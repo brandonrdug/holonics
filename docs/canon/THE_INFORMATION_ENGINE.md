@@ -7,10 +7,10 @@ ambition directs the breadth of its applications; each law, realization and prod
 actual source, domain and evidence.
 
 [definition] This is doctrine about the construction, not a component census or current-status
-page. [The roadmap](../plans/THE_ROADMAP.md) orders work and
+page. [The roadmap](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_ROADMAP.md) orders work and
 [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md) records its returned position.
-[Development](../DEVELOPMENT.md#mathematical-implementation-and-continuation) gives the working
-method; [the owner map](../ARCHITECTURE_MAP.md) locates formal and executable implementations.
+[Development](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/DEVELOPMENT.md#mathematical-implementation-and-continuation) gives the working
+method; [the owner map](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/ARCHITECTURE_MAP.md) locates formal and executable implementations.
 
 ## 1. One recurrence, several mathematical questions
 

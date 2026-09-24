@@ -1,8 +1,8 @@
 # The explorative failure
 
 [definition] The current enactment is the repository
-[research skill](../../.agents/skills/holonics-research/SKILL.md) and
-[recovery method](../DEVELOPMENT.md#research-recovery-and-derivation). The instances below
+[research skill](https://github.com/brandonrdug/holonics/blob/13f8c734/.agents/skills/holonics-research/SKILL.md) and
+[recovery method](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/DEVELOPMENT.md#research-recovery-and-derivation). The instances below
 retain their historical source coordinates; old CLAUDE sections, owner censuses and line-count
 comparisons do not reinstate retired process gates. Current AGENTS governs. The live corrective
 operation is to recover the relation's existing owner and work the actual failed composition

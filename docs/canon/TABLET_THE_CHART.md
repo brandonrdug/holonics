@@ -388,7 +388,7 @@ power work. These repair the August gap; they do not provide a universal solver 
 [project-postulate] Count exact work and measure elapsed performance. Declared scalar objectives,
 timing statistics and wall-time budgets are lawful receivers/policies with their units and
 conditions. A fitted time curve or timeout does not prove mathematical infeasibility.
-Use [the measurement conventions](../DEVELOPMENT.md#performance-and-information-measurements)
+Use [the measurement conventions](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/DEVELOPMENT.md#performance-and-information-measurements)
 and preserve both the resource vector and the requested scalar display.
 
 ---

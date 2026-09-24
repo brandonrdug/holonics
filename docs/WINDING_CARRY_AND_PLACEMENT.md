@@ -8,7 +8,11 @@ cross-sections and the tower through which an object continues. Each entry gives
 checked Lean statement, its Rust owner and the boundary between theorem and correspondence.
 The [helical guide](HELICAL_GEOMETRY.md) owns the pair geometry, the
 [September 21 record](../research/records/2026-09-21_WINDING_CARRY_FACES_AND_PLACEMENT_GENERALIZE_THE_HELICAL_PAIR.md)
-the source recovery behind this synthesis, and the [roadmap](plans/THE_ROADMAP.md) the order.
+the source recovery behind this synthesis, and [THE_REBUILD](plans/THE_REBUILD.md) the order. A
+**navigator** is the object with an initial configuration, its own clock and carry, and address
+words ([elementary objects §3](ELEMENTARY_OBJECTS.md#3-navigator)); **generator** here keeps its
+algebraic senses (a group generator, the Lie generator of a helix). Lean module names such as
+`GeneratorTraceFaces` keep their spelling until the rebuild renames them.
 
 [project-postulate] These objects are one picture. A design or a worker brief states which of
 them it touches and keeps the others attached: phase with its carry, a pair with its address,
@@ -21,7 +25,7 @@ physical and learning applications are instances; none of them owns a private ve
 [proved-derived; formal-checked] A phase modulo `n` is a reading on a circle, `x % n`. The
 winding is `x / n`, and `phase + n·winding = x`. Adding phases digit-wise fails by the **carry**
 `⌊(a%n + b%n)/n⌋`, a staircase taking the values 0 and 1.
-[`Geometry/PhaseCarry.lean`](../formal/elementary-holonics/ElementaryHolonics/Geometry/PhaseCarry.lean):
+[`Geometry/PhaseCarry.lean`](../lean/ElementaryHolonics/Geometry/PhaseCarry.lean):
 
 ```text
 winding_add              winding(x+y) = winding x + winding y + carry(x,y)
@@ -60,9 +64,9 @@ full dependency and decoder maps as in §6.
 synchronized direction satisfies `q·v_a=p·v_b`. Periodic closure and dynamical attraction to a
 locked orbit are further properties of the actual motion, not consequences of this local equation.
 The pair-contact lock laws are owned by
-[`Transport/HelicalPairInteraction.lean`](../formal/elementary-holonics/ElementaryHolonics/Transport/HelicalPairInteraction.lean);
+[`Transport/HelicalPairInteraction.lean`](../lean/ElementaryHolonics/Transport/HelicalPairInteraction.lean);
 the address and mediant laws remain in
-[`Geometry/PairResonance.lean`](../formal/elementary-holonics/ElementaryHolonics/Geometry/PairResonance.lean):
+[`Geometry/PairResonance.lean`](../lean/ElementaryHolonics/Geometry/PairResonance.lean):
 
 ```text
 HelicalPairInteraction.lock_iff_zero_power  with positive weight and null-definite response, zero power ⇔ q·v_a = p·v_b
@@ -97,7 +101,7 @@ The modular step/inversion representation and a finite rotor step/reflector each
 ordered group actions; identifying them requires a homomorphism respecting their relations.
 An arbitrary reflector is not a modular inversion merely because both are involutive. The
 Farey determinant also gives the tangency law of Ford circles (`a/b`, `c/d` tangent iff
-`|ad−bc|=1`), read by `Foundation/FractalPacking` as packing by mediants. Native owner: `relational_geometry::winding::LockAddress`.
+`|ad−bc|=1`), read by `Foundation/FractalPacking` as packing by mediants. Rust owner: `holonics::geometry::winding::LockAddress`.
 
 [interpretation] Mode-locking staircases provide an analytic instance for specified driven
 circle-map families ([Alsedà–Borrós-Cullell](https://arxiv.org/abs/2012.03340)); transferring that
@@ -106,11 +110,11 @@ obligation is to exhibit a stable periodic orbit and its drive interval. The rig
 family `x ↦ x+α` has rotation number `α` and no plateaus, refuting a universal staircase claim
 for driven pairs. The local lock theorem above remains independent of that analytic question.
 
-## 3. Generator faces, rotation–dilation and placement
+## 3. Navigator faces, rotation–dilation and placement
 
 [proved-derived; formal-checked] Carrying material to another phase conjugates it, so every class
 function of the material is conserved along the winding.
-[`Transport/GeneratorTraceFaces.lean`](../formal/elementary-holonics/ElementaryHolonics/Transport/GeneratorTraceFaces.lean):
+[`Transport/GeneratorTraceFaces.lean`](../lean/ElementaryHolonics/Transport/GeneratorTraceFaces.lean):
 
 ```text
 phaseTransport_pow                                   (S⁻ᵈPSᵈ)ᵏ = S⁻ᵈPᵏSᵈ
@@ -127,14 +131,14 @@ machine_trace_sequence                               tr((⊕M_g)ᵏ) = Σ tr(M_g
 ℝ to a rotation scaled by `√q` in an adapted metric; `TraceSequence.theRootHasSquaredModulusQ`
 and `LocalFactor.companion_preserves_scaled_metric` own these readings. `a²=4q` permits a
 nontrivial Jordan shear; `a²>4q` gives distinct real eigenvalues, including negative or zero
-ones when admitted. The native `SiteKind::{Rotation,Marginal,Dilation}` names these discriminant
+ones when admitted. `holonics::geometry::winding::SiteKind::{Rotation,Marginal,Dilation}` names these discriminant
 branches, not a universal Euclidean polar decomposition. A `SituatedScrew` does not determine
 a `SiteFactor`: the model must supply the represented two-dimensional material block. Larger
 or coupled blocks retain their own operator and faces.
 
 [proved-derived; formal-checked] For **block-diagonal** sites, the transfer determinant is the
-product of their factors and the trace sequence is the sum of theirs. Native owner:
-`relational_geometry::winding::{SiteFactor,Machine}`. Trace powers count weighted closed walks
+product of their factors and the trace sequence is the sum of theirs. Rust owner:
+`holonics::geometry::winding::{SiteFactor,Machine}`. Trace powers count weighted closed walks
 when the material is an adjacency representation; for a general matrix they are trace readings.
 Newton's identities check spectral consistency. They do not prove source/receiver equivalence:
 `I₂` and `[[1,1],[0,1]]` both have trace powers `2` and transfer determinant `(1−T)²`, but the
@@ -146,7 +150,8 @@ has a different determinant.
 [conditional] **Placement** asks whether specified spectral modes lie on a circle after a
 common positive dilation, or on an axis in a generator chart. The applicable operator,
 pairing and bridge between these readings must be declared. For a nondegenerate form `G` with
-signature `(p,q)`, the existing `StructuralPlacement::PontryaginBounded` arm requires
+signature `(p,q)`, the Pontryagin arm (realized by the prototype's `StructuralPlacement::PontryaginBounded` in
+[`holonic_interaction.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/holonic_interaction.rs)) requires
 `A*G+GA=0` and bounds open-right-half-plane modes by `min(p,q)`; its spectral symmetry is
 `λ ↦ −conj λ`. `Millennium/HodgeIndex` and `ReflectedPositivity` give related signature
 constructions, and #54 owns the corresponding Lean lift. A general dissipative
@@ -158,7 +163,7 @@ nor transfers the conservative bound to all of its off-axis modes. The exact rat
 
 [proved-derived; formal-checked] The face read at a two-cell is the holonomy of the edge
 transports around it.
-[`Transport/CellHolonomy.lean`](../formal/elementary-holonics/ElementaryHolonics/Transport/CellHolonomy.lean):
+[`Transport/CellHolonomy.lean`](../lean/ElementaryHolonics/Transport/CellHolonomy.lean):
 
 ```text
 triangleHolonomy_regauge             regauging conjugates the holonomy by the base frame
@@ -177,7 +182,7 @@ is why a matrix is the natural unit of a face. For proper rigid edge transports 
 those need not be rigid screws. `burgers_step` returns the translation only when the linear
 part is identity. For a rotating affine holonomy `(R,t)`, closure of a based point is
 `(R−I)x+t=0`; closure of the whole frame is `R=I, t=0`. Translation alone is not the test.
-The native `followed_by` convention applies maps left to right, whereas standard column
+The `followed_by` convention of `holonics::geometry` applies maps left to right, whereas standard column
 matrices/permutations multiply right to left. Its formal realization uses the opposite group
 or reverses the represented word; a noncommuting triangle checks the convention.
 Faraday induction additionally supplies the constitutive/time law and orientation
@@ -211,10 +216,12 @@ modes. It is one object with two readings: a map from one section to the other,
 and pairing readings. In a heat/Euclidean specialization, propagation is `e^{−tH}`; after
 supplying units, `t` can be an inverse-temperature parameter. A trace-class closing gives
 `tr(e^{−tH})`. A torus or exchange of its clock cycles requires the additional periodic
-geometric and boundary structure; a general tube does not supply it automatically. **Integration by reflection** (`diffusion.rs`, `causal_reflection.rs`) eliminates
+geometric and boundary structure; a general tube does not supply it automatically. **Integration by reflection** eliminates
 the interior to the boundary; that Schur complement is the discrete Dirichlet-to-Neumann map
-and the reflection coefficient of `Millennium/Horizon.smith`. `traversible_chain` owns ordered
-transfer matrices, `Transport/ContinuingTube` and `WorldTube` the continuing tube,
+and the reflection coefficient of `Millennium/Horizon.smith` (`Physics/ReflectedBoundaryMemory`;
+the prototype realized it in [`diffusion.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/diffusion.rs) and
+ordered transfer matrices in [`traversible_chain.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/traversible_chain.rs)).
+`Transport/ContinuingTube` and `WorldTube` own the continuing tube,
 `RH/FosterTanks` the lossless reading in which every zero pair is an LC tank.
 
 [proved-standard] The cusp of the modular surface is such a tube: the wave
@@ -234,11 +241,12 @@ boundary can obstruct extension, and monodromy records path dependence where con
 exists. Slice data has a unique development only for the specified well-posed equation and
 boundary/gauge conditions. A coherent thread through a tower lifts level by level, uniquely
 when the required lifting condition holds (Hensel; `Millennium/FamilyTunnellBrandtPadicHensel`, `Foundation/ContinuingTower`).
-Holon : tensor : matrix is a section with its generator : its value in a chart : its components
-in a frame. An admitted [D-finite function](https://math.mit.edu/~rstan/pubs/pubfiles/45.pdf) is an algorithmic instance: a generator and finite
-initial data, closed under sum, product and integral, with a supplied annihilator and sufficient exact initial data deciding equality on the
+Holon : tensor : matrix is a section with its navigator : its value in a chart : its components
+in a frame. An admitted [D-finite function](https://math.mit.edu/~rstan/pubs/pubfiles/45.pdf) is an algorithmic instance: a navigator (an annihilating
+operator) with finite initial data, closed under sum, product and integral, with a supplied annihilator and sufficient exact initial data deciding equality on the
 admitted germ/domain. Creative telescoping constructs differential/recurrence relations for
-specified sums and integrals, with their boundary terms; it is the target class of the [identity atlas](plans/THE_IDENTITIES_OF_A_CONFIGURATION_ARE_THE_KERNEL_OF_ITS_FACE_MAP.md).
+specified sums and integrals, with their boundary terms; it is the target class of the [identity atlas](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_IDENTITIES_OF_A_CONFIGURATION_ARE_THE_KERNEL_OF_ITS_FACE_MAP.md),
+the landmark search of rebuild step 3.
 
 [definition] Compression of functionality keeps what admitted futures can distinguish and the
 gluing between levels. Minimal realization (Myhill–Nerode, Kalman) is future-distinguishability,
@@ -275,13 +283,13 @@ reflected pair with distinct advances that reads zero power on the declared face
 pair whose tank is not lossless, would break the correspondence.
 
 [proved-derived; formal-checked] The first derivation target is returned by
-[`RH/ZeroPairLock.lean`](../formal/elementary-holonics/ElementaryHolonics/RH/ZeroPairLock.lean):
+[`RH/ZeroPairLock.lean`](../lean/ElementaryHolonics/RH/ZeroPairLock.lean):
 on the isotropic unit face the reflected pair's power is the squared advance defect
 `(2σ−1)²` (`reflectedPairPower_eq`); the pair is locked exactly when `σ = ½`
 (`reflected_pair_locked_iff_on_seam`); and for `γ ≠ 0` that is exactly when the `FosterTanks`
 inductance of `ρ′` is a positive real (`locked_iff_foster_inductance_positive`). The lock of the
 helical pair and Foster losslessness of the tank are the same locus. This is an algebraic
-statement about generators; it says nothing about where zeros lie. Next target: the finite
+statement about the pair's generators; it says nothing about where zeros lie. Next target: the finite
 Foster sum `flux_eq_tankSum` as a `contactForm` over a population of pair faces.
 
 ## 8. Using the picture in a design
@@ -302,5 +310,5 @@ Foster sum `flux_eq_tankSum` as a `contactForm` over a population of pair faces.
 6. **Continuation.** The level the object lifts from, the condition under which the lift is
    unique and the fibre retained when it is not.
 
-Each native packet lands with the Lean statement of the law it adds under the matching
+Each Rust packet lands with the Lean statement of the law it adds under the matching
 `Framework` entry point, or names the obligation it leaves in #62.

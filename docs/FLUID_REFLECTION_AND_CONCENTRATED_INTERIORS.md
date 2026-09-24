@@ -4,10 +4,10 @@
 lightning leaders and return strokes, torus/friction mechanics, stellar collisions, concentrated
 interiors, predictive release and HNN. The requested singularity is a receiver-visible
 concentration whose interior has dynamics at another scale. The physical source and its
-interior remain part of the construction. The roadmap retains construction order.
+interior remain part of the construction. [THE_REBUILD](plans/THE_REBUILD.md) orders construction.
 
 [definition] The [Swing-to-fluid derivation](HOLONIC_FLUID_CONSTRUCTION.md) now joins these
-sources into one construction: native graph reflection, material-action Euler, stress and
+sources into one construction: constitutive graph reflection, material-action Euler, stress and
 relativistic projections, Hodge pressure elimination, microscopic feedback and boundary
 memory, then an energy-balanced internal-field stress/diffusion extension. It retains the
 complex-Euler/MHD sign distinction and the source-qualified Hodge/RH/BSD connections.
@@ -127,8 +127,8 @@ e_t + (VI)_s = e_source I + i_source V - R I² - G V²
 The last term is exchange with changing geometry/material storage; it cannot be discarded by
 calling L and C weights. R I² and G V² become nonnegative dissipation for nonnegative R,G.
 Their thermalized fraction feeds temperature and then conductivity. This composes the existing
-[port-energy law](../formal/elementary-holonics/ElementaryHolonics/Physics/PortEnergyHeat.lean)
-and [scattering/heat law](../formal/elementary-holonics/ElementaryHolonics/Physics/ScatteringWaveHeat.lean)
+[port-energy law](../lean/ElementaryHolonics/Physics/PortEnergyHeat.lean)
+and [scattering/heat law](../lean/ElementaryHolonics/Physics/ScatteringWaveHeat.lean)
 with an explicit propagation source. It is a reduced physical equation, not a calibrated full
 lightning simulation.
 
@@ -158,8 +158,8 @@ electromagnetic propagation does not require a stream of conducting electrons. A
 membrane additionally supplies its ionic/electrochemical transport and channel kinetics.
 The leader/channel equations above already couple charge transport, ionization, conductivity,
 heat and changed geometry; the continuum Euler/NS and Maxwell stress account describes their
-fluid response at the declared approximation. This is the reusable feedback the engine's
-context/attention interfaces should retain.
+fluid response at the declared approximation. This is the reusable feedback the HNN's
+context/attention interfaces retain.
 
 ### Elimination retains the boundary's dynamical memory
 
@@ -182,7 +182,7 @@ the dynamic content to retain when a channel, fluid region or HNN constituent is
 It need not be implemented by saving every earlier event; a closed state realization can carry it.
 
 [proved-derived; formal-checked] For the candidate interior chart `z=K x+r`, the
-[reflected-boundary owner](../formal/elementary-holonics/ElementaryHolonics/Physics/ReflectedBoundaryMemory.lean)
+[reflected-boundary owner](../lean/ElementaryHolonics/Physics/ReflectedBoundaryMemory.lean)
 derives the complete return:
 
 ```text
@@ -268,13 +268,13 @@ MHD induction is `-2 Bop(b,u)`. Its real receiver retains the force `Bop(b,b)`.
 The sign of the stretching term matters physically. Complex Fourier amplitudes for one real
 field and the additional pair (u,b) are distinct charts. A common imaginary symbol does not
 identify their operations. The finite Galerkin implementation of this algebra is
-[ConductiveFluidReflection](../formal/elementary-holonics/ElementaryHolonics/Physics/ConductiveFluidReflection.lean).
+[ConductiveFluidReflection](../lean/ElementaryHolonics/Physics/ConductiveFluidReflection.lean).
 
 [proved-derived] Conjugation of the added field pair sends (u,b) to (u,-b). Its fixed part is u,
 but projecting to that fixed part before the quadratic operation loses `Bop(b,b)`. This is a
 precise Galois/involution connection: averaging a symmetry is linear and need not preserve
 nonlinear products. The existing
-[fluid receiver closure](../formal/elementary-holonics/ElementaryHolonics/Physics/FluidReceiverClosure.lean)
+[fluid receiver closure](../lean/ElementaryHolonics/Physics/FluidReceiverClosure.lean)
 retains `Bop(U,r)+Bop(r,U)+Bop(r,r)` and the changing receiver term. Hodge projection removes
 the appropriate pressure component; it does not remove arbitrary circulation or hidden feedback.
 
@@ -303,7 +303,7 @@ can enter and leave that receiver's resolution. A diverging physical norm at an 
 its own scale/clock and regularity analysis; changing coordinates alone does not prove it bounded.
 
 [established-bounded; source-inspected] The existing
-[dynamic rescaling](../formal/elementary-holonics/ElementaryHolonics/Millennium/NavierStokesDynamicRescaling.lean)
+[dynamic rescaling](../lean/ElementaryHolonics/Millennium/NavierStokesDynamicRescaling.lean)
 uses moving centre, scale, amplitude and physical time together. It retains the scale drift,
 centre velocity, amplitude rate, viscosity conversion and forcing. The endpoint owners retain
 conditions under which a nonvanishing normalized value or gradient obstructs smooth extension.
@@ -393,7 +393,7 @@ xi-zero/threshold inequality; it supplies operators and receiver questions to in
 
 [project-postulate] HNN should be developed as an interacting field/body system with formative
 constitutive geometry. Its source currents, phases, incidence, local reaction and return are
-the machinery; particle, mesh, mode and generator representations are chosen by their lawful
+the machinery; particle, mesh, mode and navigator representations are chosen by their lawful
 receivers and costs. A physical realization supplies units and its constitutive law. A statistical
 fit can estimate a local relation within this system; it cannot substitute for the missing
 current, coupling, clock or interior state. Model labels and generic ML terminology decide none
@@ -408,6 +408,7 @@ Neither requires storing every event or treating every holon as an individually 
 
 [definition] A physical performance report therefore includes the simulated-time advance per
 wall-time, resolved region/modes, constitutive model and error/closure bounds. Receiver frames
-and local updates can additionally be counted as FPS/TPS-like rates using the existing
-[measurement conventions](DEVELOPMENT.md#performance-and-information-measurements). A logical
-HNN epoch is not a physical timestep until its clock map is supplied.
+and local updates can additionally be counted as FPS/TPS-like rates using the
+[measurement conventions](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/DEVELOPMENT.md#performance-and-information-measurements). An
+HNN epoch (a division of an aeon at a receiver's section) is not a physical timestep until its
+clock map is supplied.

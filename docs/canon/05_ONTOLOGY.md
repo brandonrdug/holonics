@@ -83,7 +83,7 @@ composable, rather than become another qualitative gate on intelligence.
 
 [definition] Each realized claim retains its typed participants, source/constitutive relation,
 receiving consequence, applicable conditions and implementation or measurement evidence.
-The [mathematical implementation contract](../DEVELOPMENT.md#mathematical-implementation-and-continuation)
+The [mathematical implementation contract](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/DEVELOPMENT.md#mathematical-implementation-and-continuation)
 owns that account and its relevant costs. It applies to the actual operation being constructed;
 no extra later-state mutation is required to recognize a solver or generated face.
 

@@ -110,7 +110,7 @@ require their own typed hypotheses.
 
 ## Formal companion
 
-[`../../../formal/elementary-holonics/`](../../../../formal/elementary-holonics) is the retained Lean trust
+[`lean/`](../../../../lean) is the retained Lean trust
 boundary. It formalizes the elementary relational/algorithmic spine and selected exact identities.
 It does not formalize RH by replacing it with a finite surrogate. The older Labyrinth and Shrine
 formal trees are historical/toy unless an individual result is rederived into the current package.

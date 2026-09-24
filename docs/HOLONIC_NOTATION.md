@@ -42,7 +42,7 @@ separately. A frame change transports every index together with its dual,
 `H^{i'} = Λ^{i'}_i H^i`, `r_{j'} = r_j (Λ⁻¹)^j_{j'}`; primes name the frame, as in relativity.
 Lorentz/gyro transport, the connection and its holonomy enter as the transports they are
 ([constraint modes and receiver faces](CONSTRAINT_MODES_AND_RECEIVER_FACES.md)). Ket notation
-grants no linearity: a nonlinear generator is a composed map whose differentials have their own
+grants no linearity: a nonlinear navigator is a composed map whose differentials have their own
 tensor charts.
 
 ## Arrows, signs and turns
@@ -63,8 +63,8 @@ here; it is not supplied by the spelling of a Boolean or by a machine-word size.
 `−1=e^{iπ}` enacts a half-turn on the declared complex carrier; `i=e^{iπ/2}` enacts a quarter-turn.
 A sign may also be the resulting state face. Composition retains the actual path, frame and
 winding rather than identifying a full turn history with its final binary face. Positivity
-retains its declared split and choice of hand; the existing `winding_inertia` and `inertia`
-own the corresponding winding and signature readings. [Binary phase and coupled energy](../formal/elementary-holonics/ElementaryHolonics/Physics/PhaseCarrier.lean).
+retains its declared split and choice of hand; `holonics::geometry::winding_inertia` and
+`holonics::inertia` own the corresponding winding and signature readings. [Binary phase and coupled energy](../lean/ElementaryHolonics/Physics/PhaseCarrier.lean).
 
 [definition] A one-axis binary reading is an admitted face of a framed source. It need not
 identify the full source. An operation using relative quadrature, phase or further directional
@@ -106,8 +106,9 @@ Three states are therefore distinct. **Unoriented**: no section of the hand's do
 been chosen; this is potential, the state of every abstract expression. **Oriented relative to a
 frame**: a coherent section exists over the region that frame covers. **Non-orientable**: the hand
 has nontrivial holonomy around a loop (a class in `H¹(·; ℤ/2)`), exhibited as conflicting faces and
-derived from twist parity, never stored (`contact_gluing::OrientationReading`,
-`structure_group::CentralDoubleCover`). Because loops form and dissolve as incidence changes,
+derived from twist parity, never stored (`Objects/Pairing.no_orientation_of_reversing_cycle`,
+`Objects/Orientation`; the prototype's `contact_gluing::OrientationReading` and
+`structure_group::CentralDoubleCover` at `13f8c734`). Because loops form and dissolve as incidence changes,
 orientability is a reading of the continuing object at a station, not a fixed attribute: a
 configuration can be unoriented, become oriented under a frame, and acquire or lose a twisted
 loop as contacts form.
@@ -122,8 +123,8 @@ faces; a progression retains ordered passages and actual joins. These examples d
 general computational quanta or prescribe their names.
 The [class/occurrence construction](../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md#class-composed-occurrence-and-progression)
 and [music/receiver synthesis](../research/records/2026-09-14_HEAR_THE_MUSIC_SITUATED_RELEASE_AND_SELF_MOTION.md#hear-the-chord-the-interval-and-the-progression)
-retain that example's content. The [compression/intelligence/navigation construction](canon/THE_REALITY_OF_DIFFERENCE.md#current-changes-form-later-current-encounters-that-form)
-concerns the reusable paths and generating relations across these different presentations.
+retain that example's content. [Compression is intelligence is navigation](plans/THE_REBUILD.md#the-line-the-rebuild-serves)
+concerns the reusable paths and navigators across these different presentations.
 
 ## The same form in every subject
 
@@ -136,5 +137,6 @@ dynamics, Hurwitz limits, Foster classes and the explicit formula). Hodge is the
 (the obstruction lives in the cokernel of the cycle class map; `Millennium/Hodge*` holds the
 finite decomposition, harmonic representatives and the `(1, n−1)` index). Navier–Stokes and
 complex Euler are the transport law with and without dissipation (`Millennium/NavierStokes*`).
-Iwasawa theory is the tower of levels and its growth law (`Foundation/IwasawaTower.lean`,
-`iwasawa_tower.rs`). None is a separate track, and none is a prerequisite for an application.
+Iwasawa theory is the tower of levels and its growth law (`Foundation/IwasawaTower.lean`). None is
+a separate track, and none is a prerequisite for an application: each is an instance of
+compression and landmark discovery.

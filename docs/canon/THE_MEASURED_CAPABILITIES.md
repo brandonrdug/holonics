@@ -4,7 +4,7 @@
 measurements retain their original scope and value; its counts and capability summaries are
 not a second current position. Consult later direct rulings and [retractions](../RETRACTIONS.md)
 when recovering a construction, then follow the actual current source and consumer through
-[the owner map](../ARCHITECTURE_MAP.md). No archived benchmark or census is a mandatory pickup run.
+[the owner map](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/ARCHITECTURE_MAP.md). No archived benchmark or census is a mandatory pickup run.
 
 **Genre:** historical evidence navigation (`docs/canon/THE_DOCUMENT_LAW.md` §1.1).
 `docs/plans/THE_ROADMAP.md` orders construction; `CONSTRUCTION_STATE.md` records the current

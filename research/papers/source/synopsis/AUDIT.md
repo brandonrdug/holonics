@@ -27,12 +27,17 @@ files. Old entries remain source material until imported and regraded one by one
 
 ## Formal corpus
 
-The current formal foundation is `formal/elementary-holonics/`: pinned Lean/Mathlib, no
-`sorry`, exact receiver factorization, situated transition paths, conjugate rebase, telescoping,
-the exact numerator--denominator Swing carrier, and Mathlib's actual `RiemannHypothesis`
-proposition. `formal/rh-source-transport/` remains a separate exact finite conditional
-result whose proportional candidate is rejected at the claimed analytic scope; it is not an RH
-proof.
+The current formal foundation is `lean/` (formerly `formal/elementary-holonics/`): pinned
+Lean/Mathlib, no `sorry`, exact receiver factorization, situated transition paths, conjugate
+rebase, telescoping, the exact numerator--denominator Swing carrier, and Mathlib's actual
+`RiemannHypothesis` proposition. The divisor-source transport of
+`divisor-source-transport-boundary.typ` is checked in
+`lean/ElementaryHolonics/RH/DivisorSourceTransport.lean` (the finite proportional-transport
+implication and its subset-overload converse) and `RH/DivisorQuotientFamily.lean` (the exact
+integer quotient re-indexing), ported on September 24, 2026 from the former side project
+`formal/rh-source-transport/`. It remains an exact finite conditional result whose proportional
+candidate is rejected at the claimed analytic scope (the primorial obstruction, whose analytic
+estimates are not Lean-checked); it is not an RH proof.
 
 The old `src/labyrinth/mathematics/lean/` and `src/shrine/holon-math/` trees are quarantined as
 historical/toy:

@@ -26,10 +26,10 @@ be carried by rational homogeneous data satisfying `c²+s²=1`; no angle mantiss
 [proved-derived; formal-checked] The recovered Machin constraint is
 `(5+i)^4=(239+i)(2+2i)` and `π=16 atan(1/5)-4 atan(1/239)`.
 `MachinPhaseConstraint`, `PhaseCarrier`, `RatioSeriesTransport` and `RadixWindowReceiver`
-retain its algebra, branch, generator state and exact window laws. Native `reopening` and
-`exact_value::CertifiedSeries` carry rational partial sums and oriented remainders.
+retain its algebra, branch, navigator state and exact window laws. `holonics::exact_value::CertifiedSeries`
+carries rational partial sums and oriented remainders, as the prototype's `reopening` did at `13f8c734`.
 The [September 11 recovery](../research/records/2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md)
-connects the August exponential/kernel study to the existing code and formal owners.
+connects the August exponential/kernel study to its formal owners and the code of its date.
 
 [definition] Logarithm is the inverse of normalized real exponential transport on the
 positive branch, or a complex lifted branch with its winding. A positive rational kernel K
@@ -51,23 +51,25 @@ meromorphic domain and poles. The shift law gives finite products and noncommuti
 coordinate operators even without evaluating one absolute Gamma seed. This is distinct
 from Kelvin circulation `Γ_K=∮v·dl`. Riemann, Hurwitz, Dedekind and dynamical zeta constructions
 likewise retain their particular coefficient source, product, continuation and receiver.
-The [framework synthesis](MATHEMATICS_AND_NATIVE_CONDUCT.md) links the actual golden/Gamma/
-zeta relations, Gaussian rebase and the two separately named de Bruijn boundaries.
+The [framework synthesis](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/MATHEMATICS_AND_NATIVE_CONDUCT.md#constraint-defined-modes-and-named-de-bruijn-boundaries)
+links the actual golden/Gamma/zeta relations, Gaussian rebase and the two separately named de
+Bruijn boundaries.
 
 [definition] The golden mode is algebraic: `φ²=φ+1`, `φ>1`. Its reciprocal, fifth-turn
 face and Fibonacci residue are parts of the same constrained construction. Its connection
 to Euler-Gamma and Dirichlet/dynamical zeta comes through explicit identities, not a shared
 decimal. Copson–de Bruijn `c_CD` is a variational/recurrence threshold; de Bruijn–Newman
 `Λ_DN` is a heat-flow real-zero threshold. Their lower-boundary pattern is reusable, but
-no equality of those constants is asserted. The [chronological synthesis](MATHEMATICS_AND_NATIVE_CONDUCT.md)
+no equality of those constants is asserted. The same [synthesis](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/MATHEMATICS_AND_NATIVE_CONDUCT.md#constraint-defined-modes-and-named-de-bruijn-boundaries)
 retains the finite/infinite boundaries, normalized drift and heat-coordinate/time corrections.
 
-[established-bounded; source-inspected] The hypergeometric closure owner supplies another
-concrete connection: rational local turn differences `1-c`, `c-a-b`, `a-b` become integer
+[established-bounded; source-inspected] Hypergeometric closure supplies another concrete
+connection: rational local turn differences `1-c`, `c-a-b`, `a-b` become integer
 residues on a common cyclic chart. Under its irreducibility/domain conditions, Galois-rebased
-interlacing decides finite monodromy. `hypergeometric_closure.rs` performs those exact integer
-operations instead of evaluating transcendental angles. This connects constraint-defined
-analytic solutions, phase, group transport and algebraic closure at an actual native owner.
+interlacing decides finite monodromy. The retired
+[`hypergeometric_closure.rs`](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/hypergeometric_closure.rs)
+performed those exact integer operations instead of evaluating transcendental angles, joining
+constraint-defined analytic solutions, phase, group transport and algebraic closure.
 It does not identify every finite reflection group or rational local descriptor with one
 universal global geometry.
 
@@ -167,8 +169,8 @@ specialization of the general connection/holonomy account; the diagram's four ve
 not make it a spacetime four-volume. The existing `Geometry/Gyrogroup` owns the algebraic
 contract and its flat additive restriction.
 
-[established-bounded; implemented-exact] The new
-[contact receiver calculation](../research/experiments/contact_receiver_faces/README.md)
+[established-bounded; implemented-exact] The prototype's
+[contact receiver calculation](https://github.com/brandonrdug/holonics/blob/13f8c734/research/experiments/contact_receiver_faces/README.md)
 uses rational velocities `u/c=(3/5,0,0)`, `v/c=(0,4/5,0)`. It obtains
 `u⊕v=(3/5,16/25,0)`, `v⊕u=(9/25,4/5,0)`, and spatial gyration
 `[[35,12],[-12,35]]/37`. The fourth vertex is `(315/781,560/781,0)` and its

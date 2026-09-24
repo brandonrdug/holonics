@@ -3,23 +3,28 @@
 > **ARCHIVE BANNER — 2026-08-28 RESEARCH-STATION SNAPSHOT.** This catalog preserves the measured
 > theorem inventory and open mathematical fibres of that date. It is not a current build report,
 > roadmap, or construction authority; every “next”, “current”, and “present” below is historical
-> testimony. The sole schedule is [`docs/plans/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md).
+> testimony. Construction order is [`docs/plans/THE_REBUILD.md`](../docs/plans/THE_REBUILD.md).
 > The current subject entry point is `ElementaryHolonics.Framework`; `ElementaryHolonics` retains
 > the complete research surface. See the [current Lean guide](README.md) for source organization,
 > pinned verification and scope. Build claims below belong to the snapshot date.
+>
+> The targets catalogued here are instances of Holonic Compression and landmark discovery
+> ([THE_REBUILD, "The line"](../docs/plans/THE_REBUILD.md#the-line-the-rebuild-serves)), not a
+> separate category.
 
 **Date:** 2026-08-28
 **Scope:** exterior Lean theorem station under `ElementaryHolonics`; this document schedules no
 Rust/CUDA construction and does not alter `CONSTRUCTION_STATE.md`.
-**Catalog owner:** `formal/elementary-holonics/MILLENNIUM_FORMAL_CATALOG.md`
+**Catalog owner:** `lean/MILLENNIUM_FORMAL_CATALOG.md` (at the snapshot date,
+`formal/elementary-holonics/MILLENNIUM_FORMAL_CATALOG.md`)
 **Snapshot research import face:** `ElementaryHolonics.lean`
 
 ## 1. Purpose and provenance discipline
 
 [definition] This is the surface-level catalog of the repository's Millennium mathematics.  It
 records the strongest checked returns, their external mathematical substrate, the project's local
-formulation or composition, their hypotheses, and the exact open fibre.  `docs/CLAIM_INDEX.md` is a
-generated document router and is not a substitute for this mathematical progress catalog.
+formulation or composition, their hypotheses, and the exact open fibre.  The retired
+`docs/CLAIM_INDEX.md` was a generated document router, not a substitute for this catalog.
 
 [definition] The provenance labels used below are:
 
@@ -71,7 +76,7 @@ foundation and official-pose owners used below, but no current claim may cite th
 as a station-wide proof receipt until those failures are repaired and the `sorryAx` emissions in
 the failing targets are removed.
 
-[definition] The reproducible inventory receiver is:
+[definition] The reproducible inventory receiver, run from `lean/`, is:
 
 ```bash
 rg --files ElementaryHolonics -g '*.lean' | wc -l
@@ -85,7 +90,9 @@ rg -n '^\s*(theorem|lemma|def|abbrev|structure|class|inductive)\s+' \
 rg -n '^#print axioms' ElementaryHolonics/Millennium -g '*.lean' | wc -l
 ```
 
-[definition] Counts establish the size of the source population only.  A declaration count is not
+[definition] Verification of a target is `bash tools/lean_check.sh <module>` from the repository
+root, or `bash tools/lean_check.sh ElementaryHolonics` for the complete research import face.
+Counts establish the size of the source population only.  A declaration count is not
 a theorem-strength metric, and an axiom-audit command is not itself proof that every declaration in
 the library has the same dependency boundary.  The per-worktrack rows below name the mathematical
 returns that matter.
@@ -969,7 +976,7 @@ For a discrete transport `T`, the same operator is `T - I` and its `k`th finite 
 additively enriched category the subtraction occurs in a hom-group; an arbitrary category does not
 provide that operation merely because its arrows compose.
 
-[established-bounded; implemented-exact] `applications/derivation-atlas` now returns two additional
+[established-bounded; implemented-exact] [`applications/derivation-atlas`](https://github.com/brandonrdug/holonics/tree/23982c5e/applications/derivation-atlas) (retired; its Lean exporter is `lean/DerivationAtlas.lean`) returned two additional
 receivers without changing the Lean export schema: exact complete-operation argument transitions,
 and same-head structural recurrence towers with the finite-difference rows of their occurrence
 profiles.  Function-side partial applications introduced by Lean's curried encoding are removed per
@@ -1081,7 +1088,7 @@ region and compose its retained magnitude faces through the existing dyadic Hodg
    owners only through declared source maps, retaining every reconstruction fibre.
 
 [definition] This order is an exterior mathematical worktrack.  It does not supersede
-`docs/plans/THE_ROADMAP.md`, schedule the production engine, or authorize updates to root
+`docs/plans/THE_REBUILD.md`, schedule the HNN, or authorize updates to root
 `CONSTRUCTION_STATE.md`.
 
 ## 16. Maintenance rule

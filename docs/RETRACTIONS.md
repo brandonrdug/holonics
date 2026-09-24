@@ -1,8 +1,12 @@
 # Capability and retraction history
 
 [definition] This is the relocated history index formerly embedded in AGENTS.md. It is evidence,
-not a scheduler. Current product architecture is in [ARCHITECTURE.md](ARCHITECTURE.md); the
-root construction state records current implementation scope. Paths in code spans are repository-relative.
+not a scheduler. The machine is stated in [THE_MACHINE](THE_MACHINE.md), construction order in
+[THE_REBUILD](plans/THE_REBUILD.md), and the root construction state records the current
+position. Paths in code spans are repository-relative at the entry's date; most name code retired
+by the September 24 reset (readable at [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734)
+or earlier). Entries keep the vocabulary of their date: "generator" for the object now called a
+navigator, "session" and "episode" for what are now aeons and epochs.
 
 ## Capability and retraction record
 
@@ -197,5 +201,5 @@ HNA/SKE native recurrence and declared-family emissions retain their own bounded
 earlier failures do not establish their absence. The historical attachment question is recorded
 in `2026-08-10_THE_MACHINE_RETURNS_EVERY_BRANCH_BECAUSE_NOTHING_ATTACHES.md`,
 `docs/canon/TABLET_THE_RESONANCE.md` §6, and
-`archive/operations/2026-09-12_INFORMATION_ENGINE_BEFORE_FRONTIER_CONSOLIDATION.md` §5; current scope is in
-`CONSTRUCTION_STATE.md`.
+[`archive/operations/2026-09-12_INFORMATION_ENGINE_BEFORE_FRONTIER_CONSOLIDATION.md`](https://github.com/brandonrdug/holonics/blob/6bcf6599/archive/operations/2026-09-12_INFORMATION_ENGINE_BEFORE_FRONTIER_CONSOLIDATION.md)
+§5; current position is in `CONSTRUCTION_STATE.md`.

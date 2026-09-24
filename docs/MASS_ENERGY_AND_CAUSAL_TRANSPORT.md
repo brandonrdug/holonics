@@ -138,8 +138,8 @@ not “nothing.”[^6]
 [definition] Nuclear decay rates additionally depend on transition dynamics, phase space,
 couplings and selection rules. An exponential population law is a statistical dynamical chart
 for that ensemble; mass–energy conservation alone does not determine a half-life. This is
-consistent with using deterministic generator evolution and declared probability receivers
-without inserting a generic decay counter into native inference.
+consistent with using deterministic evolution (its semigroup generator) and declared probability receivers
+without inserting a generic decay counter into HNN inference.
 
 ## 3. Interior-to-exterior energy transport
 
@@ -309,7 +309,7 @@ same scalar mass reading does not retain every internal mode or phase relation.
 
 [definition] Electromagnetic energy density and flux are contractions of a stress tensor,
 not by themselves a total four-momentum vector. A changed observer must transform the fields
-or the full tensor before taking those readings. The exact executable field boost therefore
+or the full tensor before taking those readings. An exact field boost therefore
 transforms E and B, preserving their two electromagnetic invariants, and only then recomputes
 u and S. It does not apply a four-vector boost to a scalar energy-density summary.
 
@@ -371,7 +371,7 @@ Newman time has the backward-heat sign and the actual xi source's analytic admis
 zero-placement problem retains that generator and source rather than borrowing forward
 heat contractivity.
 
-## 8. Modes, Hodge classes, rebase and fractal generators
+## 8. Modes, Hodge classes, rebase and fractal navigators
 
 [proved-derived; formal-checked] Mode elimination retains coefficients: if
 \(qv_* =\sum_i a_iqv_i\), the contribution \(bv_*\) is represented by adding \(ba_i\)
@@ -405,7 +405,7 @@ relative phases, multiplicities and mixed energies can all be relevant. The alge
 realizer question asks for a supported cycle realizing a rational class; the source lift
 remains the constructive task.
 
-[proved-derived] Fractal generators retain scale, restriction, orientation and separation laws.
+[proved-derived] Fractal navigators retain scale, restriction, orientation and separation laws.
 The two Cantor child maps describe an entire depth-n family without listing all its cells;
 selecting an arbitrary one of its \(2^n\) separated members still needs n fixed-length bits.
 Energy or information bounds on a branching family must also sum the admitted contributions:
@@ -428,7 +428,7 @@ shared mathematical mechanism for architecture comparison and lawful compression
 the complete internal energy of the rest-frame system, not automatically to free energy.
 Available work and retained mass–energy are different receivers of the same thermodynamic state.
 
-[proved-derived; formal-checked] The finite generator objective
+[proved-derived; formal-checked] The finite navigator objective
 \(J=L_{\rm description}+L_{\rm data}\) has posterior \(p_g\propto2^{-J_g}\), and the
 variational excess is KL in bits. Coarse classes add their weights before logarithmic
 projection: \(\bar J(c)=-\log_2\sum_{g\in c}2^{-J_g}\). The mass/current attention
@@ -506,7 +506,7 @@ its endpoint defect. The changing-capacitance owner proves the scalar material-r
 the matrix generalization \(\dot U=V^TI-\tfrac12V^T\dot C V\) follows from differentiating
 the inverse constitutive matrix as derived in the release report. Deterministic transport
 pushes unresolved source measures without sampling a different law. The physical probability
-receiver and the deterministic generator therefore coexist in one model.[^2]
+receiver and the deterministic evolution (its semigroup generator) therefore coexist in one model.[^2]
 
 [definition] Retained heat changes rest energy; translational kinetic energy changes an
 observer's energy/momentum reading. A constant-mass low-speed simulation keeps the latter
@@ -525,7 +525,7 @@ energy reading does not determine all those dynamics. The existing sequence/fold
 reaction constructions supply explicit instances of that source/future distinction.[^2]
 
 [definition] For complexity, the corresponding question is the cost of constructing and
-using a sufficient generator, including its precision, source preparation and decoder.
+using a sufficient navigator, including its precision, source preparation and decoder.
 Compact dynamics can support efficient prediction and synthesis, while a global P-versus-NP
 claim still refers to a fixed encoding and uniform computational bound. The same source and
 cost accounting applies to solvers, neural formation and physical computation.[^13]
@@ -618,7 +618,7 @@ The formal and executable owners supply their stated mathematical domains.[^2]
 1. Particle Data Group. *Kinematics*, 2025 review; invariant products and two-body kinematics.
    [Review](https://pdg.lbl.gov/2025/reviews/rpp2025-rev-kinematics.pdf).
 2. Holonics. Current formal and exact executable constructions:
-   [formal framework](FORMAL_FRAMEWORK.md), [owner map](ARCHITECTURE_MAP.md),
+   [formal framework](FORMAL_FRAMEWORK.md), [owner map](THE_MACHINE.md#how-the-geometry-reaches-the-implementation),
    [mass/Maxwell return](../research/records/2026-09-12_MASS_ENERGY_AND_MAXWELL_BOUNDS_UNIFY_TRANSPORT.md),
    [predictive release](../research/records/2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md),
    [periplus/Gamma/Hodge](../research/records/2026-09-12_PERIPLUS_REBASE_AND_TEMPORAL_RESIDUES_JOIN_GAMMA_ZETA_AND_HODGE.md),
@@ -658,7 +658,7 @@ The formal and executable owners supply their stated mathematical domains.[^2]
     [Source tree](https://github.com/teorth/equational_theories/tree/1aec8a7acf223b7c56e4830977b6e90d4ef1924b/equational_theories).
 
 [^1]: Particle Data Group, *Kinematics* (2025), [invariant kinematics](https://pdg.lbl.gov/2025/reviews/rpp2025-rev-kinematics.pdf).
-[^2]: Holonics, [formal and executable source map](ARCHITECTURE_MAP.md); theorem and experiment scopes are attached to the named owners.
+[^2]: Holonics, [formal and executable owner map](THE_MACHINE.md#how-the-geometry-reaches-the-implementation); theorem and experiment scopes are attached to the named owners.
 [^3]: Perez–Ribisi, [confined Maxwell/scalar energy and inertia](https://arxiv.org/html/2101.11923v1), §§III–VI and appendices.
 [^4]: Yang et al., [QCD energy–momentum decomposition](https://arxiv.org/html/1808.08677v2), equations (1)–(6) and renormalization scope.
 [^5]: IAEA, [nuclear source data](https://nucleus.iaea.org/Pages/ripl-3.aspx); PDG [two-body kinematics](https://pdg.lbl.gov/2025/reviews/rpp2025-rev-kinematics.pdf).

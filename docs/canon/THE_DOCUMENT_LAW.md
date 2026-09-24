@@ -10,12 +10,12 @@ contract. Brandon's latest direct request governs; these conventions support tha
 |---|---|
 | Shared machine description | [THE_MACHINE](../THE_MACHINE.md): the object, operative equations and implementation routes |
 | Harness entry points | Root [AGENTS.md](../../AGENTS.md) for Codex and self-contained [CLAUDE.md](../../CLAUDE.md) for Claude; both use the shared mathematical sources |
-| Construction order | [THE_ROADMAP](../plans/THE_ROADMAP.md), with supporting plans providing contracts rather than separate schedules |
+| Construction order | [THE_ROADMAP](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_ROADMAP.md), with supporting plans providing contracts rather than separate schedules |
 | Current position | [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md): active object, unclosed consuming operation, next action and completion evidence |
 | Mathematical/object/interface contracts | Subject guides, [HOLON](../HOLON.md), [HNN_FORMULA](../HNN_FORMULA.md), formal statements and actual native owners |
 | Doctrine and durable interpretation | `docs/canon/`, with its decisive source and exact claim scope |
 | Research and result evidence | `research/records/`, experiments, papers and notebooks at their stated scopes |
-| Discovery and navigation | [Research routes](../../research/records/README.md), [repository guide](../REPOSITORY.md), [owner map](../ARCHITECTURE_MAP.md) and direct source links |
+| Discovery and navigation | [Research routes](../../research/records/README.md), [repository guide](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/REPOSITORY.md), [owner map](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/ARCHITECTURE_MAP.md) and direct source links |
 | Historical material | `archive/`, preserved with date/provenance and a route to the current source |
 
 [definition] A useful entry point states what a thing is, its equation, where it lives and what
@@ -54,7 +54,7 @@ is resolved by checking the equation and both implementations. Source code is in
 evidence, not infallible authority over a reference calculation.
 
 [definition] Keep public records free of raw private captures and machine-specific source paths.
-The [evidence protocol](../AGENT_PROTOCOL.md) retains source coordinates and chronology. Code,
+The [evidence protocol](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/AGENT_PROTOCOL.md) retains source coordinates and chronology. Code,
 documentation and their checks can be committed together. Relocations preserve source and links;
 archive a superseded reading surface recoverably when it is still useful provenance.
 
@@ -63,7 +63,7 @@ archive a superseded reading surface recoverably when it is still useful provena
 [project-postulate] Validate the changed relation and the documentation paths it uses. Run the
 relevant implementation, formal or application checks; reuse unchanged recorded receipts.
 A documentation edit needs the checks that answer its claims, not an automatic rebuild of every
-paper or backend. The [development guide](../DEVELOPMENT.md) states the commands and scopes.
+paper or backend. The [development guide](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/DEVELOPMENT.md) states the commands and scopes.
 
 [historical] The earlier generated claim index, equation database, document-size gates and
 mandatory multi-commit ritual remain retired. Their source is preserved in

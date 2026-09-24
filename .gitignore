@@ -14,3 +14,4 @@ __pycache__/
 
 # Third-party working transcripts remain private, even inside frozen reference material.
 archive/reference/external/3b1b-compression-*
+.vscode/

@@ -34,7 +34,7 @@ site” explicit: context is a situated boundary over intersecting trees of even
 their actual incidence, flux, constitutive storage/capacitance, local chronology and interior–
 exterior response. Its instantaneous lattice is a chart of ongoing conduct. A condition vector,
 text prefix or present boundary measurement is a restriction of that situation. The
-[composition guide](../HNN_COMPOSITION.md#context-names-a-situated-causal-boundary) develops the
+[composition guide](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/HNN_COMPOSITION.md#context-names-a-situated-causal-boundary) develops the
 event-cut, state-space, convolution, diffusion and joint-prediction equations and current owners.
 The historical owner table below retains its original deposit scope; current implementation
 status belongs to CONSTRUCTION_STATE and current source.

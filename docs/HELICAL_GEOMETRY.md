@@ -1,14 +1,17 @@
-# Helical geometry: generators, paired faces and continuing transport
+# Helical geometry: screw generators, paired faces and continuing transport
 
 [project-postulate] Brandon's September 19 question concerns **two parametric helical objects**,
 their elementary configurations, either object's independent degeneration, and the interaction
 they sustain. The subsequent audit returns this subject to elementary Holonics and its Rust/Lean
 library. Proteins are one possible material instance, not the definition or the active consumer.
-The [roadmap](plans/THE_ROADMAP.md) schedules construction; this guide states the mathematics.
+[THE_REBUILD](plans/THE_REBUILD.md) schedules construction; this guide states the mathematics.
+Here **generator** keeps its Lie sense, the screw generator `ξ=(ω,v)`; the object that carries a
+generator with an initial configuration, a clock and a carry is a **navigator**
+([elementary objects §3](ELEMENTARY_OBJECTS.md#3-navigator)).
 
 ## The objects that must be kept together
 
-[definition] [Situated generator inference](HOLON.md#situated-generator-inference-dormant-modes-and-action)
+[definition] [Situated navigator inference](HOLON.md#situated-generator-inference-dormant-modes-and-action)
 uses these helical objects as reusable action/material, including their inactive availability
 and later receiving use. Rotor-state transport and knot manipulation provide concrete source
 comparisons in the [September 21 synthesis](../research/records/2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md).
@@ -16,35 +19,36 @@ A rotor is the finite specialization of this object: fixed material carried by a
 with a discrete torus of states and stepping as a winding. An articulated body is an ordered
 chain of these objects. [The pair below is a Holonic Interaction contact](#the-pair-is-a-holonic-interaction-contact)
 states both. Homeostasis refers to the actual driven return/stability law. The existing
-[`Horizon.smith`](../formal/elementary-holonics/ElementaryHolonics/Millennium/Horizon.lean)
-and [`RatioPresentation.blockTransport`](../formal/elementary-holonics/ElementaryHolonics/Geometry/CrossRatio.lean)
-connect projective charting to ordered cascades, while
-[`traversible_chain`](../crates/holonic-engine/src/traversible_chain.rs) retains the physical
+[`Horizon.smith`](../lean/ElementaryHolonics/Millennium/Horizon.lean)
+and [`RatioPresentation.blockTransport`](../lean/ElementaryHolonics/Geometry/CrossRatio.lean)
+connect projective charting to ordered cascades, while the prototype's
+[`traversible_chain`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/traversible_chain.rs) kept the physical
 port normalization and reflected remainder. These source maps make the Flash testimony's
 useful bilateral reading available without refounding the chart or merging distinct operands.
 
 [definition] In a declared oriented Euclidean frame F, a constant screw generator is
 `ξ = (ω,v)` and its action on a situated point is `V_ξ(x) = ω × x + v`. The continuing object is
-the generator **and an initial configuration**, with its parameter/clock and receiver:
+a navigator: the generator **and an initial configuration**, with its parameter/clock and receiver:
 
 ```text
 |H_a(s)⟩_F = Ĝ_a(s)|H_a(0)⟩_F,       Ĝ_a(s) = exp(s ξ̂_a).
 ξ̂_a = [[ [ω_a]× , v_a ], [ 0 , 0 ]].
 ```
 
-[definition] One pair has two generators, initial configurations and parameters `(s,t)`.
+[definition] One pair has two navigators: two generators, two initial configurations and
+parameters `(s,t)`.
 An actual incidence or synchronization law specifies which `(s,t)` can interact. Do not silently
 identify the parameters because two helices are drawn next to each other. Radii, relative phase,
 axis offset, aperture, retained winding and material all affect the receiver. The rotational and
 translational components of **one** generator, the two **objects**, and the two factors of a
 split algebra are three different decompositions. None substitutes for another.
 
-[established-bounded; source-inspected] The existing `RatVec3`, `RatMat3`, `AffineMap3`,
-`LocalFrame` and `FrameRelation` own these coordinate/frame operations. The new
-[`screw`](../crates/relational-geometry/src/screw.rs) specialization uses them for a generator,
-its orbit jets and paired quadrance. It is exposed through `holonics::geometry`; it does not
-add an engine, a new frame system or a protein codec. The formal companion is
-[`Geometry/ScrewGeometry.lean`](../formal/elementary-holonics/ElementaryHolonics/Geometry/ScrewGeometry.lean).
+[established-bounded; source-inspected] `RatVec3`, `RatMat3`, `AffineMap3`, `LocalFrame` and
+`FrameRelation` in `holonics::geometry` own these coordinate/frame operations. The
+[`screw`](../crates/holonics/src/geometry/screw.rs) specialization uses them for a generator,
+its orbit jets and paired quadrance; it adds no new frame system or protein codec. The formal
+companion is
+[`Geometry/ScrewGeometry.lean`](../lean/ElementaryHolonics/Geometry/ScrewGeometry.lean).
 It checks the bracket, translation covariance, invariant pairings, polynomial two-jet and moment
 specialization. Axis extraction and general proper rotational recharting currently have exact
 Rust tests; they are not silently included in that Lean proof scope.
@@ -151,7 +155,7 @@ composes it with the generating orbit's velocity and acceleration.
 `D U=Φ′(Q)D Q` and `D²U=Φ″(Q)(D Q)*D Q+Φ′(Q)D²Q`. The second term is the geometric/prestress
 return already distinguished by `MechanicalReceiver` and `ConstitutiveModulation`. A dissipative
 face has a declared slip map J and material `D=D*⪰0`, with power `⟨J q̇,D J q̇⟩` and force
-pullback `−J*D J q̇`. The existing contact/constitutive/adjoint owners consume these operands.
+pullback `−J*D J q̇`. The contact form of `Transport/HolonicInteraction` consumes these operands.
 Area, normal reaction, medium, clocks and units supply the physical realization; a linking number
 alone supplies none of them. This is how the helical object reaches the Holonic Interaction.
 
@@ -160,13 +164,14 @@ alone supplies none of them. This is how the helical object reaches the Holonic 
 ### The pair is a Holonic Interaction contact
 
 [definition] The slip map of a pair is its relative velocity on the two parameters,
-`J=[v_a | −v_b]` with `Δ̇=J(ṡ,ṫ)`. It is the `J_f` of a `holonic_interaction::ContactFace`;
-the face's `D_f`, weight and `Clock` remain declared material. A `HolonicInteraction` whose
-declared rate ports carry the pair parameter rates and whose faces take this slip map is the
+`J=[v_a | −v_b]` with `Δ̇=J(ṡ,ṫ)`. It is the face slip `J_f` of the contact form
+`contactForm w J D` (`Transport/HolonicInteraction`); the face's `D_f`, weight and clock remain
+declared material. A Holonic Interaction whose declared rate ports carry the pair parameter rates
+and whose faces take this slip map is the
 [helical pair interaction unit](HOLON.md#the-helical-pair-interaction-unit), the site of an HNN
 and the contact of an articulated body.
 
-[proved-derived; formal-checked] [`Transport/HelicalPairInteraction.lean`](../formal/elementary-holonics/ElementaryHolonics/Transport/HelicalPairInteraction.lean)
+[proved-derived; formal-checked] [`Transport/HelicalPairInteraction.lean`](../lean/ElementaryHolonics/Transport/HelicalPairInteraction.lean)
 proves, over ℚ at one configuration:
 
 ```text
@@ -193,12 +198,13 @@ so the unit-phase chart `β cos(2π(q_i−q_j−φ_ij))` is this pair with zero 
 [definition] The pair parameter rate `u`, spatial slip `J u`, and resident current `q` are
 separate charts. A port map `C` from medium co-state to pair rates gives
 `M_medium=C* J*D_f J C` and medium dissipation at `J C Gz`. This does not identify `Gz` with
-physical configuration velocity. The native pair adapter declares those units and maps.
+physical configuration velocity. The pair contact owner (`holon::contact`, rebuild step 1)
+declares those units and maps.
 For features `(Δ,Q,DQ)`, the parameter pullback is
 `J*λ_Δ + λ_Q DQ + (D²Q)*λ_DQ`; `PairQuadranceJet::pullback` supplies only `λ_Q DQ`.
 Geometry/material/clock derivatives and the chart from field current are additional terms.
 A conjugated physical return `A⁻¹FA` agrees with an adjoint construction only under the declared
-isometry/duality; the incident field continues to use the full derivative adjoint.
+isometry/duality; the HNN field uses the full derivative adjoint.
 
 [definition] **Winding.** A torus chart reads a phase modulo its closure. The helix
 `x(s)=(r e^{i(as+φ)}, bs)` is the lift that retains the winding: two parameters one full turn
@@ -240,23 +246,22 @@ carry cocycle behind the winding (`Geometry/PhaseCarry`), a lock as the zero-pow
 its Farey address and mediant cost (`Geometry/PairResonance`), the determinant, trace sequence
 and transfer determinant that phase carriage conserves (`Transport/GeneratorTraceFaces`), and
 the holonomy of a cell with harmonic standing relative to node/cell receivers (`Transport/CellHolonomy`).
-`relational_geometry::winding` is their exact native owner.
+`holonics::geometry::winding` is their exact Rust owner.
 
-[established-bounded; implemented-exact] **Returned Rust consumers.**
-`holonic_interaction/helical.rs::HelicalPairInteraction` constructs `J C` and the existing
-checked `ContactFace`/`MediumContact`/`HolonicInteraction` with an explicit medium-block split,
-PSD response, weight, units and clock. It exposes the full `(Δ,Q,DQ)` return and both kernels;
-`rank(D J C)=rank(J C)` checks definiteness on the attained slip image. The local wrapper uses
-unit storage and zero skew structure and retains that scope.
-
-`holonic_chain/serial.rs` now validates Cayley/prismatic finite charts against their
-unit-parameter generators and keeps clock rates separate. Its prefix is the local-joint product
-`base ∘ T₀ ∘ T₁…`, matched by `SerialScrewChain.serialFoldl_eq_configuration`. Link contacts
-form one full `J_chain* D J_chain` including cross-joint terms. Candidate closure evaluates the
-actual parameter family; the all-prismatic target preimage retains its nullspace, limits and
+[established-bounded; implemented-exact] **The prototype's Rust consumers** (history; rebuild
+step 1 ports them to `holon::contact`). At `13f8c734`,
+[`holonic_interaction/helical.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/holonic_interaction/helical.rs)
+constructed `J C` and the checked contact face, medium contact and interaction with an explicit
+medium-block split, PSD response, weight, units and clock. It exposed the full `(Δ,Q,DQ)` return
+and both kernels; `rank(D J C)=rank(J C)` checks definiteness on the attained slip image.
+[`holonic_chain/serial.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/holonic_chain/serial.rs)
+validated Cayley/prismatic finite charts against their unit-parameter generators and kept clock
+rates separate. Its prefix is the local-joint product `base ∘ T₀ ∘ T₁…`, matched by
+`SerialScrewChain.serialFoldl_eq_configuration`. Link contacts form one full `J_chain* D J_chain`
+including cross-joint terms; the all-prismatic target preimage keeps its nullspace, limits and
 endpoint equation. Broader finite screw flows and the generic continuous Jacobian proof remain
-explicit. The [return and receipts](../research/records/2026-09-21_PAIR_CONTACT_SERIAL_KINEMATICS_AND_THE_RESIDENT_QUADRANCE_RETURN.md)
-give the exact controls and native receiving connection.
+open. The [return and receipts](../research/records/2026-09-21_PAIR_CONTACT_SERIAL_KINEMATICS_AND_THE_RESIDENT_QUADRANCE_RETURN.md)
+give the exact controls.
 
 ## Two-sided angles are an algebraic chart of this construction
 
@@ -267,8 +272,9 @@ hyperbolic signs. The existing half-angle chart is
 `C_k=(1−kt²)/(1+kt²)`, `S_k=2t/(1+kt²)`, with denominator domain retained. Its addition law is
 `(C,S)(C′,S′)=(CC′−kSS′,SC′+CS′)`.
 
-[established-bounded; source-inspected] `identity_atlas` and `TwoSidedIdentityAtlas.lean` return
-bounded polynomial identities of these declared charts. At `k=0`, the algebraic conic contains
+[established-bounded; source-inspected] `Geometry/TwoSidedIdentityAtlas` and the prototype's
+[`identity_atlas`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/identity_atlas.rs) return bounded polynomial
+identities of these declared charts. At `k=0`, the algebraic conic contains
 both `C=1` and `C=−1`; the connected normalized flow through `(1,0)` occupies only the first.
 An identity can be correct on that physical branch and false on the entire algebraic fibre.
 The receiver's domain decides which claim is being made. A test of omitted-component coverage
@@ -277,9 +283,10 @@ does not mean an exact algorithm spontaneously invented a false relation on its 
 [definition] The Gram chart `G=K+ιR` is a compact pair/triple receiver for screw data. Its
 adjugate/Jacobi polynomial identities are valid where evaluated, but it omits orbit radius and
 relative phase. Two objects' independent line/circle/point collapses must be read from their
-generators and initial points, not inferred from two idempotents of one `A_+1` element.
-Specialization can add identities; do not call a generic Gröbner basis the complete special-fibre
-ideal without checking it. The native `screw_gram_point` now consumes the shared screw pairings.
+navigators (generators and initial points), not inferred from two idempotents of one `A_+1`
+element. Specialization can add identities; do not call a generic Gröbner basis the complete
+special-fibre ideal without checking it. The prototype's `identity_atlas::screw_gram_point`
+consumed the shared screw pairings.
 
 [interpretation] Constant-curvature, Lorentzian and double-rotation extensions remain maps to
 derive through the existing metric/connection owners. A generic double rotation on S³ has a
@@ -294,12 +301,12 @@ the action and metric needed for each extension.
 
 | Required relation | Existing owner and consuming use |
 |---|---|
-| Phase closure, windings and arithmetic landmarks | `LandmarksAndModuli`, `Farey`, `Polarity`, `winding_inertia`; period/modulus and doubled-angle relations already connect finite generators to exact algebraic faces |
-| π/e as normalized generating constraints | `PiIterationConstraint`, `MachinPhaseConstraint`, `relational_geometry::exact_analysis`; [September 11 recovery](../research/records/2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md) retains branch, winding, independent generators and remainder |
-| Named critical parameter | The actual `CopsonDeBruijn*` or `RH/DeBruijn*` source family; [the maintained distinction](MATHEMATICS_AND_NATIVE_CONDUCT.md#constraint-defined-modes-and-named-de-bruijn-boundaries) prevents conflating the two constants |
-| Inferred generator/factor family | `GeneratorInference`, `GeneratorFactorization`, `GeneratorObservationScope`, native bilinear/factor/preimage owners; supplied generators and inferred parameters are stated separately |
-| Lossless continuation at the admitted receivers | `ReceiverHistoryCompression`, `GeneratorModeQuotient`, `JointReceiverDescent`, `exact_linear::factor_receiver`; preserve `E T_g=U_g E` and the decoder, not merely a present rank |
-| Cost, mass and tolerance | `ReceiverCodeCost`, `presentation_cost`, `AttentionModeCompression`, `AccumulatedReceiverDefect`; retain encoding/decoder work, complete class mass and transported residuals |
+| Phase closure, windings and arithmetic landmarks | `LandmarksAndModuli`, `Farey`, `Polarity`, `holonics::geometry::winding_inertia`; period/modulus and doubled-angle relations already connect finite navigators to exact algebraic faces |
+| π/e as normalized generating constraints | `PiIterationConstraint`, `MachinPhaseConstraint`, the exact analysis of `holonics::geometry`; [September 11 recovery](../research/records/2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md) retains branch, winding, independent navigators and remainder |
+| Named critical parameter | The actual `CopsonDeBruijn*` or `RH/DeBruijn*` source family; [the maintained distinction](CONSTRAINT_MODES_AND_RECEIVER_FACES.md) prevents conflating the two constants |
+| Inferred navigator/factor family | `GeneratorInference`, `GeneratorFactorization`, `GeneratorObservationScope`, `holonics::exact_linear` bilinear/factor owners; supplied navigators and inferred parameters are stated separately |
+| Lossless continuation at the admitted receivers | `ReceiverHistoryCompression`, `GeneratorModeQuotient`, `JointReceiverDescent`, the `holonics::exact_linear` receiver factorization; preserve `E T_g=U_g E` and the decoder, not merely a present rank |
+| Cost, mass and tolerance | `ReceiverCodeCost`, `AttentionModeCompression`, `AccumulatedReceiverDefect`; retain encoding/decoder work, complete class mass and transported residuals |
 
 [proved-derived] A useful helical compression bridge can be written now. For two situated initial
 configurations let `y=(x_a,1,x_b,1)` be the eight-coordinate concatenation of their two
@@ -331,9 +338,9 @@ factorization constructs U precisely when `E T=U E`, equivalently `ker E⊆ker(E
 its separator is explicitly scoped to the ambient linear moment space; it is not automatically a
 physically realizable screw-pair variation, because symmetry, rank-one, homogeneous and source
 clock constraints still apply. `ReceiverHistoryCompression` extends the commuting square through
-every admitted ordered word. A changed generator or receiver contributes `Ė+E L−U E`, already
+every admitted ordered word. A changed navigator or receiver contributes `Ė+E L−U E`, already
 owned by `ChangingReceiver`; the omitted interior cannot be deleted merely because the current Q
-agrees. This gives the actual join between helical generators, identity relations and continuing
+agrees. This gives the actual join between helical navigators, identity relations and continuing
 compression.
 
 [definition] Geometric landmarks include axis/rank degeneracy, zero bracket, contact-boundary
@@ -346,36 +353,33 @@ function classes.
 ## Connection to HNN and scope of the returned construction
 
 [definition] The [pair interaction](#the-pair-is-a-holonic-interaction-contact) is the HNN's
-site. Its generators and initial configurations are the field's junctions, its admitted pairs
-the arcs, its phases the context, its slip map and jet the participation/contact operands and
-its pullback the local adjoint of [HNN_FORMULA](HNN_FORMULA.md). The present incident field
-executes the zero-advance, unit-radius collapse of this pair on a per-source-cell ring; the
+site. Its navigators (generators with initial configurations) are the field's junctions, its
+admitted pairs the arcs, its phases the context, its slip map and jet the participation/contact
+operands and its pullback the local adjoint of [HNN_FORMULA](HNN_FORMULA.md). The prototype's
+incident field executed only the zero-advance, unit-radius collapse of this pair, on a ring with
+one site per source cell; the
 [design record](../research/records/2026-09-21_THE_HELICAL_PAIR_INTERACTION_IS_THE_HNN_SITE_AND_PHASE_CARRIES_CONTEXT.md)
-records that audit and the [native contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition)
-the packets that replace it. The constant-generator closure is the exact reusable
+records that audit and the prototype's [machine contract](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition)
+the packets meant to replace it. The constant-navigator closure is the exact reusable
 specialization; changing material, noncommuting contacts and nonlinear refinement retain their
 source equations and residuals through the same unit.
 
-[established-bounded; source-inspected] This increment returns the shared Euclidean generator,
-local pair differential, frame/degeneration controls and its Gram-chart consumer. It does not
-claim a trained conversation return, a calibrated molecular force law, all curved-space motor
+[established-bounded; source-inspected] `holonics::geometry::screw` holds the Euclidean screw
+generator, the local pair differential and the frame/degeneration controls. They do not claim a
+trained conversation return, a calibrated molecular force law, all curved-space motor
 actions, or a global closure of every nonlinear field. Those boundaries identify further
 mathematical terms, not a reason to reset the framework's already returned capabilities.
 
-## The bracket as an inferred native generator
+## The bracket as an inferred relation
 
-[established-bounded; computational-witness] The
-[helical field consumer](../research/records/2026-09-20_NATIVE_INCIDENCE_FORMS_AND_REUSES_THE_HELICAL_GENERATOR.md) uses `ScrewGenerator::bracket` to supply
-exact reference observations in a declared common frame. Native incidence constructs
-`s=xi`, `c=eta−xi`; the same field body forms their relation and normal material. The held pair
-returns the exact bracket `(-24,-22,7,47,52,6)` through its inferred contextual section, while the
-normal prediction retains its finite-prior residual. The original section is reused on another
-condition; the inferred two-direction condition fibre is transported to another source and yields
-plural output. This develops use of the shared bracket without introducing another screw or
-contact definition. Orbit configurations, finite motion, closure and physical material still
-use their existing owners and hypotheses above.
-
-[definition] The [finalized field contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
-now carries this dependency into the selected q/Delta reaction, independent transported drive,
-global joint state and actual Athena receiver. It specifies matching port/material recharting;
-it does not replace this shared bracket with a newly authored operator or reinterpret its units.
+[established-bounded; computational-witness] The prototype's
+[helical field consumer](../research/records/2026-09-20_NATIVE_INCIDENCE_FORMS_AND_REUSES_THE_HELICAL_GENERATOR.md)
+used `ScrewGenerator::bracket` to supply exact reference observations in a declared common frame.
+Incidence constructed `s=ξ`, `c=η−ξ`, and one field body formed their relation and normal
+material. The held pair returned the exact bracket `(−24,−22,7,47,52,6)` through its inferred
+contextual section, while the normal prediction kept its finite-prior residual. The section was
+reused on another condition, and the inferred two-direction condition fibre, transported to
+another source, yielded plural output. Orbit configurations, finite motion, closure and physical
+material keep their owners and hypotheses above. In the [HNN formula](HNN_FORMULA.md#the-incident-word)
+the same dependency enters the standing/difference reaction with matching port/material
+recharting; the bracket is not replaced by an authored operator.

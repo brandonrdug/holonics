@@ -3,16 +3,17 @@
 Research supplies the mathematical objects and laws the library and HNN implement. Start with
 [the machine](../docs/THE_MACHINE.md) and the [subject reading routes](records/README.md): each route
 connects important records to its maintained guide, formal statements and executable consumers.
-The [roadmap](../docs/plans/THE_ROADMAP.md) orders construction; research evidence does not create
-a competing schedule.
+[The rebuild](../docs/plans/THE_REBUILD.md) orders construction; research evidence does not create
+a competing schedule. Records are dated history: code they name that the September 24 reset
+retired is in history at [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
 | Read or produce | Where it lives |
 |---|---|
 | A derivation, design decision, source comparison or substantial result | [Dated records](records/README.md), with its source, hypotheses, receiver and evidence |
-| A reproducible calculation or native/application run | [Experiments](experiments/README.md), retaining inputs, source revision, outputs, command and cost |
+| A reproducible calculation or native/application run | Its dated record, retaining inputs, source revision, command, cost and conclusions. The experiment tree before the reset is in history at [`research/experiments`](https://github.com/brandonrdug/holonics/tree/13f8c734/research/experiments) |
 | A paper, expository diagram or composed mathematical argument | [Papers](papers/README.md), with editable Typst sources and rendered artifacts |
 | Symbolic exploration, exercises and handwritten development | [Notebook](notebook/README.md), including its local Lean checks |
-| Current definitions and implementation contracts | [Formal framework](../docs/FORMAL_FRAMEWORK.md), [model formula](../docs/HNN_FORMULA.md), [subject guides](../docs/REPOSITORY.md) and actual source |
+| Current definitions and implementation contracts | [Elementary objects](../docs/ELEMENTARY_OBJECTS.md), [formal framework](../docs/FORMAL_FRAMEWORK.md), [model formula](../docs/HNN_FORMULA.md), [subject guides](../docs/canon/README.md#where-the-current-laws-live), [`lean/`](../lean/README.md) and `crates/` |
 | Earlier corrected capabilities or decisions | [Retraction history](../docs/RETRACTIONS.md), [portable source evidence](records/2026-09-06_REPOSITORY_SYNTHESIS_AND_PORTABLE_EVIDENCE.md), and the relevant record's chronological corrections |
 
 A record can establish a theorem, a source-scoped calculation, a native execution result or an
@@ -26,14 +27,16 @@ and current callers. Search both the subject and its mathematical operations whe
 
 ```bash
 rg --files research/records | rg -i 'helic|torus|phase|contact'
-.agents/bin/prior-art 'normalization|softmax|NormalizedKernel|pullback'
+rg -n 'normalization|softmax|NormalizedKernel|pullback' docs research lean crates
+git grep -n 'NormalizedKernel' 13f8c734 -- crates docs
 git log --follow -- research/records/<record>.md
 ```
 
 When a return changes a reusable law, update its guide and consuming source and add the record to
 its subject route. Preserve older evidence and explain the changed claim. The
-[evidence protocol](../docs/AGENT_PROTOCOL.md) locates private conversation sources and how their
-actual occurrences are recovered without publishing raw captures.
+[evidence protocol](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/AGENT_PROTOCOL.md)
+(history) locates private conversation sources and how their actual occurrences are recovered
+without publishing raw captures.
 
 The old August-heavy thematic index is retained as a
 [historical navigation snapshot](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/operations/RESEARCH_NAVIGATION_BEFORE_2026-09-20.md).

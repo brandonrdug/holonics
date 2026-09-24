@@ -19,7 +19,7 @@ circulation.
 
 [historical] The dated capability and open-status statements below describe their cited
 construction returns. They are not the current position. Source-qualified reuse of those
-returns is governed by the current [development method](../DEVELOPMENT.md#mathematical-implementation-and-continuation).
+returns is governed by the current [development method](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/DEVELOPMENT.md#mathematical-implementation-and-continuation).
 
 ---
 

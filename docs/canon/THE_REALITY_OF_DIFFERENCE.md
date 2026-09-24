@@ -91,10 +91,10 @@ and on how its result travels under lawful changes of chart. Relativity gives th
 its structure. An arbitrary change of coordinates cannot authorize arbitrary consequences.
 A reader who changes the reference, grain or boundary must carry the comparison law too.
 
-[definition] The elementary [holon](../../formal/elementary-holonics/ElementaryHolonics/Foundation/Holon.lean)
+[definition] The elementary [holon](../../lean/ElementaryHolonics/Foundation/Holon.lean)
 retains occurrence, source, target and receiver. The
-[measured-difference owner](../../formal/elementary-holonics/ElementaryHolonics/Foundation/MeasuredDifferenceReceiver.lean)
-and [changing-receiver calculus](../../formal/elementary-holonics/ElementaryHolonics/Transport/ChangingReceiver.lean)
+[measured-difference owner](../../lean/ElementaryHolonics/Foundation/MeasuredDifferenceReceiver.lean)
+and [changing-receiver calculus](../../lean/ElementaryHolonics/Transport/ChangingReceiver.lean)
 give explicit mathematical presentations. These sources formalize particular constructions;
 the philosophical thesis directs which distinctions their types must retain.
 
@@ -138,7 +138,7 @@ begins as an addressed correspondence; a functional map, singular chart, physica
 holographic duality each owes its particular additional construction. Continuous and discrete
 charts keep their actual comparison, dynamics and remainder.
 
-[project-postulate] [The comprehensive construction programme](../plans/THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md)
+[project-postulate] [The comprehensive construction programme](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md)
 now carries these notions into formalization and use through the sole roadmap. It begins with
 joint receiver potential and Swing, continues through active tubes, scale, constitutive dynamics
 and mathematical applications, and develops quantum/geometric, topological and physical

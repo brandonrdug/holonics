@@ -6,7 +6,7 @@ receivers belong to one construction. The [computational Holon](HOLON.md) suppli
 operator notation; [constraint modes](CONSTRAINT_MODES_AND_RECEIVER_FACES.md) supply exact
 scale/phase and active receiving faces. The derivation below recovers the classical fluid
 specializations and constructs an explicit retained-material extension. It is a mathematical
-construction document, not another scheduler or a substitute for native HNN assembly.
+construction document, not another scheduler or a substitute for the HNN law.
 
 ## What already existed, and what is joined here
 
@@ -17,7 +17,7 @@ September 11–12 connected Hodge, source Swing, heat, spectral and arithmetic o
 September 13 derived the actual finite-Galerkin Elsasser equations and dynamic interior return.
 Their source chain is retained in
 [fluid reflection](FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md),
-[framework synthesis](MATHEMATICS_AND_NATIVE_CONDUCT.md), and the formal owners linked below.
+[framework synthesis](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/MATHEMATICS_AND_NATIVE_CONDUCT.md), and the formal owners linked below.
 The lapse was leaving these operations in separate accounts instead of constructing the
 primitive → interaction → balance → constitutive law → receiver equation explicitly.
 
@@ -58,10 +58,10 @@ The physical state includes thermal/internal energy when mechanical energy is di
 velocity and stress retain their units. Analytic modes retain defining constraints and source
 families: `E'(z)=E(z)`, `E(0)=1`, and the rotation kernel `i Θ_turn ℤ` with
 `Θ_turn=2π` in the classical chart. A numeric projection does not define these operations.
-Lean's real/complex carriers express the mathematical laws; native realizations use exact
+Lean's real/complex carriers express the mathematical laws; Rust realizations use exact
 expressions, rational/algebraic data or certified families as their operation requires.
 
-## 2. The native contact equation is a Swing
+## 2. The constitutive contact equation is a Swing
 
 [proved-derived; formal-checked] Let `D:W→V`, `D†:V→W`, and let K⁻¹ solve
 `K=I+D D†` exactly. Define the graph projection and reflected current on `V⊕W`:
@@ -72,10 +72,11 @@ P_G(u,b) = (a,D†a),
 R_G(u,b) = 2P_G(u,b)−(u,b) = Swing_(P_G(u,b))(u,b).
 ```
 
-This is exactly the native equation `Kv=2(u+Db)`, `w=v−u`, `b'=D†v−b`, with `v=2a`.
+This is exactly the scattering equation `Kv=2(u+Db)`, `w=v−u`, `b'=D†v−b`, with `v=2a`
+([HNN formula](HNN_FORMULA.md#the-constitutive-scattering-operator)).
 Indeed `K⁻¹(a+D D†a)=a`, so `P_G²=P_G`; linearity then gives
 `R_G²=4P_G²−4P_G+I=I`.
-[HolonicConstitutiveCirculation](../formal/elementary-holonics/ElementaryHolonics/Computation/HolonicConstitutiveCirculation.lean)
+[HolonicConstitutiveCirculation](../lean/ElementaryHolonics/Computation/HolonicConstitutiveCirculation.lean)
 proves `graphProjection_idempotent`, `graphScattering_involutive`, and
 `graphScattering_eq_swing`, using the actual solve identity and the original Swing definition.
 The algebraic proof allows a supplied transpose-like map; orthogonality additionally uses the
@@ -94,7 +95,7 @@ differentiable orthogonal involution R(t), differentiate `R²=I` to obtain
 The derivative of `R(t+h)R(t)` at h=0 is Ω: paired Swings therefore generate an
 energy-preserving infinitesimal transport in the fixed metric. For a changing metric M(t),
 `d(xᵀMx/2)/dt=xᵀM ẋ+xᵀṀx/2`; the metric-work term remains.
-The existing [port-energy owner](../formal/elementary-holonics/ElementaryHolonics/Physics/PortEnergyHeat.lean)
+The existing [port-energy owner](../lean/ElementaryHolonics/Physics/PortEnergyHeat.lean)
 already proves the corresponding changing-storage and heat-return balances.
 
 [proved-derived] The bridge to a concrete advection step is constructive. In an
@@ -180,7 +181,7 @@ Integration by parts separates boundary work from mechanical loss. The lost mech
 energy becomes internal/thermal energy in the complete Holon. Across a joined surface,
 equal opposite transmitted tractions cancel only after both bodies and any surface storage
 are included. Slip with `t=−κ_f w` contributes heat `κ_f|w|²` for `κ_f≥0`.
-The [exact torus contact](../research/experiments/contact_receiver_faces/README.md) realizes
+The prototype's [exact torus contact](https://github.com/brandonrdug/holonics/blob/13f8c734/research/experiments/contact_receiver_faces/README.md) realized
 oriented surface patches and an explicit slip/traction law; geometry is an operand of this
 calculation, not a decorative skin.
 
@@ -238,10 +239,10 @@ retained in their respective kernels. This use of the Hodge viscosity is the fla
 specialization above; the curved Newtonian operator follows the stress calculation.
 
 [proved-derived; formal-checked] The existing finite
-[Hodge decomposition](../formal/elementary-holonics/ElementaryHolonics/Millennium/HodgeFiniteDecomposition.lean)
-and [Green operator](../formal/elementary-holonics/ElementaryHolonics/Millennium/HodgeGreenOperator.lean)
+[Hodge decomposition](../lean/ElementaryHolonics/Millennium/HodgeFiniteDecomposition.lean)
+and [Green operator](../lean/ElementaryHolonics/Millennium/HodgeGreenOperator.lean)
 split exact, coexact and harmonic sections. The
-[temporal owner](../formal/elementary-holonics/ElementaryHolonics/Physics/TemporalHodgeResidue.lean)
+[temporal owner](../lean/ElementaryHolonics/Physics/TemporalHodgeResidue.lean)
 preserves the cohomology class under its heat step, with step stability a separate spectral
 condition. A harmonic toroidal circulation can have zero local curl and divergence while
 retaining a nonzero period around a cycle. Removing local pressure therefore does not erase
@@ -272,12 +273,12 @@ N(2b−u)+N(u)−2ḃ = 2[N(b)−ḃ−B(u−b,u−b)].
 
 If `ḃ=N(b)`, the defect is `−2B(r,r)`. Affine Swing acts on a state; its rate pushforward
 is −I with the moving-anchor term, not another affine reflection of a velocity.
-[FluidReceiverClosure](../formal/elementary-holonics/ElementaryHolonics/Physics/FluidReceiverClosure.lean)
+[FluidReceiverClosure](../lean/ElementaryHolonics/Physics/FluidReceiverClosure.lean)
 proves the two `swing_even/odd` identities and `moving_swing_galerkin_rate_defect`.
 These statements use the actual Galerkin operators, not a stand-in bilinear law.
 
 [established-bounded; source-inspected] The earlier
-[clocked nonlinear-source Swing](../formal/elementary-holonics/ElementaryHolonics/Millennium/NavierStokesClockedPantographicSourceSwing.lean)
+[clocked nonlinear-source Swing](../lean/ElementaryHolonics/Millennium/NavierStokesClockedPantographicSourceSwing.lean)
 also telescopes oriented source differences along dyadically approaching times and retains
 their reconstruction fibre. Compact-interior continuity controls that source increment.
 A terminal-uniform estimate at a potential singular time is a distinct unclosed analytic
@@ -300,14 +301,14 @@ q̇_t X + q_t[S_νr−B(R_tY,r)−B(r,R_tY)−B(r,r)].
 ```
 
 The actual trajectory theorem `moving_galerkin_receiver_equation` in
-[FluidReceiverClosure](../formal/elementary-holonics/ElementaryHolonics/Physics/FluidReceiverClosure.lean)
+[FluidReceiverClosure](../lean/ElementaryHolonics/Physics/FluidReceiverClosure.lean)
 proves this equation with derivative hypotheses. `q_t r=0` does not imply the quadratic
 and mixed terms are invisible. For a Reynolds/filter realization obeying its required
 commutation rules, the same product difference appears as unresolved stress
 `τ_q=q(u⊗u)−q(u)⊗q(u)`. A general reconstruction retains the mixed terms too.
 
 [proved-derived; formal-checked] Boundary elimination has the same obligation. The existing
-[ReflectedBoundaryMemory](../formal/elementary-holonics/ElementaryHolonics/Physics/ReflectedBoundaryMemory.lean)
+[ReflectedBoundaryMemory](../lean/ElementaryHolonics/Physics/ReflectedBoundaryMemory.lean)
 starts with `ẋ=Ax+Bz+f`, `ż=Cx+Dz+g` and derives, for `z=Kx+r`,
 
 ```text
@@ -382,9 +383,10 @@ The middle operator is skew-adjoint; the last is dissipative. The contact Swing 
 reversible scattering realization of a constituted relation; this block gives its
 energy-exchange form once the physical advection port is specified. Equating an arbitrary
 contact graph with this particular fluid port still requires the stated realization map.
-The native scattering owner and [PortEnergyHeat](../formal/elementary-holonics/ElementaryHolonics/Physics/PortEnergyHeat.lean)
-are reusable foundations. The continuum Q-field stress derivation above is complete on paper;
-a native Q-field consumer and its continuum formalization are not yet implemented.
+The scattering law (`HolonicConstitutiveCirculation`) and
+[PortEnergyHeat](../lean/ElementaryHolonics/Physics/PortEnergyHeat.lean) are reusable
+foundations. The continuum Q-field stress derivation above is complete on paper; a Q-field
+consumer and its continuum formalization are not yet implemented.
 
 ## 8. Complex Euler/NS and conducting-fluid modes retain their distinct signs
 
@@ -416,7 +418,7 @@ cannot be assigned magnetic-energy conservation merely by calling it a phase.
 velocity `b=B_magnetic/√(μ₀ρ)`, induction instead has
 `ḃ=−B(a,b)+B(b,a)+η_mΔ_Eb`. That opposite stretching sign cancels the physical cross
 power. The existing
-[ConductiveFluidReflection](../formal/elementary-holonics/ElementaryHolonics/Physics/ConductiveFluidReflection.lean)
+[ConductiveFluidReflection](../lean/ElementaryHolonics/Physics/ConductiveFluidReflection.lean)
 proves the difference `−2B(b,a)` and the actual Galerkin Elsasser identities:
 
 ```text
@@ -451,7 +453,7 @@ Hstd_t(z) = (1/8) heatE(−t/4, ξ, 1/2+iz/2),
 Λ_std = 4Λ_DN.
 ```
 
-[CriticalChart](../formal/elementary-holonics/ElementaryHolonics/RH/CriticalChart.lean)
+[CriticalChart](../lean/ElementaryHolonics/RH/CriticalChart.lean)
 proves these source, coordinate and time identities. Thus the shared heat calculus is
 usable, but physical viscosity time cannot silently replace the reversed entire-function
 time. The zero-location statement requires this source and its analytic domain; a harmonic
@@ -466,8 +468,8 @@ t₀=2, t₁=a,                 t_(n+2)=a t_(n+1)−q t_n,
 tr(M^n)=t_n.
 ```
 
-[LocalFactor](../formal/elementary-holonics/ElementaryHolonics/Millennium/LocalFactor.lean)
-and [TraceSequence](../formal/elementary-holonics/ElementaryHolonics/Millennium/TraceSequence.lean)
+[LocalFactor](../lean/ElementaryHolonics/Millennium/LocalFactor.lean)
+and [TraceSequence](../lean/ElementaryHolonics/Millennium/TraceSequence.lean)
 prove those equalities and, under `a²≤4q`, the root pair with `|α|²=q`.
 
 [proved-derived; formal-checked] The exact quadratic form
@@ -498,20 +500,19 @@ not a further physical friction coefficient. Source work may make the endpoint e
 For the graded law, L contains both lower and upper Hodge terms; upper compatibility alone
 is insufficient to account for the dissipative return.
 
-[established-bounded; implemented-exact] The scalar and graded Rust diffusion owners now
-expose and consume this complete `DiffusionEnergyBalance`; the native circulation boundary
-uses it too. Exact regression includes source work, a harmonic section, a grade-one lower
-coboundary contribution and a mismatched source operator. The bilinear library now supplies
-the complete input differential and covector return of a factorized interaction, including
-explicit port precomposition. Applied to the advection vertex from §7, this is the elementary
-return required for its state and material operands; physical adjunction additionally uses
-the declared energy pairing. The [diagram/interface source](../research/experiments/hnn_field_architecture/README.md)
-records the actual library and native-consumer scopes.
+[established-bounded; implemented-exact] The prototype's scalar and graded diffusion owners
+([`diffusion.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/diffusion.rs),
+[`sheaf_diffusion.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/sheaf_diffusion.rs)) exposed and
+consumed this complete `DiffusionEnergyBalance`, with exact regression over source work, a
+harmonic section, a grade-one lower coboundary contribution and a mismatched source operator.
+The bilinear owner of `holonics::exact_linear` supplies the complete input differential and
+covector return of a factorized interaction, including explicit port precomposition. Applied to
+the advection vertex from §7, this is the elementary return required for its state and material
+operands; physical adjunction additionally uses the declared energy pairing.
 
 ## Implementation consequence
 
-[project-postulate] HNN's Holon operations must carry this composition through their existing
-owners: current/contact tensors, source-conditioned material, ordered transport, complete
+[project-postulate] HNN's Holon operations carry this composition through their owners: current/contact tensors, source-conditioned material, ordered transport, complete
 adjoints, and receiver restriction with the required fibre or dynamic interior. Whole-field
 generation integrates that coupled law and emits its requested face. Diffusion does not
 require sequential token prediction or a separately imposed universal settling criterion.
@@ -520,7 +521,6 @@ provide concrete realizations and expose the terms a purported implementation wo
 
 [definition] The next absent implementation operation for the explicit extension in §7 is
 the same A_Q in both momentum and material rates, including its adjoint stress and thermal
-return. The paused general Athena assembly retains its own current/material/encoded-action
-join in CONSTRUCTION_STATE. Neither operation is replaced by another boundary wrapper or
-by proving that a state changes later. Their completion is judged by their actual equations
+return; rebuild step 4 builds the HNN's current/material/encoded-action join. Neither operation
+is replaced by another boundary wrapper or by proving that a state changes later. Their completion is judged by their actual equations
 and generated physical/application faces.

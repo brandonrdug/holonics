@@ -78,7 +78,7 @@ flux. There is no new universal convergence assumption.
 [established-bounded; implemented-exact] `ComplexJet2::residual_velocity_with_source_rate`
 solves `f_s v+source_rate=−f` over complete complex rational enclosures. A backward-heat
 caller supplies `source_rate=−u_dot*f_ss`; it must supply the actual current source jet too.
-The executable ζ basin application below uses a fixed ζ source. It does not mislabel its
+The prototype ζ basin application below used a fixed ζ source. It does not mislabel its
 static jet as a finite-time evaluation of `heatE(u,ξ)`.
 
 ## Recursive geometry is the complete preimage relation
@@ -139,7 +139,7 @@ merely a coordinate equivalence.
 
 ## Exact executable receiving regions
 
-[definition] `holonics::geometry` exports the existing `ComplexJet2` plus the new
+[definition] `holonics::geometry` exports `ComplexJet2`,
 `certify_capture`, `mean_value_release` and `propagate_to_capture`. A supplied callback must
 enclose the same holomorphic source and its first two derivatives throughout every requested
 box, including its analytic remainder. Capture certificates apply only to that source/law.
@@ -163,16 +163,17 @@ prove that every member first arrives at that same step. Exact first-arrival pop
 require the earlier exclusions present in the formal preimage relation. Root receiving
 regions use `Option.some '' U`, excluding the absorbing obstruction from successful capture.
 
-[definition] `analytic_receiving_basins` consumes the existing Euler–Maclaurin ζ jets. It
-discovers receiving centers from supplied rational initial regions, certifies their neighborhoods,
-and transports other complete initial regions to them. It independently computes η boundary
-winding around each accepted neighborhood. In `0<Re s<1`,
+[definition] The prototype's
+[`analytic_receiving_basins`](https://github.com/brandonrdug/holonics/blob/13f8c734/research/experiments/analytic_receiving_basins/README.md)
+consumed Euler–Maclaurin ζ jets. It discovered receiving centers from supplied rational initial
+regions, certified their neighborhoods, transported other complete initial regions to them, and
+independently computed η boundary winding around each accepted neighborhood. In `0<Re s<1`,
 `η=(1−2^(1−s))ζ` and the factor is nonzero because `|2^(1−s)|>1`; it contributes zero contour
 winding there. The nonzero ξ completion factor likewise preserves the divisor in this strip.
 Their logarithmic currents differ by the logarithmic derivative of those factors, so this is
 a ζ traversal with a shared zero-count receiver, not a ξ or η traversal renamed after the fact.
 
-[definition] The application is exact CPU mathematical apparatus under the shared library,
-with no float-driven semantic decision and no live Lean dependency. It is not yet a GPU lowering
-of general analytic source evaluation. The [dated return](../research/records/2026-09-14_ANALYTIC_RELEASE_AND_RECURSIVE_RECEIVING_POPULATIONS.md)
+[definition] The application was exact CPU mathematical apparatus over the shared library, with
+no float-driven semantic decision and no live Lean dependency; it was not a GPU lowering of
+general analytic source evaluation. The [dated return](../research/records/2026-09-14_ANALYTIC_RELEASE_AND_RECURSIVE_RECEIVING_POPULATIONS.md)
 records the actual regions, source config, elapsed costs, checks and remaining scope.

@@ -1,8 +1,9 @@
 # Holonics: objects, interaction and changing geometry
 
 [project-postulate] Holonics develops a framework for constructing and explaining situated
-systems. Its subject includes mathematics, physics, biology and computation. A Millennium
-application contributes reusable mathematics; an HNN contributes an executable realization.
+systems. Its subject includes mathematics, physics, biology and computation. A target (RH, Hodge,
+complex Euler/Navier–Stokes, BSD) contributes reusable mathematics as an instance of compression
+and landmark discovery; an HNN contributes an executable realization.
 Neither determines the framework's endpoint. Brandon's September 7–8 direct messages and this
 review's exact source coordinates are retained in the
 [formal synthesis deposit](../research/records/2026-09-08_FORMAL_HOLONICS_IS_A_FRAMEWORK_OF_INTERACTING_TRANSPORT.md).
@@ -21,13 +22,14 @@ and its consumers together, with the accumulated framework's strength as the sta
 Its six subject imports—Core, Geometry, Dynamics, Information, Physics and Computation—compose
 existing owners. They are reading and dependency boundaries, not six substances or runtime organs.
 The [Lean guide](../lean/README.md) gives focused imports and verification.
-The [mathematics/native synthesis](MATHEMATICS_AND_NATIVE_CONDUCT.md) connects these laws to
-current executable owners.
+The [HNN formula](HNN_FORMULA.md) states the machine law these owners serve; the prototype's
+[mathematics/native synthesis](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/MATHEMATICS_AND_NATIVE_CONDUCT.md) mapped them to its
+retired executable owners.
 
-[project-postulate] The [repository restructure](plans/THE_REPOSITORY_RESTRUCTURE.md#32-lean-one-lake-package-two-import-closures)
-targets one `lean/` Lake package with public `Holonics` and dependent `HolonicsResearch` libraries.
-This section's `ElementaryHolonics` imports are the **current** checked paths. The move first
-separates their import closures; declaration namespaces change in a later checked phase.
+[project-postulate] Rebuild step 1 (#70, [THE_REBUILD](plans/THE_REBUILD.md#order)) renames the
+`lean/` Lake package to `holonics`, with a public `Holonics` library (the `Framework` closure) and a
+dependent `HolonicsResearch`, and moves the namespace `Soma.Holonics` to `Holonics`. The
+`ElementaryHolonics` imports in this guide are the **current** checked paths.
 
 [definition] [Mass–energy and causal transport](MASS_ENERGY_AND_CAUSAL_TRANSPORT.md) is the
 comprehensive synthesis of the recent source, optics, mode exclusion, periplus, Gamma/ζ,
@@ -42,8 +44,8 @@ GR-derived models are identified by their actual equations and approximation dom
 generator, frame, contact and receiving variation: two screw generators act on two initial
 configurations; their pair quadrance has a source-derived gradient and full geometric Hessian.
 `Framework.Geometry` imports `Geometry/ScrewGeometry`, whose moment specialization consumes
-`HolonicQuadraticMomentCondensation`. `relational_geometry::screw` shares the existing exact
-vector/affine objects and is consumed by the identity atlas's screw Gram map. The guide keeps
+`HolonicQuadraticMomentCondensation`. `holonics::geometry::screw` shares the exact vector/affine
+objects; the prototype's identity atlas consumed it through its screw Gram map. The guide keeps
 the proper-frame/axis Rust tests separate from the checked Lean bracket/translation/jet scope.
 It also reconnects the existing landmark, normalized-mode, inference and future-receiver
 compression owners; none is newly founded by this specialization.
@@ -95,14 +97,14 @@ law and its attainable-slip specialization, plus
 trace powers and transfer determinants yet differ at a supplied source/receiver. These
 statements keep harmonic standing relative to node/cell receivers and spectral faces distinct
 from the full future-action certificate. The [iteration record](../research/records/2026-09-21_THE_GENERATOR_MACHINE_RETAINS_ITS_SOURCE_AND_RECEIVING_LAWS.md)
-and [receipts](VERIFICATION_RECEIPTS.tsv) give their checked scope.
+and [receipts](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/VERIFICATION_RECEIPTS.tsv) give their checked scope.
 
 [proved-derived; formal-checked] The [first implementation return](../research/records/2026-09-21_PAIR_CONTACT_SERIAL_KINEMATICS_AND_THE_RESIDENT_QUADRANCE_RETURN.md)
 adds `pairFeatureReturn_adjoint`, `pairQuadranceHessian_quad`, the rate-port congruence and
 PSD/null laws, and the finite quadrance score remainder. `Geometry/ScrewGeometry` adds
 translation-rechart composition. `Transport/SerialScrewChain`, imported by Dynamics, checks
-finite affine/Cayley/translation algebra and the local-joint product, including the native
-fold correspondence. General proper-rotation cross-product covariance and continuous chain
+finite affine/Cayley/translation algebra and the local-joint product, including the prototype
+chain's fold correspondence. General proper-rotation cross-product covariance and continuous chain
 Jacobian correspondence retain their #62 obligations. The integrated Framework check passes
 at 9,207 jobs; added statements use standard axioms only.
 
@@ -114,7 +116,7 @@ feature/material/clock derivative; an actual later-phase `StandingLaw` instance.
 Farey words, the next Foster population identity, conditional signature placement and
 rigid/affine holonomy keep their source domains. General linear material conjugated by an invertible frame remains to be joined beyond the
 current unit-valued phase-material theorem; reset material need not be invertible. Newton identities are invariant checks,
-not compression sufficiency. Each native packet lands with its matching formal law or names
+not compression sufficiency. Each Rust packet lands with its matching formal law or names
 the concrete remaining obligation in #62; unchanged source receipts remain usable.
 
 [definition] The [Holon specification](HOLON.md) is the current elementary operational
@@ -149,19 +151,18 @@ map is proved equal to the existing `coupledResponse` through identity incidence
 dimensionless rod chart is reusable mathematics; a DNA/material application supplies reference
 strain, stiffness, units, medium and boundary conditions.
 
-[definition] The [HNN integration plan](plans/THE_ROADMAP.md#immediate-mathematical-application-and-implementation)
-now orders use of the returned mathematics through callable construction, contextual
-formation, compiled continuation and actual Athena tasks. The
+[definition] [THE_REBUILD](plans/THE_REBUILD.md#order) orders use of the returned mathematics:
+compression and landmark discovery (step 3), then the HNN law (step 4). The
 [Lorentzian bounded-ratio review](../research/records/2026-09-12_BOUNDED_LORENTZIAN_RATIOS_JOIN_COEFFICIENT_GAUGES_AND_HODGE_BOUNDS.md)
 connects coefficient log gauges, M-convex affine quotients and Hodge-type Hessian signatures
 to a specific admissible coefficient-bound consumer. This source is reviewed mathematics;
-its optimization is not silently described as an already implemented native operation.
+its optimization is not an implemented operation.
 
-[project-postulate] [The Reality of Difference in construction](plans/THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md)
-now carries the philosophical account into one ordered programme: compatible potential and
-joint receivers; Swing/tube/scale transport; constitutive continuation; mathematical source
-applications; quantum/geometric comparison; and framed-loop, holographic and physical response.
-The sole roadmap orders those steps and useful applications accompany each returned construction.
+[project-postulate] [The Reality of Difference in construction](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md)
+carried the philosophical account into one programme: compatible potential and joint receivers;
+Swing/tube/scale transport; constitutive continuation; mathematical source applications;
+quantum/geometric comparison; and framed-loop, holographic and physical response. THE_REBUILD
+now orders the construction.
 
 [proved-derived; formal-checked] The [opening return](../research/records/2026-09-08_COMPATIBLE_POTENTIAL_SWINGS_THROUGH_JOINT_RECEIVERS_AND_THE_PROGRAMME_BEGINS.md)
 uses the existing preimage fibre to form its complete future image. Additional observations
@@ -169,7 +170,7 @@ refine it; an exact rebase carries it through every ordered history; explicit re
 can determine one future face while source causes stay plural. Whole-family tolerance transports
 through a declared Lipschitz receiver, and shrinking bounds force compatible readouts to converge.
 
-[definition; source-cut, formal-checked] `Foundation/Receiver.lean` extends the existing receiver owner with additive receiver-family laws: the collapsed kernel, joint reading, its application lemma, kernel equivalence, and difference-based indistinguishability. `Foundation/JointReceiverDescent` imports it directly. The source-specific chain placement and theta-complex identities remain in `Millennium/Receiver`; the five extracted declarations keep their current `Soma.Holonics.Millennium.Receiver` namespace until M2. The focused receiver closure passes at 3,139 Lake jobs, `Framework.Core` at 8,738, and top-level `ElementaryHolonics` at 10,105. The extracted declarations use standard axioms (`propext`, `Classical.choice`, `Quot.sound`); see the R3 edge audit and verification receipts.
+[definition; source-cut, formal-checked] `Foundation/Receiver.lean` extends the existing receiver owner with additive receiver-family laws: the collapsed kernel, joint reading, its application lemma, kernel equivalence, and difference-based indistinguishability. `Foundation/JointReceiverDescent` imports it directly. The source-specific chain placement and theta-complex identities remain in `Millennium/Receiver`; the five extracted declarations keep their current `Soma.Holonics.Millennium.Receiver` namespace until the namespace move of rebuild step 1. The focused receiver closure passed at 3,139 Lake jobs, `Framework.Core` at 8,738, and top-level `ElementaryHolonics` at 10,105. The extracted declarations use standard axioms (`propext`, `Classical.choice`, `Quot.sound`).
 
 [proved-derived; formal-checked] The joint additive construction uses
 `N=intersection_i ker(read_i)` and `Q=X/N`. Preservation of N is exactly the receiver-transformer
@@ -232,14 +233,14 @@ Thus `2πi` is the primitive positive imaginary period; `π` is the constrained 
 phase receiver sees only the quotient face and must retain its winding fibre. The formal
 `Physics/PhaseCarrier` owner proves `exp(i(θ + 2π)) = exp(iθ)` and the half-turn sign,
 and `Mathematics/MachinPhaseConstraint` proves the exact Gaussian/Machin relations
-`(5+i)^4 = (239+i)(2+2i)` and `π = 16 atan(1/5) − 4 atan(1/239)`. The native
-`reopening::arctan_unit_fraction` carries the rational partial sum and alternating remainder;
-it is an exact generator face at a declared term aperture, not a stored π literal.
+`(5+i)^4 = (239+i)(2+2i)` and `π = 16 atan(1/5) − 4 atan(1/239)`. The prototype's
+`reopening::arctan_unit_fraction` (`13f8c734`) carried the rational partial sum and alternating
+remainder: an exact face of the π navigator at a declared term aperture, not a stored π literal.
 
 [definition] A logarithm is the inverse-scale face of a declared positive multiplicative
-transport. `atmospheric_inverse::exact_positive_log_ratio` realizes `log(n/d)` by the exact
-series `2 Σ z^(2k+1)/(2k+1)`, `z=(n−d)/(n+d)`, with its positive geometric tail. The
-normalized kernel owner accepts supplied positive rational `K` and defines its implicit real
+transport: `log(n/d)` is the exact series `2 Σ z^(2k+1)/(2k+1)`, `z=(n−d)/(n+d)`, with its
+positive geometric tail (the prototype's `atmospheric_inverse::exact_positive_log_ratio`).
+`holonics::ratio::exponentiated::NormalizedKernel` accepts supplied positive rational `K` and defines its implicit real
 log-potential by the normalized relation `E(s)=K`. This relation needs no stored/evaluated
 logarithm and does not claim that a learner generated the supplied K. `exp(tA)` and
 Gaussian amplitude/argument shifts are instead generic operator constructions: the formal
@@ -248,17 +249,17 @@ Gaussian amplitude/argument shifts are instead generic operator constructions: t
 provides the reusable block composition for Gamma-like coefficient shifts. This preserves
 the shift law without identifying every `Gamma` name with one function.
 
-[definition] Two Gamma constructions remain distinct. `kelvin::MaterialLoop` owns
-circulation `Γ(t)=∮_{C(t)} v·dl` and transports the material loop with the field; it is not
+[definition] Two Gamma constructions remain distinct. Kelvin circulation `Γ(t)=∮_{C(t)} v·dl`
+transports the material loop with the field (the prototype's `kelvin::MaterialLoop`); it is not
 Euler's Gamma function. Euler-Gamma/ratio work is represented through the generic exact
 factorization and shifted-block owners when a concrete source seed and recurrence are supplied.
-No bare Gamma symbol is a native law by itself.
+No bare Gamma symbol is a law by itself.
 
-[established-bounded; source-inspected] The arithmetic owner retains formal prime-log
+[established-bounded; source-inspected] The prototype's arithmetic owner
+([`arithmetic_fiber.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/arithmetic_fiber.rs)) kept formal prime-log
 coefficients. For the Chebyshev source, `a_p` counts the positive powers `p^k≤x`, and
-`ψ(x)=Σ_p a_p log p` has exact multiplicative face `exp(ψ(x))=lcm(1,…,x)` in
-`PrimePowerCurrent`. Arbitrary prime-log coefficients are not asserted to have that lcm face.
-The owner does not evaluate a floating logarithm in standing. Its `zeta_receiver_measure` is a finite selected-prime chart with
+`ψ(x)=Σ_p a_p log p` has exact multiplicative face `exp(ψ(x))=lcm(1,…,x)`. Arbitrary prime-log
+coefficients are not asserted to have that lcm face, and no floating logarithm enters. Its zeta receiver measure is a finite selected-prime chart with
 `q_p=p^(−σ)`, `m₀,p=1−q_p`, and return mass `∏_{p∈P}(1−p^(−σ))^(−1)` for `σ>1`.
 The formal/RH zeta owners and the September 11 spectral atlas supply analytic continuation,
 η/ξ zero enclosures and winding receivers at their declared rectangles. A finite zeta
@@ -266,7 +267,7 @@ place measure, a completed-zeta analytic function, and a serialized information 
 different faces and must not be substituted for one another.
 
 [definition] Transcendental use therefore follows one route: constraint identity → retained
-mode/generator state and branch or period → typed receiver face with remainder. A decimal,
+mode/navigator state and branch or period → typed receiver face with remainder. A decimal,
 float, radix window, phase sign, circulation `Γ`, or finite ζ product is a receiver reading;
 it does not become the generating relation merely because it is printed or serialized.
 
@@ -294,9 +295,9 @@ arbitrary complex mode superpositions, proving `c†(v)²=0` without a privilege
 normalized exponential to derive the Fermi–Dirac/sigmoid and vacancy receivers. The polarized
 transport owner admits distinct source/target frames; `ChangingReceiver` and
 `ConstitutiveModulation` retain frame velocity and material/current mixed terms. Their emulator
-map is the same indexed generator/decoder relation used for source-qualified encoding.
+map is the same indexed navigator/decoder relation used for source-qualified encoding.
 
-[proved-derived; formal-checked] The [generator-inference construction](../research/records/2026-09-12_GENERATOR_INFERENCE_CODES_FREE_ENERGY_AND_SUFFICIENT_CONTINUATION.md)
+[proved-derived; formal-checked] The [navigator-inference construction](../research/records/2026-09-12_GENERATOR_INFERENCE_CODES_FREE_ENERGY_AND_SUFFICIENT_CONTINUATION.md)
 connects exact solving, MDL/MAP, Gibbs variational inference and sufficient representations.
 `Foundation/GeneratorInference.lean`, imported by `Framework.Information`, reads a finite admitted
 candidate objective `J=L_description+L_data` through the existing normalized-exponential owner.
@@ -487,9 +488,10 @@ physical interpretation requires it.
 
 [definition] Its `WorldTube` composes addressed membrane contact, constitutive current, outward
 restriction and returned difference. Its outward radical is relative to the specified receiver.
-A silent boundary can contain active interior current. The existing native
-[`tube.rs`](../crates/holonic-engine/src/tube.rs) supplies `ReceiverTube` in its declared executable
-scope; it is not the definition of all smooth physical tubes.
+A silent boundary can contain active interior current.
+[`holonics::restriction::tube`](../crates/holonics/src/restriction/tube.rs) supplies the continuing
+tube's commuting squares, circuit holonomy and wormhole receipt in its declared executable scope;
+it is not the definition of all smooth physical tubes.
 
 [interpretation] A space-time tube network uses local sections as interiors, addressed contacts
 as interfaces, and compatible transports as its connecting geometry. A smooth manifold chart,
@@ -515,10 +517,10 @@ with an exact decoder. `ConstitutiveWorldTube` carries the actual step, material
 clock and remainder; an addressed join requires the complete successor to equal the next source.
 The response also casts into the existing Parametron `coupledResponse` owner.
 
-[established-bounded; implemented-exact; computational-witness] The
-[exterior executable](../research/experiments/four_torus_current/README.md) advances those
+[established-bounded; implemented-exact; computational-witness] The prototype's
+[exterior executable](https://github.com/brandonrdug/holonics/blob/13f8c734/research/experiments/four_torus_current/README.md) advanced those
 coordinates while comparing against a full branch solve on 64- and 324-branch carriers.
-Fresh-process continuation reproduces the complete current. Equal declared receiver futures
+Fresh-process continuation reproduced the complete current. Equal declared receiver futures
 coexist with a retained branch-separating remainder. This gives a usable finite transport and
 compression construction; decoder and standing costs accompany its smaller continuing state.
 
@@ -528,12 +530,12 @@ the gain defect and the finite deposit defect against the new Gram matrix, even 
 fit was inexact. Its complex square-completion theorem supplies the algebra for separating solve
 error from the declared objective. The
 [Athena/CTC review](../research/records/2026-09-09_MATHEMATICAL_REVIEW_NORMAL_GEOMETRY_AND_CLOSED_RETURNS.md)
-connects these reusable laws to the active implementation and its producing-history requirement.
+connected these reusable laws to the prototype implementation and its producing-history requirement.
 
 [proved-derived; formal-checked] The same normal-response owner now derives a finite unit-prior
 minimizer's Frobenius norm bound from its actual sample objective: comparison with the zero
 operator gives `||P||_F ≤ sqrt(E_upper)`. The applied/reference triangle and minimum of two valid
-bounds give an additional native error certificate. The
+bounds give an additional error certificate. The
 [producing-return construction](../research/records/2026-09-10_ATHENA_RETURNS_OBSERVATIONS_TO_THEIR_PRODUCING_JOINT.md)
 uses this without changing fitted coefficients, source moments or carrier width. The hypothesis is
 a compatible normal-objective source family; this is not a bound for arbitrary independently
@@ -603,15 +605,15 @@ remain distinct realization work; the finite construction is an implemented foun
 [proved-derived; formal-checked] `Physics/ReactionCurrent` derives enzyme and substrate-moiety
 conservation from the mass-action stoichiometric source. Its joint fold/free-bound counterexample
 proves that equal marginals can have different binding current. These laws attach to the actual
-source/condition and producing-return ports described in the Athena blueprint; they introduce no
-molecular classifier or runtime proof assistant into HNN.
+source/condition and producing-return ports of the [HNN formula](HNN_FORMULA.md); they introduce
+no molecular classifier or runtime proof assistant into HNN.
 
 [definition] The [computational handoff](../research/records/2026-09-10_TENSION_DYNAMICS_BECOME_ATHENAS_COMPUTATIONAL_CONSTRUCTION.md)
 now reviews these laws with passive phase contact, prestress, world-tube composition and
-future-stable receiver agreement. The finalized Athena plan uses their consequences for jointly
-bounded return, conditional local conduct, emitted output and dynamic reuse. Formal conservation
-or conformation identities do not themselves supply the native port conversion or training rule;
-the plan names the existing owners and new composed passages that must realize them.
+future-stable receiver agreement. The prototype's Athena plan used their consequences for
+jointly bounded return, conditional local conduct, emitted output and dynamic reuse. Formal
+conservation or conformation identities do not themselves supply the port conversion or training
+rule; the HNN formula names the composed passages that realize them.
 
 ## Twist, curvature and phase keep their different meanings
 
@@ -669,7 +671,7 @@ R(M+δM, x+δx) − R(M,x) = R(M,δx) + R(δM,x) + R(δM,δx).
 [counterexample; formal-checked] With one branch/node, `B=1`, `M=x=1`, `δM=1`, `δx=−1`, the first
 two terms sum to zero but the complete response changes by `−1`. Thus tangent cancellation does
 not establish a finite completed return. This is a scalar control of that claim, not evidence
-that an arbitrary native update is unstable.
+that an arbitrary update is unstable.
 
 [definition] The common lesson for molecular modulation and Athena is concrete: a current
 passing through changing structure must carry both changes and their coupling. An adjoint is a
@@ -724,7 +726,7 @@ exactly commuting fine/coarse step while energy increases from 2 to 50. Exact de
 receiver chart does not establish energy descent of the finite step.
 
 [definition] The [primitive-to-fluid construction](HOLONIC_FLUID_CONSTRUCTION.md) now uses
-Swing at the native graph projection and at an evolving Galerkin mean. The checked identities
+Swing at the constitutive graph projection and at an evolving Galerkin mean. The checked identities
 retain `B(r,r)` in the even part and both mixed interactions in the odd part. It develops
 material-action Euler, constituted stress/diffusion, active Einstein faces and an explicit
 internal-field energy exchange, and joins the Hodge/heat/arithmetic sources without identifying
@@ -749,7 +751,7 @@ uniform continuum limit.
 [definition] For numerical realization, the exact declared finite law and an unrounded reference
 law may have different successors. Their difference is a comparison with retained scope. It does
 not automatically become coefficient uncertainty in the finite law, and it does not erase actual
-uncertainty in the source. This calculus therefore informs the native return without prescribing
+uncertainty in the source. This calculus therefore informs the HNN return without prescribing
 a new numerical policy, an extra certainty condition or another engine.
 
 ## Coarse graining is transport with a declared future
@@ -774,7 +776,7 @@ hypotheses, not because a source is called neural.
 [definition] A Preimage Fibre may remain plural and implicit. Exact decoder execution, approximate
 receiver bounds and source identification are separate claims. A representation can support
 useful navigation without recovering every microscopic cause. When restriction and rebase reuse
-one generator across scales, retain its decoder, scale action and actual remainder; do not
+one navigator across scales, retain its decoder, scale action and actual remainder; do not
 replace them by a picture of a fractal or an assumed fixed semantic dimension.
 
 [proved-derived; formal-checked] `HolonicRecurrentEcology.FirstArrival` now packages the
@@ -853,15 +855,15 @@ using its already established local constructions.
 ecology now passes prior local standing into its constitutive reaction. The graph specialization
 had accepted that argument but supplied zero; the complete graph update and covariance are
 now explicit, with a retention control. The [deeper architecture review](../research/records/2026-09-09_ARCHITECTURE_CHARTS_REQUIRE_COMPOSED_MECHANISMS_AND_FINITE_CONSTRUCTION_RETURNS.md)
-connects this repair, classical/tensor mechanism charts and bounded approximation to the revised
-native construction. It does not make a full-history adjoint a prerequisite for local learning.
+connects this repair, classical/tensor mechanism charts and bounded approximation to the HNN
+construction. It does not make a full-history adjoint a prerequisite for local learning.
 
 [definition] Classical architecture charts expose attention as conditional contact, convolution
 as shared transported structure, graph computation as incident current and state-space models as
 retained recurrence. The normalized-exponential receiver has an exact Jacobian and a binary
 sigmoid restriction. These are reusable maps in the same framework. HNN need not inherit an
-entire architecture to use them. Execution/simulation, logical resources and native recurrence
-remain explicit in the computation owners.
+entire architecture to use them. Execution/simulation, logical resources and recurrence remain
+explicit in the computation owners.
 
 [definition] Biological neural transport adds its own membrane and constitutive data. The
 Hodgkin–Huxley conduction model is a concrete historical comparison for voltage, membrane
@@ -870,33 +872,35 @@ current and internal channel state
 Mapping an axon to a tube requires those fields and longitudinal/boundary transport, not merely
 renaming a machine-learning edge. Conversely, tube composition is not exclusive to neurons.
 
-[definition] The formal deposit informs the parallel AC1 work at three existing obligations:
-return through the producing interior; retain the finite mixed response of changing current and
-morphology; and re-establish generator/receiver descent before reusing a compressed successor.
-The normalized material receiver, its partial adjoint and paired producer retain their separate
-native evidence. This review changes no AC1 kernel, model or product grade. Its new finite theorem
-is a useful local comparison, not a mandate to replace AC1 with the coupled-LC chart.
+[definition] The formal deposit fixes three obligations of the HNN law (rebuild step 4): return
+through the producing interior; keep the finite mixed response of changing current and
+morphology; and re-establish navigator/receiver descent before reusing a compressed successor.
+Its finite theorem is a local comparison, not a mandate to replace the machine with the
+coupled-LC chart.
 
 [project-postulate] “Compression is intelligence is navigation” names the framework's adopted
-construction: learn reusable routes through changing, receiver-relative geometry. Exact
+construction ([the line](plans/THE_REBUILD.md#the-line-the-rebuild-serves)): couple fractal
+navigators with terrain, quotient what no admitted receiver distinguishes, and learn reusable
+routes through changing, receiver-relative geometry. Exact
 factorization and generator descent are mathematical theorems at declared scope. A universal
 prediction or intelligence guarantee requires its own statement and assumptions. The practical
 return here is a navigable formal framework, shared operators and explicit comparisons that can
 continue growing across subjects.
 
 [established-bounded; formal-proof] `Transport/GeneratorMachineCharts.lean`, imported by
-Framework Dynamics, checks the fixed machine's rational affine spatial realization,
+Framework Dynamics, checks the fixed navigator machine's rational affine spatial realization,
 changing-anchor composition, geometry/value adjoints, projection, affine normalized mixtures
 and the six-real-coordinate encoding into native complex channels. Its image hypothesis is
 explicit; arbitrary native imaginary channels are not original machine coordinates. The
-[native consumer record](../research/records/2026-09-21_THE_FIXED_GENERATOR_MACHINE_CONSUMES_ITS_AFFINE_CURRENT_CHART.md)
-connects these laws to the current/refinement implementation.
+[consumer record](../research/records/2026-09-21_THE_FIXED_GENERATOR_MACHINE_CONSUMES_ITS_AFFINE_CURRENT_CHART.md)
+connects these laws to the prototype's current/refinement implementation.
 
 [established-bounded; formal-proof] `Transport/GeneratorSourceEpisode.lean` adds the directed
 pooled-contrast adjoint, affine standing/tangent injection law, and finite reverse telescope
 with independent state/source/condition dimensions. Producing linearized maps and matching
-input lengths are explicit hypotheses. Dynamics imports it; the [public source consumer](../research/records/2026-09-21_ORDERED_SOURCE_AND_PHASE_RECEIVING_ENTER_THE_PUBLIC_GENERATOR_SESSION.md)
-uses the same incidence and source/condition return.
+input lengths are explicit hypotheses. Dynamics imports it; the prototype's
+[source consumer](../research/records/2026-09-21_ORDERED_SOURCE_AND_PHASE_RECEIVING_ENTER_THE_PUBLIC_GENERATOR_SESSION.md)
+used the same incidence and source/condition return.
 
 [established-bounded; formal-proof] `Transport/ContactFactorScale.lean` proves rectangular
 amplitude variation and cotangent pairing, quadratic Gram scaling and the unchanged null kernel
@@ -904,18 +908,18 @@ for nonzero amplitude. Its two-factor contraction matches the machine's real-coo
 parameter receiver. The relative-basis law rebases an old comparison's amplitude covector;
 a scalar counterexample separates old and contemporary bases. A gradient-ball bound proves
 positivity of the proposed relative step, and amplitude composition retains the pair template.
-These laws constrain the implemented positive-amplitude publication owner; they do not
-assert finite-step objective improvement. [Native return and scope](../research/records/2026-09-21_THE_PAIR_RESPONSE_RETURNS_ITS_RECTANGULAR_FACTOR_COTANGENT.md).
+These laws constrained the prototype's positive-amplitude publication; they do not assert
+finite-step objective improvement. [Return and scope](../research/records/2026-09-21_THE_PAIR_RESPONSE_RETURNS_ITS_RECTANGULAR_FACTOR_COTANGENT.md).
 
 [proved-derived; formal-checked] `Transport/ContactAmplitudeState.lean` instantiates
 `StandingLaw` for completed update sequences mapped to their complete current state, proving
 the fold/transport correspondence and equality of declared future consequences. Pending
 comparison operands remain separate. `Transport/{AffineJointBall,PairJointBall}.lean` proves
 conditional affine/adjoint, projection, simplex and perturbation bounds for joint enclosures.
-All three are imported by Dynamics. Native matrix-norm and integer-rounding correspondence,
+All three are imported by Dynamics. Matrix-norm and integer-rounding correspondence,
 nonlinear source descent and geometric/clock derivatives remain #62 obligations. The
 [amplitude consumer and scope](../research/records/2026-09-22_PAIR_MATERIAL_LEARNS_WITHOUT_A_COMPLETED_UPDATE_ARCHIVE.md)
-binds these laws to public observation, current state, and numerical tests.
+bound these laws to the prototype's observation, current state and numerical tests.
 
 [proved-derived; formal-checked] `Transport/SourceMoment.lean`, imported by Dynamics, defines
 the source moment by its one-step law `moment (l ++ [u]) = U (moment l) + I (E u)` over a
@@ -928,7 +932,7 @@ state `(moment, last, offset)` as `ReceiverHistoryCompression` instances for the
 with generator `U_u(x) = U x + I E u`. `Transport/ContactAmplitudeState.lean` is a generic
 fold/current-state identity, not the standing counterpart of the pair machine; that binding
 remains #17/#62. The [retention audit](../research/records/2026-09-22_RETENTION_IS_A_QUOTIENT_NOT_A_TAPE_AND_THE_SOURCE_ENTERS_AS_PHASE_CARRIED_MOMENTS.md)
-names the native tape these laws replace.
+names the prototype's tape these laws replace.
 
 [proved-derived; formal-checked] **Elementary objects** (`Framework/Objects.lean`, September 22).
 `Objects/Pairing` (coholon face as potential drop, orientation in the pairing, class pairing,

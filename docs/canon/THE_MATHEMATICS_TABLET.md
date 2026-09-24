@@ -26,7 +26,7 @@ including an integer. Equal faces do not merge causal origins: `2+2` and `2^2` r
 numerical face while retaining different constructions. Bit-pure computation and exact ratios,
 generators and retained remainders realize the no-float discipline; exp, log, sigmoid, softmax,
 adjoints and the mathematics of classical architectures remain available. Read the
-[framework synthesis](../MATHEMATICS_AND_NATIVE_CONDUCT.md) for their connection to reflection,
+[framework synthesis](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/MATHEMATICS_AND_NATIVE_CONDUCT.md) for their connection to reflection,
 leader growth, fractal restriction and Holonic Compression. Current neural terminology is HNN.
 
 [definition] The [formal framework guide](../FORMAL_FRAMEWORK.md) connects this ontology to Lean's

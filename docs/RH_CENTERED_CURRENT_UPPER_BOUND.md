@@ -2,7 +2,7 @@
 
 [project-postulate] Brandon's September 14 request explicitly continues upper-bound work
 using the evolving-source equation and the wider Holonic constructions. This bounded
-derivation proceeds alongside the Athena engine blueprint. It does not make an RH endpoint
+derivation proceeds alongside every rebuild step as landmark discovery. It does not make an RH endpoint
 an admission condition for ordinary model generation or training.
 
 ## A conserved face with remaining complex motion
@@ -93,7 +93,7 @@ retains the `L_dot` term. Choosing an observer can simplify the current/estimate
 centring the view does not establish zero separation from the transported critical line.
 
 [established-bounded; computational-witness] The
-[moving-plate/Burgers audit](../research/experiments/mfr_entropy_heat_current/moving_plate_and_burgers.json)
+[moving-plate/Burgers audit](https://github.com/brandonrdug/holonics/blob/13f8c734/research/experiments/mfr_entropy_heat_current/moving_plate_and_burgers.json)
 checks the quotient-jet PDE, its pole coefficient, the accelerating-frame source and
 normalized gap/rate. It also constructs an explicit reflected-quartet polynomial heat
 source and verifies its Burgers law and initial normal/tangential pole velocities. That

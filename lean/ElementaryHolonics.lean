@@ -9,6 +9,8 @@ import ElementaryHolonics.RH.PositiveLaplaceOffLineControl
 import ElementaryHolonics.RH.PrimePhasePartition
 import ElementaryHolonics.RH.PrimeApertureCorrelation
 import ElementaryHolonics.RH.ArchimedeanModeSign
+import ElementaryHolonics.RH.DivisorSourceTransport
+import ElementaryHolonics.RH.DivisorQuotientFamily
 import ElementaryHolonics.Foundation.Receiver
 import ElementaryHolonics.Foundation.MeasuredDifferenceReceiver
 import ElementaryHolonics.Foundation.TransportLift
