@@ -8,7 +8,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_engine::receiver_history_compression::NativeStateId;
+use holonics::receiver::native::NativeStateId;
 use holonic_engine::{
     cuda_refine::{
         CudaRefineExecutor, ResidentIntegratedFront, ResidentParticipantCausalFrontReturn,

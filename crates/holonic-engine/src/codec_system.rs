@@ -139,8 +139,12 @@ use crate::codec_recovery::{
     Boundary, Emission, RecoveredCodec, RecoveryError, Symbol, SymbolClass,
 };
 use crate::receiver_exact_compression::{
-    InputId, ItemId, Observation, ObservedSystem, ReceiverExactCompression, ReceiverId, compress,
+    ItemId,
+        ObservedSystem,
+        ReceiverExactCompression,
+        compress
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 
 /// The name a [`SeparationCrossCheck`] writes onto itself, so a return read back from octets can be
 /// checked against what produced it rather than assumed.

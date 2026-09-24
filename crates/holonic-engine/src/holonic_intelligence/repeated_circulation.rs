@@ -4,7 +4,8 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::native_spool::NativeTransportScaffold;
-use crate::{EventId, receiver_history_compression::NativeStateId};
+use crate::{EventId};
+use holonics::receiver::native::NativeStateId;
 
 use super::{
     InferenceCirculation, NativeEmissionAddress, NativeFutureFace, NativeInferenceAddress,
@@ -253,7 +254,7 @@ fn variable_grain(
 mod tests {
     use crate::native_spool::NativeTransportScaffold;
     use crate::native_spool::fixture;
-    use crate::receiver_history_compression::NativeStateId;
+    use holonics::receiver::native::NativeStateId;
 
     use super::*;
 

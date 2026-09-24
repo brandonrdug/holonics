@@ -15,7 +15,8 @@ use std::{
 };
 
 use holonics::exact_linear::ExactRatMatrix;
-use holonic_engine::{native_spool::{NativeCollapsedFibre, NativeConstitutiveResponse, NativeIncidenceTerm}, receiver_exact_compression::ReceiverId, EventId, ExactComplexWaveCurrent, OccurrencePort};
+use holonic_engine::{native_spool::{NativeCollapsedFibre, NativeConstitutiveResponse, NativeIncidenceTerm}, EventId, ExactComplexWaveCurrent, OccurrencePort};
+use holonics::receiver::native::ReceiverId;
 use life::{
     exchange_world_tube::ContinuationAperture,
     native_intelligence::{
@@ -714,8 +715,8 @@ fn returned_difference(
 
 fn common_receiver(
     thread: &holonic_engine::native_spool::NativeThread,
-    left: holonic_engine::receiver_history_compression::NativeStateId,
-    right: holonic_engine::receiver_history_compression::NativeStateId,
+    left: holonics::receiver::native::NativeStateId,
+    right: holonics::receiver::native::NativeStateId,
 ) -> Result<ReceiverId, String> {
     thread
         .constitutive_responses
@@ -736,9 +737,9 @@ fn common_receiver(
 
 fn observation(
     thread: &holonic_engine::native_spool::NativeThread,
-    native: holonic_engine::receiver_history_compression::NativeStateId,
+    native: holonics::receiver::native::NativeStateId,
     receiver: ReceiverId,
-) -> Result<holonic_engine::receiver_exact_compression::Observation, String> {
+) -> Result<holonics::receiver::native::Observation, String> {
     thread
         .receiver_consequences
         .iter()

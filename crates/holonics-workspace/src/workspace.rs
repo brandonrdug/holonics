@@ -7,9 +7,9 @@ use holonic_engine::{
     native_ecology::holonic_intelligence::{
         NativeInferenceAddress, NativeInferenceRequest,
     },
-    receiver_exact_compression::ReceiverId,
-    EventId,
+        EventId
 };
+use holonics::receiver::native::ReceiverId;
 use life::native_intelligence::{
     export_morphology, ExportCodecKind, ExportPurpose, MorphologyExportRequest,
     MorphologyExportReturn, NativeCirculationBoundary,

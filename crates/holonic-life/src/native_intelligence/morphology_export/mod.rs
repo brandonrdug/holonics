@@ -5,7 +5,7 @@ mod safetensors;
 
 use std::collections::BTreeSet;
 
-use holonic_engine::receiver_exact_compression::{Observation, ReceiverId};
+use holonics::receiver::native::{Observation, ReceiverId};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 

@@ -8,8 +8,10 @@ use std::collections::BTreeSet;
 
 use holonic_engine::{
     native_ecology::holonic_intelligence::NativeEmissionAddress,
-    receiver_history_compression::NativeStateId, EventId, ExactComplexWaveCurrent,
+        EventId,
+        ExactComplexWaveCurrent
 };
+use holonics::receiver::native::NativeStateId;
 use holonics::structure::CountedCrossing;
 use num_bigint::{BigInt, BigUint};
 use num_rational::BigRational as Rat;

@@ -1,6 +1,5 @@
 use crate::native_spool::{NativeSpoolConductReturn, NativeSpoolRefusal, NativeTransportScaffold};
-use crate::receiver_exact_compression::{InputId, ReceiverId};
-use crate::receiver_history_compression::NativeStateId;
+use holonics::receiver::native::{InputId, ReceiverId, NativeStateId};
 
 use super::NativeEcologyProfile;
 

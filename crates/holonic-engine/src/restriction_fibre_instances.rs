@@ -17,8 +17,10 @@ use crate::native_ecology::recurrent_condensation::{
     CondensedFibre, CondensedFibreMember, CondensedSeparator,
 };
 use crate::native_spool::{NativeCollapsedFibre, NativeShortestSeparator};
-use crate::receiver_exact_compression::{InputId, ItemId, Observation, ReceiverId};
-use crate::receiver_history_compression::{NativeStateId, ReconstructionFibre};
+use crate::receiver_exact_compression::{ItemId};
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
+use crate::receiver_history_compression::{ReconstructionFibre};
+use holonics::receiver::native::NativeStateId;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]

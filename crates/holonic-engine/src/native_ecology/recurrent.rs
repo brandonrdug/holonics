@@ -14,8 +14,7 @@ use thiserror::Error;
 
 use holonics::exact_work::ExactWork;
 use crate::generator_native_rest::{GeneratorNativeRest, NativeGenerator};
-use crate::receiver_exact_compression::{InputId, Observation, ReceiverId};
-use crate::receiver_history_compression::{NativeStateId, NativeTransport};
+use holonics::receiver::native::{InputId, Observation, ReceiverId, NativeStateId, NativeTransport};
 
 pub const RETAINED_PASSAGE_SCHEMA: &str = "holonics.i1.retained-continuation-passage.v1";
 pub const RETAINED_REST_SCHEMA: &str = "holonics.i1.retained-continuation-rest.v1";
@@ -311,7 +310,7 @@ impl RetainedContinuationPassage {
         let receiver_factors = decoder
             .iter()
             .map(
-                |entry| crate::receiver_history_compression::ReceiverFactor {
+                |entry| holonics::receiver::native::ReceiverFactor {
                     native: entry.native,
                     receiver,
                     observation: Observation(

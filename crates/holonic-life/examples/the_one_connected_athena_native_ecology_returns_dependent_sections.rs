@@ -13,9 +13,9 @@ use std::{
 
 use holonic_engine::{
     native_spool::{NativeTransportScaffold, ReceiverInsufficiencyCause},
-    receiver_exact_compression::ReceiverId,
-    EventId,
+        EventId
 };
+use holonics::receiver::native::ReceiverId;
 use life::native_intelligence::{NativeConductConsequence, NativeEcologyRest};
 use serde::Serialize;
 use serde_json::json;

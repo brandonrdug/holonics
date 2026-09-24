@@ -3,7 +3,7 @@ use std::path::Path;
 use std::time::Instant;
 
 use holonic_engine::cuda_refine::CudaRefineExecutor;
-use holonic_engine::receiver_history_compression::NativeStateId;
+use holonics::receiver::native::NativeStateId;
 use life::mathematical_particle::LongHorizonRetainedBoundary;
 use serde::{Deserialize, Serialize};
 

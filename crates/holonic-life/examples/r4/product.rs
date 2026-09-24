@@ -5,7 +5,8 @@ use std::process::Command;
 use std::time::Instant;
 
 use holonic_engine::cuda_refine::{CudaRefineExecutor, DeviceRaggedNativeTrace};
-use holonic_engine::receiver_exact_compression::{compress_on_device, Observation};
+use holonic_engine::receiver_exact_compression::{compress_on_device};
+use holonics::receiver::native::Observation;
 use life::mathematical_particle::{
     AddressedHistorySystem, CultivatedActionLineage, DynamicMorphologyRest,
     LongHorizonRetainedBoundary,

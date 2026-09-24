@@ -44,8 +44,11 @@ use holonics::exact_linear::ExactRatMatrix;
 use holonics::exact_value::ieee754::decode_bfloat16_bits;
 use holonic_engine::lattice_gauge::exact_spectrum;
 use holonic_engine::receiver_exact_compression::{
-    InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress_on_device,
+    ItemId,
+        ObservedSystem,
+        compress_on_device
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 use holonic_engine::regime_reading::{Regime, RegimeReading};
 use num_bigint::BigInt;
 use num_bigint::BigUint;

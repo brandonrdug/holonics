@@ -10,9 +10,12 @@ use std::{
 };
 
 use holonic_engine::{
-    cuda_refine::ResidentMembraneInteriorReturn, quantity::BaseUnits,
-    receiver_exact_compression::ReceiverId, BoundaryId, ExactComplexWaveCurrent,
+    cuda_refine::ResidentMembraneInteriorReturn,
+        quantity::BaseUnits,
+        BoundaryId,
+        ExactComplexWaveCurrent
 };
+use holonics::receiver::native::ReceiverId;
 use holonics::structure::CausalMembrane;
 use life::{
     mathematical_source::ExactAcousticOccurrence,

@@ -1,4 +1,5 @@
-use holonic_engine::receiver_exact_compression::{compress, Observation};
+use holonic_engine::receiver_exact_compression::{compress};
+use holonics::receiver::native::Observation;
 use sha2::{Digest, Sha256};
 
 use super::{

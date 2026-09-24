@@ -15,7 +15,8 @@ use thiserror::Error;
 use holonics::geometry::Rat;
 
 use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
-use crate::{generator_native_rest::GeneratorNativeRest, receiver_exact_compression::InputId, receiver_history_compression::NativeStateId};
+use crate::{generator_native_rest::GeneratorNativeRest};
+use holonics::receiver::native::{InputId, NativeStateId};
 
 use super::recurrent::{BoundaryDecoder, RetainedContinuationRest};
 
@@ -748,8 +749,7 @@ mod tests {
     use crate::native_ecology::recurrent::{
         BoundaryFace, ClosureDerivation, RetainedContinuationRest,
     };
-    use crate::receiver_exact_compression::{Observation, ReceiverId};
-    use crate::receiver_history_compression::{NativeTransport, ReceiverFactor};
+    use holonics::receiver::native::{Observation, ReceiverId, NativeTransport, ReceiverFactor};
 
     fn predecessor() -> Vec<u8> {
         let native = GeneratorNativeRest::new(

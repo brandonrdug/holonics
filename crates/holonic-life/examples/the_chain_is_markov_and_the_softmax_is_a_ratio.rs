@@ -87,8 +87,11 @@ use std::collections::BTreeMap;
 use holonics::ratio::exponentiated::RatioFamily;
 use holonic_engine::landauer::{self, ThermalFrame};
 use holonic_engine::receiver_exact_compression::{
-    compress, InputId, ItemId, Observation, ObservedSystem, ReceiverId,
+    compress,
+        ItemId,
+        ObservedSystem
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 use holonics::ratio::surprisal::SymbolicSurprisal;
 use life::decomposing_codec::{read, render_word, DecompositionGrain, Symbol};
 use life::material_incidence::strongly_connected_cores;

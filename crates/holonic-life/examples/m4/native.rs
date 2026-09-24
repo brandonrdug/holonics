@@ -4,8 +4,8 @@ use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
 use holonic_engine::generator_native_rest::GeneratorNativeRest;
-use holonic_engine::receiver_exact_compression::{InputId, ItemId, Observation, ReceiverId};
-use holonic_engine::receiver_history_compression::NativeStateId;
+use holonic_engine::receiver_exact_compression::{ItemId};
+use holonics::receiver::native::{InputId, Observation, ReceiverId, NativeStateId};
 use serde::{Deserialize, Serialize};
 
 const REST: &str =

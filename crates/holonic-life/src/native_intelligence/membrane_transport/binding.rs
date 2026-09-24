@@ -2,7 +2,7 @@
 
 use super::super::InteriorContactConsequence;
 use super::*;
-use holonic_engine::receiver_exact_compression::ReceiverId;
+use holonics::receiver::native::ReceiverId;
 
 impl<Standing: MembraneStanding> NativeCausalMembrane<Standing> {
     pub fn founded_interior_contact(

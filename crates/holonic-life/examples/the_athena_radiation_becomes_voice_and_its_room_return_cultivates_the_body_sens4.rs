@@ -12,14 +12,32 @@ use std::{
 };
 
 use holonic_engine::{
-    cuda_refine::ResidentMembraneInteriorReturn, quantity::BaseUnits,
-    receive_phase_transport_spectrum, receiver_exact_compression::ReceiverId, BoundaryId,
-    CausalWorld, CpuExecutor, EventId, ExactComplexWaveCurrent, ExactPhaseCurrentSection,
-    ExactWavePropagationLaw, ExactWaveSection, PhaseCurrentLineageId, PhaseCurrentReceiverId,
-    WaveConditioningEvent, WaveGenerationEvent, WaveInteractionId, WaveInteractionSpec,
-    WaveLineageId, WavePredictionReturnEvent, WavePropagationEvent, WavePropagationRadiation,
-    WavePropagationSpec, WaveReceiverId, WaveReceiverSpec,
+    cuda_refine::ResidentMembraneInteriorReturn,
+        quantity::BaseUnits,
+        receive_phase_transport_spectrum,
+        BoundaryId,
+        CausalWorld,
+        CpuExecutor,
+        EventId,
+        ExactComplexWaveCurrent,
+        ExactPhaseCurrentSection,
+        ExactWavePropagationLaw,
+        ExactWaveSection,
+        PhaseCurrentLineageId,
+        PhaseCurrentReceiverId,
+        WaveConditioningEvent,
+        WaveGenerationEvent,
+        WaveInteractionId,
+        WaveInteractionSpec,
+        WaveLineageId,
+        WavePredictionReturnEvent,
+        WavePropagationEvent,
+        WavePropagationRadiation,
+        WavePropagationSpec,
+        WaveReceiverId,
+        WaveReceiverSpec
 };
+use holonics::receiver::native::ReceiverId;
 use holonics::structure::CausalMembrane;
 use life::native_intelligence::{
     AcousticProductRest, AddressedMaterialOccurrence, ExactMembraneChartPassage,

@@ -688,10 +688,12 @@ mod tests {
 
     use holonic_engine::{
         native_spool::{NativeConstitutiveResponse, NativeIncidenceTerm, NativeThreadHand},
-        receiver_exact_compression::{InputId, Observation, ReceiverId},
-        receiver_history_compression::NativeStateId,
-        BoundaryId, EventId, ExactUnitConicPhase, OccurrencePort,
+                BoundaryId,
+                EventId,
+                ExactUnitConicPhase,
+                OccurrencePort
     };
+    use holonics::receiver::native::{InputId, NativeStateId, Observation, ReceiverId};
     use num_bigint::BigInt;
 
     use super::*;

@@ -31,9 +31,13 @@ use holonic_engine::complex_system::{AddressReading, ComplexSystem, cell, item};
 use holonic_engine::dilation::{Horizon, WalkOrder, covering_horizon, dilate};
 use holonic_engine::placement::place;
 use holonic_engine::receiver_exact_compression::{
-    InputId, ItemId, Observation, ObservedSystem, Partition, ReceiverExactCompression, ReceiverId,
-    compress,
+    ItemId,
+        ObservedSystem,
+        Partition,
+        ReceiverExactCompression,
+        compress
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 use holonic_engine::supported_realizers::RealizerId;
 
 const SIDE: usize = 3;

@@ -29,12 +29,8 @@ use thiserror::Error;
 
 use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::factored_moment::FactoredMomentError;
-use crate::receiver_exact_compression::{CollapsedPair, InputId, ItemId, Observation, ReceiverId};
-
-/// One state of the native quotient.  Its ordinal is only the canonical address of a conduct
-/// block; no arithmetic or semantic ordering is read from it.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
-pub struct NativeStateId(pub u64);
+use holonics::receiver::native::{InputId, NativeStateId, NativeTransport, Observation, ReceiverFactor, ReceiverId};
+use crate::receiver_exact_compression::{CollapsedPair, ItemId};
 
 /// The quotient map `q : X -> Q`, exhibited at every source occurrence.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -62,13 +58,6 @@ pub struct SourceTransport {
     pub to: ItemId,
 }
 
-/// One entry of the induced native generator `U_i`.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct NativeTransport {
-    pub from: NativeStateId,
-    pub to: NativeStateId,
-}
-
 /// A complete commuting generator square.  `source` and `native` are total functions over their
 /// respective declared populations; construction refuses a terminus rather than hiding it.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -76,14 +65,6 @@ pub struct GeneratorSquare {
     pub generator: InputId,
     pub source: Vec<SourceTransport>,
     pub native: Vec<NativeTransport>,
-}
-
-/// The factor `rhoBar_j : Q -> Face` for one native state and receiver.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ReceiverFactor {
-    pub native: NativeStateId,
-    pub receiver: ReceiverId,
-    pub observation: Observation,
 }
 
 /// Exact semantic work used to found the native rest.  These are populations of exact relation

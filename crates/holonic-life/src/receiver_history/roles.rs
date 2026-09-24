@@ -1,6 +1,7 @@
 use std::collections::BTreeSet;
 
-use holonic_engine::receiver_exact_compression::{InputId, ItemId};
+use holonic_engine::receiver_exact_compression::{ItemId};
+use holonics::receiver::native::InputId;
 use sha2::{Digest, Sha256};
 
 use crate::exchange_world_tube::ContinuationAperture;

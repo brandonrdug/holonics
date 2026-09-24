@@ -1,6 +1,6 @@
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_engine::receiver_history_compression::NativeStateId;
+use holonics::receiver::native::NativeStateId;
 
 use super::{
     rest::{derive_holonomy, derive_recurrences, digest},

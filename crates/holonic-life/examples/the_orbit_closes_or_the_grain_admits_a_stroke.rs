@@ -84,8 +84,11 @@ use std::path::{Path, PathBuf};
 
 use holonics_portable::manifold::{locate, ContinuingBody, Node, ENCLOSURE_WORDS};
 use holonic_engine::receiver_exact_compression::{
-    compress, InputId, ItemId, Observation, ObservedSystem, ReceiverId,
+    compress,
+        ItemId,
+        ObservedSystem
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 use holonic_engine::winding_inertia::lattice_admits_order;
 use holonics::structure::DeclaredGauge;
 

@@ -30,8 +30,11 @@ use std::collections::{BTreeMap, BTreeSet};
 use crate::causal_language::token_germs;
 use crate::suffix_ecology::ExactSuffixEcology;
 use holonic_engine::receiver_exact_compression::{
-    compress, InputId, ItemId, Observation, ObservedSystem, ReceiverId,
+    compress,
+        ItemId,
+        ObservedSystem
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 use sha2::{Digest, Sha256};
 
 /// One candidate the emission conducted, as the emission returned it.

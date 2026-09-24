@@ -251,7 +251,7 @@ pub(super) fn derive_branch_deposit(
     k3_branches: &[K3PullbackBranch],
     covers: &[NativeStateExchangeCover],
     mixed: &[MixedConstitutiveInteractionFamily],
-    receiver: holonic_engine::receiver_exact_compression::ReceiverId,
+    receiver: holonics::receiver::native::ReceiverId,
     dependent_receiver_support: &BTreeSet<NativeStateId>,
 ) -> Result<(NativeThreadDeposit, SituatedCultivationBranch), SituatedCultivationError> {
     let k3 = k3_branches.get(branch_index).ok_or_else(|| {
@@ -550,7 +550,7 @@ pub(super) fn derive_returned_difference_deposit(
 fn native_mixed_family(
     family: &MixedConstitutiveInteractionFamily,
     thread_addresses: &[String],
-    receiver: holonic_engine::receiver_exact_compression::ReceiverId,
+    receiver: holonics::receiver::native::ReceiverId,
     dependent_receiver_support: &BTreeSet<NativeStateId>,
 ) -> Result<NativeMixedConstitutiveFamily, SituatedCultivationError> {
     let left_thread = thread_addresses.get(family.left_branch).ok_or_else(|| {

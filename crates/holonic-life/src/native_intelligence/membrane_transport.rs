@@ -488,7 +488,7 @@ pub struct MembraneCrossingReceipt {
     pub interior_boundary: BoundaryId,
     pub interior_port: OccurrencePort,
     pub native_occurrence: holonic_engine::EventId,
-    pub native_ordered_word: Vec<holonic_engine::receiver_exact_compression::InputId>,
+    pub native_ordered_word: Vec<holonics::receiver::native::InputId>,
     pub returned_difference: ReturnedMembraneDifference,
     pub exact_source_fibre_retained: bool,
     pub cold_lineage_did_not_select_contact: bool,

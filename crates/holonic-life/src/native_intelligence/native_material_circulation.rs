@@ -9,9 +9,9 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use holonic_engine::{
-    receiver_exact_compression::{Observation, ReceiverId},
-    ExactComplexWaveCurrent,
+    ExactComplexWaveCurrent
 };
+use holonics::receiver::native::{Observation, ReceiverId};
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
 use serde::Serialize;

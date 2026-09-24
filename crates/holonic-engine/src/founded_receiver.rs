@@ -72,8 +72,13 @@ use num_bigint::BigUint;
 use num_traits::One;
 
 use crate::receiver_exact_compression::{
-    CollapsedPair, InputId, ItemId, Observation, ObservedSystem, Partition, ReceiverId, compress,
+    CollapsedPair,
+        ItemId,
+        ObservedSystem,
+        Partition,
+        compress
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 
 /// **Why an axis was founded.** Two pressures, and the second is the traffic law.
 ///

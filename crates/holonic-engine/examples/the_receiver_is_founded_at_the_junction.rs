@@ -42,8 +42,11 @@ use holonic_engine::lean_development::{
     ConductGrain, DeclarationGrain, DevelopmentReading, join, read_development,
 };
 use holonic_engine::receiver_exact_compression::{
-    InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress,
+    ItemId,
+        ObservedSystem,
+        compress
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 
 /// The development as a system under observation.
 ///

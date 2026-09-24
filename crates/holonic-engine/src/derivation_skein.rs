@@ -1108,9 +1108,9 @@ mod tests {
 
         // The frames genuinely disagree: two receivers that address every cell alike are one frame
         // wearing two names.
-        let first = system.addresses(crate::receiver_exact_compression::ReceiverId(0));
+        let first = system.addresses(holonics::receiver::native::ReceiverId(0));
         let disagreeing = (1..system.receivers.len()).filter(|index| {
-            system.addresses(crate::receiver_exact_compression::ReceiverId(*index as u64)) != first
+            system.addresses(holonics::receiver::native::ReceiverId(*index as u64)) != first
         });
         assert!(
             disagreeing.count() > 0,

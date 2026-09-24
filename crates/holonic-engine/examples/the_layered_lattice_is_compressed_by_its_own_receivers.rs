@@ -62,9 +62,13 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use holonic_engine::cuda_refine::{CudaRefineExecutor, quotient_on_cpu};
 use holonic_engine::receiver_exact_compression::{
-    InputId, ItemId, Observation, ObservedSystem, ReceiverExactCompression, ReceiverId, compress,
-    compress_on_device,
+    ItemId,
+        ObservedSystem,
+        ReceiverExactCompression,
+        compress,
+        compress_on_device
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 
 /// The declared depth of the lattice. A caller declaration about how deep a stack it is asking
 /// about, exhibited in the return.

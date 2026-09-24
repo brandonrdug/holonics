@@ -15,7 +15,7 @@ use holonic_engine::{
         CausalAdjointPulledIncidence, CoupledComplexInteraction, CudaRefineExecutor,
         ResidentCoupledComplexParametron, ResidentCoupledComplexParametronReturn,
     },
-    native_spool::{
+        native_spool::{
         NativeConstitutiveResponse, NativeDepositFibreDelta, NativeExactReconstructionFibre,
         NativeIncidenceTerm, NativeMixedConstitutiveFamily, NativeOccurrenceSection,
         NativeParametronCell, NativePullbackOccurrence, NativeReceiverConsequence,
@@ -24,9 +24,10 @@ use holonic_engine::{
         SituatedNativeTransportPredecessor, SituatedNativeTransportScaffold,
         NATIVE_THREAD_DEPOSIT_SCHEMA, NATIVE_THREAD_SCHEMA,
     },
-    receiver_history_compression::NativeStateId,
-    ExactComplexWaveCurrent, OccurrencePort,
+        ExactComplexWaveCurrent,
+        OccurrencePort
 };
+use holonics::receiver::native::NativeStateId;
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
 use serde::{Deserialize, Serialize};

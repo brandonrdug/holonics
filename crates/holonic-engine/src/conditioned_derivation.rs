@@ -121,8 +121,12 @@ use crate::derivation_atlas::{
     StatementIncidence, found_circuit, read_derivation, statement_vertex_key,
 };
 use crate::receiver_exact_compression::{
-    InputId, ItemId, Observation, ObservedSystem, ReceiverExactCompression, ReceiverId, compress,
+    ItemId,
+        ObservedSystem,
+        ReceiverExactCompression,
+        compress
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 
 /// The number of **distinct** wholes that must witness a word before it commits.
 ///

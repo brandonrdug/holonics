@@ -3,8 +3,7 @@
 use std::path::Path;
 
 use holonic_engine::generator_native_rest::GeneratorNativeRest;
-use holonic_engine::receiver_exact_compression::{InputId, ReceiverId};
-use holonic_engine::receiver_history_compression::NativeStateId;
+use holonics::receiver::native::{InputId, ReceiverId, NativeStateId};
 use num_bigint::BigUint;
 use num_traits::Zero;
 use serde::Serialize;
@@ -65,7 +64,7 @@ pub struct CostComparison {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 struct RemountReceipt {
     first_endpoint: NativeStateId,
-    first_receiver_image: holonic_engine::receiver_exact_compression::Observation,
+    first_receiver_image: holonics::receiver::native::Observation,
     repeated_endpoint_identical: bool,
     repeated_receiver_image_identical: bool,
     source_material_opened_by_decoder: bool,

@@ -28,15 +28,20 @@ use thiserror::Error;
 
 use crate::{
     cuda_refine::CudaRefineExecutor,
-    native_anatomy::{NativeAnatomyClass, NativeAnatomyRefusal, NativeAnatomyRest},
-    receiver_exact_compression::{
-        InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress, compress_on_device,
+        native_anatomy::{NativeAnatomyClass, NativeAnatomyRefusal, NativeAnatomyRest},
+        receiver_exact_compression::{
+        ItemId,
+                ObservedSystem,
+                compress,
+                compress_on_device
     },
-    receiver_history_compression::{
-        NativeStateId, PartialReceiverHistoryCompression, ReceiverHistoryCompression,
-        ReceiverHistoryRefusal,
-    },
+        receiver_history_compression::{
+        PartialReceiverHistoryCompression,
+                ReceiverHistoryCompression,
+                ReceiverHistoryRefusal
+    }
 };
+use holonics::receiver::native::{InputId, NativeStateId, Observation, ReceiverId};
 
 use super::foreign_section_descent::{
     ForeignCoefficientReceiverQuotient, ForeignCoefficientWordSeparator,

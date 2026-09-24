@@ -1,9 +1,9 @@
 //! Native fine emission from one addressed material current.
 
 use holonic_engine::{
-    native_ecology::holonic_intelligence::{NativeFutureFace, NativeMaterialCurrentOccurrence},
-    receiver_exact_compression::Observation,
+    native_ecology::holonic_intelligence::{NativeFutureFace, NativeMaterialCurrentOccurrence}
 };
+use holonics::receiver::native::Observation;
 use serde::Serialize;
 
 use super::{
@@ -99,9 +99,9 @@ mod tests {
         native_ecology::holonic_intelligence::{
             direct_source_neutral_rest, NativeInferenceAddress, NativeInferenceRequest,
         },
-        receiver_exact_compression::ReceiverId,
-        EventId,
+                EventId
     };
+    use holonics::receiver::native::ReceiverId;
 
     use crate::native_intelligence::{
         InferenceConfigurationAddress, MorphologyLineage, NativeCirculationConfiguration,

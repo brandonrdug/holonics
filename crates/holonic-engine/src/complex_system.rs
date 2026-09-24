@@ -138,7 +138,8 @@ use thiserror::Error;
 
 use crate::algebraic::{CausalCellId, GradedCausalComplex};
 use crate::dilation::DilatedSection;
-use crate::receiver_exact_compression::{InputId, ItemId, Observation, ObservedSystem, ReceiverId};
+use crate::receiver_exact_compression::{ItemId, ObservedSystem};
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 
 /// A cell, named as an item of the population under compression.
 ///

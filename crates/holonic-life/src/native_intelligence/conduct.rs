@@ -1,8 +1,8 @@
 use holonic_engine::{
     native_spool::{ReceiverInsufficiency, ReceiverInsufficiencyCause},
-    receiver_exact_compression::ReceiverId,
-    EventId,
+        EventId
 };
+use holonics::receiver::native::ReceiverId;
 
 use super::types::{
     NativeBatchSectionAddress, NativeConductBatchPassage, NativeConductConsequence,

@@ -13,8 +13,9 @@ use std::{
 
 use holonic_engine::{
     receiver_exact_compression::ItemId,
-    receiver_history_compression::{NativeStateId, ReceiverHistoryCompression},
+        receiver_history_compression::{ReceiverHistoryCompression}
 };
+use holonics::receiver::native::NativeStateId;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use thiserror::Error;

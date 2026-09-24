@@ -68,8 +68,11 @@ use std::collections::{BTreeMap, BTreeSet};
 use holonic_engine::corpus_census::density_band;
 use holonic_engine::lean_development::{DeclarationGrain, DeclaredForm, read_development};
 use holonic_engine::receiver_exact_compression::{
-    InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress,
+    ItemId,
+        ObservedSystem,
+        compress
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 
 /// Term-position surfaces that are not mathematical objects. Stripped, and the
 /// count of what was stripped is returned rather than assumed.

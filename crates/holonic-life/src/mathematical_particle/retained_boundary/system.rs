@@ -1,6 +1,8 @@
 use holonic_engine::receiver_exact_compression::{
-    InputId, ItemId, Observation, ObservedSystem, ReceiverId,
+    ItemId,
+        ObservedSystem
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 
 use super::types::LongHorizonBoundaryError;
 

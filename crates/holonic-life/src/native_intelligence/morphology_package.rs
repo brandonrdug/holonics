@@ -11,16 +11,16 @@ use holonic_engine::{
         DimensionFace, ExteriorDegree, IncidenceNullity, IncidenceRank, RepresentationRank,
         TopologicalDegree,
     },
-    native_spool::{
+        native_spool::{
         NativeCollapsedFibre, NativeExactReconstructionFibre, NativeMixedConstitutiveFamily,
         NativeShortestSeparator, NativeSituatedThreadWithdrawal, NativeSpoolRefusal, NativeThread,
         NativeTransportScaffold, SituatedNativeTransportScaffold, NATIVE_SPOOL_SCHEMA,
         NATIVE_THREAD_SCHEMA, NATIVE_TRANSPORT_SCAFFOLD_SCHEMA,
         SITUATED_NATIVE_TRANSPORT_SCAFFOLD_SCHEMA,
     },
-    receiver_exact_compression::{Observation, ReceiverId},
-    EventId,
+        EventId
 };
+use holonics::receiver::native::{Observation, ReceiverId};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -749,10 +749,12 @@ mod tests {
             conduct_native_inference, InferenceCirculation, NativeInferenceAddress,
             NativeInferenceRequest,
         },
-        native_spool::fixture,
-        receiver_history_compression::NativeStateId,
-        BoundaryId, EventId, ExactComplexWaveCurrent,
+                native_spool::fixture,
+                BoundaryId,
+                EventId,
+                ExactComplexWaveCurrent
     };
+    use holonics::receiver::native::NativeStateId;
     use num_bigint::BigInt;
     use num_rational::BigRational as Rat;
 

@@ -1,5 +1,5 @@
-use holonic_engine::receiver_exact_compression::{CollapsedPair, ItemId, Observation, ReceiverId};
-use holonic_engine::receiver_history_compression::{NativeStateId, ReceiverFactor};
+use holonic_engine::receiver_exact_compression::{CollapsedPair, ItemId};
+use holonics::receiver::native::{Observation, ReceiverId, NativeStateId, ReceiverFactor};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 

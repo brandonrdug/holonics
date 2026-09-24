@@ -17,10 +17,14 @@ use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    BoundaryId, EventId, ExactComplexWaveCurrent, ExactUnitConicPhase, OccurrencePort, PortHand,
-    receiver_exact_compression::{InputId, Observation, ReceiverId},
-    receiver_history_compression::{NativeStateId, ReceiverFactor},
+    BoundaryId,
+        EventId,
+        ExactComplexWaveCurrent,
+        ExactUnitConicPhase,
+        OccurrencePort,
+        PortHand
 };
+use holonics::receiver::native::{InputId, NativeStateId, Observation, ReceiverFactor, ReceiverId};
 
 pub const NATIVE_THREAD_SCHEMA: &str = "holonic-engine.native-thread.v2";
 pub const NATIVE_SPOOL_SCHEMA: &str = "holonic-engine.native-spool.v4";

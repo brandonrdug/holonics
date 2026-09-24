@@ -17,7 +17,8 @@ use holonic_engine::realization::passage::{
     LinearPassageChainReceipt, PhysicalRealizationReference, ReceiverHistoryRealizationPassage,
     ReusedApparatusReceipt, SameEndpointDistinctLineage, TypedBoundaryReference,
 };
-use holonic_engine::receiver_exact_compression::{InputId, ItemId};
+use holonic_engine::receiver_exact_compression::{ItemId};
+use holonics::receiver::native::InputId;
 use holonic_engine::receiver_history_compression::ReceiverHistoryCompression;
 use num_bigint::BigInt;
 use holonics::geometry::Rat;
@@ -131,7 +132,7 @@ struct RealizationAtlas<'a> {
     quotient_assignments: &'a [holonic_engine::receiver_history_compression::QuotientAssignment],
     source_native_generator_squares:
         &'a [holonic_engine::receiver_history_compression::GeneratorSquare],
-    receiver_factors: &'a [holonic_engine::receiver_history_compression::ReceiverFactor],
+    receiver_factors: &'a [holonics::receiver::native::ReceiverFactor],
     reconstruction_fibre_evidence: &'a ArtifactOccurrence,
     addressed_passage_occurrences: &'a [AddressedPassageOccurrence],
     same_endpoint_distinct_lineage: &'a SameEndpointDistinctLineage,

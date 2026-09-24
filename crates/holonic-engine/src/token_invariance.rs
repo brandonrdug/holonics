@@ -209,8 +209,12 @@ use holonics::hardware_cover::{
     Chart, ChartId, CoverDecomposition, CpuDeclaration, FrontCell, HardwareCover, expand_front,
 };
 use crate::receiver_exact_compression::{
-    AblatedSystem, InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress,
+    AblatedSystem,
+        ItemId,
+        ObservedSystem,
+        compress
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 
 /// One declared receiver. Each reads exactly one coordinate of a [`Reading`], so each is separately
 /// ablatable and each one's contribution is separately measurable.

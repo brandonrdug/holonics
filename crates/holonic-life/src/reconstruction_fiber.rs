@@ -24,9 +24,14 @@ use holonic_engine::diffusion::{
     DiffusionError, DiffusionEvent, DiffusionReceipt, DiffusionStanding, ExactDiffusionLaw,
 };
 use holonic_engine::receiver_exact_compression::{
-    compress, CollapsedPair, InputId, ItemId, Observation, ObservedSystem, Partition,
-    ReceiverExactCompression, ReceiverId,
+    compress,
+        CollapsedPair,
+        ItemId,
+        ObservedSystem,
+        Partition,
+        ReceiverExactCompression
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 use holonic_engine::token_invariance::{reading, ConductAtlas, ReceiverAxis, ReceiverFamily, Step};
 use num_bigint::BigUint;
 

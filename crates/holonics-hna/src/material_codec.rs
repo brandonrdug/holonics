@@ -38,11 +38,11 @@ mod tests {
 
     use holonic_engine::{
         EventId,
-        native_ecology::holonic_intelligence::{
+                native_ecology::holonic_intelligence::{
             NativeInferenceAddress, NativeInferenceRequest, direct_source_neutral_rest,
-        },
-        receiver_exact_compression::ReceiverId,
+        }
     };
+    use holonics::receiver::native::ReceiverId;
     use life::native_intelligence::{
         InferenceConfigurationAddress, MorphologyLineage, NativeCirculationConfiguration,
         NativeEcologyRest, NativeMorphologyArtifact, NativeWorldStage,

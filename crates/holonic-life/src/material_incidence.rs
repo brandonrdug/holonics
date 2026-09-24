@@ -58,8 +58,11 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use holonic_engine::receiver_exact_compression::{
-    compress, InputId, ItemId, Observation, ObservedSystem, ReceiverId,
+    compress,
+        ItemId,
+        ObservedSystem
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 use num_bigint::BigInt;
 use num_rational::BigRational;
 

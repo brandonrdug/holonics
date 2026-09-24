@@ -43,8 +43,11 @@ use holonics::exact_linear::ExactRatMatrix;
 use holonics::exact_value::ieee754;
 use holonic_engine::foreign_map::{ForeignContainer, manifest_safetensors};
 use holonic_engine::receiver_exact_compression::{
-    InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress,
+    ItemId,
+        ObservedSystem,
+        compress
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 use num_bigint::BigInt;
 use num_traits::{Euclid, One, Signed, Zero};
 use holonics::geometry::Rat;

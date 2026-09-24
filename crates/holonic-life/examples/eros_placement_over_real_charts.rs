@@ -39,8 +39,10 @@ use std::path::PathBuf;
 use holonics_portable::num::Cog;
 use holonic_engine::placement::{place, Placement};
 use holonic_engine::receiver_exact_compression::{
-    InputId, ItemId, Observation, ObservedSystem, ReceiverId,
+    ItemId,
+        ObservedSystem
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 use holonic_engine::supported_realizers::RealizerId;
 use life::resonance_ecology::{fiber_from_bytes, ResonanceGerm};
 use life::suffix_ecology::ExactSuffixEcology;

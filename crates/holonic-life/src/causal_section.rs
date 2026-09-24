@@ -11,11 +11,14 @@ use std::collections::{BTreeMap, BTreeSet};
 use holonic_engine::receiver_exact_compression::compress;
 use holonic_engine::{
     cuda_refine::CudaRefineExecutor,
-    receiver_exact_compression::{
-        compress_on_device, InputId, ItemId, Observation, ObservedSystem, ReceiverExactCompression,
-        ReceiverId,
-    },
+        receiver_exact_compression::{
+        compress_on_device,
+                ItemId,
+                ObservedSystem,
+                ReceiverExactCompression
+    }
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 use num_bigint::BigUint;
 
 use crate::incidence_production::IncidenceComplex;

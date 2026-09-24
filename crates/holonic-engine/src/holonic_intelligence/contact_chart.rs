@@ -3,8 +3,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::receiver_exact_compression::{Observation, ReceiverId};
-use crate::receiver_history_compression::NativeStateId;
+use holonics::receiver::native::{Observation, ReceiverId, NativeStateId};
 
 /// An exterior contact schedule chart. It observes a founded native population and never becomes
 /// the identity or topology of that population.

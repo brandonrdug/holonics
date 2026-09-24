@@ -12,11 +12,12 @@ use holonic_engine::{
         NativeInferenceAddress, NativeInferenceLineage, NativeInferenceRequest,
         NativeVariableGrainEmission, OpenScope,
     },
-    native_spool::{NativeCollapsedFibre, NativeShortestSeparator},
-    receiver_exact_compression::{InputId, ReceiverId},
-    receiver_history_compression::NativeStateId,
-    BoundaryId, EventId, OccurrencePort,
+        native_spool::{NativeCollapsedFibre, NativeShortestSeparator},
+        BoundaryId,
+        EventId,
+        OccurrencePort
 };
+use holonics::receiver::native::{InputId, NativeStateId, ReceiverId};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 

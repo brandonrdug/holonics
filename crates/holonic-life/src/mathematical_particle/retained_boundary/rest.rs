@@ -3,7 +3,8 @@ use std::collections::{BTreeMap, BTreeSet};
 use holonic_engine::receiver_exact_compression::{
     ItemId, ObservedSystem, ReceiverExactCompression,
 };
-use holonic_engine::receiver_history_compression::{NativeStateId, ReceiverHistoryCompression};
+use holonic_engine::receiver_history_compression::{ReceiverHistoryCompression};
+use holonics::receiver::native::NativeStateId;
 use sha2::{Digest, Sha256};
 
 use super::{

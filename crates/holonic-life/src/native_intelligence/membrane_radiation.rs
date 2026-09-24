@@ -133,7 +133,7 @@ pub struct NativeRadiationSection {
     /// affine local star.  Ordinary ingress has no predecessor here.
     pub predecessor_radiation_identity_sha256: Option<String>,
     pub carried_relational_cell_addresses: Vec<String>,
-    pub native_ordered_word: Vec<holonic_engine::receiver_exact_compression::InputId>,
+    pub native_ordered_word: Vec<holonics::receiver::native::InputId>,
     pub family_overlaps: Vec<Rat>,
     pub native_radiation: ExactComplexWaveCurrent,
     pub injected_boundary_current: ExactComplexWaveCurrent,

@@ -4,7 +4,8 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use holonic_engine::{cuda_refine::CudaRefineExecutor, receiver_exact_compression::InputId};
+use holonic_engine::{cuda_refine::CudaRefineExecutor};
+use holonics::receiver::native::InputId;
 use life::{
     exchange_world_tube::ContinuationAperture,
     receiver_history::{ProposalRelationKind, ReceiverHistoryCongruence, TransportSpecies},

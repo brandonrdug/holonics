@@ -1,7 +1,8 @@
 #[cfg(test)]
 mod tests {
     use holonics::exact_linear::ExactRatMatrix;
-    use crate::receiver_exact_compression::{Observation, compress};
+    use crate::receiver_exact_compression::{compress};
+    use holonics::receiver::native::Observation;
     use crate::receiver_history_compression::*;
     use num_traits::Zero;
     use holonics::geometry::{

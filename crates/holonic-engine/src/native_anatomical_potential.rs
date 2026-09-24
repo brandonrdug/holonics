@@ -16,9 +16,9 @@ use thiserror::Error;
 use crate::{
     cuda_refine::{
         CudaRefineExecutor, ResidentIntervalPotentialReceiver, ResidentIntervalPotentialReturn,
-    },
-    receiver_history_compression::NativeStateId,
+    }
 };
+use holonics::receiver::native::NativeStateId;
 
 const SCHEMA: &str = "holonic-engine.native-anatomical-potential-rest.v2";
 

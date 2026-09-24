@@ -48,7 +48,7 @@ use holonic_engine::placement::{Discharge, discharge};
 use holonics::rebase_invariants::IntegerMatrix;
 use holonics::rebase_invariants::PivotRule;
 use holonics::rebase_invariants::smith_normal_form;
-use holonic_engine::receiver_exact_compression::ReceiverId;
+use holonics::receiver::native::ReceiverId;
 use holonic_engine::skein::read_substitution;
 use holonic_engine::substitution_realizers::{
     RealizerAdmission, SubstitutionDischarge, discharge_substitutions,

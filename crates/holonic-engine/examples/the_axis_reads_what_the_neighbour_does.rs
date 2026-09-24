@@ -65,8 +65,10 @@ use num_bigint::BigUint;
 use holonic_engine::corpus_census::{CorpusCensus, DECLARED_STRATA, LexicalSpecies, SurfaceId};
 use holonic_engine::founded_receiver::{FoundingRefusal, found_to_exhaustion};
 use holonic_engine::receiver_exact_compression::{
-    InputId, ItemId, Observation, ObservedSystem, ReceiverId,
+    ItemId,
+        ObservedSystem
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 use holonic_engine::token_invariance::{
     ConductAtlas, ConductSignature, ConductVerdict, ReceiverAxis, ReceiverFamily,
     SeparationReading, cross_check_family, invariance_partition, reading, separation_reading,

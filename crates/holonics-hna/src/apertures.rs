@@ -1,8 +1,8 @@
 use holonic_engine::{
     EventId,
-    native_ecology::holonic_intelligence::{NativeInferenceAddress, NativeInferenceRequest},
-    receiver_exact_compression::ReceiverId,
+        native_ecology::holonic_intelligence::{NativeInferenceAddress, NativeInferenceRequest}
 };
+use holonics::receiver::native::ReceiverId;
 
 /// Construct one explicit addressed ingress. No label, surface, or collection position is
 /// interpreted as a native route.

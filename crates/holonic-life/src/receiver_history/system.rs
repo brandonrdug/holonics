@@ -1,8 +1,10 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use holonic_engine::receiver_exact_compression::{
-    InputId, ItemId, Observation, ObservedSystem, ReceiverId,
+    ItemId,
+        ObservedSystem
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 use sha2::{Digest, Sha256};
 
 use crate::exchange_world_tube::{ContinuationAperture, ContinuationFamily, MessageAddress};

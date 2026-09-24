@@ -14,11 +14,15 @@ use thiserror::Error;
 
 use crate::cross_chart::{ChainLawReading, CrossChartDefect};
 use crate::generator_native_rest::GeneratorNativeRest;
-use crate::receiver_exact_compression::{InputId, ItemId, Observation, ReceiverId};
+use crate::receiver_exact_compression::{ItemId};
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 use crate::receiver_history_compression::{
-    DecodedReceiverImage, NativeStateId, OrderedWordConsequence, ReceiverHistoryCompression,
-    ReceiverHistoryRefusal,
+    DecodedReceiverImage,
+        OrderedWordConsequence,
+        ReceiverHistoryCompression,
+        ReceiverHistoryRefusal
 };
+use holonics::receiver::native::NativeStateId;
 
 pub const REALIZATION_PASSAGE_SCHEMA: &str = "holonics.i0.realization-passage.v1";
 

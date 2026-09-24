@@ -35,7 +35,8 @@ use holonic_engine::codec_system::{
     PushEventSystem, ReversedInputOrder, SeparationCrossCheck, StepReturn, TheJointAutomaton,
     ThePushEventAutomaton, cross_check, cross_check_over,
 };
-use holonic_engine::receiver_exact_compression::{InputId, ItemId, ObservedSystem, compress};
+use holonic_engine::receiver_exact_compression::{ItemId, ObservedSystem, compress};
+use holonics::receiver::native::InputId;
 
 /// **The apertures this driver declares.** They moved out of `codec_recovery` on 2026-08-09
 /// (`docs/canon/THE_AUTHORED_LEVEL.md` §5.2): neither is derivable from the material, both are statements

@@ -219,7 +219,7 @@ fn surface_counterexamples(
 }
 
 fn receiver_grain(
-    receiver: holonic_engine::receiver_exact_compression::ReceiverId,
+    receiver: holonics::receiver::native::ReceiverId,
 ) -> ReceiverGrain {
     match receiver.0 {
         0 => ReceiverGrain::ReturnedSurface,

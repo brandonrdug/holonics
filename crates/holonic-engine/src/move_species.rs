@@ -55,8 +55,13 @@ use serde::{Deserialize, Serialize};
 
 use crate::lean_development::DeclaredForm;
 use crate::receiver_exact_compression::{
-    CollapsedPair, InputId, ItemId, Observation, ObservedSystem, Partition, ReceiverId, compress,
+    CollapsedPair,
+        ItemId,
+        ObservedSystem,
+        Partition,
+        compress
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 
 /// One situated proof move: the declaration it was written in and its step index inside that body.
 ///

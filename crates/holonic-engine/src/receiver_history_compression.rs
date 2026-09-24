@@ -12,8 +12,12 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::receiver_exact_compression::{
-    CollapsedPair, InputId, ItemId, ObservedSystem, ReceiverExactCompression, ReceiverId,
+    CollapsedPair,
+        ItemId,
+        ObservedSystem,
+        ReceiverExactCompression
 };
+use holonics::receiver::native::{InputId, ReceiverId};
 
 mod compression;
 mod factored_forms;

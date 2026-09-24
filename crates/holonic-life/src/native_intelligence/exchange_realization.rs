@@ -11,10 +11,12 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use holonic_engine::{
     ported_operation::{OperationSpecies, PortedOperationComplex, SourceTestimony},
-    receiver_exact_compression::{ItemId, Observation, ReceiverId},
-    receiver_history_compression::{NativeStateId, ReceiverFactor, ReceiverHistoryCompression},
-    EventId, OccurrencePort,
+        receiver_exact_compression::{ItemId},
+        receiver_history_compression::{ReceiverHistoryCompression},
+        EventId,
+        OccurrencePort
 };
+use holonics::receiver::native::{NativeStateId, Observation, ReceiverFactor, ReceiverId};
 use serde::{Deserialize, Serialize};
 
 use crate::receiver_history::{CausalSectionAddress, ReceiverHistoryCongruence};

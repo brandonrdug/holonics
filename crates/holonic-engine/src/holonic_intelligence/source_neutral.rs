@@ -17,8 +17,7 @@ use crate::native_spool::{
     NativeSerialPullback, NativeSpool, NativeSpoolRefusal, NativeThread, NativeThreadHand,
     NativeThreadOccurrence, NativeTransportScaffold,
 };
-use crate::receiver_exact_compression::{InputId, Observation, ReceiverId};
-use crate::receiver_history_compression::{NativeStateId, NativeTransport, ReceiverFactor};
+use holonics::receiver::native::{InputId, Observation, ReceiverId, NativeStateId, NativeTransport, ReceiverFactor};
 use crate::{BoundaryId, EventId, ExactComplexWaveCurrent, ExactUnitConicPhase, OccurrencePort};
 
 use super::{

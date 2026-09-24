@@ -11,7 +11,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::receiver_history_compression::NativeStateId;
+use holonics::receiver::native::NativeStateId;
 
 pub const NATIVE_ANATOMY_SCHEMA: &str = "holonic-engine.native-anatomy-rest.v1";
 

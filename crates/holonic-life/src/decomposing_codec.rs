@@ -64,9 +64,13 @@ use num_rational::BigRational as Rat;
 use serde::{Deserialize, Serialize};
 
 use holonic_engine::receiver_exact_compression::{
-    compress, CollapsedPair, InputId, ItemId, Observation, ObservedSystem,
-    ReceiverExactCompression, ReceiverId,
+    compress,
+        CollapsedPair,
+        ItemId,
+        ObservedSystem,
+        ReceiverExactCompression
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 use holonics::generator::reflection::{
     CodecCrossingError, CodecId, CodecLineageRefusal, CodecObstruction, CodecRevisionRefusal,
     CodecStep, ContinuationId, ContinuationState, FaceId, ReceiverId as CodecReceiverId,

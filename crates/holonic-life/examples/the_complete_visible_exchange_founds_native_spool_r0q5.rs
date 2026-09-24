@@ -1,9 +1,9 @@
 use std::{collections::BTreeMap, error::Error, fs, ops::Range, path::PathBuf};
 
 use holonic_engine::{
-    native_spool::NativeTransportScaffold, receiver_exact_compression::ReceiverId,
-    receiver_history_compression::NativeStateId,
+    native_spool::NativeTransportScaffold
 };
+use holonics::receiver::native::{NativeStateId, ReceiverId};
 use life::{
     dialogue_lineage::{
         import_claude_visible_prefix, CodexDialogueImportSpec, DialoguePhase, DialogueSpeaker,

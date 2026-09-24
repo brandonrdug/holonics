@@ -9,11 +9,12 @@ use std::{
 
 use holonic_engine::{
     cuda_refine::CudaRefineExecutor,
-    image::{ExactRaster, ExactRgb, ImageExtent},
-    quantity::BaseUnits,
-    receiver_exact_compression::ReceiverId,
-    BoundaryId, ExactComplexWaveCurrent,
+        image::{ExactRaster, ExactRgb, ImageExtent},
+        quantity::BaseUnits,
+        BoundaryId,
+        ExactComplexWaveCurrent
 };
+use holonics::receiver::native::ReceiverId;
 use holonics::structure::CausalMembrane;
 use image::ImageReader;
 use life::{

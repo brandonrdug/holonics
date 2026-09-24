@@ -41,8 +41,11 @@ use holonic_engine::founded_receiver::{
     AxisSpecies, FoundingPressure, found_to_exhaustion, gyration_holonomy, gyration_of,
 };
 use holonic_engine::receiver_exact_compression::{
-    InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress,
+    ItemId,
+        ObservedSystem,
+        compress
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 
 const MAP: &str = "/home/b/models/gemma-4-E4B-it/model.safetensors";
 const READOUT: &str = "model.language_model.embed_tokens.weight";

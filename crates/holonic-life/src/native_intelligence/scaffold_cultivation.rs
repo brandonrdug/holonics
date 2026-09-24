@@ -8,10 +8,12 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use holonics::exact_linear::ExactRatMatrix;
-use holonic_engine::{native_ecology::holonic_intelligence::{
+use holonic_engine::{
+        native_ecology::holonic_intelligence::{
         conduct_native_inference, InferenceCirculation, NativeEmissionAddress,
         NativeInferenceAddress, NativeInferenceRequest,
-    }, native_spool::{
+    },
+                native_spool::{
         NativeConstitutiveResponse, NativeDepositFibreDelta, NativeExactReconstructionFibre,
         NativeGeneratorDescent, NativeGeneratorStep, NativeIncidenceTerm, NativeInterchangeReceipt,
         NativeMutualConstitutiveResponse, NativeOccurrenceSection, NativeOrderedConsequence,
@@ -20,7 +22,14 @@ use holonic_engine::{native_ecology::holonic_intelligence::{
         NativeThreadDepositReceipt, NativeThreadHand, NativeThreadObstruction,
         NativeThreadOccurrence, NativeTransportScaffold, SituatedNativeTransportScaffold,
         NATIVE_THREAD_DEPOSIT_SCHEMA, NATIVE_THREAD_SCHEMA,
-    }, receiver_exact_compression::{InputId, Observation}, receiver_history_compression::{NativeStateId, ReceiverFactor}, BoundaryId, EventId, ExactComplexWaveCurrent, ExactUnitConicPhase, OccurrencePort};
+    },
+                BoundaryId,
+                EventId,
+                ExactComplexWaveCurrent,
+                ExactUnitConicPhase,
+                OccurrencePort
+};
+use holonics::receiver::native::{InputId, NativeStateId, Observation, ReceiverFactor};
 use num_rational::BigRational as Rat;
 use serde::Serialize;
 use thiserror::Error;

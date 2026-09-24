@@ -15,9 +15,13 @@ use sha2::{Digest, Sha256};
 use thiserror::Error;
 
 use crate::{
-    BoundaryId, EventId, ExactComplexWaveCurrent, ExactUnitConicPhase, OccurrencePort,
-    native_anatomy::NativeAnatomyRest,
-    native_spool::{
+    BoundaryId,
+        EventId,
+        ExactComplexWaveCurrent,
+        ExactUnitConicPhase,
+        OccurrencePort,
+        native_anatomy::NativeAnatomyRest,
+        native_spool::{
         NATIVE_SPOOL_SCHEMA, NATIVE_THREAD_SCHEMA, NATIVE_TRANSPORT_SCAFFOLD_SCHEMA,
         NativeCollapsedFibre, NativeConstitutiveResponse, NativeGeneratorDescent,
         NativeGeneratorStep, NativeIncidenceTerm, NativeMutualConstitutiveResponse,
@@ -27,14 +31,13 @@ use crate::{
         NativeTransportScaffold, RECEIVER_INSUFFICIENCY_SCHEMA, ReceiverInsufficiency,
         ReceiverInsufficiencyCause,
     },
-    receiver_exact_compression::{InputId, Observation, ReceiverId},
-    receiver_history_compression::{NativeStateId, ReceiverFactor},
-    soulkiller_witness::{
+        soulkiller_witness::{
         ExteriorSoulkillerWitness, ExteriorSoulkillerWitnessRefusal, ForeignExecutionTestimony,
         ForeignFragmentTestimony, ForeignRealizationTestimony, ForeignShortestSeparator,
         SpoolCondensationWitness, ThreadExtractionWitness,
-    },
+    }
 };
+use holonics::receiver::native::{InputId, NativeStateId, Observation, ReceiverFactor, ReceiverId};
 
 use super::{
     SoulkillerDismantlingInput, SoulkillerDismantlingReturn,

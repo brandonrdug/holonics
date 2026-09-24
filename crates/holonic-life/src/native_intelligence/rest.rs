@@ -5,12 +5,12 @@ use holonic_engine::{
         IntoDismantlingBoundaryReturn, NativeEcologyProfile, NativeTransportRequest,
         RestedTransportEcology,
     },
-    native_spool::NativeSpoolConductReturn,
-    native_spool::NativeTransportScaffold,
-    receiver_exact_compression::{InputId, ReceiverId},
-    receiver_history_compression::NativeStateId,
-    BoundaryId, EventId,
+        native_spool::NativeSpoolConductReturn,
+        native_spool::NativeTransportScaffold,
+        BoundaryId,
+        EventId
 };
+use holonics::receiver::native::{InputId, NativeStateId, ReceiverId};
 use sha2::{Digest, Sha256};
 
 use super::types::{

@@ -1,7 +1,8 @@
 use holonic_engine::{
-    receiver_exact_compression::{InputId, ReceiverExactCompression, ReceiverId},
-    receiver_history_compression::ReceiverHistoryCompression,
+    receiver_exact_compression::{ReceiverExactCompression},
+        receiver_history_compression::ReceiverHistoryCompression
 };
+use holonics::receiver::native::{InputId, ReceiverId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]

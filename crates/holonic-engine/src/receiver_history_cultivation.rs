@@ -21,8 +21,7 @@ use holonics::geometry::Rat;
 
 use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::generator_native_rest::{GeneratorNativeRest, GeneratorNativeRestError};
-use crate::receiver_exact_compression::InputId;
-use crate::receiver_history_compression::NativeStateId;
+use holonics::receiver::native::{InputId, NativeStateId};
 
 pub const CULTIVATED_HISTORY_SCHEMA: &str = "holonics.m4.receiver-history-cultivation.v1";
 
@@ -427,7 +426,7 @@ fn permutation_matrix(transport: &[usize]) -> Result<ExactRatMatrix, ExactLinear
 mod tests {
     use super::*;
     use crate::generator_native_rest::{GeneratorNativeRest, NativeGenerator};
-    use crate::receiver_history_compression::NativeTransport;
+    use holonics::receiver::native::NativeTransport;
 
     fn predecessor() -> Vec<u8> {
         GeneratorNativeRest::new(

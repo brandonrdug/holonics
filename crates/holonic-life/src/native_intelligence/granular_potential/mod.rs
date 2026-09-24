@@ -25,11 +25,10 @@ use holonic_engine::{
         ResidentBoundaryRestrictionFront, ResidentFactoredMomentAddress,
         ResidentGeneratedPortCurrentPassageReturn, ResidentQuadraticMomentRestriction,
     },
-    dimensional_wave::ExactComplexWaveCurrent,
-    is_sha256_digest as is_digest,
-    receiver_exact_compression::{InputId, Observation, ReceiverId},
-    receiver_history_compression::NativeStateId,
+        dimensional_wave::ExactComplexWaveCurrent,
+        is_sha256_digest as is_digest
 };
+use holonics::receiver::native::{InputId, NativeStateId, Observation, ReceiverId};
 
 use crate::resonance_ecology::fiber_from_bytes;
 

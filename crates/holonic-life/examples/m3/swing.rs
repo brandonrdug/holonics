@@ -2,7 +2,7 @@
 
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
-use holonic_engine::receiver_exact_compression::InputId;
+use holonics::receiver::native::InputId;
 use serde::Serialize;
 
 use super::active_cover::StateAddress;

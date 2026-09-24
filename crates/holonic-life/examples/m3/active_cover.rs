@@ -6,8 +6,10 @@ use std::path::{Path, PathBuf};
 
 use holonics::exact_work::ExactWork;
 use holonic_engine::receiver_exact_compression::{
-    InputId, ItemId, Observation, ObservedSystem, ReceiverId,
+    ItemId,
+        ObservedSystem
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 use serde::{Deserialize, Serialize};
 
 pub const CHRONOLOGY: InputId = InputId(0);

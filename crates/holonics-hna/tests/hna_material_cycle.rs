@@ -5,9 +5,9 @@ use holonic_engine::{
     native_ecology::holonic_intelligence::{
         direct_source_neutral_rest, NativeInferenceAddress, NativeInferenceRequest,
     },
-    receiver_exact_compression::ReceiverId,
-    EventId,
+        EventId
 };
+use holonics::receiver::native::ReceiverId;
 use life::native_intelligence::{
     InferenceConfigurationAddress, MorphologyLineage, NativeCirculationConfiguration,
     NativeEcologyRest, NativeMorphologyArtifact, NativeWorldStage,

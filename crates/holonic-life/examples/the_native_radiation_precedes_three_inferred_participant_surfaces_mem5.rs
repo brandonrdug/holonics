@@ -6,9 +6,10 @@ use std::{env, fs, path::PathBuf};
 
 use holonic_engine::{
     quantity::{BaseUnits, Dimension},
-    receiver_exact_compression::ReceiverId,
-    BoundaryId, ExactUnitConicPhase,
+        BoundaryId,
+        ExactUnitConicPhase
 };
+use holonics::receiver::native::ReceiverId;
 use holonics::structure::CausalMembrane;
 use life::native_intelligence::{
     AddressedMaterialOccurrence, AdmittedReturnedAffineLaboratoryRestWitness,

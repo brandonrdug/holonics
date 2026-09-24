@@ -2,9 +2,9 @@ use std::collections::BTreeSet;
 
 use holonic_engine::{
     native_spool::fixture,
-    receiver_exact_compression::{Observation, ReceiverId},
-    EventId,
+        EventId
 };
+use holonics::receiver::native::{Observation, ReceiverId};
 
 use super::*;
 use crate::native_intelligence::{

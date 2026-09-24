@@ -5,9 +5,11 @@
 use std::{collections::BTreeSet, env, fs, path::PathBuf, time::Instant};
 
 use holonic_engine::{
-    quantity::BaseUnits, receiver_exact_compression::ReceiverId, BoundaryId,
-    ExactComplexWaveCurrent,
+    quantity::BaseUnits,
+        BoundaryId,
+        ExactComplexWaveCurrent
 };
+use holonics::receiver::native::ReceiverId;
 use holonics::structure::CausalMembrane;
 use life::{
     mathematical_source::{ExactOpticalOccurrence, HierarchicalOpticalPassage},

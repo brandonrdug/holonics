@@ -91,8 +91,11 @@ use holonic_engine::lean_development::{
     DeclarationGrain, DevelopmentReading, join, read_development,
 };
 use holonic_engine::receiver_exact_compression::{
-    InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress,
+    ItemId,
+        ObservedSystem,
+        compress
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 
 /// The development as a system under observation — the same reading
 /// `the_receiver_is_founded_at_the_junction.rs` declares, so the two drivers speak about one

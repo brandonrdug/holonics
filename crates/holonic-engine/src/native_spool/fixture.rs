@@ -15,8 +15,7 @@ use std::collections::BTreeSet;
 
 use holonics::geometry::Rat;
 
-use crate::receiver_exact_compression::{InputId, Observation, ReceiverId};
-use crate::receiver_history_compression::{NativeStateId, ReceiverFactor};
+use holonics::receiver::native::{InputId, Observation, ReceiverId, NativeStateId, ReceiverFactor};
 use crate::soulkiller::SoulkillerDismantlingReturn;
 use crate::{BoundaryId, EventId, ExactComplexWaveCurrent, ExactUnitConicPhase, OccurrencePort};
 

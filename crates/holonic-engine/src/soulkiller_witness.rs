@@ -12,9 +12,9 @@ use sha2::{Digest, Sha256};
 use thiserror::Error;
 
 use crate::{
-    native_spool::{NativeSpoolRefusal, NativeTransportScaffold},
-    receiver_exact_compression::{InputId, ReceiverId},
+    native_spool::{NativeSpoolRefusal, NativeTransportScaffold}
 };
+use holonics::receiver::native::{InputId, ReceiverId};
 
 pub const EXTERIOR_SOULKILLER_WITNESS_SCHEMA: &str =
     "holonic-engine.exterior-soulkiller-witness.v3";
@@ -397,17 +397,20 @@ pub enum ExteriorSoulkillerWitnessRefusal {
 mod tests {
     use super::*;
     use crate::{
-        BoundaryId, EventId, ExactComplexWaveCurrent, ExactUnitConicPhase, OccurrencePort,
-        native_spool::{
+        BoundaryId,
+                EventId,
+                ExactComplexWaveCurrent,
+                ExactUnitConicPhase,
+                OccurrencePort,
+                native_spool::{
             NATIVE_SPOOL_SCHEMA, NATIVE_THREAD_SCHEMA, NATIVE_TRANSPORT_SCAFFOLD_SCHEMA,
             NativeCollapsedFibre, NativeConstitutiveResponse, NativeGeneratorDescent,
             NativeGeneratorStep, NativeIncidenceTerm, NativeOccurrenceSection,
             NativeParametronCell, NativeReceiverConsequence, NativeSpool, NativeThread,
             NativeThreadHand, NativeThreadOccurrence, NativeTransportScaffold,
-        },
-        receiver_exact_compression::Observation,
-        receiver_history_compression::{NativeStateId, ReceiverFactor},
+        }
     };
+    use holonics::receiver::native::{NativeStateId, Observation, ReceiverFactor};
 
     fn scaffold() -> NativeTransportScaffold {
         let event = EventId(1);

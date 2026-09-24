@@ -9,9 +9,10 @@ use holonic_engine::{
         NativeParametronCell, NativeReceiverConsequence, NativeThread, NativeThreadDeposit,
         SituatedNativeTransportScaffold, NATIVE_THREAD_DEPOSIT_SCHEMA, NATIVE_THREAD_SCHEMA,
     },
-    receiver_history_compression::NativeStateId,
-    ExactComplexWaveCurrent, OccurrencePort,
+        ExactComplexWaveCurrent,
+        OccurrencePort
 };
+use holonics::receiver::native::NativeStateId;
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
 use serde::Serialize;
@@ -319,7 +320,7 @@ pub(super) fn derive_returned_difference_deposit_from_history(
 fn returned_mixed_family(
     left_thread: &str,
     right_thread: &str,
-    receiver: holonic_engine::receiver_exact_compression::ReceiverId,
+    receiver: holonics::receiver::native::ReceiverId,
     storage: Rat,
     returned_left: &ExactComplexWaveCurrent,
     returned_right: &ExactComplexWaveCurrent,

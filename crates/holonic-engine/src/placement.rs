@@ -212,7 +212,7 @@ fn gcd(left: &BigInt, right: &BigInt) -> BigInt {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::receiver_exact_compression::{InputId, Observation, ReceiverId};
+    use holonics::receiver::native::{InputId, Observation, ReceiverId};
 
     /// Four items in four conduct classes, one input, receivers reading the item directly.
     struct Four {

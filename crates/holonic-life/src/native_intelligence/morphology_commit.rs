@@ -62,7 +62,7 @@ pub struct NativeMorphologyCommit {
     pub source: NativeOwnedInferenceAddress,
     pub emission: holonic_engine::native_ecology::holonic_intelligence::NativeEmissionAddress,
     pub returned_occurrence: EventId,
-    pub causal_cone: BTreeSet<holonic_engine::receiver_history_compression::NativeStateId>,
+    pub causal_cone: BTreeSet<holonics::receiver::native::NativeStateId>,
     pub deposit_wire: Vec<u8>,
     pub deposit_receipt: NativeThreadDepositReceipt,
     pub interchange_population: usize,

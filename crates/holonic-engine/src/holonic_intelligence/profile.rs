@@ -6,7 +6,7 @@ use crate::native_spool::{
     NativeReceiverConsequence, NativeSerialPullback, NativeSpoolComposition, NativeSpoolRefusal,
     NativeThread, NativeThreadObstruction, NativeThreadOccurrence, NativeTransportScaffold,
 };
-use crate::receiver_history_compression::{NativeStateId, ReceiverFactor};
+use holonics::receiver::native::{NativeStateId, ReceiverFactor};
 use crate::{BoundaryId, EventId};
 
 use super::{
@@ -38,7 +38,7 @@ pub struct CarrierFacet<'a> {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TransportFacet<'a> {
     pub occurrences: &'a [NativeThreadOccurrence],
-    pub chronology: &'a [crate::receiver_exact_compression::InputId],
+    pub chronology: &'a [holonics::receiver::native::InputId],
     pub generator_descents: Vec<&'a NativeGeneratorDescent>,
     pub serial_pullbacks: Vec<&'a NativeSerialPullback>,
 }

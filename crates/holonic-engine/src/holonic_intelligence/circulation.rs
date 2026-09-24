@@ -7,8 +7,7 @@ use crate::native_spool::{
     NativeAddressedSection, NativeCollapsedFibre, NativeShortestSeparator,
     NativeSpoolConductReturn, NativeSpoolRefusal, NativeTransportScaffold,
 };
-use crate::receiver_exact_compression::{InputId, Observation, ReceiverId};
-use crate::receiver_history_compression::NativeStateId;
+use holonics::receiver::native::{InputId, Observation, ReceiverId, NativeStateId};
 use crate::{EventId, OccurrencePort};
 
 use super::{InferenceCirculation, OpenObligation, OpenScope};

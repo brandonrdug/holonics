@@ -68,8 +68,13 @@ use crate::founded_receiver::{
     found_to_exhaustion, gyration_of, panel_from_founded,
 };
 use crate::receiver_exact_compression::{
-    CollapsedPair, InputId, ItemId, Observation, ObservedSystem, Partition, ReceiverId, compress,
+    CollapsedPair,
+        ItemId,
+        ObservedSystem,
+        Partition,
+        compress
 };
+use holonics::receiver::native::{InputId, Observation, ReceiverId};
 
 /// One staged occurrence, named by the junction it founds a receiver at.
 ///

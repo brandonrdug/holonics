@@ -11,11 +11,12 @@ use holonic_engine::{
         DiffusionBranch, DiffusionComplex, DiffusionEvent, DiffusionNode, DiffusionReceipt,
         DiffusionStanding, ExactDiffusionLaw,
     },
-    native_spool::NativeTransportScaffold,
-    receiver_exact_compression::ReceiverId,
-    receiver_history_compression::NativeStateId,
-    CurrentBranchId, CurrentNodeId, EventId,
+        native_spool::NativeTransportScaffold,
+        CurrentBranchId,
+        CurrentNodeId,
+        EventId
 };
+use holonics::receiver::native::{NativeStateId, ReceiverId};
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
 use num_traits::{Signed, Zero};

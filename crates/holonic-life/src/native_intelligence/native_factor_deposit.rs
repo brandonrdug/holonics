@@ -8,7 +8,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use holonics::exact_linear::ExactRatMatrix;
-use holonic_engine::{receiver_exact_compression::{Observation, ReceiverId}, receiver_history_compression::NativeStateId};
+use holonics::receiver::native::{NativeStateId, Observation, ReceiverId};
 use num_rational::BigRational as Rat;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -407,10 +407,9 @@ fn is_sha256(address: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use holonic_engine::{
-        receiver_exact_compression::{Observation, ReceiverId},
-        receiver_history_compression::NativeStateId,
-        EventId,
+        EventId
     };
+    use holonics::receiver::native::{NativeStateId, Observation, ReceiverId};
     use num_bigint::BigInt;
 
     use super::*;

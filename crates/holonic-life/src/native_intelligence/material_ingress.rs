@@ -95,9 +95,9 @@ mod tests {
         native_ecology::holonic_intelligence::{
             direct_source_neutral_rest, NativeInferenceAddress,
         },
-        receiver_exact_compression::ReceiverId,
-        EventId,
+                EventId
     };
+    use holonics::receiver::native::ReceiverId;
 
     use crate::native_intelligence::{
         InferenceConfigurationAddress, MorphologyLineage, NativeCirculationConfiguration,

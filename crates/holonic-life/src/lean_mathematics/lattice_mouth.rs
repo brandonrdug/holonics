@@ -21,10 +21,13 @@ use holonic_engine::{
         NativeThreadHand, NativeThreadOccurrence, NativeTransportScaffold, NATIVE_SPOOL_SCHEMA,
         NATIVE_THREAD_SCHEMA, NATIVE_TRANSPORT_SCAFFOLD_SCHEMA,
     },
-    receiver_exact_compression::{InputId, Observation, ReceiverId},
-    receiver_history_compression::{NativeStateId, ReceiverFactor},
-    BoundaryId, EventId, ExactComplexWaveCurrent, ExactUnitConicPhase, OccurrencePort,
+        BoundaryId,
+        EventId,
+        ExactComplexWaveCurrent,
+        ExactUnitConicPhase,
+        OccurrencePort
 };
+use holonics::receiver::native::{InputId, NativeStateId, Observation, ReceiverFactor, ReceiverId};
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
 use serde::{Deserialize, Serialize};

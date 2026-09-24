@@ -9,8 +9,7 @@ use crate::native_ecology::recurrent_return::{
     ReturnCommitEvent, ReturnedCausalAdjoint, ReturnedRecurrentRest, RevisitHolonomy,
     action_matrix, local_delta, next, recurrence_trace, semantic_work,
 };
-use crate::receiver_exact_compression::InputId;
-use crate::receiver_history_compression::NativeStateId;
+use holonics::receiver::native::{InputId, NativeStateId};
 
 /// Material crossing without a durable morphology claim.
 #[derive(Clone, Debug, PartialEq, Eq)]

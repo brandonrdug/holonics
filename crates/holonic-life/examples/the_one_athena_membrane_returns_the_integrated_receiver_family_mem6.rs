@@ -13,9 +13,10 @@ use std::{
 
 use holonic_engine::{
     quantity::{BaseUnits, Dimension},
-    receiver_exact_compression::ReceiverId,
-    BoundaryId, ExactComplexWaveCurrent,
+        BoundaryId,
+        ExactComplexWaveCurrent
 };
+use holonics::receiver::native::ReceiverId;
 use holonics::structure::CausalMembrane;
 use life::{
     mathematical_source::{ExactAcousticOccurrence, HierarchicalOpticalPassage},

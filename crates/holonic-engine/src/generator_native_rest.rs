@@ -11,8 +11,7 @@ use std::collections::BTreeSet;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::receiver_exact_compression::{InputId, Observation, ReceiverId};
-use crate::receiver_history_compression::{NativeStateId, NativeTransport, ReceiverFactor};
+use holonics::receiver::native::{InputId, Observation, ReceiverId, NativeStateId, NativeTransport, ReceiverFactor};
 
 pub const GENERATOR_NATIVE_REST_SCHEMA: &str = "holonics.m3.generator-native-rest.v1";
 

@@ -38,7 +38,7 @@ use holonic_engine::complex_system::{AddressReading, ComplexSystem, cell as cell
 use holonic_engine::dilation::{Horizon, WalkOrder, dilate};
 use holonic_engine::placement::{Discharge, Placement, discharge};
 use holonics::rebase_invariants::PivotRule;
-use holonic_engine::receiver_exact_compression::ReceiverId;
+use holonics::receiver::native::ReceiverId;
 use holonic_engine::skein::Substitution;
 use holonic_engine::substitution_realizers::{
     RealizerAdmission, SubstitutionDischarge, SubstitutionPlacement, SubstitutionRealizers,

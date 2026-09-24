@@ -10,9 +10,11 @@ use std::{
 };
 
 use holonic_engine::{
-    quantity::BaseUnits, receiver_exact_compression::ReceiverId, BoundaryId,
-    ExactComplexWaveCurrent,
+    quantity::BaseUnits,
+        BoundaryId,
+        ExactComplexWaveCurrent
 };
+use holonics::receiver::native::ReceiverId;
 use holonics::structure::CausalMembrane;
 use life::{
     mathematical_source::HierarchicalOpticalPassage,

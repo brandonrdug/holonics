@@ -2,15 +2,18 @@ use std::collections::BTreeSet;
 
 use holonic_engine::{
     cuda_refine::ResidentComplexIncidenceReturn,
-    native_spool::{
+        native_spool::{
         NativeCollapsedFibre, NativeConstitutiveResponse, NativeIncidenceTerm,
         NativeMutualConstitutiveResponse, NativeSpoolConductReturn, NativeThreadHand,
         NativeTransportScaffold, ReceiverInsufficiency,
     },
-    receiver_exact_compression::{InputId, Observation, ReceiverId},
-    receiver_history_compression::NativeStateId,
-    BoundaryId, EventId, ExactComplexWaveCurrent, ExactUnitConicPhase, OccurrencePort,
+        BoundaryId,
+        EventId,
+        ExactComplexWaveCurrent,
+        ExactUnitConicPhase,
+        OccurrencePort
 };
+use holonics::receiver::native::{InputId, NativeStateId, Observation, ReceiverId};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 

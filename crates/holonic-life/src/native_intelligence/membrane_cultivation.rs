@@ -36,7 +36,7 @@ pub struct MembraneCultivationReceipt {
     pub exterior_world_return_occurrence: String,
     pub exterior_world_return_event: holonic_engine::EventId,
     pub carrying_occurrence: NativePullbackOccurrence,
-    pub actual_native_word: Vec<holonic_engine::receiver_exact_compression::InputId>,
+    pub actual_native_word: Vec<holonics::receiver::native::InputId>,
     pub winding_rank: usize,
     pub winding_section: Vec<Rat>,
     pub returned_source_covector: Vec<Rat>,
@@ -67,7 +67,7 @@ pub struct DetachedMembraneCultivation {
     predecessor_rest_identity_sha256: String,
     exterior_world_return_occurrence: String,
     exterior_world_return_event: holonic_engine::EventId,
-    actual_native_word: Vec<holonic_engine::receiver_exact_compression::InputId>,
+    actual_native_word: Vec<holonics::receiver::native::InputId>,
     difference: SituatedDifferenceSection,
     open_exterior: Vec<String>,
 }
