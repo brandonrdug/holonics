@@ -1,7 +1,6 @@
 # M2 Receiver shared-junction extraction
 
-This bounded cut follows verified pair-lock curation at `eb0f76b7`. Lake verification is pending
-root coordination; no Lake builds were run for this cut.
+This bounded cut follows verified pair-lock curation at `eb0f76b7`. Focused Lake verification passed; the completed gates and limits are recorded below.
 
 ## Declaration ownership
 
@@ -49,7 +48,7 @@ The existing direct importers of `Foundation.Receiver` remain, with `Framework.G
 `Transport.ReceiverPotential`. `Millennium.Rigidity` now has one direct importer:
 `ElementaryHolonics`.
 
-## Focused Lake gates (pending)
+## Focused Lake gates (verified)
 
 Run from `formal/elementary-holonics`:
 
@@ -58,8 +57,14 @@ lake build ElementaryHolonics.Foundation.Receiver
 lake build ElementaryHolonics.Millennium.Rigidity
 lake build ElementaryHolonics.Framework.Geometry
 lake build ElementaryHolonics.Framework
-lake build ElementaryHolonics
 ```
 
-These gates check the new core owner, retained concrete stress instances, subject facade, full
-framework, and umbrella. Record completed commands and logs after root coordination.
+The moved Receiver owner and retained Rigidity research owner built. The extraction exposed its
+actual Mathlib kernel-product owner; `Foundation.Receiver` now imports
+`Mathlib.LinearAlgebra.Prod` directly. `Framework.Geometry` and combined `Framework` also built;
+the final Framework gate completed 9,196 jobs. Final affected logs have no error, declaration
+using `sorry`, `sorryAx`, or linter warning in the changed Receiver owner. The broad umbrella was
+verified on the preceding pair-lock source and was not rerun here: its imports are unchanged,
+while both direct owners and combined Framework built. The eventual `Holonics` and
+`HolonicsResearch` roots remain unbuilt. Commands and logs are pinned in
+`docs/VERIFICATION_RECEIPTS.tsv`.

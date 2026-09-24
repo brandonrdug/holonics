@@ -1,5 +1,5 @@
 import Mathlib.Algebra.Group.Subgroup.Ker
-import Mathlib.LinearAlgebra.Basic
+import Mathlib.LinearAlgebra.Prod
 import Mathlib.Logic.Relation
 import Mathlib.Data.Set.Operations
 
