@@ -109,16 +109,16 @@ resolve these 25 source files outside that legacy umbrella closure individually:
 | Current module (line count) | Project imports | Current source importers | First-pass M2 disposition |
 |---|---|---|---|
 | `DerivationAtlas` (462) | none | none | Keep as standalone Lean analysis tooling; do not place in either library root without checking Lake executable ownership. |
-| `Computation.GeneratorObservationScope` (94) | none | none | Keep; candidate for `Holonics.HNN` because it states finite generator observation, but it has no current consumer. Root it only with the HNN operation it serves. |
-| `Computation.HolonicConstitutiveFibreCollapse` (117) | `Computation.HolonicConstitutiveFibre` | none | Keep; HNN/computation candidate, no duplicate evidenced. Inspect its fibre consumer before making it a public root import. |
-| `Mathematics.MachinPhaseConstraint` (27) | none | none | Keep the unique exact phase constraint; candidate Geometry/Ratio owner, not a duplicate. |
+| `Computation.GeneratorObservationScope` (94) | none | none | Keep in `HolonicsResearch`; promote to `Holonics.HNN` only when a public generator-observation operation consumes it. |
+| `Computation.HolonicConstitutiveFibreCollapse` (117) | `Computation.HolonicConstitutiveFibre` | none | Keep in `HolonicsResearch`; move into HNN only after its fibre consumer is named. |
+| `Mathematics.MachinPhaseConstraint` (27) | none | none | Keep in `HolonicsResearch`; move to Geometry/Ratio only when a public exact-phase operation consumes it. |
 | `Mathematics.PiIterationConstraint` (100) | none | none | Keep as a named exact-iteration result in Research pending a public landmark consumer. |
-| `Mathematics.RadixWindowReceiver` (89) | none | none | Keep; candidate Ratio/Receiver law for exact scaled windows and residues. It currently has no consumer. |
+| `Mathematics.RadixWindowReceiver` (89) | none | none | Keep in `HolonicsResearch`; candidate Ratio/Receiver law for exact scaled windows/residues, with promotion pending a public consumer. |
 | `Millennium.FamilyTunnellHeckeCorrespondence` (230) | `Millennium.FamilyTunnellHeckeIntertwining` | none | Keep as a Research theorem family; no duplicate identified. |
 | `Millennium.HodgeCausalLengthBridge` (172) | `Millennium.HolonStagedCausalLength`; `Millennium.HodgeHolonicCutFalsifier` | none | Keep as a Research bridge; no duplicate identified. |
 | `Millennium.HodgeOfficialReceiver` (116) | `Millennium.HodgeSmoothProjectiveReceiver` | `Millennium.OfficialFinishLines` | Keep in Research; preserve its official-endpoint consumer. |
 | `Millennium.HolonStagedCausalLength` (222) | `Millennium.ReceiverIndexedCausalLengthTower` | `Millennium.HodgeCausalLengthBridge` | Keep in Research; preserve the causal-length bridge. |
-| `Millennium.HolonicCausalFluxTime` (556) | `Millennium.HolonicClockedPantographicSwingApparatus` | none | Keep as a source-specific physical clock/flux result; no duplicate identified. |
+| `Millennium.HolonicCausalFluxTime` (556) | `Millennium.HolonicClockedPantographicSwingApparatus` | none | Keep in `HolonicsResearch` as a source-specific physical clock/flux result; no duplicate identified. |
 | `Millennium.HolonicClockedPantographicSwingApparatus` (298) | `Millennium.HolonicClockedPantographicSwing`; `Millennium.HolonicFiniteCausalAperture`; `Millennium.PVersusNP` | `Millennium.HolonicCausalFluxTime` | Keep as a Research apparatus theorem; preserve its clock/causal-flux consumer. |
 | `Millennium.HolonicStateAddressedQuadratic` (186) | `Millennium.HolonicQuadraticMomentCondensation` | none | Keep the source-addressed result; when re-rooting, check whether its generic moment use can retarget to `Holon.QuadraticMoment`. No duplicate established. |
 | `Millennium.MestreCompletedSquare` (245) | `Millennium.MestreForcedSectionIncidence` | none | Keep as a Research result; no duplicate identified. |
@@ -131,15 +131,17 @@ resolve these 25 source files outside that legacy umbrella closure individually:
 | `Millennium.PVersusNPOfficialBridge` (148) | `Millennium.PVersusNP` | `Millennium.OfficialFinishLines`; `Millennium.PVersusNPCausalLengthBridge` | Keep in Research; preserve both endpoint and bridge consumers. |
 | `Millennium.PoincareOfficialBridge` (164) | `Millennium.PoincareConjecture` | `Millennium.OfficialFinishLines` | Keep in Research; preserve its official-endpoint consumer. |
 | `Millennium.YangMillsOfficialReceiver` (290) | `Millennium.HilbertTransportRefinement`; `Millennium.YangMillsLimit` | `Millennium.OfficialFinishLines` | Keep in Research; preserve its official-endpoint consumer. |
-| `Transport.GenerativeTransport` (85) | none | none | Keep as an HNN/transport candidate; it has no current consumer, so do not root until its generation operation is specified. |
+| `Transport.GenerativeTransport` (85) | none | none | Keep in `HolonicsResearch`; move into `Holonics.HNN` only when its generic generation law has a public consumer. |
 | `M6CausalReturn` (366) | Lean elaborator/server, Mathlib geometry and tactics | none | Keep as standalone analysis tooling outside both library roots; audit its executable target during the path move. |
 
-This import/consumer audit supports no duplicate-based fold or retirement for any of these 25
-files. “No source importer” means the old umbrella does not cover the module; it does not prove the
-theorem is unused or checked. Confirm the source owner, issue/record citation and verification
-scope before classifying each file. Do not silently drop a theorem because the old umbrella misses
-it or claim it was built only because it is listed in a future root.
-
+The first-pass root for every non-tooling theorem module in this table is `HolonicsResearch`,
+including theorem owners with no source importer. Promote a declaration into `Holonics` only when
+a generic public operator and its consuming call justify that extraction. This import/consumer
+audit supports no duplicate-based fold or retirement for any of these 25 files. “No source
+importer” means the old umbrella does not cover the module; it does not prove the theorem is unused
+or checked. Confirm the source owner, issue/record citation and verification scope before
+classifying each file. Do not silently drop a theorem because the old umbrella misses it or claim a
+module was built only because it is listed in a future root.
 The final root source audit checks (1) `Holonics` transitively imports no `HolonicsResearch`,
 `Millennium` or `RH` module; (2) `HolonicsResearch` imports `Holonics` and has no path back into
 the legacy `Framework` or `ElementaryHolonics` umbrellas; (3) every retained declaration has one
