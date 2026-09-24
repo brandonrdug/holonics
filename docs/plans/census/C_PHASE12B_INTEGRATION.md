@@ -87,10 +87,12 @@ Nested writer formats remain as recorded above: coupled `NormalWaveRest` v7/v12 
 The separate outer `HNA-FIELD-SESSION` keeps its writer-selected v3/v4/v5. This packet does not
 retire or reinterpret any of those nested charts.
 
-**Verification pending.** After ABI/Lean owner gates, run the host v1/v2 refusal test and the
-GPU-locked coupled-session tests for current v3 process resume, delayed base prediction return,
-observed-next reception, source-pair actuation/reentry, and incorporation. Do not run broad HNA or
-Phase14 suites as part of this packet.
+**Verification, September 24.** The host v1/v2 refusal test passed; five GPU-locked v3 session
+tests passed for pending-emission process resume, base-prediction return, observed-next reception,
+source-pair generation/reentry, and incorporation. `cargo check -p holonics-hna --all-targets -j2`
+passed with existing warnings only. Exact commands and results are pinned in
+`docs/VERIFICATION_RECEIPTS.tsv` against this session packet commit. No broad HNA or Phase14 suite
+was run.
 
 The current-history source, contextual lift/material transport, HNA session contract, behavior
 measurement and `NormalWaveHolon` reception/actuation chart remain open; Phase 14 also remains open.
