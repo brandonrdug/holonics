@@ -286,10 +286,6 @@ mod tests {
         let c = certificate(s.search(1));
         assert_eq!(c.n, u(2));
         assert_eq!(c.z, z);
-        println!(
-            "certificate: a={}, b={}, z={}, divisor={}, clock={}",
-            c.a, c.b, c.z, c.d, c.n
-        );
     }
     #[test]
     fn a_cycle_missing_zero_has_terminal_exhaustion() {
@@ -317,14 +313,7 @@ mod tests {
             d: d.clone(),
             n: d.clone(),
         };
-        let start = std::time::Instant::now();
         c.verify().unwrap();
-        println!(
-            "translation certificate: exponent_bits={}, modulus_bits={}, verification_ns={}",
-            c.n.bits(),
-            c.d.bits(),
-            start.elapsed().as_nanos()
-        );
         assert_eq!(
             AffineOrbitCertificate { n: d - u(1), ..c }.verify(),
             Err(AffineOrbitError::InvalidCertificate)

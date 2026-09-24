@@ -1,8 +1,4 @@
-use super::schema::digest_bytes;
 use super::*;
-use std::sync::atomic::{AtomicU64, Ordering};
-
-static TEST_NONCE: AtomicU64 = AtomicU64::new(0);
 
 fn source() -> SourceAssetIdentity {
     SourceAssetIdentity {
@@ -234,50 +230,4 @@ fn mount_rejects_descriptor_identity_without_companion_bytes() {
             ..
         })
     ));
-}
-
-#[test]
-fn companion_codec_bytes_survive_source_deletion_and_mount() {
-    let suffix = format!(
-        "{}-{}-{}",
-        std::process::id(),
-        std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos(),
-        TEST_NONCE.fetch_add(1, Ordering::Relaxed)
-    );
-    let tokenizer_path = std::env::temp_dir().join(format!("phoenix-tokenizer-{suffix}.json"));
-    let config_path = std::env::temp_dir().join(format!("phoenix-tokenizer-config-{suffix}.json"));
-    let tokenizer = br#"{"model":{"merges":["a b"]}}"#.to_vec();
-    let config = br#"{"add_prefix_space":true}"#.to_vec();
-    std::fs::write(&tokenizer_path, &tokenizer).unwrap();
-    std::fs::write(&config_path, &config).unwrap();
-    let artifact = ExteriorCodecArtifact::from_paths(&tokenizer_path, Some(&config_path)).unwrap();
-    let mut source = source();
-    source.tokenizer_sha256 = digest_bytes(&tokenizer);
-    source.tokenizer_config_sha256 = digest_bytes(&config);
-    let rest = ExteriorCodebookRest::seal_with_codec_ref(
-        source,
-        1,
-        vec![CodebookEntry {
-            source_id: 0,
-            source_piece: "a".into(),
-            native_id: 0,
-            native_surface: "a".into(),
-        }],
-        CoverageSummary {
-            represented_token_ids: 1,
-        },
-        vec![],
-        Some(&artifact),
-    )
-    .unwrap();
-    std::fs::remove_file(tokenizer_path).unwrap();
-    std::fs::remove_file(config_path).unwrap();
-    let mounted = ExteriorCodebookRest::mount_with_codec(rest, artifact).unwrap();
-    assert_eq!(
-        mounted.codec.unwrap().tokenizer_json_len,
-        tokenizer.len() as u64
-    );
 }

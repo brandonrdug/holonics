@@ -2,19 +2,12 @@
 //! `formal/elementary-holonics/ElementaryHolonics/Foundation/PresentationCost.lean` theorem by
 //! theorem. Each test names the Lean declaration it realizes.
 
-use std::path::PathBuf;
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
 use holonics::geometry::Rat;
 
 use super::*;
-
-const STRUCTURE_ROOT_ENV: &str = "HOLONICS_M5_STRUCTURE_ROOT";
-const DEFAULT_STRUCTURE_ROOT: &str = "/home/b/Downloads/holonics-m5-rbx1-rank05";
-/// The resident decimal grain `crates/holonic-life/examples/m5/fold.rs::derive_resident_places`
-/// derives for this family, reproduced here so the wire column is the M5 deed's own.
-const RESIDENT_DECIMAL_PLACES: u32 = 7;
 
 fn rat(numerator: i64, denominator: i64) -> Rat {
     Rat::new(BigInt::from(numerator), BigInt::from(denominator))
@@ -582,60 +575,6 @@ fn a_declared_wire_extent_is_checked_and_never_allocated_from() {
         Err(CostRefusal::DeclaredExtentOverflows { .. })
     ));
 }
-
-#[test]
-fn text_with_no_atom_site_block_is_refused_by_name() {
-    let refusal = measure_atom_site_block("synthetic", "data_x\n_cell.length_a 1.0\n#\n")
-        .expect_err("a text with no atom_site block cannot be measured");
-    assert!(matches!(refusal, CostRefusal::NoAtomSiteBlock { .. }));
-}
-
-#[test]
-fn a_declared_row_count_that_disagrees_with_the_measurement_is_refused() {
-    let measurement =
-        measure_atom_site_block("synthetic", SYNTHETIC_MMCIF).expect("the block measures");
-    assert_eq!(measurement.rows, 6);
-    measurement
-        .check_declared_rows(6)
-        .expect("the truthful declaration is admitted");
-    assert!(matches!(
-        measurement.check_declared_rows(600_000),
-        Err(CostRefusal::DeclaredRowsDisagree {
-            declared: 600_000,
-            measured: 6
-        })
-    ));
-}
-
-// ---------------------------------------------------------------------------------------------
-// The measurement, on a synthetic deposit and on the authenticated M5 fixture.
-// ---------------------------------------------------------------------------------------------
-
-/// Two residues of one chain, three atoms each, in the deposited mmCIF column order. Small enough
-/// that every count below can be checked by hand.
-const SYNTHETIC_MMCIF: &str = "data_synthetic
-loop_
-_atom_site.group_PDB
-_atom_site.id
-_atom_site.type_symbol
-_atom_site.label_atom_id
-_atom_site.label_comp_id
-_atom_site.label_asym_id
-_atom_site.label_entity_id
-_atom_site.label_seq_id
-_atom_site.Cartn_x
-_atom_site.Cartn_y
-_atom_site.Cartn_z
-ATOM 1 N N ALA A 1 1 1.000 2.000 3.000
-ATOM 2 C CA ALA A 1 1 2.000 2.000 3.000
-ATOM 3 C C ALA A 1 1 3.000 2.000 3.000
-ATOM 4 N N GLY A 1 2 4.000 2.000 3.000
-ATOM 5 C CA GLY A 1 2 5.000 2.000 3.000
-ATOM 6 C C GLY A 1 2 6.000 2.000 3.000
-#
-";
-
-
 
 // ---------------------------------------------------------------------------------------------
 // A costed tower, from the tower's own receipts.

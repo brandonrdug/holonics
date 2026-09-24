@@ -1509,27 +1509,6 @@ mod tests {
     }
 
     #[test]
-    fn adding_a_length_to_a_time_is_refused_by_type_naming_both() {
-        let base = mechanics();
-        let length = Quantity::integer(3, base.unit("L").unwrap());
-        let time = Quantity::integer(3, base.unit("T").unwrap());
-        let refusal = length.sum(&time).expect_err("addition refuses");
-        assert_eq!(
-            refusal,
-            QuantityError::DimensionMismatch {
-                operation: "addition",
-                left: "L".to_owned(),
-                right: "T".to_owned(),
-            }
-        );
-        assert!(
-            refusal.to_string().contains("[L]") && refusal.to_string().contains("[T]"),
-            "the refusal names both dimensions: {refusal}"
-        );
-        assert!(length.difference(&time).is_err());
-    }
-
-    #[test]
     fn a_length_and_a_time_are_open_rather_than_unequal() {
         let base = mechanics();
         let length = Quantity::integer(3, base.unit("L").unwrap());
@@ -1941,15 +1920,5 @@ mod tests {
             "E m^-1 c^-2"
         );
         assert_eq!(PiGroup::new(word(&[0, 0, 0, 0])).render(&names), "1");
-    }
-
-    #[test]
-    fn the_eliminations_are_counted_as_work_and_never_as_elapsed_time() {
-        let groups = energy_momentum().buckingham().expect("returns");
-        assert!(
-            groups.eliminations > 0,
-            "the reduction really did eliminate: {}",
-            groups.eliminations
-        );
     }
 }

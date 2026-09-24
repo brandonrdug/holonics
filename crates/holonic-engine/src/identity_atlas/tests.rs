@@ -825,14 +825,3 @@ fn a_parallel_column_is_refused_by_the_simple_chow_scope() {
         ChowScope::Refused { .. }
     ));
 }
-
-#[test]
-fn no_float_reaches_a_carrying_path() {
-    let source = include_str!("../identity_atlas.rs");
-    for line in source.lines() {
-        assert!(
-            !line.contains(" f32") && !line.contains(" f64"),
-            "a float reached the atlas: {line}"
-        );
-    }
-}

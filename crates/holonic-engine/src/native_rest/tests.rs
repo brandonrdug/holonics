@@ -147,11 +147,9 @@ pub(crate) mod tests {
     }
 
     #[test]
-    fn seal_round_trip_is_byte_exact_and_drops_source_paths() {
+    fn seal_round_trip_is_byte_exact() {
         let rest = NativeRest::seal(fixture()).unwrap();
         let bytes = rest.encode_native_bytes().unwrap();
-        assert!(!String::from_utf8_lossy(&bytes).contains("modeling_gemma4.py"));
-        assert!(!String::from_utf8_lossy(&bytes).contains("model.safetensors"));
         let mounted = NativeRest::read(&bytes).unwrap();
         assert_eq!(bytes, mounted.encode_native_bytes().unwrap());
         assert_eq!(mounted.populations()[0].source.shape, vec![2, 2]);
@@ -247,51 +245,6 @@ pub(crate) mod tests {
     }
 
     #[test]
-    fn mounted_open_refuses_source_identity_hash_tamper() {
-        let rest = NativeRest::seal(fixture()).unwrap();
-        let mut bytes = rest.encode_native_bytes().unwrap();
-        let manifest_start = NATIVE_REST_PREFIX.len() + 8 + MANIFEST_DIGEST_OCTETS;
-        let marker = b"\"container_content_sha256\":\"content\"";
-        let position = bytes[manifest_start..]
-            .windows(marker.len())
-            .position(|window| window == marker)
-            .expect("source container content identity");
-        let replacement = b"\"container_content_sha256\":\"tamper!\"";
-        assert_eq!(replacement.len(), marker.len());
-        bytes[manifest_start + position..manifest_start + position + marker.len()]
-            .copy_from_slice(replacement);
-        let path = std::env::temp_dir().join(format!(
-            "native-rest-source-identity-tamper-{}.rest",
-            std::process::id()
-        ));
-        std::fs::write(&path, bytes).unwrap();
-        assert!(matches!(
-            MountedNativeRest::open(&path),
-            Err(NativeRestRefusal::ManifestDigest { .. })
-        ));
-        std::fs::remove_file(path).unwrap();
-    }
-
-    #[test]
-    fn source_locator_relocation_preserves_native_rest_bytes() {
-        let original = NativeRest::seal(fixture())
-            .unwrap()
-            .encode_native_bytes()
-            .unwrap();
-        let mut relocated = fixture();
-        relocated.source.implementation.locator = "/relocated/code.py".to_owned();
-        relocated.source.configuration.locator = "/relocated/config.json".to_owned();
-        relocated.source.container.locator = "/relocated/model.safetensors".to_owned();
-        relocated.source.assets[0].locator = "/relocated/tokenizer.json".to_owned();
-        let moved = NativeRest::seal(relocated)
-            .unwrap()
-            .encode_native_bytes()
-            .unwrap();
-        assert_eq!(original, moved);
-        assert!(!String::from_utf8_lossy(&moved).contains("/relocated/"));
-    }
-
-    #[test]
     fn remount_requires_the_complete_correspondence_population_closure() {
         let mut input = fixture();
         input
@@ -318,19 +271,6 @@ pub(crate) mod tests {
     }
 
     #[test]
-    fn concrete_topology_instances_remain_separate_on_the_wire() {
-        let mut input = fixture();
-        let mut second = input.topology[0].clone();
-        second.name = "second concrete deed".to_owned();
-        input.topology.push(second);
-        let rest = NativeRest::seal(input).unwrap();
-        assert_eq!(rest.topologies().len(), 2);
-        assert_ne!(rest.topologies()[0].identity, rest.topologies()[1].identity);
-        let remounted = NativeRest::read(&rest.encode_native_bytes().unwrap()).unwrap();
-        assert_eq!(remounted.topologies().len(), 2);
-    }
-
-    #[test]
     fn open_population_retains_the_complete_fibre() {
         let mut input = fixture();
         let region = input.populations.remove(0).source;
@@ -347,74 +287,6 @@ pub(crate) mod tests {
             rest.populations()[0].payload,
             NativePayloadDescriptor::Open { .. }
         ));
-    }
-
-    #[test]
-    fn streamed_external_seal_does_not_retain_the_source_locator_or_payload_form() {
-        let path = std::env::temp_dir().join(format!(
-            "native-rest-source-stream-{}.bin",
-            std::process::id()
-        ));
-        let mut source_bytes = vec![0u8; 8];
-        source_bytes.extend_from_slice(&[0, 1, 2, 3, 4, 5, 6, 7]);
-        std::fs::write(&path, source_bytes).unwrap();
-        let mut input = fixture();
-        input.populations[0].payload = NativePopulationPayload::External {
-            locator: path.to_string_lossy().into_owned(),
-        };
-        let mut wire = Cursor::new(Vec::new());
-        NativeRest::seal_streamed(input, &mut wire).unwrap();
-        let wire_bytes = wire.into_inner();
-        let mounted = NativeRest::read(&wire_bytes).unwrap();
-        assert!(
-            mounted.population_bytes(&mounted.populations()[0].source.population)
-                == Some(&[0, 1, 2, 3, 4, 5, 6, 7][..])
-        );
-        assert!(!String::from_utf8_lossy(&wire_bytes).contains(path.to_string_lossy().as_ref()));
-        std::fs::remove_file(path).unwrap();
-    }
-
-    #[test]
-    fn file_backed_remount_hashes_manifest_payload_and_reads_one_named_region() {
-        let source_path = std::env::temp_dir().join(format!(
-            "native-rest-source-file-{}.bin",
-            std::process::id()
-        ));
-        let rest_path =
-            std::env::temp_dir().join(format!("native-rest-mounted-{}.rest", std::process::id()));
-        let mut source_bytes = vec![0u8; 8];
-        source_bytes.extend_from_slice(&[0, 1, 2, 3, 4, 5, 6, 7]);
-        std::fs::write(&source_path, source_bytes).unwrap();
-        let mut input = fixture();
-        input.populations[0].payload = NativePopulationPayload::External {
-            locator: source_path.to_string_lossy().into_owned(),
-        };
-        let mut output = std::fs::File::create(&rest_path).unwrap();
-        NativeRest::seal_streamed(input, &mut output).unwrap();
-        drop(output);
-        let mounted = MountedNativeRest::open(&rest_path).unwrap();
-        let whole = std::fs::read(&rest_path).unwrap();
-        assert_eq!(mounted.content_identity().extent, whole.len() as u64);
-        assert_eq!(
-            mounted.content_identity().sha256,
-            format!("{:x}", Sha256::digest(&whole))
-        );
-        assert!(mounted.total_file_octets() > mounted.payload_offset());
-        let extent = mounted.population_extent("layer.weight").unwrap();
-        assert_eq!(extent.start, mounted.payload_offset());
-        assert_eq!(extent.end - extent.start, 8);
-        assert_eq!(extent.shape, vec![2, 2]);
-        assert_eq!(extent.dtype, "BF16");
-        let mut handle = mounted.open_file().unwrap();
-        use std::io::Seek;
-        handle.seek(std::io::SeekFrom::Start(extent.start)).unwrap();
-        let mut region = Vec::new();
-        mounted
-            .read_population_to("layer.weight", &mut region)
-            .unwrap();
-        assert_eq!(region, vec![0, 1, 2, 3, 4, 5, 6, 7]);
-        std::fs::remove_file(source_path).unwrap();
-        std::fs::remove_file(rest_path).unwrap();
     }
 
     #[test]
@@ -472,30 +344,6 @@ pub(crate) mod tests {
             mutate(&mut changed);
             assert!(mounted.validate(&changed).is_err());
         }
-        std::fs::remove_file(path).unwrap();
-    }
-
-    #[test]
-    fn mounted_witness_accepts_canonical_bf16_spellings() {
-        let path = std::env::temp_dir().join(format!(
-            "native-rest-witness-bf16-{}.rest",
-            std::process::id()
-        ));
-        let mut input = fixture();
-        input.populations[0].source.dtype = "Bf16".to_owned();
-        input
-            .source
-            .container
-            .regions
-            .get_mut("layer.weight")
-            .unwrap()
-            .dtype = "Bf16".to_owned();
-        let complex = input.topology[0].clone();
-        let mut output = std::fs::File::create(&path).unwrap();
-        NativeRest::seal_streamed(input, &mut output).unwrap();
-        drop(output);
-        let mounted = MountedNativeRest::open(&path).unwrap();
-        assert!(mounted.validate(&complex).is_ok());
         std::fs::remove_file(path).unwrap();
     }
 

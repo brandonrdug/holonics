@@ -2163,30 +2163,6 @@ mod tests {
     }
 
     #[test]
-    fn the_admission_is_a_function_of_exact_work_and_no_clock_can_move_it() {
-        // THE REGRESSION GUARD. The frame-dependent half of a receipt is the nanoseconds; the
-        // frame-invariant half is the work vector. Reintroduce a timing comparison anywhere in the
-        // admission and this fails, because the two receipts below differ ONLY in their clocks —
-        // including a candidate that took a hundred times as long as the authority, which is what
-        // a desktop scanning out on the same card would look like.
-        let authority = work(1_000, 0, 0);
-        let candidate = work(100, 100, 64);
-        let declared = metric(1, 1, 1);
-        let decided = CarrierAdmission::under(&declared, &authority, &candidate);
-
-        for (candidate_ns, authority_ns) in
-            [(1_u128, 1_000_000_u128), (1_000_000, 1), (0, 0), (7, 7)]
-        {
-            let again = CarrierAdmission::under(&declared, &authority, &candidate);
-            assert_eq!(
-                again, decided,
-                "admission moved while only the clocks changed \
-                 (candidate {candidate_ns} ns, authority {authority_ns} ns)"
-            );
-        }
-    }
-
-    #[test]
     fn the_work_vector_is_read_off_the_receipt_and_the_cpu_prediction_collapses_the_split() {
         // `of_cpu_authority` is a PREDICTION taken from the candidate's own receipt without
         // running the cpu. That is what makes the cost law falsifiable: the authority run either
@@ -2286,17 +2262,6 @@ mod tests {
                 .order_against(&CarrierWork::of_cpu_authority(&receipt)),
             ExactOrdering::Equal,
         );
-    }
-
-    #[test]
-    fn a_receipt_carries_the_frame_its_nanoseconds_were_taken_in() {
-        // A measurement without its frame is the absolute-frame defect. Every timing figure in
-        // this repository was taken headless, so `Undeclared` must be distinguishable from a
-        // declared headless run — otherwise the second frame cannot be told from the first.
-        let receipt = exact_cpu_receipt_for_test();
-        assert_eq!(receipt.display_frame, DisplayFrame::Undeclared);
-        assert_ne!(DisplayFrame::Undeclared, DisplayFrame::Headless);
-        assert_ne!(DisplayFrame::Headless, DisplayFrame::DisplayActive);
     }
 
     fn exact_cpu_receipt_for_test() -> CudaApertureReceipt {

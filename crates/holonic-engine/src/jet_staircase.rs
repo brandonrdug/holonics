@@ -143,7 +143,7 @@
 use std::collections::BTreeMap;
 
 use num_bigint::BigInt;
-use num_traits::{One, Signed, Zero};
+use num_traits::{One, Zero};
 use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
@@ -1922,11 +1922,6 @@ pub fn omega_action_is_not_iterated_difference(
         omega_at_base: omega_value,
         iterated_difference_at_base: iterated,
     })
-}
-
-/// A readout helper the neck station uses: the sign of a rational, without a float anywhere.
-pub(crate) fn is_strictly_positive(value: &Rat) -> bool {
-    value.is_positive()
 }
 
 #[cfg(test)]

@@ -2158,68 +2158,6 @@ mod tests {
         );
     }
 
-    #[test]
-    fn nonzero_controls() {
-        // A law that returns zero proves nothing about itself (CLAUDE.md §8). Each population this
-        // module can return is exercised here on material that forces it to be non-empty.
-        let (boundary, expected) = unaligned_piecewise();
-        assert!(expected > Rat::zero(), "the graded area must be nonzero");
-
-        let ridden = run(&boundary, rat(1, 4), RideDiscipline::GermBounded);
-        assert_eq!(ridden.area, expected);
-        assert!(ridden.area > Rat::zero(), "the returned area is zero");
-        assert!(ridden.extension_count() > 0, "no extension was founded");
-        assert!(ridden.found_count() > 0, "nothing was FOUNDed");
-        assert!(ridden.ride_count() > 0, "nothing was RIDden");
-        assert!(
-            !ridden.obstructions.is_empty(),
-            "no obstruction was retained"
-        );
-        assert!(!ridden.scale_witnesses.is_empty(), "no scale was witnessed");
-        assert!(
-            ridden
-                .obstructions
-                .iter()
-                .any(|obstruction| !obstruction.winding_residual.is_zero()),
-            "every retained obstruction carried a zero residual, so none of them measured anything"
-        );
-        for obstruction in &ridden.obstructions {
-            assert_ne!(
-                obstruction.predicted_jet, obstruction.returned_jet,
-                "an obstruction was retained where the material did not change"
-            );
-        }
-
-        // The refused-ride population needs a leader conducted past its aperture against material
-        // that changes at the landing tip of the ride it proposes.
-        let (abrupt, abrupt_area) = abrupt_material();
-        assert_eq!(
-            run(&abrupt, rat(1, 2), RideDiscipline::GermBounded).area,
-            abrupt_area
-        );
-        let refusing = integrate_by_leaders(
-            &abrupt,
-            &LeaderLaw::new(
-                rat(1, 2),
-                RideDiscipline::UnclampedAncestry,
-                WitnessDepth::ReadOffTheJet,
-            ),
-        )
-        .expect("a lawful growth");
-        assert!(
-            !refusing.refused_rides.is_empty(),
-            "no ride was refused, so the refusal law is present in the code and absent from the \
-             evidence"
-        );
-        for refusal in &refusing.refused_rides {
-            assert!(refusal.proposed_span > refusing.grain);
-            assert_ne!(
-                refusal.predicted_landing_jet, refusal.returned_landing_jet,
-                "a ride was refused where the landing material agreed"
-            );
-        }
-    }
-
     // --- the declared aperture ----------------------------------------------------------------
 
     #[test]

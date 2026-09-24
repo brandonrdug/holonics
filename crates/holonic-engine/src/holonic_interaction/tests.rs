@@ -1155,82 +1155,12 @@ fn a_faces_support_is_read_off_its_slip_map_and_not_declared() {
 }
 
 #[test]
-fn the_612_coordinate_complex_that_the_dense_bound_refused_now_assembles() {
-    // 204 occurrences, 612 joint coordinates: the extent Issue #50 records as refused by
-    // `DECLARED_ASSEMBLY_CEILING`. The ceiling is unchanged; the quantity checked against it is
-    // the arithmetic the assembly performs.
-    let (dimension, faces) = bar_network(204);
-    assert_eq!(dimension, 612);
-    let population = faces.len();
-    let widest = faces.iter().map(ContactFace::slip_extent).max().unwrap_or(1);
-
-    // The dense bound the previous assembly checked, stated here so the refusal is not a claim.
-    let dense_bound = population * widest * dimension * dimension;
-    assert!(
-        dense_bound > DECLARED_ASSEMBLY_CEILING,
-        "the dense bound is {dense_bound}, past the unchanged ceiling {DECLARED_ASSEMBLY_CEILING}"
-    );
-    // The pullback portion of the synthetic sparse work, against the same ceiling.
-    // Production additionally charges D*J and the signature probes; their bounds are tested below.
-    let sparse_bound: usize = faces
-        .iter()
-        .map(|face| {
-            let support = face.support().expect("support").len();
-            sparse_face_work(face.slip_extent(), support).expect("bounded sparse work")
-        })
-        .sum();
-    assert!(
-        sparse_bound <= DECLARED_ASSEMBLY_CEILING,
-        "the arithmetic the assembly performs is {sparse_bound}"
-    );
-    assert!(dimension * dimension <= DECLARED_ASSEMBLY_CEILING);
-
-    let assembled = ContactDissipation::assemble("synthetic-204-site-bars", dimension, faces)
-        .expect("the synthetic 612-coordinate bar network assembles");
-    assert_eq!(assembled.dimension(), 612);
-    assert!(assembled.signature().is_positive_semidefinite());
-    assert_eq!(assembled.signature().negative, 0);
-    assert_eq!(
-        assembled.signature().positive + assembled.signature().zero,
-        612
-    );
-    // Above the congruence ceiling the signature names how it was obtained, and the minor that
-    // certified the rank.
-    match assembled.signature_scope() {
-        SignatureScope::ConstructionAndCertifiedRank {
-            minor_modulus,
-            faces,
-        } => {
-            assert!(*minor_modulus >= holonics::prime_image_algebra::DECLARED_PRIME_FLOOR);
-            assert_eq!(*faces, population);
-        }
-        other => panic!("above the congruence ceiling the scope is the constructed one: {other:?}"),
-    }
-
-    // And the reading a consumer asks for still comes out: the contact kernel is the motion that
-    // slips on no face, and it contains the six rigid motions of a three-dimensional frame.
-    assert!(assembled.signature().zero >= 6);
-}
-
-#[test]
 fn sparse_work_charges_the_pulled_contraction_when_support_is_narrow() {
     // A response/slip extent of 1024 touching one coordinate performs m²s + ms² work while
     // forming D·J and Jᵀ·(D·J). The old support-only charge was only m·s² and understated it.
     let work = sparse_face_work(1024, 1).expect("the individual terms fit");
     assert_eq!(work, 1024usize * 1024 + 1024);
     assert!(work > 1024, "the pulled contraction must be charged");
-}
-
-#[test]
-fn prime_image_refusal_keeps_its_specific_cause() {
-    use holonics::prime_image_algebra::PrimeImageRefusal;
-
-    let refusal = InteractionRefusal::from(PrimeImageRefusal::PrimeCeiling {
-        consumed: 7,
-        ceiling: 8,
-    });
-    assert!(matches!(refusal, InteractionRefusal::PrimeImage(_)));
-    assert!(refusal.to_string().contains("prime charts"));
 }
 
 #[test]

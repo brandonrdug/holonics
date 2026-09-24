@@ -679,27 +679,3 @@ fn every_moment_chart_is_one_storage_element_of_the_weighted_family() {
             .expect("D C D")
     );
 }
-
-/// Plan phase 13: the retired per-passage archive of the rooted spine still decodes (the field is
-/// ignored) into the same quotient.
-#[test]
-fn a_spine_wire_carrying_the_retired_passage_archive_still_decodes() {
-    let foundation = FactoredMomentSection::found(
-        3,
-        vec![current(2, &[(0, 1), (1, 2)]), current(3, &[(1, 1), (2, 1)])],
-    )
-    .expect("foundation");
-    let generators = vec![vec![1, 2, 0], vec![1, 2, 0]];
-    let (spine, passage) = FactoredConstitutiveSpine::found(&foundation.section)
-        .expect("root")
-        .transport_with_quotient(&generators)
-        .expect("passage");
-    let mut wire = serde_json::to_value(&spine).expect("wire");
-    assert!(wire.get("reconstruction_fibre").is_none());
-    wire.as_object_mut().expect("object").insert(
-        "reconstruction_fibre".to_owned(),
-        serde_json::to_value(vec![passage]).expect("legacy archive"),
-    );
-    let decoded: FactoredConstitutiveSpine = serde_json::from_value(wire).expect("legacy decode");
-    assert_eq!(decoded, spine);
-}

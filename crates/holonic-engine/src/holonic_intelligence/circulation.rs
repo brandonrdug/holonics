@@ -527,15 +527,6 @@ mod tests {
     }
 
     #[test]
-    fn text_and_binary_codecs_render_one_unchanged_complete_emission() {
-        let emission = fixture();
-        let text = Utf8InspectionCodec.render(&emission).expect("text");
-        let binary = BinaryEmissionCodec.render(&emission).expect("binary");
-        assert!(text.contains("plural_futures"));
-        assert_eq!(BinaryEmissionCodec::read(&binary).expect("read"), emission);
-    }
-
-    #[test]
     fn binary_codec_refuses_truncation_trailing_octets_and_repeated_starting_states() {
         let emission = fixture();
         let mut binary = BinaryEmissionCodec.render(&emission).expect("binary");

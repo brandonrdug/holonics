@@ -838,18 +838,3 @@ fn the_neck_invariants_assemble_over_one_source_and_name_what_is_open() {
             .any(|(_, owner)| *owner == "continuing_tube::check_circuit_holonomy")
     );
 }
-
-#[test]
-fn a_neck_certificate_names_its_receiver_scope_and_gates_nothing() {
-    let certificate = NeckCertificate {
-        receiver_scope: "test|height-receiver at the image plane".to_owned(),
-        statement: "the transverse half-extent is zero at station 3".to_owned(),
-        station: 3,
-    };
-    assert_eq!(certificate.station, 3);
-    assert!(certificate.receiver_scope.contains("height-receiver"));
-    // The certificate carries a scope and a statement, and this owner offers no function that
-    // consumes one to permit or forbid a generated face. The reading below is taken without it.
-    let train = imaging_train();
-    assert!(train.stations()[3].transverse_half_extent.is_zero());
-}

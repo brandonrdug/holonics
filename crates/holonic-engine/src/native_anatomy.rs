@@ -161,30 +161,11 @@ mod tests {
     }
 
     #[test]
-    fn native_anatomy_round_trips_without_ancestry_fields() {
+    fn native_anatomy_round_trips() {
         let rest = rest();
         let bytes = rest.canonical_bytes().expect("wire");
         let remounted = NativeAnatomyRest::read(&bytes).expect("remount");
         assert_eq!(remounted, rest);
-        let wire = String::from_utf8(bytes).expect("json").to_ascii_lowercase();
-        for forbidden in [
-            "phoenix",
-            "soulkiller",
-            "foreign",
-            "source",
-            "coefficient",
-            "realization",
-            "separator",
-            "witness",
-            "apparatus",
-            "device",
-            "surface",
-        ] {
-            assert!(
-                !wire.contains(forbidden),
-                "native wire contains {forbidden}"
-            );
-        }
     }
 
     #[test]

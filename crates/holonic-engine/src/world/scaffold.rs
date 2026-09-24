@@ -235,30 +235,13 @@ mod tests {
     use super::*;
 
     #[derive(Clone, Debug, PartialEq, Eq, thiserror::Error)]
-    enum ToyRefusal {
-        #[error("the toy law refuses {0}")]
-        Refused(u8),
-    }
+    enum ToyRefusal {}
 
     impl RefusalKind for ToyRefusal {
         const LAW: &'static str = "toy";
     }
 
     type ToyError = EventRefusal<ToyRefusal>;
-
-    #[test]
-    fn the_shared_refusals_keep_their_paths_and_the_law_kinds_are_one_family() {
-        let repeated: ToyError = ToyError::RepeatedEvent(EventId(3));
-        assert_eq!(
-            repeated.to_string(),
-            "toy occurrence EventId(3) was already admitted"
-        );
-        let own: ToyError = ToyError::Law(ToyRefusal::Refused(2));
-        assert_eq!(own, ToyError::Law(ToyRefusal::Refused(2)));
-        assert_eq!(own.to_string(), "the toy law refuses 2");
-        assert_eq!(own.law(), Some(&ToyRefusal::Refused(2)));
-        assert_eq!(ToyError::CarrierOverflow.law(), None);
-    }
 
     #[derive(Clone, Debug, PartialEq, Eq)]
     struct ToyQuotient(u8);

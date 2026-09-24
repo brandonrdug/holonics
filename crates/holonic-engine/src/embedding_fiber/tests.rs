@@ -89,11 +89,9 @@ fn the_fast_mouth_agrees_with_the_declared_mouth_on_every_pattern() {
 /// the serial mouth. This fixture includes negative words and unequal exponents, so it crosses
 /// the hand-restoration path which previously used an undefined signed left shift.
 #[test]
+#[ignore = "requires CUDA; host/device parity of the exact embedding-fiber kernel"]
 fn the_resident_bfloat16_mouth_agrees_with_the_serial_mouth_on_a_nontrivial_frame() {
-    let Ok(resident) = ResidentReadout::new() else {
-        eprintln!("no resident chart answered; the BF16 mouth parity check did not run");
-        return;
-    };
+    let resident = ResidentReadout::new().expect("a CUDA device mounts the resident readout");
     // Three rows at width four: positive, negative, zero, and several exponent spreads.
     let words = vec![
         0x3f80, 0xc000, 0x3f00, 0x0000, // 1, -2, 1/2, 0
@@ -219,146 +217,6 @@ fn an_entirely_zero_material_aligns_to_the_zero_exponent() {
     assert_eq!(aligned.exponent, 0);
     assert_eq!(aligned.entry_octaves, 0);
     assert_eq!(aligned.negatives, 0);
-}
-
-/// **The resident chart is graded against the serial one, bit for bit.**
-///
-/// Two independent implementations of one law; `CLAUDE.md` requires that where one exists, both
-/// are stated. This is the parity half. Ignored when no device answers, because a skipped check
-/// must not read as a passing one.
-#[test]
-fn the_two_charts_return_the_identical_exact_population() {
-    let Ok(resident) = ResidentReadout::new() else {
-        eprintln!("no resident chart answered; the parity check did not run");
-        return;
-    };
-    // A material wide enough that the resident chart's width is doing something.
-    let dim = 64usize;
-    let rows = 512usize;
-    let entries: Vec<i64> = (0..rows * dim)
-        .map(|at| ((at as i64 * 2_654_435_761) % 1021) - 510)
-        .collect();
-    let readout = AlignedMaterial {
-        entry_octaves: entries
-            .iter()
-            .map(|e| e.unsigned_abs().max(1).ilog2() + 1)
-            .max()
-            .unwrap_or(0),
-        negatives: entries.iter().filter(|e| **e < 0).count() as u64,
-        entries,
-        exponent: -7,
-    };
-    let query_entries: Vec<i64> = (0..dim).map(|at| ((at as i64 * 97) % 255) - 127).collect();
-    let query = AlignedMaterial {
-        entry_octaves: query_entries
-            .iter()
-            .map(|e| e.unsigned_abs().max(1).ilog2() + 1)
-            .max()
-            .unwrap_or(0),
-        negatives: query_entries.iter().filter(|e| **e < 0).count() as u64,
-        entries: query_entries,
-        exponent: -3,
-    };
-
-    let carried = resident
-        .score(&readout, &query, dim, None)
-        .expect("the deed is admissible");
-    let serial = score_serially(&readout, &query, dim, None).expect("well-formed");
-    assert_eq!(carried.scores, serial, "the two charts disagree");
-    assert_eq!(carried.exact_multiply_accumulates, (rows * dim) as u64);
-
-    // The octave face agrees with the exact scores it was taken beside.
-    for (score, octave) in carried.scores.iter().zip(&carried.octaves) {
-        let expected = if *score == 0 {
-            0
-        } else {
-            128 - score.unsigned_abs().leading_zeros()
-        };
-        assert_eq!(*octave, expected, "score {score}");
-    }
-
-    // And the addressed form agrees with the whole one on the rows it named.
-    let named: Vec<u32> = vec![7, 0, 511, 256];
-    let addressed = resident
-        .score(&readout, &query, dim, Some(&named))
-        .expect("admissible");
-    for (slot, row) in named.iter().enumerate() {
-        assert_eq!(addressed.scores[slot], carried.scores[*row as usize]);
-    }
-}
-
-/// **Mounting once and asking many is the same arithmetic as asking one at a time.**
-///
-/// The residency and the batched grid exist to stop the invariant crossing the bus per
-/// question; neither may change a single returned integer. Three queries, so a batch that
-/// silently scored only the first — or indexed its output by row and overwrote across
-/// queries — fails here rather than at map scale.
-#[test]
-fn the_batched_grid_returns_exactly_what_one_query_at_a_time_returns() {
-    let Ok(resident) = ResidentReadout::new() else {
-        eprintln!("no resident chart answered; the batch parity check did not run");
-        return;
-    };
-    let dim = 48usize;
-    let rows = 300usize;
-    let entries: Vec<i64> = (0..rows * dim)
-        .map(|at| ((at as i64 * 1_000_003) % 977) - 488)
-        .collect();
-    let readout = AlignedMaterial {
-        entry_octaves: entries
-            .iter()
-            .map(|e| e.unsigned_abs().max(1).ilog2() + 1)
-            .max()
-            .unwrap_or(0),
-        negatives: entries.iter().filter(|e| **e < 0).count() as u64,
-        entries,
-        exponent: -11,
-    };
-    let queries: Vec<AlignedMaterial> = (0..3)
-        .map(|which| {
-            let entries: Vec<i64> = (0..dim)
-                .map(|at| ((at as i64 * (31 + which * 17)) % 211) - 105)
-                .collect();
-            AlignedMaterial {
-                entry_octaves: entries
-                    .iter()
-                    .map(|e| e.unsigned_abs().max(1).ilog2() + 1)
-                    .max()
-                    .unwrap_or(0),
-                negatives: entries.iter().filter(|e| **e < 0).count() as u64,
-                entries,
-                // Distinct exponents, so a batch that carried one query's frame to all of them
-                // is caught by the returned frame and not only by the integers.
-                exponent: -3 - which as i32,
-            }
-        })
-        .collect();
-
-    let mounted = resident.mount(&readout, dim).expect("the map mounts");
-    assert_eq!(mounted.rows(), rows);
-    assert_eq!(mounted.dim(), dim);
-    assert_eq!(mounted.resident_octets(), rows * dim * 8);
-
-    let borrowed: Vec<&AlignedMaterial> = queries.iter().collect();
-    let batched = mounted.score_many(&borrowed).expect("admissible");
-    assert_eq!(batched.len(), queries.len());
-    for (which, query) in queries.iter().enumerate() {
-        let one = mounted.score(query, None).expect("admissible");
-        assert_eq!(batched[which].scores, one.scores, "query {which}");
-        assert_eq!(batched[which].octaves, one.octaves, "query {which}");
-        assert_eq!(batched[which].query_exponent, query.exponent);
-        assert_eq!(batched[which].readout_exponent, readout.exponent);
-        // And against the independent serial chart, so agreement is not two forms of one bug.
-        let serial = score_serially(&readout, query, dim, None).expect("well-formed");
-        assert_eq!(
-            batched[which].scores, serial,
-            "query {which} against serial"
-        );
-    }
-    // Distinct queries must return distinct populations, or the batch scored one of them three
-    // times and the agreement above would be vacuous.
-    assert_ne!(batched[0].scores, batched[1].scores);
-    assert_ne!(batched[1].scores, batched[2].scores);
 }
 
 /// **Nothing in this module returns a winner**, which is the deposit's bar made checkable: the

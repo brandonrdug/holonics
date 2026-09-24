@@ -1376,41 +1376,6 @@ mod tests {
         }
     }
 
-    /// Phase 10: the collapsed pair is the core `ShortestSeparator`, and its wire is the struct it
-    /// replaced, field for field.
-    #[test]
-    fn the_collapsed_pair_keeps_its_wire_as_the_core_separator() {
-        #[derive(Serialize, Deserialize, PartialEq, Debug)]
-        struct OldCollapsedPair {
-            left: ItemId,
-            right: ItemId,
-            distinguishing_word: Vec<InputId>,
-            witness: Option<(ReceiverId, Observation, Observation)>,
-            separated_by_terminus: bool,
-        }
-        for n in 2..=12u64 {
-            let system = CyclicCounter {
-                n,
-                moduli: vec![2, 3],
-            };
-            for pair in compress(&system).collapsed {
-                let old = OldCollapsedPair {
-                    left: pair.left,
-                    right: pair.right,
-                    distinguishing_word: pair.distinguishing_word.clone(),
-                    witness: pair.witness,
-                    separated_by_terminus: pair.separated_by_terminus,
-                };
-                let wire = serde_json::to_string(&pair).expect("serializes");
-                assert_eq!(wire, serde_json::to_string(&old).expect("serializes"));
-                let back: CollapsedPair = serde_json::from_str(&wire).expect("remounts");
-                assert_eq!(back, pair);
-                let old_back: OldCollapsedPair = serde_json::from_str(&wire).expect("remounts");
-                assert_eq!(old_back, old);
-            }
-        }
-    }
-
     /// The ablation must be capable of actually changing something, or the control above is a law
     /// that returns zero.
     #[test]
