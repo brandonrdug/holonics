@@ -1,3 +1,4 @@
+import ElementaryHolonics.Geometry.AffineSwing
 import Mathlib.Analysis.Calculus.MeanValue
 import Mathlib.GroupTheory.Perm.Basic
 import ElementaryHolonics.Millennium.Swing
@@ -27,6 +28,7 @@ Every `theorem` here is discharged.
 namespace Soma.Holonics.Millennium.Chronology
 
 open Soma.Holonics.Millennium.Swing
+open Soma.Holonics.Geometry.AffineSwing
 
 /-- **The swing family is not endpoint-order-blind**, so its ordered action has a real endpoint
 effect.

@@ -6,12 +6,13 @@ import ElementaryHolonics.Foundation.BoundaryScalePassage
 import ElementaryHolonics.Foundation.HigherDifferenceTransport
 import ElementaryHolonics.Geometry.CrossRatio
 import ElementaryHolonics.Geometry.Gyrogroup
-import ElementaryHolonics.Geometry.SwingPotential
 import ElementaryHolonics.Geometry.ExteriorBoundary
 import ElementaryHolonics.Geometry.ScrewGeometry
 import ElementaryHolonics.Geometry.PhaseCarry
 import ElementaryHolonics.Geometry.PairResonance
 import ElementaryHolonics.Geometry.ConnectionCalculus
+import ElementaryHolonics.Geometry.AffineSwing
+import ElementaryHolonics.Geometry.SwingPotential
 
 /-!
 # Orientation, scale, constraints, and curved transport

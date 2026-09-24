@@ -1,3 +1,4 @@
+import ElementaryHolonics.Geometry.AffineSwing
 import Mathlib.Analysis.SpecialFunctions.Sqrt
 import Mathlib.Tactic.Positivity
 import ElementaryHolonics.Millennium.Chronology
@@ -40,7 +41,8 @@ Every `theorem` here is discharged.
 
 namespace Soma.Holonics.Millennium.Navigation
 
-open Soma.Holonics.Millennium.Swing Soma.Holonics.Millennium.Chronology
+open Soma.Holonics.Millennium.Swing
+open Soma.Holonics.Geometry.AffineSwing Soma.Holonics.Millennium.Chronology
 
 /-! ## 1. The swings are graded by parity, and the grading is the orientation class -/
 

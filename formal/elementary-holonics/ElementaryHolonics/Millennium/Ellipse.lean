@@ -1,3 +1,4 @@
+import ElementaryHolonics.Geometry.AffineSwing
 import ElementaryHolonics.Millennium.Swing
 
 /-!
@@ -58,16 +59,16 @@ theorem theEightPiFactors : (8 : ℝ) * Real.pi = 2 * (4 * Real.pi) := by ring
 the half-turn about the semi-major axis, with the board frozen at infinity.  The same
 shape as `r + r' = n` for a modulus, with `a` in the anchor's place. -/
 theorem theFocalSumLawIsTheSwing (a r₁ r₂ : ℝ) :
-    r₁ + r₂ = 2 * a ↔ r₂ = Swing.swing a r₁ := by
-  unfold Swing.swing
+    r₁ + r₂ = 2 * a ↔ r₂ = Soma.Holonics.Geometry.AffineSwing.swing a r₁ := by
+  unfold Soma.Holonics.Geometry.AffineSwing.swing
   constructor <;> intro h <;> linarith
 
 /-- **THE CIRCLE IS THE FIXED POINT OF THE ORBIT.**  A focal radius equal to its own
 swing is the degenerate orbit — the anchor itself, where the two foci coincide and the
 residue vanishes.  Exactly the handless class of a modulus. -/
 theorem theCircleIsTheFixedPointOfTheOrbit (a r : ℝ) :
-    Swing.swing a r = r ↔ r = a := by
-  unfold Swing.swing
+    Soma.Holonics.Geometry.AffineSwing.swing a r = r ↔ r = a := by
+  unfold Soma.Holonics.Geometry.AffineSwing.swing
   constructor <;> intro h <;> linarith
 
 /-- **THE ECCENTRICITY IS THE RESIDUE OVER THE MODULUS.**  With apsides `a(1±e)` the

@@ -1,3 +1,4 @@
+import ElementaryHolonics.Geometry.AffineSwing
 import Mathlib.Tactic
 import Mathlib.Analysis.InnerProductSpace.Basic
 import ElementaryHolonics.Geometry.CrossRatio
@@ -299,13 +300,13 @@ def ReturnedQuadrilateral.flatFourth (q : ReturnedQuadrilateral G) : G :=
 /-- Construct the same flat fourth point by swinging the source through the left anchor and then
 transporting the right arm. -/
 def ReturnedQuadrilateral.swingThenTransport (q : ReturnedQuadrilateral G) : G :=
-  Swing.swing q.left q.source + (q.right - q.left)
+  Soma.Holonics.Geometry.AffineSwing.swing q.left q.source + (q.right - q.left)
 
 /-- The flat parallelogram completion is exactly a Swing followed by edge transport. -/
 theorem ReturnedQuadrilateral.swingThenTransport_eq_flatFourth
     (q : ReturnedQuadrilateral G) :
     q.swingThenTransport = q.flatFourth := by
-  simp [ReturnedQuadrilateral.swingThenTransport, ReturnedQuadrilateral.flatFourth, Swing.swing]
+  simp [ReturnedQuadrilateral.swingThenTransport, ReturnedQuadrilateral.flatFourth, Soma.Holonics.Geometry.AffineSwing.swing]
   abel
 
 /-- The genuine gyrogroup construction specializes to the same fourth point in the flat additive

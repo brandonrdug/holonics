@@ -1,3 +1,4 @@
+import ElementaryHolonics.Geometry.AffineSwing
 import ElementaryHolonics.Foundation.ComparisonCell
 import ElementaryHolonics.Foundation.TransportWord
 import ElementaryHolonics.Millennium.PhysicalRealization
@@ -123,6 +124,7 @@ end AddressedPassage
 namespace Millennium.HolonicComposition
 
 open Soma.Holonics.Millennium.Swing
+open Soma.Holonics.Geometry.AffineSwing
 open Soma.Holonics.Millennium.PhysicalRealization
 open Soma.Holonics.Millennium.LineageCompression
 open Soma.Holonics.Foundation.ConnectionLineage

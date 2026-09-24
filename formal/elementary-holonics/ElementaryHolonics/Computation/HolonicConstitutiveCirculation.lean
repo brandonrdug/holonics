@@ -1,3 +1,4 @@
+import ElementaryHolonics.Geometry.AffineSwing
 import ElementaryHolonics.Computation.HolonicConstitutiveFibre
 import ElementaryHolonics.Millennium.Swing
 import Mathlib.Tactic
@@ -480,8 +481,8 @@ theorem graphScattering_involutive
 theorem graphScattering_eq_swing
     (D : W →ₗ[ℝ] V) (Dt : V →ₗ[ℝ] W) (Kinv : V →ₗ[ℝ] V) (x : V × W) :
     graphScattering D Dt Kinv x =
-      Soma.Holonics.Millennium.Swing.swing (graphProjection D Dt Kinv x) x := by
-  simp [graphScattering, Soma.Holonics.Millennium.Swing.swing, two_smul]
+      Soma.Holonics.Geometry.AffineSwing.swing (graphProjection D Dt Kinv x) x := by
+  simp [graphScattering, Soma.Holonics.Geometry.AffineSwing.swing, two_smul]
 
 /-- An inverse paired coupling scatters by exchanging its transported components.
 In an isometric realization Dt is the energy adjoint and `(1/2) I` is the normal inverse. -/

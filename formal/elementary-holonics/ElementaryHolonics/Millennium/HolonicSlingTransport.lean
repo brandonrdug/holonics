@@ -1,3 +1,4 @@
+import ElementaryHolonics.Geometry.AffineSwing
 import ElementaryHolonics.Millennium.HolonicComposition
 import ElementaryHolonics.Millennium.HolonicEntropyActionInduction
 import Mathlib.Data.Fintype.BigOperators
@@ -32,6 +33,7 @@ open Soma.Holonics
 open Soma.Holonics.Millennium.Chronology
 open Soma.Holonics.Millennium.HolonicEntropyActionInduction
 open Soma.Holonics.Millennium.Swing
+open Soma.Holonics.Geometry.AffineSwing
 
 /-! ## The exact source decomposition -/
 

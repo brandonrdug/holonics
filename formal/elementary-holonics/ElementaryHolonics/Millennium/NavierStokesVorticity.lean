@@ -1,3 +1,4 @@
+import ElementaryHolonics.Geometry.AffineSwing
 import Mathlib.Tactic
 import Mathlib.Analysis.Calculus.FDeriv.Symmetric
 import Mathlib.LinearAlgebra.CrossProduct
@@ -82,10 +83,10 @@ theorem cross_swap (u v : Space) : cross v u = -cross u v := by
 
 /-- The exchange of the cross interaction is exactly the frozen-board swing about zero. -/
 theorem cross_swap_is_zeroAnchoredSwing (u v : Space) :
-    cross v u = Swing.swing 0 (cross u v) := by
+    cross v u = Soma.Holonics.Geometry.AffineSwing.swing 0 (cross u v) := by
   rw [cross_swap]
   ext i
-  simp [Swing.swing]
+  simp [Soma.Holonics.Geometry.AffineSwing.swing]
 
 /-- **The pointwise Lamb identity in a Jacobian chart.**
 
