@@ -23,14 +23,14 @@ separate Lake path/namespace migration. The move adds no wire decoder: the stand
 
 ## Verification
 
-Source audit and `rustfmt` on the touched files completed; `git diff --check` passes. Cargo builds
-and tests were intentionally not run while the root workspace check was active. Run these after
-restacking onto the verified Phase 12b session cut:
+- `cargo test --locked -j2 -p holonics receiver::standing::tests`: 39 passed, 0 failed.
+- `cargo check --locked -j2 -p holonic-engine --all-targets`: passed in 3m51s, including the
+  exact CUDA `compute_89` build. It reports warnings in existing unrelated engine modules.
+- `cargo doc --locked -j2 -p holonics --no-deps`: passed. The crate emits 222 existing warnings
+  in other documentation; none point to `receiver/standing.rs` or `receiver/standing_tests.rs`.
+  Internal Rust paths and the receiver law links in the moved owner resolve. The Holonic
+  `[definition]` and `[implemented-exact]` markers are escaped as plain documentation labels.
+- `git diff --check`: passes.
 
-- `cargo test --locked -j2 -p holonics receiver::standing::tests`
-- `cargo check --locked -j2 -p holonic-engine --all-targets`
-- `cargo check --locked -j2 --workspace --all-targets`
-
-The main-library test exercises the complete moved standing suite; the engine check covers the
-`TimedFace` caller and remaining receiver-release integration; the workspace check validates the
-new dependency direction. No Lean declaration changed, so no new Lean build obligation is created.
+The workspace all-target check remains for the root after it restacks onto the verified Phase 12b
+session cut. No Lean declaration changed, so no new Lean build obligation is created.
