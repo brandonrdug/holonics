@@ -51,7 +51,9 @@ remained. The package and workspace member were therefore removed, along with it
 entry. Their schemas were unused prototypes, not active current/runtime contracts. The live
 boundary guide no longer attributes generated currents to `soma-abi::current::EventHeader`.
 
-This follow-up is a source/documentation cut only. No Cargo build, test, or device gate was run in
-the retirement worktree; focused workspace verification is coordinated after the portable-wire
-stack is restacked.
->>>>>>> 43ac2a55 (Retire unused substrate ABI package)
+The locked `cargo check -j2 --workspace --all-targets` passed after the package removal.
+`cargo metadata --locked --no-deps` lists ten workspace packages with no `soma-abi` member;
+`cargo tree --locked -p holonics -e normal` retains only `holonics-portable` as a local main-crate
+dependency. The preceding wire cut's portable tests and device gates still apply: this
+follow-up removed only the unconsumed package and corrected documentation, with no production
+kernel or launch change.
