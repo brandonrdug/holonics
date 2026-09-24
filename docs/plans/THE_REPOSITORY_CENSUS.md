@@ -164,8 +164,9 @@ whole-face implementation or a missing Lean theorem.
 
 The [R2 owner audit](census/SOMA_R0.tsv) changes two earlier assumptions. `holonics-workspace`
 has a live workbench application caller. `holonic-language`'s source-neutral reflection and
-continuation law now has checked `Transport/ReflectiveContinuation.lean`; its Rust crate remains
-live through `holonic-life` and needs the caller disposition before retirement. The
+continuation law now has checked `Transport/ReflectiveContinuation.lean`; the Rust law is folded
+into `holonics::generator::reflection`, and the life callers are retargeted. See the M1 reflection
+owner audit. The
 [device and exact-word audit](census/R2_DEVICE_WORDS.md) establishes that
 `holonic-core::PrimeChart` consumes `holonic-words`, while the Rust NVPTX kernel consumes
 `soma-abi` directly; the latter owns the shared `no_std` arithmetic. The Soma PTX is embedded at

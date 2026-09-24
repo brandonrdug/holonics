@@ -18,7 +18,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_language::{
+use holonics::generator::reflection::{
     CodecCrossingError, CodecId, CodecObstruction, CodecStep, ContinuationId, ContinuationState,
     ReceiverId, ReflectiveCodecExecutor, ReflectiveRuntime, ReflectiveRuntimeError,
 };

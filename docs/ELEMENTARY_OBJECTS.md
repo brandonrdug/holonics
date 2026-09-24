@@ -165,7 +165,7 @@ that same continuation at the same instruction only when the new codec names the
 as a parent; unchanged resumption keeps the codec and instruction. The environment returned by
 the executor remains with the continuation throughout. `Transport/ReflectiveContinuation.lean`
 states these transitions and success laws. The Rust chart is
-`holonic-language::ReflectiveRuntime`; its executor-specific semantics, atlas limits and remount
+`holonics::generator::reflection::ReflectiveRuntime`; its executor-specific semantics, atlas limits and remount
 validation are outside this formal contract.
 
 ### 4. Pair contact

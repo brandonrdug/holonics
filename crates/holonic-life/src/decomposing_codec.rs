@@ -67,7 +67,7 @@ use holonic_engine::receiver_exact_compression::{
     compress, CollapsedPair, InputId, ItemId, Observation, ObservedSystem,
     ReceiverExactCompression, ReceiverId,
 };
-use holonic_language::{
+use holonics::generator::reflection::{
     CodecCrossingError, CodecId, CodecLineageRefusal, CodecObstruction, CodecRevisionRefusal,
     CodecStep, ContinuationId, ContinuationState, FaceId, ReceiverId as CodecReceiverId,
     ReflectionId, ReflectiveCodecExecutor, ReflectiveRuntime, ReflectiveRuntimeError,
@@ -2244,7 +2244,7 @@ mod tests {
     ///
     /// This test read `assert_eq!(run(), run())` until 2026-08-08 and could not fail. Nothing on
     /// the path is nondeterministic: this module holds only `BTreeMap`/`BTreeSet`,
-    /// `receiver_exact_compression` and `holonic-language` contain no hash container at all, and
+    /// `receiver_exact_compression` and `holonics::generator::reflection` contain no hash container at all, and
     /// `LocalSet` is `Vec`-backed. Determinism there was a property of the containers, not a
     /// measurement of this organ, and `CLAUDE.md` §8 calls a receipt that could not have come out
     /// otherwise no evidence.

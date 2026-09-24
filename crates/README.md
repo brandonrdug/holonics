@@ -12,7 +12,6 @@ and follow the actual source/consumer map.
 | `holonics-workspace` | The specialized persistent snapshot/workspace artifact family. |
 | `holonic-engine` | Native mathematical computation, resident CUDA laws, operator ecology, dismantling and comparison owners. |
 | `holonic-life` | Earlier lifecycle/package, source transport and application-boundary owners (Cargo package `life`). |
-| `holonic-language` | Reflective substrate owner. |
 | `holonic-body`, `holonic-abi` | Shared exact substrate and host/device wire carriers, pending the portable kernel-law consolidation. |
 | `holonics-cuda` | CUDA driver, device sections and launch apparatus. |
 

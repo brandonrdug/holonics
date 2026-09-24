@@ -9,8 +9,8 @@
 # typed atomic membrane. `holonics::geometry` and the native mathematical owners in
 # `crates/holonic-engine` keep receiver-relative conduct exact over BigRational with
 # Sturm-certified algebraic roots; exterior float codewords and measurements keep their
-# declared codec/apparatus roles. `crates/holonic-language` is the reflective
-# runtime. `crates/holonic-life` is the membrane where the ecologies live.
+# declared codec/apparatus roles. Generator reflection lives in `holonics`;
+# `crates/holonic-life` is the membrane where the ecologies live.
 #
 # Excluded on purpose: the nvptx mount kernel pins its own nightly and publishes a
 # committed boundary artifact, so the host workspace never needs that target.
@@ -21,7 +21,6 @@ members = [
   "crates/holonics-hna",
   "crates/holonics-workspace",
   "applications/holonics-workbench",
-  "crates/holonic-language",
   "crates/holonic-words",
   "crates/holonic-engine",
   "crates/holonics-portable",

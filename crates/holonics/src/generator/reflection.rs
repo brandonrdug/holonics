@@ -13,14 +13,12 @@
 //! Bytecode is therefore one possible terminal `Program`, not the ontology of every preceding
 //! face. CPU and card executors may realize the same typed crossing without becoming its law.
 
-#![no_std]
-
 extern crate alloc;
 
 use alloc::borrow::ToOwned;
 use core::fmt;
 
-use holonics::structure::{
+use crate::structure::{
     GrowingKeyAtlas, KeyAtlasError, LocalSet, LocalStructureError, OrdinalAtlasError,
     SparseOrdinalAtlas,
 };

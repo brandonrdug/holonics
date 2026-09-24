@@ -1,4 +1,4 @@
-use holonic_language::{
+use holonics::generator::reflection::{
     CodecObstruction, CodecStep, ContinuationState, ReceiverId, ReflectiveCodecExecutor,
     ReflectiveRuntime,
 };

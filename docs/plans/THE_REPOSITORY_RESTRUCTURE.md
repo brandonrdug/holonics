@@ -705,6 +705,10 @@ existing suites (§0.9):
    engine/HNN execution moves to CUDA. The [CUDA apparatus](census/M1_CUDA_MOUNT_OWNER_MOVE.md)
    now lives in `crates/holonics-cuda` as the `holonics-cuda` package (`holonics_cuda` library);
    engine and life consumers use that owner directly, with committed PTX and binary names retained.
+   The source-neutral codec reflection/continuation relation is folded into
+   `holonics::generator::reflection`; `holonic-life` callers are retargeted and the separate
+   `holonic-language` package is retired. The [reflection owner audit](census/M1_REFLECTION_OWNER_MOVE.md)
+   records its checked Lean peer and pending focused gates.
 8. **M2: the Lean move.** Move paths to `lean/` (`Holonics` and `HolonicsResearch`) and build both
    targets. Rename `Soma.Holonics` to `Holonics` as a separate mechanical commit.
 9. **D: documents (the restructure's closing acceptance).** All to the verified paths:

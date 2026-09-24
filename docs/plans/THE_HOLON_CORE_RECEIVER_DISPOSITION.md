@@ -335,7 +335,7 @@ extents; no kernel, launch or returned value changed (device tests
 | `WaveReceiverId` | struct | `holonic-engine/src/wave_propagation.rs` | different object | an identifier/address (name-inferred) |
 | `WaveReceiverSpec` | struct | `holonic-engine/src/wave_propagation.rs` | receiver face (codec) | a receiver chart/aperture geometry (where a face is read), not a port object (name-inferred) |
 | `CyclicReceiver` | struct | `holonic-engine/src/winding_inertia.rs` | passive coholon | a declared reading (name-inferred): a passive coholon unless it returns a current |
-| `ReceiverId` | struct | `holonic-language/src/lib.rs` | different object | an identifier; the three `ReceiverId(u64)` name distinct ID spaces and are not aliased (source-inspected) |
+| `ReceiverId` | struct | `holonics/src/generator/reflection.rs` | different object | an identifier; the three `ReceiverId(u64)` name distinct ID spaces and are not aliased (source-inspected) |
 | `ReceiverQuestion` | struct | `holonic-life/examples/m6/route.rs` | different object | an event/world/program chart of a receiver-named system (the occurrence Holon's event chart), not a port object (name-inferred) |
 | `ContinuationReceiver` | enum | `holonic-life/src/causal_language.rs` | different object | a receiver kind label (name-inferred) |
 | `LaboratoryReceiverQuotientReceipt` | struct | `holonic-life/src/laboratory_language.rs` | receiver face (codec) | a readout/face value (codec projection) of a receiver (name-inferred) |
