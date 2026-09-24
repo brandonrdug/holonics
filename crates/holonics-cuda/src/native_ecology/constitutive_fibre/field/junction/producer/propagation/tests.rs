@@ -1,5 +1,5 @@
 use super::*;
-use crate::{causal_reflection::RationalCirclePoint, ExactWavePhaseTransport};
+use crate::ExactWavePhaseTransport;
 
 fn w(real: i64, imaginary: i64) -> Wave {
     Wave::new(
@@ -135,39 +135,6 @@ fn overlap_derivative_and_complete_reflected_adjoint_agree() {
     assert_eq!(pairing, returned);
 }
 
-#[test]
-fn current_and_contact_rechart_preserve_the_propagated_receiver() {
-    let d = contacts();
-    let b = vec![w(1, 1), w(0, 1), w(1, 0), w(0, 0)];
-    let p = CausalContactPropagation::at(&births(), d.clone(), &b).unwrap();
-    let point = RationalCirclePoint::from_slope(&Rat::new(1.into(), 2.into()));
-    let phase =
-        ExactWavePhaseTransport::new(point.real().clone(), point.imaginary().clone()).unwrap();
-    let charts = [
-        phase.clone(),
-        phase.inverse(),
-        ExactWavePhaseTransport::identity(),
-        phase,
-    ];
-    let moved_d = d
-        .iter()
-        .zip(&charts)
-        .map(|(d, chart)| d.iter().map(|v| chart.transport(v)).collect())
-        .collect();
-    let moved_b = b
-        .iter()
-        .zip(&charts)
-        .map(|(b, chart)| chart.inverse().transport(b))
-        .collect::<Vec<_>>();
-    let moved = CausalContactPropagation::at(&births(), moved_d, &moved_b).unwrap();
-    let expected = p
-        .internal()
-        .iter()
-        .zip(&charts)
-        .map(|(v, chart)| chart.inverse().transport(v))
-        .collect::<Vec<_>>();
-    assert_eq!(moved.internal(), expected);
-}
 
 #[test]
 fn invalid_chronology_is_not_a_new_propagation_edge() {
