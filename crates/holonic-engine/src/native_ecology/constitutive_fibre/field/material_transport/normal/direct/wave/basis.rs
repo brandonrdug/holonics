@@ -82,11 +82,11 @@ impl<'c> NormalWaveBasisFace<'c> {
     }
     /// The codec face is a passive reading of the current (`2n` real coordinates): it selects a
     /// basis action and injects no current (power zero).
-    pub fn receiver_element(&self) -> holonic_core::law::receiver::ActiveReceiver {
-        holonic_core::law::receiver::ActiveReceiver::declared(
+    pub fn receiver_element(&self) -> holonics::law::receiver::ActiveReceiver {
+        holonics::law::receiver::ActiveReceiver::declared(
             "normal wave basis face",
             2 * self.coordinates.len(),
-            holonic_core::law::receiver::ReceiverPower::Reading,
+            holonics::law::receiver::ReceiverPower::Reading,
         )
     }
     /// Only the already-selected native face crosses here. The host never ranks scores.

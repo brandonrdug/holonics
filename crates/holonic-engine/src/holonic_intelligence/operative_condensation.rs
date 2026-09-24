@@ -118,15 +118,15 @@ pub struct NativeCollapsedPair {
 }
 
 impl NativeCollapsedPair {
-    /// The core [`Separation`](holonic_core::restriction::Separation) (plan phases 10, 15): the
+    /// The core [`Separation`](holonics::restriction::Separation) (plan phases 10, 15): the
     /// lens restriction merges the two occurrences at `exposure` (both read `lens_face`); the
     /// extracted operator separates them, witnessed by the exposure, the lens face and the
     /// shortest separating history, with its two full faces as the readings. The record keeps
     /// its own wire.
     pub fn separation(
         &self,
-    ) -> holonic_core::restriction::Separation<usize, (NativeExposure, u32, Vec<u32>), u32> {
-        holonic_core::restriction::Separation::new(
+    ) -> holonics::restriction::Separation<usize, (NativeExposure, u32, Vec<u32>), u32> {
+        holonics::restriction::Separation::new(
             self.left,
             self.right,
             (self.exposure.clone(), self.lens_face, self.separating_word.clone()),
@@ -274,22 +274,22 @@ pub struct NativeClassEcology {
 }
 
 impl NativeClassEcology {
-    /// The class as the core [`PreimageFibre`](holonic_core::restriction::PreimageFibre)
+    /// The class as the core [`PreimageFibre`](holonics::restriction::PreimageFibre)
     /// (plan phases 10, 15): the signature quotient's image and every occurrence it merges there,
     /// with the addresses each entered by. The class body refuses every occurrence outside it
     /// (`NativeConeRestrictedEcology::admit`); the retained occurrences are this fibre, a quotient
     /// class of the declared family, not an archive of cycles.
     pub fn preimage_fibre(
         &self,
-    ) -> holonic_core::restriction::PreimageFibre<NativeSignature, Vec<NativeRetainedOccurrence>> {
-        holonic_core::restriction::PreimageFibre::new(self.signature.clone(), self.fibre.clone())
+    ) -> holonics::restriction::PreimageFibre<NativeSignature, Vec<NativeRetainedOccurrence>> {
+        holonics::restriction::PreimageFibre::new(self.signature.clone(), self.fibre.clone())
     }
 
     /// The remainder's collapsed pairs as core separations of the lens restriction, on the body's
     /// domain.
     pub fn separations(
         &self,
-    ) -> Vec<holonic_core::restriction::Separation<usize, (NativeExposure, u32, Vec<u32>), u32>> {
+    ) -> Vec<holonics::restriction::Separation<usize, (NativeExposure, u32, Vec<u32>), u32>> {
         self.remainder.collapsed.iter().map(NativeCollapsedPair::separation).collect()
     }
 }

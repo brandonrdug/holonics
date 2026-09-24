@@ -15,13 +15,8 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use thiserror::Error;
 
-use crate::{
-    cultivated_rest::{AlignedFactor, MorphologyPayload},
-    derived_factor_cover::{DerivedFactorCover, LocalFactorReceipt},
-    embedding_fiber::{AlignedMaterial, ResidentReadout},
-    exact_linear::{ExactLinearError, ExactRatMatrix},
-    resident_section::{Dyadic, ResidentGrain, ResidentSurface, TransferCensus},
-};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
+use crate::{cultivated_rest::{AlignedFactor, MorphologyPayload}, derived_factor_cover::{DerivedFactorCover, LocalFactorReceipt}, embedding_fiber::{AlignedMaterial, ResidentReadout}, resident_section::{Dyadic, ResidentGrain, ResidentSurface, TransferCensus}};
 
 use super::cultivation_overlay::{
     DerivedRankDerivationReceipt, FactorDerivationReceipt, SeparatingReceiver, SparseDefect,

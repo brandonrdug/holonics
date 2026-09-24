@@ -14,8 +14,8 @@ use sha2::{Digest, Sha256};
 use thiserror::Error;
 
 use crate::embedding_fiber::AlignedMaterial;
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix, LinearFactorization};
-use crate::exact_work::ExactWork;
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix, LinearFactorization};
+use holonics::exact_work::ExactWork;
 
 /// A terminal hidden point section supplied by the caller as caused continuation.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]

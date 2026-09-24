@@ -42,7 +42,7 @@ use holonic_engine::conditioned_derivation::{
     FoundedMorphology, PassageOrigin, StemAblation, ablate_stem, expose,
 };
 use holonic_engine::derivation_atlas::CircuitAperture;
-use holonic_engine::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::PivotRule;
 
 /// Every file with one of the declared extensions under `root`, in a stable order.
 fn material(root: &Path, extension: &str) -> Vec<PathBuf> {

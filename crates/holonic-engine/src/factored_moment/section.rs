@@ -15,7 +15,7 @@ use crate::receiver_history_compression::{exact_bigint_gcd, exact_bigint_lcm};
 /// `source_to_image` carries every transported row into that basis, and the constitutive form is
 /// pulled through the same addressed map. This is the chart-independent law mirrored by the
 /// resident finite-chart construction; no cross-moment Gram is part of the returned section.
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::receiver_history_compression::{
     AddressedFactoredIntegralReceiverComplex, FactoredIntegralReceiverForm,
     SparseIntegralFunctional,

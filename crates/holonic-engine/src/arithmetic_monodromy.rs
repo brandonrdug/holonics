@@ -76,7 +76,7 @@ use crate::{
 /// **MATERIAL, and the theorem is named.** Every return here is founded on the discriminant
 /// `disc(f) = (-1)^(n(n-1)/2) Res(f, f')`, and `Res(f, f')` requires `deg f' >= 1`, hence `n >= 2`.
 /// The same floor is stated independently by
-/// [`crate::rational_polynomial::integer_discriminant`], which refuses `degree < 2` with
+/// [`holonics::rational_polynomial::integer_discriminant`], which refuses `degree < 2` with
 /// `DiscriminantDegreeTooLow`. It is not an aperture: a degree-one polynomial has one root, no pair
 /// of roots to separate, no cycle type but the identity, and no Galois group to constrain.
 const LEAST_DEGREE_WITH_A_DISCRIMINANT: usize = 2;

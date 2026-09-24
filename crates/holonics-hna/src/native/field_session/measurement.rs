@@ -28,7 +28,7 @@
 use super::generator_application::GeneratorObserveCut;
 use super::*;
 use crate::alpha::exposure::{ExteriorRequestMeasure, ExteriorReturnObserver};
-use holonic_engine::ExactInterval;
+use holonics::exact_value::ExactInterval;
 use holonic_engine::native_ecology::constitutive_fibre::{
     NativeNormalizedSection, NormalMaterialRest, ResidentNormalEnclosureSection,
 };

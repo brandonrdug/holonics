@@ -8,7 +8,7 @@
 //! fire.
 
 use super::*;
-use crate::continuing_tower::{ComposedTransition, check_restriction_laws};
+use holonics::restriction::tower::{ComposedTransition, check_restriction_laws};
 
 fn ints(values: &[i64]) -> Vec<BigInt> {
     values.iter().map(|value| BigInt::from(*value)).collect()

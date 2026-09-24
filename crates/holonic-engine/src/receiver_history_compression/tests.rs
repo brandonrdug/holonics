@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::exact_linear::ExactRatMatrix;
+    use holonics::exact_linear::ExactRatMatrix;
     use crate::receiver_exact_compression::{Observation, compress};
     use crate::receiver_history_compression::*;
     use num_traits::Zero;

@@ -16,7 +16,7 @@ use num_traits::Zero;
 use super::*;
 use crate::EventId;
 use crate::physical_intake::mmcif::StructurePresentation;
-use crate::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::PivotRule;
 
 // ---------------------------------------------------------------------------------------------
 // synthetic material

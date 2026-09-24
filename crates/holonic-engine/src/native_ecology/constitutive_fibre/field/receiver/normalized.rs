@@ -1,7 +1,7 @@
 //! A source-qualified normalized receiver over the material target chart. The receiver uses
 //! real coordinate potentials; the original complex reports and their numerical fibres stay held.
 use super::*;
-use crate::exact_value::ExactInterval;
+use holonics::exact_value::ExactInterval;
 use crate::resident_section::SeriesAperture;
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
@@ -255,7 +255,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
 // ---------------------------------------------------------------------------------------------
 //
 // [definition] Each resident receiver here is a Holon at ports with its declared power term
-// (`holonic_core::law::receiver`, `Holon/Law.lean`): the normalized face and the comparison return
+// (`holonics::law::receiver`, `Holon/Law.lean`): the normalized face and the comparison return
 // are readings at zero flow (`coholon_reading_power`) — `p = softmax(Re s)` is a nonlinear reading,
 // not a current; the phase and pair participations inject the drive `y` into the field and are
 // exterior drives whose delivered power `⟨e_D, y⟩` the field's balance counts
@@ -265,7 +265,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
 // declarations are host-side and read only extents already carried; no kernel, launch or returned
 // value changes. Ports count real-coded coordinates.
 
-use holonic_core::law::receiver::{ActiveReceiver, ReceiverPower};
+use holonics::law::receiver::{ActiveReceiver, ReceiverPower};
 
 /// Real-coded coordinates of one resident enclosure section: `rows × components`.
 fn real_coordinates(section: &ResidentNormalEnclosureSection<'_>) -> usize {

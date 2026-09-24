@@ -15,10 +15,9 @@ use crate::native::{
         PhaseSpec,
     },
 };
-use holonic_engine::{
-    ExactRatMatrix, inertia::SymmetricForm,
-    native_ecology::constitutive_fibre::NativeEnclosurePropagation,
-};
+use holonics::exact_linear::ExactRatMatrix;
+use holonics::inertia::SymmetricForm;
+use holonic_engine::{native_ecology::constitutive_fibre::NativeEnclosurePropagation};
 use num_bigint::BigInt;
 use num_traits::Zero;
 use relational_geometry::{AffineMap3, Rat, RatMat3, RatVec3, cayley_rotation_z};

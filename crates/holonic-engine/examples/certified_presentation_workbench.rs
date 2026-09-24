@@ -38,7 +38,7 @@ use relational_geometry::{Rat, format_rat, integer, rat};
 use holonic_engine::certified_face::{
     CertifiedFace, ReceiverWindow, certify_face, mark_census, station_sign_changes,
 };
-use holonic_engine::exact_value::IntegerPolynomial;
+use holonics::exact_value::IntegerPolynomial;
 use holonic_engine::presentation_gauge::{
     CanvasChart, DisplayGauge, exact_rows, place, render, structural_residue,
 };

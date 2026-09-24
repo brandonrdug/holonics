@@ -1330,7 +1330,7 @@ impl MorphologicalLanguageEcology {
                 prompt,
                 native_features,
                 spec,
-                &holonic_engine::hardware_cover::HardwareCover::cpu_only(),
+                &holonics::hardware_cover::HardwareCover::cpu_only(),
                 GenerationConduct::Complete,
             )?
             .generation;
@@ -1353,7 +1353,7 @@ impl MorphologicalLanguageEcology {
         self.generate_currents_over(
             prompt,
             spec,
-            &holonic_engine::hardware_cover::HardwareCover::cpu_only(),
+            &holonics::hardware_cover::HardwareCover::cpu_only(),
         )
     }
 
@@ -1368,7 +1368,7 @@ impl MorphologicalLanguageEcology {
         &self,
         prompt: &str,
         spec: MorphologicalGenerationSpec,
-        cover: &holonic_engine::hardware_cover::HardwareCover,
+        cover: &holonics::hardware_cover::HardwareCover,
     ) -> Result<MorphologicalLanguageCurrentGeneration, MorphologicalLanguageError> {
         Ok(self
             .generate_currents_over_inner(
@@ -1385,7 +1385,7 @@ impl MorphologicalLanguageEcology {
         &self,
         prompt: &str,
         spec: MorphologicalGenerationSpec,
-        cover: &holonic_engine::hardware_cover::HardwareCover,
+        cover: &holonics::hardware_cover::HardwareCover,
         morphology: &MorphologicalConductMorphology,
         executor: &mut CudaMorphologicalConductExecutor,
     ) -> Result<MorphologicalConductedGeneration, MorphologicalLanguageError> {
@@ -1410,7 +1410,7 @@ impl MorphologicalLanguageEcology {
         prompt: &str,
         native_features: &BTreeSet<String>,
         spec: MorphologicalGenerationSpec,
-        cover: &holonic_engine::hardware_cover::HardwareCover,
+        cover: &holonics::hardware_cover::HardwareCover,
         mut conduct: GenerationConduct<'_>,
     ) -> Result<MorphologicalConductedGeneration, MorphologicalLanguageError> {
         if spec.maximum_observed_tokens == 0 {
@@ -1526,7 +1526,7 @@ impl MorphologicalLanguageEcology {
             // round is a JUNCTION and not an arc: what leaves it is co-present. Chronology inside a
             // single branch is untouched.
             //
-            // The law is `holonic_engine::hardware_cover::expand_front`, the same organ the causal
+            // The law is `holonics::hardware_cover::expand_front`, the same organ the causal
             // leader conducts through. What stood here instead was a covering per organ — a direct
             // `std::thread::available_parallelism()` call, a round-robin `at % lanes` **by count**,
             // a per-lane `BTreeMap` and a merge in lane order. That is the cabinet failure one
@@ -1553,7 +1553,7 @@ impl MorphologicalLanguageEcology {
             // generation returns and is not this repair's to take.
             let front: Vec<(MorphologicalCurrentState, MorphologicalCurrentPopulation)> =
                 arrived.into_iter().collect();
-            let prepared = holonic_engine::hardware_cover::expand_front(
+            let prepared = holonics::hardware_cover::expand_front(
                 front,
                 cover,
                 // **The extent of a generation cell is its witness population.**

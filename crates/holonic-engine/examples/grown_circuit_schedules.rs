@@ -27,10 +27,8 @@ use holonic_engine::grown_cell::{
     Bus, ComplexAperture, Growth, NetId, RuleName, Schedule, canonical_netlist, evaluate,
     found_complex, grow, primitive_section, split, standard_cells,
 };
-use holonic_engine::rebase_invariants::{
-    PivotRule, RebaseInvariants, invariants_agree, rebase_invariants_on,
-    rebase_invariants_with_schedule,
-};
+use holonics::rebase_invariants::PivotRule;
+use holonic_engine::rebase_invariants::{RebaseInvariants, invariants_agree, rebase_invariants_on, rebase_invariants_with_schedule};
 use num_bigint::BigUint;
 use num_traits::One;
 

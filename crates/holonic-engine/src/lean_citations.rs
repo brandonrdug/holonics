@@ -233,8 +233,8 @@ fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
         // The tube's carrier law and the whole tower moved to the Holon core's restriction facet
         // (plan phase 6); their tables are read where they now live.
         (
-            include_str!("../../holonic-core/src/restriction/tube.rs"),
-            "holonic-core/src/restriction/tube.rs",
+            include_str!("../../holonics/src/restriction/tube.rs"),
+            "holonics/src/restriction/tube.rs",
             "Transport/ContinuingTube.lean",
         ),
         (
@@ -273,13 +273,13 @@ fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
             "Foundation/RelationLadder.lean",
         ),
         (
-            include_str!("../../holonic-core/src/restriction.rs"),
-            "holonic-core/src/restriction.rs",
+            include_str!("../../holonics/src/restriction.rs"),
+            "holonics/src/restriction.rs",
             "Holon/Restriction.lean",
         ),
         (
-            include_str!("../../holonic-core/src/restriction/tower.rs"),
-            "holonic-core/src/restriction/tower.rs",
+            include_str!("../../holonics/src/restriction/tower.rs"),
+            "holonics/src/restriction/tower.rs",
             "Foundation/ContinuingTower.lean",
         ),
         (
@@ -455,7 +455,7 @@ fn every_inline_lean_citation_names_a_declared_lean_name() {
     );
     // The Holon core mirrors `ElementaryHolonics/Holon/` facet by facet and cites it in every
     // module header, so its sources are read by the same scan.
-    let core = repository_root().join("crates/holonic-core/src");
+    let core = repository_root().join("crates/holonics/src");
     let engine_sources = sources.len();
     collect_rust_sources(&core, &mut sources);
     assert!(

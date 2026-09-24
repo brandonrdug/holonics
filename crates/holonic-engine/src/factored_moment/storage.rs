@@ -13,7 +13,7 @@
 //! and therefore one [`ElementRelation::Storage`] on the factor ports. Its energy is
 //! `½ Σ_s w_s ⟨f_s, x⟩²`, so a positive-weight family is passive storage (positive semidefinite);
 //! a change of `C` at a fixed configuration is deposition work `½⟨x, (C' − C) x⟩`
-//! ([`holonic_core::element::deposition_work`]). The resident card holds the same object in its own
+//! ([`holonics::element::deposition_work`]). The resident card holds the same object in its own
 //! limb layout; its read-back sections are compared against these host charts in the device suite.
 //!
 //! | Lean | Rust |
@@ -23,17 +23,17 @@
 //! | `Holon/MomentStorage.lean::storageEnergy_quadraticMoment_nonneg` | [`QuadraticMomentStorage::is_passive`] |
 //! | `Holon/Deposition.lean::deposition_work` | [`QuadraticMomentStorage::deposition_work`] |
 
-use holonic_core::element::{self, ElementRelation};
-use holonic_core::inertia::SymmetricForm;
-use holonic_core::scalar::matrix_form;
+use holonics::element::{self, ElementRelation};
+use holonics::inertia::SymmetricForm;
+use holonics::scalar::matrix_form;
 use num_bigint::BigInt;
 use num_traits::Zero;
 use relational_geometry::Rat;
 
 use super::*;
-use crate::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 
-fn storage_refusal(_: holonic_core::holon::HolonError) -> FactoredMomentError {
+fn storage_refusal(_: holonics::holon::HolonError) -> FactoredMomentError {
     FactoredMomentError::Shape
 }
 

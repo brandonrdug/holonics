@@ -67,8 +67,8 @@ use num_bigint::BigInt;
 use num_traits::{One, Zero};
 use relational_geometry::Rat;
 
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
-use crate::rational_polynomial::{ExactPolynomialError, RationalPolynomial, rational_root_census};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::rational_polynomial::{ExactPolynomialError, RationalPolynomial, rational_root_census};
 use crate::structure_group::{
     GroupElement, OrientedEdge, SeparatedPair, StructureConnection, StructureGroup,
     StructureGroupRefusal,
@@ -989,7 +989,7 @@ pub fn characteristic_polynomial(
 /// off; the composed form is retained for the test that holds the corrected route against the
 /// defect it replaced.
 #[cfg(test)]
-fn refuting_prime(primitive: &crate::exact_value::IntegerPolynomial) -> Option<u64> {
+fn refuting_prime(primitive: &holonics::exact_value::IntegerPolynomial) -> Option<u64> {
     let deflated = deflate_zero_root(primitive).1?;
     refuting_prime_of_deflated(&deflated)
 }
@@ -1007,8 +1007,8 @@ pub const REFUTING_PRIME_CEILING: u64 = 4096;
 /// `(multiplicity of the root 0, the polynomial with `x^k` divided out)`. The second is `None` only
 /// for the zero polynomial, which has no deflation.
 fn deflate_zero_root(
-    primitive: &crate::exact_value::IntegerPolynomial,
-) -> (usize, Option<crate::exact_value::IntegerPolynomial>) {
+    primitive: &holonics::exact_value::IntegerPolynomial,
+) -> (usize, Option<holonics::exact_value::IntegerPolynomial>) {
     let zeros = primitive
         .coefficients
         .iter()
@@ -1017,11 +1017,11 @@ fn deflate_zero_root(
     let remaining = primitive.coefficients[zeros..].to_vec();
     (
         zeros,
-        crate::exact_value::IntegerPolynomial::new(remaining).ok(),
+        holonics::exact_value::IntegerPolynomial::new(remaining).ok(),
     )
 }
 
-fn refuting_prime_of_deflated(primitive: &crate::exact_value::IntegerPolynomial) -> Option<u64> {
+fn refuting_prime_of_deflated(primitive: &holonics::exact_value::IntegerPolynomial) -> Option<u64> {
     let degree = primitive.degree();
     if degree == 0 {
         return None;

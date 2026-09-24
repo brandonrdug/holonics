@@ -67,7 +67,7 @@
 //! `apply` is constant in the source's classes, so two different sources of one passage have the
 //! same transported face and the transported face alone determines nothing;
 //! [`Passage::reverse_passage`] returns
-//! [`crate::continuing_tower::ReversePassageReceipt::OnlyWithTheResidual`] with the two merged
+//! [`holonics::restriction::tower::ReversePassageReceipt::OnlyWithTheResidual`] with the two merged
 //! faces. **The reverse exists exactly when the residual is retained**, which is the passage
 //! instance of `Foundation/ContinuingTower.lean::ResidualMigration.traversability_is_the_residual`;
 //! [`Transition::check_reopen`] is the receipt that it is exact and not an approximation.
@@ -104,7 +104,7 @@ use super::{
     Coordinate, CoordinateName, CoordinateValue, Environment, EnvironmentDisagreement,
     EnvironmentPassage, EnvironmentRefusal, ObjectKinship, OccurrenceId, SituatedFamily,
 };
-use crate::continuing_tower::{ReversePassageReceipt, Transition};
+use holonics::restriction::tower::{ReversePassageReceipt, Transition};
 use crate::physical_constraint_complex::{ContactClass, DistanceAperture};
 use crate::presentation_cost::{CostReceipt, Counted, code_bits};
 

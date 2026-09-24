@@ -499,7 +499,7 @@ fn run_window(
     // `W = diag(gamma / (4 l^2))` puts one squared length into the denominator of every entry, so
     // K's entries are much wider than the Jacobian's coordinate differences. Reported so the cost
     // of a solve is attributable rather than guessed at.
-    let widest_entry_bits = |matrix: &holonic_engine::exact_linear::ExactRatMatrix| -> u64 {
+    let widest_entry_bits = |matrix: &holonics::exact_linear::ExactRatMatrix| -> u64 {
         matrix
             .entries()
             .iter()

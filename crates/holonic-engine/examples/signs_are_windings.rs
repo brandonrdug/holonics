@@ -56,9 +56,9 @@
 //!   adjacency fixture;
 //! - and one form is taken from a circuit the machine actually **grew**.
 
-use holonic_engine::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use holonic_engine::grown_cell::{ComplexAperture, Schedule, found_complex, grow, standard_cells};
-use holonic_engine::inertia::{Inertia, PivotOrder, SymmetricForm, congruence, inertia};
+use holonics::inertia::{Inertia, PivotOrder, SymmetricForm, congruence, inertia};
 use holonic_engine::winding_inertia::{
     Hand, PassageReturn, StarTable, SymmetricCirculant, WindingError, WindingInertia,
     cycle_adjacency, cycle_laplacian, cyclic_receiver_of_growth, quarter_turn_reading,
@@ -333,7 +333,7 @@ fn main() {
         }
         let mut after = Inertia::default();
         for order in PivotOrder::ALL {
-            after = holonic_engine::inertia::inertia_with_order(&transported, order);
+            after = holonics::inertia::inertia_with_order(&transported, order);
             transported_agree &= after == reading.split();
         }
         let show = |reading: Inertia| {

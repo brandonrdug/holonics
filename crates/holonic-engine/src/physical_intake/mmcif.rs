@@ -53,7 +53,7 @@ use num_bigint::BigInt;
 use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 
-use crate::exact_value::ExactInterval;
+use holonics::exact_value::ExactInterval;
 use crate::physical_constraint_complex::CoordinateBox3;
 
 use super::IntakeRefusal;

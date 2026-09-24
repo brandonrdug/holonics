@@ -105,9 +105,10 @@ use holonic_engine::causal::EventId;
 use holonic_engine::grown_cell::{
     ComplexAperture, NetId, Schedule, found_complex, grow, standard_cells,
 };
-use holonic_engine::rebase_invariants::{
-    PivotRule, ReadingSchedule, RebaseInvariants, ReductionWork, rebase_invariants_with_schedule_on,
-};
+use holonics::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::ReadingSchedule;
+use holonics::rebase_invariants::ReductionWork;
+use holonic_engine::rebase_invariants::{RebaseInvariants, rebase_invariants_with_schedule_on};
 use holonic_engine::skein::{GradeRemainder, SkeinReading, Substitution, read_substitution};
 
 // ===============================================================================================

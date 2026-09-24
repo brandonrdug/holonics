@@ -65,8 +65,8 @@ use thiserror::Error;
 use crate::category::BoundaryId;
 use crate::causal::EventId;
 use crate::evolution::{EvolutionError, EvolutionLawId, EvolutionShape};
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix, LinearFactorization, RebaseReceipt};
-use crate::exact_work::{Admission, ExactWork, WorkBudget};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix, LinearFactorization, RebaseReceipt};
+use holonics::exact_work::{Admission, ExactWork, WorkBudget};
 use crate::interaction::{
     InteractionBond, InteractionPattern, InteractionTemporality, OccurrencePort,
 };
@@ -226,7 +226,7 @@ impl PortedTransport {
 
     /// **Pose a transport from a source population's own stored codewords, exactly.**
     ///
-    /// The codewords enter through [`crate::exact_value::ieee754`], the workspace's declared float
+    /// The codewords enter through [`holonics::exact_value::ieee754`], the workspace's declared float
     /// mouth, so the posed entries **are** the stored values rather than approximations of them.
     /// The chart lineage names where they came from, because a matrix without its chart is a
     /// coordinate array and not a transport.
@@ -250,7 +250,7 @@ impl PortedTransport {
             let mut carried = Vec::with_capacity(columns);
             for column in 0..columns {
                 let word = words[row * columns + column];
-                let datum = crate::exact_value::ieee754::decode_bfloat16_bits(word)
+                let datum = holonics::exact_value::ieee754::decode_bfloat16_bits(word)
                     .map_err(|_| PortedError::CodewordRefused { word })?;
                 carried.push(datum.value());
             }

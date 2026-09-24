@@ -34,7 +34,7 @@ use std::time::Instant;
 use holonic_engine::category::BoundaryId;
 use holonic_engine::causal::EventId;
 use holonic_engine::embedding_fiber::{ResidentReadout, align_bfloat16};
-use holonic_engine::exact_value::ieee754::{decode_bfloat16_bits, round_into_bfloat16};
+use holonics::exact_value::ieee754::{decode_bfloat16_bits, round_into_bfloat16};
 use holonic_engine::foreign_map::{ForeignContainer, manifest_safetensors};
 use holonic_engine::interaction::OccurrencePort;
 use holonic_engine::ported_operation::{OperationSpecies, PortedOperationComplex, SourceTestimony};
@@ -93,8 +93,8 @@ struct ResidentSourceCarrier<'chart> {
     rotations: std::collections::BTreeMap<
         String,
         Vec<(
-            holonic_engine::exact_value::ExactInterval,
-            holonic_engine::exact_value::ExactInterval,
+            holonics::exact_value::ExactInterval,
+            holonics::exact_value::ExactInterval,
         )>,
     >,
 }
@@ -206,8 +206,8 @@ impl PortedCarrier for ResidentSourceCarrier<'_> {
         population: &str,
     ) -> Result<
         Vec<(
-            holonic_engine::exact_value::ExactInterval,
-            holonic_engine::exact_value::ExactInterval,
+            holonics::exact_value::ExactInterval,
+            holonics::exact_value::ExactInterval,
         )>,
         String,
     > {
@@ -347,7 +347,7 @@ fn main() {
     // isolation of a degree-128 polynomial inside the hot path.
     let bands = chart_width / 2;
     let ladder: Vec<Rat> = {
-        let ratio = holonic_engine::exact_value::AlgebraicRoot::nth_root(
+        let ratio = holonics::exact_value::AlgebraicRoot::nth_root(
             &Rat::from_integer(BigInt::from(10_000)),
             bands as u32,
             44,
@@ -359,7 +359,7 @@ fn main() {
         let two = Rat::from_integer(BigInt::from(2));
         let mut angles: Vec<Rat> = Vec::with_capacity(bands);
         let mut current =
-            holonic_engine::exact_value::ExactInterval::point(Rat::from_integer(BigInt::from(1)));
+            holonics::exact_value::ExactInterval::point(Rat::from_integer(BigInt::from(1)));
         for _ in 0..bands {
             angles.push((&current.lower + &current.upper) / &two);
             // Held outward on a dyadic grid at every step. Without it the ladder's denominators
@@ -376,13 +376,13 @@ fn main() {
     // and a position spends only multiplication. Founding them per occurrence cost a quarter of a
     // second an occurrence for a value that does not change.
     let rotations: Vec<(
-        holonic_engine::exact_value::ExactInterval,
-        holonic_engine::exact_value::ExactInterval,
+        holonics::exact_value::ExactInterval,
+        holonics::exact_value::ExactInterval,
     )> = ladder
         .iter()
         .map(|angle| {
             let (cosine, sine) =
-                holonic_engine::exact_value::CertifiedSeries::circular_series(angle, terms)
+                holonics::exact_value::CertifiedSeries::circular_series(angle, terms)
                     .expect("in the unit domain");
             (
                 cosine.enclosure().round_out(40).expect("held"),

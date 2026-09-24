@@ -52,7 +52,7 @@ use relational_geometry::{Rat, format_rat, integer};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::exact_value::{ExactInterval, ExactValueError, IntegerPolynomial};
+use holonics::exact_value::{ExactInterval, ExactValueError, IntegerPolynomial};
 
 /// One receiver's declared window onto an exact object.
 ///
@@ -415,7 +415,7 @@ fn resolve_cell(
 fn sturm_variations(polynomial: &IntegerPolynomial, interval: &ExactInterval) -> (u32, u32) {
     // The isolation certificate carries the variation counts; recovering them here keeps the
     // located feature self-describing without re-deriving the sequence at the call site.
-    match crate::exact_value::AlgebraicRoot::isolate(polynomial.clone(), interval.clone()) {
+    match holonics::exact_value::AlgebraicRoot::isolate(polynomial.clone(), interval.clone()) {
         Ok(root) => (
             root.certificate.variations_at_lower,
             root.certificate.variations_at_upper,

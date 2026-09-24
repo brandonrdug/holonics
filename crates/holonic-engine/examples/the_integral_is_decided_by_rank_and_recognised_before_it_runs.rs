@@ -66,7 +66,7 @@ use holonic_engine::elementary_chart::{
     ElementaryChartError, ElementaryReading, ExponentialIntegrand, RecognitionOutcome,
     read_elementary_chart,
 };
-use holonic_engine::rational_polynomial::RationalPolynomial;
+use holonics::rational_polynomial::RationalPolynomial;
 use relational_geometry::exact::rat;
 
 fn polynomial(coefficients: &[i64]) -> RationalPolynomial {

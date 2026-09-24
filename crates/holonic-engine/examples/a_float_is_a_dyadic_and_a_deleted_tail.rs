@@ -69,7 +69,7 @@ use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 use sha2::{Digest, Sha256};
 
-use holonic_engine::exact_value::ieee754::{
+use holonics::exact_value::ieee754::{
     BinaryFloatDatum, BinaryFloatSpecies, FloatReading, decode_bfloat16_bits, decode_bits,
     decode_f32, decode_f64, encode_f32, encode_f64,
 };

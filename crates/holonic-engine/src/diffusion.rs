@@ -39,10 +39,10 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use holonic_core::holon::HolonError;
-use holonic_core::restriction::KronReduction;
+use holonics::holon::HolonError;
+use holonics::restriction::KronReduction;
 
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::{CurrentBranchId, CurrentNodeId};
 
 // The complex as a core Holon and the law as a `HolonLaw` (plan phase 3).
@@ -893,7 +893,7 @@ pub enum DiffusionError {
     /// The Holon core refused (a Dirac, resistance or step certificate). Boxed: the core's
     /// refusals carry exact witnesses.
     #[error(transparent)]
-    Holon(Box<holonic_core::holon::HolonError>),
+    Holon(Box<holonics::holon::HolonError>),
     /// A core energy balance carried a term a diffusion event does not owe.
     #[error("a diffusion event balance carries no {term}")]
     NotADiffusionBalance { term: &'static str },

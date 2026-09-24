@@ -63,7 +63,7 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::EventId;
-use crate::exact_value::ExactInterval;
+use holonics::exact_value::ExactInterval;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct ConstraintVertexId(pub u64);

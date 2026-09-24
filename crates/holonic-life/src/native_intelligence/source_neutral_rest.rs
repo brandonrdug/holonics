@@ -9,31 +9,25 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use thiserror::Error;
 
-use holonic_engine::{
-    cuda_refine::{
+use holonics::exact_linear::ExactRatMatrix;
+use holonic_engine::{cuda_refine::{
         CudaRefineExecutor, ResidentBoundaryRestrictionFront, ResidentCurrentAddress,
         ResidentFactoredMomentReceiverReturn, ResidentGeneratedPortLocalCurrent,
         ResidentMembraneInteriorWord, ResidentQuadraticMomentFront,
         ResidentQuadraticMomentPortReturn, ResidentQuadraticMomentRestrictionSource,
         ResidentQuadraticMomentReturn, ResidentReceiverHistoryCompressionReceipt,
         ResidentSparseQuadraticMomentFoundationReturn,
-    },
-    native_spool::{
+    }, native_spool::{
         NativeCollapsedFibre, NativeConstitutiveResponse, NativeIncidenceTerm,
         NativePullbackOccurrence, NativeSituatedRadicalWithdrawal, NativeSituatedThreadWithdrawal,
         NativeThreadDeposit, NativeThreadDepositBatchReceipt, NativeThreadDepositReceipt,
         NativeThreadHand, ReceiverInsufficiency, SituatedNativeTransportPredecessor,
         SituatedNativeTransportScaffold,
-    },
-    receiver_exact_compression::{
+    }, receiver_exact_compression::{
         compress, InputId, ItemId, Observation, ObservedSystem, ReceiverId,
-    },
-    receiver_history_compression::{
+    }, receiver_history_compression::{
         NativeStateId, OrderedWordConsequence, ReceiverHistoryCompression,
-    },
-    AddressedCurrentSection, AddressedGeneratedPortJunctionPassage, EventId,
-    ExactComplexWaveCurrent, ExactRatMatrix, OccurrencePort,
-};
+    }, AddressedCurrentSection, AddressedGeneratedPortJunctionPassage, EventId, ExactComplexWaveCurrent, OccurrencePort};
 use num_bigint::{BigInt, BigUint};
 use num_rational::BigRational as Rat;
 use num_traits::{Signed, Zero};

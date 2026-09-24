@@ -299,7 +299,7 @@ fn validate_geometry(
     value: &NormalConstitution,
     observations: u64,
 ) -> Result<(), ConstitutiveFibreError> {
-    use crate::inertia::{SymmetricForm, positive_source_energy};
+    use holonics::inertia::{SymmetricForm, positive_source_energy};
     let m = value.source_normal.len();
     if m == 0 || value.source_normal.iter().any(|row| row.len()!=m)
         || value.cross_source.iter().any(|row| row.len()!=m) {

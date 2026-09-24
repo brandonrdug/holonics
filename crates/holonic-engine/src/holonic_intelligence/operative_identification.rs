@@ -119,12 +119,12 @@ pub struct NativeSeparation {
 }
 
 impl NativeSignatureClass {
-    /// The class as the core [`PreimageFibre`](holonic_core::restriction::PreimageFibre) of the
+    /// The class as the core [`PreimageFibre`](holonics::restriction::PreimageFibre) of the
     /// signature quotient (plan phase 15): the signature and every occurrence it merges.
     pub fn preimage_fibre(
         &self,
-    ) -> holonic_core::restriction::PreimageFibre<NativeSignature, Vec<usize>> {
-        holonic_core::restriction::PreimageFibre::new(
+    ) -> holonics::restriction::PreimageFibre<NativeSignature, Vec<usize>> {
+        holonics::restriction::PreimageFibre::new(
             self.signature.clone(),
             self.occurrences.clone(),
         )
@@ -132,11 +132,11 @@ impl NativeSignatureClass {
 }
 
 impl NativeSeparation {
-    /// The core [`Separation`](holonic_core::restriction::Separation) (plan phase 15): the two
+    /// The core [`Separation`](holonics::restriction::Separation) (plan phase 15): the two
     /// occurrences the coarser exposure family merged, witnessed by the declared exposure that
     /// separates them, with their two faces there as the readings.
-    pub fn separation(&self) -> holonic_core::restriction::Separation<usize, NativeExposure, u32> {
-        holonic_core::restriction::Separation::new(
+    pub fn separation(&self) -> holonics::restriction::Separation<usize, NativeExposure, u32> {
+        holonics::restriction::Separation::new(
             self.left,
             self.right,
             self.exposure.clone(),

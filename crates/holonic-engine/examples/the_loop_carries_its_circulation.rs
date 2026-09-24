@@ -54,7 +54,7 @@ use holonic_engine::analytic_field::{
     ExactAnalyticAdvectionEvent, ExactAnalyticAdvectionLaw, ExactAnalyticAdvectionStanding,
     ExactAnalyticCirculationProbe,
 };
-use holonic_engine::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use holonic_engine::kelvin::{
     ArcIncidence, KelvinError, MaterialLoop, read_fixed_step, read_material_step,
 };

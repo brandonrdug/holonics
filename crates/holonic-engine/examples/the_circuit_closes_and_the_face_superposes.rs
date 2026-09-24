@@ -61,7 +61,8 @@ use holonic_engine::contact_gluing::{
     Circuit, ContactGluingRefusal, ContactGraph, LeaderCochain, contact_complex, contact_graph,
     ride_circuit,
 };
-use holonic_engine::rebase_invariants::{PivotRule, rebase_invariants};
+use holonics::rebase_invariants::PivotRule;
+use holonic_engine::rebase_invariants::{rebase_invariants};
 use holonic_engine::running_integral::{
     Cochain, Orientation, Path, PathStep, RunningIntegralError, holonomy,
 };

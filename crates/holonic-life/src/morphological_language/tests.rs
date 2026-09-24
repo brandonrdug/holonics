@@ -1,4 +1,4 @@
-use holonic_engine::hardware_cover::{Chart, CpuDeclaration, HardwareCover};
+use holonics::hardware_cover::{Chart, CpuDeclaration, HardwareCover};
 
 use super::current::{materialize_returned_path_live, receive_question};
 use super::*;

@@ -911,7 +911,7 @@ mod tests {
         }
         let potential = vec![integer(2), integer(5), integer(-1)];
         let cycle = vec![integer(1), integer(1), integer(1)];
-        let (drops_against_cycle, potential_against_boundary) = holonic_core::dirac::tellegen(
+        let (drops_against_cycle, potential_against_boundary) = holonics::dirac::tellegen(
             &chart.complex().incidence().unwrap(),
             &potential,
             &cycle,

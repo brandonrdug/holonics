@@ -1,7 +1,7 @@
 //! **Readings of the normal Holon, in one module** (plan phase 9, receive facet).
 //!
 //! [definition] A reading is a coholon's face of the Holon: a passive reading of an effort at
-//! zero power (`Holon/Law.lean::passive_reading`; `holonic_core::law::receiver`). These are the
+//! zero power (`Holon/Law.lean::passive_reading`; `holonics::law::receiver`). These are the
 //! host faces every normal receiver returns — the constitution's objective and per-observation
 //! report, the wave state's word reading, the one passage reading, the codec faces of the basis
 //! receivers (selection, score, projected family), the anchored family receiver, and the coupled
@@ -38,12 +38,12 @@ pub struct NativeNormalMaterialObjective {
     pub normal_residual_squared: Rat,
     /// H >= I implies 0 <= Phi(M) - min Phi <= ||M H - B||_F^2 / 2.
     pub solve_gap_upper: Rat,
-    pub nominal_minimum: crate::ExactInterval,
+    pub nominal_minimum: holonics::exact_value::ExactInterval,
     /// Bounds at the stored numerical M over every admitted observed-source/target family.
-    pub family_data_term: crate::ExactInterval,
-    pub family_regularized_objective: crate::ExactInterval,
+    pub family_data_term: holonics::exact_value::ExactInterval,
+    pub family_regularized_objective: holonics::exact_value::ExactInterval,
     /// Minimum for each admitted source geometry, including its unit prior.
-    pub family_minimum: crate::ExactInterval,
+    pub family_minimum: holonics::exact_value::ExactInterval,
 }
 
 #[derive(Debug, Serialize)]

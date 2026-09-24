@@ -7,11 +7,8 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_engine::{
-    exact_linear::ExactRatMatrix,
-    receiver_exact_compression::{Observation, ReceiverId},
-    receiver_history_compression::NativeStateId,
-};
+use holonics::exact_linear::ExactRatMatrix;
+use holonic_engine::{receiver_exact_compression::{Observation, ReceiverId}, receiver_history_compression::NativeStateId};
 use num_rational::BigRational as Rat;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};

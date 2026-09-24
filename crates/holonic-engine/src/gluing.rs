@@ -51,7 +51,8 @@ use num_bigint::BigInt;
 use serde::{Deserialize, Serialize};
 
 use crate::algebraic::{CausalAlgebraicError, CausalCellId, GradedCausalComplex};
-use crate::rebase_invariants::{PivotRule, RebaseInvariants, rebase_invariants_on};
+use holonics::rebase_invariants::PivotRule;
+use crate::rebase_invariants::{RebaseInvariants, rebase_invariants_on};
 
 /// Two sections offered as a cover. Neither is required to be proper, and neither is required to
 /// cover the whole complex — a cover of *its own union* is what Mayer–Vietoris needs.

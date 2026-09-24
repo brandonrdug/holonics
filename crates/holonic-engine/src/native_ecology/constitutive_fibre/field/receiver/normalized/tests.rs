@@ -1,6 +1,6 @@
 use super::*;
 use crate::embedding_fiber::ResidentReadout;
-use crate::exact_value::CertifiedSeries;
+use holonics::exact_value::CertifiedSeries;
 
 pub(super) fn phase(r: i64, i: i64) -> NativePhaseCurrent {
     NativePhaseCurrent::new(r, i, 1).unwrap()

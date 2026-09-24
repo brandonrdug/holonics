@@ -4,7 +4,7 @@ use std::collections::BTreeMap;
 
 use holonic_engine::causal::EventId;
 use holonic_engine::certified_face::{certify_face, mark_census, ReceiverWindow};
-use holonic_engine::exact_value::IntegerPolynomial;
+use holonics::exact_value::IntegerPolynomial;
 use holonic_engine::image::ExactRaster;
 use holonic_engine::presentation_gauge::{
     rasterize, render, structural_residue, CanvasChart, DisplayGauge,

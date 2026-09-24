@@ -1,7 +1,7 @@
 //! CUDA-scoped checks for rectangular declared-factor scale cotangents.
 
 use super::*;
-use crate::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use crate::embedding_fiber::ResidentReadout;
 use crate::native_ecology::constitutive_fibre::{
     NativeConstitutiveField, NativeFieldContactOrigin, NativeFieldDeclaredIncidence,

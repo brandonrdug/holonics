@@ -75,7 +75,8 @@ use holonic_engine::derivation_integral::AccumulationRule;
 use holonic_engine::derivation_skein::{
     MoveAperture, MoveSpecies, declared_contexts, moves_the_production_made, passages_under,
 };
-use holonic_engine::rebase_invariants::{PivotRule, RebaseInvariants};
+use holonics::rebase_invariants::PivotRule;
+use holonic_engine::rebase_invariants::{RebaseInvariants};
 use holonic_engine::returned_reading::{condition_again, read_production};
 use holonic_engine::situated_residual::{Frame, emission_reaching, situate};
 use holonic_engine::skein::read_substitution;
@@ -1272,7 +1273,7 @@ fn main() {
             entry
                 .left_form
                 .compare_grain(&entry.right_form, Grain::DECLARED)
-                .is_ok_and(|verdict| verdict != holonic_engine::exact_value::ExactOrdering::Open)
+                .is_ok_and(|verdict| verdict != holonics::exact_value::ExactOrdering::Open)
         })
         .count();
     println!(

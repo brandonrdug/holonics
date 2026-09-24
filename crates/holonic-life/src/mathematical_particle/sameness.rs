@@ -2,8 +2,8 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_engine::exact_linear::ExactRatMatrix;
-use holonic_engine::exact_value::{ExactOrdering, ExactValue};
+use holonics::exact_linear::ExactRatMatrix;
+use holonics::exact_value::{ExactOrdering, ExactValue};
 use holonic_engine::ported_operation::PortedTransport;
 use holonic_engine::{
     category::BoundaryId, causal::EventId, evolution::EvolutionLawId, interaction::InteractionId,

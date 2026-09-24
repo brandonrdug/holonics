@@ -66,7 +66,7 @@ use num_traits::{One, Signed, Zero};
 use holonic_engine::elementary_chart::{ExponentialIntegrand, read_elementary_chart};
 use holonic_engine::hermite_reduction::{ReductionSchedule, reduce};
 use holonic_engine::lean_development::{DeclarationGrain, header_nests, read_development};
-use holonic_engine::rational_polynomial::RationalPolynomial;
+use holonics::rational_polynomial::RationalPolynomial;
 use relational_geometry::Rat;
 
 /// The declared material: mathlib's own table of definite integrals.

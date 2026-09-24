@@ -98,7 +98,7 @@ use relational_geometry::Rat;
 use serde::Serialize;
 use thiserror::Error;
 
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::presentation_cost::{Counted, CostReceipt};
 use crate::rigidity_receiver::{
     RigidClusterReading, RigidityError, RigidityJacobian, RigidityReading, rigid_clusters,
@@ -1612,7 +1612,7 @@ pub fn plural_rethreading(
 /// **The admitted edit-direction family**: the edit directions the revision process may take, as
 /// the columns of the generator matrix. Renamed from `GeneratorFamily` (kept as an alias) so the
 /// name does not collide with the linear-map family `standing::GeneratorFamily` or the core
-/// `holonic_core::generator::Generator`; the serde name is unchanged.
+/// `holonics::generator::Generator`; the serde name is unchanged.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename = "GeneratorFamily")]
 pub struct EditDirectionFamily {

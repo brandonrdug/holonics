@@ -10,9 +10,10 @@
 //! rows are derived from those columns and retain their orientation; their pullback is the
 //! transpose in the declared Euclidean pairing.
 
-use crate::exact_linear::ExactRatMatrix;
-use crate::holonic_interaction::{ContactFace, CoreClock, InteractionRefusal};
-use crate::inertia::SymmetricForm;
+use holonics::exact_linear::ExactRatMatrix;
+use holonics::generator::Clock as CoreClock;
+use crate::holonic_interaction::{ContactFace, InteractionRefusal};
+use holonics::inertia::SymmetricForm;
 use num_traits::One;
 use relational_geometry::{
     AffineMap3, HingeAxis, Rat, RatVec3, RationalPhase, ScrewGenerator, SituatedScrew,
@@ -376,10 +377,10 @@ pub struct LinkContactJacobian {
 /// An ambient affine preimage intersected with the retained joint limits. The linear
 /// fibre may be nonempty while that constrained intersection is empty; `admits` checks
 /// a candidate against both the endpoint equation and every limit. The ambient fibre is the
-/// core [`AffineFibre`](holonic_core::restriction::AffineFibre) (plan phase 10).
+/// core [`AffineFibre`](holonics::restriction::AffineFibre) (plan phase 10).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PrismaticEndpointFibre {
-    fibre: holonic_core::restriction::AffineFibre,
+    fibre: holonics::restriction::AffineFibre,
     limits: Vec<Option<JointLimit>>,
     source: ExactRatMatrix,
     target: Vec<Rat>,
@@ -395,7 +396,7 @@ impl PrismaticEndpointFibre {
     }
 
     /// The ambient affine preimage, before the joint limits.
-    pub fn affine_fibre(&self) -> &holonic_core::restriction::AffineFibre {
+    pub fn affine_fibre(&self) -> &holonics::restriction::AffineFibre {
         &self.fibre
     }
 

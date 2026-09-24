@@ -30,17 +30,8 @@ use crate::world::{
     EventQuotient, EventRefusal, EventStanding, RefusalKind, event_refusal_from,
     event_standing_wire,
 };
-use crate::{
-    CausalChain, CausalFieldStanding, CoordinateCarrierId, CoordinateCarrierKind, CoordinateGermId,
-    DimensionalAxis, DimensionalAxisId, DimensionalWaveCarrierDoctrine, DimensionalWaveError,
-    DimensionalWaveEvent, DimensionalWaveImpulse, DimensionalWaveMode, DimensionalWaveModeId,
-    DimensionalWaveReceipt, EventId, EventSuccessor, ExactComplexAxisPair, ExactComplexWaveCurrent,
-    ExactCoordinateCarrier, ExactCoordinateGerm, ExactDimensionalSource, ExactDimensionalWaveLaw,
-    ExactDimensionalWaveStanding, ExactEventLaw, ExactPremultipliedReceiverResponse,
-    ExactRatMatrix, ExactReceiverPhasePopulation, ExactReceiverPrimaryDoctrine,
-    ExactWavePhaseTransport, FieldGermId, FieldOverlapId, FieldOverlapOutcome,
-    FieldSupportStanding, GradedCausalComplex, LogicalResourceReceipt,
-};
+use holonics::exact_linear::ExactRatMatrix;
+use crate::{CausalChain, CausalFieldStanding, CoordinateCarrierId, CoordinateCarrierKind, CoordinateGermId, DimensionalAxis, DimensionalAxisId, DimensionalWaveCarrierDoctrine, DimensionalWaveError, DimensionalWaveEvent, DimensionalWaveImpulse, DimensionalWaveMode, DimensionalWaveModeId, DimensionalWaveReceipt, EventId, EventSuccessor, ExactComplexAxisPair, ExactComplexWaveCurrent, ExactCoordinateCarrier, ExactCoordinateGerm, ExactDimensionalSource, ExactDimensionalWaveLaw, ExactDimensionalWaveStanding, ExactEventLaw, ExactPremultipliedReceiverResponse, ExactReceiverPhasePopulation, ExactReceiverPrimaryDoctrine, ExactWavePhaseTransport, FieldGermId, FieldOverlapId, FieldOverlapOutcome, FieldSupportStanding, GradedCausalComplex, LogicalResourceReceipt};
 
 const ANALYTIC_SLICE_SCHEMA: &str = "holonic-engine.analytic-field-wave-slice.v1";
 const ADVECTION_STANDING_SCHEMA: &str = "holonic-engine.analytic-advection-standing.v1";
@@ -2458,7 +2449,7 @@ pub enum AnalyticFieldRefusal {
     #[error(transparent)]
     Algebraic(#[from] crate::CausalAlgebraicError),
     #[error(transparent)]
-    Linear(#[from] crate::ExactLinearError),
+    Linear(#[from] holonics::exact_linear::ExactLinearError),
 }
 
 impl RefusalKind for AnalyticFieldRefusal {
@@ -2468,7 +2459,7 @@ impl RefusalKind for AnalyticFieldRefusal {
 /// The analytic-field law's refusal family (plan phase 16): the shared event refusals and its own kinds.
 pub type AnalyticFieldError = EventRefusal<AnalyticFieldRefusal>;
 
-event_refusal_from!(AnalyticFieldRefusal: DimensionalWaveError, crate::DimensionalReceiverError, crate::CausalAlgebraicError, crate::ExactLinearError);
+event_refusal_from!(AnalyticFieldRefusal: DimensionalWaveError, crate::DimensionalReceiverError, crate::CausalAlgebraicError, holonics::exact_linear::ExactLinearError);
 
 #[cfg(test)]
 mod tests {

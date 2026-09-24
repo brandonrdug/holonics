@@ -1,6 +1,6 @@
 //! The certified reading's checks that need engine owners: the arithmetic-fibre pair law and the
 //! production rigidity consumer. The reading and its own laws are tested with their owner,
-//! `holonic_core::prime_image_algebra`.
+//! `holonics::prime_image_algebra`.
 
 use num_bigint::BigInt;
 use relational_geometry::Rat;
@@ -9,7 +9,7 @@ use relational_geometry::Rat;
 const CONSUMER_ENV: &str = "HOLONICS_PRIME_IMAGE_CONSUMER";
 
 /// The lattice geometry the consumer reading is built from — the same places, jitter and aperture
-/// as `holonic_core::prime_image_algebra`'s fixture Jacobian, so the two measurements read one
+/// as `holonics::prime_image_algebra`'s fixture Jacobian, so the two measurements read one
 /// material.
 const SPACING: i64 = 3_800;
 const APERTURE_SQUARED: i64 = 8_000 * 8_000;
@@ -59,7 +59,7 @@ fn separation(left: &[i64; 3], right: &[i64; 3]) -> i64 {
 }
 
 /// **The hoisted lift agrees with the pair law it specialises.** The certified reading lifts its
-/// images with a hoisted CRT accumulator (`holonic_core::prime_image_algebra`); the arithmetic
+/// images with a hoisted CRT accumulator (`holonics::prime_image_algebra`); the arithmetic
 /// fibre owns the pair law `chinese_remainder_pair`. Folding the same images through the pair law
 /// returns the same residues and modulus, and the lift reconstructs every original value.
 #[test]
@@ -68,7 +68,7 @@ fn the_hoisted_lift_agrees_with_the_pair_law_it_specialises() {
 
     let values: Vec<u64> = vec![17, 0, 4_000_000_001, 999];
     let (moduli, residues, modulus, reconstructed) =
-        holonic_core::prime_image_algebra::hoisted_lift_probe(&values, 3).expect("three charts");
+        holonics::prime_image_algebra::hoisted_lift_probe(&values, 3).expect("three charts");
     assert_eq!(moduli.len(), 3);
     let mut combined: Option<Vec<ExactCongruence>> = None;
     for chart in &moduli {
@@ -118,7 +118,7 @@ fn the_hoisted_lift_agrees_with_the_pair_law_it_specialises() {
 /// `rigidity_receiver::rigidity_reading` is one of the two consumers Issue #50 measures, and this
 /// owner edits nothing in it: the Jacobian below is built through that module's own
 /// `ExactConfiguration` and `ConstraintEdge` constructors, from the same lattice places
-/// `holonic_core::prime_image_algebra`'s fixture Jacobian uses, and the reading is taken by the public function unchanged.
+/// `holonics::prime_image_algebra`'s fixture Jacobian uses, and the reading is taken by the public function unchanged.
 ///
 /// The consumer shares the rank/kernel return and separately reads the cokernel; its
 /// rank–nullity, cokernel and Maxwell checks constrain those returned dimensions. These

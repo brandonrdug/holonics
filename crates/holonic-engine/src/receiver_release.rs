@@ -98,14 +98,14 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 
 use crate::causal_chord::Linearization;
-use crate::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 
 /// [definition] **The receiver face, moved to the core** (plan phase 7): the exact face, the norm,
 /// the passive linear reading, the width and its witness, the two-axis horizon and the refusal
-/// moved to `holonic_core::law::receiver`, where [`LinearReading`] is also the passive coholon
+/// moved to `holonics::law::receiver`, where [`LinearReading`] is also the passive coholon
 /// (`LinearReading::passive_coholon`, `Holon/Law.lean::passive_reading`). Every item is re-exported
 /// here at its existing path; the wire forms are unchanged.
-pub use holonic_core::law::receiver::{
+use holonics::law::receiver::{
     CoarserClaim, CoarserToleranceClaim, DiameterNorm, ExactFace, FAMILY_CEILING, HORIZON_CEILING,
     Horizon, INDEX_HORIZON_CEILING, LinearReading, RECEIVER_WIDTH_SCHEMA, Reading, ReceiverWidth,
     ReleasedClaim, WidthRefusal, WidthWitness, width_over_readings,
@@ -185,7 +185,7 @@ impl fmt::Display for GeneratorSource {
 /// One generator of an exact zonotope: a column of exact rationals with the source it came from.
 ///
 /// A zonotope column is a direction of an exact set, not a clocked transport like
-/// `holonic_core::generator::Generator`. Its serde name and shape are `Generator` for existing
+/// `holonics::generator::Generator`. Its serde name and shape are `Generator` for existing
 /// current-format zonotope packets.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename = "Generator")]
@@ -1047,14 +1047,14 @@ pub fn release_coarser(
 }
 
 /// The quotient a finer reading makes of an enumerated family: member `k` transports its face and
-/// retains itself. It is the core restriction's [`Transition`](crate::continuing_tower::Transition)
+/// retains itself. It is the core restriction's [`Transition`](holonics::restriction::tower::Transition)
 /// over which [`CoarseningTower::descent`] asks each step to factor; the residual is the member,
 /// which is exactly what a later finer receiver reopens.
 struct FaceQuotient {
     faces: Vec<ExactFace>,
 }
 
-impl crate::continuing_tower::Transition for FaceQuotient {
+impl holonics::restriction::tower::Transition for FaceQuotient {
     type Source = usize;
     type Target = Option<ExactFace>;
     type Residual = usize;
@@ -1076,7 +1076,7 @@ impl crate::continuing_tower::Transition for FaceQuotient {
 /// reading factors through the reading below it (the witness carries the induced map on its
 /// faces), or the pairs it separates that the finer reading identified.
 pub type CoarseningDescent =
-    holonic_core::restriction::FactorDescent<Option<ExactFace>, usize, ExactFace>;
+    holonics::restriction::FactorDescent<Option<ExactFace>, usize, ExactFace>;
 
 impl CoarseningTower {
     /// **The tower read as core descents**, one per step up to and including the first step that
@@ -1112,7 +1112,7 @@ impl CoarseningTower {
                 .map(|member| step.reading.read(member))
                 .collect::<Result<Vec<_>, _>>()?;
             let quotient = FaceQuotient { faces: previous };
-            let descent = holonic_core::restriction::factor_descent(
+            let descent = holonics::restriction::factor_descent(
                 &quotient,
                 |member: &usize| coarse[*member].clone(),
                 &indices,

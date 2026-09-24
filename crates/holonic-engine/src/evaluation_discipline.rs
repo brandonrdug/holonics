@@ -66,7 +66,7 @@
 //!
 //! # No floats
 //!
-//! [implemented-exact] Every reading is an [`crate::exact_value::ExactInterval`] over
+//! [implemented-exact] Every reading is an [`holonics::exact_value::ExactInterval`] over
 //! `BigRational`, every comparison goes through
 //! [`crate::topological_receiver::compare_values`], and every clock reading is an exact integer
 //! nanosecond count from a named monotonic source. A decimal appears only in prose and in assertion
@@ -90,11 +90,11 @@ use serde::Serialize;
 use thiserror::Error;
 
 use crate::design_selection::{AdmittedTransformation, DesignFamily, DesignId, ReceiverReading};
-use crate::exact_value::ExactInterval;
+use holonics::exact_value::ExactInterval;
 use crate::physical_occurrence::{
     DecidedClass, ExteriorDeclaration, OccurrenceId, PassageRefusal, PluralFibre,
 };
-use crate::relation_ladder::Rung;
+use holonics::law::receiver::Rung;
 use crate::standing::TimedFace;
 use crate::topological_receiver::{ValueOrder, compare_values};
 

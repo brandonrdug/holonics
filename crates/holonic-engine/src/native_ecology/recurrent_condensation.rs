@@ -71,13 +71,13 @@ pub struct CondensedFibreMember {
     pub terminal_potential_sha256: Option<String>,
 }
 
-holonic_core::fibre_field_names!(pub CondensedFibreNames = "CondensedFibre", "native", "members", deny);
+holonics::fibre_field_names!(pub CondensedFibreNames = "CondensedFibre", "native", "members", deny);
 
 /// The occurrences one condensed native state merges: the core
-/// [`PreimageFibre`](holonic_core::restriction::PreimageFibre) under its `native`/`members` wire
+/// [`PreimageFibre`](holonics::restriction::PreimageFibre) under its `native`/`members` wire
 /// (plan phase 10).
 pub type CondensedFibre =
-    holonic_core::restriction::PreimageFibre<u32, Vec<CondensedFibreMember>, CondensedFibreNames>;
+    holonics::restriction::PreimageFibre<u32, Vec<CondensedFibreMember>, CondensedFibreNames>;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -91,13 +91,13 @@ pub struct CondensedSeparator {
 }
 
 impl CondensedSeparator {
-    /// The core [`Separation`](holonic_core::restriction::Separation) (plan phase 10): two
+    /// The core [`Separation`](holonics::restriction::Separation) (plan phase 10): two
     /// occurrences the condensed native merges, witnessed by that native and the shortest history,
     /// with their two terminal potentials.
     pub fn separation(
         &self,
-    ) -> holonic_core::restriction::Separation<String, (u32, Vec<u32>), String> {
-        holonic_core::restriction::Separation::new(
+    ) -> holonics::restriction::Separation<String, (u32, Vec<u32>), String> {
+        holonics::restriction::Separation::new(
             self.left_occurrence.clone(),
             self.right_occurrence.clone(),
             (self.native, self.shortest_history.clone()),

@@ -77,7 +77,8 @@ use holonic_engine::algebraic::{
     CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex,
 };
 use holonic_engine::causal::EventId;
-use holonic_engine::rebase_invariants::{PivotRule, rebase_invariants};
+use holonics::rebase_invariants::PivotRule;
+use holonic_engine::rebase_invariants::{rebase_invariants};
 use holonic_engine::running_integral::{
     Cochain, CoefficientGroup, PotentialSearch, coboundary, found_potential, found_potential_in,
 };

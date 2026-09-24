@@ -10,7 +10,7 @@ use holonic_engine::category::BoundaryId;
 use holonic_engine::causal::EventId;
 use holonic_engine::evolution::EvolutionLawId;
 use holonic_engine::exact_owner_testimony::{ExactOwnerKind, ExactOwnerLicense};
-use holonic_engine::exact_value::ExactValue;
+use holonics::exact_value::ExactValue;
 use holonic_engine::ported_operation::{OperationSpecies, PortedOperationComplex, PortedWord};
 use holonic_engine::quantity::{DimensionMatrix, Quantity};
 use num_rational::BigRational as Rat;
@@ -339,7 +339,7 @@ pub fn conduct_exact_linear(
     reference: TypedPassageRef,
     passage: &TypedPassage,
     word: &PortedWord,
-    matrices: &BTreeMap<EvolutionLawId, holonic_engine::exact_linear::ExactRatMatrix>,
+    matrices: &BTreeMap<EvolutionLawId, holonics::exact_linear::ExactRatMatrix>,
     licenses: &BTreeMap<EvolutionLawId, ExactOwnerLicense>,
     standing: &[Rat],
 ) -> Result<ExactLinearOwnerReturn, MathematicalParticleError> {
@@ -360,7 +360,7 @@ pub fn conduct_exact_linear_population(
     reference: TypedPassageRef,
     passage: &TypedPassage,
     word: &PortedWord,
-    matrices: &BTreeMap<EvolutionLawId, holonic_engine::exact_linear::ExactRatMatrix>,
+    matrices: &BTreeMap<EvolutionLawId, holonics::exact_linear::ExactRatMatrix>,
     licenses: &BTreeMap<EvolutionLawId, ExactOwnerLicense>,
     rows: usize,
     width: usize,

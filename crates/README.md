@@ -7,7 +7,7 @@ and follow the actual source/consumer map.
 
 | Library | Responsibility |
 |---|---|
-| `holonics` | Public structural/geometric namespaces and native HNN, Soulkiller and interoperability interfaces. |
+| `holonics` | Main Holon law and source-neutral exact operators; structural and geometric packages still supply their current charts. |
 | `holonics-hna` | Native application/session API, exterior codecs and bounded artifact adapters. |
 | `holonics-workspace` | The specialized persistent snapshot/workspace artifact family. |
 | `holonic-engine` | Native mathematical computation, resident CUDA laws, operator ecology, dismantling and comparison owners. |

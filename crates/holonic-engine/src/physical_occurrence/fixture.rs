@@ -19,7 +19,7 @@ use super::{
     OligomericState, PartnerPanel, SituatedFamily, SituatedPairReading, Solvation, SpeciesHomolog,
 };
 use crate::EventId;
-use crate::exact_value::ExactInterval;
+use holonics::exact_value::ExactInterval;
 use crate::physical_constraint_complex::{
     ConstraintComponentId, ContactClass, DistanceAperture, PhysicalConstraintComplex,
 };

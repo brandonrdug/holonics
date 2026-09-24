@@ -2,7 +2,7 @@ use crate::ExactComplexWaveCurrent;
 use crate::addressed_current::{
     AddressedCurrentPassage, AddressedCurrentSection, AddressedGeneratedPortJunctionPassage,
 };
-use crate::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use crate::factored_moment::{
     AddressedDiagonalCurrentStep, FactoredMomentFoundation, FactoredMomentSection,
     SparseQuadraticMomentFoundation,

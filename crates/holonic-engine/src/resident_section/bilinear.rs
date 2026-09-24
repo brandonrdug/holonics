@@ -1,6 +1,6 @@
 //! Pure exact rational bilinear application; one resident passage, retained product section.
 use super::*;
-use crate::exact_linear::{BilinearProductCore, BilinearRealization, ExactRatMatrix};
+use holonics::exact_linear::{BilinearProductCore, BilinearRealization, ExactRatMatrix};
 use num_traits::{One, ToPrimitive};
 use std::rc::Rc;
 
@@ -442,7 +442,7 @@ impl<'c> ResidentSurface<'c> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::exact_linear::{BilinearOperator, BilinearProductCore};
+    use holonics::exact_linear::{BilinearOperator, BilinearProductCore};
     fn q(n: i64, d: i64) -> Rat {
         Rat::new(n.into(), d.into())
     }
@@ -583,21 +583,21 @@ mod tests {
 /// A resident evaluator of an implicit joint observation fibre. Both affine ports read one
 /// parameter occurrence. The output is a residual current, not an automatic material commit.
 pub struct ResidentJointBilinearFibre<'c> {
-    model: std::sync::Arc<crate::exact_linear::JointBilinearSystem>,
+    model: std::sync::Arc<holonics::exact_linear::JointBilinearSystem>,
     residual: ResidentBilinearMap<'c>,
 }
 /// A residual reading retains the actual parameter occurrence and complete implicit model.
 /// This borrow does not clone the continuing source or identify it by equal coordinates.
 pub struct ResidentJointBilinearEvaluation<'a, 'c> {
     parameters: &'a ResidentSection<'c>,
-    model: std::sync::Arc<crate::exact_linear::JointBilinearSystem>,
+    model: std::sync::Arc<holonics::exact_linear::JointBilinearSystem>,
     returned: ResidentBilinearReturn<'c>,
 }
 impl<'a, 'c> ResidentJointBilinearEvaluation<'a, 'c> {
     pub fn parameters(&self) -> &'a ResidentSection<'c> {
         self.parameters
     }
-    pub fn model(&self) -> &crate::exact_linear::JointBilinearSystem {
+    pub fn model(&self) -> &holonics::exact_linear::JointBilinearSystem {
         &self.model
     }
     pub fn residual(&self) -> &ResidentBilinearReturn<'c> {
@@ -610,20 +610,20 @@ impl<'a, 'c> ResidentJointBilinearEvaluation<'a, 'c> {
 impl<'c> ResidentJointBilinearFibre<'c> {
     pub fn mount(
         surface: &'c ResidentSurface<'c>,
-        model: std::sync::Arc<crate::exact_linear::JointBilinearFibre>,
+        model: std::sync::Arc<holonics::exact_linear::JointBilinearFibre>,
     ) -> Result<Self, ResidentRefusal> {
-        let system = crate::exact_linear::JointBilinearSystem::new(vec![model])
+        let system = holonics::exact_linear::JointBilinearSystem::new(vec![model])
             .map_err(|e| refusal(e.to_string()))?;
         Self::mount_system(surface, std::sync::Arc::new(system))
     }
     pub fn mount_system(
         surface: &'c ResidentSurface<'c>,
-        model: std::sync::Arc<crate::exact_linear::JointBilinearSystem>,
+        model: std::sync::Arc<holonics::exact_linear::JointBilinearSystem>,
     ) -> Result<Self, ResidentRefusal> {
         let residual = ResidentBilinearMap::mount(surface, model.residual_realization())?;
         Ok(Self { model, residual })
     }
-    pub fn model(&self) -> &crate::exact_linear::JointBilinearSystem {
+    pub fn model(&self) -> &holonics::exact_linear::JointBilinearSystem {
         &self.model
     }
     pub fn evaluate<'a>(
@@ -645,7 +645,7 @@ impl<'c> ResidentJointBilinearFibre<'c> {
 #[cfg(test)]
 mod joint_tests {
     use super::*;
-    use crate::exact_linear::{
+    use holonics::exact_linear::{
         BilinearOperator, BilinearProductCore, JointBilinearFibre, JointPreimageReduction,
     };
     fn q(n: i64, d: i64) -> Rat {
@@ -757,7 +757,7 @@ mod joint_tests {
 #[cfg(test)]
 mod joined_material_tests {
     use super::*;
-    use crate::exact_linear::{
+    use holonics::exact_linear::{
         BilinearOperator, BilinearProductCore, JointBilinearFibre, JointBilinearSystem,
     };
     fn q(v: i64) -> Rat {

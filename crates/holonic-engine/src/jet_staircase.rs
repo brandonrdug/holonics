@@ -41,7 +41,7 @@
 //! polynomials agreeing with the jet: a base point and `d − r` free directions, never a chosen
 //! member. [`compatible_splines`] does the same over declared knots with a declared smoothness,
 //! solving the exact linear system through
-//! [`ExactRatMatrix::preimage_fibre`](crate::exact_linear::ExactRatMatrix::preimage_fibre) so that
+//! [`ExactRatMatrix::preimage_fibre`](holonics::exact_linear::ExactRatMatrix::preimage_fibre) so that
 //! the particular solution and the kernel come from one reduction. Neither returns "the"
 //! continuation: `PolynomialFamily::member` makes the caller declare the coordinates it wants.
 //!
@@ -148,7 +148,7 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::iwasawa_tower::{IwasawaLevel, IwasawaRefusal, omega};
 use crate::junction_law::JointOrder;
 use crate::leader_quadrature::{LeaderError, LocalJet};

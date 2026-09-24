@@ -202,7 +202,7 @@ impl BlockIndex {
 }
 
 /// One pair the one-shot reading merged and later conduct separates: the core
-/// [`ShortestSeparator`](holonic_core::restriction::ShortestSeparator) over items, input words,
+/// [`ShortestSeparator`](holonics::restriction::ShortestSeparator) over items, input words,
 /// receivers and observations (plan phase 10; same fields and wire). The shortest word is never
 /// empty here by construction — an empty word is the one-shot reading, which held these together;
 /// `separated_by_terminus` marks a word that separates because one continues and the other does
@@ -211,7 +211,7 @@ impl BlockIndex {
 /// This is the artifact, not a count. `CLAUDE.md` §9: a returned obstruction must itself be
 /// returned and inspected.
 pub type CollapsedPair =
-    holonic_core::restriction::ShortestSeparator<ItemId, InputId, ReceiverId, Observation>;
+    holonics::restriction::ShortestSeparator<ItemId, InputId, ReceiverId, Observation>;
 
 /// What a compression returns.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -436,7 +436,7 @@ struct OneShotQuotient {
     index: BlockIndex,
 }
 
-impl holonic_core::restriction::tower::Transition for OneShotQuotient {
+impl holonics::restriction::tower::Transition for OneShotQuotient {
     type Source = ItemId;
     type Target = Option<usize>;
     type Residual = ItemId;
@@ -457,7 +457,7 @@ impl holonic_core::restriction::tower::Transition for OneShotQuotient {
 /// Receiver-exact compression read as the core restriction's factor descent: the future conduct
 /// (the Nerode block) factors through the one-shot quotient, or it does not.
 pub type OneShotDescent =
-    holonic_core::restriction::FactorDescent<Option<usize>, ItemId, Option<usize>>;
+    holonics::restriction::FactorDescent<Option<usize>, ItemId, Option<usize>>;
 
 /// **The one-shot quotient as a descent** (H.0016 with its successor clause;
 /// `Foundation/Standing.lean::standingLaw_exists_iff_future_factors`). The witness is an exact
@@ -467,7 +467,7 @@ pub type OneShotDescent =
 /// scan is not taken; [`separated_pair_population`] counts it from block sizes instead.
 pub fn one_shot_descent(
     system: &dyn ObservedSystem,
-) -> Result<OneShotDescent, holonic_core::restriction::DescentRefusal> {
+) -> Result<OneShotDescent, holonics::restriction::DescentRefusal> {
     let reading = refine(system);
     let items = system.items();
     let conduct = reading.conduct.index();
@@ -476,7 +476,7 @@ pub fn one_shot_descent(
     let quotient = OneShotQuotient {
         index: reading.one_shot.index(),
     };
-    holonic_core::restriction::factor_descent_over(&quotient, &items, &conduct_blocks)
+    holonics::restriction::factor_descent_over(&quotient, &items, &conduct_blocks)
 }
 
 /// Enact the same stable receiver/history quotient through the resident card's material-free

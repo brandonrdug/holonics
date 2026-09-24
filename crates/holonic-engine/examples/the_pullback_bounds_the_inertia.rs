@@ -41,8 +41,8 @@ use num_bigint::BigInt;
 use num_traits::Zero;
 use relational_geometry::Rat;
 
-use holonic_engine::exact_linear::ExactRatMatrix;
-use holonic_engine::inertia::{
+use holonics::exact_linear::ExactRatMatrix;
+use holonics::inertia::{
     InertiaError, PullbackInertia, SymmetricForm, block_defect, congruence, inertia,
     pullback_inertia_bound, rank_trace_defect,
 };

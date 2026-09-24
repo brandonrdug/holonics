@@ -57,7 +57,7 @@
 //! [proved-standard] `K` is self-adjoint, so `image K = (ker K)^⊥` in the same pairing and a static
 //! equilibrium exists **iff** `Z* f = 0`. [`StaticResponse`] tests that exactly before it solves.
 //!
-//! * compatible: `K δq = f` is solved through [`crate::exact_linear::ExactRatMatrix::preimage_fibre`],
+//! * compatible: `K δq = f` is solved through [`holonics::exact_linear::ExactRatMatrix::preimage_fibre`],
 //!   which returns the complete affine fibre `δq₀ + ker K` and selects nothing. The declared gauge
 //!   [`ResponseGauge::MetricComplement`] then picks the representative with `Z* G δq = 0`. Both
 //!   `K δq − f` and `Z* G δq` are returned and both are exactly zero.
@@ -109,8 +109,8 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
-use crate::exact_work::ExactWork;
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::exact_work::ExactWork;
 use crate::rigidity_receiver::{
     ConfigurationDegeneracy, ExactConfiguration, RigidityError, RigidityJacobian,
     TrivialMotionReading,
@@ -750,7 +750,7 @@ pub struct StaticResponse {
     /// away.** Zero when the forcing is compatible.
     pub retained_incompatible_force: Vec<Rat>,
     /// A covector `w` with `w* K = 0` and `⟨w, f⟩ ≠ 0`, from
-    /// [`crate::exact_linear::ExactRatMatrix::preimage_obstruction`]. An obstruction is a return.
+    /// [`holonics::exact_linear::ExactRatMatrix::preimage_obstruction`]. An obstruction is a return.
     pub obstruction: Option<Vec<Rat>>,
     /// The gauge-fixed displacement, present exactly when `compatible`.
     pub displacement: Option<Vec<Rat>>,

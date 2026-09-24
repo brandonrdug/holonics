@@ -28,8 +28,8 @@
 use std::time::Instant;
 
 use holonic_engine::embedding_fiber::{ResidentReadout, align_bfloat16};
-use holonic_engine::exact_linear::{ExactRatMatrix, RebaseReceipt};
-use holonic_engine::exact_work::{Admission, ExactWork, WorkBudget, WorkMetric};
+use holonics::exact_linear::{ExactRatMatrix, RebaseReceipt};
+use holonics::exact_work::{Admission, ExactWork, WorkBudget, WorkMetric};
 use holonic_engine::foreign_map::manifest_safetensors;
 use holonic_engine::ported_operation::{
     OperationSpecies, PortedOperationComplex, PortedTransport, PortedWord, SourceTestimony,

@@ -73,9 +73,9 @@ use thiserror::Error;
 
 use crate::cuda_aperture::DerivedLaunch;
 use crate::embedding_fiber::{MountedReadout, ResidentReadout};
-use crate::exact_value::ExactInterval;
-use crate::exact_work::ExactWork;
-use crate::hardware_cover::{DeviceDeclaration, HardwareCover, ModeIdentity};
+use holonics::exact_value::ExactInterval;
+use holonics::exact_work::ExactWork;
+use holonics::hardware_cover::{DeviceDeclaration, HardwareCover, ModeIdentity};
 use mount::{
     BorrowedContext, Device, DeviceAttribute, DeviceBuffer, Dim3, Event, GraphCensus, GraphExec,
     MemoryInfo, Module, Stream,
@@ -462,7 +462,7 @@ impl Dyadic {
 
     /// The exact dyadic of a `binary64` word, through the workspace's declared float mouth.
     pub fn of_binary64_bits(bits: u64) -> Result<Self, ResidentRefusal> {
-        let datum = crate::exact_value::ieee754::decode_binary64_bits(bits).map_err(|error| {
+        let datum = holonics::exact_value::ieee754::decode_binary64_bits(bits).map_err(|error| {
             ResidentRefusal::Declaration {
                 operation: "dyadic",
                 what: format!("{error:?}"),
@@ -485,7 +485,7 @@ impl Dyadic {
 
     /// The exact dyadic of a `bfloat16` word.
     pub fn of_bfloat16_bits(word: u16) -> Result<Self, ResidentRefusal> {
-        let datum = crate::exact_value::ieee754::decode_bfloat16_bits(word).map_err(|error| {
+        let datum = holonics::exact_value::ieee754::decode_bfloat16_bits(word).map_err(|error| {
             ResidentRefusal::Declaration {
                 operation: "dyadic",
                 what: format!("{error:?}"),

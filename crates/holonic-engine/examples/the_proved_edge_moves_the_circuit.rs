@@ -36,7 +36,7 @@ use holonic_engine::derivation_atlas::{
 use holonic_engine::lean_development::{
     BinderGrain, ConductGrain, DeclarationGrain, read_development_at,
 };
-use holonic_engine::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::PivotRule;
 
 const PROJECT: &str = "formal/rh-source-transport";
 const CORPUS: &str = "SomaRHSourceTransport/FiniteTransport.lean";

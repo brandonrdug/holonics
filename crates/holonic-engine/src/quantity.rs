@@ -98,10 +98,12 @@ use relational_geometry::{Rat, format_rat};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::exact_linear::ExactRatMatrix;
-use crate::exact_value::ExactOrdering;
+use holonics::exact_linear::ExactRatMatrix;
+use holonics::exact_value::ExactOrdering;
 use crate::inverse_transport::ExactAffineVersionFiber;
-use crate::rebase_invariants::{IntegerMatrix, PivotRule, smith_normal_form};
+use holonics::rebase_invariants::IntegerMatrix;
+use holonics::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::smith_normal_form;
 
 // ===============================================================================================
 // the declared base
@@ -311,12 +313,12 @@ impl Dimension {
             .collect()
     }
 
-    /// **This dimension as a core port dimension** (`holonic_core::port::Dimension`, integer
+    /// **This dimension as a core port dimension** (`holonics::port::Dimension`, integer
     /// exponents over named bases). The core carries `Z^k` words, so a rational exponent this
     /// carrier admits is refused by name rather than rounded, and an exponent beyond `i64` is
     /// outside the core's carrier.
-    pub fn to_core(&self) -> Result<holonic_core::port::Dimension, QuantityError> {
-        let mut core = holonic_core::port::Dimension::dimensionless();
+    pub fn to_core(&self) -> Result<holonics::port::Dimension, QuantityError> {
+        let mut core = holonics::port::Dimension::dimensionless();
         for (symbol, exponent) in self.base.symbols.iter().zip(&self.exponents) {
             if !exponent.is_integer() {
                 return Err(QuantityError::NonIntegralCoreExponent {
@@ -328,7 +330,7 @@ impl Dimension {
                 .to_integer()
                 .to_i64()
                 .ok_or(QuantityError::ExponentOutsideCarrier)?;
-            core = core.times(&holonic_core::port::Dimension::power_of(symbol, exponent));
+            core = core.times(&holonics::port::Dimension::power_of(symbol, exponent));
         }
         Ok(core)
     }
@@ -337,7 +339,7 @@ impl Dimension {
     /// `base`; one that is not would be dropped, so the round trip is checked and refuses.
     pub fn from_core(
         base: &BaseUnits,
-        core: &holonic_core::port::Dimension,
+        core: &holonics::port::Dimension,
     ) -> Result<Self, QuantityError> {
         let dimension = Self {
             base: base.clone(),
@@ -455,7 +457,7 @@ impl Quantity {
     }
 
     /// The magnitude with its dimension as a core port dimension ([`Dimension::to_core`]).
-    pub fn to_core(&self) -> Result<(Rat, holonic_core::port::Dimension), QuantityError> {
+    pub fn to_core(&self) -> Result<(Rat, holonics::port::Dimension), QuantityError> {
         Ok((self.value.clone(), self.dimension.to_core()?))
     }
 
@@ -463,7 +465,7 @@ impl Quantity {
     pub fn from_core(
         value: Rat,
         base: &BaseUnits,
-        core: &holonic_core::port::Dimension,
+        core: &holonics::port::Dimension,
     ) -> Result<Self, QuantityError> {
         Ok(Self::new(value, Dimension::from_core(base, core)?))
     }

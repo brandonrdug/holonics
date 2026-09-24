@@ -44,7 +44,7 @@ use holonic_engine::conditioned_derivation::{
 };
 use holonic_engine::derivation_atlas::CircuitAperture;
 use holonic_engine::derivation_integral::AccumulationRule;
-use holonic_engine::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::PivotRule;
 use holonic_engine::returned_reading::{
     ReturnedArtifact, ReturnedReading, condition_again, condition_again_from_sealed,
     read_production,

@@ -1,6 +1,6 @@
 use super::*;
 use crate::embedding_fiber::ResidentReadout;
-use crate::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use crate::exponentiated_ratio::NormalizedKernel;
 use crate::resident_section::ResidentSectionRest;
 
@@ -293,7 +293,7 @@ fn row_sectioned_face_and_pullback_agree_with_the_normalized_kernel() {
     );
     let returned = face.pull_back(&covector).unwrap();
     // Plan phase 7: the face is a zero-power reading and its return a pullback on the same ports.
-    use holonic_core::law::receiver::ReceiverPower;
+    use holonics::law::receiver::ReceiverPower;
     assert_eq!(face.receiver_element().power(), &ReceiverPower::Reading);
     assert_eq!(returned.receiver_element().power(), &ReceiverPower::Pullback);
     assert_eq!(

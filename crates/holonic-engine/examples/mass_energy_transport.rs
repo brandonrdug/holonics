@@ -1,5 +1,5 @@
 //! Exact relativistic composition, recoil, electromagnetic energy flux and observer changes.
-use holonic_engine::exact_linear::{EnergyMomentum, MaxwellEnergyFace, VacuumEnergyChart};
+use holonics::exact_linear::{EnergyMomentum, MaxwellEnergyFace, VacuumEnergyChart};
 use num_traits::{Signed, Zero};
 use relational_geometry::Rat;
 use serde_json::{Value, json};

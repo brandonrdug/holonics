@@ -46,7 +46,7 @@ pub(crate) struct CompiledFieldGeometry {
     placement: std::cell::OnceCell<(
         usize,
         usize,
-        holonic_engine::hardware_cover::ModeIdentity,
+        holonics::hardware_cover::ModeIdentity,
         serde_json::Value,
     )>,
     pub groups: Vec<GeometricRowGroup>,

@@ -24,11 +24,8 @@ use crate::world::{
     EventQuotient, EventRefusal, EventStanding, RefusalKind, event_refusal_from,
     event_standing_wire,
 };
-use crate::{
-    CausalAlgebraicError, CausalCellId, CausalChain, CellularRestriction, ComparativeMultiplicity,
-    EventId, EventSuccessor, ExactCellularSheaf, ExactEventLaw, ExactRatMatrix,
-    GradedCausalComplex, PrimeValuation, SheafDiffusionError, SheafLinearMap,
-};
+use holonics::exact_linear::ExactRatMatrix;
+use crate::{CausalAlgebraicError, CausalCellId, CausalChain, CellularRestriction, ComparativeMultiplicity, EventId, EventSuccessor, ExactCellularSheaf, ExactEventLaw, GradedCausalComplex, PrimeValuation, SheafDiffusionError, SheafLinearMap};
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct PrimeAxisProbe {

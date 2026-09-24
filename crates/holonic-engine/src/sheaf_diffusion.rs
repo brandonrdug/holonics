@@ -40,7 +40,7 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::diffusion::DiffusionEnergyBalance;
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::world::{EventRefusal, RefusalKind, event_refusal_from};
 use crate::{
     CausalAlgebraicError, CausalCellId, EventSuccessor, ExactEventLaw, GradedCausalComplex,
@@ -131,7 +131,7 @@ pub mod linear_map_rows {
     use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
     use crate::CausalCellId;
-    use crate::exact_linear::ExactRatMatrix;
+    use holonics::exact_linear::ExactRatMatrix;
 
     #[derive(Serialize)]
     struct RowsRef {
@@ -1307,7 +1307,7 @@ pub enum SheafDiffusionRefusal {
     Algebraic(#[from] CausalAlgebraicError),
     /// The Holon core refused (a Dirac, resistance or step certificate).
     #[error(transparent)]
-    Holon(Box<holonic_core::holon::HolonError>),
+    Holon(Box<holonics::holon::HolonError>),
 }
 
 impl RefusalKind for SheafDiffusionRefusal {

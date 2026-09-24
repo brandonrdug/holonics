@@ -2,7 +2,7 @@
 //! phase-sensitive friction, joint refinement and an implicit generated field.
 //! This mounts supplied operands and calls public algebra/learning owners. It is
 //! exterior reference execution, not a second native HNN implementation.
-use holonic_engine::exact_linear::ExactRatMatrix as Matrix;
+use holonics::exact_linear::ExactRatMatrix as Matrix;
 use holonic_engine::exponentiated_ratio::NormalizedKernel;
 use num_traits::{One, ToPrimitive, Zero};
 use relational_geometry::Rat;

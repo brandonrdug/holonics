@@ -188,7 +188,7 @@ fn check_pullback(source_kind:NativeMaterialTransportSource){
             let element = resident.receiver_element();
             assert_eq!(
                 element.power(),
-                &holonic_core::law::receiver::ReceiverPower::Pullback
+                &holonics::law::receiver::ReceiverPower::Pullback
             );
             assert_eq!(
                 element.read_ports(),

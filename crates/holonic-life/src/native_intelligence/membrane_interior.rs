@@ -7,12 +7,8 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_engine::{
-    cuda_refine::{CudaRefineExecutor, ResidentMembraneInteriorWord},
-    CausalCellId, CausalChain, CellularRestriction, ComparativeMultiplicity, EventId,
-    ExactCellularSheaf, ExactComplexWaveCurrent, ExactRatMatrix, GradedCausalComplex,
-    SheafLinearMap,
-};
+use holonics::exact_linear::ExactRatMatrix;
+use holonic_engine::{cuda_refine::{CudaRefineExecutor, ResidentMembraneInteriorWord}, CausalCellId, CausalChain, CellularRestriction, ComparativeMultiplicity, EventId, ExactCellularSheaf, ExactComplexWaveCurrent, GradedCausalComplex, SheafLinearMap};
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
 use serde::Serialize;
@@ -106,10 +102,10 @@ pub struct ExactLocalReconstructionFibre {
 
 impl ExactLocalReconstructionFibre {
     /// The retained `particular + span(radical)` as the core
-    /// [`AffineFibre`](holonic_core::restriction::AffineFibre): the preimage of
+    /// [`AffineFibre`](holonics::restriction::AffineFibre): the preimage of
     /// `returned_overlap` under `receiver_functional` (plan phase 10).
-    pub fn affine_fibre(&self) -> holonic_core::restriction::AffineFibre {
-        holonic_core::restriction::AffineFibre::new(self.particular.clone(), self.radical.clone())
+    pub fn affine_fibre(&self) -> holonics::restriction::AffineFibre {
+        holonics::restriction::AffineFibre::new(self.particular.clone(), self.radical.clone())
     }
 }
 
@@ -1325,8 +1321,8 @@ fn reconstruction_fibre(
     // functional: the core fibre law (plan phase 10).
     let receiver = ExactRatMatrix::new(vec![functional.clone()])
         .map_err(|_| MembraneInteriorError::ReconstructionFibre)?;
-    let fibre_is_preimage = holonic_core::restriction::AffineFibre::<
-        holonic_core::restriction::fibre::ParticularRadical,
+    let fibre_is_preimage = holonics::restriction::AffineFibre::<
+        holonics::restriction::fibre::ParticularRadical,
     >::new(particular.clone(), radical.clone())
     .check_preimage(&receiver, std::slice::from_ref(overlap))
     .is_ok();

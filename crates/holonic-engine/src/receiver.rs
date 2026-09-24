@@ -17,12 +17,10 @@ use relational_geometry::{
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::{
-    ConicCellId, ConicClass, ConicError, ConicLineRelation, ConicRoot, CpuExecutionError,
-    CpuExecutionReceipt, CpuExecutor, Edge, EventId, ExactOrdering, ExactTorus, ExactValue, FaceId,
-    HingeId, HomogeneousConic, ImplicitCellId, ImplicitError, NativeConicPopulation, TorusRayFiber,
-    VertexId, VertexLinkClass, canonical_homogeneous,
-};
+use holonics::exact_value::ExactOrdering;
+use holonics::exact_value::ExactValue;
+use holonics::exact_value::canonical_homogeneous;
+use crate::{ConicCellId, ConicClass, ConicError, ConicLineRelation, ConicRoot, CpuExecutionError, CpuExecutionReceipt, CpuExecutor, Edge, EventId, ExactTorus, FaceId, HingeId, HomogeneousConic, ImplicitCellId, ImplicitError, NativeConicPopulation, TorusRayFiber, VertexId, VertexLinkClass};
 
 /// The intrinsic source population admitted to one receiver's local star.
 ///

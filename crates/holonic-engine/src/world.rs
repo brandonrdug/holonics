@@ -22,7 +22,7 @@ use std::fmt;
 use holonic_structure::CausalMembrane;
 use serde::{Deserialize, Serialize};
 
-pub use holonic_core::holon::HolonState;
+use holonics::holon::HolonState;
 
 use crate::{LogicalResourceReceipt, PhysicalResourceReceipt};
 

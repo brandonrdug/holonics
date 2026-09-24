@@ -86,7 +86,7 @@ pub fn required_aperture(triangle: &ContactTriangle) -> usize {
     }
     kernels.len().max(1)
 }
-use crate::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::PivotRule;
 use crate::running_integral::{
     Cochain, Orientation, Path, PathStep, RunningIntegralError, running_sum,
 };

@@ -7,7 +7,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 
-use holonic_engine::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use holonic_engine::exact_owner_testimony::ExactOwnerLicense;
 use life::mathematical_particle::{
     AnalyticBranch, BinderId, BinderScope, BranchId, CarrierId, CarrierOccurrence, HypothesisId,

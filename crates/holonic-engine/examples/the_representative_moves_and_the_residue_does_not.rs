@@ -57,7 +57,7 @@
 //! ```
 
 use holonic_engine::hermite_reduction::{RationalFunction, ReductionSchedule, reduce};
-use holonic_engine::rational_polynomial::RationalPolynomial;
+use holonics::rational_polynomial::RationalPolynomial;
 use relational_geometry::exact::rat;
 
 fn polynomial(coefficients: &[i64]) -> RationalPolynomial {

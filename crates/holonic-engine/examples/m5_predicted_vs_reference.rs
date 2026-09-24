@@ -59,7 +59,7 @@ use holonic_engine::EventId;
 use holonic_engine::evaluation_discipline::{
     DisagreementClass, disagreement_subsets, performance_on,
 };
-use holonic_engine::exact_value::ExactInterval;
+use holonics::exact_value::ExactInterval;
 use holonic_engine::holonic_chain::{
     ANALYTIC_EXTENT_CEILING, AnalyticScope, CUT_CEILING, HingeVerdict, elastic_chain,
     hinge_by_minimal_section,

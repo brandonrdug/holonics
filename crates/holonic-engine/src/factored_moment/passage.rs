@@ -11,7 +11,7 @@ use std::collections::{BTreeMap, BTreeSet, HashMap};
 use super::*;
 use crate::receiver_history_compression::exact_bigint_lcm;
 
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::receiver_history_compression::{
     AddressedFactoredIntegralReceiverComplex, FactoredIntegralReceiverForm,
     SparseIntegralFunctional,

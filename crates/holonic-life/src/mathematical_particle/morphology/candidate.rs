@@ -1,6 +1,7 @@
 use std::collections::BTreeSet;
 
-use holonic_engine::{cuda_refine::DeviceDynamicMorphology, exact_linear::ExactRatMatrix};
+use holonics::exact_linear::ExactRatMatrix;
+use holonic_engine::{cuda_refine::DeviceDynamicMorphology};
 
 use super::super::DerivationRecurrenceRest;
 use super::{

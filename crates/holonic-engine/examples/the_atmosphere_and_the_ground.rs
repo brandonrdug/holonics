@@ -48,7 +48,7 @@ use holonic_engine::conditioned_derivation::{
     ConditionedBody, ContactSpecies, Exposure, FoundedMorphology, expose,
 };
 use holonic_engine::contact_gluing::{LeaderCochain, glue_at_contact, integrate_leader};
-use holonic_engine::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::PivotRule;
 use holonic_engine::statement_composition::{StatementAdmission, found_statements};
 
 /// The declared atmosphere. Roots and extensions only — every file under each is read whole, and

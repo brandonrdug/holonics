@@ -12,11 +12,8 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use thiserror::Error;
 
-use crate::{
-    EventId, ExactComplexWaveCurrent, ExactRatMatrix,
-    receiver_exact_compression::{InputId, Observation, ReceiverId},
-    receiver_history_compression::{NativeStateId, ReceiverFactor},
-};
+use holonics::exact_linear::ExactRatMatrix;
+use crate::{EventId, ExactComplexWaveCurrent, receiver_exact_compression::{InputId, Observation, ReceiverId}, receiver_history_compression::{NativeStateId, ReceiverFactor}};
 
 mod deposits;
 pub mod fixture;

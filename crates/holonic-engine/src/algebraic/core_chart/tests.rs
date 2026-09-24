@@ -1,7 +1,7 @@
 use std::collections::BTreeSet;
 
-use holonic_core::complex::CellComplex;
-use holonic_core::holon::HolonError;
+use holonics::complex::CellComplex;
+use holonics::holon::HolonError;
 use num_traits::{One, Zero};
 use relational_geometry::Rat;
 

@@ -33,7 +33,7 @@ use relational_geometry::ReceiverId;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::exact_value::ExactOrdering;
+use holonics::exact_value::ExactOrdering;
 use crate::{
     ContinuousPresentation, CpuExecutor, PresentationAddress, PresentationError,
     PresentedPrimitiveKey, PrimitiveApertureTrace, ReceiverApertureTrace, ReceiverPrimitive,

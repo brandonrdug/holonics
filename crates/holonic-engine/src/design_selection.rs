@@ -168,7 +168,7 @@ use relational_geometry::Rat;
 use serde::Serialize;
 use thiserror::Error;
 
-use crate::exact_value::ExactInterval;
+use holonics::exact_value::ExactInterval;
 use crate::physical_constraint_complex::ContactClass;
 use crate::physical_occurrence::{
     CoordinateName, DecidedClass, Environment, EnvironmentPassage, EnvironmentRefusal, Horizontal,
@@ -176,10 +176,8 @@ use crate::physical_occurrence::{
     StatusRefusal, Vertical, VerticalFamily,
 };
 use crate::presentation_cost::{Axis, AxisComparison, CostReceipt, Counted, frontier_by};
-use crate::relation_ladder::{
-    Classification, Declarations, LadderRefusal, NamedGenerator, NamedReceiver, PotentialVerdict,
-    Rung, Separator, Situation,
-};
+use holonics::law::receiver::Rung;
+use crate::relation_ladder::{Classification, Declarations, LadderRefusal, NamedGenerator, NamedReceiver, PotentialVerdict, Separator, Situation};
 use crate::topological_receiver::{ValueOrder, compare_values};
 
 // -------------------------------------------------------------------------------------------

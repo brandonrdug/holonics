@@ -100,8 +100,8 @@ use serde::{Deserialize, Serialize};
 use crate::algebraic::{CausalAlgebraicError, CausalCellId, GradedCausalComplex};
 
 // The Smith reduction itself (pivot rule, integer matrix, normal form, schedules and their work)
-// is owned by `holonic_core::rebase_invariants` and re-exported here at its old paths.
-pub use holonic_core::rebase_invariants::{
+// is owned by `holonics::rebase_invariants` and re-exported here at its old paths.
+use holonics::rebase_invariants::{
     IntegerMatrix, PivotRule, PivotSchedule, ReadingSchedule, ReductionWork, SmithNormalForm,
     smith_normal_form, smith_normal_form_with_schedule,
 };

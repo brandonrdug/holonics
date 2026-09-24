@@ -55,7 +55,7 @@ fn the_fast_mouth_agrees_with_the_declared_mouth_on_every_pattern() {
     let mut finite = 0u32;
     let mut refused = 0u32;
     for pattern in 0u16..=u16::MAX {
-        let declared = crate::exact_value::ieee754::decode_bfloat16_bits(pattern);
+        let declared = holonics::exact_value::ieee754::decode_bfloat16_bits(pattern);
         let fast = super::decode_bfloat16_word(pattern);
         match (declared, fast) {
             (Ok(datum), Ok((signed, exponent))) => {
@@ -168,7 +168,7 @@ fn the_alignment_is_a_rebase_with_zero_remainder() {
     // in any library `src/` in this workspace, evaluating a zero-remainder claim in the very
     // carrier the module exists to avoid.
     for (word, entry) in words.iter().zip(&aligned.entries) {
-        let datum = crate::exact_value::ieee754::decode_bfloat16_bits(*word)
+        let datum = holonics::exact_value::ieee754::decode_bfloat16_bits(*word)
             .expect("the mouth admits these");
         let magnitude =
             u64::try_from(&datum.significand).expect("a BF16 significand is one word") as i64;

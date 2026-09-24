@@ -61,11 +61,8 @@ use life::incidence_production::{
     ArrivalResponse, DeclaredOccurrence, Differentiation, Emission, IncidenceComplex, PhaseChart,
 };
 
-use holonic_engine::{
-    gluing::{read_cover, Cover},
-    rebase_invariants::PivotRule,
-    running_integral::CoefficientGroup,
-};
+use holonics::rebase_invariants::PivotRule;
+use holonic_engine::{gluing::{read_cover, Cover}, running_integral::CoefficientGroup};
 
 /// The declared aperture on inscription patches per occurrence. Returns its outside.
 const DECLARED_EXTENT: usize = 40;

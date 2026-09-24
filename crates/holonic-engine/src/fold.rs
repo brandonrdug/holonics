@@ -50,7 +50,7 @@
 //! # Reversibility is the residual
 //!
 //! [proved-derived; implemented-exact] [`FoldTransition`] implements
-//! [`crate::continuing_tower::Transition`] with `Residual = Side`: the side bit, one bit, and
+//! [`holonics::restriction::tower::Transition`] with `Residual = Side`: the side bit, one bit, and
 //! `reopen(fold(x), side(x)) = x` exactly (Lean `reopen_apply_fold`). The fold is two-to-one off
 //! the crease (Lean `fold_fibre`): its fibre through `x` is `{x, R_H x}`, so **folding in half is
 //! the quotient of the sheet by the reflection** onto the closed positive half-space as a
@@ -63,7 +63,7 @@
 //! [definition] An **elastic** crease retains that residual and is a `Transition`. A **plastic**
 //! crease dissipates it: [`PlasticCrease`] has an `apply` and no `Transition` implementation at
 //! all, and [`PlasticCrease::reverse_passage`] returns
-//! [`crate::continuing_tower::ReversePassageReceipt::OnlyWithTheResidual`] with the two merged
+//! [`holonics::restriction::tower::ReversePassageReceipt::OnlyWithTheResidual`] with the two merged
 //! faces — the passage instance of
 //! `Foundation/ContinuingTower.lean::ResidualMigration.traversability_is_the_residual`. The two are
 //! **different types with no coercion**, which is the typing Brandon's "plastic warps via heat,
@@ -136,7 +136,7 @@
 //! # Unfolding at a tolerance
 //!
 //! [proved-derived; implemented-exact] [`FoldCatastrophe`] is `V_a(x) = x³/3 − a x`, whose
-//! equilibria are counted exactly by [`crate::exact_value::SturmChain`] and whose stability is the
+//! equilibria are counted exactly by [`holonics::exact_value::SturmChain`] and whose stability is the
 //! exact sign of `V'' = 2x`. [`CreaseModel`] is the declared constitutive model — a polynomial
 //! hinge torque `κ(u² − u₀²)` against a constant gravity load, with typed units through
 //! [`crate::quantity`] — whose held equilibrium disappears at the exact threshold `κ u₀²`. Its
@@ -210,9 +210,9 @@ use crate::EventId;
 use crate::algebraic::{
     CausalAlgebraicError, CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex,
 };
-use crate::continuing_tower::{ReversePassageReceipt, Transition};
-use crate::exact_linear::ExactRatMatrix;
-use crate::exact_value::{ExactInterval, ExactValueError, IntegerPolynomial, SturmChain};
+use holonics::restriction::tower::{ReversePassageReceipt, Transition};
+use holonics::exact_linear::ExactRatMatrix;
+use holonics::exact_value::{ExactInterval, ExactValueError, IntegerPolynomial, SturmChain};
 use crate::physical_constraint_complex::{
     ConstraintEdge, ConstraintVertexId, ContactClass, DistanceAperture,
 };
@@ -220,7 +220,8 @@ use crate::physical_constraint_grading::EdgeProvenance;
 use crate::physical_occurrence::{SituatedFamily, SituatedPairReading};
 use crate::presentation_cost::{CostReceipt, Counted, code_bits};
 use crate::quantity::{BaseUnits, Dimension, Quantity, QuantityError};
-use crate::rebase_invariants::{PivotRule, rebase_invariants};
+use holonics::rebase_invariants::PivotRule;
+use crate::rebase_invariants::{rebase_invariants};
 use crate::rigidity_receiver::{
     ExactConfiguration, RigidityError, RigidityJacobian, RigidityReading, rigidity_reading,
 };
@@ -2393,7 +2394,7 @@ impl FoldCatastrophe {
     /// `V''`.**
     ///
     /// The roots are `±√a` and are irrational in general; none is ever formed. The count comes
-    /// from [`crate::exact_value::SturmChain`] on two windows whose endpoints are proved not to be
+    /// from [`holonics::exact_value::SturmChain`] on two windows whose endpoints are proved not to be
     /// roots, and the stability of each root is the sign of the window it sits in, because
     /// `V''(x) = 2x`.
     pub fn equilibria(&self) -> Result<EquilibriumReading, FoldRefusal> {

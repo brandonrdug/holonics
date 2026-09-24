@@ -13,12 +13,8 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use thiserror::Error;
 
-use crate::{
-    exact_json,
-    exact_value::ieee754::{decode_bfloat16_bits, round_into_bfloat16},
-    foreign_map::{ForeignMapError, ForeignTensor, manifest_safetensors},
-    resident_law::decimal_to_rat,
-};
+use holonics::exact_value::ieee754::{decode_bfloat16_bits, round_into_bfloat16};
+use crate::{exact_json, foreign_map::{ForeignMapError, ForeignTensor, manifest_safetensors}, resident_law::decimal_to_rat};
 
 pub const NATIVE_OPERATOR_MORPHOLOGY_SCHEMA: &str = "holonic-engine.native-operator-morphology.v1";
 

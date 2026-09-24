@@ -22,7 +22,7 @@
 //! transports have holonomy `(∏ λ) · 1`, and for every transport the **determinant line** is a
 //! `ℚ^×` connection whose core curvature is `det(hol) − 1`, a gauge-free class function (tested).
 
-use holonic_core::complex::ConnectionIncidence;
+use holonics::complex::ConnectionIncidence;
 use num_traits::Zero;
 
 use super::{HingeId, HingeTransportId, HingeTransportNetwork, SimplicialComplex};

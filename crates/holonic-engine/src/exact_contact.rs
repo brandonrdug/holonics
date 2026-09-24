@@ -14,7 +14,7 @@
 //! than asserting it, and refuses a contact whose frames did not cancel to exactly zero.
 //!
 //! **Nothing here is divided.** The face is carried as the pair `(numerator, denominator)` and
-//! ordered by cross-multiplication through [`crate::exact_value::ExactOrdering`], so the four-state
+//! ordered by cross-multiplication through [`holonics::exact_value::ExactOrdering`], so the four-state
 //! ordering with `Open` survives and no epsilon is ever reached for.
 //!
 //! **The quotient by the phase circle deletes the hand, so the hand is carried beside it.** `cos²`
@@ -45,7 +45,7 @@ use relational_geometry::Rat;
 use thiserror::Error;
 
 use crate::clifford::{Aim, Arrow};
-use crate::exact_value::ExactOrdering;
+use holonics::exact_value::ExactOrdering;
 
 /// Why a contact could not be read.
 ///

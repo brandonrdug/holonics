@@ -980,14 +980,14 @@ fn a_costed_chart_above_the_declared_aperture_is_refused_by_name() {
         .expect_err("a million-bit carrier is above the declared aperture");
     assert!(matches!(
         refusal,
-        crate::continuing_tower::SplittingRefusal::CarrierAboveCeiling { .. }
+        holonics::restriction::tower::SplittingRefusal::CarrierAboveCeiling { .. }
     ));
     let not_a_refinement = costed
         .receipt(5, 2)
         .expect_err("chart 2 does not refine chart 5");
     assert!(matches!(
         not_a_refinement,
-        crate::continuing_tower::SplittingRefusal::NotARefinement { coarse: 5, fine: 2 }
+        holonics::restriction::tower::SplittingRefusal::NotARefinement { coarse: 5, fine: 2 }
     ));
 }
 

@@ -1,4 +1,4 @@
-use holonic_engine::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -206,8 +206,8 @@ impl From<super::super::DerivationRecurrenceError> for DynamicMorphologyError {
     }
 }
 
-impl From<holonic_engine::exact_linear::ExactLinearError> for DynamicMorphologyError {
-    fn from(value: holonic_engine::exact_linear::ExactLinearError) -> Self {
+impl From<holonics::exact_linear::ExactLinearError> for DynamicMorphologyError {
+    fn from(value: holonics::exact_linear::ExactLinearError) -> Self {
         Self::ExactLinear(value.to_string())
     }
 }

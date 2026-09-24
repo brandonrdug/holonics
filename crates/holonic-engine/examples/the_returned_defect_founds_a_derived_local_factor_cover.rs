@@ -15,9 +15,9 @@ use holonic_engine::{
         OverlapReceipt, SupportedDefectSection,
     },
     embedding_fiber::{AlignedMaterial, ResidentReadout},
-    exact_linear::ExactRatMatrix,
     resident_section::{Dyadic, ResidentGrain, ResidentSurface, TransferCensus},
 };
+use holonics::exact_linear::ExactRatMatrix;
 use num_bigint::BigInt;
 use num_traits::ToPrimitive;
 use relational_geometry::Rat;
@@ -626,8 +626,7 @@ fn code_closure() -> String {
     sha([
         include_str!("the_returned_defect_founds_a_derived_local_factor_cover.rs"),
         include_str!("../src/derived_factor_cover.rs"),
-        include_str!("../src/exact_linear.rs"),
-        include_str!("../../holonic-core/src/exact_linear.rs"),
+        include_str!("../../holonics/src/exact_linear.rs"),
         include_str!("../src/resident_law.rs"),
         include_str!("../src/resident_section.rs"),
         include_str!("../kernels/exact_resident_section.cu"),

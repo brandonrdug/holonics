@@ -4,11 +4,9 @@
 use num_bigint::BigInt;
 use relational_geometry::Rat;
 
-use crate::{
-    exact_value::ieee754::{BinaryFloatSpecies, decode_bfloat16_bits, round_into},
-    exact_value::{AlgebraicRoot, ExactInterval},
-    resident_section::{Dyadic, DyadicEnclosure},
-};
+use holonics::exact_value::ieee754::{BinaryFloatSpecies, decode_bfloat16_bits, round_into};
+use holonics::exact_value::{AlgebraicRoot, ExactInterval};
+use crate::{resident_section::{Dyadic, DyadicEnclosure}};
 
 use super::{ExtractedOperatorRefusal, NativeScaleConstraint};
 

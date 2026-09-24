@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::generator_native_rest::GeneratorNativeRest;
 use crate::native_ecology::recurrent::BoundaryDecoder;
 use crate::native_ecology::recurrent_return::{

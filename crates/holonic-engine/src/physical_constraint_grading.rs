@@ -120,7 +120,7 @@ use crate::EventId;
 use crate::algebraic::{
     CausalAlgebraicError, CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex,
 };
-use crate::exact_value::ExactInterval;
+use holonics::exact_value::ExactInterval;
 use crate::physical_constraint_complex::{
     ConstraintComponentId, ConstraintEdge, ConstraintError, ConstraintFace, ConstraintFaceId,
     ConstraintVertexId, ContactClass, PhysicalConstraintComplex,

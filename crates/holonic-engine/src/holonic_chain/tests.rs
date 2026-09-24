@@ -18,12 +18,12 @@ use relational_geometry::Rat;
 
 use super::*;
 use crate::causal_chord::PoleReading;
-use crate::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use crate::holonic_interaction::{
     ApertureChart, Carrier, ContactFace, Coupling, HolonicInteraction, Medium, MediumContact,
     Perspective, ReceiverBody, SourceCurrent, SpectralLicence, StructuralPlacement,
 };
-use crate::inertia::SymmetricForm;
+use holonics::inertia::SymmetricForm;
 use crate::neck::{
     AnalyticCertificate, ConstitutiveLink, NeckReading, RealSpectrumLicence, WidthFace,
 };

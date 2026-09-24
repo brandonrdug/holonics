@@ -33,7 +33,7 @@
 //!
 //! Run: `cargo run -p holonic-engine --release --example the_material_states_its_own_isolation_depth`
 
-use holonic_engine::rational_polynomial::{
+use holonics::rational_polynomial::{
     BivariatePolynomial, RationalPolynomial, RootSeparation, integer_discriminant,
     interior_split_schedule, rational_root_census, resultant_in_eliminated_variable,
     root_separation, worst_retained_fraction,
@@ -134,7 +134,7 @@ fn the_bound_against_what_is_known() {
     );
     let base = RationalPolynomial::new(vec![integer(-6), integer(11), integer(-6), integer(1)]);
     for factor in [1_i64, 2, 3, 5] {
-        let scaled = holonic_engine::exact_value::IntegerPolynomial::new(
+        let scaled = holonics::exact_value::IntegerPolynomial::new(
             base.coefficients()
                 .iter()
                 .map(|value| (value * integer(factor)).to_integer())

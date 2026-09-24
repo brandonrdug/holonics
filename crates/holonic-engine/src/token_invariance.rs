@@ -205,7 +205,7 @@ use std::convert::Infallible;
 use num_bigint::BigUint;
 
 use crate::corpus_census::{CorpusCensus, Kind, SurfaceId, weight_band_name};
-use crate::hardware_cover::{
+use holonics::hardware_cover::{
     Chart, ChartId, CoverDecomposition, CpuDeclaration, FrontCell, HardwareCover, expand_front,
 };
 use crate::receiver_exact_compression::{
@@ -4320,8 +4320,8 @@ mod tests {
                 &census,
                 &atlas,
                 1,
-                &HardwareCover::of_charts(vec![crate::hardware_cover::Chart::Cpu(
-                    crate::hardware_cover::CpuDeclaration { lanes },
+                &HardwareCover::of_charts(vec![holonics::hardware_cover::Chart::Cpu(
+                    holonics::hardware_cover::CpuDeclaration { lanes },
                 )]),
             )
         };

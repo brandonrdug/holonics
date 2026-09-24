@@ -223,13 +223,13 @@ use thiserror::Error;
 
 use crate::algebraic::CausalCellId;
 use crate::causal_chord::{ChordRefusal, PoleAtlas, PoleReading};
-use crate::continuing_tube::check_circuit_holonomy;
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::restriction::tube::check_circuit_holonomy;
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::holonic_interaction::{
     Carrier, ContactFace, Coupling, HolonicInteraction, InteractionRefusal, InterfaceReading,
     Medium, MediumContact, Perspective, ReceiverBody, SourceCurrent, StructuralPlacement,
 };
-use crate::inertia::{InertiaError, SymmetricForm};
+use holonics::inertia::{InertiaError, SymmetricForm};
 use crate::jet_staircase::{FiniteJet, JetChart, JetLadder, StaircaseRefusal, jet_ladder};
 use crate::junction_law::{
     Interface, JunctionField, JunctionRefusal, ResistiveNetwork, Side,
@@ -1918,16 +1918,16 @@ impl PowerStations {
             .all(|gap| (&self.flux[gap + 1] - &self.flux[gap]) - &self.source[gap] == Rat::zero())
     }
     /// **The whole balance as a view of the core energy balance** (per unit time, the rate
-    /// chart of `holonic_core::law::EnergyBalance`): `stored_change` the summed block storage rate,
+    /// chart of `holonics::law::EnergyBalance`): `stored_change` the summed block storage rate,
     /// `dissipated` the summed face power, `port` the injected power `⟨u, Bᵀ G x⟩`; no active or
     /// deposited term and no discretization defect. The core residual is
     /// `stored − (−dissipated + port) = −transport_residual`, so it vanishes exactly when
     /// [`PowerStations::transport_residual`] does. The same point read through the core Holon,
     /// [`HolonicInteraction::power_balance_at`] (`Holon/Element.lean::PortHolon.power_balance`),
     /// returns these numbers; the tests assert it.
-    pub fn energy_balance(&self) -> holonic_core::law::EnergyBalance {
+    pub fn energy_balance(&self) -> holonics::law::EnergyBalance {
         let zero = Rat::zero();
-        holonic_core::law::EnergyBalance::closed(
+        holonics::law::EnergyBalance::closed(
             self.storage_rate_total.clone(),
             self.dissipated.clone(),
             self.injected.clone(),

@@ -122,7 +122,7 @@ impl ReactionLaw {
 
 /// The fixed-size receipt of the power-neutral deposits: count, the latest projection and running
 /// sums/maxima of what the projections removed. A reading, never a gate. The deposit ledger of the
-/// Holon balance (`holonic_core::deposition::DepositLedger`) is recorded against the current's
+/// Holon balance (`holonics::deposition::DepositLedger`) is recorded against the current's
 /// declared unit storage pairing, which a reaction deposit does not change: each such deposit has
 /// `ε = 0` exactly, so its product stays `1`.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -170,11 +170,11 @@ impl ReactionDepositRecord {
             self.removed_l1_sum += &p.removed_l1;
         }
         // Unit storage pairing: Q_(k+1) = Q_k, certified with ε = 0.
-        let unit = holonic_core::inertia::SymmetricForm::from_diagonal(vec![
+        let unit = holonics::inertia::SymmetricForm::from_diagonal(vec![
             relational_geometry::Rat::one();
             1
         ]);
-        holonic_core::deposition::DepositLedger::certify_deposit(
+        holonics::deposition::DepositLedger::certify_deposit(
             &unit,
             &unit,
             &self.storage_epsilon,

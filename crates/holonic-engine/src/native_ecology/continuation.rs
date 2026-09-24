@@ -16,18 +16,13 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use thiserror::Error;
 
-use crate::{
-    cultivated_rest::{
+use holonics::exact_linear::ExactRatMatrix;
+use crate::{cultivated_rest::{
         AlignedFactor, DirectoryCompanion, MorphologyPayload, NativeMorphologyInput,
         PredecessorProductIdentity, RuntimeLawReceipt, TypedLaw, native_morphology_bytes,
-    },
-    embedding_fiber::AlignedMaterial,
-    exact_linear::ExactRatMatrix,
-    native_ecology::cultivation_overlay::{
+    }, embedding_fiber::AlignedMaterial, native_ecology::cultivation_overlay::{
         RankDerivationReceipt, SeparatingReceiver, SparseDefect, SupportedFactor,
-    },
-    native_occurrence::NativeOccurrence,
-};
+    }, native_occurrence::NativeOccurrence};
 
 const SCHEMA: &str = "holonic-engine.native-ecology.cultivation-continuation.v1";
 const DIRECTORY_SCHEMA: &str =
@@ -985,8 +980,8 @@ pub enum ContinuationRefusal {
     ExactLinear(String),
 }
 
-impl From<crate::exact_linear::ExactLinearError> for ContinuationRefusal {
-    fn from(error: crate::exact_linear::ExactLinearError) -> Self {
+impl From<holonics::exact_linear::ExactLinearError> for ContinuationRefusal {
+    fn from(error: holonics::exact_linear::ExactLinearError) -> Self {
         Self::ExactLinear(error.to_string())
     }
 }

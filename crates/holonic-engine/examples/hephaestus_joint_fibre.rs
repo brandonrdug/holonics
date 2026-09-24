@@ -1,11 +1,11 @@
 //! Shared source, condition, junction and material parameters; no independent tensor relaxation.
 use holonic_engine::{
     embedding_fiber::ResidentReadout,
-    exact_linear::{
-        BilinearOperator, BilinearProductCore, ExactRatMatrix, JointBilinearFibre,
-        JointBilinearSystem, JointPreimageReduction,
-    },
     resident_section::{ResidentBilinearMap, ResidentJointBilinearFibre, ResidentSurface},
+};
+use holonics::exact_linear::{
+    BilinearOperator, BilinearProductCore, ExactRatMatrix, JointBilinearFibre,
+    JointBilinearSystem, JointPreimageReduction,
 };
 use relational_geometry::Rat;
 use serde_json::json;

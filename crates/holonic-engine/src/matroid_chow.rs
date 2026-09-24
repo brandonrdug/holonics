@@ -2,7 +2,7 @@
 //!
 //! ## Why this exists: this is the positive form, on the object where it is finite and proved
 //!
-//! [`crate::inertia`] supplies the instrument — Sylvester's law over exact rationals — and records
+//! [`holonics::inertia::inertia`] supplies the instrument — Sylvester's law over exact rationals — and records
 //! in its own opening why the thing it replaced carried no evidence: `M^T M` is positive for every
 //! integer matrix `M`, so its positivity is a property of the expression and never of the material.
 //! What that module did not have is **material**. This one is the material.
@@ -93,8 +93,10 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::inertia::{Inertia, InertiaError, SymmetricForm, inertia};
-use crate::rebase_invariants::{IntegerMatrix, PivotRule, smith_normal_form};
+use holonics::inertia::{Inertia, InertiaError, SymmetricForm, inertia};
+use holonics::rebase_invariants::IntegerMatrix;
+use holonics::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::smith_normal_form;
 use crate::winding_inertia::{CyclicReceiver, WindingError, cyclic_receiver_of_form};
 
 /// A subset of the ground set, as a bitmask. The ground set is bounded by [`GROUND_APERTURE`], so
@@ -687,7 +689,7 @@ fn extend_chains(
 
 /// The order in which the row reduction visits columns when it chooses pivots.
 ///
-/// A pivot column is a **solver coordinate**, exactly as [`crate::inertia::PivotOrder`] is. The
+/// A pivot column is a **solver coordinate**, exactly as [`holonics::inertia::PivotOrder`] is. The
 /// dimension of the quotient cannot depend on it — that is linear algebra, and
 /// `the_dimension_does_not_depend_on_the_basis_order` holds this module to it by recording the
 /// dimension every order returned rather than the one it kept.
@@ -1575,7 +1577,7 @@ impl ChowRing {
 /// The Smith invariant factors of an integral matrix, or `None` when the matrix is not integral.
 ///
 /// **The pivot rule here is load-bearing, and it is a measured cost and not a preference.**
-/// [`crate::rebase_invariants::smith_normal_form`] is a naive Euclidean reduction with a
+/// [`holonics::rebase_invariants::smith_normal_form`] is a naive Euclidean reduction with a
 /// divisibility repair. Its three rules are proved to return the same invariant factors — that is
 /// its own `the_invariants_do_not_depend_on_the_pivot_rule` — but they do **not** cost the same. On
 /// the `11x11` Lefschetz matrix of the Boolean matroid `B_4` under a supermodular class, measured
@@ -1867,7 +1869,7 @@ pub enum ChowError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::inertia::{PivotOrder, inertia_with_order};
+    use holonics::inertia::{PivotOrder, inertia_with_order};
 
     fn fano() -> Matroid {
         Matroid::rank_three_from_lines(

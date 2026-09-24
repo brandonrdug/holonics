@@ -341,7 +341,8 @@ mod tests {
     use super::*;
     use crate::algebraic::{CausalChain, ComparativeMultiplicity};
     use crate::causal::EventId;
-    use crate::rebase_invariants::{PivotRule, rebase_invariants_on};
+    use holonics::rebase_invariants::PivotRule;
+    use crate::rebase_invariants::{rebase_invariants_on};
 
     fn source() -> BTreeSet<EventId> {
         BTreeSet::from([EventId(1)])

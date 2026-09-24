@@ -15,7 +15,7 @@ use sha2::{Digest, Sha256};
 use thiserror::Error;
 
 use crate::category::BoundaryId;
-use crate::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use crate::ported_operation::{OperationSpecies, PortedOperationComplex};
 use crate::quantity::{Dimension, DimensionMatrix};
 use crate::source_occurrence::{BindingValidation, OccurrenceWitness, OccurrenceWitnessRefusal};

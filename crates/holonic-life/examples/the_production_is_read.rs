@@ -28,7 +28,7 @@ use std::{
 };
 
 use body::num::Cog;
-use holonic_engine::hardware_cover::HardwareCover;
+use holonics::hardware_cover::HardwareCover;
 use life::{
     morphological_language::{
         CudaMorphologicalConductExecutor, MorphologicalConductPlurality, MorphologicalConductState,

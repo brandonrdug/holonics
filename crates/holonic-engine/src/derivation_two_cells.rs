@@ -174,7 +174,8 @@ use crate::name_elaboration::{
     ConsequentClosure, Elaboration, ElaborationAperture, ElaborationDeposit, ElaborationRefusal,
     NameMeaning, RetainedCycle, STATEMENT_KEY_PREFIX,
 };
-use crate::rebase_invariants::{PivotRule, RebaseInvariants, rebase_invariants};
+use holonics::rebase_invariants::PivotRule;
+use crate::rebase_invariants::{RebaseInvariants, rebase_invariants};
 
 /// Which half of a meaning a criterion reads. A comparison or a [`Crossing`] never carries
 /// [`Self::Both`]; only a criterion does.

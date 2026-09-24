@@ -1,11 +1,8 @@
 use super::super::super::super::comparison_tests::{current, point};
 use super::super::super::super::family::tests::{body, law};
 use super::*;
-use crate::{
-    embedding_fiber::ResidentReadout,
-    exact_linear::ExactRatMatrix,
-    native_ecology::constitutive_fibre::{ConditionContactMetric, WaveSourceReceiver},
-};
+use holonics::exact_linear::ExactRatMatrix;
+use crate::{embedding_fiber::ResidentReadout, native_ecology::constitutive_fibre::{ConditionContactMetric, WaveSourceReceiver}};
 fn r(v: i64) -> Rat {
     Rat::from_integer(v.into())
 }

@@ -12,8 +12,8 @@
 //! general object is the **tube**; a tower is what one instantaneous frame of it shows; a
 //! staircase is its passage between grains or difference orders. A neck is therefore a
 //! **station of the existing tube**, not a second tube: [`NeckTube`] implements
-//! [`StationedTower`](crate::continuing_tube::StationedTower) and the holonomy around a neck is
-//! `continuing_tube`'s own [`check_circuit_holonomy`](crate::continuing_tube::check_circuit_holonomy).
+//! [`StationedTower`](holonics::restriction::tube::StationedTower) and the holonomy around a neck is
+//! `continuing_tube`'s own [`check_circuit_holonomy`](holonics::restriction::tube::check_circuit_holonomy).
 //!
 //! # Three widths, three types
 //!
@@ -23,7 +23,7 @@
 //!
 //! * [`GeometricSection`] — `A(s)`, an exact nonnegative rational with a declared unit lineage.
 //! * [`ReceiverUncertaintyWidth`] — a wrapper over `receiver_release`'s own
-//!   [`ReceiverWidth`](crate::receiver_release::ReceiverWidth), so the diameter here **is** that
+//!   [`ReceiverWidth`](holonics::law::receiver::ReceiverWidth), so the diameter here **is** that
 //!   owner's diameter and release is that owner's width-zero condition.
 //! * [`AnalyticWidth`] — the distance from the real axis to the nearest pole, taken from
 //!   [`pole_atlas`](crate::causal_chord::pole_atlas) as a **squared** rational or as a named
@@ -131,23 +131,32 @@ use thiserror::Error;
 
 use crate::algebraic::CausalCellId;
 use crate::causal_chord::{ChordRefusal, PoleAtlas, PoleReading, pole_atlas};
-use crate::continuing_tower::{Tower, TowerFaceOutcome, TowerRefusal};
-use crate::continuing_tube::{
-    FaceReading, HolonomyVerdict, HorizonDeclaration, Observer, StationedTower, TubeOutcome,
-    TubeRefusal, check_circuit_holonomy, horizon_reach, two_axis_width,
-};
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::restriction::tower::{Tower, TowerFaceOutcome, TowerRefusal};
+use holonics::restriction::tube::horizon::FaceReading;
+use holonics::restriction::tube::HolonomyVerdict;
+use holonics::restriction::tube::horizon::HorizonDeclaration;
+use holonics::restriction::tube::horizon::Observer;
+use holonics::restriction::tube::StationedTower;
+use holonics::restriction::tube::TubeOutcome;
+use holonics::restriction::tube::TubeRefusal;
+use holonics::restriction::tube::check_circuit_holonomy;
+use holonics::restriction::tube::horizon::horizon_reach;
+use holonics::restriction::tube::horizon::two_axis_width;
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::iwasawa_tower::{IwasawaLevel, IwasawaRefusal, LambdaPresentation};
 use crate::jet_staircase::{FiniteJet, StaircaseRefusal};
 use crate::junction_law::{
     Interface, JunctionField, JunctionRefusal, JunctionVerdict, OrientationBit, ResistiveNetwork,
     Side, check_junction,
 };
-use crate::rational_polynomial::RationalPolynomial;
-use crate::receiver_release::{
-    CompatibleFamily, DiameterNorm, ExactFace, ExactZonotope, Horizon, LinearReading, ReceiverWidth,
-    WidthRefusal, width_enclosed,
-};
+use holonics::rational_polynomial::RationalPolynomial;
+use holonics::law::receiver::DiameterNorm;
+use holonics::law::receiver::ExactFace;
+use holonics::law::receiver::Horizon;
+use holonics::law::receiver::LinearReading;
+use holonics::law::receiver::ReceiverWidth;
+use holonics::law::receiver::WidthRefusal;
+use crate::receiver_release::{CompatibleFamily, ExactZonotope, width_enclosed};
 use crate::topological_receiver::{
     ClosedPolygon, ProjectionDirection, TopologicalError, linking_number,
 };
@@ -301,7 +310,7 @@ impl GeometricSection {
 ///
 /// [definition] A wrapper, not a re-founding: the diameter, the norm and the witness are that
 /// owner's and are read back through it. Release is
-/// [`ReceiverWidth::releasable_at`](crate::receiver_release::ReceiverWidth::releasable_at).
+/// [`ReceiverWidth::releasable_at`](holonics::law::receiver::ReceiverWidth::releasable_at).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReceiverUncertaintyWidth {
     width: ReceiverWidth,
@@ -1169,7 +1178,7 @@ impl NeckTube {
         &self,
         from: usize,
         face: Rat,
-    ) -> TubeOutcome<Self, crate::continuing_tube::HolonomyVerdict<usize, usize, Rat>> {
+    ) -> TubeOutcome<Self, holonics::restriction::tube::HolonomyVerdict<usize, usize, Rat>> {
         let neck = self.profile.neck_index();
         check_circuit_holonomy(self, &[from, neck, from], &[0usize], &[(0usize, face)])
     }

@@ -32,7 +32,7 @@ use holonic_engine::quintic_chart::{
     ChartObstructionSpecies, ChartOutcome, QuinticChart, QuinticChartAtlas, RadicalChartVerdict,
     RadicalReturn, read_quintic_charts,
 };
-use holonic_engine::rational_polynomial::RationalPolynomial;
+use holonics::rational_polynomial::RationalPolynomial;
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
 use relational_geometry::Rat;

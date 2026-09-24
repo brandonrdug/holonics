@@ -171,9 +171,9 @@ fn material_null_is_checked_on_attainable_slips() {
 /// Holon whose words close exactly.
 #[test]
 fn the_pair_contact_is_a_core_resistive_element_on_relative_slip() {
-    use holonic_core::conformance::{check_exact_advance, check_tellegen};
-    use holonic_core::holon::HolonState;
-    use holonic_core::law::Scheme;
+    use holonics::conformance::{check_exact_advance, check_tellegen};
+    use holonics::holon::HolonState;
+    use holonics::law::Scheme;
 
     let adapter = adapter();
     let element = adapter.contact_element().unwrap();

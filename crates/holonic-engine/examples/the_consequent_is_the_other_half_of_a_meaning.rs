@@ -59,7 +59,7 @@ use holonic_engine::derivation_two_cells::{
 use holonic_engine::name_elaboration::{
     ConsequentClosure, ConsequentSpecies, ElaborationAperture, ElaborationDeposit, NameMeaning,
 };
-use holonic_engine::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::PivotRule;
 
 /// The declared square population any one reading may found. Exceeding it **refuses the reading
 /// with its size** rather than truncating it.

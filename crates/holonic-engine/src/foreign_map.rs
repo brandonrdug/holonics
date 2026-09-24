@@ -55,8 +55,8 @@ use num_bigint::BigUint;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::exact_value::ExactValueError;
-use crate::exact_value::ieee754::{
+use holonics::exact_value::ExactValueError;
+use holonics::exact_value::ieee754::{
     BinaryFloatDatum, BinaryFloatSpecies, decode_bfloat16_bits, decode_binary32_bits,
     decode_binary64_bits,
 };

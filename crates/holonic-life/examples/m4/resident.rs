@@ -1,7 +1,7 @@
 //! Carry the held-out reflection word as one exact resident GPU graph.
 
 use holonic_engine::embedding_fiber::{AlignedMaterial, ResidentReadout};
-use holonic_engine::exact_work::ExactWork;
+use holonics::exact_work::ExactWork;
 use holonic_engine::receiver_history_cultivation::MountedCultivatedHistory;
 use holonic_engine::resident_section::{Dyadic, ResidentGrain, ResidentSurface, TransferCensus};
 use num_traits::ToPrimitive;

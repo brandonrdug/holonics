@@ -24,7 +24,6 @@ members = [
   "crates/holonic-structure",
   "crates/holonic-language",
   "crates/relational-geometry",
-  "crates/holonic-core",
   "crates/holonic-words",
   "crates/holonic-engine",
   "crates/holonic-body",
@@ -50,7 +49,6 @@ license = "MIT OR Apache-2.0"
 [workspace.dependencies]
 holonic-structure = { path = "crates/holonic-structure" }
 relational-geometry = { path = "crates/relational-geometry" }
-holonic-core = { path = "crates/holonic-core" }
 holonic-words = { path = "crates/holonic-words" }
 serde = { version = "1", features = ["derive", "rc"] }
 ron = "0.12"

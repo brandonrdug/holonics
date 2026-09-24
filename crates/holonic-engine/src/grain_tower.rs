@@ -91,10 +91,10 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::continuing_tower::{
+use holonics::restriction::tower::{
     ReopenReceipt, Tower, TowerRefusal, TowerRestrictTransition, Transition,
 };
-use crate::exact_value::ExactInterval;
+use holonics::exact_value::ExactInterval;
 use crate::physical_constraint_complex::{ContactClass, CoordinateBox3, DistanceAperture};
 
 /// The grain axis of the carrier's index. `Component` is coarsest and `Atom` finest, so the derived

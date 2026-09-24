@@ -4,7 +4,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use holonic_engine::exact_value::ExactValue;
+use holonics::exact_value::ExactValue;
 use life::mathematical_particle::{
     MathematicalParticle, PassageEndpoint, PassageEquivalence, RelationWitness,
 };

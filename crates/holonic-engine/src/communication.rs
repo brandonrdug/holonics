@@ -41,7 +41,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::algebraic::{CausalCellId, GradedCausalComplex};
 use crate::gluing::{Cover, GluingRefusal, read_cover};
-use crate::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::PivotRule;
 
 /// One receiver's section. Communication happens only where sections meet.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]

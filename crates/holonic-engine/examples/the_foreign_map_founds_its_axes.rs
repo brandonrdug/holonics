@@ -40,8 +40,8 @@ use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
 
 use holonic_engine::cuda_refine::CudaRefineExecutor;
-use holonic_engine::exact_linear::ExactRatMatrix;
-use holonic_engine::exact_value::ieee754::decode_bfloat16_bits;
+use holonics::exact_linear::ExactRatMatrix;
+use holonics::exact_value::ieee754::decode_bfloat16_bits;
 use holonic_engine::lattice_gauge::exact_spectrum;
 use holonic_engine::receiver_exact_compression::{
     InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress_on_device,

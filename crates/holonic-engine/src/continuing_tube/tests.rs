@@ -11,15 +11,16 @@ use num_traits::{One, Zero};
 use relational_geometry::Rat;
 
 use super::*;
-use crate::continuing_tower::Tower;
-use crate::continuing_tower::{
+use holonics::restriction::tower::Tower;
+use holonics::restriction::tower::{
     HalvingMigration, ResidualMigration, ResidueTower, ReversePassageReceipt, SwapMigration,
     TwoChartTower, TwoCharts, check_reverse_passage,
 };
 use crate::grain_tower::GrainPair;
 use crate::physical_constraint_complex::ContactClass;
-use crate::receiver_release::{DiameterNorm, Horizon};
-use crate::relation_ladder::Rung;
+use holonics::law::receiver::DiameterNorm;
+use holonics::law::receiver::Horizon;
+use holonics::law::receiver::Rung;
 
 fn rational(value: i64) -> Rat {
     Rat::from_integer(num_bigint::BigInt::from(value))
@@ -214,8 +215,8 @@ fn a_declared_aperture_above_the_ceiling_is_refused_before_any_loop() {
 /// loss (`Transport/ContinuingTube.lean::grainSquare_defect_is_not_a_loss`).
 #[test]
 fn the_grain_tube_square_is_the_core_restriction_descent() {
-    use crate::continuing_tower::TowerRestrictTransition;
-    use holonic_core::restriction::{Descent, tower_square_descent};
+    use holonics::restriction::tower::TowerRestrictTransition;
+    use holonics::restriction::{Descent, tower_square_descent};
     let tube = grain_reading_tube();
     let atom_face = tube.complete().atom_face().clone();
     let verdict = check_commuting_square(
@@ -305,7 +306,7 @@ fn the_grain_square_defect_is_holonomy_and_not_a_loss() {
     // Lean counterpart: `grainSquare_defect_is_not_a_loss`, which cites
     // `grain_residual_reopens_the_source`. What the square loses is agreement between two routes;
     // the selection's own residual still returns the fine face exactly.
-    use crate::continuing_tower::Transition;
+    use holonics::restriction::tower::Transition;
     let tube = grain_reading_tube();
     let atom_face = tube.complete().atom_face().clone();
     let receipt = tube
@@ -883,7 +884,7 @@ fn every_lean_name_the_header_cites_is_declared_by_the_lean_owner() {
 // T5 — the two-axis horizon
 // ---------------------------------------------------------------------------------------------
 
-use crate::receiver_release::WidthWitness;
+use holonics::law::receiver::WidthWitness;
 
 /// The `p`-adic cross-section as a tube: one residue tower at every station, carried by the
 /// identity. Its restriction is a genuine many-to-one map, so its charts have real fibres.
@@ -1233,7 +1234,7 @@ fn the_longitudinal_only_case_is_the_existing_width() {
 
     // The same family, read through `receiver_release`'s own diameter.
     let faces = vec![ExactFace::Flag(false), ExactFace::Flag(true)];
-    let one_axis = crate::receiver_release::width_over_readings(
+    let one_axis = holonics::law::receiver::width_over_readings(
         "the Boolean face itself",
         two_axis.lineage(),
         &faces,

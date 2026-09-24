@@ -1012,7 +1012,7 @@ impl CausalLanguageEcology {
         }
 
         // The cover, declared once for this leader.
-        let cover = holonic_engine::hardware_cover::HardwareCover::cpu_only();
+        let cover = holonics::hardware_cover::HardwareCover::cpu_only();
         let initial = self.recruit(&prompt_tokens);
         let initial_hexis = self.recruitment_read(&initial.sources)?;
         let mut states = vec![GenerationState {
@@ -1041,7 +1041,7 @@ impl CausalLanguageEcology {
             // placement. All three generation fronts conduct through it now. A covering per organ
             // is the cabinet failure one level down — and the two receiver-conditioning fronts
             // further down THIS file still section by count, so they are outside that statement.
-            let successors = holonic_engine::hardware_cover::expand_front(
+            let successors = holonics::hardware_cover::expand_front(
                 states,
                 &cover,
                 // A tip's extent is what it has already emitted: a long branch opens a wider

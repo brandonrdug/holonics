@@ -1976,9 +1976,8 @@ fn gcd(left: BigInt, right: BigInt) -> BigInt {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::rebase_invariants::{
-        PivotRule, invariants_agree, rebase_invariants, rebase_invariants_with_schedule,
-    };
+    use holonics::rebase_invariants::PivotRule;
+    use crate::rebase_invariants::{invariants_agree, rebase_invariants, rebase_invariants_with_schedule};
 
     fn adder(width: usize, schedule: Schedule) -> Growth {
         grow(

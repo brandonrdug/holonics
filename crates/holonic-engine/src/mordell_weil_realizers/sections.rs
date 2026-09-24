@@ -1,5 +1,5 @@
 use super::foundation::{RealizerSextuple, monic_square_root_remainder, poly_eval, poly_mul};
-use crate::rational_polynomial::{RationalPolynomial, rational_roots_by_lifting};
+use holonics::rational_polynomial::{RationalPolynomial, rational_roots_by_lifting};
 use num_bigint::BigInt;
 use num_rational::BigRational;
 use num_traits::{One, Zero};

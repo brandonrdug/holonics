@@ -6,7 +6,7 @@
 
 use super::super::NativeSessionError;
 use super::{CompiledFieldGeometry, GeometricRowGroup};
-use holonic_engine::hardware_cover::{Chart, CoverDecomposition, FrontCell, HardwareCover};
+use holonics::hardware_cover::{Chart, CoverDecomposition, FrontCell, HardwareCover};
 use holonic_engine::resident_section::{ResidentSurface, SLOT_WORDS};
 use holonic_engine::section_partition::{
     DeclaredSpecies, JunctionOutput, ReadRegion, ResourceDeclaration, SectionCell, SectionLineage,
@@ -306,7 +306,7 @@ impl CompiledFieldGeometry {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use holonic_engine::hardware_cover::HardwareCover;
+    use holonics::hardware_cover::HardwareCover;
     use std::collections::BTreeMap;
 
     fn partition(cells: Vec<SectionCell>) -> SectionPartition {

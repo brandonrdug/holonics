@@ -10,16 +10,12 @@ use crate::native::field_geometry::machine::{
     ClockSpec, GeneratorMachineSpec, GeneratorPairArcSpec, GeneratorSiteSpec, MachineUnitsSpec,
     PhaseSpec,
 };
-use holonic_engine::{
-    ExactRatMatrix,
-    embedding_fiber::ResidentReadout,
-    inertia::SymmetricForm,
-    native_ecology::constitutive_fibre::{
+use holonics::exact_linear::ExactRatMatrix;
+use holonics::inertia::SymmetricForm;
+use holonic_engine::{embedding_fiber::ResidentReadout, native_ecology::constitutive_fibre::{
         NativeEnclosurePropagation, ResidentConstitutiveSection, ResidentNormalEnclosure,
         ResidentNormalEnclosureSection,
-    },
-    resident_section::{ResidentGrain, ResidentSectionRest, ResidentSurface},
-};
+    }, resident_section::{ResidentGrain, ResidentSectionRest, ResidentSurface}};
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
 use relational_geometry::{AffineMap3, Rat, RatVec3, cayley_rotation_z};

@@ -2,7 +2,7 @@
 //!
 //! Organs: `relational_geometry::receiver_topology::ihara_signature` (the reciprocal Ihara zeta,
 //! already cross-checked against its Euler product), and
-//! `holonic_engine::rational_polynomial::rational_root_census` (Sturm isolation over exact
+//! `holonics::rational_polynomial::rational_root_census` (Sturm isolation over exact
 //! rationals). Nothing new is built.
 //!
 //! # Why this driver exists
@@ -44,8 +44,8 @@
 //! cargo run --release -p holonic-engine --example the_graph_is_asked_the_ramanujan_question
 //! ```
 
-use holonic_engine::exact_linear::ExactRatMatrix;
-use holonic_engine::rational_polynomial::{RationalPolynomial, rational_root_census};
+use holonics::exact_linear::ExactRatMatrix;
+use holonics::rational_polynomial::{RationalPolynomial, rational_root_census};
 use num_traits::Zero;
 use relational_geometry::Rat;
 

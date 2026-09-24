@@ -1,6 +1,6 @@
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_engine::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 
 use super::*;
 

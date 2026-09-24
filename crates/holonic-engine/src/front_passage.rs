@@ -80,8 +80,8 @@ use sha2::{Digest, Sha256};
 use crate::approach_front::ApproachFront;
 use crate::causal::EventId;
 use crate::exact_owner_testimony::ExactOwnerWitnessRefusal;
-use crate::exact_work::{ExactWork, WorkBudget};
-use crate::hardware_cover::{ChartId, CoverBarrier, CoverDecomposition, FrontCell, ModeIdentity};
+use holonics::exact_work::{ExactWork, WorkBudget};
+use holonics::hardware_cover::{ChartId, CoverBarrier, CoverDecomposition, FrontCell, ModeIdentity};
 use crate::interaction::{InteractionTemporality, OccurrencePort};
 use crate::interchange::{
     DistinguishingWord, FrontCertificate, MemberFootprint, certify_footprints,
@@ -3271,11 +3271,11 @@ impl<'chart> CompiledPassage<'chart> {
 mod tests {
     use super::*;
     use crate::embedding_fiber::{AlignedMaterial, ResidentReadout};
-    use crate::exact_linear::ExactRatMatrix;
+    use holonics::exact_linear::ExactRatMatrix;
     use crate::exact_owner_testimony::{
         ExactOwnerLicense, ExactOwnerOccurrence, TypedMathematicalBoundary,
     };
-    use crate::exact_work::WorkMetric;
+    use holonics::exact_work::WorkMetric;
     use crate::ported_operation::SourceTestimony;
     use crate::resident_section::{
         Dyadic, DyadicEnclosure, LaneTree, REFUSED_MALFORMED, REFUSED_UPSTREAM, TileGeometry,

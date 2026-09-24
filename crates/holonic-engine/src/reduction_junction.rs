@@ -5,11 +5,11 @@
 //!
 //! | owner | what it carries | what it cannot say |
 //! |---|---|---|
-//! | [`crate::exact_linear::ExactRatMatrix::metric_adjoint`] | `G_X^-1 T^T G_Y` for **one** map, and [`crate::exact_linear::ExactRatMatrix::adjoint_defect`] exhibits its defect against a declared pair | **one map, not a family into one output.** There is no term for a population of partials writing one logical output, so there is nothing to reduce and nothing to return the adjoint *of*. |
-//! | [`crate::exact_work::ExactWork`] | additions, multiplications, `peak_bits` — the widest single entry, and a `dependency_span` | **no per-node width and no aperture that refuses.** `peak_bits` is one maximum over a whole deed; it cannot say which node of which reduction word was widest, and it is a *measurement* that never refuses. An overflow aperture that turns a width into a refusal has no term anywhere. |
+//! | [`holonics::exact_linear::ExactRatMatrix::metric_adjoint`] | `G_X^-1 T^T G_Y` for **one** map, and [`holonics::exact_linear::ExactRatMatrix::adjoint_defect`] exhibits its defect against a declared pair | **one map, not a family into one output.** There is no term for a population of partials writing one logical output, so there is nothing to reduce and nothing to return the adjoint *of*. |
+//! | [`holonics::exact_work::ExactWork`] | additions, multiplications, `peak_bits` — the widest single entry, and a `dependency_span` | **no per-node width and no aperture that refuses.** `peak_bits` is one maximum over a whole deed; it cannot say which node of which reduction word was widest, and it is a *measurement* that never refuses. An overflow aperture that turns a width into a refusal has no term anywhere. |
 //! | [`crate::interchange::certify_footprints`] | that two members do not share an address | it *refuses* a shared output; it has no construction that makes one lawful. |
-//! | [`crate::hardware_cover::CoverDecomposition`] | which chart carries which cell | no reduction, no order, no rounding. |
-//! | [`crate::exact_value::ExactInterval`] | an exact enclosure as a set | one carrier, no junction and no directed boundary. |
+//! | [`holonics::hardware_cover::CoverDecomposition`] | which chart carries which cell | no reduction, no order, no rounding. |
+//! | [`holonics::exact_value::ExactInterval`] | an exact enclosure as a set | one carrier, no junction and no directed boundary. |
 //!
 //! So the absent relation founded here is: **a fixed reduction word over a declared family of
 //! partials into one owned output, carrying the intermediate width at every node against a declared
@@ -20,12 +20,12 @@
 //!
 //! # What is composed
 //!
-//! - [`crate::exact_linear::ExactRatMatrix`] for every `T_a`, its metric adjoint and its exact
+//! - [`holonics::exact_linear::ExactRatMatrix`] for every `T_a`, its metric adjoint and its exact
 //!   adjoint defect — this module builds no adjoint of its own and asserts no orthonormality;
 //! - [`crate::section_partition::SectionRegion`] and
 //!   [`crate::section_partition::uncovered_regions`] for the inner regions `K_a`, so the inner
 //!   partition is certified by the same computation the output partition is;
-//! - [`crate::exact_work::ExactWork`] for the reduction's own counted work.
+//! - [`holonics::exact_work::ExactWork`] for the reduction's own counted work.
 //!
 //! # Two things the receipt says about its own evidence
 //!
@@ -46,8 +46,8 @@ use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
 use relational_geometry::Rat;
 
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
-use crate::exact_work::ExactWork;
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::exact_work::ExactWork;
 use crate::section_partition::{JunctionOutput, SectionRegion, SectionShape, uncovered_regions};
 
 // -------------------------------------------------------------------------------------------------

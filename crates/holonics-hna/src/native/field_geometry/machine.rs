@@ -5,16 +5,12 @@
 //! directed contacts, while source and response lengths remain external costs.  All geometry is
 //! carried by the existing exact screw, affine, winding and helical-interaction owners.
 
-use holonic_core::generator::{Generator, PhaseLift, Transport};
-use holonic_core::holon::HolonError;
-use holonic_engine::{
-    exact_linear::{ExactLinearError, ExactRatMatrix},
-    holonic_interaction::{
-        Clock, CoreClock, InteractionRefusal,
-        helical::{HelicalPairInteraction, HelicalRefusal, PairUnits},
-    },
-    inertia::{SymmetricForm, inertia},
-};
+use holonics::generator::{Generator, PhaseLift, Transport};
+use holonics::holon::HolonError;
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::inertia::{SymmetricForm, inertia};
+use holonics::generator::Clock as CoreClock;
+use holonic_engine::{holonic_interaction::{Clock, InteractionRefusal, helical::{HelicalPairInteraction, HelicalRefusal, PairUnits}}};
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed};
 use relational_geometry::{
@@ -92,7 +88,7 @@ pub struct PhaseSpec {
 }
 
 /// [definition; agent-inferred] **The wire form of the one clock.** The clock is the core
-/// `holonic_core::generator::Clock`; its declaration (lineage, step `h`, unit) is the engine
+/// `holonics::generator::Clock`; its declaration (lineage, step `h`, unit) is the engine
 /// [`Clock`], and this is that declaration's `deny_unknown_fields` wire. The conversions are
 /// lossless: [`Self::compile`] and [`Self::from_clock`] are mutually inverse on declared clocks,
 /// and [`Self::core_clock`]/[`Self::from_core`] are mutually inverse on unwound core clocks at

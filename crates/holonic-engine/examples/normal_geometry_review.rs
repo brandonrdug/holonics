@@ -1,6 +1,6 @@
 //! Exterior exact witnesses for normal-response reuse and complete versus open reflection.
 //! Uses the standing matrix and paired-producer owners. No native learning law is changed.
-use holonic_engine::exact_linear::ExactRatMatrix as Matrix;
+use holonics::exact_linear::ExactRatMatrix as Matrix;
 use holonic_engine::native_ecology::constitutive_fibre::PairedJunctionLinearization;
 use holonic_engine::ExactComplexWaveCurrent as Wave;
 use holonic_engine::{causal_reflection::RationalCirclePoint, ExactWavePhaseTransport};

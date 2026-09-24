@@ -14,12 +14,8 @@ use thiserror::Error;
 
 use relational_geometry::Rat;
 
-use crate::{
-    exact_linear::{ExactLinearError, ExactRatMatrix},
-    generator_native_rest::GeneratorNativeRest,
-    receiver_exact_compression::InputId,
-    receiver_history_compression::NativeStateId,
-};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
+use crate::{generator_native_rest::GeneratorNativeRest, receiver_exact_compression::InputId, receiver_history_compression::NativeStateId};
 
 use super::recurrent::{BoundaryDecoder, RetainedContinuationRest};
 

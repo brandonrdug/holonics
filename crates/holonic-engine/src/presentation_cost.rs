@@ -78,7 +78,7 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::continuing_tower::{ResidueTower, SplittingRefusal};
+use holonics::restriction::tower::{ResidueTower, SplittingRefusal};
 use crate::physical_intake::mmcif::StructurePresentation;
 
 // -------------------------------------------------------------------------------------------

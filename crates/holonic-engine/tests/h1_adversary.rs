@@ -6,8 +6,8 @@
 
 use std::collections::BTreeMap;
 
-use holonic_engine::exact_linear::ExactRatMatrix;
-use holonic_engine::hardware_cover::{Chart, CpuDeclaration, HardwareCover};
+use holonics::exact_linear::ExactRatMatrix;
+use holonics::hardware_cover::{Chart, CpuDeclaration, HardwareCover};
 use holonic_engine::reduction_junction::*;
 use holonic_engine::section_partition::*;
 use num_bigint::{BigInt, BigUint};

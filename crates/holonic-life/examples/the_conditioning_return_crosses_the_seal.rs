@@ -21,19 +21,13 @@ use std::{
     process::Command,
 };
 
-use holonic_engine::{
-    conditioned_derivation::{
+use holonics::rebase_invariants::PivotRule;
+use holonic_engine::{conditioned_derivation::{
         found_conditioned_circuit, ConditionedBody, DerivationQuery, FoundedMorphology,
-    },
-    derivation_atlas::CircuitAperture,
-    derivation_integral::AccumulationRule,
-    rebase_invariants::PivotRule,
-    returned_conduct::{
+    }, derivation_atlas::CircuitAperture, derivation_integral::AccumulationRule, returned_conduct::{
         canonical_incidences, cell_addresses, passages_founding_address, FirstProductionIdentity,
         PassageSite,
-    },
-    returned_reading::{condition_again, read_production, ReturnedReading},
-};
+    }, returned_reading::{condition_again, read_production, ReturnedReading}};
 use life::{
     conditioned_rest::{decode_derived_passages, render_derived_passages, ConditionedRest},
     form_mouth::{content_address, deposit_form_or_message, deposit_form_under, DepositedForm},

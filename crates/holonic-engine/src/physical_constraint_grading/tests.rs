@@ -13,13 +13,14 @@ use relational_geometry::Rat;
 use super::*;
 use crate::EventId;
 use crate::algebraic::GradedCausalComplex;
-use crate::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use crate::lattice_gauge::exact_spectrum;
 use crate::physical_constraint_complex::{
     ComponentMaterial, ContactFamily, CoordinateBox3, DistanceAperture, PairUncertainty,
     ResidueMaterial,
 };
-use crate::rebase_invariants::{PivotRule, invariants_agree, rebase_invariants};
+use holonics::rebase_invariants::PivotRule;
+use crate::rebase_invariants::{invariants_agree, rebase_invariants};
 use crate::sheaf_diffusion::{CellularRestriction, ExactCellularSheaf};
 
 fn rat(numerator: i64, denominator: i64) -> Rat {
@@ -1008,7 +1009,7 @@ fn each_family_member_is_its_own_core_complex() {
     ] {
         let invariants = crate::rebase_invariants::rebase_invariants(
             &member.complex,
-            crate::rebase_invariants::PivotRule::SmallestMagnitude,
+            holonics::rebase_invariants::PivotRule::SmallestMagnitude,
         )
         .expect("the Smith owner");
         let rational: Vec<usize> = (0..=chart.complex().dimension())

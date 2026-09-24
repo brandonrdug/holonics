@@ -47,7 +47,7 @@ use holonic_engine::derivation_two_cells::{
     AgreementCriterion, RouteFilling, TwoCellRefusal, betti_at, fill_routes, torsion_at,
 };
 use holonic_engine::name_elaboration::{Elaboration, ElaborationAperture, ElaborationDeposit};
-use holonic_engine::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::PivotRule;
 
 /// The declared square population any one reading may found. Exceeding it **refuses the reading
 /// with its size** rather than truncating it, so a printed number is never of less material than

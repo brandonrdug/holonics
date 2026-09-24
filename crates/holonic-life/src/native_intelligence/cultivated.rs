@@ -13,13 +13,8 @@
 
 use std::collections::BTreeSet;
 
-use holonic_engine::{
-    cuda_refine::{CudaRefineExecutor, ResidentComplexIncidence, ResidentComplexIncidenceReturn},
-    exact_linear::ExactRatMatrix,
-    native_spool::ReceiverInsufficiency,
-    receiver_exact_compression::ReceiverId,
-    ExactComplexWaveCurrent,
-};
+use holonics::exact_linear::ExactRatMatrix;
+use holonic_engine::{cuda_refine::{CudaRefineExecutor, ResidentComplexIncidence, ResidentComplexIncidenceReturn}, native_spool::ReceiverInsufficiency, receiver_exact_compression::ReceiverId, ExactComplexWaveCurrent};
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
 use serde::{Deserialize, Serialize};

@@ -14,7 +14,7 @@ use num_traits::Zero;
 
 use super::*;
 use crate::EventId;
-use crate::exact_value::ExactInterval;
+use holonics::exact_value::ExactInterval;
 use crate::physical_constraint_complex::{
     ComponentMaterial, ConstraintComponentId, ContactClass, CoordinateBox3, DistanceAperture,
     PairUncertainty, ResidueMaterial,

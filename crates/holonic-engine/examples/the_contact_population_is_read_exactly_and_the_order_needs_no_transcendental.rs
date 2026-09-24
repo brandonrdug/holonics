@@ -33,8 +33,8 @@ use std::time::Instant;
 
 use holonic_engine::embedding_fiber::{ResidentReadout, align_bfloat16};
 use holonic_engine::exact_contact::{ContactError, ExactContact};
-use holonic_engine::exact_value::{CertifiedSeries, ExactOrdering, SeriesTailCertificate};
-use holonic_engine::exact_work::{Admission, ExactWork, WorkBudget, WorkMetric};
+use holonics::exact_value::{CertifiedSeries, ExactOrdering, SeriesTailCertificate};
+use holonics::exact_work::{Admission, ExactWork, WorkBudget, WorkMetric};
 use holonic_engine::foreign_map::manifest_safetensors;
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
@@ -328,7 +328,7 @@ fn main() {
     );
     println!(
         "      four-state order against a point   {:?}",
-        enclosure.disjoint_order(&holonic_engine::exact_value::ExactInterval::point(
+        enclosure.disjoint_order(&holonics::exact_value::ExactInterval::point(
             above.clone()
         ))
     );

@@ -68,8 +68,8 @@ use relational_geometry::Rat;
 use crate::algebraic::{CausalChain, ComparativeMultiplicity, GradedCausalComplex};
 use crate::causal::EventId;
 use crate::causal_chord::{ChordRefusal, Linearization, causal_chord, transfer_function};
-use crate::continuing_tower::Transition;
-use crate::exact_linear::ExactRatMatrix;
+use holonics::restriction::tower::Transition;
+use holonics::exact_linear::ExactRatMatrix;
 use crate::grain_tower::{GrainFace, GrainPair, GrainSelection, SelectionResidual};
 use crate::hodge_receiver::{
     BoundaryCondition, HodgeError, HodgeOperator, MetricDeclaration, hodge_decomposition,

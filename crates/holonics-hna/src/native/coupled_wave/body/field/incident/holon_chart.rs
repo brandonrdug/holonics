@@ -38,14 +38,14 @@
 use super::machine_receiving::receiving_current_map;
 use super::*;
 use crate::native::field_geometry::machine::CompiledGeneratorMachine;
-use holonic_core::dirac::DiracStructure;
-use holonic_core::element::ResistiveRelation;
-use holonic_core::exact_linear::ExactRatMatrix;
-use holonic_core::holon::{Holon, PortCounts, PortHolon};
-use holonic_core::inertia::SymmetricForm;
-use holonic_core::law::receiver::PassiveCoholon;
-use holonic_core::law::{EnergyBalance, PassiveReading, ReferenceHolon, Scheme};
-use holonic_core::restriction::PortMap;
+use holonics::dirac::DiracStructure;
+use holonics::element::ResistiveRelation;
+use holonics::exact_linear::ExactRatMatrix;
+use holonics::holon::{Holon, PortCounts, PortHolon};
+use holonics::inertia::SymmetricForm;
+use holonics::law::receiver::PassiveCoholon;
+use holonics::law::{EnergyBalance, PassiveReading, ReferenceHolon, Scheme};
+use holonics::restriction::PortMap;
 use holonic_engine::native_ecology::constitutive_fibre::PowerNeutralCertificate;
 use num_traits::{One, Zero};
 use relational_geometry::{AffineMap3, Rat};
@@ -68,7 +68,7 @@ pub struct ResidentHolonChart {
     /// Real resident coordinates per ring (`2n`).
     width: usize,
     contacts: Vec<ChartContact>,
-    generators: Vec<holonic_core::generator::Generator>,
+    generators: Vec<holonics::generator::Generator>,
 }
 
 /// One ring's reaction at a contrast: the exact executed coefficients (`n × F` integers at
@@ -378,7 +378,7 @@ impl ResidentHolonChart {
                     }));
                     Ok(entries)
                 })
-                .collect::<Result<Vec<_>, holonic_core::exact_linear::ExactLinearError>>()
+                .collect::<Result<Vec<_>, holonics::exact_linear::ExactLinearError>>()
                 .map_err(rat_err)?;
             ExactRatMatrix::shaped(self.width, k + self.width, rows).map_err(rat_err)?
         } else {
@@ -555,8 +555,8 @@ impl ResidentHolonChart {
 mod tests {
     use super::super::machine_tests::spec;
     use super::*;
-    use holonic_core::holon::HolonState;
-    use holonic_core::law::HolonLaw;
+    use holonics::holon::HolonState;
+    use holonics::law::HolonLaw;
 
     fn r(v: i64) -> Rat {
         Rat::from_integer(v.into())

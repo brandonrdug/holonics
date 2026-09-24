@@ -167,12 +167,13 @@ use crate::EventId;
 use crate::algebraic::{
     CausalAlgebraicError, CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex,
 };
-use crate::exact_value::ExactInterval;
+use holonics::exact_value::ExactInterval;
 use crate::physical_constraint_complex::{
     ConstraintComponentId, ConstraintEdge, ConstraintError, ConstraintVertexId, ContactClass,
     CoordinateBox3, PhysicalConstraintComplex,
 };
-use crate::rebase_invariants::{PivotRule, RebaseInvariants, rebase_invariants_on};
+use holonics::rebase_invariants::PivotRule;
+use crate::rebase_invariants::{RebaseInvariants, rebase_invariants_on};
 use crate::rigidity_receiver::{ExactConfiguration, RigidityError};
 
 // ==============================================================================================
@@ -1047,8 +1048,8 @@ struct PrimeField {
 pub const MODULUS_BIT_CEILING: u64 = 64;
 
 // Primality — `MILLER_RABIN_BASES` and its deterministic test — is owned by
-// `holonic_core::primality`; the decision below and the certified prime-image charts read the same code.
-pub(crate) use holonic_core::primality::is_prime;
+// `holonics::primality`; the decision below and the certified prime-image charts read the same code.
+pub(crate) use holonics::primality::is_prime;
 
 impl PrimeField {
     /// A declared prime, **decided** within [`MODULUS_BIT_CEILING`] and refused above it.

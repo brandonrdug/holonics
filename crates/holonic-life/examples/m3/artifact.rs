@@ -31,7 +31,7 @@ struct Evidence<'a> {
     open_domain: &'a super::active_cover::OpenDomainReceipt,
     compression_apparatus: &'a super::native::CompressionApparatus,
     native_semantic_work: &'a super::native::NativeSemanticWork,
-    source_exact_work: &'a holonic_engine::exact_work::ExactWork,
+    source_exact_work: &'a holonics::exact_work::ExactWork,
     source_apparatus: &'a super::active_cover::SourceApparatus,
     boundary: &'static str,
 }
@@ -360,7 +360,7 @@ fn compare_cost(
     }
 }
 
-fn source_relation_applications(work: &holonic_engine::exact_work::ExactWork) -> BigUint {
+fn source_relation_applications(work: &holonics::exact_work::ExactWork) -> BigUint {
     &work.additions + &work.multiplications + &work.divisions + &work.entries_written
 }
 

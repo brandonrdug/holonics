@@ -37,7 +37,7 @@
 //! rounds."*
 //!
 //! **2. It is not called `rank`.** In this crate `rank` already means a dimension or a cardinality
-//! in six public places, including [`crate::inertia::Inertia::rank`]. The probe's `rank` is a
+//! in six public places, including [`holonics::inertia::Inertia::rank`]. The probe's `rank` is a
 //! **bit-length**, so it is [`octaves`] here — the count of doublings a magnitude spans, which is
 //! what `CLAUDE.md` §2b already calls the octave. Note also that
 //! [`crate::corpus_census::density_band`] is bit-length **minus one** and `u64`-only, so the tree

@@ -1,7 +1,7 @@
 //! Cold, source-qualified finite-response comparison. This is an exact rational observer,
 //! not a native update or a choice of one source from its retained uncertainty family.
 use super::*;
-use crate::ExactInterval;
+use holonics::exact_value::ExactInterval;
 use num_traits::{Signed, Zero};
 
 #[derive(Debug, Serialize)]

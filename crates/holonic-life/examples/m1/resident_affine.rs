@@ -2,9 +2,9 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use holonic_engine::causal::EventId;
 use holonic_engine::embedding_fiber::{AlignedMaterial, MountedReadout, ResidentReadout};
-use holonic_engine::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use holonic_engine::exact_owner_testimony::ExactOwnerOccurrence;
-use holonic_engine::exact_work::{WorkBudget, WorkMetric};
+use holonics::exact_work::{WorkBudget, WorkMetric};
 use holonic_engine::front_passage::{
     AlignedMaterialPlan, ApparatusPrediction, ContractTiled, DeedAdmission, DeedReceiver, Enter,
     EnteringRows, ExactOwnerDeedReceipt, FrontPassage, MaterialAdmission, MountedPopulation,
@@ -67,7 +67,7 @@ pub struct ResidentReturn {
     pub selected_tiles: BTreeMap<String, [u32; 5]>,
     pub material_reconciliation: Vec<(String, u64, u64)>,
     pub material_admission: MaterialAdmission,
-    pub deed_prediction: holonic_engine::exact_work::ExactWork,
+    pub deed_prediction: holonics::exact_work::ExactWork,
     pub apparatus_prediction: ApparatusPrediction,
     pub deed_admission: DeedAdmission,
     pub semantic_price: u64,

@@ -1,6 +1,6 @@
 //! A caller of reusable mathematical owners: construction, changed receiver, source return,
 //! and a separating future. The native material-incorporation binding has its separate scope.
-use holonic_engine::exact_linear::{
+use holonics::exact_linear::{
     BilinearOperator, BilinearSupportSearch, ContextualFactorization, ExactRatMatrix,
     ReceiverFactorization,
 };

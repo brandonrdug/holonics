@@ -35,7 +35,7 @@
 //!
 //! [proved-standard] `ker J` is the infinitesimal motion space and `ker Jᵀ` is the self-stress —
 //! equivalently constraint-reaction — space. Both come from
-//! [`crate::exact_linear::ExactRatMatrix`]: `kernel_basis` at `exact_linear.rs:770` and
+//! [`holonics::exact_linear::ExactRatMatrix`]: `kernel_basis` at `exact_linear.rs:770` and
 //! `cokernel_annihilator` at `:814`, with `rank` at `:761`. Nothing here reimplements them.
 //!
 //! # The trivial motions are measured, never assumed
@@ -161,7 +161,7 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::physical_constraint_complex::{
     ConstraintEdge, ConstraintError, ConstraintVertexId, PhysicalConstraintComplex,
 };

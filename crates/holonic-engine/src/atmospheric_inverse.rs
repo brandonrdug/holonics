@@ -29,11 +29,9 @@ use crate::world::{
     EventQuotient, EventRefusal, EventStanding, RefusalKind, event_refusal_from,
     event_standing_wire,
 };
-use crate::{
-    CpuExecutionError, CpuExecutionReceipt, CpuExecutor, EventId, EventSuccessor, ExactEventLaw,
-    ExactInterval, ExactValueError, LogicalResourceReceipt, ReceiverPredictionId,
-    ReceiverRelationPrediction, ReceiverRelationState, ReceiverTestimonyId,
-};
+use holonics::exact_value::ExactInterval;
+use holonics::exact_value::ExactValueError;
+use crate::{CpuExecutionError, CpuExecutionReceipt, CpuExecutor, EventId, EventSuccessor, ExactEventLaw, LogicalResourceReceipt, ReceiverPredictionId, ReceiverRelationPrediction, ReceiverRelationState, ReceiverTestimonyId};
 
 const PROFILE_SCHEMA: &str = "holonic-engine.atmospheric-profile.v1";
 const RESOLUTION_SCHEMA: &str = "holonic-engine.atmospheric-inverse-resolution.v1";

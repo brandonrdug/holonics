@@ -589,7 +589,7 @@ mod gpu_tests {
     #[test]
     #[ignore = "requires CUDA; the receiver declaration leaves the resident phase return unchanged"]
     fn phase_receiver_element_declares_its_drive_without_changing_the_return() {
-        use holonic_core::law::receiver::ReceiverPower;
+        use holonics::law::receiver::ReceiverPower;
         let readout = ResidentReadout::new().unwrap();
         let surface = ResidentSurface::on(&readout).unwrap();
         let unit = 1i128 << 12;

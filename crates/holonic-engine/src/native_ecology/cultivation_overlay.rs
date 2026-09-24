@@ -20,7 +20,7 @@ use std::rc::Rc;
 
 use crate::causal::EventId;
 use crate::embedding_fiber::{AlignedMaterial, ResidentReadout};
-use crate::exact_linear::{ExactRankFactorization, ExactRatMatrix};
+use holonics::exact_linear::{ExactRankFactorization, ExactRatMatrix};
 use crate::front_passage::{
     AlignedMaterialPlan, CompiledPassage, DeedReceiver, FactorizedContract, FrontPassage,
     FrontPassageObstruction, MaterialAdmission, ReEntry, ResidentMaterial, ResidentRealization,

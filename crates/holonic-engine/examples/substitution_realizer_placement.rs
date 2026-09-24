@@ -37,7 +37,7 @@ use holonic_engine::causal::EventId;
 use holonic_engine::complex_system::{AddressReading, ComplexSystem, cell as cell_of_item};
 use holonic_engine::dilation::{Horizon, WalkOrder, dilate};
 use holonic_engine::placement::{Discharge, Placement, discharge};
-use holonic_engine::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::PivotRule;
 use holonic_engine::receiver_exact_compression::ReceiverId;
 use holonic_engine::skein::Substitution;
 use holonic_engine::substitution_realizers::{

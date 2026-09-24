@@ -4,7 +4,7 @@
 //! new operator, expand the tensor image, or invoke a compiler/runtime.
 
 use super::NativeSessionError;
-use holonic_engine::exact_linear::BilinearRealization;
+use holonics::exact_linear::BilinearRealization;
 use num_rational::BigRational;
 use num_traits::Zero;
 
@@ -129,7 +129,7 @@ fn dot_expr(row: &[BigRational], input: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use holonic_engine::exact_linear::{BilinearOperator, BilinearProductCore, ExactRatMatrix};
+    use holonics::exact_linear::{BilinearOperator, BilinearProductCore, ExactRatMatrix};
     use num_bigint::BigInt;
     use std::sync::Arc;
 

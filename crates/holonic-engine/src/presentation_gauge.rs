@@ -540,7 +540,7 @@ mod tests {
 
     use super::*;
     use crate::certified_face::{ReceiverWindow, certify_face};
-    use crate::exact_value::IntegerPolynomial;
+    use holonics::exact_value::IntegerPolynomial;
 
     fn cubic_three_roots() -> IntegerPolynomial {
         IntegerPolynomial::new(vec![

@@ -35,7 +35,7 @@ pub use field::{
     NativeFieldReactionPort,
 };
 
-/// The four resident charts of one body. Each is a chart of a core `holonic_core::holon::Holon`
+/// The four resident charts of one body. Each is a chart of a core `holonics::holon::Holon`
 /// (`HolonState.configuration` = the resident current, `HolonState.commit` = `epoch`); all four
 /// have live public callers (consumer audit and mapping: plan
 /// `THE_HOLON_CORE_FOUNDS_THE_NATIVE_MACHINERY.md`, "Phase 8b disposition").

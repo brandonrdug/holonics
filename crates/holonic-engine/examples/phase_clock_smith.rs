@@ -13,12 +13,12 @@
 use std::fs;
 use std::path::Path;
 
-use holonic_engine::exact_linear::ExactRatMatrix;
-use holonic_engine::exact_work::ExactWork;
+use holonics::exact_linear::ExactRatMatrix;
+use holonics::exact_work::ExactWork;
 use holonic_engine::interchange::order_price_bits;
-use holonic_engine::rebase_invariants::{
-    IntegerMatrix, PivotRule, smith_normal_form_with_schedule,
-};
+use holonics::rebase_invariants::IntegerMatrix;
+use holonics::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::smith_normal_form_with_schedule;
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
 use serde::Serialize;

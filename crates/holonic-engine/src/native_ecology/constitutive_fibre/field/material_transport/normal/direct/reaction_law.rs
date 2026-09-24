@@ -10,10 +10,10 @@
 //!   bilinear block is `J(c) s = Σ_r c_r A_r s`.
 //!
 //! After each normal-law solve (a deposit), [`ResidentNormalMaterial::project_power_neutral_reaction`]
-//! holds every `A_r` exactly skew-Hermitian at the grain (`holonic_core::reaction::
+//! holds every `A_r` exactly skew-Hermitian at the grain (`holonics::reaction::
 //! skew_hermitian_at_grain`; `Holon/Reaction.lean::skewReaction_workless`: `Re⟨s, J(c)s⟩ = 0` for
 //! every admitted `c`), and `W_s` passive by the minimal certified scalar shift
-//! (`holonic_core::reaction::passive_shift_at_grain`: `W_s − τI`, `τ` the least grain value with
+//! (`holonics::reaction::passive_shift_at_grain`: `W_s − τI`, `τ` the least grain value with
 //! `herm W_s − τI ⪯ 0`; its Hermitian part, the resistive element, is `⪯ 0` and its power is
 //! `−dissipation`). [agent-inferred; measured] Not the certified congruence clip
 //! (`passive_complex_at_grain`, `project_passive`): on learned native blocks that clip removed a
@@ -35,7 +35,7 @@
 //! certified distance to the normal solution (the removed parts are part of that distance).
 use super::*;
 use crate::native_ecology::constitutive_fibre::circulation::rest::point_section;
-use holonic_core::reaction::{
+use holonics::reaction::{
     GridComplex, frobenius_square, l1, passive_shift_at_grain, skew_hermitian_at_grain,
 };
 use num_bigint::BigInt;
@@ -86,7 +86,7 @@ pub struct PowerNeutralCertificate<'c> {
     pub n: usize,
     pub k: usize,
     /// Inertia of `sym(realify W_s)`: `positive == 0`.
-    pub linear_inertia: holonic_core::inertia::Inertia,
+    pub linear_inertia: holonics::inertia::Inertia,
     /// The exact executed coefficients (`n × F`, integers at `2^-grain`), for exterior readings
     /// such as the incident energy balance. Never an operand of the resident step.
     pub coefficients: Vec<Vec<GridComplex>>,
@@ -126,13 +126,13 @@ impl<'c> PowerNeutralCertificate<'c> {
         };
         for r in 0..k {
             let start = n + k / 2 + r * n;
-            if !holonic_core::reaction::is_skew_hermitian(&block(start..start + n)) {
+            if !holonics::reaction::is_skew_hermitian(&block(start..start + n)) {
                 return Err(invalid("power-neutral slice is not exactly skew-Hermitian"));
             }
         }
-        let linear_inertia = holonic_core::inertia::inertia(
-            &holonic_core::scalar::symmetric_part(
-                &holonic_core::reaction::realify(&block(0..n)).map_err(invalid)?,
+        let linear_inertia = holonics::inertia::inertia(
+            &holonics::scalar::symmetric_part(
+                &holonics::reaction::realify(&block(0..n)).map_err(invalid)?,
             )
             .map_err(invalid)?,
         );
@@ -450,9 +450,9 @@ impl<'c> ResidentNormalMaterial<'c> {
 mod tests {
     use super::*;
     use crate::embedding_fiber::ResidentReadout;
-    use holonic_core::inertia::inertia;
-    use holonic_core::reaction::{hermitian_power, is_skew_hermitian, realify};
-    use holonic_core::scalar::symmetric_part;
+    use holonics::inertia::inertia;
+    use holonics::reaction::{hermitian_power, is_skew_hermitian, realify};
+    use holonics::scalar::symmetric_part;
     use num_traits::One;
 
     /// Point rows at `grain`: real words interleaved `(re, im)`, integer values.
@@ -829,7 +829,7 @@ mod tests {
                 .collect()
         };
         let matrix =
-            holonic_core::exact_linear::ExactRatMatrix::shaped(2 * n, 2 * n, system).unwrap();
+            holonics::exact_linear::ExactRatMatrix::shaped(2 * n, 2 * n, system).unwrap();
         let (z, kernel) = matrix.preimage_fibre(&rhs).unwrap().unwrap();
         assert!(kernel.is_empty());
         z

@@ -131,7 +131,8 @@ use crate::derivation_integral::{
     AccumulationRule, DerivationIntegralError, HolonomyPopulation, NamedChord, NamedPotential,
     accumulation, potential_over, statement_lineage,
 };
-use crate::rebase_invariants::{PivotRule, RebaseInvariants};
+use holonics::rebase_invariants::PivotRule;
+use crate::rebase_invariants::{RebaseInvariants};
 use crate::running_integral::Cochain;
 use crate::temper::{TemperedFamily, Twist, found_on};
 

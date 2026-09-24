@@ -212,7 +212,7 @@ fn material_contact_response_reaches_its_producer_and_changes_subsequent_conduct
     internal.truncate(before.count);
     internal.resize(k, ExactComplexWaveCurrent::zero());
     let producer = PairedJunctionLinearization::at(map, &incoming, &internal).unwrap();
-    let midpoint = |xs: &[crate::exact_value::ExactInterval]| {
+    let midpoint = |xs: &[holonics::exact_value::ExactInterval]| {
         xs.chunks_exact(2)
             .map(|v| {
                 ExactComplexWaveCurrent::new(

@@ -23,10 +23,9 @@ use crate::world::{
     EventQuotient, EventRefusal, EventStanding, RefusalKind, event_refusal_from,
     event_standing_wire,
 };
-use crate::{
-    CausalBodyStanding, CausalCellId, EventId, EventSuccessor, ExactEventLaw, ExactLinearError,
-    ExactRatMatrix,
-};
+use holonics::exact_linear::ExactLinearError;
+use holonics::exact_linear::ExactRatMatrix;
+use crate::{CausalBodyStanding, CausalCellId, EventId, EventSuccessor, ExactEventLaw};
 
 const STANDING_SCHEMA: &str = "holonic-engine.exact-causal-traversal-standing.v1";
 const RADIATION_SCHEMA: &str = "holonic-engine.exact-causal-traversal-radiation.v1";

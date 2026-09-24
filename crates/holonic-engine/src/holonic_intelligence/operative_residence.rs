@@ -15,14 +15,11 @@ use relational_geometry::Rat;
 use serde::Serialize;
 use thiserror::Error;
 
-use crate::{
-    embedding_fiber::{
+use holonics::exact_value::{AlgebraicRoot, CertifiedSeries, ExactInterval};
+use crate::{embedding_fiber::{
         FiberError, FixedFramePooledMount, PooledReadout, ResidentBfloat16Frame,
         ResidentBfloat16Population,
-    },
-    exact_value::{AlgebraicRoot, CertifiedSeries, ExactInterval},
-    resident_section::{BandElements, DyadicEnclosure, ResidentRefusal, ResidentSurface},
-};
+    }, resident_section::{BandElements, DyadicEnclosure, ResidentRefusal, ResidentSurface}};
 
 use super::{
     NativeCarrierAxis, NativeFullOperatorColdWitness, NativeFullOperatorEcology,

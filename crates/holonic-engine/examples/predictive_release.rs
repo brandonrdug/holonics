@@ -1,6 +1,6 @@
 //! Exact release synthesis and deterministic transport of unresolved source conditions.
 //! Units: m, s, kg; a declared constant downward acceleration 10 m/s^2, not an Earth calibration.
-use holonic_engine::exact_linear::{
+use holonics::exact_linear::{
     ConstantAccelerationRelease, ExactRatMatrix, ReceiverFactorization,
 };
 use holonic_engine::surprisal::SymbolicSurprisal;

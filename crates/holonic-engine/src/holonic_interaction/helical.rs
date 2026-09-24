@@ -19,8 +19,8 @@
 //! passive through the core. The whole pair unit is the core Holon of its interaction
 //! ([`HolonicInteraction::holon`]).
 
-use holonic_core::element::ResistiveRelation;
-use holonic_core::port::Bond;
+use holonics::element::ResistiveRelation;
+use holonics::port::Bond;
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
 use relational_geometry::{PairQuadranceJet, Rat, ScrewPair};
@@ -63,7 +63,7 @@ pub enum HelicalRefusal {
     #[error(transparent)]
     Interaction(#[from] InteractionRefusal),
     #[error(transparent)]
-    Linear(#[from] crate::exact_linear::ExactLinearError),
+    Linear(#[from] holonics::exact_linear::ExactLinearError),
     #[error("the pair response has extent {found}, but a spatial slip has extent 3")]
     ResponseExtent { found: usize },
     #[error("the pair rate port must have 2 rows, found {found}")]
@@ -82,7 +82,7 @@ pub enum HelicalRefusal {
     EmptyMediumBlock,
     /// The Holon core refused the contact element.
     #[error(transparent)]
-    Holon(#[from] holonic_core::holon::HolonError),
+    Holon(#[from] holonics::holon::HolonError),
 }
 
 /// A covector over the full fixed-generator pair feature `(Delta,Q,DQ)`.

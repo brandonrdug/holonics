@@ -221,7 +221,7 @@ fn delayed_return_is_one_cut_equal_to_an_immediate_return() {
         .map(|z| z.real.clone())
         .collect::<Vec<_>>();
     assert!(contemporary.source_normal.iter().flatten().all(|z| z.imaginary.is_zero()));
-    let ht = crate::exact_linear::ExactRatMatrix::new(h).unwrap().transpose().unwrap();
+    let ht = holonics::exact_linear::ExactRatMatrix::new(h).unwrap().transpose().unwrap();
     let p = ht.inverse().unwrap().apply(&b).unwrap();
     // Source joint (p, c) = (0, 1): φ = (c − p, c, p) = (1, 1, 0). The source response the
     // return reads (`contemporary_source_forward`, in the difference chart `η = v − c`) is `P φ`

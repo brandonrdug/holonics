@@ -1201,7 +1201,7 @@ fn the_612_coordinate_complex_that_the_dense_bound_refused_now_assembles() {
             minor_modulus,
             faces,
         } => {
-            assert!(*minor_modulus >= crate::prime_image_algebra::DECLARED_PRIME_FLOOR);
+            assert!(*minor_modulus >= holonics::prime_image_algebra::DECLARED_PRIME_FLOOR);
             assert_eq!(*faces, population);
         }
         other => panic!("above the congruence ceiling the scope is the constructed one: {other:?}"),
@@ -1223,7 +1223,7 @@ fn sparse_work_charges_the_pulled_contraction_when_support_is_narrow() {
 
 #[test]
 fn prime_image_refusal_keeps_its_specific_cause() {
-    use crate::prime_image_algebra::PrimeImageRefusal;
+    use holonics::prime_image_algebra::PrimeImageRefusal;
 
     let refusal = InteractionRefusal::from(PrimeImageRefusal::PrimeCeiling {
         consumed: 7,
@@ -1378,12 +1378,12 @@ fn a_body_that_does_not_carry_its_faces_disagrees_at_a_declared_probe() {
 // =============================================================================================
 
 mod core_holon {
-    use holonic_core::conformance::{
+    use holonics::conformance::{
         check_exact_advance, check_interaction, check_restriction, check_run, check_tellegen,
     };
-    use holonic_core::holon::{HolonError, HolonState};
-    use holonic_core::law::{HolonLaw, Scheme};
-    use holonic_core::restriction::PortMap;
+    use holonics::holon::{HolonError, HolonState};
+    use holonics::law::{HolonLaw, Scheme};
+    use holonics::restriction::PortMap;
 
     use super::*;
 

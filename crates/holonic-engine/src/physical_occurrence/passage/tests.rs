@@ -9,7 +9,7 @@
 use num_bigint::BigUint;
 
 use super::*;
-use crate::continuing_tower::{ReversePassageReceipt, Transition};
+use holonics::restriction::tower::{ReversePassageReceipt, Transition};
 use crate::physical_constraint_complex::ContactClass;
 use crate::physical_occurrence::fixture::{
     absent_structure_root_message, complete_environment, complete_environment_with,

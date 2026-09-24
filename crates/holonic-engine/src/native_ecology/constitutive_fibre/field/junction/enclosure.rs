@@ -2,7 +2,7 @@
 //! This module never seals a numerical center as the unique physical current.
 
 use super::*;
-use crate::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 

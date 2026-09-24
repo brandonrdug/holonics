@@ -594,7 +594,7 @@ impl ConductingMorphologicalLanguageEcology {
         &self,
         prompt: &str,
         spec: MorphologicalGenerationSpec,
-        cover: &holonic_engine::hardware_cover::HardwareCover,
+        cover: &holonics::hardware_cover::HardwareCover,
         executor: &mut CudaMorphologicalConductExecutor,
     ) -> Result<MorphologicalConductedGeneration, MorphologicalLanguageError> {
         self.ecology

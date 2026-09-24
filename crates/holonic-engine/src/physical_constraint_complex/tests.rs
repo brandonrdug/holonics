@@ -994,7 +994,8 @@ fn the_within_component_family_measures_the_m5_structures() {
     use crate::physical_constraint_grading::{
         OpenContactLaw, graded_constraint_family, graded_constraint_member,
     };
-    use crate::rebase_invariants::{PivotRule, rebase_invariants};
+    use holonics::rebase_invariants::PivotRule;
+    use crate::rebase_invariants::{rebase_invariants};
     use crate::rigidity_receiver::{ExactConfiguration, rigidity_family};
 
     let root = std::env::var_os(STRUCTURE_ROOT_ENV)
@@ -1166,7 +1167,8 @@ fn m5_enclosure_window(
 #[test]
 fn the_within_component_family_carries_the_open_class_and_closes_the_m5_loops() {
     use crate::physical_constraint_grading::graded_constraint_family;
-    use crate::rebase_invariants::{PivotRule, rebase_invariants};
+    use holonics::rebase_invariants::PivotRule;
+    use crate::rebase_invariants::{rebase_invariants};
     use crate::rigidity_receiver::ExactConfiguration;
     use crate::topological_receiver::{
         ApertureFiltration, TopologicalError, contact_loops, presented_contact_loops,

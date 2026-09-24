@@ -46,7 +46,7 @@
 //!
 //! the characteristic polynomial is `det(sI−A) = Σ_k c_k s^k` and the adjugate is
 //! `adj(sI−A) = Σ_{k=1}^{n} M_k s^{n−k}`. [`ResolventExpansion`] carries both. The scalar half is
-//! already owned by [`crate::exact_linear::ExactRatMatrix::characteristic_polynomial`]
+//! already owned by [`holonics::exact_linear::ExactRatMatrix::characteristic_polynomial`]
 //! (`exact_linear.rs:336`), which discards the intermediate `M_k`; this module recomputes the
 //! recurrence because it needs them, and
 //! `the_expansion_agrees_with_the_existing_characteristic_owner` holds the two to exact agreement
@@ -70,12 +70,12 @@
 //! # Poles: the polynomial factor is the exact object, an interval is only a readout
 //!
 //! [definition] [`pole_atlas`] squarefree-factors the reduced denominator with
-//! [`crate::rational_polynomial::RationalPolynomial::squarefree_decomposition`], so each pole
+//! [`holonics::rational_polynomial::RationalPolynomial::squarefree_decomposition`], so each pole
 //! carries its **multiplicity as an index, not a guess**. Rational poles are returned as exact
 //! rationals. Every other pole is named by the exact squarefree factor it is a root of. Under
 //! [`PoleReading::Certified`] each factor additionally reports Sturm-certified isolating boxes for
 //! its real roots — obtained from the existing owner
-//! [`crate::rational_polynomial::rational_root_census`] (`rational_polynomial.rs:1110`), whose
+//! [`holonics::rational_polynomial::rational_root_census`] (`rational_polynomial.rs:1110`), whose
 //! isolation is for the monic companion `c^{n−1}A(z/c)` and is rescaled here by the leading
 //! coefficient — and a sign-certified half-plane count. **The interval is a readout. The factor is
 //! the pole's name.**
@@ -84,7 +84,7 @@
 //! machinery this module had to write, because the repository had no owner for it. **It is no
 //! longer this module's**: the signed remainder sequence a Cauchy index reads is the Sturm chain
 //! read at `±∞` instead of at a point, so the routine lives in
-//! [`crate::rational_polynomial`] beside [`crate::exact_value::SturmChain`] and the root census,
+//! [`crate::rational_polynomial`] beside [`holonics::exact_value::SturmChain`] and the root census,
 //! and [`half_plane_count`] here is re-entry into it at the same signature. The three steps are
 //! unchanged and are stated at the owner; in outline:
 //!
@@ -111,8 +111,8 @@
 //!
 //! [definition] When `A` is symmetric the whole question is already owned: the spectrum is real and
 //! the half-plane count **is** Sylvester's signature. [`half_plane_from_symmetric`] routes to
-//! [`crate::inertia::inertia`] (`inertia.rs:375`), and [`rate_form_congruence`] routes a chart
-//! change to [`crate::inertia::congruence`] (`inertia.rs:597`), which refuses a singular chart by
+//! [`holonics::inertia::inertia`] (`inertia.rs:375`), and [`rate_form_congruence`] routes a chart
+//! change to [`holonics::inertia::congruence`] (`inertia.rs:597`), which refuses a singular chart by
 //! name. This is the connection
 //! `research/records/2026-09-15_INTEGRATING_AND_DIFFERENTIATING_ROLES_SHARE_ONE_CURRENT.md` asks
 //! for — "the intention is to connect that owner to the rate reading, not to build a second one."
@@ -154,7 +154,7 @@
 //! semisimplicity, and [`jordan_realification`] is the counterexample — purely imaginary spectrum,
 //! non-squarefree minimal polynomial, and no positive definite `G` making it `G`-skew.
 //! [`is_semisimple`] decides that exactly, as "the minimal polynomial equals its own squarefree
-//! part", through [`crate::exact_linear::ExactRatMatrix::minimal_polynomial`]
+//! part", through [`holonics::exact_linear::ExactRatMatrix::minimal_polynomial`]
 //! (`exact_linear.rs:367`). A defective generator can sit on the seam spectrally and still have no
 //! conserving receiver.
 
@@ -166,10 +166,10 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
-use crate::exact_value::{ExactInterval, ExactValueError};
-use crate::inertia::{Inertia, InertiaError, SymmetricForm, congruence, inertia};
-use crate::rational_polynomial::{
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::exact_value::{ExactInterval, ExactValueError};
+use holonics::inertia::{Inertia, InertiaError, SymmetricForm, congruence, inertia};
+use holonics::rational_polynomial::{
     ExactPolynomialError, RationalPolynomial, rational_root_census, rational_roots_by_lifting,
 };
 
@@ -364,7 +364,7 @@ impl Linearization {
     /// The Lean owner's `rebase_numerator` / `rebase_denominator` / `rebase_transfer` prove that the
     /// transfer object is invariant under this, which is exactly why it is a *chart* change and not
     /// a different object. A singular `T` is refused by name, for the same reason
-    /// [`crate::inertia::congruence`] refuses one.
+    /// [`holonics::inertia::congruence`] refuses one.
     pub fn rebased(&self, chart: &ExactRatMatrix) -> Result<Self, ChordRefusal> {
         if !chart.is_square() || chart.rows() != self.extent() {
             return Err(ChordRefusal::ChartShape {
@@ -1036,28 +1036,25 @@ fn polynomial_lcm(
 /// [definition] `causal_chord` founded this routine because the repository had no owner for it.
 /// It is now `crate::rational_polynomial`'s, beside the Sturm chain the Cauchy index is built from
 /// and beside `rational_root_census`, because those are the same machinery: the signed remainder
-/// sequence over `Z` with tracked signs is [`crate::exact_value::SturmChain`], and reading it at
+/// sequence over `Z` with tracked signs is [`holonics::exact_value::SturmChain`], and reading it at
 /// `±∞` rather than at a point is the only difference between a Sturm count and a Cauchy index.
-/// Every name below is re-exported at its old path and every signature is the one it always had;
-/// the refusals are mapped back into [`ChordRefusal`]'s own species so a caller matching on
+/// The chart adapters below map refusals into [`ChordRefusal`]'s own species so a caller matching on
 /// [`ChordRefusal::HalfPlaneParityFailure`] or
 /// [`ChordRefusal::HalfPlaneRefinementExhausted`] still sees them.
-pub use crate::rational_polynomial::{
-    HALF_PLANE_REFINEMENT_CEILING, HalfPlaneCount, cauchy_index, distinct_real_root_count,
-};
+use holonics::rational_polynomial::HalfPlaneCount;
 
 /// The number of roots of `p` on the imaginary axis, with multiplicity.
 ///
-/// Re-entry into [`crate::rational_polynomial::axis_root_count`].
+/// Re-entry into [`holonics::rational_polynomial::axis_root_count`].
 pub fn axis_root_count(polynomial: &RationalPolynomial) -> Result<usize, ChordRefusal> {
-    crate::rational_polynomial::axis_root_count(polynomial).map_err(chord_refusal)
+    holonics::rational_polynomial::axis_root_count(polynomial).map_err(chord_refusal)
 }
 
 /// **The exact half-plane population of a real polynomial's roots, with multiplicity.**
 ///
-/// Re-entry into [`crate::rational_polynomial::half_plane_count`], which is the owner.
+/// Re-entry into [`holonics::rational_polynomial::half_plane_count`], which is the owner.
 pub fn half_plane_count(polynomial: &RationalPolynomial) -> Result<HalfPlaneCount, ChordRefusal> {
-    crate::rational_polynomial::half_plane_count(polynomial).map_err(chord_refusal)
+    holonics::rational_polynomial::half_plane_count(polynomial).map_err(chord_refusal)
 }
 
 /// Map the two refusals this module named before the owner moved back onto its own species, so the
@@ -1077,7 +1074,7 @@ fn chord_refusal(error: ExactPolynomialError) -> ChordRefusal {
 /// **The half-plane count of a symmetric operator, from Sylvester's signature.**
 ///
 /// A symmetric rational `A` has real spectrum, so `Re λ > 0`, `= 0` and `< 0` are exactly the
-/// positive, null and negative indices of the form. This routes to [`crate::inertia::inertia`]
+/// positive, null and negative indices of the form. This routes to [`holonics::inertia::inertia`]
 /// (`inertia.rs:375`) rather than running the Routh–Hurwitz machinery, which is both cheaper and
 /// the connection the September 15 record asks for.
 pub fn half_plane_from_symmetric(state: &ExactRatMatrix) -> Result<HalfPlaneCount, ChordRefusal> {
@@ -2320,7 +2317,7 @@ pub fn seam_form(
 /// The rate form under a chart change, through the existing congruence owner.
 ///
 /// `Σ_{G'} = P^T Σ_G P` for `G' = P^T G P` and `A' = P^{-1} A P`. The singular case is
-/// [`crate::inertia::congruence`]'s refusal, by name, and is not re-implemented here.
+/// [`holonics::inertia::congruence`]'s refusal, by name, and is not re-implemented here.
 pub fn rate_form_congruence(
     state: &ExactRatMatrix,
     metric: &SymmetricForm,
@@ -2358,7 +2355,7 @@ pub fn is_semisimple(state: &ExactRatMatrix) -> Result<bool, ChordRefusal> {
 ///   [`jordan_realification`] is exactly the case it refutes.
 /// - **Exhibition.** The declared candidate set is the solved basis, its sum, and the Euclidean
 ///   metric when that is admissible. A positive definite member found among them is returned, and
-///   [`crate::inertia::inertia`] certifies it.
+///   [`holonics::inertia::inertia`] certifies it.
 ///
 /// When neither happens the answer is `None`. Deciding whether a linear subspace of symmetric
 /// forms meets the positive definite cone is a feasibility question this receiver does not claim
@@ -2367,7 +2364,7 @@ pub fn is_semisimple(state: &ExactRatMatrix) -> Result<bool, ChordRefusal> {
 /// **A remounted space re-derives both of its answers.** A vanishing diagonal is a diagonal
 /// coordinate on which the *whole* subspace vanishes, which the exhibited basis decides completely,
 /// so the list is recomputed from the basis and refused on disagreement. An exhibited witness is
-/// re-certified through [`crate::inertia::inertia`] and re-solved for membership in the span of the
+/// re-certified through [`holonics::inertia::inertia`] and re-solved for membership in the span of the
 /// basis, because a positive definite form that is not in the subspace is not a conserving
 /// receiver. The subspace is a statement about a generator the struct does not carry, so which
 /// forms are in it at all is testimony; everything the exhibited basis decides is decided.
@@ -3243,7 +3240,7 @@ pub fn separate_under_probe(
 pub enum NetworkForm {
     /// `A = −JᵀJ`: the overdamped relaxation of the quadratic constraint energy `|J v|²/2` at unit
     /// mobility. Symmetric negative semidefinite, so the spectrum is real and
-    /// [`half_plane_from_symmetric`] reads it through [`crate::inertia::inertia`]. Its kernel is
+    /// [`half_plane_from_symmetric`] reads it through [`holonics::inertia::inertia`]. Its kernel is
     /// exactly the infinitesimal motion space `ker J` the rigidity receiver already returns.
     OverdampedRelaxation,
 }

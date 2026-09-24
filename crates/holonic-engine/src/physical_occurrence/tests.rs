@@ -14,8 +14,8 @@ use relational_geometry::Rat;
 
 use super::*;
 use crate::EventId;
-use crate::continuing_tower::check_restriction_laws;
-use crate::exact_value::ExactInterval;
+use holonics::restriction::tower::check_restriction_laws;
+use holonics::exact_value::ExactInterval;
 use crate::physical_intake::mmcif::{ChainOccurrence, StructurePresentation};
 use crate::physical_intake::numpy::UncertaintyWordFormat;
 use crate::physical_intake::{

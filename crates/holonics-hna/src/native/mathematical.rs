@@ -3,21 +3,17 @@
 //! executable material; application and retained-product receivers run on the resident surface.
 //! Product names do not select an engine. Handles address objects in this session only.
 use super::{NativeSessionError, RationalWire, ReceiverWire};
-use holonic_engine::{
-    embedding_fiber::ResidentReadout,
-    exact_linear::{
+use holonics::exact_linear::{
         BilinearOperator, BilinearProductCore, BilinearRealization, BilinearSupportSearch,
         ExactRatMatrix, ReceiverFactorization,
-    },
-    native_ecology::constitutive_fibre::{
+    };
+use holonic_engine::{embedding_fiber::ResidentReadout, native_ecology::constitutive_fibre::{
         ConditionCoverage, ConditionImageReading, ConditionPreimageReading,
         ResidentConstitutiveCurrent, ResidentConstitutiveFibre, ResidentConstitutiveSection,
         ResidentNormalMaterial,
-    },
-    resident_section::{
+    }, resident_section::{
         ResidentBilinearMap, ResidentBilinearReturn, ResidentGrain, ResidentSection, ResidentSurface,
-    },
-};
+    }};
 use num_rational::BigRational;
 use num_traits::{One, Zero};
 use serde::{Deserialize, Serialize};
@@ -563,7 +559,7 @@ impl<'c> NativeMathematicalSession<'c> {
     fn declared_linear_matrix(
         &self,
         operator: u64,
-    ) -> Result<(ExactRatMatrix, holonic_engine::exact_work::ExactWork), NativeSessionError> {
+    ) -> Result<(ExactRatMatrix, holonics::exact_work::ExactWork), NativeSessionError> {
         let op = self
             .operators
             .get(&operator)

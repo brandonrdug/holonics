@@ -546,6 +546,7 @@ version = "0.1.0"
 dependencies = [
  "body",
  "holonic-engine",
+ "holonics",
  "life",
  "num-bigint",
  "sha2 0.10.9",
@@ -553,25 +554,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "holonic-core"
-version = "0.1.0"
-dependencies = [
- "holonic-words",
- "num-bigint",
- "num-traits",
- "relational-geometry",
- "serde",
- "serde_json",
- "thiserror",
-]
-
-[[package]]
 name = "holonic-engine"
 version = "0.1.0"
 dependencies = [
  "claxon",
- "holonic-core",
  "holonic-structure",
+ "holonics",
  "hound",
  "image",
  "mount",
@@ -613,17 +601,22 @@ dependencies = [
 name = "holonics"
 version = "0.1.0"
 dependencies = [
- "holonic-core",
  "holonic-structure",
+ "holonic-words",
+ "num-bigint",
+ "num-traits",
  "relational-geometry",
+ "serde",
+ "serde_json",
+ "thiserror",
 ]
 
 [[package]]
 name = "holonics-hna"
 version = "0.1.0"
 dependencies = [
- "holonic-core",
  "holonic-engine",
+ "holonics",
  "life",
  "num-bigint",
  "num-rational",
@@ -764,10 +757,10 @@ name = "life"
 version = "0.0.0"
 dependencies = [
  "body",
- "holonic-core",
  "holonic-engine",
  "holonic-language",
  "holonic-structure",
+ "holonics",
  "hound",
  "image",
  "libc",

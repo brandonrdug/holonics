@@ -267,7 +267,7 @@ fn joint_pair_constant_values_have_zero_geometric_return() {
 #[test]
 #[ignore = "requires CUDA; the receiver declaration leaves the resident pair return unchanged"]
 fn pair_receiver_element_declares_its_drive_without_changing_the_return() {
-    use holonic_core::law::receiver::ReceiverPower;
+    use holonics::law::receiver::ReceiverPower;
     let device = ResidentReadout::new().unwrap();
     let surface = ResidentSurface::on(&device).unwrap();
     let u = 1i128 << 16;

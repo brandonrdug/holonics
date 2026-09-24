@@ -58,7 +58,7 @@
 //! `{T_w x, T_w 0}`. [`extinction`] computes it that way: it builds
 //! [`crate::receiver_release::CompatibleFamily::enumerated`] with those two members, takes
 //! [`crate::receiver_release::width_enumerated`] in the sup norm and decides with
-//! [`crate::receiver_release::ReceiverWidth::releasable_at`]. No second diameter is founded here.
+//! [`holonics::law::receiver::ReceiverWidth::releasable_at`]. No second diameter is founded here.
 //!
 //! # Why `Extinct` is a verdict and not a search that ran out
 //!
@@ -134,13 +134,15 @@ use relational_geometry::Rat;
 use serde::Serialize;
 use thiserror::Error;
 
-use holonic_core::law::receiver::PassiveCoholon;
-use holonic_core::restriction::{FactorDescent, LinearRestriction, factor_descent_over};
+use holonics::law::receiver::PassiveCoholon;
+use holonics::restriction::{FactorDescent, LinearRestriction, factor_descent_over};
 
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
-use crate::receiver_release::{
-    CompatibleFamily, DiameterNorm, ExactFace, Reading, WidthRefusal, width_enumerated,
-};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::law::receiver::DiameterNorm;
+use holonics::law::receiver::ExactFace;
+use holonics::law::receiver::Reading;
+use holonics::law::receiver::WidthRefusal;
+use crate::receiver_release::{CompatibleFamily, width_enumerated};
 
 /// The ceiling on a declared carrier extent.
 ///
@@ -206,7 +208,7 @@ fn one() -> Rat {
 ///
 /// [definition; agent-inferred] **The linear-map chart of a generator family.** Each member is
 /// the finite exact linear passage a generator induces on this carrier, not the generator itself:
-/// a core `holonic_core::generator::Generator` (transport, initial configuration, clock, phase
+/// a core `holonics::generator::Generator` (transport, initial configuration, clock, phase
 /// lift) enters here only through its induced map, e.g. one Cayley tick of a `Transport::Linear`
 /// is the member `(I − hA/2)⁻¹(I + hA/2)`. The initial configuration, clock and winding are not
 /// retained by this chart; standing sufficiency is read over the passages alone.
@@ -535,7 +537,7 @@ impl StandingLaw {
 /// **An exact linear reading**, with the receiver's declared name.
 ///
 /// [implemented-exact] Private fields and one validating constructor. It implements
-/// [`crate::receiver_release::Reading`], so every width taken here is the release owner's width
+/// [`holonics::law::receiver::Reading`], so every width taken here is the release owner's width
 /// and not a second diameter.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct ReceiverReading {
@@ -817,7 +819,7 @@ fn check_sufficiency_declaration(
 
 impl StandingLaw {
     /// **The standing as a core restriction**: `S` transports the retained residue and retains the
-    /// kernel component `x − σ S x` (`holonic_core::restriction::LinearRestriction`), which, with
+    /// kernel component `x − σ S x` (`holonics::restriction::LinearRestriction`), which, with
     /// the standing, reopens the source exactly. Nothing requires `S` to be injective.
     pub fn restriction(&self) -> Result<LinearRestriction, StandingRefusal> {
         Ok(LinearRestriction::new(self.retain.clone())?)
@@ -1415,7 +1417,7 @@ pub enum ExtinctionVerdict {
 /// [implemented-exact] Lean: `Extinct` and `extinct_iff_release_width_inside_tolerance`. Every
 /// width is taken by [`crate::receiver_release::width_enumerated`] over the two-point family
 /// `{T_w x, T_w z}` in the sup norm, and the decision is
-/// [`crate::receiver_release::ReceiverWidth::releasable_at`]. This module computes no diameter of
+/// [`holonics::law::receiver::ReceiverWidth::releasable_at`]. This module computes no diameter of
 /// its own.
 ///
 /// The certificate route is tried first because it is cheap and decides the whole infinite family;
@@ -1779,7 +1781,7 @@ pub enum StandingRefusal {
     Linear(#[from] ExactLinearError),
     /// The core restriction refused the standing's retention map.
     #[error(transparent)]
-    Restriction(#[from] holonic_core::holon::HolonError),
+    Restriction(#[from] holonics::holon::HolonError),
 }
 
 impl PartialEq for StandingRefusal {

@@ -3,9 +3,9 @@ use super::super::machine::{
     PhaseSpec,
 };
 use super::*;
-use holonic_engine::{
-    exact_linear::ExactRatMatrix, exact_value::ExactInterval, inertia::SymmetricForm,
-};
+use holonics::exact_linear::ExactRatMatrix;
+use holonics::exact_value::ExactInterval;
+use holonics::inertia::SymmetricForm;
 use num_bigint::{BigInt, BigUint};
 use num_traits::Zero;
 use relational_geometry::{AffineMap3, Rat, RatVec3};

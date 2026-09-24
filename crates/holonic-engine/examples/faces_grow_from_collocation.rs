@@ -49,7 +49,8 @@ use holonic_engine::collocation::{
 };
 use holonic_engine::derivation_atlas::{Derivation, read_derivation};
 use holonic_engine::name_elaboration::{ElaborationAperture, ElaborationDeposit};
-use holonic_engine::rebase_invariants::{PivotRule, rebase_invariants};
+use holonics::rebase_invariants::PivotRule;
+use holonic_engine::rebase_invariants::{rebase_invariants};
 
 /// The declared enumeration aperture: the co-presented population any one reading may walk. A
 /// reading that exceeds it is **refused with the bound**, never truncated.

@@ -1,6 +1,6 @@
 use super::*;
 use crate::embedding_fiber::ResidentReadout;
-use crate::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use num_traits::Zero;
 
 pub(super) fn row_space(rows: Vec<Vec<Rat>>) -> Vec<Vec<Rat>> {

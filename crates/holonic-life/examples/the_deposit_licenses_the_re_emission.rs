@@ -46,7 +46,7 @@ use std::{
 };
 
 use body::num::Cog;
-use holonic_engine::hardware_cover::HardwareCover;
+use holonics::hardware_cover::HardwareCover;
 use life::{
     form_mouth::deposit_form_or_message,
     morphological_language::{

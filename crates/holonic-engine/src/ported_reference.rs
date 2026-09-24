@@ -37,8 +37,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::causal::EventId;
 use crate::evolution::EvolutionLawId;
-use crate::exact_value::{AlgebraicRoot, CertifiedSeries, ExactInterval};
-use crate::exact_work::ExactWork;
+use holonics::exact_value::{AlgebraicRoot, CertifiedSeries, ExactInterval};
+use holonics::exact_work::ExactWork;
 use crate::interaction::OccurrencePort;
 use crate::ported_operation::{Front, OperationSpecies, PortedError, PortedOperationComplex};
 
@@ -945,7 +945,7 @@ fn enact(
 fn compose_rotation(
     step: &(ExactInterval, ExactInterval),
     power: u64,
-) -> Result<(ExactInterval, ExactInterval), crate::exact_value::ExactValueError> {
+) -> Result<(ExactInterval, ExactInterval), holonics::exact_value::ExactValueError> {
     let mut carried = (
         ExactInterval::point(Rat::one()),
         ExactInterval::point(Rat::zero()),
@@ -969,7 +969,7 @@ fn compose_rotation(
 /// denominators without bound.
 const ROTATION_OCTAVES: u32 = 40;
 
-fn interval_scaled(interval: &crate::exact_value::ExactInterval, factor: &Rat) -> (Rat, Rat) {
+fn interval_scaled(interval: &holonics::exact_value::ExactInterval, factor: &Rat) -> (Rat, Rat) {
     let a = &interval.lower * factor;
     let b = &interval.upper * factor;
     if a <= b { (a, b) } else { (b, a) }

@@ -40,7 +40,7 @@ use super::super::*;
 use crate::EventId;
 use crate::grain_tower::{certified_coarse_aperture_squared, rational_root_upper_bound};
 use crate::hodge_receiver::{BoundaryLaw, MetricDeclaration, hodge_member};
-use crate::exact_value::ExactInterval;
+use holonics::exact_value::ExactInterval;
 use crate::physical_constraint_complex::{
     ComponentMaterial, ConstraintComponentId, ContactClass, CoordinateBox3, DistanceAperture,
     PairUncertainty, ResidueMaterial,

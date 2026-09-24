@@ -132,11 +132,11 @@ pub struct SectionReconstructionFiber {
 }
 
 /// A collapsed pair read through the section's naming chart: the core
-/// [`ShortestSeparator`](holonic_core::restriction::ShortestSeparator) over presentation names,
+/// [`ShortestSeparator`](holonics::restriction::ShortestSeparator) over presentation names,
 /// intervention names, and receiver/observation names that stay optional where the chart does
 /// not name them (plan phase 10). `distinguishing_word` is the shortest intervention sequence.
 pub type SectionSeparator =
-    holonic_core::restriction::ShortestSeparator<String, String, Option<String>, Option<String>>;
+    holonics::restriction::ShortestSeparator<String, String, Option<String>, Option<String>>;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SectionWork {

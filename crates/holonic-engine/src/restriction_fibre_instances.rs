@@ -1,5 +1,5 @@
 //! Plan phase 10 equality evidence: every engine reconstruction fibre and separator that became an
-//! instance of the core restriction fibre (`holonic_core::restriction::fibre`) keeps its wire,
+//! instance of the core restriction fibre (`holonics::restriction::fibre`) keeps its wire,
 //! its `Debug` face and its reading.
 //!
 //! Each `Old*` struct below is the exact derive the alias replaced; the tests compare serialized

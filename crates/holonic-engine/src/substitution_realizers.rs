@@ -97,7 +97,7 @@ use crate::algebraic::{CausalCellId, GradedCausalComplex};
 // agreement. It is deliberately not an `impl From` in `algebraic.rs`.
 use crate::complex_system::item as item_of_cell;
 use crate::placement::{Placement, place};
-use crate::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::PivotRule;
 use crate::receiver_exact_compression::{ItemId, ObservedSystem, Partition};
 use crate::skein::{GradeRemainder, SkeinReading, SkeinRefusal, Substitution, read_substitution};
 use crate::supported_realizers::{Realization, RealizerId, landings_from_classes};
@@ -541,7 +541,8 @@ mod tests {
     use crate::complex_system::{AddressReading, ComplexSystem, cell as cell_of_item};
     use crate::dilation::{Horizon, WalkOrder, dilate};
     use crate::placement::{Discharge, discharge};
-    use crate::rebase_invariants::{IntegerMatrix, smith_normal_form};
+    use holonics::rebase_invariants::IntegerMatrix;
+    use holonics::rebase_invariants::smith_normal_form;
     use crate::supported_realizers::{incidence, positive_form, quadratic_value};
     use num_bigint::BigInt;
     use num_traits::Zero;

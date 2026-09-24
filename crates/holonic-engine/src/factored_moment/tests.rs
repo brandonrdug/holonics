@@ -1,5 +1,5 @@
 use super::*;
-use crate::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use crate::receiver_history_compression::{
     AddressedFactoredIntegralReceiver, AddressedFactoredIntegralReceiverComplex,
     AddressedFactoredIntegralReceiverTerm, FactoredIntegralReceiverForm,
@@ -609,7 +609,7 @@ fn every_moment_chart_is_one_storage_element_of_the_weighted_family() {
     ] {
         assert!(matches!(
             chart.element().expect("element"),
-            holonic_core::element::ElementRelation::Storage { .. }
+            holonics::element::ElementRelation::Storage { .. }
         ));
         assert!(chart.is_passive().expect("inertia"));
         // ½ Σ w ⟨f, x⟩²: the energy of the rank-one family itself.

@@ -27,9 +27,9 @@ use std::fmt::Write as _;
 use std::fs;
 
 use holonic_engine::embedding_fiber::align_bfloat16;
-use holonic_engine::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use holonic_engine::foreign_map::manifest_safetensors;
-use holonic_engine::hardware_cover::HardwareCover;
+use holonics::hardware_cover::HardwareCover;
 use holonic_engine::reduction_junction::{
     DirectedRounding, PartialTerm, ReductionDefect, ReductionJunction, ReductionReceipt,
     ReductionWord, RoundingPolicy,

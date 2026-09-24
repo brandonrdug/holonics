@@ -62,10 +62,10 @@ use std::path::Path;
 
 use holonic_engine::algebraic::{CausalCellId, GradedCausalComplex, SimplicialIncidenceReceipt};
 use holonic_engine::causal::EventId;
-use holonic_engine::rebase_invariants::{
-    IntegerMatrix, PivotRule, RebaseInvariants, boundary_matrix, invariants_agree,
-    rebase_invariants, smith_normal_form,
-};
+use holonics::rebase_invariants::IntegerMatrix;
+use holonics::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::smith_normal_form;
+use holonic_engine::rebase_invariants::{RebaseInvariants, boundary_matrix, invariants_agree, rebase_invariants};
 use holonic_engine::simplicial::{
     Edge, FaceId, OrientedFace, SimplicialComplex, SimplicialError, VertexId,
 };

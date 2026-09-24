@@ -65,7 +65,8 @@ use holonic_engine::derivation_atlas::{
     CircuitAperture, Derivation, DerivationCircuit, DerivationIdentity, RecruitmentCoefficient,
     found_circuit, invariant_movement, read_derivation, route_cycle_agreement, route_movement,
 };
-use holonic_engine::rebase_invariants::{PivotRule, RebaseInvariants, invariants_agree};
+use holonics::rebase_invariants::PivotRule;
+use holonic_engine::rebase_invariants::{RebaseInvariants, invariants_agree};
 
 /// Every `.lean` artifact under `root`, in a stable filename order. Recursive, so a standing that
 /// holds several foundings side by side reads as one deposit.

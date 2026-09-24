@@ -46,9 +46,9 @@ use num_bigint::BigInt;
 use serde::{Deserialize, Serialize};
 
 use crate::algebraic::{CausalAlgebraicError, CausalCellId, GradedCausalComplex};
-use crate::rebase_invariants::{
-    PivotRule, RebaseInvariants, ReductionWork, rebase_invariants_with_schedule_on,
-};
+use holonics::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::ReductionWork;
+use crate::rebase_invariants::{RebaseInvariants, rebase_invariants_with_schedule_on};
 
 /// Two fillings of one hole, and the boundary they share.
 #[derive(Clone, Debug, PartialEq, Eq)]

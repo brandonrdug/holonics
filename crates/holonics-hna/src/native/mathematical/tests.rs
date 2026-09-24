@@ -157,7 +157,7 @@ fn calibrated_dot(complex: usize, initial: &[i64]) -> MathematicalRequest {
 #[test]
 #[ignore = "requires CUDA; one uncertain release source produces a joint future and is refined by a landing"]
 fn public_joint_release_predicts_correlated_futures_before_selecting_a_source() {
-    use holonic_engine::exact_linear::ConstantAccelerationRelease;
+    use holonics::exact_linear::ConstantAccelerationRelease;
     with_mathematical_session(|session| {
         let mut stream = HnaStream::new();
         // One SI chart: h=(position, velocity, acceleration, impulse), each a planar

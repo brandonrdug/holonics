@@ -8,9 +8,9 @@ use num_traits::{One, Signed, Zero};
 use relational_geometry::Rat;
 
 use super::*;
-use crate::continuing_tube::HolonomyVerdict;
+use holonics::restriction::tube::HolonomyVerdict;
 use crate::jet_staircase::JetChart;
-use crate::rational_polynomial::RationalPolynomial;
+use holonics::rational_polynomial::RationalPolynomial;
 
 fn integer(value: i64) -> Rat {
     Rat::from_integer(BigInt::from(value))

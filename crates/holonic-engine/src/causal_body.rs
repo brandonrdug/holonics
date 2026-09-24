@@ -36,12 +36,8 @@ use crate::world::{
     EventQuotient, EventRefusal, EventStanding, RefusalKind, event_refusal_from,
     event_standing_wire,
 };
-use crate::{
-    CausalAlgebraicError, CausalCellId, CausalChain, ComparativeMultiplicity, EventId,
-    EventSuccessor, ExactCellularSheaf, ExactEventLaw, ExactRatMatrix, ExactSheafCochain,
-    ExactSheafDiffusionLaw, GradedCausalComplex, SheafDiffusionError, SheafDiffusionEvent,
-    SheafDiffusionReceipt, SheafDiffusionStanding, SheafLinearMap, linear_map_rows,
-};
+use holonics::exact_linear::ExactRatMatrix;
+use crate::{CausalAlgebraicError, CausalCellId, CausalChain, ComparativeMultiplicity, EventId, EventSuccessor, ExactCellularSheaf, ExactEventLaw, ExactSheafCochain, ExactSheafDiffusionLaw, GradedCausalComplex, SheafDiffusionError, SheafDiffusionEvent, SheafDiffusionReceipt, SheafDiffusionStanding, SheafLinearMap, linear_map_rows};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct EventCellId(pub u64);

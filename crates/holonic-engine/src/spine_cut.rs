@@ -73,7 +73,7 @@ use thiserror::Error;
 
 use crate::VertexId;
 use crate::algebraic::{CausalCell, CausalCellId, CausalChain, GradedCausalComplex};
-use crate::inertia::{InertiaError, SymmetricForm, inertia};
+use holonics::inertia::{InertiaError, SymmetricForm, inertia};
 use crate::running_integral::PotentialSearch;
 
 // ---------------------------------------------------------------------------------------------
@@ -552,7 +552,7 @@ pub enum SinkReading {
 ///   and the diagnostic only ever asks whether the norm is **negligible** — which for an exact
 ///   carrier means zero, and zero is the same set in every norm. So `ℓ¹` loses nothing the
 ///   diagnostic uses and keeps the reading exact.
-/// - **the output rank** of `O = A·V`, computed as the rank of `OᵀO` by [`crate::inertia`]'s exact
+/// - **the output rank** of `O = A·V`, computed as the rank of `OᵀO` by [`holonics::inertia::inertia`]'s exact
 ///   elimination. `rank(OᵀO) = rank(O)` over an ordered field, so no separate rank organ is founded.
 ///
 /// [`SinkDiagnostics::full_rank_bound`] is `min(queries, value extent)` — read off the material —

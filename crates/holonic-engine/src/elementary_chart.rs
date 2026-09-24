@@ -81,11 +81,8 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::{
-    InverseTransportError,
-    inverse_transport::{AffineObstruction, ExactAffineVersionFiber},
-    rational_polynomial::RationalPolynomial,
-};
+use holonics::rational_polynomial::RationalPolynomial;
+use crate::{InverseTransportError, inverse_transport::{AffineObstruction, ExactAffineVersionFiber}};
 
 /// `R(x) e^{g(x)}`, with `R = numerator / denominator`.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]

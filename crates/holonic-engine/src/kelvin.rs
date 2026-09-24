@@ -69,7 +69,7 @@ use crate::analytic_field::{
 /// a wave, which is what makes them small enough to read.
 pub type ArcIncidence =
     BTreeMap<AnalyticFieldArcId, (AnalyticFieldJunctionId, AnalyticFieldJunctionId)>;
-use crate::exact_linear::ExactLinearError;
+use holonics::exact_linear::ExactLinearError;
 
 /// A closed covector on the arcs, carried by the flow rather than held fixed.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -285,7 +285,7 @@ mod tests {
     use super::*;
     use crate::EventId;
     use crate::analytic_field::ExactAnalyticAdvectionLaw;
-    use crate::exact_linear::ExactRatMatrix;
+    use holonics::exact_linear::ExactRatMatrix;
     use num_bigint::BigInt;
     use std::collections::BTreeSet;
 

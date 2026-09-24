@@ -49,7 +49,7 @@
 //! subspace and a single Hodge type, with the sign alternating with degree. Those are signature
 //! theorems whose count can come out wrong. A Gram matrix's positivity cannot, which is why reaching
 //! for one was the symptom rather than the construction: it is the only positive form available to a
-//! body with no inertia routine. That routine now exists at [`crate::inertia`].
+//! body with no inertia routine. That routine now exists at [`holonics::inertia::inertia`].
 //!
 //! Read through it, `M^T M` does report something about `M` that can fail: its nullity is
 //! `|C| - rank(M)` and its positive count is `rank(M)`. That is a joint statement about the incidence
@@ -73,7 +73,9 @@ use num_bigint::BigInt;
 use num_traits::{One, Zero};
 use serde::{Deserialize, Serialize};
 
-use crate::rebase_invariants::{IntegerMatrix, PivotRule, smith_normal_form};
+use holonics::rebase_invariants::IntegerMatrix;
+use holonics::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::smith_normal_form;
 use crate::receiver_exact_compression::ItemId;
 
 /// One thing the machine can actually produce.
@@ -169,7 +171,7 @@ pub fn incidence(realizations: &[Realization], class_extent: usize) -> IntegerMa
 ///
 /// What the Gram matrix does carry is the geometry of the pairing. Over a field
 /// `rank(M^T M) = rank(M)`, so its inertia is `(rank(M), |C| - rank(M), 0)` — a statement about `M`
-/// which [`crate::inertia::inertia`] returns independently and which can be wrong.
+/// which [`holonics::inertia::inertia`] returns independently and which can be wrong.
 pub fn positive_form(incidence: &IntegerMatrix) -> IntegerMatrix {
     let mut form = IntegerMatrix::zeros(incidence.columns(), incidence.columns());
     for left in 0..incidence.columns() {
@@ -291,7 +293,7 @@ pub fn landings_from_classes(
 /// smuggled an absolute frame into the engine."*
 ///
 /// **The pair was joined only inside `#[cfg(test)]` until 2026-08-10.** [`positive_form`] returned
-/// `MᵀM` and [`crate::inertia::inertia`] returned its signature, and the only place the two met was
+/// `MᵀM` and [`holonics::inertia::inertia`] returned its signature, and the only place the two met was
 /// an `assert_eq!` in this file's test module — so the chain the project's own doctrine runs through
 /// was a test assertion and not a conduct path. `docs/plans/THE_ROADMAP.md` carried it as open work.
 /// The caller is `examples/the_realizer_places_itself.rs`, which builds the incidence from
@@ -329,16 +331,16 @@ pub fn landings_from_classes(
 /// here.
 pub fn induced_placement(
     incidence: &IntegerMatrix,
-) -> Result<crate::inertia::Inertia, crate::inertia::InertiaError> {
+) -> Result<holonics::inertia::Inertia, holonics::inertia::InertiaError> {
     let form = positive_form(incidence);
-    let symmetric = crate::inertia::SymmetricForm::from_integer_matrix(&form)?;
-    Ok(crate::inertia::inertia(&symmetric))
+    let symmetric = holonics::inertia::SymmetricForm::from_integer_matrix(&form)?;
+    Ok(holonics::inertia::inertia(&symmetric))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::inertia::{SymmetricForm, inertia};
+    use holonics::inertia::{SymmetricForm, inertia};
 
     fn realization(realizer: u64, landings: &[(usize, i64)]) -> Realization {
         Realization {
@@ -439,7 +441,7 @@ mod tests {
     // §8 it carried no evidence. The two tests below are what it is replaced with. The first checks
     // an IDENTITY rather than an inequality — it can fail, and would, if `positive_form` computed
     // `M M^T` or mis-indexed. The second reads the Gram matrix's SIGNATURE through
-    // `crate::inertia`, which is a joint statement about `M` and about the elimination.
+    // `holonics::inertia::inertia`, which is a joint statement about `M` and about the elimination.
 
     /// `x^T (M^T M) x = |M x|^2` exactly. An identity, not an inequality: a transposed or
     /// mis-indexed `positive_form`, or a `quadratic_value` that dropped the cross terms, breaks it.

@@ -64,11 +64,11 @@ pub struct DerivationSeparator {
 }
 
 impl DerivationSeparator {
-    /// The core [`Separation`](holonic_core::restriction::Separation) (plan phase 10): two events
+    /// The core [`Separation`](holonics::restriction::Separation) (plan phase 10): two events
     /// the native state merges, witnessed by that state and the shortest receiver occurrence, with
     /// their two branches.
-    pub fn separation(&self) -> holonic_core::restriction::Separation<u64, (u32, String), u64> {
-        holonic_core::restriction::Separation::new(
+    pub fn separation(&self) -> holonics::restriction::Separation<u64, (u32, String), u64> {
+        holonics::restriction::Separation::new(
             self.left_event,
             self.right_event,
             (self.native_state, self.shortest_receiver_occurrence.clone()),

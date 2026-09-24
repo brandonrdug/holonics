@@ -265,12 +265,12 @@ fn coefficients() -> Vec<Rat> {
 /// before. That is the loop closing, checked over the whole front rather than per cell — and it is a
 /// statement no address-disjointness test can make.
 fn front_licence(body: &DiscreteCurvatureConfiguration, coefficient: &Rat) -> (bool, bool) {
-    let cover = holonic_engine::hardware_cover::HardwareCover::cpu_only();
+    let cover = holonics::hardware_cover::HardwareCover::cpu_only();
 
     // The vertices as a front. Extent is the vertex's own incident-hinge population — the material's
     // own measure, so covering by extent is meaningful here rather than degenerate.
     let vertices: Vec<VertexId> = body.vertices().collect();
-    let distributed: Vec<(VertexId, Rat)> = holonic_engine::hardware_cover::expand_front(
+    let distributed: Vec<(VertexId, Rat)> = holonics::hardware_cover::expand_front(
         vertices.clone(),
         &cover,
         |vertex: &VertexId| body.link_size(*vertex).map(|size| size as u64).unwrap_or(1),

@@ -25,7 +25,7 @@ use num_traits::One;
 use relational_geometry::Rat;
 
 use super::*;
-use crate::continuing_tower::{CompatibleSection, check_restriction_laws};
+use holonics::restriction::tower::{CompatibleSection, check_restriction_laws};
 
 fn atom(component: u32, residue: u32, at: u32) -> GrainCell {
     GrainAddress::new(component, residue, at).cell(Grain::Atom)
@@ -295,7 +295,7 @@ fn a_residual_block_under_a_refused_coarse_pair_is_a_typed_refusal() {
         .expect_err("a coarse face that refuses every pair cannot carry these blocks");
     assert!(matches!(
         refusal,
-        crate::continuing_tower::TowerRefusal::IncompatibleWitness { .. }
+        holonics::restriction::tower::TowerRefusal::IncompatibleWitness { .. }
     ));
 }
 

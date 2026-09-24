@@ -18,7 +18,7 @@ holonic-structure = { path = "../holonic-structure" }
 holonic-language = { path = "../holonic-language" }
 holonic-engine = { path = "../holonic-engine", default-features = false }
 # The Holon core: restriction fibres and separators (plan phase 10).
-holonic-core = { path = "../holonic-core" }
+holonics = { path = "../holonics" }
 soma-abi = { path = "../holonic-abi" }
 soma-membrane = { path = "../holonic-membrane" }
 mount = { path = "../holonic-mount" }

@@ -8,15 +8,10 @@
 
 use super::super::field_geometry::GeometricFieldSpec;
 use crate::native::NativeSessionError;
-use holonic_engine::{
-    AnalyticFieldArcId, AnalyticFieldJunctionId, DimensionalWaveModeId, ExactAnalyticFieldJunction,
-    ExactAnalyticFieldWaveLaw, ExactWavePhaseTransport,
-    exact_linear::{BilinearOperator, BilinearProductCore, BilinearRealization, ExactRatMatrix},
-    native_ecology::constitutive_fibre::ResidentConstitutiveCurrent,
-    resident_section::{
+use holonics::exact_linear::{BilinearOperator, BilinearProductCore, BilinearRealization, ExactRatMatrix};
+use holonic_engine::{AnalyticFieldArcId, AnalyticFieldJunctionId, DimensionalWaveModeId, ExactAnalyticFieldJunction, ExactAnalyticFieldWaveLaw, ExactWavePhaseTransport, native_ecology::constitutive_fibre::ResidentConstitutiveCurrent, resident_section::{
         ResidentBilinearMap, ResidentBilinearReturn, ResidentSection, ResidentSurface,
-    },
-};
+    }};
 use num_traits::{One, Zero};
 use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};

@@ -9,7 +9,7 @@ use thiserror::Error;
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 use super::*;
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::receiver_history_compression::{
     AddressedFactoredIntegralReceiverComplex, FactoredIntegralReceiverForm,
     SparseIntegralFunctional,

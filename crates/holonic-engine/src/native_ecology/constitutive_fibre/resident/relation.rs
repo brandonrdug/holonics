@@ -9,7 +9,7 @@
 //! projection, otherwise the translate of the vertical fibre `R_0 = {t | (0, t) ∈ R}` through any
 //! member (`Computation/HolonicConstitutiveFibre.lean::vertical_fibre_iff_zero_source_difference`,
 //! `sourceSpan_iff_paired_source`). In the core it is the restriction fibre
-//! `holonic_core::restriction::AffineFibre` (`Holon/Restriction.lean::affineFibre_mem`), and a
+//! `holonics::restriction::AffineFibre` (`Holon/Restriction.lean::affineFibre_mem`), and a
 //! plural reading retains the whole fibre rather than choosing a member.
 //!
 //! [definition] [`ConstitutiveRelation`] is the exact host reading of the device relation (as
@@ -18,11 +18,11 @@
 //! the rows: `(s, t) ∈ R ⟺ N_T t = −N_S s` for a kernel basis `[N_S | N_T]` of the rows, so
 //! `R_s` is the affine preimage of `−N_S s` under `N_T`, whose radical is `R_0`.
 use super::*;
-use crate::exact_linear::ExactRatMatrix;
-use holonic_core::restriction::AffineFibre;
+use holonics::exact_linear::ExactRatMatrix;
+use holonics::restriction::AffineFibre;
 use num_traits::{One, Zero};
 
-holonic_core::fibre_field_names!(pub ParticularDirections = "ConstitutiveFibre", "particular", "directions", deny);
+holonics::fibre_field_names!(pub ParticularDirections = "ConstitutiveFibre", "particular", "directions", deny);
 
 /// The fibre of the constitutive relation over one source: `particular + span(directions)`.
 pub type ConstitutiveAffineFibre = AffineFibre<ParticularDirections>;

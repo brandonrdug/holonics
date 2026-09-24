@@ -6,11 +6,9 @@
 //! `w Kᵀ D K`.  No unchecked Cholesky or float midpoint is introduced.
 
 use super::machine::CompiledGeneratorPairArc;
-use holonic_engine::{
-    edit_rigidity::{EditRigidityRefusal, ExactMetric, MetricCertificate},
-    exact_linear::{ExactLinearError, ExactRankFactorization, ExactRatMatrix},
-    exact_value::{AlgebraicRoot, ExactInterval, ExactValueError},
-};
+use holonics::exact_linear::{ExactLinearError, ExactRankFactorization, ExactRatMatrix};
+use holonics::exact_value::{AlgebraicRoot, ExactInterval, ExactValueError};
+use holonic_engine::{edit_rigidity::{EditRigidityRefusal, ExactMetric, MetricCertificate}};
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
 use relational_geometry::Rat;
@@ -295,7 +293,7 @@ pub enum MachineFactorError {
 }
 
 fn form_matrix(
-    form: &holonic_engine::inertia::SymmetricForm,
+    form: &holonics::inertia::SymmetricForm,
 ) -> Result<ExactRatMatrix, MachineFactorError> {
     ExactRatMatrix::new(
         (0..form.extent())

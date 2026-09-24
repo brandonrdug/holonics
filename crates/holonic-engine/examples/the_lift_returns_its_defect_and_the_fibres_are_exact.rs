@@ -39,8 +39,8 @@ use holonic_engine::cross_chart::{
     shortest_reopening_separator,
 };
 use holonic_engine::embedding_fiber::align_bfloat16;
-use holonic_engine::exact_linear::ExactRatMatrix;
-use holonic_engine::exact_value::ieee754;
+use holonics::exact_linear::ExactRatMatrix;
+use holonics::exact_value::ieee754;
 use holonic_engine::foreign_map::{ForeignContainer, manifest_safetensors};
 use holonic_engine::receiver_exact_compression::{
     InputId, ItemId, Observation, ObservedSystem, ReceiverId, compress,

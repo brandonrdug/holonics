@@ -246,7 +246,7 @@ pub struct AlignedMaterial {
 /// sweeps all `65,536` patterns and requires bit-identical agreement — including the refusals — so
 /// what stands here is one mouth with two implementations and a proof that they are one.
 fn decode_bfloat16_word(word: u16) -> Result<(i64, i32), FiberError> {
-    let species = crate::exact_value::ieee754::BinaryFloatSpecies::Bfloat16;
+    let species = holonics::exact_value::ieee754::BinaryFloatSpecies::Bfloat16;
     let stored_bits = species.stored_significand_bits();
     let hidden: u16 = 1 << stored_bits;
     let exponent_mask = (1u16 << species.exponent_bits()) - 1;

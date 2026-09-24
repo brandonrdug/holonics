@@ -14,7 +14,7 @@ use holonic_engine::evolution::EvolutionLawId;
 use holonic_engine::exact_owner_testimony::{
     ExactOwnerLicense, ExactOwnerOccurrence, ExactOwnerWitnessRefusal,
 };
-use holonic_engine::exact_value::ExactValue;
+use holonics::exact_value::ExactValue;
 use holonic_engine::front_passage::ExactOwnerDeedReceipt;
 use holonic_engine::interaction::{InteractionTemporality, OccurrencePort};
 use holonic_engine::ported_operation::PortedOperationComplex;

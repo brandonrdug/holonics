@@ -42,11 +42,11 @@ impl<'a, 'c> NormalWaveFamilyReceiver<'a, 'c> {
     /// nearest supported anchor — that returns a face and injects no current, so its power term
     /// is zero (`Holon/Law.lean::coholon_reading_power`). It reads every coordinate of the
     /// relation's target.
-    pub fn receiver_element(&self) -> holonic_core::law::receiver::ActiveReceiver {
-        holonic_core::law::receiver::ActiveReceiver::declared(
+    pub fn receiver_element(&self) -> holonics::law::receiver::ActiveReceiver {
+        holonics::law::receiver::ActiveReceiver::declared(
             "normal wave family receiver",
             self.target_width(),
-            holonic_core::law::receiver::ReceiverPower::Reading,
+            holonics::law::receiver::ReceiverPower::Reading,
         )
     }
     pub fn image(&self) -> Option<&ResidentConstitutiveImage<'a, 'c>> {

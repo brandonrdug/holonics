@@ -34,7 +34,7 @@
 //! `M`, `L`, `T` occur only in this file's fixture and in the module's tests. The organ names no
 //! unit.
 
-use holonic_engine::exact_value::ExactOrdering;
+use holonics::exact_value::ExactOrdering;
 use holonic_engine::quantity::{
     BaseUnits, Cast, Dimension, DimensionMatrix, PiGroup, PiGroups, Quantity, QuantityError,
 };

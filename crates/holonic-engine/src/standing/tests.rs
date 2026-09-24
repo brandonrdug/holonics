@@ -9,7 +9,8 @@
 
 use super::*;
 
-use crate::receiver_release::{CompatibleFamily, DiameterNorm, width_enumerated};
+use holonics::law::receiver::DiameterNorm;
+use crate::receiver_release::{CompatibleFamily, width_enumerated};
 
 fn rat(numerator: i64, denominator: i64) -> Rat {
     Rat::new(BigInt::from(numerator), BigInt::from(denominator))
@@ -129,7 +130,7 @@ fn a_quotient_is_a_standing_exactly_when_the_future_factors_through_it() {
 /// the standing, reopen each exactly.
 #[test]
 fn sufficiency_is_the_core_factor_descent_through_the_standing() {
-    use crate::continuing_tower::Transition;
+    use holonics::restriction::tower::Transition;
     let generators = medium_generators();
     let population = SourcePopulation::declared(
         "three-presents",

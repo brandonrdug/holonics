@@ -317,7 +317,7 @@ impl ResidentLaw for Enter {
             .words
             .iter()
             .map(|word| {
-                crate::exact_value::ieee754::decode_bfloat16_bits(*word)
+                holonics::exact_value::ieee754::decode_bfloat16_bits(*word)
                     .map(|datum| datum.value() * &scale)
                     .map_err(|error| error.to_string())
             })

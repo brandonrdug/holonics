@@ -17,8 +17,8 @@
 //! Neither is a new organ. Each is the relation that fell out of composing owners that already
 //! stand, and each was measured absent before it was written.
 //!
-//! **1. The exact rounding preimage.** [`crate::exact_value::ieee754`] owns the forward map
-//! ([`round_into`](crate::exact_value::ieee754::round_into), with its exact residual) and an
+//! **1. The exact rounding preimage.** [`holonics::exact_value::ieee754`] owns the forward map
+//! ([`round_into`](holonics::exact_value::ieee754::round_into), with its exact residual) and an
 //! *outward* enclosure, and its own documentation names what the enclosure is not: *"at the low
 //! edge of a binade the true rounding preimage is only a quarter-ulp wide below the point, and this
 //! returns a half-ulp there."* Outward is the honest direction for an admission test and it is the
@@ -31,7 +31,7 @@
 //! a binade's low edge, endpoint membership decided by ties-to-even, the subnormal grid, and the two
 //! zeros splitting one magnitude cell between them.
 //!
-//! **2. The cross-chart intertwining defect.** [`crate::exact_linear::ExactRatMatrix`] owns rank,
+//! **2. The cross-chart intertwining defect.** [`holonics::exact_linear::ExactRatMatrix`] owns rank,
 //! kernel, image, cokernel annihilator, affine preimage fibre, the rebase receipt requiring **both**
 //! identity compositions, and the metric adjoint. It owns all of that for *one* map. Nothing
 //! composed two charts into `Phi_Y T - S Phi_X` and returned its faces, and nothing carried the
@@ -68,9 +68,9 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix, LinearFactorization, RebaseReceipt};
-use crate::exact_value::ExactValueError;
-use crate::exact_value::ieee754::{self, BinaryFloatSpecies};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix, LinearFactorization, RebaseReceipt};
+use holonics::exact_value::ExactValueError;
+use holonics::exact_value::ieee754::{self, BinaryFloatSpecies};
 
 // -------------------------------------------------------------------------------------------
 // the exact rounding preimage
@@ -120,7 +120,7 @@ impl FibreCell {
 /// cannot say which side a tie lands on has not partitioned anything.
 ///
 /// The membership rule, derived from
-/// [`round_into`](crate::exact_value::ieee754::round_into) as written and uniform across every case
+/// [`round_into`](holonics::exact_value::ieee754::round_into) as written and uniform across every case
 /// the format has: **both endpoints belong to the codeword whose significand is even.** Adjacent
 /// codewords always have opposite significand parity — including across a binade re-seat, where
 /// `255` is followed by `128` — so every tie belongs to exactly one side and the cells partition the
@@ -805,12 +805,12 @@ pub struct ReopeningSeparator {
 }
 
 impl ReopeningSeparator {
-    /// The core [`Separation`](holonic_core::restriction::Separation) (plan phase 10): the merged
+    /// The core [`Separation`](holonics::restriction::Separation) (plan phase 10): the merged
     /// pair, witnessed by the shared image and the separating coordinate, with the two readings.
     pub fn separation(
         &self,
-    ) -> holonic_core::restriction::Separation<Vec<Rat>, (Vec<Rat>, usize), Rat> {
-        holonic_core::restriction::Separation::new(
+    ) -> holonics::restriction::Separation<Vec<Rat>, (Vec<Rat>, usize), Rat> {
+        holonics::restriction::Separation::new(
             self.left.clone(),
             self.right.clone(),
             (self.identified_image.clone(), self.separating_coordinate),
@@ -1182,10 +1182,10 @@ mod tests {
         assert_ne!(separator.left_reading, separator.right_reading);
         // Phase 10: the same pair is the core factor descent's defect through the quotient, read
         // at the separating coordinate — one fibre {left, right} and one equal separator.
-        let restriction = holonic_core::restriction::LinearRestriction::new(quotient.clone())
+        let restriction = holonics::restriction::LinearRestriction::new(quotient.clone())
             .expect("restriction");
         let coordinate = separator.separating_coordinate;
-        let descent = holonic_core::restriction::factor_descent(
+        let descent = holonics::restriction::factor_descent(
             &restriction,
             |x: &Vec<Rat>| x[coordinate].clone(),
             &[separator.left.clone(), separator.right.clone()],

@@ -33,7 +33,7 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::world::{EventQuotient, event_standing_wire};
 use crate::world::{EventRefusal, RefusalKind, event_refusal_from};
 use crate::{

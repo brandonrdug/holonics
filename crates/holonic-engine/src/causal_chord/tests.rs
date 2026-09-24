@@ -14,9 +14,10 @@ use std::path::{Path, PathBuf};
 
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
+use holonics::rational_polynomial::HALF_PLANE_REFINEMENT_CEILING;
 
 use super::*;
-use crate::inertia::inertia;
+use holonics::inertia::inertia;
 use crate::physical_constraint_grading::EdgeProvenance;
 use crate::physical_constraint_complex::{ConstraintEdge, ConstraintVertexId};
 use crate::rigidity_receiver::{ExactConfiguration, RigidityJacobian, rigidity_reading};

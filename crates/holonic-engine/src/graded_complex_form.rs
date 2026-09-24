@@ -415,7 +415,8 @@ impl<'a> Cursor<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::rebase_invariants::{PivotRule, rebase_invariants};
+    use holonics::rebase_invariants::PivotRule;
+    use crate::rebase_invariants::{rebase_invariants};
     use num_bigint::BigInt;
 
     fn source() -> BTreeSet<EventId> {

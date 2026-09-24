@@ -499,12 +499,12 @@ pub struct NativeGeneratorDescent {
     pub open_domain: BTreeSet<NativeStateId>,
 }
 
-holonic_core::fibre_field_names!(pub NativeCollapsedFibreNames = "NativeCollapsedFibre", "native", "occurrences", deny);
+holonics::fibre_field_names!(pub NativeCollapsedFibreNames = "NativeCollapsedFibre", "native", "occurrences", deny);
 
 /// The occurrences one native state merges: the core
-/// [`PreimageFibre`](holonic_core::restriction::PreimageFibre) under its `native`/`occurrences`
+/// [`PreimageFibre`](holonics::restriction::PreimageFibre) under its `native`/`occurrences`
 /// wire (plan phase 10).
-pub type NativeCollapsedFibre = holonic_core::restriction::PreimageFibre<
+pub type NativeCollapsedFibre = holonics::restriction::PreimageFibre<
     NativeStateId,
     BTreeSet<EventId>,
     NativeCollapsedFibreNames,
@@ -522,13 +522,13 @@ pub struct NativeShortestSeparator {
 }
 
 impl NativeShortestSeparator {
-    /// The core [`ShortestSeparator`](holonic_core::restriction::ShortestSeparator) this wire
+    /// The core [`ShortestSeparator`](holonics::restriction::ShortestSeparator) this wire
     /// carries: a present receiver witness, never a terminus (plan phase 10).
     pub fn shortest_separator(
         &self,
-    ) -> holonic_core::restriction::ShortestSeparator<EventId, InputId, ReceiverId, Observation>
+    ) -> holonics::restriction::ShortestSeparator<EventId, InputId, ReceiverId, Observation>
     {
-        holonic_core::restriction::ShortestSeparator {
+        holonics::restriction::ShortestSeparator {
             left: self.left,
             right: self.right,
             distinguishing_word: self.word.clone(),

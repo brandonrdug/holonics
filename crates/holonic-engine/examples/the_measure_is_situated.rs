@@ -29,9 +29,9 @@ use holonic_engine::conditioned_derivation::{
     ConditionedBody, DerivationQuery, Exposure, PassageId, expose,
 };
 use holonic_engine::derivation_atlas::CircuitAperture;
-use holonic_engine::exact_value::ExactOrdering;
+use holonics::exact_value::ExactOrdering;
 use holonic_engine::gluing::{Cover, read_cover};
-use holonic_engine::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::PivotRule;
 use holonic_engine::situated_residual::{
     Emission, Frame, ResidualArm, SituatedReading, Situation, emission_reaching, one_body_read,
     situate,

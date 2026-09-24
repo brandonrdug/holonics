@@ -4,8 +4,8 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::Path;
 
-use holonic_engine::exact_linear::ExactRatMatrix;
-use holonic_engine::exact_value::ExactValue;
+use holonics::exact_linear::ExactRatMatrix;
+use holonics::exact_value::ExactValue;
 use holonic_engine::ported_operation::PortedTransport;
 use life::mathematical_particle::{
     ByteRelation, CarrierEqualityRelation, CarrierId, ClassificationReceiverReturn,

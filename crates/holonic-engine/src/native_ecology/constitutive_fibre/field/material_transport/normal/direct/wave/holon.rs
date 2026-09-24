@@ -22,11 +22,11 @@
 //! (the chart square, `holon_tests`). Scope: the free applied word; reception, actuation and
 //! the normal-reference transport are device passages that are not charted here.
 use super::*;
-use holonic_core::element::ActiveRelation;
-use holonic_core::exact_linear::ExactRatMatrix;
-use holonic_core::holon::{Holon, HolonError, HolonState, PortHolon};
-use holonic_core::inertia::SymmetricForm;
-use holonic_core::law::{Advance, HolonLaw, ReferenceHolon, Scheme};
+use holonics::element::ActiveRelation;
+use holonics::exact_linear::ExactRatMatrix;
+use holonics::holon::{Holon, HolonError, HolonState, PortHolon};
+use holonics::inertia::SymmetricForm;
+use holonics::law::{Advance, HolonLaw, ReferenceHolon, Scheme};
 
 /// [definition] The normal wave Holon (see the module header).
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -167,7 +167,7 @@ impl HolonLaw for NormalWaveHolon {
     }
     fn interact(&self, other: &Self, joined: &[(usize, usize)]) -> Result<Self, HolonError> {
         let reference = self.reference.interact(&other.reference, joined)?;
-        let transfer = holonic_core::scalar::block_diagonal(&self.transfer, &other.transfer)?;
+        let transfer = holonics::scalar::block_diagonal(&self.transfer, &other.transfer)?;
         Ok(Self {
             roots: self.roots + other.roots,
             transfer,
@@ -264,8 +264,8 @@ mod holon_tests {
             .coefficient_rows()
             .iter()
             .map(|w| {
-                holonic_core::element::storage_energy(&after.storage_form().unwrap(), w).unwrap()
-                    - holonic_core::element::storage_energy(&before.storage_form().unwrap(), w)
+                holonics::element::storage_energy(&after.storage_form().unwrap(), w).unwrap()
+                    - holonics::element::storage_energy(&before.storage_form().unwrap(), w)
                         .unwrap()
             })
             .sum();
@@ -276,7 +276,7 @@ mod holon_tests {
         );
         assert!(matches!(
             after.element().unwrap(),
-            holonic_core::element::ElementRelation::Storage { .. }
+            holonics::element::ElementRelation::Storage { .. }
         ));
         // The receivers of the Holon declare their core element: passive readings.
         let family = body.read_family().unwrap();

@@ -9,7 +9,7 @@
 //! ```
 //!
 //! and its stored change telescopes exactly into the stage terms. The reaction stage is the core
-//! Holon balance (`holonic_core::law::EnergyBalance`, `Holon/Cayley.lean::midpoint_reaction_balance`):
+//! Holon balance (`holonics::law::EnergyBalance`, `Holon/Cayley.lean::midpoint_reaction_balance`):
 //! with `x̄ = (p + y)/2` and the exact residual `ρ = (I + K/2)p + W_c c − (I − K/2)y` of the returned
 //! centre, `½|y|² − ½|p|² = −⟨x̄, R x̄⟩ + Re⟨x̄, W_c c⟩ + Re⟨x̄, J(c) x̄⟩ − Re⟨x̄, ρ⟩`, `R = −herm W_s`:
 //! `dissipated`, `port`, `reaction` (the skew interconnection's work, exactly `0` for exactly

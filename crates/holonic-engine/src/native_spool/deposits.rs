@@ -126,9 +126,9 @@ pub struct NativeExactReconstructionFibre {
 
 impl NativeExactReconstructionFibre {
     /// The retained `particular + span(radical)` as the core
-    /// [`AffineFibre`](holonic_core::restriction::AffineFibre) (plan phase 10).
-    pub fn affine_fibre(&self) -> holonic_core::restriction::AffineFibre {
-        holonic_core::restriction::AffineFibre::new(self.particular.clone(), self.radical.clone())
+    /// [`AffineFibre`](holonics::restriction::AffineFibre) (plan phase 10).
+    pub fn affine_fibre(&self) -> holonics::restriction::AffineFibre {
+        holonics::restriction::AffineFibre::new(self.particular.clone(), self.radical.clone())
     }
 
     pub fn validate(&self) -> Result<(), NativeSpoolRefusal> {

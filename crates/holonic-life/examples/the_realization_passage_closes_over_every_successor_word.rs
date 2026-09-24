@@ -10,7 +10,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use holonic_engine::cross_chart::chain_law;
-use holonic_engine::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use holonic_engine::generator_native_rest::GeneratorNativeRest;
 use holonic_engine::realization::passage::{
     AddressedPassageOccurrence, ArtifactOccurrence, BoundaryHand, ContinuationPassageReference,

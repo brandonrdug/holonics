@@ -23,7 +23,7 @@
 //! band class is one exact rational comparison — no eigenvalue is extracted, no angle is taken.
 
 use holonic_engine::dimensional_wave::{ExactComplexWaveCurrent, ExactWavePhaseTransport};
-use holonic_engine::exact_value::{AlgebraicRoot, ExactInterval, IntegerPolynomial};
+use holonics::exact_value::{AlgebraicRoot, ExactInterval, IntegerPolynomial};
 use holonic_engine::traversible_chain::{
     Admittance, BandClass, BlochReading, Crossing, PhasedLink, PhasedTransfer, Standing,
     StandingWaveReading, cavity, found_phased,

@@ -58,9 +58,8 @@ use holonic_engine::algebraic::{
 };
 use holonic_engine::causal::EventId;
 use holonic_engine::dilation::{Horizon, WalkOrder, covering_horizon, dilate, euler_reading};
-use holonic_engine::rebase_invariants::{
-    PivotRule, RebaseInvariants, invariants_agree, rebase_invariants, rebase_invariants_on,
-};
+use holonics::rebase_invariants::PivotRule;
+use holonic_engine::rebase_invariants::{RebaseInvariants, invariants_agree, rebase_invariants, rebase_invariants_on};
 
 // -------------------------------------------------------------------------------------------
 // the schedule, which is a receiver

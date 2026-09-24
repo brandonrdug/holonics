@@ -181,7 +181,7 @@ fn exact_positions(
         .vertices
         .iter()
         .map(|(id, vertex)| {
-            let coordinate = |interval: &holonic_engine::exact_value::ExactInterval| {
+            let coordinate = |interval: &holonics::exact_value::ExactInterval| {
                 let center = (&interval.lower + &interval.upper) / BigInt::from(2);
                 let scaled = center * &scale;
                 if scaled.denom() != &BigInt::from(1) {

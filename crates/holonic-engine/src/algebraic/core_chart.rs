@@ -28,8 +28,8 @@
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
-use holonic_core::complex::{CellComplex, ConnectionIncidence};
-use holonic_core::holon::HolonError;
+use holonics::complex::{CellComplex, ConnectionIncidence};
+use holonics::holon::HolonError;
 use num_traits::{One, Zero};
 use relational_geometry::Rat;
 use thiserror::Error;
@@ -38,7 +38,7 @@ use super::{
     CausalAlgebraicError, CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex,
 };
 use crate::EventId;
-use crate::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 
 /// Why an engine complex could not be read as a core complex, or a core complex as an engine one.
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
@@ -78,8 +78,8 @@ impl From<HolonError> for CoreChartRefusal {
     }
 }
 
-impl From<crate::exact_linear::ExactLinearError> for CoreChartRefusal {
-    fn from(error: crate::exact_linear::ExactLinearError) -> Self {
+impl From<holonics::exact_linear::ExactLinearError> for CoreChartRefusal {
+    fn from(error: holonics::exact_linear::ExactLinearError) -> Self {
         Self::Holon(Box::new(HolonError::Linear(error)))
     }
 }

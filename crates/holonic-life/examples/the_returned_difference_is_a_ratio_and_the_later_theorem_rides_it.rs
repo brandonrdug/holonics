@@ -482,7 +482,7 @@ fn main() {
                 .filter(|(_, form)| {
                     matches!(
                         form.compare(&ceiling),
-                        Ok(holonic_engine::exact_value::ExactOrdering::Less)
+                        Ok(holonics::exact_value::ExactOrdering::Less)
                     )
                 })
                 .map(|(member, _)| *member)

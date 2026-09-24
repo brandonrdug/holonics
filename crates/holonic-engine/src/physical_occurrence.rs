@@ -23,10 +23,10 @@
 //!    situated families and returns [`EnvironmentRefusal::EnvironmentsDiffer`] — naming the
 //!    coordinates the two environments diverge in — unless the two environments are the same value.
 //!    Carrying a claim from `e` to `e'` needs a supplied [`EnvironmentPassage`], which is a
-//!    [`crate::continuing_tower::Transition`] whose residual **is** the environment the claim was
+//!    [`holonics::restriction::tower::Transition`] whose residual **is** the environment the claim was
 //!    read at. There is no other path: [`compare_through`] takes the passage by reference.
 //! 4. **Environments are the vertical index of the carrier.** [`EnvironmentTower`] instantiates
-//!    [`crate::continuing_tower::Tower`] on the refinement order of *declared coordinate sets*, so
+//!    [`holonics::restriction::tower::Tower`] on the refinement order of *declared coordinate sets*, so
 //!    refining the environment around one object is a restriction with a residual
 //!    ([`EnvironmentRestriction`]) and not a change of object. Varying the object at one
 //!    environment is the separate, separately typed [`HorizontalFamily`]; varying the environment
@@ -174,8 +174,8 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::continuing_tower::{Tower, TowerFaceOutcome, TowerRefusal, Transition};
-use crate::exact_value::ExactInterval;
+use holonics::restriction::tower::{Tower, TowerFaceOutcome, TowerRefusal, Transition};
+use holonics::exact_value::ExactInterval;
 use crate::physical_constraint_complex::{
     ConstraintComponentId, ConstraintEdge, ConstraintError, ConstraintVertexId, ContactClass,
     DistanceAperture, PairUncertainty, PhysicalConstraintComplex,
@@ -686,7 +686,7 @@ const FORGOTTEN_BY_RESTRICTION: &str =
 ///
 /// Lean counterpart: the refinement order this instantiates is
 /// `Foundation/ContinuingTower.lean::Tower.Refines`; the Rust trait is
-/// [`crate::continuing_tower::Tower`].
+/// [`holonics::restriction::tower::Tower`].
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct EnvironmentTower {
     /// Exterior lineage of the tower, retained as testimony.

@@ -712,19 +712,8 @@ mod tests {
     use std::collections::{BTreeMap, BTreeSet};
     use std::sync::Arc;
 
-    use holonic_engine::{
-        AtmosphericContactSelection, AtmosphericInverseResolution, AtmosphericInverseWork,
-        AtmosphericLayerId, AtmosphericProfileId, AtmosphericReceiverBody, AtmosphericResolutionId,
-        AtmosphericVerticalCoordinate, AtmosphericVerticalFiber, CausalWorld,
-        CoupledInformantEvent, CoupledInformantLaw, CoupledInformantStanding, CoupledPhaseChart,
-        ExactDifferenceVector, ExactInterval, HydrostaticChordReceipt, LearnedPartitionRelation,
-        OpaqueThermalChordDoctrine, PredictedReceiverRelation, ReceiverCoordinateFamilyId,
-        ReceiverPredictionId, ReceiverRelationPrediction, ReceiverRelationState,
-        ReceiverTestimonyId, ReturnedAlgorithmId, ReturnedCellCoverage, ReturnedCellId,
-        ReturnedReceiverCell, ReturnedReceiverPartition, SpectralAddressStatus, SpectralBandId,
-        SpectralContactTemporality, SpectralReceiverContact, SpectralReceiverOccurrence,
-        SpectralScanId, VerticalFiberSupport,
-    };
+    use holonics::exact_value::ExactInterval;
+    use holonic_engine::{AtmosphericContactSelection, AtmosphericInverseResolution, AtmosphericInverseWork, AtmosphericLayerId, AtmosphericProfileId, AtmosphericReceiverBody, AtmosphericResolutionId, AtmosphericVerticalCoordinate, AtmosphericVerticalFiber, CausalWorld, CoupledInformantEvent, CoupledInformantLaw, CoupledInformantStanding, CoupledPhaseChart, ExactDifferenceVector, HydrostaticChordReceipt, LearnedPartitionRelation, OpaqueThermalChordDoctrine, PredictedReceiverRelation, ReceiverCoordinateFamilyId, ReceiverPredictionId, ReceiverRelationPrediction, ReceiverRelationState, ReceiverTestimonyId, ReturnedAlgorithmId, ReturnedCellCoverage, ReturnedCellId, ReturnedReceiverCell, ReturnedReceiverPartition, SpectralAddressStatus, SpectralBandId, SpectralContactTemporality, SpectralReceiverContact, SpectralReceiverOccurrence, SpectralScanId, VerticalFiberSupport};
     use num_bigint::BigInt;
     use relational_geometry::{Rat, ReceiverId};
     use soma_membrane::{

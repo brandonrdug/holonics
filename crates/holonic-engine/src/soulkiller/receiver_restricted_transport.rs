@@ -65,12 +65,12 @@ pub struct FactorSupportSeparator {
 }
 
 impl FactorSupportSeparator {
-    /// The core [`Separation`](holonic_core::restriction::Separation) (plan phase 10): the pair the
+    /// The core [`Separation`](holonics::restriction::Separation) (plan phase 10): the pair the
     /// poorer quotient merges, the receiver that reopens it, and what the two returned.
     pub fn separation(
         &self,
-    ) -> holonic_core::restriction::Separation<ItemId, ReceiverId, Observation> {
-        holonic_core::restriction::Separation::new(
+    ) -> holonics::restriction::Separation<ItemId, ReceiverId, Observation> {
+        holonics::restriction::Separation::new(
             self.inside,
             self.outside,
             self.receiver,

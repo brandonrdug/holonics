@@ -112,7 +112,7 @@
 //! instrument could only reverse a deletion it had performed itself with [`ExactFace::collapsed`].
 //! [`ExactFace::from_binary_float`] is the constructor that takes a **measured** IEEE-754 datum —
 //! a network weight read out of a safetensors payload, a wire word, a decimal literal the compiler
-//! rounded — decoded by `crate::exact_value::ieee754`, which is the workspace's one declared
+//! rounded — decoded by `holonics::exact_value::ieee754`, which is the workspace's one declared
 //! floating-point boundary. **No float crosses into this file.** The mouth takes a
 //! `BinaryFloatDatum`, which is `BigUint` and a power of two.
 //!
@@ -155,8 +155,8 @@ use thiserror::Error;
 use relational_geometry::exact::{Rat, integer};
 use relational_geometry::exact_analysis::RatInterval;
 
-use crate::exact_value::ieee754::{BinaryFloatDatum, BinaryFloatSpecies, FloatReading};
-use crate::exact_value::{CertifiedSeries, ExactInterval, SeriesTailCertificate};
+use holonics::exact_value::ieee754::{BinaryFloatDatum, BinaryFloatSpecies, FloatReading};
+use holonics::exact_value::{CertifiedSeries, ExactInterval, SeriesTailCertificate};
 use relational_geometry::exact::ExactExpr;
 
 #[derive(Debug, Error, Clone, PartialEq, Eq)]
@@ -292,7 +292,7 @@ pub enum FaceProvenance {
     /// behind it. The enclosure is the collapse itself.
     Collapsed { truncated_at_bits: u32 },
     /// A face that arrived as a **real IEEE-754-shaped datum** — a stored weight, a wire word, a
-    /// decimal literal a compiler rounded — decoded by `crate::exact_value::ieee754`.
+    /// decimal literal a compiler rounded — decoded by `holonics::exact_value::ieee754`.
     ///
     /// Everything needed to re-derive the face is retained: the exact pattern, the format, the
     /// declared reading, the scale of what the format could not carry, and where the bits came
@@ -466,7 +466,7 @@ impl ExactFace {
     /// **The mouth.** A real measured floating-point datum, plus the declaration that says what it
     /// is, becomes the face it actually is.
     ///
-    /// `datum` is already exact — `crate::exact_value::ieee754` decoded the interchange pattern
+    /// `datum` is already exact — `holonics::exact_value::ieee754` decoded the interchange pattern
     /// into `BigUint × 2^e` and refused `NaN` and `±∞` by name before this is reachable, so no
     /// float crosses into this module. `reading` is the caller's declaration and cannot be
     /// inferred from the bits:
@@ -1340,7 +1340,7 @@ pub fn finest_admissible_grain(faces: &[ExactFace]) -> CertifiedBits {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::exact_value::ieee754::{decode_bfloat16_bits, decode_binary64_bits};
+    use holonics::exact_value::ieee754::{decode_bfloat16_bits, decode_binary64_bits};
     use relational_geometry::exact_analysis::log_rational_interval;
 
     fn grain_pair() -> Vec<DeclaredGrain> {

@@ -9,7 +9,8 @@
 
 use std::collections::BTreeSet;
 
-use holonic_engine::{is_sha256_digest as is_sha256, ExactComplexWaveCurrent, ExactRatMatrix};
+use holonics::exact_linear::ExactRatMatrix;
+use holonic_engine::{is_sha256_digest as is_sha256, ExactComplexWaveCurrent};
 use serde::Serialize;
 use thiserror::Error;
 

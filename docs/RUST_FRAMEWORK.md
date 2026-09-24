@@ -1,8 +1,9 @@
 # Holonics as a Rust library
 
-[definition] `crates/holonics` is the framework entry point (`publish = false`). Its core,
-structure and geometry paths are still re-exports awaiting their M1 source moves. HNN application
-and wire identifiers retain `hna`; the workbench imports their implementation packages directly.
+[definition] `crates/holonics` is the substantive Holon library (`publish = false`). Its Holon
+facets and exact operators now live at the crate root; structure and geometry remain separate
+source owners awaiting their M1 moves. HNN application and wire identifiers retain `hna`; the
+workbench imports their current implementation packages directly.
 
 [project-postulate] This table records the **current** public paths. The
 [repository restructure](plans/THE_REPOSITORY_RESTRUCTURE.md#31-rust-the-main-holonics-library-owns-the-construction)
@@ -19,16 +20,17 @@ general model architecture.
 
 | Public path | Owner and scope |
 |---|---|
-| `holonics::core` | Temporary re-export of `holonic-core`; M1 will move the Holon law and exact foundation into this crate |
+| `holonics::{Holon,holon,law,port,dirac,complex,element,generator,restriction,deposition}` | The one Holon law and its facets, owned by the main crate |
+| `holonics::{exact_linear,exact_value,exact_work,inertia,prime_image_algebra,rational_polynomial}` | Source-neutral exact operators owned by the main crate |
 | `holonics::structure` | Temporary re-export of `holonic-structure`; M1 will move its surviving structural carriers into this crate |
 | `holonics::geometry` | Temporary re-export of `relational-geometry`; M1 will move exact frames and receiver maps into this crate |
 | `holonic-engine` | Current direct owner of engine mathematics, constitutive fields and resident execution; resident execution moves to `holonics-cuda` |
 | `holonics-hna` | Current direct owner of HNN sessions and application adapters; its backend-neutral HNN law moves into `holonics`, resident execution to CUDA |
 
-[definition] The M1 façade cut removed `holonics`’ `native` feature and its direct dependencies on
-`holonics-hna`, `holonic-engine` and `life`. The workbench already declared those crates directly
-and now imports them by their package crate names. `holonics` therefore builds without pulling in
-the CUDA-bound engine through its own manifest.
+[definition] The M1 dependency cut removed `holonics`’ `native` feature and its direct dependencies
+on `holonics-hna`, `holonic-engine` and `life`. The core source move then absorbed `holonic-core`
+into the main crate root and moved its callers to direct `holonics` paths. The main library builds
+without pulling in the CUDA-bound engine through its own manifest.
 
 ```rust
 use holonics::geometry::{ExactExpr, integer, rat};
@@ -42,7 +44,7 @@ let unevaluated = ExactExpr::symbol("source_parameter");
 
 [definition; M1 transition] The engine and HNN remain direct packages for current consumers; no
 `holonics::engine`, `holonics::hna`, `holonics::soulkiller` or `holonics::interop` forwarding path
-remains. Main still re-exports `core`, `structure` and `geometry` pending their owner moves. Advanced
+remains. Main still re-exports `structure` and `geometry` pending their owner moves. Advanced
 mathematical modules and the resident HNN have not yet moved into their target owners.
 
 ## Productive local generator construction
@@ -141,7 +143,7 @@ the [formula](HNN_FORMULA.md), not a proposal for another `holonics-ml` wrapper 
 
 | Mathematical contract | Existing library implementation | Actual model connection |
 |---|---|---|
-| Exact linear maps, preimages and factorization | `holonic_engine::exact_linear` (while the source owner remains in `holonic-core`), including `ExactRatMatrix::factor_receiver` | `NativeMathematicalSession` constructs resident linear/bilinear operators and parameter families. Its operator/product/predictor maps are application storage, not one assembled field model. |
+| Exact linear maps, preimages and factorization | `holonics::exact_linear`, including `ExactRatMatrix::factor_receiver` | `NativeMathematicalSession` constructs resident linear/bilinear operators and parameter families. Its operator/product/predictor maps are application storage, not one assembled field model. |
 | Normalized attention, weighted mode summaries and descended actions | `exact_linear::KernelModeReduction` and `KernelModeSummary`; formal `AttentionModeCompression`, `GeneratorModeQuotient` | The reducer's callers are its example and unit tests. It uses `ExactRatMatrix`/`Rat` on the host. Native consumption requires lowering the derived operators and current columns through existing resident owners; do not run a host semantic replay loop. |
 | Normalized vector-current transport and learning differential | `exponentiated_ratio::NormalizedKernel::{apply,differential,pullback,fit_step}` | Exact log-rational kernel chart; binary sigmoid and complete value/potential returns. `connected_holonic_field` composes it into the reference field that drives the synopsis. It is exterior CPU execution. |
 | Native multihead block and normalized field return | Earlier `operative_atlas` / `ExtractedOperatorSession`; active `NativeConstitutiveField::normalized_material_return` | The earlier graph has Q/K/V, phase, multihead contact, residual/gated reaction and adjoints. The active field has grouped exponential and material/current pullbacks; width two is a binary normalization. These are actual mechanisms with different consumers, not absent theory. |

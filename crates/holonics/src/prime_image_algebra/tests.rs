@@ -1,7 +1,7 @@
 //! What the certified reading owes, checked on material that can refuse it.
 //!
 //! The measurement at the end is a **normal test** gated by an environment variable rather than an
-//! `#[ignore]`, so the default `cargo test -p holonic-core --lib prime_image_algebra::` run stays
+//! `#[ignore]`, so the default `cargo test -p holonics --lib prime_image_algebra::` run stays
 //! fast and the measured staircase is taken by the same command with the variable set.
 
 use super::*;
@@ -14,7 +14,7 @@ use relational_geometry::Rat;
 const MEASURE_ENV: &str = "HOLONICS_PRIME_IMAGE_MEASURE";
 // The reading taken through the real `rigidity_receiver` consumer
 // (`HOLONICS_PRIME_IMAGE_CONSUMER`) and the cross-check of the hoisted lift against the
-// arithmetic-fibre pair law live in `holonic_engine::prime_image_algebra::tests`, where those
+// arithmetic-fibre pair law live in `holonics::prime_image_algebra::tests`, where those
 // owners are.
 
 /// The lattice geometry both the fixture Jacobian and the consumer reading are built from.
@@ -566,7 +566,7 @@ fn the_certified_reading_agrees_with_the_rational_carrier_on_a_rigidity_jacobian
 }
 
 /// **The measured staircase.** Off by default; taken with
-/// `HOLONICS_PRIME_IMAGE_MEASURE=72,120,180,324,612 cargo test --release -p holonic-core --lib
+/// `HOLONICS_PRIME_IMAGE_MEASURE=72,120,180,324,612 cargo test --release -p holonics --lib
 /// prime_image_algebra::tests::the_measured_staircase -- --nocapture`.
 ///
 /// Every stage is clocked separately, and the clock only reports: the returned certificate's own

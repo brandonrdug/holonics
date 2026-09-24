@@ -586,7 +586,7 @@ fn a_factor_map_is_the_induced_reading_of_a_descent() {
             .collect(),
     };
     let indices: Vec<usize> = (0..members.len()).collect();
-    let descent = holonic_core::restriction::factor_descent(
+    let descent = holonics::restriction::factor_descent(
         &quotient,
         |k: &usize| coarse.read(&members[*k]).expect("a face"),
         &indices,

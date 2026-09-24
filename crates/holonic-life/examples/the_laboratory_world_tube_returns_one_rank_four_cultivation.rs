@@ -14,11 +14,8 @@ use std::{
     time::Instant,
 };
 
-use holonic_engine::{
-    native_spool::{NativeCollapsedFibre, NativeConstitutiveResponse, NativeIncidenceTerm},
-    receiver_exact_compression::ReceiverId,
-    EventId, ExactComplexWaveCurrent, ExactRatMatrix, OccurrencePort,
-};
+use holonics::exact_linear::ExactRatMatrix;
+use holonic_engine::{native_spool::{NativeCollapsedFibre, NativeConstitutiveResponse, NativeIncidenceTerm}, receiver_exact_compression::ReceiverId, EventId, ExactComplexWaveCurrent, OccurrencePort};
 use life::{
     exchange_world_tube::ContinuationAperture,
     native_intelligence::{

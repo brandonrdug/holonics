@@ -15,13 +15,8 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_engine::{
-    derived_factor_cover::{DefectMetrics, DerivedFactorCover, SupportedDefectSection},
-    exact_linear::ExactRatMatrix,
-    receiver_exact_compression::{ItemId, Observation, ReceiverId},
-    receiver_history_compression::NativeStateId,
-    EventId,
-};
+use holonics::exact_linear::ExactRatMatrix;
+use holonic_engine::{derived_factor_cover::{DefectMetrics, DerivedFactorCover, SupportedDefectSection}, receiver_exact_compression::{ItemId, Observation, ReceiverId}, receiver_history_compression::NativeStateId, EventId};
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
 use serde::{Deserialize, Serialize};

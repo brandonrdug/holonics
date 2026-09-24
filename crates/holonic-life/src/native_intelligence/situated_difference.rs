@@ -5,11 +5,8 @@
 //! lineage, and reconstruction owners into the one L0 carrier.  Chart coordinates remain
 //! presentations of the same situated body; a noncommuting chart returns its exact defect.
 
-use holonic_engine::{
-    cross_chart::{cross_chart_defect, CrossChartDefect},
-    native_spool::{NativeCollapsedFibre, NativePullbackOccurrence, NativeThreadObstruction},
-    ExactComplexWaveCurrent, ExactRatMatrix,
-};
+use holonics::exact_linear::ExactRatMatrix;
+use holonic_engine::{cross_chart::{cross_chart_defect, CrossChartDefect}, native_spool::{NativeCollapsedFibre, NativePullbackOccurrence, NativeThreadObstruction}, ExactComplexWaveCurrent};
 use num_rational::BigRational as Rat;
 use num_traits::Zero;
 use serde::{Deserialize, Serialize};
@@ -20,14 +17,14 @@ use super::types::NativeConductedSection;
 
 pub const SITUATED_DIFFERENCE_SCHEMA: &str = "soma-life.situated-difference-section.v1";
 
-holonic_core::fibre_field_names!(pub AffineReconstructionFibreNames = "AffineReconstructionFibre", "particular", "kernel", deny);
+holonics::fibre_field_names!(pub AffineReconstructionFibreNames = "AffineReconstructionFibre", "particular", "kernel", deny);
 
 /// One affine reconstruction fibre of a linear return: the core
-/// [`AffineFibre`](holonic_core::restriction::AffineFibre) under its `particular`/`kernel` wire
+/// [`AffineFibre`](holonics::restriction::AffineFibre) under its `particular`/`kernel` wire
 /// (plan phase 10). `particular + span(kernel)` is retained instead of choosing the particular
 /// point as if it were an inverse.
 pub type AffineReconstructionFibre =
-    holonic_core::restriction::AffineFibre<AffineReconstructionFibreNames>;
+    holonics::restriction::AffineFibre<AffineReconstructionFibreNames>;
 
 /// One forward differential and the receiver constitutive forms which determine its adjoint.
 /// Metrics are mandatory: a bare transpose is not silently promoted to the causal return.
@@ -49,8 +46,8 @@ pub struct CausalAdjointStep {
     pub domain_metric: ExactRatMatrix,
     pub codomain_metric: ExactRatMatrix,
     pub adjoint: ExactRatMatrix,
-    pub forward_factorization: holonic_engine::LinearFactorization,
-    pub adjoint_factorization: holonic_engine::LinearFactorization,
+    pub forward_factorization: holonics::exact_linear::LinearFactorization,
+    pub adjoint_factorization: holonics::exact_linear::LinearFactorization,
 }
 
 /// One covector current as it crosses a named step in reverse order.
@@ -76,15 +73,15 @@ pub enum InverseTransportReceipt {
         backward_identity: bool,
     },
     Refused {
-        factorization: holonic_engine::LinearFactorization,
+        factorization: holonics::exact_linear::LinearFactorization,
         reason: String,
     },
 }
 
 impl InverseTransportReceipt {
-    fn from_engine(receipt: holonic_engine::RebaseReceipt) -> Self {
+    fn from_engine(receipt: holonics::exact_linear::RebaseReceipt) -> Self {
         match receipt {
-            holonic_engine::RebaseReceipt::Rebase {
+            holonics::exact_linear::RebaseReceipt::Rebase {
                 inverse,
                 forward_identity,
                 backward_identity,
@@ -93,7 +90,7 @@ impl InverseTransportReceipt {
                 forward_identity,
                 backward_identity,
             },
-            holonic_engine::RebaseReceipt::Refused {
+            holonics::exact_linear::RebaseReceipt::Refused {
                 factorization,
                 reason,
             } => Self::Refused {

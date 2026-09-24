@@ -80,7 +80,7 @@ use num_traits::Zero;
 use serde::{Deserialize, Serialize};
 
 use crate::conditioned_derivation::Passage;
-use crate::exact_value::ExactOrdering;
+use holonics::exact_value::ExactOrdering;
 use crate::surprisal::{
     Grain, Support, SurprisalError, SymbolicSurprisal, entropy, read_population,
 };

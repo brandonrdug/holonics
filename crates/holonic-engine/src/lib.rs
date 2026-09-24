@@ -129,12 +129,6 @@ pub mod conditioned_derivation;
 // `docs/plans/THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-conditioned-structural-response-consumer`.
 pub mod conditioned_static_response;
 pub mod conic;
-/// The continuing tower carrier: faces over a refinement order, the gluing trichotomy, and the
-/// non-invertible transition that carries its residual. Paired with
-/// `formal/elementary-holonics/ElementaryHolonics/Foundation/ContinuingTower.lean`. Declared, never
-/// glob-exported: `Tower`, `Transition`, `GluingResult` and `MaterializedFace` are deliberately
-/// reached through this module's name so that a caller states which carrier it means.
-pub mod continuing_tower;
 /// The continuing tube: a tower is the transverse section of a tube, longitudinal transport and
 /// transverse restriction commute, and a wormhole is a passage between charts the tube's own order
 /// does not relate. Paired with
@@ -182,8 +176,6 @@ pub mod embedding_fiber;
 // this returns a COCYCLE of exact pairwise ratios and normalises only when a caller names a null.
 // Temperature is a root on the ratio, and the `T -> 0` limit -- argmax -- is never taken.
 pub mod exponentiated_ratio;
-#[cfg(target_os = "linux")]
-pub mod hardware_cover;
 // The coboundary move, as distinct from a chart transition. Hermite reduction changes the
 // representative of a rational integrand by an exact term and leaves the residues untouched, which
 // is why it is a lawful move at all — the integral depends only on the class. The two declared
@@ -243,7 +235,6 @@ pub mod divisor_reconstruction;
 // receipts and named clocks. Paired with `Foundation/EvaluationDiscipline.lean`.
 pub mod evaluation_discipline;
 pub mod evolution;
-pub mod exact_linear;
 mod factored_moment;
 pub use factored_moment::*;
 // The contact between two constructions as an exact ratio that crosses a horizon. `cos²` is
@@ -253,10 +244,6 @@ pub use factored_moment::*;
 pub mod exact_contact;
 pub mod exact_json;
 pub mod exact_owner_testimony;
-pub mod exact_value;
-/// What an exact deed cost, counted rather than timed — the work vector `TABLET_THE_CHART` §3.7
-/// records as owed, with a typed admission and no clock anywhere in it.
-pub mod exact_work;
 pub mod executor;
 pub mod field_atlas;
 /// T7's fold and cut: a reflection applied to one side of an exact rational crease, its side-bit
@@ -313,13 +300,6 @@ pub mod image;
 // `formal/elementary-holonics/ElementaryHolonics/Geometry/TwoSidedIdentityAtlas.lean`.
 pub mod identity_atlas;
 pub mod implicit;
-// Sylvester's law of inertia over exact rationals: the signature of a symmetric form, which is the
-// only way a positivity claim in this body can be a claim about material rather than about the
-// shape of the expression that produced it. Declared, never glob-exported: it names `inertia`,
-// `congruence`, `PivotOrder` and `PivotStep`, and `PivotOrder`/`PivotStep` collide in meaning with
-// `rebase_invariants::PivotRule`/`PivotSchedule` — a form's pivot order and a Smith reduction's
-// must be named apart at every call site.
-pub mod inertia;
 pub mod interaction;
 pub mod interchange;
 pub mod inverse_transport;
@@ -451,9 +431,7 @@ pub mod ported_operation;
 // 2026-08-18: admission and parity testimony only. The resident owner is `resident_section`.
 pub mod ported_reference;
 pub mod quintic_chart;
-// Exact univariate and bivariate polynomials over `Q`, with the complete rational-root census and
-// the fraction-free polynomial resultant that `quintic_chart` eliminates with.
-pub mod rational_polynomial;
+// Engine-specific rebase readings over the exact Smith owner in `holonics`.
 pub mod rebase_invariants;
 pub mod receiver;
 pub mod receiver_exact_compression;
@@ -635,13 +613,9 @@ pub use dimensional_wave::*;
 pub use display::*;
 pub use divisor_reconstruction::*;
 pub use evolution::*;
-pub use exact_linear::*;
-pub use exact_value::*;
 pub use executor::*;
 pub use field_atlas::*;
 pub use graph_receiver::*;
-#[cfg(target_os = "linux")]
-pub use hardware_cover::*;
 pub use holonic_complex::*;
 pub use image::*;
 pub use implicit::*;
@@ -657,7 +631,6 @@ pub use platform::*;
 pub use presentation::*;
 pub use prime_ecology::*;
 pub use quintic_chart::*;
-pub use rational_polynomial::*;
 pub use realization::*;
 pub use receiver::*;
 pub use receiver_current::*;
@@ -670,8 +643,6 @@ pub use tube::*;
 pub use wave_propagation::*;
 pub use world::*;
 
-// Issue #50: one certificate-bearing rank/kernel/solve reached through bounded prime charts, with
-// rational reconstruction and an exact verification owning the return. `exact_linear`'s public API
-// routes through it above a declared extent; the certificate types are reachable here for a
-// consumer that wants the witness rather than only the value.
-pub mod prime_image_algebra;
+// Integration checks of the Holonics prime-image algebra against engine-specific consumers.
+#[cfg(test)]
+mod core_prime_image_integration_tests;

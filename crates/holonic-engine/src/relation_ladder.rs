@@ -227,8 +227,8 @@ pub enum LadderRefusal {
 
 /// [definition] **The scale moved to the core** (plan phase 7): [`Rung`] and [`rung_meet`] are the
 /// relation a receiver establishes, and the core tube's defect profile reads it, so they live in
-/// `holonic_core::law::receiver` and are re-exported here at their existing paths.
-pub use holonic_core::law::receiver::{Rung, rung_meet};
+/// `holonics::law::receiver` and are re-exported here at their existing paths.
+use holonics::law::receiver::{Rung, rung_meet};
 
 // -------------------------------------------------------------------------------------------
 // The declared situation

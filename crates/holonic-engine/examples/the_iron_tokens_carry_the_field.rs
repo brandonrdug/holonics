@@ -79,8 +79,8 @@ use std::path::PathBuf;
 use holonic_engine::corpus_census::{
     CorpusCensus, DECLARED_STRATA, DensityRow, Stratum, SurfaceId, density_band,
 };
-use holonic_engine::exact_value::ExactOrdering;
-use holonic_engine::hardware_cover::HardwareCover;
+use holonics::exact_value::ExactOrdering;
+use holonics::hardware_cover::HardwareCover;
 use holonic_engine::surprisal::{
     Grain, Support, SymbolicSurprisal, cross_entropy, read_population,
 };

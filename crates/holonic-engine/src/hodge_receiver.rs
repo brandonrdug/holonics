@@ -17,7 +17,7 @@
 //! [definition] The metric is a [`MetricDeclaration`] and the unit metric is
 //! [`MetricLaw::Unit`] — **one declaration among others, not the absence of one**. A bare
 //! transpose is the codifferential only under an undeclared orthonormal chart, which is exactly
-//! the substitution [`crate::exact_linear::ExactRatMatrix::metric_adjoint`] exists to refuse; this
+//! the substitution [`holonics::exact_linear::ExactRatMatrix::metric_adjoint`] exists to refuse; this
 //! module reaches the codifferential `δ_k = W_k^{-1} d_k^T W_{k+1}` through that owner and never
 //! writes a transpose in its place. The boundary condition is a [`BoundaryCondition`]:
 //! [`BoundaryCondition::Free`] is the absolute complex, named; [`BoundaryCondition::VanishingOn`]
@@ -30,13 +30,13 @@
 //! |---|---|
 //! | the exact cellular coboundary | [`crate::sheaf_diffusion::ExactCellularSheaf::coboundary`] (`sheaf_diffusion.rs:274`) through the rank-one sheaf on the same complex |
 //! | the unit-metric Hodge operator to agree with, entry for entry | [`crate::sheaf_diffusion::ExactCellularSheaf::hodge_laplacian`] (`:307`), checked in `the_coboundary_and_the_unit_laplacian_agree_with_the_cellular_sheaf_owner` |
-//! | the metric adjoint | [`crate::exact_linear::ExactRatMatrix::metric_adjoint`] (`exact_linear.rs:987`) and [`crate::exact_linear::ExactRatMatrix::adjoint_defect`] (`:1006`) |
+//! | the metric adjoint | [`holonics::exact_linear::ExactRatMatrix::metric_adjoint`] (`exact_linear.rs:987`) and [`holonics::exact_linear::ExactRatMatrix::adjoint_defect`] (`:1006`) |
 //! | rank, kernel, image, preimage fibre | `exact_linear.rs:761,770,796,823` |
-//! | Betti numbers with torsion | [`crate::rebase_invariants::smith_normal_form`] (`rebase_invariants.rs:440`), cross-checked against [`crate::rebase_invariants::rebase_invariants`] (`:723`) |
+//! | Betti numbers with torsion | [`holonics::rebase_invariants::smith_normal_form`] (`rebase_invariants.rs:440`), cross-checked against [`crate::rebase_invariants::rebase_invariants`] (`:723`) |
 //! | the characteristic polynomial over `ℚ` | [`crate::lattice_gauge::characteristic_polynomial`] (`lattice_gauge.rs:946`) |
-//! | squarefree factorization with multiplicities | [`crate::rational_polynomial::RationalPolynomial::squarefree_decomposition`] |
-//! | every rational eigenvalue, completely | [`crate::rational_polynomial::rational_roots_by_lifting`] |
-//! | the Sturm root count and the isolation certificate | [`crate::exact_value::IntegerPolynomial::distinct_root_count`] and [`crate::exact_value::AlgebraicRoot::isolate`] |
+//! | squarefree factorization with multiplicities | [`holonics::rational_polynomial::RationalPolynomial::squarefree_decomposition`] |
+//! | every rational eigenvalue, completely | [`holonics::rational_polynomial::rational_roots_by_lifting`] |
+//! | the Sturm root count and the isolation certificate | [`holonics::exact_value::IntegerPolynomial::distinct_root_count`] and [`holonics::exact_value::AlgebraicRoot::isolate`] |
 //!
 //! [definition] **Where the isolation lives, and what this receiver contributes to it.**
 //! [`crate::lattice_gauge::exact_spectrum`] answers the same question and its rational half is used
@@ -45,9 +45,9 @@
 //! `max |coefficient| + 1` of the monic companion, which for a Hodge Laplacian is astronomically
 //! wider than the spectrum — so this module carried its own descent from the bound
 //! positive semidefiniteness gives it. **That is no longer a second descent.**
-//! [`crate::rational_polynomial::isolate_against_chain`] takes a declared enclosure as a
+//! [`holonics::rational_polynomial::isolate_against_chain`] takes a declared enclosure as a
 //! first-class argument and does the bisection against one cached
-//! [`crate::exact_value::SturmChain`]; what this receiver contributes is the enclosure itself,
+//! [`holonics::exact_value::SturmChain`]; what this receiver contributes is the enclosure itself,
 //! `Δ_k` being positive semidefinite in the declared metric so that **every eigenvalue lies in
 //! `[0, tr Δ_k]`**. One chain is built per reading and every count below — the isolation, the
 //! certificates, [`refine_spectral_gap`] — is taken against it.
@@ -75,9 +75,9 @@
 //!
 //! [implemented-exact] [`exact_hodge_spectrum`] returns the characteristic polynomial over `ℚ`,
 //! its squarefree decomposition keyed by multiplicity, every rational eigenvalue with its
-//! multiplicity, and every irrational eigenvalue as an [`crate::exact_value::AlgebraicRoot`] —
+//! multiplicity, and every irrational eigenvalue as an [`holonics::exact_value::AlgebraicRoot`] —
 //! a polynomial plus a rational interval plus the Sturm sign-variation certificate that the
-//! interval holds exactly one root. The spectral gap is an [`crate::exact_value::ExactInterval`]
+//! interval holds exactly one root. The spectral gap is an [`holonics::exact_value::ExactInterval`]
 //! and is a point interval exactly when the smallest positive eigenvalue is rational. **No float
 //! appears anywhere on this path**, including in the gap.
 //!
@@ -118,7 +118,7 @@
 //! # The core complex and its storage
 //!
 //! [definition] The operator is a chart of the Holon core (plan phase 4):
-//! [`HodgeOperator::core_chart`] is its active complex as `holonic_core::complex::CellComplex`
+//! [`HodgeOperator::core_chart`] is its active complex as `holonics::complex::CellComplex`
 //! and [`HodgeOperator::metric_storage`] its declared metric as core storage `W_k`. The core
 //! `CellComplex::{coboundary, codifferential, hodge_laplacian}` under that storage return this
 //! operator's `d_k`, `δ_k` and `Δ_k` entry for entry (tested); this module keeps its own
@@ -160,18 +160,20 @@ use thiserror::Error;
 use crate::algebraic::{
     CausalAlgebraicError, CausalCellId, CoreCellChart, CoreChartRefusal, GradedCausalComplex,
 };
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
-use crate::exact_value::{AlgebraicRoot, ExactInterval, ExactValueError, IntegerPolynomial, SturmChain};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::exact_value::{AlgebraicRoot, ExactInterval, ExactValueError, IntegerPolynomial, SturmChain};
 use crate::lattice_gauge::{LatticeGaugeRefusal, characteristic_polynomial};
 use crate::physical_constraint_complex::{ConstraintVertexId, PhysicalConstraintComplex};
 use crate::physical_constraint_grading::{
     ConstraintGradingError, ConstraintComplexFamily, GradedConstraintComplex, OpenContact,
     OpenContactLaw, graded_constraint_family, graded_constraint_member,
 };
-use crate::rational_polynomial::{
+use holonics::rational_polynomial::{
     ExactPolynomialError, RationalPolynomial, isolate_against_chain, rational_roots_by_lifting,
 };
-use crate::rebase_invariants::{IntegerMatrix, PivotRule, smith_normal_form};
+use holonics::rebase_invariants::IntegerMatrix;
+use holonics::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::smith_normal_form;
 
 // -------------------------------------------------------------------------------------------
 // the declared metric
@@ -900,25 +902,25 @@ impl HodgeOperator {
 
     /// [definition] **The declared metric of one grade as core storage**: the positive diagonal form
     /// `W_k`, an `ElementRelation::Storage` on the grade's cochains. The codifferential is its
-    /// metric adjoint, `holonic_core::complex::CellComplex::codifferential(k, W_k, W_(k+1))`,
+    /// metric adjoint, `holonics::complex::CellComplex::codifferential(k, W_k, W_(k+1))`,
     /// equal entry for entry to [`Self::codifferential`] (tested).
     pub fn metric_storage(
         &self,
         grade: u32,
-    ) -> Result<holonic_core::inertia::SymmetricForm, HodgeError> {
+    ) -> Result<holonics::inertia::SymmetricForm, HodgeError> {
         let diagonal = self
             .cells(grade)
             .iter()
             .map(|cell| self.metric.weight(*cell).cloned())
             .collect::<Result<Vec<_>, _>>()?;
-        Ok(holonic_core::inertia::SymmetricForm::from_diagonal(
+        Ok(holonics::inertia::SymmetricForm::from_diagonal(
             diagonal,
         ))
     }
 
     /// The metric storage of every grade `0..=dimension`, the argument of
     /// `CellComplex::hodge_laplacian`.
-    pub fn metric_storages(&self) -> Result<Vec<holonic_core::inertia::SymmetricForm>, HodgeError> {
+    pub fn metric_storages(&self) -> Result<Vec<holonics::inertia::SymmetricForm>, HodgeError> {
         let top = self.dimension.map_or(0, |grade| grade);
         (0..=top).map(|grade| self.metric_storage(grade)).collect()
     }
@@ -1411,7 +1413,7 @@ pub fn hodge_readings(operator: &HodgeOperator) -> Result<Vec<HodgeReading>, Hod
 
 /// The Betti number and torsion coefficients of the active complex at one grade, over `ℤ`.
 ///
-/// Reduced by [`crate::rebase_invariants::smith_normal_form`]. The boundary matrices are
+/// Reduced by [`holonics::rebase_invariants::smith_normal_form`]. The boundary matrices are
 /// assembled here rather than by [`crate::rebase_invariants::boundary_matrix_on`] because that
 /// owner requires a support closed under boundary, and the active population of a
 /// [`BoundaryCondition::VanishingOn`] reading is the *complement* of a closed set, which is not
@@ -1470,7 +1472,7 @@ fn active_boundary_matrix(operator: &HodgeOperator, grade: u32) -> IntegerMatrix
 /// One eigenvalue, held exactly.
 ///
 /// **Its wire adds nothing of its own.** Every rational is a lawful rational eigenvalue reading,
-/// and the isolated case is a [`crate::exact_value::AlgebraicRoot`], whose wire re-runs the Sturm
+/// and the isolated case is a [`holonics::exact_value::AlgebraicRoot`], whose wire re-runs the Sturm
 /// isolation and refuses a certificate that does not agree with the polynomial it travels with.
 /// *Which* polynomial that is — this spectrum's radical rather than some other — is the relation
 /// that matters, and it is enforced at [`ExactHodgeSpectrum`] where the radical is in hand.

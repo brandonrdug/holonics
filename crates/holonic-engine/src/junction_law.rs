@@ -129,12 +129,12 @@ use crate::algebraic::{
     CausalAlgebraicError, CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex,
 };
 use crate::causal::EventId;
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::hodge_receiver::{
     BoundaryCondition, HodgeError, HodgeOperator, MetricDeclaration, hodge_reading,
 };
 use crate::quantity::{BaseUnits, Dimension, Quantity, QuantityError};
-use crate::relation_ladder::Rung;
+use holonics::law::receiver::Rung;
 
 pub const JUNCTION_LAW_SCHEMA: &str = "holonic-engine.junction-law.v1";
 
@@ -332,8 +332,8 @@ impl JointUnits {
     /// **The declared joint as one core port** (`Holon/Port.lean::power`): flow the flux, effort
     /// the potential, power their product, each through [`Dimension::to_core`]. The core refuses a
     /// power that is not flow times effort, which this declaration already re-derived.
-    pub fn port_units(&self) -> Result<holonic_core::port::PortUnits, JunctionRefusal> {
-        holonic_core::port::PortUnits::declared(
+    pub fn port_units(&self) -> Result<holonics::port::PortUnits, JunctionRefusal> {
+        holonics::port::PortUnits::declared(
             self.flux.to_core()?,
             self.potential.to_core()?,
             self.power.to_core()?,
@@ -352,7 +352,7 @@ impl JointUnits {
     pub fn from_port_units(
         lineage: impl Into<String>,
         base: BaseUnits,
-        units: &holonic_core::port::PortUnits,
+        units: &holonics::port::PortUnits,
     ) -> Result<Self, JunctionRefusal> {
         let potential = Dimension::from_core(&base, units.effort())?;
         let flux = Dimension::from_core(&base, units.flow())?;
@@ -1218,8 +1218,8 @@ impl TellegenReceipt {
     /// receipt's own `dissipated − delivered`, number for number. The magnitudes are read in the
     /// declared power unit; a receipt whose three quantities do not share one dimension is refused.
     /// Tellegen on the Kirchhoff structure is `Holon/Dirac.lean::tellegen`; the tests assert the
-    /// core's `holonic_core::dirac::tellegen` returns the same pair at the metric-weighted flux.
-    pub fn energy_balance(&self) -> Result<holonic_core::law::EnergyBalance, JunctionRefusal> {
+    /// core's `holonics::dirac::tellegen` returns the same pair at the metric-weighted flux.
+    pub fn energy_balance(&self) -> Result<holonics::law::EnergyBalance, JunctionRefusal> {
         let (dissipated, unit) = self.dissipated.parts();
         let (delivered, delivered_unit) = self.delivered.parts();
         let (_, residual_unit) = self.residual.parts();
@@ -1235,7 +1235,7 @@ impl TellegenReceipt {
             }
         }
         let zero = Rat::zero();
-        Ok(holonic_core::law::EnergyBalance::closed(
+        Ok(holonics::law::EnergyBalance::closed(
             zero.clone(),
             dissipated.clone(),
             delivered.clone(),
@@ -1553,9 +1553,9 @@ impl ResistiveNetwork {
     /// dissipation `⟨u, G u⟩` is the Tellegen ledger's dissipated power at those drops.
     pub fn conductance_relation(
         &self,
-    ) -> Result<holonic_core::element::ResistiveRelation, JunctionRefusal> {
+    ) -> Result<holonics::element::ResistiveRelation, JunctionRefusal> {
         let conductance = ExactRatMatrix::from_diagonal(self.conductances.clone())?;
-        holonic_core::element::ResistiveRelation::new(conductance)
+        holonics::element::ResistiveRelation::new(conductance)
             .map_err(|error| JunctionRefusal::Hodge(HodgeError::Core(Box::new(error.into()))))
     }
 }
@@ -2356,9 +2356,9 @@ impl Triangulation {
     /// numbers with torsion, the `𝔽₂` Betti numbers, the boundary circles, the surface
     /// certificate and the orientation bit.
     pub fn reading(&self) -> Result<SurfaceReading, JunctionRefusal> {
-        use crate::rebase_invariants::{
-            PivotRule, boundary_matrix, rebase_invariants, smith_normal_form,
-        };
+        use holonics::rebase_invariants::PivotRule;
+        use holonics::rebase_invariants::smith_normal_form;
+        use crate::rebase_invariants::{boundary_matrix, rebase_invariants};
 
         let certificate = self.certificate();
         // The reading is a surface's. A declaration that fails its certificate returns the
@@ -2792,7 +2792,7 @@ pub fn compare_surfaces(left: &SurfaceReading, right: &SurfaceReading) -> Surfac
     };
     SurfaceComparison {
         homological_rung,
-        rung: crate::relation_ladder::rung_meet(homological_rung, finer_rung),
+        rung: holonics::law::receiver::rung_meet(homological_rung, finer_rung),
         agreeing,
         separators,
     }

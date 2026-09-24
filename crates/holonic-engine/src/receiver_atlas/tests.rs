@@ -750,13 +750,13 @@ use num_traits::One;
 use crate::algebraic::{CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex};
 use crate::causal::EventId;
 use crate::causal_chord::{Linearization, separate_under_probe, transfer_function};
-use crate::exact_linear::ExactRatMatrix;
-use crate::exact_value::ExactInterval;
+use holonics::exact_linear::ExactRatMatrix;
+use holonics::exact_value::ExactInterval;
 use crate::hodge_receiver::{
     BoundaryCondition, HodgeOperator, MetricDeclaration, hodge_reading,
 };
 use crate::physical_constraint_complex::{ConstraintComponentId, CoordinateBox3};
-use crate::rational_polynomial::RationalPolynomial;
+use holonics::rational_polynomial::RationalPolynomial;
 use crate::topological_receiver::{
     ApertureFiltration, Coefficients, DeclaredFiltration, FiltrationOrder, OrderLaw, persistence,
     persistence_with_grade_zero_agreement,
@@ -1537,9 +1537,11 @@ fn a_chart_that_reads_only_one_occurrence_separates_nothing() {
 use std::path::{Path, PathBuf};
 
 use crate::causal_chord::{NetworkForm, elastic_network};
-use crate::receiver_release::{
-    CompatibleFamily, DiameterNorm, ExactFace, Reading, WidthRefusal, width_enumerated,
-};
+use holonics::law::receiver::DiameterNorm;
+use holonics::law::receiver::ExactFace;
+use holonics::law::receiver::Reading;
+use holonics::law::receiver::WidthRefusal;
+use crate::receiver_release::{CompatibleFamily, width_enumerated};
 
 const STRUCTURE_ROOT_ENV: &str = "HOLONICS_M5_STRUCTURE_ROOT";
 const DEFAULT_STRUCTURE_ROOT: &str = "/home/b/Downloads/holonics-m5-rbx1-rank05";

@@ -3,7 +3,7 @@ use super::{
     ResidentFactoredMomentTransportAddress, ResidentFactoredMomentTransportOccurrence,
     ResidentFactoredMomentTransportReturn, ResidentMembraneInteriorWord, cuCtxSynchronize, driver,
 };
-use crate::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use num_bigint::{BigInt, BigUint};
 use num_traits::Zero;
 use relational_geometry::Rat;

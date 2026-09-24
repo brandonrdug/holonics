@@ -1253,7 +1253,7 @@ fn the_tellegen_ledger_is_a_core_energy_balance_with_the_same_numbers() {
         .unwrap()
         .apply(&solution.drops)
         .unwrap();
-    let (drops_against_flux, potential_against_source) = holonic_core::dirac::tellegen(
+    let (drops_against_flux, potential_against_source) = holonics::dirac::tellegen(
         &operator.coboundary(0).unwrap(),
         &solution.potentials,
         &weighted_flux,
@@ -1286,7 +1286,7 @@ fn a_declared_joint_is_one_core_port_and_round_trips() {
         half.to_core(),
         Err(QuantityError::NonIntegralCoreExponent { .. })
     ));
-    let outside = holonic_core::port::Dimension::base("W");
+    let outside = holonics::port::Dimension::base("W");
     assert!(matches!(
         crate::quantity::Dimension::from_core(&base, &outside),
         Err(QuantityError::CoreDimensionOutsideBase { .. })
@@ -1298,7 +1298,7 @@ fn a_declared_joint_is_one_core_port_and_round_trips() {
 
 /// **The network is the core complex with a certified resistive element (plan phase 4).** The
 /// chart's `d₀` is the operator's; the Kirchhoff structure of the chart is Dirac and passes Tellegen
-/// on its basis; `junction_law::tellegen` equals `holonic_core::dirac::tellegen` on the chart's
+/// on its basis; `junction_law::tellegen` equals `holonics::dirac::tellegen` on the chart's
 /// incidence at the solved potential and the Ohmic flux; the conductance relation's dissipation is
 /// the ledger's dissipated power.
 #[test]
@@ -1319,7 +1319,7 @@ fn the_network_is_the_core_complex_and_its_ledger_is_core_tellegen() {
         .power_ledger(&solution.potentials)
         .expect("the ledger returns");
     let (drops_against_flux, potential_against_source) =
-        holonic_core::dirac::tellegen(&incidence, &solution.potentials, &solution.currents)
+        holonics::dirac::tellegen(&incidence, &solution.potentials, &solution.currents)
             .unwrap();
     assert_eq!(&drops_against_flux, receipt.dissipated.parts().0);
     assert_eq!(&potential_against_source, receipt.delivered.parts().0);

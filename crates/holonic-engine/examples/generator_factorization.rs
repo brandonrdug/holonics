@@ -1,6 +1,6 @@
 //! Exterior exact algorithm synthesis through the standing rational preimage owner.
 //! No native ecology, foreign model, floating arithmetic or replacement elimination engine.
-use holonic_engine::exact_linear::{
+use holonics::exact_linear::{
     BilinearOperator, BilinearSupportSearch, ExactRatMatrix, ReceiverFactorization,
 };
 use num_traits::{One, Zero};
@@ -195,7 +195,7 @@ fn gamma_jet() -> Result<Value, Box<dyn std::error::Error>> {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let bilinear = multiplication_search()?;
     let result = json!({"schema":"holonics.exterior-generator-factorization.v1",
-        "owner":"holonic_engine::exact_linear::ExactRatMatrix::preimage_fibre",
+        "owner":"holonics::exact_linear::ExactRatMatrix::preimage_fibre",
         "bilinear":bilinear,
         "series":[route_synthesis("arctan(1/5), Machin arm",
             vec![q(-1,75),q(-3,125),q(-1,35)],(q(1,5),q(1,5)),q(-7,225))?,

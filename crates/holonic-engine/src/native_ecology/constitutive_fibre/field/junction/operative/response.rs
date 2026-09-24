@@ -40,10 +40,10 @@ pub struct NativeMaterialContactResponseReading {
     pub solve_residual: NativeFieldCurrentBall,
 }
 impl NativeMaterialContactResponseReading {
-    pub fn contact(&self,at:usize) -> Result<Vec<ExactComplexWaveCurrent>,crate::exact_linear::ExactLinearError> {
+    pub fn contact(&self,at:usize) -> Result<Vec<ExactComplexWaveCurrent>,holonics::exact_linear::ExactLinearError> {
         let mut value=self.contact_covector.contact(at)?;
         if let Some(extra)=self.propagation_contacts.as_ref().and_then(|v|v.get(at)) {
-            if extra.len()!=value.len(){return Err(crate::exact_linear::ExactLinearError::ShapeMismatch);}
+            if extra.len()!=value.len(){return Err(holonics::exact_linear::ExactLinearError::ShapeMismatch);}
             for (a,b) in value.iter_mut().zip(extra){*a=a.add(b);}
         }
         Ok(value)

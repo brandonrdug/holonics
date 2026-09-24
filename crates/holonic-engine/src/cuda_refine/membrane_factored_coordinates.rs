@@ -6,7 +6,7 @@ use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
 use relational_geometry::Rat;
 
-use crate::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 
 use super::{
     Buffer, CudaRefineError, ResidentFactoredMomentCoordinateAddress,

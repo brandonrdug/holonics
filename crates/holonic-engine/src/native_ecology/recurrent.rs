@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use thiserror::Error;
 
-use crate::exact_work::ExactWork;
+use holonics::exact_work::ExactWork;
 use crate::generator_native_rest::{GeneratorNativeRest, NativeGenerator};
 use crate::receiver_exact_compression::{InputId, Observation, ReceiverId};
 use crate::receiver_history_compression::{NativeStateId, NativeTransport};
@@ -72,13 +72,13 @@ pub struct RetainedContinuationSection {
     pub open_exterior: Vec<String>,
 }
 
-holonic_core::fibre_field_names!(pub BoundaryFibreNames = "BoundaryFibre", "native", "source_sections", deny);
+holonics::fibre_field_names!(pub BoundaryFibreNames = "BoundaryFibre", "native", "source_sections", deny);
 
 /// The source sections one native boundary merges: the core
-/// [`PreimageFibre`](holonic_core::restriction::PreimageFibre) under its `native`/`source_sections`
+/// [`PreimageFibre`](holonics::restriction::PreimageFibre) under its `native`/`source_sections`
 /// wire (plan phase 10).
 pub type BoundaryFibre =
-    holonic_core::restriction::PreimageFibre<NativeStateId, Vec<String>, BoundaryFibreNames>;
+    holonics::restriction::PreimageFibre<NativeStateId, Vec<String>, BoundaryFibreNames>;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]

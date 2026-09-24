@@ -19,7 +19,7 @@ fn field<'c>(surface: &'c ResidentSurface<'c>) -> NativeConstitutiveField<'c> {
     f.enable_causal_contact_propagation().unwrap();
     f
 }
-fn waves(values: &[crate::exact_value::ExactInterval]) -> Vec<ExactComplexWaveCurrent> {
+fn waves(values: &[holonics::exact_value::ExactInterval]) -> Vec<ExactComplexWaveCurrent> {
     let two = Rat::one() + Rat::one();
     values
         .chunks_exact(2)

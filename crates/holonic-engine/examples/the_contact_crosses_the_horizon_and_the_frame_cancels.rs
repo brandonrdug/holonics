@@ -31,7 +31,7 @@ use std::collections::BTreeMap;
 use holonic_engine::clifford::Aim;
 use holonic_engine::embedding_fiber::{AlignedMaterial, align_bfloat16, safetensors};
 use holonic_engine::exact_contact::{ContactError, ExactContact, RatioFace};
-use holonic_engine::exact_value::ExactOrdering;
+use holonics::exact_value::ExactOrdering;
 use num_bigint::BigInt;
 use num_traits::Zero;
 

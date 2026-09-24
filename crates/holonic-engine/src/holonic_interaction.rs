@@ -17,7 +17,7 @@
 //! | `quad`, `quad_add`, `quad_neg`, `quad_smul` | [`ContactDissipation::power`] and [`ClockedEnergy`] |
 //! | `faceForm`, `contactForm` | [`ContactFace`] and [`ContactDissipation::assemble`] |
 //! | `quad_faceForm`, `quad_contactForm` | [`ContactDissipation::power_by_face`], which returns the face population and never only its sum |
-//! | `contactForm_nonneg` | [`ContactDissipation`]'s constructor, which certifies positive semidefiniteness through [`crate::inertia::inertia`] and refuses otherwise |
+//! | `contactForm_nonneg` | [`ContactDissipation`]'s constructor, which certifies positive semidefiniteness through [`holonics::inertia::inertia`] and refuses otherwise |
 //! | `contactForm_quad_eq_zero_iff`, `contactForm_quad_eq_zero_iff_no_slip` | [`ContactDissipation::zero_slip_kernel`] |
 //! | `contactForm_mulVec_eq_zero_of_no_slip`, `contactForm_kernel_iff` | [`ContactDissipation::kernel_basis`] compared against the zero-slip kernel |
 //! | `clockedEnergy`, `clockedEnergy_eq_duration_times_power`, `clockedEnergy_scales_inversely` | [`ContactDissipation::clocked_energy`] and [`Clock`] |
@@ -43,7 +43,7 @@
 //! `J_f` (relative slip `s_f = J_f v`), a constitutive response `D_f` giving the traction
 //! `t_f = −D_f s_f`, and a declared positive weight `w_f` — the face's area or measure. `D_f` is
 //! **checked** positive semidefinite in the declared pairing through
-//! [`crate::inertia::inertia`], and a face whose response is indefinite is refused by name.
+//! [`holonics::inertia::inertia`], and a face whose response is indefinite is refused by name.
 //!
 //! # The contact exchange
 //!
@@ -134,7 +134,7 @@
 //!
 //! # The interaction is a core Holon
 //!
-//! [definition] [`holon`] builds the core `holonic_core::holon::Holon` from these parts — media and
+//! [definition] [`holon`] builds the core `holonics::holon::Holon` from these parts — media and
 //! couplings as storage with the skew Dirac part, contact faces as resistive ports on their slips,
 //! the source as external ports, the perspective as a passive coholon's reader, a participating
 //! receiver as a joined Holon and a perturbation as deposition work — and its
@@ -158,13 +158,14 @@ use serde::Serialize;
 use thiserror::Error;
 
 use crate::causal_chord::{
-    ChordRefusal, HalfPlaneCount, Linearization, PoleAtlas, PoleReading, TransferFunction,
+    ChordRefusal, Linearization, PoleAtlas, PoleReading, TransferFunction,
     half_plane_count, pole_atlas, rate_form, transfer_function,
 };
+use holonics::rational_polynomial::HalfPlaneCount;
 use crate::edit_rigidity::{EditRigidityRefusal, ExactMetric};
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::hodge_receiver::HodgeOperator;
-use crate::inertia::{Inertia, InertiaError, SymmetricForm, inertia};
+use holonics::inertia::{Inertia, InertiaError, SymmetricForm, inertia};
 use crate::junction_law::{
     Interface, JointUnits, JunctionField, JunctionRefusal, JunctionVerdict, check_junction,
 };
@@ -193,9 +194,9 @@ pub const DECLARED_ASSEMBLY_CEILING: usize = 1 << 26;
 
 /// **The joint dimension above which the assembled signature is not taken by congruence.**
 ///
-/// [definition] [`crate::inertia::inertia`] is a symmetric elimination over `Rat`: cubic in the
+/// [definition] [`holonics::inertia::inertia`] is a symmetric elimination over `Rat`: cubic in the
 /// extent with the same unbounded coefficient growth that
-/// [`crate::exact_linear::DECLARED_PRIME_IMAGE_CROSSOVER`] exists to answer, and it is why a
+/// [`holonics::exact_linear::DECLARED_PRIME_IMAGE_CROSSOVER`] exists to answer, and it is why a
 /// 612-coordinate complex could not be read even once its assembly fitted. Above this ceiling the
 /// signature is still **complete and exact**, and it is obtained differently:
 /// `negative = 0` because the assembly is positive semidefinite *by construction* — every face
@@ -403,10 +404,10 @@ pub enum InteractionRefusal {
     /// The certified prime-image rank or fibre owner refused. Preserve the exact cause so a
     /// caller can distinguish a prime budget, reconstruction, cover, or extent refusal.
     #[error(transparent)]
-    PrimeImage(#[from] crate::prime_image_algebra::PrimeImageRefusal),
+    PrimeImage(#[from] holonics::prime_image_algebra::PrimeImageRefusal),
     /// The Holon core refused (a Dirac, resistance or step certificate).
     #[error(transparent)]
-    Holon(#[from] holonic_core::holon::HolonError),
+    Holon(#[from] holonics::holon::HolonError),
 }
 
 fn bounded(
@@ -517,9 +518,9 @@ fn pairing(
 /// declares it, and a non-positive duration is refused by name.
 ///
 /// [definition; agent-inferred] **One clock.** The clock itself is the core
-/// [`holonic_core::generator::Clock`]; this type is that clock with its lineage and unit tag
+/// [`holonics::generator::Clock`]; this type is that clock with its lineage and unit tag
 /// attached. A declaration claims no ring, so its core chart is the unwound clock
-/// ([`holonic_core::generator::Clock::unwound`], step `h`, every tick one counted passage); a ring
+/// ([`holonics::generator::Clock::unwound`], step `h`, every tick one counted passage); a ring
 /// is a separate closure claim, supplied through [`Self::on_ring`]. The wire shape is unchanged:
 /// `{"lineage", "duration", "unit"}`, `Serialize` only, with `duration` the core step `h`.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -530,7 +531,7 @@ pub struct Clock {
 }
 
 /// The core clock this declaration carries.
-pub use holonic_core::generator::Clock as CoreClock;
+use holonics::generator::Clock as CoreClock;
 
 impl Serialize for Clock {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -629,7 +630,7 @@ impl Clock {
     pub fn on_ring(
         &self,
         radices: Vec<num_bigint::BigUint>,
-    ) -> Result<CoreClock, holonic_core::holon::HolonError> {
+    ) -> Result<CoreClock, holonics::holon::HolonError> {
         CoreClock::new(self.clock.step().clone(), radices)
     }
 }
@@ -642,7 +643,7 @@ impl Clock {
 ///
 /// [definition] `s_f = J_f v` is the relative slip of the motion `v` at this face, and
 /// `t_f = −D_f s_f` is the constitutive traction opposing it. `D_f` is checked positive
-/// semidefinite in the declared pairing through [`crate::inertia::inertia`]; the weight `w_f` is
+/// semidefinite in the declared pairing through [`holonics::inertia::inertia`]; the weight `w_f` is
 /// the face's declared area or measure and must be strictly positive.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct ContactFace {
@@ -997,7 +998,7 @@ impl ContactFace {
 /// **How the assembled signature was obtained.** Carried on the value, never inferred by a reader.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 pub enum SignatureScope {
-    /// The symmetric congruence elimination of [`crate::inertia::inertia`], at or below
+    /// The symmetric congruence elimination of [`holonics::inertia::inertia`], at or below
     /// [`DECLARED_ASSEMBLY_CONGRUENCE_CEILING`]. The assembly's own arithmetic is what was checked.
     Congruence,
     /// Above that ceiling: `negative = 0` because the assembly is positive semidefinite **by
@@ -1016,7 +1017,7 @@ pub enum SignatureScope {
 /// [proved-derived; implemented-exact] This is the carrier plan's derived configuration-space
 /// dissipation form. Its positive semidefiniteness is the Lean owner's `contactForm_nonneg`.
 /// At or below [`DECLARED_ASSEMBLY_CONGRUENCE_CEILING`] it is **certified here** through
-/// [`crate::inertia::inertia`] rather than inherited from the faces' own certificates: the
+/// [`holonics::inertia::inertia`] rather than inherited from the faces' own certificates: the
 /// assembly is where exact arithmetic could go wrong, so that is where it is checked. Above that
 /// ceiling the congruence is the thing that cannot run, and what replaces it is stated on
 /// [`SignatureScope`] and checked in [`Self::assemble`] — not dropped.
@@ -1228,7 +1229,7 @@ impl ContactDissipation {
                 });
             }
         }
-        let certificate = crate::prime_image_algebra::certified_kernel(assembled)?;
+        let certificate = holonics::prime_image_algebra::certified_kernel(assembled)?;
         let dimension = assembled.columns();
         let rank = certificate.rank();
         for motion in certificate.kernel() {

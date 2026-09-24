@@ -21,7 +21,7 @@ use super::deflate::{
 use super::mmcif::{DecimalToken, StructurePresentation};
 use super::numpy::{ExactWord, NpyArray, NumpySource, UncertaintyWordFormat};
 use super::*;
-use crate::exact_value::ieee754::{FloatReading, decode_binary16_bits, decode_binary32_bits};
+use holonics::exact_value::ieee754::{FloatReading, decode_binary16_bits, decode_binary32_bits};
 use crate::physical_constraint_complex::ContactClass;
 
 // ---------------------------------------------------------------------------------------------

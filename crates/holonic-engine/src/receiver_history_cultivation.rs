@@ -19,7 +19,7 @@ use thiserror::Error;
 
 use relational_geometry::Rat;
 
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::generator_native_rest::{GeneratorNativeRest, GeneratorNativeRestError};
 use crate::receiver_exact_compression::InputId;
 use crate::receiver_history_compression::NativeStateId;

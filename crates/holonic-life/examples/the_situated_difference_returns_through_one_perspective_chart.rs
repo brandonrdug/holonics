@@ -7,10 +7,8 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use holonic_engine::{
-    native_spool::{NativeCollapsedFibre, NativePullbackOccurrence},
-    EventId, ExactComplexWaveCurrent, ExactRatMatrix,
-};
+use holonics::exact_linear::ExactRatMatrix;
+use holonic_engine::{native_spool::{NativeCollapsedFibre, NativePullbackOccurrence}, EventId, ExactComplexWaveCurrent};
 use life::native_intelligence::{
     CausalAdjointStepInput, NativeConductedSection, SituatedDifferenceError,
     SituatedDifferenceInput, SituatedDifferenceSection,

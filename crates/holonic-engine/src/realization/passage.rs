@@ -601,7 +601,7 @@ mod tests {
 
     use super::*;
     use crate::cross_chart::chain_law;
-    use crate::exact_linear::ExactRatMatrix;
+    use holonics::exact_linear::ExactRatMatrix;
     use crate::generator_native_rest::NativeGenerator;
     use crate::receiver_exact_compression::{ObservedSystem, compress};
 

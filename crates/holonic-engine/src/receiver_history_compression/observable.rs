@@ -27,7 +27,7 @@ use relational_geometry::{AffineMap3, PairFiniteMotion, RationalPhaseError, Scre
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::factored_moment::FactoredMomentError;
 use crate::receiver_exact_compression::{CollapsedPair, InputId, ItemId, Observation, ReceiverId};
 
@@ -43,13 +43,13 @@ pub struct QuotientAssignment {
     pub native: NativeStateId,
 }
 
-holonic_core::fibre_field_names!(pub ReconstructionFibreNames = "ReconstructionFibre", "native", "sources", allow);
+holonics::fibre_field_names!(pub ReconstructionFibreNames = "ReconstructionFibre", "native", "sources", allow);
 
 /// One complete source fibre `q⁻¹(native)`: the core
-/// [`PreimageFibre`](holonic_core::restriction::PreimageFibre) under its `native`/`sources` wire
+/// [`PreimageFibre`](holonics::restriction::PreimageFibre) under its `native`/`sources` wire
 /// (plan phase 10). This is what an exterior decoder must retain instead of silently choosing a
 /// source occurrence.
-pub type ReconstructionFibre = holonic_core::restriction::PreimageFibre<
+pub type ReconstructionFibre = holonics::restriction::PreimageFibre<
     NativeStateId,
     BTreeSet<ItemId>,
     ReconstructionFibreNames,

@@ -3,8 +3,16 @@ name = "holonics"
 version = "0.1.0"
 edition = "2024"
 publish = false
+license.workspace = true
 
 [dependencies]
 holonic-structure = { workspace = true }
 relational-geometry = { workspace = true }
-holonic-core = { workspace = true }
+holonic-words = { workspace = true }
+num-bigint = { workspace = true }
+num-traits = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+serde_json = "1"

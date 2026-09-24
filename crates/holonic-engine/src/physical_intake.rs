@@ -98,7 +98,7 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::EventId;
-use crate::exact_value::ExactInterval;
+use holonics::exact_value::ExactInterval;
 use crate::grain_tower::{
     ApertureRelation, Grain, GrainAddress, GrainCell, GrainCensus, GrainFace,
     GrainPair, GrainRefusal, GrainReopenReceipt, GrainSelection, GrainTower, InflationWitness,
@@ -117,7 +117,7 @@ mod deflate;
 pub mod mmcif;
 pub mod numpy;
 
-use crate::continuing_tower::Transition;
+use holonics::restriction::tower::Transition;
 use mmcif::{ChainOccurrence, StructurePresentation};
 use numpy::{ExactWord, NumpySource, UncertaintyWordFormat};
 

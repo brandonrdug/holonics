@@ -22,14 +22,11 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use thiserror::Error;
 
-use crate::{
-    cuda_refine::{
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
+use crate::{cuda_refine::{
         CudaRefineExecutor, ResidentComplexIncidence, ResidentComplexIncidenceReturn,
         ResidentNativeWord, ResidentNativeWordReturn,
-    },
-    dimensional_wave::ExactComplexWaveCurrent,
-    exact_linear::{ExactLinearError, ExactRatMatrix},
-};
+    }, dimensional_wave::ExactComplexWaveCurrent};
 
 const SCHEMA: &str = "holonic-engine.soulkiller.foreign-reachable-section-rest.v1";
 
@@ -127,10 +124,10 @@ pub struct HistorySeparator {
 }
 
 impl HistorySeparator {
-    /// The core [`Separation`](holonic_core::restriction::Separation) (plan phase 10): two
+    /// The core [`Separation`](holonics::restriction::Separation) (plan phase 10): two
     /// histories, the target coordinate that separates them, and the two coefficients.
-    pub fn separation(&self) -> holonic_core::restriction::Separation<usize, usize, i64> {
-        holonic_core::restriction::Separation::new(
+    pub fn separation(&self) -> holonics::restriction::Separation<usize, usize, i64> {
+        holonics::restriction::Separation::new(
             self.left_history,
             self.right_history,
             self.target_coordinate,
@@ -163,13 +160,13 @@ pub struct ForeignCoefficientWordSeparator {
 }
 
 impl ForeignCoefficientWordSeparator {
-    /// The core [`Separation`](holonic_core::restriction::Separation) (plan phase 10): two
+    /// The core [`Separation`](holonics::restriction::Separation) (plan phase 10): two
     /// histories, the section (index and address) and coordinate that separate them, and the two
     /// coefficients.
     pub fn separation(
         &self,
-    ) -> holonic_core::restriction::Separation<usize, (usize, String, usize), i64> {
-        holonic_core::restriction::Separation::new(
+    ) -> holonics::restriction::Separation<usize, (usize, String, usize), i64> {
+        holonics::restriction::Separation::new(
             self.left_history,
             self.right_history,
             (self.section, self.section_address.clone(), self.coordinate),

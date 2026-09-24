@@ -4,7 +4,7 @@
 //! **188** (2018). The Chow ring of an arbitrary matroid satisfies Poincaré duality, hard Lefschetz,
 //! and the Hodge–Riemann relations — with no ambient variety, over no field. This driver builds the
 //! ring exactly over `BigRational`, computes the form, hands the form to
-//! `holonic_engine::inertia::inertia`, and prints the split it returns.
+//! `holonics::inertia::inertia`, and prints the split it returns.
 //!
 //! Every declared control is checked and a failure exits nonzero. The falsifier — a class certified
 //! to sit **outside** the ample cone — is required to break Hodge–Riemann somewhere; a suite in
@@ -12,7 +12,7 @@
 
 use std::process::ExitCode;
 
-use holonic_engine::inertia::{Inertia, SymmetricForm, inertia};
+use holonics::inertia::{Inertia, SymmetricForm, inertia};
 use holonic_engine::matroid_chow::{
     ChowRing, GROUND_APERTURE, LefschetzReport, Matroid, RANK_APERTURE, SubmodularVerdict,
     chain_monomial_census,

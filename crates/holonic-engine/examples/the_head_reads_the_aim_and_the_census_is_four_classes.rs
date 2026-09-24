@@ -79,9 +79,9 @@
 use std::collections::BTreeMap;
 
 use holonic_engine::embedding_fiber::{ResidentReadout, align_bfloat16, safetensors};
-use holonic_engine::exact_linear::ExactRatMatrix;
-use holonic_engine::exact_work::{Admission, ExactWork, WorkBudget, WorkMetric};
-use holonic_engine::inertia::{SymmetricForm, pullback_inertia_bound_with_work};
+use holonics::exact_linear::ExactRatMatrix;
+use holonics::exact_work::{Admission, ExactWork, WorkBudget, WorkMetric};
+use holonics::inertia::{SymmetricForm, pullback_inertia_bound_with_work};
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 use relational_geometry::Rat;

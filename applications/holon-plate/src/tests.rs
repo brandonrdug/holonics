@@ -1252,7 +1252,7 @@ fn a_forged_rbin_census_refuses_and_names_the_field() {
 /// gauge is declared rather than discovered.
 #[test]
 fn the_three_rule_cross_check_runs_over_three_genuinely_different_pivot_walks() {
-    use holonic_engine::rebase_invariants::PivotRule;
+    use holonics::rebase_invariants::PivotRule;
 
     type Walk = Vec<(u32, Vec<(usize, usize)>)>;
     fn walks_of(complex: &GradedCausalComplex) -> (Vec<PivotRule>, BTreeSet<Walk>) {
@@ -1329,7 +1329,8 @@ fn the_three_rule_cross_check_runs_over_three_genuinely_different_pivot_walks() 
 /// the agreement independently rather than trusting the schema's own loop.
 #[test]
 fn the_pivot_rule_does_not_reach_the_rbin_census() {
-    use holonic_engine::rebase_invariants::{invariants_agree, rebase_invariants, PivotRule};
+    use holonics::rebase_invariants::PivotRule;
+    use holonic_engine::rebase_invariants::{invariants_agree, rebase_invariants};
 
     for complex in [
         hollow_triangle(),

@@ -1,6 +1,6 @@
 //! Exterior exact derivation over actually retained field passages. No native state is changed.
 use super::*;
-use crate::exact_linear::{ContextualFactorization, ExactRatMatrix};
+use holonics::exact_linear::{ContextualFactorization, ExactRatMatrix};
 use num_traits::{One, Zero};
 
 #[derive(Debug, Serialize, PartialEq, Eq)]

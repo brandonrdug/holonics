@@ -165,7 +165,7 @@ use relational_geometry::Rat;
 use serde::Serialize;
 use thiserror::Error;
 
-use crate::exact_value::{AlgebraicRoot, ExactInterval, ExactValueError};
+use holonics::exact_value::{AlgebraicRoot, ExactInterval, ExactValueError};
 use crate::EventId;
 use crate::physical_constraint_complex::{
     ComponentMaterial, ConstraintComponentId, ConstraintError, ConstraintVertexId, ContactClass,

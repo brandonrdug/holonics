@@ -4,18 +4,8 @@ use std::fmt::Write as _;
 use std::fs;
 use std::path::PathBuf;
 
-use holonic_engine::{
-    AnalyticCirculationProbeId, AnalyticFieldArcId, AnalyticFieldJunctionId,
-    AnalyticFieldJunctionOrigin, CausalFieldAtlasLaw, CausalFieldEvent, CausalFieldStanding,
-    DimensionalWaveModeId, EventId, ExactAnalyticAdvectionEvent, ExactAnalyticAdvectionLaw,
-    ExactAnalyticCirculationProbe, ExactAnalyticFieldArc, ExactAnalyticFieldJunction,
-    ExactAnalyticFieldMode, ExactAnalyticFieldWaveEvent, ExactAnalyticFieldWaveImpulse,
-    ExactAnalyticFieldWaveLaw, ExactAnalyticInterfaceAmplitudeFiber, ExactAnalyticOrbitGeometry,
-    ExactComplexWaveCurrent, ExactEventLaw, ExactRatMatrix, ExactReceiverPrimaryDoctrine,
-    ExactRefractionHand, ExactRefractionRegime, ExactTorus, ExactTorusPhaseFrame,
-    ExactUnitConicPhase, ExactWavePhaseTransport, FieldGermId, FieldOverlapId, FieldPhaseChannel,
-    FieldRegionId, ImplicitCellId, OrientedFieldSample, SourceTorusOccurrence,
-};
+use holonics::exact_linear::ExactRatMatrix;
+use holonic_engine::{AnalyticCirculationProbeId, AnalyticFieldArcId, AnalyticFieldJunctionId, AnalyticFieldJunctionOrigin, CausalFieldAtlasLaw, CausalFieldEvent, CausalFieldStanding, DimensionalWaveModeId, EventId, ExactAnalyticAdvectionEvent, ExactAnalyticAdvectionLaw, ExactAnalyticCirculationProbe, ExactAnalyticFieldArc, ExactAnalyticFieldJunction, ExactAnalyticFieldMode, ExactAnalyticFieldWaveEvent, ExactAnalyticFieldWaveImpulse, ExactAnalyticFieldWaveLaw, ExactAnalyticInterfaceAmplitudeFiber, ExactAnalyticOrbitGeometry, ExactComplexWaveCurrent, ExactEventLaw, ExactReceiverPrimaryDoctrine, ExactRefractionHand, ExactRefractionRegime, ExactTorus, ExactTorusPhaseFrame, ExactUnitConicPhase, ExactWavePhaseTransport, FieldGermId, FieldOverlapId, FieldPhaseChannel, FieldRegionId, ImplicitCellId, OrientedFieldSample, SourceTorusOccurrence};
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
 use num_traits::{One, Zero};

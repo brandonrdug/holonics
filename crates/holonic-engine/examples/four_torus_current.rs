@@ -3,7 +3,7 @@
 //! This is a rational current chart, not an HNN cultivation path or a physical
 //! power measurement. The full reference solves the independently assembled
 //! branch equation; six continuing coordinates use its derived two-face return.
-use holonic_engine::exact_linear::ExactRatMatrix as Matrix;
+use holonics::exact_linear::ExactRatMatrix as Matrix;
 use num_traits::{One, Zero};
 use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};

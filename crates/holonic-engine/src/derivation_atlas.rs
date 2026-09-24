@@ -147,7 +147,8 @@ use crate::algebraic::{
     CausalAlgebraicError, CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex,
 };
 use crate::causal::EventId;
-use crate::rebase_invariants::{GradeInvariants, PivotRule, RebaseInvariants, rebase_invariants};
+use holonics::rebase_invariants::PivotRule;
+use crate::rebase_invariants::{GradeInvariants, RebaseInvariants, rebase_invariants};
 
 /// The export codec's own structural vocabulary. These words are how a Lean file is written; they
 /// name nothing the derivation recruited from its environment.

@@ -552,7 +552,7 @@ fn the_mouths_a_priori_bound_is_read_off_the_entering_words_and_not_authored_fro
 
 #[test]
 fn the_production_cone_gate_names_what_it_finds_and_only_that() {
-    let clean = [("resident", "use crate::exact_work::ExactWork;")];
+    let clean = [("resident", "use holonics::exact_work::ExactWork;")];
     assert!(production_cone_reaches_the_reference(&clean).is_empty());
     let dirty = [("driver", "use holonic_engine::ported_reference::realize;")];
     assert!(

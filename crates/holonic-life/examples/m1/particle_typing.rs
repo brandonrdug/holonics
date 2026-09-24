@@ -3,7 +3,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use holonic_engine::category::BoundaryId;
-use holonic_engine::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use holonic_engine::exact_owner_testimony::{
     ExactOwnerLicense, ExactOwnerOccurrence, ExactOwnerWitnessRefusal,
 };

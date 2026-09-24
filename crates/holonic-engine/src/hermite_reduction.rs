@@ -75,7 +75,7 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::rational_polynomial::{
+use holonics::rational_polynomial::{
     BivariatePolynomial, ExactPolynomialError, RationalPolynomial, resultant_in_eliminated_variable,
 };
 

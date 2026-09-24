@@ -88,7 +88,8 @@ use holonic_engine::derivation_atlas::{
     found_circuit, invariant_movement, read_derivation, route_cycle_agreement, route_movement,
     CircuitAperture, Derivation, DerivationCircuit, DerivationIdentity, MovedField,
 };
-use holonic_engine::rebase_invariants::{invariants_agree, PivotRule, RebaseInvariants};
+use holonics::rebase_invariants::PivotRule;
+use holonic_engine::rebase_invariants::{invariants_agree, RebaseInvariants};
 use life::lean_mathematics::{
     collect_lean_documents,
     kernel_returns::{LeanKernelOutcome, LeanKernelReturnFamily},

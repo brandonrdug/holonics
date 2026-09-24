@@ -19,10 +19,10 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use thiserror::Error;
 
-use crate::exact_linear::{
+use holonics::exact_linear::{
     ExactLinearError, ExactRankFactorization, ExactRatMatrix, RebaseReceipt,
 };
-use crate::exact_work::ExactWork;
+use holonics::exact_work::ExactWork;
 
 /// The nondegenerate receiver metrics declared at one local defect chart.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]

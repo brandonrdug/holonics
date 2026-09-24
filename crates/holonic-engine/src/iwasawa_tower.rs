@@ -72,7 +72,7 @@
 //! `M/ω_n M = Z_p[T]/(f₁, …, f_k, ω_n)`. The free `Z`-module `Z[T]/(ω_n)` has basis
 //! `1, T, …, T^(p^n - 1)` because `ω_n` is monic. The relations are `T^j · f_i mod ω_n` for every
 //! generator `i` and every `j < p^n`. That `(k·p^n) × p^n` integer matrix goes to
-//! [`crate::rebase_invariants::smith_normal_form`] — this module founds **no** second Smith normal
+//! [`holonics::rebase_invariants::smith_normal_form`] — this module founds **no** second Smith normal
 //! form — and the cokernel is read off its invariant factors: free rank `p^n - rank`, torsion
 //! `⊕ Z/d_i`. Tensoring with `Z_p` kills the prime-to-`p` part of each `d_i` and leaves
 //! `⊕ Z/p^(v_p(d_i))`.
@@ -92,8 +92,8 @@
 //! # Composition with the wave-1 continuing tower
 //!
 //! This module founds no second tower vocabulary. [`IwasawaTower`] is an instance of
-//! [`crate::continuing_tower::Tower`] at index `n` with face "a polynomial representative modulo
-//! `ω_n`", and [`OmegaRestriction`] is an instance of [`crate::continuing_tower::Transition`] whose
+//! [`holonics::restriction::tower::Tower`] at index `n` with face "a polynomial representative modulo
+//! `ω_n`", and [`OmegaRestriction`] is an instance of [`holonics::restriction::tower::Transition`] whose
 //! residual is the exact quotient by `ω_coarse`. The transition is non-invertible and its residual
 //! is exactly what a later (finer) receiver reopens, which is
 //! `ContinuingTower.Transition.laterReceiverFactors`. Its `reopen_apply` law is the division
@@ -152,8 +152,10 @@ use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
 use thiserror::Error;
 
-use crate::continuing_tower::{Tower, TowerFaceOutcome, TowerRefusal, Transition};
-use crate::rebase_invariants::{IntegerMatrix, PivotRule, smith_normal_form};
+use holonics::restriction::tower::{Tower, TowerFaceOutcome, TowerRefusal, Transition};
+use holonics::rebase_invariants::IntegerMatrix;
+use holonics::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::smith_normal_form;
 
 /// The largest prime this owner will accept.
 ///
@@ -216,7 +218,7 @@ pub const MAX_RING_POWER: u32 = MAX_PRIME as u32;
 /// * `FiniteLevelRing::reduce`: `residue.to_biguint()` is `Some`. `residue` is
 ///   `((c % m) + m) % m` with `m = p^e ≥ 2`, so it lies in `[0, m)` and is never negative.
 /// * `LambdaPresentation::specialize`: `factor.to_biguint()` is `Some`. The factors come from
-///   [`crate::rebase_invariants::smith_normal_form`], which returns them nonnegative, and the loop
+///   [`holonics::rebase_invariants::smith_normal_form`], which returns them nonnegative, and the loop
 ///   has already skipped every factor at or below one.
 /// * [`fit_and_verify_growth`]: the measured vector converts to `[(u32, u64); 4]`. Its own loop
 ///   runs `0..4` and pushes once per iteration, so the vector has exactly four entries.
@@ -992,7 +994,7 @@ pub fn omega_quotient_by_identity(level: &IwasawaLevel) -> Result<Vec<BigInt>, I
 // The tower and its transition — instances of the wave-1 owners.
 // ---------------------------------------------------------------------------------------------
 
-/// The tower of levels `Λ/(ω_n)`, as an instance of [`crate::continuing_tower::Tower`].
+/// The tower of levels `Λ/(ω_n)`, as an instance of [`holonics::restriction::tower::Tower`].
 ///
 /// Index: the level `n`, a `u32`. Face: a trimmed integer coefficient vector of degree `< p^n`,
 /// the canonical representative of a class in `Z[T]/(ω_n)`. Restriction from a finer level to a
@@ -1062,7 +1064,7 @@ impl IwasawaTower {
             .map(Vec::as_slice)
     }
 
-    /// The charts, as [`crate::continuing_tower::Tower`] wants them for a receipt.
+    /// The charts, as [`holonics::restriction::tower::Tower`] wants them for a receipt.
     pub fn charts(&self) -> Vec<u32> {
         (0..=self.max_level).collect()
     }
@@ -1108,7 +1110,7 @@ impl Tower for IwasawaTower {
 }
 
 /// Restriction from level `fine` to level `coarse`, as an instance of
-/// [`crate::continuing_tower::Transition`].
+/// [`holonics::restriction::tower::Transition`].
 ///
 /// * `apply` is reduction modulo `ω_coarse`;
 /// * `residual` is the exact quotient, which is what the transition drops;
@@ -1618,7 +1620,7 @@ impl LambdaPresentation {
 
     /// `M/ω_n M` as an explicit finite abelian group.
     ///
-    /// Assembles the relation matrix, runs [`crate::rebase_invariants::smith_normal_form`] with
+    /// Assembles the relation matrix, runs [`holonics::rebase_invariants::smith_normal_form`] with
     /// [`PivotRule::SmallestMagnitude`] — the rule that owner measured as the one which keeps
     /// intermediate coefficients small — and reads the cokernel off the invariant factors.
     ///

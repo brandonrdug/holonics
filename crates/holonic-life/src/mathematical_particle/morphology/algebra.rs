@@ -1,6 +1,6 @@
 use std::collections::BTreeSet;
 
-use holonic_engine::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use num_rational::BigRational as Rat;
 use sha2::{Digest, Sha256};
 

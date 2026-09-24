@@ -90,7 +90,7 @@ use crate::conditioned_derivation::{ConditionedCircuit, Passage, PassageId, Pass
 use crate::derivation_atlas::{DerivationIdentity, statement_vertex_key};
 use crate::dilation::{Horizon, WalkOrder, dilate};
 use crate::placement::Placement;
-use crate::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::PivotRule;
 use crate::receiver_exact_compression::{ItemId, ObservedSystem};
 use crate::skein::Substitution;
 use crate::substitution_realizers::{
@@ -871,7 +871,8 @@ mod tests {
     use super::*;
     use crate::conditioned_derivation::{ConditionedBody, DerivationQuery, Exposure, expose};
     use crate::derivation_atlas::CircuitAperture;
-    use crate::rebase_invariants::{IntegerMatrix, smith_normal_form};
+    use holonics::rebase_invariants::IntegerMatrix;
+    use holonics::rebase_invariants::smith_normal_form;
     use crate::substitution_realizers::{SubstitutionDischarge, discharge_substitutions};
     use crate::supported_realizers::{incidence, positive_form, quadratic_value};
     use num_traits::Zero;

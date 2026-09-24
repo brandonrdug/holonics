@@ -40,7 +40,7 @@ Each is backed by a measurement at `d3b8b509`.
    reference are then built method by method (campaign K2 in §4). Neither blocks the restructure.
    `holonics-apple` implements the same port later.
 4. **Crate count: `holonics` and `holonics-cuda` now, `holonics-apple` later.** `holonic-words` is
-   a temporary host crate (it currently uses `std`): `holonic-core::PrimeChart` consumes
+   a temporary host crate (it currently uses `std`): `holonics::PrimeChart` consumes
    `ModularWords`, while the Rust NVPTX `accelerators/cuda-kernel` depends directly on
    `soma-abi`, **not** on `holonic-words`. Both host words and the device kernel use
    `soma-abi::section_layout_cuda` arithmetic for parity. The kernel's committed PTX is
@@ -183,19 +183,19 @@ sources; §3 gives the target layout.
 
 | Object | Law (one line) | Lean owner now | Rust owner now |
 |---|---|---|---|
-| Holon `H=(K,∂_A;Π;𝒟;𝓔;G;π)` | the law and its ports, not its state; interconnection of Holons is a Holon; passivity proved | `Holon/{Law,Port,Dirac,Complex,Element,Generator,Restriction,Conformance}` | `holonic-core::{holon,law,port,dirac,complex,element,generator,restriction}` |
-| Complex, holon/coholon pairing | `∂²=0`; `d=∂ᵀ`; Stokes; power is the pairing | `Objects/Pairing`, `Holon/Complex` | `holonic-core::complex` |
-| Constitution (element relations) | storage `C`, `K`, resistive `D⪰0`, sources, active relations with power, pumps; modes `Kv=ω²Cv` | `Holon/Element`, `Holon/MomentStorage` | `holonic-core::element`; normal law `NormalConstitution`; moment storage |
-| Generator | initial configuration (key), clock, phase lift; helix = circle + carry; fractal family = words, restrictions, scale square, first arrival | `Geometry/PhaseCarry`, `Holon/Generator`, `Foundation/FractalPacking` | `holonic-core::generator`; `relational-geometry::winding` |
+| Holon `H=(K,∂_A;Π;𝒟;𝓔;G;π)` | the law and its ports, not its state; interconnection of Holons is a Holon; passivity proved | `Holon/{Law,Port,Dirac,Complex,Element,Generator,Restriction,Conformance}` | `holonics::{holon,law,port,dirac,complex,element,generator,restriction}` |
+| Complex, holon/coholon pairing | `∂²=0`; `d=∂ᵀ`; Stokes; power is the pairing | `Objects/Pairing`, `Holon/Complex` | `holonics::complex` |
+| Constitution (element relations) | storage `C`, `K`, resistive `D⪰0`, sources, active relations with power, pumps; modes `Kv=ω²Cv` | `Holon/Element`, `Holon/MomentStorage` | `holonics::element`; normal law `NormalConstitution`; moment storage |
+| Generator | initial configuration (key), clock, phase lift; helix = circle + carry; fractal family = words, restrictions, scale square, first arrival | `Geometry/PhaseCarry`, `Holon/Generator`, `Foundation/FractalPacking` | `holonics::generator`; `relational-geometry::winding` |
 | Helical pair contact | slip `J`, `Q=⟨Δ|Δ⟩`, `DQ=2J*Δ`, Farey lock address; contact material `ΣwJ*DJ` | `Transport/HelicalPairInteraction`, `Geometry/PairResonance`, `Millennium/Farey` | `holonic_interaction`, `holonic_chain`, `relational-geometry::screw` |
 | Complex parametron (HNN physical instance) | LC storage↔flow at `ω=1/√(LC)`, pump, half-turn Ising lock; perceptron = locked-sheet face | `Objects/Parametron` | `cuda_refine::complex_parametron` (device); no host owner yet |
-| Tube, tower | longitudinal clocked span; transverse restriction with unique/plural/obstructed gluing; `Λ_DN` | `Transport/ContinuingTube`, `Foundation/IwasawaTower` | `holonic-core::restriction::{tube,tower,fibre,descent}` |
+| Tube, tower | longitudinal clocked span; transverse restriction with unique/plural/obstructed gluing; `Λ_DN` | `Transport/ContinuingTube`, `Foundation/IwasawaTower` | `holonics::restriction::{tube,tower,fibre,descent}` |
 | Relative completeness (globe) | boundary bounds interior; coupled by conserved charges, not determined; persistent motion | `Objects/RelativeCompleteness` (full theorem owed, #62) | none |
-| Deposition and retention | the only law changing a constitution; retention = future-sufficient quotient, never a tape | `Objects/{Deposition,Retention}`, `Foundation/Standing`, `Holon/Deposition` | `holonic-core::deposition`, `standing` |
+| Deposition and retention | the only law changing a constitution; retention = future-sufficient quotient, never a tape | `Objects/{Deposition,Retention}`, `Foundation/Standing`, `Holon/Deposition` | `holonics::deposition`, `standing` |
 | Ratio and loss | `R=Ĝ_(T←H)`, `ℓ=log R` with winding branch, covector `R⁻¹dR`, jets | `Objects/{Ratio,RatioPhase,RatioBlock}` | `exponentiated_ratio`; incident receivers |
 | Receipt | field of per-region readings, own frame and clock; no global scalar | none | readings in each owner; bits readings in the exposure measurement |
 | Keys and navigation | action fits a constitution (lock); learning = locating keys by loop closure (Bombe) | `Transport/{GeneratorTraceFaces,CellHolonomy}` | `relational-geometry::winding::Machine` |
-| Reaction (power-neutral, Cayley step) | skew reaction; `(I−½K)y=(I+½K)p+W_c c`, gain 1 | `Holon/{Reaction,Cayley}` | `holonic-core::reaction`; `normal/direct/reaction_law.rs`; `kernels/enclosure_cayley.cuh` |
+| Reaction (power-neutral, Cayley step) | skew reaction; `(I−½K)y=(I+½K)p+W_c c`, gain 1 | `Holon/{Reaction,Cayley}` | `holonics::reaction`; `normal/direct/reaction_law.rs`; `kernels/enclosure_cayley.cuh` |
 
 Exact algebra underneath: `exact_linear`, `prime_image_algebra`, `inertia`, `rational_polynomial`,
 `primality`, `ExactRing`/`ModularWords` (now in `holonic-core`/`holonic-words`).
@@ -681,10 +681,12 @@ existing suites (§0.9):
      the workbench/all-target check passes.
    - Clean the old `target/`.
 
-   **M1 dependency prerequisite (landed in the facade cut):** `holonics` no longer depends on HNA, engine or life,
+   **M1 dependency and core owner cuts:** `holonics` no longer depends on HNA, engine or life,
    and it no longer forwards their `hna`, `engine`, `soulkiller` or `interop` surfaces. The workbench
-   selects the direct HNA and engine packages. `core`, `structure` and `geometry` remain re-export
-   boundaries until their source owners move; they are not yet represented as internal Holonics code.
+   selects the direct HNA and engine packages. The Holon core and source-neutral exact operators
+   are now internal root modules of `holonics`; callers use those qualified paths directly.
+   `structure` and `geometry` remain source owners to fold, and resident engine/HNN execution
+   still moves to CUDA.
 8. **M2: the Lean move.** Move paths to `lean/` (`Holonics` and `HolonicsResearch`) and build both
    targets. Rename `Soma.Holonics` to `Holonics` as a separate mechanical commit.
 9. **D: documents (the restructure's closing acceptance).** All to the verified paths:

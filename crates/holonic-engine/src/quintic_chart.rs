@@ -144,7 +144,7 @@ use crate::arithmetic_monodromy::{
     QuinticTransitiveGroup, SolvabilityConstraint, catalogued_transitive_degree,
 };
 use crate::causal::EventId;
-use crate::rational_polynomial::{
+use holonics::rational_polynomial::{
     BivariatePolynomial, CensusWork, ExactPolynomialError, RationalPolynomial, RationalRootCensus,
     ResultantWork, monic_from_power_sums, newton_power_sums, rational_root_census,
     resultant_in_eliminated_variable,

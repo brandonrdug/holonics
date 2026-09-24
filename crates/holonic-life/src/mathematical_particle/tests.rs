@@ -4,9 +4,9 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::sync::OnceLock;
 
 use holonic_engine::embedding_fiber::{AlignedMaterial, ResidentReadout};
-use holonic_engine::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use holonic_engine::exact_owner_testimony::{ExactOwnerLicense, ExactOwnerOccurrence};
-use holonic_engine::exact_value::ExactValue;
+use holonics::exact_value::ExactValue;
 use holonic_engine::front_passage::{
     AlignedMaterialPlan, ContractTiled, DeedReceiver, Enter, EnteringRows, FrontPassage,
     MountedPopulation, ResidentMaterial, ResidentRealization,

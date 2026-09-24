@@ -14,7 +14,7 @@
 //! at step `τ` under the external effort `u = s/τ` (`Holon/Element.lean::backwardEuler_balance`):
 //! its source work is `τ⟨u, f_P⟩ = ⟨s, φ⁺⟩`, its conduction `τ⟨dφ⁺, W dφ⁺⟩`, and its implicit step
 //! defect is the core's `−½⟨Δn, C⁻¹ Δn⟩`. [`DiffusionEnergyBalance`] is therefore a view of
-//! `holonic_core::law::EnergyBalance`, converted both ways with identical numbers.
+//! `holonics::law::EnergyBalance`, converted both ways with identical numbers.
 //!
 //! [definition; agent-inferred] [`HolonLaw`] needs a step and a borrowed [`Holon`], so the law is
 //! [`DiffusionHolonLaw`], built by [`ExactDiffusionLaw::holon_law`] at a declared interval. Its
@@ -24,12 +24,12 @@
 
 use relational_geometry::Rat;
 
-use holonic_core::dirac::DiracStructure;
-use holonic_core::element::ResistiveRelation;
-use holonic_core::holon::{Holon, HolonError, HolonState, PortCounts, PortHolon};
-use holonic_core::inertia::SymmetricForm;
-use holonic_core::law::{Advance, EnergyBalance, HolonLaw, ReferenceHolon, Scheme};
-use holonic_core::port::Bond;
+use holonics::dirac::DiracStructure;
+use holonics::element::ResistiveRelation;
+use holonics::holon::{Holon, HolonError, HolonState, PortCounts, PortHolon};
+use holonics::inertia::SymmetricForm;
+use holonics::law::{Advance, EnergyBalance, HolonLaw, ReferenceHolon, Scheme};
+use holonics::port::Bond;
 use num_traits::{One, Signed, Zero};
 
 use super::{
@@ -336,7 +336,7 @@ impl From<CoreChartRefusal> for DiffusionError {
 impl DiffusionComplex {
     /// [definition] **The complex as the core graph complex**: one 0-cell per node and one 1-cell per
     /// branch, in identity order, `∂₁` with `−1` at each branch's source and `+1` at its target
-    /// (`holonic_core::complex::CellComplex::graph`). A diffusion complex is this incidence with two
+    /// (`holonics::complex::CellComplex::graph`). A diffusion complex is this incidence with two
     /// element relations: the capacities ([`Self::capacity_storage`]) and the conductances
     /// ([`Self::conductance_relation`]).
     pub fn graph_chart(
@@ -378,10 +378,10 @@ impl DiffusionComplex {
 mod tests {
     use std::collections::BTreeMap;
 
-    use holonic_core::conformance::{
+    use holonics::conformance::{
         check_exact_advance, check_interaction, check_restriction, check_run, check_tellegen,
     };
-    use holonic_core::restriction::PortMap;
+    use holonics::restriction::PortMap;
     use relational_geometry::integer;
 
     use super::*;
@@ -587,7 +587,7 @@ mod tests {
         );
     }
 
-    /// Generic conformance (`holonic_core::conformance`) against the diffusion law: Tellegen on its
+    /// Generic conformance (`holonics::conformance`) against the diffusion law: Tellegen on its
     /// structure, exact words over a run, interaction closure and restriction.
     #[test]
     fn exact_diffusion_passes_the_core_conformance_checks() {

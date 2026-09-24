@@ -1,6 +1,6 @@
 //! A complete finite kernel request: infer independent modes, retain mass/current, reuse and
 //! transport the summary, and exhibit a new receiver that cannot factor through it.
-use holonic_engine::exact_linear::{
+use holonics::exact_linear::{
     ExactRatMatrix, KernelModeError, KernelModeReduction, ReceiverFactorization,
 };
 use num_traits::Zero;
@@ -48,7 +48,7 @@ fn main() -> Result<()> {
             .collect(),
     )?;
     let (full, mut full_work) = kernel.multiply_with_work(&packed)?;
-    let mut reduced_work = holonic_engine::exact_work::ExactWork::nothing();
+    let mut reduced_work = holonics::exact_work::ExactWork::nothing();
     let mut outputs = Vec::new();
     for query in 0..kernel.rows() {
         let (face, work) = reduction.read(&summary, query)?;

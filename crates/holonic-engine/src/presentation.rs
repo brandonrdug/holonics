@@ -20,13 +20,8 @@ use thiserror::Error;
 const EXACT_COVER_TILE: u32 = 16;
 const EXACT_WORK_CHUNK_CELLS: usize = (EXACT_COVER_TILE as usize) * (EXACT_COVER_TILE as usize);
 
-use crate::{
-    ArrangementRelation, ArrangementSeam, CpuExecutionError, CpuExecutionReceipt, CpuExecutor,
-    EventId, HomogeneousConic, ProjectedConic, ProjectedThread, ProjectedTriangle, ProjectiveLine2,
-    ProjectiveLineFamily, ProjectivePoint2, ReceiverError, ReceiverFace, ReceiverPrimitive,
-    ReceiverPrimitiveId, TransportedCoordinateField, canonical_homogeneous,
-    indexed_arrangement_relations_with_cpu, linear_pieces,
-};
+use holonics::exact_value::canonical_homogeneous;
+use crate::{ArrangementRelation, ArrangementSeam, CpuExecutionError, CpuExecutionReceipt, CpuExecutor, EventId, HomogeneousConic, ProjectedConic, ProjectedThread, ProjectedTriangle, ProjectiveLine2, ProjectiveLineFamily, ProjectivePoint2, ReceiverError, ReceiverFace, ReceiverPrimitive, ReceiverPrimitiveId, TransportedCoordinateField, indexed_arrangement_relations_with_cpu, linear_pieces};
 
 mod terminal_surface;
 pub use terminal_surface::{

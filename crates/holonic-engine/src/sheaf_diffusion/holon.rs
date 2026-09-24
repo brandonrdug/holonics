@@ -16,8 +16,8 @@
 
 use relational_geometry::Rat;
 
-use holonic_core::holon::{Holon, HolonError, HolonState};
-use holonic_core::law::{Advance, HolonLaw, ReferenceHolon, Scheme};
+use holonics::holon::{Holon, HolonError, HolonState};
+use holonics::law::{Advance, HolonLaw, ReferenceHolon, Scheme};
 use num_traits::Signed;
 
 use super::{
@@ -166,10 +166,10 @@ impl From<HolonError> for SheafDiffusionError {
 mod tests {
     use std::collections::{BTreeMap, BTreeSet};
 
-    use holonic_core::conformance::{
+    use holonics::conformance::{
         check_exact_advance, check_interaction, check_restriction, check_run, check_tellegen,
     };
-    use holonic_core::restriction::PortMap;
+    use holonics::restriction::PortMap;
     use relational_geometry::integer;
 
     use super::*;

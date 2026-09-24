@@ -71,9 +71,11 @@ use holonic_engine::algebraic::{
 use holonic_engine::causal::EventId;
 use holonic_engine::complex_system::{AddressReading, ComplexSystem, cell as cell_of_item};
 use holonic_engine::dilation::{Horizon, WalkOrder, dilate};
-use holonic_engine::inertia::{Inertia, PivotOrder, SymmetricForm, inertia, inertia_with_schedule};
+use holonics::inertia::{Inertia, PivotOrder, SymmetricForm, inertia, inertia_with_schedule};
 use holonic_engine::placement::Placement;
-use holonic_engine::rebase_invariants::{IntegerMatrix, PivotRule, smith_normal_form};
+use holonics::rebase_invariants::IntegerMatrix;
+use holonics::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::smith_normal_form;
 use holonic_engine::skein::Substitution;
 use holonic_engine::substitution_realizers::{
     RealizerAdmission, SubstitutionRealizers, place_substitutions, read_and_realize,

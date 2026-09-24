@@ -20,26 +20,8 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::Instant;
 
-use holonic_engine::{
-    exact_rational_from_f32_bits, AtmosphericInverseEvent, AtmosphericInverseLaw,
-    AtmosphericInverseResolution, AtmosphericInverseStanding, AtmosphericObstructionKind,
-    AtmosphericProfile, AtmosphericProfileId, AtmosphericProfileLevel,
-    AtmosphericVerticalCoordinate, AtmosphericVerticalFiber, CausalBodyDeed, CausalBodyEvent,
-    CausalBodyRadiation, CausalBodyStanding, CausalCellId, CausalCellReference, CausalOpeningState,
-    CausalWorld, ComparativeMultiplicity, CoupledInformantEvent, CoupledInformantGrade,
-    CoupledInformantLaw, CoupledInformantPrediction, CoupledInformantRelationState,
-    CoupledInformantStanding, CoupledInformantWork, CoupledPhaseBranch, CoupledPhaseChart,
-    CoupledRelationOrigin, CpuExecutionError, CpuExecutionReceipt, CpuExecutor, EventBoundaryTerm,
-    EventCellId, EventId, ExactCausalBodyLaw, ExactCoordinateInterval, ExactInterval,
-    ObservationEcologyEvent, ObservationEcologyLaw, ObservationEcologyStanding,
-    ObservationEcologyWork, OpaqueThermalChordDoctrine, ReceiverAffineChart, ReceiverBatch,
-    ReceiverChartId, ReceiverCoordinateFamily, ReceiverCoordinateFamilyId, ReceiverGradeId,
-    ReceiverLineageId, ReceiverRelationGrade, ReceiverRelationPrediction, ReceiverRelationState,
-    ReceiverTestimony, ReceiverTestimonyId, ReturnedAlgorithmId, ReturnedCellCoverage,
-    ReturnedCellId, ReturnedReceiverCell, ReturnedReceiverPartition, SpectralAddressStatus,
-    SpectralBandId, SpectralContactTemporality, SpectralReceiverContact,
-    SpectralReceiverOccurrence, SpectralScanId, TransitionReceipt, VerticalFiberSupport,
-};
+use holonics::exact_value::ExactInterval;
+use holonic_engine::{exact_rational_from_f32_bits, AtmosphericInverseEvent, AtmosphericInverseLaw, AtmosphericInverseResolution, AtmosphericInverseStanding, AtmosphericObstructionKind, AtmosphericProfile, AtmosphericProfileId, AtmosphericProfileLevel, AtmosphericVerticalCoordinate, AtmosphericVerticalFiber, CausalBodyDeed, CausalBodyEvent, CausalBodyRadiation, CausalBodyStanding, CausalCellId, CausalCellReference, CausalOpeningState, CausalWorld, ComparativeMultiplicity, CoupledInformantEvent, CoupledInformantGrade, CoupledInformantLaw, CoupledInformantPrediction, CoupledInformantRelationState, CoupledInformantStanding, CoupledInformantWork, CoupledPhaseBranch, CoupledPhaseChart, CoupledRelationOrigin, CpuExecutionError, CpuExecutionReceipt, CpuExecutor, EventBoundaryTerm, EventCellId, EventId, ExactCausalBodyLaw, ExactCoordinateInterval, ObservationEcologyEvent, ObservationEcologyLaw, ObservationEcologyStanding, ObservationEcologyWork, OpaqueThermalChordDoctrine, ReceiverAffineChart, ReceiverBatch, ReceiverChartId, ReceiverCoordinateFamily, ReceiverCoordinateFamilyId, ReceiverGradeId, ReceiverLineageId, ReceiverRelationGrade, ReceiverRelationPrediction, ReceiverRelationState, ReceiverTestimony, ReceiverTestimonyId, ReturnedAlgorithmId, ReturnedCellCoverage, ReturnedCellId, ReturnedReceiverCell, ReturnedReceiverPartition, SpectralAddressStatus, SpectralBandId, SpectralContactTemporality, SpectralReceiverContact, SpectralReceiverOccurrence, SpectralScanId, TransitionReceipt, VerticalFiberSupport};
 use life::coupled_informant_current::CoupledInformantCurrentAdapter;
 use life::exact_world::ExactWorldOrgan;
 use life::form_mouth::deposit_form;

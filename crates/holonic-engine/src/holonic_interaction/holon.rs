@@ -52,11 +52,11 @@
 use num_traits::{One, Zero};
 use relational_geometry::Rat;
 
-use holonic_core::dirac::DiracStructure;
-use holonic_core::element::{ResistiveRelation, deposition_work};
-use holonic_core::holon::{Holon, HolonError, HolonState, PortCounts, PortHolon, PowerBalance};
-use holonic_core::law::{Advance, EnergyBalance, HolonLaw, ReferenceHolon, Scheme};
-use holonic_core::port::{Bond, Port, PortKind, PortUnits};
+use holonics::dirac::DiracStructure;
+use holonics::element::{ResistiveRelation, deposition_work};
+use holonics::holon::{Holon, HolonError, HolonState, PortCounts, PortHolon, PowerBalance};
+use holonics::law::{Advance, EnergyBalance, HolonLaw, ReferenceHolon, Scheme};
+use holonics::port::{Bond, Port, PortKind, PortUnits};
 
 use super::{
     Carrier, ClockedEnergy, ContactDissipation, ContactFace, ExactRatMatrix, HolonicInteraction,
@@ -166,8 +166,8 @@ fn dimensionless_ports(names: Vec<(String, PortKind)>) -> Vec<Port> {
             name,
             kind,
             units: PortUnits::new(
-                holonic_core::port::Dimension::dimensionless(),
-                holonic_core::port::Dimension::dimensionless(),
+                holonics::port::Dimension::dimensionless(),
+                holonics::port::Dimension::dimensionless(),
             ),
         })
         .collect()

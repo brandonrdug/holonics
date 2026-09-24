@@ -46,8 +46,8 @@
 //!
 //! # Owners composed
 //!
-//! [`crate::exact_linear::ExactRatMatrix::rank`] and
-//! [`crate::exact_linear::ExactRatMatrix::kernel_basis`] carry every solve; this module never
+//! [`holonics::exact_linear::ExactRatMatrix::rank`] and
+//! [`holonics::exact_linear::ExactRatMatrix::kernel_basis`] carry every solve; this module never
 //! eliminates. [`crate::matroid_chow`] reads the column matroid **at its supported scope** — it
 //! accepts simple matroids presented by a complete rank function over `2^|E|` subsets, so a
 //! 130-column family is refused by extent and the simplification (loops, parallel classes) plus the
@@ -81,7 +81,7 @@ use relational_geometry::{Rat, RatVec3, ScrewGenerator};
 use serde::Serialize;
 use thiserror::Error;
 
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 
 #[cfg(test)]
 mod tests;

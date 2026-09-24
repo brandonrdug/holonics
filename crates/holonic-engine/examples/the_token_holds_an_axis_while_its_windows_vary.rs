@@ -88,7 +88,7 @@ use std::path::PathBuf;
 use num_bigint::BigUint;
 
 use holonic_engine::corpus_census::{CorpusCensus, DECLARED_STRATA, Kind, SurfaceId};
-use holonic_engine::hardware_cover::HardwareCover;
+use holonics::hardware_cover::HardwareCover;
 use holonic_engine::token_invariance::{
     ConductAtlas, ConductVerdict, ReceiverAxis, ReceiverFamily, SeparationChart, SeparationReading,
     collapsing_family_population, conduct_invariance_at, cross_check_family, invariance_partition,

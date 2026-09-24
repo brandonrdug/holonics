@@ -7,14 +7,11 @@
 
 use std::collections::BTreeSet;
 
-use holonic_engine::{
-    cuda_refine::ResidentMembraneInteriorReturn,
-    native_spool::{
+use holonics::exact_linear::ExactRatMatrix;
+use holonic_engine::{cuda_refine::ResidentMembraneInteriorReturn, native_spool::{
         NativeCollapsedFibre, NativeConstitutiveResponse, NativeIncidenceTerm,
         NativePullbackOccurrence, NativeThreadHand,
-    },
-    ExactRatMatrix, OccurrencePort,
-};
+    }, OccurrencePort};
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
 use serde::{Deserialize, Serialize};

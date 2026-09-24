@@ -34,7 +34,7 @@
 //! so each runs under its own aperture and writes its own receipt.
 
 use holonic_engine::RealizerSextuple;
-use holonic_engine::rational_polynomial::{RationalPolynomial, modular_monic_gcd};
+use holonics::rational_polynomial::{RationalPolynomial, modular_monic_gcd};
 use num_bigint::BigInt;
 use num_rational::BigRational;
 use num_traits::{One, Signed, Zero};

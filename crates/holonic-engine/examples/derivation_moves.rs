@@ -45,7 +45,9 @@ use holonic_engine::derivation_skein::{
     place_moves, split_moves,
 };
 use holonic_engine::placement::{Discharge, discharge};
-use holonic_engine::rebase_invariants::{IntegerMatrix, PivotRule, smith_normal_form};
+use holonics::rebase_invariants::IntegerMatrix;
+use holonics::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::smith_normal_form;
 use holonic_engine::receiver_exact_compression::ReceiverId;
 use holonic_engine::skein::read_substitution;
 use holonic_engine::substitution_realizers::{

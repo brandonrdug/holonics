@@ -54,7 +54,7 @@ use num_traits::One;
 use relational_geometry::exact_analysis::log_rational_interval;
 use relational_geometry::{Rat, integer};
 
-use crate::exact_value::ExactOrdering;
+use holonics::exact_value::ExactOrdering;
 
 /// Why a reading refused.
 #[derive(Clone, Debug, PartialEq, Eq)]

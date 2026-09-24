@@ -183,7 +183,7 @@ use crate::addressed_current::{
     AddressedGeneratedPortSlot,
 };
 use crate::corpus_census::CorpusCensus;
-use crate::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use crate::factored_moment::{
     AddressedDiagonalCurrentStep, FactoredMomentSection, SparseQuadraticMomentAction,
     SparseQuadraticMomentFoundation, SparseQuadraticPairReceiverFrame, WeightedIntegralCurrent,

@@ -2,7 +2,7 @@
 //!
 //! ## Why this exists
 //!
-//! [`crate::inertia`] computes the split `(positive, zero, negative)` correctly, by elimination,
+//! [`holonics::inertia::inertia`] computes the split `(positive, zero, negative)` correctly, by elimination,
 //! with no trigonometry anywhere. What it returns is a *count of signs*, and `CLAUDE.md` §2b strikes
 //! that reading:
 //!
@@ -56,7 +56,7 @@
 //!    Sturm/`AlgebraicRoot` carrier. **The "zero drivers" figure this line used to cite from
 //!    `CLAUDE.md` §11 was falsified there on 2026-08-08 and is struck**; the carrier is driven, by
 //!    `examples/reopening_the_collapsed_face.rs` among others, and now also from below by
-//!    [`crate::rational_polynomial::root_separation`], which reads its own descent depth off the
+//!    [`holonics::rational_polynomial::root_separation`], which reads its own descent depth off the
 //!    same polynomial's discriminant.
 //! 2. **The rational special case.** By Niven's theorem `2cos(2πm/n)` is rational exactly when
 //!    `n/gcd(m,n) ∈ {1,2,3,4,6}`, with values `2, −2, −1, 0, 1`. Those entries are stored as exact
@@ -120,8 +120,8 @@
 //!                                                          that polynomial's own discriminant
 //! ```
 //!
-//! Both are exact positive rationals — see [`crate::rational_polynomial::root_separation`] and
-//! [`crate::rational_polynomial::nonzero_root_lower_bound`] — and the enclosure's width after `r`
+//! Both are exact positive rationals — see [`holonics::rational_polynomial::root_separation`] and
+//! [`holonics::rational_polynomial::nonzero_root_lower_bound`] — and the enclosure's width after `r`
 //! refinements is bounded by `(sum_j |c_j|) * w_max * retained^r`. So the number of refinements is
 //! *computed*, and a construction that passes it is a contradiction between the character route and
 //! the determinant rather than a run that wanted a larger allowance.
@@ -133,7 +133,7 @@
 //!
 //! `Rat` and `BigInt` throughout. The split-point schedule in [`StarTable`] and the refinement
 //! counter choose *which exact step to take next* and can never change what is returned — that is
-//! measurement, not governance, exactly as [`crate::inertia::PivotOrder`] is.
+//! measurement, not governance, exactly as [`holonics::inertia::PivotOrder`] is.
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
@@ -141,11 +141,11 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
-use crate::exact_value::{AlgebraicRoot, ExactInterval, ExactValueError, IntegerPolynomial};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::exact_value::{AlgebraicRoot, ExactInterval, ExactValueError, IntegerPolynomial};
 use crate::grown_cell::GrownComplex;
-use crate::inertia::{Inertia, InertiaError, SymmetricForm, congruence};
-use crate::rational_polynomial::{
+use holonics::inertia::{Inertia, InertiaError, SymmetricForm, congruence};
+use holonics::rational_polynomial::{
     ExactPolynomialError, RootSeparation, interior_split_schedule, nonzero_root_lower_bound,
     root_separation, squared_shrinking_steps, worst_retained_fraction,
 };
@@ -285,7 +285,7 @@ impl SymmetricCirculant {
     /// orders them by rank and then by bitmask, which is a reading convention and nothing more — can
     /// therefore be refused in one order and admitted in another **while being the same form**.
     ///
-    /// The reordering is routed through [`crate::inertia::congruence`], which refuses a singular
+    /// The reordering is routed through [`holonics::inertia::congruence`], which refuses a singular
     /// change of basis, so this is Sylvester's own operation and not a hand-rolled shuffle: the split
     /// is invariant across every reading, and only the *nameability of the passages* moves. That is
     /// the whole content — an invariant is only visible across two frames, and here the two frames
@@ -351,7 +351,7 @@ impl CyclicReading {
 
     /// The permutation matrix `P` with `(P^T A P)_{ij} = A_{order[i], order[j]}`.
     ///
-    /// Handed to [`crate::inertia::congruence`], which proves it invertible before transporting.
+    /// Handed to [`holonics::inertia::congruence`], which proves it invertible before transporting.
     pub fn basis(&self) -> Result<ExactRatMatrix, WindingError> {
         let extent = self.order.len();
         let mut rows = vec![vec![Rat::zero(); extent]; extent];
@@ -1651,7 +1651,7 @@ pub enum WindingError {
 mod tests {
     use super::*;
     use crate::grown_cell::{ComplexAperture, Schedule, found_complex, grow, standard_cells};
-    use crate::inertia::{PivotOrder, congruence, inertia, inertia_with_schedule};
+    use holonics::inertia::{PivotOrder, congruence, inertia, inertia_with_schedule};
 
     fn circulant(first_row: &[i64]) -> SymmetricCirculant {
         SymmetricCirculant::from_integers(first_row).expect("fixture is reversal-symmetric")

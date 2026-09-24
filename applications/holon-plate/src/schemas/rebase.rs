@@ -128,9 +128,9 @@ use holonic_engine::causal::EventId;
 use holonic_engine::graded_complex_form::{
     decode_native_bytes, encode_native_bytes, GRADED_COMPLEX_FORM_LAYOUT_VERSION,
 };
-use holonic_engine::rebase_invariants::{
-    invariants_agree, rebase_invariants_with_schedule, PivotRule, ReadingSchedule, RebaseInvariants,
-};
+use holonics::rebase_invariants::PivotRule;
+use holonics::rebase_invariants::ReadingSchedule;
+use holonic_engine::rebase_invariants::{invariants_agree, rebase_invariants_with_schedule, RebaseInvariants};
 use num_bigint::BigUint;
 
 use crate::census::Census;

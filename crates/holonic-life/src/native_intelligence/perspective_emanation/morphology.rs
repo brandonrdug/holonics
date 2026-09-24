@@ -1,6 +1,6 @@
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_engine::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
 use serde::Serialize;

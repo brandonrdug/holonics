@@ -1,16 +1,62 @@
-//! Public Holonics framework entry point. Implementations retain their existing owners.
+//! **The Holon core: one object, the law and its ports.**
 //!
-//! [`structure`], [`geometry`] and [`core`] currently re-export their existing package owners.
-//! These three paths are remaining M1 forwarding boundaries; their implementations have not yet
-//! moved into this crate. Geometry and structural carriers do not require a CUDA SDK or device
-//! runtime. They do not encompass every mathematical construction in the repository.
+//! [project-postulate] Brandon, September 22: the Holon is the foundational class of the Rust
+//! codebase ([plan](../../../docs/plans/THE_HOLON_CORE_FOUNDS_THE_NATIVE_MACHINERY.md),
+//! [object](../../../docs/ELEMENTARY_OBJECTS.md#the-holon-as-one-object)). A Holon is
 //!
-//! The current HNN implementation remains in the direct `holonics-hna` and `holonic-engine`
-//! packages while M1 moves their backend-neutral laws into this crate and their resident execution
-//! into `holonics-cuda`. Those packages are application-selected dependencies, not re-exported
-//! compatibility paths from `holonics`. Package containers are distinct from standard executable
-//! model graphs; see docs/INTEROPERABILITY.md.
+//! ```text
+//! H = (K, ∂_A;  Π;  𝒟;  𝓔;  G;  π)
+//! ```
+//!
+//! and a state is a point on it. The modules below mirror the Lean foundation
+//! `formal/elementary-holonics/ElementaryHolonics/Holon/` (namespace
+//! `Soma.Holonics.HolonCore`) facet by facet; each module header names its Lean owner, and the
+//! engine's `lean_citations` test checks those citations.
+//!
+//! [definition] This is the main `holonics` library. Its Holon facets and exact operators
+//! build without CUDA; resident HNN execution remains in the backend until its move.
+//!
+//! **The exact base** (phase 2): the exact rational linear carrier [`exact_linear::ExactRatMatrix`]
+//! with its certified prime-image reading ([`prime_image_algebra`], computing in
+//! `holonic_words::ModularWords`, the device's own ring, over the declared [`hardware_cover`]),
+//! symmetric forms and their [`inertia`], the integer Smith reduction ([`rebase_invariants`]),
+//! [`exact_value`], [`exact_work`], [`rational_polynomial`] and [`primality`]. These are
+//! existing source-neutral operators now owned by the main library.
+//!
+//! **The facets** (phase 3a): [`port`] (bonds, power, units), [`dirac`] (kernel-form Dirac
+//! structures, composition, interconnection, pushforward), [`complex`] (validated cell complexes,
+//! connection incidence and curvature), [`element`] (storage, certified resistance, source, active,
+//! pump), [`generator`] (transport, initial configuration, clock, phase lift), [`restriction`] (port
+//! maps, scale square, Kron), [`holon`] (the port Holon, the medium, the Holon and its state),
+//! [`law`] (`HolonLaw`, `EnergyBalance`, the exact reference motion), [`deposition`] (commit
+//! balance, deposit ledger, exact passive projection) and [`conformance`]. Everything computes over
+//! `Rat`; the engine consumers adopt them in the later phases.
 
-pub use holonic_core as core;
+pub mod exact_linear;
+pub mod exact_value;
+pub mod exact_work;
+pub mod hardware_cover;
+pub mod inertia;
+pub mod primality;
+pub mod prime_image_algebra;
+pub mod rational_polynomial;
+pub mod rebase_invariants;
+
+pub mod complex;
+pub mod conformance;
+pub mod deposition;
+pub mod dirac;
+pub mod element;
+pub mod generator;
+pub mod holon;
+pub mod law;
+pub mod port;
+pub mod reaction;
+pub mod restriction;
+pub mod scalar;
+
+pub use holon::Holon;
+
+// Structural and geometric packages remain separate until their measured M1 owner moves.
 pub use holonic_structure as structure;
 pub use relational_geometry as geometry;

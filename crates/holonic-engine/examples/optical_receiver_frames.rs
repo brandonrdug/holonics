@@ -1,5 +1,5 @@
 //! Exact exterior optics, mode exchange and changing-frame comparisons through shared owners.
-use holonic_engine::exact_linear::{EnergyMomentum, ExactRatMatrix};
+use holonics::exact_linear::{EnergyMomentum, ExactRatMatrix};
 use holonic_engine::exponentiated_ratio::RatioFamily;
 use holonic_engine::surprisal::SymbolicSurprisal;
 use num_traits::{One, Zero};

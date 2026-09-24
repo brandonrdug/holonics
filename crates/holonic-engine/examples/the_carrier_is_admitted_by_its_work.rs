@@ -36,13 +36,8 @@
 
 use std::collections::BTreeSet;
 
-use holonic_engine::{
-    ApertureExecutionBackend, CarrierAdmission, CarrierWork, ConicCellId, ContinuousPresentation,
-    CpuExecutor, CudaApertureError, CudaApertureExecutor, CudaApertureReceipt,
-    DeclaredCarrierMetric, DisplayFrame, ExactOrdering, HomogeneousConic, PresentationBoundary,
-    PresentedPrimitive, ProjectedConic, ProjectiveDepthLaw, ProjectiveLine2, ReceiverPrimitive,
-    ReceiverPrimitiveId, TerminalMatrixSpec,
-};
+use holonics::exact_value::ExactOrdering;
+use holonic_engine::{ApertureExecutionBackend, CarrierAdmission, CarrierWork, ConicCellId, ContinuousPresentation, CpuExecutor, CudaApertureError, CudaApertureExecutor, CudaApertureReceipt, DeclaredCarrierMetric, DisplayFrame, HomogeneousConic, PresentationBoundary, PresentedPrimitive, ProjectedConic, ProjectiveDepthLaw, ProjectiveLine2, ReceiverPrimitive, ReceiverPrimitiveId, TerminalMatrixSpec};
 use num_bigint::BigUint;
 use relational_geometry::{Rat, ReceiverId, integer};
 

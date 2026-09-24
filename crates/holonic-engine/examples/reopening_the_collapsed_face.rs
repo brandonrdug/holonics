@@ -60,7 +60,7 @@
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
-use holonic_engine::exact_value::{CertifiedSeries, ExactInterval, SeriesTailCertificate};
+use holonics::exact_value::{CertifiedSeries, ExactInterval, SeriesTailCertificate};
 use holonic_engine::reopening::{
     CertifiedBits, DeclaredGrain, EnclosureFrame, ExactFace, FaceProvenance, LatticeWork,
     Reopening, ReopeningError, ReopeningVerdict, arctan_unit_fraction, dyadic_scale,

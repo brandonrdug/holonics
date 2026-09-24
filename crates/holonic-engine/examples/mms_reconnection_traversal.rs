@@ -20,14 +20,8 @@ use std::fs::{self, File};
 use std::io::{BufRead, BufReader, BufWriter, Read, Write};
 use std::path::{Path, PathBuf};
 
-use holonic_engine::{
-    CausalBodyDeed, CausalBodyEvent, CausalBodyStanding, CausalCellId, CausalCellReference,
-    CausalTraversalPassageId, CausalTraversalSpeciesId, CausalWorld, ComparativeMultiplicity,
-    EventBoundaryTerm, EventCellId, EventId, ExactCausalBodyLaw, ExactCausalTraversalEvent,
-    ExactCausalTraversalImpulse, ExactCausalTraversalLaw, ExactCausalTraversalPassage,
-    ExactCausalTraversalStanding, ExactEventLaw, ExactRatMatrix, ExactReactiveTraversalInteraction,
-    ExactTraversalCurrentSpecies, ExactTraversalLinearBalance,
-};
+use holonics::exact_linear::ExactRatMatrix;
+use holonic_engine::{CausalBodyDeed, CausalBodyEvent, CausalBodyStanding, CausalCellId, CausalCellReference, CausalTraversalPassageId, CausalTraversalSpeciesId, CausalWorld, ComparativeMultiplicity, EventBoundaryTerm, EventCellId, EventId, ExactCausalBodyLaw, ExactCausalTraversalEvent, ExactCausalTraversalImpulse, ExactCausalTraversalLaw, ExactCausalTraversalPassage, ExactCausalTraversalStanding, ExactEventLaw, ExactReactiveTraversalInteraction, ExactTraversalCurrentSpecies, ExactTraversalLinearBalance};
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 use relational_geometry::{Rat, ReceiverId};

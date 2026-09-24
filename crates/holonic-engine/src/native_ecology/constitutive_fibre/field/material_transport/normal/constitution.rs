@@ -5,13 +5,13 @@
 //! [`NormalConstitution::storage_form`]), its source is the cross moment `B`, and its stored
 //! energy at the applied coefficients is `½ Σ_r Re(w_r H w_r*)`. An observation deposits into
 //! `H`, `B` and `C`; the work that deposit does at the successor's coefficients is the core
-//! deposition work `½⟨x, (Q' − Q) x⟩` (`holonic_core::element::deposition_work`,
+//! deposition work `½⟨x, (Q' − Q) x⟩` (`holonics::element::deposition_work`,
 //! `Holon/Deposition.lean::deposition_work`). The resident chart of this relation is
 //! [`ResidentNormalMaterial`]; this type is its exact host reading, and
 //! [`NativeNormalMaterialObjective`] the reading of its normal objective.
 use super::*;
-use crate::inertia::SymmetricForm;
-use holonic_core::element::ElementRelation;
+use holonics::inertia::SymmetricForm;
+use holonics::element::ElementRelation;
 
 #[derive(Clone, Debug, Serialize)]
 pub struct NormalConstitution {
@@ -210,18 +210,18 @@ impl NormalConstitution {
             + &two * &k * &self.cross_source_error
             + &self.target_energy_error)
             / &two;
-        let around = |value: &Rat, error: &Rat| crate::ExactInterval {
+        let around = |value: &Rat, error: &Rat| holonics::exact_value::ExactInterval {
             lower: (value - error).max(Rat::zero()),
             upper: value + error,
         };
         Ok(NativeNormalMaterialObjective {
             family_data_term: around(&data, &family_error),
             family_regularized_objective: around(&attained, &family_error),
-            family_minimum: crate::ExactInterval {
+            family_minimum: holonics::exact_value::ExactInterval {
                 lower: (&lower - &minimum_error).max(Rat::zero()),
                 upper: &attained + &minimum_error,
             },
-            nominal_minimum: crate::ExactInterval {
+            nominal_minimum: holonics::exact_value::ExactInterval {
                 lower,
                 upper: attained.clone(),
             },
@@ -284,17 +284,17 @@ impl NormalConstitution {
         let form = self.storage_form()?;
         self.coefficient_rows()
             .iter()
-            .map(|x| holonic_core::element::storage_energy(&form, x).map_err(invalid))
+            .map(|x| holonics::element::storage_energy(&form, x).map_err(invalid))
             .sum()
     }
     /// Deposition work of the change `self → successor` at the successor's coefficients:
-    /// `Σ_r ½⟨x'_r, (R(H') − R(H)) x'_r⟩` (`holonic_core::element::deposition_work`).
+    /// `Σ_r ½⟨x'_r, (R(H') − R(H)) x'_r⟩` (`holonics::element::deposition_work`).
     pub fn deposition_work(&self, successor: &Self) -> Result<Rat, ConstitutiveFibreError> {
         let (before, after) = (self.storage_form()?, successor.storage_form()?);
         successor
             .coefficient_rows()
             .iter()
-            .map(|x| holonic_core::element::deposition_work(&before, &after, x).map_err(invalid))
+            .map(|x| holonics::element::deposition_work(&before, &after, x).map_err(invalid))
             .sum()
     }
 }

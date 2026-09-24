@@ -13,10 +13,13 @@ use relational_geometry::{FrameId, Rat, RatMat3, RatVec3};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::{
-    AlgebraicRoot, EventId, EvolutionShape, ExactInterval, ExactValue, ExactValueError,
-    IntegerPolynomial, canonical_homogeneous,
-};
+use holonics::exact_value::AlgebraicRoot;
+use holonics::exact_value::ExactInterval;
+use holonics::exact_value::ExactValue;
+use holonics::exact_value::ExactValueError;
+use holonics::exact_value::IntegerPolynomial;
+use holonics::exact_value::canonical_homogeneous;
+use crate::{EventId, EvolutionShape};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct ConicCellId(pub u64);

@@ -89,7 +89,7 @@ mod tests {
     fn mixed_product_operator(
         source_complex: usize,
         condition_complex: usize,
-    ) -> crate::exact_linear::BilinearOperator {
+    ) -> holonics::exact_linear::BilinearOperator {
         let right = 2 * condition_complex;
         let mut coefficients =
             vec![vec![Rat::zero(); 2 * source_complex * right]; 2 * source_complex * condition_complex];
@@ -102,10 +102,10 @@ mod tests {
                 coefficients[out + 1][(2 * i + 1) * right + 2 * j] = Rat::one();
             }
         }
-        crate::exact_linear::BilinearOperator::new(
+        holonics::exact_linear::BilinearOperator::new(
             2 * source_complex,
             right,
-            crate::exact_linear::ExactRatMatrix::new(coefficients).unwrap(),
+            holonics::exact_linear::ExactRatMatrix::new(coefficients).unwrap(),
         )
         .unwrap()
     }

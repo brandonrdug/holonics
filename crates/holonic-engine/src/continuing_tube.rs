@@ -2,12 +2,12 @@
 //!
 //! [definition] The tube's own carrier law — [`StationedTower`], the two-axis commuting square
 //! ([`check_commuting_square`], [`SquareVerdict`], [`SquareDefect`]), circuit holonomy and the
-//! wormhole receipt — moved to `crates/holonic-core/src/restriction/tube.rs`
-//! (`holonic_core::restriction::tube`) in phase 6 of
+//! wormhole receipt — moved to `crates/holonics/src/restriction/tube.rs`
+//! (`holonics::restriction::tube`) in phase 6 of
 //! `docs/plans/THE_HOLON_CORE_FOUNDS_THE_NATIVE_MACHINERY.md`, and the two-axis horizon, the defect
-//! profile and the route plan followed in phase 7 to `holonic_core::restriction::tube::horizon`,
+//! profile and the route plan followed in phase 7 to `holonics::restriction::tube::horizon`,
 //! once `receiver_release`'s `Horizon`, width and `ExactFace` and `relation_ladder`'s `Rung` became
-//! core receiver faces (`holonic_core::law::receiver`). Every moved item is re-exported here at
+//! core receiver faces (`holonics::law::receiver`). Every moved item is re-exported here at
 //! its old path. What stays is the tubes whose sections are engine presentations: the grain tube
 //! over `grain_tower`, the presentation tube over `physical_constraint_complex`, and the grain
 //! contact receiver.
@@ -53,7 +53,7 @@ use std::fmt::Debug;
 use num_bigint::BigInt;
 use relational_geometry::Rat;
 
-pub use holonic_core::restriction::tube::{
+use holonics::restriction::tube::{
     CircuitDefect, CommutingSquares, ConstantTube, DECLARED_CHART_CEILING,
     DECLARED_CIRCUIT_CEILING, DECLARED_FACE_CEILING, DECLARED_WORK_CEILING, FlipTube,
     HolonomyVerdict, IdentityCircuit, LossySwapMigration, SquareDefect, SquareVerdict,
@@ -62,13 +62,14 @@ pub use holonic_core::restriction::tube::{
     check_circuit_holonomy, check_commuting_square, wormhole_receipt,
 };
 
-use crate::continuing_tower::TowerRefusal;
+use holonics::restriction::tower::TowerRefusal;
 use crate::grain_tower::{
     ApertureRelation, FineNativeDeclaration, Grain, GrainAddress, GrainCell, GrainFace,
     GrainRefusal, GrainSelection, GrainTower,
 };
 use crate::physical_constraint_complex::ContactClass;
-use crate::receiver_release::{ExactFace, WidthRefusal};
+use holonics::law::receiver::ExactFace;
+use holonics::law::receiver::WidthRefusal;
 
 /// The two readings of one physical presentation: the complete atom-grain face, and the
 /// alpha-carbon selection of it.
@@ -244,10 +245,10 @@ impl StationedTower for GrainReadingTube {
 
 /// [definition] **The horizon, profile and route layers moved to the core** (plan phase 7): once
 /// `receiver_release`'s `Horizon`, width and `ExactFace` and `relation_ladder`'s `Rung` became core
-/// receiver faces (`holonic_core::law::receiver`), these layers had no engine dependency left and
-/// joined the core tube at `holonic_core::restriction::tube::horizon`. Every item is re-exported
+/// receiver faces (`holonics::law::receiver`), these layers had no engine dependency left and
+/// joined the core tube at `holonics::restriction::tube::horizon`. Every item is re-exported
 /// here at its existing path.
-pub use holonic_core::restriction::tube::horizon::{
+use holonics::restriction::tube::horizon::{
     CrossRankPassage, CrossedSquare, DECLARED_CANDIDATE_CEILING, DECLARED_REACH_CEILING,
     DECLARED_ROUTE_CEILING, DECLARED_ROUTE_LENGTH_CEILING, DECLARED_SEARCH_CEILING, DefectProfile,
     FaceReading, HorizonDeclaration, HorizonOutcome, HorizonReach, HorizonRefusal,

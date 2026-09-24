@@ -1270,10 +1270,8 @@ impl std::error::Error for ReturnedConductRefusal {}
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        conditioned_derivation::{expose, found_conditioned_circuit},
-        rebase_invariants::PivotRule,
-    };
+    use holonics::rebase_invariants::PivotRule;
+    use crate::{conditioned_derivation::{expose, found_conditioned_circuit}};
 
     const STATEMENT: &str = "(h : P) : exactCarrier P";
     const FIRST_FORM: &str = "first-production-form/one";

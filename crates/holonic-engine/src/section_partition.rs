@@ -7,9 +7,9 @@
 //!
 //! | owner | what it carries | what it cannot say |
 //! |---|---|---|
-//! | [`crate::hardware_cover::FrontCell`] | `index: usize`, `extent: u64` | **no coordinate.** Two cells of extent four on a `2 x 4` section are indistinguishable from two cells that both cover the same four coordinates. `CoverDecomposition::independence` proves the *index* population is a partition; there is no term in it that could be a *region*, so it cannot be asked whether the coordinates are one. |
+//! | [`holonics::hardware_cover::FrontCell`] | `index: usize`, `extent: u64` | **no coordinate.** Two cells of extent four on a `2 x 4` section are indistinguishable from two cells that both cover the same four coordinates. `CoverDecomposition::independence` proves the *index* population is a partition; there is no term in it that could be a *region*, so it cannot be asked whether the coordinates are one. |
 //! | [`crate::interchange::MemberFootprint`] | flat half-open address ranges | **no completeness, and the region is deleted on refusal.** `certify_footprints` proves pairwise write-disjointness and returns one `address` where two ranges meet, not the region where they meet; and a partition with a *hole* is disjoint, so it certifies as `Interchangeable`. Completeness is the one property a footprint certificate cannot fail on, because absence never collides. |
-//! | [`crate::hardware_cover::CoverSection::work`] | members, occupied lanes, idle lanes | a count of members with no coordinate attached to any of them. |
+//! | [`holonics::hardware_cover::CoverSection::work`] | members, occupied lanes, idle lanes | a count of members with no coordinate attached to any of them. |
 //! | [`crate::receiver_current`] | site capacity, co-present population, service rounds, chronology, deferred arrivals | **no resource-species axis** — a site carries one capacity — and **no port for a declared arriving population**: the population is minted as one per source by radiation and multiplied by the outgoing branch count. `found_site` takes a capacity and nothing else. |
 //!
 //! So the absent relation founded here is exactly one: **a coordinate region of a section, and the
@@ -57,7 +57,7 @@ use holonic_structure::LocalSet;
 use num_bigint::BigUint;
 use num_traits::Zero;
 
-use crate::hardware_cover::{
+use holonics::hardware_cover::{
     ChartId, CoverBarrier, CoverDecomposition, FrontCell, HardwareCover, ModeIdentity, SectionWork,
 };
 use crate::interchange::{

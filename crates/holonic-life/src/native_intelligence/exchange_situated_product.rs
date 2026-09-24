@@ -7,17 +7,12 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_engine::{
-    derived_factor_cover::{
+use holonics::exact_linear::ExactRatMatrix;
+use holonic_engine::{derived_factor_cover::{
         DefectMetrics, DerivedFactorCover, OverlapKind, SupportedDefectSection,
-    },
-    native_spool::{
+    }, native_spool::{
         NativeCollapsedFibre, NativeMutualConstitutiveResponse, NativePullbackOccurrence,
-    },
-    receiver_exact_compression::{InputId, ItemId, ReceiverId},
-    receiver_history_compression::{NativeStateId, ReceiverHistoryCompression, SourceTransport},
-    EventId, ExactComplexWaveCurrent, ExactRatMatrix, OccurrencePort,
-};
+    }, receiver_exact_compression::{InputId, ItemId, ReceiverId}, receiver_history_compression::{NativeStateId, ReceiverHistoryCompression, SourceTransport}, EventId, ExactComplexWaveCurrent, OccurrencePort};
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
 use serde::{Deserialize, Serialize};
@@ -158,7 +153,7 @@ pub struct NativeReceiverConstitutiveForm {
     pub receiver: ReceiverId,
     pub branch_addresses: Vec<String>,
     pub form: ExactRatMatrix,
-    pub factorization: holonic_engine::LinearFactorization,
+    pub factorization: holonics::exact_linear::LinearFactorization,
     pub mutual_responses: Vec<NativeMutualConstitutiveResponse>,
 }
 

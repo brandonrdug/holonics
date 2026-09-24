@@ -1,7 +1,7 @@
 //! The cultivated mathematical carrier: a compressed coordinate orbit of rank-one metric
 //! reflections on the exact Soddy--Gossett bend quadric.
 
-use holonic_engine::exact_linear::ExactRatMatrix;
+use holonics::exact_linear::ExactRatMatrix;
 use holonic_engine::receiver_history_cultivation::{
     CausalAdjointReceipt, CultivatedReceiverHistoryRest, RankOneMetricMorphology,
 };

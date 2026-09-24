@@ -1166,7 +1166,7 @@ fn index_occurrence_phases(
         .collect::<Result<Vec<_>, CoupledInformantError>>()?;
     let mut fibers_by_occurrence = BTreeMap::<
         ReceiverTestimonyId,
-        Vec<(u64, SpectralScanId, Rat, crate::ExactInterval)>,
+        Vec<(u64, SpectralScanId, Rat, holonics::exact_value::ExactInterval)>,
     >::new();
     for (testimony, fiber) in fibers {
         fibers_by_occurrence

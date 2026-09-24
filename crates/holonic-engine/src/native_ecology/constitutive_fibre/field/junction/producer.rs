@@ -2,7 +2,7 @@
 //! This is cold differential algebra, not another ecology or a native state update. An enclosed
 //! operand retains its uncertainty outside this point calculation; its centre is not sealed here.
 use super::*;
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use num_traits::{One, Zero};
 
 type Wave = ExactComplexWaveCurrent;
