@@ -593,9 +593,10 @@ impl<'a> From<&'a OrganizationalGrammarStanding> for OrganizationalGrammarStandi
     }
 }
 
-/// Reads the current rest and the retired one (whose archive fields are dropped).
+/// Reads only the writer-selected current rest. Retired archive fields are refused rather than
+/// silently discarded; any future rest extension must receive an explicit versioned law.
 #[derive(Deserialize)]
-#[serde(rename = "OrganizationalGrammarStanding")]
+#[serde(rename = "OrganizationalGrammarStanding", deny_unknown_fields)]
 struct OrganizationalGrammarStandingRead {
     schema: String,
     spec: OrganizationalEcologySpec,
@@ -2266,10 +2267,10 @@ mod tests {
         assert!(certificate.finite_region_complete);
     }
 
-    /// Phase 16: the certificate's source events are the admitted occurrences, an old rest's
-    /// observation archive is dropped on decode, and the decoded standing's future is unchanged.
+    /// The current writer roundtrips the complete standing; retired archive fields are refused,
+    /// and the decoded standing has the same continuation and certificate.
     #[test]
-    fn a_retired_history_rest_decodes_and_its_certificate_is_unchanged() {
+    fn current_standing_rest_roundtrips_and_retired_history_is_refused() {
         let standing = OrganizationalGrammarStanding::new(coupled_resource_spec()).unwrap();
         let mut world = CausalWorld::new(OrganizationalGrammarLaw, standing);
         let first = world.standing().next_query().unwrap().clone();
@@ -2285,19 +2286,44 @@ mod tests {
                 observation.clone(),
             ))
             .unwrap();
-        let mut legacy = serde_json::to_value(world.standing()).unwrap();
-        legacy.as_object_mut().unwrap().insert(
+        let current = serde_json::to_value(world.standing()).unwrap();
+        assert_eq!(current["schema"], ORGANIZATIONAL_GRAMMAR_SCHEMA);
+        assert_eq!(
+            current
+                .as_object()
+                .unwrap()
+                .keys()
+                .cloned()
+                .collect::<BTreeSet<_>>(),
+            BTreeSet::from([
+                "schema".to_owned(),
+                "spec".to_owned(),
+                "phase".to_owned(),
+                "next_query".to_owned(),
+                "query_queue".to_owned(),
+                "pending_holdout".to_owned(),
+                "first_recurrence".to_owned(),
+                "reference_values".to_owned(),
+                "observations".to_owned(),
+                "used_events".to_owned(),
+                "recurrence_obstruction".to_owned(),
+                "intervention_obstructions".to_owned(),
+                "lineage_prediction".to_owned(),
+                "lineage_prediction_obstruction".to_owned(),
+                "certificate".to_owned(),
+            ])
+        );
+        assert!(current.get("history").is_none());
+        let decoded: OrganizationalGrammarStanding =
+            serde_json::from_value(current.clone()).unwrap();
+        assert_eq!(&decoded, world.standing());
+
+        let mut retired = current;
+        retired.as_object_mut().unwrap().insert(
             "history".to_owned(),
             serde_json::json!([{ "SourceObservation": observation }]),
         );
-        let decoded: OrganizationalGrammarStanding = serde_json::from_value(legacy).unwrap();
-        assert_eq!(&decoded, world.standing());
-        assert!(
-            serde_json::to_value(&decoded)
-                .unwrap()
-                .get("history")
-                .is_none()
-        );
+        assert!(serde_json::from_value::<OrganizationalGrammarStanding>(retired).is_err());
 
         let mut remounted = CausalWorld::new(OrganizationalGrammarLaw, decoded);
         let native = return_all_requested(&mut world);

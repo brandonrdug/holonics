@@ -97,3 +97,23 @@ was run.
 The current-history source, contextual lift/material transport, HNA session contract, behavior
 measurement and `NormalWaveHolon` reception/actuation chart remain open; Phase 14 also remains open.
 This source cut does not claim their acceptance or the final M1/M2 library layout.
+
+## Fourth packet: organizational standing archive refusal
+
+`OrganizationalGrammarStanding` writes the quotient fields under the existing
+`OrganizationalGrammarStanding` serde name. Its writer has never emitted the retired `history`
+field, but its derived read record previously inherited Serde's default behavior of silently
+ignoring unknown fields. Consequently an old observation archive was accepted and discarded even
+though no current writer could produce it. The reader now denies unknown fields, so a rest carrying
+that retired archive is refused. This strictness is local to the organizational standing DTO; it
+does not alter the writer name, schema, field set or field values. Future additions must be explicit
+versioned/rest laws rather than silently discarded fields.
+
+The former positive legacy-history fixture is replaced by a current writer roundtrip that checks
+the exact serialized field set and schema, rejects the retired `history` field, and compares the
+continued radiation and certificate after remount. Actual nested consumers remain
+`CausalStateGrammarQuotient.state_organizations` and `OrganizationalGrammarLaw`; neither changes.
+Run the focused test
+`cargo test --locked -p holonic-engine --lib organizational_grammar::tests::current_standing_rest_roundtrips_and_retired_history_is_refused`.
+This source/doc packet has not run Cargo yet; the focused gate is intentionally deferred while the
+receiver-release gate uses the shared build resources.
