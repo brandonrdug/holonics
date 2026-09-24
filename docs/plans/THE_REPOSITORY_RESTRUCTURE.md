@@ -799,7 +799,11 @@ roots in §0.11.
       deleted items go with them.
    4. Afterwards, K2 extracts the backend-neutral HNN law into `holonics::hnn`, method by method.
 
-   The result is two libraries: `holonics` and `holonics-cuda`.
+   The result is two libraries: `holonics` and `holonics-cuda`. Time vocabulary follows the
+   [aeon/epoch/cycle record](../../research/records/2026-09-24_THE_AEON_EPOCH_AND_CYCLE_STANDARDIZE_THE_PASSAGE_OF_TIME.md).
+   The pruned code keeps no "session" or "episode" types. Surviving `epoch`/`cycle` identifiers
+   that mean a counter or an iteration count are renamed. K1 rebuilds the HNN interface over
+   aeons.
 
    **No applications survive the cut** (Brandon, September 24). The workbench CLI, the JSONL
    stream protocol, the exposure source and the Athena example applications were prototypes, never

@@ -79,11 +79,15 @@ Rust core implement this object, and every native owner implements or charts it.
 | Ratio: "one per two", a typed comparison of two Holons/coholons/transports carried as an undivided pair, with division-with-remainder, residue/modulo, inversion with its nonunit fibre, lift/carry and jets | `ℓ=log R` with winding branch; `R⁻¹dR`; its jet (velocity, acceleration, jerk, …); loss is `log Ĝ_(T←H)` |
 | Receiver and receipt: a receiver is a role of a participating Holon; reception `I_C(\|H_S⟩,\|H_R⟩)=(\|H'_S⟩,\|H'_R⟩,f_R)` changes both and returns a receipt, a field of readings over a partition, each region in its own frame and clock | no global scalar or global gradient; per-region variability over its own ticks, joined to interface flux |
 | Holarchy: what `interconnect` returns; the joined whole with its retained constituents, incidence, gluing and restrictions (or a typed gluing defect) | quantities belong to the receiver: `view(receiver, grain, clock)`; `count` only under a certified finite partition; one continuing whole, many receiver-relative counts |
+| Aeon (a container of causality in time, part of a Holarchy's parametric orientation), epoch (a division of an aeon at a receiver's section), cycle (a closed loop; completeness, not duration) | elapsed time is the pairing `⟨ω_R\|γ⟩ = windings + phase`; no privileged clock; epochs count flux through the receiver's section; cycles read conserved whole windings |
 
 [definition] Retire these phrasings: "terrain" and bare "standing" for the constitution; "a
 current changes a later current's standing" as a definition of learning; a constitution
 "turning" a coholon "into" a Holon; a single scalar of progress; and any tape, journal or
-frozen cut as retention.
+frozen cut as retention. For time, use aeon, epoch and cycle
+([record](research/records/2026-09-24_THE_AEON_EPOCH_AND_CYCLE_STANDARDIZE_THE_PASSAGE_OF_TIME.md));
+retire "session" and "episode", and do not use `epoch`, `cycle` or `generations` for a
+program-chosen counter or iteration count.
 
 [project-postulate] **Keys and navigation.** Every action is a key: an action expression and its
 antecedents induce a consequence as flux only when they fit a constitution (the lock). The

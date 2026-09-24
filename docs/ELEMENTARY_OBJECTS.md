@@ -63,6 +63,7 @@ is verified. Each move updates this table in the same commit.
 | Holon | `advance` (state, bond, energy balance), `interconnect -> Holarchy`, `contact` (pair geometry + contact material), `continue` (through a tube), `restrict`, `depose`, `pullback` | Lean `Holon/{Law,Port,Dirac,Element,Generator,Restriction,Deposition,Reaction,Cayley}`, `Foundation/{Holon,Standing,Lineage,ConnectionLineage}`; Rust `holonics::{holon,law,port,dirac,element,generator,restriction,deposition,reaction}`, engine `holonic_interaction`, `holonic_chain`; main `holonics::receiver::standing` | `holonics::holon`; `Holonics.Holon` |
 | Receiver and receipt | `interact`/`receive -> InteractionReturn` (both participants' next states, face, receipt, boundary currents, power balance, unresolved fibre); `Ratio::between(receipts)`; `width`, `release` (caller-declared decision and tolerance checks) | Lean `Foundation/Receiver`, `Foundation/ReceiverRelease`, `Transport/ChangingReceiver`, `Objects/Pairing`; Rust `HolonLaw::receive` (passive coholon reading, the zero-storage specialization), `law/receiver.rs` (faces and passive law), `receiver/release.rs` (finite compatible-family width, exact affine enclosure, release decisions), `PresentationCost`, `landauer`; guide [RECEIVER_HOLARCHY](RECEIVER_HOLARCHY.md) | `holonics::receiver` (release operations); `Holonics.Receiver` |
 | Holarchy | `interconnect -> Holarchy` (typed port/cellular gluing); `whole`, `view(receiver, grain, clock)`, `count` (receiver-certified finite partition), `refine` (commuting square or defect) | none as one object; ingredients are `Holon::interconnect`, the receiver atlas, the tower and the future-sufficient quotient | `holonics::holarchy`; `Holonics.Holarchy` (K1a structure, K1b active reception) |
+| Aeon, epoch, cycle | `reading(clock, aeon) -> (windings, phase)`, `concat` (with carry), `epochs(receiver, grain)`, `coarsen` (induced section), `is_cycle` | Lean `Geometry/PhaseCarry`, `Transport/CellHolonomy`, `Objects/Pairing`, `Physics/ObserverBoundaryCurrent`; Rust `holonics::geometry::winding::{Odometer,LockAddress}` | `holonics::aeon` (or within `geometry::clock`); `Holonics.Aeon` (construction K1) |
 | Physical instances | fluid `face_flux`/`advance`; wave `propagate`/`interfere`; thermal `exchange`/`diffuse`/`entropy_production`; spacetime `einstein_residual`/`observer_current`; information `apply` | Lean `Physics/*`, `Millennium/{NavierStokesLambCurrentCell,NavierStokesCurvedTransport}`; Rust `diffusion` | `holonics::physics`; `Holonics.Physics` (construction K3–K4) |
 | HNN | field law, source moments, adjoint, deposition return, execution port | engine `native_ecology/constitutive_fibre/field/**`, `holonics-hna` `native/**` (device-resident) | law and port in `holonics::hnn`; resident realization in `holonics-cuda::hnn`; `Holonics.HNN` |
 
@@ -340,7 +341,9 @@ zero-storage specialization of this operation.
 ### 11. Holarchy
 
 [definition] A **Holarchy** is a Holon perceived as a compound of distinct Holons, always in a
-context (Brandon, September 23). It is what `Holon::interconnect` returns: the joined whole
+context (Brandon, September 23). Its decomposition is spatial; its parametric orientation carries
+its aeons (§12), which it decomposes in time the same receiver-relative way. It is what
+`Holon::interconnect` returns: the joined whole
 together with its retained constituents, incidence, typed gluing and restrictions. When the join
 does not close, `interconnect` returns a typed gluing defect. Its constituent family may be
 implicit or recursively generated, carried by a constituent generator. Gluing retains namespaced
@@ -361,6 +364,37 @@ flux cancels once on every joined face, whatever the grain
 Holarchies. Formal ingredients are `Foundation/{HodgeReceiver,IwasawaTower,FractalPacking}`: a
 count can be stable while its representative changes, and a quotient's cardinality depends on the
 restriction.
+
+### 12. Aeon, epoch and cycle (the passage of time)
+
+[definition] Brandon, September 24 ([record](../research/records/2026-09-24_THE_AEON_EPOCH_AND_CYCLE_STANDARDIZE_THE_PASSAGE_OF_TIME.md)). These three terms are the standard
+vocabulary for time.
+- **Aeon:** an arbitrary container of causality in time, part of a Holarchy's parametric
+  orientation. It is the stretch of the motion between two occurrences: a 1-chain in the lift of
+  the generators' joint clock torus, retaining winding. It is not an interval of a privileged
+  clock.
+- **Epoch:** a division of an aeon. A receiver ticks when the motion crosses its section `Σ_R`,
+  and those ticks partition the aeon into epochs at that receiver's grain. Coarsening merges
+  epochs: the first return to a sub-section, or the Odometer's carry.
+- **Cycle:** a closed loop, meaning completeness rather than a duration. Its readings are whole
+  windings, gauge-free and conserved.
+
+[definition] **Elapsed time is a pairing:** `t_R(γ) = ⟨ω_R | γ⟩ = n_R + r_R`.
+- `ω_R` is the receiver's clock, a closed 1-form: `dθ_R`, or the observer covector `−U_μdx^μ`.
+- `n_R` is the whole windings (the quotient) and `r_R` the open phase (the remainder).
+- No frame is privileged. The rate between two receivers is the ratio of their readings.
+- Readings add under concatenation, with the carry cocycle.
+- Epoch ticks count the flux of the motion through `Σ_R`.
+- Across grains, the mean number of fine epochs per coarse epoch is the section-measure ratio
+  (Kac, under its hypotheses).
+- Two clocks lock at their Farey address, where every `q`-tick aeon is a cycle. Otherwise their
+  natural epoch grains are the continued-fraction convergents of their frequency ratio.
+- An aeon boundary is where the future-sufficient quotient is taken.
+
+"Session", "episode", and counters named `epoch`/`cycle`/`generations` that serve as one global
+clock are retired as terms for time. Owed Lean: additivity with carry, cycle readings invariant
+under homotopy, quotient/remainder, convergent near-return, the Kac relation, and epoch
+refinement towers.
 
 ## Keys, locks and navigation
 
