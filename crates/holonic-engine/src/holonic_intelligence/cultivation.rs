@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
-use crate::generator_native_rest::GeneratorNativeRest;
+use holonics::receiver::native::GeneratorNativeRest;
 use crate::native_ecology::recurrent::BoundaryDecoder;
 use crate::native_ecology::recurrent_return::{
     ExteriorToolReturn, LocalGeneratorDelta, RecurrentReturnRefusal, RecurrentSemanticWork,

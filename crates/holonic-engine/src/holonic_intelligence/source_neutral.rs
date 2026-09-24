@@ -5,7 +5,7 @@ use holonics::geometry::Rat;
 use serde::Serialize;
 use thiserror::Error;
 
-use crate::generator_native_rest::{
+use holonics::receiver::native::{
     GeneratorNativeRest, GeneratorNativeRestError, NativeGenerator,
 };
 use crate::native_ecology::recurrent_return::{RecurrentReturnRefusal, recurrence_trace};

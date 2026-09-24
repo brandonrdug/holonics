@@ -3,7 +3,7 @@
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
-use holonic_engine::generator_native_rest::GeneratorNativeRest;
+use holonics::receiver::native::GeneratorNativeRest;
 use holonic_engine::receiver_exact_compression::{ItemId};
 use holonics::receiver::native::{InputId, Observation, ReceiverId, NativeStateId};
 use serde::{Deserialize, Serialize};

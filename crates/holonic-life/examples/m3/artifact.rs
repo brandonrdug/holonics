@@ -2,7 +2,7 @@
 
 use std::path::Path;
 
-use holonic_engine::generator_native_rest::GeneratorNativeRest;
+use holonics::receiver::native::GeneratorNativeRest;
 use holonics::receiver::native::{InputId, ReceiverId, NativeStateId};
 use num_bigint::BigUint;
 use num_traits::Zero;

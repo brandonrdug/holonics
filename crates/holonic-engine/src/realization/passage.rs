@@ -13,7 +13,7 @@ use sha2::{Digest, Sha256};
 use thiserror::Error;
 
 use crate::cross_chart::{ChainLawReading, CrossChartDefect};
-use crate::generator_native_rest::GeneratorNativeRest;
+use holonics::receiver::native::GeneratorNativeRest;
 use crate::receiver_exact_compression::{ItemId};
 use holonics::receiver::native::{InputId, Observation, ReceiverId};
 use crate::receiver_history_compression::{
@@ -606,7 +606,7 @@ mod tests {
     use super::*;
     use crate::cross_chart::chain_law;
     use holonics::exact_linear::ExactRatMatrix;
-    use crate::generator_native_rest::NativeGenerator;
+    use holonics::receiver::native::NativeGenerator;
     use crate::receiver_exact_compression::{ObservedSystem, compress};
 
     struct ExchangeBits;

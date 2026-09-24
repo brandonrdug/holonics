@@ -11,7 +11,7 @@ use std::path::{Path, PathBuf};
 
 use holonic_engine::cross_chart::chain_law;
 use holonics::exact_linear::ExactRatMatrix;
-use holonic_engine::generator_native_rest::GeneratorNativeRest;
+use holonics::receiver::native::GeneratorNativeRest;
 use holonic_engine::realization::passage::{
     AddressedPassageOccurrence, ArtifactOccurrence, BoundaryHand, ContinuationPassageReference,
     LinearPassageChainReceipt, PhysicalRealizationReference, ReceiverHistoryRealizationPassage,
@@ -657,7 +657,7 @@ fn code_closure() -> String {
         include_bytes!("../../holonic-engine/src/receiver_history_compression.rs")
             .as_slice(),
         include_bytes!("../../holonic-engine/src/cross_chart.rs").as_slice(),
-        include_bytes!("../../holonic-engine/src/generator_native_rest.rs").as_slice(),
+        include_bytes!("../../holonics/src/receiver/native.rs").as_slice(),
         include_bytes!(
             "../../../formal/elementary-holonics/ElementaryHolonics/Millennium/PhysicalRealization.lean"
         )

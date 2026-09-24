@@ -1,9 +1,7 @@
 use std::collections::BTreeSet;
 
-use holonic_engine::{
-    generator_native_rest::GeneratorNativeRest,
-    receiver_history_cultivation::CultivatedReceiverHistoryRest,
-};
+use holonics::receiver::native::GeneratorNativeRest;
+use holonic_engine::receiver_history_cultivation::CultivatedReceiverHistoryRest;
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 

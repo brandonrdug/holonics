@@ -15,7 +15,7 @@ use thiserror::Error;
 use holonics::geometry::Rat;
 
 use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
-use crate::{generator_native_rest::GeneratorNativeRest};
+use holonics::receiver::native::GeneratorNativeRest;
 use holonics::receiver::native::{InputId, NativeStateId};
 
 use super::recurrent::{BoundaryDecoder, RetainedContinuationRest};
@@ -744,7 +744,7 @@ impl From<ExactLinearError> for RecurrentReturnRefusal {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::generator_native_rest::NativeGenerator;
+    use holonics::receiver::native::NativeGenerator;
     use crate::native_ecology::holonic_intelligence::CultivationLifecycle;
     use crate::native_ecology::recurrent::{
         BoundaryFace, ClosureDerivation, RetainedContinuationRest,

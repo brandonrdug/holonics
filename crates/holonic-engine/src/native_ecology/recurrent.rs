@@ -13,7 +13,7 @@ use sha2::{Digest, Sha256};
 use thiserror::Error;
 
 use holonics::exact_work::ExactWork;
-use crate::generator_native_rest::{GeneratorNativeRest, NativeGenerator};
+use holonics::receiver::native::{GeneratorNativeRest, NativeGenerator};
 use holonics::receiver::native::{InputId, Observation, ReceiverId, NativeStateId, NativeTransport};
 
 pub const RETAINED_PASSAGE_SCHEMA: &str = "holonics.i1.retained-continuation-passage.v1";

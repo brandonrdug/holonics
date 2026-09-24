@@ -433,10 +433,6 @@ pub mod quintic_chart;
 pub mod rebase_invariants;
 pub mod receiver;
 pub mod receiver_exact_compression;
-// A source-detached executable rest for a finite generator action.  This is the reusable runtime
-// face of `receiver_history_compression`; it deliberately carries neither the quotient map nor a
-// source representative.
-pub mod generator_native_rest;
 // The explicit finite action induced by a receiver/history quotient. Kept behind its module path:
 // its source/native identities and decoder are meaningful only with the quotient they witness.
 pub mod receiver_history_compression;
