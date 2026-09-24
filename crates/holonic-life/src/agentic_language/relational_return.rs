@@ -1,4 +1,4 @@
-use holonic_structure::{LocalRelations, LocalSequence, LocalSet};
+use holonics::structure::{LocalRelations, LocalSequence, LocalSet};
 
 use crate::relational_language::{RelationalThoughtCurrent, RelationalThoughtFiber};
 

@@ -19,7 +19,7 @@ use std::{
 };
 
 use body::num::Cog;
-use holonic_structure::{BranchLineage, LocalSequence, LocalSet};
+use holonics::structure::{BranchLineage, LocalSequence, LocalSet};
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use soma_membrane::{
     LiveCurrentExecutor, LiveCurrentMachine, ParallelCpuLiveCurrentExecutor, ReceiverFiberIdentity,

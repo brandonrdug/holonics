@@ -96,7 +96,7 @@ use holonic_engine::conditioned_derivation::{
     expose, Bridge, ConditionedBody, DerivedPassage, FoundedMorphology, FoundedMorphologyRefusal,
     FoundedStem, PassageOrigin, StemId,
 };
-use holonic_structure::LocalSequence;
+use holonics::structure::LocalSequence;
 
 /// The leading octets of this form's wire: the four-octet tag, then the codec's own layout version.
 ///

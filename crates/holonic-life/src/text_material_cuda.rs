@@ -9,7 +9,7 @@
 use core::ffi::c_void;
 use std::time::Instant;
 
-use holonic_structure::{LocalSequence, LocalStructureError};
+use holonics::structure::{LocalSequence, LocalStructureError};
 use mount::{
     Context, Device, DeviceBuffer, Dim3, Module, Stream, VirtualDeviceBuffer, VirtualDeviceGrowth,
     SOMA_PTX,

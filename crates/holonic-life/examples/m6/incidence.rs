@@ -7,7 +7,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_structure::LocalSequence;
+use holonics::structure::LocalSequence;
 use life::returned_contact_cuda::{
     CudaReturnedContactExecutor, ReturnedContactCudaReceipt, ReturnedContactGroups,
     ReturnedContactRelation, ReturnedContactSparseFront,

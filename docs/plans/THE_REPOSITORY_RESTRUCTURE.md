@@ -685,8 +685,9 @@ existing suites (§0.9):
    and it no longer forwards their `hna`, `engine`, `soulkiller` or `interop` surfaces. The workbench
    selects the direct HNA and engine packages. The Holon core and source-neutral exact operators
    are now internal root modules of `holonics`; callers use those qualified paths directly.
-   `structure` and `geometry` remain source owners to fold, and resident engine/HNN execution
-   still moves to CUDA.
+   The live structural carriers now belong to internal `holonics::structure`, with their callers
+   retargeted. The [structure move](census/M1_STRUCTURE_OWNER_MOVE.md) records its tests. Geometry
+   remains a source owner to fold, and resident engine/HNN execution still moves to CUDA.
 8. **M2: the Lean move.** Move paths to `lean/` (`Holonics` and `HolonicsResearch`) and build both
    targets. Rename `Soma.Holonics` to `Holonics` as a separate mechanical commit.
 9. **D: documents (the restructure's closing acceptance).** All to the verified paths:

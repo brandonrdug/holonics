@@ -20,7 +20,7 @@ extern crate alloc;
 use alloc::borrow::ToOwned;
 use core::fmt;
 
-use holonic_structure::{
+use holonics::structure::{
     GrowingKeyAtlas, KeyAtlasError, LocalSet, LocalStructureError, OrdinalAtlasError,
     SparseOrdinalAtlas,
 };

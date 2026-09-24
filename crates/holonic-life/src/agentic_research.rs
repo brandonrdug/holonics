@@ -10,7 +10,7 @@
 use std::collections::BTreeSet;
 
 use holonic_engine::CpuExecutor;
-use holonic_structure::{CausalMembrane, LocalRelations, LocalSequence};
+use holonics::structure::{CausalMembrane, LocalRelations, LocalSequence};
 use serde::Serialize;
 
 use crate::{
@@ -437,23 +437,23 @@ impl AgenticResearchSession {
                     .iter()
                     .map(|clause| clause.identity.to_owned()),
             ),
-            holonic_structure::LocalSet::from_iter(current.source_witnesses.iter().cloned()),
-            holonic_structure::LocalSet::from_iter(current.passage_witnesses.iter().cloned()),
+            holonics::structure::LocalSet::from_iter(current.source_witnesses.iter().cloned()),
+            holonics::structure::LocalSet::from_iter(current.passage_witnesses.iter().cloned()),
             LocalSequence::from_iter(
                 current
                     .required_entity_regions
                     .iter()
-                    .map(|region| holonic_structure::LocalSet::from_iter(region.iter().cloned())),
+                    .map(|region| holonics::structure::LocalSet::from_iter(region.iter().cloned())),
             ),
-            holonic_structure::LocalSet::from_iter(
+            holonics::structure::LocalSet::from_iter(
                 current
                     .returned_entity_regions
                     .iter()
                     .filter_map(|at| current.required_entity_regions.get(*at))
-                    .map(|region| holonic_structure::LocalSet::from_iter(region.iter().cloned())),
+                    .map(|region| holonics::structure::LocalSet::from_iter(region.iter().cloned())),
             ),
             selected.minimal_closed_witness_family,
-            holonic_structure::LocalSet::from_iter(target.lineage.iter().cloned()),
+            holonics::structure::LocalSet::from_iter(target.lineage.iter().cloned()),
         )
         .ok_or(AgenticResearchError::NoClosedCurrent)
     }
@@ -1326,7 +1326,7 @@ mod tests {
                 LeanTheoremTargetRequest {
                     identity: "formal-target".to_owned(),
                     target_episode: diagnosis_answer.answer.answer_episode_identity.to_owned(),
-                    declared_theorem_faces: holonic_structure::LocalSet::from([
+                    declared_theorem_faces: holonics::structure::LocalSet::from([
                         declared_theorem_face,
                     ]),
                     alternatives: LocalSequence::from_iter([LeanTheoremTargetFace {

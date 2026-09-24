@@ -1,6 +1,6 @@
 //! Ownership-coupled CUDA residency, exact admission, bounded restriction, and native rest.
 
-use holonic_structure::LocalSequence;
+use holonics::structure::LocalSequence;
 use serde::Serialize;
 use soma_abi::text_restrict_cuda as text_cuda;
 

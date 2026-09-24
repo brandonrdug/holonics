@@ -2,7 +2,7 @@ use holonic_language::{
     CodecObstruction, CodecStep, ContinuationState, ReceiverId, ReflectiveCodecExecutor,
     ReflectiveRuntime,
 };
-use holonic_structure::LocalSet;
+use holonics::structure::LocalSet;
 
 #[derive(Debug, PartialEq, Eq)]
 enum Instruction {

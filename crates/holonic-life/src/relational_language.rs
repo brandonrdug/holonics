@@ -19,7 +19,7 @@ use holonic_engine::{
     ExactReceiverCurrentLaw, ExactReceiverCurrentPassage, ExactReceiverCurrentRadiation,
     ReceiverCurrentPassageId, ReceiverCurrentSiteId,
 };
-use holonic_structure::{GrowingKeyAtlas, LocalQueue, LocalRelations, LocalSequence, LocalSet};
+use holonics::structure::{GrowingKeyAtlas, LocalQueue, LocalRelations, LocalSequence, LocalSet};
 use num_bigint::BigUint;
 use soma_abi::active::{ActionCurrent, RelationAtom};
 #[cfg(test)]

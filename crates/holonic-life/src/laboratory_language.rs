@@ -35,7 +35,7 @@ macro_rules! trace_phase {
         crate::laboratory_language::eros_trace($phase, &format_args!($($argument)*))
     };
 }
-use holonic_structure::{LocalRelations, LocalSequence, LocalSet};
+use holonics::structure::{LocalRelations, LocalSequence, LocalSet};
 use serde::{Deserialize, Serialize};
 
 use crate::{

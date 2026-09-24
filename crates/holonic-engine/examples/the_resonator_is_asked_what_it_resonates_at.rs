@@ -28,7 +28,7 @@ use holonic_engine::traversible_chain::{
     Admittance, BandClass, BlochReading, Crossing, PhasedLink, PhasedTransfer, Standing,
     StandingWaveReading, cavity, found_phased,
 };
-use holonic_structure::Composes;
+use holonics::structure::Composes;
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 use relational_geometry::Rat;

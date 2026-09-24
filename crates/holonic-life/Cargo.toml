@@ -14,7 +14,6 @@ path = "src/bin/eros.rs"
 
 [dependencies]
 body = { path = "../holonic-body" }
-holonic-structure = { path = "../holonic-structure" }
 holonic-language = { path = "../holonic-language" }
 holonic-engine = { path = "../holonic-engine", default-features = false }
 # The Holon core: restriction fibres and separators (plan phase 10).

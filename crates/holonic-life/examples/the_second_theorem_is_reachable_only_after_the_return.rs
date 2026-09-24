@@ -67,7 +67,7 @@ use std::collections::BTreeSet;
 use std::path::PathBuf;
 use std::process::Command;
 
-use holonic_structure::{LocalSequence, LocalSet};
+use holonics::structure::{LocalSequence, LocalSet};
 use life::lean_mathematics::{
     LeanDiagnosisCurrentFace, LeanDiagnosisRequirement, LeanKernelWorld, LeanMathematicsEcology,
     LeanMathematicsError, LeanProofProblem, LeanSourceDocument, LeanTargetSelectionReceipt,

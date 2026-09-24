@@ -30,7 +30,7 @@ use holonic_engine::{algebraic::ComparativeMultiplicity, conditioned_derivation:
         ReturnedIncidence, ReturnedProduction, ReturnedTargetGroup as EngineReturnedTargetGroup,
         ValidatedReturnedAtlas,
     }, returned_reading::{read_production, ReturnedReading}};
-use holonic_structure::{LocalSequence, LocalSet};
+use holonics::structure::{LocalSequence, LocalSet};
 use num_bigint::BigUint;
 use serde::Serialize;
 use sha2::{Digest, Sha256};

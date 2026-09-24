@@ -154,9 +154,9 @@
 //! power chart and is equally not evidence. `CLAUDE.md`'s tautology rule governs: a receipt that
 //! could not have come out otherwise carries no evidence. The junction is lossless by construction,
 //! and what a traversal actually loses is the **reflected population**, which is why that is what
-//! [`holonic_structure::Chain`] retains — now on both routes, the caller's and the transport's own.
+//! [`holonics::structure::Chain`] retains — now on both routes, the caller's and the transport's own.
 
-use holonic_structure::{Chain, ChainEnd, Composes, Hand, Relating};
+use holonics::structure::{Chain, ChainEnd, Composes, Hand, Relating};
 use num_traits::{One, Signed, Zero};
 use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
@@ -657,15 +657,15 @@ impl Relating for Crossing {
     }
 }
 
-// The junction law over integer populations MOVED to `holonic_structure::CountedCrossing` on
+// The junction law over integer populations MOVED to `holonics::structure::CountedCrossing` on
 // 2026-08-15, and re-exported here so every consumer of this module is unchanged.
 //
 // It moved because `crates/holonic-membrane` needs the same law for its co-present seam closure and cannot
-// see this crate — `membrane` depends on `holonic-structure`, not on the engine. Two crates that
+// see this crate — `membrane` depends on `holonics::structure`, not on the engine. Two crates that
 // cannot see each other both needing one law is the definition of a substrate carrier. The exact
 // rational chart stays here, and the parity gate between the two charts stays here with it — and
 // since 2026-08-15 that gate compares the transfer matrix entry by entry, not only its faces.
-pub use holonic_structure::CountedCrossing;
+pub use holonics::structure::CountedCrossing;
 
 /// Why a traversal stopped, or what still stands where it paused. Both are testimony; neither is an
 /// absence.
@@ -941,7 +941,7 @@ impl Relating for PhasedLink {
 
     /// **The hand is the sign of the STORED face, and it is read that way at every link.**
     ///
-    /// `holonic_structure::Hand::Ortho` is defined as *"cohere-null with the cross **maximal** — the
+    /// `holonics::structure::Hand::Ortho` is defined as *"cohere-null with the cross **maximal** — the
     /// pure orthogonal turn, the founding hand"*, so `Ortho` names the case where nothing stands and
     /// everything transports. `crates/holonic-body/src/arrow.rs` reads the sign of `aim`, which its own typing
     /// calls *what STANDS*; [`Crossing::meet`] reads the sign of `M₂₁`, the half that came **back**
@@ -1320,7 +1320,7 @@ impl BandReading {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use holonic_structure::{DeclaredGauge, Disposition};
+    use holonics::structure::{DeclaredGauge, Disposition};
     use num_bigint::BigInt;
     use std::collections::BTreeSet;
 

@@ -12,7 +12,7 @@ use core::{
 
 use serde::{Deserialize, Serialize};
 
-use crate::LocalStructureError;
+use crate::structure::LocalStructureError;
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(transparent)]

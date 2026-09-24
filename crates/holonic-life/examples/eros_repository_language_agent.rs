@@ -32,7 +32,7 @@ use std::{
 };
 
 use body::num::Cog;
-use holonic_structure::CausalMembrane;
+use holonics::structure::CausalMembrane;
 use life::{
     agentic_language::{
         AgenticDeedArgument, AgenticDialogueOccurrence, AgenticDialogueRole,

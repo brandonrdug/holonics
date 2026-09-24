@@ -47,7 +47,7 @@ use num_bigint::BigInt;
 use num_traits::{One, Zero};
 
 use holonic_engine::hypergeometric_closure::{ClosureReading, ThreeSiteDials, read_return_group};
-use holonic_structure::Composes;
+use holonics::structure::Composes;
 use relational_geometry::Rat;
 use relational_geometry::exact::RatVec2;
 use relational_geometry::receiver_atlas;
@@ -506,7 +506,7 @@ impl Form {
 /// # Why this is a `Composes` and not a comparison written here
 ///
 /// The three-way discrimination this station needs is already written, at
-/// `crates/holonic-structure/src/chain.rs`: *"Loop closure is `Chain::holonomy`; path-independence
+/// `crates/holonics/src/structure/chain.rs`: *"Loop closure is `Chain::holonomy`; path-independence
 /// is `Chain::defect_against`; loss is here [`is_rebase`]."* Measured 2026-08-17 by
 /// `grep -c "holonic_structure\|Composes\|Chain"` over this driver and its founding twin: **0** in
 /// both. Five implementors of `Composes` stood in the tree and neither production driver imported

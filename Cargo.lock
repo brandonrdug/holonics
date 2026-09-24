@@ -558,7 +558,6 @@ name = "holonic-engine"
 version = "0.1.0"
 dependencies = [
  "claxon",
- "holonic-structure",
  "holonics",
  "hound",
  "image",
@@ -580,14 +579,7 @@ dependencies = [
 name = "holonic-language"
 version = "0.1.0"
 dependencies = [
- "holonic-structure",
-]
-
-[[package]]
-name = "holonic-structure"
-version = "0.1.0"
-dependencies = [
- "serde",
+ "holonics",
 ]
 
 [[package]]
@@ -601,7 +593,6 @@ dependencies = [
 name = "holonics"
 version = "0.1.0"
 dependencies = [
- "holonic-structure",
  "holonic-words",
  "num-bigint",
  "num-traits",
@@ -759,7 +750,6 @@ dependencies = [
  "body",
  "holonic-engine",
  "holonic-language",
- "holonic-structure",
  "holonics",
  "hound",
  "image",
@@ -1294,7 +1284,7 @@ name = "soma-membrane"
 version = "0.0.0"
 dependencies = [
  "body",
- "holonic-structure",
+ "holonics",
  "soma-abi",
 ]
 

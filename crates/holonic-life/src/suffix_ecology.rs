@@ -10,7 +10,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use body::num::COG_WORDS;
-use holonic_structure::{
+use holonics::structure::{
     FrozenRelationAtlas, FrozenRelationBuilder, LocalRelations, LocalSequence, LocalSet,
     RelationAtlasError, RelationSpan,
 };

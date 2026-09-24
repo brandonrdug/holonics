@@ -53,7 +53,7 @@ use std::path::PathBuf;
 use holonic_engine::traversible_chain::{
     found, Admittance, Crossing, InteractionChain, Standing, TransferMatrix,
 };
-use holonic_structure::{DeclaredGauge, Disposition, Face};
+use holonics::structure::{DeclaredGauge, Disposition, Face};
 use life::laboratory_language::{
     text_features, LaboratoryResearchLeader, LaboratorySourceAtlas, LaboratoryWorldReturn,
 };
@@ -77,7 +77,7 @@ fn admittance(population: u64) -> Option<Admittance> {
 /// a relation — *this leader against this section* — and a bare `u64` deletes the relation and keeps
 /// the magnitude, which is the float argument one grain down. `Face` carries both, so the traversal
 /// below can name which site a link crossed instead of reporting that link 4,187 had admittance 2.
-/// `holonic_structure::Face` has no constructor that yields a scalar without its relation.
+/// `holonics::structure::Face` has no constructor that yields a scalar without its relation.
 fn profile_of(
     leader: &LaboratoryResearchLeader,
     returned: &LaboratoryWorldReturn,

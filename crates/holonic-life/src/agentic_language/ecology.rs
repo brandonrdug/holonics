@@ -764,7 +764,7 @@ impl AgenticLanguageEcology {
 
     /// Receive one occurrence through an explicitly mounted physical-current executor.
     ///
-    /// [`holonic_structure::CausalMembrane::receive_occurrence`] cannot carry a carrier argument —
+    /// [`holonics::structure::CausalMembrane::receive_occurrence`] cannot carry a carrier argument —
     /// its signature is fixed by the trait — so this is the outer mouth a caller holding a mounted
     /// card conducts through. It is the same membrane: the occurrence is retained exactly when it
     /// was admitted, and the returned consequence is identical. The only difference is that the
@@ -1684,7 +1684,7 @@ impl AgenticLanguageEcology {
     }
 }
 
-impl holonic_structure::CausalMembrane for AgenticLanguageEcology {
+impl holonics::structure::CausalMembrane for AgenticLanguageEcology {
     type Standing = AgenticLanguageStanding;
     type Occurrence<'a>
         = AgenticLanguageOccurrence<'a>

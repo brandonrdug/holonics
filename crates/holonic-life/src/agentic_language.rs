@@ -22,7 +22,7 @@ use holonic_language::{
     CodecCrossingError, CodecId, CodecObstruction, CodecStep, ContinuationId, ContinuationState,
     ReceiverId, ReflectiveCodecExecutor, ReflectiveRuntime, ReflectiveRuntimeError,
 };
-use holonic_structure::{CausalMembrane, LocalSet};
+use holonics::structure::{CausalMembrane, LocalSet};
 use soma_abi::active::ActionCurrent;
 use soma_membrane::{LiveCurrentExecutor, ParallelCpuLiveCurrentExecutor};
 

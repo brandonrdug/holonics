@@ -12,7 +12,7 @@
 //! testimony.  The factorized predecessor body can be observed without
 //! pretending its union was one enacted path: witness paths remain separate.
 
-use holonic_structure::{LocalQueue, LocalRelations, LocalSequence, LocalSet, SparseOrdinalAtlas};
+use holonics::structure::{LocalQueue, LocalRelations, LocalSequence, LocalSet, SparseOrdinalAtlas};
 use num_bigint::BigUint;
 use num_traits::{One, ToPrimitive, Zero};
 use thiserror::Error;
@@ -103,7 +103,7 @@ pub struct ExactReceiverCurrentRadiation {
 }
 
 /// Sparse receiver-addressed arrival population. The physical page directory is owned by
-/// `holonic-structure`; a language or physics application can observe receiver identities but
+/// `holonics::structure`; a language or physics application can observe receiver identities but
 /// cannot acquire or reinterpret the directory as its own graph.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct ExactReceiverCurrentArrivalAtlas {

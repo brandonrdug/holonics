@@ -19,7 +19,7 @@
 
 use std::fmt;
 
-use holonic_structure::CausalMembrane;
+use holonics::structure::CausalMembrane;
 use serde::{Deserialize, Serialize};
 
 use holonics::holon::HolonState;

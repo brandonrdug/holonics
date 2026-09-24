@@ -5,7 +5,7 @@
 //! directory position, and contiguous row offsets never become source identity, chronology, or
 //! receiver testimony.
 //!
-//! The crate deliberately does not define a universal event, scalar state, modality, or wire
+//! This module deliberately does not define a universal event, scalar state, modality, or wire
 //! format. [`CausalMembrane`] instead preserves each application's typed occurrence and return
 //! while giving both reference laws and live machines one atomic receiving contract.
 //!
@@ -21,12 +21,6 @@
 //! and a hand that **gates**; a chain has both ends open and retains what did not connect; an index
 //! is a scalar face whose relation stays askable. Plan:
 //! `archive/plans/THE_TRAVERSIBLE_CHAIN.md`.
-
-#![no_std]
-
-extern crate alloc;
-#[cfg(test)]
-extern crate std;
 
 mod branch_lineage;
 mod chain;

@@ -50,7 +50,7 @@ use std::process::Command;
 
 use holonic_engine::exponentiated_ratio::RatioFamily;
 use holonic_engine::surprisal::{Support, SymbolicSurprisal};
-use holonic_structure::{LocalSequence, LocalSet};
+use holonics::structure::{LocalSequence, LocalSet};
 use life::lean_mathematics::{
     LeanDiagnosisCurrentFace, LeanDiagnosisRequirement, LeanKernelWorld, LeanMathematicsEcology,
     LeanMathematicsError, LeanProofProblem, LeanSourceDocument, LeanTargetSelectionReceipt,

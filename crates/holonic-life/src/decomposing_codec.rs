@@ -72,7 +72,7 @@ use holonic_language::{
     CodecStep, ContinuationId, ContinuationState, FaceId, ReceiverId as CodecReceiverId,
     ReflectionId, ReflectiveCodecExecutor, ReflectiveRuntime, ReflectiveRuntimeError,
 };
-use holonic_structure::LocalSet;
+use holonics::structure::LocalSet;
 
 const PASS_SCHEMA: &str = "life.decomposing-codec.pass.v1";
 

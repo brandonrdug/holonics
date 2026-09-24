@@ -17,7 +17,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_structure::GrowingKeyAtlas;
+use holonics::structure::GrowingKeyAtlas;
 
 /// A source-local address.  It is a binding axis inside one declared ecology, not a semantic
 /// identity, global token id, hash, or claim that two equal byte faces have the same lineage.

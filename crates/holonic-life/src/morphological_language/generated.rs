@@ -48,7 +48,7 @@ impl MorphologicalSupportConduct {
     /// which organ assembled it.
     pub fn of(tokens: &[MorphologicalGeneratedToken]) -> (Self, usize) {
         // `LocalSet` is the substrate's own population carrier — ordered, insert-deduplicating,
-        // and the thing `holonic-structure` exists to provide. Reaching past it for a std container
+        // and the thing `holonics::structure` exists to provide. Reaching past it for a std container
         // is what the ownership ratchet counts, and it counts it because the machine has its own.
         let mut supporting = LocalSet::new();
         let mut recurrent = 0usize;

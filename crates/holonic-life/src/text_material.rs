@@ -40,7 +40,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use holonic_structure::{LocalRelations, LocalSequence, LocalSet};
+use holonics::structure::{LocalRelations, LocalSequence, LocalSet};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 

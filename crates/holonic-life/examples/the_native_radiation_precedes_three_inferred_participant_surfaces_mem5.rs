@@ -9,7 +9,7 @@ use holonic_engine::{
     receiver_exact_compression::ReceiverId,
     BoundaryId, ExactUnitConicPhase,
 };
-use holonic_structure::CausalMembrane;
+use holonics::structure::CausalMembrane;
 use life::native_intelligence::{
     AddressedMaterialOccurrence, AdmittedReturnedAffineLaboratoryRestWitness,
     ExactMembraneChartPassage, ExteriorActionCurrent, ExteriorOccurrenceTransducer,

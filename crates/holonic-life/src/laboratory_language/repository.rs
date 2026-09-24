@@ -6,7 +6,7 @@ use std::{
 };
 
 use holonic_engine::{CpuExecutionError, CpuExecutor};
-use holonic_structure::{LocalSequence, LocalSet};
+use holonics::structure::{LocalSequence, LocalSet};
 use serde::Serialize;
 
 use crate::causal_language::{lexical_tokens, render_tokens};

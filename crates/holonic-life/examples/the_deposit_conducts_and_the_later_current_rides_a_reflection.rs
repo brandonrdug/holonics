@@ -66,7 +66,7 @@ use holonic_engine::traversible_chain::{
     found_phased, Admittance, BandClass, BlochReading, Crossing, PhasedLink, PhasedTransfer,
     Standing, StandingWaveReading,
 };
-use holonic_structure::Composes;
+use holonics::structure::Composes;
 use life::incidence_production::{
     ArrivalResponse, DeclaredOccurrence, IncidenceComplex, IncidenceProductionError, PhaseChart,
 };

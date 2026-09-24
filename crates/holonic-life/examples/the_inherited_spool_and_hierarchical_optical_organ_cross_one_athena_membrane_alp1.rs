@@ -8,7 +8,7 @@ use holonic_engine::{
     quantity::BaseUnits, receiver_exact_compression::ReceiverId, BoundaryId,
     ExactComplexWaveCurrent,
 };
-use holonic_structure::CausalMembrane;
+use holonics::structure::CausalMembrane;
 use life::{
     mathematical_source::{ExactOpticalOccurrence, HierarchicalOpticalPassage},
     native_intelligence::{

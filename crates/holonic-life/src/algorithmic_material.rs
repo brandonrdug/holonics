@@ -8,7 +8,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_structure::LocalSequence;
+use holonics::structure::LocalSequence;
 use serde::Serialize;
 
 use crate::{

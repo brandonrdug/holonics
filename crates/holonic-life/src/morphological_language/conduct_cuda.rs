@@ -22,7 +22,7 @@
 use core::ffi::c_void;
 use std::time::Instant;
 
-use holonic_structure::{LocalSequence, LocalStructureError};
+use holonics::structure::{LocalSequence, LocalStructureError};
 use mount::{Context, Device, DeviceBuffer, Module, Stream, SOMA_PTX};
 use serde::Serialize;
 use soma_abi::morphological_conduct_cuda as wire;

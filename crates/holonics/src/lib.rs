@@ -54,9 +54,11 @@ pub mod port;
 pub mod reaction;
 pub mod restriction;
 pub mod scalar;
+pub mod structure;
 
 pub use holon::Holon;
 
-// Structural and geometric packages remain separate until their measured M1 owner moves.
-pub use holonic_structure as structure;
+extern crate alloc;
+
+// Geometry remains a separate source owner until its measured M1 move.
 pub use relational_geometry as geometry;

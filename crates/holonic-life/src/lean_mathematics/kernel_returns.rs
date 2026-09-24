@@ -1,6 +1,6 @@
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_structure::{LocalRelations, LocalSequence};
+use holonics::structure::{LocalRelations, LocalSequence};
 use serde::Serialize;
 
 use super::LeanProofMotion;

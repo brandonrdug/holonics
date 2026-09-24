@@ -6,7 +6,6 @@ publish = false
 license.workspace = true
 
 [dependencies]
-holonic-structure = { workspace = true }
 relational-geometry = { workspace = true }
 holonic-words = { workspace = true }
 num-bigint = { workspace = true }

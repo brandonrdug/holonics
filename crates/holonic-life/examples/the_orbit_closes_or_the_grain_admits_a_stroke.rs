@@ -87,7 +87,7 @@ use holonic_engine::receiver_exact_compression::{
     compress, InputId, ItemId, Observation, ObservedSystem, ReceiverId,
 };
 use holonic_engine::winding_inertia::lattice_admits_order;
-use holonic_structure::DeclaredGauge;
+use holonics::structure::DeclaredGauge;
 
 const AXIS: i64 = 1 << 8;
 const SEED: &[u8] = b"the orbit closes or the grain admits a stroke";

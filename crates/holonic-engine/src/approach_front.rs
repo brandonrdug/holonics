@@ -382,7 +382,7 @@ mod tests {
         ExactReceiverCurrentDeferredArrival, ExactReceiverCurrentLaw, ExactReceiverCurrentPassage,
         ReceiverCurrentPassageId, ReceiverCurrentSiteId,
     };
-    use holonic_structure::LocalSet;
+    use holonics::structure::LocalSet;
     use num_traits::One;
 
     fn site(at: u64) -> ReceiverCurrentSiteId {

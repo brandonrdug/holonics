@@ -7,7 +7,7 @@
 
 use core::{cmp::Ordering, fmt};
 
-use crate::{OrdinalAtlasError, SparseOrdinalAtlas};
+use crate::structure::{OrdinalAtlasError, SparseOrdinalAtlas};
 
 const MAXIMUM_AVL_DEPTH: usize = 128;
 

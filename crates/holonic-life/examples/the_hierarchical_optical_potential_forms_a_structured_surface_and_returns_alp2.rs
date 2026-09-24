@@ -14,7 +14,7 @@ use holonic_engine::{
     receiver_exact_compression::ReceiverId,
     BoundaryId, ExactComplexWaveCurrent,
 };
-use holonic_structure::CausalMembrane;
+use holonics::structure::CausalMembrane;
 use image::ImageReader;
 use life::{
     mathematical_source::{

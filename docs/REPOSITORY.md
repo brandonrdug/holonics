@@ -44,8 +44,9 @@ The old `soma/` parent no longer divides host Rust libraries, device targets, fo
 tools into a parallel tree. Package names for older substrate components remain stable; the
 public HNN implementation currently lives in `holonics-hna`. The main `holonics` crate owns the
 Holon facets and source-neutral exact operators after the M1 core source move. Its dependency cut
-removed the native feature and HNN/engine/life forwarding paths. `structure` and `geometry` still
-re-export their current packages until those owners move; see the [Rust API map](RUST_FRAMEWORK.md).
+removed the native feature and HNN/engine/life forwarding paths. `structure` now owns its carriers
+inside main; `geometry` still re-exports its current package until that owner moves. See the
+[Rust API map](RUST_FRAMEWORK.md).
 
 [project-postulate] The [September 23 restructure](plans/THE_REPOSITORY_RESTRUCTURE.md)
 supersedes this layout as a **target**, while this page maps the present checkout. It reduces

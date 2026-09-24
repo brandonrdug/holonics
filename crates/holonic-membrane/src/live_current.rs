@@ -324,7 +324,7 @@ use body::manifold::{
 use body::medium::{RegionalForm, COMPACT_FORM_LAYOUT_VERSION, COMPACT_FORM_WORDS};
 use body::num::{cog_packed_word, packed_cog_is_canonical, read_cog, Cog, COG_WORDS};
 use body::place::Place;
-use holonic_structure::{CausalMembrane, OrdinalAtlasError, SparseOrdinalAtlas};
+use holonics::structure::{CausalMembrane, OrdinalAtlasError, SparseOrdinalAtlas};
 use soma_abi::active::{ActionCurrent, RelationAtom};
 
 use crate::live_constituent::{

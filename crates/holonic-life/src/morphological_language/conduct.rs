@@ -6,7 +6,7 @@
 //! multiplicity remain testimony; none of them can manufacture the contact or enter its address.
 
 use body::num::COG_WORDS;
-use holonic_structure::{LocalRelations, LocalSequence, LocalSet};
+use holonics::structure::{LocalRelations, LocalSequence, LocalSet};
 use soma_membrane::ReceiverFiberIdentity;
 
 use crate::suffix_ecology::{

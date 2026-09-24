@@ -10,7 +10,7 @@ use std::sync::Arc;
 
 use body::incidence::IncidenceHand;
 use body::num::{Cog, COG_WORDS};
-use holonic_structure::{
+use holonics::structure::{
     GrowingKeyAtlas, KeyAtlasError, LocalRelations, LocalSequence, LocalSet, LocalStructureError,
     RelationAtlasError,
 };

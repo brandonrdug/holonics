@@ -6,5 +6,5 @@ publish = false
 
 [dependencies]
 body = { path = "../holonic-body" }
-holonic-structure = { path = "../holonic-structure" }
+holonics = { path = "../holonics" }
 soma-abi = { path = "../holonic-abi" }

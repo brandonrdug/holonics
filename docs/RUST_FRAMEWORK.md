@@ -1,8 +1,8 @@
 # Holonics as a Rust library
 
 [definition] `crates/holonics` is the substantive Holon library (`publish = false`). Its Holon
-facets and exact operators now live at the crate root; structure and geometry remain separate
-source owners awaiting their M1 moves. HNN application and wire identifiers retain `hna`; the
+facets and exact operators now live at the crate root, and structural carriers under its
+`structure` module. Geometry remains a separate source owner awaiting its M1 move. HNN application and wire identifiers retain `hna`; the
 workbench imports their current implementation packages directly.
 
 [project-postulate] This table records the **current** public paths. The
@@ -22,7 +22,7 @@ general model architecture.
 |---|---|
 | `holonics::{Holon,holon,law,port,dirac,complex,element,generator,restriction,deposition}` | The one Holon law and its facets, owned by the main crate |
 | `holonics::{exact_linear,exact_value,exact_work,inertia,prime_image_algebra,rational_polynomial}` | Source-neutral exact operators owned by the main crate |
-| `holonics::structure` | Temporary re-export of `holonic-structure`; M1 will move its surviving structural carriers into this crate |
+| `holonics::structure` | Structural relation, chain, local population, gauge and membrane carriers owned inside the main crate |
 | `holonics::geometry` | Temporary re-export of `relational-geometry`; M1 will move exact frames and receiver maps into this crate |
 | `holonic-engine` | Current direct owner of engine mathematics, constitutive fields and resident execution; resident execution moves to `holonics-cuda` |
 | `holonics-hna` | Current direct owner of HNN sessions and application adapters; its backend-neutral HNN law moves into `holonics`, resident execution to CUDA |
@@ -44,7 +44,7 @@ let unevaluated = ExactExpr::symbol("source_parameter");
 
 [definition; M1 transition] The engine and HNN remain direct packages for current consumers; no
 `holonics::engine`, `holonics::hna`, `holonics::soulkiller` or `holonics::interop` forwarding path
-remains. Main still re-exports `structure` and `geometry` pending their owner moves. Advanced
+remains. Main still re-exports `geometry` pending its owner move. Advanced
 mathematical modules and the resident HNN have not yet moved into their target owners.
 
 ## Productive local generator construction

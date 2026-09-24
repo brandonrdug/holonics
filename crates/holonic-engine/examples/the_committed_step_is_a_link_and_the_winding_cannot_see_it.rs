@@ -38,7 +38,7 @@ use holonic_engine::leader_quadrature::{
     CommittedTransport, LeaderLaw, LeaderQuadrature, LocalJet, MaterialBoundary, RationalGerm,
     RideDiscipline, WitnessDepth, chain_of, integrate_by_leaders,
 };
-use holonic_structure::{Composes, Hand, Relating};
+use holonics::structure::{Composes, Hand, Relating};
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
 use relational_geometry::Rat;

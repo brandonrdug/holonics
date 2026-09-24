@@ -30,7 +30,7 @@
 
 use std::{path::PathBuf, process::Command};
 
-use holonic_structure::LocalSet;
+use holonics::structure::LocalSet;
 use life::lean_mathematics::{
     kernel_returns::{LeanKernelOutcome, LeanKernelReturnFamily},
     LeanKernelWorld, LeanProofCandidate, LeanProofProblem,

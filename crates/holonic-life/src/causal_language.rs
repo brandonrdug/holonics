@@ -17,7 +17,7 @@ use holonic_engine::exponentiated_ratio::{RatioError, RatioFamily};
 use holonic_engine::surprisal::{
     section_modulus, SectionModulus, SurprisalError, SymbolicSurprisal,
 };
-use holonic_structure::{LocalRelations, LocalSequence, LocalSet};
+use holonics::structure::{LocalRelations, LocalSequence, LocalSet};
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
 use soma_abi::active::{ActionCurrent, RelationAtom};

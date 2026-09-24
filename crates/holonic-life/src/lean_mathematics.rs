@@ -20,7 +20,7 @@ use std::{
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
-use holonic_structure::{LocalRelations, LocalSequence, LocalSet};
+use holonics::structure::{LocalRelations, LocalSequence, LocalSet};
 
 mod candidates; mod ecology; mod lattice_mouth;
 pub mod kernel_returns;

@@ -11,7 +11,7 @@ use std::ops::Range;
 use std::sync::Arc;
 
 use body::channel::WindingQuantum;
-use holonic_structure::CountedCrossing;
+use holonics::structure::CountedCrossing;
 
 /// In-flight reading for the co-present seam closure, gated on `EROS_TRACE` and resolved once.
 ///
@@ -1252,7 +1252,7 @@ impl StandingIncidenceAperture {
         //
         // A factor replicated five hundred times meeting a front of two is an impedance mismatch,
         // and admitting it whole is the same defect as a leader star with no aperture. The law is
-        // `holonic_structure::CountedCrossing`, shared with the transport carrier that computes it
+        // `holonics::structure::CountedCrossing`, shared with the transport carrier that computes it
         // over exact rationals.
         let mut candidates = Vec::new();
         let mut deferred = Vec::new();

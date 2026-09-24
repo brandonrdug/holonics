@@ -13,7 +13,7 @@
 
 use std::cmp::Ordering;
 
-use holonic_structure::{LocalSequence, LocalSet};
+use holonics::structure::{LocalSequence, LocalSet};
 use serde::{Deserialize, Serialize};
 
 use crate::{

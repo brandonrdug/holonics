@@ -52,7 +52,7 @@ use alloc::vec::Vec;
 
 use serde::{Deserialize, Serialize};
 
-use crate::relating::{Composes, Relating};
+use crate::structure::relating::{Composes, Relating};
 
 /// A chain boundary. There is no third case, and neither case is an absence.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
@@ -277,7 +277,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::relating::Hand;
+    use crate::structure::relating::Hand;
 
     /// The additive chart of a chart transition, used as the test carrier: `carried` composes by
     /// addition, and the defect between two transports is their difference. `exp` would carry it to

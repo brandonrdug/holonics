@@ -4,7 +4,7 @@
 //! `Arrow { reach, aim, cross }` — *"the reach WEIGHS (the elevation), never gates"*, the aim
 //! GATES, and the hand is one of three turns rather than a bool. That law never reached the
 //! traversal carriers: `BranchLineage`'s link is `Option<Arc<BranchNode<T>>>` with `extent: usize`,
-//! and [`crate::RelationSpan`] is `{ start, len }` — a raw address and a count, with the relation
+//! and [`crate::structure::RelationSpan`] is `{ start, len }` — a raw address and a count, with the relation
 //! deleted.
 //!
 //! **The traversal structures addressed by index while the substrate one floor down addressed by
@@ -100,9 +100,9 @@ pub trait Relating {
 ///
 /// [`Composes::compose`] alone describes only the half that continued. A carrier that composes
 /// perfectly and cannot say what it turned back has **quotiented without keeping its fiber**, and
-/// the observable consequence was measured: [`crate::Chain::is_rebase`] read
+/// the observable consequence was measured: [`crate::structure::Chain::is_rebase`] read
 /// `unconnected.is_empty()`, which records only what a *caller* chose to hand to
-/// [`crate::Chain::reflect`], so a chain that reflected at every one of its own links reported a
+/// [`crate::structure::Chain::reflect`], so a chain that reflected at every one of its own links reported a
 /// clean pass.
 ///
 /// [`Composes::remainder`] closes that. It is the transport's **own** returned component, derived

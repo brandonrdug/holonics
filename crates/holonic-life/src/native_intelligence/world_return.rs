@@ -10,7 +10,7 @@ use holonic_engine::{
     native_ecology::holonic_intelligence::NativeEmissionAddress,
     receiver_history_compression::NativeStateId, EventId, ExactComplexWaveCurrent,
 };
-use holonic_structure::CountedCrossing;
+use holonics::structure::CountedCrossing;
 use num_bigint::{BigInt, BigUint};
 use num_rational::BigRational as Rat;
 use serde::{Deserialize, Serialize};

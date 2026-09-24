@@ -70,7 +70,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_structure::LocalSet;
+use holonics::structure::LocalSet;
 use num_bigint::BigUint;
 use num_traits::{ToPrimitive, Zero};
 use relational_geometry::Rat;

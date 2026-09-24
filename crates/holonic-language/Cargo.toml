@@ -6,4 +6,4 @@ license.workspace = true
 publish = false
 
 [dependencies]
-holonic-structure.workspace = true
+holonics = { path = "../holonics" }

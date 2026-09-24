@@ -4,7 +4,7 @@
 # whose only purpose was to host a Bevy-era sandbox, and a separate soma
 # workspace of 190 that the actual body built against. The sandbox is not here.
 #
-# `body` is pure law: no_std, zero dependencies. `crates/holonic-structure` is the
+# `body` is pure law: no_std, zero dependencies. `holonics::structure` is the
 # substrate — ordinal and relation atlases, local populations, branch lineage,
 # typed atomic membrane. `crates/relational-geometry` and the native mathematical owners in
 # `crates/holonic-engine` keep receiver-relative conduct exact over BigRational with
@@ -21,7 +21,6 @@ members = [
   "crates/holonics-hna",
   "crates/holonics-workspace",
   "applications/holonics-workbench",
-  "crates/holonic-structure",
   "crates/holonic-language",
   "crates/relational-geometry",
   "crates/holonic-words",
@@ -47,7 +46,6 @@ edition = "2024"
 license = "MIT OR Apache-2.0"
 
 [workspace.dependencies]
-holonic-structure = { path = "crates/holonic-structure" }
 relational-geometry = { path = "crates/relational-geometry" }
 holonic-words = { path = "crates/holonic-words" }
 serde = { version = "1", features = ["derive", "rc"] }

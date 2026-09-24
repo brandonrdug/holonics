@@ -20,7 +20,7 @@ use holonic_engine::{
     WaveLineageId, WavePredictionReturnEvent, WavePropagationEvent, WavePropagationRadiation,
     WavePropagationSpec, WaveReceiverId, WaveReceiverSpec,
 };
-use holonic_structure::CausalMembrane;
+use holonics::structure::CausalMembrane;
 use life::native_intelligence::{
     AcousticProductRest, AddressedMaterialOccurrence, ExactMembraneChartPassage,
     ExteriorOccurrenceTransducer, MembraneConsequence, MembraneCultivationReceipt,

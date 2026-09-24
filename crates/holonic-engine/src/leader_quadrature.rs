@@ -190,7 +190,7 @@ use num_traits::{One, Signed, Zero};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use holonic_structure::{Chain, ChainEnd, Composes, Hand, Relating};
+use holonics::structure::{Chain, ChainEnd, Composes, Hand, Relating};
 use relational_geometry::Rat;
 use std::collections::BTreeMap;
 

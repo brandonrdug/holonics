@@ -26,7 +26,7 @@ use holonic_engine::{
     AddressedCurrentSection, BoundaryId, EventId, ExactComplexWaveCurrent, ExactUnitConicPhase,
     OccurrencePort,
 };
-use holonic_structure::CausalMembrane;
+use holonics::structure::CausalMembrane;
 use num_bigint::BigUint;
 use serde::Serialize;
 use sha2::{Digest, Sha256};

@@ -3,7 +3,7 @@
 //! ## The measured defect this closes
 //!
 //! A census of the library modules on 2026-08-08 returned that `holonic-engine`,
-//! `holonic-structure`, `relational-geometry` and `holonic-language` carry **no cycles at module
+//! `holonics::structure`, `relational-geometry` and `holonic-language` carry **no cycles at module
 //! granularity**: nothing an engine module emits re-enters any module upstream of it. Two instances
 //! were verified by hand and both are here.
 //!
@@ -115,7 +115,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_structure::{LocalSequence, LocalSet};
+use holonics::structure::{LocalSequence, LocalSet};
 use num_bigint::BigInt;
 use serde::Serialize;
 

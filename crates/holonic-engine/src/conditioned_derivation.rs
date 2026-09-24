@@ -112,7 +112,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_structure::LocalSequence;
+use holonics::structure::LocalSequence;
 use serde::{Deserialize, Serialize};
 
 use crate::algebraic::CausalCellId;
