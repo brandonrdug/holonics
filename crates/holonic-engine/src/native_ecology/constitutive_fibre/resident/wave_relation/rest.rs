@@ -6,7 +6,6 @@ use num_bigint::BigInt;
 use num_traits::{One, Zero};
 use relational_geometry::Rat;
 use std::io::{Read, Write};
-const MAGIC_V1: &[u8] = b"HOLONIC-WAVE-RELATION\x01";
 const MAGIC_V2: &[u8] = b"HOLONIC-WAVE-RELATION\x02";
 const MAGIC_V4: &[u8] = b"HOLONIC-WAVE-RELATION\x04";
 /// A source map retaining only its operand, row and reaction (plan phase 11).
@@ -326,20 +325,15 @@ impl NormalWaveRelationRest {
     }
     pub fn read(input: &mut impl Read, octets: u64) -> Result<Self, ConstitutiveFibreError> {
         let mut input = input.take(octets);
-        let mut magic = vec![0u8; MAGIC_V1.len()];
+        let mut magic = vec![0u8; MAGIC_V2.len()];
         input.read_exact(&mut magic).map_err(invalid)?;
-        if ![MAGIC_V1, MAGIC_V2, MAGIC_V4, MAGIC_V5].contains(&magic.as_slice()) {
+        if ![MAGIC_V2, MAGIC_V4, MAGIC_V5].contains(&magic.as_slice()) {
             return Err(invalid("wave relation magic is absent"));
         }
         let header: Header =
             serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
         if magic != MAGIC_V5 && header.source_row.is_some() {
             return Err(invalid("only a v5 source map declares its field row"));
-        }
-        if magic == MAGIC_V1 && (header.receiver != WaveSourceReceiver::Direct || header.source) {
-            return Err(invalid(
-                "legacy wave relation declares an unknown receiver chart",
-            ));
         }
         let basis = read_point(&read_blob(&mut input)?)?;
         let fixed = read_point(&read_blob(&mut input)?)?;
@@ -557,29 +551,12 @@ mod tests {
         assert!(absent.validate().is_err());
     }
     #[test]
-    fn legacy_wave_relation_has_only_the_direct_receiver() {
-        let rest = specimen();
-        for receiver in [None, Some(WaveSourceReceiver::UnitRealSum)] {
-            let mut bytes = Vec::new();
-            bytes.extend_from_slice(MAGIC_V1);
-            let mut header = serde_json::json!({"roots":1,"conditions":1,"cut":0});
-            if let Some(receiver) = receiver {
-                header["receiver"] = serde_json::to_value(receiver).unwrap();
-            }
-            blob(&mut bytes, &serde_json::to_vec(&header).unwrap()).unwrap();
-            blob(&mut bytes, &point_bytes(&rest.basis).unwrap()).unwrap();
-            blob(&mut bytes, &point_bytes(&rest.fixed).unwrap()).unwrap();
-            bytes.extend_from_slice(END);
-            let decoded = NormalWaveRelationRest::read(&mut bytes.as_slice(), bytes.len() as u64);
-            if receiver.is_none() {
-                assert_eq!(
-                    decoded.unwrap().source_receiver(),
-                    WaveSourceReceiver::Direct
-                );
-            } else {
-                assert!(decoded.is_err());
-            }
-        }
+    fn v1_wave_relation_is_refused_as_a_typed_rest_error() {
+        let bytes = b"HOLONIC-WAVE-RELATION\x01".to_vec();
+        assert!(matches!(
+            NormalWaveRelationRest::read(&mut bytes.as_slice(), bytes.len() as u64),
+            Err(ConstitutiveFibreError::Rest(message)) if message == "wave relation magic is absent"
+        ));
     }
     /// The v3 anchored source-map save format is retired under restructure §0.2.
     #[test]
