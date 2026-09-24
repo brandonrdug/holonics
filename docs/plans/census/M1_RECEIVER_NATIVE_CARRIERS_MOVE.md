@@ -43,5 +43,8 @@ forwarding path for the moved types. Life callers import the main library direct
 workspace code continue through their existing consumers and direct dependencies.
 
 Import census finds no remaining `generator_native_rest` module paths or engine module declaration.
-Rust source parsing and `git diff --check` pass for this packet. The locked main-rest tests and
-affected all-target workspace gate are pending root review; no Cargo gate is claimed here.
+Rust source parsing and `git diff --check` pass for this packet. The locked main-library
+`receiver::native::tests` gate passed both source-detached rest tests: current wire roundtrip and
+ordered conduct, plus partial-generator refusal. The locked workspace all-target check passed in
+4m24s after stacking on the six-type carrier packet, including engine, CUDA, life, HNA, workspace
+and applications. The move changes no CUDA kernel law and makes no card or HNN outcome claim.
