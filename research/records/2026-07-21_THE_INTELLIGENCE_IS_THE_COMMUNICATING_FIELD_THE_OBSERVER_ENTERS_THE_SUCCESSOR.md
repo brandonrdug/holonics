@@ -72,7 +72,7 @@ analogy, `L` the live source worldlines, `P` the placement capable of becoming l
 also changes the frame and medium from which any later factorization will be made. `pi_F` does not
 stand outside the transition and does not govern it.
 
-This refines rather than discards the [two axioms](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/reference/pureholonics-seed/src/pureholonics/01_THE_AXIOMS.md), the
+This refines rather than discards the [two axioms](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/reference/pureholonics-seed/src/pureholonics/01_THE_AXIOMS.md), the
 [no-outside atlas](2026-07-17_THE_DUALITY_IS_THE_SITUATED_TRANSITION_THE_NET_HAS_NO_OUTSIDE.md),
 and the [one swept relation](2026-07-19_THE_LIVE_WEAVE_IS_THE_ONE_SWEPT_RELATION_THE_DEED_IS_ITS_LOCAL_STITCH.md).
 The early language of a perfect “soul” as retained provenance does not enter the implementation:
@@ -415,9 +415,9 @@ world-mediated communication and with the observer's own intervention included i
 
 ## Internal lineage
 
-- [The axioms](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/reference/pureholonics-seed/src/pureholonics/01_THE_AXIOMS.md)
+- [The axioms](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/reference/pureholonics-seed/src/pureholonics/01_THE_AXIOMS.md)
 - [The historical distributed-concurrence correction](../../holobrochos/FABLE_DERIVATIONS.md)
-- [The ontology of communication](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/reference/holobrochos-a07ff376/src/holobrochos/THEORY/FOSTER.md)
+- [The ontology of communication](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/reference/holobrochos-a07ff376/src/holobrochos/THEORY/FOSTER.md)
 - [The flock, joint, and fold](2026-07-13_THE_FLOCK_THE_JOINT_AND_THE_FOLD.md)
 - [The continuous net and local solve](2026-07-14_THE_CONTINUOUS_NET_AND_THE_LOCAL_SOLVE.md)
 - [The situated transition has no outside](2026-07-17_THE_DUALITY_IS_THE_SITUATED_TRANSITION_THE_NET_HAS_NO_OUTSIDE.md)

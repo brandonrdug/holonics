@@ -126,7 +126,7 @@ invented. Private conversation logs, prepared datasets, model rests and caches a
 
 [project-postulate] The live contract, Claude pointer, evidence protocol, architecture, repository
 and research guides, doctrine navigation and roadmap consumers now use repository-local evidence.
-The old connector protocol is [retained historically](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/operations/AGENT_PROTOCOL_BEFORE_PORTABLE_EVIDENCE.md).
+The old connector protocol is [retained historically](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/operations/AGENT_PROTOCOL_BEFORE_PORTABLE_EVIDENCE.md).
 No subsequent Holonics session should query, deposit or require the retired apparatus. Historical
 transcripts retain its original name and coordinates only to preserve what happened.
 

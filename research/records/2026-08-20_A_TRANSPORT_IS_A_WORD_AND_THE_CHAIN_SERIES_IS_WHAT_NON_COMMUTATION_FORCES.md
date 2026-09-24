@@ -5,13 +5,13 @@
 [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction authorities.
 **Position under the active plan.** Exterior mathematical material for Deed M2 of
-[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/plans/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
+[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/plans/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
 The active deed is W1. **No engine source is touched**; the only tree written under `soma/` is
 `soma/formal/`.
 **Truth status:** `proved-derived` for every Lean theorem, kernel-checked and audited free of
 `sorryAx`; `proved-standard` for the classical results cited as asides; `interpretation` for the
 correspondences; `open` for §6.
-**Companion:** [`archive/equation-atlas/`](https://github.com/brandonrdug/holonics/tree/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/equation-atlas) — seven equations and seven
+**Companion:** [`archive/equation-atlas/`](https://github.com/brandonrdug/holonics/tree/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/equation-atlas) — seven equations and seven
 relations appended.
 **Predecessor:**
 [`2026-08-20_THE_SWING_IS_HARMONIC_CONJUGATION_AND_THE_FROZEN_BOARD_DECIDES_ITS_PUZZLE.md`](2026-08-20_THE_SWING_IS_HARMONIC_CONJUGATION_AND_THE_FROZEN_BOARD_DECIDES_ITS_PUZZLE.md).

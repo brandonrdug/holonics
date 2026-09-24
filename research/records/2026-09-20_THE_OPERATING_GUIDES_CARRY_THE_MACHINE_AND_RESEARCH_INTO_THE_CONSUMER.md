@@ -95,7 +95,7 @@ actual consumer; a zero result is bounded by the displayed aperture and spelling
 relocation or immutable Git source could be verified. The initial scanner's 1,512 apparent
 unresolved links were concentrated in frozen archive snapshots (1,392), with some formula
 syntax misidentified as links. Old private/untracked observation, `runs/` and `output/` artifacts
-cannot be made portable by pointing at a different current file. [Archive recovery](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/README.md#following-an-old-source-address)
+cannot be made portable by pointing at a different current file. [Archive recovery](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/README.md#following-an-old-source-address)
 now states how to use the original revision/repository; current entry points use verified local
 routes. The historical orphan-binary transcript is linked to its verified public source revision.
 

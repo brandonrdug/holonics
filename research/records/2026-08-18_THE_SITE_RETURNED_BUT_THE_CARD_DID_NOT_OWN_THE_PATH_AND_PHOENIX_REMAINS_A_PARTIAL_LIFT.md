@@ -9,8 +9,8 @@ promoted claims refuted by source or execution; **open** for every Phoenix maste
 **proposal** only for the corrected status and next gate.
 **Audited range:** commits **4a99b32** through **584b5d5**, on top of the corrected Phoenix
 foundation **d601e9e**.
-**Authority:** [Phoenix master](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/plans/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md),
-[Gemma instance](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/plans/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md),
+**Authority:** [Phoenix master](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/plans/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md),
+[Gemma instance](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/plans/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md),
 and [THE_ROADMAP.md](../../docs/plans/THE_ROADMAP.md).
 **Position boundary:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md) remains unchanged. That
 was correct.
@@ -347,7 +347,7 @@ not return:
 
 **Truth status: counterexample.**
 
-Every law founded by [phoenix/site.rs](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/retired-phoenix-rust/holonic-engine-examples/phoenix/site.rs) receives
+Every law founded by [phoenix/site.rs](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/retired-phoenix-rust/holonic-engine-examples/phoenix/site.rs) receives
 
 ~~~text
 SourceTestimony::AuthoritativeDescription {

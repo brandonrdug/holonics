@@ -114,7 +114,7 @@ claim index or blanket release gate is not a prerequisite for a construction.
 
 [historical] The August census, implementation claims, quoted corrections and two-stroke
 interpretation previously occupying this path are preserved verbatim in
-[the archived version](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/operations/2026-09-12_INFORMATION_ENGINE_BEFORE_FRONTIER_CONSOLIDATION.md).
+[the archived version](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/operations/2026-09-12_INFORMATION_ENGINE_BEFORE_FRONTIER_CONSOLIDATION.md).
 Its dates and source coordinates locate historical evidence. They schedule no work and do not
 describe the current body without a new subject-specific source comparison. The September 12
 frontier consolidation corrects the universal condensation, Carnot-identification and census

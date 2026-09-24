@@ -466,8 +466,8 @@ byte/marker feedback campaign or establish the generator-bearing model by themse
 
 [historical] The former `alpha::{material,text_codec,text_session,checkpoint}`, eight alpha
 examples, and `native::{NativeFieldModelSpec,NativeSavedField,with_native_field}` wrapper were
-[retired recoverably](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/implementations/2026-09-09-byte-field-cultivation/README.md).
-The [former guide](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/implementations/2026-09-09-byte-field-cultivation/docs/NATIVE_HNA.md)
+[retired recoverably](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/implementations/2026-09-09-byte-field-cultivation/README.md).
+The [former guide](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/implementations/2026-09-09-byte-field-cultivation/docs/NATIVE_HNA.md)
 preserves their historical command/source testimony. The old commands are not supported usage.
 Existing private models and evidence remain; no native wire identifier was silently renamed.
 

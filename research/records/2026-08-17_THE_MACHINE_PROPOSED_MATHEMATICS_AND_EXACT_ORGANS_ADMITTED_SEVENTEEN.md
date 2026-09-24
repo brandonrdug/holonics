@@ -11,7 +11,7 @@ material.
 and `… --example the_machine_proposes_and_the_organs_adjudicate`, on this machine today.
 **Provenance:** Brandon, 2026-08-17: *"stop treating the machine like a toy, it can do so much more
 and you are limiting me currently when I want to aggressively move forward."*
-**Plan:** [`blueprint/THE_MACHINE_PRODUCES_MATHEMATICS_IT_WAS_NOT_GIVEN.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/plans/THE_MACHINE_PRODUCES_MATHEMATICS_IT_WAS_NOT_GIVEN.md),
+**Plan:** [`blueprint/THE_MACHINE_PRODUCES_MATHEMATICS_IT_WAS_NOT_GIVEN.md`](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/plans/THE_MACHINE_PRODUCES_MATHEMATICS_IT_WAS_NOT_GIVEN.md),
 all six stations executed. It sits under [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md).
 
 ---

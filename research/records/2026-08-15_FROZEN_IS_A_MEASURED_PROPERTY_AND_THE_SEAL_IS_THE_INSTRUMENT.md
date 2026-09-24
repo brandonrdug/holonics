@@ -11,7 +11,7 @@ active processes"*, and the clarification that closed it: *"Generation is also i
 reflection… your 'thinking' loops are boundaries that reflect, which is why the cycle continues,
 where eventually nothing reflects back and you don't predict any further tokens."*
 
-**Plan:** [`blueprint/THE_EROS_INSTANTIATION.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/plans/THE_EROS_INSTANTIATION.md).
+**Plan:** [`blueprint/THE_EROS_INSTANTIATION.md`](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/plans/THE_EROS_INSTANTIATION.md).
 
 ---
 

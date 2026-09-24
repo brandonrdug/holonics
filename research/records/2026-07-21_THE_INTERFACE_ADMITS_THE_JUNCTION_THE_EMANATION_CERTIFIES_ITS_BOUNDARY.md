@@ -6,7 +6,7 @@ one-core/eight-core/CUDA exact · durable rest exact · `FORMULA.md` unchanged**
 ## Result
 
 The production mouth now receives the smallest general carrier selected by
-[`archive/reference/minimum-mechanics-a07ff376/src/soma/ELEMENTARY_MECHANICS.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/reference/minimum-mechanics-a07ff376/src/soma/ELEMENTARY_MECHANICS.md):
+[`archive/reference/minimum-mechanics-a07ff376/src/soma/ELEMENTARY_MECHANICS.md`](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/reference/minimum-mechanics-a07ff376/src/soma/ELEMENTARY_MECHANICS.md):
 
 ```text
 actual situated occurrence

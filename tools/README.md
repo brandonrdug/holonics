@@ -7,7 +7,7 @@ requiring document regexes, source-size ledgers, generated indexes or untouched 
 shows progress and refuses a `sorry` warning. It is opt-in, not an inference dependency or an
 automatic requirement for a Rust edit. Cargo owns Rust build/test discovery.
 
-The superseded suite is in [archive/tooling](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/tooling/README.md). Prior Nsight scripts
+The superseded suite is in [archive/tooling](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/tooling/README.md). Prior Nsight scripts
 are [research instruments](../research/experiments/profiling/README.md). Research navigation uses
 repository-local evidence; start with the
 [research routes](../research/records/README.md), [architecture](../docs/ARCHITECTURE.md)

@@ -13,9 +13,9 @@ locates their closest prior art. Manuscript packaging is not a condition of that
 its importable notation registry and the composed manuscripts below are presentation/research
 sources; they do not regrade all current mathematics or replace the live construction order.
 
-Use the pinned [`MATHEMATICAL_HOLONICS.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/reference/holobrochos-a07ff376/src/soma/MATHEMATICAL_HOLONICS.md)
+Use the pinned [`MATHEMATICAL_HOLONICS.md`](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/reference/holobrochos-a07ff376/src/soma/MATHEMATICAL_HOLONICS.md)
 for historical mathematical orientation, the pinned
-[`MATHEMATICAL_RESEARCH_NETWORK.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/reference/minimum-mechanics-a07ff376/src/soma/MATHEMATICAL_RESEARCH_NETWORK.md)
+[`MATHEMATICAL_RESEARCH_NETWORK.md`](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/reference/minimum-mechanics-a07ff376/src/soma/MATHEMATICAL_RESEARCH_NETWORK.md)
 for the mechanism-indexed external source atlas, and the current
 [`ESTABLISHED_CAPABILITIES`](../../../docs/canon/06_ESTABLISHED_CAPABILITIES.md) ledger for bounded
 implementation and measured evidence.

@@ -27,7 +27,7 @@ the requested contextual model construction. Runtime source is preserved by this
 [historical; process-audit] September 9, following explicit removal authorization: the
 byte-field material/text/session/checkpoint adapters, their generic field/model wrapper and
 eight alpha examples were moved out of the live SDK/build into the
-[recoverable source archive](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/implementations/2026-09-09-byte-field-cultivation/README.md).
+[recoverable source archive](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/implementations/2026-09-09-byte-field-cultivation/README.md).
 The source reader and native mathematical owners remain. The new local-law rest uses the
 existing constitutive relation, not an archived-source prediction path; its first returned
 scope is in the [construction record](../research/records/2026-09-09_THE_BYTE_CAMPAIGN_RETIRES_AND_A_LEARNED_LOCAL_GENERATOR_RESTS_WITHOUT_HISTORY.md).

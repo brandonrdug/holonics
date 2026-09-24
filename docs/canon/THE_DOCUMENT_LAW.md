@@ -67,7 +67,7 @@ paper or backend. The [development guide](../DEVELOPMENT.md) states the commands
 
 [historical] The earlier generated claim index, equation database, document-size gates and
 mandatory multi-commit ritual remain retired. Their source is preserved in
-[the pre-consolidation document law](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/operations/DOCUMENT_LAW_BEFORE_HNA_CONSOLIDATION.md).
+[the pre-consolidation document law](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/operations/DOCUMENT_LAW_BEFORE_HNA_CONSOLIDATION.md).
 Current navigation uses maintained subject routes and actual source, not a replacement grading
 registry. The September 20 consolidation also retires the blanket experiment-directory disclaimer
 and the August-only research entry page; their historical snapshots are linked from research.

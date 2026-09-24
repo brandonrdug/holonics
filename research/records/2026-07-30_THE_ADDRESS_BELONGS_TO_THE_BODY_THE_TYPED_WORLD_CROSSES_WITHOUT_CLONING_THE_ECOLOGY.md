@@ -5,7 +5,7 @@ MEMBRANE / SPARSE ORDINAL POPULATIONS / FROZEN LOCAL LANGUAGE TRANSPORT /
 BRANCH-LOCAL WORLD FORK REMOVED**
 
 Code ownership is indexed in
-[`archive/reference/engine-a07ff376/HOLONIC_MACHINE_OWNERSHIP.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/reference/engine-a07ff376/HOLONIC_MACHINE_OWNERSHIP.md).
+[`archive/reference/engine-a07ff376/HOLONIC_MACHINE_OWNERSHIP.md`](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/reference/engine-a07ff376/HOLONIC_MACHINE_OWNERSHIP.md).
 
 ## Question
 

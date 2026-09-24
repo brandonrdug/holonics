@@ -29,5 +29,5 @@ question. A changed input, operation or receiver requires its own scope and comp
 The [research routes](../records/README.md) connect these runs to derivations and formal/native
 owners. [DEVELOPMENT](../../docs/DEVELOPMENT.md) defines measurement and validation conventions.
 The former blanket exterior-only banner is retained as
-[historical evidence](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/operations/EXPERIMENT_READING_RULES_BEFORE_2026-09-20.md);
+[historical evidence](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/operations/EXPERIMENT_READING_RULES_BEFORE_2026-09-20.md);
 it does not grade every experiment in this directory.

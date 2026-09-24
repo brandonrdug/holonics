@@ -21,7 +21,7 @@ opaque exterior bytes without typing the engine interior. Actual process compari
 scoped release `native_resources` receiver returned at the guide's declared limits.
 
 [definition] `alpha::exposure` remains the conversation source reader. The former byte-field
-material/text/checkpoint adapters and field/model wrapper were [retired](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/implementations/2026-09-09-byte-field-cultivation/README.md).
+material/text/checkpoint adapters and field/model wrapper were [retired](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/implementations/2026-09-09-byte-field-cultivation/README.md).
 The `native_generator` example now exercises the engine's learned local law and
 `ConstitutiveFibreRest` through resident current composition, with no text codec or observation
 archive in its learned material. Its declared phase-source example does not establish a general model.
@@ -93,7 +93,7 @@ general conversation.
   that terminal row crosses to the host; the complete resident successor and checkpoint remain
   unchanged. Existing `advance_native` and `observe_native` still return every terminal row.
 - The withdrawn `from_native_rest_with_boundary_contact` draft and its inner-wire v2 are
-  [archived](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/experiments/2026-09-05-tied-next-arrival/README.md), not active APIs
+  [archived](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/experiments/2026-09-05-tied-next-arrival/README.md), not active APIs
   or native contextual foundations. The portable-fact framing and CLI promotion were withdrawn. See the
   [contextual audit](../../research/records/2026-09-05_CONTEXTUAL_TRANSPORT_PRECEDES_INHERITED_MODEL_PRODUCTION.md).
 

@@ -13,7 +13,7 @@ blueprints, and [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md) are untouch
 **Intended use:** after the current Phoenix dissection and compression work returns, this record is
 an independent architecture audit and a source of exact candidate identities, defects, compression
 tests, and falsifiers. It is then an intermediary to the
-[mathematics-codec blueprint](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/plans/THE_MATHEMATICS_CODEC_RECOVERS_THE_OPERATION_COMPLEX_AND_EVERY_RESULT_RETURNS_AS_A_RECEIVER_FACE.md),
+[mathematics-codec blueprint](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/plans/THE_MATHEMATICS_CODEC_RECOVERS_THE_OPERATION_COMPLEX_AND_EVERY_RESULT_RETURNS_AS_A_RECEIVER_FACE.md),
 not a replacement for it.
 
 ## Primary source

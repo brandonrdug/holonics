@@ -2,9 +2,9 @@
 
 **Date:** 2026-08-24  
 **Authority:** admission record for the second station of
-[`../../blueprint/THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/plans/THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md)  
+[`../../blueprint/THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md`](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/plans/THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md)  
 **Driver:**
-[`../../archive/retired-phoenix-rust/life-examples/the_candidate_departs_before_sibling_testimony_returns.rs`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/retired-phoenix-rust/life-examples/the_candidate_departs_before_sibling_testimony_returns.rs)
+[`../../archive/retired-phoenix-rust/life-examples/the_candidate_departs_before_sibling_testimony_returns.rs`](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/retired-phoenix-rust/life-examples/the_candidate_departs_before_sibling_testimony_returns.rs)
 **Owner:**
 [`athena_returned_defect.rs`](https://github.com/brandonrdug/holonics/blob/4caee05bc50a304344db942150ee743865becd4f/soma/life/src/athena_returned_defect.rs)  
 **Returned artifact:** `output/the_candidate_departs_before_sibling_testimony_returns/`  

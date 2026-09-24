@@ -800,7 +800,7 @@ Cold rest and normal-state validation share `normal.rs`'s exact wire-scale numer
 kernel refine numerical realization without changing exact moments or source-family bounds.
 
 [historical] The SDK field/model wrapper, text adapters and eight alpha examples were
-[retired recoverably](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/implementations/2026-09-09-byte-field-cultivation/README.md).
+[retired recoverably](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/implementations/2026-09-09-byte-field-cultivation/README.md).
 Core field/operative/receiver owners below remain mathematical and diagnostic constructions;
 references to alpha text drivers name historical consumers, not current cultivation entrypoints.
 
@@ -1342,7 +1342,7 @@ axis or replace the full-operator cultivation law.
 [historical; measured] The withdrawn `holonic_intelligence::operative_boundary_contact` draft
 bound that contrast to retained fields and applied a persistent contact word at the tied-input
 port. Its API, inner v2 wire and application integration are now
-[archived](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/experiments/2026-09-05-tied-next-arrival/README.md), not active source owners. The
+[archived](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/experiments/2026-09-05-tied-next-arrival/README.md), not active source owners. The
 [actual-model record](../research/records/2026-09-05_HNP4_THE_NEXT_ARRIVAL_DEPOSITS_A_REUSABLE_CONTACT_AND_MATCHED_SELF_RETURN_IS_ZERO.md)
 records numerical changes and full-state restart equality. Its promotion into contextual HNN
 foundations and portable-fact test framing are withdrawn by the

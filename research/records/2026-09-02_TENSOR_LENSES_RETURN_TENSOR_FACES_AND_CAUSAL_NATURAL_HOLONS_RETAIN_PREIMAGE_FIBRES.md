@@ -4,7 +4,7 @@
 **Scope:** HTP0--HTP4 construction and the HTP5--HTP6 roadmap.
 **Authority:** Brandon's direct instruction of 2026-09-02, composed by
 [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) under
-[`blueprint/THE_HOLON_IS_CAUSAL_NATURAL_AND_TENSOR_LENSES_RETURN_TENSOR_FACES.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/plans/THE_HOLON_IS_CAUSAL_NATURAL_AND_TENSOR_LENSES_RETURN_TENSOR_FACES.md).
+[`blueprint/THE_HOLON_IS_CAUSAL_NATURAL_AND_TENSOR_LENSES_RETURN_TENSOR_FACES.md`](https://github.com/brandonrdug/holonics/blob/6bcf6599abeaf601f7e31f3ddbd46292abbdb145/archive/plans/THE_HOLON_IS_CAUSAL_NATURAL_AND_TENSOR_LENSES_RETURN_TENSOR_FACES.md).
 **Truth status:** per claim under [`canon/EPISTEMIC_GRADES.md`](../../docs/canon/EPISTEMIC_GRADES.md).
 
 ## 1. Return
