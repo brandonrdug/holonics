@@ -215,6 +215,8 @@ claim or older implementation is in question. The [evidence protocol](../../docs
 gives original-message coordinates and provider codecs. A later agent summary is not the original
 human request or a substitute for the changed source.
 
+- [Lessons from the workbench and Athena prototypes](2026-09-24_LESSONS_FROM_THE_WORKBENCH_AND_ATHENA_PROTOTYPES.md): what the retired `holonics` CLI and Athena examples achieved and failed at, with evidence, and ten requirements for any rebuilt application.
+
 ## Maintaining a route
 
 A new record keeps its dated filename. Add it to the relevant route when it changes a reusable
