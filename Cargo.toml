@@ -18,7 +18,6 @@ resolver = "2"
 members = [
   "crates/holonics",
   "crates/holonics-hna",
-  "applications/holonics-workbench",
   "crates/holonic-engine",
   "crates/holonics-cuda",
 ]
