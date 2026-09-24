@@ -113,7 +113,9 @@ The former positive legacy-history fixture is replaced by a current writer round
 the exact serialized field set and schema, rejects the retired `history` field, and compares the
 continued radiation and certificate after remount. Actual nested consumers remain
 `CausalStateGrammarQuotient.state_organizations` and `OrganizationalGrammarLaw`; neither changes.
-Run the focused test
-`cargo test --locked -p holonic-engine --lib organizational_grammar::tests::current_standing_rest_roundtrips_and_retired_history_is_refused`.
-This source/doc packet has not run Cargo yet; the focused gate is intentionally deferred while the
-receiver-release gate uses the shared build resources.
+The focused locked test
+`cargo test -j2 -p holonic-engine --lib organizational_grammar::tests::current_standing_rest_roundtrips_and_retired_history_is_refused`
+passed after restacking on the receiver-release owner: 1 passed, 0 failed, 3,263 filtered out.
+The current writer's field shape, exact rest roundtrip, retired-history refusal and continuing
+radiation/certificate are all asserted by that test. No full engine suite or Phase 14 gate is
+claimed for this two-file packet.
