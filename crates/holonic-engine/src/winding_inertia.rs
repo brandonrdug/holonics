@@ -7,9 +7,10 @@ use crate::grown_cell::GrownComplex;
 #[cfg(test)]
 use holonics::geometry::Rat;
 use holonics::geometry::winding_inertia::{
-    CyclicReading, Hand, SymmetricCirculant, WindingError, cycle_adjacency, rational_star_value,
-    winding_inertia,
+    CyclicReading, SymmetricCirculant, WindingError, rational_star_value,
 };
+#[cfg(test)]
+use holonics::geometry::winding_inertia::{Hand, cycle_adjacency, winding_inertia};
 use holonics::inertia::SymmetricForm;
 
 /// Read grown arcs by displacement class on a declared cyclic receiver.
@@ -159,6 +160,7 @@ pub fn lattice_admits_order(order: usize) -> bool {
     rational_star_value(1, order).is_some()
 }
 
+#[cfg(test)]
 mod lattice_rung_tests {
     use super::*;
 
@@ -210,7 +212,7 @@ mod lattice_rung_tests {
 mod receiver_tests {
     use super::*;
     use crate::grown_cell::{ComplexAperture, Schedule, found_complex, grow, standard_cells};
-    use holonics::inertia::{congruence, inertia};
+    use holonics::inertia::{Inertia, congruence, inertia};
 
     #[test]
     fn a_grown_circuit_read_on_a_cyclic_receiver_returns_its_passages_by_winding() {
