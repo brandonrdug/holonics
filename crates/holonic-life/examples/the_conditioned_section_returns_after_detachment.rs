@@ -8,7 +8,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use body::num::Cog;
+use holonics_portable::num::Cog;
 use holonic_engine::cuda_refine::CudaRefineExecutor;
 use life::{
     causal_section::{CausalSectionEcology, CausalSectionReading, SectionSeparator},

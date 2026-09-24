@@ -575,10 +575,10 @@ impl CudaLiveCurrentExecutor {
                     .map_err(|_| LiveCurrentError::ResourceReservation)?;
                 for ordinal in 0..count {
                     let at = (row * overflow_capacity + ordinal) * NODE_WORDS;
-                    if !body::manifold::packed_node_is_canonical(&overflow_cpu, at) {
+                    if !holonics_portable::manifold::packed_node_is_canonical(&overflow_cpu, at) {
                         return Err(LiveCurrentError::ExecutionMismatch(request.lineage()));
                     }
-                    nodes.push(body::manifold::unpack_node(&overflow_cpu, at));
+                    nodes.push(holonics_portable::manifold::unpack_node(&overflow_cpu, at));
                 }
                 overflow.push(nodes);
             }
@@ -1501,10 +1501,10 @@ impl CudaLiveCurrentExecutor {
                     .map_err(|_| LiveCurrentError::ResourceReservation)?;
                 for ordinal in 0..held {
                     let at = (row * caps.overflow + ordinal) * NODE_WORDS;
-                    if !body::manifold::packed_node_is_canonical(overflow_words, at) {
+                    if !holonics_portable::manifold::packed_node_is_canonical(overflow_words, at) {
                         return Err(LiveCurrentError::ExecutionMismatch(lineage));
                     }
-                    nodes.push(body::manifold::unpack_node(overflow_words, at));
+                    nodes.push(holonics_portable::manifold::unpack_node(overflow_words, at));
                 }
                 overflow.push(nodes);
             }

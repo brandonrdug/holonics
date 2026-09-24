@@ -943,7 +943,7 @@ impl Relating for PhasedLink {
     ///
     /// `holonics::structure::Hand::Ortho` is defined as *"cohere-null with the cross **maximal** — the
     /// pure orthogonal turn, the founding hand"*, so `Ortho` names the case where nothing stands and
-    /// everything transports. `crates/holonic-body/src/arrow.rs` reads the sign of `aim`, which its own typing
+    /// everything transports. `crates/holonics-portable/src/arrow.rs` reads the sign of `aim`, which its own typing
     /// calls *what STANDS*; [`Crossing::meet`] reads the sign of `M₂₁`, the half that came **back**
     /// and therefore did not transport. Both are the stored face and both agree.
     ///

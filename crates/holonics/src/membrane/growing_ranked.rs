@@ -7,11 +7,11 @@
 
 use std::vec::Vec;
 
-use body::manifold::{
+use holonics_portable::manifold::{
     RankedFoundEdge, RankedOwnCellFace, RankedOwnError, RankedOwnStorage, SparseOwnCell,
 };
-use body::medium::RegionalForm;
-use body::place::Place;
+use holonics_portable::medium::RegionalForm;
+use holonics_portable::place::Place;
 
 use crate::membrane::ChartAddress;
 
@@ -395,11 +395,11 @@ impl RankedOwnStorage for GrowingRankedOwn {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use body::channel::WindingQuantum;
-    use body::manifold::{RankedOwnState, SparseOwnCell, SparseOwnState};
-    use body::medium::FeltTerm;
-    use body::num::Cog;
-    use body::soul::Chi;
+    use holonics_portable::channel::WindingQuantum;
+    use holonics_portable::manifold::{RankedOwnState, SparseOwnCell, SparseOwnState};
+    use holonics_portable::medium::FeltTerm;
+    use holonics_portable::num::Cog;
+    use holonics_portable::soul::Chi;
 
     fn form(same: i64, other: i64) -> RegionalForm {
         RegionalForm::UNBORN.deposit(FeltTerm {

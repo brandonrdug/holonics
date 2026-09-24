@@ -13,7 +13,7 @@
 //!
 //! Everything above is a **negative** discipline: it stops a substrate container from becoming
 //! ontology. It never supplied the geometry that should have been there instead, and the cost was
-//! measurable — the traversal carriers addressed by **index** while `crates/holonic-body/src/arrow.rs`, one
+//! measurable — the traversal carriers addressed by **index** while `crates/holonics-portable/src/arrow.rs`, one
 //! floor down, already addressed by **turn**. [`BranchLineage`] is the proof: a genuinely holonic
 //! ancestry whose link is a raw pointer and a count.
 //!

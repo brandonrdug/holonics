@@ -63,7 +63,7 @@ use std::{
     time::Instant,
 };
 
-use body::num::Cog;
+use holonics_portable::num::Cog;
 use life::{
     agentic_language::{
         AgenticLanguageCapability, AgenticLanguageEcology, AgenticLanguageSpec,

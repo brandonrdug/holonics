@@ -64,8 +64,8 @@
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 
-use body::manifold::{atom_node, ContinuingBody, ENCLOSURE_WORDS};
-use body::num::Cog;
+use holonics_portable::manifold::{atom_node, ContinuingBody, ENCLOSURE_WORDS};
+use holonics_portable::num::Cog;
 
 const AXIS: i64 = 1 << 8;
 const SEED: &[u8] = b"the grain is declared or it is founded";
@@ -96,8 +96,8 @@ fn material(root: &Path, cap: usize) -> Vec<u8> {
 }
 
 struct NoEmission;
-impl body::manifold::FeltEmissionTarget for NoEmission {
-    fn emit(&mut self, _emission: body::manifold::FeltEmission) {}
+impl holonics_portable::manifold::FeltEmissionTarget for NoEmission {
+    fn emit(&mut self, _emission: holonics_portable::manifold::FeltEmission) {}
 }
 
 #[derive(Debug, Default)]
@@ -179,7 +179,7 @@ fn at_atom_grain(material: &[u8]) -> Reading {
         for pair in material.windows(2) {
             // The membrane's own relation shape: the signed difference of two adjacent packets,
             // carried as a `Cog` and located by `atom_node`. Nothing is invented here.
-            let relation = body::boundary::difference(pair[1], pair[0]);
+            let relation = holonics_portable::boundary::difference(pair[1], pair[0]);
             if relation.mag == 0 {
                 // Equal adjacent packets are one dead bit and pass the horizon unread — the body's
                 // own law. The membrane never presents them as a resolving action either, since
@@ -248,7 +248,7 @@ fn at_atom_grain_monotone(extent: usize) -> Reading {
             // Every relation the same hand. Magnitudes vary so the stream is not one repeated atom
             // — a repeated atom would be dark by the body's own equal-packet law — but the SIGN
             // never changes, so no pairwise cancellation is available.
-            let relation = body::boundary::difference(0, 1 + (step % 7) as u8);
+            let relation = holonics_portable::boundary::difference(0, 1 + (step % 7) as u8);
             if relation.mag == 0 {
                 continue;
             }
@@ -353,7 +353,7 @@ fn main() {
     // that is a function of one byte magnitude is chosen by the ENCODING.
     let mut atom_sites: BTreeSet<(u32, u32, u32, u32)> = BTreeSet::new();
     let mut word_sites: BTreeSet<(u32, u32, u32, u32)> = BTreeSet::new();
-    let key = |node: body::manifold::Node| {
+    let key = |node: holonics_portable::manifold::Node| {
         (
             node.place.0.mag,
             node.place.0.turn,
@@ -362,14 +362,14 @@ fn main() {
         )
     };
     for pair in material.windows(2) {
-        let relation = body::boundary::difference(pair[1], pair[0]);
+        let relation = holonics_portable::boundary::difference(pair[1], pair[0]);
         if relation.mag != 0 {
             atom_sites.insert(key(atom_node(relation)));
         }
     }
     for word in material.split(|byte| byte.is_ascii_whitespace()) {
         if !word.is_empty() {
-            word_sites.insert(key(body::manifold::locate(word)));
+            word_sites.insert(key(holonics_portable::manifold::locate(word)));
         }
     }
     println!("\n  WHERE EACH PRESENTATION CAN LAND");
@@ -385,7 +385,7 @@ fn main() {
     );
     let mut monotone_sites: BTreeSet<(u32, u32, u32, u32)> = BTreeSet::new();
     for step in 0..22_987usize {
-        let relation = body::boundary::difference(0, 1 + (step % 7) as u8);
+        let relation = holonics_portable::boundary::difference(0, 1 + (step % 7) as u8);
         if relation.mag != 0 {
             monotone_sites.insert(key(atom_node(relation)));
         }

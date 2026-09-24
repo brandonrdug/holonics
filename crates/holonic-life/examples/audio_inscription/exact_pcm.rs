@@ -1,9 +1,9 @@
 use std::path::Path;
 
-use body::incidence::{
+use holonics_portable::incidence::{
     EventCell, EventCellId, EventComplex, EventPort, IncidenceHand, OrientedIncidence,
 };
-use body::num::Cog;
+use holonics_portable::num::Cog;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct PcmWave {

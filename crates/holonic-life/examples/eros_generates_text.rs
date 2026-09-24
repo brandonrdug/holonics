@@ -12,7 +12,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use body::num::Cog;
+use holonics_portable::num::Cog;
 use life::causal_language::{
     fiber_bytes, lexical_tokens, token_germs_public, CausalLanguageEcology, CausalLanguagePassage,
 };

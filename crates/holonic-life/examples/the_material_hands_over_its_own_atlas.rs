@@ -71,7 +71,7 @@ const INTERFERENCE_ARRIVALS: usize = 96;
 /// `next_grain`'s `compounds² · contacts` — the two counted costs of closing and handing up.
 const CLOSURE_BUDGET: u128 = 500_000_000;
 
-/// The declared budget on `body::incidence::EventComplex`'s **unsorted** validation, in
+/// The declared budget on `holonics_portable::incidence::EventComplex`'s **unsorted** validation, in
 /// `cells × incidences`. Handing the slices over in a reversed order sets `cells_indexed = false`
 /// and the validator falls back to a linear scan per cell and per incidence.
 const UNSORTED_VALIDATION_BUDGET: u128 = 30_000_000;

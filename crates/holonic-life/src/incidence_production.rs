@@ -15,8 +15,8 @@
 //! | term | owner here |
 //! |---|---|
 //! | `K_t` cells at each material grain | [`Site`] (dimension 0), [`Bond`] (1), [`Compound`] (2), each carrying its own `grain` |
-//! | `∂_t` oriented boundary, `∂∂ = 0` | [`IncidenceComplex::event_complex`] hands the whole thing to `body::incidence::EventComplex`, whose validator *is* the `∂∂ = 0` check. No second complex is built. |
-//! | `o_t` hand | `body::incidence::IncidenceHand`, carried on every incidence and on every route passage |
+//! | `∂_t` oriented boundary, `∂∂ = 0` | [`IncidenceComplex::event_complex`] hands the whole thing to `holonics_portable::incidence::EventComplex`, whose validator *is* the `∂∂ = 0` check. No second complex is built. |
+//! | `o_t` hand | `holonics_portable::incidence::IncidenceHand`, carried on every incidence and on every route passage |
 //! | `⪯_t` actual source dependency | [`Site::causal_rank`], the longest-path rank in the corpus's own `caused_by` relation. **Never the storage ordinal**, which is carried beside it in [`DeclaredOccurrence::storage_ordinal`] only so the two can be exhibited apart. |
 //! | `Γ_t` ingress / exposed / return | [`IncidenceComplex::ingress`] / [`Emission::residual`]'s exposed sites. See the boundary note below: the body owns only two port species. |
 //!
@@ -103,7 +103,7 @@
 //!
 //! # Boundary: the body owns two port species, the law names three
 //!
-//! `body::incidence::EventPortKind` is `{Ingress, Exposed}`. The ratified law's `Γ_t` names
+//! `holonics_portable::incidence::EventPortKind` is `{Ingress, Exposed}`. The ratified law's `Γ_t` names
 //! *ingress, exposed boundary, and return*. This module therefore carries the return port as a
 //! **polarity on an exposed site** ([`ExposedPolarity`], §IV's donor/acceptor), and does not
 //! invent a third species inside the body. That is a real gap between the specification and the
@@ -111,7 +111,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use body::{
+use holonics_portable::{
     incidence::{
         EventCell, EventCellId, EventComplex, EventComplexError, EventPort, EventPortKind,
         IncidenceHand, OrientedIncidence,
@@ -148,14 +148,14 @@ pub enum IncidenceProductionError {
     NoContact,
     /// The complex declared no exposed boundary, so nothing can hand up.
     NoExposedBoundary,
-    /// `body::incidence` refused the complex. This is the `∂∂ = 0` verdict.
+    /// `holonics_portable::incidence` refused the complex. This is the `∂∂ = 0` verdict.
     Body(EventComplexError),
     /// A declared rotation left the exact unit conic. Unreachable through the declared charts;
     /// retained because the engine's constructor can say so and this module must not assume.
     NonUnitRotation,
     Extent,
     /// `holonic_engine::algebraic::GradedCausalComplex` refused a cell. This is its own `∂∂ = 0`
-    /// verdict, taken independently of `body::incidence`'s.
+    /// verdict, taken independently of `holonics_portable::incidence`'s.
     Engine(String),
     /// `holonic_engine::running_integral` refused a pairing, a coboundary or a potential search.
     Integral(String),
@@ -342,7 +342,7 @@ pub struct Site {
 ///
 /// `∂bond = to − from`, so `from` enters at `IncidenceHand::Against` and `to` at
 /// `IncidenceHand::With`, and the two coefficients sum to zero. That sum is what
-/// `body::incidence` checks.
+/// `holonics_portable::incidence` checks.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Bond {
     pub id: EventCellId,
@@ -384,7 +384,7 @@ pub struct Bond {
 /// A closed internal boundary: dimension 2, one element of the fundamental cycle basis.
 ///
 /// `bonds[i]` is crossed with `hands[i]`; `sites[i]` is the constituent the crossing arrives at.
-/// The traversal telescopes, so `∂compound = 0` by construction and `body::incidence` confirms it.
+/// The traversal telescopes, so `∂compound = 0` by construction and `holonics_portable::incidence` confirms it.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Compound {
     pub id: EventCellId,
@@ -940,7 +940,7 @@ impl IncidenceComplex {
     // `∂∂ = 0`, checked by the body's own organ
     // -----------------------------------------------------------------------------------------
 
-    /// The cells, incidences and ports this complex presents to `body::incidence`.
+    /// The cells, incidences and ports this complex presents to `holonics_portable::incidence`.
     ///
     /// `sorted` chooses whether the three slices are handed over in the body's indexed order or in
     /// an arbitrary one. Both must validate and both must emanate the same node: that is §II's
@@ -1045,7 +1045,7 @@ impl IncidenceComplex {
         (cells, incidences, ports)
     }
 
-    /// Hand the complex to `body::incidence::EventComplex`, whose validator is the `∂∂ = 0` check.
+    /// Hand the complex to `holonics_portable::incidence::EventComplex`, whose validator is the `∂∂ = 0` check.
     ///
     /// This module owns no second validator and no second complex.
     pub fn validate_with_body(&self, sorted: bool) -> Result<(), IncidenceProductionError> {
@@ -1064,7 +1064,7 @@ impl IncidenceComplex {
             .map_err(IncidenceProductionError::Body)
     }
 
-    /// The two exposed-boundary readings `body::incidence` supplies, under both storage orders.
+    /// The two exposed-boundary readings `holonics_portable::incidence` supplies, under both storage orders.
     /// Equal returns are the gauge statement; unequal ones would be a defect in this module.
     pub fn emanated_under_both_storage_orders(
         &self,
@@ -1735,7 +1735,7 @@ impl IncidenceComplex {
     /// module already carries, presented in the engine's carrier so that
     /// `holonic_engine::running_integral` can act on them. `found_cell` re-checks `∂∂ = 0` on
     /// construction, so this is a **third independent frame** on the same law —
-    /// `body::incidence::EventComplex` is the second — and a disagreement between any two of them
+    /// `holonics_portable::incidence::EventComplex` is the second — and a disagreement between any two of them
     /// is a defect in this module rather than a fact about the material.
     pub fn engine_view(&self) -> Result<EngineView, IncidenceProductionError> {
         let mut complex = GradedCausalComplex::default();

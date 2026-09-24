@@ -1,6 +1,6 @@
 //! The live-current membrane: one contemporary event in, one bounded radiation population out.
 //!
-//! This is the production lifetime owner of [`body::manifold::ContinuingBody`].  World material and
+//! This is the production lifetime owner of [`holonics_portable::manifold::ContinuingBody`].  World material and
 //! hardware chunks remain outside.  A live lineage retains only its first-person body header,
 //! dynamic carrier, and a genuinely open dark tread.  Every current-local OWN surface lives for
 //! one complete event, every co-present current reads the same standing-before body, and their
@@ -9,7 +9,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Arc;
 
-use body::channel::LineageChannel;
+use holonics_portable::channel::LineageChannel;
 
 /// WHERE THE POLE STANDS RELATIVE TO THE PAIR IT RELATES. `arrow::relate` reads `a, b` from the
 /// pole `f = receiver.channel.frame().tip()`, and `at_horizon` (both faces null) holds exactly when
@@ -109,11 +109,11 @@ pub(crate) static BPRIME_WOUND: core::sync::atomic::AtomicUsize =
     core::sync::atomic::AtomicUsize::new(0);
 pub(crate) static BPRIME_FLAT: core::sync::atomic::AtomicUsize =
     core::sync::atomic::AtomicUsize::new(0);
-static BPRIME_PREVIOUS: std::sync::Mutex<Option<body::manifold::Face>> =
+static BPRIME_PREVIOUS: std::sync::Mutex<Option<holonics_portable::manifold::Face>> =
     std::sync::Mutex::new(None);
 
 #[inline]
-fn observe_supplied_flywheel(meeting: body::manifold::Face) {
+fn observe_supplied_flywheel(meeting: holonics_portable::manifold::Face) {
     use core::sync::atomic::Ordering::Relaxed;
     let Ok(mut previous) = BPRIME_PREVIOUS.lock() else {
         return;
@@ -139,7 +139,7 @@ fn observe_supplied_flywheel(meeting: body::manifold::Face) {
 
 /// Read what the producer actually returned for a contact whose meeting was founding-capable.
 #[inline]
-pub(crate) fn observe_contact_outcome(contact: &body::manifold::DirectedEventContact) {
+pub(crate) fn observe_contact_outcome(contact: &holonics_portable::manifold::DirectedEventContact) {
     use core::sync::atomic::Ordering::Relaxed;
     let arrow = contact.meeting.arrow;
     if arrow.cross.mag == 0 || !arrow.founds() {
@@ -153,14 +153,14 @@ pub(crate) fn observe_contact_outcome(contact: &body::manifold::DirectedEventCon
     match contact.emission {
         None => ARMED_NO_EMISSION.fetch_add(1, Relaxed),
         Some(emission) => match emission.deed {
-            body::manifold::FeltDeed::Ride => ARMED_RIDE.fetch_add(1, Relaxed),
+            holonics_portable::manifold::FeltDeed::Ride => ARMED_RIDE.fetch_add(1, Relaxed),
             _ => ARMED_FOUND.fetch_add(1, Relaxed),
         },
     };
 }
 
 #[inline]
-fn word_of(c: body::num::Cog) -> Word {
+fn word_of(c: holonics_portable::num::Cog) -> Word {
     (c.mag, c.rank.mag, c.rank.rank, c.rank.neg, c.turn)
 }
 
@@ -230,7 +230,7 @@ pub(crate) fn observe_read_depth(source_grain: u32) {
 
 /// Read `held_live` at the contacts' own depth AFTER the founder has run in the same event.
 #[inline]
-pub(crate) fn observe_after_founder(receiver: &body::manifold::EventReceiver) {
+pub(crate) fn observe_after_founder(receiver: &holonics_portable::manifold::EventReceiver) {
     use core::sync::atomic::Ordering::Relaxed;
     if receiver.held_live {
         HELD_LIVE_AFTER_FOUNDER.fetch_add(1, Relaxed);
@@ -243,16 +243,16 @@ pub(crate) fn observe_after_founder(receiver: &body::manifold::EventReceiver) {
 /// four disjoint tallies and one overlapping one, exactly as `ArrivalResponse` reports.
 #[inline]
 pub(crate) fn observe_pole_placement(
-    receiver: &body::manifold::EventReceiver,
+    receiver: &holonics_portable::manifold::EventReceiver,
     from: Place,
     to: Place,
 ) {
     use core::sync::atomic::Ordering::Relaxed;
     let frame = receiver.channel.frame();
-    if frame.sweep == body::place::origin() {
+    if frame.sweep == holonics_portable::place::origin() {
         POLE_SWEEP_IDLE.fetch_add(1, Relaxed);
     }
-    if frame.basis == body::soul::FormedRotor::identity() {
+    if frame.basis == holonics_portable::soul::FormedRotor::identity() {
         BASIS_IDENTITY.fetch_add(1, Relaxed);
     }
     if receiver.held_live {
@@ -287,7 +287,7 @@ pub(crate) fn observe_pole_placement(
         set.insert((kf, kt, kp));
     }
     // The producer's own argument order, so this reads the arrow that will actually be formed.
-    let arrow = body::manifold::face(to, from, pole).arrow;
+    let arrow = holonics_portable::manifold::face(to, from, pole).arrow;
     if arrow.aim.mag == 0 && arrow.cross.mag == 0 {
         ARROW_AT_HORIZON.fetch_add(1, Relaxed);
     }
@@ -312,18 +312,18 @@ pub(crate) fn observe_pole_placement(
         (false, false) => POLE_DISTINCT.fetch_add(1, Relaxed),
     };
 }
-use body::incidence::{
+use holonics_portable::incidence::{
     EventCellId, EventComplex, EventComplexError, EventPortKind, IncidenceHand, IncidenceKind,
     OrientedIncidence,
 };
-use body::manifold::{
+use holonics_portable::manifold::{
     atom_node, compose_place, node_packed_word, ContinuingBody, DirectedEventContact, Enclosure,
     EventEmanation, EventReceiver, FeltEmission, FeltEmissionTarget, LiveBodyHeader, Node,
     ENCLOSURE_WORDS, NODE_WORDS,
 };
-use body::medium::{RegionalForm, COMPACT_FORM_LAYOUT_VERSION, COMPACT_FORM_WORDS};
-use body::num::{cog_packed_word, packed_cog_is_canonical, read_cog, Cog, COG_WORDS};
-use body::place::Place;
+use holonics_portable::medium::{RegionalForm, COMPACT_FORM_LAYOUT_VERSION, COMPACT_FORM_WORDS};
+use holonics_portable::num::{cog_packed_word, packed_cog_is_canonical, read_cog, Cog, COG_WORDS};
+use holonics_portable::place::Place;
 use crate::structure::{CausalMembrane, OrdinalAtlasError, SparseOrdinalAtlas};
 use soma_abi::active::{ActionCurrent, RelationAtom};
 
@@ -2603,9 +2603,9 @@ pub fn canonical_event_incidences(
             .cell(incidence.to())
             .expect("a validated incidence retains its target cell");
         let kind = match incidence.kind() {
-            body::incidence::IncidenceKind::Boundary => 0u32,
-            body::incidence::IncidenceKind::Dependency => 1u32,
-            body::incidence::IncidenceKind::RewriteInterface => 2u32,
+            holonics_portable::incidence::IncidenceKind::Boundary => 0u32,
+            holonics_portable::incidence::IncidenceKind::Dependency => 1u32,
+            holonics_portable::incidence::IncidenceKind::RewriteInterface => 2u32,
         };
         (
             (
@@ -2925,7 +2925,7 @@ impl RegionalCellBuilder {
                         .pins
                         .get(pin_at)
                         .ok_or(LiveCurrentError::RegionalTopology(receiver))?;
-                    let mut effective_winding = body::channel::WindingQuantum::None;
+                    let mut effective_winding = holonics_portable::channel::WindingQuantum::None;
                     if pin.is_found() {
                         if let Some(axis) = axis_for_pin[pin_at] {
                             active = axis;
@@ -4733,8 +4733,8 @@ impl CausalMembrane for LiveCurrentMachine {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use body::incidence::{EventCell, EventCellId, EventPort, IncidenceHand, OrientedIncidence};
-    use body::manifold::FeltDeed;
+    use holonics_portable::incidence::{EventCell, EventCellId, EventPort, IncidenceHand, OrientedIncidence};
+    use holonics_portable::manifold::FeltDeed;
 
     fn relation(value: i64) -> RelationAtom {
         RelationAtom::new(Cog::lit(value)).unwrap()

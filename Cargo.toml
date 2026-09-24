@@ -4,7 +4,7 @@
 # whose only purpose was to host a Bevy-era sandbox, and a separate soma
 # workspace of 190 that the actual body built against. The sandbox is not here.
 #
-# `body` is pure law: no_std, zero dependencies. `holonics::structure` is the
+# `holonics-portable` is pure law: no_std, zero dependencies. `holonics::structure` is the
 # substrate — ordinal and relation atlases, local populations, branch lineage,
 # typed atomic membrane. `holonics::geometry` and the native mathematical owners in
 # `crates/holonic-engine` keep receiver-relative conduct exact over BigRational with
@@ -24,7 +24,7 @@ members = [
   "crates/holonic-language",
   "crates/holonic-words",
   "crates/holonic-engine",
-  "crates/holonic-body",
+  "crates/holonics-portable",
   "crates/holonic-abi",
   "crates/holonic-life",
   "crates/holonics-cuda",

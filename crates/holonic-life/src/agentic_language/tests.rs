@@ -1,5 +1,5 @@
 use super::*;
-use body::num::Cog;
+use holonics_portable::num::Cog;
 
 fn action() -> ActionCurrent {
     ActionCurrent::new(Cog::lit(1)).unwrap()

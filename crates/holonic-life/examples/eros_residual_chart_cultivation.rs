@@ -4,8 +4,8 @@ use std::io::Write;
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
 
-use body::incidence::IncidenceHand;
-use body::num::Cog;
+use holonics_portable::incidence::IncidenceHand;
+use holonics_portable::num::Cog;
 use life::form_mouth::deposit_form_or_message;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};

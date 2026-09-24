@@ -692,7 +692,9 @@ existing suites (§0.9):
    selects the direct HNA and engine packages. The Holon core and source-neutral exact operators
    are now internal root modules of `holonics`; callers use those qualified paths directly.
    The live structural carriers now belong to internal `holonics::structure`, with their callers
-   retargeted. [Structure](census/M1_STRUCTURE_OWNER_MOVE.md) and
+   retargeted. The dependency-free, `no_std` [`holonics-portable` leaf](census/M1_PORTABLE_LEAF_MOVE.md)
+   now owns the former `holonic-body` source unchanged apart from crate naming; ABI/word
+   consolidation and its host/device gates remain pending. [Structure](census/M1_STRUCTURE_OWNER_MOVE.md) and
    [geometry](census/M1_GEOMETRY_OWNER_MOVE.md) now have internal main-library source and measured
    gates. The exact causal-chord equation extractor now belongs to `holonics::receiver::causal_chord`; its
    portable laws move with it and engine-owner comparisons remain engine integration tests.

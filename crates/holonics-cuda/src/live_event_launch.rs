@@ -153,7 +153,7 @@ fn live_event_argument_law() -> Vec<ArgumentRequirement> {
         ArgumentRequirement::device(
             "owns",
             Access::Write,
-            core::mem::size_of::<body::manifold::SparseOwnCell>(),
+            core::mem::size_of::<holonics_portable::manifold::SparseOwnCell>(),
             Extent::Any,
         ),
         ArgumentRequirement::device("carriers", Access::Write, 4, Extent::Any),
@@ -222,7 +222,7 @@ pub struct LiveEventArguments<'a> {
     pub standing: LiveEventSpan<'a, u32>,
     pub control: LiveEventWriteSpan<'a, u32>,
     pub relations: LiveEventSpan<'a, u32>,
-    pub owns: LiveEventWriteSpan<'a, body::manifold::SparseOwnCell>,
+    pub owns: LiveEventWriteSpan<'a, holonics_portable::manifold::SparseOwnCell>,
     pub carriers: LiveEventWriteSpan<'a, u32>,
     pub overflow_nodes: LiveEventWriteSpan<'a, u32>,
     pub overflow_counts: LiveEventWriteSpan<'a, u32>,
@@ -483,7 +483,7 @@ mod tests {
         assert_eq!(law[1].access, Access::Write);
         assert_eq!(
             law[3].element_bytes,
-            core::mem::size_of::<body::manifold::SparseOwnCell>()
+            core::mem::size_of::<holonics_portable::manifold::SparseOwnCell>()
         );
         // `control` is declared as whole CONTROL_WORDS rows; a short control face is a refusal
         // rather than a kernel that silently returns.

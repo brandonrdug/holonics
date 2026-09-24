@@ -8,9 +8,9 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
-use body::incidence::IncidenceHand;
-use body::manifold::FeltDeed;
-use body::num::Cog;
+use holonics_portable::incidence::IncidenceHand;
+use holonics_portable::manifold::FeltDeed;
+use holonics_portable::num::Cog;
 use exact_pcm::{ExactPathChart, PcmWave};
 use life::current_world::{
     present_native_event_with_regional, NativeEventCurrent, NativeRegionalArc,

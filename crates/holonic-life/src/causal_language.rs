@@ -12,7 +12,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::time::Instant;
 
-use body::num::Cog;
+use holonics_portable::num::Cog;
 use holonics::ratio::exponentiated::{RatioError, RatioFamily};
 use holonics::ratio::surprisal::{
     section_modulus, SectionModulus, SurprisalError, SymbolicSurprisal,

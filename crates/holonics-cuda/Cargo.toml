@@ -12,10 +12,10 @@ publish = false
 name = "holonics_cuda"
 path = "src/lib.rs"
 
-# `body` is the no_std law crate. mount-link-gate stages the configuration-fold GATE DATA and the
+# `holonics-portable` is the no_std law crate. mount-link-gate stages the configuration-fold GATE DATA and the
 # host reference through the SAME law code the CUDA kernel compiles for nvptx — one mouth, both sides.
 [dependencies]
-body = { path = "../holonic-body" }
+holonics-portable = { path = "../holonics-portable" }
 soma-abi = { path = "../holonic-abi" }
 # The exact word rings (`ExactRing`, `ModularWords`, …), host-only, re-exported at their old paths.
 holonic-words = { path = "../holonic-words" }

@@ -82,7 +82,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
-use body::manifold::{locate, ContinuingBody, Node, ENCLOSURE_WORDS};
+use holonics_portable::manifold::{locate, ContinuingBody, Node, ENCLOSURE_WORDS};
 use holonic_engine::receiver_exact_compression::{
     compress, InputId, ItemId, Observation, ObservedSystem, ReceiverId,
 };
@@ -272,11 +272,11 @@ fn drive_atom(material: &[u8]) -> Rung {
     let (standing_open, winding) = {
         let mut eyes = ContinuingBody::over(&standing, &mut own, AXIS, SEED, 1 << 20, &mut carrier);
         for pair in material.windows(2) {
-            let relation = body::boundary::difference(pair[1], pair[0]);
+            let relation = holonics_portable::boundary::difference(pair[1], pair[0]);
             if relation.mag == 0 {
                 continue;
             }
-            let node = body::manifold::atom_node(relation);
+            let node = holonics_portable::manifold::atom_node(relation);
             seen.insert(place_of(node));
             growth.push(seen.len());
 

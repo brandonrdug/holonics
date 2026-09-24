@@ -10,7 +10,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::ops::Range;
 use std::sync::Arc;
 
-use body::channel::WindingQuantum;
+use holonics_portable::channel::WindingQuantum;
 use crate::structure::CountedCrossing;
 
 /// In-flight reading for the co-present seam closure, gated on `EROS_TRACE` and resolved once.
@@ -42,17 +42,17 @@ pub(crate) fn seam_trace(detail: &core::fmt::Arguments<'_>) {
         eprintln!("eros-trace seam.round                  {detail}");
     }
 }
-use body::incidence::IncidenceHand;
-use body::manifold::{
+use holonics_portable::incidence::IncidenceHand;
+use holonics_portable::manifold::{
     cast_position, face_packed_word, packed_face_is_canonical, unpack_face, DirectedEventContact,
     Face, FeltDeed, FACE_WORDS,
 };
-use body::num::{
+use holonics_portable::num::{
     cog_packed_word, packed_cog_is_canonical, packed_rung_is_canonical, read_cog, read_rung,
     rung_packed_word, Cog, Rung, COG_WORDS, RUNG_WORDS,
 };
-use body::place::Place;
-use body::soul::Chi;
+use holonics_portable::place::Place;
+use holonics_portable::soul::Chi;
 
 use crate::membrane::support_family::{
     LiveSupportExpression, LiveSupportFamily, LiveSupportSection, SupportFamilyError,
@@ -4797,7 +4797,7 @@ fn read_deed(word: u32) -> Result<FeltDeed, LiveConstituentError> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use body::arrow::Arrow;
+    use holonics_portable::arrow::Arrow;
 
     fn exposed_pin(reach: i64) -> LivePin {
         let meeting = Face {

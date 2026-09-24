@@ -10,7 +10,7 @@ use crate::{
     Context, CudaError, DeviceBuffer, RegisterCarrierRebaseArguments, RegisterCarrierRebaseKernel,
     RegisterSpan, RegisterWriteSpan, Result,
 };
-use body::manifold;
+use holonics_portable::manifold;
 use soma_abi::register;
 
 pub struct RegisterCarrierRebase<'a> {

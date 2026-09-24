@@ -5,8 +5,8 @@
 //! reports every accepted body deed through a caller-owned output target.  Allocation, launch
 //! shape, journal storage, directed-incidence indexing, and world interpretation remain outside.
 
-use body::manifold::{AtomEvent, ContinuingBody, FeltEmission, FeltEmissionTarget};
-use body::num::Cog;
+use holonics_portable::manifold::{AtomEvent, ContinuingBody, FeltEmission, FeltEmissionTarget};
+use holonics_portable::num::Cog;
 
 use crate::active::{relation_span_node, ValidationError, View};
 

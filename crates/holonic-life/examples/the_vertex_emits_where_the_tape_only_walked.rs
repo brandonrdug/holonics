@@ -209,7 +209,7 @@ fn run() -> Result<(), String> {
     println!();
 
     // -- `∂∂ = 0`, by the body's own organ -----------------------------------------------------
-    println!("∂∂ = 0 — CHECKED BY `body::incidence::EventComplex`, NOT BY THIS MODULE");
+    println!("∂∂ = 0 — CHECKED BY `holonics_portable::incidence::EventComplex`, NOT BY THIS MODULE");
     complex
         .validate_with_body(true)
         .map_err(|error| format!("the body refused the complex: {error:?}"))?;

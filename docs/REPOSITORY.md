@@ -51,9 +51,9 @@ removed the native feature and HNN/engine/life forwarding paths. `structure`, `g
 supersedes this layout as a **target**, while this page maps the present checkout. It reduces
 the maintained Rust library graph to a substantive main `holonics` (Holon laws, geometry,
 extraction and the backend-neutral HNN law and port) → `holonics-cuda` (driver, kernels and the
-resident HNN), over a portable `no_std` leaf shared with the detached Rust CUDA kernel.
-`holonics-portable` is its working name; it consolidates the surviving `body`, `soma-abi` and
-`holonic-words` laws after classification. Brandon's
+resident HNN), over the shared `no_std` `holonics-portable` leaf used by the detached Rust CUDA
+kernel. The current leaf is the renamed dependency-free `holonic-body`; `soma-abi` and
+`holonic-words` still need classification before further consolidation. Brandon's
 later `holonics-apple` package implements the same port on his separate branch. The Lean target is one top-level
 `lean/` Lake package with `Holonics` and dependent `HolonicsResearch`. Until verified moves land,
 `crates/` and `formal/` above are the correct source paths. The operator guides distinguish

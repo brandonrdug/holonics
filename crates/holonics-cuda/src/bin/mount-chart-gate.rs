@@ -20,14 +20,14 @@
 use std::ffi::c_void;
 use std::time::Instant;
 
-use body::chart::{carried_into_hand, zero_extend_grip, zero_extended_source};
-use body::manifold::{
+use holonics_portable::chart::{carried_into_hand, zero_extend_grip, zero_extended_source};
+use holonics_portable::manifold::{
     cog_packed_word, own_cell_position, COG_WORDS, OWN_CELL_FORM, OWN_CELL_LIVE, OWN_CELL_POSITION,
     OWN_CELL_WORDS,
 };
-use body::medium::{RegionalForm, FORM_WORDS};
-use body::num::{Cog, Rung};
-use body::place::{self, Place};
+use holonics_portable::medium::{RegionalForm, FORM_WORDS};
+use holonics_portable::num::{Cog, Rung};
+use holonics_portable::place::{self, Place};
 use holonics_cuda::{Context, DeviceBuffer, Dim3, Function, Module, Result};
 
 const PTX: &[u8] = include_bytes!("../../../../accelerators/cuda-kernel/soma_kernel_cuda.ptx");

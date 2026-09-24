@@ -9,7 +9,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use body::num::COG_WORDS;
+use holonics_portable::num::COG_WORDS;
 use holonics::membrane::ReceiverFiberIdentity;
 
 use crate::{
@@ -775,7 +775,7 @@ fn take<'a>(
 
 #[cfg(test)]
 mod tests {
-    use body::num::Cog;
+    use holonics_portable::num::Cog;
     use soma_abi::active::RelationAtom;
 
     use super::*;

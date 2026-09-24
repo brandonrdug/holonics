@@ -36,7 +36,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::PathBuf;
 
-use body::num::Cog;
+use holonics_portable::num::Cog;
 use holonic_engine::placement::{place, Placement};
 use holonic_engine::receiver_exact_compression::{
     InputId, ItemId, Observation, ObservedSystem, ReceiverId,

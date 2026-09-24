@@ -41,7 +41,7 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use body::num::Cog;
+use holonics_portable::num::Cog;
 use life::causal_language::{
     lexical_tokens, render_tokens, BranchingLaw, CausalLanguageEcology, CausalLanguageGeneration,
     CausalLanguageGenerationSpec, CausalLanguagePassage, ContinuationReading, ContinuationReceiver,

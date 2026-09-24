@@ -1,13 +1,13 @@
 use std::io::Write;
 use std::path::PathBuf;
 
-use body::channel::WindingQuantum;
-use body::incidence::{
+use holonics_portable::channel::WindingQuantum;
+use holonics_portable::incidence::{
     DiscreteEventGerm, EventCell, EventCellId, EventComplex, EventPort, EventPortKind,
     IncidenceHand, IncidenceKind, OrientedIncidence,
 };
-use body::manifold::FeltDeed;
-use body::num::Cog;
+use holonics_portable::manifold::FeltDeed;
+use holonics_portable::num::Cog;
 use life::current_world::{
     present_native_event_with, present_native_event_with_regional, NativeEventCurrent,
     NativeRegionalArc, NativeRegionalRelation, NativeRelationOrgan, NativeRelationOrganImage,

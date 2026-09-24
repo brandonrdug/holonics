@@ -39,7 +39,7 @@
 //! be bit-identical to the private path's. This is a precondition being made expressible, not a
 //! performance change.
 
-use body::num::Cog;
+use holonics_portable::num::Cog;
 use holonics::structure::CausalMembrane;
 use life::agentic_language::{
     AgenticLanguageAnswer, AgenticLanguageCapability, AgenticLanguageConsequence,

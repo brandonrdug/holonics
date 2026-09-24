@@ -8,5 +8,5 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies]
-body = { path = "../holonic-body" }
+holonics-portable = { path = "../holonics-portable" }
 

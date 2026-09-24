@@ -4,11 +4,11 @@ use crate::current_world::{
     NativeEventCurrent, NativeEventRelation, NativePathChart, NativeRegionalArc,
     NativeRegionalRelation, NativeRelationOrgan, NativeRelationOrganImage,
 };
-use body::incidence::{
+use holonics_portable::incidence::{
     DiscreteEventGerm, EventCell, EventCellId, EventComplex, EventPort, IncidenceHand,
     IncidenceKind, OrientedIncidence,
 };
-use body::num::Cog;
+use holonics_portable::num::Cog;
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use holonics::membrane::{
     ContemporaryEvent, ContemporaryRadiation, CpuLiveCurrentExecutor, CurrentBoundaryPort,

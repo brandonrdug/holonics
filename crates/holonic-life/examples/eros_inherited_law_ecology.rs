@@ -2,8 +2,8 @@ use std::collections::BTreeMap;
 use std::io::Write;
 use std::path::PathBuf;
 
-use body::incidence::IncidenceHand;
-use body::num::Cog;
+use holonics_portable::incidence::IncidenceHand;
+use holonics_portable::num::Cog;
 use life::current_world::{
     present_native_event_with, present_native_event_with_regional, NativeEventCurrent,
     NativePathChart, NativeRegionalArc, NativeRegionalRelation, NativeRelationOrgan,

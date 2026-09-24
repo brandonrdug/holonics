@@ -220,14 +220,14 @@ fn holon_header_refuses_partial_population_pairs() {
 
 #[test]
 fn cooperative_contact_sheet_retains_the_existing_extent() {
-    assert_eq!(contact::OUTPUT_WORDS, 1 + 2 * body::num::COG_WORDS);
+    assert_eq!(contact::OUTPUT_WORDS, 1 + 2 * holonics_portable::num::COG_WORDS);
     assert_eq!(
         contact::RECEIPT,
-        contact::OUTPUT + body::register::REGISTER as usize * contact::OUTPUT_WORDS
+        contact::OUTPUT + holonics_portable::register::REGISTER as usize * contact::OUTPUT_WORDS
     );
     assert_eq!(
         contact::SURFACE_WORDS,
-        contact::RECEIPT + body::register::REGISTER as usize
+        contact::RECEIPT + holonics_portable::register::REGISTER as usize
     );
 }
 

@@ -45,7 +45,7 @@ use std::{
     time::Instant,
 };
 
-use body::num::Cog;
+use holonics_portable::num::Cog;
 use holonics::hardware_cover::HardwareCover;
 use life::{
     form_mouth::deposit_form_or_message,

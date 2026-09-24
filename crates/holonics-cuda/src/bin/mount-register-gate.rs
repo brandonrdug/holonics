@@ -1,6 +1,6 @@
 //! mount-register-gate — the first bounded CUDA gate for the §XXXII-c REGISTER.
 //!
-//! The fixed raw-light lineage is carried through the shared `body::carriage` register mouth on
+//! The fixed raw-light lineage is carried through the shared `holonics_portable::carriage` register mouth on
 //! the cpu and through the CUDA `scope_register` shell over the same empty axis-64 standing.
 //! OWN begins as the all-zero rank-zero seed inside a declared 64²-cell storage aperture; that
 //! aperture is an instrument reservation, never the current's starting or final gauge. The gate
@@ -14,18 +14,18 @@
 
 use std::time::Instant;
 
-use body::carriage::{
+use holonics_portable::carriage::{
     carry_register_stroke_with_completion, registered_own_row_is_canonical, LineageStroke,
     RegisterStrokeStatus, WordSpan,
 };
-use body::manifold::{
+use holonics_portable::manifold::{
     self, carrier_row_words, COMPLETION_KIND, COMPLETION_WORDS, RADIATION_BRICK,
     RADIATION_BRICK_LIVE, RADIATION_CUT, RADIATION_FLAGS, RADIATION_FOLD, RADIATION_FORM,
     RADIATION_GRIP, RADIATION_ROTOR, RADIATION_STEP, RADIATION_WORDS,
 };
-use body::medium::{RegionalForm, FORM_WORDS};
-use body::num::COG_WORDS;
-use body::seam::SliceWordSeam;
+use holonics_portable::medium::{RegionalForm, FORM_WORDS};
+use holonics_portable::num::COG_WORDS;
+use holonics_portable::seam::SliceWordSeam;
 use holonics_cuda::{
     launch_register_carrier_rebase, Context, DeviceBuffer, Dim3, LaunchEvidence, Module,
     RegisterCarrierRebase, RegisterCarrierRebaseKernel, RegisterScopeArguments,
@@ -45,7 +45,7 @@ const DEPTH: usize = 4;
 const WHOLE: usize = 0;
 const ONE_MOVE: usize = 1;
 const PLURAL_COMPLETION_ROWS: usize = 17;
-const CONTACT_BLOCK: u32 = body::register::REGISTER;
+const CONTACT_BLOCK: u32 = holonics_portable::register::REGISTER;
 const CONTACT_RECEIPT_BASE: usize = contact_abi::RECEIPT;
 const CONTACT_SURFACE_WORDS: usize = contact_abi::SURFACE_WORDS;
 const REGISTER_STATUS_WORDS: usize = register_abi::STATUS_WORDS;
@@ -229,8 +229,8 @@ fn validate_radiation_row(row: &[u32]) -> std::result::Result<(), &'static str> 
     }
     RegionalForm::unpack_compact_checked(row, RADIATION_FORM)
         .map_err(|_| "a stepped row carries one canonical RegionalForm")?;
-    if !body::num::packed_cog_is_canonical(row, RADIATION_ROTOR)
-        || !body::num::packed_cog_is_canonical(row, RADIATION_ROTOR + COG_WORDS)
+    if !holonics_portable::num::packed_cog_is_canonical(row, RADIATION_ROTOR)
+        || !holonics_portable::num::packed_cog_is_canonical(row, RADIATION_ROTOR + COG_WORDS)
     {
         return Err("a stepped row carries two canonical meeting-rotor Cogs");
     }
@@ -343,7 +343,7 @@ fn cpu_reference(interior_installment: usize, completion_rows: usize) -> Registe
                 let required = usize::try_from(required_depth)
                     .expect("the requested carrier depth is cpu-representable");
                 let mut fresh = vec![0u32; carrier_row_words(required)];
-                body::carriage::rebase_carrier_row(&carriers, &mut fresh)
+                holonics_portable::carriage::rebase_carrier_row(&carriers, &mut fresh)
                     .expect("the cpu remount retains the exact live carrier");
                 carriers = fresh;
                 continue;
@@ -540,7 +540,7 @@ fn cuda_reference(
     let mut radiation = vec![0u32; radiation_words];
     radiation_b.copy_to_slice(&mut radiation)?;
     let mut worker_receipts = if cooperative {
-        vec![0u32; body::register::REGISTER as usize]
+        vec![0u32; holonics_portable::register::REGISTER as usize]
     } else {
         Vec::new()
     };
@@ -858,7 +858,7 @@ mod tests {
         let mut fresh =
             vec![0u32; manifold::OWN_REGISTER_WORDS + new_capacity * manifold::OWN_CELL_WORDS];
         assert_eq!(
-            body::carriage::recast_registered_own_row(&source, &mut fresh),
+            holonics_portable::carriage::recast_registered_own_row(&source, &mut fresh),
             Some((old_axis, new_axis))
         );
 
@@ -884,7 +884,7 @@ mod tests {
             let from = manifold::OWN_REGISTER_WORDS + old_grip * manifold::OWN_CELL_WORDS;
             if source[from + manifold::OWN_CELL_LIVE] != 0 {
                 let moved =
-                    body::chart::zero_extend_grip(old_grip as u32, old_axis, new_axis) as usize;
+                    holonics_portable::chart::zero_extend_grip(old_grip as u32, old_axis, new_axis) as usize;
                 let to = manifold::OWN_REGISTER_WORDS + moved * manifold::OWN_CELL_WORDS;
                 assert_eq!(
                     &fresh[to..to + manifold::OWN_CELL_WORDS],
@@ -913,7 +913,7 @@ mod tests {
         let mut widened =
             vec![0u32; manifold::OWN_REGISTER_WORDS + widened_capacity * manifold::OWN_CELL_WORDS];
         assert_eq!(
-            body::carriage::recast_registered_own_row(&source, &mut widened),
+            holonics_portable::carriage::recast_registered_own_row(&source, &mut widened),
             Some((axis, widened_axis))
         );
         let old_lanes = [

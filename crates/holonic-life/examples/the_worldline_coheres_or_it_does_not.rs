@@ -27,8 +27,8 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use body::channel::DepositCensus;
-use body::manifold::{ContinuingBody, ENCLOSURE_WORDS};
+use holonics_portable::channel::DepositCensus;
+use holonics_portable::manifold::{ContinuingBody, ENCLOSURE_WORDS};
 
 /// Small enough to mount several bodies in one process; the axis is a declared receiver coordinate
 /// and every reading below is a ratio against another reading in the SAME axis, so it cancels.

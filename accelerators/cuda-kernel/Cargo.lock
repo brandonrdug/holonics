@@ -3,20 +3,20 @@
 version = 4
 
 [[package]]
-name = "body"
+name = "holonics-portable"
 version = "0.0.0"
 
 [[package]]
 name = "soma-abi"
 version = "0.0.0"
 dependencies = [
- "body",
+ "holonics-portable",
 ]
 
 [[package]]
 name = "soma-kernel-cuda"
 version = "0.0.0"
 dependencies = [
- "body",
+ "holonics-portable",
  "soma-abi",
 ]

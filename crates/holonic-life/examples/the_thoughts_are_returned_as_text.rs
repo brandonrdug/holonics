@@ -16,7 +16,7 @@
 //!
 //! # What a thought IS, from the body's own words
 //!
-//! `Perception::thought_completed` is documented at `crates/holonic-body/src/manifold.rs` as *"the swing cut
+//! `Perception::thought_completed` is documented at `crates/holonics-portable/src/manifold.rs` as *"the swing cut
 //! here — the standing thought completed and the arrival began the next."* So **a thought is the run
 //! of arrivals between two cuts**, and the segmentation is the material carved at those cuts. That is
 //! a string. Nothing here computes it; the cut is the body's and this driver only writes down where
@@ -36,7 +36,7 @@
 
 use std::path::{Path, PathBuf};
 
-use body::manifold::{atom_node, ContinuingBody, ENCLOSURE_WORDS};
+use holonics_portable::manifold::{atom_node, ContinuingBody, ENCLOSURE_WORDS};
 
 const AXIS: i64 = 1 << 8;
 const SEED: &[u8] = b"the thoughts are returned as text";
@@ -108,7 +108,7 @@ fn segment(material: &[u8], grain: usize) -> (Vec<Thought>, usize, Totals) {
 
     if grain == 0 {
         for (at, pair) in material.windows(2).enumerate() {
-            let relation = body::boundary::difference(pair[1], pair[0]);
+            let relation = holonics_portable::boundary::difference(pair[1], pair[0]);
             if relation.mag == 0 {
                 open.push(material[at + 1]);
                 continue;

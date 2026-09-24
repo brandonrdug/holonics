@@ -87,7 +87,7 @@ pub mod foreign_codec_rest;
 // across the engine's receiver modules and must be named at every call site.
 pub mod causal_traversal;
 /// The `d`-dimensional arrow and the even Clifford algebra that carries its hand — the lift of
-/// `crates/holonic-body/src/arrow.rs` out of two dimensions, over exact rationals.
+/// `crates/holonics-portable/src/arrow.rs` out of two dimensions, over exact rationals.
 pub mod clifford;
 pub mod codec_system;
 /// Source-detached cultivated Phoenix product over one immutable native rest.

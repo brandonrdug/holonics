@@ -18,7 +18,7 @@
 //!   on `relational-geometry`, so neither side could see the other's half.
 //!
 //! Its three fixtures used `ProjectiveTurn::identity()` or the fixed translate `(1,1,0,1)`: **the
-//! orbit was trivial by construction.** A third cross-ratio at `crates/holonic-body/src/soul.rs:159` does test
+//! orbit was trivial by construction.** A third cross-ratio at `crates/holonics-portable/src/soul.rs:159` does test
 //! invariance, but only under translation and scaling — the **affine subgroup**, which is the weak
 //! part of the group and the part that fixes the point at infinity.
 //!

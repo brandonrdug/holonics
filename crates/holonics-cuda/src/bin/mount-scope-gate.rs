@@ -5,20 +5,20 @@
 //!   stage a bounded co-present cohort of raw-light lineages (each a short distinct light ⊕ two-byte
 //!   founding frame) over an immutable pre-light standing plane, exactly the buffer contract the
 //!   SPIR-V/PTX scope entries bind -> compute the CPU REFERENCE by carving each lane's disjoint OWN
-//!   ⊕ carrier/K spans and running `body::carriage::carry_dense_stroke` / `carry_founded_stroke`
+//!   ⊕ carrier/K spans and running `holonics_portable::carriage::carry_dense_stroke` / `carry_founded_stroke`
 //!   with `SliceWordSeam` (the SAME law the card runs, only the cpu lowering) -> upload -> dispatch
 //!   one thread per lane (block 64 × 1, with the 100-lane case deliberately crossing a second grid
 //!   row through the runtime X-thread stride) -> read back ->
 //!   assert the card's OWN reservation, carrier/K rows, per-lane term counts, and every word of the
 //!   formed radiation aperture are BYTE-EXACT.
 //!
-//! Both substrates call the identical `body::carriage` code; the gate therefore proves the nvptx
+//! Both substrates call the identical `holonics_portable::carriage` code; the gate therefore proves the nvptx
 //! lowering ⊕ the shell's span carving reproduce the cpu lowering word-for-word. Nothing is scored.
 //! Five lane counts are swept — 1 · 2 · 3 · 64 (one whole block) · 100 (a non-multiple of 64) — so the
 //! block-boundary and guard paths are exercised. The founded reservation opens the exact manifested
 //! `RADIATION_WORDS` aperture over a fresh zeroed buffer, matching the observed wgpu mouth. On any
 //! driver fault the exact CUresult name prints and the gate stops — no retry.
-//! One further single-lineage gate carries the fixed long passage from body::carriage with one
+//! One further single-lineage gate carries the fixed long passage from holonics_portable::carriage with one
 //! interior move per launch. The same complete grid is presented unconditionally until the carried
 //! cursor reaches the light's true end; OWN, carrier/K, radiation, and accumulated counts must then
 //! equal the uninterrupted cpu sibling while all eight continuation phases have crossed.
@@ -29,18 +29,18 @@
 use std::ffi::c_void;
 use std::time::Instant;
 
-use body::carriage::{
+use holonics_portable::carriage::{
     carry_dense_stroke, carry_founded_stroke, rebase_carrier_row, required_carrier_rebase_depth,
     LineageStroke, WordSpan,
 };
-use body::manifold::{
+use holonics_portable::manifold::{
     self, carrier_row_words, OWN_CELL_WORDS, RADIATION_BRICK, RADIATION_BRICK_LIVE, RADIATION_CUT,
     RADIATION_FLAGS, RADIATION_FOLD, RADIATION_FORM, RADIATION_GRIP, RADIATION_ROTOR,
     RADIATION_STEP, RADIATION_WORDS,
 };
-use body::medium::{RegionalForm, FORM_WORDS};
-use body::num::COG_WORDS;
-use body::seam::SliceWordSeam;
+use holonics_portable::medium::{RegionalForm, FORM_WORDS};
+use holonics_portable::num::COG_WORDS;
+use holonics_portable::seam::SliceWordSeam;
 use holonics_cuda::{Context, DeviceBuffer, Dim3, Function, Module, Result};
 
 /// The committed PTX boundary artifact, built by soma-kernel-cuda/build-ptx.sh.
@@ -62,7 +62,7 @@ const LANE_COUNTS: [usize; 5] = [1, 2, 3, 64, 100];
 /// **Regenerated 2026-08-07 against the carriage law, not against a prior receipt.** The 64- and
 /// 100-lane entries stood at `(256, 160, 38)` and `(408, 250, 67)` from the commit that first pinned
 /// them (laboratory `687e0899`) and were never regenerated across the ten later commits that
-/// changed `body::carriage`. Two of those commits moved the tuple, and each is a deliberate
+/// changed `holonics_portable::carriage`. Two of those commits moved the tuple, and each is a deliberate
 /// correction that updated its own in-crate tests in the same commit:
 ///
 /// - laboratory `323522b7`, *publish the current Soma production spine* — a lineage that exhausted
@@ -103,7 +103,7 @@ const EXPECTED_RADIATION_SPECIES: [(usize, usize, usize); 5] = [
 /// report.
 #[cfg(test)]
 const RESERVATION_LIMITED_LANES: [&[usize]; 5] = [&[], &[], &[], &[], &[86]];
-/// The exact long worldline used by body::carriage's within-atom continuation gate.
+/// The exact long worldline used by holonics_portable::carriage's within-atom continuation gate.
 const CONTINUATION_LIGHT: &[u8] =
     b"the cat sat on the mat and then it ran to see an old dog who was far too shy \
 now the cat sat on the mat again and the dog ran to see the old cat by the mat";
@@ -209,8 +209,8 @@ fn validate_radiation_row(row: &[u32]) -> std::result::Result<(), &'static str> 
     }
     RegionalForm::unpack_compact_checked(row, RADIATION_FORM)
         .map_err(|_| "a stepped row carries one canonical RegionalForm")?;
-    if !body::num::packed_cog_is_canonical(row, RADIATION_ROTOR)
-        || !body::num::packed_cog_is_canonical(row, RADIATION_ROTOR + COG_WORDS)
+    if !holonics_portable::num::packed_cog_is_canonical(row, RADIATION_ROTOR)
+        || !holonics_portable::num::packed_cog_is_canonical(row, RADIATION_ROTOR + COG_WORDS)
     {
         return Err("a stepped row carries two canonical meeting-rotor Cogs");
     }

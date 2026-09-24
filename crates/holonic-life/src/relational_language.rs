@@ -13,7 +13,7 @@ use std::{
     num::NonZeroUsize,
 };
 
-use body::num::Cog;
+use holonics_portable::num::Cog;
 use holonic_engine::{
     CpuExecutionError, CpuExecutionReceipt, CpuExecutor, ExactReceiverCurrentError,
     ExactReceiverCurrentLaw, ExactReceiverCurrentPassage, ExactReceiverCurrentRadiation,

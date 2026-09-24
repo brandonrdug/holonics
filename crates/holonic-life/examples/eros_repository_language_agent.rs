@@ -31,7 +31,7 @@ use std::{
     time::Instant,
 };
 
-use body::num::Cog;
+use holonics_portable::num::Cog;
 use holonics::structure::CausalMembrane;
 use life::{
     agentic_language::{

@@ -3,9 +3,9 @@ use std::fmt::Debug;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
-use body::incidence::IncidenceHand;
-use body::manifold::FeltDeed;
-use body::num::Cog;
+use holonics_portable::incidence::IncidenceHand;
+use holonics_portable::manifold::FeltDeed;
+use holonics_portable::num::Cog;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use soma_abi::active::{ActionCurrent, RelationAtom};

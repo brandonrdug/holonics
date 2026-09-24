@@ -2,11 +2,11 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
-use body::incidence::{
+use holonics_portable::incidence::{
     DiscreteEventGerm, EventCell, EventCellId, EventComplex, EventPort, EventPortKind,
     IncidenceHand, IncidenceKind, OrientedIncidence,
 };
-use body::num::Cog;
+use holonics_portable::num::Cog;
 use num_bigint::BigUint;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};

@@ -7,13 +7,13 @@
 //! move OWN out-of-place before pending-first carriage resumes. No standing read, receiving fold,
 //! integration, or render enters this gate.
 
-use body::carriage::{
+use holonics_portable::carriage::{
     carry_register_stroke, recast_registered_own_row, registered_own_row_is_canonical,
     LineageStroke, RegisterStrokeResult, RegisterStrokeStatus, WordSpan,
 };
-use body::manifold::{self, TermCounts};
-use body::medium::FORM_WORDS;
-use body::seam::SliceWordSeam;
+use holonics_portable::manifold::{self, TermCounts};
+use holonics_portable::medium::FORM_WORDS;
+use holonics_portable::seam::SliceWordSeam;
 use holonics_cuda::cuda::LaunchCensus;
 use holonics_cuda::{
     launch_register_own_recast, Context, CudaError, Device, DeviceBuffer, Module,

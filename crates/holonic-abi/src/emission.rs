@@ -6,12 +6,12 @@
 //! source event or scanning a dense OWN chart.  Durable word spelling is testimony and device ABI;
 //! these rows are never converted into source light.
 
-use body::channel::WindingQuantum;
-use body::manifold::{FeltDeed, FeltEmission, StandingRead};
-use body::medium::{FeltTerm, RegionalForm, FORM_WORDS};
-use body::num::{self, COG_WORDS};
-use body::place::{self, Place};
-use body::soul::Chi;
+use holonics_portable::channel::WindingQuantum;
+use holonics_portable::manifold::{FeltDeed, FeltEmission, StandingRead};
+use holonics_portable::medium::{FeltTerm, RegionalForm, FORM_WORDS};
+use holonics_portable::num::{self, COG_WORDS};
+use holonics_portable::place::{self, Place};
+use holonics_portable::soul::Chi;
 
 pub const LAYOUT_VERSION: u32 = 3;
 
@@ -622,7 +622,7 @@ impl View<'_> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use body::num::{Cog, Rung};
+    use holonics_portable::num::{Cog, Rung};
 
     fn emission(deed: FeltDeed, cause: (u64, u64)) -> DeedEmission {
         let winding = DeedKind::from(deed).winding();

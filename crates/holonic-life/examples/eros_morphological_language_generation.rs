@@ -13,7 +13,7 @@ use std::{
     time::Instant,
 };
 
-use body::num::Cog;
+use holonics_portable::num::Cog;
 use life::{
     causal_language::lexical_tokens,
     form_mouth::deposit_form_or_message,

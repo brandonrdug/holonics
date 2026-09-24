@@ -56,7 +56,7 @@
 
 use std::path::{Path, PathBuf};
 
-use body::manifold::{ContinuingBody, ENCLOSURE_WORDS};
+use holonics_portable::manifold::{ContinuingBody, ENCLOSURE_WORDS};
 use holonic_engine::traversible_chain::CountedCrossing;
 
 const AXIS: i64 = 1 << 8;

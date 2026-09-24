@@ -38,13 +38,13 @@ const DECLARED_THEORY: &[&str] = &[
     "docs/canon/EPISTEMIC_GRADES.md",
 ];
 
-/// The Rust material — real live owners, copied into the fixture's `src/crates/holonic-body`.
+/// The Rust material — real live owners, copied into the fixture's `src/crates/holonics-portable`.
 /// `lean_mathematics/syntax.rs` is here on purpose: it carries `'{'` and `'}'` as character
 /// literals, which is exactly what separates a delimiter reader from a brace counter.
 const DECLARED_RUST: &[&str] = &[
-    "crates/holonic-body/src/law.rs",
-    "crates/holonic-body/src/place.rs",
-    "crates/holonic-body/src/num.rs",
+    "crates/holonics-portable/src/law.rs",
+    "crates/holonics-portable/src/place.rs",
+    "crates/holonics-portable/src/num.rs",
     "crates/holonic-life/src/lean_mathematics/syntax.rs",
     "crates/holonic-life/src/laboratory_language/repository.rs",
 ];
@@ -62,7 +62,7 @@ fn main() {
     let mut theory_bytes = 0usize;
     let mut rust_bytes = 0usize;
     fs::create_dir_all(fixture.join("src/soma/RESEARCH")).expect("fixture research root");
-    fs::create_dir_all(fixture.join("src/crates/holonic-body")).expect("fixture rust root");
+    fs::create_dir_all(fixture.join("src/crates/holonics-portable")).expect("fixture rust root");
     let mut theory_at = Vec::new();
     for named in DECLARED_THEORY {
         let from = root.join(named);
@@ -78,7 +78,7 @@ fn main() {
     for named in DECLARED_RUST {
         let from = root.join(named);
         let into = fixture
-            .join("src/crates/holonic-body")
+            .join("src/crates/holonics-portable")
             .join(Path::new(named).file_name().expect("a file name"));
         let text = fs::read_to_string(&from).unwrap_or_else(|e| panic!("{}: {e}", from.display()));
         rust_bytes += text.len();
@@ -231,7 +231,7 @@ fn main() {
         .count();
     println!(
         "  of the deleted, {extension_artifacts} open with `rs ` or `md ` — the splitter firing on \
-         the `.` inside a path like `crates/holonic-body/src/law.rs`, which the retired bound was hiding \
+         the `.` inside a path like `crates/holonics-portable/src/law.rs`, which the retired bound was hiding \
          rather than fixing"
     );
 

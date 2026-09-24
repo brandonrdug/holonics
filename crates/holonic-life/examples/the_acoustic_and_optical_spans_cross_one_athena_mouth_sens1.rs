@@ -5,7 +5,7 @@
 
 use std::{any::Any, env, fs, path::PathBuf};
 
-use body::num::Cog;
+use holonics_portable::num::Cog;
 use holonic_engine::{
     quantity::BaseUnits, receiver_exact_compression::ReceiverId, BoundaryId,
     ExactComplexWaveCurrent,

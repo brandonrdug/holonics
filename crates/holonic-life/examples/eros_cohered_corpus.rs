@@ -3,10 +3,10 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
-use body::channel::WindingQuantum;
-use body::incidence::IncidenceHand;
-use body::manifold::{Face, FeltDeed};
-use body::num::{Cog, Rung};
+use holonics_portable::channel::WindingQuantum;
+use holonics_portable::incidence::IncidenceHand;
+use holonics_portable::manifold::{Face, FeltDeed};
+use holonics_portable::num::{Cog, Rung};
 use life::current_world::{
     present_native_event_with_regional, NativeEventCurrent, NativeRegionalArc,
     NativeRegionalRelation, NativeRelationOrgan,
@@ -1299,7 +1299,7 @@ fn face_read(face: Face) -> FaceRead {
     }
 }
 
-fn chi_read(chi: body::soul::Chi) -> ChiRead {
+fn chi_read(chi: holonics_portable::soul::Chi) -> ChiRead {
     ChiRead {
         other: cog_read(chi.other),
         same: cog_read(chi.same),

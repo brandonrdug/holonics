@@ -753,7 +753,7 @@ fn control_nine_sub_illicium(
     section("CONTROL 9 -- THE SUB-ILLICIUM: A COMPLETION IS AN ARRIVAL ONE GRAIN UP");
 
     println!(
-        "\n  `crates/holonic-body/src/manifold.rs`, W9: \"the sub-illicium -- the atom-grain traversal given"
+        "\n  `crates/holonics-portable/src/manifold.rs`, W9: \"the sub-illicium -- the atom-grain traversal given"
     );
     println!(
         "  the SAME live law, so the walk FEELS the standing terrain instead of dead reckoning."

@@ -4,8 +4,8 @@ use std::fs::File;
 use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
 
-use body::incidence::IncidenceHand;
-use body::num::Cog;
+use holonics_portable::incidence::IncidenceHand;
+use holonics_portable::num::Cog;
 use life::form_mouth::deposit_form_or_message;
 use num_bigint::BigInt;
 use serde::{Deserialize, Serialize};

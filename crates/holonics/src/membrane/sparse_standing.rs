@@ -8,9 +8,9 @@ use std::collections::BTreeMap;
 use std::ops::Range;
 use std::sync::{Arc, OnceLock};
 
-use body::manifold::{SparseStandingCell as FlatStandingCell, StandingQuery};
-use body::medium::RegionalForm;
-use body::place::{Grip, Place};
+use holonics_portable::manifold::{SparseStandingCell as FlatStandingCell, StandingQuery};
+use holonics_portable::medium::RegionalForm;
+use holonics_portable::place::{Grip, Place};
 
 use crate::membrane::growing_ranked::ExactCount;
 use crate::membrane::live_constituent::StandingConstituentAccess;
@@ -826,7 +826,7 @@ impl SparseStandingSurface {
                 forms.push(grounded[at].1);
                 at += 1;
             }
-            let after = body::medium::integrate(&forms).occupy();
+            let after = holonics_portable::medium::integrate(&forms).occupy();
             let replacement =
                 StandingCell::new(address.clone(), after).ok_or(SparseStandingError::Topology)?;
             match cells.binary_search_by(|cell| cell.address.cmp(&address)) {
@@ -866,15 +866,15 @@ impl SparseStandingSurface {
     }
 }
 
-fn map_ranked_resource(error: body::manifold::RankedOwnError) -> SparseStandingError {
+fn map_ranked_resource(error: holonics_portable::manifold::RankedOwnError) -> SparseStandingError {
     match error {
-        body::manifold::RankedOwnError::ResourceReservation => {
+        holonics_portable::manifold::RankedOwnError::ResourceReservation => {
             SparseStandingError::ResourceReservation
         }
-        body::manifold::RankedOwnError::ResourceExtent => SparseStandingError::ResourceExtent,
-        body::manifold::RankedOwnError::Geometry
-        | body::manifold::RankedOwnError::Topology
-        | body::manifold::RankedOwnError::Poisoned => SparseStandingError::Topology,
+        holonics_portable::manifold::RankedOwnError::ResourceExtent => SparseStandingError::ResourceExtent,
+        holonics_portable::manifold::RankedOwnError::Geometry
+        | holonics_portable::manifold::RankedOwnError::Topology
+        | holonics_portable::manifold::RankedOwnError::Poisoned => SparseStandingError::Topology,
     }
 }
 
@@ -922,11 +922,11 @@ mod tests {
     use super::*;
     use std::collections::BTreeSet;
 
-    use body::arrow::Arrow;
-    use body::channel::{LineageChannel, WindingQuantum};
-    use body::incidence::IncidenceHand;
-    use body::manifold::{DirectedEventContact, EventReceiver, Face};
-    use body::num::Cog;
+    use holonics_portable::arrow::Arrow;
+    use holonics_portable::channel::{LineageChannel, WindingQuantum};
+    use holonics_portable::incidence::IncidenceHand;
+    use holonics_portable::manifold::{DirectedEventContact, EventReceiver, Face};
+    use holonics_portable::num::Cog;
 
     use crate::membrane::{
         InterfaceCapability, LiveBoundary, LiveCell, LiveIncidence, LiveIncidenceKind, LivePath,

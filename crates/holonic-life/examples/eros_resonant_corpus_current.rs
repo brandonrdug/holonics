@@ -14,7 +14,7 @@ use std::{
     time::Instant,
 };
 
-use body::num::Cog;
+use holonics_portable::num::Cog;
 use life::form_mouth::deposit_form_or_message;
 use life::resonance_ecology::{
     ResonanceConstituentRead, ResonanceEcology, ResonanceEcologyRestImage, ResonanceGerm,

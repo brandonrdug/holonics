@@ -11,8 +11,8 @@ use algorithm_organ::{
     AlgorithmWord, Evaluation, ExactValue, Node, Program, Quantity, Rational, StepShape, Unit,
     ValueDomain,
 };
-use body::incidence::IncidenceHand;
-use body::num::Cog;
+use holonics_portable::incidence::IncidenceHand;
+use holonics_portable::num::Cog;
 use life::form_mouth::deposit_form_or_message;
 use serde::Deserialize;
 use serde_json::{json, Value};

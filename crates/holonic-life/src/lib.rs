@@ -46,7 +46,7 @@ pub mod form_mouth;
 pub mod founded_mouth;
 pub mod holonic_training;
 // Production on the oriented incidence complex rather than on a tape chart. It consumes
-// `body::incidence` for `∂∂ = 0`, hands, ports and cells, and `holonic-engine`'s
+// `holonics_portable::incidence` for `∂∂ = 0`, hands, ports and cells, and `holonic-engine`'s
 // `dimensional_wave` for exact amplitude superposition, and only `life` depends on both.
 // `research/records/2026-08-11_THE_TAPE_HAS_NO_VERTEX_AND_PRODUCTION_IS_RECEPTION_AT_THE_OTHER_HAND.md` §5.
 pub mod incidence_production;

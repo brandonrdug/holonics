@@ -17,7 +17,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 
-use body::{
+use holonics_portable::{
     incidence::{
         EventCell, EventCellId, EventComplex, EventPort, IncidenceHand, OrientedIncidence,
     },

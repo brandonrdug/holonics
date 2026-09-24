@@ -1,6 +1,6 @@
 //! The link, which is a relating and not a pointer.
 //!
-//! The substrate already owns this law. `crates/holonic-body/src/arrow.rs` reads a relating from a pole as
+//! The substrate already owns this law. `crates/holonics-portable/src/arrow.rs` reads a relating from a pole as
 //! `Arrow { reach, aim, cross }` — *"the reach WEIGHS (the elevation), never gates"*, the aim
 //! GATES, and the hand is one of three turns rather than a bool. That law never reached the
 //! traversal carriers: `BranchLineage`'s link is `Option<Arc<BranchNode<T>>>` with `extent: usize`,
@@ -26,7 +26,7 @@ use serde::{Deserialize, Serialize};
 
 /// Which way the relating turns, read in the pole's frame.
 ///
-/// Mirrors `body::Aim` and carries its ruling: there is no "nothing" here, only which way the turn
+/// Mirrors `holonics_portable::Aim` and carries its ruling: there is no "nothing" here, only which way the turn
 /// bites. `Ortho` is **cohere-null with the cross maximal** — the pure orthogonal turn, the founding
 /// hand — and is never to be read as an absent relation.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
@@ -54,7 +54,7 @@ impl Hand {
     /// Whether this hand is the exactly-orthogonal one — the quarter turn, `aim = 0`.
     ///
     /// **THIS IS NOT THE FOUNDING PREDICATE AND WAS MISNAMED `founds` UNTIL 2026-08-15.** A hand is
-    /// a species and carries no magnitudes, so it cannot decide founding: `body::Arrow::founds` is
+    /// a species and carries no magnitudes, so it cannot decide founding: `holonics_portable::Arrow::founds` is
     /// the *cone* `cross² ≥ aim²`, an arc-annulus about the Thales circle, while this is the knife
     /// edge at its centre. On one measured run the cone admits 2,672 contacts and the edge admits
     /// only those with `aim` exactly zero.

@@ -3,12 +3,12 @@
 //! The snapshot keeps the canonical header and exact generalized carrier together. Its native
 //! schema is the only persistence mouth.
 
-use body::manifold::{
+use holonics_portable::manifold::{
     node_packed_word, packed_face_is_canonical, packed_node_is_canonical, unpack_node,
     CarrierGrowth, Enclosure, LiveBodyHeader, Node, CARRIER_HEADER_WORDS, ENCLOSURE_FLY,
     ENCLOSURE_FLY_LIVE, ENCLOSURE_STANCE, ENCLOSURE_WORDS, NODE_WORDS,
 };
-use body::register::REGISTER;
+use holonics_portable::register::REGISTER;
 
 use crate::membrane::GrowingCarrier;
 
@@ -391,8 +391,8 @@ impl From<CarrierGrowth> for LiveCarrierError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use body::manifold::{atom_node, ContinuingBody};
-    use body::num::Cog;
+    use holonics_portable::manifold::{atom_node, ContinuingBody};
+    use holonics_portable::num::Cog;
 
     #[test]
     fn native_snapshot_reopens_and_branches_without_changing_its_predecessor() {

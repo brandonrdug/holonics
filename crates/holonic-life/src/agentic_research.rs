@@ -873,7 +873,7 @@ pub fn answer_causes(answer: &AgenticLanguageAnswer) -> BTreeSet<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use body::num::Cog;
+    use holonics_portable::num::Cog;
     use soma_abi::active::ActionCurrent;
 
     use crate::{

@@ -1,7 +1,7 @@
 //! Transient cooperative REGISTER-contact sheet.
 
-use body::manifold::{FACE_WORDS, NODE_WORDS};
-use body::num::COG_WORDS;
+use holonics_portable::manifold::{FACE_WORDS, NODE_WORDS};
+use holonics_portable::num::COG_WORDS;
 
 /// One transient cooperative REGISTER-contact sheet per mounted lineage.
 pub const COMMAND: usize = 0;
@@ -20,8 +20,8 @@ pub const OUTPUT_SAME: usize = 1;
 pub const OUTPUT_OTHER: usize = OUTPUT_SAME + COG_WORDS;
 pub const OUTPUT_WORDS: usize = 1 + 2 * COG_WORDS;
 
-pub const RECEIPT: usize = OUTPUT + body::register::REGISTER as usize * OUTPUT_WORDS;
-pub const SURFACE_WORDS: usize = RECEIPT + body::register::REGISTER as usize;
+pub const RECEIPT: usize = OUTPUT + holonics_portable::register::REGISTER as usize * OUTPUT_WORDS;
+pub const SURFACE_WORDS: usize = RECEIPT + holonics_portable::register::REGISTER as usize;
 
 pub const COMMAND_FORM: u32 = 1;
 pub const COMMAND_STOP: u32 = 2;

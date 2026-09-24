@@ -149,7 +149,7 @@ fn run() -> Result<(), String> {
     complex
         .validate_with_body(true)
         .map_err(|error| format!("body refused: {error:?}"))?;
-    println!("  body::incidence::EventComplex               ADMITS");
+    println!("  holonics_portable::incidence::EventComplex               ADMITS");
     let view = complex
         .engine_view()
         .map_err(|error| format!("engine refused: {error:?}"))?;

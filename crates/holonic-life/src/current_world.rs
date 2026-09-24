@@ -5,7 +5,7 @@
 //! co-present faces. The octet organ retains only the preceding octet needed to derive the next
 //! actual adjacency, so arbitrary storage chunks cannot become lineage cuts.
 
-use body::{
+use holonics_portable::{
     boundary,
     incidence::{
         EventCell, EventCellId, EventComplex, EventPort, IncidenceHand, OrientedIncidence,
@@ -538,7 +538,7 @@ impl NativePathChart {
     pub fn new(path: &[RelationAtom]) -> Result<Self, LiveCurrentError> {
         if path.is_empty() {
             return Err(LiveCurrentError::EventComplex(
-                body::incidence::EventComplexError::Empty,
+                holonics_portable::incidence::EventComplexError::Empty,
             ));
         }
         let edges = path.len() - 1;
@@ -612,8 +612,8 @@ impl NativePathChart {
         }
         ports.sort_unstable_by_key(|port| {
             let kind = match port.kind() {
-                body::incidence::EventPortKind::Ingress => 0u8,
-                body::incidence::EventPortKind::Exposed => 1u8,
+                holonics_portable::incidence::EventPortKind::Ingress => 0u8,
+                holonics_portable::incidence::EventPortKind::Exposed => 1u8,
             };
             (kind, port.slot())
         });
@@ -922,7 +922,7 @@ impl StreamedOctetOrgan {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use body::num::Cog;
+    use holonics_portable::num::Cog;
     use holonics::membrane::SparseStandingSurface;
 
     #[derive(Clone, Copy, Debug, PartialEq, Eq)]

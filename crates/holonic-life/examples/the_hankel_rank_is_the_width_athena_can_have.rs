@@ -23,7 +23,7 @@
 
 use std::collections::BTreeSet;
 
-use body::num::Cog;
+use holonics_portable::num::Cog;
 use life::causal_language::{
     lexical_tokens, token_germs_public, CausalLanguageEcology, CausalLanguagePassage,
 };

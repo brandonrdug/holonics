@@ -27,7 +27,7 @@ use std::{
     path::PathBuf,
 };
 
-use body::num::Cog;
+use holonics_portable::num::Cog;
 use holonics::hardware_cover::HardwareCover;
 use life::{
     morphological_language::{

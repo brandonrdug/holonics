@@ -6,7 +6,7 @@
 
 use std::sync::Arc;
 
-use body::manifold::{CarrierGrowth, CarrierStorage, Node, ENCLOSURE_WORDS};
+use holonics_portable::manifold::{CarrierGrowth, CarrierStorage, Node, ENCLOSURE_WORDS};
 
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct GrowingCarrier {
@@ -173,19 +173,19 @@ impl CarrierStorage for GrowingCarrier {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use body::manifold::{atom_node, ContinuingBody, Enclosure};
-    use body::num::Cog;
-    use body::register::REGISTER;
+    use holonics_portable::manifold::{atom_node, ContinuingBody, Enclosure};
+    use holonics_portable::num::Cog;
+    use holonics_portable::register::REGISTER;
 
     #[derive(Debug, PartialEq, Eq)]
     struct Face {
         axis: i64,
         occupancy: u64,
         breath: (u64, u64),
-        own: Vec<body::manifold::SparseOwnCell>,
-        channel: body::channel::LineageChannel,
+        own: Vec<holonics_portable::manifold::SparseOwnCell>,
+        channel: holonics_portable::channel::LineageChannel,
         thoughts: u32,
-        terms: body::manifold::TermCounts,
+        terms: holonics_portable::manifold::TermCounts,
         carrier: GrowingCarrier,
     }
 

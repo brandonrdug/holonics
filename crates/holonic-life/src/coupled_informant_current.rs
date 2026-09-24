@@ -21,7 +21,7 @@
 
 use std::fmt;
 
-use body::num::Cog;
+use holonics_portable::num::Cog;
 use holonic_engine::{
     CoupledInformantEvent, CoupledInformantGrade, CoupledInformantLaw, CoupledInformantPrediction,
     CoupledInformantRadiationKind, CoupledInformantStanding, EventSuccessor, ReturnedCellCoverage,

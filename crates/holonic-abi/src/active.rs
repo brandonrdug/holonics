@@ -9,9 +9,9 @@
 //! Every extent is 64-bit.  These rows own no allocation and choose no device sharding.  [`View`]
 //! validates a borrowed population as one complete cut body before any mutation can occur.
 
-use body::manifold::Node;
-use body::num::{self, Cog, COG_WORDS};
-use body::place::{self, Place};
+use holonics_portable::manifold::Node;
+use holonics_portable::num::{self, Cog, COG_WORDS};
+use holonics_portable::place::{self, Place};
 use core::mem::{align_of, size_of};
 
 pub const LAYOUT_VERSION: u32 = 1;

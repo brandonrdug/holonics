@@ -8,8 +8,8 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Arc;
 
-use body::incidence::IncidenceHand;
-use body::num::{Cog, COG_WORDS};
+use holonics_portable::incidence::IncidenceHand;
+use holonics_portable::num::{Cog, COG_WORDS};
 use holonics::structure::{
     GrowingKeyAtlas, KeyAtlasError, LocalRelations, LocalSequence, LocalSet, LocalStructureError,
     RelationAtlasError,

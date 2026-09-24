@@ -40,7 +40,7 @@ use std::{
     time::Instant,
 };
 
-use body::num::Cog;
+use holonics_portable::num::Cog;
 use life::causal_language::{
     lexical_tokens, CausalGeneratedText, CausalLanguageEcology, CausalLanguageGeneration,
     CausalLanguageGenerationSpec, CausalLanguagePassage, CausalLanguageRouteRestImage,

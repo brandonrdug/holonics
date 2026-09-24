@@ -12,12 +12,12 @@ use ::holonics_cuda::{
     Context, Device, DeviceBuffer, LaunchEvidence, LiveEventArguments, LiveEventSpan,
     LiveEventWriteSpan, Module, RegionalContactArguments, SOMA_PTX,
 };
-use body::manifold::{
+use holonics_portable::manifold::{
     node_packed_word, LiveBodyHeader, SparseOwnCell, CARRIER_HEADER_WORDS, ENCLOSURE_WORDS,
     NODE_WORDS,
 };
-use body::medium::FORM_WORDS;
-use body::num::COG_WORDS;
+use holonics_portable::medium::FORM_WORDS;
+use holonics_portable::num::COG_WORDS;
 use soma_abi::emission::{DeedEmission, DEED_WORDS};
 use soma_abi::live_event_cuda as cuda;
 use holonics::membrane::{

@@ -3,7 +3,7 @@
 //! the cpu reference fold, on the headless RTX 4080 SUPER.
 //!
 //!   stage a bounded co-present configuration (pre-light standing ⊕ N disjoint OWN planes, built
-//!   through `body`'s law) -> compute the cpu reference with `body::medium::integrate` (the SAME
+//!   through `body`'s law) -> compute the cpu reference with `holonics_portable::medium::integrate` (the SAME
 //!   fold the SPIR-V card reproduces) -> upload -> dispatch the three CUDA entries in the same
 //!   two-pass geometry the wgpu card uses (block 64, 2-D grid, the dispatch boundary is the pass
 //!   boundary) -> read back -> assert the card's final standing, topology reads, and touched map are
@@ -17,8 +17,8 @@
 use std::ffi::c_void;
 use std::time::Instant;
 
-use body::medium::{integrate, RegionalForm, FORM_WORDS};
-use body::num::{Cog, Rung};
+use holonics_portable::medium::{integrate, RegionalForm, FORM_WORDS};
+use holonics_portable::num::{Cog, Rung};
 use holonics_cuda::{Context, Device, DeviceBuffer, Dim3, Module, Result};
 
 /// The committed PTX boundary artifact, built by soma-kernel-cuda/build-ptx.sh;
@@ -96,7 +96,7 @@ fn run() -> Result<()> {
         }
     }
 
-    // --- the CPU REFERENCE: one fold per touched place, `body::medium::integrate` --------------
+    // --- the CPU REFERENCE: one fold per touched place, `holonics_portable::medium::integrate` --------------
     // Identical to life's `integrate_light`: forms = [pre-light standing, own0, own1, ...]; a place
     // is touched iff any OWN plane is occupied; touched places fold once, untouched stay as staged.
     let mut cpu_standing = pre_light.clone();

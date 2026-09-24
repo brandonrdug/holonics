@@ -90,7 +90,7 @@ fn main() {
     println!("                 a scalar            an oriented area");
     println!();
     println!(
-        "  `crates/holonic-body/src/arrow.rs` already carries this as Arrow{{reach, aim, cross}} in TWO"
+        "  `crates/holonics-portable/src/arrow.rs` already carries this as Arrow{{reach, aim, cross}} in TWO"
     );
     println!("  dimensions, with the note \"The whole arrow, never one scalar.\" The carrier read");
     println!(
@@ -347,7 +347,7 @@ fn main() {
     println!("[3]  THE ORTHO CASE  --  where the score reads nothing and the gyration is maximal");
     println!("{}", "=".repeat(100));
     println!();
-    println!("  `crates/holonic-body/src/arrow.rs:32-34`, on Aim::Ortho:");
+    println!("  `crates/holonics-portable/src/arrow.rs:32-34`, on Aim::Ortho:");
     println!();
     println!(
         "    \"the cohere is null, but the CROSS/gyration is MAXIMAL: the pure orthogonal turn,"

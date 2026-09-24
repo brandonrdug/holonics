@@ -17,10 +17,10 @@
 //! register's OWN carry event, and zero-extend the standing form into the widened chart.
 //! The scope family (`scope_felt` / `scope_founded` / CUDA-only `scope_register`) compiles here.
 //! The earlier port was blocked while the lineage law lived kernel-side with no `body` mouth; Route A
-//! (commit a778567d) relocated the whole lineage stroke into `body::carriage` behind the `WordSeam`
+//! (commit a778567d) relocated the whole lineage stroke into `holonics_portable::carriage` behind the `WordSeam`
 //! trait, so the ONE MOUTH now exists: the trusted device carriage and checked cpu-reference
 //! carriage compile the SAME interior stroke. Only the entry SHELLS — span
-//! carving ⊕ guards ⊕ `(ptr,len)` reconstruction — are re-expressed here. `body::seam::SliceWordSeam`
+//! carving ⊕ guards ⊕ `(ptr,len)` reconstruction — are re-expressed here. `holonics_portable::seam::SliceWordSeam`
 //! (the ordinary Rust slice realization) compiles for nvptx, and each lane's OWN/carrier spans are
 //! invocation-exclusive (single-writer), so its plain scalar store is the faithful mirror of the
 //! SPIR-V atomic-store seam; correctness comes from the span's single writer, never atomic arbitration.
@@ -50,29 +50,29 @@ use core::arch::nvptx;
 use core::slice;
 use core::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
-use body::arrow::Arrow;
-use body::carriage::{
+use holonics_portable::arrow::Arrow;
+use holonics_portable::carriage::{
     self, LineageStroke, RegisterContactSnapshot, RegisterContactSurface, RegisterStrokeStatus,
     WordSpan, carry_dense_stroke_trusted, carry_founded_stroke_trusted,
     carry_register_stroke_trusted_with_completion,
     carry_register_stroke_trusted_with_completion_surface, form_register_contact,
 };
-use body::chart;
-use body::manifold::{
+use holonics_portable::chart;
+use holonics_portable::manifold::{
     CARRIER_HEADER_WORDS, CarrierGrowth, CarrierStorage, ENCLOSURE_WORDS, ContinuingBody, EventEmanation,
     EventIncidence, FACE_WORDS, Face, LiveBodyHeader, NODE_WORDS, Node, OWN_CELL_FORM,
     OWN_CELL_LIVE, OWN_CELL_WORDS, OWN_REGISTER_WORDS, SparseOwnCell, SparseOwnStorage,
     StandingQuery, directed_event_contact_over_standing, node_packed_word, own_cell_position,
     packed_node_is_canonical, unpack_node,
 };
-use body::medium::{
+use holonics_portable::medium::{
     FORM_WORDS, RegionalForm, arm_at_grain, arm_from_sum, cog_at_grain, cog_from_sum,
     grain_from_key, grain_key,
 };
-use body::num::{self, COG_WORDS, Cog, Rung};
-use body::place;
-use body::register;
-use body::seam::SliceWordSeam;
+use holonics_portable::num::{self, COG_WORDS, Cog, Rung};
+use holonics_portable::place;
+use holonics_portable::register;
+use holonics_portable::seam::SliceWordSeam;
 use soma_abi::emission::{DEED_WORDS, DeedEmission};
 use soma_abi::live_event_cuda as event_cuda;
 use soma_abi::material_shadow_cuda;
@@ -323,7 +323,7 @@ impl CudaRegisterContactSurface {
             unsafe {
                 self.store(
                     CONTACT_NODE + word,
-                    body::manifold::node_packed_word(snapshot.node, word),
+                    holonics_portable::manifold::node_packed_word(snapshot.node, word),
                 )
             };
             word += 1;
@@ -349,7 +349,7 @@ impl CudaRegisterContactSurface {
             unsafe {
                 self.store(
                     CONTACT_FLY + word,
-                    body::manifold::face_packed_word(snapshot.fly, word),
+                    holonics_portable::manifold::face_packed_word(snapshot.fly, word),
                 )
             };
             word += 1;
@@ -465,7 +465,7 @@ fn source_and_cell(idx: u32, idy: u32, params: &[u32]) -> Option<(usize, usize, 
 fn read_standing(standing: &[u32], cell: usize) -> RegionalForm {
     let at = cell * FORM_WORDS;
     if at + FORM_WORDS <= standing.len() {
-        unsafe { RegionalForm::unpack_unchecked_with::<body::seam::SliceWordSeam>(standing, at) }
+        unsafe { RegionalForm::unpack_unchecked_with::<holonics_portable::seam::SliceWordSeam>(standing, at) }
     } else {
         RegionalForm::UNBORN
     }
@@ -484,7 +484,7 @@ fn read_form(
     } else {
         let at = ((source - 1) * cells + cell) * FORM_WORDS;
         if at + FORM_WORDS <= owns.len() {
-            unsafe { RegionalForm::unpack_unchecked_with::<body::seam::SliceWordSeam>(owns, at) }
+            unsafe { RegionalForm::unpack_unchecked_with::<holonics_portable::seam::SliceWordSeam>(owns, at) }
         } else {
             RegionalForm::UNBORN
         }
@@ -509,9 +509,9 @@ unsafe fn store_form(standing: &mut [u32], cell: usize, form: RegionalForm) {
 #[inline(always)]
 fn read_founded_form(standing: &[u32], owns: &[u32], own: bool, at: usize) -> RegionalForm {
     if own && at + FORM_WORDS <= owns.len() {
-        unsafe { RegionalForm::unpack_unchecked_with::<body::seam::SliceWordSeam>(owns, at) }
+        unsafe { RegionalForm::unpack_unchecked_with::<holonics_portable::seam::SliceWordSeam>(owns, at) }
     } else if !own && at + FORM_WORDS <= standing.len() {
-        unsafe { RegionalForm::unpack_unchecked_with::<body::seam::SliceWordSeam>(standing, at) }
+        unsafe { RegionalForm::unpack_unchecked_with::<holonics_portable::seam::SliceWordSeam>(standing, at) }
     } else {
         RegionalForm::UNBORN
     }
@@ -1002,7 +1002,7 @@ fn registered_cell(
     if row_end > owns.len() {
         return None;
     }
-    let active_axis = owns[row_base + body::manifold::OWN_REGISTER_AXIS];
+    let active_axis = owns[row_base + holonics_portable::manifold::OWN_REGISTER_AXIS];
     let active_cells = carriage::checked_extent_mul(active_axis as usize, active_axis as usize)?;
     if active_axis == 0 || active_axis & (active_axis - 1) != 0 || active_cells > capacity {
         return None;
@@ -1667,7 +1667,7 @@ fn register_recast_ranges(
     if old_header_end > old_owns.len() || new_header_end > fresh_owns_len {
         return None;
     }
-    let mounted_axis = old_owns[old_word_base + body::manifold::OWN_REGISTER_AXIS];
+    let mounted_axis = old_owns[old_word_base + holonics_portable::manifold::OWN_REGISTER_AXIS];
     let effective_axis = if mounted_axis == 0 { 1 } else { mounted_axis };
     if effective_axis & (effective_axis - 1) != 0 {
         return None;
@@ -1863,7 +1863,7 @@ pub unsafe extern "ptx-kernel" fn register_own_recast_finish(
         word += 1;
     }
     if ranges.requested {
-        fresh_owns[ranges.new_word_base + body::manifold::OWN_REGISTER_AXIS] = ranges.new_axis;
+        fresh_owns[ranges.new_word_base + holonics_portable::manifold::OWN_REGISTER_AXIS] = ranges.new_axis;
     }
     // The separate launch is the global completion seam for every preceding unique cell write.
     // Publish Complete last; leaving this store unreachable preserves the incomplete sentinel.
@@ -1962,7 +1962,7 @@ pub unsafe extern "ptx-kernel" fn register_carrier_rebase(
         let Ok(required) = usize::try_from(required) else {
             return;
         };
-        if body::manifold::carrier_row_words(required) != new_words
+        if holonics_portable::manifold::carrier_row_words(required) != new_words
             || carriage::required_carrier_rebase_depth(old) != Some(required as u64)
             || carriage::rebase_carrier_row(old, fresh).is_none()
         {
@@ -1979,7 +1979,7 @@ pub unsafe extern "ptx-kernel" fn register_carrier_rebase(
 
 // --- §XXVIII-b · THE SCOPE FAMILY (CUDA LADDER RUNG 3) -------------------------------------------
 // One thread carries one raw-light lineage into one invocation-exclusive OWN region and complete
-// carrier/K row through the shared `body::carriage` stroke. The SHELL decodes the storage ABI and
+// carrier/K row through the shared `holonics_portable::carriage` stroke. The SHELL decodes the storage ABI and
 // carves the disjoint spans; every decision that advances the worldline belongs to `carriage`. The
 // span is single-writer, so `SliceWordSeam`'s plain scalar store is the faithful mirror of the
 // SPIR-V atomic-store seam. Count publication stays this substrate's atomic boundary exactly as the
@@ -2133,7 +2133,7 @@ fn founded_ranges(
     let own_base = carriage::checked_extent_mul(own_cell_base, OWN_CELL_WORDS)?;
     let own_words = carriage::checked_extent_mul(own_cells, OWN_CELL_WORDS)?;
     let _own_end = carriage::checked_extent_add(own_base, own_words)?;
-    let radiation = if radiation_stride == body::manifold::RADIATION_WORDS {
+    let radiation = if radiation_stride == holonics_portable::manifold::RADIATION_WORDS {
         let base = carriage::checked_extent_mul(offset, radiation_stride)?;
         let words = carriage::checked_extent_mul(count, radiation_stride)?;
         let _end = carriage::checked_extent_add(base, words)?;
@@ -2172,7 +2172,7 @@ fn register_ranges(
     let cell_words = carriage::checked_extent_mul(capacity_cells, OWN_CELL_WORDS)?;
     let own_words = carriage::checked_extent_add(OWN_REGISTER_WORDS, cell_words)?;
     let _own_end = carriage::checked_extent_add(own_word_base, own_words)?;
-    let radiation = if radiation_stride == body::manifold::RADIATION_WORDS {
+    let radiation = if radiation_stride == holonics_portable::manifold::RADIATION_WORDS {
         let base = carriage::checked_extent_mul(offset, radiation_stride)?;
         let words = carriage::checked_extent_mul(count, radiation_stride)?;
         let _end = carriage::checked_extent_add(base, words)?;
@@ -2180,8 +2180,8 @@ fn register_ranges(
     } else {
         WordSpan::empty()
     };
-    let completion = if completion_stride >= body::manifold::COMPLETION_WORDS
-        && completion_stride % body::manifold::COMPLETION_WORDS == 0
+    let completion = if completion_stride >= holonics_portable::manifold::COMPLETION_WORDS
+        && completion_stride % holonics_portable::manifold::COMPLETION_WORDS == 0
     {
         let base = carriage::checked_extent_mul(lane, completion_stride)?;
         let _end = carriage::checked_extent_add(base, completion_stride)?;
@@ -2770,8 +2770,8 @@ impl StandingQuery for EventStanding<'_> {
         self.axis.trailing_zeros() as u64
     }
 
-    fn form_at_position(&self, position: body::place::Place) -> Option<RegionalForm> {
-        Some(self.form_at_grip(body::place::ground(position, self.axis as i64)))
+    fn form_at_position(&self, position: holonics_portable::place::Place) -> Option<RegionalForm> {
+        Some(self.form_at_grip(holonics_portable::place::ground(position, self.axis as i64)))
     }
 
     fn form_at_flat_grip(&self, grip: u32) -> Option<RegionalForm> {
@@ -2992,8 +2992,8 @@ struct EventEmissionTarget<'a> {
     invalid: bool,
 }
 
-impl body::manifold::FeltEmissionTarget for EventEmissionTarget<'_> {
-    fn emit(&mut self, emission: body::manifold::FeltEmission) {
+impl holonics_portable::manifold::FeltEmissionTarget for EventEmissionTarget<'_> {
+    fn emit(&mut self, emission: holonics_portable::manifold::FeltEmission) {
         let ordinal = self.emitted;
         self.emitted = self.emitted.saturating_add(1);
         if ordinal >= self.capacity {

@@ -71,7 +71,7 @@
 //!
 //! **Depth is a chart index, not a distance.** `FORMULA.md` §XVI: *"the moving origin grown to full
 //! rank, emanated by each relating and receiving the next infall — **`frame(n+1)` is the emanation
-//! of the relating in `frame(n)`**."* And `crates/holonic-body/src/manifold.rs`: *"depth 0 is the word grain;
+//! of the relating in `frame(n)`**."* And `crates/holonics-portable/src/manifold.rs`: *"depth 0 is the word grain;
 //! **a completion at depth k is an arrival at depth k+1 — the same node, the same verb** … the
 //! illicium is depth-recursive; the hourglass nests."*
 //!
@@ -179,7 +179,7 @@ pub struct UnopenedDeclaration {
 
 /// One founded step of a proof body — **the sub-illicium**.
 ///
-/// `crates/holonic-body/src/manifold.rs`, W9 · THE LIVING BOUNDARY: *"the sub-illicium — the atom-grain
+/// `crates/holonics-portable/src/manifold.rs`, W9 · THE LIVING BOUNDARY: *"the sub-illicium — the atom-grain
 /// traversal given the SAME live law (sub-stance, sub-groove), so the walk FEELS the standing
 /// terrain (the tire on the road) instead of dead reckoning. **Its completions are THE FOLDS — the
 /// cohered segments, found never listed — handed up as the word grain's arrivals.**"* And the

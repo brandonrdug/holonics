@@ -1,10 +1,10 @@
 use std::io::Write;
 use std::path::PathBuf;
 
-use body::channel::WindingQuantum;
-use body::incidence::IncidenceHand;
-use body::manifold::FeltDeed;
-use body::num::Cog;
+use holonics_portable::channel::WindingQuantum;
+use holonics_portable::incidence::IncidenceHand;
+use holonics_portable::manifold::FeltDeed;
+use holonics_portable::num::Cog;
 use serde::Serialize;
 use soma_abi::active::{ActionCurrent, RelationAtom};
 use holonics::membrane::{

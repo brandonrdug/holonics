@@ -1,14 +1,14 @@
 //! Rank-qualified sparse chart addresses.
 //!
-//! The historical [`body::place::Grip`] is a flat `u32` quotient.  It is an exact compatibility
+//! The historical [`holonics_portable::place::Grip`] is a flat `u32` quotient.  It is an exact compatibility
 //! face only while both dyadic coordinates fit that word.  A live sparse ecology instead keeps
 //! the chart rank and the two coordinate bit paths independently.  Widening appends the actually
 //! enacted zero section; it never re-grounds an old founder or allocates an `axis²` plane.
 
 use core::cmp::Ordering;
 
-use body::num::Cog;
-use body::place::{self, Place};
+use holonics_portable::num::Cog;
+use holonics_portable::place::{self, Place};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ChartAddressError {
@@ -186,7 +186,7 @@ impl ChartAddress {
     }
 
     /// Ground a new founder at the receiving rank.  This is the arbitrary-rank lift of
-    /// `body::place::ground`: mantissa, turn, rank, and the centered chart hand all remain in the
+    /// `holonics_portable::place::ground`: mantissa, turn, rank, and the centered chart hand all remain in the
     /// same sum, but the result is retained as two bit paths instead of flattened into `u32`.
     pub fn ground(place: Place, rank: u64) -> Result<Self, ChartAddressError> {
         Ok(Self {
@@ -198,7 +198,7 @@ impl ChartAddress {
 
     /// Compare this retained address with the body-owned grounding of one construction without
     /// allocating a temporary address.  Storage ordering remains the receiver's gauge; the
-    /// coordinate limbs themselves come only from `body::place`.
+    /// coordinate limbs themselves come only from `holonics_portable::place`.
     pub(crate) fn cmp_grounded(&self, place: Place) -> Result<Ordering, ChartAddressError> {
         match self.x.cmp_grounded(place.0, self.rank)? {
             Ordering::Equal => self.y.cmp_grounded(place.1, self.rank),
@@ -323,7 +323,7 @@ impl ChartAddress {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use body::chart;
+    use holonics_portable::chart;
 
     fn fixtures() -> [Place; 6] {
         [
@@ -344,7 +344,7 @@ mod tests {
                 let address = ChartAddress::ground(place, rank).unwrap();
                 assert_eq!(
                     address.try_flat_grip(),
-                    Some(body::place::ground(place, axis))
+                    Some(holonics_portable::place::ground(place, axis))
                 );
             }
         }

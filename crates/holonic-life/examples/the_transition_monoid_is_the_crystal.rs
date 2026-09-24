@@ -35,7 +35,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use body::num::Cog;
+use holonics_portable::num::Cog;
 use life::causal_language::{fiber_bytes, CausalLanguageEcology, CausalLanguagePassage};
 use life::suffix_ecology::ExactSuffixEcology;
 use soma_abi::active::ActionCurrent;

@@ -1,9 +1,9 @@
 use std::io::Write;
 use std::path::PathBuf;
 
-use body::incidence::IncidenceHand;
-use body::manifold::FeltDeed;
-use body::num::Cog;
+use holonics_portable::incidence::IncidenceHand;
+use holonics_portable::manifold::FeltDeed;
+use holonics_portable::num::Cog;
 use life::form_mouth::deposit_form_or_message;
 use serde::Serialize;
 use sha2::{Digest, Sha256};

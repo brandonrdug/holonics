@@ -9,7 +9,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use body::num::COG_WORDS;
+use holonics_portable::num::COG_WORDS;
 use holonics::structure::{
     FrozenRelationAtlas, FrozenRelationBuilder, LocalRelations, LocalSequence, LocalSet,
     RelationAtlasError, RelationSpan,
@@ -2592,7 +2592,7 @@ fn join_u64(low: u32, high: u32) -> Option<u64> {
 
 #[cfg(test)]
 mod tests {
-    use body::num::Cog;
+    use holonics_portable::num::Cog;
     use soma_abi::active::RelationAtom;
 
     use super::*;

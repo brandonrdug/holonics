@@ -4,7 +4,7 @@
 //! failed cpu allocation returns `false` through the body storage seam; the enclosing prepared
 //! transaction discards this uncommitted current and preserves the prior receiver whole.
 
-use body::manifold::{SparseOwnCell, SparseOwnStorage};
+use holonics_portable::manifold::{SparseOwnCell, SparseOwnStorage};
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct GrowingSparseOwn {

@@ -4,7 +4,7 @@
 //!
 //!   stage a reservation-sized OWN buffer (a concatenation of live founded cells, each carrying its
 //!   founding POSITION beside its accumulated form, built through `body`'s law) ⊕ a dense pre-light
-//!   standing plane -> compute the cpu reference with `body::medium::integrate` per receiving grip
+//!   standing plane -> compute the cpu reference with `holonics_portable::medium::integrate` per receiving grip
 //!   (the SAME fold the SPIR-V card reproduces; each founded cell re-grounds to its standing grip via
 //!   `place::ground`) -> upload -> dispatch the two founded passes and the shared finish in the same
 //!   two-pass geometry the wgpu card uses (block 64, 2-D grid, the dispatch boundary is the pass
@@ -21,12 +21,12 @@
 use std::ffi::c_void;
 use std::time::Instant;
 
-use body::manifold::{
+use holonics_portable::manifold::{
     cog_packed_word, COG_WORDS, OWN_CELL_FORM, OWN_CELL_LIVE, OWN_CELL_POSITION, OWN_CELL_WORDS,
 };
-use body::medium::{integrate, RegionalForm, FORM_WORDS};
-use body::num::{Cog, Rung};
-use body::place::{self, Place};
+use holonics_portable::medium::{integrate, RegionalForm, FORM_WORDS};
+use holonics_portable::num::{Cog, Rung};
+use holonics_portable::place::{self, Place};
 use holonics_cuda::{Context, DeviceBuffer, Dim3, Function, Module, Result};
 
 /// The committed PTX boundary artifact, built by soma-kernel-cuda/build-ptx.sh.
@@ -135,7 +135,7 @@ fn founded_case(
         if owns[at + OWN_CELL_LIVE] == 0 {
             continue;
         }
-        let position = body::manifold::own_cell_position(&owns, at);
+        let position = holonics_portable::manifold::own_cell_position(&owns, at);
         let target = place::ground(position, STANDING_AXIS as i64) as usize;
         if target >= STANDING_CELLS {
             continue; // ground() is bounded by axis², so this never fires here — mirrors the card guard

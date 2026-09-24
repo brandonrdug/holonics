@@ -5,7 +5,7 @@
 //! at least two distinct exterior sources. Context incidence, match horizon, and recurrence
 //! multiplicity remain testimony; none of them can manufacture the contact or enter its address.
 
-use body::num::COG_WORDS;
+use holonics_portable::num::COG_WORDS;
 use holonics::structure::{LocalRelations, LocalSequence, LocalSet};
 use holonics::membrane::ReceiverFiberIdentity;
 
@@ -794,7 +794,7 @@ impl std::error::Error for MorphologicalConductRefusal {}
 
 #[cfg(test)]
 mod tests {
-    use body::num::Cog;
+    use holonics_portable::num::Cog;
     use soma_abi::active::RelationAtom;
 
     use crate::{resonance_ecology::ResonanceGerm, suffix_ecology::ExactLabeledSuffixEcology};

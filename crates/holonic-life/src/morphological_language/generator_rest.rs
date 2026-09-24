@@ -10,7 +10,7 @@ use std::{
     collections::{BTreeMap, BTreeSet},
 };
 
-use body::num::Cog;
+use holonics_portable::num::Cog;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use soma_abi::active::ActionCurrent;
