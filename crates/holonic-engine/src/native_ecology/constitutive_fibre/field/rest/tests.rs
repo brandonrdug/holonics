@@ -98,7 +98,7 @@ fn remount_preserves_current_coefficients_frames_and_live_capabilities() {
         .unwrap();
     let expected = reference.rest(&[], &[]).unwrap();
     drop(reference);
-    let (resumed, sources, anchors) =
+    let (mut resumed, sources, anchors) =
         NativeConstitutiveField::remount(&surface, saved).unwrap();
     assert_eq!(resumed.occurrence_count(), 2);
     assert_eq!(sources.len(), 2);
@@ -240,7 +240,7 @@ fn source_only_field_refuses_occurrences_at_runtime_and_at_rest() {
     let mut bytes = Vec::new();
     rest.write(&mut bytes).unwrap();
     let decoded = NativeFieldRest::read(&mut &bytes[..], bytes.len() as u64).unwrap();
-    let (mut resumed, sources, anchors) =
+    let (resumed, sources, anchors) =
         NativeConstitutiveField::remount(&surface, decoded).unwrap();
     assert_eq!(resumed.occurrence_count(), 0);
     assert!(sources.is_empty() && anchors.is_empty());
