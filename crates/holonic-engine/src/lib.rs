@@ -89,7 +89,6 @@ pub mod causal_traversal;
 /// The `d`-dimensional arrow and the even Clifford algebra that carries its hand — the lift of
 /// `crates/holonics-portable/src/arrow.rs` out of two dimensions, over exact rationals.
 pub mod clifford;
-pub mod codec_system;
 /// Source-detached cultivated Phoenix product over one immutable native rest.
 pub mod cultivated_rest;
 /// Exact bounded two-coordinate W3 cultivation derivation and its receiver receipts.
@@ -99,21 +98,16 @@ pub mod soulkiller;
 // Reached explicitly rather than glob-exported for the same reason as
 // `discrete_curvature`: the bridge names `read`, `step` and `revise`, and a glob would put those
 // verbs in the crate root where nothing says what they read or step. `archive/plans/THE_ASSEMBLY.md`.
-pub mod curvature_bridge;
 // Reached explicitly rather than glob-exported: a presentation face is a declared apparatus
 // membrane, and flattening it into the crate root would let a caller reach a display type without
 // naming that it is one. `archive/plans/THE_PRESENTATION_ORGAN.md`.
-pub mod certified_face;
-pub mod communication;
 // Declared, never glob-exported. `ReceiverId`, `Observation` and `ItemId` reach this module from
 // `receiver_exact_compression` and collide at the crate root with `holonics::geometry::ReceiverId`
 // and with `graph_receiver`'s own vocabulary. `archive/plans/THE_ASSEMBLY.md`, "what must not be built".
-pub mod complex_system;
 // Coherence is collocation over time: two things relate iff presented together within one source.
 // The ratified law `archive/reference/holobrochos-a07ff376/src/soma/FORMULA.md:298` and its referent law at
 // `:1278`, which had no implementation in either tree until this module. Declared, never
 // glob-exported: `Presentation` collides with the `presentation` family at the crate root.
-pub mod collocation;
 // The conditioning, the production it makes possible, and that production read back as a circuit,
 // on one carrier with a map from every cell to the passage that founded it. Declared, never
 // glob-exported: `ItemId`, `ReceiverId` and `Observation` reach it from
@@ -126,7 +120,6 @@ pub mod conditioned_derivation;
 // `NullFibre`, `StaticResponse` and `OrientedAgreement` are local to this consumer, and
 // `DeclaredMetric` would collide with the metric names already at the crate root. Contract:
 // `docs/plans/THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-conditioned-structural-response-consumer`.
-pub mod conditioned_static_response;
 pub mod conic;
 /// The continuing tube: a tower is the transverse section of a tube, longitudinal transport and
 /// transverse restriction commute, and a wormhole is a passage between charts the tube's own order
@@ -143,14 +136,6 @@ pub mod coupled_informant;
 #[cfg(target_os = "linux")]
 pub mod cuda_aperture;
 #[cfg(target_os = "linux")]
-mod cuda_eta_head;
-#[cfg(target_os = "linux")]
-pub use cuda_eta_head::{EtaHeadError, ResidentEtaHead};
-mod cuda_realizer_search;
-pub use cuda_realizer_search::{
-    RealizerSearchError, ReceiverFamily as CudaRealizerReceiverFamily, ResidentRealizerSearch,
-    SearchReturn, SurfaceReturn, WheelReceiver, exact_square_root, homogeneous_value,
-};
 pub mod cuda_refine;
 #[cfg(target_os = "linux")]
 pub mod cuda_relation;
@@ -167,7 +152,6 @@ pub mod edit_rigidity;
 // one exact rational linear system. The candidate realizer's degree is forced a priori, so the
 // candidate population is finite and exhaustible and non-elementarity returns as a rank deficiency
 // with an exhibited annihilating combination rather than as a search that gave up.
-pub mod elementary_chart;
 pub mod embedding_fiber;
 // Softmax with the division removed. The exponential carries an additive difference to a
 // multiplicative ratio, and that is its whole work; the partition function is a declared null.
@@ -179,59 +163,48 @@ pub mod embedding_fiber;
 // is why it is a lawful move at all — the integral depends only on the class. The two declared
 // schedules are a gauge whose orbit this module MEASURES rather than assumes, and the class is
 // returned as the Rothstein-Trager resultant with no root extracted anywhere.
-pub mod hermite_reduction;
 // Whether the three-site turning equation's solution closes, decided by integer alternation on a
 // circle under every coprime restretching. The return group is finite exactly when the numerator
 // and denominator marks take turns; nothing is extracted, no angle is taken, and the classical
 // fifteen-row table of closing turn numbers is a CONTROL here and never a decider.
-pub mod hypergeometric_closure;
 // The deposited derivation circuit conducted as an exact population current: `receiver_current`'s
 // transport law pointed at the atlas's own 0-cells and 1-cells, so that an atom recruited by ninety
 // derivations separates from one recruited by two through a dilated passage delay rather than
 // through a score. Declared, never glob-exported: it names `CapacityLaw`, `named_lines`,
 // `one_result_star` and `read`, and all four say nothing at the crate root about which carrier they
 // belong to.
-pub mod derivation_capacitance;
 // The derivation's layout read as a hinge incidence, realized as a closed oriented surface the
 // curvature bridge can read, and the write-back that spends the returned curvature back into
 // `local_star`'s own geometry. Declared, never glob-exported: it names `realize`, `flow` and
 // `found`, which say nothing at the crate root about which carrier they belong to.
-pub mod derivation_curvature;
 // A foreign codec, recovered from its own declared statistics, entering the conditioning path by
 // the seam `conditioned_derivation::FoundedMorphology::from_founded_words` declares for exactly
 // that. Declared, never glob-exported: it names `present`, `intake` and `distinguish`, and all
 // three are verbs that say nothing at the crate root about which carrier they belong to.
-pub mod derivation_codec_intake;
 // Integration through reflection on a derivation circuit: the routes, and the holonomy their
 // disagreement retains. Declared, never glob-exported: it names `Route`, `AccumulationRule` and
 // `accumulation`, and `Route`/`accumulation` say nothing at the crate root about which carrier
 // they belong to.
-pub mod derivation_integral;
 // The 2-cells `derivation_atlas` refused to found, resolved by construction rather than by choosing:
 // a route loop is filled where the two routes' elaborated meanings agree and held open with a typed
 // disagreement where they do not. Declared, never glob-exported: it names `compare`, `fill_routes`
 // and `betti_at`, and all three say nothing at the crate root about which carrier they belong to.
-pub mod derivation_two_cells;
 // The moves a conditioned production made, read as substitutions and paid for by placement.
 // Declared, never glob-exported: it names `MoveSpecies`, `OpenClass`, `ClassReading` and
 // `substitutions`, and `OpenClass` collides with `placement`'s own while the verb `substitutions`
 // says nothing at the crate root about which family it means.
 pub mod cross_chart;
-pub mod derivation_skein;
 pub mod derived_factor_cover;
 // B8: the selection cascade and design equivalence. Hard constraints, the Pareto frontier over
 // the (receiver, environment) reading vector, worst-environment ranking, quality-diversity and
 // structural clusters from the exact separator structure -- with design equivalence being
 // `relation_ladder`'s EqualPotential and never a score.
-pub mod design_selection;
-pub mod dilation;
 pub mod dimensional_receiver;
 pub mod dimensional_wave;
 pub mod display;
 pub mod divisor_reconstruction;
 // B9 of the biological-ecology plan: typed evaluation splits with a leakage law, and B10's run
 // receipts and named clocks. Paired with `Foundation/EvaluationDiscipline.lean`.
-pub mod evaluation_discipline;
 pub mod evolution;
 mod factored_moment;
 pub use factored_moment::*;
@@ -244,12 +217,6 @@ pub mod exact_json;
 pub mod exact_owner_testimony;
 pub mod executor;
 pub mod field_atlas;
-/// T7's fold and cut: a reflection applied to one side of an exact rational crease, its side-bit
-/// residual, the bounce and the layer contact, rotation as two reflections, the cut that changes
-/// homology where a fold cannot, crease patterns as hinge frameworks, the fold catastrophe and the
-/// protein backbone as rigid origami. Paired with
-/// `formal/elementary-holonics/ElementaryHolonics/Transport/Fold.lean`.
-pub mod fold;
 pub mod foreign_map;
 pub mod gluing;
 pub mod landauer;
@@ -257,7 +224,6 @@ pub mod landauer;
 // deposited and re-lit by a different part. Declared, never glob-exported: it names
 // `encode_native_bytes` and `decode_native_bytes`, and a glob would put those verbs in the crate
 // root where nothing says which form they are of. `archive/plans/THE_ASSEMBLY.md` step 6.
-pub mod graded_complex_form;
 /// The grain tower `Component ⊑ Residue ⊑ Atom`, its restriction as a non-invertible
 /// transition, and the typed `ApertureRelation` a coarse receiver must declare. Paired with
 /// `formal/elementary-holonics/ElementaryHolonics/Foundation/GrainRestriction.lean`. Declared,
@@ -333,17 +299,12 @@ pub mod founded_receiver;
 mod lean_citations;
 // Plan phase 10: the engine's reconstruction fibres and separators, read against the core
 // restriction fibre they became, wire for wire. Test-only.
-pub mod lean_development;
-#[cfg(test)]
-mod restriction_fibre_instances;
 // The material loop and its circulation -- Kelvin's theorem as a carried loop rather than a fixed
 // covector. Reached explicitly: `MaterialLoop` and `circulation` say nothing at the crate root
 // about which field they belong to.
-pub mod kelvin;
 // The species of a proof move, returned as a fiber rather than a label. A sibling of
 // `crates/holonic-life/src/reconstruction_fiber.rs`: the same common-exposed-face construction over
 // `receiver_exact_compression`, with causal arrivals where the token system has stream neighbours.
-pub mod move_species;
 // A lattice gauge configuration read through `structure_group`: an exact integral representation,
 // plaquette holonomy, the Wilson action in character form, and one transfer operator whose spectrum
 // is exact. Declared, never glob-exported: `Link`, `Lattice` and `Plaquette` are deliberately
@@ -359,12 +320,10 @@ pub mod mode;
 // outside exhibited by name. Declared, never glob-exported: it names `Arrival`, `Constituent` and
 // `compare`-adjacent vocabulary that says nothing at the crate root about which carrier it belongs
 // to.
-pub mod name_elaboration;
 // The declared-option modeling surface. Reached explicitly, like the other presentation membranes:
 // an option is a receiver coordinate and every call site must name it as one.
 pub mod observation_ecology;
 pub mod organizational_grammar;
-pub mod parcel;
 pub mod phase_current;
 pub mod physical;
 // Exact addressed polygonal and higher-cell constraint incidence. Kept explicit because its
@@ -386,14 +345,11 @@ pub mod physical_intake;
 // `Coordinate`, `Environment`, `Occurrence` and `ContactStatus` names are local to this carrier
 // and must not collide with the addressing at the crate root. A claim read at one environment is
 // a claim at that environment only, and carrying it elsewhere needs a supplied passage.
-pub mod physical_occurrence;
 // B7's physicochemical half: residue-class contact composition, hydrogen-bond *candidates*, steric
 // overlaps, a burial *proxy* and a declared finite electrostatic model carried as an exact
 // enclosure. Not glob-exported: its `ResidueClass`, `ParameterTables` and `RigidMotion` names are
 // local to this receiver. Every reading carries its unit and the declared parameter table it was
 // taken under, and a charged reading refuses on an undeclared acidity axis.
-pub mod physicochemical_receiver;
-pub mod placement;
 pub mod platform;
 pub mod presentation;
 // C5: cost as a receipt with provenance, and the receiver-relative Pareto frontier of
@@ -402,22 +358,17 @@ pub mod presentation_cost;
 pub mod quantity;
 // The declared display gauge and the body's one vector codec. Not glob-exported for the same
 // reason as `certified_face`: colour is a gauge and must be named as one at every call site.
-pub mod discrete_curvature;
 pub mod leader_quadrature;
-pub mod presentation_gauge;
 pub mod prime_ecology;
 pub mod realization;
 pub mod running_integral;
 // The temper: founding and decay as one property of a structure's own twist. No glob — `Twist`
 // and `Temper` are deliberately narrow names and must be reached through the module.
-pub mod temper;
 // The return path: the movement between two readings, carried back into the production that caused
 // it as material. Joins `derivation_atlas`'s movement and the `temper`/`derivation_integral`
 // cochain circuit, neither of which had a consumer.
-pub mod returned_reading;
 // A returned circuit difference founded as reusable, passage-local conduct.  Declared rather than
 // glob-exported: its occurrence, cell, and passage addresses are meaningful only at this boundary.
-pub mod returned_conduct;
 // The Tschirnhaus organ: transport a quintic to another chart, exhibit the transport, and refuse
 // with the obstruction named when the target chart cannot represent the answer.
 // `docs/canon/TABLET_THE_CHART.md:280`.
@@ -439,7 +390,6 @@ pub mod receiver_history_compression;
 // A returned receiver difference riding one addressed native word and depositing one exact local
 // rank-one morphology.  Kept behind its module path because the metric, port and predecessor
 // identity are part of every lawful use.
-pub mod receiver_history_cultivation;
 // Exact integer relation detection over `BigInt`: a collapsed numeric face read as the truncated
 // series expansion it is, and the basis in which it can continue founded by lattice reduction.
 // Declared, never glob-exported: it names `ExactFace`, `reopen`, `probe_at_grain` and
@@ -450,7 +400,6 @@ pub mod receiver_history_cultivation;
 // `LocalChart` with transition maps on overlaps, and `ReceiverAtlas` — an embedding is an
 // atlas of placements whose content is its transition maps, not one global vector. Paired
 // with `Foundation/ReceiverAtlas.lean`.
-pub mod receiver_atlas;
 pub mod receiver_current;
 pub mod receiver_ecology;
 pub mod receiver_phase_atlas;
@@ -459,11 +408,9 @@ pub mod receiver_phase_atlas;
 // an exact zonotope enclosure under `causal_chord`'s linear dynamics — and the caller-declared
 // release law whose lawful returns are hold, widen, ask, release-coarser and
 // no-continuation-bridges. Paired with `Foundation/ReceiverRelease.lean`.
-pub mod regime_reading;
 // T1 — the relation ladder: one typed scale between two occurrences (identity, continuation,
 // isomorphism, receiver equality, equal potential, tolerance) with its order, its bounded
 // separator search and the two worked instances. Paired with `Foundation/RelationLadder.lean`.
-pub mod relation_ladder;
 // The rigidity receiver **R4**: the constraint Jacobian `J = D F(q)` of a contact complex's
 // one-skeleton, `ker J` as the infinitesimal motions, `ker J^T` as the self-stress, the trivial
 // motions measured rather than assumed, rigid clusters and contact-removal sensitivity. Declared
@@ -507,7 +454,6 @@ pub mod streamed_standing;
 // D3's engine-side adoption: the hand-written enclosure scatter declared as a `mount`
 // `IncidenceDeclaration`, with the generated gather/apply/scatter triple cross-checked against the
 // kernel's own result on the card. Declaration and cross-check only; no production path.
-pub mod section_layout_adoption;
 // The coordinate-region partition of one section, with its completeness and disjointness computed
 // rather than asserted, its cover and independence certificate composed, and its pressure one
 // covector per resource species. `FrontCell` carries an index and an extent and no coordinate;
@@ -517,7 +463,6 @@ pub mod section_partition;
 // and its reversed control, the intermediate width at every node against a declared overflow
 // aperture, one directed outward rounding at the declared boundary with its residual, and the
 // adjoint return `T_a^*` into every partial chart under declared metrics.
-pub mod reduction_junction;
 pub mod reopening;
 pub mod resident_law;
 pub mod resource;
@@ -527,8 +472,6 @@ pub mod simplicial;
 // Declared, never glob-exported: `Emission`, `Frame` and `situate` say nothing at the crate root
 // about which carrier they belong to, and `Frame` would collide with the receiver families.
 // `docs/canon/THE_HOLOBROCHOS_SPINE.md` §2 — comparison is situated by a frame.
-pub mod situated_residual;
-pub mod skein;
 // A statement grammar recovered from the deposit's own statement population, and the composition of
 // a statement the deposit does not reach into a slot that recovery founded. Declared, never
 // glob-exported: they name `Span`, `Slot`, `recover`, `normalize` and `admit`, every one of which
@@ -538,19 +481,14 @@ pub mod contact_gluing;
 mod mordell_weil_realizers;
 pub use mordell_weil_realizers::*;
 pub mod multiquadratic;
-pub mod spine_cut;
 // T2 of the generalized-transport plan: standing as the retained residue of passages, memory
 // as a generator `m_t = D_t(S_t, c_t)`, the receiver that keeps changing after its source
 // stops, and effective extinction read as `holonics::receiver::release`'s width inside tolerance on the
 // two-point family. Paired with `Foundation/Standing.lean`.
-pub mod statement_composition;
-pub mod statement_grammar;
 pub mod structure_group;
 // Declared, never glob-exported: `ReceiverId`, `Disagreement`, `Partition`, `Cover`, `Observation`
 // and `ItemId` collide across the placement family, and a realizer founded by a substitution must
 // be reached by naming which organ founded it. `archive/plans/THE_ASSEMBLY.md` step 2.
-pub mod substitution_realizers;
-pub mod supported_realizers;
 // Which tokens a corpus treats as invariant objects: a surface's occurrence population presented to
 // `receiver_exact_compression` as positions under a declared receiver family, so an unseparated
 // population is iron and a shattered one exhibits the shortest word that shattered it. Declared,
@@ -632,5 +570,3 @@ pub use wave_propagation::*;
 pub use world::*;
 
 // Integration checks of the Holonics prime-image algebra against engine-specific consumers.
-#[cfg(test)]
-mod core_prime_image_integration_tests;

@@ -216,11 +216,6 @@ fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
             "Foundation/ReceiverRelease.lean",
         ),
         (
-            include_str!("receiver_atlas.rs"),
-            "receiver_atlas.rs",
-            "Foundation/ReceiverAtlas.lean",
-        ),
-        (
             include_str!("topological_receiver.rs"),
             "topological_receiver.rs",
             "Foundation/TopologicalReceiver.lean",
@@ -248,29 +243,9 @@ fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
             "Foundation/IwasawaTower.lean",
         ),
         (
-            include_str!("physical_occurrence.rs"),
-            "physical_occurrence.rs",
-            "Foundation/PhysicalOccurrence.lean",
-        ),
-        (
-            include_str!("physical_occurrence/passage.rs"),
-            "physical_occurrence/passage.rs",
-            "Foundation/PhysicalOccurrence.lean",
-        ),
-        (
-            include_str!("physical_occurrence/plural_fibre.rs"),
-            "physical_occurrence/plural_fibre.rs",
-            "Foundation/PhysicalOccurrence.lean",
-        ),
-        (
             include_str!("presentation_cost.rs"),
             "presentation_cost.rs",
             "Foundation/PresentationCost.lean",
-        ),
-        (
-            include_str!("relation_ladder.rs"),
-            "relation_ladder.rs",
-            "Foundation/RelationLadder.lean",
         ),
         (
             include_str!("../../holonics/src/restriction.rs"),
@@ -306,26 +281,10 @@ fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
             "Foundation/AperturedGradedComplex.lean",
         ),
         (
-            include_str!("physicochemical_receiver.rs"),
-            "physicochemical_receiver.rs",
-            "Foundation/PhysicochemicalReceiver.lean",
-        ),
-        (
-            include_str!("design_selection.rs"),
-            "design_selection.rs",
-            "Foundation/DesignSelection.lean",
-        ),
-        (
-            include_str!("evaluation_discipline.rs"),
-            "evaluation_discipline.rs",
-            "Foundation/EvaluationDiscipline.lean",
-        ),
-        (
             include_str!("junction_law.rs"),
             "junction_law.rs",
             "Transport/JunctionLaw.lean",
         ),
-        (include_str!("fold.rs"), "fold.rs", "Transport/Fold.lean"),
         (
             include_str!("jet_staircase.rs"),
             "jet_staircase.rs",
