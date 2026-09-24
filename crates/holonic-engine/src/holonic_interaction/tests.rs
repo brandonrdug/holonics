@@ -8,7 +8,7 @@ use num_traits::{One, Signed, Zero};
 use holonics::geometry::Rat;
 
 use super::*;
-use crate::causal_chord::PoleReading;
+use holonics::causal_chord::PoleReading;
 use crate::edit_rigidity::ExactMetric;
 use crate::junction_law::{Interface, JointUnits, JunctionField, ResistiveNetwork, Side};
 

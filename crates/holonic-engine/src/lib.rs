@@ -76,7 +76,6 @@ pub mod causal;
 pub mod causal_body;
 /// Receiver R1: the exact transfer object `C(sI−A)^{-1}B` of a linearization, its poles, residues,
 /// eigenvector support and Gaussian-rational resolvent probes.
-pub mod causal_chord;
 pub mod causal_reflection;
 pub mod causal_state_grammar;
 pub mod codec_recovery;

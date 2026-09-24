@@ -49,6 +49,8 @@ pub mod dirac;
 pub mod element;
 pub mod generator;
 pub mod geometry;
+/// Exact source-to-receiver linear response, rational transfer functions and causal chord readings.
+pub mod causal_chord;
 pub mod holon;
 pub mod law;
 pub mod membrane;

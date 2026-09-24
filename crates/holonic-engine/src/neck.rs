@@ -26,7 +26,7 @@
 //!   [`ReceiverWidth`](holonics::law::receiver::ReceiverWidth), so the diameter here **is** that
 //!   owner's diameter and release is that owner's width-zero condition.
 //! * [`AnalyticWidth`] — the distance from the real axis to the nearest pole, taken from
-//!   [`pole_atlas`](crate::causal_chord::pole_atlas) as a **squared** rational or as a named
+//!   [`pole_atlas`](holonics::causal_chord::pole_atlas) as a **squared** rational or as a named
 //!   algebraic factor. No square root appears on any deciding path: for an irreducible
 //!   `x² + b x + c` with `4c − b² > 0` the squared half-width is `(4c − b²)/4` exactly, and a
 //!   factor of degree above two that no rational decides is returned in its own `undecided` list
@@ -130,7 +130,7 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::algebraic::CausalCellId;
-use crate::causal_chord::{ChordRefusal, PoleAtlas, PoleReading, pole_atlas};
+use holonics::causal_chord::{ChordRefusal, PoleAtlas, PoleReading, pole_atlas};
 use holonics::restriction::tower::{Tower, TowerFaceOutcome, TowerRefusal};
 use holonics::restriction::tube::horizon::FaceReading;
 use holonics::restriction::tube::HolonomyVerdict;
@@ -417,7 +417,7 @@ impl AnalyticWidth {
 
 /// **Read the analytic width off a pole atlas.**
 ///
-/// Composes [`pole_atlas`](crate::causal_chord::pole_atlas): the atlas' squarefree factors are
+/// Composes [`pole_atlas`](holonics::causal_chord::pole_atlas): the atlas' squarefree factors are
 /// walked, a rational root contributes squared distance zero, a quadratic `a x² + b x + c`
 /// contributes `(4ac − b²)/(4a²)` when its discriminant is negative and zero when it is not (real
 /// roots need no rational to name them), and a factor of degree above two is left undecided.

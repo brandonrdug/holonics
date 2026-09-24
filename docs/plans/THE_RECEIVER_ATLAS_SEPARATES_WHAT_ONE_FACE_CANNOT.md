@@ -106,7 +106,7 @@ theorem is the absent spectral realization, not the rate algebra.
 resolvent response as a first-class receiver over any object supplying a linearization, with its
 source, excitation, transport path, approximation error and residual returned alongside every
 audible or visible component. The owners are
-[`causal_chord.rs`](../../crates/holonic-engine/src/causal_chord.rs) and
+[`holonics::causal_chord`](../../crates/holonics/src/causal_chord.rs) and
 [`Foundation/CausalChord.lean`](../../formal/elementary-holonics/ElementaryHolonics/Foundation/CausalChord.lean),
 built on `exact_linear`'s exact matrix algebra, `rational_polynomial`'s gcd, squarefree
 decomposition, prime-lifting root census and Sturm isolation, `exact_value`'s Sturm certificate,
@@ -127,7 +127,7 @@ vanish. The chart-change law `(TAT⁻¹, TB, CT⁻¹)` leaves the whole object f
 (`rebase_numerator`, `rebase_denominator`, `rebase_transfer`) and in Rust.
 
 [proved-derived; implemented-exact] The repository had **no** half-plane root counter, so
-`causal_chord.rs` founds one: axis roots with multiplicity from `gcd(P,Q)` for
+`holonics::causal_chord` founds one: axis roots with multiplicity from `gcd(P,Q)` for
 `p(iω) = P(ω) + iQ(ω)`, left and right from the Cauchy index of the signed remainder sequence —
 Routh–Hurwitz in its Sturm form — evaluated at a rational shift whose stopping condition
 `left + axis + right = degree` is a certificate rather than a tolerance. For a symmetric operator
@@ -265,7 +265,7 @@ phase — the cross-term of `|Σ z_j|² = Σ|z_j|² + 2 Re Σ_{j<k} conj(z_j) z_
 The declared quadratic energy `Σ_b e_b ‖r_b‖²` is nonincreasing at zero input and strictly
 decreasing wherever `gamma_b > 0` (`energy_advance_le`, `energy_advance_lt`), and that reading is
 **tied** to the continuous rate form rather than asserted beside it: `rate_form` through
-`causal_chord.rs` returns exactly `diag(-2 gamma_b e_b)` — the rotation part of each block cancels
+`holonics::causal_chord` returns exactly `diag(-2 gamma_b e_b)` — the rotation part of each block cancels
 against its transpose — and `inertia.rs:375` reads its signature, negative on each dissipating band
 and null on each conservative one, in exact agreement with `‖z_b‖ < 1` and `‖z_b‖ = 1`.
 
@@ -574,7 +574,7 @@ is released when the width falls inside its **declared** tolerance; otherwise th
 are exactly `Hold`, `Widen`, `Ask`, `ReleaseCoarser` and `NoContinuationBridges`. The owners are
 [`receiver_release.rs`](../../crates/holonic-engine/src/receiver_release.rs) and
 [`Foundation/ReceiverRelease.lean`](../../formal/elementary-holonics/ElementaryHolonics/Foundation/ReceiverRelease.lean),
-built on `causal_chord.rs`'s `Linearization` as the first real dynamics, on `exact_linear`'s exact
+built on `holonics::causal_chord`'s `Linearization` as the first real dynamics, on `exact_linear`'s exact
 matrix algebra, and on `receiver_atlas`'s preimage fibre and refinement order.
 
 [definition] **Why R6 has its own owner rather than extending `receiver_atlas`.** The atlas
@@ -703,7 +703,7 @@ one-dimensional complexes on six occurrences with seven contacts and the declare
 and R5 actually supply for such a complex with no configuration: the grade-0 and grade-1 Hodge
 spectra under the unit metric, the integral Betti numbers with torsion, and the persistence of the
 dimension filtration. On the two Laplacian-cospectral non-isomorphic graphs of
-`causal_chord.rs::cospectral_graphs_are_separated_by_the_response_atlas` — degree sequences
+`holonics::causal_chord::cospectral_graphs_are_separated_by_the_response_atlas` — degree sequences
 `(4,2,2,2,2,2)` and `(3,3,3,2,2,1)` — the whole atlas returns **one** reading: characteristic
 polynomials `X⁶ − 14X⁵ + 73X⁴ − 176X³ + 192X² − 72X` at grade 0 and `X` times it at grade 1,
 `β = (1, 2)`, no torsion, and the same eight-pair persistence diagram. The grade-1 agreement is

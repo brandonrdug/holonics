@@ -17,7 +17,7 @@ use num_traits::{One, Zero};
 use holonics::geometry::Rat;
 
 use super::*;
-use crate::causal_chord::PoleReading;
+use holonics::causal_chord::PoleReading;
 use holonics::exact_linear::ExactRatMatrix;
 use crate::holonic_interaction::{
     ApertureChart, Carrier, ContactFace, Coupling, HolonicInteraction, Medium, MediumContact,

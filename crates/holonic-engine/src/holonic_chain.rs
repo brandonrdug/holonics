@@ -222,7 +222,7 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::algebraic::CausalCellId;
-use crate::causal_chord::{ChordRefusal, PoleAtlas, PoleReading};
+use holonics::causal_chord::{ChordRefusal, PoleAtlas, PoleReading};
 use holonics::restriction::tube::check_circuit_holonomy;
 use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::holonic_interaction::{
@@ -1894,7 +1894,7 @@ impl PowerStations {
     }
 
     /// `(Σ storage − injected) − ½ xᵀ(AᵀG + GA)x`: the block/vector route against
-    /// [`crate::causal_chord::rate_form`]'s matrix route. It is an identity for any `A` and
+    /// [`holonics::causal_chord::rate_form`]'s matrix route. It is an identity for any `A` and
     /// symmetric `G`, so it checks the arithmetic paths only; the derivation `AᵀG + GA = −2GMG`
     /// is checked by [`PowerStations::rate_form_agrees`].
     pub fn rate_form_residual(&self) -> &Rat {
