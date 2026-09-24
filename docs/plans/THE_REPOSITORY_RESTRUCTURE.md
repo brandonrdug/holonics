@@ -39,21 +39,21 @@ Each is backed by a measurement at `d3b8b509`.
    contracts, the execution-port trait and, over time, a host reference. The port and host
    reference are then built method by method (campaign K2 in §4). Neither blocks the restructure.
    `holonics-apple` implements the same port later.
-4. **Crate count: three maintained Linux libraries, Apple later.** The detached Rust NVPTX
-   kernel currently compiles shared `no_std` laws from both `body` and `soma-abi`, including
+4. **Crate count: three maintained Linux libraries, Apple later.** At the R0 source census, the
+   detached Rust NVPTX kernel compiled shared `no_std` laws from both `body` and `soma-abi`, including
    carriage, manifold, medium, number, register, active-current and section-layout operators.
-   Host `holonic-words` calls `soma-abi::section_layout_cuda` for the same exact residue arithmetic,
-   but the kernel does not consume `holonic-words` today. A two-package host graph cannot simply
-   fold `body`/`soma-abi` into `holonics`: the detached kernel cannot compile the host `std` crate,
-   and the current `holonics → holonic-words → soma-abi → body` edges would become a cycle.
-   The revised target is a dependency-free, portable `no_std` leaf (`holonics-portable`, final name
-   subject to the source classification), the substantive `holonics`, and `holonics-cuda`. The
+   Host `holonic-words` called `soma-abi::section_layout_cuda` for the same exact residue arithmetic,
+   but the kernel did not consume the host crate. Folding `body`/`soma-abi` straight into
+   `holonics` would have left the detached kernel unable to compile them and created a Cargo cycle.
+   The revised target is a dependency-free, portable `no_std` leaf (`holonics-portable`), the
+   substantive `holonics`, and `holonics-cuda`. The
    detached kernel and host consume the same leaf directly. `holonics-apple` comes later on Brandon's
    Mac branch. The portable leaf is justified by actual shared source and stays limited to laws and
    wire-neutral carriers that both sides compile. R2/M1 move host owners first; a separate cut
-   classifies and consolidates `body`, `soma-abi` and `holonic-words` without changing device math.
-   The exact section arithmetic and its CUDA entry ABI have moved to the portable leaf; the
-   remaining `soma-abi` records and host word wrappers still need disposition.
+   classified and consolidated the shared portion of `body`, `soma-abi` and the host `holonic-words`
+   owner without changing device arithmetic. The exact section arithmetic and CUDA entry ABI moved
+   to the portable leaf; host ring math moved into `holonics::ratio::ring`; CUDA owns section
+   refusals; and `holonic-words` is retired. Other `soma-abi` records still need disposition.
    The kernel's committed PTX is embedded at compile time by `holonics-cuda`
    library/tests/gates, loaded from those bytes by engine `section_layout_adoption` tests, and
    used by `holonic-life`'s Soma CUDA lineage. Its launch owners (`SOMA_PTX`, `register_launch`,
@@ -206,7 +206,7 @@ sources; §3 gives the target layout.
 | Reaction (power-neutral, Cayley step) | skew reaction; `(I−½K)y=(I+½K)p+W_c c`, gain 1 | `Holon/{Reaction,Cayley}` | `holonics::reaction`; `normal/direct/reaction_law.rs`; `kernels/enclosure_cayley.cuh` |
 
 Exact algebra underneath: `exact_linear`, `prime_image_algebra`, `inertia`, `rational_polynomial`,
-`primality`, `ExactRing`/`ModularWords` (now in `holonic-core`/`holonic-words`).
+`primality`, `ExactRing`/`ModularWords` (now in `holonics::ratio::ring`).
 
 ### 2.2 The machine (HNN) built from them
 
@@ -262,7 +262,7 @@ The target is three maintained libraries on this branch, four when Brandon adds 
 
 | Package | Internal ownership | Existing sources to sort at R0 |
 |---|---|---|
-| `holonics-portable` (§0.4) | A dependency-free `no_std` leaf for exact body/ABI laws and word arithmetic compiled by both host and detached Rust CUDA kernel. Host-only ratio wrappers and section refusals stay with their host owners. | Former `body` and the shared section ABI/arithmetic now live here; classify remaining shared parts of `soma-abi` and `holonic-words`, preserving one arithmetic implementation and host/device parity. |
+| `holonics-portable` (§0.4) | A dependency-free `no_std` leaf for exact body/ABI laws compiled by both host and detached Rust CUDA kernel. | Former `body` and shared section ABI/arithmetic live here; host exact rings live in `holonics::ratio::ring`, section refusals in `holonics-cuda::section_layout`, and remaining wire records stay under `soma-abi` pending disposition. |
 | `holonics` | Main library: typed ratio/remainder/inversion and jets; geometric frames, exterior cells, pair and tube/tower charts; the one Holon law with active receiving, composition, restriction and deposition; a proposed receiver-relative `Holarchy`; fluid, wave, spacetime and thermal constitutive instances; equation extraction as a Holon boundary; and the backend-neutral HNN: field law, source moments, adjoint contracts, execution-port trait and host reference, the last built in K2. The complex-parametron chart is an HNN physical chart. No CUDA dependency and no `nvcc`. | `holonic-core`, `relational-geometry`, live `holonic-structure`, the source-neutral parts of `holonic-engine` (extraction included), and the law/declaration parts of `holonics-hna` and live `holonic-life`. |
 | `holonics-cuda` | CUDA realization: driver, allocation, transfer completion, section layout and partition, hardware cover, the `.cu` kernels and their `build.rs`, and `hnn/`, the resident HNN field moved as it is (§0.3). It depends on `holonics` and implements the HNN execution port as K2 defines it. It does not redefine the material or loss law. | the former `holonic-mount` owner (now moved), engine `cuda_refine`, `resident_section`, `kernels/`, `hardware_cover`, `section_partition`, the resident `native_ecology/**` and `embedding_fiber`, the resident `holonics-hna` `native/**`, and the device files of `holonic_intelligence`. |
 | `holonics-apple` (later) | Apple silicon implementation behind the same typed execution port, with its own kernels and placement. Create it only on Brandon's Mac branch after its actual implementation is ready. | No Linux-branch move. |
@@ -368,8 +368,8 @@ The HNN execution port is defined at its surviving consuming call, including the
 field, complete geometry/feature pullback, material return, source order, receiving phase and
 receipt. The host/reference implementation and CUDA implementation must return the same typed
 relation at their stated precision. The apparatus package now has its target owner; the resident HNN cut remains: engine imports
-`holonics-cuda` and runs `nvcc`; resident field owners remain in engine/HNA/life; `holonic-words`
-imports `soma-abi`; and the HNN field has no host reference (§0.3). M1 moves the resident HNN into
+`holonics-cuda` and runs `nvcc`; resident field owners remain in engine/HNA/life; exact rings belong
+to `holonics::ratio::ring`; and the HNN field has no host reference (§0.3). M1 moves the resident HNN into
 `holonics-cuda` with its current behavior. K2 then extracts the port and host reference one
 method at a time, each against the CUDA return. A module with a distinct
 mathematical consumer survives in its object owner; unconsumed legacy scaffolding retires.
@@ -661,7 +661,8 @@ existing suites (§0.9):
 3. **R2: the Soma/`life` lineage and unconsumed crates.** Covers `holonic-body`, `-membrane`,
    `-surface`, `-circulation-abi`, `-language`, `holonics-workspace`, the dead parts of
    `holonic-life`, and `accelerators/` per §0.4. The isolated Vulkan surface cut is complete;
-   continue with the remaining consumers and decide `holonic-words` here. The
+   continue with the remaining consumers. The `holonic-words` package is now retired by the
+   [ring owner move](census/M1_RING_OWNER_MOVE.md). The
    [membrane owner audit](census/R2_MEMBRANE_EDGE.md) finds a live receive/standing runtime used by
    `life` and CUDA: its source moves with callers into main `holonics` during the Rust cut. The
    ERST `.holon` reader/deed adapter has been retired in R2 while retaining the runtime rest-image
@@ -696,10 +697,12 @@ existing suites (§0.9):
    The live structural carriers now belong to internal `holonics::structure`, with their callers
    retargeted. The dependency-free, `no_std` [`holonics-portable` leaf](census/M1_PORTABLE_LEAF_MOVE.md)
    now owns the former `holonic-body` source unchanged apart from crate naming and the shared
-   `section_layout_cuda` arithmetic/entry ABI; remaining ABI/word consolidation and its host/device
-   gates remain pending. The [portable section ABI move](census/M1_PORTABLE_SECTION_LAYOUT_MOVE.md)
-   now passes its focused portable/host checks, pinned PTX validation, exported ABI parity and
-   section-adoption card tests. [Structure](census/M1_STRUCTURE_OWNER_MOVE.md) and
+   `section_layout_cuda` arithmetic/entry ABI. The exact ratio ring now lives in
+   `holonics::ratio::ring`, section refusals belong to CUDA, and the `holonic-words` package is
+   retired ([ring owner audit](census/M1_RING_OWNER_MOVE.md); focused gates are pending).
+   The [portable section ABI move](census/M1_PORTABLE_SECTION_LAYOUT_MOVE.md) passes its focused
+   portable/host checks, pinned PTX validation, exported ABI parity and section-adoption card tests.
+   [Structure](census/M1_STRUCTURE_OWNER_MOVE.md) and
    [geometry](census/M1_GEOMETRY_OWNER_MOVE.md) now have internal main-library source and measured
    gates. The exact causal-chord equation extractor now belongs to `holonics::receiver::causal_chord`; its
    portable laws move with it and engine-owner comparisons remain engine integration tests.

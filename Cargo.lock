@@ -571,17 +571,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "holonic-words"
-version = "0.1.0"
-dependencies = [
- "holonics-portable",
-]
-
-[[package]]
 name = "holonics"
 version = "0.1.0"
 dependencies = [
- "holonic-words",
  "holonics-portable",
  "num-bigint",
  "num-rational",
@@ -598,7 +590,7 @@ dependencies = [
 name = "holonics-cuda"
 version = "0.1.0"
 dependencies = [
- "holonic-words",
+ "holonics",
  "holonics-portable",
  "soma-abi",
 ]

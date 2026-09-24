@@ -1,5 +1,5 @@
 use super::*;
-use holonics_cuda::{ScatterReceipt, ScatterRequest, SectionLayout};
+use holonics_cuda::section_layout::{ScatterReceipt, ScatterRequest, SectionLayout};
 
 /// The engine's own scatter material, small enough to read by eye: four source rows of six real
 /// coordinates (three complex), the window `[2, 6)`, scattered onto five destination rows.
@@ -71,7 +71,7 @@ fn the_declaration_refuses_the_duplicate_destination_the_kernel_refuses_at_run_t
 fn the_generated_reference_places_each_window_at_its_destination() {
     let layout = declaration();
     let operator = window_placement_operator(COUNT, 4 * COUNT * COUNT).expect("canonical");
-    let ring = ModularWords::DEVICE;
+    let ring = ModularWords::MERSENNE61;
     let source_words = DESTINATIONS.len() * WIDTH;
     let mut field = vec![0u64; layout.global_extent()];
     for (at, slot) in field.iter_mut().enumerate().take(source_words) {
@@ -118,7 +118,7 @@ fn compare_generated_scatter(adopt_engine_context: bool) {
         ResidentConstitutiveSection, ResidentNormalEnclosureSection,
     };
     use crate::resident_section::{ResidentGrain, ResidentSection, ResidentSectionRest, ResidentSurface};
-    use holonics_cuda::{SectionDeviceTables, SectionKernels};
+    use holonics_cuda::section_layout::{SectionDeviceTables, SectionKernels};
 
     let readout = ResidentReadout::new().expect("a resident chart");
     let surface = ResidentSurface::on(&readout).expect("the apparatus mounts");
@@ -190,7 +190,7 @@ fn compare_generated_scatter(adopt_engine_context: bool) {
         }
     }
     let reference = layout
-        .apply_reference(&ModularWords::DEVICE, &operator, &field)
+        .apply_reference(&ModularWords::MERSENNE61, &operator, &field)
         .expect("the placement is exact");
     let engine_words: Vec<i128> = {
         let out = surface
@@ -288,7 +288,10 @@ fn compare_generated_scatter(adopt_engine_context: bool) {
 /// comparison is a comparison of integers rather than of folds.
 #[test]
 fn the_shared_local_operator_cannot_carry_two_faces_with_different_blocks() {
-    use holonics_cuda::{AccumulationLaw, CheckedIntegers, ExactRing, IncidenceDeclaration, LocalOperator, ScatterRequest, SectionLayout};
+    use holonics::ratio::ring::{AccumulationLaw, CheckedIntegers, ExactRing};
+    use holonics_cuda::section_layout::{
+        IncidenceDeclaration, LocalOperator, ScatterRequest, SectionLayout,
+    };
 
     // A joint chart of three coordinates; face 0 reaches coordinates {0, 1}, face 1 reaches
     // {1, 2}. One region per face, each two slots wide.
@@ -296,7 +299,11 @@ fn the_shared_local_operator_cannot_carry_two_faces_with_different_blocks() {
     const WIDTH: usize = 2;
     let incidence = IncidenceDeclaration::uniform(EXTENT, WIDTH, vec![0, 1, 1, 2])
         .expect("a lawful two-region incidence");
-    let layout = SectionLayout::generate(incidence, ScatterRequest::Accumulated(AccumulationLaw::IntegerAdd)).expect("the layout generates");
+    let layout = SectionLayout::generate(
+        incidence,
+        ScatterRequest::Accumulated(AccumulationLaw::IntegerAdd),
+    )
+    .expect("the layout generates");
     let ring = CheckedIntegers;
 
     // `L_0 = J_0ᵀ J_0` for the slip covector `J_0 = (1, -1)` on its support, and `L_1` for
@@ -355,13 +362,20 @@ fn the_shared_local_operator_cannot_carry_two_faces_with_different_blocks() {
 /// field it reads.
 #[test]
 fn a_fixed_local_apply_is_linear_in_the_field_and_a_pivot_update_is_not() {
-    use holonics_cuda::{AccumulationLaw, CheckedIntegers, IncidenceDeclaration, LocalOperator, ScatterRequest, SectionLayout};
+    use holonics::ratio::ring::{AccumulationLaw, CheckedIntegers};
+    use holonics_cuda::section_layout::{
+        IncidenceDeclaration, LocalOperator, ScatterRequest, SectionLayout,
+    };
 
     const EXTENT: usize = 4;
     const WIDTH: usize = 2;
     let incidence = IncidenceDeclaration::uniform(EXTENT, WIDTH, vec![0, 1, 2, 3])
         .expect("a lawful incidence");
-    let layout = SectionLayout::generate(incidence, ScatterRequest::Accumulated(AccumulationLaw::IntegerAdd)).expect("the layout generates");
+    let layout = SectionLayout::generate(
+        incidence,
+        ScatterRequest::Accumulated(AccumulationLaw::IntegerAdd),
+    )
+    .expect("the layout generates");
     let ring = CheckedIntegers;
     let operator = LocalOperator::dense(WIDTH, vec![1, -1, 0, 1]).expect("a 2x2 block");
 

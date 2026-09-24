@@ -17,9 +17,10 @@ the roadmap orders it. The machine, source guides and research supply the constr
 guide are **current owners**, not claims that the target layout has landed. The substantive
 main `holonics` library will own the Holon, exact geometry, elementary operations and the backend-neutral `hnn` law
 and execution port. `holonics-cuda` receives the device-resident HNN as it is and implements the
-port; `holonics-apple` (later, on Brandon's branch) implements it for Apple silicon. `holonic-words`
-stays a separate `no_std` crate only while a Rust device kernel consumes it; otherwise its rings fold
-into `holonics::ratio`. Main builds without CUDA; its HNN host reference is construction campaign
+port; `holonics-apple` (later, on Brandon's branch) implements it for Apple silicon. Exact host
+rings are owned by `holonics::ratio::ring`; the shared low-level CUDA section ABI is in
+`holonics-portable`, and section refusals are in `holonics-cuda::section_layout`. Main builds
+without CUDA; its HNN host reference is construction campaign
 K2, not a precondition of the move. Lean becomes one Lake package with
 `Holonics` and dependent `HolonicsResearch`; the current `ElementaryHolonics` paths and
 `Soma.Holonics` declaration namespace stay factual until their distinct migrations land.

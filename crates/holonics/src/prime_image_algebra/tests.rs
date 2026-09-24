@@ -168,13 +168,13 @@ fn the_scaled_target_is_the_one_the_cleared_map_solves_against() {
 // ===============================================================================================
 
 #[test]
-fn the_first_chart_is_the_cards_own_ring_and_a_composite_modulus_is_refused() {
-    let device = PrimeChart::device().expect("the device chart is admissible");
-    assert_eq!(device.modulus(), holonic_words::ModularWords::DEVICE.modulus());
-    assert_eq!(device.modulus(), (1u64 << 61) - 1);
+fn the_first_chart_is_the_mersenne61_ring_and_a_composite_modulus_is_refused() {
+    let mersenne = PrimeChart::mersenne61().expect("the Mersenne chart is admissible");
+    assert_eq!(mersenne.modulus(), crate::ratio::ring::ModularWords::MERSENNE61.modulus());
+    assert_eq!(mersenne.modulus(), (1u64 << 61) - 1);
 
     let charts = descending_charts(4).expect("four charts");
-    assert_eq!(charts[0].modulus(), device.modulus());
+    assert_eq!(charts[0].modulus(), mersenne.modulus());
     for pair in charts.windows(2) {
         assert!(pair[0].modulus() > pair[1].modulus(), "descending, deterministic");
     }
@@ -196,7 +196,7 @@ fn the_first_chart_is_the_cards_own_ring_and_a_composite_modulus_is_refused() {
 
 #[test]
 fn the_charts_arithmetic_is_the_rings_and_inversion_is_exact() {
-    let chart = PrimeChart::device().expect("device chart");
+    let chart = PrimeChart::mersenne61().expect("Mersenne chart");
     let modulus = chart.modulus();
     for value in [1u64, 2, 3, 1_000_003, modulus - 1] {
         assert_eq!(chart.mul(value, chart.invert(value)), 1 % modulus);
@@ -219,7 +219,7 @@ fn a_rational_entry_reconstructs_and_the_square_root_bound_is_the_one_that_admit
     );
 
     // `-3/7` as a residue in one chart, lifted and recovered.
-    let chart = PrimeChart::device().expect("device chart");
+    let chart = PrimeChart::mersenne61().expect("Mersenne chart");
     let modulus = chart.modulus();
     let residue = chart.mul(modulus - 3, chart.invert(7));
     let mut accumulator = CrtAccumulator::new(1);
@@ -349,7 +349,7 @@ fn a_zero_or_duplicated_kernel_vector_certifies_nothing_and_is_refused() {
 fn a_vanishing_minor_is_refused_rather_than_read_as_a_rank() {
     let map = matrix(&[&[1, 2], &[2, 4]]);
     let presentation = IntegralPresentation::of(&map).expect("presentation");
-    let chart = PrimeChart::device().expect("device chart");
+    let chart = PrimeChart::mersenne61().expect("Mersenne chart");
     let mut spent = 0u64;
     // Rows `{0, 1}` against columns `{0, 1}` is a singular 2x2 minor: it certifies no rank 2.
     assert!(matches!(
@@ -381,7 +381,7 @@ fn a_map_with_a_bad_chart_still_returns_and_names_the_chart_it_refused() {
     // `det [[1, 1], [1, 1 + p]] = p`, so the map has rank two over Q and rank one in the device's
     // own chart: a genuinely bad prime, not one the content division would have removed — both
     // rows are primitive. The reading returns anyway, and the refusal is retained, not dropped.
-    let modulus = holonic_words::ModularWords::DEVICE.modulus();
+    let modulus = crate::ratio::ring::ModularWords::MERSENNE61.modulus();
     let map = ExactRatMatrix::new(vec![
         vec![rat(1, 1), rat(1, 1)],
         vec![

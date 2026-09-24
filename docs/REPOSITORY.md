@@ -54,7 +54,8 @@ extraction and the backend-neutral HNN law and port) → `holonics-cuda` (driver
 resident HNN), over the shared `no_std` `holonics-portable` leaf used by the detached Rust CUDA
 kernel. The current leaf contains the renamed dependency-free `holonic-body` source and the
 shared section arithmetic/ABI formerly owned by `soma-abi`. That package retains its other wire
-records; `holonic-words` still needs classification before further consolidation. Brandon's
+records; exact host rings belong to `holonics::ratio::ring`, while section admission errors belong
+to the CUDA section owner. Brandon's
 later `holonics-apple` package implements the same port on his separate branch. The Lean target is one top-level
 `lean/` Lake package with `Holonics` and dependent `HolonicsResearch`. Until verified moves land,
 `crates/` and `formal/` above are the correct source paths. The operator guides distinguish

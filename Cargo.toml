@@ -21,7 +21,6 @@ members = [
   "crates/holonics-hna",
   "crates/holonics-workspace",
   "applications/holonics-workbench",
-  "crates/holonic-words",
   "crates/holonic-engine",
   "crates/holonics-portable",
   "crates/holonic-abi",
@@ -43,7 +42,6 @@ edition = "2024"
 license = "MIT OR Apache-2.0"
 
 [workspace.dependencies]
-holonic-words = { path = "crates/holonic-words" }
 serde = { version = "1", features = ["derive", "rc"] }
 ron = "0.12"
 num-bigint = { version = "0.4", features = ["serde"] }

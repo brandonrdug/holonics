@@ -56,7 +56,10 @@
 //! Neither is a defect in either owner; they are the exact seam, and no engine result is changed by
 //! this module. Nothing here is on a production path: it is the declaration and its cross-check.
 
-use holonics_cuda::{IncidenceDeclaration, LocalOperator, ModularWords, SectionClause, SectionRefusal, Sectioned};
+use holonics::ratio::ring::ModularWords;
+use holonics_cuda::section_layout::{
+    IncidenceDeclaration, LocalOperator, SectionClause, SectionRefusal, Sectioned,
+};
 
 /// Declare the incidence of one `scatter_components` call over the common source/destination
 /// field described in this module's documentation.
@@ -179,7 +182,7 @@ pub fn window_placement_operator(count: usize, entry_ceiling: usize) -> Sectione
     for j in 0..count {
         table[(count + j) * width + j] = 1;
     }
-    LocalOperator::dense_canonical(width, table, &ModularWords::DEVICE)
+    LocalOperator::dense_canonical(width, table, &ModularWords::MERSENNE61)
 }
 
 // ===============================================================================================

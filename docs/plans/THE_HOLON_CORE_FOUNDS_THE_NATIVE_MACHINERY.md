@@ -916,8 +916,10 @@ areas, not a proposal for six new crates:
 - the remaining CUDA-free mathematics.
 
 The target is a substantive main `holonics` library containing the Holon laws, geometry,
-extraction and internal HNN; `holonic-words` remains the small shared exact ABI;
-`holonics-cuda` owns CUDA realization, with `holonics-apple` later on Brandon's branch.
+extraction, internal HNN and exact ring math in `holonics::ratio::ring`; the shared `no_std`
+section ABI remains in `holonics-portable`; `holonics-cuda` owns CUDA realization and section
+refusals, with `holonics-apple` later on Brandon's branch. The former host-only `holonic-words`
+package is retired.
 Public-path and wire handling follows the restructure's audited migration map. Run it after
 phases 11, 12 and 14 land, since those phases edit the same modules.
 Moving a module first requires a dependency census (`use crate::` edges) to find the acyclic cut. The

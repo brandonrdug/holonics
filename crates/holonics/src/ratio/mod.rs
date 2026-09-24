@@ -5,3 +5,4 @@
 
 pub mod surprisal;
 pub mod exponentiated;
+pub mod ring;

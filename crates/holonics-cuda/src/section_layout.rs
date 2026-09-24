@@ -58,7 +58,11 @@
 //! atomic.
 
 use std::collections::BTreeMap;
+use std::fmt;
 
+use holonics::ratio::ring::{
+    AccumulationLaw, CheckedIntegers, ExactRing, ModularWords, RingRefusal,
+};
 use holonics_portable::section_layout_cuda as section_cuda;
 
 use crate::launch_law::{
@@ -69,13 +73,118 @@ use crate::launch_law::{
 };
 use crate::{Context, CudaError, Device, DeviceBuffer, Dim3, Function, Module, Result, Stream};
 
-// The exact word rings, the accumulation law and the refusal vocabulary are owned by
-// `holonic-words` (host-only, no CUDA) and re-exported here at their old paths, so every
-// `holonics_cuda::section_layout::X` and `holonics_cuda::X` name is unchanged.
-pub use holonic_words::{
-    AccumulationLaw, CheckedIntegers, ExactRing, ModularWords, SectionClause, SectionRefusal,
-    Sectioned,
-};
+/// A named clause of the CUDA section-layout contract. A refusal identifies exactly one.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum SectionClause {
+    /// The global field carries one positive address extent.
+    PositiveGlobalExtent,
+    /// The global address extent is representable in the `u32` index wire the device reads.
+    GlobalExtentWire,
+    /// The declaration carries one or more regions.
+    PositiveRegions,
+    /// The slot population is positive and representable in the `u32` index wire.
+    SlotWire,
+    /// The offsets table carries one boundary per region plus its end, and starts at zero.
+    OffsetsLength,
+    /// The offsets table is monotone and every region carries at least one slot.
+    RegionWidth,
+    /// The offsets table ends exactly at the address table's own length.
+    OffsetsEnd,
+    /// Every declared global address is below the declared global extent.
+    AddressWithinExtent,
+    /// A declared extent product does not fit its wire.
+    ExtentProduct,
+    /// The declared scatter receipt is not the one the incidence supports.
+    ScatterReceipt,
+    /// The declared accumulation is not an exact ring.
+    AccumulationLaw,
+    /// The declared accumulation has no device realization.
+    AccumulationOnDevice,
+    /// The local operator's width is not the declared tile width.
+    LocalOperatorWidth,
+    /// A presented field or tile does not carry the declared extent.
+    SpanExtent,
+    /// The exact arithmetic refused: a checked integer sum or product left its wire.
+    ExactArithmetic,
+    /// A word presented for the device is not the canonical residue of its class in the declared
+    /// ring, i.e. it does not lie in `[0, modulus)`.
+    CanonicalWord,
+    /// A bounded derivation was asked for more work than the caller's declared ceiling admits.
+    WorkCeiling,
+    /// The generated launch shape could not be derived from the caller's device evidence.
+    LaunchDerivation,
+    /// A named colour class does not exist in this colouring.
+    ColourClass,
+    /// The colouring is not proper for this incidence.
+    ColouringProper,
+    /// The host descriptors used to stage the device tables do not match the descriptors supplied
+    /// for enactment.
+    TableProvenance,
+}
+
+impl SectionClause {
+    /// The clause's own name.
+    pub const fn name(self) -> &'static str {
+        match self {
+            SectionClause::PositiveGlobalExtent => "positive-global-extent",
+            SectionClause::GlobalExtentWire => "global-extent-wire",
+            SectionClause::PositiveRegions => "positive-regions",
+            SectionClause::SlotWire => "slot-wire",
+            SectionClause::OffsetsLength => "offsets-length",
+            SectionClause::RegionWidth => "region-width",
+            SectionClause::OffsetsEnd => "offsets-end",
+            SectionClause::AddressWithinExtent => "address-within-extent",
+            SectionClause::ExtentProduct => "extent-product",
+            SectionClause::ScatterReceipt => "scatter-receipt",
+            SectionClause::AccumulationLaw => "accumulation-law",
+            SectionClause::AccumulationOnDevice => "accumulation-on-device",
+            SectionClause::LocalOperatorWidth => "local-operator-width",
+            SectionClause::SpanExtent => "span-extent",
+            SectionClause::ExactArithmetic => "exact-arithmetic",
+            SectionClause::CanonicalWord => "canonical-word",
+            SectionClause::WorkCeiling => "work-ceiling",
+            SectionClause::LaunchDerivation => "launch-derivation",
+            SectionClause::ColourClass => "colour-class",
+            SectionClause::ColouringProper => "colouring-proper",
+            SectionClause::TableProvenance => "table-provenance",
+        }
+    }
+}
+
+/// A typed refusal of the section-layout declaration.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SectionRefusal {
+    /// The single clause that failed.
+    pub clause: SectionClause,
+    /// The exact quantities that failed it.
+    pub detail: String,
+}
+
+impl SectionRefusal {
+    /// Name a violated clause.
+    pub fn new(clause: SectionClause, detail: impl Into<String>) -> Self {
+        Self {
+            clause,
+            detail: detail.into(),
+        }
+    }
+}
+
+impl fmt::Display for SectionRefusal {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "section layout clause `{}` refused: {}",
+            self.clause.name(),
+            self.detail
+        )
+    }
+}
+
+impl std::error::Error for SectionRefusal {}
+
+/// The section-layout operation's construction result.
+pub type Sectioned<T> = core::result::Result<T, SectionRefusal>;
 
 impl From<SectionRefusal> for CudaError {
     fn from(refusal: SectionRefusal) -> CudaError {
@@ -90,6 +199,24 @@ impl From<SectionRefusal> for CudaError {
 
 fn refuse<T>(clause: SectionClause, detail: impl Into<String>) -> Sectioned<T> {
     Err(SectionRefusal::new(clause, detail))
+}
+
+/// Refuse a non-canonical word at the section boundary; ring arithmetic itself remains total.
+fn verify_canonical_words(ring: &ModularWords, values: &[u64], table: &str) -> Sectioned<()> {
+    for (at, value) in values.iter().enumerate() {
+        if !ring.is_canonical(*value) {
+            return refuse(
+                SectionClause::CanonicalWord,
+                format!(
+                    "{table} entry {at} is {value}, which is not the canonical residue {} of its class in Z/{}; \
+                     a word presented to the device is canonical or refused",
+                    ring.canonical(*value),
+                    ring.modulus()
+                ),
+            );
+        }
+    }
+    Ok(())
 }
 
 fn from_partition(refusal: PartitionRefusal) -> SectionRefusal {
@@ -344,7 +471,7 @@ impl TileExtents {
 // The scatter receipt
 // ---------------------------------------------------------------------------------------------
 
-/// Admit a declared accumulation: `AccumulationLaw` (now owned by `holonic-words`) names the law,
+/// Admit a declared accumulation: `holonics::ratio::ring::AccumulationLaw` names the ring law,
 /// and the section layout refuses a degenerate modulus before any allocation.
 fn admit(law: AccumulationLaw) -> Sectioned<AccumulationLaw> {
     match law {
@@ -1091,8 +1218,8 @@ impl RegionColouring {
 // The exact arithmetic and the exact CPU reference
 // ---------------------------------------------------------------------------------------------
 //
-// `ExactRing`, `CheckedIntegers` and `ModularWords` live in `holonic-words` and are re-exported
-// above; the operator and reference below compute in them unchanged.
+// `ExactRing`, `CheckedIntegers` and `ModularWords` are owned by `holonics::ratio::ring`; the
+// operator and reference below compute in those exact rings.
 
 /// **The declared local material operator**: a dense `width × width` table of exact ring elements,
 /// shared by every region.  Region `r` uses its leading `width(r) × width(r)` block, which is the
@@ -1174,8 +1301,8 @@ impl<V: Copy + PartialEq> LocalOperator<V> {
 impl LocalOperator<u64> {
     /// Declare a dense local operator **over a ring of modular words**, verifying in the same
     /// breath that every declared coefficient is the canonical residue of its class.  The width
-    /// clause is [`LocalOperator::dense`]'s; the representation clause is
-    /// [`ModularWords::verify_canonical`]'s, and a non-canonical coefficient is refused under
+    /// clause is [`LocalOperator::dense`]'s; the representation clause is checked at this section
+    /// boundary, and a non-canonical coefficient is refused under
     /// [`SectionClause::CanonicalWord`] naming its own index.
     pub fn dense_canonical(
         width: usize,
@@ -1189,10 +1316,9 @@ impl LocalOperator<u64> {
 
     /// Verify that every declared coefficient is canonical in `ring`, naming the first that is not.
     /// This is the clause [`SectionDeviceTables::stage`] discharges before it allocates anything on
-    /// the card; see [`ModularWords::verify_canonical`] for why the boundary refuses rather than
-    /// reduces.
+    /// the card; this section boundary refuses rather than silently reducing a declaration.
     pub fn verify_canonical(&self, ring: &ModularWords) -> Sectioned<()> {
-        ring.verify_canonical(&self.entries, "local operator coefficient")
+        verify_canonical_words(ring, &self.entries, "local operator coefficient")
     }
 }
 
@@ -1640,7 +1766,7 @@ impl SectionDeviceTables<'_> {
             )
             .into());
         }
-        operator.verify_canonical(&ModularWords::DEVICE)?;
+        operator.verify_canonical(&ModularWords::MERSENNE61)?;
         if let Some(colouring) = colouring {
             colouring.verify_proper(layout)?;
         }
@@ -1943,7 +2069,7 @@ impl<'m> SectionApparatus<'m> {
             )
             .into());
         }
-        ModularWords::DEVICE.verify_canonical(x, "global field")?;
+        verify_canonical_words(&ModularWords::MERSENNE61, x, "global field")?;
         // This convenience owner explicitly receives a context. Select it before allocation,
         // not only at the final synchronization after work has already been submitted.
         context.make_current()?;

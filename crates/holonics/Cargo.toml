@@ -9,7 +9,6 @@ license.workspace = true
 num-rational = { workspace = true }
 ron = { workspace = true }
 sha2 = { workspace = true }
-holonic-words = { workspace = true }
 holonics-portable = { path = "../holonics-portable" }
 soma-abi = { path = "../holonic-abi" }
 num-bigint = { workspace = true }

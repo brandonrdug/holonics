@@ -33,7 +33,8 @@ The restructuring work is in progress; these are the paths that exist now.
 |---|---|
 | `crates/holonics/` | Main Holon law, structural carriers, receiver-relative geometry, live receiving/standing and exact operators |
 | `crates/holonic-engine/`, `crates/holonics-hna/`, `crates/holonic-life/` | Native field, HNN sessions, equation extraction and inherited implementation layers |
-| `crates/holonics-cuda/`, `crates/holonic-words/` | CUDA driver/launch boundary and exact word arithmetic |
+| `crates/holonics-cuda/` | CUDA driver/launch boundary and section realization |
+| `crates/holonics-portable/` | Shared `no_std` body laws and exact section arithmetic compiled by host and detached NVPTX |
 | `formal/elementary-holonics/` | Current Lean/Lake project; the final `Holonics` and `HolonicsResearch` roots remain an M2 move |
 | `applications/`, `accelerators/` | CLI, data/tools and device-specific targets |
 | `docs/`, `research/` | Maintained contracts, plans, derivations, experiments and papers |
@@ -50,15 +51,16 @@ laws and HNN**, organized by elementary object rather than acting as a facade:
 
 | Library | Responsibility |
 |---|---|
-| `holonics` | Ratio/remainder, geometric transport and pair/tube charts, the Holon law and its operators, receivers and receipts, the Holarchy returned by interconnection, equation extraction, and the backend-neutral HNN law and execution port |
-| `holonics-cuda` | CUDA realization: driver, sections, kernels and the resident HNN field |
-| `holonics-portable` | Shared `no_std` laws compiled by both the host and detached Rust CUDA kernel; it now owns the former body source and exact section ABI, while other ABI/word consolidation remains pending |
+| `holonics` | Ratio/remainder and exact ring arithmetic, geometric transport and pair/tube charts, the Holon law and its operators, receivers and receipts, the Holarchy returned by interconnection, equation extraction, and the backend-neutral HNN law and execution port |
+| `holonics-cuda` | CUDA realization: driver, section contracts and kernels, and the resident HNN field |
+| `holonics-portable` | Shared `no_std` laws compiled by both the host and detached Rust CUDA kernel; it owns the former body source and exact section ABI |
 | `holonics-apple` (later) | Apple silicon implementation on Brandon's separate branch |
 
 That is three maintained Rust libraries on Linux after consolidation and four after Apple.
 The portable leaf began by replacing `body` and now owns the shared section arithmetic and CUDA
-section ABI. `soma-abi` retains its other wire records, and host `holonic-words` remains separate
-pending classification. The main library
+section ABI. `soma-abi` retains its other wire records, exact rings belong to
+`holonics::ratio::ring`, and CUDA section refusals belong to `holonics-cuda::section_layout`; the
+host-only `holonic-words` package is retired. The main library
 builds without CUDA; its HNN host reference is built after the move, one method at a time
 against the CUDA return.
 Its physical instances must carry fluid stress/pressure, wave propagation, spacetime

@@ -86,7 +86,7 @@ fn irregular_contact(regions: usize, global_extent: usize) -> IncidenceDeclarati
 /// canonical in `Z/(2^61 - 1)`.  Symmetric by construction, so
 /// `SectionLayout.Incidence.assembled_symm` applies.
 fn symmetric_operator(width: usize) -> LocalOperator<u64> {
-    let ring = ModularWords::DEVICE;
+    let ring = ModularWords::MERSENNE61;
     let mut entries = Vec::with_capacity(width * width);
     for row in 0..width {
         for column in 0..width {
@@ -99,7 +99,7 @@ fn symmetric_operator(width: usize) -> LocalOperator<u64> {
 
 /// A deterministic exact global field.
 fn field(extent: usize) -> Vec<u64> {
-    let ring = ModularWords::DEVICE;
+    let ring = ModularWords::MERSENNE61;
     (0..extent)
         .map(|at| ring.canonical(3 + 7 * at as u64 + (at as u64) * (at as u64)))
         .collect()
@@ -303,8 +303,8 @@ fn a_degenerate_modulus_does_not_name_a_ring() {
     .expect_err("refused");
     assert_eq!(refusal.clause, SectionClause::AccumulationLaw);
     assert_eq!(
-        ModularWords::new(0).expect_err("refused").clause,
-        SectionClause::AccumulationLaw
+        ModularWords::new(0).expect_err("refused"),
+        RingRefusal::ModulusTooSmall { modulus: 0 }
     );
 }
 
@@ -314,9 +314,9 @@ fn a_degenerate_modulus_does_not_name_a_ring() {
 
 #[test]
 fn the_device_ring_agrees_with_the_general_modular_path_over_the_same_modulus() {
-    // `ModularWords::DEVICE` dispatches to `holonics_portable::section_layout_cuda`, the same code the nvptx
-    // kernels compile.  This holds it against the ordinary 128-bit remainder path.
-    let device = ModularWords::DEVICE;
+    // `ModularWords::MERSENNE61` dispatches to `holonics_portable::section_layout_cuda`, the same
+    // code the nvptx kernels compile. This holds it against the ordinary 128-bit remainder path.
+    let device = ModularWords::MERSENNE61;
     let modulus = section_cuda::MODULUS;
     let probes: [u64; 9] = [
         0,
@@ -345,7 +345,7 @@ fn the_device_ring_agrees_with_the_general_modular_path_over_the_same_modulus() 
 fn the_device_ring_is_associative_and_commutative_on_its_probes() {
     // The property an accumulating scatter depends on, witnessed executably.  It is what a float
     // accumulation does not have and why `AccumulationLaw` carries no float variant.
-    let ring = ModularWords::DEVICE;
+    let ring = ModularWords::MERSENNE61;
     let probes: [u64; 5] = [0, 1, 7, section_cuda::MODULUS - 1, 1 << 59];
     for a in probes {
         for b in probes {
@@ -384,7 +384,7 @@ fn a_checked_integer_sum_past_its_wire_is_refused_rather_than_wrapped() {
 
 #[test]
 fn scatter_is_the_transpose_of_gather_on_every_declared_case() {
-    let ring = ModularWords::DEVICE;
+    let ring = ModularWords::MERSENNE61;
     for layout in [
         SectionLayout::generate(chain_1d(7, 4, 2), accumulated()).expect("generated"),
         SectionLayout::generate(grid_2d(6, 5), accumulated()).expect("generated"),
@@ -405,7 +405,7 @@ fn scatter_is_the_transpose_of_gather_on_every_declared_case() {
 
 #[test]
 fn the_generated_operator_equals_the_directly_assembled_matrix() {
-    let ring = ModularWords::DEVICE;
+    let ring = ModularWords::MERSENNE61;
     for layout in [
         SectionLayout::generate(chain_1d(7, 4, 2), accumulated()).expect("generated"),
         SectionLayout::generate(grid_2d(6, 5), accumulated()).expect("generated"),
@@ -433,7 +433,7 @@ fn the_generated_operator_equals_the_directly_assembled_matrix() {
 
 #[test]
 fn a_symmetric_local_operator_assembles_to_a_symmetric_global_matrix() {
-    let ring = ModularWords::DEVICE;
+    let ring = ModularWords::MERSENNE61;
     let layout = SectionLayout::generate(grid_2d(6, 5), accumulated()).expect("generated");
     let operator = symmetric_operator(layout.tile().max_width());
     assert!(operator.is_symmetric());
@@ -454,7 +454,7 @@ fn a_symmetric_local_operator_assembles_to_a_symmetric_global_matrix() {
 
 #[test]
 fn a_dense_assembly_past_the_declared_entry_ceiling_is_refused_before_it_allocates() {
-    let ring = ModularWords::DEVICE;
+    let ring = ModularWords::MERSENNE61;
     let layout = SectionLayout::generate(chain_1d(4, 4, 2), accumulated()).expect("generated");
     let operator = symmetric_operator(layout.tile().max_width());
     let refusal = layout
@@ -467,7 +467,7 @@ fn a_dense_assembly_past_the_declared_entry_ceiling_is_refused_before_it_allocat
 fn an_injective_scatter_reference_agrees_with_the_accumulating_one() {
     // `SectionLayout.Incidence.scatterAdd_of_injective`: through an injective incidence the
     // accumulation degenerates to a store, so the two device arms compute the same field.
-    let ring = ModularWords::DEVICE;
+    let ring = ModularWords::MERSENNE61;
     let addresses: Vec<u32> = (0..12u32).collect();
     let injective = SectionLayout::generate(
         IncidenceDeclaration::uniform(12, 3, addresses.clone()).expect("lawful"),
@@ -495,7 +495,7 @@ fn an_injective_scatter_reference_agrees_with_the_accumulating_one() {
 fn the_scatter_reference_refuses_a_field_that_is_not_the_declared_extent() {
     // The public scatter mouth takes the destination field rather than allocating one, so this
     // owner never allocates from the *declared* global extent; the length is checked instead.
-    let ring = ModularWords::DEVICE;
+    let ring = ModularWords::MERSENNE61;
     let layout = SectionLayout::generate(chain_1d(4, 4, 2), accumulated()).expect("generated");
     let tile = vec![0u64; layout.slots()];
     let mut short = vec![0u64; layout.global_extent() - 1];
@@ -686,7 +686,7 @@ fn every_colour_partition_is_an_injective_scatter_and_the_classes_cover_the_inci
 fn the_colour_by_colour_scatter_equals_the_sequential_scatter() {
     // The executable witness of `SectionLayout.Incidence.colour_schedule`: accumulating one colour
     // class at a time into a running field leaves exactly what the whole scatter leaves.
-    let ring = ModularWords::DEVICE;
+    let ring = ModularWords::MERSENNE61;
     for layout in [
         SectionLayout::generate(chain_1d(9, 4, 2), accumulated()).expect("generated"),
         SectionLayout::generate(grid_2d(7, 6), accumulated()).expect("generated"),
@@ -915,7 +915,7 @@ fn the_generated_triple_matches_the_exact_reference_on_the_card() -> crate::Resu
     crate::cuda::init()?;
     let device = crate::Device::get(0)?;
     let context = crate::Context::create(&device)?;
-    let ring = ModularWords::DEVICE;
+    let ring = ModularWords::MERSENNE61;
 
     let cases: Vec<(&str, IncidenceDeclaration, ScatterRequest)> = vec![
         ("1d-chain-of-overlapping-tiles", chain_1d(512, 16, 6), accumulated()),
@@ -1098,7 +1098,7 @@ fn operator_with_one_non_canonical_entry(width: usize, at: usize, word: u64) -> 
 /// An **independent** exact reference for `Z/(2^61 - 1)`: a plain 128-bit remainder sharing no code
 /// with `holonics_portable::section_layout_cuda`.
 ///
-/// `ModularWords::DEVICE` dispatches *into* the very code the card runs, which is exactly what makes
+/// `ModularWords::MERSENNE61` dispatches *into* the very code the card runs, which is exactly what makes
 /// it the right reference for a transcription question and the wrong one for an arithmetic
 /// question: a fold that is wrong on both sides agrees with itself. This ring is the second
 /// witness, and the device assertions below compare against it.
@@ -1131,14 +1131,14 @@ impl ExactRing for IndependentModulus {
 fn a_non_canonical_coefficient_is_refused_at_the_staging_boundary_naming_its_first_index() {
     let layout = SectionLayout::generate(chain_1d(6, 4, 2), accumulated()).expect("generated");
     let width = layout.tile().max_width();
-    let ring = ModularWords::DEVICE;
+    let ring = ModularWords::MERSENNE61;
 
     // A lawful declaration passes every mouth of the boundary.
     let lawful = symmetric_operator(width);
     lawful.verify_canonical(&ring).expect("a canonical operator is admitted");
     LocalOperator::dense_canonical(width, lawful.entries().to_vec(), &ring)
         .expect("a canonical operator is admitted at construction");
-    ring.verify_canonical(&field(layout.global_extent()), "global field")
+    verify_canonical_words(&ring, &field(layout.global_extent()), "global field")
         .expect("a canonical field is admitted");
 
     // `p` itself is the first non-canonical word and `u64::MAX` the widest; the refusal names the
@@ -1191,7 +1191,7 @@ fn a_non_canonical_coefficient_is_refused_at_the_staging_boundary_naming_its_fir
     // The same clause holds the global-field mouth, which is the other host table that crosses.
     let mut x = field(layout.global_extent());
     x[2] = section_cuda::MODULUS;
-    let refusal = ring.verify_canonical(&x, "global field").expect_err("refused");
+    let refusal = verify_canonical_words(&ring, &x, "global field").expect_err("refused");
     assert_eq!(refusal.clause, SectionClause::CanonicalWord);
     assert!(
         refusal.detail.contains("global field entry 2 is"),
@@ -1212,7 +1212,7 @@ fn a_non_canonical_coefficient_is_refused_at_the_staging_boundary_naming_its_fir
 fn the_device_ring_agrees_with_an_independent_reference_over_non_canonical_words() {
     // `the_device_ring_agrees_with_the_general_modular_path_over_the_same_modulus` reduces every
     // probe first, so it can say nothing about a word outside `[0, p)`. This one does not reduce.
-    let device = ModularWords::DEVICE;
+    let device = ModularWords::MERSENNE61;
     let probes: [u64; 12] = [
         0,
         1,
@@ -1291,7 +1291,7 @@ fn stage_around_the_canonicality_clause<'a>(
 /// 1. a non-canonical coefficient and a non-canonical global field are refused at the host mouths,
 ///    naming the first offending index, with the card present and nothing staged;
 /// 2. what those mouths admit is exact against the **independent** 128-bit reference, not merely
-///    against `ModularWords::DEVICE`, which is the same code the card runs;
+///    against `ModularWords::MERSENNE61`, which is the same code the card runs;
 /// 3. driven *around* the refusal — the only way to reach it — the four entries run `mul` and `add`
 ///    on words outside `[0, p)`, including an accumulation target seeded non-canonical, and still
 ///    produce the exact residue. That is the arithmetic being total rather than guarded, and it is
@@ -1310,7 +1310,7 @@ fn the_device_boundary_refuses_non_canonical_declarations_and_its_arithmetic_is_
     let width = layout.tile().max_width();
     let colouring = layout.colouring(1 << 20)?;
     colouring.verify_proper(&layout)?;
-    let ring = ModularWords::DEVICE;
+    let ring = ModularWords::MERSENNE61;
     let x = field(layout.global_extent());
 
     // --- (1) the two host mouths refuse -----------------------------------------------------

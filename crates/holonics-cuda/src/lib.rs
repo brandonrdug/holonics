@@ -47,12 +47,6 @@ pub use register_launch::{
     RegisterRecastFinishKernel, RegisterRecastKernel, RegisterScopeArguments, RegisterScopeKernel,
     RegisterScopeSurfaceArguments, RegisterScopeSurfaceKernel, RegisterSpan, RegisterWriteSpan,
 };
-pub use section_layout::{
-    AccumulationLaw, CheckedIntegers, ExactRing, IncidenceDeclaration, LocalOperator, ModularWords,
-    RegionColouring, ScatterReceipt, ScatterRequest, SectionApparatus, SectionClause,
-    SectionDeviceTables, SectionKernels, SectionLayout, SectionReceipts, SectionRefusal, Sectioned,
-    TileExtents, TransposeTable,
-};
 pub use register_recast::{
     launch_register_own_recast, RegisterOwnRecast, RegisterOwnRecastOutput, REGISTER_LANE_WORDS,
     REGISTER_RECAST_COMPLETE, REGISTER_RECAST_INCOMPLETE, REGISTER_STATUS_WORDS,

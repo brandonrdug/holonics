@@ -101,11 +101,10 @@
 //! modular matrix product, and this module does not infer it. The concrete obligation is named in
 //! [`crate::section_layout_adoption`].
 //!
-//! `holonic_words::ModularWords` (re-exported as `holonics_cuda::ModularWords`) is nevertheless the ring
-//! this module computes in, and at `ModularWords::DEVICE`'s own modulus `2^61 − 1` its `add` and
-//! `mul` *are* the device's — the same code `accelerators/cuda-kernel` compiles for nvptx.
-//! [`PrimeChart::device`] is that chart, and it is the first chart every reconstruction takes, so
-//! the leading image of every return is already computed in the card's own arithmetic.
+//! `holonics::ratio::ring::ModularWords` is the ring this module computes in. At the
+//! `MERSENNE61` modulus `2^61 − 1`, its `add` and `mul` use the same portable code that the CUDA
+//! section kernel compiles for nvptx. [`PrimeChart::mersenne61`] is the starting chart every
+//! reconstruction takes; later charts descend through smaller primes.
 //!
 //! # Prior art this composes rather than re-founds
 //!
@@ -129,7 +128,7 @@
 //!   and [`self::tests`] holds the two against each other on every fixture rather than on trust.
 //! - **Primality** is `crate::primality::is_prime` — deterministic Miller–Rabin over
 //!   twelve fixed bases, exact for every `u64`. This module calls it; it declares no base set.
-//! - **The ring** is `holonics_cuda::ModularWords`, as above.
+//! - **The ring** is [`crate::ratio::ring::ModularWords`], as above.
 //! - **The hardware cover** is [`crate::hardware_cover`]; this module declares a front to it and
 //!   owns no placement law.
 
@@ -141,7 +140,7 @@ use crate::geometry::Rat;
 use serde::Serialize;
 use thiserror::Error;
 
-use holonic_words::{ExactRing, ModularWords};
+use crate::ratio::ring::{ExactRing, ModularWords};
 
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::hardware_cover::{ChartId, CoverDecomposition, FrontCell, HardwareCover};
@@ -510,7 +509,7 @@ fn lcm(left: &BigInt, right: &BigInt) -> BigInt {
 // 2. the bounded arithmetic chart
 // ===============================================================================================
 
-/// **One bounded arithmetic chart: a prime, decided, carrying `holonics_cuda::ModularWords` as its ring.**
+/// **One bounded arithmetic chart: a prime, decided, carrying the exact ratio ring.**
 ///
 /// [definition] The modulus is decided prime by `crate::primality::is_prime` —
 /// deterministic Miller–Rabin over twelve fixed bases, exact for every `u64` — and is held inside
@@ -535,16 +534,17 @@ impl PrimeChart {
         if !crate::primality::is_prime(modulus) {
             return Err(PrimeImageRefusal::ModulusNotPrime(modulus));
         }
-        let ring = ModularWords::new(modulus)
-            .map_err(|_| PrimeImageRefusal::ModulusNotPrime(modulus))?;
+        let ring = ModularWords::new(modulus).map_err(|_| PrimeImageRefusal::ModulusWindow {
+            modulus,
+            floor: DECLARED_PRIME_FLOOR,
+            ceiling: DECLARED_PRIME_MODULUS_CEILING,
+        })?;
         Ok(Self { ring })
     }
 
-    /// **The card's own chart**, `holonics_cuda::ModularWords::DEVICE`'s Mersenne prime `2^61 − 1`, whose
-    /// `add` and `mul` are literally the code compiled for nvptx. Every reconstruction takes this
-    /// chart first.
-    pub fn device() -> Result<Self, PrimeImageRefusal> {
-        Self::declared(ModularWords::DEVICE.modulus())
+    /// The Mersenne prime chart `2^61 − 1`, whose reduction shares the portable section arithmetic.
+    pub fn mersenne61() -> Result<Self, PrimeImageRefusal> {
+        Self::declared(ModularWords::MERSENNE61.modulus())
     }
 
     pub fn modulus(&self) -> u64 {
@@ -585,7 +585,7 @@ impl PrimeChart {
 /// The admissible charts at or below a declared start, in descending order.
 ///
 /// [definition] Deterministic and reproducible: the first chart is always
-/// [`PrimeChart::device`]'s `2^61 − 1`, and every later one is the next prime below its
+/// [`PrimeChart::mersenne61`]'s `2^61 − 1`, and every later one is the next prime below its
 /// predecessor. Nothing is sampled.
 ///
 /// **Extended one batch at a time, never to the budget.** The budget is a Hadamard-sized upper
@@ -595,7 +595,7 @@ impl PrimeChart {
 /// actually decided is [`ImageCost::charts_decided`], accounted apart from the image work.
 fn extend_charts(charts: &mut Vec<PrimeChart>, wanted: usize) -> Result<(), PrimeImageRefusal> {
     if charts.is_empty() && wanted > 0 {
-        charts.push(PrimeChart::device()?);
+        charts.push(PrimeChart::mersenne61()?);
     }
     let mut candidate = charts.last().map_or(0, PrimeChart::modulus);
     while charts.len() < wanted {
@@ -1165,7 +1165,7 @@ pub fn certified_kernel_over(
             rank: 0,
             pivot_columns: Vec::new(),
             free_columns: (0..columns).collect(),
-            minor_modulus: PrimeChart::device()?.modulus(),
+            minor_modulus: PrimeChart::mersenne61()?.modulus(),
             minor_rows: Vec::new(),
             minor_determinant: 1,
             image_moduli: Vec::new(),

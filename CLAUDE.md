@@ -18,9 +18,10 @@ explicit rather than relying on an assumption about which files a particular har
 describe today's tree until a verified move lands. The substantive main `holonics` library
 will own the Holon, exact geometry, elementary operations and the backend-neutral `hnn` law
 and execution port. `holonics-cuda` receives the device-resident HNN as it is and implements the
-port; `holonics-apple` (later, on Brandon's branch) implements it for Apple silicon. `holonic-words`
-stays a separate `no_std` crate only while a Rust device kernel consumes it; otherwise its rings fold
-into `holonics::ratio`. Main builds without CUDA; its HNN host reference is construction campaign
+port; `holonics-apple` (later, on Brandon's branch) implements it for Apple silicon. Exact host
+rings are owned by `holonics::ratio::ring`; the shared low-level CUDA section ABI is in
+`holonics-portable`, and section refusals are in `holonics-cuda::section_layout`. Main builds
+without CUDA; its HNN host reference is construction campaign
 K2, not a precondition of the move. Lean becomes one Lake package with `Holonics` and dependent
 `HolonicsResearch`. Moving its paths and changing the current `Soma.Holonics` declaration
 namespace are separate checked phases.

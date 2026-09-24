@@ -17,8 +17,8 @@ path = "src/lib.rs"
 [dependencies]
 holonics-portable = { path = "../holonics-portable" }
 soma-abi = { path = "../holonic-abi" }
-# The exact word rings (`ExactRing`, `ModularWords`, …), host-only, re-exported at their old paths.
-holonic-words = { path = "../holonic-words" }
+# The backend consumes the framework's exact ratio rings; the framework does not depend on CUDA.
+holonics = { path = "../holonics" }
 
 [[bin]]
 name = "mount-smoke"

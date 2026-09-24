@@ -18,7 +18,7 @@
 //!
 //! **The exact base** (phase 2): the exact rational linear carrier [`exact_linear::ExactRatMatrix`]
 //! with its certified prime-image reading ([`prime_image_algebra`], computing in
-//! `holonic_words::ModularWords`, the device's own ring, over the declared [`hardware_cover`]),
+//! `crate::ratio::ring::ModularWords`, the device's own ring, over the declared [`hardware_cover`]),
 //! symmetric forms and their [`inertia`], the integer Smith reduction ([`rebase_invariants`]),
 //! [`exact_value`], [`exact_work`], [`rational_polynomial`] and [`primality`]. These are
 //! existing source-neutral operators now owned by the main library.

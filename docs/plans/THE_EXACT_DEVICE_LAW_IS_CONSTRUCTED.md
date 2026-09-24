@@ -353,8 +353,8 @@ allocated.
 `section_apply`, `section_scatter_store`, `section_scatter_add` — compiled into the committed PTX
 artifact and validated by `ptxas -arch=sm_89`. The arithmetic is `Z/(2^61 - 1)`, a Mersenne prime
 chosen so the whole ring operation is exact with no division: a 128-bit product folds back by shift
-and mask. `soma_abi::section_layout_cuda::{add, mul, reduce}` is **one mouth** — the same code
-`accelerators/cuda-kernel` compiles for nvptx and `ModularWords::DEVICE` dispatches to on the host —
+and mask. `holonics_portable::section_layout_cuda::{add, mul, reduce}` is **one mouth** — the same code
+`accelerators/cuda-kernel` compiles for nvptx and `holonics::ratio::ring::ModularWords::MERSENNE61` dispatches to on the host —
 so the bit-for-bit agreement below is a property of one piece of code, not of two transcriptions;
 a cpu test additionally holds it against the ordinary 128-bit remainder path. `section_apply` runs
 one block per region, staging the region's tile into **dynamic shared memory** and barriering once
