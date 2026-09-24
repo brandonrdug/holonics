@@ -17,8 +17,6 @@
 resolver = "2"
 members = [
   "crates/holonics",
-  "crates/holonics-hna",
-  "crates/holonic-engine",
   "crates/holonics-cuda",
 ]
 # The nvptx mount kernel pins its own nightly. Its committed PTX is included by mount,

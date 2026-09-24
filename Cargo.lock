@@ -391,27 +391,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "holonic-engine"
-version = "0.1.0"
-dependencies = [
- "claxon",
- "holonics",
- "holonics-cuda",
- "hound",
- "image",
- "num-bigint",
- "num-integer",
- "num-rational",
- "num-traits",
- "ron",
- "serde",
- "serde_json",
- "sha2",
- "thiserror",
- "tokenizers",
-]
-
-[[package]]
 name = "holonics"
 version = "0.1.0"
 dependencies = [
@@ -429,18 +408,15 @@ dependencies = [
 name = "holonics-cuda"
 version = "0.1.0"
 dependencies = [
+ "claxon",
  "holonics",
-]
-
-[[package]]
-name = "holonics-hna"
-version = "0.1.0"
-dependencies = [
- "holonic-engine",
- "holonics",
+ "hound",
+ "image",
  "num-bigint",
+ "num-integer",
  "num-rational",
  "num-traits",
+ "ron",
  "serde",
  "serde_json",
  "sha2",

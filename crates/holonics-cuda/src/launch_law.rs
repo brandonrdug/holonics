@@ -2665,8 +2665,8 @@ impl<T: Copy> OpenWrite<'_, '_, T> {
 /// A second borrow of the same allocation is a compile error while the write span lives:
 ///
 /// ```compile_fail,E0502
-/// # use holonics_cuda::launch_law::{DeviceReadSpan, DeviceWriteSpan};
-/// # use holonics_cuda::DeviceBuffer;
+/// # use crate::launch_law::{DeviceReadSpan, DeviceWriteSpan};
+/// # use crate::DeviceBuffer;
 /// fn aliasing_is_a_compile_error(buffer: &mut DeviceBuffer<u32>) {
 ///     let write = DeviceWriteSpan::whole(buffer);
 ///     let read = DeviceReadSpan::whole(buffer); // second borrow while `write` lives
@@ -2749,9 +2749,9 @@ impl<'a, T: Copy> PartitionedWrite<'a, T> {
     /// The positive control — the same API, used lawfully, compiles:
     ///
     /// ```no_run
-    /// # use holonics_cuda::launch_law::{DeviceReadSpan, DeviceWriteSpan, DisjointPartition, PartitionedWrite};
-    /// # use holonics_cuda::{DeviceBuffer, Stream};
-    /// fn a_lawful_scope(buffer: &mut DeviceBuffer<u32>, stream: &Stream) -> holonics_cuda::Result<()> {
+    /// # use crate::launch_law::{DeviceReadSpan, DeviceWriteSpan, DisjointPartition, PartitionedWrite};
+    /// # use crate::{DeviceBuffer, Stream};
+    /// fn a_lawful_scope(buffer: &mut DeviceBuffer<u32>, stream: &Stream) -> crate::Result<()> {
     ///     let partition = DisjointPartition::uniform(buffer.len(), 4, 1, 1).unwrap();
     ///     let mut write =
     ///         PartitionedWrite::bind(DeviceWriteSpan::whole(&mut *buffer), partition).unwrap();
@@ -2768,8 +2768,8 @@ impl<'a, T: Copy> PartitionedWrite<'a, T> {
     /// access to an allocation already uniquely borrowed by the open scope:
     ///
     /// ```compile_fail,E0500
-    /// # use holonics_cuda::launch_law::{DeviceWriteSpan, DisjointPartition, PartitionedWrite};
-    /// # use holonics_cuda::{DeviceBuffer, Stream};
+    /// # use crate::launch_law::{DeviceWriteSpan, DisjointPartition, PartitionedWrite};
+    /// # use crate::{DeviceBuffer, Stream};
     /// fn respanning_is_a_compile_error(buffer: &mut DeviceBuffer<u32>, stream: &Stream) {
     ///     let partition = DisjointPartition::uniform(buffer.len(), 4, 1, 1).unwrap();
     ///     let mut write =
@@ -2783,8 +2783,8 @@ impl<'a, T: Copy> PartitionedWrite<'a, T> {
     /// Nor read-spanned while a scope is open:
     ///
     /// ```compile_fail,E0502
-    /// # use holonics_cuda::launch_law::{DeviceReadSpan, DeviceWriteSpan, DisjointPartition, PartitionedWrite};
-    /// # use holonics_cuda::{DeviceBuffer, Stream};
+    /// # use crate::launch_law::{DeviceReadSpan, DeviceWriteSpan, DisjointPartition, PartitionedWrite};
+    /// # use crate::{DeviceBuffer, Stream};
     /// fn read_spanning_is_a_compile_error(buffer: &mut DeviceBuffer<u32>, stream: &Stream) {
     ///     let partition = DisjointPartition::uniform(buffer.len(), 4, 1, 1).unwrap();
     ///     let mut write =
@@ -2798,8 +2798,8 @@ impl<'a, T: Copy> PartitionedWrite<'a, T> {
     /// Nor dropped while a scope is open:
     ///
     /// ```compile_fail,E0505
-    /// # use holonics_cuda::launch_law::{DeviceWriteSpan, DisjointPartition, PartitionedWrite};
-    /// # use holonics_cuda::{DeviceBuffer, Stream};
+    /// # use crate::launch_law::{DeviceWriteSpan, DisjointPartition, PartitionedWrite};
+    /// # use crate::{DeviceBuffer, Stream};
     /// fn freeing_is_a_compile_error(mut buffer: DeviceBuffer<u32>, stream: &Stream) {
     ///     let partition = DisjointPartition::uniform(buffer.len(), 4, 1, 1).unwrap();
     ///     let mut write =

@@ -1,23 +1,33 @@
-# holonics-cuda — the CUDA driver and device-launch boundary for Holonics.
-# NOT engine law: a minimal, safe host-side wrapper over libcuda + one smoke binary proving
-# the full path (Rust PTX -> load -> alloc -> memcpy -> launch -> sync -> readback -> exact assert).
-# Vulkan is convicted for production (headless Xid); the law stays in Rust (rustc nvptx64 + Driver API).
 [package]
 name = "holonics-cuda"
-version = "0.1.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
 publish = false
 
 [lib]
 name = "holonics_cuda"
 path = "src/lib.rs"
 
-# host reference through the SAME law code the CUDA kernel compiles for nvptx — one mouth, both sides.
 [dependencies]
-# The backend consumes the framework's exact ratio rings; the framework does not depend on CUDA.
 holonics = { path = "../holonics" }
+num-bigint = { workspace = true }
+num-integer = "0.1.46"
+num-rational = { workspace = true }
+num-traits = { workspace = true }
+serde = { workspace = true }
+serde_json = "1"
+sha2 = { workspace = true }
+tokenizers = "0.21.4"
+thiserror = { workspace = true }
+
+[dev-dependencies]
+claxon = "0.4.3"
+hound = "3.5.1"
+image = { version = "0.25.10", default-features = false, features = ["png"] }
+ron = { workspace = true }
+tempfile = "3"
 
 [[bin]]
 name = "mount-smoke"
 path = "src/bin/mount-smoke.rs"
-

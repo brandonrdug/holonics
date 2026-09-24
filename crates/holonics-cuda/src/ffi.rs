@@ -70,7 +70,7 @@ pub type CUresult = c_int;
 pub const CUDA_SUCCESS: CUresult = 0;
 
 #[link(name = "cuda")]
-extern "C" {
+unsafe extern "C" {
     pub fn cuInit(flags: c_uint) -> CUresult;
 
     pub fn cuDeviceGetCount(count: *mut c_int) -> CUresult;

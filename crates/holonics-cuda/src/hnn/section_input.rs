@@ -1,0 +1,238 @@
+//! Exterior symbol-basis measurement. An alphabet ordinal addresses a unit basis vector; it
+//! is never read as amplitude, distance, a latent identity, or a native model clock.
+use super::NativeSessionError;
+use crate::{
+    codec_recovery::{Symbol, SymbolAlphabet},
+    native_ecology::constitutive_fibre::{
+        FamilyBasisSelection, NormalBasisSelection, NormalFamilyBasisFace, NormalWaveBasisChart,
+        NormalWaveBasisFace, NormalWaveFamily,
+    },
+    resident_section::{ResidentGrain, ResidentSection, ResidentSectionRest, ResidentSurface},
+};
+
+pub struct SymbolCurrentChart {
+    alphabet: SymbolAlphabet,
+    coordinates: Vec<usize>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn unicode_is_an_exterior_symbol_and_opaque_equal_spellings_can_stay_distinct() {
+        let chart = SymbolCurrentChart::declared(SymbolAlphabet::from_chars(&['a', 'é']).unwrap());
+        assert_eq!(chart.decode_text("aé").unwrap(), vec![Symbol(0), Symbol(1)]);
+        assert!(chart.decode_text("b").is_err());
+        let opaque = SymbolAlphabet::declared(vec![
+            ("left".into(), vec![0xff]),
+            ("right".into(), vec![0xff]),
+        ])
+        .unwrap();
+        assert_ne!(opaque.symbol_of("left"), opaque.symbol_of("right"));
+    }
+}
+impl SymbolCurrentChart {
+    pub fn declared(alphabet: SymbolAlphabet) -> Self {
+        let coordinates = (0..alphabet.len()).collect();
+        Self {
+            alphabet,
+            coordinates,
+        }
+    }
+    /// A declared simultaneous source/receiver rechart. The permutation acts on actual unit
+    /// coordinates; symbol spelling and occurrence identity do not supply its coefficients.
+    pub fn recharted(
+        alphabet: SymbolAlphabet,
+        coordinates: Vec<usize>,
+    ) -> Result<Self, NativeSessionError> {
+        let mut sorted = coordinates.clone();
+        sorted.sort_unstable();
+        if coordinates.len() != alphabet.len() || !sorted.iter().copied().eq(0..alphabet.len()) {
+            return Err(NativeSessionError::Application(
+                "symbol basis is not a complete permutation".into(),
+            ));
+        }
+        Ok(Self {
+            alphabet,
+            coordinates,
+        })
+    }
+    pub fn coordinates(&self) -> &[usize] {
+        &self.coordinates
+    }
+    pub fn receiver<'c>(
+        &self,
+        surface: &'c ResidentSurface<'c>,
+    ) -> Result<NormalWaveBasisChart<'c>, NativeSessionError> {
+        Ok(NormalWaveBasisChart::from_permutation(
+            surface,
+            &self.coordinates,
+        )?)
+    }
+    /// Decode a face already selected on device. No score or centre is ranked on the host.
+    pub fn emit<'c>(
+        &self,
+        source: NormalWaveBasisFace<'c>,
+    ) -> Result<SymbolEmission<'c>, NativeSessionError> {
+        if source.basis_coordinates() != self.coordinates {
+            return Err(NativeSessionError::Application(
+                "emission and symbol source charts differ".into(),
+            ));
+        }
+        let selection = source.selection()?;
+        let symbol = Symbol(
+            u32::try_from(selection.selected)
+                .map_err(|e| NativeSessionError::Application(e.to_string()))?,
+        );
+        let octets = self
+            .alphabet
+            .octets(symbol)
+            .ok_or_else(|| NativeSessionError::Application("selected symbol outside codec".into()))?
+            .to_vec();
+        Ok(SymbolEmission {
+            symbol,
+            octets,
+            selection,
+            source,
+        })
+    }
+    /// Decode an already-selected projected family action. Its producing family remains owned
+    /// by the emission; this is not a bounded-score or unique-current assertion.
+    pub fn emit_family<'c, Origin>(
+        &self,
+        source: NormalFamilyBasisFace<'c, Origin>,
+    ) -> Result<FamilySymbolEmission<'c, Origin>, NativeSessionError> {
+        if source.basis_coordinates() != self.coordinates {
+            return Err(NativeSessionError::Application(
+                "emission and symbol source charts differ".into(),
+            ));
+        }
+        let selection = source.selection()?;
+        let symbol = Symbol(
+            u32::try_from(selection.selected)
+                .map_err(|e| NativeSessionError::Application(e.to_string()))?,
+        );
+        let octets = self
+            .alphabet
+            .octets(symbol)
+            .ok_or_else(|| NativeSessionError::Application("selected symbol outside codec".into()))?
+            .to_vec();
+        Ok(FamilySymbolEmission {
+            symbol,
+            octets,
+            selection,
+            source,
+        })
+    }
+    pub fn alphabet(&self) -> &SymbolAlphabet {
+        &self.alphabet
+    }
+    pub fn components(&self) -> usize {
+        2 * self.alphabet.len()
+    }
+    pub fn mount<'c>(
+        &self,
+        surface: &'c ResidentSurface<'c>,
+        symbols: &[Symbol],
+    ) -> Result<ResidentSection<'c>, NativeSessionError> {
+        if symbols.is_empty() || symbols.iter().any(|s| s.0 as usize >= self.alphabet.len()) {
+            return Err(NativeSessionError::Application(
+                "empty or unsupported symbol section".into(),
+            ));
+        }
+        let words = symbols
+            .len()
+            .checked_mul(self.components())
+            .ok_or_else(|| NativeSessionError::Application("symbol section extent".into()))?;
+        let mut values = Vec::new();
+        values
+            .try_reserve_exact(words)
+            .map_err(|e| NativeSessionError::Application(e.to_string()))?;
+        values.resize(words, (0, 0));
+        for (row, symbol) in symbols.iter().enumerate() {
+            values[row * self.components() + 2 * self.coordinates[symbol.0 as usize]] = (1, 1);
+        }
+        let rest = ResidentSectionRest::found(
+            symbols.len(),
+            self.components(),
+            ResidentGrain(0),
+            i64::BITS,
+            values,
+        )
+        .map_err(NativeSessionError::Application)?;
+        surface
+            .mount_section_rest(&rest)
+            .map_err(|e| NativeSessionError::Application(e.to_string()))
+    }
+    /// Block inclusion of a complete symbol section in a declared complex boundary.
+    /// Positions are simultaneous codec coordinates; optional trailing channels receive zero.
+    pub fn mount_joint<'c>(&self, surface:&'c ResidentSurface<'c>, symbols:&[Symbol], components:usize)
+        ->Result<ResidentSection<'c>,NativeSessionError> {
+        let used=symbols.len().checked_mul(self.components()).ok_or_else(||NativeSessionError::Application("joint symbol extent".into()))?;
+        if symbols.is_empty() || components<used || components%2!=0 || symbols.iter().any(|s|s.0 as usize>=self.alphabet.len()) {
+            return Err(NativeSessionError::Application("joint symbol boundary shape".into()));
+        }
+        let mut values=Vec::new();values.try_reserve_exact(components).map_err(|e|NativeSessionError::Application(e.to_string()))?;values.resize(components,(0,0));
+        for (position,symbol) in symbols.iter().enumerate(){values[position*self.components()+2*self.coordinates[symbol.0 as usize]]=(1,1);}
+        Ok(surface.mount_section_rest(&ResidentSectionRest::found(1,components,ResidentGrain(0),64,values).map_err(NativeSessionError::Application)?).map_err(|e|NativeSessionError::Application(e.to_string()))?)
+    }
+    /// Unicode decoding is explicitly exterior. Multi-octet spellings are not multiple native
+    /// impulses; a different codec may supply opaque symbols through `mount` directly.
+    pub fn decode_text(&self, text: &str) -> Result<Vec<Symbol>, NativeSessionError> {
+        text.chars()
+            .map(|c| {
+                self.alphabet.symbol_of(&c.to_string()).ok_or_else(|| {
+                    NativeSessionError::Application(
+                        "text is outside the declared symbol chart".into(),
+                    )
+                })
+            })
+            .collect()
+    }
+}
+
+/// A known emitted action and its complete producing receiver. Re-entry may mount this action
+/// as a new ordinary source; it does not turn the earlier wave family into a singleton or label
+/// the action as a human observation. The old receiver remains available while this is retained.
+pub struct SymbolEmission<'c> {
+    symbol: Symbol,
+    octets: Vec<u8>,
+    selection: NormalBasisSelection,
+    source: NormalWaveBasisFace<'c>,
+}
+impl<'c> SymbolEmission<'c> {
+    pub fn symbol(&self) -> Symbol {
+        self.symbol
+    }
+    pub fn octets(&self) -> &[u8] {
+        &self.octets
+    }
+    pub fn selection(&self) -> &NormalBasisSelection {
+        &self.selection
+    }
+    pub fn source(&self) -> &NormalWaveBasisFace<'c> {
+        &self.source
+    }
+}
+
+/// A known codec action from a declared family projection, with its complete source retained.
+pub struct FamilySymbolEmission<'c, Origin = (std::rc::Rc<NormalWaveFamily<'c>>, ResidentSection<'c>)> {
+    symbol: Symbol,
+    octets: Vec<u8>,
+    selection: FamilyBasisSelection,
+    source: NormalFamilyBasisFace<'c, Origin>,
+}
+impl<'c, Origin> FamilySymbolEmission<'c, Origin> {
+    pub fn symbol(&self) -> Symbol {
+        self.symbol
+    }
+    pub fn octets(&self) -> &[u8] {
+        &self.octets
+    }
+    pub fn selection(&self) -> &FamilyBasisSelection {
+        &self.selection
+    }
+    pub fn source(&self) -> &NormalFamilyBasisFace<'c, Origin> {
+        &self.source
+    }
+}

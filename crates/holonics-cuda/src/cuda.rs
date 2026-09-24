@@ -8,7 +8,7 @@ use std::ffi::CString;
 // These three calls are the whole-machine boundary added after the original minimal FFI mouth.
 // Keep them private: callers cross through the checked, typed wrappers below.
 #[link(name = "cuda")]
-extern "C" {
+unsafe extern "C" {
     fn cuMemsetD32_v2(dst_device: ffi::CUdeviceptr, value: u32, count: usize) -> ffi::CUresult;
     fn cuDeviceGetAttribute(
         value: *mut i32,
