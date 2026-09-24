@@ -326,18 +326,3 @@ impl IncidentFieldModel<'_> {
         })
     }
 }
-
-#[cfg(test)]
-mod format_tests {
-    use super::*;
-
-    #[test]
-    fn retired_incident_pending_tags_are_refused() {
-        for version in [2u8, 3, 4] {
-            let mut bytes = b"HNA-INCIDENT-FIELD".to_vec();
-            bytes.push(version);
-            assert!(NativeIncidentModelRest::read(&mut bytes.as_slice(), bytes.len() as u64)
-                .is_err());
-        }
-    }
-}

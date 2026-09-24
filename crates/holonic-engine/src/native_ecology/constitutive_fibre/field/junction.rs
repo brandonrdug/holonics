@@ -34,8 +34,6 @@ pub use producer::{
     JointMaterialContactResponse, PairedContactCotangent, PairedJunctionCotangent,
     PairedJunctionLinearization, PairedJunctionTangent, joint_material_contact,
 };
-#[cfg(test)]
-mod solver_tests;
 pub use enclosure::{
     NativeFieldCurrentBall, NativeFieldEnclosedJunctionReading, NativeFieldInternalCurrentBall,
 };

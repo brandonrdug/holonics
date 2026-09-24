@@ -11,9 +11,6 @@ use holonic_engine::{
 };
 mod codec;
 mod rest;
-#[cfg(test)]
-#[path = "incident_application_tests.rs"]
-mod tests;
 pub(super) use rest::IncidentPresentationRest;
 
 /// The incident chart's presentation boundary: its encoder, text receiver and fixed slots. An

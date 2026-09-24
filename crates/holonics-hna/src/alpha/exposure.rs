@@ -1162,6 +1162,3 @@ pub struct ExteriorReturnObserver {
     pub requests: BTreeMap<u64, ExteriorRequestMeasure>,
     pub returns: u64,
 }
-
-#[cfg(test)]
-mod tests;

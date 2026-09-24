@@ -11,11 +11,7 @@ use holonic_engine::native_ecology::constitutive_fibre::BoundaryMaterialSeed;
 use holonic_engine::resident_section::SeriesAperture;
 use std::rc::Rc;
 mod codec;
-#[cfg(test)]
-mod deposition_probe;
 mod rest;
-#[cfg(test)]
-mod tests;
 pub(super) use rest::GeneratorPresentationRest;
 
 /// The source and receiving clocks are declared boundaries of one fixed machine. The last
@@ -164,14 +160,6 @@ impl GeneratorRetainedRecord {
 /// Read-only operands of an outstanding generator comparison.
 #[cfg_attr(not(test), allow(dead_code))]
 impl GeneratorPending {
-    /// First source clock event and passage length at which the request was read.
-    pub(super) fn source_clock(&self) -> (u64, usize) {
-        (self.start, self.cells)
-    }
-    /// The alphabet binding: occurrence count per codec identity at request time.
-    pub(super) fn symbol_counts(&self) -> &[usize] {
-        &self.symbol_counts
-    }
     /// Host words this comparison holds beyond its clock: `|A|`, fixed in `N`.
     pub(super) fn pending_relation_words(&self) -> usize {
         self.symbol_counts.len()
@@ -589,48 +577,5 @@ impl<'c> NativeFieldSession<'c> {
             pooled_symbol_counts: counts.iter().copied().filter(|k| *k > 0).collect(),
         });
         Ok((value, cut))
-    }
-}
-
-#[cfg(test)]
-impl<'c> NativeFieldSession<'c> {
-    /// Test reading of an outstanding comparison at the contemporary constitution: its phase
-    /// rows and the current receiver's text/stop potentials, without any publication.
-    pub(super) fn generator_contemporary_reading(&mut self, id: u64) -> Result<Value> {
-        let options = self
-            .presentation
-            .spec
-            .generator
-            .as_ref()
-            .ok_or_else(|| invalid("generator session options"))?
-            .clone();
-        let pending = self
-            .generator
-            .as_ref()
-            .ok_or_else(|| invalid("generator presentation"))?
-            .pending
-            .get(&id)
-            .ok_or_else(|| invalid("unknown generator comparison"))?;
-        let (start, cells) = pending.source_clock();
-        let alphabet = pending.symbol_counts.len();
-        let table = self
-            .generator
-            .as_ref()
-            .ok_or_else(|| invalid("generator presentation"))?
-            .encoder
-            .table(alphabet)?;
-        let now = self.body.contemporary_symbol_comparison(id, &table)?;
-        let phases = now.receive_generator_phases(options.receiver.clone())?;
-        let model = self
-            .generator
-            .as_ref()
-            .ok_or_else(|| invalid("generator presentation"))?;
-        let received = model
-            .receiver
-            .forward(phases.output(), SeriesAperture(options.field.series_terms))?;
-        Ok(json!({"phase":phases.output().inspect_rows()?,
-            "text":received.text_logits.inspect_rows()?,
-            "stop":received.support_logits.inspect_rows()?,
-            "binding":phases.binding(),"start":start,"cells":cells}))
     }
 }

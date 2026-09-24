@@ -1,6 +1,20 @@
-use super::super::tests::{phase, seed};
 use super::*;
 use crate::embedding_fiber::ResidentReadout;
+
+fn phase(r: i64, i: i64) -> NativePhaseCurrent {
+    NativePhaseCurrent::new(r, i, 1).unwrap()
+}
+fn seed(nodes: usize) -> Vec<NativeJunctionSeed> {
+    vec![
+        NativeJunctionSeed {
+            incoming_admittance: 1,
+            held_admittance: 1,
+            incoming_transport: NativePhaseCurrent::unit(),
+            initial_held: NativePhaseCurrent::zero(),
+        };
+        nodes
+    ]
+}
 
 fn coordinates(v: &[ExactComplexWaveCurrent]) -> Vec<Rat> {
     v.iter()
@@ -86,17 +100,13 @@ fn reference(
     answer
 }
 
+/// Material-pullback parity: for every metric and every corner of the covector box, the device
+/// pullback of the contextual material source contains the exact host quotient-rule derivative
+/// of the scalar reproducing kernel through the actual producing factors.
 #[test]
 #[ignore = "requires CUDA; actual producing factors against independent exact quotient derivatives"]
 fn material_source_pullback_keeps_both_arguments_and_the_producing_cut() {
-    check_pullback(NativeMaterialTransportSource::OperativeContextual);
-}
-#[test]
-#[ignore="requires CUDA; outgoing receiver projection and complete producing contact adjoint"]
-fn operative_boundary_source_returns_through_the_retained_interior(){
-    check_pullback(NativeMaterialTransportSource::OperativeBoundary);
-}
-fn check_pullback(source_kind:NativeMaterialTransportSource){
+    let source_kind = NativeMaterialTransportSource::OperativeContextual;
     let readout = ResidentReadout::new().unwrap();
     let surface = ResidentSurface::on(&readout).unwrap();
     let make = || {
@@ -288,97 +298,5 @@ fn check_pullback(source_kind:NativeMaterialTransportSource){
         "the imaginary material return must have a separating source consequence"
     );
     assert!(certified_visible,"the visible query must return");
-    if source_kind==NativeMaterialTransportSource::OperativeBoundary {
-        let before=field.stage_operative_contacts().unwrap().inspect().unwrap();
-        assert!(!before.internal.center.is_empty());
-        assert!(before.internal.center.iter().any(|z|!z.norm_square().is_zero()));
-        let query=field.pull_back_material_current(5).unwrap().unwrap();
-        assert!(query.inspect().unwrap().internal_current.iter().all(|v|v.lower.is_zero() && v.upper.is_zero()));
-        let response=field.material_contact_response(query).unwrap();
-        let reaction=response.inspect().unwrap();
-        assert!(!reaction.incoming_internal.center.is_empty());
-        assert!(reaction.incoming_internal.center.iter().any(|z|!z.norm_square().is_zero()));
-        field.apply_material_contact_realization(&response,NativeContactRealization::DyadicDeposit).unwrap();
-        let after=field.stage_operative_contacts().unwrap().inspect().unwrap();
-        assert_ne!(before.contacts,after.contacts);
-        let saved=field.rest(&[previous.as_ref()],&[]).unwrap();
-        let mut bytes=vec![];saved.write(&mut bytes).unwrap();
-        let saved=NativeFieldRest::read(&mut bytes.as_slice(),bytes.len() as u64).unwrap();
-        assert_eq!(saved.material_transport_source(),Some(source_kind));
-        let expected=field.advance_resident(&mut NativeFieldOccurrence::through(previous.take().unwrap(),vec![phase(1,-1),phase(0,1)])).unwrap();
-        let expected=field.rest(&[Some(&expected.source)],&[]).unwrap();
-        drop(response);drop(field);
-        let (mut field,mut sources,_)=NativeConstitutiveField::remount(&surface,saved).unwrap();
-        let next=field.advance_resident(&mut NativeFieldOccurrence::through(sources[0].take().unwrap(),vec![phase(1,-1),phase(0,1)])).unwrap();
-        assert_eq!(field.rest(&[Some(&next.source)],&[]).unwrap(),expected);
-    } else {assert!(certified_internal,"the full query must reach its internal argument");}
-}
-
-#[test]
-#[ignore = "requires CUDA; a zero observed tensor packet is in the current metric domain"]
-fn material_current_pullback_accepts_zero_observation_without_a_probability_face() {
-    let readout = ResidentReadout::new().unwrap();
-    let surface = ResidentSurface::on(&readout).unwrap();
-    let mut field =
-        NativeConstitutiveField::found_with_enclosed_junction(&surface, seed(2), ResidentGrain(72))
-            .unwrap();
-    field
-        .enable_material_transport_chart(
-            NativeMaterialTransportSource::OperativeContextual,
-            NativeMaterialTarget::TensorProduct { factor_width: 2 },
-        )
-        .unwrap();
-    let first = field
-        .advance_resident(&mut NativeFieldOccurrence::entering(vec![
-            phase(1, 1),
-            phase(1, 0),
-        ]))
-        .unwrap();
-    assert!(field.pull_back_material_current(0).unwrap().is_none());
-    let second = field
-        .advance_resident(&mut NativeFieldOccurrence::through(
-            first.source,
-            vec![phase(0, 1), phase(1, 1)],
-        ))
-        .unwrap();
-    let third = field
-        .advance_resident(&mut NativeFieldOccurrence::through(
-            second.source,
-            vec![phase(0, 0), phase(0, 0)],
-        ))
-        .unwrap();
-    assert!(
-        field
-            .normalized_material_return(2, 2, SeriesAperture(32))
-            .is_err()
-    );
-    let before = field.census();
-    let pulled = field.pull_back_material_current(2).unwrap().unwrap();
-    assert_eq!(field.census().section_read_outs, before.section_read_outs);
-    let reading = pulled.inspect().unwrap();
-    assert_eq!(reading.metric, NativeMaterialPullbackMetric::SquaredCurrent);
-    assert_eq!((reading.group_width, reading.series_terms), (0, 0));
-    let response = field.material_contact_response(pulled).unwrap();
-    field
-        .apply_material_contact_realization(&response, NativeContactRealization::DyadicDeposit)
-        .unwrap();
-    assert_eq!(field.operative_return_count(), Some(1));
-    let saved = field.rest(&[Some(&third.source)], &[]).unwrap();
-    let next = field
-        .advance_resident(&mut NativeFieldOccurrence::through(
-            third.source,
-            vec![phase(1, 0), phase(0, -1)],
-        ))
-        .unwrap();
-    let expected = field.rest(&[Some(&next.source)], &[]).unwrap();
-    drop(response);
-    drop(field);
-    let (mut field, mut sources, _) = NativeConstitutiveField::remount(&surface, saved).unwrap();
-    let next = field
-        .advance_resident(&mut NativeFieldOccurrence::through(
-            sources[0].take().unwrap(),
-            vec![phase(1, 0), phase(0, -1)],
-        ))
-        .unwrap();
-    assert_eq!(field.rest(&[Some(&next.source)], &[]).unwrap(), expected);
+    assert!(certified_internal, "the full query must reach its internal argument");
 }

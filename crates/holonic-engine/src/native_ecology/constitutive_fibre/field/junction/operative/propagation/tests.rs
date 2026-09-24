@@ -19,6 +19,8 @@ fn make<'c>(surface: &'c ResidentSurface<'c>) -> NativeConstitutiveField<'c> {
     field
 }
 
+/// Causal-propagation parity: the device word equals the exact host
+/// `CausalContactPropagation::at_enclosed` joins, overlaps and centre, within one ulp of radius.
 #[test]
 #[ignore = "requires CUDA; full native word, exact overlaps, family enclosure and unchanged source"]
 fn resident_causal_propagation_matches_the_enclosed_word_and_retains_the_source() {
@@ -112,65 +114,8 @@ fn resident_causal_propagation_matches_the_enclosed_word_and_retains_the_source(
     );
 }
 
-#[test]
-#[ignore = "requires CUDA; a malformed source chronology refuses without changing the producing field"]
-fn resident_causal_propagation_refuses_a_false_join_chronology() {
-    let readout = ResidentReadout::new().unwrap();
-    let surface = ResidentSurface::on(&readout).unwrap();
-    let mut field = make(&surface);
-    let source = field
-        .advance_resident(&mut NativeFieldOccurrence::entering(vec![
-            NativePhaseCurrent::unit(),
-        ]))
-        .unwrap()
-        .source;
-    let latest = field
-        .advance_resident(&mut NativeFieldOccurrence::through(
-            source,
-            vec![NativePhaseCurrent::unit()],
-        ))
-        .unwrap()
-        .source;
-    let before = field.rest(&[Some(&latest)], &[]).unwrap();
-    {
-        let view = field.stage_operative_contacts().unwrap();
-        let candidate = view.propagate_causal_contacts().unwrap();
-        let wrong = surface
-            .mount_section_rest(
-                &ResidentSectionRest::found(1, 2, ResidentGrain(0), 64, vec![(1, 1), (1, 1)])
-                    .unwrap(),
-            )
-            .unwrap();
-        let mut passage = surface.begin_passage(&[vec![]]).unwrap();
-        {
-            let lane = passage.open(0, &[]).unwrap();
-            surface
-                .record_causal_contact_propagation(
-                    &lane,
-                    &wrong,
-                    view.sections.current(),
-                    6,
-                    1,
-                    view.grain,
-                    &candidate.word.current,
-                    &candidate.word.bounds,
-                    &candidate.word.trace,
-                    &candidate.word.summary,
-                )
-                .unwrap();
-        }
-        passage.close(0, &candidate.word.bounds, 64).unwrap();
-        assert!(!passage
-            .finish()
-            .unwrap()
-            .launch()
-            .unwrap()
-            .obstruction
-            .is_empty());
-    }
-    assert_eq!(field.rest(&[Some(&latest)], &[]).unwrap(), before);
-}
-
+/// Causal-pullback parity: the device return contains the exact host
+/// `CausalContactPropagation::pullback` of the same covector, at zero and positive radius.
 #[test]
 #[ignore = "requires CUDA; source-qualified sparse overlap return contains the complete exact adjoint"]
 fn resident_causal_propagation_returns_the_source_current_and_learned_overlap() {

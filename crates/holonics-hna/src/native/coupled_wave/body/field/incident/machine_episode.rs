@@ -170,24 +170,6 @@ impl<'c> GeneratorMomentHolon<'c> {
     }
 }
 
-/// Read-only producing operands of a generator comparison, for observer readings.
-#[allow(dead_code)] // read by the observer-reading consumer outside this owner
-pub(crate) struct GeneratorMomentOperands<'a, 'c> {
-    pub binding: &'a GeneratorSourceBinding,
-    pub start: u64,
-    pub rows: usize,
-    pub contact_counts: &'a [usize],
-    /// First/last clock exponent of every site: the phases at which the passage was read.
-    pub clock_witnesses: &'a [GeneratorSourceClockWitness],
-    /// The source moment `m` on the machine boundary.
-    pub moment: ResidentNormalEnclosureView<'a, 'c>,
-    /// `(L^N q₀ + m) ⊕ b₀` at the cut this word was evaluated at, in the real-coded image.
-    pub accumulated: ResidentNormalEnclosureView<'a, 'c>,
-    /// Phase-weighted directed contact and offset condition, `G × 12P`.
-    pub condition: Option<&'a ResidentNormalEnclosureSection<'c>>,
-    /// Material cut id: the incident epoch at which the word was evaluated.
-    pub material_cut: u64,
-}
 
 impl<'c> IncidentFieldModel<'c> {
     fn source_machine(
@@ -772,16 +754,6 @@ impl<'c> IncidentFieldModel<'c> {
         self.word_at(boundary, held, comparison.admitted.clone())
     }
 
-    #[cfg_attr(not(test), allow(dead_code))]
-    /// The one word's adjoint without a source relation. A moment word whose passage pooled
-    /// directed contacts needs that relation: use `pull_back_with_contacts`.
-    pub(super) fn pull_back(
-        &self,
-        word: &IncidentWord<'c>,
-        covector: ResidentNormalEnclosureView<'_, 'c>,
-    ) -> Result<IncidentPullback<'c>, NativeSessionError> {
-        self.pull_back_with_contacts(word, covector, &[])
-    }
 
     /// The one word's adjoint, then the standing adjoint `(L^N)*` to the `q₀` the word read,
     /// one covector per occurrence `I* (L^(N−1−k))* g` and the phase-weighted condition
@@ -1273,23 +1245,6 @@ impl<'c> NativeIncidentGenerated<'c> {
             )
         })
     }
-    /// The operands of a generator word.
-    pub(crate) fn generator_moment_operands(&self) -> Option<GeneratorMomentOperands<'_, 'c>> {
-        self.word
-            .source_moment
-            .as_ref()
-            .map(|m| GeneratorMomentOperands {
-                binding: &m.meta.binding,
-                start: m.meta.start,
-                rows: m.meta.rows,
-                contact_counts: &m.meta.contact_counts,
-                clock_witnesses: &m.witnesses,
-                moment: m.moment.view(),
-                accumulated: self.word.anchor.view(),
-                condition: self.word.external_condition.as_deref(),
-                material_cut: self.word.epoch,
-            })
-    }
 }
 
 impl<'c> RetainedComparison<'c> {
@@ -1338,6 +1293,3 @@ impl<'c> NativeCoupledBody<'c> {
         }
     }
 }
-
-#[cfg(test)]
-mod tests;

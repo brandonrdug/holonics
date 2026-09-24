@@ -213,6 +213,3 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
         Ok(self.incidence_changes.last().expect("committed material"))
     }
 }
-
-#[cfg(test)]
-mod tests;

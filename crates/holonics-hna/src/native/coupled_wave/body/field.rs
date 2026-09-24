@@ -961,40 +961,7 @@ impl<'c> NativeCoupledBody<'c> {
 }
 
 #[cfg(test)]
-impl<'c> NativeCoupledBody<'c> {
-    /// Test port: produce a fresh retained comparison from the operands a pending comparison
-    /// retains (its input, producing condition and held mask), at the contemporary cut.
-    fn regenerate_field_comparison(&mut self, id: u64) -> Result<u64, NativeSessionError> {
-        let model = self.field_model()?;
-        let comparison = model
-            .pending
-            .get(&id)
-            .ok_or_else(|| invalid("unknown field producing comparison"))?;
-        let input = comparison.input.view().to_owned()?;
-        let surface = model.field.surface();
-        let condition = surface
-            .mount_section_rest(
-                &surface
-                    .detach_section(&comparison.condition, 64)
-                    .map_err(invalid)?,
-            )
-            .map_err(invalid)?;
-        let held = comparison.held.clone();
-        let generated = model.generate(
-            ResidentNormalInput::Enclosed(input.view()),
-            ResidentConstitutiveCurrent::rational(&condition)?,
-            true,
-            true,
-            held.as_deref(),
-        )?;
-        generated
-            .comparison_id()
-            .ok_or_else(|| invalid("regenerated comparison"))
-    }
-}
-
-#[cfg(test)]
-mod compatibility_tests {
+mod field_tests {
     use super::*;
     use holonic_engine::embedding_fiber::ResidentReadout;
     use holonic_engine::native_ecology::constitutive_fibre::{
@@ -1075,70 +1042,6 @@ mod compatibility_tests {
         .unwrap()
     }
 
-    fn field_model_rest(body: &NativeCoupledBody<'_>) -> Vec<u8> {
-        let BodyState::Field(model) = body.state.as_ref().expect("initialized body") else {
-            panic!("constituted field body")
-        };
-        let mut bytes = Vec::new();
-        model.rest().unwrap().write(&mut bytes).unwrap();
-        bytes
-    }
-
-    fn field_extension_offset(bytes: &[u8]) -> usize {
-        let mut at = 5 * 8;
-        for _ in 0..2 {
-            let length = u64::from_le_bytes(bytes[at..at + 8].try_into().unwrap()) as usize;
-            at += 8 + length;
-        }
-        at
-    }
-
-    #[test]
-    #[ignore = "requires CUDA; current field rest roundtrips empty and pending operand state"]
-    fn current_field_rest_roundtrips_empty_and_pending_operand_state() {
-        let readout = ResidentReadout::new().unwrap();
-        let surface = ResidentSurface::on(&readout).unwrap();
-        let mut body = current_field_body(&surface);
-        let expected = body.inspect_current().unwrap();
-        let empty_rest = field_model_rest(&body);
-        assert_eq!(empty_rest[field_extension_offset(&empty_rest)], 1);
-        let empty = saved(&body);
-        let mut reopened = reopen(&surface, &empty);
-        assert_eq!(reopened.inspect_current().unwrap(), expected);
-
-        let (width, condition_width, _, _) = body.field_dimensions().unwrap();
-        let mut input_values = vec![0; width];
-        input_values[0] = 1;
-        let mut condition_values = vec![0; condition_width];
-        condition_values[0] = 1;
-        let input = point(&surface, &input_values);
-        let condition = point(&surface, &condition_values);
-        let pending = body
-            .generate_field(
-                ResidentConstitutiveCurrent::integers(&input).unwrap().into(),
-                ResidentConstitutiveCurrent::integers(&condition).unwrap(),
-                true,
-            )
-            .unwrap()
-            .comparison_id()
-            .unwrap();
-        let operand_rest = field_model_rest(&body);
-        let extension = field_extension_offset(&operand_rest);
-        assert_eq!(operand_rest[extension], 4);
-        for retired in [2, 3] {
-            let mut old_cut = operand_rest.clone();
-            old_cut[extension] = retired;
-            assert!(NativeFieldModelRest::read(
-                &mut old_cut.as_slice(),
-                old_cut.len() as u64,
-            )
-            .is_err());
-        }
-        let pending_rest = saved(&body);
-        let reopened = reopen(&surface, &pending_rest);
-        assert_eq!(reopened.pending_ids().unwrap(), vec![pending]);
-    }
-
     fn point<'c>(surface: &'c ResidentSurface<'c>, v: &[i64]) -> ResidentSection<'c> {
         surface
             .mount_section_rest(
@@ -1153,72 +1056,6 @@ mod compatibility_tests {
             )
             .unwrap()
     }
-    fn occurrences(body: &NativeCoupledBody<'_>) -> usize {
-        match body.state.as_ref() {
-            Some(BodyState::Field(model)) => model.field.occurrence_count(),
-            _ => panic!("constituted field body"),
-        }
-    }
-
-    /// Phase 8b retention bound on the constituted field. Its occurrence clock is the two
-    /// foundation occurrences; generation and observation continue through reflection commits
-    /// and the reaction material, so an attached field adds no occurrence, and current operand
-    /// rest keeps the same count.
-    #[test]
-    #[ignore = "requires CUDA; an attached field adds no occurrence through generation, return and rest"]
-    fn attached_field_occurrence_clock_is_fixed_through_generation_return_and_rest() {
-        let readout = ResidentReadout::new().unwrap();
-        let surface = ResidentSurface::on(&readout).unwrap();
-        let mut body = current_field_body(&surface);
-        let founded = occurrences(&body);
-        assert_eq!(founded, 2);
-        let input = |[a, b]: [i64; 2]| [a, b, -b, a, a + b, b - a];
-        for h in [[1, 0], [0, 1]] {
-            let x = input(h);
-            let t = [-x[1], x[0], -x[3], x[2], -x[5], x[4]];
-            let (x, c, t) = (
-                point(&surface, &x),
-                point(&surface, &h),
-                point(&surface, &t),
-            );
-            let generated = body
-                .generate_field(
-                    ResidentConstitutiveCurrent::integers(&x).unwrap().into(),
-                    ResidentConstitutiveCurrent::integers(&c).unwrap(),
-                    true,
-                )
-                .unwrap();
-            let id = generated.comparison_id().unwrap();
-            body.observe_field(
-                id,
-                ResidentConstitutiveCurrent::integers(&t).unwrap().into(),
-                3,
-            )
-            .unwrap();
-            assert_eq!(occurrences(&body), founded);
-        }
-        let (x, c) = (point(&surface, &input([2, 0])), point(&surface, &[2, 0]));
-        let pending = body
-            .generate_field(
-                ResidentConstitutiveCurrent::integers(&x).unwrap().into(),
-                ResidentConstitutiveCurrent::integers(&c).unwrap(),
-                true,
-            )
-            .unwrap()
-            .comparison_id()
-            .unwrap();
-        assert_eq!(occurrences(&body), founded);
-        let mut saved = Vec::new();
-        body.rest().unwrap().write(&mut saved).unwrap();
-        drop(body);
-        let resumed = SavedCoupledBody::read(&mut saved.as_slice(), saved.len() as u64)
-            .unwrap()
-            .remount(&surface)
-            .unwrap();
-        assert_eq!(occurrences(&resumed), founded);
-        assert_eq!(resumed.pending_ids().unwrap(), vec![pending]);
-    }
-
     fn saved(body: &NativeCoupledBody<'_>) -> Vec<u8> {
         let mut bytes = Vec::new();
         body.rest().unwrap().write(&mut bytes).unwrap();

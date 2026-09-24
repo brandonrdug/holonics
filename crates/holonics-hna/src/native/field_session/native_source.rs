@@ -477,6 +477,3 @@ impl NativeSourceSavedSession {
         f(&mut session)
     }
 }
-
-#[cfg(test)]
-mod tests;

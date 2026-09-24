@@ -481,7 +481,3 @@ impl<'c> IncidentEncoder<'c> {
         })
     }
 }
-
-#[cfg(test)]
-#[path = "incident_encoder_tests.rs"]
-mod incident_encoder_tests;

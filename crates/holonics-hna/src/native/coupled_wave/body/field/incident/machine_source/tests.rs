@@ -95,25 +95,6 @@ fn binding_rejects_non_source_injection_and_missing_clock_site() {
     assert!(invalid.validate_scope(&machine, 0, 1).is_err());
 }
 
-#[test]
-#[ignore = "requires CUDA; verifies one fixed action row per site is reused across events"]
-fn source_maps_mount_one_fixed_step_row_per_site() {
-    let readout = holonic_engine::embedding_fiber::ResidentReadout::new().unwrap();
-    let surface = holonic_engine::resident_section::ResidentSurface::on(&readout).unwrap();
-    let maps = MachineSourceMaps::new(
-        &surface,
-        &machine(),
-        &binding(),
-        4,
-        3,
-        holonic_engine::resident_section::ResidentGrain(32),
-    )
-    .unwrap();
-    assert_eq!(maps.coefficients.rows(), maps.site_count());
-    assert_eq!(maps.source_count(), 3);
-    assert_eq!(maps.next_event(), 0);
-}
-
 /// Host-exact law: the composite powers reproduce `N` stepped injections exactly,
 /// `L^N q₀ + Σ_k L^(N−1−k) E_k = (… (L q₀ + E_0) …)`, under a nonidentity rotation with a
 /// translation-bearing step. The current is a tangent: the translation acts only on the

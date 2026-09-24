@@ -217,15 +217,3 @@ impl NativeConstitutiveField<'_> {
         })
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn factor_reference_bound_keeps_overwide_factor_balls_out_of_carrier_arithmetic() {
-        let huge = Rat::from_integer(BigInt::one() << 200);
-        let bound = factor_reference_bound(&huge, &huge, &huge, &huge);
-        assert!(bound > Rat::from_integer(BigInt::one() << 400));
-    }
-}

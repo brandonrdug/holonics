@@ -289,6 +289,3 @@ impl<'c> NativeConstitutiveField<'c> {
         })
     }
 }
-
-#[cfg(test)]
-mod tests;

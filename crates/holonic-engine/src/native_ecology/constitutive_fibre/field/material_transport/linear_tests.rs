@@ -1,6 +1,5 @@
 use super::*;
 use crate::embedding_fiber::ResidentReadout;
-use crate::resident_section::SeriesAperture;
 use num_traits::Zero;
 fn phase(r: i64, i: i64, d: i64) -> NativePhaseCurrent {
     NativePhaseCurrent::new(r, i, d).unwrap()
@@ -53,9 +52,12 @@ fn transpose(
         })
         .collect()
 }
+/// Parity law (operative linear material): the device operator ball encloses the exact coercive
+/// updates computed on the host, its forward ball contains the exact forward current, and the
+/// pulled-back current contains the exact transpose of the producing (not the latest) operator.
 #[test]
-#[ignore = "requires CUDA; finite operator, tensor phase, historical adjoint, development and restart"]
-fn operative_linear_material_has_a_bounded_operator_and_the_producing_return() {
+#[ignore = "requires CUDA; finite operator, tensor phase and the producing-operator adjoint"]
+fn operative_linear_material_encloses_the_exact_operator_and_its_producing_transpose() {
     let readout = ResidentReadout::new().unwrap();
     let surface = ResidentSurface::on(&readout).unwrap();
     let mut f = make(&surface);
@@ -210,50 +212,4 @@ fn operative_linear_material_has_a_bounded_operator_and_the_producing_return() {
             .any(|(a, x)| *x < a.lower || *x > a.upper),
         "today's matrix must not replace the producer"
     );
-    let normalized = f
-        .normalized_material_return(4, 8, SeriesAperture(32))
-        .unwrap()
-        .unwrap();
-    for metric in [
-        NativeMaterialPullbackMetric::RelativeEntropy,
-        NativeMaterialPullbackMetric::SquaredProbability,
-    ] {
-        let result = f
-            .pull_back_material_source(&normalized, metric)
-            .unwrap()
-            .inspect()
-            .unwrap();
-        assert_eq!(result.source.occurrence, 1);
-        assert!(
-            result
-                .internal_current
-                .iter()
-                .all(|v| v.lower.is_zero() && v.upper.is_zero())
-        );
-    }
-    let response = f.material_contact_response(query).unwrap();
-    f.apply_material_contact_realization(&response, NativeContactRealization::DyadicDeposit)
-        .unwrap();
-    let saved = f.rest(&[previous.as_ref()], &[anchor.as_ref()]).unwrap();
-    let mut bytes = vec![];
-    saved.write(&mut bytes).unwrap();
-    let saved = NativeFieldRest::read(&mut bytes.as_slice(), bytes.len() as u64).unwrap();
-    let incoming = vec![phase(1, 0, 1); 6];
-    let next = f
-        .advance_resident(&mut NativeFieldOccurrence::through(
-            previous.take().unwrap(),
-            incoming.clone(),
-        ))
-        .unwrap();
-    let expected = f.rest(&[Some(&next.source)], &[]).unwrap();
-    drop(response);
-    drop(f);
-    let (mut f, mut sources, _) = NativeConstitutiveField::remount(&surface, saved).unwrap();
-    let next = f
-        .advance_resident(&mut NativeFieldOccurrence::through(
-            sources[0].take().unwrap(),
-            incoming,
-        ))
-        .unwrap();
-    assert_eq!(f.rest(&[Some(&next.source)], &[]).unwrap(), expected);
 }

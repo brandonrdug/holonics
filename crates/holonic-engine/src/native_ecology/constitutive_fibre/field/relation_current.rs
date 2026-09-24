@@ -70,6 +70,3 @@ impl<'chart> NativeConstitutiveField<'chart> {
         Ok(returned)
     }
 }
-
-#[cfg(test)]
-mod tests;

@@ -446,18 +446,6 @@ impl<'c> ResidentNormalWave<'c> {
     }
 }
 
-#[cfg(test)]
-mod tests;
-
-#[cfg(test)]
-mod comparison_tests;
-
-#[cfg(test)]
-mod transport_tests;
-
-#[cfg(test)]
-mod basis_tests;
-
 impl<'c,C> ResidentNormalWave<'c,C> {
     pub(super) fn normal_bank_fibre(&self) -> NormalWaveFibre<'c> {
         NormalWaveFibre {

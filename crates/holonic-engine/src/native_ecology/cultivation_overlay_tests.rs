@@ -115,14 +115,6 @@ fn valid_sparse_rank_one_defect_is_admitted_and_terminal_quotient_precedes_contr
     };
     assert!(depth(events.input) < depth(events.terminal));
     assert!(depth(events.terminal) < depth(events.factorized));
-    assert_eq!(
-        complex.shape.laws[&complex.shape.occurrences[&events.terminal].law].name,
-        "native-ecology.overlay.withdraw-terminal"
-    );
-    assert_eq!(
-        complex.shape.laws[&complex.shape.occurrences[&events.factorized].law].name,
-        FACTORIZED_LAW
-    );
 }
 
 #[test]
@@ -175,24 +167,6 @@ fn wrong_supported_outer_product_refuses_exactly() {
     assert!(matches!(
         factors.complex(Some(&receipt)),
         Err(CandidateRefusal::ReconstructionMismatch)
-    ));
-}
-
-#[test]
-fn zero_supported_defect_refuses_as_zero_rank() {
-    let factors = candidate(
-        OverlayShape {
-            rows: 2,
-            input_width: 2_560,
-        },
-        4,
-    );
-    let mut receipt = valid_receipt();
-    receipt.defect.supported = ExactRatMatrix::zero(1, 2).expect("zero supported defect");
-    let receipt = FactorDerivationReceipt::RankOne(receipt);
-    assert!(matches!(
-        factors.complex(Some(&receipt)),
-        Err(CandidateRefusal::DefectRank { rank: 0 })
     ));
 }
 

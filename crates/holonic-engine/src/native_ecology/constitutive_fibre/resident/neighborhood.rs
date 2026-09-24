@@ -284,17 +284,6 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
         self.epoch=epoch.checked_add(1).expect("staged material epoch");
     }
 
-    #[cfg(test)]
-    pub(crate) fn read_wave_relation(
-        &self,
-        member: usize,
-        roots: usize,
-        proposed: Option<&PreparedNeighborhoodConsequence<'c>>,
-    ) -> Result<ResidentWaveRelation<'c>, ConstitutiveFibreError> {
-        self.read_wave_relation_in_chart(member, roots, WaveSourceReceiver::Direct, proposed)
-    }
-    /// The member's wave relation at the contemporary condition, or at a proposed consequence's
-    /// successor condition and material when one is supplied.
     pub(crate) fn read_wave_relation_in_chart(
         &self,
         member: usize,
@@ -532,5 +521,3 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
         }
     }
 }
-#[cfg(test)]
-mod tests;

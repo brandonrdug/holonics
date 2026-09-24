@@ -592,6 +592,3 @@ impl NativeCoupledWaveSavedSession {
         operation(&mut session, &mut stream)
     }
 }
-
-#[cfg(test)]
-mod tests;

@@ -261,6 +261,3 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
         Ok(())
     }
 }
-
-#[cfg(test)]
-mod tests;

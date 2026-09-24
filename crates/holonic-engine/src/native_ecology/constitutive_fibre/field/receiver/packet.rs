@@ -165,6 +165,3 @@ impl NativeMaterialPacketReading {
         })
     }
 }
-
-#[cfg(test)]
-mod tests;

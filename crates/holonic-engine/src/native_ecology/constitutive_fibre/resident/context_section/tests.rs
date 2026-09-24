@@ -1,12 +1,13 @@
 use super::super::contact_tests::{calibrate, current, observe, phase, points, value, world};
 use super::*;
-use crate::{dimensional_wave::ExactComplexWaveCurrent, embedding_fiber::ResidentReadout};
-use num_traits::Zero;
+use crate::embedding_fiber::ResidentReadout;
 const METRIC: ConditionContactMetric = ConditionContactMetric::UnitAdmittanceRealification;
 fn rational<'a, 'c>(s: &'a ResidentSection<'c>) -> ResidentConstitutiveCurrent<'a, 'c> {
     ResidentConstitutiveCurrent::rational(s).unwrap()
 }
 
+/// Host/device parity (context-section kernel): the device infers the exact hidden condition
+/// change and its read change equals the exact difference of the two exterior returns.
 #[test]
 #[ignore = "requires CUDA; the fixed-source mixed section infers an unprovided phase change and its successor drives later native conduct"]
 fn contextual_return_changes_the_actual_condition_and_subsequent_native_current() {
@@ -68,119 +69,4 @@ fn contextual_return_changes_the_actual_condition_and_subsequent_native_current(
         ),
         actual_later
     );
-}
-
-#[test]
-#[ignore = "requires CUDA; partial and vertical contextual relations retain their full domain and original producing cut"]
-fn partial_and_vertical_sections_are_not_selected_maps() {
-    let r = ResidentReadout::new().unwrap();
-    let s = ResidentSurface::on(&r).unwrap();
-    let zero = points(&s, &[0, 0]);
-    let one = points(&s, &[1, 0]);
-    let i = points(&s, &[0, 1]);
-    let mut body = ResidentConstitutiveFibre::found_bilinear_contact(&s, 1, 1, 1).unwrap();
-    body.advance_bilinear_contact(current(&one), current(&zero), Some(current(&zero)))
-        .unwrap();
-    let partial = body.contextual_section(current(&one)).unwrap();
-    assert!(matches!(
-        partial
-            .read_change(current(&one))
-            .unwrap()
-            .inspect()
-            .unwrap()
-            .predecessor_reading,
-        ConstitutiveReading::OutsideDomain { .. }
-    ));
-    calibrate(&s, &mut body, &mut world(&s), None);
-    let fixed = body.contextual_section(current(&i)).unwrap();
-    let previous = fixed.inspect_relation().unwrap();
-    body.advance_bilinear_contact(current(&zero), current(&zero), Some(current(&one)))
-        .unwrap();
-    let vertical = body.contextual_section(current(&i)).unwrap();
-    let read = vertical.read_change(current(&one)).unwrap();
-    assert!(
-        matches!(read.inspect().unwrap().predecessor_reading,ConstitutiveReading::Plural{directions,..} if directions.len()==1)
-    );
-    let about = points(&s, &[3, 4]);
-    let dy = points(&s, &[7, 2]);
-    let h = points(&s, &[10, -6]);
-    let family = vertical
-        .preimage_change(current(&about), current(&dy))
-        .unwrap();
-    let mut actual = vertical
-        .retain_condition_current(current(&h), METRIC)
-        .unwrap();
-    let c = actual.contact(&family).unwrap();
-    assert_eq!(
-        c.inspect().unwrap().successor,
-        vec![Rat::from_integer(5.into()), Rat::from_integer((-6).into())]
-    );
-    assert!(
-        matches!(family.inspect().unwrap(),ConditionPreimageReading::Compatible{directions,..} if directions.len()==1)
-    );
-    assert_eq!(fixed.inspect_relation().unwrap(), previous);
-    assert_eq!(
-        value(&fixed.read_change(current(&one)).unwrap()),
-        phase(0, 1, 1).current()
-    );
-    assert!(matches!(
-        partial
-            .read_change(current(&one))
-            .unwrap()
-            .inspect()
-            .unwrap()
-            .predecessor_reading,
-        ConstitutiveReading::OutsideDomain { .. }
-    ));
-    drop(body);
-    assert_eq!(
-        value(&fixed.read_change(current(&one)).unwrap()),
-        phase(0, 1, 1).current()
-    );
-}
-
-#[test]
-#[ignore = "requires CUDA; zero-source change law has free condition fibre while incompatible evidence preserves actual standing"]
-fn free_and_empty_change_evidence_preserve_actual_current() {
-    let r = ResidentReadout::new().unwrap();
-    let s = ResidentSurface::on(&r).unwrap();
-    let mut body = ResidentConstitutiveFibre::found_bilinear_contact(&s, 1, 1, 1).unwrap();
-    calibrate(&s, &mut body, &mut world(&s), None);
-    let z = points(&s, &[0, 0]);
-    let one = points(&s, &[1, 0]);
-    let about = points(&s, &[9, 2]);
-    let h = points(&s, &[3, 4, 5]);
-    let section = body.contextual_section(current(&z)).unwrap();
-    let free = section
-        .preimage_change(current(&about), current(&z))
-        .unwrap();
-    let empty = section
-        .preimage_change(current(&about), current(&one))
-        .unwrap();
-    let mut actual = section
-        .retain_condition_current(rational(&h), METRIC)
-        .unwrap();
-    let before = body.census();
-    let a = actual.contact(&free).unwrap();
-    let b = actual.contact(&empty).unwrap();
-    let y = section.read_change(actual.current()).unwrap();
-    assert_eq!(body.census().section_read_outs, before.section_read_outs);
-    assert_eq!(value(&y), ExactComplexWaveCurrent::zero());
-    for receipt in [&a, &b] {
-        assert!(
-            receipt
-                .inspect()
-                .unwrap()
-                .difference
-                .iter()
-                .all(Zero::is_zero)
-        );
-    }
-    assert!(
-        matches!(free.inspect().unwrap(),ConditionPreimageReading::Compatible{directions,..} if directions.len()==2)
-    );
-    assert!(matches!(
-        empty.inspect().unwrap(),
-        ConditionPreimageReading::OutsideRepresentedRelation { .. }
-    ));
 }

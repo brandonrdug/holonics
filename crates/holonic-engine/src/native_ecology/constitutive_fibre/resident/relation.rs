@@ -326,11 +326,9 @@ mod tests {
         kinds
     }
 
-    /// Every device reading equals the core fibre of the detached relation: unique and outside
-    /// readings on the partial-knowledge shape of
-    /// `limited_native_observations_conduct_a_new_superposition_without_host_readout` (two
-    /// observed sources of three, the returns of `(i/2)·z`), and plural readings on the
-    /// affine-contact family of `actual_affine_reaction_is_not_a_particular_solution_cast`.
+    /// Host/device parity (resident constitutive-read kernel): every device reading equals the
+    /// host core fibre of the detached relation — unique and outside readings for two observed
+    /// sources of three (the returns of `(i/2)·z`), and plural readings for a two-target family.
     #[test]
     #[ignore = "requires CUDA; each resident reading is the core fibre of the one relation"]
     fn every_resident_reading_is_the_fibre_of_the_one_relation() {

@@ -235,10 +235,6 @@ impl<'c> MachineParticipation<'c> {
         self.participation.output()
     }
 
-    #[cfg(test)]
-    pub fn values(&self) -> &Section<'c> {
-        self.participation.values()
-    }
 
     /// Pull back the complete score-geometry and value return to the original width-12 source.
     /// The query, neighbor, and value branches are individually transposed before their full

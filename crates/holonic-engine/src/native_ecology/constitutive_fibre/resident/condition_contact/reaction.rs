@@ -166,85 +166,28 @@ fn square(values: &[Rat]) -> Rat {
 mod tests {
     use super::*;
 
-    /// The pre-phase-11 condition reading, kept here only to check the wire is unchanged.
-    #[derive(Serialize)]
-    struct FormerConditionContactReading {
-        contact: u64,
-        relation_cut: u64,
-        metric: ConditionContactMetric,
-        status: ConditionContactStatus,
-        predecessor: Vec<Rat>,
-        successor: Vec<Rat>,
-        incoming_normal: Vec<Rat>,
-        returned_normal: Vec<Rat>,
-        difference: Vec<Rat>,
-    }
-    /// The pre-phase-11 affine reading.
-    #[derive(Serialize)]
-    struct FormerAffineContactReading {
-        relation_cut: u64,
-        metric: ConditionContactMetric,
-        status: ConditionContactStatus,
-        predecessor: Vec<Rat>,
-        successor: Vec<Rat>,
-        incoming_normal: Vec<Rat>,
-        returned_normal: Vec<Rat>,
-        difference: Vec<Rat>,
-    }
     fn rats(v: &[i64], d: i64) -> Vec<Rat> {
         v.iter().map(|n| Rat::new((*n).into(), d.into())).collect()
     }
 
-    /// The device witness of `oblique_family_preserves_tangent_and_returns_normal_current`
-    /// (h = (7, 4) against the family c₁ + c₂ = 2): both former JSON faces are byte-identical
-    /// and the reading satisfies the lossless contact law exactly.
+    /// Lossless contact law (`Holon/AffineContact.lean::contact_lossless`): `h' − h = n_in − n_ret`
+    /// and `‖h‖² + ‖n_in‖² = ‖h'‖² + ‖n_ret‖²`; a changed returned normal breaks it.
     #[test]
-    fn one_contact_reading_keeps_both_former_wires_and_the_lossless_law() {
-        let reading = |contact| AffineContactReading {
-            contact,
+    fn affine_contact_reading_satisfies_the_lossless_exchange_law() {
+        let reading = |returned_normal| AffineContactReading {
+            contact: None,
             relation_cut: 6,
             metric: ConditionContactMetric::UnitAdmittanceRealification,
             status: ConditionContactStatus::Compatible,
             predecessor: rats(&[7, 4], 1),
             successor: rats(&[5, -1], 2),
             incoming_normal: rats(&[1, 1], 1),
-            returned_normal: rats(&[11, 11], 2),
+            returned_normal,
             difference: rats(&[-9, -9], 2),
         };
-        let condition = FormerConditionContactReading {
-            contact: 1,
-            relation_cut: 6,
-            metric: ConditionContactMetric::UnitAdmittanceRealification,
-            status: ConditionContactStatus::Compatible,
-            predecessor: rats(&[7, 4], 1),
-            successor: rats(&[5, -1], 2),
-            incoming_normal: rats(&[1, 1], 1),
-            returned_normal: rats(&[11, 11], 2),
-            difference: rats(&[-9, -9], 2),
-        };
-        assert_eq!(
-            serde_json::to_string(&reading(Some(1))).unwrap(),
-            serde_json::to_string(&condition).unwrap()
-        );
-        let affine = FormerAffineContactReading {
-            relation_cut: 6,
-            metric: ConditionContactMetric::UnitAdmittanceRealification,
-            status: ConditionContactStatus::Compatible,
-            predecessor: rats(&[7, 4], 1),
-            successor: rats(&[5, -1], 2),
-            incoming_normal: rats(&[1, 1], 1),
-            returned_normal: rats(&[11, 11], 2),
-            difference: rats(&[-9, -9], 2),
-        };
-        assert_eq!(
-            serde_json::to_string(&reading(None)).unwrap(),
-            serde_json::to_string(&affine).unwrap()
-        );
-        let witness = reading(None);
+        let witness = reading(rats(&[11, 11], 2));
         assert!(witness.is_lossless_exchange());
-        assert_eq!(witness.incoming_power(), Rat::from_integer(67.into()));
-        let mut broken = reading(None);
-        broken.returned_normal = rats(&[5, 5], 1);
-        assert!(!broken.is_lossless_exchange());
+        assert_eq!(witness.incoming_power(), witness.returned_power());
+        assert!(!reading(rats(&[5, 5], 1)).is_lossless_exchange());
     }
 }

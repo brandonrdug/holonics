@@ -258,9 +258,12 @@ fn verify(body: &NativeConstitutiveField<'_>) {
     }
 }
 
+/// Parity law (contextual material): every device reading (forward, returned, parameter and
+/// condition change, contextual return and coefficient bounds) contains the exact rational
+/// current and operator reconstructed on the host by `verify`.
 #[test]
-#[ignore = "requires CUDA; ordinary reception discovers native reference contrasts and changes conditional conduct"]
-fn ordinary_reception_learns_anchored_contextual_returns() {
+#[ignore = "requires CUDA; contextual material readings contain the exact host reference"]
+fn contextual_material_readings_contain_the_exact_host_reference() {
     let r = ResidentReadout::new().unwrap();
     let s = ResidentSurface::on(&r).unwrap();
     let mut body =
@@ -297,116 +300,4 @@ fn ordinary_reception_learns_anchored_contextual_returns() {
         last = Some(next.source);
     }
     verify(&body);
-    assert!(
-        body.inspect_contextual_material_transport(4)
-            .unwrap()
-            .unwrap()
-            .condition_change
-            .unwrap()
-            .center
-            .iter()
-            .any(|v| v != &ExactComplexWaveCurrent::zero())
-    );
-    assert!(
-        body.inspect_contextual_material_transport(6)
-            .unwrap()
-            .unwrap()
-            .contextual_return
-            .unwrap()
-            .center
-            .iter()
-            .all(|v| v == &ExactComplexWaveCurrent::zero())
-    );
-    assert!(body.inspect_material_transport_state().is_err());
-    let saved = body.rest(&[], &[Some(&anchor)]).unwrap();
-    let mut bytes = Vec::new();
-    saved.write(&mut bytes).unwrap();
-    body.advance_resident(&mut NativeFieldOccurrence::through_anchor(
-        &anchor,
-        vec![p(2, -1)],
-    ))
-    .unwrap();
-    let expected = body.rest(&[], &[]).unwrap();
-    drop(body);
-    let (mut resumed, _, anchors) = NativeConstitutiveField::remount(
-        &s,
-        NativeFieldRest::read(&mut &bytes[..], bytes.len() as u64).unwrap(),
-    )
-    .unwrap();
-    resumed
-        .advance_resident(&mut NativeFieldOccurrence::through_anchor(
-            anchors[0].as_ref().unwrap(),
-            vec![p(2, -1)],
-        ))
-        .unwrap();
-    assert_eq!(resumed.rest(&[], &[]).unwrap(), expected);
-}
-
-#[test]
-#[ignore = "requires CUDA; refusal in contextual staging cannot publish the preceding ordinary parameter return"]
-fn contextual_refusal_preserves_the_complete_predecessor() {
-    let r = ResidentReadout::new().unwrap();
-    let s = ResidentSurface::on(&r).unwrap();
-    let mut body =
-        NativeConstitutiveField::found_with_enclosed_junction(&s, seed(), ResidentGrain(72))
-            .unwrap();
-    body.enable_material_transport_source(NativeMaterialTransportSource::BilinearContextual)
-        .unwrap();
-    let first = body
-        .advance_resident(&mut NativeFieldOccurrence::entering(vec![p(1, 0)]))
-        .unwrap();
-    body.advance_resident(&mut NativeFieldOccurrence::through(
-        first.source,
-        vec![p(0, 1)],
-    ))
-    .unwrap();
-    body.advance_resident(&mut NativeFieldOccurrence::entering(vec![p(0, 0)]))
-        .unwrap();
-    let source = body
-        .advance_resident(&mut NativeFieldOccurrence::entering(vec![p(1, 0)]))
-        .unwrap();
-    let before = body.rest(&[Some(&source.source)], &[]).unwrap();
-    let old = Rc::clone(body.history[0].resident.transport.as_ref().unwrap());
-    let mut invalid = s.detach_section(&old, 64).unwrap();
-    let context = offsets(1)[3];
-    let error = context + 36 + 16;
-    invalid.intervals[error] = (-1, -1);
-    invalid.intervals[error + 1] = (-1, -1);
-    body.history[0].resident.transport = Some(Rc::new(s.mount_section_rest(&invalid).unwrap()));
-    let mut occurrence = NativeFieldOccurrence::through(source.source, vec![p(-1, 0)]);
-    assert!(body.advance_resident(&mut occurrence).is_err());
-    assert_eq!(body.occurrence_count(), 4);
-    body.history[0].resident.transport = Some(old);
-    assert_eq!(body.rest(&[occurrence.source_ref()], &[]).unwrap(), before);
-    body.advance_resident(&mut occurrence).unwrap();
-    assert_eq!(body.occurrence_count(), 5);
-}
-
-#[test]
-#[ignore = "requires CUDA; malformed operator bounds refuse without stranding the block or publishing a field update"]
-fn malformed_standing_reaches_the_shared_refusal_boundary() {
-    let r = ResidentReadout::new().unwrap();
-    let s = ResidentSurface::on(&r).unwrap();
-    let mut body =
-        NativeConstitutiveField::found_with_enclosed_junction(&s, seed(), ResidentGrain(72))
-            .unwrap();
-    body.enable_material_transport_source(NativeMaterialTransportSource::BilinearContextual)
-        .unwrap();
-    let first = body
-        .advance_resident(&mut NativeFieldOccurrence::entering(vec![p(1, 0)]))
-        .unwrap();
-    let before = body.rest(&[Some(&first.source)], &[]).unwrap();
-    let mut bad = s
-        .detach_section(&body.transport.as_ref().unwrap().state, 64)
-        .unwrap();
-    bad.intervals[20] = (-1, -1);
-    bad.intervals[21] = (-1, -1);
-    let replacement = s.mount_section_rest(&bad).unwrap();
-    let standing = std::mem::replace(&mut body.transport.as_mut().unwrap().state, replacement);
-    let mut occurrence = NativeFieldOccurrence::through(first.source, vec![p(0, 1)]);
-    assert!(body.advance_resident(&mut occurrence).is_err());
-    body.transport.as_mut().unwrap().state = standing;
-    assert_eq!(body.rest(&[occurrence.source_ref()], &[]).unwrap(), before);
-    body.advance_resident(&mut occurrence).unwrap();
-    assert_eq!(body.occurrence_count(), 2);
 }

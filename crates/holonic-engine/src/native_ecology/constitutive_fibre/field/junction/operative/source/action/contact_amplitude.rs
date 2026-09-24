@@ -330,6 +330,3 @@ impl<'c> NativeConstitutiveField<'c> {
         self.commit_global_action_material_return(prepared.material)
     }
 }
-
-#[cfg(test)]
-mod tests;

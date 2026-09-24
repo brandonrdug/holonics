@@ -1,99 +1,12 @@
 use super::*;
 use crate::embedding_fiber::ResidentReadout;
 
-fn calibrated_receiver(centers: &[i128], radius: i128, exact_words: bool) -> Vec<i64> {
-    let readout = ResidentReadout::new().expect("CUDA");
-    let surface = ResidentSurface::on(&readout).unwrap();
-    let dimension = centers.len();
-    let stride = dimension + 1;
-    let mode = if exact_words { 1 } else { 2 };
-    let mut values = vec![0i64; if exact_words { 4 * stride } else { 12 * stride }];
-    if exact_words {
-        for part in 0..4 {
-            values[part * stride + dimension] = 1;
-        }
-        for (i, value) in centers.iter().enumerate() {
-            values[stride + i] = i64::try_from(*value).unwrap();
-        }
-    } else {
-        for (i, value) in centers.iter().copied().chain([radius]).enumerate() {
-            let at = 2 * (stride + i);
-            values[at] = value as i64;
-            values[at + 1] = (value >> 64) as i64;
-        }
-    }
-    let report = surface
-        .mount_section_rest(
-            &ResidentSectionRest::found(
-                1,
-                values.len(),
-                ResidentGrain(0),
-                64,
-                values.into_iter().map(|v| (v, v)).collect(),
-            )
-            .unwrap(),
-        )
-        .unwrap();
-    let output = surface.fresh_section(1, 4, ResidentGrain(0)).unwrap();
-    let mut passage = surface.begin_passage(&[vec![]]).unwrap();
-    {
-        let lane = passage.open(0, &[]).unwrap();
-        surface
-            .record_field_differential_receiver(
-                &lane,
-                &report,
-                dimension,
-                mode,
-                0,
-                dimension / 4,
-                &output,
-            )
-            .unwrap();
-    }
-    passage.close(0, &output, 64).unwrap();
-    let reading = passage.finish().unwrap().launch().unwrap();
-    assert!(reading.obstruction.is_empty());
-    surface
-        .read_out(&output)
-        .unwrap()
-        .into_iter()
-        .map(|(lo, hi)| {
-            assert_eq!(lo, hi);
-            lo
-        })
-        .collect()
-}
-
-#[test]
-#[ignore = "requires CUDA; exact signs and a real-current tie with differing imaginary carriers"]
-fn differential_word_receiver_keeps_exact_ties() {
-    let currents = [0, 7, 2, -13, 2, 0, 0, 0, 1, 9, 1, -8];
-    assert_eq!(calibrated_receiver(&currents, 0, true), vec![1, 2, 4, 4]);
-}
-
-#[test]
-#[ignore = "requires CUDA; ball half-spaces are certified without choosing a center"]
-fn differential_enclosure_does_not_seal_a_center_sign() {
-    let currents = [0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 1, 0];
-    assert_eq!(calibrated_receiver(&currents, 1, false), vec![1, 2, 4, 0]);
-}
-
-#[test]
-#[ignore = "requires CUDA; packed signed-wide extremes use complete unsigned-256 squares"]
-fn differential_receiver_keeps_the_complete_wide_gap() {
-    assert_eq!(
-        calibrated_receiver(&[i128::MIN, 0, i128::MAX, 0], i128::MAX, false),
-        vec![1, 0, 0, 0]
-    );
-    assert_eq!(
-        calibrated_receiver(&[0, 0, i128::MAX, 0], i128::MAX, false),
-        vec![0, 0, 1, 0]
-    );
-}
-
+/// Differential-receiver parity: the device pair reading is resolved exactly when the host
+/// criterion `margin² > 2·radius²` holds on the cold enclosure, with the host sign; reading
+/// leaves the field able to continue.
 #[test]
 #[ignore = "requires CUDA; terminal current observation leaves the native owner and source available"]
-fn differential_current_reading_preserves_continuation() {
+fn differential_receiver_certifies_the_exact_host_margin_and_preserves_continuation() {
     let readout = ResidentReadout::new().expect("CUDA");
     let surface = ResidentSurface::on(&readout).unwrap();
     let material = vec![

@@ -28,11 +28,6 @@ impl<'chart> ResidentSurface<'chart> {
         let block=self.declaration.warp_size.max(1);
         self.record_blocks(lane,"section_field_material_current_covector",(2*targets).div_ceil(block as usize),block,0,&mut p,"material-current-covector")
     }
-    #[cfg(test)]
-    pub(crate) fn record_field_material_packet_receiver(&self,lane:&Lane<'_,'chart>,input:&ResidentSection<'chart>,
-        targets:usize,scratch:&ResidentSection<'chart>,output:&ResidentSection<'chart>)->Result<(),ResidentRefusal>{
-        self.record_field_material_packet_quadrature(lane,input,targets,0,scratch,output)
-    }
     pub(crate) fn record_field_material_packet_quadrature(&self,lane:&Lane<'_,'chart>,input:&ResidentSection<'chart>,
         targets:usize,quadrature:u32,scratch:&ResidentSection<'chart>,output:&ResidentSection<'chart>)->Result<(),ResidentRefusal>{
         if quadrature>1||targets==0||targets>u32::MAX as usize/4||input.rows!=1||input.width<4*targets+2

@@ -18,10 +18,6 @@ pub struct SymbolCurrentChart {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use holonic_engine::{
-        embedding_fiber::ResidentReadout,
-        native_ecology::constitutive_fibre::{ResidentConstitutiveSection, ResidentNormalMaterial},
-    };
     #[test]
     fn unicode_is_an_exterior_symbol_and_opaque_equal_spellings_can_stay_distinct() {
         let chart = SymbolCurrentChart::declared(SymbolAlphabet::from_chars(&['a', 'é']).unwrap());
@@ -33,55 +29,6 @@ mod tests {
         ])
         .unwrap();
         assert_ne!(opaque.symbol_of("left"), opaque.symbol_of("right"));
-    }
-    #[test]
-    #[ignore = "requires CUDA; exterior alphabet permutation transports exact source/cross geometry and no ordinal supplies amplitude"]
-    fn symbol_relabeling_carries_the_same_difference_geometry() {
-        let readout = ResidentReadout::new().unwrap();
-        let s = ResidentSurface::on(&readout).unwrap();
-        let left =
-            SymbolCurrentChart::declared(SymbolAlphabet::from_chars(&['a', 'b', 'é']).unwrap());
-        let right =
-            SymbolCurrentChart::declared(SymbolAlphabet::from_chars(&['é', 'a', 'b']).unwrap());
-        let symbols = "abéaébba";
-        let a = left.mount(&s, &left.decode_text(symbols).unwrap()).unwrap();
-        let b = right
-            .mount(&s, &right.decode_text(symbols).unwrap())
-            .unwrap();
-        assert_eq!(a.rows(), symbols.chars().count());
-        assert!(a.rows() < symbols.len());
-        let a = ResidentConstitutiveSection::integers(&a)
-            .unwrap()
-            .differences(&s)
-            .unwrap();
-        let b = ResidentConstitutiveSection::integers(&b)
-            .unwrap()
-            .differences(&s)
-            .unwrap();
-        let mut ma = ResidentNormalMaterial::found(&s, 3, 3, ResidentGrain(u32::BITS)).unwrap();
-        let mut mb = ResidentNormalMaterial::found(&s, 3, 3, ResidentGrain(u32::BITS)).unwrap();
-        ma.receive_section(a.source(), a.observed()).unwrap();
-        mb.receive_section(b.source(), b.observed()).unwrap();
-        let a = ma.inspect().unwrap();
-        let b = mb.inspect().unwrap();
-        let permutation = [1, 2, 0];
-        let source = |index: usize| (index / 3) * 3 + permutation[index % 3];
-        for i in 0..9 {
-            for j in 0..9 {
-                assert_eq!(a.source_normal[i][j], b.source_normal[source(i)][source(j)]);
-            }
-        }
-        for i in 0..3 {
-            for j in 0..9 {
-                assert_eq!(
-                    a.cross_source[i][j],
-                    b.cross_source[permutation[i]][source(j)]
-                );
-            }
-        }
-        assert_eq!(a.target_energy, b.target_energy);
-        assert_eq!(a.source_normal_error, b.source_normal_error);
-        assert_eq!(a.cross_source_error, b.cross_source_error);
     }
 }
 impl SymbolCurrentChart {

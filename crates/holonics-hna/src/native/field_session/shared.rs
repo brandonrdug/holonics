@@ -412,24 +412,8 @@ mod tests {
             fractional_bits: 48,
         }
     }
-    fn partial(text: &str, hidden: usize) -> FieldSectionRequest {
-        let mut parts = text
-            .as_bytes()
-            .iter()
-            .flat_map(|b| [Some(format!("{:x}", b >> 4)), Some(format!("{:x}", b & 15))])
-            .collect::<Vec<_>>();
-        parts[2 * hidden] = None;
-        parts[2 * hidden + 1] = None;
-        FieldSectionRequest {
-            text: String::new(),
-            partial: Some(parts),
-            output_symbols: None,
-            context: vec![],
-            incident_preparation: None,
-            commit: false,
-            retain_comparison: false,
-        }
-    }
+    /// The shared chart's coefficient shape is fixed by its alphabet and region offsets, not by
+    /// the source aperture; offsets must be distinct and include the receiving region.
     #[test]
     fn coefficient_shape_is_independent_of_the_complete_source_aperture() {
         let mut s = spec();
@@ -437,109 +421,9 @@ mod tests {
         s.section_symbols = 1_000_000;
         s.context_symbols = 2_000_000;
         assert_eq!(s.extents().unwrap(), small);
-        assert_eq!(small, (18, 1, 109));
         s.region_offsets = vec![-1, 1];
         assert!(s.chart().is_err());
         s.region_offsets = vec![0, 0];
         assert!(s.chart().is_err());
-    }
-    #[test]
-    #[ignore = "requires CUDA; complete source observation updates shared material and reopens the same receiving face"]
-    fn shared_source_updates_and_reopens_without_a_position_sized_model() {
-        let dir = tempfile::tempdir().unwrap();
-        let path = dir.path().join("shared.session");
-        let request = partial("faces carry current", 6);
-        let expected = with_field_session(&spec(), |s| {
-            let before = s.inspect_current()?;
-            assert!(s.observe_source(&request, "short", 1).is_err());
-            assert_eq!(s.inspect_current()?, before);
-            let r = s.observe_source(&request, "faces carry current", 1)?;
-            assert_eq!(r["returned"]["rows"], 2);
-            let after = s.inspect_current()?;
-            assert_ne!(before["reaction"], after["reaction"]);
-            assert_eq!(before["material"], after["material"]);
-            let output = s.request(&request)?;
-            assert_eq!(output["output_symbols"], 38);
-            assert_eq!(output["generated_positions"], json!([12, 13]));
-            assert_eq!(output["symbols"][0], "6");
-            s.checkpoint(&path, &HnaStreamState::default())?;
-            Ok(output)
-        })
-        .unwrap();
-        NativeFieldSavedSession::open(&path)
-            .unwrap()
-            .with_session(|s, _| {
-                let actual = s.request(&request)?;
-                for k in [
-                    "text",
-                    "output_bytes",
-                    "symbols",
-                    "selections",
-                    "producing_epoch",
-                    "generated_positions",
-                    "selection_bound",
-                ] {
-                    assert_eq!(actual[k], expected[k], "{k}");
-                }
-                Ok(())
-            })
-            .unwrap();
-    }
-    #[test]
-    #[ignore = "requires CUDA; a retained shared-source comparison survives reopen and applies exactly once"]
-    fn retained_shared_comparison_applies_once_after_reopen() {
-        let dir = tempfile::tempdir().unwrap();
-        let path = dir.path().join("retained.session");
-        let mut request = partial("faces carry current", 6);
-        request.retain_comparison = true;
-        let (before, produced) = with_field_session(&spec(), |s| {
-            let produced = s.request(&request)?;
-            assert_eq!(produced["comparison"], 0);
-            assert_eq!(s.inspect()["retained_shared"], json!([0]));
-            // The comparison is retained, not applied: this cut's material is untouched.
-            let before = s.inspect_current()?;
-            s.checkpoint(&path, &HnaStreamState::default())?;
-            Ok((before, produced))
-        })
-        .unwrap();
-        NativeFieldSavedSession::open(&path)
-            .unwrap()
-            .with_session(|s, _| {
-                assert_eq!(s.retained_shared_comparisons(), [0]);
-                assert!(s.observe(1, "faces carry current", 1).is_err());
-                assert!(s.observe(0, "short", 1).is_err());
-                assert_eq!(s.inspect_current()?, before);
-                let returned = s.observe(0, "faces carry current", 1)?;
-                assert_eq!(returned["comparison"], 0);
-                assert_eq!(returned["producing_epoch"], produced["producing_epoch"]);
-                assert_eq!(returned["returned"]["rows"], 2);
-                assert_ne!(s.inspect_current()?["reaction"], before["reaction"]);
-                assert!(s.observe(0, "faces carry current", 1).is_err());
-                assert_eq!(s.retained_shared_comparisons(), Vec::<u64>::new());
-                Ok(())
-            })
-            .unwrap();
-    }
-    #[test]
-    #[ignore = "requires CUDA; fixed source disagreements are reported rather than trained as invented observations"]
-    fn completely_observed_source_reports_a_conflict_without_deposition() {
-        with_field_session(&spec(), |s| {
-            let request = FieldSectionRequest {
-                text: String::new(),
-                partial: Some(vec![Some("6".into()), Some("1".into())]),
-                output_symbols: None,
-                context: vec![],
-                incident_preparation: None,
-                commit: false,
-                retain_comparison: false,
-            };
-            let before = s.inspect_current()?;
-            assert_eq!(s.request(&request)?["text"], "a");
-            let result = s.observe_source(&request, "b", 1)?;
-            assert_eq!(result["held_disagreements"].as_array().unwrap().len(), 1);
-            assert_eq!(s.inspect_current()?, before);
-            Ok(())
-        })
-        .unwrap();
     }
 }

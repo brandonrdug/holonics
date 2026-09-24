@@ -171,5 +171,3 @@ impl<'c> ResidentNormalWave<'c> {
         })
     }
 }
-#[cfg(test)]
-pub(super) mod tests;

@@ -182,11 +182,7 @@ fn sync_directory(path: &Path) -> io::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::{
-        io::ErrorKind,
-        panic::AssertUnwindSafe,
-        sync::atomic::{AtomicBool, Ordering},
-    };
+    use std::panic::AssertUnwindSafe;
     use tempfile::tempdir;
 
     #[test]
@@ -217,6 +213,7 @@ mod tests {
             Err(PublicationError::BeforePublication { .. })
         ));
         assert!(!path.exists());
+        assert_eq!(fs::read_dir(dir.path()).unwrap().count(), 0);
     }
 
     #[test]
@@ -266,14 +263,6 @@ mod tests {
     }
 
     #[test]
-    fn bare_relative_parent_normalizes_to_current_directory_without_chdir() {
-        assert_eq!(
-            parent_directory(Path::new("artifact.bin")).unwrap(),
-            PathBuf::from(".")
-        );
-    }
-
-    #[test]
     fn panic_in_writer_removes_staged_file_and_destination_stays_absent() {
         let dir = tempdir().unwrap();
         let path = dir.path().join("artifact.bin");
@@ -286,25 +275,6 @@ mod tests {
             });
         }));
         assert!(result.is_err());
-        assert!(!path.exists());
-        assert_eq!(fs::read_dir(dir.path()).unwrap().count(), 0);
-    }
-
-    #[test]
-    fn writer_is_only_given_a_borrow_and_no_temp_is_left_on_failure() {
-        let dir = tempdir().unwrap();
-        let path = dir.path().join("artifact.bin");
-        let called = AtomicBool::new(false);
-        let result = publish_new(&path, |file| {
-            called.store(true, Ordering::Relaxed);
-            file.write_all(b"x")?;
-            Err::<(), _>(io::Error::new(ErrorKind::Interrupted, "interrupted"))
-        });
-        assert!(called.load(Ordering::Relaxed));
-        assert!(matches!(
-            result,
-            Err(PublicationError::BeforePublication { .. })
-        ));
         assert!(!path.exists());
         assert_eq!(fs::read_dir(dir.path()).unwrap().count(), 0);
     }

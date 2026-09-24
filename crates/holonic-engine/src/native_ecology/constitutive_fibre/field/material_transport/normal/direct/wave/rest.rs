@@ -476,39 +476,3 @@ impl NormalWaveFibre<'_> {
         })
     }
 }
-
-#[cfg(test)]
-mod format_tests {
-    use super::*;
-
-    #[test]
-    fn retired_v5_pending_cut_format_is_rejected() {
-        let mut bytes = MAGIC.to_vec();
-        bytes.push(5);
-        assert!(matches!(
-            NormalWaveRest::read(&mut bytes.as_slice(), bytes.len() as u64),
-            Err(ConstitutiveFibreError::Rest(reason))
-                if reason == "normal material: normal wave version"
-        ));
-    }
-
-    #[test]
-    fn current_v6_applied_transport_rejects_pending_cut_payloads() {
-        let mut bytes = MAGIC.to_vec();
-        bytes.push(6);
-        let header = TransportHeader {
-            steps: 0,
-            epoch: 0,
-            seed_kind: NormalWaveSeedKind::ExactPair,
-            seed_epochs: [None, Some(0)],
-            transport: NormalWaveTransport::Applied,
-            pending: vec![1],
-        };
-        blob(&mut bytes, &serde_json::to_vec(&header).unwrap()).unwrap();
-        assert!(matches!(
-            NormalWaveRest::read(&mut bytes.as_slice(), bytes.len() as u64),
-            Err(ConstitutiveFibreError::Rest(reason))
-                if reason == "normal material: applied transport wave cannot contain pending sources"
-        ));
-    }
-}

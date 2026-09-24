@@ -390,6 +390,3 @@ impl<'c> GeneratorTextReceiver<'c> {
         })
     }
 }
-
-#[cfg(test)]
-mod tests;

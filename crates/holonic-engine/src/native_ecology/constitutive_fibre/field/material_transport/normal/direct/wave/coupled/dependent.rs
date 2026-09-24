@@ -312,5 +312,3 @@ impl<'c> ResidentCoupledConstitutive<'c> {
 
 mod rest;
 pub use rest::CoupledConstitutiveRest;
-#[cfg(test)]
-mod tests;

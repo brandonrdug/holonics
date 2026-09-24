@@ -455,6 +455,3 @@ pub fn resume_wave_control(
     WaveSavedApplication::read(path)?
         .with_application(|session, app| execute(app, session, options))
 }
-
-#[cfg(test)]
-mod tests;

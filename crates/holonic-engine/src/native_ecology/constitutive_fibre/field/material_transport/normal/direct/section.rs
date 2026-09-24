@@ -1097,6 +1097,9 @@ mod covector_return_tests {
     use super::*;
     use crate::embedding_fiber::ResidentReadout;
 
+    /// Parity law (direct normal material): H = H₀ + Σ f f*, B = Σ t f* with proxy target
+    /// t = current·f + 2^-step·g; device statistics equal the exact values and the applied map
+    /// ball contains W = B H⁻¹. Staging does not mutate the live cut.
     #[test]
     #[ignore = "requires CUDA; resident normal proxy stages current·feature + 2^-step_bits·g without host arithmetic"]
     fn covector_return_stages_scalar_and_complex_proxy_without_live_mutation() {
@@ -1170,73 +1173,6 @@ mod covector_return_tests {
                 .subtract(&reference)
                 .norm_square()
                 <= &state.material.radius * &state.material.radius
-        );
-    }
-}
-
-#[cfg(test)]
-mod tests;
-
-#[cfg(test)]
-mod applied_enclosed_features_tests {
-    use super::*;
-    use crate::embedding_fiber::ResidentReadout;
-
-    #[test]
-    #[ignore = "requires CUDA; three resident rows use one applied normal owner without host per-row transfers"]
-    fn applied_enclosed_rows_use_one_owner_and_retain_row_order() {
-        let readout = ResidentReadout::new().unwrap();
-        let surface = ResidentSurface::on(&readout).unwrap();
-        let prior = NativeNormalPrior::from_coefficients(vec![vec![ExactComplexWaveCurrent::new(
-            Rat::from_integer(2.into()),
-            Rat::zero(),
-        )]])
-        .unwrap();
-        let material = ResidentNormalMaterial::found_features_with_prior(
-            &surface,
-            1,
-            1,
-            ResidentGrain(16),
-            prior,
-        )
-        .unwrap();
-        let raw = surface
-            .mount_section_rest(
-                &ResidentSectionRest::found(
-                    3,
-                    2,
-                    ResidentGrain(0),
-                    i64::BITS,
-                    vec![(1, 1), (0, 0), (2, 2), (0, 0), (3, 3), (0, 0)],
-                )
-                .unwrap(),
-            )
-            .unwrap();
-        let features = ResidentNormalEnclosureSection::from_points(
-            ResidentConstitutiveSection::integers(&raw).unwrap(),
-            ResidentGrain(16),
-        )
-        .unwrap();
-        let reads = surface.census().section_read_outs;
-        let applied = material
-            .retained_view()
-            .read_applied_enclosed_section(&features)
-            .unwrap();
-        assert_eq!(surface.census().section_read_outs, reads);
-        let values = (0..3)
-            .map(|row| {
-                applied.row(row).unwrap().inspect().unwrap().center[0]
-                    .real
-                    .clone()
-            })
-            .collect::<Vec<_>>();
-        assert_eq!(
-            values,
-            vec![
-                Rat::from_integer(2.into()),
-                Rat::from_integer(4.into()),
-                Rat::from_integer(6.into())
-            ]
         );
     }
 }

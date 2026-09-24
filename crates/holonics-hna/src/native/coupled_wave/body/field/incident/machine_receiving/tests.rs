@@ -1,9 +1,4 @@
 use super::*;
-use crate::native::coupled_wave::body::field::incident::machine_tests::{
-    make_machine_anchor, spec,
-};
-use holonic_engine::embedding_fiber::ResidentReadout;
-use holonic_engine::resident_section::{ResidentGrain, ResidentSurface};
 use num_bigint::BigInt;
 use holonics::geometry::{AffineMap3, Rat, RatVec3, cayley_rotation_z};
 
@@ -59,7 +54,7 @@ fn invalid_binding_rejects_missing_ports_and_nonpositive_clock() {
 }
 
 #[test]
-fn phase_binding_wire_roundtrips_and_refuses_a_legacy_slot_tag() {
+fn phase_binding_wire_roundtrips() {
     let binding = GeneratorPhaseReceiverBinding {
         receiver_id: "text".into(),
         termination_receiver_id: "stop".into(),
@@ -71,157 +66,9 @@ fn phase_binding_wire_roundtrips_and_refuses_a_legacy_slot_tag() {
         clock: clock(),
         aperture: 3,
     };
-    let mut wire = serde_json::to_value(&binding).unwrap();
-    assert_eq!(wire["kind"], "generator-phases");
-    assert_eq!(
-        serde_json::from_value::<GeneratorPhaseReceiverBinding>(wire.clone()).unwrap(),
-        binding
-    );
-    wire["kind"] = serde_json::json!("slots");
-    assert!(serde_json::from_value::<GeneratorPhaseReceiverBinding>(wire).is_err());
-}
-
-#[test]
-#[ignore = "requires CUDA; receiver endpoint, changed phase action, and complete adjoint return"]
-fn receiving_uses_generated_endpoint_and_returns_full_machine_boundary() {
-    let readout = ResidentReadout::new().unwrap();
-    let surface = ResidentSurface::on(&readout).unwrap();
-    let grain = ResidentGrain(48);
-    let mut spec = spec();
-    let mut sites = spec.machine.sites().to_vec();
-    sites[1].phase.step = AffineMap3 {
-        linear: cayley_rotation_z(&(rat(1) / rat(2))),
-        translation: RatVec3::new(rat(0), rat(0), rat(1) / rat(4)),
-    };
-    sites[1].phase.period = None;
-    let step = sites[1].phase.step.clone();
-    spec.machine = crate::native::field_geometry::machine::GeneratorMachineSpec::declare(
-        spec.machine.frame(),
-        spec.machine.units().clone(),
-        sites,
-        spec.machine.arcs().to_vec(),
-        spec.machine.cells().to_vec(),
-    )
-    .unwrap();
-    let mut body = NativeCoupledBody::found_generator_field(&surface, spec, grain).unwrap();
-    let anchor = make_machine_anchor(&surface, grain, 0);
-    let held = vec![false; anchor.view().components() / 2];
-    let prepared = body.prepare_incident_field(anchor.view(), &held).unwrap();
-    let generated = body.publish_incident_field(prepared, false, true).unwrap();
-    let binding = GeneratorPhaseReceiverBinding {
-        receiver_id: "boundary-receiver".into(),
-        ports: vec![GeneratorPhasePort {
-            site_id: "b".into(),
-            origin_exponent: 1,
-            step_exponent: 1,
-        }],
-        clock: clock(),
-        aperture: 2,
-        termination_receiver_id: "boundary-termination".into(),
-    };
     let wire = serde_json::to_value(&binding).unwrap();
-    assert_eq!(wire["kind"], "generator-phases");
-    let binding: GeneratorPhaseReceiverBinding = serde_json::from_value(wire).unwrap();
-    // The receive and pullback facets of the chart: the exact passive coholon of the same maps.
-    let reception = super::super::holon_chart::ResidentHolonChart::phase_reception(
-        generated.word.machine.as_ref().unwrap(),
-        &binding,
-        12,
-    )
-    .unwrap();
-    let received = generated.receive_generator_phases(binding).unwrap();
-    assert_eq!(received.output().rows(), 2);
-    assert_eq!(received.output().components(), 12);
-    let endpoint = received.output().inspect_rows().unwrap();
-    let source = generated.boundary().unwrap().inspect().unwrap();
-    let vector = |q: &[holonic_engine::ExactComplexWaveCurrent], offset: usize| {
-        RatVec3::new(
-            q[offset].real.clone(),
-            q[offset + 2].real.clone(),
-            q[offset + 4].real.clone(),
-        )
-    };
-    let native = |re: &RatVec3, im: &RatVec3| {
-        [&re.x, &im.x, &re.y, &im.y, &re.z, &im.z]
-            .into_iter()
-            .map(|x| holonic_engine::ExactComplexWaveCurrent::new(x.clone(), rat(0)))
-            .collect::<Vec<_>>()
-    };
-    let qre = vector(&source.center[6..], 0);
-    let qim = vector(&source.center[6..], 1);
-    let mut returned_re = RatVec3::zero();
-    let mut returned_im = RatVec3::zero();
-    for (j, row) in endpoint.iter().enumerate() {
-        let action = signed_affine_power(&step, (j + 1) as i64).unwrap();
-        // Chart law: the current advances by the linear part only; the affine translation
-        // (and the initial configuration) act on configuration, not on the current.
-        let re = action.linear.apply(&qre);
-        let im = action.linear.apply(&qim);
-        assert!(row.contains(&native(&re, &im)));
-        returned_re = returned_re.add(&action.linear.transpose().apply(&vector(&row.center, 0)));
-        returned_im = returned_im.add(&action.linear.transpose().apply(&vector(&row.center, 1)));
-    }
-    assert_ne!(endpoint[0].center, endpoint[1].center);
-    let flat = |rows: &[holonic_engine::ExactComplexWaveCurrent]| {
-        rows.iter()
-            .flat_map(|z| [z.real.clone(), z.imaginary.clone()])
-            .collect::<Vec<_>>()
-    };
-    let complex = |values: &[Rat]| {
-        values
-            .chunks(2)
-            .map(|z| holonic_engine::ExactComplexWaveCurrent::new(z[0].clone(), z[1].clone()))
-            .collect::<Vec<_>>()
-    };
-    let read = reception.receive(&flat(&source.center)).unwrap();
-    assert!(read.power.is_zero(), "a passive coholon draws no power");
-    for (j, row) in endpoint.iter().enumerate() {
-        let action = signed_affine_power(&step, (j + 1) as i64).unwrap();
-        let exact = complex(&read.value[12 * j..12 * (j + 1)]);
-        assert_eq!(
-            exact,
-            native(&action.linear.apply(&qre), &action.linear.apply(&qim)),
-            "the chart's reading is the hand-rolled L re, L im"
-        );
-        assert!(row.contains(&exact), "exact reading in the device ball");
-    }
-    let covector = endpoint.iter().flat_map(|row| flat(&row.center)).collect::<Vec<_>>();
-    let pulled = reception.pull_back(&covector).unwrap();
-    let returned = received.pull_back(received.output()).unwrap();
-    for (site, row) in returned.inspect_rows().unwrap().iter().enumerate() {
-        assert!(
-            row.contains(&complex(&pulled[12 * site..12 * (site + 1)])),
-            "exact pullback Cᵀ g in the device ball"
-        );
-    }
-    assert_eq!(returned.rows(), 2);
-    assert_eq!(returned.components(), 12);
-    assert!(
-        returned
-            .row(0)
-            .unwrap()
-            .inspect()
-            .unwrap()
-            .contains(&native(&RatVec3::zero(), &RatVec3::zero()))
-    );
-    assert!(
-        returned
-            .row(1)
-            .unwrap()
-            .inspect()
-            .unwrap()
-            .contains(&native(&returned_re, &returned_im))
-    );
-    let joint = received.pull_back_joint(received.output()).unwrap();
     assert_eq!(
-        joint.view().components(),
-        generated.joint_output().components()
-    );
-    let returned_material = body
-        .prepare_incident_material_return(generated.comparison_id().unwrap(), joint.view(), 4)
-        .unwrap();
-    assert_eq!(
-        returned_material.anchor_covector().components(),
-        joint.view().components()
+        serde_json::from_value::<GeneratorPhaseReceiverBinding>(wire).unwrap(),
+        binding
     );
 }

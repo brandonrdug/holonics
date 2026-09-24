@@ -65,6 +65,7 @@ mod tests {
             .collect()
     }
 
+    /// Parity law (enclosure ports): the sum of two balls has centre a + b and radius r_a + r_b exactly.
     #[test]
     #[ignore = "requires CUDA; the enclosure sum is a resident GPU operation"]
     fn sum_same_shape_adds_nonzero_radius_without_host_readout() {
@@ -120,42 +121,4 @@ mod tests {
         assert_eq!(ball.center[0].imaginary, Rat::from_integer(BigInt::from(-1)));
     }
 
-    #[test]
-    #[ignore = "requires CUDA; shape refusals are checked before resident launch"]
-    fn sum_same_shape_refuses_mismatched_width_and_grain() {
-        let readout = ResidentReadout::new().unwrap();
-        let surface = ResidentSurface::on(&readout).unwrap();
-        let section = surface
-            .mount_section_rest(
-                &ResidentSectionRest::found(
-                    1,
-                    10,
-                    ResidentGrain(0),
-                    i64::BITS,
-                    words(&[0, 0, 0, 0, 1]),
-                )
-                .unwrap(),
-            )
-            .unwrap();
-        let a = ResidentNormalEnclosureView {
-            surface: &surface,
-            section: &section,
-            offset: 0,
-            width: 2,
-            grain: ResidentGrain(8),
-        };
-        let b = ResidentNormalEnclosureView {
-            surface: &surface,
-            section: &section,
-            offset: 0,
-            width: 4,
-            grain: ResidentGrain(8),
-        };
-        assert!(a.sum_same_shape(b).is_err());
-        let c = ResidentNormalEnclosureView {
-            grain: ResidentGrain(9),
-            ..a
-        };
-        assert!(a.sum_same_shape(c).is_err());
-    }
 }

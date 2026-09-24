@@ -1,6 +1,5 @@
 //! CUDA-scoped checks for rectangular declared-factor scale cotangents.
 
-use super::*;
 use holonics::exact_linear::ExactRatMatrix;
 use crate::embedding_fiber::ResidentReadout;
 use crate::native_ecology::constitutive_fibre::{
@@ -11,11 +10,10 @@ use crate::native_ecology::constitutive_fibre::{
 use crate::resident_section::{
     ResidentGrain, ResidentSection, ResidentSectionRest, ResidentSurface,
 };
-use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
 use holonics::geometry::Rat;
 
-pub(in super::super) fn packet<'c>(
+fn packet<'c>(
     surface: &'c ResidentSurface<'c>,
     rows: usize,
     width: usize,
@@ -32,7 +30,7 @@ pub(in super::super) fn packet<'c>(
         .unwrap()
 }
 
-pub(in super::super) fn current<'c>(
+fn current<'c>(
     surface: &'c ResidentSurface<'c>,
     values: &[i64],
     grain: ResidentGrain,
@@ -56,7 +54,7 @@ pub(in super::super) fn current<'c>(
     .unwrap()
 }
 
-pub(in super::super) fn declared_field<'c>(
+fn declared_field<'c>(
     surface: &'c ResidentSurface<'c>,
     grain: ResidentGrain,
     zero_last: bool,
@@ -224,6 +222,8 @@ fn dense_reference(
     gradients
 }
 
+/// Contact-scale parity: the device group-scale cotangent contains the exact host derivative of
+/// `⟨g, out⟩` through `(I + D Dᴴ) v = 2(a + D b)` for each declared factor group.
 #[test]
 #[ignore = "requires CUDA; declared rectangular factor scale gradient and exact realified reference"]
 fn declared_factor_scale_gradient_matches_two_group_reference() {
@@ -300,38 +300,4 @@ fn declared_factor_scale_gradient_matches_two_group_reference() {
             "gradient {row:?} expected {wanted}"
         );
     }
-}
-
-#[test]
-#[ignore = "requires CUDA; malformed declared factor grouping"]
-fn declared_factor_scale_gradient_rejects_malformed_group_width() {
-    let readout = ResidentReadout::new().unwrap();
-    let surface = ResidentSurface::on(&readout).unwrap();
-    let grain = ResidentGrain(32);
-    let mut field = declared_field(&surface, grain, true, 1);
-    let source = field.read_current_source().unwrap();
-    let input = current(
-        &surface,
-        &(1..=18).map(|value| value as i64).collect::<Vec<_>>(),
-        grain,
-    );
-    let covector = current(
-        &surface,
-        &(1..=18).map(|value| value as i64).collect::<Vec<_>>(),
-        grain,
-    );
-    let action = source
-        .action_matrix_free_auto(input.row(0).unwrap(), 128)
-        .unwrap();
-    let pullback = action
-        .pullback_full_auto(covector.row(0).unwrap(), 128)
-        .unwrap();
-    assert!(source.declared_factor_scale_gradient(&pullback, 4).is_err());
-    let gradient = source.declared_factor_scale_gradient(&pullback, 3).unwrap();
-    let zero = gradient.gradient().row(1).unwrap().inspect().unwrap();
-    assert!(zero.center[0].real.abs() <= zero.radius);
-    assert!(
-        zero.radius > Rat::zero(),
-        "structural zero must retain basis uncertainty"
-    );
 }

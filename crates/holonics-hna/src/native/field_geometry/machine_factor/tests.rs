@@ -116,6 +116,8 @@ fn native_gram(factor: &MachineFactor) -> ExactRatMatrix {
     ExactRatMatrix::new(entries).expect("native Gram")
 }
 
+/// Enclosure law: each native factor row contains its exact algebraic root, and the Gram
+/// residual against the exact contact form lies inside the declared Gram error bound.
 #[test]
 fn full_rank_square_root_rows_retain_algebraic_intervals_and_gram_bound() {
     let factor = factor(response([1, 1, 1]), 2);
@@ -156,6 +158,7 @@ fn full_rank_square_root_rows_retain_algebraic_intervals_and_gram_bound() {
     assert_ne!(factor.factor_error().words, factor.gram_error().words);
 }
 
+/// Enclosure law below the grid: a root smaller than the native unit stays inside a nonzero radius.
 #[test]
 fn tiny_positive_material_keeps_its_root_below_the_native_grid() {
     let tiny = Rat::new(BigInt::one(), BigInt::from(BigUint::one() << 240usize));
@@ -167,6 +170,7 @@ fn tiny_positive_material_keeps_its_root_below_the_native_grid() {
     assert!(factor.native_rows()[0].iter().any(|entry| entry.radius > 0));
 }
 
+/// Rank law: a rank-one response keeps its structural rows zero and reconstructs exactly.
 #[test]
 fn singular_response_keeps_three_structural_rows() {
     let factor = factor(response([0, 1, 0]), 1);
@@ -178,6 +182,7 @@ fn singular_response_keeps_three_structural_rows() {
     assert_eq!(factor.response(), factor.response_reconstruction());
 }
 
+/// Rank law: a zero response factors as zero rows with a zero contact form and no error.
 #[test]
 fn rank_zero_response_returns_zero_rows_and_zero_form() {
     let factor = factor(response([0, 0, 0]), 7);
