@@ -4,7 +4,7 @@
 use super::*;
 use crate::native_ecology::constitutive_fibre::resident::{GeneratorMaterial, PredictiveMaterial, ResidentNeighborhoodAlternative};
 use crate::native_ecology::constitutive_fibre::{
-    ConditionContactReading, ConstitutiveFibreReturn, PreparedConditionContact,
+    AffineContactReading, ConstitutiveFibreReturn, PreparedConditionContact,
 };
 
 /// Exclusive access fixes the contemporary condition/material cut while this dependent law
@@ -29,7 +29,7 @@ pub struct CoupledConstitutiveAlternative<'p, 'j, 'c> {
     // Full locally formed members retain their predictive component in-place.
     predictive_updates: BTreeMap<usize, PredictiveMaterial<'c>>,
     last_observation: Option<NormalCoupledObservation<'c>>,
-    received_condition: Option<crate::native_ecology::constitutive_fibre::ResidentConditionStanding<'c>>,
+    received_condition: Option<crate::native_ecology::constitutive_fibre::ResidentConditionCurrent<'c>>,
     path: Vec<(
         u64,
         usize,
@@ -238,7 +238,7 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
     pub fn condition_current(&self)->ResidentConstitutiveCurrent<'_, 'c>{
         self.received_condition.as_ref().map_or_else(||self.consequence.condition.successor(),|v|v.current())
     }
-    pub fn condition_standing(&self)->crate::native_ecology::constitutive_fibre::ResidentConditionStanding<'c>{
+    pub fn condition_standing(&self)->crate::native_ecology::constitutive_fibre::ResidentConditionCurrent<'c>{
         self.received_condition.clone().unwrap_or_else(||self.consequence.condition.standing())
     }
     pub(in super::super) fn receive_condition(&mut self,incoming:ResidentConstitutiveCurrent<'_, 'c>,inputs:u64)
@@ -466,7 +466,7 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
         let map = Rc::new(relation.read_source_contact(law, source)?);
         self.apply_map(map, passage)
     }
-    pub fn inspect_condition(&self) -> Result<ConditionContactReading, ConstitutiveFibreError> {
+    pub fn inspect_condition(&self) -> Result<AffineContactReading, ConstitutiveFibreError> {
         self.condition().inspect()
     }
     pub fn inspect_formation(&self) -> Result<ConstitutiveFibreReturn, ConstitutiveFibreError> {

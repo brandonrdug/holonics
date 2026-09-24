@@ -30,7 +30,7 @@ mod law_rest;
 mod resident;
 pub use law_rest::ConstitutiveFibreRest;
 pub use resident::{
-    AffineContactReading, ConditionContactMetric, ConditionContactReading, ConditionContactStatus,
+    AffineContactReading, ConditionContactMetric, ConditionContactStatus,
     ConditionCoverage, ConditionCurrentRest, ConditionImageReading, ConditionPreimageReading,
     ConditionPreimageRest, ConstitutiveAffineFibre, ConstitutiveDifferentialReading,
     ConstitutiveImageReading, ConstitutiveRelation, ParticularDirections, same_affine_fibre,
@@ -39,7 +39,7 @@ pub use resident::{
     GeneratorNeighborhoodStep, NeighborhoodEvidence, NeighborhoodEvidenceRest,
     NormalWaveRelationRest, PreparedConditionContact, PreparedFieldReaction, ResidentAffineContact,
     ResidentBilinearFeatures, ResidentConditionContact, ResidentConditionCurrent,
-    ResidentConditionImage, ResidentConditionPreimage, ResidentConditionStanding,
+    ResidentConditionImage, ResidentConditionPreimage,
     ResidentConstitutiveCurrent, ResidentConstitutiveImage, ResidentConstitutiveRefinement,
     ResidentConstitutiveReturn, ResidentConstitutiveSection, ResidentContactReaction,
     ResidentContextualSection,

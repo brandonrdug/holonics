@@ -581,9 +581,9 @@ pub use image::{
 mod condition_contact;
 mod context_section;
 pub use condition_contact::{
-    AffineContactReading, ConditionContactMetric, ConditionContactReading, ConditionContactStatus,
+    AffineContactReading, ConditionContactMetric, ConditionContactStatus,
     ConditionCurrentRest, PreparedConditionContact, ResidentAffineContact,
-    ResidentConditionContact, ResidentConditionCurrent, ResidentConditionStanding,
+    ResidentConditionContact, ResidentConditionCurrent,
     ResidentContactReaction,
 };
 pub use context_section::{ContextualSectionOrigin, ResidentContextualSection};

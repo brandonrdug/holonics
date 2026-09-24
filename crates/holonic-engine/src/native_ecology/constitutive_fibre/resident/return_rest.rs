@@ -62,12 +62,6 @@ impl ConstitutiveReturnRest {
         }
         Ok(())
     }
-    pub(crate) fn field_source(&self) -> Option<usize> {
-        self.source_occurrence
-    }
-    pub(crate) fn source_chart(&self) -> ConstitutiveSourceChart {
-        self.source_chart
-    }
     pub(crate) fn source_width(&self) -> usize {
         self.source_width
     }
@@ -98,19 +92,6 @@ impl ConstitutiveReturnRest {
             {
                 return Err(ConstitutiveFibreError::Shape);
             }
-        }
-        Ok(())
-    }
-    /// Cold disposition only; the complete stored return remains this object's evidence.
-    pub(crate) fn validate_zero_real_sum(&self)->Result<(),ConstitutiveFibreError>{
-        self.validate()?;
-        if self.target_width%2!=0{return Err(ConstitutiveFibreError::Shape);}
-        if self.outside_domain(){return Ok(());}
-        let w=self.source_width+self.target_width;
-        // A validated u32 extent of signed-i64 coordinates fits a signed-i128 sum.
-        let sum=|values:&[i64]|values.iter().step_by(2).map(|v|*v as i128).sum::<i128>();
-        if sum(&self.words[self.source_width..w])!=0||self.words[w+4..].chunks_exact(self.target_width).any(|row|sum(row)!=0){
-            return Err(ConstitutiveFibreError::Rest("source difference family has a nonzero real sum".into()));
         }
         Ok(())
     }

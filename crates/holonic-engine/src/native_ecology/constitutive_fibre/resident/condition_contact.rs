@@ -10,7 +10,7 @@ pub use affine::ResidentAffineContact;
 pub(crate) use affine::ResidentWaveSourceGeometry;
 use affine::affine_contact_section;
 pub(crate) use reaction::block;
-pub use reaction::{AffineContactReading, ConditionContactReading, ResidentContactReaction};
+pub use reaction::{AffineContactReading, ResidentContactReaction};
 
 /// Equal unit admittance for each real/imaginary coordinate in the bound local chart.
 /// Orthogonal chart changes preserve this law. General recharting owes the transported metric.
@@ -27,17 +27,13 @@ pub enum ConditionContactStatus {
 
 /// One move owner for the actual retained condition current: the successor block of its latest
 /// contact reaction. Immutable passage receipts may share its reaction section; they cannot move
-/// or develop this owner. A clone is the retained standing a producing passage reads (formerly
-/// the separate `ResidentConditionStanding`, whose fields and reads were this type's).
+/// or develop this owner. A clone is the retained standing a producing passage reads.
 #[derive(Clone)]
 pub struct ResidentConditionCurrent<'chart> {
     reaction: ResidentContactReaction<'chart>,
     source_chart: ConstitutiveSourceChart,
     contacts: u64,
 }
-
-/// Compatibility name: the standing a producing passage reads is a clone of the current.
-pub type ResidentConditionStanding<'chart> = ResidentConditionCurrent<'chart>;
 
 /// Complete local contact return, including the original compatible-condition evidence.
 /// It does not recursively retain every previous current or assert the successor is the cause.
@@ -52,7 +48,7 @@ pub struct PreparedConditionContact<'chart> {
     returned: ResidentConditionContact<'chart>,
 }
 impl<'chart> PreparedConditionContact<'chart> {
-    pub fn standing(&self) -> ResidentConditionStanding<'chart> {
+    pub fn standing(&self) -> ResidentConditionCurrent<'chart> {
         ResidentConditionCurrent {
             reaction: self.returned.reaction.clone(),
             source_chart: self.returned.family.source_chart(),
@@ -65,7 +61,7 @@ impl<'chart> PreparedConditionContact<'chart> {
     pub fn family(&self) -> &ResidentConditionPreimage<'chart> {
         self.returned.family()
     }
-    pub fn inspect(&self) -> Result<ConditionContactReading, ConstitutiveFibreError> {
+    pub fn inspect(&self) -> Result<AffineContactReading, ConstitutiveFibreError> {
         self.returned.inspect()
     }
 }
@@ -146,7 +142,7 @@ impl<'chart> ResidentConditionCurrent<'chart> {
     }
 
     /// The retained standing a producing passage reads: a clone sharing the reaction section.
-    pub fn standing(&self) -> ResidentConditionStanding<'chart> {
+    pub fn standing(&self) -> ResidentConditionCurrent<'chart> {
         self.clone()
     }
     /// The actual current: the successor block of the latest reaction.
@@ -169,7 +165,7 @@ impl<'chart> ResidentConditionCurrent<'chart> {
     pub fn receive_current(
         &mut self,
         incoming: ResidentConstitutiveCurrent<'_, 'chart>,
-    ) -> Result<ResidentConditionStanding<'chart>, ConstitutiveFibreError> {
+    ) -> Result<ResidentConditionCurrent<'chart>, ConstitutiveFibreError> {
         let next = self.with_current(incoming)?;
         Ok(std::mem::replace(self, next))
     }
@@ -305,7 +301,7 @@ impl<'chart> ResidentConditionContact<'chart> {
     pub fn difference(&self) -> ResidentConstitutiveCurrent<'_, 'chart> {
         self.reaction.block(block::DIFFERENCE, false)
     }
-    pub fn inspect(&self) -> Result<ConditionContactReading, ConstitutiveFibreError> {
+    pub fn inspect(&self) -> Result<AffineContactReading, ConstitutiveFibreError> {
         self.reaction
             .inspect(self.family.relation_cut(), Some(self.contact))
     }

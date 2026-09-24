@@ -19,7 +19,7 @@
 //!
 //! [established-bounded; source-inspected] Before phase 11 this section had three wrappers with
 //! their own block views and decoders (`ResidentConditionContact`, `ResidentAffineContact`, the
-//! wave source contact) and two readings (`ConditionContactReading`, `AffineContactReading`). They
+//! wave source contact) and two readings (`AffineContactReading`, `AffineContactReading`). They
 //! are now this one reaction and the one [`AffineContactReading`]; the condition current is the
 //! successor block of its latest reaction.
 use super::*;
@@ -138,9 +138,6 @@ pub struct AffineContactReading {
     pub returned_normal: Vec<Rat>,
     pub difference: Vec<Rat>,
 }
-
-/// Compatibility name: the condition-current face of the one contact reading.
-pub type ConditionContactReading = AffineContactReading;
 
 impl AffineContactReading {
     /// `‖h‖² + ‖n_in‖²`, the power the contact receives (`Holon/AffineContact.lean::contact_lossless`).

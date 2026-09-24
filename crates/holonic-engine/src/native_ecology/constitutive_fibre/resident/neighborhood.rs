@@ -92,7 +92,7 @@ pub struct GeneratorNeighborhoodStep<'input, 'c> {
     pub predecessor_epoch: u64,
     pub successor_epoch: u64,
     pub prediction: ResidentConstitutiveReturn<'c>,
-    pub prior_condition: ResidentConditionStanding<'c>,
+    pub prior_condition: ResidentConditionCurrent<'c>,
     pub contact: Option<ResidentConditionContact<'c>>,
     pub formation: Option<ResidentConstitutiveReturn<'c>>,
     source: ResidentConstitutiveCurrent<'input, 'c>,
@@ -111,7 +111,7 @@ pub(crate) struct PreparedNeighborhoodConsequence<'c> {
     predecessor_epoch: u64,
     successor_epoch: u64,
     prediction: ResidentConstitutiveReturn<'c>,
-    prior_condition: ResidentConditionStanding<'c>,
+    prior_condition: ResidentConditionCurrent<'c>,
     condition: Option<PreparedConditionContact<'c>>,
     formation: Option<PreparedConstitutiveFormation<'c>>,
     predictive: Option<PredictiveMaterial<'c>>,
@@ -136,7 +136,7 @@ impl<'c> ResidentNeighborhoodAlternative<'c> {
     /// witness or an independently sampled alternative.
     pub(crate) fn prepare_following(
         material:&mut GeneratorMaterial<'c>,
-        prior:&ResidentConditionStanding<'c>,
+        prior:&ResidentConditionCurrent<'c>,
         source:ResidentConstitutiveCurrent<'_, 'c>,
         observed:ResidentConstitutiveCurrent<'_, 'c>,
         producing_condition:ResidentConstitutiveCurrent<'_, 'c>,
@@ -225,7 +225,7 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
     /// An actual supplied condition in this neighborhood's declared chart.
     /// Pending producers retain their former condition; only later reads use this input.
     pub fn receive_condition(&mut self,incoming:ResidentConstitutiveCurrent<'_, 'c>)
-        ->Result<ResidentConditionStanding<'c>,ConstitutiveFibreError>{
+        ->Result<ResidentConditionCurrent<'c>,ConstitutiveFibreError>{
         self.require_usable()?;
         let next=self.epoch.checked_add(1).ok_or(ConstitutiveFibreError::Shape)?;
         let prior=self.condition.receive_current(incoming)?;self.epoch=next;Ok(prior)

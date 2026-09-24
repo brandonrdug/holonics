@@ -10,7 +10,7 @@ fn rats(v: &[i64], d: i64) -> Vec<Rat> {
 fn norm(v: &[Rat]) -> Rat {
     v.iter().map(|x| x * x).sum()
 }
-fn check_balance(r: &ConditionContactReading) {
+fn check_balance(r: &AffineContactReading) {
     assert_eq!(
         norm(&r.predecessor) + norm(&r.incoming_normal),
         norm(&r.successor) + norm(&r.returned_normal)
