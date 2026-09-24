@@ -1,6 +1,6 @@
 # M1 portable section ABI owner move
 
-**Campaign:** #69, Rust cut. **Base:** `40f71c41` (portable leaf plus workspace caller receipt).
+**Campaign:** #69, Rust cut. **Base:** `d21d4564` (portable leaf and verified reflective generator).
 
 Moved `soma-abi::section_layout_cuda` into `holonics_portable::section_layout_cuda`. The module's
 production source and symbols are unchanged: `Entry`, entry-name constants, parameter-word counts,
