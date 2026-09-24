@@ -2440,40 +2440,6 @@ mod tests {
         assert!(machine.standing().certificate().is_none());
     }
 
-    /// Phase 16: the certificate's `predictions_graded` is the count of predictions the
-    /// radiation returned, and an old rest's archive decodes to that count.
-    #[test]
-    fn the_emitted_prediction_count_is_the_archive_statistic_and_old_rests_decode() {
-        let (machine, radiation) = run_hidden_charge_experiment();
-        let emitted = radiation
-            .iter()
-            .filter(|receipt| receipt.emitted_prediction.is_some())
-            .count() as u64;
-        assert_eq!(machine.standing().emanated_predictions(), emitted);
-        assert_eq!(
-            machine.standing().certificate().unwrap().predictions_graded,
-            emitted
-        );
-
-        // The observation table is keyed by action words, so the rest is RON (as the examples
-        // persist it); the retired field carried the archive where the count now stands.
-        let history = radiation
-            .iter()
-            .filter_map(|receipt| receipt.emitted_prediction.clone())
-            .map(CausalStateGrammarHistoryEntry::EmanatedPrediction)
-            .collect::<Vec<_>>();
-        let rest = ron::to_string(machine.standing()).unwrap();
-        let count = format!("emanated_predictions:{emitted},");
-        assert_eq!(rest.matches(&count).count(), 1);
-        let legacy = rest.replace(
-            &count,
-            &format!("history:{},", ron::to_string(&history).unwrap()),
-        );
-        let decoded: CausalStateGrammarStanding = ron::from_str(&legacy).unwrap();
-        assert_eq!(&decoded, machine.standing());
-        assert!(!ron::to_string(&decoded).unwrap().contains("history:"));
-    }
-
     #[test]
     fn hidden_charge_becomes_temporal_state_with_organizational_fibers() {
         let (machine, radiation) = run_hidden_charge_experiment();

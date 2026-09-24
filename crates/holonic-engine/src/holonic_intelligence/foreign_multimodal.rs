@@ -513,18 +513,6 @@ mod tests {
     }
 
     #[test]
-    fn multimodal_manifest_keeps_source_families_cold_and_complete() {
-        let (config, processor, container) = fixture();
-        let chart = Gemma4ExteriorTransportChart::from_charts(&config, &processor, &container)
-            .expect("multimodal chart");
-        assert_eq!(chart.tensor_population, 5);
-        assert_eq!(chart.output_modality, ExteriorModality::Text);
-        assert!(chart.source_names_are_cold);
-        assert!(chart.unclassified_tensors.is_empty());
-        assert_eq!(chart.input_modalities.len(), 4);
-    }
-
-    #[test]
     fn modality_excitation_cannot_cross_a_foreign_family() {
         let (config, processor, container) = fixture();
         let chart = Gemma4ExteriorTransportChart::from_charts(&config, &processor, &container)

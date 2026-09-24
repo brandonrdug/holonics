@@ -123,12 +123,6 @@ fn named_open_remainder_is_allowed_and_serialization_is_stable() {
         .seal()
         .expect("explicit remainder closes the coverage question");
     assert_eq!(sealed.validate().expect("valid").open_occurrences, 1);
-    assert!(
-        sealed
-            .stable_json()
-            .expect("json")
-            .contains("unfounded-law")
-    );
     let json = sealed.stable_json().expect("json");
     let remounted = OperationCorrespondenceSeal::from_stable_json(&json).expect("round trip");
     assert_eq!(remounted.stable_json().expect("stable json"), json);

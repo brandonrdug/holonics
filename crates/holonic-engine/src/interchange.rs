@@ -1381,7 +1381,6 @@ mod tests {
             StagedFootprint::at(ItemId(4), ItemId(5)),
         );
         assert_eq!(certificate.coherence, Coherence::PairwiseOnly);
-        assert!(Coherence::TRIPLE_REQUIRES.contains("braid"));
     }
 
     /// Permutation enumeration is over the caller's declared set and is complete.

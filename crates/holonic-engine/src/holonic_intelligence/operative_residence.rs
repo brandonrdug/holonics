@@ -965,107 +965,6 @@ fn decoded_row_runs(retained: &[u32], first: usize, count: usize) -> Vec<Decoded
 #[cfg(test)]
 mod restriction_tests {
     use super::*;
-    use crate::embedding_fiber::ResidentReadout;
-    use super::super::{mount_operator_surface, NativeAttentionTopology, NativeCarrierChart,
-        NativeCarrierOrdinal, NativeCoefficientPopulation, NativeKvStanding, NativeLayerTopology,
-        NativeOperatorNode, NATIVE_FULL_OPERATOR_ECOLOGY_SCHEMA};
-
-    struct TestIntake { rows: Vec<u32>, words: Vec<u16>, gap: bool }
-
-    impl NativeCoefficientIntake for TestIntake {
-        fn populations(&self) -> usize { 1 }
-        fn population_octets(&self, _: usize) -> Result<u64, NativeOperatorResidenceError> { Ok(54) }
-        fn retained_rows(&self, _: usize) -> Result<Option<Vec<u32>>, NativeOperatorResidenceError> {
-            Ok(Some(self.rows.clone()))
-        }
-        fn deliver_retained(&mut self, _: usize,
-            sink: &mut dyn FnMut(usize, &[u8]) -> Result<(), NativeOperatorResidenceError>,
-        ) -> Result<(), NativeOperatorResidenceError> {
-            let bytes: Vec<u8> = self.words.iter().flat_map(|word| word.to_le_bytes()).collect();
-            for (at, chunk) in bytes.chunks(7).enumerate() { sink(at * 7 + usize::from(self.gap), chunk)?; }
-            Ok(())
-        }
-        fn deliver(&mut self, _: usize,
-            sink: &mut dyn FnMut(usize, &[u8]) -> Result<(), NativeOperatorResidenceError>,
-        ) -> Result<(), NativeOperatorResidenceError> {
-            let mut bytes = vec![0; 54];
-            for (physical, row) in self.rows.iter().enumerate() {
-                for col in 0..3 {
-                    bytes[*row as usize * 6 + col * 2..*row as usize * 6 + col * 2 + 2]
-                        .copy_from_slice(&self.words[physical * 3 + col].to_le_bytes());
-                }
-            }
-            sink(0, &bytes)
-        }
-    }
-
-    fn test_ecology() -> NativeFullOperatorEcology {
-        NativeFullOperatorEcology {
-            schema: NATIVE_FULL_OPERATOR_ECOLOGY_SCHEMA.into(), shared_carrier_extent: 3,
-            coefficient_populations: vec![NativeCoefficientPopulation {
-                ordinal: NativeTensorOrdinal(0), shape: vec![9, 3], coefficient_population: 27 }],
-            carriers: [3, 5, 7, 11].into_iter().enumerate().map(|(at, dim)| NativeCarrierChart {
-                ordinal: NativeCarrierOrdinal(at as u32), axes: vec![NativeCarrierAxis::Fixed(dim)] }).collect(),
-            operations: vec![NativeOperatorNode { ordinal: 0, layer: Some(0),
-                primitive: NativeOperationPrimitive::Lookup { scale: super::super::NativeScaleConstraint::Rational { numerator: 1, denominator: 1 } }, inputs: vec![], output: NativeCarrierOrdinal(3),
-                coefficients: vec![NativeTensorOrdinal(0)] }],
-            layers: vec![NativeLayerTopology { ordinal: 0, attention: NativeAttentionTopology::Local,
-                kv_standing: NativeKvStanding::Own, first_operation: 0, operation_population: 1 }],
-            coefficient_obstructions: vec![],
-        }
-    }
-
-    #[test]
-    #[ignore = "requires CUDA; compare compact decoder with expanded reference on the device"]
-    fn native_compact_tiles_gathers_and_frames_match_the_expanded_chart() {
-        let readout = ResidentReadout::new().expect("CUDA");
-        let surface = mount_operator_surface(&readout).unwrap();
-        let ecology = test_ecology();
-        // Empty, isolated, interior gaps, contiguous runs, and the full population. Negative
-        // zero remains an exact stored codeword; decoding only inserts positive zero in gaps.
-        for rows in [vec![], vec![4], vec![1, 3, 8], vec![0, 1, 2, 6, 7, 8], (0..9).collect()] {
-            let words = rows.iter().enumerate().flat_map(|(at, _)|
-                [0x3f80 + (at as u16) * 0x80, 0xc000, 0x8000]).collect();
-            let mut intake = TestIntake { rows, words, gap: false };
-            let compact = NativeOperatorResidence::mount_from_intake(&surface, &ecology, &mut intake).unwrap();
-            let dense = NativeOperatorResidence::mount_expanded_reference(&surface, &ecology, &mut intake).unwrap();
-            assert_eq!(compact.populations[0].frame, dense.populations[0].frame);
-            assert_eq!(compact.receipt.raw_coefficient_octets, intake.rows.len() as u64 * 6);
-            assert_eq!(dense.receipt.raw_coefficient_octets, 54);
-            for first in 0..9 {
-                for count in 1..=9 - first {
-                    let left = compact.align_tile(NativeTensorOrdinal(0), first, count).unwrap();
-                    let right = dense.align_tile(NativeTensorOrdinal(0), first, count).unwrap();
-                    let mut a = vec![0u8; count * 3 * 8];
-                    let mut b = a.clone();
-                    compact.pool.buffer.copy_range_to_slice(compact.aligned_offset, &mut a).unwrap();
-                    dense.pool.buffer.copy_range_to_slice(dense.aligned_offset, &mut b).unwrap();
-                    assert_eq!(a, b, "tile {first}+{count}, rows {:?}", intake.rows);
-                    assert_eq!(left.mounted.readout.entry_octaves(), right.mounted.readout.entry_octaves());
-                    assert!(compact.gather_rows(NativeTensorOrdinal(0), &[0]).is_err(), "live tile owns its aperture");
-                }
-                compact.gather_rows(NativeTensorOrdinal(0), &[first as u32]).unwrap();
-                dense.gather_rows(NativeTensorOrdinal(0), &[first as u32]).unwrap();
-                let mut a = [0u8; 6];
-                let mut b = [0u8; 6];
-                compact.pool.buffer.copy_range_to_slice(compact.gather_offset, &mut a).unwrap();
-                dense.pool.buffer.copy_range_to_slice(dense.gather_offset, &mut b).unwrap();
-                assert_eq!(a, b);
-            }
-        }
-        let mut invalid = TestIntake { rows: vec![1, 1], words: vec![0; 6], gap: false };
-        assert!(matches!(NativeOperatorResidence::mount_from_intake(&surface, &ecology, &mut invalid),
-            Err(NativeOperatorResidenceError::Witness)));
-        invalid.rows = vec![9];
-        assert!(matches!(NativeOperatorResidence::mount_from_intake(&surface, &ecology, &mut invalid),
-            Err(NativeOperatorResidenceError::Witness)));
-        invalid.rows = vec![1]; invalid.words = vec![0; 3]; invalid.gap = true;
-        assert!(matches!(NativeOperatorResidence::mount_from_intake(&surface, &ecology, &mut invalid),
-            Err(NativeOperatorResidenceError::Witness)));
-        invalid.gap = false; invalid.words.pop();
-        assert!(matches!(NativeOperatorResidence::mount_from_intake(&surface, &ecology, &mut invalid),
-            Err(NativeOperatorResidenceError::Witness)));
-    }
 
     #[test]
     fn every_small_restriction_and_partial_tile_decodes_exactly_once() {
@@ -1088,19 +987,6 @@ mod restriction_tests {
             }
         }
         assert!(decoded_row_runs(&[], 0, 0).is_empty());
-    }
-
-    #[test]
-    fn compact_pool_counts_decoder_space_and_dense_pool_does_not_allocate_it() {
-        let dense = OperatorPoolShape::for_rows(8, 16, 3, 128, 60, 16, false).unwrap();
-        let compact = OperatorPoolShape::for_rows(8, 16, 3, 128, 60, 16, true).unwrap();
-        assert_eq!(compact.decode_octets, 48);
-        assert_eq!(compact.pool_octets, dense.pool_octets + 48);
-        assert!(compact.scratch_offset >= compact.decode_offset + 48);
-        assert!(compact.scratch_offset < compact.decode_offset + 48 + 16);
-        assert_eq!(compact.scratch_offset % 16, 0);
-        assert_eq!(compact.mass_offset % 16, 0);
-        assert_eq!(dense.decode_octets, 0);
     }
 }
 

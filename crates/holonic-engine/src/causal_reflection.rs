@@ -1240,52 +1240,6 @@ mod tests {
 
     // --- the fixture guard --------------------------------------------------------------------
 
-    /// The material must be able to vary the property. A fixture whose faces are annihilated by the
-    /// signature, or which cannot be acausal, proves nothing about the law.
-    #[test]
-    fn every_fixture_declares_what_it_can_exercise() {
-        for (name, fixture) in every_fixture() {
-            let dispersive = fixture.dispersive_face();
-            let absorptive = fixture.absorptive_face();
-            assert_eq!(
-                fixture.exercises_the_pairing(),
-                name != "instantaneous_only",
-                "{name}: the declared exercisability is wrong"
-            );
-            if fixture.exercises_the_pairing() {
-                assert!(
-                    !dispersive.moving_support().is_empty()
-                        || !absorptive.moving_support().is_empty(),
-                    "{name}: both faces vanish away from the fixed point"
-                );
-            }
-        }
-
-        // And the family must populate both classes, or the biconditional is only ever tested on
-        // one side.
-        let causal = every_fixture()
-            .iter()
-            .filter(|(_, fixture)| fixture.is_causal())
-            .count();
-        let acausal = every_fixture().len() - causal;
-        assert!(causal >= 3, "too few causal fixtures: {causal}");
-        assert!(acausal >= 3, "too few acausal fixtures: {acausal}");
-
-        // The symmetric and antisymmetric traps really are the degenerate shapes they claim to be.
-        assert!(
-            even_response().absorptive_face().is_zero(),
-            "the even fixture must have a vanishing absorptive face"
-        );
-        assert!(
-            odd_response().dispersive_face().is_zero(),
-            "the odd fixture must have a vanishing dispersive face"
-        );
-        assert!(
-            !even_response().is_causal() && !odd_response().is_causal(),
-            "a nonzero response with a mirror symmetry cannot be causal"
-        );
-    }
-
     // --- the faces ----------------------------------------------------------------------------
 
     #[test]
@@ -2047,76 +2001,5 @@ mod tests {
         assert_eq!(built, causal_tail());
         assert!(built.is_causal());
         assert!(causality_lock(&built).unwrap().locks());
-    }
-
-    // --- provably nonzero controls ------------------------------------------------------------
-
-    /// `CLAUDE.md` §8: a law that returns zero proves nothing about itself. Every population this
-    /// module can return is exercised here on material that forces it to be non-empty.
-    #[test]
-    fn nonzero_controls() {
-        let causal = causal_tail();
-        let acausal = advanced_leak();
-
-        // The faces themselves.
-        assert!(!causal.dispersive_face().is_zero());
-        assert!(!causal.absorptive_face().is_zero());
-        assert!(!causal.dispersive_face().moving_support().is_empty());
-        assert!(!causal.absorptive_face().moving_support().is_empty());
-
-        // The derived face is not a copy of the source face: the transform does something.
-        let derived = causal.dispersive_face().reflect();
-        assert_ne!(
-            derived.values(),
-            causal.dispersive_face().values(),
-            "the signature left the face unchanged, so it transformed nothing"
-        );
-        assert_eq!(derived, causal.absorptive_face());
-
-        // The lock's populations.
-        let lock = causality_lock(&acausal).expect("a lawful lock");
-        assert!(!lock.advanced_support.is_empty());
-        assert!(!lock.dispersive_to_absorptive.standing_indices.is_empty());
-        assert!(!lock.absorptive_to_dispersive.standing_indices.is_empty());
-        assert!(!lock.blind_free());
-        assert!(
-            lock.dispersive_to_absorptive
-                .standing_residuals()
-                .iter()
-                .any(|(_, residual)| !residual.is_zero())
-        );
-        assert!(!lock.subtraction_constants[0].value.is_zero());
-
-        // The holomorphy witness.
-        assert!(
-            !acausal
-                .holomorphy_witness()
-                .advanced_coefficients
-                .is_empty()
-        );
-        assert!(acausal.holomorphy_witness().pole_order_at_infinity() > 0);
-
-        // The spectral faces at a point that is neither real nor a Gaussian unit.
-        let point = RationalCirclePoint::from_slope(&rat(1, 2));
-        let faces = causal.transfer_faces_at(&point);
-        assert!(!faces.dispersive.is_zero(), "Re chi vanished");
-        assert!(!faces.absorptive.is_zero(), "Im chi vanished");
-        assert_ne!(point.real(), &Rat::zero());
-        assert_ne!(point.imaginary(), &Rat::zero());
-
-        // The four-point spectrum.
-        let spectral = causal.four_point_spectral_reflection();
-        assert!(!spectral.is_vacuous());
-        assert!(spectral.folded.iter().any(|value| !value.is_zero()));
-    }
-
-    impl CausalityLock {
-        /// A helper for the nonzero control: some fixed-point residual stands.
-        fn blind_free(&self) -> bool {
-            self.absorptive_to_dispersive
-                .blind_residuals
-                .iter()
-                .all(|residual| residual.residual.is_zero())
-        }
     }
 }

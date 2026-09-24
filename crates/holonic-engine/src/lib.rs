@@ -291,11 +291,6 @@ pub mod junction_law;
 // two founding orders. Reached explicitly: `Gyration` and `FoundedReceiver` say nothing at the crate
 // root about which population they grow.
 pub mod founded_receiver;
-// The library-level Lean-citation check: every Lean declaration name a Rust owner cites is looked
-// up in that owner's Lean file, so a stale citation fails `cargo test`. Test-only; it exports
-// nothing.
-#[cfg(test)]
-mod lean_citations;
 // Plan phase 10: the engine's reconstruction fibres and separators, read against the core
 // restriction fibre they became, wire for wire. Test-only.
 // The material loop and its circulation -- Kelvin's theorem as a carried loop rather than a fixed

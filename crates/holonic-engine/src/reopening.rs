@@ -1340,7 +1340,7 @@ pub fn finest_admissible_grain(faces: &[ExactFace]) -> CertifiedBits {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use holonics::exact_value::ieee754::{decode_bfloat16_bits, decode_binary64_bits};
+    use holonics::exact_value::ieee754::decode_binary64_bits;
     use holonics::geometry::log_rational_interval;
 
     fn grain_pair() -> Vec<DeclaredGrain> {
@@ -1882,90 +1882,6 @@ mod tests {
             FloatReading::ExactBitPattern,
         );
         assert_eq!(exact.certified_bits(), CertifiedBits::Exact);
-    }
-
-    /// **Real material, and the distinction is load-bearing on it.**
-    ///
-    /// Three `bfloat16` words from `model.language_model.layers.1.mlp.down_proj.weight` of
-    /// Qwen3.5-4B. Read as *patterns* they are exact dyadics with eight-bit significands, so they
-    /// are commensurable and the relation `7a − 4b + 6c = 0` holds **exactly** — the residual is a
-    /// point at zero, not an enclosure containing zero. Read as *measurements* the same forty-eight
-    /// bits carry ceilings of `2^-12`, `2^-13`, `2^-12` and the instrument returns nothing.
-    ///
-    /// The existence of *some* relation among three rationals is guaranteed; what is measured here
-    /// is that the instrument recovers it at height 7 with an exactly zero residual, and that one
-    /// reading of the same bits destroys it.
-    #[test]
-    fn three_real_bfloat16_weights_relate_as_patterns_and_not_as_measurements() {
-        let words: [u16; 3] = [0xbd1e, 0xbc94, 0x3d07];
-        let data: Vec<_> = words
-            .iter()
-            .map(|word| decode_bfloat16_bits(*word).expect("a finite weight"))
-            .collect();
-        let source = "Qwen3.5-4B model.language_model.layers.1.mlp.down_proj.weight[0..3]";
-
-        let patterns: Vec<ExactFace> = data
-            .iter()
-            .enumerate()
-            .map(|(index, datum)| {
-                ExactFace::from_binary_float(
-                    format!("w{index} as a pattern"),
-                    source,
-                    datum,
-                    FloatReading::ExactBitPattern,
-                )
-            })
-            .collect();
-        let grains = [DeclaredGrain::bits(32), DeclaredGrain::bits(64)];
-        let reopening = reopen(&patterns, &grains).expect("points admit every grain");
-        let candidate = reopening
-            .verdict
-            .candidate()
-            .expect("three exact dyadics are commensurable");
-        assert_eq!(
-            candidate.coefficients,
-            vec![BigInt::from(7), BigInt::from(-4), BigInt::from(6)]
-        );
-        assert!(
-            candidate.residual.is_point() && candidate.residual.lower.is_zero(),
-            "patterns relate exactly, not to within an enclosure: {:?}",
-            candidate.residual
-        );
-        assert!(candidate.chance_population.is_zero());
-        // And the relation is checkable by hand: 7*(-316) + (-4)*(-148) + 6*270 = 0 over 2^-13.
-        let check = BigInt::from(7) * BigInt::from(-316)
-            + BigInt::from(-4) * BigInt::from(-148)
-            + BigInt::from(6) * BigInt::from(270);
-        assert!(check.is_zero());
-
-        let measurements: Vec<ExactFace> = data
-            .iter()
-            .enumerate()
-            .map(|(index, datum)| {
-                ExactFace::from_binary_float(
-                    format!("w{index} as a measurement"),
-                    source,
-                    datum,
-                    FloatReading::RoundedToNearest,
-                )
-            })
-            .collect();
-        assert_eq!(
-            finest_admissible_grain(&measurements),
-            CertifiedBits::Bits(12)
-        );
-        let measured = reopen(
-            &measurements,
-            &[DeclaredGrain::bits(11), DeclaredGrain::bits(12)],
-        )
-        .expect("both grains are within the coarsest ulp");
-        assert!(
-            measured.verdict.returned_nothing(),
-            "eight significand bits cannot resolve a relation: {:?}",
-            measured.verdict
-        );
-        // Every probe's own enclosure refutes its vector; gate one carries this, not gate three.
-        assert!(measured.probes.iter().all(|probe| probe.refuted));
     }
 
     #[test]

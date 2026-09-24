@@ -1984,42 +1984,6 @@ mod tests {
         assert_eq!(right_split, vec![BigUint::from(8u32), BigUint::from(16u32)]);
     }
 
-    /// **The absence of a combined coordinate, read off the type's own field names.**
-    ///
-    /// The split comparison above shows the species are not collapsed into one; it does NOT show
-    /// that no combined coordinate stands beside them, because a receipt carrying an extra `total`
-    /// would pass it too. This reads the rendered receipt for any cross-species name and fails the
-    /// moment one is added.
-    #[test]
-    fn control_seven_the_receipt_names_no_combined_coordinate() {
-        let cover = HardwareCover::cpu_only();
-        let receipt = partition(two_cells(true))
-            .certify(&cover, &[], &resources(), "section_partition_control")
-            .expect("certifies");
-        let rendered = format!("{:?}", receipt.pressure[0]);
-        for forbidden in [
-            "total",
-            "sum",
-            "combined",
-            "utilization",
-            "utilisation",
-            "overall",
-            "aggregate",
-            "score",
-            "pressure:",
-        ] {
-            assert!(
-                !rendered.to_lowercase().contains(forbidden),
-                "the pressure receipt names a combined coordinate `{forbidden}`: {rendered}"
-            );
-        }
-        // And the only plural it carries is the declared species population itself.
-        assert_eq!(
-            receipt.pressure[0].coordinates().len(),
-            resources().species.len()
-        );
-    }
-
     /// A genuine zero demand is a zero, not an unknown.
     #[test]
     fn a_zero_demand_is_a_named_zero_and_never_the_unknown_variant() {

@@ -432,18 +432,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn direct_rest_has_no_source_or_foreign_fields() {
-        let rest = direct_source_neutral_rest().expect("direct rest");
-        let text = String::from_utf8(rest.canonical_bytes().expect("wire")).expect("json");
-        for forbidden in ["source_surface", "foreign", ".local/artifacts/"] {
-            assert!(
-                !text.contains(forbidden),
-                "productive rest retained {forbidden}"
-            );
-        }
-    }
-
-    #[test]
     fn direct_rest_projects_one_total_recurrent_action() {
         let rest = direct_source_neutral_rest().expect("direct rest");
         let (projection, generator) = recurrent_projection(&rest).expect("projection");

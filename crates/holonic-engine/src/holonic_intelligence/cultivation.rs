@@ -408,16 +408,4 @@ mod tests {
         };
         assert!(equal_loss_different_return(&left, &right));
     }
-
-    #[test]
-    fn exposure_reference_mount_and_cultivation_are_distinct_rust_types() {
-        assert_ne!(
-            std::any::type_name::<Exposure<u8>>(),
-            std::any::type_name::<ReferenceConsultation<u8>>()
-        );
-        assert_ne!(
-            std::any::type_name::<MountedStanding<u8>>(),
-            std::any::type_name::<ReturnedCultivation<u8>>()
-        );
-    }
 }

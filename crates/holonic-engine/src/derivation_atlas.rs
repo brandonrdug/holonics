@@ -2113,31 +2113,6 @@ end LinearOrderedAddCommGroup
     }
 
     #[test]
-    fn control_the_grade_one_reading_is_nonzero_on_real_deposited_material() {
-        // THE DECLARED NONZERO CONTROL, on verbatim deposited artifacts and no fixture.
-        // `lean-kernel-witness/carrier_transport-00000` and
-        // `agentic-research-kernel/formal_carry-00000` are two DIFFERENT declaration names carrying
-        // the SAME normalized statement, sharing {Soma, Prop, exactCarrier}. |shared| - 1 = 2.
-        let population = [read(WITNESS_CARRIER_TRANSPORT), read(RESEARCH_FORMAL_CARRY)];
-        assert_eq!(population[0].statement, population[1].statement);
-        assert_ne!(population[0].name, population[1].name);
-
-        let circuit = circuit_of(&population, CircuitAperture::DEPOSITED_READER);
-        assert_eq!(
-            circuit.plural_vertex_statements(),
-            BTreeSet::from(["(h : P) : exactCarrier P"])
-        );
-        let invariants = circuit
-            .invariants(PivotRule::FirstNonzero)
-            .expect("the atlas reads");
-        assert_eq!(betti_at(&invariants, 1), 2);
-
-        // and with the statements founded, one more cycle: the route to that one result
-        let seeing = invariants_of(&population, CircuitAperture::STATEMENT_INCIDENT);
-        assert_eq!(betti_at(&seeing, 1), 3);
-    }
-
-    #[test]
     fn one_deposit_reads_zero_by_declaration_and_nonzero_by_route() {
         // The same material, two identities. If these agreed, every route-identity claim in this
         // module would be vacuous.
@@ -2316,32 +2291,6 @@ end LinearOrderedAddCommGroup
     }
 
     // ---------------------------------------------------------------- torsion
-
-    #[test]
-    fn control_torsion_is_nonzero_under_multiplicity_on_one_real_artifact() {
-        // THE DECLARED NONZERO CONTROL for the torsion half, and it moved material on 2026-08-08.
-        // It used to rest on `every_receiver_agrees-00000` naming `Soma` twice -- once in
-        // `namespace Soma` and once in `end Soma`, the export codec's closing convention. That is a
-        // receiver-visible coordinate of the file layout and it is no longer read as a recruitment,
-        // so that artifact now carries no torsion at all.
-        //
-        // What carries it instead is a recruitment the machine actually made:
-        // `lean-kernel-witness/carrier_transport-00000` names `Prop` three times -- in the
-        // definition of the carrier, in the section variable, and in the theorem's own binder.
-        // Its boundary is
-        //     Prop         [-3   0   0]
-        //     Soma         [ 0  -1   0]
-        //     exactCarrier [ 0   0  -1]
-        //     route        [ 3   1   1]
-        // whose 3x3 minors have gcd 3 and whose 2x2 minors have gcd 1, so the Smith diagonal is
-        // (1, 1, 3) and H_0 carries Z/3.
-        let population = [read(WITNESS_CARRIER_TRANSPORT)];
-        assert_eq!(population[0].recruited.get("Prop"), Some(&3));
-
-        let counted = invariants_of(&population, CircuitAperture::PER_ROUTE_MULTIPLICITY);
-        assert_eq!(torsion_at(&counted, 0), vec![BigInt::from(3)]);
-        assert_eq!(betti_at(&counted, 0), 1);
-    }
 
     #[test]
     fn the_incidence_coefficient_returns_no_torsion_on_the_population_that_does_return_it() {

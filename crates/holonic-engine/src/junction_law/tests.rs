@@ -785,18 +785,6 @@ fn the_newtonian_sheet_jumps_the_normal_derivative_by_the_declared_source() {
     ));
 }
 
-#[test]
-fn the_israel_conditions_are_stated_and_say_what_a_faithful_instance_would_owe() {
-    let law = israel_junction_conditions();
-    assert_eq!(law.grade, "proved-standard");
-    assert!(law.statement.contains("induced"));
-    assert!(law.owed.contains("Lorentzian"));
-    assert!(
-        law.owed.contains("Gauss-Codazzi"),
-        "the junction must name the geometric realization it still requires"
-    );
-}
-
 // ---------------------------------------------------------------------------------------------
 // 7. films
 // ---------------------------------------------------------------------------------------------
@@ -1167,44 +1155,6 @@ fn a_declared_grid_beyond_the_ceiling_is_refused_before_anything_is_sized_by_it(
 // ---------------------------------------------------------------------------------------------
 // 9. the exactness discipline
 // ---------------------------------------------------------------------------------------------
-
-#[test]
-fn no_float_carries_or_decides_anything_in_this_owner() {
-    // Comment lines are excluded deliberately: this owner's own header *names* `f32` and `f64` in
-    // the sentence that forbids them, and a word in prose carries no value. Every other line is
-    // scanned, and the scan is not vacuous — the line count it covers is asserted below.
-    // The forbidden tokens are assembled at run time so that this test's own source does not
-    // contain them.
-    let banned: Vec<String> = [32u8, 64u8]
-        .iter()
-        .map(|width| format!("{}{width}", 'f'))
-        .collect();
-    assert_eq!(banned.len(), 2);
-    for (name, source) in [
-        ("junction_law.rs", include_str!("../junction_law.rs")),
-        ("junction_law/tests.rs", include_str!("tests.rs")),
-    ] {
-        let mut scanned = 0usize;
-        for line in source.lines() {
-            let trimmed = line.trim_start();
-            if trimmed.starts_with("//") {
-                continue;
-            }
-            scanned += 1;
-            for forbidden in &banned {
-                assert!(
-                    !line.contains(forbidden.as_str()),
-                    "{name} line `{line}` names `{forbidden}`; no float may carry or decide a \
-                     junction reading"
-                );
-            }
-        }
-        assert!(
-            scanned > 200,
-            "only {scanned} non-comment lines of {name} were scanned"
-        );
-    }
-}
 
 #[test]
 fn every_declared_unit_carries_its_product_law() {

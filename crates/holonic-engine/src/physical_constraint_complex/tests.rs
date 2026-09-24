@@ -840,86 +840,8 @@ fn founding_a_within_component_family_leaves_the_cross_family_exactly_as_it_was(
     assert_eq!(complex.boundary.two_chain_boundary, boundary_before);
 }
 
-// ==============================================================================================
-// the measured within-component reading on the authenticated M5 release
-// ==============================================================================================
-
-const STRUCTURE_ROOT_ENV: &str = "HOLONICS_M5_STRUCTURE_ROOT";
-const DEFAULT_STRUCTURE_ROOT: &str = "/home/b/Downloads/holonics-m5-rbx1-rank05";
-/// The RBX1 chain is the one component present in all three presentations.
-const RBX1_RESIDUES: usize = 108;
-/// The residue window `rigidity_receiver` and `hodge_receiver` were measured on in wave 3, so the
-/// readings below are comparable to the recorded ones rather than a different object.
-const M5_WINDOW: usize = 24;
-/// Eight angstroms, squared, on the exact decimal wire the intake reads.
-const M5_CONTACT_SQUARED: i64 = 64;
-
-const M5_STRUCTURES: [(&str, &str); 3] = [
-    ("designed-free", "designed-free-rbx1.cif"),
-    ("protenix-free-seed2", "ptxv2-free-rbx1-seed2.cif"),
-    ("protenix-cul1-seed0", "ptxv2-cul1-rbx1-seed0.cif"),
-];
-
-/// The measured within-component inside population of the whole RBX1 chain of each authenticated
-/// release, per declared separation. Recorded rather than printed: a change here is a change in
-/// the reading of the release, and the test says so instead of leaving it to a reader of stdout.
-const M5_WHOLE_CHAIN_INSIDE: [(&str, u32, usize); 6] = [
-    ("designed-free", 3, 224),
-    ("designed-free", 4, 159),
-    ("protenix-free-seed2", 3, 214),
-    ("protenix-free-seed2", 4, 160),
-    ("protenix-cul1-seed0", 3, 175),
-    ("protenix-cul1-seed0", 4, 138),
-];
-
-fn m5_aperture() -> DistanceAperture {
-    DistanceAperture {
-        lineage: "eight angstroms, squared, on the deposited decimal wire".to_owned(),
-        squared: Rat::from_integer(BigInt::from(M5_CONTACT_SQUARED)),
-    }
-}
-
-/// One declared uncertainty reading per addressed pair, whose lineage says what it is: this path
-/// reads geometry only and no predictor array is mounted on it. It is a declaration, not a
-/// fabricated confidence, and it never enters a class.
-fn declared_geometry_only(pairs: &[(u32, u32)]) -> BTreeMap<(u32, u32), PairUncertainty> {
-    let mut result = BTreeMap::new();
-    for pair in pairs {
-        result.insert(
-            *pair,
-            PairUncertainty {
-                source_lineage:
-                    "declared by this reading: geometry only, no predictor array mounted".to_owned(),
-                row_given_column_bits: 0x3c00,
-                column_given_row_bits: 0x3c00,
-                row_given_column: ExactInterval::point(Rat::from_integer(BigInt::from(1))),
-                column_given_row: ExactInterval::point(Rat::from_integer(BigInt::from(1))),
-                row_given_column_ulp: rat(1, 1024),
-                column_given_row_ulp: rat(1, 1024),
-            },
-        );
-    }
-    result
-}
 
 
-
-fn census(complex: &PhysicalConstraintComplex, separation: u32) -> (usize, usize, usize) {
-    let family = complex
-        .within_component_family(ConstraintComponentId(1), separation)
-        .expect("the family stands");
-    let inside = family
-        .readings
-        .iter()
-        .filter(|reading| reading.class == ContactClass::Inside)
-        .count();
-    let open = family
-        .readings
-        .iter()
-        .filter(|reading| reading.class == ContactClass::Open)
-        .count();
-    (family.readings.len(), inside, open)
-}
 
 
 

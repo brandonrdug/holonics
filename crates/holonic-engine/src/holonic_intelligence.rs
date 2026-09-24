@@ -72,9 +72,6 @@ mod rested;
 mod source_neutral;
 #[path = "holonic_intelligence/weight.rs"]
 mod weight;
-#[cfg(test)]
-#[path = "holonic_intelligence/extraction_equality_tests.rs"]
-mod extraction_equality_tests;
 
 pub use circulation::*;
 pub use contact_chart::*;

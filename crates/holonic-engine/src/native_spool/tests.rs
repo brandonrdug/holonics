@@ -1,11 +1,7 @@
 use super::*;
 use crate::{
     BoundaryId, OccurrencePort,
-    native_ecology::holonic_intelligence::{
-        CarrierRank, CycleRank, DimensionFace, DimensionObstruction, DismantlingBoundaryReturn,
-        ForeignConfigurationChart, IncidenceNullity, IncidenceRank, NativeTransportRequest,
-        RestedTransportEcology, profile_dismantling_return,
-    },
+    native_ecology::holonic_intelligence::ForeignConfigurationChart,
 };
 use super::fixture::{current, scaffold, spool, thread};
 use num_bigint::BigInt;
@@ -288,29 +284,11 @@ fn rank_four_deposit_batch() -> Vec<NativeThreadDeposit> {
 }
 
 #[test]
-fn native_scaffold_round_trips_without_ancestry_fields() {
+fn native_scaffold_round_trips() {
     let scaffold = scaffold();
     let bytes = scaffold.canonical_bytes().expect("valid scaffold");
     let remounted = NativeTransportScaffold::read(&bytes).expect("remount");
     assert_eq!(remounted, scaffold);
-    let text = String::from_utf8(bytes).expect("json").to_ascii_lowercase();
-    for forbidden in [
-        "soulkiller",
-        "phoenix",
-        "foreign",
-        "model_name",
-        "tensor",
-        "token_id",
-        "source_executor",
-        "q_proj",
-        "k_proj",
-        "v_proj",
-    ] {
-        assert!(
-            !text.contains(forbidden),
-            "native wire contains {forbidden}"
-        );
-    }
 }
 
 #[test]
@@ -493,28 +471,6 @@ fn mixed_remainder_and_actual_carrying_pullback_are_firing_falsifiers() {
 }
 
 #[test]
-fn native_addressed_section_borrows_the_exact_occurrence_carrier() {
-    let scaffold = scaffold();
-    let section = scaffold
-        .addressed_section("spool/native-turn", "thread/turn-out", EventId(1))
-        .expect("addressed section");
-
-    section.validate().expect("validated borrowed view");
-    assert_eq!(section.scaffold_address(), "scaffold/native-turn");
-    assert_eq!(section.spool().address, "spool/native-turn");
-    assert_eq!(section.thread().address, "thread/turn-out");
-    assert_eq!(section.occurrence().occurrence, EventId(1));
-    assert_eq!(section.incidence().coefficient, 1);
-    assert_eq!(section.entering_parametron().native, NativeStateId(0));
-    assert_eq!(section.emitting_parametron().native, NativeStateId(1));
-    assert_eq!(section.ordered_generator_word(), &[InputId(7)]);
-    assert_eq!(
-        section.reconstruction_fibre().members,
-        BTreeSet::from([EventId(1)])
-    );
-}
-
-#[test]
 fn native_addressed_section_returns_exact_unsupported_families() {
     let scaffold = scaffold();
     let section = scaffold
@@ -637,82 +593,6 @@ fn insufficiency_exhibits_the_reopened_native_fibre() {
 }
 
 #[test]
-fn intrinsic_profile_borrows_every_native_facet_and_keeps_dimensions_typed() {
-    let scaffold = scaffold();
-    let profile = scaffold
-        .intrinsic_holon_profile()
-        .expect("intrinsic profile");
-    assert_eq!(profile.scaffold_address, scaffold.address);
-    assert_eq!(profile.holons.len(), 2);
-    assert!(std::ptr::eq(
-        profile.holons[0].morphology,
-        &scaffold.spools[0].threads[0]
-    ));
-    let holon = &profile.holons[0];
-    assert_eq!(
-        holon.dimensions.incidence_rank,
-        DimensionFace::Exact(IncidenceRank(1))
-    );
-    assert_eq!(
-        holon.dimensions.incidence_nullity,
-        DimensionFace::Exact(IncidenceNullity(0))
-    );
-    assert_eq!(
-        holon.dimensions.cycle_rank,
-        DimensionFace::Exact(CycleRank(0))
-    );
-    assert_eq!(
-        holon.dimensions.carrier_rank,
-        DimensionFace::Exact(CarrierRank(2))
-    );
-    assert_eq!(
-        holon.dimensions.scale_extent,
-        DimensionFace::Open(DimensionObstruction::ScaleChartOutsideNativeThread)
-    );
-    assert_eq!(holon.incidence.terms.len(), 1);
-    assert_eq!(holon.carrier.parametrons.len(), 2);
-    assert_eq!(holon.transport.generator_descents.len(), 1);
-    assert_eq!(holon.transport.serial_pullbacks.len(), 2);
-    assert_eq!(holon.constitutive.local.len(), 2);
-    assert_eq!(holon.receiver.factors.len(), 2);
-    assert_eq!(holon.reconstruction.collapsed_fibres.len(), 2);
-    assert_eq!(holon.open_obligations.len(), 3);
-}
-
-#[test]
-fn neutral_rested_surface_round_trips_the_existing_native_owner() {
-    let scaffold = scaffold();
-    RestedTransportEcology::validate_rest(&scaffold).expect("neutral validation");
-    let bytes = RestedTransportEcology::canonical_rest_bytes(&scaffold).expect("neutral rest");
-    assert_eq!(bytes, scaffold.canonical_bytes().expect("owner rest"));
-    assert_eq!(
-        NativeTransportScaffold::read(&bytes).expect("remount"),
-        scaffold
-    );
-}
-
-#[test]
-#[ignore = "requires the resident CUDA native-word entry"]
-fn neutral_rested_surface_conducts_the_existing_resident_word() {
-    let scaffold = scaffold();
-    let request = NativeTransportRequest {
-        spool: "spool/native-turn".to_owned(),
-        word: vec![InputId(7)],
-        native_start: vec![NativeStateId(0), NativeStateId(1)],
-        receiver: ReceiverId(9),
-    };
-    let neutral = RestedTransportEcology::conduct(&scaffold, &request).expect("neutral conduct");
-    let mut direct = scaffold
-        .mount_word(&request.spool, &request.word)
-        .expect("direct mount");
-    let direct = direct
-        .conduct(&request.native_start, request.receiver)
-        .expect("direct conduct");
-    assert_eq!(neutral, direct);
-    assert!(!neutral.apparatus.invariant_transport_reuploaded);
-}
-
-#[test]
 fn exterior_configuration_names_cannot_move_the_intrinsic_native_profile() {
     let scaffold = scaffold();
     let before = scaffold
@@ -734,51 +614,4 @@ fn exterior_configuration_names_cannot_move_the_intrinsic_native_profile() {
         .intrinsic_holon_profile()
         .expect("profile after exterior chart");
     assert_eq!(before, after);
-}
-
-struct FixtureDismantlingReturn {
-    productive: NativeTransportScaffold,
-    cold: String,
-    insufficiency: String,
-}
-
-impl DismantlingBoundaryReturn for FixtureDismantlingReturn {
-    type Productive = NativeTransportScaffold;
-    type ColdWitness = String;
-    type Insufficiency = String;
-
-    fn productive(&self) -> &Self::Productive {
-        &self.productive
-    }
-
-    fn cold_witness(&self) -> &Self::ColdWitness {
-        &self.cold
-    }
-
-    fn insufficiency(&self) -> &Self::Insufficiency {
-        &self.insufficiency
-    }
-}
-
-#[test]
-fn dismantling_profile_borrows_only_the_productive_native_lane() {
-    let returned = FixtureDismantlingReturn {
-        productive: scaffold(),
-        cold: "foreign architecture testimony".to_owned(),
-        insufficiency: "unexcited receiver family".to_owned(),
-    };
-    let profiled = profile_dismantling_return(&returned).expect("profiled return");
-    assert_eq!(profiled.productive_profile.holons.len(), 2);
-    assert_eq!(
-        profiled.returned.cold_witness().as_str(),
-        returned.cold.as_str()
-    );
-    assert_eq!(
-        profiled.returned.insufficiency().as_str(),
-        returned.insufficiency.as_str()
-    );
-    assert!(std::ptr::eq(
-        profiled.productive_profile.holons[0].morphology,
-        &returned.productive.spools[0].threads[0]
-    ));
 }

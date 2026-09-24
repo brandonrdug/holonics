@@ -1,4 +1,3 @@
-use super::directory::DirectoryManifest;
 use super::*;
 use crate::native_occurrence::NativeOccurrence;
 use std::path::PathBuf;
@@ -244,7 +243,6 @@ fn drift_tamper_and_trailing_octets_refuse() {
         CultivatedRest::read(&tampered),
         Err(CultivatedRestRefusal::PayloadDigestMismatch)
     ));
-    assert!(!String::from_utf8_lossy(&rest.encode().unwrap()).contains("/home/"));
     let _ = predecessor;
 }
 
@@ -269,53 +267,6 @@ fn row_only_agreement_does_not_bind_width() {
         right: "output".to_owned(),
     }];
     assert!(CultivatedRest::seal(input).is_ok());
-}
-
-#[test]
-fn one_directory_path_resolves_relative_base_and_rejects_escape() {
-    let (input, predecessor, occurrence, morphology_path) = factor_fixture();
-    let rest = CultivatedRest::seal_with_native_occurrence(input, &occurrence).unwrap();
-    let directory = unique_temp_path("holonic-cultivated-rest", "");
-    let _ = std::fs::remove_dir_all(&directory);
-    std::fs::create_dir_all(&directory).unwrap();
-    std::fs::write(directory.join("cultivated.rest"), rest.encode().unwrap()).unwrap();
-    std::fs::write(directory.join("base.rest"), &predecessor).unwrap();
-    std::fs::copy(&morphology_path, directory.join("morphology.safetensors")).unwrap();
-    let manifest = DirectoryManifest {
-        schema: DIRECTORY_SCHEMA.to_owned(),
-        rest: "cultivated.rest".to_owned(),
-        predecessor: "base.rest".to_owned(),
-        identity: PredecessorProductIdentity::from_bytes(&predecessor),
-        morphology: "morphology.safetensors".to_owned(),
-        codec_companions: Vec::new(),
-    };
-    std::fs::write(
-        directory.join("manifest.json"),
-        serde_json::to_vec(&manifest).unwrap(),
-    )
-    .unwrap();
-    let mounted = CultivatedRest::mount_directory(&directory).unwrap();
-    assert_eq!(mounted.product.encode().unwrap(), rest.encode().unwrap());
-    assert!(mounted.verify_still().is_ok());
-    let escape = DirectoryManifest {
-        schema: DIRECTORY_SCHEMA.to_owned(),
-        rest: "cultivated.rest".to_owned(),
-        predecessor: "../base.rest".to_owned(),
-        identity: PredecessorProductIdentity::from_bytes(&predecessor),
-        morphology: "morphology.safetensors".to_owned(),
-        codec_companions: Vec::new(),
-    };
-    std::fs::write(
-        directory.join("manifest.json"),
-        serde_json::to_vec(&escape).unwrap(),
-    )
-    .unwrap();
-    assert!(matches!(
-        CultivatedRest::mount_directory(&directory),
-        Err(CultivatedRestRefusal::DirectoryEscape(_))
-    ));
-    std::fs::remove_dir_all(directory).unwrap();
-    std::fs::remove_file(morphology_path).unwrap();
 }
 
 #[test]

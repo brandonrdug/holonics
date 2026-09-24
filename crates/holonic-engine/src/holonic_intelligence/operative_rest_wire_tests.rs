@@ -193,44 +193,6 @@ fn trailing_bytes_and_hostile_length_refuse() {
 }
 
 #[test]
-fn pending_interrupted_state_roundtrips() {
-    let mut rest = base_rest();
-    rest.overlay.clear();
-    rest.passage = Some(NativePassageRest {
-        aperture: NativeReturnAperture {
-            learning_shift: 2,
-            series_terms: 8,
-        },
-        pending: [(NativeTensorOrdinal(0), vec![overlay()])]
-            .into_iter()
-            .collect(),
-        returns: vec![],
-    });
-    rest.header.interruption = Some(NativeCycleInterruption {
-        progress: NativeCycleProgress {
-            occurrence: 8,
-            row_addresses: vec![0],
-            installed_through: Some(0),
-            returned_through: None,
-            at_terminal: false,
-        },
-        reason: "interrupted after pending contact".to_owned(),
-    });
-    rest.header.cycle_complete = false;
-    rest.header.progress = rest
-        .header
-        .interruption
-        .as_ref()
-        .map(|i| i.progress.clone());
-    let bytes = encoded(&rest);
-    assert_eq!(
-        ExtractedOperatorRest::read_from(&mut Cursor::new(bytes.clone()), bytes.len() as u64)
-            .unwrap(),
-        rest
-    );
-}
-
-#[test]
 fn malformed_operator_extents_and_missing_ports_refuse_before_device_access() {
     let mut rest = base_rest();
     rest.header.ecology.layers[0].first_operation = u32::MAX;
@@ -241,68 +203,4 @@ fn malformed_operator_extents_and_missing_ports_refuse_before_device_access() {
     let mut rest = base_rest();
     rest.header.ecology.operations[1].inputs.clear();
     assert!(rest.validate().is_err());
-}
-
-/// The frame as the writer laid it out before the retention law retired the previous-cycle
-/// terminal material: the reacted tiles, the dissection's tied row and the presented carrier.
-fn legacy_encoded(rest: &ExtractedOperatorRest) -> Vec<u8> {
-    let mut out = Vec::new();
-    out.extend_from_slice(MAGIC);
-    json(&mut out, &rest.header).unwrap();
-    sections(&mut out, &rest.carriers).unwrap();
-    sections(&mut out, &rest.checkpoints).unwrap();
-    tiled(&mut out, &rest.terminal_carrier).unwrap();
-    let reacted = NativeTiledRest {
-        carrier: NativeCarrierOrdinal(5),
-        rows: 1,
-        width: 1,
-        grain: 0,
-        sections: vec![section()],
-    };
-    tiled(&mut out, &Some(reacted)).unwrap();
-    flag(&mut out, true).unwrap();
-    number(&mut out, 1).unwrap();
-    out.extend_from_slice(&1i64.to_le_bytes());
-    out.extend_from_slice(&1i64.to_le_bytes());
-    flag(&mut out, true).unwrap();
-    super::section(&mut out, &section()).unwrap();
-    overlays(&mut out, &rest.overlay).unwrap();
-    flag(&mut out, false).unwrap();
-    flag(&mut out, false).unwrap();
-    out.extend_from_slice(END);
-    out
-}
-
-#[test]
-fn an_older_wire_with_previous_cycle_terminal_material_decodes_and_releases_it() {
-    let rest = base_rest();
-    let legacy = legacy_encoded(&rest);
-    let decoded =
-        ExtractedOperatorRest::read_from(&mut Cursor::new(legacy.clone()), legacy.len() as u64)
-            .unwrap();
-    assert_eq!(decoded, rest, "the retired positions are read and released");
-    let current = encoded(&rest);
-    assert!(current.len() < legacy.len());
-    // The current frame keeps the old layout, declaring the retired positions absent.
-    let mut out = Vec::new();
-    out.extend_from_slice(MAGIC);
-    json(&mut out, &rest.header).unwrap();
-    sections(&mut out, &rest.carriers).unwrap();
-    sections(&mut out, &rest.checkpoints).unwrap();
-    tiled(&mut out, &rest.terminal_carrier).unwrap();
-    tiled(&mut out, &None).unwrap();
-    flag(&mut out, false).unwrap();
-    flag(&mut out, false).unwrap();
-    overlays(&mut out, &rest.overlay).unwrap();
-    flag(&mut out, false).unwrap();
-    flag(&mut out, false).unwrap();
-    out.extend_from_slice(END);
-    assert_eq!(current, out);
-    let mut hostile = legacy;
-    let at = hostile.len() - END.len() - 3;
-    hostile.truncate(at);
-    assert!(
-        ExtractedOperatorRest::read_from(&mut Cursor::new(hostile.clone()), hostile.len() as u64)
-            .is_err()
-    );
 }

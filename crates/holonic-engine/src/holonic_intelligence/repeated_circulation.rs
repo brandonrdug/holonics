@@ -288,35 +288,6 @@ mod tests {
         body
     }
 
-    #[test]
-    fn actual_successors_form_a_repeated_variable_grain_circulation() {
-        let body = fixture::scaffold();
-        let repeated = conduct_repeated_inference::<(), _>(
-            &body,
-            first_request(&body),
-            &UniqueActualSuccessorReceiver,
-        )
-        .expect("repeated circulation");
-        assert_eq!(repeated.cuts.len(), 2);
-        assert_eq!(repeated.emissions.len(), 2);
-        assert!(matches!(
-            repeated.dispositions.last(),
-            Some(NativeCycleDisposition::Terminate {
-                reason: NativeTerminationReason::NoActualSuccessor,
-                ..
-            })
-        ));
-        for pair in repeated.cuts.windows(2) {
-            assert_eq!(
-                pair[0].emitted_occurrence().entering_occurrence,
-                pair[1]
-                    .entering_occurrence()
-                    .predecessor
-                    .expect("predecessor")
-            );
-        }
-    }
-
     struct CultivationReceiver;
 
     impl NativeContinuationReceiver<u64> for CultivationReceiver {

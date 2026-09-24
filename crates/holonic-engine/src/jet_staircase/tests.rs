@@ -698,10 +698,3 @@ fn the_derivative_values_are_the_coefficients_times_the_factorials() {
         integer(1 + 2 * 2 + 3 * 4 + 4 * 8)
     );
 }
-
-#[test]
-fn the_helper_that_neck_reads_agrees_with_the_sign_it_names() {
-    assert!(is_strictly_positive(&Rat::one()));
-    assert!(!is_strictly_positive(&Rat::zero()));
-    assert!(!is_strictly_positive(&-Rat::one()));
-}

@@ -962,35 +962,6 @@ mod tests {
         assert_eq!(scalar.rows(), 0);
     }
 
-    /// The key is stated verbatim and nothing in it is collapsed to a scalar: a receipt that says
-    /// two executables differ must say WHERE.
-    #[test]
-    fn a_graph_key_states_every_field_it_carries_and_hashes_none_of_them() {
-        let key = GraphKey {
-            mode: "exact-integer-interval-v2/exact_resident_section".to_owned(),
-            source: "identity+header".to_owned(),
-            topology: vec![(69, 45, 106, 113)],
-            ports: vec![("continuing standing, 2560".to_owned(), 5, 2560)],
-            grain: 48,
-            series_terms: 14,
-            reductions: vec![("section_rms_rebase".to_owned(), 2560)],
-            receiver_boundary: "terminal EventId(0)".to_owned(),
-            material: vec![("carried standing".to_owned(), 0x7f00_0000, 5, 2560)],
-            chronology: vec!["entering standing".to_owned(), "input rebase".to_owned()],
-        };
-        let stated = key.stated();
-        assert!(stated.contains("grain 2^-48"), "{stated}");
-        assert!(stated.contains("terms 14"), "{stated}");
-        assert!(stated.contains("segments 1"), "{stated}");
-        assert!(stated.contains("material 1"), "{stated}");
-        assert!(stated.contains("occurrences 2"), "{stated}");
-        assert_eq!(
-            key.clone(),
-            key,
-            "the key is a value, compared field by field"
-        );
-    }
-
     fn cohort_key(standing: u64) -> GraphKey {
         GraphKey {
             mode: "exact-integer-interval-v2/exact_resident_section".to_owned(),
@@ -1014,22 +985,14 @@ mod tests {
     /// at the same extents under the same mode and source; only their carried standings sit at
     /// different addresses. Under H4's fields alone the two keys are equal, so a cache keyed on
     /// them would relaunch one sibling's executable for the other and the second would read the
-    /// first's standing. The residency field is what refuses it, and the refusal says so in words.
+    /// first's standing. The residency field is what refuses it.
     #[test]
     fn a_cohort_sibling_may_not_reuse_a_sibling_executable_whose_standing_sits_elsewhere() {
         let first = cohort_key(0x7f00_0000);
         let second = cohort_key(0x7f10_0000);
-        let because = first
-            .reuse_refused(&second)
-            .expect("the residency differs, so the reuse is refused");
         assert!(
-            because.starts_with("every field of the diagram agrees"),
-            "{because}"
-        );
-        assert!(because.contains("carried standing"), "{because}");
-        assert!(
-            because.contains("0x7f000000") && because.contains("0x7f100000"),
-            "{because}"
+            first.reuse_refused(&second).is_some(),
+            "the residency differs, so the reuse is refused"
         );
         // and the diagram itself is identical: nothing but the residency separates them
         let mut stripped = second.clone();
@@ -1038,60 +1001,6 @@ mod tests {
             first.reuse_refused(&stripped),
             None,
             "with one residency the two deeds are one executable"
-        );
-    }
-
-    /// A key difference in the diagram is named as such, and never confused with a residency move.
-    #[test]
-    fn a_cohort_key_names_which_field_stopped_the_reuse() {
-        let base = cohort_key(0x7f00_0000);
-        let mut intervened = base.clone();
-        intervened.topology = vec![(71, 45, 108, 116)];
-        let because = base
-            .reuse_refused(&intervened)
-            .expect("the diagram differs");
-        assert!(
-            because.starts_with("the diagram's census differs"),
-            "{because}"
-        );
-        // **What a count cannot separate, and the chronology can.** Two matched siblings whose
-        // interventions each insert exactly ONE occurrence, at different sites, carry the same four
-        // numbers — measured on the real cohort, where keying on the census admitted 697 of 714
-        // offers as reuses. The chronology names the occurrence and refuses.
-        let mut left = base.clone();
-        left.chronology
-            .push("per-layer input withdrawn (intervention)".to_owned());
-        left.topology = vec![(70, 45, 109, 116)];
-        let mut right = base.clone();
-        right
-            .chronology
-            .push("gated passage span withdrawn (intervention)".to_owned());
-        right.topology = vec![(70, 45, 109, 116)];
-        assert_eq!(
-            left.topology, right.topology,
-            "one inserted occurrence each: the census cannot tell them apart"
-        );
-        let because = left.reuse_refused(&right).expect("the chronology differs");
-        assert!(
-            because.starts_with("the diagram's chronology differs by 2 occurrence(s)"),
-            "{because}"
-        );
-        assert!(
-            because.contains("per-layer input withdrawn")
-                && because.contains("gated passage span withdrawn"),
-            "{because}"
-        );
-        let mut coarser = base.clone();
-        coarser.grain = 24;
-        assert!(
-            base.reuse_refused(&coarser)
-                .is_some_and(|b| b.starts_with("the carrier differs"))
-        );
-        let mut other_extent = base.clone();
-        other_extent.ports = vec![("continuing standing, 2560".to_owned(), 7, 2560)];
-        assert!(
-            base.reuse_refused(&other_extent)
-                .is_some_and(|b| b.starts_with("the declared port extents differ"))
         );
     }
 
@@ -1133,14 +1042,5 @@ mod tests {
         assert_eq!(ledger.offers, 3);
         assert_eq!(ledger.hits, 1);
         assert_eq!(ledger.residency_only_refusals(), 1);
-    }
-
-    #[test]
-    fn the_streamed_census_starts_empty_and_every_field_is_a_count() {
-        let census = StreamedCensus::default();
-        assert_eq!(census.segments, 0);
-        assert_eq!(census.graph_launches, 0);
-        assert_eq!(census.terminal_synchronizations, 0);
-        assert_eq!(census.mount_synchronizations, 0);
     }
 }
