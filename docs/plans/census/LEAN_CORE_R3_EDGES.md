@@ -266,3 +266,20 @@ additional Millennium dependency). The full `Framework`
 closure falls only from 474 / 172,792 to 473 / 172,596 (280 to 279 Millennium), because other
 facades retain overlapping research imports. These are static source-graph counts; see the build
 receipts for Lake gates.
+
+## M2 addressed-linearized-passage owner
+
+`Transport/AddressedLinearizedPassage.lean` now owns the generic addressed linearized transport,
+its joined two-step differential and reverse adjoint, and the exact receiver-radical and complete
+preimage-fibre equalities. `Computation/HolonicAdjointNormalization` no longer imports
+`Millennium/SituatedReturnedDifference`; its former reverse-order wrapper was removed because it
+only restated the moved theorem. `Framework.Dynamics` imports the new owner. `Millennium/SituatedReturnedDifference` keeps the dependent
+connection-square and returned-difference rebase theorem. `WorldTube` and
+`SituatedMachineLearning` still import that Research owner for separate uses.
+
+The static source import closure for `Objects.Ratio` drops from 16 modules / 2 Millennium modules
+to 14 / 1; `HolonicAdjointNormalization` drops from 6 / 1 to 3 / 0. `Framework.Information` drops
+from 155 / 107 to 154 / 106. `Framework.Objects` remains at 24 Millennium modules through its
+separate `Transport.WorldTube → Millennium.SituatedReturnedDifference` edge. These are source
+import-line counts, not Lake jobs. The focused Lake command and full root gates are recorded in
+[`M2_ADDRESSED_LINEARIZED_PASSAGE.md`](M2_ADDRESSED_LINEARIZED_PASSAGE.md); verification is pending.

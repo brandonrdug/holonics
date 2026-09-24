@@ -50,6 +50,11 @@ the carrying occurrences. Neither a number nor a theorem's printed name is a hol
 The [new finite modulation theorem](ElementaryHolonics/Physics/ConstitutiveModulation.lean)
 connects changing conformation and internal current to the complete coupled response.
 
+[definition] `Transport/AddressedLinearizedPassage.lean` owns the generic linearized differential
+on an addressed passage, its pullback-joined two-step composition, reverse-order adjoint, receiver
+radical and complete preimage fibres. `Millennium/SituatedReturnedDifference.lean` retains the
+dependent connection-square return; it no longer owns or forwards the generic adjoint declarations.
+
 [definition] The [continuing unification](../../docs/FORMAL_FRAMEWORK.md#changing-constitution-and-changing-grain-are-one-returned-comparison)
 adds `Transport/ChangingReceiver`, with mechanical and actual nonlinear-fluid instances in
 `Physics/MechanicalReceiver` and `Physics/FluidReceiverClosure`. They connect changing
