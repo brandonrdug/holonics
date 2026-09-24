@@ -1,13 +1,9 @@
-//! **The rest of the coupled continuation** (wave rest v7 and v12; v8–v10 decode).
+//! **The rest of the coupled continuation** (current wave rest v7 and v12).
 //!
-//! [definition; agent-inferred] Phase 12b: v12 retains, for each pending prediction, its
-//! producing operands only — the source family, the member and its source chart — beside the
-//! contemporary family, the neighborhood (constitution) and the admitted contacts. Frames v8–v10
-//! also carried each pending prediction's produced family and the ordered relation word from the
-//! oldest pending source to the contemporary family; they still decode (the chart is read off the
-//! stored producing map) and the produced families and the word are dropped: a comparison or a
-//! return reads the source at the contemporary cut. A rest without pending predictions or a
-//! historical current keeps the v7 frame.
+//! A v12 pending comparison retains its source family, member and source chart beside the
+//! contemporary family and constitution. Its produced family and relation word are reconstructed
+//! when read at the contemporary cut. A state without pending or historical current writes v7.
+
 use super::*;
 use crate::native_ecology::constitutive_fibre::circulation::rest::{blob, read_blob};
 use crate::native_ecology::constitutive_fibre::{
@@ -25,16 +21,8 @@ struct ContactHeader {
 struct PendingHeader {
     id: u64,
     member: usize,
-    /// v12: the admitted source chart (v8–v10 read it off the stored producing map).
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    chart: Option<WaveSourceReceiver>,
-}
-/// A v9/v10 passage of the retired relation word (decoded and dropped).
-#[derive(Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
-#[serde(deny_unknown_fields)]
-struct PassageHeader {
-    epoch: u64,
-    factors: usize,
+    /// The admitted source chart of this pending operand.
+    chart: WaveSourceReceiver,
 }
 #[derive(Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -48,8 +36,6 @@ struct Header {
     contacts: Vec<ContactHeader>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pending: Vec<PendingHeader>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    passages: Vec<PassageHeader>,
 }
 /// The retained producing operands of one pending prediction.
 #[derive(Debug, PartialEq, Eq)]
@@ -120,7 +106,6 @@ impl CoupledRestData {
                 .current_neighborhood_epoch
                 .is_some_and(|e| e >= self.neighborhood.epoch())
             || self.header.contacts.len() != self.relations.len()
-            || !self.header.passages.is_empty()
         {
             return Err(ConstitutiveFibreError::Shape);
         }
@@ -175,7 +160,7 @@ impl CoupledRestData {
                 || p.id <= bank.normal_bank_epoch()
                 || !pending_ids.insert(p.id)
                 || cut.member != p.member
-                || p.chart.is_some_and(|chart| chart != cut.chart)
+                || p.chart != cut.chart
                 || p.member >= self.neighborhood.members()
                 || cut.source.roots() != n
                 || cut.source.grain() != self.family.grain()
@@ -222,22 +207,14 @@ impl CoupledRestData {
         input: &mut Take<impl Read>,
         version: u8,
     ) -> Result<Self, ConstitutiveFibreError> {
-        let mut header: Header = serde_json::from_slice(&read_blob(input)?).map_err(invalid)?;
-        if version < 10 && header.current_neighborhood_epoch.is_some() {
-            return Err(invalid(
-                "material-only current provenance requires wave rest v10",
-            ));
+        if version != 7 && version != 12 {
+            return Err(invalid("coupled wave rest version"));
         }
-        if version < 9 && !header.passages.is_empty() {
-            return Err(invalid("pending continuation requires wave rest v9"));
-        }
-        if version == 12 && (!header.passages.is_empty()
-            || header.pending.iter().any(|p| p.chart.is_none()))
+        let header: Header = serde_json::from_slice(&read_blob(input)?).map_err(invalid)?;
+        if version == 7 && (!header.pending.is_empty()
+            || header.current_neighborhood_epoch.is_some())
         {
-            return Err(invalid("wave rest v12 retains source operands only"));
-        }
-        if version != 12 && header.pending.iter().any(|p| p.chart.is_some()) {
-            return Err(invalid("a declared pending chart requires wave rest v12"));
+            return Err(invalid("pending or historical coupled state requires wave rest v12"));
         }
         let bytes = read_blob(input)?;
         let neighborhood =
@@ -259,29 +236,10 @@ impl CoupledRestData {
             return Err(ConstitutiveFibreError::Shape);
         }
         let mut pending = BTreeMap::new();
-        for p in &mut header.pending {
+        for p in &header.pending {
             let source = read_blob(input)?;
             let source = NormalWaveFamilyRest::read(&mut source.as_slice(), source.len() as u64)?;
-            let chart = match p.chart {
-                Some(chart) => chart,
-                None => {
-                    // Legacy frame: the produced family follows; its last map names the chart.
-                    let produced = read_blob(input)?;
-                    let produced =
-                        NormalWaveFamilyRest::read(&mut produced.as_slice(), produced.len() as u64)?;
-                    let law = produced
-                        .last_relation()
-                        .ok_or(ConstitutiveFibreError::Shape)?;
-                    if !law.is_conditional()
-                        || produced.current_epoch()? != p.id
-                        || law.relation_cut() > neighborhood.action_cut(p.member)?
-                    {
-                        return Err(invalid("legacy pending producing map is not conditional"));
-                    }
-                    law.source_receiver()
-                }
-            };
-            p.chart = Some(chart);
+            let chart = p.chart;
             if pending
                 .insert(
                     p.id,
@@ -294,16 +252,6 @@ impl CoupledRestData {
                 .is_some()
             {
                 return Err(invalid("duplicate pending producing cut"));
-            }
-        }
-        // The retired relation word of v9/v10 frames: read to the end of the frame and dropped.
-        for passage in std::mem::take(&mut header.passages) {
-            if passage.factors == 0 || passage.factors as u64 > input.limit() / 8 {
-                return Err(ConstitutiveFibreError::Shape);
-            }
-            for _ in 0..passage.factors {
-                let bytes = read_blob(input)?;
-                NormalWaveRelationRest::read(&mut bytes.as_slice(), bytes.len() as u64)?;
             }
         }
         Ok(Self {
@@ -333,7 +281,7 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
             pending_meta.push(PendingHeader {
                 id: *id,
                 member: cut.member,
-                chart: Some(cut.chart),
+                chart: cut.chart,
             });
             pending.insert(
                 *id,
@@ -355,7 +303,6 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
                 active_member: mode.active_member,
                 contacts,
                 pending: pending_meta,
-                passages: Vec::new(),
             },
             neighborhood: mode.neighborhood.rest()?,
             family: mode.current.rest()?,
@@ -484,94 +431,40 @@ mod pending_tests {
             .with_neighborhood(local)
             .unwrap()
     }
-    /// The v8/v9 payload of a state: each pending source followed by the family the prediction
-    /// produced, and (v9) the relation word from the oldest pending source to the contemporary
-    /// family, `words[k]` being passage `k`'s maps.
-    fn legacy_payload(
-        wave: &ResidentNormalWave<'_, NormalWaveCoupled<'_>>,
-        produced: &BTreeMap<u64, NormalWaveFamilyRest>,
-        words: Option<&[(u64, Vec<NormalWaveRelationRest>)]>,
-    ) -> Vec<u8> {
-        let saved = wave.rest().unwrap();
-        let data = saved.coupled.as_ref().unwrap();
-        let mut out = Vec::new();
-        let mut header = serde_json::to_value(&data.header).unwrap();
-        for p in header["pending"].as_array_mut().into_iter().flatten() {
-            p.as_object_mut().unwrap().remove("chart");
-        }
-        if let Some(words) = words {
-            header["passages"] = serde_json::json!(
-                words
-                    .iter()
-                    .map(|(epoch, maps)| serde_json::json!({"epoch":epoch,"factors":maps.len()}))
-                    .collect::<Vec<_>>()
-            );
-        }
-        blob(&mut out, &serde_json::to_vec(&header).unwrap()).unwrap();
-        let mut bytes = Vec::new();
-        data.neighborhood.write(&mut bytes).unwrap();
-        blob(&mut out, &bytes).unwrap();
-        bytes.clear();
-        data.family.write(&mut bytes).unwrap();
-        blob(&mut out, &bytes).unwrap();
-        for c in &data.header.contacts {
-            bytes.clear();
-            data.relations[&c.id].write(&mut bytes).unwrap();
-            blob(&mut out, &bytes).unwrap();
-        }
-        for p in &data.header.pending {
-            bytes.clear();
-            data.pending[&p.id].source.write(&mut bytes).unwrap();
-            blob(&mut out, &bytes).unwrap();
-            bytes.clear();
-            produced[&p.id].write(&mut bytes).unwrap();
-            blob(&mut out, &bytes).unwrap();
-        }
-        for (_, maps) in words.into_iter().flatten() {
-            for map in maps {
-                bytes.clear();
-                map.write(&mut bytes).unwrap();
-                blob(&mut out, &bytes).unwrap();
-            }
-        }
-        out
-    }
-    /// A legacy frame carrying produced families and the relation word decodes to the same
-    /// one-cut state: the source operands and their charts, with the produced cuts and the word
-    /// dropped. Its comparison is then read at the contemporary cut.
+    /// The writer-selected v7 empty and v12 pending forms remount. Read-only v8–v10 frames
+    /// refuse; a v12 comparison reads through the contemporary family and releases once.
     #[test]
-    #[ignore = "requires CUDA; v8/v9 pending frames decode to their source operands"]
-    fn legacy_produced_cuts_and_relation_words_decode_to_source_operands() {
+    #[ignore = "requires CUDA; current v7/v12 coupled rests and retired version refusals"]
+    fn current_v7_v12_roundtrip_and_retired_frames_refuse() {
         let ro = ResidentReadout::new().unwrap();
         let s = ResidentSurface::on(&ro).unwrap();
         let mut wave = body(&s, 1);
-        let mut produced = BTreeMap::new();
-        let mut words = Vec::new();
+        let magic = b"HOLONIC-NORMAL-WAVE";
+        let empty = wave.rest().unwrap();
+        let mut v7 = Vec::new();
+        empty.write(&mut v7).unwrap();
+        assert_eq!(v7[magic.len()], 7);
+        let remounted = NormalWaveRest::read(&mut v7.as_slice(), v7.len() as u64)
+            .unwrap().remount_coupled(&s, |_| {}).unwrap();
+        assert_eq!(remounted.rest().unwrap(), empty);
+
         for _ in 0..2 {
             let contact = wave.admit_contact(0).unwrap();
-            let (id, step) = wave.predict_contact(&contact).unwrap();
-            produced.insert(id, step.successor().rest().unwrap());
-            words.push((id, vec![step.applied_relation().rest().unwrap()]));
+            let _ = wave.predict_contact(&contact).unwrap();
         }
         let saved = wave.rest().unwrap();
-        for (version, word) in [(8, None), (9, Some(words.as_slice()))] {
-            let bytes = legacy_payload(&wave, &produced, word);
-            let restored =
-                CoupledRestData::read(&mut bytes.as_slice().take(bytes.len() as u64), version)
-                    .unwrap();
-            restored.validate(&saved).unwrap();
-            assert_eq!(&restored, saved.coupled.as_ref().unwrap().as_ref());
-        }
         let mut written = Vec::new();
         saved.write(&mut written).unwrap();
-        let magic = b"HOLONIC-NORMAL-WAVE";
         assert_eq!(written[magic.len()], 12);
+        for retired in [8, 9, 10] {
+            let mut old = written.clone();
+            old[magic.len()] = retired;
+            assert!(NormalWaveRest::read(&mut old.as_slice(), old.len() as u64).is_err());
+        }
         let mut restored = NormalWaveRest::read(&mut written.as_slice(), written.len() as u64)
-            .unwrap()
-            .remount_coupled(&s, |_| {})
-            .unwrap();
+            .unwrap().remount_coupled(&s, |_| {}).unwrap();
         assert_eq!(restored.rest().unwrap(), saved);
-        let id = *produced.keys().next().unwrap();
+        let id = *saved.coupled.as_ref().unwrap().pending.keys().next().unwrap();
         let observed = point(&s, &[3, 0]);
         let a = wave.compare_coupled_prediction(id, current(&observed)).unwrap();
         let b = restored.compare_coupled_prediction(id, current(&observed)).unwrap();

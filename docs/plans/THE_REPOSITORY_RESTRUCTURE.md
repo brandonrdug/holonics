@@ -668,7 +668,8 @@ existing suites (§0.9):
 5. **R4: compatibility debt.** Remove every alias, forwarding path and legacy decoder (§0.2).
 6. **C: finish the paused consolidation.** Rebase phases 11, 12a and 12b (WIP branches) onto the
    reduced tree, then do phase 14. The [Phase 12a integration map](census/C_PHASE12A_INTEGRATION.md)
-   records its current operand-rest cut, writer-selected tags and remaining C acceptance.
+   records its current operand-rest cut; the [Phase 12b return](census/C_PHASE12B_INTEGRATION.md)
+   records coupled v7/v12 and published-continuation rest. Both name remaining C acceptance.
 7. **M1: the Rust cut.**
    - Create `holonics-cuda` and move the driver, sections, kernels and the resident HNN into it as
      they are (§0.3).

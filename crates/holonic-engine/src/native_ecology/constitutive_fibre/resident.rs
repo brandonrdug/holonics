@@ -555,7 +555,7 @@ mod law_rest_tests;
 
 mod neighborhood;
 pub(crate) use neighborhood::{
-    GeneratorMaterial, PredictiveMaterial, ResidentNeighborhoodAlternative,
+    PredictiveMaterial, ResidentNeighborhoodAlternative,
 };
 mod read;
 #[allow(unused_imports)]

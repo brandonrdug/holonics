@@ -178,7 +178,7 @@ impl NormalWaveRest {
         expect(&mut input, MAGIC)?;
         let mut version = [0];
         input.read_exact(&mut version).map_err(invalid)?;
-        if (7..=10).contains(&version[0]) || version[0] == 12 {
+        if version[0] == 7 || version[0] == 12 {
             if !allow_coupled {
                 return Err(invalid("coupled state is not a normal source bank"));
             }
@@ -189,7 +189,7 @@ impl NormalWaveRest {
                 return Err(invalid("trailing coupled wave state"));
             }
             data.validate(&bank)?;
-            if version[0]==7 && data.has_pending(){return Err(invalid("coupled producing comparisons require wave rest v8"));}
+            if version[0]==7 && data.has_pending(){return Err(invalid("coupled producing comparisons require wave rest v12"));}
             bank.coupled = Some(Box::new(data));
             return Ok(bank);
         }

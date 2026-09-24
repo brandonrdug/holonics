@@ -677,6 +677,3 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
 }
 #[cfg(test)]
 mod tests;
-
-#[cfg(test)]
-mod return_tests;
