@@ -471,6 +471,13 @@ place HNN specializations under `Holonics.HNN`. The source map and two small Phy
 are recorded in [`LEAN_CORE_R3_EDGES.md`](census/LEAN_CORE_R3_EDGES.md#physics-facade-curation-audit).
 Those cuts remove direct edges but do not by themselves make the full Physics closure research-free;
 each remaining generic/source-specific mixed owner needs its declaration-level boundary audited.
+The full operator-root map, measured source closures, and 25 Lean modules absent from the legacy
+umbrella are recorded in the [M2 Lean root curation audit](census/M2_LEAN_ROOT_CURATION.md).
+
+M2 moves paths and Lake roots only after that audit's generic/research declaration cuts are
+complete. The current `Framework` source closure is not accepted as `Holonics`; its facades still
+reach mixed Millennium owners. `HolonicsResearch` imports `Holonics` one-way, and the old broad
+umbrella's extra source modules are retained or classified individually before it is replaced.
 
 The September 23 Millennium work supplies concrete tests of this placement. `Computation/CertifiedWindingRoute`
 has receiver-count additivity over zero-free shared cuts and a compatible shrinking route;
