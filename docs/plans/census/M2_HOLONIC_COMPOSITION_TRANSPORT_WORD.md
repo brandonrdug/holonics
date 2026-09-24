@@ -53,7 +53,10 @@ Mathlib and Lake jobs. The before graph was measured at predecessor source `eb0f
 | `ElementaryHolonics` umbrella | 1,390 / 485,117 / 987 | 1,390 / 485,143 / 987 | No local module or Millennium count change. |
 
 The follow-up facade cut can remove `Framework.Geometry → Millennium.HolonicComposition` after the
-remaining generic AddressedPassage, connection, and route-comparison declarations have core owners.
+remaining generic addressed-occurrence declarations have core owners. Connection and route-return
+laws now live in `Foundation.ConnectionLineage`; see
+[M2_CONNECTION_LINEAGE](M2_CONNECTION_LINEAGE.md). The Geometry facade direct import has been removed,
+while eight direct Research imports remain for concrete composition examples.
 This packet alone does not claim a smaller public-root closure.
 
 ## Focused Lake gates (verified)

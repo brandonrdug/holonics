@@ -1,6 +1,7 @@
 import ElementaryHolonics.Transport.WorldTube
 import ElementaryHolonics.Millennium.HolonicPantographicSwingJets
 import ElementaryHolonics.Millennium.HolonicComposition
+import ElementaryHolonics.Foundation.ConnectionLineage
 import Mathlib.Tactic
 
 /-!
@@ -621,7 +622,7 @@ end ClockedPantographicSwing
 comparison.  Both route occurrences and both connection transports remain present. -/
 abbrev ClockRouteComparison (Fibre Source Target : Type*)
     (left right : AddressedPassage Source Target) :=
-  HolonicComposition.AddressedConnectionComparison Fibre left right
+  Soma.Holonics.Foundation.ConnectionLineage.AddressedConnectionComparison Fibre left right
 
 /-- [definition] Clock holonomy is the existing returned curvature of the two retained routes. -/
 def ClockRouteComparison.returnedHolonomy

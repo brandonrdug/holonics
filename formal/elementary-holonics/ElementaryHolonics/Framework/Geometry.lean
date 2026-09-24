@@ -12,7 +12,6 @@ import ElementaryHolonics.Geometry.ScrewGeometry
 import ElementaryHolonics.Geometry.PhaseCarry
 import ElementaryHolonics.Geometry.PairResonance
 import ElementaryHolonics.Geometry.ConnectionCalculus
-import ElementaryHolonics.Millennium.HolonicComposition
 
 /-!
 # Orientation, scale, constraints, and curved transport

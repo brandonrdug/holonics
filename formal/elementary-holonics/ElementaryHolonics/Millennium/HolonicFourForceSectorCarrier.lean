@@ -1,4 +1,5 @@
 import ElementaryHolonics.Millennium.HolonicComposition
+import ElementaryHolonics.Foundation.ConnectionLineage
 import ElementaryHolonics.Foundation.TransportWord
 import ElementaryHolonics.Millennium.HolonicInteractionExterior
 import ElementaryHolonics.Millennium.HolonicRankFourInteractionPlanes
@@ -33,6 +34,8 @@ Holonics; the current physical guide records their source domains and continuing
 noncomputable section
 
 namespace Soma.Holonics.Millennium.HolonicFourForceSectorCarrier
+
+open Soma.Holonics.Foundation.ConnectionLineage
 
 open Soma.Holonics
 open Soma.Holonics.Geometry.SixSphereMonodromy

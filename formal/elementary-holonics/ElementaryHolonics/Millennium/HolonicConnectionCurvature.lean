@@ -9,7 +9,7 @@ import Mathlib.Analysis.Calculus.ContDiff.Basic
 # Curvature itself: `F = dA + A ∧ A`, the covariant derivative, and the Bianchi return
 
 The tree carried curvature only as a returned holonomy defect on an addressed face
-(`HolonicComposition.routeComparisonReturn`, `HolonicFourForceSectorCarrier.returnedCurvature`)
+(`Foundation.ConnectionLineage.routeComparisonReturn`, `HolonicFourForceSectorCarrier.returnedCurvature`)
 and, in Rust, as the abelian `F = da` with the commutator `a ∧ a` measured but never differentiated.
 The generic chart, directional derivative, connection carrier and product rules now live in
 `Geometry/ConnectionCalculus`; this research owner supplies the curvature and its identities.

@@ -1,4 +1,5 @@
 import ElementaryHolonics.Millennium.HolonicComposition
+import ElementaryHolonics.Foundation.ConnectionLineage
 import ElementaryHolonics.Millennium.NavierStokesCurvedTransport
 import ElementaryHolonics.Foundation.TransportWord
 
@@ -22,6 +23,8 @@ local calibrated equation survives.
 -/
 
 namespace Soma.Holonics.Millennium.HolonicCurvedArcEinstein
+
+open Soma.Holonics.Foundation.ConnectionLineage
 
 open Soma.Holonics
 open Soma.Holonics.Millennium.HolonicComposition
