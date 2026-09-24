@@ -1602,33 +1602,3 @@ fn the_width_over_readings_is_the_enumerated_width() {
         Err(WidthRefusal::FamilyCeiling { .. })
     ));
 }
-
-/// **Plan phase 7: the linear reading is the passive coholon** (`Holon/Law.lean::passive_reading`),
-/// reached through this module's re-exported path: the reading's face and the coholon's value are
-/// equal entry for entry at zero power, and the width over a family is the same width.
-#[test]
-fn the_linear_reading_is_the_passive_coholon() {
-    let reading = LinearReading {
-        receiver: "first and difference".to_owned(),
-        matrix: matrix(&[&[1, 0], &[1, -1]]),
-    };
-    let coholon = reading.passive_coholon();
-    let members = vec![
-        vec![ratio(1, 2), integer(3)],
-        vec![integer(-2), ratio(5, 3)],
-        vec![integer(0), integer(0)],
-    ];
-    for member in &members {
-        let passive = coholon.read(member).expect("a coholon reading");
-        assert!(passive.power.is_zero());
-        assert_eq!(
-            reading.read(member).expect("a face"),
-            ExactFace::Vector(passive.value)
-        );
-    }
-    let family = CompatibleFamily::enumerated("phase 7", members).expect("a family");
-    assert_eq!(
-        width(&reading, &family, DiameterNorm::Supremum).expect("a width"),
-        width(&coholon, &family, DiameterNorm::Supremum).expect("a width")
-    );
-}

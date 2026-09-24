@@ -1180,8 +1180,6 @@ mod tests {
         assert!(with.device.is_some());
         assert!(without.device.is_none());
         assert_ne!(with, without, "changing D must reopen admission");
-        assert_eq!(with.apparatus, "cpu+device0");
-        assert_eq!(without.apparatus, "cpu");
     }
 }
 

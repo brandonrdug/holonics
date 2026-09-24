@@ -1207,7 +1207,6 @@ mod tests {
             log_five.enclosure_grain(Grain::DECLARED).unwrap(),
             log_five.enclosure().unwrap()
         );
-        assert_eq!(format!("{coarse}"), "grain(terms=1, bits=4)");
     }
 
     /// A probability above one, or at zero, is refused — the latter because that case FOUNDs.

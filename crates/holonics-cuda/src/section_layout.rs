@@ -57,7 +57,6 @@
 //! accumulating scatter — the region colouring that makes the device arm race-free without a single
 //! atomic.
 
-use std::collections::BTreeMap;
 use std::fmt;
 
 use holonics::ratio::ring::{AccumulationLaw, ExactRing, ModularWords};
@@ -2090,14 +2089,6 @@ impl<'m> SectionApparatus<'m> {
         target.copy_to_slice(&mut out)?;
         Ok((out, receipts))
     }
-}
-
-/// The entry population this owner launches, for the artifact assertion in `crate`'s own tests.
-pub fn section_entry_symbols() -> BTreeMap<&'static str, usize> {
-    section_cuda::Entry::ALL
-        .iter()
-        .map(|entry| (entry.symbol(), entry.cuda_parameter_words()))
-        .collect()
 }
 
 #[cfg(test)]

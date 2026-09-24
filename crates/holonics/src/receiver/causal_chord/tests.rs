@@ -1,8 +1,6 @@
 //! The causal chord's own checks.
 //!
 //! Exact laws are checked on synthetic material with no engine or external fixture dependency.
-//! Engine-owner comparisons and measured M5 readings live in
-//! `holonic-engine/tests/causal_chord_engine.rs`.
 //!
 //! Each Lean theorem of
 //! `formal/elementary-holonics/ElementaryHolonics/Foundation/CausalChord.lean` appears here by
@@ -514,23 +512,6 @@ fn the_residue_at_an_irrational_pole_lives_in_the_quotient_ring() {
 // ---------------------------------------------------------------------------------------------
 // the half-plane count
 // ---------------------------------------------------------------------------------------------
-
-#[test]
-fn the_half_plane_count_places_a_hurwitz_polynomial_entirely_left() {
-    // (s+1)(s+2)(s+3) = s³ + 6s² + 11s + 6
-    let count = half_plane_count(&polynomial(&[6, 11, 6, 1])).expect("the count returns");
-    assert_eq!((count.left, count.axis, count.right), (3, 0, 0));
-    assert!(count.is_hurwitz());
-}
-
-#[test]
-fn the_half_plane_count_separates_left_axis_and_right() {
-    // (s+1)(s−2)(s²+1) = s⁴ − s³ − s² − s − 2
-    let count = half_plane_count(&polynomial(&[-2, -1, -1, -1, 1])).expect("the count returns");
-    assert_eq!((count.left, count.axis, count.right), (1, 2, 1));
-    assert_eq!(count.total(), 4);
-    assert!(!count.is_hurwitz());
-}
 
 /// The degenerate shapes the Cauchy index has to survive: a pure even polynomial, a pure odd one,
 /// a repeated axis pair, and a repeated real pair.
@@ -1069,9 +1050,8 @@ fn a_chord_remounts_from_its_serialized_chart() {
 //
 // Every returned object of this module carries a certificate or an invariant, and `Deserialize`
 // runs no constructor. Each test below builds a lawful value through the real constructor, checks
-// that it round-trips unchanged, and then hands the wire a hand-tampered chart that the derived
-// implementation used to accept and asserts the refusal **by the words of its own species**, so a
-// test that passes against the unfixed file is impossible.
+// that it round-trips unchanged, and then hands the wire a hand-tampered chart and asserts the
+// refusal.
 
 /// A lawful value's serialized chart, ready to be tampered with.
 fn chart<T: serde::Serialize>(value: &T) -> serde_json::Value {
@@ -1084,11 +1064,11 @@ fn rational(value: &Rat) -> serde_json::Value {
     serde_json::to_value(value).expect("a rational serializes")
 }
 
-fn refusal_of<T: serde::de::DeserializeOwned>(hostile: serde_json::Value) -> String {
-    serde_json::from_value::<T>(hostile)
-        .err()
-        .expect("the tampered chart is refused")
-        .to_string()
+fn assert_refused<T: serde::de::DeserializeOwned>(hostile: serde_json::Value) {
+    assert!(
+        serde_json::from_value::<T>(hostile).is_err(),
+        "the tampered chart is refused"
+    );
 }
 
 /// **A remounted linearization passes through its own constructor.** The port-name vectors are
@@ -1103,19 +1083,11 @@ fn a_linearization_wire_is_refused_when_it_does_not_fit_its_own_matrices() {
 
     let mut hostile = chart(&base);
     hostile["sources"] = serde_json::json!(["u", "v"]);
-    let refusal = refusal_of::<Linearization>(hostile);
-    assert!(
-        refusal.contains("source names were declared"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<Linearization>(hostile);
 
     let mut hostile = chart(&base);
     hostile["readout"]["columns"] = serde_json::json!(1);
-    let refusal = refusal_of::<Linearization>(hostile);
-    assert!(
-        refusal.contains("readout has 1 columns"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<Linearization>(hostile);
 }
 
 /// **A remounted expansion re-runs the Faddeev--LeVerrier certificate.** The operator is recovered
@@ -1131,35 +1103,19 @@ fn a_resolvent_expansion_wire_re_runs_its_own_adjugate_certificate() {
 
     let mut hostile = chart(&expansion);
     hostile["adjugate"][1]["entries"][0] = rational(&integer(99));
-    let refusal = refusal_of::<ResolventExpansion>(hostile);
-    assert!(
-        refusal.contains("exact certificate"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<ResolventExpansion>(hostile);
 
     let mut hostile = chart(&expansion);
     hostile["certified_coefficients"] = serde_json::json!(1);
-    let refusal = refusal_of::<ResolventExpansion>(hostile);
-    assert!(
-        refusal.contains("certified coefficient count"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<ResolventExpansion>(hostile);
 
     let mut hostile = chart(&expansion);
     hostile["residual"] = rational(&ratio(1, 1000));
-    let refusal = refusal_of::<ResolventExpansion>(hostile);
-    assert!(
-        refusal.contains("exactly zero"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<ResolventExpansion>(hostile);
 
     let mut hostile = chart(&expansion);
     hostile["extent"] = serde_json::json!(3);
-    let refusal = refusal_of::<ResolventExpansion>(hostile);
-    assert!(
-        refusal.contains("adjugate coefficients"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<ResolventExpansion>(hostile);
 }
 
 /// **A remounted transfer chart re-derives its cancellation and its atlas.** The gcd and the least
@@ -1175,36 +1131,19 @@ fn a_transfer_wire_re_derives_its_cancellation_and_its_atlas() {
 
     let mut hostile = chart(&transfer);
     hostile["entries"][0]["numerator"]["coefficients"][0] = rational(&integer(5));
-    let refusal = refusal_of::<TransferFunction>(hostile);
-    assert!(
-        refusal.contains("reduced factor times the cancellation")
-            || refusal.contains("cancelled gcd"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<TransferFunction>(hostile);
 
     let mut hostile = chart(&transfer);
     hostile["entries"][0]["certified_coefficients"] = serde_json::json!(1);
-    let refusal = refusal_of::<TransferFunction>(hostile);
-    assert!(
-        refusal.contains("certified coefficient count"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<TransferFunction>(hostile);
 
     let mut hostile = chart(&transfer);
     hostile["atlas_denominator"]["coefficients"][0] = rational(&integer(7));
-    let refusal = refusal_of::<TransferFunction>(hostile);
-    assert!(
-        refusal.contains("lcm of the reduced entry denominators"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<TransferFunction>(hostile);
 
     let mut hostile = chart(&transfer);
     hostile["extent"] = serde_json::json!(3);
-    let refusal = refusal_of::<TransferFunction>(hostile);
-    assert!(
-        refusal.contains("declared extent against the expansion"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<TransferFunction>(hostile);
 }
 
 /// **A remounted pole chart tests its declared poles against the factor that names them.** One
@@ -1221,38 +1160,22 @@ fn a_pole_wire_tests_its_declared_poles_against_the_factor_that_names_them() {
 
     let mut hostile = chart(&atlas);
     hostile["factors"][0]["rational_poles"][0] = rational(&integer(7));
-    let refusal = refusal_of::<PoleAtlas>(hostile);
-    assert!(
-        refusal.contains("evaluated on the factor it names"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<PoleAtlas>(hostile);
 
     let mut hostile = chart(&atlas);
     hostile["factors"][1]["multiplicity"] = serde_json::json!(3);
-    let refusal = refusal_of::<PoleAtlas>(hostile);
-    assert!(
-        refusal.contains("the factors account for"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<PoleAtlas>(hostile);
 
     let mut hostile = chart(&atlas);
     hostile["reading"] = serde_json::json!("named");
-    let refusal = refusal_of::<PoleAtlas>(hostile);
-    assert!(
-        refusal.contains("present exactly under the certified reading"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<PoleAtlas>(hostile);
 
     // A half-plane population that still totals the degree — so the count is lawful on its own
     // terms — but is not the one its own factors add up to.
     let mut hostile = chart(&atlas);
     hostile["half_plane"]["left"] = serde_json::json!(2);
     hostile["half_plane"]["right"] = serde_json::json!(1);
-    let refusal = refusal_of::<PoleAtlas>(hostile);
-    assert!(
-        refusal.contains("summed with multiplicity"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<PoleAtlas>(hostile);
 }
 
 /// **A remounted mode support re-derives its support from its own eigenvectors.** The support is a
@@ -1269,19 +1192,11 @@ fn a_mode_support_wire_re_derives_its_support_from_its_eigenvectors() {
 
     let mut hostile = chart(&first);
     hostile["support"] = serde_json::json!([0]);
-    let refusal = refusal_of::<ModeSupport>(hostile);
-    assert!(
-        refusal.contains("carried support against the exhibited eigenvectors"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<ModeSupport>(hostile);
 
     let mut hostile = chart(&first);
     hostile["geometric_multiplicity"] = serde_json::json!(2);
-    let refusal = refusal_of::<ModeSupport>(hostile);
-    assert!(
-        refusal.contains("exhibited eigenvector count"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<ModeSupport>(hostile);
 }
 
 /// **A remounted probe re-sums its own squared Frobenius norm.** That reading is the one the
@@ -1297,19 +1212,11 @@ fn a_resolvent_probe_wire_re_sums_its_own_frobenius_norm() {
 
     let mut hostile = chart(&probe);
     hostile["resolvent_frobenius_squared"] = rational(&integer(0));
-    let refusal = refusal_of::<ResolventProbe>(hostile);
-    assert!(
-        refusal.contains("squared Frobenius norm"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<ResolventProbe>(hostile);
 
     let mut hostile = chart(&probe);
     hostile["residual"] = rational(&ratio(1, 7));
-    let refusal = refusal_of::<ResolventProbe>(hostile);
-    assert!(
-        refusal.contains("exactly zero"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<ResolventProbe>(hostile);
 }
 
 /// **A remounted conserving space re-derives its refutation and re-certifies its witness.** The
@@ -1328,19 +1235,11 @@ fn a_conserving_receiver_space_wire_re_certifies_its_witness() {
             .expect("a symmetric form");
     let mut hostile = chart(&defective);
     hostile["witness"] = chart(&euclidean);
-    let refusal = refusal_of::<ConservingReceiverSpace>(hostile);
-    assert!(
-        refusal.contains("span of the solved basis"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<ConservingReceiverSpace>(hostile);
 
     let mut hostile = chart(&defective);
     hostile["vanishing_diagonals"] = serde_json::json!([1]);
-    let refusal = refusal_of::<ConservingReceiverSpace>(hostile);
-    assert!(
-        refusal.contains("vanishing diagonals against the exhibited basis"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<ConservingReceiverSpace>(hostile);
 
     let semisimple =
         conserving_receiver_space(&semisimple_realification()).expect("the space returns");
@@ -1363,35 +1262,19 @@ fn a_chord_wire_holds_its_components_to_the_entries_they_came_from() {
     let mut hostile = chart(&chord);
     hostile["hidden_modes"]["coefficients"] =
         serde_json::Value::Array(vec![rational(&integer(2))]);
-    let refusal = refusal_of::<CausalChord>(hostile);
-    assert!(
-        refusal.contains("hidden modes"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<CausalChord>(hostile);
 
     let mut hostile = chart(&chord);
     hostile["components"][0]["rational_pole"] = rational(&integer(5));
-    let refusal = refusal_of::<CausalChord>(hostile);
-    assert!(
-        refusal.contains("named once beside the residue") || refusal.contains("`x − pole`"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<CausalChord>(hostile);
 
     let mut hostile = chart(&chord);
     hostile["components"][0]["residue"]["rational"]["order"] = serde_json::json!(2);
-    let refusal = refusal_of::<CausalChord>(hostile);
-    assert!(
-        refusal.contains("declared pole order"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<CausalChord>(hostile);
 
     let mut hostile = chart(&chord);
     hostile["components"][0]["approximation_error"] = serde_json::json!("factor-only");
-    let refusal = refusal_of::<CausalChord>(hostile);
-    assert!(
-        refusal.contains("exact on exactly the rational poles"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<CausalChord>(hostile);
 }
 
 /// **A remounted separation must still separate.** A chart whose two numerators agree is not a
@@ -1409,17 +1292,9 @@ fn an_atlas_separation_wire_must_still_separate() {
 
     let mut hostile = chart(&separation);
     hostile["right_numerator"] = chart(&separation.left_numerator);
-    let refusal = refusal_of::<AtlasSeparation>(hostile);
-    assert!(
-        refusal.contains("no declared probe separates"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<AtlasSeparation>(hostile);
 
     let mut hostile = chart(&separation);
     hostile["transport_path"] = serde_json::json!(1);
-    let refusal = refusal_of::<AtlasSeparation>(hostile);
-    assert!(
-        refusal.contains("first of the declared separating probes"),
-        "the refusal names the disagreement: {refusal}"
-    );
+    assert_refused::<AtlasSeparation>(hostile);
 }

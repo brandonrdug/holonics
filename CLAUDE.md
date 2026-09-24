@@ -390,27 +390,19 @@ separate truth status from evidence; `agent-inferred` annotates a decision rathe
 [The document law](docs/canon/THE_DOCUMENT_LAW.md) gives the shared placement convention.
 
 Commands below use Bash; invoke Bash explicitly if the active shell is fish. CUDA may need
-`PATH=/opt/cuda/bin:$PATH`. [DEVELOPMENT](docs/DEVELOPMENT.md) owns the detailed procedure.
+`PATH=/opt/cuda/bin:$PATH`. [DEVELOPMENT](docs/DEVELOPMENT.md#verification-cadence) owns the
+detail. The gates, lowest first:
 
-```bash
-cargo check -p holonic-engine --lib
-cargo test -p <crate> --lib <module>::
-cargo test -p holonic-engine -p holonics-hna -p holonics --lib
-flock .local/gpu.lock cargo test -p <crate> --lib <module>:: -- --include-ignored --test-threads=1
-bash tools/lean_check.sh ElementaryHolonics.Framework.Geometry
-bash tools/lean_check.sh ElementaryHolonics  # complete research umbrella when that scope changed
-rustfmt --edition 2024 --config skip_children=true <explicit-changed-files.rs>
-git diff --check
-```
+1. any code change: `cargo check --workspace --all-targets`;
+2. once per step or PR: the host suite of each changed crate, `cargo test -p <crate>`;
+3. at the end of a step that changes HNN behaviour or a kernel: the GPU suite, alone on an idle
+   card, `flock .local/gpu.lock cargo test -p <crate> -- --include-ignored --test-threads=1`;
+4. when Lean changes: the library build, `bash tools/lean_check.sh`.
 
-Check current device use before GPU tests; the file lock coordinates only processes taking it.
-Record command, tree, scope and result in [VERIFICATION_RECEIPTS](docs/VERIFICATION_RECEIPTS.tsv).
-Reuse unchanged receipts. The primary verifies the combined changed scope; a later isolated fix
-needs its own scope rather than a replay of every suite. Lean verifies mathematics outside native
-cultivation/inference. A native packet that adds or changes a mathematical law lands with its
-Lean counterpart under the matching `Framework` entry point, or names the obligation it leaves
-in #62; formal work is part of the packet, not a later pass. The normal Lake default is `ElementaryHolonics.Framework`, not the complete
-research umbrella. Timeouts remain incomplete evidence.
+Record one receipt per step in [VERIFICATION_RECEIPTS](docs/VERIFICATION_RECEIPTS.tsv), not one
+per check. A timeout is incomplete evidence. A native packet that adds or changes a mathematical
+law lands with its Lean counterpart under the matching `Framework` entry point, or names the
+obligation it leaves in #62.
 
 [project-postulate] Claude delegates to at most **three Opus 5.5 workers** on disjoint owner paths,
 then **one Opus 5.5 reviewer that spawns nothing**; use fewer workers when the work does not split,

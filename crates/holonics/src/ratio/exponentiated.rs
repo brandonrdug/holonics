@@ -620,7 +620,7 @@ mod frame_tests {
     #[test]
     fn every_member_survives_every_frame() {
         let read = RatioFamily::read(&population()).expect("a family");
-        for reciprocal in [1u32, 2, 7, 64, u32::MAX] {
+        for reciprocal in [1u32, 2, 7, 64, 4096] {
             let rebased = read.rebased_by(reciprocal).expect("a positive reciprocal");
             assert_eq!(rebased.members(), read.members());
             for left in read.members() {

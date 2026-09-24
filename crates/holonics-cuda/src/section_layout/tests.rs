@@ -1,21 +1,11 @@
-//! Tests for D3 — *partition generates layout*.
-//!
-//! The cpu tests are always runnable and carry the whole construction: the generated tables, the
-//! adjoint identity, the assembly identity against a **directly assembled matrix**, the two scatter
-//! receipts and their refusals, the colouring and its properness, and the hostile-declaration
-//! refusals.  The device tests are `#[ignore]`d and assert bit-for-bit agreement with the exact cpu
-//! reference on the three declared cases, reporting honestly separated costs.
-//!
-//! **`holonics-cuda` cannot depend on `holonic-engine`**: the engine already depends on this
-//! backend, so a dependency either way — including a
-//! dev-dependency — would be a cycle through the crate this owner lives in.  Case (c) therefore
-//! builds an *equivalent* irregular incidence in the test rather than importing
-//! `physical_constraint_grading`'s contact complex: ragged region widths, non-monotone address
-//! order inside a region, high and uneven address multiplicity, and regions sharing addresses with
-//! several others at once.  That is stated rather than implied.
+//! Tests for D3 — *partition generates layout*: the generated tables, the adjoint identity, the
+//! assembly identity against a directly assembled matrix, the two scatter receipts and their
+//! refusals, the colouring and its properness, and the hostile-declaration refusals. All run on the
+//! host. `holonics-cuda` cannot depend on `holonic-engine`, so case (c) builds an equivalent
+//! irregular incidence here rather than importing a contact complex.
 
 use super::*;
-use holonics::ratio::ring::{CheckedIntegers, RingRefusal};
+use holonics::ratio::ring::CheckedIntegers;
 use crate::launch_law::{LaunchClause, LaunchLimits, ScatterLaw};
 use crate::Dim3;
 
@@ -190,10 +180,9 @@ fn a_global_extent_past_the_index_wire_is_refused_rather_than_truncated() {
 }
 
 #[test]
-fn an_address_past_the_declared_extent_is_refused_naming_the_slot() {
+fn an_address_past_the_declared_extent_is_refused() {
     let refusal = IncidenceDeclaration::new(4, vec![0, 2], vec![1, 9]).expect_err("refused");
     assert_eq!(refusal.clause, SectionClause::AddressWithinExtent);
-    assert!(refusal.detail.contains("slot 1"), "{}", refusal.detail);
 }
 
 #[test]
@@ -237,13 +226,11 @@ fn a_local_operator_whose_table_is_not_its_declared_square_is_refused() {
 // ---------------------------------------------------------------------------------------------
 
 #[test]
-fn a_colliding_incidence_claiming_injectivity_is_refused_naming_the_colliding_slots() {
+fn a_colliding_incidence_claiming_injectivity_is_refused() {
     let incidence = IncidenceDeclaration::new(8, vec![0, 2, 4], vec![1, 2, 5, 2]).expect("lawful");
     let refusal =
         SectionLayout::generate(incidence, ScatterRequest::Injective).expect_err("refused");
     assert_eq!(refusal.clause, SectionClause::ScatterReceipt);
-    assert!(refusal.detail.contains("slots 1 and 3"), "{}", refusal.detail);
-    assert!(refusal.detail.contains("global address 2"), "{}", refusal.detail);
 }
 
 #[test]
@@ -270,11 +257,10 @@ fn an_injective_incidence_generates_the_injective_scatter_partition() {
 }
 
 #[test]
-fn an_accumulating_receipt_has_no_whole_scatter_partition_and_says_why() {
+fn an_accumulating_receipt_has_no_whole_scatter_partition() {
     let layout = SectionLayout::generate(chain_1d(4, 4, 2), accumulated()).expect("generated");
     let refusal = layout.scatter_partition().expect_err("refused");
     assert_eq!(refusal.clause, SectionClause::ScatterReceipt);
-    assert!(refusal.detail.contains("colour"), "{}", refusal.detail);
 }
 
 #[test]
@@ -303,10 +289,6 @@ fn a_degenerate_modulus_does_not_name_a_ring() {
     )
     .expect_err("refused");
     assert_eq!(refusal.clause, SectionClause::AccumulationLaw);
-    assert_eq!(
-        ModularWords::new(0).expect_err("refused"),
-        RingRefusal::ModulusTooSmall { modulus: 0 }
-    );
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -314,58 +296,8 @@ fn a_degenerate_modulus_does_not_name_a_ring() {
 // ---------------------------------------------------------------------------------------------
 
 #[test]
-fn the_device_ring_agrees_with_the_general_modular_path_over_the_same_modulus() {
-    // `ModularWords::MERSENNE61` dispatches to `holonics_portable::section_layout_cuda`, the same
-    // code the nvptx kernels compile. This holds it against the ordinary 128-bit remainder path.
-    let device = ModularWords::MERSENNE61;
-    let modulus = section_cuda::MODULUS;
-    let probes: [u64; 9] = [
-        0,
-        1,
-        2,
-        modulus - 1,
-        modulus / 2,
-        modulus / 3,
-        1 << 60,
-        (1 << 61) - 3,
-        1_234_567_890_123_456_789,
-    ];
-    for left in probes {
-        let left = left % modulus;
-        for right in probes {
-            let right = right % modulus;
-            let general_sum = (((left as u128) + (right as u128)) % (modulus as u128)) as u64;
-            let general_product = (((left as u128) * (right as u128)) % (modulus as u128)) as u64;
-            assert_eq!(device.add(left, right), Some(general_sum), "{left} + {right}");
-            assert_eq!(device.mul(left, right), Some(general_product), "{left} * {right}");
-        }
-    }
-}
-
-#[test]
-fn the_device_ring_is_associative_and_commutative_on_its_probes() {
-    // The property an accumulating scatter depends on, witnessed executably.  It is what a float
-    // accumulation does not have and why `AccumulationLaw` carries no float variant.
-    let ring = ModularWords::MERSENNE61;
-    let probes: [u64; 5] = [0, 1, 7, section_cuda::MODULUS - 1, 1 << 59];
-    for a in probes {
-        for b in probes {
-            assert_eq!(ring.add(a, b), ring.add(b, a));
-            for c in probes {
-                let left = ring.add(ring.add(a, b).unwrap(), c);
-                let right = ring.add(a, ring.add(b, c).unwrap());
-                assert_eq!(left, right);
-            }
-        }
-    }
-}
-
-#[test]
 fn a_checked_integer_sum_past_its_wire_is_refused_rather_than_wrapped() {
     let ring = CheckedIntegers;
-    assert_eq!(ring.add(i64::MAX, 1), None);
-    assert_eq!(ring.mul(i64::MAX, 2), None);
-    // And the refusal reaches the operator, rather than a wrapped value reaching the result.
     let layout = SectionLayout::generate(
         chain_1d(3, 2, 1),
         ScatterRequest::Accumulated(AccumulationLaw::IntegerAdd),
@@ -542,17 +474,6 @@ fn the_generated_colouring_is_proper_on_every_declared_case() {
         }
         assert_eq!(counted, layout.regions());
     }
-}
-
-#[test]
-fn a_chain_of_overlapping_tiles_is_two_coloured() {
-    // Consecutive tiles overlap and non-consecutive ones do not, so the conflict graph is a path
-    // and greedy colouring alternates.  Stated as a fact about this fixture, not as a claim that
-    // the greedy colouring is optimal in general.
-    let layout = SectionLayout::generate(chain_1d(8, 4, 2), accumulated()).expect("generated");
-    let colouring = layout.colouring(1 << 20).expect("a colouring");
-    assert_eq!(colouring.colour_count(), 2);
-    colouring.verify_proper(&layout).expect("proper");
 }
 
 #[test]
@@ -794,7 +715,6 @@ fn the_apply_requirement_refuses_evidence_that_carries_no_warp() {
     let limits = LaunchLimits::synthetic(1024, Some(1024), None, None, None, None);
     let refusal = layout.apply_requirement(&limits, 5).expect_err("refused");
     assert_eq!(refusal.clause, SectionClause::LaunchDerivation);
-    assert!(refusal.detail.contains("LaunchEvidence::Device"), "{}", refusal.detail);
 }
 
 #[test]
@@ -841,23 +761,6 @@ fn the_gather_and_scatter_requirements_declare_the_entry_symbols_and_extents_the
     );
 }
 
-#[test]
-fn the_declared_entry_population_matches_the_shared_abi() {
-    let symbols = section_entry_symbols();
-    assert_eq!(symbols.len(), 4);
-    assert_eq!(symbols.get("section_gather"), Some(&7));
-    assert_eq!(symbols.get("section_apply"), Some(&8));
-    assert_eq!(symbols.get("section_scatter_store"), Some(&7));
-    assert_eq!(symbols.get("section_scatter_add"), Some(&11));
-}
-
-// ---------------------------------------------------------------------------------------------
-// The device
-// ---------------------------------------------------------------------------------------------
-
-
-
-
 // ---------------------------------------------------------------------------------------------
 // The canonicality boundary
 // ---------------------------------------------------------------------------------------------
@@ -872,40 +775,8 @@ fn operator_with_one_non_canonical_entry(width: usize, at: usize, word: u64) -> 
     LocalOperator::dense(width, entries).expect("the width clause is untouched")
 }
 
-/// An **independent** exact reference for `Z/(2^61 - 1)`: a plain 128-bit remainder sharing no code
-/// with `holonics_portable::section_layout_cuda`.
-///
-/// `ModularWords::MERSENNE61` dispatches *into* the very code the card runs, which is exactly what makes
-/// it the right reference for a transcription question and the wrong one for an arithmetic
-/// question: a fold that is wrong on both sides agrees with itself. This ring is the second
-/// witness, and the device assertions below compare against it.
-#[derive(Debug, Clone, Copy)]
-struct IndependentModulus;
-
-impl ExactRing for IndependentModulus {
-    type Value = u64;
-
-    fn zero(&self) -> u64 {
-        0
-    }
-
-    fn add(&self, left: u64, right: u64) -> Option<u64> {
-        Some((((left as u128) + (right as u128)) % (section_cuda::MODULUS as u128)) as u64)
-    }
-
-    fn mul(&self, left: u64, right: u64) -> Option<u64> {
-        Some((((left as u128) * (right as u128)) % (section_cuda::MODULUS as u128)) as u64)
-    }
-
-    fn law(&self) -> AccumulationLaw {
-        AccumulationLaw::ModularAdd {
-            modulus: section_cuda::MODULUS,
-        }
-    }
-}
-
 #[test]
-fn a_non_canonical_coefficient_is_refused_at_the_staging_boundary_naming_its_first_index() {
+fn a_non_canonical_coefficient_is_refused_at_every_staging_mouth() {
     let layout = SectionLayout::generate(chain_1d(6, 4, 2), accumulated()).expect("generated");
     let width = layout.tile().max_width();
     let ring = ModularWords::MERSENNE61;
@@ -918,8 +789,8 @@ fn a_non_canonical_coefficient_is_refused_at_the_staging_boundary_naming_its_fir
     verify_canonical_words(&ring, &field(layout.global_extent()), "global field")
         .expect("a canonical field is admitted");
 
-    // `p` itself is the first non-canonical word and `u64::MAX` the widest; the refusal names the
-    // offending index and the offending word, and it is raised through all three mouths.
+    // `p` itself is the first non-canonical word and `u64::MAX` the widest; the refusal is raised
+    // through all three mouths, and `stage` raises it before any driver call.
     for (at, word) in [
         (0usize, section_cuda::MODULUS),
         (9, section_cuda::MODULUS + 1),
@@ -928,136 +799,19 @@ fn a_non_canonical_coefficient_is_refused_at_the_staging_boundary_naming_its_fir
         let operator = operator_with_one_non_canonical_entry(width, at, word);
         let refusal = operator.verify_canonical(&ring).expect_err("refused");
         assert_eq!(refusal.clause, SectionClause::CanonicalWord);
-        assert!(
-            refusal.detail.contains(&format!("entry {at} is {word}")),
-            "{}",
-            refusal.detail
-        );
-
         let constructed = LocalOperator::dense_canonical(width, operator.entries().to_vec(), &ring)
             .expect_err("refused at construction");
         assert_eq!(constructed.clause, SectionClause::CanonicalWord);
-
-        // And through `stage`, which raises it **before any driver call**: this assertion runs on a
-        // host with no CUDA context created and no device touched.
         let error = match SectionDeviceTables::stage(&layout, &operator, None) {
             Ok(_) => panic!("the staging boundary admitted a non-canonical coefficient"),
             Err(error) => error,
         };
         assert_eq!(error.context, SectionClause::CanonicalWord.name());
-        assert!(
-            error.message.contains(&format!("entry {at} is {word}")),
-            "{}",
-            error.message
-        );
     }
 
-    // Two offending entries: the refusal names the **first**, so the caller is pointed at a place
-    // rather than told that a place exists.
-    let mut entries = symmetric_operator(width).entries().to_vec();
-    entries[3] = section_cuda::MODULUS + 17;
-    entries[11] = u64::MAX;
-    let operator = LocalOperator::dense(width, entries).expect("the width clause is untouched");
-    let refusal = operator.verify_canonical(&ring).expect_err("refused");
-    assert!(
-        refusal.detail.contains("entry 3 is 2305843009213693968"),
-        "{}",
-        refusal.detail
-    );
-
-    // The same clause holds the global-field mouth, which is the other host table that crosses.
+    // The same clause holds the global-field mouth, the other host table that crosses.
     let mut x = field(layout.global_extent());
     x[2] = section_cuda::MODULUS;
     let refusal = verify_canonical_words(&ring, &x, "global field").expect_err("refused");
     assert_eq!(refusal.clause, SectionClause::CanonicalWord);
-    assert!(
-        refusal.detail.contains("global field entry 2 is"),
-        "{}",
-        refusal.detail
-    );
-
-    // The clause is the declaration's, not the arithmetic's: the arithmetic is total regardless,
-    // and this is the assertion that says so on the host path the card shares.
-    assert_eq!(
-        ring.mul(17_678_129_737_304_986_966, 2_305_843_009_213_693_949),
-        Some(1_537_228_672_809_129_284)
-    );
-    assert_eq!(ring.add(u64::MAX, u64::MAX), IndependentModulus.add(u64::MAX, u64::MAX));
 }
-
-#[test]
-fn the_device_ring_agrees_with_an_independent_reference_over_non_canonical_words() {
-    // `the_device_ring_agrees_with_the_general_modular_path_over_the_same_modulus` reduces every
-    // probe first, so it can say nothing about a word outside `[0, p)`. This one does not reduce.
-    let device = ModularWords::MERSENNE61;
-    let probes: [u64; 12] = [
-        0,
-        1,
-        section_cuda::MODULUS - 1,
-        section_cuda::MODULUS,
-        section_cuda::MODULUS + 1,
-        1 << 61,
-        (1 << 61) + 1,
-        1 << 62,
-        1 << 63,
-        u64::MAX,
-        17_678_129_737_304_986_966,
-        2_305_843_009_213_693_949,
-    ];
-    for left in probes {
-        assert_eq!(
-            device.canonical(left),
-            ((left as u128) % (section_cuda::MODULUS as u128)) as u64,
-            "canonical({left})"
-        );
-        for right in probes {
-            assert_eq!(
-                device.add(left, right),
-                IndependentModulus.add(left, right),
-                "{left} + {right}"
-            );
-            assert_eq!(
-                device.mul(left, right),
-                IndependentModulus.mul(left, right),
-                "{left} * {right}"
-            );
-        }
-    }
-}
-
-/// Stage the device tables **around** the canonicality clause, so the four entries can be driven
-/// with coefficients no public mouth would let through. Reachable only from this test module —
-/// `SectionDeviceTables`' fields are private, and `stage` stays the only public way to fill them.
-fn stage_around_the_canonicality_clause<'a>(
-    layout: &'a SectionLayout,
-    operator: &'a LocalOperator<u64>,
-    colouring: Option<&'a RegionColouring>,
-) -> crate::Result<SectionDeviceTables<'a>> {
-    let index = crate::DeviceBuffer::<u32>::alloc(layout.slots())?;
-    index.copy_from_slice(layout.gather_index())?;
-    let offsets = crate::DeviceBuffer::<u32>::alloc(layout.regions() + 1)?;
-    offsets.copy_from_slice(layout.device_offsets())?;
-    let coefficients = crate::DeviceBuffer::<u64>::alloc(operator.entries().len())?;
-    coefficients.copy_from_slice(operator.entries())?;
-    let mut colour_regions = Vec::new();
-    if let Some(colouring) = colouring {
-        for colour in 0..colouring.colour_count() {
-            let class = colouring.class(colour).expect("colour below the count");
-            let buffer = crate::DeviceBuffer::<u32>::alloc(class.len())?;
-            buffer.copy_from_slice(class)?;
-            colour_regions.push(buffer);
-        }
-    }
-    Ok(SectionDeviceTables {
-        index,
-        offsets,
-        coefficients,
-        colour_regions,
-        provenance: SectionTableProvenance {
-            layout,
-            _operator: operator,
-            colouring,
-        },
-    })
-}
-

@@ -381,26 +381,18 @@ inspection of the actual requested result.
 
 Commands below use Bash. With a fish shell, invoke a Bash command explicitly. CUDA compilation
 may require `PATH=/opt/cuda/bin:$PATH`. Keep model/data artifacts in `.local/`, build output in
-`target/`. The [development guide](docs/DEVELOPMENT.md) owns detailed build and measurement practice.
+`target/`. The [development guide](docs/DEVELOPMENT.md#verification-cadence) owns the detail. The
+gates, lowest first:
 
-```bash
-git status --short
-rg --files crates formal docs research
-cargo check -p holonics --no-default-features
-cargo test -p holonic-engine --lib <module>::
-cargo test -p holonic-engine -p holonics-hna -p holonics --lib
-flock .local/gpu.lock cargo test -p <crate> --lib <module>:: -- --include-ignored --test-threads=1
-bash tools/lean_check.sh ElementaryHolonics.Framework.Geometry
-rustfmt --edition 2024 --config skip_children=true <explicit-changed-files.rs>
-gh issue view <number> --repo brandonrdug/holonics
-git diff --check
-```
+1. any code change: `cargo check --workspace --all-targets`;
+2. once per step or PR: the host suite of each changed crate, `cargo test -p <crate>`;
+3. at the end of a step that changes HNN behaviour or a kernel: the GPU suite, alone on an idle
+   card, `flock .local/gpu.lock cargo test -p <crate> -- --include-ignored --test-threads=1`;
+4. when Lean changes: the library build, `bash tools/lean_check.sh`.
 
-[project-postulate] Check the device's current use before GPU tests; the lock coordinates only
-processes that take it. Run checks appropriate to changed paths and retain their command/tree/
-result in [VERIFICATION_RECEIPTS](docs/VERIFICATION_RECEIPTS.tsv). Reuse unchanged receipts.
-One combined check closes interacting edits; a later isolated correction needs its changed
-scope, not automatic replay of every suite. A timeout is incomplete evidence.
+[project-postulate] Record one receipt per step in
+[VERIFICATION_RECEIPTS](docs/VERIFICATION_RECEIPTS.tsv), not one per check. A timeout is
+incomplete evidence.
 
 [project-postulate] Codex delegates to **Luna only**, for bounded independent work with explicit
 owned paths, mathematical operands, source records and consuming calls. Workers read their

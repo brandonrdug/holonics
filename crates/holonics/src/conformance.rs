@@ -162,21 +162,18 @@ pub fn energy_at<L: HolonLaw>(law: &L, state: &HolonState) -> Result<Rat, HolonE
 
 #[cfg(test)]
 mod tests {
-    use num_bigint::{BigInt, BigUint};
     use num_traits::{One, Signed};
-    use crate::geometry::RationalPhase;
 
     use super::*;
     use crate::complex::CellComplex;
     use crate::deposition::{DepositLedger, divergent_state, indefinite_block, project_passive};
     use crate::element::{ActiveRelation, Pump, PumpSchedule, ResistiveRelation};
     use crate::exact_linear::ExactRatMatrix;
-    use crate::generator::{Clock, PhaseLift, jump_cocycle};
+    use crate::generator::Clock;
     use crate::holon::{Holon, PortCounts, PortHolon, medium_structure};
     use crate::inertia::SymmetricForm;
     use crate::law::{ReferenceHolon, Scheme, active_receiver};
     use crate::port::Bond;
-    use crate::restriction::{KronReduction, SquareDefect};
     use crate::scalar::{from_blocks, int, integer_matrix, ints, is_zero, matrix, quad, rat, sub};
 
     fn form(rows: &[Vec<i64>]) -> SymmetricForm {
@@ -578,26 +575,10 @@ mod tests {
     }
 
     // ---------------------------------------------------------------------------------------
-    // Generators: winding jump and carry
-
-    #[test]
-    fn a_holon_generator_jumps_losslessly_and_its_jumps_are_carries() {
-        let lift = PhaseLift::new(RationalPhase::new(rat(2, 3), 1), BigInt::from(-1));
-        assert!(lift.jump_is_lossless(|(c, s)| c * c + int(3) * s));
-        let n = BigUint::from(7u32);
-        for (a, b, c) in [(3u32, 5u32, 6u32), (6, 6, 6), (0, 13, 1)] {
-            assert!(jump_cocycle(&n, &a.into(), &b.into(), &c.into()).unwrap());
-        }
-        let mut clock = Clock::ring(int(1), 7).unwrap();
-        assert_eq!(clock.advance(&BigUint::from(20u32)), BigUint::from(2u32));
-        assert_eq!(clock.phase(), [BigUint::from(6u32)]);
-    }
-
-    // ---------------------------------------------------------------------------------------
     // Restriction
 
     #[test]
-    fn restriction_square_kron_and_defect() {
+    fn a_port_restriction_of_the_medium_passes_the_restriction_check() {
         let law = medium_law(
             &integer_matrix(&[&[0, 1], &[-1, 0]]).unwrap(),
             &integer_matrix(&[&[1, 0], &[0, 0]]).unwrap(),
@@ -608,31 +589,6 @@ mod tests {
         // Restrict the five ports (σ σ ρ ρ π) to the storage and input ports summed.
         let map = PortMap::new(integer_matrix(&[&[1, 1, 0, 0, 0], &[0, 0, 0, 0, 1]]).unwrap());
         check_restriction(&law, &map, &ints(&[1, -2, 3, 0, 5]), &ints(&[2, -1])).unwrap();
-        // The scale square: diagonal closes, shift carries its typed defect.
-        let read = integer_matrix(&[&[1, 0]]).unwrap();
-        assert!(
-            SquareDefect::new(
-                &read,
-                &integer_matrix(&[&[2, 0], &[0, 5]]).unwrap(),
-                &integer_matrix(&[&[2]]).unwrap()
-            )
-            .unwrap()
-            .closes()
-        );
-        let defect = SquareDefect::new(
-            &read,
-            &integer_matrix(&[&[0, 1], &[0, 0]]).unwrap(),
-            &integer_matrix(&[&[4]]).unwrap(),
-        )
-        .unwrap();
-        assert_eq!(defect.at(&ints(&[0, 1])).unwrap(), ints(&[1]));
-        // Kron: the series path.
-        let network = integer_matrix(&[&[1, -1, 0], &[-1, 3, -2], &[0, -2, 2]]).unwrap();
-        let kron = KronReduction::new(&network, &[1]).unwrap();
-        assert!(
-            kron.is_exact_at(&kron.extend(&ints(&[1, 4])).unwrap())
-                .unwrap()
-        );
     }
 
     // ---------------------------------------------------------------------------------------

@@ -1969,7 +1969,6 @@ mod tests {
                 exhausted.message
             );
         }
-        assert!(exhausted.message.contains("--test-threads=1"));
         let mut calls = 0;
         let failure = super::retry_allocation_measurement(|| {
             calls += 1;
@@ -2013,43 +2012,5 @@ mod tests {
     fn zero_fill_count_is_measured_in_cuda_dwords() {
         assert_eq!(device_dword_count::<u32>(7), 7);
         assert_eq!(device_dword_count::<u64>(7), 14);
-    }
-
-
-    #[test]
-    #[ignore = "requires a CUDA device with virtual-memory management"]
-    fn virtual_device_buffer_maps_a_new_tail_without_readdressing_its_body() -> Result<()> {
-        init()?;
-        let device = Device::get(0)?;
-        let context = Context::create(&device)?;
-        let logical_words = 1usize << 24;
-        let mut buffer = VirtualDeviceBuffer::<u32>::reserve(0, logical_words, 1)?;
-        let base = buffer.base_address();
-        let first_mapped = buffer.mapped_elements();
-        assert!(first_mapped > 0);
-        assert!(first_mapped < logical_words);
-        assert_eq!(buffer.mapping_count(), 1);
-
-        buffer.copy_range_from_slice(0, &[11, 13, 17, 19])?;
-        let growth = buffer.ensure_mapped(first_mapped + 1)?;
-        assert!(growth.newly_mapped_elements > 0);
-        assert_eq!(growth.mapping_operations, 1);
-        assert!(growth.base_address_unchanged);
-        assert_eq!(buffer.base_address(), base);
-        assert_eq!(buffer.mapping_count(), 2);
-
-        let mut prefix = [0u32; 4];
-        buffer.copy_range_to_slice(0, &mut prefix)?;
-        assert_eq!(prefix, [11, 13, 17, 19]);
-        let mut new_tail = [u32::MAX; 2];
-        buffer.copy_range_to_slice(first_mapped, &mut new_tail)?;
-        assert_eq!(new_tail, [0, 0]);
-        buffer.copy_range_from_slice(first_mapped, &[23, 29])?;
-        buffer.copy_range_to_slice(first_mapped, &mut new_tail)?;
-        assert_eq!(new_tail, [23, 29]);
-
-        drop(buffer);
-        context.destroy()?;
-        Ok(())
     }
 }

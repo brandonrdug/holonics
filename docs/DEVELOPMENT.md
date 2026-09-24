@@ -128,16 +128,11 @@ the driver can JIT the admitted PTX on the actual device. Model material is supp
 
 ```sh
 export PATH=/opt/cuda/bin:$PATH
-cargo check --workspace --lib --bins
-cargo build -p holonics-workbench --bin holonics
-target/debug/holonics --help
-target/debug/holonics hna --help
+cargo check --workspace --all-targets
 ```
 
-For Rust clients, the local `crates/holonics` package exposes `structure` and `geometry` even
-with default features disabled. Default `native` also exposes `engine`, `hna`, `soulkiller`
-and `interop`, preserving the existing runtime API. The [Rust framework guide](RUST_FRAMEWORK.md)
-states the dependency and implementation boundaries. The facade re-exports its owners.
+The main `holonics` library has no features and builds without CUDA. The
+[Rust framework guide](RUST_FRAMEWORK.md) states the dependency and implementation boundaries.
 
 ## Training and inference
 
@@ -243,45 +238,25 @@ further applications; the file is an experiment, not a universal gate or native 
 
 ## Verification cadence
 
-[definition] CUDA controls that measure allocation granularity require an isolated allocation
-reading. Run the explicit resident-return controls with `--test-threads=1`; concurrent contexts
-can invalidate that calibration before the numerical test starts. This is an observer/apparatus
-condition, not a production worker limit or a reason to serialize independent native currents.
+[definition] The gates, lowest first:
 
-[established-bounded; source-inspected] **What that calibration measures and why concurrency
-breaks it.** `holonics_cuda::cuda::measure_allocation_grain_once` reads the free extent, allocates one
-word, reads it again, and takes the difference as the legacy `cuMemAlloc` charge grain; it then
-frees the word, requires the free extent to close exactly at its starting value, and requires a
-probe one word wider than the grain to cost exactly twice. Nothing is declared and no page size is
-guessed. The reading it differences, `cuMemGetInfo_v2`, is the free extent of the **whole device**
-— not of this context and not of this process — so any other allocation on the card between two
-samples enters the difference and the closure check fails with `one-word charge … and restored
-free extent … do not close`. The perturbation carries no attribution and cannot be subtracted.
-The calibration is therefore serialized process-wide (two of our own calibrations never sample
-across each other), a disturbed sample is retried a bounded `ALLOCATION_CALIBRATION_ATTEMPTS`
-times with the retry count reported by `holonics_cuda::cuda::allocation_calibration_retries`, and an
-exhausted calibration returns **every** attempt's reading, so readings that repeat name an
-allocator that does not compose while readings that differ name a busy card. None of that makes
-a shared card measurable: run `--include-ignored` device suites with `--test-threads=1` and no
-other GPU process, one crate at a time.
+1. Any code change: `cargo check --workspace --all-targets`.
+2. Once per step or PR: the host suite of each changed crate, `cargo test -p <crate>`.
+3. At the end of a step that changes HNN behaviour or a kernel: the GPU suite, run alone on an
+   idle card under the lock, one crate at a time:
+   `flock .local/gpu.lock cargo test -p <crate> -- --include-ignored --test-threads=1`.
+4. When Lean changes: the library build, `bash tools/lean_check.sh`.
 
-```sh
-cargo test -p holonics-hna --lib hna
-cargo test -p holonics-workbench --lib adapters::hna
-cargo test --workspace --lib --bins --tests
-cargo check --workspace --examples
-```
+Receipts are recorded once per step in [`VERIFICATION_RECEIPTS.tsv`](VERIFICATION_RECEIPTS.tsv),
+not once per check.
 
-[definition] The workspace commands above are appropriate for a workspace-wide source move;
-ordinary changes use their affected owner tests. Supervise productive compilation and diagnose
-an unfinished check before resuming it. Retain successful unaffected checks. The blanket gate,
-document/index tools and source-size ledger are archived; do not recreate them or compile every
-example/paper after each edit. Review source cohesion and verify behavior directly.
-"Retain successful unaffected checks" means a line in
-[`VERIFICATION_RECEIPTS.tsv`](VERIFICATION_RECEIPTS.tsv), not a memory. Parallel workers share
-one tree and one `target/`, so they build only their own module scopes; `--all-targets` compiles
-every example and belongs to a workspace-wide source move. `target/` had grown to 626 GB by
-September 19 and was cleaned; keep models, rests and evidence out of it.
+[established-bounded; source-inspected] The GPU suite runs alone because
+`holonics_cuda::cuda::measure_allocation_grain_once` differences the whole device's free extent
+(`cuMemGetInfo_v2`): another allocation on the card between two samples breaks its closure check,
+and `holonics_cuda::cuda::allocation_calibration_retries` reports the bounded retries.
+
+Builds share one scratch target directory with `CARGO_PROFILE_DEV_DEBUG=line-tables-only`; keep
+models, rests and evidence out of `target/`.
 
 [definition] `CONSTRUCTION_STATE.md` records the current position and
 `docs/plans/THE_ROADMAP.md` orders construction. The shared machine and mathematical guides support the harness-specific

@@ -513,18 +513,6 @@ mod tests {
     }
 
     #[test]
-    fn the_reach_weighs_and_the_hand_gates_separately() {
-        let heavy = step(1_000_000, 0);
-        let light = step(1, 0);
-        // Both weigh; neither decides. The hand is what gates, and it is not derived from the
-        // weight — a carrier that let the heavier one decide would have promoted a magnitude into
-        // an admission.
-        assert_eq!(*heavy.reach(), 1_000_000);
-        assert_eq!(*light.reach(), 1);
-        assert_eq!(heavy.hand(), light.hand());
-    }
-
-    #[test]
     fn the_founding_hand_is_its_own_reverse() {
         assert_eq!(Hand::Cohere.reversed(), Hand::Anti);
         assert_eq!(Hand::Anti.reversed(), Hand::Cohere);

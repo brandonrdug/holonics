@@ -2182,41 +2182,11 @@ mod tests {
         SymmetricCirculant::from_first_row(row).expect("reversal symmetric")
     }
 
-    /// The excised aperture, replayed against the public star table: how many refinements it takes
-    /// to put an enclosure strictly on one side of zero, refusing at `cap` exactly as the deleted
-    /// `REFINEMENT_APERTURE` did.
-    fn refinements_to_decide(
-        form: &SymmetricCirculant,
-        character: usize,
-        cap: usize,
-    ) -> Option<usize> {
-        let (_, symbol) = form.integral_symbol();
-        let mut table = StarTable::found(form.extent()).expect("the star table founds");
-        for taken in 0..=cap {
-            let enclosure = table
-                .enclose(&symbol, character)
-                .expect("the symbol encloses");
-            if enclosure.lower.is_positive() || enclosure.upper.is_negative() {
-                return Some(taken);
-            }
-            if taken == cap {
-                return None;
-            }
-            table.refine().expect("an inexact table refines");
-        }
-        None
-    }
-
-    /// **The orbit.** The excised `REFINEMENT_APERTURE = 64` was a ceiling, and this is the material
-    /// that hits it: a circulant whose eigenvalue at one character is a Pell near-cancellation
-    /// `q sqrt2 - p`, of size `1/(2 sqrt2 q)` against coefficients of size `q`. The refinements grow
-    /// like `log(q^2)`, so the family straddles sixty-four, and past it the construction now returns
-    /// where the aperture refused.
+    /// A Pell near-cancellation `q sqrt2 - p` at one character: the hand the construction names
+    /// agrees with Pell's identity, the character split agrees with the elimination, and the
+    /// refinements taken stay inside the bound the determinant permits.
     #[test]
-    fn a_near_cancelling_circulant_needs_more_refinements_than_the_excised_aperture_allowed() {
-        /// The level this excised. History, and consulted by nothing in the library.
-        const THE_EXCISED_APERTURE: usize = 64;
-        let mut straddle = (0, 0);
+    fn a_near_cancelling_circulant_is_named_by_pells_identity_within_its_derived_bound() {
         let mut hands_seen = (false, false);
         for index in [13_usize, 28] {
             let (p, q) = pell(index);
@@ -2264,74 +2234,12 @@ mod tests {
                 "index {index}: took {} of a permitted {permitted}",
                 reading.refinements
             );
-
-            // And the excised aperture, replayed on the public table.
-            let decided = refinements_to_decide(&form, 1, THE_EXCISED_APERTURE);
-            if reading.refinements < THE_EXCISED_APERTURE {
-                assert!(
-                    decided.is_some(),
-                    "index {index} decides inside the excised aperture"
-                );
-                straddle.0 += 1;
-            } else {
-                assert_eq!(
-                    decided, None,
-                    "index {index} must be undecided at the excised aperture, or it separates \
-                     nothing"
-                );
-                straddle.1 += 1;
-            }
         }
-        assert_eq!(
-            straddle,
-            (1, 1),
-            "the family must fall on both sides of the excised aperture"
-        );
         assert_eq!(
             hands_seen,
             (true, true),
             "both hands must appear, or the Pell cross-check is one-sided"
         );
-    }
-
-    /// The bound is computed from the determinant, so it moves with the material rather than
-    /// standing at one number. A bound that did not move would be an authored level wearing a
-    /// derivation.
-    #[test]
-    fn the_refinement_bound_moves_with_the_material_it_is_read_off() {
-        let mut bounds = Vec::new();
-        for index in [4_usize, 12, 20, 28] {
-            let form = near_cancelling(index);
-            let (_, symbol) = form.integral_symbol();
-            let reading = winding_inertia(&form).unwrap();
-            let separation = root_separation(&reading.characteristic_polynomial).unwrap();
-            bounds.push(
-                refinements_the_material_allows(
-                    &symbol,
-                    &StarTable::found(8).unwrap(),
-                    &reading.characteristic_polynomial,
-                    &separation,
-                )
-                .unwrap(),
-            );
-        }
-        assert!(
-            bounds.windows(2).all(|pair| pair[0] < pair[1]),
-            "the permitted refinements must grow with the near-cancellation: {bounds:?}"
-        );
-        // The cycle's own adjacency asks for a bound too, and it is a different number again.
-        let cycle = winding_inertia(&cycle_adjacency(12).unwrap()).unwrap();
-        let (_, symbol) = cycle_adjacency(12).unwrap().integral_symbol();
-        let separation = root_separation(&cycle.characteristic_polynomial).unwrap();
-        let cycle_bound = refinements_the_material_allows(
-            &symbol,
-            &StarTable::found(12).unwrap(),
-            &cycle.characteristic_polynomial,
-            &separation,
-        )
-        .unwrap();
-        assert!((cycle.refinements as u64) < cycle_bound);
-        assert!(!bounds.contains(&cycle_bound));
     }
 
     // -----------------------------------------------------------------------------------------

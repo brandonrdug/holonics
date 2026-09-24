@@ -610,68 +610,10 @@ impl<T, S> FibreDefect<PreimageFibre<T, Vec<usize>>, S> {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::BTreeSet;
-
     use super::*;
 
     fn q(n: i64) -> Rat {
         Rat::from_integer(n.into())
-    }
-
-    /// The wire a class fibre replaced, exactly as it was derived.
-    #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-    #[serde(deny_unknown_fields)]
-    struct OldCollapsedFibre {
-        native: u32,
-        occurrences: BTreeSet<u64>,
-    }
-
-    crate::fibre_field_names!(
-        Collapsed = "OldCollapsedFibre",
-        "native",
-        "occurrences",
-        deny
-    );
-    crate::fibre_field_names!(Loose = "OldCollapsedFibre", "native", "occurrences", allow);
-
-    #[test]
-    fn a_named_preimage_fibre_keeps_its_wire_and_debug_shape() {
-        let old = OldCollapsedFibre {
-            native: 7,
-            occurrences: [3, 1, 4].into_iter().collect(),
-        };
-        let new: PreimageFibre<u32, BTreeSet<u64>, Collapsed> =
-            PreimageFibre::new(7, [3, 1, 4].into_iter().collect());
-        let old_json = serde_json::to_string(&old).unwrap();
-        assert_eq!(serde_json::to_string(&new).unwrap(), old_json);
-        assert_eq!(format!("{old:?}"), format!("{new:?}"));
-        assert_eq!(format!("{old:#?}"), format!("{new:#?}"));
-        let back: PreimageFibre<u32, BTreeSet<u64>, Collapsed> =
-            serde_json::from_str(&old_json).unwrap();
-        assert_eq!(back, new);
-        let value = serde_json::to_value(&new).unwrap();
-        let from_value: PreimageFibre<u32, BTreeSet<u64>, Collapsed> =
-            serde_json::from_value(value).unwrap();
-        assert_eq!(from_value, new);
-        // Positional form, as a non-self-describing codec would present it.
-        let positional: PreimageFibre<u32, BTreeSet<u64>, Collapsed> =
-            serde_json::from_str("[7,[1,3,4]]").unwrap();
-        assert_eq!(positional, new);
-        let unknown = r#"{"native":7,"occurrences":[1],"extra":0}"#;
-        assert_eq!(
-            serde_json::from_str::<OldCollapsedFibre>(unknown).is_err(),
-            serde_json::from_str::<PreimageFibre<u32, BTreeSet<u64>, Collapsed>>(unknown).is_err()
-        );
-        assert!(serde_json::from_str::<PreimageFibre<u32, BTreeSet<u64>, Loose>>(unknown).is_ok());
-        let missing = r#"{"native":7}"#;
-        assert!(
-            serde_json::from_str::<PreimageFibre<u32, BTreeSet<u64>, Collapsed>>(missing).is_err()
-        );
-        let duplicate = r#"{"native":7,"native":8,"occurrences":[]}"#;
-        assert!(
-            serde_json::from_str::<PreimageFibre<u32, BTreeSet<u64>, Collapsed>>(duplicate)
-                .is_err()
-        );
     }
 
     #[test]

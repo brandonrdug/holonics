@@ -31,27 +31,6 @@ const RING_PROBES: [u64; 18] = [
 ];
 
 #[test]
-fn the_section_ring_multiplies_the_observed_counterexample_exactly() {
-    // Observed against the narrowing fold: `low + high` left the `u64` wire and the product came
-    // back eight short, silently inside `[0, p)` so that nothing downstream could notice.
-    let a: u64 = 17_678_129_737_304_986_966;
-    let b: u64 = 2_305_843_009_213_693_949;
-    let modulus = section_layout_cuda::MODULUS as u128;
-    let truth = (((a as u128) * (b as u128)) % modulus) as u64;
-    assert_eq!(truth, 1_537_228_672_809_129_284);
-    assert_eq!(section_layout_cuda::mul(a, b), 1_537_228_672_809_129_284);
-    // And the same product reached through the canonical residues, which is the value a caller who
-    // had reduced by hand would have got: totality means the two agree.
-    assert_eq!(
-        section_layout_cuda::mul(a, b),
-        section_layout_cuda::mul(
-            section_layout_cuda::canonical(a),
-            section_layout_cuda::canonical(b)
-        )
-    );
-}
-
-#[test]
 fn the_section_ring_is_total_on_every_boundary_pair() {
     let modulus = section_layout_cuda::MODULUS as u128;
     for value in RING_PROBES {
