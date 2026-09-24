@@ -1,4 +1,5 @@
 import ElementaryHolonics.Framework.Core
+import ElementaryHolonics.Foundation.Receiver
 import ElementaryHolonics.Foundation.LatticeTransport
 import ElementaryHolonics.Foundation.FractalPacking
 import ElementaryHolonics.Foundation.BoundaryScalePassage
@@ -12,7 +13,6 @@ import ElementaryHolonics.Geometry.PhaseCarry
 import ElementaryHolonics.Geometry.PairResonance
 import ElementaryHolonics.Geometry.ConnectionCalculus
 import ElementaryHolonics.Millennium.HolonicComposition
-import ElementaryHolonics.Millennium.Rigidity
 
 /-!
 # Orientation, scale, constraints, and curved transport

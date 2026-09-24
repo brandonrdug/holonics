@@ -324,3 +324,11 @@ research path through that owner. `Geometry.PairResonance` also drops an unused 
 `Millennium.Farey` import; its elementary determinant characterization stays in Geometry. The
 source closure counts, direct importers, and exact Lake gate list are recorded there. Verification
 is pending root coordination; no Lake builds were run for this cut.
+
+## M2 Receiver shared-junction extraction
+
+[`M2_GEOMETRY_RECEIVER_RIGIDITY.md`](M2_GEOMETRY_RECEIVER_RIGIDITY.md) moves the generic shared
+kernel/fibre laws from the concrete `Millennium.Rigidity` examples into the already-reachable
+`Foundation.Receiver` owner. `Framework.Geometry` names the Receiver owner directly and drops its
+direct Rigidity import; the Research module retains the square and collinear stress instances. The
+closure audit and focused pending Lake gates are recorded in the cut report.
