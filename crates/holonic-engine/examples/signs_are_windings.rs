@@ -59,10 +59,10 @@
 use holonics::exact_linear::ExactRatMatrix;
 use holonic_engine::grown_cell::{ComplexAperture, Schedule, found_complex, grow, standard_cells};
 use holonics::inertia::{Inertia, PivotOrder, SymmetricForm, congruence, inertia};
-use holonic_engine::winding_inertia::{
+use holonic_engine::winding_inertia::cyclic_receiver_of_growth;
+use holonics::geometry::winding_inertia::{
     Hand, PassageReturn, StarTable, SymmetricCirculant, WindingError, WindingInertia,
-    cycle_adjacency, cycle_laplacian, cyclic_receiver_of_growth, quarter_turn_reading,
-    winding_inertia,
+    cycle_adjacency, cycle_laplacian, quarter_turn_reading, winding_inertia,
 };
 use num_bigint::BigInt;
 use num_traits::{One, Zero};

@@ -28,7 +28,7 @@
 //! Run: `PATH=/opt/cuda/bin:$PATH cargo run -p holonic-engine --example curvature_is_the_adjacency`
 
 use holonic_engine::discrete_curvature::{DiscreteCurvatureConfiguration, FLAT_COORDINATION};
-use holonic_engine::winding_inertia::{Hand, PassageReturn, SymmetricCirculant, winding_inertia};
+use holonics::geometry::winding_inertia::{Hand, PassageReturn, SymmetricCirculant, winding_inertia};
 use holonic_engine::{HingeId, VertexId};
 use num_bigint::BigInt;
 use holonics::geometry::Rat;

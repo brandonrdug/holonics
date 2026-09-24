@@ -15,6 +15,8 @@ pub mod receiver_topology;
 pub mod scene;
 pub mod screw;
 pub mod winding;
+pub mod winding_inertia;
+pub mod winding_inertia;
 
 pub use decorated_path::*;
 pub use eta_atlas::*;

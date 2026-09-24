@@ -27,7 +27,7 @@ use holonics::inertia::SymmetricForm;
 use crate::neck::{
     AnalyticCertificate, ConstitutiveLink, NeckReading, RealSpectrumLicence, WidthFace,
 };
-use crate::winding_inertia::Hand;
+use holonics::geometry::winding_inertia::Hand;
 use crate::physical_constraint_complex::{ConstraintEdge, ConstraintVertexId};
 use crate::physical_constraint_grading::EdgeProvenance;
 use crate::rigidity_receiver::{ExactConfiguration, RigidityJacobian, rigidity_reading};

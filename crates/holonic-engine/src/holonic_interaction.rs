@@ -116,7 +116,7 @@
 //! bare signature: `docs/HOLONIC_NOTATION.md` rules that a count of signs is a state reading and
 //! that a sign is a passage. [`FormSplit`] carries the split, the hand, the null cone and — where
 //! the form is a symmetric circulant — the **named windings** of its passages, taken from
-//! [`crate::winding_inertia::winding_inertia`], which is that naming's owner.
+//! [`holonics::geometry::winding_inertia::winding_inertia`], which is that naming's owner.
 //!
 //! # The interface between two media
 //!
@@ -169,7 +169,7 @@ use holonics::inertia::{Inertia, InertiaError, SymmetricForm, inertia};
 use crate::junction_law::{
     Interface, JointUnits, JunctionField, JunctionRefusal, JunctionVerdict, check_junction,
 };
-use crate::winding_inertia::{Hand, SymmetricCirculant, WindingInertia, winding_inertia};
+use holonics::geometry::winding_inertia::{Hand, SymmetricCirculant, WindingInertia, winding_inertia};
 
 pub const HOLONIC_INTERACTION_SCHEMA: &str = "holonic-engine.holonic-interaction.v1";
 
@@ -250,7 +250,7 @@ pub use holon::HolonicInteractionLaw;
 
 /// **The extent above which a form's passages are not named by winding.**
 ///
-/// [definition] [`crate::winding_inertia::winding_inertia`] isolates one algebraic root per
+/// [definition] [`holonics::geometry::winding_inertia::winding_inertia`] isolates one algebraic root per
 /// character against a Sturm chain. The split is available at every extent; the *naming* of the
 /// passages stops here, and its absence is reported as absence rather than as a defect.
 pub const WINDING_EXTENT_CEILING: usize = 16;
@@ -3100,7 +3100,7 @@ impl StorageRateReading {
 /// realizer. The **hand** is which side is called positive, and it is a declared convention:
 /// negating a form swaps the two hands and moves no split. Where the form is a symmetric
 /// circulant its passages are **named by their windings** through
-/// [`crate::winding_inertia::winding_inertia`], which is the owner of that naming; this reading
+/// [`holonics::geometry::winding_inertia::winding_inertia`], which is the owner of that naming; this reading
 /// composes it and re-founds nothing.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct FormSplit {
@@ -3118,7 +3118,7 @@ pub struct FormSplit {
     /// [`WINDING_EXTENT_CEILING`]. **Absent is absence, not a defect**: most forms carry no cyclic
     /// symmetry for any character group to factor through, and naming their passages by winding
     /// would be a fabrication — which is why
-    /// [`crate::winding_inertia::SymmetricCirculant::from_symmetric_form`] refuses them.
+    /// [`holonics::geometry::winding_inertia::SymmetricCirculant::from_symmetric_form`] refuses them.
     pub windings: Option<WindingInertia>,
 }
 

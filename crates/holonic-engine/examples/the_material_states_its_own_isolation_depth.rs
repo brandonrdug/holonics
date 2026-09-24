@@ -38,7 +38,7 @@ use holonics::rational_polynomial::{
     interior_split_schedule, rational_root_census, resultant_in_eliminated_variable,
     root_separation, worst_retained_fraction,
 };
-use holonic_engine::winding_inertia::{StarTable, SymmetricCirculant, winding_inertia};
+use holonics::geometry::winding_inertia::{StarTable, SymmetricCirculant, winding_inertia};
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 use holonics::geometry::Rat;

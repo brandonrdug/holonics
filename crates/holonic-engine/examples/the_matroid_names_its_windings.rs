@@ -28,7 +28,8 @@ use std::process::ExitCode;
 
 use holonics::inertia::{Inertia, SymmetricForm, inertia};
 use holonic_engine::matroid_chow::{ChowError, ChowRing, Matroid};
-use holonic_engine::winding_inertia::{
+use holonic_engine::winding_inertia::cyclic_receiver_of_form;
+use holonics::geometry::winding_inertia::{
     CyclicReading, Hand, PassageReturn, SymmetricCirculant, WindingError, winding_inertia,
 };
 use num_traits::{One, Signed, Zero};

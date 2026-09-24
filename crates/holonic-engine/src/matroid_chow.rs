@@ -97,7 +97,8 @@ use holonics::inertia::{Inertia, InertiaError, SymmetricForm, inertia};
 use holonics::rebase_invariants::IntegerMatrix;
 use holonics::rebase_invariants::PivotRule;
 use holonics::rebase_invariants::smith_normal_form;
-use crate::winding_inertia::{CyclicReceiver, WindingError, cyclic_receiver_of_form};
+use crate::winding_inertia::{CyclicReceiver, cyclic_receiver_of_form};
+use holonics::geometry::winding_inertia::WindingError;
 
 /// A subset of the ground set, as a bitmask. The ground set is bounded by [`GROUND_APERTURE`], so
 /// one machine word holds every subset and the empty set is `0`.
@@ -1363,7 +1364,7 @@ impl ChowRing {
 
     /// Hand this ring's generator pairing to the organ that names windings, and return what it says.
     ///
-    /// [`crate::winding_inertia`] declines to count signs: where a form's inertia factors through a
+    /// [`holonics::geometry::winding_inertia`] declines to count signs: where a form's inertia factors through a
     /// character group, every direction has a **name** — how far it winds — and the lawful return is
     /// the windings rather than a tally of negatives. The condition for that is a cyclic group acting
     /// on the generators and preserving the pairing, and this asks the material whether one does.
@@ -2691,7 +2692,7 @@ mod tests {
                         "{name}: the ring's own flat order was already circulant, so the two-frame \
                          claim would be one frame"
                     );
-                    let split = crate::winding_inertia::winding_inertia(&receiver.circulant)
+                    let split = holonics::geometry::winding_inertia::winding_inertia(&receiver.circulant)
                         .expect("the circulant names its passages")
                         .split();
                     assert_eq!(
@@ -2727,7 +2728,7 @@ mod tests {
         let receiver = ring
             .cyclic_generator_receiver(1_000_000)
             .expect("U(3,3) admits a cyclic reading");
-        let reading = crate::winding_inertia::winding_inertia(&receiver.circulant).unwrap();
+        let reading = holonics::geometry::winding_inertia::winding_inertia(&receiver.circulant).unwrap();
 
         let nulls = reading.null_windings();
         assert_eq!(nulls.len(), ring.matroid().ground() - 1);
@@ -2748,7 +2749,7 @@ mod tests {
             ]
         );
         assert_eq!(
-            reading.windings_of(crate::winding_inertia::Hand::WithTheTurn),
+            reading.windings_of(holonics::geometry::winding_inertia::Hand::WithTheTurn),
             vec![Rat::zero()]
         );
         assert_eq!(reading.passage(0).unwrap().star_polygon.label(), "{1/0}");
