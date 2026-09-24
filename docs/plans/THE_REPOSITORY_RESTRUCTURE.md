@@ -195,36 +195,6 @@ run one workspace build per batch, and restore only what the build proves is nee
 suites (GPU) run once per step and for any change to HNN behaviour. Use one PR per plan step,
 not one per module.
 
-**Tests are not gates (Brandon, September 24).** The existing Rust and GPU tests were written
-beside each campaign and never reviewed as a set. Many assert retired semantics (frozen-cut
-comparisons, old rest version bytes, token-occurrence sessions), sentences about the tree, or
-GPU-state-dependent values that fail spuriously under contention. On September 24, eight HNN GPU
-tests that pass on pre-stack main failed on the stack tip. By code reading, the stack's change is
-the intended contemporary-read law: a delayed comparison keeps its producing operands and
-re-reads the field when it returns. The tests encode the retired frozen-cut behaviour, and one
-failed only under contention. Until campaign **T** lands:
-- the workspace build (`cargo check --workspace --all-targets`) is the gate for moves and
-  deletions;
-- a change to HNN behaviour is judged by reading its code against the operator contract and the
-  retention law;
-- no test result decides a retirement.
-
-**T: rebuild the tests and gates (isolated campaign, new issue).**
-- Inventory every test and gate binary.
-- Delete tests that assert retired semantics, repository-content sentences, fixture-specific
-  numbers without a stated law, or GPU contention artefacts.
-- Write the replacements from the operator contract, one per law, each naming the law it checks:
-  - the conservation and power balances;
-  - `∂²=0` and Stokes;
-  - delayed = immediate at one constitution;
-  - rest round-trip at the current version only;
-  - host/device parity for each kernel.
-- Define the gate tiers and when each runs:
-  1. build;
-  2. host law suite;
-  3. GPU parity and behaviour suite, run alone on an idle card with its receipt;
-  4. the Lean library builds.
-
 **Remaining:**
 - R4: remove the HNN's positional/old-length rest decoders and serde defaults for absent legacy
   fields.
@@ -784,149 +754,58 @@ source-qualified verification; no package rename substitutes for it.
 
 ## 4. Order of work
 
-**The restructure** moves and retires existing code with its current behavior, verified by the
-existing suites (§0.9):
+**Done (landed on main, September 24):**
+- R0 census.
+- R1–R2 retirement by reachability (§0.11).
+- R3's Core, Ratio and MomentStorage edges.
+- C phases 11, 12a and 12b.
+- The first M1 moves: the Holon core, geometry, ratio, receiver, standing and release now sit in
+  `holonics`, and the driver sits in `holonics-cuda`.
 
-1. **R0 census (first; nothing retired before it).** Record the
-   exact HEAD, dirty files, worktrees/branches, build outputs and saved artifacts. Commit or
-   account for the uncommitted Lean/research work and the paused WIP branches. Produce
-   `docs/plans/THE_REPOSITORY_CENSUS.md` with one table per area:
-   - Rust owners and examples;
-   - Lean files outside the foundation;
-   - documents and records;
-   - issues.
+**Next, in order.** Each step is one PR and one issue. Retirement uses reachability from the
+roots in §0.11.
 
-   Each table's columns are: path, lines, elementary object or application, consumers
-   (build-confirmed), superseding owner, disposition (**keep** / **fold** / **retire**, applying
-   §0.1), target (§3) and verification. **The census is Codex's working instrument, not a
-   review for Brandon** (September 23): he has already stated what is kept (§0, §2), so dispositions
-   follow those rules and proceed without a review step. A disposition that would delete one of
-   §2's objects or a checked non-duplicate theorem is a mistake in the census, not a question to
-   escalate.
-2. **R1: Rust with no consumer.** Retire engine modules and examples first; their laws move to
-   Lean or a guide first, as §0.1 requires.
-3. **R2: the Soma/`life` lineage and unconsumed crates.** Covers `holonic-body`, `-membrane`,
-   `-surface`, `-circulation-abi`, `-language`, `holonics-workspace`, the dead parts of
-   `holonic-life`, and `accelerators/` per §0.4. The isolated Vulkan surface cut is complete;
-   continue with the remaining consumers. The `holonic-words` package is now retired by the
-   [ring owner move](census/M1_RING_OWNER_MOVE.md). The
-   [membrane owner audit](census/R2_MEMBRANE_EDGE.md) finds a live receive/standing runtime used by
-   `life` and CUDA: its source moves with callers into main `holonics` during the Rust cut. The
-   ERST `.holon` reader/deed adapter has been retired in R2 while retaining the runtime rest-image
-   codec. The
-   [workspace owner audit](census/R2_WORKSPACE_EDGE.md) finds a live workbench application edge:
-   disposition its old persisted readers under §0.2, then move retained application operations
-   into workbench or retire the command after the `life`/HNN owners move. Neither live crate is a
-   safe delete-only R2 cut; #65 stays open across those caller moves.
-4. **R3: the Lean foundation cut.** Cut the §0.10 edges, curate the `Holonics` root and retire
-   duplicate or wrapper theorems. Build `ElementaryHolonics.Framework` and the affected research
-   modules.
-5. **R4: compatibility debt.** Remove every alias, forwarding path and legacy decoder (§0.2).
-6. **C: finish the paused consolidation.** Rebase phases 11, 12a and 12b (WIP branches) onto the
-   reduced tree, then do phase 14. The [Phase 12a integration map](census/C_PHASE12A_INTEGRATION.md)
-   records its current operand-rest cut; the [Phase 12b return](census/C_PHASE12B_INTEGRATION.md)
-   records coupled v7/v12 and published-continuation rest. Both name remaining C acceptance.
-7. **M1: the Rust cut.**
-   - Establish the minimal backend-neutral HNN section/receipt boundary in `holonics::hnn`, with
-     the shared packet words owned by `holonics-portable::wire`; make the current consuming field
-     call use that boundary. This is the dependency-inversion prerequisite in §0.3, not K2's host
-     reference or full execution-port conformance.
-   - Extract the field's engine-owned current, wave, material and readout values to main or make
-     them explicit typed boundary operands; move `DerivedLaunch` to the CUDA section/launch owner;
-     and move or recast every remaining engine CUDA caller until the engine-to-CUDA edge is gone.
-     Then move the CUDA resident closure—driver-facing resident sections, `embedding_fiber`, field
-     operators, CUDA kernels and their `build.rs`—into `holonics-cuda::hnn` with behavior and wire
-     unchanged. Move/update HNA and life callers with their owners. Never add a CUDA-to-engine edge
-     to bridge the move.
-   - Merge `holonic-core`, `relational-geometry`, live `holonic-structure`, the source-neutral
-     engine, the live membrane receive/standing runtime and extraction into substantive
-     `holonics`. Move backend-specific membrane execution with the resident CUDA HNN.
-   - Update every caller in the same commits (§0.2).
-   - Verify the seam packet with `holonics` all-target compilation and its focused section/receipt
-     owner tests, plus the current field consumer tests. For the resident move, run the locked
-     workspace all-target check, regenerate/validate the relocated CUDA PTX from the moved kernels
-     and its exported entry ABI, then run focused section/field and native-rest tests plus
-     `mount-link-gate`, `mount-register-gate`, `mount-register-remount-gate` and `mount-scope-gate`
-     on the card under the GPU lock. Also verify `holonics` builds without CUDA and the workbench
-     check passes. Record each command and receipt in the M1 census.
-   - Clean the old `target/`.
+1. **T: tests and gates (#144).** The suite was written beside each campaign for a
+   1.3M-line monolith. It is 142k lines: 3,208 tests, 582 of them GPU-gated. Re-running it cost
+   hours during the restructure. Audit it by owner and delete tests that:
+   - assert old save/wire versions or decoding;
+   - assert prose, paths, citations or repository contents;
+   - encode retired semantics (tapes, frozen cuts, token sessions, circulation, protein fixtures);
+   - are campaign measurements dressed as tests (long loops, printed summaries, fixture numbers
+     without a stated law);
+   - duplicate another test of the same law.
 
-   **M1 dependency and core owner cuts:** `holonics` no longer depends on HNA, engine or life,
-   and it no longer forwards their `hna`, `engine`, `soulkiller` or `interop` surfaces. The workbench
-   selects the direct HNA and engine packages. The Holon core and source-neutral exact operators
-   are now internal root modules of `holonics`; callers use those qualified paths directly.
-   The live structural carriers now belong to internal `holonics::structure`, with their callers
-   retargeted. The dependency-free, `no_std` [`holonics-portable` leaf](census/M1_PORTABLE_LEAF_MOVE.md)
-   now owns the former `holonic-body` source unchanged apart from crate naming and the shared
-   `section_layout_cuda` arithmetic/entry ABI. The exact ratio ring now lives in
-   `holonics::ratio::ring`, section refusals belong to CUDA, and the `holonic-words` package is
-   retired ([ring owner audit](census/M1_RING_OWNER_MOVE.md); focused gates are pending).
-   The [portable section ABI move](census/M1_PORTABLE_SECTION_LAYOUT_MOVE.md) passes its focused
-   portable/host checks, pinned PTX validation, exported ABI parity and section-adoption card tests.
-   [Structure](census/M1_STRUCTURE_OWNER_MOVE.md) and
-   [geometry](census/M1_GEOMETRY_OWNER_MOVE.md) now have internal main-library source and measured
-   gates. The exact causal-chord equation extractor now belongs to `holonics::receiver::causal_chord`; its
-   portable laws move with it and engine-owner comparisons remain engine integration tests.
-   [Causal chord](census/M1_CAUSAL_CHORD_OWNER_MOVE.md) records its source split and pending gate.
-   The [ratio and information operators](census/M1_RATIO_OWNER_MOVE.md) now live under `holonics::ratio`;
-   the [live membrane runtime](census/M1_MEMBRANE_OWNER_MOVE.md) now lives under `holonics::membrane`;
-   the active relation/action grammar now lives under `holonics::generator::action`, with the
-   unused ABI conduct dispatcher retired and its no-caller/no-test evidence recorded in
-   [the action owner audit](census/M1_GENERATOR_ACTION_OWNER_MOVE.md);
-   the remaining `soma-abi` schemas had no production consumers and the package is retired in
-   [the ABI disposition](census/M1_PORTABLE_WIRE_MOVE.md#follow-up-retire-the-former-abi-package);
-   exact words and the remaining source-neutral engine/HNN laws still need disposition. Resident
-   engine/HNN execution moves to CUDA. The [CUDA apparatus](census/M1_CUDA_MOUNT_OWNER_MOVE.md)
-   now lives in `crates/holonics-cuda` as the `holonics-cuda` package (`holonics_cuda` library);
-   engine and life consumers use that owner directly, with committed PTX and binary names retained.
-   The source-neutral codec reflection/continuation relation is folded into
-   `holonics::generator::reflection`; `holonic-life` callers are retargeted and the separate
-   `holonic-language` package is retired. The [reflection owner audit](census/M1_REFLECTION_OWNER_MOVE.md)
-   records its checked Lean peer and pending focused gates. Receiver width, exact affine enclosure,
-   coarsening and caller-declared release now live in `holonics::receiver::release`; face and
-   passive-reading laws plus the two-axis Horizon value remain in `holonics::law::receiver`, while
-   tube reach and horizon composition remain in `holonics::restriction::tube::horizon`
-   ([owner move](census/M1_RECEIVER_RELEASE_MOVE.md)). Rust now refuses a `Widen` proposal below
-   measured width as required by Lean `ReleaseLaw.widenSound`; the prior executable law accepted
-   that invalid proposal. Lean states generic finite-family width and release laws but does not
-   formalize the Rust zonotope carrier, matrix transport implementation or work ceilings.
-8. **M2: the Lean move.** Move paths to `lean/` (`Holonics` and `HolonicsResearch`) and build both
-   targets. Rename `Soma.Holonics` to `Holonics` as a separate mechanical commit.
-9. **D: documents (the restructure's closing acceptance).** All to the verified paths:
-   - **Operator contracts:** [ELEMENTARY_OBJECTS](../ELEMENTARY_OBJECTS.md) owner map (current →
-     verified), [HOLON](../HOLON.md) operator methods, [THE_MACHINE](../THE_MACHINE.md) and
-     [HNN_FORMULA](../HNN_FORMULA.md) owner columns, [RECEIVER_HOLARCHY](../RECEIVER_HOLARCHY.md),
-     [FORMAL_FRAMEWORK](../FORMAL_FRAMEWORK.md), [RUST_FRAMEWORK](../RUST_FRAMEWORK.md),
-     [ARCHITECTURE_MAP](../ARCHITECTURE_MAP.md), and the CLAUDE.md/AGENTS.md owner tables.
-   - Guides that name `holonics::hna` or retired owners (ATHENA, NATIVE_HNA, CONVERSATION_DATA,
-     HARDWARE_AND_MODALITY_BOUNDARIES, the workbench guide) are updated or deleted.
-   - `CONSTRUCTION_STATE.md`, the roadmap and `docs/REPOSITORY.md`.
-   - **Last: rewrite `README.md` in full** to describe the repository as it now stands: the
-     libraries and their operators, `lean/`, the HNN, the applications, docs and research. The
-     restructure is complete only when the README matches the tree.
+   Keep fast tests of a named law of the operation, plus one host/device parity check per
+   kernel family. Retire the gates that serve only the old layout: source-scanning citation
+   tests, per-check receipt logging and `mount-*` gate binaries.
+2. **R4: compatibility debt.** Remove the positional/old-length rest decoders and the serde
+   defaults for absent legacy fields (§0.2).
+3. **M1: the Rust cut.**
+   - Move the source-neutral engine into `holonics` and the resident HNN (`native_ecology`,
+     `resident_section`, `embedding_fiber`, `cuda_refine`, the kernels and `build.rs`) into
+     `holonics-cuda::hnn`, following §0.3's dependency seam.
+   - Retire at item level on the way: anything the moved owners do not use stays behind and is
+     deleted with `holonic-engine`.
+   - Retire the `holonics-hna` name: its field sessions and stream go to `holonics::hnn` (law) and
+     `holonics-cuda::hnn` (resident). Check the non-field sessions (native, wave, coupled-wave,
+     mathematical) against the field, and retire the superseded ones.
+4. **C: phase 14** (the cultivated body) on the moved tree.
+5. **R3 remainder and M2 (Lean).** Remove the duplicate and wrapper theorems the audit found, cut
+   the Physics research ingress, then move to `lean/` as `Holonics` + `HolonicsResearch`.
+6. **R5: records and documents**, by citation from the kept guides and owners.
+7. **D: docs and README**, per the closing acceptance below.
 
-**Construction campaigns** run on the new layout, each with its own issue. K1 follows completion
-of M1 and M2; restructuring does not claim either K1 acceptance packet:
+**Construction** (K1–K5, #72–#76) and the machine campaigns (#17, #16, #18, #61) run on the new
+layout after M1.
 
-- **K1a:** complete structural `interconnect -> Holarchy` (§3.7): named, unit-checked port joins;
-  explicit cellular gluing; clock-mapped pump schedules; retained generator provenance and
-  restrictions; receiver-relative `view`, certified `count` and square-checked `refine`; typed
-  defects at each unresolved seam.
-- **K1b:** implement joint active `interact`/`receive` (§3.7), advancing both participants at one
-  declared contact and returning both next states, face, receipt, boundary currents, power balance
-  and unresolved fibre. The passive coholon reader remains its zero-storage specialization.
-- **K2:** the HNN execution port and host reference, one method at a time against the resident
-  CUDA return. This is the precondition for `holonics-apple`.
-- **K3:** finite physics cells. §3.5's tests cover polygon/cube reflection and join, wave
-  interference and propagation, the Euler/NS control volume and thermal exchange.
-- **K4:** the stress-energy source map and moving observer, the information-to-material port, and
-  independent clock axes (§3.6).
-- **K5 (#76):** the device-realization debts in `holonics-cuda` (formerly #12–#15 and #50).
-- **The machine** resumes after M1: GitHub #17, #16, #18 and #61, source-port growth of ring g0,
-  and the model-versus-uniform gap.
-
-Issue map: parent #63; R0 #64, R1–R2 #65, R3 #66, R4 #67, C #68, M1 #69, M2 #70, D #71;
-K1 #72, K2 #73, K3 #74, K4 #75, K5 #76.
+**Closing acceptance (D).** Update everything below to the verified paths:
+- **Operator contracts:** [ELEMENTARY_OBJECTS](../ELEMENTARY_OBJECTS.md), [HOLON](../HOLON.md),
+  [THE_MACHINE](../THE_MACHINE.md), [HNN_FORMULA](../HNN_FORMULA.md),
+  [RECEIVER_HOLARCHY](../RECEIVER_HOLARCHY.md), [FORMAL_FRAMEWORK](../FORMAL_FRAMEWORK.md),
+  [RUST_FRAMEWORK](../RUST_FRAMEWORK.md), [ARCHITECTURE_MAP](../ARCHITECTURE_MAP.md), and the
+  CLAUDE.md/AGENTS.md owner tables.
+- **Guides naming retired owners:** update or delete them.
+- **Last:** rewrite `README.md` in full to describe the repository as it now stands.
 
 Build hygiene starts now: use one shared scratch target directory and
 `CARGO_PROFILE_DEV_DEBUG=line-tables-only`; inspect each target/cache's owner before reclaiming
