@@ -30,7 +30,9 @@ separate Lake path/namespace migration. The move adds no wire decoder: the stand
   in other documentation; none point to `receiver/standing.rs` or `receiver/standing_tests.rs`.
   Internal Rust paths and the receiver law links in the moved owner resolve. The Holonic
   `[definition]` and `[implemented-exact]` markers are escaped as plain documentation labels.
+- After rebasing onto the verified Phase 12b session tip, `cargo check --locked -j2 --workspace
+  --all-targets` passed in 5m54s. This includes the main library, engine, CUDA, life, HNA and
+  application targets on the same dependency graph.
 - `git diff --check`: passes.
 
-The workspace all-target check remains for the root after it restacks onto the verified Phase 12b
-session cut. No Lean declaration changed, so no new Lean build obligation is created.
+No Lean declaration changed, so no new Lean build obligation is created.
