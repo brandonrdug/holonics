@@ -21,7 +21,7 @@ use std::sync::Arc;
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
-use relational_geometry::{Rat, ReceiverId};
+use holonics::geometry::{Rat, ReceiverId};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 

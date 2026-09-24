@@ -149,7 +149,7 @@
 //! ## No float, no scalar governor, no truncation
 //!
 //! Every coefficient is a `ComparativeMultiplicity` over `BigUint`; the independent rank runs over
-//! `relational_geometry::Rat`, which is `BigRational`. Nothing is ranked, scored, or thresholded: a
+//! `holonics::geometry::Rat`, which is `BigRational`. Nothing is ranked, scored, or thresholded: a
 //! pair either agrees under a declared criterion or it does not, and the population that does not is
 //! returned whole. A square population past the declared aperture is **refused by name with its
 //! size** ([`TwoCellRefusal::SquarePopulationExceedsAperture`]) rather than truncated, so a reading
@@ -159,7 +159,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 
 use crate::algebraic::{

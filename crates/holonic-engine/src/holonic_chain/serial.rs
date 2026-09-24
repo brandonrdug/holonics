@@ -15,7 +15,7 @@ use holonics::generator::Clock as CoreClock;
 use crate::holonic_interaction::{ContactFace, InteractionRefusal};
 use holonics::inertia::SymmetricForm;
 use num_traits::One;
-use relational_geometry::{
+use holonics::geometry::{
     AffineMap3, HingeAxis, Rat, RatVec3, RationalPhase, ScrewGenerator, SituatedScrew,
 };
 use thiserror::Error;
@@ -199,7 +199,7 @@ impl JointMotion {
             Self::Prismatic {
                 axis, displacement, ..
             } => AffineMap3 {
-                linear: relational_geometry::RatMat3::identity(),
+                linear: holonics::geometry::RatMat3::identity(),
                 translation: axis.scale(displacement),
             },
         }
@@ -242,7 +242,7 @@ impl JointMotion {
                 AffineMap3::rotation_about(pivot, axis.rotation(parameter))
             }
             Self::Prismatic { axis, .. } => AffineMap3 {
-                linear: relational_geometry::RatMat3::identity(),
+                linear: holonics::geometry::RatMat3::identity(),
                 translation: axis.scale(parameter),
             },
         }

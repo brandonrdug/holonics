@@ -18,7 +18,7 @@
 //! `(π A_fine − A_coarse π) x` of [`crate::restriction::SquareDefect`]
 //! (`Holon/Restriction.lean::squareDefect`), which is how the two square defects are one object.
 
-use relational_geometry::Rat;
+use crate::geometry::Rat;
 
 use super::SquareDefect as OperatorDefect;
 use super::tower::{

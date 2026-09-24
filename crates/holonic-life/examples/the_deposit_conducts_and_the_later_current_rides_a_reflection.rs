@@ -71,7 +71,7 @@ use life::incidence_production::{
     ArrivalResponse, DeclaredOccurrence, IncidenceComplex, IncidenceProductionError, PhaseChart,
 };
 use num_traits::Zero;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 /// The declared aperture on how many inscription patches of each occurrence participate. A caller
 /// declaration, never an authored level: the population it excludes is returned by the complex.

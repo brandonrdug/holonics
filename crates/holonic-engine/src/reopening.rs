@@ -152,12 +152,12 @@ use num_traits::{One, Signed, Zero};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use relational_geometry::exact::{Rat, integer};
-use relational_geometry::exact_analysis::RatInterval;
+use holonics::geometry::{Rat, integer};
+use holonics::geometry::RatInterval;
 
 use holonics::exact_value::ieee754::{BinaryFloatDatum, BinaryFloatSpecies, FloatReading};
 use holonics::exact_value::{CertifiedSeries, ExactInterval, SeriesTailCertificate};
-use relational_geometry::exact::ExactExpr;
+use holonics::geometry::ExactExpr;
 
 #[derive(Debug, Error, Clone, PartialEq, Eq)]
 pub enum ReopeningError {
@@ -284,7 +284,7 @@ pub enum FaceProvenance {
     Rational,
     /// A partial sum plus the exact remainder interval its tail certificate returns.
     CertifiedSeries(Box<CertifiedSeries>),
-    /// An interval-valued analytic carrier in `relational_geometry::exact_analysis`.
+    /// An interval-valued analytic carrier in `holonics::geometry::exact_analysis`.
     AnalyticEnclosure { carrier: String },
     /// An exact integer combination of other faces, with the combination retained.
     IntegerCombination { parts: Vec<(BigInt, String)> },
@@ -393,7 +393,7 @@ impl ExactFace {
     }
 
     /// A face carried by one of the analytic enclosures in
-    /// `relational_geometry::exact_analysis` — `log_rational_interval`,
+    /// `holonics::geometry::exact_analysis` — `log_rational_interval`,
     /// `exp_rational_interval`, `sin_cos_rational_interval` and their siblings.
     pub fn from_rat_interval(
         name: impl Into<String>,
@@ -1341,7 +1341,7 @@ pub fn finest_admissible_grain(faces: &[ExactFace]) -> CertifiedBits {
 mod tests {
     use super::*;
     use holonics::exact_value::ieee754::{decode_bfloat16_bits, decode_binary64_bits};
-    use relational_geometry::exact_analysis::log_rational_interval;
+    use holonics::geometry::log_rational_interval;
 
     fn grain_pair() -> Vec<DeclaredGrain> {
         vec![DeclaredGrain::bits(48), DeclaredGrain::bits(72)]

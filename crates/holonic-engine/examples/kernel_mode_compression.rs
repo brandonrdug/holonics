@@ -4,7 +4,7 @@ use holonics::exact_linear::{
     ExactRatMatrix, KernelModeError, KernelModeReduction, ReceiverFactorization,
 };
 use num_traits::Zero;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde_json::json;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 fn q(n: i64, d: i64) -> Rat {

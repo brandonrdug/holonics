@@ -18,7 +18,7 @@
 //! realization belongs to the existing native operator owners.
 use super::{ExactLinearError, ExactRatMatrix, LinearMapFamily, ReceiverFactorization};
 use num_traits::Zero;
-use relational_geometry::Rat;
+use crate::geometry::Rat;
 use std::sync::Arc;
 
 #[derive(Clone, Debug, PartialEq, Eq)]

@@ -49,7 +49,7 @@ use holonic_engine::quintic_chart::{
     CompassVerdict, NeusisVerdict, RadicalChartVerdict, read_ladder, read_quintic_charts,
 };
 use num_bigint::BigInt;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 /// Declared by this caller, matching the sibling degree drivers so the three are comparable.
 const PRIME_LIMIT: u64 = 97;

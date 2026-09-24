@@ -41,7 +41,7 @@ use holonics::rational_polynomial::{
 use holonic_engine::winding_inertia::{StarTable, SymmetricCirculant, winding_inertia};
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 /// The three levels this construction excised. They appear here as history and are read by nothing
 /// in the library; every refusal below is decided by a quantity computed from the material.

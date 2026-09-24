@@ -73,7 +73,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use holonics::structure::LocalSet;
 use num_bigint::BigUint;
 use num_traits::{ToPrimitive, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 

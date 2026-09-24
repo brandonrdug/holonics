@@ -31,7 +31,7 @@ use holonic_engine::traversible_chain::{
 use holonics::structure::Composes;
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use std::collections::BTreeMap;
 
 const KERNEL_BOUND: u64 = 1 << 20;

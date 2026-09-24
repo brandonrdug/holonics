@@ -49,7 +49,7 @@ use std::path::{Path, PathBuf};
 
 use num_bigint::BigInt;
 use num_traits::Zero;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 use holonic_engine::VertexId;
 use holonic_engine::spine_cut::{

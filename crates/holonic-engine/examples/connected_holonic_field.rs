@@ -5,7 +5,7 @@
 use holonics::exact_linear::ExactRatMatrix as Matrix;
 use holonic_engine::exponentiated_ratio::NormalizedKernel;
 use num_traits::{One, ToPrimitive, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde_json::{Value, json};
 use std::{error::Error, fs, time::Instant};
 

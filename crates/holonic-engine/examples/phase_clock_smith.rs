@@ -27,8 +27,8 @@ const MODULI: [u64; 2] = [5, 12];
 const PERIODS: [u32; 4] = [1, 2, 3, 5];
 const ENUMERATION_MODULUS: u64 = 5;
 
-fn q(numerator: i64, denominator: i64) -> relational_geometry::Rat {
-    relational_geometry::Rat::new(numerator.into(), denominator.into())
+fn q(numerator: i64, denominator: i64) -> holonics::geometry::Rat {
+    holonics::geometry::Rat::new(numerator.into(), denominator.into())
 }
 
 #[derive(Clone, Copy)]

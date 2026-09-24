@@ -22,7 +22,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use num_bigint::BigUint;
 use num_traits::{One, Signed, Zero};
-use relational_geometry::{Rat, RatVec3, ReceiverId};
+use holonics::geometry::{Rat, RatVec3, ReceiverId};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -2765,7 +2765,7 @@ mod tests {
     }
 
     use num_bigint::BigInt;
-    use relational_geometry::integer;
+    use holonics::geometry::integer;
 
     use super::*;
     use crate::{

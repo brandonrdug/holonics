@@ -57,7 +57,7 @@ impl<'c> NativeFieldCurrentSource<'c> {
         }
         let grain = self.grain;
         let rat = |value: i128| -> String {
-            relational_geometry::Rat::new(value.into(), num_bigint::BigInt::from(1u8) << grain)
+            holonics::geometry::Rat::new(value.into(), num_bigint::BigInt::from(1u8) << grain)
                 .to_string()
         };
         let mut map_error = bounds[0];

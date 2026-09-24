@@ -597,7 +597,7 @@ impl From<ReceiverHistoryRefusal> for RealizationPassageRefusal {
 #[cfg(test)]
 mod tests {
     use num_bigint::BigInt;
-    use relational_geometry::Rat;
+    use holonics::geometry::Rat;
 
     use super::*;
     use crate::cross_chart::chain_law;

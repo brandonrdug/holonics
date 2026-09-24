@@ -8,7 +8,7 @@ use super::*;
 use crate::exact_linear::ExactRatMatrix;
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
-use relational_geometry::Rat;
+use crate::geometry::Rat;
 
 /// The environment variable that turns the measurement on, and the coordinate extents it takes.
 const MEASURE_ENV: &str = "HOLONICS_PRIME_IMAGE_MEASURE";

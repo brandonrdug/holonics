@@ -20,7 +20,7 @@ use std::sync::Arc;
 
 use num_bigint::BigInt;
 use num_traits::{Signed, ToPrimitive, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 

@@ -15,7 +15,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use num_traits::{Signed, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 

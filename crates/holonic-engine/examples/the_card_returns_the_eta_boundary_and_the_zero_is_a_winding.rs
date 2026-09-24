@@ -7,7 +7,7 @@
 //! zeros and fixes only that line (`RH.theZeroSetIsReflectionStable`,
 //! `RH.theOffLineZeroIsNeverAlone`, kernel-checked). The law — bands at a start derived from the
 //! height, breadth-first certification, refinement that certifies only the cut, verification —
-//! is [`relational_geometry::eta_atlas`] and is shared with the serial driver. This driver plugs
+//! is [`holonics::geometry::eta_atlas`] and is shared with the serial driver. This driver plugs
 //! in [`ResidentEtaHead`], which forms the `O(N)` head of every pending midpoint of one depth in
 //! one launch of `kernels/exact_eta_head.cu` in exact fixed-point interval arithmetic.
 //!
@@ -26,7 +26,7 @@
 use holonic_engine::ResidentEtaHead;
 use num_bigint::BigInt;
 use num_rational::BigRational;
-use relational_geometry::{
+use holonics::geometry::{
     Field, HeadSource, RatInterval, SerialJets, atlas_base_config, atlas_summary, boundary_winding,
     build_atlas, derive_euler_maclaurin_start, eta_boundary_winding, read_atlas, receiver_band,
     regrain_atlas, split_winding, verify_artifact, verify_winding, write_atlas,

@@ -49,7 +49,7 @@ mod tests {
     use super::*;
     use crate::embedding_fiber::ResidentReadout;
     use num_bigint::BigInt;
-    use relational_geometry::Rat;
+    use holonics::geometry::Rat;
 
     fn words(values: &[i128]) -> Vec<(i64, i64)> {
         values

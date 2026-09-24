@@ -77,7 +77,7 @@ use std::time::Instant;
 
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
-use relational_geometry::{Rat, RatVec3, ScrewGenerator};
+use holonics::geometry::{Rat, RatVec3, ScrewGenerator};
 use serde::Serialize;
 use thiserror::Error;
 

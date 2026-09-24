@@ -6,7 +6,9 @@ publish = false
 license.workspace = true
 
 [dependencies]
-relational-geometry = { workspace = true }
+num-rational = { workspace = true }
+ron = { workspace = true }
+sha2 = { workspace = true }
 holonic-words = { workspace = true }
 num-bigint = { workspace = true }
 num-traits = { workspace = true }

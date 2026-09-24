@@ -5,7 +5,7 @@ use crate::native::coupled_wave::body::field::incident::machine_tests::{
 use holonic_engine::embedding_fiber::ResidentReadout;
 use holonic_engine::resident_section::{ResidentGrain, ResidentSurface};
 use num_bigint::BigInt;
-use relational_geometry::{AffineMap3, Rat, RatVec3, cayley_rotation_z};
+use holonics::geometry::{AffineMap3, Rat, RatVec3, cayley_rotation_z};
 
 fn rat(value: i64) -> Rat {
     Rat::from_integer(BigInt::from(value))
@@ -22,7 +22,7 @@ fn clock() -> ClockSpec {
 #[test]
 fn signed_translation_and_cayley_powers_are_exact_and_checked() {
     let translation = AffineMap3 {
-        linear: relational_geometry::RatMat3::identity(),
+        linear: holonics::geometry::RatMat3::identity(),
         translation: RatVec3::from_i64(1, 0, 0),
     };
     assert_eq!(

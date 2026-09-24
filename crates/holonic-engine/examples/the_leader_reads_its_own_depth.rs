@@ -63,7 +63,7 @@ use holonic_engine::leader_quadrature::{
 };
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
-use relational_geometry::{Rat, format_rat, integer, rat};
+use holonics::geometry::{Rat, format_rat, integer, rat};
 
 // ---------------------------------------------------------------------------------------------
 // declared material

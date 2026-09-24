@@ -10,7 +10,7 @@ use super::*;
 use crate::native::field_geometry::machine::{ClockSpec, CompiledGeneratorSite};
 use holonic_engine::native_ecology::constitutive_fibre::ResidentNormalEnclosureSection;
 use num_traits::Zero;
-use relational_geometry::{AffineMap3, Rat};
+use holonics::geometry::{AffineMap3, Rat};
 use serde::{Deserialize, Serialize};
 use std::rc::Rc;
 
@@ -189,7 +189,7 @@ pub(super) fn receiving_current_map(
     let action = signed_affine_power(site.phase_action(), exponent)?;
     Ok(AffineMap3 {
         linear: action.linear,
-        translation: relational_geometry::RatVec3::zero(),
+        translation: holonics::geometry::RatVec3::zero(),
     })
 }
 

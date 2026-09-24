@@ -32,7 +32,7 @@ use std::collections::BTreeMap;
 use holonic_engine::clifford::{Aim, Arrow, Causal, Clifford, Signature, merge_blades};
 use num_bigint::BigInt;
 use num_traits::Zero;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 fn rational(numerator: i64, denominator: i64) -> Rat {
     Rat::new(BigInt::from(numerator), BigInt::from(denominator))

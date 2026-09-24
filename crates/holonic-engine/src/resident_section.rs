@@ -66,7 +66,7 @@ use std::cell::RefCell;
 use std::ffi::c_void;
 
 use num_bigint::{BigInt, BigUint};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 use thiserror::Error;

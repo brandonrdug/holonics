@@ -77,8 +77,8 @@ use holonic_engine::reopening::{
     CertifiedBits, DeclaredGrain, ExactFace, Reopening, ReopeningError, ReopeningVerdict,
     dyadic_scale, finest_admissible_grain, probe_at_grain, reopen,
 };
-use relational_geometry::exact::{Rat, integer};
-use relational_geometry::exact_analysis::log_rational_interval;
+use holonics::geometry::{Rat, integer};
+use holonics::geometry::log_rational_interval;
 
 // ---------------------------------------------------------------------------------------------
 // The declared external material.

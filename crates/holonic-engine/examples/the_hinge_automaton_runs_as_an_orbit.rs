@@ -69,7 +69,7 @@ use holonic_engine::discrete_curvature::{
 };
 use holonic_engine::{HingeId, VertexId};
 use num_traits::Zero;
-use relational_geometry::{Rat, rat};
+use holonics::geometry::{Rat, rat};
 
 /// The caller's declared orbit aperture. It bounds how far this run walks and decides nothing about
 /// the law: a walk that used all of it is reported as unresolved, never as divergent.

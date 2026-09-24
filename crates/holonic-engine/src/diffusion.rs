@@ -35,7 +35,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::sync::{Arc, RwLock};
 
 use num_traits::{Signed, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -901,7 +901,7 @@ pub enum DiffusionError {
 
 #[cfg(test)]
 mod tests {
-    use relational_geometry::integer;
+    use holonics::geometry::integer;
 
     use super::*;
 

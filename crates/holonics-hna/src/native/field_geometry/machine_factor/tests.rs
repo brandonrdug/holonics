@@ -8,7 +8,7 @@ use holonics::exact_value::ExactInterval;
 use holonics::inertia::SymmetricForm;
 use num_bigint::{BigInt, BigUint};
 use num_traits::Zero;
-use relational_geometry::{AffineMap3, Rat, RatVec3};
+use holonics::geometry::{AffineMap3, Rat, RatVec3};
 
 fn r(value: i64) -> Rat {
     Rat::from_integer(BigInt::from(value))

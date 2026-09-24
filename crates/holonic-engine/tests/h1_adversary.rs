@@ -12,7 +12,7 @@ use holonic_engine::reduction_junction::*;
 use holonic_engine::section_partition::*;
 use num_bigint::{BigInt, BigUint};
 use num_traits::Zero;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 // -------------------------------------------------------------------------------------------------
 // fixtures

@@ -14,7 +14,7 @@ use holonic_engine::{
     ReceiverGraphSection, ReceiverHolonicComplexEvent, ReceiverHolonicComplexLaw,
     ReceiverPhaseSectionOccurrence,
 };
-use relational_geometry::{RatVec3, ReceiverId};
+use holonics::geometry::{RatVec3, ReceiverId};
 
 const DEFAULT_INPUT: &str =
     "target/holonic-engine/deterministic-image-completion-full-mask64/00_truth.png";

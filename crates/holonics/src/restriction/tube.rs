@@ -80,7 +80,7 @@ use std::fmt::{self, Debug};
 
 use num_bigint::BigUint;
 use num_traits::One;
-use relational_geometry::Rat;
+use crate::geometry::Rat;
 
 use crate::restriction::Descent;
 

@@ -30,7 +30,7 @@ use std::sync::Arc;
 use holonics::exact_value::ExactInterval;
 use holonic_engine::{AtmosphericContactSelection, AtmosphericInverseResolution, AtmosphericInverseWork, AtmosphericLayerId, AtmosphericProfileId, AtmosphericReceiverBody, AtmosphericResolutionId, AtmosphericVerticalCoordinate, AtmosphericVerticalFiber, CausalWorld, CoupledInformantEvent, CoupledInformantLaw, CoupledInformantStanding, CoupledPhaseChart, EventId, ExactDifferenceVector, HydrostaticChordReceipt, ImageExtent, LearnedPartitionRelation, OpaqueThermalChordDoctrine, PredictedReceiverRelation, RayFamily, ReceiverChannelSample, ReceiverCoordinateFamilyId, ReceiverPhaseAtlasError, ReceiverPhaseAtlasEvent, ReceiverPhaseAtlasLaw, ReceiverPhaseAtlasStanding, ReceiverPhaseSectionOccurrence, ReceiverPredictionId, ReceiverRelationPrediction, ReceiverRelationState, ReceiverTestimonyId, ReturnedAlgorithmId, SpectralAddressStatus, SpectralBandId, SpectralContactTemporality, SpectralReceiverContact, SpectralReceiverOccurrence, SpectralScanId, VerticalFiberSupport};
 use num_bigint::BigInt;
-use relational_geometry::{Rat, RatVec3, ReceiverId};
+use holonics::geometry::{Rat, RatVec3, ReceiverId};
 
 fn main() -> Result<(), Box<dyn Error>> {
     println!("== the phase atlas reads the channel population the receiver declares ==\n");

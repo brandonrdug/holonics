@@ -23,7 +23,7 @@ use holonics_hna::native::{
     GeometricFieldSpec, NativeFieldSession, NativeFieldSourceSpec, NativeFieldSources,
 };
 use num_traits::{One, ToPrimitive, Zero};
-use relational_geometry::{Rat, RatVec3, ScrewGenerator, integer};
+use holonics::geometry::{Rat, RatVec3, ScrewGenerator, integer};
 use serde_json::{Value, json};
 use std::{
     collections::{BTreeMap, BTreeSet},

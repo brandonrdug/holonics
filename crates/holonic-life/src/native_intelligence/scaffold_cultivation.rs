@@ -741,7 +741,7 @@ mod tests {
         native_ecology::holonic_intelligence::conduct_native_inference, native_spool::fixture,
     };
     use num_bigint::BigInt;
-    use relational_geometry::Rat;
+    use holonics::geometry::Rat;
 
     #[test]
     fn returned_local_interaction_preserves_disjoint_morphology_and_survives_release() {

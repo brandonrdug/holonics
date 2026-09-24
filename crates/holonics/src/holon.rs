@@ -33,7 +33,7 @@
 //! | `mediumJ`, `mediumHolon`, `medium_admits` | [`medium_structure`], [`PortHolon::medium`] |
 
 use num_traits::Zero;
-use relational_geometry::{Rat, WindingError};
+use crate::geometry::{Rat, WindingError};
 use serde::Serialize;
 use thiserror::Error;
 

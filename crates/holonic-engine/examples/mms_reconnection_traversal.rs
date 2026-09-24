@@ -24,7 +24,7 @@ use holonics::exact_linear::ExactRatMatrix;
 use holonic_engine::{CausalBodyDeed, CausalBodyEvent, CausalBodyStanding, CausalCellId, CausalCellReference, CausalTraversalPassageId, CausalTraversalSpeciesId, CausalWorld, ComparativeMultiplicity, EventBoundaryTerm, EventCellId, EventId, ExactCausalBodyLaw, ExactCausalTraversalEvent, ExactCausalTraversalImpulse, ExactCausalTraversalLaw, ExactCausalTraversalPassage, ExactCausalTraversalStanding, ExactEventLaw, ExactReactiveTraversalInteraction, ExactTraversalCurrentSpecies, ExactTraversalLinearBalance};
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
-use relational_geometry::{Rat, ReceiverId};
+use holonics::geometry::{Rat, ReceiverId};
 use sha2::{Digest, Sha256};
 
 const DEFAULT_DATA: &str = concat!(

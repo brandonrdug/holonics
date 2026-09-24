@@ -5,7 +5,7 @@ use std::{collections::BTreeMap, path::Path};
 use holonic_engine::surprisal::{CrossEntropyFiber, SymbolicSurprisal, cross_entropy_fiber};
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
-use relational_geometry::{
+use holonics::geometry::{
     ComplexInterval, ComplexReceiverBox, Rat, RatInterval, WindingReceipt, ZeroLineage,
     derive_ordinate_relations, eta_evaluate, read_atlas, verify_artifact,
 };

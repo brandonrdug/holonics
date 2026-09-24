@@ -61,7 +61,7 @@ use holonic_engine::hypergeometric_closure::{
     read_return_group,
 };
 use num_bigint::BigInt;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 fn rational(numerator: i64, denominator: i64) -> Rat {
     Rat::new(BigInt::from(numerator), BigInt::from(denominator))

@@ -22,7 +22,7 @@
 //! from the receipt; two such laws joined at their node ports are a Holon that is no longer a
 //! diffusion complex, and the joined law advances through the core [`ReferenceHolon`] instead.
 
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 use holonics::dirac::DiracStructure;
 use holonics::element::ResistiveRelation;
@@ -382,7 +382,7 @@ mod tests {
         check_exact_advance, check_interaction, check_restriction, check_run, check_tellegen,
     };
     use holonics::restriction::PortMap;
-    use relational_geometry::integer;
+    use holonics::geometry::integer;
 
     use super::*;
     use crate::diffusion::{DiffusionBranch, DiffusionComplex, DiffusionNode, DiffusionStanding};

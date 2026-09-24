@@ -696,7 +696,7 @@ impl<'c> NativeNormalizedSectionPullback<'c> {
 /// when `n = 0`.
 fn branch_words(turns: &[i64], grain: u32) -> Result<Vec<(i64, i64)>, ConstitutiveFibreError> {
     use num_traits::ToPrimitive;
-    let pi = relational_geometry::exact_analysis::pi_interval(grain + 16);
+    let pi = holonics::geometry::pi_interval(grain + 16);
     let scale = Rat::from_integer(num_bigint::BigInt::one() << grain);
     let mut words = Vec::with_capacity(6 * turns.len());
     for &n in turns {

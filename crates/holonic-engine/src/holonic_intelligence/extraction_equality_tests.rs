@@ -577,7 +577,7 @@ fn recurrent_morphology() -> NativeOperatorMorphology {
             },
             NativeOperatorKind::RmsNorm {
                 gain_population: 4,
-                epsilon: relational_geometry::Rat::new(1.into(), 1_000_000.into()),
+                epsilon: holonics::geometry::Rat::new(1.into(), 1_000_000.into()),
             },
             NativeOperatorKind::Reentry,
         ],

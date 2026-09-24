@@ -836,9 +836,9 @@ mod tests {
             node(2, NativeOperationPrimitive::Contract),
             node(3, NativeOperationPrimitive::GeluTanh),
             node(4, NativeOperationPrimitive::Hadamard),
-            node(5, NativeOperationPrimitive::RmsRebase { group: 4, epsilon: relational_geometry::Rat::from_integer(0.into()), has_gain: true }),
+            node(5, NativeOperationPrimitive::RmsRebase { group: 4, epsilon: holonics::geometry::Rat::from_integer(0.into()), has_gain: true }),
             node(6, NativeOperationPrimitive::Add),
-            node(7, NativeOperationPrimitive::RmsRebase { group: 4, epsilon: relational_geometry::Rat::from_integer(0.into()), has_gain: false }),
+            node(7, NativeOperationPrimitive::RmsRebase { group: 4, epsilon: holonics::geometry::Rat::from_integer(0.into()), has_gain: false }),
         ];
         assert_eq!(segments(&operations), vec![(0, 2), (2, 5), (5, 8)]);
         assert_eq!(segments(&operations[3..]), vec![(0, 2), (2, 5)]);

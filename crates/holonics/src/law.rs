@@ -41,7 +41,7 @@
 pub mod receiver;
 
 use num_traits::{One, Zero};
-use relational_geometry::Rat;
+use crate::geometry::Rat;
 
 use crate::dirac::DiracStructure;
 use crate::element::{ResistiveRelation, storage_energy};

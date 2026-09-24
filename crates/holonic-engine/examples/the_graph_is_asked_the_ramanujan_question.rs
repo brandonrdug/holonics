@@ -1,6 +1,6 @@
 //! **The Ramanujan question, asked — because a finite graph can answer it and this one never had.**
 //!
-//! Organs: `relational_geometry::receiver_topology::ihara_signature` (the reciprocal Ihara zeta,
+//! Organs: `holonics::geometry::receiver_topology::ihara_signature` (the reciprocal Ihara zeta,
 //! already cross-checked against its Euler product), and
 //! `holonics::rational_polynomial::rational_root_census` (Sturm isolation over exact
 //! rationals). Nothing new is built.
@@ -47,7 +47,7 @@
 use holonics::exact_linear::ExactRatMatrix;
 use holonics::rational_polynomial::{RationalPolynomial, rational_root_census};
 use num_traits::Zero;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 fn integer(value: i64) -> Rat {
     Rat::from_integer(value.into())

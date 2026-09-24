@@ -9,7 +9,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
-use relational_geometry::{Rat, RatVec3};
+use holonics::geometry::{Rat, RatVec3};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -769,7 +769,7 @@ fn isolate_polynomial_roots(
 
 #[cfg(test)]
 mod tests {
-    use relational_geometry::integer;
+    use holonics::geometry::integer;
 
     use super::*;
 

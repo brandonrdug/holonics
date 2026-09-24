@@ -4,7 +4,7 @@ use holonic_engine::native_ecology::constitutive_fibre::{
 };
 use holonic_engine::ExactComplexWaveCurrent as Wave;
 use num_traits::Zero;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::Deserialize;
 use serde_json::json;
 use std::{

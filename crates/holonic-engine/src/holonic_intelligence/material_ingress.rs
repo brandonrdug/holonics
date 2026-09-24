@@ -5,7 +5,7 @@
 //! hash, or expected answer selects a native state.
 
 use num_bigint::BigInt;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 

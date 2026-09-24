@@ -1,6 +1,6 @@
 use std::num::NonZeroUsize;
 
-use relational_geometry::{Construction, EntityId, Geometry, ProjectionLaw, Receiver, integer};
+use holonics::geometry::{Construction, EntityId, Geometry, ProjectionLaw, Receiver, integer};
 
 use super::*;
 use crate::{ProjectiveDepthLaw, RayFamily, ReceiverFaceExtent, ReceiverFaceSpec, receive_face};
@@ -174,8 +174,8 @@ fn a_projective_edge_crossing_infinity_casts_two_finite_aperture_branches() {
 fn integral_span_is_exact_across_negative_and_positive_boundaries() {
     assert_eq!(
         integral_span(
-            &relational_geometry::rat(-21, 5),
-            &relational_geometry::rat(29, 5)
+            &holonics::geometry::rat(-21, 5),
+            &holonics::geometry::rat(29, 5)
         ),
         IntegralPhaseCell::Levels {
             first: BigInt::from(-4),
@@ -184,8 +184,8 @@ fn integral_span_is_exact_across_negative_and_positive_boundaries() {
     );
     assert_eq!(
         integral_span(
-            &relational_geometry::rat(1, 5),
-            &relational_geometry::rat(4, 5)
+            &holonics::geometry::rat(1, 5),
+            &holonics::geometry::rat(4, 5)
         ),
         IntegralPhaseCell::NoLevel
     );
@@ -326,7 +326,7 @@ fn exact_surface_returns_rational_triangle_coverage() {
     assert_eq!(cell.contributions.len(), 1);
     assert_eq!(
         cell.contributions[0].coverage,
-        SurfaceCoverage::AreaFraction(relational_geometry::rat(1, 2))
+        SurfaceCoverage::AreaFraction(holonics::geometry::rat(1, 2))
     );
     assert_eq!(
         cell.contributions[0].depth,
@@ -438,8 +438,8 @@ fn exact_surface_keeps_thread_source_parameter_intervals() {
     assert_eq!(
         intervals,
         vec![
-            (Rat::zero(), relational_geometry::rat(1, 2)),
-            (relational_geometry::rat(1, 2), Rat::one()),
+            (Rat::zero(), holonics::geometry::rat(1, 2)),
+            (holonics::geometry::rat(1, 2), Rat::one()),
         ]
     );
 }

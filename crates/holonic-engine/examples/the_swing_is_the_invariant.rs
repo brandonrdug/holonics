@@ -11,7 +11,7 @@
 //! Until 2026-08-08 that property was asserted nowhere in this workspace, and neither were the group
 //! laws of the one genuine `PGL(2,ℚ)` carrier in the tree. The two halves sat one crate apart:
 //!
-//! - `crates/relational-geometry/src/receiver_atlas.rs` computed the cross-ratio in a **private**
+//! - `crates/holonics/src/geometry/receiver_atlas.rs` computed the cross-ratio in a **private**
 //!   `fn`, exact over `Rat`, collinearity-checked;
 //! - `crates/holonic-engine/src/simplicial.rs` carried `ProjectiveTurn` — `apply`, `followed_by`,
 //!   `inverse`, `is_projective_identity`, singular matrices refused — and `holonic-engine` depends
@@ -58,7 +58,7 @@
 use std::collections::BTreeSet;
 
 use holonic_engine::simplicial::{ProjectivePencil, ProjectiveTurn, SimplicialError};
-use relational_geometry::{
+use holonics::geometry::{
     Construction, CrossRatioRefusal, GrainedReceiver, MarkedOccurrence, OccurrenceId,
     ProjectionLaw, Rat, RatMat3, RatVec2, RatVec3, Receiver, ReceiverGrain, ReceiverId,
     ReceiverOrientation, SwingCell, analyze_receiver_atlas, cross_ratio, format_rat, integer, rat,
@@ -167,7 +167,7 @@ fn main() {
     println!("==========================");
     println!(
         "\ncross_ratio(T.p) == cross_ratio(p) for T in PGL(2,Q), exact over Rat, with the orbit\n\
-         exhibited first. `relational_geometry::cross_ratio` reads four plane marks in one pencil;\n\
+         exhibited first. `holonics::geometry::cross_ratio` reads four plane marks in one pencil;\n\
          `holonic_engine::simplicial::ProjectiveTurn` moves one projective line coordinate; a\n\
          `ProjectivePencil` is what joins them."
     );

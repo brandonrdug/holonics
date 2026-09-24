@@ -30,7 +30,7 @@ use holonic_engine::parcel::{
 use holonic_engine::{CurrentBranchId, CurrentNodeId};
 use num_bigint::{BigInt, BigUint};
 use num_traits::Zero;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 fn rational(numerator: i64, denominator: i64) -> Rat {
     Rat::new(BigInt::from(numerator), BigInt::from(denominator))
@@ -528,7 +528,7 @@ fn main() {
     );
     println!("  Ihara's non-backtracking condition arrives from the word rather than from a rule.");
     println!(
-        "  comparable in shape to relational_geometry::IharaSignature::primitive_oriented_cycles,"
+        "  comparable in shape to holonics::geometry::IharaSignature::primitive_oriented_cycles,"
     );
     println!(
         "  which is indexed the same way. NOT the same population: Ihara quotients by the cyclic"

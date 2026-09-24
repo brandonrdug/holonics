@@ -133,17 +133,17 @@ pub struct ReactionDepositRecord {
     pub last:
         Option<Vec<holonic_engine::native_ecology::constitutive_fibre::NormalReactionProjection>>,
     /// `Σ` over deposits and owners of the removed slice Hermitian parts `‖·‖_F²`.
-    pub bilinear_removed_square_sum: relational_geometry::Rat,
+    pub bilinear_removed_square_sum: holonics::geometry::Rat,
     /// `max` over deposits and owners of the linear removed rank.
     pub linear_removed_rank_max: usize,
     /// `Σ` of the linear removed traces.
-    pub linear_removed_trace_sum: relational_geometry::Rat,
+    pub linear_removed_trace_sum: holonics::geometry::Rat,
     /// `Σ ‖removed‖₁` over deposits and owners.
-    pub removed_l1_sum: relational_geometry::Rat,
+    pub removed_l1_sum: holonics::geometry::Rat,
     /// Storage `ε` of each reaction deposit against the unit pairing (exactly zero) and the
     /// ledger product `∏(1 + ε_k)`.
-    pub storage_epsilon: relational_geometry::Rat,
-    pub ledger_product: relational_geometry::Rat,
+    pub storage_epsilon: holonics::geometry::Rat,
+    pub ledger_product: holonics::geometry::Rat,
 }
 impl ReactionDepositRecord {
     pub(crate) fn is_empty(&self) -> bool {
@@ -157,7 +157,7 @@ impl ReactionDepositRecord {
     ) -> Result<(), NativeSessionError> {
         use num_traits::One;
         if self.deposits == 0 {
-            self.ledger_product = relational_geometry::Rat::one();
+            self.ledger_product = holonics::geometry::Rat::one();
         }
         self.deposits = self
             .deposits
@@ -171,7 +171,7 @@ impl ReactionDepositRecord {
         }
         // Unit storage pairing: Q_(k+1) = Q_k, certified with ε = 0.
         let unit = holonics::inertia::SymmetricForm::from_diagonal(vec![
-            relational_geometry::Rat::one();
+            holonics::geometry::Rat::one();
             1
         ]);
         holonics::deposition::DepositLedger::certify_deposit(
@@ -181,7 +181,7 @@ impl ReactionDepositRecord {
         )
         .map_err(invalid)?;
         self.ledger_product =
-            &self.ledger_product * (relational_geometry::Rat::one() + &self.storage_epsilon);
+            &self.ledger_product * (holonics::geometry::Rat::one() + &self.storage_epsilon);
         self.last = Some(projections);
         Ok(())
     }
@@ -681,7 +681,7 @@ impl IncidentRebaseResidual {
     }
     /// The propagated trajectory bound `R_(i+1) = K_i R_i + r_i` needs a Lipschitz bound `K_i`
     /// of the full incident word, which the field does not expose. Always `None` for now.
-    pub fn trajectory_bound(&self) -> Option<relational_geometry::Rat> {
+    pub fn trajectory_bound(&self) -> Option<holonics::geometry::Rat> {
         None
     }
     fn scaled(value: &str) -> Result<num_bigint::BigInt, NativeSessionError> {
@@ -710,22 +710,22 @@ impl IncidentRebaseResidual {
         self.sum = sum.to_string();
         Ok(())
     }
-    fn value(&self, word: &str) -> Result<relational_geometry::Rat, NativeSessionError> {
-        Ok(relational_geometry::Rat::new(
+    fn value(&self, word: &str) -> Result<holonics::geometry::Rat, NativeSessionError> {
+        Ok(holonics::geometry::Rat::new(
             Self::scaled(word)?,
             num_bigint::BigInt::from(1u8) << self.grain,
         ))
     }
     /// `r` of the last commit.
-    pub fn last_radius(&self) -> Result<relational_geometry::Rat, NativeSessionError> {
+    pub fn last_radius(&self) -> Result<holonics::geometry::Rat, NativeSessionError> {
         self.value(&self.last)
     }
     /// `max_j r_j`.
-    pub fn max_radius(&self) -> Result<relational_geometry::Rat, NativeSessionError> {
+    pub fn max_radius(&self) -> Result<holonics::geometry::Rat, NativeSessionError> {
         self.value(&self.max)
     }
     /// `Σ_j r_j`: the sum of the dropped radii. Not a trajectory bound (see the type docs).
-    pub fn sum_radius(&self) -> Result<relational_geometry::Rat, NativeSessionError> {
+    pub fn sum_radius(&self) -> Result<holonics::geometry::Rat, NativeSessionError> {
         self.value(&self.sum)
     }
 }

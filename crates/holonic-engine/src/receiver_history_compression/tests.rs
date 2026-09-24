@@ -4,7 +4,7 @@ mod tests {
     use crate::receiver_exact_compression::{Observation, compress};
     use crate::receiver_history_compression::*;
     use num_traits::Zero;
-    use relational_geometry::{
+    use holonics::geometry::{
         AffineMap3, PairFiniteMotion, Rat, RatMat3, RatVec3, RationalPhase, ScrewGenerator,
         ScrewPair, SituatedScrew, cayley_rotation_z, integer,
     };

@@ -51,7 +51,7 @@ use std::collections::BTreeSet;
 use std::fmt::Debug;
 
 use num_bigint::BigInt;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 use holonics::restriction::tube::{
     CircuitDefect, CommutingSquares, ConstantTube, DECLARED_CHART_CEILING,

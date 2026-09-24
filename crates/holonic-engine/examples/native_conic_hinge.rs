@@ -5,7 +5,7 @@ use holonic_engine::{
     HingeTransportNetwork, HingeWorldLaw, RayFamily, ReceiverFaceExtent, ReceiverFaceSpec,
     SimplicialComplex, receive_face_with_conics,
 };
-use relational_geometry::{
+use holonics::geometry::{
     Construction, Geometry, ProjectionLaw, RatVec3, Receiver, ReceiverId, integer,
 };
 

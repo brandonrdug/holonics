@@ -30,7 +30,7 @@
 
 use num_bigint::BigInt;
 use num_traits::Zero;
-use relational_geometry::{Rat, RatInterval, read_atlas};
+use holonics::geometry::{Rat, RatInterval, read_atlas};
 use serde_json::{Value, json};
 use std::path::PathBuf;
 

@@ -20,7 +20,7 @@
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
 use num_traits::{One, Signed, Zero};
-use relational_geometry::{Rat, RatVec3, ReceiverId};
+use holonics::geometry::{Rat, RatVec3, ReceiverId};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -2181,7 +2181,7 @@ event_refusal_from!(FieldAtlasRefusal: DiagramError, ReceiverError, ImplicitErro
 #[cfg(test)]
 mod tests {
     use num_bigint::BigUint;
-    use relational_geometry::integer;
+    use holonics::geometry::integer;
 
     use super::*;
     use crate::{CausalWorld, ExactRay, ExactRgb};

@@ -401,7 +401,7 @@ fn main() {
         },
         DeclaredCorpus {
             name: "code — exact projective geometry over BigRational",
-            roots: vec![PathBuf::from("crates/relational-geometry/src")],
+            roots: vec![PathBuf::from("crates/holonics/src/geometry")],
             extension: "rs",
             passages: 12,
         },

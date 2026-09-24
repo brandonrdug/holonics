@@ -23,7 +23,7 @@
 
 use std::collections::BTreeMap;
 
-use relational_geometry::Rat;
+use crate::geometry::Rat;
 use serde::{Deserialize, Serialize};
 
 use crate::holon::HolonError;

@@ -1468,11 +1468,11 @@ mod tests {
             .expect("binary64");
         assert_eq!(
             single[0].value(),
-            relational_geometry::Rat::from_integer(1.into())
+            holonics::geometry::Rat::from_integer(1.into())
         );
         assert_eq!(
             double[0].value(),
-            relational_geometry::Rat::from_integer(1.into())
+            holonics::geometry::Rat::from_integer(1.into())
         );
         assert!(ForeignDtype::F32.exactly_decodable());
         assert!(ForeignDtype::F64.exactly_decodable());

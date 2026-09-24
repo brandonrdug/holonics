@@ -40,7 +40,7 @@
 //! # No float
 //!
 //! Parsing is digit arithmetic on `i64` with `checked_*` at every step; the exact centre and
-//! enclosure are `relational_geometry::Rat` over `BigInt`; the wire is `i64` numerators over a
+//! enclosure are `holonics::geometry::Rat` over `BigInt`; the wire is `i64` numerators over a
 //! declared power of ten. There is no `f32`, no `f64`, no `parse::<f64>()` and no cast between an
 //! integer and a float in this file. A token that is not a plain decimal, a row whose field count
 //! disagrees with the header, an absent column and an overflowing significand are each a typed
@@ -50,7 +50,7 @@ use std::collections::BTreeMap;
 use std::path::Path;
 
 use num_bigint::BigInt;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 
 use holonics::exact_value::ExactInterval;

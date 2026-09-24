@@ -12,7 +12,7 @@
 //! Formal owner: `Computation/HolonicConstitutiveFibre.lean`. Native incidence, physical contact
 //! and the wider ecology must still be composed: this local owner alone does not complete NCF1.
 
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::Serialize;
 use std::rc::Rc;
 use thiserror::Error;

@@ -90,7 +90,7 @@ use holonic_engine::topological_receiver::{
 };
 use num_bigint::BigInt;
 use num_traits::Zero;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde_json::{Value, json};
 
 // ==============================================================================================

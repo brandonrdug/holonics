@@ -67,7 +67,7 @@ use holonic_engine::elementary_chart::{ExponentialIntegrand, read_elementary_cha
 use holonic_engine::hermite_reduction::{ReductionSchedule, reduce};
 use holonic_engine::lean_development::{DeclarationGrain, header_nests, read_development};
 use holonics::rational_polynomial::RationalPolynomial;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 /// The declared material: mathlib's own table of definite integrals.
 const SUBTREE: &str = "formal/elementary-holonics/.lake/packages/mathlib/Mathlib/Analysis/SpecialFunctions/Integrals";

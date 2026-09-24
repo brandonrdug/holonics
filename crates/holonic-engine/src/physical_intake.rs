@@ -93,7 +93,7 @@ use std::path::Path;
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::One;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 

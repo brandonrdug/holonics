@@ -5,7 +5,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 use super::*;
 use crate::causal_chord::PoleReading;

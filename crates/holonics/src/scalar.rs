@@ -1,6 +1,6 @@
 //! **Scalars: the exact reference field and its coordinate vectors.**
 //!
-//! [project-postulate; agent-inferred] The reference field is `relational_geometry::Rat`. Every
+//! [project-postulate; agent-inferred] The reference field is `crate::geometry::Rat`. Every
 //! facet of the Holon core computes over it; no `f32`/`f64` enters a law. A bond is a pair of
 //! coordinate vectors over ℚ (`Holon/Port.lean::Bond`), and the facets share the small exact
 //! vector and block-matrix operations below, all routed through
@@ -13,7 +13,7 @@
 
 use num_bigint::BigInt;
 use num_traits::Zero;
-use relational_geometry::Rat;
+use crate::geometry::Rat;
 
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::inertia::SymmetricForm;

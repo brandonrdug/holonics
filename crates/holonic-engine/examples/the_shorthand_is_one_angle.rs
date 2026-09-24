@@ -40,7 +40,7 @@ use holonic_engine::quantity::{
 };
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
-use relational_geometry::{Rat, format_rat};
+use holonics::geometry::{Rat, format_rat};
 
 fn whole(value: i64) -> Rat {
     Rat::from_integer(BigInt::from(value))

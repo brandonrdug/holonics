@@ -2,7 +2,7 @@
 use holonic_engine::exponentiated_ratio::RatioFamily;
 use holonic_engine::surprisal::SymbolicSurprisal;
 use num_traits::{One, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;

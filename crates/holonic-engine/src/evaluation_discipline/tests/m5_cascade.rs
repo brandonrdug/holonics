@@ -34,7 +34,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use num_bigint::{BigInt, BigUint};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 use super::super::*;
 use crate::EventId;
@@ -201,7 +201,7 @@ fn the_m5_cost_cascade_is_measured_end_to_end() {
         "holonic-engine::evaluation_discipline::m5_cascade",
         "CPU only; exact rational contact law; no CUDA path is touched",
         "exact BigInt/BigRational throughout on a 10^7 resident decimal grain; every aperture, \
-         radius and squared distance is a relational_geometry::Rat and no float decides anything",
+         radius and squared distance is a holonics::geometry::Rat and no float decides anything",
     )
     .expect("a stated recorder");
 

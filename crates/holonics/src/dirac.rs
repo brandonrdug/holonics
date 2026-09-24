@@ -43,7 +43,7 @@
 //! | `passiveCoholon`, `passiveCoholon_isDirac` | [`DiracStructure::passive_coholon`] |
 
 use num_traits::{One, Zero};
-use relational_geometry::Rat;
+use crate::geometry::Rat;
 use serde::Serialize;
 
 use crate::exact_linear::ExactRatMatrix;

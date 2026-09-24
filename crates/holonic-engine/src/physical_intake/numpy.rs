@@ -3,7 +3,7 @@
 //!
 //! [definition] A stored `<f2`, `<f4` or `<f8` word is an *exterior codeword*. It is read as an
 //! unsigned integer, handed to [`holonics::exact_value::ieee754`], and leaves as an exact dyadic
-//! `relational_geometry::Rat`. No arithmetic is ever performed on it as a float: this module
+//! `holonics::geometry::Rat`. No arithmetic is ever performed on it as a float: this module
 //! contains no `f32`, no `f64` and no cast between an integer and a float. A non-finite word is
 //! not a value of any format this intake admits and is refused by name, with its index and its
 //! bit pattern.
@@ -26,7 +26,7 @@
 use std::collections::BTreeMap;
 use std::path::Path;
 
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 
 use holonics::exact_value::ExactInterval;

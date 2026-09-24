@@ -23,7 +23,7 @@ use holonics::element::ResistiveRelation;
 use holonics::port::Bond;
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
-use relational_geometry::{PairQuadranceJet, Rat, ScrewPair};
+use holonics::geometry::{PairQuadranceJet, Rat, ScrewPair};
 use thiserror::Error;
 
 use super::{
@@ -111,7 +111,7 @@ pub enum PairLockReading {
     PositiveAddress {
         numerator: BigInt,
         denominator: BigInt,
-        address: relational_geometry::LockAddress,
+        address: holonics::geometry::LockAddress,
     },
     SignedOrStationary {
         numerator: BigInt,
@@ -460,12 +460,12 @@ impl HelicalPairInteraction {
     /// Preserve the positive Farey address only when the supplied nonzero ratio is positive and
     /// actually locks this pair. Signed and stationary rate relations remain explicit readings.
     pub fn lock_reading(&self, numerator: BigInt, denominator: BigInt) -> PairLockReading {
-        if !relational_geometry::pair_lock(&self.pair, &numerator, &denominator) {
+        if !holonics::geometry::pair_lock(&self.pair, &numerator, &denominator) {
             return PairLockReading::NotLocked;
         }
         if numerator.is_positive() && denominator.is_positive() {
             if let Ok(address) =
-                relational_geometry::LockAddress::from_ratio(&numerator, &denominator)
+                holonics::geometry::LockAddress::from_ratio(&numerator, &denominator)
             {
                 return PairLockReading::PositiveAddress {
                     numerator,

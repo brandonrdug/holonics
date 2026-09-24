@@ -16,7 +16,7 @@ use holonic_engine::{
     PrimePowerCurrentEvent, PrimeRecognitionClosure,
 };
 use num_bigint::BigInt;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let limit = std::env::args()

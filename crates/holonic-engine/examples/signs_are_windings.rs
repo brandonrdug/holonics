@@ -66,7 +66,7 @@ use holonic_engine::winding_inertia::{
 };
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
-use relational_geometry::{Rat, format_rat};
+use holonics::geometry::{Rat, format_rat};
 
 fn circulant(first_row: &[i64]) -> SymmetricCirculant {
     SymmetricCirculant::from_integers(first_row).expect("the declared row is reversal-symmetric")

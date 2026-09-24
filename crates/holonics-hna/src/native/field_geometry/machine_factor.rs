@@ -11,7 +11,7 @@ use holonics::exact_value::{AlgebraicRoot, ExactInterval, ExactValueError};
 use holonic_engine::{edit_rigidity::{EditRigidityRefusal, ExactMetric, MetricCertificate}};
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use thiserror::Error;
 
 const NATIVE_ROWS: usize = 3;

@@ -84,7 +84,7 @@
 use std::collections::BTreeMap;
 
 use num_traits::{Signed, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use thiserror::Error;
 
 #[derive(Clone, Debug, PartialEq, Eq, Error)]

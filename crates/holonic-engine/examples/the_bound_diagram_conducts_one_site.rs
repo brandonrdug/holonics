@@ -43,7 +43,7 @@ use holonic_engine::ported_reference::{
 };
 use num_bigint::BigInt;
 use num_traits::Zero;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 const SITE: usize = 0;
 const SYMBOLS: &str = "model.language_model.embed_tokens.weight";

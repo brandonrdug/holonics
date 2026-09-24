@@ -50,7 +50,7 @@ use holonic_engine::regime_reading::{Regime, RegimeReading};
 use num_bigint::BigInt;
 use num_bigint::BigUint;
 use num_traits::{One, Signed, Zero};
-use relational_geometry::exact::Rat;
+use holonics::geometry::Rat;
 
 const MODEL: &str = "/home/b/models/gemma-4-E4B-it/model.safetensors";
 

@@ -70,7 +70,7 @@ pub fn encode_ppm(face: &DisplayFace) -> Vec<u8> {
 #[cfg(test)]
 mod tests {
     use num_bigint::BigUint;
-    use relational_geometry::integer;
+    use holonics::geometry::integer;
 
     use super::*;
     use crate::{

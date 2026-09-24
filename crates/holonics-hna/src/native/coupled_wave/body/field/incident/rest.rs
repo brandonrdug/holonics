@@ -238,7 +238,7 @@ impl NativeIncidentModelRest {
                             // Width of one mounted affine coefficient row at this grain.
                             let width = ResidentNormalEnclosureSection::affine_coefficients(
                                 surface,
-                                &[relational_geometry::AffineMap3::identity()],
+                                &[holonics::geometry::AffineMap3::identity()],
                                 grain,
                             )?
                             .components();

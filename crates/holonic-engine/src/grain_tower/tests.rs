@@ -22,7 +22,7 @@ use std::path::{Path, PathBuf};
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::One;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 use super::*;
 use holonics::restriction::tower::{CompatibleSection, check_restriction_laws};

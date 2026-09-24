@@ -1,5 +1,5 @@
 use num_traits::Zero;
-use relational_geometry::{ComplexInterval, Rat};
+use holonics::geometry::{ComplexInterval, Rat};
 
 // Closed quadrant signatures. Axis uncertainty is retained as a set of possible quadrants.
 pub fn phase_signature(z: &ComplexInterval) -> u64 {

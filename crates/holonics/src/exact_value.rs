@@ -16,7 +16,7 @@ use std::cmp::Ordering;
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
-use relational_geometry::{ExactExpr, Rat};
+use crate::geometry::{ExactExpr, Rat};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -2061,7 +2061,7 @@ fn sign_variations(sequence: &[Vec<Rat>], point: &Rat) -> u32 {
 pub mod ieee754 {
     use num_bigint::{BigInt, BigUint};
     use num_traits::{One, ToPrimitive, Zero};
-    use relational_geometry::Rat;
+    use crate::geometry::Rat;
     use serde::{Deserialize, Serialize};
 
     use super::{ExactInterval, ExactValueError};
@@ -3342,7 +3342,7 @@ mod tests {
         );
     }
 
-    use relational_geometry::{integer, rat};
+    use crate::geometry::{integer, rat};
 
     use super::*;
 

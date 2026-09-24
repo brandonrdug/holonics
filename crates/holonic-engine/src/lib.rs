@@ -107,7 +107,7 @@ pub mod curvature_bridge;
 pub mod certified_face;
 pub mod communication;
 // Declared, never glob-exported. `ReceiverId`, `Observation` and `ItemId` reach this module from
-// `receiver_exact_compression` and collide at the crate root with `relational_geometry::ReceiverId`
+// `receiver_exact_compression` and collide at the crate root with `holonics::geometry::ReceiverId`
 // and with `graph_receiver`'s own vocabulary. `archive/plans/THE_ASSEMBLY.md`, "what must not be built".
 pub mod complex_system;
 // Coherence is collocation over time: two things relate iff presented together within one source.

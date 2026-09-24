@@ -15,7 +15,7 @@ use holonic_engine::ResidentEtaHead;
 use num_bigint::BigInt;
 use num_rational::BigRational;
 use num_traits::{Signed, ToPrimitive};
-use relational_geometry::{
+use holonics::geometry::{
     ComplexReceiverBox, HeadSource, RatInterval, atlas_base_config, derive_euler_maclaurin_start,
     zeta_evaluate_jet2_with_head,
 };

@@ -12,7 +12,7 @@ use std::{
     path::Path,
 };
 
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use thiserror::Error;

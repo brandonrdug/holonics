@@ -3,7 +3,7 @@
 //! `holonics::prime_image_algebra`.
 
 use num_bigint::BigInt;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 /// The environment variable that turns the consumer measurement on, and the coordinate extents.
 const CONSUMER_ENV: &str = "HOLONICS_PRIME_IMAGE_CONSUMER";

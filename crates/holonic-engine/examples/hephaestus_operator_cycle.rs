@@ -5,7 +5,7 @@ use holonics::exact_linear::{
     ReceiverFactorization,
 };
 use num_traits::Zero;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde_json::json;
 fn q(n: i64) -> Rat {
     Rat::from_integer(n.into())

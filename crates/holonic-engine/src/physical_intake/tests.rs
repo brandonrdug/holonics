@@ -12,7 +12,7 @@ use std::path::PathBuf;
 
 use num_bigint::BigInt;
 use num_bigint::BigUint;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 use super::deflate::{
     MAXIMUM_DECLARED_EXTENT, MAXIMUM_DEFLATE_EXPANSION, crc32_of, declared_extent_bound, inflate,

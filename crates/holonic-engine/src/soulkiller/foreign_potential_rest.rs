@@ -10,7 +10,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use num_bigint::BigInt;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use thiserror::Error;

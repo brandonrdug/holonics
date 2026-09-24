@@ -29,7 +29,7 @@ use holonic_engine::{
 use image::{DynamicImage, Rgb, RgbImage};
 use num_bigint::BigInt;
 use num_traits::{ToPrimitive, Zero};
-use relational_geometry::{Rat, ReceiverId};
+use holonics::geometry::{Rat, ReceiverId};
 use sha2::{Digest, Sha256};
 
 const FAMILY: ReceiverCoordinateFamilyId = ReceiverCoordinateFamilyId(0x474c_4d);

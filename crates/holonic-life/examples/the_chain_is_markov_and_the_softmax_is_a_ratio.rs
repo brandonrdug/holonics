@@ -93,7 +93,7 @@ use holonic_engine::surprisal::SymbolicSurprisal;
 use life::decomposing_codec::{read, render_word, DecompositionGrain, Symbol};
 use life::material_incidence::strongly_connected_cores;
 use num_bigint::BigInt;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 const MATERIAL: [&str; 2] = [
     "docs/canon/TABLET_THE_COMPRESSION.md",

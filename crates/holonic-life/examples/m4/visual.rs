@@ -11,7 +11,7 @@ use holonic_engine::presentation_gauge::{
 };
 use holonic_engine::simplicial::{Edge, SimplicialComplex, VertexId};
 use num_bigint::BigInt;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 
 use super::quadric::CultivationProduct;

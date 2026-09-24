@@ -9,7 +9,7 @@ use crate::dimensional_wave::ExactComplexWaveCurrent;
 use crate::native_ecology::constitutive_fibre::ConstitutiveFibreError;
 use num_bigint::BigInt;
 use num_traits::Zero;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 /// A deterministic, persisted material seed.  `seed` is deliberately the only
 /// source identity used by the constructor; changing a codec's labels cannot change

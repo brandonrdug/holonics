@@ -84,8 +84,8 @@ fn resident_contact_layout_preserves_empty_kind_and_reverses_full_source_chart()
                     0
                 };
                 holonic_engine::ExactComplexWaveCurrent::new(
-                    relational_geometry::Rat::from_integer(value.into()),
-                    relational_geometry::Rat::zero(),
+                    holonics::geometry::Rat::from_integer(value.into()),
+                    holonics::geometry::Rat::zero(),
                 )
             })
             .collect::<Vec<_>>();
@@ -103,8 +103,8 @@ fn resident_contact_layout_preserves_empty_kind_and_reverses_full_source_chart()
         let expected = (0..6)
             .map(|coordinate| {
                 holonic_engine::ExactComplexWaveCurrent::new(
-                    relational_geometry::Rat::from_integer((factor * (2 * coordinate + 1)).into()),
-                    relational_geometry::Rat::from_integer((factor * (2 * coordinate + 2)).into()),
+                    holonics::geometry::Rat::from_integer((factor * (2 * coordinate + 1)).into()),
+                    holonics::geometry::Rat::from_integer((factor * (2 * coordinate + 2)).into()),
                 )
             })
             .collect::<Vec<_>>();

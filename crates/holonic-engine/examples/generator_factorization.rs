@@ -4,7 +4,7 @@ use holonics::exact_linear::{
     BilinearOperator, BilinearSupportSearch, ExactRatMatrix, ReceiverFactorization,
 };
 use num_traits::{One, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde_json::{Value, json};
 
 fn q(n: i64, d: i64) -> Rat {

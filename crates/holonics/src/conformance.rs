@@ -27,7 +27,7 @@
 //! step that is not implemented here.
 
 use num_traits::Zero;
-use relational_geometry::Rat;
+use crate::geometry::Rat;
 
 use crate::dirac::DiracStructure;
 use crate::element::storage_energy;
@@ -164,7 +164,7 @@ pub fn energy_at<L: HolonLaw>(law: &L, state: &HolonState) -> Result<Rat, HolonE
 mod tests {
     use num_bigint::{BigInt, BigUint};
     use num_traits::{One, Signed};
-    use relational_geometry::RationalPhase;
+    use crate::geometry::RationalPhase;
 
     use super::*;
     use crate::complex::CellComplex;

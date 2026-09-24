@@ -48,7 +48,7 @@ use std::collections::BTreeMap;
 
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
-use relational_geometry::{Rat, format_rat, integer};
+use holonics::geometry::{Rat, format_rat, integer};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -479,7 +479,7 @@ mod tests {
     //! control is paired with the negative one that proves the law is looking.
 
     use num_bigint::BigInt;
-    use relational_geometry::rat;
+    use holonics::geometry::rat;
 
     use super::*;
 

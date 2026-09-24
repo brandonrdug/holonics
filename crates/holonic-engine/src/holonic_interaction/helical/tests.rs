@@ -1,5 +1,5 @@
 use super::*;
-use relational_geometry::{RatVec3, ScrewGenerator, SituatedScrew};
+use holonics::geometry::{RatVec3, ScrewGenerator, SituatedScrew};
 
 fn int(value: i64) -> Rat {
     Rat::from_integer(value.into())

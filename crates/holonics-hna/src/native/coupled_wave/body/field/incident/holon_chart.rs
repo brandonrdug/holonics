@@ -48,7 +48,7 @@ use holonics::law::{EnergyBalance, PassiveReading, ReferenceHolon, Scheme};
 use holonics::restriction::PortMap;
 use holonic_engine::native_ecology::constitutive_fibre::PowerNeutralCertificate;
 use num_traits::{One, Zero};
-use relational_geometry::{AffineMap3, Rat};
+use holonics::geometry::{AffineMap3, Rat};
 
 /// One arc's contact in the resident chart.
 #[derive(Clone, Debug)]

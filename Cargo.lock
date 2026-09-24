@@ -566,7 +566,6 @@ dependencies = [
  "num-integer",
  "num-rational",
  "num-traits",
- "relational-geometry",
  "ron",
  "serde",
  "serde_json",
@@ -595,10 +594,12 @@ version = "0.1.0"
 dependencies = [
  "holonic-words",
  "num-bigint",
+ "num-rational",
  "num-traits",
- "relational-geometry",
+ "ron",
  "serde",
  "serde_json",
+ "sha2 0.10.9",
  "thiserror",
 ]
 
@@ -612,7 +613,6 @@ dependencies = [
  "num-bigint",
  "num-rational",
  "num-traits",
- "relational-geometry",
  "serde",
  "serde_json",
  "sha2 0.10.9",
@@ -759,7 +759,6 @@ dependencies = [
  "num-rational",
  "num-traits",
  "rayon",
- "relational-geometry",
  "ron",
  "serde",
  "serde_json",
@@ -1121,19 +1120,6 @@ name = "regex-syntax"
 version = "0.8.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
-
-[[package]]
-name = "relational-geometry"
-version = "0.1.0"
-dependencies = [
- "num-bigint",
- "num-rational",
- "num-traits",
- "ron",
- "serde",
- "sha2 0.10.9",
- "thiserror",
-]
 
 [[package]]
 name = "ron"

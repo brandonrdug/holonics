@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
 use num_traits::One;
-use relational_geometry::{AffineMap3, Rat, RatMat3, RatVec3, integer, rat, triangle_holonomy};
+use holonics::geometry::{AffineMap3, Rat, RatMat3, RatVec3, integer, rat, triangle_holonomy};
 
 use super::*;
 use crate::{Edge, EventId, ExactEventLaw, HingeEvent, HingeWorldLaw, ProjectiveTurn};
@@ -151,7 +151,7 @@ fn a_projective_turn_is_not_a_scalar_transport() {
 }
 
 /// **The affine cell holonomy read by the core curvature face** (the reading of the fixed
-/// machine's `CompiledOrientedCell::holonomy`, `relational_geometry::triangle_holonomy`). Scalar
+/// machine's `CompiledOrientedCell::holonomy`, `holonics::geometry::triangle_holonomy`). Scalar
 /// dilation transports have holonomy `(∏ λ) · 1`, whose scalar is the core walk transport; for
 /// rotating and dilating transports the determinant line is a `ℚ^×` connection and its core
 /// curvature is `det(hol) − 1`, unchanged by a vertex regauge.
@@ -178,7 +178,7 @@ fn the_affine_cell_holonomy_is_read_by_the_core_curvature_face() {
 
     // Rotations (Cayley, rational) composed with dilations: the determinant line.
     let rotate_dilate = |parameter: Rat, lambda: Rat| AffineMap3 {
-        linear: relational_geometry::cayley_rotation_x(&parameter).scale(&lambda),
+        linear: holonics::geometry::cayley_rotation_x(&parameter).scale(&lambda),
         translation: RatVec3::from_i64(1, -1, 2),
     };
     let transports = [
@@ -194,6 +194,6 @@ fn the_affine_cell_holonomy_is_read_by_the_core_curvature_face() {
         holonomy.linear.determinant() - Rat::one()
     );
     let frame = rotate_dilate(rat(5, 4), integer(7));
-    let regauged = relational_geometry::regauge(&frame, &frame, &holonomy).unwrap();
+    let regauged = holonics::geometry::regauge(&frame, &frame, &holonomy).unwrap();
     assert_eq!(regauged.linear.determinant(), holonomy.linear.determinant());
 }

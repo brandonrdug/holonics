@@ -67,7 +67,7 @@
 
 use num_bigint::BigUint;
 use num_traits::Zero;
-use relational_geometry::Rat;
+use crate::geometry::Rat;
 use serde::{Deserialize, Serialize};
 
 use crate::exact_value::ExactOrdering;

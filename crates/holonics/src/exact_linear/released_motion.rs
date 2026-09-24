@@ -5,7 +5,7 @@
 //! reusable operators for a GR-derived weak-field motion simulation with prescribed acceleration.
 use super::{ExactLinearError, ExactRatMatrix};
 use num_traits::{One, Signed};
-use relational_geometry::Rat;
+use crate::geometry::Rat;
 use thiserror::Error;
 
 #[derive(Debug, Error)]

@@ -31,7 +31,7 @@
 //! | `curved_witness`, `seam_curvature_witness` | tests |
 
 use num_traits::{One, Zero};
-use relational_geometry::Rat;
+use crate::geometry::Rat;
 use serde::Serialize;
 
 use crate::dirac::DiracStructure;

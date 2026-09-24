@@ -42,7 +42,7 @@ use holonic_engine::identity_atlas::{
 };
 use num_bigint::BigInt;
 use num_traits::Zero;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 fn names(source: &[&str]) -> Vec<String> {
     source.iter().map(|name| (*name).to_owned()).collect()

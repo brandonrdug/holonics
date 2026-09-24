@@ -66,8 +66,8 @@ use holonic_engine::reopening::{
     Reopening, ReopeningError, ReopeningVerdict, arctan_unit_fraction, dyadic_scale,
     finest_admissible_grain, probe_at_frame, probe_at_grain, reopen, reopen_with_frames,
 };
-use relational_geometry::exact::{Rat, integer};
-use relational_geometry::exact_analysis::log_rational_interval;
+use holonics::geometry::{Rat, integer};
+use holonics::geometry::log_rational_interval;
 
 const ARCTAN_TERMS: u32 = 128;
 const LOG_TERMS: u32 = 120;

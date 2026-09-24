@@ -1,7 +1,7 @@
 //! The eta boundary on the card: the `O(N)` head of every boundary jet at once, the certification
 //! law and the winding on the CPU.
 //!
-//! [`relational_geometry::eta_boundary_winding`] certifies a receiver box by walking its boundary,
+//! [`holonics::geometry::eta_boundary_winding`] certifies a receiver box by walking its boundary,
 //! evaluating the eta jet at every segment midpoint, and subdividing until every segment's image
 //! excludes the origin; the polygon of the images then winds, and the winding is the zero count.
 //! With the Euler--Maclaurin start derived from the height that evaluation is `O(tau)` series per
@@ -26,7 +26,7 @@
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
-use relational_geometry::{
+use holonics::geometry::{
     ComplexInterval, ComplexReceiverBox, ExactAnalysisError, ExactSeriesConfig, HeadJet,
     HeadSource, Rat, RatInterval, log_integer_interval,
 };

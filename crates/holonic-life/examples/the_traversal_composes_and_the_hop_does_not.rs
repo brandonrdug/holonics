@@ -57,7 +57,7 @@ use holonics::structure::{DeclaredGauge, Disposition, Face};
 use life::laboratory_language::{
     text_features, LaboratoryResearchLeader, LaboratorySourceAtlas, LaboratoryWorldReturn,
 };
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 fn repository_root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..")

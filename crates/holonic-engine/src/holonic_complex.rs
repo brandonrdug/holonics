@@ -1011,7 +1011,7 @@ event_refusal_from!(HolonicComplexRefusal: CausalAlgebraicError, ReceiverPhaseAt
 
 #[cfg(test)]
 mod tests {
-    use relational_geometry::{RatVec3, ReceiverId};
+    use holonics::geometry::{RatVec3, ReceiverId};
 
     use super::*;
     use crate::{CausalWorld, ExactRgb, ImageExtent, RayFamily};

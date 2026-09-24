@@ -55,7 +55,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::Zero;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 use crate::algebraic::{CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex};
 use crate::causal::EventId;

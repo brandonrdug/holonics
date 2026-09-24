@@ -48,6 +48,7 @@ pub mod deposition;
 pub mod dirac;
 pub mod element;
 pub mod generator;
+pub mod geometry;
 pub mod holon;
 pub mod law;
 pub mod port;
@@ -59,6 +60,3 @@ pub mod structure;
 pub use holon::Holon;
 
 extern crate alloc;
-
-// Geometry remains a separate source owner until its measured M1 move.
-pub use relational_geometry as geometry;

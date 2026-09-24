@@ -4,7 +4,7 @@
 //! names the exact ports, boundary species, hand, and temporal relation which
 //! make two otherwise available occurrences participate in one construction.
 
-use relational_geometry::ReceiverId;
+use holonics::geometry::ReceiverId;
 use serde::{Deserialize, Serialize};
 
 use crate::{BoundaryId, EventId};

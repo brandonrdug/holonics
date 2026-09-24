@@ -6,7 +6,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use relational_geometry::{Construction, EntityId};
+use holonics::geometry::{Construction, EntityId};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 

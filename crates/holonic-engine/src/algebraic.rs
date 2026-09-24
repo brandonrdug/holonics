@@ -21,7 +21,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use crate::world::{EventRefusal, RefusalKind, event_refusal_from};
 use num_bigint::{BigInt, BigUint, Sign};
 use num_traits::{One, Zero};
-use relational_geometry::{Rat, ReceiverId};
+use holonics::geometry::{Rat, ReceiverId};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -2280,7 +2280,7 @@ event_refusal_from!(CausalAlgebraicRefusal: EvolutionError, ConicError);
 
 #[cfg(test)]
 mod tests {
-    use relational_geometry::{FrameId, RatVec3};
+    use holonics::geometry::{FrameId, RatVec3};
 
     use super::*;
     use crate::{CausalWorld, ConicChart};

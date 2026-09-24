@@ -12,7 +12,7 @@ use thiserror::Error;
 
 use crate::world::{EventRefusal, RefusalKind};
 use crate::{EventId, EventSuccessor, ExactEventLaw};
-use relational_geometry::ReceiverId;
+use holonics::geometry::ReceiverId;
 
 mod affine_orbit;
 pub use affine_orbit::{

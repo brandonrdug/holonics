@@ -7,7 +7,7 @@ use std::path::{Path, PathBuf};
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 use super::*;
 use crate::physical_constraint_complex::DistanceAperture;

@@ -21,7 +21,7 @@
 //! | `PortHolon.passive` | [`ResistiveRelation::new`] |
 //! | `PortHolon.energy_balance`, `energy_balance_const` | [`crate::law::EnergyBalance`] |
 
-use relational_geometry::Rat;
+use crate::geometry::Rat;
 use serde::Serialize;
 
 use crate::exact_linear::ExactRatMatrix;

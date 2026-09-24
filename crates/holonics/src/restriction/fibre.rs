@@ -27,7 +27,7 @@ use std::fmt;
 use std::marker::PhantomData;
 
 use num_traits::Zero;
-use relational_geometry::Rat;
+use crate::geometry::Rat;
 use serde::de::{self, DeserializeSeed, IgnoredAny, MapAccess, SeqAccess, Visitor};
 use serde::ser::SerializeStruct;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};

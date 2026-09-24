@@ -9,7 +9,7 @@ use std::cmp::Ordering;
 use std::collections::{BTreeMap, BTreeSet};
 
 use num_traits::{One, Signed, Zero};
-use relational_geometry::{
+use holonics::geometry::{
     AffineMap3, Construction, EntityId, FrameId, FrameRelation, Geometry, GeometryEntity,
     LocalFrame, ProjectionError, ProjectionLaw, Rat, RatMat3, RatVec3, Receiver, ReceiverId,
     ReceiverOrientation, RelationId, TransportError,
@@ -2415,7 +2415,7 @@ fn crossing_layers(mut crossings: Vec<SurfaceCrossing>) -> Vec<CrossingLayer> {
 
 #[cfg(test)]
 mod tests {
-    use relational_geometry::{Geometry, ProjectionLaw, integer, rat};
+    use holonics::geometry::{Geometry, ProjectionLaw, integer, rat};
 
     use super::*;
 
@@ -2473,11 +2473,11 @@ mod tests {
             .add_entity(
                 "circle",
                 frame,
-                Geometry::Conic(relational_geometry::ProjectiveConic {
+                Geometry::Conic(holonics::geometry::ProjectiveConic {
                     center: RatVec3::from_i64(0, 0, 2),
                     axis_u: RatVec3::from_i64(1, 0, 0),
                     axis_v: RatVec3::from_i64(0, 1, 0),
-                    species: relational_geometry::ConicSpecies::Circle,
+                    species: holonics::geometry::ConicSpecies::Circle,
                 }),
             )
             .unwrap();

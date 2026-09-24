@@ -2,7 +2,7 @@
 //! rational constraints, the enclosure of a declared scale, and the bound read from a passage.
 
 use num_bigint::BigInt;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 use holonics::exact_value::ieee754::{BinaryFloatSpecies, decode_bfloat16_bits, round_into};
 use holonics::exact_value::{AlgebraicRoot, ExactInterval};

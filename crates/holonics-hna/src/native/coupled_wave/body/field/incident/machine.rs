@@ -5,7 +5,7 @@ use crate::native::field_geometry::{
     machine_factor::MachineFactor,
 };
 use holonic_engine::native_ecology::constitutive_fibre::NativeEnclosurePropagation;
-use relational_geometry::{AffineMap3, RatMat3};
+use holonics::geometry::{AffineMap3, RatMat3};
 
 /// A fixed machine and its finite resident refinement. Each original complex-3 current is
 /// encoded as six real-coded native complex channels. Geometry and rate/contact material are
@@ -314,7 +314,7 @@ impl<'c> MachineGroupMaps<'c> {
                 let u = machine.arcs()[i].current_action();
                 AffineMap3 {
                     linear: u.linear.clone(),
-                    translation: relational_geometry::RatVec3::zero(),
+                    translation: holonics::geometry::RatVec3::zero(),
                 }
             })
             .unwrap_or_else(AffineMap3::identity)

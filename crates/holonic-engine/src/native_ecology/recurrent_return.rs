@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use thiserror::Error;
 
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::{generator_native_rest::GeneratorNativeRest, receiver_exact_compression::InputId, receiver_history_compression::NativeStateId};

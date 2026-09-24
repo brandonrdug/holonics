@@ -28,7 +28,7 @@ use holonic_engine::leader_quadrature::{
     ExtensionKind, LeaderLaw, LeaderQuadrature, LocalJet, MaterialBoundary, RationalGerm,
     RideDiscipline, WitnessDepth, germwise_oracle_area, integrate_by_leaders,
 };
-use relational_geometry::{Rat, format_rat, integer, rat};
+use holonics::geometry::{Rat, format_rat, integer, rat};
 
 // ------------------------------------------------------------------------------------------
 // declared options — every knob is a named declaration, none is a literal buried in logic

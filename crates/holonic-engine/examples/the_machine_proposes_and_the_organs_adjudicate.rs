@@ -48,9 +48,9 @@ use num_traits::{One, Zero};
 
 use holonic_engine::hypergeometric_closure::{ClosureReading, ThreeSiteDials, read_return_group};
 use holonics::structure::Composes;
-use relational_geometry::Rat;
-use relational_geometry::exact::RatVec2;
-use relational_geometry::receiver_atlas;
+use holonics::geometry::Rat;
+use holonics::geometry::RatVec2;
+use holonics::geometry::receiver_atlas;
 
 const DEFAULT_ATLAS: &str = "tools/baselines/IDENTITY_ATLAS_mathlib.tsv";
 const SHOWN: usize = 12;

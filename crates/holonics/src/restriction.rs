@@ -69,7 +69,7 @@ pub use fibre::{
 pub use linear::{LinearChart, LinearRestriction, LinearStation, LinearTower, LinearTube};
 
 use num_traits::Zero;
-use relational_geometry::Rat;
+use crate::geometry::Rat;
 use serde::Serialize;
 
 use crate::dirac::DiracStructure;

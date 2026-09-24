@@ -183,7 +183,7 @@ fn pair_transports_source_into_receiver_frame_before_contact() {
     source.angular = RatVec3::from_i64(0, 0, 1);
     let receiver = site_with_roles("b", RatVec3::from_i64(1, 4, 0), false, true);
     let transport = AffineMap3 {
-        linear: relational_geometry::cayley_rotation_z(&r(1)),
+        linear: holonics::geometry::cayley_rotation_z(&r(1)),
         translation: RatVec3::from_i64(1, 2, 0),
     };
     let spec = GeneratorMachineSpec::declare(
@@ -442,7 +442,7 @@ fn core_generator_ticks_as_the_phase_action_and_counts_closure_windings() {
         let power = affine_power(site.phase_action(), k as usize);
         assert_eq!(point(&configuration), power.apply(&key));
         let odometer =
-            relational_geometry::Odometer::from_value(vec![BigUint::from(4u32)], &BigUint::from(k))
+            holonics::geometry::Odometer::from_value(vec![BigUint::from(4u32)], &BigUint::from(k))
                 .unwrap();
         assert_eq!(stepwise.clock().phase(), odometer.digits());
         assert_eq!(stepwise.clock().winding(), odometer.overflow_winding());

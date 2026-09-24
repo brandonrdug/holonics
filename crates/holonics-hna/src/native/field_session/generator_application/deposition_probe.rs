@@ -187,7 +187,7 @@ fn coefficients(session: &mut NativeFieldSession<'_>, member: usize) -> Vec<Vec<
     let value = session.body.inspect_predictive_material(member).unwrap();
     let rat = |v: &Value| -> f64 {
         use num_traits::ToPrimitive;
-        serde_json::from_value::<relational_geometry::Rat>(v.clone())
+        serde_json::from_value::<holonics::geometry::Rat>(v.clone())
             .ok()
             .and_then(|r| r.to_f64())
             .unwrap_or(f64::NAN)
@@ -503,7 +503,7 @@ fn power_neutral_silent_probe_after_learning() {
             .iter()
             .filter(|b| {
                 let zero = |v: &Value| {
-                    serde_json::from_value::<relational_geometry::Rat>(v.clone())
+                    serde_json::from_value::<holonics::geometry::Rat>(v.clone())
                         .is_ok_and(|r| num_traits::Zero::is_zero(&r))
                 };
                 !b.is_null() && !(zero(&b["reaction"]) && zero(&b["residual"]))

@@ -4,7 +4,7 @@ use crate::native::field_geometry::machine::{
     ClockSpec, GeneratorMachineSpec, GeneratorSiteSpec, MachineUnitsSpec, PhaseSpec,
 };
 use num_bigint::BigInt;
-use relational_geometry::{AffineMap3, Rat, RatVec3};
+use holonics::geometry::{AffineMap3, Rat, RatVec3};
 
 fn r(value: i64) -> Rat {
     Rat::from_integer(BigInt::from(value))
@@ -120,7 +120,7 @@ fn source_maps_mount_one_fixed_step_row_per_site() {
 /// configuration chart `U^N`.
 #[test]
 fn moment_powers_equal_repeated_steps_exactly() {
-    use relational_geometry::cayley_rotation_z;
+    use holonics::geometry::cayley_rotation_z;
     let step = AffineMap3 {
         linear: cayley_rotation_z(&(r(1) / r(2))),
         translation: RatVec3::new(r(1) / r(16), r(-3), r(1) / r(5)),

@@ -94,7 +94,7 @@ use std::fmt;
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
-use relational_geometry::{Rat, format_rat};
+use holonics::geometry::{Rat, format_rat};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 

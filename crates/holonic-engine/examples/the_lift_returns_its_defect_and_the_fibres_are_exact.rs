@@ -47,7 +47,7 @@ use holonic_engine::receiver_exact_compression::{
 };
 use num_bigint::BigInt;
 use num_traits::{Euclid, One, Signed, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use sha2::{Digest, Sha256};
 
 // ---------------------------------------------------------------------------------------------

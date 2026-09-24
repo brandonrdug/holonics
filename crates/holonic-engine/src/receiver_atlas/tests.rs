@@ -11,7 +11,7 @@ use crate::grain_tower::{Grain, GrainAddress, GrainFace, GrainPair, GrainSelecti
 use crate::physical_constraint_complex::{ConstraintEdge, ConstraintVertexId, ContactClass};
 use crate::physical_constraint_grading::EdgeProvenance;
 use crate::rigidity_receiver::{rigidity_reading, ExactConfiguration, RigidityJacobian};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 // -------------------------------------------------------------------------------------------
 // Capability: supplied, never conferred

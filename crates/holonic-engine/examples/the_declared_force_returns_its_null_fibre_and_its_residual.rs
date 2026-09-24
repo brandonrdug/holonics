@@ -32,7 +32,7 @@ use std::time::Instant;
 
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde_json::{json, Map, Value};
 
 use holonic_engine::conditioned_static_response::{

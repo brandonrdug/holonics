@@ -4,7 +4,7 @@ use super::{
     BilinearOperator, BilinearProductCore, BilinearRealization, ExactLinearError, ExactRatMatrix,
 };
 use num_traits::{One, Zero};
-use relational_geometry::Rat;
+use crate::geometry::Rat;
 use std::sync::Arc;
 
 #[derive(Clone, Debug, PartialEq, Eq)]

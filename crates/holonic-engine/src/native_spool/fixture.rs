@@ -13,7 +13,7 @@
 
 use std::collections::BTreeSet;
 
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 use crate::receiver_exact_compression::{InputId, Observation, ReceiverId};
 use crate::receiver_history_compression::{NativeStateId, ReceiverFactor};

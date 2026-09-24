@@ -5,7 +5,7 @@
 //! branch equation; six continuing coordinates use its derived two-face return.
 use holonics::exact_linear::ExactRatMatrix as Matrix;
 use num_traits::{One, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, error::Error, fs, path::Path, time::Instant};
 

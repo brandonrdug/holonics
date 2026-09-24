@@ -9,7 +9,7 @@ use super::*;
 use crate::embedding_fiber::ResidentReadout;
 use crate::resident_section::ResidentSectionRest;
 use num_traits::Zero;
-use relational_geometry::{AffineMap3, Rat, RatVec3, cayley_rotation_z};
+use holonics::geometry::{AffineMap3, Rat, RatVec3, cayley_rotation_z};
 use std::rc::Rc;
 
 fn balls<'c>(
@@ -225,7 +225,7 @@ fn affine_coefficients_accept_a_high_grain_dyadic_map() {
         grain,
     ));
     let map = AffineMap3 {
-        linear: relational_geometry::RatMat3::identity(),
+        linear: holonics::geometry::RatMat3::identity(),
         translation: RatVec3::from_i64(1, -2, 3),
     };
     let coefficients =

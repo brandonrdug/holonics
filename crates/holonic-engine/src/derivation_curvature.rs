@@ -188,7 +188,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use num_traits::Zero;
-use relational_geometry::{Rat, RatVec3, integer, rat};
+use holonics::geometry::{Rat, RatVec3, integer, rat};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -387,7 +387,7 @@ pub const UNIT_RESPONSE: i64 = 1;
 /// What a 0-cell of the circuit stands for.
 ///
 /// Renamed from `SiteKind` (kept as an alias) so it does not collide with
-/// `relational_geometry::winding::SiteKind`, the rotation/hyperbolic reading of a generator
+/// `holonics::geometry::winding::SiteKind`, the rotation/hyperbolic reading of a generator
 /// site's trace face. The serde name and variant spellings are unchanged.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(rename = "SiteKind", rename_all = "kebab-case")]

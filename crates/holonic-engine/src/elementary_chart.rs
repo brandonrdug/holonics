@@ -77,7 +77,7 @@
 use std::collections::BTreeMap;
 
 use num_traits::{One, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -508,7 +508,7 @@ pub enum ElementaryChartError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use relational_geometry::exact::rat;
+    use holonics::geometry::rat;
 
     fn polynomial(coefficients: &[i64]) -> RationalPolynomial {
         RationalPolynomial::new(coefficients.iter().map(|value| rat(*value, 1)).collect())

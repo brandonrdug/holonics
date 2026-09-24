@@ -272,7 +272,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use num_traits::Zero;
-use relational_geometry::{Rat, RatVec3};
+use holonics::geometry::{Rat, RatVec3};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -876,7 +876,7 @@ mod tests {
         HingeWorldLaw, LocalStarLaw, LocalStarMaterial, QuadraticHingeAction, SimplicialComplex,
     };
     use num_traits::Signed;
-    use relational_geometry::{integer, rat};
+    use holonics::geometry::{integer, rat};
 
     fn units() -> HingeUnitSystem {
         HingeUnitSystem {

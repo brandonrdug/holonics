@@ -9,7 +9,7 @@ use holonic_engine::{AnalyticCirculationProbeId, AnalyticFieldArcId, AnalyticFie
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
 use num_traits::{One, Zero};
-use relational_geometry::{RatVec3, ReceiverId, integer};
+use holonics::geometry::{RatVec3, ReceiverId, integer};
 
 const MODE_PROPAGATING: DimensionalWaveModeId = DimensionalWaveModeId(1);
 const MODE_GRAZING: DimensionalWaveModeId = DimensionalWaveModeId(2);

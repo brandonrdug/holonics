@@ -22,8 +22,8 @@
 use std::collections::BTreeSet;
 
 use num_traits::Zero;
-use relational_geometry::Rat;
-use relational_geometry::{AffineMap3, PairFiniteMotion, RationalPhaseError, ScrewPair};
+use holonics::geometry::Rat;
+use holonics::geometry::{AffineMap3, PairFiniteMotion, RationalPhaseError, ScrewPair};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 

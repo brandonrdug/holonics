@@ -79,7 +79,7 @@
 //! No float decides a contact, a restriction, a residual, an inflation or a receipt. Coordinates
 //! enter as integer numerators over one declared denominator ([`ScaledOccurrence`]) — the same
 //! exact wire the M5 driver hands the card — and every published aperture, radius and ratio is a
-//! `relational_geometry::Rat`. [`ScaledOccurrence::position`] recovers the exact
+//! `holonics::geometry::Rat`. [`ScaledOccurrence::position`] recovers the exact
 //! [`CoordinateBox3`] so that [`DistanceAperture::classify`] can re-derive any classification this
 //! module produced.
 
@@ -87,7 +87,7 @@ use std::collections::BTreeMap;
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 

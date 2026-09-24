@@ -34,7 +34,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use num_traits::Zero;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 use holonic_engine::lattice_gauge::{
     ExactSpectrum, GaugeConfiguration, IntegralRepresentation, Lattice, Link, Plaquette,

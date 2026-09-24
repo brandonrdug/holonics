@@ -60,7 +60,7 @@ use holonic_engine::kelvin::{
 };
 use holonic_engine::{EventId, ExactEventLaw};
 use num_traits::Zero;
-use relational_geometry::{Rat, format_rat, integer, rat};
+use holonics::geometry::{Rat, format_rat, integer, rat};
 
 fn arc(index: u64) -> AnalyticFieldArcId {
     AnalyticFieldArcId(index)

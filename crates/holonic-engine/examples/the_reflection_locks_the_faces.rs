@@ -62,7 +62,7 @@ use holonic_engine::causal_reflection::{
     RationalCirclePoint, causality_lock,
 };
 use num_traits::{One, Zero};
-use relational_geometry::{Rat, format_rat, integer, rat};
+use holonics::geometry::{Rat, format_rat, integer, rat};
 
 /// The declared lattice grain. It appears in every carrier and must move nothing in the law;
 /// section 10 measures both halves of that.

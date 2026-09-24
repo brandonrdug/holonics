@@ -11,7 +11,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use num_bigint::BigUint;
 use num_traits::Zero;
-use relational_geometry::{RatMat3, ReceiverId};
+use holonics::geometry::{RatMat3, ReceiverId};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -1063,7 +1063,7 @@ mod tests {
         trace_primitives_aperture_with_cpu, trace_receivers_aperture_with_cpu,
     };
     use num_traits::One;
-    use relational_geometry::{
+    use holonics::geometry::{
         Construction, Geometry, ProjectionLaw, Rat, RatVec3, Receiver, integer,
     };
 
@@ -1176,7 +1176,7 @@ mod tests {
                         receiver: *receiver,
                         source_section: source_sections[receiver].clone(),
                         rays: face.rays.clone(),
-                        orientation: relational_geometry::ReceiverOrientation::identity(),
+                        orientation: holonics::geometry::ReceiverOrientation::identity(),
                         face: face.clone(),
                         cause: ReceiverFaceFormationCause::Projected,
                     },
@@ -1280,7 +1280,7 @@ mod tests {
             .expect("the receiver formation exists")
             .orientation
             .precess_cayley(
-                relational_geometry::ReceiverRotationAxis::Y,
+                holonics::geometry::ReceiverRotationAxis::Y,
                 &(integer(1) / integer(16)),
             );
         let rotation_plan = atlas

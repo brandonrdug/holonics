@@ -100,7 +100,7 @@ use std::collections::BTreeMap;
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -371,7 +371,7 @@ pub enum RatioError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use relational_geometry::exact::rat;
+    use holonics::geometry::rat;
 
     fn surprisal_of(numerator: i64, denominator: i64) -> SymbolicSurprisal {
         SymbolicSurprisal::of_probability(&rat(numerator, denominator)).expect("a probability")

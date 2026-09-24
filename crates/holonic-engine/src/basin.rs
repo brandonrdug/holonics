@@ -16,7 +16,7 @@
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
 use num_traits::{Signed, Zero};
-use relational_geometry::{Rat, ReceiverId};
+use holonics::geometry::{Rat, ReceiverId};
 use thiserror::Error;
 
 use crate::{EventSuccessor, ExactEventLaw};

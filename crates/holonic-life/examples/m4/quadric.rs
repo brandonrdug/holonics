@@ -5,7 +5,7 @@ use holonics::exact_linear::ExactRatMatrix;
 use holonic_engine::receiver_history_cultivation::{
     CausalAdjointReceipt, CultivatedReceiverHistoryRest, RankOneMetricMorphology,
 };
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::Serialize;
 
 use super::native::NativeTrainingMount;

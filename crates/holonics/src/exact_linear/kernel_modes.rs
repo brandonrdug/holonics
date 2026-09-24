@@ -7,7 +7,7 @@
 use super::{ExactLinearError, ExactRatMatrix, ReceiverFactorization};
 use crate::exact_work::ExactWork;
 use num_traits::Signed;
-use relational_geometry::Rat;
+use crate::geometry::Rat;
 use std::sync::Arc;
 use thiserror::Error;
 

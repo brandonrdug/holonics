@@ -9,7 +9,7 @@ use crate::{
 };
 use super::fixture::{current, scaffold, spool, thread};
 use num_bigint::BigInt;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 #[test]
 fn factorized_section_block_grouping_does_not_change_coordinates_or_current() {

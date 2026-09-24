@@ -29,7 +29,7 @@ use std::time::Instant;
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{Signed, ToPrimitive, Zero};
-use relational_geometry::ReceiverId;
+use holonics::geometry::ReceiverId;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -1963,7 +1963,7 @@ pub enum CudaApertureError {
 
 #[cfg(test)]
 mod tests {
-    use relational_geometry::integer;
+    use holonics::geometry::integer;
 
     use super::*;
     use crate::{HomogeneousConic, PresentationBoundary};

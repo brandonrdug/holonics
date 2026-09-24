@@ -12,7 +12,7 @@ use std::num::NonZeroUsize;
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
-use relational_geometry::{Rat, ReceiverId};
+use holonics::geometry::{Rat, ReceiverId};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -1441,7 +1441,7 @@ event_refusal_from!(ReceiverPhaseAtlasRefusal: ConicError, ImageCarrierError, Re
 
 #[cfg(test)]
 mod tests {
-    use relational_geometry::RatVec3;
+    use holonics::geometry::RatVec3;
 
     use super::*;
     use crate::CausalWorld;

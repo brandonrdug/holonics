@@ -308,7 +308,7 @@ fn generator_session_learns_pair_response_without_accumulating_completed_returns
                 amplitudes.windows(2).any(|w| w[0] != w[1]),
                 "observed targets must change pair response after boundary material develops"
             );
-            let radius: relational_geometry::Rat = serde_json::from_value(session.inspect_current()?["joint"]["radius"].clone()).unwrap();
+            let radius: holonics::geometry::Rat = serde_json::from_value(session.inspect_current()?["joint"]["radius"].clone()).unwrap();
             eprintln!("final joint radius: {radius}");
             eprintln!(
                 "observed pair amplitude change: {:?}",
@@ -409,7 +409,7 @@ fn generator_silent_source_commit_energy() {
             let current = session.body.inspect_current()?;
             let energies = super::super::measurement::site_energies(&current["joint"], sites);
             let total = energies.iter().flatten().sum::<f64>();
-            let radius: relational_geometry::Rat =
+            let radius: holonics::geometry::Rat =
                 serde_json::from_value(current["joint"]["radius"].clone()).unwrap();
             eprintln!(
                 "SILENT {}",

@@ -25,7 +25,7 @@ impl<'c> NativeDeclaredAmplitudeCommit<'c> {
     pub fn proposal_reference(&self) -> &ResidentNormalEnclosureSection<'c> {
         &self.reference
     }
-    pub fn inspect_amplitudes(&self) -> Result<Vec<relational_geometry::Rat>, Error> {
+    pub fn inspect_amplitudes(&self) -> Result<Vec<holonics::geometry::Rat>, Error> {
         amplitude_points(self.surface, &self.amplitudes, self.grain)
     }
     pub fn inspect_step_bits(&self) -> Result<Vec<u32>, Error> {
@@ -43,7 +43,7 @@ fn amplitude_points<'c>(
     surface: &'c ResidentSurface<'c>,
     section: &ResidentSection<'c>,
     grain: u32,
-) -> Result<Vec<relational_geometry::Rat>, Error> {
+) -> Result<Vec<holonics::geometry::Rat>, Error> {
     let rest = surface.detach_section(section, 64)?;
     let words = wides(&rest.intervals)?;
     words
@@ -52,7 +52,7 @@ fn amplitude_points<'c>(
             if r[0] <= 0 || r[1] != 0 || r[2] != 0 {
                 return Err(Error::Shape);
             }
-            Ok(relational_geometry::Rat::new(
+            Ok(holonics::geometry::Rat::new(
                 r[0].into(),
                 num_bigint::BigInt::from(1) << grain,
             ))
@@ -63,7 +63,7 @@ impl<'c> NativeFieldCurrentSource<'c> {
     /// Cold parameter reading, without realizing a dense D matrix or any update history.
     pub fn inspect_declared_amplitudes(
         &self,
-    ) -> Result<Option<Vec<relational_geometry::Rat>>, Error> {
+    ) -> Result<Option<Vec<holonics::geometry::Rat>>, Error> {
         self._producing
             .factor_program
             .as_ref()

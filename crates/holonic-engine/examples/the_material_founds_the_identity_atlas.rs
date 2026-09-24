@@ -55,9 +55,9 @@ use holonic_engine::multiquadratic::Multiquadratic;
 use holonic_engine::statement_grammar::{
     GrammarAperture, RecoveredStatementGrammar, SeparatorOrientation, recover, recover_under,
 };
-use relational_geometry::Rat;
-use relational_geometry::exact::RatVec2;
-use relational_geometry::receiver_atlas;
+use holonics::geometry::Rat;
+use holonics::geometry::RatVec2;
+use holonics::geometry::receiver_atlas;
 
 /// The declared material. A subtree, named so the aperture is visible: this is one region of one
 /// library, and every figure below is about it.
@@ -394,7 +394,7 @@ fn corner_cosine(argument: &[Rat]) -> Option<Rat> {
 }
 
 /// The cross ratio of four marks on a line, computed by **the standing organ**,
-/// `relational_geometry::receiver_atlas::cross_ratio`, which owns its own refusals — coincident
+/// `holonics::geometry::receiver_atlas::cross_ratio`, which owns its own refusals — coincident
 /// pivots, marks outside one pencil, a repeated projective member.
 ///
 /// The four rationals are placed as four points of one horizontal pencil, which is the shape that

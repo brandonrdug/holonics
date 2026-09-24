@@ -353,8 +353,8 @@ fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
             "Geometry/TwoSidedIdentityAtlas.lean",
         ),
         (
-            include_str!("../../relational-geometry/src/screw.rs"),
-            "relational-geometry/src/screw.rs",
+            include_str!("../../holonics/src/geometry/screw.rs"),
+            "holonics/src/geometry/screw.rs",
             "Geometry/ScrewGeometry.lean",
         ),
     ]

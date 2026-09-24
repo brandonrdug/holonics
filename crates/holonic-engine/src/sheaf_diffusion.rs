@@ -35,7 +35,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::sync::{Arc, RwLock};
 
 use num_traits::{One, Signed, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -127,7 +127,7 @@ impl SheafLinearMap for ExactRatMatrix {
 pub mod linear_map_rows {
     use std::collections::BTreeMap;
 
-    use relational_geometry::Rat;
+    use holonics::geometry::Rat;
     use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
     use crate::CausalCellId;
@@ -1323,7 +1323,7 @@ event_refusal_from!(SheafDiffusionRefusal: CausalAlgebraicError);
 mod tests {
     use std::collections::BTreeSet;
 
-    use relational_geometry::integer;
+    use holonics::geometry::integer;
 
     use super::*;
     use crate::{CausalChain, ComparativeMultiplicity, EventId};

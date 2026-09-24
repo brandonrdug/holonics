@@ -25,7 +25,7 @@ use super::holon_chart::{ResidentHolonChart, RingReaction};
 use super::*;
 use holonic_engine::ExactComplexWaveCurrent;
 use num_traits::{ToPrimitive, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 /// One committed word's balance. Exact terms are kept as rationals; `f64` fields are readings.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]

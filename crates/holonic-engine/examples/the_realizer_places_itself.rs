@@ -85,7 +85,7 @@ use holonic_engine::supported_realizers::{
 };
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 // ---------------------------------------------------------------------------------------------
 // the material: the hollow tetrahedron

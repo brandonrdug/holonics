@@ -5,7 +5,7 @@ use holonics::exact_work::ExactWork;
 use holonic_engine::receiver_history_cultivation::MountedCultivatedHistory;
 use holonic_engine::resident_section::{Dyadic, ResidentGrain, ResidentSurface, TransferCensus};
 use num_traits::ToPrimitive;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::Serialize;
 
 use super::quadric::MathematicalReturn;

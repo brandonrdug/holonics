@@ -450,7 +450,7 @@ pub(super) fn port_symbol_sums(
     alphabet: usize,
     ports: &[GeneratorSourcePort],
     contacts: &[GeneratorSourceContact],
-) -> Result<Vec<relational_geometry::RatMat3>> {
+) -> Result<Vec<holonics::geometry::RatMat3>> {
     use super::machine_source::{add_matrix, zero_matrix};
     let n = symbols.len();
     let s = maps.injection_indices().len();

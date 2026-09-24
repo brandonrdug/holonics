@@ -226,7 +226,7 @@ use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
 use num_bigint::BigInt;
 use num_traits::Zero;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -956,7 +956,7 @@ mod tests {
     use super::*;
     use crate::{Edge, EventId, SimplicialComplex, VertexLinkClass};
     use num_traits::Signed;
-    use relational_geometry::{integer, rat};
+    use holonics::geometry::{integer, rat};
 
     fn vertex(id: u64) -> VertexId {
         VertexId(id)

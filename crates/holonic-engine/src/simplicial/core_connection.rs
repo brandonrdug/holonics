@@ -17,7 +17,7 @@
 //! it is refused by name ([`CoreChartRefusal::NotAScalarTransport`]) rather than projected. The
 //! matrix-valued connection is a core obligation of the Holon plan (phase 4 "NOT DONE").
 //!
-//! [definition] The same statement for affine cell transports (`relational_geometry::triangle_holonomy`,
+//! [definition] The same statement for affine cell transports (`holonics::geometry::triangle_holonomy`,
 //! the reading behind the fixed machine's `CompiledOrientedCell::holonomy`): scalar dilation
 //! transports have holonomy `(∏ λ) · 1`, and for every transport the **determinant line** is a
 //! `ℚ^×` connection whose core curvature is `det(hol) − 1`, a gauge-free class function (tested).

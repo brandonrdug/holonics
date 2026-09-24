@@ -406,7 +406,7 @@ impl<'a, 'c> NativeFieldMatrixFreeAction<'a, 'c> {
         &self.origins
     }
 
-    pub fn residual_bound(&self) -> Result<relational_geometry::Rat, Error> {
+    pub fn residual_bound(&self) -> Result<holonics::geometry::Rat, Error> {
         Ok(self.residual().inspect()?.radius)
     }
 
@@ -574,7 +574,7 @@ impl<'a, 'c> NativeFieldActionPullback<'a, 'c> {
         }
     }
 
-    pub fn residual_bound(&self) -> Result<relational_geometry::Rat, Error> {
+    pub fn residual_bound(&self) -> Result<holonics::geometry::Rat, Error> {
         let view = ResidentNormalEnclosureView {
             surface: self.source.surface,
             section: &self.residual,
@@ -707,7 +707,7 @@ impl<'c> NativeConstitutiveField<'c> {
                             values
                                 .into_iter()
                                 .map(|value| {
-                                    relational_geometry::Rat::new(
+                                    holonics::geometry::Rat::new(
                                         value.into(),
                                         num_bigint::BigInt::from(1) << source_grain,
                                     )

@@ -23,7 +23,7 @@
 use holonic_engine::ResidentEtaHead;
 use num_bigint::BigInt;
 use num_rational::BigRational;
-use relational_geometry::{
+use holonics::geometry::{
     ComplexReceiverBox, Field, HeadSource, RatInterval, SerialJets, atlas_base_config,
     boundary_winding, build_saddle_atlas, derive_euler_maclaurin_start, saddle_summary,
     verify_saddle_artifact, verify_winding, write_saddle_atlas,

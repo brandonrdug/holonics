@@ -35,7 +35,7 @@ use holonic_engine::ported_operation::{
     OperationSpecies, PortedOperationComplex, PortedTransport, PortedWord, SourceTestimony,
 };
 use num_bigint::BigInt;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 const RECEIVER: &str = "model.language_model.layers.0.self_attn.q_proj.weight";
 const PRESENTED: &str = "model.language_model.layers.0.self_attn.k_proj.weight";

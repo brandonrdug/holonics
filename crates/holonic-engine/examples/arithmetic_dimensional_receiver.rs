@@ -28,7 +28,7 @@ use holonic_engine::{
 };
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
-use relational_geometry::{Rat, ReceiverId};
+use holonics::geometry::{Rat, ReceiverId};
 
 const RECEIVER: ReceiverId = ReceiverId(71);
 const DEFAULT_LIMIT: u64 = 512;

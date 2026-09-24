@@ -26,7 +26,7 @@ use holonic_engine::{
     TerminalMatrixSpec, trace_receivers_aperture_with_cpu,
 };
 use num_bigint::BigUint;
-use relational_geometry::{Rat, ReceiverId, integer};
+use holonics::geometry::{Rat, ReceiverId, integer};
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 

@@ -34,7 +34,7 @@ impl<'a, 'b, 'c> NativeFieldReflectionTarget<'a, 'b, 'c> {
     }
     pub fn material_covector(
         &self,
-    ) -> Result<(PairedContactCotangent, relational_geometry::Rat), Error> {
+    ) -> Result<(PairedContactCotangent, holonics::geometry::Rat), Error> {
         let source = self.reflection.source();
         let surface = source.surface;
         let ports = wides(&surface.read_out(&self.ports)?)?;
@@ -45,8 +45,8 @@ impl<'a, 'b, 'c> NativeFieldReflectionTarget<'a, 'b, 'c> {
             v.chunks_exact(2)
                 .map(|p| {
                     ExactComplexWaveCurrent::new(
-                        relational_geometry::Rat::new(p[0].into(), scale.clone()),
-                        relational_geometry::Rat::new(p[1].into(), scale.clone()),
+                        holonics::geometry::Rat::new(p[0].into(), scale.clone()),
+                        holonics::geometry::Rat::new(p[1].into(), scale.clone()),
                     )
                 })
                 .collect()
@@ -58,7 +58,7 @@ impl<'a, 'b, 'c> NativeFieldReflectionTarget<'a, 'b, 'c> {
                 port_factors: [values(&ports[..d]), values(&ports[d..2 * d])],
                 contact_factors: [values(&currents[..2 * k]), values(&currents[2 * k..4 * k])],
             },
-            relational_geometry::Rat::new(bounds[0].into(), scale),
+            holonics::geometry::Rat::new(bounds[0].into(), scale),
         ))
     }
 }

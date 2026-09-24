@@ -27,7 +27,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
-use relational_geometry::{Rat, ReceiverId};
+use holonics::geometry::{Rat, ReceiverId};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 

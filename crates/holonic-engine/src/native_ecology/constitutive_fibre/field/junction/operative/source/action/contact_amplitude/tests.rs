@@ -2,7 +2,7 @@ use super::super::contact_scale::tests::{current, declared_field};
 use super::*;
 use crate::embedding_fiber::ResidentReadout;
 use num_traits::{Signed, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 #[test]
 #[ignore = "requires CUDA; positive pair publication, old source, fixed template and bounded state"]

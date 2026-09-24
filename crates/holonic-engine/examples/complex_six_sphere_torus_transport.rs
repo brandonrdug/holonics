@@ -30,7 +30,7 @@ use holonic_engine::{
 use image::{Rgb, RgbImage};
 use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
-use relational_geometry::{ProjectionLaw, Rat, RatVec3, ReceiverId, project_receiver_point};
+use holonics::geometry::{ProjectionLaw, Rat, RatVec3, ReceiverId, project_receiver_point};
 
 const DEFAULT_OUT: &str = ".local/artifacts/complex-s6-torus-transport";
 const EXTENT: i64 = 4;

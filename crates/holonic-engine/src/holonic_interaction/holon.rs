@@ -50,7 +50,7 @@
 //! [`HolonicInteraction::perturbed_commit`].
 
 use num_traits::{One, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 use holonics::dirac::DiracStructure;
 use holonics::element::{ResistiveRelation, deposition_work};

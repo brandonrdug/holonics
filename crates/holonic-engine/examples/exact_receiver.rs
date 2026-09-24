@@ -3,7 +3,7 @@ use holonic_engine::{
     ReceiverFaceSpec, ReceiverStandingRelation, TerminalMatrixSpec, quotient_presentation,
     receive_face,
 };
-use relational_geometry::{
+use holonics::geometry::{
     Construction, Geometry, ProjectionLaw, RatVec3, Receiver, ReceiverId, integer,
 };
 

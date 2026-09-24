@@ -20,7 +20,7 @@ use holonic_engine::realization::passage::{
 use holonic_engine::receiver_exact_compression::{InputId, ItemId};
 use holonic_engine::receiver_history_compression::ReceiverHistoryCompression;
 use num_bigint::BigInt;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 

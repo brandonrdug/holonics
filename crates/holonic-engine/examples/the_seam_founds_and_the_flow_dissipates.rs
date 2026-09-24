@@ -48,7 +48,7 @@ use holonic_engine::discrete_curvature::{
 };
 use holonic_engine::{HingeId, VertexId};
 use num_bigint::BigInt;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 /// APERTURE — generators one composed turn may carry while climbing. Declared by this caller; the
 /// hinge organ reads its own off the material.

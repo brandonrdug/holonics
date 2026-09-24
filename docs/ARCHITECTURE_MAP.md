@@ -81,7 +81,7 @@ scope without making every reference calculation a claimed resident model operat
 [definition] [Receiver holarchy](RECEIVER_HOLARCHY.md) joins the existing receiving Holon,
 frame, stress/induction, entropy and future-receiver compression owners. New geometric
 `project_receiver_point_rate` and `project_point_with_motion` in
-`relational-geometry/src/projection.rs` feed the existing
+`crates/holonics/src/geometry/projection.rs` feed the existing
 `holonic-engine/examples/optical_receiver_frames.rs` consumer. The example's moving aperture,
 null momenta and proper-time face rates supply the architecture animation.
 `Computation/HolonicRecurrentEcology.ClockedFirstArrival` derives moving-region/nonautonomous
@@ -1430,7 +1430,7 @@ not with the shape of a familiar network diagram. The actual related owners are:
 | The same incidence read as rigidity | `rigidity_receiver.rs` | `J = D F(q)` over the one-skeleton, `ker J` the infinitesimal motions, `ker J^T` the self-stress, rigid clusters and contact-removal sensitivity — one reading per resolution of the open class, with both bounds constructed |
 | Toroidal phase charts and current around closed paths | `analytic_field.rs`; `implicit.rs`; `lattice_gauge.rs`; `structure_group.rs` | Carrier equations, phase, winding and ordered holonomy |
 | Nonlinear recursive operation and first-arrival geometry | `HolonicRecurrentEcology.FirstArrival`; `basin.rs` for bounded outcome regions | Full preimages, first-reception populations and chart covariance |
-| Analytic residual current, changing source and recursive receiving regions | `Mathematics/AnalyticNavigation.lean`, `AnalyticReceiving.lean`; `RH/ZeroDynamicsEntire.lean`; `relational-geometry::exact_analysis::{ComplexJet2,certify_capture,mean_value_release,propagate_to_capture}` | Actual source jet, partial-map Holon, time-varying chart covariance, backward-heat residual law, enclosed ζ traversal and η circulation receiver; [scope and equations](ANALYTIC_FLUX_AND_RECEIVING_BASINS.md) |
+| Analytic residual current, changing source and recursive receiving regions | `Mathematics/AnalyticNavigation.lean`, `AnalyticReceiving.lean`; `RH/ZeroDynamicsEntire.lean`; `holonics::geometry::{ComplexJet2,certify_capture,mean_value_release,propagate_to_capture}` | Actual source jet, partial-map Holon, time-varying chart covariance, backward-heat residual law, enclosed ζ traversal and η circulation receiver; [scope and equations](ANALYTIC_FLUX_AND_RECEIVING_BASINS.md) |
 | Reflected face and quantitative inward zero current | `RH/TransverseCurrentBound.lean`, `RH/FiniteZeroCurrent.lean`, existing `FosterClassFlux.comb'_sub_le` | Paired centre, distinct quartet currents, multiplicity-aware surplus, actual flowed-ξ finite tail and conditional squared-width improvement; [upper-bound scope](RH_CENTERED_CURRENT_UPPER_BOUND.md) |
 | Current, material and changing geometry | Active constitutive field/junction; `discrete_curvature.rs` at its declared hinge-response scope | Coupled operation on the existing current and incidence |
 | Restriction and receiver-compatible compression | Tube/clocked span, mode quotient, `FractalPacking` | Recursive rebase, retained phase/fibre and specialized separated restriction |
@@ -1603,7 +1603,7 @@ checks. These owners supply no native current or learned model; AC1 owns that at
 [`holonic-engraving`](../research/papers/source/packages/holonic-engraving/README.md) consume supplied
 complex source/current/incidence and return vector faces. The exact exterior companion supplies
 projection, depth clipping, field level traces, primary response and retained mark/source data;
-Typst and SVG paint that packet. Existing `relational-geometry::{projection,receiver_atlas}`,
+Typst and SVG paint that packet. Existing `holonics::geometry::{projection,receiver_atlas}`,
 `holonic-engine::{dimensional_wave,display}` and the CAD rendering sources remain their distinct
 native/design owners. The unconsumed Rust `model_surface` prototype was retired in R1; its exact
 readout and receiver-scope mathematics remain in [the realizer guide](canon/TABLET_THE_REALIZER.md#143-the-holomorphic-half-is-owned-and-it-is-aperture-complete-by-a-theorem).

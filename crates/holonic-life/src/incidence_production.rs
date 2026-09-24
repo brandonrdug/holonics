@@ -129,7 +129,7 @@ use holonic_engine::{
 use num_bigint::BigInt;
 use num_rational::BigRational;
 
-/// The exact rational carrier. Identical to `relational_geometry::Rat`, which is the same
+/// The exact rational carrier. Identical to `holonics::geometry::Rat`, which is the same
 /// `num_rational::BigRational`; no float enters this module at any point.
 pub type Rat = BigRational;
 

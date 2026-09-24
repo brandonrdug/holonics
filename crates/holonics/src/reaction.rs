@@ -32,7 +32,7 @@
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
-use relational_geometry::Rat;
+use crate::geometry::Rat;
 
 use crate::deposition::project_passive;
 use crate::exact_linear::ExactRatMatrix;

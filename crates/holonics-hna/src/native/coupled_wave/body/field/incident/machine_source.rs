@@ -15,7 +15,7 @@ use crate::native::field_geometry::machine::{
 use holonic_engine::native_ecology::constitutive_fibre::NativeEnclosurePropagation;
 use holonic_engine::native_ecology::constitutive_fibre::ResidentNormalEnclosureSection;
 use num_traits::Signed;
-use relational_geometry::{AffineMap3, RatMat3};
+use holonics::geometry::{AffineMap3, RatMat3};
 use serde::{Deserialize, Serialize};
 use std::cell::Cell;
 use std::rc::Rc;
@@ -236,7 +236,7 @@ impl<'c> MachineSourceMaps<'c> {
             .iter()
             .map(|map| AffineMap3 {
                 linear: map.linear.clone(),
-                translation: relational_geometry::RatVec3::zero(),
+                translation: holonics::geometry::RatVec3::zero(),
             })
             .collect::<Vec<_>>();
         let coefficients =
@@ -428,7 +428,7 @@ pub(super) fn moment_powers(
         .iter()
         .map(|power| AffineMap3 {
             linear: power.linear.clone(),
-            translation: relational_geometry::RatVec3::zero(),
+            translation: holonics::geometry::RatVec3::zero(),
         })
         .collect::<Vec<_>>();
     let mut injection = Vec::new();
@@ -496,7 +496,7 @@ impl<'c> MachineSourceMaps<'c> {
                     .injection(i, exponent)
                     .ok_or_else(|| invalid("generator moment phase exponent"))?
                     .clone(),
-                translation: relational_geometry::RatVec3::zero(),
+                translation: holonics::geometry::RatVec3::zero(),
             });
         }
         ResidentNormalEnclosureSection::affine_coefficients(self.surface(), &maps, grain)
@@ -620,7 +620,7 @@ impl<'c> MachineSourceMaps<'c> {
             .iter()
             .map(|linear| AffineMap3 {
                 linear: linear.clone(),
-                translation: relational_geometry::RatVec3::zero(),
+                translation: holonics::geometry::RatVec3::zero(),
             })
             .collect::<Vec<_>>();
         ResidentNormalEnclosureSection::affine_coefficients(self.surface(), &maps, grain)

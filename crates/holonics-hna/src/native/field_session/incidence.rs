@@ -13,7 +13,7 @@ use holonic_engine::{AnalyticFieldArcId, AnalyticFieldJunctionId, DimensionalWav
         ResidentBilinearMap, ResidentBilinearReturn, ResidentSection, ResidentSurface,
     }};
 use num_traits::{One, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, sync::Arc};
 

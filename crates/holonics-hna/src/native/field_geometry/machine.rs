@@ -13,7 +13,7 @@ use holonics::generator::Clock as CoreClock;
 use holonic_engine::{holonic_interaction::{Clock, InteractionRefusal, helical::{HelicalPairInteraction, HelicalRefusal, PairUnits}}};
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed};
-use relational_geometry::{
+use holonics::geometry::{
     AffineMap3, PairFiniteMotion, Rat, RatMat3, RatVec3, RationalPhase, ScrewError, ScrewGenerator,
     ScrewPair, SiteFactor, SituatedScrew, triangle_holonomy,
 };
@@ -505,7 +505,7 @@ impl GeneratorMachineSpec {
             .filter_map(|site| site.factor.clone())
             .collect::<Vec<_>>();
         let trace_machine = (supplied_factors.len() == compiled_sites.len())
-            .then(|| relational_geometry::Machine::new(supplied_factors));
+            .then(|| holonics::geometry::Machine::new(supplied_factors));
         Ok(CompiledGeneratorMachine {
             frame: self.frame.clone(),
             units: self.units.clone(),
@@ -832,7 +832,7 @@ pub struct CompiledGeneratorMachine {
     sites: Vec<CompiledGeneratorSite>,
     arcs: Vec<CompiledGeneratorPairArc>,
     cells: Vec<CompiledOrientedCell>,
-    trace_machine: Option<relational_geometry::Machine>,
+    trace_machine: Option<holonics::geometry::Machine>,
 }
 
 impl CompiledGeneratorMachine {
@@ -851,7 +851,7 @@ impl CompiledGeneratorMachine {
     pub fn cells(&self) -> &[CompiledOrientedCell] {
         &self.cells
     }
-    pub fn trace_machine(&self) -> Option<&relational_geometry::Machine> {
+    pub fn trace_machine(&self) -> Option<&holonics::geometry::Machine> {
         self.trace_machine.as_ref()
     }
     pub fn source_sites(&self) -> impl Iterator<Item = &CompiledGeneratorSite> {
@@ -929,7 +929,7 @@ pub enum MachineError {
     #[error(transparent)]
     Screw(#[from] ScrewError),
     #[error(transparent)]
-    Winding(#[from] relational_geometry::winding::WindingError),
+    Winding(#[from] holonics::geometry::winding::WindingError),
 }
 
 fn validate_units(units: &MachineUnitsSpec) -> Result<(), MachineError> {

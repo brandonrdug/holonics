@@ -69,14 +69,14 @@
 //! ## No float
 //!
 //! Extents and populations are `usize`; the complex's coefficients are `ComparativeMultiplicity`
-//! over `BigUint`; `Q` is `relational_geometry::Rat`. Nothing in this module constructs, compares,
+//! over `BigUint`; `Q` is `holonics::geometry::Rat`. Nothing in this module constructs, compares,
 //! or stores an IEEE scalar.
 
 use std::collections::{BTreeMap, BTreeSet};
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::One;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 
 use crate::algebraic::{

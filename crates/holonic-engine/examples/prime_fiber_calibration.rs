@@ -13,7 +13,7 @@ use holonic_engine::{
     residue_transport_sheaf, residue_triangle_obstructions,
 };
 use num_bigint::BigInt;
-use relational_geometry::{format_rat, integer};
+use holonics::geometry::{format_rat, integer};
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut arguments = std::env::args().skip(1);

@@ -62,7 +62,7 @@
 //! # What is exact and what is declared
 //!
 //! No float decides anything here. Faces, residuals, moduli and costs are `num_bigint::BigUint`,
-//! `num_bigint::BigInt` or `relational_geometry::Rat`; comparison is `Eq` on those exact carriers.
+//! `num_bigint::BigInt` or `crate::geometry::Rat`; comparison is `Eq` on those exact carriers.
 //!
 //! Two things are *declared by the caller* and are not derived, and the Lean side is where their
 //! general form lives:
@@ -83,7 +83,7 @@ use std::fmt::{self, Debug};
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
-use relational_geometry::Rat;
+use crate::geometry::Rat;
 
 /// Why a tower, a section or a restriction law was refused.
 ///
@@ -996,7 +996,7 @@ impl Transition for ExactShift {
 /// Lean counterpart: an instance of `Foundation/ContinuingTower.lean::Transition` with a nontrivial
 /// residual over an ordered field; the general laws it satisfies are `Transition.reopen_apply` and
 /// `Transition.laterReceiverFactors`. No float participates: the residual is a
-/// `relational_geometry::Rat`.
+/// `crate::geometry::Rat`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct RationalFloor;
 

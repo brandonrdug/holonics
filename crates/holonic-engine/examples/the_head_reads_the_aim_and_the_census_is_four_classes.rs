@@ -84,7 +84,7 @@ use holonics::exact_work::{Admission, ExactWork, WorkBudget, WorkMetric};
 use holonics::inertia::{SymmetricForm, pullback_inertia_bound_with_work};
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 const MODEL: &str = "/home/b/models/gemma-4-E4B-it/model.safetensors";
 const EMBED: &str = "model.language_model.embed_tokens.weight";

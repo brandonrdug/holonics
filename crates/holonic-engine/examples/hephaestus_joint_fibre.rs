@@ -7,7 +7,7 @@ use holonics::exact_linear::{
     BilinearOperator, BilinearProductCore, ExactRatMatrix, JointBilinearFibre,
     JointBilinearSystem, JointPreimageReduction,
 };
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde_json::json;
 use std::sync::Arc;
 fn q(v: i64) -> Rat {

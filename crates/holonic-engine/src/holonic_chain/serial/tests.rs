@@ -1,6 +1,6 @@
 use super::*;
 use num_traits::Zero;
-use relational_geometry::{HingeAxis, rat};
+use holonics::geometry::{HingeAxis, rat};
 
 #[test]
 fn cayley_generator_uses_half_angle_differential_and_pivot_arm() {
@@ -145,7 +145,7 @@ fn prismatic_endpoint_fibre_keeps_exact_kernel() {
     .unwrap();
     let chain = SerialChain::new(AffineMap3::identity(), vec![first, second]).unwrap();
     let target = AffineMap3 {
-        linear: relational_geometry::RatMat3::identity(),
+        linear: holonics::geometry::RatMat3::identity(),
         translation: RatVec3::from_i64(3, 0, 0),
     };
     let fibre = match chain.prismatic_endpoint_fibre(&target).unwrap() {

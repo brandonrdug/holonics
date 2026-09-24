@@ -26,12 +26,12 @@ composition. The intended generally useful Athena assistant is still under const
 
 ## The checkout today
 
-The root `Cargo.toml` currently declares **15 workspace packages** (12 libraries and three applications).
+The root `Cargo.toml` currently declares **14 workspace packages** (11 libraries and three applications).
 The restructuring work is in progress; these are the paths that exist now.
 
 | Path | Current role |
 |---|---|
-| `crates/holonics/`, `crates/relational-geometry/` | Main Holon law, structural carriers and exact operators; geometric source laws still in their separate owner |
+| `crates/holonics/` | Main Holon law, structural carriers, receiver-relative geometry and exact operators |
 | `crates/holonic-engine/`, `crates/holonics-hna/`, `crates/holonic-life/` | Native field, HNN sessions, equation extraction and inherited implementation layers |
 | `crates/holonic-mount/`, `crates/holonic-words/` | CUDA driver/launch boundary and exact word arithmetic |
 | `formal/elementary-holonics/` | Current Lean/Lake project; the final `Holonics` and `HolonicsResearch` roots remain an M2 move |

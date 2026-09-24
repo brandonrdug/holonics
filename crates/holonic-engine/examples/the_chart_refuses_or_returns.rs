@@ -35,7 +35,7 @@ use holonic_engine::quintic_chart::{
 use holonics::rational_polynomial::RationalPolynomial;
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 /// **What this driver declares as its horn local-section limit.** `prime_ecology` stopped picking a
 /// default on 2026-08-09 (`docs/canon/THE_CONTAMINANT_PROTOCOL.md` §2.5 — *a default is a level the

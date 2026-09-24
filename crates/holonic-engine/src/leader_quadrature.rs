@@ -191,7 +191,7 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use holonics::structure::{Chain, ChainEnd, Composes, Hand, Relating};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use std::collections::BTreeMap;
 
 #[derive(Clone, Debug, PartialEq, Eq, Error)]
@@ -1231,7 +1231,7 @@ pub fn path_disagreement(left: &LeaderQuadrature, right: &LeaderQuadrature) -> R
 #[cfg(test)]
 mod tests {
     use super::*;
-    use relational_geometry::{integer, rat};
+    use holonics::geometry::{integer, rat};
     use std::collections::BTreeSet;
 
     fn jet(coefficients: &[(i64, i64)]) -> LocalJet {

@@ -31,7 +31,7 @@ use holonic_engine::discrete_curvature::{DiscreteCurvatureConfiguration, FLAT_CO
 use holonic_engine::winding_inertia::{Hand, PassageReturn, SymmetricCirculant, winding_inertia};
 use holonic_engine::{HingeId, VertexId};
 use num_bigint::BigInt;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 fn integer(value: i64) -> Rat {
     Rat::from_integer(BigInt::from(value))

@@ -90,7 +90,7 @@ use std::collections::BTreeMap;
 
 use num_bigint::BigUint;
 use num_traits::{One, Signed, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -623,7 +623,7 @@ impl ParcelCohort {
 
     /// Primitive closed words counted by length, index zero being length one.
     ///
-    /// **Comparable in shape** to `relational_geometry::IharaSignature::primitive_oriented_cycles`,
+    /// **Comparable in shape** to `holonics::geometry::IharaSignature::primitive_oriented_cycles`,
     /// which is indexed the same way. It is **not** the same population and is not asserted equal to
     /// it: Ihara counts primitive cycles modulo the cyclic choice of starting dart and admits no
     /// backtracking, while a closed word here is **rooted** at the release site and a parcel may

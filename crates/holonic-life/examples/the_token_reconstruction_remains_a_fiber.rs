@@ -16,7 +16,7 @@ use life::reconstruction_fiber::{
     DeclaredDiffusionPassage, OccurrenceAddress, ReconstructionBody, ReconstructionDeclaration,
     ReconstructionPassage, ReconstructionWorkCover,
 };
-use relational_geometry::integer;
+use holonics::geometry::integer;
 
 const STRATA: [StratumDeclaration; 1] = [StratumDeclaration {
     stratum: Stratum(0),

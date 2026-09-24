@@ -10,7 +10,7 @@ use holonic_engine::physical_constraint_complex::{
 };
 use holonic_engine::EventId;
 use num_bigint::BigInt;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 
 use super::cif::{CifComponent, CifPresentation};

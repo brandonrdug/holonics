@@ -16,7 +16,7 @@ use holonic_engine::{
 use image::{DynamicImage, Rgb, RgbImage};
 use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
-use relational_geometry::{Rat, RatVec3, ReceiverId};
+use holonics::geometry::{Rat, RatVec3, ReceiverId};
 
 const DEFAULT_INPUT: &str = "/tmp/codex-clipboard-T9jMYB.png";
 const DEFAULT_OUTPUT: &str = "target/holonic-engine/curved-receiver-phase-atlas-tiger";

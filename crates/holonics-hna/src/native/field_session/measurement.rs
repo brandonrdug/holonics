@@ -36,7 +36,7 @@ use holonic_engine::presentation_cost::{CostReceipt, Counted};
 use holonic_engine::resident_section::TransferCensus;
 use num_bigint::BigInt;
 use num_traits::{Signed, ToPrimitive, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use std::io::Cursor;
 
 #[cfg(test)]
@@ -1041,7 +1041,7 @@ impl<'c> NativeFieldSession<'c> {
                     reading.committed_windings = Some(turns.to_string());
                     reading.turn = "rational turn: lifted winding per closure period";
                     if winding.lifted > 0 {
-                        if let Ok(address) = relational_geometry::winding::LockAddress::from_ratio(
+                        if let Ok(address) = holonics::geometry::winding::LockAddress::from_ratio(
                             &BigInt::from(winding.lifted),
                             &BigInt::from(period as u64),
                         ) {

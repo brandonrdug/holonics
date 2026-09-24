@@ -30,7 +30,7 @@ use holonic_engine::{
 };
 use num_bigint::BigUint;
 use num_traits::{ToPrimitive, Zero};
-use relational_geometry::{
+use holonics::geometry::{
     Construction, EntityId, Geometry, ProjectiveRatio, Rat, RatMat3, RatVec3, ReceiverId,
     ReceiverOrientation, ReceiverRotationAxis, integer,
 };
@@ -286,7 +286,7 @@ struct DesktopEcology {
     face_entities: BTreeMap<FaceId, EntityId>,
     face_vertices: BTreeMap<FaceId, [VertexId; 3]>,
     physical: CausalWorld<LocalStarLaw>,
-    frame: relational_geometry::FrameId,
+    frame: holonics::geometry::FrameId,
     radiation: LocalStarRadiation,
 }
 
@@ -300,7 +300,7 @@ fn third_vertex(vertices: [VertexId; 3], edge: Edge) -> VertexId {
 fn conic_family(
     ordinal: usize,
     founding: EventId,
-    frame: relational_geometry::FrameId,
+    frame: holonics::geometry::FrameId,
     hinge: HingeId,
     edge: Edge,
     complex: &SimplicialComplex,
@@ -660,7 +660,7 @@ fn sync_construction(
 }
 
 fn receiver_specification(
-    frame: relational_geometry::FrameId,
+    frame: holonics::geometry::FrameId,
     receiver: ReceiverId,
     standing: &LocalStarStanding,
 ) -> Result<ReceiverFaceSpec, Box<dyn std::error::Error>> {
@@ -760,7 +760,7 @@ struct ReceiverSupportCut {
 
 fn support_assembly(
     construction: &Construction,
-    frame: relational_geometry::FrameId,
+    frame: holonics::geometry::FrameId,
     physical: &CausalWorld<LocalStarLaw>,
     face_entities: &BTreeMap<FaceId, EntityId>,
     terminal_receiver: ReceiverId,

@@ -27,7 +27,7 @@ use holonic_engine::{
     FieldChart, FieldChartAxis, FieldPhaseChannel, FieldReceiverQuery, FieldRegionId,
     FieldSupportStanding, ImplicitCellId, OrientedFieldSample, SourceTorusOccurrence,
 };
-use relational_geometry::{Rat, RatVec3, ReceiverId, integer};
+use holonics::geometry::{Rat, RatVec3, ReceiverId, integer};
 
 fn rat(numerator: i64, denominator: i64) -> Rat {
     Rat::new(numerator.into(), denominator.into())
@@ -531,7 +531,7 @@ fn the_wall() {
     println!("  The declared chart dimension ranges over 1..=3 and nothing above 3 can be named.");
     println!("  Two carriers fix that ceiling, and neither is in this module:");
     println!(
-        "    relational_geometry::RatVec3   (crates/relational-geometry/src/exact.rs:298) — the"
+        "    holonics::geometry::RatVec3   (crates/holonics/src/geometry/exact.rs:298) — the"
     );
     println!("      sample, point and normal carrier, three named fields x, y, z.");
     println!(

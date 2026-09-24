@@ -3,7 +3,7 @@ use holonics::exact_linear::{EnergyMomentum, ExactRatMatrix};
 use holonic_engine::exponentiated_ratio::RatioFamily;
 use holonic_engine::surprisal::SymbolicSurprisal;
 use num_traits::{One, Zero};
-use relational_geometry::{
+use holonics::geometry::{
     project_point_with_motion, AffineMap3, Construction, ExactExpr, FrameRelationKind,
     ProjectionLaw, Rat, RatMat3, RatVec3, Receiver, ReceiverId,
 };

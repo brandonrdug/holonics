@@ -19,7 +19,7 @@ use holonic_engine::{
 use image::{Rgb, RgbImage};
 use num_bigint::BigInt;
 use num_traits::ToPrimitive;
-use relational_geometry::{
+use holonics::geometry::{
     ConicSpecies, Construction, FrameId, Geometry, ProjectionLaw, ProjectiveConic, RatVec3,
     Receiver, ReceiverId, integer,
 };

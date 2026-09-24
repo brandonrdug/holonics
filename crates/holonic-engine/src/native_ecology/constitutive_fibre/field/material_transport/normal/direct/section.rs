@@ -142,7 +142,7 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
     }
 
     /// Inspect only the certified radius of every row from one resident readout.
-    pub fn inspect_radii(&self) -> Result<Vec<relational_geometry::Rat>, ConstitutiveFibreError> {
+    pub fn inspect_radii(&self) -> Result<Vec<holonics::geometry::Rat>, ConstitutiveFibreError> {
         let stride = self
             .width
             .checked_add(1)

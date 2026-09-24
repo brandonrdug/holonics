@@ -4,7 +4,7 @@ use crate::native_ecology::constitutive_fibre::circulation::rest::{
 };
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use std::io::{Read, Write};
 const MAGIC_V2: &[u8] = b"HOLONIC-WAVE-RELATION\x02";
 const MAGIC_V4: &[u8] = b"HOLONIC-WAVE-RELATION\x04";

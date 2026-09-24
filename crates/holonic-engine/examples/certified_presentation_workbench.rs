@@ -33,7 +33,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use num_bigint::BigInt;
-use relational_geometry::{Rat, format_rat, integer, rat};
+use holonics::geometry::{Rat, format_rat, integer, rat};
 
 use holonic_engine::certified_face::{
     CertifiedFace, ReceiverWindow, certify_face, mark_census, station_sign_changes,

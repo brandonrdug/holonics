@@ -28,7 +28,7 @@ use holonics::inertia::SymmetricForm;
 use holonics::scalar::matrix_form;
 use num_bigint::BigInt;
 use num_traits::Zero;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 use super::*;
 use holonics::exact_linear::ExactRatMatrix;

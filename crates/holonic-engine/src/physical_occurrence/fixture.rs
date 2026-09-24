@@ -11,7 +11,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::PathBuf;
 
 use num_bigint::BigInt;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 use super::{
     Acidity, AssayFormat, Coordinate, CoordinateName, CoordinateValue, Environment,

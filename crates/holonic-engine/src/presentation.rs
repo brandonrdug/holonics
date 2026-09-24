@@ -10,7 +10,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
-use relational_geometry::{FrameId, Rat, RatMat3, RatVec3, ReceiverId};
+use holonics::geometry::{FrameId, Rat, RatMat3, RatVec3, ReceiverId};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 

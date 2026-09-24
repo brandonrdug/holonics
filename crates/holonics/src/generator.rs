@@ -11,12 +11,12 @@
 //! `Geometry/PhaseCarry.lean::carry_cocycle`, `Geometry/PhaseCarry.lean::carry_le_one`); a rational
 //! clock passage jumps losslessly (`Holon/Generator.lean::clockPassage_jumps_lossless`).
 //!
-//! [definition; agent-inferred] Exact charts. The phase is `relational_geometry::RationalPhase`, the
+//! [definition; agent-inferred] Exact charts. The phase is `crate::geometry::RationalPhase`, the
 //! Cayley half-angle chart (a point of the rational unit circle), and the winding is a `BigInt`; no
-//! real angle is formed. The clock's ticks run on `relational_geometry::winding::Odometer`, whose
+//! real angle is formed. The clock's ticks run on `crate::geometry::winding::Odometer`, whose
 //! overflow is the counted jump population. The transport is the flow generator `ẋ = A x + b`
 //! ([`Transport::Linear`], [`Transport::Affine`], or a screw `ω × x + v` through
-//! `relational_geometry::ScrewGenerator`); one clock tick is its Cayley (implicit-midpoint) step
+//! `crate::geometry::ScrewGenerator`); one clock tick is its Cayley (implicit-midpoint) step
 //! `(I − hA/2) x⁺ = (I + hA/2) x + h b`, which is the exact rational stepping of the Holon law
 //! (`Holon/Element.lean::midpoint_balance` with `J = A` skew, `R = 0`, `Q = I`) and is norm
 //! preserving for a skew `A` with `b = 0`.
@@ -29,7 +29,7 @@
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
-use relational_geometry::{
+use crate::geometry::{
     Odometer, Rat, RatVec3, RationalPhase, ScrewGenerator, SituatedScrew, carry, winding,
 };
 
@@ -201,7 +201,7 @@ pub enum Transport {
         linear: ExactRatMatrix,
         translation: Vec<Rat>,
     },
-    /// `ω × x + v`, through `relational_geometry::ScrewGenerator` (boxed: six exact rationals).
+    /// `ω × x + v`, through `crate::geometry::ScrewGenerator` (boxed: six exact rationals).
     Screw(Box<ScrewGenerator>),
 }
 

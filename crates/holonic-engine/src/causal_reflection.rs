@@ -170,7 +170,7 @@ use num_traits::{One, Signed, Zero};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 const RESPONSE_SCHEMA: &str = "holonic-engine.causal-response.v1";
 const FACE_SCHEMA: &str = "holonic-engine.causal-response-face.v1";
@@ -1123,7 +1123,7 @@ impl FourPointSpectralReflection {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use relational_geometry::{integer, rat};
+    use holonics::geometry::{integer, rat};
 
     fn grain() -> Rat {
         rat(1, 3)

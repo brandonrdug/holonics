@@ -1,5 +1,5 @@
 use num_traits::Zero;
-use relational_geometry::{integer, rat};
+use crate::geometry::{integer, rat};
 
 use crate::exact_value::STURM_DEGREE_CEILING;
 

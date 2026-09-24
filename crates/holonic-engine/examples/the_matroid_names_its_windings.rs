@@ -32,7 +32,7 @@ use holonic_engine::winding_inertia::{
     CyclicReading, Hand, PassageReturn, SymmetricCirculant, WindingError, winding_inertia,
 };
 use num_traits::{One, Signed, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 /// Declared by this caller, not by the library: how many placements the cyclic-reading walk may
 /// touch before it reports an exhausted allowance rather than an absence.

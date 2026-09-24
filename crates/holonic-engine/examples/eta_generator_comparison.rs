@@ -2,7 +2,7 @@
 use holonic_engine::surprisal::SymbolicSurprisal;
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
-use relational_geometry::{
+use holonics::geometry::{
     ComplexInterval, ComplexReceiverBox, Rat, RatInterval, eta_chain_decomposition,
     eta_partial_current, pi_interval, read_atlas, verify_artifact,
 };

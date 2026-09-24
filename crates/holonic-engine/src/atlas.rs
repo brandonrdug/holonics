@@ -5,7 +5,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use relational_geometry::ReceiverId;
+use holonics::geometry::ReceiverId;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 

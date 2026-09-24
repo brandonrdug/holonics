@@ -8,7 +8,7 @@ use crate::factored_moment::{
     SparseQuadraticMomentFoundation,
 };
 use num_bigint::{BigInt, BigUint};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 #[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct ResidentMembraneInteriorReturn {
     pub left_cell: u32,

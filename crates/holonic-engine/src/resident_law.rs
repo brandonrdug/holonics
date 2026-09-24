@@ -2391,7 +2391,7 @@ impl ResidentLaw for CollapseControl {
 
 use crate::source_occurrence::BindingValidation;
 use num_bigint::BigInt;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 /// **What entails one law's parameters**, read off the validated testimony of its occurrence. A
 /// binding is source-authenticated only when this returns: every parameter the law holds is

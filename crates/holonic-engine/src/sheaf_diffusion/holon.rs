@@ -14,7 +14,7 @@
 //! declared interval; its `advance` enacts this law's own certified event, and a joined law
 //! advances through the core [`ReferenceHolon`].
 
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 use holonics::holon::{Holon, HolonError, HolonState};
 use holonics::law::{Advance, HolonLaw, ReferenceHolon, Scheme};
@@ -170,7 +170,7 @@ mod tests {
         check_exact_advance, check_interaction, check_restriction, check_run, check_tellegen,
     };
     use holonics::restriction::PortMap;
-    use relational_geometry::integer;
+    use holonics::geometry::integer;
 
     use super::*;
     use crate::{

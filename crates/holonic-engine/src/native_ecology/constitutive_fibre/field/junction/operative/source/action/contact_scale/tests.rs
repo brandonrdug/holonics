@@ -13,7 +13,7 @@ use crate::resident_section::{
 };
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 pub(in super::super) fn packet<'c>(
     surface: &'c ResidentSurface<'c>,

@@ -36,7 +36,7 @@
 use std::fmt::{self, Debug};
 
 use num_traits::Zero;
-use relational_geometry::Rat;
+use crate::geometry::Rat;
 
 use super::{
     CircuitDefect, DECLARED_CHART_CEILING, DECLARED_CIRCUIT_CEILING, DECLARED_FACE_CEILING,

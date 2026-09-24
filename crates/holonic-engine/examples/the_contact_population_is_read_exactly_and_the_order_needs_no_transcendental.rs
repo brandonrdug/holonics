@@ -38,7 +38,7 @@ use holonics::exact_work::{Admission, ExactWork, WorkBudget, WorkMetric};
 use holonic_engine::foreign_map::manifest_safetensors;
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
-use relational_geometry::{ExactExpr, Rat};
+use holonics::geometry::{ExactExpr, Rat};
 
 const RECEIVER: &str = "model.language_model.layers.0.self_attn.q_proj.weight";
 const PRESENTED: &str = "model.language_model.layers.0.self_attn.k_proj.weight";

@@ -9,7 +9,7 @@ use std::collections::BTreeMap;
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
-use relational_geometry::{FrameId, Rat, RatMat3, RatVec3};
+use holonics::geometry::{FrameId, Rat, RatMat3, RatVec3};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -449,7 +449,7 @@ pub enum ConicError {
 
 #[cfg(test)]
 mod tests {
-    use relational_geometry::{integer, rat};
+    use holonics::geometry::{integer, rat};
 
     use super::*;
 

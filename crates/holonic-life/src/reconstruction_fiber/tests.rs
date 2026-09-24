@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use holonic_engine::corpus_census::{LexicalSpecies, Stratum, StratumDeclaration};
 use holonic_engine::diffusion::{DiffusionBranch, DiffusionComplex, DiffusionNode};
 use holonic_engine::{CurrentBranchId, CurrentNodeId};
-use relational_geometry::integer;
+use holonics::geometry::integer;
 
 use super::*;
 

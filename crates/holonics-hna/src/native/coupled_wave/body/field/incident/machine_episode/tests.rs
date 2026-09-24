@@ -6,7 +6,7 @@ use crate::native::field_geometry::machine::{ClockSpec, GeneratorMachineSpec};
 use holonic_engine::native_ecology::constitutive_fibre::ResidentConstitutiveSection;
 use holonic_engine::{ExactComplexWaveCurrent, embedding_fiber::ResidentReadout};
 use num_traits::{Signed, ToPrimitive, Zero};
-use relational_geometry::{AffineMap3, Rat, RatVec3, cayley_rotation_z};
+use holonics::geometry::{AffineMap3, Rat, RatVec3, cayley_rotation_z};
 
 fn r(n: i64) -> Rat {
     Rat::from_integer(n.into())

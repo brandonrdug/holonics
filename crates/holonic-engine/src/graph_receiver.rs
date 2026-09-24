@@ -14,7 +14,7 @@ use std::{
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
-use relational_geometry::ReceiverId;
+use holonics::geometry::ReceiverId;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -2055,7 +2055,7 @@ pub enum GraphReceiverError {
 
 #[cfg(test)]
 mod tests {
-    use relational_geometry::{RatVec3, ReceiverId};
+    use holonics::geometry::{RatVec3, ReceiverId};
 
     use super::*;
     use crate::{

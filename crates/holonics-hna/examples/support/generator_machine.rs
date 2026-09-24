@@ -20,7 +20,7 @@ use holonics::inertia::SymmetricForm;
 use holonic_engine::{native_ecology::constitutive_fibre::NativeEnclosurePropagation};
 use num_bigint::BigInt;
 use num_traits::Zero;
-use relational_geometry::{AffineMap3, Rat, RatMat3, RatVec3, cayley_rotation_z};
+use holonics::geometry::{AffineMap3, Rat, RatMat3, RatVec3, cayley_rotation_z};
 
 fn rat(numerator: i64, denominator: i64) -> Rat {
     Rat::new(BigInt::from(numerator), BigInt::from(denominator))

@@ -569,18 +569,18 @@ fn ratio_return_carries_the_phase_face_and_the_gap_weighted_covector() {
         .normalized_ratio_return(&observed, &target, &[1], 4, SeriesAperture(32))
         .unwrap();
     let wound = covector(&wound);
-    let pi = relational_geometry::exact_analysis::pi_interval(GRAIN + 16);
+    let pi = holonics::geometry::pi_interval(GRAIN + 16);
     let lower = (&pi.lower * rat(2) - Rat::one()) * &half;
     let upper = (&pi.upper * rat(2) - Rat::one()) * &half;
     let centre = &wound.center[2].imaginary;
     assert!(centre - &wound.radius <= lower && upper <= centre + &wound.radius);
     assert!(wound.radius > Rat::zero() && wound.radius < Rat::new(1.into(), (1u64 << 40).into()));
     // Exact reference for the magnitude part: the principal log of the real amplitude ratio 2.
-    let config = relational_geometry::exact_analysis::ExactSeriesConfig::default();
+    let config = holonics::geometry::ExactSeriesConfig::default();
     let log_ratio =
-        relational_geometry::exact_analysis::complex_log_point(&rat(2), &Rat::zero(), &config)
+        holonics::geometry::complex_log_point(&rat(2), &Rat::zero(), &config)
             .unwrap();
-    let half_log_q_over_p = relational_geometry::exact_analysis::complex_log_point(
+    let half_log_q_over_p = holonics::geometry::complex_log_point(
         &(Rat::one() / &quarter),
         &Rat::zero(),
         &config,

@@ -164,7 +164,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Arc;
 
 use num_bigint::BigUint;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::Serialize;
 use thiserror::Error;
 

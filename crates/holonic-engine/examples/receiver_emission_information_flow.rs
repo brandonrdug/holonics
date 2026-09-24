@@ -28,7 +28,7 @@ use holonic_engine::{
 };
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use ron::ser::PrettyConfig;
 use serde::{Deserialize, Serialize};
 

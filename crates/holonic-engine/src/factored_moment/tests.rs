@@ -7,7 +7,7 @@ use crate::receiver_history_compression::{
 };
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 fn current(weight: u32, entries: &[(u32, u32)]) -> WeightedIntegralCurrent {
     WeightedIntegralCurrent {

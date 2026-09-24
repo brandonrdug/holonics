@@ -28,7 +28,7 @@ use life::form_mouth::deposit_form;
 use life::live_current_cuda::CudaLiveCurrentExecutor;
 use num_bigint::BigInt;
 use num_traits::{ToPrimitive, Zero};
-use relational_geometry::{Rat, ReceiverId};
+use holonics::geometry::{Rat, ReceiverId};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use soma_membrane::{

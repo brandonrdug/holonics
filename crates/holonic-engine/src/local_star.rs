@@ -10,7 +10,7 @@
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
-use relational_geometry::{
+use holonics::geometry::{
     ExactSpin, FrameId, ProjectionLaw, ProjectiveRatio, Rat, RatVec3, Receiver, ReceiverId,
     ReceiverOrientation, ReceiverRotationAxis, integer,
 };
@@ -2758,7 +2758,7 @@ mod tests {
     use std::collections::BTreeSet;
     use std::num::NonZeroUsize;
 
-    use relational_geometry::integer;
+    use holonics::geometry::integer;
 
     use super::*;
     use crate::{CausalWorld, HingeTransportNetwork, HingeUnitSystem, SimplicialComplex};

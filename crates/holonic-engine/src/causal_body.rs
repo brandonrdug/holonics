@@ -26,7 +26,7 @@ use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::Zero;
-use relational_geometry::{
+use holonics::geometry::{
     ExactTurn, JointDecoratedPathOperator, Rat, ReceiverId, SourceSegmentAddress, SourceVertexId,
 };
 use serde::{Deserialize, Serialize};
@@ -1956,7 +1956,7 @@ event_refusal_from!(CausalBodyRefusal: CausalAlgebraicError, SheafDiffusionError
 
 #[cfg(test)]
 mod tests {
-    use relational_geometry::{
+    use holonics::geometry::{
         Construction, Geometry, ProjectionLaw, RatVec3, Receiver, ReceiverId,
         build_joint_decorated_path_operator, integer,
     };

@@ -10,7 +10,7 @@
 
 use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use num_traits::{One, Signed, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use thiserror::Error;
 
 #[derive(Clone, Debug, PartialEq, Eq)]

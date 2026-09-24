@@ -772,7 +772,7 @@ impl<'residence, 'chart> ExtractedOperatorSession<'residence, 'chart> {
         dy: &ContemporaryCarrier<'chart>,
         presented: NativeCarrierOrdinal,
         group: usize,
-        epsilon: &relational_geometry::Rat,
+        epsilon: &holonics::geometry::Rat,
         gain: Option<NativeTensorOrdinal>,
         ordinal: u32,
     ) -> Result<ContemporaryCarrier<'chart>, ExtractedOperatorRefusal> {

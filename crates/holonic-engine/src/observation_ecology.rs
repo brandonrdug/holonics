@@ -22,7 +22,7 @@ use std::sync::Mutex;
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{Signed, ToPrimitive, Zero};
-use relational_geometry::{Rat, ReceiverId};
+use holonics::geometry::{Rat, ReceiverId};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 

@@ -18,7 +18,7 @@ use holonic_engine::matroid_chow::{
     chain_monomial_census,
 };
 use num_traits::{One, Signed, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 fn main() -> ExitCode {
     let mut failures: Vec<String> = Vec::new();

@@ -39,7 +39,7 @@
 
 use num_bigint::BigInt;
 use num_traits::Zero;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 use holonics::exact_linear::ExactRatMatrix;
 use holonics::inertia::{

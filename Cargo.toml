@@ -6,7 +6,7 @@
 #
 # `body` is pure law: no_std, zero dependencies. `holonics::structure` is the
 # substrate — ordinal and relation atlases, local populations, branch lineage,
-# typed atomic membrane. `crates/relational-geometry` and the native mathematical owners in
+# typed atomic membrane. `holonics::geometry` and the native mathematical owners in
 # `crates/holonic-engine` keep receiver-relative conduct exact over BigRational with
 # Sturm-certified algebraic roots; exterior float codewords and measurements keep their
 # declared codec/apparatus roles. `crates/holonic-language` is the reflective
@@ -22,7 +22,6 @@ members = [
   "crates/holonics-workspace",
   "applications/holonics-workbench",
   "crates/holonic-language",
-  "crates/relational-geometry",
   "crates/holonic-words",
   "crates/holonic-engine",
   "crates/holonic-body",
@@ -46,7 +45,6 @@ edition = "2024"
 license = "MIT OR Apache-2.0"
 
 [workspace.dependencies]
-relational-geometry = { path = "crates/relational-geometry" }
 holonic-words = { path = "crates/holonic-words" }
 serde = { version = "1", features = ["derive", "rc"] }
 ron = "0.12"

@@ -70,7 +70,7 @@ use holonic_engine::simplicial::{
     Edge, FaceId, OrientedFace, SimplicialComplex, SimplicialError, VertexId,
 };
 use num_bigint::BigInt;
-use relational_geometry::exact::{Rat, format_rat};
+use holonics::geometry::{Rat, format_rat};
 
 /// Vertices the search runs over. Six is the smallest count on which a closed surface other than
 /// the boundary of a tetrahedron can be triangulated at all.

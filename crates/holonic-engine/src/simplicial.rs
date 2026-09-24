@@ -9,7 +9,7 @@ use std::collections::{BTreeMap, BTreeSet, VecDeque, btree_map::Entry};
 
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
-use relational_geometry::{FrameId, Rat, RatVec2};
+use holonics::geometry::{FrameId, Rat, RatVec2};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -705,7 +705,7 @@ impl ProjectiveTurn {
 /// direction with the parameterisation `origin + parameter * direction`.
 ///
 /// This exists so that a [`ProjectiveTurn`] has something to act on that
-/// `relational_geometry::cross_ratio` will accept.  The turn is a `PGL(2,ℚ)`
+/// `holonics::geometry::cross_ratio` will accept.  The turn is a `PGL(2,ℚ)`
 /// map of the projective *line* — it moves one `Rat` — while `cross_ratio`
 /// reads four *plane* points and refuses any quadruple that leaves one pencil.
 /// A pencil is the join: it carries a parameter quadruple into the plane, and
@@ -1610,7 +1610,7 @@ event_refusal_from!(HingeWorldRefusal: SimplicialError, crate::ConicError);
 
 #[cfg(test)]
 mod tests {
-    use relational_geometry::{
+    use holonics::geometry::{
         Construction, CrossRatioRefusal, RatVec3, cross_ratio, integer, rat,
     };
 
@@ -1929,7 +1929,7 @@ mod tests {
     // =====================================================================================
     // THE SWING IS THE INVARIANT
     //
-    // `ProjectiveTurn` is `PGL(2,ℚ)` and `relational_geometry::cross_ratio` is the
+    // `ProjectiveTurn` is `PGL(2,ℚ)` and `holonics::geometry::cross_ratio` is the
     // cross-ratio, and until 2026-08-08 nothing in this workspace asserted the one sentence
     // that relates them, nor any of the group's own laws.  The three fixtures that used
     // `ProjectiveTurn` used `identity()` or the fixed translate `(1,1,0,1)`, so the orbit
@@ -2106,20 +2106,20 @@ mod tests {
     /// The declared planar homography, acting on homogeneous plane coordinates `(x,y,1)`.
     /// Its bottom row is `(0,1,2)`, so `w = y+2` is not constant and the map is genuinely
     /// projective in the plane rather than affine.  Determinant `8`.
-    fn declared_homography() -> relational_geometry::RatMat3 {
-        relational_geometry::RatMat3::from_i64([[2, 1, 0], [1, 3, 1], [0, 1, 2]])
+    fn declared_homography() -> holonics::geometry::RatMat3 {
+        holonics::geometry::RatMat3::from_i64([[2, 1, 0], [1, 3, 1], [0, 1, 2]])
     }
 
     /// Carry plane marks through a planar homography and dehomogenize.  A mark on the map's
     /// vanishing line returns `None` rather than being repaired.
     fn carry_through_plane(
-        homography: &relational_geometry::RatMat3,
+        homography: &holonics::geometry::RatMat3,
         points: &[RatVec2],
     ) -> Option<Vec<RatVec2>> {
         points
             .iter()
             .map(|point| {
-                let image = homography.apply(&relational_geometry::RatVec3::new(
+                let image = homography.apply(&holonics::geometry::RatVec3::new(
                     point.x.clone(),
                     point.y.clone(),
                     Rat::one(),

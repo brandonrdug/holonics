@@ -37,7 +37,7 @@ use std::collections::BTreeMap;
 use std::fmt::Write as _;
 
 use num_traits::Zero;
-use relational_geometry::{Rat, format_rat};
+use holonics::geometry::{Rat, format_rat};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -536,7 +536,7 @@ mod tests {
     //! — made into a test that can fail.
 
     use num_bigint::BigInt;
-    use relational_geometry::{integer, rat};
+    use holonics::geometry::{integer, rat};
 
     use super::*;
     use crate::certified_face::{ReceiverWindow, certify_face};

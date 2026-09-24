@@ -51,8 +51,8 @@
 
 use num_bigint::BigUint;
 use num_traits::One;
-use relational_geometry::exact_analysis::log_rational_interval;
-use relational_geometry::{Rat, integer};
+use holonics::geometry::log_rational_interval;
+use holonics::geometry::{Rat, integer};
 
 use holonics::exact_value::ExactOrdering;
 

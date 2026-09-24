@@ -161,7 +161,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde::Serialize;
 use thiserror::Error;
 
@@ -360,8 +360,8 @@ impl UnitedInterval {
     pub fn render(&self) -> String {
         format!(
             "[{}, {}] [{}]",
-            relational_geometry::format_rat(&self.enclosure.lower),
-            relational_geometry::format_rat(&self.enclosure.upper),
+            holonics::geometry::format_rat(&self.enclosure.lower),
+            holonics::geometry::format_rat(&self.enclosure.upper),
             self.dimension.render()
         )
     }
@@ -894,7 +894,7 @@ impl ParameterTables {
             protonation: self.formal_charge.protonation.statement().to_owned(),
             hydrogen_bond: self.hydrogen_bond.name.clone(),
             radii: self.radii.name.clone(),
-            dielectric: relational_geometry::format_rat(&self.dielectric.relative),
+            dielectric: holonics::geometry::format_rat(&self.dielectric.relative),
         }
     }
 }
@@ -1410,8 +1410,8 @@ impl ProtonationBasis {
             Self::FromEnvironment(acidity) => format!(
                 "the occurrence's own declared acidity: pH in [{}, {}] under the assumption {:?}, \
                  declared on the ground {:?}",
-                relational_geometry::format_rat(&acidity.p_h().lower),
-                relational_geometry::format_rat(&acidity.p_h().upper),
+                holonics::geometry::format_rat(&acidity.p_h().lower),
+                holonics::geometry::format_rat(&acidity.p_h().upper),
                 acidity.assumption(),
                 acidity.ground()
             ),
@@ -2258,7 +2258,7 @@ impl HydrogenBondWindow {
         DistanceAperture {
             lineage: format!(
                 "hydrogen-bond candidate window upper bound {}",
-                relational_geometry::format_rat(&self.upper)
+                holonics::geometry::format_rat(&self.upper)
             ),
             squared: &self.upper * &self.upper,
         }
@@ -2268,7 +2268,7 @@ impl HydrogenBondWindow {
         DistanceAperture {
             lineage: format!(
                 "hydrogen-bond candidate window lower bound {}",
-                relational_geometry::format_rat(&self.lower)
+                holonics::geometry::format_rat(&self.lower)
             ),
             squared: &self.lower * &self.lower,
         }
@@ -2497,16 +2497,16 @@ pub fn steric_overlaps(
         let threshold = &radius_sum - tolerance;
         if !threshold.is_positive() {
             return Err(PhysicochemicalRefusal::ToleranceExceedsRadii {
-                radius_sum: relational_geometry::format_rat(&radius_sum),
-                tolerance: relational_geometry::format_rat(tolerance),
+                radius_sum: holonics::geometry::format_rat(&radius_sum),
+                tolerance: holonics::geometry::format_rat(tolerance),
             });
         }
         let aperture = DistanceAperture {
             lineage: format!(
                 "steric threshold {} = {} - {}",
-                relational_geometry::format_rat(&threshold),
-                relational_geometry::format_rat(&radius_sum),
-                relational_geometry::format_rat(tolerance)
+                holonics::geometry::format_rat(&threshold),
+                holonics::geometry::format_rat(&radius_sum),
+                holonics::geometry::format_rat(tolerance)
             ),
             squared: &threshold * &threshold,
         };
@@ -2623,14 +2623,14 @@ pub fn neighbour_count_proxy(
     if !radius.is_positive() {
         return Err(PhysicochemicalRefusal::RadiusNotPositive {
             table: "the declared burial radius".to_owned(),
-            element: relational_geometry::format_rat(radius),
+            element: holonics::geometry::format_rat(radius),
         });
     }
     let pairs = population.pairs(sites, bound)?;
     let aperture = DistanceAperture {
         lineage: format!(
             "declared burial radius {}",
-            relational_geometry::format_rat(radius)
+            holonics::geometry::format_rat(radius)
         ),
         squared: radius * radius,
     };
@@ -2831,14 +2831,14 @@ pub fn half_sphere_exposure(
     if !radius.is_positive() {
         return Err(PhysicochemicalRefusal::RadiusNotPositive {
             table: "the declared half-sphere radius".to_owned(),
-            element: relational_geometry::format_rat(radius),
+            element: holonics::geometry::format_rat(radius),
         });
     }
     let pairs = population.pairs(sites, bound)?;
     let aperture = DistanceAperture {
         lineage: format!(
             "declared half-sphere radius {}",
-            relational_geometry::format_rat(radius)
+            holonics::geometry::format_rat(radius)
         ),
         squared: radius * radius,
     };

@@ -39,7 +39,7 @@ use holonic_engine::{
     SimplicialComplex, VertexId,
 };
 use num_traits::Zero;
-use relational_geometry::{Rat, RatVec3, integer, rat};
+use holonics::geometry::{Rat, RatVec3, integer, rat};
 
 // ---------------------------------------------------------------------------
 // Exact display. Nothing here rounds, and no value is ordered by magnitude.

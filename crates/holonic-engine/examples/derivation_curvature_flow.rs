@@ -47,7 +47,7 @@ use holonic_engine::derivation_curvature::{
 };
 use holonic_engine::discrete_curvature::CurvatureFixedPoint;
 use num_traits::Zero;
-use relational_geometry::{Rat, RatVec3, integer};
+use holonics::geometry::{Rat, RatVec3, integer};
 
 // -------------------------------------------------------------------------------------------------
 // Material

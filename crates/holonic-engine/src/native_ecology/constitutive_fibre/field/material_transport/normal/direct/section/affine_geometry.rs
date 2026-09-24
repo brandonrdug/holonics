@@ -10,7 +10,7 @@ use crate::ExactWavePhaseTransport;
 use crate::resident_section::SLOT_WORDS;
 use num_bigint::BigInt;
 use num_traits::ToPrimitive;
-use relational_geometry::AffineMap3;
+use holonics::geometry::AffineMap3;
 use std::rc::Rc;
 
 pub const AFFINE_GEOMETRY_COMPONENTS: usize = 6;
@@ -185,10 +185,10 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
         let minimum = -(BigInt::from(1_u8) << 127_usize);
         let maximum = (BigInt::from(1_u8) << 127_usize) - BigInt::from(1_u8);
         let scale = BigInt::from(1_u8) << grain.0 as usize;
-        let scale = relational_geometry::Rat::from_integer(scale);
+        let scale = holonics::geometry::Rat::from_integer(scale);
         let mut words = Vec::with_capacity(maps.len() * ROW_WIDTH);
         for map in maps {
-            let coefficients: [&relational_geometry::Rat; AFFINE_GEOMETRY_COEFFICIENTS] = [
+            let coefficients: [&holonics::geometry::Rat; AFFINE_GEOMETRY_COEFFICIENTS] = [
                 &map.linear.rows[0][0],
                 &map.linear.rows[0][1],
                 &map.linear.rows[0][2],

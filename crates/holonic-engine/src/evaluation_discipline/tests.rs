@@ -8,7 +8,7 @@
 use std::path::PathBuf;
 
 use num_bigint::BigInt;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 
 use super::*;
 use crate::design_selection::{

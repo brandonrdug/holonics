@@ -19,7 +19,7 @@ use holonic_engine::{
     InverseTransportLaw, InverseTransportStanding, InverseTransportWork, PotentialTransportEdge,
     TransportLineageId, TransportQuery,
 };
-use relational_geometry::{Rat, format_rat, integer};
+use holonics::geometry::{Rat, format_rat, integer};
 
 const EXTENT: usize = 6;
 

@@ -5,7 +5,7 @@ use holonic_engine::native_ecology::constitutive_fibre::PairedJunctionLinearizat
 use holonic_engine::ExactComplexWaveCurrent as Wave;
 use holonic_engine::{causal_reflection::RationalCirclePoint, ExactWavePhaseTransport};
 use num_traits::{One, Zero};
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use serde_json::json;
 use std::{error::Error, fs};
 

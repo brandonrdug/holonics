@@ -18,7 +18,7 @@ use holonic_engine::{embedding_fiber::ResidentReadout, native_ecology::constitut
     }, resident_section::{ResidentGrain, ResidentSectionRest, ResidentSurface}};
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
-use relational_geometry::{AffineMap3, Rat, RatVec3, cayley_rotation_z};
+use holonics::geometry::{AffineMap3, Rat, RatVec3, cayley_rotation_z};
 
 fn r(value: i64) -> Rat {
     Rat::from_integer(BigInt::from(value))

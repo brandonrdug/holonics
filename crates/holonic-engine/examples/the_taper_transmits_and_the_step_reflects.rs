@@ -50,7 +50,7 @@ use holonic_engine::analytic_field::{
     ExactRefractionHand, ExactStratifiedLayer, exact_stratified_stack,
 };
 use holonic_engine::dimensional_wave::ExactWavePhaseTransport;
-use relational_geometry::{Rat, RatVec3};
+use holonics::geometry::{Rat, RatVec3};
 
 /// The 3-4-5 rational rotation. A point of the exact unit conic that is not the identity, so the
 /// round trip genuinely turns and successive boundaries can cancel.

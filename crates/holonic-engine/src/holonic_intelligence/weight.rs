@@ -1,5 +1,5 @@
 use num_bigint::BigInt;
-use relational_geometry::Rat;
+use holonics::geometry::Rat;
 use thiserror::Error;
 
 use crate::foreign_map::ForeignDtype;
