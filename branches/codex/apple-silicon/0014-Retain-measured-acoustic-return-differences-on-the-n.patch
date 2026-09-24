@@ -1,0 +1,4399 @@
+From aca81771df6a5064964b24786943bc612ce7e901 Mon Sep 17 00:00:00 2001
+From: Brandon Duggan <brandonrdug@users.noreply.github>
+Date: Mon, 7 Sep 2026 18:02:49 -0700
+Subject: [PATCH 14/18] Retain measured acoustic return differences on the
+ native device
+
+---
+ CONSTRUCTION_STATE.md                         |    7 +
+ accelerators/metal/README.md                  |    6 +
+ accelerators/metal/phase_convolution.metal    |   44 +-
+ accelerators/metal/phase_difference.metal     |  123 ++
+ crates/holonic-engine/build.rs                |    1 +
+ .../kernels/exact_resident_section.cu         |    1 +
+ .../kernels/phase_current_convolution.cuh     |   42 +-
+ .../kernels/phase_current_difference.cuh      |  121 ++
+ .../src/phase_current/resident.rs             |    7 +
+ .../src/phase_current/resident/difference.rs  |  172 ++
+ .../resident/difference/tests.rs              |  231 +++
+ .../src/phase_current/resident/tests.rs       |   16 +
+ crates/holonic-engine/src/resident_section.rs |    8 +-
+ .../surface_phase_difference.rs               |  183 +++
+ crates/holonic-mount/src/metal.rs             |    7 +-
+ .../examples/recorded_acoustic_return.rs      |  253 +++
+ docs/ACOUSTIC_EXPERIMENTS.md                  |   22 +
+ docs/ARCHITECTURE_MAP.md                      |   10 +
+ docs/DEVELOPMENT.md                           |    4 +-
+ docs/plans/HOLONICS_ON_APPLE_SILICON.md       |    6 +
+ .../compare_recorded_acoustic_return.py       |  138 ++
+ .../apple_silicon/fetch_soundcam.py           |  439 ++++++
+ ..._RETURNS_KEEP_THEIR_ORIENTED_DIFFERENCE.md |  133 ++
+ .../acquisition.json                          | 1386 +++++++++++++++++
+ .../comparison.json                           |   86 +
+ .../observer-controls.json                    |   29 +
+ .../row_000.json                              |  192 +++
+ .../row_001.json                              |  192 +++
+ .../row_002.json                              |  192 +++
+ 29 files changed, 4002 insertions(+), 49 deletions(-)
+ create mode 100644 accelerators/metal/phase_difference.metal
+ create mode 100644 crates/holonic-engine/kernels/phase_current_difference.cuh
+ create mode 100644 crates/holonic-engine/src/phase_current/resident/difference.rs
+ create mode 100644 crates/holonic-engine/src/phase_current/resident/difference/tests.rs
+ create mode 100644 crates/holonic-engine/src/resident_section/surface_phase_difference.rs
+ create mode 100644 crates/holonics-hna/examples/recorded_acoustic_return.rs
+ create mode 100644 research/experiments/apple_silicon/compare_recorded_acoustic_return.py
+ create mode 100644 research/experiments/apple_silicon/fetch_soundcam.py
+ create mode 100644 research/records/2026-09-07_MEASURED_ACOUSTIC_RETURNS_KEEP_THEIR_ORIENTED_DIFFERENCE.md
+ create mode 100644 research/records/2026-09-07_measured_acoustic_return/acquisition.json
+ create mode 100644 research/records/2026-09-07_measured_acoustic_return/comparison.json
+ create mode 100644 research/records/2026-09-07_measured_acoustic_return/observer-controls.json
+ create mode 100644 research/records/2026-09-07_measured_acoustic_return/row_000.json
+ create mode 100644 research/records/2026-09-07_measured_acoustic_return/row_001.json
+ create mode 100644 research/records/2026-09-07_measured_acoustic_return/row_002.json
+
+diff --git a/CONSTRUCTION_STATE.md b/CONSTRUCTION_STATE.md
+index 5bd2bd2d..e4b0571e 100644
+--- a/CONSTRUCTION_STATE.md
++++ b/CONSTRUCTION_STATE.md
+@@ -10,6 +10,13 @@ instruction governs.
+ 
+ ## Parallel MacBook position
+ 
++[established-bounded; measured] The [measured acoustic return](research/records/2026-09-07_MEASURED_ACOUSTIC_RETURNS_KEEP_THEIR_ORIENTED_DIFFERENCE.md)
++now retains full oriented differences for three actual 14-second SoundCam loopback/microphone
++pairs on their original clocks. Nineteen native controls and all-coordinate source-qualified
++comparisons pass. Prediction/difference take about 2.4 s together; cold audio export takes
++14.4–14.7 s, with 139.8 MB peak native residency. The initial unit response remains a baseline;
++using measured differences to develop the acoustic generator is next. AS4–AS5 stay active.
++
+ [established-bounded; measured] The [conditional restart return](research/records/2026-09-07_THE_RECORDED_CONDITIONAL_ACTION_CONTINUES_AFTER_RESTART.md)
+ now persists the learned local relation, actual condition and complete field history/capabilities.
+ Seventeen focused controls and three recorded processes return; cold comparisons verify both
+diff --git a/accelerators/metal/README.md b/accelerators/metal/README.md
+index ad392017..137dca3f 100644
+--- a/accelerators/metal/README.md
++++ b/accelerators/metal/README.md
+@@ -27,6 +27,12 @@ precedes arithmetic, and no output is admitted after any refusal. The Rust owner
+ operands and device workspace until completion. This changes placement, not temporal support
+ or native grain, and requires no intermediate numerical readback.
+ 
++[definition] `phase_difference.metal` receives predicted and observed rational currents over
++their declared common temporal support. It validates both full views, computes the oriented
++coordinate difference with one common denominator, and reuses convolution normalization and
++publication. Independent product lanes have disjoint workspace coordinates. The Rust receiver
++retains both operands and excludes unmatched support explicitly; missing observations are not zeros.
++
+ [definition] Build arithmetic apparatus explicitly; the probe kernels are absent from production:
+ 
+ ```sh
+diff --git a/accelerators/metal/phase_convolution.metal b/accelerators/metal/phase_convolution.metal
+index 7115c710..4986d821 100644
+--- a/accelerators/metal/phase_convolution.metal
++++ b/accelerators/metal/phase_convolution.metal
+@@ -97,17 +97,16 @@ kernel void section_phase_convolution(
+     uint source_last = min(target, source_raw_count - 1u);
+     for (uint source = source_first; source <= source_last; ++source) {
+       uint response = target - source;
+-      W product[3];
+-      field_phase_product(fromword(source_lo[source_at + 2u * source]),
+-                fromword(source_lo[source_at + 2u * source + 1u]), source_den,
+-                fromword(response_lo[response_at + 2u * response]),
+-                fromword(response_lo[response_at + 2u * response + 1u]), response_den,
+-                product, slot);
+-      if (*slot)
+-        return;
+-      W factor = wdiv(common, product[2], slot);
+-      real = field_add_checked(real, field_product_checked(product[0], factor, slot), slot);
+-      imaginary = field_add_checked(imaginary, field_product_checked(product[1], factor, slot), slot);
++      W ar = fromword(source_lo[source_at + 2u * source]);
++      W ai = fromword(source_lo[source_at + 2u * source + 1u]);
++      W br = fromword(response_lo[response_at + 2u * response]);
++      W bi = fromword(response_lo[response_at + 2u * response + 1u]);
++      W product_real = field_sub_checked(field_product_checked(ar, br, slot),
++                                         field_product_checked(ai, bi, slot), slot);
++      W product_imaginary = field_add_checked(field_product_checked(ar, bi, slot),
++                                              field_product_checked(ai, br, slot), slot);
++      real = field_add_checked(real, product_real, slot);
++      imaginary = field_add_checked(imaginary, product_imaginary, slot);
+       if (*slot)
+         return;
+     }
+@@ -241,19 +240,16 @@ kernel void section_phase_convolution_products(
+   W real = wzero(), imaginary = wzero();
+   for (uint source = source_first; source <= source_last; ++source) {
+     uint response = gid - source;
+-    W product[3];
+-    field_phase_product(
+-        fromword(source_lo[(ulong)source_at + 2ul * (ulong)source]),
+-        fromword(source_lo[(ulong)source_at + 2ul * (ulong)source + 1ul]), source_den,
+-        fromword(response_lo[(ulong)response_at + 2ul * (ulong)response]),
+-        fromword(response_lo[(ulong)response_at + 2ul * (ulong)response + 1ul]), response_den,
+-        product, slot);
+-    if (*slot)
+-      return;
+-    W factor = wdiv(common, product[2], slot);
+-    real = field_add_checked(real, field_product_checked(product[0], factor, slot), slot);
+-    imaginary = field_add_checked(imaginary,
+-                                 field_product_checked(product[1], factor, slot), slot);
++    W ar = fromword(source_lo[(ulong)source_at + 2ul * (ulong)source]);
++    W ai = fromword(source_lo[(ulong)source_at + 2ul * (ulong)source + 1ul]);
++    W br = fromword(response_lo[(ulong)response_at + 2ul * (ulong)response]);
++    W bi = fromword(response_lo[(ulong)response_at + 2ul * (ulong)response + 1ul]);
++    W product_real = field_sub_checked(field_product_checked(ar, br, slot),
++                                       field_product_checked(ai, bi, slot), slot);
++    W product_imaginary = field_add_checked(field_product_checked(ar, bi, slot),
++                                            field_product_checked(ai, br, slot), slot);
++    real = field_add_checked(real, product_real, slot);
++    imaginary = field_add_checked(imaginary, product_imaginary, slot);
+     if (*slot)
+       return;
+   }
+diff --git a/accelerators/metal/phase_difference.metal b/accelerators/metal/phase_difference.metal
+new file mode 100644
+index 00000000..a49d82a8
+--- /dev/null
++++ b/accelerators/metal/phase_difference.metal
+@@ -0,0 +1,123 @@
++// Oriented difference of two resident rational phase currents on one exact overlap.
++// The serial admission precedes flat product lanes; the shared convolution normalize and pack
++// kernels complete exact reduction and output without a host numerical read.
++
++kernel void section_phase_difference_validate(
++    device const long *predicted_lo [[buffer(0)]], device const long *predicted_hi [[buffer(1)]],
++    constant uint &predicted_at [[buffer(2)]], constant uint &predicted_denominator_at [[buffer(3)]],
++    constant uint &predicted_disposition_at [[buffer(4)]],
++    device const long *observed_lo [[buffer(5)]], device const long *observed_hi [[buffer(6)]],
++    constant uint &observed_at [[buffer(7)]], constant uint &observed_denominator_at [[buffer(8)]],
++    constant uint &observed_disposition_at [[buffer(9)]],
++    constant uint &predicted_complex_coordinates [[buffer(10)]],
++    constant uint &observed_complex_coordinates [[buffer(11)]],
++    constant uint &predicted_raw_extent [[buffer(12)]], constant uint &observed_raw_extent [[buffer(13)]],
++    constant uint &predicted_from [[buffer(14)]], constant uint &observed_from [[buffer(15)]],
++    constant uint &extent [[buffer(16)]], device W *workspace [[buffer(17)]],
++    device uint *slot [[buffer(18)]], device const uint *census [[buffer(19)]],
++    device const uint *lineage [[buffer(20)]], constant uint &lineage_count [[buffer(21)]],
++    uint gid [[thread_position_in_grid]]) {
++  if (gid != 0 || *slot || upstream(census, lineage, lineage_count, slot))
++    return;
++  ulong predicted_complex = (ulong)predicted_complex_coordinates;
++  ulong observed_complex = (ulong)observed_complex_coordinates;
++  ulong predicted_raw = (ulong)predicted_raw_extent;
++  ulong observed_raw = (ulong)observed_raw_extent;
++  ulong predicted_start = (ulong)predicted_from;
++  ulong observed_start = (ulong)observed_from;
++  ulong overlap = (ulong)extent;
++  if (!predicted_complex || !observed_complex || !predicted_raw || !observed_raw || !overlap
++      || predicted_raw > predicted_complex || observed_raw > observed_complex
++      || predicted_complex > 0x7ffffffful || observed_complex > 0x7ffffffful
++      || predicted_start + overlap > predicted_raw || observed_start + overlap > observed_raw
++      || overlap > 0x7ffffffful || 2ul * overlap > 0xfffffffful - 1ul
++      || (ulong)predicted_at + 2ul * predicted_complex > 0xfffffffful
++      || (ulong)observed_at + 2ul * observed_complex > 0xfffffffful) {
++    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
++                             memory_order_relaxed);
++    return;
++  }
++  uint predicted_count = (uint)predicted_complex;
++  uint observed_count = (uint)observed_complex;
++  uint predicted_raw_count = (uint)predicted_raw;
++  uint observed_raw_count = (uint)observed_raw;
++  uint width = 2u * (uint)overlap;
++  W predicted_den = fibre_current_denominator(predicted_lo, predicted_hi,
++                                              predicted_denominator_at,
++                                              predicted_disposition_at, slot);
++  W observed_den = fibre_current_denominator(observed_lo, observed_hi,
++                                             observed_denominator_at,
++                                             observed_disposition_at, slot);
++  if (*slot)
++    return;
++  for (uint coordinate = 0; coordinate < predicted_count; ++coordinate) {
++    ulong at64 = (ulong)predicted_at + 2ul * (ulong)coordinate;
++    uint at = (uint)at64;
++    if (predicted_lo[at] != predicted_hi[at]
++        || predicted_lo[at + 1u] != predicted_hi[at + 1u]
++        || (coordinate >= predicted_raw_count
++            && (predicted_lo[at] != 0 || predicted_lo[at + 1u] != 0))) {
++      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
++                               memory_order_relaxed);
++      return;
++    }
++  }
++  for (uint coordinate = 0; coordinate < observed_count; ++coordinate) {
++    ulong at64 = (ulong)observed_at + 2ul * (ulong)coordinate;
++    uint at = (uint)at64;
++    if (observed_lo[at] != observed_hi[at]
++        || observed_lo[at + 1u] != observed_hi[at + 1u]
++        || (coordinate >= observed_raw_count
++            && (observed_lo[at] != 0 || observed_lo[at + 1u] != 0))) {
++      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
++                               memory_order_relaxed);
++      return;
++    }
++  }
++  W common = field_lcm(predicted_den, observed_den, slot);
++  if (*slot || wzero_p(common) || wneg_p(common))
++    return;
++  workspace[width] = common;
++  workspace[width + 2u] = wdiv(common, predicted_den, slot);
++  workspace[width + 3u] = wdiv(common, observed_den, slot);
++}
++
++kernel void section_phase_difference_products(
++    device const long *predicted_lo [[buffer(0)]], device const long *predicted_hi [[buffer(1)]],
++    constant uint &predicted_at [[buffer(2)]], constant uint &predicted_denominator_at [[buffer(3)]],
++    constant uint &predicted_disposition_at [[buffer(4)]],
++    device const long *observed_lo [[buffer(5)]], device const long *observed_hi [[buffer(6)]],
++    constant uint &observed_at [[buffer(7)]], constant uint &observed_denominator_at [[buffer(8)]],
++    constant uint &observed_disposition_at [[buffer(9)]],
++    constant uint &predicted_complex_coordinates [[buffer(10)]],
++    constant uint &observed_complex_coordinates [[buffer(11)]],
++    constant uint &predicted_raw_extent [[buffer(12)]], constant uint &observed_raw_extent [[buffer(13)]],
++    constant uint &predicted_from [[buffer(14)]], constant uint &observed_from [[buffer(15)]],
++    constant uint &extent [[buffer(16)]], device W *workspace [[buffer(17)]],
++    device uint *slot [[buffer(18)]], device const uint *census [[buffer(19)]],
++    device const uint *lineage [[buffer(20)]], constant uint &lineage_count [[buffer(21)]],
++    uint gid [[thread_position_in_grid]]) {
++  (void)predicted_hi;
++  (void)predicted_denominator_at;
++  (void)predicted_disposition_at;
++  (void)observed_hi;
++  (void)observed_denominator_at;
++  (void)observed_disposition_at;
++  (void)predicted_complex_coordinates;
++  (void)observed_complex_coordinates;
++  (void)predicted_raw_extent;
++  (void)observed_raw_extent;
++  if (*slot || upstream(census, lineage, lineage_count, slot))
++    return;
++  uint width = 2u * extent;
++  if (gid >= width)
++    return;
++  W observed = field_product_checked(
++      fromword(observed_lo[(ulong)observed_at + 2ul * (ulong)observed_from + gid]),
++      workspace[width + 3u], slot);
++  W predicted = field_product_checked(
++      fromword(predicted_lo[(ulong)predicted_at + 2ul * (ulong)predicted_from + gid]),
++      workspace[width + 2u], slot);
++  if (!*slot)
++    workspace[gid] = field_sub_checked(observed, predicted, slot);
++}
+diff --git a/crates/holonic-engine/build.rs b/crates/holonic-engine/build.rs
+index 78306af1..29f7ecfb 100644
+--- a/crates/holonic-engine/build.rs
++++ b/crates/holonic-engine/build.rs
+@@ -72,6 +72,7 @@ fn main() {
+     println!("cargo:rerun-if-changed=kernels/exact_resident_section.cu");
+     println!("cargo:rerun-if-changed=kernels/constitutive_condition_preimage.cuh");
+     println!("cargo:rerun-if-changed=kernels/phase_current_convolution.cuh");
++    println!("cargo:rerun-if-changed=kernels/phase_current_difference.cuh");
+     println!("cargo:rerun-if-changed=kernels/constitutive_condition_image.cuh");
+     println!("cargo:rerun-if-changed=kernels/constitutive_condition_contact.cuh");
+     println!("cargo:rerun-if-changed=kernels/constitutive_field.cuh");
+diff --git a/crates/holonic-engine/kernels/exact_resident_section.cu b/crates/holonic-engine/kernels/exact_resident_section.cu
+index bb1d9a06..58c3da3f 100644
+--- a/crates/holonic-engine/kernels/exact_resident_section.cu
++++ b/crates/holonic-engine/kernels/exact_resident_section.cu
+@@ -1292,6 +1292,7 @@ extern "C" __global__ void section_constitutive_bilinear_source(
+ 
+ #include "constitutive_condition_preimage.cuh"
+ #include "phase_current_convolution.cuh"
++#include "phase_current_difference.cuh"
+ #include "constitutive_condition_image.cuh"
+ #include "constitutive_condition_contact.cuh"
+ 
+diff --git a/crates/holonic-engine/kernels/phase_current_convolution.cuh b/crates/holonic-engine/kernels/phase_current_convolution.cuh
+index d421487c..c6aef1ea 100644
+--- a/crates/holonic-engine/kernels/phase_current_convolution.cuh
++++ b/crates/holonic-engine/kernels/phase_current_convolution.cuh
+@@ -77,17 +77,16 @@ extern "C" __global__ void section_phase_convolution(
+         uint32_t source_last = min(target, source_raw_count - 1U);
+         for (uint32_t source = source_first; source <= source_last; ++source) {
+             uint32_t response = target - source;
+-            wide product[3];
+-            fibre_phase_product(
+-                source_lo[source_at + 2U * source], source_lo[source_at + 2U * source + 1U],
+-                source_den,
+-                response_lo[response_at + 2U * response],
+-                response_lo[response_at + 2U * response + 1U], response_den,
+-                product, slot);
+-            if (*slot) return;
+-            wide factor = common / product[2];
+-            real = add_checked(real, product_checked(product[0], factor, slot), slot);
+-            imaginary = add_checked(imaginary, product_checked(product[1], factor, slot), slot);
++            wide ar = source_lo[source_at + 2U * source];
++            wide ai = source_lo[source_at + 2U * source + 1U];
++            wide br = response_lo[response_at + 2U * response];
++            wide bi = response_lo[response_at + 2U * response + 1U];
++            wide product_real = sub_checked(product_checked(ar, br, slot),
++                product_checked(ai, bi, slot), slot);
++            wide product_imaginary = add_checked(product_checked(ar, bi, slot),
++                product_checked(ai, br, slot), slot);
++            real = add_checked(real, product_real, slot);
++            imaginary = add_checked(imaginary, product_imaginary, slot);
+             if (*slot) return;
+         }
+         convolution_scratch[2U * target] = real;
+@@ -207,17 +206,16 @@ extern "C" __global__ void section_phase_convolution_products(
+     uint32_t source_last = min(target, source_raw_count - 1U);
+     for (uint32_t source = source_first; source <= source_last; ++source) {
+         uint32_t response = target - source;
+-        wide product[3];
+-        fibre_phase_product(
+-            source_lo[source_at + 2U * source], source_lo[source_at + 2U * source + 1U],
+-            source_den,
+-            response_lo[response_at + 2U * response],
+-            response_lo[response_at + 2U * response + 1U], response_den,
+-            product, slot);
+-        if (*slot) return;
+-        wide factor = common / product[2];
+-        real = add_checked(real, product_checked(product[0], factor, slot), slot);
+-        imaginary = add_checked(imaginary, product_checked(product[1], factor, slot), slot);
++        wide ar = source_lo[source_at + 2U * source];
++        wide ai = source_lo[source_at + 2U * source + 1U];
++        wide br = response_lo[response_at + 2U * response];
++        wide bi = response_lo[response_at + 2U * response + 1U];
++        wide product_real = sub_checked(product_checked(ar, br, slot),
++            product_checked(ai, bi, slot), slot);
++        wide product_imaginary = add_checked(product_checked(ar, bi, slot),
++            product_checked(ai, br, slot), slot);
++        real = add_checked(real, product_real, slot);
++        imaginary = add_checked(imaginary, product_imaginary, slot);
+         if (*slot) return;
+     }
+     workspace[2U * target] = real;
+diff --git a/crates/holonic-engine/kernels/phase_current_difference.cuh b/crates/holonic-engine/kernels/phase_current_difference.cuh
+new file mode 100644
+index 00000000..8a399ab5
+--- /dev/null
++++ b/crates/holonic-engine/kernels/phase_current_difference.cuh
+@@ -0,0 +1,121 @@
++// Oriented difference of two resident rational phase currents on one exact overlap.
++// Validation is a serial resident admission; product lanes only run after it and write the
++// private workspace. The existing convolution normalize and pack kernels finish the passage.
++
++extern "C" __global__ void section_phase_difference_validate(
++    const int64_t *predicted_lo, const int64_t *predicted_hi,
++    uint32_t predicted_at, uint32_t predicted_denominator_at,
++    uint32_t predicted_disposition_at,
++    const int64_t *observed_lo, const int64_t *observed_hi,
++    uint32_t observed_at, uint32_t observed_denominator_at,
++    uint32_t observed_disposition_at,
++    uint32_t predicted_complex_coordinates, uint32_t observed_complex_coordinates,
++    uint32_t predicted_raw_extent, uint32_t observed_raw_extent,
++    uint32_t predicted_from, uint32_t observed_from, uint32_t extent,
++    wide *workspace, uint32_t *slot, const uint32_t *census,
++    const uint32_t *lineage, uint32_t lineage_count
++) {
++    if (blockIdx.x != 0 || threadIdx.x != 0) return;
++    if (*slot != 0 || upstream_refused(census, lineage, lineage_count, slot)) return;
++
++    uint64_t predicted_complex = predicted_complex_coordinates;
++    uint64_t observed_complex = observed_complex_coordinates;
++    uint64_t predicted_raw = predicted_raw_extent;
++    uint64_t observed_raw = observed_raw_extent;
++    uint64_t predicted_start = predicted_from;
++    uint64_t observed_start = observed_from;
++    uint64_t overlap = extent;
++    if (!predicted_complex || !observed_complex || !predicted_raw || !observed_raw || !overlap
++        || predicted_raw > predicted_complex || observed_raw > observed_complex
++        || predicted_complex > 0x7fffffffULL || observed_complex > 0x7fffffffULL
++        || predicted_start + overlap > predicted_raw
++        || observed_start + overlap > observed_raw
++        || overlap > 0x7fffffffULL
++        || 2ULL * overlap > (0xffffffffULL - 1ULL)) {
++        atomicOr(slot, REFUSED_MALFORMED);
++        return;
++    }
++    if (predicted_at + 2ULL * predicted_complex > 0xffffffffULL
++        || observed_at + 2ULL * observed_complex > 0xffffffffULL) {
++        atomicOr(slot, REFUSED_MALFORMED);
++        return;
++    }
++    uint32_t predicted_count = (uint32_t)predicted_complex;
++    uint32_t observed_count = (uint32_t)observed_complex;
++    uint32_t predicted_raw_count = (uint32_t)predicted_raw;
++    uint32_t observed_raw_count = (uint32_t)observed_raw;
++    uint32_t width = 2U * (uint32_t)overlap;
++
++    wide predicted_den = fibre_current_denominator(
++        predicted_lo, predicted_hi, predicted_denominator_at,
++        predicted_disposition_at, slot);
++    wide observed_den = fibre_current_denominator(
++        observed_lo, observed_hi, observed_denominator_at,
++        observed_disposition_at, slot);
++    if (*slot) return;
++    for (uint32_t coordinate = 0; coordinate < predicted_count; ++coordinate) {
++        uint64_t at64 = (uint64_t)predicted_at + 2ULL * coordinate;
++        uint32_t at = (uint32_t)at64;
++        if (predicted_lo[at] != predicted_hi[at]
++            || predicted_lo[at + 1U] != predicted_hi[at + 1U]
++            || (coordinate >= predicted_raw_count
++                && (predicted_lo[at] != 0 || predicted_lo[at + 1U] != 0))) {
++            atomicOr(slot, REFUSED_MALFORMED);
++            return;
++        }
++    }
++    for (uint32_t coordinate = 0; coordinate < observed_count; ++coordinate) {
++        uint64_t at64 = (uint64_t)observed_at + 2ULL * coordinate;
++        uint32_t at = (uint32_t)at64;
++        if (observed_lo[at] != observed_hi[at]
++            || observed_lo[at + 1U] != observed_hi[at + 1U]
++            || (coordinate >= observed_raw_count
++                && (observed_lo[at] != 0 || observed_lo[at + 1U] != 0))) {
++            atomicOr(slot, REFUSED_MALFORMED);
++            return;
++        }
++    }
++    wide common = fibre_lcm(predicted_den, observed_den, slot);
++    if (*slot || common <= 0) return;
++    workspace[width] = common;
++    workspace[width + 2U] = common / predicted_den;
++    workspace[width + 3U] = common / observed_den;
++}
++
++extern "C" __global__ void section_phase_difference_products(
++    const int64_t *predicted_lo, const int64_t *predicted_hi,
++    uint32_t predicted_at, uint32_t predicted_denominator_at,
++    uint32_t predicted_disposition_at,
++    const int64_t *observed_lo, const int64_t *observed_hi,
++    uint32_t observed_at, uint32_t observed_denominator_at,
++    uint32_t observed_disposition_at,
++    uint32_t predicted_complex_coordinates, uint32_t observed_complex_coordinates,
++    uint32_t predicted_raw_extent, uint32_t observed_raw_extent,
++    uint32_t predicted_from, uint32_t observed_from, uint32_t extent,
++    wide *workspace, uint32_t *slot, const uint32_t *census,
++    const uint32_t *lineage, uint32_t lineage_count
++) {
++    (void)predicted_hi;
++    (void)predicted_denominator_at;
++    (void)predicted_disposition_at;
++    (void)observed_hi;
++    (void)observed_denominator_at;
++    (void)observed_disposition_at;
++    (void)predicted_complex_coordinates;
++    (void)observed_complex_coordinates;
++    (void)predicted_raw_extent;
++    (void)observed_raw_extent;
++    uint64_t j64 = (uint64_t)blockIdx.x * (uint64_t)blockDim.x + (uint64_t)threadIdx.x;
++    uint32_t width = 2U * extent;
++    if (j64 >= width || *slot != 0) return;
++    if (upstream_refused(census, lineage, lineage_count, slot)) return;
++    uint32_t j = (uint32_t)j64;
++    wide predicted_scale = workspace[width + 2U];
++    wide observed_scale = workspace[width + 3U];
++    wide observed = product_checked(
++        observed_lo[observed_at + 2U * observed_from + j], observed_scale, slot);
++    wide predicted = product_checked(
++        predicted_lo[predicted_at + 2U * predicted_from + j], predicted_scale, slot);
++    if (*slot) return;
++    workspace[j] = sub_checked(observed, predicted, slot);
++}
+diff --git a/crates/holonic-engine/src/phase_current/resident.rs b/crates/holonic-engine/src/phase_current/resident.rs
+index 5a24153b..040de3e2 100644
+--- a/crates/holonic-engine/src/phase_current/resident.rs
++++ b/crates/holonic-engine/src/phase_current/resident.rs
+@@ -16,8 +16,15 @@ pub enum ResidentPhaseCurrentError {
+     Chart(#[from] PhaseCurrentError),
+     #[error(transparent)]
+     Native(#[from] ConstitutiveFibreError),
++    #[error("temporal observations have no common sampled support")]
++    NonOverlappingSupport,
++    #[error("temporal observation origins do not align on their shared sample clock")]
++    UnalignedSupport,
+ }
+ 
++mod difference;
++pub use difference::{compare_resident, PhaseComparisonSupport, ResidentPhaseDifference};
++
+ impl From<ResidentRefusal> for ResidentPhaseCurrentError {
+     fn from(value: ResidentRefusal) -> Self {
+         Self::Native(value.into())
+diff --git a/crates/holonic-engine/src/phase_current/resident/difference.rs b/crates/holonic-engine/src/phase_current/resident/difference.rs
+new file mode 100644
+index 00000000..e7c95f92
+--- /dev/null
++++ b/crates/holonic-engine/src/phase_current/resident/difference.rs
+@@ -0,0 +1,172 @@
++//! The oriented return at one temporal receiver. Comparing a prediction with an observation
++//! supplies evidence; it neither installs a condition nor asserts an exact constitutive fit.
++use super::*;
++use num_traits::ToPrimitive;
++use serde::Serialize;
++use std::ops::Range;
++
++/// Exact overlap and the portions excluded from this comparison. Excluded coefficients are
++/// retained in the operand carriers; lack of an observation never supplies a zero target.
++#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
++pub struct PhaseComparisonSupport {
++    pub predicted: Range<usize>,
++    pub observed: Range<usize>,
++    pub unobserved_prediction: Vec<Range<usize>>,
++    pub unpredicted_observation: Vec<Range<usize>>,
++    pub begin: Rat,
++    pub end: Rat,
++}
++
++/// Both complete operands remain borrowed alongside `observed - predicted`. Keeping this
++/// difference before scalar measurement preserves its orientation and both quadratures.
++pub struct ResidentPhaseDifference<'source, 'chart> {
++    predicted: ResidentPhaseCurrentView<'source, 'chart>,
++    observed: ResidentPhaseCurrentView<'source, 'chart>,
++    support: PhaseComparisonSupport,
++    output: ResidentSection<'chart>,
++    lineage: PhaseCurrentLineageId,
++}
++
++fn outside(range: &Range<usize>, extent: usize) -> Vec<Range<usize>> {
++    let mut result = Vec::with_capacity(2);
++    if range.start > 0 {
++        result.push(0..range.start);
++    }
++    if range.end < extent {
++        result.push(range.end..extent);
++    }
++    result
++}
++
++fn support(
++    predicted: &ResidentPhaseCurrentView<'_, '_>,
++    observed: &ResidentPhaseCurrentView<'_, '_>,
++) -> Result<PhaseComparisonSupport, ResidentPhaseCurrentError> {
++    if predicted.sample_step != observed.sample_step
++        || predicted.phase_extent != observed.phase_extent
++        || predicted.receiver != observed.receiver
++    {
++        return Err(PhaseCurrentError::ChartMismatch.into());
++    }
++    let begin = predicted.origin.clone().max(observed.origin.clone());
++    let offset = |origin: &Rat| -> Result<usize, ResidentPhaseCurrentError> {
++        let cells = (&begin - origin) / &predicted.sample_step;
++        if !cells.is_integer() {
++            return Err(ResidentPhaseCurrentError::UnalignedSupport);
++        }
++        cells
++            .to_integer()
++            .to_usize()
++            .ok_or(ResidentPhaseCurrentError::NonOverlappingSupport)
++    };
++    let p = offset(&predicted.origin)?;
++    let o = offset(&observed.origin)?;
++    let extent = predicted
++        .raw_extent
++        .checked_sub(p)
++        .zip(observed.raw_extent.checked_sub(o))
++        .map(|(a, b)| a.min(b))
++        .filter(|extent| *extent > 0)
++        .ok_or(ResidentPhaseCurrentError::NonOverlappingSupport)?;
++    let predicted_range = p..p + extent;
++    let observed_range = o..o + extent;
++    Ok(PhaseComparisonSupport {
++        unobserved_prediction: outside(&predicted_range, predicted.raw_extent),
++        unpredicted_observation: outside(&observed_range, observed.raw_extent),
++        predicted: predicted_range,
++        observed: observed_range,
++        end: &begin + &predicted.sample_step * Rat::from_integer(extent.into()),
++        begin,
++    })
++}
++
++/// Compare at an explicitly shared receiver and exact clock. Origins may differ by an integral
++/// number of samples; no interpolation, delay estimation, resampling or exterior zero extension
++/// is performed. All numerical subtraction and normalization run in one resident passage.
++pub fn compare_resident<'source, 'chart>(
++    surface: &'chart ResidentSurface<'chart>,
++    predicted: ResidentPhaseCurrentView<'source, 'chart>,
++    observed: ResidentPhaseCurrentView<'source, 'chart>,
++    lineage: PhaseCurrentLineageId,
++) -> Result<ResidentPhaseDifference<'source, 'chart>, ResidentPhaseCurrentError> {
++    let support = support(&predicted, &observed)?;
++    surface.validate_constitutive_current_view(predicted.current)?;
++    surface.validate_constitutive_current_view(observed.current)?;
++    let extent = support.predicted.len();
++    let width = extent
++        .checked_mul(2)
++        .filter(|n| *n < u32::MAX as usize)
++        .ok_or(PhaseCurrentError::CarrierOverflow)?;
++    let workspace_words = width
++        .checked_add(4)
++        .and_then(ResidentSurface::constitutive_wide_workspace_words)
++        .ok_or(PhaseCurrentError::CarrierOverflow)?;
++    let workspace = surface.fresh_section(1, workspace_words, ResidentGrain(0))?;
++    let output = surface.fresh_section(1, width + 1, ResidentGrain(0))?;
++    let mut passage = surface.begin_passage(&[vec![]])?;
++    {
++        let lane = passage.open(0, &[])?;
++        surface.record_phase_difference(
++            &lane,
++            predicted.current,
++            observed.current,
++            predicted.raw_extent,
++            observed.raw_extent,
++            support.predicted.start,
++            support.observed.start,
++            extent,
++            &workspace,
++            &output,
++        )?;
++    }
++    passage.close(0, &output, 64)?;
++    let receipt = passage.finish()?.launch()?;
++    if !receipt.obstruction.is_empty() {
++        return Err(ConstitutiveFibreError::Arithmetic(format!(
++            "phase difference: {:?}",
++            receipt.obstruction
++        ))
++        .into());
++    }
++    Ok(ResidentPhaseDifference {
++        predicted,
++        observed,
++        support,
++        output,
++        lineage,
++    })
++}
++
++impl<'source, 'chart> ResidentPhaseDifference<'source, 'chart> {
++    pub fn predicted(&self) -> &ResidentPhaseCurrentView<'source, 'chart> {
++        &self.predicted
++    }
++    pub fn observed(&self) -> &ResidentPhaseCurrentView<'source, 'chart> {
++        &self.observed
++    }
++    pub fn support(&self) -> &PhaseComparisonSupport {
++        &self.support
++    }
++    pub fn section(&self) -> &ResidentSection<'chart> {
++        &self.output
++    }
++    pub fn current(
++        &self,
++    ) -> Result<ResidentConstitutiveCurrent<'_, 'chart>, ConstitutiveFibreError> {
++        ResidentConstitutiveCurrent::rational(&self.output)
++    }
++    pub fn view(&self) -> Result<ResidentPhaseCurrentView<'_, 'chart>, ResidentPhaseCurrentError> {
++        ResidentPhaseCurrentView::new(
++            self.current()?,
++            self.predicted.receiver,
++            self.lineage,
++            self.support.begin.clone(),
++            self.predicted.sample_step.clone(),
++            self.predicted.phase_extent,
++            self.support.predicted.len(),
++        )
++    }
++}
++
++#[cfg(test)]
++mod tests;
+diff --git a/crates/holonic-engine/src/phase_current/resident/difference/tests.rs b/crates/holonic-engine/src/phase_current/resident/difference/tests.rs
+new file mode 100644
+index 00000000..a05e0e7c
+--- /dev/null
++++ b/crates/holonic-engine/src/phase_current/resident/difference/tests.rs
+@@ -0,0 +1,231 @@
++use super::*;
++use crate::{embedding_fiber::ResidentReadout, resident_section::ResidentSectionRest};
++
++fn q(n: i64, d: i64) -> Rat {
++    Rat::new(n.into(), d.into())
++}
++fn mount<'c>(s: &'c ResidentSurface<'c>, words: &[i64]) -> ResidentSection<'c> {
++    s.mount_section_rest(
++        &ResidentSectionRest::found(
++            1,
++            words.len(),
++            ResidentGrain(0),
++            64,
++            words.iter().map(|v| (*v, *v)).collect(),
++        )
++        .unwrap(),
++    )
++    .unwrap()
++}
++fn view<'a, 'c>(
++    section: &'a ResidentSection<'c>,
++    raw: usize,
++    origin_samples: i64,
++    lineage: u64,
++) -> ResidentPhaseCurrentView<'a, 'c> {
++    ResidentPhaseCurrentView::new(
++        ResidentConstitutiveCurrent::rational(section).unwrap(),
++        PhaseCurrentReceiverId(9),
++        PhaseCurrentLineageId(lineage),
++        q(origin_samples, 48000),
++        q(1, 48000),
++        4,
++        raw,
++    )
++    .unwrap()
++}
++fn values(s: &ResidentSurface<'_>, section: &ResidentSection<'_>) -> Vec<Rat> {
++    let pairs = s.read_out(section).unwrap();
++    assert!(pairs.iter().all(|(a, b)| a == b));
++    let den = pairs.last().unwrap().0;
++    pairs[..pairs.len() - 1]
++        .iter()
++        .map(|v| q(v.0, den))
++        .collect()
++}
++
++#[test]
++#[ignore = "requires native GPU; oriented rational return and complete operand lineage"]
++fn exact_oriented_difference_stays_resident() {
++    let r = ResidentReadout::new().unwrap();
++    let s = ResidentSurface::on(&r).unwrap();
++    let p = mount(&s, &[2, -3, 4, 5, 3]);
++    let o = mount(&s, &[7, 1, -2, 3, 7]);
++    let before = s.census();
++    let d = compare_resident(
++        &s,
++        view(&p, 2, 0, 1),
++        view(&o, 2, 0, 2),
++        PhaseCurrentLineageId(3),
++    )
++    .unwrap();
++    let after = s.census();
++    assert_eq!(after.section_read_outs, before.section_read_outs);
++    assert_eq!(after.ingress_octets, before.ingress_octets);
++    assert_eq!(after.deed_launches - before.deed_launches, 1);
++    assert_eq!(d.predicted().lineage(), PhaseCurrentLineageId(1));
++    assert_eq!(d.observed().lineage(), PhaseCurrentLineageId(2));
++    assert_eq!(d.view().unwrap().lineage(), PhaseCurrentLineageId(3));
++    assert_eq!(d.support().begin, q(0, 1));
++    assert_eq!(d.support().end, q(2, 48000));
++    assert_eq!(
++        values(&s, d.section()),
++        vec![q(1, 3), q(8, 7), q(-34, 21), q(-26, 21)]
++    );
++    assert!(d.support().unobserved_prediction.is_empty());
++}
++
++#[test]
++#[ignore = "requires native GPU; unmatched support stays unobserved instead of becoming zero"]
++fn shifted_support_preserves_both_excluded_populations() {
++    let r = ResidentReadout::new().unwrap();
++    let s = ResidentSurface::on(&r).unwrap();
++    let p = mount(&s, &[1, 0, 2, 0, 3, 0, 4, 0, 1]);
++    let o = mount(&s, &[10, 0, 20, 0, 30, 0, 40, 0, 50, 0, 1]);
++    let d = compare_resident(
++        &s,
++        view(&p, 4, 0, 1),
++        view(&o, 5, 2, 2),
++        PhaseCurrentLineageId(3),
++    )
++    .unwrap();
++    assert_eq!(d.support().predicted, 2..4);
++    assert_eq!(d.support().observed, 0..2);
++    assert_eq!(d.support().unobserved_prediction, vec![0..2]);
++    assert_eq!(d.support().unpredicted_observation, vec![2..5]);
++    assert_eq!(d.view().unwrap().origin(), &q(2, 48000));
++    assert_eq!(
++        values(&s, d.section()),
++        vec![q(7, 1), q(0, 1), q(16, 1), q(0, 1)]
++    );
++    let d = compare_resident(
++        &s,
++        view(&o, 5, 2, 2),
++        view(&p, 4, 0, 1),
++        PhaseCurrentLineageId(4),
++    )
++    .unwrap();
++    assert_eq!(d.support().unobserved_prediction, vec![2..5]);
++    assert_eq!(d.support().unpredicted_observation, vec![0..2]);
++    assert_eq!(
++        values(&s, d.section()),
++        vec![q(-7, 1), q(0, 1), q(-16, 1), q(0, 1)]
++    );
++}
++
++#[test]
++#[ignore = "requires native GPU; clocks and receiver identity are checked before native work"]
++fn mismatched_or_disjoint_charts_refuse_before_launch() {
++    let r = ResidentReadout::new().unwrap();
++    let s = ResidentSurface::on(&r).unwrap();
++    let p = mount(&s, &[1, 2, 1]);
++    let before = s.census();
++    assert!(matches!(
++        compare_resident(
++            &s,
++            view(&p, 1, 0, 1),
++            view(&p, 1, 1, 2),
++            PhaseCurrentLineageId(3)
++        ),
++        Err(ResidentPhaseCurrentError::NonOverlappingSupport)
++    ));
++    for case in 0..4 {
++        let mut o = view(&p, 1, 0, 2);
++        match case {
++            0 => o.origin = q(1, 96000),
++            1 => o.sample_step = q(1, 16000),
++            2 => o.receiver = PhaseCurrentReceiverId(10),
++            _ => o.phase_extent = 8,
++        }
++        assert!(compare_resident(&s, view(&p, 1, 0, 1), o, PhaseCurrentLineageId(3)).is_err());
++    }
++    assert_eq!(s.census().deed_launches, before.deed_launches);
++    assert_eq!(s.census().allocations, before.allocations);
++}
++
++#[test]
++#[ignore = "requires native GPU; complete source validity and late refusal leave operands usable"]
++fn malformed_and_overflowing_differences_do_not_publish() {
++    let r = ResidentReadout::new().unwrap();
++    let s = ResidentSurface::on(&r).unwrap();
++    let p = mount(&s, &[-i64::MAX, 0, 1]);
++    let o = mount(&s, &[i64::MAX, 0, 1]);
++    assert!(compare_resident(
++        &s,
++        view(&p, 1, 0, 1),
++        view(&o, 1, 0, 2),
++        PhaseCurrentLineageId(3)
++    )
++    .is_err());
++    let z = mount(&s, &[0, 0, 1]);
++    for words in [&[1, 0, 7, 0, 1][..], &[1, 0, 0][..]] {
++        let bad = mount(&s, words);
++        assert!(compare_resident(
++            &s,
++            view(&z, 1, 0, 1),
++            view(&bad, 1, 0, 2),
++            PhaseCurrentLineageId(3)
++        )
++        .is_err());
++    }
++    let bad = s
++        .mount_section_rest(
++            &ResidentSectionRest::found(1, 3, ResidentGrain(0), 64, vec![(0, 1), (0, 0), (1, 1)])
++                .unwrap(),
++        )
++        .unwrap();
++    assert!(compare_resident(
++        &s,
++        view(&z, 1, 0, 1),
++        view(&bad, 1, 0, 2),
++        PhaseCurrentLineageId(3)
++    )
++    .is_err());
++    let d = compare_resident(
++        &s,
++        view(&p, 1, 0, 1),
++        view(&z, 1, 0, 2),
++        PhaseCurrentLineageId(3),
++    )
++    .unwrap();
++    assert_eq!(values(&s, d.section()), vec![q(i64::MAX, 1), q(0, 1)]);
++    let a = mount(&s, &[i64::MAX, 0, 3]);
++    let b = mount(&s, &[i64::MAX, 0, 6]);
++    let d = compare_resident(
++        &s,
++        view(&a, 1, 0, 1),
++        view(&b, 1, 0, 2),
++        PhaseCurrentLineageId(3),
++    )
++    .unwrap();
++    assert_eq!(values(&s, d.section()), vec![q(-i64::MAX, 6), q(0, 1)]);
++}
++
++#[test]
++#[ignore = "requires native GPU; all coordinates of a whole parallel section agree with exact algebra"]
++fn complete_parallel_section_matches_independent_rationals() {
++    let r = ResidentReadout::new().unwrap();
++    let s = ResidentSurface::on(&r).unwrap();
++    let extent = 4099;
++    let mut a: Vec<i64> = (0..2 * extent)
++        .map(|i| (i * 71 % 2999) as i64 - 1500)
++        .collect();
++    let mut b: Vec<i64> = (0..2 * extent)
++        .map(|i| (i * 97 % 1999) as i64 - 1000)
++        .collect();
++    let expected: Vec<_> = a.iter().zip(&b).map(|(a, b)| q(*b, 7) - q(*a, 3)).collect();
++    a.push(3);
++    b.push(7);
++    let p = mount(&s, &a);
++    let o = mount(&s, &b);
++    let before = s.census();
++    let d = compare_resident(
++        &s,
++        view(&p, extent, 0, 1),
++        view(&o, extent, 0, 2),
++        PhaseCurrentLineageId(3),
++    )
++    .unwrap();
++    assert_eq!(s.census().section_read_outs, before.section_read_outs);
++    assert_eq!(values(&s, d.section()), expected);
++}
+diff --git a/crates/holonic-engine/src/phase_current/resident/tests.rs b/crates/holonic-engine/src/phase_current/resident/tests.rs
+index 057dc721..5ad6f93c 100644
+--- a/crates/holonic-engine/src/phase_current/resident/tests.rs
++++ b/crates/holonic-engine/src/phase_current/resident/tests.rs
+@@ -162,6 +162,22 @@ fn rational_complex_products_continue_resident() {
+     );
+ }
+ 
++#[test]
++#[ignore = "requires native GPU; unequal rational denominators accumulate raw complex products before one exact normalization"]
++fn unequal_denominators_preserve_cancelled_quadrature_and_tail() {
++    let r = ResidentReadout::new().unwrap();
++    let s = ResidentSurface::on(&r).unwrap();
++    // The source denominator is 3 and the response denominator is 5. The first complex
++    // product's imaginary coordinate cancels exactly; the second target retains both signs.
++    let x = mount(&s, &[2, 4, 6, -3, 3]);
++    let c = mount(&s, &[5, -10, 5, 0, 5]);
++    let out = product(&s, &x, &c, 2, 2).unwrap();
++    assert_eq!(
++        values(&s, out.section()),
++        vec![q(10, 3), q(0, 1), q(2, 3), q(-11, 3), q(2, 1), q(-1, 1)]
++    );
++}
++
+ #[test]
+ #[ignore = "requires native GPU; normalization precedes the final i64 carrier conversion"]
+ fn wide_products_normalize_before_word_publication() {
+diff --git a/crates/holonic-engine/src/resident_section.rs b/crates/holonic-engine/src/resident_section.rs
+index bc0046a6..5d098bd9 100644
+--- a/crates/holonic-engine/src/resident_section.rs
++++ b/crates/holonic-engine/src/resident_section.rs
+@@ -95,6 +95,8 @@ mod surface_intervention;
+ mod surface_mount;
+ #[path = "resident_section/surface_passage.rs"]
+ mod surface_passage;
++#[path = "resident_section/surface_phase_difference.rs"]
++mod surface_phase_difference;
+ #[path = "resident_section/surface_shapes.rs"]
+ mod surface_shapes;
+ #[path = "resident_section/surface_tiled.rs"]
+@@ -116,6 +118,8 @@ const METAL_SOURCE: &str = concat!(
+     include_str!("../../../accelerators/metal/field_entry.metal"),
+     "\n",
+     include_str!("../../../accelerators/metal/phase_convolution.metal"),
++    "\n",
++    include_str!("../../../accelerators/metal/phase_difference.metal"),
+ );
+ 
+ /// The exact accumulator the kernels carry, read off `__int128`; one octave is the hand.
+@@ -149,7 +153,7 @@ const CENSUS_MAX_WARPS: u32 = 32;
+ 
+ /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
+ /// refuses there and never at a launch.
+-pub const KERNELS: [&str; 52] = [
++pub const KERNELS: [&str; 54] = [
+     "section_constitutive_field",
+     "section_constitutive_field_rechart",
+     "section_constitutive_rechart",
+@@ -216,6 +220,8 @@ pub const KERNELS: [&str; 52] = [
+     "section_contract_partial_r1_l32",
+     "section_contract_partial_r4_l32",
+     "section_contract_join",
++    "section_phase_difference_validate",
++    "section_phase_difference_products",
+ ];
+ 
+ /// `CUdevice_attribute` selectors from `cuda.h`, fixed by the foreign interface.
+diff --git a/crates/holonic-engine/src/resident_section/surface_phase_difference.rs b/crates/holonic-engine/src/resident_section/surface_phase_difference.rs
+new file mode 100644
+index 00000000..2ae9b1ea
+--- /dev/null
++++ b/crates/holonic-engine/src/resident_section/surface_phase_difference.rs
+@@ -0,0 +1,183 @@
++use super::*;
++
++impl<'chart> ResidentSurface<'chart> {
++    pub(crate) fn record_phase_difference(
++        &self,
++        lane: &Lane<'_, 'chart>,
++        predicted: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<
++            '_,
++            'chart,
++        >,
++        observed: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<
++            '_,
++            'chart,
++        >,
++        predicted_extent: usize,
++        observed_extent: usize,
++        predicted_from: usize,
++        observed_from: usize,
++        extent: usize,
++        workspace: &ResidentSection<'chart>,
++        output: &ResidentSection<'chart>,
++    ) -> Result<(), ResidentRefusal> {
++        self.validate_constitutive_current_view(predicted)?;
++        self.validate_constitutive_current_view(observed)?;
++        let fail = || ResidentRefusal::Declaration {
++            operation: "phase-difference",
++            what: "incompatible timed rational current overlap or scratch aperture".into(),
++        };
++        let width = extent
++            .checked_mul(2)
++            .filter(|n| *n < u32::MAX as usize)
++            .ok_or_else(fail)?;
++        let predicted_complex = predicted.width / 2;
++        let observed_complex = observed.width / 2;
++        if predicted_extent == 0
++            || observed_extent == 0
++            || extent == 0
++            || predicted.width % 2 != 0
++            || observed.width % 2 != 0
++            || predicted_extent > predicted_complex
++            || observed_extent > observed_complex
++            || predicted_from
++                .checked_add(extent)
++                .is_none_or(|n| n > predicted_extent)
++            || observed_from
++                .checked_add(extent)
++                .is_none_or(|n| n > observed_extent)
++            || output.rows != 1
++            || output.width != width + 1
++            || output.grain.0 != 0
++            || !std::ptr::eq(output.surface, self)
++            || workspace.rows != 1
++            || workspace.grain.0 != 0
++            || !std::ptr::eq(workspace.surface, self)
++        {
++            return Err(fail());
++        }
++        let workspace_words = width
++            .checked_add(4)
++            .and_then(Self::constitutive_wide_workspace_words)
++            .ok_or_else(fail)?;
++        if workspace.width != workspace_words
++            || predicted.offset > u32::MAX as usize
++            || observed.offset > u32::MAX as usize
++            || predicted.denominator.is_some_and(|n| n > u32::MAX as usize)
++            || observed.denominator.is_some_and(|n| n > u32::MAX as usize)
++            || predicted.disposition.is_some_and(|n| n > u32::MAX as usize)
++            || observed.disposition.is_some_and(|n| n > u32::MAX as usize)
++            || predicted_complex > u32::MAX as usize
++            || observed_complex > u32::MAX as usize
++            || predicted_extent > u32::MAX as usize
++            || observed_extent > u32::MAX as usize
++            || predicted_from > u32::MAX as usize
++            || observed_from > u32::MAX as usize
++        {
++            return Err(fail());
++        }
++
++        let mut validation = Params::new();
++        validation
++            .ptr(predicted.section.lo.device_ptr())
++            .ptr(predicted.section.hi.device_ptr())
++            .u32(predicted.offset as u32)
++            .u32(predicted.denominator.map_or(u32::MAX, |n| n as u32))
++            .u32(predicted.disposition.map_or(u32::MAX, |n| n as u32))
++            .ptr(observed.section.lo.device_ptr())
++            .ptr(observed.section.hi.device_ptr())
++            .u32(observed.offset as u32)
++            .u32(observed.denominator.map_or(u32::MAX, |n| n as u32))
++            .u32(observed.disposition.map_or(u32::MAX, |n| n as u32))
++            .u32(predicted_complex as u32)
++            .u32(observed_complex as u32)
++            .u32(predicted_extent as u32)
++            .u32(observed_extent as u32)
++            .u32(predicted_from as u32)
++            .u32(observed_from as u32)
++            .u32(extent as u32)
++            .ptr(workspace.lo.device_ptr())
++            .ptr(lane.slot)
++            .ptr(lane.census)
++            .ptr(lane.lineage)
++            .u32(lane.lineage_count);
++        let block = self.declaration.warp_size.max(1);
++        self.record_blocks(
++            lane,
++            "section_phase_difference_validate",
++            1,
++            block,
++            0,
++            &mut validation,
++            "phase-difference",
++        )?;
++
++        let mut products = Params::new();
++        products
++            .ptr(predicted.section.lo.device_ptr())
++            .ptr(predicted.section.hi.device_ptr())
++            .u32(predicted.offset as u32)
++            .u32(predicted.denominator.map_or(u32::MAX, |n| n as u32))
++            .u32(predicted.disposition.map_or(u32::MAX, |n| n as u32))
++            .ptr(observed.section.lo.device_ptr())
++            .ptr(observed.section.hi.device_ptr())
++            .u32(observed.offset as u32)
++            .u32(observed.denominator.map_or(u32::MAX, |n| n as u32))
++            .u32(observed.disposition.map_or(u32::MAX, |n| n as u32))
++            .u32(predicted_complex as u32)
++            .u32(observed_complex as u32)
++            .u32(predicted_extent as u32)
++            .u32(observed_extent as u32)
++            .u32(predicted_from as u32)
++            .u32(observed_from as u32)
++            .u32(extent as u32)
++            .ptr(workspace.lo.device_ptr())
++            .ptr(lane.slot)
++            .ptr(lane.census)
++            .ptr(lane.lineage)
++            .u32(lane.lineage_count);
++        self.record_flat(
++            lane,
++            "section_phase_difference_products",
++            width,
++            &mut products,
++            "phase-difference",
++        )?;
++
++        let mut normalize = Params::new();
++        normalize
++            .ptr(workspace.lo.device_ptr())
++            .u32(width as u32)
++            .ptr(lane.slot)
++            .ptr(lane.census)
++            .ptr(lane.lineage)
++            .u32(lane.lineage_count);
++        self.record_blocks(
++            lane,
++            "section_phase_convolution_normalize",
++            1,
++            block,
++            0,
++            &mut normalize,
++            "phase-difference",
++        )?;
++
++        let mut pack = Params::new();
++        pack.ptr(workspace.lo.device_ptr())
++            .u32(width as u32)
++            .ptr(output.lo.device_ptr())
++            .ptr(output.hi.device_ptr())
++            .ptr(lane.slot)
++            .ptr(lane.census)
++            .ptr(lane.lineage)
++            .u32(lane.lineage_count);
++        self.record_blocks(
++            lane,
++            "section_phase_convolution_pack",
++            (width + 1).div_ceil(block as usize),
++            block,
++            0,
++            &mut pack,
++            "phase-difference",
++        )
++    }
++}
+diff --git a/crates/holonic-mount/src/metal.rs b/crates/holonic-mount/src/metal.rs
+index 5ecc9766..f7b6292c 100644
+--- a/crates/holonic-mount/src/metal.rs
++++ b/crates/holonic-mount/src/metal.rs
+@@ -863,6 +863,9 @@ impl Module {
+             "section_phase_convolution_validate" | "section_phase_convolution_products" => {
+                 (&[2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 18], 19)
+             }
++            "section_phase_difference_validate" | "section_phase_difference_products" => {
++                (&[2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 21], 22)
++            }
+             "section_phase_convolution_normalize" => (&[1, 5], 6),
+             "section_phase_convolution_pack" => (&[1, 7], 8),
+             "section_field_current_input" => (&[2, 3, 4, 5, 11], 12),
+@@ -911,7 +914,9 @@ impl Module {
+                 pack_scalars: name == "section_constitutive_condition_image",
+                 parallel_grid: matches!(
+                     name,
+-                    "section_phase_convolution_products" | "section_phase_convolution_pack"
++                    "section_phase_convolution_products"
++                        | "section_phase_convolution_pack"
++                        | "section_phase_difference_products"
+                 ) || (cfg!(test) && name == "test_grid"),
+                 nullable: if name == "section_constitutive_differential" {
+                     &[6, 7]
+diff --git a/crates/holonics-hna/examples/recorded_acoustic_return.rs b/crates/holonics-hna/examples/recorded_acoustic_return.rs
+new file mode 100644
+index 00000000..b38401e6
+--- /dev/null
++++ b/crates/holonics-hna/examples/recorded_acoustic_return.rs
+@@ -0,0 +1,253 @@
++//! Actual recorded excitation/receiver evidence against an explicit initial unit response.
++//! This returns the complete temporal defect; it does not fit or certify a room model.
++use holonic_engine::{
++    embedding_fiber::ResidentReadout,
++    native_ecology::constitutive_fibre::ResidentConstitutiveCurrent,
++    phase_current::{
++        resident::{compare_resident, convolve_resident, ResidentPhaseCurrentView},
++        PhaseCurrentLineageId, PhaseCurrentReceiverId,
++    },
++    resident_section::{ResidentGrain, ResidentSection, ResidentSectionRest, ResidentSurface},
++    ExactComplexWaveCurrent,
++};
++use holonics_hna::native::acoustic_field::AcousticFieldChart;
++use life::{
++    mathematical_source::ExactAcousticOccurrence,
++    native_intelligence::NativeAcousticTemporalPcm16Projection,
++};
++use num_rational::BigRational as Rat;
++use serde_json::{json, Value};
++use sha2::{Digest, Sha256};
++use std::{
++    error::Error,
++    fs::{self, OpenOptions},
++    io::Write,
++    path::{Path, PathBuf},
++    time::Instant,
++};
++
++type Result<T> = std::result::Result<T, Box<dyn Error>>;
++const DIVISOR: i64 = 32768;
++const PHASE_EXTENT: usize = 4;
++
++fn write_new(path: &Path, bytes: &[u8]) -> Result<()> {
++    let mut file = OpenOptions::new().write(true).create_new(true).open(path)?;
++    file.write_all(bytes)?;
++    file.sync_all()?;
++    Ok(())
++}
++fn stage<T>(
++    s: &ResidentSurface<'_>,
++    report: &mut Value,
++    name: &str,
++    f: impl FnOnce() -> Result<T>,
++) -> Result<T> {
++    let before = s.census();
++    #[cfg(target_os = "macos")]
++    let gpu_before = s.metal_execution_timing();
++    let started = Instant::now();
++    let result = f();
++    let after = s.census();
++    report["stages"][name] = json!({
++        "seconds":started.elapsed().as_secs_f64(),
++        "section_readouts":after.section_read_outs-before.section_read_outs,
++        "numerical_egress_octets":after.egress_section_octets-before.egress_section_octets,
++        "ingress_octets":after.ingress_octets-before.ingress_octets,
++        "receipt_egress_octets":after.egress_receipt_octets-before.egress_receipt_octets,
++        "deeds":after.deed_launches-before.deed_launches,
++        "allocations":after.allocations-before.allocations,
++        "resident_octets_now":after.resident_octets_now,
++        "resident_octets_peak":after.resident_octets_peak
++    });
++    #[cfg(target_os = "macos")]
++    {
++        let gpu_after = s.metal_execution_timing();
++        report["stages"][name]["gpu_seconds"] =
++            json!(gpu_after.gpu_seconds - gpu_before.gpu_seconds);
++        report["stages"][name]["unavailable_gpu_timestamps"] =
++            json!(gpu_after.unavailable_timestamps - gpu_before.unavailable_timestamps);
++    }
++    result
++}
++fn source_report(source: &ExactAcousticOccurrence) -> Value {
++    json!({"path":source.locator,"sha256":source.source_sha256,"octets":source.source_octets,
++        "occurrence":source.occurrence,"sample_rate":source.sample_rate,"frames":source.samples.len(),"origin":"0"})
++}
++fn publish(
++    s: &ResidentSurface<'_>,
++    section: &ResidentSection<'_>,
++    view: ResidentPhaseCurrentView<'_, '_>,
++    directory: &Path,
++    name: &str,
++    rate: u32,
++    audio: bool,
++) -> Result<Value> {
++    let rest = s.detach_section(section, 64)?;
++    let bytes = rest.canonical_bytes()?;
++    let path = directory.join(format!("{name}.section"));
++    write_new(&path, &bytes)?;
++    let mut report = json!({"section_path":path,"section_sha256":format!("{:x}",Sha256::digest(&bytes)),
++        "section_octets":bytes.len(),"frames":view.raw_extent(),"origin":view.origin().to_string(),
++        "sample_step":view.sample_step().to_string(),"receiver":view.receiver().0,"lineage":view.lineage().0});
++    if audio {
++        if rest.intervals.iter().any(|(a, b)| a != b) || rest.intervals.last().unwrap().0 <= 0 {
++            return Err("terminal section is not an exact rational point".into());
++        }
++        let denominator = rest.intervals.last().unwrap().0;
++        let coordinates: Vec<_> = rest.intervals[..rest.intervals.len() - 1]
++            .chunks_exact(2)
++            .map(|p| {
++                ExactComplexWaveCurrent::new(
++                    Rat::new(p[0].0.into(), denominator.into()),
++                    Rat::new(p[1].0.into(), denominator.into()),
++                )
++            })
++            .collect();
++        let projection = NativeAcousticTemporalPcm16Projection::found(
++            view.receiver(),
++            view.lineage(),
++            view.origin().clone(),
++            view.sample_step().clone(),
++            rate,
++            Rat::from_integer(DIVISOR.into()),
++            &coordinates,
++        )?;
++        let wav = projection.wav_bytes()?;
++        let wav_path = directory.join(format!("{name}.wav"));
++        write_new(&wav_path, &wav)?;
++        report["wav_path"] = json!(wav_path);
++        report["wav_sha256"] = json!(format!("{:x}", Sha256::digest(&wav)));
++        report["pcm_gain"] = json!(DIVISOR);
++        report["clipped_sample_population"] = json!(projection.clipped_sample_population);
++        report["projection_fibre"] = json!("the complete exact section is retained; remainder = current * gain - PCM at each timed quadrature");
++    }
++    Ok(report)
++}
++
++fn main() -> Result<()> {
++    let args: Vec<_> = std::env::args_os().skip(1).map(PathBuf::from).collect();
++    if args.len() != 4 {
++        return Err("usage: recorded_acoustic_return EXCITATION_PCM16.wav OBSERVED_PCM16.wav NEW_REPORT.json NEW_OUTPUT_DIRECTORY".into());
++    }
++    let [excitation_path, observation_path, report_path, directory] = args.as_slice() else {
++        unreachable!()
++    };
++    if report_path.exists() || directory.exists() {
++        return Err("output report and directory must be new".into());
++    }
++    let started = Instant::now();
++    let excitation = ExactAcousticOccurrence::read(
++        excitation_path,
++        "recorded-excitation",
++        4096,
++        4096,
++        PHASE_EXTENT,
++    )?;
++    let observation = ExactAcousticOccurrence::read(
++        observation_path,
++        "recorded-microphone-return",
++        4096,
++        4096,
++        PHASE_EXTENT,
++    )?;
++    if excitation.sample_rate != observation.sample_rate {
++        return Err("the supplied raw recordings do not share one sample clock".into());
++    }
++    let rate = excitation.sample_rate;
++    let chart = |source: &ExactAcousticOccurrence, receiver, lineage| {
++        AcousticFieldChart::from_acoustic(
++            source,
++            PhaseCurrentReceiverId(receiver),
++            PhaseCurrentLineageId(lineage),
++            Rat::from_integer(0.into()),
++            PHASE_EXTENT,
++            DIVISOR,
++        )
++    };
++    let source_chart = chart(&excitation, 1, 1)?;
++    let observed_chart = chart(&observation, 9, 2)?;
++    let mut report = json!({"schema":"holonics.recorded-acoustic-return.v1","status":"running",
++        "excitation":source_report(&excitation),"observation":source_report(&observation),
++        "clock_contract":"caller supplies simultaneously recorded raw channels with common origin; no delay alignment or resampling",
++        "initial_response":{"real":1,"imaginary":0,"denominator":1,"origin":"0","extent":1},
++        "initial_response_scope":"explicit unit digital starting current, not a measured room transfer or cultivated model",
++        "phase_extent":PHASE_EXTENT,"divisor":DIVISOR,"stages":{},"native_development":"none; this receiver retains the actual defect for subsequent constitutive contact"});
++    fs::create_dir_all(directory)?;
++    let readout = ResidentReadout::new()?;
++    let s = ResidentSurface::on(&readout)?;
++    report["device"] = json!(s.device_name());
++    let source = stage(&s, &mut report, "mount_excitation", || {
++        Ok(source_chart.mount_complete(&s)?)
++    })?;
++    let initial = stage(&s, &mut report, "mount_initial_response", || {
++        Ok(s.mount_section_rest(&ResidentSectionRest::found(
++            1,
++            3,
++            ResidentGrain(0),
++            64,
++            vec![(1, 1), (0, 0), (1, 1)],
++        )?)?)
++    })?;
++    let prediction = stage(&s, &mut report, "predict_before_reception", || {
++        let response = ResidentPhaseCurrentView::new(
++            ResidentConstitutiveCurrent::rational(&initial)?,
++            PhaseCurrentReceiverId(8),
++            PhaseCurrentLineageId(3),
++            Rat::from_integer(0.into()),
++            Rat::new(1.into(), rate.into()),
++            PHASE_EXTENT as u32,
++            1,
++        )?;
++        Ok(convolve_resident(
++            &s,
++            source.temporal_view()?,
++            response,
++            PhaseCurrentReceiverId(9),
++            PhaseCurrentLineageId(4),
++        )?)
++    })?;
++    let observed = stage(&s, &mut report, "mount_observed_return", || {
++        Ok(observed_chart.mount_complete(&s)?)
++    })?;
++    let difference = stage(&s, &mut report, "native_oriented_return", || {
++        Ok(compare_resident(
++            &s,
++            prediction.view()?,
++            observed.temporal_view()?,
++            PhaseCurrentLineageId(5),
++        )?)
++    })?;
++    report["support"] = json!(difference.support());
++    report["prediction"] = stage(&s, &mut report, "cold_prediction", || {
++        publish(
++            &s,
++            prediction.section(),
++            prediction.view()?,
++            directory,
++            "prediction",
++            rate,
++            false,
++        )
++    })?;
++    report["difference"] = stage(&s, &mut report, "cold_difference_and_audio", || {
++        publish(
++            &s,
++            difference.section(),
++            difference.view()?,
++            directory,
++            "difference",
++            rate,
++            true,
++        )
++    })?;
++    report["seconds"] = json!(started.elapsed().as_secs_f64());
++    report["status"] = json!("returned");
++    write_new(report_path, &serde_json::to_vec_pretty(&report)?)?;
++    println!(
++        "{}",
++        serde_json::to_string(
++            &json!({"status":"returned","report":report_path,"seconds":report["seconds"]})
++        )?
++    );
++    Ok(())
++}
+diff --git a/docs/ACOUSTIC_EXPERIMENTS.md b/docs/ACOUSTIC_EXPERIMENTS.md
+index 87039adb..8e14ef8c 100644
+--- a/docs/ACOUSTIC_EXPERIMENTS.md
++++ b/docs/ACOUSTIC_EXPERIMENTS.md
+@@ -30,6 +30,28 @@ sound model or timed waveform emission; productive recorded development remains
+ 
+ ## Shared material field and profiling
+ 
++[definition] Actual simultaneous playback/receiver evidence is now available through the
++selective SoundCam acquisition. Raw electrical loopback is the excitation witness; microphone
++channels keep the same 48 kHz recording clock. The initial unit-response example returns the
++full native `observed - predicted` current, with an exact section and cold stereo PCM projection.
++Its output is a measured defect, not a fitted acoustic model. The
++[return record](../research/records/2026-09-07_MEASURED_ACOUSTIC_RETURNS_KEEP_THEIR_ORIENTED_DIFFERENCE.md)
++retains data provenance, source qualification, native checks and actual scope.
++
++```sh
++SSL_CERT_FILE=/etc/ssl/cert.pem python3 research/experiments/apple_silicon/fetch_soundcam.py
++cargo build -p holonics-hna --example recorded_acoustic_return
++target/debug/examples/recorded_acoustic_return .local/datasets/soundcam/wav/row_000/loopback.wav .local/datasets/soundcam/wav/row_000/microphone_00.wav NEW_RETURN.json .local/experiments/NEW_RETURN
++python3 research/experiments/apple_silicon/compare_recorded_acoustic_return.py .local/datasets/soundcam/acquisition.json NEW_RETURN.json --output NEW_COMPARISON.json
++```
++
++[definition] The report/output directory must be new. This command declares the two raw files
++as simultaneous channels with origin zero; it estimates no delay and applies no resampling.
++`compare_resident` also supports integral origin offsets and reports both excluded populations.
++Its subtraction stays native until the cold terminal receiver. The source-qualified observer
++compares WAVs against the original NPY selectors and checks every prediction/difference
++coordinate, clock, PCM sample and reconstruction residual. It supplies no target to development.
++
+ [established-bounded; implemented-exact] `holonics_hna::native::acoustic_field::AcousticFieldChart`
+ now supplies complete timed coefficient fields to the shared `NativeConstitutiveField` used by
+ the desktop material work. The field performs one joint operation, retaining both complex outgoing
+diff --git a/docs/ARCHITECTURE_MAP.md b/docs/ARCHITECTURE_MAP.md
+index 3a6f926d..bb1f52da 100644
+--- a/docs/ARCHITECTURE_MAP.md
++++ b/docs/ARCHITECTURE_MAP.md
+@@ -63,6 +63,16 @@ normalization and publication; these remain one native passage.
+ Both operand carriers remain borrowed and the complete causal tail returns. This is one declared
+ temporal action; useful learned acoustic conduct and general material composition remain open.
+ 
++[established-bounded; implemented-exact] `phase_current::resident::{compare_resident,
++ResidentPhaseDifference}` returns the full oriented difference on exact common receiver/clock
++support, borrowing both operands and retaining excluded support. Its binding is
++`resident_section/surface_phase_difference.rs`, with CUDA `kernels/phase_current_difference.cuh`
++and Metal `accelerators/metal/phase_difference.metal`; it reuses the existing convolution
++normalization and publication. `recorded_acoustic_return` attaches actual PCM excitation/receiver
++channels, while `fetch_soundcam.py` and `compare_recorded_acoustic_return.py` own exterior
++acquisition and independent comparison. The [measured-return record](../research/records/2026-09-07_MEASURED_ACOUSTIC_RETURNS_KEEP_THEIR_ORIENTED_DIFFERENCE.md)
++states the initial unit-response scope and remaining generator development.
++
+ [established-bounded; measured] `native::recorded` exposes
+ `native/speech/{recorded.rs,recorded/sections.rs}` for source/target pointer resolution, exact
+ annotation-to-PCM bounds and `RecordedResponseSections::bind`. It uses
+diff --git a/docs/DEVELOPMENT.md b/docs/DEVELOPMENT.md
+index ca21e767..7ad88f00 100644
+--- a/docs/DEVELOPMENT.md
++++ b/docs/DEVELOPMENT.md
+@@ -9,7 +9,9 @@ apparatus; they are not dependencies that schedule native inference.
+ [established-bounded; implemented-exact] The native phase session runs through CUDA on Linux
+ and direct Metal on macOS. The Metal realization covers the local constitutive fibre,
+ circulation and rechart operation, with the same native state/checkpoint owners. The shared complete
+-constitutive field and its rechart also run on Metal; that field has no rest/remount product yet.
++constitutive field and its rechart also run on Metal; complete field rest/remount and the
++[conditional checkpoint](../research/records/2026-09-07_THE_RECORDED_CONDITIONAL_ACTION_CONTINUES_AFTER_RESTART.md)
++preserve their supported state and source capabilities.
+ The [field record](../research/records/2026-09-06_APPLE_ACOUSTIC_FIELDS_AND_HOLONIC_PROFILING.md)
+ documents its acoustic chart and execution profiler. Broader resident
+ operations and inherited-model readout remain CUDA-only and return named unsupported-operation
+diff --git a/docs/plans/HOLONICS_ON_APPLE_SILICON.md b/docs/plans/HOLONICS_ON_APPLE_SILICON.md
+index 9af26548..1bf94af4 100644
+--- a/docs/plans/HOLONICS_ON_APPLE_SILICON.md
++++ b/docs/plans/HOLONICS_ON_APPLE_SILICON.md
+@@ -88,6 +88,12 @@ by a plural fibre; identifying an individual performance or reversing the raw pa
+    digital gain. The v5 recorded study compares the retained earlier and successor conditions
+    across a whole recording. The digital two-tap law remains an explicit experimental control;
+    next attach actual acoustic material/receiving conditions and persistent generative standing.
++   The [measured-return construction](../../research/records/2026-09-07_MEASURED_ACOUSTIC_RETURNS_KEEP_THEIR_ORIENTED_DIFFERENCE.md)
++   now provides actual simultaneous electrical-loopback/microphone evidence from SoundCam and a
++   resident oriented temporal difference. It preserves common support and leaves unmatched tails
++   unobserved. Next use the measured return in the declared acoustic action's condition/contact
++   law, retaining noise and unmodelled transport instead of supplying an invented exact target.
++   The initial unit-response comparison does not itself develop the generator.
+ 3. Develop and retain acoustic generative standing across source-qualified recordings and
+    actual joined returns, then conduct its native emission into the declared acoustic receiver.
+    Inspect perception differences and generated sound, preserve the declared reconstruction
+diff --git a/research/experiments/apple_silicon/compare_recorded_acoustic_return.py b/research/experiments/apple_silicon/compare_recorded_acoustic_return.py
+new file mode 100644
+index 00000000..11865401
+--- /dev/null
++++ b/research/experiments/apple_silicon/compare_recorded_acoustic_return.py
+@@ -0,0 +1,138 @@
++#!/usr/bin/env python3
++"""Cold exact comparison of a source-qualified recorded return, never a native learner."""
++import argparse
++from fractions import Fraction as Q
++import hashlib
++import json
++from pathlib import Path
++import struct
++import wave
++
++import numpy as np
++
++from compare_recorded_temporal_action import native_fraction, RESIDENT_SECTION_REST_MAGIC
++
++
++def digest(path):
++    return hashlib.sha256(path.read_bytes()).hexdigest()
++
++
++def pcm(path, channels):
++    with wave.open(str(path), "rb") as recording:
++        assert recording.getnchannels() == channels and recording.getsampwidth() == 2
++        rate, frames = recording.getframerate(), recording.getnframes()
++        result = np.frombuffer(recording.readframes(frames), dtype="<i2").reshape(frames, channels)
++    return rate, result.astype(np.int64)
++
++
++def section(metadata, expected):
++    path = Path(metadata["section_path"])
++    data = path.read_bytes()
++    assert digest(path) == metadata["section_sha256"]
++    assert len(data) == metadata["section_octets"]
++    assert data[:8] == RESIDENT_SECTION_REST_MAGIC
++    rows, width, grain, bound, population = struct.unpack_from("<QQIIQ", data, 8)
++    assert (rows, width, grain, bound, population) == (1, expected.size + 1, 0, 64, expected.size + 1)
++    assert len(data) == 40 + 16 * population
++    pairs = np.frombuffer(data, dtype="<i8", offset=40).reshape(population, 2)
++    assert np.array_equal(pairs[:, 0], pairs[:, 1])
++    den = int(pairs[-1, 0])
++    assert 0 < den <= 32768 and 32768 % den == 0
++    coordinates = pairs[:-1, 0].reshape(expected.shape)
++    # This bound follows from the supplied PCM16 comparison, and makes the subsequent
++    # independent integer equality free of int64 overflow even for malformed artifacts.
++    assert np.all(coordinates >= -65536) and np.all(coordinates <= 65536)
++    assert np.array_equal(coordinates * (32768 // den), expected)
++    return {"sha256": metadata["section_sha256"], "coordinates_verified": expected.size,
++            "denominator": den}
++
++
++def compare(report_path, acquisition_path):
++    report = json.loads(report_path.read_text())
++    acquisition = json.loads(acquisition_path.read_text())
++    assert report["schema"] == "holonics.recorded-acoustic-return.v1" and report["status"] == "returned"
++    assert acquisition["schema"] == "soundcam-selective-acquisition.v1"
++    root = acquisition_path.parent
++    matches = [pair for pair in acquisition["pairs"]
++               if (root / pair["loopback"]["path"]).resolve() == Path(report["excitation"]["path"]).resolve()
++               and (root / pair["microphone_recording"]["path"]).resolve() == Path(report["observation"]["path"]).resolve()]
++    assert len(matches) == 1
++    pair = matches[0]
++    assert pair["origin_frame"] == 0 and pair["sample_rate_hz"] == 48000
++    sources = {}
++    for role, pair_role, raw_key in (("excitation", "loopback", "music_directlines_npy"),
++                                    ("observation", "microphone_recording", "music_audio_npy")):
++        claimed, qualified = report[role], pair[pair_role]
++        path = Path(claimed["path"])
++        assert digest(path) == claimed["sha256"] == qualified["wav_sha256"]
++        assert path.stat().st_size == claimed["octets"]
++        rate, data = pcm(path, 1)
++        assert rate == claimed["sample_rate"] == pair["sample_rate_hz"]
++        assert len(data) == claimed["frames"] == qualified["frames"] and claimed["origin"] == "0"
++        raw_path = root / acquisition["raw_outputs"][raw_key]
++        assert digest(raw_path) == qualified["source_array_sha256"]
++        raw = np.load(raw_path, mmap_mode="r", allow_pickle=False)
++        assert raw.dtype.str == "<i2"
++        selected = raw[pair["row"]] if role == "excitation" else raw[pair["row"], pair["microphone"]]
++        assert np.array_equal(selected, data[:, 0])
++        sources[role] = data[:, 0]
++    count = min(map(len, sources.values()))
++    assert len(sources["excitation"]) == len(sources["observation"])
++    support = report["support"]
++    assert support["predicted"] == support["observed"] == {"start": 0, "end": count}
++    assert support["unobserved_prediction"] == support["unpredicted_observation"] == []
++    assert native_fraction(support["begin"]) == Q(0)
++    assert native_fraction(support["end"]) == Q(count, rate)
++    assert report["initial_response"] == {"real": 1, "imaginary": 0, "denominator": 1, "origin": "0", "extent": 1}
++    assert report["divisor"] == 32768
++    zero = np.zeros(count, dtype=np.int64)
++    prediction = np.stack((sources["excitation"], zero), axis=1)
++    real_difference = sources["observation"] - sources["excitation"]
++    difference = np.stack((real_difference, zero), axis=1)
++    checked = {}
++    for name, expected, lineage in (("prediction", prediction, 4), ("difference", difference, 5)):
++        metadata = report[name]
++        assert metadata["frames"] == count and metadata["origin"] == "0"
++        assert Q(metadata["sample_step"]) == Q(1, rate)
++        assert metadata["receiver"] == 9 and metadata["lineage"] == lineage
++        checked[name] = section(metadata, expected)
++    metadata = report["difference"]
++    wav_path = Path(metadata["wav_path"])
++    assert digest(wav_path) == metadata["wav_sha256"] and metadata["pcm_gain"] == 32768
++    pcm_rate, actual_pcm = pcm(wav_path, 2)
++    expected_pcm = difference.clip(-32768, 32767)
++    assert pcm_rate == rate and np.array_equal(actual_pcm, expected_pcm)
++    assert int(np.count_nonzero(expected_pcm != difference)) == metadata["clipped_sample_population"]
++    # The integer residual after projection exactly reconstructs the full native current.
++    assert np.array_equal(actual_pcm + (difference - actual_pcm), difference)
++    for name in ("predict_before_reception", "native_oriented_return"):
++        stage = report["stages"][name]
++        assert stage["section_readouts"] == stage["numerical_egress_octets"] == stage["ingress_octets"] == 0
++        assert stage["deeds"] == 1
++    for name in ("cold_prediction", "cold_difference_and_audio"):
++        stage = report["stages"][name]
++        assert stage["section_readouts"] == 1 and stage["deeds"] == 0
++        assert stage["numerical_egress_octets"] == (2 * count + 1) * 16
++    signal_energy = int(np.dot(sources["observation"], sources["observation"]))
++    defect_energy = int(np.dot(real_difference, real_difference))
++    return {"verified": True, "row": pair["row"], "microphone": pair["microphone"],
++            "frames": count, "sample_rate": rate, "qualified_raw_arrays_match_wavs": True,
++            "complete_oriented_difference_matches": True, "projection_fibre_reconstructs": True,
++            "zero_native_numerical_readouts": True, "sections": checked,
++            "observed_pcm_square_sum": signal_energy, "defect_pcm_square_sum": defect_energy,
++            "defect_to_observed_energy_ratio": str(Q(defect_energy, signal_energy)) if signal_energy else None,
++            "scope": "unit-response baseline versus actual measured channels; no fitted acoustic model"}
++
++
++if __name__ == "__main__":
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("acquisition", type=Path)
++    parser.add_argument("reports", type=Path, nargs="+")
++    parser.add_argument("--output", type=Path)
++    args = parser.parse_args()
++    results = [compare(path, args.acquisition) for path in args.reports]
++    rendered = json.dumps({"verified": True, "returns": results}, indent=2) + "\n"
++    if args.output:
++        with args.output.open("x") as output:
++            output.write(rendered)
++    print(rendered, end="")
+diff --git a/research/experiments/apple_silicon/fetch_soundcam.py b/research/experiments/apple_silicon/fetch_soundcam.py
+new file mode 100644
+index 00000000..6f0a9c9c
+--- /dev/null
++++ b/research/experiments/apple_silicon/fetch_soundcam.py
+@@ -0,0 +1,439 @@
++"""Selectively acquire the SoundCam treated-room raw music/loopback pair.
++
++This is an exterior codec and provenance operation.  It range-reads only the two
++requested NPY members from the small Stanford ZIP sample; it does not acquire the
++digital music source, deconvolved RIRs, adjusted recordings, or any room/person
++labels.  The electrical loopback is retained as the measured excitation witness.
++"""
++
++from __future__ import annotations
++
++import argparse
++import hashlib
++import io
++import json
++from pathlib import Path, PurePosixPath
++import re
++import struct
++import time
++import urllib.request
++import urllib.error
++import wave
++import zipfile
++import zlib
++
++import numpy as np
++
++
++ARCHIVE_URL = "https://downloads.cs.stanford.edu/viscam/SoundCam/TreatedRoomSmallSet.zip"
++EXPECTED_ARCHIVE_SIZE = 659_806_886
++EXPECTED_ARCHIVE_ETAG = '"6700980d-2753daa6"'
++TAIL_BYTES = 1 << 20
++MAX_ENTRY_COMPRESSED = 64 << 20
++MAX_ENTRY_UNCOMPRESSED = 64 << 20
++MAX_EXPANSION_RATIO = 100
++SAMPLE_RATE = 48_000
++FRAME_COUNT = 672_000
++ROW_COUNT = 3
++MICROPHONE_COUNT = 10
++ROOT_MEMBER = "TreatedRoomSmallSet/Human1"
++AUDIO_MEMBER = f"{ROOT_MEMBER}/music_audio.npy"
++LOOPBACK_MEMBER = f"{ROOT_MEMBER}/music_directlines.npy"
++SOURCE_MEMBER = f"{ROOT_MEMBER}/music_sources.npy"
++EMPTY_SOURCE_MEMBER = "TreatedRoomSmallSet/Empty/music_sources.npy"
++
++EXPECTED_ENTRIES = {
++    AUDIO_MEMBER: {"size": 40_320_128, "crc": 0x74320442},
++    LOOPBACK_MEMBER: {"size": 4_032_128, "crc": 0x52BF1D9C},
++    SOURCE_MEMBER: {"size": 16_128_128, "crc": 0x6C3D954C},
++    EMPTY_SOURCE_MEMBER: {"size": 16_128_128, "crc": 0x6C3D954C},
++}
++
++
++class AcquisitionError(RuntimeError):
++    pass
++
++
++def sha256_bytes(value: bytes) -> str:
++    return hashlib.sha256(value).hexdigest()
++
++
++def safe_member(name: str) -> None:
++    path = PurePosixPath(name)
++    if "\\" in name or path.is_absolute() or any(part == ".." for part in path.parts):
++        raise AcquisitionError(f"unsafe ZIP member path: {name!r}")
++
++
++class RangeFetcher:
++    def __init__(self, url: str) -> None:
++        self.url = url
++        self.ranges: list[dict[str, object]] = []
++        request = urllib.request.Request(url, method="HEAD")
++        try:
++            with urllib.request.urlopen(request, timeout=60) as response:
++                headers = response.headers
++                self.size = int(headers.get("Content-Length", "0"))
++                self.etag = headers.get("ETag")
++                self.last_modified = headers.get("Last-Modified")
++                self.accept_ranges = headers.get("Accept-Ranges")
++        except Exception as error:  # pragma: no cover - network failure is environment-specific
++            raise AcquisitionError(f"SoundCam archive HEAD failed: {error}") from error
++        if self.size != EXPECTED_ARCHIVE_SIZE:
++            raise AcquisitionError(
++                f"archive size changed: expected {EXPECTED_ARCHIVE_SIZE}, got {self.size}"
++            )
++        if self.etag != EXPECTED_ARCHIVE_ETAG:
++            raise AcquisitionError(
++                f"archive ETag changed: expected {EXPECTED_ARCHIVE_ETAG}, got {self.etag!r}"
++            )
++        if self.accept_ranges != "bytes":
++            raise AcquisitionError(f"archive does not advertise byte ranges: {self.accept_ranges!r}")
++
++    def get_range(self, start: int, end: int, purpose: str) -> bytes:
++        if start < 0 or end < start or end >= self.size:
++            raise AcquisitionError(f"invalid archive range {start}-{end} for {purpose}")
++        request = urllib.request.Request(
++            self.url,
++            headers={"Range": f"bytes={start}-{end}", "Accept-Encoding": "identity"},
++        )
++        for attempt in range(3):
++            try:
++                with urllib.request.urlopen(request, timeout=120) as response:
++                    status = getattr(response, "status", None)
++                    etag = response.headers.get("ETag")
++                    content_range = response.headers.get("Content-Range", "")
++                    match = re.fullmatch(r"bytes (\d+)-(\d+)/(\d+)", content_range)
++                    if status != 206 or match is None:
++                        raise AcquisitionError(
++                            f"range response was not 206 for {purpose}: {status}, {content_range!r}"
++                        )
++                    response_start, response_end, response_size = map(int, match.groups())
++                    if (response_start, response_end, response_size) != (start, end, self.size):
++                        raise AcquisitionError(
++                            f"archive range mismatch for {purpose}: {content_range!r}"
++                        )
++                    if etag != self.etag:
++                        raise AcquisitionError(f"archive ETag changed during {purpose}: {etag!r}")
++                    expected_bytes = end - start + 1
++                    body = response.read(expected_bytes + 1)
++                    if len(body) != expected_bytes:
++                        raise AcquisitionError(
++                            f"short or oversized archive range for {purpose}: {len(body)} bytes"
++                        )
++                break
++            except urllib.error.HTTPError as error:
++                if error.code not in (429, 503) or attempt == 2:
++                    raise AcquisitionError(f"archive range failed for {purpose}: {error}") from error
++                time.sleep(2**attempt)
++            except Exception as error:  # pragma: no cover - network failure is environment-specific
++                raise AcquisitionError(f"archive range failed for {purpose}: {error}") from error
++        self.ranges.append(
++            {"purpose": purpose, "start": start, "end": end, "bytes": len(body), "etag": etag}
++        )
++        return body
++
++
++def inspect_entries(tail: bytes, tail_start: int) -> dict[str, zipfile.ZipInfo]:
++    try:
++        with zipfile.ZipFile(io.BytesIO(tail)) as archive:
++            infos = archive.infolist()
++    except Exception as error:
++        raise AcquisitionError(f"SoundCam ZIP central directory refused: {error}") from error
++    for info in infos:
++        safe_member(info.filename)
++    by_name = {info.filename: info for info in infos}
++    for name, expected in EXPECTED_ENTRIES.items():
++        info = by_name.get(name)
++        if info is None or info.is_dir():
++            raise AcquisitionError(f"required ZIP member absent: {name}")
++        if info.file_size != expected["size"] or info.CRC != expected["crc"]:
++            raise AcquisitionError(
++                f"ZIP member changed: {name} size={info.file_size} crc={info.CRC:08x}"
++            )
++        if info.compress_type != zipfile.ZIP_DEFLATED or info.flag_bits & 0x1:
++            raise AcquisitionError(f"unsupported ZIP member encoding: {name}")
++        if info.compress_size > MAX_ENTRY_COMPRESSED or info.file_size > MAX_ENTRY_UNCOMPRESSED:
++            raise AcquisitionError(f"ZIP member exceeds bounded extraction size: {name}")
++        if info.compress_size == 0 or info.file_size > info.compress_size * MAX_EXPANSION_RATIO:
++            raise AcquisitionError(f"ZIP member expansion bound refused: {name}")
++        actual_offset = tail_start + info.header_offset
++        if actual_offset < 0 or actual_offset >= EXPECTED_ARCHIVE_SIZE:
++            raise AcquisitionError(f"invalid ZIP member offset: {name}")
++    return by_name
++
++
++def extract_member(
++    fetcher: RangeFetcher, info: zipfile.ZipInfo, name: str, tail_start: int
++) -> bytes:
++    actual_offset = tail_start + info.header_offset
++    header = fetcher.get_range(actual_offset, min(actual_offset + 4095, fetcher.size - 1), f"{name} local header")
++    if len(header) < 30:
++        raise AcquisitionError(f"short local ZIP header: {name}")
++    signature, _version, flags, method, _time, _date, _crc, _compressed, _uncompressed, filename_len, extra_len = struct.unpack(
++        "<4s5H3L2H", header[:30]
++    )
++    if signature != b"PK\x03\x04" or method != zipfile.ZIP_DEFLATED or flags & 0x1:
++        raise AcquisitionError(f"local ZIP header refused: {name}")
++    data_start = actual_offset + 30 + filename_len + extra_len
++    header_end = data_start - 1
++    if header_end >= actual_offset + len(header):
++        raise AcquisitionError(f"local ZIP header exceeds bounded read: {name}")
++    local_name = header[30 : 30 + filename_len].decode("utf-8")
++    if local_name != name:
++        raise AcquisitionError(f"local ZIP member name mismatch: {local_name!r}")
++    data_end = data_start + info.compress_size - 1
++    compressed = fetcher.get_range(data_start, data_end, f"{name} compressed payload")
++    try:
++        decompressor = zlib.decompressobj(-15)
++        payload = decompressor.decompress(compressed, info.file_size + 1)
++        if len(payload) > info.file_size or decompressor.unconsumed_tail:
++            raise AcquisitionError(f"ZIP member exceeds bounded output size: {name}")
++        payload += decompressor.flush(info.file_size + 1 - len(payload))
++    except zlib.error as error:
++        raise AcquisitionError(f"ZIP deflate refused for {name}: {error}") from error
++    if (
++        len(payload) != info.file_size
++        or not decompressor.eof
++        or decompressor.unused_data
++        or decompressor.unconsumed_tail
++        or zlib.crc32(payload) & 0xFFFFFFFF != info.CRC
++    ):
++        raise AcquisitionError(f"ZIP member integrity mismatch after extraction: {name}")
++    return payload
++
++
++def load_pcm16(payload: bytes, name: str, shape: tuple[int, ...]) -> np.ndarray:
++    try:
++        value = np.load(io.BytesIO(payload), allow_pickle=False)
++    except Exception as error:
++        raise AcquisitionError(f"NPY refused for {name}: {error}") from error
++    if not isinstance(value, np.ndarray) or value.dtype.str != "<i2" or value.shape != shape:
++        raise AcquisitionError(
++            f"unexpected NPY schema for {name}: dtype={getattr(value, 'dtype', None)!r}, "
++            f"shape={getattr(value, 'shape', None)!r}"
++        )
++    if not value.flags.c_contiguous:
++        raise AcquisitionError(f"non-contiguous NPY array: {name}")
++    return value
++
++
++def exact_write(path: Path, payload: bytes) -> None:
++    if path.exists():
++        if path.is_symlink() or not path.is_file() or path.read_bytes() != payload:
++            raise AcquisitionError(f"pre-existing incompatible output: {path}")
++        return
++    path.parent.mkdir(parents=True, exist_ok=True)
++    try:
++        with path.open("xb") as output:
++            output.write(payload)
++    except FileExistsError as error:
++        raise AcquisitionError(f"output appeared during acquisition: {path}") from error
++
++
++def wav_bytes(samples: np.ndarray) -> bytes:
++    if samples.dtype.str != "<i2" or samples.ndim != 1 or samples.shape[0] != FRAME_COUNT:
++        raise AcquisitionError("invalid PCM16 row for WAV export")
++    output = io.BytesIO()
++    with wave.open(output, "wb") as writer:
++        writer.setnchannels(1)
++        writer.setsampwidth(2)
++        writer.setframerate(SAMPLE_RATE)
++        writer.writeframes(samples.tobytes(order="C"))
++    encoded = output.getvalue()
++    with wave.open(io.BytesIO(encoded), "rb") as reader:
++        if (reader.getnchannels(), reader.getsampwidth(), reader.getframerate(), reader.getnframes()) != (
++            1,
++            2,
++            SAMPLE_RATE,
++            FRAME_COUNT,
++        ):
++            raise AcquisitionError("WAV round-trip chart mismatch")
++    return encoded
++
++
++def output_root(path: Path) -> Path:
++    path.mkdir(parents=True, exist_ok=True)
++    if path.is_symlink() or not path.is_dir():
++        raise AcquisitionError(f"unsafe output root: {path}")
++    return path.resolve()
++
++
++def main() -> None:
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--output", type=Path, default=Path(".local/datasets/soundcam"))
++    args = parser.parse_args()
++    root = output_root(args.output)
++    fetcher = RangeFetcher(ARCHIVE_URL)
++    tail_start = max(0, fetcher.size - TAIL_BYTES)
++    tail = fetcher.get_range(tail_start, fetcher.size - 1, "ZIP central directory")
++    infos = inspect_entries(tail, tail_start)
++
++    audio_payload = extract_member(fetcher, infos[AUDIO_MEMBER], AUDIO_MEMBER, tail_start)
++    loopback_payload = extract_member(fetcher, infos[LOOPBACK_MEMBER], LOOPBACK_MEMBER, tail_start)
++    audio = load_pcm16(audio_payload, AUDIO_MEMBER, (ROW_COUNT, MICROPHONE_COUNT, FRAME_COUNT))
++    loopback = load_pcm16(loopback_payload, LOOPBACK_MEMBER, (ROW_COUNT, FRAME_COUNT))
++
++    raw_audio_path = root / "raw" / "TreatedRoomSmallSet" / "Human1" / "music_audio.npy"
++    raw_loopback_path = root / "raw" / "TreatedRoomSmallSet" / "Human1" / "music_directlines.npy"
++    outputs: list[dict[str, object]] = []
++    pairs: list[dict[str, object]] = []
++    audio_sha256 = sha256_bytes(audio_payload)
++    loopback_sha256 = sha256_bytes(loopback_payload)
++    exact_write(raw_audio_path, audio_payload)
++    exact_write(raw_loopback_path, loopback_payload)
++
++    for row in range(ROW_COUNT):
++        loopback_wav = wav_bytes(loopback[row])
++        loopback_path = root / "wav" / f"row_{row:03d}" / "loopback.wav"
++        exact_write(loopback_path, loopback_wav)
++        outputs.append(
++            {
++                "path": str(loopback_path.relative_to(root)),
++                "array": "music_directlines.npy",
++                "row": row,
++                "channel": "loopback",
++                "sample_rate_hz": SAMPLE_RATE,
++                "frame_count": FRAME_COUNT,
++                "origin_frame": 0,
++                "pcm16_sha256": sha256_bytes(loopback[row].tobytes(order="C")),
++                "wav_sha256": sha256_bytes(loopback_wav),
++                "wav_bytes": len(loopback_wav),
++            }
++        )
++        for channel in range(MICROPHONE_COUNT):
++            microphone_wav = wav_bytes(audio[row, channel])
++            microphone_path = root / "wav" / f"row_{row:03d}" / f"microphone_{channel:02d}.wav"
++            exact_write(microphone_path, microphone_wav)
++            outputs.append(
++                {
++                    "path": str(microphone_path.relative_to(root)),
++                    "array": "music_audio.npy",
++                    "row": row,
++                    "channel": channel,
++                    "sample_rate_hz": SAMPLE_RATE,
++                    "frame_count": FRAME_COUNT,
++                    "origin_frame": 0,
++                    "pcm16_sha256": sha256_bytes(audio[row, channel].tobytes(order="C")),
++                    "wav_sha256": sha256_bytes(microphone_wav),
++                    "wav_bytes": len(microphone_wav),
++                }
++            )
++            pairs.append(
++                {
++                    "row": row,
++                    "microphone": channel,
++                    "sample_rate_hz": SAMPLE_RATE,
++                    "origin_frame": 0,
++                    "loopback": {
++                        "path": str(loopback_path.relative_to(root)),
++                        "wav_sha256": sha256_bytes(loopback_wav),
++                        "frames": FRAME_COUNT,
++                        "source_array": "music_directlines.npy",
++                        "source_array_sha256": loopback_sha256,
++                        "selector": {"row": row, "channel": "loopback"},
++                    },
++                    "microphone_recording": {
++                        "path": str(microphone_path.relative_to(root)),
++                        "wav_sha256": sha256_bytes(microphone_wav),
++                        "frames": FRAME_COUNT,
++                        "source_array": "music_audio.npy",
++                        "source_array_sha256": audio_sha256,
++                        "selector": {"row": row, "channel": channel},
++                    },
++                }
++            )
++
++    receipt = {
++        "schema": "soundcam-selective-acquisition.v1",
++        "dataset": "SoundCam",
++        "project_url": "https://masonlwang.com/soundcam/",
++        "dataset_url": "https://purl.stanford.edu/xq364hd5023",
++        "doi": "https://doi.org/10.25740/xq364hd5023",
++        "paper_url": "https://arxiv.org/pdf/2311.03517.pdf",
++        "license": {
++            "name": "MIT",
++            "url": "https://opensource.org/license/mit/",
++            "basis": "SoundCam datasheet and Stanford repository metadata",
++        },
++        "archive": {
++            "url": ARCHIVE_URL,
++            "etag": fetcher.etag,
++            "last_modified": fetcher.last_modified,
++            "size_bytes": fetcher.size,
++            "selected_ranges": fetcher.ranges,
++            "downloaded_archive": False,
++        },
++        "collection_clock": {
++            "sample_rate_hz": SAMPLE_RATE,
++            "frame_count": FRAME_COUNT,
++            "origin_frame": 0,
++            "origin_seconds": "0",
++            "citation": "SoundCam paper Appendix D.3: synchronized MOTU 8M interfaces at 48 kHz",
++        },
++        "selectors": {
++            "folder": ROOT_MEMBER,
++            "rows": list(range(ROW_COUNT)),
++            "microphone_channels": list(range(MICROPHONE_COUNT)),
++            "loopback_channel": "music_directlines.npy",
++        },
++        "entries": {
++            "music_audio.npy": {
++                "archive_member": AUDIO_MEMBER,
++                "zip_crc32": f"{infos[AUDIO_MEMBER].CRC:08x}",
++                "compressed_bytes": infos[AUDIO_MEMBER].compress_size,
++                "uncompressed_bytes": len(audio_payload),
++                "sha256": sha256_bytes(audio_payload),
++                "dtype": "<i2",
++                "shape": list(audio.shape),
++            },
++            "music_directlines.npy": {
++                "archive_member": LOOPBACK_MEMBER,
++                "zip_crc32": f"{infos[LOOPBACK_MEMBER].CRC:08x}",
++                "compressed_bytes": infos[LOOPBACK_MEMBER].compress_size,
++                "uncompressed_bytes": len(loopback_payload),
++                "sha256": sha256_bytes(loopback_payload),
++                "dtype": "<i2",
++                "shape": list(loopback.shape),
++            },
++            "music_sources.npy": {
++                "archive_member": SOURCE_MEMBER,
++                "downloaded": False,
++                "zip_crc32": f"{infos[SOURCE_MEMBER].CRC:08x}",
++                "uncompressed_bytes": infos[SOURCE_MEMBER].file_size,
++                "sha256": None,
++                "sha256_available": False,
++                "sha256_reason": "member intentionally not acquired",
++                "dtype": "<f8",
++                "shape": [ROW_COUNT, FRAME_COUNT],
++                "used_as_native_input": False,
++                "reason": "float64 digital source intentionally not acquired; electrical loopback is the measured excitation witness",
++            },
++            "empty_music_sources_provenance": {
++                "archive_member": EMPTY_SOURCE_MEMBER,
++                "downloaded": False,
++                "zip_crc32": f"{infos[EMPTY_SOURCE_MEMBER].CRC:08x}",
++                "same_crc_as_human1_source": infos[EMPTY_SOURCE_MEMBER].CRC == infos[SOURCE_MEMBER].CRC,
++            },
++        },
++        "not_acquired": [
++            "music_sources.npy",
++            "music_deconvolved.npy",
++            "adjusted_music.npy",
++            "all other archive members",
++        ],
++        "raw_outputs": {
++            "music_audio_npy": str(raw_audio_path.relative_to(root)),
++            "music_directlines_npy": str(raw_loopback_path.relative_to(root)),
++        },
++        "wav_outputs": outputs,
++        "pairs": pairs,
++        "semantic_conditions": False,
++        "native_current_formation": False,
++    }
++    receipt_bytes = (json.dumps(receipt, indent=2, sort_keys=True) + "\n").encode()
++    exact_write(root / "acquisition.json", receipt_bytes)
++    print(json.dumps({"output": str(root), "wav_count": len(outputs), "acquisition_sha256": sha256_bytes(receipt_bytes)}, indent=2))
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/research/records/2026-09-07_MEASURED_ACOUSTIC_RETURNS_KEEP_THEIR_ORIENTED_DIFFERENCE.md b/research/records/2026-09-07_MEASURED_ACOUSTIC_RETURNS_KEEP_THEIR_ORIENTED_DIFFERENCE.md
+new file mode 100644
+index 00000000..fd2b5e94
+--- /dev/null
++++ b/research/records/2026-09-07_MEASURED_ACOUSTIC_RETURNS_KEEP_THEIR_ORIENTED_DIFFERENCE.md
+@@ -0,0 +1,133 @@
++# Measured acoustic returns keep their oriented difference
++
++[definition] September 7, 2026, on `codex/apple-silicon`, after `7dcb9f1d`. This return
++continues AS4–AS5 under the [Apple blueprint](../../docs/plans/HOLONICS_ON_APPLE_SILICON.md).
++The preceding checkpoint study retained a controlled digital action. This construction attaches
++actual synchronized excitation/receiver recordings and returns their complete temporal defect.
++It does not install a learned room response or complete useful sound/English development.
++
++## Source and declared acoustic relation
++
++[established-bounded; source-inspected] [SoundCam](https://masonlwang.com/soundcam/) publishes
++recorded music, microphone arrays and electrical loopback channels. Its
++[paper](https://arxiv.org/abs/2311.03517) describes synchronized playback/recording at 48 kHz,
++ten seconds of excitation and four subsequent seconds for decay. We use the raw recorded
++electrical loopback as an excitation witness, with its simultaneous microphone recording.
++The digital float64 music source, deconvolved impulse responses and delay-adjusted recordings
++are separate products and are not substituted for either measured channel.
++
++[established-bounded; measured] `research/experiments/apple_silicon/fetch_soundcam.py` acquired
++only `Human1/music_audio.npy` and `Human1/music_directlines.npy` from the
++[Stanford small-set archive](https://downloads.cs.stanford.edu/viscam/SoundCam/TreatedRoomSmallSet.zip).
++One acquisition receipt records five ZIP ranges transferring 31,340,408 bytes from the
++659,806,886-byte archive. Its ETag is
++`"6700980d-2753daa6"`; the selected member CRCs are `74320442` and `52bf1d9c` respectively.
++The original little-endian PCM16 arrays have shapes `(3,10,672000)` and `(3,672000)`.
++The 33 exported mono WAVs preserve every original coefficient. Source arrays, WAVs and
++acquisition receipt occupy 88,752,401 bytes outside Git under `.local/datasets/soundcam`.
++The receipt retains archive/range/member identities, exact array selectors, output hashes,
++the source clock and project licensing references. These are exterior provenance, not semantic
++identities. Room/person labels never supply conditions or choose a native current.
++
++[definition] The first application uses an explicit unit digital response as its initial
++prediction. Electrical loopback and microphone ADC values are normalized PCM coordinates;
++unit gain does not assert calibrated acoustic pressure, equal instrument gain or a physical
++room law. Their common raw recording clock is retained without onset fitting, resampling or
++delay correction. A later temporal constitutive family must carry propagation, gain and the
++remaining observed difference at its declared scope.
++
++## Native owners and exact operation
++
++[established-bounded; implemented-exact] `phase_current::resident::compare_resident` borrows
++both complete current views and returns `ResidentPhaseDifference`. It requires the same receiver,
++sample step and phase chart. Origins may differ by an integral clock step. The support receipt
++identifies the exact common interval and both excluded populations; a predicted tail outside the
++recording remains unobserved. No padding or lack of observation supplies a zero target.
++
++[proved-derived] If the overlap coordinates are `p/a` and `o/b`, let `d=lcm(a,b)>0`.
++The returned current has numerator `o(d/b)-p(d/a)` and denominator `d`. Reducing the complete
++vector and denominator by their common divisor preserves every coordinate of `o/b-p/a`.
++This is the oriented receiver difference, including both quadratures; it is not a condition
++estimate or an assertion that the observations belong to a particular generator family.
++
++[established-bounded; implemented-exact] The resident binding
++`resident_section/surface_phase_difference.rs` records validation, independent coordinate
++products, normalization and publication in one passage. CUDA
++`kernels/phase_current_difference.cuh` and Metal `accelerators/metal/phase_difference.metal`
++use the existing checked wide arithmetic and convolution normalization/publication. Validation
++checks the full input views, dispositions, denominators and structural padding before product
++lanes run. Private candidate output is published only after the complete receipt succeeds.
++Both operand carriers survive; no numerical intermediate is read to the CPU.
++
++[proved-derived] The existing convolution already uses the common denominator `a*b` for
++every product. Normalizing each complex product and then multiplying it back by the removed
++factor restores precisely its original numerator. Both device implementations now accumulate
++that original checked complex numerator directly, then perform the existing complete-vector
++normalization. Product/sum bounds, final i64 publication, causal order and tail remain unchanged.
++This removes redundant rational work; no speedup ratio is claimed without a matched measurement.
++
++## Verification and recorded return
++
++[established-bounded; measured] Nineteen focused native controls pass with:
++
++```sh
++cargo test -p holonic-engine --lib phase_current::resident:: -- --include-ignored --test-threads=1
++```
++
++[established-bounded; measured] Five new controls cover full oriented rational differences,
++clock/receiver refusals before launch, shifted overlapping support, retained excluded populations,
++malformed points/padding, late overflow, wide normalization, all coordinates of a 4,099-frame
++parallel section and zero hot numerical readouts. Fourteen convolution controls include the
++shared conditional-relation composition, both storage placements and unequal denominators.
++The new unequal-denominator test initially omitted the final `(2,-1)` causal coefficient in its
++expected vector; direct multiplication supplied the correction. Native execution was unchanged.
++
++[established-bounded; measured] `cargo build -p holonics-hna --example recorded_acoustic_return`
++passes. The application then returns all three complete 672,000-frame loopback/microphone-0 pairs,
++each in its own process with the explicit initial unit response. The
++[raw reports and acquisition receipt](2026-09-07_measured_acoustic_return/) retain source files,
++hashes, selected channels, full clock/support and stage costs. Native exact sections and cold WAVs
++remain outside Git at `.local/experiments/soundcam-native-return/row_{000,001,002}/`.
++The thirty acquired microphone recordings are available material; these executions use three.
++
++[established-bounded; measured] `compare_recorded_acoustic_return.py` verifies the selected
++source NPY arrays against every WAV sample, every coordinate of the native prediction and
++oriented difference, clocks, common support, terminal PCM and its exact projection residual.
++All three reports pass, including 1,344,000 real/imaginary coordinates in each returned section.
++Four negative observer controls reject a changed clock, a declared hot numerical readout, an
++altered final exact coefficient with its hash updated, and altered PCM with its hash updated.
++The acquisition's local malformed dtype and bounded-deflate controls also pass. Original arrays
++and acquired WAVs remain untouched; no source, cache or evidence was removed.
++
++[established-bounded; measured] M1 Pro debug-build wall times in seconds are:
++
++| SoundCam row / microphone | Native prediction | Native oriented return | Cold exact prediction | Cold difference + audio | Whole process study |
++|---|---:|---:|---:|---:|---:|
++| 0 / 0 | 1.078520 | 1.342001 | 0.167540 | 14.405782 | 18.764140 |
++| 1 / 0 | 1.098458 | 1.355091 | 0.167959 | 14.450938 | 17.921433 |
++| 2 / 0 | 1.098214 | 1.364538 | 0.174234 | 14.719390 | 18.204402 |
++
++[established-bounded; measured] Each prediction and difference has one deed, zero numerical
++readouts/ingress and 64 receipt bytes. Peak tracked native residency is 139,776,340 bytes;
++86,016,112 remain while the complete operands and outputs are borrowed. Each cold section read
++returns 21,504,016 bytes. No PCM sample clips in these three returns. CPU codec objects, process
++RSS and durable bytes are separate from the native residency census. GPU timestamps are present;
++the raw reports distinguish them from wall time. This is batch execution with an expensive cold
++codec, not a completed real-time streaming application or a measured power claim.
++
++[established-bounded; measured] The unit-response defect has respectively about 3.68, 4.38 and
++3.12 times the recorded microphone's squared PCM amplitude sum. The exact ratios and complete
++oriented currents survive in the reports/artifacts. This exposes the starting model's discrepancy;
++it does not attribute that discrepancy to one physical cause or establish acoustic learning.
++The CUDA counterpart was inspected, but CUDA compilation/execution was unavailable on this Mac.
++No Lean source or import changed.
++
++## Remaining developmental attachment
++
++[open] The measured difference is now available as a resident rational current, with its actual
++source/receiver support. A declared acoustic action and its condition/contact law must use that
++evidence to develop persistent generative standing. An exact condition fibre may be empty when
++a restricted action cannot represent an observation; noise and unmodelled transport must remain
++explicit instead of manufacturing a compatible target. A residual receiver alone does not
++perform that development. Useful sound perception/production, English/conversation capability
++and the complete continuing streaming application remain open under the active AS4–AS5 goal.
+diff --git a/research/records/2026-09-07_measured_acoustic_return/acquisition.json b/research/records/2026-09-07_measured_acoustic_return/acquisition.json
+new file mode 100644
+index 00000000..59fb9da5
+--- /dev/null
++++ b/research/records/2026-09-07_measured_acoustic_return/acquisition.json
+@@ -0,0 +1,1386 @@
++{
++  "archive": {
++    "downloaded_archive": false,
++    "etag": "\"6700980d-2753daa6\"",
++    "last_modified": "Sat, 05 Oct 2024 01:36:13 GMT",
++    "selected_ranges": [
++      {
++        "bytes": 1048576,
++        "end": 659806885,
++        "etag": "\"6700980d-2753daa6\"",
++        "purpose": "ZIP central directory",
++        "start": 658758310
++      },
++      {
++        "bytes": 4096,
++        "end": 432808090,
++        "etag": "\"6700980d-2753daa6\"",
++        "purpose": "TreatedRoomSmallSet/Human1/music_audio.npy local header",
++        "start": 432803995
++      },
++      {
++        "bytes": 27658583,
++        "end": 460462677,
++        "etag": "\"6700980d-2753daa6\"",
++        "purpose": "TreatedRoomSmallSet/Human1/music_audio.npy compressed payload",
++        "start": 432804095
++      },
++      {
++        "bytes": 4096,
++        "end": 430182927,
++        "etag": "\"6700980d-2753daa6\"",
++        "purpose": "TreatedRoomSmallSet/Human1/music_directlines.npy local header",
++        "start": 430178832
++      },
++      {
++        "bytes": 2625057,
++        "end": 432803994,
++        "etag": "\"6700980d-2753daa6\"",
++        "purpose": "TreatedRoomSmallSet/Human1/music_directlines.npy compressed payload",
++        "start": 430178938
++      }
++    ],
++    "size_bytes": 659806886,
++    "url": "https://downloads.cs.stanford.edu/viscam/SoundCam/TreatedRoomSmallSet.zip"
++  },
++  "collection_clock": {
++    "citation": "SoundCam paper Appendix D.3: synchronized MOTU 8M interfaces at 48 kHz",
++    "frame_count": 672000,
++    "origin_frame": 0,
++    "origin_seconds": "0",
++    "sample_rate_hz": 48000
++  },
++  "dataset": "SoundCam",
++  "dataset_url": "https://purl.stanford.edu/xq364hd5023",
++  "doi": "https://doi.org/10.25740/xq364hd5023",
++  "entries": {
++    "empty_music_sources_provenance": {
++      "archive_member": "TreatedRoomSmallSet/Empty/music_sources.npy",
++      "downloaded": false,
++      "same_crc_as_human1_source": true,
++      "zip_crc32": "6c3d954c"
++    },
++    "music_audio.npy": {
++      "archive_member": "TreatedRoomSmallSet/Human1/music_audio.npy",
++      "compressed_bytes": 27658583,
++      "dtype": "<i2",
++      "sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++      "shape": [
++        3,
++        10,
++        672000
++      ],
++      "uncompressed_bytes": 40320128,
++      "zip_crc32": "74320442"
++    },
++    "music_directlines.npy": {
++      "archive_member": "TreatedRoomSmallSet/Human1/music_directlines.npy",
++      "compressed_bytes": 2625057,
++      "dtype": "<i2",
++      "sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++      "shape": [
++        3,
++        672000
++      ],
++      "uncompressed_bytes": 4032128,
++      "zip_crc32": "52bf1d9c"
++    },
++    "music_sources.npy": {
++      "archive_member": "TreatedRoomSmallSet/Human1/music_sources.npy",
++      "downloaded": false,
++      "dtype": "<f8",
++      "reason": "float64 digital source intentionally not acquired; electrical loopback is the measured excitation witness",
++      "sha256": null,
++      "sha256_available": false,
++      "sha256_reason": "member intentionally not acquired",
++      "shape": [
++        3,
++        672000
++      ],
++      "uncompressed_bytes": 16128128,
++      "used_as_native_input": false,
++      "zip_crc32": "6c3d954c"
++    }
++  },
++  "license": {
++    "basis": "SoundCam datasheet and Stanford repository metadata",
++    "name": "MIT",
++    "url": "https://opensource.org/license/mit/"
++  },
++  "native_current_formation": false,
++  "not_acquired": [
++    "music_sources.npy",
++    "music_deconvolved.npy",
++    "adjusted_music.npy",
++    "all other archive members"
++  ],
++  "pairs": [
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_000/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 0
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
++      },
++      "microphone": 0,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_000/microphone_00.wav",
++        "selector": {
++          "channel": 0,
++          "row": 0
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "e20fd5db50601393f2623042ea45cbce163dfd071ad6debb6eda27a9a7b08394"
++      },
++      "origin_frame": 0,
++      "row": 0,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_000/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 0
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
++      },
++      "microphone": 1,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_000/microphone_01.wav",
++        "selector": {
++          "channel": 1,
++          "row": 0
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "bd8294218f19b95d33e345e66eb5d5cb38d89adf1be0601369e25254c50ee1a0"
++      },
++      "origin_frame": 0,
++      "row": 0,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_000/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 0
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
++      },
++      "microphone": 2,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_000/microphone_02.wav",
++        "selector": {
++          "channel": 2,
++          "row": 0
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "274a152f92191cb4f335094aa07431664e9569f44a8b669db5207bd8faa15235"
++      },
++      "origin_frame": 0,
++      "row": 0,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_000/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 0
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
++      },
++      "microphone": 3,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_000/microphone_03.wav",
++        "selector": {
++          "channel": 3,
++          "row": 0
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "310fe594e9885bd18aaa178daf25798247ee7e48dae79a32f39d57357b910bf1"
++      },
++      "origin_frame": 0,
++      "row": 0,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_000/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 0
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
++      },
++      "microphone": 4,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_000/microphone_04.wav",
++        "selector": {
++          "channel": 4,
++          "row": 0
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "7aa284e035f06c990965842b72fcc1d5b8354e1f62906c98e4afd64b7b290ceb"
++      },
++      "origin_frame": 0,
++      "row": 0,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_000/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 0
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
++      },
++      "microphone": 5,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_000/microphone_05.wav",
++        "selector": {
++          "channel": 5,
++          "row": 0
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "3afde73585933b5dca6605d243048e14df3228bfd172573e1f7b514552208988"
++      },
++      "origin_frame": 0,
++      "row": 0,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_000/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 0
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
++      },
++      "microphone": 6,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_000/microphone_06.wav",
++        "selector": {
++          "channel": 6,
++          "row": 0
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "f862f3415364f89463f3b402c5e55e975584677a351116b85a9d1819816824cd"
++      },
++      "origin_frame": 0,
++      "row": 0,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_000/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 0
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
++      },
++      "microphone": 7,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_000/microphone_07.wav",
++        "selector": {
++          "channel": 7,
++          "row": 0
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "2751131583997b0d2b9a100438a022c28f2676acb566da544b429a907ae1e301"
++      },
++      "origin_frame": 0,
++      "row": 0,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_000/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 0
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
++      },
++      "microphone": 8,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_000/microphone_08.wav",
++        "selector": {
++          "channel": 8,
++          "row": 0
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "27c0f1a01ddceb9680d43385f4bf7f44a549056c5fbaf63d160a7d1910230ff0"
++      },
++      "origin_frame": 0,
++      "row": 0,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_000/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 0
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
++      },
++      "microphone": 9,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_000/microphone_09.wav",
++        "selector": {
++          "channel": 9,
++          "row": 0
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "1606a0b300d655a44071e42359372b609514d090ab0764296a049356ee5694ac"
++      },
++      "origin_frame": 0,
++      "row": 0,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_001/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 1
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
++      },
++      "microphone": 0,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_001/microphone_00.wav",
++        "selector": {
++          "channel": 0,
++          "row": 1
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "b7a88809e4ba46590c43982b76d0efc5727ad492e88fd9c526c529c28d60c1fd"
++      },
++      "origin_frame": 0,
++      "row": 1,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_001/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 1
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
++      },
++      "microphone": 1,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_001/microphone_01.wav",
++        "selector": {
++          "channel": 1,
++          "row": 1
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "94ca3d1c7cc1a330bf8911310fc7f9b2df7716c389e99d103d16dc6b16771349"
++      },
++      "origin_frame": 0,
++      "row": 1,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_001/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 1
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
++      },
++      "microphone": 2,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_001/microphone_02.wav",
++        "selector": {
++          "channel": 2,
++          "row": 1
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "1e90ff4e77f816ec8600ffaf9a74c712d733cbe2871393e901dfd01f8b1218ed"
++      },
++      "origin_frame": 0,
++      "row": 1,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_001/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 1
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
++      },
++      "microphone": 3,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_001/microphone_03.wav",
++        "selector": {
++          "channel": 3,
++          "row": 1
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "c2a8a87795c35ef0a8eec1a69eda89dc41f1d04d38c18beb08879b2418224021"
++      },
++      "origin_frame": 0,
++      "row": 1,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_001/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 1
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
++      },
++      "microphone": 4,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_001/microphone_04.wav",
++        "selector": {
++          "channel": 4,
++          "row": 1
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "5b890f276a6596f0852999ec2e233d2bf7b23ac96c67e6edbf4c0868debff514"
++      },
++      "origin_frame": 0,
++      "row": 1,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_001/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 1
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
++      },
++      "microphone": 5,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_001/microphone_05.wav",
++        "selector": {
++          "channel": 5,
++          "row": 1
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "2c91b1611553f43c22011aa3124c012f059bf36739dbc5bb48d8627df40dcedb"
++      },
++      "origin_frame": 0,
++      "row": 1,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_001/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 1
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
++      },
++      "microphone": 6,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_001/microphone_06.wav",
++        "selector": {
++          "channel": 6,
++          "row": 1
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "9321b7608ce55714981583c1894e98cb5982670fffc2f0bf989b569e797e6631"
++      },
++      "origin_frame": 0,
++      "row": 1,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_001/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 1
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
++      },
++      "microphone": 7,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_001/microphone_07.wav",
++        "selector": {
++          "channel": 7,
++          "row": 1
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "d2fa9d4921d7075a4f80f8b238cd6eeacc6bef2ac0fbd61f9770bfec6f1b4ba4"
++      },
++      "origin_frame": 0,
++      "row": 1,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_001/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 1
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
++      },
++      "microphone": 8,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_001/microphone_08.wav",
++        "selector": {
++          "channel": 8,
++          "row": 1
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "d144be8a86db06425f95a1b4a50dff006e05b8add8f222d57ae5d2b8a8e7a886"
++      },
++      "origin_frame": 0,
++      "row": 1,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_001/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 1
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
++      },
++      "microphone": 9,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_001/microphone_09.wav",
++        "selector": {
++          "channel": 9,
++          "row": 1
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "b0c65287f721ad05a98fde90f9498d5cdd20bcc1257ac2a8cb01831625d770f9"
++      },
++      "origin_frame": 0,
++      "row": 1,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_002/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 2
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
++      },
++      "microphone": 0,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_002/microphone_00.wav",
++        "selector": {
++          "channel": 0,
++          "row": 2
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "e5155416859bce4fe7d41ef755741f6af0e28003bf2d9cd776145fccdfbc2121"
++      },
++      "origin_frame": 0,
++      "row": 2,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_002/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 2
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
++      },
++      "microphone": 1,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_002/microphone_01.wav",
++        "selector": {
++          "channel": 1,
++          "row": 2
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "4d877f551f5a6e2f3e0b28f4b15295487a9beae55cf22a3a84327ebb331b37c6"
++      },
++      "origin_frame": 0,
++      "row": 2,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_002/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 2
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
++      },
++      "microphone": 2,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_002/microphone_02.wav",
++        "selector": {
++          "channel": 2,
++          "row": 2
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "b6e8ef7382299c386187df8f3bfa86a82c53ec7e545807816ec9d52f42787194"
++      },
++      "origin_frame": 0,
++      "row": 2,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_002/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 2
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
++      },
++      "microphone": 3,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_002/microphone_03.wav",
++        "selector": {
++          "channel": 3,
++          "row": 2
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "3b4b8fd78ff84f7ea61e951c20316802d300967c755173ec81f24cfbfba14658"
++      },
++      "origin_frame": 0,
++      "row": 2,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_002/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 2
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
++      },
++      "microphone": 4,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_002/microphone_04.wav",
++        "selector": {
++          "channel": 4,
++          "row": 2
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "dbc359ccf1f1c6d6eb9d5c0adc7e47d234c2c91aeea6c9867604813688eaf344"
++      },
++      "origin_frame": 0,
++      "row": 2,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_002/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 2
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
++      },
++      "microphone": 5,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_002/microphone_05.wav",
++        "selector": {
++          "channel": 5,
++          "row": 2
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "8ddf94bb62d8f96c78111c3374c3ce6395c4d77f6a40b49cf7b8da743358d252"
++      },
++      "origin_frame": 0,
++      "row": 2,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_002/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 2
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
++      },
++      "microphone": 6,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_002/microphone_06.wav",
++        "selector": {
++          "channel": 6,
++          "row": 2
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "af8c0b03c395b6071f15ff884f34a92cea9f6b1af7d781b844f54b3b99489ac6"
++      },
++      "origin_frame": 0,
++      "row": 2,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_002/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 2
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
++      },
++      "microphone": 7,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_002/microphone_07.wav",
++        "selector": {
++          "channel": 7,
++          "row": 2
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "9ec89049cdfeb9e5397a96008fa24fdcc1f51a90ba3c5da450caa97bda3fc102"
++      },
++      "origin_frame": 0,
++      "row": 2,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_002/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 2
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
++      },
++      "microphone": 8,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_002/microphone_08.wav",
++        "selector": {
++          "channel": 8,
++          "row": 2
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "7c80691eefd708d88d24d71fe6253c8c1a4509b7630e034c3993bf154d1a17fa"
++      },
++      "origin_frame": 0,
++      "row": 2,
++      "sample_rate_hz": 48000
++    },
++    {
++      "loopback": {
++        "frames": 672000,
++        "path": "wav/row_002/loopback.wav",
++        "selector": {
++          "channel": "loopback",
++          "row": 2
++        },
++        "source_array": "music_directlines.npy",
++        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
++        "wav_sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
++      },
++      "microphone": 9,
++      "microphone_recording": {
++        "frames": 672000,
++        "path": "wav/row_002/microphone_09.wav",
++        "selector": {
++          "channel": 9,
++          "row": 2
++        },
++        "source_array": "music_audio.npy",
++        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
++        "wav_sha256": "65879f2a9a10ebe38579704facdf74a30966ab38d34b2424750b91d4fdab8b80"
++      },
++      "origin_frame": 0,
++      "row": 2,
++      "sample_rate_hz": 48000
++    }
++  ],
++  "paper_url": "https://arxiv.org/pdf/2311.03517.pdf",
++  "project_url": "https://masonlwang.com/soundcam/",
++  "raw_outputs": {
++    "music_audio_npy": "raw/TreatedRoomSmallSet/Human1/music_audio.npy",
++    "music_directlines_npy": "raw/TreatedRoomSmallSet/Human1/music_directlines.npy"
++  },
++  "schema": "soundcam-selective-acquisition.v1",
++  "selectors": {
++    "folder": "TreatedRoomSmallSet/Human1",
++    "loopback_channel": "music_directlines.npy",
++    "microphone_channels": [
++      0,
++      1,
++      2,
++      3,
++      4,
++      5,
++      6,
++      7,
++      8,
++      9
++    ],
++    "rows": [
++      0,
++      1,
++      2
++    ]
++  },
++  "semantic_conditions": false,
++  "wav_outputs": [
++    {
++      "array": "music_directlines.npy",
++      "channel": "loopback",
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_000/loopback.wav",
++      "pcm16_sha256": "48b0d8728c8442ff9a847849bbb7dd41ea37cebb47610af1411c01aeb791c8c5",
++      "row": 0,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 0,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_000/microphone_00.wav",
++      "pcm16_sha256": "24c88b289eed250cfe6ee28dae72ec16b9ad6a4adcbdf6cd857c2508d62101e0",
++      "row": 0,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "e20fd5db50601393f2623042ea45cbce163dfd071ad6debb6eda27a9a7b08394"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 1,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_000/microphone_01.wav",
++      "pcm16_sha256": "9b9deae640eb89356daa47c47b9516fff5bbc62f4d3f656d9c64d2f6f8641796",
++      "row": 0,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "bd8294218f19b95d33e345e66eb5d5cb38d89adf1be0601369e25254c50ee1a0"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 2,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_000/microphone_02.wav",
++      "pcm16_sha256": "159ac047ce6c63f1aeda6e1bc9651ef6ef6b0943601b16de5b8dc4e4c9f00113",
++      "row": 0,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "274a152f92191cb4f335094aa07431664e9569f44a8b669db5207bd8faa15235"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 3,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_000/microphone_03.wav",
++      "pcm16_sha256": "d1e89c2c61c0ba616f4c77e8082705f007be66b24d7c1b41b0fb441b4caf5306",
++      "row": 0,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "310fe594e9885bd18aaa178daf25798247ee7e48dae79a32f39d57357b910bf1"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 4,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_000/microphone_04.wav",
++      "pcm16_sha256": "54fb6e3ade3821a5c06855bcab30f1cb01a84e928ce4085c3f4472f92a94b78b",
++      "row": 0,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "7aa284e035f06c990965842b72fcc1d5b8354e1f62906c98e4afd64b7b290ceb"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 5,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_000/microphone_05.wav",
++      "pcm16_sha256": "9c5b2a8fd104b1a9e7a9e2091c7329ab22ef70e06d07e5664dc3541084d2f76a",
++      "row": 0,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "3afde73585933b5dca6605d243048e14df3228bfd172573e1f7b514552208988"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 6,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_000/microphone_06.wav",
++      "pcm16_sha256": "682f471829b7867a3d0e2590e5861b784a574b9b70649f5a5babf327369b3312",
++      "row": 0,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "f862f3415364f89463f3b402c5e55e975584677a351116b85a9d1819816824cd"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 7,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_000/microphone_07.wav",
++      "pcm16_sha256": "79608f810524ff749dab08f1c7e98c04bd22a5f69dc26277f12ec2cdf14e87fb",
++      "row": 0,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "2751131583997b0d2b9a100438a022c28f2676acb566da544b429a907ae1e301"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 8,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_000/microphone_08.wav",
++      "pcm16_sha256": "dbb8a77e77d2070a356eaa2fc1cf6aad5346656b9dbcade04a83a42c5c182b1b",
++      "row": 0,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "27c0f1a01ddceb9680d43385f4bf7f44a549056c5fbaf63d160a7d1910230ff0"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 9,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_000/microphone_09.wav",
++      "pcm16_sha256": "940106353d78b7f76c3daf7e0eb8db031546d20eee71feb7397e9b3e1bc88b58",
++      "row": 0,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "1606a0b300d655a44071e42359372b609514d090ab0764296a049356ee5694ac"
++    },
++    {
++      "array": "music_directlines.npy",
++      "channel": "loopback",
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_001/loopback.wav",
++      "pcm16_sha256": "848d85a31b2d7bd829f163cf958cdf9585c82722350b890a98aec8b11b656afa",
++      "row": 1,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 0,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_001/microphone_00.wav",
++      "pcm16_sha256": "f02bbaf5b9bef32f06e8eac446678cf62be9919cc8a0275f498ad680665fcce7",
++      "row": 1,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "b7a88809e4ba46590c43982b76d0efc5727ad492e88fd9c526c529c28d60c1fd"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 1,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_001/microphone_01.wav",
++      "pcm16_sha256": "488ce3fe59054d29d18785a08346560c19646d4f611661c68d729f429bed2f49",
++      "row": 1,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "94ca3d1c7cc1a330bf8911310fc7f9b2df7716c389e99d103d16dc6b16771349"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 2,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_001/microphone_02.wav",
++      "pcm16_sha256": "717f4873d4be9347cad7df4757ec9f70863916e7646e28c896cfd2b2ab4d32cb",
++      "row": 1,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "1e90ff4e77f816ec8600ffaf9a74c712d733cbe2871393e901dfd01f8b1218ed"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 3,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_001/microphone_03.wav",
++      "pcm16_sha256": "f6079f94fe03cf758cce6170f50a9a120ce4b3f2bf98775a808033c0fc79c8cb",
++      "row": 1,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "c2a8a87795c35ef0a8eec1a69eda89dc41f1d04d38c18beb08879b2418224021"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 4,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_001/microphone_04.wav",
++      "pcm16_sha256": "258e0ca4ca083a4bd963c927fb7d07b1c76dcce3f069842d103b3a8f1b4173d5",
++      "row": 1,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "5b890f276a6596f0852999ec2e233d2bf7b23ac96c67e6edbf4c0868debff514"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 5,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_001/microphone_05.wav",
++      "pcm16_sha256": "f7f90e17441930b396aa7b7a4a25a4c7e0b50d9ac5660d70d4351067ea95fc75",
++      "row": 1,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "2c91b1611553f43c22011aa3124c012f059bf36739dbc5bb48d8627df40dcedb"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 6,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_001/microphone_06.wav",
++      "pcm16_sha256": "4dfbf3af694544acb842aaebad9c4c4fe2430853bd56df155ea6939e44a47aea",
++      "row": 1,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "9321b7608ce55714981583c1894e98cb5982670fffc2f0bf989b569e797e6631"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 7,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_001/microphone_07.wav",
++      "pcm16_sha256": "96c4bb437b1676b21ab72f7f762354d083938b0967b7eed8d3fae4be2beeabe6",
++      "row": 1,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "d2fa9d4921d7075a4f80f8b238cd6eeacc6bef2ac0fbd61f9770bfec6f1b4ba4"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 8,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_001/microphone_08.wav",
++      "pcm16_sha256": "88f2655e620646632cb85db2574b9c3196c0275b19bc64aa437b35c8230f2770",
++      "row": 1,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "d144be8a86db06425f95a1b4a50dff006e05b8add8f222d57ae5d2b8a8e7a886"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 9,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_001/microphone_09.wav",
++      "pcm16_sha256": "ed34972cf0366220f28f8d049a210adf1475100ad401ce81f960711e2ef01cf0",
++      "row": 1,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "b0c65287f721ad05a98fde90f9498d5cdd20bcc1257ac2a8cb01831625d770f9"
++    },
++    {
++      "array": "music_directlines.npy",
++      "channel": "loopback",
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_002/loopback.wav",
++      "pcm16_sha256": "0aeb736aff3dfc63a5c0902845fdea4309a95855c9128895c3e1dc3bcb51b0ce",
++      "row": 2,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 0,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_002/microphone_00.wav",
++      "pcm16_sha256": "21b736da8633f0509cabf356a61df6a60f852ea7786a8f1275c5a43b2a70363a",
++      "row": 2,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "e5155416859bce4fe7d41ef755741f6af0e28003bf2d9cd776145fccdfbc2121"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 1,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_002/microphone_01.wav",
++      "pcm16_sha256": "26c925bf1ad4ec3f3199d9611dee4347ff785eb8a9070993d633b239f59b716e",
++      "row": 2,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "4d877f551f5a6e2f3e0b28f4b15295487a9beae55cf22a3a84327ebb331b37c6"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 2,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_002/microphone_02.wav",
++      "pcm16_sha256": "0aec62fae5e42463155bb25da01e4ca8b27c865e9536e9d9786fffc0148c541f",
++      "row": 2,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "b6e8ef7382299c386187df8f3bfa86a82c53ec7e545807816ec9d52f42787194"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 3,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_002/microphone_03.wav",
++      "pcm16_sha256": "540cab0418ae8f1ae39ac89e494cb136da77f096f52d9e54b365daf9c703099b",
++      "row": 2,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "3b4b8fd78ff84f7ea61e951c20316802d300967c755173ec81f24cfbfba14658"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 4,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_002/microphone_04.wav",
++      "pcm16_sha256": "174c8d015a719b549f2c92ed890e6aaa32425cd30270a2750b239b3781c4256d",
++      "row": 2,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "dbc359ccf1f1c6d6eb9d5c0adc7e47d234c2c91aeea6c9867604813688eaf344"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 5,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_002/microphone_05.wav",
++      "pcm16_sha256": "b4e7d4ebb47c3a1ab7b4b8f3b3370dead8a92ae11575dbaf523726bf0c22633b",
++      "row": 2,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "8ddf94bb62d8f96c78111c3374c3ce6395c4d77f6a40b49cf7b8da743358d252"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 6,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_002/microphone_06.wav",
++      "pcm16_sha256": "f20720549cf05a60950afee8dc71706ecf22d4dca769e279fe8fd54468bf1a4d",
++      "row": 2,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "af8c0b03c395b6071f15ff884f34a92cea9f6b1af7d781b844f54b3b99489ac6"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 7,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_002/microphone_07.wav",
++      "pcm16_sha256": "6183a01a34962e8d331649cfb428848fdbe808870e7205ecf80ac647adb45c1a",
++      "row": 2,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "9ec89049cdfeb9e5397a96008fa24fdcc1f51a90ba3c5da450caa97bda3fc102"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 8,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_002/microphone_08.wav",
++      "pcm16_sha256": "989c1acc27484b7d39962c87d99d38e7f08ea8c81bdea950cb6a1053fc72403c",
++      "row": 2,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "7c80691eefd708d88d24d71fe6253c8c1a4509b7630e034c3993bf154d1a17fa"
++    },
++    {
++      "array": "music_audio.npy",
++      "channel": 9,
++      "frame_count": 672000,
++      "origin_frame": 0,
++      "path": "wav/row_002/microphone_09.wav",
++      "pcm16_sha256": "4c658c7c1035e4c4fe6d73a792967cb16739f777f64c0902c7cb6757cc7c4cda",
++      "row": 2,
++      "sample_rate_hz": 48000,
++      "wav_bytes": 1344044,
++      "wav_sha256": "65879f2a9a10ebe38579704facdf74a30966ab38d34b2424750b91d4fdab8b80"
++    }
++  ]
++}
+diff --git a/research/records/2026-09-07_measured_acoustic_return/comparison.json b/research/records/2026-09-07_measured_acoustic_return/comparison.json
+new file mode 100644
+index 00000000..e7a5564a
+--- /dev/null
++++ b/research/records/2026-09-07_measured_acoustic_return/comparison.json
+@@ -0,0 +1,86 @@
++{
++  "verified": true,
++  "returns": [
++    {
++      "verified": true,
++      "row": 0,
++      "microphone": 0,
++      "frames": 672000,
++      "sample_rate": 48000,
++      "qualified_raw_arrays_match_wavs": true,
++      "complete_oriented_difference_matches": true,
++      "projection_fibre_reconstructs": true,
++      "zero_native_numerical_readouts": true,
++      "sections": {
++        "prediction": {
++          "sha256": "d70902b9f7d4d943f25da69b6cbedb299a7367d83093d459e02988e6fa68e06a",
++          "coordinates_verified": 1344000,
++          "denominator": 32768
++        },
++        "difference": {
++          "sha256": "bfb3dd38dd4af442e396471dd5868273930e8333c11fdc4fa999ddb1e44a543d",
++          "coordinates_verified": 1344000,
++          "denominator": 32768
++        }
++      },
++      "observed_pcm_square_sum": 624263408838,
++      "defect_pcm_square_sum": 2296313232289,
++      "defect_to_observed_energy_ratio": "2296313232289/624263408838",
++      "scope": "unit-response baseline versus actual measured channels; no fitted acoustic model"
++    },
++    {
++      "verified": true,
++      "row": 1,
++      "microphone": 0,
++      "frames": 672000,
++      "sample_rate": 48000,
++      "qualified_raw_arrays_match_wavs": true,
++      "complete_oriented_difference_matches": true,
++      "projection_fibre_reconstructs": true,
++      "zero_native_numerical_readouts": true,
++      "sections": {
++        "prediction": {
++          "sha256": "edd7e4b90bbeb6c79e9fb50575ab1710845083b5ae85dd6c4c0d4ec3f3451ddb",
++          "coordinates_verified": 1344000,
++          "denominator": 32768
++        },
++        "difference": {
++          "sha256": "c28b95f6e10c2ce6172dbe950aeeb739feedca411e64192d258a2b266194f86f",
++          "coordinates_verified": 1344000,
++          "denominator": 32768
++        }
++      },
++      "observed_pcm_square_sum": 583640951579,
++      "defect_pcm_square_sum": 2559022134613,
++      "defect_to_observed_energy_ratio": "365574590659/83377278797",
++      "scope": "unit-response baseline versus actual measured channels; no fitted acoustic model"
++    },
++    {
++      "verified": true,
++      "row": 2,
++      "microphone": 0,
++      "frames": 672000,
++      "sample_rate": 48000,
++      "qualified_raw_arrays_match_wavs": true,
++      "complete_oriented_difference_matches": true,
++      "projection_fibre_reconstructs": true,
++      "zero_native_numerical_readouts": true,
++      "sections": {
++        "prediction": {
++          "sha256": "8fa262fb85050bc10cb7738f1d9da883ff8a81810644f6dc66150585c432f993",
++          "coordinates_verified": 1344000,
++          "denominator": 32768
++        },
++        "difference": {
++          "sha256": "7b9db63aef75ee04ef817c15d1fab2b1be3e07edf3f4ba32f814bf2ffbdd77e0",
++          "coordinates_verified": 1344000,
++          "denominator": 32768
++        }
++      },
++      "observed_pcm_square_sum": 1268724676088,
++      "defect_pcm_square_sum": 3953252227199,
++      "defect_to_observed_energy_ratio": "3953252227199/1268724676088",
++      "scope": "unit-response baseline versus actual measured channels; no fitted acoustic model"
++    }
++  ]
++}
+diff --git a/research/records/2026-09-07_measured_acoustic_return/observer-controls.json b/research/records/2026-09-07_measured_acoustic_return/observer-controls.json
+new file mode 100644
+index 00000000..0f35fd5c
+--- /dev/null
++++ b/research/records/2026-09-07_measured_acoustic_return/observer-controls.json
+@@ -0,0 +1,29 @@
++{
++  "all_refused": true,
++  "controls": [
++    {
++      "control": "clock",
++      "refused": true,
++      "comparison_line": 70,
++      "condition": "assert rate == claimed[\"sample_rate\"] == pair[\"sample_rate_hz\"]"
++    },
++    {
++      "control": "hot-readout",
++      "refused": true,
++      "comparison_line": 110,
++      "condition": "assert stage[\"section_readouts\"] == stage[\"numerical_egress_octets\"] == stage[\"ingress_octets\"] == 0"
++    },
++    {
++      "control": "exact-tail",
++      "refused": true,
++      "comparison_line": 45,
++      "condition": "assert np.array_equal(coordinates * (32768 // den), expected)"
++    },
++    {
++      "control": "pcm-sample",
++      "refused": true,
++      "comparison_line": 104,
++      "condition": "assert pcm_rate == rate and np.array_equal(actual_pcm, expected_pcm)"
++    }
++  ]
++}
+\ No newline at end of file
+diff --git a/research/records/2026-09-07_measured_acoustic_return/row_000.json b/research/records/2026-09-07_measured_acoustic_return/row_000.json
+new file mode 100644
+index 00000000..9da91f71
+--- /dev/null
++++ b/research/records/2026-09-07_measured_acoustic_return/row_000.json
+@@ -0,0 +1,192 @@
++{
++  "clock_contract": "caller supplies simultaneously recorded raw channels with common origin; no delay alignment or resampling",
++  "device": "Apple M1 Pro",
++  "difference": {
++    "clipped_sample_population": 0,
++    "frames": 672000,
++    "lineage": 5,
++    "origin": "0",
++    "pcm_gain": 32768,
++    "projection_fibre": "the complete exact section is retained; remainder = current * gain - PCM at each timed quadrature",
++    "receiver": 9,
++    "sample_step": "1/48000",
++    "section_octets": 21504056,
++    "section_path": "/Users/brandonduggan/Workspaces/holonics/.local/experiments/soundcam-native-return/row_000/difference.section",
++    "section_sha256": "bfb3dd38dd4af442e396471dd5868273930e8333c11fdc4fa999ddb1e44a543d",
++    "wav_path": "/Users/brandonduggan/Workspaces/holonics/.local/experiments/soundcam-native-return/row_000/difference.wav",
++    "wav_sha256": "9fd2a9305c64c929351bb46b6d357535eeba3fa22153211ca9b29bd9050b3074"
++  },
++  "divisor": 32768,
++  "excitation": {
++    "frames": 672000,
++    "occurrence": "recorded-excitation",
++    "octets": 1344044,
++    "origin": "0",
++    "path": "/Users/brandonduggan/Workspaces/holonics/.local/datasets/soundcam/wav/row_000/loopback.wav",
++    "sample_rate": 48000,
++    "sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
++  },
++  "initial_response": {
++    "denominator": 1,
++    "extent": 1,
++    "imaginary": 0,
++    "origin": "0",
++    "real": 1
++  },
++  "initial_response_scope": "explicit unit digital starting current, not a measured room transfer or cultivated model",
++  "native_development": "none; this receiver retains the actual defect for subsequent constitutive contact",
++  "observation": {
++    "frames": 672000,
++    "occurrence": "recorded-microphone-return",
++    "octets": 1344044,
++    "origin": "0",
++    "path": "/Users/brandonduggan/Workspaces/holonics/.local/datasets/soundcam/wav/row_000/microphone_00.wav",
++    "sample_rate": 48000,
++    "sha256": "e20fd5db50601393f2623042ea45cbce163dfd071ad6debb6eda27a9a7b08394"
++  },
++  "phase_extent": 4,
++  "prediction": {
++    "frames": 672000,
++    "lineage": 4,
++    "origin": "0",
++    "receiver": 9,
++    "sample_step": "1/48000",
++    "section_octets": 21504056,
++    "section_path": "/Users/brandonduggan/Workspaces/holonics/.local/experiments/soundcam-native-return/row_000/prediction.section",
++    "section_sha256": "d70902b9f7d4d943f25da69b6cbedb299a7367d83093d459e02988e6fa68e06a"
++  },
++  "schema": "holonics.recorded-acoustic-return.v1",
++  "seconds": 18.76414025,
++  "stages": {
++    "cold_difference_and_audio": {
++      "allocations": 0,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 21504016,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 86016112,
++      "resident_octets_peak": 139776340,
++      "seconds": 14.405782291,
++      "section_readouts": 1,
++      "unavailable_gpu_timestamps": 0
++    },
++    "cold_prediction": {
++      "allocations": 0,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 21504016,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 86016112,
++      "resident_octets_peak": 139776340,
++      "seconds": 0.167540417,
++      "section_readouts": 1,
++      "unavailable_gpu_timestamps": 0
++    },
++    "mount_excitation": {
++      "allocations": 2,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 21504016,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 21504016,
++      "resident_octets_peak": 21504016,
++      "seconds": 0.088801917,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "mount_initial_response": {
++      "allocations": 2,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 48,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 21504064,
++      "resident_octets_peak": 21504064,
++      "seconds": 0.000037375,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "mount_observed_return": {
++      "allocations": 2,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 21504016,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 64512096,
++      "resident_octets_peak": 96768244,
++      "seconds": 0.090915,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "native_oriented_return": {
++      "allocations": 6,
++      "deeds": 1,
++      "gpu_seconds": 1.3397020833799616,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 64,
++      "resident_octets_now": 86016112,
++      "resident_octets_peak": 139776340,
++      "seconds": 1.342001167,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "predict_before_reception": {
++      "allocations": 6,
++      "deeds": 1,
++      "gpu_seconds": 1.0739278750261292,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 64,
++      "resident_octets_now": 43008080,
++      "resident_octets_peak": 96768244,
++      "seconds": 1.078520375,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    }
++  },
++  "status": "returned",
++  "support": {
++    "begin": [
++      [
++        0,
++        []
++      ],
++      [
++        1,
++        [
++          1
++        ]
++      ]
++    ],
++    "end": [
++      [
++        1,
++        [
++          14
++        ]
++      ],
++      [
++        1,
++        [
++          1
++        ]
++      ]
++    ],
++    "observed": {
++      "end": 672000,
++      "start": 0
++    },
++    "predicted": {
++      "end": 672000,
++      "start": 0
++    },
++    "unobserved_prediction": [],
++    "unpredicted_observation": []
++  }
++}
+\ No newline at end of file
+diff --git a/research/records/2026-09-07_measured_acoustic_return/row_001.json b/research/records/2026-09-07_measured_acoustic_return/row_001.json
+new file mode 100644
+index 00000000..2c2849b8
+--- /dev/null
++++ b/research/records/2026-09-07_measured_acoustic_return/row_001.json
+@@ -0,0 +1,192 @@
++{
++  "clock_contract": "caller supplies simultaneously recorded raw channels with common origin; no delay alignment or resampling",
++  "device": "Apple M1 Pro",
++  "difference": {
++    "clipped_sample_population": 0,
++    "frames": 672000,
++    "lineage": 5,
++    "origin": "0",
++    "pcm_gain": 32768,
++    "projection_fibre": "the complete exact section is retained; remainder = current * gain - PCM at each timed quadrature",
++    "receiver": 9,
++    "sample_step": "1/48000",
++    "section_octets": 21504056,
++    "section_path": "/Users/brandonduggan/Workspaces/holonics/.local/experiments/soundcam-native-return/row_001/difference.section",
++    "section_sha256": "c28b95f6e10c2ce6172dbe950aeeb739feedca411e64192d258a2b266194f86f",
++    "wav_path": "/Users/brandonduggan/Workspaces/holonics/.local/experiments/soundcam-native-return/row_001/difference.wav",
++    "wav_sha256": "7855d9b019ccaefc49be18f60f8548a6083099580d21ccea344c234783ecf930"
++  },
++  "divisor": 32768,
++  "excitation": {
++    "frames": 672000,
++    "occurrence": "recorded-excitation",
++    "octets": 1344044,
++    "origin": "0",
++    "path": "/Users/brandonduggan/Workspaces/holonics/.local/datasets/soundcam/wav/row_001/loopback.wav",
++    "sample_rate": 48000,
++    "sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
++  },
++  "initial_response": {
++    "denominator": 1,
++    "extent": 1,
++    "imaginary": 0,
++    "origin": "0",
++    "real": 1
++  },
++  "initial_response_scope": "explicit unit digital starting current, not a measured room transfer or cultivated model",
++  "native_development": "none; this receiver retains the actual defect for subsequent constitutive contact",
++  "observation": {
++    "frames": 672000,
++    "occurrence": "recorded-microphone-return",
++    "octets": 1344044,
++    "origin": "0",
++    "path": "/Users/brandonduggan/Workspaces/holonics/.local/datasets/soundcam/wav/row_001/microphone_00.wav",
++    "sample_rate": 48000,
++    "sha256": "b7a88809e4ba46590c43982b76d0efc5727ad492e88fd9c526c529c28d60c1fd"
++  },
++  "phase_extent": 4,
++  "prediction": {
++    "frames": 672000,
++    "lineage": 4,
++    "origin": "0",
++    "receiver": 9,
++    "sample_step": "1/48000",
++    "section_octets": 21504056,
++    "section_path": "/Users/brandonduggan/Workspaces/holonics/.local/experiments/soundcam-native-return/row_001/prediction.section",
++    "section_sha256": "edd7e4b90bbeb6c79e9fb50575ab1710845083b5ae85dd6c4c0d4ec3f3451ddb"
++  },
++  "schema": "holonics.recorded-acoustic-return.v1",
++  "seconds": 17.921433125,
++  "stages": {
++    "cold_difference_and_audio": {
++      "allocations": 0,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 21504016,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 86016112,
++      "resident_octets_peak": 139776340,
++      "seconds": 14.450937625,
++      "section_readouts": 1,
++      "unavailable_gpu_timestamps": 0
++    },
++    "cold_prediction": {
++      "allocations": 0,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 21504016,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 86016112,
++      "resident_octets_peak": 139776340,
++      "seconds": 0.167959291,
++      "section_readouts": 1,
++      "unavailable_gpu_timestamps": 0
++    },
++    "mount_excitation": {
++      "allocations": 2,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 21504016,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 21504016,
++      "resident_octets_peak": 21504016,
++      "seconds": 0.089434791,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "mount_initial_response": {
++      "allocations": 2,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 48,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 21504064,
++      "resident_octets_peak": 21504064,
++      "seconds": 0.000054042,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "mount_observed_return": {
++      "allocations": 2,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 21504016,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 64512096,
++      "resident_octets_peak": 96768244,
++      "seconds": 0.092522666,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "native_oriented_return": {
++      "allocations": 6,
++      "deeds": 1,
++      "gpu_seconds": 1.3539041249314323,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 64,
++      "resident_octets_now": 86016112,
++      "resident_octets_peak": 139776340,
++      "seconds": 1.355090667,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "predict_before_reception": {
++      "allocations": 6,
++      "deeds": 1,
++      "gpu_seconds": 1.0970738750183955,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 64,
++      "resident_octets_now": 43008080,
++      "resident_octets_peak": 96768244,
++      "seconds": 1.098458042,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    }
++  },
++  "status": "returned",
++  "support": {
++    "begin": [
++      [
++        0,
++        []
++      ],
++      [
++        1,
++        [
++          1
++        ]
++      ]
++    ],
++    "end": [
++      [
++        1,
++        [
++          14
++        ]
++      ],
++      [
++        1,
++        [
++          1
++        ]
++      ]
++    ],
++    "observed": {
++      "end": 672000,
++      "start": 0
++    },
++    "predicted": {
++      "end": 672000,
++      "start": 0
++    },
++    "unobserved_prediction": [],
++    "unpredicted_observation": []
++  }
++}
+\ No newline at end of file
+diff --git a/research/records/2026-09-07_measured_acoustic_return/row_002.json b/research/records/2026-09-07_measured_acoustic_return/row_002.json
+new file mode 100644
+index 00000000..15a95ff0
+--- /dev/null
++++ b/research/records/2026-09-07_measured_acoustic_return/row_002.json
+@@ -0,0 +1,192 @@
++{
++  "clock_contract": "caller supplies simultaneously recorded raw channels with common origin; no delay alignment or resampling",
++  "device": "Apple M1 Pro",
++  "difference": {
++    "clipped_sample_population": 0,
++    "frames": 672000,
++    "lineage": 5,
++    "origin": "0",
++    "pcm_gain": 32768,
++    "projection_fibre": "the complete exact section is retained; remainder = current * gain - PCM at each timed quadrature",
++    "receiver": 9,
++    "sample_step": "1/48000",
++    "section_octets": 21504056,
++    "section_path": "/Users/brandonduggan/Workspaces/holonics/.local/experiments/soundcam-native-return/row_002/difference.section",
++    "section_sha256": "7b9db63aef75ee04ef817c15d1fab2b1be3e07edf3f4ba32f814bf2ffbdd77e0",
++    "wav_path": "/Users/brandonduggan/Workspaces/holonics/.local/experiments/soundcam-native-return/row_002/difference.wav",
++    "wav_sha256": "2ec6a7fc5b03469ca1797465dc1e736aafbc37b65b10d6fa5265b33d2bb9bbef"
++  },
++  "divisor": 32768,
++  "excitation": {
++    "frames": 672000,
++    "occurrence": "recorded-excitation",
++    "octets": 1344044,
++    "origin": "0",
++    "path": "/Users/brandonduggan/Workspaces/holonics/.local/datasets/soundcam/wav/row_002/loopback.wav",
++    "sample_rate": 48000,
++    "sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
++  },
++  "initial_response": {
++    "denominator": 1,
++    "extent": 1,
++    "imaginary": 0,
++    "origin": "0",
++    "real": 1
++  },
++  "initial_response_scope": "explicit unit digital starting current, not a measured room transfer or cultivated model",
++  "native_development": "none; this receiver retains the actual defect for subsequent constitutive contact",
++  "observation": {
++    "frames": 672000,
++    "occurrence": "recorded-microphone-return",
++    "octets": 1344044,
++    "origin": "0",
++    "path": "/Users/brandonduggan/Workspaces/holonics/.local/datasets/soundcam/wav/row_002/microphone_00.wav",
++    "sample_rate": 48000,
++    "sha256": "e5155416859bce4fe7d41ef755741f6af0e28003bf2d9cd776145fccdfbc2121"
++  },
++  "phase_extent": 4,
++  "prediction": {
++    "frames": 672000,
++    "lineage": 4,
++    "origin": "0",
++    "receiver": 9,
++    "sample_step": "1/48000",
++    "section_octets": 21504056,
++    "section_path": "/Users/brandonduggan/Workspaces/holonics/.local/experiments/soundcam-native-return/row_002/prediction.section",
++    "section_sha256": "8fa262fb85050bc10cb7738f1d9da883ff8a81810644f6dc66150585c432f993"
++  },
++  "schema": "holonics.recorded-acoustic-return.v1",
++  "seconds": 18.204401792,
++  "stages": {
++    "cold_difference_and_audio": {
++      "allocations": 0,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 21504016,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 86016112,
++      "resident_octets_peak": 139776340,
++      "seconds": 14.719389917,
++      "section_readouts": 1,
++      "unavailable_gpu_timestamps": 0
++    },
++    "cold_prediction": {
++      "allocations": 0,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 21504016,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 86016112,
++      "resident_octets_peak": 139776340,
++      "seconds": 0.174234459,
++      "section_readouts": 1,
++      "unavailable_gpu_timestamps": 0
++    },
++    "mount_excitation": {
++      "allocations": 2,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 21504016,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 21504016,
++      "resident_octets_peak": 21504016,
++      "seconds": 0.089651417,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "mount_initial_response": {
++      "allocations": 2,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 48,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 21504064,
++      "resident_octets_peak": 21504064,
++      "seconds": 0.000063166,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "mount_observed_return": {
++      "allocations": 2,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 21504016,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 64512096,
++      "resident_octets_peak": 96768244,
++      "seconds": 0.092554333,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "native_oriented_return": {
++      "allocations": 6,
++      "deeds": 1,
++      "gpu_seconds": 1.3635526249418035,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 64,
++      "resident_octets_now": 86016112,
++      "resident_octets_peak": 139776340,
++      "seconds": 1.364538125,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "predict_before_reception": {
++      "allocations": 6,
++      "deeds": 1,
++      "gpu_seconds": 1.0968152083223686,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 64,
++      "resident_octets_now": 43008080,
++      "resident_octets_peak": 96768244,
++      "seconds": 1.098214458,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    }
++  },
++  "status": "returned",
++  "support": {
++    "begin": [
++      [
++        0,
++        []
++      ],
++      [
++        1,
++        [
++          1
++        ]
++      ]
++    ],
++    "end": [
++      [
++        1,
++        [
++          14
++        ]
++      ],
++      [
++        1,
++        [
++          1
++        ]
++      ]
++    ],
++    "observed": {
++      "end": 672000,
++      "start": 0
++    },
++    "predicted": {
++      "end": 672000,
++      "start": 0
++    },
++    "unobserved_prediction": [],
++    "unpredicted_observation": []
++  }
++}
+\ No newline at end of file
+-- 
+2.54.0
+

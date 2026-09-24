@@ -1,0 +1,61 @@
+worktree: /home/b/Workspaces/holonics/.local/p15/head
+branch: (detached HEAD)
+HEAD: 5b7c89abcfcb461bbb1d6e0ca5305b045b233a28
+HEAD subject: Carry the device quadratic moment as one storage element
+HEAD ancestor of origin/main (bb73054a): True
+
+git status --porcelain (tracked):
+ M crates/holonic-engine/examples/advance_full_native_operator_hna2.rs
+ M crates/holonic-engine/examples/advance_full_native_operator_prefix_hna3.rs
+ M crates/holonic-engine/examples/complete_full_native_recurrence_hna3.rs
+ M crates/holonic-engine/examples/recurrent_native_operator_hna2_hna3.rs
+ M crates/holonic-engine/src/holonic_intelligence.rs
+ M crates/holonic-engine/src/holonic_intelligence/full_operation.rs
+ M crates/holonic-engine/src/holonic_intelligence/operative_adjoint.rs
+ M crates/holonic-engine/src/holonic_intelligence/operative_atlas.rs
+ M crates/holonic-engine/src/holonic_intelligence/operative_backward.rs
+ M crates/holonic-engine/src/holonic_intelligence/operative_condensation.rs
+ M crates/holonic-engine/src/holonic_intelligence/operative_identification.rs
+ M crates/holonic-engine/src/holonic_intelligence/operative_intervention.rs
+ M crates/holonic-engine/src/holonic_intelligence/operative_morphology.rs
+ M crates/holonic-engine/src/holonic_intelligence/operative_passage_return.rs
+ M crates/holonic-engine/src/holonic_intelligence/operative_residence.rs
+ M crates/holonic-engine/src/holonic_intelligence/operative_rest.rs
+ M crates/holonic-engine/src/holonic_intelligence/operative_rest_wire.rs
+ M crates/holonic-engine/src/holonic_intelligence/operative_rest_wire_tests.rs
+ M crates/holonic-engine/src/holonic_intelligence/operative_return.rs
+ M crates/holonic-engine/src/holonic_intelligence/operative_reuse.rs
+ M crates/holonic-engine/src/holonic_intelligence/operative_scalars.rs
+ M crates/holonic-engine/src/holonic_intelligence/operative_segment.rs
+ M crates/holonic-engine/src/holonic_intelligence/operative_session.rs
+ M crates/holonic-engine/src/holonic_intelligence/operative_terminal.rs
+ M crates/holonic-engine/src/soulkiller/boundary.rs
+ M crates/holonic-engine/src/soulkiller/mod.rs
+ M crates/holonics-hna/examples/adjoint_return_ske1.rs
+ M crates/holonics-hna/examples/checkpoint_hnp3.rs
+ M crates/holonics-hna/examples/composed_variant_ske5.rs
+ M crates/holonics-hna/examples/condensation_seal_ske4.rs
+ M crates/holonics-hna/examples/cone_by_intervention_ske2.rs
+ M crates/holonics-hna/examples/developmental_return_hna4.rs
+ M crates/holonics-hna/examples/full_application_matrix_hna5.rs
+ M crates/holonics-hna/examples/full_autoregressive_recurrence_hna3.rs
+ M crates/holonics-hna/examples/passage_return_hnp1.rs
+ M crates/holonics-hna/examples/recurrent_token_application_hna3.rs
+ M crates/holonics-hna/examples/session_census_ske4.rs
+ M crates/holonics-hna/examples/signature_quotient_ske3.rs
+ M crates/holonics-hna/src/checkpoint.rs
+ M crates/holonics-hna/src/hna.rs
+ M crates/holonics-hna/src/recurrent_operator.rs
+ M crates/holonics-hna/src/session.rs
+ M crates/holonics-hna/src/stream.rs
+ M docs/ARCHITECTURE_MAP.md
+ M docs/ATHENA.md
+ M docs/HNN_FORMULA.md
+ M docs/RUST_FRAMEWORK.md
+ M docs/plans/THE_HOLON_CORE_FOUNDS_THE_NATIVE_MACHINERY.md
+
+untracked, non-ignored:
+crates/holonic-engine/src/holonic_intelligence/extracted_operator.rs
+crates/holonic-engine/src/holonic_intelligence/extraction_equality_tests.rs
+crates/holonic-engine/src/holonic_intelligence/fixtures/phase15_branch_rest.json
+crates/holonic-engine/src/holonic_intelligence/fixtures/phase15_continuing_return_rest.bin

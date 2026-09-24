@@ -1,0 +1,28 @@
+worktree: /home/b/Workspaces/holonics/.local/p13-wt
+branch: (detached HEAD)
+HEAD: 883f33d4e42616ce05ce5725b861c054a133eda6
+HEAD subject: Record that Soulkiller is a label and its subject is equation extraction
+HEAD ancestor of origin/main (bb73054a): True
+
+git status --porcelain (tracked):
+ M crates/holonic-engine/src/cuda_refine.rs
+ M crates/holonic-engine/src/cuda_refine/complex_parametron.rs
+ M crates/holonic-engine/src/cuda_refine/membrane_factored_receivers.rs
+ M crates/holonic-engine/src/cuda_refine/membrane_factored_transport.rs
+ M crates/holonic-engine/src/cuda_refine/membrane_moment_contraction.rs
+ M crates/holonic-engine/src/cuda_refine/membrane_moment_workspace.rs
+ M crates/holonic-engine/src/cuda_refine/membrane_receiver_completion.rs
+ M crates/holonic-engine/src/cuda_refine/membrane_state.rs
+ M crates/holonic-engine/src/cuda_refine/membrane_transport_setup.rs
+ M crates/holonic-engine/src/cuda_refine/tests/factored_moment.rs
+ M crates/holonic-engine/src/factored_moment.rs
+ M crates/holonic-engine/src/factored_moment/passage.rs
+ M crates/holonic-engine/src/factored_moment/section.rs
+ M crates/holonic-engine/src/factored_moment/spine.rs
+ M crates/holonic-engine/src/factored_moment/tests.rs
+ M crates/holonic-engine/src/factored_moment/types.rs
+ M crates/holonic-engine/src/receiver_history_compression/factored_forms.rs
+ M crates/holonic-engine/src/receiver_history_compression/projective_history.rs
+
+untracked, non-ignored:
+crates/holonic-engine/src/factored_moment/storage.rs

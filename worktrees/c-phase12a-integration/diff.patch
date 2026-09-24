@@ -1,0 +1,26 @@
+diff --git a/docs/plans/census/C_PHASE12A_INTEGRATION.md b/docs/plans/census/C_PHASE12A_INTEGRATION.md
+index cb07ad65..7c0f200a 100644
+--- a/docs/plans/census/C_PHASE12A_INTEGRATION.md
++++ b/docs/plans/census/C_PHASE12A_INTEGRATION.md
+@@ -1,8 +1,8 @@
+ # Phase 12a integration map
+ 
+-Source-linked integration plan for the paused HNN field/session packet. Phase 11 is present on draft
+-PR #108, rebased onto the current facade; it is not merged. This note records source and wire
+-boundaries; phase 12a remains unrebased and unbuilt.
++Source-linked integration plan for the paused HNN field/session packet. The phase-11 source cut is
++present on draft PR #108 but is not merged; one long HNA probe was interrupted. This note records
++source and wire boundaries; phase 12a remains unrebased and unbuilt.
+ 
+ ## Branches and overlaps
+ 
+@@ -12,7 +12,8 @@ boundaries; phase 12a remains unrebased and unbuilt.
+ | Phase 12a | `wip/consolidation-phase-12a`, `.local/p12a-wt`, WIP `0ee4ea6d`, based on `5b7c89ab`; 20 HNA files change. |
+ | M1 facade base | `codex/restructure-m1-facade`, current tip `3b2acef7`. The facade cut does not touch phase-12a source paths. |
+ 
+-The path intersection from the shared `5b7c89ab` base between phase 11 and phase 12a is exactly:
++The path intersection from the shared `5b7c89ab` source base between phase 11 and phase 12a is
++exactly:
+ 
+ | Shared path | Phase 11 change | Phase 12a change | Join to preserve |
+ |---|---|---|---|

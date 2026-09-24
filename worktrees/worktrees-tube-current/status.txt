@@ -1,0 +1,10 @@
+worktree: /home/b/Workspaces/holonics/.local/worktrees/tube-current
+branch: (detached HEAD)
+HEAD: 04064e78714b15ed480104645eeee97ee0e7c712
+HEAD subject: Establish the Reality of Difference programme and formalize compatible potential through Swing and joint receivers
+HEAD ancestor of origin/main (bb73054a): True
+
+git status --porcelain (tracked):
+
+untracked, non-ignored:
+crates/holonic-engine/examples/four_torus_current.rs

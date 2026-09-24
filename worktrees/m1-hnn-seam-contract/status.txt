@@ -1,0 +1,11 @@
+worktree: /home/b/Workspaces/holonics/.local/m1-hnn-seam-contract
+branch: codex/restructure-m1-hnn-seam-contract
+HEAD: 1547889e799f10feb5f0a21f221bf553f6b3a146
+HEAD subject: Clarify M1 resident HNN dependency seam (Refs #69)
+HEAD ancestor of origin/main (bb73054a): True
+
+git status --porcelain (tracked):
+
+untracked, non-ignored:
+crates/holonics-hna/.tmpBwvfBQ/pn39.hna
+crates/holonics-hna/.tmpBwvfBQ/pn47.hna

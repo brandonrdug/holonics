@@ -1,0 +1,25 @@
+worktree: /home/b/Workspaces/holonics/.local/p8a-wt
+branch: (detached HEAD)
+HEAD: 7c4063b51ef5901b208684c2beb8f7b8e788630a
+HEAD subject: Add the power-neutral reaction law and the deposition probe
+HEAD ancestor of origin/main (bb73054a): True
+
+git status --porcelain (tracked):
+ M crates/holonic-engine/build.rs
+ A crates/holonic-engine/kernels/enclosure_cayley.cuh
+ M crates/holonic-engine/kernels/exact_resident_section.cu
+ M crates/holonic-engine/src/native_ecology/constitutive_fibre/field.rs
+ M crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport.rs
+ M crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal.rs
+ M crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal/direct.rs
+ M crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal/direct/reaction_law.rs
+ M crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal/direct/section/composition.rs
+ M crates/holonic-engine/src/resident_section.rs
+ M crates/holonic-engine/src/resident_section/surface_enclosure_composition.rs
+ M crates/holonics-hna/src/native/coupled_wave/body/field/incident.rs
+ A crates/holonics-hna/src/native/coupled_wave/body/field/incident/energy.rs
+ A crates/holonics-hna/src/native/coupled_wave/body/field/incident/holon_chart.rs
+ M crates/holonics-hna/src/native/field_session/generator_application/deposition_probe.rs
+ M docs/VERIFICATION_RECEIPTS.tsv
+
+untracked, non-ignored:

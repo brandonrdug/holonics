@@ -1,0 +1,638 @@
+From 2329a539b252ea4ca7235c8ab5c1c4c1978feb5c Mon Sep 17 00:00:00 2001
+From: Brandon Duggan <brandonrdug@users.noreply.github>
+Date: Sun, 6 Sep 2026 15:40:28 -0700
+Subject: [PATCH 01/18] Specify Holonics on Apple silicon and provision Mac
+ apparatus
+
+---
+ CONSTRUCTION_STATE.md                         |  15 ++
+ docs/ARCHITECTURE_MAP.md                      |   5 +
+ docs/DEVELOPMENT.md                           |  36 ++++
+ docs/HARDWARE_AND_MODALITY_BOUNDARIES.md      |  18 ++
+ docs/plans/HOLONICS_ON_APPLE_SILICON.md       | 199 ++++++++++++++++++
+ docs/plans/THE_ROADMAP.md                     |  18 ++
+ .../apple_silicon/check_mlx_device.py         |  82 ++++++++
+ .../apple_silicon/requirements.txt            |   2 +
+ ...PLE_SILICON_SPECIFICATION_AND_MAC_SETUP.md | 119 +++++++++++
+ .../mlx-device.json                           |  18 ++
+ 10 files changed, 512 insertions(+)
+ create mode 100644 docs/plans/HOLONICS_ON_APPLE_SILICON.md
+ create mode 100644 research/experiments/apple_silicon/check_mlx_device.py
+ create mode 100644 research/experiments/apple_silicon/requirements.txt
+ create mode 100644 research/records/2026-09-06_APPLE_SILICON_SPECIFICATION_AND_MAC_SETUP.md
+ create mode 100644 research/records/2026-09-06_apple_silicon_receipts/mlx-device.json
+
+diff --git a/CONSTRUCTION_STATE.md b/CONSTRUCTION_STATE.md
+index 46a82921..2f4cff61 100644
+--- a/CONSTRUCTION_STATE.md
++++ b/CONSTRUCTION_STATE.md
+@@ -7,6 +7,21 @@ cultivation blueprint. **Position:** design deposited; AC0 starts. **Athena-alph
+ orders work; completed history belongs in the linked records and Git. Brandon's latest direct
+ instruction governs.
+ 
++## Parallel MacBook position
++
++[definition] Brandon's subsequent September 6 request establishes `codex/apple-silicon` for
++[Holonics on Apple silicon](docs/plans/HOLONICS_ON_APPLE_SILICON.md), independently of the desktop
++Athena-alpha session above. Sound perception and generation precede speech. Desktop private
++conversation data and cultivation remain on that machine.
++
++[established-bounded; process-audit] AS0 specification and apparatus setup returned in the
++[Mac record](research/records/2026-09-06_APPLE_SILICON_SPECIFICATION_AND_MAC_SETUP.md): compatible
++Rust, pinned Lean, repaired Xcode setup, Metal tools and an isolated MLX custom-kernel check.
++The native HNA Cargo check reached the known CUDA/PTX/target-gating obstruction on macOS.
++
++[open] AS1 device-boundary factoring is next. The native Apple backend and acoustic attachment
++remain unimplemented; the MLX arithmetic/dependency probe is exterior apparatus evidence only.
++
+ ## Current HNA direction
+ 
+ [definition] Brandon now authorizes immediate construction and completion of the
+diff --git a/docs/ARCHITECTURE_MAP.md b/docs/ARCHITECTURE_MAP.md
+index 4fe7e141..3a7d84cb 100644
+--- a/docs/ARCHITECTURE_MAP.md
++++ b/docs/ARCHITECTURE_MAP.md
+@@ -18,6 +18,11 @@ consequences, and [hardware/modality boundaries](HARDWARE_AND_MODALITY_BOUNDARIE
+ future Apple and acoustic composition. These are source comparisons, not implemented backends
+ or a Lean runtime inside HNA.
+ 
++[definition] The [Apple platform specification](plans/HOLONICS_ON_APPLE_SILICON.md) names the
++current native session/resident boundary and the acoustic attachment to port. The exterior
++`research/experiments/apple_silicon/check_mlx_device.py` owns a custom-Metal arithmetic and
++dependent-stream apparatus probe only; it is not an alternate native owner.
++
+ Each row connects one mathematical relation to its live formal and executable presentations.
+ 
+ - **exact** means the named implementation owns the same stated carrier/law in the row's declared
+diff --git a/docs/DEVELOPMENT.md b/docs/DEVELOPMENT.md
+index c792a2a3..ecca9be4 100644
+--- a/docs/DEVELOPMENT.md
++++ b/docs/DEVELOPMENT.md
+@@ -26,6 +26,42 @@ For Rust clients, depend on the local `crates/holonics` package and use
+ `holonics::{hna,soulkiller,interop}`. The framework re-exports its implementation owners; it
+ does not create a second neural engine.
+ 
++## Apple silicon development
++
++[established-bounded; process-audit] The September 6 MacBook setup installed Rust 1.98.1,
++Lean 4.33.0 and 4.27.0 through elan, and MLX/MLX Metal 0.32.2 in
++`.local/venvs/apple-silicon`. Xcode first-launch repair and Metal Toolchain download completed.
++The [setup record](../research/records/2026-09-06_APPLE_SILICON_SPECIFICATION_AND_MAC_SETUP.md)
++contains the M1 Pro apparatus and actual check scopes. The
++[platform specification](plans/HOLONICS_ON_APPLE_SILICON.md) keeps MLX apparatus distinct from
++the native backend still to be implemented.
++
++[definition] For another Apple checkout, use a Rust release supporting this workspace and let
++elan select the committed formal project versions. Do not update `lean-toolchain` or Mathlib
++merely because a newer release exists. Lean remains separate verification apparatus.
++
++```sh
++rustup update stable
++export PATH="$HOME/.cargo/bin:$HOME/.elan/bin:$PATH"
++elan toolchain install leanprover/lean4:v4.33.0
++elan toolchain install leanprover/lean4:v4.27.0
++uv venv --python 3.12 .local/venvs/apple-silicon
++uv pip install --python .local/venvs/apple-silicon/bin/python -r research/experiments/apple_silicon/requirements.txt
++.local/venvs/apple-silicon/bin/python research/experiments/apple_silicon/check_mlx_device.py
++cargo check -p relational-geometry --lib --locked
++```
++
++[definition] Install elan using the [official installer](https://lean-lang.org/install/manual/)
++if absent. Xcode provides the SDK and native compilers; `xcodebuild -runFirstLaunch` completes
++its system setup, and `xcodebuild -downloadComponent MetalToolchain` installs the separately
++distributed Metal compiler when needed. Do not reinstall an already-working toolchain.
++
++[established-bounded; process-audit] The commands above verify exterior GPU arithmetic and a
++portable Rust library. `cargo check -p holonics-hna --lib --locked` currently fails on macOS
++at the recorded CUDA/PTX and target-gating boundary. Neither this probe nor a successful MLX
++installation is a native HNA build. Formal dependencies are fetched when relevant Lean work
++requires them; no full Mathlib build is part of device setup.
++
+ ## Training and inference
+ 
+ ```sh
+diff --git a/docs/HARDWARE_AND_MODALITY_BOUNDARIES.md b/docs/HARDWARE_AND_MODALITY_BOUNDARIES.md
+index 6f2ebc74..9d4e6bf5 100644
+--- a/docs/HARDWARE_AND_MODALITY_BOUNDARIES.md
++++ b/docs/HARDWARE_AND_MODALITY_BOUNDARIES.md
+@@ -4,6 +4,12 @@
+ future Apple and audio work. It does not add a backend, alter native HNA, or schedule an audio
+ campaign. The roadmap and `CONSTRUCTION_STATE.md` remain the construction authorities.
+ 
++[definition] Brandon's subsequent MacBook request is now specified in
++[Holonics on Apple silicon](plans/HOLONICS_ON_APPLE_SILICON.md). Its order is native Apple
++execution and sound perception/generation, then speech, on the separate `codex/apple-silicon`
++branch. The [Mac setup record](../research/records/2026-09-06_APPLE_SILICON_SPECIFICATION_AND_MAC_SETUP.md)
++adds actual local build and MLX apparatus evidence to the source comparison below.
++
+ [established-bounded; source-inspected] Local sources were inspected at `6f547c4a` on September 6,
+ 2026. Source descriptions below are not fresh execution measurements.
+ 
+@@ -82,6 +88,11 @@ PTX generation is skipped while several PTX-bearing modules and the CUDA mount r
+ dependency closure. Documentation, formal sources and exterior data tools remain portable
+ repository material; this is a source-derived build obstruction, not an executed Mac check.
+ 
++[established-bounded; process-audit] The subsequent Mac check at `b16e6bc0`, with Rust 1.98.1,
++executed `cargo check -p holonics-hna --lib --locked` and failed with four missing PTX includes
++and six imports of target-gated `cuda_aperture`/`hardware_cover`. This confirms an actual
++compile obstruction before linkage, not an unavailable Rust installation.
++
+ [definition] The future repair boundary is a target-gated CUDA/PTX implementation and a portable
+ host/native surface whose exact owners can compile without `libcuda`. The repair must preserve the
+ same native operation and return an explicit unsupported-device obstruction when no admitted
+@@ -193,6 +204,13 @@ rejects clipping, and marks the result `cold_renderer_only`
+ NativeAcousticPotentialComplex::found -> render_pcm16`. Native current formation remains the hot
+ owner; PCM/WAV is a receiver and codec surface after the exact native return.
+ 
++[open; source-inspected] `AcousticProductRest` embeds the earlier
++`RecurrentGranularReturnedAffineEcologyRest`. It is not a wrapper for the current
++`NativeConstitutiveEcology`; nor does the current phase session return a
++`NativeOpenWorldTubeReceipt`. The Apple/acoustic specification therefore requires the actual
++PCM-to-native-material and native-outward-current attachments before claiming this composition
++over the current ecology. Existing acoustic results retain their original body/receiver scope.
++
+ [open] No current audio owner establishes calibrated microphone pressure, speaker pressure, power,
+ or room acoustics. Those claims require a physical chart with typed units, constitutive and
+ boundary laws, chronology, and calibrated receivers.
+diff --git a/docs/plans/HOLONICS_ON_APPLE_SILICON.md b/docs/plans/HOLONICS_ON_APPLE_SILICON.md
+new file mode 100644
+index 00000000..92fdeabc
+--- /dev/null
++++ b/docs/plans/HOLONICS_ON_APPLE_SILICON.md
+@@ -0,0 +1,199 @@
++# Holonics on Apple silicon
++
++[definition] This is the Apple platform specification deposited September 6, 2026, under
++Brandon's MacBook request and his clarification: **sound perception and generation, then speech**.
++The branch is `codex/apple-silicon`. “MLX” names a candidate execution tool within this work;
++Holonics is the framework, HNA the architecture, and Athena a continuing model. The
++[roadmap](THE_ROADMAP.md) owns construction order and the
++[position](../../CONSTRUCTION_STATE.md) records actual returns.
++
++## Intent and scope
++
++[project-postulate] Establish development and native GPU execution on Apple silicon, then use
++that realization to explore acoustic perception and production through the same HNA recurrence.
++Sound has temporal, phase, source and receiver structure before a transcript exists. Speech is a
++later acoustic/text application, not the definition of perception or a prerequisite for learning.
++The wider multimodal direction composes situated charts and actual interactions in one ecology.
++
++[definition] The desktop session continues Athena-alpha cultivation against its private
++conversation material. This Mac branch develops apparatus and acoustic interfaces independently.
++It does not move that dataset, recreate cultivation, resume inherited-first production, or change
++the desktop's AC0–AC5 order. No new model name or duplicate learning engine is introduced.
++The user's current request authorizes review, specification, branch establishment and local
++toolchain preparation; the implementation sequence below makes the ensuing platform work concrete.
++
++[historical; source-inspected] Before this request, the September 6
++[hardware/modality guide](../HARDWARE_AND_MODALITY_BOUNDARIES.md) already described the shared
++recurrence, CUDA build obstruction, MLX comparison and exact acoustic owners. It explicitly left
++implementation to separately authorized work. The imported discussion records are historical
++agent testimony; they are not a substitute for a direct Apple implementation request. This
++request supplies that direction and the clarified acoustic priority. Older sensory results keep
++their bounded scopes under [retractions](../RETRACTIONS.md); they do not establish today's
++Athena-alpha or an Apple audio runtime.
++
++## One native operation across devices
++
++[definition] Preserve
++`occurrence -> local current -> reaction -> emission + successor ecology -> next occurrence`.
++Device selection changes allocation, instruction realization and scheduling. It does not change
++situated identity, the admitted relation, current orientation, contextual hypotheses, complete
++fibres, obstruction, historical frames or the successor consumed by the next occurrence.
++
++[definition] The first production port is the current native phase session:
++`holonics-hna::native::with_native_session`, `NativeConstitutiveEcology` and its circulation,
++rechart and rest owners. The local rational-linear family is the first parity domain, not a
++universal linear model. Port broader native owners as the actual acoustic/material composition
++requires them. The older inherited full operator is a separate implementation scope.
++
++[established-bounded; source-inspected] At base `b16e6bc0`, `native.rs` directly mounts
++`ResidentReadout` and `ResidentSurface`; circulation and formation use that surface. Independently,
++`NativeTransportScaffold` constructs `CudaRefineExecutor`. Changing the small
++`ExactDeviceExecutor` trait alone reaches neither complete lifecycle. `AcousticProductRest`
++contains `RecurrentGranularReturnedAffineEcologyRest`, not `NativeConstitutiveEcology`.
++These are concrete composition boundaries, not interchangeable types with different names.
++
++[definition] Reuse the existing resident surface/section operation boundary and move its CUDA
++allocation, event/graph and launch details behind a device implementation. Keep public native
++wire/checkpoint semantics in their current owners. Target-gate the whole CUDA dependency closure,
++including PTX generation and consumers, mount linkage, launch derivation and hardware-cover
++consumers. A feature that merely suppresses a linker error, empty PTX, or a CPU semantic fallback
++does not implement Apple execution. An unavailable operation returns its typed device/operation
++obstruction, with no committed partial successor.
++
++| Boundary | Required Apple realization |
++|---|---|
++| Memory | One owned resident allocation family; immutable standing may be shared. Unified addressability does not permit simultaneous mutable semantic owners. |
++| Arithmetic | Exact signed integer/rational carriers, both phase coordinates, checked intermediates and explicit refusal/reconstruction. |
++| Schedule | Dependencies for every retained forward carrier, return, rechart and formation; no intermediate host semantic replay. |
++| Commit | Stage deltas, validate device status and publish exactly one complete successor after successful completion. Failure preserves recoverable ownership. |
++| Persistence | Existing source/frame/handle/stream chronology remains reconstructible; device handles are remounted apparatus, not serialized semantic identity. |
++| Receivers | Report actual operation, device, allocation/residency, transfers, synchronization, elapsed time and obstruction separately from native consequences. |
++
++[definition] The phase mouth currently admits signed `i64` real/imaginary coordinates and a
++positive common denominator; its conversion refuses values outside that chart. The Apple port
++must preserve that admitted domain and its refusal behavior. Use explicit `u32` limbs for wider
++intermediates where needed, retaining sign, carry, denominator and checked overflow. Native
++arbitrary-width owners require their own complete limb representation and lawful growth;
++success on two limbs does not discharge them. Preserve exact cancellation and relative phase
++before any scalar or PCM projection.
++
++[definition] First port the actual operations used by `section_constitutive_fibre`,
++`section_constitutive_circulation` and `section_constitutive_rechart`, including their dependent
++resident rational primitives and source/frame storage. Preserve their actual input and output
++relations rather than rewriting a similar update in a Python trainer. CPU exact arithmetic is
++an exterior comparison during verification. Production current and formation remain GPU work.
++
++## MLX and Metal implementation decision
++
++[definition] Start with MLX custom Metal kernels as executable apparatus for testing representation
++and dependency behavior. The experiment directory is
++`research/experiments/apple_silicon/`; it is not a public HNA backend. The production Apple device
++code belongs under `accelerators/metal/` with the host binding at the existing resident/mount
++boundary. Create those owners when the first complete native operation can be attached, not as
++empty packages or a second state machine.
++
++[established-bounded; source-inspected] MLX documents
++[custom Metal kernels](https://ml-explore.github.io/mlx/build/html/dev/custom_metal_kernels.html)
++and [custom extensions](https://ml-explore.github.io/mlx/build/html/dev/extensions.html).
++These supply a way to execute authored exact device arithmetic while using MLX allocation and
++scheduling. Its array or autodiff API does not define the HNA learning law.
++
++[interpretation] The proposed correspondence is resident carriers to MLX buffers, ordered native
++dependencies to stream edges, and terminal completion to explicit evaluation. The first native
++target is the complete phase operation, including the successor and obstruction. A missing source
++frame, changed fibre, overflow accepted as exact, intermediate host decision or duplicate commit
++falsifies this mapping. The current device smoke check only establishes an arithmetic/scheduling
++subcase and does not prove this correspondence.
++
++[definition] Use direct Metal command queues and Rust-compatible host bindings if MLX cannot
++expose the required ownership, resident arithmetic or error/commit boundary. Select by the
++returned complete-operation evidence and integration cost. Neither library branding nor a
++float-array performance comparison decides native semantics. MLX model export is separately
++governed by [interoperability](../INTEROPERABILITY.md).
++
++## Acoustic perception and generation
++
++[definition] The initial offline input is a caused mono PCM16 occurrence with a positive sample
++rate, retained source samples and exact sample chronology. Reuse
++`life::mathematical_source::acoustic::ExactAcousticOccurrence`. Its frame length, hop and section
++width are declared receiver extents, never hidden learned capacity. Retain the complete samples
++alongside any folded section: equal frame sums cannot identify acoustically distinct sources.
++
++[definition] The first perception return must show how an acoustic occurrence participates in
++the current native material/contact relation and changes or is read through the continuing
++ecology. Reuse synchronized occurrence, clock transport and situated returned-difference owners.
++Do not map a file label, expected sound class or arbitrary frame summary straight into a desired
++native current. Derive and implement the actual PCM/material-to-contact attachment; report its
++retained fibre and present limitations. A waveform decoder alone is not sound perception.
++
++[definition] The production starting point is native outward port current, preserving its order
++and two quadratures. Reuse `NativeAcousticProductionMorphology` and
++`NativeAcousticPotentialComplex`, followed by `render_pcm16` as an explicitly cold lossy receiver.
++The existing route is `NativeAcousticRadiationInput::from_open_world_tube ->
++AcousticProductRest::radiate -> NativeAcousticPotentialComplex::found -> render_pcm16`.
++The first attachment must derive the current ecology's actual outward-port passage into this
++interface or factor the codec from its older body wrapper. Do not invent an open-world-tube
++receipt, adopt an older acoustic body as the new ecology, or play a stored input as native output.
++
++[definition] Keep receiver sample rate, time/frequency support, gain/divisor and PCM quantization
++explicit and stable during comparisons. Inspect both the exact emitted current and the audible
++surface: distinct internal states can collapse to the same rendered sound. Preserve silence,
++duration and gaps as chronology. Spectra, amplitudes and distances are observer measurements,
++not internal governors or proof of intelligibility.
++
++[definition] Use a small declared family of sounds with different temporal order, phase,
++frequency content and source conditions. Synthetic tones/impulses are lawful exterior controls,
++with their generation settings retained; ordinary recordings provide less authored material.
++Vary packet boundaries without changing the underlying occurrence, then vary actual chronology,
++source or receiver conditions separately. Read the full native return and listen to generated
++WAVs. No universal benchmark score or speech gate is imposed on this first exploration.
++
++[definition] Follow offline execution with an explicit microphone/speaker session using the
++platform audio API at the application boundary. Retain device/channel identity as lineage,
++sample format/rate, monotonic clock relation, buffer offsets, dropped/late frames, playback and
++capture chronology, and declared conversions. Callback buffers are delivery packets, not
++utterances or holons. Device permission and capture state remain visible. A resampler or audio
++format conversion is an exterior codec with declared loss. Backpressure must preserve pending
++input/output or report a gap; it cannot silently skip a committed occurrence.
++
++[definition] Full duplex is one ecology receiving ordinary later occurrences during output.
++An emitted sound and a microphone's later reception have a caused interaction when the physical
++path is declared; timestamps alone do not prove contact. A file reentry checks codec/persistence
++conduct, not room propagation. Acoustic pressure, speaker transfer, room response and energy
++claims require typed units, calibration and boundary laws. First experiments need not claim them.
++
++[definition] Add speech after the sound path can perceive, emit and retain development. Spoken
++language and text are distinct situated occurrences joined through actual exposure/contact;
++shared transcript wording alone is not identity. Speech recognizers, synthesizers or pretrained
++models may serve declared exterior comparisons; they cannot secretly supply native perception
++or generation. Images and other sensors later reuse the same contact/clock/recurrence interfaces.
++
++## Construction sequence and evidence
++
++[definition] The following stages define deliverables; the roadmap alone activates their order.
++
++| Stage | Concrete return and relevant verification |
++|---|---|
++| AS0 — branch and apparatus | Deposit this specification; provision compatible Rust, repository-pinned Lean and isolated MLX; execute a custom Metal integer/dependency probe and record the actual Mac build boundary. |
++| AS1 — native device boundary | Factor/gate the existing CUDA closure, compile the public native host interface on macOS, and expose precise unsupported operations until implemented. Check changed Rust owners and the preserved Linux/CUDA path. |
++| AS2 — resident Apple phase ecology | Conduct formation, circulation and rechart with exact carriers, full source/frame/fibre and one atomic successor. Compare complete declared returns against existing exact reference/CUDA evidence, including old sources after rechart, open/plural readings, overflow and failure recovery. |
++| AS3 — public continuation | Run native-session and its independent wave-control application on this Mac; preserve checkpoints, stream cursors and pending output through process restart without replay. Measure actual costs on the M1 Pro. |
++| AS4 — offline acoustic composition | Attach real PCM material and actual native outward current through the existing owners; inspect perception consequences, generated WAVs and continuing development. Retain source/receiver and projection differences. |
++| AS5 — live sound, then speech | Add explicit capture/playback chronology, interruption and gap handling; inspect sound products and retained continuation. Extend to speech and cross-modal exposure through actual shared interactions. |
++
++[definition] A relevant check answers its claimed boundary. Arithmetic parity is not lifecycle
++parity; lifecycle parity is not sound perception; audible output is not speech competence. When
++persistence or attribution is claimed, use the existing remount and targeted-change mechanisms
++for that claim. No new blanket gate, claim index or fixture-local learner is created.
++
++## Parallel development and integration
++
++[definition] This branch starts at `b16e6bc0` and is pushed separately. Keep the desktop's active
++native cultivation source as the integration base when its coherent commits arrive; inspect
++changes to shared native session/material owners before rebasing. Resolve roadmap/state edits
++by preserving both active tracks and their actual evidence, never by replacing the desktop's
++position with an older Mac snapshot. Do not merge this branch into `main` as part of setup.
++
++[definition] Checkpoint interchange requires a matching schema and the actual complete artifact,
++not a Git branch name or export receipt. Any later private-data transfer is separate from this
++source branch and retains provenance. No private conversation transfer is necessary for AS0–AS3.
+diff --git a/docs/plans/THE_ROADMAP.md b/docs/plans/THE_ROADMAP.md
+index 433d0133..ab206fc6 100644
+--- a/docs/plans/THE_ROADMAP.md
++++ b/docs/plans/THE_ROADMAP.md
+@@ -40,6 +40,24 @@ and the inherited-first sequence are not activated by this campaign.
+ attachment is derived against existing native source. Completed NCF and data preparation remain
+ standing and need no repeated orientation or unchanged demonstration to begin useful work.
+ 
++## Apple silicon and acoustic branch
++
++[definition] Brandon's subsequent September 6 MacBook request establishes the independent
++`codex/apple-silicon` branch and [Apple platform specification](HOLONICS_ON_APPLE_SILICON.md).
++The acoustic order is sound perception and generation, then speech. This track preserves the
++desktop's active Athena-alpha campaign and private conversation material; it does not resume
++inherited-first production or create another HNA learning law.
++
++[definition] AS0 deposits the specification and verifies the local apparatus. The ensuing order
++is AS1: factor the native device boundary and CUDA build closure; AS2: resident exact Apple phase
++operation; AS3: public session, persistence and measured continuation; AS4: offline acoustic
++material/production attachment; AS5: live sound and subsequent speech. Full-operation source,
++frame, fibre and successor parity govern the port. MLX is an apparatus candidate within Holonics.
++
++[established-bounded; process-audit] AS0 returned branch/specification and Mac toolchain/device
++checks in the [setup record](../../research/records/2026-09-06_APPLE_SILICON_SPECIFICATION_AND_MAC_SETUP.md).
++AS1 is next; no native Apple HNA or acoustic perception/generation product is claimed by setup.
++
+ ## Completed September 6 synthesis before Athena-alpha cultivation
+ 
+ [definition] Brandon's latest request directs repository-wide synthesis of the available
+diff --git a/research/experiments/apple_silicon/check_mlx_device.py b/research/experiments/apple_silicon/check_mlx_device.py
+new file mode 100644
+index 00000000..071c3b07
+--- /dev/null
++++ b/research/experiments/apple_silicon/check_mlx_device.py
+@@ -0,0 +1,82 @@
++"""Exterior Apple apparatus check; this does not implement or certify native HNA.
++
++Run with the environment described in docs/DEVELOPMENT.md. Integer reference
++arithmetic is an observer, and all readback follows both dependent GPU kernels.
++"""
++
++import json
++
++import mlx.core as mx
++
++
++def main():
++    if not mx.metal.is_available():
++        raise RuntimeError("Metal GPU unavailable; no CPU fallback")
++    # Each row is an unsigned 64-bit integer in two little-endian 32-bit limbs.
++    # The separate overflow word prevents an overflowing sum looking exact.
++    kernel = mx.fast.metal_kernel(
++        name="holonics_apparatus_add_u64",
++        input_names=["a", "b"],
++        output_names=["sum", "overflow"],
++        source="""
++            uint i = thread_position_in_grid.x;
++            uint low = a[2*i] + b[2*i];
++            uint carry = uint(low < a[2*i]);
++            uint high = a[2*i+1] + b[2*i+1];
++            uint top = uint(high < a[2*i+1]);
++            uint carried = high + carry;
++            top |= uint(carried < high);
++            sum[2*i] = low;
++            sum[2*i+1] = carried;
++            overflow[i] = top;
++        """,
++    )
++    values = [0, 1, (1 << 32) - 1, 1 << 32, (1 << 63) - 1,
++              1 << 63, (1 << 64) - 2, (1 << 64) - 1]
++    pairs = [(a, b) for a in values for b in values]
++    mask = (1 << 64) - 1
++
++    def limbs(numbers):
++        return mx.array([[n & 0xffffffff, n >> 32] for n in numbers], dtype=mx.uint32)
++
++    a = limbs([a for a, _ in pairs])
++    b = limbs([b for _, b in pairs])
++    one = limbs([1] * len(pairs))
++    first_stream, second_stream = mx.new_stream(mx.gpu), mx.new_stream(mx.gpu)
++
++    def add(a, b, stream):
++        return kernel(inputs=[a, b], grid=(len(pairs), 1, 1),
++                      threadgroup=(1, 1, 1),
++                      output_shapes=[(len(pairs), 2), (len(pairs),)],
++                      output_dtypes=[mx.uint32, mx.uint32], stream=stream)
++
++    # One thread per group is a declared smoke-test aperture, not a device tuning rule.
++    first, first_overflow = add(a, b, first_stream)
++    second, second_overflow = add(first, one, second_stream)
++    mx.eval(first, first_overflow, second, second_overflow)
++    returned = [x.tolist() for x in (first, first_overflow, second, second_overflow)]
++    for i, (a_value, b_value) in enumerate(pairs):
++        total = a_value + b_value
++        next_total = (total & mask) + 1
++        for rows, overflows, expected in (
++            (returned[0], returned[1], total),
++            (returned[2], returned[3], next_total),
++        ):
++            actual = rows[i][0] | (rows[i][1] << 32)
++            if actual != expected & mask or overflows[i] != expected >> 64:
++                raise AssertionError((i, actual, expected, overflows[i]))
++    print(json.dumps({
++        "scope": "exterior custom-Metal arithmetic and dependent-stream apparatus",
++        "native_hna": False,
++        "mlx_version": mx.__version__,
++        "device": mx.device_info(),
++        "input_pairs": len(pairs),
++        "dependent_dispatches": 2,
++        "checked_results": len(pairs) * 2,
++        "integer_limb_and_overflow_parity": True,
++        "readback": "after both dependent dispatches",
++    }, indent=2))
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/research/experiments/apple_silicon/requirements.txt b/research/experiments/apple_silicon/requirements.txt
+new file mode 100644
+index 00000000..ae7e0266
+--- /dev/null
++++ b/research/experiments/apple_silicon/requirements.txt
+@@ -0,0 +1,2 @@
++mlx==0.32.2
++mlx-metal==0.32.2
+diff --git a/research/records/2026-09-06_APPLE_SILICON_SPECIFICATION_AND_MAC_SETUP.md b/research/records/2026-09-06_APPLE_SILICON_SPECIFICATION_AND_MAC_SETUP.md
+new file mode 100644
+index 00000000..77dc75fc
+--- /dev/null
++++ b/research/records/2026-09-06_APPLE_SILICON_SPECIFICATION_AND_MAC_SETUP.md
+@@ -0,0 +1,119 @@
++# Apple silicon specification and Mac development setup
++
++[definition] This return establishes the Mac branch, deposited implementation contract and
++development apparatus. It does not claim a completed Apple HNA backend or sound-learning product.
++Source base: `b16e6bc0`; branch: `codex/apple-silicon`; date: September 6, 2026.
++The [specification](../../docs/plans/HOLONICS_ON_APPLE_SILICON.md),
++[roadmap](../../docs/plans/THE_ROADMAP.md) and
++[position](../../CONSTRUCTION_STATE.md) separate this track from desktop Athena-alpha cultivation.
++
++## Direct intent and review
++
++[historical; process-audit] Brandon's direct request in Codex task
++`01a078d8-09b0-7db0-a13a-a57765ca850c` describes importing the repository onto his MacBook,
++the desktop's active Athena-alpha session with desktop conversation data, and asks for a review
++so specifications can be deposited and the “MLX” branch constructed. He permits a more fitting
++name and authorizes necessary toolchain installation. In the same task he selects
++“Sound perception and generation, then speech.” These are paraphrased instructions except for
++the quoted branch label and acoustic answer. No private desktop logs or datasets were transferred.
++
++[established-bounded; source-inspected] The existing hardware/modality guide already articulates
++the shared recurrence, native exactness, residency, source/receiver lineage, MLX comparison and
++acoustic codec boundaries. The new contract makes device ownership, complete-operation parity,
++public continuation, acoustic attachment and live I/O deliverables explicit. The primary agent
++read the governing sources and integrated a bounded Luna source audit; agent testimony does not
++establish a capability or supersede direct instructions.
++
++[established-bounded; source-inspected] Exact source owners inspected at the base revision:
++
++- `crates/holonics-hna/src/native.rs::with_native_session` directly mounts `ResidentReadout` and
++  `ResidentSurface`; it owns the current phase session and emitted-handle delivery.
++- `crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs` owns signed-word
++  phase admission, the continuing ecology and historical source/receiver relation.
++- `crates/holonic-engine/{Cargo.toml,build.rs}` and
++  `src/{lib,cuda_refine,cuda_realizer_search,embedding_fiber,resident_section}.rs` expose the
++  unconditional CUDA closure and non-Linux PTX generation skip.
++- `crates/holonic-mount/src/{ffi,cuda}.rs` retain CUDA driver linkage;
++  `native_spool/scaffold.rs` directly constructs `CudaRefineExecutor`.
++- `crates/holonic-life/src/mathematical_source/acoustic.rs::ExactAcousticOccurrence` retains
++  complete PCM16 samples and exact chronology beside a folded receiver section.
++- `crates/holonic-life/src/synchronized_occurrence.rs` retains clock transports, timed receiver
++  cells and declared interactions. Co-presence alone is not contact.
++- `crates/holonic-life/src/native_intelligence/membrane_acoustic.rs::AcousticProductRest`
++  embeds `RecurrentGranularReturnedAffineEcologyRest`; `NativeAcousticRadiationInput` consumes
++  actual outward-port/open-world-tube returns. The current phase session does not return that type.
++- `membrane_acoustic/potential_formation.rs` keeps exact native potential and an explicit cold
++  floating/trigonometric PCM16 projection. A renderer does not establish native perception.
++
++[definition] Consequently AS1 must factor the existing native device boundary; AS4 must attach
++acoustic material and outward current to the current ecology. Neither a trait implementation in
++the small parity vocabulary nor reusing an older acoustic body by name closes these relations.
++
++## Machine and changes
++
++[established-bounded; measured] Local system reports: arm64 MacBook Pro, Apple M1 Pro, 8 CPU
++cores (6 performance/2 efficiency), 14 GPU cores, 16 GiB unified memory; macOS 26.5 build 25F71.
++These identify apparatus, not measured power, usable-model capacity or semantic limits.
++
++| Tool | Before | Returned setup |
++|---|---|---|
++| Rust/Cargo | 1.78.0; cannot parse the workspace's Rust 2024 edition | `rustup update stable` installed Rust/Cargo 1.98.1 for aarch64-apple-darwin; rustfmt, clippy and rust-src available. |
++| Lean | elan/lean/lake absent from initial command lookup | elan installed; repository-pinned 4.33.0 and 4.27.0 installed. No global Lean default or formal-source change. |
++| Xcode | Xcode 26.6 build 17F113 present; Metal shim present but toolchain absent | `xcodebuild -runFirstLaunch` repaired required system components; Metal Toolchain 17F109 downloaded; `xcrun metal --version` returned compiler 32023.883. |
++| Python/MLX | Python and uv already available | Isolated CPython 3.12.13 environment with `mlx==0.32.2` and `mlx-metal==0.32.2`; no global Python packages changed. |
++| Other tools | Git, Homebrew, ffmpeg and Typst already present | Retained; no unrelated upgrade, cache deletion or CMake/Ninja installation was needed for this setup. |
++
++[established-bounded; process-audit] Initial `xcodebuild -downloadComponent MetalToolchain`
++failed with exit 70: `IDESimulatorFoundation` expected a missing `DVTDownloads` symbol. The
++tool's recommended `xcodebuild -runFirstLaunch` completed successfully; the subsequent component
++download exited 0. The Metal compiler then executed. This was a repaired local installation
++failure, not an HNA source defect. An unrelated Homebrew cask trust error occurred during broad
++inventory; no trust was granted or cask changed because it was unnecessary for this work.
++
++[definition] Reproduction commands are in [development](../../docs/DEVELOPMENT.md#apple-silicon-development).
++Local installation/build logs remain under `.local/setup/apple-silicon/`; the small portable
++device receipt below is committed without hardware identifiers or private source material.
++Lean dependencies/caches are fetched when needed for actual proof work. No Lean kernel enters
++the native application as part of this installation.
++
++## Actual checks
++
++[established-bounded; computational-witness] The committed
++[MLX device probe](../experiments/apple_silicon/check_mlx_device.py) compiled and executed a custom
++Metal kernel using two `u32` limbs for unsigned 64-bit addition, retaining a separate overflow
++word. Eight declared values (zero, one, limb boundaries, signed boundary and maximum values)
++produced 64 ordered operand pairs. A second GPU stream consumed the first result and added one
++without intermediate host readback. All 128 returned results and per-dispatch overflow flags
++matched Python integer observer arithmetic. Exit 0; the
++[raw device receipt](2026-09-06_apple_silicon_receipts/mlx-device.json) retains the apparatus return.
++The one-thread threadgroup is a smoke-test choice, not a production tuning rule.
++
++[definition] This witnesses only the declared unsigned arithmetic and dependency case. It does
++not implement signed rational operations, native incidence, current formation, rechart, lineage,
++successor commit or checkpointing. It measures no HNA throughput or energy. The returned memory
++recommendation is MLX/device testimony, not a reserved application budget or a semantic bound.
++
++[established-bounded; process-audit] `cargo check -p relational-geometry --lib --locked` passed
++in 6.17 seconds on the updated compiler. Both installed Lean versions returned their version;
++the formal projects' committed pins remain unchanged. No proof/import was changed and no full
++Lean build or unrelated CUDA regression was claimed.
++
++[counterexample; process-audit] `cargo check -p holonics-hna --lib --locked` exited 101 after
++reaching the engine: four missing generated PTX files (`exact_quartic_realizers`, `refine_shell`,
++`exact_embedding_fiber`, `exact_resident_section`) and six unresolved imports of Linux-gated
++`cuda_aperture`/`hardware_cover` from the resident, embedding, front-passage, partition and
++token-invariance owners. This refutes a claim that the base checkout already compiles native HNA
++on this Mac. Linkage was not reached, so no successful CUDA-free link or native run is claimed.
++The source port is specified work, not repaired by toolchain installation or empty PTX stubs.
++
++## Return boundary
++
++[established-bounded; process-audit] AS0 returned specifications, branch setup, working Rust and
++formal toolchain executables, repaired Metal development tools and a verified custom-kernel
++apparatus probe. Current guides now link the Mac work and name the exact acoustic attachment.
++No native runtime, proof or desktop cultivation source was modified by this return.
++
++[open] AS1 native device factoring is next, followed by complete resident Apple parity and
++public continuation. Acoustic perception/generation and subsequent speech remain the specified
++product work. The desktop's Athena-alpha position is preserved as last known at the branch base;
++this record makes no claim about unobserved progress in its running session.
+diff --git a/research/records/2026-09-06_apple_silicon_receipts/mlx-device.json b/research/records/2026-09-06_apple_silicon_receipts/mlx-device.json
+new file mode 100644
+index 00000000..cb59a0a9
+--- /dev/null
++++ b/research/records/2026-09-06_apple_silicon_receipts/mlx-device.json
+@@ -0,0 +1,18 @@
++{
++  "scope": "exterior custom-Metal arithmetic and dependent-stream apparatus",
++  "native_hna": false,
++  "mlx_version": "0.32.2",
++  "device": {
++    "device_name": "Apple M1 Pro",
++    "max_recommended_working_set_size": 12713115648,
++    "memory_size": 17179869184,
++    "architecture": "applegpu_g13s",
++    "max_buffer_length": 9534832640,
++    "resource_limit": 499000
++  },
++  "input_pairs": 64,
++  "dependent_dispatches": 2,
++  "checked_results": 128,
++  "integer_limb_and_overflow_parity": true,
++  "readback": "after both dependent dispatches"
++}
+-- 
+2.54.0
+

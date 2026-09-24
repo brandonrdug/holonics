@@ -1,0 +1,1671 @@
+From 8122f7770f91017b2de51bb15d15369e6b57731e Mon Sep 17 00:00:00 2001
+From: Brandon Duggan <brandonrdug@users.noreply.github>
+Date: Sun, 6 Sep 2026 19:19:00 -0700
+Subject: [PATCH 06/18] Compose acoustic sections with shared Metal fields and
+ exact execution profiling
+
+---
+ accelerators/metal/native_phase.metal         | 374 +++++++++++++++++-
+ .../src/holonic_intelligence/dimensions.rs    |   1 +
+ .../constitutive_fibre/field.rs               |   6 +-
+ .../constitutive_fibre/field/profile.rs       | 161 ++++++++
+ .../constitutive_fibre/field/tests.rs         |  83 +++-
+ crates/holonic-engine/src/resident_section.rs |   4 +-
+ .../src/resident_section/surface_mount.rs     |   5 +
+ .../src/resident_section/surface_passage.rs   | 153 +++++--
+ crates/holonic-mount/src/metal.rs             |  38 ++
+ .../examples/acoustic_field_profile.rs        | 140 +++++++
+ crates/holonics-hna/src/native.rs             |   1 +
+ .../holonics-hna/src/native/acoustic_field.rs | 178 +++++++++
+ .../src/native/acoustic_field/tests.rs        | 116 ++++++
+ .../apple_silicon/generate_wide_cases.py      |  14 +-
+ .../native_phase_arithmetic_check.swift       |   3 +-
+ .../experiments/apple_silicon/wide_cases.json |   2 +-
+ 16 files changed, 1218 insertions(+), 61 deletions(-)
+ create mode 100644 crates/holonic-engine/src/native_ecology/constitutive_fibre/field/profile.rs
+ create mode 100644 crates/holonics-hna/examples/acoustic_field_profile.rs
+ create mode 100644 crates/holonics-hna/src/native/acoustic_field.rs
+ create mode 100644 crates/holonics-hna/src/native/acoustic_field/tests.rs
+
+diff --git a/accelerators/metal/native_phase.metal b/accelerators/metal/native_phase.metal
+index ff35e1e5..5812aa4b 100644
+--- a/accelerators/metal/native_phase.metal
++++ b/accelerators/metal/native_phase.metal
+@@ -143,6 +143,16 @@ inline U uset(U a, uint n) {
+   return a;
+ }
+ inline U umul(U a, U b, thread bool &ov) {
++  // Exact one-limb product: (2^32-1)^2 fits in ulong. This is a carrier
++  // specialization, not a different field law or a truncated product.
++  if (!(a.x[1] | a.x[2] | a.x[3] | b.x[1] | b.x[2] | b.x[3])) {
++    ulong product = (ulong)a.x[0] * (ulong)b.x[0];
++    U r = uzero();
++    r.x[0] = (uint)product;
++    r.x[1] = (uint)(product >> 32);
++    ov = false;
++    return r;
++  }
+   uint p[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+   for (uint i = 0; i < 4; ++i) {
+     ulong carry = 0;
+@@ -175,6 +185,15 @@ inline W wmul(W a, W b, device uint *slot) {
+   return wof(m, a.neg != b.neg, slot);
+ }
+ inline U udiv(U n, U d, thread U &rem) {
++  // Callers have already established d != 0. Avoid emulated wider division
++  // when both complete magnitudes inhabit the native uint chart.
++  if (!(n.x[1] | n.x[2] | n.x[3] | d.x[1] | d.x[2] | d.x[3])) {
++    U q = uzero();
++    q.x[0] = n.x[0] / d.x[0];
++    rem = uzero();
++    rem.x[0] = n.x[0] % d.x[0];
++    return q;
++  }
+   if (n.x[2] == 0 && n.x[3] == 0 && d.x[2] == 0 && d.x[3] == 0) {
+     ulong nn = (ulong)n.x[0] | ((ulong)n.x[1] << 32);
+     ulong dd = (ulong)d.x[0] | ((ulong)d.x[1] << 32);
+@@ -222,9 +241,9 @@ inline W wgcd(W a, W b, device uint *slot) {
+ }
+ inline W wnorm(thread W *row, uint width, thread W *den, device uint *slot) {
+   W d = den ? (!wzero_p(*den) ? *den : wzero()) : wzero();
+-  for (uint j = 0; j < width; ++j)
++  for (uint j = 0; j < width && !ueq(d.m, uone()); ++j)
+     d = wgcd(d, row[j], slot);
+-  if (wzero_p(d))
++  if (wzero_p(d) || ueq(d.m, uone()))
+     return d;
+   for (uint j = 0; j < width; ++j)
+     row[j] = wdiv(row[j], d, slot);
+@@ -234,9 +253,9 @@ inline W wnorm(thread W *row, uint width, thread W *den, device uint *slot) {
+ }
+ inline W wnorm(threadgroup W *row, uint width, threadgroup W *den, device uint *slot) {
+   W d = den ? (!wzero_p(*den) ? *den : wzero()) : wzero();
+-  for (uint j = 0; j < width; ++j)
++  for (uint j = 0; j < width && !ueq(d.m, uone()); ++j)
+     d = wgcd(d, row[j], slot);
+-  if (wzero_p(d))
++  if (wzero_p(d) || ueq(d.m, uone()))
+     return d;
+   for (uint j = 0; j < width; ++j)
+     row[j] = wdiv(row[j], d, slot);
+@@ -244,6 +263,14 @@ inline W wnorm(threadgroup W *row, uint width, threadgroup W *den, device uint *
+     *den = wdiv(*den, d, slot);
+   return d;
+ }
++inline W wnorm(threadgroup W *row, uint width, thread W *den, device uint *slot) {
++  W d = den ? (!wzero_p(*den) ? *den : wzero()) : wzero();
++  for (uint j = 0; j < width && !ueq(d.m, uone()); ++j) d = wgcd(d, row[j], slot);
++  if (wzero_p(d) || ueq(d.m, uone())) return d;
++  for (uint j = 0; j < width; ++j) row[j] = wdiv(row[j], d, slot);
++  if (den) *den = wdiv(*den, d, slot);
++  return d;
++}
+ inline long toword(W a, device uint *slot) {
+   if (a.m.x[2] || a.m.x[3] || (a.m.x[1] == 0x80000000u && a.m.x[0] != 0) ||
+       (a.m.x[1] == 0x80000000u && !a.neg) || (a.m.x[1] > 0x80000000u)) {
+@@ -295,6 +322,24 @@ inline void fibre_query(device const long *basis, uint source_width, uint width,
+     if (!wzero_p(query[j]))
+       *disp = 1u;
+ }
++inline void fibre_query(device const long *basis, uint source_width, uint width,
++                        threadgroup W *query, thread W *den, threadgroup const W *staged,
++                        long staged_pivot, thread uint *disp, thread uint *rank,
++                        device uint *slot) {
++  uint vertical = 0; *rank = 0;
++  for (uint p = 0; p < width; ++p) {
++    W pivot = fibre_entry(basis, width, p, p, staged, staged_pivot);
++    if (wneg_p(pivot)) { atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED, memory_order_relaxed); return; }
++    if (!wzero_p(pivot)) { ++*rank; if (p >= source_width) ++vertical; }
++    if (p >= source_width || wzero_p(pivot) || wzero_p(query[p])) continue;
++    W coefficient = query[p];
++    for (uint j = 0; j < width; ++j)
++      query[j] = wsub(wmul(pivot, query[j], slot), wmul(coefficient, fibre_entry(basis,width,p,j,staged,staged_pivot),slot),slot);
++    *den = wmul(*den, pivot, slot); if (*slot) return;
++    wnorm(query, width, den, slot); if (*slot) return;
++  }
++  *disp = vertical ? 2u : 0u; for (uint j=0;j<source_width;++j) if(!wzero_p(query[j])) *disp=1u;
++}
+ inline long fibre_stage(device const long *basis, uint width, thread W *formed, device uint *slot) {
+   long inserted = -1;
+   for (uint p = 0; p < width; ++p) {
+@@ -311,12 +356,12 @@ inline long fibre_stage(device const long *basis, uint width, thread W *formed,
+                        wmul(co, fromword(basis[(ulong)p * width + j]), slot), slot);
+     if (*slot)
+       return -1;
+-    wnorm(formed, width, nullptr, slot);
++    wnorm(formed, width, (thread W *)nullptr, slot);
+     if (*slot)
+       return -1;
+   }
+   if (inserted >= 0) {
+-    wnorm(formed, width, nullptr, slot);
++    wnorm(formed, width, (thread W *)nullptr, slot);
+     if (*slot)
+       return -1;
+     if (wneg_p(formed[inserted]))
+@@ -342,12 +387,12 @@ inline long fibre_stage(device const long *basis, uint width, threadgroup W *for
+                        wmul(co, fromword(basis[(ulong)p * width + j]), slot), slot);
+     if (*slot)
+       return -1;
+-    wnorm(formed, width, nullptr, slot);
++    wnorm(formed, width, (threadgroup W *)nullptr, slot);
+     if (*slot)
+       return -1;
+   }
+   if (inserted >= 0) {
+-    wnorm(formed, width, nullptr, slot);
++    wnorm(formed, width, (threadgroup W *)nullptr, slot);
+     if (*slot)
+       return -1;
+     if (wneg_p(formed[inserted]))
+@@ -515,6 +560,315 @@ kernel void native_phase_wide_probe(device const uint *a [[buffer(0)]],
+ }
+ #endif
+ 
++// Complete multi-port field recurrence.  The field uses four source coordinates per node
++// (outgoing and held complex branches) followed by the two-coordinate target face.  All
++// intermediates remain W until the checked exterior conversion at the commit boundary.
++kernel void section_constitutive_field(
++    device const long *seed [[buffer(0)]], device long *memory_lo [[buffer(1)]],
++    device long *memory_hi [[buffer(2)]], device long *basis_lo [[buffer(3)]],
++    device long *basis_hi [[buffer(4)]], device const long *incoming [[buffer(5)]],
++    device const long *origin [[buffer(6)]], device const long *current_frame [[buffer(7)]],
++    device const long *origin_frame [[buffer(8)]], constant uint &nodes [[buffer(9)]],
++    constant uint &linked [[buffer(10)]], device long *output_lo [[buffer(11)]],
++    device long *output_hi [[buffer(12)]], device uint *slot [[buffer(13)]],
++    device const uint *census [[buffer(14)]], device const uint *lineage [[buffer(15)]],
++    constant uint &lineage_count [[buffer(16)]], threadgroup W *scratch [[threadgroup(0)]],
++    uint3 tid [[thread_position_in_threadgroup]]) {
++  if (tid.x || tid.y || tid.z)
++    return;
++  if (upstream(census, lineage, lineage_count, slot))
++    return;
++  if (!nodes || linked > 1 || nodes > 0xffffffffu / 6u) {
++    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED, memory_order_relaxed);
++    return;
++  }
++  uint sw = 4u * nodes, width = 6u * nodes;
++  if (width < sw || !current_frame || (linked && (!origin || !origin_frame))) {
++    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED, memory_order_relaxed);
++    return;
++  }
++  for (uint n = 0; n < nodes; ++n) {
++    device const long *f = current_frame + 3u * n;
++    W lhs = wadd(wmul(fromword(f[0]), fromword(f[0]), slot),
++                 wmul(fromword(f[1]), fromword(f[1]), slot), slot);
++    W rhs = wmul(fromword(f[2]), fromword(f[2]), slot);
++    if (f[2] <= 0 || *slot || !ueq(lhs.m, rhs.m)) {
++      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED, memory_order_relaxed);
++      return;
++    }
++    if (linked) {
++      device const long *b = origin_frame + 3u * n;
++      W bl = wadd(wmul(fromword(b[0]), fromword(b[0]), slot),
++                  wmul(fromword(b[1]), fromword(b[1]), slot), slot),
++        br = wmul(fromword(b[2]), fromword(b[2]), slot);
++      if (b[2] <= 0 || *slot || !ueq(bl.m, br.m)) {
++        atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
++                                 memory_order_relaxed);
++        return;
++      }
++    }
++  }
++  threadgroup W *cur = scratch, *prior = cur + width, *formed = prior + width;
++  threadgroup W *out = formed + width, *held = out + 3u * nodes;
++  for (uint j = 0; j < width; ++j) {
++    cur[j] = prior[j] = formed[j] = wzero();
++  }
++  W incoming_den = wi64(1);
++  for (uint n = 0; n < nodes; ++n) {
++    device const long *law = seed + 5u * n, *mem = memory_lo + 3u * n, *arr = incoming + 3u * n;
++    if (law[0] <= 0 || law[1] <= 0 || law[4] <= 0 || mem[2] <= 0 || arr[2] <= 0) {
++      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED, memory_order_relaxed);
++      return;
++    }
++    W unit = wadd(wmul(fromword(law[2]), fromword(law[2]), slot),
++                  wmul(fromword(law[3]), fromword(law[3]), slot), slot);
++    if (*slot || !ueq(unit.m, wmul(fromword(law[4]), fromword(law[4]), slot).m)) {
++      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED, memory_order_relaxed);
++      return;
++    }
++    if (linked)
++      incoming_den = flcm(incoming_den, fromword(arr[2]), slot);
++    W ir = wsub(wmul(fromword(law[2]), fromword(arr[0]), slot),
++                wmul(fromword(law[3]), fromword(arr[1]), slot), slot);
++    W ii = wadd(wmul(fromword(law[3]), fromword(arr[0]), slot),
++                wmul(fromword(law[2]), fromword(arr[1]), slot), slot);
++    W id = wmul(fromword(law[4]), fromword(arr[2]), slot);
++    W inc[3] = {ir, ii, id};
++    wnorm(inc, 2, &inc[2], slot);
++    W common = flcm(inc[2], fromword(mem[2]), slot),
++      adm = wadd(fromword(law[0]), fromword(law[1]), slot), den = wmul(common, adm, slot);
++    for (uint c = 0; c < 2; ++c) {
++      W entering = wmul(inc[c], wdiv(common, inc[2], slot), slot),
++        retained = wmul(fromword(mem[c]), wdiv(common, fromword(mem[2]), slot), slot);
++      W vel = wmul(wi64(2),
++                   wadd(wmul(fromword(law[0]), entering, slot),
++                        wmul(fromword(law[1]), retained, slot), slot),
++                   slot);
++      out[3 * n + c] = wsub(vel, wmul(adm, entering, slot), slot);
++      held[3 * n + c] = wsub(vel, wmul(adm, retained, slot), slot);
++    }
++    out[3 * n + 2] = held[3 * n + 2] = den;
++    wnorm(out + 3 * n, 2, out + 3 * n + 2, slot);
++    wnorm(held + 3 * n, 2, held + 3 * n + 2, slot);
++    if (*slot)
++      return;
++  }
++  W source_den = wi64(1);
++  for (uint n = 0; n < nodes; ++n) {
++    source_den = flcm(source_den, out[3 * n + 2], slot);
++    source_den = flcm(source_den, held[3 * n + 2], slot);
++  }
++  for (uint n = 0; n < nodes; ++n)
++    for (uint c = 0; c < 2; ++c) {
++      cur[4 * n + c] = wmul(out[3 * n + c], wdiv(source_den, out[3 * n + 2], slot), slot);
++      cur[4 * n + 2 + c] = wmul(held[3 * n + c], wdiv(source_den, held[3 * n + 2], slot), slot);
++    }
++  wnorm(cur, sw, &source_den, slot);
++  if (*slot)
++    return;
++  for (uint j = 0; j < sw; ++j)
++    output_lo[j] = output_hi[j] = toword(cur[j], slot);
++  output_lo[sw] = output_hi[sw] = toword(source_den, slot);
++  if (*slot)
++    return;
++  for (uint n = 0; n < nodes; ++n) {
++    out[3 * n] = cur[4 * n + 2];
++    out[3 * n + 1] = cur[4 * n + 3];
++    out[3 * n + 2] = source_den;
++    wnorm(out + 3 * n, 2, out + 3 * n + 2, slot);
++  }
++  if (*slot)
++    return;
++  W prior_den = wi64(1);
++  uint prior_status = 3, prior_rank = 0, cur_status = 0, succ_rank = 0;
++  long ins = -1;
++  if (linked) {
++    W od = fromword(origin[sw]);
++    if (wzero_p(od) || wneg_p(od)) {
++      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED, memory_order_relaxed);
++      return;
++    }
++    for (uint n = 0; n < nodes; ++n) {
++      W cross[3];
++      device const long *now = current_frame + 3 * n;
++      device const long *before = origin_frame + 3 * n;
++      phaseprod(fromword(now[0]), fromword(now[1]), fromword(now[2]), fromword(before[0]),
++                wneg(fromword(before[1])), fromword(before[2]), cross, slot);
++      phaseprod(cross[0], cross[1], cross[2], fromword(origin[4 * n]), fromword(origin[4 * n + 1]),
++                od, held + 3 * n, slot);
++      prior_den = flcm(prior_den, held[3 * n + 2], slot);
++      phaseprod(cross[0], cross[1], cross[2], fromword(origin[4 * n + 2]),
++                fromword(origin[4 * n + 3]), od, held + 3 * n, slot);
++      prior_den = flcm(prior_den, held[3 * n + 2], slot);
++    }
++    W paired = flcm(prior_den, incoming_den, slot);
++    for (uint n = 0; n < nodes; ++n) {
++      W cross[3];
++      device const long *now = current_frame + 3 * n;
++      device const long *before = origin_frame + 3 * n;
++      phaseprod(fromword(now[0]), fromword(now[1]), fromword(now[2]), fromword(before[0]),
++                wneg(fromword(before[1])), fromword(before[2]), cross, slot);
++      for (uint branch = 0; branch < 2; ++branch) {
++        phaseprod(cross[0], cross[1], cross[2], fromword(origin[4 * n + 2 * branch]),
++                  fromword(origin[4 * n + 2 * branch + 1]), od, held + 3 * n, slot);
++        for (uint c = 0; c < 2; ++c) {
++          prior[4 * n + 2 * branch + c] =
++              wmul(held[3 * n + c], wdiv(prior_den, held[3 * n + 2], slot), slot);
++          formed[4 * n + 2 * branch + c] =
++              wmul(held[3 * n + c], wdiv(paired, held[3 * n + 2], slot), slot);
++        }
++      }
++      for (uint c = 0; c < 2; ++c)
++        formed[sw + 2 * n + c] = wmul(fromword(incoming[3 * n + c]),
++                                      wdiv(paired, fromword(incoming[3 * n + 2]), slot), slot);
++    }
++    fibre_query(basis_lo, sw, width, prior, &prior_den, (threadgroup const W *)nullptr, -1,
++                &prior_status, &prior_rank, slot);
++    wnorm(formed, width, (threadgroup W *)nullptr, slot);
++    ins = fibre_stage(basis_lo, width, formed, slot);
++    if (*slot)
++      return;
++  }
++  W cd = source_den;
++  fibre_query(basis_lo, sw, width, cur, &cd, formed, ins, &cur_status, &succ_rank, slot);
++  if (*slot)
++    return;
++  for (uint j = 0; j < width; ++j) {
++    if (j >= sw) {
++      cur[j] = wneg(cur[j]);
++      prior[j] = wneg(prior[j]);
++    }
++    toword(cur[j], slot);
++    toword(prior[j], slot);
++    if (ins >= 0)
++      toword(formed[j], slot);
++  }
++  toword(cd, slot);
++  toword(prior_den, slot);
++  for (uint j = 0; j < 3 * nodes; ++j)
++    toword(out[j], slot);
++  if (*slot)
++    return;
++  uint ca = sw + 1, pa = ca + width + 4;
++  for (uint j = 0; j < width; ++j) {
++    output_lo[ca + j] = output_hi[ca + j] = toword(cur[j], slot);
++    output_lo[pa + j] = output_hi[pa + j] = toword(prior[j], slot);
++  }
++  output_lo[ca + width] = output_hi[ca + width] = toword(cd, slot);
++  output_lo[ca + width + 1] = output_hi[ca + width + 1] = cur_status;
++  output_lo[ca + width + 2] = output_hi[ca + width + 2] = ins;
++  output_lo[ca + width + 3] = output_hi[ca + width + 3] = succ_rank;
++  output_lo[pa + width] = output_hi[pa + width] = toword(prior_den, slot);
++  output_lo[pa + width + 1] = output_hi[pa + width + 1] = prior_status;
++  output_lo[pa + width + 2] = output_hi[pa + width + 2] = -1;
++  output_lo[pa + width + 3] = output_hi[pa + width + 3] = prior_rank;
++  if (ins >= 0)
++    for (uint j = 0; j < width; ++j) {
++      ulong at = (ulong)ins * width + j;
++      basis_lo[at] = basis_hi[at] = toword(formed[j], slot);
++    }
++  for (uint j = 0; j < 3 * nodes; ++j) {
++    memory_lo[j] = memory_hi[j] = toword(out[j], slot);
++  }
++}
++
++kernel void section_constitutive_field_rechart(
++    device const long *seed [[buffer(0)]], device const long *memory [[buffer(1)]],
++    device const long *root_frame [[buffer(2)]], device const long *basis [[buffer(3)]],
++    device const long *change [[buffer(4)]], constant uint &nodes [[buffer(5)]],
++    device long *seed_lo [[buffer(6)]], device long *seed_hi [[buffer(7)]],
++    device long *memory_lo [[buffer(8)]], device long *memory_hi [[buffer(9)]],
++    device long *frame_lo [[buffer(10)]], device long *frame_hi [[buffer(11)]],
++    device long *basis_lo [[buffer(12)]], device long *basis_hi [[buffer(13)]],
++    device long *report_lo [[buffer(14)]], device long *report_hi [[buffer(15)]],
++    device uint *slot [[buffer(16)]], device const uint *census [[buffer(17)]],
++    device const uint *lineage [[buffer(18)]], constant uint &lineage_count [[buffer(19)]],
++    threadgroup W *row [[threadgroup(0)]], uint3 tid [[thread_position_in_threadgroup]]) {
++  if (tid.x || tid.y || tid.z)
++    return;
++  if (upstream(census, lineage, lineage_count, slot))
++    return;
++  if (!nodes || nodes > 0xffffffffu / 6u) {
++    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED, memory_order_relaxed);
++    return;
++  }
++  uint sw = 4 * nodes, width = 6 * nodes;
++  W common = wi64(1);
++  for (uint n = 0; n < nodes; ++n) {
++    device const long *g = change + 6 * n;
++    device const long *law = seed + 5 * n;
++    device const long *mem = memory + 3 * n;
++    device const long *rf = root_frame + 3 * n;
++    W u = wadd(wmul(fromword(g[0]), fromword(g[0]), slot),
++               wmul(fromword(g[1]), fromword(g[1]), slot), slot);
++    W d = wmul(fromword(g[2]), fromword(g[2]), slot);
++    W ou = wadd(wmul(fromword(rf[0]), fromword(rf[0]), slot),
++                wmul(fromword(rf[1]), fromword(rf[1]), slot), slot);
++    W od = wmul(fromword(rf[2]), fromword(rf[2]), slot);
++    if (g[2] <= 0 || rf[2] <= 0 || law[0] <= 0 || law[1] <= 0 || law[4] <= 0 || mem[2] <= 0 ||
++        *slot || !ueq(u.m, d.m) || !ueq(ou.m, od.m)) {
++      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED, memory_order_relaxed);
++      return;
++    }
++    common = flcm(common, fromword(g[2]), slot);
++    W t[3], h[3], f[3], i[3];
++    phaseprod(fromword(g[0]), fromword(g[1]), fromword(g[2]), fromword(law[2]), fromword(law[3]),
++              fromword(law[4]), t, slot);
++    phaseprod(fromword(g[0]), fromword(g[1]), fromword(g[2]), fromword(mem[0]), fromword(mem[1]),
++              fromword(mem[2]), h, slot);
++    phaseprod(fromword(g[0]), fromword(g[1]), fromword(g[2]), fromword(rf[0]), fromword(rf[1]),
++              fromword(rf[2]), f, slot);
++    phaseprod(fromword(g[0]), fromword(g[1]), fromword(g[2]), fromword(g[3]), fromword(g[4]),
++              fromword(g[5]), i, slot);
++    seed_lo[5 * n] = seed_hi[5 * n] = law[0];
++    seed_lo[5 * n + 1] = seed_hi[5 * n + 1] = law[1];
++    for (uint j = 0; j < 3; ++j) {
++      seed_lo[5 * n + 2 + j] = seed_hi[5 * n + 2 + j] = toword(t[j], slot);
++      memory_lo[3 * n + j] = memory_hi[3 * n + j] = toword(h[j], slot);
++      frame_lo[3 * n + j] = frame_hi[3 * n + j] = toword(f[j], slot);
++      report_lo[9 * n + j] = report_hi[9 * n + j] = toword(t[j], slot);
++      report_lo[9 * n + 3 + j] = report_hi[9 * n + 3 + j] = toword(i[j], slot);
++      report_lo[9 * n + 6 + j] = report_hi[9 * n + 6 + j] = toword(f[j], slot);
++    }
++  }
++  if (*slot)
++    return;
++  for (ulong j = 0; j < (ulong)width * width; ++j)
++    basis_lo[j] = basis_hi[j] = 0;
++  for (uint p = 0; p < width; ++p) {
++    if (!basis[(ulong)p * width + p])
++      continue;
++    for (uint n = 0; n < nodes; ++n) {
++      device const long *g = change + 6 * n;
++      row[4 * n] = wmul(
++          wsub(wmul(fromword(g[0]), fromword(basis[(ulong)p * width + 4 * n]), slot),
++               wmul(fromword(g[1]), fromword(basis[(ulong)p * width + 4 * n + 1]), slot), slot),
++          wdiv(common, fromword(g[2]), slot), slot);
++      row[4 * n + 1] = wmul(
++          wadd(wmul(fromword(g[1]), fromword(basis[(ulong)p * width + 4 * n]), slot),
++               wmul(fromword(g[0]), fromword(basis[(ulong)p * width + 4 * n + 1]), slot), slot),
++          wdiv(common, fromword(g[2]), slot), slot);
++      row[4 * n + 2] = wmul(
++          wsub(wmul(fromword(g[0]), fromword(basis[(ulong)p * width + 4 * n + 2]), slot),
++               wmul(fromword(g[1]), fromword(basis[(ulong)p * width + 4 * n + 3]), slot), slot),
++          wdiv(common, fromword(g[2]), slot), slot);
++      row[4 * n + 3] = wmul(
++          wadd(wmul(fromword(g[1]), fromword(basis[(ulong)p * width + 4 * n + 2]), slot),
++               wmul(fromword(g[0]), fromword(basis[(ulong)p * width + 4 * n + 3]), slot), slot),
++          wdiv(common, fromword(g[2]), slot), slot);
++    }
++    for (uint j = sw; j < width; ++j)
++      row[j] = wmul(fromword(basis[(ulong)p * width + j]), common, slot);
++    wnorm(row, width, (threadgroup W *)nullptr, slot);
++    long ins = fibre_stage(basis_lo, width, row, slot);
++    if (ins >= 0)
++      for (uint j = 0; j < width; ++j)
++        basis_lo[(ulong)ins * width + j] = basis_hi[(ulong)ins * width + j] = toword(row[j], slot);
++    if (*slot)
++      return;
++  }
++}
++
+ kernel void section_constitutive_fibre(
+     device long *basis_lo [[buffer(0)]], device long *basis_hi [[buffer(1)]],
+     device const long *input_lo [[buffer(2)]], device const long *input_hi [[buffer(3)]],
+@@ -676,7 +1030,7 @@ kernel void section_constitutive_rechart(
+       scratch[j] = wmul(fromword(basis[(ulong)p * width + j]), common, slot);
+     if (*slot)
+       return;
+-    wnorm(scratch, width, nullptr, slot);
++    wnorm(scratch, width, (threadgroup W *)nullptr, slot);
+     long ins = fibre_stage(basis_lo, width, scratch, slot);
+     if (*slot)
+       return;
+@@ -792,7 +1146,7 @@ kernel void section_constitutive_circulation(
+     formed[sw + 1] =
+         wmul(fromword(incoming[1]), wdiv(paired_den, fromword(incoming[2]), slot), slot);
+     fibre_query(basis_lo, sw, width, prior, pden, nullptr, -1, &prior_status, &prior_rank, slot);
+-    wnorm(formed, width, nullptr, slot);
++    wnorm(formed, width, (threadgroup W *)nullptr, slot);
+     ins = fibre_stage(basis_lo, width, formed, slot);
+     if (*slot)
+       return;
+diff --git a/crates/holonic-engine/src/holonic_intelligence/dimensions.rs b/crates/holonic-engine/src/holonic_intelligence/dimensions.rs
+index 9d62c142..a0ebc9fd 100644
+--- a/crates/holonic-engine/src/holonic_intelligence/dimensions.rs
++++ b/crates/holonic-engine/src/holonic_intelligence/dimensions.rs
+@@ -24,6 +24,7 @@ dimension!(ApparatusWork);
+ pub enum DimensionObstruction {
+     ScaleChartOutsideNativeThread,
+     ApparatusWorkOutsideNativeRest,
++    NotExposedByConstitutiveFieldProfile,
+ }
+ 
+ /// An exact dimension or its typed open obligation. Unknown is never encoded as zero.
+diff --git a/crates/holonic-engine/src/native_ecology/constitutive_fibre/field.rs b/crates/holonic-engine/src/native_ecology/constitutive_fibre/field.rs
+index 25758994..83067c0d 100644
+--- a/crates/holonic-engine/src/native_ecology/constitutive_fibre/field.rs
++++ b/crates/holonic-engine/src/native_ecology/constitutive_fibre/field.rs
+@@ -12,7 +12,9 @@ use super::*;
+ use crate::dimensional_wave::ExactComplexWaveCurrent;
+ use std::rc::Rc;
+ 
++mod profile;
+ mod rechart;
++pub use profile::*;
+ 
+ /// One actual emitted source from this live body. It is linear; the caller cannot manufacture
+ /// it from an occurrence number or duplicate it for another receiving edge.
+@@ -122,9 +124,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
+         let nodes = material.len();
+         let source_width = nodes.checked_mul(4).ok_or(ConstitutiveFibreError::Shape)?;
+         let target_width = nodes.checked_mul(2).ok_or(ConstitutiveFibreError::Shape)?;
+-        let scratch = nodes
+-            .checked_mul(24)
+-            .and_then(|v| v.checked_mul(16))
++        let scratch = ResidentSurface::constitutive_field_scratch(nodes)
+             .ok_or(ConstitutiveFibreError::Shape)?;
+         let available = surface.declaration().max_sectiond_bytes;
+         if nodes == 0 {
+diff --git a/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/profile.rs b/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/profile.rs
+new file mode 100644
+index 00000000..c0f8c7ca
+--- /dev/null
++++ b/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/profile.rs
+@@ -0,0 +1,161 @@
++//! Borrowed structural profile for the complete constitutive field.
++//!
++//! This is a receiver over the field owner, not a second ecology and not a basis export.  It
++//! reports the complete source and receiving chart extents, the owned material and chronology,
++//! and the source/frame fibres already retained by the continuing field.  Apparatus readings are
++//! kept in their own census facet; they do not become intrinsic dimensions.
++
++use super::*;
++use crate::native_ecology::holonic_intelligence::{
++    DimensionFace, DimensionObstruction, IntrinsicHolonDimensions, ReconstructionExtent,
++};
++
++/// The exact chart extents of one complete field relation.
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub struct NativeConstitutiveFieldExtents {
++    /// Two complex source branches per node, represented as real coordinates.
++    pub source_extent: usize,
++    /// One complex receiving current per node, represented as real coordinates.
++    pub target_extent: usize,
++    /// The complete paired relation width, including both sides.
++    pub relation_extent: usize,
++}
++
++/// A borrowed profile of the continuing complete field. All source, frame, material and
++/// predecessor data remain owned by `NativeConstitutiveField`; observing this value cannot issue
++/// a receiving handle or copy the resident paired basis.
++#[derive(Debug)]
++pub struct NativeConstitutiveFieldProfile<'a> {
++    pub extents: NativeConstitutiveFieldExtents,
++    pub dimensions: IntrinsicHolonDimensions,
++    pub material: &'a [NativeJunctionSeed],
++    pub current_frame: &'a NativeCurrentFrame,
++    pub lineages: Vec<&'a NativeFieldLineage>,
++    pub source_frames: Vec<&'a NativeCurrentFrame>,
++    pub predecessor_states: Vec<Option<usize>>,
++    pub recharts: &'a [NativeRechartReceipt],
++    pub incidence_changes: &'a [NativeIncidenceChange],
++    pub pending_lineage: Option<&'a NativeFieldLineage>,
++    pub transfer_census: TransferCensus,
++    /// The complete historical source sections remain in the field owner and can be requested
++    /// with `inspect_source`; this extent records that reconstruction fibre without materializing
++    /// any section or resident relation basis here.
++    pub reconstruction_extent: usize,
++    pub open_obligations: Vec<crate::native_ecology::holonic_intelligence::OpenObligation<'static>>,
++}
++
++impl NativeConstitutiveField<'_> {
++    /// Read the field's intrinsic structural profile without a full-basis readback.
++    pub fn intrinsic_profile(&self) -> NativeConstitutiveFieldProfile<'_> {
++        let nodes = self.nodes();
++        let source_extent = nodes.checked_mul(4).expect("validated field source extent");
++        let target_extent = nodes.checked_mul(2).expect("validated field target extent");
++        let relation_extent = source_extent
++            .checked_add(target_extent)
++            .expect("validated field relation extent");
++        let lineages = (0..self.occurrence_count())
++            .filter_map(|occurrence| self.lineage(occurrence))
++            .collect::<Vec<_>>();
++        let source_frames = (0..self.occurrence_count())
++            .filter_map(|occurrence| self.source_frame(occurrence))
++            .collect::<Vec<_>>();
++        let predecessor_states = lineages
++            .iter()
++            .map(|lineage| lineage.predecessor_state)
++            .collect::<Vec<_>>();
++        NativeConstitutiveFieldProfile {
++            extents: NativeConstitutiveFieldExtents {
++                source_extent,
++                target_extent,
++                relation_extent,
++            },
++            dimensions: field_dimensions(nodes, source_extent, target_extent, lineages.len()),
++            material: self.material(),
++            current_frame: self.current_frame(),
++            lineages,
++            source_frames,
++            predecessor_states,
++            recharts: self.recharts(),
++            incidence_changes: self.incidence_changes(),
++            pending_lineage: self.pending_lineage(),
++            transfer_census: self.census(),
++            reconstruction_extent: self.occurrence_count(),
++            open_obligations: vec![
++                crate::native_ecology::holonic_intelligence::OpenObligation {
++                    scope: crate::native_ecology::holonic_intelligence::OpenScope::Thread,
++                    testimony: "scale chart is outside the native constitutive field profile",
++                },
++                crate::native_ecology::holonic_intelligence::OpenObligation {
++                    scope: crate::native_ecology::holonic_intelligence::OpenScope::Thread,
++                    testimony: "apparatus work is reported by TransferCensus, not intrinsic field dimensions",
++                },
++            ],
++        }
++    }
++}
++
++fn field_dimensions(
++    _nodes: usize,
++    _source_extent: usize,
++    _target_extent: usize,
++    reconstruction_extent: usize,
++) -> IntrinsicHolonDimensions {
++    IntrinsicHolonDimensions {
++        // The field exposes complete chart extents above, but does not yet found the native
++        // incidence/carrier/generator facets needed to assign these dimensions.
++        topological_degree: DimensionFace::Open(
++            DimensionObstruction::NotExposedByConstitutiveFieldProfile,
++        ),
++        incidence_rank: DimensionFace::Open(
++            DimensionObstruction::NotExposedByConstitutiveFieldProfile,
++        ),
++        incidence_nullity: DimensionFace::Open(
++            DimensionObstruction::NotExposedByConstitutiveFieldProfile,
++        ),
++        cycle_rank: DimensionFace::Open(DimensionObstruction::NotExposedByConstitutiveFieldProfile),
++        carrier_rank: DimensionFace::Open(
++            DimensionObstruction::NotExposedByConstitutiveFieldProfile,
++        ),
++        exterior_degree: DimensionFace::Open(
++            DimensionObstruction::NotExposedByConstitutiveFieldProfile,
++        ),
++        representation_rank: DimensionFace::Open(
++            DimensionObstruction::NotExposedByConstitutiveFieldProfile,
++        ),
++        generator_extent: DimensionFace::Open(
++            DimensionObstruction::NotExposedByConstitutiveFieldProfile,
++        ),
++        receiver_extent: DimensionFace::Open(
++            DimensionObstruction::NotExposedByConstitutiveFieldProfile,
++        ),
++        reconstruction_extent: DimensionFace::Exact(ReconstructionExtent(reconstruction_extent)),
++        scale_extent: DimensionFace::Open(DimensionObstruction::ScaleChartOutsideNativeThread),
++        apparatus_work: DimensionFace::Open(DimensionObstruction::ApparatusWorkOutsideNativeRest),
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn field_dimensions_keep_chart_extents_separate_from_unfounded_ranks() {
++        let dimensions = field_dimensions(2, 8, 4, 3);
++        assert!(matches!(
++            dimensions.carrier_rank,
++            DimensionFace::Open(DimensionObstruction::NotExposedByConstitutiveFieldProfile)
++        ));
++        assert!(matches!(
++            dimensions.generator_extent,
++            DimensionFace::Open(DimensionObstruction::NotExposedByConstitutiveFieldProfile)
++        ));
++        assert!(matches!(
++            dimensions.receiver_extent,
++            DimensionFace::Open(DimensionObstruction::NotExposedByConstitutiveFieldProfile)
++        ));
++        assert_eq!(
++            dimensions.reconstruction_extent,
++            DimensionFace::Exact(ReconstructionExtent(3))
++        );
++    }
++}
+diff --git a/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/tests.rs b/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/tests.rs
+index dc489b69..f01979bd 100644
+--- a/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/tests.rs
++++ b/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/tests.rs
+@@ -32,6 +32,79 @@ fn paired_vector(field: &[ExactComplexWaveCurrent]) -> Vec<Rat> {
+         .collect()
+ }
+ 
++#[test]
++#[cfg(target_os = "macos")]
++#[ignore = "requires Metal; complete field scratch aperture and full-width rechart"]
++fn metal_field_aperture_covers_the_last_rechart_coordinate() {
++    let readout = ResidentReadout::new().unwrap();
++    let surface = ResidentSurface::on(&readout).unwrap();
++    let available = surface.declaration().max_sectiond_bytes as usize;
++    let nodes = (1..=available)
++        .take_while(|n| ResidentSurface::constitutive_field_scratch(*n).unwrap() <= available)
++        .last()
++        .unwrap();
++    assert!(matches!(
++        NativeConstitutiveField::found(&surface, equal_seed(nodes + 1)),
++        Err(ConstitutiveFibreError::ScratchAperture { .. })
++    ));
++    let mut field = NativeConstitutiveField::found(&surface, equal_seed(nodes)).unwrap();
++    let first = field
++        .advance_status(&mut NativeFieldOccurrence::entering(
++            vec![NativePhaseCurrent::unit(); nodes],
++        ))
++        .unwrap();
++    field
++        .advance_status(&mut NativeFieldOccurrence::through(
++            first.source,
++            vec![phase(2, 1, 1); nodes],
++        ))
++        .unwrap();
++    let historical = field.inspect_source(0).unwrap();
++    field.rechart(&vec![phase(0, 1, 1); nodes]).unwrap();
++    assert_eq!(field.inspect_source(0).unwrap(), historical);
++    let relation = field.inspect_relation().unwrap();
++    assert!(
++        relation
++            .intervals
++            .chunks_exact(relation.width)
++            .any(|row| row.last().unwrap().0 != 0)
++    );
++    assert_eq!(field.current_frame().ordinal(), 1);
++    assert_eq!(field.occurrence_count(), 2);
++}
++
++#[test]
++#[ignore = "requires native field; borrowed profile adds no device readout and consumes no handle"]
++fn field_profile_borrows_history_without_changing_native_ownership() {
++    let readout = ResidentReadout::new().unwrap();
++    let surface = ResidentSurface::on(&readout).unwrap();
++    let mut field = NativeConstitutiveField::found(&surface, equal_seed(2)).unwrap();
++    let first = field
++        .advance_status(&mut NativeFieldOccurrence::entering(vec![
++            phase(1, 0, 1),
++            phase(0, 1, 1),
++        ]))
++        .unwrap();
++    let before = field.census();
++    {
++        let profile = field.intrinsic_profile();
++        assert_eq!(profile.extents.source_extent, 8);
++        assert_eq!(profile.extents.target_extent, 4);
++        assert_eq!(profile.lineages[0], field.lineage(0).unwrap());
++        assert!(std::ptr::eq(
++            profile.source_frames[0],
++            field.source_frame(0).unwrap()
++        ));
++        assert!(std::ptr::eq(profile.material, field.material()));
++        assert_eq!(profile.reconstruction_extent, 1);
++    }
++    assert_eq!(field.census(), before);
++    let next = field
++        .advance_status(&mut NativeFieldOccurrence::through(first.source, zero(2)))
++        .unwrap();
++    assert_eq!(next.lineage.received_from, Some(0));
++}
++
+ #[test]
+ #[ignore = "requires CUDA; complete independent port currents and actual held successor"]
+ fn field_scattering_returns_both_branches_with_weighted_energy() {
+@@ -229,10 +302,12 @@ fn zero_source_discrepancy_remains_a_full_plural_receiver() {
+             assert!(particular.iter().all(Rat::is_zero));
+             assert_eq!(
+                 directions,
+-                vec![vec![1, 0, 0, 2]
+-                    .into_iter()
+-                    .map(|v| Rat::from_integer(v.into()))
+-                    .collect::<Vec<_>>()]
++                vec![
++                    vec![1, 0, 0, 2]
++                        .into_iter()
++                        .map(|v| Rat::from_integer(v.into()))
++                        .collect::<Vec<_>>()
++                ]
+             );
+         }
+         other => panic!("lost full vertical fibre: {other:?}"),
+diff --git a/crates/holonic-engine/src/resident_section.rs b/crates/holonic-engine/src/resident_section.rs
+index 2cf6f51f..23cbb443 100644
+--- a/crates/holonic-engine/src/resident_section.rs
++++ b/crates/holonic-engine/src/resident_section.rs
+@@ -137,7 +137,9 @@ const CENSUS_MAX_WARPS: u32 = 32;
+ 
+ /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
+ /// refuses there and never at a launch.
+-pub const KERNELS: [&str; 50] = [
++pub const KERNELS: [&str; 52] = [
++    "section_constitutive_field",
++    "section_constitutive_field_rechart",
+     "section_constitutive_rechart",
+     "section_constitutive_circulation",
+     "section_constitutive_fibre",
+diff --git a/crates/holonic-engine/src/resident_section/surface_mount.rs b/crates/holonic-engine/src/resident_section/surface_mount.rs
+index 20d68e91..1e05f13d 100644
+--- a/crates/holonic-engine/src/resident_section/surface_mount.rs
++++ b/crates/holonic-engine/src/resident_section/surface_mount.rs
+@@ -1,6 +1,11 @@
+ use super::*;
+ 
+ impl<'chart> ResidentSurface<'chart> {
++    /// Completed Metal command-buffer times, observed without reading native state or waiting.
++    #[cfg(target_os = "macos")]
++    pub fn metal_execution_timing(&self) -> mount::cuda::MetalExecutionTiming {
++        self.context.execution_timing()
++    }
+     /// **Mount the apparatus occurrence** on the readout's context. Refuses when no device answers,
+     /// when the census names a device the readout did not mount, or when a kernel symbol is
+     /// missing from the module.
+diff --git a/crates/holonic-engine/src/resident_section/surface_passage.rs b/crates/holonic-engine/src/resident_section/surface_passage.rs
+index 28d319f6..debb5a33 100644
+--- a/crates/holonic-engine/src/resident_section/surface_passage.rs
++++ b/crates/holonic-engine/src/resident_section/surface_passage.rs
+@@ -5,63 +5,105 @@ impl<'chart> ResidentSurface<'chart> {
+     /// input field. Both departing branches are retained before receiver projection.
+     #[allow(clippy::too_many_arguments)]
+     pub(crate) fn record_constitutive_field(
+-        &self, lane: &Lane<'_, 'chart>, seed: &ResidentSection<'chart>,
+-        memory: &mut ResidentSection<'chart>, basis: &mut ResidentSection<'chart>,
+-        incoming: &ResidentSection<'chart>, origin: Option<&ResidentSection<'chart>>,
+-        frame: &ResidentSection<'chart>, origin_frame: Option<&ResidentSection<'chart>>,
++        &self,
++        lane: &Lane<'_, 'chart>,
++        seed: &ResidentSection<'chart>,
++        memory: &mut ResidentSection<'chart>,
++        basis: &mut ResidentSection<'chart>,
++        incoming: &ResidentSection<'chart>,
++        origin: Option<&ResidentSection<'chart>>,
++        frame: &ResidentSection<'chart>,
++        origin_frame: Option<&ResidentSection<'chart>>,
+         output: &ResidentSection<'chart>,
+     ) -> Result<(), ResidentRefusal> {
+         let fail = |what: &str| ResidentRefusal::Declaration {
+-            operation: "constitutive-field", what: what.into(),
++            operation: "constitutive-field",
++            what: what.into(),
+         };
+         let nodes = seed.rows;
+-        let width = nodes.checked_mul(6).filter(|v| *v <= u32::MAX as usize / 4)
++        let width = nodes
++            .checked_mul(6)
++            .filter(|v| *v <= u32::MAX as usize / 4)
+             .ok_or_else(|| fail("field relation extent overflow"))?;
+-        let output_width = nodes.checked_mul(16).and_then(|v| v.checked_add(9))
++        let output_width = nodes
++            .checked_mul(16)
++            .and_then(|v| v.checked_add(9))
+             .ok_or_else(|| fail("field report extent overflow"))?;
+-        let matches = |s: &ResidentSection<'chart>, rows, columns|
+-            s.rows == rows && s.width == columns && s.grain.0 == 0;
+-        if nodes == 0 || !matches(seed, nodes, 5) || !matches(memory, nodes, 3)
+-            || !matches(basis, width, width) || !matches(incoming, nodes, 3)
++        let matches = |s: &ResidentSection<'chart>, rows, columns| {
++            s.rows == rows && s.width == columns && s.grain.0 == 0
++        };
++        if nodes == 0
++            || !matches(seed, nodes, 5)
++            || !matches(memory, nodes, 3)
++            || !matches(basis, width, width)
++            || !matches(incoming, nodes, 3)
+             || !matches(frame, nodes, 3)
+             || !matches(output, 1, output_width)
+             || origin.is_some_and(|s| !matches(s, 1, output_width))
+             || origin.is_some() != origin_frame.is_some()
+-            || origin_frame.is_some_and(|s| !matches(s, nodes, 3)) {
++            || origin_frame.is_some_and(|s| !matches(s, nodes, 3))
++        {
+             return Err(fail("incompatible field, source or continuing relation"));
+         }
+-        let shared = nodes.checked_mul(24).and_then(|v| v.checked_mul(16))
++        let shared = Self::constitutive_field_scratch(nodes)
+             .and_then(|v| u32::try_from(v).ok())
+             .filter(|v| *v <= self.declaration.max_sectiond_bytes)
+             .ok_or_else(|| fail("field exact scratch exceeds the mounted aperture"))?;
+         let mut params = Params::new();
+-        params.ptr(seed.lo.device_ptr()).ptr(memory.lo.device_ptr()).ptr(memory.hi.device_ptr())
+-            .ptr(basis.lo.device_ptr()).ptr(basis.hi.device_ptr()).ptr(incoming.lo.device_ptr())
+-            .ptr(origin.unwrap_or(incoming).lo.device_ptr()).ptr(frame.lo.device_ptr())
+-            .ptr(origin_frame.unwrap_or(frame).lo.device_ptr()).u32(nodes as u32)
+-            .u32(u32::from(origin.is_some())).ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr())
+-            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+-        self.record_blocks(lane, "section_constitutive_field", 1, self.launch.block_x,
+-            shared, &mut params, "constitutive-field")
++        params
++            .ptr(seed.lo.device_ptr())
++            .ptr(memory.lo.device_ptr())
++            .ptr(memory.hi.device_ptr())
++            .ptr(basis.lo.device_ptr())
++            .ptr(basis.hi.device_ptr())
++            .ptr(incoming.lo.device_ptr())
++            .ptr(origin.unwrap_or(incoming).lo.device_ptr())
++            .ptr(frame.lo.device_ptr())
++            .ptr(origin_frame.unwrap_or(frame).lo.device_ptr())
++            .u32(nodes as u32)
++            .u32(u32::from(origin.is_some()))
++            .ptr(output.lo.device_ptr())
++            .ptr(output.hi.device_ptr())
++            .ptr(lane.slot)
++            .ptr(lane.census)
++            .ptr(lane.lineage)
++            .u32(lane.lineage_count);
++        self.record_blocks(
++            lane,
++            "section_constitutive_field",
++            1,
++            self.launch.block_x,
++            shared,
++            &mut params,
++            "constitutive-field",
++        )
+     }
+     #[allow(clippy::too_many_arguments)]
+     pub(crate) fn record_constitutive_field_rechart(
+-        &self, lane: &Lane<'_, 'chart>, seed: &ResidentSection<'chart>,
+-        memory: &ResidentSection<'chart>, frame: &ResidentSection<'chart>,
+-        basis: &ResidentSection<'chart>, change: &ResidentSection<'chart>,
+-        new_seed: &ResidentSection<'chart>, new_memory: &ResidentSection<'chart>,
+-        new_frame: &ResidentSection<'chart>, new_basis: &ResidentSection<'chart>,
++        &self,
++        lane: &Lane<'_, 'chart>,
++        seed: &ResidentSection<'chart>,
++        memory: &ResidentSection<'chart>,
++        frame: &ResidentSection<'chart>,
++        basis: &ResidentSection<'chart>,
++        change: &ResidentSection<'chart>,
++        new_seed: &ResidentSection<'chart>,
++        new_memory: &ResidentSection<'chart>,
++        new_frame: &ResidentSection<'chart>,
++        new_basis: &ResidentSection<'chart>,
+         report: &ResidentSection<'chart>,
+     ) -> Result<(), ResidentRefusal> {
+         let nodes = seed.rows;
+-        let width = nodes.checked_mul(6)
++        let width = nodes
++            .checked_mul(6)
+             .filter(|v| *v <= u32::MAX as usize / 4)
+             .ok_or_else(|| ResidentRefusal::Declaration {
+                 operation: "constitutive-field-rechart",
+                 what: "field relation extent overflow".into(),
+             })?;
+-        let matching = |s: &ResidentSection<'chart>, rows, columns|
+-            s.rows == rows && s.width == columns && s.grain.0 == 0;
++        let matching = |s: &ResidentSection<'chart>, rows, columns| {
++            s.rows == rows && s.width == columns && s.grain.0 == 0
++        };
+         if nodes == 0
+             || !matching(seed, nodes, 5)
+             || !matching(memory, nodes, 3)
+@@ -79,7 +121,7 @@ impl<'chart> ResidentSurface<'chart> {
+                 what: "incompatible field phase, seed or relation charts".into(),
+             });
+         }
+-        let shared = width.checked_mul(16)
++        let shared = Self::constitutive_rechart_scratch(width)
+             .and_then(|v| u32::try_from(v).ok())
+             .filter(|v| *v <= self.declaration.max_sectiond_bytes)
+             .ok_or_else(|| ResidentRefusal::Declaration {
+@@ -87,16 +129,36 @@ impl<'chart> ResidentSurface<'chart> {
+                 what: "exact field rechart scratch exceeds the mounted aperture".into(),
+             })?;
+         let mut params = Params::new();
+-        params.ptr(seed.lo.device_ptr()).ptr(memory.lo.device_ptr()).ptr(frame.lo.device_ptr())
+-            .ptr(basis.lo.device_ptr()).ptr(change.lo.device_ptr()).u32(nodes as u32)
+-            .ptr(new_seed.lo.device_ptr()).ptr(new_seed.hi.device_ptr())
+-            .ptr(new_memory.lo.device_ptr()).ptr(new_memory.hi.device_ptr())
+-            .ptr(new_frame.lo.device_ptr()).ptr(new_frame.hi.device_ptr())
+-            .ptr(new_basis.lo.device_ptr()).ptr(new_basis.hi.device_ptr())
+-            .ptr(report.lo.device_ptr()).ptr(report.hi.device_ptr())
+-            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+-        self.record_blocks(lane, "section_constitutive_field_rechart", 1, self.launch.block_x,
+-            shared, &mut params, "constitutive-field-rechart")
++        params
++            .ptr(seed.lo.device_ptr())
++            .ptr(memory.lo.device_ptr())
++            .ptr(frame.lo.device_ptr())
++            .ptr(basis.lo.device_ptr())
++            .ptr(change.lo.device_ptr())
++            .u32(nodes as u32)
++            .ptr(new_seed.lo.device_ptr())
++            .ptr(new_seed.hi.device_ptr())
++            .ptr(new_memory.lo.device_ptr())
++            .ptr(new_memory.hi.device_ptr())
++            .ptr(new_frame.lo.device_ptr())
++            .ptr(new_frame.hi.device_ptr())
++            .ptr(new_basis.lo.device_ptr())
++            .ptr(new_basis.hi.device_ptr())
++            .ptr(report.lo.device_ptr())
++            .ptr(report.hi.device_ptr())
++            .ptr(lane.slot)
++            .ptr(lane.census)
++            .ptr(lane.lineage)
++            .u32(lane.lineage_count);
++        self.record_blocks(
++            lane,
++            "section_constitutive_field_rechart",
++            1,
++            self.launch.block_x,
++            shared,
++            &mut params,
++            "constitutive-field-rechart",
++        )
+     }
+ 
+     /// Exact scratch layout of the target representation, including local denominators.
+@@ -118,6 +180,17 @@ impl<'chart> ResidentSurface<'chart> {
+             width.checked_mul(32)
+         }
+     }
++    pub(crate) fn constitutive_field_scratch(nodes: usize) -> Option<usize> {
++        let words = nodes.checked_mul(24)?;
++        #[cfg(target_os = "macos")]
++        {
++            words.checked_mul(20)?.checked_add(15).map(|v| v / 16 * 16)
++        }
++        #[cfg(not(target_os = "macos"))]
++        {
++            words.checked_mul(16)
++        }
++    }
+     pub(crate) fn constitutive_circulation_scratch(nodes: usize) -> Option<usize> {
+         #[cfg(target_os = "macos")]
+         {
+diff --git a/crates/holonic-mount/src/metal.rs b/crates/holonic-mount/src/metal.rs
+index 2dd1b67e..e78fcec1 100644
+--- a/crates/holonic-mount/src/metal.rs
++++ b/crates/holonic-mount/src/metal.rs
+@@ -6,6 +6,7 @@
+ //! the CPU only at explicit ingress/egress boundaries after GPU completion.
+ 
+ use metal::{MTLCommandBufferStatus, MTLResourceOptions, MTLSize};
++use objc::{msg_send, sel, sel_impl};
+ use std::{
+     cell::{Cell, RefCell},
+     collections::BTreeMap,
+@@ -51,6 +52,16 @@ struct Runtime {
+     queue: ::metal::CommandQueue,
+     pending: RefCell<Vec<::metal::CommandBuffer>>,
+     failure: RefCell<Option<CudaError>>,
++    execution_timing: Cell<MetalExecutionTiming>,
++}
++
++/// Cold command-buffer timing supplied by Metal after completion. These floating-point seconds
++/// are apparatus measurements only and never participate in native arithmetic or dispatch.
++#[derive(Clone, Copy, Debug, Default, PartialEq)]
++pub struct MetalExecutionTiming {
++    pub completed_command_buffers: u64,
++    pub unavailable_timestamps: u64,
++    pub gpu_seconds: f64,
+ }
+ struct Capture {
+     runtime: Rc<Runtime>,
+@@ -66,11 +77,24 @@ fn runtime() -> Result<Rc<Runtime>> {
+         .with(|c| c.borrow().clone())
+         .ok_or_else(|| invalid("context", "no current Metal context"))
+ }
++#[allow(unexpected_cfgs)] // objc 0.2's selector macro checks the legacy cargo-clippy feature.
+ fn synchronize(rt: &Runtime) -> Result<()> {
+     let pending = std::mem::take(&mut *rt.pending.borrow_mut());
+     let mut first_failure = rt.failure.borrow().clone();
+     for command in pending {
+         command.wait_until_completed();
++        let mut timing = rt.execution_timing.get();
++        timing.completed_command_buffers += 1;
++        // MTLCommandBuffer.h: host seconds at GPU execution start/end; zero means unavailable.
++        let command_ref = command.as_ref();
++        let start: f64 = unsafe { msg_send![command_ref, GPUStartTime] };
++        let end: f64 = unsafe { msg_send![command_ref, GPUEndTime] };
++        if start.is_finite() && end.is_finite() && start > 0.0 && end >= start {
++            timing.gpu_seconds += end - start;
++        } else {
++            timing.unavailable_timestamps += 1;
++        }
++        rt.execution_timing.set(timing);
+         if command.status() != MTLCommandBufferStatus::Completed {
+             if first_failure.is_none() {
+                 first_failure = Some(invalid(
+@@ -204,6 +228,7 @@ impl Context {
+             queue: device.inner.new_command_queue(),
+             pending: RefCell::new(Vec::new()),
+             failure: RefCell::new(None),
++            execution_timing: Cell::new(MetalExecutionTiming::default()),
+         });
+         CURRENT.with(|c| *c.borrow_mut() = Some(inner.clone()));
+         Ok(Self { inner })
+@@ -250,6 +275,10 @@ impl Drop for Context {
+     }
+ }
+ impl BorrowedContext {
++    /// Observe timestamps already collected at ordinary completion; this does not synchronize.
++    pub fn execution_timing(&self) -> MetalExecutionTiming {
++        self.inner.execution_timing.get()
++    }
+     pub fn adopt(raw: *mut c_void) -> Result<Self> {
+         let inner = runtime()?;
+         if Rc::as_ptr(&inner) as *mut c_void != raw {
+@@ -804,6 +833,8 @@ impl Module {
+             "section_constitutive_fibre" => (&[4, 5, 6, 12], 13),
+             "section_constitutive_circulation" => (&[9, 10, 16], 17),
+             "section_constitutive_rechart" => (&[5, 19], 20),
++            "section_constitutive_field" => (&[9, 10, 16], 17),
++            "section_constitutive_field_rechart" => (&[5, 19], 20),
+             "section_census" | "section_census_serial_control" => (&[2, 3], 5),
+             "section_carry" => (&[2, 8], 9),
+             _ => {
+@@ -1044,12 +1075,19 @@ mod tests {
+         let graph = stream.end_capture().unwrap();
+         assert_eq!(graph.census().unwrap().memset_nodes, 1);
+         assert_eq!(graph.census().unwrap().memcpy_nodes, 1);
++        let timing_before = context.inner.execution_timing.get();
+         graph.instantiate().unwrap().launch(&stream).unwrap();
+         stream.synchronize().unwrap();
+         let mut output = [0u32; 4];
+         destination.copy_to_slice(&mut output).unwrap();
+         assert_eq!(output, [7, 11, 13, 17]);
+         context.synchronize().unwrap();
++        let timing = context.inner.execution_timing.get();
++        assert_eq!(timing.completed_command_buffers, timing_before.completed_command_buffers + 1);
++        assert!(timing.unavailable_timestamps <= timing.completed_command_buffers);
++        assert!(timing.gpu_seconds.is_finite() && timing.gpu_seconds >= 0.0);
++        context.synchronize().unwrap();
++        assert_eq!(context.inner.execution_timing.get(), timing);
+     }
+ 
+     #[test]
+diff --git a/crates/holonics-hna/examples/acoustic_field_profile.rs b/crates/holonics-hna/examples/acoustic_field_profile.rs
+new file mode 100644
+index 00000000..63f85f7f
+--- /dev/null
++++ b/crates/holonics-hna/examples/acoustic_field_profile.rs
+@@ -0,0 +1,140 @@
++//! Profile complete recorded temporal sections through the shared native field.
++//! This receiver measures the declared material chart; it does not grade sound/language learning.
++use holonic_engine::{
++    embedding_fiber::ResidentReadout,
++    native_ecology::constitutive_fibre::{NativeConstitutiveField, NativeFieldReceiverStatus},
++    phase_current::{PhaseCurrentLineageId, PhaseCurrentReceiverId},
++    resident_section::ResidentSurface,
++};
++use holonics_hna::native::{acoustic_field::AcousticFieldChart, NativeModelSpec};
++use life::mathematical_source::ExactAcousticOccurrence;
++use serde_json::json;
++use std::{env, fs, time::Instant};
++
++fn main() -> Result<(), Box<dyn std::error::Error>> {
++    let args: Vec<_> = env::args().skip(1).collect();
++    if args.len() < 2 {
++        return Err("usage: acoustic_field_profile SEED WAV [WAV ...]".into());
++    }
++    let spec = NativeModelSpec::read(&fs::read(&args[0])?)?;
++    let mount_started = Instant::now();
++    let readout = ResidentReadout::new()?;
++    let surface = ResidentSurface::on(&readout)?;
++    let mut field = NativeConstitutiveField::found(&surface, spec.material()?)?;
++    let mount_ns = mount_started.elapsed().as_nanos();
++    for (source_index, path) in args[1..].iter().enumerate() {
++        let cold_started = Instant::now();
++        let bytes = fs::read(path)?;
++        let source = ExactAcousticOccurrence::from_wav_bytes(
++            &bytes,
++            format!("acoustic-field-source:{source_index}"),
++            path,
++            4096,
++            4096,
++            1,
++        )?;
++        let mut chart = AcousticFieldChart::from_acoustic(
++            &source,
++            PhaseCurrentReceiverId(1),
++            PhaseCurrentLineageId(source_index as u64),
++            num_rational::BigRational::from_integer(0.into()),
++            field.nodes(),
++            32768,
++        )?;
++        let cold_ns = cold_started.elapsed().as_nanos();
++        let start = field.occurrence_count();
++        let before = field.census();
++        #[cfg(target_os = "macos")]
++        let timing_before = surface.metal_execution_timing();
++        let mut latency = Vec::new();
++        let mut counts = [0u64; 3];
++        let mut first = None;
++        let mut last = None;
++        let mut failure = None;
++        let started = Instant::now();
++        while !chart.is_complete() {
++            let tick = Instant::now();
++            // Recorded time adjacency is not a receiving interaction. No source handle is
++            // fabricated or attached here. The SAME held field continues across all inputs.
++            match chart.advance_status(&mut field, &mut None) {
++                Ok((support, step)) => {
++                    latency.push(tick.elapsed().as_nanos());
++                    counts[match step.receiver {
++                        NativeFieldReceiverStatus::Unique => 0,
++                        NativeFieldReceiverStatus::OutsideDomain => 1,
++                        NativeFieldReceiverStatus::Plural => 2,
++                    }] += 1;
++                    // Inspect the product at the two declared boundaries. Intermediate full
++                    // sources remain in the native owner; the profiler does not duplicate them.
++                    if first.is_none() || chart.is_complete() {
++                        let observed = json!({"support":support,"lineage":step.lineage,
++                        "outgoing":step.outgoing,"held_successor":step.held_successor,
++                        "receiver":step.receiver,"formed_pivot":step.formed_pivot,
++                        "successor_rank":step.successor_rank});
++                        if first.is_none() {
++                            first = Some(observed.clone());
++                        }
++                        last = Some(observed);
++                    }
++                }
++                Err(error) => {
++                    failure = Some(
++                        json!({"error":error.to_string(), "support":chart.next_support(),
++                        "uncertain":field.pending_lineage().is_some()}),
++                    );
++                    break;
++                }
++            }
++        }
++        let elapsed_ns = started.elapsed().as_nanos();
++        let after = field.census();
++        #[cfg(target_os = "macos")]
++        let device_timing = {
++            let timing_after = surface.metal_execution_timing();
++            json!({"gpu_seconds":timing_after.gpu_seconds-timing_before.gpu_seconds,
++                "completed_command_buffers":timing_after.completed_command_buffers-timing_before.completed_command_buffers,
++                "unavailable_timestamps":timing_after.unavailable_timestamps-timing_before.unavailable_timestamps,
++                "scope":"Metal command-buffer GPU start/end span; includes native field and terminal census"})
++        };
++        #[cfg(not(target_os = "macos"))]
++        let device_timing = serde_json::Value::Null;
++        latency.sort_unstable();
++        let quantile = |p: usize| {
++            latency
++                .get(latency.len().saturating_sub(1) * p / 100)
++                .copied()
++        };
++        let profile = field.intrinsic_profile();
++        let profile_census = field.census();
++        println!(
++            "{}",
++            json!({
++                "schema":"holonics.acoustic-field-profile.v1",
++                "scope":"complete timed coefficient fields over declared fixed material; no learned grain or acoustic-language product",
++                "build_debug_assertions":cfg!(debug_assertions),
++                "source":path,"source_sha256":source.source_sha256,
++                "samples":source.samples.len(),"sample_rate":source.sample_rate,
++                "complete":chart.is_complete(),"failure":failure,
++                "native_from":start,"native_until":field.occurrence_count(),
++                "source_duration_seconds":source.samples.len() as f64 / source.sample_rate as f64,
++                "mount_ns":mount_ns,"decode_and_chart_ns":cold_ns,"loop_ns":elapsed_ns,
++                "loop_includes":"chart delivery, native operation, terminal readout and observer JSON construction; excludes mount/decode/final stdout",
++                "median_field_ns":quantile(50),"p95_field_ns":quantile(95),"max_field_ns":latency.last(),
++                "receivers":{"unique":counts[0],"outside_domain":counts[1],"plural":counts[2]},
++                "profile":{"ports":field.nodes(),"source_real_extent":profile.extents.source_extent,
++                    "receiver_real_extent":profile.extents.target_extent,"relation_real_extent":profile.extents.relation_extent,
++                    "retained_sources":profile.reconstruction_extent,"dimensions":format!("{:?}",profile.dimensions),
++                    "current_frame":field.current_frame().ordinal(),"recharts":profile.recharts.len(),
++                    "incidence_changes":profile.incidence_changes.len(),
++                    "profile_added_readouts":profile_census.section_read_outs-after.section_read_outs},
++            "census_before":before,"census_after":after,"first":first,"last":last,
++            "device_timing":device_timing,
++                "persistence":"native field rest/remount is not implemented by this receiver"
++            })
++        );
++        if failure.is_some() {
++            return Err("native field refused; complete obstruction printed".into());
++        }
++    }
++    Ok(())
++}
+diff --git a/crates/holonics-hna/src/native.rs b/crates/holonics-hna/src/native.rs
+index 3caa4c69..0bf1e5a6 100644
+--- a/crates/holonics-hna/src/native.rs
++++ b/crates/holonics-hna/src/native.rs
+@@ -17,6 +17,7 @@ pub use batch::NativeBatchReceive;
+ mod checkpoint;
+ pub use checkpoint::NativeSavedSession;
+ mod acoustic;
++pub mod acoustic_field;
+ pub use acoustic::{
+     AcousticApplication, AcousticInterruption, AcousticPendingReceive, AcousticRun,
+     AcousticRunOptions, AcousticSavedApplication, append_acoustic, resume_acoustic,
+diff --git a/crates/holonics-hna/src/native/acoustic_field.rs b/crates/holonics-hna/src/native/acoustic_field.rs
+new file mode 100644
+index 00000000..cd28fcc9
+--- /dev/null
++++ b/crates/holonics-hna/src/native/acoustic_field.rs
+@@ -0,0 +1,178 @@
++//! Exterior temporal sections entering the shared native material field.
++//!
++//! A chart cell supplies a complete addressed coefficient field, not a series of scalar native
++//! operations. The existing constitutive field owns scattering, joint relation formation, both
++//! source branches and the successor. Cell extent is a declared receiver aperture, never an
++//! inferred semantic grain. The complete section stays available as the reconstruction fibre.
++
++use holonic_engine::{
++    native_ecology::constitutive_fibre::{
++        ConstitutiveFibreError, NativeConstitutiveField, NativeFieldEmission,
++        NativeFieldOccurrence, NativeFieldReceiverStatus, NativeFieldStep, NativePhaseCurrent,
++    },
++    phase_current::{ExactPhaseCurrentSection, PhaseCurrentLineageId, PhaseCurrentReceiverId},
++};
++use life::mathematical_source::ExactAcousticOccurrence;
++use num_bigint::BigInt;
++use num_rational::BigRational;
++use num_traits::ToPrimitive;
++use serde::Serialize;
++use thiserror::Error;
++
++#[derive(Debug, Error)]
++pub enum AcousticFieldError {
++    #[error("acoustic temporal chart: {0}")]
++    Chart(String),
++    #[error(transparent)]
++    Native(#[from] ConstitutiveFibreError),
++}
++
++/// Exterior source coordinates only. Neither the occurrence number nor its clock supplies contact.
++#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
++pub struct AcousticFieldSupport {
++    pub source_occurrence: String,
++    pub cell: usize,
++    pub coefficient_from: usize,
++    pub coefficient_until: usize,
++    pub begin: BigRational,
++    pub end: BigRational,
++    pub structural_padding: usize,
++}
++
++/// A cold reversible chart over the existing phase-current section. Its private construction
++/// prevents arbitrary serialized coefficients from being accepted as a validated PCM chart.
++pub struct AcousticFieldChart {
++    section: ExactPhaseCurrentSection,
++    source_occurrence: String,
++    divisor: i64,
++    cursor: usize,
++}
++
++impl AcousticFieldChart {
++    pub fn from_acoustic(
++        source: &ExactAcousticOccurrence,
++        receiver: PhaseCurrentReceiverId,
++        lineage: PhaseCurrentLineageId,
++        origin: BigRational,
++        port_extent: usize,
++        divisor: i64,
++    ) -> Result<Self, AcousticFieldError> {
++        if source.sample_rate == 0 || divisor <= 0 {
++            return Err(AcousticFieldError::Chart(
++                "positive clock rate and divisor required".into(),
++            ));
++        }
++        let section = ExactPhaseCurrentSection::from_integers(
++            receiver,
++            lineage,
++            origin,
++            BigRational::new(1.into(), source.sample_rate.into()),
++            port_extent,
++            source.samples.iter().map(|s| BigInt::from(*s)).collect(),
++        )
++        .map_err(|e| AcousticFieldError::Chart(e.to_string()))?;
++        Ok(Self {
++            section,
++            source_occurrence: source.occurrence.clone(),
++            divisor,
++            cursor: 0,
++        })
++    }
++
++    pub fn section(&self) -> &ExactPhaseCurrentSection {
++        &self.section
++    }
++    pub fn divisor(&self) -> i64 {
++        self.divisor
++    }
++    pub fn cursor(&self) -> usize {
++        self.cursor
++    }
++    pub fn is_complete(&self) -> bool {
++        self.cursor == self.section.cells.len()
++    }
++
++    /// Complete inverse of this exterior chart, including zeros but excluding structural padding.
++    pub fn reconstruct_samples(&self) -> Vec<i16> {
++        // The only constructor accepts i16; neither execution nor callers can mutate coefficients.
++        self.section
++            .flat_values()
++            .iter()
++            .map(|v| v.to_i16().expect("validated source"))
++            .collect()
++    }
++
++    pub fn next_support(&self) -> Option<AcousticFieldSupport> {
++        if self.is_complete() {
++            return None;
++        }
++        let width = self.section.phase_extent as usize;
++        let from = self.cursor * width;
++        let until = (from + width).min(self.section.raw_extent());
++        let at = |i: usize| &self.section.origin + &self.section.sample_step * BigInt::from(i);
++        Some(AcousticFieldSupport {
++            source_occurrence: self.source_occurrence.clone(),
++            cell: self.cursor,
++            coefficient_from: from,
++            coefficient_until: until,
++            begin: at(from),
++            end: at(until),
++            structural_padding: width - (until - from),
++        })
++    }
++
++    fn prepare(&self, source: Option<NativeFieldEmission>) -> NativeFieldOccurrence {
++        let incoming = self.section.cells[self.cursor]
++            .iter()
++            .map(|v| {
++                NativePhaseCurrent::new(v.to_i64().expect("validated source"), 0, self.divisor)
++                    .expect("positive divisor")
++            })
++            .collect();
++        match source {
++            Some(source) => NativeFieldOccurrence::through(source, incoming),
++            None => NativeFieldOccurrence::entering(incoming),
++        }
++    }
++
++    /// Conduct one complete coefficient field through the caller's existing native owner.
++    ///
++    /// A source handle is accepted only when the application declares an actual receiving
++    /// interaction. Time adjacency alone never supplies one. Refusal restores that same handle
++    /// and leaves the chart cursor unchanged. Success advances only this exterior source cursor.
++    /// The returned classification is an observer projection; the full native fibre stays resident.
++    pub fn advance_status(
++        &mut self,
++        field: &mut NativeConstitutiveField<'_>,
++        receiving: &mut Option<NativeFieldEmission>,
++    ) -> Result<
++        (
++            AcousticFieldSupport,
++            NativeFieldStep<NativeFieldReceiverStatus>,
++        ),
++        AcousticFieldError,
++    > {
++        let support = self
++            .next_support()
++            .ok_or_else(|| AcousticFieldError::Chart("source complete".into()))?;
++        if field.nodes() != self.section.phase_extent as usize {
++            return Err(AcousticFieldError::Chart(
++                "material port extent differs from temporal chart".into(),
++            ));
++        }
++        let mut occurrence = self.prepare(receiving.take());
++        match field.advance_status(&mut occurrence) {
++            Ok(step) => {
++                self.cursor += 1;
++                Ok((support, step))
++            }
++            Err(error) => {
++                *receiving = occurrence.take_source();
++                Err(error.into())
++            }
++        }
++    }
++}
++
++#[cfg(test)]
++mod tests;
+diff --git a/crates/holonics-hna/src/native/acoustic_field/tests.rs b/crates/holonics-hna/src/native/acoustic_field/tests.rs
+new file mode 100644
+index 00000000..320de182
+--- /dev/null
++++ b/crates/holonics-hna/src/native/acoustic_field/tests.rs
+@@ -0,0 +1,116 @@
++use super::*;
++use holonic_engine::{
++    embedding_fiber::ResidentReadout, native_ecology::constitutive_fibre::NativeJunctionSeed,
++    resident_section::ResidentSurface,
++};
++
++fn source(samples: &[i16]) -> ExactAcousticOccurrence {
++    let bytes = (samples.len() * 2) as u32;
++    let mut wav = Vec::new();
++    wav.extend(b"RIFF");
++    wav.extend((36 + bytes).to_le_bytes());
++    wav.extend(b"WAVEfmt ");
++    wav.extend(16u32.to_le_bytes());
++    wav.extend(1u16.to_le_bytes());
++    wav.extend(1u16.to_le_bytes());
++    wav.extend(16000u32.to_le_bytes());
++    wav.extend(32000u32.to_le_bytes());
++    wav.extend(2u16.to_le_bytes());
++    wav.extend(16u16.to_le_bytes());
++    wav.extend(b"data");
++    wav.extend(bytes.to_le_bytes());
++    for s in samples {
++        wav.extend(s.to_le_bytes());
++    }
++    ExactAcousticOccurrence::from_wav_bytes(&wav, "source", "memory.wav", 2, 2, 1).unwrap()
++}
++
++fn chart(samples: &[i16], width: usize) -> AcousticFieldChart {
++    AcousticFieldChart::from_acoustic(
++        &source(samples),
++        PhaseCurrentReceiverId(1),
++        PhaseCurrentLineageId(2),
++        BigRational::new(7.into(), 3.into()),
++        width,
++        32768,
++    )
++    .unwrap()
++}
++fn material(n: usize) -> Vec<NativeJunctionSeed> {
++    (0..n)
++        .map(|_| NativeJunctionSeed {
++            incoming_admittance: 1,
++            held_admittance: 1,
++            incoming_transport: NativePhaseCurrent::unit(),
++            initial_held: NativePhaseCurrent::zero(),
++        })
++        .collect()
++}
++
++#[test]
++fn temporal_chart_reconstructs_extremes_zeros_and_padding() {
++    let values = [i16::MIN, 0, i16::MAX, -1, 9];
++    for width in [1, 2, 4, 9] {
++        let mut c = chart(&values, width);
++        assert_eq!(c.reconstruct_samples(), values);
++        let first = c.next_support().unwrap();
++        assert_eq!(first.begin, BigRational::new(7.into(), 3.into()));
++        c.cursor = c.section.cells.len() - 1;
++        let last = c.next_support().unwrap();
++        assert_eq!(last.coefficient_until, values.len());
++        assert_eq!(
++            last.end,
++            BigRational::new(7.into(), 3.into()) + BigRational::new(5.into(), 16000.into())
++        );
++        assert_eq!(
++            last.structural_padding,
++            width * c.section.cells.len() - values.len()
++        );
++    }
++}
++
++#[test]
++fn equal_integrated_faces_retain_different_temporal_fibres() {
++    let a = chart(&[1, -1, 4, 0], 2);
++    let b = chart(&[-1, 1, 0, 4], 2);
++    assert_eq!(a.section.integrated_cells(), b.section.integrated_cells());
++    assert_ne!(a.section.flat_values(), b.section.flat_values());
++    assert_ne!(a.prepare(None).incoming(), b.prepare(None).incoming());
++}
++
++#[test]
++#[ignore = "requires resident native field backend"]
++fn acoustic_field_returns_complete_branches_and_preserves_refused_source() {
++    let readout = ResidentReadout::new().unwrap();
++    let surface = ResidentSurface::on(&readout).unwrap();
++    let mut field = NativeConstitutiveField::found(&surface, material(2)).unwrap();
++    let mut chart = chart(&[3, -7, 0, 9, 2], 2);
++    let (_, first) = chart.advance_status(&mut field, &mut None).unwrap();
++    assert_eq!(first.lineage.incoming.len(), 2);
++    assert_eq!(first.outgoing.len(), 2);
++    assert_eq!(
++        first.held_successor,
++        first
++            .lineage
++            .incoming
++            .iter()
++            .map(|v| v.current())
++            .collect::<Vec<_>>()
++    );
++    assert_eq!(field.occurrence_count(), 1);
++    let mut source = Some(first.source);
++    let mut foreign = NativeConstitutiveField::found(&surface, material(2)).unwrap();
++    assert!(chart.advance_status(&mut foreign, &mut source).is_err());
++    assert_eq!(chart.cursor(), 1);
++    assert!(source.is_some());
++    let (_, second) = chart.advance_status(&mut field, &mut source).unwrap();
++    assert!(source.is_none());
++    assert_eq!(second.lineage.received_from, Some(0));
++    assert_eq!(second.outgoing, first.held_successor);
++    assert_eq!(second.received_difference.unwrap().arrived.len(), 2);
++    let (tail, third) = chart.advance_status(&mut field, &mut None).unwrap();
++    assert_eq!(tail.structural_padding, 1);
++    assert_eq!(third.lineage.received_from, None);
++    assert!(chart.is_complete());
++    assert_eq!(field.occurrence_count(), 3);
++}
+diff --git a/research/experiments/apple_silicon/generate_wide_cases.py b/research/experiments/apple_silicon/generate_wide_cases.py
+index d4f1433b..c79d8c7e 100644
+--- a/research/experiments/apple_silicon/generate_wide_cases.py
++++ b/research/experiments/apple_silicon/generate_wide_cases.py
+@@ -7,7 +7,7 @@ MASK = (1 << 32) - 1
+ def limbs(x):
+     return [(x >> (32*i)) & MASK for i in range(4)]
+ 
+-cases = []
++pairs = []
+ for i in range(100):
+     if i < 40:
+         a = rng.randrange(1, 1 << 95)
+@@ -19,6 +19,18 @@ for i in range(100):
+     else:
+         a = rng.randrange(1, 1 << 127)
+         b = rng.randrange(1, 1 << 32)
++    pairs.append((a, b))
++
++# Preserve the original wide cases, and exercise the complete 32-/64-bit chart
++# boundaries used by the exact Metal carrier specializations.
++for a in (0, 1, 2, 32767, 32768, (1 << 32)-1, 1 << 32, (1 << 64)-1):
++    for b in (1, 2, 32768, (1 << 32)-1, (1 << 32)+1, (1 << 64)-1):
++        pairs.append((a, b))
++for _ in range(100):
++    pairs.append((rng.randrange(1 << 32), rng.randrange(1, 1 << 32)))
++
++cases = []
++for a, b in pairs:
+     product = a * b
+     flags = 1 if product >= (1 << 127) else 0
+     cases.append({
+diff --git a/research/experiments/apple_silicon/native_phase_arithmetic_check.swift b/research/experiments/apple_silicon/native_phase_arithmetic_check.swift
+index d5c3f1f4..389bedd2 100644
+--- a/research/experiments/apple_silicon/native_phase_arithmetic_check.swift
++++ b/research/experiments/apple_silicon/native_phase_arithmetic_check.swift
+@@ -80,7 +80,7 @@ struct WideCase: Codable {
+ }
+ let casesPath = CommandLine.arguments.dropFirst(2).first ?? "research/experiments/apple_silicon/wide_cases.json"
+ let cases = try JSONDecoder().decode([WideCase].self, from: Data(contentsOf: URL(fileURLWithPath: casesPath)))
+-precondition(cases.count == 100, "expected 100 generated wide cases")
++precondition(cases.count == 248, "expected 248 generated wide and carrier-boundary cases")
+ for (index, test) in cases.enumerated() {
+     let result = runWide(test.a, test.b)
+     precondition(result.1 == test.flags, "wide case \(index) refusal mismatch: \(result.1) vs \(test.flags)")
+@@ -89,3 +89,4 @@ for (index, test) in cases.enumerated() {
+     }
+ }
+ print("native phase arithmetic probe passed: normal=\(normal.0), overflowFlags=\(overflow.1), minFlags=\(minCase.1), wideFlags=\(wide.1), earlyShiftFlags=\(earlyShift.1), boundaryFlags=\(boundary.1)")
++print("exact generated cases checked: \(cases.count)")
+diff --git a/research/experiments/apple_silicon/wide_cases.json b/research/experiments/apple_silicon/wide_cases.json
+index 402d2a7f..4e9fc334 100644
+--- a/research/experiments/apple_silicon/wide_cases.json
++++ b/research/experiments/apple_silicon/wide_cases.json
+@@ -1 +1 @@
+-[{"a":[2582792245,2596698250,1370637575,0],"b":[110831631,0,0,0],"flags":0,"product":[3599860507,1342020495,2641795231,35369302],"gcd":[1,0,0,0],"quotient":[1920428662,1575586267,12,0]},{"a":[3544675767,1964450515,1790441629,0],"b":[1650112830,0,0,0],"flags":0,"product":[1068876114,1763648811,2036729143,687882002],"gcd":[1,0,0,0],"quotient":[1516779944,365252359,1,0]},{"a":[2666973953,217612558,1455048513,0],"b":[342955680,0,0,0],"flags":0,"product":[1059190432,2454150552,3209053067,116186484],"gcd":[3,0,0,0],"quotient":[1283607853,1042268958,4,0]},{"a":[917769553,4076829538,285619601,0],"b":[1661115262,0,0,0],"flags":0,"product":[1582340318,996098052,4288310956,110465818],"gcd":[1,0,0,0],"quotient":[2193414055,738495923,0,0]},{"a":[2499852147,957652456,1901264164,0],"b":[448446569,0,0,0],"flags":0,"product":[2658106923,973179212,1392676783,198514990],"gcd":[1,0,0,0],"quotient":[3803003416,1029362351,4,0]},{"a":[2248840913,1270175720,904432130,0],"b":[1660610516,0,0,0],"flags":0,"product":[3639966740,820154773,542357238,349690557],"gcd":[1,0,0,0],"quotient":[71611596,2339203795,0,0]},{"a":[3948266487,366819578,501566441,0],"b":[1714909163,0,0,0],"flags":0,"product":[3150183613,896849377,187733677,200267156],"gcd":[1,0,0,0],"quotient":[3168909121,1256166511,0,0]},{"a":[189960765,3307904901,442851123,0],"b":[1228922454,0,0,0],"flags":0,"product":[3398502014,1688161160,4153642329,126713348],"gcd":[3,0,0,0],"quotient":[3560764055,1547722630,0,0]},{"a":[4224426961,536267081,467778898,0],"b":[163218382,0,0,0],"flags":0,"product":[831243566,3677483033,1683113170,17776646],"gcd":[1,0,0,0],"quotient":[403184801,3719310510,2,0]},{"a":[956792699,159320666,229890821,0],"b":[317014043,0,0,0],"flags":0,"product":[2461020665,1572089969,2934294854,16968375],"gcd":[1,0,0,0],"quotient":[709451038,3114605109,0,0]},{"a":[2244956232,2421803874,447260145,0],"b":[810914990,0,0,0],"flags":0,"product":[4114231536,124419893,47592855,84445336],"gcd":[2,0,0,0],"quotient":[710772457,2368889121,0,0]},{"a":[3718604861,483239017,1018034400,0],"b":[1053199516,0,0,0],"flags":0,"product":[3942310188,3502871270,3798879536,249639464],"gcd":[1,0,0,0],"quotient":[2836900940,4151563296,0,0]},{"a":[3587870393,1366298126,1668149450,0],"b":[694969968,0,0,0],"flags":0,"product":[2072520432,2502052034,1248805500,269923771],"gcd":[3,0,0,0],"quotient":[3651827829,1719355972,2,0]},{"a":[3354377863,4283097283,1236879539,0],"b":[173027520,0,0,0],"flags":0,"product":[3082302784,1699422383,3369138955,49829063],"gcd":[365,0,0,0],"quotient":[643288431,637611840,7,0]},{"a":[2547450785,3213219465,2011750045,0],"b":[1028201494,0,0,0],"flags":0,"product":[4140362710,258081947,3623543754,481606554],"gcd":[1,0,0,0],"quotient":[1623217453,4108444588,1,0]},{"a":[4193876107,3727173213,779940586,0],"b":[1262563192,0,0,0],"flags":0,"product":[1314719272,3354774426,937633872,229273987],"gcd":[1,0,0,0],"quotient":[761708748,2653189428,0,0]},{"a":[2869513255,729525296,1935050575,0],"b":[262207080,0,0,0],"flags":0,"product":[1280600536,4196739430,909408340,118134534],"gcd":[1,0,0,0],"quotient":[35130911,1631470450,7,0]},{"a":[2912062869,52060773,61736284,0],"b":[2094898834,0,0,0],"flags":0,"product":[3600266490,1067496245,2994556372,30112282],"gcd":[1,0,0,0],"quotient":[2800906469,126571897,0,0]},{"a":[421769139,2371464041,375887054,0],"b":[765583661,0,0,0],"flags":0,"product":[3208983927,4008613349,3737017104,67002369],"gcd":[1,0,0,0],"quotient":[2136945200,2108747467,0,0]},{"a":[1002065364,2041941511,1594973000,0],"b":[31657645,0,0,0],"flags":0,"product":[1680093252,622530728,1802913837,11756338],"gcd":[5,0,0,0],"quotient":[3193766363,1640342415,50,0]},{"a":[2363233724,3606274446,188565697,0],"b":[1242849468,0,0,0],"flags":0,"product":[74872336,4079728892,4086383659,54565904],"gcd":[84,0,0,0],"quotient":[2463033630,651634430,0,0]},{"a":[4014411727,3324690207,1343274153,0],"b":[316916531,0,0,0],"flags":0,"product":[1589629757,3258814911,3984892188,99117351],"gcd":[1,0,0,0],"quotient":[2384004313,1024667328,4,0]},{"a":[1658576735,3634497100,1230188884,0],"b":[2005840019,0,0,0],"flags":0,"product":[4253324173,3383831710,443753332,574524071],"gcd":[1,0,0,0],"quotient":[246019731,2634118862,0,0]},{"a":[243192324,482745043,1729744573,0],"b":[1541643550,0,0,0],"flags":0,"product":[523571320,2901902267,1941644289,620877734],"gcd":[10,0,0,0],"quotient":[1372663391,524043150,1,0]},{"a":[2418874344,695549015,1394469832,0],"b":[1725629196,0,0,0],"flags":0,"product":[752670432,3549309157,3018494771,560269191],"gcd":[12,0,0,0],"quotient":[917066667,3470735392,0,0]},{"a":[2868459937,3621235522,864919834,0],"b":[39880364,0,0,0],"flags":0,"product":[838663724,2799830578,1698491194,8031101],"gcd":[1,0,0,0],"quotient":[1390990938,2954345214,21,0]},{"a":[350572194,3572046725,2014927861,0],"b":[1860364495,0,0,0],"flags":0,"product":[3148965118,3823424964,3898229847,872765726],"gcd":[5,0,0,0],"quotient":[2784904336,356835774,1,0]},{"a":[726785523,107071633,1963899919,0],"b":[916451060,0,0,0],"flags":0,"product":[2186048924,787959117,1032768843,419052821],"gcd":[5,0,0,0],"quotient":[2772347484,613923958,2,0]},{"a":[2520439736,779631013,1311262302,0],"b":[135782709,0,0,0],"flags":0,"product":[1389638936,2753613433,3625535217,41454738],"gcd":[3,0,0,0],"quotient":[1724503288,2822068115,9,0]},{"a":[997884665,2645539822,564464966,0],"b":[695407590,0,0,0],"flags":0,"product":[1051010742,1247862134,3225429552,91393762],"gcd":[1,0,0,0],"quotient":[2899126054,3486241171,0,0]},{"a":[2796159006,830954477,510891439,0],"b":[465363557,0,0,0],"flags":0,"product":[355764182,2628347072,1956666865,55355545],"gcd":[1,0,0,0],"quotient":[1414037083,420189252,1,0]},{"a":[1146100777,1178776635,597015967,0],"b":[47683989,0,0,0],"flags":0,"product":[2615403741,2530824658,3016496671,6628246],"gcd":[1,0,0,0],"quotient":[2218134432,2234502131,12,0]},{"a":[995822333,2738232016,1477300646,0],"b":[557404022,0,0,0],"flags":0,"product":[2209358750,3174732284,53829549,191725167],"gcd":[1,0,0,0],"quotient":[904640062,2793115607,2,0]},{"a":[477211748,1765339373,54825441,0],"b":[1241853318,0,0,0],"flags":0,"product":[616681560,1426207786,3311042365,15852310],"gcd":[2,0,0,0],"quotient":[4021353591,189614565,0,0]},{"a":[3830050746,4047440443,1297866248,0],"b":[1280459781,0,0,0],"flags":0,"product":[447944354,2213031593,2957095804,386933221],"gcd":[3,0,0,0],"quotient":[920521989,58385442,1,0]},{"a":[148266323,3059874588,1912830525,0],"b":[674700586,0,0,0],"flags":0,"product":[3230840478,1508688956,19696146,300488406],"gcd":[7,0,0,0],"quotient":[3064276226,3586643761,2,0]},{"a":[3678169459,3928724196,735302941,0],"b":[329452386,0,0,0],"flags":0,"product":[853626630,133899346,3417125929,56402596],"gcd":[1,0,0,0],"quotient":[1358199839,995978949,2,0]},{"a":[2739183141,1901962135,1472545773,0],"b":[996475808,0,0,0],"flags":0,"product":[3293988384,1894072372,2967767904,341645497],"gcd":[1,0,0,0],"quotient":[3665710112,2051936349,1,0]},{"a":[3678455272,676755691,312881391,0],"b":[1534127605,0,0,0],"flags":0,"product":[3652529928,1725171299,542285834,111758704],"gcd":[1,0,0,0],"quotient":[2843247418,875947566,0,0]},{"a":[178935783,438608171,1628067751,0],"b":[1721201777,0,0,0],"flags":0,"product":[3360061687,1507184212,3443747949,652445737],"gcd":[1,0,0,0],"quotient":[1322792733,4062567120,0,0]},{"a":[2434567796,1438472584,2747104231,1037914],"b":[3628467379,21,0,0],"flags":1,"product":[0,0,0,0],"gcd":[3628467379,21,0,0],"quotient":[1441135036,350598224,47513,0]},{"a":[3465182712,855502430,2233000165,3641214],"b":[1957799852,247,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1957799852,247,0,0],"quotient":[3712848122,2592227243,14714,0]},{"a":[775512105,3968915125,1910014692,3112853],"b":[2590486117,70,0,0],"flags":1,"product":[0,0,0,0],"gcd":[2590486117,70,0,0],"quotient":[556481653,1910423743,44089,0]},{"a":[195843341,2648990615,1186980361,12198903],"b":[3644480011,238,0,0],"flags":1,"product":[0,0,0,0],"gcd":[3644480011,238,0,0],"quotient":[95261767,3442728950,51073,0]},{"a":[755789436,3526895372,319062345,1381267],"b":[3241428990,39,0,0],"flags":1,"product":[0,0,0,0],"gcd":[3241428990,39,0,0],"quotient":[76091586,3202054305,34744,0]},{"a":[881220544,266310005,207093357,15005358],"b":[3795650598,249,0,0],"flags":1,"product":[0,0,0,0],"gcd":[3795650598,249,0,0],"quotient":[3182237344,1531755854,60049,0]},{"a":[388469408,2186980723,2634468762,1055756],"b":[2383045856,57,0,0],"flags":1,"product":[0,0,0,0],"gcd":[2383045856,57,0,0],"quotient":[4118878179,2094794721,18343,0]},{"a":[1752517166,3799306811,2018196630,4511293],"b":[902127046,207,0,0],"flags":1,"product":[0,0,0,0],"gcd":[902127046,207,0,0],"quotient":[1265464125,2562504659,21771,0]},{"a":[3671230412,1310295300,801869377,4626285],"b":[2119214668,110,0,0],"flags":1,"product":[0,0,0,0],"gcd":[2119214668,110,0,0],"quotient":[3945488929,1409596410,41869,0]},{"a":[1021053526,487422567,699401414,1944528],"b":[615265618,236,0,0],"flags":1,"product":[0,0,0,0],"gcd":[615265618,236,0,0],"quotient":[1540618675,2266588821,8234,0]},{"a":[4000035264,3804886662,3152039845,53159],"b":[1714441056,249,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1714441056,249,0,0],"quotient":[2759045642,649409146,213,0]},{"a":[2316368495,3175588746,436507955,10604710],"b":[3468678895,172,0,0],"flags":1,"product":[0,0,0,0],"gcd":[3468678895,172,0,0],"quotient":[320148609,626518097,61367,0]},{"a":[63619836,2552115182,2841856419,14217283],"b":[265632948,226,0,0],"flags":1,"product":[0,0,0,0],"gcd":[265632948,226,0,0],"quotient":[2917077787,532186317,62891,0]},{"a":[4016675591,2990367403,2475896959,619350],"b":[459352849,75,0,0],"flags":1,"product":[0,0,0,0],"gcd":[459352849,75,0,0],"quotient":[1497232535,1066783686,8246,0]},{"a":[3602907662,1107484511,1915342136,18810],"b":[2799293857,2,0,0],"flags":1,"product":[0,0,0,0],"gcd":[2799293857,2,0,0],"quotient":[3243445070,2433398103,7093,0]},{"a":[2062949468,2413525414,1105010524,4306382],"b":[40038091,146,0,0],"flags":1,"product":[0,0,0,0],"gcd":[40038091,146,0,0],"quotient":[548621716,3804061085,29493,0]},{"a":[2212257790,918723990,2860534418,9592427],"b":[459999874,169,0,0],"flags":1,"product":[0,0,0,0],"gcd":[459999874,169,0,0],"quotient":[2785027391,4203747801,56723,0]},{"a":[1435355512,3611971998,2962290910,10307759],"b":[2942385643,238,0,0],"flags":1,"product":[0,0,0,0],"gcd":[2942385643,238,0,0],"quotient":[1357080168,2602261721,43185,0]},{"a":[3022628337,2573189062,2623621423,179773],"b":[3274195375,11,0,0],"flags":1,"product":[0,0,0,0],"gcd":[3274195375,11,0,0],"quotient":[3593116255,3605949312,15283,0]},{"a":[352405412,1400792377,957625513,4115728],"b":[1800063052,93,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1800063052,93,0,0],"quotient":[3264596883,2570931460,44056,0]},{"a":[436277480,2799420269,1769130752,3995140],"b":[2142174038,171,0,0],"flags":1,"product":[0,0,0,0],"gcd":[2142174038,171,0,0],"quotient":[3858308444,1921106805,23295,0]},{"a":[3314929338,177083109,2867865895,2858450],"b":[2953170654,108,0,0],"flags":1,"product":[0,0,0,0],"gcd":[2953170654,108,0,0],"quotient":[2240141299,2994352908,26299,0]},{"a":[1760521635,3467592644,776096366,1068802],"b":[3866727209,33,0,0],"flags":1,"product":[0,0,0,0],"gcd":[3866727209,33,0,0],"quotient":[3946086379,3503899695,31527,0]},{"a":[3192915472,1981893755,323700991,2550648],"b":[483856550,74,0,0],"flags":1,"product":[0,0,0,0],"gcd":[483856550,74,0,0],"quotient":[3427495896,3534912338,34415,0]},{"a":[4068046348,425686328,3044315914,1908855],"b":[3323673687,208,0,0],"flags":1,"product":[0,0,0,0],"gcd":[3323673687,208,0,0],"quotient":[1096921812,748217438,9143,0]},{"a":[2576416118,75324280,3723768282,1645060],"b":[1418849066,189,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1418849066,189,0,0],"quotient":[3645697807,3601768282,8688,0]},{"a":[2262360061,30919668,3896289909,1261593],"b":[2606939877,76,0,0],"flags":1,"product":[0,0,0,0],"gcd":[2606939877,76,0,0],"quotient":[3832935225,1695113754,16468,0]},{"a":[2068962878,1812294496,1194503720,10494750],"b":[1250572842,182,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1250572842,182,0,0],"quotient":[2126508131,1536964579,57571,0]},{"a":[1621803901,868507231,98886389,31900],"b":[2772959743,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[2772959743,0,0,0],"quotient":[665993859,600478449,49409,0]},{"a":[770077492,2103789394,1142646835,1187637],"b":[2904910022,202,0,0],"flags":1,"product":[0,0,0,0],"gcd":[2904910022,202,0,0],"quotient":[4114248222,3316840436,5859,0]},{"a":[4213479029,3368913977,3699410143,547133511],"b":[4095742075,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[5,0,0,0],"quotient":[619051098,763527327,573747198,0]},{"a":[3877132724,733594045,3613429875,519218605],"b":[2733387241,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[1343336042,626974022,815847421,0]},{"a":[1946457428,1312648325,1691842282,1356464899],"b":[1082598037,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[1248979267,477592772,1086505958,1]},{"a":[1492418783,3548165081,3749660254,2004675201],"b":[1990037716,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[836143833,1812120657,31591121,1]},{"a":[2064537680,173950870,2693593802,1104186453],"b":[1059823659,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[189846683,1146975956,179781561,1]},{"a":[2378070704,531677833,2392245410,522824115],"b":[1580820306,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[26,0,0,0],"quotient":[619540861,1947889836,1420472946,0]},{"a":[315845768,3989545644,299772377,252571532],"b":[3371790344,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[8,0,0,0],"quotient":[3552728141,92010372,321724176,0]},{"a":[3124020067,13156689,1965420153,954069343],"b":[3838192101,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[2571713725,3323433382,1067611135,0]},{"a":[2376446666,3268714726,2615436594,1674520542],"b":[4160917759,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[251519561,179954378,1728467464,0]},{"a":[1173910515,1197432677,1003064345,1180838555],"b":[3043620127,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[1525811743,3174291422,1666325876,0]},{"a":[3492928276,813965729,464081193,1133103090],"b":[2438643025,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[637,0,0,0],"quotient":[2030517616,437427961,1995634730,0]},{"a":[1548143063,1436411214,2599373576,2114141758],"b":[3533833621,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[4093113492,2096462890,2569495535,0]},{"a":[3602735460,102249726,3177087087,678011869],"b":[3277653189,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[47287972,984624917,888452389,0]},{"a":[4053470891,1556444101,3739442251,674404037],"b":[2994174620,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[5,0,0,0],"quotient":[1265393482,332174231,967392906,0]},{"a":[2687976473,3807632990,2334472769,1355341828],"b":[1286656001,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[1500656852,1089589118,229279141,1]},{"a":[314204127,359838022,2943376786,2106203715],"b":[993012338,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[3045922840,1466601405,519797212,2]},{"a":[2003677210,3310002632,2428359449,195328369],"b":[2407976167,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[677352298,712067112,348395873,0]},{"a":[1962632783,298157760,3621473237,94828694],"b":[3407549553,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[3,0,0,0],"quotient":[2161585590,3345525589,119524642,0]},{"a":[1400079235,703294640,1502565596,1425476895],"b":[1927936801,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[2198626346,2755538316,3175610654,0]},{"a":[3903405730,2949343347,2204932306,809132402],"b":[3927361791,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[342961785,1794022350,884868110,0]},{"a":[4160722669,459855147,3396620311,1343096999],"b":[1845960058,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[3977605816,463023339,3124963438,0]},{"a":[1187690635,1308402629,3313727835,453099797],"b":[1496031565,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[2643321457,3025589557,1300807321,0]},{"a":[2472861818,3816539704,3154508679,1152196439],"b":[901724697,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[1782220397,1632162638,1193011511,1]},{"a":[2638165945,3043396524,94839154,326535534],"b":[4212556180,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[1614964991,3627594007,332923616,0]},{"a":[3607487430,1955037954,584787247,586240372],"b":[375383787,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[975073629,2536461220,2412523312,1]},{"a":[3682636941,1069522228,3318933072,862061715],"b":[2374828589,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[7,0,0,0],"quotient":[2434686696,3087660157,1559071207,0]},{"a":[774288064,125922622,2355464939,1495283334],"b":[419112013,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[19,0,0,0],"quotient":[3857091280,1746983027,2438431304,3]},{"a":[3700341327,1282114598,249227573,1380452249],"b":[933496908,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[3,0,0,0],"quotient":[3344856056,1920880971,2056416637,1]},{"a":[3637500410,1346035344,562455727,858411568],"b":[4087794386,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[2,0,0,0],"quotient":[1685756211,1679116861,901916599,0]},{"a":[807859412,3619675441,3313972940,2118344536],"b":[1866218668,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[4,0,0,0],"quotient":[426413632,3291998819,580249452,1]}]
+\ No newline at end of file
++[{"a":[2582792245,2596698250,1370637575,0],"b":[110831631,0,0,0],"flags":0,"product":[3599860507,1342020495,2641795231,35369302],"gcd":[1,0,0,0],"quotient":[1920428662,1575586267,12,0]},{"a":[3544675767,1964450515,1790441629,0],"b":[1650112830,0,0,0],"flags":0,"product":[1068876114,1763648811,2036729143,687882002],"gcd":[1,0,0,0],"quotient":[1516779944,365252359,1,0]},{"a":[2666973953,217612558,1455048513,0],"b":[342955680,0,0,0],"flags":0,"product":[1059190432,2454150552,3209053067,116186484],"gcd":[3,0,0,0],"quotient":[1283607853,1042268958,4,0]},{"a":[917769553,4076829538,285619601,0],"b":[1661115262,0,0,0],"flags":0,"product":[1582340318,996098052,4288310956,110465818],"gcd":[1,0,0,0],"quotient":[2193414055,738495923,0,0]},{"a":[2499852147,957652456,1901264164,0],"b":[448446569,0,0,0],"flags":0,"product":[2658106923,973179212,1392676783,198514990],"gcd":[1,0,0,0],"quotient":[3803003416,1029362351,4,0]},{"a":[2248840913,1270175720,904432130,0],"b":[1660610516,0,0,0],"flags":0,"product":[3639966740,820154773,542357238,349690557],"gcd":[1,0,0,0],"quotient":[71611596,2339203795,0,0]},{"a":[3948266487,366819578,501566441,0],"b":[1714909163,0,0,0],"flags":0,"product":[3150183613,896849377,187733677,200267156],"gcd":[1,0,0,0],"quotient":[3168909121,1256166511,0,0]},{"a":[189960765,3307904901,442851123,0],"b":[1228922454,0,0,0],"flags":0,"product":[3398502014,1688161160,4153642329,126713348],"gcd":[3,0,0,0],"quotient":[3560764055,1547722630,0,0]},{"a":[4224426961,536267081,467778898,0],"b":[163218382,0,0,0],"flags":0,"product":[831243566,3677483033,1683113170,17776646],"gcd":[1,0,0,0],"quotient":[403184801,3719310510,2,0]},{"a":[956792699,159320666,229890821,0],"b":[317014043,0,0,0],"flags":0,"product":[2461020665,1572089969,2934294854,16968375],"gcd":[1,0,0,0],"quotient":[709451038,3114605109,0,0]},{"a":[2244956232,2421803874,447260145,0],"b":[810914990,0,0,0],"flags":0,"product":[4114231536,124419893,47592855,84445336],"gcd":[2,0,0,0],"quotient":[710772457,2368889121,0,0]},{"a":[3718604861,483239017,1018034400,0],"b":[1053199516,0,0,0],"flags":0,"product":[3942310188,3502871270,3798879536,249639464],"gcd":[1,0,0,0],"quotient":[2836900940,4151563296,0,0]},{"a":[3587870393,1366298126,1668149450,0],"b":[694969968,0,0,0],"flags":0,"product":[2072520432,2502052034,1248805500,269923771],"gcd":[3,0,0,0],"quotient":[3651827829,1719355972,2,0]},{"a":[3354377863,4283097283,1236879539,0],"b":[173027520,0,0,0],"flags":0,"product":[3082302784,1699422383,3369138955,49829063],"gcd":[365,0,0,0],"quotient":[643288431,637611840,7,0]},{"a":[2547450785,3213219465,2011750045,0],"b":[1028201494,0,0,0],"flags":0,"product":[4140362710,258081947,3623543754,481606554],"gcd":[1,0,0,0],"quotient":[1623217453,4108444588,1,0]},{"a":[4193876107,3727173213,779940586,0],"b":[1262563192,0,0,0],"flags":0,"product":[1314719272,3354774426,937633872,229273987],"gcd":[1,0,0,0],"quotient":[761708748,2653189428,0,0]},{"a":[2869513255,729525296,1935050575,0],"b":[262207080,0,0,0],"flags":0,"product":[1280600536,4196739430,909408340,118134534],"gcd":[1,0,0,0],"quotient":[35130911,1631470450,7,0]},{"a":[2912062869,52060773,61736284,0],"b":[2094898834,0,0,0],"flags":0,"product":[3600266490,1067496245,2994556372,30112282],"gcd":[1,0,0,0],"quotient":[2800906469,126571897,0,0]},{"a":[421769139,2371464041,375887054,0],"b":[765583661,0,0,0],"flags":0,"product":[3208983927,4008613349,3737017104,67002369],"gcd":[1,0,0,0],"quotient":[2136945200,2108747467,0,0]},{"a":[1002065364,2041941511,1594973000,0],"b":[31657645,0,0,0],"flags":0,"product":[1680093252,622530728,1802913837,11756338],"gcd":[5,0,0,0],"quotient":[3193766363,1640342415,50,0]},{"a":[2363233724,3606274446,188565697,0],"b":[1242849468,0,0,0],"flags":0,"product":[74872336,4079728892,4086383659,54565904],"gcd":[84,0,0,0],"quotient":[2463033630,651634430,0,0]},{"a":[4014411727,3324690207,1343274153,0],"b":[316916531,0,0,0],"flags":0,"product":[1589629757,3258814911,3984892188,99117351],"gcd":[1,0,0,0],"quotient":[2384004313,1024667328,4,0]},{"a":[1658576735,3634497100,1230188884,0],"b":[2005840019,0,0,0],"flags":0,"product":[4253324173,3383831710,443753332,574524071],"gcd":[1,0,0,0],"quotient":[246019731,2634118862,0,0]},{"a":[243192324,482745043,1729744573,0],"b":[1541643550,0,0,0],"flags":0,"product":[523571320,2901902267,1941644289,620877734],"gcd":[10,0,0,0],"quotient":[1372663391,524043150,1,0]},{"a":[2418874344,695549015,1394469832,0],"b":[1725629196,0,0,0],"flags":0,"product":[752670432,3549309157,3018494771,560269191],"gcd":[12,0,0,0],"quotient":[917066667,3470735392,0,0]},{"a":[2868459937,3621235522,864919834,0],"b":[39880364,0,0,0],"flags":0,"product":[838663724,2799830578,1698491194,8031101],"gcd":[1,0,0,0],"quotient":[1390990938,2954345214,21,0]},{"a":[350572194,3572046725,2014927861,0],"b":[1860364495,0,0,0],"flags":0,"product":[3148965118,3823424964,3898229847,872765726],"gcd":[5,0,0,0],"quotient":[2784904336,356835774,1,0]},{"a":[726785523,107071633,1963899919,0],"b":[916451060,0,0,0],"flags":0,"product":[2186048924,787959117,1032768843,419052821],"gcd":[5,0,0,0],"quotient":[2772347484,613923958,2,0]},{"a":[2520439736,779631013,1311262302,0],"b":[135782709,0,0,0],"flags":0,"product":[1389638936,2753613433,3625535217,41454738],"gcd":[3,0,0,0],"quotient":[1724503288,2822068115,9,0]},{"a":[997884665,2645539822,564464966,0],"b":[695407590,0,0,0],"flags":0,"product":[1051010742,1247862134,3225429552,91393762],"gcd":[1,0,0,0],"quotient":[2899126054,3486241171,0,0]},{"a":[2796159006,830954477,510891439,0],"b":[465363557,0,0,0],"flags":0,"product":[355764182,2628347072,1956666865,55355545],"gcd":[1,0,0,0],"quotient":[1414037083,420189252,1,0]},{"a":[1146100777,1178776635,597015967,0],"b":[47683989,0,0,0],"flags":0,"product":[2615403741,2530824658,3016496671,6628246],"gcd":[1,0,0,0],"quotient":[2218134432,2234502131,12,0]},{"a":[995822333,2738232016,1477300646,0],"b":[557404022,0,0,0],"flags":0,"product":[2209358750,3174732284,53829549,191725167],"gcd":[1,0,0,0],"quotient":[904640062,2793115607,2,0]},{"a":[477211748,1765339373,54825441,0],"b":[1241853318,0,0,0],"flags":0,"product":[616681560,1426207786,3311042365,15852310],"gcd":[2,0,0,0],"quotient":[4021353591,189614565,0,0]},{"a":[3830050746,4047440443,1297866248,0],"b":[1280459781,0,0,0],"flags":0,"product":[447944354,2213031593,2957095804,386933221],"gcd":[3,0,0,0],"quotient":[920521989,58385442,1,0]},{"a":[148266323,3059874588,1912830525,0],"b":[674700586,0,0,0],"flags":0,"product":[3230840478,1508688956,19696146,300488406],"gcd":[7,0,0,0],"quotient":[3064276226,3586643761,2,0]},{"a":[3678169459,3928724196,735302941,0],"b":[329452386,0,0,0],"flags":0,"product":[853626630,133899346,3417125929,56402596],"gcd":[1,0,0,0],"quotient":[1358199839,995978949,2,0]},{"a":[2739183141,1901962135,1472545773,0],"b":[996475808,0,0,0],"flags":0,"product":[3293988384,1894072372,2967767904,341645497],"gcd":[1,0,0,0],"quotient":[3665710112,2051936349,1,0]},{"a":[3678455272,676755691,312881391,0],"b":[1534127605,0,0,0],"flags":0,"product":[3652529928,1725171299,542285834,111758704],"gcd":[1,0,0,0],"quotient":[2843247418,875947566,0,0]},{"a":[178935783,438608171,1628067751,0],"b":[1721201777,0,0,0],"flags":0,"product":[3360061687,1507184212,3443747949,652445737],"gcd":[1,0,0,0],"quotient":[1322792733,4062567120,0,0]},{"a":[2434567796,1438472584,2747104231,1037914],"b":[3628467379,21,0,0],"flags":1,"product":[0,0,0,0],"gcd":[3628467379,21,0,0],"quotient":[1441135036,350598224,47513,0]},{"a":[3465182712,855502430,2233000165,3641214],"b":[1957799852,247,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1957799852,247,0,0],"quotient":[3712848122,2592227243,14714,0]},{"a":[775512105,3968915125,1910014692,3112853],"b":[2590486117,70,0,0],"flags":1,"product":[0,0,0,0],"gcd":[2590486117,70,0,0],"quotient":[556481653,1910423743,44089,0]},{"a":[195843341,2648990615,1186980361,12198903],"b":[3644480011,238,0,0],"flags":1,"product":[0,0,0,0],"gcd":[3644480011,238,0,0],"quotient":[95261767,3442728950,51073,0]},{"a":[755789436,3526895372,319062345,1381267],"b":[3241428990,39,0,0],"flags":1,"product":[0,0,0,0],"gcd":[3241428990,39,0,0],"quotient":[76091586,3202054305,34744,0]},{"a":[881220544,266310005,207093357,15005358],"b":[3795650598,249,0,0],"flags":1,"product":[0,0,0,0],"gcd":[3795650598,249,0,0],"quotient":[3182237344,1531755854,60049,0]},{"a":[388469408,2186980723,2634468762,1055756],"b":[2383045856,57,0,0],"flags":1,"product":[0,0,0,0],"gcd":[2383045856,57,0,0],"quotient":[4118878179,2094794721,18343,0]},{"a":[1752517166,3799306811,2018196630,4511293],"b":[902127046,207,0,0],"flags":1,"product":[0,0,0,0],"gcd":[902127046,207,0,0],"quotient":[1265464125,2562504659,21771,0]},{"a":[3671230412,1310295300,801869377,4626285],"b":[2119214668,110,0,0],"flags":1,"product":[0,0,0,0],"gcd":[2119214668,110,0,0],"quotient":[3945488929,1409596410,41869,0]},{"a":[1021053526,487422567,699401414,1944528],"b":[615265618,236,0,0],"flags":1,"product":[0,0,0,0],"gcd":[615265618,236,0,0],"quotient":[1540618675,2266588821,8234,0]},{"a":[4000035264,3804886662,3152039845,53159],"b":[1714441056,249,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1714441056,249,0,0],"quotient":[2759045642,649409146,213,0]},{"a":[2316368495,3175588746,436507955,10604710],"b":[3468678895,172,0,0],"flags":1,"product":[0,0,0,0],"gcd":[3468678895,172,0,0],"quotient":[320148609,626518097,61367,0]},{"a":[63619836,2552115182,2841856419,14217283],"b":[265632948,226,0,0],"flags":1,"product":[0,0,0,0],"gcd":[265632948,226,0,0],"quotient":[2917077787,532186317,62891,0]},{"a":[4016675591,2990367403,2475896959,619350],"b":[459352849,75,0,0],"flags":1,"product":[0,0,0,0],"gcd":[459352849,75,0,0],"quotient":[1497232535,1066783686,8246,0]},{"a":[3602907662,1107484511,1915342136,18810],"b":[2799293857,2,0,0],"flags":1,"product":[0,0,0,0],"gcd":[2799293857,2,0,0],"quotient":[3243445070,2433398103,7093,0]},{"a":[2062949468,2413525414,1105010524,4306382],"b":[40038091,146,0,0],"flags":1,"product":[0,0,0,0],"gcd":[40038091,146,0,0],"quotient":[548621716,3804061085,29493,0]},{"a":[2212257790,918723990,2860534418,9592427],"b":[459999874,169,0,0],"flags":1,"product":[0,0,0,0],"gcd":[459999874,169,0,0],"quotient":[2785027391,4203747801,56723,0]},{"a":[1435355512,3611971998,2962290910,10307759],"b":[2942385643,238,0,0],"flags":1,"product":[0,0,0,0],"gcd":[2942385643,238,0,0],"quotient":[1357080168,2602261721,43185,0]},{"a":[3022628337,2573189062,2623621423,179773],"b":[3274195375,11,0,0],"flags":1,"product":[0,0,0,0],"gcd":[3274195375,11,0,0],"quotient":[3593116255,3605949312,15283,0]},{"a":[352405412,1400792377,957625513,4115728],"b":[1800063052,93,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1800063052,93,0,0],"quotient":[3264596883,2570931460,44056,0]},{"a":[436277480,2799420269,1769130752,3995140],"b":[2142174038,171,0,0],"flags":1,"product":[0,0,0,0],"gcd":[2142174038,171,0,0],"quotient":[3858308444,1921106805,23295,0]},{"a":[3314929338,177083109,2867865895,2858450],"b":[2953170654,108,0,0],"flags":1,"product":[0,0,0,0],"gcd":[2953170654,108,0,0],"quotient":[2240141299,2994352908,26299,0]},{"a":[1760521635,3467592644,776096366,1068802],"b":[3866727209,33,0,0],"flags":1,"product":[0,0,0,0],"gcd":[3866727209,33,0,0],"quotient":[3946086379,3503899695,31527,0]},{"a":[3192915472,1981893755,323700991,2550648],"b":[483856550,74,0,0],"flags":1,"product":[0,0,0,0],"gcd":[483856550,74,0,0],"quotient":[3427495896,3534912338,34415,0]},{"a":[4068046348,425686328,3044315914,1908855],"b":[3323673687,208,0,0],"flags":1,"product":[0,0,0,0],"gcd":[3323673687,208,0,0],"quotient":[1096921812,748217438,9143,0]},{"a":[2576416118,75324280,3723768282,1645060],"b":[1418849066,189,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1418849066,189,0,0],"quotient":[3645697807,3601768282,8688,0]},{"a":[2262360061,30919668,3896289909,1261593],"b":[2606939877,76,0,0],"flags":1,"product":[0,0,0,0],"gcd":[2606939877,76,0,0],"quotient":[3832935225,1695113754,16468,0]},{"a":[2068962878,1812294496,1194503720,10494750],"b":[1250572842,182,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1250572842,182,0,0],"quotient":[2126508131,1536964579,57571,0]},{"a":[1621803901,868507231,98886389,31900],"b":[2772959743,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[2772959743,0,0,0],"quotient":[665993859,600478449,49409,0]},{"a":[770077492,2103789394,1142646835,1187637],"b":[2904910022,202,0,0],"flags":1,"product":[0,0,0,0],"gcd":[2904910022,202,0,0],"quotient":[4114248222,3316840436,5859,0]},{"a":[4213479029,3368913977,3699410143,547133511],"b":[4095742075,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[5,0,0,0],"quotient":[619051098,763527327,573747198,0]},{"a":[3877132724,733594045,3613429875,519218605],"b":[2733387241,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[1343336042,626974022,815847421,0]},{"a":[1946457428,1312648325,1691842282,1356464899],"b":[1082598037,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[1248979267,477592772,1086505958,1]},{"a":[1492418783,3548165081,3749660254,2004675201],"b":[1990037716,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[836143833,1812120657,31591121,1]},{"a":[2064537680,173950870,2693593802,1104186453],"b":[1059823659,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[189846683,1146975956,179781561,1]},{"a":[2378070704,531677833,2392245410,522824115],"b":[1580820306,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[26,0,0,0],"quotient":[619540861,1947889836,1420472946,0]},{"a":[315845768,3989545644,299772377,252571532],"b":[3371790344,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[8,0,0,0],"quotient":[3552728141,92010372,321724176,0]},{"a":[3124020067,13156689,1965420153,954069343],"b":[3838192101,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[2571713725,3323433382,1067611135,0]},{"a":[2376446666,3268714726,2615436594,1674520542],"b":[4160917759,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[251519561,179954378,1728467464,0]},{"a":[1173910515,1197432677,1003064345,1180838555],"b":[3043620127,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[1525811743,3174291422,1666325876,0]},{"a":[3492928276,813965729,464081193,1133103090],"b":[2438643025,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[637,0,0,0],"quotient":[2030517616,437427961,1995634730,0]},{"a":[1548143063,1436411214,2599373576,2114141758],"b":[3533833621,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[4093113492,2096462890,2569495535,0]},{"a":[3602735460,102249726,3177087087,678011869],"b":[3277653189,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[47287972,984624917,888452389,0]},{"a":[4053470891,1556444101,3739442251,674404037],"b":[2994174620,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[5,0,0,0],"quotient":[1265393482,332174231,967392906,0]},{"a":[2687976473,3807632990,2334472769,1355341828],"b":[1286656001,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[1500656852,1089589118,229279141,1]},{"a":[314204127,359838022,2943376786,2106203715],"b":[993012338,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[3045922840,1466601405,519797212,2]},{"a":[2003677210,3310002632,2428359449,195328369],"b":[2407976167,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[677352298,712067112,348395873,0]},{"a":[1962632783,298157760,3621473237,94828694],"b":[3407549553,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[3,0,0,0],"quotient":[2161585590,3345525589,119524642,0]},{"a":[1400079235,703294640,1502565596,1425476895],"b":[1927936801,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[2198626346,2755538316,3175610654,0]},{"a":[3903405730,2949343347,2204932306,809132402],"b":[3927361791,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[342961785,1794022350,884868110,0]},{"a":[4160722669,459855147,3396620311,1343096999],"b":[1845960058,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[3977605816,463023339,3124963438,0]},{"a":[1187690635,1308402629,3313727835,453099797],"b":[1496031565,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[2643321457,3025589557,1300807321,0]},{"a":[2472861818,3816539704,3154508679,1152196439],"b":[901724697,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[1782220397,1632162638,1193011511,1]},{"a":[2638165945,3043396524,94839154,326535534],"b":[4212556180,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[1614964991,3627594007,332923616,0]},{"a":[3607487430,1955037954,584787247,586240372],"b":[375383787,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[975073629,2536461220,2412523312,1]},{"a":[3682636941,1069522228,3318933072,862061715],"b":[2374828589,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[7,0,0,0],"quotient":[2434686696,3087660157,1559071207,0]},{"a":[774288064,125922622,2355464939,1495283334],"b":[419112013,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[19,0,0,0],"quotient":[3857091280,1746983027,2438431304,3]},{"a":[3700341327,1282114598,249227573,1380452249],"b":[933496908,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[3,0,0,0],"quotient":[3344856056,1920880971,2056416637,1]},{"a":[3637500410,1346035344,562455727,858411568],"b":[4087794386,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[2,0,0,0],"quotient":[1685756211,1679116861,901916599,0]},{"a":[807859412,3619675441,3313972940,2118344536],"b":[1866218668,0,0,0],"flags":1,"product":[0,0,0,0],"gcd":[4,0,0,0],"quotient":[426413632,3291998819,580249452,1]},{"a":[0,0,0,0],"b":[1,0,0,0],"flags":0,"product":[0,0,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[0,0,0,0],"b":[2,0,0,0],"flags":0,"product":[0,0,0,0],"gcd":[2,0,0,0],"quotient":[0,0,0,0]},{"a":[0,0,0,0],"b":[32768,0,0,0],"flags":0,"product":[0,0,0,0],"gcd":[32768,0,0,0],"quotient":[0,0,0,0]},{"a":[0,0,0,0],"b":[4294967295,0,0,0],"flags":0,"product":[0,0,0,0],"gcd":[4294967295,0,0,0],"quotient":[0,0,0,0]},{"a":[0,0,0,0],"b":[1,1,0,0],"flags":0,"product":[0,0,0,0],"gcd":[1,1,0,0],"quotient":[0,0,0,0]},{"a":[0,0,0,0],"b":[4294967295,4294967295,0,0],"flags":0,"product":[0,0,0,0],"gcd":[4294967295,4294967295,0,0],"quotient":[0,0,0,0]},{"a":[1,0,0,0],"b":[1,0,0,0],"flags":0,"product":[1,0,0,0],"gcd":[1,0,0,0],"quotient":[1,0,0,0]},{"a":[1,0,0,0],"b":[2,0,0,0],"flags":0,"product":[2,0,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[1,0,0,0],"b":[32768,0,0,0],"flags":0,"product":[32768,0,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[1,0,0,0],"b":[4294967295,0,0,0],"flags":0,"product":[4294967295,0,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[1,0,0,0],"b":[1,1,0,0],"flags":0,"product":[1,1,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[1,0,0,0],"b":[4294967295,4294967295,0,0],"flags":0,"product":[4294967295,4294967295,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[2,0,0,0],"b":[1,0,0,0],"flags":0,"product":[2,0,0,0],"gcd":[1,0,0,0],"quotient":[2,0,0,0]},{"a":[2,0,0,0],"b":[2,0,0,0],"flags":0,"product":[4,0,0,0],"gcd":[2,0,0,0],"quotient":[1,0,0,0]},{"a":[2,0,0,0],"b":[32768,0,0,0],"flags":0,"product":[65536,0,0,0],"gcd":[2,0,0,0],"quotient":[0,0,0,0]},{"a":[2,0,0,0],"b":[4294967295,0,0,0],"flags":0,"product":[4294967294,1,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[2,0,0,0],"b":[1,1,0,0],"flags":0,"product":[2,2,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[2,0,0,0],"b":[4294967295,4294967295,0,0],"flags":0,"product":[4294967294,4294967295,1,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[32767,0,0,0],"b":[1,0,0,0],"flags":0,"product":[32767,0,0,0],"gcd":[1,0,0,0],"quotient":[32767,0,0,0]},{"a":[32767,0,0,0],"b":[2,0,0,0],"flags":0,"product":[65534,0,0,0],"gcd":[1,0,0,0],"quotient":[16383,0,0,0]},{"a":[32767,0,0,0],"b":[32768,0,0,0],"flags":0,"product":[1073709056,0,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[32767,0,0,0],"b":[4294967295,0,0,0],"flags":0,"product":[4294934529,32766,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[32767,0,0,0],"b":[1,1,0,0],"flags":0,"product":[32767,32767,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[32767,0,0,0],"b":[4294967295,4294967295,0,0],"flags":0,"product":[4294934529,4294967295,32766,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[32768,0,0,0],"b":[1,0,0,0],"flags":0,"product":[32768,0,0,0],"gcd":[1,0,0,0],"quotient":[32768,0,0,0]},{"a":[32768,0,0,0],"b":[2,0,0,0],"flags":0,"product":[65536,0,0,0],"gcd":[2,0,0,0],"quotient":[16384,0,0,0]},{"a":[32768,0,0,0],"b":[32768,0,0,0],"flags":0,"product":[1073741824,0,0,0],"gcd":[32768,0,0,0],"quotient":[1,0,0,0]},{"a":[32768,0,0,0],"b":[4294967295,0,0,0],"flags":0,"product":[4294934528,32767,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[32768,0,0,0],"b":[1,1,0,0],"flags":0,"product":[32768,32768,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[32768,0,0,0],"b":[4294967295,4294967295,0,0],"flags":0,"product":[4294934528,4294967295,32767,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[4294967295,0,0,0],"b":[1,0,0,0],"flags":0,"product":[4294967295,0,0,0],"gcd":[1,0,0,0],"quotient":[4294967295,0,0,0]},{"a":[4294967295,0,0,0],"b":[2,0,0,0],"flags":0,"product":[4294967294,1,0,0],"gcd":[1,0,0,0],"quotient":[2147483647,0,0,0]},{"a":[4294967295,0,0,0],"b":[32768,0,0,0],"flags":0,"product":[4294934528,32767,0,0],"gcd":[1,0,0,0],"quotient":[131071,0,0,0]},{"a":[4294967295,0,0,0],"b":[4294967295,0,0,0],"flags":0,"product":[1,4294967294,0,0],"gcd":[4294967295,0,0,0],"quotient":[1,0,0,0]},{"a":[4294967295,0,0,0],"b":[1,1,0,0],"flags":0,"product":[4294967295,4294967295,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[4294967295,0,0,0],"b":[4294967295,4294967295,0,0],"flags":0,"product":[1,4294967295,4294967294,0],"gcd":[4294967295,0,0,0],"quotient":[0,0,0,0]},{"a":[0,1,0,0],"b":[1,0,0,0],"flags":0,"product":[0,1,0,0],"gcd":[1,0,0,0],"quotient":[0,1,0,0]},{"a":[0,1,0,0],"b":[2,0,0,0],"flags":0,"product":[0,2,0,0],"gcd":[2,0,0,0],"quotient":[2147483648,0,0,0]},{"a":[0,1,0,0],"b":[32768,0,0,0],"flags":0,"product":[0,32768,0,0],"gcd":[32768,0,0,0],"quotient":[131072,0,0,0]},{"a":[0,1,0,0],"b":[4294967295,0,0,0],"flags":0,"product":[0,4294967295,0,0],"gcd":[1,0,0,0],"quotient":[1,0,0,0]},{"a":[0,1,0,0],"b":[1,1,0,0],"flags":0,"product":[0,1,1,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[0,1,0,0],"b":[4294967295,4294967295,0,0],"flags":0,"product":[0,4294967295,4294967295,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[4294967295,4294967295,0,0],"b":[1,0,0,0],"flags":0,"product":[4294967295,4294967295,0,0],"gcd":[1,0,0,0],"quotient":[4294967295,4294967295,0,0]},{"a":[4294967295,4294967295,0,0],"b":[2,0,0,0],"flags":0,"product":[4294967294,4294967295,1,0],"gcd":[1,0,0,0],"quotient":[4294967295,2147483647,0,0]},{"a":[4294967295,4294967295,0,0],"b":[32768,0,0,0],"flags":0,"product":[4294934528,4294967295,32767,0],"gcd":[1,0,0,0],"quotient":[4294967295,131071,0,0]},{"a":[4294967295,4294967295,0,0],"b":[4294967295,0,0,0],"flags":0,"product":[1,4294967295,4294967294,0],"gcd":[4294967295,0,0,0],"quotient":[1,1,0,0]},{"a":[4294967295,4294967295,0,0],"b":[1,1,0,0],"flags":0,"product":[4294967295,4294967294,0,1],"gcd":[1,1,0,0],"quotient":[4294967295,0,0,0]},{"a":[4294967295,4294967295,0,0],"b":[4294967295,4294967295,0,0],"flags":1,"product":[0,0,0,0],"gcd":[4294967295,4294967295,0,0],"quotient":[1,0,0,0]},{"a":[1852522452,0,0,0],"b":[1911639974,0,0,0],"flags":0,"product":[1557254008,824536190,0,0],"gcd":[2,0,0,0],"quotient":[0,0,0,0]},{"a":[637248935,0,0,0],"b":[1561036390,0,0,0],"flags":0,"product":[2753981066,231612654,0,0],"gcd":[5,0,0,0],"quotient":[0,0,0,0]},{"a":[2908906593,0,0,0],"b":[3924261570,0,0,0],"flags":0,"product":[619531138,2657834057,0,0],"gcd":[3,0,0,0],"quotient":[0,0,0,0]},{"a":[3234325471,0,0,0],"b":[393461446,0,0,0],"flags":0,"product":[3689332858,296296173,0,0],"gcd":[1,0,0,0],"quotient":[8,0,0,0]},{"a":[457255244,0,0,0],"b":[3350491593,0,0,0],"flags":0,"product":[1188296876,356703496,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[3119225280,0,0,0],"b":[3780212380,0,0,0],"flags":0,"product":[1244672256,2745383889,0,0],"gcd":[20,0,0,0],"quotient":[0,0,0,0]},{"a":[1554649230,0,0,0],"b":[2914499280,0,0,0],"flags":0,"product":[2780208992,1054961248,0,0],"gcd":[30,0,0,0],"quotient":[0,0,0,0]},{"a":[1598609097,0,0,0],"b":[1311873993,0,0,0],"flags":0,"product":[1152734929,488286302,0,0],"gcd":[9,0,0,0],"quotient":[1,0,0,0]},{"a":[571354004,0,0,0],"b":[3114698018,0,0,0],"flags":0,"product":[410889640,414344292,0,0],"gcd":[2,0,0,0],"quotient":[0,0,0,0]},{"a":[2864933123,0,0,0],"b":[2287756743,0,0,0],"flags":0,"product":[728289365,1526034919,0,0],"gcd":[1,0,0,0],"quotient":[1,0,0,0]},{"a":[133249549,0,0,0],"b":[525396294,0,0,0],"flags":0,"product":[1893446798,16300198,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[1101711779,0,0,0],"b":[3199489375,0,0,0],"flags":0,"product":[3555717757,820708258,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[2677074478,0,0,0],"b":[4270524373,0,0,0],"flags":0,"product":[2230590022,2661839082,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[2946990046,0,0,0],"b":[1132048560,0,0,0],"flags":0,"product":[1962838176,776754654,0,0],"gcd":[2,0,0,0],"quotient":[2,0,0,0]},{"a":[487565349,0,0,0],"b":[3375127095,0,0,0],"flags":0,"product":[3000377843,383144947,0,0],"gcd":[3,0,0,0],"quotient":[0,0,0,0]},{"a":[1989939065,0,0,0],"b":[1794700546,0,0,0],"flags":0,"product":[1597959154,831518491,0,0],"gcd":[1,0,0,0],"quotient":[1,0,0,0]},{"a":[2321526551,0,0,0],"b":[3340789479,0,0,0],"flags":0,"product":[3220842433,1805771951,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[3063165244,0,0,0],"b":[1198231755,0,0,0],"flags":0,"product":[1531497108,854577372,0,0],"gcd":[1,0,0,0],"quotient":[2,0,0,0]},{"a":[3524444997,0,0,0],"b":[3503272886,0,0,0],"flags":0,"product":[1823150606,2874781516,0,0],"gcd":[1,0,0,0],"quotient":[1,0,0,0]},{"a":[1098361093,0,0,0],"b":[894804283,0,0,0],"flags":0,"product":[2139691303,228830196,0,0],"gcd":[1,0,0,0],"quotient":[1,0,0,0]},{"a":[3208527999,0,0,0],"b":[3101569783,0,0,0],"flags":0,"product":[3821734025,2317007977,0,0],"gcd":[1,0,0,0],"quotient":[1,0,0,0]},{"a":[968931696,0,0,0],"b":[2350706980,0,0,0],"flags":0,"product":[367821760,530312420,0,0],"gcd":[4,0,0,0],"quotient":[0,0,0,0]},{"a":[3824884426,0,0,0],"b":[3867740137,0,0,0],"flags":0,"product":[794879962,3444417150,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[1164118580,0,0,0],"b":[332975182,0,0,0],"flags":0,"product":[2284751832,90250418,0,0],"gcd":[2,0,0,0],"quotient":[3,0,0,0]},{"a":[2517922558,0,0,0],"b":[3735427764,0,0,0],"flags":0,"product":[1858250392,2189892770,0,0],"gcd":[2,0,0,0],"quotient":[0,0,0,0]},{"a":[2284053758,0,0,0],"b":[3322450648,0,0,0],"flags":0,"product":[4073853520,1766871634,0,0],"gcd":[2,0,0,0],"quotient":[0,0,0,0]},{"a":[1842111783,0,0,0],"b":[4036281003,0,0,0],"flags":0,"product":[1186668301,1731161213,0,0],"gcd":[9,0,0,0],"quotient":[0,0,0,0]},{"a":[3284883552,0,0,0],"b":[2157924873,0,0,0],"flags":0,"product":[3893680992,1650427449,0,0],"gcd":[3,0,0,0],"quotient":[1,0,0,0]},{"a":[3687948194,0,0,0],"b":[2816573776,0,0,0],"flags":0,"product":[1314161824,2418499945,0,0],"gcd":[2,0,0,0],"quotient":[1,0,0,0]},{"a":[1571455102,0,0,0],"b":[3574692714,0,0,0],"flags":0,"product":[313769516,1307918947,0,0],"gcd":[2,0,0,0],"quotient":[0,0,0,0]},{"a":[2879370854,0,0,0],"b":[1893849175,0,0,0],"flags":0,"product":[80940202,1269647413,0,0],"gcd":[1,0,0,0],"quotient":[1,0,0,0]},{"a":[1678083461,0,0,0],"b":[632002702,0,0,0],"flags":0,"product":[724436934,246929303,0,0],"gcd":[1,0,0,0],"quotient":[2,0,0,0]},{"a":[1875169723,0,0,0],"b":[357291215,0,0,0],"flags":0,"product":[647852597,155992263,0,0],"gcd":[1,0,0,0],"quotient":[5,0,0,0]},{"a":[4115012315,0,0,0],"b":[2257585848,0,0,0],"flags":0,"product":[2889117544,2162995181,0,0],"gcd":[1,0,0,0],"quotient":[1,0,0,0]},{"a":[1217866747,0,0,0],"b":[2213870411,0,0,0],"flags":0,"product":[3634690953,627757784,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[4031438217,0,0,0],"b":[2956700087,0,0,0],"flags":0,"product":[1884737007,2775283932,0,0],"gcd":[1,0,0,0],"quotient":[1,0,0,0]},{"a":[952006000,0,0,0],"b":[3623794407,0,0,0],"flags":0,"product":[813275152,803236388,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[3720265072,0,0,0],"b":[3974800973,0,0,0],"flags":0,"product":[3382024880,3442939656,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[519907322,0,0,0],"b":[3202594034,0,0,0],"flags":0,"product":[1243189844,387675149,0,0],"gcd":[2,0,0,0],"quotient":[0,0,0,0]},{"a":[671716430,0,0,0],"b":[2096856291,0,0,0],"flags":0,"product":[1422805290,327940290,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[3272871039,0,0,0],"b":[2131508606,0,0,0],"flags":0,"product":[1640786306,1624262143,0,0],"gcd":[1,0,0,0],"quotient":[1,0,0,0]},{"a":[770595990,0,0,0],"b":[105334834,0,0,0],"flags":0,"product":[875709772,18899003,0,0],"gcd":[2,0,0,0],"quotient":[7,0,0,0]},{"a":[1429261935,0,0,0],"b":[137883449,0,0,0],"flags":0,"product":[1517328311,45884299,0,0],"gcd":[1,0,0,0],"quotient":[10,0,0,0]},{"a":[1039713754,0,0,0],"b":[1293883289,0,0,0],"flags":0,"product":[3940209994,313219672,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[2499706809,0,0,0],"b":[3602276015,0,0,0],"flags":0,"product":[3227860343,2096554702,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[2368981668,0,0,0],"b":[648602831,0,0,0],"flags":0,"product":[2700798620,357750853,0,0],"gcd":[1,0,0,0],"quotient":[3,0,0,0]},{"a":[2966984894,0,0,0],"b":[364399482,0,0,0],"flags":0,"product":[445150348,251728985,0,0],"gcd":[2,0,0,0],"quotient":[8,0,0,0]},{"a":[2180778443,0,0,0],"b":[820877851,0,0,0],"flags":0,"product":[1952982633,416802410,0,0],"gcd":[1,0,0,0],"quotient":[2,0,0,0]},{"a":[3064896048,0,0,0],"b":[1642401020,0,0,0],"flags":0,"product":[537528128,1172020192,0,0],"gcd":[4,0,0,0],"quotient":[1,0,0,0]},{"a":[401372421,0,0,0],"b":[411906702,0,0,0],"flags":0,"product":[1606738630,38493422,0,0],"gcd":[3,0,0,0],"quotient":[0,0,0,0]},{"a":[2219941005,0,0,0],"b":[4029268187,0,0,0],"flags":0,"product":[2848959647,2082609028,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[3747873889,0,0,0],"b":[4018347259,0,0,0],"flags":0,"product":[3291342619,3506489742,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[1854868498,0,0,0],"b":[3122832902,0,0,0],"flags":0,"product":[127005804,1348658552,0,0],"gcd":[14,0,0,0],"quotient":[0,0,0,0]},{"a":[3426063994,0,0,0],"b":[1514450546,0,0,0],"flags":0,"product":[948694612,1208066122,0,0],"gcd":[2,0,0,0],"quotient":[2,0,0,0]},{"a":[1872972125,0,0,0],"b":[2353731821,0,0,0],"flags":0,"product":[55223065,1026427860,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[3625734566,0,0,0],"b":[4161223814,0,0,0],"flags":0,"product":[3447694564,3512830710,0,0],"gcd":[2,0,0,0],"quotient":[0,0,0,0]},{"a":[4172308959,0,0,0],"b":[2253639999,0,0,0],"flags":0,"product":[2828805345,2189279151,0,0],"gcd":[39,0,0,0],"quotient":[1,0,0,0]},{"a":[2254216742,0,0,0],"b":[3369282117,0,0,0],"flags":0,"product":[1916460094,1768370195,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[2488388599,0,0,0],"b":[2859369372,0,0,0],"flags":0,"product":[3881414532,1656641751,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[3535511467,0,0,0],"b":[1671610304,0,0,0],"flags":0,"product":[873354560,1376028498,0,0],"gcd":[1,0,0,0],"quotient":[2,0,0,0]},{"a":[1415662889,0,0,0],"b":[1169667556,0,0,0],"flags":0,"product":[663074180,385533774,0,0],"gcd":[1,0,0,0],"quotient":[1,0,0,0]},{"a":[3219748807,0,0,0],"b":[1710782087,0,0,0],"flags":0,"product":[1562108913,1282498376,0,0],"gcd":[1,0,0,0],"quotient":[1,0,0,0]},{"a":[2732737160,0,0,0],"b":[4249719091,0,0,0],"flags":0,"product":[95045912,2703947313,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[311923530,0,0,0],"b":[1736079806,0,0,0],"flags":0,"product":[1751206636,126083414,0,0],"gcd":[2,0,0,0],"quotient":[0,0,0,0]},{"a":[2455898326,0,0,0],"b":[4112633328,0,0,0],"flags":0,"product":[2928780960,2351638233,0,0],"gcd":[2,0,0,0],"quotient":[0,0,0,0]},{"a":[1757450218,0,0,0],"b":[3052461424,0,0,0],"flags":0,"product":[1843132512,1249031395,0,0],"gcd":[2,0,0,0],"quotient":[0,0,0,0]},{"a":[2087126316,0,0,0],"b":[67881453,0,0,0],"flags":0,"product":[4149433788,32986785,0,0],"gcd":[3,0,0,0],"quotient":[30,0,0,0]},{"a":[2674691803,0,0,0],"b":[2988526296,0,0,0],"flags":0,"product":[2501826248,1861105390,0,0],"gcd":[7,0,0,0],"quotient":[0,0,0,0]},{"a":[2141245187,0,0,0],"b":[3202140427,0,0,0],"flags":0,"product":[3741728801,1596419088,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[3382275890,0,0,0],"b":[2433482827,0,0,0],"flags":0,"product":[2555089830,1916361575,0,0],"gcd":[1,0,0,0],"quotient":[1,0,0,0]},{"a":[2602357999,0,0,0],"b":[2638914423,0,0,0],"flags":0,"product":[2517706777,1598941175,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[1546654623,0,0,0],"b":[1305751145,0,0,0],"flags":0,"product":[2246745655,470212205,0,0],"gcd":[1,0,0,0],"quotient":[1,0,0,0]},{"a":[426803527,0,0,0],"b":[3539509301,0,0,0],"flags":0,"product":[266281907,351731445,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[1502179233,0,0,0],"b":[2982902704,0,0,0],"flags":0,"product":[1825184176,1043280236,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[3557772283,0,0,0],"b":[1619863625,0,0,0],"flags":0,"product":[3581600403,1341827657,0,0],"gcd":[1,0,0,0],"quotient":[2,0,0,0]},{"a":[2126490007,0,0,0],"b":[2472084422,0,0,0],"flags":0,"product":[4055429066,1223958753,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[2174817044,0,0,0],"b":[57542222,0,0,0],"flags":0,"product":[3021883416,29137312,0,0],"gcd":[2,0,0,0],"quotient":[37,0,0,0]},{"a":[493147700,0,0,0],"b":[3581452174,0,0,0],"flags":0,"product":[2606308568,411221967,0,0],"gcd":[2,0,0,0],"quotient":[0,0,0,0]},{"a":[1786223912,0,0,0],"b":[2206536822,0,0,0],"flags":0,"product":[2301726832,917671442,0,0],"gcd":[2,0,0,0],"quotient":[0,0,0,0]},{"a":[2605764397,0,0,0],"b":[1246511651,0,0,0],"flags":0,"product":[2496785703,756260864,0,0],"gcd":[1,0,0,0],"quotient":[2,0,0,0]},{"a":[2289604637,0,0,0],"b":[2207703440,0,0,0],"flags":0,"product":[3112504656,1176904894,0,0],"gcd":[1,0,0,0],"quotient":[1,0,0,0]},{"a":[162015351,0,0,0],"b":[3368230123,0,0,0],"flags":0,"product":[208611645,127056843,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[2964985622,0,0,0],"b":[1208171045,0,0,0],"flags":0,"product":[694309422,834048208,0,0],"gcd":[1,0,0,0],"quotient":[2,0,0,0]},{"a":[2169671938,0,0,0],"b":[1848249450,0,0,0],"flags":0,"product":[290464468,933672992,0,0],"gcd":[2,0,0,0],"quotient":[1,0,0,0]},{"a":[281041354,0,0,0],"b":[3024316430,0,0,0],"flags":0,"product":[2531064076,197896264,0,0],"gcd":[2,0,0,0],"quotient":[0,0,0,0]},{"a":[606528626,0,0,0],"b":[2769449099,0,0,0],"flags":0,"product":[789834214,391097310,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[1603751573,0,0,0],"b":[2046915636,0,0,0],"flags":0,"product":[1257011780,764323438,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[3944655781,0,0,0],"b":[1867626841,0,0,0],"flags":0,"product":[3253266781,1715297115,0,0],"gcd":[1,0,0,0],"quotient":[2,0,0,0]},{"a":[2633910793,0,0,0],"b":[532187834,0,0,0],"flags":0,"product":[1914872970,326366927,0,0],"gcd":[1,0,0,0],"quotient":[4,0,0,0]},{"a":[4139906096,0,0,0],"b":[45659865,0,0,0],"flags":0,"product":[4035058864,44011406,0,0],"gcd":[1,0,0,0],"quotient":[90,0,0,0]},{"a":[3180921720,0,0,0],"b":[3635987851,0,0,0],"flags":0,"product":[1879063080,2692870965,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[3953814564,0,0,0],"b":[3772208536,0,0,0],"flags":0,"product":[3579062624,3472578955,0,0],"gcd":[4,0,0,0],"quotient":[1,0,0,0]},{"a":[3753573928,0,0,0],"b":[2921707788,0,0,0],"flags":0,"product":[2318848480,2553417854,0,0],"gcd":[4,0,0,0],"quotient":[1,0,0,0]},{"a":[956948656,0,0,0],"b":[2748992223,0,0,0],"flags":0,"product":[4033714512,612494631,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[2174182387,0,0,0],"b":[3568209615,0,0,0],"flags":0,"product":[3993279357,1806285813,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[3728514622,0,0,0],"b":[382006619,0,0,0],"flags":0,"product":[2121635338,331624705,0,0],"gcd":[1,0,0,0],"quotient":[9,0,0,0]},{"a":[2291888583,0,0,0],"b":[1910331872,0,0,0],"flags":0,"product":[2723986720,1019394911,0,0],"gcd":[1,0,0,0],"quotient":[1,0,0,0]},{"a":[2914484752,0,0,0],"b":[3384382115,0,0,0],"flags":0,"product":[3516198960,2296578620,0,0],"gcd":[1,0,0,0],"quotient":[0,0,0,0]},{"a":[22075006,0,0,0],"b":[959266854,0,0,0],"flags":0,"product":[700798644,4930380,0,0],"gcd":[2,0,0,0],"quotient":[0,0,0,0]},{"a":[668067400,0,0,0],"b":[1499666006,0,0,0],"flags":0,"product":[2149944368,233267892,0,0],"gcd":[2,0,0,0],"quotient":[0,0,0,0]}]
+\ No newline at end of file
+-- 
+2.54.0
+

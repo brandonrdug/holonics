@@ -1,0 +1,10 @@
+worktree: /home/b/Workspaces/holonics/.local/worktrees/athena-math-review-2026-09-09
+branch: (detached HEAD)
+HEAD: 5167e325b539fb54ce88c030880c791072f235e9
+HEAD subject: Measure finite contact improvement and expose loss of retained material relations
+HEAD ancestor of origin/main (bb73054a): True
+
+git status --porcelain (tracked):
+
+untracked, non-ignored:
+crates/holonic-engine/examples/normal_geometry_review.rs

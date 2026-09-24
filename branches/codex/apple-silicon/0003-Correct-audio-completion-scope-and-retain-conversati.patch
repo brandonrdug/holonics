@@ -1,0 +1,334 @@
+From aef12e4753ea160983607d1ef6b7962ffecbb896 Mon Sep 17 00:00:00 2001
+From: Brandon Duggan <brandonrdug@users.noreply.github>
+Date: Sun, 6 Sep 2026 17:18:05 -0700
+Subject: [PATCH 03/18] Correct audio completion scope and retain
+ conversational audio as active work
+
+---
+ CONSTRUCTION_STATE.md                         | 45 +++++-----
+ docs/ACOUSTIC_EXPERIMENTS.md                  |  8 ++
+ docs/RETRACTIONS.md                           |  8 ++
+ docs/plans/HOLONICS_ON_APPLE_SILICON.md       | 37 ++++++---
+ docs/plans/THE_ROADMAP.md                     | 14 ++--
+ ...E_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md | 19 +++--
+ ...ES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md | 83 +++++++++++++++++++
+ 7 files changed, 170 insertions(+), 44 deletions(-)
+ create mode 100644 research/records/2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md
+
+diff --git a/CONSTRUCTION_STATE.md b/CONSTRUCTION_STATE.md
+index e96c0c30..852bdde3 100644
+--- a/CONSTRUCTION_STATE.md
++++ b/CONSTRUCTION_STATE.md
+@@ -19,26 +19,31 @@ conversation data and cultivation remain on that machine.
+ Rust, pinned Lean, repaired Xcode setup, Metal tools and an isolated MLX custom-kernel check.
+ The native HNA Cargo check reached the known CUDA/PTX/target-gating obstruction on macOS.
+ 
+-[established-bounded; implemented-exact, measured] AS1–AS5 have returned at the
+-[specified experimental scopes](research/records/2026-09-06_APPLE_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md).
+-AS3 establishes the Apple phase foundation: direct Metal exact formation/circulation/rechart,
+-complete persistence and public continuation. Final checks include 28 engine phase tests, six
+-mount ownership tests, 20 public native tests and four separate-process tests. Warm open
+-medians were 0.46–0.59 ms in the declared debug two-node receiver.
+-
+-[established-bounded; measured] AS4 completed a 220,500-sample real WAV, generated and played
+-actual native emissions, and inspected nine chronology/polarity controls through one fixed
+-receiver. AS5 supplies capture/playback apparatus, verified speaker completion/interruption,
+-and a complete 105,440-sample LibriSpeech occurrence followed by 113 transcript bytes through
+-one persisted ecology. Brandon substituted curated Hugging Face WAVs for the microphone
+-experiment; no microphone capture occurred. Installed material is 2,000 ESC-50 WAVs and a
+-100-clip LibriSpeech subset, retained locally outside Git. The [acoustic guide](docs/ACOUSTIC_EXPERIMENTS.md)
+-gives runnable public commands.
+-
+-[open] The completed branch establishes the bounded phase and digital exposure foundation,
+-not real-time audio throughput, calibrated room coupling, broader inherited operator support,
+-or useful speech recognition/generation. The Linux/CUDA runtime was source-reviewed but not
+-rerun on this Mac. These returns do not establish desktop Athena-alpha.
++[established-bounded; implemented-exact, measured] AS1–AS3 returned the local rational phase
++foundation on Apple Metal: exact formation/circulation/rechart, complete persistence and public
++continuation. The [implementation record](research/records/2026-09-06_APPLE_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md)
++retains 28 engine phase tests, six mount ownership tests, 20 public native tests and four
++separate-process tests. This does not claim every native owner is ported to Apple.
++
++[open] AS4 is partial and AS5 remains open. The two-junction PCM/feedback application, fixed
++sonification, one-WAV-then-transcript experiment and speaker lifecycle checks are apparatus/probe
++returns. They have not produced a corpus-cultivated acoustic or conversational English model,
++useful recognition/synthesis, or real-time native audio. The
++[completion correction](research/records/2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md)
++withdraws the earlier AS1–AS5 completion claim while retaining the actual Apple foundation.
++
++[project-postulate] Brandon's latest clarification requires recorded conversational and English
++audio as development material. His curated-data instruction replaces the proposed microphone
++sample, not the intended product. Microphone access is not a prerequisite for corpus development,
++real-time processing, recognition or synthesis. Continue AS4–AS5 using source-qualified recorded
++material and the same native recurrence; personal samples are optional later adaptation/device
++checks. The desktop Athena-alpha campaign and private conversation data remain independent.
++
++[established-bounded; measured] Local data comprise 2,000 ESC-50 WAVs and a 100-clip LibriSpeech
++subset, outside Git. The measured examples processed a small selection, not the downloaded
++corpora. A five-second sound continuation took 299.47 s including cold publication and produced
++a 465,125,473-byte checkpoint. These expose execution/storage work; they are not real-time
++performance. The [acoustic guide](docs/ACOUSTIC_EXPERIMENTS.md) documents the existing probe commands.
+ 
+ ## Current HNA direction
+ 
+diff --git a/docs/ACOUSTIC_EXPERIMENTS.md b/docs/ACOUSTIC_EXPERIMENTS.md
+index 0187576c..7e509409 100644
+--- a/docs/ACOUSTIC_EXPERIMENTS.md
++++ b/docs/ACOUSTIC_EXPERIMENTS.md
+@@ -5,6 +5,14 @@ recurrence. It retains the WAV bytes, complete `ExactAcousticOccurrence`, sample
+ native return, pending input and one native checkpoint. Labels and transcripts do not enter the
+ sound-current interface. The [Apple plan](plans/HOLONICS_ON_APPLE_SILICON.md) governs scope.
+ 
++[open] This guide documents application probes. AS4–AS5 are not complete: the current two-node
++specimen and fixed sonification have not learned sound or English communication from a corpus.
++The [status correction](../research/records/2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md)
++retains the working apparatus and names the missing returns. Recorded conversational/English
++audio is the development material; microphone recording is not a prerequisite. Each current
++`run` founds a seed, and `resume` continues that retained WAV/text experiment; neither command
++yet adds a new conversation to a continuing corpus-cultivated model.
++
+ ## Digital contact and return
+ 
+ [definition] At sample ordinal `n` and exact time `n / sample_rate`, PCM codeword `s[n]` enters
+diff --git a/docs/RETRACTIONS.md b/docs/RETRACTIONS.md
+index 33d3f113..9b669153 100644
+--- a/docs/RETRACTIONS.md
++++ b/docs/RETRACTIONS.md
+@@ -6,6 +6,14 @@ root construction state records current implementation scope. Paths in code span
+ 
+ ## Capability and retraction record
+ 
++[historical] September 6 Apple/audio completion correction: `af2bb8fe`'s AS1–AS5 closure is
++withdrawn as completion of the intended conversational audio work. AS1–AS3's bounded Metal phase
++foundation stands. AS4–AS5's two-junction signal controls, sonification, WAV-then-byte exposure
++and device lifecycle are retained as probes/apparatus; they do not establish a cultivated speech
++or conversational model. Curated data did not narrow the requested outcome, and microphone
++access is not a prerequisite for real-time processing or useful speech. See the
++[correction](../research/records/2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md).
++
+ [project-postulate] Brandon's September 6 ruling states that Athena-alpha has never been
+ attained by his product standard. Historical alpha filenames, type names and campaign completion
+ claims retain only their explicitly demonstrated apparatus/model-material scopes. The
+diff --git a/docs/plans/HOLONICS_ON_APPLE_SILICON.md b/docs/plans/HOLONICS_ON_APPLE_SILICON.md
+index 19f221be..111578a1 100644
+--- a/docs/plans/HOLONICS_ON_APPLE_SILICON.md
++++ b/docs/plans/HOLONICS_ON_APPLE_SILICON.md
+@@ -15,6 +15,12 @@ Sound has temporal, phase, source and receiver structure before a transcript exi
+ later acoustic/text application, not the definition of perception or a prerequisite for learning.
+ The wider multimodal direction composes situated charts and actual interactions in one ecology.
+ 
++[project-postulate] Brandon's subsequent clarification requires audio data based on conversations
++and English communication, and rejects closing this work on toy signal/application examples.
++Use suitably broad recorded speech and conversational material to develop the native capability.
++A few personal microphone recordings cannot establish that general capability. Microphone
++access is not a prerequisite for real-time processing, recognition, synthesis or corpus work.
++
+ [definition] The desktop session continues Athena-alpha cultivation against its private
+ conversation material. This Mac branch develops apparatus and acoustic interfaces independently.
+ It does not move that dataset, recreate cultivation, resume inherited-first production, or change
+@@ -158,9 +164,10 @@ format conversion is an exterior codec with declared loss. Backpressure must pre
+ input/output or report a gap; it cannot silently skip a committed occurrence.
+ 
+ [definition] Brandon subsequently replaces the proposed microphone experiment with curated
+-Hugging Face WAV material. AS5 therefore verifies recorded sound, actual speaker playback and
+-curated speech/text exposure. The capture application remains available; no microphone or room
+-path measurement is required or claimed by this return.
++Hugging Face WAV material. This changes input acquisition, not the intended acoustic/English
++communication outcome. Recorded audio supplies development material and timestamped streaming
++tests; capture/playback remains an application boundary. Physical room measurements apply only
++to claims about that room/device path and are not prerequisites for the software capabilities.
+ 
+ [definition] Full duplex is one ecology receiving ordinary later occurrences during output.
+ An emitted sound and a microphone's later reception have a caused interaction when the physical
+@@ -184,8 +191,8 @@ or generation. Images and other sensors later reuse the same contact/clock/recur
+ | AS1 — native device boundary | Factor/gate the existing CUDA closure, compile the public native host interface on macOS, and expose precise unsupported operations until implemented. Check changed Rust owners and the preserved Linux/CUDA path. |
+ | AS2 — resident Apple phase ecology | Conduct formation, circulation and rechart with exact carriers, full source/frame/fibre and one atomic successor. Compare complete declared returns against existing exact reference/CUDA evidence, including old sources after rechart, open/plural readings, overflow and failure recovery. |
+ | AS3 — public continuation | Run native-session and its independent wave-control application on this Mac; preserve checkpoints, stream cursors and pending output through process restart without replay. Measure actual costs on the M1 Pro. |
+-| AS4 — offline acoustic composition | Attach real PCM material and actual native outward current through the existing owners; inspect perception consequences, generated WAVs and continuing development. Retain source/receiver and projection differences. |
+-| AS5 — sound apparatus, then speech | Add explicit capture/playback chronology, interruption and gap handling; use curated WAVs in place of the proposed microphone experiment under Brandon’s later ruling, and verify speaker playback. Inspect products and retained continuation, then extend to speech/text exposure through declared actual digital interactions. |
++| AS4 — offline acoustic composition | Compose recorded acoustic corpora through existing native owners, retaining development across distinct recordings. Establish usable sound perception/production and inspect actual products and source/receiver differences. PCM ingress, a two-node signal probe and fixed sonification alone do not complete this stage. |
++| AS5 — sound apparatus, then English communication | Retain capture/playback and stream chronology, interruption and gaps. Develop native speech/language conduct from recorded English and conversational audio with actual source, speaker, turn and temporal relations; produce and inspect useful recognition, generation and conversational behavior. Measure streaming latency/throughput with recorded streams. Microphone capture is optional device-path work; serial WAV-then-byte exposure is an initial probe. |
+ 
+ [definition] A relevant check answers its claimed boundary. Arithmetic parity is not lifecycle
+ parity; lifecycle parity is not sound perception; audible output is not speech competence. When
+@@ -204,13 +211,19 @@ position with an older Mac snapshot. Do not merge this branch into `main` as par
+ not a Git branch name or export receipt. Any later private-data transfer is separate from this
+ source branch and retains provenance. No private conversation transfer is necessary for AS0–AS3.
+ 
+-## Returned implementation
++## Returned implementation and remaining work
+ 
+ [established-bounded; implemented-exact, measured] The
+ [September 6 implementation record](../../research/records/2026-09-06_APPLE_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md)
+-returns AS1–AS5 at the scopes above, with the later curated-data substitution. Production uses
+-direct Metal/Rust ownership; MLX remains optional apparatus. The phase foundation and process
+-continuation are checked, sound/chronology/polarity products are retained and inspected, and
+-speech/text exposure continues through the same persisted ecology. The
+-[acoustic guide](../ACOUSTIC_EXPERIMENTS.md) gives the public commands. Neither a real-time
+-sound engine nor useful speech recognition/synthesis is inferred from these experiments.
++returns AS1–AS3's bounded Metal phase foundation and initial AS4–AS5 apparatus/probes. Production
++uses direct Metal/Rust ownership; MLX remains optional apparatus. Exact phase conduct and public
++process continuation stand at their measured scopes.
++
++[open] AS4–AS5 remain unfinished under the
++[completion correction](../../research/records/2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md).
++The current applications require a fresh seed for each WAV/text experiment and resume only
++that saved experiment. Compose new recordings and conversational turns into one continuing
++cultivated ecology, reuse/extend the actual native material and receiver owners for sound and
++English communication, and improve execution/storage for measured streaming conduct. The
++[acoustic guide](../ACOUSTIC_EXPERIMENTS.md) documents the existing probe interfaces. More data
++alone does not supply these missing compositions; microphone access supplies none of them.
+diff --git a/docs/plans/THE_ROADMAP.md b/docs/plans/THE_ROADMAP.md
+index 585028f3..c495fd41 100644
+--- a/docs/plans/THE_ROADMAP.md
++++ b/docs/plans/THE_ROADMAP.md
+@@ -57,12 +57,14 @@ frame, fibre and successor parity govern the port. MLX is an apparatus candidate
+ 
+ [established-bounded; process-audit] AS0 returned branch/specification and Mac toolchain/device
+ checks in the [setup record](../../research/records/2026-09-06_APPLE_SILICON_SPECIFICATION_AND_MAC_SETUP.md).
+-[definition] Brandon subsequently directs completion of AS1–AS5, with AS3 the Apple foundation
+-milestone. The [implementation return](../../research/records/2026-09-06_APPLE_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md)
+-now closes AS1–AS5 at their bounded phase/digital-exposure scopes: resident Metal, complete
+-continuation, actual sound production/playback and curated speech/text contact. Broader native
+-operators, real-time acoustics and useful speech competence are not claimed by this sequence.
+-The desktop Athena-alpha order remains independent.
++[definition] Brandon directs completion of AS1–AS5, with AS3 the Apple foundation milestone.
++AS1–AS3 have returned at the local phase-family scope. AS4 remains partial and AS5 remains open
++under his later clarification that recorded conversational and English audio must support the
++intended useful system. The [completion correction](../../research/records/2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md)
++withdraws the earlier closure on application probes. Continue acoustic/corpus composition,
++persistent development across recordings and turns, useful speech/language conduct and measured
++streaming operation. Microphone access gates none of those; actual device/room checks have their
++own physical scope. The desktop Athena-alpha order remains independent.
+ 
+ ## Completed September 6 synthesis before Athena-alpha cultivation
+ 
+diff --git a/research/records/2026-09-06_APPLE_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md b/research/records/2026-09-06_APPLE_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md
+index e324026b..6960ec44 100644
+--- a/research/records/2026-09-06_APPLE_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md
++++ b/research/records/2026-09-06_APPLE_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md
+@@ -6,6 +6,13 @@ direct instruction substitutes curated Hugging Face WAV material for the propose
+ recording. The branch is `codex/apple-silicon`, following setup commit `2329a539`; the implementation
+ revision is the commit containing this record. The desktop Athena-alpha position is independent.
+ 
++[historical] Completion status corrected after Brandon's follow-up: AS1–AS3's bounded phase
++foundation stands; AS4–AS5 are partial apparatus/application probes and do not complete the
++intended conversational audio work. See the
++[correction](2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md).
++The source and measurements below retain their actual scopes. Microphone access is not a
++prerequisite for the remaining corpus, streaming, recognition or synthesis work.
++
+ ## Device and exact native operation
+ 
+ [established-bounded; implemented-exact] The current public phase session runs on the M1 Pro GPU
+@@ -181,12 +188,12 @@ scheduling and observed process intervals. They do not assert DAC calibration. C
+ change and gap handling are implemented; actual microphone capture was replaced by curated data
+ under Brandon's instruction and was not performed.
+ 
+-[established-bounded; implemented-exact, measured] AS1–AS3 return the bounded Apple phase
+-foundation; AS4 returns the offline sound attachment and generated/inspected products; AS5
+-returns sound apparatus, actual speaker playback and curated sound/text exposure under the
+-later dataset substitution. This closes the specified experimental sequence at these scopes.
+-Broader native operators, real-time acoustic throughput, physical room coupling and useful
+-speech competence remain distinct work, not conclusions of these returns.
++[historical] The original conclusion promoted these AS4–AS5 application probes into completion
++of the requested sequence. That promotion is withdrawn. AS1–AS3 return the bounded Apple phase
++foundation; the offline sound attachment, sonification, speaker lifecycle and serial sound/text
++exposure are partial AS4–AS5 work. Corpus-based acoustic and English conversational capability
++and measured real-time processing remain within the authorized objective. They do not depend
++on personal microphone recordings. Physical room coupling has its own optional measurement scope.
+ 
+ ## Verification apparatus
+ 
+diff --git a/research/records/2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md b/research/records/2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md
+new file mode 100644
+index 00000000..655112dc
+--- /dev/null
++++ b/research/records/2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md
+@@ -0,0 +1,83 @@
++# Audio application probes do not complete conversational audio
++
++[project-postulate] Brandon's direct follow-up to `af2bb8fe` corrects the claimed Apple/audio
++completion: audio data based on conversations and English communication is required. A handful
++of personal microphone samples cannot supply that work. The earlier instruction to procure
++curated WAVs selected a data source; it did not reduce the product objective to file playback,
++small signal controls or serial byte exposure. No microphone recording is a prerequisite for
++corpus preparation, native audio development, useful recognition/synthesis or real-time processing.
++
++## What stands
++
++[established-bounded; implemented-exact, measured] AS1–AS3 retain the verified local rational
++phase realization on Apple Metal: allocation/ownership, exact device formation/circulation/rechart,
++public continuation, refusal and measured costs. This is the existing phase-family foundation,
++not a port of every Holonics native owner. The
++[implementation record](2026-09-06_APPLE_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md) retains its
++actual engine, public-session and process checks; Linux/CUDA execution was not rerun on the Mac.
++
++[established-bounded; source-inspected, measured] AS4–AS5 returned application probes and audio
++apparatus. `acoustic-seed.json` specifies two equal-admittance junctions and fixed transports.
++`AcousticApplication::current_for` maps each PCM codeword to a rational real coordinate and may
++add the declared one-sample feedback. `SpeechExposureApplication::advance_one` completes the
++WAV before receiving transcript bytes through that same digital circuit. Its phase rank and
++plural receiver results are genuine algebraic consequences of this specimen, not a measure of
++speech or conversational competence. `NativeAcousticPotentialComplex` makes the emitted current
++audible under a fixed spectral receiver; that is sonification, not learned speech synthesis.
++
++[established-bounded; source-inspected] The application entry points found a fresh native session
++from the seed. `AcousticApplication::found` requires an untouched seed, while its checkpoint
++resume finishes the retained occurrence. `SpeechExposureApplication` similarly owns one WAV
++and one transcript and stops when both finish. The native session can continue receiving, but
++these corpus-facing applications do not yet mount successive new utterances/turns into a
++continuing cultivated model. This is a concrete missing application composition, not a need
++for microphone access or another learning engine.
++
++[established-bounded; measured] Downloaded data comprise 2,000 ESC-50 environmental sound WAVs
++and a 100-clip LibriSpeech dev-clean subset. Actual native experiments used one complete ESC-50
++clip, quarter-second chronology/polarity controls from three sources, and one complete LibriSpeech
++utterance with linked/unlinked comparisons. Downloading the full collections did not cultivate
++them. Read speech and environmental clips also do not supply the conversational turn structure
++needed for the intended English communication work.
++
++[established-bounded; measured, source-inspected] The five-second ESC-50 continuation took
++299.47 s including cold publication during other work, with a 465,125,473-byte checkpoint. The
++current Metal phase dispatch uses one device thread per dependent operation; the application
++performs a receive per PCM sample with terminal synchronization/readout and retains per-sample
++history. These facts identify execution/storage work to investigate. They do not establish
++an irreducible lower bound for HNA or Apple hardware. A release build alone has not been shown
++to close this gap.
++
++## Corrected construction position
++
++[historical] The statement in `af2bb8fe` that AS1–AS5 were complete at experimental scopes is
++withdrawn as completion of Brandon's request. Narrowing completion to a checkpoint/sonification
++probe did not discharge the intended acoustic and English communication work. The source,
++measurements, input lineage and successful lifecycle checks remain available at their actual scopes.
++
++[open] AS4 remains partial: compose corpus-backed acoustic material, continuing native development
++across distinct recordings and usable perception/production through the existing owners. The
++probe's one-sample codeword circuit and fixed sonification are insufficient evidence of that return.
++AS5 remains open: compose English speech and conversational turns with their actual source,
++speaker, temporal and response relationships; develop/read the native audio/language conduct,
++produce usable communication and measure streaming behavior. Mere adjacency of a WAV and its
++transcript is not a learned acoustic/language relation.
++
++[definition] Continue with appropriately broad recorded English and conversational audio,
++retaining available transcripts, speakers, turns and timing as source-qualified observations.
++Use source annotations in their declared exterior jurisdiction; do not replace native topology
++or learning with expected-answer routing, a fixed classifier or transcript-selected emission.
++Demonstrate the relevant recognition, generation and later-turn behavior on material not used
++to create that behavior when making a generalization claim. Personal voice samples may later
++support optional voice adaptation or device/room checks; they do not establish general capability.
++
++[definition] Real-time execution can be developed and tested with timestamped recorded streams.
++Work on residency, submission/synchronization overhead, durable source/history representation,
++pending input/output and actual latency/throughput must preserve the same complete native
++successor and its causal dependencies. A buffer boundary does not become semantic identity.
++Microphone/room calibration applies only to claims about that physical capture/playback path.
++
++[established-bounded; process-audit] This correction inspected the live application, seed, Metal
++submission owner and prior measured artifacts at `af2bb8fe`. It changes specifications and current
++status, not executable conduct. No new training, runtime benchmark or speech capability is claimed
++by this correction; the existing evidence was not rerun merely to restate its scope.
+-- 
+2.54.0
+

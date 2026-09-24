@@ -1,0 +1,11 @@
+worktree: /home/b/Workspaces/holonics/.local/p15/base
+branch: (detached HEAD)
+HEAD: 4dff57c82ee25810b38c7c5c339fb3b541bcb9a8
+HEAD subject: Carry reconstruction fibres and separators as core descent types
+HEAD ancestor of origin/main (bb73054a): True
+
+git status --porcelain (tracked):
+ M crates/holonic-engine/src/holonic_intelligence.rs
+
+untracked, non-ignored:
+crates/holonic-engine/src/holonic_intelligence/extraction_equality_tests.rs

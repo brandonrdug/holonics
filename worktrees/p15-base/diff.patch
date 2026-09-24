@@ -1,0 +1,14 @@
+diff --git a/crates/holonic-engine/src/holonic_intelligence.rs b/crates/holonic-engine/src/holonic_intelligence.rs
+index cc386687..28a52723 100644
+--- a/crates/holonic-engine/src/holonic_intelligence.rs
++++ b/crates/holonic-engine/src/holonic_intelligence.rs
+@@ -70,6 +70,9 @@ mod rested;
+ mod source_neutral;
+ #[path = "holonic_intelligence/weight.rs"]
+ mod weight;
++#[cfg(test)]
++#[path = "holonic_intelligence/extraction_equality_tests.rs"]
++mod extraction_equality_tests;
+ 
+ pub use circulation::*;
+ pub use contact_chart::*;

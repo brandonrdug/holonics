@@ -1,0 +1,51 @@
+From 5a147e79ba22b7abc3bb53be5e5217de449e15d2 Mon Sep 17 00:00:00 2001
+From: Brandon <brandonrdug@users.noreply.github.com>
+Date: Thu, 24 Sep 2026 00:25:27 -0700
+Subject: [PATCH] Audit typed-origin Physics edge (Refs #66)
+
+---
+ docs/plans/census/LEAN_CORE_R3_EDGES.md | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/docs/plans/census/LEAN_CORE_R3_EDGES.md b/docs/plans/census/LEAN_CORE_R3_EDGES.md
+index 3023685f..e6d334f8 100644
+--- a/docs/plans/census/LEAN_CORE_R3_EDGES.md
++++ b/docs/plans/census/LEAN_CORE_R3_EDGES.md
+@@ -222,7 +222,7 @@ the main root no longer re-exports its research owner.
+ | Direct Framework import | Other source importers / consuming owners | Target disposition |
+ |---|---|---|
+ | `Millennium.HolonicCurvedArcEinstein` | broad `ElementaryHolonics.lean`; it itself imports `HolonicComposition` and `NavierStokesCurvedTransport` | research instance; preserve in `HolonicsResearch` |
+-| `Millennium.HolonicTypedOriginDimensions` | broad umbrella; `HolonicCosmologicalInference`, `HolonicDiscreteMaxwellOperator`, `HolonicFieldTheoryPassage` | mixed: the two-origin `OriginDim` and symmetrization are generic candidates; Einstein/cosmological/tensor-area instances stay source-specific until separately cut |
++| `Millennium.HolonicTypedOriginDimensions` | broad umbrella; `HolonicCosmologicalInference`, `HolonicDiscreteMaxwellOperator`, `HolonicFieldTheoryPassage` | research dimensional-analysis chart: the axes and symmetrizer are the concrete length/mass/source-time/receiver-time chart; Einstein/cosmological/tensor-area instances stay in Millennium. The generic inhabited-fibre/kernel law is already owned by `Foundation.TransportLift`. |
+ | `Millennium.HolonicCosmologicalInference` | `HolonicTypedOriginDimensions` | research parameter-receiver instance; preserve in `HolonicsResearch` |
+ | `Millennium.HolonicFourForceSectorCarrier` | broad umbrella; `HolonicConnectionCurvature`, `HolonicEntropyActionInduction` | research carrier until its generic oriented-cell/connection declarations have an independent owner |
+ | `Computation.HolonicQuantumTransport` | no other direct importer; it aggregates nine computation owners including Fermi/HNN modules | HNN specialization root, not Physics re-export |
+@@ -235,6 +235,25 @@ the stacked source graph the full Physics facade still reaches 274 Millennium mo
+ The target root must split those mixed declarations, not blindly remove the Physics modules or
+ re-export all their source dependencies.
+ 
++### Typed-origin dimensions: no standalone core cut in this packet
++
++`Framework.Physics` imports `Millennium.HolonicTypedOriginDimensions` only to re-export it; the
++facade itself refers to none of its declarations. The owner fixes `OriginAxis` to the
++length/mass/source-time/receiver-time chart and `symmetrizeDimension` to the conventional
++`Ellipse.Dim = ℤ × ℤ × ℤ`. The Einstein, stress-energy, cosmological, and primal/dual cell-measure
++dimensions are therefore instances of that chart, not a generic Physics API. The only generic
++claim in its receiver-fibre section is already available as `Foundation.TransportLift`'s
++`fibreEquivKernel`; extracting a duplicate would not add a reusable law.
++
++The stacked import graph has five paths from `Framework.Physics` to this owner: the direct
++re-export; `HolonicCosmologicalInference`; `HolonicEvolutionKinds`; `HolonicSimulationCertificate`
++then `HolonicEvolutionKinds`; and `HolonicQuantumTransport` then `HolonicEvolutionKinds`. The
++last three reach it through `HolonicFieldTheoryPassage`. Removing the direct facade import alone
++leaves four paths and does not reduce the research closure. A useful follow-up must split the
++concrete chart's consumers at the declaration boundary (including the cosmological and
++field-theory owners) before curating the facade. No core module or forwarding alias is introduced
++here.
++
+ ## Geometry connection-curvature edge audit
+ 
+ The current `Framework/Geometry.lean` is also an import facade and contains no use of
+-- 
+2.54.0
+

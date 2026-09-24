@@ -1,0 +1,2576 @@
+From 9404b54c3013b3be67bfc3b86cdd441fce4d4222 Mon Sep 17 00:00:00 2001
+From: Brandon Duggan <brandonrdug@users.noreply.github>
+Date: Sun, 6 Sep 2026 18:08:43 -0700
+Subject: [PATCH 04/18] Continue recorded acoustic sources with ordered
+ resident packets
+
+---
+ CONSTRUCTION_STATE.md                         |   8 +
+ accelerators/metal/complex_incidence.metal    |  35 ++
+ .../src/bin/holonics-acoustic.rs              | 117 +++++-
+ .../src/cuda_refine/complex_parametron.rs     | 351 ++++++++++++++++
+ .../src/cuda_refine/cuda_driver.rs            |   8 +
+ .../constitutive_fibre/circulation.rs         |  11 +-
+ .../constitutive_fibre/circulation/batch.rs   | 169 ++++++++
+ .../constitutive_fibre/circulation/rest.rs    |   1 +
+ .../src/native_intelligence/cultivated.rs     |  26 +-
+ crates/holonic-mount/src/metal.rs             |   3 +-
+ .../examples/native_audio_packets.rs          |  79 ++++
+ crates/holonics-hna/src/native.rs             |  16 +-
+ crates/holonics-hna/src/native/acoustic.rs    | 284 ++++++++++---
+ .../holonics-hna/src/native/acoustic/tests.rs |  97 ++++-
+ crates/holonics-hna/src/native/batch.rs       | 181 ++++++++
+ docs/ACOUSTIC_EXPERIMENTS.md                  |  21 +
+ docs/ARCHITECTURE_MAP.md                      |   8 +
+ docs/plans/HOLONICS_ON_APPLE_SILICON.md       |  11 +-
+ .../apple_silicon/README_AMI_CONVERSATION.md  |  60 +++
+ .../prepare_ami_conversation_subset.py        | 394 ++++++++++++++++++
+ ...ORPUS_CONTINUATION_AND_RESIDENT_PACKETS.md | 118 ++++++
+ .../ami_source_receipt.json                   |  90 ++++
+ .../recorded_packets.jsonl                    |   2 +
+ 23 files changed, 2005 insertions(+), 85 deletions(-)
+ create mode 100644 accelerators/metal/complex_incidence.metal
+ create mode 100644 crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation/batch.rs
+ create mode 100644 crates/holonics-hna/examples/native_audio_packets.rs
+ create mode 100644 crates/holonics-hna/src/native/batch.rs
+ create mode 100644 research/experiments/apple_silicon/README_AMI_CONVERSATION.md
+ create mode 100644 research/experiments/apple_silicon/prepare_ami_conversation_subset.py
+ create mode 100644 research/records/2026-09-06_AS4_AS5_CORPUS_CONTINUATION_AND_RESIDENT_PACKETS.md
+ create mode 100644 research/records/2026-09-06_as4_as5_continuation/ami_source_receipt.json
+ create mode 100644 research/records/2026-09-06_as4_as5_continuation/recorded_packets.jsonl
+
+diff --git a/CONSTRUCTION_STATE.md b/CONSTRUCTION_STATE.md
+index 852bdde3..b65605f1 100644
+--- a/CONSTRUCTION_STATE.md
++++ b/CONSTRUCTION_STATE.md
+@@ -39,6 +39,14 @@ real-time processing, recognition or synthesis. Continue AS4–AS5 using source-
+ material and the same native recurrence; personal samples are optional later adaptation/device
+ checks. The desktop Athena-alpha campaign and private conversation data remain independent.
+ 
++[open] Corrected AS4–AS5 implementation remains active. The
++[continuation return](research/records/2026-09-06_AS4_AS5_CORPUS_CONTINUATION_AND_RESIDENT_PACKETS.md)
++adds consecutive recordings in one native checkpoint, ordered packets with exact refusal
++prefixes, and bounded Metal complex incidence. Four complete AMI meetings retain timed speakers,
++words and original response links, including source annotation refusals. These do not yet return
++learned acoustic/English conduct. Complete recorded inputs still took 7.07–12.65 times their
++source durations; retained per-sample allocation/history remains a concrete cost.
++
+ [established-bounded; measured] Local data comprise 2,000 ESC-50 WAVs and a 100-clip LibriSpeech
+ subset, outside Git. The measured examples processed a small selection, not the downloaded
+ corpora. A five-second sound continuation took 299.47 s including cold publication and produced
+diff --git a/accelerators/metal/complex_incidence.metal b/accelerators/metal/complex_incidence.metal
+new file mode 100644
+index 00000000..ed8c796d
+--- /dev/null
++++ b/accelerators/metal/complex_incidence.metal
+@@ -0,0 +1,35 @@
++// Exact signed-word complex incidence contraction.  One Metal thread owns the complete
++// output section; this preserves the CUDA kernel's ordered integer accumulation while the
++// mount boundary retains allocation and command-buffer ownership.
++#include <metal_stdlib>
++using namespace metal;
++
++kernel void conduct_complex_incidence(
++    device const long *incidence [[buffer(0)]],
++    device const long *coefficient_real [[buffer(1)]],
++    device const long *coefficient_imaginary [[buffer(2)]],
++    device long *section_real [[buffer(3)]],
++    device long *section_imaginary [[buffer(4)]],
++    constant uint &branch_count [[buffer(5)]],
++    constant uint &node_count [[buffer(6)]],
++    constant uint &front_count [[buffer(7)]],
++    uint tid [[thread_position_in_grid]]) {
++    if (tid != 0) return;
++    const ulong extent = (ulong)front_count * (ulong)branch_count;
++    for (ulong at = 0; at < extent; ++at) {
++        const uint front = (uint)(at / (ulong)branch_count);
++        const uint branch = (uint)(at % (ulong)branch_count);
++        const ulong incidence_at = (ulong)branch * (ulong)node_count;
++        const ulong coefficient_at = (ulong)front * (ulong)node_count;
++        long real = 0;
++        long imaginary = 0;
++        for (uint node = 0; node < node_count; ++node) {
++            real += incidence[incidence_at + (ulong)node]
++                * coefficient_real[coefficient_at + (ulong)node];
++            imaginary += incidence[incidence_at + (ulong)node]
++                * coefficient_imaginary[coefficient_at + (ulong)node];
++        }
++        section_real[at] = real;
++        section_imaginary[at] = imaginary;
++    }
++}
+diff --git a/applications/holonics-workbench/src/bin/holonics-acoustic.rs b/applications/holonics-workbench/src/bin/holonics-acoustic.rs
+index c8e08b65..2f03b619 100644
+--- a/applications/holonics-workbench/src/bin/holonics-acoustic.rs
++++ b/applications/holonics-workbench/src/bin/holonics-acoustic.rs
+@@ -2,8 +2,8 @@
+ use clap::{Parser, Subcommand};
+ use holonic_engine::phase_current::{PhaseCurrentLineageId, PhaseCurrentReceiverId};
+ use holonics_hna::native::{
+-    resume_acoustic, run_acoustic_with_options, AcousticRunOptions, AcousticSavedApplication,
+-    CurrentWire, NativeModelSpec,
++    append_acoustic, resume_acoustic, run_acoustic_with_options, AcousticApplication,
++    AcousticRunOptions, AcousticSavedApplication, CurrentWire, NativeModelSpec,
+ };
+ use life::mathematical_source::ExactAcousticOccurrence;
+ use life::native_intelligence::{NativeAcousticPotentialComplex, NativeAcousticReceiverChart};
+@@ -46,6 +46,33 @@ enum Action {
+         /// JSON array of exact per-node gains for an explicitly declared one-sample digital return.
+         #[arg(long)]
+         return_couplings: Option<PathBuf>,
++        /// Exterior source frame length and hop; this does not define native recurrence.
++        #[arg(long, default_value_t = 4096)]
++        frame_size: u32,
++    },
++    /// Append a complete new PCM recording to an existing acoustic owner/checkpoint.
++    Append {
++        /// Existing complete acoustic checkpoint whose continuing owner receives the recording.
++        source: PathBuf,
++        #[arg(long)]
++        wav: PathBuf,
++        /// Source occurrence coordinate, distinct from its filename/content.
++        #[arg(long)]
++        occurrence: String,
++        #[arg(long)]
++        checkpoint: PathBuf,
++        /// Optional process cut. The remainder stays in the new checkpoint.
++        #[arg(long)]
++        samples: Option<usize>,
++        /// Exact digital amplitude divisor; this does not assert calibrated acoustic pressure.
++        #[arg(long, default_value_t = 32768)]
++        divisor: i64,
++        /// JSON array of exact per-node gains for an explicitly declared one-sample digital return.
++        #[arg(long)]
++        return_couplings: Option<PathBuf>,
++        /// Exterior source frame length and hop; this does not define native recurrence.
++        #[arg(long, default_value_t = 4096)]
++        frame_size: u32,
+     },
+     /// Continue the next pending sample from a complete application/native checkpoint.
+     Resume {
+@@ -94,6 +121,39 @@ fn write_new(path: &Path, bytes: &[u8]) -> Result<(), Box<dyn std::error::Error>
+ fn json_new(path: &Path, value: &impl Serialize) -> Result<(), Box<dyn std::error::Error>> {
+     write_new(path, &serde_json::to_vec_pretty(value)?)
+ }
++fn read_acoustic_occurrence(
++    wav: &Path,
++    occurrence: String,
++    frame_size: u32,
++) -> Result<(ExactAcousticOccurrence, Vec<u8>), Box<dyn std::error::Error>> {
++    if frame_size == 0 {
++        return Err("--frame-size must be positive".into());
++    }
++    let bytes = fs::read(wav)?;
++    let source = ExactAcousticOccurrence::from_wav_bytes(
++        &bytes,
++        occurrence,
++        wav.display().to_string(),
++        frame_size,
++        frame_size,
++        1,
++    )?;
++    Ok((source, bytes))
++}
++fn recording_summary(app: &AcousticApplication) -> serde_json::Value {
++    serde_json::json!({
++        "occurrence": app.occurrence().occurrence,
++        "locator": app.occurrence().locator,
++        "sample_rate": app.occurrence().sample_rate,
++        "sample_count": app.occurrence().samples.len(),
++        "frame_length": app.occurrence().frame_length,
++        "frame_hop": app.occurrence().frame_hop,
++        "native_start": app.native_start(),
++        "next_sample": app.cursor(),
++        "complete": app.complete(),
++        "pending": app.pending(),
++    })
++}
+ fn production(
+     path: &Path,
+ ) -> Result<
+@@ -145,7 +205,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
+                     "total_samples":app.occurrence().samples.len(), "next_sample":app.cursor(),
+                     "complete":app.complete(), "pending":app.pending(),
+                     "pcm_divisor":app.pcm_divisor(),"digital_return_couplings":app.return_couplings(),
+-                    "first_native_return":app.steps().first(), "last_native_return":app.steps().last()
++                    "first_native_return":app.steps().first(), "last_native_return":app.steps().last(),
++                    "native_start":app.native_start(),
++                    "recording_count":app.recording_count(),
++                    "current_recording":recording_summary(app),
++                    "completed_recordings":app.completed_recordings().iter().map(recording_summary).collect::<Vec<_>>()
+                 }))?
+             );
+         }
+@@ -157,18 +221,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
+             samples,
+             divisor,
+             return_couplings,
++            frame_size,
+         } => {
+             let model: NativeModelSpec = read(&seed)?;
+-            let bytes = fs::read(&wav)?;
+-            // One-sample frame is an explicit receiver extent; the folded section is not used.
+-            let occurrence = ExactAcousticOccurrence::from_wav_bytes(
+-                &bytes,
+-                occurrence,
+-                wav.display().to_string(),
+-                1,
+-                1,
+-                1,
+-            )?;
++            let (occurrence, bytes) = read_acoustic_occurrence(&wav, occurrence, frame_size)?;
+             let gains: Option<Vec<CurrentWire>> =
+                 return_couplings.as_deref().map(read).transpose()?;
+             let run = run_acoustic_with_options(
+@@ -177,6 +233,41 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
+                 &bytes,
+                 divisor,
+                 gains,
++                &AcousticRunOptions {
++                    samples,
++                    checkpoint: Some(checkpoint.clone()),
++                },
++            )?;
++            println!(
++                "{}",
++                serde_json::json!({"cursor":run.cursor,"complete":run.complete,
++                "checkpoint":run.checkpoint,"checkpoint_octets":run.checkpoint_octets,
++                "checkpoint_error":run.checkpoint_error,"interruption":run.interruption,
++                "pending":run.pending,"elapsed_ns":started.elapsed().as_nanos()})
++            );
++            if run.interruption.is_some() || run.checkpoint_error.is_some() {
++                std::process::exit(1);
++            }
++        }
++        Action::Append {
++            source,
++            wav,
++            occurrence,
++            checkpoint,
++            samples,
++            divisor,
++            return_couplings,
++            frame_size,
++        } => {
++            let (occurrence, bytes) = read_acoustic_occurrence(&wav, occurrence, frame_size)?;
++            let gains: Option<Vec<CurrentWire>> =
++                return_couplings.as_deref().map(read).transpose()?;
++            let run = append_acoustic(
++                &source,
++                &occurrence,
++                &bytes,
++                divisor,
++                gains,
+                 &AcousticRunOptions {
+                     samples,
+                     checkpoint: Some(checkpoint),
+diff --git a/crates/holonic-engine/src/cuda_refine/complex_parametron.rs b/crates/holonic-engine/src/cuda_refine/complex_parametron.rs
+index 5af60108..93663e57 100644
+--- a/crates/holonic-engine/src/cuda_refine/complex_parametron.rs
++++ b/crates/holonic-engine/src/cuda_refine/complex_parametron.rs
+@@ -33,8 +33,12 @@ pub struct ResidentNativeWordReturn {
+ /// binary receiver is taken.  The owner is singular and deliberately not `Clone`.
+ pub struct ResidentComplexIncidence {
+     // Released before the context which owns it.
++    #[cfg(target_os = "linux")]
+     incidence: Buffer,
++    #[cfg(target_os = "linux")]
+     card: CudaRefineExecutor,
++    #[cfg(target_os = "macos")]
++    metal: MetalComplexIncidence,
+     address: String,
+     grain: u32,
+     branches: u32,
+@@ -43,6 +47,24 @@ pub struct ResidentComplexIncidence {
+     mount_host_ingress_octets: u64,
+ }
+ 
++#[cfg(target_os = "macos")]
++struct MetalComplexIncidence {
++    incidence: mount::cuda::DeviceBuffer<i64>,
++    context: mount::cuda::Context,
++    module: mount::cuda::Module,
++    device_name: String,
++}
++
++#[cfg(target_os = "macos")]
++fn metal_refusal(error: mount::cuda::CudaError) -> CudaRefineError {
++    CudaRefineError::Metal {
++        operation: error.context,
++        code: error.code,
++        name: error.name,
++        message: error.message,
++    }
++}
++
+ /// One terminal exact complex section returned from the resident incidence map.
+ #[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+ pub struct ResidentComplexIncidenceReturn {
+@@ -67,6 +89,7 @@ pub struct ResidentComplexIncidenceReturn {
+ impl ResidentComplexIncidence {
+     /// Mount one exact oriented incidence map. Its extents and row-mass aperture are read from the
+     /// material; no hidden width or phase population is authored.
++    #[cfg(target_os = "linux")]
+     pub fn mount(
+         card: CudaRefineExecutor,
+         address: impl Into<String>,
+@@ -111,10 +134,92 @@ impl ResidentComplexIncidence {
+         })
+     }
+ 
++    /// Preserve the legacy constructor for owners that have not yet selected a Metal route.
++    /// Those owners receive a typed obstruction instead of silently falling back to host work.
++    #[cfg(not(target_os = "linux"))]
++    pub fn mount(
++        _card: CudaRefineExecutor,
++        _address: impl Into<String>,
++        _grain: u32,
++        _branches: usize,
++        _nodes: usize,
++        _incidence: &[i64],
++    ) -> Result<Self, CudaRefineError> {
++        Err(CudaRefineError::UnsupportedDevice)
++    }
++
++    /// Mount the same exact incidence operation on the target-selected Metal backend.  The
++    /// legacy CUDA spelling remains at the call sites, but this path never accepts PTX or CPU
++    /// arithmetic as a substitute for the resident operation.
++    #[cfg(target_os = "macos")]
++    pub fn mount_metal(
++        address: impl Into<String>,
++        grain: u32,
++        branches: usize,
++        nodes: usize,
++        incidence: &[i64],
++    ) -> Result<Self, CudaRefineError> {
++        let expected = branches
++            .checked_mul(nodes)
++            .ok_or(CudaRefineError::ComplexIncidenceShape)?;
++        if branches == 0
++            || nodes == 0
++            || incidence.len() != expected
++            || branches > u32::MAX as usize
++            || nodes > u32::MAX as usize
++        {
++            return Err(CudaRefineError::ComplexIncidenceShape);
++        }
++        let greatest_row_mass = incidence
++            .chunks_exact(nodes)
++            .map(|row| {
++                row.iter().fold(0u128, |mass, entry| {
++                    mass.saturating_add(u128::from(entry.unsigned_abs()))
++                })
++            })
++            .max()
++            .unwrap_or(0);
++        let mount_host_ingress_octets = u64::try_from(std::mem::size_of_val(incidence))
++            .map_err(|_| CudaRefineError::ComplexIncidenceShape)?;
++        mount::cuda::init().map_err(metal_refusal)?;
++        let device = mount::cuda::Device::get(0).map_err(metal_refusal)?;
++        let context = mount::cuda::Context::create(&device).map_err(metal_refusal)?;
++        let device_name = device.name.clone();
++        let module = mount::cuda::Module::load_metal(include_str!(
++            "../../../../accelerators/metal/complex_incidence.metal"
++        ))
++        .map_err(metal_refusal)?;
++        let incidence_buffer =
++            mount::cuda::DeviceBuffer::alloc(incidence.len()).map_err(metal_refusal)?;
++        incidence_buffer
++            .copy_from_slice(incidence)
++            .map_err(metal_refusal)?;
++        Ok(Self {
++            metal: MetalComplexIncidence {
++                incidence: incidence_buffer,
++                context,
++                module,
++                device_name,
++            },
++            address: address.into(),
++            grain,
++            branches: branches as u32,
++            nodes: nodes as u32,
++            greatest_row_mass,
++            mount_host_ingress_octets,
++        })
++    }
++
++    #[cfg(target_os = "linux")]
+     pub fn device_name(&self) -> &str {
+         self.card.device_name()
+     }
+ 
++    #[cfg(target_os = "macos")]
++    pub fn device_name(&self) -> &str {
++        &self.metal.device_name
++    }
++
+     pub fn address(&self) -> &str {
+         &self.address
+     }
+@@ -127,6 +232,7 @@ impl ResidentComplexIncidence {
+     /// Each front is rebased to its own common positive denominator at the apparatus mouth and
+     /// reconstructed exactly after the terminal read. The card performs both contractions; the
+     /// host neither selects a phase nor replays the product.
++    #[cfg(target_os = "linux")]
+     pub fn conduct(
+         &mut self,
+         fronts: &[Vec<ExactComplexWaveCurrent>],
+@@ -276,6 +382,166 @@ impl ResidentComplexIncidence {
+             binary_receiver_taken: false,
+         })
+     }
++
++    #[cfg(target_os = "macos")]
++    pub fn conduct(
++        &mut self,
++        fronts: &[Vec<ExactComplexWaveCurrent>],
++    ) -> Result<ResidentComplexIncidenceReturn, CudaRefineError> {
++        self.conduct_metal(fronts)
++    }
++
++    #[cfg(target_os = "macos")]
++    fn conduct_metal(
++        &mut self,
++        fronts: &[Vec<ExactComplexWaveCurrent>],
++    ) -> Result<ResidentComplexIncidenceReturn, CudaRefineError> {
++        self.metal.context.make_current().map_err(metal_refusal)?;
++        let nodes = self.nodes as usize;
++        if fronts.is_empty()
++            || fronts.len() > u32::MAX as usize
++            || fronts.iter().any(|front| front.len() != nodes)
++        {
++            return Err(CudaRefineError::ComplexCurrentShape);
++        }
++        let coefficient_count = fronts
++            .len()
++            .checked_mul(nodes)
++            .ok_or(CudaRefineError::ComplexIncidenceShape)?;
++        let mut real = Vec::with_capacity(coefficient_count);
++        let mut imaginary = Vec::with_capacity(coefficient_count);
++        let mut denominators = Vec::with_capacity(fronts.len());
++        let mut greatest_numerator = 0u128;
++        for front in fronts {
++            let denominator = common_complex_denominator(front)?;
++            for current in front {
++                let re = (current.real.numer() * (&denominator / current.real.denom()))
++                    .to_i64()
++                    .ok_or(CudaRefineError::ComplexCurrentOutsideApparatus)?;
++                let im = (current.imaginary.numer() * (&denominator / current.imaginary.denom()))
++                    .to_i64()
++                    .ok_or(CudaRefineError::ComplexCurrentOutsideApparatus)?;
++                greatest_numerator = greatest_numerator
++                    .max(u128::from(re.unsigned_abs()))
++                    .max(u128::from(im.unsigned_abs()));
++                real.push(re);
++                imaginary.push(im);
++            }
++            denominators.push(
++                denominator
++                    .to_u64()
++                    .ok_or(CudaRefineError::ComplexCurrentOutsideApparatus)?,
++            );
++        }
++        if self
++            .greatest_row_mass
++            .checked_mul(greatest_numerator)
++            .filter(|bound| *bound <= i64::MAX as u128)
++            .is_none()
++        {
++            return Err(CudaRefineError::ComplexIncidenceAccumulationOverflow);
++        }
++        let output_count = fronts
++            .len()
++            .checked_mul(self.branches as usize)
++            .ok_or(CudaRefineError::ComplexIncidenceShape)?;
++        let coefficient_octets = real
++            .len()
++            .checked_add(imaginary.len())
++            .and_then(|count| count.checked_mul(std::mem::size_of::<i64>()))
++            .ok_or(CudaRefineError::ComplexIncidenceShape)? as u64;
++        let output_octets = output_count
++            .checked_mul(2 * std::mem::size_of::<i64>())
++            .ok_or(CudaRefineError::ComplexIncidenceShape)? as u64;
++        let coefficient_real =
++            mount::cuda::DeviceBuffer::alloc(real.len()).map_err(metal_refusal)?;
++        let coefficient_imaginary =
++            mount::cuda::DeviceBuffer::alloc(imaginary.len()).map_err(metal_refusal)?;
++        coefficient_real
++            .copy_from_slice(&real)
++            .map_err(metal_refusal)?;
++        coefficient_imaginary
++            .copy_from_slice(&imaginary)
++            .map_err(metal_refusal)?;
++        let section_real = mount::cuda::DeviceBuffer::alloc(output_count).map_err(metal_refusal)?;
++        let section_imaginary =
++            mount::cuda::DeviceBuffer::alloc(output_count).map_err(metal_refusal)?;
++        let function = self
++            .metal
++            .module
++            .function("conduct_complex_incidence")
++            .map_err(metal_refusal)?;
++        let mut incidence_pointer = self.metal.incidence.device_ptr();
++        let mut real_pointer = coefficient_real.device_ptr();
++        let mut imaginary_pointer = coefficient_imaginary.device_ptr();
++        let mut section_real_pointer = section_real.device_ptr();
++        let mut section_imaginary_pointer = section_imaginary.device_ptr();
++        let mut branch_count = self.branches;
++        let mut node_count = self.nodes;
++        let mut front_count = fronts.len() as u32;
++        let mut arguments: [*mut std::ffi::c_void; 8] = [
++            (&mut incidence_pointer as *mut u64).cast(),
++            (&mut real_pointer as *mut u64).cast(),
++            (&mut imaginary_pointer as *mut u64).cast(),
++            (&mut section_real_pointer as *mut u64).cast(),
++            (&mut section_imaginary_pointer as *mut u64).cast(),
++            (&mut branch_count as *mut u32).cast(),
++            (&mut node_count as *mut u32).cast(),
++            (&mut front_count as *mut u32).cast(),
++        ];
++        function
++            .launch(
++                mount::cuda::Dim3::x(1),
++                mount::cuda::Dim3::x(1),
++                &mut arguments,
++            )
++            .map_err(metal_refusal)?;
++        self.metal.context.synchronize().map_err(metal_refusal)?;
++        let mut returned_real = vec![0i64; output_count];
++        let mut returned_imaginary = vec![0i64; output_count];
++        section_real
++            .copy_to_slice(&mut returned_real)
++            .map_err(metal_refusal)?;
++        section_imaginary
++            .copy_to_slice(&mut returned_imaginary)
++            .map_err(metal_refusal)?;
++        let branches = self.branches as usize;
++        let sections = denominators
++            .iter()
++            .enumerate()
++            .map(|(front, denominator)| {
++                (0..branches)
++                    .map(|branch| {
++                        let at = front * branches + branch;
++                        ExactComplexWaveCurrent::new(
++                            Rat::new(BigInt::from(returned_real[at]), BigInt::from(*denominator)),
++                            Rat::new(
++                                BigInt::from(returned_imaginary[at]),
++                                BigInt::from(*denominator),
++                            ),
++                        )
++                    })
++                    .collect()
++            })
++            .collect();
++        Ok(ResidentComplexIncidenceReturn {
++            address: self.address.clone(),
++            grain: self.grain,
++            sections,
++            device: self.metal.device_name.clone(),
++            launches: 1,
++            synchronizations: 1,
++            block_threads: 1,
++            mount_host_ingress_octets: self.mount_host_ingress_octets,
++            successor_host_ingress_octets: coefficient_octets,
++            successor_host_egress_octets: output_octets,
++            resident_invariant_octets: self.mount_host_ingress_octets,
++            resident_working_octets: coefficient_octets + output_octets,
++            invariant_transport_reuploaded: false,
++            cpu_semantic_replay_after_device: false,
++            binary_receiver_taken: false,
++        })
++    }
+ }
+ 
+ /// The source-neutral incidence returned after a complete receiver constitutive form has already
+@@ -1175,6 +1441,91 @@ fn integer_gcd(mut left: BigInt, mut right: BigInt) -> BigInt {
+     if left.is_zero() { BigInt::one() } else { left }
+ }
+ 
++#[cfg(all(test, target_os = "macos"))]
++mod metal_complex_incidence_tests {
++    use super::*;
++
++    fn current(real: i64, imaginary: i64, denominator: i64) -> ExactComplexWaveCurrent {
++        ExactComplexWaveCurrent::new(
++            Rat::new(BigInt::from(real), BigInt::from(denominator)),
++            Rat::new(BigInt::from(imaginary), BigInt::from(denominator)),
++        )
++    }
++
++    #[test]
++    #[ignore = "requires a Metal device"]
++    fn metal_complex_incidence_matches_exact_oracle_and_preserves_ownership() {
++        let incidence = [1, -2, 3, -1, 0, 2];
++        let fronts = vec![
++            vec![current(1, 2, 2), current(-3, 1, 2), current(5, -1, 2)],
++            vec![current(-2, 3, 3), current(4, -2, 3), current(1, 5, 3)],
++        ];
++        let mut first = ResidentComplexIncidence::mount_metal(
++            "test/metal-complex-incidence/first",
++            0,
++            2,
++            3,
++            &incidence,
++        )
++        .expect("first Metal incidence mounts");
++        let mut second = ResidentComplexIncidence::mount_metal(
++            "test/metal-complex-incidence/second",
++            0,
++            2,
++            3,
++            &incidence,
++        )
++        .expect("second Metal incidence mounts");
++
++        let first_return = first.conduct(&fronts).expect("first conduct");
++        let reference: Vec<Vec<_>> = fronts
++            .iter()
++            .map(|front| {
++                incidence
++                    .chunks_exact(3)
++                    .map(|row| {
++                        row.iter().zip(front).fold(
++                            ExactComplexWaveCurrent::zero(),
++                            |sum, (coefficient, value)| {
++                                sum.add(&value.multiply(&current(*coefficient, 0, 1)))
++                            },
++                        )
++                    })
++                    .collect()
++            })
++            .collect();
++        assert_eq!(first_return.sections, reference);
++        let second_return = second.conduct(&fronts).expect("second conduct");
++        assert_eq!(second_return.sections, first_return.sections);
++        let first_again = first.conduct(&fronts).expect("first remains reusable");
++        assert_eq!(first_again.sections, first_return.sections);
++    }
++
++    #[test]
++    #[ignore = "requires a Metal device"]
++    fn metal_complex_incidence_refusal_does_not_consume_resident_state() {
++        let mut resident = ResidentComplexIncidence::mount_metal(
++            "test/metal-complex-incidence/overflow",
++            0,
++            1,
++            1,
++            &[i64::MAX],
++        )
++        .expect("overflow fixture mounts");
++        let overflowing = vec![vec![current(i64::MAX, -i64::MAX, 1)]];
++        assert!(matches!(
++            resident.conduct(&overflowing),
++            Err(CudaRefineError::ComplexIncidenceAccumulationOverflow)
++        ));
++        let valid = vec![vec![current(-1, 1, 2)]];
++        let returned = resident.conduct(&valid).expect("resident remains usable");
++        assert_eq!(
++            returned.sections,
++            vec![vec![current(-i64::MAX, i64::MAX, 2)]]
++        )
++    }
++}
++
+ impl ResidentNativeWord {
+     /// Mount one finite native action and its complete ordered word as continuing device standing.
+     pub fn mount(
+diff --git a/crates/holonic-engine/src/cuda_refine/cuda_driver.rs b/crates/holonic-engine/src/cuda_refine/cuda_driver.rs
+index 814f655b..a2e1d2b4 100644
+--- a/crates/holonic-engine/src/cuda_refine/cuda_driver.rs
++++ b/crates/holonic-engine/src/cuda_refine/cuda_driver.rs
+@@ -194,6 +194,14 @@ pub(super) unsafe extern "C" fn cuGetErrorString(_: i32, out: *mut *const c_char
+ 
+ #[derive(Debug, Error)]
+ pub enum CudaRefineError {
++    #[cfg(target_os = "macos")]
++    #[error("Metal {operation} returned {code} ({name}): {message}")]
++    Metal {
++        operation: &'static str,
++        code: i32,
++        name: String,
++        message: String,
++    },
+     #[error("the CUDA refinement apparatus is unavailable on this target")]
+     UnsupportedDevice,
+     #[error("the CUDA driver reports no device")]
+diff --git a/crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs b/crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs
+index e7cf1388..863191ae 100644
+--- a/crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs
++++ b/crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs
+@@ -323,6 +323,8 @@ pub struct NativeConstitutiveEcology<'chart> {
+     owner: Rc<()>,
+     history: Vec<HeldEmission<'chart>>,
+     pending: Option<HeldEmission<'chart>>,
++    // Complete staged outputs survive uncertain batch launch/readback with this owner.
++    pending_batch: Vec<HeldEmission<'chart>>,
+ }
+ 
+ impl<'chart> NativeConstitutiveEcology<'chart> {
+@@ -387,6 +389,7 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
+             owner: Rc::new(()),
+             history: Vec::new(),
+             pending: None,
++            pending_batch: Vec::new(),
+         })
+     }
+ 
+@@ -495,7 +498,10 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
+             .collect())
+     }
+     pub fn pending_lineage(&self) -> Option<&NativeCurrentLineage> {
+-        self.pending.as_ref().map(|e| &e.lineage)
++        self.pending
++            .as_ref()
++            .or_else(|| self.pending_batch.first())
++            .map(|e| &e.lineage)
+     }
+     pub fn census(&self) -> TransferCensus {
+         self.relation.census()
+@@ -665,3 +671,6 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
+ 
+ #[cfg(test)]
+ mod tests;
++
++mod batch;
++pub use batch::NativeUnlinkedBatchReturn;
+diff --git a/crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation/batch.rs b/crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation/batch.rs
+new file mode 100644
+index 00000000..734aa0f1
+--- /dev/null
++++ b/crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation/batch.rs
+@@ -0,0 +1,169 @@
++//! Ordered ingress through the existing circulation kernel. Scheduling edges carry failure
++//! dependency, not an invented semantic returned-source contact. Unlinked ingress never deposits
++//! a relation row, so the complete receiver basis is unchanged throughout this batch.
++use super::*;
++use crate::resident_section::ObstructionLineage;
++
++pub struct NativeUnlinkedBatchReturn {
++    pub steps: Vec<NativeCurrentStep>,
++    /// Batch-local index. The preceding prefix committed; this index and its suffix did not.
++    pub refused_at: Option<usize>,
++    pub obstruction: ObstructionLineage,
++}
++
++impl<'chart> NativeConstitutiveEcology<'chart> {
++    pub fn advance_unlinked_batch(
++        &mut self,
++        currents: &[NativePhaseCurrent],
++    ) -> Result<NativeUnlinkedBatchReturn, ConstitutiveFibreError> {
++        if !self.relation.usable || self.pending.is_some() || !self.pending_batch.is_empty() {
++            return Err(ConstitutiveFibreError::Uncertain);
++        }
++        let count = currents.len();
++        let start = self.history.len();
++        start
++            .checked_add(count)
++            .ok_or(ConstitutiveFibreError::Shape)?;
++        self.relation
++            .occurrences
++            .checked_add(count as u64)
++            .ok_or(ConstitutiveFibreError::Shape)?;
++        self.history
++            .try_reserve(count)
++            .map_err(|_| ConstitutiveFibreError::Shape)?;
++        let mut steps = Vec::new();
++        steps
++            .try_reserve(count)
++            .map_err(|_| ConstitutiveFibreError::Shape)?;
++        if count == 0 {
++            return Ok(NativeUnlinkedBatchReturn {
++                steps,
++                refused_at: None,
++                obstruction: ObstructionLineage::default(),
++            });
++        }
++        let surface = self.relation.surface;
++        let mut inputs = Vec::with_capacity(count);
++        let mut outputs = Vec::with_capacity(count);
++        for (index, current) in currents.iter().enumerate() {
++            inputs.push(
++                surface.mount_section_rest(
++                    &ResidentSectionRest::found(
++                        1,
++                        3,
++                        ResidentGrain(0),
++                        64,
++                        current.words().into_iter().map(|v| (v, v)).collect(),
++                    )
++                    .map_err(|_| ConstitutiveFibreError::Shape)?,
++                )?,
++            );
++            outputs.push(HeldEmission {
++                section: surface.fresh_section(
++                    1,
++                    6 * self.material.len() + 13,
++                    ResidentGrain(0),
++                )?,
++                lineage: NativeCurrentLineage {
++                    occurrence: start + index,
++                    frame: self.frame.view.ordinal,
++                    predecessor_state: (start + index).checked_sub(1),
++                    received_from: None,
++                    incoming: *current,
++                },
++                returned: false,
++                frame: Rc::clone(&self.frame),
++                material: Rc::clone(&self.material),
++            });
++        }
++        let dependencies: Vec<Vec<usize>> = (0..count)
++            .map(|i| i.checked_sub(1).into_iter().collect())
++            .collect();
++        let mut passage = surface.begin_passage_serialized(&dependencies)?;
++        for index in 0..count {
++            {
++                let lane = passage.open(index, &dependencies[index])?;
++                surface.record_constitutive_circulation(
++                    &lane,
++                    &self.seed,
++                    &mut self.memory,
++                    &mut self.relation.basis,
++                    &inputs[index],
++                    None,
++                    &self.frame.native,
++                    None,
++                    &outputs[index].section,
++                )?;
++            }
++            passage.close(index, &outputs[index].section, 64)?;
++        }
++        let passage = passage.finish()?;
++        self.pending_batch = outputs;
++        self.relation.usable = false;
++        let reading = passage.launch()?;
++        let refused_at = reading.obstruction.refusals.first().map(|r| r.index);
++        let committed = refused_at.unwrap_or(count);
++        // Every suffix occurrence must have carried the preceding refusal. A malformed receipt
++        // leaves the staged batch with the faulted owner; never guess what committed.
++        if reading.slots.len() != count
++            || reading
++                .obstruction
++                .refusals
++                .iter()
++                .map(|r| r.index)
++                .ne(committed..count)
++        {
++            return Err(ConstitutiveFibreError::Uncertain);
++        }
++        for held in self.pending_batch.iter().take(committed) {
++            let words = surface.read_out(&held.section)?;
++            let source_width = self.relation.source_width;
++            let width = source_width + 2;
++            let current_at = source_width + 1;
++            if words.len() != 6 * self.material.len() + 13
++                || words.iter().any(|(a, b)| a != b)
++                || words[source_width].0 <= 0
++                || words[current_at + width + 2].0 != -1
++            {
++                return Err(ConstitutiveFibreError::Uncertain);
++            }
++            let rank = usize::try_from(words[current_at + width + 3].0)
++                .map_err(|_| ConstitutiveFibreError::Uncertain)?;
++            if rank > width {
++                return Err(ConstitutiveFibreError::Uncertain);
++            }
++            let denominator = words[source_width].0;
++            let source_currents = (0..self.material.len())
++                .map(|i| {
++                    ExactComplexWaveCurrent::new(
++                        Rat::new(words[2 * i].0.into(), denominator.into()),
++                        Rat::new(words[2 * i + 1].0.into(), denominator.into()),
++                    )
++                })
++                .collect();
++            steps.push(NativeCurrentStep {
++                source: NativeEmissionHandle {
++                    owner: Rc::clone(&self.owner),
++                    occurrence: held.lineage.occurrence,
++                },
++                lineage: held.lineage.clone(),
++                frame: Rc::clone(&held.frame.view),
++                source_currents,
++                receiver: self.relation.decode_reading(&words, current_at, None)?,
++                received_difference: None,
++                formed_pivot: None,
++                successor_rank: rank,
++            });
++        }
++        // Publish the GPU-produced successor and its exact carriers together after decoding.
++        self.history.extend(self.pending_batch.drain(..committed));
++        self.pending_batch.clear();
++        self.relation.occurrences += committed as u64;
++        self.relation.usable = true;
++        Ok(NativeUnlinkedBatchReturn {
++            steps,
++            refused_at,
++            obstruction: reading.obstruction,
++        })
++    }
++}
+diff --git a/crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation/rest.rs b/crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation/rest.rs
+index 951286fe..2783b598 100644
+--- a/crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation/rest.rs
++++ b/crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation/rest.rs
+@@ -591,6 +591,7 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
+             owner,
+             history,
+             pending: None,
++            pending_batch: Vec::new(),
+         };
+         Ok((body, sources))
+     }
+diff --git a/crates/holonic-life/src/native_intelligence/cultivated.rs b/crates/holonic-life/src/native_intelligence/cultivated.rs
+index a5296757..ccb42dd1 100644
+--- a/crates/holonic-life/src/native_intelligence/cultivated.rs
++++ b/crates/holonic-life/src/native_intelligence/cultivated.rs
+@@ -13,12 +13,14 @@
+ 
+ use std::collections::BTreeSet;
+ 
++#[cfg(target_os = "linux")]
++use holonic_engine::cuda_refine::CudaRefineExecutor;
+ use holonic_engine::{
+-    cuda_refine::{CudaRefineExecutor, ResidentComplexIncidence, ResidentComplexIncidenceReturn},
++    ExactComplexWaveCurrent,
++    cuda_refine::{ResidentComplexIncidence, ResidentComplexIncidenceReturn},
+     exact_linear::ExactRatMatrix,
+     native_spool::ReceiverInsufficiency,
+     receiver_exact_compression::ReceiverId,
+-    ExactComplexWaveCurrent,
+ };
+ use num_bigint::BigInt;
+ use num_rational::BigRational as Rat;
+@@ -196,10 +198,22 @@ impl CultivatedEcologyRest {
+             return Err(CultivatedEcologyError::Standing);
+         }
+         let incidence = native_incidence(&self.morphology, &ingress_sections)?;
+-        let card = CudaRefineExecutor::new()
+-            .map_err(|error| CultivatedEcologyError::Apparatus(error.to_string()))?;
+-        let morphology_current = ResidentComplexIncidence::mount(
+-            card,
++        #[cfg(target_os = "linux")]
++        let morphology_current = {
++            let card = CudaRefineExecutor::new()
++                .map_err(|error| CultivatedEcologyError::Apparatus(error.to_string()))?;
++            ResidentComplexIncidence::mount(
++                card,
++                "athena/native-cultivation-complex-parametron",
++                0,
++                self.morphology.deposits.len(),
++                ingress_sections.len(),
++                &incidence,
++            )
++            .map_err(|error| CultivatedEcologyError::Apparatus(error.to_string()))?
++        };
++        #[cfg(target_os = "macos")]
++        let morphology_current = ResidentComplexIncidence::mount_metal(
+             "athena/native-cultivation-complex-parametron",
+             0,
+             self.morphology.deposits.len(),
+diff --git a/crates/holonic-mount/src/metal.rs b/crates/holonic-mount/src/metal.rs
+index d70efce0..2dd1b67e 100644
+--- a/crates/holonic-mount/src/metal.rs
++++ b/crates/holonic-mount/src/metal.rs
+@@ -800,6 +800,7 @@ impl Module {
+     pub fn function(&self, name: &str) -> Result<Function<'_>> {
+         // Scalar positions and arity are the exact published kernel ABI, not semantic routing.
+         let (signature, arity): (&'static [usize], usize) = match name {
++            "conduct_complex_incidence" => (&[5, 6, 7], 8),
+             "section_constitutive_fibre" => (&[4, 5, 6, 12], 13),
+             "section_constitutive_circulation" => (&[9, 10, 16], 17),
+             "section_constitutive_rechart" => (&[5, 19], 20),
+@@ -809,7 +810,7 @@ impl Module {
+                 return Err(error(
+                     "function",
+                     format!("native operation {name} has not been realized on Metal"),
+-                ))
++                ));
+             }
+         };
+         objc::rc::autoreleasepool(|| {
+diff --git a/crates/holonics-hna/examples/native_audio_packets.rs b/crates/holonics-hna/examples/native_audio_packets.rs
+new file mode 100644
+index 00000000..79deecfe
+--- /dev/null
++++ b/crates/holonics-hna/examples/native_audio_packets.rs
+@@ -0,0 +1,79 @@
++//! Measure recorded PCM delivery through the public acoustic application. This is an execution
++//! receiver, not cultivation or evidence of acoustic/English competence. No samples are skipped.
++use holonics_hna::native::{
++    AcousticApplication, NativeModelSpec, NativeSessionError, with_native_session,
++};
++use life::mathematical_source::ExactAcousticOccurrence;
++use std::{env, fs, time::Instant};
++
++fn main() -> Result<(), Box<dyn std::error::Error>> {
++    let args: Vec<_> = env::args().skip(1).collect();
++    if args.len() < 3 {
++        return Err("usage: native_audio_packets SEED PACKET_SAMPLES WAV [WAV ...]".into());
++    }
++    let spec = NativeModelSpec::read(&fs::read(&args[0])?)?;
++    let packet: usize = args[1].parse()?;
++    if packet == 0 {
++        return Err("packet size must be positive".into());
++    }
++    with_native_session(&spec, |session| {
++        let mut app: Option<AcousticApplication> = None;
++        for (index, path) in args[2..].iter().enumerate() {
++            let bytes = fs::read(path)?;
++            let occurrence = ExactAcousticOccurrence::from_wav_bytes(
++                &bytes,
++                format!("recorded-packet-measurement:{index}"),
++                path,
++                4096,
++                4096,
++                1,
++            )
++            .map_err(|e| NativeSessionError::Application(e.to_string()))?;
++            if let Some(app) = app.as_mut() {
++                app.append_recording(session, &occurrence, &bytes, 32768, None)?;
++            } else {
++                app = Some(AcousticApplication::found(
++                    &spec,
++                    &occurrence,
++                    &bytes,
++                    32768,
++                    None,
++                    session,
++                )?);
++            }
++            let app = app.as_mut().expect("attached source");
++            let before = session.inspect().census;
++            let started = Instant::now();
++            let mut latency = Vec::new();
++            while !app.complete() {
++                let tick = Instant::now();
++                app.advance_packet(session, packet)?;
++                latency.push(tick.elapsed().as_nanos());
++            }
++            let elapsed = started.elapsed().as_nanos();
++            latency.sort_unstable();
++            let after = session.inspect().census;
++            println!(
++                "{}",
++                serde_json::json!({
++                    "scope":"ordered unlinked PCM ingress; no learned audio-language capability",
++                    "source":path,"source_sha256":occurrence.source_sha256,
++                    "source_samples":occurrence.samples.len(),"sample_rate":occurrence.sample_rate,
++                    "native_start":app.native_start(),"native_end":session.occurrence_count(),
++                    "recordings":app.recording_count(),"packet_samples":packet,
++                    "elapsed_ns":elapsed,"packet_median_ns":latency[latency.len()/2],
++                    "packet_p95_ns":latency[(latency.len()-1)*95/100],"packet_max_ns":latency.last(),
++                    "deed_launches":after.deed_launches-before.deed_launches,
++                    "synchronizations":after.synchronizations-before.synchronizations,
++                    "allocations":after.allocations-before.allocations,
++                    "ingress_octets":after.ingress_octets-before.ingress_octets,
++                    "egress_section_octets":after.egress_section_octets-before.egress_section_octets,
++                    "egress_receipt_octets":after.egress_receipt_octets-before.egress_receipt_octets,
++                    "first_return":app.steps().first(),"last_return":app.steps().last(),
++                })
++            );
++        }
++        Ok(())
++    })?;
++    Ok(())
++}
+diff --git a/crates/holonics-hna/src/native.rs b/crates/holonics-hna/src/native.rs
+index df0cff4c..3caa4c69 100644
+--- a/crates/holonics-hna/src/native.rs
++++ b/crates/holonics-hna/src/native.rs
+@@ -12,12 +12,15 @@ use thiserror::Error;
+ 
+ mod wire;
+ pub use wire::*;
++mod batch;
++pub use batch::NativeBatchReceive;
+ mod checkpoint;
+ pub use checkpoint::NativeSavedSession;
+ mod acoustic;
+ pub use acoustic::{
+     AcousticApplication, AcousticInterruption, AcousticPendingReceive, AcousticRun,
+-    AcousticRunOptions, AcousticSavedApplication, resume_acoustic, run_acoustic_with_options,
++    AcousticRunOptions, AcousticSavedApplication, append_acoustic, resume_acoustic,
++    run_acoustic_with_options,
+ };
+ mod speech;
+ pub use speech::{
+@@ -247,6 +250,15 @@ impl NativeSession<'_> {
+                 return Err(error.into());
+             }
+         };
++        Ok(self.commit_return(step, source, next_source))
++    }
++
++    fn commit_return(
++        &mut self,
++        step: holonic_engine::native_ecology::constitutive_fibre::NativeCurrentStep,
++        source: Option<u64>,
++        next_source: u64,
++    ) -> NativeSessionStep {
+         let root = step.root_source_currents();
+         let wire = NativeSessionStep {
+             source: next_source,
+@@ -284,7 +296,7 @@ impl NativeSession<'_> {
+         };
+         self.confirmed_rank = step.successor_rank;
+         self.sources.push(Some(step.source));
+-        Ok(wire)
++        wire
+     }
+ 
+     pub fn rechart(
+diff --git a/crates/holonics-hna/src/native/acoustic.rs b/crates/holonics-hna/src/native/acoustic.rs
+index 58b2f47f..5a6c5fd6 100644
+--- a/crates/holonics-hna/src/native/acoustic.rs
++++ b/crates/holonics-hna/src/native/acoustic.rs
+@@ -16,6 +16,7 @@ use sha2::{Digest, Sha256};
+ use std::path::{Path, PathBuf};
+ 
+ const ACOUSTIC_APPLICATION_SCHEMA: &str = "org.holonics.hna.acoustic-application.v1";
++const ACOUSTIC_CORPUS_SCHEMA: &str = "org.holonics.hna.acoustic-application.v2";
+ 
+ #[cfg(test)]
+ mod tests;
+@@ -35,6 +36,16 @@ pub struct AcousticApplication {
+     cursor: usize,
+     steps: Vec<NativeSessionStep>,
+     pending: Option<AcousticPendingReceive>,
++    /// Earlier complete recordings in this same native owner. These are cold source/return
++    /// records, not independently mountable ecologies. Entries never contain nested archives.
++    #[serde(default, skip_serializing_if = "Vec::is_empty")]
++    completed_recordings: Vec<AcousticApplication>,
++    #[serde(default, skip_serializing_if = "is_zero")]
++    native_start: usize,
++}
++
++fn is_zero(value: &usize) -> bool {
++    *value == 0
+ }
+ 
+ #[derive(Clone, Debug, Serialize, Deserialize)]
+@@ -105,6 +116,8 @@ impl AcousticApplication {
+             cursor: 0,
+             steps: Vec::new(),
+             pending: None,
++            completed_recordings: Vec::new(),
++            native_start: 0,
+         };
+         app.validate_chart()?;
+         Ok(app)
+@@ -113,6 +126,60 @@ impl AcousticApplication {
+     pub fn cursor(&self) -> usize {
+         self.cursor
+     }
++    pub fn native_start(&self) -> usize {
++        self.native_start
++    }
++    pub fn recording_count(&self) -> usize {
++        self.completed_recordings.len() + 1
++    }
++    pub fn completed_recordings(&self) -> &[AcousticApplication] {
++        &self.completed_recordings
++    }
++
++    /// Attach a distinct recording without resetting or cloning the native successor. The
++    /// first sample is exterior ingress: recording adjacency cannot manufacture a return edge.
++    /// An explicitly supplied digital return circuit begins within this recording only.
++    pub fn append_recording(
++        &mut self,
++        session: &mut NativeSession<'_>,
++        occurrence: &ExactAcousticOccurrence,
++        original_wav: &[u8],
++        pcm_divisor: i64,
++        return_couplings: Option<Vec<CurrentWire>>,
++    ) -> Result<(), NativeSessionError> {
++        self.validate_session(session)?;
++        if !self.complete() || self.pending.is_some() {
++            return Err(invalid(
++                "finish the current recording before appending another",
++            ));
++        }
++        if occurrence.samples.is_empty() || !source_matches(occurrence, original_wav)? {
++            return Err(invalid("new recording source does not decode identically"));
++        }
++        let next = Self {
++            schema: ACOUSTIC_CORPUS_SCHEMA.to_owned(),
++            spec: self.spec.clone(),
++            occurrence: occurrence.clone(),
++            original_wav: original_wav.to_vec(),
++            pcm_divisor,
++            return_couplings,
++            cursor: 0,
++            steps: Vec::new(),
++            pending: None,
++            completed_recordings: Vec::new(),
++            native_start: session.occurrence_count(),
++        };
++        next.validate_chart()?;
++        self.completed_recordings
++            .try_reserve(1)
++            .map_err(|error| invalid(format!("recording allocation: {error}")))?;
++        // Every fallible check precedes this move. The old source bytes and returns remain
++        // attached, while the single session retains precisely its existing resident successor.
++        let mut previous = std::mem::replace(self, next);
++        self.completed_recordings = std::mem::take(&mut previous.completed_recordings);
++        self.completed_recordings.push(previous);
++        Ok(())
++    }
+     pub fn complete(&self) -> bool {
+         self.cursor == self.occurrence.samples.len()
+     }
+@@ -176,7 +243,7 @@ impl AcousticApplication {
+     }
+ 
+     fn validate(&self) -> Result<(), NativeSessionError> {
+-        if self.schema != ACOUSTIC_APPLICATION_SCHEMA
++        if ![ACOUSTIC_APPLICATION_SCHEMA, ACOUSTIC_CORPUS_SCHEMA].contains(&self.schema.as_str())
+             || self.pcm_divisor <= 0
+             || self.cursor > self.occurrence.samples.len()
+             || self.steps.len() != self.cursor
+@@ -214,6 +281,29 @@ impl AcousticApplication {
+         Ok(())
+     }
+ 
++    fn validate_recordings(&self) -> Result<(), NativeSessionError> {
++        let mut start = 0usize;
++        for prior in &self.completed_recordings {
++            prior.validate()?;
++            prior.validate_chart()?;
++            if !prior.completed_recordings.is_empty()
++                || !prior.complete()
++                || prior.pending.is_some()
++                || prior.native_start != start
++                || prior.spec != self.spec
++            {
++                return Err(invalid("completed recording chronology"));
++            }
++            start = start
++                .checked_add(prior.cursor)
++                .ok_or_else(|| invalid("recording extent overflow"))?;
++        }
++        if start != self.native_start {
++            return Err(invalid("recording/native start differs"));
++        }
++        Ok(())
++    }
++
+     fn validate_chart(&self) -> Result<(), NativeSessionError> {
+         if self.pcm_divisor <= 0 {
+             return Err(invalid("PCM divisor must be positive"));
+@@ -232,8 +322,15 @@ impl AcousticApplication {
+     pub(crate) fn validate_checkpoint(&self) -> Result<(), NativeSessionError> {
+         self.validate()?;
+         self.validate_chart()?;
+-        if !source_matches(&self.occurrence, &self.original_wav)? {
+-            return Err(invalid("acoustic source does not decode identically"));
++        self.validate_recordings()?;
++        for recording in self
++            .completed_recordings
++            .iter()
++            .chain(std::iter::once(self))
++        {
++            if !source_matches(&recording.occurrence, &recording.original_wav)? {
++                return Err(invalid("acoustic source does not decode identically"));
++            }
+         }
+         Ok(())
+     }
+@@ -241,7 +338,7 @@ impl AcousticApplication {
+     fn validate_session(&self, session: &NativeSession<'_>) -> Result<(), NativeSessionError> {
+         self.validate()?;
+         self.validate_chart()?;
+-        if session.occurrence_count() != self.cursor
++        if self.native_start.checked_add(self.cursor) != Some(session.occurrence_count())
+             || session.nodes() != self.spec.nodes.len()
+             || self
+                 .steps
+@@ -338,6 +435,62 @@ impl AcousticApplication {
+         Ok(true)
+     }
+ 
++    /// Deliver a bounded packet of independent exterior samples. Native operations remain
++    /// ordered; neither packet boundaries nor neighboring recordings create return contact.
++    /// A declared digital feedback circuit still uses `advance_one`, since its next input
++    /// depends on the preceding output and is not known at packet ingress.
++    pub fn advance_packet(
++        &mut self,
++        session: &mut NativeSession<'_>,
++        samples: usize,
++    ) -> Result<usize, NativeSessionError> {
++        self.validate_session(session)?;
++        if samples == 0 || self.complete() {
++            return Ok(0);
++        }
++        if self.return_couplings.is_some() {
++            return self.advance_one(session).map(usize::from);
++        }
++        let count = samples.min(self.occurrence.samples.len() - self.cursor);
++        let currents = (self.cursor..self.cursor + count)
++            .map(|i| self.current_for(i))
++            .collect::<Result<Vec<_>, _>>()?;
++        self.steps
++            .try_reserve(count)
++            .map_err(|e| invalid(format!("native step allocation: {e}")))?;
++        self.pending = Some(AcousticPendingReceive {
++            sample: self.cursor,
++            current: currents[0].clone(),
++            source: None,
++            detail: None,
++        });
++        let returned = match session.receive_unlinked_batch(&currents) {
++            Ok(returned) => returned,
++            Err(error) => {
++                self.pending.as_mut().expect("staged packet").detail = Some(error.to_string());
++                return Err(error);
++            }
++        };
++        let committed = returned.committed.len();
++        self.steps.extend(returned.committed);
++        self.cursor += committed;
++        self.pending = None;
++        if let Some(at) = returned.refused_at {
++            let error = invalid(format!(
++                "resident packet refusal: {:?}",
++                returned.obstruction
++            ));
++            self.pending = Some(AcousticPendingReceive {
++                sample: self.cursor,
++                current: currents[at].clone(),
++                source: None,
++                detail: Some(error.to_string()),
++            });
++            return Err(error);
++        }
++        Ok(committed)
++    }
++
+     pub fn checkpoint(
+         &self,
+         session: &NativeSession<'_>,
+@@ -375,33 +528,31 @@ pub fn resume_acoustic(
+     options: &AcousticRunOptions,
+ ) -> Result<AcousticRun, NativeSessionError> {
+     preflight(options)?;
+-    let native = NativeSavedSession::read(path)?;
+-    let bytes = native
+-        .application_state()
+-        .ok_or_else(|| invalid("checkpoint has no acoustic application state"))?;
+-    let mut app: AcousticApplication = serde_json::from_slice(bytes)?;
+-    app.validate()?;
+-    if !source_matches(&app.occurrence, &app.original_wav)? {
+-        return Err(invalid(
+-            "checkpoint acoustic source does not decode identically",
+-        ));
+-    }
+-    app.validate_chart()?;
+-    let last = app
+-        .steps
+-        .last()
+-        .map(|step| (step.source as usize, step.native_occurrence));
+-    if native.nodes() != app.spec.nodes.len()
+-        || native.occurrences() != app.cursor
+-        || last.is_some_and(|(source, occurrence)| {
+-            native.source_slots().get(source) != Some(&Some(occurrence))
+-        })
+-        || *native.transport() != HnaStreamState::default()
+-    {
+-        return Err(invalid("checkpoint/native acoustic boundary differs"));
+-    }
+-    validate_saved_native(&native, &app)?;
+-    native.with_application_session(|session, _, _| execute(&mut app, session, options))
++    AcousticSavedApplication::read(path)?
++        .with_application(|session, app| execute(app, session, options))
++}
++
++/// Continue a saved acoustic ecology with a new source recording, retaining every earlier
++/// recording and native successor. This is corpus ingress, not an audio/language learner.
++pub fn append_acoustic(
++    path: impl AsRef<Path>,
++    occurrence: &ExactAcousticOccurrence,
++    original_wav: &[u8],
++    pcm_divisor: i64,
++    return_couplings: Option<Vec<CurrentWire>>,
++    options: &AcousticRunOptions,
++) -> Result<AcousticRun, NativeSessionError> {
++    preflight(options)?;
++    AcousticSavedApplication::read(path)?.with_application(|session, app| {
++        app.append_recording(
++            session,
++            occurrence,
++            original_wav,
++            pcm_divisor,
++            return_couplings,
++        )?;
++        execute(app, session, options)
++    })
+ }
+ 
+ pub struct AcousticSavedApplication {
+@@ -416,11 +567,10 @@ impl AcousticSavedApplication {
+             .application_state()
+             .ok_or_else(|| invalid("checkpoint has no acoustic application state"))?;
+         let application: AcousticApplication = serde_json::from_slice(bytes)?;
+-        application.validate()?;
+-        application.validate_chart()?;
+-        if !source_matches(&application.occurrence, &application.original_wav)?
+-            || native.nodes() != application.spec.nodes.len()
+-            || native.occurrences() != application.cursor
++        application.validate_checkpoint()?;
++        if native.nodes() != application.spec.nodes.len()
++            || application.native_start.checked_add(application.cursor)
++                != Some(native.occurrences())
+             || *native.transport() != HnaStreamState::default()
+         {
+             return Err(invalid("checkpoint/native acoustic boundary differs"));
+@@ -459,14 +609,16 @@ fn execute(
+     let mut interruption = None;
+     let mut remaining = limit;
+     while remaining > 0 && !app.complete() {
+-        if let Err(error) = app.advance_one(session) {
+-            interruption = Some(AcousticInterruption {
+-                sample: app.cursor,
+-                detail: error.to_string(),
+-            });
+-            break;
++        match app.advance_packet(session, remaining.min(256)) {
++            Ok(committed) => remaining -= committed,
++            Err(error) => {
++                interruption = Some(AcousticInterruption {
++                    sample: app.cursor,
++                    detail: error.to_string(),
++                });
++                break;
++            }
+         }
+-        remaining -= 1;
+     }
+     let (checkpoint_octets, checkpoint_error) = if let Some(path) = &options.checkpoint {
+         match app.checkpoint(session, path) {
+@@ -477,7 +629,11 @@ fn execute(
+         (None, None)
+     };
+     Ok(AcousticRun {
+-        schema: ACOUSTIC_APPLICATION_SCHEMA,
++        schema: if app.completed_recordings.is_empty() {
++            ACOUSTIC_APPLICATION_SCHEMA
++        } else {
++            ACOUSTIC_CORPUS_SCHEMA
++        },
+         steps: app.steps.clone(),
+         cursor: app.cursor,
+         complete: app.complete(),
+@@ -515,19 +671,33 @@ fn validate_saved_native(
+     native: &NativeSavedSession,
+     application: &AcousticApplication,
+ ) -> Result<(), NativeSessionError> {
+-    if application.steps.iter().enumerate().any(|(index, step)| {
+-        step.native_occurrence != index
+-            || step.predecessor_state != index.checked_sub(1)
+-            || native.source_slots().get(step.source as usize)
+-                != Some(&if application.return_couplings.is_some()
+-                    && index + 1 < application.steps.len()
+-                {
+-                    None
+-                } else {
+-                    Some(index)
+-                })
+-    }) {
+-        return Err(invalid("checkpoint acoustic step/source lineage differs"));
++    for recording in application
++        .completed_recordings
++        .iter()
++        .chain(std::iter::once(application))
++    {
++        if recording.steps.iter().enumerate().any(|(index, step)| {
++            let ordinal = recording.native_start + index;
++            step.native_occurrence != ordinal
++                || step.source != ordinal as u64
++                || step.predecessor_state != ordinal.checked_sub(1)
++                || step.received_from
++                    != if recording.return_couplings.is_some() && index > 0 {
++                        Some((ordinal - 1) as u64)
++                    } else {
++                        None
++                    }
++                || native.source_slots().get(step.source as usize)
++                    != Some(&if recording.return_couplings.is_some()
++                        && index + 1 < recording.steps.len()
++                    {
++                        None
++                    } else {
++                        Some(ordinal)
++                    })
++        }) {
++            return Err(invalid("checkpoint acoustic step/source lineage differs"));
++        }
+     }
+     Ok(())
+ }
+diff --git a/crates/holonics-hna/src/native/acoustic/tests.rs b/crates/holonics-hna/src/native/acoustic/tests.rs
+index e8acda5e..b6dbf7c3 100644
+--- a/crates/holonics-hna/src/native/acoustic/tests.rs
++++ b/crates/holonics-hna/src/native/acoustic/tests.rs
+@@ -1,6 +1,6 @@
+ use super::*;
+ use crate::native::{
+-    with_native_session, CurrentWire, JunctionSpec, NativeModelSpec, NATIVE_MODEL_SPEC_SCHEMA,
++    CurrentWire, JunctionSpec, NATIVE_MODEL_SPEC_SCHEMA, NativeModelSpec, with_native_session,
+ };
+ use life::mathematical_source::ExactAcousticOccurrence;
+ use std::path::Path;
+@@ -191,3 +191,98 @@ fn first_sample_refusal_remounts_without_losing_or_replaying_input() {
+         std::fs::read(second).unwrap()
+     );
+ }
++
++#[test]
++#[ignore = "requires resident GPU execution"]
++fn distinct_recordings_continue_the_same_successor_across_restart() {
++    for gains in [None, Some(vec![CurrentWire::integers(1, 0)])] {
++        let first = wav_bytes();
++        let mut second = first.clone();
++        second[44..46].copy_from_slice(&17_i16.to_le_bytes());
++        let a = occurrence(&first);
++        let mut b = occurrence(&second);
++        b.occurrence = "second-recording".into();
++        let directory = tempfile::tempdir().unwrap();
++        let start = directory.path().join("first.hna");
++        let cut = directory.path().join("second-cut.hna");
++        let done = directory.path().join("second-done.hna");
++        let uninterrupted = directory.path().join("uninterrupted.hna");
++        run_acoustic_with_options(
++            &spec(),
++            &a,
++            &first,
++            32768,
++            gains.clone(),
++            &run_options(None, Some(&start)),
++        )
++        .unwrap();
++        let prefix = append_acoustic(
++            &start,
++            &b,
++            &second,
++            32768,
++            gains.clone(),
++            &run_options(Some(1), Some(&cut)),
++        )
++        .unwrap();
++        assert_eq!(prefix.cursor, 1);
++        assert_eq!(prefix.steps[0].native_occurrence, 4);
++        assert_eq!(prefix.steps[0].predecessor_state, Some(3));
++        assert_eq!(prefix.steps[0].received_from, None);
++        let resumed = resume_acoustic(&cut, &run_options(None, Some(&done))).unwrap();
++        assert!(resumed.complete);
++        let full = append_acoustic(
++            &start,
++            &b,
++            &second,
++            32768,
++            gains,
++            &run_options(None, Some(&uninterrupted)),
++        )
++        .unwrap();
++        assert_eq!(
++            serde_json::to_vec(&full.steps).unwrap(),
++            serde_json::to_vec(&resumed.steps).unwrap()
++        );
++        assert_eq!(
++            std::fs::read(done).unwrap(),
++            std::fs::read(uninterrupted).unwrap()
++        );
++        let saved = AcousticSavedApplication::read(cut).unwrap();
++        assert_eq!(saved.application().recording_count(), 2);
++        assert_eq!(saved.application().native_start(), 4);
++        assert_eq!(
++            saved.application().completed_recordings()[0].original_wav,
++            first
++        );
++        assert_eq!(saved.application().original_wav, second);
++    }
++}
++
++#[test]
++#[ignore = "requires resident GPU execution"]
++fn incomplete_or_invalid_append_preserves_original_application_and_owner() {
++    let bytes = wav_bytes();
++    let source = occurrence(&bytes);
++    with_native_session(&spec(), |session| {
++        let mut app = AcousticApplication::found(&spec(), &source, &bytes, 32768, None, session)?;
++        app.advance_one(session)?;
++        let before = serde_json::to_vec(&app)?;
++        assert!(
++            app.append_recording(session, &source, &bytes, 32768, None)
++                .is_err()
++        );
++        assert_eq!(before, serde_json::to_vec(&app)?);
++        assert_eq!(session.occurrence_count(), 1);
++        while app.advance_one(session)? {}
++        let before = serde_json::to_vec(&app)?;
++        assert!(
++            app.append_recording(session, &source, &bytes, 0, None)
++                .is_err()
++        );
++        assert_eq!(before, serde_json::to_vec(&app)?);
++        assert_eq!(session.occurrence_count(), 4);
++        Ok(())
++    })
++    .unwrap();
++}
+diff --git a/crates/holonics-hna/src/native/batch.rs b/crates/holonics-hna/src/native/batch.rs
+new file mode 100644
+index 00000000..9451f4fb
+--- /dev/null
++++ b/crates/holonics-hna/src/native/batch.rs
+@@ -0,0 +1,181 @@
++//! Packet delivery into one continuing native session. This API admits exterior ingress only;
++//! packet boundaries do not create returned-source contact or parallel semantic independence.
++use super::*;
++use holonic_engine::resident_section::ObstructionLineage;
++
++pub struct NativeBatchReceive {
++    pub committed: Vec<NativeSessionStep>,
++    pub refused_at: Option<usize>,
++    pub obstruction: ObstructionLineage,
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    fn spec() -> NativeModelSpec {
++        NativeModelSpec {
++            schema: NATIVE_MODEL_SPEC_SCHEMA.into(),
++            nodes: vec![
++                JunctionSpec {
++                    incoming_admittance: 1,
++                    held_admittance: 1,
++                    incoming_transport: CurrentWire::integers(1, 0),
++                    initial_held: CurrentWire::integers(0, 0),
++                },
++                JunctionSpec {
++                    incoming_admittance: 1,
++                    held_admittance: 1,
++                    incoming_transport: CurrentWire::integers(0, 1),
++                    initial_held: CurrentWire::integers(0, 0),
++                },
++            ],
++        }
++    }
++    fn form(session: &mut NativeSession<'_>) -> Result<(), NativeSessionError> {
++        let a = session.receive(&CurrentWire::integers(1, 0), None)?;
++        let b = session.receive(&CurrentWire::integers(0, 1), Some(a.source))?;
++        session.receive(&CurrentWire::integers(2, 3), Some(b.source))?;
++        session.rechart(&[CurrentWire::integers(0, 1), CurrentWire::integers(-1, 0)])?;
++        Ok(())
++    }
++
++    #[test]
++    #[ignore = "requires resident GPU execution"]
++    fn batch_and_scalar_preserve_complete_returns_old_sources_and_rest() {
++        let inputs: Vec<_> = (0..19)
++            .map(|i| CurrentWire::integers(i - 8, 3 - i))
++            .collect();
++        let directory = tempfile::tempdir().unwrap();
++        let scalar_path = directory.path().join("scalar.hna");
++        let batch_path = directory.path().join("batch.hna");
++        let scalar = with_native_session(&spec(), |session| {
++            form(session)?;
++            let steps = inputs
++                .iter()
++                .map(|c| session.receive(c, None))
++                .collect::<Result<Vec<_>, _>>()?;
++            // Return a source which predates rechart and the whole packet.
++            let old = session.receive(&CurrentWire::integers(7, -2), Some(2))?;
++            session.checkpoint(&scalar_path)?;
++            Ok((steps, old))
++        })
++        .unwrap();
++        let batched = with_native_session(&spec(), |session| {
++            form(session)?;
++            let before = session.inspect().census;
++            let batch = session.receive_unlinked_batch(&inputs)?;
++            assert_eq!(batch.refused_at, None);
++            assert!(batch.obstruction.is_empty());
++            assert_eq!(
++                session.inspect().census.synchronizations - before.synchronizations,
++                1
++            );
++            let old = session.receive(&CurrentWire::integers(7, -2), Some(2))?;
++            session.checkpoint(&batch_path)?;
++            Ok((batch.committed, old))
++        })
++        .unwrap();
++        assert_eq!(
++            serde_json::to_vec(&scalar).unwrap(),
++            serde_json::to_vec(&batched).unwrap()
++        );
++        assert_eq!(
++            std::fs::read(&scalar_path).unwrap(),
++            std::fs::read(&batch_path).unwrap()
++        );
++        let next = NativeSavedSession::read(&batch_path)
++            .unwrap()
++            .with_session(|session, _| {
++                session.receive_unlinked_batch(&[CurrentWire::integers(4, -3)])
++            })
++            .unwrap();
++        assert_eq!(next.committed[0].native_occurrence, 23);
++    }
++
++    #[test]
++    #[ignore = "requires resident GPU execution"]
++    fn arithmetic_refusal_preserves_exact_prefix_and_blocks_suffix() {
++        let mut model = spec();
++        model.nodes[0].incoming_admittance = 2;
++        let inputs = [
++            CurrentWire::integers(0, 0),
++            CurrentWire::integers(i64::MAX, 0),
++            CurrentWire::integers(1, 0),
++        ];
++        let directory = tempfile::tempdir().unwrap();
++        let expected = directory.path().join("expected.hna");
++        let actual = directory.path().join("actual.hna");
++        let scalar = with_native_session(&model, |session| {
++            let first = session.receive(&inputs[0], None)?;
++            assert!(session.receive(&inputs[1], None).is_err());
++            session.checkpoint(&expected)?;
++            Ok(first)
++        })
++        .unwrap();
++        with_native_session(&model, |session| {
++            let returned = session.receive_unlinked_batch(&inputs)?;
++            assert_eq!(returned.refused_at, Some(1));
++            assert_eq!(returned.committed.len(), 1);
++            assert_eq!(returned.obstruction.refusals.len(), 2);
++            assert!(returned.obstruction.refusals[0].origin);
++            assert!(!returned.obstruction.refusals[1].origin);
++            assert_eq!(
++                serde_json::to_vec(&scalar)?,
++                serde_json::to_vec(&returned.committed[0])?
++            );
++            session.checkpoint(&actual)?;
++            assert_eq!(session.occurrence_count(), 1);
++            let retry = session.receive_unlinked_batch(&inputs[1..])?;
++            assert_eq!(retry.refused_at, Some(0));
++            assert!(retry.committed.is_empty());
++            Ok(())
++        })
++        .unwrap();
++        assert_eq!(
++            std::fs::read(expected).unwrap(),
++            std::fs::read(actual).unwrap()
++        );
++    }
++}
++
++impl NativeSession<'_> {
++    /// Validate the complete input chart before dispatch. Device arithmetic refusal returns the
++    /// committed prefix and unexecuted suffix boundary. Driver uncertainty returns an error and
++    /// prevents retry/checkpoint against the potentially changed owner.
++    pub fn receive_unlinked_batch(
++        &mut self,
++        currents: &[CurrentWire],
++    ) -> Result<NativeBatchReceive, NativeSessionError> {
++        let native = currents
++            .iter()
++            .map(CurrentWire::native)
++            .collect::<Result<Vec<_>, _>>()?;
++        let end = self
++            .sources
++            .len()
++            .checked_add(native.len())
++            .and_then(|n| u64::try_from(n).ok())
++            .ok_or_else(|| {
++                NativeSessionError::Application("session source coordinates exhausted".into())
++            })?;
++        let _ = end;
++        self.sources
++            .try_reserve(native.len())
++            .map_err(|e| NativeSessionError::Application(e.to_string()))?;
++        let mut committed = Vec::new();
++        committed
++            .try_reserve(native.len())
++            .map_err(|e| NativeSessionError::Application(e.to_string()))?;
++        let returned = self.body.advance_unlinked_batch(&native)?;
++        for step in returned.steps {
++            let next = self.sources.len() as u64;
++            committed.push(self.commit_return(step, None, next));
++        }
++        Ok(NativeBatchReceive {
++            committed,
++            refused_at: returned.refused_at,
++            obstruction: returned.obstruction,
++        })
++    }
++}
+diff --git a/docs/ACOUSTIC_EXPERIMENTS.md b/docs/ACOUSTIC_EXPERIMENTS.md
+index 7e509409..235b7757 100644
+--- a/docs/ACOUSTIC_EXPERIMENTS.md
++++ b/docs/ACOUSTIC_EXPERIMENTS.md
+@@ -105,6 +105,27 @@ actual shared interactions; a stored transcript or a WAV renderer alone does not
+ 
+ ## Speech and text exposure
+ 
++[established-bounded; implemented-exact, measured] The acoustic owner can now attach a new WAV
++after the current recording completes, retaining both complete sources and the same native
++successor. The first sample of each new recording is unlinked exterior ingress; file adjacency
++does not create feedback. An explicitly declared digital return circuit starts within each
++recording. Unlinked input uses ordered packets of at most 256 samples, retaining every output
++source and the exact successful prefix on refusal. Coupled input retains its dependent scalar
++path. CLI frame/hop defaults are 4096 samples with section width one; complete PCM is retained
++and the folded section never drives the native operation.
++
++```sh
++target/debug/holonics-acoustic append completed-recording.hna \
++  --wav next-recording.wav --occurrence next-recorded-occurrence \
++  --checkpoint continuing-recordings.hna
++```
++
++[established-bounded; measured] The
++[current continuation record](../research/records/2026-09-06_AS4_AS5_CORPUS_CONTINUATION_AND_RESIDENT_PACKETS.md)
++includes full recorded-input timings and the AMI acquisition with timed speakers, words and
++original annotated response links. Recorded-stream execution remains slower than real time.
++The new corpus and continuation interfaces do not constitute speech recognition or synthesis.
++
+ [definition] `SpeechExposureApplication` composes the acoustic application and a separate byte
+ occurrence in one native session. All sound samples arrive before any transcript byte. A byte
+ enters as `(byte / transcript_divisor, 0)` under a declared digital codeword chart. With the
+diff --git a/docs/ARCHITECTURE_MAP.md b/docs/ARCHITECTURE_MAP.md
+index e63ffe72..917e33de 100644
+--- a/docs/ARCHITECTURE_MAP.md
++++ b/docs/ARCHITECTURE_MAP.md
+@@ -38,6 +38,14 @@ application owners in `crates/holonics-hna/src/native/{acoustic,speech}.rs`, exp
+ into the existing acoustic receiver. `applications/holonics-audio/main.swift` owns exterior
+ capture/playback chronology. These share the native session and introduce no second engine.
+ 
++[established-bounded; implemented-exact] Ordered unlinked packets are owned by
++`constitutive_fibre/circulation/batch.rs` and `holonics-hna/src/native/batch.rs`; they reuse the
++circulation kernel with serial failure dependencies and retain every source section. The acoustic
++owner appends recordings to one successor. `cuda_refine/complex_parametron.rs::mount_metal` and
++`accelerators/metal/complex_incidence.metal` realize the bounded complex-incidence contraction.
++The cultivated morphology mount selects this route; predecessor spool conduct, situated
++cultivation and receiver-history quotient construction retain their separate CUDA dependencies.
++
+ Each row connects one mathematical relation to its live formal and executable presentations.
+ 
+ - **exact** means the named implementation owns the same stated carrier/law in the row's declared
+diff --git a/docs/plans/HOLONICS_ON_APPLE_SILICON.md b/docs/plans/HOLONICS_ON_APPLE_SILICON.md
+index 111578a1..82020bac 100644
+--- a/docs/plans/HOLONICS_ON_APPLE_SILICON.md
++++ b/docs/plans/HOLONICS_ON_APPLE_SILICON.md
+@@ -221,9 +221,12 @@ process continuation stand at their measured scopes.
+ 
+ [open] AS4–AS5 remain unfinished under the
+ [completion correction](../../research/records/2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md).
+-The current applications require a fresh seed for each WAV/text experiment and resume only
+-that saved experiment. Compose new recordings and conversational turns into one continuing
+-cultivated ecology, reuse/extend the actual native material and receiver owners for sound and
+-English communication, and improve execution/storage for measured streaming conduct. The
++The acoustic application now appends distinct recordings without resetting its native successor;
++the serial speech probe still resumes only its original WAV/text experiment. Ordered unlinked
++packet submission and a bounded Metal complex-incidence contraction are implemented in the
++[continuation record](../../research/records/2026-09-06_AS4_AS5_CORPUS_CONTINUATION_AND_RESIDENT_PACKETS.md).
++These do not establish corpus cultivation. Compose source-qualified conversational returns with
++the shared native material/formation construction, provide useful acoustic and English receivers,
++and continue execution/storage work. The
+ [acoustic guide](../ACOUSTIC_EXPERIMENTS.md) documents the existing probe interfaces. More data
+ alone does not supply these missing compositions; microphone access supplies none of them.
+diff --git a/research/experiments/apple_silicon/README_AMI_CONVERSATION.md b/research/experiments/apple_silicon/README_AMI_CONVERSATION.md
+new file mode 100644
+index 00000000..6cc77ef2
+--- /dev/null
++++ b/research/experiments/apple_silicon/README_AMI_CONVERSATION.md
+@@ -0,0 +1,60 @@
++# AMI conversation subset
++
++[established-bounded; implemented-exact] `prepare_ami_conversation_subset.py` acquires the original AMI Meeting Corpus headset-mix WAV
++files for `ES2002a` through `ES2002d` from the official Edinburgh AMI distribution and extracts
++the corresponding manual NXT annotations from `ami_public_manual_1.6.2`. It keeps the source ZIP,
++the selected XML files, the complete meeting WAV for each session, a JSONL index of the original
++time-aligned segments and words, and a separate source graph of the corpus' explicit dialogue-act
++adjacency-pair pointers.
++
++The local corpus is at:
++
++```text
++.local/datasets/ami-conversation-es2002/
++├── audio/                         # four complete 16 kHz mono Mix-Headset WAVs
++├── annotations/                   # selected original NXT XML, dialogue acts, and LICENCE.txt
++├── source/ami_public_manual_1.6.2.zip
++├── turns.exact.jsonl              # 2,109 source-linked segments, exact source clock strings
++├── response-links.exact.jsonl     # 899 original adjacency-pair records
++├── turns.v1.float.jsonl           # preserved earlier convenience index
++└── provenance.json
++```
++
++[established-bounded; measured] The four WAVs total 275,208,026 bytes and retain the original 16 kHz, mono, signed PCM16 files.
++Their exact frame durations are 1272.64, 2279.7546875, 2423.68, and 2624.170625 seconds for
++ES2002a-d respectively. The revised index has 2,109 segments across four meetings and four
++speaker agents. It retains empty
++transcript segments when the source segment contains a vocal-sound annotation, so the index does
++not silently turn the source into text-only examples. Each row carries source session, speaker
++agent/channel/global name/role, start/end seconds, source segment ID/file, and the original word
++IDs and times. Clock fields remain the original decimal strings; segment and word references are
++refused if unresolved, and every annotation bound is checked against its source WAV duration.
++[established-bounded; measured] The response-link graph contains 3,874 dialogue-act records and 899 original
++adjacency-pair records: 844 resolve direct source/target pointers with valid word intervals, while
++55 remain explicit refusals (54 incomplete pointer records and one invalid source clock). The
++graph never infers a link from temporal or turn adjacency. Resolved endpoints retain source
++dialogue-act IDs/files, direct word-span hrefs, exact times, speaker metadata, all source
++attributes, and the original annotation type pointers. These labels and links remain cold corpus
++provenance; they do not supply native current or contact.
++
++[established-bounded; source-inspected] The official [AMI site](https://groups.inf.ed.ac.uk/ami/corpus/) describes the corpus as about 100 hours of English meeting recordings with
++orthographic transcription and other annotations. Its download page states that signals and
++transcription are released under CC BY 4.0; the copied `annotations/LICENCE.txt` is the governing
++license text for this acquisition. The selected ES2002a-d scenario meetings have
++`seen_type="training"` in the copied official `corpusResources/meetings.xml`; the provenance
++receipt records that source partition metadata without asserting an external evaluation split.
++This is corpus material, not evidence of a trained model or speech competence.
++
++Reproduce or choose another admitted ES2002 a-d subset with the installed Apple Silicon Python:
++
++```sh
++.local/venvs/apple-silicon/bin/python \
++  research/experiments/apple_silicon/prepare_ami_conversation_subset.py
++```
++
++[established-bounded; implemented-exact] The script publishes downloads atomically through `.partial` files and refuses an existing partial
++download. It does not use repository code, gated-access workarounds, generated audio, synthetic
++labels, pretrained models, or a native learner. Re-running with `--rebuild-existing` preserves the
++earlier float index and provenance receipt before writing the exact-clock revision.
++
++[established-bounded; measured] Primary validation retains four reversed source word intervals as explicit clock refusals. The 899 original adjacency-pair records yield 844 resolved links and 55 refused links (54 incomplete pointers and one affected by an invalid word clock). Endpoint extrema use exact decimal ordering. Complete WAV payload lengths were checked against their declared frame counts. Original XML and earlier convenience indices remain retained.
+diff --git a/research/experiments/apple_silicon/prepare_ami_conversation_subset.py b/research/experiments/apple_silicon/prepare_ami_conversation_subset.py
+new file mode 100644
+index 00000000..202dc40e
+--- /dev/null
++++ b/research/experiments/apple_silicon/prepare_ami_conversation_subset.py
+@@ -0,0 +1,394 @@
++#!/usr/bin/env python3
++"""Acquire an original AMI meeting subset with synchronized audio and turn metadata.
++
++The downloader uses the official AMI Edinburgh endpoints and stores the original mixed WAVs and
++manual NXT annotation files. Generated JSON is a convenience index over the original segments;
++it is not a replacement transcript or a semantic labeler.
++"""
++
++from __future__ import annotations
++
++import argparse
++import hashlib
++import json
++import re
++import ssl
++import urllib.request
++import zipfile
++from decimal import Decimal, InvalidOperation
++from pathlib import Path
++from shutil import copyfile
++import wave
++from xml.etree import ElementTree
++
++
++BASE = "https://groups.inf.ed.ac.uk/ami"
++ANNOTATION_URL = f"{BASE}/AMICorpusAnnotations/ami_public_manual_1.6.2.zip"
++
++
++def download(url: str, path: Path) -> None:
++    if path.exists():
++        return
++    path.parent.mkdir(parents=True, exist_ok=True)
++    partial = path.with_name(path.name + ".partial")
++    if partial.exists():
++        raise RuntimeError(f"refusing pre-existing partial download; inspect and recover it first: {partial}")
++    try:
++        import certifi
++
++        context = ssl.create_default_context(cafile=certifi.where())
++    except ImportError:
++        context = ssl.create_default_context()
++    try:
++        with urllib.request.urlopen(url, context=context) as response, partial.open("wb") as output:
++            received = 0
++            while chunk := response.read(1024 * 1024):
++                output.write(chunk)
++                received += len(chunk)
++            expected = response.headers.get("Content-Length")
++            if expected is not None and received != int(expected):
++                raise RuntimeError(f"incomplete download: {received} of {expected} bytes from {url}")
++        partial.replace(path)
++    except Exception:
++        raise
++
++
++def sha256(path: Path) -> str:
++    digest = hashlib.sha256()
++    with path.open("rb") as stream:
++        while chunk := stream.read(1024 * 1024):
++            digest.update(chunk)
++    return digest.hexdigest()
++
++
++def attr(element: ElementTree.Element, name: str) -> str | None:
++    return element.attrib.get(name) or element.attrib.get(f"{{http://nite.sourceforge.net/}}{name}")
++
++
++def words_for_segment(href: str, words: dict[str, dict]) -> list[dict]:
++    match = re.fullmatch(r"[^#]+#id\(([^)]+)\)(?:\.\.id\(([^)]+)\))?", href)
++    if not match:
++        raise ValueError(f"unresolved or malformed NXT word href: {href!r}")
++    first, last = match.group(1), match.group(2) or match.group(1)
++    keys = list(words)
++    try:
++        start, end = keys.index(first), keys.index(last)
++    except ValueError:
++        raise ValueError(f"NXT word href references an absent word: {href!r}")
++    if end < start:
++        raise ValueError(f"NXT word href reverses source order: {href!r}")
++    selected = [words[key] for key in keys[start : end + 1]]
++    filename = Path(href.split("#", 1)[0]).name
++    if any(Path(word["source_file"]).name != filename for word in selected):
++        raise ValueError(f"NXT word href crosses its declared source file: {href!r}")
++    return selected
++
++
++def href_parts(href: str) -> tuple[str, str]:
++    match = re.fullmatch(r"([^#]+)#id\(([^)]+)\)", href)
++    if not match:
++        raise ValueError(f"malformed NXT pointer href: {href!r}")
++    return match.group(1), match.group(2)
++
++
++def pointer_records(element: ElementTree.Element) -> list[dict]:
++    return [
++        {"role": pointer.attrib.get("role"), "href": attr(pointer, "href"), "source_attributes": dict(pointer.attrib)}
++        for pointer in element
++        if pointer.tag.rsplit("}", 1)[-1] == "pointer"
++    ]
++
++
++def exact_clock(value: str, label: str) -> str:
++    try:
++        parsed = Decimal(value)
++    except InvalidOperation as error:
++        raise ValueError(f"invalid {label} clock value: {value!r}") from error
++    if not parsed.is_finite() or parsed < 0:
++        raise ValueError(f"invalid {label} clock value: {value!r}")
++    return value
++
++
++def extract_turns(annotation_root: Path, sessions: list[str], audio_durations: dict[str, Decimal]) -> tuple[list[dict], dict, dict[str, dict]]:
++    meetings = ElementTree.parse(annotation_root / "corpusResources/meetings.xml").getroot()
++    speakers: dict[str, dict[str, dict]] = {}
++    meeting_metadata: dict[str, dict] = {}
++    for meeting in meetings.findall("meeting"):
++        observation = meeting.attrib.get("observation")
++        if observation not in sessions:
++            continue
++        meeting_metadata[observation] = dict(meeting.attrib)
++        speakers[observation] = {
++            speaker.attrib["nxt_agent"]: {
++                "agent": speaker.attrib["nxt_agent"],
++                "channel": int(speaker.attrib["channel"]),
++                "global_name": speaker.attrib.get("global_name"),
++                "role": speaker.attrib.get("role"),
++                "source_attributes": dict(speaker.attrib),
++            }
++            for speaker in meeting.findall("speaker")
++        }
++
++    turns: list[dict] = []
++    all_words: dict[str, dict] = {}
++    for session in sessions:
++        for segment_path in sorted((annotation_root / "segments").glob(f"{session}.*.segments.xml")):
++            agent = segment_path.name.split(".")[1]
++            word_path = annotation_root / "words" / f"{session}.{agent}.words.xml"
++            words: dict[str, dict] = {}
++            for element in ElementTree.parse(word_path).getroot():
++                identifier = attr(element, "id")
++                if not identifier:
++                    continue
++                if identifier in all_words:
++                    raise ValueError(f"duplicate source word ID: {identifier}")
++                words[identifier] = {
++                    "id": identifier,
++                    "kind": element.tag.rsplit("}", 1)[-1],
++                    "text": element.text or "",
++                    "start": exact_clock(element.attrib["starttime"], "word start"),
++                    "end": exact_clock(element.attrib["endtime"], "word end"),
++                    "punctuation": element.attrib.get("punc") == "true",
++                    "source_attributes": dict(element.attrib),
++                    "source_file": str(word_path.relative_to(annotation_root)),
++                    **({"vocal_type": element.attrib["type"]} if "type" in element.attrib else {}),
++                }
++                all_words[identifier] = words[identifier]
++                word = words[identifier]
++                word["clock_refusal"] = (
++                    "source word interval is reversed" if Decimal(word["end"]) < Decimal(word["start"])
++                    else "source word interval is outside WAV" if max(Decimal(word["start"]), Decimal(word["end"])) > audio_durations[session]
++                    else None
++                )
++            for segment in ElementTree.parse(segment_path).getroot().findall("segment"):
++                children = list(segment)
++                href = attr(children[0], "href") if children else ""
++                if not href:
++                    raise ValueError(f"segment has no NXT child word href: {segment_path}:{attr(segment, 'id')}")
++                segment_words = words_for_segment(href, words)
++                start = exact_clock(segment.attrib["transcriber_start"], "segment start")
++                end = exact_clock(segment.attrib["transcriber_end"], "segment end")
++                if Decimal(end) < Decimal(start) or Decimal(end) > audio_durations[session]:
++                    raise ValueError(f"segment clock is outside its WAV extent: {session} {start}..{end} > {audio_durations[session]}")
++                turns.append(
++                    {
++                        "session": session,
++                        "audio_file": f"audio/{session}.Mix-Headset.wav",
++                        "speaker_agent": agent,
++                        "speaker": speakers.get(session, {}).get(agent),
++                        "start": start,
++                        "end": end,
++                        "transcript": " ".join(word["text"] for word in segment_words),
++                        "words": segment_words,
++                        "clock_refusals": [{"word": word["id"], "refusal": word["clock_refusal"]} for word in segment_words if word["clock_refusal"]],
++                        "source_segment_id": attr(segment, "id"),
++                        "source_segment_file": str(segment_path.relative_to(annotation_root)),
++                        "source_segment_attributes": dict(segment.attrib),
++                        "source_word_file": str(word_path.relative_to(annotation_root)),
++                        "source_word_href": href,
++                    }
++                )
++    return sorted(turns, key=lambda row: (row["session"], Decimal(row["start"]), row["speaker_agent"])), {"meetings": meeting_metadata}, all_words
++
++
++def extract_dialogue_graph(annotation_root: Path, sessions: list[str], words: dict[str, dict], audio_durations: dict[str, Decimal]) -> tuple[list[dict], dict]:
++    acts: dict[tuple[str, str], dict] = {}
++    type_records: dict[str, dict] = {}
++    for ontology_name in ("ontologies/ap-types.xml", "ontologies/da-types.xml"):
++        root = ElementTree.parse(annotation_root / ontology_name).getroot()
++        for element in root.iter():
++            identifier = attr(element, "id")
++            if identifier:
++                type_records[identifier] = {"id": identifier, "name": element.attrib.get("name"), "gloss": element.attrib.get("gloss"), "source_attributes": dict(element.attrib), "source_file": ontology_name}
++    for session in sessions:
++        for path in sorted((annotation_root / "dialogueActs").glob(f"{session}.*.dialog-act.xml")):
++            filename = path.name
++            agent = filename.split(".")[1]
++            for element in ElementTree.parse(path).getroot().findall("dact"):
++                identifier = attr(element, "id")
++                if not identifier:
++                    raise ValueError(f"dialogue act has no source ID: {path}")
++                children = [child for child in element if child.tag.rsplit("}", 1)[-1] == "child"]
++                href = attr(children[0], "href") if len(children) == 1 else None
++                if not href:
++                    raise ValueError(f"dialogue act must have exactly one word span: {path}:{identifier}")
++                act_words = words_for_segment(href, words)
++                if not act_words:
++                    raise ValueError(f"dialogue act word span did not resolve: {path}:{identifier}")
++                start = min((act_word["start"] for act_word in act_words), key=Decimal)
++                end = max((act_word["end"] for act_word in act_words), key=Decimal)
++                if Decimal(end) > audio_durations[session]:
++                    raise ValueError(f"dialogue act lies outside WAV: {session}:{identifier}")
++                aspects = [pointer for pointer in pointer_records(element) if pointer["role"] == "da-aspect"]
++                if len(aspects) > 1:
++                    raise ValueError(f"dialogue act has multiple da-aspect pointers: {path}:{identifier}")
++                annotation_type = None
++                if aspects:
++                    ontology_file, ontology_id = href_parts(aspects[0]["href"] or "")
++                    annotation_type = type_records.get(ontology_id, {"id": ontology_id, "source_file": ontology_file})
++                acts[(filename, identifier)] = {
++                    "dialog_act_id": identifier,
++                    "speaker_agent": agent,
++                    "speaker": speakers_for_graph(session, agent, annotation_root),
++                    "start": start,
++                    "end": end,
++                    "transcript": " ".join(word["text"] for word in act_words),
++                    "word_ids": [word["id"] for word in act_words],
++                    "clock_refusals": [{"word": word["id"], "refusal": word["clock_refusal"]} for word in act_words if word["clock_refusal"]],
++                    "source_file": str(path.relative_to(annotation_root)),
++                    "source_attributes": dict(element.attrib),
++                    "source_word_href": href,
++                    "source_pointers": pointer_records(element),
++                    "annotation_type": annotation_type,
++                }
++    links: list[dict] = []
++    for session in sessions:
++        for path in sorted((annotation_root / "dialogueActs").glob(f"{session}.adjacency-pairs.xml")):
++            for pair in ElementTree.parse(path).getroot().findall("adjacency-pair"):
++                pair_id = attr(pair, "id")
++                pointers = pointer_records(pair)
++                role_map = {pointer["role"]: pointer for pointer in pointers}
++                if not pair_id:
++                    raise ValueError(f"adjacency pair has no source ID: {path}")
++                if len(role_map) != len(pointers):
++                    links.append({"session": session, "adjacency_pair_id": pair_id, "source_file": str(path.relative_to(annotation_root)), "source_attributes": dict(pair.attrib), "source_pointers": pointers, "resolution_status": "refused-repeated-pointer-role", "refusal": "repeated role cannot select one pointer"})
++                    continue
++                missing_roles = [role for role in ("source", "target", "type") if role not in role_map]
++                if missing_roles:
++                    links.append({"session": session, "adjacency_pair_id": pair_id, "source_file": str(path.relative_to(annotation_root)), "source_attributes": dict(pair.attrib), "source_pointers": pointers, "resolution_status": "refused-incomplete-pointers", "refusal": f"missing roles: {missing_roles}"})
++                    continue
++                endpoints = {}
++                refusal = None
++                for role in ("source", "target"):
++                    try:
++                        filename, identifier = href_parts(role_map[role]["href"] or "")
++                    except ValueError as error:
++                        refusal = str(error)
++                        break
++                    endpoint = acts.get((filename, identifier))
++                    if endpoint is None:
++                        refusal = f"adjacency pair endpoint did not resolve: {path}:{pair_id}:{role}"
++                        break
++                    endpoints[role] = endpoint
++                if refusal:
++                    links.append({"session": session, "adjacency_pair_id": pair_id, "source_file": str(path.relative_to(annotation_root)), "source_attributes": dict(pair.attrib), "source_pointers": pointers, "resolution_status": "refused-unresolved-endpoint", "refusal": refusal})
++                    continue
++                try:
++                    type_file, type_id = href_parts(role_map["type"]["href"] or "")
++                except ValueError as error:
++                    links.append({"session": session, "adjacency_pair_id": pair_id, "source_file": str(path.relative_to(annotation_root)), "source_attributes": dict(pair.attrib), "source_pointers": pointers, "resolution_status": "refused-malformed-type", "refusal": str(error)})
++                    continue
++                links.append({
++                    "session": session,
++                    "adjacency_pair_id": pair_id,
++                    "source": endpoints["source"],
++                    "target": endpoints["target"],
++                    "link_type": type_records.get(type_id, {"id": type_id, "source_file": type_file}),
++                    "source_file": str(path.relative_to(annotation_root)),
++                    "source_attributes": dict(pair.attrib),
++                    "source_pointers": pointers,
++                    "resolution_status": "refused-invalid-source-clock" if any(endpoint["clock_refusals"] for endpoint in endpoints.values()) else "resolved-direct-source-pointer",
++                })
++    return links, {"dialogue_act_count": len(acts), "adjacency_pair_count": len(links), "resolved_count": sum(link["resolution_status"] == "resolved-direct-source-pointer" for link in links), "refused_count": sum(link["resolution_status"].startswith("refused-") for link in links), "type_records": len(type_records)}
++
++
++def speakers_for_graph(session: str, agent: str, annotation_root: Path) -> dict | None:
++    root = ElementTree.parse(annotation_root / "corpusResources/meetings.xml").getroot()
++    for meeting in root.findall("meeting"):
++        if meeting.attrib.get("observation") == session:
++            for speaker in meeting.findall("speaker"):
++                if speaker.attrib.get("nxt_agent") == agent:
++                    return {"agent": agent, "channel": int(speaker.attrib["channel"]), "global_name": speaker.attrib.get("global_name"), "role": speaker.attrib.get("role"), "source_attributes": dict(speaker.attrib)}
++    return None
++
++
++def main() -> int:
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--output", type=Path, default=Path(".local/datasets/ami-conversation-es2002"))
++    parser.add_argument("--sessions", nargs="+", default=["ES2002a", "ES2002b", "ES2002c", "ES2002d"])
++    parser.add_argument("--rebuild-existing", action="store_true", help="preserve v1 indexes and write the revised exact-clock index")
++    args = parser.parse_args()
++    if any(not re.fullmatch(r"ES2002[abcd]", session) for session in args.sessions):
++        parser.error("this bounded acquisition only admits ES2002a-d")
++    if args.output.exists() and (args.output / "provenance.json").exists() and not args.rebuild_existing:
++        raise SystemExit(f"refusing an existing completed dataset: {args.output}")
++    args.output.mkdir(parents=True, exist_ok=True)
++    archive = args.output / "source" / "ami_public_manual_1.6.2.zip"
++    download(ANNOTATION_URL, archive)
++    annotation_root = args.output / "annotations"
++    annotation_root.mkdir(exist_ok=True)
++    with zipfile.ZipFile(archive) as bundle:
++        if bundle.testzip() is not None:
++            raise RuntimeError(f"annotation archive failed CRC validation: {archive}")
++        wanted = [name for name in bundle.namelist() if name in {"LICENCE.txt", "00README_MANUAL.txt", "corpusResources/meetings.xml", "ontologies/ap-types.xml", "ontologies/da-types.xml"}]
++        wanted += [name for name in bundle.namelist() if any(name.startswith(f"{kind}/{session}.") for kind in ("segments", "words", "dialogueActs") for session in args.sessions)]
++        for name in sorted(set(wanted)):
++            destination = annotation_root / name
++            destination.parent.mkdir(parents=True, exist_ok=True)
++            destination.write_bytes(bundle.read(name))
++    audio_records = []
++    audio_durations: dict[str, Decimal] = {}
++    for session in args.sessions:
++        url = f"{BASE}/AMICorpusMirror//amicorpus/{session}/audio/{session}.Mix-Headset.wav"
++        path = args.output / "audio" / f"{session}.Mix-Headset.wav"
++        download(url, path)
++        with wave.open(str(path), "rb") as source:
++            if (source.getnchannels(), source.getsampwidth(), source.getframerate()) != (1, 2, 16000):
++                raise ValueError(f"unexpected AMI Mix-Headset WAV format: {path}")
++            frames = source.getnframes()
++            duration = Decimal(frames) / Decimal(source.getframerate())
++            payload_bytes = 0
++            while block := source.readframes(524288):
++                payload_bytes += len(block)
++            if payload_bytes != frames * source.getsampwidth() * source.getnchannels():
++                raise ValueError(f"truncated WAV payload: {path}")
++        audio_durations[session] = duration
++        audio_records.append({"session": session, "url": url, "path": str(path), "sha256": sha256(path), "bytes": path.stat().st_size, "channels": 1, "sample_width_bytes": 2, "sample_rate": 16000, "frames": frames, "duration_seconds_exact": str(duration)})
++    turns, source_metadata, all_words = extract_turns(annotation_root, args.sessions, audio_durations)
++    response_links, graph_stats = extract_dialogue_graph(annotation_root, args.sessions, all_words, audio_durations)
++    index_name = "turns.exact.jsonl"
++    old_index = args.output / "turns.jsonl"
++    if args.rebuild_existing and old_index.exists() and not (args.output / "turns.v1.float.jsonl").exists():
++        copyfile(old_index, args.output / "turns.v1.float.jsonl")
++    exact_index = args.output / "turns.exact.jsonl"
++    if args.rebuild_existing and exact_index.exists() and not (args.output / "turns.exact.v2.jsonl").exists():
++        copyfile(exact_index, args.output / "turns.exact.v2.jsonl")
++    with (args.output / index_name).open("w", encoding="utf-8") as stream:
++        for turn in turns:
++            stream.write(json.dumps(turn, ensure_ascii=False) + "\n")
++    links_index = args.output / "response-links.exact.jsonl"
++    if args.rebuild_existing and links_index.exists() and not (args.output / "response-links.exact.v3.jsonl").exists():
++        copyfile(links_index, args.output / "response-links.exact.v3.jsonl")
++    with links_index.open("w", encoding="utf-8") as stream:
++        for link in response_links:
++            stream.write(json.dumps(link, ensure_ascii=False) + "\n")
++    old_provenance = args.output / "provenance.json"
++    if args.rebuild_existing and old_provenance.exists() and not (args.output / "provenance.v2.json").exists():
++        copyfile(old_provenance, args.output / "provenance.v2.json")
++    provenance = {
++        "schema": "holonics.apple.ami-conversation-subset.v3",
++        "source": "AMI Meeting Corpus official Edinburgh distribution",
++        "source_word_clock_refusals": [{"word": word["id"], "refusal": word["clock_refusal"]} for word in all_words.values() if word["clock_refusal"]],
++        "source_url": "https://groups.inf.ed.ac.uk/ami/corpus/",
++        "download_url": "https://groups.inf.ed.ac.uk/ami/download/",
++        "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
++        "manual_annotation_release": "ami_public_manual_1.6.2 (10-Apr-2017)",
++        "manual_annotation_sha256": sha256(archive),
++        "sessions": args.sessions,
++        "audio": audio_records,
++        "audio_stream": "Mix-Headset single WAV per meeting; original source file retained",
++        "turn_index": {"path": str(args.output / index_name), "count": len(turns), "speaker_agents": sorted({turn["speaker_agent"] for turn in turns}), "clock_representation": "exact source decimal strings"},
++        "response_links": {"path": str(links_index), **graph_stats, "link_semantics": "direct source/target pointers from original adjacency-pairs XML; no adjacency inference"},
++        "meeting_source_metadata": source_metadata["meetings"],
++        "audio_bounds_validation": {"segments_and_words_checked_against_audio_duration": True, "out_of_audio_range_count": 0},
++        "partition": "official meetings.xml marks ES2002a-d seen_type=training; no external evaluation split claim is made",
++        "synthetic_labels_or_audio": False,
++        "models_or_repository_code_executed": False,
++    }
++    (args.output / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n", encoding="utf-8")
++    print(json.dumps({"output": str(args.output), "sessions": len(args.sessions), "turns": len(turns), "response_links": len(response_links), "audio_bytes": sum(item["bytes"] for item in audio_records)}))
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/research/records/2026-09-06_AS4_AS5_CORPUS_CONTINUATION_AND_RESIDENT_PACKETS.md b/research/records/2026-09-06_AS4_AS5_CORPUS_CONTINUATION_AND_RESIDENT_PACKETS.md
+new file mode 100644
+index 00000000..e2eb95e3
+--- /dev/null
++++ b/research/records/2026-09-06_AS4_AS5_CORPUS_CONTINUATION_AND_RESIDENT_PACKETS.md
+@@ -0,0 +1,118 @@
++# Corrected AS4–AS5: corpus continuity and resident packets
++
++[definition] Brandon's September 6 request, “Can you proceed then into the corrected AS4-AS5?”,
++continues the [correction](2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md).
++Recorded sound and English conversations are required development material; a microphone is not
++a prerequisite. This return starts from `aef12e47` on `codex/apple-silicon`.
++
++[open] AS4 and AS5 remain incomplete. This return implements source acquisition, continuation
++and device operations; it does not produce a corpus-cultivated acoustic model, useful recognition,
++intelligible synthesis or conversational responses. A continuing signal state is not evidence of
++learned acoustic/language correspondence. The unlinked packet operation does not deposit a
++constitutive relation row. The older fixed sonification and WAV-then-byte probe keep their
++previously corrected scopes.
++
++## Source and communication material
++
++[established-bounded; measured] The official AMI distribution supplied four complete recordings,
++ES2002a–d, with 275,208,026 original WAV bytes and 8,600.2453125 seconds of mono PCM16 at 16 kHz.
++The original manual annotation ZIP, selected XML and CC BY 4.0 license remain local. The
++acquisition recipe is `research/experiments/apple_silicon/prepare_ami_conversation_subset.py`;
++the local corpus is `.local/datasets/ami-conversation-es2002`. The source metadata designates
++these meetings as training material. This is one scenario group with four speaker agents,
++not an evaluation result or a claim of broad speaker coverage. Sources: the
++[AMI corpus](https://groups.inf.ed.ac.uk/ami/corpus/) and
++[official download distribution](https://groups.inf.ed.ac.uk/ami/download/).
++
++[established-bounded; measured] The source index retains 2,109 timed segments and 3,874 dialogue
++acts. All 899 original adjacency-pair records remain: 844 links resolve their direct source and
++target pointers; 54 have incomplete source pointers and one additional link has a reversed source
++word interval. Four reversed word intervals remain explicit source clock refusals. No timestamps
++were repaired or links inferred from neighboring turns. Word/segment attributes, speaker/channel
++and role metadata, original pointer roles, XML paths, exact decimal clocks and original bytes
++remain source-qualified. Annotation types are cold testimony, not native routes or currents.
++The [source receipt](2026-09-06_as4_as5_continuation/ami_source_receipt.json) records provenance.
++
++[established-bounded; source-inspected] Primary review corrected lexical ordering of decimal
++timestamps, silent reversed word-span selection, cross-file word references, duplicate role
++selection and incomplete download/WAV-payload acceptance in the first acquisition drafts.
++Earlier indices remain local alongside their original XML. The final recipe checks source
++intervals, preserves explicit refusals and compares actual WAV payload length to frame counts.
++
++## Continuing application and device operation
++
++[established-bounded; implemented-exact] `AcousticApplication::append_recording` and
++`append_acoustic` attach another complete source recording to the same `NativeSession`. The
++application retains earlier WAV bytes, PCM charts, returns and absolute native chronology.
++Append refuses an incomplete current recording or malformed source before mutation. Its first
++sample is new exterior ingress. The optional digital return law operates only within that
++recording; adjacency never fabricates a receiving edge. Version-one saved applications remain
++readable, and appended applications use the extended version-two chart.
++
++[established-bounded; implemented-exact] `NativeSession::receive_unlinked_batch` and
++`NativeConstitutiveEcology::advance_unlinked_batch` submit known exterior inputs through the
++existing circulation kernel in a serial resident passage. Each kernel depends on its predecessor's
++success. Arithmetic refusal commits only the exact successful prefix and reports the refused
++suffix with complete obstruction lineage. Every successful output remains a source section.
++Uncertain launch/readback retains staged sections in the unusable owner and prevents replay or
++checkpoint. No input is downsampled, no CPU semantic operation substitutes for GPU conduct,
++and no temporal parallel-independence claim is made. The relation is unchanged for unlinked
++ingress, so reading its complete receiver basis after the packet preserves each receiver fibre.
++
++[established-bounded; implemented-exact] The acoustic run path uses packets of at most 256 samples
++for unlinked input. Explicit digital feedback keeps its dependent scalar path. `holonics-acoustic
++append SOURCE --wav WAV --occurrence ID --checkpoint OUTPUT` exposes continuation with an explicit
++new output path. CLI frame/hop defaults are now 4096, with complete PCM retained and the folded
++section unused. This removes redundant per-sample cold frame descriptions without deleting any
++source samples or treating delivery boundaries as semantic boundaries.
++
++[established-bounded; implemented-exact, measured] `ResidentComplexIncidence::mount_metal` and
++`accelerators/metal/complex_incidence.metal` implement the existing bounded signed-integer complex
++incidence contraction on Metal. Both quadratures and rational common denominators are preserved;
++the inherited row-mass bound refuses possible signed accumulation overflow before launch. This
++retains that bounded apparatus domain, including its conservative refusals. The immutable incidence
++stays resident and independent contexts rebind correctly. Errors retain the actual Metal boundary
++message. The cultivated morphology mount selects this operation on macOS.
++
++[open] The broader cultivated ecology is not thereby runnable end to end on Apple. Its predecessor
++conduct still mounts resident words/thread currents through CUDA; situated cultivation and
++receiver-history quotient construction also have CUDA dependencies. The existing
++`ReceiverHistoryCongruence::found_on_device` consumes a laboratory `ContinuationAperture` with
++particular surface-counterexample and overlapping proposal-role requirements. AMI's annotated
++audio/response graph cannot be admitted by relabeling its speakers as user/assistant or inventing
++those witnesses. Native source/material interaction, contextual formation and productive acoustic
++and English receivers remain the required composition, alongside the desktop's AC1 work.
++
++## Returned checks and costs
++
++[established-bounded; measured] On this M1 Pro, 24 ignored public native tests passed, including
++the new scalar/batch complete-return and byte-identical checkpoint comparison after formation and
++rechart, old-source return after the batch, exact arithmetic refusal prefix/suffix behavior,
++cross-recording restart and refusal before invalid append. Six acoustic tests include both
++unlinked packets and coupled continuation. The existing 28 engine phase tests also passed with
++Metal API validation enabled. Two new Metal complex-incidence tests passed against exact rational
++contraction, including negative coefficients, multiple fronts, interleaved contexts and reuse
++after overflow refusal. No Linux GPU execution or Lean build is claimed.
++
++[established-bounded; measured] The public `native_audio_packets` example processed two complete
++recordings in one owner, using the existing two-junction seed, unlinked PCM ingress and packets
++of 256. Native occurrence count continued from 0 through 220,500 to 325,940. Source decoding and
++final checkpoint publication are outside these timed intervals. The debug run overlapped CPU
++compilation, so these are observed execution costs, not isolated performance bounds. Full returns
++are in the [packet receipt](2026-09-06_as4_as5_continuation/recorded_packets.jsonl).
++
++| Complete input | Source duration | Processing | Median packet | p95 packet | Synchronizations | Resident allocation calls |
++|---|---:|---:|---:|---:|---:|---:|
++| ESC-50 `1-100032-A-0.wav` | 5 s | 63.251 s | 69.767 ms | 108.068 ms | 862 | 883,724 |
++| LibriSpeech `2277-149896-0000.wav` | 6.59 s | 46.584 s | 115.105 ms | 122.681 ms | 412 | 422,584 |
++
++[open] These runs are 12.65 and 7.07 times slower than their source clocks. Reducing synchronization
++count has not achieved real time: per-sample allocations, command encoding, retained source
++sections and cold history remain substantial. A resident arena with exclusive subregions and
++ordered device iteration is a concrete next execution change; it must preserve every source,
++failure prefix and complete successor. It cannot be replaced by dropping samples or history.
++
++[established-bounded; process-audit] Raw build/test/acquisition/measurement logs remain under
++`.local/setup/apple-silicon/as4-*`. During integration, an agent's accidental workspace-wide
++formatting was restored outside the changed owners; the patch was retained locally. No corpus,
++user file or historical evidence was removed. The unrelated `.DS_Store` files remain unstaged.
+diff --git a/research/records/2026-09-06_as4_as5_continuation/ami_source_receipt.json b/research/records/2026-09-06_as4_as5_continuation/ami_source_receipt.json
+new file mode 100644
+index 00000000..85637f79
+--- /dev/null
++++ b/research/records/2026-09-06_as4_as5_continuation/ami_source_receipt.json
+@@ -0,0 +1,90 @@
++{
++  "schema": "holonics.apple.ami-conversation-subset.v3",
++  "source": "AMI Meeting Corpus official Edinburgh distribution",
++  "source_url": "https://groups.inf.ed.ac.uk/ami/corpus/",
++  "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
++  "manual_annotation_sha256": "b56e5babb2496b8795deeeda7e71178d7fbc9963f94276cf2a3f4b56ebbc9f9d",
++  "source_word_clock_refusals": [
++    {
++      "word": "ES2002a.B.words1587",
++      "refusal": "source word interval is reversed"
++    },
++    {
++      "word": "ES2002b.A.words2346",
++      "refusal": "source word interval is reversed"
++    },
++    {
++      "word": "ES2002b.C.words848",
++      "refusal": "source word interval is reversed"
++    },
++    {
++      "word": "ES2002b.D.words2593",
++      "refusal": "source word interval is reversed"
++    }
++  ],
++  "sessions": [
++    "ES2002a",
++    "ES2002b",
++    "ES2002c",
++    "ES2002d"
++  ],
++  "audio": [
++    {
++      "session": "ES2002a",
++      "url": "https://groups.inf.ed.ac.uk/ami/AMICorpusMirror//amicorpus/ES2002a/audio/ES2002a.Mix-Headset.wav",
++      "path": ".local/datasets/ami-conversation-es2002/audio/ES2002a.Mix-Headset.wav",
++      "sha256": "9c76866990fcc8b84006dc32d273ad99df439090b748ebe72103bb78c3216ee7",
++      "bytes": 40724524,
++      "channels": 1,
++      "sample_width_bytes": 2,
++      "sample_rate": 16000,
++      "frames": 20362240,
++      "duration_seconds_exact": "1272.64"
++    },
++    {
++      "session": "ES2002b",
++      "url": "https://groups.inf.ed.ac.uk/ami/AMICorpusMirror//amicorpus/ES2002b/audio/ES2002b.Mix-Headset.wav",
++      "path": ".local/datasets/ami-conversation-es2002/audio/ES2002b.Mix-Headset.wav",
++      "sha256": "977fbf6cd473cfb1984b41755762eea4d7ffdad3fb15adcfdebcb8842163ec66",
++      "bytes": 72952194,
++      "channels": 1,
++      "sample_width_bytes": 2,
++      "sample_rate": 16000,
++      "frames": 36476075,
++      "duration_seconds_exact": "2279.7546875"
++    },
++    {
++      "session": "ES2002c",
++      "url": "https://groups.inf.ed.ac.uk/ami/AMICorpusMirror//amicorpus/ES2002c/audio/ES2002c.Mix-Headset.wav",
++      "path": ".local/datasets/ami-conversation-es2002/audio/ES2002c.Mix-Headset.wav",
++      "sha256": "8aa5dca8a0d31aaa596ecec8e0d7d8df1646fd4328d2740b287650d8012412df",
++      "bytes": 77557804,
++      "channels": 1,
++      "sample_width_bytes": 2,
++      "sample_rate": 16000,
++      "frames": 38778880,
++      "duration_seconds_exact": "2423.68"
++    },
++    {
++      "session": "ES2002d",
++      "url": "https://groups.inf.ed.ac.uk/ami/AMICorpusMirror//amicorpus/ES2002d/audio/ES2002d.Mix-Headset.wav",
++      "path": ".local/datasets/ami-conversation-es2002/audio/ES2002d.Mix-Headset.wav",
++      "sha256": "b8e0c2d0df9fccfcfab8e5d148f399a679bd2d90299c2262194b9db941749374",
++      "bytes": 83973504,
++      "channels": 1,
++      "sample_width_bytes": 2,
++      "sample_rate": 16000,
++      "frames": 41986730,
++      "duration_seconds_exact": "2624.170625"
++    }
++  ],
++  "response_links": {
++    "path": ".local/datasets/ami-conversation-es2002/response-links.exact.jsonl",
++    "dialogue_act_count": 3874,
++    "adjacency_pair_count": 899,
++    "resolved_count": 844,
++    "refused_count": 55,
++    "type_records": 27,
++    "link_semantics": "direct source/target pointers from original adjacency-pairs XML; no adjacency inference"
++  }
++}
+diff --git a/research/records/2026-09-06_as4_as5_continuation/recorded_packets.jsonl b/research/records/2026-09-06_as4_as5_continuation/recorded_packets.jsonl
+new file mode 100644
+index 00000000..1821768c
+--- /dev/null
++++ b/research/records/2026-09-06_as4_as5_continuation/recorded_packets.jsonl
+@@ -0,0 +1,2 @@
++{"allocations":883724,"deed_launches":862,"egress_receipt_octets":14112000,"egress_section_octets":88200000,"elapsed_ns":63251029458,"first_return":{"formed_pivot":null,"frame":{"ordinal":0,"root_to_local":[{"imaginary":{"denominator":"1","numerator":"0"},"real":{"denominator":"1","numerator":"1"}},{"imaginary":{"denominator":"1","numerator":"0"},"real":{"denominator":"1","numerator":"1"}}]},"local_source_currents":[{"imaginary":{"denominator":"1","numerator":"0"},"real":{"denominator":"1","numerator":"0"}},{"imaginary":{"denominator":"1","numerator":"0"},"real":{"denominator":"1","numerator":"0"}}],"native_occurrence":0,"native_received_from":null,"predecessor_state":null,"received_difference":null,"received_from":null,"receiver":{"current":[{"denominator":"1","numerator":"0"},{"denominator":"1","numerator":"0"}],"kind":"unique"},"root_source_currents":[{"imaginary":{"denominator":"1","numerator":"0"},"real":{"denominator":"1","numerator":"0"}},{"imaginary":{"denominator":"1","numerator":"0"},"real":{"denominator":"1","numerator":"0"}}],"source":0,"successor_rank":0},"ingress_octets":11462552,"last_return":{"formed_pivot":null,"frame":{"ordinal":0,"root_to_local":[{"imaginary":{"denominator":"1","numerator":"0"},"real":{"denominator":"1","numerator":"1"}},{"imaginary":{"denominator":"1","numerator":"0"},"real":{"denominator":"1","numerator":"1"}}]},"local_source_currents":[{"imaginary":{"denominator":"1","numerator":"0"},"real":{"denominator":"1","numerator":"0"}},{"imaginary":{"denominator":"1","numerator":"0"},"real":{"denominator":"1","numerator":"0"}}],"native_occurrence":220499,"native_received_from":null,"predecessor_state":220498,"received_difference":null,"received_from":null,"receiver":{"current":[{"denominator":"1","numerator":"0"},{"denominator":"1","numerator":"0"}],"kind":"unique"},"root_source_currents":[{"imaginary":{"denominator":"1","numerator":"0"},"real":{"denominator":"1","numerator":"0"}},{"imaginary":{"denominator":"1","numerator":"0"},"real":{"denominator":"1","numerator":"0"}}],"source":220499,"successor_rank":0},"native_end":220500,"native_start":0,"packet_max_ns":179417167,"packet_median_ns":69766958,"packet_p95_ns":108067625,"packet_samples":256,"recordings":1,"sample_rate":44100,"scope":"ordered unlinked PCM ingress; no learned audio-language capability","source":".local/datasets/esc50/audio/1-100032-A-0.wav","source_samples":220500,"source_sha256":"f40a849a2375c8c63312a73dd2dd6c74007301fcc21b4be2ece29a642831e3d8","synchronizations":862}
++{"allocations":422584,"deed_launches":412,"egress_receipt_octets":6748160,"egress_section_octets":42176000,"elapsed_ns":46584160250,"first_return":{"formed_pivot":null,"frame":{"ordinal":0,"root_to_local":[{"imaginary":{"denominator":"1","numerator":"0"},"real":{"denominator":"1","numerator":"1"}},{"imaginary":{"denominator":"1","numerator":"0"},"real":{"denominator":"1","numerator":"1"}}]},"local_source_currents":[{"imaginary":{"denominator":"1","numerator":"0"},"real":{"denominator":"1","numerator":"0"}},{"imaginary":{"denominator":"1","numerator":"0"},"real":{"denominator":"1","numerator":"0"}}],"native_occurrence":220500,"native_received_from":null,"predecessor_state":220499,"received_difference":null,"received_from":null,"receiver":{"current":[{"denominator":"1","numerator":"0"},{"denominator":"1","numerator":"0"}],"kind":"unique"},"root_source_currents":[{"imaginary":{"denominator":"1","numerator":"0"},"real":{"denominator":"1","numerator":"0"}},{"imaginary":{"denominator":"1","numerator":"0"},"real":{"denominator":"1","numerator":"0"}}],"source":220500,"successor_rank":0},"ingress_octets":5481232,"last_return":{"formed_pivot":null,"frame":{"ordinal":0,"root_to_local":[{"imaginary":{"denominator":"1","numerator":"0"},"real":{"denominator":"1","numerator":"1"}},{"imaginary":{"denominator":"1","numerator":"0"},"real":{"denominator":"1","numerator":"1"}}]},"local_source_currents":[{"imaginary":{"denominator":"1","numerator":"0"},"real":{"denominator":"8192","numerator":"-9"}},{"imaginary":{"denominator":"8192","numerator":"-9"},"real":{"denominator":"1","numerator":"0"}}],"native_occurrence":325939,"native_received_from":null,"predecessor_state":325938,"received_difference":null,"received_from":null,"receiver":{"kind":"outside-domain","source_remainder":[{"denominator":"8192","numerator":"-9"},{"denominator":"1","numerator":"0"},{"denominator":"1","numerator":"0"},{"denominator":"8192","numerator":"-9"}]},"root_source_currents":[{"imaginary":{"denominator":"1","numerator":"0"},"real":{"denominator":"8192","numerator":"-9"}},{"imaginary":{"denominator":"8192","numerator":"-9"},"real":{"denominator":"1","numerator":"0"}}],"source":325939,"successor_rank":0},"native_end":325940,"native_start":220500,"packet_max_ns":130047417,"packet_median_ns":115105041,"packet_p95_ns":122681417,"packet_samples":256,"recordings":2,"sample_rate":16000,"scope":"ordered unlinked PCM ingress; no learned audio-language capability","source":".local/datasets/librispeech-dev-clean-subset/wav/2277-149896-0000.wav","source_samples":105440,"source_sha256":"20e10e583b4918e05cea91316f7bde65a345d2756e64abc7f7ee133e2a0547f5","synchronizations":412}
+-- 
+2.54.0
+

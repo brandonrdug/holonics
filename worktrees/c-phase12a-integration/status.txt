@@ -1,0 +1,10 @@
+worktree: /home/b/Workspaces/holonics/.local/c-phase12a-integration
+branch: codex/c-phase12a-integration
+HEAD: 75d357d65e0e3aaf471cf0ca940c709fcab7c551
+HEAD subject: C: map phase 12a integration onto phase 11
+HEAD ancestor of origin/main (bb73054a): False
+
+git status --porcelain (tracked):
+ M docs/plans/census/C_PHASE12A_INTEGRATION.md
+
+untracked, non-ignored:

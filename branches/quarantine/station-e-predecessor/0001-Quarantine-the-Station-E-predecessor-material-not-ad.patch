@@ -1,0 +1,745 @@
+From 06347e10e2b315777997acd380e7e98652f29f7b Mon Sep 17 00:00:00 2001
+From: Brandon <brandonrdug@users.noreply.github.com>
+Date: Wed, 19 Aug 2026 12:49:29 -0700
+Subject: [PATCH] Quarantine: the Station E predecessor material (not admitted,
+ not deleted)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The native occurrence witness (native_occurrence.rs), the native laws (native_law.rs:
+AthenaWalk/AthenaFuture), the athena_walk/athena_future kernels and their shape/record
+functions, the OccurrenceWitness trait, and the permutations->arrays material rename — written
+before the 2026-08-19 single-card pivot and quarantined by
+blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md: "neither deleted
+nor admitted; their source testimony may be rederived after Deed H5; their current execution shape
+may not be extended." Kept on this side branch, off main, so main's gates read the admitted tree.
+One-thread flat kernels and maximum-legal-block launch are the convicted substrate; the
+architecture ratchet is red on this cone by construction and no ledger re-seed is authorized.
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01ALNYjvFtk4XBf6zUsgmQys
+---
+ .../examples/phoenix/conduct.rs               |   2 +-
+ .../kernels/exact_resident_section.cu         |  77 +++++++
+ crates/holonic-engine/src/front_passage.rs    |   6 +-
+ crates/holonic-engine/src/lib.rs              |   2 +
+ crates/holonic-engine/src/native_law.rs       | 208 ++++++++++++++++++
+ .../holonic-engine/src/native_occurrence.rs   | 133 +++++++++++
+ crates/holonic-engine/src/resident_law.rs     |  16 +-
+ crates/holonic-engine/src/resident_section.rs |  70 +++++-
+ .../holonic-engine/src/source_occurrence.rs   |  27 +++
+ 9 files changed, 529 insertions(+), 12 deletions(-)
+ create mode 100644 crates/holonic-engine/src/native_law.rs
+ create mode 100644 crates/holonic-engine/src/native_occurrence.rs
+
+diff --git a/crates/holonic-engine/examples/phoenix/conduct.rs b/crates/holonic-engine/examples/phoenix/conduct.rs
+index ab3d9e80..041e0448 100644
+--- a/crates/holonic-engine/examples/phoenix/conduct.rs
++++ b/crates/holonic-engine/examples/phoenix/conduct.rs
+@@ -175,7 +175,7 @@ pub fn conduct(
+         material.positions = Some(surface.mount_positions(layer_positions).map_err(|e| e.to_string())?);
+         if let Intervention::PermuteReceiverHeads { a, b } | Intervention::PermuteCarriedHeads { a, b } = applied {
+             let permutation: Vec<u32> = tower::swap_permutation(tower::HEADS, *a, *b).into_iter().map(|i| i as u32).collect();
+-            material.permutations.insert(tower::HEAD_PERMUTATION.to_owned(), surface.mount_positions(&permutation).map_err(|e| e.to_string())?);
++            material.arrays.insert(tower::HEAD_PERMUTATION.to_owned(), surface.mount_positions(&permutation).map_err(|e| e.to_string())?);
+         }
+         tower::enter(source, tokens, layer, &mut material)?;
+         let entry = if layer == 0 { Entry::Rows } else { Entry::Carried };
+diff --git a/crates/holonic-engine/kernels/exact_resident_section.cu b/crates/holonic-engine/kernels/exact_resident_section.cu
+index 318cef64..7efcb5da 100644
+--- a/crates/holonic-engine/kernels/exact_resident_section.cu
++++ b/crates/holonic-engine/kernels/exact_resident_section.cu
+@@ -918,6 +918,83 @@ extern "C" __global__ void section_permute_columns(
+     out_hi[flat] = hi[(size_t)r * width + source];
+ }
+ 
++// ---------------------------------------------------------------------------------------------
++// THE NATIVE ATLAS — the suffix automaton's transport as compressed sparse rows, walked and read.
++// Rows are sorted by germ index; every value is an integer at grain 2^0. Nothing here is the
++// foreign arm's: the arrays are the native rest's own populations.
++// ---------------------------------------------------------------------------------------------
++
++// Binary search for `g` in the row of `state`; returns the slot or UINT32_MAX.
++__device__ __forceinline__ uint32_t athena_row_find(const uint32_t *indptr, const uint32_t *germ, uint32_t state, uint32_t g) {
++    uint32_t lo = indptr[state], hi = indptr[state + 1];
++    while (lo < hi) {
++        uint32_t mid = lo + (hi - lo) / 2;
++        uint32_t at = germ[mid];
++        if (at == g) return mid;
++        if (at < g) lo = mid + 1; else hi = mid;
++    }
++    return 0xFFFFFFFFu;
++}
++
++// The walk: one thread carries the prompt's germs from the root. Out T × 2: [class, mark] with
++// mark 1 forward, 0 arc (found at a shorter context), 2 unseen (the germ is not in the vocabulary;
++// the walk returns to the root).
++extern "C" __global__ void athena_walk(
++    const uint32_t *indptr, const uint32_t *germ, const uint32_t *target, const uint32_t *suffix,
++    const uint32_t *prompt, uint32_t prompt_len, uint32_t vocabulary,
++    int64_t *out_lo, int64_t *out_hi, uint32_t *refused, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
++) {
++    uint32_t flat = blockIdx.x * blockDim.x + threadIdx.x;
++    if (flat != 0) return;
++    if (upstream_refused(census, lineage, lineage_count, refused)) return;
++    uint32_t state = 0;
++    for (uint32_t t = 0; t < prompt_len; t++) {
++        uint32_t g = prompt[t];
++        int64_t mark;
++        if (g >= vocabulary) {
++            state = 0; mark = 2;
++        } else {
++            uint32_t at = state;
++            mark = 1;
++            for (;;) {
++                uint32_t slot = athena_row_find(indptr, germ, at, g);
++                if (slot != 0xFFFFFFFFu) { state = target[slot]; break; }
++                uint32_t parent = suffix[at];
++                if (parent == at) { state = 0; mark = 0; break; }
++                at = parent; mark = 0;
++            }
++        }
++        out_lo[t * 2] = (int64_t)state; out_hi[t * 2] = (int64_t)state;
++        out_lo[t * 2 + 1] = mark;        out_hi[t * 2 + 1] = mark;
++    }
++}
++
++// The future section: for (position, germ) the standing of the class the germ reaches from the
++// landed class's suffix chain (`depth_face` 0), or how far up the chain it was found (`depth_face`
++// 1; −1 where unreached). In T × 2 (the walk), out T × V.
++extern "C" __global__ void athena_future(
++    const uint32_t *indptr, const uint32_t *germ, const uint32_t *target, const uint32_t *standing, const uint32_t *suffix,
++    const int64_t *walk_lo, uint32_t rows, uint32_t vocabulary, uint32_t depth_face,
++    int64_t *out_lo, int64_t *out_hi, uint32_t *refused, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
++) {
++    uint32_t flat = blockIdx.x * blockDim.x + threadIdx.x;
++    if (flat >= rows * vocabulary) return;
++    if (upstream_refused(census, lineage, lineage_count, refused)) return;
++    uint32_t t = flat / vocabulary;
++    uint32_t v = flat % vocabulary;
++    uint32_t at = (uint32_t)walk_lo[t * 2];
++    int64_t depth = 0;
++    int64_t value = depth_face ? -1 : 0;
++    for (;;) {
++        uint32_t slot = athena_row_find(indptr, germ, at, v);
++        if (slot != 0xFFFFFFFFu) { value = depth_face ? depth : (int64_t)standing[target[slot]]; break; }
++        uint32_t parent = suffix[at];
++        if (parent == at) break;
++        at = parent; depth++;
++    }
++    out_lo[flat] = value; out_hi[flat] = value;
++}
++
+ // **A CONTROL, and it is unsound by construction**: every enclosure collapsed to its lower midpoint,
+ // the widths dropped. It exists so a driver can show that the propagated remainder is load-bearing.
+ extern "C" __global__ void section_collapse_control(
+diff --git a/crates/holonic-engine/src/front_passage.rs b/crates/holonic-engine/src/front_passage.rs
+index c62ed60b..f2e039c9 100644
+--- a/crates/holonic-engine/src/front_passage.rs
++++ b/crates/holonic-engine/src/front_passage.rs
+@@ -87,7 +87,7 @@ use crate::resident_section::{
+     CouplingPlan, LawShape, ObstructionLineage, ResidentGrain, ResidentPassage, ResidentRefusal, ResidentSection, ResidentSurface, Schedule,
+     SlotReading, StagedWords, TransferCensus, SLOT_WORDS, WORD_OCTAVES,
+ };
+-use crate::source_occurrence::{BindingValidation, SourceOccurrence, SourceRefusal};
++use crate::source_occurrence::{BindingValidation, OccurrenceWitness, SourceRefusal};
+ use crate::traversible_chain::{found, Admittance, Crossing, Standing as ChainStanding};
+ use mount::GraphCensus;
+ 
+@@ -817,7 +817,7 @@ impl<'chart> FrontPassage<'chart> {
+         complex: &PortedOperationComplex,
+         realization: &'a ResidentRealization,
+         material: &ResidentMaterial<'chart>,
+-        source: &SourceOccurrence,
++        source: &dyn OccurrenceWitness,
+         terminal: EventId,
+     ) -> Result<CompiledPlan<'a>, FrontPassageObstruction> {
+         realization.validate(complex)?;
+@@ -1262,7 +1262,7 @@ impl<'chart> FrontPassage<'chart> {
+         complex: &PortedOperationComplex,
+         realization: &ResidentRealization,
+         material: &ResidentMaterial<'chart>,
+-        source: &SourceOccurrence,
++        source: &dyn OccurrenceWitness,
+         receiver: &DeedReceiver,
+         material_admission: Option<&MaterialAdmission>,
+         terminal: EventId,
+diff --git a/crates/holonic-engine/src/lib.rs b/crates/holonic-engine/src/lib.rs
+index 098f797e..65eadc7e 100644
+--- a/crates/holonic-engine/src/lib.rs
++++ b/crates/holonic-engine/src/lib.rs
+@@ -328,6 +328,8 @@ pub mod source_occurrence;
+ // The front passage: causal front -> interchange certificate -> cover -> exact work -> admission
+ // -> resident enactment -> receipt, with the four obstruction species kept apart. Same contract.
+ pub mod front_passage;
++pub mod native_law;
++pub mod native_occurrence;
+ pub mod resident_law;
+ pub mod reopening;
+ pub mod resource;
+diff --git a/crates/holonic-engine/src/native_law.rs b/crates/holonic-engine/src/native_law.rs
+new file mode 100644
+index 00000000..02903ff8
+--- /dev/null
++++ b/crates/holonic-engine/src/native_law.rs
+@@ -0,0 +1,208 @@
++//! **The native arm's resident laws: the Athena atlas walked and read on the card.**
++//!
++//! The native Eros/Athena baseline (`crate::athena`) is a suffix automaton over the declared
++//! material, emitted as an integer container — classes, compressed-sparse-row transport by germ,
++//! standings, suffix links, a vocabulary — and mounted from that container alone. These three laws
++//! are its hot deed, realized as resident kernels under the same passage as the foreign arm's: one
++//! graph, typed admission, lineage-local refusal, a census read once.
++//!
++//! ```text
++//!   walk     (construction, 0 → 1)   the prompt's germs carried through the transport rows from the
++//!                                     root; a row with no such germ falls along the suffix link and
++//!                                     retries (the ARC); an unseen germ returns to the root.
++//!                                     Returns T × 2: the landed class and the mark (1 forward, 0 arc,
++//!                                     2 unseen) per position.
++//!   future   (transport, 1 → 1)      for every position and every vocabulary germ, the STANDING of
++//!                                     the class reached by that germ from the landed class's suffix
++//!                                     chain (0 where no class in the chain offers it). T × V.
++//!   depth    (transport, 1 → 1)      the same climb returning how far up the chain the germ was
++//!                                     found (−1 where unreached). T × V.
++//! ```
++//!
++//! The words are integers: the laws refuse any grain but `2^0`. Every law is entailed only by the
++//! rest's own declarations — the populations it reads must be identified in the rest's header with
++//! their shapes and integer carriers (`DeclaredShape`), and the law's statement must be one the rest
++//! carries in its metadata (`AuthoritativeDescription`); see [`crate::native_occurrence`].
++
++use std::collections::BTreeMap;
++
++use crate::ported_operation::OperationSpecies;
++use crate::resident_law::{EntailmentRefusal, LawEntailment, ResidentLaw, ResidentMaterial};
++use crate::resident_section::{Lane, LawShape, ResidentGrain, ResidentRefusal, ResidentSection, ResidentSurface, StagedWords};
++use crate::source_occurrence::BindingValidation;
++
++/// The statement of the walk law, as the rest must declare it.
++pub const WALK_LAW: &str = "walk: carry each prompt germ through the transport row of the current class from the root; when the row has no such germ, fall along the suffix link and retry (the arc); an unseen germ returns to the root";
++/// The statement of the future-standing law, as the rest must declare it.
++pub const FUTURE_LAW: &str = "future: for every position and every vocabulary germ, the standing of the class reached by that germ from the landed class's suffix chain, zero where no class in the chain offers it";
++/// The statement of the future-depth law, as the rest must declare it.
++pub const DEPTH_LAW: &str = "depth: for every position and every vocabulary germ, how far up the landed class's suffix chain the germ was found, minus one where unreached";
++
++/// The rest's populations the laws read, by their names in the rest.
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub struct AthenaArrays {
++    pub indptr: String,
++    pub germ: String,
++    pub target: String,
++    pub standing: String,
++    pub suffix: String,
++    pub classes: usize,
++    pub transitions: usize,
++    pub vocabulary: usize,
++}
++
++impl AthenaArrays {
++    fn present(&self, material: &ResidentMaterial<'_>, with_standing: bool) -> Result<(), String> {
++        for name in [&self.indptr, &self.germ, &self.target, &self.suffix] {
++            if !material.arrays.contains_key(name) {
++                return Err(name.clone());
++            }
++        }
++        if with_standing && !material.arrays.contains_key(&self.standing) {
++            return Err(self.standing.clone());
++        }
++        Ok(())
++    }
++    fn shapes_entailed(&self, validation: &BindingValidation, law: &'static str, with_standing: bool) -> Result<Vec<(String, String, String)>, EntailmentRefusal> {
++        let mut parameters = Vec::new();
++        let mut need: Vec<(&str, &String, Vec<usize>)> = vec![
++            ("indptr", &self.indptr, vec![self.classes + 1, 1]),
++            ("germ", &self.germ, vec![self.transitions, 1]),
++            ("target", &self.target, vec![self.transitions, 1]),
++            ("suffix", &self.suffix, vec![self.classes, 1]),
++        ];
++        if with_standing {
++            need.push(("standing", &self.standing, vec![self.classes, 1]));
++        }
++        for (parameter, name, shape) in need {
++            match validation.shapes.iter().find(|(p, s)| p == name && *s == shape) {
++                Some((p, s)) => parameters.push((parameter.to_owned(), format!("{name} {shape:?}"), format!("declared shape {p}: {s:?}"))),
++                None => {
++                    return Err(EntailmentRefusal::ParameterUnentailed { law, parameter, value: format!("{name} {shape:?}"), testimony: validation.shapes.iter().map(|(p, s)| format!("{p}: {s:?}")).collect() });
++                }
++            }
++        }
++        Ok(parameters)
++    }
++    fn ranges(&self, material: &ResidentMaterial<'_>, with_standing: bool) -> Vec<(u64, u64)> {
++        let mut out = vec![material.arrays[&self.indptr].range(), material.arrays[&self.germ].range(), material.arrays[&self.target].range(), material.arrays[&self.suffix].range()];
++        if with_standing {
++            out.push(material.arrays[&self.standing].range());
++        }
++        out
++    }
++}
++
++fn declared(validation: &BindingValidation, law: &'static str, statement: &str) -> Result<(String, String, String), EntailmentRefusal> {
++    if validation.descriptions.iter().any(|d| d == statement) {
++        Ok(("law".to_owned(), law.to_owned(), "the rest's own declaration of this law".to_owned()))
++    } else {
++        Err(EntailmentRefusal::SliceDoesNotEntail { law, required_any_of: vec![law], offered: validation.descriptions.clone() })
++    }
++}
++
++fn integer_grain(operation: &'static str, grain: ResidentGrain) -> Result<(), ResidentRefusal> {
++    if grain.0 != 0 {
++        return Err(ResidentRefusal::Declaration { operation, what: format!("the native atlas words are integers: grain 2^0 is declared, not 2^-{}", grain.0) });
++    }
++    Ok(())
++}
++
++/// The walk: the prompt's germs carried from the root. Species: construction.
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub struct AthenaWalk {
++    pub arrays: AthenaArrays,
++    /// The prompt's germ indices, mounted as a u32 array under this name (`vocabulary` marks unseen).
++    pub prompt: String,
++}
++
++impl ResidentLaw for AthenaWalk {
++    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
++        let mut parameters = self.arrays.shapes_entailed(validation, "athena-walk", false)?;
++        parameters.push(declared(validation, "athena-walk", WALK_LAW)?);
++        Ok(LawEntailment { law: "athena-walk", parameters, naming_slices: vec![WALK_LAW.to_owned()] })
++    }
++    fn name(&self) -> &'static str {
++        "athena-walk"
++    }
++    fn species(&self) -> OperationSpecies {
++        OperationSpecies::Construction
++    }
++    fn arity(&self) -> (usize, usize) {
++        (0, 1)
++    }
++    fn material(&self, material: &ResidentMaterial<'_>) -> Result<(), String> {
++        self.arrays.present(material, false)?;
++        if material.arrays.contains_key(&self.prompt) { Ok(()) } else { Err(self.prompt.clone()) }
++    }
++    fn bound_octaves(&self, _grain: ResidentGrain, _inputs: &[u32], _material: &ResidentMaterial<'_>) -> i64 {
++        33 // a class index or a mark, below 2^32, at grain 2^0
++    }
++    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, grain: ResidentGrain, _inputs: &[(usize, usize, u32)], material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
++        integer_grain("athena-walk", grain)?;
++        let positions = material.arrays[&self.prompt].rows();
++        surface.shape_athena_walk(positions, self.arrays.classes, self.arrays.transitions)
++    }
++    fn reads<'chart>(&self, material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
++        let mut out = self.arrays.ranges(material, false);
++        out.push(material.arrays[&self.prompt].range());
++        out
++    }
++    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, _inputs: &[&ResidentSection<'chart>], material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
++        surface.record_athena_walk(lane, &material.arrays[&self.arrays.indptr], &material.arrays[&self.arrays.germ], &material.arrays[&self.arrays.target], &material.arrays[&self.arrays.suffix], &material.arrays[&self.prompt], self.arrays.vocabulary, out)
++    }
++}
++
++/// The future section: the standing (or the depth) of every vocabulary germ from every landed
++/// class. Species: transport.
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub struct AthenaFuture {
++    pub arrays: AthenaArrays,
++    /// `false`: the standing face; `true`: the depth face.
++    pub depth: bool,
++}
++
++impl AthenaFuture {
++    fn law(&self) -> &'static str {
++        if self.depth { "athena-depth" } else { "athena-future" }
++    }
++}
++
++impl ResidentLaw for AthenaFuture {
++    fn entailment(&self, validation: &BindingValidation) -> Result<LawEntailment, EntailmentRefusal> {
++        let statement = if self.depth { DEPTH_LAW } else { FUTURE_LAW };
++        let mut parameters = self.arrays.shapes_entailed(validation, self.law(), !self.depth)?;
++        parameters.push(declared(validation, self.law(), statement)?);
++        Ok(LawEntailment { law: self.law(), parameters, naming_slices: vec![statement.to_owned()] })
++    }
++    fn name(&self) -> &'static str {
++        self.law()
++    }
++    fn species(&self) -> OperationSpecies {
++        OperationSpecies::Transport
++    }
++    fn arity(&self) -> (usize, usize) {
++        (1, 1)
++    }
++    fn material(&self, material: &ResidentMaterial<'_>) -> Result<(), String> {
++        self.arrays.present(material, !self.depth)
++    }
++    fn bound_octaves(&self, _grain: ResidentGrain, _inputs: &[u32], _material: &ResidentMaterial<'_>) -> i64 {
++        33 // a standing below 2^32, or a depth below the class count, at grain 2^0
++    }
++    fn shape<'chart>(&self, surface: &ResidentSurface<'chart>, grain: ResidentGrain, inputs: &[(usize, usize, u32)], _material: &ResidentMaterial<'chart>) -> Result<LawShape, ResidentRefusal> {
++        integer_grain(self.law(), grain)?;
++        let (positions, width, _) = inputs.first().copied().unwrap_or((0, 0, 0));
++        if width != 2 {
++            return Err(ResidentRefusal::WidthDisagrees { operation: self.law(), left: width, right: 2 });
++        }
++        surface.shape_athena_future(positions, self.arrays.vocabulary, self.arrays.classes, self.arrays.transitions, self.depth)
++    }
++    fn reads<'chart>(&self, material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
++        self.arrays.ranges(material, !self.depth)
++    }
++    fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
++        let standing = if self.depth { &material.arrays[&self.arrays.suffix] } else { &material.arrays[&self.arrays.standing] };
++        surface.record_athena_future(lane, &material.arrays[&self.arrays.indptr], &material.arrays[&self.arrays.germ], &material.arrays[&self.arrays.target], standing, &material.arrays[&self.arrays.suffix], inputs[0], self.arrays.vocabulary, self.depth, out)
++    }
++}
+diff --git a/crates/holonic-engine/src/native_occurrence.rs b/crates/holonic-engine/src/native_occurrence.rs
+new file mode 100644
+index 00000000..aac8d663
+--- /dev/null
++++ b/crates/holonic-engine/src/native_occurrence.rs
+@@ -0,0 +1,133 @@
++//! **The native occurrence: a native rest authenticated by content, witnessing its own laws.**
++//!
++//! The foreign arm binds its laws through [`crate::source_occurrence::SourceOccurrence`] — an
++//! implementation text, a configuration, a container — and refuses any law the source's own
++//! testimony does not entail. The native arm has no foreign implementation to authenticate; what it
++//! has is **its own rest**: a container it emitted, carrying its atlas as integer populations and,
++//! in the container's own metadata slot, the statements of the laws that read them. This module is
++//! the witness for that rest, held to the same standard as the foreign one — a law binds only when
++//! the rest *declares* it and the populations it reads are *identified* in the rest's header with
++//! their shapes and integer carriers — so a native law can no more be authenticated by an unrelated
++//! statement than a foreign law by an unrelated slice.
++//!
++//! Admissible testimony on a native occurrence: [`SourceTestimony::DeclaredShape`] (the population
++//! must be a region of the rest with that shape and an integer carrier — `U16`/`U32` — the
++//! rest's populations cross as integers and nothing else), [`SourceTestimony::AuthoritativeDescription`]
++//! (the statement must be one the rest itself carries in its metadata), and the caller's
++//! [`SourceTestimony::Intervention`]. An `Implementation` or `Configuration` testimony is foreign
++//! to a native rest and refuses at validation: the native arm is independent by construction, not
++//! by declaration.
++
++use std::collections::BTreeMap;
++
++use crate::foreign_map::{manifest_safetensors, FileIdentity};
++use crate::ported_operation::{OperationSpecies, PortedOperationComplex, SourceTestimony};
++use crate::source_occurrence::{AuthenticatedContainer, BindingValidation, OccurrenceWitness, RegionIdentity, SourceRefusal};
++
++/// The native rest as an occurrence: its container, content-addressed, and its own declarations.
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub struct NativeOccurrence {
++    pub container: AuthenticatedContainer,
++    /// The rest's own metadata, verbatim: `key → statement`. A law's description must be one of
++    /// these statements.
++    pub declarations: BTreeMap<String, String>,
++}
++
++impl NativeOccurrence {
++    /// Read and authenticate the native rest at `locator`: the header (every region with its shape
++    /// and carrier), the container's own metadata, the whole-content digest (a native rest is small
++    /// and the digest is always taken), and the file identity.
++    pub fn read(locator: &str) -> Result<Self, SourceRefusal> {
++        let (_, manifest) = manifest_safetensors(locator).map_err(|error| SourceRefusal::ContainerMalformed { locator: locator.to_owned(), reason: error.to_string() })?;
++        let (octets, header_octets, header_sha256) = AuthenticatedContainer::read_header(locator)?;
++        let content_sha256 = AuthenticatedContainer::digest_whole(locator)?;
++        let mut regions = BTreeMap::new();
++        for (name, tensor) in &manifest.tensors {
++            regions.insert(
++                name.clone(),
++                RegionIdentity { population: name.clone(), dtype: tensor.dtype.declared().to_owned(), shape: tensor.shape.clone(), start: tensor.start, end: tensor.end, sha256: None },
++            );
++        }
++        Ok(Self {
++            container: AuthenticatedContainer {
++                locator: locator.to_owned(),
++                octets,
++                header_octets,
++                header_sha256,
++                content_sha256: Some(content_sha256),
++                regions,
++                identity: FileIdentity::at(locator).ok(),
++            },
++            declarations: manifest.container_metadata,
++        })
++    }
++
++    /// Does the rest itself carry this statement?
++    pub fn declares(&self, statement: &str) -> bool {
++        self.declarations.values().any(|s| s == statement)
++    }
++
++    pub fn identifies(&self, population: &str) -> bool {
++        self.container.regions.contains_key(population)
++    }
++}
++
++fn integer_carrier(dtype: &str) -> bool {
++    matches!(dtype, "U16" | "U32" | "U8" | "U64" | "I8" | "I16" | "I32" | "I64")
++}
++
++impl OccurrenceWitness for NativeOccurrence {
++    fn witness(&self) -> &'static str {
++        "native rest"
++    }
++
++    fn validate(&self, complex: &PortedOperationComplex) -> Result<Vec<BindingValidation>, SourceRefusal> {
++        self.container.verify_still()?;
++        let mut validated = Vec::with_capacity(complex.operations.len());
++        for operation in complex.operations.values() {
++            let name = complex.shape.laws.get(&operation.law).map(|law| law.name.clone()).unwrap_or_default();
++            let mut validation = BindingValidation { operation: name.clone(), species: operation.species, symbols: Vec::new(), fields: Vec::new(), shapes: Vec::new(), interventions: Vec::new(), descriptions: Vec::new() };
++            let mut exterior = false;
++            for testimony in &operation.testimony {
++                match testimony {
++                    SourceTestimony::DeclaredShape { population, shape } => {
++                        let region = self.container.regions.get(population).ok_or_else(|| SourceRefusal::PopulationNotIdentified { operation: name.clone(), population: population.clone() })?;
++                        if region.shape != *shape {
++                            return Err(SourceRefusal::ShapeDiffers { operation: name, population: population.clone(), declared: shape.clone(), measured: region.shape.clone() });
++                        }
++                        if !integer_carrier(&region.dtype) {
++                            return Err(SourceRefusal::DtypeDiffers { operation: name.clone(), population: population.clone(), declared: "an integer carrier".to_owned(), measured: region.dtype.clone() });
++                        }
++                        validation.shapes.push((population.clone(), shape.clone()));
++                        exterior = true;
++                    }
++                    SourceTestimony::AuthoritativeDescription { statement } => {
++                        if !self.declares(statement) {
++                            return Err(SourceRefusal::DeclarationNotInRest { operation: name, statement: statement.clone() });
++                        }
++                        validation.descriptions.push(statement.clone());
++                        exterior = true;
++                    }
++                    SourceTestimony::Intervention { statement } => validation.interventions.push(statement.clone()),
++                    SourceTestimony::Implementation { .. } | SourceTestimony::Configuration { .. } => {
++                        return Err(SourceRefusal::TestimonyForeignToNativeRest { operation: name, testimony: format!("{testimony:?}") });
++                    }
++                    SourceTestimony::Undecided { .. } => {}
++                }
++            }
++            if !validation.interventions.is_empty() && exterior && operation.species != OperationSpecies::Quotient {
++                return Err(SourceRefusal::InterventionOnSourceLaw { operation: name, species: operation.species });
++            }
++            if !exterior && validation.interventions.is_empty() {
++                return Err(SourceRefusal::TestimonyNotExterior { operation: name, testimony: operation.testimony.iter().map(|t| format!("{t:?}")).collect() });
++            }
++            if let Some(carrier) = &operation.carrier {
++                if !self.identifies(carrier) {
++                    return Err(SourceRefusal::PopulationNotIdentified { operation: name, population: carrier.clone() });
++                }
++            }
++            validated.push(validation);
++        }
++        Ok(validated)
++    }
++}
+diff --git a/crates/holonic-engine/src/resident_law.rs b/crates/holonic-engine/src/resident_law.rs
+index 6a9d9719..4b73cd94 100644
+--- a/crates/holonic-engine/src/resident_law.rs
++++ b/crates/holonic-engine/src/resident_law.rs
+@@ -51,12 +51,14 @@ pub struct ResidentMaterial<'chart> {
+     /// pointer to an immutable section is not a second owner of a continuing body.
+     pub standings: BTreeMap<String, (std::rc::Rc<ResidentSection<'chart>>, u32)>,
+     /// Mounted permutation arrays for [`PermuteColumns`] interventions, by name.
+-    pub permutations: BTreeMap<String, Positions<'chart>>,
++    /// Mounted u32 arrays by name: a head permutation for the permute-columns intervention, the
++    /// native atlas's compressed-sparse-row transport, standings, suffix links and a prompt.
++    pub arrays: BTreeMap<String, Positions<'chart>>,
+ }
+ 
+ impl ResidentMaterial<'_> {
+     pub fn empty() -> Self {
+-        Self { populations: BTreeMap::new(), entering: BTreeMap::new(), bands: BTreeMap::new(), positions: None, standings: BTreeMap::new(), permutations: BTreeMap::new() }
++        Self { populations: BTreeMap::new(), entering: BTreeMap::new(), bands: BTreeMap::new(), positions: None, standings: BTreeMap::new(), arrays: BTreeMap::new() }
+     }
+ 
+     /// The resident octets of every mounted map, band and position — the source-map residency the
+@@ -65,7 +67,7 @@ impl ResidentMaterial<'_> {
+         self.populations.values().map(|p| p.readout.resident_octets() as u64).sum::<u64>()
+             + self.bands.values().map(|(b, _)| b.resident_octets()).sum::<u64>()
+             + self.positions.as_ref().map(Positions::resident_octets).unwrap_or(0)
+-            + self.permutations.values().map(Positions::resident_octets).sum::<u64>()
++            + self.arrays.values().map(Positions::resident_octets).sum::<u64>()
+     }
+ 
+     /// The resident octets of the standings carried in from earlier passages — resident already,
+@@ -346,7 +348,7 @@ impl ResidentLaw for WithdrawRows {
+ pub struct PermuteColumns {
+     pub block: usize,
+     pub permutation: Vec<usize>,
+-    /// The name of the mounted permutation array in `material.permutations`.
++    /// The name of the mounted permutation array in `material.arrays`.
+     pub mounted: String,
+ }
+ 
+@@ -367,7 +369,7 @@ impl ResidentLaw for PermuteColumns {
+         (1, 1)
+     }
+     fn material(&self, material: &ResidentMaterial<'_>) -> Result<(), String> {
+-        if material.permutations.contains_key(&self.mounted) { Ok(()) } else { Err(self.mounted.clone()) }
++        if material.arrays.contains_key(&self.mounted) { Ok(()) } else { Err(self.mounted.clone()) }
+     }
+     fn bound_octaves(&self, _grain: ResidentGrain, inputs: &[u32], _material: &ResidentMaterial<'_>) -> i64 {
+         first(inputs, 0)
+@@ -377,10 +379,10 @@ impl ResidentLaw for PermuteColumns {
+         surface.shape_permute_columns(rows, width, octaves, self.block, &self.permutation)
+     }
+     fn reads<'chart>(&self, material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>) -> Vec<(u64, u64)> {
+-        vec![material.permutations[&self.mounted].range()]
++        vec![material.arrays[&self.mounted].range()]
+     }
+     fn record<'chart>(&self, surface: &ResidentSurface<'chart>, lane: &Lane<'_, 'chart>, inputs: &[&ResidentSection<'chart>], material: &ResidentMaterial<'chart>, _staged: &BTreeMap<String, StagedWords<'chart>>, _shape: &LawShape, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+-        surface.record_permute_columns(lane, inputs[0], self.block, &material.permutations[&self.mounted], out)
++        surface.record_permute_columns(lane, inputs[0], self.block, &material.arrays[&self.mounted], out)
+     }
+ }
+ 
+diff --git a/crates/holonic-engine/src/resident_section.rs b/crates/holonic-engine/src/resident_section.rs
+index 7a068ace..ba1d6e38 100644
+--- a/crates/holonic-engine/src/resident_section.rs
++++ b/crates/holonic-engine/src/resident_section.rs
+@@ -87,8 +87,10 @@ pub const SLOT_WORDS: usize = 16;
+ 
+ /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
+ /// refuses there and never at a launch.
+-pub const KERNELS: [&str; 16] = [
++pub const KERNELS: [&str; 18] = [
+     "section_from_bfloat16",
++    "athena_walk",
++    "athena_future",
+     "section_carry",
+     "section_withdraw_rows",
+     "section_permute_columns",
+@@ -1173,6 +1175,46 @@ impl<'chart> ResidentSurface<'chart> {
+         self.flat_shape(OPERATION, rows, width, input_octaves, work, Vec::new())
+     }
+ 
++    /// **The native atlas walked**: one thread carries `positions` prompt germs from the root through
++    /// compressed-sparse-row transport over `classes` classes and `transitions` arcs. Out `positions × 2`.
++    pub fn shape_athena_walk(&self, positions: usize, classes: usize, transitions: usize) -> Result<LawShape, ResidentRefusal> {
++        const OPERATION: &str = "athena-walk";
++        if positions == 0 || classes == 0 {
++            return Err(ResidentRefusal::Declaration { operation: OPERATION, what: format!("{positions} positions over {classes} classes") });
++        }
++        let height = ceil_log2(classes.max(2)) as u64;
++        let row = ceil_log2(transitions.max(2)) as u64;
++        let mut work = ExactWork::nothing();
++        // every position: at most the tree's height of row searches, each a binary search
++        work.additions = BigUint::from(positions as u64 * height * row);
++        work.entries_written = BigUint::from(2 * 2 * positions as u64);
++        work.resident(2 * 2 * positions as u64);
++        work.peak_bits = BigUint::from(33u64);
++        work.cumulative_bits = BigUint::from(2 * 2 * positions as u64 * 33);
++        work.dependency_span = BigUint::from(positions as u64 * (height + 1));
++        self.flat_shape(OPERATION, positions, 2, 33, work, Vec::new())
++    }
++
++    /// **The native future section**: for every position and vocabulary germ, one climb of the
++    /// suffix chain with a binary search per class. Out `positions × vocabulary`.
++    pub fn shape_athena_future(&self, positions: usize, vocabulary: usize, classes: usize, transitions: usize, depth_face: bool) -> Result<LawShape, ResidentRefusal> {
++        let operation: &'static str = if depth_face { "athena-depth" } else { "athena-future" };
++        if positions == 0 || vocabulary == 0 || classes == 0 {
++            return Err(ResidentRefusal::Declaration { operation, what: format!("{positions} positions × {vocabulary} germs over {classes} classes") });
++        }
++        let height = ceil_log2(classes.max(2)) as u64;
++        let row = ceil_log2(transitions.max(2)) as u64;
++        let count = (positions * vocabulary) as u64;
++        let mut work = ExactWork::nothing();
++        work.additions = BigUint::from(count * height * row);
++        work.entries_written = BigUint::from(2 * count);
++        work.resident(2 * count);
++        work.peak_bits = BigUint::from(33u64);
++        work.cumulative_bits = BigUint::from(2 * count * 33);
++        work.dependency_span = BigUint::from(height + 1);
++        self.flat_shape(operation, positions, vocabulary, 33, work, Vec::new())
++    }
++
+     /// The intervention permuting the column blocks of `block` by a declared permutation.
+     pub fn shape_permute_columns(&self, rows: usize, width: usize, input_octaves: u32, block: usize, permutation: &[usize]) -> Result<LawShape, ResidentRefusal> {
+         const OPERATION: &str = "permute-columns";
+@@ -1438,6 +1480,32 @@ impl<'chart> ResidentSurface<'chart> {
+         self.record_flat(lane, "section_permute_columns", input.count(), &mut params, "permute-columns")
+     }
+ 
++    /// Record the native walk: the prompt's germs carried through the rest's transport.
++    #[allow(clippy::too_many_arguments)]
++    pub fn record_athena_walk(&self, lane: &Lane<'_, 'chart>, indptr: &Positions<'chart>, germ: &Positions<'chart>, target: &Positions<'chart>, suffix: &Positions<'chart>, prompt: &Positions<'chart>, vocabulary: usize, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
++        if out.rows() != prompt.rows() || out.width() != 2 {
++            return Err(ResidentRefusal::Ragged { operation: "athena-walk", words: prompt.rows() * 2, rows: out.rows, width: out.width });
++        }
++        let mut params = Params::new();
++        params.ptr(indptr.device_ptr()).ptr(germ.device_ptr()).ptr(target.device_ptr()).ptr(suffix.device_ptr()).ptr(prompt.device_ptr()).u32(prompt.rows() as u32).u32(vocabulary as u32)
++            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
++        self.record_flat(lane, "athena_walk", out.count(), &mut params, "athena-walk")
++    }
++
++    /// Record the native future section (standing face, or depth face).
++    #[allow(clippy::too_many_arguments)]
++    pub fn record_athena_future(&self, lane: &Lane<'_, 'chart>, indptr: &Positions<'chart>, germ: &Positions<'chart>, target: &Positions<'chart>, standing: &Positions<'chart>, suffix: &Positions<'chart>, walk: &ResidentSection<'chart>, vocabulary: usize, depth_face: bool, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
++        let operation: &'static str = if depth_face { "athena-depth" } else { "athena-future" };
++        if walk.width() != 2 || out.rows() != walk.rows() || out.width() != vocabulary {
++            return Err(ResidentRefusal::Ragged { operation, words: walk.rows() * vocabulary, rows: out.rows, width: out.width });
++        }
++        let mut params = Params::new();
++        params.ptr(indptr.device_ptr()).ptr(germ.device_ptr()).ptr(target.device_ptr()).ptr(standing.device_ptr()).ptr(suffix.device_ptr())
++            .ptr(walk.lo.device_ptr()).u32(walk.rows() as u32).u32(vocabulary as u32).u32(u32::from(depth_face))
++            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
++        self.record_flat(lane, "athena_future", out.count(), &mut params, operation)
++    }
++
+     pub fn record_collapse_control(&self, lane: &Lane<'_, 'chart>, input: &ResidentSection<'chart>, out: &ResidentSection<'chart>) -> Result<(), ResidentRefusal> {
+         let mut params = Params::new();
+         params.ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr()).u32(input.count() as u32)
+diff --git a/crates/holonic-engine/src/source_occurrence.rs b/crates/holonic-engine/src/source_occurrence.rs
+index c804a774..33c7ccb9 100644
+--- a/crates/holonic-engine/src/source_occurrence.rs
++++ b/crates/holonic-engine/src/source_occurrence.rs
+@@ -78,6 +78,10 @@ pub enum SourceRefusal {
+     /// An operation whose testimony is a description alone — a name — has no source behind it.
+     TestimonyNotExterior { operation: String, testimony: Vec<String> },
+     ContainerMalformed { locator: String, reason: String },
++    /// A native rest is asked to witness a law it does not itself declare.
++    DeclarationNotInRest { operation: String, statement: String },
++    /// Implementation or configuration testimony offered to a native rest, which has neither.
++    TestimonyForeignToNativeRest { operation: String, testimony: String },
+ }
+ 
+ impl std::fmt::Display for SourceRefusal {
+@@ -303,6 +307,28 @@ pub struct BindingValidation {
+     pub fields: Vec<(String, String)>,
+     pub shapes: Vec<(String, Vec<usize>)>,
+     pub interventions: Vec<String>,
++    /// Authoritative descriptions the witness VERIFIED as its own (a native rest's declarations);
++    /// the foreign source records none — a description is not exterior testimony there.
++    pub descriptions: Vec<String>,
++}
++
++/// **What validates a complex's testimony before the passage compiles it**: the foreign source
++/// occurrence (implementation, configuration, container) or the native rest (its own container and
++/// declarations). The passage asks the witness and never reads the files itself.
++pub trait OccurrenceWitness {
++    /// Which witness this is, for the receipt.
++    fn witness(&self) -> &'static str;
++    /// Every operation's testimony checked against content; refuses on the first that does not resolve.
++    fn validate(&self, complex: &PortedOperationComplex) -> Result<Vec<BindingValidation>, SourceRefusal>;
++}
++
++impl OccurrenceWitness for SourceOccurrence {
++    fn witness(&self) -> &'static str {
++        "foreign source"
++    }
++    fn validate(&self, complex: &PortedOperationComplex) -> Result<Vec<BindingValidation>, SourceRefusal> {
++        SourceOccurrence::validate(self, complex)
++    }
+ }
+ 
+ /// **The source occurrence.** Built by the caller at the apparatus boundary; consumed by the
+@@ -604,6 +630,7 @@ impl SourceOccurrence {
+                 fields: Vec::new(),
+                 shapes: Vec::new(),
+                 interventions: Vec::new(),
++                descriptions: Vec::new(),
+             };
+             let mut exterior = false;
+             for testimony in &operation.testimony {
+-- 
+2.54.0
+

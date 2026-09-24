@@ -1,0 +1,277 @@
+From 2b612f2e6bf11395c760014e993f8b679bdb61f7 Mon Sep 17 00:00:00 2001
+From: Brandon Duggan <brandonrdug@users.noreply.github>
+Date: Sun, 6 Sep 2026 18:25:18 -0700
+Subject: [PATCH 05/18] Correct acoustic native grain beyond PCM sample probes
+
+---
+ CONSTRUCTION_STATE.md                         |  8 ++
+ crates/holonics-hna/src/native/acoustic.rs    |  7 +-
+ docs/ACOUSTIC_EXPERIMENTS.md                  |  9 ++-
+ docs/HARDWARE_AND_MODALITY_BOUNDARIES.md      |  9 ++-
+ docs/RETRACTIONS.md                           |  7 ++
+ docs/plans/HOLONICS_ON_APPLE_SILICON.md       | 31 ++++++--
+ docs/plans/THE_ROADMAP.md                     |  7 ++
+ ...COUSTIC_HOLONS_ARE_NOT_PCM_SAMPLE_STEPS.md | 74 +++++++++++++++++++
+ 8 files changed, 139 insertions(+), 13 deletions(-)
+ create mode 100644 research/records/2026-09-06_ACOUSTIC_HOLONS_ARE_NOT_PCM_SAMPLE_STEPS.md
+
+diff --git a/CONSTRUCTION_STATE.md b/CONSTRUCTION_STATE.md
+index f311b3f6..195c6a50 100644
+--- a/CONSTRUCTION_STATE.md
++++ b/CONSTRUCTION_STATE.md
+@@ -48,6 +48,14 @@ words and original response links, including source annotation refusals. These d
+ learned acoustic/English conduct. Complete recorded inputs still took 7.07–12.65 times their
+ source durations; retained per-sample allocation/history remains a concrete cost.
+ 
++[project-postulate] Brandon's subsequent acoustic-grain correction requires native holonic
++organization, not one PCM sample per recurrence. The existing sample loop remains a probe;
++its timings do not establish the cost of the intended acoustic realization. Next compose the
++exterior acoustic chart with native situated material/transport and receiver-relative reconstruction,
++alongside the shared linguistic formation work. The
++[correction record](research/records/2026-09-06_ACOUSTIC_HOLONS_ARE_NOT_PCM_SAMPLE_STEPS.md)
++locates existing owners and preserves the distinction between an exterior codec and native grain.
++
+ [established-bounded; measured] Local data comprise 2,000 ESC-50 WAVs and a 100-clip LibriSpeech
+ subset, outside Git. The measured examples processed a small selection, not the downloaded
+ corpora. A five-second sound continuation took 299.47 s including cold publication and produced
+diff --git a/crates/holonics-hna/src/native/acoustic.rs b/crates/holonics-hna/src/native/acoustic.rs
+index 5a6c5fd6..0b672f89 100644
+--- a/crates/holonics-hna/src/native/acoustic.rs
++++ b/crates/holonics-hna/src/native/acoustic.rs
+@@ -1,7 +1,8 @@
+-//! Public exact PCM attachment to the continuing native phase session.
++//! Public digital PCM probe over the continuing native phase session.
+ //!
+-//! PCM is retained as exterior source material. It enters one native occurrence per admitted
+-//! sample; it is never used as a label, classifier, or replayed output.
++//! This probe chooses one native occurrence per admitted sample. That is an application control,
++//! not the native grain of acoustic holons; see docs/plans/HOLONICS_ON_APPLE_SILICON.md.
++//! PCM remains exterior source material, never a label, classifier, or replayed output.
+ 
+ use super::*;
+ use crate::{HnaStreamState, publication::PublicationReceipt};
+diff --git a/docs/ACOUSTIC_EXPERIMENTS.md b/docs/ACOUSTIC_EXPERIMENTS.md
+index 235b7757..e800afb3 100644
+--- a/docs/ACOUSTIC_EXPERIMENTS.md
++++ b/docs/ACOUSTIC_EXPERIMENTS.md
+@@ -1,10 +1,17 @@
+ # Acoustic experiments through native HNA
+ 
+-[definition] This application attaches ordered PCM material to the existing native phase
++[definition] This probe application attaches ordered PCM material to the existing native phase
+ recurrence. It retains the WAV bytes, complete `ExactAcousticOccurrence`, sample clock, every
+ native return, pending input and one native checkpoint. Labels and transcripts do not enter the
+ sound-current interface. The [Apple plan](plans/HOLONICS_ON_APPLE_SILICON.md) governs scope.
+ 
++[project-postulate] Brandon's September 6 correction rejects using PCM samples as the native
++acoustic organization. The per-sample mapping documented below remains a digital control only.
++Native acoustic holons must be constructed through caused relations, temporal transport and
++receiver consequences; changing the file codec or naming a frame a holon does not supply this.
++The [grain correction](../research/records/2026-09-06_ACOUSTIC_HOLONS_ARE_NOT_PCM_SAMPLE_STEPS.md)
++records the source owners and the revised integration target.
++
+ [open] This guide documents application probes. AS4–AS5 are not complete: the current two-node
+ specimen and fixed sonification have not learned sound or English communication from a corpus.
+ The [status correction](../research/records/2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md)
+diff --git a/docs/HARDWARE_AND_MODALITY_BOUNDARIES.md b/docs/HARDWARE_AND_MODALITY_BOUNDARIES.md
+index e45e681b..1622f5d1 100644
+--- a/docs/HARDWARE_AND_MODALITY_BOUNDARIES.md
++++ b/docs/HARDWARE_AND_MODALITY_BOUNDARIES.md
+@@ -194,9 +194,16 @@ owner; PCM/WAV is a receiver and codec surface after the exact native return.
+ `RecurrentGranularReturnedAffineEcologyRest`. It is not a wrapper for the current
+ `NativeConstitutiveEcology`; nor does the current phase session return a
+ `NativeOpenWorldTubeReceipt`. The Apple/acoustic specification therefore requires the actual
+-PCM-to-native-material and native-outward-current attachments before claiming this composition
++exterior-acoustic-to-native-material and native-outward-current attachments before claiming this composition
+ over the current ecology. Existing acoustic results retain their original body/receiver scope.
+ 
++[project-postulate] Brandon's subsequent September 6 acoustic correction requires native holons,
++not PCM sample ordinals, to organize acoustic material. WAV decoding and playback are exterior
++charts; their coordinates do not prescribe native topology or operation frequency. The
++[grain correction](../research/records/2026-09-06_ACOUSTIC_HOLONS_ARE_NOT_PCM_SAMPLE_STEPS.md)
++locates phase, clock, occurrence and reconstruction owners without treating their older execution
++bodies as an already integrated Apple acoustic learner.
++
+ [open] No current audio owner establishes calibrated microphone pressure, speaker pressure, power,
+ or room acoustics. Those claims require a physical chart with typed units, constitutive and
+ boundary laws, chronology, and calibrated receivers.
+diff --git a/docs/RETRACTIONS.md b/docs/RETRACTIONS.md
+index 9b669153..cbe91704 100644
+--- a/docs/RETRACTIONS.md
++++ b/docs/RETRACTIONS.md
+@@ -6,6 +6,13 @@ root construction state records current implementation scope. Paths in code span
+ 
+ ## Capability and retraction record
+ 
++[historical; source-inspected] September 6 acoustic-grain correction: the Apple application's
++one-PCM-sample/one-native-step mapping is withdrawn as the intended acoustic architecture. It
++remains an explicit digital probe with its actual continuation and timing evidence. Brandon
++requires acoustic material organized as holons through the existing ontology. PCM may remain
++an exterior import/playback chart; packet batching does not establish native acoustic grain.
++See the [source-grounded correction](../research/records/2026-09-06_ACOUSTIC_HOLONS_ARE_NOT_PCM_SAMPLE_STEPS.md).
++
+ [historical] September 6 Apple/audio completion correction: `af2bb8fe`'s AS1–AS5 closure is
+ withdrawn as completion of the intended conversational audio work. AS1–AS3's bounded Metal phase
+ foundation stands. AS4–AS5's two-junction signal controls, sonification, WAV-then-byte exposure
+diff --git a/docs/plans/HOLONICS_ON_APPLE_SILICON.md b/docs/plans/HOLONICS_ON_APPLE_SILICON.md
+index 82020bac..b87436f9 100644
+--- a/docs/plans/HOLONICS_ON_APPLE_SILICON.md
++++ b/docs/plans/HOLONICS_ON_APPLE_SILICON.md
+@@ -120,17 +120,31 @@ governed by [interoperability](../INTEROPERABILITY.md).
+ 
+ ## Acoustic perception and generation
+ 
+-[definition] The initial offline input is a caused mono PCM16 occurrence with a positive sample
+-rate, retained source samples and exact sample chronology. Reuse
+-`life::mathematical_source::acoustic::ExactAcousticOccurrence`. Its frame length, hop and section
+-width are declared receiver extents, never hidden learned capacity. Retain the complete samples
+-alongside any folded section: equal frame sums cannot identify acoustically distinct sources.
++[project-postulate] Brandon's subsequent September 6 correction requires acoustic material to be
++organized as holons through the existing ontology and native constructions. PCM sample ordinals,
++WAV frames and delivery packets do not determine native grains or recurrence steps. The current
++sample-by-sample application is a retained digital probe, not the intended acoustic architecture.
++
++[definition] `life::mathematical_source::acoustic::ExactAcousticOccurrence` is the existing exterior
++WAV import chart. Its sample clock, source samples and declared frame extents preserve the input
++presentation; its folded section does not identify the source. Native acoustic material must carry
++addressed occurrences, caused incidence, local receiver charts, temporal transport, oriented current
++and retained reconstruction fibres. Composition derives native organization from these relations;
++neither a fixed frame size nor an authored spectral/phoneme vocabulary supplies that organization.
++The [acoustic grain correction](../../research/records/2026-09-06_ACOUSTIC_HOLONS_ARE_NOT_PCM_SAMPLE_STEPS.md)
++locates the existing constructions and their current attachment boundaries.
++
++[definition] A compact acoustic realization carries its executable decoder, declared receiver family
++and full reconstruction remainder. Where continuing generators descend through a quotient, retain
++their transport compatibility and separating histories. This is not a requirement to keep every
++source sample in hot native history or to preserve every possible receiver losslessly. Preserve
++source evidence recoverably while constructing and checking the declared representation.
+ 
+ [definition] The first perception return must show how an acoustic occurrence participates in
+ the current native material/contact relation and changes or is read through the continuing
+ ecology. Reuse synchronized occurrence, clock transport and situated returned-difference owners.
+ Do not map a file label, expected sound class or arbitrary frame summary straight into a desired
+-native current. Derive and implement the actual PCM/material-to-contact attachment; report its
++native current. Derive and implement the exterior acoustic chart's native material/contact passage; report its
+ retained fibre and present limitations. A waveform decoder alone is not sound perception.
+ 
+ [definition] The production starting point is native outward port current, preserving its order
+@@ -142,7 +156,7 @@ The first attachment must derive the current ecology's actual outward-port passa
+ interface or factor the codec from its older body wrapper. Do not invent an open-world-tube
+ receipt, adopt an older acoustic body as the new ecology, or play a stored input as native output.
+ 
+-[definition] Keep receiver sample rate, time/frequency support, gain/divisor and PCM quantization
++[definition] Keep exterior receiver sample rate, time/frequency support, gain/divisor and PCM quantization
+ explicit and stable during comparisons. Inspect both the exact emitted current and the audible
+ surface: distinct internal states can collapse to the same rendered sound. Preserve silence,
+ duration and gaps as chronology. Spectra, amplitudes and distances are observer measurements,
+@@ -225,7 +239,8 @@ The acoustic application now appends distinct recordings without resetting its n
+ the serial speech probe still resumes only its original WAV/text experiment. Ordered unlinked
+ packet submission and a bounded Metal complex-incidence contraction are implemented in the
+ [continuation record](../../research/records/2026-09-06_AS4_AS5_CORPUS_CONTINUATION_AND_RESIDENT_PACKETS.md).
+-These do not establish corpus cultivation. Compose source-qualified conversational returns with
++These do not establish corpus cultivation or make PCM samples the native units. Compose
++source-qualified acoustic holons and conversational returns with
+ the shared native material/formation construction, provide useful acoustic and English receivers,
+ and continue execution/storage work. The
+ [acoustic guide](../ACOUSTIC_EXPERIMENTS.md) documents the existing probe interfaces. More data
+diff --git a/docs/plans/THE_ROADMAP.md b/docs/plans/THE_ROADMAP.md
+index 2ac1357b..a3fd334a 100644
+--- a/docs/plans/THE_ROADMAP.md
++++ b/docs/plans/THE_ROADMAP.md
+@@ -68,6 +68,13 @@ persistent development across recordings and turns, useful speech/language condu
+ streaming operation. Microphone access gates none of those; actual device/room checks have their
+ own physical scope. The desktop Athena-alpha order remains independent.
+ 
++[project-postulate] Brandon subsequently rejects PCM sample steps as the native acoustic
++organization. Continue AS4 by composing acoustic holons through the existing native material,
++temporal transport and receiver-relative reconstruction owners, in coordination with linguistic
++formation. Optimize the resulting resident operation; sample-loop batching alone does not supply
++it. The [grain correction](../../research/records/2026-09-06_ACOUSTIC_HOLONS_ARE_NOT_PCM_SAMPLE_STEPS.md)
++amends the Apple specification without adding another construction campaign.
++
+ ## Completed September 6 synthesis before Athena-alpha cultivation
+ 
+ [definition] Brandon's latest request directs repository-wide synthesis of the available
+diff --git a/research/records/2026-09-06_ACOUSTIC_HOLONS_ARE_NOT_PCM_SAMPLE_STEPS.md b/research/records/2026-09-06_ACOUSTIC_HOLONS_ARE_NOT_PCM_SAMPLE_STEPS.md
+new file mode 100644
+index 00000000..a78814a7
+--- /dev/null
++++ b/research/records/2026-09-06_ACOUSTIC_HOLONS_ARE_NOT_PCM_SAMPLE_STEPS.md
+@@ -0,0 +1,74 @@
++# Acoustic holons are not PCM sample steps
++
++[definition] September 6, 2026. Source inspection at `be9211857c330fda4594f218a2a997699e434aa8`
++on `codex/apple-silicon`. This record corrects the acoustic specification and interpretation of the
++[packet measurements](2026-09-06_AS4_AS5_CORPUS_CONTINUATION_AND_RESIDENT_PACKETS.md);
++it does not report a new native implementation or performance run.
++
++## Direct correction
++
++[project-postulate] Brandon's direct message in the MacBook Apple/acoustics task, following the
++explanation of slower-than-real-time processing: “I would rather not use PCM when we they are
++better put as Holons, we have extensive research and ontology about this.” The requested native
++representation is holonic. His preceding request places acoustic/linguistic unification with the
++desktop work; neither a microphone sample nor a new file format resolves that composition.
++
++[established-bounded; source-inspected] `AcousticApplication::current_for` in
++`crates/holonics-hna/src/native/acoustic.rs` supplies `(sample / pcm_divisor, 0)`, optionally adding
++the declared digital return. Scalar and packet execution both perform a native step for every
++sample. Packet submission preserves this chosen sequence. This was an authored experimental
++mapping, not a consequence of the ontology or a requirement imposed by WAV decoding.
++
++## Existing constructions and their boundaries
++
++[established-bounded; source-inspected] The following are existing sources, not newly verified
++theorems or a claim that their complete composition already runs on Apple:
++
++| Owner | Relevant construction and limitation |
++|---|---|
++| `docs/canon/TABLET_THE_OPERATIONS.md`; `TABLET_THE_RESONANCE.md` | Construction composes holons with causal residue; participation and relations precede a receiver's face. Sample count, spectral magnitude and file labels do not found native identity. |
++| `formal/elementary-holonics/ElementaryHolonics/Foundation/CausalNaturalHolon.lean` | `CausalNaturalHolon` carries occurrence/source/target/receiver families and actual parameter passages. `mapPreimageFibre` transports the population behind a face; arbitrary causal transport does not fabricate an inverse. This is formal apparatus, not a runtime to embed. |
++| `formal/elementary-holonics/ElementaryHolonics/Computation/IntrinsicHolonProfile.lean` | Profiles distinguish caused relations and role-indexed dimensions; codec labels do not classify native topology. |
++| `crates/holonic-engine/src/phase_current.rs` | `ExactPhaseCurrentSection` retains receiver, lineage, local clock, full phase coefficients and raw extent; causal convolution carries phase into later cells. The caller's `phase_extent` is a chart choice, not learned grain. Existing CPU execution is not an authorized substitute for the GPU hot operation. |
++| `crates/holonic-life/src/synchronized_occurrence.rs` | `ExactClockTransport` and `SynchronizedReceiverSection` retain distinct local clocks and overlapping cells. Co-presence does not supply association. This owner uses the older live-current mouth, not the current phase-session API. |
++| `crates/holonic-engine/src/native_ecology/recurrent_condensation.rs` | `CondensedRecurrentRest` retains compact standing, executable decoder and fibres with separators for its bounded recurrent family. This is an existing construction to reuse at its actual domain, not an arbitrary WAV compressor. |
++| `crates/holonic-life/src/native_intelligence/membrane_acoustic.rs` and `membrane_acoustic/potential_formation.rs` | Native production carries actual ordered outward currents and both quadratures into an acoustic receiver. Cold PCM rendering follows it. The existing phase attachment/fixed sonification does not yet supply learned acoustic production. |
++
++[definition] `docs/canon/TABLET_THE_COMPRESSION.md` governs a codec pivot: its decoder and
++receiver-relative remainder belong to the construction. Continuing condensation also retains the
++generator transport relation and separating histories required by its domain. This does not impose
++universal losslessness, permanent hot residency of raw audio, or a universal compression gate.
++Source recordings remain recoverable evidence; they are not a source-bearing quotation emitter.
++
++## Corrected AS4–AS5 composition
++
++[definition] Import recorded sound through its exterior chart, then compose situated material with
++addressed source/receiver relations, local temporal support, actual transport and oriented current.
++Retain the complete reconstruction fibre for any admitted projection. Native organization must
++come from that interaction and its returned consequences. Fixed PCM steps, arbitrary frame cuts,
++frequency bins or authored phoneme labels cannot silently determine native morphology.
++
++[definition] Acoustic and linguistic exposure meet through the same native material/current/formation
++construction and one continuing successor. AMI speaker, clock, transcript and response annotations
++remain source-qualified exterior testimony; their metadata alone cannot author learned contact.
++The active phase session and older acoustic/clock bodies have concrete type/execution boundaries
++to compose. Do not create another learner or fabricate older receipts to hide those boundaries.
++
++[definition] Production proceeds from the developed native emission into an explicit acoustic
++receiver, with PCM only where the file/device boundary needs that presentation. Retaining a
++waveform for provenance does not license playing it as native generation. Useful sound perception,
++production and English communication remain the requested products.
++
++[established-bounded; measured] The prior packet run took 63.251 s for 5 s of sound and 46.584 s
++for 6.59 s of English under its recorded debug/concurrent-build conditions. Those are measurements
++of the per-sample probe; no native holonic acoustic representation was compared in that run.
++
++[open] The realized native acoustic carrier, its attachment to shared formation and its end-to-end
++cost remain unfinished. Establish the composition before presenting sample-loop optimization as
++the product path. Fewer operations or smaller storage may follow from lawful composition and
++reuse, but no speedup or real-time capability is established by this correction.
++
++[established-bounded; process-audit] This return updates the Apple specification, live position,
++roadmap, acoustic/hardware guides, retraction history and probe module documentation. Runtime
++behavior and schemas are unchanged. The diff was reviewed and `git diff --check` passed;
++no Cargo, Lean or audio benchmark was rerun for documentation-only changes.
+-- 
+2.54.0
+

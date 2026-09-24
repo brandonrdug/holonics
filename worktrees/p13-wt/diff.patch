@@ -1,0 +1,1155 @@
+diff --git a/crates/holonic-engine/src/cuda_refine.rs b/crates/holonic-engine/src/cuda_refine.rs
+index 2af3cd9c..4c33d87a 100644
+--- a/crates/holonic-engine/src/cuda_refine.rs
++++ b/crates/holonic-engine/src/cuda_refine.rs
+@@ -142,8 +142,7 @@ use membrane_state::{
+     ResidentSparseRelationalBoundaryReceiver, ResidentSparseRelationalConditionedCurrent,
+     ResidentSparseRelationalCurrentAtlasMount, ResidentSparseRelationalCurrentState,
+     ResidentSparseRelationalGeneratorTransport, ResidentTransportedConstitutiveSpine,
+-    ResidentTransportedFactoredHistory, ResidentTransportedFactoredMomentIncidence,
+-    SparsePairActionIngress,
++    ResidentTransportedFactoredMomentIncidence, SparsePairActionIngress,
+ };
+ pub use membrane_types::{
+     ResidentAddressedCurrentPassageReturn, ResidentAddressedFactoredReceiverFrameReturn,
+diff --git a/crates/holonic-engine/src/cuda_refine/complex_parametron.rs b/crates/holonic-engine/src/cuda_refine/complex_parametron.rs
+index 5af60108..e21b2c28 100644
+--- a/crates/holonic-engine/src/cuda_refine/complex_parametron.rs
++++ b/crates/holonic-engine/src/cuda_refine/complex_parametron.rs
+@@ -667,28 +667,22 @@ impl ResidentFactoredConstitutiveSpine {
+ }
+ 
+ impl ResidentTransportedConstitutiveSpine {
++    /// Validate a compact/refactor passage, which carries its own effective incidence.
+     pub(super) fn validate_layout(&self, factors: u32) -> Result<(), CudaRefineError> {
+-        self.effective_incidence.validate_layout()?;
+-        if self.root_rank == 0
+-            || self.history_population == 0
+-            || self.effective_incidence.columns != factors
+-            || self.effective_incidence.rows
+-                != self
+-                    .root_rank
+-                    .checked_mul(self.history_population)
+-                    .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?
+-            || self.history_weight_limb_count == 0
+-            || self.maximal_history_weight.is_zero()
+-            || self.history_weights.pointer == 0
+-        {
++        let effective_incidence = self
++            .effective_incidence
++            .as_ref()
++            .ok_or(CudaRefineError::MembraneInteriorWordShape)?;
++        effective_incidence.validate_layout()?;
++        if effective_incidence.columns != factors {
+             return Err(CudaRefineError::MembraneInteriorWordShape);
+         }
+-        Ok(())
++        self.validate_weights(effective_incidence.rows)
+     }
+-}
+ 
+-impl ResidentTransportedFactoredHistory {
+-    pub(super) fn validate_layout(&self, effective_rows: u32) -> Result<(), CudaRefineError> {
++    /// Validate the history weights against the effective incidence rows they address (a direct
++    /// rooted continuation's rows are the transport's own).
++    pub(super) fn validate_weights(&self, effective_rows: u32) -> Result<(), CudaRefineError> {
+         if self.root_rank == 0
+             || self.history_population == 0
+             || effective_rows
+diff --git a/crates/holonic-engine/src/cuda_refine/membrane_factored_receivers.rs b/crates/holonic-engine/src/cuda_refine/membrane_factored_receivers.rs
+index 1aaa5f05..9538952f 100644
+--- a/crates/holonic-engine/src/cuda_refine/membrane_factored_receivers.rs
++++ b/crates/holonic-engine/src/cuda_refine/membrane_factored_receivers.rs
+@@ -412,6 +412,10 @@ impl super::ResidentMembraneInteriorWord {
+                 (Some(source_spine), Some(transported_spine)) => {
+                     source_spine.validate_layout(source.factor_population)?;
+                     transported_spine.validate_layout(transport.factor_population)?;
++                    let transported_incidence = transported_spine
++                        .effective_incidence
++                        .as_ref()
++                        .ok_or(CudaRefineError::MembraneInteriorWordShape)?;
+                     let presented_histories = source_spine
+                         .history_population
+                         .checked_mul(transport.generator_population)
+@@ -423,15 +427,14 @@ impl super::ResidentMembraneInteriorWord {
+                         return Err(CudaRefineError::MembraneInteriorWordShape);
+                     }
+                     (
+-                        transported_spine.effective_incidence.rows as usize,
++                        transported_incidence.rows as usize,
+                         source_spine.root_rank as usize,
+                         transported_spine.history_population as usize,
+                         transported_spine.history_weight_limb_count as usize,
+                         transported_spine.maximal_history_weight.clone(),
+-                        transported_spine.effective_incidence.numerator_limb_count as usize,
++                        transported_incidence.numerator_limb_count as usize,
+                         source_spine.root_constitutive.numerator_limb_count as usize,
+-                        transported_spine
+-                            .effective_incidence
++                        transported_incidence
+                             .maximal_numerator
+                             .to_biguint()
+                             .ok_or(CudaRefineError::MembraneInteriorWordShape)?,
+@@ -441,8 +444,8 @@ impl super::ResidentMembraneInteriorWord {
+                             .to_biguint()
+                             .ok_or(CudaRefineError::MembraneInteriorWordShape)?,
+                         source_spine.root_constitutive.common_denominator.clone(),
+-                        transported_spine.effective_incidence.signs.pointer,
+-                        transported_spine.effective_incidence.limbs.pointer,
++                        transported_incidence.signs.pointer,
++                        transported_incidence.limbs.pointer,
+                         source_spine.root_constitutive.numerator_signs.pointer,
+                         source_spine.root_constitutive.numerator_limbs.pointer,
+                         transported_spine.history_weights.pointer,
+@@ -454,7 +457,7 @@ impl super::ResidentMembraneInteriorWord {
+                         .productive_history
+                         .as_ref()
+                         .ok_or(CudaRefineError::MembraneInteriorWordShape)?;
+-                    history.validate_layout(transport.transported_row_population)?;
++                    history.validate_weights(transport.transported_row_population)?;
+                     if transport.transported_row_population
+                         != history
+                             .root_rank
+diff --git a/crates/holonic-engine/src/cuda_refine/membrane_factored_transport.rs b/crates/holonic-engine/src/cuda_refine/membrane_factored_transport.rs
+index fab92cb3..71e7cd7e 100644
+--- a/crates/holonic-engine/src/cuda_refine/membrane_factored_transport.rs
++++ b/crates/holonic-engine/src/cuda_refine/membrane_factored_transport.rs
+@@ -253,7 +253,8 @@ impl ResidentMembraneInteriorWord {
+         .checked_add(
+             constitutive_spine
+                 .as_ref()
+-                .map(|spine| spine.effective_incidence.resident_octets)
++                .and_then(|spine| spine.effective_incidence.as_ref())
++                .map(|incidence| incidence.resident_octets)
+                 .unwrap_or(0),
+         )
+         .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?;
+@@ -376,7 +377,14 @@ impl ResidentMembraneInteriorWord {
+         identity.update(source_address.generation.to_le_bytes());
+         identity.update(target_generation.to_le_bytes());
+         identity.update(generator_count.to_le_bytes());
+-        identity.update(transported.effective_incidence.rows.to_le_bytes());
++        identity.update(
++            transported
++                .effective_incidence
++                .as_ref()
++                .ok_or(CudaRefineError::MembraneInteriorWordShape)?
++                .rows
++                .to_le_bytes(),
++        );
+         identity.update(self.factors.to_le_bytes());
+         for target in generator_targets {
+             identity.update(target.to_le_bytes());
+@@ -386,20 +394,15 @@ impl ResidentMembraneInteriorWord {
+             .iter()
+             .map(|octet| format!("{octet:02x}"))
+             .collect::<String>();
+-        let resident_octets = transported
++        let mut transported = transported;
++        let effective_incidence = transported
+             .effective_incidence
++            .take()
++            .ok_or(CudaRefineError::MembraneInteriorWordShape)?;
++        let resident_octets = effective_incidence
+             .resident_octets
+             .checked_add(2 * std::mem::size_of::<u32>() as u64)
+             .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?;
+-        let ResidentTransportedConstitutiveSpine {
+-            root_rank,
+-            history_population,
+-            effective_incidence,
+-            history_weight_limb_count,
+-            maximal_history_weight,
+-            history_weights,
+-            quotient_passage,
+-        } = transported;
+         let ResidentIntegralMatrix {
+             rows,
+             columns,
+@@ -427,14 +430,9 @@ impl ResidentMembraneInteriorWord {
+             productive_admitted,
+             productive_receiver: None,
+             constitutive_spine: None,
+-            productive_history: Some(ResidentTransportedFactoredHistory {
+-                root_rank,
+-                history_population,
+-                history_weight_limb_count,
+-                maximal_history_weight,
+-                history_weights,
+-                quotient_passage,
+-            }),
++            // The incidence moved into the transport's primary buffers above; the spine keeps
++            // its weights and lineage as the direct rooted continuation.
++            productive_history: Some(transported),
+             rank_atlas: None,
+             sparse_conditioned: None,
+             sparse_native_boundary: None,
+diff --git a/crates/holonic-engine/src/cuda_refine/membrane_moment_contraction.rs b/crates/holonic-engine/src/cuda_refine/membrane_moment_contraction.rs
+index cd50fcfb..08b3cdf3 100644
+--- a/crates/holonic-engine/src/cuda_refine/membrane_moment_contraction.rs
++++ b/crates/holonic-engine/src/cuda_refine/membrane_moment_contraction.rs
+@@ -33,12 +33,6 @@ pub(super) fn launch(
+         .quadratic_action
+         .as_ref()
+         .ok_or(CudaRefineError::MembraneInteriorWordShape)?;
+-    let octets = |population: usize, limbs: usize| {
+-        population
+-            .checked_mul(limbs)
+-            .and_then(|words| words.checked_mul(std::mem::size_of::<u32>()))
+-            .ok_or(CudaRefineError::MembraneInteriorWordShape)
+-    };
+ 
+     let axis_count = plan.axis_count;
+     let compatibility_limb_count = plan.compatibility_limb_count;
+@@ -359,24 +353,7 @@ pub(super) fn launch(
+         let observer_work = response_population
+             .checked_mul(axis_count)
+             .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?;
+-        let membrane_moment_workspace::MomentCompletedTargetObserverBuffers {
+-            face_current,
+-            face_relational_real_sign,
+-            face_relational_real_limbs,
+-            face_relational_imaginary_sign,
+-            face_relational_imaginary_limbs,
+-            relational_dot_real_sign,
+-            relational_dot_real_limbs,
+-            relational_dot_imaginary_sign,
+-            relational_dot_imaginary_limbs,
+-            target_norm_limbs,
+-            relational_norm_limbs,
+-            norm_product_limbs,
+-            first_scratch,
+-            second_scratch,
+-            third_scratch,
+-            obstruction,
+-        } = membrane_moment_workspace::allocate_completed_target_observer(
++        let observer = membrane_moment_workspace::allocate_completed_target_observer(
+             response_population,
+             face_factor_population,
+             face_current_limb_count,
+@@ -405,12 +382,14 @@ pub(super) fn launch(
+             *target_relational_imaginary_limbs_pointer;
+         let mut candidate_selected_slots_pointer = aperture.candidate_selected_slots.pointer;
+         let mut candidate_to_target_pointer = aperture.candidate_to_target.pointer;
+-        let mut face_current_pointer = face_current.pointer;
+-        let mut face_relational_real_sign_pointer = face_relational_real_sign.pointer;
+-        let mut face_relational_real_limbs_pointer = face_relational_real_limbs.pointer;
+-        let mut face_relational_imaginary_sign_pointer = face_relational_imaginary_sign.pointer;
+-        let mut face_relational_imaginary_limbs_pointer = face_relational_imaginary_limbs.pointer;
+-        let mut observer_obstruction_pointer = obstruction.pointer;
++        let mut face_current_pointer = observer.face_current.pointer;
++        let mut face_relational_real_sign_pointer = observer.face_relational_real_sign.pointer;
++        let mut face_relational_real_limbs_pointer = observer.face_relational_real_limbs.pointer;
++        let mut face_relational_imaginary_sign_pointer =
++            observer.face_relational_imaginary_sign.pointer;
++        let mut face_relational_imaginary_limbs_pointer =
++            observer.face_relational_imaginary_limbs.pointer;
++        let mut observer_obstruction_pointer = observer.obstruction.pointer;
+         let mut target_count_wire = context_count as u32;
+         let mut selected_slot_count_wire = aperture.selected_slot_count as u32;
+         let mut candidate_count_wire = aperture.candidate_count as u32;
+@@ -477,15 +456,17 @@ pub(super) fn launch(
+         let mut source_class_factor_offset_pointer =
+             quadratic_action.source_class_factor_offsets.pointer;
+         let mut source_class_factor_pointer = quadratic_action.source_class_factors.pointer;
+-        let mut relational_dot_real_sign_pointer = relational_dot_real_sign.pointer;
+-        let mut relational_dot_real_limbs_pointer = relational_dot_real_limbs.pointer;
+-        let mut relational_dot_imaginary_sign_pointer = relational_dot_imaginary_sign.pointer;
+-        let mut relational_dot_imaginary_limbs_pointer = relational_dot_imaginary_limbs.pointer;
+-        let mut target_norm_pointer = target_norm_limbs.pointer;
+-        let mut relational_norm_pointer = relational_norm_limbs.pointer;
+-        let mut first_scratch_pointer = first_scratch.pointer;
+-        let mut second_scratch_pointer = second_scratch.pointer;
+-        let mut third_scratch_pointer = third_scratch.pointer;
++        let mut relational_dot_real_sign_pointer = observer.relational_dot_real_sign.pointer;
++        let mut relational_dot_real_limbs_pointer = observer.relational_dot_real_limbs.pointer;
++        let mut relational_dot_imaginary_sign_pointer =
++            observer.relational_dot_imaginary_sign.pointer;
++        let mut relational_dot_imaginary_limbs_pointer =
++            observer.relational_dot_imaginary_limbs.pointer;
++        let mut target_norm_pointer = observer.target_norm_limbs.pointer;
++        let mut relational_norm_pointer = observer.relational_norm_limbs.pointer;
++        let mut first_scratch_pointer = observer.first_scratch.pointer;
++        let mut second_scratch_pointer = observer.second_scratch.pointer;
++        let mut third_scratch_pointer = observer.third_scratch.pointer;
+         let mut axis_count_wire = axis_count as u32;
+         let mut observer_limb_count_wire = observer_limb_count as u32;
+         let mut direct_arguments: [*mut c_void; 47] = [
+@@ -555,46 +536,7 @@ pub(super) fn launch(
+             },
+             "cuLaunchKernel(contract_membrane_completed_target_observer)",
+         )?;
+-        let resident_working_octets = [
+-            octets(face_factor_population, face_current_limb_count)?,
+-            octets(face_factor_population, face_relational_limb_count)?
+-                .checked_mul(2)
+-                .and_then(|octets| octets.checked_add(face_factor_population * 2))
+-                .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?,
+-            octets(response_population, observer_limb_count)?
+-                .checked_mul(7)
+-                .and_then(|octets| octets.checked_add(response_population * 2))
+-                .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?,
+-            octets(observer_work, observer_limb_count)?
+-                .checked_mul(3)
+-                .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?,
+-            std::mem::size_of::<u32>(),
+-        ]
+-        .into_iter()
+-        .try_fold(0_u64, |sum, octets| {
+-            sum.checked_add(u64::try_from(octets).ok()?)
+-        })
+-        .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?;
+-        completed_target_observer_workspace = Some(ResidentCompletedTargetObserverWorkspace {
+-            face_current,
+-            face_relational_real_sign,
+-            face_relational_real_limbs,
+-            face_relational_imaginary_sign,
+-            face_relational_imaginary_limbs,
+-            relational_dot_real_sign,
+-            relational_dot_real_limbs,
+-            relational_dot_imaginary_sign,
+-            relational_dot_imaginary_limbs,
+-            target_norm_limbs,
+-            relational_norm_limbs,
+-            norm_product_limbs,
+-            first_scratch,
+-            second_scratch,
+-            third_scratch,
+-            limb_count: observer_limb_count,
+-            obstruction,
+-            resident_working_octets,
+-        });
++        completed_target_observer_workspace = Some(observer);
+     } else if materialize_moment_field {
+         driver(
+             unsafe {
+diff --git a/crates/holonic-engine/src/cuda_refine/membrane_moment_workspace.rs b/crates/holonic-engine/src/cuda_refine/membrane_moment_workspace.rs
+index a4ef974d..528bfea4 100644
+--- a/crates/holonic-engine/src/cuda_refine/membrane_moment_workspace.rs
++++ b/crates/holonic-engine/src/cuda_refine/membrane_moment_workspace.rs
+@@ -105,25 +105,6 @@ pub(super) struct MomentFrontWorkspace {
+     pub(super) factorized_relational_workspace: Option<ResidentFactorizedRelationalWorkspace>,
+ }
+ 
+-pub(super) struct MomentCompletedTargetObserverBuffers {
+-    pub(super) face_current: Buffer,
+-    pub(super) face_relational_real_sign: Buffer,
+-    pub(super) face_relational_real_limbs: Buffer,
+-    pub(super) face_relational_imaginary_sign: Buffer,
+-    pub(super) face_relational_imaginary_limbs: Buffer,
+-    pub(super) relational_dot_real_sign: Buffer,
+-    pub(super) relational_dot_real_limbs: Buffer,
+-    pub(super) relational_dot_imaginary_sign: Buffer,
+-    pub(super) relational_dot_imaginary_limbs: Buffer,
+-    pub(super) target_norm_limbs: Buffer,
+-    pub(super) relational_norm_limbs: Buffer,
+-    pub(super) norm_product_limbs: Buffer,
+-    pub(super) first_scratch: Buffer,
+-    pub(super) second_scratch: Buffer,
+-    pub(super) third_scratch: Buffer,
+-    pub(super) obstruction: Buffer,
+-}
+-
+ pub(super) fn allocate(
+     word: &ResidentMembraneInteriorWord,
+     plan: &MomentFrontPlan<'_>,
+@@ -636,7 +617,7 @@ pub(super) fn allocate_completed_target_observer(
+     face_relational_limb_count: usize,
+     observer_limb_count: usize,
+     observer_work: usize,
+-) -> Result<MomentCompletedTargetObserverBuffers, CudaRefineError> {
++) -> Result<ResidentCompletedTargetObserverWorkspace, CudaRefineError> {
+     let face_current = Buffer::alloc(buffer_octets(
+         face_factor_population,
+         face_current_limb_count,
+@@ -668,7 +649,27 @@ pub(super) fn allocate_completed_target_observer(
+     let third_scratch = Buffer::alloc(buffer_octets(observer_work, observer_limb_count)?)?;
+     let obstruction = Buffer::alloc(std::mem::size_of::<u32>())?;
+     obstruction.fill(0, std::mem::size_of::<u32>())?;
+-    Ok(MomentCompletedTargetObserverBuffers {
++    let resident_working_octets = [
++        buffer_octets(face_factor_population, face_current_limb_count)?,
++        buffer_octets(face_factor_population, face_relational_limb_count)?
++            .checked_mul(2)
++            .and_then(|octets| octets.checked_add(face_factor_population * 2))
++            .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?,
++        buffer_octets(response_population, observer_limb_count)?
++            .checked_mul(7)
++            .and_then(|octets| octets.checked_add(response_population * 2))
++            .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?,
++        buffer_octets(observer_work, observer_limb_count)?
++            .checked_mul(3)
++            .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?,
++        std::mem::size_of::<u32>(),
++    ]
++    .into_iter()
++    .try_fold(0_u64, |sum, octets| {
++        sum.checked_add(u64::try_from(octets).ok()?)
++    })
++    .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?;
++    Ok(ResidentCompletedTargetObserverWorkspace {
+         face_current,
+         face_relational_real_sign,
+         face_relational_real_limbs,
+@@ -684,6 +685,8 @@ pub(super) fn allocate_completed_target_observer(
+         first_scratch,
+         second_scratch,
+         third_scratch,
++        limb_count: observer_limb_count,
+         obstruction,
++        resident_working_octets,
+     })
+ }
+diff --git a/crates/holonic-engine/src/cuda_refine/membrane_receiver_completion.rs b/crates/holonic-engine/src/cuda_refine/membrane_receiver_completion.rs
+index 4604fc5d..108a9cd4 100644
+--- a/crates/holonic-engine/src/cuda_refine/membrane_receiver_completion.rs
++++ b/crates/holonic-engine/src/cuda_refine/membrane_receiver_completion.rs
+@@ -180,7 +180,6 @@ impl super::ResidentMembraneInteriorWord {
+                 history_weight_limb_count,
+                 maximal_history_weight,
+                 history_weights,
+-                reconstruction_fibre,
+             ) = match (source_spine, transported_spine) {
+                 (Some(spine), Some(transported)) => {
+                     spine.validate_layout(source_factors)?;
+@@ -203,16 +202,17 @@ impl super::ResidentMembraneInteriorWord {
+                         quotient_passage,
+                         ..
+                     } = transported;
+-                    let mut reconstruction_fibre = spine.reconstruction_fibre;
+-                    if let Some(passage) = quotient_passage {
+-                        if passage.source_history_population != spine.history_population
++                    let effective_incidence =
++                        effective_incidence.ok_or(CudaRefineError::MembraneInteriorWordShape)?;
++                    // The passage lineage is checked and released: the successor spine's history
++                    // weights are the retained quotient (plan phase 13).
++                    if let Some(passage) = quotient_passage
++                        && (passage.source_history_population != spine.history_population
+                             || passage.generator_population != transport.generator_population
+                             || passage.presented_history_population != presented_histories
+-                            || passage.target_history_population != history_population
+-                        {
+-                            return Err(CudaRefineError::MembraneInteriorWordShape);
+-                        }
+-                        reconstruction_fibre.push(passage);
++                            || passage.target_history_population != history_population)
++                    {
++                        return Err(CudaRefineError::MembraneInteriorWordShape);
+                     }
+                     (
+                         spine.root_rank,
+@@ -222,7 +222,6 @@ impl super::ResidentMembraneInteriorWord {
+                         history_weight_limb_count,
+                         maximal_history_weight,
+                         history_weights,
+-                        reconstruction_fibre,
+                     )
+                 }
+                 (None, None) => {
+@@ -258,7 +257,6 @@ impl super::ResidentMembraneInteriorWord {
+                         1,
+                         BigUint::one(),
+                         Buffer::of(&vec![1_u32; transport.generator_population as usize])?,
+-                        Vec::new(),
+                     )
+                 }
+                 _ => return Err(CudaRefineError::MembraneInteriorWordShape),
+@@ -271,7 +269,6 @@ impl super::ResidentMembraneInteriorWord {
+                 history_weight_limb_count,
+                 maximal_history_weight,
+                 history_weights,
+-                reconstruction_fibre,
+             };
+             spine.validate_layout(source_factors)?;
+             (candidate, spine)
+@@ -522,7 +519,7 @@ impl super::ResidentMembraneInteriorWord {
+                 .productive_history
+                 .take()
+                 .ok_or(CudaRefineError::MembraneInteriorWordShape)?;
+-            productive_history.validate_layout(transport.transported_row_population)?;
++            productive_history.validate_weights(transport.transported_row_population)?;
+             target_generation = transport.target_generation;
+             let presented_history_population = source_spine
+                 .history_population
+@@ -539,16 +536,13 @@ impl super::ResidentMembraneInteriorWord {
+             {
+                 return Err(CudaRefineError::MembraneInteriorWordShape);
+             }
+-            let mut reconstruction_fibre = source_spine.reconstruction_fibre;
+-            if let Some(passage) = productive_history.quotient_passage {
+-                if passage.source_history_population != source_spine.history_population
++            if let Some(passage) = &productive_history.quotient_passage
++                && (passage.source_history_population != source_spine.history_population
+                     || passage.generator_population != transport.generator_population
+                     || passage.presented_history_population != presented_history_population
+-                    || passage.target_history_population != productive_history.history_population
+-                {
+-                    return Err(CudaRefineError::MembraneInteriorWordShape);
+-                }
+-                reconstruction_fibre.push(passage);
++                    || passage.target_history_population != productive_history.history_population)
++            {
++                return Err(CudaRefineError::MembraneInteriorWordShape);
+             }
+             let entries = (transport.transported_row_population as usize)
+                 .checked_mul(transport.factor_population as usize)
+@@ -580,7 +574,6 @@ impl super::ResidentMembraneInteriorWord {
+                 history_weight_limb_count: productive_history.history_weight_limb_count,
+                 maximal_history_weight: productive_history.maximal_history_weight,
+                 history_weights: productive_history.history_weights,
+-                reconstruction_fibre,
+             };
+             target_spine.validate_layout(source.factor_population)?;
+             let target = ResidentFactoredMomentState {
+diff --git a/crates/holonic-engine/src/cuda_refine/membrane_state.rs b/crates/holonic-engine/src/cuda_refine/membrane_state.rs
+index dfd6c283..1f6f6b44 100644
+--- a/crates/holonic-engine/src/cuda_refine/membrane_state.rs
++++ b/crates/holonic-engine/src/cuda_refine/membrane_state.rs
+@@ -133,6 +133,8 @@ pub(super) struct ResidentCompletedTargetObservationAperture {
+ 
+ /// Occurrence-local realization of the sparse pushforward from committed target sites to one
+ /// receiver face per local `(port,generator)` incidence.  No target-by-face rectangle is stored.
++/// Allocated whole by `membrane_moment_workspace::allocate_completed_target_observer` (plan phase
++/// 13 retired the duplicate `MomentCompletedTargetObserverBuffers` staging struct).
+ pub(super) struct ResidentCompletedTargetObserverWorkspace {
+     /// Raw pointers into these buffers remain arguments of queued observer kernels; ownership here
+     /// is their CUDA lifetime boundary even when Rust never reads the buffers again.
+@@ -312,7 +314,9 @@ pub(super) struct ResidentIntegralMatrix {
+ 
+ /// Rooted productive presentation `E^T (direct_sum H_root) E`.  Its history and root-coordinate
+ /// addresses are not identified with the compact target-image coordinates even when both return
+-/// the same complete moment.
++/// the same complete moment. The history weights are the whole retained history (plan phase 13):
++/// the per-passage candidate maps it formerly accumulated on the card were an occurrence archive
++/// no later passage read, and are no longer retained.
+ pub(super) struct ResidentFactoredConstitutiveSpine {
+     pub(super) root_rank: u32,
+     pub(super) history_population: u32,
+@@ -321,45 +325,32 @@ pub(super) struct ResidentFactoredConstitutiveSpine {
+     pub(super) history_weight_limb_count: u32,
+     pub(super) maximal_history_weight: BigUint,
+     pub(super) history_weights: Buffer,
+-    pub(super) reconstruction_fibre: Vec<ResidentFactoredHistoryQuotientPassage>,
+ }
+ 
+-/// The next addressed incidence of the rooted spine while the compact target chart is still an
+-/// admission candidate.
++/// The next addressed incidence and history weights of the rooted spine while its passage is
++/// still an admission candidate. A standard compact/refactor passage carries its own
++/// `effective_incidence`; a direct rooted continuation (`productive_history`) already owns its
++/// productive incidence in `ResidentTransportedFactoredMomentIncidence::{signs,limbs}` and
++/// carries `None` here. (Plan phase 13 merged the former `ResidentTransportedFactoredHistory`,
++/// the same object without the duplicated incidence, into this one owner.)
+ pub(super) struct ResidentTransportedConstitutiveSpine {
+     pub(super) root_rank: u32,
+     pub(super) history_population: u32,
+-    pub(super) effective_incidence: ResidentIntegralMatrix,
++    pub(super) effective_incidence: Option<ResidentIntegralMatrix>,
+     pub(super) history_weight_limb_count: u32,
+     pub(super) maximal_history_weight: BigUint,
+     pub(super) history_weights: Buffer,
+     pub(super) quotient_passage: Option<ResidentFactoredHistoryQuotientPassage>,
+ }
+ 
+-/// Weight and reconstruction testimony accompanying a rooted incidence carried in the primary
+-/// transport buffers.  Standard compact/refactor passages need a second incidence and therefore
+-/// use [`ResidentTransportedConstitutiveSpine`]; direct rooted continuation already owns its
+-/// productive incidence in `ResidentTransportedFactoredMomentIncidence::{signs,limbs}` and keeps
+-/// only this non-duplicated continuation fibre beside it.
+-pub(super) struct ResidentTransportedFactoredHistory {
+-    pub(super) root_rank: u32,
+-    pub(super) history_population: u32,
+-    pub(super) history_weight_limb_count: u32,
+-    pub(super) maximal_history_weight: BigUint,
+-    pub(super) history_weights: Buffer,
+-    pub(super) quotient_passage: Option<ResidentFactoredHistoryQuotientPassage>,
+-}
+-
+-/// Complete candidate-history to condensed-history boundary map for one plural passage.  It is
+-/// reconstruction testimony and never selects a productive receiver.
++/// The lineage counts of one plural spine passage, checked against the source spine when the
++/// passage completes. The candidate-to-target map itself is device work of the condensation
++/// kernel and is released at the synchronization that closes the passage.
+ pub(super) struct ResidentFactoredHistoryQuotientPassage {
+     pub(super) source_history_population: u32,
+     pub(super) generator_population: u32,
+     pub(super) presented_history_population: u32,
+     pub(super) target_history_population: u32,
+-    /// Retains the complete candidate fibre on the card beside the productive quotient.
+-    #[allow(dead_code)]
+-    pub(super) candidate_to_target: Buffer,
+ }
+ 
+ /// The native quadratic image occurrence.  The addressed source-current family is deliberately
+@@ -398,7 +389,8 @@ pub(super) struct ResidentTransportedFactoredMomentIncidence {
+     pub(super) productive_admitted: Buffer,
+     pub(super) productive_receiver: Option<ResidentFactoredMomentReceiverState>,
+     pub(super) constitutive_spine: Option<ResidentTransportedConstitutiveSpine>,
+-    pub(super) productive_history: Option<ResidentTransportedFactoredHistory>,
++    /// A direct rooted continuation's weights; its incidence is `signs`/`limbs` above.
++    pub(super) productive_history: Option<ResidentTransportedConstitutiveSpine>,
+     pub(super) rank_atlas: Option<ResidentFactoredMomentRankAtlas>,
+     /// Returned membrane action queued after the current boundary receivers.  The unconditioned
+     /// `limbs` stay alive until the terminal synchronization because those earlier launches read
+diff --git a/crates/holonic-engine/src/cuda_refine/membrane_transport_setup.rs b/crates/holonic-engine/src/cuda_refine/membrane_transport_setup.rs
+index e207d0f0..94753661 100644
+--- a/crates/holonic-engine/src/cuda_refine/membrane_transport_setup.rs
++++ b/crates/holonic-engine/src/cuda_refine/membrane_transport_setup.rs
+@@ -627,10 +627,13 @@ impl ResidentMembraneInteriorWord {
+             )
+             .map_err(|_| CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?,
+         };
++        // The condensation kernel's candidate-to-target map completed at the synchronization
++        // above; it is device work of this passage and is released here rather than retained.
++        drop(candidate_to_target);
+         let returned = ResidentTransportedConstitutiveSpine {
+             root_rank,
+             history_population: target_history_population,
+-            effective_incidence,
++            effective_incidence: Some(effective_incidence),
+             history_weight_limb_count: target_weight_limb_count as u32,
+             maximal_history_weight: target_weight_bound,
+             history_weights: target_weights,
+@@ -639,7 +642,6 @@ impl ResidentMembraneInteriorWord {
+                 generator_population: generator_count,
+                 presented_history_population: candidate_history_population,
+                 target_history_population,
+-                candidate_to_target,
+             }),
+         };
+         returned.validate_layout(self.factors)?;
+diff --git a/crates/holonic-engine/src/cuda_refine/tests/factored_moment.rs b/crates/holonic-engine/src/cuda_refine/tests/factored_moment.rs
+index cfb469b2..9dff0878 100644
+--- a/crates/holonic-engine/src/cuda_refine/tests/factored_moment.rs
++++ b/crates/holonic-engine/src/cuda_refine/tests/factored_moment.rs
+@@ -376,6 +376,51 @@ fn factored_moment_foundation_and_factor_leg_transport_remain_resident() {
+             );
+         }
+     }
++    // Plan phase 13: the founding image and the device-staged target are the storage element of
++    // the weighted family and of its transport `Σ_g Σ_s w_s (T_g f_s)(T_g f_s)ᵀ`.
++    {
++        use crate::factored_moment::{
++            QuadraticMomentStorage, WeightedIntegralCurrent, weighted_family_moment,
++        };
++        let family = contexts
++            .iter()
++            .map(|context| WeightedIntegralCurrent {
++                weight: context.quadratic_weight.clone(),
++                entries: context.factor_current.clone(),
++            })
++            .collect::<Vec<_>>();
++        let transported_family = generators
++            .iter()
++            .flat_map(|generator| {
++                family.iter().map(|source| {
++                    let mut target = std::collections::BTreeMap::<u32, BigUint>::new();
++                    for (factor, coefficient) in &source.entries {
++                        *target.entry(generator[*factor as usize]).or_default() += coefficient;
++                    }
++                    WeightedIntegralCurrent {
++                        weight: source.weight.clone(),
++                        entries: target.into_iter().collect(),
++                    }
++                })
++            })
++            .collect::<Vec<_>>();
++        assert_eq!(
++            returned
++                .foundation
++                .section
++                .moment()
++                .expect("founding storage"),
++            weighted_family_moment(3, &family).expect("family moment")
++        );
++        assert_eq!(
++            descent_return
++                .target
++                .moment()
++                .expect("device target storage"),
++            weighted_family_moment(3, &transported_family).expect("transported moment")
++        );
++        assert!(descent_return.target.is_passive().expect("inertia"));
++    }
+     assert_eq!(transported.transported_incidence, expected);
+     assert_eq!(transported.source_address, returned.target_address);
+     assert_eq!(transported.occurrences.len(), 4);
+@@ -865,6 +910,32 @@ fn addressed_functional_pairs_contract_through_the_admitted_image() {
+         .expect("the descended rooted history remains resident");
+     assert_eq!(spine.history_population, 2);
+     assert!(spine.maximal_history_weight >= BigUint::from(4_u32));
++
++    // Plan phase 13: the resident spine retains only its history weights (the per-passage
++    // candidate maps are no longer archived on the card), and they are exactly the host rooted
++    // spine's quotient after the same three passages.
++    let limb_count = spine.history_weight_limb_count as usize;
++    let mut device_limbs = vec![0_u32; spine.history_population as usize * limb_count];
++    spine
++        .history_weights
++        .read(&mut device_limbs)
++        .expect("the resident history weights read back");
++    let mut device_weights = device_limbs
++        .chunks(limb_count)
++        .map(|limbs| BigUint::new(limbs.to_vec()))
++        .collect::<Vec<_>>();
++    let mut host =
++        crate::factored_moment::FactoredConstitutiveSpine::found(&foundation.foundation.section)
++            .expect("the host rooted spine founds");
++    for _ in 0..3 {
++        host = host
++            .transport_direct_sum(&generators)
++            .expect("the host rooted passage returns");
++    }
++    let mut host_weights = host.history_weights.clone();
++    device_weights.sort();
++    host_weights.sort();
++    assert_eq!(device_weights, host_weights);
+ }
+ 
+ #[test]
+diff --git a/crates/holonic-engine/src/factored_moment.rs b/crates/holonic-engine/src/factored_moment.rs
+index 27f43c01..e48902d4 100644
+--- a/crates/holonic-engine/src/factored_moment.rs
++++ b/crates/holonic-engine/src/factored_moment.rs
+@@ -12,6 +12,9 @@
+ //! coordinate passage derives the next image population and pulls `H` through the same map.
+ //! Cross-moment Gram charts and matrix inverses are construction certificates, not hot-section
+ //! anatomy. Source presentations remain a separate reconstruction fibre.
++//!
++//! Every chart here is one core storage element relation `½⟨x, C x⟩` ([`QuadraticMomentStorage`]);
++//! the resident card realizes the same object in `cuda_refine::membrane_*` (plan phase 13).
+ 
+ mod types;
+ pub use types::*;
+@@ -21,6 +24,8 @@ mod passage;
+ mod section;
+ mod sparse;
+ mod spine;
++mod storage;
++pub use storage::{QuadraticMomentStorage, weighted_family_moment};
+ 
+ #[cfg(test)]
+ #[path = "factored_moment/tests.rs"]
+diff --git a/crates/holonic-engine/src/factored_moment/passage.rs b/crates/holonic-engine/src/factored_moment/passage.rs
+index 7671438a..c5b9e7f4 100644
+--- a/crates/holonic-engine/src/factored_moment/passage.rs
++++ b/crates/holonic-engine/src/factored_moment/passage.rs
+@@ -9,26 +9,8 @@ use thiserror::Error;
+ use std::collections::{BTreeMap, BTreeSet, HashMap};
+ 
+ use super::*;
++use crate::receiver_history_compression::exact_bigint_lcm;
+ 
+-fn exact_bigint_gcd(mut left: BigInt, mut right: BigInt) -> BigInt {
+-    left = left.abs();
+-    right = right.abs();
+-    while !right.is_zero() {
+-        let remainder = left % &right;
+-        left = right;
+-        right = remainder;
+-    }
+-    left
+-}
+-
+-fn exact_bigint_lcm(left: BigInt, right: BigInt) -> BigInt {
+-    if left.is_zero() || right.is_zero() {
+-        BigInt::ZERO
+-    } else {
+-        let divisor = exact_bigint_gcd(left.clone(), right.clone());
+-        (left / divisor * right).abs()
+-    }
+-}
+ use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+ use crate::receiver_history_compression::{
+     AddressedFactoredIntegralReceiverComplex, FactoredIntegralReceiverForm,
+diff --git a/crates/holonic-engine/src/factored_moment/section.rs b/crates/holonic-engine/src/factored_moment/section.rs
+index 0761b6f4..887bbd28 100644
+--- a/crates/holonic-engine/src/factored_moment/section.rs
++++ b/crates/holonic-engine/src/factored_moment/section.rs
+@@ -9,6 +9,7 @@ use thiserror::Error;
+ use std::collections::{BTreeMap, BTreeSet, HashMap};
+ 
+ use super::*;
++use crate::receiver_history_compression::{exact_bigint_gcd, exact_bigint_lcm};
+ 
+ /// Refactor a direct sum through an intrinsic row image. The selected rows remain integral;
+ /// `source_to_image` carries every transported row into that basis, and the constitutive form is
+@@ -101,26 +102,6 @@ impl IntegralFactorSpanFounder {
+     }
+ }
+ 
+-fn exact_bigint_gcd(mut left: BigInt, mut right: BigInt) -> BigInt {
+-    left = left.abs();
+-    right = right.abs();
+-    while !right.is_zero() {
+-        let remainder = left % &right;
+-        left = right;
+-        right = remainder;
+-    }
+-    left
+-}
+-
+-fn exact_bigint_lcm(left: BigInt, right: BigInt) -> BigInt {
+-    if left.is_zero() || right.is_zero() {
+-        BigInt::ZERO
+-    } else {
+-        let divisor = exact_bigint_gcd(left.clone(), right.clone());
+-        (left / divisor * right).abs()
+-    }
+-}
+-
+ impl FactoredMomentSection {
+     /// Found the exact canonical image chart from one positive weighted integral current family.
+     /// The family is returned separately as reconstruction testimony and is not retained by the
+diff --git a/crates/holonic-engine/src/factored_moment/spine.rs b/crates/holonic-engine/src/factored_moment/spine.rs
+index 5760d909..c64bb744 100644
+--- a/crates/holonic-engine/src/factored_moment/spine.rs
++++ b/crates/holonic-engine/src/factored_moment/spine.rs
+@@ -29,7 +29,6 @@ impl FactoredConstitutiveSpine {
+             root_constitutive: section.constitutive.clone(),
+             effective_incidence: section.incidence.clone(),
+             history_weights: vec![BigUint::one()],
+-            reconstruction_fibre: Vec::new(),
+         })
+     }
+ 
+@@ -63,6 +62,16 @@ impl FactoredConstitutiveSpine {
+         &self,
+         generators: &[Vec<u32>],
+     ) -> Result<Self, FactoredMomentError> {
++        Ok(self.transport_with_quotient(generators)?.0)
++    }
++
++    /// [`Self::transport_direct_sum`] together with the passage's candidate-to-target boundary
++    /// map. The map is returned as a reading of this passage; the successor spine does not retain
++    /// it (its history weights are the retained quotient).
++    pub fn transport_with_quotient(
++        &self,
++        generators: &[Vec<u32>],
++    ) -> Result<(Self, FactoredHistoryQuotientPassage), FactoredMomentError> {
+         self.validate()?;
+         let factors = self.factor_population as usize;
+         if generators.is_empty()
+@@ -112,8 +121,7 @@ impl FactoredConstitutiveSpine {
+         }
+         let history_population =
+             u32::try_from(distinct_blocks.len()).map_err(|_| FactoredMomentError::Shape)?;
+-        let mut reconstruction_fibre = self.reconstruction_fibre.clone();
+-        reconstruction_fibre.push(FactoredHistoryQuotientPassage {
++        let passage = FactoredHistoryQuotientPassage {
+             source_history_population: self.history_population,
+             generator_population: u32::try_from(generators.len())
+                 .map_err(|_| FactoredMomentError::Shape)?,
+@@ -121,7 +129,7 @@ impl FactoredConstitutiveSpine {
+                 .map_err(|_| FactoredMomentError::Shape)?,
+             target_history_population: history_population,
+             candidate_to_target,
+-        });
++        };
+         let returned = Self {
+             schema: self.schema.clone(),
+             factor_population: self.factor_population,
+@@ -132,10 +140,9 @@ impl FactoredConstitutiveSpine {
+                 distinct_blocks.into_iter().flatten().collect(),
+             )?,
+             history_weights,
+-            reconstruction_fibre,
+         };
+         returned.validate()?;
+-        Ok(returned)
++        Ok((returned, passage))
+     }
+ 
+     /// Reconstruct the complete moment through the addressed direct sum of the root constitutive
+diff --git a/crates/holonic-engine/src/factored_moment/tests.rs b/crates/holonic-engine/src/factored_moment/tests.rs
+index a9ea0ace..d8f0be41 100644
+--- a/crates/holonic-engine/src/factored_moment/tests.rs
++++ b/crates/holonic-engine/src/factored_moment/tests.rs
+@@ -380,18 +380,16 @@ fn equal_complete_history_blocks_descend_with_multiplicity_and_reconstruction_fi
+         .section
+         .transport_direct_sum(&generators)
+         .expect("compact direct sum");
+-    let descended = FactoredConstitutiveSpine::found(&foundation.section)
++    let (descended, passage) = FactoredConstitutiveSpine::found(&foundation.section)
+         .expect("root")
+-        .transport_direct_sum(&generators)
++        .transport_with_quotient(&generators)
+         .expect("exact history descent");
+ 
+     assert_eq!(descended.history_population, 1);
+     assert_eq!(descended.history_weights, vec![BigUint::from(2_u32)]);
+-    assert_eq!(descended.reconstruction_fibre.len(), 1);
+-    assert_eq!(
+-        descended.reconstruction_fibre[0].candidate_to_target,
+-        vec![0, 0]
+-    );
++    assert_eq!(passage.candidate_to_target, vec![0, 0]);
++    assert_eq!(passage.presented_history_population, 2);
++    assert_eq!(passage.target_history_population, 1);
+     assert!(
+         descended
+             .agrees_with(&compact.target)
+@@ -525,3 +523,183 @@ fn section_admission_rejects_false_basis_and_constitutive_certificates() {
+         Err(FactoredMomentError::Linear(_))
+     ));
+ }
++
++fn transported_weighted_family(
++    family: &[WeightedIntegralCurrent],
++    generators: &[Vec<u32>],
++) -> Vec<WeightedIntegralCurrent> {
++    generators
++        .iter()
++        .flat_map(|generator| {
++            family.iter().map(|source| {
++                let mut target = std::collections::BTreeMap::<u32, BigUint>::new();
++                for (factor, coefficient) in &source.entries {
++                    *target.entry(generator[*factor as usize]).or_default() += coefficient;
++                }
++                WeightedIntegralCurrent {
++                    weight: source.weight.clone(),
++                    entries: target.into_iter().collect(),
++                }
++            })
++        })
++        .collect()
++}
++
++fn rats(values: &[i64]) -> Vec<Rat> {
++    values
++        .iter()
++        .map(|value| Rat::from_integer(BigInt::from(*value)))
++        .collect()
++}
++
++/// Plan phase 13: the compact image chart, the rooted spine and the fixed pair carrier are one
++/// storage element `½⟨x, C x⟩` with `C = Σ w f fᵀ`, before and after a plural generator passage.
++#[test]
++fn every_moment_chart_is_one_storage_element_of_the_weighted_family() {
++    let family = vec![
++        current(2, &[(0, 1), (1, 2), (2, 3)]),
++        current(3, &[(0, 2), (1, 1), (2, 1)]),
++    ];
++    let generators = vec![vec![1, 2, 0], vec![0, 0, 2]];
++    let direct = weighted_family_moment(3, &family).expect("direct moment");
++
++    let compact = FactoredMomentSection::found(3, family.clone()).expect("compact foundation");
++    let spine = FactoredConstitutiveSpine::found(&compact.section).expect("root spine");
++    let sparse = SparseQuadraticMomentFoundation::found(3, family.clone(), generators.clone())
++        .expect("sparse foundation");
++    assert_eq!(compact.section.moment().expect("compact moment"), direct);
++    assert_eq!(spine.moment().expect("spine moment"), direct);
++    assert_eq!(sparse.section.moment().expect("pair moment"), direct);
++
++    let transported_family = transported_weighted_family(&family, &generators);
++    let transported = weighted_family_moment(3, &transported_family).expect("transported moment");
++    let compact_next = compact
++        .section
++        .transport_direct_sum(&generators)
++        .expect("compact passage")
++        .target;
++    let spine_next = spine
++        .transport_direct_sum(&generators)
++        .expect("spine passage");
++    let sparse_next = sparse
++        .section
++        .transport_direct_sum(&sparse.action)
++        .expect("pair passage");
++    assert_eq!(compact_next.moment().expect("compact"), transported);
++    assert_eq!(spine_next.moment().expect("spine"), transported);
++    assert_eq!(sparse_next.moment().expect("pair"), transported);
++
++    let x = rats(&[1, -2, 3]);
++    for (chart, source) in [
++        (&compact.section as &dyn QuadraticMomentStorage, &family),
++        (&spine as &dyn QuadraticMomentStorage, &family),
++        (&sparse.section as &dyn QuadraticMomentStorage, &family),
++        (
++            &compact_next as &dyn QuadraticMomentStorage,
++            &transported_family,
++        ),
++        (
++            &spine_next as &dyn QuadraticMomentStorage,
++            &transported_family,
++        ),
++        (
++            &sparse_next as &dyn QuadraticMomentStorage,
++            &transported_family,
++        ),
++    ] {
++        assert!(matches!(
++            chart.element().expect("element"),
++            holonic_core::element::ElementRelation::Storage { .. }
++        ));
++        assert!(chart.is_passive().expect("inertia"));
++        // ½ Σ w ⟨f, x⟩²: the energy of the rank-one family itself.
++        let expected = source
++            .iter()
++            .map(|current| {
++                let pairing = current
++                    .entries
++                    .iter()
++                    .map(|(factor, coefficient)| {
++                        Rat::from_integer(BigInt::from(coefficient.clone())) * &x[*factor as usize]
++                    })
++                    .fold(Rat::zero(), |sum, term| sum + term);
++                Rat::from_integer(BigInt::from(current.weight.clone())) * &pairing * &pairing
++            })
++            .fold(Rat::zero(), |sum, term| sum + term)
++            * Rat::new(BigInt::one(), BigInt::from(2));
++        assert_eq!(chart.stored_energy(&x).expect("energy"), expected);
++    }
++
++    let work = compact
++        .section
++        .deposition_work(&compact_next, &x)
++        .expect("deposition work");
++    assert_eq!(
++        work,
++        compact_next.stored_energy(&x).expect("after")
++            - compact.section.stored_energy(&x).expect("before")
++    );
++    assert_eq!(
++        spine
++            .deposition_work(&sparse_next, &x)
++            .expect("cross-chart work"),
++        work
++    );
++
++    // A returned diagonal restriction changes the pair storage to `D C D` at the same generation.
++    let restriction = vec![(0, BigUint::from(2_u32)), (2, BigUint::from(1_u32))];
++    let conditioned = sparse_next
++        .condition_by_diagonal_restriction(&restriction)
++        .expect("conditioned");
++    let diagonal = ExactRatMatrix::new(
++        (0..3)
++            .map(|row| {
++                (0..3)
++                    .map(|column| {
++                        if row != column {
++                            Rat::zero()
++                        } else {
++                            restriction
++                                .iter()
++                                .find(|(factor, _)| *factor as usize == row)
++                                .map(|(_, value)| Rat::from_integer(BigInt::from(value.clone())))
++                                .unwrap_or_else(Rat::zero)
++                        }
++                    })
++                    .collect()
++            })
++            .collect(),
++    )
++    .expect("diagonal");
++    assert_eq!(
++        conditioned.moment().expect("conditioned moment"),
++        diagonal
++            .multiply(&transported)
++            .and_then(|held| held.multiply(&diagonal))
++            .expect("D C D")
++    );
++}
++
++/// Plan phase 13: the retired per-passage archive of the rooted spine still decodes (the field is
++/// ignored) into the same quotient.
++#[test]
++fn a_spine_wire_carrying_the_retired_passage_archive_still_decodes() {
++    let foundation = FactoredMomentSection::found(
++        3,
++        vec![current(2, &[(0, 1), (1, 2)]), current(3, &[(1, 1), (2, 1)])],
++    )
++    .expect("foundation");
++    let generators = vec![vec![1, 2, 0], vec![1, 2, 0]];
++    let (spine, passage) = FactoredConstitutiveSpine::found(&foundation.section)
++        .expect("root")
++        .transport_with_quotient(&generators)
++        .expect("passage");
++    let mut wire = serde_json::to_value(&spine).expect("wire");
++    assert!(wire.get("reconstruction_fibre").is_none());
++    wire.as_object_mut().expect("object").insert(
++        "reconstruction_fibre".to_owned(),
++        serde_json::to_value(vec![passage]).expect("legacy archive"),
++    );
++    let decoded: FactoredConstitutiveSpine = serde_json::from_value(wire).expect("legacy decode");
++    assert_eq!(decoded, spine);
++}
+diff --git a/crates/holonic-engine/src/factored_moment/types.rs b/crates/holonic-engine/src/factored_moment/types.rs
+index a9f317cf..3641fe85 100644
+--- a/crates/holonic-engine/src/factored_moment/types.rs
++++ b/crates/holonic-engine/src/factored_moment/types.rs
+@@ -175,11 +175,16 @@ pub struct FactoredConstitutiveSpine {
+     pub effective_incidence: ExactRatMatrix,
+     /// Exact ordered-history multiplicity carried by each distinct incidence block.  Equal
+     /// realizations are one productive block but never lose the population which reached it.
++    /// These multiplicities are the whole retained history: the spine is the quotient sufficient
++    /// for every later moment and receiver (plan phase 13). The earlier per-passage
++    /// `reconstruction_fibre` list was an occurrence archive nothing read; a wire carrying it still
++    /// decodes (the field is ignored), and each passage's boundary map is returned by
++    /// [`FactoredConstitutiveSpine::transport_with_quotient`] instead of being retained.
+     pub history_weights: Vec<BigUint>,
+-    /// Complete candidate-history boundary maps retained by each exact action descent.
+-    pub reconstruction_fibre: Vec<FactoredHistoryQuotientPassage>,
+ }
+ 
++/// The candidate-history to condensed-history boundary map of one plural spine passage: a reading
++/// returned with that passage, never retained by the spine.
+ #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+ pub struct FactoredHistoryQuotientPassage {
+     pub source_history_population: u32,
+diff --git a/crates/holonic-engine/src/receiver_history_compression/factored_forms.rs b/crates/holonic-engine/src/receiver_history_compression/factored_forms.rs
+index 945fbf3c..ebf70807 100644
+--- a/crates/holonic-engine/src/receiver_history_compression/factored_forms.rs
++++ b/crates/holonic-engine/src/receiver_history_compression/factored_forms.rs
+@@ -126,6 +126,8 @@ impl SparseIntegralBilinearForm {
+     }
+ }
+ 
++/// The nonnegative greatest common divisor. The one exact integer gcd of the moment owners
++/// (`factored_moment`, `receiver_history_compression`).
+ pub(crate) fn exact_bigint_gcd(mut left: BigInt, mut right: BigInt) -> BigInt {
+     while !right.is_zero() {
+         let remainder = left % &right;
+@@ -135,6 +137,16 @@ pub(crate) fn exact_bigint_gcd(mut left: BigInt, mut right: BigInt) -> BigInt {
+     left.abs()
+ }
+ 
++/// The nonnegative least common multiple; zero when either argument is zero.
++pub(crate) fn exact_bigint_lcm(left: BigInt, right: BigInt) -> BigInt {
++    if left.is_zero() || right.is_zero() {
++        BigInt::ZERO
++    } else {
++        let divisor = exact_bigint_gcd(left.clone(), right.clone());
++        (left / divisor * right).abs()
++    }
++}
++
+ /// One exact factor through the primitive integral form frame.  `None` is the zero receiver;
+ /// otherwise the represented form is `scale * forms[coordinate]`.
+ #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+diff --git a/crates/holonic-engine/src/receiver_history_compression/projective_history.rs b/crates/holonic-engine/src/receiver_history_compression/projective_history.rs
+index 05c90b25..fd79c544 100644
+--- a/crates/holonic-engine/src/receiver_history_compression/projective_history.rs
++++ b/crates/holonic-engine/src/receiver_history_compression/projective_history.rs
+@@ -1,5 +1,5 @@
+ use super::compression::exact_biguint_gcd;
+-use super::factored_forms::exact_bigint_gcd;
++use super::factored_forms::{exact_bigint_gcd, exact_bigint_lcm};
+ use super::*;
+ /// One primitive nonzero projective current ray on the native factor population.  The ray is a
+ /// hot coordinate of the quadratic moment; its removed positive scale is carried separately and
+@@ -592,15 +592,6 @@ impl RationalFactoredForm {
+     }
+ }
+ 
+-fn exact_bigint_lcm(left: BigInt, right: BigInt) -> BigInt {
+-    if left.is_zero() || right.is_zero() {
+-        BigInt::ZERO
+-    } else {
+-        let divisor = exact_bigint_gcd(left.clone().abs(), right.clone().abs());
+-        (left / divisor * right).abs()
+-    }
+-}
+-
+ struct RationalFactoredSpanFounder {
+     factor_population: u32,
+     basis: Vec<RationalFactoredForm>,

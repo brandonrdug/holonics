@@ -1,0 +1,428 @@
+From ba1068dd3f89ef57495e0dd58bb428d10269c359 Mon Sep 17 00:00:00 2001
+From: Brandon Duggan <brandonrdug@users.noreply.github>
+Date: Mon, 7 Sep 2026 14:47:45 -0700
+Subject: [PATCH 09/18] Attach timed acoustic sections to shared resident
+ currents
+
+---
+ CONSTRUCTION_STATE.md                         |   6 +
+ .../holonics-hna/src/native/acoustic_field.rs | 107 +++++++++++++++++-
+ .../src/native/acoustic_field/tests.rs        |  96 +++++++++++++++-
+ docs/ACOUSTIC_EXPERIMENTS.md                  |   7 ++
+ docs/ARCHITECTURE_MAP.md                      |   6 +
+ docs/plans/HOLONICS_ON_APPLE_SILICON.md       |   3 +
+ ..._ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md |  54 +++++++++
+ 7 files changed, 272 insertions(+), 7 deletions(-)
+ create mode 100644 research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md
+
+diff --git a/CONSTRUCTION_STATE.md b/CONSTRUCTION_STATE.md
+index 53399940..812831f1 100644
+--- a/CONSTRUCTION_STATE.md
++++ b/CONSTRUCTION_STATE.md
+@@ -25,6 +25,12 @@ constraint graph and subsequent prediction. The public text-codec control reache
+ unported paired-field refusal. Actual acoustic interval/interaction and condition/receiver
+ composition is next. No useful acoustic or English model is claimed.
+ 
++[established-bounded; measured] The [acoustic resident ingress](research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md)
++now exposes complete timed PCM cells to the same rational-current port, preserving source
++delivery lineage, zeros and padding without advancing the source cursor. Five acoustic-field
++controls pass. Next attach actual recording intervals and source/response pointers; the available
++AMI mono material does not supply separate microphone channels through its speaker labels.
++
+ [established-bounded; measured] The September 7 Mac pickup integrates desktop `6ef7bf9d` with
+ 68 passing engine/public native tests and successful HNA library, application and shared-example
+ checks. The [integration record](research/records/2026-09-07_APPLE_INTEGRATES_THE_SHARED_CONDITIONAL_GENERATOR_HANDOFF.md)
+diff --git a/crates/holonics-hna/src/native/acoustic_field.rs b/crates/holonics-hna/src/native/acoustic_field.rs
+index cd28fcc9..61de5f23 100644
+--- a/crates/holonics-hna/src/native/acoustic_field.rs
++++ b/crates/holonics-hna/src/native/acoustic_field.rs
+@@ -9,8 +9,10 @@ use holonic_engine::{
+     native_ecology::constitutive_fibre::{
+         ConstitutiveFibreError, NativeConstitutiveField, NativeFieldEmission,
+         NativeFieldOccurrence, NativeFieldReceiverStatus, NativeFieldStep, NativePhaseCurrent,
++        ResidentConstitutiveCurrent,
+     },
+     phase_current::{ExactPhaseCurrentSection, PhaseCurrentLineageId, PhaseCurrentReceiverId},
++    resident_section::{ResidentGrain, ResidentSection, ResidentSectionRest, ResidentSurface},
+ };
+ use life::mathematical_source::ExactAcousticOccurrence;
+ use num_bigint::BigInt;
+@@ -39,11 +41,59 @@ pub struct AcousticFieldSupport {
+     pub structural_padding: usize,
+ }
+ 
++/// One immutable chart cell mounted as a resident rational current. The chart borrow keeps the
++/// complete raw PCM source and its receiver/lineage testimony live while the cell is consumed.
++pub struct AcousticFieldCell<'surface, 'source> {
++    chart: &'source AcousticFieldChart,
++    section: ResidentSection<'surface>,
++    support: AcousticFieldSupport,
++}
++
++impl<'surface, 'source> AcousticFieldCell<'surface, 'source> {
++    pub fn section(&self) -> &ResidentSection<'surface> {
++        &self.section
++    }
++
++    pub fn rational(
++        &self,
++    ) -> Result<ResidentConstitutiveCurrent<'_, 'surface>, AcousticFieldError> {
++        Ok(ResidentConstitutiveCurrent::rational(&self.section)?)
++    }
++
++    pub fn chart(&self) -> &'source AcousticFieldChart {
++        self.chart
++    }
++
++    pub fn support(&self) -> &AcousticFieldSupport {
++        &self.support
++    }
++
++    pub fn receiver(&self) -> PhaseCurrentReceiverId {
++        self.chart.section.receiver
++    }
++
++    pub fn lineage(&self) -> PhaseCurrentLineageId {
++        self.chart.section.lineage
++    }
++
++    pub fn divisor(&self) -> i64 {
++        self.chart.divisor
++    }
++
++    pub fn sample_step(&self) -> &BigRational {
++        &self.chart.section.sample_step
++    }
++}
++
+ /// A cold reversible chart over the existing phase-current section. Its private construction
+ /// prevents arbitrary serialized coefficients from being accepted as a validated PCM chart.
+ pub struct AcousticFieldChart {
+     section: ExactPhaseCurrentSection,
+     source_occurrence: String,
++    // Exterior delivery lineage copied from the decoded occurrence, never semantic identity.
++    source_locator: String,
++    source_sha256: String,
++    source_octets: u64,
+     divisor: i64,
+     cursor: usize,
+ }
+@@ -74,6 +124,9 @@ impl AcousticFieldChart {
+         Ok(Self {
+             section,
+             source_occurrence: source.occurrence.clone(),
++            source_locator: source.locator.clone(),
++            source_sha256: source.source_sha256.clone(),
++            source_octets: source.source_octets,
+             divisor,
+             cursor: 0,
+         })
+@@ -82,6 +135,15 @@ impl AcousticFieldChart {
+     pub fn section(&self) -> &ExactPhaseCurrentSection {
+         &self.section
+     }
++    pub fn source_locator(&self) -> &str {
++        &self.source_locator
++    }
++    pub fn source_sha256(&self) -> &str {
++        &self.source_sha256
++    }
++    pub fn source_octets(&self) -> u64 {
++        self.source_octets
++    }
+     pub fn divisor(&self) -> i64 {
+         self.divisor
+     }
+@@ -102,17 +164,17 @@ impl AcousticFieldChart {
+             .collect()
+     }
+ 
+-    pub fn next_support(&self) -> Option<AcousticFieldSupport> {
+-        if self.is_complete() {
+-            return None;
++    fn support_at(&self, cell: usize) -> Result<AcousticFieldSupport, AcousticFieldError> {
++        if cell >= self.section.cells.len() {
++            return Err(AcousticFieldError::Chart("cell out of range".into()));
+         }
+         let width = self.section.phase_extent as usize;
+-        let from = self.cursor * width;
++        let from = cell * width;
+         let until = (from + width).min(self.section.raw_extent());
+         let at = |i: usize| &self.section.origin + &self.section.sample_step * BigInt::from(i);
+-        Some(AcousticFieldSupport {
++        Ok(AcousticFieldSupport {
+             source_occurrence: self.source_occurrence.clone(),
+-            cell: self.cursor,
++            cell,
+             coefficient_from: from,
+             coefficient_until: until,
+             begin: at(from),
+@@ -121,6 +183,39 @@ impl AcousticFieldChart {
+         })
+     }
+ 
++    pub fn next_support(&self) -> Option<AcousticFieldSupport> {
++        self.support_at(self.cursor).ok()
++    }
++
++    /// Mount one chosen temporal cell as `(sample / divisor, 0)` complex coordinates. The
++    /// operation is read-only with respect to this chart: it neither advances `cursor` nor
++    /// changes the retained PCM source or its receiver-local chronology.
++    pub fn mount_cell<'surface, 'source>(
++        &'source self,
++        surface: &'surface ResidentSurface<'surface>,
++        cell: usize,
++    ) -> Result<AcousticFieldCell<'surface, 'source>, AcousticFieldError> {
++        let support = self.support_at(cell)?;
++        let width = self.section.phase_extent as usize;
++        let mut words = Vec::with_capacity(2 * width + 1);
++        for sample in &self.section.cells[cell] {
++            let sample = sample.to_i64().expect("validated source");
++            words.push((sample, sample));
++            words.push((0, 0));
++        }
++        words.push((self.divisor, self.divisor));
++        let rest = ResidentSectionRest::found(1, words.len(), ResidentGrain(0), 64, words)
++            .map_err(AcousticFieldError::Chart)?;
++        let section = surface
++            .mount_section_rest(&rest)
++            .map_err(ConstitutiveFibreError::from)?;
++        Ok(AcousticFieldCell {
++            chart: self,
++            section,
++            support,
++        })
++    }
++
+     fn prepare(&self, source: Option<NativeFieldEmission>) -> NativeFieldOccurrence {
+         let incoming = self.section.cells[self.cursor]
+             .iter()
+diff --git a/crates/holonics-hna/src/native/acoustic_field/tests.rs b/crates/holonics-hna/src/native/acoustic_field/tests.rs
+index 320de182..9fc54941 100644
+--- a/crates/holonics-hna/src/native/acoustic_field/tests.rs
++++ b/crates/holonics-hna/src/native/acoustic_field/tests.rs
+@@ -1,6 +1,9 @@
+ use super::*;
+ use holonic_engine::{
+-    embedding_fiber::ResidentReadout, native_ecology::constitutive_fibre::NativeJunctionSeed,
++    embedding_fiber::ResidentReadout,
++    native_ecology::constitutive_fibre::{
++        ConstitutiveReading, NativeJunctionSeed, ResidentConstitutiveFibre,
++    },
+     resident_section::ResidentSurface,
+ };
+ 
+@@ -78,6 +81,29 @@ fn equal_integrated_faces_retain_different_temporal_fibres() {
+     assert_ne!(a.prepare(None).incoming(), b.prepare(None).incoming());
+ }
+ 
++#[test]
++fn chosen_cell_support_is_exact_and_does_not_advance_the_chart() {
++    let c = chart(&[-7, 0, 9], 2);
++    assert!(c.support_at(usize::MAX).is_err());
++    let support = c.support_at(1).unwrap();
++    assert_eq!(support.source_occurrence, "source");
++    assert_eq!(support.cell, 1);
++    assert_eq!(support.coefficient_from, 2);
++    assert_eq!(support.coefficient_until, 3);
++    assert_eq!(support.structural_padding, 1);
++    assert_eq!(
++        support.begin,
++        BigRational::new(7.into(), 3.into()) + BigRational::new(2.into(), 16000.into())
++    );
++    assert_eq!(
++        support.end,
++        BigRational::new(7.into(), 3.into()) + BigRational::new(3.into(), 16000.into())
++    );
++    assert_eq!(c.cursor(), 0);
++    assert_eq!(c.reconstruct_samples(), vec![-7, 0, 9]);
++    assert!(c.support_at(2).is_err());
++}
++
+ #[test]
+ #[ignore = "requires resident native field backend"]
+ fn acoustic_field_returns_complete_branches_and_preserves_refused_source() {
+@@ -114,3 +140,71 @@ fn acoustic_field_returns_complete_branches_and_preserves_refused_source() {
+     assert!(chart.is_complete());
+     assert_eq!(field.occurrence_count(), 3);
+ }
++
++#[test]
++#[ignore = "requires resident native field backend"]
++fn mounted_cells_keep_exact_pcm_support_and_feed_rational_current_without_readback() {
++    let readout = ResidentReadout::new().unwrap();
++    let surface = ResidentSurface::on(&readout).unwrap();
++    let c = chart(&[-7, 0, 9], 2);
++    let before = surface.census();
++    assert!(c.mount_cell(&surface, usize::MAX).is_err());
++    assert_eq!(surface.census(), before);
++    let negative_zero = c.mount_cell(&surface, 0).unwrap();
++    let padded = c.mount_cell(&surface, 1).unwrap();
++    assert_eq!(negative_zero.support().structural_padding, 0);
++    assert_eq!(padded.support().structural_padding, 1);
++    assert_eq!(padded.receiver(), PhaseCurrentReceiverId(1));
++    assert_eq!(padded.lineage(), PhaseCurrentLineageId(2));
++    let decoded = source(&[-7, 0, 9]);
++    assert_eq!(padded.chart().source_locator(), decoded.locator);
++    assert_eq!(padded.chart().source_sha256(), decoded.source_sha256);
++    assert_eq!(padded.chart().source_octets(), decoded.source_octets);
++    assert_eq!(padded.chart().reconstruct_samples(), decoded.samples);
++    assert_eq!(padded.divisor(), 32768);
++    assert_eq!(
++        padded.sample_step(),
++        &BigRational::new(1.into(), 16000.into())
++    );
++    assert_eq!(c.cursor(), 0);
++
++    let mut body = ResidentConstitutiveFibre::found(&surface, 4, 4).unwrap();
++    let before = surface.census();
++    // Identity-receiver control: the native relation must transport the common denominator
++    // to a new magnitude while preserving every zero quadrature and padded source coordinate.
++    body.advance_resident(
++        negative_zero.rational().unwrap(),
++        Some(negative_zero.rational().unwrap()),
++    )
++    .unwrap();
++    let returned = body
++        .advance_resident(padded.rational().unwrap(), None)
++        .unwrap();
++    let after = surface.census();
++    assert_eq!(after.section_read_outs, before.section_read_outs);
++    assert_eq!(after.egress_section_octets, before.egress_section_octets);
++    assert_eq!(after.ingress_octets, before.ingress_octets);
++    match returned.inspect().unwrap().predecessor_reading {
++        ConstitutiveReading::Unique { current } => assert_eq!(
++            current,
++            vec![
++                BigRational::new(9.into(), 32768.into()),
++                BigRational::from_integer(0.into()),
++                BigRational::from_integer(0.into()),
++                BigRational::from_integer(0.into())
++            ]
++        ),
++        other => panic!("expected exact rational current: {other:?}"),
++    }
++
++    let negative_words = surface.read_out(negative_zero.section()).unwrap();
++    assert_eq!(
++        negative_words,
++        vec![(-7, -7), (0, 0), (0, 0), (0, 0), (32768, 32768)]
++    );
++    let padded_words = surface.read_out(padded.section()).unwrap();
++    assert_eq!(
++        padded_words,
++        vec![(9, 9), (0, 0), (0, 0), (0, 0), (32768, 32768)]
++    );
++}
+diff --git a/docs/ACOUSTIC_EXPERIMENTS.md b/docs/ACOUSTIC_EXPERIMENTS.md
+index 8f121a74..7fdf5544 100644
+--- a/docs/ACOUSTIC_EXPERIMENTS.md
++++ b/docs/ACOUSTIC_EXPERIMENTS.md
+@@ -31,6 +31,13 @@ coefficients. Its port extent remains a caller-declared receiver aperture, and t
+ section, times and padding remain explicit. Source handles are passed only for declared receiving
+ interactions; chronological adjacency does not create one.
+ 
++[established-bounded; measured] The same chart now exposes `mount_cell(surface, cell)` and
++`AcousticFieldCell::rational()` for the shared resident relation/conditional-current owners.
++This read-only source attachment retains exact support, receiver/lineage, clock, divisor, zeros,
++padding and parent delivery metadata. It does not advance the chart cursor or supply contact.
++The [resident ingress return](../research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md)
++records five passing acoustic-field controls and the remaining interval/interaction attachment.
++
+ [established-bounded; implemented-exact] `NativeConstitutiveField::intrinsic_profile()` borrows
+ material, historical sources/frames and predecessor relations without another device readout or
+ consuming a source handle. It reports actual chart extents separately from intrinsic dimensions
+diff --git a/docs/ARCHITECTURE_MAP.md b/docs/ARCHITECTURE_MAP.md
+index 289260d7..2435f8cd 100644
+--- a/docs/ARCHITECTURE_MAP.md
++++ b/docs/ARCHITECTURE_MAP.md
+@@ -39,6 +39,12 @@ application owners in `crates/holonics-hna/src/native/{acoustic,speech}.rs`, exp
+ into the existing acoustic receiver. `applications/holonics-audio/main.swift` owns exterior
+ capture/playback chronology. These share the native session and introduce no second engine.
+ 
++[established-bounded; measured] `holonics-hna::native::acoustic_field::{AcousticFieldChart,AcousticFieldCell}`
++also mounts timed source coefficients through `mount_cell` into the shared resident rational
++current port. The [five-control return](../research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md)
++retains exact source/clock support and delivery lineage. Actual interval/interaction binding and
++useful acoustic conduct remain open.
++
+ [established-bounded; implemented-exact] Ordered unlinked packets are owned by
+ `constitutive_fibre/circulation/batch.rs` and `holonics-hna/src/native/batch.rs`; they reuse the
+ circulation kernel with serial failure dependencies and retain every source section. The acoustic
+diff --git a/docs/plans/HOLONICS_ON_APPLE_SILICON.md b/docs/plans/HOLONICS_ON_APPLE_SILICON.md
+index 49eb832c..b3ec2070 100644
+--- a/docs/plans/HOLONICS_ON_APPLE_SILICON.md
++++ b/docs/plans/HOLONICS_ON_APPLE_SILICON.md
+@@ -54,6 +54,9 @@ by a plural fibre; identifying an individual performance or reversing the raw pa
+    treating cell width, sample ordinal, transcript spelling or a supplied class label as native
+    organization. Where conditions are only partially inferred, compose the existing affine
+    elimination/Preimage Fibre relation and use only its supported subsequent consequences.
++   The [resident cell ingress](../../research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md)
++   now supplies the current port. Next retain parent recording and annotation-pointer lineage
++   when attaching source/response intervals and their exact supports, including gaps and refusals.
+ 3. Develop and retain acoustic generative standing across source-qualified recordings and
+    actual joined returns, then conduct its native emission into the declared acoustic receiver.
+    Inspect perception differences and generated sound, preserve the declared reconstruction
+diff --git a/research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md b/research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md
+new file mode 100644
+index 00000000..06fdabca
+--- /dev/null
++++ b/research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md
+@@ -0,0 +1,54 @@
++# Acoustic sections enter the shared resident current port
++
++[definition] September 7, 2026, following Apple `b041e462`. This closes the acoustic ingress
++adapter identified during the shared conditional-generator port. It introduces no new learner
++and does not complete AS4–AS5.
++
++[established-bounded; implemented-exact] `AcousticFieldChart::mount_cell` in
++`crates/holonics-hna/src/native/acoustic_field.rs` mounts a chosen temporal coefficient cell into
++the existing `ResidentSurface`. Every sample is an exact point numerator in the declared digital
++amplitude chart `(sample/divisor, 0)`. One common denominator, zero quadratures and structural
++padding are retained. `AcousticFieldCell::rational` supplies the existing
++`ResidentConstitutiveCurrent`, usable by the shared relation without a numerical host readout.
++
++[established-bounded; implemented-exact] The immutable cell borrows its complete source chart.
++Its exact source occurrence, coefficient support, receiver, lineage, sample step and origin
++remain accessible. The chart also retains the decoded occurrence's locator, WAV digest and byte
++count as exterior delivery lineage. Complete PCM remains recoverable. Mounting changes neither
++the chart cursor nor any native ecology, and declares no contact or inferred condition. Cell
++extent remains a caller-declared aperture rather than native acoustic grain.
++
++[established-bounded; measured] All five `native::acoustic_field::tests` passed on Metal after
++the final changes. Existing controls cover signed-word PCM extremes, zeros, padding, separating
++temporal fibres and recovery of refused source handles. New controls verify exact nonzero-origin
++support, invalid-index refusal before allocation, retained source metadata and native consumption
++of the rational cell. An identity-receiver control carries a new `9/32768` source magnitude through
++the relation while preserving its zero coordinates, with zero numerical readouts, numerical
++egress or ingress during the two native operations. Cold readout subsequently verifies the entire
++mounted numerator/denominator section. This is codec/current composition evidence, not acoustic
++recognition or generative learning.
++
++```sh
++cargo test -p holonics-hna --lib native::acoustic_field::tests:: -- --include-ignored --test-threads=1
++```
++
++[established-bounded; process-audit] The final HNA test build and `git diff --check` passed.
++An accidental workspace formatting pass was removed from 156 unrelated files before publication;
++the prior unstaged patch was preserved at `/tmp/holonics-september7-unintended-formatting.patch`.
++Only the intended source, tests and documentation are committed. Existing untracked `.DS_Store`
++files remain untouched. No corpus cultivation, Lean build or physical acoustic measurement ran.
++
++[established-bounded; source-inspected] The local AMI subset retains four mono PCM16/16-kHz
++meeting recordings and exact source/target annotation pointers. Its speaker channel metadata
++does not identify separate waveform channels. The existing source loader reads complete mono
++recordings; no current Rust owner loads those exact annotation links as native interactions.
++The [preparation guide](../experiments/apple_silicon/README_AMI_CONVERSATION.md) and
++`prepare_ami_conversation_subset.py` retain the source annotation and refusals.
++
++[open] Next attach independently addressed recording intervals to the actual annotation
++source/target roles and exact clock supports. Retain the parent recording and pointer lineage,
++overlap, gaps and unresolved annotation cases; do not use proximity, speaker IDs, transcript
++spelling or response-type labels to author a native condition. Compose admitted conditions and
++their complete Preimage Fibres with the shared relation, then develop retained sound and English
++conduct and its acoustic receiver. The resident ingress port does not yet supply that interaction,
++the general forward image of plural conditions, or useful produced sound.
+-- 
+2.54.0
+

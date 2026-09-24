@@ -1,0 +1,3421 @@
+From 798f7578c6b47ea2e8a87ef58b31366f6bed6793 Mon Sep 17 00:00:00 2001
+From: Brandon Duggan <brandonrdug@users.noreply.github>
+Date: Mon, 7 Sep 2026 15:44:09 -0700
+Subject: [PATCH 11/18] Compose resident temporal currents with recorded
+ conditional observations
+
+---
+ CONSTRUCTION_STATE.md                         |   9 +
+ accelerators/metal/native_phase.metal         | 123 +++
+ crates/holonic-engine/build.rs                |   1 +
+ .../kernels/exact_resident_section.cu         |   1 +
+ .../kernels/phase_current_convolution.cuh     | 105 +++
+ crates/holonic-engine/src/phase_current.rs    |   2 +
+ .../src/phase_current/resident.rs             | 195 +++++
+ .../src/phase_current/resident/tests.rs       | 375 +++++++++
+ .../src/resident_section/surface_passage.rs   |  74 +-
+ crates/holonic-mount/src/metal.rs             |   1 +
+ .../examples/recorded_temporal_action.rs      | 334 ++++++++
+ .../holonics-hna/src/native/acoustic_field.rs |  21 +-
+ .../src/native/acoustic_field/tests.rs        |  72 ++
+ docs/ACOUSTIC_EXPERIMENTS.md                  |  16 +
+ docs/ARCHITECTURE_MAP.md                      |  15 +-
+ docs/plans/HOLONICS_ON_APPLE_SILICON.md       |   8 +-
+ .../compare_recorded_temporal_action.py       | 102 +++
+ ...TEMPORAL_ACTION_RETAINS_ITS_CAUSAL_TAIL.md | 132 +++
+ .../comparison.json                           |  82 ++
+ .../esc50.json                                | 757 ++++++++++++++++++
+ .../librispeech.json                          | 743 +++++++++++++++++
+ 21 files changed, 3161 insertions(+), 7 deletions(-)
+ create mode 100644 crates/holonic-engine/kernels/phase_current_convolution.cuh
+ create mode 100644 crates/holonic-engine/src/phase_current/resident.rs
+ create mode 100644 crates/holonic-engine/src/phase_current/resident/tests.rs
+ create mode 100644 crates/holonics-hna/examples/recorded_temporal_action.rs
+ create mode 100644 research/experiments/apple_silicon/compare_recorded_temporal_action.py
+ create mode 100644 research/records/2026-09-07_THE_NATIVE_TEMPORAL_ACTION_RETAINS_ITS_CAUSAL_TAIL.md
+ create mode 100644 research/records/2026-09-07_native_temporal_action/comparison.json
+ create mode 100644 research/records/2026-09-07_native_temporal_action/esc50.json
+ create mode 100644 research/records/2026-09-07_native_temporal_action/librispeech.json
+
+diff --git a/CONSTRUCTION_STATE.md b/CONSTRUCTION_STATE.md
+index 13f60522..4d4ee971 100644
+--- a/CONSTRUCTION_STATE.md
++++ b/CONSTRUCTION_STATE.md
+@@ -35,6 +35,15 @@ mounts through the resident current port. Next compose the actual temporal/mater
+ condition standing; equal cell ordinals are not that passage. No native cultivation ran in this
+ source-attachment return. AMI speaker labels still do not supply separate microphone channels.
+ 
++[established-bounded; measured] The [native temporal return](research/records/2026-09-07_THE_NATIVE_TEMPORAL_ACTION_RETAINS_ITS_CAUSAL_TAIL.md)
++now realizes the existing exact causal convolution on resident currents and binds the acoustic
++clock/support to it. Twenty-one focused controls pass. One LibriSpeech coefficient experiment
++infers a digital two-tap response and predicts a later held-out source exactly; the fixed ESC-50
++cuts retain a plural condition and a native point-consumer refusal. No native stage numerically
++reads a current to the host. The new desktop `82fef476` whole-family image/receive return is the
++next integration, followed by actual material/condition binding. This is a bounded temporal
++action return, not useful sound or English-model completion.
++
+ [established-bounded; measured] The September 7 Mac pickup integrates desktop `6ef7bf9d` with
+ 68 passing engine/public native tests and successful HNA library, application and shared-example
+ checks. The [integration record](research/records/2026-09-07_APPLE_INTEGRATES_THE_SHARED_CONDITIONAL_GENERATOR_HANDOFF.md)
+diff --git a/accelerators/metal/native_phase.metal b/accelerators/metal/native_phase.metal
+index ad95ec5c..a24d0fbf 100644
+--- a/accelerators/metal/native_phase.metal
++++ b/accelerators/metal/native_phase.metal
+@@ -951,6 +951,129 @@ inline W fibre_current_denominator(device const long *lo, device const long *hi,
+   return fromword(lo[denominator_at]);
+ }
+ 
++// Causal convolution of two resident complex polynomial currents. The two
++// raw extents are the active coefficient populations; coordinates after them
++// must be structural zero and cannot conceal an unadmitted current.
++kernel void section_phase_convolution(
++    device const long *source_lo [[buffer(0)]], device const long *source_hi [[buffer(1)]],
++    constant uint &source_at [[buffer(2)]], constant uint &source_denominator_at [[buffer(3)]],
++    constant uint &source_disposition_at [[buffer(4)]],
++    device const long *response_lo [[buffer(5)]], device const long *response_hi [[buffer(6)]],
++    constant uint &response_at [[buffer(7)]], constant uint &response_denominator_at [[buffer(8)]],
++    constant uint &response_disposition_at [[buffer(9)]],
++    constant uint &source_complex_coordinates [[buffer(10)]],
++    constant uint &response_complex_coordinates [[buffer(11)]],
++    constant uint &source_raw_extent [[buffer(12)]], constant uint &response_raw_extent [[buffer(13)]],
++    device long *output_lo [[buffer(14)]], device long *output_hi [[buffer(15)]],
++    device uint *slot [[buffer(16)]], device const uint *census [[buffer(17)]],
++    device const uint *lineage [[buffer(18)]], constant uint &lineage_count [[buffer(19)]],
++    threadgroup W *scratch [[threadgroup(0)]], uint3 tid [[thread_position_in_threadgroup]]) {
++  if (tid.x || tid.y || tid.z)
++    return;
++  if (upstream(census, lineage, lineage_count, slot))
++    return;
++  ulong source_complex = (ulong)source_complex_coordinates;
++  ulong response_complex = (ulong)response_complex_coordinates;
++  ulong source_raw = (ulong)source_raw_extent;
++  ulong response_raw = (ulong)response_raw_extent;
++  if (!source_complex || !response_complex || !source_raw || !response_raw
++      || source_raw > source_complex || response_raw > response_complex
++      || source_complex > 0x7ffffffful || response_complex > 0x7ffffffful) {
++    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
++                             memory_order_relaxed);
++    return;
++  }
++  ulong output_extent64 = source_raw + response_raw - 1ul;
++  if (output_extent64 > 0x7ffffffful
++      || output_extent64 > (0xfffffffful - 1ul) / 2ul) {
++    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
++                             memory_order_relaxed);
++    return;
++  }
++  uint source_complex_count = (uint)source_complex;
++  uint response_complex_count = (uint)response_complex;
++  uint source_raw_count = (uint)source_raw;
++  uint response_raw_count = (uint)response_raw;
++  uint output_extent = (uint)output_extent64;
++  uint output_width = 2u * output_extent + 1u;
++
++  W source_den = fibre_current_denominator(source_lo, source_hi,
++                                           source_denominator_at,
++                                           source_disposition_at, slot);
++  W response_den = fibre_current_denominator(response_lo, response_hi,
++                                             response_denominator_at,
++                                             response_disposition_at, slot);
++  if (*slot)
++    return;
++  for (uint coordinate = 0; coordinate < source_complex_count; ++coordinate) {
++    uint at = source_at + 2u * coordinate;
++    if (source_lo[at] != source_hi[at] || source_lo[at + 1u] != source_hi[at + 1u]) {
++      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
++                               memory_order_relaxed);
++      return;
++    }
++    if (coordinate >= source_raw_count
++        && (source_lo[at] != 0 || source_lo[at + 1u] != 0)) {
++      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
++                               memory_order_relaxed);
++      return;
++    }
++  }
++  for (uint coordinate = 0; coordinate < response_complex_count; ++coordinate) {
++    uint at = response_at + 2u * coordinate;
++    if (response_lo[at] != response_hi[at] || response_lo[at + 1u] != response_hi[at + 1u]) {
++      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
++                               memory_order_relaxed);
++      return;
++    }
++    if (coordinate >= response_raw_count
++        && (response_lo[at] != 0 || response_lo[at + 1u] != 0)) {
++      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
++                               memory_order_relaxed);
++      return;
++    }
++  }
++  W common = wmul(source_den, response_den, slot);
++  if (*slot)
++    return;
++  for (uint target = 0; target < output_extent; ++target) {
++    W real = wzero(), imaginary = wzero();
++    uint source_first = target >= response_raw_count
++        ? target - response_raw_count + 1u
++        : 0u;
++    uint source_last = min(target, source_raw_count - 1u);
++    for (uint source = source_first; source <= source_last; ++source) {
++      uint response = target - source;
++      W product[3];
++      phaseprod(fromword(source_lo[source_at + 2u * source]),
++                fromword(source_lo[source_at + 2u * source + 1u]), source_den,
++                fromword(response_lo[response_at + 2u * response]),
++                fromword(response_lo[response_at + 2u * response + 1u]), response_den,
++                product, slot);
++      if (*slot)
++        return;
++      W factor = wdiv(common, product[2], slot);
++      real = wadd(real, wmul(product[0], factor, slot), slot);
++      imaginary = wadd(imaginary, wmul(product[1], factor, slot), slot);
++      if (*slot)
++        return;
++    }
++    scratch[2u * target] = real;
++    scratch[2u * target + 1u] = imaginary;
++  }
++  wnorm(scratch, output_width - 1u, &common, slot);
++  if (*slot)
++    return;
++  for (uint j = 0; j < output_width - 1u; ++j)
++    toword(scratch[j], slot);
++  toword(common, slot);
++  if (*slot)
++    return;
++  for (uint j = 0; j < output_width - 1u; ++j)
++    output_lo[j] = output_hi[j] = toword(scratch[j], slot);
++  output_lo[output_width - 1u] = output_hi[output_width - 1u] = toword(common, slot);
++}
++
+ // Fixed-source condition preimage.  The graph and right-hand side are derived
+ // evidence owned by this operation; the learned relation basis is read-only.
+ // A refusal may leave partial derived evidence, but it never publishes a row
+diff --git a/crates/holonic-engine/build.rs b/crates/holonic-engine/build.rs
+index ba68db24..21515f8d 100644
+--- a/crates/holonic-engine/build.rs
++++ b/crates/holonic-engine/build.rs
+@@ -71,6 +71,7 @@ fn main() {
+     println!("cargo:rerun-if-changed=kernels/exact_embedding_fiber.cu");
+     println!("cargo:rerun-if-changed=kernels/exact_resident_section.cu");
+     println!("cargo:rerun-if-changed=kernels/constitutive_condition_preimage.cuh");
++    println!("cargo:rerun-if-changed=kernels/phase_current_convolution.cuh");
+     println!("cargo:rerun-if-changed=kernels/constitutive_field.cuh");
+     println!("cargo:rerun-if-changed=kernels/paired_field_junction.cuh");
+     println!("cargo:rerun-if-changed=kernels/enclosed_field_junction.cuh");
+diff --git a/crates/holonic-engine/kernels/exact_resident_section.cu b/crates/holonic-engine/kernels/exact_resident_section.cu
+index c95751fb..b0a91529 100644
+--- a/crates/holonic-engine/kernels/exact_resident_section.cu
++++ b/crates/holonic-engine/kernels/exact_resident_section.cu
+@@ -1291,6 +1291,7 @@ extern "C" __global__ void section_constitutive_bilinear_source(
+ }
+ 
+ #include "constitutive_condition_preimage.cuh"
++#include "phase_current_convolution.cuh"
+ 
+ // Push both actual source branches through their producing-to-current unit-phase frame.
+ // This does not read the paired-junction enclosure or substitute its numerical centre.
+diff --git a/crates/holonic-engine/kernels/phase_current_convolution.cuh b/crates/holonic-engine/kernels/phase_current_convolution.cuh
+new file mode 100644
+index 00000000..feff7d29
+--- /dev/null
++++ b/crates/holonic-engine/kernels/phase_current_convolution.cuh
+@@ -0,0 +1,105 @@
++// Causal convolution of two resident complex polynomial currents. The raw extents are the
++// active coefficient populations; coordinates after them must be structural zero.
++extern "C" __global__ void section_phase_convolution(
++    const int64_t *source_lo, const int64_t *source_hi,
++    uint32_t source_at, uint32_t source_denominator_at, uint32_t source_disposition_at,
++    const int64_t *response_lo, const int64_t *response_hi,
++    uint32_t response_at, uint32_t response_denominator_at, uint32_t response_disposition_at,
++    uint32_t source_complex_coordinates, uint32_t response_complex_coordinates,
++    uint32_t source_raw_extent, uint32_t response_raw_extent,
++    int64_t *output_lo, int64_t *output_hi,
++    uint32_t *slot, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
++) {
++    if (blockIdx.x != 0 || threadIdx.x != 0) return;
++    if (upstream_refused(census, lineage, lineage_count, slot)) return;
++
++    uint64_t source_complex = source_complex_coordinates;
++    uint64_t response_complex = response_complex_coordinates;
++    uint64_t source_raw = source_raw_extent;
++    uint64_t response_raw = response_raw_extent;
++    if (!source_complex || !response_complex || !source_raw || !response_raw
++        || source_raw > source_complex || response_raw > response_complex
++        || source_complex > 0x7fffffffULL || response_complex > 0x7fffffffULL) {
++        atomicOr(slot, REFUSED_MALFORMED);
++        return;
++    }
++    uint64_t output_extent64 = source_raw + response_raw - 1ULL;
++    if (output_extent64 > 0x7fffffffULL
++        || output_extent64 > (0xffffffffULL - 1ULL) / 2ULL) {
++        atomicOr(slot, REFUSED_MALFORMED);
++        return;
++    }
++    uint32_t source_complex_count = (uint32_t)source_complex;
++    uint32_t response_complex_count = (uint32_t)response_complex;
++    uint32_t source_raw_count = (uint32_t)source_raw;
++    uint32_t response_raw_count = (uint32_t)response_raw;
++    uint32_t output_extent = (uint32_t)output_extent64;
++    uint32_t output_width = 2U * output_extent + 1U;
++
++    wide source_den = fibre_current_denominator(source_lo, source_hi,
++        source_denominator_at, source_disposition_at, slot);
++    wide response_den = fibre_current_denominator(response_lo, response_hi,
++        response_denominator_at, response_disposition_at, slot);
++    if (*slot) return;
++    for (uint32_t coordinate = 0; coordinate < source_complex_count; ++coordinate) {
++        uint32_t at = source_at + 2U * coordinate;
++        if (source_lo[at] != source_hi[at] || source_lo[at + 1U] != source_hi[at + 1U]) {
++            atomicOr(slot, REFUSED_MALFORMED);
++            return;
++        }
++        if (coordinate >= source_raw_count
++            && (source_lo[at] != 0 || source_lo[at + 1U] != 0)) {
++            atomicOr(slot, REFUSED_MALFORMED);
++            return;
++        }
++    }
++    for (uint32_t coordinate = 0; coordinate < response_complex_count; ++coordinate) {
++        uint32_t at = response_at + 2U * coordinate;
++        if (response_lo[at] != response_hi[at]
++            || response_lo[at + 1U] != response_hi[at + 1U]) {
++            atomicOr(slot, REFUSED_MALFORMED);
++            return;
++        }
++        if (coordinate >= response_raw_count
++            && (response_lo[at] != 0 || response_lo[at + 1U] != 0)) {
++            atomicOr(slot, REFUSED_MALFORMED);
++            return;
++        }
++    }
++    wide common = product_checked(source_den, response_den, slot);
++    if (*slot) return;
++    extern __shared__ wide convolution_scratch[];
++    for (uint32_t target = 0; target < output_extent; ++target) {
++        wide real = 0, imaginary = 0;
++        uint32_t source_first = target >= response_raw_count
++            ? target - response_raw_count + 1U
++            : 0U;
++        uint32_t source_last = min(target, source_raw_count - 1U);
++        for (uint32_t source = source_first; source <= source_last; ++source) {
++            uint32_t response = target - source;
++            wide product[3];
++            fibre_phase_product(
++                source_lo[source_at + 2U * source], source_lo[source_at + 2U * source + 1U],
++                source_den,
++                response_lo[response_at + 2U * response],
++                response_lo[response_at + 2U * response + 1U], response_den,
++                product, slot);
++            if (*slot) return;
++            wide factor = common / product[2];
++            real = add_checked(real, product_checked(product[0], factor, slot), slot);
++            imaginary = add_checked(imaginary, product_checked(product[1], factor, slot), slot);
++            if (*slot) return;
++        }
++        convolution_scratch[2U * target] = real;
++        convolution_scratch[2U * target + 1U] = imaginary;
++    }
++    fibre_normalize(convolution_scratch, output_width - 1U, &common, slot);
++    if (*slot) return;
++    for (uint32_t j = 0; j < output_width - 1U; ++j)
++        to_word(convolution_scratch[j], slot);
++    to_word(common, slot);
++    if (*slot) return;
++    for (uint32_t j = 0; j < output_width - 1U; ++j)
++        output_lo[j] = output_hi[j] = to_word(convolution_scratch[j], slot);
++    output_lo[output_width - 1U] = output_hi[output_width - 1U] = to_word(common, slot);
++}
+diff --git a/crates/holonic-engine/src/phase_current.rs b/crates/holonic-engine/src/phase_current.rs
+index dcf31b7a..361b221a 100644
+--- a/crates/holonic-engine/src/phase_current.rs
++++ b/crates/holonic-engine/src/phase_current.rs
+@@ -14,6 +14,8 @@ use thiserror::Error;
+ 
+ use crate::{CpuExecutionError, CpuExecutionReceipt, CpuExecutor};
+ 
++pub mod resident;
++
+ const SECTION_SCHEMA: &str = "holonic-engine.exact-phase-current-section.v1";
+ const RECEIPT_SCHEMA: &str = "holonic-engine.phase-current-convolution-receipt.v1";
+ const SPECTRUM_SCHEMA: &str = "holonic-engine.exact-phase-transport-spectrum.v1";
+diff --git a/crates/holonic-engine/src/phase_current/resident.rs b/crates/holonic-engine/src/phase_current/resident.rs
+new file mode 100644
+index 00000000..85cf4115
+--- /dev/null
++++ b/crates/holonic-engine/src/phase_current/resident.rs
+@@ -0,0 +1,195 @@
++//! Resident realization of the existing carried causal convolution. Temporal coordinates and
++//! exact source carriers remain explicit; this operation supplies no acoustic classifier or
++//! separate learning law.
++use super::{PhaseCurrentError, PhaseCurrentLineageId, PhaseCurrentReceiverId};
++use crate::{
++    native_ecology::constitutive_fibre::{ConstitutiveFibreError, ResidentConstitutiveCurrent},
++    resident_section::{ResidentGrain, ResidentRefusal, ResidentSection, ResidentSurface},
++};
++use num_rational::BigRational as Rat;
++use num_traits::Signed;
++use thiserror::Error;
++
++#[derive(Debug, Error)]
++pub enum ResidentPhaseCurrentError {
++    #[error(transparent)]
++    Chart(#[from] PhaseCurrentError),
++    #[error(transparent)]
++    Native(#[from] ConstitutiveFibreError),
++}
++
++impl From<ResidentRefusal> for ResidentPhaseCurrentError {
++    fn from(value: ResidentRefusal) -> Self {
++        Self::Native(value.into())
++    }
++}
++
++/// Borrowed complex rational coefficients in an exact temporal chart. Extra coordinates are
++/// declared structural padding and are checked to be zero on device before any product returns.
++pub struct ResidentPhaseCurrentView<'source, 'chart> {
++    current: ResidentConstitutiveCurrent<'source, 'chart>,
++    receiver: PhaseCurrentReceiverId,
++    lineage: PhaseCurrentLineageId,
++    origin: Rat,
++    sample_step: Rat,
++    phase_extent: u32,
++    raw_extent: usize,
++}
++
++impl<'source, 'chart> ResidentPhaseCurrentView<'source, 'chart> {
++    #[allow(clippy::too_many_arguments)]
++    pub fn new(
++        current: ResidentConstitutiveCurrent<'source, 'chart>,
++        receiver: PhaseCurrentReceiverId,
++        lineage: PhaseCurrentLineageId,
++        origin: Rat,
++        sample_step: Rat,
++        phase_extent: u32,
++        raw_extent: usize,
++    ) -> Result<Self, ResidentPhaseCurrentError> {
++        if current.width % 2 != 0
++            || raw_extent == 0
++            || raw_extent > current.width / 2
++            || phase_extent == 0
++            || !sample_step.is_positive()
++        {
++            return Err(PhaseCurrentError::MalformedSection.into());
++        }
++        Ok(Self {
++            current,
++            receiver,
++            lineage,
++            origin,
++            sample_step,
++            phase_extent,
++            raw_extent,
++        })
++    }
++
++    pub fn current(&self) -> ResidentConstitutiveCurrent<'source, 'chart> {
++        self.current
++    }
++    pub fn raw_extent(&self) -> usize {
++        self.raw_extent
++    }
++    pub fn receiver(&self) -> PhaseCurrentReceiverId {
++        self.receiver
++    }
++    pub fn lineage(&self) -> PhaseCurrentLineageId {
++        self.lineage
++    }
++    pub fn origin(&self) -> &Rat {
++        &self.origin
++    }
++    pub fn sample_step(&self) -> &Rat {
++        &self.sample_step
++    }
++    pub fn phase_extent(&self) -> u32 {
++        self.phase_extent
++    }
++}
++
++/// A returned temporal product with both complete operand carriers still borrowed. These
++/// particular operands retain every mixed contribution; the summed output alone does not
++/// identify its source or constitute the preimage of every possible operand pair.
++pub struct ResidentPhaseConvolution<'source, 'chart> {
++    source: ResidentPhaseCurrentView<'source, 'chart>,
++    response: ResidentPhaseCurrentView<'source, 'chart>,
++    output: ResidentSection<'chart>,
++    target_receiver: PhaseCurrentReceiverId,
++    target_lineage: PhaseCurrentLineageId,
++}
++
++impl<'source, 'chart> ResidentPhaseConvolution<'source, 'chart> {
++    pub fn source(&self) -> &ResidentPhaseCurrentView<'source, 'chart> {
++        &self.source
++    }
++    pub fn response(&self) -> &ResidentPhaseCurrentView<'source, 'chart> {
++        &self.response
++    }
++    pub fn section(&self) -> &ResidentSection<'chart> {
++        &self.output
++    }
++    pub fn current(
++        &self,
++    ) -> Result<ResidentConstitutiveCurrent<'_, 'chart>, ConstitutiveFibreError> {
++        ResidentConstitutiveCurrent::rational(&self.output)
++    }
++    pub fn view(&self) -> Result<ResidentPhaseCurrentView<'_, 'chart>, ResidentPhaseCurrentError> {
++        ResidentPhaseCurrentView::new(
++            self.current()?,
++            self.target_receiver,
++            self.target_lineage,
++            &self.source.origin + &self.response.origin,
++            self.source.sample_step.clone(),
++            self.source.phase_extent,
++            self.source.raw_extent + self.response.raw_extent - 1,
++        )
++    }
++}
++
++/// Apply the existing polynomial action with its complete causal carry. Both charts must share
++/// the sample step and phase extent. The response origin is in its declared local chart; origins
++/// add exactly as in the cold reference owner. This does not align arbitrary dialogue intervals.
++pub fn convolve_resident<'source, 'chart>(
++    surface: &'chart ResidentSurface<'chart>,
++    source: ResidentPhaseCurrentView<'source, 'chart>,
++    response: ResidentPhaseCurrentView<'source, 'chart>,
++    target_receiver: PhaseCurrentReceiverId,
++    target_lineage: PhaseCurrentLineageId,
++) -> Result<ResidentPhaseConvolution<'source, 'chart>, ResidentPhaseCurrentError> {
++    if source.sample_step != response.sample_step || source.phase_extent != response.phase_extent {
++        return Err(PhaseCurrentError::ChartMismatch.into());
++    }
++    surface.validate_constitutive_current_view(source.current)?;
++    surface.validate_constitutive_current_view(response.current)?;
++    let width = source
++        .raw_extent
++        .checked_add(response.raw_extent)
++        .and_then(|n| n.checked_sub(1))
++        .and_then(|n| n.checked_mul(2))
++        .filter(|n| *n < u32::MAX as usize)
++        .ok_or(PhaseCurrentError::CarrierOverflow)?;
++    let scratch = ResidentSurface::constitutive_wide_scratch(width)
++        .ok_or(PhaseCurrentError::CarrierOverflow)?;
++    let available = surface.declaration().max_sectiond_bytes;
++    if scratch > available as usize {
++        return Err(ConstitutiveFibreError::ScratchAperture {
++            required: scratch,
++            available,
++        }
++        .into());
++    }
++    let output = surface.fresh_section(1, width + 1, ResidentGrain(0))?;
++    let mut passage = surface.begin_passage(&[vec![]])?;
++    {
++        let lane = passage.open(0, &[])?;
++        surface.record_phase_convolution(
++            &lane,
++            source.current,
++            response.current,
++            source.raw_extent,
++            response.raw_extent,
++            &output,
++        )?;
++    }
++    passage.close(0, &output, 64)?;
++    let receipt = passage.finish()?.launch()?;
++    if !receipt.obstruction.is_empty() {
++        return Err(ConstitutiveFibreError::Arithmetic(format!(
++            "phase convolution: {:?}",
++            receipt.obstruction
++        ))
++        .into());
++    }
++    Ok(ResidentPhaseConvolution {
++        source,
++        response,
++        output,
++        target_receiver,
++        target_lineage,
++    })
++}
++
++#[cfg(test)]
++mod tests;
+diff --git a/crates/holonic-engine/src/phase_current/resident/tests.rs b/crates/holonic-engine/src/phase_current/resident/tests.rs
+new file mode 100644
+index 00000000..9bc68d05
+--- /dev/null
++++ b/crates/holonic-engine/src/phase_current/resident/tests.rs
+@@ -0,0 +1,375 @@
++use super::*;
++use crate::{
++    embedding_fiber::ResidentReadout,
++    native_ecology::constitutive_fibre::{
++        ConditionPreimageReading, ConstitutiveReading, ResidentConstitutiveFibre,
++    },
++    phase_current::{convolve_phase_current, ExactPhaseCurrentSection},
++    resident_section::ResidentSectionRest,
++    CpuExecutor,
++};
++use num_traits::Zero;
++
++fn q(n: i64, d: i64) -> Rat {
++    Rat::new(n.into(), d.into())
++}
++fn mount<'c>(s: &'c ResidentSurface<'c>, words: &[i64]) -> ResidentSection<'c> {
++    s.mount_section_rest(
++        &ResidentSectionRest::found(
++            1,
++            words.len(),
++            ResidentGrain(0),
++            64,
++            words.iter().map(|v| (*v, *v)).collect(),
++        )
++        .unwrap(),
++    )
++    .unwrap()
++}
++fn view<'a, 'c>(
++    s: &'a ResidentSection<'c>,
++    raw: usize,
++    id: u64,
++) -> ResidentPhaseCurrentView<'a, 'c> {
++    ResidentPhaseCurrentView::new(
++        ResidentConstitutiveCurrent::rational(s).unwrap(),
++        PhaseCurrentReceiverId(id),
++        PhaseCurrentLineageId(id),
++        q(id as i64, 10),
++        q(1, 16000),
++        2,
++        raw,
++    )
++    .unwrap()
++}
++fn product<'a, 'c>(
++    s: &'c ResidentSurface<'c>,
++    x: &'a ResidentSection<'c>,
++    c: &'a ResidentSection<'c>,
++    n: usize,
++    k: usize,
++) -> Result<ResidentPhaseConvolution<'a, 'c>, ResidentPhaseCurrentError> {
++    convolve_resident(
++        s,
++        view(x, n, 1),
++        view(c, k, 2),
++        PhaseCurrentReceiverId(3),
++        PhaseCurrentLineageId(4),
++    )
++}
++fn values(s: &ResidentSurface<'_>, output: &ResidentSection<'_>) -> Vec<Rat> {
++    let pairs = s.read_out(output).unwrap();
++    assert!(pairs.iter().all(|(lo, hi)| lo == hi));
++    let den = pairs.last().unwrap().0;
++    pairs[..pairs.len() - 1]
++        .iter()
++        .map(|p| q(p.0, den))
++        .collect()
++}
++
++#[test]
++#[ignore = "requires native GPU; exact causal tail agrees with the independent cold owner"]
++fn complete_carry_matches_cold_reference_and_retains_operand_charts() {
++    let r = ResidentReadout::new().unwrap();
++    let s = ResidentSurface::on(&r).unwrap();
++    let x = mount(&s, &[1, 0, 2, 0, 3, 0, 0, 0, 1]);
++    let c = mount(&s, &[4, 0, 5, 0, 1]);
++    let before = s.census();
++    let out = product(&s, &x, &c, 3, 2).unwrap();
++    assert_eq!(s.census().section_read_outs, before.section_read_outs);
++    assert_eq!(s.census().ingress_octets, before.ingress_octets);
++    assert_eq!(out.source().lineage(), PhaseCurrentLineageId(1));
++    assert_eq!(out.response().lineage(), PhaseCurrentLineageId(2));
++    let chart = out.view().unwrap();
++    assert_eq!(chart.receiver(), PhaseCurrentReceiverId(3));
++    assert_eq!(chart.lineage(), PhaseCurrentLineageId(4));
++    assert_eq!(chart.origin(), &q(3, 10));
++    assert_eq!(chart.sample_step(), &q(1, 16000));
++    assert_eq!(chart.raw_extent(), 4);
++    let cold = |id, values: &[i32]| {
++        ExactPhaseCurrentSection::from_i32(
++            PhaseCurrentReceiverId(id),
++            PhaseCurrentLineageId(id),
++            q(id as i64, 10),
++            q(1, 16000),
++            2,
++            values,
++        )
++        .unwrap()
++    };
++    let reference = convolve_phase_current(
++        &cold(1, &[1, 2, 3]),
++        &cold(2, &[4, 5]),
++        PhaseCurrentReceiverId(3),
++        PhaseCurrentLineageId(4),
++        CpuExecutor::serial(),
++    )
++    .unwrap();
++    let expected: Vec<_> = reference
++        .output
++        .flat_values()
++        .into_iter()
++        .flat_map(|v| [Rat::from_integer(v), Rat::zero()])
++        .collect();
++    assert_eq!(values(&s, out.section()), expected);
++}
++
++#[test]
++#[ignore = "requires native GPU; complex rational results continue without remount"]
++fn rational_complex_products_continue_resident() {
++    let r = ResidentReadout::new().unwrap();
++    let s = ResidentSurface::on(&r).unwrap();
++    let x = mount(&s, &[1, 2, -3, 4, 2]);
++    let c = mount(&s, &[2, -1, 5, 3, 3]);
++    let before = s.census();
++    let first = product(&s, &x, &c, 2, 2).unwrap();
++    let second = convolve_resident(
++        &s,
++        first.view().unwrap(),
++        view(&c, 2, 2),
++        PhaseCurrentReceiverId(5),
++        PhaseCurrentLineageId(6),
++    )
++    .unwrap();
++    assert_eq!(s.census().section_read_outs, before.section_read_outs);
++    assert_eq!(s.census().ingress_octets, before.ingress_octets);
++    assert_eq!(
++        values(&s, first.section()),
++        vec![q(4, 6), q(3, 6), q(-3, 6), q(24, 6), q(-27, 6), q(11, 6)]
++    );
++    assert_eq!(
++        values(&s, second.section()),
++        vec![
++            q(11, 18),
++            q(2, 18),
++            q(29, 18),
++            q(78, 18),
++            q(-130, 18),
++            q(160, 18),
++            q(-168, 18),
++            q(-26, 18)
++        ]
++    );
++}
++
++#[test]
++#[ignore = "requires native GPU; normalization precedes the final i64 carrier conversion"]
++fn wide_products_normalize_before_word_publication() {
++    let r = ResidentReadout::new().unwrap();
++    let s = ResidentSurface::on(&r).unwrap();
++    let m = i64::MAX;
++    let x = mount(&s, &[m, 0, m]);
++    let c = mount(&s, &[m, 0, m]);
++    let out = product(&s, &x, &c, 1, 1).unwrap();
++    assert_eq!(values(&s, out.section()), vec![q(1, 1), q(0, 1)]);
++}
++
++#[test]
++#[ignore = "requires native GPU; malformed carriers and overflow refuse without changing sources"]
++fn malformed_numeric_carriers_and_late_overflow_preserve_inputs() {
++    let r = ResidentReadout::new().unwrap();
++    let s = ResidentSurface::on(&r).unwrap();
++    let c = mount(&s, &[2, 0, 1]);
++    for words in [
++        vec![1, 0, 0],
++        vec![1, 0, -1],
++        vec![1, 0, 9, 0, 1],
++        vec![1, 0, i64::MAX, 0, 1],
++    ] {
++        let x = mount(&s, &words);
++        let original = s.read_out(&x).unwrap();
++        let raw = if words.get(2) == Some(&i64::MAX) {
++            2
++        } else {
++            1
++        };
++        assert!(product(&s, &x, &c, raw, 1).is_err());
++        assert_eq!(s.read_out(&x).unwrap(), original);
++    }
++    let x = s
++        .mount_section_rest(
++            &ResidentSectionRest::found(1, 3, ResidentGrain(0), 64, vec![(1, 2), (0, 0), (1, 1)])
++                .unwrap(),
++        )
++        .unwrap();
++    assert!(product(&s, &x, &c, 1, 1).is_err());
++    assert_eq!(s.read_out(&x).unwrap(), vec![(1, 2), (0, 0), (1, 1)]);
++}
++
++#[test]
++#[ignore = "requires native GPU; chart and surface refusals precede output allocation"]
++fn incompatible_charts_and_surface_refuse_before_allocation() {
++    let r = ResidentReadout::new().unwrap();
++    let s = ResidentSurface::on(&r).unwrap();
++    let foreign = ResidentSurface::on(&r).unwrap();
++    let x = mount(&s, &[1, 0, 1]);
++    let c = mount(&foreign, &[1, 0, 1]);
++    let before = s.census();
++    assert!(product(&s, &x, &c, 1, 1).is_err());
++    for (step, phase) in [(q(1, 8000), 2), (q(1, 16000), 3)] {
++        let mismatched = ResidentPhaseCurrentView::new(
++            ResidentConstitutiveCurrent::rational(&x).unwrap(),
++            PhaseCurrentReceiverId(2),
++            PhaseCurrentLineageId(2),
++            q(0, 1),
++            step,
++            phase,
++            1,
++        )
++        .unwrap();
++        assert!(matches!(
++            convolve_resident(
++                &s,
++                view(&x, 1, 1),
++                mismatched,
++                PhaseCurrentReceiverId(3),
++                PhaseCurrentLineageId(3)
++            ),
++            Err(ResidentPhaseCurrentError::Chart(
++                PhaseCurrentError::ChartMismatch
++            ))
++        ));
++    }
++    assert!(ResidentPhaseCurrentView::new(
++        ResidentConstitutiveCurrent::rational(&x).unwrap(),
++        PhaseCurrentReceiverId(1),
++        PhaseCurrentLineageId(1),
++        q(0, 1),
++        q(0, 1),
++        2,
++        1
++    )
++    .is_err());
++    assert_eq!(s.census(), before);
++}
++
++#[test]
++#[ignore = "requires native GPU; the full admitted scratch tail is retained and the next extent refuses"]
++fn scratch_boundary_uses_actual_target_carriers() {
++    let r = ResidentReadout::new().unwrap();
++    let s = ResidentSurface::on(&r).unwrap();
++    let available = s.declaration().max_sectiond_bytes as usize;
++    let mut n = 1;
++    while ResidentSurface::constitutive_wide_scratch(2 * (n + 1)).unwrap() <= available {
++        n += 1;
++    }
++    let mut words = vec![0; 2 * n + 1];
++    words[2 * n - 2] = 7;
++    words[2 * n] = 1;
++    let x = mount(&s, &words);
++    let c = mount(&s, &[1, 0, 1]);
++    let out = product(&s, &x, &c, n, 1).unwrap();
++    assert_eq!(values(&s, out.section())[2 * n - 2], q(7, 1));
++    let too_wide = mount(&s, &vec![0; 2 * (n + 1) + 1]);
++    let before = s.census();
++    assert!(matches!(
++        product(&s, &too_wide, &c, n + 1, 1),
++        Err(ResidentPhaseCurrentError::Native(
++            ConstitutiveFibreError::ScratchAperture { .. }
++        ))
++    ));
++    assert_eq!(s.census(), before);
++}
++
++#[test]
++#[ignore = "requires native GPU; a plural returned current cannot silently become a temporal point"]
++fn temporal_point_consumer_preserves_a_plural_fibre() {
++    let r = ResidentReadout::new().unwrap();
++    let s = ResidentSurface::on(&r).unwrap();
++    let mut body = ResidentConstitutiveFibre::found(&s, 2, 2).unwrap();
++    body.advance(&[0, 0], Some(&[1, 0])).unwrap();
++    let zero = mount(&s, &[0, 0, 1]);
++    let plural = body
++        .advance_resident(ResidentConstitutiveCurrent::rational(&zero).unwrap(), None)
++        .unwrap();
++    let original = plural.inspect().unwrap();
++    assert!(matches!(
++        original.predecessor_reading,
++        ConstitutiveReading::Plural { .. }
++    ));
++    let response = mount(&s, &[1, 0, 1]);
++    let source = ResidentPhaseCurrentView::new(
++        plural.current(),
++        PhaseCurrentReceiverId(1),
++        PhaseCurrentLineageId(1),
++        q(0, 1),
++        q(1, 16000),
++        2,
++        1,
++    )
++    .unwrap();
++    let before = s.census();
++    assert!(convolve_resident(
++        &s,
++        source,
++        view(&response, 1, 2),
++        PhaseCurrentReceiverId(3),
++        PhaseCurrentLineageId(3)
++    )
++    .is_err());
++    assert_eq!(s.census().section_read_outs, before.section_read_outs);
++    assert_eq!(plural.inspect().unwrap(), original);
++    assert_eq!(body.occurrences(), 2);
++}
++
++#[test]
++#[ignore = "requires native GPU; one native learner recovers a causal action and an unprovided response"]
++fn native_temporal_observations_develop_the_shared_conditional_relation() {
++    let r = ResidentReadout::new().unwrap();
++    let s = ResidentSurface::on(&r).unwrap();
++    let mut body = ResidentConstitutiveFibre::found_bilinear_contact(&s, 2, 2, 3).unwrap();
++    let mut population = vec![vec![0, 0, 0, 0, 1]];
++    for coordinate in 0..4 {
++        let mut words = vec![0, 0, 0, 0, 1];
++        words[coordinate] = 1;
++        population.push(words);
++    }
++    let inputs: Vec<_> = population.iter().map(|v| mount(&s, v)).collect();
++    let before = s.census();
++    // Independent source and response impulses expose the declared causal polynomial world.
++    // Only its resident observations enter the existing learner; no target is calculated here.
++    for x in &inputs {
++        for c in &inputs {
++            let measured = product(&s, x, c, 2, 2).unwrap();
++            body.advance_bilinear_contact(
++                view(x, 2, 1).current(),
++                view(c, 2, 2).current(),
++                Some(measured.current().unwrap()),
++            )
++            .unwrap();
++        }
++    }
++    assert_eq!(s.census().section_read_outs, before.section_read_outs);
++    let x = mount(&s, &[1, 2, -3, 4, 2]);
++    let hidden = mount(&s, &[2, -1, 5, 3, 3]);
++    let later = mount(&s, &[-2, 3, 4, 1, 5]);
++    let before = s.census();
++    let observed = product(&s, &x, &hidden, 2, 2).unwrap();
++    let cut = body.occurrences();
++    let inferred = body
++        .read_condition_preimage(view(&x, 2, 1).current(), observed.current().unwrap())
++        .unwrap();
++    assert_eq!(body.occurrences(), cut);
++    let predicted = body
++        .advance_bilinear_contact(view(&later, 2, 1).current(), inferred.current(), None)
++        .unwrap();
++    let actual = product(&s, &later, &hidden, 2, 2).unwrap();
++    assert_eq!(s.census().section_read_outs, before.section_read_outs);
++    match predicted.inspect().unwrap().predecessor_reading {
++        ConstitutiveReading::Unique { current } => {
++            assert_eq!(current, values(&s, actual.section()))
++        }
++        other => panic!("unresolved learned action: {other:?}"),
++    }
++    match inferred.inspect().unwrap() {
++        ConditionPreimageReading::Compatible {
++            particular,
++            directions,
++        } => {
++            assert!(directions.is_empty());
++            assert_eq!(particular, vec![q(2, 3), q(-1, 3), q(5, 3), q(1, 1)]);
++        }
++        other => panic!("unexpected response fibre: {other:?}"),
++    }
++    assert_eq!(body.occurrences(), 26);
++}
+diff --git a/crates/holonic-engine/src/resident_section/surface_passage.rs b/crates/holonic-engine/src/resident_section/surface_passage.rs
+index a7aa6f9f..ba1c7c46 100644
+--- a/crates/holonic-engine/src/resident_section/surface_passage.rs
++++ b/crates/holonic-engine/src/resident_section/surface_passage.rs
+@@ -976,7 +976,7 @@ impl<'chart> ResidentSurface<'chart> {
+         )
+     }
+ 
+-    fn validate_constitutive_current_view(
++    pub(crate) fn validate_constitutive_current_view(
+         &self,
+         current: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<'_, 'chart>,
+     ) -> Result<(), ResidentRefusal> {
+@@ -1003,6 +1003,78 @@ impl<'chart> ResidentSurface<'chart> {
+         Ok(())
+     }
+ 
++    pub(crate) fn record_phase_convolution(
++        &self,
++        lane: &Lane<'_, 'chart>,
++        source: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<'_, 'chart>,
++        response: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<
++            '_,
++            'chart,
++        >,
++        source_extent: usize,
++        response_extent: usize,
++        output: &ResidentSection<'chart>,
++    ) -> Result<(), ResidentRefusal> {
++        self.validate_constitutive_current_view(source)?;
++        self.validate_constitutive_current_view(response)?;
++        let fail = || ResidentRefusal::Declaration {
++            operation: "phase-convolution",
++            what: "incompatible temporal coefficient chart or scratch aperture".into(),
++        };
++        let width = source_extent
++            .checked_add(response_extent)
++            .and_then(|n| n.checked_sub(1))
++            .and_then(|n| n.checked_mul(2))
++            .filter(|n| *n < u32::MAX as usize)
++            .ok_or_else(fail)?;
++        if source_extent == 0
++            || response_extent == 0
++            || source.width % 2 != 0
++            || response.width % 2 != 0
++            || source_extent > source.width / 2
++            || response_extent > response.width / 2
++            || output.rows != 1
++            || output.width != width + 1
++            || output.grain.0 != 0
++            || !std::ptr::eq(output.surface, self)
++        {
++            return Err(fail());
++        }
++        let shared = Self::constitutive_wide_scratch(width)
++            .and_then(|n| u32::try_from(n).ok())
++            .filter(|n| *n <= self.declaration.max_sectiond_bytes)
++            .ok_or_else(fail)?;
++        let mut params = Params::new();
++        for current in [source, response] {
++            params
++                .ptr(current.section.lo.device_ptr())
++                .ptr(current.section.hi.device_ptr())
++                .u32(current.offset as u32)
++                .u32(current.denominator.map_or(u32::MAX, |n| n as u32))
++                .u32(current.disposition.map_or(u32::MAX, |n| n as u32));
++        }
++        params
++            .u32((source.width / 2) as u32)
++            .u32((response.width / 2) as u32)
++            .u32(source_extent as u32)
++            .u32(response_extent as u32)
++            .ptr(output.lo.device_ptr())
++            .ptr(output.hi.device_ptr())
++            .ptr(lane.slot)
++            .ptr(lane.census)
++            .ptr(lane.lineage)
++            .u32(lane.lineage_count);
++        self.record_blocks(
++            lane,
++            "section_phase_convolution",
++            1,
++            self.declaration.warp_size.max(1),
++            shared,
++            &mut params,
++            "phase-convolution",
++        )
++    }
++
+     pub(crate) fn record_constitutive_bilinear_source(
+         &self,
+         lane: &Lane<'_, 'chart>,
+diff --git a/crates/holonic-mount/src/metal.rs b/crates/holonic-mount/src/metal.rs
+index 3ea23213..4eba5b52 100644
+--- a/crates/holonic-mount/src/metal.rs
++++ b/crates/holonic-mount/src/metal.rs
+@@ -833,6 +833,7 @@ impl Module {
+             "section_constitutive_fibre" => (&[4, 5, 6, 12], 13),
+             "section_constitutive_current" => (&[4, 5, 6, 9, 10, 11, 12, 13, 14, 20], 21),
+             "section_constitutive_bilinear_source" => (&[2, 3, 4, 7, 8, 9, 10, 11, 17], 18),
++            "section_phase_convolution" => (&[2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 19], 20),
+             "section_constitutive_differential" => (&[2, 3, 4, 5, 11], 12),
+             "section_constitutive_condition_preimage" => (&[3, 4, 5, 8, 9, 10, 11, 12, 13, 23], 24),
+             "section_field_source_frame" => (&[6, 12], 13),
+diff --git a/crates/holonics-hna/examples/recorded_temporal_action.rs b/crates/holonics-hna/examples/recorded_temporal_action.rs
+new file mode 100644
+index 00000000..732c1e50
+--- /dev/null
++++ b/crates/holonics-hna/examples/recorded_temporal_action.rs
+@@ -0,0 +1,334 @@
++//! A declared native temporal action learned from recorded coefficient observations.
++//! The digital response controls do not assert a physical room or utterance-response law.
++use holonic_engine::{
++    embedding_fiber::ResidentReadout,
++    native_ecology::constitutive_fibre::{
++        ConditionPreimageReading, ConstitutiveReading, ResidentConstitutiveCurrent,
++        ResidentConstitutiveFibre, ResidentConstitutiveReturn,
++    },
++    phase_current::{
++        resident::{convolve_resident, ResidentPhaseCurrentView},
++        PhaseCurrentLineageId, PhaseCurrentReceiverId,
++    },
++    resident_section::{
++        ResidentGrain, ResidentSection, ResidentSectionRest, ResidentSurface, TransferCensus,
++    },
++};
++use holonics_hna::native::acoustic_field::AcousticFieldChart;
++use life::mathematical_source::ExactAcousticOccurrence;
++use num_rational::BigRational as Rat;
++use serde_json::{json, Value};
++use std::{error::Error, fs::OpenOptions, io::Write, path::PathBuf, time::Instant};
++
++type Result<T> = std::result::Result<T, Box<dyn Error>>;
++const WIDTH: usize = 4;
++const DIVISOR: i64 = 32768;
++const CONTROLS: [[i64; 4]; 5] = [
++    [0, 0, 0, 0],
++    [1, 0, 0, 0],
++    [0, 1, 0, 0],
++    [0, 0, 1, 0],
++    [0, 0, 0, 1],
++];
++
++fn strings(values: &[Rat]) -> Vec<String> {
++    values.iter().map(ToString::to_string).collect()
++}
++fn work(before: &TransferCensus, after: &TransferCensus, seconds: f64) -> Value {
++    json!({"seconds":seconds,"section_readouts":after.section_read_outs-before.section_read_outs,
++        "numerical_egress_octets":after.egress_section_octets-before.egress_section_octets,
++        "ingress_octets":after.ingress_octets-before.ingress_octets,
++        "receipt_egress_octets":after.egress_receipt_octets-before.egress_receipt_octets,
++        "deeds":after.deed_launches-before.deed_launches,
++        "allocations":after.allocations-before.allocations,
++        "resident_octets_now":after.resident_octets_now,"resident_octets_peak":after.resident_octets_peak})
++}
++fn stage<T>(
++    s: &ResidentSurface<'_>,
++    report: &mut Value,
++    name: &str,
++    action: impl FnOnce() -> Result<T>,
++) -> Result<T> {
++    report["active_stage"] = json!(name);
++    let before = s.census();
++    let started = Instant::now();
++    let result = action();
++    report["stages"][name] = work(&before, &s.census(), started.elapsed().as_secs_f64());
++    result
++}
++fn mount<'c>(
++    s: &'c ResidentSurface<'c>,
++    coordinates: &[i64],
++    den: i64,
++) -> Result<ResidentSection<'c>> {
++    let mut words: Vec<_> = coordinates.iter().map(|v| (*v, *v)).collect();
++    words.push((den, den));
++    Ok(s.mount_section_rest(&ResidentSectionRest::found(
++        1,
++        words.len(),
++        ResidentGrain(0),
++        64,
++        words,
++    )?)?)
++}
++fn rational<'a, 'c>(s: &'a ResidentSection<'c>) -> Result<ResidentConstitutiveCurrent<'a, 'c>> {
++    Ok(ResidentConstitutiveCurrent::rational(s)?)
++}
++fn response<'a, 'c>(
++    s: &'a ResidentSection<'c>,
++    step: &Rat,
++    id: u64,
++) -> Result<ResidentPhaseCurrentView<'a, 'c>> {
++    Ok(ResidentPhaseCurrentView::new(
++        rational(s)?,
++        PhaseCurrentReceiverId(2),
++        PhaseCurrentLineageId(id),
++        Rat::from_integer(0.into()),
++        step.clone(),
++        WIDTH as u32,
++        2,
++    )?)
++}
++fn point(s: &ResidentSurface<'_>, section: &ResidentSection<'_>) -> Result<Value> {
++    let words = s.read_out(section)?;
++    if words.len() < 2 || words.iter().any(|(a, b)| a != b) || words.last().unwrap().0 <= 0 {
++        return Err("terminal point/denominator refusal".into());
++    }
++    let den = words.last().unwrap().0;
++    let coordinates: Vec<_> = words[..words.len() - 1]
++        .iter()
++        .map(|p| Rat::new(p.0.into(), den.into()))
++        .collect();
++    Ok(json!({"coordinates":strings(&coordinates),"raw_words":words}))
++}
++fn returned(result: &ResidentConstitutiveReturn<'_>) -> Result<Value> {
++    Ok(match result.inspect()?.predecessor_reading {
++        ConstitutiveReading::Unique { current } => {
++            json!({"status":"unique","coordinates":strings(&current)})
++        }
++        ConstitutiveReading::Plural {
++            particular,
++            directions,
++        } => json!({"status":"plural",
++            "particular":strings(&particular),"directions":directions.iter().map(|v|strings(v)).collect::<Vec<_>>()}),
++        ConstitutiveReading::OutsideDomain { source_remainder } => {
++            json!({"status":"outside-domain","residual":strings(&source_remainder)})
++        }
++    })
++}
++
++fn experiment<'c>(
++    s: &'c ResidentSurface<'c>,
++    chart: &AcousticFieldChart,
++    body: &mut ResidentConstitutiveFibre<'c>,
++    report: &mut Value,
++) -> Result<()> {
++    // Eight interior clock cuts are fixed before any current is observed. Cuts 3/9 and 6/9
++    // are held out; the other six train. No silence, amplitude, rank or answer selects a cut.
++    let full_cells = chart.section().raw_extent() / WIDTH;
++    if full_cells < 9 {
++        return Err("recording needs at least nine complete temporal cells".into());
++    }
++    let indices: Vec<_> = (1..=8).map(|i| i * (full_cells - 1) / 9).collect();
++    let training_indices: Vec<_> = indices
++        .iter()
++        .enumerate()
++        .filter(|(i, _)| *i != 2 && *i != 5)
++        .map(|(_, v)| *v)
++        .collect();
++    let hidden_index = indices[2];
++    let later_index = indices[5];
++    report["selection"] = json!({"rule":"eight fixed interior chronological cuts at ninths; third and sixth held out",
++        "training_cells":training_indices,"hidden_cell":hidden_index,"later_cell":later_index});
++    let cells: Vec<_> = training_indices
++        .iter()
++        .map(|i| chart.mount_cell(s, *i))
++        .collect::<std::result::Result<_, _>>()?;
++    let hidden_cell = chart.mount_cell(s, hidden_index)?;
++    let later_cell = chart.mount_cell(s, later_index)?;
++    let zero = mount(s, &[0; 2 * WIDTH], DIVISOR)?;
++    let controls: Vec<_> = CONTROLS
++        .iter()
++        .map(|v| mount(s, v, 1))
++        .collect::<Result<_>>()?;
++    let hidden_response = mount(s, &[2, -1, 5, 3], 3)?;
++    report["training_supports"] =
++        json!(cells.iter().map(|cell| cell.support()).collect::<Vec<_>>());
++    report["hidden_support"] = json!(hidden_cell.support());
++    report["later_support"] = json!(later_cell.support());
++    report["training_observations"] = json!(0);
++    report["calibration_observations"] = json!(0);
++    stage(s, report, "zero_source_calibration", || {
++        for (i, c) in controls.iter().enumerate() {
++            let source = ResidentPhaseCurrentView::new(
++                rational(&zero)?,
++                PhaseCurrentReceiverId(1),
++                PhaseCurrentLineageId(2),
++                Rat::from_integer(0.into()),
++                chart.section().sample_step.clone(),
++                WIDTH as u32,
++                WIDTH,
++            )?;
++            let actual = convolve_resident(
++                s,
++                source,
++                response(c, &chart.section().sample_step, 10 + i as u64)?,
++                PhaseCurrentReceiverId(3),
++                PhaseCurrentLineageId(20 + i as u64),
++            )?;
++            body.advance_bilinear_contact(rational(&zero)?, rational(c)?, Some(actual.current()?))?;
++        }
++        Ok(())
++    })?;
++    report["calibration_observations"] = json!(body.occurrences());
++    let calibration_cut = body.occurrences();
++    let training = stage(s, report, "recorded_development", || {
++        for cell in &cells {
++            for (i, c) in controls.iter().enumerate() {
++                let actual = convolve_resident(
++                    s,
++                    cell.temporal_view()?,
++                    response(c, cell.sample_step(), 10 + i as u64)?,
++                    PhaseCurrentReceiverId(3),
++                    PhaseCurrentLineageId(30 + body.occurrences()),
++                )?;
++                body.advance_bilinear_contact(
++                    cell.rational()?,
++                    rational(c)?,
++                    Some(actual.current()?),
++                )?;
++            }
++        }
++        Ok(())
++    });
++    report["training_observations"] = json!(body.occurrences() - calibration_cut);
++    training?;
++    let actual = stage(s, report, "hidden_native_observation", || {
++        Ok(convolve_resident(
++            s,
++            hidden_cell.temporal_view()?,
++            response(&hidden_response, hidden_cell.sample_step(), 100)?,
++            PhaseCurrentReceiverId(3),
++            PhaseCurrentLineageId(101),
++        )?)
++    })?;
++    let cut = body.occurrences();
++    let preimage = stage(s, report, "condition_preimage", || {
++        Ok(body.read_condition_preimage(hidden_cell.rational()?, actual.current()?)?)
++    })?;
++    report["preimage_relation_cut"] = json!(preimage.relation_cut());
++    if body.occurrences() != cut {
++        return Err("condition read changed the continuing relation".into());
++    }
++    // Attempt the native point consumer directly. Its device-side disposition check refuses
++    // plural/outside conditions; the host does not inspect a fibre to select subsequent conduct.
++    let predicted = stage(s, report, "inferred_prediction", || {
++        Ok(body.advance_bilinear_contact(later_cell.rational()?, preimage.current(), None)?)
++    });
++    let later_actual = stage(s, report, "later_native_observation", || {
++        Ok(convolve_resident(
++            s,
++            later_cell.temporal_view()?,
++            response(&hidden_response, later_cell.sample_step(), 100)?,
++            PhaseCurrentReceiverId(3),
++            PhaseCurrentLineageId(102),
++        )?)
++    })?;
++
++    // All numerical inspection happens after native development, inference and comparison act.
++    let observed = stage(s, report, "terminal_observer", || {
++        let condition = match preimage.inspect()? {
++            ConditionPreimageReading::Compatible {
++                particular,
++                directions,
++            } => json!({
++                "status":if directions.is_empty(){"unique"}else{"plural"},"particular":strings(&particular),
++                "directions":directions.iter().map(|v|strings(v)).collect::<Vec<_>>()}),
++            ConditionPreimageReading::OutsideRepresentedRelation { residual } => {
++                json!({"status":"outside","residual":strings(&residual)})
++            }
++        };
++        let prediction = match &predicted {
++            Ok(value) => returned(value)?,
++            Err(error) => json!({"status":"native-consumer-refused","error":error.to_string()}),
++        };
++        let later = point(s, later_actual.section())?;
++        let agreement = prediction["coordinates"].is_array()
++            && prediction["coordinates"] == later["coordinates"];
++        Ok(
++            json!({"preimage":condition,"prediction":prediction,"later_actual":later,"exact_agreement":agreement,
++            "hidden_source":point(s,hidden_cell.section())?,"later_source":point(s,later_cell.section())?,
++            "hidden_response":point(s,&hidden_response)?,"hidden_actual":point(s,actual.section())?}),
++        )
++    })?;
++    report["observation"] = observed;
++    report["complete_bounded_comparison"] = report["observation"]["exact_agreement"].clone();
++    Ok(())
++}
++
++fn main() -> Result<()> {
++    let args: Vec<_> = std::env::args().skip(1).collect();
++    if args.len() != 2 {
++        return Err("usage: recorded_temporal_action WAV_PATH NEW_REPORT.json".into());
++    }
++    let wav_path = PathBuf::from(&args[0]);
++    let report_path = PathBuf::from(&args[1]);
++    if report_path.exists() {
++        return Err("report already exists".into());
++    }
++    let started = Instant::now();
++    let recording = ExactAcousticOccurrence::read(
++        &wav_path,
++        format!("recorded-temporal-action:{}", wav_path.display()),
++        4096,
++        4096,
++        1,
++    )?;
++    let decode_seconds = started.elapsed().as_secs_f64();
++    let readout = ResidentReadout::new()?;
++    let s = ResidentSurface::on(&readout)?;
++    let chart = AcousticFieldChart::from_acoustic(
++        &recording,
++        PhaseCurrentReceiverId(1),
++        PhaseCurrentLineageId(1),
++        Rat::from_integer(0.into()),
++        WIDTH,
++        DIVISOR,
++    )?;
++    let mut report = json!({"schema":"holonics.recorded-temporal-action.v1","truth_status":"established-bounded",
++        "evidence_tags":["measured"],"scope":"declared complex polynomial action on recorded coefficients",
++        "source":{"path":wav_path,"sha256":recording.source_sha256,"octets":recording.source_octets,
++            "samples":recording.samples.len(),"sample_rate":recording.sample_rate,"occurrence":recording.occurrence,
++            "receiver":1,"lineage":1},
++        "aperture":{"source_complex":WIDTH,"condition_complex":2,"target_complex":WIDTH+1,"pcm_divisor":DIVISOR,
++            "interpretation":"caller-declared temporal aperture, not learned semantic grain"},
++        "response_control":{"coordinates":["2","-1","5","3"],"denominator":"3",
++            "interpretation":"independently controlled complex digital two-tap action; no physical room/utterance response claim"},
++        "training_controls":CONTROLS,"decode_seconds":decode_seconds,"active_stage":"found-owner","stages":{},
++        "complete_bounded_comparison":false,"sound_model":false,"conversation_model":false});
++    match ResidentConstitutiveFibre::found_bilinear_contact(&s, WIDTH, 2, WIDTH + 1) {
++        Ok(mut body) => {
++            if let Err(error) = experiment(&s, &chart, &mut body, &mut report) {
++                report["refusal"] =
++                    json!({"stage":report["active_stage"],"error":error.to_string()});
++            }
++            report["learner_occurrences"] = json!(body.occurrences());
++        }
++        Err(error) => report["refusal"] = json!({"stage":"found-owner","error":error.to_string()}),
++    }
++    report["elapsed_seconds"] = json!(started.elapsed().as_secs_f64());
++    report["final_census"] = json!(s.census());
++    let mut file = OpenOptions::new()
++        .write(true)
++        .create_new(true)
++        .open(&report_path)?;
++    serde_json::to_writer_pretty(&mut file, &report)?;
++    file.write_all(b"\n")?;
++    file.sync_all()?;
++    println!(
++        "{}",
++        json!({"report":report_path,"recorded_observations":report["training_observations"],
++        "preimage":report["observation"]["preimage"]["status"],"agreement":report["observation"]["exact_agreement"],"refusal":report["refusal"]})
++    );
++    Ok(())
++}
+diff --git a/crates/holonics-hna/src/native/acoustic_field.rs b/crates/holonics-hna/src/native/acoustic_field.rs
+index 33ee1f9b..d5dd75ce 100644
+--- a/crates/holonics-hna/src/native/acoustic_field.rs
++++ b/crates/holonics-hna/src/native/acoustic_field.rs
+@@ -11,7 +11,10 @@ use holonic_engine::{
+         NativeFieldOccurrence, NativeFieldReceiverStatus, NativeFieldStep, NativePhaseCurrent,
+         ResidentConstitutiveCurrent,
+     },
+-    phase_current::{ExactPhaseCurrentSection, PhaseCurrentLineageId, PhaseCurrentReceiverId},
++    phase_current::{
++        resident::{ResidentPhaseCurrentError, ResidentPhaseCurrentView},
++        ExactPhaseCurrentSection, PhaseCurrentLineageId, PhaseCurrentReceiverId,
++    },
+     resident_section::{ResidentGrain, ResidentSection, ResidentSectionRest, ResidentSurface},
+ };
+ use life::mathematical_source::ExactAcousticOccurrence;
+@@ -61,6 +64,22 @@ impl<'surface, 'source> AcousticFieldCell<'surface, 'source> {
+         Ok(ResidentConstitutiveCurrent::rational(&self.section)?)
+     }
+ 
++    /// Borrow this cell in its actual source clock for the resident causal temporal owner.
++    /// This supplies no contact or impulse-response interpretation for a second recording.
++    pub fn temporal_view(
++        &self,
++    ) -> Result<ResidentPhaseCurrentView<'_, 'surface>, ResidentPhaseCurrentError> {
++        ResidentPhaseCurrentView::new(
++            ResidentConstitutiveCurrent::rational(&self.section)?,
++            self.receiver(),
++            self.lineage(),
++            self.support.begin.clone(),
++            self.sample_step().clone(),
++            self.chart.section.phase_extent,
++            self.support.coefficient_until - self.support.coefficient_from,
++        )
++    }
++
+     pub fn chart(&self) -> &'source AcousticFieldChart {
+         self.chart
+     }
+diff --git a/crates/holonics-hna/src/native/acoustic_field/tests.rs b/crates/holonics-hna/src/native/acoustic_field/tests.rs
+index b542729e..dbc361a8 100644
+--- a/crates/holonics-hna/src/native/acoustic_field/tests.rs
++++ b/crates/holonics-hna/src/native/acoustic_field/tests.rs
+@@ -225,6 +225,13 @@ fn mounted_cells_keep_exact_pcm_support_and_feed_rational_current_without_readba
+     );
+     assert_eq!(c.cursor(), 0);
+ 
++    let temporal = padded.temporal_view().unwrap();
++    assert_eq!(temporal.origin(), &padded.support().begin);
++    assert_eq!(temporal.sample_step(), padded.sample_step());
++    assert_eq!(temporal.raw_extent(), 1);
++    assert_eq!(temporal.phase_extent(), 2);
++    assert_eq!(temporal.lineage(), padded.lineage());
++
+     let mut body = ResidentConstitutiveFibre::found(&surface, 4, 4).unwrap();
+     let before = surface.census();
+     // Identity-receiver control: the native relation must transport the common denominator
+@@ -265,3 +272,68 @@ fn mounted_cells_keep_exact_pcm_support_and_feed_rational_current_without_readba
+         vec![(9, 9), (0, 0), (0, 0), (0, 0), (32768, 32768)]
+     );
+ }
++
++#[test]
++#[ignore = "requires native GPU; acoustic temporal support enters the resident causal owner"]
++fn acoustic_cell_convolution_retains_exact_clock_padding_and_causal_tail() {
++    use holonic_engine::phase_current::resident::{convolve_resident, ResidentPhaseCurrentView};
++    let r = ResidentReadout::new().unwrap();
++    let s = ResidentSurface::on(&r).unwrap();
++    let recording = chart(&[3, -7, 0, 9, 2], 4);
++    let cell = recording.mount_cell(&s, 0).unwrap();
++    let response = s
++        .mount_section_rest(
++            &ResidentSectionRest::found(
++                1,
++                5,
++                ResidentGrain(0),
++                64,
++                vec![(1, 1), (0, 0), (1, 1), (0, 0), (2, 2)],
++            )
++            .unwrap(),
++        )
++        .unwrap();
++    // A declared local two-tap response, whose origin is a delay rather than a recording clock.
++    let response = ResidentPhaseCurrentView::new(
++        ResidentConstitutiveCurrent::rational(&response).unwrap(),
++        PhaseCurrentReceiverId(3),
++        PhaseCurrentLineageId(4),
++        BigRational::from_integer(0.into()),
++        cell.sample_step().clone(),
++        4,
++        2,
++    )
++    .unwrap();
++    let before = s.census();
++    let out = convolve_resident(
++        &s,
++        cell.temporal_view().unwrap(),
++        response,
++        PhaseCurrentReceiverId(5),
++        PhaseCurrentLineageId(6),
++    )
++    .unwrap();
++    assert_eq!(s.census().section_read_outs, before.section_read_outs);
++    assert_eq!(s.census().ingress_octets, before.ingress_octets);
++    assert_eq!(out.view().unwrap().origin(), &cell.support().begin);
++    assert_eq!(out.view().unwrap().raw_extent(), 5);
++    let words = s.read_out(out.section()).unwrap();
++    assert_eq!(
++        words,
++        vec![
++            (3, 3),
++            (0, 0),
++            (-4, -4),
++            (0, 0),
++            (-7, -7),
++            (0, 0),
++            (9, 9),
++            (0, 0),
++            (9, 9),
++            (0, 0),
++            (65536, 65536)
++        ]
++    );
++    assert_eq!(recording.cursor(), 0);
++    assert_eq!(recording.reconstruct_samples(), vec![3, -7, 0, 9, 2]);
++}
+diff --git a/docs/ACOUSTIC_EXPERIMENTS.md b/docs/ACOUSTIC_EXPERIMENTS.md
+index 7a4b1244..8776fddc 100644
+--- a/docs/ACOUSTIC_EXPERIMENTS.md
++++ b/docs/ACOUSTIC_EXPERIMENTS.md
+@@ -38,6 +38,22 @@ padding and parent delivery metadata. It does not advance the chart cursor or su
+ The [resident ingress return](../research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md)
+ records five passing acoustic-field controls; the subsequent interval attachment is described below.
+ 
++[established-bounded; implemented-exact] `AcousticFieldCell::temporal_view()` now borrows the
++cell's exact support, clock and rational coefficients into
++`holonic_engine::phase_current::resident::convolve_resident`. This resident realization of the
++existing causal polynomial owner retains every output coefficient through the final carry and
++both particular operand carriers. A response has an explicitly declared local delay chart;
++this operation does not align arbitrary source/reply utterances or infer a physical room law.
++The existing conditional learner can receive its resident observations and later use the
++condition Preimage Fibre. A plural fibre is refused by a point consumer rather than selected.
++
++[established-bounded; measured] The [temporal return](../research/records/2026-09-07_THE_NATIVE_TEMPORAL_ACTION_RETAINS_ITS_CAUSAL_TAIL.md)
++records 21 focused checks and the public `recorded_temporal_action WAV_PATH NEW_REPORT.json`
++experiment. Fixed chronological LibriSpeech cells support an exact inferred two-tap digital
++response and later prediction. Silent ESC-50 cuts retain four condition directions and a native
++point-consumer refusal. The independent Fraction observer checks complete source/output
++coordinates. These finite coefficient studies do not establish learned sound or language quality.
++
+ [established-bounded; measured] The [recorded interval attachment](../research/records/2026-09-07_RECORDED_RESPONSE_POINTERS_RETAIN_THEIR_ACOUSTIC_INTERVALS.md)
+ now supplies `AcousticFieldChart::from_acoustic_range` and `native::recorded` for exact original
+ source/target pointers and recording bounds. `RecordedResponseSections::bind` keeps annotation
+diff --git a/docs/ARCHITECTURE_MAP.md b/docs/ARCHITECTURE_MAP.md
+index 3fed3661..aee9d3c8 100644
+--- a/docs/ARCHITECTURE_MAP.md
++++ b/docs/ARCHITECTURE_MAP.md
+@@ -42,8 +42,16 @@ capture/playback chronology. These share the native session and introduce no sec
+ [established-bounded; measured] `holonics-hna::native::acoustic_field::{AcousticFieldChart,AcousticFieldCell}`
+ also mounts timed source coefficients through `mount_cell` into the shared resident rational
+ current port. The [five-control return](../research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md)
+-retains exact source/clock support and delivery lineage. Native temporal/material action and
+-useful acoustic conduct remain open.
++retains exact source/clock support and delivery lineage. `AcousticFieldCell::temporal_view`
++now attaches that exact clock/support to `holonic-engine::phase_current::resident`.
++
++[established-bounded; implemented-exact] `phase_current::resident::{ResidentPhaseCurrentView,
++ResidentPhaseConvolution,convolve_resident}` realizes the existing causal polynomial action
++from `phase_current::convolve_phase_current` on resident complex rational coefficients.
++`kernels/phase_current_convolution.cuh`, `resident_section/surface_passage.rs` and Apple
++`accelerators/metal/native_phase.metal::section_phase_convolution` own execution and launch.
++Both operand carriers remain borrowed and the complete causal tail returns. This is one declared
++temporal action; useful learned acoustic conduct and general material composition remain open.
+ 
+ [established-bounded; measured] `native::recorded` exposes
+ `native/speech/{recorded.rs,recorded/sections.rs}` for source/target pointer resolution, exact
+@@ -51,7 +59,8 @@ annotation-to-PCM bounds and `RecordedResponseSections::bind`. It uses
+ `AcousticFieldChart::from_acoustic_range` and the existing resident ingress. The
+ [actual-recording return](../research/records/2026-09-07_RECORDED_RESPONSE_POINTERS_RETAIN_THEIR_ACOUSTIC_INTERVALS.md)
+ retains all 899 AMI records and their actual interval/receiver scope. This is an exterior source
+-attachment; the native temporal/material action and useful acoustic conduct remain open.
++attachment; it does not make one utterance an impulse response for another. Useful acoustic
++conduct and the appropriate material/condition binding remain open.
+ 
+ [established-bounded; implemented-exact] Ordered unlinked packets are owned by
+ `constitutive_fibre/circulation/batch.rs` and `holonics-hna/src/native/batch.rs`; they reuse the
+diff --git a/docs/plans/HOLONICS_ON_APPLE_SILICON.md b/docs/plans/HOLONICS_ON_APPLE_SILICON.md
+index e2729f07..ee1b780d 100644
+--- a/docs/plans/HOLONICS_ON_APPLE_SILICON.md
++++ b/docs/plans/HOLONICS_ON_APPLE_SILICON.md
+@@ -57,8 +57,12 @@ by a plural fibre; identifying an individual performance or reversing the raw pa
+    The [resident cell ingress](../../research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md)
+    supplies the current port. The [recorded interval return](../../research/records/2026-09-07_RECORDED_RESPONSE_POINTERS_RETAIN_THEIR_ACOUSTIC_INTERVALS.md)
+    now attaches parent recording and annotation-pointer lineage, exact supports, gaps and refusals.
+-   Next construct the admitted temporal/material action between the complete source and receiving
+-   sections; equal cell ordinals in unequal utterances do not supply that action.
++   The resident temporal owner now realizes the existing exact causal polynomial convolution,
++   retaining the complete tail and borrowing both operand carriers. It composes with the shared
++   conditional relation and condition Preimage Fibre without numerical host replay. Its response
++   is a declared local temporal action, not an arbitrary second utterance. Next bind the material
++   and receiving conditions appropriate to actual sound development; equal cell ordinals in
++   unequal utterances do not supply that action.
+ 3. Develop and retain acoustic generative standing across source-qualified recordings and
+    actual joined returns, then conduct its native emission into the declared acoustic receiver.
+    Inspect perception differences and generated sound, preserve the declared reconstruction
+diff --git a/research/experiments/apple_silicon/compare_recorded_temporal_action.py b/research/experiments/apple_silicon/compare_recorded_temporal_action.py
+new file mode 100644
+index 00000000..ec3f48cb
+--- /dev/null
++++ b/research/experiments/apple_silicon/compare_recorded_temporal_action.py
+@@ -0,0 +1,102 @@
++#!/usr/bin/env python3
++"""Cold independent Fraction/PCM comparison; never supplies a target to native development."""
++import argparse
++from fractions import Fraction as Q
++import hashlib
++import json
++from pathlib import Path
++import struct
++import wave
++
++
++def coordinates(point):
++    pairs = point["raw_words"]
++    assert all(a == b for a, b in pairs)
++    den = pairs[-1][0]
++    assert den > 0
++    actual = [Q(a, den) for a, _ in pairs[:-1]]
++    assert actual == [Q(value) for value in point["coordinates"]]
++    return actual
++
++
++def convolve(source, response):
++    n, k = len(source) // 2, len(response) // 2
++    out = [Q(0) for _ in range(2 * (n + k - 1))]
++    for i in range(n):
++        for j in range(k):
++            ar, ai = source[2*i:2*i+2]
++            br, bi = response[2*j:2*j+2]
++            out[2*(i+j)] += ar*br - ai*bi
++            out[2*(i+j)+1] += ar*bi + ai*br
++    return out
++
++
++def compare(path):
++    report = json.loads(path.read_text())
++    source = report["source"]
++    wav = Path(source["path"])
++    assert hashlib.sha256(wav.read_bytes()).hexdigest() == source["sha256"]
++    with wave.open(str(wav), "rb") as recording:
++        assert recording.getnchannels() == 1 and recording.getsampwidth() == 2
++        rate = recording.getframerate()
++        assert rate == source["sample_rate"]
++        count = recording.getnframes()
++        assert count == source["samples"]
++        samples = struct.unpack(f"<{count}h", recording.readframes(count))
++    observation = report["observation"]
++    response = coordinates(observation["hidden_response"])
++    inputs = {}
++    for role in ("hidden", "later"):
++        support = report[f"{role}_support"]
++        start, end = support["coefficient_from"], support["coefficient_until"]
++        # The report's rational clocks use the repository BigRational serializer. Their sample
++        # support is independently checked against the unchanged source PCM and exact rate.
++        actual = coordinates(observation[f"{role}_source"])
++        expected = [q for sample in samples[start:end] for q in (Q(sample,32768),Q(0))]
++        assert actual == expected
++        assert end-start == report["aperture"]["source_complex"]
++        inputs[role] = actual
++        assert coordinates(observation[f"{role}_actual"]) == convolve(actual,response)
++    preimage = observation["preimage"]
++    particular = [Q(value) for value in preimage["particular"]]
++    directions = [[Q(value) for value in row] for row in preimage["directions"]]
++    hidden_target = coordinates(observation["hidden_actual"])
++    assert convolve(inputs["hidden"],particular) == hidden_target
++    assert all(not any(convolve(inputs["hidden"],d)) for d in directions)
++    later_directions = [convolve(inputs["later"],d) for d in directions]
++    if preimage["status"] == "unique":
++        assert not directions and particular == response
++        assert observation["prediction"]["status"] == "unique"
++        assert [Q(v) for v in observation["prediction"]["coordinates"]] == convolve(inputs["later"],response)
++        assert observation["exact_agreement"] is True
++    else:
++        assert preimage["status"] == "plural" and directions
++        assert observation["prediction"]["status"] == "native-consumer-refused"
++    for name, stage in report["stages"].items():
++        if name != "terminal_observer":
++            assert stage["section_readouts"] == 0 and stage["numerical_egress_octets"] == 0
++    return {"report":str(path),"source_sha256":source["sha256"],"sample_rate":rate,
++        "pcm_support_and_two_native_convolutions_agree":True,
++        "native_preimage_status":preimage["status"],"condition_direction_count":len(directions),
++        "native_prediction_status":observation["prediction"]["status"],
++        "cold_later_image_directions":[[str(q) for q in row] for row in later_directions],
++        "cold_later_image_is_singleton":not any(any(row) for row in later_directions),
++        "native_stages_have_zero_numerical_readouts":True}
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("reports", type=Path, nargs="+")
++    parser.add_argument("--output", required=True, type=Path)
++    args = parser.parse_args()
++    result = {"truth_status":"established-bounded","evidence_tags":["measured"],
++        "scope":"cold Fraction and original PCM comparison; no native execution or learning",
++        "comparisons":[compare(path) for path in args.reports]}
++    with args.output.open("x") as output:
++        json.dump(result,output,indent=2)
++        output.write("\n")
++    print(json.dumps(result))
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/research/records/2026-09-07_THE_NATIVE_TEMPORAL_ACTION_RETAINS_ITS_CAUSAL_TAIL.md b/research/records/2026-09-07_THE_NATIVE_TEMPORAL_ACTION_RETAINS_ITS_CAUSAL_TAIL.md
+new file mode 100644
+index 00000000..1792d2b7
+--- /dev/null
++++ b/research/records/2026-09-07_THE_NATIVE_TEMPORAL_ACTION_RETAINS_ITS_CAUSAL_TAIL.md
+@@ -0,0 +1,132 @@
++# The native temporal action retains its causal tail
++
++**Date:** September 7, 2026. **Branch:** `codex/apple-silicon`.
++**Source parent:** `65b4c5b2`. **Scope:** resident causal polynomial action and its composition
++with the existing conditional relation, acoustic chart and condition Preimage Fibre.
++
++[project-postulate] Brandon resumed AS4–AS5 after the shared generator/linguistic handoff and
++blueprint update. Useful recorded sound, then recorded English/conversation, persistence and
++consumer cost remain the goal. A device primitive or a declared digital action does not complete it.
++
++## Existing owner and exact composition
++
++[established-bounded; source-inspected] `holonic-engine/src/phase_current.rs` already owns
++`convolve_phase_current`: complete temporal polynomial coefficients, the carried product, exact
++clock and both source lineages. Its CPU implementation is an independent cold observer/reference.
++The absent port was the execution of this action on `ResidentConstitutiveCurrent` operands,
++without copying numerical currents back to that reference owner.
++
++[established-bounded; implemented-exact] `phase_current::resident` now provides that port.
++`ResidentPhaseCurrentView` borrows a rational complex current with validated raw extent, phase
++extent, exact origin and positive sample step. `convolve_resident` produces all `N + K - 1`
++complex coefficients of the two input polynomials. Their clocks must share sample step and phase
++extent; output origins add. Coordinates beyond a declared raw extent must be exactly zero.
++The resulting `ResidentPhaseConvolution` borrows both complete particular operands, so summation
++does not discard those source histories. It does not claim to enumerate all possible factorizations
++of a given output. `view()` carries the result directly into another resident temporal operation.
++
++[established-bounded; implemented-exact] Metal `section_phase_convolution` uses existing checked
++wide multiplication, addition, normalization and rational-current validation. Every output word
++is checked before publication. Negative/zero/nonpoint denominators, nonpoint coordinates,
++nonzero padding and nonunique current dispositions refuse. Host launch admission checks surface,
++shape and actual device scratch aperture before allocating output. Scratch contains
++`2 * (N + K - 1)` wide carriers; on Metal each has twenty bytes, with launch allocation rounded
++to sixteen-byte alignment. Inputs are never mutated. Arithmetic can still refuse at the declared
++wide or final signed-word carrier boundary.
++
++[established-bounded; source-inspected] The matching CUDA entry is in
++`kernels/phase_current_convolution.cuh`, included by `exact_resident_section.cu` and watched by
++`build.rs`. Its ABI and use of the corresponding checked wide helpers were reviewed. This Mac
++has no `nvcc`; this return supplies neither CUDA compilation nor measured cross-device parity
++for the new convolution kernel.
++
++[established-bounded; implemented-exact] `AcousticFieldCell::temporal_view()` binds the resident
++operation to the existing exact PCM chart. It retains the actual recording support/origin,
++receiver, lineage, sample step and structural padding without advancing the chart cursor.
++The response origin belongs to its declared local delay chart. A recorded reply interval is
++not thereby an impulse response, and equal cell ordinals in two utterances do not establish contact.
++
++## Verification
++
++[established-bounded; measured] Thirteen engine temporal controls passed on Apple Metal: five
++existing cold phase-current controls and eight new resident controls. The first command returned
++twelve passes; the additional plural-fibre control was compiled and run separately after addition.
++
++```sh
++cargo test -p holonic-engine --lib phase_current:: -- --include-ignored --test-threads=1
++cargo test -p holonic-engine --lib phase_current::resident::tests::temporal_point_consumer_preserves_a_plural_fibre -- --include-ignored --test-threads=1
++```
++
++[established-bounded; measured] These controls cover complete causal carry against the existing
++cold owner, nonzero origins and exact clocks, rational complex serial continuation without ingress
++or numerical readout, wide-product normalization before word conversion, late overflow and
++malformed-source preservation, chart/surface refusal before allocation, the last admitted scratch
++coordinate and next-extent refusal, and preservation of a plural current when the point consumer
++refuses it.
++
++[established-bounded; measured] The native learning control uses the existing
++`ResidentConstitutiveFibre::found_bilinear_contact(2,2,3)`. Twenty-five independent source/response
++impulse combinations are applied to the native temporal apparatus; only its resident returns
++enter the learner. A later source and observation infer the unprovided response
++`[(2-i)/3, (5+3i)/3]`. That inferred condition predicts another source's complete three-coefficient
++return exactly. Development, preimage derivation and prediction use no numerical host readout.
++This is a declared finite polynomial-action control, not corpus-cultivated acoustic competence.
++
++[established-bounded; measured] Eight acoustic-field controls passed, including the new actual
++source-clock attachment and two-tap causal-tail control, plus the previous source/padding,
++recording-range, rational ingress and refused-source continuation checks:
++
++```sh
++cargo test -p holonics-hna --lib native::acoustic_field::tests -- --include-ignored --test-threads=1
++```
++
++## Recorded coefficient experiment
++
++[established-bounded; measured] The public `recorded_temporal_action` example ran on an original
++ESC-50 WAV and a LibriSpeech WAV. Each run founds one conditional owner with four source complex
++coordinates, two response coordinates and five output coordinates. Six fixed interior clock cuts
++provide thirty recorded observations under five declared digital response controls. Five native
++zero-source calibration observations expose the direct condition axes. Two further fixed clock
++cuts are held out. Neither amplitude, rank nor an expected answer selects a cut. All native
++development, preimage and prediction stages have zero numerical host readouts; inspection happens
++after the native operations. The learner never receives the hidden response control directly.
++
++[established-bounded; measured] The [LibriSpeech receipt](2026-09-07_native_temporal_action/librispeech.json)
++returns the unique condition `[(2-i)/3, (5+3i)/3]` and exactly predicts the complete later temporal
++current. The source contains 125,680 mono samples at 16 kHz; this experiment learns from six
++four-sample cells, not from the full recording. Thirty recorded observations take 0.067211667 s;
++condition inference takes 0.002308208 s and prediction 0.004068084 s. Whole cold execution takes
++0.198372 s. These small-aperture measurements do not establish sound throughput or speech quality.
++
++[counterexample; measured] The [ESC-50 receipt](2026-09-07_native_temporal_action/esc50.json)
++has zero hidden and later source cells at the declared cuts. The compatible condition retains
++four free directions and its point consumer refuses without choosing a condition or advancing
++the relation. The run retains 35 observations rather than the successful run's 36th predictive
++occurrence. Source and output silence are retained; this is not a sound recognition result.
++
++[established-bounded; measured] The independent
++[Fraction/PCM comparison](2026-09-07_native_temporal_action/comparison.json) checks the original
++WAV hashes and source sample supports, all complex rational convolution coordinates including
++the final carry, inferred conditions and the native-stage readout census. For the silent case,
++every basis direction in the returned condition fibre has zero later image under the declared
++polynomial action. Thus that entire image is fixed even though the condition remains plural;
++the point-condition consumer alone cannot expose that supported consequence. Desktop subsequently
++pushed `82fef476`, supplying the shared condition-image/receive owners for the next integration.
++Their whole-family evidence is not a universal certainty gate on generation.
++
++```sh
++cargo build -p holonics-hna --example recorded_temporal_action
++target/debug/examples/recorded_temporal_action .local/datasets/esc50/audio/1-100032-A-0.wav research/records/2026-09-07_native_temporal_action/esc50.json
++target/debug/examples/recorded_temporal_action .local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav research/records/2026-09-07_native_temporal_action/librispeech.json
++python3 research/experiments/apple_silicon/compare_recorded_temporal_action.py research/records/2026-09-07_native_temporal_action/esc50.json research/records/2026-09-07_native_temporal_action/librispeech.json --output research/records/2026-09-07_native_temporal_action/comparison.json
++```
++
++## Remaining product work
++
++[open] General situated material/condition binding, useful sound perception and production,
++recorded English/conversation, persistence of the resulting acoustic ecology and measured
++streaming consumer cost remain unfinished. A convolution family supplies one temporal action;
++it is not a universal sound law or a learned utterance-to-reply mechanism. Actual generated sound
++must come from productive native standing and its declared timed receiver, with complete causal
++composition across source sections. Fixed sonification and a sequence of independent short cells
++do not close that boundary.
+diff --git a/research/records/2026-09-07_native_temporal_action/comparison.json b/research/records/2026-09-07_native_temporal_action/comparison.json
+new file mode 100644
+index 00000000..1d788af4
+--- /dev/null
++++ b/research/records/2026-09-07_native_temporal_action/comparison.json
+@@ -0,0 +1,82 @@
++{
++  "truth_status": "established-bounded",
++  "evidence_tags": [
++    "measured"
++  ],
++  "scope": "cold Fraction and original PCM comparison; no native execution or learning",
++  "comparisons": [
++    {
++      "report": "research/records/2026-09-07_native_temporal_action/esc50.json",
++      "source_sha256": "f40a849a2375c8c63312a73dd2dd6c74007301fcc21b4be2ece29a642831e3d8",
++      "sample_rate": 44100,
++      "pcm_support_and_two_native_convolutions_agree": true,
++      "native_preimage_status": "plural",
++      "condition_direction_count": 4,
++      "native_prediction_status": "native-consumer-refused",
++      "cold_later_image_directions": [
++        [
++          "0",
++          "0",
++          "0",
++          "0",
++          "0",
++          "0",
++          "0",
++          "0",
++          "0",
++          "0"
++        ],
++        [
++          "0",
++          "0",
++          "0",
++          "0",
++          "0",
++          "0",
++          "0",
++          "0",
++          "0",
++          "0"
++        ],
++        [
++          "0",
++          "0",
++          "0",
++          "0",
++          "0",
++          "0",
++          "0",
++          "0",
++          "0",
++          "0"
++        ],
++        [
++          "0",
++          "0",
++          "0",
++          "0",
++          "0",
++          "0",
++          "0",
++          "0",
++          "0",
++          "0"
++        ]
++      ],
++      "cold_later_image_is_singleton": true,
++      "native_stages_have_zero_numerical_readouts": true
++    },
++    {
++      "report": "research/records/2026-09-07_native_temporal_action/librispeech.json",
++      "source_sha256": "a0f4ce7fc87c059762daedb43420a9763dd992949271666cca1eff2240dabcc3",
++      "sample_rate": 16000,
++      "pcm_support_and_two_native_convolutions_agree": true,
++      "native_preimage_status": "unique",
++      "condition_direction_count": 0,
++      "native_prediction_status": "unique",
++      "cold_later_image_directions": [],
++      "cold_later_image_is_singleton": true,
++      "native_stages_have_zero_numerical_readouts": true
++    }
++  ]
++}
+diff --git a/research/records/2026-09-07_native_temporal_action/esc50.json b/research/records/2026-09-07_native_temporal_action/esc50.json
+new file mode 100644
+index 00000000..dfa9d58d
+--- /dev/null
++++ b/research/records/2026-09-07_native_temporal_action/esc50.json
+@@ -0,0 +1,757 @@
++{
++  "active_stage": "terminal_observer",
++  "aperture": {
++    "condition_complex": 2,
++    "interpretation": "caller-declared temporal aperture, not learned semantic grain",
++    "pcm_divisor": 32768,
++    "source_complex": 4,
++    "target_complex": 5
++  },
++  "calibration_observations": 5,
++  "complete_bounded_comparison": false,
++  "conversation_model": false,
++  "decode_seconds": 0.107173417,
++  "elapsed_seconds": 0.763326917,
++  "evidence_tags": [
++    "measured"
++  ],
++  "final_census": {
++    "allocations": 404,
++    "captured_launches": 220,
++    "control_launches": 0,
++    "deed_launches": 74,
++    "device_to_device_octets": 0,
++    "egress_receipt_octets": 7040,
++    "egress_section_octets": 1712,
++    "ingress_octets": 25024,
++    "resident_octets_now": 0,
++    "resident_octets_peak": 57764,
++    "section_read_outs": 6,
++    "synchronizations": 74
++  },
++  "hidden_support": {
++    "begin": [
++      [
++        1,
++        [
++          18374
++        ]
++      ],
++      [
++        1,
++        [
++          11025
++        ]
++      ]
++    ],
++    "cell": 18374,
++    "coefficient_from": 73496,
++    "coefficient_until": 73500,
++    "end": [
++      [
++        1,
++        [
++          5
++        ]
++      ],
++      [
++        1,
++        [
++          3
++        ]
++      ]
++    ],
++    "source_occurrence": "recorded-temporal-action:.local/datasets/esc50/audio/1-100032-A-0.wav",
++    "structural_padding": 0
++  },
++  "later_support": {
++    "begin": [
++      [
++        1,
++        [
++          36749
++        ]
++      ],
++      [
++        1,
++        [
++          11025
++        ]
++      ]
++    ],
++    "cell": 36749,
++    "coefficient_from": 146996,
++    "coefficient_until": 147000,
++    "end": [
++      [
++        1,
++        [
++          10
++        ]
++      ],
++      [
++        1,
++        [
++          3
++        ]
++      ]
++    ],
++    "source_occurrence": "recorded-temporal-action:.local/datasets/esc50/audio/1-100032-A-0.wav",
++    "structural_padding": 0
++  },
++  "learner_occurrences": 35,
++  "observation": {
++    "exact_agreement": false,
++    "hidden_actual": {
++      "coordinates": [
++        "0",
++        "0",
++        "0",
++        "0",
++        "0",
++        "0",
++        "0",
++        "0",
++        "0",
++        "0"
++      ],
++      "raw_words": [
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          1,
++          1
++        ]
++      ]
++    },
++    "hidden_response": {
++      "coordinates": [
++        "2/3",
++        "-1/3",
++        "5/3",
++        "1"
++      ],
++      "raw_words": [
++        [
++          2,
++          2
++        ],
++        [
++          -1,
++          -1
++        ],
++        [
++          5,
++          5
++        ],
++        [
++          3,
++          3
++        ],
++        [
++          3,
++          3
++        ]
++      ]
++    },
++    "hidden_source": {
++      "coordinates": [
++        "0",
++        "0",
++        "0",
++        "0",
++        "0",
++        "0",
++        "0",
++        "0"
++      ],
++      "raw_words": [
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          32768,
++          32768
++        ]
++      ]
++    },
++    "later_actual": {
++      "coordinates": [
++        "0",
++        "0",
++        "0",
++        "0",
++        "0",
++        "0",
++        "0",
++        "0",
++        "0",
++        "0"
++      ],
++      "raw_words": [
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          1,
++          1
++        ]
++      ]
++    },
++    "later_source": {
++      "coordinates": [
++        "0",
++        "0",
++        "0",
++        "0",
++        "0",
++        "0",
++        "0",
++        "0"
++      ],
++      "raw_words": [
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          32768,
++          32768
++        ]
++      ]
++    },
++    "prediction": {
++      "error": "native constitutive arithmetic refused without depositing a row: resident constitutive point-current passage: ObstructionLineage { refusals: [OccurrenceRefusal { index: 0, flags: 2, origin: true, upstream_flags: 0, upstream_first: None, upstream_count: 0 }, OccurrenceRefusal { index: 1, flags: 8, origin: false, upstream_flags: 2, upstream_first: Some(0), upstream_count: 1 }] }",
++      "status": "native-consumer-refused"
++    },
++    "preimage": {
++      "directions": [
++        [
++          "1",
++          "0",
++          "0",
++          "0"
++        ],
++        [
++          "0",
++          "1",
++          "0",
++          "0"
++        ],
++        [
++          "0",
++          "0",
++          "1",
++          "0"
++        ],
++        [
++          "0",
++          "0",
++          "0",
++          "1"
++        ]
++      ],
++      "particular": [
++        "0",
++        "0",
++        "0",
++        "0"
++      ],
++      "status": "plural"
++    }
++  },
++  "preimage_relation_cut": 35,
++  "response_control": {
++    "coordinates": [
++      "2",
++      "-1",
++      "5",
++      "3"
++    ],
++    "denominator": "3",
++    "interpretation": "independently controlled complex digital two-tap action; no physical room/utterance response claim"
++  },
++  "schema": "holonics.recorded-temporal-action.v1",
++  "scope": "declared complex polynomial action on recorded coefficients",
++  "selection": {
++    "hidden_cell": 18374,
++    "later_cell": 36749,
++    "rule": "eight fixed interior chronological cuts at ninths; third and sixth held out",
++    "training_cells": [
++      6124,
++      12249,
++      24499,
++      30624,
++      42874,
++      48999
++    ]
++  },
++  "sound_model": false,
++  "source": {
++    "lineage": 1,
++    "occurrence": "recorded-temporal-action:.local/datasets/esc50/audio/1-100032-A-0.wav",
++    "octets": 441044,
++    "path": ".local/datasets/esc50/audio/1-100032-A-0.wav",
++    "receiver": 1,
++    "sample_rate": 44100,
++    "samples": 220500,
++    "sha256": "f40a849a2375c8c63312a73dd2dd6c74007301fcc21b4be2ece29a642831e3d8"
++  },
++  "stages": {
++    "condition_preimage": {
++      "allocations": 8,
++      "deeds": 1,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 64,
++      "resident_octets_now": 54896,
++      "resident_octets_peak": 54964,
++      "seconds": 0.001936208,
++      "section_readouts": 0
++    },
++    "hidden_native_observation": {
++      "allocations": 4,
++      "deeds": 1,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 64,
++      "resident_octets_now": 25056,
++      "resident_octets_peak": 27924,
++      "seconds": 0.000508917,
++      "section_readouts": 0
++    },
++    "inferred_prediction": {
++      "allocations": 6,
++      "deeds": 1,
++      "ingress_octets": 4,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 128,
++      "resident_octets_now": 54896,
++      "resident_octets_peak": 57764,
++      "seconds": 0.00094375,
++      "section_readouts": 0
++    },
++    "later_native_observation": {
++      "allocations": 4,
++      "deeds": 1,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 64,
++      "resident_octets_now": 55072,
++      "resident_octets_peak": 57764,
++      "seconds": 0.001581459,
++      "section_readouts": 0
++    },
++    "recorded_development": {
++      "allocations": 300,
++      "deeds": 60,
++      "ingress_octets": 120,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 5760,
++      "resident_octets_now": 24880,
++      "resident_octets_peak": 27924,
++      "seconds": 0.072669333,
++      "section_readouts": 0
++    },
++    "terminal_observer": {
++      "allocations": 0,
++      "deeds": 0,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 1712,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 55072,
++      "resident_octets_peak": 57764,
++      "seconds": 0.000144875,
++      "section_readouts": 6
++    },
++    "zero_source_calibration": {
++      "allocations": 50,
++      "deeds": 10,
++      "ingress_octets": 20,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 960,
++      "resident_octets_now": 24880,
++      "resident_octets_peak": 27924,
++      "seconds": 0.012393,
++      "section_readouts": 0
++    }
++  },
++  "training_controls": [
++    [
++      0,
++      0,
++      0,
++      0
++    ],
++    [
++      1,
++      0,
++      0,
++      0
++    ],
++    [
++      0,
++      1,
++      0,
++      0
++    ],
++    [
++      0,
++      0,
++      1,
++      0
++    ],
++    [
++      0,
++      0,
++      0,
++      1
++    ]
++  ],
++  "training_observations": 30,
++  "training_supports": [
++    {
++      "begin": [
++        [
++          1,
++          [
++            6124
++          ]
++        ],
++        [
++          1,
++          [
++            11025
++          ]
++        ]
++      ],
++      "cell": 6124,
++      "coefficient_from": 24496,
++      "coefficient_until": 24500,
++      "end": [
++        [
++          1,
++          [
++            5
++          ]
++        ],
++        [
++          1,
++          [
++            9
++          ]
++        ]
++      ],
++      "source_occurrence": "recorded-temporal-action:.local/datasets/esc50/audio/1-100032-A-0.wav",
++      "structural_padding": 0
++    },
++    {
++      "begin": [
++        [
++          1,
++          [
++            1361
++          ]
++        ],
++        [
++          1,
++          [
++            1225
++          ]
++        ]
++      ],
++      "cell": 12249,
++      "coefficient_from": 48996,
++      "coefficient_until": 49000,
++      "end": [
++        [
++          1,
++          [
++            10
++          ]
++        ],
++        [
++          1,
++          [
++            9
++          ]
++        ]
++      ],
++      "source_occurrence": "recorded-temporal-action:.local/datasets/esc50/audio/1-100032-A-0.wav",
++      "structural_padding": 0
++    },
++    {
++      "begin": [
++        [
++          1,
++          [
++            24499
++          ]
++        ],
++        [
++          1,
++          [
++            11025
++          ]
++        ]
++      ],
++      "cell": 24499,
++      "coefficient_from": 97996,
++      "coefficient_until": 98000,
++      "end": [
++        [
++          1,
++          [
++            20
++          ]
++        ],
++        [
++          1,
++          [
++            9
++          ]
++        ]
++      ],
++      "source_occurrence": "recorded-temporal-action:.local/datasets/esc50/audio/1-100032-A-0.wav",
++      "structural_padding": 0
++    },
++    {
++      "begin": [
++        [
++          1,
++          [
++            10208
++          ]
++        ],
++        [
++          1,
++          [
++            3675
++          ]
++        ]
++      ],
++      "cell": 30624,
++      "coefficient_from": 122496,
++      "coefficient_until": 122500,
++      "end": [
++        [
++          1,
++          [
++            25
++          ]
++        ],
++        [
++          1,
++          [
++            9
++          ]
++        ]
++      ],
++      "source_occurrence": "recorded-temporal-action:.local/datasets/esc50/audio/1-100032-A-0.wav",
++      "structural_padding": 0
++    },
++    {
++      "begin": [
++        [
++          1,
++          [
++            42874
++          ]
++        ],
++        [
++          1,
++          [
++            11025
++          ]
++        ]
++      ],
++      "cell": 42874,
++      "coefficient_from": 171496,
++      "coefficient_until": 171500,
++      "end": [
++        [
++          1,
++          [
++            35
++          ]
++        ],
++        [
++          1,
++          [
++            9
++          ]
++        ]
++      ],
++      "source_occurrence": "recorded-temporal-action:.local/datasets/esc50/audio/1-100032-A-0.wav",
++      "structural_padding": 0
++    },
++    {
++      "begin": [
++        [
++          1,
++          [
++            16333
++          ]
++        ],
++        [
++          1,
++          [
++            3675
++          ]
++        ]
++      ],
++      "cell": 48999,
++      "coefficient_from": 195996,
++      "coefficient_until": 196000,
++      "end": [
++        [
++          1,
++          [
++            40
++          ]
++        ],
++        [
++          1,
++          [
++            9
++          ]
++        ]
++      ],
++      "source_occurrence": "recorded-temporal-action:.local/datasets/esc50/audio/1-100032-A-0.wav",
++      "structural_padding": 0
++    }
++  ],
++  "truth_status": "established-bounded"
++}
+diff --git a/research/records/2026-09-07_native_temporal_action/librispeech.json b/research/records/2026-09-07_native_temporal_action/librispeech.json
+new file mode 100644
+index 00000000..be906d53
+--- /dev/null
++++ b/research/records/2026-09-07_native_temporal_action/librispeech.json
+@@ -0,0 +1,743 @@
++{
++  "active_stage": "terminal_observer",
++  "aperture": {
++    "condition_complex": 2,
++    "interpretation": "caller-declared temporal aperture, not learned semantic grain",
++    "pcm_divisor": 32768,
++    "source_complex": 4,
++    "target_complex": 5
++  },
++  "calibration_observations": 5,
++  "complete_bounded_comparison": true,
++  "conversation_model": false,
++  "decode_seconds": 0.049800458,
++  "elapsed_seconds": 0.198372,
++  "evidence_tags": [
++    "measured"
++  ],
++  "final_census": {
++    "allocations": 404,
++    "captured_launches": 220,
++    "control_launches": 0,
++    "deed_launches": 74,
++    "device_to_device_octets": 0,
++    "egress_receipt_octets": 7040,
++    "egress_section_octets": 3984,
++    "ingress_octets": 25024,
++    "resident_octets_now": 0,
++    "resident_octets_peak": 57764,
++    "section_read_outs": 7,
++    "synchronizations": 74
++  },
++  "hidden_support": {
++    "begin": [
++      [
++        1,
++        [
++          10473
++        ]
++      ],
++      [
++        1,
++        [
++          4000
++        ]
++      ]
++    ],
++    "cell": 10473,
++    "coefficient_from": 41892,
++    "coefficient_until": 41896,
++    "end": [
++      [
++        1,
++        [
++          5237
++        ]
++      ],
++      [
++        1,
++        [
++          2000
++        ]
++      ]
++    ],
++    "source_occurrence": "recorded-temporal-action:.local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav",
++    "structural_padding": 0
++  },
++  "later_support": {
++    "begin": [
++      [
++        1,
++        [
++          10473
++        ]
++      ],
++      [
++        1,
++        [
++          2000
++        ]
++      ]
++    ],
++    "cell": 20946,
++    "coefficient_from": 83784,
++    "coefficient_until": 83788,
++    "end": [
++      [
++        1,
++        [
++          20947
++        ]
++      ],
++      [
++        1,
++        [
++          4000
++        ]
++      ]
++    ],
++    "source_occurrence": "recorded-temporal-action:.local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav",
++    "structural_padding": 0
++  },
++  "learner_occurrences": 36,
++  "observation": {
++    "exact_agreement": true,
++    "hidden_actual": {
++      "coordinates": [
++        "43/49152",
++        "-43/98304",
++        "277/98304",
++        "49/49152",
++        "181/98304",
++        "5/6144",
++        "31/32768",
++        "25/98304",
++        "35/49152",
++        "7/16384"
++      ],
++      "raw_words": [
++        [
++          86,
++          86
++        ],
++        [
++          -43,
++          -43
++        ],
++        [
++          277,
++          277
++        ],
++        [
++          98,
++          98
++        ],
++        [
++          181,
++          181
++        ],
++        [
++          80,
++          80
++        ],
++        [
++          93,
++          93
++        ],
++        [
++          25,
++          25
++        ],
++        [
++          70,
++          70
++        ],
++        [
++          42,
++          42
++        ],
++        [
++          98304,
++          98304
++        ]
++      ]
++    },
++    "hidden_response": {
++      "coordinates": [
++        "2/3",
++        "-1/3",
++        "5/3",
++        "1"
++      ],
++      "raw_words": [
++        [
++          2,
++          2
++        ],
++        [
++          -1,
++          -1
++        ],
++        [
++          5,
++          5
++        ],
++        [
++          3,
++          3
++        ],
++        [
++          3,
++          3
++        ]
++      ]
++    },
++    "hidden_source": {
++      "coordinates": [
++        "43/32768",
++        "0",
++        "31/32768",
++        "0",
++        "13/32768",
++        "0",
++        "7/16384",
++        "0"
++      ],
++      "raw_words": [
++        [
++          43,
++          43
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          31,
++          31
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          13,
++          13
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          14,
++          14
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          32768,
++          32768
++        ]
++      ]
++    },
++    "later_actual": {
++      "coordinates": [
++        "-1/8192",
++        "1/16384",
++        "-1/4096",
++        "-7/32768",
++        "13/98304",
++        "5/49152",
++        "-17/32768",
++        "5/24576",
++        "-115/98304",
++        "-23/32768"
++      ],
++      "raw_words": [
++        [
++          -12,
++          -12
++        ],
++        [
++          6,
++          6
++        ],
++        [
++          -24,
++          -24
++        ],
++        [
++          -21,
++          -21
++        ],
++        [
++          13,
++          13
++        ],
++        [
++          10,
++          10
++        ],
++        [
++          -51,
++          -51
++        ],
++        [
++          20,
++          20
++        ],
++        [
++          -115,
++          -115
++        ],
++        [
++          -69,
++          -69
++        ],
++        [
++          98304,
++          98304
++        ]
++      ]
++    },
++    "later_source": {
++      "coordinates": [
++        "-3/16384",
++        "0",
++        "3/32768",
++        "0",
++        "-1/32768",
++        "0",
++        "-23/32768",
++        "0"
++      ],
++      "raw_words": [
++        [
++          -6,
++          -6
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          3,
++          3
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          -1,
++          -1
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          -23,
++          -23
++        ],
++        [
++          0,
++          0
++        ],
++        [
++          32768,
++          32768
++        ]
++      ]
++    },
++    "prediction": {
++      "coordinates": [
++        "-1/8192",
++        "1/16384",
++        "-1/4096",
++        "-7/32768",
++        "13/98304",
++        "5/49152",
++        "-17/32768",
++        "5/24576",
++        "-115/98304",
++        "-23/32768"
++      ],
++      "status": "unique"
++    },
++    "preimage": {
++      "directions": [],
++      "particular": [
++        "2/3",
++        "-1/3",
++        "5/3",
++        "1"
++      ],
++      "status": "unique"
++    }
++  },
++  "preimage_relation_cut": 35,
++  "response_control": {
++    "coordinates": [
++      "2",
++      "-1",
++      "5",
++      "3"
++    ],
++    "denominator": "3",
++    "interpretation": "independently controlled complex digital two-tap action; no physical room/utterance response claim"
++  },
++  "schema": "holonics.recorded-temporal-action.v1",
++  "scope": "declared complex polynomial action on recorded coefficients",
++  "selection": {
++    "hidden_cell": 10473,
++    "later_cell": 20946,
++    "rule": "eight fixed interior chronological cuts at ninths; third and sixth held out",
++    "training_cells": [
++      3491,
++      6982,
++      13964,
++      17455,
++      24437,
++      27928
++    ]
++  },
++  "sound_model": false,
++  "source": {
++    "lineage": 1,
++    "occurrence": "recorded-temporal-action:.local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav",
++    "octets": 251404,
++    "path": ".local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav",
++    "receiver": 1,
++    "sample_rate": 16000,
++    "samples": 125680,
++    "sha256": "a0f4ce7fc87c059762daedb43420a9763dd992949271666cca1eff2240dabcc3"
++  },
++  "stages": {
++    "condition_preimage": {
++      "allocations": 8,
++      "deeds": 1,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 64,
++      "resident_octets_now": 54896,
++      "resident_octets_peak": 54964,
++      "seconds": 0.002308208,
++      "section_readouts": 0
++    },
++    "hidden_native_observation": {
++      "allocations": 4,
++      "deeds": 1,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 64,
++      "resident_octets_now": 25056,
++      "resident_octets_peak": 27924,
++      "seconds": 0.000472542,
++      "section_readouts": 0
++    },
++    "inferred_prediction": {
++      "allocations": 6,
++      "deeds": 1,
++      "ingress_octets": 4,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 128,
++      "resident_octets_now": 57168,
++      "resident_octets_peak": 57764,
++      "seconds": 0.004068084,
++      "section_readouts": 0
++    },
++    "later_native_observation": {
++      "allocations": 4,
++      "deeds": 1,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 64,
++      "resident_octets_now": 57344,
++      "resident_octets_peak": 57764,
++      "seconds": 0.000689,
++      "section_readouts": 0
++    },
++    "recorded_development": {
++      "allocations": 300,
++      "deeds": 60,
++      "ingress_octets": 120,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 5760,
++      "resident_octets_now": 24880,
++      "resident_octets_peak": 27924,
++      "seconds": 0.067211667,
++      "section_readouts": 0
++    },
++    "terminal_observer": {
++      "allocations": 0,
++      "deeds": 0,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 3984,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 57344,
++      "resident_octets_peak": 57764,
++      "seconds": 0.00026575,
++      "section_readouts": 7
++    },
++    "zero_source_calibration": {
++      "allocations": 50,
++      "deeds": 10,
++      "ingress_octets": 20,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 960,
++      "resident_octets_now": 24880,
++      "resident_octets_peak": 27924,
++      "seconds": 0.016494541,
++      "section_readouts": 0
++    }
++  },
++  "training_controls": [
++    [
++      0,
++      0,
++      0,
++      0
++    ],
++    [
++      1,
++      0,
++      0,
++      0
++    ],
++    [
++      0,
++      1,
++      0,
++      0
++    ],
++    [
++      0,
++      0,
++      1,
++      0
++    ],
++    [
++      0,
++      0,
++      0,
++      1
++    ]
++  ],
++  "training_observations": 30,
++  "training_supports": [
++    {
++      "begin": [
++        [
++          1,
++          [
++            3491
++          ]
++        ],
++        [
++          1,
++          [
++            4000
++          ]
++        ]
++      ],
++      "cell": 3491,
++      "coefficient_from": 13964,
++      "coefficient_until": 13968,
++      "end": [
++        [
++          1,
++          [
++            873
++          ]
++        ],
++        [
++          1,
++          [
++            1000
++          ]
++        ]
++      ],
++      "source_occurrence": "recorded-temporal-action:.local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav",
++      "structural_padding": 0
++    },
++    {
++      "begin": [
++        [
++          1,
++          [
++            3491
++          ]
++        ],
++        [
++          1,
++          [
++            2000
++          ]
++        ]
++      ],
++      "cell": 6982,
++      "coefficient_from": 27928,
++      "coefficient_until": 27932,
++      "end": [
++        [
++          1,
++          [
++            6983
++          ]
++        ],
++        [
++          1,
++          [
++            4000
++          ]
++        ]
++      ],
++      "source_occurrence": "recorded-temporal-action:.local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav",
++      "structural_padding": 0
++    },
++    {
++      "begin": [
++        [
++          1,
++          [
++            3491
++          ]
++        ],
++        [
++          1,
++          [
++            1000
++          ]
++        ]
++      ],
++      "cell": 13964,
++      "coefficient_from": 55856,
++      "coefficient_until": 55860,
++      "end": [
++        [
++          1,
++          [
++            2793
++          ]
++        ],
++        [
++          1,
++          [
++            800
++          ]
++        ]
++      ],
++      "source_occurrence": "recorded-temporal-action:.local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav",
++      "structural_padding": 0
++    },
++    {
++      "begin": [
++        [
++          1,
++          [
++            3491
++          ]
++        ],
++        [
++          1,
++          [
++            800
++          ]
++        ]
++      ],
++      "cell": 17455,
++      "coefficient_from": 69820,
++      "coefficient_until": 69824,
++      "end": [
++        [
++          1,
++          [
++            1091
++          ]
++        ],
++        [
++          1,
++          [
++            250
++          ]
++        ]
++      ],
++      "source_occurrence": "recorded-temporal-action:.local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav",
++      "structural_padding": 0
++    },
++    {
++      "begin": [
++        [
++          1,
++          [
++            24437
++          ]
++        ],
++        [
++          1,
++          [
++            4000
++          ]
++        ]
++      ],
++      "cell": 24437,
++      "coefficient_from": 97748,
++      "coefficient_until": 97752,
++      "end": [
++        [
++          1,
++          [
++            12219
++          ]
++        ],
++        [
++          1,
++          [
++            2000
++          ]
++        ]
++      ],
++      "source_occurrence": "recorded-temporal-action:.local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav",
++      "structural_padding": 0
++    },
++    {
++      "begin": [
++        [
++          1,
++          [
++            3491
++          ]
++        ],
++        [
++          1,
++          [
++            500
++          ]
++        ]
++      ],
++      "cell": 27928,
++      "coefficient_from": 111712,
++      "coefficient_until": 111716,
++      "end": [
++        [
++          1,
++          [
++            27929
++          ]
++        ],
++        [
++          1,
++          [
++            4000
++          ]
++        ]
++      ],
++      "source_occurrence": "recorded-temporal-action:.local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav",
++      "structural_padding": 0
++    }
++  ],
++  "truth_status": "established-bounded"
++}
+-- 
+2.54.0
+

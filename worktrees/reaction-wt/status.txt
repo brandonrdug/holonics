@@ -1,0 +1,29 @@
+worktree: /home/b/Workspaces/holonics/.local/reaction-wt
+branch: (detached HEAD)
+HEAD: c58f8c7dfecdd3e6bd5b78bdf36933bdf8529245
+HEAD subject: Consolidate complexes onto the core complex and unify clocks and generators
+HEAD ancestor of origin/main (bb73054a): True
+
+git status --porcelain (tracked):
+ M crates/holonic-core/src/lib.rs
+ M crates/holonic-engine/kernels/enclosure_composition.cuh
+ M crates/holonic-engine/src/native_ecology/constitutive_fibre/field.rs
+ M crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport.rs
+ M crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal.rs
+ M crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal/direct.rs
+ M crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal/direct/section/composition.rs
+ M crates/holonic-engine/src/resident_section/surface_enclosure_composition.rs
+ M crates/holonics-hna/examples/support/generator_machine.rs
+ M crates/holonics-hna/src/native.rs
+ M crates/holonics-hna/src/native/coupled_wave.rs
+ M crates/holonics-hna/src/native/coupled_wave/body.rs
+ M crates/holonics-hna/src/native/coupled_wave/body/field/incident.rs
+ M crates/holonics-hna/src/native/coupled_wave/body/field/incident/machine.rs
+ M crates/holonics-hna/src/native/coupled_wave/body/field/incident/machine_tests.rs
+ M crates/holonics-hna/src/native/coupled_wave/body/field/incident/rest.rs
+ M crates/holonics-hna/src/native/field_session/generator_application.rs
+
+untracked, non-ignored:
+crates/holonic-core/src/reaction.rs
+crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal/direct/reaction_law.rs
+crates/holonics-hna/src/native/field_session/generator_application/deposition_probe.rs

@@ -1,0 +1,51 @@
+worktree: /home/b/Workspaces/holonics/.local/p16-verify
+branch: (detached HEAD)
+HEAD: 5b7c89abcfcb461bbb1d6e0ca5305b045b233a28
+HEAD subject: Carry the device quadratic moment as one storage element
+HEAD ancestor of origin/main (bb73054a): True
+
+git status --porcelain (tracked):
+ M crates/holonic-core/src/holon.rs
+ M crates/holonic-engine/examples/analytic_field_transport.rs
+ M crates/holonic-engine/examples/causal_state_grammar_experiment.rs
+ M crates/holonic-engine/examples/desktop_receiver.rs
+ M crates/holonic-engine/examples/the_channel_population_is_the_receivers.rs
+ M crates/holonic-engine/examples/the_chart_declares_the_quadric_dimension.rs
+ M crates/holonic-engine/examples/the_loop_carries_its_circulation.rs
+ M crates/holonic-engine/src/algebraic.rs
+ M crates/holonic-engine/src/algebraic/core_chart.rs
+ M crates/holonic-engine/src/analytic_field.rs
+ M crates/holonic-engine/src/arithmetic_fiber.rs
+ M crates/holonic-engine/src/arithmetic_monodromy.rs
+ M crates/holonic-engine/src/arithmetic_phase.rs
+ M crates/holonic-engine/src/atmospheric_inverse.rs
+ M crates/holonic-engine/src/bit_causal.rs
+ M crates/holonic-engine/src/causal_body.rs
+ M crates/holonic-engine/src/causal_state_grammar.rs
+ M crates/holonic-engine/src/causal_traversal.rs
+ M crates/holonic-engine/src/coupled_informant.rs
+ M crates/holonic-engine/src/curvature_bridge.rs
+ M crates/holonic-engine/src/derivation_curvature.rs
+ M crates/holonic-engine/src/dimensional_wave.rs
+ M crates/holonic-engine/src/divisor_reconstruction.rs
+ M crates/holonic-engine/src/elementary_chart.rs
+ M crates/holonic-engine/src/field_atlas.rs
+ M crates/holonic-engine/src/generative_transport.rs
+ M crates/holonic-engine/src/graded_complex_form.rs
+ M crates/holonic-engine/src/grown_cell.rs
+ M crates/holonic-engine/src/holonic_complex.rs
+ M crates/holonic-engine/src/inverse_transport.rs
+ M crates/holonic-engine/src/local_star.rs
+ M crates/holonic-engine/src/observation_ecology.rs
+ M crates/holonic-engine/src/organizational_grammar.rs
+ M crates/holonic-engine/src/physical.rs
+ M crates/holonic-engine/src/prime_ecology.rs
+ M crates/holonic-engine/src/receiver_phase_atlas.rs
+ M crates/holonic-engine/src/sheaf_diffusion.rs
+ M crates/holonic-engine/src/sheaf_diffusion/holon.rs
+ M crates/holonic-engine/src/simplicial.rs
+ M crates/holonic-engine/src/wave_propagation.rs
+ M crates/holonic-engine/src/world.rs
+
+untracked, non-ignored:
+crates/holonic-engine/src/world/scaffold.rs

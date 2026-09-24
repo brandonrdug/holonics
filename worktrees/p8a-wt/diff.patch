@@ -1,0 +1,2493 @@
+diff --git a/crates/holonic-engine/build.rs b/crates/holonic-engine/build.rs
+index 640424b8..681008bd 100644
+--- a/crates/holonic-engine/build.rs
++++ b/crates/holonic-engine/build.rs
+@@ -59,6 +59,7 @@ fn main() {
+     println!("cargo:rerun-if-changed=kernels/direct_normal_material.cuh");
+     println!("cargo:rerun-if-changed=kernels/normal_applied_relation.cuh");
+     println!("cargo:rerun-if-changed=kernels/section_bilinear_adjoint.cuh");
++    println!("cargo:rerun-if-changed=kernels/enclosure_cayley.cuh");
+     println!("cargo:rerun-if-changed=kernels/normal_material_section.cuh");
+     println!("cargo:rerun-if-changed=kernels/current_difference_section.cuh");
+     println!("cargo:rerun-if-changed=kernels/normal_wave.cuh");
+diff --git a/crates/holonic-engine/kernels/enclosure_cayley.cuh b/crates/holonic-engine/kernels/enclosure_cayley.cuh
+new file mode 100644
+index 00000000..1e0bb4b8
+--- /dev/null
++++ b/crates/holonic-engine/kernels/enclosure_cayley.cuh
+@@ -0,0 +1,231 @@
++// The implicit-midpoint (Cayley) reaction step of the power-neutral law, per row, and its adjoint.
++//
++// Material chart (targets n complex, sources F = n + k/2 + n k complex, words at S = 2^grain):
++//   W_s = columns [0,n)            linear self-relation (certified passive on the host: herm W_s <= 0)
++//   W_c = columns [n, n+k/2)       contrast port coupling
++//   A_r = columns [n+k/2+r n, +n)  one slice per REAL contrast coordinate c_r, exactly skew-Hermitian
++// K(c) = W_s + sum_r c_r A_r, A(c) = I - K(c)/2. Forward (h = 1):
++//   A(c) y = (I + K(c)/2) p + W_c c,   mid = (p + y)/2,
++// i.e. y - p = K(c) mid + W_c c (Holon/Cayley.lean::midpoint_reaction_balance). With herm K <= 0
++// (skew slices for every real c, passive W_s), herm A >= I, so ||A^-1|| <= 1 and the Cayley map
++// C = A^-1 (I + K/2) = 2A^-1 - I has ||C|| <= 1 (Holon/Cayley.lean::cayley_isometry when W_s is skew).
++// The centre is a floating-point proposal rounded to the grain and refined against the EXACT residual
++// rho = (I + K/2) p0 + W_c c0 - A y_c; the radius is certified, never assumed:
++//   r_y = r_p                                   (||C(c)|| <= 1 at fixed c)
++//       + r_c (F_A X + F_c)                     (mean value in c at p0; |mid| <= X; ||A^-1|| <= 1)
++//       + |rho|                                 (||A^-1|| <= 1 at the centre)
++// with F_A = sqrt(sum_r ||A_r||_F^2) and F_c = ||W_c||_F, both ceiled, X = |p0|_1 + F_c(|c0|_1 + r_c)/2.
++// This is Holon/Cayley.lean::device_containment with K_k = 1: ||L c - c'|| <= r' - r.
++// Adjoint: A^H u = g, g_p = (I + K/2)^H u = 2u - g, r_u = r_g + r_c F_A |g0|/2 + |rho_u|.
++// The material return is (Phi(mid, c), u) and the contrast return the realified feature pullback of
++// W^H u at (mid, c); both use existing kernels.
++constexpr uint32_t ECY_MAX = 8u;
++__device__ double ecy_double_wide(wide x){
++ const int64_t hi=(int64_t)(x>>64);const uint64_t lo=(uint64_t)x;
++ return ldexp((double)hi,64)+(double)lo;
++}
++__device__ double ecy_double_moment(const MomentInteger &x){
++ double v=0.0;for(int j=MomentInteger::LIMBS-1;j>=0;--j)v=ldexp(v,32)+(double)x.limb[j];
++ return x.negative?-v:v;
++}
++__device__ wide ecy_wide_double(double v,uint32_t *status){
++ if(!isfinite(v)||fabs(v)>=0x1p125){atomicOr(status,REFUSED_CARRIER);return 0;}
++ const double r=rint(v),a=fabs(r),hi=floor(ldexp(a,-64)),lo=a-ldexp(hi,64);
++ const uwide m=((uwide)(uint64_t)hi<<64)|(uwide)(uint64_t)lo;
++ return r<0?-(wide)m:(wide)m;
++}
++// Complex LU with partial pivoting, in place, on an n x n system (n <= ECY_MAX). Returns false when a
++// pivot vanishes: the proposal is then refused, never replaced.
++__device__ bool ecy_lu(double (*re)[ECY_MAX],double (*im)[ECY_MAX],uint32_t n,uint32_t *perm){
++ for(uint32_t i=0;i<n;++i)perm[i]=i;
++ for(uint32_t c=0;c<n;++c){
++  uint32_t best=c;double size=hypot(re[c][c],im[c][c]);
++  for(uint32_t r=c+1;r<n;++r){double s=hypot(re[r][c],im[r][c]);if(s>size){size=s;best=r;}}
++  if(!(size>0.0))return false;
++  if(best!=c){for(uint32_t j=0;j<n;++j){double t=re[c][j];re[c][j]=re[best][j];re[best][j]=t;t=im[c][j];im[c][j]=im[best][j];im[best][j]=t;}
++   uint32_t t=perm[c];perm[c]=perm[best];perm[best]=t;}
++  const double pr=re[c][c],pi=im[c][c],den=pr*pr+pi*pi;
++  for(uint32_t r=c+1;r<n;++r){
++   const double fr=(re[r][c]*pr+im[r][c]*pi)/den,fi=(im[r][c]*pr-re[r][c]*pi)/den;
++   re[r][c]=fr;im[r][c]=fi;
++   for(uint32_t j=c+1;j<n;++j){re[r][j]-=fr*re[c][j]-fi*im[c][j];im[r][j]-=fr*im[c][j]+fi*re[c][j];}
++  }
++ }
++ return true;
++}
++__device__ void ecy_solve(double (*re)[ECY_MAX],double (*im)[ECY_MAX],uint32_t n,const uint32_t *perm,
++ const double *br,const double *bi,double *xr,double *xi){
++ double yr[ECY_MAX],yi[ECY_MAX];
++ for(uint32_t r=0;r<n;++r){double sr=br[perm[r]],si=bi[perm[r]];
++  for(uint32_t j=0;j<r;++j){sr-=re[r][j]*yr[j]-im[r][j]*yi[j];si-=re[r][j]*yi[j]+im[r][j]*yr[j];}
++  yr[r]=sr;yi[r]=si;}
++ for(int r=(int)n-1;r>=0;--r){double sr=yr[r],si=yi[r];
++  for(uint32_t j=r+1;j<n;++j){sr-=re[r][j]*xr[j]-im[r][j]*xi[j];si-=re[r][j]*xi[j]+im[r][j]*xr[j];}
++  const double pr=re[r][r],pi=im[r][r],den=pr*pr+pi*pi;
++  xr[r]=(sr*pr+si*pi)/den;xi[r]=(si*pr-sr*pi)/den;}
++}
++// Material coefficient (target a, complex source j), interleaved (re, im) at S.
++__device__ wide ecy_m(const wide *M,uint32_t F,uint32_t a,uint32_t j,uint32_t part){return M[(size_t)a*2u*F+2u*(size_t)j+part];}
++// K S^2 entry (a,b) exactly: W_s S + sum_r c_r A_r.
++__device__ void ecy_k(const wide *M,const wide *C,uint32_t n,uint32_t k,uint32_t F,wide S,uint32_t a,uint32_t b,
++ MomentInteger &kr,MomentInteger &ki){
++ kr=normal_wide(ecy_m(M,F,a,b,0))*normal_wide(S);ki=normal_wide(ecy_m(M,F,a,b,1))*normal_wide(S);
++ for(uint32_t r=0;r<k;++r){const uint32_t j=n+k/2u+r*n+b;const MomentInteger cr=normal_wide(C[r]);
++  kr=kr+normal_wide(ecy_m(M,F,a,j,0))*cr;ki=ki+normal_wide(ecy_m(M,F,a,j,1))*cr;}
++}
++__device__ double ecy_kd(const wide *M,const wide *C,uint32_t n,uint32_t k,uint32_t F,uint32_t grain,uint32_t a,uint32_t b,uint32_t part){
++ double v=ldexp(ecy_double_wide(ecy_m(M,F,a,b,part)),-(int)grain);
++ for(uint32_t r=0;r<k;++r)v+=ldexp(ecy_double_wide(C[r]),-(int)grain)*ldexp(ecy_double_wide(ecy_m(M,F,a,n+k/2u+r*n+b,part)),-(int)grain);
++ return v;
++}
++// Common row validation: material point words, slice skewness, ball shapes.
++__device__ bool ecy_admit(const int64_t *state,const int64_t *state_hi,uint32_t n,uint32_t k,uint32_t grain,
++ uint32_t certified,uint32_t *status){
++ if(grain<1u||grain>120u||!n||n>ECY_MAX||(k&1u)){atomicOr(status,REFUSED_MALFORMED);return false;}
++ // The host certificate (herm W_s <= 0 by exact inertia) is the premise of ||A^-1|| <= 1.
++ if(!certified){atomicOr(status,REFUSED_BOUND);return false;}
++ const uint32_t F=n+k/2u+n*k;const size_t words=2u*(2u*(size_t)F*n);
++ for(size_t j=0;j<words;++j)if(state[j]!=state_hi[j]){atomicOr(status,REFUSED_MALFORMED);return false;}
++ const wide *M=(const wide*)state;
++ for(uint32_t r=0;r<k;++r)for(uint32_t a=0;a<n;++a)for(uint32_t b=0;b<=a;++b){
++  const uint32_t ja=n+k/2u+r*n+b,jb=n+k/2u+r*n+a;
++  if(ecy_m(M,F,a,ja,0)!=-ecy_m(M,F,b,jb,0)||ecy_m(M,F,a,ja,1)!=ecy_m(M,F,b,jb,1)){atomicOr(status,REFUSED_BOUND);return false;}
++ }
++ return true;
++}
++// ceil sqrt of the sum of squares of the slice (and coupling) words, at S.
++__device__ void ecy_norms(const wide *M,uint32_t n,uint32_t k,uint32_t F,wide *FA,wide *FC,uint32_t *status){
++ HistoryInteger a,c;
++ for(uint32_t t=0;t<n;++t){
++  for(uint32_t j=n;j<n+k/2u;++j)for(uint32_t part=0;part<2u;++part){HistoryInteger v=history_integer(ecy_m(M,F,t,j,part));c=c+v*v;}
++  for(uint32_t j=n+k/2u;j<F;++j)for(uint32_t part=0;part<2u;++part){HistoryInteger v=history_integer(ecy_m(M,F,t,j,part));a=a+v*v;}
++ }
++ *FA=history_norm_ceiling(a,status);*FC=history_norm_ceiling(c,status);
++}
++extern "C" __global__ void section_enclosure_cayley_reaction(
++ const int64_t *state,const int64_t *state_hi,const int64_t *drive,const int64_t *drive_hi,
++ const int64_t *condition,const int64_t *condition_hi,
++ uint32_t rows,uint32_t n,uint32_t k,uint32_t grain,uint32_t certified,
++ int64_t *out,int64_t *oh,int64_t *mid,int64_t *mh,int64_t *flags,
++ uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
++ if(threadIdx.x)return;uint32_t row=blockIdx.x;if(row>=rows)return;
++ uint32_t *status=ec_status(flags,row);if(upstream_refused(census,lineage,lineage_count,status))return;
++ if(!ecy_admit(state,state_hi,n,k,grain,certified,status))return;
++ const uint32_t d=2u*n,F=n+k/2u+n*k;
++ const int64_t *pw=drive+2u*((size_t)d+1u)*row;
++ if(!ec_ball(pw,drive_hi+2u*((size_t)d+1u)*row,d,status))return;
++ const wide *C=nullptr;wide rc=0,cn=0;
++ if(k){const int64_t *cw=condition+2u*((size_t)k+1u)*row;
++  if(!ec_ball(cw,condition_hi+2u*((size_t)k+1u)*row,k,status))return;
++  C=(const wide*)cw;rc=C[k];cn=ec_l1(C,k,status);}
++ const wide *M=(const wide*)state,*P=(const wide*)pw;const wide S=(wide)((uwide)1<<grain);
++ // Proposal: LU of A = I - K/2 in double.
++ double are[ECY_MAX][ECY_MAX],aim[ECY_MAX][ECY_MAX];uint32_t perm[ECY_MAX];
++ for(uint32_t a=0;a<n;++a)for(uint32_t b=0;b<n;++b){
++  are[a][b]=(a==b?1.0:0.0)-0.5*ecy_kd(M,C,n,k,F,grain,a,b,0);aim[a][b]=-0.5*ecy_kd(M,C,n,k,F,grain,a,b,1);}
++ if(!ecy_lu(are,aim,n,perm)){atomicOr(status,REFUSED_BOUND);return;}
++ // W_c c0 at S^2, exactly.
++ MomentInteger wr[ECY_MAX],wi[ECY_MAX];
++ for(uint32_t a=0;a<n;++a){wr[a]=MomentInteger();wi[a]=MomentInteger();
++  for(uint32_t j=0;j<k/2u;++j)normal_product(wr[a],wi[a],normal_wide(ecy_m(M,F,a,n+j,0)),normal_wide(ecy_m(M,F,a,n+j,1)),
++   normal_wide(C[2u*j]),normal_wide(C[2u*j+1u]),false);}
++ // rhs (grain units) = (I + K/2) p0 + W_c c0 = 2 p0 - A p0 + W_c c0, in double.
++ double br[ECY_MAX],bi[ECY_MAX],xr[ECY_MAX],xi[ECY_MAX];
++ for(uint32_t a=0;a<n;++a){
++  double sr=ecy_double_wide(P[2u*a]),si=ecy_double_wide(P[2u*a+1u]);
++  for(uint32_t b=0;b<n;++b){const double kr=ecy_kd(M,C,n,k,F,grain,a,b,0),ki=ecy_kd(M,C,n,k,F,grain,a,b,1);
++   const double pr=ecy_double_wide(P[2u*b]),pi=ecy_double_wide(P[2u*b+1u]);sr+=0.5*(kr*pr-ki*pi);si+=0.5*(kr*pi+ki*pr);}
++  br[a]=sr+ldexp(ecy_double_moment(wr[a]),-(int)grain);bi[a]=si+ldexp(ecy_double_moment(wi[a]),-(int)grain);}
++ ecy_solve(are,aim,n,perm,br,bi,xr,xi);
++ wide Y[2u*ECY_MAX];
++ for(uint32_t a=0;a<n;++a){Y[2u*a]=ecy_wide_double(xr[a],status);Y[2u*a+1u]=ecy_wide_double(xi[a],status);}
++ if(*status)return;
++ // Exact residual R = 2S^3 rho = 2S^2 (P - Y) + K S^2 (P + Y) + 2S (W_c c0 S^2); two refinements.
++ MomentInteger Rr[ECY_MAX],Ri[ECY_MAX];const MomentInteger S2=normal_wide(S)*normal_wide(S);
++ for(uint32_t pass=0;pass<3u;++pass){
++  for(uint32_t a=0;a<n;++a){
++   Rr[a]=S2*normal_wide(2)*(normal_wide(P[2u*a])-normal_wide(Y[2u*a]))+normal_wide(2)*normal_wide(S)*wr[a];
++   Ri[a]=S2*normal_wide(2)*(normal_wide(P[2u*a+1u])-normal_wide(Y[2u*a+1u]))+normal_wide(2)*normal_wide(S)*wi[a];
++   for(uint32_t b=0;b<n;++b){MomentInteger kr,ki;ecy_k(M,C,n,k,F,S,a,b,kr,ki);
++    normal_product(Rr[a],Ri[a],kr,ki,normal_wide(P[2u*b])+normal_wide(Y[2u*b]),normal_wide(P[2u*b+1u])+normal_wide(Y[2u*b+1u]),false);}
++  }
++  if(pass==2u)break;
++  for(uint32_t a=0;a<n;++a){br[a]=ldexp(ecy_double_moment(Rr[a]),-(int)(2u*grain+1u));bi[a]=ldexp(ecy_double_moment(Ri[a]),-(int)(2u*grain+1u));}
++  ecy_solve(are,aim,n,perm,br,bi,xr,xi);
++  for(uint32_t a=0;a<n;++a){Y[2u*a]=add_checked(Y[2u*a],ecy_wide_double(xr[a],status),status);
++   Y[2u*a+1u]=add_checked(Y[2u*a+1u],ecy_wide_double(xi[a],status),status);}
++  if(*status)return;
++ }
++ MomentInteger rl1;for(uint32_t a=0;a<n;++a)rl1=rl1+normal_abs(Rr[a])+normal_abs(Ri[a]);
++ const wide centre=ec_ceil(rl1,S2*normal_wide(2),status);
++ wide FA=0,FC=0;ecy_norms(M,n,k,F,&FA,&FC,status);
++ const wide pn=ec_l1(P,d,status),rp=P[d];
++ const wide X=add_checked(pn,ec_ceil(normal_wide(FC)*(normal_wide(cn)+normal_wide(rc)),normal_wide(2)*normal_wide(S),status),status);
++ const wide spread=ec_ceil(normal_wide(rc)*(normal_wide(FA)*normal_wide(X)+normal_wide(FC)*normal_wide(S)),S2,status);
++ const wide ry=add_checked(add_checked(rp,spread,status),centre,status);
++ if(*status)return;
++ int64_t *ow=out+2u*((size_t)d+1u)*row;wide *y=(wide*)ow;
++ for(uint32_t j=0;j<d;++j)y[j]=Y[j];y[d]=ry;
++ int64_t *mw=mid+2u*((size_t)d+1u)*row;wide *x=(wide*)mw;wide odd=0;
++ for(uint32_t j=0;j<d;++j){const wide s=add_checked(P[j],Y[j],status);x[j]=s>>1;odd=add_checked(odd,(wide)(s&1),status);}
++ const wide half=add_checked(rp,ry,status);
++ x[d]=add_checked(add_checked(half>>1,half&1,status),odd,status);
++ ec_seal(ow,oh+2u*((size_t)d+1u)*row,d,status);ec_seal(mw,mh+2u*((size_t)d+1u)*row,d,status);
++}
++extern "C" __global__ void section_enclosure_cayley_adjoint(
++ const int64_t *state,const int64_t *state_hi,const int64_t *condition,const int64_t *condition_hi,
++ const int64_t *covector,const int64_t *covector_hi,
++ uint32_t rows,uint32_t n,uint32_t k,uint32_t grain,uint32_t certified,
++ int64_t *uo,int64_t *uh,int64_t *po,int64_t *ph,int64_t *flags,
++ uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
++ if(threadIdx.x)return;uint32_t row=blockIdx.x;if(row>=rows)return;
++ uint32_t *status=ec_status(flags,row);if(upstream_refused(census,lineage,lineage_count,status))return;
++ if(!ecy_admit(state,state_hi,n,k,grain,certified,status))return;
++ const uint32_t d=2u*n,F=n+k/2u+n*k;
++ const int64_t *gw=covector+2u*((size_t)d+1u)*row;
++ if(!ec_ball(gw,covector_hi+2u*((size_t)d+1u)*row,d,status))return;
++ const wide *C=nullptr;wide rc=0;
++ if(k){const int64_t *cw=condition+2u*((size_t)k+1u)*row;
++  if(!ec_ball(cw,condition_hi+2u*((size_t)k+1u)*row,k,status))return;
++  C=(const wide*)cw;rc=C[k];}
++ const wide *M=(const wide*)state,*G=(const wide*)gw;const wide S=(wide)((uwide)1<<grain);
++ // A^H = I - K^H/2.
++ double are[ECY_MAX][ECY_MAX],aim[ECY_MAX][ECY_MAX];uint32_t perm[ECY_MAX];
++ for(uint32_t a=0;a<n;++a)for(uint32_t b=0;b<n;++b){
++  are[a][b]=(a==b?1.0:0.0)-0.5*ecy_kd(M,C,n,k,F,grain,b,a,0);aim[a][b]=0.5*ecy_kd(M,C,n,k,F,grain,b,a,1);}
++ if(!ecy_lu(are,aim,n,perm)){atomicOr(status,REFUSED_BOUND);return;}
++ double br[ECY_MAX],bi[ECY_MAX],xr[ECY_MAX],xi[ECY_MAX];
++ for(uint32_t a=0;a<n;++a){br[a]=ecy_double_wide(G[2u*a]);bi[a]=ecy_double_wide(G[2u*a+1u]);}
++ ecy_solve(are,aim,n,perm,br,bi,xr,xi);
++ wide U[2u*ECY_MAX];
++ for(uint32_t a=0;a<n;++a){U[2u*a]=ecy_wide_double(xr[a],status);U[2u*a+1u]=ecy_wide_double(xi[a],status);}
++ if(*status)return;
++ // R = 2S^3 rho_u = 2S^2 (G - U) + K^H S^2 U.
++ MomentInteger Rr[ECY_MAX],Ri[ECY_MAX];const MomentInteger S2=normal_wide(S)*normal_wide(S);
++ for(uint32_t pass=0;pass<3u;++pass){
++  for(uint32_t a=0;a<n;++a){
++   Rr[a]=S2*normal_wide(2)*(normal_wide(G[2u*a])-normal_wide(U[2u*a]));
++   Ri[a]=S2*normal_wide(2)*(normal_wide(G[2u*a+1u])-normal_wide(U[2u*a+1u]));
++   // (K^H U)_a = sum_b conj(K_ba) U_b = U_b conj(K_ba).
++   for(uint32_t b=0;b<n;++b){MomentInteger kr,ki;ecy_k(M,C,n,k,F,S,b,a,kr,ki);
++    normal_product(Rr[a],Ri[a],normal_wide(U[2u*b]),normal_wide(U[2u*b+1u]),kr,ki,true);}
++  }
++  if(pass==2u)break;
++  for(uint32_t a=0;a<n;++a){br[a]=ldexp(ecy_double_moment(Rr[a]),-(int)(2u*grain+1u));bi[a]=ldexp(ecy_double_moment(Ri[a]),-(int)(2u*grain+1u));}
++  ecy_solve(are,aim,n,perm,br,bi,xr,xi);
++  for(uint32_t a=0;a<n;++a){U[2u*a]=add_checked(U[2u*a],ecy_wide_double(xr[a],status),status);
++   U[2u*a+1u]=add_checked(U[2u*a+1u],ecy_wide_double(xi[a],status),status);}
++  if(*status)return;
++ }
++ MomentInteger rl1;for(uint32_t a=0;a<n;++a)rl1=rl1+normal_abs(Rr[a])+normal_abs(Ri[a]);
++ const wide centre=ec_ceil(rl1,S2*normal_wide(2),status);
++ wide FA=0,FC=0;ecy_norms(M,n,k,F,&FA,&FC,status);
++ const wide gn=ec_l1(G,d,status),rg=G[d];
++ const wide spread=ec_ceil(normal_wide(rc)*normal_wide(FA)*normal_wide(gn),S2*normal_wide(2),status);
++ const wide ru=add_checked(add_checked(rg,spread,status),centre,status);
++ if(*status)return;
++ int64_t *uw=uo+2u*((size_t)d+1u)*row,*pw=po+2u*((size_t)d+1u)*row;wide *u=(wide*)uw,*gp=(wide*)pw;
++ for(uint32_t j=0;j<d;++j){u[j]=U[j];gp[j]=add_checked(add_checked(U[j],U[j],status),-G[j],status);}
++ u[d]=ru;gp[d]=add_checked(add_checked(ru,ru,status),rg,status);
++ ec_seal(uw,uh+2u*((size_t)d+1u)*row,d,status);ec_seal(pw,ph+2u*((size_t)d+1u)*row,d,status);
++}
+diff --git a/crates/holonic-engine/kernels/exact_resident_section.cu b/crates/holonic-engine/kernels/exact_resident_section.cu
+index 7e37a0df..862b5a93 100644
+--- a/crates/holonic-engine/kernels/exact_resident_section.cu
++++ b/crates/holonic-engine/kernels/exact_resident_section.cu
+@@ -1705,6 +1705,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
+ #include "normal_wave.cuh"
+ #include "normal_applied_condition.cuh"
+ #include "enclosure_composition.cuh"
++#include "enclosure_cayley.cuh"
+ #include "enclosure_incident.cuh"
+ #include "global_field_action.cuh"
+ #include "field_factor_action.cuh"
+diff --git a/crates/holonic-engine/src/native_ecology/constitutive_fibre/field.rs b/crates/holonic-engine/src/native_ecology/constitutive_fibre/field.rs
+index 789906b5..6621bf83 100644
+--- a/crates/holonic-engine/src/native_ecology/constitutive_fibre/field.rs
++++ b/crates/holonic-engine/src/native_ecology/constitutive_fibre/field.rs
+@@ -116,6 +116,7 @@ use material_transport::{MaterialTransport, PendingMaterialTransport};
+ pub use material_transport::{
+     NativeAffineGeometry, NativeAffineGeometryAdjoint, NativeEnclosurePropagation,
+     NativeRealification, NativeRealificationAdjoint, NormalReactionProjection,
++    PowerNeutralCertificate,
+ };
+ pub use receiver::{
+     NativeFieldDifferentialReading, NativeMaterialActuation, NativeMaterialPacketReading,
+diff --git a/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport.rs b/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport.rs
+index de11f4d6..bb32f36a 100644
+--- a/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport.rs
++++ b/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport.rs
+@@ -10,7 +10,7 @@ pub use normal::{
+     NativeAffineGeometry, NativeAffineGeometryAdjoint, NativeEnclosurePropagation,
+     NativeRealification, NativeRealificationAdjoint,
+ };
+-pub use normal::{NativeNormalPrior, BoundaryMaterialMaps, BoundaryMaterialSeed, NormalReactionProjection};
++pub use normal::{NativeNormalPrior, BoundaryMaterialMaps, BoundaryMaterialSeed, NormalReactionProjection, PowerNeutralCertificate};
+ pub use normal::{NormalSourceChart, NativeNormalMaterialObjective, NativeNormalMaterialReading, NativeNormalMaterialState, ResidentNormalMaterial, ResidentNormalMaterialView, NormalMaterialRest, NormalRealizationRefinement, ResidentNormalReturn, ResidentNormalWave, NormalWaveWord, NormalWaveCoupled, NormalCoupledAttachRefusal, NormalCoupledContact, NormalCoupledStep, NormalCoupledReception, NormalCoupledSourceActuation, NormalCoupledProducingHandle, NormalCoupledPrediction, NormalCoupledComparison, NormalCoupledObservation, ConstitutiveComparisonSection, ConstitutiveSourceFrame, ResidentCoupledConstitutive, CoupledConstitutiveRefusal, ConstitutiveSourceRefusal, CoupledConstitutiveRest, NormalCoupledContinuation, NormalContinuationPullback, NormalContinuationJoin, CoupledConstitutiveFamily, CoupledConstitutiveAlternative, CompiledCoupledJoint, CoupledJointEvaluation, CoupledJointReading, NormalFamilyComparisonRow, NormalWaveCurrent, NormalWaveFibre, NormalWaveStep, NormalWaveReading, NormalWaveRest, NormalWaveSeedRefusal, NormalWaveSeedKind, NormalWaveReception, NormalWaveReceptionReading, NormalWaveDevelopment, NormalSourceActuation, NormalProducingHandle, NormalWavePrediction, NormalWaveComparison, NormalWaveComparisonReading, NormalWaveTransport, NormalWaveTransportChange, NormalWaveReference, NormalWaveReferenceReading, NormalWaveBasisChart, NormalWaveBasisFace, NormalWaveBasisReading, NormalBasisSelection, NormalBasisScore, NormalWaveSource, NormalWaveJointSource, NormalReceiverCoordinates,NormalWaveFacePacket, NormalFamilyPullback, NormalWaveFamily, NormalWaveFamilyRest, NormalFamilyBasisFace, FamilyBasisSelection, FamilyBasisReading, NormalFamilySupport, NormalFamilyReceiverReading, NormalWaveFamilyReceiver, NormalSectionBasisFace, ResidentNormalEnclosureSection, ResidentNormalSectionReturn, ResidentNormalInput, ResidentHeldSection, ResidentHeldSectionRest, ResidentNormalEnclosure, ResidentNormalEnclosureView};
+ mod support;
+ pub use support::{NativeMaterialReportPacking, NativeMaterialReportPackingRest};
+diff --git a/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal.rs b/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal.rs
+index c39441d8..aa2e6a94 100644
+--- a/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal.rs
++++ b/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal.rs
+@@ -958,7 +958,7 @@ pub use direct::{
+     NormalCoupledPrediction, NormalCoupledProducingHandle, NormalCoupledReception,
+     NormalCoupledSourceActuation, NormalCoupledStep, NormalFamilyBasisFace,
+     NormalFamilyComparisonRow, NormalFamilyPullback, NormalFamilyReceiverReading,
+-    NormalFamilySupport, NormalMaterialRest, NormalProducingHandle, NormalReactionProjection,
++    NormalFamilySupport, NormalMaterialRest, NormalProducingHandle, NormalReactionProjection, PowerNeutralCertificate,
+     NormalRealizationRefinement, NormalReceiverCoordinates, NormalSectionBasisFace,
+     NormalSourceActuation, NormalSourceChart, NormalWaveBasisChart, NormalWaveBasisFace,
+     NormalWaveBasisReading, NormalWaveComparison, NormalWaveComparisonReading, NormalWaveCoupled,
+diff --git a/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal/direct.rs b/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal/direct.rs
+index dc8e6316..5cc5393c 100644
+--- a/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal/direct.rs
++++ b/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal/direct.rs
+@@ -28,7 +28,7 @@ pub use section::{ResidentNormalEnclosureSection, ResidentNormalSectionReturn};
+ mod section_basis;
+ pub use section_basis::NormalSectionBasisFace;
+ mod reaction_law;
+-pub use reaction_law::NormalReactionProjection;
++pub use reaction_law::{NormalReactionProjection, PowerNeutralCertificate};
+ 
+ /// Declared domain of the same normal-statistic operator. A feature chart is not silently
+ /// padded or identified with the wave's three equally sized physical/current ports.
+diff --git a/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal/direct/reaction_law.rs b/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal/direct/reaction_law.rs
+index 338e4971..d698cf6d 100644
+--- a/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal/direct/reaction_law.rs
++++ b/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal/direct/reaction_law.rs
+@@ -71,6 +71,118 @@ pub struct NormalReactionProjection {
+     pub normal_residual_after: Rat,
+ }
+ 
++/// [definition] **The host certificate of a power-neutral reaction material cut**: every modulated
++/// slice `A_r` exactly skew-Hermitian and the linear self-relation `W_s` passive (`herm W_s ⪯ 0`
++/// by exact inertia of its realification), bound to the resident state it was read from (the
++/// same `Rc`). It is the premise of the Cayley step's certified radius: with it,
++/// `herm K(c) ⪯ 0` for every real contrast `c`, so `‖(I − K/2)⁻¹‖ ≤ 1` and the Cayley map is a
++/// contraction (`Holon/Cayley.lean::cayley_isometry` on the skew part,
++/// `Holon/Cayley.lean::midpoint_reaction_balance` with `R = −herm W_s`). The kernel re-checks
++/// slice skewness itself; passivity is read only from this certificate.
++#[derive(Clone)]
++pub struct PowerNeutralCertificate<'c> {
++    pub(crate) state: Rc<ResidentSection<'c>>,
++    /// Complex targets `n` (the row's current) and real contrast coordinates `k`.
++    pub n: usize,
++    pub k: usize,
++    /// Inertia of `sym(realify W_s)`: `positive == 0`.
++    pub linear_inertia: holonic_core::inertia::Inertia,
++    /// The exact executed coefficients (`n × F`, integers at `2^-grain`), for exterior readings
++    /// such as the incident energy balance. Never an operand of the resident step.
++    pub coefficients: Vec<Vec<GridComplex>>,
++    pub grain: u32,
++}
++impl std::fmt::Debug for PowerNeutralCertificate<'_> {
++    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
++        f.debug_struct("PowerNeutralCertificate")
++            .field("n", &self.n)
++            .field("k", &self.k)
++            .field("linear_inertia", &self.linear_inertia)
++            .finish()
++    }
++}
++impl<'c> PowerNeutralCertificate<'c> {
++    /// Whether this certificate was read from exactly `view`'s resident state.
++    pub fn certifies(&self, view: &ResidentNormalMaterialView<'c>) -> bool {
++        Rc::ptr_eq(&self.state, &view.state)
++    }
++    fn from_words(
++        state: Rc<ResidentSection<'c>>,
++        numeric: &[i128],
++        n: usize,
++        k: usize,
++        grain: u32,
++    ) -> Result<Self, ConstitutiveFibreError> {
++        let features = power_neutral_features(n, k)?;
++        let block = |columns: std::ops::Range<usize>| -> Vec<Vec<GridComplex>> {
++            (0..n)
++                .map(|t| {
++                    columns
++                        .clone()
++                        .map(|j| grid(numeric, t, j, features))
++                        .collect()
++                })
++                .collect()
++        };
++        for r in 0..k {
++            let start = n + k / 2 + r * n;
++            if !holonic_core::reaction::is_skew_hermitian(&block(start..start + n)) {
++                return Err(invalid("power-neutral slice is not exactly skew-Hermitian"));
++            }
++        }
++        let linear_inertia = holonic_core::inertia::inertia(
++            &holonic_core::scalar::symmetric_part(
++                &holonic_core::reaction::realify(&block(0..n)).map_err(invalid)?,
++            )
++            .map_err(invalid)?,
++        );
++        if linear_inertia.positive != 0 {
++            return Err(invalid("power-neutral linear self-relation is not passive"));
++        }
++        Ok(Self {
++            state,
++            n,
++            k,
++            linear_inertia,
++            coefficients: block(0..features),
++            grain,
++        })
++    }
++}
++
++fn power_neutral_features(n: usize, k: usize) -> Result<usize, ConstitutiveFibreError> {
++    n.checked_mul(k)
++        .and_then(|v| v.checked_add(n)?.checked_add(k / 2))
++        .filter(|_| n > 0 && k % 2 == 0)
++        .ok_or(ConstitutiveFibreError::Shape)
++}
++
++impl<'c> ResidentNormalMaterialView<'c> {
++    /// Certify this material cut for the Cayley reaction step (see [`PowerNeutralCertificate`]):
++    /// one explicit detachment of the resident state and an exact inertia. Refuses a cut whose
++    /// slices are not exactly skew-Hermitian or whose linear block is active.
++    pub fn certify_power_neutral_reaction(
++        &self,
++        n: usize,
++        k: usize,
++    ) -> Result<PowerNeutralCertificate<'c>, ConstitutiveFibreError> {
++        let features = power_neutral_features(n, k)?;
++        if self.targets != n
++            || self.source_chart
++                != (NormalSourceChart::Features {
++                    source_complex: features,
++                })
++        {
++            return Err(ConstitutiveFibreError::Shape);
++        }
++        let layout = self.source_chart.layout(self.targets)?;
++        let rest = self.surface.detach_section(&self.state, i64::BITS)?;
++        point_section(&rest, 1, layout.state_words)?;
++        let numeric = wides(&rest.intervals[..layout.matrix_words])?;
++        PowerNeutralCertificate::from_words(Rc::clone(&self.state), &numeric, n, k, self.grain.0)
++    }
++}
++
+ fn grid(numeric: &[i128], row: usize, column: usize, features: usize) -> GridComplex {
+     let at = 2 * (row * features + column);
+     (BigInt::from(numeric[at]), BigInt::from(numeric[at + 1]))
+@@ -84,6 +196,18 @@ impl<'c> ResidentNormalMaterial<'c> {
+         source_complex: usize,
+         condition_real: usize,
+     ) -> Result<(Self, NormalReactionProjection), ConstitutiveFibreError> {
++        self.project_power_neutral_reaction_certified(source_complex, condition_real)
++            .map(|(material, receipt, _)| (material, receipt))
++    }
++
++    /// [`Self::project_power_neutral_reaction`] with the certificate of the projected cut, read
++    /// from the same exact words the projection wrote (no second detachment).
++    pub fn project_power_neutral_reaction_certified(
++        &self,
++        source_complex: usize,
++        condition_real: usize,
++    ) -> Result<(Self, NormalReactionProjection, PowerNeutralCertificate<'c>), ConstitutiveFibreError>
++    {
+         let n = source_complex;
+         let k = condition_real;
+         let features = n
+@@ -169,12 +293,14 @@ impl<'c> ResidentNormalMaterial<'c> {
+             rest.intervals[2 * w] = (lo, lo);
+             rest.intervals[2 * w + 1] = (hi, hi);
+         }
+-        let state = self.surface.mount_section_rest(&rest)?;
++        let state = Rc::new(self.surface.mount_section_rest(&rest)?);
++        let certificate =
++            PowerNeutralCertificate::from_words(Rc::clone(&state), &next, n, k, grain)?;
+         let square = |v: BigInt| Rat::new(v, &unit * &unit);
+         Ok((
+             Self {
+                 surface: self.surface,
+-                state: Rc::new(state),
++                state,
+                 source_chart: self.source_chart,
+                 targets: self.targets,
+                 grain: self.grain,
+@@ -197,6 +323,7 @@ impl<'c> ResidentNormalMaterial<'c> {
+                 normal_residual_before: at_grain(residual_before),
+                 normal_residual_after: at_grain(residual_after),
+             },
++            certificate,
+         ))
+     }
+ 
+@@ -587,4 +714,272 @@ mod tests {
+         assert_eq!(second.linear_removed_rank, 0);
+         assert_eq!(second.normal_residual_after, receipt.normal_residual_after);
+     }
++
++    /// Rows at `grain` with a declared nonzero radius (grain units).
++    fn balls<'c>(
++        surface: &'c ResidentSurface<'c>,
++        rows: &[Vec<i64>],
++        grain: ResidentGrain,
++        radius: i128,
++    ) -> ResidentNormalEnclosureSection<'c> {
++        let width = rows[0].len();
++        let scale = 1i128 << grain.0;
++        let values = rows
++            .iter()
++            .flat_map(|row| {
++                row.iter()
++                    .map(|v| i128::from(*v) * scale)
++                    .chain([radius])
++                    .flat_map(|word| [word as i64, (word >> 64) as i64])
++                    .map(|word| (word, word))
++                    .collect::<Vec<_>>()
++            })
++            .collect();
++        let section = surface
++            .mount_section_rest(
++                &ResidentSectionRest::found(
++                    rows.len(),
++                    2 * (width + 1),
++                    ResidentGrain(0),
++                    64,
++                    values,
++                )
++                .unwrap(),
++            )
++            .unwrap();
++        ResidentNormalEnclosureSection::from_resident(surface, section, rows.len(), width, grain)
++            .unwrap()
++    }
++
++    /// The exact Cayley step `(I − K/2) y = (I + K/2) p + W_c c` (and, with `adjoint`, the solve
++    /// `(I − K/2)ᴴ u = g`) over ℚ on the interleaved real chart, from the certificate's coefficients.
++    fn exact_cayley(
++        certificate: &PowerNeutralCertificate<'_>,
++        p: &[Rat],
++        c: &[Rat],
++        adjoint: bool,
++    ) -> Vec<Rat> {
++        let (n, k) = (certificate.n, certificate.k);
++        let unit = Rat::from_integer(BigInt::one() << certificate.grain);
++        let w = |a: usize, j: usize| {
++            let (x, y) = &certificate.coefficients[a][j];
++            (
++                Rat::from_integer(x.clone()) / &unit,
++                Rat::from_integer(y.clone()) / &unit,
++            )
++        };
++        let kc = |a: usize, b: usize| {
++            let (mut x, mut y) = w(a, b);
++            for r in 0..k {
++                let (sx, sy) = w(a, n + k / 2 + r * n + b);
++                x += &c[r] * sx;
++                y += &c[r] * sy;
++            }
++            (x, y)
++        };
++        let half = Rat::new(1.into(), 2.into());
++        // Real 2n × 2n of K (or Kᴴ).
++        let mut kr = vec![vec![Rat::zero(); 2 * n]; 2 * n];
++        for a in 0..n {
++            for b in 0..n {
++                let (x, y) = if adjoint {
++                    let (x, y) = kc(b, a);
++                    (x, -y)
++                } else {
++                    kc(a, b)
++                };
++                kr[2 * a][2 * b] = x.clone();
++                kr[2 * a][2 * b + 1] = -y.clone();
++                kr[2 * a + 1][2 * b] = y;
++                kr[2 * a + 1][2 * b + 1] = x;
++            }
++        }
++        let system: Vec<Vec<Rat>> = (0..2 * n)
++            .map(|i| {
++                (0..2 * n)
++                    .map(|j| {
++                        let id = if i == j { Rat::one() } else { Rat::zero() };
++                        id - &half * &kr[i][j]
++                    })
++                    .collect()
++            })
++            .collect();
++        let rhs: Vec<Rat> = if adjoint {
++            p.to_vec()
++        } else {
++            (0..2 * n)
++                .map(|i| {
++                    let mut v = p[i].clone();
++                    for j in 0..2 * n {
++                        v += &half * &kr[i][j] * &p[j];
++                    }
++                    // W_c c: complex column m multiplies c_(2m) + i c_(2m+1).
++                    let a = i / 2;
++                    for m in 0..k / 2 {
++                        let (x, y) = w(a, n + m);
++                        let (cr, ci) = (&c[2 * m], &c[2 * m + 1]);
++                        v += if i % 2 == 0 {
++                            &x * cr - &y * ci
++                        } else {
++                            &x * ci + &y * cr
++                        };
++                    }
++                    v
++                })
++                .collect()
++        };
++        let matrix =
++            holonic_core::exact_linear::ExactRatMatrix::shaped(2 * n, 2 * n, system).unwrap();
++        let (z, kernel) = matrix.preimage_fibre(&rhs).unwrap().unwrap();
++        assert!(kernel.is_empty());
++        z
++    }
++
++    fn inside(exact: &[Rat], ball: &NativeFieldCurrentBall) -> bool {
++        let centre = real(ball);
++        let square: Rat = exact
++            .iter()
++            .zip(&centre)
++            .map(|(a, b)| (a - b) * (a - b))
++            .sum();
++        square <= &ball.radius * &ball.radius
++    }
++
++    /// **The Cayley step's certified enclosure.** On a trained, projected power-neutral material
++    /// with large contrasts (so the explicit step would amplify by `1 + |Jx|²/|x|²`), the device
++    /// step and its adjoint contain the exact rational solutions at the ball centres and at
++    /// perturbed points inside the input balls; the step is contractive on the drive (`|y| ≤ |p|
++    /// + |W_c c|`, `Holon/Cayley.lean::cayley_isometry` with the resistive part); a certificate of
++    /// another material cut is refused.
++    #[test]
++    #[ignore = "requires CUDA; the Cayley reaction step and its adjoint contain the exact solution"]
++    fn the_cayley_step_and_adjoint_contain_the_exact_solution() {
++        let readout = ResidentReadout::new().unwrap();
++        let surface = ResidentSurface::on(&readout).unwrap();
++        let grain = ResidentGrain(20);
++        let (n, k) = (3usize, 4usize);
++        let features = n + k / 2 + n * k;
++        let mut seed = 29;
++        let material =
++            ResidentNormalMaterial::found_features(&surface, features, n, grain).unwrap();
++        let rows = 16;
++        let s_rows: Vec<Vec<i64>> = (0..rows)
++            .map(|_| (0..2 * n).map(|_| lcg(&mut seed, 4)).collect())
++            .collect();
++        let c_rows: Vec<Vec<i64>> = (0..rows)
++            .map(|_| (0..k).map(|_| lcg(&mut seed, 4)).collect())
++            .collect();
++        let t_rows: Vec<Vec<i64>> = (0..rows)
++            .map(|_| (0..2 * n).map(|_| lcg(&mut seed, 9)).collect())
++            .collect();
++        let phi = points(&surface, &s_rows, grain)
++            .realified_bilinear_enclosed_features(&points(&surface, &c_rows, grain))
++            .unwrap();
++        let material = material
++            .stage_receive_enclosed_section(&phi, &points(&surface, &t_rows, grain))
++            .unwrap();
++        let (projected, _, certificate) = material
++            .project_power_neutral_reaction_certified(n, k)
++            .unwrap();
++        let view = projected.retained_view();
++        // Large contrasts: |c| ~ 300, the regime in which the explicit step diverged.
++        let p_rows: Vec<Vec<i64>> = (0..4)
++            .map(|_| (0..2 * n).map(|_| lcg(&mut seed, 50)).collect())
++            .collect();
++        let c_rows: Vec<Vec<i64>> = (0..4)
++            .map(|_| (0..k).map(|_| lcg(&mut seed, 300)).collect())
++            .collect();
++        let g_rows: Vec<Vec<i64>> = (0..4)
++            .map(|_| (0..2 * n).map(|_| lcg(&mut seed, 20)).collect())
++            .collect();
++        let (rp, rc, rg) = (7i128, 5i128, 3i128);
++        let p = balls(&surface, &p_rows, grain, rp);
++        let c = balls(&surface, &c_rows, grain, rc);
++        let g = balls(&surface, &g_rows, grain, rg);
++        let (y, mid) = view
++            .cayley_reaction_step(&certificate, &p, Some(&c))
++            .unwrap();
++        let (u, gp) = view
++            .cayley_reaction_adjoint(&certificate, Some(&c), &g)
++            .unwrap();
++        let int = |v: i64| Rat::from_integer(v.into());
++        let unit = Rat::from_integer(BigInt::one() << grain.0);
++        for row in 0..4 {
++            let yb = y.row(row).unwrap().inspect().unwrap();
++            let mb = mid.row(row).unwrap().inspect().unwrap();
++            let ub = u.row(row).unwrap().inspect().unwrap();
++            let gpb = gp.row(row).unwrap().inspect().unwrap();
++            // Centres and one perturbed corner inside each input ball.
++            for corner in [0i64, 1] {
++                let shift = |r: i128, len: usize, i: usize| -> Rat {
++                    // Spread r/2 over the first coordinate and r/2 over the last: |δ|₂ ≤ r.
++                    if corner == 0 || (i != 0 && i != len - 1) {
++                        Rat::zero()
++                    } else {
++                        Rat::new(BigInt::from(r), BigInt::from(2)) / &unit
++                    }
++                };
++                let p0: Vec<Rat> = p_rows[row]
++                    .iter()
++                    .enumerate()
++                    .map(|(i, v)| int(*v) + shift(rp, 2 * n, i))
++                    .collect();
++                let c0: Vec<Rat> = c_rows[row]
++                    .iter()
++                    .enumerate()
++                    .map(|(i, v)| int(*v) - shift(rc, k, i))
++                    .collect();
++                let g0: Vec<Rat> = g_rows[row]
++                    .iter()
++                    .enumerate()
++                    .map(|(i, v)| int(*v) + shift(rg, 2 * n, i))
++                    .collect();
++                let y_exact = exact_cayley(&certificate, &p0, &c0, false);
++                assert!(
++                    inside(&y_exact, &yb),
++                    "row {row} corner {corner}: y outside"
++                );
++                let m_exact: Vec<Rat> = p0
++                    .iter()
++                    .zip(&y_exact)
++                    .map(|(a, b)| (a + b) / int(2))
++                    .collect();
++                assert!(inside(&m_exact, &mb), "row {row}: midpoint outside");
++                let u_exact = exact_cayley(&certificate, &g0, &c0, true);
++                assert!(inside(&u_exact, &ub), "row {row}: u outside");
++                let gp_exact: Vec<Rat> = u_exact
++                    .iter()
++                    .zip(&g0)
++                    .map(|(a, b)| int(2) * a - b)
++                    .collect();
++                assert!(inside(&gp_exact, &gpb), "row {row}: drive covector outside");
++                if corner == 0 {
++                    // Contraction on the drive: |y − A⁻¹W_c c| ≤ |p|, via |y| ≤ |p| + ‖A⁻¹W_c c‖.
++                    let zero_p = vec![Rat::zero(); 2 * n];
++                    let port = exact_cayley(&certificate, &zero_p, &c0, false);
++                    let free: Rat = y_exact
++                        .iter()
++                        .zip(&port)
++                        .map(|(a, b)| (a - b) * (a - b))
++                        .sum();
++                    let drive: Rat = p0.iter().map(|a| a * a).sum();
++                    assert!(
++                        free <= drive,
++                        "row {row}: the Cayley map is not contractive"
++                    );
++                }
++            }
++            // The certified radius stays small: a few grain units above the input radius.
++            assert!(yb.radius < int(1), "row {row}: radius {}", yb.radius);
++        }
++        // A certificate of another cut is refused.
++        let other = ResidentNormalMaterial::found_features(&surface, features, n, grain)
++            .unwrap()
++            .retained_view();
++        assert!(
++            other
++                .cayley_reaction_step(&certificate, &p, Some(&c))
++                .is_err()
++        );
++    }
+ }
+diff --git a/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal/direct/section/composition.rs b/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal/direct/section/composition.rs
+index 0172c789..ad6e46ef 100644
+--- a/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal/direct/section/composition.rs
++++ b/crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal/direct/section/composition.rs
+@@ -45,6 +45,8 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
+             EnclosureComposition::Features { .. } => "bilinear features",
+             EnclosureComposition::FeaturesAdjoint { .. } => "bilinear input adjoints",
+             EnclosureComposition::NormalAdjoint { .. } => "normal material adjoint",
++            EnclosureComposition::CayleyReaction { .. } => "Cayley reaction step",
++            EnclosureComposition::CayleyAdjoint { .. } => "Cayley reaction adjoint",
+         };
+         let flags =
+             self.surface
+@@ -450,6 +452,135 @@ impl<'c> ResidentNormalMaterialView<'c> {
+         )
+     }
+ }
++impl<'c> ResidentNormalMaterialView<'c> {
++    fn cayley_shape(
++        &self,
++        certificate: &PowerNeutralCertificate<'c>,
++        rows: usize,
++        condition: Option<&ResidentNormalEnclosureSection<'c>>,
++    ) -> Result<(usize, usize), ConstitutiveFibreError> {
++        let (n, k) = (certificate.n, certificate.k);
++        if !certificate.certifies(self)
++            || self.targets != n
++            || condition.map_or(0, |c| c.width) != k
++            || condition.is_some_and(|c| {
++                c.rows != rows || c.grain != self.grain || !std::ptr::eq(c.surface, self.surface)
++            })
++        {
++            return Err(ConstitutiveFibreError::Shape);
++        }
++        Ok((n, k))
++    }
++    /// **The Cayley (implicit-midpoint) reaction step** of the power-neutral law on each row:
++    /// `(I − K(c)/2) y = (I + K(c)/2) p + W_c c` with `K(c) = W_s + Σ_r c_r A_r`, and the midpoint
++    /// `(p + y)/2` on which the material and contrast returns are read. The centre is refined
++    /// against the exact residual and the radius is certified from the certificate's passivity
++    /// (`kernels/enclosure_cayley.cuh`; `Holon/Cayley.lean::device_containment` with gain `1`).
++    /// Returns `(y, midpoint)`.
++    pub fn cayley_reaction_step(
++        &self,
++        certificate: &PowerNeutralCertificate<'c>,
++        drive: &ResidentNormalEnclosureSection<'c>,
++        condition: Option<&ResidentNormalEnclosureSection<'c>>,
++    ) -> Result<
++        (
++            ResidentNormalEnclosureSection<'c>,
++            ResidentNormalEnclosureSection<'c>,
++        ),
++        ConstitutiveFibreError,
++    > {
++        let (n, k) = self.cayley_shape(certificate, drive.rows, condition)?;
++        if drive.width != 2 * n
++            || drive.grain != self.grain
++            || !std::ptr::eq(drive.surface, self.surface)
++        {
++            return Err(ConstitutiveFibreError::Shape);
++        }
++        let y = drive.composition_output(drive.rows, drive.width)?;
++        let mid = drive.composition_output(drive.rows, drive.width)?;
++        drive.enact_composition(
++            EnclosureComposition::CayleyReaction {
++                state: &self.state,
++                drive: &drive.section,
++                condition: condition.map(|c| &c.section),
++                n,
++                k,
++                grain: self.grain.0,
++                certified: true,
++            },
++            &[&y, &mid],
++        )?;
++        Ok((
++            ResidentNormalEnclosureSection::from_resident(
++                self.surface,
++                y,
++                drive.rows,
++                drive.width,
++                self.grain,
++            )?,
++            ResidentNormalEnclosureSection::from_resident(
++                self.surface,
++                mid,
++                drive.rows,
++                drive.width,
++                self.grain,
++            )?,
++        ))
++    }
++    /// The exact adjoint of [`Self::cayley_reaction_step`] at its producing contrast: `u = A⁻ᴴ g`
++    /// (the covector the material and contrast returns read through `Wᴴ`) and the drive covector
++    /// `(I + K/2)ᴴ u = 2u − g`. Returns `(u, drive covector)`.
++    pub fn cayley_reaction_adjoint(
++        &self,
++        certificate: &PowerNeutralCertificate<'c>,
++        condition: Option<&ResidentNormalEnclosureSection<'c>>,
++        covector: &ResidentNormalEnclosureSection<'c>,
++    ) -> Result<
++        (
++            ResidentNormalEnclosureSection<'c>,
++            ResidentNormalEnclosureSection<'c>,
++        ),
++        ConstitutiveFibreError,
++    > {
++        let (n, k) = self.cayley_shape(certificate, covector.rows, condition)?;
++        if covector.width != 2 * n
++            || covector.grain != self.grain
++            || !std::ptr::eq(covector.surface, self.surface)
++        {
++            return Err(ConstitutiveFibreError::Shape);
++        }
++        let u = covector.composition_output(covector.rows, covector.width)?;
++        let drive = covector.composition_output(covector.rows, covector.width)?;
++        covector.enact_composition(
++            EnclosureComposition::CayleyAdjoint {
++                state: &self.state,
++                condition: condition.map(|c| &c.section),
++                covector: &covector.section,
++                n,
++                k,
++                grain: self.grain.0,
++                certified: true,
++            },
++            &[&u, &drive],
++        )?;
++        Ok((
++            ResidentNormalEnclosureSection::from_resident(
++                self.surface,
++                u,
++                covector.rows,
++                covector.width,
++                self.grain,
++            )?,
++            ResidentNormalEnclosureSection::from_resident(
++                self.surface,
++                drive,
++                covector.rows,
++                covector.width,
++                self.grain,
++            )?,
++        ))
++    }
++}
+ impl<'c> ResidentNormalMaterial<'c> {
+     pub fn pull_back_enclosed_section(
+         &self,
+diff --git a/crates/holonic-engine/src/resident_section.rs b/crates/holonic-engine/src/resident_section.rs
+index 4a7dd612..5734fd26 100644
+--- a/crates/holonic-engine/src/resident_section.rs
++++ b/crates/holonic-engine/src/resident_section.rs
+@@ -182,7 +182,7 @@ const CENSUS_MAX_WARPS: u32 = 32;
+ 
+ /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
+ /// refuses there and never at a launch.
+-pub const KERNELS: [&str; 96] = [
++pub const KERNELS: [&str; 98] = [
+     "section_constitutive_rechart",
+     "section_constitutive_circulation",
+     "section_constitutive_fibre",
+@@ -275,6 +275,8 @@ pub const KERNELS: [&str; 96] = [
+     "section_enclosure_refine_rows",
+     "section_enclosure_bilinear_features",
+     "section_enclosure_bilinear_adjoint",
++    "section_enclosure_cayley_reaction",
++    "section_enclosure_cayley_adjoint",
+     "section_normal_enclosed_adjoint",
+     "section_enclosure_collect_row_status",
+     "section_enclosure_concatenate_rows",
+diff --git a/crates/holonic-engine/src/resident_section/surface_enclosure_composition.rs b/crates/holonic-engine/src/resident_section/surface_enclosure_composition.rs
+index 0028ebc2..a1a3d366 100644
+--- a/crates/holonic-engine/src/resident_section/surface_enclosure_composition.rs
++++ b/crates/holonic-engine/src/resident_section/surface_enclosure_composition.rs
+@@ -53,8 +53,42 @@ pub(crate) enum EnclosureComposition<'a, 'c> {
+         grain: u32,
+         joint: bool,
+     },
++    /// The implicit-midpoint (Cayley) reaction step of the power-neutral law
++    /// (`kernels/enclosure_cayley.cuh`): outputs the step `y` and the midpoint `(p + y)/2`.
++    /// `condition` is absent exactly when `k = 0`. `certified` is the host's exact passivity
++    /// certificate of the linear self-relation; the kernel refuses without it.
++    CayleyReaction {
++        state: &'a ResidentSection<'c>,
++        drive: &'a ResidentSection<'c>,
++        condition: Option<&'a ResidentSection<'c>>,
++        n: usize,
++        k: usize,
++        grain: u32,
++        certified: bool,
++    },
++    /// Its adjoint: outputs `u = A⁻ᴴ g` and the drive covector `2u − g`.
++    CayleyAdjoint {
++        state: &'a ResidentSection<'c>,
++        condition: Option<&'a ResidentSection<'c>>,
++        covector: &'a ResidentSection<'c>,
++        n: usize,
++        k: usize,
++        grain: u32,
++        certified: bool,
++    },
+ }
+ impl<'c> ResidentSurface<'c> {
++    /// `(2n, state words)` of a power-neutral reaction material with `n` complex targets and `k`
++    /// real contrast coordinates (`F = n + k/2 + n·k` complex sources); `n ≤ 8` (the kernel's
++    /// per-row solve extent).
++    fn cayley_extent(&self, n: usize, k: usize) -> Option<(usize, usize)> {
++        if n == 0 || n > 8 || k % 2 != 0 || k >= u32::MAX as usize {
++            return None;
++        }
++        let f = n.checked_mul(k)?.checked_add(n)?.checked_add(k / 2)?;
++        let words = crate::native_ecology::constitutive_fibre::normal_feature_state_words(f, n)?;
++        Some((2 * n, words))
++    }
+     pub(crate) fn record_enclosure_composition(
+         &self,
+         lane: &Lane<'_, 'c>,
+@@ -287,6 +321,76 @@ impl<'c> ResidentSurface<'c> {
+                     .u32(u32::from(joint));
+                 "section_normal_enclosed_adjoint"
+             }
++            EnclosureComposition::CayleyReaction {
++                state,
++                drive,
++                condition,
++                n,
++                k,
++                grain,
++                certified,
++            } => {
++                let (d, words) = self.cayley_extent(n, k).ok_or_else(fail)?;
++                if outputs.len() != 2
++                    || !(1..=120).contains(&grain)
++                    || !self.operative_shape(state, 1, words)
++                    || !ball(drive, rows, d)
++                    || condition.is_some() != (k > 0)
++                    || condition.is_some_and(|c| !ball(c, rows, k))
++                    || !ball(out, rows, d)
++                    || !ball(outputs[1], rows, d)
++                {
++                    return Err(fail());
++                }
++                let c = condition.unwrap_or(drive);
++                p.ptr(state.lo.device_ptr())
++                    .ptr(state.hi.device_ptr())
++                    .ptr(drive.lo.device_ptr())
++                    .ptr(drive.hi.device_ptr())
++                    .ptr(c.lo.device_ptr())
++                    .ptr(c.hi.device_ptr())
++                    .u32(rows as u32)
++                    .u32(n as u32)
++                    .u32(k as u32)
++                    .u32(grain)
++                    .u32(u32::from(certified));
++                "section_enclosure_cayley_reaction"
++            }
++            EnclosureComposition::CayleyAdjoint {
++                state,
++                condition,
++                covector,
++                n,
++                k,
++                grain,
++                certified,
++            } => {
++                let (d, words) = self.cayley_extent(n, k).ok_or_else(fail)?;
++                if outputs.len() != 2
++                    || !(1..=120).contains(&grain)
++                    || !self.operative_shape(state, 1, words)
++                    || !ball(covector, rows, d)
++                    || condition.is_some() != (k > 0)
++                    || condition.is_some_and(|c| !ball(c, rows, k))
++                    || !ball(out, rows, d)
++                    || !ball(outputs[1], rows, d)
++                {
++                    return Err(fail());
++                }
++                let c = condition.unwrap_or(covector);
++                p.ptr(state.lo.device_ptr())
++                    .ptr(state.hi.device_ptr())
++                    .ptr(c.lo.device_ptr())
++                    .ptr(c.hi.device_ptr())
++                    .ptr(covector.lo.device_ptr())
++                    .ptr(covector.hi.device_ptr())
++                    .u32(rows as u32)
++                    .u32(n as u32)
++                    .u32(k as u32)
++                    .u32(grain)
++                    .u32(u32::from(certified));
++                "section_enclosure_cayley_adjoint"
++            }
+         };
+         for output in outputs {
+             p.ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr());
+diff --git a/crates/holonics-hna/src/native/coupled_wave/body/field/incident.rs b/crates/holonics-hna/src/native/coupled_wave/body/field/incident.rs
+index a462cd0f..48d7eed5 100644
+--- a/crates/holonics-hna/src/native/coupled_wave/body/field/incident.rs
++++ b/crates/holonics-hna/src/native/coupled_wave/body/field/incident.rs
+@@ -13,7 +13,12 @@ mod machine_transport;
+ pub use machine_receiving::{
+     GeneratorPhasePort, GeneratorPhaseReceiverBinding, NativeGeneratorPhaseReception,
+ };
++mod energy;
+ mod rest;
++pub use energy::IncidentEnergyBalance;
++mod holon_chart;
++#[allow(unused_imports)] // the phase-8 chart; named by its conformance tests and future consumers
++pub use holon_chart::{ResidentHolonChart, RingReaction};
+ pub use machine::GeneratorIncidentFieldSpec;
+ use machine::{IncidentModelSpec, MachineGroupMaps};
+ use machine_transport::{MachineParticipation, MachineValueTransport};
+@@ -416,6 +421,24 @@ struct IncidentSiteStep<'c> {
+     external_condition: Option<ResidentNormalEnclosureSection<'c>>,
+     machine_difference: Option<MachineValueTransport<'c>>,
+     features: ResidentNormalEnclosureSection<'c>,
++    /// The power-neutral law's implicit reaction stage; `None` under the legacy law.
++    cayley: Option<CayleyStage<'c>>,
++}
++/// [definition; agent-inferred] The Cayley (implicit-midpoint) reaction stage of one group.
++/// The reaction acts on the participation drive `p` as the modulated skew interconnection
++/// `J(c)` with the resistive part of `W_s` and the contrast port `W_c c`:
++/// `(I − K(c)/2) y = (I + K(c)/2) p + W_c c`, `K(c) = W_s + Σ_r c_r A_r`, and `y` (not
++/// `p + W Φ(q, c)`) is the site's incoming current. [agent-inferred] The drive, not the standing
++/// query, is what the step carries: then `|y|² − |p|² = −2⟨x̄, R x̄⟩ + 2 Re⟨x̄, W_c c⟩` exactly
++/// (`Holon/Cayley.lean::midpoint_reaction_balance`), gain exactly `1` on the drive whatever
++/// `|Δ|` (`Holon/Cayley.lean::cayley_isometry`), whereas carrying the query would leave
++/// `p − q` outside the isometry. The standing current still enters through the contrast `Δ`
++/// (which modulates `J`) and through participation. The explicit law's gain `1 + h²|J x|²/|x|²`
++/// (`Holon/Cayley.lean::explicit_step_growth`) is what this replaces.
++struct CayleyStage<'c> {
++    certificate: holonic_engine::native_ecology::constitutive_fibre::PowerNeutralCertificate<'c>,
++    step: ResidentNormalEnclosureSection<'c>,
++    midpoint: ResidentNormalEnclosureSection<'c>,
+ }
+ enum IncidentParticipationForward<'c> {
+     Bilinear(NativePhaseParticipation<'c>),
+@@ -465,6 +488,10 @@ impl<'c> IncidentParticipationForward<'c> {
+ struct IncidentStep<'c> {
+     sites: Vec<IncidentSiteStep<'c>>,
+     input: ResidentNormalEnclosure<'c>,
++    /// The step's current before (`q`), the projected reflection `S_D(input)` and the relaxed
++    /// current after it: exterior readings of the energy balance, never operands of the return.
++    before: Rc<ResidentNormalEnclosure<'c>>,
++    reflected: ResidentNormalEnclosure<'c>,
+ }
+ pub(crate) struct IncidentWord<'c> {
+     /// Ordered-source Holon of a generator word (declaration and moment `m`); the anchor is
+@@ -494,6 +521,10 @@ pub struct NativeIncidentGenerated<'c> {
+ pub struct NativeIncidentMaterialReturn<'c> {
+     /// The reaction deposit receipt this return publishes (unchanged under the legacy law).
+     reaction: ReactionDepositRecord,
++    /// The certificates of the projected cuts (power-neutral law), installed with them.
++    reaction_certificates: Vec<
++        Option<holonic_engine::native_ecology::constitutive_fibre::PowerNeutralCertificate<'c>>,
++    >,
+     contact_amplitude: Option<
+         holonic_engine::native_ecology::constitutive_fibre::NativeDeclaredAmplitudeCommit<'c>,
+     >,
+@@ -606,6 +637,15 @@ pub(crate) struct IncidentFieldModel<'c> {
+     rebase: IncidentRebaseResidual,
+     /// Receipt of the power-neutral reaction deposits (empty under the legacy law).
+     reaction_record: ReactionDepositRecord,
++    /// Certificates of the power-neutral material cuts in force, bound to their resident states;
++    /// filled lazily (one detachment per cut) and installed by each deposit's projection.
++    reaction_certificates: std::cell::RefCell<
++        Vec<
++            Option<holonic_engine::native_ecology::constitutive_fibre::PowerNeutralCertificate<'c>>,
++        >,
++    >,
++    /// The exterior energy balance of the latest committed power-neutral word.
++    energy_balance: Option<IncidentEnergyBalance>,
+     /// Test control only: publish the whole solve enclosure, as before the rebase law.
+     #[cfg(test)]
+     rebase_off: bool,
+@@ -834,10 +874,59 @@ impl<'c> IncidentFieldModel<'c> {
+             moments: BTreeMap::new(),
+             rebase: IncidentRebaseResidual::default(),
+             reaction_record: ReactionDepositRecord::default(),
++            reaction_certificates: std::cell::RefCell::new(Vec::new()),
++            energy_balance: None,
+             #[cfg(test)]
+             rebase_off: false,
+         })
+     }
++    /// `(n, k)` of reaction material `member`: `n` complex current coordinates, `k` real contrast
++    /// coordinates (features `n + c + 2nc` complex, `k = 2c`).
++    fn reaction_extent(&self, member: usize) -> Result<(usize, usize), NativeSessionError> {
++        let n = self.layout.width / 2;
++        let features = *self
++            .layout
++            .material_features
++            .get(member)
++            .ok_or_else(|| invalid("reaction material owner"))?;
++        if n == 0 || features < n || (features - n) % (2 * n + 1) != 0 {
++            return Err(invalid("power-neutral reaction feature chart"));
++        }
++        Ok((n, 2 * ((features - n) / (2 * n + 1))))
++    }
++    /// The certificates of the supplied material cuts under the power-neutral law (`None` under
++    /// the legacy law). A cached certificate is reused only for the exact resident state it
++    /// certified; any other cut is certified by one explicit detachment.
++    fn reaction_certificates(
++        &self,
++        material: &[ResidentNormalMaterialView<'c>],
++    ) -> Result<
++        Vec<
++            Option<holonic_engine::native_ecology::constitutive_fibre::PowerNeutralCertificate<'c>>,
++        >,
++        NativeSessionError,
++    > {
++        if self.layout.reaction != ReactionLaw::PowerNeutral {
++            return Ok(vec![None; material.len()]);
++        }
++        let mut cache = self.reaction_certificates.borrow_mut();
++        if cache.len() != material.len() {
++            cache.resize(material.len(), None);
++        }
++        material
++            .iter()
++            .enumerate()
++            .map(|(member, view)| {
++                if let Some(certificate) = cache[member].as_ref().filter(|c| c.certifies(view)) {
++                    return Ok(Some(certificate.clone()));
++                }
++                let (n, k) = self.reaction_extent(member)?;
++                let certificate = view.certify_power_neutral_reaction(n, k)?;
++                cache[member] = Some(certificate.clone());
++                Ok(Some(certificate))
++            })
++            .collect()
++    }
+     fn word(
+         &mut self,
+         prepared_boundary: ResidentNormalEnclosureView<'_, 'c>,
+@@ -941,6 +1030,7 @@ impl<'c> IncidentFieldModel<'c> {
+             "operative_storage":self.field.operative_return_storage(),
+             "rebase_residual":&self.rebase,
+             "reaction_law":self.layout.reaction,"reaction_deposits":&self.reaction_record,
++            "energy_balance":&self.energy_balance,
+             "chart": if self.layout.machine.is_some() {"fixed-generator-machine"} else {"legacy-slot-field"},
+             "contact_material": if self.layout.machine.is_some() {"positive-pair-amplitude-family"} else {"unconstrained-global-return"}}),
+         )
+@@ -1031,8 +1121,15 @@ impl<'c> IncidentFieldModel<'c> {
+             None
+         };
+         if let Some((staged, rebase)) = staged {
++            // The exterior balance is read from the committed word's balls before publication.
++            let balance = (self.layout.reaction == ReactionLaw::PowerNeutral)
++                .then(|| self.read_energy_balance(&generated.word))
++                .transpose()?;
+             self.field.commit_joint_current(staged)?;
+             self.rebase = rebase;
++            if balance.is_some() {
++                self.energy_balance = balance;
++            }
+         }
+         if let Some(retained) = retained {
+             generated.comparison = Some(self.next_comparison);
+@@ -1073,6 +1170,7 @@ impl<'c> IncidentFieldModel<'c> {
+         external: Option<&ResidentNormalEnclosureSection<'c>>,
+     ) -> Result<(Vec<IncidentStep<'c>>, ResidentNormalEnclosure<'c>), NativeSessionError> {
+         let layout = &self.layout;
++        let certificates = self.reaction_certificates(material)?;
+         let external_width = layout
+             .width
+             .checked_mul(layout.source_condition_ports)
+@@ -1240,22 +1338,50 @@ impl<'c> IncidentFieldModel<'c> {
+                     current_condition.as_ref(),
+                     external_condition.as_ref(),
+                 )?;
+-                let features = match (&condition, layout.reaction) {
+-                    (Some(c), ReactionLaw::Legacy) => query.bilinear_enclosed_features(c)?,
+-                    (Some(c), ReactionLaw::PowerNeutral) => {
+-                        query.realified_bilinear_enclosed_features(c)?
++                let (site_incoming, features, cayley) = match layout.reaction {
++                    ReactionLaw::Legacy => {
++                        let features = match &condition {
++                            Some(c) => query.bilinear_enclosed_features(c)?,
++                            None => ResidentNormalEnclosureSection::concatenate_rows(&[&query])?,
++                        };
++                        let reaction = material[group.material]
++                            .read_applied_enclosed_section_with_enclosure(
++                                &features,
++                                self.spec.enclosure_propagation(),
++                            )?;
++                        (phase.output().sum_same_shape(&reaction)?, features, None)
++                    }
++                    ReactionLaw::PowerNeutral => {
++                        let certificate = certificates[group.material]
++                            .clone()
++                            .ok_or_else(|| invalid("power-neutral material certificate"))?;
++                        let (step, midpoint) = material[group.material].cayley_reaction_step(
++                            &certificate,
++                            phase.output(),
++                            condition.as_ref(),
++                        )?;
++                        // The material and contrast returns are read at the midpoint.
++                        let features = match &condition {
++                            Some(c) => midpoint.realified_bilinear_enclosed_features(c)?,
++                            None => ResidentNormalEnclosureSection::concatenate_rows(&[&midpoint])?,
++                        };
++                        let incoming = ResidentNormalEnclosureSection::concatenate_rows(&[&step])?;
++                        (
++                            incoming,
++                            features,
++                            Some(CayleyStage {
++                                certificate,
++                                step,
++                                midpoint,
++                            }),
++                        )
+                     }
+-                    (None, _) => ResidentNormalEnclosureSection::concatenate_rows(&[&query])?,
+                 };
+-                let reaction = material[group.material]
+-                    .read_applied_enclosed_section_with_enclosure(
+-                        &features,
+-                        self.spec.enclosure_propagation(),
+-                    )?;
+-                let scattered = phase
+-                    .output()
+-                    .sum_same_shape(&reaction)?
+-                    .scatter_phase_adjoint(&group.receivers, &phases(rows), layout.sites.len())?;
++                let scattered = site_incoming.scatter_phase_adjoint(
++                    &group.receivers,
++                    &phases(rows),
++                    layout.sites.len(),
++                )?;
+                 incoming = Some(match incoming {
+                     Some(previous) => previous.sum_same_shape(&scattered)?,
+                     None => scattered,
+@@ -1268,6 +1394,7 @@ impl<'c> IncidentFieldModel<'c> {
+                     external_condition,
+                     machine_difference,
+                     features,
++                    cayley,
+                 });
+             }
+             let a = self
+@@ -1291,12 +1418,23 @@ impl<'c> IncidentFieldModel<'c> {
+                 self.spec
+                     .solver()
+                     .action(source, input.view(), self.spec.solve_steps())?;
+-            current = self
++            let reflected = self
+                 .project_machine(reflection.output().as_section()?)?
++                .row(0)?
++                .to_owned()?;
++            let before = Rc::new(current);
++            current = reflected
++                .view()
++                .as_section()?
+                 .held_refinement(&anchor_section, held, layout.relaxation_bits)?
+                 .row(0)?
+                 .to_owned()?;
+-            steps.push(IncidentStep { sites, input });
++            steps.push(IncidentStep {
++                sites,
++                input,
++                before,
++                reflected,
++            });
+         }
+         Ok((steps, current))
+     }
+@@ -1363,12 +1501,31 @@ impl<'c> IncidentFieldModel<'c> {
+                 let group = &stage.group;
+                 let rows = group.receivers.len();
+                 let g = ga.gather_phase_rows(&group.receivers, &phases(rows), layout.width)?;
++                // The Cayley stage returns through `u = A⁻ᴴ g`: the material reads `(Φ(x̄,c), u)`,
++                // the contrast the feature pullback of `Wᴴu` at the midpoint, and the drive
++                // `(I + K/2)ᴴ u = 2u − g`; the standing query receives nothing from the reaction.
++                let cayley_return = match &stage.cayley {
++                    Some(cy) => Some(word.material[group.material].cayley_reaction_adjoint(
++                        &cy.certificate,
++                        stage.condition.as_ref(),
++                        &g,
++                    )?),
++                    None => None,
++                };
++                let gdrive = cayley_return.as_ref().map_or(&g, |(_, drive)| drive);
+                 let gf = word.material[group.material].pull_back_enclosed_section_with_enclosure(
+-                    &g,
++                    cayley_return.as_ref().map_or(&g, |(u, _)| u),
+                     word.enclosure_propagation.clone(),
+                 )?;
+-                let (gq, gcondition) = match &stage.condition {
+-                    Some(c) => {
++                let (gq, gcondition) = match (&stage.condition, &stage.cayley) {
++                    (Some(c), Some(cy)) => (
++                        zero(self.field.surface(), rows, layout.width, grain)?,
++                        Some(cy.midpoint.realified_bilinear_enclosed_pullback(c, &gf)?.1),
++                    ),
++                    (None, Some(_)) => {
++                        (zero(self.field.surface(), rows, layout.width, grain)?, None)
++                    }
++                    (Some(c), None) => {
+                         let (q, c) = match layout.reaction {
+                             ReactionLaw::Legacy => {
+                                 stage.query.bilinear_enclosed_pullback(c, &gf)?
+@@ -1379,7 +1536,7 @@ impl<'c> IncidentFieldModel<'c> {
+                         };
+                         (q, Some(c))
+                     }
+-                    None => (gf, None),
++                    (None, None) => (gf, None),
+                 };
+                 let current_width = group
+                     .differences
+@@ -1414,11 +1571,11 @@ impl<'c> IncidentFieldModel<'c> {
+                 }
+                 let mut query = match &stage.phase {
+                     IncidentParticipationForward::Machine(p) => {
+-                        previous = previous.sum_same_shape(&p.pull_back(&g)?)?;
++                        previous = previous.sum_same_shape(&p.pull_back(gdrive)?)?;
+                         gq
+                     }
+                     _ => {
+-                        let (phase_query, phase_neighbors) = stage.phase.pull_back(&g)?;
++                        let (phase_query, phase_neighbors) = stage.phase.pull_back(gdrive)?;
+                         previous =
+                             previous.sum_same_shape(&phase_neighbors.scatter_phase_adjoint(
+                                 &group.sources,
+@@ -1460,7 +1617,10 @@ impl<'c> IncidentFieldModel<'c> {
+                 )?)?;
+                 material[group.material].push((
+                     ResidentNormalEnclosureSection::concatenate_rows(&[&stage.features])?,
+-                    g,
++                    match cayley_return {
++                        Some((u, _)) => u,
++                        None => g,
++                    },
+                 ));
+             }
+             let q = previous
+@@ -1596,16 +1756,18 @@ impl<'c> NativeCoupledBody<'c> {
+         }
+         // The power-neutral law: each normal-law solve is followed by its projections.
+         let mut reaction = model.reaction_record.clone();
++        let mut reaction_certificates = vec![None; material.len()];
+         if model.layout.reaction == ReactionLaw::PowerNeutral {
+-            let n = model.layout.width / 2;
+             let mut projections = Vec::with_capacity(material.len());
+-            for (staged, &features) in material.iter_mut().zip(&model.layout.material_features) {
++            for (member, staged) in material.iter_mut().enumerate() {
+                 // features = n + c + 2nc complex, so the real contrast count is k = 2c.
+                 // With no contrast (c = 0) only the linear self-relation is projected.
+-                let c = (features - n) / (2 * n + 1);
+-                let (projected, receipt) = staged.project_power_neutral_reaction(n, 2 * c)?;
++                let (n, k) = model.reaction_extent(member)?;
++                let (projected, receipt, certificate) =
++                    staged.project_power_neutral_reaction_certified(n, k)?;
+                 *staged = projected;
+                 projections.push(receipt);
++                reaction_certificates[member] = Some(certificate);
+             }
+             reaction.record(projections)?;
+         }
+@@ -1645,6 +1807,7 @@ impl<'c> NativeCoupledBody<'c> {
+         };
+         Ok(NativeIncidentMaterialReturn {
+             reaction,
++            reaction_certificates,
+             contact_amplitude,
+             source_covector: returned.source_covector,
+             symbol_covector: returned.symbol_covector,
+@@ -1687,6 +1850,7 @@ impl<'c> NativeCoupledBody<'c> {
+         }
+         model.materials = prepared.material;
+         model.reaction_record = prepared.reaction;
++        *model.reaction_certificates.borrow_mut() = prepared.reaction_certificates;
+         model.epoch = prepared.next_epoch;
+         model.observations = prepared.observations;
+         model.pending.remove(&prepared.comparison);
+diff --git a/crates/holonics-hna/src/native/coupled_wave/body/field/incident/energy.rs b/crates/holonics-hna/src/native/coupled_wave/body/field/incident/energy.rs
+new file mode 100644
+index 00000000..4e8b8e13
+--- /dev/null
++++ b/crates/holonics-hna/src/native/coupled_wave/body/field/incident/energy.rs
+@@ -0,0 +1,283 @@
++//! The exterior energy balance of one committed power-neutral incident word.
++//!
++//! [definition; agent-inferred] Read host-side from the word's returned balls at their exact
++//! centres, never an operand of the word or its return. With `E(x) = ½|x|²` (the current's unit
++//! storage pairing), each refinement step is the chain
++//!
++//! ```text
++//! q ─participation→ p ─Cayley reaction→ y ─projection→ a ─S_D reflection→ r ─relaxation→ q⁺
++//! ```
++//!
++//! and its stored change telescopes exactly into the stage terms. The reaction stage is the core
++//! Holon balance (`holonic_core::law::EnergyBalance`, `Holon/Cayley.lean::midpoint_reaction_balance`):
++//! with `x̄ = (p + y)/2` and the exact residual `ρ = (I + K/2)p + W_c c − (I − K/2)y` of the returned
++//! centre, `½|y|² − ½|p|² = −⟨x̄, R x̄⟩ + Re⟨x̄, W_c c⟩ + Re⟨x̄, J(c) x̄⟩ − Re⟨x̄, ρ⟩`, `R = −herm W_s`:
++//! `dissipated`, `port`, `reaction` (the skew interconnection's work, exactly `0` for exactly
++//! skew-Hermitian slices at every point of every ball, `Holon/Reaction.lean::skewReaction_workless`)
++//! and the solve's `discretization_defect`; the core balance's residual is computed and must be
++//! `0`. The participation is an exterior drive (an active receiver's delivered power, plan phase 7),
++//! the projection onto the real-coded image is orthogonal (`≤ 0`), and `S_D` joins the contact
++//! dissipation and the source injection `b` in one reflection, which this host reading does not
++//! separate. Deposition work is `0`: a reaction deposit leaves the unit storage pairing unchanged
++//! (`ReactionDepositRecord::storage_epsilon`).
++use super::*;
++use holonic_core::law::EnergyBalance;
++use holonic_engine::ExactComplexWaveCurrent;
++use num_traits::{ToPrimitive, Zero};
++use relational_geometry::Rat;
++
++/// One committed word's balance. Exact terms are kept as rationals; `f64` fields are readings.
++#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
++pub struct IncidentEnergyBalance {
++    /// The body generation this word was committed at.
++    pub generation: u64,
++    pub steps: usize,
++    /// `E(q_final) − E(q_anchor)` over the joint current (before the commit's rebase).
++    pub stored_change: f64,
++    /// `Σ E(p) − E(q_boundary)`: the participation drive's delivered power (exterior drive).
++    pub participation: f64,
++    /// `Σ ⟨x̄, R x̄⟩ ≥ 0` of the reaction stage.
++    pub reaction_dissipated: f64,
++    /// `Σ Re⟨x̄, W_c c⟩`: the contrast port of the reaction stage.
++    pub reaction_port: f64,
++    /// `Σ Re⟨x̄, J(c) x̄⟩`, exact: must be `0`.
++    pub reaction: Rat,
++    /// `Σ −Re⟨x̄, ρ⟩`: the certified solve's centre residual.
++    pub reaction_solve_defect: f64,
++    /// Whether every row's core `EnergyBalance` closed with residual exactly `0`.
++    pub reaction_balance_exact: bool,
++    /// `Σ E(a) − E(y)` (`≤ 0`).
++    pub projection: f64,
++    /// `Σ E(S_D(a)) − E(a)`: contact dissipation and source injection, joined.
++    pub reflection: f64,
++    /// `Σ E(q⁺) − E(S_D(a))`: the held relaxation toward the anchor.
++    pub relaxation: f64,
++    /// `½⟨x, (Q' − Q)x⟩ = 0` (unit pairing).
++    pub deposition_work: Rat,
++    /// `stored_change − Σ terms`, computed exactly: `0`.
++    pub residual: Rat,
++    /// `½|q_final|²` per site (ring).
++    pub rings: Vec<f64>,
++}
++
++fn f(value: &Rat) -> f64 {
++    value.to_f64().unwrap_or(f64::NAN)
++}
++fn half() -> Rat {
++    Rat::new(1.into(), 2.into())
++}
++fn energy(center: &[ExactComplexWaveCurrent]) -> Rat {
++    center
++        .iter()
++        .map(|z| &z.real * &z.real + &z.imaginary * &z.imaginary)
++        .sum::<Rat>()
++        * half()
++}
++type C = (Rat, Rat);
++fn cmul(a: &C, b: &C) -> C {
++    (&a.0 * &b.0 - &a.1 * &b.1, &a.0 * &b.1 + &a.1 * &b.0)
++}
++fn cadd(a: &C, b: &C) -> C {
++    (&a.0 + &b.0, &a.1 + &b.1)
++}
++/// `Re⟨x, v⟩ = Σ Re(conj(x_i) v_i)`.
++fn re_inner(x: &[C], v: &[C]) -> Rat {
++    x.iter()
++        .zip(v)
++        .map(|(a, b)| &a.0 * &b.0 + &a.1 * &b.1)
++        .sum()
++}
++fn apply(m: &[Vec<C>], v: &[C]) -> Vec<C> {
++    m.iter()
++        .map(|row| {
++            row.iter()
++                .zip(v)
++                .fold((Rat::zero(), Rat::zero()), |acc, (a, b)| {
++                    cadd(&acc, &cmul(a, b))
++                })
++        })
++        .collect()
++}
++
++/// The exact reaction-stage balance of one row at the returned centres (see the module header):
++/// `(stored, dissipated, port, reaction, defect)` and the core balance.
++pub(crate) fn reaction_row_balance(
++    certificate: &holonic_engine::native_ecology::constitutive_fibre::PowerNeutralCertificate<'_>,
++    drive: &[ExactComplexWaveCurrent],
++    step: &[ExactComplexWaveCurrent],
++    contrast: &[Rat],
++) -> Result<EnergyBalance, NativeSessionError> {
++    let (n, k) = (certificate.n, certificate.k);
++    if drive.len() != n || step.len() != n || contrast.len() != k {
++        return Err(invalid("reaction balance extent"));
++    }
++    let unit = Rat::from_integer(num_bigint::BigInt::from(1) << certificate.grain);
++    let coefficient = |a: usize, j: usize| -> C {
++        let (re, im) = &certificate.coefficients[a][j];
++        (
++            Rat::from_integer(re.clone()) / &unit,
++            Rat::from_integer(im.clone()) / &unit,
++        )
++    };
++    let ws: Vec<Vec<C>> = (0..n)
++        .map(|a| (0..n).map(|b| coefficient(a, b)).collect())
++        .collect();
++    let j: Vec<Vec<C>> = (0..n)
++        .map(|a| {
++            (0..n)
++                .map(|b| {
++                    (0..k).fold((Rat::zero(), Rat::zero()), |acc, r| {
++                        let s = coefficient(a, n + k / 2 + r * n + b);
++                        (&acc.0 + &contrast[r] * &s.0, &acc.1 + &contrast[r] * &s.1)
++                    })
++                })
++                .collect()
++        })
++        .collect();
++    let wc: Vec<C> = (0..n)
++        .map(|a| {
++            (0..k / 2).fold((Rat::zero(), Rat::zero()), |acc, m| {
++                cadd(
++                    &acc,
++                    &cmul(
++                        &coefficient(a, n + m),
++                        &(contrast[2 * m].clone(), contrast[2 * m + 1].clone()),
++                    ),
++                )
++            })
++        })
++        .collect();
++    let p: Vec<C> = drive
++        .iter()
++        .map(|z| (z.real.clone(), z.imaginary.clone()))
++        .collect();
++    let y: Vec<C> = step
++        .iter()
++        .map(|z| (z.real.clone(), z.imaginary.clone()))
++        .collect();
++    let xbar: Vec<C> = p
++        .iter()
++        .zip(&y)
++        .map(|(a, b)| ((&a.0 + &b.0) * half(), (&a.1 + &b.1) * half()))
++        .collect();
++    // ρ = (I + K/2)p + W_c c − (I − K/2)y = p − y + K x̄ + W_c c.
++    let (wsx, jx) = (apply(&ws, &xbar), apply(&j, &xbar));
++    let rho: Vec<C> = (0..n)
++        .map(|a| {
++            (
++                &p[a].0 - &y[a].0 + &wsx[a].0 + &jx[a].0 + &wc[a].0,
++                &p[a].1 - &y[a].1 + &wsx[a].1 + &jx[a].1 + &wc[a].1,
++            )
++        })
++        .collect();
++    let stored = (re_inner(&y, &y) - re_inner(&p, &p)) * half();
++    let dissipated = -re_inner(&xbar, &wsx);
++    let port = re_inner(&xbar, &wc);
++    let reaction = re_inner(&xbar, &jx);
++    let defect = -re_inner(&xbar, &rho);
++    Ok(EnergyBalance::closed(
++        stored,
++        dissipated,
++        port,
++        reaction,
++        Rat::zero(),
++        defect,
++    ))
++}
++
++impl<'c> IncidentFieldModel<'c> {
++    /// The balance of a committed word (see the module header). Power-neutral words only.
++    pub(super) fn read_energy_balance(
++        &self,
++        word: &IncidentWord<'c>,
++    ) -> Result<IncidentEnergyBalance, NativeSessionError> {
++        let boundary = word.source.boundary_components() / 2;
++        let joint = |e: &ResidentNormalEnclosure<'c>| -> Result<Vec<ExactComplexWaveCurrent>, NativeSessionError> {
++            Ok(e.view().inspect()?.center)
++        };
++        let anchor = joint(&word.anchor)?;
++        let output = joint(&word.output)?;
++        let mut balance = IncidentEnergyBalance {
++            generation: self.generations,
++            steps: word.steps.len(),
++            stored_change: f(&(energy(&output) - energy(&anchor))),
++            participation: 0.0,
++            reaction_dissipated: 0.0,
++            reaction_port: 0.0,
++            reaction: Rat::zero(),
++            reaction_solve_defect: 0.0,
++            reaction_balance_exact: true,
++            projection: 0.0,
++            reflection: 0.0,
++            relaxation: 0.0,
++            deposition_work: Rat::zero(),
++            residual: Rat::zero(),
++            rings: output[..boundary]
++                .chunks(self.layout.width / 2)
++                .map(|ring| f(&energy(ring)))
++                .collect(),
++        };
++        let (mut participation, mut dissipated, mut port, mut defect) =
++            (Rat::zero(), Rat::zero(), Rat::zero(), Rat::zero());
++        let (mut projection, mut reflection, mut relaxation) =
++            (Rat::zero(), Rat::zero(), Rat::zero());
++        for (index, step) in word.steps.iter().enumerate() {
++            let before = joint(&step.before)?;
++            let input = joint(&step.input)?;
++            let reflected = joint(&step.reflected)?;
++            let after = match word.steps.get(index + 1) {
++                Some(next) => joint(&next.before)?,
++                None => output.clone(),
++            };
++            let (mut drive_energy, mut step_energy) = (Rat::zero(), Rat::zero());
++            for stage in &step.sites {
++                let cayley = stage
++                    .cayley
++                    .as_ref()
++                    .ok_or_else(|| invalid("energy balance of a legacy reaction stage"))?;
++                let drives = stage.phase.output().inspect_rows()?;
++                let steps = cayley.step.inspect_rows()?;
++                let contrasts = match &stage.condition {
++                    Some(c) => c.inspect_rows()?,
++                    None => vec![],
++                };
++                for (row, (p, y)) in drives.iter().zip(&steps).enumerate() {
++                    let c: Vec<Rat> = contrasts
++                        .get(row)
++                        .map(|ball| {
++                            ball.center
++                                .iter()
++                                .flat_map(|z| [z.real.clone(), z.imaginary.clone()])
++                                .collect()
++                        })
++                        .unwrap_or_default();
++                    let row_balance =
++                        reaction_row_balance(&cayley.certificate, &p.center, &y.center, &c)?;
++                    balance.reaction_balance_exact &= row_balance.is_exact();
++                    balance.reaction += &row_balance.active;
++                    dissipated += &row_balance.dissipated;
++                    port += &row_balance.port;
++                    defect += &row_balance.discretization_defect;
++                    drive_energy += energy(&p.center);
++                    step_energy += energy(&y.center);
++                }
++            }
++            participation += &drive_energy - energy(&before[..boundary]);
++            projection += energy(&input[..boundary]) - &step_energy;
++            reflection += energy(&reflected) - energy(&input);
++            relaxation += energy(&after) - energy(&reflected);
++        }
++        let stored = energy(&output) - energy(&anchor);
++        let reaction_stored = -&dissipated + &port + &balance.reaction + &defect;
++        balance.residual =
++            &stored - (&participation + reaction_stored + &projection + &reflection + &relaxation);
++        balance.participation = f(&participation);
++        balance.reaction_dissipated = f(&dissipated);
++        balance.reaction_port = f(&port);
++        balance.reaction_solve_defect = f(&defect);
++        balance.projection = f(&projection);
++        balance.reflection = f(&reflection);
++        balance.relaxation = f(&relaxation);
++        Ok(balance)
++    }
++}
+diff --git a/crates/holonics-hna/src/native/coupled_wave/body/field/incident/holon_chart.rs b/crates/holonics-hna/src/native/coupled_wave/body/field/incident/holon_chart.rs
+new file mode 100644
+index 00000000..054e8fe5
+--- /dev/null
++++ b/crates/holonics-hna/src/native/coupled_wave/body/field/incident/holon_chart.rs
+@@ -0,0 +1,666 @@
++//! **`ResidentHolonChart`: the core Holon of a fixed generator machine, and its chart square.**
++//!
++//! [definition; agent-inferred] Plan phase 8 (`docs/plans/THE_HOLON_CORE_FOUNDS_THE_NATIVE_MACHINERY.md`):
++//! the resident incident word is a chart of a core Holon, owing "exact reference value ∈ returned
++//! dyadic ball", not equality. Compiled from a `CompiledGeneratorMachine`:
++//!
++//! - **storage**: every ring (site) carries its `2n` real resident coordinates under the unit
++//!   pairing `E = ½|x|²` (the pairing the reaction deposit leaves unchanged);
++//! - **resistive**: per site the reaction's resistive element `R = −herm W_s` on its own ring,
++//!   and per arc the helical pair contact `w D` on the relative slip (`HelicalPairInteraction::
++//!   contact_element`), whose flow is `J_pair C` read on the receiver and source rings through the
++//!   real-coded embedding (original coordinate `i` ↦ the real face of native channel `i`);
++//! - **interconnection**: the skew graph `f_S = −Ω e_S − Gᵀ e_R − B e_P`, `f_R = G e_S`,
++//!   `f_P = Bᵀ e_S`, with `Ω` the modulated skew interconnection `realify(skew W_s + J(c))`
++//!   at each ring's contrast `c`, `G` the resistive incidence above and `B = realify W_c`;
++//! - **ports**: each ring's real contrast coordinates (the reaction's port `W_c c`);
++//! - **generators**: each site's core `Generator` (`CompiledGeneratorSite::core_generator`).
++//!
++//! The implicit-midpoint advance of the ring-local reaction Holon is exactly the device Cayley
++//! stage's law, `y − p = K(c) x̄ + W_c c` (`Holon/Law.lean::advance_law`,
++//! `Holon/Cayley.lean::midpoint_reaction_balance`); [`ResidentHolonChart::reaction_holon`] is that
++//! Holon, and the chart-square test checks that its exact advance lies in the ball the device word
++//! returned. Scope: the square is stated and tested for the reaction stage; the participation drive
++//! (an exterior receiver), the `S_D` reflection and the held relaxation are not yet charted here.
++#![allow(dead_code)] // consumed by its conformance square; `NativeCoupledBody` delegation is owed
++use super::*;
++use crate::native::field_geometry::machine::CompiledGeneratorMachine;
++use holonic_core::dirac::DiracStructure;
++use holonic_core::element::ResistiveRelation;
++use holonic_core::exact_linear::ExactRatMatrix;
++use holonic_core::holon::{Holon, PortCounts, PortHolon};
++use holonic_core::inertia::SymmetricForm;
++use holonic_core::law::{ReferenceHolon, Scheme};
++use holonic_engine::native_ecology::constitutive_fibre::PowerNeutralCertificate;
++use num_traits::{One, Zero};
++use relational_geometry::Rat;
++
++/// One arc's contact in the resident chart.
++#[derive(Clone, Debug)]
++pub struct ChartContact {
++    pub receiver: usize,
++    pub source: usize,
++    /// `w D` on the three slip coordinates, certified passive.
++    pub resistance: ResistiveRelation,
++    /// `J_pair C` read on the resident rings: `3 × (sites · width)`.
++    pub slip: ExactRatMatrix,
++}
++
++/// [definition] The compiled chart (see the module header).
++#[derive(Clone, Debug)]
++pub struct ResidentHolonChart {
++    sites: usize,
++    /// Real resident coordinates per ring (`2n`).
++    width: usize,
++    contacts: Vec<ChartContact>,
++    generators: Vec<holonic_core::generator::Generator>,
++}
++
++/// One ring's reaction at a contrast: the exact executed coefficients (`n × F` integers at
++/// `2^-grain`, `F = n + k/2 + n·k`) and the real contrast coordinates `c`.
++pub struct RingReaction<'a> {
++    pub n: usize,
++    pub k: usize,
++    pub grain: u32,
++    pub coefficients: &'a [Vec<(num_bigint::BigInt, num_bigint::BigInt)>],
++    pub contrast: &'a [Rat],
++}
++impl<'a> RingReaction<'a> {
++    /// The reaction of a certified resident cut.
++    pub fn certified(certificate: &'a PowerNeutralCertificate<'_>, contrast: &'a [Rat]) -> Self {
++        Self {
++            n: certificate.n,
++            k: certificate.k,
++            grain: certificate.grain,
++            coefficients: &certificate.coefficients,
++            contrast,
++        }
++    }
++}
++
++fn rat_err(e: impl ToString) -> NativeSessionError {
++    invalid(e.to_string())
++}
++
++impl ResidentHolonChart {
++    /// Compile the machine's rings, contacts and generators; `width` is the resident real width of
++    /// one ring (`12` for the six native complex channels).
++    pub fn compile(
++        machine: &CompiledGeneratorMachine,
++        width: usize,
++    ) -> Result<Self, NativeSessionError> {
++        let sites = machine.sites().len();
++        if width < 12 || width % 2 != 0 {
++            return Err(invalid("resident ring width"));
++        }
++        let sigma = sites * width;
++        let mut contacts = Vec::with_capacity(machine.arcs().len());
++        for arc in machine.arcs() {
++            let interaction = arc.interaction();
++            let resistance = interaction.contact_element().map_err(rat_err)?;
++            let slip = interaction.effective_slip();
++            if slip.rows() != 3 || slip.columns() != 12 {
++                return Err(invalid("pair slip is not 3 × (6 receiver + 6 source)"));
++            }
++            // Blocks: [receiver(6), source(6)] original real coordinates; original coordinate i
++            // is the real face of native channel i, resident real index 2i.
++            let mut rows = vec![vec![Rat::zero(); sigma]; 3];
++            for (row, target) in rows.iter_mut().enumerate() {
++                for i in 0..6 {
++                    target[arc.receiver_index() * width + 2 * i] +=
++                        slip.get(row, i).map_err(rat_err)?;
++                    target[arc.source_index() * width + 2 * i] +=
++                        slip.get(row, 6 + i).map_err(rat_err)?;
++                }
++            }
++            contacts.push(ChartContact {
++                receiver: arc.receiver_index(),
++                source: arc.source_index(),
++                resistance,
++                slip: ExactRatMatrix::shaped(3, sigma, rows).map_err(rat_err)?,
++            });
++        }
++        let generators = machine
++            .sites()
++            .iter()
++            .map(|site| site.core_generator().map_err(rat_err))
++            .collect::<Result<Vec<_>, _>>()?;
++        Ok(Self {
++            sites,
++            width,
++            contacts,
++            generators,
++        })
++    }
++
++    pub fn sites(&self) -> usize {
++        self.sites
++    }
++    pub fn contacts(&self) -> &[ChartContact] {
++        &self.contacts
++    }
++
++    /// `(Ω, R, B)` of one ring's reaction on the interleaved real chart: `Ω = realify(skew W_s +
++    /// J(c))` (real skew), `R = −realify(herm W_s)` (PSD by the certificate) and `B = realify W_c`
++    /// on the `k` real contrast coordinates.
++    fn ring_blocks(
++        &self,
++        reaction: &RingReaction<'_>,
++    ) -> Result<(ExactRatMatrix, ExactRatMatrix, ExactRatMatrix), NativeSessionError> {
++        let (n, k) = (reaction.n, reaction.k);
++        if 2 * n != self.width
++            || reaction.contrast.len() != k
++            || reaction.coefficients.len() != n
++            || reaction
++                .coefficients
++                .iter()
++                .any(|row| row.len() != n + k / 2 + n * k)
++        {
++            return Err(invalid("ring reaction extent"));
++        }
++        let unit = Rat::from_integer(num_bigint::BigInt::from(1) << reaction.grain);
++        let coefficient = |a: usize, j: usize| -> (Rat, Rat) {
++            let (re, im) = &reaction.coefficients[a][j];
++            (
++                Rat::from_integer(re.clone()) / &unit,
++                Rat::from_integer(im.clone()) / &unit,
++            )
++        };
++        // K = W_s + J(c) as complex entries.
++        let k_entry = |a: usize, b: usize| -> (Rat, Rat) {
++            let (mut re, mut im) = coefficient(a, b);
++            for (r, c) in reaction.contrast.iter().enumerate() {
++                let (sr, si) = coefficient(a, n + k / 2 + r * n + b);
++                re += c * sr;
++                im += c * si;
++            }
++            (re, im)
++        };
++        let realify = |m: &dyn Fn(usize, usize) -> (Rat, Rat), columns: usize| {
++            let mut rows = vec![vec![Rat::zero(); 2 * columns]; 2 * n];
++            for a in 0..n {
++                for b in 0..columns {
++                    let (x, y) = m(a, b);
++                    rows[2 * a][2 * b] = x.clone();
++                    rows[2 * a][2 * b + 1] = -y.clone();
++                    rows[2 * a + 1][2 * b] = y;
++                    rows[2 * a + 1][2 * b + 1] = x;
++                }
++            }
++            ExactRatMatrix::shaped(2 * n, 2 * columns, rows).map_err(rat_err)
++        };
++        let kr = realify(&k_entry, n)?;
++        let half = Rat::new(1.into(), 2.into());
++        let kt = kr.transpose().map_err(rat_err)?;
++        // Ω = (K − Kᵀ)/2, R = −(K + Kᵀ)/2 in the realified chart (the slices are exactly skew,
++        // so the symmetric part is that of W_s).
++        let omega = kr.subtract(&kt).map_err(rat_err)?.scaled(&half);
++        let resistance = kr.add(&kt).map_err(rat_err)?.scaled(&(-half));
++        // B maps real contrast coordinate c_(2m) ↦ W_c[:,m], c_(2m+1) ↦ i W_c[:,m].
++        let mut b_rows = vec![vec![Rat::zero(); k]; 2 * n];
++        for a in 0..n {
++            for m in 0..k / 2 {
++                let (x, y) = coefficient(a, n + m);
++                b_rows[2 * a][2 * m] = x.clone();
++                b_rows[2 * a + 1][2 * m] = y.clone();
++                b_rows[2 * a][2 * m + 1] = -y;
++                b_rows[2 * a + 1][2 * m + 1] = x;
++            }
++        }
++        Ok((
++            omega,
++            resistance,
++            ExactRatMatrix::shaped(2 * n, k, b_rows).map_err(rat_err)?,
++        ))
++    }
++
++    /// **The ring-local reaction Holon** at its contrast, stepped by the exact implicit midpoint
++    /// at `h = 1`: its advance from the drive `p` with input `c` is the device Cayley stage's law.
++    pub fn reaction_holon(
++        &self,
++        reaction: &RingReaction<'_>,
++    ) -> Result<ReferenceHolon, NativeSessionError> {
++        let (omega, resistance, input) = self.ring_blocks(reaction)?;
++        let port = PortHolon::medium(
++            &omega,
++            &resistance,
++            SymmetricForm::from_diagonal(vec![Rat::one(); self.width]),
++            &input,
++            false,
++        )
++        .map_err(rat_err)?;
++        ReferenceHolon::new(
++            Holon::new(port).map_err(rat_err)?,
++            Rat::one(),
++            Scheme::Midpoint,
++        )
++        .map_err(rat_err)
++    }
++
++    /// **The machine Holon**: every ring's storage and reaction, every arc's contact, the rings'
++    /// contrast ports, on one skew interconnection (see the module header), with the sites'
++    /// generators attached.
++    pub fn holon(&self, reactions: &[RingReaction<'_>]) -> Result<Holon, NativeSessionError> {
++        if reactions.len() != self.sites {
++            return Err(invalid("one reaction per ring"));
++        }
++        let w = self.width;
++        let sigma = self.sites * w;
++        let blocks = reactions
++            .iter()
++            .map(|r| self.ring_blocks(r))
++            .collect::<Result<Vec<_>, _>>()?;
++        let mu: usize = blocks.iter().map(|b| b.2.columns()).sum();
++        let rho = sigma + 3 * self.contacts.len();
++        let total = sigma + rho + mu;
++        let mut s = vec![vec![Rat::zero(); total]; total];
++        let mut port_at = sigma + rho;
++        let mut resistance = vec![vec![Rat::zero(); rho]; rho];
++        for (site, (omega, r, b)) in blocks.iter().enumerate() {
++            let o = site * w;
++            for i in 0..w {
++                for j in 0..w {
++                    s[o + i][o + j] = -omega.get(i, j).map_err(rat_err)?.clone();
++                    resistance[o + i][o + j] = r.get(i, j).map_err(rat_err)?.clone();
++                }
++                // Reaction resistive incidence G = I on its own ring.
++                s[o + i][sigma + o + i] = -Rat::one();
++                s[sigma + o + i][o + i] = Rat::one();
++                for m in 0..b.columns() {
++                    let v = b.get(i, m).map_err(rat_err)?;
++                    s[o + i][port_at + m] = -v.clone();
++                    s[port_at + m][o + i] = v.clone();
++                }
++            }
++            port_at += b.columns();
++        }
++        for (index, contact) in self.contacts.iter().enumerate() {
++            let at = sigma + sigma + 3 * index;
++            for row in 0..3 {
++                for column in 0..sigma {
++                    let g = contact.slip.get(row, column).map_err(rat_err)?;
++                    if !g.is_zero() {
++                        s[column][at + row] = -g.clone();
++                        s[at + row][column] = g.clone();
++                    }
++                }
++                for column in 0..3 {
++                    resistance[sigma + 3 * index + row][sigma + 3 * index + column] = contact
++                        .resistance
++                        .resistance()
++                        .get(row, column)
++                        .map_err(rat_err)?
++                        .clone();
++                }
++            }
++        }
++        let structure = ExactRatMatrix::shaped(total, total, s).map_err(rat_err)?;
++        let port = PortHolon::new(
++            DiracStructure::skew_graph(&structure).map_err(rat_err)?,
++            PortCounts {
++                storage: sigma,
++                resistive: rho,
++                external: mu,
++                active: 0,
++            },
++            SymmetricForm::from_diagonal(vec![Rat::one(); sigma]),
++            ResistiveRelation::new(ExactRatMatrix::shaped(rho, rho, resistance).map_err(rat_err)?)
++                .map_err(rat_err)?,
++        )
++        .map_err(rat_err)?;
++        let mut holon = Holon::new(port).map_err(rat_err)?;
++        for generator in &self.generators {
++            holon = holon.with_generator(generator.clone());
++        }
++        Ok(holon)
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::super::machine_tests::spec;
++    use super::*;
++    use holonic_core::holon::HolonState;
++    use holonic_core::law::HolonLaw;
++
++    fn r(v: i64) -> Rat {
++        Rat::from_integer(v.into())
++    }
++
++    /// A deterministic exactly power-neutral certificate-shaped coefficient set (host only): skew
++    /// slices, a passive `W_s` (negative diagonal plus a skew part), a nonzero `W_c`.
++    fn coefficients(
++        n: usize,
++        k: usize,
++        grain: u32,
++    ) -> Vec<Vec<(num_bigint::BigInt, num_bigint::BigInt)>> {
++        let f = n + k / 2 + n * k;
++        let mut w = vec![vec![(num_bigint::BigInt::zero(), num_bigint::BigInt::zero()); f]; n];
++        let unit = 1i64 << grain;
++        for a in 0..n {
++            w[a][a] = ((-(unit / 2) - a as i64).into(), ((a as i64 + 1) * 3).into());
++            for b in a + 1..n {
++                let (x, y) = ((a * 7 + b) as i64 - 20, (a + 2 * b) as i64);
++                w[a][b] = (x.into(), y.into());
++                w[b][a] = ((-x).into(), y.into());
++            }
++            for m in 0..k / 2 {
++                w[a][n + m] = (
++                    ((a + m) as i64 * 5 - 9).into(),
++                    (m as i64 - a as i64).into(),
++                );
++            }
++            for rr in 0..k {
++                let base = n + k / 2 + rr * n;
++                w[a][base + a] = (0.into(), ((rr + a) as i64 * 11 - 30).into());
++                for b in a + 1..n {
++                    let (x, y) = ((rr * 3 + a * b) as i64 - 7, (b as i64 - rr as i64) * 13);
++                    w[a][base + b] = (x.into(), y.into());
++                    w[b][base + a] = ((-x).into(), y.into());
++                }
++            }
++        }
++        w
++    }
++
++    /// The machine Holon is Dirac, its midpoint advance closes the core balance exactly (zero
++    /// residual, zero defect), dissipates through the reaction resistance and the contacts, and
++    /// its skew interconnection does no work.
++    #[test]
++    fn the_machine_holon_advances_with_an_exact_balance() {
++        let machine = spec().machine.compile().unwrap();
++        let chart = ResidentHolonChart::compile(&machine, 12).unwrap();
++        assert_eq!((chart.sites(), chart.contacts().len()), (2, 1));
++        let n = 6;
++        let k = 12;
++        let grain = 8;
++        let w = coefficients(n, k, grain);
++        let contrasts: Vec<Vec<Rat>> = (0..2)
++            .map(|s| {
++                (0..k)
++                    .map(|i| Rat::new(((i * 3 + s) as i64 - 10).into(), 16.into()))
++                    .collect()
++            })
++            .collect();
++        let reactions: Vec<RingReaction> = contrasts
++            .iter()
++            .map(|c| RingReaction {
++                n,
++                k,
++                grain,
++                coefficients: &w,
++                contrast: c,
++            })
++            .collect();
++        let holon = chart.holon(&reactions).unwrap();
++        assert!(holon.port_holon().dirac().form().is_dirac().unwrap());
++        let law = ReferenceHolon::new(holon, r(1), Scheme::Midpoint).unwrap();
++        let x: Vec<Rat> = (0..24).map(|i| r((i * 5 % 11) as i64 - 5)).collect();
++        let input = contrasts.concat();
++        let advance = law.advance(&HolonState::new(x), &input).unwrap();
++        assert!(advance.balance.is_exact());
++        assert!(advance.balance.discretization_defect.is_zero());
++        assert!(advance.balance.dissipated > Rat::zero());
++        assert!(advance.balance.active.is_zero());
++    }
++
++    fn rational_rows<'c>(
++        surface: &'c holonic_engine::resident_section::ResidentSurface<'c>,
++        rows: &[Vec<i64>],
++        denominator: i64,
++        grain: holonic_engine::resident_section::ResidentGrain,
++    ) -> ResidentNormalEnclosureSection<'c> {
++        use holonic_engine::native_ecology::constitutive_fibre::ResidentConstitutiveSection;
++        use holonic_engine::resident_section::{ResidentGrain, ResidentSectionRest};
++        let width = rows[0].len();
++        let values = rows
++            .iter()
++            .flat_map(|row| {
++                row.iter()
++                    .map(|v| (*v, *v))
++                    .chain([(denominator, denominator)])
++                    .collect::<Vec<_>>()
++            })
++            .collect();
++        let raw = surface
++            .mount_section_rest(
++                &ResidentSectionRest::found(rows.len(), width + 1, ResidentGrain(0), 64, values)
++                    .unwrap(),
++            )
++            .unwrap();
++        ResidentNormalEnclosureSection::from_points(
++            ResidentConstitutiveSection::rationals(&raw).unwrap(),
++            grain,
++        )
++        .unwrap()
++    }
++
++    fn lcg(seed: &mut u64, span: i64) -> i64 {
++        *seed = seed
++            .wrapping_mul(6364136223846793005)
++            .wrapping_add(1442695040888963407);
++        ((*seed >> 33) as i64).rem_euclid(2 * span + 1) - span
++    }
++
++    fn real(center: &[holonic_engine::ExactComplexWaveCurrent]) -> Vec<Rat> {
++        center
++            .iter()
++            .flat_map(|z| [z.real.clone(), z.imaginary.clone()])
++            .collect()
++    }
++
++    /// Install trained, projected power-neutral reaction materials in every owner of `body`.
++    fn install_trained_reactions<'c>(
++        body: &mut NativeCoupledBody<'c>,
++        surface: &'c holonic_engine::resident_section::ResidentSurface<'c>,
++        grain: holonic_engine::resident_section::ResidentGrain,
++        seed: u64,
++    ) {
++        use holonic_engine::native_ecology::constitutive_fibre::ResidentNormalMaterial;
++        let surface = surface;
++        let mut seed = seed;
++        {
++            let BodyState::Incident(model) = body.state_mut().unwrap() else {
++                panic!("incident chart");
++            };
++            for member in 0..model.materials.len() {
++                let (n, k) = model.reaction_extent(member).unwrap();
++                let features = n + k / 2 + n * k;
++                let rows = 24;
++                let s: Vec<Vec<i64>> = (0..rows)
++                    .map(|_| (0..2 * n).map(|_| lcg(&mut seed, 40)).collect())
++                    .collect();
++                let t: Vec<Vec<i64>> = (0..rows)
++                    .map(|_| (0..2 * n).map(|_| lcg(&mut seed, 60)).collect())
++                    .collect();
++                let s = rational_rows(surface, &s, 16, grain);
++                let phi = if k == 0 {
++                    s
++                } else {
++                    let c: Vec<Vec<i64>> = (0..rows)
++                        .map(|_| (0..k).map(|_| lcg(&mut seed, 40)).collect())
++                        .collect();
++                    s.realified_bilinear_enclosed_features(&rational_rows(surface, &c, 16, grain))
++                        .unwrap()
++                };
++                let trained = ResidentNormalMaterial::found_features(surface, features, n, grain)
++                    .unwrap()
++                    .stage_receive_enclosed_section(&phi, &rational_rows(surface, &t, 16, grain))
++                    .unwrap();
++                let (projected, _, _) = trained
++                    .project_power_neutral_reaction_certified(n, k)
++                    .unwrap();
++                model.materials[member] = projected;
++            }
++        }
++    }
++
++    /// **The chart square** (`reference ∈ resident ball`): on the two-ring machine under the
++    /// power-neutral law, with trained and projected reaction materials installed (ring `a` has no
++    /// contrast, `k = 0`; ring `b` has one arc contrast, `k = 12`), every row of the device word's
++    /// Cayley stage contains the exact implicit-midpoint advance of the ring's core reaction Holon
++    /// from the same drive and contrast centres, whose core balance closes exactly with zero
++    /// active power. Committing the word publishes its exterior energy balance: the reaction
++    /// (skew) term is exactly `0` and the telescoped residual is exactly `0`.
++    #[test]
++    #[ignore = "requires CUDA; chart square of the Cayley reaction stage and the committed energy balance"]
++    fn the_reference_reaction_advance_lies_in_the_device_ball() {
++        use holonic_engine::embedding_fiber::ResidentReadout;
++        use holonic_engine::resident_section::{ResidentGrain, ResidentSurface};
++        let readout = ResidentReadout::new().unwrap();
++        let surface = ResidentSurface::on(&readout).unwrap();
++        let grain = ResidentGrain(48);
++        let mut declared = spec();
++        declared.reaction_law = ReactionLaw::PowerNeutral;
++        let mut body = NativeCoupledBody::found_generator_field(&surface, declared, grain).unwrap();
++        install_trained_reactions(&mut body, &surface, grain, 41);
++        let anchor = super::super::machine_tests::make_machine_anchor(&surface, grain, 0);
++        let held = vec![false; anchor.view().components() / 2];
++        let prepared = body.prepare_incident_field(anchor.view(), &held).unwrap();
++        let word = std::rc::Rc::clone(&prepared.word);
++        let chart = ResidentHolonChart::compile(word.machine.as_ref().unwrap(), 12).unwrap();
++        let mut checked = 0;
++        let mut contrasted = 0;
++        for step in &word.steps {
++            for stage in &step.sites {
++                let cayley = stage.cayley.as_ref().expect("power-neutral stage");
++                let drives = stage.phase.output().inspect_rows().unwrap();
++                let steps = cayley.step.inspect_rows().unwrap();
++                let contrasts = match &stage.condition {
++                    Some(c) => c.inspect_rows().unwrap(),
++                    None => vec![],
++                };
++                for (row, (p, y)) in drives.iter().zip(&steps).enumerate() {
++                    let c = contrasts
++                        .get(row)
++                        .map(|b| real(&b.center))
++                        .unwrap_or_default();
++                    contrasted += usize::from(!c.is_empty());
++                    let law = chart
++                        .reaction_holon(&RingReaction::certified(&cayley.certificate, &c))
++                        .unwrap();
++                    let advance = law.advance(&HolonState::new(real(&p.center)), &c).unwrap();
++                    assert!(advance.balance.is_exact());
++                    assert!(advance.balance.active.is_zero());
++                    assert!(advance.balance.dissipated >= Rat::zero());
++                    let square: Rat = advance
++                        .state
++                        .configuration
++                        .iter()
++                        .zip(real(&y.center))
++                        .map(|(a, b)| (a - &b) * (a - &b))
++                        .sum();
++                    assert!(
++                        square <= &y.radius * &y.radius,
++                        "reference outside the resident ball (row {row})"
++                    );
++                    checked += 1;
++                }
++            }
++        }
++        assert_eq!(checked, 2);
++        assert_eq!(contrasted, 1);
++        body.publish_incident_field(prepared, true, false).unwrap();
++        let current = body.inspect_current().unwrap();
++        let balance: IncidentEnergyBalance =
++            serde_json::from_value(current["energy_balance"].clone()).unwrap();
++        assert!(balance.reaction.is_zero());
++        assert!(balance.residual.is_zero());
++        assert!(balance.reaction_balance_exact);
++        assert!(balance.reaction_dissipated >= 0.0);
++        assert!(balance.projection <= 0.0);
++        eprintln!(
++            "CHART-SQUARE-BALANCE {}",
++            serde_json::to_string(&balance).unwrap()
++        );
++    }
++
++    /// **The Cayley word's complete adjoint** (anchor return through `S_D`, the relaxation, the
++    /// projection, the Cayley stage's `2u − g`, the participation and the contrast return through
++    /// `Wᴴu` at the midpoint) pairs with the word's central difference on the two-ring machine with
++    /// trained power-neutral materials, and the material return deposits and recertifies.
++    #[test]
++    #[ignore = "requires CUDA; full-word adjoint of the Cayley reaction against its central difference"]
++    fn the_cayley_word_adjoint_pairs_with_its_central_difference() {
++        use num_traits::Signed;
++        use holonic_engine::embedding_fiber::ResidentReadout;
++        use holonic_engine::resident_section::{ResidentGrain, ResidentSurface};
++        let readout = ResidentReadout::new().unwrap();
++        let surface = ResidentSurface::on(&readout).unwrap();
++        let grain = ResidentGrain(48);
++        let mut declared = spec();
++        declared.reaction_law = ReactionLaw::PowerNeutral;
++        let mut body = NativeCoupledBody::found_generator_field(&surface, declared, grain).unwrap();
++        install_trained_reactions(&mut body, &surface, grain, 43);
++        let machine_anchor = super::super::machine_tests::make_machine_anchor;
++        let anchor = machine_anchor(&surface, grain, 0);
++        let held = vec![false; anchor.view().components() / 2];
++        let prepared = body.prepare_incident_field(anchor.view(), &held).unwrap();
++        let generated = body.publish_incident_field(prepared, false, true).unwrap();
++        let comparison = generated.comparison_id().unwrap();
++        let output = generated.joint_output().inspect().unwrap();
++        let (plus, minus) = (
++            machine_anchor(&surface, grain, 1),
++            machine_anchor(&surface, grain, -1),
++        );
++        let out_plus = body
++            .prepare_incident_field(plus.view(), &held)
++            .unwrap()
++            .joint_output()
++            .inspect()
++            .unwrap();
++        let out_minus = body
++            .prepare_incident_field(minus.view(), &held)
++            .unwrap()
++            .joint_output()
++            .inspect()
++            .unwrap();
++        let pair = |a: &[holonic_engine::ExactComplexWaveCurrent],
++                    b: &[holonic_engine::ExactComplexWaveCurrent]| {
++            a.iter()
++                .zip(b)
++                .map(|(x, y)| &x.real * &y.real + &x.imaginary * &y.imaginary)
++                .sum::<Rat>()
++        };
++        let half = Rat::new(1.into(), 2.into());
++        let delta_out: Vec<_> = out_minus
++            .center
++            .iter()
++            .zip(&out_plus.center)
++            .map(|(a, b)| {
++                holonic_engine::ExactComplexWaveCurrent::new(
++                    (&b.real - &a.real) * &half,
++                    (&b.imaginary - &a.imaginary) * &half,
++                )
++            })
++            .collect();
++        let base_source = anchor.inspect().unwrap();
++        let delta_source: Vec<_> = base_source
++            .center
++            .iter()
++            .zip(&plus.inspect().unwrap().center)
++            .map(|(a, b)| b.subtract(a))
++            .collect();
++        let frozen = body.incident_comparison(comparison).unwrap();
++        let returned = body
++            .prepare_incident_material_return(comparison, frozen.joint_output(), 4)
++            .unwrap();
++        let forward = pair(&output.center, &delta_out);
++        let adjoint = pair(
++            &returned.anchor_covector().inspect().unwrap().center,
++            &delta_source,
++        );
++        let scale = forward.abs().max(adjoint.abs());
++        assert!(scale > Rat::zero());
++        let residual = (&forward - &adjoint).abs();
++        assert!(
++            residual < &scale / r(1000),
++            "Cayley word pairing residual {residual}, forward {forward}, adjoint {adjoint}"
++        );
++        assert_eq!(returned.reaction_deposits().deposits, 1);
++        body.publish_incident_material_return(returned).unwrap();
++        // The deposited cuts carry their certificates: the next word needs no recertification.
++        let again = body.prepare_incident_field(anchor.view(), &held).unwrap();
++        assert!(again.word.steps[0].sites.iter().all(|s| s.cayley.is_some()));
++    }
++}
+diff --git a/crates/holonics-hna/src/native/field_session/generator_application/deposition_probe.rs b/crates/holonics-hna/src/native/field_session/generator_application/deposition_probe.rs
+index 8dd62f6d..7dc3f302 100644
+--- a/crates/holonics-hna/src/native/field_session/generator_application/deposition_probe.rs
++++ b/crates/holonics-hna/src/native/field_session/generator_application/deposition_probe.rs
+@@ -111,11 +111,30 @@ fn silent_probe_partial(path: &Path, commits: usize) -> Result<(Vec<f64>, Option
+     NativeFieldSavedSession::open(path)?.with_session(|session, _| silent_commits(session, commits))
+ }
+ 
++/// The same probe with each silent commit's energy balance.
++fn silent_probe_balanced(
++    path: &Path,
++    commits: usize,
++) -> Result<(Vec<f64>, Option<String>, Vec<Value>)> {
++    NativeFieldSavedSession::open(path)?
++        .with_session(|session, _| silent_commits_with_balance(session, commits))
++}
++
+ /// Silent commits on an open session.
+ fn silent_commits(
+     session: &mut NativeFieldSession<'_>,
+     commits: usize,
+ ) -> Result<(Vec<f64>, Option<String>)> {
++    silent_commits_with_balance(session, commits).map(|(e, r, _)| (e, r))
++}
++
++/// Silent commits, also returning each committed word's exterior energy balance
++/// (`IncidentEnergyBalance`, power-neutral law; `null` under the legacy law).
++fn silent_commits_with_balance(
++    session: &mut NativeFieldSession<'_>,
++    commits: usize,
++) -> Result<(Vec<f64>, Option<String>, Vec<Value>)> {
++    let mut balances = Vec::new();
+     {
+         let options = session.presentation.spec.generator.clone().unwrap();
+         let sites = options.field.machine.sites().len();
+@@ -140,12 +159,13 @@ fn silent_commits(
+                 )
+                 .and_then(|generated| session.body.publish_incident_field(generated, true, false));
+             if let Err(error) = step {
+-                return Ok((energies, Some(error.to_string())));
++                return Ok((energies, Some(error.to_string()), balances));
+             }
+             session.generator.as_mut().unwrap().next_event += 1;
+             energies.push(energy(session, sites));
++            balances.push(session.body.inspect_current()?["energy_balance"].clone());
+         }
+-        Ok((energies, None))
++        Ok((energies, None, balances))
+     }
+ }
+ 
+@@ -471,16 +491,29 @@ fn power_neutral_silent_probe_after_learning() {
+     .unwrap();
+     let mut worst = 0.0f64;
+     let mut probe_refusals = 0usize;
++    let mut reaction_nonzero = 0usize;
+     for (cycle, path, deposits, w) in &checkpoints {
+-        let (energies, probe_refused) = silent_probe_partial(path, commits).unwrap();
++        let (energies, probe_refused, balances) = silent_probe_balanced(path, commits).unwrap();
+         let r = ratios(&energies);
+         let max = r.iter().cloned().fold(f64::MIN, f64::max);
+         worst = worst.max(max);
+         probe_refusals += usize::from(probe_refused.is_some());
++        // The skew reaction's work is exactly zero in every committed word's balance.
++        reaction_nonzero += balances
++            .iter()
++            .filter(|b| {
++                let zero = |v: &Value| {
++                    serde_json::from_value::<relational_geometry::Rat>(v.clone())
++                        .is_ok_and(|r| num_traits::Zero::is_zero(&r))
++                };
++                !b.is_null() && !(zero(&b["reaction"]) && zero(&b["residual"]))
++            })
++            .count();
+         eprintln!(
+             "POWER-NEUTRAL-SYNTH {}",
+             json!({"cycle":cycle,"law":law_of_spec(&spec),"energies":energies,"ratios":r,"max_ratio":max,
+-                "probe_refused":probe_refused,"W":w,"reaction_deposits":deposits})
++                "probe_refused":probe_refused,"W":w,"reaction_deposits":deposits,
++                "energy_balance":balances.last()})
+         );
+         if std::env::var("DEPOSITION_KEEP").is_err() {
+             let _ = std::fs::remove_file(path);
+@@ -494,6 +527,10 @@ fn power_neutral_silent_probe_after_learning() {
+     assert!(refused.is_none(), "learning refused: {refused:?}");
+     if law_of_spec(&spec) == crate::native::ReactionLaw::PowerNeutral {
+         assert_eq!(probe_refusals, 0, "a silent probe refused");
++        assert_eq!(
++            reaction_nonzero, 0,
++            "a committed balance with nonzero reaction work or residual"
++        );
+         assert!(
+             worst <= 1.0,
+             "an active silent commit under the power-neutral law: {worst}"
+diff --git a/docs/VERIFICATION_RECEIPTS.tsv b/docs/VERIFICATION_RECEIPTS.tsv
+index 2e0bf163..ed5a6f43 100644
+--- a/docs/VERIFICATION_RECEIPTS.tsv
++++ b/docs/VERIFICATION_RECEIPTS.tsv
+@@ -193,3 +193,6 @@ when	tree	dirty	scope	command	result	secs	who	log
+ 2026-09-22	ef76f84f+p7	restructure phase 7 (receivers as coholons/active Holons), isolated worktree	rust	cargo check --workspace --all-targets; cargo test -p holonic-core; engine receiver modules; worker ran receiver::normalized device tests 21/21 under flock	pass: core 294, engine 251 (29 device-ignored in isolated run)	-	Opus 5.5 phase-7 worker + primary	.local/campaign-moment/p7-*.log
+ 2026-09-22	b6c6fdcb+rx	power-neutral reaction law (realified skew slices, passive linear shift, deposit projection) + deposition probe, isolated worktree	rust	cargo check --workspace --all-targets; cargo test -p holonic-core reaction::; lean_citations; flock gpu cargo test -p holonics-hna --lib incident:: --include-ignored	pass: 4, 3, 33	-	Opus 5.5 reaction worker + primary	.local/campaign-moment/rx-*.log
+ 2026-09-22	b6c6fdcb+rx	exposure sample under PowerNeutral	measured	athena_exposure_field (spec .local/campaign-reaction/spec.json)	516 frames, 13 returns, 0 native refusals; late growth slowed (g1 11.6 at frame 408 vs 2.6e7) but explicit word still diverges	-	Opus 5.5 reaction worker	.local/campaign-reaction/
++2026-09-22	7c4063b5+p8a	restructure phase 8a: Cayley (implicit-midpoint) reaction step on the device with certified enclosure and exact adjoint (kernels/enclosure_cayley.cuh), PowerNeutralCertificate, incident word Cayley stage, exterior IncidentEnergyBalance, ResidentHolonChart, isolated worktree	rust	cargo check --workspace --all-targets; flock gpu: holonic-engine --lib reaction_law --include-ignored; holonics-hna --lib incident:: --include-ignored; holonics-hna --lib holon_chart --include-ignored; holonic-engine --lib lean_citations	pass: engine 3 (Cayley containment of exact step/adjoint at |c|~300), hna incident 35, chart 3 (reference ∈ resident ball; full-word adjoint vs central difference < 1e-3 rel), citations 3	-	Opus 5.5 phase-8a worker	.local/campaign-p8a/
++2026-09-22	7c4063b5+p8a	synthetic control under PowerNeutral with the Cayley word (48 cycles, 6 checkpoints × 16 silent commits)	measured	flock gpu holonics-hna --lib power_neutral_silent_probe_after_learning --include-ignored	pass: worst silent ratio 0.99994 (explicit word: 2.2e18), 0 probe refusals, every committed balance reaction = 0 and residual = 0 exactly	-	Opus 5.5 phase-8a worker	.local/campaign-p8a/synthetic-cayley.log
++2026-09-22	7c4063b5+p8a	exposure sample under PowerNeutral with the Cayley word	measured	athena_exposure_field (spec .local/campaign-reaction/spec.json, run_exposure.sh 1500)	516 frames, 13 returns, 0 native refusals; receiver ring g1 energy 1.45 at frame 489 (explicit 1801.7); model/uniform bits 1.108 at frame 489 (explicit 5.41); update median 8.96 s (explicit 8.07 s); checkpoint 93.5 MB	-	Opus 5.5 phase-8a worker	.local/campaign-p8a/

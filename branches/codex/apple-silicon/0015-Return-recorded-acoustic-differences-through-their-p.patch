@@ -1,0 +1,2264 @@
+From d7cdc22897e81db107298dc3447d41a2b1f2ef7b Mon Sep 17 00:00:00 2001
+From: Brandon Duggan <brandonrdug@users.noreply.github>
+Date: Mon, 7 Sep 2026 18:30:34 -0700
+Subject: [PATCH 15/18] Return recorded acoustic differences through their
+ producing temporal adjoint
+
+---
+ CONSTRUCTION_STATE.md                         |  10 +-
+ accelerators/metal/README.md                  |   6 +
+ .../metal/phase_response_adjoint.metal        | 137 +++++++++++
+ crates/holonic-engine/build.rs                |   1 +
+ .../kernels/exact_resident_section.cu         |   1 +
+ .../phase_current_response_adjoint.cuh        | 121 +++++++++
+ .../src/phase_current/resident.rs             |   5 +
+ .../resident/response_adjoint.rs              | 125 ++++++++++
+ .../resident/response_adjoint/tests.rs        | 225 +++++++++++++++++
+ crates/holonic-engine/src/resident_section.rs |   8 +-
+ .../surface_phase_response_adjoint.rs         | 178 ++++++++++++++
+ crates/holonic-mount/src/metal.rs             |   4 +
+ .../examples/recorded_acoustic_return.rs      |  29 ++-
+ docs/ACOUSTIC_EXPERIMENTS.md                  |   7 +
+ docs/ARCHITECTURE_MAP.md                      |   8 +
+ docs/plans/HOLONICS_ON_APPLE_SILICON.md       |   5 +-
+ .../compare_recorded_acoustic_return.py       |  44 +++-
+ ...URN_USES_ITS_PRODUCING_TEMPORAL_ADJOINT.md | 112 +++++++++
+ .../comparison.json                           | 145 +++++++++++
+ .../observer-controls.json                    |  38 +++
+ .../row_000.json                              | 230 ++++++++++++++++++
+ .../row_000_response_return.section           | Bin 0 -> 88 bytes
+ .../row_001.json                              | 230 ++++++++++++++++++
+ .../row_001_response_return.section           | Bin 0 -> 88 bytes
+ .../row_002.json                              | 230 ++++++++++++++++++
+ .../row_002_response_return.section           | Bin 0 -> 88 bytes
+ 26 files changed, 1890 insertions(+), 9 deletions(-)
+ create mode 100644 accelerators/metal/phase_response_adjoint.metal
+ create mode 100644 crates/holonic-engine/kernels/phase_current_response_adjoint.cuh
+ create mode 100644 crates/holonic-engine/src/phase_current/resident/response_adjoint.rs
+ create mode 100644 crates/holonic-engine/src/phase_current/resident/response_adjoint/tests.rs
+ create mode 100644 crates/holonic-engine/src/resident_section/surface_phase_response_adjoint.rs
+ create mode 100644 research/records/2026-09-07_THE_RECORDED_RETURN_USES_ITS_PRODUCING_TEMPORAL_ADJOINT.md
+ create mode 100644 research/records/2026-09-07_recorded_acoustic_response_return/comparison.json
+ create mode 100644 research/records/2026-09-07_recorded_acoustic_response_return/observer-controls.json
+ create mode 100644 research/records/2026-09-07_recorded_acoustic_response_return/row_000.json
+ create mode 100644 research/records/2026-09-07_recorded_acoustic_response_return/row_000_response_return.section
+ create mode 100644 research/records/2026-09-07_recorded_acoustic_response_return/row_001.json
+ create mode 100644 research/records/2026-09-07_recorded_acoustic_response_return/row_001_response_return.section
+ create mode 100644 research/records/2026-09-07_recorded_acoustic_response_return/row_002.json
+ create mode 100644 research/records/2026-09-07_recorded_acoustic_response_return/row_002_response_return.section
+
+diff --git a/CONSTRUCTION_STATE.md b/CONSTRUCTION_STATE.md
+index bf974f38..efde3ae1 100644
+--- a/CONSTRUCTION_STATE.md
++++ b/CONSTRUCTION_STATE.md
+@@ -30,6 +30,13 @@ microphone pairs on their original clocks. All-coordinate source-qualified compa
+ Prediction/difference take about 2.4 seconds together; cold audio export takes 14.4–14.7 seconds,
+ with 139.8 MB peak native residency. The initial unit response is still a baseline.
+ 
++[established-bounded; measured] The [producing-adjoint return](research/records/2026-09-07_THE_RECORDED_RETURN_USES_ITS_PRODUCING_TEMPORAL_ADJOINT.md)
++now returns those differences into the original response chart using the retained convolution.
++Twenty-three temporal controls, all three exact recorded comparisons and four negative observer
++controls pass. The adjoint takes 2.53–3.33 seconds per 14-second recording with zero numerical
++readback; the three native stages together take 4.50–5.79 seconds. The full condition-fibre contact
++and persistent acoustic update remain next; the unit response was not developed by this return.
++
+ [established-bounded; measured] The [complete-recording action](research/records/2026-09-07_APPLE_CONDUCTS_COMPLETE_RECORDINGS_AND_RETURNS_TIMED_AUDIO.md)
+ and [conditional restart](research/records/2026-09-07_THE_RECORDED_CONDITIONAL_ACTION_CONTINUES_AFTER_RESTART.md)
+ retain complete timed convolution, both quadratures, actual condition current and the local
+@@ -38,8 +45,7 @@ ports resident input and paired/enclosed/balanced field conduct, including histo
+ These controlled two-tap and field returns establish their apparatus scope, not cultivated sound
+ or English usefulness. Completed measurements and control counts remain in those records.
+ 
+-[open; source-inspected] Next compose the recorded difference through the temporal adjoint of
+-its retained producing operator, retain the complete compatible-condition fibre and unmodelled
++[open; source-inspected] Next retain the complete compatible-condition fibre and unmodelled
+ return, and develop persistent acoustic standing through the native contact law. The bilinear
+ preimage owner does not yet supply this structured temporal fibre. Larger material/current-history
+ owners remain outside the current Metal port. Actual acoustic/English development and streaming
+diff --git a/accelerators/metal/README.md b/accelerators/metal/README.md
+index 8c06b2d0..d08b8b16 100644
+--- a/accelerators/metal/README.md
++++ b/accelerators/metal/README.md
+@@ -39,6 +39,12 @@ and normalization templates for threadgroup carriers. Signed-128 amplitudes reta
+ two-i64 wire, numerical radius and point-port guard. Occurrence/step scalars retain their full
+ 64-bit ABI; the declared sign progression has no implicit acoustic clock.
+ 
++[definition] `phase_response_adjoint.metal` returns a temporal difference through the exact
++source carrier retained by its producing convolution. It validates complete point views, sums
++conjugate-source products only on the actual receiver support, and shares whole-result
++normalization/publication with convolution. Response lanes have disjoint workspace; every lane
++keeps ascending source order. No condition update or numerical enclosure projection is implied.
++
+ [definition] Build arithmetic apparatus explicitly; the probe kernels are absent from production:
+ 
+ ```sh
+diff --git a/accelerators/metal/phase_response_adjoint.metal b/accelerators/metal/phase_response_adjoint.metal
+new file mode 100644
+index 00000000..a10e9d72
+--- /dev/null
++++ b/accelerators/metal/phase_response_adjoint.metal
+@@ -0,0 +1,137 @@
++// Response-leg adjoint of the retained causal phase convolution. For each response coefficient k,
++// accumulate conjugate(source[j]) * residual[k+j-predicted_from] only over the explicitly observed
++// residual support. This is a receiver-restricted return, not a learner.
++
++kernel void section_phase_response_adjoint_validate(
++    device const long *source_lo [[buffer(0)]], device const long *source_hi [[buffer(1)]],
++    constant uint &source_at [[buffer(2)]], constant uint &source_denominator_at [[buffer(3)]],
++    constant uint &source_disposition_at [[buffer(4)]],
++    device const long *residual_lo [[buffer(5)]], device const long *residual_hi [[buffer(6)]],
++    constant uint &residual_at [[buffer(7)]], constant uint &residual_denominator_at [[buffer(8)]],
++    constant uint &residual_disposition_at [[buffer(9)]],
++    constant uint &source_complex_coordinates [[buffer(10)]],
++    constant uint &residual_complex_coordinates [[buffer(11)]],
++    constant uint &source_raw_extent [[buffer(12)]], constant uint &response_raw_extent [[buffer(13)]],
++    constant uint &predicted_from [[buffer(14)]], constant uint &residual_raw_extent [[buffer(15)]],
++    device W *workspace [[buffer(16)]], device uint *slot [[buffer(17)]],
++    device const uint *census [[buffer(18)]], device const uint *lineage [[buffer(19)]],
++    constant uint &lineage_count [[buffer(20)]], uint gid [[thread_position_in_grid]]) {
++  if (gid != 0 || *slot || upstream(census, lineage, lineage_count, slot))
++    return;
++  ulong source_complex = (ulong)source_complex_coordinates;
++  ulong residual_complex = (ulong)residual_complex_coordinates;
++  ulong source_raw = (ulong)source_raw_extent;
++  ulong response_raw = (ulong)response_raw_extent;
++  ulong predicted = (ulong)predicted_from;
++  ulong residual_raw = (ulong)residual_raw_extent;
++  if (!source_complex || !residual_complex || !source_raw || !response_raw || !residual_raw
++      || source_raw > source_complex || residual_raw > residual_complex
++      || source_complex > 0x7ffffffful || residual_complex > 0x7ffffffful
++      || predicted + residual_raw > source_raw + response_raw - 1ul
++      || source_raw + response_raw - 1ul > 0x7ffffffful
++      || 2ul * response_raw > 0xfffffffful - 1ul
++      || (ulong)source_at + 2ul * source_complex > 0xfffffffful
++      || (ulong)residual_at + 2ul * residual_complex > 0xfffffffful) {
++    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
++                             memory_order_relaxed);
++    return;
++  }
++  uint source_count = (uint)source_complex;
++  uint residual_count = (uint)residual_complex;
++  uint source_raw_count = (uint)source_raw;
++  uint residual_raw_count = (uint)residual_raw;
++  uint response_count = (uint)response_raw;
++  uint width = 2u * response_count;
++  W source_den = fibre_current_denominator(source_lo, source_hi,
++                                           source_denominator_at,
++                                           source_disposition_at, slot);
++  W residual_den = fibre_current_denominator(residual_lo, residual_hi,
++                                             residual_denominator_at,
++                                             residual_disposition_at, slot);
++  if (*slot)
++    return;
++  for (uint coordinate = 0; coordinate < source_count; ++coordinate) {
++    ulong at64 = (ulong)source_at + 2ul * (ulong)coordinate;
++    uint at = (uint)at64;
++    if (source_lo[at] != source_hi[at] || source_lo[at + 1u] != source_hi[at + 1u]
++        || (coordinate >= source_raw_count
++            && (source_lo[at] != 0 || source_lo[at + 1u] != 0))) {
++      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
++                               memory_order_relaxed);
++      return;
++    }
++  }
++  for (uint coordinate = 0; coordinate < residual_count; ++coordinate) {
++    ulong at64 = (ulong)residual_at + 2ul * (ulong)coordinate;
++    uint at = (uint)at64;
++    if (residual_lo[at] != residual_hi[at]
++        || residual_lo[at + 1u] != residual_hi[at + 1u]
++        || (coordinate >= residual_raw_count
++            && (residual_lo[at] != 0 || residual_lo[at + 1u] != 0))) {
++      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
++                               memory_order_relaxed);
++      return;
++    }
++  }
++  W common = field_product_checked(source_den, residual_den, slot);
++  if (*slot || wzero_p(common) || wneg_p(common))
++    return;
++  workspace[width] = common;
++}
++
++kernel void section_phase_response_adjoint_products(
++    device const long *source_lo [[buffer(0)]], device const long *source_hi [[buffer(1)]],
++    constant uint &source_at [[buffer(2)]], constant uint &source_denominator_at [[buffer(3)]],
++    constant uint &source_disposition_at [[buffer(4)]],
++    device const long *residual_lo [[buffer(5)]], device const long *residual_hi [[buffer(6)]],
++    constant uint &residual_at [[buffer(7)]], constant uint &residual_denominator_at [[buffer(8)]],
++    constant uint &residual_disposition_at [[buffer(9)]],
++    constant uint &source_complex_coordinates [[buffer(10)]],
++    constant uint &residual_complex_coordinates [[buffer(11)]],
++    constant uint &source_raw_extent [[buffer(12)]], constant uint &response_raw_extent [[buffer(13)]],
++    constant uint &predicted_from [[buffer(14)]], constant uint &residual_raw_extent [[buffer(15)]],
++    device W *workspace [[buffer(16)]], device uint *slot [[buffer(17)]],
++    device const uint *census [[buffer(18)]], device const uint *lineage [[buffer(19)]],
++    constant uint &lineage_count [[buffer(20)]], uint gid [[thread_position_in_grid]]) {
++  (void)source_hi;
++  (void)source_denominator_at;
++  (void)source_disposition_at;
++  (void)residual_hi;
++  (void)residual_denominator_at;
++  (void)residual_disposition_at;
++  (void)source_complex_coordinates;
++  (void)residual_complex_coordinates;
++  if (*slot || upstream(census, lineage, lineage_count, slot))
++    return;
++  if (gid >= response_raw_extent)
++    return;
++  W real = wzero();
++  W imaginary = wzero();
++  ulong observed_start = (ulong)predicted_from;
++  ulong observed_end = observed_start + (ulong)residual_raw_extent;
++  ulong source_begin = observed_start > gid ? observed_start - gid : 0ul;
++  ulong source_end = observed_end > gid
++      ? min((ulong)source_raw_extent, observed_end - gid) : 0ul;
++  for (ulong source = source_begin; source < source_end; ++source) {
++    ulong summed = (ulong)gid + (ulong)source;
++    uint residual = (uint)(summed - observed_start);
++    ulong source_index = (ulong)source_at + 2ul * (ulong)source;
++    ulong residual_index = (ulong)residual_at + 2ul * (ulong)residual;
++    W ar = fromword(source_lo[source_index]);
++    W ai = fromword(source_lo[source_index + 1ul]);
++    W br = fromword(residual_lo[residual_index]);
++    W bi = fromword(residual_lo[residual_index + 1ul]);
++    real = field_add_checked(real,
++        field_add_checked(field_product_checked(ar, br, slot),
++                          field_product_checked(ai, bi, slot), slot), slot);
++    imaginary = field_add_checked(imaginary,
++        field_sub_checked(field_product_checked(ar, bi, slot),
++                          field_product_checked(ai, br, slot), slot), slot);
++    if (*slot)
++      return;
++  }
++  if (!*slot) {
++    workspace[2u * gid] = real;
++    workspace[2u * gid + 1u] = imaginary;
++  }
++}
+diff --git a/crates/holonic-engine/build.rs b/crates/holonic-engine/build.rs
+index 353ac722..1a04204b 100644
+--- a/crates/holonic-engine/build.rs
++++ b/crates/holonic-engine/build.rs
+@@ -73,6 +73,7 @@ fn main() {
+     println!("cargo:rerun-if-changed=kernels/constitutive_condition_preimage.cuh");
+     println!("cargo:rerun-if-changed=kernels/phase_current_convolution.cuh");
+     println!("cargo:rerun-if-changed=kernels/phase_current_difference.cuh");
++    println!("cargo:rerun-if-changed=kernels/phase_current_response_adjoint.cuh");
+     println!("cargo:rerun-if-changed=kernels/constitutive_condition_image.cuh");
+     println!("cargo:rerun-if-changed=kernels/constitutive_condition_contact.cuh");
+     println!("cargo:rerun-if-changed=kernels/constitutive_field.cuh");
+diff --git a/crates/holonic-engine/kernels/exact_resident_section.cu b/crates/holonic-engine/kernels/exact_resident_section.cu
+index 6b543cae..0a7e947a 100644
+--- a/crates/holonic-engine/kernels/exact_resident_section.cu
++++ b/crates/holonic-engine/kernels/exact_resident_section.cu
+@@ -1293,6 +1293,7 @@ extern "C" __global__ void section_constitutive_bilinear_source(
+ #include "constitutive_condition_preimage.cuh"
+ #include "phase_current_convolution.cuh"
+ #include "phase_current_difference.cuh"
++#include "phase_current_response_adjoint.cuh"
+ #include "constitutive_condition_image.cuh"
+ #include "constitutive_condition_contact.cuh"
+ 
+diff --git a/crates/holonic-engine/kernels/phase_current_response_adjoint.cuh b/crates/holonic-engine/kernels/phase_current_response_adjoint.cuh
+new file mode 100644
+index 00000000..57ff446c
+--- /dev/null
++++ b/crates/holonic-engine/kernels/phase_current_response_adjoint.cuh
+@@ -0,0 +1,121 @@
++// Response-leg adjoint of the retained causal phase convolution. For each response coefficient k,
++// accumulate conjugate(source[j]) * residual[k+j-predicted_from] only where the explicitly
++// observed residual support contains k+j. This is a receiver-restricted return, not a learner.
++
++extern "C" __global__ void section_phase_response_adjoint_validate(
++    const int64_t *source_lo, const int64_t *source_hi,
++    uint32_t source_at, uint32_t source_denominator_at, uint32_t source_disposition_at,
++    const int64_t *residual_lo, const int64_t *residual_hi,
++    uint32_t residual_at, uint32_t residual_denominator_at, uint32_t residual_disposition_at,
++    uint32_t source_complex_coordinates, uint32_t residual_complex_coordinates,
++    uint32_t source_raw_extent, uint32_t response_raw_extent,
++    uint32_t predicted_from, uint32_t residual_raw_extent,
++    wide *workspace, uint32_t *slot, const uint32_t *census,
++    const uint32_t *lineage, uint32_t lineage_count
++) {
++    if (blockIdx.x != 0 || threadIdx.x != 0) return;
++    if (*slot != 0 || upstream_refused(census, lineage, lineage_count, slot)) return;
++
++    uint64_t source_complex = source_complex_coordinates;
++    uint64_t residual_complex = residual_complex_coordinates;
++    uint64_t source_raw = source_raw_extent;
++    uint64_t response_raw = response_raw_extent;
++    uint64_t predicted = predicted_from;
++    uint64_t residual_raw = residual_raw_extent;
++    if (!source_complex || !residual_complex || !source_raw || !response_raw || !residual_raw
++        || source_raw > source_complex || residual_raw > residual_complex
++        || source_complex > 0x7fffffffULL || residual_complex > 0x7fffffffULL
++        || predicted + residual_raw > source_raw + response_raw - 1ULL
++        || source_raw + response_raw - 1ULL > 0x7fffffffULL
++        || 2ULL * response_raw > (0xffffffffULL - 1ULL)
++        || source_at + 2ULL * source_complex > 0xffffffffULL
++        || residual_at + 2ULL * residual_complex > 0xffffffffULL) {
++        atomicOr(slot, REFUSED_MALFORMED);
++        return;
++    }
++    uint32_t source_count = (uint32_t)source_complex;
++    uint32_t residual_count = (uint32_t)residual_complex;
++    uint32_t source_raw_count = (uint32_t)source_raw;
++    uint32_t residual_raw_count = (uint32_t)residual_raw;
++    uint32_t response_count = (uint32_t)response_raw;
++    uint32_t width = 2U * response_count;
++    wide source_den = fibre_current_denominator(
++        source_lo, source_hi, source_denominator_at, source_disposition_at, slot);
++    wide residual_den = fibre_current_denominator(
++        residual_lo, residual_hi, residual_denominator_at, residual_disposition_at, slot);
++    if (*slot) return;
++    for (uint32_t coordinate = 0; coordinate < source_count; ++coordinate) {
++        uint32_t at = source_at + 2U * coordinate;
++        if (source_lo[at] != source_hi[at] || source_lo[at + 1U] != source_hi[at + 1U]
++            || (coordinate >= source_raw_count
++                && (source_lo[at] != 0 || source_lo[at + 1U] != 0))) {
++            atomicOr(slot, REFUSED_MALFORMED);
++            return;
++        }
++    }
++    for (uint32_t coordinate = 0; coordinate < residual_count; ++coordinate) {
++        uint32_t at = residual_at + 2U * coordinate;
++        if (residual_lo[at] != residual_hi[at]
++            || residual_lo[at + 1U] != residual_hi[at + 1U]
++            || (coordinate >= residual_raw_count
++                && (residual_lo[at] != 0 || residual_lo[at + 1U] != 0))) {
++            atomicOr(slot, REFUSED_MALFORMED);
++            return;
++        }
++    }
++    wide common = product_checked(source_den, residual_den, slot);
++    if (*slot || common <= 0) return;
++    workspace[width] = common;
++}
++
++extern "C" __global__ void section_phase_response_adjoint_products(
++    const int64_t *source_lo, const int64_t *source_hi,
++    uint32_t source_at, uint32_t source_denominator_at, uint32_t source_disposition_at,
++    const int64_t *residual_lo, const int64_t *residual_hi,
++    uint32_t residual_at, uint32_t residual_denominator_at, uint32_t residual_disposition_at,
++    uint32_t source_complex_coordinates, uint32_t residual_complex_coordinates,
++    uint32_t source_raw_extent, uint32_t response_raw_extent,
++    uint32_t predicted_from, uint32_t residual_raw_extent,
++    wide *workspace, uint32_t *slot, const uint32_t *census,
++    const uint32_t *lineage, uint32_t lineage_count
++) {
++    (void)source_hi;
++    (void)source_denominator_at;
++    (void)source_disposition_at;
++    (void)residual_hi;
++    (void)residual_denominator_at;
++    (void)residual_disposition_at;
++    (void)source_complex_coordinates;
++    (void)residual_complex_coordinates;
++    uint64_t target64 = (uint64_t)blockIdx.x * (uint64_t)blockDim.x + (uint64_t)threadIdx.x;
++    if (target64 >= response_raw_extent || *slot != 0) return;
++    if (upstream_refused(census, lineage, lineage_count, slot)) return;
++    uint32_t target = (uint32_t)target64;
++    wide real = 0;
++    wide imaginary = 0;
++    uint64_t observed_start = predicted_from;
++    uint64_t observed_end = observed_start + residual_raw_extent;
++    uint64_t source_begin = observed_start > target ? observed_start - target : 0;
++    uint64_t source_end = observed_end > target ? observed_end - target : 0;
++    if (source_end > source_raw_extent) source_end = source_raw_extent;
++    for (uint64_t source = source_begin; source < source_end; ++source) {
++        uint64_t summed = (uint64_t)target + source;
++        uint32_t residual = (uint32_t)(summed - observed_start);
++        uint32_t source_index = source_at + 2U * source;
++        uint32_t residual_index = residual_at + 2U * residual;
++        wide ar = source_lo[source_index];
++        wide ai = source_lo[source_index + 1U];
++        wide br = residual_lo[residual_index];
++        wide bi = residual_lo[residual_index + 1U];
++        real = add_checked(real,
++            add_checked(product_checked(ar, br, slot), product_checked(ai, bi, slot), slot),
++            slot);
++        imaginary = add_checked(imaginary,
++            sub_checked(product_checked(ar, bi, slot), product_checked(ai, br, slot), slot),
++            slot);
++        if (*slot) return;
++    }
++    if (*slot) return;
++    workspace[2U * target] = real;
++    workspace[2U * target + 1U] = imaginary;
++}
+diff --git a/crates/holonic-engine/src/phase_current/resident.rs b/crates/holonic-engine/src/phase_current/resident.rs
+index 040de3e2..f872fa04 100644
+--- a/crates/holonic-engine/src/phase_current/resident.rs
++++ b/crates/holonic-engine/src/phase_current/resident.rs
+@@ -20,11 +20,16 @@ pub enum ResidentPhaseCurrentError {
+     NonOverlappingSupport,
+     #[error("temporal observation origins do not align on their shared sample clock")]
+     UnalignedSupport,
++    #[error("temporal return does not retain this operation's producing prediction")]
++    PredictionMismatch,
+ }
+ 
+ mod difference;
+ pub use difference::{compare_resident, PhaseComparisonSupport, ResidentPhaseDifference};
+ 
++mod response_adjoint;
++pub use response_adjoint::{return_response_resident, ResidentPhaseResponseAdjoint};
++
+ impl From<ResidentRefusal> for ResidentPhaseCurrentError {
+     fn from(value: ResidentRefusal) -> Self {
+         Self::Native(value.into())
+diff --git a/crates/holonic-engine/src/phase_current/resident/response_adjoint.rs b/crates/holonic-engine/src/phase_current/resident/response_adjoint.rs
+new file mode 100644
+index 00000000..c206de47
+--- /dev/null
++++ b/crates/holonic-engine/src/phase_current/resident/response_adjoint.rs
+@@ -0,0 +1,125 @@
++//! Return through the source carrier that produced a retained temporal prediction. The
++//! receiver is restricted to observed support before taking its response adjoint.
++use super::*;
++
++/// The response leg of the actual forward operation's adjoint, with its complete prediction
++/// and observed-minus-predicted return still borrowed. This does not develop a condition.
++pub struct ResidentPhaseResponseAdjoint<'operation, 'source, 'observed, 'chart> {
++    forward: &'operation ResidentPhaseConvolution<'source, 'chart>,
++    difference: &'operation ResidentPhaseDifference<'observed, 'chart>,
++    output: ResidentSection<'chart>,
++    lineage: PhaseCurrentLineageId,
++}
++
++/// For the retained forward y=x*h and its comparison on S, return X_x* R_S* e in
++/// h's original chart. R_S* is the dual of restriction: missing observations supply no
++/// returned covector, rather than being asserted to have zero measured value.
++/// All coefficients are computed on device, including zero response directions.
++pub fn return_response_resident<'operation, 'source, 'observed, 'chart>(
++    surface: &'chart ResidentSurface<'chart>,
++    forward: &'operation ResidentPhaseConvolution<'source, 'chart>,
++    difference: &'operation ResidentPhaseDifference<'observed, 'chart>,
++    lineage: PhaseCurrentLineageId,
++) -> Result<
++    ResidentPhaseResponseAdjoint<'operation, 'source, 'observed, 'chart>,
++    ResidentPhaseCurrentError,
++> {
++    let expected = forward.view()?;
++    let actual = difference.predicted();
++    let a = actual.current();
++    let b = expected.current();
++    // Equal values, labels, clocks or digests cannot stand in for the producing carrier.
++    if !std::ptr::eq(a.section, b.section)
++        || a.offset != b.offset
++        || a.width != b.width
++        || a.denominator != b.denominator
++        || a.disposition != b.disposition
++        || actual.receiver != expected.receiver
++        || actual.lineage != expected.lineage
++        || actual.origin != expected.origin
++        || actual.sample_step != expected.sample_step
++        || actual.phase_extent != expected.phase_extent
++        || actual.raw_extent != expected.raw_extent
++    {
++        return Err(ResidentPhaseCurrentError::PredictionMismatch);
++    }
++    let source = forward.source();
++    let residual = difference.current()?;
++    surface.validate_constitutive_current_view(source.current())?;
++    surface.validate_constitutive_current_view(residual)?;
++    let response_extent = forward.response().raw_extent();
++    let width = response_extent
++        .checked_mul(2)
++        .filter(|n| *n < u32::MAX as usize)
++        .ok_or(PhaseCurrentError::CarrierOverflow)?;
++    let workspace_words = width
++        .checked_add(2)
++        .and_then(ResidentSurface::constitutive_wide_workspace_words)
++        .ok_or(PhaseCurrentError::CarrierOverflow)?;
++    let workspace = surface.fresh_section(1, workspace_words, ResidentGrain(0))?;
++    let output = surface.fresh_section(1, width + 1, ResidentGrain(0))?;
++    let mut passage = surface.begin_passage(&[vec![]])?;
++    {
++        let lane = passage.open(0, &[])?;
++        surface.record_phase_response_adjoint(
++            &lane,
++            source.current(),
++            residual,
++            source.raw_extent(),
++            response_extent,
++            difference.support().predicted.start,
++            difference.support().predicted.len(),
++            &workspace,
++            &output,
++        )?;
++    }
++    passage.close(0, &output, 64)?;
++    let receipt = passage.finish()?.launch()?;
++    if !receipt.obstruction.is_empty() {
++        return Err(ConstitutiveFibreError::Arithmetic(format!(
++            "phase response adjoint: {:?}",
++            receipt.obstruction
++        ))
++        .into());
++    }
++    Ok(ResidentPhaseResponseAdjoint {
++        forward,
++        difference,
++        output,
++        lineage,
++    })
++}
++
++impl<'operation, 'source, 'observed, 'chart>
++    ResidentPhaseResponseAdjoint<'operation, 'source, 'observed, 'chart>
++{
++    pub fn forward(&self) -> &ResidentPhaseConvolution<'source, 'chart> {
++        self.forward
++    }
++    pub fn difference(&self) -> &ResidentPhaseDifference<'observed, 'chart> {
++        self.difference
++    }
++    pub fn section(&self) -> &ResidentSection<'chart> {
++        &self.output
++    }
++    pub fn current(
++        &self,
++    ) -> Result<ResidentConstitutiveCurrent<'_, 'chart>, ConstitutiveFibreError> {
++        ResidentConstitutiveCurrent::rational(&self.output)
++    }
++    pub fn view(&self) -> Result<ResidentPhaseCurrentView<'_, 'chart>, ResidentPhaseCurrentError> {
++        let response = self.forward.response();
++        ResidentPhaseCurrentView::new(
++            self.current()?,
++            response.receiver(),
++            self.lineage,
++            response.origin().clone(),
++            response.sample_step().clone(),
++            response.phase_extent(),
++            response.raw_extent(),
++        )
++    }
++}
++
++#[cfg(test)]
++mod tests;
+diff --git a/crates/holonic-engine/src/phase_current/resident/response_adjoint/tests.rs b/crates/holonic-engine/src/phase_current/resident/response_adjoint/tests.rs
+new file mode 100644
+index 00000000..284f9900
+--- /dev/null
++++ b/crates/holonic-engine/src/phase_current/resident/response_adjoint/tests.rs
+@@ -0,0 +1,225 @@
++use super::*;
++use crate::{embedding_fiber::ResidentReadout, resident_section::ResidentSectionRest};
++
++fn q(n: i64, d: i64) -> Rat {
++    Rat::new(n.into(), d.into())
++}
++fn mount<'c>(s: &'c ResidentSurface<'c>, words: &[i64]) -> ResidentSection<'c> {
++    s.mount_section_rest(
++        &ResidentSectionRest::found(
++            1,
++            words.len(),
++            ResidentGrain(0),
++            64,
++            words.iter().map(|v| (*v, *v)).collect(),
++        )
++        .unwrap(),
++    )
++    .unwrap()
++}
++fn view<'a, 'c>(
++    section: &'a ResidentSection<'c>,
++    raw: usize,
++    origin: i64,
++    receiver: u64,
++    lineage: u64,
++) -> ResidentPhaseCurrentView<'a, 'c> {
++    ResidentPhaseCurrentView::new(
++        ResidentConstitutiveCurrent::rational(section).unwrap(),
++        PhaseCurrentReceiverId(receiver),
++        PhaseCurrentLineageId(lineage),
++        q(origin, 48000),
++        q(1, 48000),
++        4,
++        raw,
++    )
++    .unwrap()
++}
++fn values(s: &ResidentSurface<'_>, section: &ResidentSection<'_>) -> Vec<Rat> {
++    let pairs = s.read_out(section).unwrap();
++    assert!(pairs.iter().all(|(a, b)| a == b));
++    let denominator = pairs.last().unwrap().0;
++    pairs[..pairs.len() - 1]
++        .iter()
++        .map(|v| q(v.0, denominator))
++        .collect()
++}
++
++#[test]
++#[ignore = "requires native GPU; complex response adjoint uses only actual observed support"]
++fn partial_complex_return_preserves_clock_morphology_and_duality() {
++    let r = ResidentReadout::new().unwrap();
++    let s = ResidentSurface::on(&r).unwrap();
++    let x = mount(&s, &[2, 1, -1, 3, 4, -2, 0, 0, 3]);
++    let h = mount(&s, &[1, -2, 3, 1, 5]);
++    let y = mount(&s, &[7, 2, 3, -4, 7]);
++    let prediction = convolve_resident(
++        &s,
++        view(&x, 3, 5, 1, 11),
++        view(&h, 2, 2, 2, 12),
++        PhaseCurrentReceiverId(3),
++        PhaseCurrentLineageId(13),
++    )
++    .unwrap();
++    let difference = compare_resident(
++        &s,
++        prediction.view().unwrap(),
++        view(&y, 2, 8, 3, 14),
++        PhaseCurrentLineageId(15),
++    )
++    .unwrap();
++    let before = s.census();
++    let returned =
++        return_response_resident(&s, &prediction, &difference, PhaseCurrentLineageId(16)).unwrap();
++    let after = s.census();
++    assert_eq!(after.deed_launches - before.deed_launches, 1);
++    assert_eq!(after.section_read_outs, before.section_read_outs);
++    assert_eq!(after.ingress_octets, before.ingress_octets);
++    assert_eq!(
++        values(&s, returned.section()),
++        vec![q(19, 21), q(-5, 21), q(-13, 21), q(-22, 21)]
++    );
++    assert_eq!(returned.view().unwrap().origin(), &q(2, 48000));
++    assert_eq!(returned.view().unwrap().sample_step(), &q(1, 48000));
++    assert_eq!(
++        returned.view().unwrap().receiver(),
++        PhaseCurrentReceiverId(2)
++    );
++    assert_eq!(returned.view().unwrap().raw_extent(), 2);
++    assert_eq!(returned.difference().support().predicted, 1..3);
++    assert_eq!(
++        returned.difference().support().unobserved_prediction,
++        vec![0..1, 3..4]
++    );
++    assert!(std::ptr::eq(returned.forward(), &prediction));
++    assert!(std::ptr::eq(returned.difference(), &difference));
++
++    // Independent receiver identity <R_S X delta_h,e> = <delta_h,X* R_S* e>.
++    let delta = mount(&s, &[1, 3, -2, 4, 11]);
++    let action = convolve_resident(
++        &s,
++        view(&x, 3, 5, 1, 11),
++        view(&delta, 2, 2, 2, 17),
++        PhaseCurrentReceiverId(3),
++        PhaseCurrentLineageId(18),
++    )
++    .unwrap();
++    let action = values(&s, action.section());
++    let e = values(&s, difference.section());
++    let dh = values(&s, &delta);
++    let adjoint = values(&s, returned.section());
++    let left: Rat = action[2..6].iter().zip(&e).map(|(a, b)| a * b).sum();
++    let right: Rat = dh.iter().zip(&adjoint).map(|(a, b)| a * b).sum();
++    assert_eq!(left, right);
++}
++
++#[test]
++#[ignore = "requires native GPU; equal values cannot replace the producing forward carrier"]
++fn equal_prediction_from_another_operation_is_refused_without_a_launch() {
++    let r = ResidentReadout::new().unwrap();
++    let s = ResidentSurface::on(&r).unwrap();
++    let x = mount(&s, &[1, 2, 1]);
++    let h = mount(&s, &[3, 4, 1]);
++    let y = mount(&s, &[5, 6, 1]);
++    let make = || {
++        convolve_resident(
++            &s,
++            view(&x, 1, 0, 1, 11),
++            view(&h, 1, 0, 2, 12),
++            PhaseCurrentReceiverId(3),
++            PhaseCurrentLineageId(13),
++        )
++        .unwrap()
++    };
++    let original = make();
++    let equal = make();
++    assert_eq!(values(&s, original.section()), values(&s, equal.section()));
++    let difference = compare_resident(
++        &s,
++        original.view().unwrap(),
++        view(&y, 1, 0, 3, 14),
++        PhaseCurrentLineageId(15),
++    )
++    .unwrap();
++    let before = s.census();
++    assert!(matches!(
++        return_response_resident(&s, &equal, &difference, PhaseCurrentLineageId(16)),
++        Err(ResidentPhaseCurrentError::PredictionMismatch)
++    ));
++    assert_eq!(s.census().deed_launches, before.deed_launches);
++    assert_eq!(s.census().section_read_outs, before.section_read_outs);
++    let first =
++        return_response_resident(&s, &original, &difference, PhaseCurrentLineageId(16)).unwrap();
++    let old = values(&s, first.section());
++    let _later = make();
++    assert_eq!(values(&s, first.section()), old);
++}
++
++#[test]
++#[ignore = "requires native GPU; a receiver cut preserves inactive response directions and complete extent"]
++fn a_short_receiver_return_keeps_all_response_directions() {
++    let r = ResidentReadout::new().unwrap();
++    let s = ResidentSurface::on(&r).unwrap();
++    let extent = s.declaration().max_sectiond_bytes as usize / 20 + 1;
++    let x = mount(&s, &[2, -1, 1]);
++    let mut zero = vec![0; 2 * extent + 1];
++    *zero.last_mut().unwrap() = 1;
++    let h = mount(&s, &zero);
++    let y = mount(&s, &[3, 4, 1]);
++    let p = convolve_resident(
++        &s,
++        view(&x, 1, 0, 1, 11),
++        view(&h, extent, 0, 2, 12),
++        PhaseCurrentReceiverId(3),
++        PhaseCurrentLineageId(13),
++    )
++    .unwrap();
++    let d = compare_resident(
++        &s,
++        p.view().unwrap(),
++        view(&y, 1, 2, 3, 14),
++        PhaseCurrentLineageId(15),
++    )
++    .unwrap();
++    let before = s.census();
++    let a = return_response_resident(&s, &p, &d, PhaseCurrentLineageId(16)).unwrap();
++    assert_eq!(s.census().section_read_outs, before.section_read_outs);
++    let actual = values(&s, a.section());
++    let mut expected = vec![q(0, 1); 2 * extent];
++    expected[4] = q(2, 1);
++    expected[5] = q(11, 1);
++    assert_eq!(actual, expected);
++    assert_eq!(a.view().unwrap().raw_extent(), extent);
++}
++
++#[test]
++#[ignore = "requires native GPU; wide adjoint overflow refuses without changing the forward receipt"]
++fn overflowing_return_preserves_prediction_and_observation() {
++    let r = ResidentReadout::new().unwrap();
++    let s = ResidentSurface::on(&r).unwrap();
++    let x = mount(&s, &[i64::MAX, 0, 1]);
++    let h = mount(&s, &[0, 0, 1]);
++    let y = mount(&s, &[i64::MAX, i64::MAX, 1]);
++    let p = convolve_resident(
++        &s,
++        view(&x, 1, 0, 1, 11),
++        view(&h, 1, 0, 2, 12),
++        PhaseCurrentReceiverId(3),
++        PhaseCurrentLineageId(13),
++    )
++    .unwrap();
++    let d = compare_resident(
++        &s,
++        p.view().unwrap(),
++        view(&y, 1, 0, 3, 14),
++        PhaseCurrentLineageId(15),
++    )
++    .unwrap();
++    let before_p = values(&s, p.section());
++    let before_d = values(&s, d.section());
++    let before = s.census();
++    assert!(return_response_resident(&s, &p, &d, PhaseCurrentLineageId(16)).is_err());
++    assert_eq!(s.census().section_read_outs, before.section_read_outs);
++    assert_eq!(values(&s, p.section()), before_p);
++    assert_eq!(values(&s, d.section()), before_d);
++}
+diff --git a/crates/holonic-engine/src/resident_section.rs b/crates/holonic-engine/src/resident_section.rs
+index f254cce3..9b1bb934 100644
+--- a/crates/holonic-engine/src/resident_section.rs
++++ b/crates/holonic-engine/src/resident_section.rs
+@@ -97,6 +97,8 @@ mod surface_mount;
+ mod surface_passage;
+ #[path = "resident_section/surface_phase_difference.rs"]
+ mod surface_phase_difference;
++#[path = "resident_section/surface_phase_response_adjoint.rs"]
++mod surface_phase_response_adjoint;
+ #[path = "resident_section/surface_shapes.rs"]
+ mod surface_shapes;
+ #[path = "resident_section/surface_tiled.rs"]
+@@ -122,6 +124,8 @@ const METAL_SOURCE: &str = concat!(
+     include_str!("../../../accelerators/metal/phase_difference.metal"),
+     "\n",
+     include_str!("../../../accelerators/metal/field_internal_current.metal"),
++    "\n",
++    include_str!("../../../accelerators/metal/phase_response_adjoint.metal"),
+ );
+ 
+ /// The exact accumulator the kernels carry, read off `__int128`; one octave is the hand.
+@@ -155,7 +159,7 @@ const CENSUS_MAX_WARPS: u32 = 32;
+ 
+ /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
+ /// refuses there and never at a launch.
+-pub const KERNELS: [&str; 57] = [
++pub const KERNELS: [&str; 59] = [
+     "section_constitutive_field",
+     "section_constitutive_field_rechart",
+     "section_constitutive_rechart",
+@@ -227,6 +231,8 @@ pub const KERNELS: [&str; 57] = [
+     "section_field_internal_current",
+     "section_internal_shared_drive",
+     "section_internal_mode_unfold",
++    "section_phase_response_adjoint_validate",
++    "section_phase_response_adjoint_products",
+ ];
+ 
+ /// `CUdevice_attribute` selectors from `cuda.h`, fixed by the foreign interface.
+diff --git a/crates/holonic-engine/src/resident_section/surface_phase_response_adjoint.rs b/crates/holonic-engine/src/resident_section/surface_phase_response_adjoint.rs
+new file mode 100644
+index 00000000..9a9798b2
+--- /dev/null
++++ b/crates/holonic-engine/src/resident_section/surface_phase_response_adjoint.rs
+@@ -0,0 +1,178 @@
++use super::*;
++
++impl<'chart> ResidentSurface<'chart> {
++    pub(crate) fn record_phase_response_adjoint(
++        &self,
++        lane: &Lane<'_, 'chart>,
++        source: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<'_, 'chart>,
++        residual: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<
++            '_,
++            'chart,
++        >,
++        source_raw: usize,
++        response_raw: usize,
++        predicted_from: usize,
++        residual_raw: usize,
++        workspace: &ResidentSection<'chart>,
++        output: &ResidentSection<'chart>,
++    ) -> Result<(), ResidentRefusal> {
++        self.validate_constitutive_current_view(source)?;
++        self.validate_constitutive_current_view(residual)?;
++        let fail = || ResidentRefusal::Declaration {
++            operation: "phase-response-adjoint",
++            what: "incompatible response support or scratch aperture".into(),
++        };
++        let width = response_raw
++            .checked_mul(2)
++            .filter(|n| *n < u32::MAX as usize)
++            .ok_or_else(fail)?;
++        let source_complex = source.width / 2;
++        let residual_complex = residual.width / 2;
++        let convolution_extent = source_raw
++            .checked_add(response_raw)
++            .and_then(|n| n.checked_sub(1))
++            .ok_or_else(fail)?;
++        if source_raw == 0
++            || response_raw == 0
++            || residual_raw == 0
++            || source.width % 2 != 0
++            || residual.width % 2 != 0
++            || source_raw > source_complex
++            || residual_raw > residual_complex
++            || predicted_from
++                .checked_add(residual_raw)
++                .is_none_or(|n| n > convolution_extent)
++            || output.rows != 1
++            || output.width != width + 1
++            || output.grain.0 != 0
++            || !std::ptr::eq(output.surface, self)
++            || workspace.rows != 1
++            || workspace.grain.0 != 0
++            || !std::ptr::eq(workspace.surface, self)
++        {
++            return Err(fail());
++        }
++        let workspace_words = width
++            .checked_add(2)
++            .and_then(Self::constitutive_wide_workspace_words)
++            .ok_or_else(fail)?;
++        if workspace.width != workspace_words
++            || source.offset > u32::MAX as usize
++            || residual.offset > u32::MAX as usize
++            || source.denominator.is_some_and(|n| n > u32::MAX as usize)
++            || residual.denominator.is_some_and(|n| n > u32::MAX as usize)
++            || source.disposition.is_some_and(|n| n > u32::MAX as usize)
++            || residual.disposition.is_some_and(|n| n > u32::MAX as usize)
++            || source_complex > u32::MAX as usize
++            || residual_complex > u32::MAX as usize
++            || source_raw > u32::MAX as usize
++            || response_raw > u32::MAX as usize
++            || predicted_from > u32::MAX as usize
++            || residual_raw > u32::MAX as usize
++        {
++            return Err(fail());
++        }
++
++        let mut validation = Params::new();
++        validation
++            .ptr(source.section.lo.device_ptr())
++            .ptr(source.section.hi.device_ptr())
++            .u32(source.offset as u32)
++            .u32(source.denominator.map_or(u32::MAX, |n| n as u32))
++            .u32(source.disposition.map_or(u32::MAX, |n| n as u32))
++            .ptr(residual.section.lo.device_ptr())
++            .ptr(residual.section.hi.device_ptr())
++            .u32(residual.offset as u32)
++            .u32(residual.denominator.map_or(u32::MAX, |n| n as u32))
++            .u32(residual.disposition.map_or(u32::MAX, |n| n as u32))
++            .u32(source_complex as u32)
++            .u32(residual_complex as u32)
++            .u32(source_raw as u32)
++            .u32(response_raw as u32)
++            .u32(predicted_from as u32)
++            .u32(residual_raw as u32)
++            .ptr(workspace.lo.device_ptr())
++            .ptr(lane.slot)
++            .ptr(lane.census)
++            .ptr(lane.lineage)
++            .u32(lane.lineage_count);
++        let block = self.declaration.warp_size.max(1);
++        self.record_blocks(
++            lane,
++            "section_phase_response_adjoint_validate",
++            1,
++            block,
++            0,
++            &mut validation,
++            "phase-response-adjoint",
++        )?;
++
++        let mut products = Params::new();
++        products
++            .ptr(source.section.lo.device_ptr())
++            .ptr(source.section.hi.device_ptr())
++            .u32(source.offset as u32)
++            .u32(source.denominator.map_or(u32::MAX, |n| n as u32))
++            .u32(source.disposition.map_or(u32::MAX, |n| n as u32))
++            .ptr(residual.section.lo.device_ptr())
++            .ptr(residual.section.hi.device_ptr())
++            .u32(residual.offset as u32)
++            .u32(residual.denominator.map_or(u32::MAX, |n| n as u32))
++            .u32(residual.disposition.map_or(u32::MAX, |n| n as u32))
++            .u32(source_complex as u32)
++            .u32(residual_complex as u32)
++            .u32(source_raw as u32)
++            .u32(response_raw as u32)
++            .u32(predicted_from as u32)
++            .u32(residual_raw as u32)
++            .ptr(workspace.lo.device_ptr())
++            .ptr(lane.slot)
++            .ptr(lane.census)
++            .ptr(lane.lineage)
++            .u32(lane.lineage_count);
++        self.record_flat(
++            lane,
++            "section_phase_response_adjoint_products",
++            response_raw,
++            &mut products,
++            "phase-response-adjoint",
++        )?;
++
++        let mut normalize = Params::new();
++        normalize
++            .ptr(workspace.lo.device_ptr())
++            .u32(width as u32)
++            .ptr(lane.slot)
++            .ptr(lane.census)
++            .ptr(lane.lineage)
++            .u32(lane.lineage_count);
++        self.record_blocks(
++            lane,
++            "section_phase_convolution_normalize",
++            1,
++            block,
++            0,
++            &mut normalize,
++            "phase-response-adjoint",
++        )?;
++
++        let mut pack = Params::new();
++        pack.ptr(workspace.lo.device_ptr())
++            .u32(width as u32)
++            .ptr(output.lo.device_ptr())
++            .ptr(output.hi.device_ptr())
++            .ptr(lane.slot)
++            .ptr(lane.census)
++            .ptr(lane.lineage)
++            .u32(lane.lineage_count);
++        self.record_blocks(
++            lane,
++            "section_phase_convolution_pack",
++            (width + 1).div_ceil(block as usize),
++            block,
++            0,
++            &mut pack,
++            "phase-response-adjoint",
++        )
++    }
++}
+diff --git a/crates/holonic-mount/src/metal.rs b/crates/holonic-mount/src/metal.rs
+index 25ba6747..4ce123cd 100644
+--- a/crates/holonic-mount/src/metal.rs
++++ b/crates/holonic-mount/src/metal.rs
+@@ -867,6 +867,9 @@ impl Module {
+                 (&[2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 21], 22)
+             }
+             "section_phase_convolution_normalize" => (&[1, 5], 6),
++            "section_phase_response_adjoint_validate" | "section_phase_response_adjoint_products" => {
++                (&[2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20], 21)
++            }
+             "section_phase_convolution_pack" => (&[1, 7], 8),
+             "section_field_current_input" => (&[2, 3, 4, 5, 11], 12),
+             "section_field_source_frame" => (&[6, 12], 13),
+@@ -924,6 +927,7 @@ impl Module {
+                     "section_phase_convolution_products"
+                         | "section_phase_convolution_pack"
+                         | "section_phase_difference_products"
++                        | "section_phase_response_adjoint_products"
+                 ) || (cfg!(test) && name == "test_grid"),
+                 nullable: if name == "section_constitutive_differential" {
+                     &[6, 7]
+diff --git a/crates/holonics-hna/examples/recorded_acoustic_return.rs b/crates/holonics-hna/examples/recorded_acoustic_return.rs
+index b38401e6..15e312fd 100644
+--- a/crates/holonics-hna/examples/recorded_acoustic_return.rs
++++ b/crates/holonics-hna/examples/recorded_acoustic_return.rs
+@@ -4,7 +4,9 @@ use holonic_engine::{
+     embedding_fiber::ResidentReadout,
+     native_ecology::constitutive_fibre::ResidentConstitutiveCurrent,
+     phase_current::{
+-        resident::{compare_resident, convolve_resident, ResidentPhaseCurrentView},
++        resident::{
++            compare_resident, convolve_resident, return_response_resident, ResidentPhaseCurrentView,
++        },
+         PhaseCurrentLineageId, PhaseCurrentReceiverId,
+     },
+     resident_section::{ResidentGrain, ResidentSection, ResidentSectionRest, ResidentSurface},
+@@ -166,12 +168,14 @@ fn main() -> Result<()> {
+     };
+     let source_chart = chart(&excitation, 1, 1)?;
+     let observed_chart = chart(&observation, 9, 2)?;
+-    let mut report = json!({"schema":"holonics.recorded-acoustic-return.v1","status":"running",
++    let mut report = json!({"schema":"holonics.recorded-acoustic-return.v2","status":"running",
+         "excitation":source_report(&excitation),"observation":source_report(&observation),
+         "clock_contract":"caller supplies simultaneously recorded raw channels with common origin; no delay alignment or resampling",
+         "initial_response":{"real":1,"imaginary":0,"denominator":1,"origin":"0","extent":1},
+         "initial_response_scope":"explicit unit digital starting current, not a measured room transfer or cultivated model",
+-        "phase_extent":PHASE_EXTENT,"divisor":DIVISOR,"stages":{},"native_development":"none; this receiver retains the actual defect for subsequent constitutive contact"});
++        "phase_extent":PHASE_EXTENT,"divisor":DIVISOR,"stages":{},"generator_developed":false,
++        "native_development":"none; this receiver retains the actual defect for subsequent constitutive contact",
++        "response_return_scope":"resident response adjoint returned in the original unit-response chart; no PCM rendering and no developed room model"});
+     fs::create_dir_all(directory)?;
+     let readout = ResidentReadout::new()?;
+     let s = ResidentSurface::on(&readout)?;
+@@ -217,6 +221,14 @@ fn main() -> Result<()> {
+             PhaseCurrentLineageId(5),
+         )?)
+     })?;
++    let response_return = stage(&s, &mut report, "resident_response_adjoint", || {
++        Ok(return_response_resident(
++            &s,
++            &prediction,
++            &difference,
++            PhaseCurrentLineageId(6),
++        )?)
++    })?;
+     report["support"] = json!(difference.support());
+     report["prediction"] = stage(&s, &mut report, "cold_prediction", || {
+         publish(
+@@ -240,6 +252,17 @@ fn main() -> Result<()> {
+             true,
+         )
+     })?;
++    report["response_return"] = stage(&s, &mut report, "cold_response_return", || {
++        publish(
++            &s,
++            response_return.section(),
++            response_return.view()?,
++            directory,
++            "response_return",
++            rate,
++            false,
++        )
++    })?;
+     report["seconds"] = json!(started.elapsed().as_secs_f64());
+     report["status"] = json!("returned");
+     write_new(report_path, &serde_json::to_vec_pretty(&report)?)?;
+diff --git a/docs/ACOUSTIC_EXPERIMENTS.md b/docs/ACOUSTIC_EXPERIMENTS.md
+index 8e14ef8c..923683f3 100644
+--- a/docs/ACOUSTIC_EXPERIMENTS.md
++++ b/docs/ACOUSTIC_EXPERIMENTS.md
+@@ -52,6 +52,13 @@ Its subtraction stays native until the cold terminal receiver. The source-qualif
+ compares WAVs against the original NPY selectors and checks every prediction/difference
+ coordinate, clock, PCM sample and reconstruction residual. It supplies no target to development.
+ 
++[definition] The v2 example also returns the measured difference through the retained forward
++operation's response adjoint before any cold readout. `response_return.section` retains the exact
++current in the original response chart; it is not rendered as PCM. The observer checks its
++complete source/residual pairing, receiver, clock, lineage and zero native readouts, while still
++accepting v1 receipts. The [adjoint record](../research/records/2026-09-07_THE_RECORDED_RETURN_USES_ITS_PRODUCING_TEMPORAL_ADJOINT.md)
++separates that return from the remaining condition-fibre contact and acoustic development.
++
+ [established-bounded; implemented-exact] `holonics_hna::native::acoustic_field::AcousticFieldChart`
+ now supplies complete timed coefficient fields to the shared `NativeConstitutiveField` used by
+ the desktop material work. The field performs one joint operation, retaining both complex outgoing
+diff --git a/docs/ARCHITECTURE_MAP.md b/docs/ARCHITECTURE_MAP.md
+index b47b7bb2..95204f1c 100644
+--- a/docs/ARCHITECTURE_MAP.md
++++ b/docs/ARCHITECTURE_MAP.md
+@@ -73,6 +73,14 @@ channels, while `fetch_soundcam.py` and `compare_recorded_acoustic_return.py` ow
+ acquisition and independent comparison. The [measured-return record](../research/records/2026-09-07_MEASURED_ACOUSTIC_RETURNS_KEEP_THEIR_ORIENTED_DIFFERENCE.md)
+ states the initial unit-response scope and remaining generator development.
+ 
++[established-bounded; implemented-exact] `phase_current::resident::{return_response_resident,
++ResidentPhaseResponseAdjoint}` returns the comparison through its actual producing convolution,
++in the original response chart. `resident_section/surface_phase_response_adjoint.rs`, CUDA
++`kernels/phase_current_response_adjoint.cuh` and Metal `phase_response_adjoint.metal` conduct
++the restricted complex adjoint with complete response support and resident normalization.
++The [response-return record](../research/records/2026-09-07_THE_RECORDED_RETURN_USES_ITS_PRODUCING_TEMPORAL_ADJOINT.md)
++retains source-qualified measurements and the still-missing temporal condition/contact attachment.
++
+ [established-bounded; measured] `native::recorded` exposes
+ `native/speech/{recorded.rs,recorded/sections.rs}` for source/target pointer resolution, exact
+ annotation-to-PCM bounds and `RecordedResponseSections::bind`. It uses
+diff --git a/docs/plans/HOLONICS_ON_APPLE_SILICON.md b/docs/plans/HOLONICS_ON_APPLE_SILICON.md
+index ffd09c64..aa34561b 100644
+--- a/docs/plans/HOLONICS_ON_APPLE_SILICON.md
++++ b/docs/plans/HOLONICS_ON_APPLE_SILICON.md
+@@ -99,8 +99,9 @@ by a plural fibre; identifying an individual performance or reversing the raw pa
+    unobserved. Next use the measured return in the declared acoustic action's condition/contact
+    law, retaining noise and unmodelled transport instead of supplying an invented exact target.
+    The initial unit-response comparison does not itself develop the generator.
+-   First return the measured difference through the temporal adjoint of the retained producing
+-   convolution, restricted to actual observed support. Then compose the joint compatible family
++   The [response-adjoint return](../../research/records/2026-09-07_THE_RECORDED_RETURN_USES_ITS_PRODUCING_TEMPORAL_ADJOINT.md)
++   now returns the measured difference through the retained producing convolution, restricted to
++   actual observed support and preserving the original response chart. Next compose the joint compatible family
+    `F_y = {(h,e) : R_S X_x h + e = y_S}`, where `e` is retained unmodelled return, not a discarded
+    error score. Under the existing explicitly declared unit-admittance metric, contact of the
+    actual prior `(h_0,0)` obeys `h' - h_0 = (R_S X_x)* e'` and `R_S X_x h' + e' = y_S`.
+diff --git a/research/experiments/apple_silicon/compare_recorded_acoustic_return.py b/research/experiments/apple_silicon/compare_recorded_acoustic_return.py
+index 11865401..2200e55a 100644
+--- a/research/experiments/apple_silicon/compare_recorded_acoustic_return.py
++++ b/research/experiments/apple_silicon/compare_recorded_acoustic_return.py
+@@ -47,10 +47,32 @@ def section(metadata, expected):
+             "denominator": den}
+ 
+ 
++def section_fraction(metadata, expected):
++    """Verify an exact resident section against arbitrary rational coordinates."""
++    path = Path(metadata["section_path"])
++    data = path.read_bytes()
++    assert digest(path) == metadata["section_sha256"]
++    assert len(data) == metadata["section_octets"]
++    assert data[:8] == RESIDENT_SECTION_REST_MAGIC
++    expected = list(expected)
++    rows, width, grain, bound, population = struct.unpack_from("<QQIIQ", data, 8)
++    assert (rows, width, grain, bound, population) == (1, len(expected) + 1, 0, 64, len(expected) + 1)
++    assert len(data) == 40 + 16 * population
++    pairs = np.frombuffer(data, dtype="<i8", offset=40).reshape(population, 2)
++    assert np.array_equal(pairs[:, 0], pairs[:, 1])
++    den = int(pairs[-1, 0])
++    assert den > 0
++    coordinates = [Q(int(value), den) for value in pairs[:-1, 0]]
++    assert coordinates == expected
++    return {"sha256": metadata["section_sha256"], "coordinates_verified": len(expected),
++            "denominator": den, "exact_coordinates": [str(value) for value in coordinates]}
++
++
+ def compare(report_path, acquisition_path):
+     report = json.loads(report_path.read_text())
+     acquisition = json.loads(acquisition_path.read_text())
+-    assert report["schema"] == "holonics.recorded-acoustic-return.v1" and report["status"] == "returned"
++    assert report["schema"] in ("holonics.recorded-acoustic-return.v1", "holonics.recorded-acoustic-return.v2")
++    assert report["status"] == "returned"
+     assert acquisition["schema"] == "soundcam-selective-acquisition.v1"
+     root = acquisition_path.parent
+     matches = [pair for pair in acquisition["pairs"]
+@@ -109,6 +131,24 @@ def compare(report_path, acquisition_path):
+         stage = report["stages"][name]
+         assert stage["section_readouts"] == stage["numerical_egress_octets"] == stage["ingress_octets"] == 0
+         assert stage["deeds"] == 1
++    response_checked = None
++    if report["schema"] == "holonics.recorded-acoustic-return.v2":
++        assert report["generator_developed"] is False
++        response_stage = report["stages"]["resident_response_adjoint"]
++        assert response_stage["section_readouts"] == response_stage["numerical_egress_octets"] == response_stage["ingress_octets"] == 0
++        assert response_stage["deeds"] == 1
++        response_numerator = sum(int(x) * int(d) for x, d in zip(sources["excitation"], real_difference))
++        response_bound = count * 32768 * 65535
++        assert abs(response_numerator) <= response_bound
++        response_expected = [Q(response_numerator, 32768 * 32768), Q(0)]
++        metadata = report["response_return"]
++        assert metadata["frames"] == 1 and metadata["origin"] == "0"
++        assert Q(metadata["sample_step"]) == Q(1, rate)
++        assert metadata["receiver"] == 8 and metadata["lineage"] == 6
++        response_checked = section_fraction(metadata, response_expected)
++        response_cold_stage = report["stages"]["cold_response_return"]
++        assert response_cold_stage["section_readouts"] == 1 and response_cold_stage["deeds"] == 0
++        assert response_cold_stage["numerical_egress_octets"] == 48
+     for name in ("cold_prediction", "cold_difference_and_audio"):
+         stage = report["stages"][name]
+         assert stage["section_readouts"] == 1 and stage["deeds"] == 0
+@@ -121,6 +161,8 @@ def compare(report_path, acquisition_path):
+             "zero_native_numerical_readouts": True, "sections": checked,
+             "observed_pcm_square_sum": signal_energy, "defect_pcm_square_sum": defect_energy,
+             "defect_to_observed_energy_ratio": str(Q(defect_energy, signal_energy)) if signal_energy else None,
++            "response_return": response_checked,
++            "response_numerator_bound": response_bound if response_checked else None,
+             "scope": "unit-response baseline versus actual measured channels; no fitted acoustic model"}
+ 
+ 
+diff --git a/research/records/2026-09-07_THE_RECORDED_RETURN_USES_ITS_PRODUCING_TEMPORAL_ADJOINT.md b/research/records/2026-09-07_THE_RECORDED_RETURN_USES_ITS_PRODUCING_TEMPORAL_ADJOINT.md
+new file mode 100644
+index 00000000..922a8f07
+--- /dev/null
++++ b/research/records/2026-09-07_THE_RECORDED_RETURN_USES_ITS_PRODUCING_TEMPORAL_ADJOINT.md
+@@ -0,0 +1,112 @@
++# The recorded return uses its producing temporal adjoint
++
++[definition] This continues AS4–AS5 after the [shared internal-mode port](2026-09-07_APPLE_RETURNS_THE_INTERNAL_CURRENT_AND_SHARED_DRIVE_MODE.md).
++The [earlier measured return](2026-09-07_MEASURED_ACOUSTIC_RETURNS_KEEP_THEIR_ORIENTED_DIFFERENCE.md)
++already retained complete SoundCam electrical-loopback/microphone differences. The new port
++returns that oriented evidence into the original temporal response chart. It does not yet contact
++a compatible-condition fibre or commit developed acoustic standing.
++
++## Declared return and ownership
++
++[definition] For the retained causal action `p = X_x h`, a comparison on actual sampled support
++`S` returns `e = y_S - R_S p`. In the declared unit-admittance complex chart, the response adjoint is
++
++```text
++g[k] = sum over j with j+k in S of conjugate(x[j]) e[j+k]
++     = (R_S X_x)* e.
++```
++
++[definition] This is the adjoint of the restricted receiver. It contributes no covector outside
++observed support; it does not assert that missing measurements equal zero. Both excluded support
++populations remain in the comparison, and every original response coordinate remains in `g`,
++including directions on which this receiver returns zero. The sample clock and phase chart are
++exterior declarations, not semantic grains or measured physical admittances.
++
++[established-bounded; implemented-exact] `phase_current::resident::return_response_resident`
++borrows the actual `ResidentPhaseConvolution` and `ResidentPhaseDifference`. It checks that the
++comparison retains this exact prediction section and view, including offset, denominator,
++disposition, clock, support and lineage. Equal values or labels from another operation fail before
++a launch. The returned receipt retains both prior owners and presents the current in the original
++response chart. Later operations cannot substitute their current morphology for that forward cut.
++
++[established-bounded; implemented-exact] `phase_current_response_adjoint.cuh`,
++`phase_response_adjoint.metal` and `surface_phase_response_adjoint.rs` realize one resident passage:
++validate both full point views and padding; accumulate independent response coordinates; normalize
++the whole result; publish exact words. Each coordinate visits its admitted source indices in
++ascending order. Both quadratures use checked products and sums, sharing the existing convolution
++normalizer and packer. Intermediate workspace uses the actual target wide representation and
++never crosses to a host numerical receiver. Failure publishes no response current and leaves the
++forward and difference carriers intact.
++
++## Controls
++
++[established-bounded; measured] All 23 resident temporal controls pass on the M1 Pro, including
++four new controls. The complex partial-support case returns `[19/21, -5/21, -13/21, -22/21]`
++and independently verifies the realified duality pairing. A different equal-valued prediction
++refuses before launch. A response wider than threadgroup storage preserves all inactive
++directions. An overflowing exact return refuses while earlier prediction and observation remain
++unchanged. The nineteen existing convolution/difference/conditional controls also pass.
++
++```sh
++cargo test -p holonic-engine --lib phase_current::resident:: -- --include-ignored --test-threads=1
++```
++
++## Actual recorded return
++
++[established-bounded; measured] The v2 `recorded_acoustic_return` example builds and runs in
++three separate processes on the same three 672,000-frame, 48 kHz SoundCam row/microphone-zero
++pairs. Prediction precedes observation mounting; difference and response adjoint precede every
++cold numerical readout. The explicitly declared initial response still has one unit coefficient.
++No condition is updated, and each report states `generator_developed: false`.
++
++[established-bounded; measured] The [source-qualified comparison](2026-09-07_recorded_acoustic_response_return/comparison.json)
++verifies every original NPY/WAV sample, prediction, oriented difference and PCM projection,
++and independently computes `sum x_pcm * (y_pcm - x_pcm) / 32768^2` using Python integers.
++It checks both exact adjoint coordinates, original response receiver/clock/lineage and native
++transfer receipts. All three v2 records pass; the earlier v1 row-zero record also passes the
++updated observer. The three returned currents, with imaginary component zero, are:
++
++| Source row | Exact real response current | Portable exact section |
++|---|---|---|
++| 000 | `-1812071716551 / 1073741824` | [88-byte return](2026-09-07_recorded_acoustic_response_return/row_000_response_return.section) |
++| 001 | `-245483819625 / 134217728` | [88-byte return](2026-09-07_recorded_acoustic_response_return/row_001_response_return.section) |
++| 002 | `-2318513610903 / 1073741824` | [88-byte return](2026-09-07_recorded_acoustic_response_return/row_002_response_return.section) |
++
++[established-bounded; measured] Four [observer controls](2026-09-07_recorded_acoustic_response_return/observer-controls.json)
++refuse a changed real coordinate, changed imaginary coordinate, claimed hot readout and changed
++response clock. The coordinate mutations update their hashes, so refusal comes from the exact
++pairing rather than a checksum mismatch. Source/waveform evidence and malformed controls remain
++under `.local/experiments/soundcam-native-response-return`; only the small response sections and
++qualified receipts are retained here. No recorded source was newly acquired or removed.
++
++[established-bounded; measured] The actual M1 Pro costs are:
++
++| Row | Response adjoint, s | Its GPU time, s | Three native stages, s | Cold audio export, s | Whole process, s |
++|---|---:|---:|---:|---:|---:|
++| [000](2026-09-07_recorded_acoustic_response_return/row_000.json) | 2.525432334 | 2.524221875 | 4.498711417 | 14.198790833 | 20.721956625 |
++| [001](2026-09-07_recorded_acoustic_response_return/row_001.json) | 2.572221792 | 2.571502250 | 4.572976792 | 14.315708125 | 19.926262750 |
++| [002](2026-09-07_recorded_acoustic_response_return/row_002.json) | 3.325763417 | 3.324773625 | 5.792473959 | 14.446995292 | 21.263021292 |
++
++[established-bounded; measured] Each adjoint is one deed, six allocations and 64 receipt bytes,
++with zero numerical egress, numerical readouts or ingress. Peak native residency is 139,776,340
++bytes; 86,016,160 bytes remain held during cold publication. Cold response publication reads
++48 numerical bytes and writes an 88-byte serialized section. CPU codec/RSS and disk are separate
++from those residency counters. These are batch measurements, not a matched speedup, real-time
++stream or measured power claim. CUDA is source-inspected here, not compiled or executed.
++No Lean proofs or imports changed.
++
++```sh
++cargo build -p holonics-hna --example recorded_acoustic_return
++target/debug/examples/recorded_acoustic_return .local/datasets/soundcam/wav/row_000/loopback.wav .local/datasets/soundcam/wav/row_000/microphone_00.wav NEW_REPORT.json .local/experiments/NEW_RETURN
++python3 research/experiments/apple_silicon/compare_recorded_acoustic_return.py .local/datasets/soundcam/acquisition.json NEW_REPORT.json --output NEW_COMPARISON.json
++```
++
++## Remaining construction
++
++[open; source-inspected] The adjoint supplies a concrete missing response port. The full temporal
++family `F_y = {(h,e): R_S X_x h + e = y_S}`, its existing unit-admittance contact and persistent
++successor remain to be implemented. An exact acoustic point port also cannot consume a numerical
++enclosure centre as a selected current. The structured fibre and certified enclosure consumer
++must preserve shared amplitude constraints, unmodelled return, actual normal currents and the
++producing/current operator cuts. The [Apple blueprint](../../docs/plans/HOLONICS_ON_APPLE_SILICON.md)
++retains that sequence. Useful acoustic/English development and AS4–AS5 completion remain open.
+diff --git a/research/records/2026-09-07_recorded_acoustic_response_return/comparison.json b/research/records/2026-09-07_recorded_acoustic_response_return/comparison.json
+new file mode 100644
+index 00000000..36b86ced
+--- /dev/null
++++ b/research/records/2026-09-07_recorded_acoustic_response_return/comparison.json
+@@ -0,0 +1,145 @@
++{
++  "verified": true,
++  "returns": [
++    {
++      "verified": true,
++      "row": 0,
++      "microphone": 0,
++      "frames": 672000,
++      "sample_rate": 48000,
++      "qualified_raw_arrays_match_wavs": true,
++      "complete_oriented_difference_matches": true,
++      "projection_fibre_reconstructs": true,
++      "zero_native_numerical_readouts": true,
++      "sections": {
++        "prediction": {
++          "sha256": "d70902b9f7d4d943f25da69b6cbedb299a7367d83093d459e02988e6fa68e06a",
++          "coordinates_verified": 1344000,
++          "denominator": 32768
++        },
++        "difference": {
++          "sha256": "bfb3dd38dd4af442e396471dd5868273930e8333c11fdc4fa999ddb1e44a543d",
++          "coordinates_verified": 1344000,
++          "denominator": 32768
++        }
++      },
++      "observed_pcm_square_sum": 624263408838,
++      "defect_pcm_square_sum": 2296313232289,
++      "defect_to_observed_energy_ratio": "2296313232289/624263408838",
++      "response_return": {
++        "sha256": "771e7c9d684827db3c000aee8c2e3d7c6a3202e3c20b4ba8c2eadafd0c22378d",
++        "coordinates_verified": 2,
++        "denominator": 1073741824,
++        "exact_coordinates": [
++          "-1812071716551/1073741824",
++          "0"
++        ]
++      },
++      "response_numerator_bound": 1443086991360000,
++      "scope": "unit-response baseline versus actual measured channels; no fitted acoustic model"
++    },
++    {
++      "verified": true,
++      "row": 1,
++      "microphone": 0,
++      "frames": 672000,
++      "sample_rate": 48000,
++      "qualified_raw_arrays_match_wavs": true,
++      "complete_oriented_difference_matches": true,
++      "projection_fibre_reconstructs": true,
++      "zero_native_numerical_readouts": true,
++      "sections": {
++        "prediction": {
++          "sha256": "edd7e4b90bbeb6c79e9fb50575ab1710845083b5ae85dd6c4c0d4ec3f3451ddb",
++          "coordinates_verified": 1344000,
++          "denominator": 32768
++        },
++        "difference": {
++          "sha256": "c28b95f6e10c2ce6172dbe950aeeb739feedca411e64192d258a2b266194f86f",
++          "coordinates_verified": 1344000,
++          "denominator": 32768
++        }
++      },
++      "observed_pcm_square_sum": 583640951579,
++      "defect_pcm_square_sum": 2559022134613,
++      "defect_to_observed_energy_ratio": "365574590659/83377278797",
++      "response_return": {
++        "sha256": "90bc314691e1cd8cc1c4261b18b6ce2e594e7c18cf361aa18d5935dc1f0c15ef",
++        "coordinates_verified": 2,
++        "denominator": 134217728,
++        "exact_coordinates": [
++          "-245483819625/134217728",
++          "0"
++        ]
++      },
++      "response_numerator_bound": 1443086991360000,
++      "scope": "unit-response baseline versus actual measured channels; no fitted acoustic model"
++    },
++    {
++      "verified": true,
++      "row": 2,
++      "microphone": 0,
++      "frames": 672000,
++      "sample_rate": 48000,
++      "qualified_raw_arrays_match_wavs": true,
++      "complete_oriented_difference_matches": true,
++      "projection_fibre_reconstructs": true,
++      "zero_native_numerical_readouts": true,
++      "sections": {
++        "prediction": {
++          "sha256": "8fa262fb85050bc10cb7738f1d9da883ff8a81810644f6dc66150585c432f993",
++          "coordinates_verified": 1344000,
++          "denominator": 32768
++        },
++        "difference": {
++          "sha256": "7b9db63aef75ee04ef817c15d1fab2b1be3e07edf3f4ba32f814bf2ffbdd77e0",
++          "coordinates_verified": 1344000,
++          "denominator": 32768
++        }
++      },
++      "observed_pcm_square_sum": 1268724676088,
++      "defect_pcm_square_sum": 3953252227199,
++      "defect_to_observed_energy_ratio": "3953252227199/1268724676088",
++      "response_return": {
++        "sha256": "d0bb4246a9f4646be71fd0c22c1bf71fb1a8f8fc29d78ca1737fa8f73df44234",
++        "coordinates_verified": 2,
++        "denominator": 1073741824,
++        "exact_coordinates": [
++          "-2318513610903/1073741824",
++          "0"
++        ]
++      },
++      "response_numerator_bound": 1443086991360000,
++      "scope": "unit-response baseline versus actual measured channels; no fitted acoustic model"
++    },
++    {
++      "verified": true,
++      "row": 0,
++      "microphone": 0,
++      "frames": 672000,
++      "sample_rate": 48000,
++      "qualified_raw_arrays_match_wavs": true,
++      "complete_oriented_difference_matches": true,
++      "projection_fibre_reconstructs": true,
++      "zero_native_numerical_readouts": true,
++      "sections": {
++        "prediction": {
++          "sha256": "d70902b9f7d4d943f25da69b6cbedb299a7367d83093d459e02988e6fa68e06a",
++          "coordinates_verified": 1344000,
++          "denominator": 32768
++        },
++        "difference": {
++          "sha256": "bfb3dd38dd4af442e396471dd5868273930e8333c11fdc4fa999ddb1e44a543d",
++          "coordinates_verified": 1344000,
++          "denominator": 32768
++        }
++      },
++      "observed_pcm_square_sum": 624263408838,
++      "defect_pcm_square_sum": 2296313232289,
++      "defect_to_observed_energy_ratio": "2296313232289/624263408838",
++      "response_return": null,
++      "response_numerator_bound": null,
++      "scope": "unit-response baseline versus actual measured channels; no fitted acoustic model"
++    }
++  ]
++}
+diff --git a/research/records/2026-09-07_recorded_acoustic_response_return/observer-controls.json b/research/records/2026-09-07_recorded_acoustic_response_return/observer-controls.json
+new file mode 100644
+index 00000000..d532db7d
+--- /dev/null
++++ b/research/records/2026-09-07_recorded_acoustic_response_return/observer-controls.json
+@@ -0,0 +1,38 @@
++{
++  "schema": "holonics.recorded-response-return-observer-controls.v1",
++  "truth_status": "established-bounded",
++  "evidence_tags": [
++    "measured"
++  ],
++  "baseline_verified": true,
++  "controls": [
++    {
++      "control": "changed_real_coordinate",
++      "refused": true,
++      "report": ".local/experiments/soundcam-native-response-return/observer-controls/changed_real_coordinate.json",
++      "rule": "assert coordinates == expected",
++      "observer_line": 66
++    },
++    {
++      "control": "changed_imaginary_coordinate",
++      "refused": true,
++      "report": ".local/experiments/soundcam-native-response-return/observer-controls/changed_imaginary_coordinate.json",
++      "rule": "assert coordinates == expected",
++      "observer_line": 66
++    },
++    {
++      "control": "claimed_hot_readout",
++      "refused": true,
++      "report": ".local/experiments/soundcam-native-response-return/observer-controls/claimed_hot_readout.json",
++      "rule": "assert response_stage[\"section_readouts\"] == response_stage[\"numerical_egress_octets\"] == response_stage[\"ingress_octets\"] == 0",
++      "observer_line": 138
++    },
++    {
++      "control": "changed_response_clock",
++      "refused": true,
++      "report": ".local/experiments/soundcam-native-response-return/observer-controls/changed_response_clock.json",
++      "rule": "assert Q(metadata[\"sample_step\"]) == Q(1, rate)",
++      "observer_line": 146
++    }
++  ]
++}
+diff --git a/research/records/2026-09-07_recorded_acoustic_response_return/row_000.json b/research/records/2026-09-07_recorded_acoustic_response_return/row_000.json
+new file mode 100644
+index 00000000..c364efb9
+--- /dev/null
++++ b/research/records/2026-09-07_recorded_acoustic_response_return/row_000.json
+@@ -0,0 +1,230 @@
++{
++  "clock_contract": "caller supplies simultaneously recorded raw channels with common origin; no delay alignment or resampling",
++  "device": "Apple M1 Pro",
++  "difference": {
++    "clipped_sample_population": 0,
++    "frames": 672000,
++    "lineage": 5,
++    "origin": "0",
++    "pcm_gain": 32768,
++    "projection_fibre": "the complete exact section is retained; remainder = current * gain - PCM at each timed quadrature",
++    "receiver": 9,
++    "sample_step": "1/48000",
++    "section_octets": 21504056,
++    "section_path": ".local/experiments/soundcam-native-response-return/row_000/difference.section",
++    "section_sha256": "bfb3dd38dd4af442e396471dd5868273930e8333c11fdc4fa999ddb1e44a543d",
++    "wav_path": ".local/experiments/soundcam-native-response-return/row_000/difference.wav",
++    "wav_sha256": "9fd2a9305c64c929351bb46b6d357535eeba3fa22153211ca9b29bd9050b3074"
++  },
++  "divisor": 32768,
++  "excitation": {
++    "frames": 672000,
++    "occurrence": "recorded-excitation",
++    "octets": 1344044,
++    "origin": "0",
++    "path": ".local/datasets/soundcam/wav/row_000/loopback.wav",
++    "sample_rate": 48000,
++    "sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
++  },
++  "generator_developed": false,
++  "initial_response": {
++    "denominator": 1,
++    "extent": 1,
++    "imaginary": 0,
++    "origin": "0",
++    "real": 1
++  },
++  "initial_response_scope": "explicit unit digital starting current, not a measured room transfer or cultivated model",
++  "native_development": "none; this receiver retains the actual defect for subsequent constitutive contact",
++  "observation": {
++    "frames": 672000,
++    "occurrence": "recorded-microphone-return",
++    "octets": 1344044,
++    "origin": "0",
++    "path": ".local/datasets/soundcam/wav/row_000/microphone_00.wav",
++    "sample_rate": 48000,
++    "sha256": "e20fd5db50601393f2623042ea45cbce163dfd071ad6debb6eda27a9a7b08394"
++  },
++  "phase_extent": 4,
++  "prediction": {
++    "frames": 672000,
++    "lineage": 4,
++    "origin": "0",
++    "receiver": 9,
++    "sample_step": "1/48000",
++    "section_octets": 21504056,
++    "section_path": ".local/experiments/soundcam-native-response-return/row_000/prediction.section",
++    "section_sha256": "d70902b9f7d4d943f25da69b6cbedb299a7367d83093d459e02988e6fa68e06a"
++  },
++  "response_return": {
++    "frames": 1,
++    "lineage": 6,
++    "origin": "0",
++    "receiver": 8,
++    "sample_step": "1/48000",
++    "section_octets": 88,
++    "section_path": ".local/experiments/soundcam-native-response-return/row_000/response_return.section",
++    "section_sha256": "771e7c9d684827db3c000aee8c2e3d7c6a3202e3c20b4ba8c2eadafd0c22378d"
++  },
++  "response_return_scope": "resident response adjoint returned in the original unit-response chart; no PCM rendering and no developed room model",
++  "schema": "holonics.recorded-acoustic-return.v2",
++  "seconds": 20.721956625,
++  "stages": {
++    "cold_difference_and_audio": {
++      "allocations": 0,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 21504016,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 86016160,
++      "resident_octets_peak": 139776340,
++      "seconds": 14.198790833,
++      "section_readouts": 1,
++      "unavailable_gpu_timestamps": 0
++    },
++    "cold_prediction": {
++      "allocations": 0,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 21504016,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 86016160,
++      "resident_octets_peak": 139776340,
++      "seconds": 0.1721215,
++      "section_readouts": 1,
++      "unavailable_gpu_timestamps": 0
++    },
++    "cold_response_return": {
++      "allocations": 0,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 48,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 86016160,
++      "resident_octets_peak": 139776340,
++      "seconds": 0.008652375,
++      "section_readouts": 1,
++      "unavailable_gpu_timestamps": 0
++    },
++    "mount_excitation": {
++      "allocations": 2,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 21504016,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 21504016,
++      "resident_octets_peak": 21504016,
++      "seconds": 0.090545083,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "mount_initial_response": {
++      "allocations": 2,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 48,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 21504064,
++      "resident_octets_peak": 21504064,
++      "seconds": 0.000045584,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "mount_observed_return": {
++      "allocations": 2,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 21504016,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 64512096,
++      "resident_octets_peak": 96768244,
++      "seconds": 0.094730667,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "native_oriented_return": {
++      "allocations": 6,
++      "deeds": 1,
++      "gpu_seconds": 1.095322750043124,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 64,
++      "resident_octets_now": 86016112,
++      "resident_octets_peak": 139776340,
++      "seconds": 1.097431958,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "predict_before_reception": {
++      "allocations": 6,
++      "deeds": 1,
++      "gpu_seconds": 0.8684027083218098,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 64,
++      "resident_octets_now": 43008080,
++      "resident_octets_peak": 96768244,
++      "seconds": 0.875847125,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "resident_response_adjoint": {
++      "allocations": 6,
++      "deeds": 1,
++      "gpu_seconds": 2.5242218748899177,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 64,
++      "resident_octets_now": 86016160,
++      "resident_octets_peak": 139776340,
++      "seconds": 2.525432334,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    }
++  },
++  "status": "returned",
++  "support": {
++    "begin": [
++      [
++        0,
++        []
++      ],
++      [
++        1,
++        [
++          1
++        ]
++      ]
++    ],
++    "end": [
++      [
++        1,
++        [
++          14
++        ]
++      ],
++      [
++        1,
++        [
++          1
++        ]
++      ]
++    ],
++    "observed": {
++      "end": 672000,
++      "start": 0
++    },
++    "predicted": {
++      "end": 672000,
++      "start": 0
++    },
++    "unobserved_prediction": [],
++    "unpredicted_observation": []
++  }
++}
+\ No newline at end of file
+diff --git a/research/records/2026-09-07_recorded_acoustic_response_return/row_000_response_return.section b/research/records/2026-09-07_recorded_acoustic_response_return/row_000_response_return.section
+new file mode 100644
+index 0000000000000000000000000000000000000000..c1edbdb74fe50b7306c308c4d510462f4eb339dc
+GIT binary patch
+literal 88
+wcmeYW3JwYmVPIrrfB<F)1tuLB7#LuD%a_s;QUCt`htXgKs02tkNCZp+04bpi1poj5
+
+literal 0
+HcmV?d00001
+
+diff --git a/research/records/2026-09-07_recorded_acoustic_response_return/row_001.json b/research/records/2026-09-07_recorded_acoustic_response_return/row_001.json
+new file mode 100644
+index 00000000..be5c7c3f
+--- /dev/null
++++ b/research/records/2026-09-07_recorded_acoustic_response_return/row_001.json
+@@ -0,0 +1,230 @@
++{
++  "clock_contract": "caller supplies simultaneously recorded raw channels with common origin; no delay alignment or resampling",
++  "device": "Apple M1 Pro",
++  "difference": {
++    "clipped_sample_population": 0,
++    "frames": 672000,
++    "lineage": 5,
++    "origin": "0",
++    "pcm_gain": 32768,
++    "projection_fibre": "the complete exact section is retained; remainder = current * gain - PCM at each timed quadrature",
++    "receiver": 9,
++    "sample_step": "1/48000",
++    "section_octets": 21504056,
++    "section_path": ".local/experiments/soundcam-native-response-return/row_001/difference.section",
++    "section_sha256": "c28b95f6e10c2ce6172dbe950aeeb739feedca411e64192d258a2b266194f86f",
++    "wav_path": ".local/experiments/soundcam-native-response-return/row_001/difference.wav",
++    "wav_sha256": "7855d9b019ccaefc49be18f60f8548a6083099580d21ccea344c234783ecf930"
++  },
++  "divisor": 32768,
++  "excitation": {
++    "frames": 672000,
++    "occurrence": "recorded-excitation",
++    "octets": 1344044,
++    "origin": "0",
++    "path": ".local/datasets/soundcam/wav/row_001/loopback.wav",
++    "sample_rate": 48000,
++    "sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
++  },
++  "generator_developed": false,
++  "initial_response": {
++    "denominator": 1,
++    "extent": 1,
++    "imaginary": 0,
++    "origin": "0",
++    "real": 1
++  },
++  "initial_response_scope": "explicit unit digital starting current, not a measured room transfer or cultivated model",
++  "native_development": "none; this receiver retains the actual defect for subsequent constitutive contact",
++  "observation": {
++    "frames": 672000,
++    "occurrence": "recorded-microphone-return",
++    "octets": 1344044,
++    "origin": "0",
++    "path": ".local/datasets/soundcam/wav/row_001/microphone_00.wav",
++    "sample_rate": 48000,
++    "sha256": "b7a88809e4ba46590c43982b76d0efc5727ad492e88fd9c526c529c28d60c1fd"
++  },
++  "phase_extent": 4,
++  "prediction": {
++    "frames": 672000,
++    "lineage": 4,
++    "origin": "0",
++    "receiver": 9,
++    "sample_step": "1/48000",
++    "section_octets": 21504056,
++    "section_path": ".local/experiments/soundcam-native-response-return/row_001/prediction.section",
++    "section_sha256": "edd7e4b90bbeb6c79e9fb50575ab1710845083b5ae85dd6c4c0d4ec3f3451ddb"
++  },
++  "response_return": {
++    "frames": 1,
++    "lineage": 6,
++    "origin": "0",
++    "receiver": 8,
++    "sample_step": "1/48000",
++    "section_octets": 88,
++    "section_path": ".local/experiments/soundcam-native-response-return/row_001/response_return.section",
++    "section_sha256": "90bc314691e1cd8cc1c4261b18b6ce2e594e7c18cf361aa18d5935dc1f0c15ef"
++  },
++  "response_return_scope": "resident response adjoint returned in the original unit-response chart; no PCM rendering and no developed room model",
++  "schema": "holonics.recorded-acoustic-return.v2",
++  "seconds": 19.92626275,
++  "stages": {
++    "cold_difference_and_audio": {
++      "allocations": 0,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 21504016,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 86016160,
++      "resident_octets_peak": 139776340,
++      "seconds": 14.315708125,
++      "section_readouts": 1,
++      "unavailable_gpu_timestamps": 0
++    },
++    "cold_prediction": {
++      "allocations": 0,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 21504016,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 86016160,
++      "resident_octets_peak": 139776340,
++      "seconds": 0.165931459,
++      "section_readouts": 1,
++      "unavailable_gpu_timestamps": 0
++    },
++    "cold_response_return": {
++      "allocations": 0,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 48,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 86016160,
++      "resident_octets_peak": 139776340,
++      "seconds": 0.011614917,
++      "section_readouts": 1,
++      "unavailable_gpu_timestamps": 0
++    },
++    "mount_excitation": {
++      "allocations": 2,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 21504016,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 21504016,
++      "resident_octets_peak": 21504016,
++      "seconds": 0.09064175,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "mount_initial_response": {
++      "allocations": 2,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 48,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 21504064,
++      "resident_octets_peak": 21504064,
++      "seconds": 0.000059875,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "mount_observed_return": {
++      "allocations": 2,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 21504016,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 64512096,
++      "resident_octets_peak": 96768244,
++      "seconds": 0.091530917,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "native_oriented_return": {
++      "allocations": 6,
++      "deeds": 1,
++      "gpu_seconds": 1.1099419583333656,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 64,
++      "resident_octets_now": 86016112,
++      "resident_octets_peak": 139776340,
++      "seconds": 1.111554917,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "predict_before_reception": {
++      "allocations": 6,
++      "deeds": 1,
++      "gpu_seconds": 0.8870712083298713,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 64,
++      "resident_octets_now": 43008080,
++      "resident_octets_peak": 96768244,
++      "seconds": 0.889200083,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "resident_response_adjoint": {
++      "allocations": 6,
++      "deeds": 1,
++      "gpu_seconds": 2.5715022499207407,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 64,
++      "resident_octets_now": 86016160,
++      "resident_octets_peak": 139776340,
++      "seconds": 2.572221792,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    }
++  },
++  "status": "returned",
++  "support": {
++    "begin": [
++      [
++        0,
++        []
++      ],
++      [
++        1,
++        [
++          1
++        ]
++      ]
++    ],
++    "end": [
++      [
++        1,
++        [
++          14
++        ]
++      ],
++      [
++        1,
++        [
++          1
++        ]
++      ]
++    ],
++    "observed": {
++      "end": 672000,
++      "start": 0
++    },
++    "predicted": {
++      "end": 672000,
++      "start": 0
++    },
++    "unobserved_prediction": [],
++    "unpredicted_observation": []
++  }
++}
+\ No newline at end of file
+diff --git a/research/records/2026-09-07_recorded_acoustic_response_return/row_001_response_return.section b/research/records/2026-09-07_recorded_acoustic_response_return/row_001_response_return.section
+new file mode 100644
+index 0000000000000000000000000000000000000000..7fe38196687e7a2ebdb88b5585060af2ffa9ef37
+GIT binary patch
+literal 88
+vcmeYW3JwYmVPIrrfB<F)1tuLB7#Lvu>AGw;j{X1tA4Y=}pb{KVE|>-YUxN(^
+
+literal 0
+HcmV?d00001
+
+diff --git a/research/records/2026-09-07_recorded_acoustic_response_return/row_002.json b/research/records/2026-09-07_recorded_acoustic_response_return/row_002.json
+new file mode 100644
+index 00000000..6cadf1a1
+--- /dev/null
++++ b/research/records/2026-09-07_recorded_acoustic_response_return/row_002.json
+@@ -0,0 +1,230 @@
++{
++  "clock_contract": "caller supplies simultaneously recorded raw channels with common origin; no delay alignment or resampling",
++  "device": "Apple M1 Pro",
++  "difference": {
++    "clipped_sample_population": 0,
++    "frames": 672000,
++    "lineage": 5,
++    "origin": "0",
++    "pcm_gain": 32768,
++    "projection_fibre": "the complete exact section is retained; remainder = current * gain - PCM at each timed quadrature",
++    "receiver": 9,
++    "sample_step": "1/48000",
++    "section_octets": 21504056,
++    "section_path": ".local/experiments/soundcam-native-response-return/row_002/difference.section",
++    "section_sha256": "7b9db63aef75ee04ef817c15d1fab2b1be3e07edf3f4ba32f814bf2ffbdd77e0",
++    "wav_path": ".local/experiments/soundcam-native-response-return/row_002/difference.wav",
++    "wav_sha256": "2ec6a7fc5b03469ca1797465dc1e736aafbc37b65b10d6fa5265b33d2bb9bbef"
++  },
++  "divisor": 32768,
++  "excitation": {
++    "frames": 672000,
++    "occurrence": "recorded-excitation",
++    "octets": 1344044,
++    "origin": "0",
++    "path": ".local/datasets/soundcam/wav/row_002/loopback.wav",
++    "sample_rate": 48000,
++    "sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
++  },
++  "generator_developed": false,
++  "initial_response": {
++    "denominator": 1,
++    "extent": 1,
++    "imaginary": 0,
++    "origin": "0",
++    "real": 1
++  },
++  "initial_response_scope": "explicit unit digital starting current, not a measured room transfer or cultivated model",
++  "native_development": "none; this receiver retains the actual defect for subsequent constitutive contact",
++  "observation": {
++    "frames": 672000,
++    "occurrence": "recorded-microphone-return",
++    "octets": 1344044,
++    "origin": "0",
++    "path": ".local/datasets/soundcam/wav/row_002/microphone_00.wav",
++    "sample_rate": 48000,
++    "sha256": "e5155416859bce4fe7d41ef755741f6af0e28003bf2d9cd776145fccdfbc2121"
++  },
++  "phase_extent": 4,
++  "prediction": {
++    "frames": 672000,
++    "lineage": 4,
++    "origin": "0",
++    "receiver": 9,
++    "sample_step": "1/48000",
++    "section_octets": 21504056,
++    "section_path": ".local/experiments/soundcam-native-response-return/row_002/prediction.section",
++    "section_sha256": "8fa262fb85050bc10cb7738f1d9da883ff8a81810644f6dc66150585c432f993"
++  },
++  "response_return": {
++    "frames": 1,
++    "lineage": 6,
++    "origin": "0",
++    "receiver": 8,
++    "sample_step": "1/48000",
++    "section_octets": 88,
++    "section_path": ".local/experiments/soundcam-native-response-return/row_002/response_return.section",
++    "section_sha256": "d0bb4246a9f4646be71fd0c22c1bf71fb1a8f8fc29d78ca1737fa8f73df44234"
++  },
++  "response_return_scope": "resident response adjoint returned in the original unit-response chart; no PCM rendering and no developed room model",
++  "schema": "holonics.recorded-acoustic-return.v2",
++  "seconds": 21.263021292,
++  "stages": {
++    "cold_difference_and_audio": {
++      "allocations": 0,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 21504016,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 86016160,
++      "resident_octets_peak": 139776340,
++      "seconds": 14.446995292,
++      "section_readouts": 1,
++      "unavailable_gpu_timestamps": 0
++    },
++    "cold_prediction": {
++      "allocations": 0,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 21504016,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 86016160,
++      "resident_octets_peak": 139776340,
++      "seconds": 0.167837667,
++      "section_readouts": 1,
++      "unavailable_gpu_timestamps": 0
++    },
++    "cold_response_return": {
++      "allocations": 0,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 48,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 86016160,
++      "resident_octets_peak": 139776340,
++      "seconds": 0.005186208,
++      "section_readouts": 1,
++      "unavailable_gpu_timestamps": 0
++    },
++    "mount_excitation": {
++      "allocations": 2,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 21504016,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 21504016,
++      "resident_octets_peak": 21504016,
++      "seconds": 0.08949375,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "mount_initial_response": {
++      "allocations": 2,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 48,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 21504064,
++      "resident_octets_peak": 21504064,
++      "seconds": 0.000064042,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "mount_observed_return": {
++      "allocations": 2,
++      "deeds": 0,
++      "gpu_seconds": 0.0,
++      "ingress_octets": 21504016,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 0,
++      "resident_octets_now": 64512096,
++      "resident_octets_peak": 96768244,
++      "seconds": 0.092020333,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "native_oriented_return": {
++      "allocations": 6,
++      "deeds": 1,
++      "gpu_seconds": 1.3523623750079423,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 64,
++      "resident_octets_now": 86016112,
++      "resident_octets_peak": 139776340,
++      "seconds": 1.353298084,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "predict_before_reception": {
++      "allocations": 6,
++      "deeds": 1,
++      "gpu_seconds": 1.1120419166982174,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 64,
++      "resident_octets_now": 43008080,
++      "resident_octets_peak": 96768244,
++      "seconds": 1.113412458,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    },
++    "resident_response_adjoint": {
++      "allocations": 6,
++      "deeds": 1,
++      "gpu_seconds": 3.3247736250050366,
++      "ingress_octets": 0,
++      "numerical_egress_octets": 0,
++      "receipt_egress_octets": 64,
++      "resident_octets_now": 86016160,
++      "resident_octets_peak": 139776340,
++      "seconds": 3.325763417,
++      "section_readouts": 0,
++      "unavailable_gpu_timestamps": 0
++    }
++  },
++  "status": "returned",
++  "support": {
++    "begin": [
++      [
++        0,
++        []
++      ],
++      [
++        1,
++        [
++          1
++        ]
++      ]
++    ],
++    "end": [
++      [
++        1,
++        [
++          14
++        ]
++      ],
++      [
++        1,
++        [
++          1
++        ]
++      ]
++    ],
++    "observed": {
++      "end": 672000,
++      "start": 0
++    },
++    "predicted": {
++      "end": 672000,
++      "start": 0
++    },
++    "unobserved_prediction": [],
++    "unpredicted_observation": []
++  }
++}
+\ No newline at end of file
+diff --git a/research/records/2026-09-07_recorded_acoustic_response_return/row_002_response_return.section b/research/records/2026-09-07_recorded_acoustic_response_return/row_002_response_return.section
+new file mode 100644
+index 0000000000000000000000000000000000000000..921075216e57923421243c1ea26d402e552c604c
+GIT binary patch
+literal 88
+wcmeYW3JwYmVPIrrfB<F)1tuLB7#Lvu%=;I0pZxv*A4Y=}pb{YEAQ3PP0Hg^H`2YX_
+
+literal 0
+HcmV?d00001
+
+-- 
+2.54.0
+
