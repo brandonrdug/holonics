@@ -300,7 +300,7 @@ crates/holonics/src/
   hnn/         field law, source moments, adjoint contracts, execution port, host reference (K2)
 
 crates/holonics-cuda/src/
-  driver/      context, module, stream, allocation, transfer completion (from holonics-cuda)
+  driver/      context, module, stream, allocation, transfer completion (from former holonic-mount)
   section/     resident sections, SLOT_WORDS, section partition, hardware cover
   hnn/         the resident HNN field and session, moved as it is
   extraction/  device parts of equation extraction, if kept
@@ -365,9 +365,9 @@ an interaction that the incidence and constitution do not contain.
 The HNN execution port is defined at its surviving consuming call, including the forward
 field, complete geometry/feature pullback, material return, source order, receiving phase and
 receipt. The host/reference implementation and CUDA implementation must return the same typed
-relation at their stated precision. The present graph does **not** satisfy this cut: engine
-imports `mount` and runs `nvcc`; HNA imports engine and life; `holonic-words` imports `soma-abi`;
-and the HNN field has no host reference (§0.3). M1 therefore moves the resident HNN into
+relation at their stated precision. The apparatus package now has its target owner; the resident HNN cut remains: engine imports
+`holonics-cuda` and runs `nvcc`; resident field owners remain in engine/HNA/life; `holonic-words`
+imports `soma-abi`; and the HNN field has no host reference (§0.3). M1 moves the resident HNN into
 `holonics-cuda` with its current behavior. K2 then extracts the port and host reference one
 method at a time, each against the CUDA return. A module with a distinct
 mathematical consumer survives in its object owner; unconsumed legacy scaffolding retires.

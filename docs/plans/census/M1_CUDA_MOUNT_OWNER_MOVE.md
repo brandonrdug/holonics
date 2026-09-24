@@ -16,11 +16,12 @@ R0 census rows and historical artifacts continue to describe their recorded snap
 ## Verification
 
 See `docs/VERIFICATION_RECEIPTS.tsv` for the focused CUDA-owner tests, locked workspace all-target
-check, and package checks recorded for this commit.
+check recorded for this commit. A card smoke also passed on the RTX 4080 SUPER: the 1,048,576-cell
+`fill_identity` and `atomic_fold` checks both returned exact results.
 
 ## Scope boundary
 
 This is the apparatus owner move only. It does not move resident HNN, engine kernels/build.rs,
 life/HNA device implementations, or consolidate `body`, `soma-abi`, and `holonic-words` into the
-planned portable leaf. GPU execution tests require an available CUDA device; compile and host
-owner tests establish only their stated scope.
+planned portable leaf. Seven device-required library tests were skipped in this environment; the focused smoke exercised
+the available CUDA card, and the locked workspace check establishes compilation only.
