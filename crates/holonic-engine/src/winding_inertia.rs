@@ -10,7 +10,7 @@ use holonics::geometry::winding_inertia::{
     CyclicReading, SymmetricCirculant, WindingError, rational_star_value,
 };
 #[cfg(test)]
-use holonics::geometry::winding_inertia::{Hand, cycle_adjacency, winding_inertia};
+use holonics::geometry::winding_inertia::{cycle_adjacency, winding_inertia};
 use holonics::inertia::SymmetricForm;
 
 /// Read grown arcs by displacement class on a declared cyclic receiver.
