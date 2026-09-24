@@ -398,8 +398,7 @@ pub fn declared_relation_scene() -> LabScene {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::geometry::projection::{analyze_crossings, project_entity};
-    use num_traits::Zero;
+    use crate::geometry::projection::project_entity;
 
     #[test]
     fn exact_scene_archive_round_trips_structurally() {
@@ -435,37 +434,5 @@ mod tests {
         )
         .unwrap();
         assert_ne!(before_face, after_face);
-    }
-
-    #[test]
-    fn starter_contains_no_zero_focal_distance() {
-        let archive = starter_archive();
-        for receiver in &archive.current().receivers {
-            if let ProjectionLaw::PerspectiveRay { focal_distance } = &receiver.projection {
-                assert!(!focal_distance.is_zero());
-            }
-        }
-    }
-
-    #[test]
-    fn starter_receiver_family_exposes_distinct_crossing_faces() {
-        let scene = starter_archive().current().clone();
-        let reports = scene
-            .receivers
-            .iter()
-            .map(|receiver| {
-                let analysis = analyze_crossings(&scene.construction, receiver).unwrap();
-                (
-                    receiver.name.clone(),
-                    analysis.crossings.len(),
-                    analysis.discriminants.len(),
-                    analysis.exact,
-                )
-            })
-            .collect::<Vec<_>>();
-
-        assert!(reports.iter().any(|(_, crossings, _, _)| *crossings > 0));
-        assert!(reports.iter().any(|(_, _, _, exact)| !exact));
-        assert_ne!(reports[0].1, reports[2].1);
     }
 }

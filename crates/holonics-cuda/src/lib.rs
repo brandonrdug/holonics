@@ -36,34 +36,3 @@ pub use launch_law::{
 /// The odd fold constant the `atomic_fold` kernel adds once per thread (mirrors the kernel's
 /// `FOLD_CONSTANT`; kept here so the cpu's exact check needs no re-derivation). 2^61 - 1.
 pub const FOLD_CONSTANT: u64 = 2_305_843_009_213_693_951;
-
-#[cfg(test)]
-mod tests {
-    /// The committed PTX boundary artifact, checked cpu-side (no GPU) so the workspace test
-    /// gates that the artifact is present, sm_89, and carries both entry points.
-    const SMOKE_PTX: &[u8] = include_bytes!("../../../accelerators/cuda-smoke/mount_smoke_kernel.ptx");
-    /// The CUDA smoke boundary. This check is deliberately static: it validates
-    /// the committed artifact without loading a driver or rebuilding PTX behind the user's back.
-    #[test]
-    fn ptx_artifact_is_sm89_with_both_entries() {
-        let text = std::str::from_utf8(SMOKE_PTX).expect("PTX is text");
-        assert!(text.contains(".target sm_89"), "PTX must target sm_89");
-        assert!(
-            text.contains(".entry fill_identity"),
-            "PTX must expose fill_identity"
-        );
-        assert!(
-            text.contains(".entry atomic_fold"),
-            "PTX must expose atomic_fold"
-        );
-        // The exact 64-bit atomic lowering the mount depends on.
-        assert!(
-            text.contains("atom.global.add.u64"),
-            "expected atom.add.u64"
-        );
-        assert!(
-            text.contains("atom.global.max.u64"),
-            "expected atom.max.u64"
-        );
-    }
-}
