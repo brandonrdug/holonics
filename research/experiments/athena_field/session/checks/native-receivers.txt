@@ -1,6 +1,0 @@
-
-running 2 tests
-test native_ecology::constitutive_fibre::field::material_transport::normal::direct::conditional_tests::incoming_reaction_cancels_the_same_source_before_bounding ... ok
-test native_ecology::constitutive_fibre::field::material_transport::normal::direct::section_basis::tests::joint_basis_sections_preserve_source_phase_radius_and_permutation ... ok
-
-test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 2512 filtered out; finished in 0.57s

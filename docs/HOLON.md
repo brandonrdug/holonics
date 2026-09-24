@@ -106,7 +106,7 @@ Medium        q̇=(Ω−M_contact)Gq+Bu               storage G, flux Ω, drive/
 Reading       ρ_R at the Perspective               release through receiver_release
 ```
 
-[proved-derived; formal-checked] [`Transport/HelicalPairInteraction.lean`](../formal/elementary-holonics/ElementaryHolonics/Transport/HelicalPairInteraction.lean)
+[proved-derived; formal-checked] [`Transport/HelicalPairInteraction.lean`](../lean/ElementaryHolonics/Transport/HelicalPairInteraction.lean)
 proves these pair/contact identities and the polarization identity
 `⟨a|b⟩=(⟨a|a⟩+⟨b|b⟩−⟨a−b|a−b⟩)/2`. The existing unit-phase participation score
 `β cos(2π(q_i−q_j−φ_ij))` is therefore the pair quadrance with both advances zero and unit
@@ -184,7 +184,7 @@ reusable generating law; keeping a copy of its latest produced word is not what 
 `ρ T_w v≠0` for an admitted later word w. It cannot be discarded by a representation promising
 that later reading. For example, `ρ(x,h)=x` and `T_u(x,h)=(x+u h,h)` give the same present face
 for `(0,1)` and `(0,-1)`, but different faces after `u=1`. This is the existing
-[future-agreement/standing law](../formal/elementary-holonics/ElementaryHolonics/Foundation/Standing.lean),
+[future-agreement/standing law](../lean/ElementaryHolonics/Foundation/Standing.lean),
 with executable separators in `exact_linear/contextual.rs` and `kernel_modes.rs`.
 
 [definition] Continuing compression retains `D E=ρ` and `E_next T_a=U_a E` for its declared

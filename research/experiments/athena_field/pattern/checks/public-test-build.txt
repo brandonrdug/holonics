@@ -1,7 +1,0 @@
-warning: holonic-engine@0.1.0: exact CUDA laws built for compute_89
-   Compiling holonic-engine v0.1.0 (/home/b/Workspaces/holonics/crates/holonic-engine)
-   Compiling life v0.0.0 (/home/b/Workspaces/holonics/crates/holonic-life)
-   Compiling holonics-circulation-abi v0.1.0 (/home/b/Workspaces/holonics/crates/holonic-circulation-abi)
-   Compiling holonics-hna v0.1.0 (/home/b/Workspaces/holonics/crates/holonics-hna)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 33.67s
-  Executable unittests src/lib.rs (target/debug/deps/holonics_hna-5dc87c8819cf4508)

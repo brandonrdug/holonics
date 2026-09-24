@@ -11,7 +11,7 @@
 set -u -o pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PROJECT="$ROOT/formal/elementary-holonics"
+PROJECT="$ROOT/lean"
 if [ "$#" -eq 0 ]; then
     set -- ElementaryHolonics.Framework
 fi

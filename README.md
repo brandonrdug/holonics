@@ -1,82 +1,24 @@
 # Holonics
 
-Holonics is Brandon's mathematical, physical and computational research programme, grounded
-in the reality of difference. It develops a common language for how situated things interact,
-change and become observable. Its working ambition is a constructive theory that connects
-mathematics, physics, computation and living systems. Claims retain their hypotheses and
-evidence; open constructions remain open.
+Holonics is a theory of everything grounded in the reality of difference: a mathematical,
+physical and computational framework for how situated things exist, interact, change and become
+observable. Its elementary object is the **Holon**: a law with incidence, ports, material
+relations, generators and scale restrictions. Holons join at ports into Holarchies, receivers read
+situated faces, and time passes in aeons, epochs and cycles. **HNN** is the neural machinery built
+from these objects.
 
-The elementary object is a **Holon**: a law with incidence, ports, material relations,
-generators and scale restrictions. Holons join at ports; a receiving face reads a situated
-comparison. The [elementary objects](docs/ELEMENTARY_OBJECTS.md) and
-[the machine](docs/THE_MACHINE.md) define the laws. **HNN** is neural machinery made from those
-objects, **Athena** its first intended product, and **Eros** their collective formation and
-composition. The intended generally useful Athena assistant is still under construction.
+The repository was reset on September 24, 2026 to what functions, and it is being rebuilt from the
+elementary objects ([plan](docs/plans/THE_REBUILD.md), [state](CONSTRUCTION_STATE.md)).
 
-## Start here
-
-| Need | Read |
+| Path | Contents |
 |---|---|
-| The mathematical object and its operative equations | [The machine](docs/THE_MACHINE.md), [Holon](docs/HOLON.md), [HNN formula](docs/HNN_FORMULA.md) |
-| What is implemented and what remains open | [Construction state](CONSTRUCTION_STATE.md) |
-| Construction order and current restructuring | [Roadmap](docs/plans/THE_ROADMAP.md), [repository restructure](docs/plans/THE_REPOSITORY_RESTRUCTURE.md) |
-| Formal and native source owners | [Elementary objects](docs/ELEMENTARY_OBJECTS.md), [architecture map](docs/ARCHITECTURE_MAP.md) |
-| Research derivations and scoped results | [Research routes](research/records/README.md), [research entry](research/README.md) |
-| How Codex and Claude work in this tree | [AGENTS.md](AGENTS.md), [CLAUDE.md](CLAUDE.md), [development method](docs/DEVELOPMENT.md) |
+| [`crates/holonics`](crates/holonics) | The main Rust library: the Holon law, ratio and ring arithmetic, geometry, receivers |
+| [`crates/holonics-cuda`](crates/holonics-cuda) | The CUDA backend (currently the device driver) |
+| [`lean/`](lean) | The Lean mathematics (`ElementaryHolonics.Framework` and the research umbrella) |
+| [`docs/`](docs) | The [elementary objects](docs/ELEMENTARY_OBJECTS.md), [the Holon](docs/HOLON.md), [notation](docs/HOLONIC_NOTATION.md) and the mathematics guides |
+| [`research/`](research) | Dated research records, papers and design notes |
 
-## The checkout today
+Build: `cargo check --workspace --all-targets`; Lean: `bash tools/lean_check.sh`. Contributor
+guides: [CLAUDE.md](CLAUDE.md) and [AGENTS.md](AGENTS.md).
 
-The root `Cargo.toml` declares **five workspace packages**: four libraries and the workbench
-application. The restructuring work is in progress; these are the paths that exist now.
-
-| Path | Current role |
-|---|---|
-| `crates/holonics/` | Main Holon law, exact ratio and ring arithmetic, receiver-relative geometry, receivers, standing and release |
-| `crates/holonic-engine/` | Constitutive field and resident HNN operators, equation extraction and exact operators still awaiting their main-library or CUDA owner |
-| `crates/holonics-hna/` | The HNN field sessions, stream and Athena field examples (crate name retires in M1) |
-| `crates/holonics-cuda/` | CUDA driver, launch law and section realization |
-| `formal/elementary-holonics/` | Current Lean/Lake project; the final `Holonics` and `HolonicsResearch` roots remain an M2 move |
-| `applications/` | The workbench CLI and conversation-data tooling |
-| `docs/`, `research/` | Maintained contracts, plans, derivations, experiments and papers |
-
-[Repository organization](docs/REPOSITORY.md) maps the remaining directories and historical
-locations. Historical code and records retain their cited revisions; a source name does not
-by itself certify current use.
-
-## The intended libraries
-
-The [restructure plan](docs/plans/THE_REPOSITORY_RESTRUCTURE.md) audits consumers and retires
-superseded layers before moving code. The **main `holonics` crate will own the actual Holon
-laws and HNN**, organized by elementary object rather than acting as a facade:
-
-| Library | Responsibility |
-|---|---|
-| `holonics` | Ratio/remainder and exact ring arithmetic, geometric transport and pair/tube charts, the Holon law and its operators, receivers and receipts, the Holarchy returned by interconnection, equation extraction, and the backend-neutral HNN law and execution port |
-| `holonics-cuda` | CUDA realization: driver, section contracts and kernels, and the resident HNN field |
-| `holonics-apple` (later) | Apple silicon implementation on Brandon's separate branch |
-
-That is two maintained Rust libraries on Linux and three after Apple. Exact rings and the
-section arithmetic the CUDA kernels mirror belong to `holonics::ratio::ring`, and CUDA section
-refusals belong to `holonics-cuda::section_layout`. The main library
-builds without CUDA; its HNN host reference is built after the move, one method at a time
-against the CUDA return.
-Its physical instances must carry fluid stress/pressure, wave propagation, spacetime
-stress-energy, heat/entropy currents and the active receiver law with their stated hypotheses;
-pair slip and pumps alone do not supply those equations.
-The current workbench remains an application package while its deployment boundary is
-inventoried. Lean will become one top-level `lean/` Lake package with a public `Holonics`
-library and dependent `HolonicsResearch` library. Those names describe the **target**; the
-current paths above remain authoritative until their moves are verified. Lean verifies laws at
-its own scope and does not run inside HNN cultivation or inference.
-
-## Working in this repository
-
-Use the owner and consuming call in [AGENTS.md](AGENTS.md) or [CLAUDE.md](CLAUDE.md), then read
-the relevant research route and source. A moved operator keeps its typed source and receiver,
-forward law, variation, saved face and actual consumer. The current tree contains paused
-consolidation branches and uncommitted mathematical work; the restructure census accounts for
-them before retirement. Native build and Lean check commands live in
-[DEVELOPMENT.md](docs/DEVELOPMENT.md) and [FORMAL_FRAMEWORK.md](docs/FORMAL_FRAMEWORK.md).
-
-Holonics is dual-licensed under [MIT](LICENSE-MIT) or
-[Apache-2.0](LICENSE-APACHE), at your option. Third-party material retains its own notices.
+Holonics is dual-licensed under [MIT](LICENSE-MIT) or [Apache-2.0](LICENSE-APACHE), at your option.

@@ -1,9 +1,0 @@
-   Compiling mount v0.1.0 (/home/b/Workspaces/holonics/crates/holonic-mount)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.38s
-     Running unittests src/lib.rs (target/debug/deps/mount-4a0a76767d5563f7)
-
-running 2 tests
-test cuda::tests::allocation_calibration_keeps_persistent_and_driver_failures ... ok
-test cuda::tests::allocation_calibration_retries_an_unstable_sample_without_guessing ... ok
-
-test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 15 filtered out; finished in 0.00s

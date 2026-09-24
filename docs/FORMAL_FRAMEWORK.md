@@ -17,10 +17,10 @@ endpoints are applications of those objects. Formal/library work refines the com
 and its consumers together, with the accumulated framework's strength as the starting point.
 
 [definition] The Lean entry point is
-[`ElementaryHolonics.Framework`](../formal/elementary-holonics/ElementaryHolonics/Framework.lean).
+[`ElementaryHolonics.Framework`](../lean/ElementaryHolonics/Framework.lean).
 Its six subject imports—Core, Geometry, Dynamics, Information, Physics and Computation—compose
 existing owners. They are reading and dependency boundaries, not six substances or runtime organs.
-The [Lean guide](../formal/elementary-holonics/README.md) gives focused imports and verification.
+The [Lean guide](../lean/README.md) gives focused imports and verification.
 The [mathematics/native synthesis](MATHEMATICS_AND_NATIVE_CONDUCT.md) connects these laws to
 current executable owners.
 
@@ -48,7 +48,7 @@ the proper-frame/axis Rust tests separate from the checked Lean bracket/translat
 It also reconnects the existing landmark, normalized-mode, inference and future-receiver
 compression owners; none is newly founded by this specialization.
 
-[proved-derived; formal-checked] [`Foundation/SuccessorWitnessSystem.lean`](../formal/elementary-holonics/ElementaryHolonics/Foundation/SuccessorWitnessSystem.lean) owns the generic
+[proved-derived; formal-checked] [`Foundation/SuccessorWitnessSystem.lean`](../lean/ElementaryHolonics/Foundation/SuccessorWitnessSystem.lean) owns the generic
 sequential passage from an inhabited base and surjective adjacent restrictions to one compatible
 section. `Foundation/ContinuingTower` joins that law to all-gap tower compatibility. The associated
 Boolean flip loop witness is generic Foundation material; addressed-current composition and
@@ -56,7 +56,7 @@ null-current limit laws remain in `Millennium/HolonicDirectedPassage`. `Transpor
 retains that research import because it consumes `AddressedPassage`.
 
 [proved-derived; formal-checked] `Framework.Dynamics` imports
-[`Transport/HelicalPairInteraction`](../formal/elementary-holonics/ElementaryHolonics/Transport/HelicalPairInteraction.lean),
+[`Transport/HelicalPairInteraction`](../lean/ElementaryHolonics/Transport/HelicalPairInteraction.lean),
 the formal statement of the [helical pair interaction unit](HOLON.md#the-helical-pair-interaction-unit).
 It joins `Geometry/ScrewGeometry` to `Transport/HolonicInteraction`: the pair's relative
 velocity is a contact slip map (`pairSlip_mulVec`, `pairSlip_transpose_mulVec`), the face power
@@ -334,14 +334,14 @@ receiver. The nonlinear control distinguishes a presently hidden component from 
 hidden through the whole admitted generator family.
 
 [definition] The generic receiver-family carrier and its induced collapse are owned by
-[`Foundation/ReceiverFamily.lean`](../formal/elementary-holonics/ElementaryHolonics/Foundation/ReceiverFamily.lean).
+[`Foundation/ReceiverFamily.lean`](../lean/ElementaryHolonics/Foundation/ReceiverFamily.lean).
 `Foundation/CausalRelevance` imports this minimal owner directly; the names remain in
 `Soma.Holonics.Millennium.Separation` until the declaration-namespace migration. The research
-module [`Millennium/Separation.lean`](../formal/elementary-holonics/ElementaryHolonics/Millennium/Separation.lean)
+module [`Millennium/Separation.lean`](../lean/ElementaryHolonics/Millennium/Separation.lean)
 imports that owner and keeps its distinct algebraic, polynomial, and receiver-separation results.
 
 [definition] The generic `GluingPassage` obstruction carrier is owned by
-[`Foundation/GluingPassage.lean`](../formal/elementary-holonics/ElementaryHolonics/Foundation/GluingPassage.lean).
+[`Foundation/GluingPassage.lean`](../lean/ElementaryHolonics/Foundation/GluingPassage.lean).
 `Foundation/ContinuingTower` imports it directly; `Millennium/Gluing` retains additive passages
 and its research-specific obstruction and pairing results. Declaration names remain in
 `Soma.Holonics.Millennium` until the later namespace migration.
@@ -371,7 +371,7 @@ realization; they supply reusable relations rather than universal force identiti
                      X         F        Y
 ```
 
-The implementation is [`Holon`](../formal/elementary-holonics/ElementaryHolonics/Foundation/Holon.lean).
+The implementation is [`Holon`](../lean/ElementaryHolonics/Foundation/Holon.lean).
 `Holon.Interaction` joins two such spans at an actual equal boundary. `Holon.comp` retains the
 pair of occurrences and the equality that made them composable. `compPreimageFibreEquiv`
 identifies the composite's fibre with both component fibres plus that join. Two things returning
@@ -477,7 +477,7 @@ winding/cohomology classes remain part of the framework.
 
 ## Tubes, clocks and networks of active interiors
 
-[definition] [`Transport/WorldTube`](../formal/elementary-holonics/ElementaryHolonics/Transport/WorldTube.lean)
+[definition] [`Transport/WorldTube`](../lean/ElementaryHolonics/Transport/WorldTube.lean)
 owns `ClockedSpan`: an occurrence carries source, target, clock face, returned face and obstruction.
 Serial composition pairs those fields and retains the pullback join. Resegmentation preserves
 that complete face; `openGap_has_no_joined_occurrence` refuses to turn an actual gap into a new
@@ -644,7 +644,7 @@ coordinate edit would discard the mechanism one wants to study.
 
 [proved-derived; formal-checked] In the finite **real** coupled-incidence chart, let
 `R = Bᵀ M B x`, `R' = B'ᵀ M' B' x'`, `δB = B'−B`, `δM = M'−M`, `δx = x'−x`.
-[`ConstitutiveModulation.coupledResponse_finite_change`](../formal/elementary-holonics/ElementaryHolonics/Physics/ConstitutiveModulation.lean)
+[`ConstitutiveModulation.coupledResponse_finite_change`](../lean/ElementaryHolonics/Physics/ConstitutiveModulation.lean)
 proves
 
 ```text
@@ -684,7 +684,7 @@ patterns already engaged in particular instances. The
 [continuation deposit](../research/records/2026-09-08_CHANGING_CONSTITUTION_AND_RECEIVERS_SHARE_ONE_DEFECT_CALCULUS.md)
 joins the existing owners and carries the precise statements, examples and checks.
 
-[definition] [`ChangingReceiver`](../formal/elementary-holonics/ElementaryHolonics/Transport/ChangingReceiver.lean)
+[definition] [`ChangingReceiver`](../lean/ElementaryHolonics/Transport/ChangingReceiver.lean)
 receives an existing addressed passage through before/after charts and a proposed coarse
 operation. Its primary return is the signed defect `returned(w) − U(entering(w))` on the same
 occurrence. Receiver-transformer existence stays restricted to the actual range and complete
@@ -711,7 +711,7 @@ energy `E(x)=k/2 (a+x²)²`. The fluid instance uses the existing finite Fourier
 Navier–Stokes vector field, including its actual advective–Leray source. These are mathematical
 realizations with their specified laws; no new molecular calibration is claimed.
 
-[proved-derived; formal-checked] [`MechanicalReceiver`](../formal/elementary-holonics/ElementaryHolonics/Physics/MechanicalReceiver.lean)
+[proved-derived; formal-checked] [`MechanicalReceiver`](../lean/ElementaryHolonics/Physics/MechanicalReceiver.lean)
 identifies the material stiffness `k(2x)²` with the standing coupled-incidence response and
 retains the additional `2k(a+x²)` prestress term. The explicit finite response step
 `x' = x − 2hkx(a+x²)` descends through squared extension to
@@ -730,7 +730,7 @@ material-action Euler, constituted stress/diffusion, active Einstein faces and a
 internal-field energy exchange, and joins the Hodge/heat/arithmetic sources without identifying
 their different receivers or claiming their unsolved endpoints.
 
-[proved-derived; formal-checked] [`FluidReceiverClosure`](../formal/elementary-holonics/ElementaryHolonics/Physics/FluidReceiverClosure.lean)
+[proved-derived; formal-checked] [`FluidReceiverClosure`](../lean/ElementaryHolonics/Physics/FluidReceiverClosure.lean)
 uses a receiver Q and lift J. For resolved state r=JQx and retained z=x−r, its complete rate defect is
 
 ```text
@@ -758,7 +758,7 @@ a new numerical policy, an extra certainty condition or another engine.
 square `q T_i = U_i q`. `quotientCommutesWithEveryOrderedWord` extends it to every finite ordered
 word, and `allSuccessorHistories` supplies exact receiver factorization. A single future receiver
 that separates two collapsed states refutes the proposed compression. The complete-quotient
-extension in [`Foundation/CompleteReceiverHistory.lean`](../formal/elementary-holonics/ElementaryHolonics/Foundation/CompleteReceiverHistory.lean)
+extension in [`Foundation/CompleteReceiverHistory.lean`](../lean/ElementaryHolonics/Foundation/CompleteReceiverHistory.lean)
 equates quotient equality with equality of all declared receiver/history faces and constructs a
 separating receiver/history witness when quotient states differ. This establishes an unbounded
 family of finite continuations without enumerating them or claiming infinite-time analytic
@@ -840,7 +840,7 @@ name locates the particular mathematical test of it.
 | What can a compressed description actually compute? | `PVersusNP` retains fixed binary encodings, polynomial-time deciders/verifiers and certificate length. Execution/simulation and compression must retain the machine and decoder cost; a compact description alone supplies no polynomial-time algorithm. |
 
 [established-bounded; source-inspected] The statement boundary is
-[`OfficialProblems`](../formal/elementary-holonics/ElementaryHolonics/Millennium/OfficialProblems.lean).
+[`OfficialProblems`](../lean/ElementaryHolonics/Millennium/OfficialProblems.lean).
 The application headers and selected source owners were inspected alongside the elementary
 spine; this review is not a fresh theorem-by-theorem audit of every historical derivation. The
 full research build checks import/proof integration, while each result retains its own hypotheses.

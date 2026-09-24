@@ -1,1 +1,0 @@
-{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red red", "context": ["red", "blue"], "commit": false, "retain_comparison": false}}}

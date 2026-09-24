@@ -1,9 +1,0 @@
-# M1 exact ratio and information owner move
-
-The source-neutral exact information operators now live in the main library under `holonics::ratio`. `surprisal` retains symbolic prime-log forms, four-state comparisons, a missing-code fibre, cross-entropy and the section modulus. `exponentiated` retains the pairwise ratio cocycle, exact rational exponentiation/normalization, and `NormalizedKernel` with its tangent and pullback. These are receiver readings and transport laws, not a complete implementation of the planned typed Holon ratio with nonunit inverse fibre, winding and jets.
-
-The prior engine modules had only main-library mathematical imports: `surprisal` used `geometry::Rat`, log enclosure and `exact_value`; `exponentiated` used `geometry::Rat`, `surprisal` and `exact_linear`. No CUDA, mount or resident type enters the moved source. The engine's `corpus_census`, `situated_residual` and normalized field test, life `causal_language`, and current examples now import the main owner directly. The old engine modules and exports are removed rather than forwarded. The persisted ratio-family schema identifier `holonic-engine.exponentiated-ratio-family.v1` is intentionally unchanged; a source owner move does not rename existing data.
-
-The main library still depends on `holonic-words`, which in turn depends on the portable Soma ABI and body. That is a separate owner cut. The engine/HNN source-neutral and resident split, the full Ratio operator, backend execution port and final documentation remain open. This move keeps `holonics` free of mount, engine, HNA, life and CUDA dependencies.
-
-Verification: the focused `holonics --lib ratio::` run passed 40 tests. The locked workspace all-target check and the source/caller scan are recorded in `docs/VERIFICATION_RECEIPTS.tsv` after completion.

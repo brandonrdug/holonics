@@ -482,9 +482,9 @@ H_dot = φ* b + j* e_ind - j* R j - (φ* C_dot φ + j* L_dot j)/2.
 The internal powers cancel through the adjoint incidence. This is a calculable generalization
 of V=IR with storage, induction and changing material. For a changing population, transfer
 charge/flux and boundary work through the actual contact map; equal array indices do not
-identify those quantities. [PortEnergyHeat](../formal/elementary-holonics/ElementaryHolonics/Physics/PortEnergyHeat.lean),
-[CoupledIncidence](../formal/elementary-holonics/ElementaryHolonics/Physics/CoupledIncidence.lean)
-and [ConstitutiveModulation](../formal/elementary-holonics/ElementaryHolonics/Physics/ConstitutiveModulation.lean)
+identify those quantities. [PortEnergyHeat](../lean/ElementaryHolonics/Physics/PortEnergyHeat.lean),
+[CoupledIncidence](../lean/ElementaryHolonics/Physics/CoupledIncidence.lean)
+and [ConstitutiveModulation](../lean/ElementaryHolonics/Physics/ConstitutiveModulation.lean)
 are the existing formal owners.
 
 [definition] Port-Hamiltonian form, `x_dot=(J-R)∇H+B u`, is an available energy-chart realization
@@ -726,7 +726,7 @@ already corrected its projection conventions and supplied the entropic and modal
 `m_c=Σ μ_j` and `p_c=Σ μ_j V_j`; the same attention is
 `a_i=(Σ_c k_ic p_c)/(Σ_c k_ic m_c)`.
 The pair (mass,current) is associative; normalized means alone are not.
-[AttentionModeCompression](../formal/elementary-holonics/ElementaryHolonics/Computation/AttentionModeCompression.lean)
+[AttentionModeCompression](../lean/ElementaryHolonics/Computation/AttentionModeCompression.lean)
 owns this law. The Rust `exact_linear::KernelModeReduction` constructs an exact finite
 factorization, transports its signed current columns, and tests action closure. This reusable
 library result has not yet been bound to the native HNN model's operator execution.
@@ -736,7 +736,7 @@ transport uses actual edges. A fixed SSM `x_next=A x+B u` has output
 `y_k=R A^k x_0+Σ_(j<k) R A^(k-1-j)B u_j+D u_k`. Its internal state, convolution and resolvent
 represent one operation. Selective coefficients require ordered, varying maps. A diffusion
 model composes its drift/score/reaction and integration operators, with an initial field and
-any declared stochastic law. The [architecture charts](../formal/elementary-holonics/ElementaryHolonics/Computation/HolonicArchitectureCharts.lean)
+any declared stochastic law. The [architecture charts](../lean/ElementaryHolonics/Computation/HolonicArchitectureCharts.lean)
 and [composition guide](HNN_COMPOSITION.md) retain these specializations. HNN construction
 reuses these operations rather than requiring their names to determine its topology.
 
@@ -820,7 +820,7 @@ r_dot=(D-KB)r+(C+DK-KA-KBK-K_dot)x+g-Kf.
 The residual can be another evolving mode or a memory realization; keeping it does not require
 replaying the past. The same law explains a boundary whose present response hides circulating
 interior dynamics. The source owner is
-[ReflectedBoundaryMemory](../formal/elementary-holonics/ElementaryHolonics/Physics/ReflectedBoundaryMemory.lean).
+[ReflectedBoundaryMemory](../lean/ElementaryHolonics/Physics/ReflectedBoundaryMemory.lean).
 
 [proved-derived; formal-checked] With `x_next=A x+B z+f`, eliminating arbitrary z in the next boundary encoding
 is exact precisely when `E_next A=U E` and `E_next B=0`. The native reduction task can construct
@@ -886,7 +886,7 @@ can instantiate the same operator constructions with their computational units. 
 biological or astronomical model additionally supplies its actual material and boundary laws.
 
 [established-bounded; source-inspected] The existing
-[discrete induction owner](../formal/elementary-holonics/ElementaryHolonics/Millennium/HolonicDiscreteInduction.lean)
+[discrete induction owner](../lean/ElementaryHolonics/Millennium/HolonicDiscreteInduction.lean)
 states `d_1 e=-ΔΦ`, proves `d_1 d_0=0`, and separates induced electromotive circulation from
 conductive response `j=σ e`. It calls a nonzero divergence-free branch current an eddy at that
 declared receiver. Magnetic order, conductivity, inductance, excitation frequency and geometry

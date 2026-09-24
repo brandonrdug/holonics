@@ -1,8 +1,0 @@
-{
-  "exit_code": 1,
-  "wall_seconds": 0.2919511739964946,
-  "max_rss_kib": 292224,
-  "user_seconds": 0.094903,
-  "system_seconds": 0.168369,
-  "scope": "warm debug-process run, whole example including exterior receivers and I/O"
-}
