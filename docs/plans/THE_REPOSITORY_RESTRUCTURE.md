@@ -80,10 +80,21 @@ Each is backed by a measurement at `d3b8b509`.
    `ratio/` and constructed from receipts in `receiver/`. This replaces the separate
    `holon/receiver` and `receipt/` of the Codex draft. Lean mirrors it as `Holonics.Receiver`.
 7. **A Holarchy is what `interconnect` returns.**
-   `Holon::interconnect(parts, joins) -> Result<Holarchy, GluingDefect>`. `Holarchy::whole()` is
-   the joined Holon, and the constituents, incidence and gluing are retained. `view`, `count` and
-   `refine` follow §3.1. A recursively generated family carries its constituent generator. This
-   ties the new object to an existing operation rather than adding a parallel constructor.
+   `Holon::interconnect(parts, gluing) -> Result<Holarchy, GluingDefect>`. `Holarchy::whole()` is
+   the joined Holon. Retain identified constituents, cellular/interface maps, port identifications,
+   generator provenance and child-scoped restrictions as the decomposition relation, not an event
+   history. Port joins use namespaced references `(constituent, port name, kind)`; both references
+   must resolve to external ports with compatible flow, effort and power units, and each port may
+   occur in at most one join. A join identifies equal efforts and opposite flows, so shared
+   interface power cancels. Complexes are joined only through explicit interface complexes and
+   boundary-commuting maps into each constituent; connection transports must agree under the
+   declared orientation. Pumps compose only when the gluing supplies child-to-joint clock maps
+   whose elapsed-time squares commute and whose schedules agree at the joint ticks. Unjoined
+   generators retain their own clocks. A restriction remains attached to its constituent unless
+   an explicit common coarse target and commuting square justify a whole-Holarchy restriction.
+   `view`, `count` and `refine` follow §3.1. A recursively generated family carries its
+   constituent generator. This ties the new object to an existing operation rather than adding a
+   parallel constructor.
 8. **No empty modules.** `physics/`, `holarchy/` and `receiver/` are created by the commit that
    lands their first implementation with a consumer. The existing `diffusion` receipt and
    interaction owners move into them then. The design tables in §3 are the contract, not a
@@ -298,7 +309,7 @@ crates/holonics/src/
   holon/       law, state, ports/Dirac, elements, generators, restrictions, interconnect,
                contact, continue, deposition/retention
   receiver/    ReceiverRole, interact/receive -> InteractionReturn, Receipt, Ratio::between
-  holarchy/    Holarchy returned by interconnect: whole, constituents, gluing, view/count/refine
+  holarchy/    Holarchy returned by interconnect: whole, constituents, typed gluing, view/count/refine
   physics/     fluid, wave, thermal, spacetime, information (each created with its first implementation)
   extraction/  foreign equations as Holon element/generator relations
   hnn/         field law, source moments, adjoint contracts, execution port, host reference (K2)
@@ -344,9 +355,11 @@ returns a gluing obstruction instead of asserting that every family closes. One 
 read the compound as one face; another can separate continents, islands or molecules at its
 own grain. Quantities such as number, mass or category are methods of the receiving relation,
 with units, partition/overlap conditions and clock; they are not immutable fields of the
-Holarchy. Under a certified finite disjoint refinement, counts have a stated relation; with
-overlap, changed receivers or non-finite fibres, that relation requires a correction or remains
-unresolved. The whole itself may receive, act, and compose with other Holarchies.
+Holarchy. A finite count requires a receiver-supplied finite partition witness establishing
+coverage, disjointness and distinguishability at the requested grain; otherwise the count remains
+unresolved. Refinement carries a fine-to-coarse port map and a commuting scale square. A nonzero
+square defect or a receiver reading that separates a merged fibre remains an explicit refinement
+result. The whole itself may receive, act, and compose with other Holarchies.
 
 **Reception is a Holon interaction; ratio is its comparative reading.** The receiving Holon
 has its own material, current, frame, clock and possible next state. At an admitted contact,
@@ -581,19 +594,53 @@ source, receiver and clock belong to the method arguments/return, not to a globa
 
 ```rust
 // Shape of the API; concrete generic parameters and ownership follow the consuming call.
-Holon { complex, ports, dirac, elements, generators, restrictions }
+Holon { complex, ports, dirac, elements, pump_schedule, generators, restrictions }
 HolonState { configuration, clock_states }           // no event tape
 ReceiverRole { holon, state, port, frame, clock, aperture }
-Holarchy { whole, constituent_generator, incidence, gluing, restrictions }
+Holarchy { whole, constituents, incidence, typed_gluing, joint_clock_maps,
+           generators, restrictions }
 Receipt { source, receiver, locus, frame, clock, grain, face, unresolved }
 Ratio<Left,Right> { left, right, comparison_transport, log_branch }
 InteractionReturn { source_next, receiver_next, face, receipt,
                     boundary_currents, power_balance, unresolved }
 ```
 
-`Holon::interconnect` must join the **complete** complex, named ports, material/pumps,
-generators and restrictions or return a typed gluing/clock defect. The current
-`holonic_core::Holon::interconnect` joins only the scoped port body/active law/generators;
+`Holon::interconnect` takes identified constituents and an explicit gluing specification. A
+`PortRef` resolves `(constituent id, local port name, kind)`; a `PortJoin` names its two endpoint
+references and orientation. Endpoints must be external ports with compatible flow, effort and
+power units, and may be joined only once. Free external ports retain constituent-qualified names
+unless an explicit output alias is supplied. At a joined interface the bond convention is
+`(f,e)` on one side and `(-f,e)` on the other, so the two port powers cancel. Internal storage,
+resistive and active ports are not silently treated as external joins.
+
+When either constituent carries a cell complex, the gluing specification supplies an interface
+complex and cellular maps into both complexes. Each map must commute with boundary operators; the
+induced pushout must satisfy `∂²=0`. Connection-valued incidence is joined only when edge
+transports agree under the declared orientation (reversing an edge inverts its transport). Missing
+maps, incompatible boundary/connection data or an invalid pushout return a typed `GluingDefect`;
+matching dimensions alone do not establish a shared complex. If neither side has a complex, a
+disjoint sum is available. If only one side has one, the operation must state its interface or
+refuse rather than drop the complex.
+
+A pump-bearing join supplies a joint clock and a child-to-joint clock passage map for each pumped
+constituent. The maps preserve declared elapsed time and commute on the clock square; pump schedule
+periods and phases must yield a well-defined storage form at every joint tick. Otherwise return
+the exact clock or schedule defect. Independent generator clocks remain distinct unless a joint
+passage is explicitly declared. Retain generators with constituent provenance. Retain each
+restriction with its constituent scope; create a whole-to-coarse restriction only for a declared
+common target whose diagrams commute. A failed diagram returns its matrix defect.
+
+`Holarchy` retains the gluing maps, incidence, generator provenance and child-scoped restrictions,
+not a history of events. `view(receiver, grain, clock)` returns situated region faces, interface
+flux and unresolved fibres. `count` needs a finite partition witness for that receiver and grain,
+including coverage, disjointness and distinguishability; absent such a witness it returns an
+unresolved reading rather than a constituent-vector length. `refine` carries a fine-to-coarse
+restriction and checks `π A_fine = A_coarse π`; otherwise it returns the square defect and any
+receiver reading that separates a merged fibre. A typed gluing defect identifies at least the
+unresolved constituent/port, unit, cellular boundary/connection, clock/schedule or restriction
+square that prevented construction.
+
+The current `holonic_core::Holon::interconnect` joins only the scoped port body/active law/generators;
 it refuses pumps and omits the joined complex, named ports and restrictions. The existing
 `HolonLaw::advance`/`ReferenceHolon` already return a state, bond and exact energy balance;
 retain them as the host reference. The existing `HolonLaw::receive` is a passive linear
@@ -746,10 +793,16 @@ existing suites (§0.9):
      libraries and their operators, `lean/`, the HNN, the applications, docs and research. The
      restructure is complete only when the README matches the tree.
 
-**Construction campaigns** run on the new layout, each with its own issue:
+**Construction campaigns** run on the new layout, each with its own issue. K1 follows completion
+of M1 and M2; restructuring does not claim either K1 acceptance packet:
 
-- **K1:** complete `interconnect -> Holarchy` (joined complex, named ports, pumps with a declared
-  joint clock, restrictions, or a typed defect), and the joint `interact`/`receive` return (§3.7).
+- **K1a:** complete structural `interconnect -> Holarchy` (§3.7): named, unit-checked port joins;
+  explicit cellular gluing; clock-mapped pump schedules; retained generator provenance and
+  restrictions; receiver-relative `view`, certified `count` and square-checked `refine`; typed
+  defects at each unresolved seam.
+- **K1b:** implement joint active `interact`/`receive` (§3.7), advancing both participants at one
+  declared contact and returning both next states, face, receipt, boundary currents, power balance
+  and unresolved fibre. The passive coholon reader remains its zero-storage specialization.
 - **K2:** the HNN execution port and host reference, one method at a time against the resident
   CUDA return. This is the precondition for `holonics-apple`.
 - **K3:** finite physics cells. §3.5's tests cover polygon/cube reflection and join, wave

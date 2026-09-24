@@ -62,7 +62,7 @@ is verified. Each move updates this table in the same commit.
 | Pair and tube charts | `screw_pair` (two motions, relative jet), `tube` (longitudinal transfer), `restrict` (transverse, gluing unique/plural/obstructed) | Lean `Transport/{HelicalPairInteraction,ContinuingTube}`, `Geometry/PairResonance`, `Foundation/{ContinuingTower,IwasawaTower}`; Rust `relational-geometry::screw`, `holonic-core::restriction::{tube,tower}` | `holonics::geometry`; `Holonics.Geometry` |
 | Holon | `advance` (state, bond, energy balance), `interconnect -> Holarchy`, `contact` (pair geometry + contact material), `continue` (through a tube), `restrict`, `depose`, `pullback` | Lean `Holon/{Law,Port,Dirac,Element,Generator,Restriction,Deposition,Reaction,Cayley}`, `Foundation/{Holon,Standing}`; Rust `holonic-core::{holon,law,port,dirac,element,generator,restriction,deposition,reaction}`, engine `holonic_interaction`, `holonic_chain`; main `holonics::receiver::standing` | `holonics::holon`; `Holonics.Holon` |
 | Receiver and receipt | `interact`/`receive -> InteractionReturn` (both participants' next states, face, receipt, boundary currents, power balance, unresolved fibre); `Ratio::between(receipts)`; `width`, `release` (caller-declared decision and tolerance checks) | Lean `Foundation/Receiver`, `Foundation/ReceiverRelease`, `Transport/ChangingReceiver`, `Objects/Pairing`; Rust `HolonLaw::receive` (passive coholon reading, the zero-storage specialization), `law/receiver.rs` (faces and passive law), `receiver/release.rs` (finite compatible-family width, exact affine enclosure, release decisions), `PresentationCost`, `landauer`; guide [RECEIVER_HOLARCHY](RECEIVER_HOLARCHY.md) | `holonics::receiver` (release operations); `Holonics.Receiver` |
-| Holarchy | `whole`, `view(receiver, grain, clock)`, `count` (certified finite partition only), `refine` | none as one object; ingredients are `Holon::interconnect`, the receiver atlas, the tower and the future-sufficient quotient | `holonics::holarchy`; `Holonics.Holarchy` (construction K1) |
+| Holarchy | `interconnect -> Holarchy` (typed port/cellular gluing); `whole`, `view(receiver, grain, clock)`, `count` (receiver-certified finite partition), `refine` (commuting square or defect) | none as one object; ingredients are `Holon::interconnect`, the receiver atlas, the tower and the future-sufficient quotient | `holonics::holarchy`; `Holonics.Holarchy` (K1a structure, K1b active reception) |
 | Physical instances | fluid `face_flux`/`advance`; wave `propagate`/`interfere`; thermal `exchange`/`diffuse`/`entropy_production`; spacetime `einstein_residual`/`observer_current`; information `apply` | Lean `Physics/*`, `Millennium/{NavierStokesLambCurrentCell,NavierStokesCurvedTransport}`; Rust `diffusion` | `holonics::physics`; `Holonics.Physics` (construction K3–K4) |
 | HNN | field law, source moments, adjoint, deposition return, execution port | engine `native_ecology/constitutive_fibre/field/**`, `holonics-hna` `native/**` (device-resident) | law and port in `holonics::hnn`; resident realization in `holonics-cuda::hnn`; `Holonics.HNN` |
 
@@ -341,17 +341,22 @@ zero-storage specialization of this operation.
 
 [definition] A **Holarchy** is a Holon perceived as a compound of distinct Holons, always in a
 context (Brandon, September 23). It is what `Holon::interconnect` returns: the joined whole
-together with its retained constituents, incidence, gluing and restrictions. When the join does not
-close, `interconnect` returns a typed gluing defect. Its constituent family may be implicit or
-recursively generated, carried by a constituent generator.
+together with its retained constituents, incidence, typed gluing and restrictions. When the join
+does not close, `interconnect` returns a typed gluing defect. Its constituent family may be
+implicit or recursively generated, carried by a constituent generator. Gluing retains namespaced
+port and cellular interface maps, generator provenance and child-scoped restrictions. A port join
+checks units and cancels equal-effort/opposite-flow interface power; cellular maps commute with
+boundaries and respect oriented connection transport. Pumps join only under declared compatible
+joint-clock maps.
 
 [definition] **A Holarchy's quantities belong to the receiver.** It has no fixed count, mass or
 category. `view(receiver, grain, clock)` returns the constituent faces, interface flux and
 unresolved classes that the receiver distinguishes at that grain. One grain counts continents,
-another islands, another molecules: a telescoping coarse-graining. `count` exists only when the
-receiver certifies a finite disjoint partition. Overlap, a changed receiver or a non-finite fibre
-needs a correction or stays unresolved. `refine` passes between grains through the tower's
-restrictions. A shared physical flux cancels once on every joined face, whatever the grain
+another islands, another molecules: a telescoping coarse-graining. `count` requires a finite,
+exhaustive, disjoint and distinguishing partition certified by that receiver; otherwise it remains
+unresolved. `refine` passes between grains through the tower's restrictions and returns a commuting
+scale square or its defect, including a reading that separates a merged fibre. A shared physical
+flux cancels once on every joined face, whatever the grain
 (`smoothSolutionOn_twoCell_sharedFace_gluing`). The whole can receive, act and compose with other
 Holarchies. Formal ingredients are `Foundation/{HodgeReceiver,IwasawaTower,FractalPacking}`: a
 count can be stable while its representative changes, and a quotient's cardinality depends on the
