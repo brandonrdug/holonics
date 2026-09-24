@@ -4,7 +4,6 @@
 # whose only purpose was to host a Bevy-era sandbox, and a separate soma
 # workspace of 190 that the actual body built against. The sandbox is not here.
 #
-# `holonics-portable` is pure law: no_std, zero dependencies. `holonics::structure` is the
 # substrate — ordinal and relation atlases, local populations, branch lineage,
 # typed atomic membrane. `holonics::geometry` and the native mathematical owners in
 # `crates/holonic-engine` keep receiver-relative conduct exact over BigRational with
@@ -19,20 +18,14 @@ resolver = "2"
 members = [
   "crates/holonics",
   "crates/holonics-hna",
-  "crates/holonics-workspace",
   "applications/holonics-workbench",
   "crates/holonic-engine",
-  "crates/holonics-portable",
-  "crates/holonic-life",
   "crates/holonics-cuda",
-  "applications/derivation-atlas",
-  "applications/holon-plate",
 ]
 # The nvptx mount kernel pins its own nightly. Its committed PTX is included by mount,
 # so the host workspace carries that boundary artifact without carrying the toolchain.
 exclude = [
   "accelerators/cuda-smoke",
-  "accelerators/cuda-kernel",
 ]
 
 [workspace.package]

@@ -15,10 +15,7 @@ mod session_stream;
 mod store;
 
 pub use cli::{parse_cli, Cli, OutputFormat, WorkbenchInvocation};
-pub use command::{
-    AthenaCommand, DiagnosticCommand, EngineCommand, ErosCommand, ExportCodecArgument, HnaCommand,
-    SoulkillerCommand, WorkbenchCommand, WorkspaceCommand,
-};
+pub use command::{DiagnosticCommand, HnaCommand, SoulkillerCommand, WorkbenchCommand};
 pub use event::{EventLevel, WorkbenchEvent};
 pub use protocol::{
     WorkbenchDisposition, WorkbenchRequest, WorkbenchResponse, WORKBENCH_REQUEST_SCHEMA,

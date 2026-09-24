@@ -53,7 +53,6 @@ pub mod geometry;
 pub mod receiver;
 pub mod holon;
 pub mod law;
-pub mod membrane;
 pub mod port;
 pub mod reaction;
 pub mod ratio;

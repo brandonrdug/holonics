@@ -2015,49 +2015,6 @@ mod tests {
         assert_eq!(device_dword_count::<u64>(7), 14);
     }
 
-    #[test]
-    #[ignore = "requires a CUDA device visible to the test process"]
-    fn whole_machine_boundary_reads_the_driver_and_zeroes_on_device() -> Result<()> {
-        init()?;
-        assert!(Device::count()? > 0);
-        let device = Device::get(0)?;
-        let census = device.launch_census()?;
-        assert!(census.max_threads_per_block > 0);
-        assert!(census.multiprocessor_count > 0);
-
-        let context = Context::create(&device)?;
-        let memory = context.memory_info()?;
-        assert!(memory.total_bytes > 0);
-        eprintln!(
-            "device={} · free={} · total={} bytes · grid={}x{}x{} · threads/block={} · multiprocessors={}",
-            device.name,
-            memory.free_bytes,
-            memory.total_bytes,
-            census.max_grid.x,
-            census.max_grid.y,
-            census.max_grid.z,
-            census.max_threads_per_block,
-            census.multiprocessor_count,
-        );
-        let allocation_grain = context.allocation_grain_bytes()?;
-        assert!(allocation_grain >= core::mem::size_of::<u32>());
-        eprintln!("legacy allocation grain={allocation_grain} bytes");
-
-        let module = Module::load_ptx(crate::SOMA_PTX)?;
-        let scope = module.function(holonics_portable::wire::register::Entry::ScopeSurface.symbol())?;
-        let local = scope.local_size_bytes()?;
-        assert!(local > 0);
-        eprintln!("scope_register_surface local={local} bytes/thread");
-
-        let buffer: DeviceBuffer<u32> = DeviceBuffer::alloc_zeroed(17)?;
-        context.synchronize()?;
-        let mut words = [u32::MAX; 17];
-        buffer.copy_to_slice(&mut words)?;
-        assert_eq!(words, [0; 17]);
-        drop(buffer);
-        context.destroy()?;
-        Ok(())
-    }
 
     #[test]
     #[ignore = "requires a CUDA device with virtual-memory management"]

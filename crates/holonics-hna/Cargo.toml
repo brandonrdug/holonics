@@ -5,7 +5,6 @@ edition = "2021"
 publish = false
 
 [dependencies]
-life = { path = "../../crates/holonic-life" }
 holonic-engine = { path = "../../crates/holonic-engine", default-features = false }
 # The core generator facet (`CompiledGeneratorSite::core_generator`), host-only.
 holonics = { path = "../holonics" }

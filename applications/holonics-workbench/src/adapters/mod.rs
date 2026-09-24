@@ -1,8 +1,6 @@
-pub mod engine;
+pub mod diagnostic;
 pub mod hna;
-pub mod eros;
 pub mod soulkiller;
-pub mod workspace;
 
 use serde_json::Value;
 

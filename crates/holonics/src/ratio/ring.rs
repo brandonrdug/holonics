@@ -1,12 +1,14 @@
 //! Exact machine rings used for ratio arithmetic and the portable section realization.
 //!
 //! `ModularWords` is a host-side chart over `Z/modulus`. At `MERSENNE61`, its reduction dispatches
-//! to the same portable section arithmetic compiled by the detached CUDA kernel; every other
+//! to the exact section arithmetic in [`section`], which the CUDA kernels mirror; every other
 //! modulus uses the general exact `u128` path.
 
 use std::fmt;
 
-use holonics_portable::section_layout_cuda as section_cuda;
+pub mod section;
+
+use self::section as section_cuda;
 use thiserror::Error;
 
 /// A modulus that cannot name a ring with at least two elements.

@@ -6,26 +6,20 @@
 
 pub mod alpha;
 mod apertures;
-mod application;
 mod checkpoint;
 mod composed_variant;
-mod diffusion;
 mod hna;
 mod input_material;
-mod material_codec;
 pub mod native;
 mod publication;
-mod receivers;
 mod recurrent_operator;
 mod session;
 mod stream;
 mod text_session;
-mod world_application;
 
 pub use holonic_engine::native_ecology::holonic_intelligence::{NativeEmissionReadout,NativeEmissionProjection};
 
 pub use apertures::addressed_ingress;
-pub use application::{AthenaAlphaAdmission, AthenaAlphaApplication, AthenaAlphaError};
 pub use checkpoint::{
     read_checkpoint, save_checkpoint_new, CheckpointError, HnaBaseDependency, HnaCheckpointReceipt,
     HnaFileDependency, HnaInputMaterialDependency,
@@ -36,18 +30,13 @@ pub use composed_variant::{
     ComposedVariant, DeclaredDecoder, ProductVector, ReceiptDerivation, ReleaseReceipt,
     SaturationReceipt, SaturationStep, COMPOSED_DEED_SCOPE, COMPOSED_VARIANT_SCHEMA,
 };
-pub use diffusion::declared_diffusion_law;
 pub use hna::{
     inspect_native_restricted_rest, run_hna, HnaCultivationAperture, HnaCycleReceipt, HnaError,
     HnaOccurrence, HnaRestrictedInspection, HnaRunReceipt, HnaRunRequest, HnaSource, HnaSourceKind,
     HNA_RUN_SCHEMA,
 };
 pub use input_material::HnaInputAcquisitionReceipt;
-pub use material_codec::{
-    render_material_artifact, AthenaMaterialArtifact, AthenaMaterialCodecError,
-};
 pub use publication::{publish_new, PublicationError, PublicationReceipt};
-pub use receivers::{inspect_cycle, AthenaAlphaCycleReceipt};
 pub use recurrent_operator::{
     AthenaRecurrentApplicationError, AthenaRenderedTokenFace, AthenaTextOccurrenceApplication,
     AthenaTokenApplication, AthenaVocabularyFace,
@@ -61,9 +50,6 @@ pub use stream::{
     HnaStreamState, HNA_STREAM_EVENT_SCHEMA, HNA_STREAM_REQUEST_SCHEMA,
 };
 pub use text_session::{HnaTextApplication, HnaTextContinuation, HnaTextDisposition, HnaTextStep};
-pub use world_application::{
-    ApplicationWorldError, ApplicationWorldReturn, ExactReadbackWorld, ProcessArtifactWorld,
-};
 
 pub const ATHENA_ALPHA_APPLICATION_SCHEMA: &str = "org.holonics.athena-alpha.application.v1";
 pub const BASE_CONFIGURATION: &str = include_str!("../configurations/base.json");

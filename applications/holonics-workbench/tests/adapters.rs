@@ -2,44 +2,15 @@ use std::fs;
 use std::io::Write;
 use std::process::{Command, Stdio};
 
-use holonics_hna::AthenaAlphaApplication;
-use holonic_engine::native_spool::fixture;
 use holonics_workbench::{
-    AthenaCommand, DiagnosticCommand, EngineCommand, ErosCommand, EventLevel, ExportCodecArgument,
-    SoulkillerCommand, WorkbenchCommand, WorkbenchEvent, WorkbenchRequest, WorkbenchResponse,
-    WorkbenchRuntime,
+    DiagnosticCommand, EventLevel, SoulkillerCommand, WorkbenchCommand, WorkbenchEvent,
+    WorkbenchRequest, WorkbenchResponse, WorkbenchRuntime,
 };
-use life::native_intelligence::NativeCirculationConfiguration;
 use tempfile::tempdir;
 
-/// Write one generation-zero snapshot of the engine's declared native body. Nothing is lifted: the
-/// workbench opens it exactly the way an operator opens any other snapshot.
-fn declared_snapshot(path: &std::path::Path) {
-    let mut configuration: NativeCirculationConfiguration =
-        serde_json::from_str(holonics_hna::BASE_CONFIGURATION).expect("configuration");
-    configuration.address.receiver = fixture::FIXTURE_RECEIVER;
-    let admission =
-        AthenaAlphaApplication::from_dismantling_return(fixture::detached_returned(), configuration)
-            .expect("declared admission");
-    fs::write(
-        path,
-        admission
-            .application
-            .snapshot()
-            .expect("snapshot")
-            .canonical_bytes()
-            .expect("snapshot wire"),
-    )
-    .expect("declared snapshot");
-}
-
 #[test]
-fn eros_soulkiller_engine_and_cli_return_shared_structured_events() {
+fn diagnostic_soulkiller_and_cli_return_shared_structured_events() {
     let temporary = tempdir().expect("temporary");
-    let material = temporary.path().join("material");
-    fs::create_dir(&material).expect("material directory");
-    fs::write(material.join("one.md"), b"alpha beta alpha\n").expect("material one");
-    fs::write(material.join("two.md"), b"beta gamma beta\n").expect("material two");
     let config = temporary.path().join("config.json");
     fs::write(
         &config,
@@ -52,51 +23,16 @@ fn eros_soulkiller_engine_and_cli_return_shared_structured_events() {
         br#"{"metadata":{"total_size":32},"weight_map":{"a.weight":"one.safetensors","b.weight":"two.safetensors"}}"#,
     )
     .expect("index");
-    let snapshot = temporary.path().join("alpha.snapshot.json");
-    let declared = temporary.path().join("declared.snapshot.json");
-    let onnx = temporary.path().join("alpha.onnx");
-    declared_snapshot(&declared);
 
     let mut runtime = WorkbenchRuntime::new();
     for command in [
         diagnostic(DiagnosticCommand::Status),
         diagnostic(DiagnosticCommand::Capabilities),
-        diagnostic(DiagnosticCommand::Eros(ErosCommand::Mouth {
-            directory: material.clone(),
-            extension: "md".to_owned(),
-            radius: 2,
-            scales: 2,
-            octet_budget: 1_000,
-        })),
-        diagnostic(DiagnosticCommand::Eros(ErosCommand::Atlas {
-            directory: material,
-            extension: "md".to_owned(),
-            octet_budget: 1_000,
-        })),
         diagnostic(DiagnosticCommand::Soulkiller(SoulkillerCommand::Config {
             path: config,
         })),
         diagnostic(DiagnosticCommand::Soulkiller(SoulkillerCommand::Index {
             path: index,
-        })),
-        diagnostic(DiagnosticCommand::Athena(AthenaCommand::Open {
-            session: "alpha".to_owned(),
-            snapshot: declared,
-        })),
-        diagnostic(DiagnosticCommand::Athena(AthenaCommand::Snapshot {
-            session: "alpha".to_owned(),
-            path: snapshot.clone(),
-        })),
-        diagnostic(DiagnosticCommand::Engine(EngineCommand::Package {
-            path: snapshot.clone(),
-        })),
-        diagnostic(DiagnosticCommand::Engine(EngineCommand::Export {
-            package: snapshot,
-            codec: ExportCodecArgument::Onnx,
-            path: onnx.clone(),
-        })),
-        diagnostic(DiagnosticCommand::Soulkiller(SoulkillerCommand::Onnx {
-            path: onnx,
         })),
     ] {
         let events = runtime.execute(command);
@@ -126,7 +62,7 @@ fn eros_soulkiller_engine_and_cli_return_shared_structured_events() {
         .output()
         .expect("CLI help");
     let help = String::from_utf8(help.stdout).expect("help UTF-8");
-    for command in ["workspace", "diagnostic", "run"] {
+    for command in ["hna", "diagnostic", "run"] {
         assert!(help.contains(command), "help omitted {command}");
     }
 }
@@ -134,9 +70,6 @@ fn eros_soulkiller_engine_and_cli_return_shared_structured_events() {
 #[test]
 fn cli_shorthand_and_structured_stdin_share_one_response_envelope() {
     let binary = env!("CARGO_BIN_EXE_holonics");
-    let temporary = tempdir().expect("temporary");
-    let cli_declared = temporary.path().join("declared.snapshot.json");
-    declared_snapshot(&cli_declared);
     let direct = Command::new(binary)
         .args(["--format", "json", "diagnostic", "status"])
         .output()
@@ -187,7 +120,7 @@ fn cli_shorthand_and_structured_stdin_share_one_response_envelope() {
     assert!(invalid.obstructed());
 
     let malformed_cli = Command::new(binary)
-        .args(["--format", "json", "diagnostic", "athena", "not-a-command"])
+        .args(["--format", "json", "diagnostic", "soulkiller", "not-a-command"])
         .output()
         .expect("malformed CLI");
     assert_eq!(malformed_cli.status.code(), Some(2));
@@ -195,26 +128,12 @@ fn cli_shorthand_and_structured_stdin_share_one_response_envelope() {
         serde_json::from_slice(&malformed_cli.stdout).expect("malformed CLI response");
     assert!(malformed_cli.obstructed());
 
-    let declared_path = cli_declared.to_str().expect("declared path");
-    // The JSON response envelope echoes its request command, and a nested internally tagged
-    // diagnostic command emits `action` twice, so the envelope of a `diagnostic athena` request
-    // cannot be read back. That defect predates this test; the JSON envelope is exercised above
-    // through `diagnostic status`, and the session command is exercised here in human form.
-    let human_open = Command::new(binary)
-        .args(["diagnostic", "athena", "open", "cli-alpha", declared_path])
-        .output()
-        .expect("human open");
-    assert!(human_open.status.success());
-    let human_open = String::from_utf8(human_open.stdout).expect("human open UTF-8");
-    assert!(human_open.contains("MORPHOLOGY"));
-    assert!(!human_open.contains("\"anatomy\""));
-
     let noninteractive = Command::new(binary)
         .stdin(Stdio::null())
         .output()
         .expect("noninteractive no-command control");
     assert!(noninteractive.status.success());
-    assert!(String::from_utf8_lossy(&noninteractive.stdout).contains("workspace"));
+    assert!(String::from_utf8_lossy(&noninteractive.stdout).contains("diagnostic"));
     assert!(!String::from_utf8_lossy(&noninteractive.stderr).contains("panicked"));
 }
 
@@ -230,11 +149,6 @@ fn missing_and_malformed_exterior_material_refuses_without_execution() {
         })),
         diagnostic(DiagnosticCommand::Soulkiller(SoulkillerCommand::Onnx {
             path: temporary.path().join("absent.onnx"),
-        })),
-        diagnostic(DiagnosticCommand::Eros(ErosCommand::Atlas {
-            directory: temporary.path().join("absent"),
-            extension: "md".to_owned(),
-            octet_budget: 10,
         })),
     ] {
         let event = runtime.execute(command).remove(0);

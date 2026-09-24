@@ -12,10 +12,8 @@ publish = false
 name = "holonics_cuda"
 path = "src/lib.rs"
 
-# `holonics-portable` is the no_std law crate. mount-link-gate stages the configuration-fold GATE DATA and the
 # host reference through the SAME law code the CUDA kernel compiles for nvptx — one mouth, both sides.
 [dependencies]
-holonics-portable = { path = "../holonics-portable" }
 # The backend consumes the framework's exact ratio rings; the framework does not depend on CUDA.
 holonics = { path = "../holonics" }
 
@@ -23,22 +21,3 @@ holonics = { path = "../holonics" }
 name = "mount-smoke"
 path = "src/bin/mount-smoke.rs"
 
-[[bin]]
-name = "mount-link-gate"
-path = "src/bin/mount-link-gate.rs"
-
-[[bin]]
-name = "mount-founded-gate"
-path = "src/bin/mount-founded-gate.rs"
-
-[[bin]]
-name = "mount-chart-gate"
-path = "src/bin/mount-chart-gate.rs"
-
-[[bin]]
-name = "mount-scope-gate"
-path = "src/bin/mount-scope-gate.rs"
-
-[[bin]]
-name = "mount-register-gate"
-path = "src/bin/mount-register-gate.rs"
