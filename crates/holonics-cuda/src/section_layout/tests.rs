@@ -6,8 +6,8 @@
 //! refusals.  The device tests are `#[ignore]`d and assert bit-for-bit agreement with the exact cpu
 //! reference on the three declared cases, reporting honestly separated costs.
 //!
-//! **`mount` cannot depend on `holonic-engine`**: the engine already depends on `mount`
-//! (`crates/holonic-engine/Cargo.toml:16`), so a dependency either way — including a
+//! **`holonics-cuda` cannot depend on `holonic-engine`**: the engine already depends on this
+//! backend, so a dependency either way — including a
 //! dev-dependency — would be a cycle through the crate this owner lives in.  Case (c) therefore
 //! builds an *equivalent* irregular incidence in the test rather than importing
 //! `physical_constraint_grading`'s contact complex: ragged region widths, non-monotone address
@@ -15,6 +15,7 @@
 //! several others at once.  That is stated rather than implied.
 
 use super::*;
+use holonics::ratio::ring::{CheckedIntegers, RingRefusal};
 use crate::launch_law::{LaunchClause, LaunchLimits, ScatterLaw};
 use crate::Dim3;
 

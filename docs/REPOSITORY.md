@@ -65,7 +65,8 @@ current owner from target owner throughout the migration.
 
 | Former location | Current location |
 |---|---|
-| `soma/{body,abi,surface,life}` | Corresponding substrate and lifecycle libraries under `crates/` |
+| `soma/{abi,surface,life}` | Corresponding surviving substrate and lifecycle libraries under `crates/` |
+| `soma/body` | `crates/holonics-portable` (shared `no_std` laws) |
 | `soma/mount` | `crates/holonics-cuda` (package `holonics-cuda`, Rust library `holonics_cuda`) |
 | `soma/membrane` | `crates/holonics/src/membrane` |
 | `applications/athena-alpha` | `crates/holonics-hna` |

@@ -24,19 +24,16 @@ dependency direction is `holonics-portable → holonics → holonics-cuda`; `hol
 portable section ABI. The `holonic-words` manifest, workspace member and lockfile package are
 removed.
 
-## Verification pending
+## Verified return
 
-No Cargo or CUDA build was run for this cut. Focused gates:
+The focused owner, consumer, workspace and card gates passed:
 
-- `cargo test -p holonics --lib ratio::ring -j 2`
-- `cargo check -p holonics --all-targets -j 2`
-- `cargo check -p holonics-cuda --all-targets -j 2`
-- `cargo test -p holonics-cuda --lib section_layout -- --test-threads=2`
-- `cargo check -p holonic-engine --all-targets -j 2`
-- `cargo check -p holonics-hna --all-targets -j 2`
-- `cargo tree -p holonics` to confirm no `holonic-words` or CUDA edge.
-- Run the ignored section-adoption card tests under `.local/gpu.lock` against the unchanged PTX.
+- `cargo test -p holonics --lib ratio::ring -j 2`: 2 passed; 19 prime-image consumer tests also passed
+- `cargo check --locked --workspace --all-targets -j 2`: passed (4m30s); the scoped CUDA lib check after test-only import cleanup passed without a new warning
+- `cargo test -p holonics-cuda --lib section_layout -- --test-threads=2`: 44 passed, 4 device-only ignored
+- `cargo tree -p holonics`: no `holonic-words` or CUDA edge; Cargo metadata reports 11 workspace packages.
+- Four ignored `holonics-cuda::section_layout` card tests under `.local/gpu.lock`: 4 passed on the unchanged PTX, including the canonical-table refusal and exact generated triple.
 
-No NVPTX source or PTX code changed: the kernel still compiles the unchanged
+The final affected logs and receipt rows are in `docs/VERIFICATION_RECEIPTS.tsv`. No NVPTX source or PTX code changed: the kernel still compiles the unchanged
 `holonics-portable::section_layout_cuda`; only host-side ring ownership, section admission, and the
 CUDA crate's dependency on main changed.

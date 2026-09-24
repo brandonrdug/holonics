@@ -26,7 +26,7 @@ composition. The intended generally useful Athena assistant is still under const
 
 ## The checkout today
 
-The root `Cargo.toml` currently declares **12 workspace packages** (9 libraries and three applications).
+The root `Cargo.toml` currently declares **11 workspace packages** (8 libraries and three applications).
 The restructuring work is in progress; these are the paths that exist now.
 
 | Path | Current role |

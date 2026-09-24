@@ -60,9 +60,7 @@
 use std::collections::BTreeMap;
 use std::fmt;
 
-use holonics::ratio::ring::{
-    AccumulationLaw, CheckedIntegers, ExactRing, ModularWords, RingRefusal,
-};
+use holonics::ratio::ring::{AccumulationLaw, ExactRing, ModularWords};
 use holonics_portable::section_layout_cuda as section_cuda;
 
 use crate::launch_law::{
