@@ -18,20 +18,20 @@ depends on the portable base as before. There is no cycle or forwarding module.
 Moved the four D3 section-ring tests and `RING_PROBES` out of the ABI crate's test module and beside
 the portable implementation. The independent REGISTER entry-symbol test remains with ABI tests.
 
-## Verification pending
+## Verification
 
-No Cargo or kernel build was run in this source cut. Required focused gates:
+- `cargo test -p holonics-portable -j 2`: 153 passed, 0 failed, 2 ignored, including all four moved
+  section-ring tests.
+- `cargo test -p soma-abi -j 2`: 24 passed, 0 failed; the retained register-entry test passes.
+- All-target checks passed for `holonic-words`, `holonics`, `holonics-cuda`, and `holonics-hna`.
+- `accelerators/cuda-kernel/build-ptx.sh` on pinned `nightly-2026-05-22` and `ptxas -arch=sm_89`:
+  passed.
+- Ignored `holonic-engine::section_layout_adoption` device tests under `.local/gpu.lock`: 2 passed,
+  0 failed, 0 ignored in the dev profile against the regenerated PTX.
 
-- `cargo test -p holonics-portable -j 2`
-- `cargo check -p holonic-words --all-targets -j 2`
-- `cargo check -p holonics --all-targets -j 2`
-- `cargo test -p holonics-cuda --lib section_layout -- --test-threads=2`
-- `cargo check -p holonics-cuda --all-targets -j 2`
-- `cargo check -p holonics-hna --all-targets -j 2`
-- Rebuild `accelerators/cuda-kernel/build-ptx.sh` on its pinned toolchain, validate with `ptxas`,
-  compare exported entry names/signatures and normalized instruction bodies, then run the ignored
-  `holonic-engine::section_layout_adoption` CUDA tests under `.local/gpu.lock` against that PTX.
-
-The PTX source dependency changes and will need regeneration after these gates. Its owner must
-review the regenerated file for stable path mapping, unchanged public entries, and equivalent
-device instruction bodies before committing that artifact.
+The PTX was regenerated because the module's Rust crate owner changed. The prior artifact SHA-256
+was `ab4d5b519b76abfa72fafecf70a0ec763a33c85e373ed92f0f9188a54c61af08`; the regenerated artifact
+is `c42c65c86a687b8f7baf1ed7d215ca982a7e13b21cf882190219c00fd1726d3a`. All 37 exported entry
+names and parameter-type sequences match. After normalizing Rust-mangled, LLVM and anonymous
+symbol hashes, the complete PTX text is identical: zero remaining hunks, including instruction
+bodies and source strings. The build script's stable `/holonics` path remap is active.

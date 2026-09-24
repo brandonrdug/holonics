@@ -698,7 +698,8 @@ existing suites (§0.9):
    now owns the former `holonic-body` source unchanged apart from crate naming and the shared
    `section_layout_cuda` arithmetic/entry ABI; remaining ABI/word consolidation and its host/device
    gates remain pending. The [portable section ABI move](census/M1_PORTABLE_SECTION_LAYOUT_MOVE.md)
-   still awaits its focused host, PTX, and card gates. [Structure](census/M1_STRUCTURE_OWNER_MOVE.md) and
+   now passes its focused portable/host checks, pinned PTX validation, exported ABI parity and
+   section-adoption card tests. [Structure](census/M1_STRUCTURE_OWNER_MOVE.md) and
    [geometry](census/M1_GEOMETRY_OWNER_MOVE.md) now have internal main-library source and measured
    gates. The exact causal-chord equation extractor now belongs to `holonics::receiver::causal_chord`; its
    portable laws move with it and engine-owner comparisons remain engine integration tests.
