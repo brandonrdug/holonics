@@ -5,7 +5,7 @@
 //! test beside it. Nothing here needs a fixture.
 
 use super::*;
-
+use crate::law::receiver::{Horizon, INDEX_HORIZON_CEILING};
 use num_traits::One;
 
 fn ratio(numerator: i64, denominator: i64) -> Rat {
@@ -586,7 +586,7 @@ fn a_factor_map_is_the_induced_reading_of_a_descent() {
             .collect(),
     };
     let indices: Vec<usize> = (0..members.len()).collect();
-    let descent = holonics::restriction::factor_descent(
+    let descent = crate::restriction::factor_descent(
         &quotient,
         |k: &usize| coarse.read(&members[*k]).expect("a face"),
         &indices,
@@ -909,6 +909,33 @@ fn a_law_releasing_outside_its_declared_tolerance_is_refused() {
     assert!(matches!(
         refusal,
         WidthRefusal::ReleasedOutsideTolerance(ref claim) if claim.law == "lying"
+    ));
+}
+
+/// Lean: `ReleaseLaw.widenSound`. A named tolerance must actually contain the measured width.
+#[test]
+fn a_widening_proposal_below_the_measured_width_is_refused() {
+    struct TooNarrow;
+    impl DecisionLaw for TooNarrow {
+        fn name(&self) -> &str {
+            "too-narrow-widening"
+        }
+
+        fn decide(&self, _options: &LawfulOptions) -> ReleaseReturn {
+            ReleaseReturn::Widen {
+                tolerance: integer(3),
+            }
+        }
+    }
+
+    let options = plural_options(); // measured width is 4
+    let refusal = release(&TooNarrow, &options).expect_err("width 4 is not inside tolerance 3");
+    assert!(matches!(
+        refusal,
+        WidthRefusal::WidenTooNarrow(ref claim)
+            if claim.law == "too-narrow-widening"
+                && claim.width == integer(4)
+                && claim.tolerance == integer(3)
     ));
 }
 

@@ -6,7 +6,7 @@
 //! (`holonics::restriction::tube`) in phase 6 of
 //! `docs/plans/THE_HOLON_CORE_FOUNDS_THE_NATIVE_MACHINERY.md`, and the two-axis horizon, the defect
 //! profile and the route plan followed in phase 7 to `holonics::restriction::tube::horizon`,
-//! once `receiver_release`'s `Horizon`, width and `ExactFace` and `relation_ladder`'s `Rung` became
+//! once `holonics::receiver::release`'s `Horizon`, width and `ExactFace` and `relation_ladder`'s `Rung` became
 //! core receiver faces (`holonics::law::receiver`). Every moved item is re-exported here at
 //! its old path. What stays is the tubes whose sections are engine presentations: the grain tube
 //! over `grain_tower`, the presentation tube over `physical_constraint_complex`, and the grain
@@ -244,7 +244,7 @@ impl StationedTower for GrainReadingTube {
 // =============================================================================================
 
 /// [definition] **The horizon, profile and route layers moved to the core** (plan phase 7): once
-/// `receiver_release`'s `Horizon`, width and `ExactFace` and `relation_ladder`'s `Rung` became core
+/// `holonics::receiver::release`'s `Horizon`, width and `ExactFace` and `relation_ladder`'s `Rung` became core
 /// receiver faces (`holonics::law::receiver`), these layers had no engine dependency left and
 /// joined the core tube at `holonics::restriction::tube::horizon`. Every item is re-exported
 /// here at its existing path.

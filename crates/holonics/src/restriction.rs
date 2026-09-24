@@ -39,7 +39,7 @@
 //! factoring as a witness or a typed defect built on [`tower::Transition::residual`]; the tube's
 //! per-face `tube::SquareDefect` is the pointwise chart of the operator [`SquareDefect`] here
 //! ([`LinearTube`], `tube::SquareDefect::route_difference`). The engine's coarsening, grain,
-//! standing and receiver-exact quotients are instances (`receiver_release::CoarseningTower::descent`,
+//! standing and receiver-exact quotients are instances (`crate::receiver::release::CoarseningTower::descent`,
 //! `continuing_tube::SquareVerdict::descent` on the grain tube, `standing::sufficiency_descent`,
 //! `receiver_exact_compression::one_shot_descent`), and the engine's Schur boundary transfer
 //! (`diffusion::compile_diffusion_transfer`) is a [`KronReduction`] reading.

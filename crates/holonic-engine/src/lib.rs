@@ -463,7 +463,6 @@ pub mod receiver_phase_atlas;
 // an exact zonotope enclosure under `causal_chord`'s linear dynamics — and the caller-declared
 // release law whose lawful returns are hold, widen, ask, release-coarser and
 // no-continuation-bridges. Paired with `Foundation/ReceiverRelease.lean`.
-pub mod receiver_release;
 pub mod regime_reading;
 // T1 — the relation ladder: one typed scale between two occurrences (identity, continuation,
 // isomorphism, receiver equality, equal potential, tolerance) with its order, its bounded
@@ -546,7 +545,7 @@ pub mod multiquadratic;
 pub mod spine_cut;
 // T2 of the generalized-transport plan: standing as the retained residue of passages, memory
 // as a generator `m_t = D_t(S_t, c_t)`, the receiver that keeps changing after its source
-// stops, and effective extinction read as `receiver_release`'s width inside tolerance on the
+// stops, and effective extinction read as `holonics::receiver::release`'s width inside tolerance on the
 // two-point family. Paired with `Foundation/Standing.lean`.
 pub mod statement_composition;
 pub mod statement_grammar;

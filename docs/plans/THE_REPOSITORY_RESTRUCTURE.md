@@ -723,7 +723,14 @@ existing suites (§0.9):
    The source-neutral codec reflection/continuation relation is folded into
    `holonics::generator::reflection`; `holonic-life` callers are retargeted and the separate
    `holonic-language` package is retired. The [reflection owner audit](census/M1_REFLECTION_OWNER_MOVE.md)
-   records its checked Lean peer and pending focused gates.
+   records its checked Lean peer and pending focused gates. Receiver width, exact affine enclosure,
+   coarsening and caller-declared release now live in `holonics::receiver::release`; face and
+   passive-reading laws plus the two-axis Horizon value remain in `holonics::law::receiver`, while
+   tube reach and horizon composition remain in `holonics::restriction::tube::horizon`
+   ([owner move](census/M1_RECEIVER_RELEASE_MOVE.md)). Rust now refuses a `Widen` proposal below
+   measured width as required by Lean `ReleaseLaw.widenSound`; the prior executable law accepted
+   that invalid proposal. Lean states generic finite-family width and release laws but does not
+   formalize the Rust zonotope carrier, matrix transport implementation or work ceilings.
 8. **M2: the Lean move.** Move paths to `lean/` (`Holonics` and `HolonicsResearch`) and build both
    targets. Rename `Soma.Holonics` to `Holonics` as a separate mechanical commit.
 9. **D: documents (the restructure's closing acceptance).** All to the verified paths:

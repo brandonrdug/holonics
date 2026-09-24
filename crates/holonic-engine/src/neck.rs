@@ -22,7 +22,7 @@
 //! domains, so they cannot be mixed by arithmetic:
 //!
 //! * [`GeometricSection`] — `A(s)`, an exact nonnegative rational with a declared unit lineage.
-//! * [`ReceiverUncertaintyWidth`] — a wrapper over `receiver_release`'s own
+//! * [`ReceiverUncertaintyWidth`] — a wrapper over `holonics::receiver::release`'s own
 //!   [`ReceiverWidth`](holonics::law::receiver::ReceiverWidth), so the diameter here **is** that
 //!   owner's diameter and release is that owner's width-zero condition.
 //! * [`AnalyticWidth`] — the distance from the real axis to the nearest pole, taken from
@@ -81,7 +81,7 @@
 //! [definition] The neck is `argmin A_i`. Its typed reading is [`NeckReading`]:
 //! `Open` while the section exceeds the receiver's declared grain; `Pinhole` when the section is a
 //! single point at that grain **while the interior is still plural**, which is exactly
-//! `receiver_release`'s release condition — width zero at the receiver, plurality retained inside;
+//! `holonics::receiver::release`'s release condition — width zero at the receiver, plurality retained inside;
 //! and `Closed` at a zero section, where the flux must vanish or the residual is returned.
 //! [`TubeProfile::reopening`] reports what widens after it.
 //!
@@ -90,9 +90,9 @@
 //! [proved-derived; implemented-exact] [`RayTransfer`] is an exact `2×2` rational ray-transfer
 //! matrix on `(height, angle)`. Free propagation and a thin lens are unimodular; a refracting
 //! interface has determinant `n₁/n₂`. A declared input bundle is an
-//! [`ExactZonotope`](crate::receiver_release::ExactZonotope) box — half-height `y₀`, half-angle
+//! [`ExactZonotope`](holonics::receiver::release::ExactZonotope) box — half-height `y₀`, half-angle
 //! `θ₀` — and its transverse half-extent after a transfer is
-//! `receiver_release`'s own `coordinate_half_extent`, which for the box is `|A| y₀ + |B| θ₀`. The
+//! `holonics::receiver::release`'s own `coordinate_half_extent`, which for the box is `|A| y₀ + |B| θ₀`. The
 //! **focus** is the station where that vanishes: for a point source `y₀ = 0` it is exactly `B = 0`.
 //! At that station the angular half-extent is still positive and the **reduced étendue**
 //! `n · (phase area)` is unchanged — the geometric width has gone to zero while the bundle is
@@ -156,7 +156,7 @@ use holonics::law::receiver::Horizon;
 use holonics::law::receiver::LinearReading;
 use holonics::law::receiver::ReceiverWidth;
 use holonics::law::receiver::WidthRefusal;
-use crate::receiver_release::{CompatibleFamily, ExactZonotope, width_enclosed};
+use holonics::receiver::release::{CompatibleFamily, ExactZonotope, width_enclosed};
 use crate::topological_receiver::{
     ClosedPolygon, ProjectionDirection, TopologicalError, linking_number,
 };
@@ -306,7 +306,7 @@ impl GeometricSection {
     }
 }
 
-/// **(b) The receiver's uncertainty width**, which is `receiver_release`'s own width.
+/// **(b) The receiver's uncertainty width**, which is `holonics::receiver::release`'s own width.
 ///
 /// [definition] A wrapper, not a re-founding: the diameter, the norm and the witness are that
 /// owner's and are read back through it. Release is
@@ -318,7 +318,7 @@ pub struct ReceiverUncertaintyWidth {
 }
 
 impl ReceiverUncertaintyWidth {
-    /// Wrap a width taken by `receiver_release`, with the domain the caller read it in.
+    /// Wrap a width taken by `holonics::receiver::release`, with the domain the caller read it in.
     pub fn declare(width: ReceiverWidth, domain: impl Into<String>) -> Self {
         Self {
             width,
@@ -326,7 +326,7 @@ impl ReceiverUncertaintyWidth {
         }
     }
 
-    /// The width this reading is: `receiver_release`'s object, whole.
+    /// The width this reading is: `holonics::receiver::release`'s object, whole.
     pub fn width(&self) -> &ReceiverWidth {
         &self.width
     }
@@ -1015,7 +1015,7 @@ pub enum NeckReading {
         grain: Rat,
     },
     /// **The pinhole.** A single point at the receiver's grain while plural inside — the width-zero
-    /// condition of `receiver_release` with the plurality retained, which is release.
+    /// condition of `holonics::receiver::release` with the plurality retained, which is release.
     Pinhole {
         station: usize,
         section: Rat,
@@ -1240,7 +1240,7 @@ pub fn holonomy_is_identity(verdict: &HolonomyVerdict<usize, usize, Rat>) -> boo
 
 /// The receiver that reads a neck tube's flux face, as `continuing_tube`'s own `FaceReading`.
 ///
-/// [definition] The return is `receiver_release`'s [`ExactFace`], so the diameter law is that
+/// [definition] The return is `holonics::receiver::release`'s [`ExactFace`], so the diameter law is that
 /// owner's and is not written a second time here.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FluxReading {
@@ -1268,8 +1268,8 @@ impl FaceReading<NeckTube> for FluxReading {
 /// **The neck's receiver uncertainty width over the two-axis horizon `(h, k)`.**
 ///
 /// [definition] Composes `continuing_tube`'s [`horizon_reach`] and [`two_axis_width`], which are
-/// `receiver_release`'s own width taken over everything the declared horizon reaches. The `(h, k)`
-/// pair is `receiver_release`'s [`Horizon`] and is the longitudinal station and the grain index —
+/// `holonics::receiver::release`'s own width taken over everything the declared horizon reaches. The `(h, k)`
+/// pair is `holonics::receiver::release`'s [`Horizon`] and is the longitudinal station and the grain index —
 /// **not** the time/entropy pair. The returned width is wrapped so a caller cannot confuse it with
 /// the geometric section: they meet only through a [`ConstitutiveLink`].
 pub fn neck_two_axis_width(
@@ -1430,7 +1430,7 @@ impl RayTransfer {
     }
 }
 
-/// **A declared input ray bundle: a box in `(height, angle)`, carried as `receiver_release`'s own
+/// **A declared input ray bundle: a box in `(height, angle)`, carried as `holonics::receiver::release`'s own
 /// enclosure.**
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RayBundle {
@@ -1505,12 +1505,12 @@ impl RayBundle {
         &self.index
     }
 
-    /// The enclosure, as `receiver_release` carries it.
+    /// The enclosure, as `holonics::receiver::release` carries it.
     pub fn hull(&self) -> &ExactZonotope {
         &self.hull
     }
 
-    /// The compatible family this bundle is, in `receiver_release`'s own type.
+    /// The compatible family this bundle is, in `holonics::receiver::release`'s own type.
     pub fn family(&self) -> CompatibleFamily {
         CompatibleFamily::enclosed(self.lineage.clone(), self.hull.clone())
     }
@@ -1525,11 +1525,11 @@ pub struct OpticalStation {
     pub transfer: RayTransfer,
     /// The refractive index of the medium here.
     pub index: Rat,
-    /// The transverse half-extent, taken by `receiver_release`'s own width on the mapped hull.
+    /// The transverse half-extent, taken by `holonics::receiver::release`'s own width on the mapped hull.
     pub transverse_half_extent: Rat,
     /// The angular half-extent, same reading on the other coordinate.
     pub angular_half_extent: Rat,
-    /// `receiver_release`'s width of the height reading over the mapped family.
+    /// `holonics::receiver::release`'s width of the height reading over the mapped family.
     pub receiver_width: ReceiverWidth,
     /// Four times the absolute determinant of the two generators: the phase-space area. A
     /// point-source bundle carries one generator and therefore zero area — correctly, and the
@@ -1647,7 +1647,7 @@ fn optical_station(
     let mapped = bundle.hull.mapped(&cumulative.matrix)?;
     let transverse = mapped.coordinate_half_extent(0)?;
     let angular = mapped.coordinate_half_extent(1)?;
-    // The height reading, taken by `receiver_release` itself over the mapped family.
+    // The height reading, taken by `holonics::receiver::release` itself over the mapped family.
     let reading = LinearReading {
         receiver: format!("{name}|height"),
         matrix: ExactRatMatrix::new(vec![vec![Rat::one(), Rat::zero()]])?,

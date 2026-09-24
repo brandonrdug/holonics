@@ -1541,7 +1541,7 @@ use holonics::law::receiver::DiameterNorm;
 use holonics::law::receiver::ExactFace;
 use holonics::law::receiver::Reading;
 use holonics::law::receiver::WidthRefusal;
-use crate::receiver_release::{CompatibleFamily, width_enumerated};
+use holonics::receiver::release::{CompatibleFamily, width_enumerated};
 
 const STRUCTURE_ROOT_ENV: &str = "HOLONICS_M5_STRUCTURE_ROOT";
 const DEFAULT_STRUCTURE_ROOT: &str = "/home/b/Downloads/holonics-m5-rbx1-rank05";

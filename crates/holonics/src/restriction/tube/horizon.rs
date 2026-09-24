@@ -2,7 +2,7 @@
 //!
 //! [definition] Plan phase 7 ([plan](../../../../../docs/plans/THE_HOLON_CORE_FOUNDS_THE_NATIVE_MACHINERY.md)):
 //! these layers waited in `crates/holonic-engine/src/continuing_tube.rs` for the receivers, because
-//! they read a tube through `receiver_release`'s `Horizon`, width and `ExactFace` and through
+//! they read a tube through `crate::receiver::release`'s `Horizon`, width and `ExactFace` and through
 //! `relation_ladder`'s `Rung`. Those are now core receiver faces ([`crate::law::receiver`]), so the
 //! layers join the core tube here; the engine file re-exports every item at its existing path and
 //! keeps only the tubes over engine material (the grain tube over `grain_tower`, the presentation
@@ -69,7 +69,7 @@ pub const DECLARED_CANDIDATE_CEILING: usize = 4096;
 /// per-axis ceilings bound the declaration; this bounds what the walk may actually accumulate, and
 /// exceeding it is a typed refusal rather than a silent truncation of the reach.
 ///
-/// It is `receiver_release::FAMILY_CEILING`, deliberately: [`two_axis_width`] reads the reach as a
+/// It is `crate::receiver::release::FAMILY_CEILING`, deliberately: [`two_axis_width`] reads the reach as a
 /// compatible family, so a reach this walk admits is always one that owner will read. A larger
 /// ceiling here would build reaches whose width is then refused.
 pub const DECLARED_REACH_CEILING: usize = 4096;
@@ -95,7 +95,7 @@ pub const DECLARED_SEARCH_CEILING: usize = 1 << 18;
 /// would have sized.
 ///
 /// This type is `Debug + PartialEq` and deliberately not `Clone`: its `Width` arm carries a
-/// `receiver_release::WidthRefusal`, which is neither, because that owner compares refusals by
+/// `crate::receiver::release::WidthRefusal`, which is neither, because that owner compares refusals by
 /// their rendered message rather than structurally.
 #[derive(Debug, PartialEq)]
 pub enum HorizonRefusal<S, I, F> {
@@ -210,7 +210,7 @@ pub type TubeRoutePlan<T> = RoutePlan<TubeStation<T>, TubeIndex<T>, TubeFace<T>>
 
 /// **The observer: a station and a chart of a tube.**
 ///
-/// [definition] `receiver_release`'s width reads at a horizon of `h` steps of `Φ`, which fixes
+/// [definition] `crate::receiver::release`'s width reads at a horizon of `h` steps of `Φ`, which fixes
 /// *where along the tube* the reading happens and says nothing about *at which grain*. An observer
 /// is both, and every two-axis reading below is relative to one.
 ///
@@ -986,9 +986,9 @@ fn push_reach_entry<S: Clone + Ord + Debug, I: Clone + Ord + Debug, F: Clone + E
 
 /// A declared exact reading of a tube's faces: the receiver of the two-axis horizon.
 ///
-/// [definition] `receiver_release::Reading` reads a `Vec<Rat>` compatible state; a tube's faces are
+/// [definition] `crate::receiver::release::Reading` reads a `Vec<Rat>` compatible state; a tube's faces are
 /// whatever its transverse section presents, so the receiver of a tube is this trait. Its return is
-/// the same [`ExactFace`], so the diameter law is `receiver_release`'s own and is not written a
+/// the same [`ExactFace`], so the diameter law is `crate::receiver::release`'s own and is not written a
 /// second time.
 pub trait FaceReading<T: StationedTower> {
     /// The receiver's declared name. It appears in every width and every profile.
@@ -1035,7 +1035,7 @@ where
 ///
 /// [definition] The diameter of the receiver's reading over everything the horizon reaches. At
 /// `k = 0` the reach is the observer's own chart carried `h` steps, so this **is**
-/// `receiver_release`'s `w_R(h)` — the existing theorems are its `k = 0` case and are not restated
+/// `crate::receiver::release`'s `w_R(h)` — the existing theorems are its `k = 0` case and are not restated
 /// here (`Foundation/ReceiverRelease.lean::twoAxisWidth_at_index_zero_is_the_longitudinal_width`).
 ///
 /// Monotone in each coordinate, because a wider horizon reaches a superset and

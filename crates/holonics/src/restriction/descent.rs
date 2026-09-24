@@ -33,7 +33,7 @@
 //! standing exactly when the future factors through it). A square break's retained residual
 //! reopening the fine motion is `Transition.reopen_apply` at `A_f x`, not a new law. The engine instances
 //! read through this owner: `continuing_tube::SquareVerdict::descent` (the tube square, including
-//! the grain tube), `receiver_release::CoarseningTower::descent`, `standing::sufficiency_descent`
+//! the grain tube), `crate::receiver::release::CoarseningTower::descent`, `standing::sufficiency_descent`
 //! and `receiver_exact_compression::one_shot_descent`.
 //!
 //! Every declared population is bounded ([`DESCENT_SOURCE_CEILING`]) before any transition runs;

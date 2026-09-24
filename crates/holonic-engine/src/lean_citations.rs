@@ -211,8 +211,8 @@ const MATHLIB_NAMES: [&str; 1] = ["Preorder"];
 fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
     vec![
         (
-            include_str!("receiver_release.rs"),
-            "receiver_release.rs",
+            include_str!("../../holonics/src/receiver/release.rs"),
+            "holonics/src/receiver/release.rs",
             "Foundation/ReceiverRelease.lean",
         ),
         (

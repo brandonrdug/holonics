@@ -572,10 +572,20 @@ stands.
 `h`, the width `w_R(h) = diam { R(Phi_h(x,u)) }` over compatible states and admitted inputs. A face
 is released when the width falls inside its **declared** tolerance; otherwise the lawful returns
 are exactly `Hold`, `Widen`, `Ask`, `ReleaseCoarser` and `NoContinuationBridges`. The owners are
-[`receiver_release.rs`](../../crates/holonic-engine/src/receiver_release.rs) and
+[`receiver/release.rs`](../../crates/holonics/src/receiver/release.rs) and
 [`Foundation/ReceiverRelease.lean`](../../formal/elementary-holonics/ElementaryHolonics/Foundation/ReceiverRelease.lean),
 built on `holonics::receiver::causal_chord`'s `Linearization` as the first real dynamics, on `exact_linear`'s exact
-matrix algebra, and on `receiver_atlas`'s preimage fibre and refinement order.
+matrix algebra, and on `receiver_atlas`'s preimage fibre and refinement order. Lean's generic `width` theorem ranges over nonempty finite families; Rust enumerates bounded
+families exactly or maps an exact rational zonotope exactly. For a smaller set enclosed by that
+zonotope, the enclosed width is a certified upper bound, corresponding to `width_le_of_bounds`.
+Lean does not currently prove that Rust's matrix mapping constructs that zonotope, or state its
+resource ceilings. The source-neutral
+Rust owner is now `holonics::receiver::release`; face values and passive readings remain owned by
+`holonics::law::receiver`. Lean's generic `width` theorem ranges over nonempty finite families;
+Rust enumerates bounded families exactly or maps an exact rational zonotope exactly. For a smaller
+set enclosed by that zonotope, the enclosed width is a certified upper bound, corresponding to
+`width_le_of_bounds`. Lean does not currently prove that Rust's matrix mapping constructs that
+zonotope, or state its resource ceilings.
 
 [definition] **Why R6 has its own owner rather than extending `receiver_atlas`.** The atlas
 contributes exactly two things to this item — the preimage fibre and the refinement order — and

@@ -23,10 +23,11 @@
 //!   [`width_over_readings`]), the two-axis [`Horizon`] and the relation ladder's [`Rung`]. A face
 //!   is what a coholon's value is charted as; it is not itself a port object.
 //!
-//! [definition] The face machinery moved here from `crates/holonic-engine/src/receiver_release.rs`
-//! (and [`Rung`] from `relation_ladder.rs`), which re-export every item at their existing paths;
-//! the wire forms (`holonics.receiver-width.v1`, the kebab-case face and witness tags, the
-//! validating `try_from` routes) are unchanged. They moved so that the tube's horizon, defect
+//! [definition] The face machinery moved here from
+//! `crates/holonic-engine/src/receiver_release.rs` (and [`Rung`] from `relation_ladder.rs`); the
+//! width wire forms (`holonics.receiver-width.v1`, kebab-case face and witness tags, validating
+//! `try_from` routes) are unchanged. Executable compatible-family dynamics and release decisions
+//! now live in [`crate::receiver::release`]. The faces moved so that the tube's horizon, defect
 //! profile and route plan could join the core restriction facet
 //! ([`crate::restriction::tube::horizon`]).
 //!
@@ -888,6 +889,17 @@ pub struct ReleasedClaim {
     pub tolerance: Rat,
 }
 
+/// A declared widening whose proposed tolerance is smaller than the measured width.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct WidenClaim {
+    /// The law that proposed it.
+    pub law: String,
+    /// The measured exact width that prompted widening.
+    pub width: Rat,
+    /// The exact tolerance the law proposed.
+    pub tolerance: Rat,
+}
+
 /// A coarser release offered against a tolerance other than the one it was searched under.
 /// Carried behind a box inside [`WidthRefusal::CoarserSearchedAtAnotherTolerance`], so the
 /// refusal stays small.
@@ -1141,6 +1153,12 @@ pub enum WidthRefusal {
         .0.law, .0.width, .0.tolerance
     )]
     ReleasedOutsideTolerance(Box<ReleasedClaim>),
+    /// A declared law proposed a widening tolerance smaller than the measured width.
+    #[error(
+        "the decision law {law:?} proposed tolerance {tolerance} below measured width {width}",
+        law = .0.law, width = .0.width, tolerance = .0.tolerance
+    )]
+    WidenTooNarrow(Box<WidenClaim>),
     /// A declared law asked for a probe the library did not compute.
     #[error(
         "the decision law {law:?} asked for the probe {probe:?}, which was not among the computed options"

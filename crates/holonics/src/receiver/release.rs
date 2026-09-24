@@ -8,12 +8,12 @@
 //!
 //! | Lean | Rust |
 //! |---|---|
-//! | `width` | [`width`] and [`ReceiverWidth`] |
-//! | `width_nonneg` | [`ReceiverWidth::diameter`] is a maximum of absolute separations |
-//! | `abs_sub_le_width` | [`ReceiverWidth::attaining`], the pair that attains it |
+//! | `width` | [`width`] and [`crate::law::receiver::ReceiverWidth`] |
+//! | `width_nonneg` | [`crate::law::receiver::ReceiverWidth::diameter`] is a maximum of absolute separations |
+//! | `abs_sub_le_width` | [`crate::law::receiver::ReceiverWidth::attaining`], the pair that attains it |
 //! | `width_le_of_bounds` | [`ExactZonotope::supremum_diameter`], the enclosure route |
 //! | `width_mono` | `the_width_is_monotone_under_fibre_inclusion` |
-//! | `width_eq_zero_iff` | [`ReceiverWidth::is_zero`] |
+//! | `width_eq_zero_iff` | [`crate::law::receiver::ReceiverWidth::is_zero`] |
 //! | `releasable_at_every_tolerance_iff_width_zero` | `width_zero_releases_at_every_tolerance` |
 //! | `NonExpansive`, `width_nonExpansive_factor` | [`FactorMap`], [`FactoredReading::verify_non_expansive`] and `a_non_expansive_coarser_receiver_has_no_larger_width` |
 //! | `expansive_factor_increases_width` | `an_expansive_factor_map_widens_the_reading` |
@@ -21,7 +21,7 @@
 //! | `ReleaseLaw`, `ReleaseLaw.sound`, `ReleaseLaw.widenSound` | [`DecisionLaw`] and [`release`], which refuses a release outside tolerance by name |
 //! | `every_lawful_return_other_than_hold_ask_or_no_continuation_is_inside_its_tolerance` | [`release`]'s `Released`, `Widen` and `ReleaseCoarser` arms, and [`LawfulOptions::assemble`]'s tolerance check |
 //! | `coarser_receiver_factors`, `releaseCoarser` | [`CoarseningTower`], [`release_coarser`] and [`CoarserRelease`], which carries the tolerance it was searched under |
-//! | `Releasable` | [`ReceiverWidth::releasable_at`] |
+//! | `Releasable` | [`crate::law::receiver::ReceiverWidth::releasable_at`] |
 //! | `no_default_among_the_lawful_returns` | `two_lawful_laws_return_different_arms` |
 //! | `future_stable_event_with_unstable_timing` | `an_event_is_future_stable_while_its_timing_is_not` |
 //! | `timingInsufficiency` | `the_coarse_event_reading_does_not_determine_the_timing` |
@@ -32,8 +32,8 @@
 //!
 //! | Lean | Rust |
 //! |---|---|
-//! | `Horizon`, `Horizon.longitudinalOnly`, `Horizon.Within` | [`Horizon`], [`Horizon::longitudinal_only`], [`Horizon::contains`] |
-//! | `horizonWithin_is_not_total` | `the_horizon_has_two_coordinates_that_are_not_one_scale`; [`Horizon`] derives no `Ord` |
+//! | `Horizon`, `Horizon.longitudinalOnly`, `Horizon.Within` | [`crate::law::receiver::Horizon`], [`crate::law::receiver::Horizon::longitudinal_only`], [`crate::law::receiver::Horizon::contains`] |
+//! | `horizonWithin_is_not_total` | `the_horizon_has_two_coordinates_that_are_not_one_scale`; [`crate::law::receiver::Horizon`] derives no `Ord` |
 //! | `ChainDistanceAtMost`, `chainDistance_symm`, `chainDistance_trans` | `continuing_tube::index_distance` and `continuing_tube::IndexReading` |
 //! | `Comparable`, `chainDistance_orderDual` | `continuing_tube::IndexDirection`, which names the direction the same distance is walked in |
 //! | `TwoAxisReach`, `twoAxisWidth` | `continuing_tube::{HorizonReach, two_axis_width}` |
@@ -46,7 +46,7 @@
 //! # The object
 //!
 //! [definition] For a **compatible family** — the preimage/observation fibre of
-//! [`crate::receiver_atlas::LocalChart::preimage_fibre`], carried here either enumerated
+//! the receiver-atlas preimage fibre, carried here either enumerated
 //! ([`CompatibleFamily::Finite`]) or enclosed ([`CompatibleFamily::Enclosed`]) — an exact `h`-step
 //! map `Φ_h` and a receiver reading `R`, the **width** is
 //!
@@ -74,13 +74,28 @@
 //! ([`WidthRefusal::NormNotExactOnEnclosure`]) rather than enumerating a declared-size family.
 //! On an enumerated family both norms are exact and both are computed.
 //!
+//! # Formal boundary and executable representation
+//!
+//! [formal-checked] Lean's `width` and `ReleaseLaw` range over any nonempty finite `Finset X`
+//! and any `R : X → ℚ`; Lean proves the generic extrema, inclusion, tolerance and decision-law
+//! statements. It does not formalize this Rust module's zonotope carrier, matrix recurrence, work
+//! ceilings, or a refinement from a nonlinear system to such a carrier. Rust implements the
+//! finite case by enumerating a bounded family, or the affine rational case by exactly mapping an
+//! `ExactZonotope`; its enclosure width is exact for that declared hull and is an upper bound on
+//! any smaller compatible set it encloses. This is the `width_le_of_bounds` direction, not a
+//! Lean proof that Rust's matrix map constructs the same zonotope. Nonlinear readings over an
+//! enclosure and squared-Euclidean enclosure diameters are refused.
+//!
 //! # Release is receiver-relative, and this module builds no global gate
 //!
 //! [project-postulate] AGENTS.md: *"A plural fibre does not impose a universal certainty gate on
 //! generation."* The Lean theorem `release_is_receiver_relative_not_a_global_gate` is that clause
 //! proved, and this module is built to match it: [`release`] takes the caller's [`DecisionLaw`]
-//! and enforces exactly **one** thing — that a law returning [`ReleaseReturn::Released`] has the
-//! width inside the tolerance it declared. It supplies no default among `Hold`, `Widen`, `Ask`,
+//! and enforces the tolerance obligations of the named arms: `Released` and `ReleaseCoarser`
+//! must fit their declared tolerance, and a `Widen` proposal must be at least the measured width
+//! (`ReleaseLaw.widenSound`). This widening check corrects the prior Rust behavior, which accepted
+//! any proposed tolerance. It does not choose a return or force the caller to widen. No default
+//! is supplied among `Hold`, `Widen`, `Ask`,
 //! `ReleaseCoarser` and `NoContinuationBridges`, and it exposes no predicate on a fibre that any
 //! generator is obliged to consult.
 //!
@@ -94,21 +109,21 @@ use std::fmt::{self, Debug};
 
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
-use holonics::geometry::Rat;
+use crate::geometry::Rat;
 use serde::{Deserialize, Serialize};
 
-use holonics::receiver::causal_chord::Linearization;
-use holonics::exact_linear::ExactRatMatrix;
+use crate::receiver::causal_chord::Linearization;
+use crate::exact_linear::ExactRatMatrix;
 
-/// [definition] **The receiver face, moved to the core** (plan phase 7): the exact face, the norm,
-/// the passive linear reading, the width and its witness, the two-axis horizon and the refusal
-/// moved to `holonics::law::receiver`, where [`LinearReading`] is also the passive coholon
-/// (`LinearReading::passive_coholon`, `Holon/Law.lean::passive_reading`). Every item is re-exported
-/// here at its existing path; the wire forms are unchanged.
-use holonics::law::receiver::{
+/// The face, norm, passive linear reading, width and witness, two-axis horizon, and their validated
+/// wire forms remain owned by `holonics::law::receiver`. This module owns the executable dynamics,
+/// compatible-family carriers, coarsening and declared release law that consume those faces.
+/// `LinearReading` remains the passive coholon (`passive_coholon`,
+/// `Holon/Law.lean::passive_reading`).
+use crate::law::receiver::{
     CoarserClaim, CoarserToleranceClaim, DiameterNorm, ExactFace, FAMILY_CEILING, HORIZON_CEILING,
-    Horizon, INDEX_HORIZON_CEILING, LinearReading, RECEIVER_WIDTH_SCHEMA, Reading, ReceiverWidth,
-    ReleasedClaim, WidthRefusal, WidthWitness, width_over_readings,
+    LinearReading, Reading, ReceiverWidth,
+    ReleasedClaim, WidthRefusal, WidthWitness, WidenClaim, width_over_readings,
 };
 
 /// The ceiling on the number of uncertainty generators an enclosure may carry.
@@ -185,7 +200,7 @@ impl fmt::Display for GeneratorSource {
 /// One generator of an exact zonotope: a column of exact rationals with the source it came from.
 ///
 /// A zonotope column is a direction of an exact set, not a clocked transport like
-/// `holonics::generator::Generator`. Its serde name and shape are `Generator` for existing
+/// `crate::generator::Generator`. Its serde name and shape are `Generator` for existing
 /// current-format zonotope packets.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename = "Generator")]
@@ -938,7 +953,7 @@ impl Debug for CoarseningStep {
 }
 
 /// **A declared coarsening tower**, finest first. This is the atlas refinement order of
-/// [`crate::receiver_atlas::AtlasRefinement`] presented as a chain of readings, which is what
+/// the receiver-atlas refinement order presented as a chain of readings, which is what
 /// `ReleaseCoarser` needs: the coarser invariant to release is the first one up the tower whose
 /// width falls inside tolerance.
 #[derive(Debug)]
@@ -1047,14 +1062,14 @@ pub fn release_coarser(
 }
 
 /// The quotient a finer reading makes of an enumerated family: member `k` transports its face and
-/// retains itself. It is the core restriction's [`Transition`](holonics::restriction::tower::Transition)
+/// retains itself. It is the core restriction's [`Transition`](crate::restriction::tower::Transition)
 /// over which [`CoarseningTower::descent`] asks each step to factor; the residual is the member,
 /// which is exactly what a later finer receiver reopens.
 struct FaceQuotient {
     faces: Vec<ExactFace>,
 }
 
-impl holonics::restriction::tower::Transition for FaceQuotient {
+impl crate::restriction::tower::Transition for FaceQuotient {
     type Source = usize;
     type Target = Option<ExactFace>;
     type Residual = usize;
@@ -1076,7 +1091,7 @@ impl holonics::restriction::tower::Transition for FaceQuotient {
 /// reading factors through the reading below it (the witness carries the induced map on its
 /// faces), or the pairs it separates that the finer reading identified.
 pub type CoarseningDescent =
-    holonics::restriction::FactorDescent<Option<ExactFace>, usize, ExactFace>;
+    crate::restriction::FactorDescent<Option<ExactFace>, usize, ExactFace>;
 
 impl CoarseningTower {
     /// **The tower read as core descents**, one per step up to and including the first step that
@@ -1112,7 +1127,7 @@ impl CoarseningTower {
                 .map(|member| step.reading.read(member))
                 .collect::<Result<Vec<_>, _>>()?;
             let quotient = FaceQuotient { faces: previous };
-            let descent = holonics::restriction::factor_descent(
+            let descent = crate::restriction::factor_descent(
                 &quotient,
                 |member: &usize| coarse[*member].clone(),
                 &indices,
@@ -1241,8 +1256,9 @@ impl FactoredReading<'_> {
 // R6 (f) — the release law, declared by the caller
 // -------------------------------------------------------------------------------------------
 
-/// **The six lawful returns.** Only [`ReleaseReturn::Released`] is constrained by this module, and
-/// only by the tolerance the caller itself declared.
+/// **The six caller-declared returns.** `Released`, `Widen` and `ReleaseCoarser` are checked
+/// against the tolerance each arm names; `Hold`, `Ask` and `NoContinuationBridges` remain the
+/// caller's decisions, subject only to their offered-input and offered-coarser checks.
 ///
 /// Lean counterpart: `Foundation/ReceiverRelease.lean::ReleaseReturn`.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -1372,7 +1388,7 @@ impl LawfulOptions {
 
 /// A caller's **declared** decision law. There is no default implementation and no blanket
 /// implementation: the decision is supplied, exactly as a metric is supplied to a chart in
-/// [`crate::receiver_atlas::Capability`].
+/// the receiver-atlas capability.
 pub trait DecisionLaw {
     /// The law's declared name, for the refusal.
     fn name(&self) -> &str;
@@ -1450,9 +1466,16 @@ pub fn release(
                 });
             }
         },
-        ReleaseReturn::Hold
-        | ReleaseReturn::Widen { .. }
-        | ReleaseReturn::NoContinuationBridges { .. } => {}
+        ReleaseReturn::Widen { tolerance } => {
+            if options.width > *tolerance {
+                return Err(WidthRefusal::WidenTooNarrow(Box::new(WidenClaim {
+                    law: law.name().to_owned(),
+                    width: options.width.clone(),
+                    tolerance: tolerance.clone(),
+                })));
+            }
+        }
+        ReleaseReturn::Hold | ReleaseReturn::NoContinuationBridges { .. } => {}
     }
     Ok(decision)
 }
@@ -1462,5 +1485,5 @@ pub fn release(
 // -------------------------------------------------------------------------------------------
 
 #[cfg(test)]
-#[path = "receiver_release/tests.rs"]
+#[path = "release/tests.rs"]
 mod tests;

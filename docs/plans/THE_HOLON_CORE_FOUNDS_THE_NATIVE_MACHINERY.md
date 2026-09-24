@@ -29,7 +29,7 @@ owner exists; the resident parametron is a limb-exact product body without metri
 | Interconnection `𝒟` | `HolonicInteraction` skew assembly; `junction_law::tellegen` |
 | Element relations `𝓔` | `SymmetricForm`/`Inertia` (storage), `ContactFace`/`ContactDissipation` (resistive), `SourceCurrent` (source), resident normal material (active/learned); pump and LC loop absent |
 | Generators `G` | `CompiledGeneratorSite` content: `SituatedScrew`, `RationalPhase`, `Clock`, `Odometer` |
-| Receivers | `Perspective`/`ReceiverBody` (active); `receiver_release::Reading` (passive coholon) |
+| Receivers | `Perspective`/`ReceiverBody` (active); `holonics::law::receiver::Reading` (passive coholon) |
 | Restriction `π` | `continuing_tower::{Tower, Transition, Migration}`, `continuing_tube::SquareDefect` |
 | Motion | `ExactEventLaw` (event chart); `NativeCoupledBody` (resident) |
 
@@ -165,7 +165,7 @@ reflection), not an interior elimination, and has no Kron reading.
 §2–2b). **Passive coholon:** `PassiveCoholon` (a named linear reader `C` on the passive-coholon
 Dirac structure) reads `C e` at zero power (`passive_reading`); `coholon_bond` is the bond any
 reading, linear or not, stands on (`coholon_reading_power`); `HolonLaw::receive` delegates to it.
-`receiver_release::{Reading, LinearReading}` and `standing::ReceiverReading` are this object:
+`holonics::law::receiver::{Reading, LinearReading}` and `standing::ReceiverReading` are this object:
 each converts (`passive_coholon()`) with equality tests of the value, and the passive coholon is
 itself a `Reading` and a tube `FaceReading` on effort-vector faces. **Active receiver:**
 `ActiveReceiver` with `ReceiverPower { Reading | Learned(ActiveRelation) | ExteriorDrive |

@@ -10,7 +10,7 @@ import ElementaryHolonics.Foundation.Receiver
 # Receiver width and release
 
 [definition] This owner states the law the Rust module
-`crates/holonic-engine/src/receiver_release.rs` implements. It is receiver **R6** of
+`crates/holonics/src/receiver/release.rs` implements. It is receiver **R6** of
 `docs/plans/THE_RECEIVER_ATLAS_SEPARATES_WHAT_ONE_FACE_CANNOT.md`.
 
 For a compatible family `F` — the preimage/observation fibre of
@@ -74,7 +74,7 @@ every tolerance; its timing is released at no tolerance below `1`. `timeOfEvent_
 `timeOfEvent_crosses` earn the name: the returned step really is the first step of the exact
 trajectory at which the threshold is reached, and no earlier step reaches it.
 
-Rust owner: `crates/holonic-engine/src/receiver_release.rs`
+Rust owner: `crates/holonics/src/receiver/release.rs`
 (`width` ↔ `width_enumerated` and `width_enclosed`;
 `width_mono` ↔ `the_width_is_monotone_under_fibre_inclusion`;
 `width_nonExpansive_factor` ↔ `a_non_expansive_coarser_receiver_has_no_larger_width`;
@@ -285,7 +285,7 @@ inequality the constructor itself carries, so no separate check can be skipped f
 statement that a coarser release cannot leave the declared tolerance by being assembled under one
 tolerance and released under another.
 
-Rust counterpart: `crates/holonic-engine/src/receiver_release.rs::release`, whose `ReleaseCoarser`
+Rust counterpart: `crates/holonics/src/receiver/release.rs::release`, whose `ReleaseCoarser`
 arm recomputes `width ≤ tolerance` against the options' own tolerance, and
 `LawfulOptions::assemble`, which refuses a `CoarserRelease` searched under a different tolerance
 (`a_coarser_release_searched_under_a_wider_tolerance_is_refused`). -/
@@ -605,14 +605,15 @@ restatement of the one-axis law:
   determined **face** and toward the fine it reads the whole **fibre**. Both directions are far;
   they are far in dual ways, and that asymmetry — not a symmetry — is the content.
 
-Rust owner: `crates/holonic-engine/src/receiver_release.rs::{Horizon, width_over_readings}` and
+Rust owners: `crates/holonics/src/law/receiver.rs::{Horizon, width_over_readings}` and
+`crates/holonics/src/receiver/release.rs::{ExactZonotope, CompatibleFamily, horizon_image}`; and
 `crates/holonic-engine/src/continuing_tube.rs::{Observer, IndexDirection, IndexReading,
 index_distance, HorizonReach, horizon_reach, two_axis_width}`. -/
 
 /-- [definition] **A horizon with two coordinates**: `h` longitudinal steps of `Φ` and `k` steps in
 the tower's index, in either direction.
 
-Rust counterpart: `receiver_release.rs::Horizon`, whose two fields are private and whose
+Rust counterpart: `holonics::law::receiver::Horizon`, whose two fields are private and whose
 constructor checks both ceilings. -/
 structure Horizon where
   /-- Steps of `Φ` along the tube. -/

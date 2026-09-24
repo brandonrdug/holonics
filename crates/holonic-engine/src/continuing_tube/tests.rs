@@ -1213,7 +1213,7 @@ fn the_two_axis_width_is_monotone_in_each_coordinate() {
 }
 
 /// `Foundation/ReceiverRelease.lean::twoAxisWidth_at_index_zero_is_the_longitudinal_width`: at
-/// `k = 0` the two-axis width **is** the width `receiver_release` already owned over the
+/// `k = 0` the two-axis width **is** the width `holonics::receiver::release` already owned over the
 /// longitudinal family, so its theorems are that case and are not restated.
 #[test]
 fn the_longitudinal_only_case_is_the_existing_width() {
@@ -1232,7 +1232,7 @@ fn the_longitudinal_only_case_is_the_existing_width() {
     let reach = horizon_reach(&tube, &declaration, &false, &[]).expect("the reach walks");
     let two_axis = two_axis_width(&LadderFlag, &reach, DiameterNorm::Supremum).expect("a width");
 
-    // The same family, read through `receiver_release`'s own diameter.
+    // The same family, read through `holonics::receiver::release`'s own diameter.
     let faces = vec![ExactFace::Flag(false), ExactFace::Flag(true)];
     let one_axis = holonics::law::receiver::width_over_readings(
         "the Boolean face itself",
