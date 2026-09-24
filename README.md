@@ -52,12 +52,13 @@ laws and HNN**, organized by elementary object rather than acting as a facade:
 |---|---|
 | `holonics` | Ratio/remainder, geometric transport and pair/tube charts, the Holon law and its operators, receivers and receipts, the Holarchy returned by interconnection, equation extraction, and the backend-neutral HNN law and execution port |
 | `holonics-cuda` | CUDA realization: driver, sections, kernels and the resident HNN field |
-| `holonics-portable` | Shared `no_std` laws compiled by both the host and detached Rust CUDA kernel; the former body source has moved, while ABI/word consolidation remains pending |
+| `holonics-portable` | Shared `no_std` laws compiled by both the host and detached Rust CUDA kernel; it now owns the former body source and exact section ABI, while other ABI/word consolidation remains pending |
 | `holonics-apple` (later) | Apple silicon implementation on Brandon's separate branch |
 
 That is three maintained Rust libraries on Linux after consolidation and four after Apple.
-The portable leaf began by replacing the current `body` package; `soma-abi` and `holonic-words`
-remain separate pending classification of their shared host/device laws. The main library
+The portable leaf began by replacing `body` and now owns the shared section arithmetic and CUDA
+section ABI. `soma-abi` retains its other wire records, and host `holonic-words` remains separate
+pending classification. The main library
 builds without CUDA; its HNN host reference is built after the move, one method at a time
 against the CUDA return.
 Its physical instances must carry fluid stress/pressure, wave propagation, spacetime

@@ -314,7 +314,7 @@ fn a_degenerate_modulus_does_not_name_a_ring() {
 
 #[test]
 fn the_device_ring_agrees_with_the_general_modular_path_over_the_same_modulus() {
-    // `ModularWords::DEVICE` dispatches to `soma_abi::section_layout_cuda`, the same code the nvptx
+    // `ModularWords::DEVICE` dispatches to `holonics_portable::section_layout_cuda`, the same code the nvptx
     // kernels compile.  This holds it against the ordinary 128-bit remainder path.
     let device = ModularWords::DEVICE;
     let modulus = section_cuda::MODULUS;
@@ -1096,7 +1096,7 @@ fn operator_with_one_non_canonical_entry(width: usize, at: usize, word: u64) -> 
 }
 
 /// An **independent** exact reference for `Z/(2^61 - 1)`: a plain 128-bit remainder sharing no code
-/// with `soma_abi::section_layout_cuda`.
+/// with `holonics_portable::section_layout_cuda`.
 ///
 /// `ModularWords::DEVICE` dispatches *into* the very code the card runs, which is exactly what makes
 /// it the right reference for a transcription question and the wrong one for an arithmetic

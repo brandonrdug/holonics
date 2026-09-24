@@ -80,7 +80,7 @@ use soma_abi::morphological_condition_cuda as morph_condition_cuda;
 use soma_abi::morphological_conduct_cuda as morph_cuda;
 use soma_abi::recurrent_law_cuda;
 use soma_abi::returned_contact_cuda as returned_cuda;
-use soma_abi::section_layout_cuda as section_cuda;
+use holonics_portable::section_layout_cuda as section_cuda;
 use soma_abi::text_restrict_cuda as text_cuda;
 use soma_abi::{contact as contact_abi, register as register_abi};
 
@@ -6014,7 +6014,7 @@ pub unsafe extern "ptx-kernel" fn morphological_conduct_group(
 // (`holonics_cuda::section_layout::IncidenceDeclaration` plus a `LocalOperator`), not another hand-written
 // kernel. The Lean owner is `Soma.Holonics.Foundation.SectionLayout`.
 //
-// The arithmetic is `soma_abi::section_layout_cuda`'s `Z/(2^61 - 1)` — the SAME code the host
+// The arithmetic is `holonics_portable::section_layout_cuda`'s `Z/(2^61 - 1)` — the SAME code the host
 // reference compiles, so the bit-for-bit device/host agreement is one mouth and not two
 // transcriptions. Addition there is associative and commutative, which is what an accumulating
 // scatter requires; no float appears in any of the four bodies.

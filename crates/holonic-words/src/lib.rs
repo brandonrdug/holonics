@@ -7,7 +7,7 @@
 //! `holonics_cuda::section_layout::ExactRing`, …), so device code is unchanged.
 //!
 //! [definition] **One mouth, kept.** At the device modulus `2^61 − 1`, `ModularWords::add`, `mul`,
-//! `canonical` and `is_canonical` call `soma_abi::section_layout_cuda` — the same code
+//! `canonical` and `is_canonical` call `holonics_portable::section_layout_cuda` — the same code
 //! `accelerators/cuda-kernel` compiles for nvptx — so "`ModularWords::DEVICE` is literally the
 //! device's add/mul" remains a property of one piece of code. The tests below assert it.
 //!
@@ -17,7 +17,7 @@
 
 use std::fmt;
 
-use soma_abi::section_layout_cuda as section_cuda;
+use holonics_portable::section_layout_cuda as section_cuda;
 
 /// The result of a construction that either generates the layout or names the clause it refused.
 pub type Sectioned<T> = core::result::Result<T, SectionRefusal>;
@@ -156,7 +156,7 @@ pub enum AccumulationLaw {
     /// Exact addition in `Z/modulus`.  Total — every sum and product is exact and in range — which
     /// is why this is the law the device arm realizes.
     ModularAdd {
-        /// The modulus.  The device realizes exactly `soma_abi::section_layout_cuda::MODULUS`.
+        /// The modulus.  The device realizes exactly `holonics_portable::section_layout_cuda::MODULUS`.
         modulus: u64,
     },
 }
@@ -215,7 +215,7 @@ impl ExactRing for CheckedIntegers {
 
 /// Exact words of `Z/modulus`, total in both operations.
 ///
-/// At the device's own modulus, `soma_abi::section_layout_cuda::MODULUS = 2^61 - 1`, the operations
+/// At the device's own modulus, `holonics_portable::section_layout_cuda::MODULUS = 2^61 - 1`, the operations
 /// **are literally the device's**: [`ExactRing::add`] and [`ExactRing::mul`] call
 /// `section_layout_cuda::add` / `::mul`, the same code `accelerators/cuda-kernel` compiles for
 /// nvptx.  The bit-for-bit agreement the device tests assert is therefore a property of one piece
@@ -258,7 +258,7 @@ impl ModularWords {
 
     /// Whether a word is already the canonical residue of its class, i.e. lies in `[0, modulus)`.
     /// At the device's own modulus the predicate is
-    /// [`section_cuda::is_canonical`](soma_abi::section_layout_cuda::is_canonical) itself, the same
+    /// [`section_cuda::is_canonical`](holonics_portable::section_layout_cuda::is_canonical) itself, the same
     /// code nvptx compiles, so the boundary and the kernel name one notion of canonical.
     pub fn is_canonical(&self, value: u64) -> bool {
         if self.modulus == section_cuda::MODULUS {
@@ -370,7 +370,7 @@ mod tests {
     }
 
     /// **The device ring is the device's code.** At `2^61 − 1` every operation of
-    /// `ModularWords::DEVICE` returns exactly what `soma_abi::section_layout_cuda` returns — the
+    /// `ModularWords::DEVICE` returns exactly what `holonics_portable::section_layout_cuda` returns — the
     /// code nvptx compiles — and that is the exact residue of the integer operation.
     #[test]
     fn the_device_ring_is_literally_the_device_add_and_mul() {

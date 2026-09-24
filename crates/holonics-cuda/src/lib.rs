@@ -134,7 +134,7 @@ mod tests {
         "recurrent_law_evaluate",
         "recurrent_law_fold",
         // D3 — the generated section triple, reached by `section_layout::SectionKernels::resolve`
-        // through `soma_abi::section_layout_cuda::Entry::symbol`.
+        // through `holonics_portable::section_layout_cuda::Entry::symbol`.
         "section_gather",
         "section_apply",
         "section_scatter_store",
@@ -337,7 +337,7 @@ mod tests {
 
     /// D3 — the generated section triple's own PTX face: the declared parameter-word count of each
     /// entry, and the absence of any floating spelling in any of their bodies. The parameter counts
-    /// come from `soma_abi::section_layout_cuda::Entry`, the same declaration
+    /// come from `holonics_portable::section_layout_cuda::Entry`, the same declaration
     /// `section_layout::SectionLayout` generates its `LaunchRequirement`s against, so a signature
     /// change on either side of the seam is a failing test rather than a silent parameter-block
     /// mismatch.
@@ -348,7 +348,7 @@ mod tests {
             text.contains(".extern .shared .align 8 .b8 section_tile[]"),
             "the section-apply entry declares its dynamic shared tile"
         );
-        for entry in soma_abi::section_layout_cuda::Entry::ALL {
+        for entry in holonics_portable::section_layout_cuda::Entry::ALL {
             let mouth = format!(".entry {}(", entry.symbol());
             let after = text
                 .split_once(&mouth)

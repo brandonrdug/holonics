@@ -574,7 +574,7 @@ dependencies = [
 name = "holonic-words"
 version = "0.1.0"
 dependencies = [
- "soma-abi",
+ "holonics-portable",
 ]
 
 [[package]]

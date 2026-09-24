@@ -141,3 +141,6 @@ pub const fn mul(a: u64, b: u64) -> u64 {
 pub const fn is_canonical(value: u64) -> bool {
     value < MODULUS
 }
+
+#[cfg(test)]
+mod tests;

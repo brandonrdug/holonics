@@ -22,7 +22,7 @@ general model architecture.
 |---|---|
 | `holonics::{Holon,holon,law,port,dirac,complex,element,generator,restriction,deposition}` | The one Holon law and its facets, owned by the main crate |
 | `holonics::{exact_linear,exact_value,exact_work,inertia,prime_image_algebra,rational_polynomial}` | Source-neutral exact operators owned by the main crate |
-| `holonics::membrane` | Live receiving, concrete standing storage, constituent and current runtime; `holonics-portable` supplies shared `no_std` carriers, while `soma-abi` remains a separate host/device boundary crate pending classification. |
+| `holonics::membrane` | Live receiving, concrete standing storage, constituent and current runtime; `holonics-portable` supplies shared `no_std` carriers and section arithmetic/ABI, while `soma-abi` retains its other host/device boundary records. |
 | `holonics::structure` | Structural relation, chain, local population, gauge and membrane carriers owned inside the main crate |
 | `holonics::geometry` | Exact frames, screw pairs, phase carry, receiver maps and projection fibres owned inside the main crate |
 | `holonic-engine` | Current direct owner of engine mathematics, constitutive fields and resident execution; resident execution moves to `holonics-cuda` |

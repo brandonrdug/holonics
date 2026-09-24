@@ -4,8 +4,8 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 
-# The exact machine-word rings of the section layout, host-only: no CUDA, no driver. `soma-abi`
+# The exact machine-word rings of the section layout, host-only: no CUDA, no driver. `holonics-portable`
 # supplies the device modulus arithmetic itself, so the device-equality property is one piece of
 # code. `crates/holonics-cuda` re-exports every item from its public owner.
 [dependencies]
-soma-abi = { path = "../holonic-abi" }
+holonics-portable = { path = "../holonics-portable" }

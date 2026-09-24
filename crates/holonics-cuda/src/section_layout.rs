@@ -59,7 +59,7 @@
 
 use std::collections::BTreeMap;
 
-use soma_abi::section_layout_cuda as section_cuda;
+use holonics_portable::section_layout_cuda as section_cuda;
 
 use crate::launch_law::{
     Access, ArgumentRequirement, BlockConstraint, Coverage, DeviceReadSpan, DeviceWriteSpan,
