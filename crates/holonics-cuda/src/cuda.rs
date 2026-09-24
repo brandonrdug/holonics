@@ -2044,7 +2044,7 @@ mod tests {
         eprintln!("legacy allocation grain={allocation_grain} bytes");
 
         let module = Module::load_ptx(crate::SOMA_PTX)?;
-        let scope = module.function(soma_abi::register::Entry::ScopeSurface.symbol())?;
+        let scope = module.function(holonics_portable::wire::register::Entry::ScopeSurface.symbol())?;
         let local = scope.local_size_bytes()?;
         assert!(local > 0);
         eprintln!("scope_register_surface local={local} bytes/thread");

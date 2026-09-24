@@ -52,12 +52,13 @@ supersedes this layout as a **target**, while this page maps the present checkou
 the maintained Rust library graph to a substantive main `holonics` (Holon laws, geometry,
 extraction and the backend-neutral HNN law and port) → `holonics-cuda` (driver, kernels and the
 resident HNN), over the shared `no_std` `holonics-portable` leaf used by the detached Rust CUDA
-kernel. The current leaf contains the renamed dependency-free `holonic-body` source and the
-shared section arithmetic/ABI formerly owned by `soma-abi`. That package retains its other wire
-records for the host and detached CUDA kernel. The active generator/action grammar now belongs to
-`holonics::generator::action`; the live receiver consumes it from `holonics::membrane`. Exact host
-rings belong to `holonics::ratio::ring`, while section admission errors belong to the CUDA section
-owner. Brandon's
+kernel. The current leaf contains the renamed dependency-free `holonic-body` source, shared section
+arithmetic/ABI, and kernel-shared wire schemas formerly owned by `soma-abi`. Those rows live under
+`holonics_portable::wire`, directly consumed by host code and the detached kernel. The `soma-abi`
+package retains only current, Holon, and presentation schemas pending separate disposition. The
+active generator/action grammar belongs to `holonics::generator::action`; the live receiver consumes
+it from `holonics::membrane`. Exact host rings belong to `holonics::ratio::ring`, while section
+admission errors belong to the CUDA section owner. Brandon's
 later `holonics-apple` package implements the same port on his separate branch. The Lean target is one top-level
 `lean/` Lake package with `Holonics` and dependent `HolonicsResearch`. Until verified moves land,
 `crates/` and `formal/` above are the correct source paths. The operator guides distinguish

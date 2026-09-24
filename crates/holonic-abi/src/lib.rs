@@ -1,43 +1,17 @@
 #![no_std]
 
-//! Substrate-neutral word records at Soma's execution membrane.
+//! Substrate-neutral event schemas retained for separate disposition.
 //!
-//! This crate owns layouts which must be exact across cpu staging, CUDA entry shells,
-//! other card substrates, and exact gates. It owns no carriage law, allocation, launch sizing,
-//! sharding, world policy, persistence, or observer interpretation.
+//! `current`, `holon`, and `presentation` remain here until their separate owner decisions land.
+//! Shared host/device rows now live in `holonics-portable::wire`, the no_std source both native
+//! crates and the detached NVPTX kernel can compile without introducing a dependency cycle.
 
-/// Transient cooperative REGISTER-contact sheet.
-pub mod contact;
-/// Fixed word transport for the consequence of one live event.
-// `cuda_execution` was removed 2026-08-10. It defined `EventContactRow` / `EVENT_CONTACT_WORDS`
-// with a full pack/validate/unpack round trip, 272 lines, and **nothing on either side of the
-// membrane referenced it** — not the PTX kernel crate, not the cpu executor, not a driver.
-// `CLAUDE.md` §13 rule 3: superseded production machinery fails closed. It is removed rather than
-// deprecated, and git history is the recovery surface.
 /// One substrate-neutral active event row.
 pub mod current;
-/// Accepted body deeds partitioned at native event boundaries.
-pub mod emission;
 /// One receiver-relative swept construction over shared presentation cuts.
 pub mod holon;
-/// One contemporary live-current event at the CUDA execution seam.
-pub mod live_event_cuda;
-/// One raw-material recurrence shadow at the CUDA execution seam.
-pub mod material_shadow_cuda;
-/// Resident generalized-suffix and question-prefix conditioning mouths.
-pub mod morphological_condition_cuda;
-/// One morphological candidate/deposit attachment at the CUDA execution seam.
-pub mod morphological_conduct_cuda;
 /// One world presentation without a world-specific object model.
 pub mod presentation;
-/// Exact recurrent transformation-law founding and evaluation at the CUDA execution seam.
-pub mod recurrent_law_cuda;
-/// Exact REGISTER status, lane, and entry rows.
-pub mod register;
-/// Exact returned-contact grouping at the CUDA execution seam.
-pub mod returned_contact_cuda;
-/// Sparse exact text-section restriction at the CUDA execution seam.
-pub mod text_restrict_cuda;
 
 #[cfg(test)]
 mod tests;

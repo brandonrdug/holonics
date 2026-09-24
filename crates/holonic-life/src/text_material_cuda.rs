@@ -15,7 +15,7 @@ use holonics_cuda::{
     SOMA_PTX,
 };
 use serde::Serialize;
-use soma_abi::text_restrict_cuda as wire;
+use holonics_portable::wire::text_restrict_cuda as wire;
 
 const RESIDENT_LOGICAL_WORD_RESERVATION: usize = u32::MAX as usize;
 

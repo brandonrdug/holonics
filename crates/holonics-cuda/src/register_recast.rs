@@ -11,7 +11,7 @@ use crate::{
     RegisterRecastKernel, RegisterSpan, RegisterWriteSpan, Result,
 };
 
-pub use soma_abi::register::{
+pub use holonics_portable::wire::register::{
     LANE_WORDS as REGISTER_LANE_WORDS, RECAST_INCOMPLETE as REGISTER_RECAST_INCOMPLETE,
     STATUS_COMPLETE as REGISTER_RECAST_COMPLETE, STATUS_WORDS as REGISTER_STATUS_WORDS,
 };

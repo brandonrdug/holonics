@@ -10,7 +10,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use holonics_portable::num::COG_WORDS;
 use holonics_cuda::{DeviceBuffer, Dim3, Stream};
-use soma_abi::morphological_condition_cuda as wire;
+use holonics_portable::wire::morphological_condition_cuda as wire;
 use holonics::membrane::ReceiverFiberIdentity;
 
 use crate::{

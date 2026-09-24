@@ -5,7 +5,7 @@ use core::ffi::c_void;
 
 use holonics_cuda::{Context, Device, DeviceBuffer, Module, Stream, SOMA_PTX};
 use serde::Serialize;
-use soma_abi::recurrent_law_cuda as wire;
+use holonics_portable::wire::recurrent_law_cuda as wire;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct BiaffineSampleGrid {

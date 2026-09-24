@@ -18,7 +18,6 @@ publish = false
 # UP into the plate, which nothing here does.
 [dependencies]
 sha2 = "0.10"
-soma-abi = { path = "../../crates/holonic-abi" }
 holonics-portable = { path = "../../crates/holonics-portable" }
 life = { path = "../../crates/holonic-life" }
 holonic-engine = { path = "../../crates/holonic-engine", default-features = false }

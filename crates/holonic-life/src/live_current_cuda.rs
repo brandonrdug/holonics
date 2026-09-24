@@ -18,8 +18,8 @@ use holonics_portable::manifold::{
 };
 use holonics_portable::medium::FORM_WORDS;
 use holonics_portable::num::COG_WORDS;
-use soma_abi::emission::{DeedEmission, DEED_WORDS};
-use soma_abi::live_event_cuda as cuda;
+use holonics_portable::wire::emission::{DeedEmission, DEED_WORDS};
+use holonics_portable::wire::live_event_cuda as cuda;
 use holonics::membrane::{
     canonical_event_incidences, form_executed_regional_relation, regional_contact_pairs,
     CurrentExecutionRequest, CurrentGeometry, CurrentLineage, DirectedExecutionRequest,

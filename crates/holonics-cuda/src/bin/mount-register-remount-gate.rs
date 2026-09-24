@@ -21,7 +21,7 @@ use holonics_cuda::{
     LaunchEvidence, RegisterScopeArguments, RegisterScopeKernel, RegisterSpan, RegisterWriteSpan,
     Result,
 };
-use soma_abi::register as register_abi;
+use holonics_portable::wire::register as register_abi;
 
 const PTX: &[u8] = include_bytes!("../../../../accelerators/cuda-kernel/soma_kernel_cuda.ptx");
 const LIGHT: &[u8] = b"bdadada";

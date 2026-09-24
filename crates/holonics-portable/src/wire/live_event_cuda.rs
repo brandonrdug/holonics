@@ -5,16 +5,16 @@
 //! completed constituent. This layout carries no cut, source, journal, receipt, ancestry, or
 //! future reservation; one reusable physical mouth grows only after actual resource pressure.
 
-use holonics_portable::channel::{LineageChannel, CHANNEL_WORDS};
-use holonics_portable::manifold::{
+use crate::channel::{LineageChannel, CHANNEL_WORDS};
+use crate::manifold::{
     face_packed_word, node_packed_word, packed_face_is_canonical, packed_node_is_canonical,
     unpack_face, unpack_node, DirectedEventContact, EventEmanation, EventReceiver, LiveBodyHeader,
     Node, CARRIER_HEADER_WORDS, FACE_WORDS, NODE_WORDS,
 };
-use holonics_portable::num::{self, Cog, COG_WORDS};
-use holonics_portable::place::Place;
+use crate::num::{self, Cog, COG_WORDS};
+use crate::place::Place;
 
-use crate::emission::{DeedEmission, DEED_WORDS};
+use crate::wire::emission::{DeedEmission, DEED_WORDS};
 
 pub const ENTRY_SYMBOL: &str = "lineage_event";
 /// The co-present population mouth: one lane per current of one contemporary event.
@@ -413,7 +413,7 @@ fn put_u64(words: &mut [u32], at: usize, value: u64) {
 }
 
 #[inline]
-pub fn write_face(words: &mut [u32], at: usize, face: holonics_portable::manifold::Face) {
+pub fn write_face(words: &mut [u32], at: usize, face: crate::manifold::Face) {
     let mut word = 0usize;
     while word < FACE_WORDS {
         words[at + word] = face_packed_word(face, word);
@@ -461,7 +461,7 @@ pub const STANDING_CELLS: usize = 0;
 pub const STANDING_HEADER_WORDS: usize = 1;
 pub const STANDING_ROW_GRIP: usize = 0;
 pub const STANDING_ROW_FORM: usize = 1;
-pub const STANDING_ROW_WORDS: usize = STANDING_ROW_FORM + holonics_portable::medium::FORM_WORDS;
+pub const STANDING_ROW_WORDS: usize = STANDING_ROW_FORM + crate::medium::FORM_WORDS;
 
 pub fn header_from_control(words: &[u32]) -> Option<LiveBodyHeader> {
     LiveBodyHeader::from_words_checked(

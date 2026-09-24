@@ -723,7 +723,7 @@ fn the_launch_law_reads_every_bound_off_the_mounted_device() -> Result<()> {
     let device = Device::get(0)?;
     let context = Context::create(&device)?;
     let module = crate::cuda::Module::load_ptx(crate::SOMA_PTX)?;
-    let function = module.function(soma_abi::register::Entry::Scope.symbol())?;
+    let function = module.function(holonics_portable::wire::register::Entry::Scope.symbol())?;
 
     let limits = LaunchLimits::read(&device, &function)?;
     assert!(limits.max_grid().is_some());
@@ -744,7 +744,7 @@ fn the_launch_law_reads_every_bound_off_the_mounted_device() -> Result<()> {
     );
 
     let requirement = LaunchRequirement::guarded(
-        soma_abi::register::Entry::Scope.symbol(),
+        holonics_portable::wire::register::Entry::Scope.symbol(),
         100_000,
         vec![ArgumentRequirement::device(
             "lanes",

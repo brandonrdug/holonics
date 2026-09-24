@@ -95,8 +95,8 @@ mod tests {
     /// Entries compiled into the artifact AND resolved by a Rust launcher.
     ///
     /// Each name here is reachable: some caller resolves it through `Module::function`, either by
-    /// a literal in a `crates/holonics-cuda/src/bin/mount-*-gate.rs`, by a `soma_abi::*::ENTRY_SYMBOL`
-    /// constant, or through `soma_abi::register::Entry::symbol`.
+    /// a literal in a `crates/holonics-cuda/src/bin/mount-*-gate.rs`, by a `holonics_portable::wire::*::ENTRY_SYMBOL`
+    /// constant, or through `holonics_portable::wire::register::Entry::symbol`.
     const LAUNCHED_ENTRIES: &[&str] = &[
         "link_grain",
         "link_sum",
@@ -140,7 +140,7 @@ mod tests {
     /// These four are defined as `extern "ptx-kernel"` in `soma-kernel-cuda/src/lib.rs`, listed in
     /// `soma-kernel-cuda/build-ptx.sh`, and emitted into the PTX. They have **no `soma_abi` entry
     /// symbol, no `Module::function` resolution, and no launcher** anywhere in `soma/` or
-    /// `crates/` — `soma_abi::register::Entry` names five register entries and none of these is
+    /// `crates/` — `holonics_portable::wire::register::Entry` names five register entries and none of these is
     /// among them. The `link` family has three cpu gates (`mount-link-gate` for
     /// `link_{grain,sum,finish}`, `mount-founded-gate` for the founded pair); the *registered*
     /// third arm was compiled but its gate was never built, and `mount-chart-gate` resolves
@@ -217,7 +217,7 @@ mod tests {
             "the fifteen-lane contact surface must carry its exact partial-warp barrier"
         );
 
-        fn parameter_count(text: &str, entry: soma_abi::register::Entry) -> usize {
+        fn parameter_count(text: &str, entry: holonics_portable::wire::register::Entry) -> usize {
             let mouth = format!(".entry {}(", entry.symbol());
             let body = text
                 .split_once(&mouth)
@@ -233,11 +233,11 @@ mod tests {
                 .count()
         }
         for entry in [
-            soma_abi::register::Entry::Scope,
-            soma_abi::register::Entry::ScopeSurface,
-            soma_abi::register::Entry::Recast,
-            soma_abi::register::Entry::RecastFinish,
-            soma_abi::register::Entry::CarrierRebase,
+            holonics_portable::wire::register::Entry::Scope,
+            holonics_portable::wire::register::Entry::ScopeSurface,
+            holonics_portable::wire::register::Entry::Recast,
+            holonics_portable::wire::register::Entry::RecastFinish,
+            holonics_portable::wire::register::Entry::CarrierRebase,
         ] {
             assert_eq!(
                 parameter_count(text, entry),

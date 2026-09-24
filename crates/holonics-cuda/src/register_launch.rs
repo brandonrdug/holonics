@@ -287,7 +287,7 @@ pub struct RegisterScopeArguments<'a> {
 }
 
 impl RegisterScopeArguments<'_> {
-    fn spans(&self) -> [ArgumentSpan; soma_abi::register::Entry::Scope.buffer_pairs()] {
+    fn spans(&self) -> [ArgumentSpan; holonics_portable::wire::register::Entry::Scope.buffer_pairs()] {
         [
             self.standing.argument("standing"),
             self.owns.argument("owns"),
@@ -310,7 +310,7 @@ pub struct RegisterScopeSurfaceArguments<'a> {
 }
 
 impl RegisterScopeSurfaceArguments<'_> {
-    fn spans(&self) -> [ArgumentSpan; soma_abi::register::Entry::ScopeSurface.buffer_pairs()] {
+    fn spans(&self) -> [ArgumentSpan; holonics_portable::wire::register::Entry::ScopeSurface.buffer_pairs()] {
         let common = self.common.spans();
         [
             common[0],
@@ -340,7 +340,7 @@ pub struct RegisterRecastArguments<'a> {
 }
 
 impl RegisterRecastArguments<'_> {
-    fn spans(&self) -> [ArgumentSpan; soma_abi::register::Entry::Recast.buffer_pairs()] {
+    fn spans(&self) -> [ArgumentSpan; holonics_portable::wire::register::Entry::Recast.buffer_pairs()] {
         [
             self.old_owns.argument("old_owns"),
             self.fresh_owns.argument("fresh_owns"),
@@ -365,7 +365,7 @@ pub struct RegisterCarrierRebaseArguments<'a> {
 }
 
 impl RegisterCarrierRebaseArguments<'_> {
-    fn spans(&self) -> [ArgumentSpan; soma_abi::register::Entry::CarrierRebase.buffer_pairs()] {
+    fn spans(&self) -> [ArgumentSpan; holonics_portable::wire::register::Entry::CarrierRebase.buffer_pairs()] {
         [
             self.old_carriers.argument("old_carriers"),
             self.fresh_carriers.argument("fresh_carriers"),
@@ -443,7 +443,7 @@ impl RegisterScopeKernel<'_> {
     ) -> Result<LaunchReceipt> {
         launch_declared(
             &self.0,
-            soma_abi::register::Entry::Scope.symbol(),
+            holonics_portable::wire::register::Entry::Scope.symbol(),
             scope_argument_law(Extent::AtLeast(1)),
             evidence,
             offered(grid, block),
@@ -462,7 +462,7 @@ impl RegisterScopeKernel<'_> {
     ) -> Result<LawfulLaunch> {
         prove_cover(
             &self.0,
-            soma_abi::register::Entry::Scope.symbol(),
+            holonics_portable::wire::register::Entry::Scope.symbol(),
             scope_argument_law(Extent::AtLeast(1)),
             evidence,
             extent,
@@ -505,7 +505,7 @@ impl RegisterScopeSurfaceKernel<'_> {
     ) -> Result<LaunchReceipt> {
         launch_declared(
             &self.0,
-            soma_abi::register::Entry::ScopeSurface.symbol(),
+            holonics_portable::wire::register::Entry::ScopeSurface.symbol(),
             scope_surface_argument_law(Extent::AtLeast(1)),
             evidence,
             offered(grid, block),
@@ -535,7 +535,7 @@ impl RegisterRecastKernel<'_> {
     ) -> Result<LaunchReceipt> {
         launch_declared(
             &self.0,
-            soma_abi::register::Entry::Recast.symbol(),
+            holonics_portable::wire::register::Entry::Recast.symbol(),
             recast_argument_law(Extent::AtLeast(1)),
             evidence,
             offered(grid, block),
@@ -554,7 +554,7 @@ impl RegisterRecastKernel<'_> {
     ) -> Result<LawfulLaunch> {
         prove_cover(
             &self.0,
-            soma_abi::register::Entry::Recast.symbol(),
+            holonics_portable::wire::register::Entry::Recast.symbol(),
             recast_argument_law(params),
             evidence,
             extent,
@@ -588,7 +588,7 @@ impl RegisterRecastFinishKernel<'_> {
     ) -> Result<LaunchReceipt> {
         launch_declared(
             &self.0,
-            soma_abi::register::Entry::RecastFinish.symbol(),
+            holonics_portable::wire::register::Entry::RecastFinish.symbol(),
             recast_argument_law(Extent::AtLeast(1)),
             evidence,
             offered(grid, block),
@@ -607,7 +607,7 @@ impl RegisterRecastFinishKernel<'_> {
     ) -> Result<LawfulLaunch> {
         prove_cover(
             &self.0,
-            soma_abi::register::Entry::RecastFinish.symbol(),
+            holonics_portable::wire::register::Entry::RecastFinish.symbol(),
             recast_argument_law(params),
             evidence,
             extent,
@@ -641,7 +641,7 @@ impl RegisterCarrierRebaseKernel<'_> {
     ) -> Result<LaunchReceipt> {
         launch_declared(
             &self.0,
-            soma_abi::register::Entry::CarrierRebase.symbol(),
+            holonics_portable::wire::register::Entry::CarrierRebase.symbol(),
             carrier_argument_law(Extent::AtLeast(1)),
             evidence,
             offered(grid, block),
@@ -660,7 +660,7 @@ impl RegisterCarrierRebaseKernel<'_> {
     ) -> Result<LawfulLaunch> {
         prove_cover(
             &self.0,
-            soma_abi::register::Entry::CarrierRebase.symbol(),
+            holonics_portable::wire::register::Entry::CarrierRebase.symbol(),
             carrier_argument_law(params),
             evidence,
             extent,
@@ -676,27 +676,27 @@ impl RegisterCarrierRebaseKernel<'_> {
 
 impl Module {
     pub fn register_scope(&self) -> Result<RegisterScopeKernel<'_>> {
-        self.function(soma_abi::register::Entry::Scope.symbol())
+        self.function(holonics_portable::wire::register::Entry::Scope.symbol())
             .map(RegisterScopeKernel)
     }
 
     pub fn register_scope_surface(&self) -> Result<RegisterScopeSurfaceKernel<'_>> {
-        self.function(soma_abi::register::Entry::ScopeSurface.symbol())
+        self.function(holonics_portable::wire::register::Entry::ScopeSurface.symbol())
             .map(RegisterScopeSurfaceKernel)
     }
 
     pub fn register_recast(&self) -> Result<RegisterRecastKernel<'_>> {
-        self.function(soma_abi::register::Entry::Recast.symbol())
+        self.function(holonics_portable::wire::register::Entry::Recast.symbol())
             .map(RegisterRecastKernel)
     }
 
     pub fn register_recast_finish(&self) -> Result<RegisterRecastFinishKernel<'_>> {
-        self.function(soma_abi::register::Entry::RecastFinish.symbol())
+        self.function(holonics_portable::wire::register::Entry::RecastFinish.symbol())
             .map(RegisterRecastFinishKernel)
     }
 
     pub fn register_carrier_rebase(&self) -> Result<RegisterCarrierRebaseKernel<'_>> {
-        self.function(soma_abi::register::Entry::CarrierRebase.symbol())
+        self.function(holonics_portable::wire::register::Entry::CarrierRebase.symbol())
             .map(RegisterCarrierRebaseKernel)
     }
 }

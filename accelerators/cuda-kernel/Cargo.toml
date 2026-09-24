@@ -21,7 +21,6 @@ crate-type = ["cdylib"]
 
 [dependencies]
 holonics-portable = { path = "../../crates/holonics-portable" }
-soma-abi = { path = "../../crates/holonic-abi" }
 
 [profile.release]
 panic = "abort"

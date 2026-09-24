@@ -546,7 +546,6 @@ dependencies = [
  "life",
  "num-bigint",
  "sha2 0.10.9",
- "soma-abi",
 ]
 
 [[package]]
@@ -591,7 +590,6 @@ version = "0.1.0"
 dependencies = [
  "holonics",
  "holonics-portable",
- "soma-abi",
 ]
 
 [[package]]
@@ -757,7 +755,6 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2 0.11.0",
- "soma-abi",
  "thiserror",
 ]
 
@@ -1236,9 +1233,6 @@ checksum = "8ed6a63f02c8539c91a8685a86f4099661ba3da017932f6ebbea6de3f0fa7c90"
 [[package]]
 name = "soma-abi"
 version = "0.0.0"
-dependencies = [
- "holonics-portable",
-]
 
 [[package]]
 name = "soma-derivation-atlas"

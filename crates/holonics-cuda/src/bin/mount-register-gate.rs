@@ -32,7 +32,7 @@ use holonics_cuda::{
     RegisterScopeKernel, RegisterScopeSurfaceArguments, RegisterScopeSurfaceKernel, RegisterSpan,
     RegisterWriteSpan, Result,
 };
-use soma_abi::{contact as contact_abi, register as register_abi};
+use holonics_portable::wire::{contact as contact_abi, register as register_abi};
 
 const PTX: &[u8] = include_bytes!("../../../../accelerators/cuda-kernel/soma_kernel_cuda.ptx");
 

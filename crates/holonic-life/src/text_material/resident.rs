@@ -2,7 +2,7 @@
 
 use holonics::structure::LocalSequence;
 use serde::Serialize;
-use soma_abi::text_restrict_cuda as text_cuda;
+use holonics_portable::wire::text_restrict_cuda as text_cuda;
 
 use crate::{
     laboratory_language::{

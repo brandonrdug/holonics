@@ -25,8 +25,8 @@ use std::time::Instant;
 use holonics::structure::{LocalSequence, LocalStructureError};
 use holonics_cuda::{Context, Device, DeviceBuffer, Module, Stream, SOMA_PTX};
 use serde::Serialize;
-use soma_abi::morphological_conduct_cuda as wire;
-pub use soma_abi::morphological_conduct_cuda::MorphologicalConductCandidate;
+use holonics_portable::wire::morphological_conduct_cuda as wire;
+pub use holonics_portable::wire::morphological_conduct_cuda::MorphologicalConductCandidate;
 
 #[derive(Clone, Debug)]
 pub enum MorphologicalConductCudaError {

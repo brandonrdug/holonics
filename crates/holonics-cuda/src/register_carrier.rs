@@ -11,7 +11,7 @@ use crate::{
     RegisterSpan, RegisterWriteSpan, Result,
 };
 use holonics_portable::manifold;
-use soma_abi::register;
+use holonics_portable::wire::register;
 
 pub struct RegisterCarrierRebase<'a> {
     pub old_carriers: &'a DeviceBuffer<u32>,

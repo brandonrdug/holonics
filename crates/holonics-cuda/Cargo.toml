@@ -16,7 +16,6 @@ path = "src/lib.rs"
 # host reference through the SAME law code the CUDA kernel compiles for nvptx — one mouth, both sides.
 [dependencies]
 holonics-portable = { path = "../holonics-portable" }
-soma-abi = { path = "../holonic-abi" }
 # The backend consumes the framework's exact ratio rings; the framework does not depend on CUDA.
 holonics = { path = "../holonics" }
 

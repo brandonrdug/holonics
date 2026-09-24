@@ -13,8 +13,8 @@ use holonics::structure::{LocalSequence, LocalStructureError};
 use holonics_cuda::{Context, Device, DeviceBuffer, Module, Stream, SOMA_PTX};
 use serde::Serialize;
 
-use soma_abi::returned_contact_cuda as wire;
-pub use soma_abi::returned_contact_cuda::ReturnedContactRelation;
+use holonics_portable::wire::returned_contact_cuda as wire;
+pub use holonics_portable::wire::returned_contact_cuda::ReturnedContactRelation;
 
 #[derive(Clone, Debug)]
 pub enum ReturnedContactCudaError {

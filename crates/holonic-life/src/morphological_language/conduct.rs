@@ -1065,7 +1065,7 @@ mod tests {
                     "the declared sequence is card-key order"
                 );
                 assert!(
-                    soma_abi::morphological_conduct_cuda::key_precedes(
+                    holonics_portable::wire::morphological_conduct_cuda::key_precedes(
                         pair[0].key_words(identity_words).unwrap().as_ref(),
                         pair[1].key_words(identity_words).unwrap().as_ref()
                     ),

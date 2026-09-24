@@ -147,7 +147,7 @@ fn live_event_argument_law() -> Vec<ArgumentRequirement> {
             "control",
             Access::Write,
             4,
-            Extent::Rows(soma_abi::live_event_cuda::CONTROL_WORDS),
+            Extent::Rows(holonics_portable::wire::live_event_cuda::CONTROL_WORDS),
         ),
         ArgumentRequirement::device("relations", Access::Read, 4, Extent::Any),
         ArgumentRequirement::device(
@@ -176,13 +176,13 @@ fn live_event_argument_law() -> Vec<ArgumentRequirement> {
 /// declare a *smaller* contact extent than the kernel writes.
 fn regional_contact_argument_law(work: usize) -> Result<Vec<ArgumentRequirement>> {
     let contact_words = work
-        .checked_mul(soma_abi::live_event_cuda::DIRECTED_CONTACT_WORDS)
+        .checked_mul(holonics_portable::wire::live_event_cuda::DIRECTED_CONTACT_WORDS)
         .ok_or_else(|| {
             boundary(
                 "regional contact CUDA work extent",
                 format!(
                     "{work} rows of {} contact words overflow usize",
-                    soma_abi::live_event_cuda::DIRECTED_CONTACT_WORDS
+                    holonics_portable::wire::live_event_cuda::DIRECTED_CONTACT_WORDS
                 ),
             )
         })?;
@@ -193,7 +193,7 @@ fn regional_contact_argument_law(work: usize) -> Result<Vec<ArgumentRequirement>
             "directed_events",
             Access::Read,
             4,
-            Extent::Rows(soma_abi::live_event_cuda::DIRECTED_EVENT_WORDS),
+            Extent::Rows(holonics_portable::wire::live_event_cuda::DIRECTED_EVENT_WORDS),
         ),
         ArgumentRequirement::device(
             "directed_contacts",
@@ -287,7 +287,7 @@ impl LiveEventPopulationKernel<'_> {
         }
         let limits = LaunchLimits::from_evidence(evidence, &self.0)?;
         let requirement = LaunchRequirement::guarded(
-            soma_abi::live_event_cuda::POPULATION_ENTRY_SYMBOL,
+            holonics_portable::wire::live_event_cuda::POPULATION_ENTRY_SYMBOL,
             count as u64,
             live_event_argument_law(),
         )
@@ -329,7 +329,7 @@ impl LiveEventKernel<'_> {
     ) -> Result<LaunchReceipt> {
         let limits = LaunchLimits::from_evidence(evidence, &self.0)?;
         let requirement = LaunchRequirement::exact(
-            soma_abi::live_event_cuda::ENTRY_SYMBOL,
+            holonics_portable::wire::live_event_cuda::ENTRY_SYMBOL,
             1,
             Dim3::x(1),
             live_event_argument_law(),
@@ -362,7 +362,7 @@ impl RegionalContactKernel<'_> {
         evidence: LaunchEvidence<'_>,
         arguments: RegionalContactArguments<'_>,
     ) -> Result<LaunchReceipt> {
-        let row_words = soma_abi::live_event_cuda::DIRECTED_EVENT_WORDS;
+        let row_words = holonics_portable::wire::live_event_cuda::DIRECTED_EVENT_WORDS;
         let directed_elements = arguments.directed_events.elements();
         if directed_elements == 0 || !directed_elements.is_multiple_of(row_words) {
             return Err(boundary(
@@ -375,7 +375,7 @@ impl RegionalContactKernel<'_> {
         let requirement = LaunchRequirement {
             block: BlockConstraint::exactly(Dim3::x(REGIONAL_CONTACT_BLOCK)),
             ..LaunchRequirement::guarded(
-                soma_abi::live_event_cuda::REGIONAL_CONTACT_ENTRY_SYMBOL,
+                holonics_portable::wire::live_event_cuda::REGIONAL_CONTACT_ENTRY_SYMBOL,
                 work as u64,
                 regional_contact_argument_law(work)?,
             )
@@ -401,17 +401,17 @@ impl RegionalContactKernel<'_> {
 
 impl Module {
     pub fn lineage_event(&self) -> Result<LiveEventKernel<'_>> {
-        self.function(soma_abi::live_event_cuda::ENTRY_SYMBOL)
+        self.function(holonics_portable::wire::live_event_cuda::ENTRY_SYMBOL)
             .map(LiveEventKernel)
     }
 
     pub fn lineage_event_population(&self) -> Result<LiveEventPopulationKernel<'_>> {
-        self.function(soma_abi::live_event_cuda::POPULATION_ENTRY_SYMBOL)
+        self.function(holonics_portable::wire::live_event_cuda::POPULATION_ENTRY_SYMBOL)
             .map(LiveEventPopulationKernel)
     }
 
     pub fn regional_contacts(&self) -> Result<RegionalContactKernel<'_>> {
-        self.function(soma_abi::live_event_cuda::REGIONAL_CONTACT_ENTRY_SYMBOL)
+        self.function(holonics_portable::wire::live_event_cuda::REGIONAL_CONTACT_ENTRY_SYMBOL)
             .map(RegionalContactKernel)
     }
 }
@@ -489,7 +489,7 @@ mod tests {
         // rather than a kernel that silently returns.
         assert!(law[1]
             .extent
-            .eq(&Extent::Rows(soma_abi::live_event_cuda::CONTROL_WORDS)));
+            .eq(&Extent::Rows(holonics_portable::wire::live_event_cuda::CONTROL_WORDS)));
     }
 
     /// The regional-contact entry's result extents are declared against its work, so a mismatched
@@ -500,12 +500,12 @@ mod tests {
         assert_eq!(law.len(), 5);
         assert_eq!(
             law[3].extent,
-            Extent::Exactly(7 * soma_abi::live_event_cuda::DIRECTED_CONTACT_WORDS)
+            Extent::Exactly(7 * holonics_portable::wire::live_event_cuda::DIRECTED_CONTACT_WORDS)
         );
         assert_eq!(law[4].extent, Extent::Exactly(7));
         assert_eq!(
             law[2].extent,
-            Extent::Rows(soma_abi::live_event_cuda::DIRECTED_EVENT_WORDS)
+            Extent::Rows(holonics_portable::wire::live_event_cuda::DIRECTED_EVENT_WORDS)
         );
     }
 }

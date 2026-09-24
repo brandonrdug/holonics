@@ -20,6 +20,7 @@ pub mod register;
 pub mod seam; // the swing's substrate read/store face — one scalar mouth at every packed boundary
 pub mod soul; // the cross-ratio χ — the soul of a three-body face // the research-quest instruments (the definitional topology — Brandon, 2026-07-09)
 pub mod section_layout_cuda; // exact shared section arithmetic and the CUDA section ABI
+pub mod wire; // exact host/device word rows shared with the detached CUDA kernel
 
 #[cfg(test)]
 mod tests {
