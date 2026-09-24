@@ -18,7 +18,7 @@ elementary objects ([plan](docs/plans/THE_REBUILD.md), [state](CONSTRUCTION_STAT
 | [`crates/holonics`](crates/holonics) | The main Rust library: the Holon law, ratio and ring arithmetic, geometry, receivers |
 | [`crates/holonics-cuda`](crates/holonics-cuda) | The CUDA backend (currently the device driver) |
 | [`accelerators/`](accelerators) | Device-only builds excluded from the host workspace (the driver smoke kernel) |
-| [`lean/`](lean) | The Lean mathematics (`ElementaryHolonics.Framework` and the research umbrella) |
+| [`lean/`](lean) | The Lean mathematics (`Holonics.Framework` and the research umbrella) |
 | [`docs/`](docs) | [The machine](docs/THE_MACHINE.md), the [elementary objects](docs/ELEMENTARY_OBJECTS.md), [the Holon](docs/HOLON.md), the [HNN formula](docs/HNN_FORMULA.md), [notation](docs/HOLONIC_NOTATION.md) and the mathematics guides |
 | [`research/`](research) | Dated research records, papers and design notes |
 

@@ -139,7 +139,7 @@ merely a coordinate equivalence.
 
 ## Exact executable receiving regions
 
-[definition] `holonics::geometry` exports `ComplexJet2`,
+[definition] The retired [`geometry::exact_analysis`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/exact_analysis.rs) exported `ComplexJet2`,
 `certify_capture`, `mean_value_release` and `propagate_to_capture`. A supplied callback must
 enclose the same holomorphic source and its first two derivatives throughout every requested
 box, including its analytic remainder. Capture certificates apply only to that source/law.

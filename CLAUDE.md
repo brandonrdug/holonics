@@ -29,7 +29,7 @@ restore wholesale. [THE_REBUILD](docs/plans/THE_REBUILD.md) gives the order.
 |---|---|
 | `crates/holonics/` | The main library: the Holon law and its facets, ratio/ring arithmetic, geometry (frames, screws, winding), navigators, receivers, standing and release. Rebuild step 1 reorganizes it into the operator layout. |
 | `crates/holonics-cuda/` | The CUDA driver. The HNN's resident realization is rebuilt here after its law exists in `holonics`. |
-| `lean/` | The Lean mathematics: the `Framework` foundation and the research umbrella. The package, library split and namespace move in rebuild step 1. |
+| `lean/` | The Lean package `holonics`: library `Holonics` (the `Framework` closure, the default target) and `HolonicsResearch` (the rest), namespace `Holonics`. |
 | `docs/` | The object and mathematics guides and the canon. The canon is historical doctrine; the elementary objects govern its wording. |
 | `research/` | Dated records (derivations, measurements, lessons), papers, design, notebook. |
 
@@ -44,7 +44,7 @@ restore wholesale. [THE_REBUILD](docs/plans/THE_REBUILD.md) gives the order.
 
 RH, Hodge, complex Euler/Navier–Stokes and BSD are targets advanced enough to apply Holonics to.
 They are never a separate "Millennium" category: work on them is landmark discovery and
-compression in the same objects. Their Lean (`lean/ElementaryHolonics/{Millennium,RH,Mathematics,Computation}`)
+compression in the same objects. Their Lean (`Millennium`, `RH`, `Mathematics`, `Computation` under `lean/Holonics/` and `lean/HolonicsResearch/`)
 stays attached to every rebuild step. A campaign names the navigators, terrain, kernel, cokernel
 and landmarks it touches.
 
@@ -52,7 +52,7 @@ and landmarks it touches.
 
 [project-postulate] Brandon, September 22: design, worker briefs, formal work and code state
 their operations **only** in the [elementary objects](docs/ELEMENTARY_OBJECTS.md), which own the
-definitions, the [operator contract](docs/ELEMENTARY_OBJECTS.md#operator-contract) (operations, current and target owners); `ElementaryHolonics.Framework.Objects` imports them
+definitions, the [operator contract](docs/ELEMENTARY_OBJECTS.md#operator-contract) (operations, current and target owners); `Holonics.Framework.Objects` imports them
 and the proved joins in `Objects/{Pairing,Deposition,Ratio,Parametron,RelativeCompleteness}`. A text, image, acoustic, motor or arithmetic
 application is a boundary chart of them. A noun that is not one of them, or a composition of
 them, is a design defect. The picture: a continuing field of chains of **complex parametrons**
@@ -202,12 +202,16 @@ lineage, obstruction and resource effects commute.
 
 [project-postulate] **Recover before implementing.** Before proposing a mechanism, or saying that
 something is absent, search for the subject **and** its operations in:
+- the [expression atlas](docs/atlas/README.md) first: about 2,200 derived expressions, identities,
+  bounds and barring counterexamples, stated on the objects with their owners
+  (`rg -i '<object|operation|classical name>' docs/atlas/`);
 - `docs/` and `research/records/` (its [README](research/records/README.md) routes subjects);
 - `lean/` and `crates/`;
 - history, with `git grep -i '<term>' 13f8c734`.
 
 Read the matched record and its actual owner or caller. A search hit is not a join. Name the
-existing owner and the concrete missing term.
+existing owner and the concrete missing term. A change that adds, moves or retires an owner updates
+its atlas rows in the same commit.
 
 [project-postulate] **Decide from the mathematics.** Resolve routine choices from the mathematics,
 mark an inferred choice with its reason (`agent-inferred`), and proceed. Never hand Brandon a

@@ -91,7 +91,7 @@ the requested receiver: a Lie generator `ξ` **with an initial configuration**, 
 
 [definition] The computational object of this construction is the **helical pair interaction**:
 an interaction (`Transport/HolonicInteraction`) whose declared rate ports carry the parameter rates
-of a `holonics::geometry::ScrewPair` and whose contact slip map is that pair's relative velocity.
+of a `holonics::geometry::screw::ScrewPair` and whose contact slip map is that pair's relative velocity.
 Its configuration, storage state and rate ports retain their explicit chart maps. The
 [design record](../research/records/2026-09-21_THE_HELICAL_PAIR_INTERACTION_IS_THE_HNN_SITE_AND_PHASE_CARRIES_CONTEXT.md)
 gives the source audit; the [helical guide](HELICAL_GEOMETRY.md#the-pair-is-a-holonic-interaction-contact)
@@ -109,7 +109,7 @@ Medium        q̇=(Ω−M_contact)Gq+Bu               storage G, flux Ω, drive/
 Reading       ρ_R at the Perspective               release through holonics::receiver::release
 ```
 
-[proved-derived; formal-checked] [`Transport/HelicalPairInteraction.lean`](../lean/ElementaryHolonics/Transport/HelicalPairInteraction.lean)
+[proved-derived; formal-checked] [`Transport/HelicalPairInteraction.lean`](../lean/Holonics/Transport/HelicalPairInteraction.lean)
 proves these pair/contact identities and the polarization identity
 `⟨a|b⟩=(⟨a|a⟩+⟨b|b⟩−⟨a−b|a−b⟩)/2`. The unit-phase participation score
 `β cos(2π(q_i−q_j−φ_ij))` is therefore the pair quadrance with both advances zero and unit
@@ -191,8 +191,8 @@ reusable generating law; keeping a copy of its latest produced word is not what 
 `ρ T_w v≠0` for an admitted later word w. It cannot be discarded by a representation promising
 that later reading. For example, `ρ(x,h)=x` and `T_u(x,h)=(x+u h,h)` give the same present face
 for `(0,1)` and `(0,-1)`, but different faces after `u=1`. This is the existing
-[future-agreement/standing law](../lean/ElementaryHolonics/Foundation/Standing.lean),
-with executable separators in `holonics::exact_linear::{ContextualFactorization,KernelModeReduction}`.
+[future-agreement/standing law](../lean/Holonics/Foundation/Standing.lean),
+with executable separators in history ([`ContextualFactorization`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/contextual.rs), [`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs)).
 
 [definition] Continuing compression retains `D E=ρ` and `E_next T_a=U_a E` for its declared
 action and receiver family. For state-dependent actions it also retains their domain/incidence:
@@ -260,7 +260,7 @@ exterior readings: an imported float is the exact rational of the stored value, 
 one, and the chart declares its calibration and quantization residual. The inspected Isaac Sim
 interface (source observation, action face, timing, reset, receiving consequence) is tabled in
 [history](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/HARDWARE_AND_MODALITY_BOUNDARIES.md#robotics-and-simulation-boundary). Owners:
-Lean `Transport/SerialScrewChain`; Rust `holonics::geometry::{SituatedScrew,ScrewGenerator}`; the
+Lean `Transport/SerialScrewChain`; Rust `holonics::geometry::screw::{SituatedScrew,ScrewGenerator}`, `holonics::holon::contact::SerialChain`; the
 chain's port source is the prototype [`serial.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/holonic_chain/serial.rs).
 
 ## High-level Holonic Interactions
@@ -271,22 +271,23 @@ operations on Holons, with familiar vector/tensor realizations where applicable.
 | Operation | Operational notation and effect | Current owner (`holonics` unless marked) |
 |---|---|---|
 | Superpose | α\|A⟩+β\|B⟩ in one compatible current space; phase combines before an intensity reading | exact current addition over `Rat` |
-| Assemble | \|A⊕B⟩ keeps both port blocks; direct sum is distinct from adding them in one space | `holon::PortHolon` port blocks, `dirac` interconnection |
-| Tensor-compose | \|A⊗B⟩ has components A^i B^j, retaining their axis roles and shared parameters | `exact_linear::BilinearProductCore`; Lean `Foundation/HolonTensorLens` |
-| Interact | \|C⟩=𝓘_(K,Θ)(\|A⟩,\|B⟩); a bilinear chart is C^c=I^c_ab A^a B^b | `exact_linear::BilinearRealization::apply`; `law::HolonLaw::interact` |
-| Receive/contract | ⟨r\|H⟩, or a partial tensor contraction leaving specified output axes | `factor_receiver`, `then_receiver`; `law::HolonLaw::receive` |
-| Receive then emit | (\|B⟩⟨r\|)\|A⟩=⟨r\|A⟩\|B⟩; a rank-one operator, with an explicitly declared bra | factorized linear maps in `exact_linear` |
-| Compose transports | Ĝ₂Ĝ₁\|H⟩; the output port of the first joins the input of the second | `then_receiver`, `then_fixed_right`; `generator::Transport` |
+| Assemble | \|A⊕B⟩ keeps both port blocks; direct sum is distinct from adding them in one space | `holon::PortHolon` port blocks, `holon::dirac` interconnection |
+| Tensor-compose | \|A⊗B⟩ has components A^i B^j, retaining their axis roles and shared parameters | Lean `Foundation/HolonTensorLens`; the prototype's [`BilinearProductCore`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/bilinear.rs) |
+| Interact | \|C⟩=𝓘_(K,Θ)(\|A⟩,\|B⟩); a bilinear chart is C^c=I^c_ab A^a B^b | `holon::law::HolonLaw::interact`; the prototype's [`BilinearRealization::apply`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/bilinear.rs) |
+| Receive/contract | ⟨r\|H⟩, or a partial tensor contraction leaving specified output axes | `holon::law::HolonLaw::receive` |
+| Receive then emit | (\|B⟩⟨r\|)\|A⟩=⟨r\|A⟩\|B⟩; a rank-one operator, with an explicitly declared bra | `ratio::linear` exact maps |
+| Compose transports | Ĝ₂Ĝ₁\|H⟩; the output port of the first joins the input of the second | `navigator::Transport` |
 | Reflect/interfere | A constituted multiport operator acts on incoming and stored-current kets together | the Swing `2P_D−I`; Lean `Computation/HolonicConstitutiveCirculation`; device scattering in history |
 | Attend / normalize participation | `Y_i=Σ_j a_ij U_ij V_j`, `a_ij=exp(s_ij)/Σ_k exp(s_ik)` on admitted contacts; a sigmoid is its binary restriction | `ratio::exponentiated::NormalizedKernel` forward, differential and pullback |
-| Differentiate/pull back | δ\|H'⟩=D𝓘_H δ\|H⟩; a covector acts through (D𝓘_H)* on the same material | bilinear `differential`/`pullback`; `law::HolonLaw::pullback` |
-| Generate | \|X(τ)⟩=𝓤_(Θ,K)^(τ←τ₀)(\|Ξ⟩;h), then ⟨r\|b_H(X(τ))⟩; the whole field evolves | `law::HolonLaw::advance`; Lean `Foundation/Holon.ofEvolution`; the field law is rebuild step 4 |
-| Recur / change scale | F^∘n(\|H⟩), or a recursive family H=union_i F_i(H); retain its scale maps and branch constraints | `restriction` (scale square, tube, tower); Lean `Foundation/FractalPacking` |
-| Apply an analytic generator | exp(tA), phase exp(iθ), logarithmic scale and Gamma recurrence with their actual domains and remainders | `generator::Clock` (Cayley step), `geometry` exact analysis |
-| Encode/reopen | \|ξ⟩=Ê\|H⟩; a decoder and residual reconstruct the requested field/face, with Ê_next T=U Ê | `exact_linear::{KernelModeReduction,ContextualFactorization}`; Lean `Physics/ReflectedBoundaryMemory` |
+| Differentiate/pull back | δ\|H'⟩=D𝓘_H δ\|H⟩; a covector acts through (D𝓘_H)* on the same material | `holon::law::HolonLaw::pullback`; `ratio::exponentiated::NormalizedKernel` pullback |
+| Generate | \|X(τ)⟩=𝓤_(Θ,K)^(τ←τ₀)(\|Ξ⟩;h), then ⟨r\|b_H(X(τ))⟩; the whole field evolves | `holon::law::HolonLaw::advance`; Lean `Foundation/Holon.ofEvolution`; the field law is rebuild step 4 |
+| Recur / change scale | F^∘n(\|H⟩), or a recursive family H=union_i F_i(H); retain its scale maps and branch constraints | `holon::restriction` (scale square, tube, tower); Lean `Foundation/FractalPacking` |
+| Apply an analytic generator | exp(tA), phase exp(iθ), logarithmic scale and Gamma recurrence with their actual domains and remainders | `navigator::Clock` (Cayley step); the prototype's [exact analysis](https://github.com/brandonrdug/holonics/tree/551d6c5d/crates/holonics/src/geometry/exact_analysis) |
+| Encode/reopen | \|ξ⟩=Ê\|H⟩; a decoder and residual reconstruct the requested field/face, with Ê_next T=U Ê | Lean `Physics/ReflectedBoundaryMemory`; the prototype's [`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs) and [`ContextualFactorization`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/contextual.rs), ported in rebuild step 3 |
 
-[established-bounded; implemented-exact] The factorized bilinear library (`holonics::exact_linear`)
-exposes `differential`, `pullback` and `precompose_ports`. It differentiates both input Holons through
+[established-bounded; implemented-exact] The prototype's factorized bilinear library
+([`bilinear.rs`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/bilinear.rs), retired in rebuild step 1) exposed `differential`,
+`pullback` and `precompose_ports`. It differentiates both input Holons through
 the same retained factor core; the reverse returns input covectors before any metric/Riesz
 identification. A finite change retains its separate mixed product. Port precomposition carries
 explicit new-to-old maps and rederives the receiver family when their ranks change. These are
@@ -305,7 +306,7 @@ It includes the two direct currents and their interaction term. This is an actua
 signature, not a statement that all Holons are bilinear regressions. Higher interactions
 compose suitable tensor/contraction operators or the model's nonlinear constitutive map.
 The prototype realized it on the device (`advance_bilinear_contact`, `bilinear_features`, in
-history); `holonics::exact_linear` exposes receiver composition and factor reuse. A helper around
+history); `holonics::ratio::linear` exposes factorization and factor reuse. A helper around
 a fitter would not establish a more general Holon algebra by itself.
 
 [definition] The [connected tensor computation](HNN_FORMULA.md#one-connected-tensor-computation)
@@ -365,21 +366,21 @@ every elementary carrier.
 | Characteristic | Mathematical content | Formal / executable owner |
 |---|---|---|
 | Situated difference | Compare through actual frames/receivers; the difference can be a relation, current or geometry | `Foundation/Receiver`; `holonics::geometry` |
-| Multiple faces | Equal measured values need not identify interiors; preimages can be implicit families | `Holon.PreimageFibre`; `holonics::restriction::fibre` |
-| Oriented interfaces | The two sides of an operation have actual domain, codomain and transport | `AddressedPassage`; `holonics::port` |
-| Serial composition | Join by `t₁(ω₁)=s₂(ω₂)`, then compose the operations | `Holon.comp`, `compPreimageFibreEquiv`; `holonics::structure::Chain` |
-| Joint composition | Cartesian products introduce independent degrees of freedom; a diagonal shares one occurrence | `Holon.cartesian`, `diagonal`, `offDiagonal`; `holonics::exact_linear::JointBilinearSystem` |
+| Multiple faces | Equal measured values need not identify interiors; preimages can be implicit families | `Holon.PreimageFibre`; `holonics::holon::restriction::{PreimageFibre,AffineFibre}` |
+| Oriented interfaces | The two sides of an operation have actual domain, codomain and transport | `AddressedPassage`; `holonics::holon::port` |
+| Serial composition | Join by `t₁(ω₁)=s₂(ω₂)`, then compose the operations | `Holon.comp`, `compPreimageFibreEquiv`; history [`structure::Chain`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/structure/chain.rs) |
+| Joint composition | Cartesian products introduce independent degrees of freedom; a diagonal shares one occurrence | `Holon.cartesian`, `diagonal`, `offDiagonal`; history [`JointBilinearSystem`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/joint_bilinear.rs) |
 | Identity and associativity | Identity does no transformation; associativity uses canonical reassociation of joined populations | addressed-span and relational composition |
 | Frame/parameter transport | Move interfaces, occurrence and reading through commuting maps; a rebase is invertible at its scope | `Holon.Rebase`, `CausalNaturalHolon`; `holonics::geometry` frame transport |
-| Geometry and incidence | Actual contact determines interaction; a projected crossing does not add an edge | `AddressedBoundary`; `holonics::complex`, `holonics::geometry::projection` crossings |
-| Constitutive response | Material relates arriving current, stored modes, geometry and outgoing field | `CoupledIncidence`, `PortEnergyHeat`; `holonics::element` |
+| Geometry and incidence | Actual contact determines interaction; a projected crossing does not add an edge | `AddressedBoundary`; `holonics::geometry::complex`; history [`projection`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/projection.rs) crossings |
+| Constitutive response | Material relates arriving current, stored modes, geometry and outgoing field | `CoupledIncidence`, `PortEnergyHeat`; `holonics::holon::element` |
 | Differential and adjoint | Differentiate the transformation, including material/chart motion; compose its adjoints | `Holon/Law.pullback_law`; `HolonLaw::pullback`, bilinear `pullback` |
 | Recursion and generation | Evolve a field/family and read its generated boundary at any nested scope | `Holon.ofEvolution`; `HolonLaw::advance` |
-| Exact inference | Solve for coefficients, factors, modes or compatible realizations | exact preimage/factorization; `holonics::exact_linear` |
-| Compression/refinement | `E_next T=U E`, `D E=ρ`, or an explicit transported error; retain newly relevant modes | `ReceiverHistoryCompression`, `ReflectedBoundaryMemory`; `holonics::exact_linear::KernelModeReduction` |
-| Conservation/dissipation | A supplied law accounts for flux, storage and heat | `BoundaryHolon`, `Holon/Law`; `holonics::law::EnergyBalance` |
+| Exact inference | Solve for coefficients, factors, modes or compatible realizations | exact preimage/factorization; `holonics::ratio::linear` |
+| Compression/refinement | `E_next T=U E`, `D E=ρ`, or an explicit transported error; retain newly relevant modes | `ReceiverHistoryCompression`, `ReflectedBoundaryMemory`; history [`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs) |
+| Conservation/dissipation | A supplied law accounts for flux, storage and heat | `BoundaryHolon`, `Holon/Law`; `holonics::holon::law::EnergyBalance` |
 | Information and measure | Declared measures yield entropy/loss; oriented current precedes scalar readings | `InformationDifference`, `ReceiverCodeCost`; `holonics::ratio::surprisal` |
-| Scale and locality | Restriction/prolongation and boundary summaries relate grains and local clocks | `WorldTube`, `ContinuingTower`; `holonics::restriction` |
+| Scale and locality | Restriction/prolongation and boundary summaries relate grains and local clocks | `WorldTube`, `ContinuingTower`; `holonics::holon::restriction` |
 | Continuing computation | Executable state, factors and live comparisons suffice where their law closes | `Foundation/Standing`; `holonics::receiver::standing`; the field is rebuild step 4 |
 
 [definition] The operations these characteristics become are defined in the
@@ -416,7 +417,7 @@ those properties. An operator must carry what its equation uses.
   representations of those operations, rather than labels that replace them.
 
 [established-bounded; source-inspected] Tensor lenses (`Foundation/HolonTensorLens`), exact linear
-algebra (`holonics::exact_linear`) and the boundary operators supply these constructions in
+algebra (`holonics::ratio::linear`) and the boundary operators supply these constructions in
 their declared source families. The summary specifies their use in one Holon algebra; it
 does not assert that all nonlinear operators have exact finite modal closures.
 
@@ -480,14 +481,18 @@ on the library; foreign forward graphs and Q/K/V caches are not ported whole.
 
 ## What exists now
 
-[established-bounded; source-inspected] Since the September 24 reset the computational Holon has
-these code owners:
-- `crates/holonics`, over `Rat` throughout: the Holon law and its facets (`holon`, `law`, `port`,
-  `dirac`, `element`, `complex`, `generator`, `restriction`, `deposition`, `reaction`,
-  `conformance`); exact algebra (`exact_linear` with the factorized bilinear operators and kernel
-  modes, `inertia`, `rational_polynomial`, `prime_image_algebra`); `ratio`; `geometry` (frames,
-  screws and pairs, winding, projection, receiver atlases); `receiver` (release, standing, causal
-  chord); and `structure` (`Face`, chains, crossings, atlases).
+[established-bounded; source-inspected] After rebuild step 1 the computational Holon has these
+code owners:
+- `crates/holonics`, exact over `Rat` throughout, in five operator modules:
+  - `ratio`: the undivided pair, rings, the exponentiated/log chart, surprisal, algebraic numbers,
+    polynomials, exact work, primality, and exact linear algebra (`ratio::linear`: inversion with
+    its fibre, inertia, prime images);
+  - `geometry`: complex, frames, screws and pairs, winding, the Swing;
+  - `holon`: law, ports, Dirac, elements, restrictions (tube, tower), deposition, reaction,
+    conformance, the pair contact and serial chain (`holon::contact`), the parametron
+    (`holon::parametron`);
+  - `navigator`: navigators, clocks, phase lifts, transports, lock addresses, trace faces;
+  - `receiver`: faces, release, standing, the causal chord.
 - `crates/holonics-cuda`: the CUDA driver only. The resident HNN is rebuilt there after its law
   exists in `holonics` (rebuild steps 4–5).
 - The prototype's resident sections, operative field, coupled body and its wrappers are in
@@ -496,15 +501,14 @@ these code owners:
   [HNN_FORMULA](HNN_FORMULA.md), and they are ported one law at a time under
   [THE_REBUILD](plans/THE_REBUILD.md).
 
-[definition] `structure::Face::map_scalar` need not be injective or reversible: a constant map
-refutes reversibility whenever the retained relation does not distinguish the prior scalars, and
-reconstruction needs an actual decoder. `Face::taken` stores two supplied values; it proves no
-projection equation between them.
+[definition] A face map need not be injective or reversible: a constant map refutes
+reversibility whenever the retained relation does not distinguish the prior values, and
+reconstruction needs an actual decoder.
 
 [project-postulate] The primitive contract for HNN assembly is the complete situated operation.
 Share, factor and rechart numerical sections while carrying the interface and law the consuming
 operation requires, and consolidate those joins in the model owner. A universal record of
-unrelated optional fields would not establish them; `holonics::Holon` is the law and its ports,
+unrelated optional fields would not establish them; `holonics::holon::Holon` is the law and its ports,
 not such a record. A wire or display result that omits internal incidence is an
 exterior projection; an algorithm that needs the omitted structure consumes its owner.
 

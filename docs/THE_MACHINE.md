@@ -131,11 +131,11 @@ connects these owners to rotor constraint inference, knot/game navigation and th
 | Participation and transported current | `T_F[Ψ]=Σ_G a_FG[Ψ] U_(F←G)[Ψ] Ψ_G`, over admitted contacts | `HolonicAdjointNormalization`; `holonics::ratio::exponentiated::NormalizedKernel` |
 | Phase comparison | `s_ij=β cos(2π(q_i−q_j−φ_ij))`, the pair receiver at zero advance and unit radii, with connection `φ`; amplitudes and general pairings extend it | `HelicalPairInteraction.bilinear_score_eq_polarized_quadrance`; `holonics::geometry::screw` |
 | Complete variation | `δT=Σ a δ(UΨ)+Σ δa UΨ`; for softmax `δa=(diag(a)−aa*)δs` | `HolonicAdjointNormalization.laplacianReturn` |
-| Local learned reaction | `Φ(s,c)=s⊕c⊕(c⊗s)`, `incoming=s+MΦ(s,c)`, `out=S_D(incoming,b)` | `HolonicConstitutiveCirculation`, `Holon/{Reaction,Cayley}`; `holonics::reaction` |
-| Normal law (deposition) | `H=H₀+Σw f f*`, `B=B₀+Σw t f*`, `W H=B`; priors, weights and receiving constraints are declared | `Holon/Deposition`, `Objects/Deposition`, `GeneratorInference`; `holonics::deposition` |
+| Local learned reaction | `Φ(s,c)=s⊕c⊕(c⊗s)`, `incoming=s+MΦ(s,c)`, `out=S_D(incoming,b)` | `HolonicConstitutiveCirculation`, `Holon/{Reaction,Cayley}`; `holonics::holon::reaction` |
+| Normal law (deposition) | `H=H₀+Σw f f*`, `B=B₀+Σw t f*`, `W H=B`; priors, weights and receiving constraints are declared | `Holon/Deposition`, `Objects/Deposition`, `GeneratorInference`; `holonics::holon::deposition` |
 | Generation and reception | `∂_τ x=F_(K,Θ)(x,h,τ)`, then `y=ρ_F b_H(x)`; refinement acts on the joint field and releases its requested boundary | `Holon.ofEvolution`, `ReceiverPotential`, `Foundation/ReceiverRelease`; `holonics::receiver::release` |
 | Receiver reconstruction | In a declared basis `A(z)=Σ_i ψ_i φ_i(z)`; text, image, acoustic or internal receivers read the same organization through their maps | `Foundation/Receiver`, `ChangingReceiver`, [receiver holarchy](RECEIVER_HOLARCHY.md); `holonics::receiver` |
-| Continuing compression | `D E=ρ`, `E_next T_g=U_g E`; otherwise keep the separating direction, interior or defect | `ReceiverHistoryCompression`, `GeneratorModeQuotient`, `CausalRelevance`; `holonics::exact_linear::KernelModeReduction` |
+| Continuing compression | `D E=ρ`, `E_next T_g=U_g E`; otherwise keep the separating direction, interior or defect | `ReceiverHistoryCompression`, `GeneratorModeQuotient`, `CausalRelevance`; history [`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs) |
 | Recursive geometry | First-arrival populations `A₀=A`, `A_(n+1)=Φ⁻¹(A_n)∖A` keep the source preimages at the receiver; a fixed-dimensional nonlinear recurrence can have fractal families | `HolonicRecurrentEcology.FirstArrival`, `FractalPacking`, `ChangingReceiver` |
 
 [definition] **Loss is the logarithm of a ratio of Holons** ([ratio](ELEMENTARY_OBJECTS.md#9-ratio)):
@@ -164,15 +164,15 @@ states that a scalar loss is one receiver's face of a residual, never the residu
 
 | Source relation | Lean owner | `holonics` today | Rebuild target; history at `13f8c734` |
 |---|---|---|---|
-| Toroidal domains, shared cells, phase connection | `Holon/Complex`, connection owners, `Millennium/HolonicTorusKnots` | `holonics::complex` | step 4; prototype `analytic_field.rs`, `hnn/field_geometry/` |
-| Helical pair and contact variation | `Geometry/ScrewGeometry`, `Transport/{HelicalPairInteraction,SerialScrewChain}` | `holonics::geometry::screw` | `holon::contact` (step 1); prototype `holonic_interaction/helical.rs`, `holonic_chain/serial.rs`, `exact_contact.rs` |
+| Toroidal domains, shared cells, phase connection | `Holon/Complex`, connection owners, `Millennium/HolonicTorusKnots` | `holonics::geometry::complex` | step 4; prototype `analytic_field.rs`, `hnn/field_geometry/` |
+| Helical pair and contact variation | `Geometry/ScrewGeometry`, `Transport/{HelicalPairInteraction,SerialScrewChain}` | `holonics::geometry::screw`, `holonics::holon::contact` | `holon::contact` (step 1); prototype `holonic_interaction/helical.rs`, `holonic_chain/serial.rs`, `exact_contact.rs` |
 | Winding, carry, lock address, trace faces, cell holonomy | `Geometry/{PhaseCarry,PairResonance}`, `Transport/{GeneratorTraceFaces,CellHolonomy}`, joined to `Farey`, `LocalFactor`, `HodgeReceiver`, `IwasawaTower` | `holonics::geometry::winding` (`Odometer`, `LockAddress`, `SiteFactor`, `Machine`, `triangle_holonomy`) | `navigator/` (step 1); dynamic carry tower, lock-address inference and dormant-class consumer are #17/#62 |
 | Parametron ring: `C`, `L`, pump, half-turn sheets, Ising lock | `Objects/Parametron`, `Physics/{PhaseCarrier,CoupledIncidence}` | none | `holon::parametron` (step 1); prototype `cuda_refine/complex_parametron.rs` |
 | Normalized receiver and both input covectors | `HolonicAdjointNormalization` | `holonics::ratio::exponentiated` | `holonics::hnn` (step 4); prototype `receiver/normalized/phase.rs` |
-| Constitutive current, storage and scattering | `HolonicConstitutiveCirculation`, `Holon/{Element,Dirac,Law}` | `holonics::{element,dirac,law,reaction}` | `holonics::hnn` (step 4); prototype `native_ecology/constitutive_fibre/field/junction/operative/` |
+| Constitutive current, storage and scattering | `HolonicConstitutiveCirculation`, `Holon/{Element,Dirac,Law}` | `holonics::holon::{element,dirac,law,reaction}` | `holonics::hnn` (step 4); prototype `native_ecology/constitutive_fibre/field/junction/operative/` |
 | Source moments, standing and release | `Transport/SourceMoment`, `Foundation/{Standing,ReceiverRelease}` | `holonics::receiver::{standing,release}` | `holonics::hnn` (step 4); moment accumulation replaces the prototype's per-occurrence tape |
-| Reuse at future receivers | `ReceiverHistoryCompression`, `GeneratorModeQuotient`, `CausalRelevance`, `ReceiverCodeCost` | `holonics::exact_linear::KernelModeReduction` | `holonics::compression` (step 3); prototype `receiver_history_compression.rs`, `identity_atlas.rs` |
-| Physical placement | — | `holonics::hardware_cover`; `holonics_cuda::Device::launch_census` | step 5; prototype `section_partition.rs`, `section_layout.rs`, `launch_law.rs` |
+| Reuse at future receivers | `ReceiverHistoryCompression`, `GeneratorModeQuotient`, `CausalRelevance`, `ReceiverCodeCost` | history [`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs) | `holonics::compression` (step 3); prototype `receiver_history_compression.rs`, `identity_atlas.rs` |
+| Physical placement | — | history [`hardware_cover`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/hardware_cover.rs); `holonics_cuda::Device::launch_census` | step 5; prototype `section_partition.rs`, `section_layout.rs`, `launch_law.rs` |
 
 History paths are under `crates/holonics-cuda/src/` at
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734/crates/holonics-cuda/src). Each

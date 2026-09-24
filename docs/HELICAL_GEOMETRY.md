@@ -19,8 +19,8 @@ A rotor is the finite specialization of this object: fixed material carried by a
 with a discrete torus of states and stepping as a winding. An articulated body is an ordered
 chain of these objects. [The pair below is a Holonic Interaction contact](#the-pair-is-a-holonic-interaction-contact)
 states both. Homeostasis refers to the actual driven return/stability law. The existing
-[`Horizon.smith`](../lean/ElementaryHolonics/Millennium/Horizon.lean)
-and [`RatioPresentation.blockTransport`](../lean/ElementaryHolonics/Geometry/CrossRatio.lean)
+[`Horizon.smith`](../lean/Holonics/Millennium/Horizon.lean)
+and [`RatioPresentation.blockTransport`](../lean/Holonics/Geometry/CrossRatio.lean)
 connect projective charting to ordered cascades, while the prototype's
 [`traversible_chain`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/traversible_chain.rs) kept the physical
 port normalization and reflected remainder. These source maps make the Flash testimony's
@@ -43,12 +43,11 @@ axis offset, aperture, retained winding and material all affect the receiver. Th
 translational components of **one** generator, the two **objects**, and the two factors of a
 split algebra are three different decompositions. None substitutes for another.
 
-[established-bounded; source-inspected] `RatVec3`, `RatMat3`, `AffineMap3`, `LocalFrame` and
-`FrameRelation` in `holonics::geometry` own these coordinate/frame operations. The
+[established-bounded; source-inspected] `RatVec3`, `RatMat3` and `AffineMap3` in `holonics::geometry` own these coordinate/frame operations. The
 [`screw`](../crates/holonics/src/geometry/screw.rs) specialization uses them for a generator,
 its orbit jets and paired quadrance; it adds no new frame system or protein codec. The formal
 companion is
-[`Geometry/ScrewGeometry.lean`](../lean/ElementaryHolonics/Geometry/ScrewGeometry.lean).
+[`Geometry/ScrewGeometry.lean`](../lean/Holonics/Geometry/ScrewGeometry.lean).
 It checks the bracket, translation covariance, invariant pairings, polynomial two-jet and moment
 specialization. Axis extraction and general proper rotational recharting currently have exact
 Rust tests; they are not silently included in that Lean proof scope.
@@ -171,7 +170,7 @@ and whose faces take this slip map is the
 [helical pair interaction unit](HOLON.md#the-helical-pair-interaction-unit), the site of an HNN
 and the contact of an articulated body.
 
-[proved-derived; formal-checked] [`Transport/HelicalPairInteraction.lean`](../lean/ElementaryHolonics/Transport/HelicalPairInteraction.lean)
+[proved-derived; formal-checked] [`Transport/HelicalPairInteraction.lean`](../lean/Holonics/Transport/HelicalPairInteraction.lean)
 proves, over ℚ at one configuration:
 
 ```text
@@ -246,7 +245,7 @@ carry cocycle behind the winding (`Geometry/PhaseCarry`), a lock as the zero-pow
 its Farey address and mediant cost (`Geometry/PairResonance`), the determinant, trace sequence
 and transfer determinant that phase carriage conserves (`Transport/GeneratorTraceFaces`), and
 the holonomy of a cell with harmonic standing relative to node/cell receivers (`Transport/CellHolonomy`).
-`holonics::geometry::winding` is their exact Rust owner.
+`holonics::geometry::winding` (phase, carry, odometer, cell holonomy) and `holonics::navigator::{address,trace}` (lock addresses, trace faces) are their exact Rust owners.
 
 [established-bounded; implemented-exact] **The prototype's Rust consumers** (history; rebuild
 step 1 ports them to `holon::contact`). At `13f8c734`,
@@ -301,11 +300,11 @@ the action and metric needed for each extension.
 
 | Required relation | Existing owner and consuming use |
 |---|---|
-| Phase closure, windings and arithmetic landmarks | `LandmarksAndModuli`, `Farey`, `Polarity`, `holonics::geometry::winding_inertia`; period/modulus and doubled-angle relations already connect finite navigators to exact algebraic faces |
-| π/e as normalized generating constraints | `PiIterationConstraint`, `MachinPhaseConstraint`, the exact analysis of `holonics::geometry`; [September 11 recovery](../research/records/2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md) retains branch, winding, independent navigators and remainder |
+| Phase closure, windings and arithmetic landmarks | `LandmarksAndModuli`, `Farey`, `Polarity`, the retired [`winding_inertia`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/winding_inertia.rs); period/modulus and doubled-angle relations already connect finite navigators to exact algebraic faces |
+| π/e as normalized generating constraints | `PiIterationConstraint`, `MachinPhaseConstraint`, the retired [`exact_analysis`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/exact_analysis.rs); [September 11 recovery](../research/records/2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md) retains branch, winding, independent navigators and remainder |
 | Named critical parameter | The actual `CopsonDeBruijn*` or `RH/DeBruijn*` source family; [the maintained distinction](CONSTRAINT_MODES_AND_RECEIVER_FACES.md) prevents conflating the two constants |
-| Inferred navigator/factor family | `GeneratorInference`, `GeneratorFactorization`, `GeneratorObservationScope`, `holonics::exact_linear` bilinear/factor owners; supplied navigators and inferred parameters are stated separately |
-| Lossless continuation at the admitted receivers | `ReceiverHistoryCompression`, `GeneratorModeQuotient`, `JointReceiverDescent`, the `holonics::exact_linear` receiver factorization; preserve `E T_g=U_g E` and the decoder, not merely a present rank |
+| Inferred navigator/factor family | `GeneratorInference`, `GeneratorFactorization`, `GeneratorObservationScope`, `holonics::ratio::linear` factor owners (the bilinear owner is [history](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/bilinear.rs)); supplied navigators and inferred parameters are stated separately |
+| Lossless continuation at the admitted receivers | `ReceiverHistoryCompression`, `GeneratorModeQuotient`, `JointReceiverDescent`, the retired [receiver factorization](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/contextual.rs); preserve `E T_g=U_g E` and the decoder, not merely a present rank |
 | Cost, mass and tolerance | `ReceiverCodeCost`, `AttentionModeCompression`, `AccumulatedReceiverDefect`; retain encoding/decoder work, complete class mass and transported residuals |
 
 [proved-derived] A useful helical compression bridge can be written now. For two situated initial

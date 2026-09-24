@@ -91,10 +91,10 @@ and on how its result travels under lawful changes of chart. Relativity gives th
 its structure. An arbitrary change of coordinates cannot authorize arbitrary consequences.
 A reader who changes the reference, grain or boundary must carry the comparison law too.
 
-[definition] The elementary [holon](../../lean/ElementaryHolonics/Foundation/Holon.lean)
+[definition] The elementary [holon](../../lean/Holonics/Foundation/Holon.lean)
 retains occurrence, source, target and receiver. The
-[measured-difference owner](../../lean/ElementaryHolonics/Foundation/MeasuredDifferenceReceiver.lean)
-and [changing-receiver calculus](../../lean/ElementaryHolonics/Transport/ChangingReceiver.lean)
+[measured-difference owner](../../lean/Holonics/Foundation/MeasuredDifferenceReceiver.lean)
+and [changing-receiver calculus](../../lean/Holonics/Transport/ChangingReceiver.lean)
 give explicit mathematical presentations. These sources formalize particular constructions;
 the philosophical thesis directs which distinctions their types must retain.
 

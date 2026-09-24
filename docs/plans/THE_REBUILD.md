@@ -2,7 +2,7 @@
 
 **Status:** active, September 24. This plan replaces the restructure plan, which is in git history
 at [`13f8c734`](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_REPOSITORY_RESTRUCTURE.md).
-Tracked in #63.
+Tracked in #63. Steps 0 and 1 are done (September 24); step 2 is next.
 
 ## The line the rebuild serves
 
@@ -62,7 +62,7 @@ everything else.
 - **BSD.** The kernel of the descent face is the doubles (`Millennium/FamilyKernel`). The rank counts
   independent navigators. The obstruction lives in a cokernel.
 
-Their Lean in `lean/ElementaryHolonics/{Millennium,RH,Mathematics,Computation}` is the most developed
+Their Lean in `Millennium`, `RH`, `Mathematics` and `Computation` under `lean/Holonics/` and `lean/HolonicsResearch/` is the most developed
 use of the framework. It is not scheduled behind the HNN: work on a target proceeds alongside any
 step. Each reusable law it finds lands in the shared objects (a navigator, a kernel/cokernel
 statement, a landmark), not in a problem-named silo.

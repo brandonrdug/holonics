@@ -63,12 +63,12 @@ Read [ELEMENTARY_OBJECTS](../../docs/ELEMENTARY_OBJECTS.md) (§ "Aeon, epoch and
 - [Clocked torus currents continue through a retained fibre](2026-09-08_CLOCKED_TORUS_CURRENTS_CONTINUE_THROUGH_A_RETAINED_FIBRE.md): phase, clock and continuing current.
 - [The clock is a receiver phase](2026-08-02_THE_CLOCK_IS_A_RECEIVER_PHASE_THE_STORE_IS_RETENTION_THE_CODEC_CARRIES_PHYSICAL_CURRENT.md) and [the receivers keep their clocks](2026-07-29_THE_RECEIVERS_KEEP_THEIR_CLOCKS_THE_RETURN_CLOSES_THE_SPEAKING_OCCURRENCE.md): the earlier source of receiver-relative clocks.
 
-Owners: Lean [`Geometry/PhaseCarry`](../../lean/ElementaryHolonics/Geometry/PhaseCarry.lean) (lift,
-carry), [`Transport/CellHolonomy`](../../lean/ElementaryHolonics/Transport/CellHolonomy.lean)
-(cycles, holonomy), [`Objects/Pairing`](../../lean/ElementaryHolonics/Objects/Pairing.lean),
-[`Objects/Parametron`](../../lean/ElementaryHolonics/Objects/Parametron.lean) (ring crossings as
-clock ticks), [`Physics/ObserverBoundaryCurrent`](../../lean/ElementaryHolonics/Physics/ObserverBoundaryCurrent.lean)
-(the observer covector), [`Transport/GeneratorTraceFaces`](../../lean/ElementaryHolonics/Transport/GeneratorTraceFaces.lean)
+Owners: Lean [`Geometry/PhaseCarry`](../../lean/Holonics/Geometry/PhaseCarry.lean) (lift,
+carry), [`Transport/CellHolonomy`](../../lean/Holonics/Transport/CellHolonomy.lean)
+(cycles, holonomy), [`Objects/Pairing`](../../lean/Holonics/Objects/Pairing.lean),
+[`Objects/Parametron`](../../lean/Holonics/Objects/Parametron.lean) (ring crossings as
+clock ticks), [`Physics/ObserverBoundaryCurrent`](../../lean/Holonics/Physics/ObserverBoundaryCurrent.lean)
+(the observer covector), [`Transport/GeneratorTraceFaces`](../../lean/Holonics/Transport/GeneratorTraceFaces.lean)
 (trace faces for the zeta); Rust `holonics::geometry::winding` (`Odometer` as a tower of epochs,
 `LockAddress`). `Holonics.Aeon` and `holonics::aeon` are rebuild step 2 targets (#72); their
 Lean obligations join #62.
@@ -91,19 +91,19 @@ rebuild, the elementary objects' "Emanation and resonance" and "Keys, locks and 
 - [Relevance, loss and realized classes](2026-09-09_RELEVANCE_LOSS_AND_REALIZED_CLASSES.md): the relevance kernel.
 
 Lean owners (rebuild step 3, #145): the kernel side
-[`Foundation/CausalRelevance`](../../lean/ElementaryHolonics/Foundation/CausalRelevance.lean),
-[`ReceiverHistoryCompression`](../../lean/ElementaryHolonics/Foundation/ReceiverHistoryCompression.lean),
-[`GeneratorModeQuotient`](../../lean/ElementaryHolonics/Foundation/GeneratorModeQuotient.lean); cost
-and inference [`ReceiverCodeCost`](../../lean/ElementaryHolonics/Foundation/ReceiverCodeCost.lean),
-[`GeneratorInference`](../../lean/ElementaryHolonics/Foundation/GeneratorInference.lean); the cokernel
-side [`Millennium/CokernelCalculus`](../../lean/ElementaryHolonics/Millennium/CokernelCalculus.lean),
-[`FamilyKernel`](../../lean/ElementaryHolonics/Millennium/FamilyKernel.lean); landmarks and partial
-navigators [`Mathematics/RatioSeriesTransport`](../../lean/ElementaryHolonics/Mathematics/RatioSeriesTransport.lean),
-[`RadixWindowReceiver`](../../lean/ElementaryHolonics/Mathematics/RadixWindowReceiver.lean),
-[`Computation/ZeroNavigation`](../../lean/ElementaryHolonics/Computation/ZeroNavigation.lean) and
-[`Geometry/TwoSidedIdentityAtlas`](../../lean/ElementaryHolonics/Geometry/TwoSidedIdentityAtlas.lean).
-Rust: `holonics::geometry::winding_inertia` and `holonics::exact_linear::KernelModeReduction`
-exist; the history owners
+[`Foundation/CausalRelevance`](../../lean/Holonics/Foundation/CausalRelevance.lean),
+[`ReceiverHistoryCompression`](../../lean/Holonics/Foundation/ReceiverHistoryCompression.lean),
+[`GeneratorModeQuotient`](../../lean/Holonics/Foundation/GeneratorModeQuotient.lean); cost
+and inference [`ReceiverCodeCost`](../../lean/Holonics/Foundation/ReceiverCodeCost.lean),
+[`GeneratorInference`](../../lean/Holonics/Foundation/GeneratorInference.lean); the cokernel
+side [`Millennium/CokernelCalculus`](../../lean/HolonicsResearch/Millennium/CokernelCalculus.lean),
+[`FamilyKernel`](../../lean/HolonicsResearch/Millennium/FamilyKernel.lean); landmarks and partial
+navigators [`Mathematics/RatioSeriesTransport`](../../lean/Holonics/Mathematics/RatioSeriesTransport.lean),
+[`RadixWindowReceiver`](../../lean/HolonicsResearch/Mathematics/RadixWindowReceiver.lean),
+[`Computation/ZeroNavigation`](../../lean/Holonics/Computation/ZeroNavigation.lean) and
+[`Geometry/TwoSidedIdentityAtlas`](../../lean/HolonicsResearch/Geometry/TwoSidedIdentityAtlas.lean).
+Rust: the prototype's [`winding_inertia`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/winding_inertia.rs) and
+[`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs) were retired in rebuild step 1 and are ported in step 3; the history owners
 [`receiver_history_compression`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/receiver_history_compression.rs)
 and [`identity_atlas`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/identity_atlas.rs)
 are port sources for `holonics::compression`.
@@ -119,13 +119,13 @@ communication, dormant availability, homeostasis, control and robotics as well a
 - [Situated generators retain modes and release action](2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md): rotor/Bombe constraint inference, recurrent availability, exact simulator boundaries and source corrections.
 - [Rubik faces lift to torus intersections and navigation](2026-09-19_RUBIK_FACES_LIFT_TO_TORUS_INTERSECTIONS_AND_NAVIGATION_GRAPHS.md): actual move words, quotient faces and retained full-state fibres.
 
-[`Foundation/Standing`](../../lean/ElementaryHolonics/Foundation/Standing.lean) and
-[`CausalRelevance`](../../lean/ElementaryHolonics/Foundation/CausalRelevance.lean) retain future
+[`Foundation/Standing`](../../lean/Holonics/Foundation/Standing.lean) and
+[`CausalRelevance`](../../lean/Holonics/Foundation/CausalRelevance.lean) retain future
 sufficiency and present reconstruction: retention is a quotient sufficient for the admitted future,
 never an event archive (see the
 [retention audit](2026-09-22_RETENTION_IS_A_QUOTIENT_NOT_A_TAPE_AND_THE_SOURCE_ENTERS_AS_PHASE_CARRIED_MOMENTS.md)).
-`holonics::receiver::{standing,release}` and the contextual and kernel-mode reductions of
-`holonics::exact_linear` realize them. The prototype's equal-drive
+`holonics::receiver::{standing,release}` realize them; the contextual and kernel-mode reductions
+([history](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear)) return in rebuild step 3. The prototype's equal-drive
 [`internal_mode`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/native_ecology/constitutive_fibre/field/internal_mode.rs)
 and [condition formation](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/hnn/coupled_wave/body/field/formation.rs)
 are in history, with their [composition](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition)
@@ -146,8 +146,8 @@ turns) and [the circulating cartographer](../../docs/canon/TABLET_THE_CIRCULATIN
 - [Generator meaning and campaign drift](2026-09-13_GENERATOR_MEANING_AND_CAMPAIGN_DRIFT_AUDIT.md): original messages, implementation substitutions and the source/condition attachment.
 
 `PhaseCarrier` supplies binary sheets and their coupled energy; `Chronology`/`Navigation` retain
-ordered Swing words; `Mathematics/GeneratorFactorization` infers navigators; `holonics::geometry::eta_atlas`
-is the current zero-search atlas.
+ordered Swing words; `Mathematics/GeneratorFactorization` infers navigators; the prototype's
+[`eta_atlas`](https://github.com/brandonrdug/holonics/tree/551d6c5d/crates/holonics/src/geometry/eta_atlas) was its zero-search atlas.
 
 ## Composition and participating receivers
 
@@ -192,7 +192,7 @@ with the [navigator/mode source map](../../docs/HELICAL_GEOMETRY.md) in the heli
 - [Fractal modes lift attention into mass-preserving generator compression](2026-09-12_FRACTAL_MODES_LIFT_ATTENTION_INTO_MASS_PRESERVING_GENERATOR_COMPRESSION.md): modal elimination, complete class mass, native/reference boundaries and future separators.
 
 Use `ReceiverHistoryCompression`, `GeneratorModeQuotient`, `JointReceiverDescent`, quadratic
-moments, `ReceiverCodeCost`, and `holonics::exact_linear` (`factor_receiver`, `KernelModeReduction`).
+moments, `ReceiverCodeCost`, and the prototype's [`exact_linear`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear.rs) (`factor_receiver`, `KernelModeReduction`; step 3).
 An encoder's `E_next T=U E` and its decoder state the reuse being claimed.
 
 ## Landmarks, π/e, windings and the distinct de Bruijn boundaries
@@ -207,7 +207,7 @@ history, [the constant/source distinction](https://github.com/brandonrdug/holoni
 - [Polylogarithms and finite quantum dilogarithms](2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md#polylogarithms-and-finite-quantum-dilogarithms): classical golden special values, the supplied real-quadratic paper, finite character composition and its nonzero pentagon defect; a source comparison, not a native binding claim.
 
 `LandmarksAndModuli`, `Farey`, `Polarity`, `PiIterationConstraint`, `MachinPhaseConstraint` and
-`holonics::geometry::winding_inertia` precede the landmark search of rebuild step 3. Copson's tail
+the prototype's [`winding_inertia`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/winding_inertia.rs) precede the landmark search of rebuild step 3. Copson's tail
 coefficient and the Newman backward-heat threshold have different formal owners, normalization and
 open consequences.
 
@@ -249,8 +249,8 @@ Read [the fluid construction](../../docs/HOLONIC_FLUID_CONSTRUCTION.md),
 - [Swing, stress and interior feedback form the fluid construction](2026-09-14_SWING_STRESS_AND_INTERIOR_FEEDBACK_FORM_THE_FLUID_CONSTRUCTION.md): the constitutive/fluid and Hodge owners that the model can consume.
 - [A brief Flash session reports the bilateral screw correspondence](2026-09-21_A_BRIEF_FLASH_SESSION_REPORTS_THE_BILATERAL_SCREW_CORRESPONDENCE_AND_PROPOSES_EXACT_CASCADE_EXPERIMENTS.md): the same testimony read across the Hodge and fluid instances, including the pressure-elimination reading and the exact-experiment proposals.
 
-These connect [`ChangingReceiver`](../../lean/ElementaryHolonics/Transport/ChangingReceiver.lean),
-[`ConstitutiveModulation`](../../lean/ElementaryHolonics/Physics/ConstitutiveModulation.lean),
+These connect [`ChangingReceiver`](../../lean/Holonics/Transport/ChangingReceiver.lean),
+[`ConstitutiveModulation`](../../lean/Holonics/Physics/ConstitutiveModulation.lean),
 Hodge decomposition/realization and Galerkin Euler/NS. A shared equation retains its source and
 hypotheses when its material or receiver changes.
 
@@ -259,8 +259,8 @@ hypotheses when its material or receiver changes.
 Read [mass/energy and causal transport](../../docs/MASS_ENERGY_AND_CAUSAL_TRANSPORT.md),
 [the formal framework](../../docs/FORMAL_FRAMEWORK.md) and [RH source transport](../../docs/RH_CENTERED_CURRENT_UPPER_BOUND.md).
 The divisor-source transport of the paper `divisor-source-transport-boundary` is checked in
-[`RH/DivisorSourceTransport`](../../lean/ElementaryHolonics/RH/DivisorSourceTransport.lean) and
-[`RH/DivisorQuotientFamily`](../../lean/ElementaryHolonics/RH/DivisorQuotientFamily.lean).
+[`RH/DivisorSourceTransport`](../../lean/HolonicsResearch/RH/DivisorSourceTransport.lean) and
+[`RH/DivisorQuotientFamily`](../../lean/HolonicsResearch/RH/DivisorQuotientFamily.lean).
 
 - [Mass-energy and Maxwell bounds unify transport](2026-09-12_MASS_ENERGY_AND_MAXWELL_BOUNDS_UNIFY_TRANSPORT.md): units, source/receiver frames and the physical current.
 - [Compact fibres return charge and recover the physics](2026-09-13_COMPACT_FIBRES_RETURN_CHARGE_AND_THE_RESEARCH_WORKFLOW_RECOVERS_ITS_PHYSICS.md): the compactification, gauge and matter-Hamiltonian chain.
@@ -280,7 +280,7 @@ and [the device law](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/
 - [Warp scheduler, typed reductions and pressure](2026-08-19_THE_WARP_SCHEDULER_DOES_NOT_SCHEDULE_THE_HOLON_THE_REDUCTION_IS_A_TYPED_JUNCTION_AND_THE_CARD_OWES_ITS_PRESSURE_FIELD.md): mathematical work versus hardware scheduling.
 - [Wave 11 section ports and baseline](2026-09-20_WAVE_ELEVEN_RETURNS_THE_SECTION_PORTS_AND_ITS_BASELINE_SHOWS_A_TEXT_WINDOW_ON_ONE_LANE.md): the returned call boundaries and measured source; later corrections belong beside that scope.
 
-`holonics::hardware_cover` and the `holonics-cuda` driver exist. The partition and launch owners
+The `holonics-cuda` driver exists; the prototype's [`hardware_cover`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/hardware_cover.rs) returns in rebuild step 5. The partition and launch owners
 are port sources in history:
 [`section_partition.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/section_partition.rs),
 [`launch_law.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/launch_law.rs),

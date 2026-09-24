@@ -76,7 +76,7 @@ This is exactly the scattering equation `Kv=2(u+Db)`, `w=v−u`, `b'=D†v−b`,
 ([HNN formula](HNN_FORMULA.md#the-constitutive-scattering-operator)).
 Indeed `K⁻¹(a+D D†a)=a`, so `P_G²=P_G`; linearity then gives
 `R_G²=4P_G²−4P_G+I=I`.
-[HolonicConstitutiveCirculation](../lean/ElementaryHolonics/Computation/HolonicConstitutiveCirculation.lean)
+[HolonicConstitutiveCirculation](../lean/HolonicsResearch/Computation/HolonicConstitutiveCirculation.lean)
 proves `graphProjection_idempotent`, `graphScattering_involutive`, and
 `graphScattering_eq_swing`, using the actual solve identity and the original Swing definition.
 The algebraic proof allows a supplied transpose-like map; orthogonality additionally uses the
@@ -95,7 +95,7 @@ differentiable orthogonal involution R(t), differentiate `R²=I` to obtain
 The derivative of `R(t+h)R(t)` at h=0 is Ω: paired Swings therefore generate an
 energy-preserving infinitesimal transport in the fixed metric. For a changing metric M(t),
 `d(xᵀMx/2)/dt=xᵀM ẋ+xᵀṀx/2`; the metric-work term remains.
-The existing [port-energy owner](../lean/ElementaryHolonics/Physics/PortEnergyHeat.lean)
+The existing [port-energy owner](../lean/Holonics/Physics/PortEnergyHeat.lean)
 already proves the corresponding changing-storage and heat-return balances.
 
 [proved-derived] The bridge to a concrete advection step is constructive. In an
@@ -239,10 +239,10 @@ retained in their respective kernels. This use of the Hodge viscosity is the fla
 specialization above; the curved Newtonian operator follows the stress calculation.
 
 [proved-derived; formal-checked] The existing finite
-[Hodge decomposition](../lean/ElementaryHolonics/Millennium/HodgeFiniteDecomposition.lean)
-and [Green operator](../lean/ElementaryHolonics/Millennium/HodgeGreenOperator.lean)
+[Hodge decomposition](../lean/Holonics/Millennium/HodgeFiniteDecomposition.lean)
+and [Green operator](../lean/Holonics/Millennium/HodgeGreenOperator.lean)
 split exact, coexact and harmonic sections. The
-[temporal owner](../lean/ElementaryHolonics/Physics/TemporalHodgeResidue.lean)
+[temporal owner](../lean/Holonics/Physics/TemporalHodgeResidue.lean)
 preserves the cohomology class under its heat step, with step stability a separate spectral
 condition. A harmonic toroidal circulation can have zero local curl and divergence while
 retaining a nonzero period around a cycle. Removing local pressure therefore does not erase
@@ -273,12 +273,12 @@ N(2b−u)+N(u)−2ḃ = 2[N(b)−ḃ−B(u−b,u−b)].
 
 If `ḃ=N(b)`, the defect is `−2B(r,r)`. Affine Swing acts on a state; its rate pushforward
 is −I with the moving-anchor term, not another affine reflection of a velocity.
-[FluidReceiverClosure](../lean/ElementaryHolonics/Physics/FluidReceiverClosure.lean)
+[FluidReceiverClosure](../lean/Holonics/Physics/FluidReceiverClosure.lean)
 proves the two `swing_even/odd` identities and `moving_swing_galerkin_rate_defect`.
 These statements use the actual Galerkin operators, not a stand-in bilinear law.
 
 [established-bounded; source-inspected] The earlier
-[clocked nonlinear-source Swing](../lean/ElementaryHolonics/Millennium/NavierStokesClockedPantographicSourceSwing.lean)
+[clocked nonlinear-source Swing](../lean/HolonicsResearch/Millennium/NavierStokesClockedPantographicSourceSwing.lean)
 also telescopes oriented source differences along dyadically approaching times and retains
 their reconstruction fibre. Compact-interior continuity controls that source increment.
 A terminal-uniform estimate at a potential singular time is a distinct unclosed analytic
@@ -301,14 +301,14 @@ q̇_t X + q_t[S_νr−B(R_tY,r)−B(r,R_tY)−B(r,r)].
 ```
 
 The actual trajectory theorem `moving_galerkin_receiver_equation` in
-[FluidReceiverClosure](../lean/ElementaryHolonics/Physics/FluidReceiverClosure.lean)
+[FluidReceiverClosure](../lean/Holonics/Physics/FluidReceiverClosure.lean)
 proves this equation with derivative hypotheses. `q_t r=0` does not imply the quadratic
 and mixed terms are invisible. For a Reynolds/filter realization obeying its required
 commutation rules, the same product difference appears as unresolved stress
 `τ_q=q(u⊗u)−q(u)⊗q(u)`. A general reconstruction retains the mixed terms too.
 
 [proved-derived; formal-checked] Boundary elimination has the same obligation. The existing
-[ReflectedBoundaryMemory](../lean/ElementaryHolonics/Physics/ReflectedBoundaryMemory.lean)
+[ReflectedBoundaryMemory](../lean/Holonics/Physics/ReflectedBoundaryMemory.lean)
 starts with `ẋ=Ax+Bz+f`, `ż=Cx+Dz+g` and derives, for `z=Kx+r`,
 
 ```text
@@ -384,7 +384,7 @@ reversible scattering realization of a constituted relation; this block gives it
 energy-exchange form once the physical advection port is specified. Equating an arbitrary
 contact graph with this particular fluid port still requires the stated realization map.
 The scattering law (`HolonicConstitutiveCirculation`) and
-[PortEnergyHeat](../lean/ElementaryHolonics/Physics/PortEnergyHeat.lean) are reusable
+[PortEnergyHeat](../lean/Holonics/Physics/PortEnergyHeat.lean) are reusable
 foundations. The continuum Q-field stress derivation above is complete on paper; a Q-field
 consumer and its continuum formalization are not yet implemented.
 
@@ -418,7 +418,7 @@ cannot be assigned magnetic-energy conservation merely by calling it a phase.
 velocity `b=B_magnetic/√(μ₀ρ)`, induction instead has
 `ḃ=−B(a,b)+B(b,a)+η_mΔ_Eb`. That opposite stretching sign cancels the physical cross
 power. The existing
-[ConductiveFluidReflection](../lean/ElementaryHolonics/Physics/ConductiveFluidReflection.lean)
+[ConductiveFluidReflection](../lean/Holonics/Physics/ConductiveFluidReflection.lean)
 proves the difference `−2B(b,a)` and the actual Galerkin Elsasser identities:
 
 ```text
@@ -453,7 +453,7 @@ Hstd_t(z) = (1/8) heatE(−t/4, ξ, 1/2+iz/2),
 Λ_std = 4Λ_DN.
 ```
 
-[CriticalChart](../lean/ElementaryHolonics/RH/CriticalChart.lean)
+[CriticalChart](../lean/HolonicsResearch/RH/CriticalChart.lean)
 proves these source, coordinate and time identities. Thus the shared heat calculus is
 usable, but physical viscosity time cannot silently replace the reversed entire-function
 time. The zero-location statement requires this source and its analytic domain; a harmonic
@@ -468,8 +468,8 @@ t₀=2, t₁=a,                 t_(n+2)=a t_(n+1)−q t_n,
 tr(M^n)=t_n.
 ```
 
-[LocalFactor](../lean/ElementaryHolonics/Millennium/LocalFactor.lean)
-and [TraceSequence](../lean/ElementaryHolonics/Millennium/TraceSequence.lean)
+[LocalFactor](../lean/Holonics/Millennium/LocalFactor.lean)
+and [TraceSequence](../lean/Holonics/Millennium/TraceSequence.lean)
 prove those equalities and, under `a²≤4q`, the root pair with `|α|²=q`.
 
 [proved-derived; formal-checked] The exact quadratic form
@@ -505,7 +505,7 @@ is insufficient to account for the dissipative return.
 [`sheaf_diffusion.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/sheaf_diffusion.rs)) exposed and
 consumed this complete `DiffusionEnergyBalance`, with exact regression over source work, a
 harmonic section, a grade-one lower coboundary contribution and a mismatched source operator.
-The bilinear owner of `holonics::exact_linear` supplies the complete input differential and
+The bilinear owner ([`exact_linear::bilinear`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/bilinear.rs), retired in rebuild step 1) supplied the complete input differential and
 covector return of a factorized interaction, including explicit port precomposition. Applied to
 the advection vertex from §7, this is the elementary return required for its state and material
 operands; physical adjunction additionally uses the declared energy pairing.

@@ -272,7 +272,7 @@ event.
 integration, separation, retention and release are read from the actual navigator, source and
 receiver, and can coexist in this field. The discrete rate form `T*G_next T−G`, or the continuous
 form `A*G+GA+Ġ`, ties that reading to its metric and clock. Both forms are Hermitian, so their
-content is a signature under congruence (`holonics::inertia::{inertia, congruence}`), not an
+content is a signature under congruence (`holonics::ratio::linear::inertia::{inertia, congruence}`), not an
 eigenvalue or a score. One navigator can contract one direction of the field while expanding
 another, and a chart change carries that reading exactly.
 
@@ -412,7 +412,7 @@ Holon; a layer diagram is an execution chart, not a set of physically separated 
 restrictions do not close dynamically, keep the coupling, interior modes and residual.
 
 [definition] The carrier can have toroidal cycles, curved transport tubes and overlapping domains,
-with higher cells recording their joints. `holonics::complex` validates cell complexes with their
+with higher cells recording their joints. `holonics::geometry::complex` validates cell complexes with their
 connection incidence and curvature; connection/holonomy owners transport current around actual
 paths. A torus is not a generic hypersphere, and an aggregate intensity isosurface does not expose
 all of its constituent cycles. Interlinked cores, intersecting support domains and actual
@@ -439,7 +439,7 @@ binds that recursion to a holomorphic source: `f_s v=−f`, its enclosed release
 the complete preimage equation and certified receiving neighbourhoods. For a changing source the
 law is `F_s v=−F−u̇ F_u`; backward heat joins it to the RH zero motion.
 `Mathematics/AnalyticReceiving` binds the operation to `Holon` and clocked first arrivals;
-`holonics::geometry` supplies the exact enclosure and capture operations. These realize field
+The retired [`geometry::exact_analysis`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/exact_analysis.rs) supplied the exact enclosure and capture operations. These realize field
 refinement without making Newton dynamics every HNN's constitution; their logarithmic one-form
 and contour periods connect potential/phase circulation to the Hodge owners.
 
@@ -530,9 +530,9 @@ H = (φ* C φ + j* L j)/2,
 The internal powers cancel through the adjoint incidence: `V=IR` generalized by storage,
 induction and changing material. A changing population transfers charge/flux and boundary work
 through its actual contact map. Formal owners:
-[PortEnergyHeat](../lean/ElementaryHolonics/Physics/PortEnergyHeat.lean),
-[CoupledIncidence](../lean/ElementaryHolonics/Physics/CoupledIncidence.lean),
-[ConstitutiveModulation](../lean/ElementaryHolonics/Physics/ConstitutiveModulation.lean).
+[PortEnergyHeat](../lean/Holonics/Physics/PortEnergyHeat.lean),
+[CoupledIncidence](../lean/Holonics/Physics/CoupledIncidence.lean),
+[ConstitutiveModulation](../lean/Holonics/Physics/ConstitutiveModulation.lean).
 
 [definition] Port-Hamiltonian form `ẋ=(J−R)∇H+B u`, with skew `J`, nonnegative `R` and power
 output `B*∇H`, is a chart of the Holon's Dirac structure; graph interconnection composes it
@@ -606,7 +606,7 @@ skew, `J(c)=Σ_r c_r A_r` over the real coordinates of `c` with every slice skew
 `Re⟨s,J(c)s⟩=0` (`skewReaction_workless`); its passive part is a separate resistance. Applied
 explicitly, `x⁺=(I+hJ)x` gains `|x⁺|²=|x|²+h²|Jx|²`; the word therefore takes the Cayley step
 `C=(I−½hJ)⁻¹(I+½hJ)`, an isometry, and with resistance the midpoint balance
-`½|x⁺|²−½|x|²=−h⟨x̄,Rx̄⟩≤0` (`Holon/Cayley`; Rust `holonics::reaction`). This is the
+`½|x⁺|²−½|x|²=−h⟨x̄,Rx̄⟩≤0` (`Holon/Cayley`; Rust `holonics::holon::reaction`). This is the
 power-neutral reaction step 4 builds; the learned material on `Φ` enters through it.
 
 [proved-derived] The producing carriers give the return. For the bilinear score,
@@ -716,8 +716,8 @@ corrected its outward-normal sign and constant-input normalization domain.
 [proved-derived; formal-checked] For kernel-equivalent source classes keep `m_c=Σ μ_j` and
 `p_c=Σ μ_j V_j`; the same attention is `a_i=(Σ_c k_ic p_c)/(Σ_c k_ic m_c)`. The pair
 (mass, current) is associative; normalized means alone are not.
-[AttentionModeCompression](../lean/ElementaryHolonics/Computation/AttentionModeCompression.lean)
-owns the law. `holonics::exact_linear::KernelModeReduction` constructs an exact finite
+[AttentionModeCompression](../lean/Holonics/Computation/AttentionModeCompression.lean)
+owns the law. [`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs) constructed an exact finite
 factorization, transports its signed current columns and tests action closure, or returns the
 source-null separator; step 4 binds it to the HNN's operator execution.
 
@@ -754,7 +754,7 @@ only the common additive origin, which is a gauge. Its local return is a weighte
 Laplacian, and sigmoid is its two-member restriction. Neither needs sampling or a privileged
 winner. In the loss, `p−q` is the real codec-chart part of the Holon ratio's covector `R⁻¹dR`
 ([ratio](ELEMENTARY_OBJECTS.md#9-ratio)). Owners:
-[`Computation/HolonicAdjointNormalization`](../lean/ElementaryHolonics/Computation/HolonicAdjointNormalization.lean)
+[`Computation/HolonicAdjointNormalization`](../lean/Holonics/Computation/HolonicAdjointNormalization.lean)
 (`face_add_common`, `laplacianReturn`, `quadratic_laplacianReturn`,
 `sigmoid_is_binary_normalized_exponential`); Rust `holonics::ratio::exponentiated::RatioFamily`
 carries the cocycle and exact normalization in its symbolic-log domain.
@@ -771,7 +771,7 @@ The inference face factors through pairwise objective differences, so a candidat
 offset is the same gauge as above. A sufficient statistic with a closed update is a
 `ReceiverHistoryCompression`, keeping every admitted future inference without recovering the past;
 coarse candidate classes carry their summed fibre mass with log-sum-exp cost. Owner:
-[`Foundation/GeneratorInference`](../lean/ElementaryHolonics/Foundation/GeneratorInference.lean)
+[`Foundation/GeneratorInference`](../lean/Holonics/Foundation/GeneratorInference.lean)
 (`variational_minimum`), with the
 [September 12 record](../research/records/2026-09-12_GENERATOR_INFERENCE_CODES_FREE_ENERGY_AND_SUFFICIENT_CONTINUATION.md).
 This is navigator inference priced as description plus work.
@@ -882,11 +882,11 @@ assigned lattice/mode label.
 
 The residual can be another evolving mode or a memory realization; keeping it needs no replay of
 the past. The same law explains a boundary whose present response hides circulating interior
-dynamics. Owner: [ReflectedBoundaryMemory](../lean/ElementaryHolonics/Physics/ReflectedBoundaryMemory.lean).
+dynamics. Owner: [ReflectedBoundaryMemory](../lean/Holonics/Physics/ReflectedBoundaryMemory.lean).
 
 [proved-derived; formal-checked] With `x_next=A x+B z+f`, eliminating arbitrary `z` in the next
 boundary encoding is exact precisely when `E_next A=U E` and `E_next B=0`. The receiver
-factorization of `E_next[A B]` through `[E 0]` in `holonics::exact_linear` constructs it; a
+factorization of `E_next[A B]` through `[E 0]` in `holonics::ratio::linear` constructs it; a
 returned null-space separator identifies an omitted influence. With a constrained `z`-family,
 factor only that family. The same condition at each step yields the reduced recurrence by
 induction.
@@ -934,7 +934,7 @@ friction constructions. A biological or astronomical model additionally supplies
 material and boundary laws.
 
 [established-bounded; source-inspected] The
-[discrete induction owner](../lean/ElementaryHolonics/Millennium/HolonicDiscreteInduction.lean)
+[discrete induction owner](../lean/Holonics/Millennium/HolonicDiscreteInduction.lean)
 states `d_1 e=−ΔΦ`, proves `d_1 d_0=0`, and separates induced electromotive circulation from
 conductive response `j=σ e`; a nonzero divergence-free branch current is an eddy at that declared
 receiver. Magnetic order, conductivity, inductance, excitation frequency and geometry are distinct

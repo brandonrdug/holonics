@@ -127,8 +127,8 @@ e_t + (VI)_s = e_source I + i_source V - R I² - G V²
 The last term is exchange with changing geometry/material storage; it cannot be discarded by
 calling L and C weights. R I² and G V² become nonnegative dissipation for nonnegative R,G.
 Their thermalized fraction feeds temperature and then conductivity. This composes the existing
-[port-energy law](../lean/ElementaryHolonics/Physics/PortEnergyHeat.lean)
-and [scattering/heat law](../lean/ElementaryHolonics/Physics/ScatteringWaveHeat.lean)
+[port-energy law](../lean/Holonics/Physics/PortEnergyHeat.lean)
+and [scattering/heat law](../lean/Holonics/Physics/ScatteringWaveHeat.lean)
 with an explicit propagation source. It is a reduced physical equation, not a calibrated full
 lightning simulation.
 
@@ -182,7 +182,7 @@ the dynamic content to retain when a channel, fluid region or HNN constituent is
 It need not be implemented by saving every earlier event; a closed state realization can carry it.
 
 [proved-derived; formal-checked] For the candidate interior chart `z=K x+r`, the
-[reflected-boundary owner](../lean/ElementaryHolonics/Physics/ReflectedBoundaryMemory.lean)
+[reflected-boundary owner](../lean/Holonics/Physics/ReflectedBoundaryMemory.lean)
 derives the complete return:
 
 ```text
@@ -268,13 +268,13 @@ MHD induction is `-2 Bop(b,u)`. Its real receiver retains the force `Bop(b,b)`.
 The sign of the stretching term matters physically. Complex Fourier amplitudes for one real
 field and the additional pair (u,b) are distinct charts. A common imaginary symbol does not
 identify their operations. The finite Galerkin implementation of this algebra is
-[ConductiveFluidReflection](../lean/ElementaryHolonics/Physics/ConductiveFluidReflection.lean).
+[ConductiveFluidReflection](../lean/Holonics/Physics/ConductiveFluidReflection.lean).
 
 [proved-derived] Conjugation of the added field pair sends (u,b) to (u,-b). Its fixed part is u,
 but projecting to that fixed part before the quadratic operation loses `Bop(b,b)`. This is a
 precise Galois/involution connection: averaging a symmetry is linear and need not preserve
 nonlinear products. The existing
-[fluid receiver closure](../lean/ElementaryHolonics/Physics/FluidReceiverClosure.lean)
+[fluid receiver closure](../lean/Holonics/Physics/FluidReceiverClosure.lean)
 retains `Bop(U,r)+Bop(r,U)+Bop(r,r)` and the changing receiver term. Hodge projection removes
 the appropriate pressure component; it does not remove arbitrary circulation or hidden feedback.
 
@@ -303,7 +303,7 @@ can enter and leave that receiver's resolution. A diverging physical norm at an 
 its own scale/clock and regularity analysis; changing coordinates alone does not prove it bounded.
 
 [established-bounded; source-inspected] The existing
-[dynamic rescaling](../lean/ElementaryHolonics/Millennium/NavierStokesDynamicRescaling.lean)
+[dynamic rescaling](../lean/HolonicsResearch/Millennium/NavierStokesDynamicRescaling.lean)
 uses moving centre, scale, amplitude and physical time together. It retains the scale drift,
 centre velocity, amplitude rate, viscosity conversion and forcing. The endpoint owners retain
 conditions under which a nonvanishing normalized value or gradient obstructs smooth extension.

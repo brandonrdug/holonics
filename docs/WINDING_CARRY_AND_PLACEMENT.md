@@ -25,7 +25,7 @@ physical and learning applications are instances; none of them owns a private ve
 [proved-derived; formal-checked] A phase modulo `n` is a reading on a circle, `x % n`. The
 winding is `x / n`, and `phase + n·winding = x`. Adding phases digit-wise fails by the **carry**
 `⌊(a%n + b%n)/n⌋`, a staircase taking the values 0 and 1.
-[`Geometry/PhaseCarry.lean`](../lean/ElementaryHolonics/Geometry/PhaseCarry.lean):
+[`Geometry/PhaseCarry.lean`](../lean/Holonics/Geometry/PhaseCarry.lean):
 
 ```text
 winding_add              winding(x+y) = winding x + winding y + carry(x,y)
@@ -64,9 +64,9 @@ full dependency and decoder maps as in §6.
 synchronized direction satisfies `q·v_a=p·v_b`. Periodic closure and dynamical attraction to a
 locked orbit are further properties of the actual motion, not consequences of this local equation.
 The pair-contact lock laws are owned by
-[`Transport/HelicalPairInteraction.lean`](../lean/ElementaryHolonics/Transport/HelicalPairInteraction.lean);
+[`Transport/HelicalPairInteraction.lean`](../lean/Holonics/Transport/HelicalPairInteraction.lean);
 the address and mediant laws remain in
-[`Geometry/PairResonance.lean`](../lean/ElementaryHolonics/Geometry/PairResonance.lean):
+[`Geometry/PairResonance.lean`](../lean/Holonics/Geometry/PairResonance.lean):
 
 ```text
 HelicalPairInteraction.lock_iff_zero_power  with positive weight and null-definite response, zero power ⇔ q·v_a = p·v_b
@@ -101,7 +101,7 @@ The modular step/inversion representation and a finite rotor step/reflector each
 ordered group actions; identifying them requires a homomorphism respecting their relations.
 An arbitrary reflector is not a modular inversion merely because both are involutive. The
 Farey determinant also gives the tangency law of Ford circles (`a/b`, `c/d` tangent iff
-`|ad−bc|=1`), read by `Foundation/FractalPacking` as packing by mediants. Rust owner: `holonics::geometry::winding::LockAddress`.
+`|ad−bc|=1`), read by `Foundation/FractalPacking` as packing by mediants. Rust owner: `holonics::navigator::address::LockAddress`.
 
 [interpretation] Mode-locking staircases provide an analytic instance for specified driven
 circle-map families ([Alsedà–Borrós-Cullell](https://arxiv.org/abs/2012.03340)); transferring that
@@ -114,7 +114,7 @@ for driven pairs. The local lock theorem above remains independent of that analy
 
 [proved-derived; formal-checked] Carrying material to another phase conjugates it, so every class
 function of the material is conserved along the winding.
-[`Transport/GeneratorTraceFaces.lean`](../lean/ElementaryHolonics/Transport/GeneratorTraceFaces.lean):
+[`Transport/GeneratorTraceFaces.lean`](../lean/Holonics/Transport/GeneratorTraceFaces.lean):
 
 ```text
 phaseTransport_pow                                   (S⁻ᵈPSᵈ)ᵏ = S⁻ᵈPᵏSᵈ
@@ -131,14 +131,14 @@ machine_trace_sequence                               tr((⊕M_g)ᵏ) = Σ tr(M_g
 ℝ to a rotation scaled by `√q` in an adapted metric; `TraceSequence.theRootHasSquaredModulusQ`
 and `LocalFactor.companion_preserves_scaled_metric` own these readings. `a²=4q` permits a
 nontrivial Jordan shear; `a²>4q` gives distinct real eigenvalues, including negative or zero
-ones when admitted. `holonics::geometry::winding::SiteKind::{Rotation,Marginal,Dilation}` names these discriminant
+ones when admitted. `holonics::navigator::trace::SiteKind::{Rotation,Marginal,Dilation}` names these discriminant
 branches, not a universal Euclidean polar decomposition. A `SituatedScrew` does not determine
 a `SiteFactor`: the model must supply the represented two-dimensional material block. Larger
 or coupled blocks retain their own operator and faces.
 
 [proved-derived; formal-checked] For **block-diagonal** sites, the transfer determinant is the
 product of their factors and the trace sequence is the sum of theirs. Rust owner:
-`holonics::geometry::winding::{SiteFactor,Machine}`. Trace powers count weighted closed walks
+`holonics::navigator::trace::{SiteFactor,Machine}`. Trace powers count weighted closed walks
 when the material is an adjacency representation; for a general matrix they are trace readings.
 Newton's identities check spectral consistency. They do not prove source/receiver equivalence:
 `I₂` and `[[1,1],[0,1]]` both have trace powers `2` and transfer determinant `(1−T)²`, but the
@@ -163,7 +163,7 @@ nor transfers the conservative bound to all of its off-axis modes. The exact rat
 
 [proved-derived; formal-checked] The face read at a two-cell is the holonomy of the edge
 transports around it.
-[`Transport/CellHolonomy.lean`](../lean/ElementaryHolonics/Transport/CellHolonomy.lean):
+[`Transport/CellHolonomy.lean`](../lean/Holonics/Transport/CellHolonomy.lean):
 
 ```text
 triangleHolonomy_regauge             regauging conjugates the holonomy by the base frame
@@ -283,7 +283,7 @@ reflected pair with distinct advances that reads zero power on the declared face
 pair whose tank is not lossless, would break the correspondence.
 
 [proved-derived; formal-checked] The first derivation target is returned by
-[`RH/ZeroPairLock.lean`](../lean/ElementaryHolonics/RH/ZeroPairLock.lean):
+[`RH/ZeroPairLock.lean`](../lean/HolonicsResearch/RH/ZeroPairLock.lean):
 on the isotropic unit face the reflected pair's power is the squared advance defect
 `(2σ−1)²` (`reflectedPairPower_eq`); the pair is locked exactly when `σ = ½`
 (`reflected_pair_locked_iff_on_seam`); and for `γ ≠ 0` that is exactly when the `FosterTanks`

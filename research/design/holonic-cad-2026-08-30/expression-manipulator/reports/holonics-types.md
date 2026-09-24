@@ -39,7 +39,7 @@ Format of every row: `Name — fields — meaning — path:line`. Meanings are t
 
 Foundation files (26, 7744 lines): AddressedBoundary, BoundaryReceiver, BoundaryScalePassage, ComparisonCell, CoordinateHaarMomentReceiver, CoordinateHaarReceiver, CoordinateSubsetReceiver, CycleFilling, DiagonalChainTransport, EuclideanResidueTransport, ExactPartition, FractalPacking, HigherDifferenceAnnihilator, HigherDifferenceScaleDescent, HigherDifferenceTransport, Holon, LatticeTransport, Lineage, MeasuredDifferenceReceiver, OrderedWordChain, Presentation, PrimeValuationRadixAtlas, ProductDegreeTwo, Receiver, ReceiverQuotient, TransportLift.
 
-### A.1 `Millennium/HolonicParametron.lean` (274 lines) — namespace `Soma.Holonics.Millennium.HolonicParametron`
+### A.1 `Millennium/HolonicParametron.lean` (274 lines) — namespace `Holonics.Millennium.HolonicParametron`
 
 | Name | Definition | Meaning | Line |
 |---|---|---|---|

@@ -35,7 +35,7 @@ standard in force; CLAUDE.md and AGENTS.md cite it.
 | Winding, carry, helices and notation | [WINDING_CARRY_AND_PLACEMENT](../WINDING_CARRY_AND_PLACEMENT.md), [HELICAL_GEOMETRY](../HELICAL_GEOMETRY.md), [HOLONIC_NOTATION](../HOLONIC_NOTATION.md) |
 | Constraint modes, fluids, mass–energy and the formal framework | [CONSTRAINT_MODES_AND_RECEIVER_FACES](../CONSTRAINT_MODES_AND_RECEIVER_FACES.md), [HOLONIC_FLUID_CONSTRUCTION](../HOLONIC_FLUID_CONSTRUCTION.md), [FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS](../FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md), [MASS_ENERGY_AND_CAUSAL_TRANSPORT](../MASS_ENERGY_AND_CAUSAL_TRANSPORT.md), [FORMAL_FRAMEWORK](../FORMAL_FRAMEWORK.md) |
 | The line and the order of work; the current position | [THE_REBUILD](../plans/THE_REBUILD.md); [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md) |
-| Formal statements | [`lean/`](../../lean/README.md): `ElementaryHolonics.Framework` and the research umbrella |
+| Formal statements | [`lean/`](../../lean/README.md): `Holonics.Framework` and the research umbrella |
 | Executable law | `crates/holonics` (host), `crates/holonics-cuda` (device) |
 | Research routes and withdrawn claims | [records README](../../research/records/README.md); [RETRACTIONS](../RETRACTIONS.md) |
 

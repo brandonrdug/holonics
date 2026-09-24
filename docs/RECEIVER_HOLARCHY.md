@@ -66,7 +66,7 @@ ẏ = D_Sρ · F_S + D_Rρ · F_R + ∂_τρ.
 The source and receiver rates include the actual interaction when it changes their states.
 A prescribed receiver trajectory is a useful specialization with its motion supplied.
 For a linear receiving chart this reduces to `ẏ=q̇x+qẋ`, already proved by
-[ChangingReceiver](../lean/ElementaryHolonics/Transport/ChangingReceiver.lean).
+[ChangingReceiver](../lean/Holonics/Transport/ChangingReceiver.lean).
 Replacing the receiving Holon by a fixed row vector suppresses a term whenever that row
 actually changes. Conversely, a fixed receiver map remains a valid stated specialization.
 
@@ -119,8 +119,8 @@ builds `H(s) = C adj(sI−A) B / det(sI−A)` exactly over `ℚ`, certified coef
 The first term is supplied port work. `Σ_G` measures the source-free change of the reading and may
 carry positive, negative and null directions at once; a discrete transport has `T*G_next T − G`.
 Under a constant invertible chart `Σ_G` transforms by congruence (`CausalChord.rateForm_congruence`),
-so its signature, not the eigenvalues of `A`, is the invariant content; `holonics::inertia`
-(`inertia`, `congruence`, `pullback_inertia_bound`) reads it exactly. Integrating, differentiating,
+so its signature, not the eigenvalues of `A`, is the invariant content; `holonics::ratio::linear::inertia`
+(`inertia`, `congruence`; the pullback bound is in [history](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/inertia.rs)) reads it exactly. Integrating, differentiating,
 concentrating, maintaining, exploring and releasing are situated roles of one current at a declared
 metric, source, receiver and clock, not intrinsic capacities. A rise in a receiver intensity or in
 coarse entropy is not heat: physical homeostasis also owes storage, incoming and outgoing power and
@@ -233,7 +233,7 @@ F_R = j_R^μ n_R,μ,
 ```
 
 [proved-derived; formal-checked] The existing
-[ObserverBoundaryCurrent](../lean/ElementaryHolonics/Physics/ObserverBoundaryCurrent.lean)
+[ObserverBoundaryCurrent](../lean/Holonics/Physics/ObserverBoundaryCurrent.lean)
 derives that divergence from its source jet and contracts the symmetric observer deformation
 with T. Einstein/Bianchi supplies conserved stress under its field assumptions. The receiver
 therefore participates through its trajectory, orientation and constitutive boundary, rather
@@ -289,7 +289,7 @@ r₁(B₁)−r₀(B₀) = r₀(ΔB)+Δr(B₀)+Δr(ΔB).
 ```
 
 The last term is a genuine finite mixed difference. The existing
-[discrete induction](../lean/ElementaryHolonics/Millennium/HolonicDiscreteInduction.lean)
+[discrete induction](../lean/Holonics/Millennium/HolonicDiscreteInduction.lean)
 retains oriented face circulation and the full EMF fibre on its fixed carrier. Moving-face
 transport must supply the additional map; a new scalar flux label would not implement it.
 The exact bilinear difference/pullback library now exposes the corresponding elementary
@@ -310,7 +310,7 @@ A sampled basin image depicts evaluations of this construction; it does not repl
 full populations, parametric modes or unresolved interiors.
 
 [proved-derived; formal-checked] The new `ClockedFirstArrival` join in
-[HolonicRecurrentEcology](../lean/ElementaryHolonics/Computation/HolonicRecurrentEcology.lean)
+[HolonicRecurrentEcology](../lean/Holonics/Computation/HolonicRecurrentEcology.lean)
 uses the original autonomous first-arrival owner on `(x,k)↦(T_kx,k+1)`.
 It proves the actual iterate `(evolution T k n x,k+n)` and then the first-hit/exclusion
 identity for moving sets A_(k+n). An endogenous receiver belongs in x with its source
@@ -388,7 +388,7 @@ an event archive or perfect reconstruction of every earlier microscopic state.
 
 ## The concrete implementation and diagram return
 
-[established-bounded; implemented-exact] `holonics::geometry::projection` exposes
+[established-bounded; implemented-exact] The retired [`geometry::projection`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/projection.rs) exposed
 `project_receiver_point_rate` for its four projections and `project_point_with_motion` through the
 declared source→receiver route. The latter computes `p_R=Lp+b`, `ṗ_R=Lṗ+L̇p+ḃ`, then the actual
 projection derivative. The chart rates are supplied kinematic operands; two frame snapshots alone
@@ -397,7 +397,7 @@ material and current belong to its containing construction.
 
 [established-bounded; implemented-exact] The retired
 [`optical_receiver_frames`](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/examples/optical_receiver_frames.rs)
-example consumed that interface and `holonics::exact_linear::EnergyMomentum::{photon,boost_x}`
+example consumed that interface and [`EnergyMomentum::{photon,boost_x}`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/energy_momentum.rs)
 to form the diagram's 65 exact proper-time cuts. Its receiver world-tube is
 
 ```text
@@ -463,7 +463,7 @@ The triad is a useful selected set of cuts, not a required three-step engine or 
 
 [proved-derived; source-inspected] Adding an intermediate constraint gives
 `F_{0,1,2}⊆F_{0,2}`, hence `Y_*^{0,1,2}⊆Y_*^{0,2}`. This is the existing
-[`ReceiverPotential.additional_observation_refines`](../lean/ElementaryHolonics/Transport/ReceiverPotential.lean)
+[`ReceiverPotential.additional_observation_refines`](../lean/Holonics/Transport/ReceiverPotential.lean)
 construction on a product receiver; `image_receiver_restriction` covers source/target regions.
 `outcomes_singleton_of_factor` supplies the useful stronger case: a future face can be uniquely
 determined by the observations while the compatible source interior remains plural. The
@@ -476,7 +476,7 @@ An observation used at the contemporary cut need not have been available to a hi
 prediction; the occurrence/receiver chronology retains that distinction.
 
 [proved-derived; source-inspected] The existing
-[`ReflectedBoundaryMemory.boundary_reduction_iff`](../lean/ElementaryHolonics/Physics/ReflectedBoundaryMemory.lean)
+[`ReflectedBoundaryMemory.boundary_reduction_iff`](../lean/Holonics/Physics/ReflectedBoundaryMemory.lean)
 makes interior omission precise in a linear chart. For arbitrary boundary x and interior z,
 
 ```text
@@ -494,7 +494,7 @@ clock, obstruction, interior/radiation and receiver-family owners for the same c
 [definition] Conservation across these faces retains their orientations and actual material/
 exchange laws. Shared boundary contributions join through the declared incidence and transport;
 changing coarse charts carry their boundary-square defect when nonzero.
-[`ExteriorBoundary.pullback_coboundary_defect`](../lean/ElementaryHolonics/Geometry/ExteriorBoundary.lean)
+[`ExteriorBoundary.pullback_coboundary_defect`](../lean/Holonics/Geometry/ExteriorBoundary.lean)
 and the [active stress-face law](CONSTRAINT_MODES_AND_RECEIVER_FACES.md#the-overlap-has-stress-bearing-faces)
 make those obligations explicit. An active plate stores and changes current, material and frame;
 its receiving face is one projection of that continuing physical/mathematical construction.
