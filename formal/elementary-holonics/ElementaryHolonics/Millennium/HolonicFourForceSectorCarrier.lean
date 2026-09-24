@@ -1,4 +1,5 @@
 import ElementaryHolonics.Millennium.HolonicComposition
+import ElementaryHolonics.Foundation.TransportWord
 import ElementaryHolonics.Millennium.HolonicInteractionExterior
 import ElementaryHolonics.Millennium.HolonicRankFourInteractionPlanes
 
@@ -36,6 +37,7 @@ namespace Soma.Holonics.Millennium.HolonicFourForceSectorCarrier
 open Soma.Holonics
 open Soma.Holonics.Geometry.SixSphereMonodromy
 open Soma.Holonics.Millennium.HolonicComposition
+open Soma.Holonics.Foundation.TransportWord
 open Soma.Holonics.Millennium.HolonicFourTorusCarrier
 open Soma.Holonics.Millennium.HolonicInteractionExterior
 open Soma.Holonics.Millennium.HolonicRankFourInteractionPlanes

@@ -1,5 +1,6 @@
 import ElementaryHolonics.Millennium.HolonicFourForceSectorCarrier
 import ElementaryHolonics.Geometry.ConnectionCalculus
+import ElementaryHolonics.Foundation.TransportWord
 import Mathlib.Analysis.Calculus.FDeriv.Symmetric
 import Mathlib.Analysis.Calculus.FDeriv.Mul
 import Mathlib.Analysis.Calculus.ContDiff.Basic
@@ -130,6 +131,7 @@ section Discrete
 
 open Soma.Holonics.Millennium.HolonicFourForceSectorCarrier
 open Soma.Holonics.Millennium.HolonicComposition
+open Soma.Holonics.Foundation.TransportWord
 open Soma.Holonics.Millennium.HolonicFourTorusCarrier
 
 variable {grain : ℕ}

@@ -332,3 +332,11 @@ kernel/fibre laws from the concrete `Millennium.Rigidity` examples into the alre
 `Foundation.Receiver` owner. `Framework.Geometry` names the Receiver owner directly and drops its
 direct Rigidity import; the Research module retains the square and collinear stress instances. The
 closure audit and focused pending Lake gates are recorded in the cut report.
+## M2 group-valued TransportWord owner
+
+[`M2_HOLONIC_COMPOSITION_TRANSPORT_WORD.md`](M2_HOLONIC_COMPOSITION_TRANSPORT_WORD.md) moves
+generic endpoint-order, additive-translation, and permutation-valued word-transport laws into the
+existing `Foundation.TransportWord` source owner. The Research composition module imports that
+owner and keeps its Swing/realization constructions and controls. Direct and indirect group-word
+consumers now import the core owner explicitly. This is an ownership cut only; the subsequent
+`Framework.Geometry` edge to HolonicComposition remains. Focused gates are pending root coordination.

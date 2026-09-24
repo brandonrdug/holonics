@@ -1,4 +1,5 @@
 import ElementaryHolonics.Foundation.ComparisonCell
+import ElementaryHolonics.Foundation.TransportWord
 import ElementaryHolonics.Millennium.PhysicalRealization
 import ElementaryHolonics.Millennium.SwingBridges
 
@@ -10,12 +11,13 @@ and Swing owners into contact.  It does not introduce a planner or a universal h
 `wordPassage` is literally iterated pullback composition of generator graphs; its fibre therefore
 retains every intermediate occurrence and joining equality.  Connection transport is declared
 before loop holonomy, and noninvertible routes retain comparison defects without being promoted to
-group commutators.
+group commutators; generic endpoint-order and permutation-valued word transport are owned by Foundation/TransportWord.
 -/
 
 namespace Soma.Holonics
 
 open Soma.Holonics.Millennium.Chronology
+open Soma.Holonics.Foundation.TransportWord
 
 universe u v w
 
@@ -161,12 +163,6 @@ theorem orderedSwingWord_retains_lineage (word : List Site) (body : Site) :
     Nonempty ((AddressedPassage.wordPassage swing word).Fibre body
       (transportWord swing word body)) :=
   ⟨AddressedPassage.wordFibre swing word body⟩
-
-/-- Endpoint action is order-blind exactly for pairwise commuting transports.  The addressed word
-and its occurrence fibre remain available even when this endpoint quotient applies. -/
-theorem chronology_discard_iff_commuting {I X : Type*} (T : I → X → X) :
-    OrderBlind T ↔ ∀ i j x, T i (T j x) = T j (T i x) :=
-  orderBlind_iff_commute
 
 /-! ## Declared connection transport and loop return -/
 
@@ -381,76 +377,6 @@ theorem commutatorRouteReturn_eq_one_iff {Fibre : Type*}
   rw [commutatorRouteReturn, routeComparisonReturn_eq_one_iff]
   rfl
 
-/-! ## Additive connection specialization -/
-
-/-- Exact translation of an additive fibre.  This is the abelian connection action used by
-cellular circulation and phase transport; no metric or constitutive law is inserted. -/
-def additiveTranslation {A : Type*} [AddGroup A] (increment : A) : Equiv.Perm A where
-  toFun state := state + increment
-  invFun state := state - increment
-  left_inv state := by simp
-  right_inv state := by simp
-
-@[simp] theorem additiveTranslation_apply {A : Type*} [AddGroup A]
-    (increment state : A) : additiveTranslation increment state = state + increment := rfl
-
-/-- In an abelian fibre, serial translations add their oriented increments. -/
-theorem additiveTranslation_mul {A : Type*} [AddCommGroup A] (left right : A) :
-    additiveTranslation left * additiveTranslation right =
-      additiveTranslation (left + right) := by
-  ext state
-  simp [add_comm, add_left_comm]
-
-/-- Parallel transport composes the declared invertible elementary passages in word order. -/
-def parallelTransport {X : Type*} : List (Equiv.Perm X) → Equiv.Perm X
-  | [] => 1
-  | transport :: word => transport * parallelTransport word
-
-@[simp] theorem parallelTransport_nil {X : Type*} :
-    parallelTransport ([] : List (Equiv.Perm X)) = 1 := rfl
-
-/-- Abelian connection holonomy is translation by the exact sum of the retained increments. -/
-theorem parallelTransport_additiveTranslation {A : Type*} [AddCommGroup A]
-    (increments : List A) :
-    parallelTransport (increments.map additiveTranslation) =
-      additiveTranslation increments.sum := by
-  induction increments with
-  | nil => ext state; simp [additiveTranslation]
-  | cons increment increments ih =>
-      simp [parallelTransport, ih, additiveTranslation_mul]
-
-theorem parallelTransport_append {X : Type*} (left right : List (Equiv.Perm X)) :
-    parallelTransport (left ++ right) = parallelTransport left * parallelTransport right := by
-  induction left with
-  | nil => simp [parallelTransport]
-  | cons transport left ih => simp [parallelTransport, ih, mul_assoc]
-
-/-- The identity loop returns the identity transport. -/
-theorem identityLoop_holonomy {X : Type*} :
-    parallelTransport ([] : List (Equiv.Perm X)) = 1 := rfl
-
-/-- Serial loop joining composes the two loop returns. -/
-theorem serialLoop_holonomy {X : Type*} (left right : List (Equiv.Perm X)) :
-    parallelTransport (left ++ right) = parallelTransport left * parallelTransport right :=
-  parallelTransport_append left right
-
-/-- Reversing a route and every elementary orientation inverts its parallel transport. -/
-theorem reversal_holonomy {X : Type*} (word : List (Equiv.Perm X)) :
-    parallelTransport (word.reverse.map Inv.inv) = (parallelTransport word)⁻¹ := by
-  induction word with
-  | nil => simp [parallelTransport]
-  | cons transport word ih =>
-      rw [List.reverse_cons, List.map_append, parallelTransport_append, ih]
-      simp [parallelTransport]
-
-/-- A basepoint route conjugates, rather than identifies, the returned loop transport. -/
-def rebasedHolonomy {X : Type*} (route loop : List (Equiv.Perm X)) : Equiv.Perm X :=
-  parallelTransport route * parallelTransport loop * (parallelTransport route)⁻¹
-
-theorem changeOfBasepoint_holonomy {X : Type*} (route loop : List (Equiv.Perm X)) :
-    rebasedHolonomy route loop =
-      parallelTransport route * parallelTransport loop * (parallelTransport route)⁻¹ := rfl
-
 /-! ## Commuting, noncommuting, and noninvertible controls -/
 
 /-- A flat commuting control. -/
@@ -645,6 +571,7 @@ end Soma.Holonics
 section Audit
 open Soma.Holonics
 open Soma.Holonics.Millennium.HolonicComposition
+open Soma.Holonics.Foundation.TransportWord
 #print axioms AddressedPassage.intertwinerWordCell_commutes
 #print axioms repeatedSwingWord_orientation
 #print axioms chronology_discard_iff_commuting

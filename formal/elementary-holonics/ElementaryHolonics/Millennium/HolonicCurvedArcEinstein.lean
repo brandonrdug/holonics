@@ -1,5 +1,6 @@
 import ElementaryHolonics.Millennium.HolonicComposition
 import ElementaryHolonics.Millennium.NavierStokesCurvedTransport
+import ElementaryHolonics.Foundation.TransportWord
 
 /-!
 # Curved arc transport, gyro-return, Gauss--Bonnet holonomy, and an Einstein falsifier
@@ -24,6 +25,7 @@ namespace Soma.Holonics.Millennium.HolonicCurvedArcEinstein
 
 open Soma.Holonics
 open Soma.Holonics.Millennium.HolonicComposition
+open Soma.Holonics.Foundation.TransportWord
 open Soma.Holonics.Millennium.NavierStokes
 open Soma.Holonics.Millennium.NavierStokesMaterialPolygon
 open Soma.Holonics.Millennium.NavierStokesCurvedTransport
