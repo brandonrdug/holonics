@@ -101,23 +101,175 @@ The winding therefore decides where the Holarchy's own temporal boundaries fall.
     `Transport/ChangingReceiver`;
   - Rust: `holonics::geometry::winding` (`Odometer` as a tower of epochs, `LockAddress`).
 
-## Obligations (Lean first, then Rust)
+## The general objects
 
-1. **Additivity:** readings add under concatenation, with carry.
-2. **Cycle readings:** a cycle reads whole windings that are invariant under homotopy (exact
-   forms vanish on cycles).
-3. **Quotient and remainder:** the split into windings and open phase agrees with the ratio's
+These are stated in the elementary objects so that they can be derived further and implemented
+as the framework's basis. The instances in the next section are graded applications, not the
+objects' purpose.
+
+### A1. The aeon groupoid and clock representations
+
+[definition] Occurrences are the objects and aeons are the arrows. Composition is concatenation,
+and orientation reversal `Rγ` gives the inverse. A **clock** is a representation of this groupoid
+in `(ℝ,+)` that lifts a circle phase.
+- A closed 1-form is a **flat** time connection. Its reading on an aeon is parallel transport,
+  and on a cycle it is holonomy.
+- Epoch crossings are the ℤ-valued cocycle.
+- Carry is the 2-cocycle of reducing modulo the period.
+
+[proved-standard] Readings are functorial (additive with carry). For closed clocks, cycle
+readings factor through `H₁` and are homotopy-invariant.
+
+### A2. Hodge-decomposed time
+
+[proved-standard; agent-inferred reading] On the aeon's carrier (a compact Riemannian manifold,
+or a finite cell complex with the discrete Hodge Laplacian), every clock 1-form splits as
+`ω = dφ + δβ + h`. The three parts are three kinds of time:
+
+| Part | Kind | Reading | Examples |
+|---|---|---|---|
+| exact `dφ` | **state** | fixed by the aeon's two boundary occurrences (Stokes) | entropy `S`, cross-entropy `C`, potentials |
+| harmonic `h` | **winding** | topological and conserved on cycles | phase clocks, generator windings |
+| coexact `δβ` | **production** | non-closed, nonzero on contractible cycles; the curvature of the time connection | irreversibility, circulation generation |
+
+[agent-inferred] An aeon is relatively complete for a clock exactly when that clock reads exactly
+on it. The persistent interior motion is the harmonic plus coexact remainder.
+
+### A3. Asymptotic cycle
+
+[proved-standard] For a flow-invariant probability measure μ, long aeons satisfy
+`γ_T/T → A_μ ∈ H₁(M;ℝ)` (Schwartzman). Each receiver's long-run tick rate is
+`⟨[ω_R], A_μ⟩`, and rate ratios are ratios of these pairings. On a torus, `A_μ` is the rotation
+vector.
+
+### A4. Entropy under a change of clock
+
+[proved-standard] By Abramov's formula, entropy per epoch = entropy per unit time × mean epoch
+length. By Kac's lemma, the mean first return to `Σ′` is `μ(Σ)/μ(Σ′)`. Entropy is a density along
+aeons that transforms by the ratio of clock readings. The several axes of parametric time are
+therefore well defined: each clock has its own entropy rate, and the rates are related by
+pairings.
+
+### A5. Production: the arrow as a positive, non-closed clock
+
+[proved-standard] `dS = δQ/T + σ`, with `σ ≥ 0`. Over a cycle, `∮δQ/T = −∮σ ≤ 0` (Clausius).
+- Phase clocks are closed and reversible. Production is positive and not closed; it is the arrow.
+- The time/entropy crossing (#5) resolves here: the entropy axis is a positive curvature term,
+  not a second phase clock.
+- [agent-inferred] In the Holon, σ is the resistive `D ⪰ 0` term, `⟨Jv, D Jv⟩/T`. The
+  power-neutral Dirac interconnection and the Cayley reaction contribute zero.
+
+### A6. Irreversibility is a relative entropy
+
+[proved-standard] `σ(γ) = D(P_γ ‖ P_{Rγ})` (Kawai–Parrondo–Van den Broeck; Gaspard; Maes). It is
+additive over epochs for Markov dynamics, and zero exactly under detailed balance. This is
+cross-entropy as a literal physical effect: the arrow of an aeon is the divergence between the
+aeon and its reversal.
+
+### A7. The first law of learning
+
+[exact identity; agent-inferred reading] Along an aeon,
+
+```text
+ΔC = ∫ −Σ ṗ log q   (exchange)   +   ∫ −Σ p q̇/q   (deposition)
+```
+
+Each term depends on the path, and their sum depends only on the boundary. Over a cycle, exchange
+equals minus deposition. This is the heat/work structure of learning.
+
+### A8. The dynamical zeta of the epoch return map
+
+[proved-standard] `ζ(T) = exp Σ_n N_n Tⁿ/n`, where `N_n` counts cycles of n epochs.
+- For a linear or finite return map, `ζ = 1/det(I − T·M)`.
+- The topological entropy is `log ρ(M)`, and the first pole sits at `T = e^{−h}`.
+- The generator machine's conserved trace faces, `det(1−T·M)` and
+  `∏(1−a_g T+q_g T²)`, **are** its dynamical zeta.
+
+For a flow, the zeta is a product over primitive cycles weighted by their readings,
+`∏_c (1 − e^{−s·t(c)})^{-1}`. The trace formula equates the resonances with a sum over cycles
+weighted by `t(c)/|det(1−P_cᵏ)|^{1/2}`, where `P_c` is the cycle's transverse holonomy.
+
+### A9. Placement and reversibility
+
+[proved-standard, finite] Detailed balance makes the generator self-adjoint in `L²(π)`, so its
+spectrum is real. Production is what permits complex spectrum. This is the finite form of #54:
+`G ≻ 0, S = Sᵀ ⇒ σ(G⁻¹S) ⊂ ℝ`.
+
+[agent-inferred model] Correlations decay at the transfer operator's spectral gap. The retained
+quotient keeps the modes that survive the admitted future aeon: modes on the unit circle
+(cycles) are conserved, and modes inside it decay.
+
+### A10. The production functional
+
+[agent-inferred synthesis over standard facts] A functional `P ≥ 0` on aeons and multi-aeons whose
+**zero set is the distinguished class**:
+
+| Subject | P | Zero set |
+|---|---|---|
+| Thermodynamics | σ | reversible cycles |
+| Spectral | the generator's antisymmetric part | real spectrum |
+| Kähler/Hodge | calibration defect `Vol(Z) − ⟨ω^p/p!, Z⟩` (Wirtinger) | complex (algebraic) cycles |
+| Fluids | viscous dissipation `2ν|Def u|²/T` | Kelvin-conserved Euler cycles |
+
+Complexification or indefiniteness removes the lower bound, and singular aeons appear there.
+
+### A11. Singular aeon
+
+[definition] An aeon in which one clock's reading is finite while another clock's epoch count
+diverges: two clocks whose ratio blows up. The multi-parameter form is a k-chain swept by
+commuting clocks, the crossing axes. Its closed orbits (subtori) are its cycles.
+
+## Graded instances
+
+- **Hodge.**
+  - [reformulation, not progress] Algebraic cycles are the zero-defect multi-aeons (A10). The
+    conjecture restates as: every rational `(p,p)` class is a ℚ-combination of zero-defect cycle
+    classes.
+  - [proved-standard] It holds where commuting clocks generate everything: toric varieties, and
+    Białynicki-Birula decompositions, where orbit-closure cycles span the cohomology.
+- **Spectral placement (RH).**
+  - [standard] The trace formula is the pairing of spectrum with cycle readings (A8). Weil's
+    explicit formula is its Lefschetz form, with primes as cycles of reading `log p`.
+  - [conjectural] Deninger's flow.
+  - [heuristic, open] In A9's terms, placement on the line is reversibility of that flow
+    (Hilbert–Pólya), and Weil positivity is its positivity face. None of this proves RH.
+- **Euler and Navier–Stokes.**
+  - [proved-standard] Kelvin: Euler conserves the circulation reading of material cycles, and
+    viscosity produces `σ ≥ 0`. Helicity is the linking reading of vortex cycles.
+  - [proved-standard] Beale–Kato–Majda: a smooth solution continues past `T*` exactly when the
+    vorticity clock reads finitely, `∫₀^{T*}‖ω‖_∞ dt < ∞`. This is A11.
+  - [heuristic] With Littlewood–Paley shells as scale-clock sections, the energy flux `Π_j` is
+    the tick rate across shell j. Under K41 the turnover times have a finite sum: infinitely many
+    epochs in a finite aeon, the Onsager dissipation anomaly.
+- **Complex fluids.** [proved-standard] Complexification makes the energy form indefinite,
+  `B(a,a)−B(b,b)`, and Li–Sinai proved finite-time blow-up for complex 3D NS. Real NS keeps
+  `σ ≥ 0`, but energy is supercritical relative to the vorticity clock's scaling. That is the
+  exact shape of the open problem.
+
+## Obligations, in construction order
+
+**Lean** (`Holonics.Aeon`; items join #62 as they are owed):
+1. The aeon groupoid and clocks: readings additive with carry. Cycle readings factor through
+   homology and are homotopy-invariant.
+2. Quotient and remainder: the split into windings and open phase agrees with the ratio's
    division with remainder.
-4. **Convergent near-return:** the bound for two clocks, from continued fractions.
-5. **Kac relation:** between epoch grains, under measure-preservation and ergodicity.
-6. **Epoch partitions:** under a certified section, refinement and coarsening form a tower.
+3. Discrete Hodge-decomposed time on a finite cell complex, over the existing exact Hodge
+   owners. State readings are boundary-determined, and harmonic readings are cycle invariants.
+4. For finite Markov chains:
+   - Kac's lemma and Abramov's formula;
+   - `σ = D(P_γ‖P_{Rγ}) ≥ 0`, with equality ⇔ detailed balance;
+   - detailed balance ⇒ real spectrum.
+5. `ζ(T) = 1/det(I−TM)` and `h = log ρ(M)`, joined to the existing trace faces.
+6. The first-law split of cross-entropy change (A7).
+7. The convergent near-return bound for two clocks (continued fractions and Farey addresses).
+8. Epoch refinement towers under a certified section.
 
-Construction is part of K1 (#72), beside the Holarchy. The HNN's interface is then defined over
-aeons:
-- open from a retained quotient;
-- advance along the generator clocks;
-- receive at receivers' sections;
-- close at an aeon boundary, with the future-sufficient quotient.
+**Rust** (`holonics::aeon`, or `geometry::clock`; K1 #72):
+- `Aeon`, `Clock` (closed form with period and lift), `Epoch` partition, `Cycle`;
+- `reading -> (windings, phase)`, `concat`, `reverse`, `epochs(receiver, grain)`, `coarsen`;
+- `hodge_split(clock)` on cell complexes;
+- `production(aeon)` for Markov and port-Hamiltonian instances;
+- `zeta(return_map)`.
 
-This replaces the retired "session" types. M1 does not rename those types in place: it deletes
-the superseded ones and leaves the field interface for K1.
+The HNN interface is then rebuilt over aeons (open from a retained quotient, advance, receive at
+sections, close at a boundary), replacing the retired "session" types.

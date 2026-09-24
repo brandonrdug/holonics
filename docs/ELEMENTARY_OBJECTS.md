@@ -392,9 +392,23 @@ vocabulary for time.
 - An aeon boundary is where the future-sufficient quotient is taken.
 
 "Session", "episode", and counters named `epoch`/`cycle`/`generations` that serve as one global
-clock are retired as terms for time. Owed Lean: additivity with carry, cycle readings invariant
-under homotopy, quotient/remainder, convergent near-return, the Kac relation, and epoch
-refinement towers.
+clock are retired as terms for time.
+
+[definition] The record states the general objects built on these terms:
+- **A1:** the aeon groupoid, with clocks as time connections;
+- **A2:** Hodge-decomposed time. State time is exact and boundary-read, winding time is
+  harmonic and cycle-read, and production time is coexact curvature;
+- **A3:** the asymptotic cycle;
+- **A4:** entropy under a change of clock (Abramov/Kac);
+- **A5–A6:** production as the positive non-closed clock, with `σ(γ) = D(P_γ‖P_{Rγ})`;
+- **A7:** the first law of learning, cross-entropy change split into exchange and deposition;
+- **A8:** the dynamical zeta, the machine's trace faces;
+- **A9:** spectral placement ⇔ reversibility;
+- **A10:** the production functional, zero on the distinguished cycles;
+- **A11:** the singular aeon.
+
+The record also gives their graded Hodge, spectral and Navier–Stokes instances, and the Lean and
+Rust obligations in construction order.
 
 ## Keys, locks and navigation
 
