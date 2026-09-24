@@ -1384,7 +1384,7 @@ impl ChowRing {
     /// each point of `L₂ ∖ {p}`, so `q` is on `|L₂|` lines. Constancy forces `|L₂| = 2`, symmetrically
     /// `|L₁| = 2`, and `|E| = |L₁ ∪ L₂| = 3`. **`U(3,3)` is the only simple rank-three matroid whose
     /// generator pairing a character group can see**, and every other one is refused at the diagonal
-    /// with [`crate::winding_inertia::WindingError::DiagonalIsNotConstant`] naming the flat.
+    /// with [`holonics::geometry::winding_inertia::WindingError::DiagonalIsNotConstant`] naming the flat.
     ///
     /// `walk_aperture` is the caller's declaration, and its exhaustion is reported as an exhausted
     /// allowance rather than as an absence.
