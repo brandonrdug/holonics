@@ -1,7 +1,6 @@
 # M2 geometry carry and pair-resonance curation
 
-This bounded source cut follows the M2 Ratio exponential-kernel cut at `42eb1693`. Verification is
-pending coordination with the root; no Lake builds were run for this cut.
+This bounded source cut follows the M2 Ratio exponential-kernel cut at `42eb1693`. Focused Lake verification passed; the gate results and limits are recorded below.
 
 ## Declaration ownership
 
@@ -48,7 +47,7 @@ These are source graph counts only. They do not predict Lake jobs or claim a res
 among other research paths. `PairResonance` still needs HelicalPairInteraction for its two
 contact-power `lock_*` declarations; this cut does not move or alter those laws.
 
-## Focused Lake gates (pending)
+## Focused Lake gates (verified)
 
 Run from `formal/elementary-holonics`:
 
@@ -62,6 +61,10 @@ lake build ElementaryHolonics.Framework
 lake build ElementaryHolonics
 ```
 
-These gates cover the new theorem owner, the reduced carry owner, the direct Geometry importers,
-and the affected subject/public facades. Build results and logs are to be recorded after the
-coordinated gate run.
+These gates passed. The direct theorem, PhaseCarry and PairResonance owners built;
+Holon.Generator, Framework.Geometry, the combined Framework (9,197 jobs), and the broad
+ElementaryHolonics research umbrella (10,114 jobs) also built. The final affected logs contain
+no error, declaration using `sorry`, or `sorryAx`. Existing informational tactic suggestions
+and unrelated imported-source diagnostics retain their prior scope. Exact commands and logs are
+pinned in `docs/VERIFICATION_RECEIPTS.tsv`. The future `Holonics`/`HolonicsResearch` roots
+remain unbuilt because they do not yet exist.
