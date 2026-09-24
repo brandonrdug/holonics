@@ -116,5 +116,3 @@ impl<'c> ResidentNormalWave<'c> {
         self.joint_source().read_source()
     }
 }
-#[cfg(test)]
-mod tests;

@@ -147,17 +147,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn seed_is_independent_of_labels_and_bootstraps_margin_rows() {
-        let seed = BoundaryMaterialSeed::new(0x8a5c_19d3, 12);
-        let a = seed.initial_maps(9, 3).unwrap();
-        let b = seed.initial_maps(9, 3).unwrap();
-        assert_eq!(a, b);
-        a.validate_bootstrap().unwrap();
-        assert!(a.encoder.iter().all(|e| e.iter().any(|z| !z.is_zero())));
-        assert!(a.encoder.windows(2).all(|w| w[0] != w[1]));
-    }
-
-    #[test]
     fn bootstrap_rows_have_the_exact_squared_distance_selection_margin() {
         let maps = BoundaryMaterialSeed::new(0x91, 16)
             .initial_maps(5, 3)

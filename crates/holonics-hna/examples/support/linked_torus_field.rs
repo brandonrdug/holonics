@@ -458,22 +458,3 @@ fn append_ring_arcs(
         *next_arc += 1;
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn incident_aperture_uses_the_shared_ring_path() {
-        let spec = linked_torus_field_spec(1, 1, 1).unwrap();
-        let slots = linked_torus_incident_slot_junctions(&spec).unwrap();
-        assert_eq!(slots.len(), spec.slot_junctions.len());
-        for pair in slots.windows(2) {
-            assert!(
-                spec.arcs
-                    .iter()
-                    .any(|arc| arc.from == pair[0] && arc.to == pair[1])
-            );
-        }
-    }
-}

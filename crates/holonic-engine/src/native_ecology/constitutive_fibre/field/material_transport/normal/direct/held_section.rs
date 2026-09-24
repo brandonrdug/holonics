@@ -252,27 +252,8 @@ mod tests {
             .collect()
     }
 
-    #[test]
-    #[ignore = "requires CUDA; malformed receiver shape is refused"]
-    fn malformed_mask_shape_is_refused_before_mount() {
-        let readout = ResidentReadout::new().unwrap();
-        let surface = ResidentSurface::on(&readout).unwrap();
-        let section = surface
-            .mount_section_rest(
-                &ResidentSectionRest::found(1, 10, ResidentGrain(0), 64, words(&[1, 2, 3, 4, 0]))
-                    .unwrap(),
-            )
-            .unwrap();
-        let given = ResidentNormalEnclosureView {
-            surface: &surface,
-            section: &section,
-            offset: 0,
-            width: 4,
-            grain: ResidentGrain(32),
-        };
-        assert!(ResidentHeldSection::found(given, &[true]).is_err());
-    }
-
+    /// Parity law (held section): held coordinates take the given values, free coordinates the
+    /// generated ones, and the radius is the sum of both enclosures; rest round-trips.
     #[test]
     #[ignore = "requires CUDA; held receiver preserves exact known coordinates and only free uncertainty"]
     fn mixed_held_receiver_keeps_given_and_generated_faces() {

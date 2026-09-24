@@ -615,18 +615,6 @@ impl<'c> NativeCoupledBody<'c> {
     pub fn rest(&self) -> Result<SavedCoupledBody, NativeSessionError> {
         self.save()
     }
-    #[cfg(test)]
-    pub(super) fn admit_test_contact(
-        &mut self,
-        member: usize,
-        chart: WaveSourceReceiver,
-    ) -> Result<(), NativeSessionError> {
-        let BodyState::Affine(w) = self.state_mut()? else {
-            return Err(invalid("affine test contact"));
-        };
-        Self::affine_contact(w, member, chart)?;
-        Ok(())
-    }
     pub fn save(&self) -> Result<SavedCoupledBody, NativeSessionError> {
         Ok(match self.state()? {
             BodyState::Field(field) => SavedCoupledBody::Field(field.rest()?),

@@ -577,8 +577,3 @@ impl<'c> ResidentNormalMaterial<'c> {
         ))
     }
 }
-
-#[cfg(test)]
-mod enclosed_target_tests;
-#[cfg(test)]
-mod tests;

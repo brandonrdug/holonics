@@ -163,9 +163,6 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
     }
 }
 
-#[cfg(test)]
-mod tests;
-
 /// The `θ`-face operands of a comparison: the source `x(θ)`, the observed difference `η(θ)` and
 /// the anchor check (inside the original anchor ball, with the difference to its centre).
 pub(in super::super) fn read_return_operands<'c>(

@@ -149,7 +149,7 @@ pub struct MachineSourceMaps<'c> {
 
 /// The forward source step and its producing map. This is the per-step form of the moment;
 /// `MachineSourceMaps::{moment, anchor}` is its closed form and is what the incident word consumes.
-#[cfg_attr(not(test), allow(dead_code))]
+#[allow(dead_code)] // the per-step form of the moment law; no caller consumes it yet
 pub struct GeneratorInjection<'c> {
     output: ResidentNormalEnclosure<'c>,
     advance: MachineValueTransport<'c>,
@@ -817,19 +817,6 @@ impl<'c> MachineSourceMaps<'c> {
         q.view().join(b.view()).map_err(invalid)
     }
 
-    #[cfg_attr(not(test), allow(dead_code))]
-    /// Closed form of `N` source steps: `q_N = L^N q₀ + Σ_k L^(N−1−k) I E(u_k)`, `b` unchanged.
-    pub fn accumulate(
-        &self,
-        previous_joint: ResidentNormalEnclosureView<'_, 'c>,
-        encoded: &ResidentNormalEnclosureSection<'c>,
-    ) -> Result<ResidentNormalEnclosure<'c>> {
-        if encoded.grain() != previous_joint.grain() {
-            return Err(invalid("generator source moment chart"));
-        }
-        let moment = self.moment(encoded)?;
-        self.anchor(previous_joint, moment.view())
-    }
 
     /// `(L^N)* g_q ⊕ g_b`: the standing term's adjoint, delivered to the `q₀` it was read at.
     pub fn pull_back_standing(
@@ -922,7 +909,7 @@ impl<'c> MachineSourceMaps<'c> {
     }
 }
 
-#[cfg_attr(not(test), allow(dead_code))]
+#[allow(dead_code)]
 impl<'c> GeneratorInjection<'c> {
     pub fn event_index(&self) -> usize {
         self.event_index

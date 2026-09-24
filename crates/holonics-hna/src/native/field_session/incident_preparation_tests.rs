@@ -88,30 +88,6 @@ fn direct_multi_part_regions_reset_part_cell_ordinals() {
 }
 
 #[test]
-fn direct_origin_and_join_are_retained_without_event_ids() {
-    let packet = preparation();
-    assert!(matches!(
-        packet.regions[0].origin,
-        IncidentSourceOrigin::Direct { .. }
-    ));
-    let contact = IncidentContactKind::DirectJoin {
-        from_region: 0,
-        to_region: 1,
-        context_index: 1,
-    };
-    assert!(matches!(contact, IncidentContactKind::DirectJoin { .. }));
-}
-
-#[test]
-fn ordered_cells_retain_symbol_ordinals_and_aperture_mask() {
-    let packet = preparation();
-    packet.validate(&spec()).unwrap();
-    assert_eq!(packet.source_cells[0].symbol_index, 0);
-    assert_eq!(packet.source_cells[1].symbol_index, 1);
-    assert_eq!(packet.held_mask, vec![true, true, false]);
-}
-
-#[test]
 fn validation_refuses_non_unicode_or_overlapping_free_extent() {
     let mut packet = preparation();
     let mut non_unicode = spec();

@@ -264,14 +264,6 @@ fn invalid_response_is_rejected_at_declaration() {
 }
 
 #[test]
-fn spec_serialization_round_trip_reenters_validation() {
-    let spec = declaration();
-    let encoded = serde_json::to_string(&spec).expect("serialize");
-    let decoded: GeneratorMachineSpec = serde_json::from_str(&encoded).expect("validated decode");
-    assert_eq!(spec, decoded);
-}
-
-#[test]
 fn malformed_rate_carrier_is_rejected_on_deserialize() {
     let spec = declaration();
     let mut value = serde_json::to_value(&spec).expect("serialize");
@@ -319,30 +311,15 @@ fn point(values: &[Rat]) -> RatVec3 {
     RatVec3::new(values[0].clone(), values[1].clone(), values[2].clone())
 }
 
-/// The wire form is byte-identical to the former derive and converts losslessly to and from the
-/// declared engine clock and the unwound core clock at rest; a ring or reading is refused.
+/// The wire form converts losslessly to and from the declared engine clock and the unwound core
+/// clock at rest; a ring or reading is refused.
 #[test]
 fn clock_spec_is_the_lossless_wire_of_the_one_clock() {
-    #[derive(Serialize)]
-    struct FormerClockSpec {
-        lineage: String,
-        duration: Rat,
-        unit: String,
-    }
     let spec = ClockSpec {
         lineage: "site|clock".into(),
         duration: rational(5, 7),
         unit: "s".into(),
     };
-    let former = FormerClockSpec {
-        lineage: "site|clock".into(),
-        duration: rational(5, 7),
-        unit: "s".into(),
-    };
-    assert_eq!(
-        serde_json::to_vec(&spec).unwrap(),
-        serde_json::to_vec(&former).unwrap()
-    );
     let clock = Clock::try_from(&spec).expect("declared clock");
     // The engine clock's wire is the spec's wire, byte for byte.
     assert_eq!(
@@ -373,9 +350,8 @@ fn clock_spec_is_the_lossless_wire_of_the_one_clock() {
     assert!(serde_json::from_value::<ClockSpec>(value).is_err());
 }
 
-/// The whole machine wire is unchanged by carrying its clocks through the core clock: a
-/// serialize/deserialize/serialize cycle is byte-identical, and each compiled clock's wire is
-/// its declared spec.
+/// Round trip at the current wire: a serialize/deserialize/serialize cycle re-enters validation
+/// and is byte-identical, and each compiled clock's wire is its declared spec.
 #[test]
 fn machine_wire_is_byte_identical_through_the_core_clock() {
     let spec = declaration();

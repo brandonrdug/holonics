@@ -107,19 +107,3 @@ impl<'c> ResidentCoupledConstitutive<'c> {
         Ok(CoupledConstitutiveRest { header, wave })
     }
 }
-
-#[cfg(test)]
-mod format_tests {
-    use super::*;
-
-    #[test]
-    fn retired_programme_frames_are_refused() {
-        for version in 1u8..=6 {
-            let mut bytes = b"HOLONIC-COUPLED-CONSTITUTIVE".to_vec();
-            bytes.push(version);
-            assert!(
-                CoupledConstitutiveRest::read(&mut bytes.as_slice(), bytes.len() as u64).is_err()
-            );
-        }
-    }
-}

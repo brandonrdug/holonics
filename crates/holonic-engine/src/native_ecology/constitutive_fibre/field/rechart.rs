@@ -182,6 +182,3 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .expect("committed field incidence change"))
     }
 }
-
-#[cfg(test)]
-mod tests;

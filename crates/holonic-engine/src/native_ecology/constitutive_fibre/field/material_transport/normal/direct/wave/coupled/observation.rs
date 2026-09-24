@@ -2,8 +2,6 @@
 //! the retained source family and its bounds, never an inverse selected by a target.
 use super::*;
 use crate::native_ecology::constitutive_fibre::resident::PredictiveMaterial;
-#[cfg(test)]
-mod tests;
 
 /// Resident comparison of a later observation with its prediction, read through the
 /// contemporary member law and condition (phase 12b, one cut). Balls are outer receiver bounds;

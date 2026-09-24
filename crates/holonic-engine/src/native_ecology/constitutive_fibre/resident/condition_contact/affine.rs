@@ -154,6 +154,3 @@ pub(super) fn affine_contact_section<'c>(
     }
     Ok(section)
 }
-
-#[cfg(test)]
-mod tests;

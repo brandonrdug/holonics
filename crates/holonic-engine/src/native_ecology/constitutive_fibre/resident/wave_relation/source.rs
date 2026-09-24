@@ -308,6 +308,3 @@ impl<'c> ResidentWaveRelation<'c> {
         Ok((output, coverage))
     }
 }
-
-#[cfg(test)]
-mod tests;

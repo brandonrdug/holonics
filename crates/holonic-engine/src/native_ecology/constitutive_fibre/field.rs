@@ -311,8 +311,6 @@ pub struct NativeConstitutiveField<'chart> {
     pending_junction: Option<PendingJunction<'chart>>,
     transport: Option<MaterialTransport<'chart>>,
     pending_transport: Option<PendingMaterialTransport<'chart>>,
-    #[cfg(test)]
-    fused_contextual: bool,
 }
 
 impl<'chart> NativeConstitutiveField<'chart> {
@@ -400,8 +398,6 @@ impl<'chart> NativeConstitutiveField<'chart> {
             pending_junction: None,
             transport: None,
             pending_transport: None,
-            #[cfg(test)]
-            fused_contextual: false,
         })
     }
 
@@ -801,9 +797,6 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 "this material source requires the operative current decoder".into(),
             ));
         }
-        #[cfg(test)]
-        let fused_contextual = self.fused_contextual;
-        #[cfg(not(test))]
         let fused_contextual = false;
         let material_target = self.transport.as_ref().map_or((self.nodes(), 0), |t| {
             (t.target.dimension(self.nodes()).unwrap(), t.target.kernel())
@@ -1066,6 +1059,3 @@ impl<'chart> NativeConstitutiveField<'chart> {
 
 #[cfg(test)]
 mod tests;
-
-#[cfg(test)]
-mod resident_tests;

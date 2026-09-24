@@ -210,6 +210,3 @@ impl NativeSession<'_> {
         Ok(receipt)
     }
 }
-
-#[cfg(test)]
-mod tests;

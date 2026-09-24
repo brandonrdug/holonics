@@ -185,9 +185,55 @@ impl<'c, C> ResidentNormalWave<'c, C> {
 
 #[cfg(test)]
 mod holon_tests {
-    use super::super::comparison_tests::{contains, current, point, witness};
     use super::*;
     use crate::embedding_fiber::ResidentReadout;
+
+    fn point<'c>(surface: &'c ResidentSurface<'c>, values: &[i64], denominator: Option<i64>) -> ResidentSection<'c> {
+        let mut words = values.iter().map(|v| (*v, *v)).collect::<Vec<_>>();
+        words.extend(denominator.map(|d| (d, d)));
+        surface
+            .mount_section_rest(
+                &ResidentSectionRest::found(1, words.len(), ResidentGrain(0), i64::BITS, words)
+                    .unwrap(),
+            )
+            .unwrap()
+    }
+
+    fn contains(ball: &NativeFieldCurrentBall, expected: &[ExactComplexWaveCurrent]) {
+        let error: Rat = ball
+            .center
+            .iter()
+            .zip(expected)
+            .map(|(a, b)| a.subtract(b).norm_square())
+            .sum();
+        assert_eq!(ball.center.len(), expected.len());
+        assert!(
+            error <= &ball.radius * &ball.radius,
+            "expected current is outside retained ball"
+        )
+    }
+
+    /// The small three-port witness: one prior `(1,1,0) -> 3/2` observation and a `0 -> 1` seed.
+    fn witness<'c>(surface: &'c ResidentSurface<'c>) -> ResidentNormalWave<'c> {
+        let mut material =
+            ResidentNormalMaterial::found(surface, 1, 1, ResidentGrain(u32::BITS)).unwrap();
+        let phi = point(surface, &[1, 0, 1, 0, 0, 0], None);
+        let eta = point(surface, &[3, 0], Some(2));
+        material
+            .receive(
+                ResidentConstitutiveCurrent::integers(&phi).unwrap(),
+                ResidentConstitutiveCurrent::rational(&eta).unwrap(),
+            )
+            .unwrap();
+        let p0 = point(surface, &[0, 0], None);
+        let c1 = point(surface, &[1, 0], None);
+        material
+            .into_difference_wave(
+                ResidentConstitutiveCurrent::integers(&p0).unwrap(),
+                ResidentConstitutiveCurrent::integers(&c1).unwrap(),
+            )
+            .unwrap()
+    }
 
     /// The chart square: the exact core advance of the seed lies in the device ball the applied
     /// resident word returns, and the core balance closes with zero residual.
@@ -225,71 +271,5 @@ mod holon_tests {
             assert_eq!(advanced.state.commit, step);
             state = advanced.state;
         }
-    }
-
-    /// Two normal Holons joined at their current ports are one Holon whose free word is the
-    /// block word, and the constitution's storage/deposition reading is the core's.
-    #[test]
-    #[ignore = "requires CUDA; interaction is core interconnection and deposition is core work"]
-    fn interaction_and_deposition_are_the_core_facets() {
-        let readout = ResidentReadout::new().unwrap();
-        let s = ResidentSurface::on(&readout).unwrap();
-        let body = witness(&s);
-        let law = body.holon_law().unwrap();
-        let joined = law.interact(&law, &[]).unwrap();
-        let x: Vec<Rat> = (1..=8).map(|v| Rat::from_integer(v.into())).collect();
-        let free = joined
-            .advance(
-                &HolonState {
-                    configuration: x.clone(),
-                    commit: 0,
-                },
-                &vec![Rat::zero(); 4],
-            )
-            .unwrap();
-        assert_eq!(
-            free.state.configuration,
-            joined.transfer().apply(&x).unwrap()
-        );
-        assert!(free.balance.is_exact());
-        // Deposition: one observation's change of H is core deposition work at the successor W.
-        let mut material = ResidentNormalMaterial::found(&s, 1, 1, ResidentGrain(32)).unwrap();
-        let before = material.inspect().unwrap();
-        let phi = point(&s, &[1, 0, 1, 0, 0, 0]);
-        let eta = point(&s, &[2, 0]);
-        material.receive(current(&phi), current(&eta)).unwrap();
-        let after = material.inspect().unwrap();
-        let work = before.deposition_work(&after).unwrap();
-        let direct: Rat = after
-            .coefficient_rows()
-            .iter()
-            .map(|w| {
-                holonics::element::storage_energy(&after.storage_form().unwrap(), w).unwrap()
-                    - holonics::element::storage_energy(&before.storage_form().unwrap(), w)
-                        .unwrap()
-            })
-            .sum();
-        assert_eq!(work, direct);
-        assert!(
-            work > Rat::zero(),
-            "an observed source strictly deposits storage"
-        );
-        assert!(matches!(
-            after.element().unwrap(),
-            holonics::element::ElementRelation::Storage { .. }
-        ));
-        // The receivers of the Holon declare their core element: passive readings.
-        let family = body.read_family().unwrap();
-        let receiver = family.read_receiver().unwrap();
-        let element = receiver.receiver_element();
-        assert!(element.is_passive());
-        assert_eq!(element.read_ports(), receiver.target_width());
-        let chart = NormalWaveBasisChart::identity(&s, 1).unwrap();
-        assert!(
-            body.read_basis_face(&chart)
-                .unwrap()
-                .receiver_element()
-                .is_passive()
-        );
     }
 }

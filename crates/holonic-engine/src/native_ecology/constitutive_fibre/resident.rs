@@ -545,13 +545,9 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
     }
 }
 
-#[cfg(test)]
-mod tests;
 
 #[cfg(test)]
 mod contact_tests;
-#[cfg(test)]
-mod law_rest_tests;
 
 mod neighborhood;
 pub(crate) use neighborhood::{

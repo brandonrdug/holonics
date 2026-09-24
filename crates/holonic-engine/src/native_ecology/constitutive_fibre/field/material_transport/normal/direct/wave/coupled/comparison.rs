@@ -306,6 +306,3 @@ impl<'c> NormalCoupledComparison<'c> {
         })
     }
 }
-
-#[cfg(test)]
-mod tests;

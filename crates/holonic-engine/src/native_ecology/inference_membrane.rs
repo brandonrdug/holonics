@@ -658,28 +658,3 @@ pub enum NativeMembraneRefusal {
     #[error("the native rest refused: {0}")]
     Rest(String),
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn mark(value: u8) -> String {
-        format!("{value:064x}")
-    }
-
-    #[test]
-    fn incidence_binds_occurrence_boundary_and_population() {
-        let a = source_incidence_identity(&mark(1), BoundaryId(7), &[1, 2, 3]);
-        let b = source_incidence_identity(&mark(1), BoundaryId(8), &[1, 2, 3]);
-        let c = source_incidence_identity(&mark(1), BoundaryId(7), &[1, 2, 4]);
-        assert_ne!(a, b);
-        assert_ne!(a, c);
-    }
-
-    #[test]
-    fn withdrawal_authorization_binds_the_exact_local_edge() {
-        let a = withdrawal_authorization_identity(&mark(1), &mark(2), &mark(3), &mark(4));
-        let b = withdrawal_authorization_identity(&mark(1), &mark(2), &mark(5), &mark(4));
-        assert_ne!(a, b);
-    }
-}

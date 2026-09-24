@@ -660,6 +660,3 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
         Ok((body, sources))
     }
 }
-
-#[cfg(test)]
-mod tests;

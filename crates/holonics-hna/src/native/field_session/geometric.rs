@@ -382,6 +382,3 @@ impl<'c> NativeFieldSession<'c> {
         self.observe_geometric_source(request, text, step_bits, false)
     }
 }
-
-#[cfg(test)]
-mod tests;

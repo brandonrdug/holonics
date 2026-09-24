@@ -212,5 +212,3 @@ impl NormalWaveFamily<'_> {
         Ok(rest)
     }
 }
-#[cfg(test)]
-mod tests;

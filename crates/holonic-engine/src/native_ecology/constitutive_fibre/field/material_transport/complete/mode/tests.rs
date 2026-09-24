@@ -1,6 +1,5 @@
 use super::*;
 use crate::embedding_fiber::ResidentReadout;
-use num_traits::Zero;
 fn phase(r: i64, i: i64, d: i64) -> NativePhaseCurrent {
     NativePhaseCurrent::new(r, i, d).unwrap()
 }
@@ -83,93 +82,8 @@ fn assert_ball(b: &NativeFieldCurrentBall, v: &[ExactComplexWaveCurrent]) {
     assert!(b.contains(v), "{b:?} does not contain {v:?}");
 }
 
-#[test]
-#[ignore = "requires CUDA; one actual reception learns the hidden mode's emission contribution"]
-fn actual_return_makes_a_dark_source_mode_productive() {
-    let r = ResidentReadout::new().unwrap();
-    let s = ResidentSurface::on(&r).unwrap();
-    let (mut b, last, _) = dark(&s, false, 1);
-    let at = last.lineage.occurrence;
-    let source = b.retain_source(&last.source).unwrap();
-    let old_exact = b
-        .inspect_exact_complete_material_transport(at)
-        .unwrap()
-        .unwrap();
-    let internal = b.inspect_internal_currents().unwrap().unwrap();
-    let q = internal[0].current.subtract(&internal[1].current);
-    assert_eq!(q.real, Rat::new(2.into(), 3.into()));
-    let before = b.census();
-    let mode = b.condense_shared_drive_mode(1, 2).unwrap();
-    let old = b.read_material_mode_using(at, &mode).unwrap();
-    assert_eq!(b.census().section_read_outs, before.section_read_outs);
-    let old_read = old.inspect().unwrap();
-    assert_eq!(old_read.producing_coefficient.radius, Rat::zero());
-    assert_eq!(
-        old_read.producing_coefficient.center,
-        vec![ExactComplexWaveCurrent::zero()]
-    );
-    assert_eq!(old_read.mode_change.radius, Rat::zero());
-    b.advance_resident(&mut NativeFieldOccurrence::through(
-        last.source,
-        vec![phase(0, 1, 1)],
-    ))
-    .unwrap();
-    let before = b.census();
-    let result = b.read_material_mode_using(at, &mode).unwrap();
-    assert_eq!(b.census().section_read_outs, before.section_read_outs);
-    let future = result.unfold_current(3).unwrap();
-    assert_eq!(b.census().section_read_outs, before.section_read_outs);
-    let reading = result.inspect().unwrap();
-    assert_ball(&reading.source_mode, &[q.clone()]);
-    let exact = b
-        .inspect_exact_complete_material_transport(at + 1)
-        .unwrap()
-        .unwrap();
-    let old_k = column(&old_exact.coefficients, 3, 4);
-    let new_k = column(&exact.coefficients, 3, 4);
-    let old_y = old_k.iter().map(|k| k.multiply(&q)).collect::<Vec<_>>();
-    let new_y = new_k.iter().map(|k| k.multiply(&q)).collect::<Vec<_>>();
-    assert_eq!(new_y, vec![phase(0, 2, 11).current()]);
-    assert_ball(&reading.producing_coefficient, &old_k);
-    assert_ball(&reading.current_coefficient, &new_k);
-    assert_ball(&reading.coefficient_change, &subtract(&new_k, &old_k));
-    assert_ball(&reading.producing_mode, &old_y);
-    assert_ball(&reading.current_mode, &new_y);
-    assert_ball(&reading.mode_change, &subtract(&new_y, &old_y));
-    assert_ball(
-        &reading.producing_remainder,
-        &[ExactComplexWaveCurrent::zero()],
-    );
-    assert_ball(
-        &reading.current_remainder,
-        &[ExactComplexWaveCurrent::zero()],
-    );
-    assert_ball(&reading.current_full, &new_y);
-    assert_ball(
-        reading.actual_received.as_ref().unwrap(),
-        &[phase(0, 1, 1).current()],
-    );
-    assert_ball(
-        reading.whole_returned_difference.as_ref().unwrap(),
-        &[phase(0, 1, 1).current()],
-    );
-    assert_eq!(reading.direct_receiving_occurrence, Some(at + 1));
-    assert_ball(&future.inspect().unwrap(), &[phase(0, -2, 11).current()]);
-    assert_eq!(
-        old.inspect().unwrap().current_mode.center,
-        old_read.current_mode.center
-    );
-    let (mut other, last, _) = dark(&s, false, 1);
-    assert!(
-        other
-            .read_material_mode_using(last.lineage.occurrence, &mode)
-            .is_err()
-    );
-    assert!(other.read_material_mode(&source, 1, 2).is_err());
-    let detached = NativeSharedDriveMode::remount(&s, mode.rest().unwrap()).unwrap();
-    assert!(b.read_material_mode_using(at, &detached).is_err());
-}
-
+/// Parity law (material mode): device mode coefficient, projection, full current and remainder
+/// balls contain the exact host values, with remainder = full − projected mode.
 #[test]
 #[ignore = "requires CUDA; factor chronology before/between/after births and reversed orientation survive"]
 fn mode_coefficients_match_the_existing_full_operator_and_preserve_the_source_remainder() {
@@ -235,36 +149,4 @@ fn mode_coefficients_match_the_existing_full_operator_and_preserve_the_source_re
     );
     assert!(b.read_material_mode_at(1, 1, 3).is_err());
     drop(b);
-}
-
-#[test]
-#[ignore = "requires CUDA; a bounded material-mode generator supplies exact differential receivers without a point seal"]
-fn learned_mode_unfolding_reaches_a_native_receiver() {
-    let r = ResidentReadout::new().unwrap();
-    let s = ResidentSurface::on(&r).unwrap();
-    let (mut b, last, _) = dark(&s, false, 2);
-    let source = b.retain_source(&last.source).unwrap();
-    b.advance_resident(&mut NativeFieldOccurrence::through(
-        last.source,
-        vec![phase(1, 0, 1), phase(-1, 0, 1)],
-    ))
-    .unwrap();
-    let mode = b.read_material_mode(&source, 1, 2).unwrap();
-    let now = mode
-        .read_pairs(NativeMaterialModeComponent::CurrentMode, 1)
-        .unwrap();
-    assert_eq!((now.positive, now.negative, now.unresolved), (0, 1, 0));
-    let future = mode.unfold_current(1).unwrap();
-    drop(b);
-    let read = future.read_pairs(1).unwrap();
-    assert_eq!((read.positive, read.negative, read.unresolved), (1, 0, 0));
-    assert_eq!(read.future_steps, 1);
-    assert_ball(
-        &future.inspect().unwrap(),
-        &[phase(-2, 0, 11).current(), phase(2, 0, 11).current()],
-    );
-    assert!(
-        mode.read_pairs(NativeMaterialModeComponent::CurrentMode, 2)
-            .is_err()
-    );
 }

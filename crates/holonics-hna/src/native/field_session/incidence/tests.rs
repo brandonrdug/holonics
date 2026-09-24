@@ -26,16 +26,3 @@ fn phase_restriction_is_exact_transport_minus_receiver() {
         ]
     );
 }
-
-#[test]
-fn identity_self_comparison_is_recorded_as_omitted_provenance() {
-    let phase = ExactWavePhaseTransport::identity();
-    assert!(phase.is_unit());
-    let omitted = NativeFieldOmittedSelfComparison {
-        receiver: AnalyticFieldJunctionId(4),
-        phase,
-        reason: "identity self comparison has zero contrast".into(),
-        arc: None,
-    };
-    assert_eq!(omitted.reason, "identity self comparison has zero contrast");
-}

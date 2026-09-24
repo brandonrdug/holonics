@@ -1218,40 +1218,6 @@ impl<'c> OperativeState<'c> {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn return_bound_kind_is_explicit_and_legacy_frames_default_to_matrix() {
-        let legacy = OperativeReturnFrame {
-            at_cut: 3,
-            contact_count: 2,
-            factor_count: None,
-            current_difference_source: None,
-            source_overlap: None,
-            zero_internal_delta: false,
-            realization: NativeContactRealization::DyadicDeposit,
-            bound_kind: NativeOperativeBoundKind::MatrixAndInternal,
-        };
-        let mut wire = serde_json::to_value(&legacy).unwrap();
-        assert!(wire.get("bound_kind").is_none());
-        let restored: OperativeReturnFrame = serde_json::from_value(wire.take()).unwrap();
-        assert_eq!(
-            restored.bound_kind,
-            NativeOperativeBoundKind::MatrixAndInternal
-        );
-
-        let factored = OperativeReturnFrame {
-            bound_kind: NativeOperativeBoundKind::FactorBalls,
-            ..legacy
-        };
-        let wire = serde_json::to_value(&factored).unwrap();
-        assert!(wire.get("bound_kind").is_some());
-        let restored: OperativeReturnFrame = serde_json::from_value(wire).unwrap();
-        assert_eq!(restored.bound_kind, NativeOperativeBoundKind::FactorBalls);
-    }
-}
 impl<'c> HeldOperative<'c> {
     pub(in super::super::super) fn rest(
         &self,

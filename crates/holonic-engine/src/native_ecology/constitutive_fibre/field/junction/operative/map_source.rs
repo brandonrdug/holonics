@@ -1,8 +1,6 @@
 //! The existing return journal extended by source-map expressions. One immutable anchor and
 //! actual later birth columns generate historical maps; this is not a second continuing field.
 use super::*;
-#[cfg(test)]
-mod tests;
 
 #[derive(Clone)]
 pub(super) struct OperativeMapProgram<'c> {

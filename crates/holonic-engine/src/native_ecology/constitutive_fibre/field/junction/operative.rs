@@ -753,17 +753,6 @@ impl<'c> NativeConstitutiveField<'c> {
 impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
     // Owner-only adoption after a complete native constitutive return. Birth identity and
     // activation standing remain in the existing ecology; only its staged differences move.
-    #[cfg(test)]
-    fn into_update(
-        self,
-    ) -> (
-        Rc<OperativeSections<'c>>,
-        Rc<()>,
-        Vec<Rc<OperativeReturn<'c>>>,
-        Option<OperativeMapProgram<'c>>,
-    ) {
-        (self.sections, self.origin, self.returns, self.program)
-    }
     pub(in super::super) fn into_owned(self) -> OperativeState<'c> {
         let activated_at = self.field_cut();
         OperativeState {

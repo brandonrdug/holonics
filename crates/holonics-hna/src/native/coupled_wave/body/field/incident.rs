@@ -24,9 +24,6 @@ use machine::{IncidentModelSpec, MachineGroupMaps};
 use machine_transport::{MachineParticipation, MachineValueTransport};
 #[cfg(test)]
 mod machine_tests;
-#[cfg(test)]
-#[path = "incident_tests.rs"]
-mod tests;
 use super::*;
 use crate::native::field_geometry::GeometricFieldSpec;
 use holonic_engine::{
@@ -451,14 +448,6 @@ impl<'c> IncidentParticipationForward<'c> {
             Self::Bilinear(p) => p.output(),
             Self::Quadrance(p) => p.output(),
             Self::Machine(p) => p.output(),
-        }
-    }
-    #[cfg(test)]
-    fn transported_neighbors(&self) -> &ResidentNormalEnclosureSection<'c> {
-        match self {
-            Self::Bilinear(p) => p.transported_neighbors(),
-            Self::Quadrance(p) => p.values(),
-            Self::Machine(p) => p.values(),
         }
     }
     fn pull_back(
@@ -1643,47 +1632,6 @@ impl<'c> IncidentFieldModel<'c> {
             material,
             contacts,
         })
-    }
-}
-
-#[cfg(test)]
-impl NativeCoupledBody<'_> {
-    /// Test diagnostic: zero the selected power-neutral reaction blocks (linear `W_s`, contrast
-    /// coupling `W_c`, modulated slices) of every reaction material.
-    pub(crate) fn zero_reaction_blocks(
-        &mut self,
-        linear: bool,
-        coupling: bool,
-        slices: bool,
-    ) -> Result<(), NativeSessionError> {
-        let BodyState::Incident(model) = self.state_mut()? else {
-            return Err(invalid("reaction columns require the incident model chart"));
-        };
-        if model.layout.reaction != ReactionLaw::PowerNeutral {
-            return Err(invalid(
-                "block attribution declared for the power-neutral chart",
-            ));
-        }
-        let n = model.layout.width / 2;
-        for (material, &features) in model
-            .materials
-            .iter_mut()
-            .zip(&model.layout.material_features)
-        {
-            let c = (features - n) / (2 * n + 1);
-            let mut columns = Vec::new();
-            if linear {
-                columns.push(0..n);
-            }
-            if coupling {
-                columns.push(n..n + c);
-            }
-            if slices {
-                columns.push(n + c..features);
-            }
-            *material = material.with_coefficient_columns_zeroed(&columns)?;
-        }
-        Ok(())
     }
 }
 

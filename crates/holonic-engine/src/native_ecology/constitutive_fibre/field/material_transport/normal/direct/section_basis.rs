@@ -132,6 +132,8 @@ mod tests {
         )
         .unwrap()
     }
+    /// Parity law (section basis): each section selects the exact maximal real coordinate, a chart
+    /// permutation permutes the selection, and exact centre ties are reported as non-robust.
     #[test]
     #[ignore = "requires CUDA; all section selections share one complex source ball"]
     fn joint_basis_sections_preserve_source_phase_radius_and_permutation() {

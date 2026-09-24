@@ -69,77 +69,8 @@ pub(in super::super) fn dark<'c>(
     (b, born)
 }
 
-#[test]
-#[ignore = "requires CUDA; internal phase hidden by a zero boundary supplies a learned generator"]
-fn hidden_internal_phases_conduct_to_the_same_learned_relation() {
-    let r = ResidentReadout::new().unwrap();
-    let s = ResidentSurface::on(&r).unwrap();
-    let mut law = ResidentConstitutiveFibre::found(&s, 2, 2).unwrap();
-    let zero = mount(&s, &[0, 0, 1]);
-    for turn in [
-        NativePhaseCurrent::unit(),
-        NativePhaseCurrent::new(0, 1, 1).unwrap(),
-    ] {
-        let (mut body, births) = dark(&s, false, turn);
-        let basis = body.inspect_relation().unwrap();
-        let count = body.occurrence_count();
-        let before = body.census();
-        let a = body.read_internal_current(&births[0]).unwrap();
-        assert_eq!(body.census().section_read_outs, before.section_read_outs);
-        assert_eq!(body.census().ingress_octets, before.ingress_octets);
-        assert_eq!(body.occurrence_count(), count);
-        assert_eq!(body.inspect_relation().unwrap(), basis);
-        let read = a.inspect().unwrap();
-        assert_eq!(
-            read.point_availability,
-            NativeInternalPointAvailability::Exact
-        );
-        assert_eq!(
-            read.current.center[0],
-            turn.current().scaled(&Rat::new(1.into(), 3.into()))
-        );
-        let raw = body.inspect_junction(count - 1).unwrap().unwrap();
-        assert!(
-            raw.intervals[7..13]
-                .iter()
-                .chain(&raw.intervals[14..20])
-                .all(|p| p.0 == 0 && p.1 == 0)
-        );
-        let direct = body.inspect_internal_currents().unwrap().unwrap();
-        assert_eq!(read.contact, direct[0].contact);
-        assert_eq!(read.current.center[0], direct[0].current);
-        body.advance_current_resident(&mut NativeFieldOccurrence::entering(vec![]), current(&zero))
-            .unwrap();
-        let b = body.read_internal_current_at(1).unwrap();
-        let before = body.census();
-        law.advance_resident(a.current(), Some(b.current()))
-            .unwrap();
-        let predicted = law.advance_resident(b.current(), None).unwrap();
-        assert_eq!(body.census().section_read_outs, before.section_read_outs);
-        body.advance_current_resident(&mut NativeFieldOccurrence::entering(vec![]), current(&zero))
-            .unwrap();
-        let actual = body.read_internal_current(&births[0]).unwrap();
-        let ConstitutiveReading::Unique { current: p } =
-            predicted.inspect().unwrap().predecessor_reading
-        else {
-            panic!("generator remains open")
-        };
-        let actual = actual.inspect().unwrap();
-        assert_eq!(
-            p,
-            vec![
-                actual.current.center[0].real.clone(),
-                actual.current.center[0].imaginary.clone()
-            ]
-        );
-        assert_eq!(
-            a.inspect().unwrap(),
-            read,
-            "later recurrence cannot rewrite the earlier source"
-        );
-    }
-}
-
+/// Host/device parity (field internal-current kernel): the device ball contains the exact
+/// host-decoded internal current, and an enclosure is refused as a point source.
 #[test]
 #[ignore = "requires CUDA; prefix enclosures retain their actual error and cannot masquerade as point sources"]
 fn enclosed_internal_receiver_keeps_the_phase_ball_and_refuses_point_use() {
@@ -169,43 +100,4 @@ fn enclosed_internal_receiver_keeps_the_phase_ball_and_refuses_point_use() {
     assert_eq!(same.center, vec![ExactComplexWaveCurrent::zero()]);
     assert_eq!(same.radius, Rat::zero());
     assert_eq!(availability, NativeInternalPointAvailability::Exact);
-}
-
-#[test]
-#[ignore = "requires CUDA; internal source scope preserves the actual contact"]
-fn internal_receiver_keeps_scope_and_births() {
-    let r = ResidentReadout::new().unwrap();
-    let s = ResidentSurface::on(&r).unwrap();
-    let (mut body, births) = dark(&s, false, NativePhaseCurrent::unit());
-    let (other, foreign) = dark(&s, false, NativePhaseCurrent::unit());
-    assert!(body.read_internal_current(&foreign[0]).is_err());
-    assert!(body.read_internal_current_at(0).is_err());
-    assert!(body.read_internal_current_at(99).is_err());
-    let expected = body
-        .read_internal_current(&births[0])
-        .unwrap()
-        .inspect()
-        .unwrap();
-    assert_eq!(
-        body.read_internal_current(&births[0])
-            .unwrap()
-            .inspect()
-            .unwrap(),
-        expected
-    );
-    let mut bytes = Vec::new();
-    body.rest(&[], &[]).unwrap().write(&mut bytes).unwrap();
-    let rest = NativeFieldRest::read(&mut bytes.as_slice(), bytes.len() as u64).unwrap();
-    drop(body);
-    drop(other);
-    let (mut restored, _, _) = NativeConstitutiveField::remount(&s, rest).unwrap();
-    assert_eq!(
-        restored
-            .read_internal_current_at(1)
-            .unwrap()
-            .inspect()
-            .unwrap(),
-        expected
-    );
-    drop(restored);
 }

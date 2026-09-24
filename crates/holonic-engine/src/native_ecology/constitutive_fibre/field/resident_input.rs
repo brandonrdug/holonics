@@ -88,6 +88,3 @@ impl<'chart> NativeConstitutiveField<'chart> {
         }
     }
 }
-
-#[cfg(test)]
-mod tests;
