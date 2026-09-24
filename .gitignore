@@ -9,11 +9,8 @@ __pycache__/
 # Local agent/runtime configuration and isolated harness worktrees.
 .claude/
 .codex/
-.agents/*
-!.agents/bin/
-!.agents/skills/
-.agents/skills/*
-!.agents/skills/holonics-research/
+.agents/
+.opencode/
 
 # Third-party working transcripts remain private, even inside frozen reference material.
 archive/reference/external/3b1b-compression-*
