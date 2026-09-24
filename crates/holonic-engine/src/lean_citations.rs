@@ -262,11 +262,6 @@ fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
             "grain_tower.rs",
             "Foundation/GrainRestriction.lean",
         ),
-        (
-            include_str!("physical_intake.rs"),
-            "physical_intake.rs",
-            "Foundation/ExteriorIntake.lean",
-        ),
         // `physical_constraint_grading.rs`'s header table is written the other way round — the
         // Rust owner in the first column and the Lean name in the second — so it is not read by
         // this scan. Its inline `Foundation/…lean::Name` citations are covered by the second test.

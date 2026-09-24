@@ -338,7 +338,6 @@ pub mod physical_constraint_grading;
 // `<f4`/`<f8` uncertainty words, and the environment index without which no occurrence is
 // founded. Not glob-exported: `TokenAddress`, `ComponentGrain` and `IntakeRefusal` are local to
 // this exterior boundary and must not collide with the native addressing at the crate root.
-pub mod physical_intake;
 // The typed environment index that sits on top of the intake's presented one, the occurrence
 // situated at exactly one of them, and the six-state contact status. Not glob-exported: its
 // `Coordinate`, `Environment`, `Occurrence` and `ContactStatus` names are local to this carrier
