@@ -8,7 +8,7 @@
 //! > *"comparison is **situated by a frame** and is therefore at least a frame/object/object
 //! > relation"*
 //!
-//! [`crate::surprisal`] carries an exact measure and could not obey that sentence, because every
+//! [`holonics::ratio::surprisal`] carries an exact measure and could not obey that sentence, because every
 //! entry point it offers takes **one** population. `entropy(P)` is a one-body read. `cross_entropy(P,
 //! Q)` has two objects but returns a single weighted form with no member exhibited and nowhere to put
 //! the refusal, so an event `Q` has no standing for collapses the whole reading. Neither returns a
@@ -81,7 +81,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::conditioned_derivation::Passage;
 use holonics::exact_value::ExactOrdering;
-use crate::surprisal::{
+use holonics::ratio::surprisal::{
     Grain, Support, SurprisalError, SymbolicSurprisal, entropy, read_population,
 };
 
@@ -156,7 +156,7 @@ impl Emission {
         self.counts.is_empty()
     }
 
-    /// The emission on the `u64` axis [`crate::surprisal`] reads, under a declared name table.
+    /// The emission on the `u64` axis [`holonics::ratio::surprisal`] reads, under a declared name table.
     fn on_axis(&self, table: &EventTable) -> BTreeMap<u64, BigUint> {
         self.counts
             .iter()

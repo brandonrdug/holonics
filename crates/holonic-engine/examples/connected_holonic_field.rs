@@ -3,7 +3,7 @@
 //! This mounts supplied operands and calls public algebra/learning owners. It is
 //! exterior reference execution, not a second native HNN implementation.
 use holonics::exact_linear::ExactRatMatrix as Matrix;
-use holonic_engine::exponentiated_ratio::NormalizedKernel;
+use holonics::ratio::exponentiated::NormalizedKernel;
 use num_traits::{One, ToPrimitive, Zero};
 use holonics::geometry::Rat;
 use serde_json::{Value, json};

@@ -62,7 +62,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_engine::surprisal::{cross_entropy_fiber, CrossEntropyFiber, SymbolicSurprisal};
+use holonics::ratio::surprisal::{cross_entropy_fiber, CrossEntropyFiber, SymbolicSurprisal};
 use life::decomposing_codec::{
     read, render_word, DecomposingBody, DecompositionGrain, DecompositionPass, RevisionAperture,
     Symbol,

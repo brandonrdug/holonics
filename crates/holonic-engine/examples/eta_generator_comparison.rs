@@ -1,5 +1,5 @@
 //! Exterior Hephaestus comparison: common analytic receiver, changed head/tail generators.
-use holonic_engine::surprisal::SymbolicSurprisal;
+use holonics::ratio::surprisal::SymbolicSurprisal;
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
 use holonics::geometry::{

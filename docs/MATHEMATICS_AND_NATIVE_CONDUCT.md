@@ -248,7 +248,7 @@ or text prefix exposes one restriction. Dynamic reflection and changing capacita
 in the generating law and its encoding, rather than entering only as later analogies.
 
 [established-bounded; source-inspected] These ideas also have executable owners.
-[`exponentiated_ratio.rs`](../crates/holonic-engine/src/exponentiated_ratio.rs) carries a ratio
+[`exponentiated_ratio.rs`](../crates/holonics/src/ratio/exponentiated.rs) carries a ratio
 cocycle and exact rational normalization in its symbolic-log domain. General certified
 exponentials, normalized contact and nonlinear reactions already run in
 [`exact_resident_section.cu`](../crates/holonic-engine/kernels/exact_resident_section.cu).

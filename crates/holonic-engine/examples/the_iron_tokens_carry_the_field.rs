@@ -81,7 +81,7 @@ use holonic_engine::corpus_census::{
 };
 use holonics::exact_value::ExactOrdering;
 use holonics::hardware_cover::HardwareCover;
-use holonic_engine::surprisal::{
+use holonics::ratio::surprisal::{
     Grain, Support, SymbolicSurprisal, cross_entropy, read_population,
 };
 use holonic_engine::token_invariance::{

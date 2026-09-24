@@ -1,7 +1,7 @@
 use super::*;
 use crate::embedding_fiber::ResidentReadout;
 use holonics::exact_linear::ExactRatMatrix;
-use crate::exponentiated_ratio::NormalizedKernel;
+use holonics::ratio::exponentiated::NormalizedKernel;
 use crate::resident_section::ResidentSectionRest;
 
 const GRAIN: u32 = 72;

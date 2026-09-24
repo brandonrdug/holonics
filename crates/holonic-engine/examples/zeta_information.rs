@@ -2,7 +2,7 @@
 //! Reads complete intervals and boundary images, never treats an ordinate midpoint as a zero.
 use std::{collections::BTreeMap, path::Path};
 
-use holonic_engine::surprisal::{CrossEntropyFiber, SymbolicSurprisal, cross_entropy_fiber};
+use holonics::ratio::surprisal::{CrossEntropyFiber, SymbolicSurprisal, cross_entropy_fiber};
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
 use holonics::geometry::{

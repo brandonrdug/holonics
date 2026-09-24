@@ -65,7 +65,7 @@ use std::path::{Path, PathBuf};
 use num_bigint::BigUint;
 use serde::{Deserialize, Serialize};
 
-use crate::surprisal::{Support, SurprisalError, read_population};
+use holonics::ratio::surprisal::{Support, SurprisalError, read_population};
 
 /// **A frame index into the caller's declared corpus**, in `CLAUDE.md` §0's fourth-lesson sense: an
 /// invariant is only visible across two of them.

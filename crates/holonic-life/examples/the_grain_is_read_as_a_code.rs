@@ -23,7 +23,7 @@
 //!
 //! # Why every outcome is information
 //!
-//! `surprisal.rs:44-49` states the property that decides how this must be
+//! `crates/holonics/src/ratio/surprisal.rs:44-49` states the property that decides how this must be
 //! reported: *"Vanishing and equality are decided EXACTLY, with no enclosure…
 //! It is why `S(P) = S(Q)` is decidable here while `S(P) < S(Q)` is not."*
 //!
@@ -50,7 +50,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use holonic_engine::surprisal::{cross_entropy, Grain, Support, SymbolicSurprisal};
+use holonics::ratio::surprisal::{cross_entropy, Grain, Support, SymbolicSurprisal};
 use life::decomposing_codec::{
     read, render_word, DecomposingBody, DecompositionGrain, DecompositionPass, Symbol,
 };

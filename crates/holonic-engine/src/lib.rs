@@ -175,7 +175,6 @@ pub mod embedding_fiber;
 // Over `SymbolicSurprisal`'s prime-log carrier the exponential closes in the rationals exactly, so
 // this returns a COCYCLE of exact pairwise ratios and normalises only when a caller names a null.
 // Temperature is a root on the ratio, and the `T -> 0` limit -- argmax -- is never taken.
-pub mod exponentiated_ratio;
 // The coboundary move, as distinct from a chart transition. Hermite reduction changes the
 // representative of a rational integrand by an exact term and leaves the residues untouched, which
 // is why it is a lawful move at all — the integral depends only on the class. The two declared
@@ -557,12 +556,8 @@ pub mod structure_group;
 // Declared, never glob-exported: `ReceiverId`, `Disagreement`, `Partition`, `Cover`, `Observation`
 // and `ItemId` collide across the placement family, and a realizer founded by a substitution must
 // be reached by naming which organ founded it. `archive/plans/THE_ASSEMBLY.md` step 2.
-// Surprisal as an exact symbolic form. Reached explicitly, never glob-exported: `Support` and
-// `entropy` say nothing at the crate root about which carrier they belong to, and a caller wanting a
-// number must be made to ask for an enclosure. `docs/canon/THE_RECOVERED_LAW.md` §1 and §3.
 pub mod substitution_realizers;
 pub mod supported_realizers;
-pub mod surprisal;
 // Which tokens a corpus treats as invariant objects: a surface's occurrence population presented to
 // `receiver_exact_compression` as positions under a declared receiver family, so an unseparated
 // population is iron and a shattered one exhibits the shortest word that shattered it. Declared,

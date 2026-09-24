@@ -699,7 +699,7 @@ edge requires the separate incidence law; the derivative on a fixed support does
 uses fifteen complex toroidal channels, two normalized heads, two composed layers, a sigmoid
 gate, a phase-sensitive dissipative contact, an observed material step and a whole-field
 resolvent. Its exact rational positive-kernel/log-potential specialization lives in
-[`exponentiated_ratio::NormalizedKernel`](../crates/holonic-engine/src/exponentiated_ratio/transport.rs).
+[`holonics::ratio::exponentiated::NormalizedKernel`](../crates/holonics/src/ratio/exponentiated/transport.rs).
 It accepts supplied positive rational K. Its implicit real log chart is defined by the
 normalized flow relation `E(s)=K`; no separately evaluated or stored logarithm is needed.
 This supplied material is not an inferred exponential generator. It does not approximate a

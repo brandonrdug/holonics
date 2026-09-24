@@ -8,9 +8,9 @@
 //! or claim that a learner generated K. Its constraint source is retained by this chart.
 //! These are reusable exact reference operators; they do not insert a host loop into HNN.
 
-use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
+use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
 use num_traits::{One, Signed, Zero};
-use holonics::geometry::Rat;
+use crate::geometry::Rat;
 use thiserror::Error;
 
 #[derive(Clone, Debug, PartialEq, Eq)]

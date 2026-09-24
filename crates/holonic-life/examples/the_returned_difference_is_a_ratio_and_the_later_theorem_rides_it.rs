@@ -15,7 +15,7 @@
 //! # What is new here beyond the environment
 //!
 //! The returned difference is read through the **chart transition**, not through a score.
-//! `crates/holonic-engine/src/exponentiated_ratio.rs` was deposited on 2026-08-14 under Brandon's
+//! `crates/holonics/src/ratio/exponentiated.rs` was deposited on 2026-08-14 under Brandon's
 //! ruling that softmax *"doesn't actually seem like a statistics function… It's a rebasing thing"* —
 //! `exp` is the arc-to-whole map, `ℚ⁺` is the free abelian group on the primes, and
 //! `SymbolicSurprisal` is its additive chart. Until now that organ had no world-return to read.
@@ -48,8 +48,8 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use holonic_engine::exponentiated_ratio::RatioFamily;
-use holonic_engine::surprisal::{Support, SymbolicSurprisal};
+use holonics::ratio::exponentiated::RatioFamily;
+use holonics::ratio::surprisal::{Support, SymbolicSurprisal};
 use holonics::structure::{LocalSequence, LocalSet};
 use life::lean_mathematics::{
     LeanDiagnosisCurrentFace, LeanDiagnosisRequirement, LeanKernelWorld, LeanMathematicsEcology,

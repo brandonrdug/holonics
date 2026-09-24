@@ -3,7 +3,7 @@
 use holonics::exact_linear::{
     ConstantAccelerationRelease, ExactRatMatrix, ReceiverFactorization,
 };
-use holonic_engine::surprisal::SymbolicSurprisal;
+use holonics::ratio::surprisal::SymbolicSurprisal;
 use num_traits::{Signed, Zero};
 use holonics::geometry::Rat;
 use serde_json::json;

@@ -53,6 +53,7 @@ pub mod holon;
 pub mod law;
 pub mod port;
 pub mod reaction;
+pub mod ratio;
 pub mod restriction;
 pub mod scalar;
 pub mod structure;

@@ -80,7 +80,7 @@ use holonic_engine::rebase_invariants::{RebaseInvariants};
 use holonic_engine::returned_reading::{condition_again, read_production};
 use holonic_engine::situated_residual::{Frame, emission_reaching, situate};
 use holonic_engine::skein::read_substitution;
-use holonic_engine::surprisal::Grain;
+use holonics::ratio::surprisal::Grain;
 
 /// The statement put to the instance. It is in the deposit; the question is whether a route to it
 /// that the deposit does not carry can be returned.

@@ -70,12 +70,12 @@ use std::collections::BTreeMap;
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
-use holonics::geometry::Rat;
-use holonics::geometry::log_rational_interval;
+use crate::geometry::Rat;
+use crate::geometry::log_rational_interval;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use holonics::exact_value::{ExactInterval, ExactOrdering};
+use crate::exact_value::{ExactInterval, ExactOrdering};
 
 /// Series terms taken when enclosing `log₂ p`. Declared, not tuned.
 const LOG_SERIES_TERMS: u32 = 64;

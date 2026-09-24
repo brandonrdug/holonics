@@ -198,7 +198,7 @@ balance. Nonlinear clocks use their actual finite interval, or `r/f'(t)` locally
 `r H2(p,q) = r H2(p) + r KL2(p||q)`. An event rate alone is not cross-entropy. Keep alphabet,
 conditioning, probability receiver and log base; zero code probability for an observed event
 has infinite cost or an explicit missing-code return, not a silently finite replacement.
-Exact prime-log code forms remain in `holonic_engine::surprisal`; decimal display is an observer
+Exact prime-log code forms remain in `holonics::ratio::surprisal`; decimal display is an observer
 projection. Code lengths, phase differences, physical joules and coordinate time are separate
 quantities until their constitutive map is supplied.
 

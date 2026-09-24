@@ -84,12 +84,12 @@
 
 use std::collections::BTreeMap;
 
-use holonic_engine::exponentiated_ratio::RatioFamily;
+use holonics::ratio::exponentiated::RatioFamily;
 use holonic_engine::landauer::{self, ThermalFrame};
 use holonic_engine::receiver_exact_compression::{
     compress, InputId, ItemId, Observation, ObservedSystem, ReceiverId,
 };
-use holonic_engine::surprisal::SymbolicSurprisal;
+use holonics::ratio::surprisal::SymbolicSurprisal;
 use life::decomposing_codec::{read, render_word, DecompositionGrain, Symbol};
 use life::material_incidence::strongly_connected_cores;
 use num_bigint::BigInt;

@@ -6,8 +6,8 @@
 //!
 //! ## What this driver is for
 //!
-//! `crates/holonic-engine/src/surprisal.rs` holds an exact symbolic measure and, until this run,
-//! reached nothing. Its every entry point takes **one** population, and
+//! `crates/holonics/src/ratio/surprisal.rs` now owns the exact symbolic measure. At the
+//! original experiment it had not yet reached a library consumer. Its every entry point takes **one** population, and
 //! `docs/canon/THE_HOLOBROCHOS_SPINE.md` §2 retains as mathematically exact that *"comparison is situated
 //! by a frame and is therefore at least a frame/object/object relation"*. A measure computed from one
 //! body alone is a one-body read; calling it a comparison is the dropped third.
@@ -36,7 +36,7 @@ use holonic_engine::situated_residual::{
     Emission, Frame, ResidualArm, SituatedReading, Situation, emission_reaching, one_body_read,
     situate,
 };
-use holonic_engine::surprisal::{Grain, Support};
+use holonics::ratio::surprisal::{Grain, Support};
 
 // -------------------------------------------------------------------------------------------------
 // The declared material
@@ -244,7 +244,7 @@ struct ReachSite {
 /// - **Documentation lines are separated out and never admitted as reach.** Prose naming a module is
 ///   prose.
 /// - **A name is counted only inside a file that actually imports the module.** `surprisal` is
-///   declared and never glob-exported, so a file that does not name `crate::surprisal` cannot be
+///   declared and never glob-exported, so a file that does not name `holonics::ratio::surprisal` cannot be
 ///   reaching it. The first form of this function skipped that resolution and matched `Grain` inside
 ///   `ReceiverGrainId` and `Support::` inside `VerticalFiberSupport::`, returning 171 sites across
 ///   eleven files — the instrument committing, on its first run, exactly the defect its own
@@ -253,7 +253,7 @@ struct ReachSite {
 /// The root is `CARGO_MANIFEST_DIR`, a build-time constant, so the measurement does not depend on the
 /// working directory a run was launched from.
 fn library_reach_of_surprisal() -> Vec<ReachSite> {
-    /// Everything `crates/holonic-engine/src/surprisal.rs` declares publicly.
+    /// Everything `crates/holonics/src/ratio/surprisal.rs` declares publicly.
     const OWNED: [&str; 8] = [
         "surprisal",
         "SymbolicSurprisal",
@@ -296,7 +296,7 @@ fn library_reach_of_surprisal() -> Vec<ReachSite> {
         // items, because the module is declared and never glob-exported.
         let imports = text
             .lines()
-            .any(|line| !line.trim_start().starts_with("//") && line.contains("crate::surprisal"));
+            .any(|line| !line.trim_start().starts_with("//") && line.contains("holonics::ratio::surprisal"));
         if !imports {
             continue;
         }
@@ -314,7 +314,7 @@ fn library_reach_of_surprisal() -> Vec<ReachSite> {
                 line: ordinal + 1,
                 text: trimmed.to_owned(),
                 is_documentation: trimmed.starts_with("//"),
-                names_the_module: trimmed.contains("crate::surprisal"),
+                names_the_module: trimmed.contains("holonics::ratio::surprisal"),
             });
         }
     }
@@ -730,9 +730,9 @@ fn main() {
     let documentation = sites.len() - code.len();
     let code_files: BTreeSet<&str> = code.iter().map(|site| site.file.as_str()).collect();
     println!(
-        "  Before this run `surprisal` was reached by nothing: its only mention anywhere in the\n  \
-         workspace was `pub mod surprisal;` in lib.rs. Measured now over src/, excluding\n  \
-         surprisal.rs itself:\n"
+        "  At the original deposit `surprisal` was reached by nothing. Its first\n  \
+         engine library consumers are measured now over src/, excluding the moved\n  \
+         surprisal.rs owner:\n"
     );
     println!(
         "      code sites          : {}   across {} library file(s): {code_files:?}",

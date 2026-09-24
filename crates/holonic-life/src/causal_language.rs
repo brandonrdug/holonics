@@ -13,8 +13,8 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::time::Instant;
 
 use body::num::Cog;
-use holonic_engine::exponentiated_ratio::{RatioError, RatioFamily};
-use holonic_engine::surprisal::{
+use holonics::ratio::exponentiated::{RatioError, RatioFamily};
+use holonics::ratio::surprisal::{
     section_modulus, SectionModulus, SurprisalError, SymbolicSurprisal,
 };
 use holonics::structure::{LocalRelations, LocalSequence, LocalSet};

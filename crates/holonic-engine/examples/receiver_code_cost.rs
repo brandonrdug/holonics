@@ -1,6 +1,6 @@
 //! Exact exterior unequal-cost channel: code information, clock cost and endpoint potential.
-use holonic_engine::exponentiated_ratio::RatioFamily;
-use holonic_engine::surprisal::SymbolicSurprisal;
+use holonics::ratio::exponentiated::RatioFamily;
+use holonics::ratio::surprisal::SymbolicSurprisal;
 use num_traits::{One, Zero};
 use holonics::geometry::Rat;
 use serde_json::{Value, json};

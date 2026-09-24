@@ -100,11 +100,11 @@ use std::collections::BTreeMap;
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
-use holonics::geometry::Rat;
+use crate::geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::surprisal::SymbolicSurprisal;
+use super::surprisal::SymbolicSurprisal;
 
 mod transport;
 pub use transport::{NormalizedKernel, NormalizedKernelError};
@@ -371,7 +371,7 @@ pub enum RatioError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use holonics::geometry::rat;
+    use crate::geometry::rat;
 
     fn surprisal_of(numerator: i64, denominator: i64) -> SymbolicSurprisal {
         SymbolicSurprisal::of_probability(&rat(numerator, denominator)).expect("a probability")
@@ -585,7 +585,7 @@ mod tests {
 #[cfg(test)]
 mod frame_tests {
     use super::*;
-    use crate::surprisal::SymbolicSurprisal;
+    use crate::ratio::surprisal::SymbolicSurprisal;
 
     fn population() -> BTreeMap<u64, SymbolicSurprisal> {
         let mut carried = BTreeMap::new();
