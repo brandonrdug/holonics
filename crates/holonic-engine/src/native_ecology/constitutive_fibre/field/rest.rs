@@ -1485,7 +1485,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 surface,
                 source_width: 4 * h.nodes,
                 target_width: 2 * h.nodes,
-                occurrences,
+                occurrences: history.len() as u64,
                 usable: true,
                 source_only: h.source_only,
             },

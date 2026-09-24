@@ -63,11 +63,12 @@ impl<'chart> HeldField<'chart> {
         &self,
         surface: &ResidentSurface<'chart>,
     ) -> Result<Option<ResidentSectionRest>, Error> {
-        self.resident
+        Ok(self
+            .resident
             .incoming
             .as_ref()
             .map(|s| surface.detach_section(s, 64))
-            .transpose()
+            .transpose()?)
     }
 
     pub(super) fn source_rest(
@@ -83,22 +84,24 @@ impl<'chart> HeldField<'chart> {
         &self,
         surface: &ResidentSurface<'chart>,
     ) -> Result<Option<ResidentSectionRest>, Error> {
-        self.resident
+        Ok(self
+            .resident
             .junction
             .as_ref()
             .map(|s| surface.detach_section(s, 64))
-            .transpose()
+            .transpose()?)
     }
 
     pub(super) fn transport_rest(
         &self,
         surface: &ResidentSurface<'chart>,
     ) -> Result<Option<ResidentSectionRest>, Error> {
-        self.resident
+        Ok(self
+            .resident
             .transport
             .as_ref()
             .map(|s| surface.detach_section(s, 64))
-            .transpose()
+            .transpose()?)
     }
 
     pub(super) fn rest(&self, surface: &ResidentSurface<'chart>) -> Result<HeldRest, Error> {

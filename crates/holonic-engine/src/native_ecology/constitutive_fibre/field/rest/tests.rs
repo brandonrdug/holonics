@@ -98,7 +98,7 @@ fn remount_preserves_current_coefficients_frames_and_live_capabilities() {
         .unwrap();
     let expected = reference.rest(&[], &[]).unwrap();
     drop(reference);
-    let (mut resumed, sources, anchors) =
+    let (resumed, sources, anchors) =
         NativeConstitutiveField::remount(&surface, saved).unwrap();
     assert_eq!(resumed.occurrence_count(), 2);
     assert_eq!(sources.len(), 2);
@@ -367,4 +367,83 @@ fn resident_history_returns_the_same_current_and_cold_rest() {
         resumed.read_material_transport_pairs(0, 1).unwrap(),
         expected_reading
     );
+}
+
+#[test]
+#[ignore = "requires CUDA; all current base, packed, contemporary and joint rest tags remain writer-selected"]
+fn current_field_rest_writer_selects_all_six_tags() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+
+    for (packed, expected) in [(false, CURRENT_MAGIC), (true, CURRENT_PACKED_MAGIC)] {
+        let mut field = NativeConstitutiveField::found_with_enclosed_junction(
+            &surface,
+            two_node_seed(),
+            ResidentGrain(72),
+        )
+        .unwrap();
+        if packed {
+            field
+                .enable_material_transport_chart(
+                    NativeMaterialTransportSource::OperativeBoundary,
+                    NativeMaterialTarget::TensorProduct { factor_width: 2 },
+                )
+                .unwrap();
+        }
+        field
+            .advance_resident(&mut NativeFieldOccurrence::entering(two_node_input(1)))
+            .unwrap();
+        let mut rest = field.rest(&[], &[]).unwrap();
+        rest.current_junction = rest
+            .history
+            .last()
+            .and_then(|history| history.junction.clone());
+        assert!(rest.current_junction.is_some());
+        let mut bytes = Vec::new();
+        rest.write(&mut bytes).unwrap();
+        assert!(
+            bytes.starts_with(expected),
+            "packed={packed}, wrote {:?}, expected {:?}",
+            &bytes[..MAGIC.len()],
+            expected
+        );
+        NativeFieldRest::read(&mut bytes.as_slice(), bytes.len() as u64).unwrap();
+    }
+
+    let mut field = NativeConstitutiveField::found_with_enclosed_junction(
+        &surface,
+        two_node_seed(),
+        ResidentGrain(48),
+    )
+    .unwrap();
+    field
+        .enable_material_transport_chart(
+            NativeMaterialTransportSource::OperativeBoundary,
+            NativeMaterialTarget::TensorProduct { factor_width: 2 },
+        )
+        .unwrap();
+    let source = field.read_current_source().unwrap();
+    let point = surface
+        .mount_section_rest(
+            &ResidentSectionRest::found(
+                1,
+                12,
+                ResidentGrain(0),
+                64,
+                vec![(1, 1); 12],
+            )
+            .unwrap(),
+        )
+        .unwrap();
+    let input = ResidentNormalInput::Point(ResidentConstitutiveCurrent::integers(&point).unwrap())
+        .enclosure(&surface, ResidentGrain(48))
+        .unwrap();
+    let reflection = source.reflect(input.view()).unwrap();
+    field.commit_reflection(&reflection).unwrap();
+    let rest = field.rest(&[], &[]).unwrap();
+    assert!(rest.joint_current.is_some());
+    let mut bytes = Vec::new();
+    rest.write(&mut bytes).unwrap();
+    assert!(bytes.starts_with(JOINT_PACKED_MAGIC));
+    NativeFieldRest::read(&mut bytes.as_slice(), bytes.len() as u64).unwrap();
 }

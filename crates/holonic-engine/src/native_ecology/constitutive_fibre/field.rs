@@ -587,7 +587,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                         .pending
                         .as_ref()
                         .expect("pending field")
-                        .resident()?
+                        .resident
                         .section,
                 )?;
                 let source_width = body.relation.source_width;
@@ -717,9 +717,6 @@ impl<'chart> NativeConstitutiveField<'chart> {
             None
         };
         let observed_source_at = if actuation.is_some() { None } else { source_at };
-        if let Some(at) = source_at {
-            self.mount_history_source(at)?;
-        }
         let next = self
             .relation
             .occurrences
@@ -875,7 +872,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                     surface.record_moment_source_current(
                         &lane,
                         self.history[observed_source_at.expect("refresh source")]
-                            .resident()?
+                            .resident
                             .transport
                             .as_ref()
                             .expect("source report"),
@@ -890,7 +887,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                     surface.record_complete_material_source_current(
                         &lane,
                         self.history[observed_source_at.expect("refresh source")]
-                            .resident()?
+                            .resident
                             .transport
                             .as_ref()
                             .expect("complete source report"),
@@ -907,9 +904,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 &mut self.memory,
                 &mut self.relation.basis,
                 &input,
-                observed_source_at
-                    .map(|i| self.history[i].resident().map(|h| &h.section))
-                    .transpose()?,
+                observed_source_at.map(|i| &self.history[i].resident.section),
                 &self.frame.native,
                 observed_source_at.map(|i| &self.history[i].frame.native),
                 self.junction
