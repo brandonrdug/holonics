@@ -63,7 +63,7 @@ current owner from target owner throughout the migration.
 
 | Former location | Current location |
 |---|---|
-| `soma/{body,abi,surface,mount,life}` | Corresponding `crates/holonic-*` libraries |
+| `soma/{body,abi,surface,mount,life}` | Corresponding `crates/holonic-*` libraries; the CUDA apparatus is now `crates/holonics-cuda` |
 | `soma/membrane` | `crates/holonics/src/membrane` |
 | `applications/athena-alpha` | `crates/holonics-hna` |
 | `applications/holonics-application` | `crates/holonics-workspace` |

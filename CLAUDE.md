@@ -281,7 +281,7 @@ port and source fibre.
 | Constitutive field and paired source/current | `crates/holonic-engine/src/native_ecology/constitutive_fibre/field/`: operative/source/{action,map_action,reflection_commit}.rs and operative/factor_return.rs own sparse D/D*, the full joint return and current publication; normal/direct owns E/R/support priors and material statistics |
 | Normalization and adjoints | `field/receiver/normalized{,.rs}`, `normalized/phase.rs`, `field/material_transport/normal/direct/section{,/composition}.rs`, `resident/section/bilinear_features.rs`; exact reference `exponentiated_ratio::transport::NormalizedKernel` |
 | Kernels and their Rust binders | `crates/holonic-engine/kernels/{exact_resident_section.cu,field_normalized_receiver.cuh,normal_applied_condition.cuh,section_bilinear_adjoint.cuh}`; `src/resident_section/` |
-| Hardware law | `hardware_cover`, `section_partition`; `crates/holonic-mount/src/{cuda,launch_law,section_layout}.rs` |
+| Hardware law | `hardware_cover`, `section_partition`; `crates/holonics-cuda/src/{cuda,launch_law,section_layout}.rs` |
 | Exact geometry and helical pair | `crates/relational-geometry/src/{exact,model,screw,exact_analysis}.rs`; `holonic-engine/src/{identity_atlas,exact_contact,holonic_interaction,holonic_chain}.rs`; `receiver_history_compression/observable.rs::HelicalMomentReuse` binds finite pair actions to the existing moment decoder. `holonic_interaction/helical.rs` now joins `ScrewPair` to the checked `HolonicInteraction` with an explicit rate port; `holonic_chain/serial.rs` supplies exact Cayley/prismatic chains, contact rows and constrained target fibres. `Transport/{HelicalPairInteraction,SerialScrewChain}.lean` owns their checked algebra; the full HNN generator-machine binding remains #17 |
 | Winding, carry, address, trace faces and cell holonomy | Lean `Geometry/{PhaseCarry,PairResonance}`, `Transport/{GeneratorTraceFaces,CellHolonomy}` over the existing `Millennium/{Farey,LocalFactor,TraceSequence,HodgeIndex,PlaceLedger,WindingLedger}`, `RH/{FosterTanks,HeatFlowStackedSeam}`, `Foundation/{HodgeReceiver,IwasawaTower,FractalPacking}`; Rust `crates/relational-geometry/src/winding.rs` (`Odometer`, `LockAddress`, `SiteFactor`, `Machine`, `triangle_holonomy`) |
 | Algebra and economical continuation | `exact_linear`, `prime_image_algebra`, `receiver_history_compression`, `winding_inertia`; resident bilinear/normal/word/mode owners at their separate call boundaries |
@@ -315,7 +315,7 @@ their deterministic barrier joins the statuses. Host allocations, kernel stride 
 placement use that same layout; `resident_section::SLOT_WORDS` is the Rust owner.
 
 [definition] A ready native upload includes device completion. Pageable host-to-device copies
-can return after host staging; synchronous `holonic-mount` slice/range methods complete the
+can return after host staging; synchronous `holonics-cuda` slice/range methods complete the
 legacy-stream transfer before a nonblocking passage reads it. Explicit asynchronous copies
 retain their caller-owned event/stream dependency.
 A joint ball, a family with shared parameters and independent coordinate intervals have different

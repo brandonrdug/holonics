@@ -9,7 +9,7 @@ use core::ffi::c_void;
 use std::collections::{BTreeMap, BTreeSet};
 
 use body::num::COG_WORDS;
-use mount::{DeviceBuffer, Dim3, Stream};
+use holonics_cuda::{DeviceBuffer, Dim3, Stream};
 use soma_abi::morphological_condition_cuda as wire;
 use holonics::membrane::ReceiverFiberIdentity;
 
@@ -24,7 +24,7 @@ use crate::{
 
 #[derive(Clone, Debug)]
 pub enum MorphologicalConditionCudaError {
-    Driver(mount::CudaError),
+    Driver(holonics_cuda::CudaError),
     Suffix(ExactSuffixEcologyError),
     EmptyChart,
     /// The named chart carried no path at all.
@@ -126,8 +126,8 @@ impl std::fmt::Display for MorphologicalConditionCudaError {
 
 impl std::error::Error for MorphologicalConditionCudaError {}
 
-impl From<mount::CudaError> for MorphologicalConditionCudaError {
-    fn from(value: mount::CudaError) -> Self {
+impl From<holonics_cuda::CudaError> for MorphologicalConditionCudaError {
+    fn from(value: holonics_cuda::CudaError) -> Self {
         Self::Driver(value)
     }
 }
@@ -844,7 +844,7 @@ fn stage_suffix(
 }
 
 fn launch_suffix(
-    function: &mount::Function<'_>,
+    function: &holonics_cuda::Function<'_>,
     chart: &StagedSuffix,
 ) -> Result<(), MorphologicalConditionCudaError> {
     let mut control_pointer = chart.control.device_ptr();
@@ -1100,7 +1100,7 @@ fn stage_prefix(
 }
 
 fn launch_prefix(
-    function: &mount::Function<'_>,
+    function: &holonics_cuda::Function<'_>,
     prefix: &StagedPrefix,
 ) -> Result<(), MorphologicalConditionCudaError> {
     let mut control_pointer = prefix.control.device_ptr();

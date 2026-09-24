@@ -19,7 +19,7 @@ use std::time::Instant;
 
 use body::medium::{integrate, RegionalForm, FORM_WORDS};
 use body::num::{Cog, Rung};
-use mount::{Context, Device, DeviceBuffer, Dim3, Module, Result};
+use holonics_cuda::{Context, Device, DeviceBuffer, Dim3, Module, Result};
 
 /// The committed PTX boundary artifact, built by soma-kernel-cuda/build-ptx.sh;
 /// mount_smoke_kernel.ptx is the separate smoke boundary.
@@ -132,7 +132,7 @@ fn run() -> Result<()> {
     }
 
     // --- init + device selection (refuse to run anywhere but the 4080) --------------------------
-    mount::cuda::init()?;
+    holonics_cuda::cuda::init()?;
     let count = Device::count()?;
     if count < 1 {
         eprintln!("FAILED: no CUDA device visible (cuDeviceGetCount == 0)");

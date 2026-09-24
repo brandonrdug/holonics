@@ -1,6 +1,6 @@
 use super::*;
 
-pub(super) fn substrate(error: ::mount::CudaError) -> LiveCurrentError {
+pub(super) fn substrate(error: ::holonics_cuda::CudaError) -> LiveCurrentError {
     LiveCurrentError::Substrate(error.code)
 }
 

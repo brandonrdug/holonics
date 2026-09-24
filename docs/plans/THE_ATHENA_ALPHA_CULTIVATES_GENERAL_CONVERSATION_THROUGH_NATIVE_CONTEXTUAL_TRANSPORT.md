@@ -989,8 +989,8 @@ partition. #61 implements this realization inside the #17 join, from its actual 
 |---|---|---|
 | Complete region partition and shared reads | `section_partition::{SectionRegion,SectionPartition,certify,CellReceipt::is_interchangeable,SharedRead}` | `field_geometry/placement.rs` certifies forward/reverse staged rows and admitted source reads, with conservative reverse support and complete row receipts |
 | Independence licensing placement | `interchange::certify_footprints`; `hardware_cover::{CoverDecomposition::of,independence,work}` | Mounted device-only cover and immutable D/M ports gate the actual geometric word; normal fitting is one joined update |
-| Gather → shared operator → scatter | `holonic-mount::section_layout::SectionLayout::generate`; `Foundation/SectionLayout.lean`; `section_layout_adoption` | Phased gather/transpose and enclosed local features run resident. The logical row certificate and hand-written packet kernels share the compiled chart; a fully generated/fused schedule remains open |
-| Lawful launch | `holonic-mount::launch_law`; `Foundation/DeviceLaunchLaw.lean` | Row blocks use the mounted launch limits. Refinement stages and shared-material reduction remain ordered dependencies |
+| Gather → shared operator → scatter | `holonics-cuda::section_layout::SectionLayout::generate`; `Foundation/SectionLayout.lean`; `section_layout_adoption` | Phased gather/transpose and enclosed local features run resident. The logical row certificate and hand-written packet kernels share the compiled chart; a fully generated/fused schedule remains open |
+| Lawful launch | `holonics-cuda::launch_law`; `Foundation/DeviceLaunchLaw.lean` | Row blocks use the mounted launch limits. Refinement stages and shared-material reduction remain ordered dependencies |
 | Cost at that cover | `receiver_current::ExactReceiverCurrentLaw`; `SectionPartition::SpeciesPressure` | Measure operation work, occupied/idle lanes, service rounds, transfer, memory and end-to-end time on the same source |
 
 [established-bounded; source-inspected] Applied-condition and field-reflection sections now

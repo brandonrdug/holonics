@@ -14,7 +14,7 @@
 //! `ZMod (2^61 - 1)` is one.
 //!
 //! [definition] **One mouth.**  [`add`], [`mul`] and [`reduce`] are compiled for `nvptx64` by
-//! `accelerators/cuda-kernel` and for the host by `crates/holonic-mount`'s exact reference, so the
+//! `accelerators/cuda-kernel` and for the host by `crates/holonics-cuda`'s exact reference, so the
 //! bit-for-bit agreement the device tests assert is a property of one piece of code rather than of
 //! two transcriptions.
 

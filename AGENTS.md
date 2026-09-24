@@ -275,7 +275,7 @@ Paths in this table are relative to `crates/` unless stated otherwise. These are
 | Constitutive field, source and paired return | `holonic-engine/src/native_ecology/constitutive_fibre/field/`; `field/junction/operative/source/{action,map_action,reflection,reflection_commit,reflection_target}.rs` owns the source-qualified dense/reference and CSR+low-rank global action, full joint covector and staged material return; source/reflection/target, material transport, internal modes and receiver |
 | Normalized sections and pullback | `field/receiver/normalized{,.rs}` and `normalized/phase.rs` below that field; `holonic-engine/kernels/field_normalized_receiver.cuh`; exact reference `exponentiated_ratio::transport::NormalizedKernel` |
 | Bilinear source/condition and normal law | `resident/section/bilinear_features.rs`, `field/material_transport/normal/direct/section.rs`; `section_bilinear_adjoint.cuh`, `normal_applied_condition.cuh` |
-| Resident packets, kernels and launch | `holonic-engine/src/resident_section{,.rs}`; `kernels/exact_resident_section.cu`, `exact_packet_linear.cuh`; `holonic-mount/src/{cuda,launch_law,section_layout}.rs` |
+| Resident packets, kernels and launch | `holonic-engine/src/resident_section{,.rs}`; `kernels/exact_resident_section.cu`, `exact_packet_linear.cuh`; `holonics-cuda/src/{cuda,launch_law,section_layout}.rs` |
 | Exact algebra / generator reduction | `holonic-engine/src/exact_linear{,.rs}`, `prime_image_algebra.rs`, `receiver_history_compression/`, `winding_inertia.rs`; host/reference and resident APIs have distinct scopes |
 | Retained availability and predictive release | `holonic-engine/src/{standing,receiver_release}.rs`, `exact_linear/{contextual,kernel_modes}.rs`; `field/internal_mode.rs` retains the equal-drive specialization and explicitly refuses incompatible operative currents; `Foundation/{Standing,CausalRelevance,ReceiverHistoryCompression}.lean` supplies future sufficiency |
 | Helical and geometric source | `relational-geometry/src/{exact,model,screw,exact_analysis}.rs`; `holonic-engine/src/{identity_atlas,exact_contact,holonic_interaction,holonic_chain}.rs`; `receiver_history_compression/observable.rs::HelicalMomentReuse` binds finite pair actions to the existing moment decoder. `holonic_interaction/helical.rs` now joins `ScrewPair` to the checked `HolonicInteraction` with an explicit rate port; `holonic_chain/serial.rs` supplies exact Cayley/prismatic chains, contact rows and constrained target fibres. `Transport/{HelicalPairInteraction,SerialScrewChain}.lean` owns their checked algebra; the full HNN generator-machine binding remains #17 |
@@ -297,7 +297,7 @@ barrier joins their statuses. Host allocation, kernel stride and logical placeme
 `resident_section::SLOT_WORDS` as the Rust layout owner.
 
 [definition] A ready native upload includes device completion. Pageable host-to-device copies
-can return after host staging; the synchronous `holonic-mount` slice/range methods complete
+can return after host staging; the synchronous `holonics-cuda` slice/range methods complete
 their legacy-stream transfer before a nonblocking passage consumes the destination. Explicit
 asynchronous copies retain their caller-owned event/stream dependency.
 

@@ -30,12 +30,12 @@
 //!
 //! Every quantity below comes from one of exactly two places:
 //!
-//! - **the surface declaring itself** — the device through `crates/holonic-mount`'s `Device::attribute` and
+//! - **the surface declaring itself** — the device through `crates/holonics-cuda`'s `Device::attribute` and
 //!   `Device::launch_census`, the cpu through `std::thread::available_parallelism`. A device's warp
 //!   size is not a number this project chooses; it is the device's answer about the device.
 //! - **the material** — how many members a cell has, how many cells there are.
 //!
-//! **This module does not query the card, and it must not.** `crates/holonic-mount/src/cuda.rs` already owns
+//! **This module does not query the card, and it must not.** `crates/holonics-cuda/src/cuda.rs` already owns
 //! that: `Device::attribute`, `Device::launch_census`, `Function::max_threads_per_block`, and
 //! `Function::linear_launch`, which derives grid and block from driver-reported apertures and
 //! **refuses rather than clipping** when the work exceeds them. A first version of this file
@@ -44,16 +44,16 @@
 //! caller that can reach the surface supplies the declaration.
 //!
 //! **CORRECTED 2026-08-18: this paragraph read *"the engine cannot depend on `crates/holonic-mount` — a Cargo
-//! cycle"*, and that was wrong.** `cargo metadata` shows `mount -> body, soma-abi` and nothing
-//! reaching the engine, so `holonic-engine -> mount` closes no cycle; it was `life -> engine` that
-//! forbids the *other* direction. The engine now depends on `mount`, and `resident_section` builds
-//! its [`DeviceDeclaration`] from `mount::Device::attribute` — the device's own answers, through the
+//! cycle"*, and that was wrong.** The driver owner depends on the substrate and does not reach
+//! the engine, so `holonic-engine -> holonics-cuda` closes no cycle; it is `life -> engine` that
+//! forbids the *other* direction. The engine now depends on `holonics-cuda`, and `resident_section` builds
+//! its [`DeviceDeclaration`] from `holonics_cuda::Device::attribute` — the device's own answers, through the
 //! one census this tree owns — and builds the cover from that declaration and nowhere else.
 //!
 //! What IS a contaminant, and it is in the engine's own device path: `cuda_aperture.rs:44` carries
 //! `const THREADS_PER_BLOCK: u32 = 128` and `cuda_relation.rs` carries `128` and `256`, all three
 //! historically called ABI levels because launch geometry was said to be fixed by the device
-//! interface. **That reason is false**, and `crates/holonic-mount` proves it by deriving the
+//! interface. **That reason is false**, and `crates/holonics-cuda` proves it by deriving the
 //! same quantity from the driver. Those two engine modules declare no device-attribute call at all,
 //! so they know the card's *name* and nothing about its shape — while a sibling stack in the same
 //! repository does it correctly.
@@ -248,10 +248,10 @@ impl HardwareCover {
     /// the device.
     ///
     /// **The engine does not query the card, and that is a structural fact rather than a gap.**
-    /// `crates/holonic-mount/src/cuda.rs` already owns the device query — `Device::attribute`,
+    /// `crates/holonics-cuda/src/cuda.rs` already owns the device query — `Device::attribute`,
     /// `Device::launch_census`, `Function::max_threads_per_block`, and `Function::linear_launch`,
     /// which derives a launch shape from driver-reported apertures and refuses rather than clips.
-    /// `crates/holonic-engine` cannot depend on `crates/holonic-mount`: `crates/holonic-life` depends on the engine, so
+    /// `crates/holonic-engine` cannot depend on `crates/holonics-cuda`: `crates/holonic-life` depends on the engine, so
     /// the reverse edge is a Cargo cycle (`archive/plans/THE_ASSEMBLY.md` F1). A first version of this
     /// module declared its own `cuDeviceGetAttribute` block, which is exactly the construction
     /// `docs/canon/THE_EXPLORATIVE_FAILURE.md` convicts — a new organ beside an existing owner. It was
@@ -760,7 +760,7 @@ impl CoverDecomposition {
 // -------------------------------------------------------------------------------------------------
 //
 // A first version of this module carried a `launch_for` deriving grid and block from the device
-// declaration. It was removed for the same reason the FFI was: `crates/holonic-mount`'s
+// declaration. It was removed for the same reason the FFI was: `crates/holonics-cuda`'s
 // `Function::linear_launch` already derives that shape from **both** the function's own
 // `CU_FUNC_ATTRIBUTE_MAX_THREADS_PER_BLOCK` and the device's census, folds X into Y when X
 // saturates, and refuses rather than clipping when the work exceeds the declared aperture. A weaker

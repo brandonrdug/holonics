@@ -9,7 +9,7 @@ use std::{
     collections::BTreeMap, fs::File, os::unix::fs::FileExt, path::Path,
 };
 
-use mount::DeviceBuffer;
+use holonics_cuda::DeviceBuffer;
 use num_bigint::BigInt;
 use holonics::geometry::Rat;
 use serde::Serialize;

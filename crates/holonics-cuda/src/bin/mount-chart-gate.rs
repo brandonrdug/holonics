@@ -28,7 +28,7 @@ use body::manifold::{
 use body::medium::{RegionalForm, FORM_WORDS};
 use body::num::{Cog, Rung};
 use body::place::{self, Place};
-use mount::{Context, DeviceBuffer, Dim3, Function, Module, Result};
+use holonics_cuda::{Context, DeviceBuffer, Dim3, Function, Module, Result};
 
 const PTX: &[u8] = include_bytes!("../../../../accelerators/cuda-kernel/soma_kernel_cuda.ptx");
 
@@ -341,15 +341,15 @@ fn recast_case(
 fn run() -> Result<()> {
     let t_all = Instant::now();
 
-    mount::cuda::init()?;
-    let count = mount::Device::count()?;
+    holonics_cuda::cuda::init()?;
+    let count = holonics_cuda::Device::count()?;
     if count < 1 {
         eprintln!("FAILED: no CUDA device visible (cuDeviceGetCount == 0)");
         std::process::exit(1);
     }
-    let mut chosen: Option<mount::Device> = None;
+    let mut chosen: Option<holonics_cuda::Device> = None;
     for ord in 0..count {
-        let dev = mount::Device::get(ord)?;
+        let dev = holonics_cuda::Device::get(ord)?;
         if dev.name.contains("4080") {
             chosen = Some(dev);
             break;

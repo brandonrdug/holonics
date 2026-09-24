@@ -6011,7 +6011,7 @@ pub unsafe extern "ptx-kernel" fn morphological_conduct_group(
 // declared incidence — for each local slot, the global address it reads and the region it belongs
 // to — generates a gather, a shared-tile local application and a transposed scatter. These four
 // entries are the generic realization; a new section operator is then a declaration
-// (`mount::section_layout::IncidenceDeclaration` plus a `LocalOperator`), not another hand-written
+// (`holonics_cuda::section_layout::IncidenceDeclaration` plus a `LocalOperator`), not another hand-written
 // kernel. The Lean owner is `Soma.Holonics.Foundation.SectionLayout`.
 //
 // The arithmetic is `soma_abi::section_layout_cuda`'s `Z/(2^61 - 1)` — the SAME code the host

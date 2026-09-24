@@ -27,23 +27,23 @@ disposition.
 
 ## PTX boundary and live consumers
 
-- `mount::SOMA_PTX` uses `include_bytes!` on the committed artifact
+- `holonics_cuda::SOMA_PTX` uses `include_bytes!` on the committed artifact
   [`soma_kernel_cuda.ptx`](../../../accelerators/cuda-kernel/soma_kernel_cuda.ptx), so Cargo needs
-  that source-tree path at compile time ([definition](../../../crates/holonic-mount/src/lib.rs#L61-L64)).
+  that source-tree path at compile time ([definition](../../../crates/holonics-cuda/src/lib.rs#L61-L64)).
   Runtime loading passes the embedded byte slice to `Module::load_ptx`, whose API accepts bytes
-  ([loader](../../../crates/holonic-mount/src/cuda.rs#L930-L945)). There is no separate runtime
+  ([loader](../../../crates/holonics-cuda/src/cuda.rs#L930-L945)). There is no separate runtime
   filesystem lookup for this artifact. This differs from engine PTX generated in `OUT_DIR` by
   [`holonic-engine/build.rs`](../../../crates/holonic-engine/build.rs#L138-L284) and embedded by
   `include_bytes!(concat!(env!("OUT_DIR"), ...))`, for example
   [`cuda_refine.rs`](../../../crates/holonic-engine/src/cuda_refine.rs#L195-L208).
 - Mount embeds and validates the committed PTX and its declared entries in
-  [`lib.rs`](../../../crates/holonic-mount/src/lib.rs#L69-L180); its section-layout and launch-law
+  [`lib.rs`](../../../crates/holonics-cuda/src/lib.rs#L69-L180); its section-layout and launch-law
   tests load the same bytes (for example
-  [`section_layout/tests.rs`](../../../crates/holonic-mount/src/section_layout/tests.rs#L850-L875)
-  and [`launch_law/tests.rs`](../../../crates/holonic-mount/src/launch_law/tests.rs#L715-L735)).
+  [`section_layout/tests.rs`](../../../crates/holonics-cuda/src/section_layout/tests.rs#L850-L875)
+  and [`launch_law/tests.rs`](../../../crates/holonics-cuda/src/launch_law/tests.rs#L715-L735)).
   The standalone mount gates also call `Module::load_ptx` on embedded bytes.
 - Engine's [`section_layout_adoption` test](../../../crates/holonic-engine/src/section_layout_adoption/tests.rs#L207-L239)
-  loads `mount::SOMA_PTX`, resolves the section kernels and executes the generated section triple.
+  loads `holonics_cuda::SOMA_PTX`, resolves the section kernels and executes the generated section triple.
 - `holonic-life` has live callers loading `SOMA_PTX`, including
   [`text_material_cuda.rs`](../../../crates/holonic-life/src/text_material_cuda.rs#L200-L210),
   [`returned_contact_cuda.rs`](../../../crates/holonic-life/src/returned_contact_cuda.rs#L270-L280),
@@ -61,11 +61,12 @@ disposition.
 
 ## Ownership boundary
 
-M1 should move the driver and CUDA execution owners from `holonic-mount` to `holonics-cuda`:
+The M1 apparatus move is complete: the driver and CUDA execution owners now live in
+`holonics-cuda`:
 `ffi.rs`, `cuda.rs`, `launch_law.rs`, `live_event_launch.rs`, `register_carrier.rs`,
 `register_launch.rs`, `register_recast.rs`, and the CUDA staging/enactment portions of
-`section_layout.rs`. The mount exports and module boundaries are enumerated in
-[`holonic-mount/src/lib.rs`](../../../crates/holonic-mount/src/lib.rs#L11-L58).
+`section_layout.rs`. The exports and module boundaries are enumerated in
+[`holonics-cuda/src/lib.rs`](../../../crates/holonics-cuda/src/lib.rs#L11-L58).
 Move the engine's resident HNN owners, device kernels, build script, and PTX inclusion/loading
 owners to `holonics-cuda::hnn` as specified by §0.3 and §3.1.
 

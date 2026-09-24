@@ -8,7 +8,7 @@
 
 use std::collections::BTreeMap;
 
-use ::mount::{
+use ::holonics_cuda::{
     Context, Device, DeviceBuffer, LaunchEvidence, LiveEventArguments, LiveEventSpan,
     LiveEventWriteSpan, Module, RegionalContactArguments, SOMA_PTX,
 };
@@ -63,7 +63,7 @@ pub struct CudaLiveCurrentExecutor {
     /// source of the reported multiprocessor population. It is no longer the *launch evidence* of
     /// any mouth: a census carries neither the per-dimension block extent nor the per-block shared
     /// extent nor the warp, so every mouth crossed with it deferred those clauses.
-    launch_census: Option<::mount::cuda::LaunchCensus>,
+    launch_census: Option<::holonics_cuda::cuda::LaunchCensus>,
     /// **The mounted card's own handle**, retained from mount and presented as
     /// `LaunchEvidence::Device` at every launch this executor issues, so no clause of any of them
     /// is deferred. The launch *shape* is still derived from the card, never authored.
@@ -74,30 +74,30 @@ pub struct CudaLiveCurrentExecutor {
 }
 
 impl CudaLiveCurrentExecutor {
-    pub fn new(device_ordinal: i32) -> ::mount::Result<Self> {
-        ::mount::cuda::init()?;
+    pub fn new(device_ordinal: i32) -> ::holonics_cuda::Result<Self> {
+        ::holonics_cuda::cuda::init()?;
         let device = Device::get(device_ordinal)?;
         let launch_census = Some(device.launch_census()?);
         let max_blocks_per_multiprocessor = u32::try_from(
-            device.attribute(::mount::DeviceAttribute::MAX_BLOCKS_PER_MULTIPROCESSOR)?,
+            device.attribute(::holonics_cuda::DeviceAttribute::MAX_BLOCKS_PER_MULTIPROCESSOR)?,
         )
         .ok()
         .filter(|value| *value > 0)
-        .ok_or_else(|| ::mount::CudaError {
+        .ok_or_else(|| ::holonics_cuda::CudaError {
             code: -1,
             name: String::from("LIVE_EVENT_BLOCK_RESIDENCY"),
             message: String::from("the device reported no resident block aperture"),
             context: "CudaLiveCurrentExecutor::new",
         })?;
         let concurrent_kernels =
-            device.attribute(::mount::DeviceAttribute::CONCURRENT_KERNELS)? != 0;
+            device.attribute(::holonics_cuda::DeviceAttribute::CONCURRENT_KERNELS)? != 0;
         let context = Context::create(&device)?;
         let module = Module::load_ptx(SOMA_PTX)?;
         let local = module.lineage_event()?.local_size_bytes()?;
         let stack = local
             .max(LIVE_EVENT_STACK_MIN_BYTES)
             .checked_next_power_of_two()
-            .ok_or_else(|| ::mount::CudaError {
+            .ok_or_else(|| ::holonics_cuda::CudaError {
                 code: -1,
                 name: String::from("LIVE_EVENT_STACK_EXTENT"),
                 message: String::from("lineage_event local-memory extent cannot be rounded"),

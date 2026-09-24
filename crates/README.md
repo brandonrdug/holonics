@@ -14,7 +14,7 @@ and follow the actual source/consumer map.
 | `holonic-life` | Earlier lifecycle/package, source transport and application-boundary owners (Cargo package `life`). |
 | `holonic-language` | Reflective substrate owner. |
 | `holonic-body`, `holonic-abi` | Shared exact substrate and host/device wire carriers, pending the portable kernel-law consolidation. |
-| `holonic-mount` | CUDA apparatus. |
+| `holonics-cuda` | CUDA driver, device sections and launch apparatus. |
 
 The [architecture map](../docs/ARCHITECTURE_MAP.md) gives exact ownership and scope. A crate's
 historical package name does not create a second implementation.

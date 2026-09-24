@@ -5,7 +5,7 @@
 //! through an offset.  The withdrawal is out of place: the predecessor is what the caller still
 //! holds, so the intervened carrier and the actual one coexist on the card.
 
-use mount::DeviceBuffer;
+use holonics_cuda::DeviceBuffer;
 
 use super::*;
 

@@ -100,7 +100,7 @@ use crate::source_occurrence::{
     BindingValidation, OccurrenceWitness, OccurrenceWitnessRefusal, SourceRefusal,
 };
 use crate::traversible_chain::{Admittance, Crossing, Standing as ChainStanding, found};
-use mount::{GraphCensus, Stream};
+use holonics_cuda::{GraphCensus, Stream};
 
 pub use crate::resident_law::{
     Chronology, CollapseControl, Contact, Contract, ContractTiled, EntailmentRefusal, Enter,

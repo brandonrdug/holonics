@@ -50,8 +50,8 @@ from architecture to launch shape makes an unlawful launch a construction error 
 runtime surprise.
 
 [established-bounded; formal-checked; implemented-exact] **D1 is Returned.** Owners:
-[`crates/holonic-mount/src/launch_law.rs`](../../crates/holonic-mount/src/launch_law.rs) with
-[its tests](../../crates/holonic-mount/src/launch_law/tests.rs), paired with
+[`crates/holonics-cuda/src/launch_law.rs`](../../crates/holonics-cuda/src/launch_law.rs) with
+[its tests](../../crates/holonics-cuda/src/launch_law/tests.rs), paired with
 [`DeviceLaunchLaw.lean`](../../formal/elementary-holonics/ElementaryHolonics/Foundation/DeviceLaunchLaw.lean)
 (`Soma.Holonics.Foundation.DeviceLaunchLaw`); each cites the other by declaration name. A
 `LaunchRequirement` declares the element extent, the coverage relation, the block constraint, the
@@ -143,7 +143,7 @@ mechanism rather than the intention.
 corrected here: the launcher output structs had already gained receipt fields; the `.launch(…)`
 mouths now take the declared evidence and extent and return `LaunchReceipt`; and, under D2's second
 pass, every `*mut` face takes an exclusive span type rather than the `Copy` shared one. Every
-caller in `crates/holonic-mount` (both gate binaries, `register_recast.rs`, `register_carrier.rs`)
+caller in `crates/holonics-cuda` (both gate binaries, `register_recast.rs`, `register_carrier.rs`)
 and in `crates/holonic-life` (`src/live_current_cuda/executor.rs`, three call sites) is migrated;
 `crates/holonic-life/src/live_current_cuda/` was clean in the working tree, so it was migrated
 rather than given a shared-span compatibility entry.
@@ -167,7 +167,7 @@ retains is now only the source of the reported multiprocessor population, and it
 two named clauses and both still pass EXACT. `LaunchEvidence::Census` and
 `LaunchEvidence::FunctionOnly` remain in the law — they are the honest declarations for a caller
 that holds no card, and `launch_law/tests.rs` still exercises the deferral they produce — but no
-production path in `crates/holonic-mount` or `crates/holonic-life` takes them. The remaining
+production path in `crates/holonics-cuda` or `crates/holonic-life` takes them. The remaining
 `[open]` of the former paragraph, growing `LaunchCensus` by the three readings, is **not** done and
 is not needed for any present caller; it stays available for a future caller that must pass a
 summary across a boundary a `&Device` cannot cross.
@@ -292,8 +292,8 @@ incidence declaration that generates the layout must carry it.
 
 [established-bounded; formal-checked; implemented-exact] **D3 is Returned**, at the scope stated
 here. Owners:
-[`crates/holonic-mount/src/section_layout.rs`](../../crates/holonic-mount/src/section_layout.rs)
-with [its tests](../../crates/holonic-mount/src/section_layout/tests.rs), paired with
+[`crates/holonics-cuda/src/section_layout.rs`](../../crates/holonics-cuda/src/section_layout.rs)
+with [its tests](../../crates/holonics-cuda/src/section_layout/tests.rs), paired with
 [`SectionLayout.lean`](../../formal/elementary-holonics/ElementaryHolonics/Foundation/SectionLayout.lean)
 (`Soma.Holonics.Foundation.SectionLayout`); each cites the other by declaration name, and the shared
 device wire is `soma_abi::section_layout_cuda`. **The declaration is an `IncidenceDeclaration`** — a

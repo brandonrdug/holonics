@@ -3400,7 +3400,7 @@ mod tests {
     /// this workspace, and that includes this test module. (The earlier wording said the *tokens*
     /// `f32`/`f64` occur nowhere else, which is false — they occur in a doc line of `reopening.rs`,
     /// in a `#[test]` comment of `embedding_fiber.rs` recording a removal, and as the string
-    /// literals `".f16"`/`".f32"`/`".f64"` inside `crates/holonic-mount`'s *negative* assertion that the
+    /// literals `".f16"`/`".f32"`/`".f64"` inside `crates/holonics-cuda`'s *negative* assertion that the
     /// generated PTX contains none. None of those is a float value; the claim about values holds
     /// and the claim about tokens did not. Measured 2026-08-16,
     /// `grep -rn --include='*.rs' -w 'f64\|f32' crates soma`.) The live-float round trip is

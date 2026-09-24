@@ -3,7 +3,7 @@ import Mathlib.Tactic
 /-!
 # The section layout: a declared incidence generates gather, local application and scatter
 
-This is the Lean owner paired with `crates/holonic-mount/src/section_layout.rs`, and it continues
+This is the Lean owner paired with `crates/holonics-cuda/src/section_layout.rs`, and it continues
 `ElementaryHolonics/Foundation/DeviceLaunchLaw.lean` (D1/D2 of
 `docs/plans/THE_EXACT_DEVICE_LAW_IS_CONSTRUCTED.md`) into D3, *partition generates layout*.
 

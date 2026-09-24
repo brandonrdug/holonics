@@ -52,7 +52,7 @@ Each is backed by a measurement at `d3b8b509`.
    Mac branch. The portable leaf is justified by actual shared source and stays limited to laws and
    wire-neutral carriers that both sides compile. R2/M1 move host owners first; a separate cut
    classifies and consolidates `body`, `soma-abi` and `holonic-words` without changing device math.
-   The kernel's committed PTX is embedded at compile time by the current `holonic-mount`
+   The kernel's committed PTX is embedded at compile time by `holonics-cuda`
    library/tests/gates, loaded from those bytes by engine `section_layout_adoption` tests, and
    used by `holonic-life`'s Soma CUDA lineage. Its launch owners (`SOMA_PTX`, `register_launch`,
    `live_event_launch`) cannot be retired by removing `life` alone. The HNN uses the C++ kernels
@@ -220,7 +220,7 @@ ring g0; closing the model-versus-uniform gap on the exposure sample.
 
 Exact enclosure arithmetic on the card (sealed carrier words, radii, `SLOT_WORDS` receipts, Cayley step
 kernels), the hardware cover and section partition, the device quadratic moment. Owners now:
-`holonic-mount`, engine `cuda_refine`, `resident_section`, `kernels/`, `hardware_cover`, `section_partition`.
+`holonics-cuda`, engine `cuda_refine`, `resident_section`, `kernels/`, `hardware_cover`, `section_partition`.
 
 ### 2.4 Boundary charts and measurement
 
@@ -262,7 +262,7 @@ The target is three maintained libraries on this branch, four when Brandon adds 
 |---|---|---|
 | `holonics-portable` (working name, §0.4) | A dependency-free `no_std` leaf for the exact body/ABI laws and word arithmetic genuinely compiled by both the host and detached Rust CUDA kernel. Host-only ratio wrappers and section refusals stay with their host owners. | Classify the shared parts of `body`, `soma-abi` and `holonic-words`; keep one arithmetic implementation and its host/device parity gates. |
 | `holonics` | Main library: typed ratio/remainder/inversion and jets; geometric frames, exterior cells, pair and tube/tower charts; the one Holon law with active receiving, composition, restriction and deposition; a proposed receiver-relative `Holarchy`; fluid, wave, spacetime and thermal constitutive instances; equation extraction as a Holon boundary; and the backend-neutral HNN: field law, source moments, adjoint contracts, execution-port trait and host reference, the last built in K2. The complex-parametron chart is an HNN physical chart. No CUDA dependency and no `nvcc`. | `holonic-core`, `relational-geometry`, live `holonic-structure`, the source-neutral parts of `holonic-engine` (extraction included), and the law/declaration parts of `holonics-hna` and live `holonic-life`. |
-| `holonics-cuda` | CUDA realization: driver, allocation, transfer completion, section layout and partition, hardware cover, the `.cu` kernels and their `build.rs`, and `hnn/`, the resident HNN field moved as it is (§0.3). It depends on `holonics` and implements the HNN execution port as K2 defines it. It does not redefine the material or loss law. | `holonic-mount`, engine `cuda_refine`, `resident_section`, `kernels/`, `hardware_cover`, `section_partition`, the resident `native_ecology/**` and `embedding_fiber`, the resident `holonics-hna` `native/**`, and the device files of `holonic_intelligence`. |
+| `holonics-cuda` | CUDA realization: driver, allocation, transfer completion, section layout and partition, hardware cover, the `.cu` kernels and their `build.rs`, and `hnn/`, the resident HNN field moved as it is (§0.3). It depends on `holonics` and implements the HNN execution port as K2 defines it. It does not redefine the material or loss law. | the former `holonic-mount` owner (now moved), engine `cuda_refine`, `resident_section`, `kernels/`, `hardware_cover`, `section_partition`, the resident `native_ecology/**` and `embedding_fiber`, the resident `holonics-hna` `native/**`, and the device files of `holonic_intelligence`. |
 | `holonics-apple` (later) | Apple silicon implementation behind the same typed execution port, with its own kernels and placement. Create it only on Brandon's Mac branch after its actual implementation is ready. | No Linux-branch move. |
 
 The dependency direction is `holonics-portable → holonics → holonics-cuda` (and later
@@ -300,7 +300,7 @@ crates/holonics/src/
   hnn/         field law, source moments, adjoint contracts, execution port, host reference (K2)
 
 crates/holonics-cuda/src/
-  driver/      context, module, stream, allocation, transfer completion (from holonic-mount)
+  driver/      context, module, stream, allocation, transfer completion (from holonics-cuda)
   section/     resident sections, SLOT_WORDS, section partition, hardware cover
   hnn/         the resident HNN field and session, moved as it is
   extraction/  device parts of equation extraction, if kept
@@ -695,7 +695,9 @@ existing suites (§0.9):
    retargeted. [Structure](census/M1_STRUCTURE_OWNER_MOVE.md) and
    [geometry](census/M1_GEOMETRY_OWNER_MOVE.md) now have internal main-library source and measured
    gates. The [ratio and information operators](census/M1_RATIO_OWNER_MOVE.md) now live under `holonics::ratio`; the [live membrane runtime](census/M1_MEMBRANE_OWNER_MOVE.md) now lives under `holonics::membrane`; exact words and the remaining source-neutral engine/HNN laws still need disposition;
-   resident engine/HNN execution moves to CUDA.
+   resident engine/HNN execution moves to CUDA. The [CUDA apparatus](census/M1_CUDA_MOUNT_OWNER_MOVE.md)
+   now lives in `crates/holonics-cuda` as the `holonics-cuda` package (`holonics_cuda` library);
+   engine and life consumers use that owner directly, with committed PTX and binary names retained.
 8. **M2: the Lean move.** Move paths to `lean/` (`Holonics` and `HolonicsResearch`) and build both
    targets. Rename `Soma.Holonics` to `Holonics` as a separate mechanical commit.
 9. **D: documents (the restructure's closing acceptance).** All to the verified paths:

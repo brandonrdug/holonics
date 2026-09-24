@@ -101,7 +101,7 @@ mod tests {
     /// Entries compiled into the artifact AND resolved by a Rust launcher.
     ///
     /// Each name here is reachable: some caller resolves it through `Module::function`, either by
-    /// a literal in a `crates/holonic-mount/src/bin/mount-*-gate.rs`, by a `soma_abi::*::ENTRY_SYMBOL`
+    /// a literal in a `crates/holonics-cuda/src/bin/mount-*-gate.rs`, by a `soma_abi::*::ENTRY_SYMBOL`
     /// constant, or through `soma_abi::register::Entry::symbol`.
     const LAUNCHED_ENTRIES: &[&str] = &[
         "link_grain",

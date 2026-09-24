@@ -97,7 +97,7 @@ off the device rather than chosen.
 | `cuda_aperture` | prices the detour as an **undivided pair** `(C, d)` — `C` the finding-walk that packs, dispatches, downloads and merges, `d` the checking-step that crosses directly. **`C = d` is the mirror: the detour founded nothing** |
 | `cuda_refine` | *"one lane per occurrence, no reduction, no ordering, no atomic on the reading itself — **the shape a card exists for**"* |
 | `receiver_current` | splits it correctly: the **site** carries capacity, the **passage** carries characteristic delay; congestion is computed at the site and spent on the passage |
-| `crates/holonic-mount`'s launch geometry | derives grid and block from the device census and **refuses by name rather than clipping** when work exceeds the aperture |
+| `crates/holonics-cuda`'s launch geometry | derives grid and block from the device census and **refuses by name rather than clipping** when work exceeds the aperture |
 | `crates/holonic-membrane`'s live current | *"the front is covered by EXTENT, not by cardinality… a **decomposition and never a schedule**"* |
 
 **Nothing in the live tree treats a processing surface as a place.**

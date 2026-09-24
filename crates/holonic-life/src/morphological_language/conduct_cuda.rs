@@ -23,14 +23,14 @@ use core::ffi::c_void;
 use std::time::Instant;
 
 use holonics::structure::{LocalSequence, LocalStructureError};
-use mount::{Context, Device, DeviceBuffer, Module, Stream, SOMA_PTX};
+use holonics_cuda::{Context, Device, DeviceBuffer, Module, Stream, SOMA_PTX};
 use serde::Serialize;
 use soma_abi::morphological_conduct_cuda as wire;
 pub use soma_abi::morphological_conduct_cuda::MorphologicalConductCandidate;
 
 #[derive(Clone, Debug)]
 pub enum MorphologicalConductCudaError {
-    Driver(mount::CudaError),
+    Driver(holonics_cuda::CudaError),
     Extent,
     InvalidFront,
     /// A key row or deposit row is not of the front's declared key width.
@@ -178,8 +178,8 @@ impl std::fmt::Display for MorphologicalConductCudaError {
 
 impl std::error::Error for MorphologicalConductCudaError {}
 
-impl From<mount::CudaError> for MorphologicalConductCudaError {
-    fn from(error: mount::CudaError) -> Self {
+impl From<holonics_cuda::CudaError> for MorphologicalConductCudaError {
+    fn from(error: holonics_cuda::CudaError) -> Self {
         Self::Driver(error)
     }
 }
@@ -493,7 +493,7 @@ pub enum MorphologicalConductParity {
 pub struct CudaMorphologicalConductExecutor {
     module: Module,
     device_name: String,
-    census: mount::cuda::LaunchCensus,
+    census: holonics_cuda::cuda::LaunchCensus,
     launches: u64,
     epoch: u32,
     poisoned: bool,
@@ -519,7 +519,7 @@ impl CudaMorphologicalConductExecutor {
         device_ordinal: i32,
         parity: MorphologicalConductParity,
     ) -> Result<Self, MorphologicalConductCudaError> {
-        mount::cuda::init()?;
+        holonics_cuda::cuda::init()?;
         let device = Device::get(device_ordinal)?;
         let census = device.launch_census()?;
         let context = Context::create(&device)?;
@@ -854,7 +854,7 @@ fn grow_buffer(
     Ok(true)
 }
 
-fn dimension_words(dimension: mount::Dim3) -> [u32; 3] {
+fn dimension_words(dimension: holonics_cuda::Dim3) -> [u32; 3] {
     [dimension.x, dimension.y, dimension.z]
 }
 

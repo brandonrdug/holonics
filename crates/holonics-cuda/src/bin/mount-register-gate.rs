@@ -26,7 +26,7 @@ use body::manifold::{
 use body::medium::{RegionalForm, FORM_WORDS};
 use body::num::COG_WORDS;
 use body::seam::SliceWordSeam;
-use mount::{
+use holonics_cuda::{
     launch_register_carrier_rebase, Context, DeviceBuffer, Dim3, LaunchEvidence, Module,
     RegisterCarrierRebase, RegisterCarrierRebaseKernel, RegisterScopeArguments,
     RegisterScopeKernel, RegisterScopeSurfaceArguments, RegisterScopeSurfaceKernel, RegisterSpan,
@@ -386,7 +386,7 @@ fn cuda_reference(
     ctx: &Context,
     function: GateScope<'_, '_>,
     carrier_rebase: &RegisterCarrierRebaseKernel<'_>,
-    device: &mount::Device,
+    device: &holonics_cuda::Device,
     interior_installment: usize,
     completion_rows: usize,
 ) -> Result<RegisterTrace> {
@@ -682,13 +682,13 @@ fn run() -> Result<()> {
     assert_eq!(validate_radiation(&cpu.radiation), Ok(()));
     assert!(radiation_is_nonvacuous(&cpu.radiation));
 
-    mount::cuda::init()?;
-    let count = mount::Device::count()?;
+    holonics_cuda::cuda::init()?;
+    let count = holonics_cuda::Device::count()?;
     if count < 1 {
         eprintln!("FAILED: no CUDA device visible (cuDeviceGetCount == 0)");
         std::process::exit(1);
     }
-    let device = mount::Device::get(0)?;
+    let device = holonics_cuda::Device::get(0)?;
     println!("device: {}", device.name);
     let ctx = Context::create(&device)?;
     let module = Module::load_ptx(PTX)?;

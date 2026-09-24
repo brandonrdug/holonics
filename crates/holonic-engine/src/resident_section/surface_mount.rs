@@ -5,7 +5,7 @@ impl<'chart> ResidentSurface<'chart> {
     /// when the census names a device the readout did not mount, or when a kernel symbol is
     /// missing from the module.
     pub fn on(readout: &'chart ResidentReadout) -> Result<Self, ResidentRefusal> {
-        mount::cuda::init()?;
+        holonics_cuda::cuda::init()?;
         if Device::count()? == 0 {
             return Err(ResidentRefusal::NoResidentChart);
         }

@@ -91,7 +91,7 @@
 //!
 //! ## The device arm, and the exact obstacle to it
 //!
-//! [established-bounded; source-inspected] `mount::section_layout::SectionLayout` generates
+//! [established-bounded; source-inspected] `holonics_cuda::section_layout::SectionLayout` generates
 //! gather / local-apply / scatter for `Σ_r P_rᵀ L_r P_r x`, where `L_r` is the leading block of
 //! **one declared `LocalOperator` shared by every region** and the apply is linear in the gathered
 //! words. A pivot sweep is neither: its update `a_ij ← a_ij − m_i · a_kj` carries a multiplier
@@ -101,7 +101,7 @@
 //! modular matrix product, and this module does not infer it. The concrete obligation is named in
 //! [`crate::section_layout_adoption`].
 //!
-//! `holonic_words::ModularWords` (re-exported as `mount::ModularWords`) is nevertheless the ring
+//! `holonic_words::ModularWords` (re-exported as `holonics_cuda::ModularWords`) is nevertheless the ring
 //! this module computes in, and at `ModularWords::DEVICE`'s own modulus `2^61 − 1` its `add` and
 //! `mul` *are* the device's — the same code `accelerators/cuda-kernel` compiles for nvptx.
 //! [`PrimeChart::device`] is that chart, and it is the first chart every reconstruction takes, so
@@ -129,7 +129,7 @@
 //!   and [`self::tests`] holds the two against each other on every fixture rather than on trust.
 //! - **Primality** is `crate::primality::is_prime` — deterministic Miller–Rabin over
 //!   twelve fixed bases, exact for every `u64`. This module calls it; it declares no base set.
-//! - **The ring** is `mount::ModularWords`, as above.
+//! - **The ring** is `holonics_cuda::ModularWords`, as above.
 //! - **The hardware cover** is [`crate::hardware_cover`]; this module declares a front to it and
 //!   owns no placement law.
 
@@ -510,7 +510,7 @@ fn lcm(left: &BigInt, right: &BigInt) -> BigInt {
 // 2. the bounded arithmetic chart
 // ===============================================================================================
 
-/// **One bounded arithmetic chart: a prime, decided, carrying `mount::ModularWords` as its ring.**
+/// **One bounded arithmetic chart: a prime, decided, carrying `holonics_cuda::ModularWords` as its ring.**
 ///
 /// [definition] The modulus is decided prime by `crate::primality::is_prime` —
 /// deterministic Miller–Rabin over twelve fixed bases, exact for every `u64` — and is held inside
@@ -540,7 +540,7 @@ impl PrimeChart {
         Ok(Self { ring })
     }
 
-    /// **The card's own chart**, `mount::ModularWords::DEVICE`'s Mersenne prime `2^61 − 1`, whose
+    /// **The card's own chart**, `holonics_cuda::ModularWords::DEVICE`'s Mersenne prime `2^61 − 1`, whose
     /// `add` and `mul` are literally the code compiled for nvptx. Every reconstruction takes this
     /// chart first.
     pub fn device() -> Result<Self, PrimeImageRefusal> {

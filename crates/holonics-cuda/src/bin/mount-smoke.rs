@@ -10,7 +10,7 @@
 use std::ffi::c_void;
 use std::time::Instant;
 
-use mount::{Context, Device, DeviceBuffer, Dim3, Module, FOLD_CONSTANT};
+use holonics_cuda::{Context, Device, DeviceBuffer, Dim3, Module, FOLD_CONSTANT};
 
 /// The PTX payload, built by mount-smoke-kernel/build-ptx.sh and committed as the boundary
 /// artifact. The workspace compiles without
@@ -37,11 +37,11 @@ fn ptx_version_line(ptx: &[u8]) -> String {
     String::from("<no .version line>")
 }
 
-fn run() -> mount::Result<()> {
+fn run() -> holonics_cuda::Result<()> {
     let t_all = Instant::now();
 
     // --- init + device selection -------------------------------------------------------------
-    mount::cuda::init()?;
+    holonics_cuda::cuda::init()?;
     let count = Device::count()?;
     if count < 1 {
         eprintln!("FAILED: no CUDA device visible (cuDeviceGetCount == 0)");

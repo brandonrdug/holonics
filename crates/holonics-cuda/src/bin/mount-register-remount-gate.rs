@@ -14,8 +14,8 @@ use body::carriage::{
 use body::manifold::{self, TermCounts};
 use body::medium::FORM_WORDS;
 use body::seam::SliceWordSeam;
-use mount::cuda::LaunchCensus;
-use mount::{
+use holonics_cuda::cuda::LaunchCensus;
+use holonics_cuda::{
     launch_register_own_recast, Context, CudaError, Device, DeviceBuffer, Module,
     RegisterOwnRecast, RegisterOwnRecastOutput, RegisterRecastFinishKernel, RegisterRecastKernel,
     LaunchEvidence, RegisterScopeArguments, RegisterScopeKernel, RegisterSpan, RegisterWriteSpan,
@@ -561,7 +561,7 @@ fn card_mixed_recast(device: &Device, cpu: &CpuProof) -> Result<()> {
 }
 
 fn card_proof(cpu: &CpuProof) -> Result<Snapshot> {
-    mount::cuda::init()?;
+    holonics_cuda::cuda::init()?;
     let device = Device::get(0)?;
     let census = device.launch_census()?;
     card_mixed_recast(&device, cpu)?;

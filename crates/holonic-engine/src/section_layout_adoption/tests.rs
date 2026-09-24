@@ -1,5 +1,5 @@
 use super::*;
-use mount::{ScatterReceipt, ScatterRequest, SectionLayout};
+use holonics_cuda::{ScatterReceipt, ScatterRequest, SectionLayout};
 
 /// The engine's own scatter material, small enough to read by eye: four source rows of six real
 /// coordinates (three complex), the window `[2, 6)`, scattered onto five destination rows.
@@ -118,7 +118,7 @@ fn compare_generated_scatter(adopt_engine_context: bool) {
         ResidentConstitutiveSection, ResidentNormalEnclosureSection,
     };
     use crate::resident_section::{ResidentGrain, ResidentSection, ResidentSectionRest, ResidentSurface};
-    use mount::{SectionDeviceTables, SectionKernels};
+    use holonics_cuda::{SectionDeviceTables, SectionKernels};
 
     let readout = ResidentReadout::new().expect("a resident chart");
     let surface = ResidentSurface::on(&readout).expect("the apparatus mounts");
@@ -210,26 +210,26 @@ fn compare_generated_scatter(adopt_engine_context: bool) {
     // The comparison still crosses the host codec here; it does not implement a resident cast
     // from the engine's signed enclosure words into this modular ring or carry its radius.
 
-    mount::cuda::init().expect("the driver initializes");
-    let device = mount::Device::get(0).expect("a device answers");
+    holonics_cuda::cuda::init().expect("the driver initializes");
+    let device = holonics_cuda::Device::get(0).expect("a device answers");
     let _context = if adopt_engine_context {
-        mount::cuda::BorrowedContext::adopt(readout.raw_context())
+        holonics_cuda::cuda::BorrowedContext::adopt(readout.raw_context())
             .expect("the engine context is live")
             .make_current()
             .expect("the engine context is current");
         None
     } else {
-        Some(mount::Context::create(&device).expect("a context for the generated triple"))
+        Some(holonics_cuda::Context::create(&device).expect("a context for the generated triple"))
     };
-    let module = mount::cuda::Module::load_ptx(mount::SOMA_PTX).expect("the soma PTX loads");
+    let module = holonics_cuda::cuda::Module::load_ptx(holonics_cuda::SOMA_PTX).expect("the soma PTX loads");
     let kernels = SectionKernels::resolve(&module).expect("the four entries resolve");
-    let stream = mount::Stream::create().expect("a stream");
+    let stream = holonics_cuda::Stream::create().expect("a stream");
     let tables = SectionDeviceTables::stage(&layout, &operator, None).expect("the tables stage");
-    let resident = mount::DeviceBuffer::<u64>::alloc(field.len()).expect("the source allocates");
+    let resident = holonics_cuda::DeviceBuffer::<u64>::alloc(field.len()).expect("the source allocates");
     resident.copy_from_slice(&field).expect("the source uploads");
     let mut local =
-        mount::DeviceBuffer::<u64>::alloc_zeroed(layout.slots()).expect("the tile allocates");
-    let mut target = mount::DeviceBuffer::<u64>::alloc_zeroed(layout.global_extent())
+        holonics_cuda::DeviceBuffer::<u64>::alloc_zeroed(layout.slots()).expect("the tile allocates");
+    let mut target = holonics_cuda::DeviceBuffer::<u64>::alloc_zeroed(layout.global_extent())
         .expect("the field allocates");
     let receipts = kernels
         .enact(
@@ -288,7 +288,7 @@ fn compare_generated_scatter(adopt_engine_context: bool) {
 /// comparison is a comparison of integers rather than of folds.
 #[test]
 fn the_shared_local_operator_cannot_carry_two_faces_with_different_blocks() {
-    use mount::{AccumulationLaw, CheckedIntegers, ExactRing, IncidenceDeclaration, LocalOperator, ScatterRequest, SectionLayout};
+    use holonics_cuda::{AccumulationLaw, CheckedIntegers, ExactRing, IncidenceDeclaration, LocalOperator, ScatterRequest, SectionLayout};
 
     // A joint chart of three coordinates; face 0 reaches coordinates {0, 1}, face 1 reaches
     // {1, 2}. One region per face, each two slots wide.
@@ -355,7 +355,7 @@ fn the_shared_local_operator_cannot_carry_two_faces_with_different_blocks() {
 /// field it reads.
 #[test]
 fn a_fixed_local_apply_is_linear_in_the_field_and_a_pivot_update_is_not() {
-    use mount::{AccumulationLaw, CheckedIntegers, IncidenceDeclaration, LocalOperator, ScatterRequest, SectionLayout};
+    use holonics_cuda::{AccumulationLaw, CheckedIntegers, IncidenceDeclaration, LocalOperator, ScatterRequest, SectionLayout};
 
     const EXTENT: usize = 4;
     const WIDTH: usize = 2;

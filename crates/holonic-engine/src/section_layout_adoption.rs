@@ -3,7 +3,7 @@
 //! [D3](../../../docs/plans/THE_EXACT_DEVICE_LAW_IS_CONSTRUCTED.md) names
 //! `kernels/normal_enclosure_ports.cuh::section_normal_enclosure_scatter_section` the one true
 //! `(region, slot) -> global index` scatter in the engine's hand-written section set, and the
-//! cleanest candidate instance of `mount::section_layout`'s generated gather / local apply /
+//! cleanest candidate instance of `holonics_cuda::section_layout`'s generated gather / local apply /
 //! coloured scatter triple. This module is that declaration, and its tests are the proof that the
 //! generated triple reproduces the hand-written kernel's coordinate result exactly.
 //!
@@ -56,7 +56,7 @@
 //! Neither is a defect in either owner; they are the exact seam, and no engine result is changed by
 //! this module. Nothing here is on a production path: it is the declaration and its cross-check.
 
-use mount::{IncidenceDeclaration, LocalOperator, ModularWords, SectionClause, SectionRefusal, Sectioned};
+use holonics_cuda::{IncidenceDeclaration, LocalOperator, ModularWords, SectionClause, SectionRefusal, Sectioned};
 
 /// Declare the incidence of one `scatter_components` call over the common source/destination
 /// field described in this module's documentation.
@@ -190,7 +190,7 @@ pub fn window_placement_operator(count: usize, entry_ceiling: usize) -> Sectione
 ///
 /// [definition] The contract forbids inferring a solver from the presence of a generated modular
 /// matrix product, and this is the declaration that keeps that honest: each operation is named
-/// against the clause of `mount::section_layout` it does not satisfy, and
+/// against the clause of `holonics_cuda::section_layout` it does not satisfy, and
 /// [`self::tests`] exhibits the second one rather than asserting it.
 ///
 /// Neither is a defect in either owner. `SectionLayout` generates `Σ_r P_rᵀ L_r P_r` faithfully;

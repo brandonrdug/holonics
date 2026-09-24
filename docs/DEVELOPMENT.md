@@ -249,7 +249,7 @@ can invalidate that calibration before the numerical test starts. This is an obs
 condition, not a production worker limit or a reason to serialize independent native currents.
 
 [established-bounded; source-inspected] **What that calibration measures and why concurrency
-breaks it.** `mount::cuda::measure_allocation_grain_once` reads the free extent, allocates one
+breaks it.** `holonics_cuda::cuda::measure_allocation_grain_once` reads the free extent, allocates one
 word, reads it again, and takes the difference as the legacy `cuMemAlloc` charge grain; it then
 frees the word, requires the free extent to close exactly at its starting value, and requires a
 probe one word wider than the grain to cost exactly twice. Nothing is declared and no page size is
@@ -259,7 +259,7 @@ samples enters the difference and the closure check fails with `one-word charge 
 free extent … do not close`. The perturbation carries no attribution and cannot be subtracted.
 The calibration is therefore serialized process-wide (two of our own calibrations never sample
 across each other), a disturbed sample is retried a bounded `ALLOCATION_CALIBRATION_ATTEMPTS`
-times with the retry count reported by `mount::cuda::allocation_calibration_retries`, and an
+times with the retry count reported by `holonics_cuda::cuda::allocation_calibration_retries`, and an
 exhausted calibration returns **every** attempt's reading, so readings that repeat name an
 allocator that does not compose while readings that differ name a busy card. None of that makes
 a shared card measurable: run `--include-ignored` device suites with `--test-threads=1` and no

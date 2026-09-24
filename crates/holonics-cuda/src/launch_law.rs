@@ -2534,7 +2534,7 @@ impl<'a, T: Copy> DeviceReadSpan<'a, T> {
 /// allocation where the borrow checker sees only the one backing borrow.
 ///
 /// No accessor produces a `&mut` view from a `&` one.  `PinnedHost::as_mut_octets` in
-/// `crates/holonic-mount/src/cuda.rs` takes `&mut self` for the same reason, and
+/// `crates/holonics-cuda/src/cuda.rs` takes `&mut self` for the same reason, and
 /// `crates/holonic-engine/src/streamed_standing.rs` takes that unique borrow **only after** the
 /// copy that last read the slot has been synchronized.  Its sibling
 /// `PinnedHost::as_octets_unchecked`, an `unsafe fn(&self) -> &mut [u8]` that pushed that proof
@@ -2665,8 +2665,8 @@ impl<T: Copy> OpenWrite<'_, '_, T> {
 /// A second borrow of the same allocation is a compile error while the write span lives:
 ///
 /// ```compile_fail,E0502
-/// # use mount::launch_law::{DeviceReadSpan, DeviceWriteSpan};
-/// # use mount::DeviceBuffer;
+/// # use holonics_cuda::launch_law::{DeviceReadSpan, DeviceWriteSpan};
+/// # use holonics_cuda::DeviceBuffer;
 /// fn aliasing_is_a_compile_error(buffer: &mut DeviceBuffer<u32>) {
 ///     let write = DeviceWriteSpan::whole(buffer);
 ///     let read = DeviceReadSpan::whole(buffer); // second borrow while `write` lives
@@ -2749,9 +2749,9 @@ impl<'a, T: Copy> PartitionedWrite<'a, T> {
     /// The positive control — the same API, used lawfully, compiles:
     ///
     /// ```no_run
-    /// # use mount::launch_law::{DeviceReadSpan, DeviceWriteSpan, DisjointPartition, PartitionedWrite};
-    /// # use mount::{DeviceBuffer, Stream};
-    /// fn a_lawful_scope(buffer: &mut DeviceBuffer<u32>, stream: &Stream) -> mount::Result<()> {
+    /// # use holonics_cuda::launch_law::{DeviceReadSpan, DeviceWriteSpan, DisjointPartition, PartitionedWrite};
+    /// # use holonics_cuda::{DeviceBuffer, Stream};
+    /// fn a_lawful_scope(buffer: &mut DeviceBuffer<u32>, stream: &Stream) -> holonics_cuda::Result<()> {
     ///     let partition = DisjointPartition::uniform(buffer.len(), 4, 1, 1).unwrap();
     ///     let mut write =
     ///         PartitionedWrite::bind(DeviceWriteSpan::whole(&mut *buffer), partition).unwrap();
@@ -2768,8 +2768,8 @@ impl<'a, T: Copy> PartitionedWrite<'a, T> {
     /// access to an allocation already uniquely borrowed by the open scope:
     ///
     /// ```compile_fail,E0500
-    /// # use mount::launch_law::{DeviceWriteSpan, DisjointPartition, PartitionedWrite};
-    /// # use mount::{DeviceBuffer, Stream};
+    /// # use holonics_cuda::launch_law::{DeviceWriteSpan, DisjointPartition, PartitionedWrite};
+    /// # use holonics_cuda::{DeviceBuffer, Stream};
     /// fn respanning_is_a_compile_error(buffer: &mut DeviceBuffer<u32>, stream: &Stream) {
     ///     let partition = DisjointPartition::uniform(buffer.len(), 4, 1, 1).unwrap();
     ///     let mut write =
@@ -2783,8 +2783,8 @@ impl<'a, T: Copy> PartitionedWrite<'a, T> {
     /// Nor read-spanned while a scope is open:
     ///
     /// ```compile_fail,E0502
-    /// # use mount::launch_law::{DeviceReadSpan, DeviceWriteSpan, DisjointPartition, PartitionedWrite};
-    /// # use mount::{DeviceBuffer, Stream};
+    /// # use holonics_cuda::launch_law::{DeviceReadSpan, DeviceWriteSpan, DisjointPartition, PartitionedWrite};
+    /// # use holonics_cuda::{DeviceBuffer, Stream};
     /// fn read_spanning_is_a_compile_error(buffer: &mut DeviceBuffer<u32>, stream: &Stream) {
     ///     let partition = DisjointPartition::uniform(buffer.len(), 4, 1, 1).unwrap();
     ///     let mut write =
@@ -2798,8 +2798,8 @@ impl<'a, T: Copy> PartitionedWrite<'a, T> {
     /// Nor dropped while a scope is open:
     ///
     /// ```compile_fail,E0505
-    /// # use mount::launch_law::{DeviceWriteSpan, DisjointPartition, PartitionedWrite};
-    /// # use mount::{DeviceBuffer, Stream};
+    /// # use holonics_cuda::launch_law::{DeviceWriteSpan, DisjointPartition, PartitionedWrite};
+    /// # use holonics_cuda::{DeviceBuffer, Stream};
     /// fn freeing_is_a_compile_error(mut buffer: DeviceBuffer<u32>, stream: &Stream) {
     ///     let partition = DisjointPartition::uniform(buffer.len(), 4, 1, 1).unwrap();
     ///     let mut write =

@@ -8,10 +8,9 @@ license.workspace = true
 # The Holon core owns the exact base (`ExactRatMatrix`, `inertia`, `exact_value`, …); every moved
 # item is re-exported at its existing engine path.
 holonics = { path = "../holonics" }
-# The CUDA Driver API boundary. `mount -> body, soma-abi` only (measured with `cargo metadata`,
-# 2026-08-18), so this edge closes no cycle: the engine's resident owner reaches the card through
-# the one census `crates/holonic-mount` owns rather than declaring a second `#[link(name = "cuda")]` regime.
-mount = { path = "../holonic-mount" }
+# The CUDA Driver API boundary. The engine resident owner reaches the card through this single
+# driver census rather than declaring a second `#[link(name = "cuda")]` regime.
+holonics-cuda = { path = "../holonics-cuda" }
 num-bigint = { workspace = true }
 num-integer = "0.1.46"
 num-rational = { workspace = true }

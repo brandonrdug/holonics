@@ -559,9 +559,9 @@ version = "0.1.0"
 dependencies = [
  "claxon",
  "holonics",
+ "holonics-cuda",
  "hound",
  "image",
- "mount",
  "num-bigint",
  "num-integer",
  "num-rational",
@@ -603,6 +603,15 @@ dependencies = [
  "sha2 0.10.9",
  "soma-abi",
  "thiserror",
+]
+
+[[package]]
+name = "holonics-cuda"
+version = "0.1.0"
+dependencies = [
+ "body",
+ "holonic-words",
+ "soma-abi",
 ]
 
 [[package]]
@@ -753,10 +762,10 @@ dependencies = [
  "holonic-engine",
  "holonic-language",
  "holonics",
+ "holonics-cuda",
  "hound",
  "image",
  "libc",
- "mount",
  "num-bigint",
  "num-rational",
  "num-traits",
@@ -839,15 +848,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.119",
-]
-
-[[package]]
-name = "mount"
-version = "0.1.0"
-dependencies = [
- "body",
- "holonic-words",
- "soma-abi",
 ]
 
 [[package]]

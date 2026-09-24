@@ -1237,7 +1237,7 @@ impl<'chart> ResidentSurface<'chart> {
         })
     }
 
-    pub(super) fn function(&self, symbol: &str) -> Result<mount::Function<'_>, ResidentRefusal> {
+    pub(super) fn function(&self, symbol: &str) -> Result<holonics_cuda::Function<'_>, ResidentRefusal> {
         Ok(self.module.function(symbol)?)
     }
 

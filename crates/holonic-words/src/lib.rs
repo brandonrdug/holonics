@@ -1,10 +1,10 @@
 //! **Exact machine words: the rings the section layout computes in, without the device.**
 //!
 //! [definition] `ExactRing`, `CheckedIntegers` and `ModularWords` are the exact arithmetic of
-//! `crates/holonic-mount`'s section layout, extracted so a host-only owner (the certified
+//! `crates/holonics-cuda`'s section layout, extracted so a host-only owner (the certified
 //! prime-image reading in `holonic-core`) computes in the same ring without linking CUDA. The
-//! mount re-exports every item here at its old path (`mount::ModularWords`,
-//! `mount::section_layout::ExactRing`, …), so device code is unchanged.
+//! The CUDA package re-exports every item here (`holonics_cuda::ModularWords`,
+//! `holonics_cuda::section_layout::ExactRing`, …), so device code is unchanged.
 //!
 //! [definition] **One mouth, kept.** At the device modulus `2^61 − 1`, `ModularWords::add`, `mul`,
 //! `canonical` and `is_canonical` call `soma_abi::section_layout_cuda` — the same code

@@ -53,7 +53,7 @@
 //!   cargo run -p life --example the_reservation_decides_whether_the_card_mounts
 //! ```
 
-use mount::cuda::{Context, Device, VirtualDeviceBuffer};
+use holonics_cuda::cuda::{Context, Device, VirtualDeviceBuffer};
 
 /// The level under test, verbatim from `text_material_cuda.rs:20`.
 const RESIDENT_LOGICAL_WORD_RESERVATION: usize = u32::MAX as usize;
@@ -62,7 +62,7 @@ const RESIDENT_LOGICAL_WORD_RESERVATION: usize = u32::MAX as usize;
 const RESIDENT_BUFFERS: usize = 5;
 
 fn main() {
-    if let Err(error) = mount::cuda::init() {
+    if let Err(error) = holonics_cuda::cuda::init() {
         println!("cuInit refused: {error:?}");
         return;
     }

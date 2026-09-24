@@ -16,7 +16,7 @@
 //! `HolonicAdjointNormalization`. No world verdict, reward, label, status, or caller-supplied
 //! factor enters: the only exterior data are the declared apertures, reported in every deposit.
 
-use mount::DeviceBuffer;
+use holonics_cuda::DeviceBuffer;
 use serde::{Deserialize, Serialize};
 
 use super::NativeOverlayRest;

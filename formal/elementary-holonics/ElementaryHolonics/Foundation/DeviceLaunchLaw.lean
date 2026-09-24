@@ -3,7 +3,7 @@ import Mathlib.Tactic
 /-!
 # The device launch law: coverage, guard, and per-thread exclusive write regions
 
-This is the Lean owner paired with `crates/holonic-mount/src/launch_law.rs`.  Every structure here
+This is the Lean owner paired with `crates/holonics-cuda/src/launch_law.rs`.  Every structure here
 has an executable equivalent in that module and every theorem here appears there as an invariant
 or a test.  The Rust side cites these declaration names; this file cites the Rust items.
 

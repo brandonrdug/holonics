@@ -33,7 +33,7 @@ The restructuring work is in progress; these are the paths that exist now.
 |---|---|
 | `crates/holonics/` | Main Holon law, structural carriers, receiver-relative geometry, live receiving/standing and exact operators |
 | `crates/holonic-engine/`, `crates/holonics-hna/`, `crates/holonic-life/` | Native field, HNN sessions, equation extraction and inherited implementation layers |
-| `crates/holonic-mount/`, `crates/holonic-words/` | CUDA driver/launch boundary and exact word arithmetic |
+| `crates/holonics-cuda/`, `crates/holonic-words/` | CUDA driver/launch boundary and exact word arithmetic |
 | `formal/elementary-holonics/` | Current Lean/Lake project; the final `Holonics` and `HolonicsResearch` roots remain an M2 move |
 | `applications/`, `accelerators/` | CLI, data/tools and device-specific targets |
 | `docs/`, `research/` | Maintained contracts, plans, derivations, experiments and papers |

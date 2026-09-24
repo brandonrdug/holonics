@@ -7,7 +7,7 @@
 
 use core::ffi::c_void;
 
-use mount::{Context, Device, DeviceBuffer, Module, Stream, SOMA_PTX};
+use holonics_cuda::{Context, Device, DeviceBuffer, Module, Stream, SOMA_PTX};
 use serde::Serialize;
 use soma_abi::material_shadow_cuda as wire;
 
@@ -74,7 +74,7 @@ pub struct MaterialShadowCudaReceipt {
 pub struct CudaMaterialShadowExecutor {
     module: Module,
     device_name: String,
-    census: mount::cuda::LaunchCensus,
+    census: holonics_cuda::cuda::LaunchCensus,
     launches: u64,
     stream: Stream,
     context: Context,
@@ -82,7 +82,7 @@ pub struct CudaMaterialShadowExecutor {
 
 impl CudaMaterialShadowExecutor {
     pub fn new(device_ordinal: i32) -> Result<Self, String> {
-        mount::cuda::init().map_err(|error| error.to_string())?;
+        holonics_cuda::cuda::init().map_err(|error| error.to_string())?;
         let device = Device::get(device_ordinal).map_err(|error| error.to_string())?;
         let census = device.launch_census().map_err(|error| error.to_string())?;
         let context = Context::create(&device).map_err(|error| error.to_string())?;

@@ -71,7 +71,7 @@ use crate::{Context, CudaError, Device, DeviceBuffer, Dim3, Function, Module, Re
 
 // The exact word rings, the accumulation law and the refusal vocabulary are owned by
 // `holonic-words` (host-only, no CUDA) and re-exported here at their old paths, so every
-// `mount::section_layout::X` and `mount::X` name is unchanged.
+// `holonics_cuda::section_layout::X` and `holonics_cuda::X` name is unchanged.
 pub use holonic_words::{
     AccumulationLaw, CheckedIntegers, ExactRing, ModularWords, SectionClause, SectionRefusal,
     Sectioned,

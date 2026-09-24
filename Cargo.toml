@@ -27,7 +27,7 @@ members = [
   "crates/holonic-body",
   "crates/holonic-abi",
   "crates/holonic-life",
-  "crates/holonic-mount",
+  "crates/holonics-cuda",
   "applications/derivation-atlas",
   "applications/holon-plate",
 ]

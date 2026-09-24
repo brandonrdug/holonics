@@ -24,11 +24,11 @@
 //! launch and the terminal synchronize the serial chart issues nothing — [`TransferCensus`] counts
 //! it, so a renamed loop is caught by measurement rather than by a string.
 //!
-//! # One apparatus occurrence, through `crates/holonic-mount`
+//! # One apparatus occurrence, through `crates/holonics-cuda`
 //!
 //! Device discovery, attributes, module loading, streams, events, capture and graphs come through
 //! [`mount`] — the one CUDA census this tree owns — not a second `#[link(name = "cuda")]` block.
-//! The surface adopts the [`ResidentReadout`]'s context as a [`mount::BorrowedContext`], checks the
+//! The surface adopts the [`ResidentReadout`]'s context as a [`holonics_cuda::BorrowedContext`], checks the
 //! mounted device is the readout's device by name, builds the [`DeviceDeclaration`] from the
 //! device's own attributes, builds the [`HardwareCover`] **from that declaration and nowhere else**,
 //! and states its [`ModeIdentity`] with the PTX's content digest. A caller cannot hand the passage a
@@ -76,7 +76,7 @@ use crate::embedding_fiber::{MountedReadout, ResidentReadout};
 use holonics::exact_value::ExactInterval;
 use holonics::exact_work::ExactWork;
 use holonics::hardware_cover::{DeviceDeclaration, HardwareCover, ModeIdentity};
-use mount::{
+use holonics_cuda::{
     BorrowedContext, Device, DeviceAttribute, DeviceBuffer, Dim3, Event, GraphCensus, GraphExec,
     MemoryInfo, Module, Stream,
 };
@@ -427,8 +427,8 @@ pub enum ResidentRefusal {
     MemoryAperture { required: u64, free: u64 },
 }
 
-impl From<mount::CudaError> for ResidentRefusal {
-    fn from(error: mount::CudaError) -> Self {
+impl From<holonics_cuda::CudaError> for ResidentRefusal {
+    fn from(error: holonics_cuda::CudaError) -> Self {
         Self::Driver {
             operation: error.context.to_owned(),
             code: error.code,
@@ -642,7 +642,7 @@ pub struct ResidentSurface<'chart> {
     max_shared_octets: u32,
     memory_at_mount: MemoryInfo,
     /// The `cuMemAlloc` charge grain the card actually levies, measured at mount by two probes
-    /// ([`mount::BorrowedContext::allocation_grain_bytes`]). An apparatus coordinate: every
+    /// ([`holonics_cuda::BorrowedContext::allocation_grain_bytes`]). An apparatus coordinate: every
     /// allocation a deed predicts is rounded up to it, so the predicted requirement is what the
     /// card will charge rather than what the words sum to.
     allocation_grain: u64,
@@ -1504,7 +1504,7 @@ pub struct ResidentPassage<'chart> {
     intended_edges: usize,
     schedule: Schedule,
     graph_census: GraphCensus,
-    _graph: mount::Graph,
+    _graph: holonics_cuda::Graph,
     exec: GraphExec,
 }
 

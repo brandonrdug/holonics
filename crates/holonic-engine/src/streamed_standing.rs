@@ -42,7 +42,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fs::File;
 use std::os::unix::fs::FileExt;
 
-use mount::{DeviceBuffer, Event, PinnedHost, Stream};
+use holonics_cuda::{DeviceBuffer, Event, PinnedHost, Stream};
 use serde::Serialize;
 use thiserror::Error;
 
@@ -55,7 +55,7 @@ pub enum StreamedRefusal {
     #[error("the apparatus refused: {0}")]
     Surface(#[from] ResidentRefusal),
     #[error("the apparatus refused: {0}")]
-    Apparatus(#[from] mount::CudaError),
+    Apparatus(#[from] holonics_cuda::CudaError),
     #[error("the mouth refused: {0}")]
     Mouth(String),
     #[error("slot {slot} carries {capacity} octets and the segment declared {required}")]
@@ -227,8 +227,8 @@ pub struct StreamedCensus {
 /// An input of a **different** extent moves the section shapes, hence the kernel parameters, and
 /// that is where the two routes divide: `cuGraphExecKernelNodeSetParams` updates an instantiated
 /// executable's node in place, or the passage is re-instantiated. **Neither is exercised and the
-/// first is not bound** — `crates/holonic-mount/src/ffi.rs` carries no `cuGraphExecKernelNodeSetParams`,
-/// measured 2026-08-19 by `grep -c cuGraphExec crates/holonic-mount/src/ffi.rs` → 1, which is
+/// first is not bound** — `crates/holonics-cuda/src/ffi.rs` carries no `cuGraphExecKernelNodeSetParams`,
+/// measured 2026-08-19 by `grep -c cuGraphExec crates/holonics-cuda/src/ffi.rs` → 1, which is
 /// `cuGraphExecDestroy`. Deed H5's cohort conduction is where a second extent
 /// enters.
 ///

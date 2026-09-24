@@ -10,7 +10,7 @@ use core::ffi::c_void;
 use std::time::Instant;
 
 use holonics::structure::{LocalSequence, LocalStructureError};
-use mount::{
+use holonics_cuda::{
     Context, Device, DeviceBuffer, Dim3, Module, Stream, VirtualDeviceBuffer, VirtualDeviceGrowth,
     SOMA_PTX,
 };
@@ -21,7 +21,7 @@ const RESIDENT_LOGICAL_WORD_RESERVATION: usize = u32::MAX as usize;
 
 #[derive(Clone, Debug)]
 pub enum TextMaterialCudaError {
-    Driver(mount::CudaError),
+    Driver(holonics_cuda::CudaError),
     EmptyRestriction,
     InvalidWire,
     Extent,
@@ -38,8 +38,8 @@ impl TextMaterialCudaError {
     }
 }
 
-impl From<mount::CudaError> for TextMaterialCudaError {
-    fn from(error: mount::CudaError) -> Self {
+impl From<holonics_cuda::CudaError> for TextMaterialCudaError {
+    fn from(error: holonics_cuda::CudaError) -> Self {
         Self::Driver(error)
     }
 }
@@ -163,7 +163,7 @@ pub(crate) struct CudaTextMaterialResidentExecutor {
     module: Module,
     device_ordinal: i32,
     device_name: String,
-    census: mount::cuda::LaunchCensus,
+    census: holonics_cuda::cuda::LaunchCensus,
     launches: u64,
     syncs: u64,
     epoch: u32,
@@ -201,7 +201,7 @@ impl CudaTextMaterialResidentExecutor {
         image: TextMaterialResidentImage,
     ) -> Result<Self, TextMaterialCudaError> {
         validate_image(&image)?;
-        mount::cuda::init()?;
+        holonics_cuda::cuda::init()?;
         let device = Device::get(device_ordinal)?;
         let census = device.launch_census()?;
         let context = Context::create(&device)?;
@@ -998,7 +998,7 @@ fn validate_query(query: &[u32]) -> Result<(), TextMaterialCudaError> {
     Ok(())
 }
 
-fn dim_words(dim: mount::Dim3) -> [u32; 3] {
+fn dim_words(dim: holonics_cuda::Dim3) -> [u32; 3] {
     [dim.x, dim.y, dim.z]
 }
 
