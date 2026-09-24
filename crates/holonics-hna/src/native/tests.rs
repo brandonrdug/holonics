@@ -273,13 +273,6 @@ fn native_stream_keeps_backend_boundaries_and_checkpoints_its_actual_state() {
                 current: CurrentWire::integers(1, 0),
                 source: None,
             },
-            HnaStreamCommand::Advance {
-                occurrence: crate::HnaOccurrence {
-                    row_addresses: vec![1],
-                    history: vec![],
-                },
-                full_emission: false,
-            },
             HnaStreamCommand::SupplyInputMaterial {
                 path: directory.path().join("no-inherited-material"),
             },
@@ -309,15 +302,14 @@ fn native_stream_keeps_backend_boundaries_and_checkpoints_its_actual_state() {
             .lines()
             .map(|s| serde_json::from_str::<serde_json::Value>(s).unwrap())
             .collect::<Vec<_>>();
-        assert_eq!(events.len(), 7);
+        assert_eq!(events.len(), 6);
         assert_eq!(events[1]["event"], "refused");
-        assert_eq!(events[2]["event"], "refused");
-        assert_eq!(events[3]["event"], "checkpoint-published");
-        assert_eq!(events[4]["event"], "checkpoint-refused-or-unconfirmed");
+        assert_eq!(events[2]["event"], "checkpoint-published");
+        assert_eq!(events[3]["event"], "checkpoint-refused-or-unconfirmed");
         let saved = NativeSavedSession::read(&checkpoint)?;
         assert_eq!(saved.occurrences(), 1);
         assert_eq!(saved.source_slots(), &[Some(0)]);
-        assert_eq!(saved.transport().sequence, 4);
+        assert_eq!(saved.transport().sequence, 3);
         assert!(saved.transport().output.is_some());
         assert_eq!(session.inspect().occurrences, 1);
         assert_eq!(session.inspect().available_sources, vec![0]);

@@ -193,7 +193,7 @@ use crate::receiver_history_compression::{
 pub use cuda_driver::CudaRefineError;
 use cuda_driver::{
     Buffer, CuDevicePtr, cuCtxSetCurrent, cuCtxSynchronize, cuLaunchKernel, cuMemcpyDtoDAsync_v2,
-    cuMemcpyHtoD_v2, cuMemsetD8_v2, cuModuleGetFunction, driver,
+    cuMemsetD8_v2, cuModuleGetFunction, driver,
 };
 
 const PTX: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/refine_shell.ptx"));

@@ -40,49 +40,6 @@ pub enum CliCommand {
 
 #[derive(Clone, Debug, Subcommand)]
 pub enum HnaCli {
-    /// Execute ordered native occurrences from a HnaRunRequest JSON file in one session.
-    Run { request: PathBuf },
-    /// Inspect the header of a restricted Soulkiller rest without initializing CUDA.
-    Inspect { rest: PathBuf },
-    /// Emit one native selected face for a text occurrence (not a complete chat response).
-    Infer { model: PathBuf, text: String },
-    /// Develop one session from cumulative text prefixes in a JSON string array; returns a run receipt, not a checkpoint.
-    Train {
-        model: PathBuf,
-        sequence: PathBuf,
-        #[arg(long, default_value_t = 16)]
-        learning_shift: u32,
-        #[arg(long, default_value_t = 14)]
-        series_terms: u32,
-    },
-    /// Stream JSONL occurrences through a checkpointed native session.
-    Session {
-        /// Source model or native rest path.
-        source: PathBuf,
-        /// Resume an existing checkpoint rather than opening a fresh source.
-        #[arg(long, conflicts_with = "class")]
-        resume: bool,
-        /// Optional verified base override used only while resuming.
-        #[arg(long = "base", requires = "resume")]
-        base_override: Option<PathBuf>,
-        /// Additional native input sections; checkpoints retain their explicit dependencies.
-        #[arg(long)]
-        input_material: Vec<PathBuf>,
-        /// Optional retained class used for a fresh session.
-        #[arg(long, conflicts_with = "resume")]
-        class: Option<usize>,
-        /// JSONL input path, or `-` for standard input.
-        #[arg(long, default_value = "-")]
-        input: PathBuf,
-        /// Destination checkpoint path.
-        #[arg(long)]
-        checkpoint: PathBuf,
-        /// Fresh-session aperture; resumed sessions keep their saved native law.
-        #[arg(long, default_value_t = 16, conflicts_with = "resume")]
-        learning_shift: u32,
-        #[arg(long, default_value_t = 14, conflicts_with = "resume")]
-        series_terms: u32,
-    },
     /// Live native phase session, with a seed or resumed native checkpoint.
     NativeSession {
         /// Native model specification JSON, or a native checkpoint when resuming.
@@ -163,41 +120,6 @@ pub enum HnaCli {
 impl From<HnaCli> for HnaCommand {
     fn from(command: HnaCli) -> Self {
         match command {
-            HnaCli::Run { request } => Self::Run { request },
-            HnaCli::Inspect { rest } => Self::Inspect { rest },
-            HnaCli::Infer { model, text } => Self::Infer { model, text },
-            HnaCli::Train {
-                model,
-                sequence,
-                learning_shift,
-                series_terms,
-            } => Self::Train {
-                model,
-                sequence,
-                learning_shift,
-                series_terms,
-            },
-            HnaCli::Session {
-                source,
-                resume,
-                base_override,
-                input_material,
-                class,
-                input,
-                checkpoint,
-                learning_shift,
-                series_terms,
-            } => Self::Session {
-                source,
-                resume,
-                base_override,
-                input_material,
-                class,
-                input,
-                checkpoint,
-                learning_shift,
-                series_terms,
-            },
             HnaCli::NativeSession {
                 source,
                 resume,
@@ -352,9 +274,7 @@ mod tests {
 
     #[test]
     fn command_wire_round_trips_and_malformed_input_refuses() {
-        let command = WorkbenchCommand::Diagnostic(DiagnosticCommand::Soulkiller(
-            SoulkillerCommand::Inspect { path: PathBuf::from("model") },
-        ));
+        let command = WorkbenchCommand::Diagnostic(DiagnosticCommand::Status);
         let wire = serde_json::to_vec(&command).expect("wire");
         assert_eq!(
             serde_json::from_slice::<WorkbenchCommand>(&wire).expect("round trip"),
@@ -363,95 +283,6 @@ mod tests {
         assert!(parse_cli(["holonics", "diagnostic", "not-a-command"]).is_err());
     }
 
-    #[test]
-    fn hna_session_parses_checkpoint_and_mode_constraints() {
-        let material = parse_cli([
-            "holonics",
-            "hna",
-            "session",
-            "model.hna",
-            "--resume",
-            "--checkpoint",
-            "next.hna",
-            "--input-material",
-            "inputs.safetensors",
-        ])
-        .unwrap();
-        assert!(
-            matches!(material.command,Some(WorkbenchCommand::Hna(HnaCommand::Session {input_material,..}))
-            if input_material==vec![PathBuf::from("inputs.safetensors")])
-        );
-        assert!(parse_cli([
-            "holonics",
-            "hna",
-            "session",
-            "saved.hna",
-            "--resume",
-            "--base",
-            "base.rest",
-            "--checkpoint",
-            "next.hna"
-        ])
-        .is_ok());
-        assert!(parse_cli([
-            "holonics",
-            "hna",
-            "session",
-            "saved.hna",
-            "--resume",
-            "--learning-shift",
-            "9",
-            "--checkpoint",
-            "next.hna"
-        ])
-        .is_err());
-        let invocation = parse_cli([
-            "holonics",
-            "hna",
-            "session",
-            "source.rest",
-            "--checkpoint",
-            "next.hna",
-            "--input",
-            "events.jsonl",
-            "--learning-shift",
-            "9",
-        ])
-        .expect("session parse");
-        assert!(matches!(
-            invocation.command,
-            Some(WorkbenchCommand::Hna(HnaCommand::Session {
-                source, resume: false, base_override: None, class: None, input, checkpoint,
-                learning_shift: 9, series_terms: 14, ..
-            })) if source == PathBuf::from("source.rest")
-                && input == PathBuf::from("events.jsonl")
-                && checkpoint == PathBuf::from("next.hna")
-        ));
-        assert!(parse_cli(["holonics", "hna", "session", "source", "--input", "-"]).is_err());
-        assert!(parse_cli([
-            "holonics",
-            "hna",
-            "session",
-            "source",
-            "--checkpoint",
-            "next",
-            "--base",
-            "base"
-        ])
-        .is_err());
-        assert!(parse_cli([
-            "holonics",
-            "hna",
-            "session",
-            "source",
-            "--checkpoint",
-            "next",
-            "--resume",
-            "--class",
-            "1"
-        ])
-        .is_err());
-    }
 
     #[test]
     fn native_session_and_wave_control_parse_their_positional_specs() {

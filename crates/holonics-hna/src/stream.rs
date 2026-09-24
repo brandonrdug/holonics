@@ -1,8 +1,6 @@
 //! Exterior JSONL delivery over one continuing native session. Packet boundaries do not create
 //! native occurrences. Output must drain before another request is read or executed.
 
-use crate::{HnaOccurrence, HnaSession};
-use holonic_engine::native_ecology::holonic_intelligence::face_of_last_row;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use std::{
@@ -100,17 +98,6 @@ pub enum HnaStreamCommand {
         #[serde(default)]
         full_family: bool,
     },
-    Advance {
-        occurrence: HnaOccurrence,
-        #[serde(default)]
-        full_emission: bool,
-    },
-    /// Explicit native material domain; the original inherited-family command is unchanged.
-    AdvanceNative {
-        occurrence: HnaOccurrence,
-        #[serde(default)]
-        full_emission: bool,
-    },
     Inspect,
     Checkpoint {
         path: PathBuf,
@@ -202,15 +189,6 @@ impl HnaStream {
     pub fn take_input(&mut self) -> Vec<u8> {
         self.state.input_complete = false;
         std::mem::take(&mut self.state.input)
-    }
-
-    pub fn pump(
-        &mut self,
-        session: &mut HnaSession<'_, '_>,
-        input: &mut impl BufRead,
-        output: &mut impl Write,
-    ) -> Result<HnaStreamDisposition, HnaStreamError> {
-        self.pump_target(session, input, output)
     }
 
     pub fn pump_native(
@@ -430,15 +408,6 @@ impl HnaStream {
                         self.emit("refused", json!({"error":error,"anatomy":target.inspect()}))?
                     }
                 },
-                HnaStreamCommand::Advance {
-                    occurrence,
-                    full_emission,
-                } => match target.advance(&occurrence, full_emission) {
-                    Ok(value) => self.emit("advanced", value)?,
-                    Err(error) => {
-                        self.emit("refused", json!({"error":error,"anatomy":target.inspect()}))?
-                    }
-                },
                 HnaStreamCommand::Inspect => self.emit("state", target.inspect())?,
                 HnaStreamCommand::SupplyInputMaterial { path } => {
                     match target.supply_input_material(&path) {
@@ -451,15 +420,6 @@ impl HnaStream {
                         }
                     }
                 }
-                HnaStreamCommand::AdvanceNative {
-                    occurrence,
-                    full_emission,
-                } => match target.advance_native(&occurrence, full_emission) {
-                    Ok(value) => self.emit("native-advanced", value)?,
-                    Err(error) => {
-                        self.emit("refused", json!({"error":error,"anatomy":target.inspect()}))?
-                    }
-                },
                 HnaStreamCommand::Checkpoint { path } => {
                     // The artifact contains this pending reply. Restoring it can deliver the
                     // publication result without repeating any earlier native operation.
@@ -571,8 +531,6 @@ trait StreamTarget {
     fn predict_continuation(&mut self, _: &[usize], _: bool) -> Result<Value, String> {
         Err("joint prospective continuation is not attached to this model kind".into())
     }
-    fn advance(&mut self, occurrence: &HnaOccurrence, full: bool) -> Result<Value, String>;
-    fn advance_native(&mut self, occurrence: &HnaOccurrence, full: bool) -> Result<Value, String>;
     fn inspect(&self) -> Value;
     fn checkpoint(&self, path: &Path, transport: &HnaStreamState) -> Result<(), String>;
     fn supply_input_material(&mut self, path: &Path) -> Result<(), String>;
@@ -610,12 +568,6 @@ impl StreamTarget for crate::native::NativeSession<'_> {
     fn inspect(&self) -> Value {
         json!(crate::native::NativeSession::inspect(self))
     }
-    fn advance(&mut self, _: &HnaOccurrence, _: bool) -> Result<Value, String> {
-        Err("address/token occurrences do not define native phase currents".into())
-    }
-    fn advance_native(&mut self, _: &HnaOccurrence, _: bool) -> Result<Value, String> {
-        Err("address/token occurrences do not define native phase currents".into())
-    }
     fn checkpoint(&self, path: &Path, transport: &HnaStreamState) -> Result<(), String> {
         self.checkpoint_stream(path, transport)
             .map(|_| ())
@@ -624,48 +576,6 @@ impl StreamTarget for crate::native::NativeSession<'_> {
     fn supply_input_material(&mut self, _: &Path) -> Result<(), String> {
         Err("inherited lookup rows do not define native phase material".into())
     }
-}
-
-impl StreamTarget for HnaSession<'_, '_> {
-    fn supply_input_material(&mut self, path: &Path) -> Result<(), String> {
-        HnaSession::supply_input_material(self, path).map_err(|error| error.to_string())
-    }
-    fn advance(&mut self, occurrence: &HnaOccurrence, full: bool) -> Result<Value, String> {
-        let cycle = HnaSession::advance(self, occurrence).map_err(|e| e.to_string())?;
-        Ok(cycle_value(cycle, full, self.anatomy()))
-    }
-    fn advance_native(&mut self, occurrence: &HnaOccurrence, full: bool) -> Result<Value, String> {
-        let cycle = HnaSession::advance_native(self, occurrence).map_err(|e| e.to_string())?;
-        let mut value = cycle_value(cycle.output, full, self.anatomy());
-        value["admission"] = json!(cycle.admission);
-        Ok(value)
-    }
-    fn inspect(&self) -> Value {
-        json!(self.anatomy())
-    }
-    fn checkpoint(&self, path: &Path, transport: &HnaStreamState) -> Result<(), String> {
-        self.checkpoint_stream(path, transport)
-            .map(|_| ())
-            .map_err(|e| e.to_string())
-    }
-}
-
-fn cycle_value(
-    cycle: holonic_engine::native_ecology::holonic_intelligence::ExtractedCycleOutput,
-    full: bool,
-    anatomy: crate::HnaSessionAnatomy,
-) -> Value {
-    let face = face_of_last_row(
-        &cycle.final_emission.intervals,
-        cycle.final_emission.rows,
-        cycle.final_emission.width,
-    );
-    let mut emission = cycle.final_emission;
-    if !full {
-        emission.intervals.clear();
-    }
-    json!({"emission":emission,"selected_face":face,"full_intervals":full,
-            "local_returns":cycle.passage_returns,"anatomy":anatomy})
 }
 
 #[cfg(test)]
@@ -685,14 +595,11 @@ mod tests {
         fn supply_input_material(&mut self, _: &Path) -> Result<(), String> {
             Ok(())
         }
-        fn advance_native(
+        fn receive_current(
             &mut self,
-            occurrence: &HnaOccurrence,
-            full: bool,
+            _: &crate::native::CurrentWire,
+            _: Option<u64>,
         ) -> Result<Value, String> {
-            self.advance(occurrence, full)
-        }
-        fn advance(&mut self, _: &HnaOccurrence, _: bool) -> Result<Value, String> {
             self.advances += 1;
             Ok(json!({"effects":self.advances}))
         }
@@ -714,36 +621,10 @@ mod tests {
         bytes
     }
     fn advance() -> Vec<u8> {
-        request(HnaStreamCommand::Advance {
-            occurrence: HnaOccurrence {
-                row_addresses: vec![1, 2],
-                history: vec![],
-            },
-            full_emission: false,
+        request(HnaStreamCommand::ReceiveCurrent {
+            current: crate::native::CurrentWire::integers(1, 0),
+            source: None,
         })
-    }
-
-    #[test]
-    fn native_domain_is_an_explicit_stream_request_and_event() {
-        let bytes = request(HnaStreamCommand::AdvanceNative {
-            occurrence: HnaOccurrence {
-                row_addresses: vec![4, 9],
-                history: vec![],
-            },
-            full_emission: false,
-        });
-        let mut stream = HnaStream::new();
-        let mut target = Target::default();
-        let mut output = Vec::new();
-        assert_eq!(
-            stream
-                .pump_target(&mut target, &mut Cursor::new(bytes), &mut output)
-                .unwrap(),
-            HnaStreamDisposition::InputExhausted
-        );
-        let event: Value = serde_json::from_slice(&output).unwrap();
-        assert_eq!(event["event"], "native-advanced");
-        assert_eq!(target.advances, 1);
     }
 
     #[test]
@@ -966,8 +847,6 @@ impl StreamTarget for crate::native::NativeWaveSession<'_> {
         (if retain {self.predict_symbol(full)} else {self.next_symbol(full)}).map_err(|e|e.to_string())
     }
     fn observe_symbol(&mut self,source:u64,text:&str)->Result<Value,String>{self.receive_symbol(source,text).map_err(|e|e.to_string())}
-    fn advance(&mut self,_:&HnaOccurrence,_:bool)->Result<Value,String>{Err("use the wave's declared source/receiver commands".into())}
-    fn advance_native(&mut self,_:&HnaOccurrence,_:bool)->Result<Value,String>{Err("use the wave's declared source/receiver commands".into())}
     fn inspect(&self)->Value{crate::native::NativeWaveSession::inspect(self)}
     fn checkpoint(&self,path:&Path,transport:&HnaStreamState)->Result<(),String>{self.checkpoint_stream(path,transport).map(|_|()).map_err(|e|e.to_string())}
     fn supply_input_material(&mut self,_:&Path)->Result<(),String>{Err("a file path is not a native wave source conversion".into())}
@@ -976,12 +855,6 @@ impl StreamTarget for crate::native::NativeWaveSession<'_> {
 impl StreamTarget for crate::native::NativeMathematicalSession<'_> {
     fn mathematical_request(&mut self, request: &crate::native::MathematicalRequest) -> Result<Value, String> {
         self.request(request).map_err(|error| error.to_string())
-    }
-    fn advance(&mut self, _: &HnaOccurrence, _: bool) -> Result<Value, String> {
-        Err("use the mathematical request's declared input ports".into())
-    }
-    fn advance_native(&mut self, _: &HnaOccurrence, _: bool) -> Result<Value, String> {
-        Err("use the mathematical request's declared input ports".into())
     }
     fn inspect(&self) -> Value {
         crate::native::NativeMathematicalSession::inspect(self)
@@ -1009,8 +882,6 @@ impl StreamTarget for crate::native::NativeCoupledWaveSession<'_>{
         if retain{self.predict_symbol(full)}else{self.next_symbol(full)}.map_err(|e|e.to_string())
     }
     fn observe_symbol(&mut self,id:u64,text:&str)->Result<Value,String>{self.incorporate_symbol(id,text).map_err(|e|e.to_string())}
-    fn advance(&mut self,_:&HnaOccurrence,_:bool)->Result<Value,String>{Err("use the coupled wave's declared source/receiver commands".into())}
-    fn advance_native(&mut self,_:&HnaOccurrence,_:bool)->Result<Value,String>{Err("use the coupled wave's declared source/receiver commands".into())}
     fn inspect(&self)->Value{crate::native::NativeCoupledWaveSession::inspect(self)}
     fn checkpoint(&self,path:&Path,transport:&HnaStreamState)->Result<(),String>{self.checkpoint_stream(path,transport).map(|_|()).map_err(|e|e.to_string())}
     fn supply_input_material(&mut self,_:&Path)->Result<(),String>{Err("a file path is not a coupled wave source conversion".into())}
@@ -1038,12 +909,6 @@ impl StreamTarget for crate::native::NativeFieldSession<'_> {
         self.release(source).map_err(|e| e.to_string())
     }
     fn inspect(&self) -> Value { self.inspect() }
-    fn advance(&mut self, _: &HnaOccurrence, _: bool) -> Result<Value, String> {
-        Err("use field-request with its declared source/context section".into())
-    }
-    fn advance_native(&mut self, _: &HnaOccurrence, _: bool) -> Result<Value, String> {
-        Err("use field-request with its declared source/context section".into())
-    }
     fn checkpoint(&self, path: &Path, transport: &HnaStreamState) -> Result<(), String> {
         self.checkpoint(path, transport)
             .map(|_| ())
