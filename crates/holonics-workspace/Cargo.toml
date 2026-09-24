@@ -5,6 +5,7 @@ edition = "2021"
 publish = false
 
 [dependencies]
+holonics = { path = "../holonics" }
 holonics-hna = { path = "../../crates/holonics-hna" }
 life = { path = "../../crates/holonic-life" }
 holonic-engine = { path = "../../crates/holonic-engine", default-features = false }
