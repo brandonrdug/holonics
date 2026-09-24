@@ -306,6 +306,15 @@ stays at 279 Millennium modules because other Research paths still reach Turn. F
 focused gates (not yet run for this cut) are in
 [`M2_RATIO_EXPONENTIAL_KERNEL.md`](M2_RATIO_EXPONENTIAL_KERNEL.md).
 
+## M2 pair-lock transport owner
+
+[`M2_GEOMETRY_PAIR_LOCKS.md`](M2_GEOMETRY_PAIR_LOCKS.md) moves the two pair-contact lock results
+from `Geometry.PairResonance` to `Transport.HelicalPairInteraction`, their actual operator owner.
+The arithmetic, mediant, unimodular-rechart, and coprime-torus results remain in PairResonance,
+which now has no project-local imports. The direct importer audit, source closure deltas, and exact
+pending Lake gates are recorded in the cut report. No contact hypothesis or research theorem was
+changed, and no aliases were introduced.
+
 ## M2 geometry carry and pair-resonance curation
 
 [`M2_GEOMETRY_CARRY_CURATION.md`](M2_GEOMETRY_CARRY_CURATION.md) moves only the

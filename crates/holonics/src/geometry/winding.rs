@@ -19,7 +19,7 @@
 //! | `PhaseCarry.winding_add`, `carry_le_one`, `carry_cocycle` | [`carry`] |
 //! | `PhaseCarry.digits_succ`, `odometer_iterate`, `value_digits` | [`Odometer`] |
 //! | `PhaseCarry.closed_loop_has_integer_winding` | [`closed_loop_winding`] |
-//! | `PairResonance.lock_iff_zero_power` (zero-power direction) | [`pair_lock`] |
+//! | `HelicalPairInteraction.lock_iff_zero_power` (zero-power direction) | [`pair_lock`] |
 //! | `PairResonance.mediant_neighbours_both`, `neighbours_iff_unimodular` | [`mediant`], [`are_neighbours`] |
 //! | `PairResonance.between_neighbours_costs_at_least_the_mediant` | [`simplest_between`], [`LockAddress::period`] |
 //! | `PairResonance.unimodular_rechart_is_invertible` | [`IntMat2::unimodular_inverse`] |
@@ -504,7 +504,7 @@ fn simplest_nonnegative(lower: &Rat, upper: &Rat) -> Rat {
 
 /// [proved-derived; implemented-exact] The pair locks at rate ratio `p/q` exactly when
 /// `q·V_a(x_a(0)) = p·V_b(x_b(0))` — the zero-power direction of
-/// `PairResonance.lock_iff_zero_power`, read from the pair's own generators at their retained
+/// `HelicalPairInteraction.lock_iff_zero_power`, read from the pair's own generators at their retained
 /// initial configurations. The dissipative face's weight and `D` are the consumer's material and
 /// are not inferred here.
 pub fn pair_lock(pair: &ScrewPair, numerator: &BigInt, denominator: &BigInt) -> bool {
