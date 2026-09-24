@@ -1,5 +1,5 @@
 import ElementaryHolonics.Computation.HolonicInformationTheory
-import ElementaryHolonics.Millennium.SituatedReturnedDifference
+import Mathlib.Analysis.InnerProductSpace.Adjoint
 import Mathlib.Analysis.Calculus.Deriv.Mul
 import Mathlib.Analysis.Calculus.Deriv.Inv
 import Mathlib.Analysis.SpecialFunctions.ExpDeriv
@@ -27,9 +27,8 @@ namespace Soma.Holonics.Computation.HolonicAdjointNormalization
 
 open scoped BigOperators
 open Soma.Holonics.Computation.HolonicInformationTheory
-open Soma.Holonics.Millennium.SituatedReturnedDifference
 
-universe uV uI uSource uMiddle uTarget uOccurrence
+universe uV uI
 
 /-! ## A derivative is a covector; a gradient requires a receiver chart -/
 
@@ -59,21 +58,6 @@ theorem gradient_eq_iff_same_chart_preimage
         right.tangentToCotangent.symm differential := Iff.rfl
 
 end MetricGradientChart
-
-/-! The already formalized addressed adjoint theorem is exported here as the neural return law.
-It is reverse composition order, not reversal of physical chronology. -/
-
-theorem causalAdjoint_returns_in_reverse_factor_order
-    {Source : Type uSource} {Middle : Type uMiddle} {Target : Type uTarget}
-    [NormedAddCommGroup Source] [InnerProductSpace ℝ Source] [FiniteDimensional ℝ Source]
-    [NormedAddCommGroup Middle] [InnerProductSpace ℝ Middle] [FiniteDimensional ℝ Middle]
-    [NormedAddCommGroup Target] [InnerProductSpace ℝ Target] [FiniteDimensional ℝ Target]
-    (first : AddressedLinearizedPassage Source Middle)
-    (second : AddressedLinearizedPassage Middle Target)
-    (word : AddressedTwoStepWord first second) :
-    (addressedTwoStepDifferential first second word).adjoint =
-      addressedTwoStepReverseAdjoint first second word :=
-  addressedTwoStep_adjoint_reverseOrder first second word
 
 /-! ## Normalized exponential receiver and its weighted Laplacian return -/
 
@@ -530,7 +514,6 @@ theorem entropy_doesNot_govern_complete_morphology :
 section Audit
 
 #print axioms MetricGradientChart.lower_gradient
-#print axioms causalAdjoint_returns_in_reverse_factor_order
 #print axioms sourceDerivedProjection_idempotent
 #print axioms sourceDerivedScatter_involutive
 #print axioms jointHeldRelaxation_linear_part

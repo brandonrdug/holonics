@@ -1,6 +1,6 @@
 import ElementaryHolonics.Transport.ReceiverPotential
 import ElementaryHolonics.Foundation.JointReceiverDescent
-import ElementaryHolonics.Millennium.Swing
+import ElementaryHolonics.Geometry.AffineSwing
 
 /-!
 # Swing transports compatible potential and its receiver tolerance
@@ -15,7 +15,7 @@ to every projective chart, nor identify coordinate rebase with a physical interv
 namespace Soma.Holonics.Geometry.SwingPotential
 
 open Soma.Holonics
-open Soma.Holonics.Millennium.Swing
+open Soma.Holonics.Geometry.AffineSwing
 open Soma.Holonics.Transport.ReceiverPotential
 open Soma.Holonics.Foundation.JointReceiverDescent
 open Soma.Holonics.Millennium.LineageCompression

@@ -3,6 +3,7 @@ import Mathlib.Data.ZMod.Basic
 import Mathlib.Algebra.Order.Field.Basic
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import ElementaryHolonics.Millennium.Gluing
+import ElementaryHolonics.Geometry.AffineSwing
 
 /-!
 # The swing — the one move, defined as harmonic conjugation
@@ -30,6 +31,8 @@ Every `theorem` here is discharged.
 -/
 
 namespace Soma.Holonics.Millennium.Swing
+
+open Soma.Holonics.Geometry.AffineSwing
 
 /-! ## 1. The swing is negation in the chart the constraints declare -/
 
@@ -89,41 +92,6 @@ for all motions" is exactly that distinction, and in the affine chart the harmon
 `a` with respect to `b` and the point at infinity is the point reflection. -/
 
 variable {G : Type*} [AddCommGroup G]
-
-/-- The **swing with the board frozen**: the body crosses the anchor and lands as far past it as
-it began before it. -/
-def swing (b a : G) : G := b + b - a
-
-/-- **The swing is the half turn on the displacement from the anchor.**  This is the degenerate
-harmonic condition — the one that survives when the board is at infinity — and it is why the
-move is a turn and not a translation. -/
-theorem theSwingNegatesTheDisplacementFromTheAnchor (b a : G) :
-    swing b a - b = -(a - b) := by
-  simp only [swing]; abel
-
-/-- **The swing is an involution.**  Two swings about the same anchor return the body. -/
-theorem theSwingIsAnInvolution (b : G) : Function.Involutive (swing b) := by
-  intro a; simp only [swing]; abel
-
-/-- **The anchor is fixed.** -/
-@[simp] theorem theAnchorIsFixed (b : G) : swing b b = b := by
-  simp [swing]
-
-/-- **Two swings about different anchors are a translation, and the translation is doubled.**
-
-This is the composition law: a single crossing turns, a pair of crossings translates.  The factor
-of two is not a convention — it is why the reachable population sits in the doubled lattice. -/
-theorem twoSwingsAreADoubledTranslation (b c a : G) :
-    swing b (swing c a) = a + (b + b - (c + c)) := by
-  simp only [swing]; abel
-
-/-- **The swing does not commute, and its commutator is a doubled translation.**
-
-Swinging about `b` then `c` differs from `c` then `b` by exactly twice the displacement between
-the anchors.  Order is a real coordinate of the motion, not a bookkeeping choice. -/
-theorem theSwingsDoNotCommute (b c a : G) :
-    swing b (swing c a) - swing c (swing b a) = (b + b - (c + c)) - (c + c - (b + b)) := by
-  simp only [swing]; abel
 
 /-! ## 3. The frozen board's invariants: a parity that never moves, and a hand that alternates -/
 

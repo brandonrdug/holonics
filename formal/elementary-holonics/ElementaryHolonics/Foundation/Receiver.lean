@@ -1,4 +1,5 @@
 import Mathlib.Algebra.Group.Subgroup.Ker
+import Mathlib.LinearAlgebra.Prod
 import Mathlib.Logic.Relation
 import Mathlib.Data.Set.Operations
 
@@ -6,8 +7,9 @@ import Mathlib.Data.Set.Operations
 # Receivers and receiver-exact compression
 
 This file formalizes the elementary relational carrier. It does not make receiver
-dependence into an axiom of ordinary mathematics. It also owns the additive receiver-family
-kernel and joint-reading laws in their historical Millennium namespace until M2.
+dependence into an axiom of ordinary mathematics. It owns the generic shared-junction kernel law;
+the additive receiver-family kernel and joint-reading laws remain in their historical Millennium
+namespace until their M2 extraction.
 -/
 
 namespace Soma.Holonics
@@ -189,6 +191,47 @@ structure ReceiverCondensation {X : Type u} {Entering : Type v} {Returned : Type
   sameReturned : transformer.transform left = transformer.transform right
 
 end Soma.Holonics
+
+namespace Soma.Holonics.Foundation.Receiver
+
+section SharedJunction
+
+variable {R V W₁ W₂ : Type*} [Semiring R]
+  [AddCommMonoid V] [Module R V]
+  [AddCommMonoid W₁] [Module R W₁]
+  [AddCommMonoid W₂] [Module R W₂]
+
+/-- **The shared-junction continuation fibre is the intersection of the two local fibres.**
+
+This is the exact object that a shared vertex contributes: not an independently subtracted degree
+count, but the pullback of the two zero sections. -/
+theorem theSharedJunctionFibreIsTheIntersection (F : V →ₗ[R] W₁) (G : V →ₗ[R] W₂) :
+    LinearMap.ker (F.prod G) = LinearMap.ker F ⊓ LinearMap.ker G :=
+  LinearMap.ker_prod F G
+
+/-- Removing the second contact can only enlarge the continuation fibre. -/
+theorem removingTheSecondConstraintCanOnlyEnlargeTheFibre
+    (F : V →ₗ[R] W₁) (G : V →ₗ[R] W₂) :
+    LinearMap.ker (F.prod G) ≤ LinearMap.ker F := by
+  rw [theSharedJunctionFibreIsTheIntersection]
+  exact inf_le_left
+
+/-- **One continuation accepted by `F` and rejected by `G` is an exact separator.** It lies in the
+fibre after the second contact is removed and not in the joined fibre before removal. Thus the
+enlargement is material whenever such an occurrence exists; it is not inferred from the number of
+maps. -/
+theorem aContinuationSeenOnlyByTheSecondConstraintIsASeparator
+    (F : V →ₗ[R] W₁) (G : V →ₗ[R] W₂) (x : V) (hF : F x = 0) (hG : G x ≠ 0) :
+    x ∈ LinearMap.ker F ∧ x ∉ LinearMap.ker (F.prod G) := by
+  constructor
+  · exact hF
+  · rw [theSharedJunctionFibreIsTheIntersection]
+    simp only [Submodule.mem_inf, LinearMap.mem_ker]
+    exact fun h => hG h.2
+
+end SharedJunction
+
+end Soma.Holonics.Foundation.Receiver
 
 namespace Soma.Holonics.Millennium.Receiver
 

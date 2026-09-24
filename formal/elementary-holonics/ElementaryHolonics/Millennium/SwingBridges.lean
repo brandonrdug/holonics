@@ -1,3 +1,4 @@
+import ElementaryHolonics.Geometry.AffineSwing
 import ElementaryHolonics.Geometry.CrossRatio
 import ElementaryHolonics.Millennium.Chronology
 import ElementaryHolonics.Millennium.Paying
@@ -16,6 +17,7 @@ namespace Soma.Holonics.Millennium.SwingBridges
 
 open Soma.Holonics
 open Soma.Holonics.Millennium.Swing
+open Soma.Holonics.Geometry.AffineSwing
 
 /-! ## Harmonic and projective faces -/
 

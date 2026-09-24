@@ -1,3 +1,4 @@
+import ElementaryHolonics.Geometry.AffineSwing
 import ElementaryHolonics.Millennium.LorentzianPerp
 import ElementaryHolonics.Millennium.Swing
 
@@ -74,12 +75,12 @@ theorem theConjugateLineIsEvenInItsParameter
 
 /-- **The two null parameters are a swing pair about the class itself.**
 
-`Soma.Holonics.Millennium.Swing.swing 0 t = −t`: the one move, about the anchor `ω` sits at, exchanges
+`Soma.Holonics.Geometry.AffineSwing.swing 0 t = −t`: the one move, about the anchor `ω` sits at, exchanges
 the two directions in which the conjugate line leaves the cone.  *In the optical reading those two
 directions are the two rays, and the swing is the mirror that trades them.* -/
 theorem theSwingExchangesTheNullParameters (t : R) :
-    Soma.Holonics.Millennium.Swing.swing (0 : R) t = -t := by
-  simp [Soma.Holonics.Millennium.Swing.swing]
+    Soma.Holonics.Geometry.AffineSwing.swing (0 : R) t = -t := by
+  simp [Soma.Holonics.Geometry.AffineSwing.swing]
 
 /-- **The harmonic conjugate of the anchor against a symmetric pair is the point at infinity.**
 

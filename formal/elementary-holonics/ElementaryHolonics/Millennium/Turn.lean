@@ -5,14 +5,15 @@ import Mathlib.Data.Fintype.BigOperators
 import Mathlib.NumberTheory.Real.GoldenRatio
 
 /-!
-# The turn — what the exponential deletes, and what each chart can still store
+# The turn — geometric calibration and exact charts
 
-The exponential carries the additive chart to the multiplicative one.  It is not injective, and
-the complex kernel is a lattice of whole turns.  Over the real chart this file proves only
-injectivity and the positive image; any quotient/cokernel interpretation is left unformalized.
+This Research owner develops metric turn calibration, real-chart readings, and half-angle branch
+applications. The generic complex exponential-kernel law used by ratio winding belongs to
+`Objects/Ratio/ExponentialKernel`; this module keeps its source-specific geometric turn results.
 
-That is the whole content of "a sign is what remains of a phase after the winding is deleted",
-and this file discharges it.
+The local exponential identities retain the distinction between an additive phase and its
+multiplicative chart; geometric calibration then supplies the turn readings used by the named
+applications below.
 
 The second half is the pair of branch maps that read a nested radical of two as a binary
 expansion of an angle.  Both are half-angle laws; the sign selects orientation.
@@ -25,14 +26,7 @@ namespace Soma.Holonics.Millennium.Turn
 open Real Complex
 open scoped BigOperators
 
-/-! ## 1. The complex chart stores the deleted turn in its kernel -/
-
-/-- **The whole turn generates what the exponential deletes.**
-
-*Aside: `ker(exp : ℂ → ℂˣ) = 2πiℤ`.* -/
-theorem theWholeTurnIsWhatTheExponentialDeletes (x : ℂ) :
-    Complex.exp x = 1 ↔ ∃ n : ℤ, x = n * (2 * Real.pi * Complex.I) :=
-  Complex.exp_eq_one_iff
+/-! ## 1. Local readings of the complex exponential -/
 
 /-- **A whole turn changes nothing multiplicatively.**  The additive chart moves; the
 multiplicative chart does not see it. -/

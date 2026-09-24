@@ -1,4 +1,5 @@
 import ElementaryHolonics.Foundation.TransportLift
+import ElementaryHolonics.Foundation.TransportWord
 import ElementaryHolonics.Millennium.HolonicComposition
 import ElementaryHolonics.Millennium.HolonicEntropyActionInduction
 import ElementaryHolonics.Millennium.HolonicMaxwellPropagation
@@ -36,6 +37,7 @@ open Soma.Holonics.Foundation
 open Soma.Holonics.Millennium.HolonicDifferenceCalculus
 open Soma.Holonics.Millennium.HolonicComplexParametron
 open Soma.Holonics.Millennium.HolonicComposition
+open Soma.Holonics.Foundation.TransportWord
 open Soma.Holonics.Millennium.HolonicDiscreteInduction
 open Soma.Holonics.Millennium.HolonicFourTorusCarrier
 open Soma.Holonics.Millennium.HolonicFourTorusParametronRealization

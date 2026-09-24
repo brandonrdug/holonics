@@ -266,3 +266,77 @@ additional Millennium dependency). The full `Framework`
 closure falls only from 474 / 172,792 to 473 / 172,596 (280 to 279 Millennium), because other
 facades retain overlapping research imports. These are static source-graph counts; see the build
 receipts for Lake gates.
+
+## M2 addressed-linearized-passage owner
+
+`Transport/AddressedLinearizedPassage.lean` now owns the generic addressed linearized transport,
+its joined two-step differential and reverse adjoint, and the exact receiver-radical and complete
+preimage-fibre equalities. `Computation/HolonicAdjointNormalization` no longer imports
+`Millennium/SituatedReturnedDifference`; its former reverse-order wrapper was removed because it
+only restated the moved theorem. `Framework.Dynamics` imports the new owner. `Millennium/SituatedReturnedDifference` keeps the dependent
+connection-square and returned-difference rebase theorem. `WorldTube` and
+`SituatedMachineLearning` still import that Research owner for separate uses.
+
+Immediately after this addressed-passage cut, the static source import closure for `Objects.Ratio`
+dropped from 16 modules / 2 Millennium modules to 14 / 1; `HolonicAdjointNormalization` dropped
+from 6 / 1 to 3 / 0. `Framework.Information` dropped from 155 / 107 to 154 / 106.
+`Framework.Objects` remained at 24 Millennium modules through its separate
+`Transport.WorldTube → Millennium.SituatedReturnedDifference` edge. The following
+[Ratio exponential-kernel cut](M2_RATIO_EXPONENTIAL_KERNEL.md) removes the remaining direct
+`Ratio → Millennium.Turn` edge. These are source import-line counts, not Lake jobs. The focused
+Lake command and full root gates are recorded in
+[`M2_ADDRESSED_LINEARIZED_PASSAGE.md`](M2_ADDRESSED_LINEARIZED_PASSAGE.md); the focused owner and
+consumer checks passed, while the future-root gates remain pending.
+
+## M2 Ratio exponential-kernel owner
+
+`Objects/Ratio/ExponentialKernel.lean` now owns the generic integer-period characterization of the
+complex exponential kernel. `Objects/Ratio` imports that owner and no longer imports
+`Millennium/Turn` for winding recovery; all three ratio proof sites use the core declaration.
+`Millennium/Turn` retains its geometric turn calibration, half-angle charts, golden-clock result
+and source-specific theorem uses, but no longer declares the generic kernel theorem. The two
+remaining direct Turn importers are `Millennium/Coupling` and
+`Millennium/NavierStokesH2TriadMultiplierSwing`. Source-unused direct imports were removed from
+`Millennium/HolonicPolygonalTorusCarrier` and `Millennium/HolonicSnellInteraction`.
+
+After this cut the static source closure of `Objects.Ratio` remains 14 modules while its Millennium
+count falls from 1 to 0. `RatioPhase` and `RatioBlock` each remain 15 modules and fall from 1 to 0
+Millennium modules. `Framework.Objects` falls from 110 / 24 to 110 / 23; the broader `Framework`
+stays at 279 Millennium modules because other Research paths still reach Turn. Full counts and the
+focused gates (not yet run for this cut) are in
+[`M2_RATIO_EXPONENTIAL_KERNEL.md`](M2_RATIO_EXPONENTIAL_KERNEL.md).
+
+## M2 pair-lock transport owner
+
+[`M2_GEOMETRY_PAIR_LOCKS.md`](M2_GEOMETRY_PAIR_LOCKS.md) moves the two pair-contact lock results
+from `Geometry.PairResonance` to `Transport.HelicalPairInteraction`, their actual operator owner.
+The arithmetic, mediant, unimodular-rechart, and coprime-torus results remain in PairResonance,
+which now has no project-local imports. The direct importer audit, source closure deltas, and exact
+pending Lake gates are recorded in the cut report. No contact hypothesis or research theorem was
+changed, and no aliases were introduced.
+
+## M2 geometry carry and pair-resonance curation
+
+[`M2_GEOMETRY_CARRY_CURATION.md`](M2_GEOMETRY_CARRY_CURATION.md) moves only the
+carried-material periodicity theorem from `Geometry.PhaseCarry` beside its `phaseTransport`
+owner in `Transport.HelicalPairInteraction`. The generic carry owner then drops its transitive
+research path through that owner. `Geometry.PairResonance` also drops an unused direct
+`Millennium.Farey` import; its elementary determinant characterization stays in Geometry. The
+source closure counts, direct importers, and exact Lake gate list are recorded there. Verification
+is pending root coordination; no Lake builds were run for this cut.
+
+## M2 Receiver shared-junction extraction
+
+[`M2_GEOMETRY_RECEIVER_RIGIDITY.md`](M2_GEOMETRY_RECEIVER_RIGIDITY.md) moves the generic shared
+kernel/fibre laws from the concrete `Millennium.Rigidity` examples into the already-reachable
+`Foundation.Receiver` owner. `Framework.Geometry` names the Receiver owner directly and drops its
+direct Rigidity import; the Research module retains the square and collinear stress instances. The
+closure audit and focused pending Lake gates are recorded in the cut report.
+## M2 group-valued TransportWord owner
+
+[`M2_HOLONIC_COMPOSITION_TRANSPORT_WORD.md`](M2_HOLONIC_COMPOSITION_TRANSPORT_WORD.md) moves
+generic endpoint-order, additive-translation, and permutation-valued word-transport laws into the
+existing `Foundation.TransportWord` source owner. The Research composition module imports that
+owner and keeps its Swing/realization constructions and controls. Direct and indirect group-word
+consumers now import the core owner explicitly. This is an ownership cut only; the subsequent
+`Framework.Geometry` edge to HolonicComposition remains. Focused gates are pending root coordination.

@@ -947,6 +947,11 @@ for now. Curvature variation, Ricci, gauge covariance of curvature and Yang–Mi
 remain in their research owners. `Objects/Ratio` therefore has no import edge through
 `Millennium/HolonicGaugeCovariance` into the connection-variation research closure.
 
+`Objects/Ratio/ExponentialKernel` owns the generic complex exponential-kernel law used to retain
+the ratio logarithm's whole-turn branch. `Millennium/Turn` remains the owner of metric turn
+calibration, half-angle constructions and their geometric applications; Ratio no longer imports
+that Research module for the generic kernel fact.
+
 `Framework.Dynamics` now presents the transport and clocked dynamics operators without directly
 importing RH instances. The ten formerly direct RH imports are in the complete
 `ElementaryHolonics` research umbrella, which still contains their theorems. This is one import

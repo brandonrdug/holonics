@@ -32,7 +32,7 @@ digits_succ, odometer_iterate                +1 in the digit chart is the odomet
                                              advanced by the winding (a+k)/n
 closed_loop_has_integer_winding              increments closing mod n sum to n·w
 zpow_add_mul_carry       S^(d+n·k) = S^d · C^k            when Sⁿ = C
-phaseTransport_add_carried_period            carried material returns after a turn when C commutes with it
+phaseTransport_add_carried_period            `Transport/HelicalPairInteraction`: carried material returns after a turn when C commutes with it
 ```
 
 [definition] The carry is the exact defect of additivity of the winding. It is the 2-cocycle
@@ -59,11 +59,17 @@ full dependency and decoder maps as in §6.
 [proved-derived; formal-checked] Two periodic phase charts form a torus. At a supplied contact configuration, a rational
 synchronized direction satisfies `q·v_a=p·v_b`. Periodic closure and dynamical attraction to a
 locked orbit are further properties of the actual motion, not consequences of this local equation.
+The pair-contact lock laws are owned by
+[`Transport/HelicalPairInteraction.lean`](../formal/elementary-holonics/ElementaryHolonics/Transport/HelicalPairInteraction.lean);
+the address and mediant laws remain in
 [`Geometry/PairResonance.lean`](../formal/elementary-holonics/ElementaryHolonics/Geometry/PairResonance.lean):
 
 ```text
-lock_iff_zero_power      with positive weight and null-definite response, zero power ⇔ q·v_a = p·v_b
-lock_is_a_line           every multiple of a lock is a lock
+HelicalPairInteraction.lock_iff_zero_power  with positive weight and null-definite response, zero power ⇔ q·v_a = p·v_b
+HelicalPairInteraction.lock_is_a_line       every multiple of a lock is a lock
+```
+
+```text
 neighbours_iff_unimodular                 p'q − pq' = 1 ⇔ det [[p',p],[q',q]] = 1
 mediant_neighbours_both, mediant_lies_between        cross inequalities; ratio reading needs positive denominators
 between_neighbours_costs_at_least_the_mediant   a/b strictly between neighbours ⇒ b ≥ q+q'

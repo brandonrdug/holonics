@@ -1,3 +1,4 @@
+import ElementaryHolonics.Geometry.AffineSwing
 import ElementaryHolonics.Millennium.Swing
 import Mathlib.Data.Nat.Choose.Basic
 import Mathlib.Tactic
@@ -62,8 +63,8 @@ theorem pantographicPoint_comp
 /-- [proved-derived; formal-checked] The existing frozen-board swing is precisely the pantographic
 scale `-1`: the displacement crosses the anchor and reverses orientation. -/
 theorem pantographicPoint_neg_one_eq_swing (anchor input : Carrier) :
-    pantographicPoint anchor (-1 : Scalar) input = Swing.swing anchor input := by
-  simp [pantographicPoint, Swing.swing]
+    pantographicPoint anchor (-1 : Scalar) input = Soma.Holonics.Geometry.AffineSwing.swing anchor input := by
+  simp [pantographicPoint, Soma.Holonics.Geometry.AffineSwing.swing]
   abel
 
 end AffinePantograph

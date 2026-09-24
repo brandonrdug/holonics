@@ -1,3 +1,4 @@
+import ElementaryHolonics.Geometry.AffineSwing
 import ElementaryHolonics.Geometry.Telescoping
 import ElementaryHolonics.Millennium.Horizon
 import ElementaryHolonics.Millennium.Polarisation
@@ -93,12 +94,12 @@ def anchoredEdge {G : Type*} [AddCommGroup G] (anchor body : G) : OrientedEdge G
 
 /-- The edge from the same anchor to the returned body after the swing. -/
 def swungEdge {G : Type*} [AddCommGroup G] (anchor body : G) : OrientedEdge G :=
-  ⟨anchor, Swing.swing anchor body⟩
+  ⟨anchor, Soma.Holonics.Geometry.AffineSwing.swing anchor body⟩
 
 /-- The swing reverses the oriented displacement while keeping the anchor fixed. -/
 theorem swing_reversesDifference {G : Type*} [AddCommGroup G] (anchor body : G) :
     (swungEdge anchor body).difference = -(anchoredEdge anchor body).difference := by
-  exact Swing.theSwingNegatesTheDisplacementFromTheAnchor anchor body
+  exact Soma.Holonics.Geometry.AffineSwing.theSwingNegatesTheDisplacementFromTheAnchor anchor body
 
 /-- Euler's complex half-turn acts by negation. -/
 theorem eulerHalfTurn_actsByNegation (z : ℂ) :

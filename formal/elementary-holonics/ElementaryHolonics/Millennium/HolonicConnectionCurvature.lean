@@ -1,5 +1,6 @@
 import ElementaryHolonics.Millennium.HolonicFourForceSectorCarrier
 import ElementaryHolonics.Geometry.ConnectionCalculus
+import ElementaryHolonics.Foundation.TransportWord
 import Mathlib.Analysis.Calculus.FDeriv.Symmetric
 import Mathlib.Analysis.Calculus.FDeriv.Mul
 import Mathlib.Analysis.Calculus.ContDiff.Basic
@@ -8,7 +9,7 @@ import Mathlib.Analysis.Calculus.ContDiff.Basic
 # Curvature itself: `F = dA + A ∧ A`, the covariant derivative, and the Bianchi return
 
 The tree carried curvature only as a returned holonomy defect on an addressed face
-(`HolonicComposition.routeComparisonReturn`, `HolonicFourForceSectorCarrier.returnedCurvature`)
+(`Foundation.ConnectionLineage.routeComparisonReturn`, `HolonicFourForceSectorCarrier.returnedCurvature`)
 and, in Rust, as the abelian `F = da` with the commutator `a ∧ a` measured but never differentiated.
 The generic chart, directional derivative, connection carrier and product rules now live in
 `Geometry/ConnectionCalculus`; this research owner supplies the curvature and its identities.
@@ -130,6 +131,7 @@ section Discrete
 
 open Soma.Holonics.Millennium.HolonicFourForceSectorCarrier
 open Soma.Holonics.Millennium.HolonicComposition
+open Soma.Holonics.Foundation.TransportWord
 open Soma.Holonics.Millennium.HolonicFourTorusCarrier
 
 variable {grain : ℕ}

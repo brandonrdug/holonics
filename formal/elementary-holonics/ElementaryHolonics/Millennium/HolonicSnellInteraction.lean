@@ -1,5 +1,4 @@
 import ElementaryHolonics.Millennium.HolonicDirectedPassage
-import ElementaryHolonics.Millennium.Turn
 import Mathlib.Analysis.Complex.Trigonometric
 import Mathlib.Tactic
 

@@ -246,6 +246,24 @@ theorem pair_face_power_eq_zero_iff {w : ℚ} (hw : 0 < w) (va vb : Vec)
     rw [h, sub_self]
     simp
 
+/-- [proved-derived; formal-checked] **A rational pair lock is a zero-power direction.** On a
+dissipative face of positive weight, advancing the first object at rate `q` and the second at
+rate `p` reads zero power exactly when `q v_a = p v_b`. -/
+theorem lock_iff_zero_power {w : ℚ} (hw : 0 < w) (va vb : Vec)
+    (D : Matrix (Fin 3) (Fin 3) ℚ)
+    (hdefinite : ∀ x : Vec, x ⬝ᵥ (D *ᵥ x) = 0 → x = 0) (p q : ℤ) :
+    quad (faceForm w (pairSlip va vb) D) ![(q : ℚ), (p : ℚ)] = 0
+      ↔ (q : ℚ) • va = (p : ℚ) • vb := by
+  simpa using pair_face_power_eq_zero_iff hw va vb D hdefinite ![(q : ℚ), (p : ℚ)]
+
+/-- [proved-derived; formal-checked] A pair lock is a linear set of rates: every multiple of a
+zero-power rate remains a zero-power rate. -/
+theorem lock_is_a_line (w : ℚ) (va vb : Vec) (D : Matrix (Fin 3) (Fin 3) ℚ)
+    (u : Fin 2 → ℚ)
+    (hzero : quad (faceForm w (pairSlip va vb) D) u = 0) (k : ℚ) :
+    quad (faceForm w (pairSlip va vb) D) (k • u) = 0 := by
+  rw [quad_smul, hzero, mul_zero]
+
 /-! A positive-semidefinite material distinguishes quadratic null power from zero slip: the
 material current can vanish while a nonzero relative velocity remains in its nullspace. -/
 
@@ -350,6 +368,24 @@ theorem phaseTransport_add_period (S P : G) {n : ℤ} (hclose : S ^ n = 1) (d : 
     phaseTransport S P (d + n) = phaseTransport S P d := by
   rw [phaseTransport_add, _root_.zpow_neg, hclose]
   simp
+
+/-- [proved-derived; formal-checked] **Carried material factors through the phase.** If the carry
+commutes with the material, advancing a whole turn leaves the carried material unchanged even
+though the state has moved to the next level. The torus chart of the material forgets the
+winding; the helix of the state keeps it. -/
+theorem phaseTransport_add_carried_period (S P C : G) (n : ℤ) (hcarry : S ^ n = C)
+    (hcomm : Commute C P) (d : ℤ) :
+    phaseTransport S P (d + n) = phaseTransport S P d := by
+  rw [phaseTransport_add, _root_.zpow_neg, hcarry]
+  have hP : C⁻¹ * phaseTransport S P d * C = phaseTransport S P d := by
+    have hS : Commute C S := by
+      rw [← hcarry]
+      exact (Commute.refl S).zpow_left n
+    have hT : Commute C (phaseTransport S P d) := by
+      unfold phaseTransport
+      exact ((hS.zpow_right (-d)).mul_right hcomm).mul_right (hS.zpow_right d)
+    rw [mul_assoc, ← hT.eq, ← mul_assoc, inv_mul_cancel, one_mul]
+  exact hP
 
 /-- [proved-derived; formal-checked] **A stepped word is a power of one act-and-advance
 generator.** Reading a stream of `n` occurrences through fixed material `P`, with the phase

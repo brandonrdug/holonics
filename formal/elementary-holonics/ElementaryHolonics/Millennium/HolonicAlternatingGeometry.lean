@@ -1,3 +1,4 @@
+import ElementaryHolonics.Geometry.AffineSwing
 import ElementaryHolonics.Millennium.HolonicComposition
 import ElementaryHolonics.Millennium.NavierStokesVorticity
 
@@ -22,6 +23,7 @@ namespace Soma.Holonics.Millennium.HolonicAlternatingGeometry
 open Soma.Holonics
 open Soma.Holonics.Millennium
 open Soma.Holonics.Millennium.Swing
+open Soma.Holonics.Geometry.AffineSwing
 open Soma.Holonics.Millennium.SwingBridges
 open Soma.Holonics.Millennium.NavierStokes
 open Soma.Holonics.Millennium.NavierStokesVorticity

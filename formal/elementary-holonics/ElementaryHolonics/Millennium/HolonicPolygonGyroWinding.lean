@@ -1,5 +1,6 @@
 import ElementaryHolonics.Millennium.HolonicAlternatingGeometry
 import ElementaryHolonics.Millennium.NavierStokesMaterialPolygon
+import ElementaryHolonics.Foundation.TransportWord
 
 /-!
 # Addressed material boundaries, winding fibres, and gyroparallelogram return
@@ -21,6 +22,7 @@ namespace Soma.Holonics.Millennium.HolonicPolygonGyroWinding
 open Soma.Holonics
 open Soma.Holonics.Millennium
 open Soma.Holonics.Millennium.HolonicComposition
+open Soma.Holonics.Foundation.TransportWord
 open Soma.Holonics.Millennium.NavierStokes
 open Soma.Holonics.Millennium.NavierStokesMaterialPolygon
 open Soma.Holonics.Millennium.WindingLedger

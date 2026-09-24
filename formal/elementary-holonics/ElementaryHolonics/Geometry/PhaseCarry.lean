@@ -1,4 +1,3 @@
-import ElementaryHolonics.Transport.HelicalPairInteraction
 import Mathlib.Data.ZMod.Basic
 import Mathlib.Tactic
 
@@ -20,8 +19,6 @@ group identities. Analytic windings, p-adic limits and the solenoid are outside 
 -/
 
 namespace Soma.Holonics.Geometry.PhaseCarry
-
-open Soma.Holonics.Transport.HelicalPairInteraction
 
 /-! ## 1. The carry is the defect of the winding's additivity -/
 
@@ -181,24 +178,6 @@ steps of the shift equal a carry element `C`, the state after `d + n k` steps is
 theorem zpow_add_mul_carry (S C : G) (n : ℤ) (hcarry : S ^ n = C) (d k : ℤ) :
     S ^ (d + n * k) = S ^ d * C ^ k := by
   rw [zpow_add, zpow_mul, hcarry]
-
-/-- [proved-derived; formal-checked] **Carried material factors through the phase.** If the carry
-commutes with the material, advancing a whole turn leaves the carried material unchanged even
-though the state has moved to the next level. The torus chart of the material forgets the
-winding; the helix of the state keeps it. -/
-theorem phaseTransport_add_carried_period (S P C : G) (n : ℤ) (hcarry : S ^ n = C)
-    (hcomm : Commute C P) (d : ℤ) :
-    phaseTransport S P (d + n) = phaseTransport S P d := by
-  rw [phaseTransport_add, _root_.zpow_neg, hcarry]
-  have hP : C⁻¹ * phaseTransport S P d * C = phaseTransport S P d := by
-    have hS : Commute C S := by
-      rw [← hcarry]
-      exact (Commute.refl S).zpow_left n
-    have hT : Commute C (phaseTransport S P d) := by
-      unfold phaseTransport
-      exact ((hS.zpow_right (-d)).mul_right hcomm).mul_right (hS.zpow_right d)
-    rw [mul_assoc, ← hT.eq, ← mul_assoc, inv_mul_cancel, one_mul]
-  exact hP
 
 end Group
 
