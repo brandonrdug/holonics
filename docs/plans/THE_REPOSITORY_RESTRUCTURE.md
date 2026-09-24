@@ -195,6 +195,36 @@ run one workspace build per batch, and restore only what the build proves is nee
 suites (GPU) run once per step and for any change to HNN behaviour. Use one PR per plan step,
 not one per module.
 
+**Tests are not gates (Brandon, September 24).** The existing Rust and GPU tests were written
+beside each campaign and never reviewed as a set. Many assert retired semantics (frozen-cut
+comparisons, old rest version bytes, token-occurrence sessions), sentences about the tree, or
+GPU-state-dependent values that fail spuriously under contention. On September 24, eight HNN GPU
+tests that pass on pre-stack main failed on the stack tip. By code reading, the stack's change is
+the intended contemporary-read law: a delayed comparison keeps its producing operands and
+re-reads the field when it returns. The tests encode the retired frozen-cut behaviour, and one
+failed only under contention. Until campaign **T** lands:
+- the workspace build (`cargo check --workspace --all-targets`) is the gate for moves and
+  deletions;
+- a change to HNN behaviour is judged by reading its code against the operator contract and the
+  retention law;
+- no test result decides a retirement.
+
+**T: rebuild the tests and gates (isolated campaign, new issue).**
+- Inventory every test and gate binary.
+- Delete tests that assert retired semantics, repository-content sentences, fixture-specific
+  numbers without a stated law, or GPU contention artefacts.
+- Write the replacements from the operator contract, one per law, each naming the law it checks:
+  - the conservation and power balances;
+  - `∂²=0` and Stokes;
+  - delayed = immediate at one constitution;
+  - rest round-trip at the current version only;
+  - host/device parity for each kernel.
+- Define the gate tiers and when each runs:
+  1. build;
+  2. host law suite;
+  3. GPU parity and behaviour suite, run alone on an idle card with its receipt;
+  4. the Lean library builds.
+
 **Remaining:**
 - R4: remove the HNN's positional/old-length rest decoders and serde defaults for absent legacy
   fields.

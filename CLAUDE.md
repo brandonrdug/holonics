@@ -45,6 +45,12 @@ GitHub #63 (steps #64–#71, construction #72–#76). Every campaign cites its i
 and commits (`Refs #n`/`Closes #n`), and closes it with the commit, verification receipt and
 remaining scope.
 
+[project-postulate] **Existing tests are not gates** (Brandon, September 24). Until the
+tests-and-gates rebuild (campaign T) lands, the workspace build gates moves and deletions, and HNN
+behaviour is judged by reading the code against the operator contract and retention law. Do not
+debug toward an old test's expectation, and do not repeat test runs to settle a change. Retire by
+reachability from the declared roots (plan §0.11), in large batches, one build per batch.
+
 ## The elementary objects — the only design vocabulary
 
 [project-postulate] Brandon, September 22: design, worker briefs, formal work and code state
