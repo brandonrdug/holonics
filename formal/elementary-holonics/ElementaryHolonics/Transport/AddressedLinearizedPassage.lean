@@ -12,7 +12,7 @@ factor order, and the equality identifies both the receiver radical and every pr
 
 noncomputable section
 
-namespace Soma.Holonics.Transport.AddressedLinearizedPassage
+namespace Soma.Holonics.Transport
 
 universe uSource uMiddle uTarget uOccurrence
 
@@ -103,4 +103,4 @@ end AddressedAdjoint
 #print axioms addressedTwoStep_adjointRadical_reverseOrder
 #print axioms addressedTwoStep_adjointPreimageFibre_reverseOrder
 
-end Soma.Holonics.Transport.AddressedLinearizedPassage
+end Soma.Holonics.Transport

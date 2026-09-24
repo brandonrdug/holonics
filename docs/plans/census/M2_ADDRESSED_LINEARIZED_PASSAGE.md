@@ -2,14 +2,14 @@
 
 This declaration-level cut is based on the stacked M1 causal-chord source. It separates a reusable
 linearized transport law from the situated returned-difference Research owner; it does not create
-the new `Holonics` or `HolonicsResearch` Lake roots and does not claim Lake verification.
+the new `Holonics` or `HolonicsResearch` Lake roots. Focused Lake verification is recorded below.
 
 ## Ownership and import changes
 
 `Transport/AddressedLinearizedPassage.lean` now owns `AddressedLinearizedPassage`,
 `AddressedTwoStepWord`, the two-step differential and reverse adjoint, and the corresponding
 receiver-radical and full-preimage-fibre laws. The declaration namespace is
-`Soma.Holonics.Transport.AddressedLinearizedPassage`. Its source imports are `Foundation.Lineage`
+`Soma.Holonics.Transport`. Its source imports are `Foundation.Lineage`
 and the Mathlib adjoint/finite-dimensional APIs. The addressed occurrence join remains an explicit
 operand; no inverse or injectivity assumption is introduced.
 
@@ -57,6 +57,17 @@ lake build ElementaryHolonics.Transport.AddressedLinearizedPassage \
   ElementaryHolonics.Framework.Information \
   ElementaryHolonics.Framework.Dynamics
 ```
+
+## Verified return
+
+The new Transport owner, `HolonicAdjointNormalization`, and the retained
+`Millennium.SituatedReturnedDifference` built successfully. The Ratio, RatioPhase and RatioBlock
+consumers built, as did `Framework.Dynamics`, `Framework.Objects`, `Framework.Information` and
+the combined `Framework` root. The new owner has no linter warning after placing the
+`AddressedLinearizedPassage` structure directly in `Soma.Holonics.Transport`; its three axiom
+audits report only `propext`, `Classical.choice` and `Quot.sound`. The affected build logs contain
+no declaration elaborated with `sorry`. Existing linter warnings in other imported source modules
+remain outside this cut. Commands and logs are pinned in `docs/VERIFICATION_RECEIPTS.tsv`.
 
 The eventual M2 acceptance gates remain `lake build Holonics` and `lake build HolonicsResearch`
 after those roots and the remaining declaration cuts exist.
