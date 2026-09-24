@@ -3,7 +3,8 @@ use std::path::PathBuf;
 use std::str::FromStr;
 
 use holonics_hna::{addressed_ingress, declared_diffusion_law, AthenaAlphaApplication};
-use holonic_engine::{receiver_exact_compression::ReceiverId, EventId};
+use holonic_engine::EventId;
+use holonics::receiver::native::ReceiverId;
 use life::native_intelligence::{
     export_morphology, ExportCodecKind, ExportPurpose, MorphologyExportRequest,
     MorphologyExportReturn, NativeCirculationBoundary, NativeCirculationEvent, NativeDiffusionIngress, NativeDiffusionStanding,
