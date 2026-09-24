@@ -263,20 +263,17 @@ impl<'c> NativeConstitutiveField<'c> {
         if count >= u32::MAX as usize {
             return Err(ConstitutiveFibreError::Shape);
         }
-        for i in 0..count {
-            self.mount_history_source(i)?;
-        }
         let mut pointers = Vec::with_capacity(3 * count.max(1));
         for h in &self.history {
             let p = h
-                .resident()?
+                .resident
                 .transport
                 .as_ref()
                 .ok_or_else(|| invalid("missing historical material"))?
                 .lo_device_ptr() as i64;
             pointers.push((p, p));
             let (b, k) = h
-                .resident()?
+                .resident
                 .operative
                 .as_ref()
                 .map_or((0, 0), |o| (o.b.lo_device_ptr() as i64, o.count as i64));

@@ -222,12 +222,13 @@ Every incident and generator-machine body founds `found_incident_source_only`
 occurrences**. The legacy constituted-field session founds exactly two occurrences
 (`field_session.rs::found`: entering, then through) and, once attached, `FieldModel` exposes no
 advance: generation commits reflections and the reaction material, so the count stays fixed.
-The occurrence archive (`FieldArchive`: `enable_history_archive`, `archive_history_before`,
-`remount_with_history_archive`) is enabled only by engine unit tests. Retirement landed: both
-archive entries now refuse a source-only field before creating a file, and the field doc marks
-`history`/`archive` as the legacy occurrence clock. Tests:
+The occurrence clock remains on the legacy constituted-field chart because engine drivers and
+source/material readers consume its actual receivers. The exterior occurrence-placement ladder
+(`FieldArchive`, `enable_history_archive`, `archive_history_before`, and
+`remount_with_history_archive`) had no live non-test callers and is retired. Rest writes each
+current historical carrier directly and ordinary remount restores those carriers resident. Tests:
 `field/rest/tests.rs::source_only_field_refuses_occurrences_at_runtime_and_at_rest` (runtime
-refusal, empty rest, remount, archive refusal, grafted legacy occurrence refused) and
+refusal, empty rest, remount, and grafted legacy occurrence refused) and
 `body/field.rs::compatibility_tests::attached_field_occurrence_clock_is_fixed_through_generation_return_and_rest`
 (the delivered `athena_field/one-pass` wire decodes with two occurrences, two generate/return
 cycles and a rest/remount with one pending comparison keep two). Engine drivers
@@ -883,7 +884,7 @@ since been transplanted to an isolated continuation branch:
 |---|---|---|---|---|
 | 11 resident constitutive views | Original `wip/consolidation-phase-11` (`.local/p11-wt`) remains untouched; continued on `codex/consolidation-phase-11` (`.local/p11-continuation`) | `5b7c89ab` WIP transplanted onto `de6a5300`; pre-v1 source `a6c0c95d`; current source `53e085eb` | Lean AffineContact/HolonObject import built; engine normal 172/172; resident relation/contact/rest 2/10/6; post-v1 host rest 4 passed, 2 CUDA ignored; HNA full suite interrupted by user resource stop | post-v1 GPU v5 remount and focused HNA remount consumers remain unverified; retain HNA interruption receipt and close #68 only after its remaining acceptance scope is resolved |
 | 12a field body and session | Original `wip/consolidation-phase-12a` untouched; current source cut on `codex/c-phase12a-current-cut` (draft #110) | Stacked on Phase 11 | Contemporary field/incident operand rest; old frozen/tape and read-only session tags retired; thirteen focused HNA tests and HNA all-targets passed | Remaining ladder/disposition/exposure work and final C acceptance are named in [the Phase 12a map](census/C_PHASE12A_INTEGRATION.md). |
-| 12b coupled continuation and field internals | Original `wip/consolidation-phase-12b` untouched; current return cut on `codex/consolidation-phase-12b` (draft #111) | Stacked on Phase 12a | Current coupled v7/v12 and published v7 rests; read-only coupled v8–v10 and dependent v1–v6 programme readers retired; six focused engine tests and HNA all-targets passed | The second junction/material-transport/contextual-lift packet, HNA session contract, behavior measurement and `NormalWaveHolon` reception/actuation chart remain; see [the Phase 12b return](census/C_PHASE12B_INTEGRATION.md). |
+| 12b coupled continuation and field internals | Original `wip/consolidation-phase-12b` untouched; current return cut on `codex/consolidation-phase-12b` (draft #111) | Stacked on Phase 12a | Current coupled v7/v12 and published v7 rests; read-only coupled v8–v10 and dependent v1–v6 programme readers retired; six focused engine tests and HNA all-targets passed. The unconsumed field-history exterior-placement ladder is now retired; ordinary remount keeps all current historical carriers resident. Verification for this packet is pending. | `current_history_source`, contextual lift and material transport remain. The HNA session contract, behavior measurement and `NormalWaveHolon` reception/actuation chart remain; see [the Phase 12b return](census/C_PHASE12B_INTEGRATION.md). |
 
 The Phase 11/12a overlap in HNA `field_session.rs` and `native_source.rs`, and the Phase 11/12b
 overlap in engine `coupled.rs` and `comparison/constitutive.rs`, are resolved in the draft stack.

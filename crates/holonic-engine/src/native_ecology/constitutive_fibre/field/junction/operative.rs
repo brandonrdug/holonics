@@ -646,16 +646,11 @@ impl<'c> NativeConstitutiveField<'c> {
             .collect::<Vec<_>>();
         let k = births.len();
         let mut inputs = Vec::new();
-        for birth in &births {
-            for at in [birth.source, birth.receiving, birth.receiving - 1] {
-                self.mount_history_source(at)?;
-            }
-        }
         let surface = self.relation.surface;
         let mut pointers = Vec::with_capacity(7 * k.max(1));
         for birth in &births {
             let event = &self.history[birth.receiving];
-            inputs.push(if let Some(s) = &event.resident()?.incoming {
+            inputs.push(if let Some(s) = &event.resident.incoming {
                 Rc::clone(s)
             } else {
                 Rc::new(
@@ -681,13 +676,13 @@ impl<'c> NativeConstitutiveField<'c> {
             });
             let old = &self.history[birth.source];
             for value in [
-                event.resident()?.section.lo_device_ptr(),
-                old.resident()?.section.lo_device_ptr(),
+                event.resident.section.lo_device_ptr(),
+                old.resident.section.lo_device_ptr(),
                 inputs.last().unwrap().lo_device_ptr(),
                 event.frame.native.lo_device_ptr(),
                 old.frame.native.lo_device_ptr(),
                 self.history[birth.receiving - 1]
-                    .resident()?
+                    .resident
                     .junction
                     .as_ref()
                     .ok_or(Error::Uncertain)?

@@ -96,17 +96,9 @@ fn combined<'c>(
 
 #[test]
 #[ignore = "requires CUDA; source-dependent coefficient expressions, historical producers, birth genes and restart"]
-fn source_map_program_keeps_actual_producers_across_returns_archive_and_restart() {
+fn source_map_program_keeps_actual_producers_across_returns_and_restart() {
     let readout = ResidentReadout::new().unwrap();
     let surface = ResidentSurface::on(&readout).unwrap();
-    let archive = std::env::temp_dir().join(format!(
-        "holonics-map-source-{}-{}.history",
-        std::process::id(),
-        std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos()
-    ));
     let mut field = NativeConstitutiveField::found_with_enclosed_junction(
         &surface,
         vec![NativeJunctionSeed {
@@ -121,7 +113,6 @@ fn source_map_program_keeps_actual_producers_across_returns_archive_and_restart(
     field
         .enable_material_transport_source(NativeMaterialTransportSource::OperativeNormal)
         .unwrap();
-    field.enable_history_archive(&archive).unwrap();
     let mut expected = BTreeMap::new();
     let mut overlaps = BTreeMap::<usize, NativeCausalContactReturn<'_>>::new();
     let mut latest = None;
@@ -346,9 +337,6 @@ fn source_map_program_keeps_actual_producers_across_returns_archive_and_restart(
             .unwrap()
             .returns[index] = original;
     }
-    field
-        .archive_history_before(field.occurrence_count())
-        .unwrap();
     for (&source, expected) in &expected {
         let map = field.operative_producing_map(source).unwrap();
         assert_eq!(surface.detach_section(&map, 64).unwrap(), *expected);

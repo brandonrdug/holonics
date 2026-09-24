@@ -462,16 +462,8 @@ fn changed_contacts_conduct_through_the_same_field_successor() {
     drop(field);
     drop(last);
     drop(anchor);
-    let archive = std::env::temp_dir().join(format!(
-        "holonics-operative-{}-{}.history",
-        std::process::id(),
-        std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos()
-    ));
     let (mut field, mut sources, anchors) =
-        NativeConstitutiveField::remount_with_history_archive(&surface, saved, &archive).unwrap();
+        NativeConstitutiveField::remount(&surface, saved).unwrap();
     assert_eq!(
         serde_json::to_value(field.stage_operative_contacts().unwrap().inspect().unwrap()).unwrap(),
         expected
@@ -503,7 +495,6 @@ fn changed_contacts_conduct_through_the_same_field_successor() {
     );
     assert_eq!(anchors.len(), 1);
     drop(field);
-    std::fs::remove_file(archive).unwrap();
 }
 
 #[test]

@@ -62,8 +62,8 @@ fn returned<'c>(f: &NativeConstitutiveField<'c>) -> NativeMaterialContactRespons
 }
 
 #[test]
-#[ignore = "requires CUDA; source-boundary factors decode after archive and condense a legacy journal"]
-fn current_difference_generator_decodes_archived_boundaries_and_legacy_factors() {
+#[ignore = "requires CUDA; source-boundary factors decode and condense a legacy journal"]
+fn current_difference_generator_decodes_resident_boundaries_and_legacy_factors() {
     let readout=ResidentReadout::new().unwrap();
     let surface=ResidentSurface::on(&readout).unwrap();
     let mut field=make(&surface);
@@ -104,11 +104,6 @@ fn current_difference_generator_decodes_archived_boundaries_and_legacy_factors()
         assert_eq!(serde_json::to_value(compact.inspect().unwrap()).unwrap(),
             serde_json::to_value(materialized.inspect().unwrap()).unwrap());
     }
-    let path=std::env::temp_dir().join(format!("holonics-current-boundary-{}-{}.history",std::process::id(),
-        std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
-    field.enable_history_archive(&path).unwrap();
-    field.archive_history_before(field.occurrence_count()).unwrap();
-    assert!(field.history[response.query.source.occurrence].resident.is_none());
     let decoded=field.resolve_operative_current_factors(&generated).unwrap();
     assert_eq!(surface.detach_section(&decoded,64).unwrap(),original);
     field.apply_material_contact_realization(&response,NativeContactRealization::DyadicDeposit).unwrap();
@@ -134,7 +129,6 @@ fn current_difference_generator_decodes_archived_boundaries_and_legacy_factors()
     let recovered=surface.detach_section(&returned._producing.map,64).unwrap();
     assert_eq!(recovered.intervals,producing.intervals[..recovered.intervals.len()]);
     drop(returned);drop(next);drop(anchors);drop(field);
-    std::fs::remove_file(path).unwrap();
 }
 fn enclosed(actual: &[ExactComplexWaveCurrent], center: &[ExactComplexWaveCurrent], radius: &Rat) {
     let error: Rat = actual
@@ -203,8 +197,7 @@ fn material_contact_response_reaches_its_producer_and_changes_subsequent_conduct
     };
     let incoming = waves(&raw[4 * (d + 1)..4 * (d + 1) + d]);
     let before = field.history[2]
-        .resident()
-        .unwrap()
+        .resident
         .operative
         .as_ref()
         .unwrap();

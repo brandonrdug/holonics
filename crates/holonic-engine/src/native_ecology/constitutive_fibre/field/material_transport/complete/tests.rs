@@ -162,8 +162,8 @@ fn late_source_chart_refusal_keeps_old_field_coefficients_and_capability() {
 }
 
 #[test]
-#[ignore = "requires CUDA; complete source coefficients, birth moments and old-source expression continue after archived remount"]
-fn complete_material_state_and_delayed_source_survive_archived_remount() {
+#[ignore = "requires CUDA; complete source coefficients, birth moments and old-source expression continue after ordinary remount"]
+fn complete_material_state_and_delayed_source_survive_remount() {
     fn prefix(
         body: &mut NativeConstitutiveField<'_>,
     ) -> (NativeFieldEmission, NativeFieldSourceAnchor) {
@@ -214,18 +214,10 @@ fn complete_material_state_and_delayed_source_survive_archived_remount() {
         .unwrap();
     let expected = reference.rest(&[], &[]).unwrap();
     drop(reference);
-    let archive = std::env::temp_dir().join(format!(
-        "holonics-complete-material-{}-{}",
-        std::process::id(),
-        std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos()
-    ));
     let rest = NativeFieldRest::read(&mut &bytes[..], bytes.len() as u64).unwrap();
     let before = surface.census();
     let (mut resumed, _, anchors) =
-        NativeConstitutiveField::remount_with_history_archive(&surface, rest, &archive).unwrap();
+        NativeConstitutiveField::remount(&surface, rest).unwrap();
     assert_eq!(resumed.census().deed_launches, before.deed_launches);
     assert_eq!(
         resumed.material_transport_source(),
@@ -243,5 +235,4 @@ fn complete_material_state_and_delayed_source_survive_archived_remount() {
         .unwrap()
         .unwrap();
     drop(resumed);
-    std::fs::remove_file(archive).unwrap();
 }

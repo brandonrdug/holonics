@@ -23,7 +23,6 @@ impl<'chart> NativeConstitutiveField<'chart> {
         if !Rc::ptr_eq(&source.owner, &self.owner) || source.occurrence >= self.history.len() {
             return Err(ConstitutiveFibreError::ForeignOccurrence);
         }
-        self.mount_history_source(source.occurrence)?;
         let surface = self.relation.surface;
         let nodes = self.nodes();
         let transformed = surface.fresh_section(1, 4 * nodes + 1, ResidentGrain(0))?;
@@ -36,7 +35,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             let history = &self.history[source.occurrence];
             surface.record_field_source_frame(
                 &lane,
-                &history.resident()?.section,
+                &history.resident.section,
                 &history.frame.native,
                 &self.frame.native,
                 nodes,

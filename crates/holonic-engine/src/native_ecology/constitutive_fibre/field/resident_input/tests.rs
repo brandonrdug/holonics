@@ -34,17 +34,6 @@ fn phases(v: &[i64]) -> Vec<NativePhaseCurrent> {
         .map(|x| NativePhaseCurrent::new(x[0], x[1], den).unwrap())
         .collect()
 }
-fn path() -> std::path::PathBuf {
-    std::env::temp_dir().join(format!(
-        "holonics-resident-input-{}-{}",
-        std::process::id(),
-        std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos()
-    ))
-}
-
 #[test]
 #[ignore = "requires CUDA; generated ingress obeys the same paired recurrence through delayed sources and rechart"]
 fn resident_input_and_exterior_input_produce_the_same_complete_field() {
@@ -209,7 +198,7 @@ fn refused_native_input_keeps_the_original_field_and_source_capability() {
 }
 
 #[test]
-#[ignore = "requires CUDA; resident input survives archive, exact internal/material decoding and cold restart"]
+#[ignore = "requires CUDA; resident input survives exact internal/material decoding and cold restart"]
 fn resident_input_persists_and_complete_current_decoders_use_its_actual_carrier() {
     let r = ResidentReadout::new().unwrap();
     let s = ResidentSurface::on(&r).unwrap();
@@ -219,8 +208,6 @@ fn resident_input_persists_and_complete_current_decoders_use_its_actual_carrier(
     body.enable_material_transport_source(NativeMaterialTransportSource::CompleteCurrent)
         .unwrap();
     let mut prefix = NativeCurrentHistorySourceReceiver::on_empty(&body).unwrap();
-    let p = path();
-    body.enable_history_archive(&p).unwrap();
     let mut source = None;
     let mut expected = Vec::new();
     for words in [[1, 0, 1], [0, 1, 1], [1, 1, 1], [-1, 0, 1]] {
@@ -242,7 +229,6 @@ fn resident_input_persists_and_complete_current_decoders_use_its_actual_carrier(
     }
     let exact = body.inspect_exact_complete_material_transport(3).unwrap();
     let before = body.rest(&[source.as_ref()], &[]).unwrap();
-    body.archive_history_before(4).unwrap();
     for (at, input) in expected.iter().enumerate() {
         assert_eq!(&body.inspect_incoming(at).unwrap(), input);
     }
@@ -279,7 +265,6 @@ fn resident_input_persists_and_complete_current_decoders_use_its_actual_carrier(
         .inspect_exact_complete_material_transport(4)
         .unwrap();
     drop(resumed);
-    std::fs::remove_file(p).unwrap();
 }
 
 #[test]

@@ -167,6 +167,7 @@ fn empty_field_variants_remount_without_an_initial_fake_occurrence() {
         let rest = body.rest(&[], &[]).unwrap();
         let mut bytes = Vec::new();
         rest.write(&mut bytes).unwrap();
+        assert!(bytes.starts_with(MAGIC));
         drop(body);
         let decoded = NativeFieldRest::read(&mut &bytes[..], bytes.len() as u64).unwrap();
         let (mut resumed, sources, anchors) =
@@ -243,23 +244,7 @@ fn source_only_field_refuses_occurrences_at_runtime_and_at_rest() {
         NativeConstitutiveField::remount(&surface, decoded).unwrap();
     assert_eq!(resumed.occurrence_count(), 0);
     assert!(sources.is_empty() && anchors.is_empty());
-    // No occurrence archive is created for it, live or at remount; the refusal precedes the file.
-    let placement = std::env::temp_dir().join(format!(
-        "holonics-source-only-history-{}-{}",
-        std::process::id(),
-        std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos()
-    ));
-    assert!(resumed.enable_history_archive(&placement).is_err());
-    assert!(!resumed.has_history_archive());
-    let decoded = NativeFieldRest::read(&mut &bytes[..], bytes.len() as u64).unwrap();
-    assert!(
-        NativeConstitutiveField::remount_with_history_archive(&surface, decoded, &placement)
-            .is_err()
-    );
-    assert!(!placement.exists());
+    // Source-only fields still have no legacy occurrence history after ordinary remount.
 
     let mut legacy =
         NativeConstitutiveField::found_with_enclosed_junction(&surface, seed(), ResidentGrain(48))
@@ -285,5 +270,101 @@ fn source_only_field_refuses_occurrences_at_runtime_and_at_rest() {
             .unwrap_err()
             .to_string()
             .contains("source-only field has legacy history")
+    );
+}
+
+fn two_node_seed() -> Vec<NativeJunctionSeed> {
+    vec![
+        NativeJunctionSeed {
+            incoming_admittance: 1,
+            held_admittance: 1,
+            incoming_transport: NativePhaseCurrent::unit(),
+            initial_held: NativePhaseCurrent::zero(),
+        };
+        2
+    ]
+}
+
+fn two_node_input(n: i64) -> Vec<NativePhaseCurrent> {
+    vec![
+        NativePhaseCurrent::new(n, 1, 1).unwrap(),
+        NativePhaseCurrent::new(1, -n, 1).unwrap(),
+    ]
+}
+
+fn develop_resident_history(body: &mut NativeConstitutiveField<'_>) {
+    let first = body
+        .advance_resident(&mut NativeFieldOccurrence::entering(two_node_input(1)))
+        .unwrap();
+    let anchor = body.retain_source(&first.source).unwrap();
+    let mut source = first.source;
+    for at in 1..12 {
+        if at == 3 {
+            body.rechart(&[
+                NativePhaseCurrent::new(0, 1, 1).unwrap(),
+                NativePhaseCurrent::new(-1, 0, 1).unwrap(),
+            ])
+            .unwrap();
+        }
+        if at == 8 {
+            body.replace_incoming_transport(1, NativePhaseCurrent::new(0, -1, 1).unwrap())
+                .unwrap();
+        }
+        let mut occurrence = if at == 4 || at == 10 {
+            NativeFieldOccurrence::through_anchor(&anchor, two_node_input(at + 1))
+        } else {
+            NativeFieldOccurrence::through(source, two_node_input(at + 1))
+        };
+        let before = body.census();
+        source = body.advance_resident(&mut occurrence).unwrap().source;
+        assert_eq!(body.census().section_read_outs, before.section_read_outs);
+    }
+}
+
+#[test]
+#[ignore = "requires CUDA; resident history preserves frames, delayed sources, material and ordinary rest"]
+fn resident_history_returns_the_same_current_and_cold_rest() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let mut reference = NativeConstitutiveField::found_with_enclosed_junction(
+        &surface,
+        two_node_seed(),
+        ResidentGrain(72),
+    )
+    .unwrap();
+    reference.enable_material_transport().unwrap();
+    develop_resident_history(&mut reference);
+    let expected = reference.rest(&[], &[]).unwrap();
+    let expected_reading = reference.read_material_transport_pairs(0, 1).unwrap();
+    drop(reference);
+
+    let mut body = NativeConstitutiveField::found_with_enclosed_junction(
+        &surface,
+        two_node_seed(),
+        ResidentGrain(72),
+    )
+    .unwrap();
+    body.enable_material_transport().unwrap();
+    develop_resident_history(&mut body);
+    assert_eq!(body.occurrence_count(), 12);
+    assert_eq!(
+        body.read_material_transport_pairs(0, 1).unwrap(),
+        expected_reading
+    );
+    let rest = body.rest(&[], &[]).unwrap();
+    assert_eq!(rest, expected);
+    let mut bytes = Vec::new();
+    rest.write(&mut bytes).unwrap();
+    let decoded = NativeFieldRest::read(&mut bytes.as_slice(), bytes.len() as u64).unwrap();
+    drop(body);
+
+    let before = surface.census();
+    let (resumed, _, _) = NativeConstitutiveField::remount(&surface, decoded).unwrap();
+    assert_eq!(surface.census().deed_launches, before.deed_launches);
+    assert_eq!(resumed.occurrence_count(), 12);
+    assert_eq!(resumed.rest(&[], &[]).unwrap(), expected);
+    assert_eq!(
+        resumed.read_material_transport_pairs(0, 1).unwrap(),
+        expected_reading
     );
 }

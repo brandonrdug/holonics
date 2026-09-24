@@ -42,20 +42,11 @@ impl<'c> NativeConstitutiveField<'c> {
         let later_history = if cached.is_some() { &self.history[0..0] }
             else { &self.history[source.occurrence + 1..] };
         for h in later_history {
-            // Material return factors suffice for this journal. An archived row need not
-            // restore its historical interior to the device just to recover a matrix entry.
-            let report = if let Some(r) = h.resident.as_ref() {
-                r.transport
-                    .clone()
-                    .ok_or(ConstitutiveFibreError::Uncertain)?
-            } else {
-                Rc::new(
-                    surface.mount_section_rest(
-                        &h.transport_rest(surface)?
-                            .ok_or(ConstitutiveFibreError::Uncertain)?,
-                    )?,
-                )
-            };
+            let report = h
+                .resident
+                .transport
+                .clone()
+                .ok_or(ConstitutiveFibreError::Uncertain)?;
             let p = report.lo_device_ptr() as i64;
             let linked = i64::from(h.lineage.observed_source().is_some());
             pointers.extend([(p, p), (linked, linked)]);

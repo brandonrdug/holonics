@@ -160,12 +160,9 @@ impl<'chart> NativeConstitutiveField<'chart> {
         let representation = self
             .junction_representation()
             .ok_or(ConstitutiveFibreError::Shape)?;
-        for at in [source, receiving, before, prefix_at] {
-            self.mount_history_source(at)?;
-        }
         let s = self.relation.surface;
         let event = &self.history[receiving];
-        let input = if let Some(input) = &event.resident()?.incoming {
+        let input = if let Some(input) = &event.resident.incoming {
             Rc::clone(input)
         } else {
             let values = event
@@ -198,18 +195,18 @@ impl<'chart> NativeConstitutiveField<'chart> {
             let lane = passage.open(0, &[])?;
             s.record_field_internal_current(
                 &lane,
-                &event.resident()?.section,
-                &self.history[source].resident()?.section,
+                &event.resident.section,
+                &self.history[source].resident.section,
                 &input,
                 &event.frame.native,
                 &self.history[source].frame.native,
                 self.history[before]
-                    .resident()?
+                    .resident
                     .junction
                     .as_deref()
                     .ok_or(ConstitutiveFibreError::Uncertain)?,
                 self.history[prefix_at]
-                    .resident()?
+                    .resident
                     .junction
                     .as_deref()
                     .ok_or(ConstitutiveFibreError::Uncertain)?,

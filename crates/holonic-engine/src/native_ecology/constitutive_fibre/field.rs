@@ -15,7 +15,7 @@ use super::*;
 use crate::dimensional_wave::ExactComplexWaveCurrent;
 use std::rc::Rc;
 
-mod archive;
+mod history;
 mod context_section;
 mod contextual_lift;
 mod current_history_source;
@@ -46,8 +46,6 @@ mod rechart;
 mod relation_current;
 mod resident_input;
 mod rest;
-pub use archive::NativeFieldHistoryPlacement;
-use archive::{ArchivedField, FieldArchive};
 pub use current_history_source::{
     NativeCurrentHistorySource, NativeCurrentHistorySourceReading,
     NativeCurrentHistorySourceReceiver,
@@ -284,8 +282,7 @@ struct ResidentFieldHistory<'chart> {
 }
 
 struct HeldField<'chart> {
-    resident: Option<ResidentFieldHistory<'chart>>,
-    archived: Option<ArchivedField>,
+    resident: ResidentFieldHistory<'chart>,
     lineage: NativeFieldLineage,
     frame: Rc<HeldCurrentFrame<'chart>>,
     returned: bool,
@@ -309,9 +306,6 @@ pub struct NativeConstitutiveField<'chart> {
     /// constituted-field session founds two occurrences and, once attached, has no advance.
     /// Engine drivers and the linear-emission/anchor/internal-current readers still consume it.
     history: Vec<HeldField<'chart>>,
-    /// Legacy exterior placement of `history`; only engine unit tests enable it. New sessions
-    /// never create one.
-    archive: Option<FieldArchive>,
     pending: Option<HeldField<'chart>>,
     junction: Option<PairedJunction<'chart>>,
     pending_junction: Option<PendingJunction<'chart>>,
@@ -401,7 +395,6 @@ impl<'chart> NativeConstitutiveField<'chart> {
             incidence_changes: Vec::new(),
             owner: Rc::new(()),
             history: Vec::new(),
-            archive: None,
             pending: None,
             junction: None,
             pending_junction: None,
@@ -938,18 +931,10 @@ impl<'chart> NativeConstitutiveField<'chart> {
                     .map(|(old, next)| {
                         (
                             &mut old.state,
-                            observed_source_at.and_then(|i| {
-                                self.history[i]
-                                    .resident
-                                    .as_ref()
-                                    .and_then(|h| h.junction.as_deref())
-                            }),
-                            observed_source_at.and_then(|i| {
-                                self.history[i]
-                                    .resident
-                                    .as_ref()
-                                    .and_then(|h| h.transport.as_deref())
-                            }),
+                            observed_source_at
+                                .and_then(|i| self.history[i].resident.junction.as_deref()),
+                            observed_source_at
+                                .and_then(|i| self.history[i].resident.transport.as_deref()),
                             &next.delta,
                             next.report.as_ref(),
                             old.source.kernel(),
@@ -986,8 +971,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         passage.close(field_lane, &output, 64)?;
         let passage = passage.finish()?;
         self.pending = Some(HeldField {
-            archived: None,
-            resident: Some(ResidentFieldHistory {
+            resident: ResidentFieldHistory {
                 section: output,
                 incoming: resident_current.is_some().then(|| Rc::clone(&input)),
                 junction: prepared.as_ref().map(|(next, _)| Rc::clone(&next.report)),
@@ -998,7 +982,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                     .as_ref()
                     .and_then(|(p, _)| p.operative.as_ref())
                     .map(|p| p.history()),
-            }),
+            },
             lineage: lineage.clone(),
             frame: Rc::clone(&self.frame),
             returned: false,

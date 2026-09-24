@@ -159,7 +159,7 @@ impl<'chart> NativeCurrentHistorySourceReceiver<'chart> {
         let at = self.next;
         let event = &field.history[at];
         let d = 6 * self.nodes;
-        let incoming = if let Some(input) = &event.resident()?.incoming {
+        let incoming = if let Some(input) = &event.resident.incoming {
             Rc::clone(input)
         } else {
             Rc::new(
@@ -197,10 +197,9 @@ impl<'chart> NativeCurrentHistorySourceReceiver<'chart> {
             let lane = passage.open(0, &[])?;
             self.surface.record_field_current_history_source(
                 &lane,
-                &event.resident()?.section,
+                &event.resident.section,
                 origin
-                    .map(|s| s.resident().map(|s| &s.section))
-                    .transpose()?,
+                    .map(|s| &s.resident.section),
                 &incoming,
                 &event.frame.native,
                 origin.map(|s| &s.frame.native),

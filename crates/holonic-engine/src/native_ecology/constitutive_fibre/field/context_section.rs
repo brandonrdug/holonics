@@ -38,14 +38,11 @@ impl<'c> NativeConstitutiveField<'c> {
             }
             _ => return Err(ConstitutiveFibreError::Shape),
         };
-        for at in [receiving[0], receiving[1], s0, s1, context[0], context[1]] {
-            self.mount_history_source(at)?;
-        }
         let surface = self.relation.surface;
         let mut inputs = Vec::new();
         for &at in &receiving {
             let h = &self.history[at];
-            inputs.push(if let Some(i) = &h.resident()?.incoming {
+            inputs.push(if let Some(i) = &h.resident.incoming {
                 Rc::clone(i)
             } else {
                 let words = h
@@ -68,14 +65,14 @@ impl<'c> NativeConstitutiveField<'c> {
         let contexts = [
             Rc::clone(
                 self.history[context[0]]
-                    .resident()?
+                    .resident
                     .transport
                     .as_ref()
                     .ok_or(ConstitutiveFibreError::Uncertain)?,
             ),
             Rc::clone(
                 self.history[context[1]]
-                    .resident()?
+                    .resident
                     .transport
                     .as_ref()
                     .ok_or(ConstitutiveFibreError::Uncertain)?,
@@ -85,10 +82,10 @@ impl<'c> NativeConstitutiveField<'c> {
         for (index, s) in [s0, s1].into_iter().enumerate() {
             for ptr in [
                 self.history[receiving[index]]
-                    .resident()?
+                    .resident
                     .section
                     .lo_device_ptr(),
-                self.history[s].resident()?.section.lo_device_ptr(),
+                self.history[s].resident.section.lo_device_ptr(),
                 inputs[index].lo_device_ptr(),
                 self.history[receiving[index]].frame.native.lo_device_ptr(),
                 self.history[s].frame.native.lo_device_ptr(),

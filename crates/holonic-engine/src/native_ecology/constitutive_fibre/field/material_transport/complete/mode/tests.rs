@@ -171,7 +171,7 @@ fn actual_return_makes_a_dark_source_mode_productive() {
 }
 
 #[test]
-#[ignore = "requires CUDA; factor chronology before/between/after births and reversed orientation survive archive"]
+#[ignore = "requires CUDA; factor chronology before/between/after births and reversed orientation survive"]
 fn mode_coefficients_match_the_existing_full_operator_and_preserve_the_source_remainder() {
     let r = ResidentReadout::new().unwrap();
     let s = ResidentSurface::on(&r).unwrap();
@@ -225,16 +225,6 @@ fn mode_coefficients_match_the_existing_full_operator_and_preserve_the_source_re
             .map(|v| v.negated())
             .collect::<Vec<_>>()
     );
-    let path = std::env::temp_dir().join(format!(
-        "holonics-mode-material-{}-{}",
-        std::process::id(),
-        std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos()
-    ));
-    b.enable_history_archive(&path).unwrap();
-    b.archive_history_before(b.occurrence_count()).unwrap();
     assert_eq!(
         b.read_material_mode(&source, 1, 3)
             .unwrap()
@@ -245,7 +235,6 @@ fn mode_coefficients_match_the_existing_full_operator_and_preserve_the_source_re
     );
     assert!(b.read_material_mode_at(1, 1, 3).is_err());
     drop(b);
-    std::fs::remove_file(path).unwrap();
 }
 
 #[test]

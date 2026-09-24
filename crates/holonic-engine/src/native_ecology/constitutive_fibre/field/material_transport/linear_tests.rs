@@ -59,15 +59,6 @@ fn operative_linear_material_has_a_bounded_operator_and_the_producing_return() {
     let readout = ResidentReadout::new().unwrap();
     let surface = ResidentSurface::on(&readout).unwrap();
     let mut f = make(&surface);
-    let archive = std::env::temp_dir().join(format!(
-        "holonics-linear-history-{}-{}",
-        std::process::id(),
-        std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos()
-    ));
-    f.enable_history_archive(&archive).unwrap();
     let inputs = [
         vec![
             phase(1, 1, 3),
@@ -188,7 +179,6 @@ fn operative_linear_material_has_a_bounded_operator_and_the_producing_return() {
     let r = subtract(&report.observed.center, &source_report.forward.center);
     let expected = transpose(&matrices[1], &r);
     let wrong = transpose(&matrices[4], &r);
-    f.archive_history_before(4).unwrap();
     let before = f.census();
     let query = f.pull_back_material_current(4).unwrap().unwrap();
     assert_eq!(f.census().section_read_outs, before.section_read_outs);
@@ -266,5 +256,4 @@ fn operative_linear_material_has_a_bounded_operator_and_the_producing_return() {
         ))
         .unwrap();
     assert_eq!(f.rest(&[Some(&next.source)], &[]).unwrap(), expected);
-    std::fs::remove_file(archive).unwrap();
 }

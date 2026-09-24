@@ -172,8 +172,8 @@ fn enclosed_internal_receiver_keeps_the_phase_ball_and_refuses_point_use() {
 }
 
 #[test]
-#[ignore = "requires CUDA; internal source scope and archive placement preserve the actual contact"]
-fn internal_receiver_keeps_scope_and_archived_births() {
+#[ignore = "requires CUDA; internal source scope preserves the actual contact"]
+fn internal_receiver_keeps_scope_and_births() {
     let r = ResidentReadout::new().unwrap();
     let s = ResidentSurface::on(&r).unwrap();
     let (mut body, births) = dark(&s, false, NativePhaseCurrent::unit());
@@ -185,17 +185,6 @@ fn internal_receiver_keeps_scope_and_archived_births() {
         .read_internal_current(&births[0])
         .unwrap()
         .inspect()
-        .unwrap();
-    let path = std::env::temp_dir().join(format!(
-        "holonics-internal-current-{}-{}",
-        std::process::id(),
-        std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos()
-    ));
-    body.enable_history_archive(&path).unwrap();
-    body.archive_history_before(body.occurrence_count())
         .unwrap();
     assert_eq!(
         body.read_internal_current(&births[0])
@@ -219,5 +208,4 @@ fn internal_receiver_keeps_scope_and_archived_births() {
         expected
     );
     drop(restored);
-    std::fs::remove_file(path).unwrap();
 }

@@ -154,10 +154,9 @@ impl<'chart> NativeConstitutiveField<'chart> {
             return Err(ConstitutiveFibreError::Uncertain);
         }
         let at = source.occurrence;
-        self.mount_history_source(at)?;
         let refresh = self.prepare_current_source_refresh(at)?;
         let report = self.history[at]
-            .resident()?
+            .resident
             .transport
             .as_ref()
             .ok_or_else(|| invalid("source report absent"))?;
@@ -230,20 +229,12 @@ impl<'chart> NativeConstitutiveField<'chart> {
             return Ok(None);
         }
         // Only physical addresses are assembled on the host. Historical numerical carriers
-        // mount through their existing exact archive; no current or parameter is computed here.
-        self.mount_history_source(at)?;
-        let needed = increments
-            .iter()
-            .flat_map(|(i, s)| [*i, *s])
-            .collect::<std::collections::BTreeSet<_>>();
-        for index in needed {
-            self.mount_history_source(index)?;
-        }
+        // remain resident; no current or parameter is computed here.
         let mut words = Vec::new();
         for (i, source) in &increments {
             for index in [*i, *source] {
                 let report = self.history[index]
-                    .resident()?
+                    .resident
                     .transport
                     .as_ref()
                     .ok_or_else(|| invalid("missing complete coefficient/source carrier"))?;

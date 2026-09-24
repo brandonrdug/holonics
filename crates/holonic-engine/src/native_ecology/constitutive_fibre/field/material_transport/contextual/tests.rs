@@ -366,25 +366,17 @@ fn contextual_refusal_preserves_the_complete_predecessor() {
         .advance_resident(&mut NativeFieldOccurrence::entering(vec![p(1, 0)]))
         .unwrap();
     let before = body.rest(&[Some(&source.source)], &[]).unwrap();
-    let old = Rc::clone(
-        body.history[0]
-            .resident()
-            .unwrap()
-            .transport
-            .as_ref()
-            .unwrap(),
-    );
+    let old = Rc::clone(body.history[0].resident.transport.as_ref().unwrap());
     let mut invalid = s.detach_section(&old, 64).unwrap();
     let context = offsets(1)[3];
     let error = context + 36 + 16;
     invalid.intervals[error] = (-1, -1);
     invalid.intervals[error + 1] = (-1, -1);
-    body.history[0].resident.as_mut().unwrap().transport =
-        Some(Rc::new(s.mount_section_rest(&invalid).unwrap()));
+    body.history[0].resident.transport = Some(Rc::new(s.mount_section_rest(&invalid).unwrap()));
     let mut occurrence = NativeFieldOccurrence::through(source.source, vec![p(-1, 0)]);
     assert!(body.advance_resident(&mut occurrence).is_err());
     assert_eq!(body.occurrence_count(), 4);
-    body.history[0].resident.as_mut().unwrap().transport = Some(old);
+    body.history[0].resident.transport = Some(old);
     assert_eq!(body.rest(&[occurrence.source_ref()], &[]).unwrap(), before);
     body.advance_resident(&mut occurrence).unwrap();
     assert_eq!(body.occurrence_count(), 5);

@@ -29,18 +29,8 @@ impl<'c> NativeConstitutiveField<'c> {
         }
         let read = |at: usize| -> Result<(Rc<ResidentSection<'c>>, usize), Error> {
             let h = self.history.get(at).ok_or(Error::ForeignOccurrence)?;
-            if let Some(resident) = &h.resident {
-                let o = resident.operative.as_ref().ok_or(Error::Shape)?;
-                return Ok((Rc::clone(&o.b), o.count));
-            }
-            let o = h
-                .rest(self.relation.surface)?
-                .operative
-                .ok_or(Error::Shape)?;
-            Ok((
-                Rc::new(self.relation.surface.mount_section_rest(&o.b)?),
-                o.count,
-            ))
+            let o = h.resident.operative.as_ref().ok_or(Error::Shape)?;
+            Ok((Rc::clone(&o.b), o.count))
         };
         let (after, after_count) = read(source)?;
         let (before, before_count) =

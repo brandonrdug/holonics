@@ -113,15 +113,11 @@ impl<'c> NativeConstitutiveField<'c> {
         let refs = (from..self.history.len())
             .filter_map(|i| self.history[i].lineage.observed_source().map(|s| (i, s)))
             .collect::<Vec<_>>();
-        for &(i, s) in &refs {
-            self.mount_history_source(i)?;
-            self.mount_history_source(s)?;
-        }
         let mut words = Vec::with_capacity(refs.len().max(1) * 2);
         for &(i, s) in &refs {
             for at in [i, s] {
                 let p = self.history[at]
-                    .resident()?
+                    .resident
                     .transport
                     .as_ref()
                     .ok_or_else(|| invalid("missing factor"))?

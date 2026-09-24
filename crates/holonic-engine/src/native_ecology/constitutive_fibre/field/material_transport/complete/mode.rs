@@ -352,13 +352,6 @@ impl<'c> NativeConstitutiveField<'c> {
                     .map(|s| (at, s))
             })
             .collect::<Vec<_>>();
-        for &(at, s) in &factors {
-            self.mount_history_source(at)?;
-            if s < maximum {
-                self.mount_history_source(s)?;
-            }
-        }
-        self.mount_history_source(source)?;
         let refreshed = self.prepare_current_source_refresh(source)?;
         let surface = self.relation.surface;
         let n = self.nodes();
@@ -366,13 +359,13 @@ impl<'c> NativeConstitutiveField<'c> {
         let mut pointers = Vec::with_capacity(4 * factors.len().max(1));
         for &(at, s) in &factors {
             let increment = self.history[at]
-                .resident()?
+                .resident
                 .transport
                 .as_ref()
                 .ok_or_else(|| invalid("missing native coefficient factor"))?;
             let prefix = if s < maximum {
                 self.history[s]
-                    .resident()?
+                    .resident
                     .junction
                     .as_ref()
                     .ok_or(ConstitutiveFibreError::Uncertain)?
@@ -399,7 +392,7 @@ impl<'c> NativeConstitutiveField<'c> {
         let output = surface.fresh_section(1, 92 * n + 32, ResidentGrain(0))?;
         let direct = self.history[cut].lineage.observed_source() == Some(source);
         let src = self.history[source]
-            .resident()?
+            .resident
             .transport
             .as_deref()
             .ok_or_else(|| invalid("missing source transport"))?;
@@ -423,19 +416,19 @@ impl<'c> NativeConstitutiveField<'c> {
                 src,
                 refreshed.as_ref().map(|r| &r.output),
                 if direct {
-                    self.history[cut].resident()?.transport.as_deref()
+                    self.history[cut].resident.transport.as_deref()
                 } else {
                     None
                 },
                 contact,
                 amplitude,
                 self.history[left - 1]
-                    .resident()?
+                    .resident
                     .junction
                     .as_deref()
                     .ok_or(ConstitutiveFibreError::Uncertain)?,
                 self.history[right - 1]
-                    .resident()?
+                    .resident
                     .junction
                     .as_deref()
                     .ok_or(ConstitutiveFibreError::Uncertain)?,

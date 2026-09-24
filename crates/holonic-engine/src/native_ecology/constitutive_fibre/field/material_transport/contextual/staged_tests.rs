@@ -197,24 +197,16 @@ fn staged_contextual_weight_refusal_preserves_predecessor() {
         ))
         .unwrap();
     let before = field.rest(&[Some(&second.source)], &[]).unwrap();
-    let original = Rc::clone(
-        field.history[1]
-            .resident()
-            .unwrap()
-            .transport
-            .as_ref()
-            .unwrap(),
-    );
+    let original = Rc::clone(field.history[1].resident.transport.as_ref().unwrap());
     let mut bad = surface.detach_section(&original, 64).unwrap();
     // Zero the stored source norm used by the kernel denominator, leaving the source/profile
     // prologue intact. This failure belongs to the later independent weight stage.
     let norm = offsets(1)[2] + 16 + 2;
     bad.intervals[norm..norm + 5].fill((0, 0));
-    field.history[1].resident.as_mut().unwrap().transport =
-        Some(Rc::new(surface.mount_section_rest(&bad).unwrap()));
+    field.history[1].resident.transport = Some(Rc::new(surface.mount_section_rest(&bad).unwrap()));
     let mut event = NativeFieldOccurrence::through(second.source, vec![current(2)]);
     assert!(field.advance_resident(&mut event).is_err());
-    field.history[1].resident.as_mut().unwrap().transport = Some(original);
+    field.history[1].resident.transport = Some(original);
     assert_eq!(field.rest(&[event.source_ref()], &[]).unwrap(), before);
     field.advance_resident(&mut event).unwrap();
     assert_eq!(field.occurrence_count(), 3);

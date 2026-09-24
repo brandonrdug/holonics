@@ -179,16 +179,6 @@ fn live_causal_propagation_returns_the_complete_composition_and_restarts() {
         latest = Some(next.source);
     }
     assert!(changed_by_propagation,"the live fixture must exercise nonidentity propagation");
-    let archive = std::env::temp_dir().join(format!(
-        "holonics-live-propagation-{}-{}.history",
-        std::process::id(),
-        std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos()
-    ));
-    f.enable_history_archive(&archive).unwrap();
-    f.archive_history_before(f.occurrence_count()).unwrap();
     let saved = f.rest(&[latest.as_ref()], &[]).unwrap();
     let mut bytes = Vec::new();
     saved.write(&mut bytes).unwrap();

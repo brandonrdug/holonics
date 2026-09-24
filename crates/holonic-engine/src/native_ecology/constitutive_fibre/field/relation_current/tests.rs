@@ -223,20 +223,11 @@ fn foreign_source_and_unobserved_domain_remain_distinct() {
 }
 
 #[test]
-#[ignore = "requires CUDA; an archived historical source queries the same relation after rest"]
-fn archived_source_and_remount_preserve_the_resident_receiver() {
+#[ignore = "requires CUDA; a historical source queries the same relation after ordinary rest"]
+fn historical_source_and_remount_preserve_the_resident_receiver() {
     let readout = ResidentReadout::new().unwrap();
     let surface = ResidentSurface::on(&readout).unwrap();
-    let path = std::env::temp_dir().join(format!(
-        "holonics-relation-source-{}-{}",
-        std::process::id(),
-        std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos()
-    ));
     let mut field = NativeConstitutiveField::found(&surface, seeds(1)).unwrap();
-    field.enable_history_archive(&path).unwrap();
     let first = field
         .advance_resident(&mut NativeFieldOccurrence::entering(vec![phase(2, 1)]))
         .unwrap();
@@ -250,15 +241,7 @@ fn archived_source_and_remount_preserve_the_resident_receiver() {
     field
         .advance_resident(&mut NativeFieldOccurrence::entering(vec![phase(0, 0)]))
         .unwrap();
-    field
-        .archive_history_before(field.occurrence_count())
-        .unwrap();
-    let before = field.history_placement();
     let returned = field.read_constitutive_source(&anchor).unwrap();
-    assert_eq!(
-        field.history_placement().restored_sources,
-        before.restored_sources + 1
-    );
     let expected = returned.inspect().unwrap();
     let rest = field.rest(&[], &[Some(&anchor)]).unwrap();
     let count = field.occurrence_count();
@@ -270,5 +253,4 @@ fn archived_source_and_remount_preserve_the_resident_receiver() {
     assert_eq!(actual.inspect().unwrap(), expected);
     assert_eq!(remounted.occurrence_count(), count);
     drop(remounted);
-    std::fs::remove_file(path).unwrap();
 }

@@ -1313,8 +1313,8 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 (Some(j), Some(last)) => {
                     let same = last
                         .resident
+                        .junction
                         .as_ref()
-                        .and_then(|h| h.junction.as_ref())
                         .is_some_and(|previous| Rc::ptr_eq(previous, &j.current));
                     if same {
                         None
@@ -1341,44 +1341,6 @@ impl<'chart> NativeConstitutiveField<'chart> {
     pub fn remount(
         surface: &'chart ResidentSurface<'chart>,
         rest: NativeFieldRest,
-    ) -> Result<
-        (
-            Self,
-            Vec<Option<NativeFieldEmission>>,
-            Vec<Option<NativeFieldSourceAnchor>>,
-        ),
-        Error,
-    > {
-        Self::remount_placed(surface, rest, None)
-    }
-    /// Mount current standing and the newest source on the device, with all older numerical
-    /// carriers in a fresh exterior archive. This consumes the same complete cold rest; it does
-    /// not replay history or require the prior backing file.
-    pub fn remount_with_history_archive(
-        surface: &'chart ResidentSurface<'chart>,
-        rest: NativeFieldRest,
-        path: impl AsRef<std::path::Path>,
-    ) -> Result<
-        (
-            Self,
-            Vec<Option<NativeFieldEmission>>,
-            Vec<Option<NativeFieldSourceAnchor>>,
-        ),
-        Error,
-    > {
-        rest.validate()?;
-        if rest.header.source_only {
-            return Err(invalid(
-                "a source-only field has no occurrence history to place",
-            ));
-        }
-        let archive = FieldArchive::create(path.as_ref())?;
-        Self::remount_placed(surface, rest, Some(archive))
-    }
-    fn remount_placed(
-        surface: &'chart ResidentSurface<'chart>,
-        rest: NativeFieldRest,
-        mut archive: Option<FieldArchive>,
     ) -> Result<
         (
             Self,
@@ -1456,43 +1418,24 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 })
             })
             .collect();
-        let occurrences = h.history.len() as u64;
         let history = h
             .history
             .into_iter()
             .zip(history)
-            .enumerate()
-            .map(|(at, (event, rest))| {
-                let (resident, archived) = if let Some(archive) =
-                    archive.as_mut().filter(|_| at + 1 < occurrences as usize)
-                {
-                    (None, Some(archive.append(&rest)?))
-                } else {
-                    (Some(ResidentFieldHistory::mount(surface, rest)?), None)
-                };
+            .map(|(event, rest)| {
                 Ok(HeldField {
-                    resident,
-                    archived,
+                    resident: ResidentFieldHistory::mount(surface, rest)?,
                     lineage: event.lineage,
                     returned: event.returned,
                     frame: Rc::clone(&frames[event.frame]),
                 })
             })
             .collect::<Result<Vec<_>, Error>>()?;
-        if let Some(archive) = &mut archive {
-            archive.sync()?;
-            archive.note_archived_prefix(history.len().saturating_sub(1));
-        }
         let junction = if let Some(j) = h.junction {
             let current = if let Some(current) = current_junction {
                 Rc::new(surface.mount_section_rest(&current)?)
             } else if let Some(last) = history.last() {
-                Rc::clone(
-                    last.resident()?
-                        .junction
-                        .as_ref()
-                        .expect("validated junction"),
-                )
+                Rc::clone(last.resident.junction.as_ref().expect("validated junction"))
             } else {
                 Rc::new(surface.mount_section_rest(&initial_junction.expect("initial junction"))?)
             };
@@ -1571,7 +1514,6 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 .collect(),
             owner,
             history,
-            archive,
             pending: None,
             junction,
             pending_junction: None,

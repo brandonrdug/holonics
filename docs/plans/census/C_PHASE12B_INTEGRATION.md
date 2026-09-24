@@ -40,6 +40,33 @@ return, its unit-sum receiver, and the atomic coupled source return. HNA all-tar
 against the cut. See `docs/VERIFICATION_RECEIPTS.tsv` for exact commands and logs. The original
 70-minute synthetic HNA deposition probe was not run.
 
-The handoff's second Phase 12b packet (junction/material-transport archive,
-`current_history_source`, contextual lift and associated rest) and Phase 14 remain open. This
-source cut does not claim their acceptance or the final M1/M2 library layout.
+## Second packet: exterior occurrence placement
+
+The `FieldArchive`/`ArchivedField` exterior placement ladder is retired. A repository-wide Rust
+source search found its APIs only in engine tests; no non-test caller depended on it. This removes
+`field/archive.rs`, the placement report/API, `enable_history_archive`, `archive_history_before`,
+and `remount_with_history_archive`. `HeldField` now owns a resident history carrier directly;
+there is no optional resident/archived split or on-demand archive remount. Legacy constituted-field
+occurrence clocks remain because the engine drivers and source/material readers consume them.
+Source-only fields still refuse legacy advancement and validate empty history.
+
+The ordinary `NativeFieldRest` writer and reader retain all six current formats:
+`HNA-NATIVE-FIELD-REST\x01` and `\x02` base/packed, `\x03` and `\x04` current-report
+base/packed, and `\x05` and `\x06` joint-current base/packed. The joint formats retain their
+current-report presence byte. Current source, complete/contextual/moment material transport,
+operative history, and contextual-lift operators remain in place. Existing archive-driven tests
+were retargeted to resident history plus ordinary write/read/remount, preserving their source,
+material and continuation assertions; file-placement fault/checksum tests are retired with the
+file-placement mechanism.
+
+**Verification pending.** Before claiming this packet, run the focused field rest/remount and source
+tests (`field::rest`, including `resident_history_returns_the_same_current_and_cold_rest`,
+`field::current_history_source`, `field::contextual_lift`, `field::complete`, `field::contextual`,
+`field::moment`, operative current-factor/source-map and internal-current tests), then
+`cargo check -p holonic-engine --lib` and the changed engine test target. Verify writer selection
+for all six current tags, and retain the source-only empty-history test. HNA all-targets and Phase14
+integration remain separate gates.
+
+The current-history source, contextual lift/material transport, HNA session contract, behavior
+measurement and `NormalWaveHolon` reception/actuation chart remain open; Phase 14 also remains open.
+This source cut does not claim their acceptance or the final M1/M2 library layout.
