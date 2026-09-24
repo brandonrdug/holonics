@@ -59,13 +59,15 @@ were retargeted to resident history plus ordinary write/read/remount, preserving
 material and continuation assertions; file-placement fault/checksum tests are retired with the
 file-placement mechanism.
 
-**Verification pending.** Before claiming this packet, run the focused field rest/remount and source
-tests (`field::rest`, including `resident_history_returns_the_same_current_and_cold_rest`,
-`field::current_history_source`, `field::contextual_lift`, `field::complete`, `field::contextual`,
-`field::moment`, operative current-factor/source-map and internal-current tests), then
-`cargo check -p holonic-engine --lib` and the changed engine test target. Verify writer selection
-for all six current tags, and retain the source-only empty-history test. HNA all-targets and Phase14
-integration remain separate gates.
+**Archive packet verification, September 24.** `cargo check -p holonic-engine --lib` and
+`cargo check -p holonic-engine --all-targets` pass. Under `.local/gpu.lock`, the seven field rest
+tests pass, including source-only refusal and the 12-occurrence ordinary rest/remount test. The
+dedicated writer test passes for all six current tags (`\x01`–`\x06`). Focused current-history,
+contextual-lift, complete/contextual/moment material, packed-v2 report support, operative source
+and current, internal-current, and historical-source ordinary-remount tests pass. Exact commands
+and outcomes are pinned in `docs/VERIFICATION_RECEIPTS.tsv` against this packet commit.
+
+HNA all-targets and Phase14 integration remain separate gates.
 
 The current-history source, contextual lift/material transport, HNA session contract, behavior
 measurement and `NormalWaveHolon` reception/actuation chart remain open; Phase 14 also remains open.
