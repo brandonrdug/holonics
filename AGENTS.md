@@ -21,6 +21,21 @@ one law or kernel at a time, when a rebuild step needs it. Never restore wholesa
 | `docs/` | The object and mathematics guides: [elementary objects](docs/ELEMENTARY_OBJECTS.md), [Holon](docs/HOLON.md), [notation](docs/HOLONIC_NOTATION.md), [the machine's formula](docs/HNN_FORMULA.md), winding, helical and fluid geometry, [formal framework](docs/FORMAL_FRAMEWORK.md), and the canon. |
 | `research/` | Dated records (derivations, measurements, lessons), papers, design, notebook. |
 
+## The line: compression is intelligence is navigation
+
+[project-postulate] Brandon's slogan names the line the repository builds
+([THE_REBUILD](docs/plans/THE_REBUILD.md#the-line-the-rebuild-serves)):
+- Holonic Compression couples a fractal navigator's resonating modes with terrain (stuff in
+  general).
+- Landmark discovery locates the faces where navigator paths converge.
+- The HNN executes both at scale.
+
+RH, Hodge, complex Euler/Navier–Stokes and BSD are targets advanced enough to apply Holonics to.
+They are never a separate "Millennium" category: work on them is landmark discovery and
+compression in the same objects. Their Lean (`lean/ElementaryHolonics/{Millennium,RH,Mathematics,Computation}`)
+stays attached to every rebuild step. A campaign names the navigators, terrain, kernel, cokernel
+and landmarks it touches.
+
 ## The elementary objects — the only design vocabulary
 
 [project-postulate] Brandon, September 22: design, worker briefs, formal work and code state
@@ -36,7 +51,7 @@ dissipate and address); rings rotate and align, contacts converge and diverge ac
 law and its ports, not its state — `H=(K,∂_A; Π; 𝒟; 𝓔; G; π)`: complex with connection-valued
 incidence, ports carrying flow/effort pairs whose pairing is power, a power-neutral interconnection
 (Dirac) structure, element relations (the constitution: storage, resistive contacts, sources,
-active/learned relations with their power, pumps), generators with keys/clocks/phase lifts, and
+active/learned relations with their power, pumps), navigators with keys/clocks/phase lifts, and
 scale restrictions. Receivers are Holons joined at ports; interconnected Holons form a Holon.
 Passivity is proved, never assumed. The table below lists its facets. The Lean foundation and the
 Rust core implement this object, and every native owner implements or charts it.
@@ -46,7 +61,7 @@ Rust core implement this object, and every native owner implements or charts it.
 | Complex | oriented cells, `∂²=0` |
 | Holon `\|H⟩`: a continuing current/motion, already present as potential, never produced by a computation | coholon `⟨Ȟ\|`, `d=∂ᵀ`; face `⟨Ȟ\|H⟩`; Stokes `⟨dȞ,H⟩=⟨Ȟ,∂H⟩`; orientation exists only in the pairing |
 | Constitution `Θ`: the material law relating a coholon to the motion it excites (capacitive `C=BᵀM_C B`, inverse-inductive `K=BᵀM_L B`, dissipation `D⪰0`) | modes `Kv=ω²Cv`, the two energies exchanging; motion = exact ⊕ coexact (induced) ⊕ harmonic (dormant) |
-| Generator `Ĝ` with initial configuration and clock; helix = circle + carry; fractal family = words, restrictions, scale square, first arrival; a source word is its address | adjoint `Ĝ*` carries the learning covector; release at tolerance |
+| Navigator `Ĝ` (fractal navigator; formerly "generator") with initial configuration and clock; helix = circle + carry; fractal family = words, restrictions, scale square, first arrival; a source word is its address | adjoint `Ĝ*` carries the learning covector; release at tolerance |
 | Pair contact: slip `J`, `Q=⟨Δ\|Δ⟩`, `DQ=2J*Δ`, Farey lock address | contact material `ΣwJ*DJ` |
 | Parametron: incidence, `C`, `L`, pump, half-turn sheets, Ising lock; a perceptron is its locked-sheet receiver face | storage↔flow exchange at `ω=1/√(LC)`; a section crossing is a clock tick |
 | Tube (longitudinal clocked span) and tower (transverse restriction; gluing unique/plural/obstructed); world tube; `Λ_DN` eliminates an interior | holonomy only on declared circuits |
@@ -55,9 +70,12 @@ Rust core implement this object, and every native owner implements or charts it.
 | Ratio: "one per two", a typed comparison of two Holons/coholons/transports carried as an undivided pair, with division-with-remainder, residue/modulo, inversion with its nonunit fibre, lift/carry and jets | `ℓ=log R` with winding branch; `R⁻¹dR`; its jet (velocity, acceleration, jerk, …); loss is `log Ĝ_(T←H)` |
 | Receiver and receipt: a receiver is a role of a participating Holon; reception `I_C(\|H_S⟩,\|H_R⟩)=(\|H'_S⟩,\|H'_R⟩,f_R)` changes both and returns a receipt, a field of readings over a partition, each region in its own frame and clock | no global scalar or global gradient; per-region variability over its own ticks, joined to interface flux |
 | Holarchy: what `interconnect` returns; the joined whole with its retained constituents, incidence, gluing and restrictions (or a typed gluing defect) | quantities belong to the receiver: `view(receiver, grain, clock)`; `count` only under a certified finite partition; one continuing whole, many receiver-relative counts |
+| Holonic Compression: a fractal navigator's resonating modes coupled with terrain; a codec pivot carrying its decoder | kernel: differences no admitted future receiver distinguishes, whose quotient is retention; cokernel: the residual emanated or retained; landmarks: faces where navigator paths converge |
 | Aeon (a container of causality in time, part of a Holarchy's parametric orientation), epoch (a division of an aeon at a receiver's section), cycle (a closed loop; completeness, not duration) | elapsed time is the pairing `⟨ω_R\|γ⟩ = windings + phase`; no privileged clock; epochs count flux through the receiver's section; cycles read conserved whole windings |
 
-[definition] Retire these phrasings: "terrain" and bare "standing" for the constitution; "a
+[definition] Retire these phrasings: bare "standing" for the constitution, and "terrain" as a
+synonym for it (terrain is stuff in general: whatever a navigator meets); "generator" for the
+object, which is a navigator (the algebraic senses remain); "a
 current changes a later current's standing" as a definition of learning; a constitution
 "turning" a coholon "into" a Holon; a single scalar of progress; and any tape, journal or
 frozen cut as retention. For time, use aeon, epoch and cycle
@@ -69,9 +87,9 @@ program-chosen counter or iteration count.
 antecedents induce a consequence as flux only when they fit a constitution (the lock). The
 Enigma/Bombe reading is literal: rotors are parametron rings whose stepping is winding with
 carry, fixed material and reflector return through the producing operands, the key is the
-generators' initial configuration, and the Bombe infers it by pairwise loop closure over the
+navigators' initial configuration, and the Bombe infers it by pairwise loop closure over the
 menu of contacts. Dormant modes wait for a fitting antecedent. **Learning is locating keys** —
-inferring configuration and gauge of relevant generators from loop-closure constraints, which is
+inferring configuration and gauge of relevant navigators from loop-closure constraints, which is
 compression (pruning) and navigation (the route). Resonating drives an existing mode at its
 eigenfrequency (RIDE); emanating founds or drives off-resonance (FOUND). The inference is
 general; no cryptanalytic application is pursued.
@@ -117,7 +135,7 @@ algebraic phase can have nonperiodic transport. The [helical guide](docs/HELICAL
 
 [definition] "Soulkiller" is a name only (borrowed from a game); it determines no mathematics.
 Its subject is **equation extraction**: reading a foreign realization's operators and coefficients
-as element relations, interconnection and generators of a Holon, so the extracted equations are
+as element relations, interconnection and navigators of a Holon, so the extracted equations are
 native objects. Name types and designs after the extracted-equation facet they carry.
 
 ## Work practice

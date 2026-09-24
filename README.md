@@ -3,7 +3,7 @@
 Holonics is a theory of everything grounded in the reality of difference: a mathematical,
 physical and computational framework for how situated things exist, interact, change and become
 observable. Its elementary object is the **Holon**: a law with incidence, ports, material
-relations, generators and scale restrictions. Holons join at ports into Holarchies, receivers read
+relations, navigators and scale restrictions. Holons join at ports into Holarchies, receivers read
 situated faces, and time passes in aeons, epochs and cycles. **HNN** is the neural machinery built
 from these objects.
 

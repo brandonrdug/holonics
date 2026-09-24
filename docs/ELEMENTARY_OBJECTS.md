@@ -33,7 +33,7 @@ K, ∂_A   oriented complex, connection-valued incidence d_A (d_A² = F_A, curva
 𝒟        interconnection (Dirac) structure, 𝒟 = 𝒟^⊥; power neutral: ⟨e,f⟩ = 0 on 𝒟 (Tellegen, Stokes)
 𝓔        element relations = constitution: storage E_Θ (C, K), resistive (contacts, M ⪰ 0 where passive),
          sources, active/learned relations with their power, pumps
-G        generators: initial configuration (the key), clock, phase lift θ̃ = θ + 2πn; supply U_e and skew transport
+G        navigators: initial configuration (the key), clock, phase lift θ̃ = θ + 2πn; supply U_e and skew transport
 π        restrictions to coarser grains; the scale square or a typed defect
 motion   flows/efforts in 𝒟 satisfying 𝓔;  d/dτ E_Θ = −dissipation + port power + active power + ⟨∂_Θ E, Θ̇⟩
 ```
@@ -49,26 +49,28 @@ Generator,Restriction,Law,Conformance}`); the Rust core (`holonics`) mirrors it 
 implements it.
 
 <a id="operator-contract"></a>
-[definition] **Operator contract** (finalized September 23, [restructure §0](plans/THE_REPOSITORY_RESTRUCTURE.md#0-final-decisions)).
+[definition] **Operator contract** (September 24, [the rebuild](plans/THE_REBUILD.md)).
 Each object's operations and their owners are listed below. The *current* column is the
 checked code today. The *target* column is its home in the main `holonics` library and the
-Lean `Holonics` library after the restructure. A target name is not importable until its move
-is verified. Each move updates this table in the same commit.
+Lean `Holonics` library in the rebuild. A target name is not importable until its owner is
+built. Each rebuild step updates this table in the same commit.
 
 | Object | Operations | Current owners | Target |
 |---|---|---|---|
 | Ratio | `present`, `compare`, `compose`, `invert` (nonunit fibre), `div_rem`, `residue`, `lift`, `jet`, `log` with branch | Lean `Objects/{Ratio,RatioPhase,RatioBlock}`, `Foundation/TransportLift`, `Geometry/PhaseCarry`, `Millennium/Farey`; Rust `holonics::geometry::winding::{Odometer,LockAddress}`, `holonics::ratio::ring::{ExactRing,ModularWords}`, `holonics::ratio::exponentiated::RatioFamily`, `exact_contact::RatioFace` | `holonics::ratio`; `Holonics.Ratio` |
 | Complex, frame, clock, carry | `boundary`, `transport`, `transport_rate`, `join_axes` (commuting square or defect), phase lift | Lean `Holon/Complex`, `Geometry/*`; Rust `holonics::{complex,generator::Clock}`, `holonics::geometry::{exact,model}` | `holonics::geometry`; `Holonics.Geometry` |
 | Pair and tube charts | `screw_pair` (two motions, relative jet), `tube` (longitudinal transfer), `restrict` (transverse, gluing unique/plural/obstructed) | Lean `Transport/{HelicalPairInteraction,ContinuingTube}`, `Geometry/PairResonance`, `Foundation/{ContinuingTower,IwasawaTower}`; Rust `holonics::geometry::screw`, `holonics::restriction::{tube,tower}` | `holonics::geometry`; `Holonics.Geometry` |
+| Navigator | `configure` (initial configuration: the key), `advance` (own clock, carry), `restrict` (scale square), `address` (source word), trace faces and the dynamical zeta, lock address, `release` at tolerance | Lean `Holon/Generator`, `Foundation/{FractalPacking,GeneratorInference}`, `Transport/{GeneratorTraceFaces,SourceMoment}`; Rust `holonics::generator` | `holonics::navigator`; `Holonics.Navigator` (rebuild step 1) |
 | Holon | `advance` (state, bond, energy balance), `interconnect -> Holarchy`, `contact` (pair geometry + contact material), `continue` (through a tube), `restrict`, `depose`, `pullback` | Lean `Holon/{Law,Port,Dirac,Element,Generator,Restriction,Deposition,Reaction,Cayley}`, `Foundation/{Holon,Standing,Lineage,ConnectionLineage}`; Rust `holonics::{holon,law,port,dirac,element,generator,restriction,deposition,reaction}`, engine `holonic_interaction`, `holonic_chain`; main `holonics::receiver::standing` | `holonics::holon`; `Holonics.Holon` |
 | Receiver and receipt | `interact`/`receive -> InteractionReturn` (both participants' next states, face, receipt, boundary currents, power balance, unresolved fibre); `Ratio::between(receipts)`; `width`, `release` (caller-declared decision and tolerance checks) | Lean `Foundation/Receiver`, `Foundation/ReceiverRelease`, `Transport/ChangingReceiver`, `Objects/Pairing`; Rust `HolonLaw::receive` (passive coholon reading, the zero-storage specialization), `law/receiver.rs` (faces and passive law), `receiver/release.rs` (finite compatible-family width, exact affine enclosure, release decisions), `PresentationCost`, `landauer`; guide [RECEIVER_HOLARCHY](RECEIVER_HOLARCHY.md) | `holonics::receiver` (release operations); `Holonics.Receiver` |
 | Holarchy | `interconnect -> Holarchy` (typed port/cellular gluing); `whole`, `view(receiver, grain, clock)`, `count` (receiver-certified finite partition), `refine` (commuting square or defect) | none as one object; ingredients are `Holon::interconnect`, the receiver atlas, the tower and the future-sufficient quotient | `holonics::holarchy`; `Holonics.Holarchy` (K1a structure, K1b active reception) |
 | Aeon, epoch, cycle | `reading(clock, aeon) -> (windings, phase)`, `concat` (with carry), `epochs(receiver, grain)`, `coarsen` (induced section), `is_cycle` | Lean `Geometry/PhaseCarry`, `Transport/CellHolonomy`, `Objects/Pairing`, `Physics/ObserverBoundaryCurrent`; Rust `holonics::geometry::winding::{Odometer,LockAddress}` | `holonics::aeon` (or within `geometry::clock`); `Holonics.Aeon` (construction K1) |
 | Physical instances | fluid `face_flux`/`advance`; wave `propagate`/`interfere`; thermal `exchange`/`diffuse`/`entropy_production`; spacetime `einstein_residual`/`observer_current`; information `apply` | Lean `Physics/*`, `Millennium/{NavierStokesLambCurrentCell,NavierStokesCurvedTransport}`; Rust `diffusion` | `holonics::physics`; `Holonics.Physics` (construction K3–K4) |
-| HNN | field law, source moments, adjoint, deposition return, execution port | engine `native_ecology/constitutive_fibre/field/**`, `holonics-hna` `native/**` (device-resident) | law and port in `holonics::hnn`; resident realization in `holonics-cuda::hnn`; `Holonics.HNN` |
+| Compression and landmarks | `kernel` (relevance kernel; its quotient is retention), `cokernel` (the residual to emanate or retain), `resonate`/`emanate` split, `cost` (description + work), `infer` (loop closure), `landmarks` (checked coverage) | Lean `Foundation/{CausalRelevance,ReceiverHistoryCompression,GeneratorModeQuotient,ReceiverCodeCost,GeneratorInference}`, `Millennium/{CokernelCalculus,FamilyKernel}`, `Mathematics/{RatioSeriesTransport,RadixWindowReceiver}`, `Computation/ZeroNavigation`; Rust none since the reset (history `13f8c734`: `receiver_history_compression`, `winding_inertia`, `identity_atlas`) | `holonics::compression`; `Holonics.Compression` (rebuild step 3, #145) |
+| HNN | field law, source moments, adjoint, deposition return, execution port | none since the reset; the prototype is in history at `13f8c734` (engine `native_ecology/constitutive_fibre/field/**`, `holonics-hna` `native/**`) | law and port in `holonics::hnn`; resident realization in `holonics-cuda::hnn`; `Holonics.HNN` (rebuild steps 4–5) |
 
-The restructure's detailed contracts, types and acceptance tests are in
-[§3.1 and §3.7 of the plan](plans/THE_REPOSITORY_RESTRUCTURE.md#31-rust-the-main-holonics-library-owns-the-construction).
+The restructure's detailed contracts are in history at
+[`13f8c734`](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_REPOSITORY_RESTRUCTURE.md).
 
 [definition] **Use of a Holon's material across an event boundary.** These are admissibility
 conditions on a Holon's existing ports, element relations and admitted futures, not a separate
@@ -103,7 +105,7 @@ placed. Owners: `Geometry/ExteriorBoundary`, `Foundation/Holon.BoundaryHolon`,
 
 [definition] A **Holon** `|H⟩` is a continuing object on the complex: a current, flux or motion
 with oriented ports. It is not produced by a computation. Its admitted motions — including the
-implicit generator relations that bind a passage of writing, a gait or a knot — are already
+implicit navigator relations that bind a passage of writing, a gait or a knot — are already
 present as potential, whether or not a receiver currently reads them. A **coholon** `⟨Ȟ|` is its
 dual: a potential or receiver, with coboundary `d=∂ᵀ`. Their pairing is the face:
 
@@ -144,21 +146,25 @@ exact drop, `HolonicDiscreteInduction.emf_ne_exactDrop_of_fluxDifference_ne_zero
 (dormant, silent at node/cell receivers, `CellHolonomy.dormant_mode_is_locally_silent`). Owners:
 `HodgeReceiver`, `PositiveCellHodge`, `Physics/CoupledIncidence`, the normal law `W H=B`.
 
-### 3. Generator
+<a id="3-navigator"></a>
+### 3. Navigator
 
-[definition] A **generator** `Ĝ` is a transport with an **initial configuration** and its own
-clock. It acts on Holons; its adjoint `Ĝ*` acts on coholons, `⟨Ĝ*Ȟ|H⟩=⟨Ȟ|ĜH⟩`, and the learning
+[definition] A **navigator** `Ĝ` is a transport with an **initial configuration** and its own
+clock. The guides called it a *generator*. That word keeps only its algebraic senses: a group
+generator, the Lie generator `ξ` of a helix, a generating function. Lean and Rust names change
+when the rebuild reaches them. Holonic Compression is the compression of fractal navigators
+against terrain ([the line](plans/THE_REBUILD.md#the-line-the-rebuild-serves)). It acts on Holons; its adjoint `Ĝ*` acts on coholons, `⟨Ĝ*Ȟ|H⟩=⟨Ȟ|ĜH⟩`, and the learning
 covector travels along that adjoint. A helix is circle + carry (`PhaseCarry`: winding cocycle). A
-**fractal generator** is a family of maps with parameters, restriction maps, composition order,
+**fractal navigator** is a family of maps with parameters, restriction maps, composition order,
 scale square `r∘T_fine=T_coarse∘r` and first-arrival populations of one full recurrence
 (`FractalPacking`, `HolonicRecurrentEcology.FirstArrival`); an ordered source word is its
 **address** (`SourceMoment`: identity advance merges permutations, as a restriction word cannot
 collapse to a multiset). Recursive description and branch/address information are separate
-compression operands. A generator runs until its receiver face is within tolerance
+compression operands. A navigator runs until its receiver face is within tolerance
 (`ReceiverRelease.Releasable`, `Standing.Extinct`); then it is released and a new one is founded.
 
 [established-bounded; source-inspected] The source-neutral continuation contract is a chart of
-Generator and Receiver operations, not a new elementary object. A running continuation receives a
+Navigator and Receiver operations, not a new elementary object. A running continuation receives a
 registered face under its current codec; each codec records the face that caused its mounting. A
 receiver may return an advance, rest or a reflection request. A reflection snapshots the current
 codec and instruction. A returned revision resumes
@@ -171,7 +177,7 @@ validation are outside this formal contract.
 
 ### 4. Pair contact
 
-[definition] The **helical pair contact** joins two generators with configurations:
+[definition] The **helical pair contact** joins two navigators with configurations:
 `Δ=x_a(s)−x_b(t)`, `Q=⟨Δ|Δ⟩`, slip `J=[v_a|−v_b]`, `DQ=2J*Δ`, contact material `M=Σw J*DJ`. It is
 the constitution restricted to relative motion: it slips, dissipates and addresses. A no-slip lock
 `q·v_a=p·v_b` has a Farey address; the mediant is the cheapest lock between neighbours
@@ -346,8 +352,8 @@ its aeons (§12), which it decomposes in time the same receiver-relative way. It
 `Holon::interconnect` returns: the joined whole
 together with its retained constituents, incidence, typed gluing and restrictions. When the join
 does not close, `interconnect` returns a typed gluing defect. Its constituent family may be
-implicit or recursively generated, carried by a constituent generator. Gluing retains namespaced
-port and cellular interface maps, generator provenance and child-scoped restrictions. A port join
+implicit or recursively generated, carried by a constituent navigator. Gluing retains namespaced
+port and cellular interface maps, navigator provenance and child-scoped restrictions. A port join
 checks units and cancels equal-effort/opposite-flow interface power; cellular maps commute with
 boundaries and respect oriented connection transport. Pumps join only under declared compatible
 joint-clock maps.
@@ -371,7 +377,7 @@ restriction.
 vocabulary for time.
 - **Aeon:** an arbitrary container of causality in time, part of a Holarchy's parametric
   orientation. It is the stretch of the motion between two occurrences: a 1-chain in the lift of
-  the generators' joint clock torus, retaining winding. It is not an interval of a privileged
+  the navigators' joint clock torus, retaining winding. It is not an interval of a privileged
   clock.
 - **Epoch:** a division of an aeon. A receiver ticks when the motion crosses its section `Σ_R`,
   and those ticks partition the aeon into epochs at that receiver's grain. Coarsening merges
@@ -415,16 +421,16 @@ Rust obligations in construction order.
 [definition] Brandon's Enigma/Bombe reading, September 21: the rotor is a parametron ring whose
 stepping is a winding with carry (`Odometer`); the plugboard and reflector are fixed material and a
 boundary involution, and a passage returns through the producing operands (`A⁻¹FA`); the key is the
-**initial configuration** of the generators; the Bombe infers that configuration from pairwise
+**initial configuration** of the navigators; the Bombe infers that configuration from pairwise
 **loop closure** over the menu of admitted contacts (`menu_loop_closure`: a closed menu path closes
 exactly when the stage word fixes its boundary image).
 
 [project-postulate] Every action is a key: an action expression and its antecedents, placed against
 a constitution (the lock), induce a consequence as flux only when they fit. Walking, typing a
 command, tying or untying a knot, a word that eases or wounds a listener, solving a puzzle — each is
-finding a configuration under which already-present generator relations become relevant. A dormant
+finding a configuration under which already-present navigator relations become relevant. A dormant
 mode is available but inactive until an antecedent that fits it arrives. **Learning is locating
-keys**: inferring the configuration and gauge of relevant generators from loop-closure constraints,
+keys**: inferring the configuration and gauge of relevant navigators from loop-closure constraints,
 which prunes the search (compression) and yields the route (navigation). Teaching supplies keys;
 a name is a key to a person; a coordinate is a key to a cell. The inference is general; this
 repository's applications are language, mathematics, code, perception and motor control, and no
@@ -440,11 +446,11 @@ energy. The physical floors are Landauer (erasure only), Margolus–Levitin (ope
 energy) and Bekenstein (stored bits per energy × radius). They are floors, not an exchange rate,
 and the repository refuses a fixed mass per bit.
 
-[definition] π and `e` are constraint identities; the identity is the generator and carries no
+[definition] π and `e` are constraint identities; the identity is the navigator and carries no
 error. Digits are a receiver face (`RadixWindowReceiver`), and error enters only in how a face is
 attained. π's base-16 digits are its address word under `x↦16x mod 1`, the same address map as the
-source moment. Digit extraction jumps to position `n` by the generator power `Uⁿ` (repeated
-squaring): O(log n) space, still about `n log n` time. **Partial generators** are the compiled
+source moment. Digit extraction jumps to position `n` by the navigator power `Uⁿ` (repeated
+squaring): O(log n) space, still about `n log n` time. **Partial navigators** are the compiled
 binary-splitting blocks `(P,Q,T)`, composing associatively (`RatioSeriesTransport.Block.compose`)
 and sufficient for every continuation; they are extendable where stored digits are not. In Levin's
 `Kt=|p|+log t`, a window at offset `k` costs about `2 log₂ k` against `ℓ log₂ b` for the literal. The
@@ -452,7 +458,11 @@ optimal plan is a Pareto frontier over (description bits, work, time, peak space
 under a random-access deadline; no single optimum is proved, AGM is `O(M(N) log N)`, the only proven
 lower bound is Ω(N), and base-10 log-space extraction is open.
 
-## The Millennium joins
+## The targets
+
+[project-postulate] RH, Hodge, complex Euler/Navier–Stokes and BSD are targets of compression and
+landmark discovery ([the line](plans/THE_REBUILD.md#the-line-the-rebuild-serves)), not a
+separate category. Their joins to the objects:
 
 [definition] Navier–Stokes: velocity is a coholon, vorticity `du♭`, pressure the exact part,
 Kelvin circulation a holonomy pairing, the Lamb term the cross-current. Hodge classes: which harmonic
