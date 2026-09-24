@@ -5,6 +5,8 @@ import ElementaryHolonics.Objects.Ratio.ExponentialKernel
 import ElementaryHolonics.Objects.Ratio.GaugeCalculus
 import ElementaryHolonics.Transport.JetStaircase
 import Mathlib.Analysis.Quaternion
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
+import Mathlib.Analysis.SpecialFunctions.Log.Deriv
 
 /-!
 # The ratio object: loss is the logarithm of a Holon ratio, and the ratio is a calculus

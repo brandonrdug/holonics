@@ -2,7 +2,7 @@
 
 This is the second bounded Ratio cut, stacked on the addressed-linearized-passage cut. It moves
 one generic theorem into the public Ratio owner and leaves geometric turn calibration and its
-named applications in Research. No Lake build was run for this cut; see the focused gates below.
+named applications in Research. Focused Lake verification passed; the gates and limits are recorded below.
 
 ## Declaration ownership
 
@@ -40,7 +40,7 @@ this cut; the current subject facade count is not a claim that the final root ha
 In particular, the `Framework` and `Framework.Objects` closures include independent research
 paths, so their Millennium counts do not measure this isolated import removal.
 
-## Focused Lake gates (pending)
+## Focused Lake gates (verified)
 
 ```sh
 cd formal/elementary-holonics
@@ -56,6 +56,15 @@ lake build ElementaryHolonics.Objects.Ratio.ExponentialKernel \
   ElementaryHolonics.Framework.Objects \
   ElementaryHolonics.Framework
 ```
+
+The new owner, Ratio/RatioPhase/RatioBlock, retained `Turn`, its remaining direct research
+users, `Framework.Objects` and the combined `Framework` all built. Removing the old Turn import
+exposed Mathlib log and trigonometric derivative APIs that Ratio had received transitively; Ratio
+now imports `Mathlib.Analysis.SpecialFunctions.Log.Deriv` and
+`Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv` directly. The final affected build logs
+contain no `sorryAx`, declaration using `sorry`, or error; the new theorem's axiom audit lists only
+`propext`, `Classical.choice` and `Quot.sound`. The combined Framework gate completed 9,199 jobs.
+Commands and logs are pinned in `docs/VERIFICATION_RECEIPTS.tsv`.
 
 These checks preserve both the new core owner and the source-specific direct users of the retained
 Turn owner. The eventual acceptance gates remain `lake build Holonics` and
