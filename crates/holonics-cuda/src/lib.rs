@@ -219,7 +219,6 @@ pub(crate) mod hodge_receiver;
 // the power current, and whose Markov staircase is the jet at that station. Paired with
 // `formal/elementary-holonics/ElementaryHolonics/Transport/HolonicChain.lean`.
 pub mod holonic_chain;
-pub(crate) mod holonic_complex;
 // The Holonic Interaction unit — `|source⟩`, a standing medium `H_int` with its contact faces, the
 // dynamic `H_pert`, `⟨perspective|` — its assembled contact dissipation, clocked edit energy and
 // the port-Hamiltonian linearization it hands to `causal_chord`. Paired with
@@ -275,7 +274,6 @@ pub(crate) mod founded_receiver;
 // is exact. Declared, never glob-exported: `Link`, `Lattice` and `Plaquette` are deliberately
 // general words that say nothing at the crate root about which incidence they belong to.
 pub(crate) mod lattice_gauge;
-pub(crate) mod local_star;
 // The Chow ring of a matroid. Reached explicitly: its forms are indefinite by construction and a
 // caller who wanted a Gram matrix must not arrive here by accident.
 pub(crate) mod matroid_chow;
@@ -497,12 +495,10 @@ pub(crate) use divisor_reconstruction::*;
 pub(crate) use evolution::*;
 pub(crate) use executor::*;
 pub(crate) use field_atlas::*;
-pub(crate) use holonic_complex::*;
 pub(crate) use image::*;
 pub(crate) use implicit::*;
 pub(crate) use interaction::*;
 pub(crate) use inverse_transport::*;
-pub(crate) use local_star::*;
 pub(crate) use mode::*;
 pub(crate) use observation_ecology::*;
 pub(crate) use organizational_grammar::*;
