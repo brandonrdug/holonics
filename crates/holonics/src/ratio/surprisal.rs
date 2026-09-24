@@ -49,7 +49,6 @@ use std::collections::BTreeMap;
 use crate::ratio::Rat;
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
-use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::ratio::ExactOrdering;
@@ -67,7 +66,7 @@ const LOG_SERIES_BITS: u32 = 192;
 /// declares one and every return carries it, so a verdict is not separable from the grain that
 /// reached it. Two verdicts on one pair at two grains are two readings and not a disagreement —
 /// `Open` is a statement about the receiver's grain, never about the forms.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Grain {
     pub terms: u32,
     pub bits: u32,
@@ -97,7 +96,7 @@ impl std::fmt::Display for Grain {
 /// representable without leaving the carrier. The map holds no zero coefficients: a term that
 /// cancels is removed, because unlike `ComparativeMultiplicity`'s arms these coefficients are a
 /// **basis expansion** and not a pair of passages. Vanishing here is genuine absence of a term.
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct SymbolicSurprisal {
     terms: BTreeMap<u64, Rat>,
 }
@@ -325,7 +324,7 @@ impl SymbolicSurprisal {
 ///
 /// The `Unsupported` arm is the law's own case: zero standing support is **not** infinite surprisal
 /// and takes no smoothing constant. It is a typed refusal that a live event resolves by FOUNDing.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Support {
     Supported(SymbolicSurprisal),
     /// The receiver's standing has no relation carrying this event.
@@ -413,7 +412,7 @@ pub fn read_population(
 /// already implies: the supported half is what the standing code carries, the unsupported half is
 /// what must be **founded**, and founding is a real mutation of the standing —
 /// [`Support::found`] — not a constant.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum CrossEntropyFiber {
     /// Every event the population carries has support in the code.
     Supported(SymbolicSurprisal),

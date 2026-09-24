@@ -18,7 +18,6 @@
 //! ```
 
 use num_traits::Zero;
-use serde::{Deserialize, Serialize};
 
 use crate::ratio::Rat;
 use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
@@ -27,7 +26,7 @@ use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
 /// image and every member `π` sends there, no representative selected
 /// (Lean `Foundation/Holon.Holon.PreimageFibre`). `C` is the member container the instance
 /// keeps (an ordered `Vec` or a `BTreeSet`).
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct PreimageFibre<T, C> {
     /// The coarse image `t`.
     pub native: T,
@@ -67,7 +66,7 @@ pub enum AffineFibreDefect {
 /// [definition] **The affine preimage `A⁻¹(y) = particular + span(radical)`**, retained instead of
 /// choosing the particular point as if it were an inverse (Lean `Holon/Restriction.affineFibre_mem`:
 /// every point of the span reaches the target). [`ExactRatMatrix::preimage_fibre`] returns one.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct AffineFibre {
     /// One point with `A · particular = y`.
     pub particular: Vec<Rat>,
@@ -152,7 +151,7 @@ impl ExactRatMatrix {
 /// [definition] **A separated merged pair** — the Lean defect `Descent.defect x y merged separated`
 /// (`Holon/Restriction.Descent`): two members of one fibre, the witness that separates them
 /// (the residuals, a word and receiver, a coordinate) and the two readings, which differ.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Separation<M, W, V> {
     left: M,
     right: M,
@@ -209,7 +208,7 @@ impl<M, R, V> Separation<M, (R, R), V> {
 /// with the shortest input word after which a receiver sees the difference and what that receiver
 /// returned (`Foundation/CausalRelevance.futureHistory_quotientNe_returns_separator`). A
 /// terminus — one continues and the other does not — is itself a distinction.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ShortestSeparator<M, I, R, O> {
     pub left: M,
     pub right: M,

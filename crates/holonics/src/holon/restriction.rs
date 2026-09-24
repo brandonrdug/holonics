@@ -63,7 +63,6 @@ pub use linear::{LinearChart, LinearRestriction, LinearStation, LinearTower, Lin
 
 use crate::ratio::Rat;
 use num_traits::Zero;
-use serde::Serialize;
 
 use crate::holon::HolonError;
 use crate::holon::dirac::DiracStructure;
@@ -72,7 +71,7 @@ use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{dot, is_zero, neg, submatrix};
 
 /// [definition] **A port map** `P : ports → ports'` (`ports' × ports`).
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PortMap {
     map: ExactRatMatrix,
 }
@@ -144,7 +143,7 @@ impl PortMap {
 
 /// [definition] **The scale square and its defect** `π A_fine − A_coarse π`
 /// (`Holon/Restriction.squareDefect`).
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SquareDefect {
     defect: ExactRatMatrix,
 }
@@ -191,7 +190,7 @@ pub fn square_holds_at_horizon(
 /// [definition] **Kron/Schur reduction** of a network `L` on `interior ⊕ boundary`
 /// (`Holon/Restriction.kron_exact`): `Λ_DN = L_BB − L_BI L_II⁻¹ L_IB`, refusing a singular
 /// interior block.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct KronReduction {
     network: ExactRatMatrix,
     interior: Vec<usize>,

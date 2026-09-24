@@ -54,9 +54,13 @@ pub fn constraint_chart(anchor: &Rat, board: &Rat, x: &Rat) -> Presentation {
 }
 
 /// **The projective Swing**: the harmonic conjugate of `a` with respect to the anchor `b` and the
-/// board `d`, `((a − b) d + (a − d) b) / (2a − b − d)`. `None` when `a` is the midpoint of anchor
-/// and board, whose conjugate is the board's point at infinity.
+/// board `d`, `((a − b) d + (a − d) b) / (2a − b − d)`, for `b ≠ d` (Lean's hypothesis). `None`
+/// when the anchor is the board, which declares no chart, and when `a` is the midpoint of anchor
+/// and board, whose conjugate is the line's point at infinity.
 pub fn harmonic_conjugate(anchor: &Rat, board: &Rat, a: &Rat) -> Option<Rat> {
+    if anchor == board {
+        return None;
+    }
     let denominator = integer(2) * a - anchor - board;
     if denominator.is_zero() {
         return None;
@@ -114,9 +118,10 @@ mod tests {
         );
     }
 
-    /// Lean `Millennium/Swing.theSwingIsNegationInTheConstraintChart`: in the chart sending the
-    /// anchor to `0` and the board to `∞`, the harmonic conjugate is negation, and its cross ratio
-    /// with anchor and board is `−1`.
+    /// Lean `Millennium/Swing.theSwingIsNegationInTheConstraintChart` (with `b ≠ d`): in the chart
+    /// sending the anchor to `0` and the board to `∞`, the harmonic conjugate is negation, and its
+    /// cross ratio with anchor and board is `−1`. An anchor equal to its board declares no chart
+    /// and is refused.
     #[test]
     fn the_projective_swing_is_negation_in_the_constraint_chart() {
         let (anchor, board, a) = (rat(1, 2), integer(3), rat(-4, 5));
@@ -132,6 +137,8 @@ mod tests {
         );
         let midpoint = (&anchor + &board) / integer(2);
         assert_eq!(harmonic_conjugate(&anchor, &board, &midpoint), None);
+        assert_eq!(harmonic_conjugate(&board, &board, &a), None);
+        assert_eq!(harmonic_conjugate(&board, &board, &integer(1)), None);
     }
 
     /// Lean `Geometry/CrossRatio.swingPair_affine_projectively`: an affine change of the line

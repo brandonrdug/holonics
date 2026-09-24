@@ -29,7 +29,7 @@
 //!
 //! | Lean | Rust |
 //! |---|---|
-//! | `Objects/Parametron.lc_energy_conserved`, `modeEnergy_conserved`, `modeEnergy_exchange` | [`Parametron::mode_energy`] |
+//! | `Objects/Parametron.modeEnergy_conserved`, `modeEnergy_exchange` (node-flux chart; the charge-chart `lc_energy_conserved` is its one-ring dual) | [`Parametron::mode_energy`] |
 //! | `Physics/CoupledIncidence.diagonalStorage`, `diagonalResponse`, `IsGeneralizedMode` | [`Parametron::storage`], [`Parametron::is_mode`] |
 //! | `Objects/Parametron.modeWitness` | tests |
 //! | `Physics/PhaseCarrier.pumpStorage`, `pumpStorage_halfTurnSheet`, `phaseCarrier_halfTurnSheet` | [`pump_storage`], [`Carrier::half_turn`] |
@@ -438,9 +438,12 @@ mod tests {
             .collect()
     }
 
-    /// Lean `Objects/Parametron.lc_energy_conserved`: with `ω² = 1/(LC)` carried as a ratio, the
-    /// LC ring's storage and flow exchange at every rational phase while their sum stays
-    /// `A²/(2L)`, and each term vanishes where the other carries the whole energy.
+    /// Lean `Objects/Parametron.modeEnergy_conserved` and `modeEnergy_exchange` at one branch and
+    /// one node: with `ω² = 1/(LC)` carried as a ratio, the LC ring's storage and flow exchange at
+    /// every rational phase while their sum stays `ω²·½⟨v, C v⟩ = A²/(2L)`, and each term vanishes
+    /// where the other carries the whole energy. This is the node-flux chart (`C` on `ẋ`, `1/L` on
+    /// `x`). `lc_energy_conserved` states the same exchange in the charge chart `q = C ẋ`, whose
+    /// amplitude `CωA` gives the same total `(CωA)²/(2C) = A²/(2L)`; the test checks that duality.
     #[test]
     fn the_lc_ring_exchanges_storage_and_flow_at_constant_energy() {
         let (inductance, capacitance) = (integer(2), rat(1, 8));
@@ -450,6 +453,11 @@ mod tests {
         let amplitude = vec![rat(3, 2)];
         assert!(ring.is_mode(&omega_squared, &amplitude).unwrap());
         let expected = &amplitude[0] * &amplitude[0] / (integer(2) * &inductance);
+        let charge_amplitude = &capacitance * &amplitude[0];
+        assert_eq!(
+            &charge_amplitude * &charge_amplitude * &omega_squared / (integer(2) * &capacitance),
+            expected
+        );
         for phase in phases() {
             let energy = ring
                 .mode_energy(&omega_squared, &amplitude, &phase)

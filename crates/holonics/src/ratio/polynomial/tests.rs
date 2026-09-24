@@ -244,7 +244,7 @@ fn the_cauchy_index_flips_when_only_the_numerator_flips() {
 }
 
 // -------------------------------------------------------------------------------------------------
-// the declared sizes of the monic companion, the descent's stack, and the wire's normal form
+// the declared sizes of the monic companion and the descent's stack
 // -------------------------------------------------------------------------------------------------
 
 /// **The factorization `Foundation/RootCount.theSquarefreePartSharesItsRoots` assumes is

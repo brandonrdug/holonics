@@ -11,22 +11,6 @@ path = "src/lib.rs"
 
 [dependencies]
 holonics = { path = "../holonics" }
-num-bigint = { workspace = true }
-num-integer = "0.1.46"
-num-rational = { workspace = true }
-num-traits = { workspace = true }
-serde = { workspace = true }
-serde_json = "1"
-sha2 = { workspace = true }
-tokenizers = "0.21.4"
-thiserror = { workspace = true }
-
-[dev-dependencies]
-claxon = "0.4.3"
-hound = "3.5.1"
-image = { version = "0.25.10", default-features = false, features = ["png"] }
-ron = { workspace = true }
-tempfile = "3"
 
 [[bin]]
 name = "mount-smoke"

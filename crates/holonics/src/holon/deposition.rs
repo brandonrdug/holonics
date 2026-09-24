@@ -10,7 +10,7 @@
 //!
 //! [definition] **Passivity-preserving deposition** (`Holon/Deposition.committed_energy_bound`,
 //! from `Holon/Deposition.energy_product_bound`): passive words and deposits
-//! `Q_(k+1) ⪯ (1 + ε_k) Q_k` bound the committed energy by `∏(1 + ε_k) E_0`. [`DepositLedger`]
+//! `Q_(k+1) ⪯ (1 + ε_k) Q_k` bound the committed energy by `∏(1 + ε_k) E_0`. [`CommittedEnergyBound`]
 //! certifies each deposit's `ε_k` exactly by inertia and retains only the running product and the
 //! initial energy — the quotient the bound needs, never a list of deposits
 //! (`Foundation/Standing` retention). The divergence witness
@@ -34,7 +34,7 @@
 //! | Lean | Rust |
 //! |---|---|
 //! | `learned_rate_form` | [`learned_rate_form`] |
-//! | `energy_product_bound`, `committed_energy_bound` | [`DepositLedger`] |
+//! | `energy_product_bound`, `committed_energy_bound` | [`CommittedEnergyBound`] |
 //! | `projectPassive`, `projectPassive_passive`, `projectPassive_of_passive` | [`project_passive`] |
 //! | `symPart`, `quad_symPart` | [`crate::ratio::linear::vector::symmetric_part`] |
 //! | `indefiniteBlock`, `divergentState`, `normal_law_divergence_witness` | [`indefinite_block`], [`divergent_state`] |
@@ -203,17 +203,17 @@ pub struct BoundReading {
     pub holds: bool,
 }
 
-/// [definition] **The deposit ledger** (`Holon/Deposition.committed_energy_bound`): the
+/// [definition] **The committed energy bound** (`Holon/Deposition.committed_energy_bound`): the
 /// initial energy and the running product `∏(1 + ε_k)`; each deposit's `ε_k` is certified by
 /// `(1 + ε_k) Q_k − Q_(k+1) ⪰ 0` before it enters the product.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct DepositLedger {
+pub struct CommittedEnergyBound {
     initial_energy: Rat,
     product: Rat,
     commits: u64,
 }
 
-impl DepositLedger {
+impl CommittedEnergyBound {
     pub fn new(initial_energy: Rat) -> Self {
         Self {
             initial_energy,
@@ -338,13 +338,13 @@ mod tests {
     fn a_deposit_beyond_its_declared_growth_is_refused() {
         let q = SymmetricForm::from_integers(&[vec![1, 0], vec![0, 1]]).unwrap();
         let grown = SymmetricForm::from_integers(&[vec![2, 0], vec![0, 1]]).unwrap();
-        assert!(DepositLedger::certify_deposit(&q, &grown, &integer(1)).is_ok());
+        assert!(CommittedEnergyBound::certify_deposit(&q, &grown, &integer(1)).is_ok());
         assert!(matches!(
-            DepositLedger::certify_deposit(&q, &grown, &rat(1, 2)),
+            CommittedEnergyBound::certify_deposit(&q, &grown, &rat(1, 2)),
             Err(HolonError::DepositExceedsBound { .. })
         ));
         assert_eq!(
-            DepositLedger::certify_deposit(&q, &q, &integer(-2)),
+            CommittedEnergyBound::certify_deposit(&q, &q, &integer(-2)),
             Err(HolonError::NegativeGrowth)
         );
     }

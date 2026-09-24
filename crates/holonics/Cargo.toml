@@ -9,5 +9,4 @@ license.workspace = true
 num-rational = { workspace = true }
 num-bigint = { workspace = true }
 num-traits = { workspace = true }
-serde = { workspace = true }
 thiserror = { workspace = true }

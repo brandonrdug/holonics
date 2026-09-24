@@ -44,7 +44,6 @@
 
 use crate::ratio::Rat;
 use num_traits::{One, Zero};
-use serde::Serialize;
 
 use crate::holon::HolonError;
 use crate::holon::port::Bond;
@@ -55,7 +54,7 @@ use crate::ratio::linear::vector::{
 
 /// [definition] A subspace of the bond space on `ports` ports, carried by its constraint rows
 /// `[F | E]` in reduced row echelon form (independent rows, canonical).
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct KernelForm {
     ports: usize,
     constraints: ExactRatMatrix,
@@ -330,7 +329,7 @@ fn placed_rows(
 
 /// [definition] How a Dirac structure was presented. Provenance only: identity is the canonical
 /// kernel form.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum DiracPresentation {
     /// `{(J e, e)}` with `Jᵀ = −J`.
     SkewGraph { structure: ExactRatMatrix },
@@ -355,7 +354,7 @@ pub enum DiracPresentation {
 
 /// [definition] **A certified Dirac structure** (`Holon/Dirac.IsDirac`): a kernel form that
 /// passed `F Eᵀ + E Fᵀ = 0` and `rank [F | E] = n`, with its presentation.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DiracStructure {
     presentation: DiracPresentation,
     form: KernelForm,

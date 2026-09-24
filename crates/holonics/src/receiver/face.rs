@@ -43,7 +43,6 @@ use std::fmt::Debug;
 use crate::ratio::Rat;
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
-use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::holon::HolonError;
@@ -73,7 +72,7 @@ pub fn coholon_bond(effort: &[Rat]) -> Result<Bond, HolonError> {
 /// [definition] **The passive coholon with a declared linear reader** `C`: joined at a Holon's
 /// ports it forces zero flow there, admits every effort, reads `C e` and draws zero power
 /// (`Holon/Law.passive_reading`).
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PassiveCoholon {
     receiver: String,
     reader: ExactRatMatrix,
@@ -382,9 +381,6 @@ pub fn softmax_jacobian(p: &[Rat]) -> Result<SymmetricForm, HolonError> {
 // The receiver face
 // =============================================================================================
 
-/// Serialized schema name for a returned width.
-pub(crate) const RECEIVER_WIDTH_SCHEMA: &str = "holonics.receiver-width.v1";
-
 /// The ceiling on a declared horizon.
 ///
 /// [definition] `horizon_image` runs one exact matrix multiplication per step, so the *step count*
@@ -400,8 +396,7 @@ pub const HORIZON_CEILING: usize = 4096;
 pub const FAMILY_CEILING: usize = 4096;
 
 /// An exact face returned by a receiver reading. Three arms, each exact; no float appears.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(tag = "face", rename_all = "kebab-case")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ExactFace {
     /// A yes/no reading, separated by `1` when the two disagree.
     Flag(bool),
@@ -473,8 +468,7 @@ impl ExactFace {
 /// an enclosure: the Euclidean diameter of a zonotope is attained at a vertex of the generator
 /// cube, so an exact computation would enumerate `2^k` sign patterns. The refusal is
 /// [`WidthRefusal::NormNotExactOnEnclosure`] and names the norm.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case")]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum DiameterNorm {
     /// The sup-norm. Exact on both an enumerated family and an enclosure.
     Supremum,
@@ -532,80 +526,18 @@ impl Reading for LinearReading {
 ///
 /// Lean counterpart: `Foundation/ReceiverRelease.width`.
 ///
-/// [implemented-exact] Every field is private. The only constructors are `receiver_release::width_enumerated` and
-/// `receiver_release::width_enclosed`, and the only wire route is the validating [`TryFrom`] below, reached
-/// through `#[serde(try_from = ...)]`: a remounted reading whose schema, diameter sign or
-/// attaining witness is incoherent with its own `read` count is refused rather than carried, so
-/// a forged width cannot be handed to `receiver_release::LawfulOptions::assemble`.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(try_from = "ReceiverWidthWire")]
+/// [implemented-exact] Every field is private. The constructors are `receiver_release::width_enumerated`,
+/// `receiver_release::width_enclosed` and [`Self::declared`], which refuses a negative diameter or an
+/// attaining witness incoherent with its own `read` count, so a forged width cannot be handed to
+/// `receiver_release::LawfulOptions::assemble`.
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReceiverWidth {
-    schema: String,
     receiver: String,
     lineage: String,
     norm: DiameterNorm,
     diameter: Rat,
     attaining: WidthWitness,
     read: usize,
-}
-
-/// The wire form of a [`ReceiverWidth`]. Deserializing a `ReceiverWidth` goes through this and
-/// the structural re-check in `TryFrom`; there is no unchecked route.
-#[derive(Clone, Debug, Deserialize)]
-struct ReceiverWidthWire {
-    schema: String,
-    receiver: String,
-    lineage: String,
-    norm: DiameterNorm,
-    diameter: Rat,
-    attaining: WidthWitness,
-    read: usize,
-}
-
-impl TryFrom<ReceiverWidthWire> for ReceiverWidth {
-    type Error = WidthRefusal;
-
-    fn try_from(wire: ReceiverWidthWire) -> Result<Self, Self::Error> {
-        if wire.schema != RECEIVER_WIDTH_SCHEMA {
-            return Err(WidthRefusal::WidthSchemaMismatch {
-                declared: wire.schema,
-                expected: RECEIVER_WIDTH_SCHEMA,
-            });
-        }
-        if wire.diameter.is_negative() {
-            return Err(WidthRefusal::NegativeWidth {
-                declared: wire.diameter.to_string(),
-            });
-        }
-        match &wire.attaining {
-            WidthWitness::Pair { left, right } => {
-                if left >= right || *right >= wire.read {
-                    return Err(WidthRefusal::WitnessOutsideReading {
-                        read: wire.read,
-                        witness: format!("{:?}", wire.attaining),
-                    });
-                }
-            }
-            WidthWitness::Coordinate { .. } => {}
-            WidthWitness::Point => {
-                if !wire.diameter.is_zero() {
-                    return Err(WidthRefusal::WitnessOutsideReading {
-                        read: wire.read,
-                        witness: "point witness with a nonzero diameter".to_owned(),
-                    });
-                }
-            }
-        }
-        Ok(Self {
-            schema: wire.schema,
-            receiver: wire.receiver,
-            lineage: wire.lineage,
-            norm: wire.norm,
-            diameter: wire.diameter,
-            attaining: wire.attaining,
-            read: wire.read,
-        })
-    }
 }
 
 impl ReceiverWidth {
@@ -619,8 +551,31 @@ impl ReceiverWidth {
         attaining: WidthWitness,
         read: usize,
     ) -> Result<Self, WidthRefusal> {
-        Self::try_from(ReceiverWidthWire {
-            schema: RECEIVER_WIDTH_SCHEMA.to_owned(),
+        if diameter.is_negative() {
+            return Err(WidthRefusal::NegativeWidth {
+                declared: diameter.to_string(),
+            });
+        }
+        match &attaining {
+            WidthWitness::Pair { left, right } => {
+                if left >= right || *right >= read {
+                    return Err(WidthRefusal::WitnessOutsideReading {
+                        read,
+                        witness: format!("{attaining:?}"),
+                    });
+                }
+            }
+            WidthWitness::Coordinate { .. } => {}
+            WidthWitness::Point => {
+                if !diameter.is_zero() {
+                    return Err(WidthRefusal::WitnessOutsideReading {
+                        read,
+                        witness: "point witness with a nonzero diameter".to_owned(),
+                    });
+                }
+            }
+        }
+        Ok(Self {
             receiver: receiver.into(),
             lineage: lineage.into(),
             norm,
@@ -632,11 +587,6 @@ impl ReceiverWidth {
 }
 
 impl ReceiverWidth {
-    /// The serialized schema.
-    pub fn schema(&self) -> &str {
-        &self.schema
-    }
-
     /// The receiver whose reading this is.
     pub fn receiver(&self) -> &str {
         &self.receiver
@@ -685,8 +635,7 @@ impl ReceiverWidth {
 }
 
 /// How a width was attained: the content of the diameter, not a summary of it.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(tag = "witness", rename_all = "kebab-case")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum WidthWitness {
     /// The two enumerated members whose readings are furthest apart.
     Pair {
@@ -730,30 +679,11 @@ pub(crate) const INDEX_HORIZON_CEILING: usize = 1024;
 /// lexicographic order is imposed on it here. That is why this type derives no `Ord`.
 ///
 /// [implemented-exact] Both fields are private and the only constructors are [`Self::declare`] and
-/// [`Self::longitudinal_only`], which check both ceilings. The `Deserialize` route goes through
-/// `#[serde(try_from = ...)]` and re-runs those checks, so a remounted horizon cannot carry a
-/// declaration the library would have refused.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[serde(try_from = "HorizonWire")]
+/// [`Self::longitudinal_only`], which check both ceilings.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct Horizon {
     longitudinal: usize,
     index: usize,
-}
-
-/// The wire form of a [`Horizon`]. Deserializing one goes through this and the ceiling checks in
-/// `TryFrom`; there is no unchecked route.
-#[derive(Clone, Copy, Debug, Deserialize)]
-struct HorizonWire {
-    longitudinal: usize,
-    index: usize,
-}
-
-impl TryFrom<HorizonWire> for Horizon {
-    type Error = WidthRefusal;
-
-    fn try_from(wire: HorizonWire) -> Result<Self, Self::Error> {
-        Self::declare(wire.longitudinal, wire.index)
-    }
 }
 
 impl Horizon {
@@ -860,7 +790,6 @@ pub fn width_over_readings(
         }
     }
     Ok(ReceiverWidth {
-        schema: RECEIVER_WIDTH_SCHEMA.to_owned(),
         receiver: receiver.to_owned(),
         lineage: lineage.to_owned(),
         norm,
@@ -930,15 +859,7 @@ pub enum WidthRefusal {
         .0.receiver, .0.searched, .0.declared
     )]
     CoarserSearchedAtAnotherTolerance(Box<CoarserToleranceClaim>),
-    /// A remounted width declares a schema this module does not own.
-    #[error("a receiver width declaring schema {declared} is not a {expected}")]
-    WidthSchemaMismatch {
-        /// What the wire declared.
-        declared: String,
-        /// What this module owns.
-        expected: &'static str,
-    },
-    /// A remounted width declares a negative diameter. A diameter is a maximum of absolute
+    /// A declared width is negative. A diameter is a maximum of absolute
     /// separations and is never negative (`width_nonneg`).
     #[error(
         "a receiver width of {declared} is negative; a diameter is a maximum of absolute separations"
@@ -947,7 +868,7 @@ pub enum WidthRefusal {
         /// The declared diameter, as prose.
         declared: String,
     },
-    /// A remounted width's attaining witness does not index the reading it claims.
+    /// A declared width's attaining witness does not index the reading it claims.
     #[error("an attaining witness {witness} does not index a reading of {read} members")]
     WitnessOutsideReading {
         /// How many members the width claims to have read.

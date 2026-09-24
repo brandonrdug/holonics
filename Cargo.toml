@@ -1,25 +1,15 @@
-# The holonic body.
+# Holonics.
 #
-# One workspace, not six. The laboratory carried a root workspace of 772 packages
-# whose only purpose was to host a Bevy-era sandbox, and a separate soma
-# workspace of 190 that the actual body built against. The sandbox is not here.
-#
-# substrate — ordinal and relation atlases, local populations, branch lineage,
-# typed atomic membrane. `holonics::geometry` and the native mathematical owners in
-# `crates/holonic-engine` keep receiver-relative conduct exact over BigRational with
-# Sturm-certified algebraic roots; exterior float codewords and measurements keep their
-# declared codec/apparatus roles. Generator reflection lives in `holonics`;
-# `crates/holonic-life` is the membrane where the ecologies live.
-#
-# Excluded on purpose: the nvptx mount kernel pins its own nightly and publishes a
-# committed boundary artifact, so the host workspace never needs that target.
+# `crates/holonics` is the main library: the Holon law and its operators (ratio, geometry, holon,
+# navigator, receiver), exact over the rationals, with no float in a law. `crates/holonics-cuda`
+# is the CUDA realization, currently the device driver.
 [workspace]
 resolver = "2"
 members = [
   "crates/holonics",
   "crates/holonics-cuda",
 ]
-# The nvptx mount kernel pins its own nightly. Its committed PTX is included by mount,
+# The nvptx smoke kernel pins its own nightly. Its committed PTX is included by `mount-smoke`,
 # so the host workspace carries that boundary artifact without carrying the toolchain.
 exclude = [
   "accelerators/cuda-smoke",
@@ -31,22 +21,12 @@ edition = "2024"
 license = "MIT OR Apache-2.0"
 
 [workspace.dependencies]
-serde = { version = "1", features = ["derive", "rc"] }
-ron = "0.12"
-num-bigint = { version = "0.4", features = ["serde"] }
-num-rational = { version = "0.4", features = ["serde"] }
+num-bigint = "0.4"
+num-rational = "0.4"
 num-traits = "0.2"
-sha2 = "0.10"
 thiserror = "2"
 
 [profile.release]
 opt-level = 3
 lto = true
 
-# Native-rest admission authenticates multi-gigabyte exterior occurrences before any resident
-# deed.  Leaving the cryptographic apparatus in Cargo's unoptimized development profile turns a
-# bounded integrity receiver into a minutes-long host foreman and hides the actual CUDA
-# circulation.  This changes no semantic bit and widens no aperture; it only realizes SHA-256 on
-# the CPU at its intended apparatus grade during owner-local iteration.
-[profile.dev.package.sha2]
-opt-level = 3

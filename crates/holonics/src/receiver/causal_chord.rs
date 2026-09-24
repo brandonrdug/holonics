@@ -159,8 +159,7 @@ use std::collections::BTreeSet;
 
 use crate::ratio::Rat;
 use num_bigint::BigInt;
-use num_traits::{One, Signed, Zero};
-use serde::{Deserialize, Serialize};
+use num_traits::{One, Zero};
 use thiserror::Error;
 
 use crate::ratio::algebraic::{ExactInterval, ExactValueError};
@@ -170,9 +169,6 @@ use crate::ratio::polynomial::{
     ExactPolynomialError, RationalPolynomial, rational_root_census, rational_roots_by_lifting,
 };
 
-/// Serialized schema name for a returned chord.
-pub(crate) const CAUSAL_CHORD_SCHEMA: &str = "holonics.causal-chord.v1";
-
 // -------------------------------------------------------------------------------------------------
 // the linearization
 
@@ -181,15 +177,8 @@ pub(crate) const CAUSAL_CHORD_SCHEMA: &str = "holonics.causal-chord.v1";
 /// Every returned component carries its source and
 /// its transport path, so a column of `B` and a row of `C` each carry the name the caller declared
 /// for it, and [`ChordComponent`] repeats both.
-///
-/// A remounted linearization passes through [`Linearization::declared`]: the wire carries the same
-/// fields, and one whose excitation, readout or port-name counts do not agree with the state it
-/// carries is refused at the boundary rather than reconstructed past the constructor. The declared
-/// schema label is carried through unchanged, so a remounted chart is the chart it was.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(try_from = "LinearizationWire")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Linearization {
-    pub schema: String,
     pub lineage: String,
     /// `A`, `n × n`.
     pub state: ExactRatMatrix,
@@ -201,37 +190,6 @@ pub struct Linearization {
     pub sources: Vec<String>,
     /// One name per row of `C`.
     pub receivers: Vec<String>,
-}
-
-#[derive(Deserialize)]
-struct LinearizationWire {
-    schema: String,
-    lineage: String,
-    state: ExactRatMatrix,
-    excitation: ExactRatMatrix,
-    readout: ExactRatMatrix,
-    sources: Vec<String>,
-    receivers: Vec<String>,
-}
-
-impl TryFrom<LinearizationWire> for Linearization {
-    type Error = ChordRefusal;
-
-    fn try_from(wire: LinearizationWire) -> Result<Self, Self::Error> {
-        let mut remounted = Self::declared(
-            wire.lineage,
-            wire.state,
-            wire.excitation,
-            wire.readout,
-            wire.sources,
-            wire.receivers,
-        )?;
-        // `declared` stamps this module's current schema constant. The wire's own label is what
-        // the chart declared itself to be, so it is carried through rather than overwritten; every
-        // shape the constructor checks has been re-checked above it.
-        remounted.schema = wire.schema;
-        Ok(remounted)
-    }
 }
 
 impl Linearization {
@@ -283,7 +241,6 @@ impl Linearization {
             });
         }
         Ok(Self {
-            schema: CAUSAL_CHORD_SCHEMA.to_owned(),
             lineage: lineage.into(),
             state,
             excitation,
@@ -372,7 +329,6 @@ impl Linearization {
         }
         let inverse = chart.inverse().map_err(|_| ChordRefusal::SingularChart)?;
         Ok(Self {
-            schema: self.schema.clone(),
             lineage: format!("{}|rebased", self.lineage),
             state: chart.multiply(&self.state)?.multiply(&inverse)?,
             excitation: chart.multiply(&self.excitation)?,
@@ -390,17 +346,7 @@ impl Linearization {
 ///
 /// `adjugate[j]` is the matrix multiplying `s^{extent − 1 − j}`, so
 /// `adj(sI−A) = Σ_j adjugate[j] · s^{extent−1−j}`.
-///
-/// **A remounted expansion re-runs its own certificate.** The expansion does not carry `A`, but it
-/// determines it: the coefficient identities force `M_1 = I` and `M_2 − A M_1 = c_{n−1} I`, so
-/// `A = adjugate[1] − c_{n−1} I` (and `A = −c_0 I` at extent one). That recovered operator is fed
-/// back through [`certify_adjugate`], which re-derives all `extent + 1` matrix coefficient
-/// identities of `(sI−A)·adj(sI−A) = det(sI−A)·I` — the same work the constructor did, so the
-/// remount costs what the construction cost. A forged adjugate coefficient, a characteristic that
-/// is not monic of the declared degree, a certified-coefficient count that is not `extent + 1` and
-/// a residual that is not exactly zero are each refused by name.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(try_from = "ResolventExpansionWire")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ResolventExpansion {
     pub extent: usize,
     /// `det(sI − A)`, monic of degree `extent`, ascending coefficients.
@@ -412,84 +358,6 @@ pub struct ResolventExpansion {
     pub certified_coefficients: usize,
     /// Exactly zero. The largest absolute entry over every coefficient identity's difference.
     pub residual: Rat,
-}
-
-#[derive(Deserialize)]
-struct ResolventExpansionWire {
-    extent: usize,
-    characteristic: RationalPolynomial,
-    adjugate: Vec<ExactRatMatrix>,
-    certified_coefficients: usize,
-    residual: Rat,
-}
-
-impl TryFrom<ResolventExpansionWire> for ResolventExpansion {
-    type Error = ChordRefusal;
-
-    fn try_from(wire: ResolventExpansionWire) -> Result<Self, Self::Error> {
-        if wire.extent == 0 {
-            return Err(ChordRefusal::EmptyState);
-        }
-        if wire.adjugate.len() != wire.extent {
-            return Err(ChordRefusal::ExpansionWireDisagrees {
-                relation: "the number of adjugate coefficients against the declared extent",
-                declared: wire.extent.to_string(),
-                derived: wire.adjugate.len().to_string(),
-            });
-        }
-        for block in &wire.adjugate {
-            if block.rows() != wire.extent || block.columns() != wire.extent {
-                return Err(ChordRefusal::ExpansionWireDisagrees {
-                    relation: "an adjugate coefficient's shape against the declared extent",
-                    declared: format!("{extent}x{extent}", extent = wire.extent),
-                    derived: format!("{}x{}", block.rows(), block.columns()),
-                });
-            }
-        }
-        if wire.characteristic.degree() != Some(wire.extent) || !wire.characteristic.is_monic() {
-            return Err(ChordRefusal::ExpansionWireDisagrees {
-                relation: "the characteristic polynomial as a monic of the declared extent",
-                declared: format!("monic of degree {}", wire.extent),
-                derived: format!(
-                    "degree {:?}, monic {}",
-                    wire.characteristic.degree(),
-                    wire.characteristic.is_monic()
-                ),
-            });
-        }
-        if wire.certified_coefficients != wire.extent + 1 {
-            return Err(ChordRefusal::ExpansionWireDisagrees {
-                relation: "the certified coefficient count against the declared extent",
-                declared: wire.certified_coefficients.to_string(),
-                derived: (wire.extent + 1).to_string(),
-            });
-        }
-        if !wire.residual.is_zero() {
-            return Err(ChordRefusal::ExpansionWireDisagrees {
-                relation: "the certificate residual, which is exactly zero or there is no expansion",
-                declared: wire.residual.to_string(),
-                derived: "0".to_owned(),
-            });
-        }
-        // `A` is not carried, but the identities determine it: `M_1 = I` and
-        // `M_2 − A M_1 = c_{n−1} I`, so `A = M_2 − c_{n−1} I`; at extent one the only identity
-        // left is `−A M_1 = c_0 I`.
-        let identity = ExactRatMatrix::identity(wire.extent)?;
-        let state = if wire.extent == 1 {
-            identity.scaled(&-wire.characteristic.coefficient(0))
-        } else {
-            wire.adjugate[1]
-                .subtract(&identity.scaled(&wire.characteristic.coefficient(wire.extent - 1)))?
-        };
-        let residual = certify_adjugate(&state, &wire.characteristic, &wire.adjugate)?;
-        Ok(Self {
-            extent: wire.extent,
-            characteristic: wire.characteristic,
-            adjugate: wire.adjugate,
-            certified_coefficients: wire.certified_coefficients,
-            residual,
-        })
-    }
 }
 
 impl ResolventExpansion {
@@ -609,16 +477,7 @@ fn certify_adjugate(
 // the transfer function
 
 /// One `(receiver, source)` entry of `H(s)`, before and after exact cancellation.
-///
-/// **A remounted entry re-derives its own cancellation.** The gcd is recomputed from the numerator
-/// and denominator the same wire carries and compared to the declared `cancelled` — a proper
-/// divisor of the true gcd would still multiply back correctly, so the product relations alone are
-/// not enough — and the two factorizations `numerator = reduced_numerator · cancelled` and
-/// `denominator = reduced_denominator · cancelled` are then re-derived by exact polynomial
-/// multiplication. `certified_coefficients` is the extent, which the shared denominator's degree
-/// names, and `residual` is exactly zero.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(try_from = "TransferEntryWire")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TransferEntry {
     /// Row of `C`: the transport path.
     pub transport_path: usize,
@@ -642,109 +501,6 @@ pub struct TransferEntry {
     pub residual: Rat,
 }
 
-#[derive(Deserialize)]
-struct TransferEntryWire {
-    transport_path: usize,
-    receiver_name: String,
-    excitation: usize,
-    source_name: String,
-    numerator: RationalPolynomial,
-    denominator: RationalPolynomial,
-    cancelled: RationalPolynomial,
-    reduced_numerator: RationalPolynomial,
-    reduced_denominator: RationalPolynomial,
-    certified_coefficients: usize,
-    residual: Rat,
-}
-
-impl TryFrom<TransferEntryWire> for TransferEntry {
-    type Error = ChordRefusal;
-
-    fn try_from(wire: TransferEntryWire) -> Result<Self, Self::Error> {
-        let Some(extent) = wire.denominator.degree().filter(|degree| *degree > 0) else {
-            return Err(ChordRefusal::TransferWireDisagrees {
-                relation: "the shared denominator, which is `det(sI−A)` of the state's extent",
-                declared: format!("degree {:?}", wire.denominator.degree()),
-                derived: "a positive degree".to_owned(),
-            });
-        };
-        // The gcd, re-derived from the pair the wire carries rather than read off it.
-        let cancelled = if wire.numerator.is_zero() {
-            wire.denominator.made_monic()
-        } else {
-            wire.numerator.monic_gcd(&wire.denominator)?
-        };
-        if cancelled != wire.cancelled {
-            return Err(ChordRefusal::TransferWireDisagrees {
-                relation: "the cancelled gcd of the numerator and the denominator",
-                declared: format!("{:?}", wire.cancelled.coefficients()),
-                derived: format!("{:?}", cancelled.coefficients()),
-            });
-        }
-        let numerator = wire.reduced_numerator.times(&wire.cancelled);
-        if numerator != wire.numerator {
-            return Err(ChordRefusal::TransferWireDisagrees {
-                relation: "the numerator against its reduced factor times the cancellation",
-                declared: format!("{:?}", wire.numerator.coefficients()),
-                derived: format!("{:?}", numerator.coefficients()),
-            });
-        }
-        let denominator = wire.reduced_denominator.times(&wire.cancelled);
-        if denominator != wire.denominator {
-            return Err(ChordRefusal::TransferWireDisagrees {
-                relation: "the denominator against its reduced factor times the cancellation",
-                declared: format!("{:?}", wire.denominator.coefficients()),
-                derived: format!("{:?}", denominator.coefficients()),
-            });
-        }
-        if !wire.reduced_denominator.is_monic() {
-            return Err(ChordRefusal::TransferWireDisagrees {
-                relation: "the reduced denominator, which the entry returns monic",
-                declared: format!("{:?}", wire.reduced_denominator.leading()),
-                derived: "1".to_owned(),
-            });
-        }
-        if wire
-            .numerator
-            .degree()
-            .is_some_and(|degree| degree >= extent)
-        {
-            return Err(ChordRefusal::TransferWireDisagrees {
-                relation: "the numerator's degree, which `C adj(sI−A) B` holds below the extent",
-                declared: format!("{:?}", wire.numerator.degree()),
-                derived: format!("below {extent}"),
-            });
-        }
-        if wire.certified_coefficients != extent {
-            return Err(ChordRefusal::TransferWireDisagrees {
-                relation: "the certified coefficient count against the denominator's degree",
-                declared: wire.certified_coefficients.to_string(),
-                derived: extent.to_string(),
-            });
-        }
-        if !wire.residual.is_zero() {
-            return Err(ChordRefusal::TransferWireDisagrees {
-                relation: "the entry's certificate residual, which is exactly zero",
-                declared: wire.residual.to_string(),
-                derived: "0".to_owned(),
-            });
-        }
-        Ok(Self {
-            transport_path: wire.transport_path,
-            receiver_name: wire.receiver_name,
-            excitation: wire.excitation,
-            source_name: wire.source_name,
-            numerator: wire.numerator,
-            denominator: wire.denominator,
-            cancelled: wire.cancelled,
-            reduced_numerator: wire.reduced_numerator,
-            reduced_denominator: wire.reduced_denominator,
-            certified_coefficients: wire.certified_coefficients,
-            residual: wire.residual,
-        })
-    }
-}
-
 impl TransferEntry {
     /// Whether this source/receiver pair sees a cancellation at all.
     pub fn cancels(&self) -> bool {
@@ -753,17 +509,8 @@ impl TransferEntry {
 }
 
 /// **The exact transfer matrix of a linearization.**
-///
-/// **A remounted transfer matrix re-derives its atlas.** `atlas_denominator` is recomputed as the
-/// monic least common multiple of the entries' reduced denominators — the same computation the
-/// constructor ran — and `atlas_cancellation` is then pinned by the exact product
-/// `atlas_denominator · atlas_cancellation = det(sI−A)`. The entry population is checked to be the
-/// complete rectangular grid it claims, in the row-major order the constructor emits, with one
-/// name per index and the shared denominator on every entry.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(try_from = "TransferFunctionWire")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TransferFunction {
-    pub schema: String,
     pub lineage: String,
     pub extent: usize,
     pub expansion: ResolventExpansion,
@@ -774,133 +521,6 @@ pub struct TransferFunction {
     /// `det(sI−A) / atlas_denominator` — the modes **no** declared source excites or **no** declared
     /// receiver observes. Constant exactly when the declared atlas is complete for this operator.
     pub atlas_cancellation: RationalPolynomial,
-}
-
-#[derive(Deserialize)]
-struct TransferFunctionWire {
-    schema: String,
-    lineage: String,
-    extent: usize,
-    expansion: ResolventExpansion,
-    entries: Vec<TransferEntry>,
-    atlas_denominator: RationalPolynomial,
-    atlas_cancellation: RationalPolynomial,
-}
-
-impl TryFrom<TransferFunctionWire> for TransferFunction {
-    type Error = ChordRefusal;
-
-    fn try_from(wire: TransferFunctionWire) -> Result<Self, Self::Error> {
-        if wire.extent != wire.expansion.extent {
-            return Err(ChordRefusal::TransferWireDisagrees {
-                relation: "the declared extent against the expansion's own",
-                declared: wire.extent.to_string(),
-                derived: wire.expansion.extent.to_string(),
-            });
-        }
-        check_entry_grid(&wire.entries)?;
-        for entry in &wire.entries {
-            if entry.denominator != wire.expansion.characteristic {
-                return Err(ChordRefusal::TransferWireDisagrees {
-                    relation: "an entry's denominator against the shared characteristic polynomial",
-                    declared: format!("{:?}", entry.denominator.coefficients()),
-                    derived: format!("{:?}", wire.expansion.characteristic.coefficients()),
-                });
-            }
-        }
-        // The atlas denominator is the least common multiple of the reduced entry denominators,
-        // re-derived here rather than read off the wire.
-        let mut atlas_denominator = RationalPolynomial::one();
-        for entry in &wire.entries {
-            atlas_denominator = polynomial_lcm(&atlas_denominator, &entry.reduced_denominator)?;
-        }
-        if atlas_denominator != wire.atlas_denominator {
-            return Err(ChordRefusal::TransferWireDisagrees {
-                relation: "the atlas denominator against the lcm of the reduced entry denominators",
-                declared: format!("{:?}", wire.atlas_denominator.coefficients()),
-                derived: format!("{:?}", atlas_denominator.coefficients()),
-            });
-        }
-        let reassembled = wire.atlas_denominator.times(&wire.atlas_cancellation);
-        if reassembled != wire.expansion.characteristic {
-            return Err(ChordRefusal::TransferWireDisagrees {
-                relation: "the atlas denominator times the atlas cancellation against `det(sI−A)`",
-                declared: format!("{:?}", wire.expansion.characteristic.coefficients()),
-                derived: format!("{:?}", reassembled.coefficients()),
-            });
-        }
-        Ok(Self {
-            schema: wire.schema,
-            lineage: wire.lineage,
-            extent: wire.extent,
-            expansion: wire.expansion,
-            entries: wire.entries,
-            atlas_denominator: wire.atlas_denominator,
-            atlas_cancellation: wire.atlas_cancellation,
-        })
-    }
-}
-
-/// The entry population of a transfer matrix is the complete `receivers × sources` grid in
-/// row-major order, with one receiver name per row and one source name per column.
-///
-/// [`TransferFunction::entry`] is a linear search over these, so a wire that repeats an index, omits
-/// one, or names the same port two ways is a chart whose readings depend on which copy is found
-/// first. That is checkable from the entries alone and is checked.
-fn check_entry_grid(entries: &[TransferEntry]) -> Result<(), ChordRefusal> {
-    if entries.is_empty() {
-        return Ok(());
-    }
-    let receivers = entries
-        .iter()
-        .map(|entry| entry.transport_path)
-        .max()
-        .map_or(0, |top| top + 1);
-    let sources = entries
-        .iter()
-        .map(|entry| entry.excitation)
-        .max()
-        .map_or(0, |top| top + 1);
-    let expected =
-        receivers
-            .checked_mul(sources)
-            .ok_or_else(|| ChordRefusal::StateExtentOverflows {
-                extent: receivers.max(sources),
-            })?;
-    if entries.len() != expected {
-        return Err(ChordRefusal::TransferWireDisagrees {
-            relation: "the entry count against the port grid the indices declare",
-            declared: entries.len().to_string(),
-            derived: format!("{receivers}x{sources}"),
-        });
-    }
-    for (at, entry) in entries.iter().enumerate() {
-        let (row, column) = (at / sources, at % sources);
-        if entry.transport_path != row || entry.excitation != column {
-            return Err(ChordRefusal::TransferWireDisagrees {
-                relation: "an entry's port indices against its row-major position",
-                declared: format!("({}, {})", entry.transport_path, entry.excitation),
-                derived: format!("({row}, {column})"),
-            });
-        }
-        let named = &entries[row * sources];
-        if entry.receiver_name != named.receiver_name {
-            return Err(ChordRefusal::TransferWireDisagrees {
-                relation: "the receiver name of one transport path, named two ways",
-                declared: entry.receiver_name.clone(),
-                derived: named.receiver_name.clone(),
-            });
-        }
-        let named = &entries[column];
-        if entry.source_name != named.source_name {
-            return Err(ChordRefusal::TransferWireDisagrees {
-                relation: "the source name of one excitation, named two ways",
-                declared: entry.source_name.clone(),
-                derived: named.source_name.clone(),
-            });
-        }
-    }
-    Ok(())
 }
 
 impl TransferFunction {
@@ -1008,7 +628,6 @@ pub(crate) fn transfer_function(
         .made_monic()
         .divided_exactly_by(&atlas_denominator)?;
     Ok(TransferFunction {
-        schema: CAUSAL_CHORD_SCHEMA.to_owned(),
         lineage: linearization.lineage.clone(),
         extent,
         expansion,
@@ -1097,8 +716,7 @@ pub fn half_plane_from_symmetric(state: &ExactRatMatrix) -> Result<HalfPlaneCoun
 // poles
 
 /// How much of the pole reading a caller is asking for.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case")]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum PoleReading {
     /// Exact squarefree factors, multiplicities and rational poles. No isolation, no half-plane
     /// count. This is the reading a large exact operator can afford; the factor is still the pole's
@@ -1110,15 +728,7 @@ pub enum PoleReading {
 }
 
 /// One squarefree factor of the denominator, at one multiplicity.
-///
-/// **A remounted factor is tested against its own poles.** Every declared rational pole is
-/// evaluated on the factor and refused unless it vanishes exactly — one exact evaluation each, and
-/// a genuine re-derivation rather than a restatement — the factor is re-checked to be monic,
-/// squarefree and of the declared degree, and every isolating readout is refused unless the factor
-/// changes sign across it, which for a squarefree factor is exactly the statement that a real root
-/// lies inside. The half-plane count, when present, must place the factor's whole degree.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(try_from = "PoleFactorWire")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PoleFactor {
     /// **The pole's exact name.** Monic, squarefree, and the product of exactly those irreducible
     /// factors occurring with this multiplicity.
@@ -1134,270 +744,14 @@ pub struct PoleFactor {
     pub half_plane: Option<HalfPlaneCount>,
 }
 
-#[derive(Deserialize)]
-struct PoleFactorWire {
-    factor: RationalPolynomial,
-    multiplicity: u32,
-    degree: usize,
-    rational_poles: Vec<Rat>,
-    real_isolations: Vec<ExactInterval>,
-    half_plane: Option<HalfPlaneCount>,
-}
-
-impl TryFrom<PoleFactorWire> for PoleFactor {
-    type Error = ChordRefusal;
-
-    fn try_from(wire: PoleFactorWire) -> Result<Self, Self::Error> {
-        if wire.multiplicity == 0 {
-            return Err(ChordRefusal::PoleWireDisagrees {
-                relation: "the multiplicity of a factor, which is an index and starts at one",
-                declared: "0".to_owned(),
-                derived: "at least 1".to_owned(),
-            });
-        }
-        if wire.factor.degree() != Some(wire.degree) || !wire.factor.is_monic() {
-            return Err(ChordRefusal::PoleWireDisagrees {
-                relation: "the factor as a monic of the declared degree",
-                declared: format!("monic of degree {}", wire.degree),
-                derived: format!(
-                    "degree {:?}, monic {}",
-                    wire.factor.degree(),
-                    wire.factor.is_monic()
-                ),
-            });
-        }
-        if wire.degree > 0 && wire.factor.squarefree_part()? != wire.factor {
-            return Err(ChordRefusal::PoleWireDisagrees {
-                relation: "the factor, which a squarefree decomposition returns squarefree",
-                declared: format!("{:?}", wire.factor.coefficients()),
-                derived: format!("{:?}", wire.factor.squarefree_part()?.coefficients()),
-            });
-        }
-        if wire.rational_poles.len() > wire.degree {
-            return Err(ChordRefusal::PoleWireDisagrees {
-                relation: "the rational pole count against the factor's degree",
-                declared: wire.rational_poles.len().to_string(),
-                derived: format!("at most {}", wire.degree),
-            });
-        }
-        for (at, pole) in wire.rational_poles.iter().enumerate() {
-            if wire.rational_poles[..at].contains(pole) {
-                return Err(ChordRefusal::PoleWireDisagrees {
-                    relation: "a rational pole listed twice on one squarefree factor",
-                    declared: pole.to_string(),
-                    derived: "listed once".to_owned(),
-                });
-            }
-            // The real re-derivation: the declared pole is a root of the factor, or it is not a
-            // pole of it.
-            if !wire.factor.evaluate(pole).is_zero() {
-                return Err(ChordRefusal::PoleWireDisagrees {
-                    relation: "a declared rational pole evaluated on the factor it names",
-                    declared: pole.to_string(),
-                    derived: wire.factor.evaluate(pole).to_string(),
-                });
-            }
-        }
-        for pair in wire.real_isolations.windows(2) {
-            if pair[0].upper > pair[1].lower {
-                return Err(ChordRefusal::PoleWireDisagrees {
-                    relation: "the isolating readouts, which are ascending and pairwise disjoint",
-                    declared: format!(
-                        "[{}, {}] then [{}, {}]",
-                        pair[0].lower, pair[0].upper, pair[1].lower, pair[1].upper
-                    ),
-                    derived: "ascending, disjoint".to_owned(),
-                });
-            }
-        }
-        if wire.real_isolations.len() > wire.degree {
-            return Err(ChordRefusal::PoleWireDisagrees {
-                relation: "the isolating readout count against the factor's degree",
-                declared: wire.real_isolations.len().to_string(),
-                derived: format!("at most {}", wire.degree),
-            });
-        }
-        for interval in &wire.real_isolations {
-            let low = wire.factor.evaluate(&interval.lower);
-            let high = wire.factor.evaluate(&interval.upper);
-            if low.is_zero() || high.is_zero() || low.is_negative() == high.is_negative() {
-                return Err(ChordRefusal::PoleWireDisagrees {
-                    relation: "an isolating readout, across which a squarefree factor changes sign",
-                    declared: format!("[{}, {}]", interval.lower, interval.upper),
-                    derived: format!("f = {low} and {high} at the endpoints"),
-                });
-            }
-        }
-        if let Some(count) = &wire.half_plane
-            && (count.degree != wire.degree || count.total() != wire.degree)
-        {
-            return Err(ChordRefusal::PoleWireDisagrees {
-                relation: "the factor's half-plane population against its degree",
-                declared: format!("degree {}, left+axis+right {}", count.degree, count.total()),
-                derived: wire.degree.to_string(),
-            });
-        }
-        Ok(Self {
-            factor: wire.factor,
-            multiplicity: wire.multiplicity,
-            degree: wire.degree,
-            rational_poles: wire.rational_poles,
-            real_isolations: wire.real_isolations,
-            half_plane: wire.half_plane,
-        })
-    }
-}
-
 /// The complete pole population of one denominator.
-///
-/// **A remounted atlas re-multiplies its own factorization.** `∏ factor^multiplicity` is formed
-/// exactly and refused unless it is the denominator the atlas carries — which subsumes
-/// [`PoleAtlas::accounted`] and is the statement the squarefree decomposition makes. The declared
-/// reading decides exactly which readouts may be present, and under
-/// [`PoleReading::Certified`] the whole denominator's half-plane population must be the factors'
-/// own, summed with multiplicity.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(try_from = "PoleAtlasWire")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PoleAtlas {
     pub denominator: RationalPolynomial,
     pub reading: PoleReading,
     pub factors: Vec<PoleFactor>,
     /// For the whole denominator, with multiplicity. Present only under [`PoleReading::Certified`].
     pub half_plane: Option<HalfPlaneCount>,
-}
-
-#[derive(Deserialize)]
-struct PoleAtlasWire {
-    denominator: RationalPolynomial,
-    reading: PoleReading,
-    factors: Vec<PoleFactor>,
-    half_plane: Option<HalfPlaneCount>,
-}
-
-impl TryFrom<PoleAtlasWire> for PoleAtlas {
-    type Error = ChordRefusal;
-
-    fn try_from(wire: PoleAtlasWire) -> Result<Self, Self::Error> {
-        let Some(degree) = wire.denominator.degree() else {
-            return Err(ChordRefusal::Polynomial(
-                ExactPolynomialError::ZeroPolynomial,
-            ));
-        };
-        if !wire.denominator.is_monic() {
-            return Err(ChordRefusal::PoleWireDisagrees {
-                relation: "the denominator, which the atlas returns monic",
-                declared: format!("{:?}", wire.denominator.leading()),
-                derived: "1".to_owned(),
-            });
-        }
-        for pair in wire.factors.windows(2) {
-            if pair[0].multiplicity >= pair[1].multiplicity {
-                return Err(ChordRefusal::PoleWireDisagrees {
-                    relation: "the factors, keyed by strictly ascending multiplicity",
-                    declared: format!("{} then {}", pair[0].multiplicity, pair[1].multiplicity),
-                    derived: "strictly ascending".to_owned(),
-                });
-            }
-        }
-        // A multiplicity sizes the re-multiplication below, so it is bounded against the degree it
-        // has to account for **before** anything is formed from it: `i · deg V_i ≤ n` with
-        // `deg V_i ≥ 1` gives `i ≤ n`, and a hostile `u32` is refused here rather than run.
-        for factor in &wire.factors {
-            if factor.multiplicity as usize > degree {
-                return Err(ChordRefusal::PoleWireDisagrees {
-                    relation: "a factor's multiplicity against the degree it has to account for",
-                    declared: factor.multiplicity.to_string(),
-                    derived: format!("at most {degree}"),
-                });
-            }
-        }
-        let accounted: usize = wire
-            .factors
-            .iter()
-            .map(|factor| factor.degree * factor.multiplicity as usize)
-            .sum();
-        if accounted != degree {
-            return Err(ChordRefusal::PoleWireDisagrees {
-                relation: "the degree the factors account for against the denominator's own",
-                declared: accounted.to_string(),
-                derived: degree.to_string(),
-            });
-        }
-        let mut product = RationalPolynomial::one();
-        for factor in &wire.factors {
-            for _ in 0..factor.multiplicity {
-                product = product.times(&factor.factor);
-            }
-        }
-        if product != wire.denominator {
-            return Err(ChordRefusal::PoleWireDisagrees {
-                relation: "the product of the factors at their multiplicities against the denominator",
-                declared: format!("{:?}", wire.denominator.coefficients()),
-                derived: format!("{:?}", product.coefficients()),
-            });
-        }
-        let certified = matches!(wire.reading, PoleReading::Certified);
-        if wire.half_plane.is_some() != certified {
-            return Err(ChordRefusal::PoleWireDisagrees {
-                relation: "the half-plane count, present exactly under the certified reading",
-                declared: format!("present {}", wire.half_plane.is_some()),
-                derived: format!("present {certified}"),
-            });
-        }
-        for factor in &wire.factors {
-            let expected = certified && factor.degree > 0;
-            if factor.half_plane.is_some() != expected {
-                return Err(ChordRefusal::PoleWireDisagrees {
-                    relation: "a factor's half-plane count against the atlas's declared reading",
-                    declared: format!("present {}", factor.half_plane.is_some()),
-                    derived: format!("present {expected}"),
-                });
-            }
-            if !certified && !factor.real_isolations.is_empty() {
-                return Err(ChordRefusal::PoleWireDisagrees {
-                    relation: "a factor's isolating readouts, which the named reading does not take",
-                    declared: factor.real_isolations.len().to_string(),
-                    derived: "0".to_owned(),
-                });
-            }
-        }
-        if let Some(count) = &wire.half_plane {
-            let mut summed = HalfPlaneCount {
-                degree,
-                ..HalfPlaneCount::default()
-            };
-            for factor in &wire.factors {
-                let Some(part) = &factor.half_plane else {
-                    continue;
-                };
-                let times = factor.multiplicity as usize;
-                summed.left += part.left * times;
-                summed.axis += part.axis * times;
-                summed.right += part.right * times;
-            }
-            if (count.degree, count.left, count.axis, count.right)
-                != (degree, summed.left, summed.axis, summed.right)
-            {
-                return Err(ChordRefusal::PoleWireDisagrees {
-                    relation: "the denominator's half-plane population against its factors', summed with multiplicity",
-                    declared: format!(
-                        "degree {}, left {}, axis {}, right {}",
-                        count.degree, count.left, count.axis, count.right
-                    ),
-                    derived: format!(
-                        "degree {degree}, left {}, axis {}, right {}",
-                        summed.left, summed.axis, summed.right
-                    ),
-                });
-            }
-        }
-        Ok(Self {
-            denominator: wire.denominator,
-            reading: wire.reading,
-            factors: wire.factors,
-            half_plane: wire.half_plane,
-        })
-    }
 }
 
 impl PoleAtlas {
@@ -1517,14 +871,7 @@ pub fn pole_atlas(
 // residues
 
 /// The residue of one transfer entry at one pole.
-///
-/// **A remounted residue carries its order in two places and they must agree.** The Laurent tail
-/// runs `c_{−order} … c_{−1}`, so its length is the order; an algebraic residue's coefficients are
-/// elements of `Q[x]/(factor)` and must be reduced there, which is one degree comparison each. The
-/// numerator and denominator the coefficients came from are not carried, so the values themselves
-/// are testimony about a transfer entry; what is checkable without it is checked.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case", try_from = "ChordResidueWire")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ChordResidue {
     /// A rational pole. The Laurent coefficients `c_{−order} … c_{−1}`, so the last entry is the
     /// residue proper and the earlier ones are the higher-order parts of the pole.
@@ -1541,84 +888,6 @@ pub enum ChordResidue {
         order: u32,
         laurent: Vec<RationalPolynomial>,
     },
-}
-
-#[derive(Deserialize)]
-#[serde(rename_all = "kebab-case")]
-enum ChordResidueWire {
-    Rational {
-        pole: Rat,
-        order: u32,
-        laurent: Vec<Rat>,
-    },
-    Algebraic {
-        factor: RationalPolynomial,
-        order: u32,
-        laurent: Vec<RationalPolynomial>,
-    },
-}
-
-impl TryFrom<ChordResidueWire> for ChordResidue {
-    type Error = ChordRefusal;
-
-    fn try_from(wire: ChordResidueWire) -> Result<Self, Self::Error> {
-        match wire {
-            ChordResidueWire::Rational {
-                pole,
-                order,
-                laurent,
-            } => {
-                if order == 0 || laurent.len() != order as usize {
-                    return Err(ChordRefusal::PoleOrderDisagrees { order });
-                }
-                Ok(Self::Rational {
-                    pole,
-                    order,
-                    laurent,
-                })
-            }
-            ChordResidueWire::Algebraic {
-                factor,
-                order,
-                laurent,
-            } => {
-                if order == 0 || laurent.len() != order as usize {
-                    return Err(ChordRefusal::PoleOrderDisagrees { order });
-                }
-                let Some(modulus) = factor.degree().filter(|degree| *degree > 0) else {
-                    return Err(ChordRefusal::ChordWireDisagrees {
-                        object: "an algebraic residue",
-                        relation: "the factor naming the pole, which is nonconstant",
-                        declared: format!("degree {:?}", factor.degree()),
-                        derived: "a positive degree".to_owned(),
-                    });
-                };
-                if !factor.is_monic() {
-                    return Err(ChordRefusal::ChordWireDisagrees {
-                        object: "an algebraic residue",
-                        relation: "the factor naming the pole, which is monic",
-                        declared: format!("{:?}", factor.leading()),
-                        derived: "1".to_owned(),
-                    });
-                }
-                for coefficient in &laurent {
-                    if coefficient.degree().is_some_and(|degree| degree >= modulus) {
-                        return Err(ChordRefusal::ChordWireDisagrees {
-                            object: "an algebraic residue",
-                            relation: "a Laurent coefficient reduced in `Q[x]/(factor)`",
-                            declared: format!("degree {:?}", coefficient.degree()),
-                            derived: format!("below {modulus}"),
-                        });
-                    }
-                }
-                Ok(Self::Algebraic {
-                    factor,
-                    order,
-                    laurent,
-                })
-            }
-        }
-    }
 }
 
 impl ChordResidue {
@@ -1802,16 +1071,7 @@ fn taylor_series_modulo(
 
 /// Which state coordinates participate in one rational eigenvalue's modes, and which ports reach
 /// them.
-///
-/// **A remounted support re-derives its own support.** `support` is documented as the state
-/// coordinates carrying a nonzero entry in some right eigenvector, which the eigenvectors the
-/// struct already carries determine completely, so it is recomputed and refused on disagreement.
-/// The geometric multiplicity is the eigenvector count, it cannot pass the algebraic one, and every
-/// eigenvector and covector is nonzero and of one common width. Which ports pair nontrivially is a
-/// statement about `B` and `C`, which this struct does not carry, so those two index lists are
-/// testimony; that they are ascending and repeat nothing is checkable and is checked.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(try_from = "ModeSupportWire")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ModeSupport {
     pub eigenvalue: Rat,
     pub algebraic_multiplicity: usize,
@@ -1828,113 +1088,6 @@ pub struct ModeSupport {
     /// Rows of `C` that pair nontrivially with some right eigenvector: the receivers that observe
     /// it.
     pub observed_receivers: Vec<usize>,
-}
-
-#[derive(Deserialize)]
-struct ModeSupportWire {
-    eigenvalue: Rat,
-    algebraic_multiplicity: usize,
-    geometric_multiplicity: usize,
-    eigenvectors: Vec<Vec<Rat>>,
-    left_eigenvectors: Vec<Vec<Rat>>,
-    support: Vec<usize>,
-    excited_sources: Vec<usize>,
-    observed_receivers: Vec<usize>,
-}
-
-impl TryFrom<ModeSupportWire> for ModeSupport {
-    type Error = ChordRefusal;
-
-    fn try_from(wire: ModeSupportWire) -> Result<Self, Self::Error> {
-        if wire.algebraic_multiplicity == 0 {
-            return Err(ChordRefusal::ChordWireDisagrees {
-                object: "a mode support",
-                relation: "the algebraic multiplicity of a listed eigenvalue",
-                declared: "0".to_owned(),
-                derived: "at least 1".to_owned(),
-            });
-        }
-        if wire.geometric_multiplicity != wire.eigenvectors.len() {
-            return Err(ChordRefusal::ChordWireDisagrees {
-                object: "a mode support",
-                relation: "the geometric multiplicity against the exhibited eigenvector count",
-                declared: wire.geometric_multiplicity.to_string(),
-                derived: wire.eigenvectors.len().to_string(),
-            });
-        }
-        if wire.geometric_multiplicity > wire.algebraic_multiplicity {
-            return Err(ChordRefusal::ChordWireDisagrees {
-                object: "a mode support",
-                relation: "the geometric multiplicity, which cannot pass the algebraic one",
-                declared: wire.geometric_multiplicity.to_string(),
-                derived: format!("at most {}", wire.algebraic_multiplicity),
-            });
-        }
-        let extent = wire
-            .eigenvectors
-            .iter()
-            .chain(&wire.left_eigenvectors)
-            .map(Vec::len)
-            .max()
-            .unwrap_or(0);
-        for vector in wire.eigenvectors.iter().chain(&wire.left_eigenvectors) {
-            if vector.len() != extent {
-                return Err(ChordRefusal::ChordWireDisagrees {
-                    object: "a mode support",
-                    relation: "an eigenvector's width against the state's extent",
-                    declared: vector.len().to_string(),
-                    derived: extent.to_string(),
-                });
-            }
-            if vector.iter().all(Zero::is_zero) {
-                return Err(ChordRefusal::ChordWireDisagrees {
-                    object: "a mode support",
-                    relation: "an exhibited eigenvector, which is never the zero vector",
-                    declared: "0".to_owned(),
-                    derived: "a nonzero vector".to_owned(),
-                });
-            }
-        }
-        // The support is a property of the exhibited eigenvectors, so it is re-derived from them.
-        let support: Vec<usize> = (0..extent)
-            .filter(|at| {
-                wire.eigenvectors
-                    .iter()
-                    .any(|vector| !vector[*at].is_zero())
-            })
-            .collect();
-        if support != wire.support {
-            return Err(ChordRefusal::ChordWireDisagrees {
-                object: "a mode support",
-                relation: "the carried support against the exhibited eigenvectors' own",
-                declared: format!("{:?}", wire.support),
-                derived: format!("{support:?}"),
-            });
-        }
-        for (name, indices) in [
-            ("the excited sources", &wire.excited_sources),
-            ("the observed receivers", &wire.observed_receivers),
-        ] {
-            if indices.windows(2).any(|pair| pair[0] >= pair[1]) {
-                return Err(ChordRefusal::ChordWireDisagrees {
-                    object: "a mode support",
-                    relation: name,
-                    declared: format!("{indices:?}"),
-                    derived: "strictly ascending port indices".to_owned(),
-                });
-            }
-        }
-        Ok(Self {
-            eigenvalue: wire.eigenvalue,
-            algebraic_multiplicity: wire.algebraic_multiplicity,
-            geometric_multiplicity: wire.geometric_multiplicity,
-            eigenvectors: wire.eigenvectors,
-            left_eigenvectors: wire.left_eigenvectors,
-            support: wire.support,
-            excited_sources: wire.excited_sources,
-            observed_receivers: wire.observed_receivers,
-        })
-    }
 }
 
 impl ModeSupport {
@@ -2040,12 +1193,7 @@ pub(crate) fn rational_mode_supports(
 // the resolvent at a Gaussian-rational probe point
 
 /// A Gaussian-rational probe point `σ + iω`. Exact; there is no float anywhere near it.
-///
-/// **This carries no certificate and no invariant, so its wire adds nothing.** Every pair of
-/// rationals is a lawful Gaussian rational; there is no relation between the two fields to check
-/// and no third field to check them against. Whether the point is a pole of a particular resolvent
-/// is [`resolvent_probe`]'s refusal and not the point's.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ProbePoint {
     pub real: Rat,
     pub imaginary: Rat,
@@ -2062,16 +1210,7 @@ impl ProbePoint {
 }
 
 /// `(sI − A)^{-1}` and `C (sI − A)^{-1} B` at one exact probe point.
-///
-/// **A remounted probe re-derives its own norm.** `resolvent_frobenius_squared` is the exact sum of
-/// the squared entries of the two resolvent parts the probe already carries, so it is recomputed
-/// and refused on disagreement — and it is the reading the module head says governs a non-normal
-/// response, so a forged one is the forgery that matters. The inverse certificate is a statement
-/// about `A`, which the probe does not carry, so the probe is testimony about that operator; that
-/// the residual is exactly zero and the two parts share one square shape is checkable and is
-/// checked.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(try_from = "ResolventProbeWire")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ResolventProbe {
     pub lineage: String,
     pub point: ProbePoint,
@@ -2084,90 +1223,6 @@ pub struct ResolventProbe {
     pub resolvent_frobenius_squared: Rat,
     /// Exactly zero: `(sI−A)(sI−A)^{-1} − I`, largest absolute entry over both parts.
     pub residual: Rat,
-}
-
-#[derive(Deserialize)]
-struct ResolventProbeWire {
-    lineage: String,
-    point: ProbePoint,
-    resolvent_real: ExactRatMatrix,
-    resolvent_imaginary: ExactRatMatrix,
-    response_real: ExactRatMatrix,
-    response_imaginary: ExactRatMatrix,
-    resolvent_frobenius_squared: Rat,
-    residual: Rat,
-}
-
-impl TryFrom<ResolventProbeWire> for ResolventProbe {
-    type Error = ChordRefusal;
-
-    fn try_from(wire: ResolventProbeWire) -> Result<Self, Self::Error> {
-        if !wire.resolvent_real.is_square()
-            || wire.resolvent_real.rows() != wire.resolvent_imaginary.rows()
-            || wire.resolvent_real.columns() != wire.resolvent_imaginary.columns()
-        {
-            return Err(ChordRefusal::ChordWireDisagrees {
-                object: "a resolvent probe",
-                relation: "the two resolvent parts, one square operator read in two charts",
-                declared: format!(
-                    "{}x{} and {}x{}",
-                    wire.resolvent_real.rows(),
-                    wire.resolvent_real.columns(),
-                    wire.resolvent_imaginary.rows(),
-                    wire.resolvent_imaginary.columns()
-                ),
-                derived: "one common square shape".to_owned(),
-            });
-        }
-        if wire.response_real.rows() != wire.response_imaginary.rows()
-            || wire.response_real.columns() != wire.response_imaginary.columns()
-        {
-            return Err(ChordRefusal::ChordWireDisagrees {
-                object: "a resolvent probe",
-                relation: "the two response parts, one matrix read in two charts",
-                declared: format!(
-                    "{}x{} and {}x{}",
-                    wire.response_real.rows(),
-                    wire.response_real.columns(),
-                    wire.response_imaginary.rows(),
-                    wire.response_imaginary.columns()
-                ),
-                derived: "one common shape".to_owned(),
-            });
-        }
-        if !wire.residual.is_zero() {
-            return Err(ChordRefusal::ChordWireDisagrees {
-                object: "a resolvent probe",
-                relation: "the inverse certificate's residual, which is exactly zero",
-                declared: wire.residual.to_string(),
-                derived: "0".to_owned(),
-            });
-        }
-        let frobenius = wire
-            .resolvent_real
-            .entries()
-            .iter()
-            .chain(wire.resolvent_imaginary.entries())
-            .fold(Rat::zero(), |sum, entry| sum + entry * entry);
-        if frobenius != wire.resolvent_frobenius_squared {
-            return Err(ChordRefusal::ChordWireDisagrees {
-                object: "a resolvent probe",
-                relation: "the squared Frobenius norm against the resolvent entries it sums",
-                declared: wire.resolvent_frobenius_squared.to_string(),
-                derived: frobenius.to_string(),
-            });
-        }
-        Ok(Self {
-            lineage: wire.lineage,
-            point: wire.point,
-            resolvent_real: wire.resolvent_real,
-            resolvent_imaginary: wire.resolvent_imaginary,
-            response_real: wire.response_real,
-            response_imaginary: wire.response_imaginary,
-            resolvent_frobenius_squared: wire.resolvent_frobenius_squared,
-            residual: wire.residual,
-        })
-    }
 }
 
 /// The exact resolvent at a Gaussian-rational point, by realification over `Q`.
@@ -2356,16 +1411,7 @@ pub fn is_semisimple(state: &ExactRatMatrix) -> Result<bool, ChordRefusal> {
 /// When neither happens the answer is `None`. Deciding whether a linear subspace of symmetric
 /// forms meets the positive definite cone is a feasibility question this receiver does not claim
 /// to answer, and it says so rather than defaulting.
-///
-/// **A remounted space re-derives both of its answers.** A vanishing diagonal is a diagonal
-/// coordinate on which the *whole* subspace vanishes, which the exhibited basis decides completely,
-/// so the list is recomputed from the basis and refused on disagreement. An exhibited witness is
-/// re-certified through [`crate::ratio::linear::inertia::inertia`] and re-solved for membership in the span of the
-/// basis, because a positive definite form that is not in the subspace is not a conserving
-/// receiver. The subspace is a statement about a generator the struct does not carry, so which
-/// forms are in it at all is testimony; everything the exhibited basis decides is decided.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(try_from = "ConservingReceiverSpaceWire")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ConservingReceiverSpace {
     pub extent: usize,
     pub basis: Vec<SymmetricForm>,
@@ -2373,100 +1419,6 @@ pub struct ConservingReceiverSpace {
     pub vanishing_diagonals: Vec<usize>,
     /// An exhibited positive definite member.
     pub witness: Option<SymmetricForm>,
-}
-
-#[derive(Deserialize)]
-struct ConservingReceiverSpaceWire {
-    extent: usize,
-    basis: Vec<SymmetricForm>,
-    vanishing_diagonals: Vec<usize>,
-    witness: Option<SymmetricForm>,
-}
-
-impl TryFrom<ConservingReceiverSpaceWire> for ConservingReceiverSpace {
-    type Error = ChordRefusal;
-
-    fn try_from(wire: ConservingReceiverSpaceWire) -> Result<Self, Self::Error> {
-        for form in wire.basis.iter().chain(wire.witness.as_ref()) {
-            if form.extent() != wire.extent {
-                return Err(ChordRefusal::ChordWireDisagrees {
-                    object: "a conserving receiver space",
-                    relation: "an exhibited form's extent against the declared one",
-                    declared: form.extent().to_string(),
-                    derived: wire.extent.to_string(),
-                });
-            }
-        }
-        // The refutation is read straight off the basis: only the `index`-th diagonal unit
-        // contributes to the `(index, index)` entry, so a coordinate vanishes on the subspace
-        // exactly when every basis form's diagonal entry there is zero.
-        let vanishing_diagonals: Vec<usize> = (0..wire.extent)
-            .filter(|index| {
-                wire.basis
-                    .iter()
-                    .all(|form| form.at(*index, *index).is_zero())
-            })
-            .collect();
-        if vanishing_diagonals != wire.vanishing_diagonals {
-            return Err(ChordRefusal::ChordWireDisagrees {
-                object: "a conserving receiver space",
-                relation: "the vanishing diagonals against the exhibited basis's own",
-                declared: format!("{:?}", wire.vanishing_diagonals),
-                derived: format!("{vanishing_diagonals:?}"),
-            });
-        }
-        if let Some(witness) = &wire.witness {
-            if !inertia(witness).is_positive_definite() {
-                return Err(ChordRefusal::ChordWireDisagrees {
-                    object: "a conserving receiver space",
-                    relation: "the exhibited witness, which Sylvester's signature must certify",
-                    declared: format!("{:?}", inertia(witness).signature()),
-                    derived: format!("({}, 0)", wire.extent),
-                });
-            }
-            if !form_is_spanned(witness, &wire.basis)? {
-                return Err(ChordRefusal::ChordWireDisagrees {
-                    object: "a conserving receiver space",
-                    relation: "the exhibited witness, which lies in the span of the solved basis",
-                    declared: "outside the subspace".to_owned(),
-                    derived: "a member of it".to_owned(),
-                });
-            }
-        }
-        Ok(Self {
-            extent: wire.extent,
-            basis: wire.basis,
-            vanishing_diagonals: wire.vanishing_diagonals,
-            witness: wire.witness,
-        })
-    }
-}
-
-/// Whether a symmetric form is a rational combination of the given ones, decided exactly.
-///
-/// The forms are flattened to their `extent²` coordinates and the membership question is one
-/// preimage solve through the exact linear carrier. An empty basis spans only the zero form.
-fn form_is_spanned(form: &SymmetricForm, basis: &[SymmetricForm]) -> Result<bool, ChordRefusal> {
-    let extent = form.extent();
-    let coordinates = conserving_equation_count(extent)?;
-    let target: Vec<Rat> = (0..extent)
-        .flat_map(|row| (0..extent).map(move |column| (row, column)))
-        .map(|(row, column)| form.at(row, column).clone())
-        .collect();
-    if basis.is_empty() {
-        return Ok(target.iter().all(Zero::is_zero));
-    }
-    let rows: Vec<Vec<Rat>> = (0..coordinates)
-        .map(|at| {
-            let (row, column) = (at / extent, at % extent);
-            basis
-                .iter()
-                .map(|member| member.at(row, column).clone())
-                .collect()
-        })
-        .collect();
-    let operator = ExactRatMatrix::shaped(coordinates, basis.len(), rows)?;
-    Ok(operator.preimage_fibre(&target)?.is_some())
 }
 
 impl ConservingReceiverSpace {
@@ -2634,17 +1586,7 @@ fn integer_matrix(rows: &[&[i64]]) -> ExactRatMatrix {
 /// Every field the plan requires is here: the source and its lineage, the excitation (the column of
 /// `B`), the transport path (the row of `C`), the pole's exact name, its residue, the participating
 /// state coordinates, the approximation error and the residual.
-///
-/// **A remounted component is held to the one statement it makes twice.** The pole is named in the
-/// factor, in `rational_pole` and again inside the residue, so a rational component must carry
-/// `x − pole` as its factor and a `Rational` residue at that pole, an algebraic one must carry an
-/// `Algebraic` residue at the same factor, the residue's order is the multiplicity, and
-/// `ApproximationError::Exact` is present exactly on the rational case. The isolating interval a
-/// component may carry is the *squarefree factor's* first real readout and not necessarily a
-/// readout of this component's own factor — the rational roots have been divided out of it — so it
-/// is not tested against the factor here; that would refuse lawful components.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(try_from = "ChordComponentWire")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ChordComponent {
     pub lineage: String,
     pub source_name: String,
@@ -2668,146 +1610,8 @@ pub struct ChordComponent {
     pub residual: Rat,
 }
 
-#[derive(Deserialize)]
-struct ChordComponentWire {
-    lineage: String,
-    source_name: String,
-    excitation: usize,
-    receiver_name: String,
-    transport_path: usize,
-    pole_factor: RationalPolynomial,
-    multiplicity: u32,
-    rational_pole: Option<Rat>,
-    residue: ChordResidue,
-    support: Vec<usize>,
-    approximation_error: ApproximationError,
-    residual: Rat,
-}
-
-impl TryFrom<ChordComponentWire> for ChordComponent {
-    type Error = ChordRefusal;
-
-    fn try_from(wire: ChordComponentWire) -> Result<Self, Self::Error> {
-        if wire.multiplicity == 0 {
-            return Err(ChordRefusal::PoleOrderDisagrees { order: 0 });
-        }
-        if wire.pole_factor.degree().is_none_or(|degree| degree == 0)
-            || !wire.pole_factor.is_monic()
-        {
-            return Err(ChordRefusal::ChordWireDisagrees {
-                object: "a chord component",
-                relation: "the pole's exact name, a monic nonconstant factor",
-                declared: format!(
-                    "degree {:?}, monic {}",
-                    wire.pole_factor.degree(),
-                    wire.pole_factor.is_monic()
-                ),
-                derived: "monic of positive degree".to_owned(),
-            });
-        }
-        match (&wire.rational_pole, &wire.residue) {
-            (
-                Some(pole),
-                ChordResidue::Rational {
-                    pole: named, order, ..
-                },
-            ) => {
-                if named != pole {
-                    return Err(ChordRefusal::ChordWireDisagrees {
-                        object: "a chord component",
-                        relation: "the rational pole, named once beside the residue and once inside it",
-                        declared: pole.to_string(),
-                        derived: named.to_string(),
-                    });
-                }
-                let linear = RationalPolynomial::new(vec![-pole.clone(), Rat::one()]);
-                if wire.pole_factor != linear {
-                    return Err(ChordRefusal::ChordWireDisagrees {
-                        object: "a chord component",
-                        relation: "the factor naming a rational pole, which is `x − pole`",
-                        declared: format!("{:?}", wire.pole_factor.coefficients()),
-                        derived: format!("{:?}", linear.coefficients()),
-                    });
-                }
-                if *order != wire.multiplicity {
-                    return Err(ChordRefusal::PoleOrderDisagrees { order: *order });
-                }
-            }
-            (None, ChordResidue::Algebraic { factor, order, .. }) => {
-                if factor != &wire.pole_factor {
-                    return Err(ChordRefusal::ChordWireDisagrees {
-                        object: "a chord component",
-                        relation: "the pole's factor, named once beside the residue and once inside it",
-                        declared: format!("{:?}", wire.pole_factor.coefficients()),
-                        derived: format!("{:?}", factor.coefficients()),
-                    });
-                }
-                if *order != wire.multiplicity {
-                    return Err(ChordRefusal::PoleOrderDisagrees { order: *order });
-                }
-            }
-            _ => {
-                return Err(ChordRefusal::ChordWireDisagrees {
-                    object: "a chord component",
-                    relation: "the residue's species against whether the pole is rational",
-                    declared: format!("rational pole {}", wire.rational_pole.is_some()),
-                    derived: format!(
-                        "rational residue {}",
-                        matches!(wire.residue, ChordResidue::Rational { .. })
-                    ),
-                });
-            }
-        }
-        let exact = matches!(wire.approximation_error, ApproximationError::Exact);
-        if exact != wire.rational_pole.is_some() {
-            return Err(ChordRefusal::ChordWireDisagrees {
-                object: "a chord component",
-                relation: "the approximation error, which is exact on exactly the rational poles",
-                declared: format!("exact {exact}"),
-                derived: format!("exact {}", wire.rational_pole.is_some()),
-            });
-        }
-        if wire.support.windows(2).any(|pair| pair[0] >= pair[1]) {
-            return Err(ChordRefusal::ChordWireDisagrees {
-                object: "a chord component",
-                relation: "the participating state coordinates",
-                declared: format!("{:?}", wire.support),
-                derived: "strictly ascending coordinates".to_owned(),
-            });
-        }
-        if !wire.residual.is_zero() {
-            return Err(ChordRefusal::ChordWireDisagrees {
-                object: "a chord component",
-                relation: "the transfer entry's certificate residual, which is exactly zero",
-                declared: wire.residual.to_string(),
-                derived: "0".to_owned(),
-            });
-        }
-        Ok(Self {
-            lineage: wire.lineage,
-            source_name: wire.source_name,
-            excitation: wire.excitation,
-            receiver_name: wire.receiver_name,
-            transport_path: wire.transport_path,
-            pole_factor: wire.pole_factor,
-            multiplicity: wire.multiplicity,
-            rational_pole: wire.rational_pole,
-            residue: wire.residue,
-            support: wire.support,
-            approximation_error: wire.approximation_error,
-            residual: wire.residual,
-        })
-    }
-}
-
 /// What a component's numbers cost in exactness. There is no third case.
-///
-/// **Its wire adds nothing of its own.** Two variants carry no data, and the third carries an
-/// [`ExactInterval`], which is already closed at its own wire. *Which* variant a component may
-/// carry is the relation that matters, and that is one field's agreement with another, so it is
-/// enforced at [`ChordComponent`] where both fields are in hand.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ApproximationError {
     /// The component is exact: a rational pole, an exact residue, an exact support.
     Exact,
@@ -2819,18 +1623,8 @@ pub enum ApproximationError {
 }
 
 /// **The causal chord of a linearization.**
-///
-/// **A remounted chord is held to the agreements between its parts.** The pole atlas is the atlas
-/// of the transfer matrix's own atlas denominator, the hidden modes are the transfer matrix's own
-/// atlas cancellation, and every component names a transfer entry that is present and carries that
-/// entry's names and residual. Each component's pole factor is divided into that entry's reduced
-/// denominator exactly, which refuses a component invented at a pole the entry does not have.
-/// Semisimplicity is a statement about the generator, which the chord does not carry, so it is
-/// testimony.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(try_from = "CausalChordWire")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CausalChord {
-    pub schema: String,
     pub lineage: String,
     pub extent: usize,
     pub transfer: TransferFunction,
@@ -2840,114 +1634,6 @@ pub struct CausalChord {
     /// Modes no declared source excites or no declared receiver observes: the cancellation, named.
     pub hidden_modes: RationalPolynomial,
     pub semisimple: bool,
-}
-
-#[derive(Deserialize)]
-struct CausalChordWire {
-    schema: String,
-    lineage: String,
-    extent: usize,
-    transfer: TransferFunction,
-    poles: PoleAtlas,
-    components: Vec<ChordComponent>,
-    modes: Vec<ModeSupport>,
-    hidden_modes: RationalPolynomial,
-    semisimple: bool,
-}
-
-impl TryFrom<CausalChordWire> for CausalChord {
-    type Error = ChordRefusal;
-
-    fn try_from(wire: CausalChordWire) -> Result<Self, Self::Error> {
-        if wire.extent != wire.transfer.extent {
-            return Err(ChordRefusal::ChordWireDisagrees {
-                object: "a causal chord",
-                relation: "the declared extent against the transfer matrix's own",
-                declared: wire.extent.to_string(),
-                derived: wire.transfer.extent.to_string(),
-            });
-        }
-        if wire.poles.denominator != wire.transfer.atlas_denominator {
-            return Err(ChordRefusal::ChordWireDisagrees {
-                object: "a causal chord",
-                relation: "the pole atlas's denominator against the transfer atlas denominator",
-                declared: format!("{:?}", wire.poles.denominator.coefficients()),
-                derived: format!("{:?}", wire.transfer.atlas_denominator.coefficients()),
-            });
-        }
-        if wire.hidden_modes != wire.transfer.atlas_cancellation {
-            return Err(ChordRefusal::ChordWireDisagrees {
-                object: "a causal chord",
-                relation: "the hidden modes against the transfer matrix's atlas cancellation",
-                declared: format!("{:?}", wire.hidden_modes.coefficients()),
-                derived: format!("{:?}", wire.transfer.atlas_cancellation.coefficients()),
-            });
-        }
-        for component in &wire.components {
-            let Some(entry) = wire
-                .transfer
-                .entry(component.transport_path, component.excitation)
-            else {
-                return Err(ChordRefusal::ChordWireDisagrees {
-                    object: "a causal chord",
-                    relation: "a component's port pair against the transfer matrix's entries",
-                    declared: format!("({}, {})", component.transport_path, component.excitation),
-                    derived: "a port pair the atlas carries".to_owned(),
-                });
-            };
-            if component.source_name != entry.source_name
-                || component.receiver_name != entry.receiver_name
-            {
-                return Err(ChordRefusal::ChordWireDisagrees {
-                    object: "a causal chord",
-                    relation: "a component's port names against its own transfer entry's",
-                    declared: format!("{} / {}", component.source_name, component.receiver_name),
-                    derived: format!("{} / {}", entry.source_name, entry.receiver_name),
-                });
-            }
-            if component.residual != entry.residual {
-                return Err(ChordRefusal::ChordWireDisagrees {
-                    object: "a causal chord",
-                    relation: "a component's residual against its own transfer entry's",
-                    declared: component.residual.to_string(),
-                    derived: entry.residual.to_string(),
-                });
-            }
-            if component.lineage != wire.lineage {
-                return Err(ChordRefusal::ChordWireDisagrees {
-                    object: "a causal chord",
-                    relation: "a component's lineage against the chord's own",
-                    declared: component.lineage.clone(),
-                    derived: wire.lineage.clone(),
-                });
-            }
-            // The component's pole is a pole of the entry it came from, or it is not its pole.
-            entry
-                .reduced_denominator
-                .divided_exactly_by(&component.pole_factor)?;
-        }
-        for pair in wire.modes.windows(2) {
-            if pair[0].eigenvalue >= pair[1].eigenvalue {
-                return Err(ChordRefusal::ChordWireDisagrees {
-                    object: "a causal chord",
-                    relation: "the rational mode population, ascending with each eigenvalue once",
-                    declared: format!("{} then {}", pair[0].eigenvalue, pair[1].eigenvalue),
-                    derived: "strictly ascending".to_owned(),
-                });
-            }
-        }
-        Ok(Self {
-            schema: wire.schema,
-            lineage: wire.lineage,
-            extent: wire.extent,
-            transfer: wire.transfer,
-            poles: wire.poles,
-            components: wire.components,
-            modes: wire.modes,
-            hidden_modes: wire.hidden_modes,
-            semisimple: wire.semisimple,
-        })
-    }
 }
 
 impl CausalChord {
@@ -3066,7 +1752,6 @@ pub(crate) fn causal_chord_read(
     }
     let hidden_modes = transfer.atlas_cancellation.clone();
     Ok(CausalChord {
-        schema: CAUSAL_CHORD_SCHEMA.to_owned(),
         lineage: linearization.lineage.clone(),
         extent: transfer.extent,
         transfer,
@@ -3082,14 +1767,7 @@ pub(crate) fn causal_chord_read(
 // the separating atlas
 
 /// The probe at which two isospectral systems part company.
-///
-/// **A remounted separation must still separate.** The two numerators at the named probe are
-/// refused unless they actually differ — a separation whose two readings agree is not one — the
-/// named probe is the first of the declared probe list, as the constructor takes it, no probe is
-/// listed twice, and the shared characteristic polynomial is monic, which is what makes the claim
-/// that the spectrum cannot tell the two apart a claim about one polynomial.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(try_from = "AtlasSeparationWire")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct AtlasSeparation {
     pub left_lineage: String,
     pub right_lineage: String,
@@ -3103,68 +1781,6 @@ pub struct AtlasSeparation {
     pub right_numerator: RationalPolynomial,
     /// Every probe/readout pair at which the two differ, not only the first.
     pub separating_probes: Vec<(usize, usize)>,
-}
-
-#[derive(Deserialize)]
-struct AtlasSeparationWire {
-    left_lineage: String,
-    right_lineage: String,
-    shared_characteristic: RationalPolynomial,
-    transport_path: usize,
-    excitation: usize,
-    left_numerator: RationalPolynomial,
-    right_numerator: RationalPolynomial,
-    separating_probes: Vec<(usize, usize)>,
-}
-
-impl TryFrom<AtlasSeparationWire> for AtlasSeparation {
-    type Error = ChordRefusal;
-
-    fn try_from(wire: AtlasSeparationWire) -> Result<Self, Self::Error> {
-        if wire.left_numerator == wire.right_numerator {
-            return Err(ChordRefusal::NoSeparatingProbe);
-        }
-        if wire.separating_probes.first() != Some(&(wire.transport_path, wire.excitation)) {
-            return Err(ChordRefusal::ChordWireDisagrees {
-                object: "an atlas separation",
-                relation: "the named probe against the first of the declared separating probes",
-                declared: format!("({}, {})", wire.transport_path, wire.excitation),
-                derived: format!("{:?}", wire.separating_probes.first()),
-            });
-        }
-        for (at, probe) in wire.separating_probes.iter().enumerate() {
-            if wire.separating_probes[..at].contains(probe) {
-                return Err(ChordRefusal::ChordWireDisagrees {
-                    object: "an atlas separation",
-                    relation: "a separating probe listed twice",
-                    declared: format!("({}, {})", probe.0, probe.1),
-                    derived: "listed once".to_owned(),
-                });
-            }
-        }
-        if wire.shared_characteristic.degree().is_none() || !wire.shared_characteristic.is_monic() {
-            return Err(ChordRefusal::ChordWireDisagrees {
-                object: "an atlas separation",
-                relation: "the shared characteristic polynomial, which is monic and nonzero",
-                declared: format!(
-                    "degree {:?}, monic {}",
-                    wire.shared_characteristic.degree(),
-                    wire.shared_characteristic.is_monic()
-                ),
-                derived: "monic and nonzero".to_owned(),
-            });
-        }
-        Ok(Self {
-            left_lineage: wire.left_lineage,
-            right_lineage: wire.right_lineage,
-            shared_characteristic: wire.shared_characteristic,
-            transport_path: wire.transport_path,
-            excitation: wire.excitation,
-            left_numerator: wire.left_numerator,
-            right_numerator: wire.right_numerator,
-            separating_probes: wire.separating_probes,
-        })
-    }
 }
 
 /// **Two isospectral systems, separated by the response atlas under a declared probe.**
@@ -3286,44 +1902,6 @@ pub enum ChordRefusal {
     AtlasShapesDiffer,
     #[error("no declared probe separates the two isospectral systems")]
     NoSeparatingProbe,
-    #[error(
-        "a remounted resolvent expansion declares {declared} for {relation}, where the expansion it \
-         carries gives {derived}"
-    )]
-    ExpansionWireDisagrees {
-        relation: &'static str,
-        declared: String,
-        derived: String,
-    },
-    #[error(
-        "a remounted transfer chart declares {declared} for {relation}, where the polynomials it \
-         carries give {derived}"
-    )]
-    TransferWireDisagrees {
-        relation: &'static str,
-        declared: String,
-        derived: String,
-    },
-    #[error(
-        "a remounted pole chart declares {declared} for {relation}, where the factors it carries \
-         give {derived}"
-    )]
-    PoleWireDisagrees {
-        relation: &'static str,
-        declared: String,
-        derived: String,
-    },
-    #[error(
-        "{object} declares {declared} for {relation}, where the chart it carries gives {derived}"
-    )]
-    ChordWireDisagrees {
-        object: &'static str,
-        relation: &'static str,
-        declared: String,
-        derived: String,
-    },
-    #[error("the exact spectrum refused: {0}")]
-    Spectrum(String),
     #[error(transparent)]
     Linear(#[from] ExactLinearError),
     #[error(transparent)]

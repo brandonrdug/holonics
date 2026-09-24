@@ -310,7 +310,7 @@ pub(crate) type TubeHolonomyVerdict<T> = HolonomyVerdict<TubeStation<T>, TubeInd
 /// route: `grainSquareDefect` is a real instance and
 /// `grainSquare_defect_is_not_a_loss` proves the disagreement is holonomy rather than loss.
 /// **Forging a verdict is a compile error.** The payload of each arm is a struct whose every field
-/// is private to this module, with no public constructor, no `Default` and no `Deserialize`. Only
+/// is private to this module, with no public constructor and no `Default`. Only
 /// [`check_commuting_square`] builds one, so a value of this type is a receipt that the check
 /// named in it actually ran; read access is the accessors on [`CommutingSquares`] and
 /// [`SquareDefect`].
@@ -800,7 +800,7 @@ pub fn check_circuit_holonomy<T: StationedTower>(
 /// (`Tube.transport_is_not_a_wormhole`, `Tube.refinementRoute_is_not_a_wormhole`), so a nonempty
 /// [`Self::crossings`] is exactly passage the tube does not own.
 /// **Forging a receipt is a compile error.** Every field is private to this module and there is no
-/// public constructor, no `Default` and no `Deserialize`, so an empty-crossings receipt cannot be
+/// public constructor and no `Default`, so an empty-crossings receipt cannot be
 /// minted by a caller who never ran [`wormhole_receipt`]. Read access is the accessors below.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WormholeReceipt<TI, SI> {

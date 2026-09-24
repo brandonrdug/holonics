@@ -279,7 +279,7 @@ fn a_certificate_does_not_transfer_to_another_matrix() {
     let other = matrix(&[&[1, 2, 3], &[2, 4, 7], &[1, 1, 1]]);
     assert!(
         certificate.verify(&other).is_err(),
-        "a remount re-validates; a certificate is not a token"
+        "a reuse re-validates; a certificate is not a token"
     );
     let wider = matrix(&[&[1, 2, 3, 4], &[2, 4, 6, 8], &[1, 1, 1, 1]]);
     assert!(matches!(

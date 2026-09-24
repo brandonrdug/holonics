@@ -167,7 +167,7 @@ mod tests {
     use super::*;
     use crate::geometry::complex::CellComplex;
     use crate::holon::deposition::{
-        DepositLedger, divergent_state, indefinite_block, project_passive,
+        CommittedEnergyBound, divergent_state, indefinite_block, project_passive,
     };
     use crate::holon::element::{ActiveRelation, Pump, PumpSchedule, ResistiveRelation};
     use crate::holon::law::{ReferenceHolon, Scheme, active_receiver};
@@ -631,7 +631,7 @@ mod tests {
         // Unprojected: the committed state is (3ⁿ, 0) and the energy grows ×9 per commit.
         let law = learned_law(&indefinite_block());
         let mut state = HolonState::new(divergent_state(0));
-        let mut ledger = DepositLedger::new(energy_at(&law, &state).unwrap());
+        let mut bound = CommittedEnergyBound::new(energy_at(&law, &state).unwrap());
         for n in 1..=3u32 {
             let advance = check_exact_advance(&law, &state, &[]).unwrap();
             assert_eq!(advance.state.configuration, divergent_state(n));
@@ -640,7 +640,7 @@ mod tests {
                 integer(9) * energy_at(&law, &state).unwrap()
             );
             assert!(advance.balance.active.is_positive());
-            let reading = ledger
+            let reading = bound
                 .commit(
                     &identity,
                     &identity,
@@ -655,11 +655,11 @@ mod tests {
         let projected = project_passive(&indefinite_block()).unwrap().projected;
         let law = learned_law(&projected);
         let mut state = HolonState::new(ints(&[1, 1]));
-        let mut ledger = DepositLedger::new(energy_at(&law, &state).unwrap());
+        let mut bound = CommittedEnergyBound::new(energy_at(&law, &state).unwrap());
         for _ in 0..4 {
             let advance = check_exact_advance(&law, &state, &[]).unwrap();
             assert!(advance.balance.active <= Rat::zero());
-            let reading = ledger
+            let reading = bound
                 .commit(
                     &identity,
                     &identity,
@@ -672,7 +672,7 @@ mod tests {
         }
     }
 
-    /// `Holon/Deposition.commit_balance` with a real deposit, and the ledger's `ε_k`.
+    /// `Holon/Deposition.commit_balance` with a real deposit, and the bound's `ε_k`.
     #[test]
     fn the_commit_balance_is_word_plus_deposition_work() {
         let law = learned_law(
@@ -691,8 +691,9 @@ mod tests {
             advance.balance.word_change() + advance.balance.deposition_work.clone()
         );
         // after ⪯ (1 + ε) before with ε = 3 (eigenvalues of `after` are (5 ± √5)/2 < 4).
-        let mut ledger = DepositLedger::new(storage_energy(&before, &state.configuration).unwrap());
-        let reading = ledger
+        let mut bound =
+            CommittedEnergyBound::new(storage_energy(&before, &state.configuration).unwrap());
+        let reading = bound
             .commit(
                 &before,
                 &after,
@@ -701,7 +702,20 @@ mod tests {
             )
             .unwrap();
         assert!(reading.holds);
-        assert_eq!(ledger.product(), &integer(4));
-        assert!(ledger.commits() == 1 && Rat::one() < *ledger.product());
+        assert_eq!(bound.product(), &integer(4));
+        assert!(bound.commits() == 1 && Rat::one() < *bound.product());
+    }
+
+    /// Power neutrality needs a skew `Ω`: the medium's interconnection refuses one that is not.
+    #[test]
+    fn the_medium_structure_refuses_a_non_skew_omega() {
+        assert_eq!(
+            crate::holon::medium_structure(
+                &integer_matrix(&[&[1]]).unwrap(),
+                &ExactRatMatrix::zero(1, 0).unwrap(),
+                false
+            ),
+            Err(HolonError::NotSkew)
+        );
     }
 }

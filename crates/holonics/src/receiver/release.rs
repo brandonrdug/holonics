@@ -99,7 +99,6 @@ use std::fmt::{self, Debug};
 use crate::ratio::Rat;
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
-use serde::{Deserialize, Serialize};
 
 use crate::ratio::linear::ExactRatMatrix;
 use crate::receiver::causal_chord::Linearization;
@@ -155,8 +154,7 @@ pub const CANDIDATE_CEILING: usize = 1024;
 
 /// Where one uncertainty generator came from. A [`ProbeDirection`] names this, so `Ask` asks for a
 /// *named* observation and not for "more data".
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
-#[serde(tag = "source", rename_all = "kebab-case")]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum GeneratorSource {
     /// A coordinate of the compatible-state fibre.
     CompatibleState {
@@ -185,7 +183,7 @@ impl fmt::Display for GeneratorSource {
 ///
 /// A zonotope generator is a direction of an exact set (the algebraic sense of the word), not a
 /// clocked transport like [`crate::navigator::Navigator`].
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ZonotopeGenerator {
     /// Where the unresolved direction came from.
     pub source: GeneratorSource,
@@ -198,30 +196,11 @@ pub struct ZonotopeGenerator {
 /// This is the exact enclosure of a compatible family. A box is the special case where `G` is
 /// diagonal, and the image of a zonotope under an exact linear map is again a zonotope — which is
 /// why an `h`-step exact linear map keeps the enclosure exact rather than widening it.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(try_from = "ExactZonotopeWire")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ExactZonotope {
     dimension: usize,
     center: Vec<Rat>,
     generators: Vec<ZonotopeGenerator>,
-}
-
-/// The wire an [`ExactZonotope`] deserializes from. It carries no invariant, and
-/// `TryFrom` routes every decoded value back through [`ExactZonotope::declared`], so a serialized
-/// enclosure cannot enter the module with a generator of the wrong length or a generator count
-/// past the ceiling.
-#[derive(Deserialize)]
-struct ExactZonotopeWire {
-    center: Vec<Rat>,
-    generators: Vec<ZonotopeGenerator>,
-}
-
-impl TryFrom<ExactZonotopeWire> for ExactZonotope {
-    type Error = WidthRefusal;
-
-    fn try_from(wire: ExactZonotopeWire) -> Result<Self, Self::Error> {
-        Self::declared(wire.center, wire.generators)
-    }
 }
 
 impl ExactZonotope {
@@ -756,7 +735,7 @@ pub fn width(
 // -------------------------------------------------------------------------------------------
 
 /// The named direction whose exact observation would narrow the width most.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ProbeDirection {
     /// Where the unresolved direction came from.
     pub source: GeneratorSource,
@@ -769,7 +748,7 @@ pub struct ProbeDirection {
 }
 
 /// The named declared observation whose reading would narrow the width most.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ObservationProbe {
     /// The observation's declared name.
     pub observation: String,
@@ -780,8 +759,7 @@ pub struct ObservationProbe {
 }
 
 /// Either kind of answer to `Ask`.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(tag = "ask", rename_all = "kebab-case")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum AskProbe {
     /// An unresolved direction of the enclosure.
     Direction(ProbeDirection),
@@ -871,7 +849,7 @@ pub fn narrowing_observation(
     let before = width_enumerated(reading, family, norm)?.diameter().clone();
     let mut best: Option<ObservationProbe> = None;
     for candidate in candidates {
-        // The level sets of the candidate's own reading, keyed by its serialized exact face so
+        // The level sets of the candidate's own reading, keyed by its exact face's printed form so
         // that no ordering on the face type is assumed.
         let mut levels: BTreeMap<String, Vec<Vec<Rat>>> = BTreeMap::new();
         for member in members {
@@ -945,7 +923,7 @@ pub struct CoarseningTower {
 /// *"this coarser receiver's width is inside `tolerance`"*, and the tolerance it was searched
 /// under is carried with it so that the claim cannot be re-used against a different, narrower
 /// tolerance. Every field is private and the only constructor is [`release_coarser`]: there is no
-/// literal, no `Default` and no `Deserialize` that mints one.
+/// literal and no `Default` that mints one.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CoarserRelease {
     receiver: String,
@@ -1239,8 +1217,7 @@ impl FactoredReading<'_> {
 /// caller's decisions, subject only to their offered-input and offered-coarser checks.
 ///
 /// Lean counterpart: `Foundation/ReceiverRelease.ReleaseReturn`.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(tag = "release", rename_all = "kebab-case")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ReleaseReturn {
     /// The width is inside the declared tolerance.
     Released {

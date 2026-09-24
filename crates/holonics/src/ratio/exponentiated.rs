@@ -101,7 +101,6 @@ use std::collections::BTreeMap;
 use crate::ratio::Rat;
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
-use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use super::surprisal::SymbolicSurprisal;
@@ -155,7 +154,7 @@ pub fn probability_ratio(
 /// This is the invariant half of softmax. It is a **cocycle** — see
 /// [`RatioFamily::cocycle_holds`] — and it is complete: no member is dropped,
 /// ranked, or crowned.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RatioFamily {
     /// The integer reciprocal temperature this family was rebased by, `1` for a family read
     /// directly off a surprisal population: the frame the reading stands in.

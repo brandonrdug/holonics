@@ -54,7 +54,7 @@ pub fn integer(value: i64) -> Rat {
 /// **The four-state order of two exact readings.** `Open` is not a tie: it is returned when the
 /// exact certificates cannot separate the two, and it keeps both operands rather than breaking the
 /// tie by an epsilon.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ExactOrdering {
     Less,
     Equal,

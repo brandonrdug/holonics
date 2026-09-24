@@ -22,7 +22,6 @@
 //! | `PortHolon.energy_balance`, `energy_balance_const` | [`crate::holon::law::EnergyBalance`] |
 
 use crate::ratio::Rat;
-use serde::Serialize;
 
 use crate::holon::HolonError;
 use crate::navigator::Clock;
@@ -49,7 +48,7 @@ pub fn storage_effort(storage: &SymmetricForm, x: &[Rat]) -> Result<Vec<Rat>, Ho
 }
 
 /// [definition] **A certified resistive relation** `e_R = −R f_R` with `⟨f, R f⟩ ≥ 0`.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ResistiveRelation {
     resistance: ExactRatMatrix,
     inertia: Inertia,
@@ -85,7 +84,7 @@ impl ResistiveRelation {
 
 /// [definition] **An active relation** `e_A = L f_A` whose power `⟨f_A, L f_A⟩` is declared, with
 /// the inertia of its symmetric part.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ActiveRelation {
     relation: ExactRatMatrix,
     inertia: Inertia,
@@ -122,7 +121,7 @@ impl ActiveRelation {
 
 /// [definition] **A pump schedule** `Q(τ)`: storage forms of one extent, read periodically by
 /// commit index.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PumpSchedule {
     forms: Vec<SymmetricForm>,
 }

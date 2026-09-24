@@ -30,7 +30,6 @@
 
 use crate::ratio::Rat;
 use num_traits::{One, Zero};
-use serde::Serialize;
 
 use crate::holon::HolonError;
 use crate::holon::dirac::DiracStructure;
@@ -40,7 +39,7 @@ use crate::ratio::linear::vector::{at, form_matrix, is_zero, matrix};
 
 /// [definition] **An oriented cell complex**: cell counts per degree and boundary matrices
 /// `∂_(k+1) : C_(k+1) → C_k` (`cells[k] × cells[k+1]`), with `∂_k ∂_(k+1) = 0` checked.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CellComplex {
     cells: Vec<usize>,
     boundaries: Vec<ExactRatMatrix>,
@@ -291,7 +290,7 @@ impl CellComplex {
 
 /// [definition] **A graph with edge transports** `g_e ≠ 0`
 /// (`Holon/Complex.connectionIncidence`).
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ConnectionIncidence {
     vertices: usize,
     source: Vec<usize>,

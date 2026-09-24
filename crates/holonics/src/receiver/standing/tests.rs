@@ -654,7 +654,7 @@ fn the_energy_that_left_the_wave_is_accounted_for() {
         assert_eq!(
             &origin[1] - &now[1],
             &now[2] + &dissipated,
-            "the ledger must close at step {step}"
+            "the balance must close at step {step}"
         );
         // And the closed form of that dissipation is `2(1 − 4^{−t})/3`.
         let closed = integer(2) * (integer(1) - &now[1]) / integer(3);

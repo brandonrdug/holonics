@@ -79,7 +79,6 @@
 use crate::ratio::Rat;
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
-use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::ratio::algebraic::{
@@ -96,36 +95,12 @@ pub(crate) use root_separation::{RootSeparation, RootSeparationBound};
 /// Coefficients ascend in degree. The empty vector is the zero polynomial; a nonzero polynomial
 /// never carries a zero leading coefficient, so `degree` is unambiguous.
 ///
-/// **The wire enforces that normal form.** The derived `Deserialize` skipped
-/// [`RationalPolynomial::new`]'s trim, so a remounted instance carrying a trailing zero reported a
-/// degree one too high — and `degree()` is what every division, gcd, resultant and census reads
-/// first. A wire whose leading coefficient is zero is refused as
-/// [`ExactPolynomialError::UntrimmedPolynomialWire`] rather than silently re-normalized into a
-/// different polynomial than the one it named. `Default` is the zero polynomial, which is the
-/// normal form of zero, so it is not a bypass.
-#[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-#[serde(try_from = "RationalPolynomialWire")]
+/// [`RationalPolynomial::new`] trims to that normal form, and `degree()` is what every division,
+/// gcd, resultant and census reads first. `Default` is the zero polynomial, which is the normal
+/// form of zero, so it is not a bypass.
+#[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct RationalPolynomial {
     coefficients: Vec<Rat>,
-}
-
-#[derive(Deserialize)]
-struct RationalPolynomialWire {
-    coefficients: Vec<Rat>,
-}
-
-impl TryFrom<RationalPolynomialWire> for RationalPolynomial {
-    type Error = ExactPolynomialError;
-
-    fn try_from(wire: RationalPolynomialWire) -> Result<Self, Self::Error> {
-        if wire.coefficients.last().is_some_and(Zero::is_zero) {
-            return Err(ExactPolynomialError::UntrimmedPolynomialWire {
-                declared: wire.coefficients.len(),
-            });
-        }
-        let polynomial = Self::new(wire.coefficients);
-        Ok(polynomial)
-    }
 }
 
 impl RationalPolynomial {
@@ -193,10 +168,6 @@ impl RationalPolynomial {
             .get(degree)
             .cloned()
             .unwrap_or_else(Rat::zero)
-    }
-
-    pub(crate) fn is_monic(&self) -> bool {
-        self.leading().is_some_and(|value| value.is_one())
     }
 
     pub fn evaluate(&self, point: &Rat) -> Rat {
@@ -922,14 +893,7 @@ fn reflected_with_positive_leading(coefficients: &[BigInt]) -> Vec<BigInt> {
 ///
 /// `cauchy_bound` is retained beside them so a reader can see, on their own material, what was
 /// replaced.
-/// A remounted enclosure passes through [`RealRootEnclosure::assembled`]: the wire carries the same
-/// fields, and one whose interval does not agree with its own two bounds — or whose bounds are not
-/// positive, or which claims to be narrower than the Cauchy bound it reports — is refused at the
-/// boundary rather than reconstructed past the constructor. The *certificate* itself is a statement
-/// about a polynomial the enclosure does not carry, so a remounted enclosure is testimony about
-/// that polynomial; what is checkable without it is checked.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(try_from = "RealRootEnclosureWire")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct RealRootEnclosure {
     /// Every real root is strictly below this.
     pub positive_bound: BigInt,
@@ -948,35 +912,8 @@ pub(crate) struct RealRootEnclosure {
     pub declared_negative: bool,
 }
 
-#[derive(Deserialize)]
-struct RealRootEnclosureWire {
-    positive_bound: BigInt,
-    negative_bound: BigInt,
-    interval: ExactInterval,
-    cauchy_bound: BigInt,
-    doublings: u32,
-    declared_positive: bool,
-    declared_negative: bool,
-}
-
-impl TryFrom<RealRootEnclosureWire> for RealRootEnclosure {
-    type Error = ExactPolynomialError;
-
-    fn try_from(wire: RealRootEnclosureWire) -> Result<Self, Self::Error> {
-        Self::assembled(
-            wire.positive_bound,
-            wire.negative_bound,
-            wire.interval,
-            wire.cauchy_bound,
-            wire.doublings,
-            wire.declared_positive,
-            wire.declared_negative,
-        )
-    }
-}
-
 impl RealRootEnclosure {
-    /// The one way an enclosure comes into existence, including from a wire.
+    /// The one way an enclosure comes into existence.
     fn assembled(
         positive_bound: BigInt,
         negative_bound: BigInt,
@@ -1182,7 +1119,7 @@ pub(crate) fn squared_shrinking_steps(
 
 /// One real root of the auxiliary polynomial, isolated with its Sturm sign-variation certificate,
 /// together with the exact statement of whether it is rational.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct CensusedRealRoot {
     pub isolating: AlgebraicRoot,
     /// Present exactly when this root is rational, and then it is the root itself.
@@ -1194,18 +1131,7 @@ pub(crate) struct CensusedRealRoot {
 /// `rational_roots` is exhaustive, not a sample: see this module's head for why. The real-root
 /// half is separate on purpose — a real root that is not rational is exactly the obstruction a
 /// chart transition hits, and it is retained here with a certificate rather than discarded.
-///
-/// **A remounted census is re-derived where the data to re-derive it is here.** `source` alone
-/// determines `primitive`, `leading_coefficient` and `monic_companion`, so the wire rebuilds all
-/// three — behind [`MONIC_COMPANION_BIT_CEILING`], because that is precisely the blow-up the
-/// census's own entry gates — and refuses on disagreement. What cannot be rebuilt without
-/// redoing the descent is checked for agreement with itself: every rational root vanishes on
-/// `source`, every isolated root belongs to the companion, the two counts agree, the bounding
-/// interval is the enclosure's own, and the derived splitting depth is inside this owner's
-/// ceiling. Each carried [`CensusedRealRoot`] re-runs its own Sturm isolation through
-/// [`AlgebraicRoot`]'s wire before any of this.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(try_from = "RationalRootCensusWire")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct RationalRootCensus {
     pub source: RationalPolynomial,
     pub primitive: IntegerPolynomial,
@@ -1236,141 +1162,11 @@ pub(crate) struct RationalRootCensus {
     pub work: CensusWork,
 }
 
-#[derive(Deserialize)]
-struct RationalRootCensusWire {
-    source: RationalPolynomial,
-    primitive: IntegerPolynomial,
-    monic_companion: IntegerPolynomial,
-    leading_coefficient: BigInt,
-    bounding_interval: ExactInterval,
-    distinct_real_roots: u32,
-    roots: Vec<CensusedRealRoot>,
-    rational_roots: Vec<Rat>,
-    separation: RootSeparation,
-    isolation_depth_bound: u64,
-    split_schedule_retained: Rat,
-    enclosure: RealRootEnclosure,
-    work: CensusWork,
-}
-
-fn census_clause(clause: &'static str) -> ExactPolynomialError {
-    ExactPolynomialError::MalformedCensus { clause }
-}
-
-impl TryFrom<RationalRootCensusWire> for RationalRootCensus {
-    type Error = ExactPolynomialError;
-
-    fn try_from(wire: RationalRootCensusWire) -> Result<Self, Self::Error> {
-        // Re-derived, not believed.
-        let primitive = wire.source.primitive_integer_form()?;
-        if primitive != wire.primitive {
-            return Err(census_clause(
-                "the primitive integer form is not the source's",
-            ));
-        }
-        let leading = primitive
-            .coefficients
-            .last()
-            .cloned()
-            .ok_or(ExactPolynomialError::ZeroPolynomial)?;
-        if leading != wire.leading_coefficient {
-            return Err(census_clause(
-                "the leading coefficient is not the primitive form's",
-            ));
-        }
-        // The companion is the blow-up this owner gates, so the gate is taken before it is rebuilt.
-        check_companion_declared_size(&primitive, &leading)?;
-        if monic_companion_of(&primitive, &leading)? != wire.monic_companion {
-            return Err(census_clause(
-                "the monic companion is not the one the primitive form generates",
-            ));
-        }
-        if wire.bounding_interval != wire.enclosure.interval {
-            return Err(census_clause(
-                "the bounding interval is not the certified enclosure's own",
-            ));
-        }
-        if wire.distinct_real_roots as usize != wire.roots.len() {
-            return Err(census_clause(
-                "the distinct real root count does not match the isolated population",
-            ));
-        }
-        if wire.isolation_depth_bound > SEPARATION_SPLITTING_DEPTH_CEILING {
-            return Err(ExactPolynomialError::SeparationSplittingDepthTooLarge {
-                bound: wire.isolation_depth_bound,
-                ceiling: SEPARATION_SPLITTING_DEPTH_CEILING,
-            });
-        }
-        let leading_rational = Rat::from_integer(leading.clone());
-        let mut previous: Option<&ExactInterval> = None;
-        for root in &wire.roots {
-            if root.isolating.polynomial != wire.monic_companion {
-                return Err(census_clause(
-                    "an isolated root does not belong to the monic companion",
-                ));
-            }
-            if previous.is_some_and(|last| last.upper > root.isolating.isolating_interval.lower) {
-                return Err(census_clause(
-                    "the isolating intervals are not ascending and disjoint",
-                ));
-            }
-            previous = Some(&root.isolating.isolating_interval);
-            if let Some(value) = &root.rational_value {
-                let scaled = value * &leading_rational;
-                if scaled <= root.isolating.isolating_interval.lower
-                    || scaled >= root.isolating.isolating_interval.upper
-                    || !wire.monic_companion.evaluate(&scaled).is_zero()
-                {
-                    return Err(ExactPolynomialError::CensusedRootValueDisagrees {
-                        value: value.to_string(),
-                    });
-                }
-                if !wire.rational_roots.contains(value) {
-                    return Err(census_clause(
-                        "a root declared rational is absent from the rational population",
-                    ));
-                }
-            }
-        }
-        for value in &wire.rational_roots {
-            if !wire.source.evaluate(value).is_zero() {
-                return Err(ExactPolynomialError::CensusRootDoesNotVanish);
-            }
-        }
-        if wire
-            .rational_roots
-            .windows(2)
-            .any(|pair| pair[0] >= pair[1])
-        {
-            return Err(census_clause(
-                "the rational population is not ascending and deduplicated",
-            ));
-        }
-        Ok(RationalRootCensus {
-            source: wire.source,
-            primitive,
-            monic_companion: wire.monic_companion,
-            leading_coefficient: leading,
-            bounding_interval: wire.bounding_interval,
-            distinct_real_roots: wire.distinct_real_roots,
-            roots: wire.roots,
-            rational_roots: wire.rational_roots,
-            separation: wire.separation,
-            isolation_depth_bound: wire.isolation_depth_bound,
-            split_schedule_retained: wire.split_schedule_retained,
-            enclosure: wire.enclosure,
-            work: wire.work,
-        })
-    }
-}
-
-impl RationalRootCensus {}
-
 /// Exact work, in operations, never in elapsed time.
 ///
 /// A cost is measured in work; a clock may measure but never selects, and nothing here consults
 /// one.
-#[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct CensusWork {
     pub sturm_counts: u64,
     pub bisection_steps: u64,
@@ -1687,8 +1483,7 @@ fn check_companion_declared_size(
 ///
 /// **Call [`check_companion_declared_size`] first.** The `leading.pow(exponent)` below runs the
 /// exponent up to `degree - 1`, which is the blow-up that gate exists for; this routine forms the
-/// coefficients and nothing else. Factored out so the census and the census's own wire build the
-/// same object rather than two transcriptions of it.
+/// coefficients and nothing else.
 fn monic_companion_of(
     primitive: &IntegerPolynomial,
     leading: &BigInt,
@@ -2062,11 +1857,9 @@ fn interior_non_root(
 /// [`ExactPolynomialError::HalfPlaneRefinementExhausted`] naming the reached depth.
 pub(crate) const HALF_PLANE_REFINEMENT_CEILING: u32 = 96;
 
-/// The exact population of a real polynomial's roots by half-plane, with multiplicity.
-/// **The three populations partition the roots with multiplicity**, so the wire checks that they
-/// sum to the declared degree.
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(try_from = "HalfPlaneCountWire")]
+/// The exact population of a real polynomial's roots by half-plane, with multiplicity. **The three
+/// populations partition the roots**: they sum to the degree ([`HalfPlaneCount::total`]).
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct HalfPlaneCount {
     pub degree: usize,
     /// `Re λ < 0`.
@@ -2082,50 +1875,9 @@ pub struct HalfPlaneCount {
     pub refinements: u32,
 }
 
-#[derive(Deserialize)]
-struct HalfPlaneCountWire {
-    degree: usize,
-    left: usize,
-    axis: usize,
-    right: usize,
-    shift_witness: Option<Rat>,
-    refinements: u32,
-}
-
-impl TryFrom<HalfPlaneCountWire> for HalfPlaneCount {
-    type Error = ExactPolynomialError;
-
-    fn try_from(wire: HalfPlaneCountWire) -> Result<Self, Self::Error> {
-        let total = wire
-            .left
-            .checked_add(wire.axis)
-            .and_then(|partial| partial.checked_add(wire.right));
-        if total != Some(wire.degree) {
-            return Err(ExactPolynomialError::MalformedHalfPlaneCount {
-                degree: wire.degree,
-                left: wire.left,
-                axis: wire.axis,
-                right: wire.right,
-            });
-        }
-        if wire.refinements > HALF_PLANE_REFINEMENT_CEILING {
-            return Err(ExactPolynomialError::HalfPlaneRefinementExhausted {
-                ceiling: HALF_PLANE_REFINEMENT_CEILING,
-            });
-        }
-        Ok(Self {
-            degree: wire.degree,
-            left: wire.left,
-            axis: wire.axis,
-            right: wire.right,
-            shift_witness: wire.shift_witness,
-            refinements: wire.refinements,
-        })
-    }
-}
-
 impl HalfPlaneCount {
-    pub(crate) fn total(&self) -> usize {
+    /// The three populations partition the roots with multiplicity: `left + axis + right = degree`.
+    pub fn total(&self) -> usize {
         self.left + self.axis + self.right
     }
 }
@@ -2418,35 +2170,6 @@ pub enum ExactPolynomialError {
         bits: u64,
         ceiling: u64,
     },
-    #[error(
-        "a remounted rational polynomial declares {declared} coefficients whose leading entry is \
-         zero; the constructor trims that away, so the declaration names a degree one higher than \
-         the polynomial has and is refused rather than re-normalized"
-    )]
-    UntrimmedPolynomialWire { declared: usize },
-    #[error(
-        "a remounted root separation does not agree with the bound its own material derives, or \
-         claims there is no pair of roots to separate at a degree that has one"
-    )]
-    MalformedRootSeparation,
-    #[error(
-        "a remounted half-plane count puts {left} + {axis} + {right} roots into a degree-{degree} \
-         polynomial; the three populations partition the roots with multiplicity, so the \
-         declaration is refused"
-    )]
-    MalformedHalfPlaneCount {
-        degree: usize,
-        left: usize,
-        axis: usize,
-        right: usize,
-    },
-    #[error(
-        "a remounted censused root carries the rational value {value}, which is not a root of the \
-         polynomial inside its own isolating interval"
-    )]
-    CensusedRootValueDisagrees { value: String },
-    #[error("a remounted census does not agree with itself: {clause}")]
-    MalformedCensus { clause: &'static str },
     #[error(
         "the half-plane count did not close after {ceiling} shift refinements; the polynomial is \
          refused rather than reported from an unclosed count"

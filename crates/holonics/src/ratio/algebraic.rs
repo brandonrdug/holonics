@@ -11,7 +11,6 @@
 use crate::ratio::{ExactOrdering, Rat};
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
-use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 fn exact_integer_gcd(mut left: BigInt, mut right: BigInt) -> BigInt {
@@ -92,25 +91,10 @@ pub(crate) fn natural_log_enclosure(
     .round_out(octaves)
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(try_from = "ExactIntervalWire")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ExactInterval {
     pub lower: Rat,
     pub upper: Rat,
-}
-
-#[derive(Deserialize)]
-struct ExactIntervalWire {
-    lower: Rat,
-    upper: Rat,
-}
-
-impl TryFrom<ExactIntervalWire> for ExactInterval {
-    type Error = ExactValueError;
-
-    fn try_from(wire: ExactIntervalWire) -> Result<Self, Self::Error> {
-        Self::new(wire.lower, wire.upper)
-    }
 }
 
 impl ExactInterval {
@@ -203,43 +187,10 @@ impl ExactInterval {
 ///
 /// **The normal form is part of the type.** [`IntegerPolynomial::new`] trims trailing zeros and
 /// refuses the zero polynomial, so a member of this type always carries a nonempty coefficient
-/// list whose last entry is nonzero. The wire enforces exactly that normal form — empty is
-/// refused as [`ExactValueError::ZeroPolynomial`], a zero leading coefficient as
-/// [`ExactValueError::UntrimmedPolynomialWire`] — and additionally passes
-/// [`IntegerPolynomial::check_declared_size`], because a remounted polynomial's degree and
-/// coefficient width are caller-declared extents exactly as a constructed one's are.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(try_from = "IntegerPolynomialWire")]
+/// list whose last entry is nonzero.
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct IntegerPolynomial {
     pub coefficients: Vec<BigInt>,
-}
-
-#[derive(Deserialize)]
-struct IntegerPolynomialWire {
-    coefficients: Vec<BigInt>,
-}
-
-impl TryFrom<IntegerPolynomialWire> for IntegerPolynomial {
-    type Error = ExactValueError;
-
-    fn try_from(wire: IntegerPolynomialWire) -> Result<Self, Self::Error> {
-        if wire.coefficients.is_empty() {
-            return Err(ExactValueError::ZeroPolynomial);
-        }
-        // `new` *normalizes* a trailing zero away; a wire that carries one is declaring a degree
-        // it does not have, so it is refused rather than quietly re-normalized into a different
-        // polynomial than the one the declaration named.
-        if wire.coefficients.last().is_some_and(Zero::is_zero) {
-            return Err(ExactValueError::UntrimmedPolynomialWire {
-                declared: wire.coefficients.len(),
-            });
-        }
-        let polynomial = Self {
-            coefficients: wire.coefficients,
-        };
-        polynomial.check_declared_size()?;
-        Ok(polynomial)
-    }
 }
 
 impl IntegerPolynomial {
@@ -254,7 +205,7 @@ impl IntegerPolynomial {
     /// The degree.
     ///
     /// **Total.** The normal form makes the list nonempty, so this is `len - 1` for every
-    /// polynomial the constructor or the wire admits. The field is public, so a direct mutation
+    /// polynomial the constructor admits. The field is public, so a direct mutation
     /// can still empty it; the convention for that unreachable-by-construction case is **degree
     /// zero**, because an empty list carries no power above the constant one. It is emphatically
     /// not `len() - 1`, which panics in a debug build and wraps to `usize::MAX` in a release
@@ -296,7 +247,7 @@ impl IntegerPolynomial {
     /// proportional to either passes through here first, so the refusal happens before the work
     /// and not inside it.
     pub(crate) fn check_declared_size(&self) -> Result<(), ExactValueError> {
-        // The public field admits a direct mutation the constructor and the wire do not; an empty
+        // The public field admits a direct mutation the constructor does not; an empty
         // list names no polynomial, so it is refused here rather than read as a degree-zero one.
         if self.coefficients.is_empty() {
             return Err(ExactValueError::ZeroPolynomial);
@@ -452,8 +403,7 @@ pub(crate) fn check_declared_sturm_work(
 /// `sign(S(u/v)) = sign(Σ s_i u^i v^(d−i))` because `v > 0`. No rational arithmetic occurs in a
 /// count.
 ///
-/// The member list is private and there is no `Deserialize`: a chain exists only by passing
-/// [`SturmChain::of`].
+/// The member list is private: a chain exists only by passing [`SturmChain::of`].
 ///
 /// **A chain carries the polynomial it was built from.** A sign-variation count is a statement
 /// about *one* polynomial, and a chain handed to an isolation entry beside a different polynomial
@@ -736,85 +686,20 @@ impl SturmChain {
 /// The sign-variation pair an isolation was certified by.
 ///
 /// **An isolating certificate drops exactly one variation.** That is the whole content of the
-/// certificate, so the wire enforces it rather than carrying two arbitrary integers; a pair that
-/// does not drop exactly one is refused as [`ExactValueError::NonIsolatingCertificate`]. What the
-/// pair cannot check on its own is *which* polynomial produced it, which is why
-/// [`AlgebraicRoot`]'s wire recomputes it from the polynomial it travels with.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(try_from = "SturmIsolationCertificateWire")]
+/// certificate; [`AlgebraicRoot::isolate`] derives it from the polynomial the root carries.
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct SturmIsolationCertificate {
     pub variations_at_lower: u32,
     pub variations_at_upper: u32,
 }
 
-#[derive(Deserialize)]
-struct SturmIsolationCertificateWire {
-    variations_at_lower: u32,
-    variations_at_upper: u32,
-}
-
-impl TryFrom<SturmIsolationCertificateWire> for SturmIsolationCertificate {
-    type Error = ExactValueError;
-
-    fn try_from(wire: SturmIsolationCertificateWire) -> Result<Self, Self::Error> {
-        if wire
-            .variations_at_lower
-            .checked_sub(wire.variations_at_upper)
-            != Some(1)
-        {
-            return Err(ExactValueError::NonIsolatingCertificate {
-                variations_at_lower: wire.variations_at_lower,
-                variations_at_upper: wire.variations_at_upper,
-            });
-        }
-        Ok(Self {
-            variations_at_lower: wire.variations_at_lower,
-            variations_at_upper: wire.variations_at_upper,
-        })
-    }
-}
-
 /// One real algebraic number, identified by a polynomial and an exact interval
 /// containing exactly one of its real roots.
-///
-/// **A remounted root re-runs its own isolation.** The certificate is a claim that the polynomial
-/// has exactly one real root inside the interval, and a hand-built wire can claim anything: a
-/// declaration that `x² + 1` has a root in `[−1, 1]` used to deserialize with no Sturm computation
-/// at all and then order itself against real roots through [`compare_algebraic`]. The wire
-/// therefore rebuilds the chain of the polynomial it carries, recounts the variations at both
-/// endpoints, and refuses unless the recomputed pair isolates exactly one root **and** equals the
-/// declared pair. Nothing carried is trusted; the polynomial and the interval are the only data,
-/// and the certificate is derived from them.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(try_from = "AlgebraicRootWire")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct AlgebraicRoot {
     pub polynomial: IntegerPolynomial,
     pub isolating_interval: ExactInterval,
     pub certificate: SturmIsolationCertificate,
-}
-
-#[derive(Deserialize)]
-struct AlgebraicRootWire {
-    polynomial: IntegerPolynomial,
-    isolating_interval: ExactInterval,
-    certificate: SturmIsolationCertificate,
-}
-
-impl TryFrom<AlgebraicRootWire> for AlgebraicRoot {
-    type Error = ExactValueError;
-
-    fn try_from(wire: AlgebraicRootWire) -> Result<Self, Self::Error> {
-        let recomputed = AlgebraicRoot::isolate(wire.polynomial, wire.isolating_interval)?;
-        if recomputed.certificate != wire.certificate {
-            return Err(ExactValueError::IsolationCertificateDisagrees {
-                declared_lower: wire.certificate.variations_at_lower,
-                declared_upper: wire.certificate.variations_at_upper,
-                recomputed_lower: recomputed.certificate.variations_at_lower,
-                recomputed_upper: recomputed.certificate.variations_at_upper,
-            });
-        }
-        Ok(recomputed)
-    }
 }
 
 impl AlgebraicRoot {
@@ -925,12 +810,6 @@ pub enum ExactValueError {
     #[error("the proposed interval contains {exact_count} roots rather than exactly one")]
     RootCount { exact_count: u32 },
     #[error(
-        "a remounted integer polynomial declares {declared} coefficients whose leading entry is \
-         zero; the constructor's normal form carries a nonzero leading coefficient, so the \
-         declaration names a degree it does not have and is refused rather than re-normalized"
-    )]
-    UntrimmedPolynomialWire { declared: usize },
-    #[error(
         "the subresultant divisor did not divide member {member} of the chain exactly; the \
          Brown-Traub identity says it must, so this is a defect in the chain and not an exhausted \
          budget"
@@ -941,27 +820,6 @@ pub enum ExactValueError {
          and may not certify an isolation"
     )]
     ChainIsNotASturmChain,
-    #[error(
-        "an isolating certificate must drop exactly one sign variation across its interval; \
-         {variations_at_lower} at the lower endpoint and {variations_at_upper} at the upper one \
-         isolate no single root"
-    )]
-    NonIsolatingCertificate {
-        variations_at_lower: u32,
-        variations_at_upper: u32,
-    },
-    #[error(
-        "a remounted algebraic root declares the sign-variation pair ({declared_lower}, \
-         {declared_upper}) and its own polynomial's Sturm chain gives ({recomputed_lower}, \
-         {recomputed_upper}); the certificate is recomputed rather than trusted, so the \
-         declaration is refused"
-    )]
-    IsolationCertificateDisagrees {
-        declared_lower: u32,
-        declared_upper: u32,
-        recomputed_lower: u32,
-        recomputed_upper: u32,
-    },
 }
 
 fn trim_integer_polynomial(coefficients: &mut Vec<BigInt>) {

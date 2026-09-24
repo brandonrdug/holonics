@@ -106,7 +106,6 @@
 use crate::ratio::Rat;
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
-use serde::Serialize;
 use thiserror::Error;
 
 use crate::ratio::ring::{ExactRing, ModularWords};
@@ -701,7 +700,7 @@ impl PrimeImage {
 }
 
 /// Why one chart's image was not lifted.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum BadChart {
     /// The image lost rank: `rank_p < max_p rank_p ≤ rank_ℚ`.
     RankBelowMaximum { found: usize, maximum: usize },
@@ -723,7 +722,7 @@ pub(crate) enum BadChart {
 ///
 /// No field here is a duration: as for [`crate::ratio::work::ExactWork`], a cost is measured in
 /// work, and a wall-clock reading belongs in a receipt beside the command, never inside the value.
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub(crate) struct ImageCost {
     /// Preparation: entries whose denominator was cleared.
     pub prepared_entries: u64,
@@ -758,11 +757,10 @@ pub(crate) struct ImageCost {
 
 /// **The one certificate under rank, kernel, echelon form and solve.**
 ///
-/// [proved-derived; implemented-exact] Every field is private and there is no `Deserialize`, so a
-/// certificate is one this owner issued and verified, and a wire cannot present a decorated one.
-/// [`Self::verify`] re-checks the whole certificate against a caller's own matrix, so a remount
-/// re-validates rather than trusts.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+/// [proved-derived; implemented-exact] Every field is private, so a certificate is one this owner
+/// issued and verified. [`Self::verify`] re-checks the whole certificate against a caller's own
+/// matrix, so a reuse re-validates rather than trusts.
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct KernelCertificate {
     rows: usize,
     columns: usize,

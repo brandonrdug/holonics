@@ -21,13 +21,12 @@
 use std::collections::BTreeMap;
 
 use crate::ratio::Rat;
-use serde::{Deserialize, Serialize};
 
 use crate::holon::HolonError;
 use crate::ratio::linear::vector::{add, dot, neg};
 
 /// [definition] A bond: one flow and one effort per port (`Holon/Port.Bond`).
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Bond {
     flow: Vec<Rat>,
     effort: Vec<Rat>,
@@ -158,7 +157,7 @@ impl Bond {
 
 /// [definition; agent-inferred] A physical dimension as integer exponents over named base
 /// dimensions. The empty map is dimensionless.
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Dimension {
     exponents: BTreeMap<String, i64>,
 }
@@ -216,7 +215,7 @@ impl Dimension {
 }
 
 /// [definition] The units of one port: flow, effort and their product, the power.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PortUnits {
     flow: Dimension,
     effort: Dimension,
@@ -275,7 +274,7 @@ impl PortUnits {
 
 /// [definition] The four port kinds of a port Holon, in the order the ports are laid out:
 /// storage `σ`, resistive `ρ`, external `π`, active `α` (`Holon/Element.Ports`).
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum PortKind {
     Storage,
     Resistive,
@@ -284,7 +283,7 @@ pub enum PortKind {
 }
 
 /// [definition] A named port with its kind and units.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Port {
     pub name: String,
     pub kind: PortKind,

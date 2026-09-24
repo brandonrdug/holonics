@@ -48,7 +48,6 @@
 
 use crate::ratio::Rat;
 use num_traits::{Signed, Zero};
-use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
@@ -59,41 +58,13 @@ use crate::ratio::work::ExactWork;
 
 /// A symmetric bilinear form over the rationals, exact.
 ///
-/// Symmetry is checked at construction — and again at every remount, through the wire's
-/// `TryFrom` — so [`inertia`] is total: a form that exists is a form whose inertia is defined.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(try_from = "SymmetricFormWire")]
+/// Symmetry is checked at construction, so [`inertia`] is total: a form that exists is a form
+/// whose inertia is defined.
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SymmetricForm {
     extent: usize,
     /// Row-major, `extent * extent`.
     entries: Vec<Rat>,
-}
-
-/// The wire shape. A remounted form re-enters through [`SymmetricForm::from_rows`], so an
-/// asymmetric or ragged wire is refused instead of becoming a form whose inertia is undefined.
-#[derive(Deserialize)]
-struct SymmetricFormWire {
-    extent: usize,
-    entries: Vec<Rat>,
-}
-
-impl TryFrom<SymmetricFormWire> for SymmetricForm {
-    type Error = InertiaError;
-
-    fn try_from(wire: SymmetricFormWire) -> Result<Self, Self::Error> {
-        let SymmetricFormWire { extent, entries } = wire;
-        if extent.checked_mul(extent) != Some(entries.len()) {
-            return Err(InertiaError::RaggedForm {
-                row: 0,
-                found: entries.len(),
-                extent,
-            });
-        }
-        if extent == 0 {
-            return Self::from_rows(Vec::new());
-        }
-        Self::from_rows(entries.chunks(extent).map(<[Rat]>::to_vec).collect())
-    }
 }
 
 impl SymmetricForm {
@@ -200,7 +171,7 @@ impl SymmetricForm {
 /// This is the artifact, not a verdict. `positive + negative` is the rank; `zero` is the nullity;
 /// the pair `(positive, negative)` is the signature. Sylvester's law is the statement that all three
 /// are invariants of the form.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Inertia {
     pub positive: usize,
     pub zero: usize,
@@ -229,8 +200,7 @@ impl Inertia {
 /// A parameter, because a pivot order is a property of the solver and never of the form. Sylvester's
 /// law says every order must return the same [`Inertia`], and
 /// `the_inertia_does_not_depend_on_the_pivot_order` is what holds this module to that.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case")]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum PivotOrder {
     /// Lowest surviving index. The cheapest, and the order whose dependence would be least visible
     /// if the law did not hold.
@@ -245,8 +215,7 @@ pub enum PivotOrder {
 }
 
 /// One step the elimination took, in the coordinates of the form handed in.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case")]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum PivotStep {
     /// A nonzero diagonal entry was available, and contributed its own sign.
     Diagonal { index: usize, negative: bool },
@@ -262,7 +231,7 @@ pub(crate) enum PivotStep {
 /// A pivot position is a **receiver coordinate** — a property of the solver, not of the form — and
 /// this is the only place one leaves the elimination. It is returned so that "all four orders
 /// agreed" can be audited for being an agreement between *different* computations.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct InertiaSchedule {
     pub order: PivotOrder,
     pub steps: Vec<PivotStep>,

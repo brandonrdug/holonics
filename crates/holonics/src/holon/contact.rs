@@ -9,14 +9,16 @@
 //! J = [v_a | −v_b]             Δ̇ = J (ṡ, ṫ)                       the slip map
 //! DQ = 2 Jᵀ Δ                  D²Q = 2 JᵀJ + 2 diag(Δ·a_a, −Δ·a_b)
 //! M = Σ_f w_f J_fᵀ D_f J_f     P(u) = ⟨J u, w D J u⟩ ≥ 0           the contact material
-//! P(u) = 0  ⇔  D J u = 0       q·v_a = p·v_b  ⇔  a no-slip lock at rate ratio p/q
+//! P(u) = 0  ⇔  D J u = 0  (w > 0)   q·v_a = p·v_b  ⇔  a no-slip lock at rate ratio p/q
 //! ```
 //!
 //! The contact is a resistive element on relative slip: flow `f = J u`, effort `e = −w D f`,
-//! power `⟨e, f⟩ = −⟨u, M u⟩ ≤ 0`. Zero power coincides with no slip only where the material is
-//! definite on the attainable slips; a positive semidefinite `D` can be blind to a slip. A lock
-//! with a positive rate ratio has a Farey address; signed and stationary relations keep their own
-//! reading.
+//! power `⟨e, f⟩ = −⟨u, M u⟩ ≤ 0`. For a positive weight `w > 0` (Lean's hypothesis `hw`) zero
+//! power is exactly `D J u = 0`; a zero weight dissipates nothing at any rate. Zero power coincides
+//! with no slip only where the material is definite on the attainable slips; a positive
+//! semidefinite `D` can be blind to a slip. A lock at a positive rate ratio has a Farey address;
+//! signed and stationary relations keep their own reading, and the rate pair `0/0` declares no
+//! ratio and is refused.
 //!
 //! The alignment of two velocities is a ratio carried undivided: by Lagrange's identity
 //! `⟨a|b⟩² + |a × b|² = |a|²|b|²`, the cohering and turning faces are two numerators over one
@@ -25,9 +27,9 @@
 //! An ordered family of situated screws is a **serial chain**: its finite configuration is the
 //! ordered product of the joint actions, its Jacobian columns are each joint's Lie generator
 //! recharted through the preceding product, and a contact between two links reads the relative
-//! velocity of its two points through those columns. A revolute joint is carried in the Cayley
-//! half-angle chart, whose parameter rate `ṫ` is the angular rate `2ṫ/(1 + t²)`; no rational screw
-//! is exponentiated.
+//! velocity of its two points through those columns; at the joints' declared rates the columns
+//! sum to the contact's slip. A revolute joint is carried in the Cayley half-angle chart, whose
+//! parameter rate `ṫ` is the angular rate `2ṫ/(1 + t²)`; no rational screw is exponentiated.
 //!
 //! | Lean | Rust |
 //! |---|---|
@@ -38,7 +40,15 @@
 //! | `Transport/HelicalPairInteraction.lock_iff_zero_power` | [`pair_lock`], [`ContactMaterial::definite_on_slips`] |
 //! | `Holon/Conformance.pairContact_resistive` | [`ContactMaterial::element`], [`ContactMaterial::bond`] |
 //! | `Geometry/PairResonance` (neighbours, mediant) | [`PairContact::lock`] through [`LockAddress`] |
+//! | `HolonicsResearch/Transport/Fold.lagrange_identity` | [`Alignment`] |
 //! | `Transport/SerialScrewChain.serialConfiguration`, `serialPrefixes`, `cayleyZChart` | [`SerialChain`] |
+//!
+//! [proved-derived; implemented-exact] The chain's derivative has no Lean counterpart:
+//! [`JointMotion::parameter_generator`], [`SerialChain::spatial_jacobian`],
+//! [`SerialChain::contact_jacobian`] and [`SerialChain::contact_slip`] state it here, and the
+//! continuous chain derivative is the #62 obligation (`Transport/SerialScrewChain` stops at the
+//! finite configuration). The tests compare every column with the exact product-rule derivative of
+//! the Cayley charts.
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
@@ -77,6 +87,8 @@ pub enum ContactError {
     },
     #[error("a zero velocity has no alignment against another")]
     NullVelocity,
+    #[error("the rate pair 0/0 declares no rate ratio")]
+    DegenerateRate,
     #[error("the joint's situated generator is not the generator of its finite chart")]
     GeneratorMismatch,
     #[error("joint parameter {parameter} lies outside [{lower}, {upper}]")]
@@ -259,32 +271,47 @@ impl PairContact {
         Ok(result)
     }
 
-    /// The lock reading at the rate ratio `p/q`: a positive lock carries its Farey address.
-    pub fn lock(&self, numerator: &BigInt, denominator: &BigInt) -> LockReading {
-        if !pair_lock(&self.pair, numerator, denominator) {
-            return LockReading::NotLocked;
+    /// The lock reading at the rate ratio `p/q`: a lock whose ratio is positive carries its Farey
+    /// address, whatever the signs of `p` and `q` (`−1/−2` is the lock `1/2`). The pair `0/0` is
+    /// refused.
+    pub fn lock(
+        &self,
+        numerator: &BigInt,
+        denominator: &BigInt,
+    ) -> Result<LockReading, ContactError> {
+        if !pair_lock(&self.pair, numerator, denominator)? {
+            return Ok(LockReading::NotLocked);
         }
-        if numerator.is_positive() && denominator.is_positive() {
+        if !denominator.is_zero() && Rat::new(numerator.clone(), denominator.clone()).is_positive()
+        {
             if let Ok(address) = LockAddress::from_ratio(numerator, denominator) {
-                return LockReading::PositiveAddress(address);
+                return Ok(LockReading::PositiveAddress(address));
             }
         }
-        LockReading::SignedOrStationary {
+        Ok(LockReading::SignedOrStationary {
             numerator: numerator.clone(),
             denominator: denominator.clone(),
-        }
+        })
     }
 }
 
 /// [proved-derived; implemented-exact] The pair locks at rate ratio `p/q` exactly when
 /// `q·v_a = p·v_b` at the retained initial configurations: the zero-slip direction of
-/// `Transport/HelicalPairInteraction.lock_iff_zero_power`.
-pub fn pair_lock(pair: &ScrewPair, numerator: &BigInt, denominator: &BigInt) -> bool {
+/// `Transport/HelicalPairInteraction.lock_iff_zero_power`. The pair `0/0` is no rate ratio (it
+/// would read every pair as locked) and is refused.
+pub fn pair_lock(
+    pair: &ScrewPair,
+    numerator: &BigInt,
+    denominator: &BigInt,
+) -> Result<bool, ContactError> {
+    if numerator.is_zero() && denominator.is_zero() {
+        return Err(ContactError::DegenerateRate);
+    }
     let (a, b) = (pair.first(), pair.second());
     let va = a.generator().velocity(a.initial());
     let vb = b.generator().velocity(b.initial());
-    va.scale(&Rat::from_integer(denominator.clone()))
-        == vb.scale(&Rat::from_integer(numerator.clone()))
+    Ok(va.scale(&Rat::from_integer(denominator.clone()))
+        == vb.scale(&Rat::from_integer(numerator.clone())))
 }
 
 // -------------------------------------------------------------------------------------------
@@ -372,13 +399,14 @@ impl ContactMaterial {
         Ok(Bond::new(flow, effort)?)
     }
 
-    /// The rates of zero power: `ker(D J)`, which contains the no-slip rates `ker J`.
+    /// The rates of zero power: `ker(wDJ)`, which contains the no-slip rates `ker J`. For `w > 0`
+    /// it is `ker(DJ)`; a zero weight makes every rate silent.
     pub fn zero_power_kernel(&self, slip: &ExactRatMatrix) -> Result<Vec<Vec<Rat>>, ContactError> {
         Ok(self.resistance()?.multiply(slip)?.kernel_basis()?)
     }
 
     /// Whether zero power forces zero slip: the material is definite on the attainable slips,
-    /// `rank(D J) = rank(J)`.
+    /// `rank(wDJ) = rank(J)`.
     pub fn definite_on_slips(&self, slip: &ExactRatMatrix) -> Result<bool, ContactError> {
         Ok(self.resistance()?.multiply(slip)?.rank()? == slip.rank()?)
     }
@@ -421,6 +449,7 @@ pub fn contact_material(
 
 /// **The alignment of two velocities, undivided.** `cohere = ⟨a|b⟩²` and `turn = |a × b|²` over
 /// the one denominator `|a|²|b|²`, with the hand `⟨a|b⟩` kept beside the square that erases it.
+/// The faces close by Lagrange's identity, Lean `HolonicsResearch/Transport/Fold.lagrange_identity`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Alignment {
     pub cohere: Rat,
@@ -454,7 +483,8 @@ impl Alignment {
         Presentation::new(self.turn.clone(), self.span.clone())
     }
 
-    /// Lagrange's identity: the two faces close, `cohere + turn = span`.
+    /// Lagrange's identity (`Transport/Fold.lagrange_identity`): the two faces close,
+    /// `cohere + turn = span`.
     pub fn closes(&self) -> bool {
         &self.cohere + &self.turn == self.span
     }
@@ -496,7 +526,8 @@ impl JointLimit {
 }
 
 /// **The finite action of one joint.** A revolute joint is carried in the Cayley half-angle chart;
-/// `rate` is the chart parameter's derivative along the declared clock.
+/// `rate` is the chart parameter's derivative along the declared clock, which
+/// [`SerialChain::contact_slip`] reads.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum JointMotion {
     Revolute {
@@ -520,6 +551,7 @@ impl JointMotion {
         }
     }
 
+    /// The chart parameter's declared rate `ṫ`.
     pub fn rate(&self) -> &Rat {
         match self {
             Self::Revolute { rate, .. } | Self::Prismatic { rate, .. } => rate,
@@ -790,6 +822,19 @@ impl SerialChain {
         })
     }
 
+    /// **The contact's slip at the declared joint rates**: `Δ̇ = Σ_j ṫ_j (v_first − v_second)_j`,
+    /// the contact Jacobian applied to the rates each joint carries.
+    pub fn contact_slip(&self, contact: &LinkContact) -> Result<RatVec3, ContactError> {
+        let jacobian = self.contact_jacobian(contact)?;
+        Ok(jacobian
+            .velocity_columns
+            .iter()
+            .zip(&self.joints)
+            .fold(RatVec3::zero(), |slip, (column, joint)| {
+                slip.add(&column.scale(joint.motion.rate()))
+            }))
+    }
+
     /// Compare a supplied candidate family with a target endpoint. The plural and null fibres
     /// are kept; no candidate is chosen by search.
     pub fn closure(
@@ -860,6 +905,72 @@ mod tests {
             ),
             RatVec3::from_i64(at[0], at[1], at[2]),
         )
+    }
+
+    /// A rotated, translated base frame: a proper rigid motion that is not the identity.
+    fn rotated_base() -> AffineMap3 {
+        AffineMap3 {
+            linear: Axis::X
+                .cayley_rotation(&rat(1, 2))
+                .multiply(&Axis::Z.cayley_rotation(&rat(-2, 3))),
+            translation: RatVec3::from_i64(1, -2, 3),
+        }
+    }
+
+    /// The Cayley chart's derivative in `t`, entry by entry by the quotient rule:
+    /// `c′ = −4t/(1 + t²)²`, `s′ = 2(1 − t²)/(1 + t²)²`.
+    fn cayley_derivative(axis: Axis, t: &Rat) -> RatMat3 {
+        let spread = Rat::one() + t * t;
+        let spread = &spread * &spread;
+        let dc = -(integer(4) * t) / &spread;
+        let ds = integer(2) * (Rat::one() - t * t) / &spread;
+        let o = Rat::zero();
+        match axis {
+            Axis::X => RatMat3::new([
+                [o.clone(), o.clone(), o.clone()],
+                [o.clone(), dc.clone(), -ds.clone()],
+                [o, ds, dc],
+            ]),
+            Axis::Y => RatMat3::new([
+                [dc.clone(), o.clone(), ds.clone()],
+                [o.clone(), o.clone(), o.clone()],
+                [-ds, o, dc],
+            ]),
+            Axis::Z => RatMat3::new([
+                [dc.clone(), -ds.clone(), o.clone()],
+                [ds, dc, o.clone()],
+                [o.clone(), o.clone(), o],
+            ]),
+        }
+    }
+
+    fn revolute(axis: Axis, pivot: RatVec3, parameter: Rat, rate: Rat) -> SerialJoint {
+        let motion = JointMotion::Revolute {
+            axis,
+            pivot,
+            parameter,
+            rate,
+        };
+        SerialJoint::new(
+            SituatedScrew::new(motion.parameter_generator(), RatVec3::zero()),
+            motion,
+            None,
+        )
+        .unwrap()
+    }
+
+    fn prismatic(axis: [i64; 3], limit: Option<JointLimit>) -> SerialJoint {
+        let motion = JointMotion::Prismatic {
+            axis: RatVec3::from_i64(axis[0], axis[1], axis[2]),
+            displacement: Rat::zero(),
+            rate: integer(1),
+        };
+        SerialJoint::new(
+            SituatedScrew::new(motion.parameter_generator(), RatVec3::zero()),
+            motion,
+            limit,
+        )
+        .unwrap()
     }
 
     fn form(rows: &[[i64; 3]; 3]) -> SymmetricForm {
@@ -958,18 +1069,19 @@ mod tests {
     }
 
     /// Lean `lock_iff_zero_power` and `Geometry/PairResonance`: coaxial rotations at rates `1` and
-    /// `2` lock exactly at `1/2`, addressed by its Stern–Brocot word; a stationary relation keeps
-    /// its own reading.
+    /// `2` lock exactly at `1/2`, addressed by its Stern–Brocot word whatever the signs that
+    /// present it (`−1/−2` is the same lock); a counter-rotating pair locks at a signed ratio and a
+    /// stationary relation keeps its own reading; `0/0` declares no ratio and is refused rather
+    /// than read as a lock of every pair.
     #[test]
     fn a_lock_is_zero_slip_at_its_rate_ratio_and_carries_its_farey_address() {
+        let big = |value: i64| BigInt::from(value);
         let pair = ScrewPair::new(
             screw([0, 0, 1], [0, 0, 0], [1, 0, 0]),
             screw([0, 0, 2], [0, 0, 0], [1, 0, 0]),
         );
         let contact = PairContact::of(pair);
-        let LockReading::PositiveAddress(address) =
-            contact.lock(&BigInt::from(1), &BigInt::from(2))
-        else {
+        let LockReading::PositiveAddress(address) = contact.lock(&big(1), &big(2)).unwrap() else {
             panic!("coaxial rates 1 and 2 lock at 1/2");
         };
         assert_eq!(address.to_ratio().unwrap(), rat(1, 2));
@@ -981,17 +1093,48 @@ mod tests {
                 .is_zero()
         );
         assert_eq!(
-            contact.lock(&BigInt::from(1), &BigInt::from(3)),
+            contact.lock(&big(-1), &big(-2)).unwrap(),
+            LockReading::PositiveAddress(address)
+        );
+        assert_eq!(
+            contact.lock(&big(1), &big(3)).unwrap(),
             LockReading::NotLocked
+        );
+        let counter = PairContact::of(ScrewPair::new(
+            screw([0, 0, 1], [0, 0, 0], [1, 0, 0]),
+            screw([0, 0, -2], [0, 0, 0], [1, 0, 0]),
+        ));
+        assert_eq!(
+            counter.lock(&big(-1), &big(2)).unwrap(),
+            LockReading::SignedOrStationary {
+                numerator: big(-1),
+                denominator: big(2),
+            }
         );
         let resting = PairContact::of(ScrewPair::new(
             screw([0, 0, 0], [0, 0, 0], [0, 0, 0]),
             screw([0, 0, 0], [0, 0, 0], [1, 1, 1]),
         ));
         assert!(matches!(
-            resting.lock(&BigInt::from(0), &BigInt::from(1)),
+            resting.lock(&big(0), &big(1)).unwrap(),
             LockReading::SignedOrStationary { .. }
         ));
+        let unrelated = ScrewPair::new(
+            screw([0, 0, 1], [0, 0, 2], [3, 1, 0]),
+            screw([1, 0, 0], [0, 1, 0], [0, 2, -1]),
+        );
+        assert_eq!(
+            pair_lock(&unrelated, &big(0), &big(0)),
+            Err(ContactError::DegenerateRate)
+        );
+        assert_eq!(
+            PairContact::of(unrelated).lock(&big(0), &big(0)),
+            Err(ContactError::DegenerateRate)
+        );
+        assert_eq!(
+            resting.lock(&big(0), &big(0)),
+            Err(ContactError::DegenerateRate)
+        );
     }
 
     /// Lagrange's identity: the cohering and turning faces of two velocities close over one
@@ -1011,8 +1154,9 @@ mod tests {
         );
     }
 
-    /// Lean `Transport/SerialScrewChain`: a revolute joint's Jacobian column is the derivative of
-    /// its Cayley chart. At parameter `t` the rotation's entries have derivatives
+    /// No Lean counterpart; obligation #62 (continuous chain derivative). A revolute joint's
+    /// Jacobian column is the derivative of its Cayley chart. At parameter `t` the rotation's
+    /// entries have derivatives
     /// `c′ = −(2/(1+t²)) s`, `s′ = (2/(1+t²)) c`, and the column's velocity at a link point equals
     /// that derivative applied to the point's rest position, exactly.
     #[test]
@@ -1058,32 +1202,85 @@ mod tests {
         );
     }
 
+    /// No Lean counterpart; obligation #62 (continuous chain derivative). Two revolute joints with
+    /// off-origin pivots on a rotated, translated base `B`: each spatial Jacobian column, read at
+    /// the moved point, is the exact product-rule derivative of the endpoint `B·M₁(t₁)·M₂(t₂)·p`
+    /// with `M_i x = R_i(t_i)(x − c_i) + c_i`, namely `∂₁ = B·R₁′(t₁)(M₂p − c₁)` and
+    /// `∂₂ = B·R₁(t₁)R₂′(t₂)(p − c₂)`, where `R′` is the quotient-rule derivative of the Cayley
+    /// chart (independent of the `2/(1 + t²)` angular rate the generator carries). A contact from
+    /// the tip to a point `q` on the first link reads `∂₁ − B·R₁′(t₁)(q − c₁)` and `∂₂`, and at the
+    /// declared joint rates its slip is their rate-weighted sum.
+    #[test]
+    fn two_revolute_columns_are_the_product_rule_derivative_of_the_chain() {
+        let base = rotated_base();
+        let (t1, t2) = (rat(1, 3), rat(-3, 2));
+        let (c1, c2) = (RatVec3::from_i64(1, 2, 0), RatVec3::from_i64(0, -1, 2));
+        let (r1, r2) = (integer(2), rat(-1, 5));
+        let chain = SerialChain::new(
+            base.clone(),
+            vec![
+                revolute(Axis::Z, c1.clone(), t1.clone(), r1.clone()),
+                revolute(Axis::Y, c2.clone(), t2.clone(), r2.clone()),
+            ],
+        )
+        .unwrap();
+        let p = RatVec3::from_i64(3, -1, 4);
+        let m2 = chain.joints()[1].motion().finite_map();
+        let first = base
+            .linear
+            .apply(&cayley_derivative(Axis::Z, &t1).apply(&m2.apply(&p).subtract(&c1)));
+        let second = base
+            .linear
+            .multiply(&Axis::Z.cayley_rotation(&t1))
+            .apply(&cayley_derivative(Axis::Y, &t2).apply(&p.subtract(&c2)));
+        let moved = chain.link_transforms()[1].apply(&p);
+        assert_eq!(moved, chain.endpoint().apply(&p));
+        let columns = chain.spatial_jacobian().unwrap();
+        assert_eq!(columns[0].velocity(&moved), first);
+        assert_eq!(columns[1].velocity(&moved), second);
+
+        let q = RatVec3::from_i64(-2, 0, 1);
+        let contact = LinkContact {
+            first_link: 1,
+            second_link: 0,
+            first_point: p.clone(),
+            second_point: q.clone(),
+            orientation: RatVec3::from_i64(1, 1, -1),
+        };
+        let on_first_link = base
+            .linear
+            .apply(&cayley_derivative(Axis::Z, &t1).apply(&q.subtract(&c1)));
+        let expected = vec![first.subtract(&on_first_link), second];
+        let jacobian = chain.contact_jacobian(&contact).unwrap();
+        assert_eq!(jacobian.velocity_columns, expected);
+        assert_eq!(
+            jacobian.row,
+            expected
+                .iter()
+                .map(|column| contact.orientation.dot(column))
+                .collect::<Vec<_>>()
+        );
+        let slip = expected[0].scale(&r1).add(&expected[1].scale(&r2));
+        assert_eq!(chain.contact_slip(&contact).unwrap(), slip);
+        assert_eq!(
+            jacobian.slip().unwrap().apply(&[r1, r2]).unwrap(),
+            vec![slip.x, slip.y, slip.z]
+        );
+    }
+
     /// An all-prismatic chain's endpoint family is the exact affine preimage: two parallel axes
     /// leave a one-dimensional fibre, and the joint limits decide which members are admitted.
     #[test]
     fn a_prismatic_chain_returns_its_complete_endpoint_fibre() {
-        let joint = |axis: [i64; 3], limit: Option<JointLimit>| {
-            let motion = JointMotion::Prismatic {
-                axis: RatVec3::from_i64(axis[0], axis[1], axis[2]),
-                displacement: Rat::zero(),
-                rate: integer(1),
-            };
-            SerialJoint::new(
-                SituatedScrew::new(motion.parameter_generator(), RatVec3::zero()),
-                motion,
-                limit,
-            )
-            .unwrap()
-        };
         let chain = SerialChain::new(
             AffineMap3::identity(),
             vec![
-                joint(
+                prismatic(
                     [1, 0, 0],
                     Some(JointLimit::new(integer(0), integer(2)).unwrap()),
                 ),
-                joint([2, 0, 0], None),
-                joint([0, 1, 0], None),
+                prismatic([2, 0, 0], None),
+                prismatic([0, 1, 0], None),
             ],
         )
         .unwrap();
@@ -1118,5 +1315,47 @@ mod tests {
             translation: RatVec3::from_i64(0, 0, 1),
         };
         assert_eq!(chain.prismatic_endpoint_fibre(&unreachable).unwrap(), None);
+    }
+
+    /// Under a rotated, translated base the prismatic axes act through the base's rotation, so the
+    /// fibre is the preimage of `Bᵀ(target − b)`: three axes spanning a plane leave a
+    /// one-dimensional fibre, every admitted member reaches the target, and the same local
+    /// displacement read without the rotation is unreachable.
+    #[test]
+    fn a_prismatic_fibre_reads_its_axes_through_a_rotated_base() {
+        let base = rotated_base();
+        let chain = SerialChain::new(
+            base.clone(),
+            vec![
+                prismatic([1, 0, 0], None),
+                prismatic([0, 1, 0], None),
+                prismatic([1, 1, 0], None),
+            ],
+        )
+        .unwrap();
+        let local = RatVec3::from_i64(2, 3, 0);
+        let target = AffineMap3 {
+            linear: base.linear.clone(),
+            translation: base.linear.apply(&local).add(&base.translation),
+        };
+        let fibre = chain
+            .prismatic_endpoint_fibre(&target)
+            .unwrap()
+            .expect("reachable");
+        assert_eq!(fibre.kernel.len(), 1);
+        for member in [
+            vec![integer(2), integer(3), integer(0)],
+            vec![integer(0), integer(1), integer(2)],
+            vec![rat(1, 2), rat(3, 2), rat(3, 2)],
+        ] {
+            assert!(fibre.admits(&member));
+            assert_eq!(chain.endpoint_at(&member).unwrap(), target);
+        }
+        assert!(!fibre.admits(&[integer(3), integer(3), integer(0)]));
+        let unrotated = AffineMap3 {
+            linear: base.linear.clone(),
+            translation: local.add(&base.translation),
+        };
+        assert_eq!(chain.prismatic_endpoint_fibre(&unrotated).unwrap(), None);
     }
 }

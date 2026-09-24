@@ -18,4 +18,7 @@ pub mod screw;
 pub mod swing;
 pub mod winding;
 
-pub use exact::*;
+pub use exact::{
+    AffineMap3, Axis, RatMat3, RatVec3, cayley_rotation_x, cayley_rotation_y, cayley_rotation_z,
+    rational_circle,
+};

@@ -116,6 +116,9 @@ fn the_adjugate_expansion_satisfies_the_resolvent_identity() {
 /// the certificate is its `n + 1` coefficient equations — including the closing one, which is
 /// Cayley–Hamilton and is the only one the Faddeev–LeVerrier recurrence does not produce by
 /// construction. The same holds for each transfer numerator, whose identity has degree `n − 1`.
+///
+/// **One point is not a certificate.** An adjugate corrupted by `D·s − 3D` agrees with the true one
+/// at `s = 3`, so the single-point check passes it; the coefficientwise certificate refuses it.
 #[test]
 fn the_certificate_is_every_coefficient_of_the_identity_and_not_one_point() {
     for state in [
@@ -149,6 +152,48 @@ fn the_certificate_is_every_coefficient_of_the_identity_and_not_one_point() {
         assert_eq!(entry.certified_coefficients, transfer.extent);
         assert!(entry.residual.is_zero());
     }
+
+    // The corrupted half: `D` is any nonzero matrix, and the perturbation `D·s − 3D` vanishes at
+    // `s = 3`.
+    let state = matrix(&[&[1, 2], &[3, 4]]);
+    let expansion = resolvent_expansion(&state).expect("the expansion returns");
+    let extent = expansion.extent;
+    let bump = matrix(&[&[0, 1], &[0, 0]]);
+    let corrupted = vec![
+        expansion.adjugate[0].add(&bump).expect("sum"),
+        expansion.adjugate[1]
+            .subtract(&bump.scaled(&integer(3)))
+            .expect("difference"),
+    ];
+    let decoy = ResolventExpansion {
+        extent,
+        characteristic: expansion.characteristic.clone(),
+        adjugate: corrupted.clone(),
+        certified_coefficients: 0,
+        residual: Rat::zero(),
+    };
+    let point = integer(3);
+    let identity = ExactRatMatrix::identity(extent).expect("identity");
+    let at_point = identity
+        .scaled(&point)
+        .subtract(&state)
+        .expect("shift")
+        .multiply(&decoy.adjugate_at(&point).expect("adjugate"))
+        .expect("product")
+        .subtract(&identity.scaled(&expansion.characteristic.evaluate(&point)))
+        .expect("difference");
+    assert!(
+        at_point.entries().iter().all(Zero::is_zero),
+        "the corruption is invisible at the single point"
+    );
+    assert_eq!(
+        certify_adjugate(&state, &expansion.characteristic, &corrupted),
+        Err(ChordRefusal::AdjugateCertificateFailure)
+    );
+    assert_eq!(
+        certify_adjugate(&state, &expansion.characteristic, &expansion.adjugate),
+        Ok(Rat::zero())
+    );
 }
 
 // ---------------------------------------------------------------------------------------------

@@ -19,7 +19,6 @@ use std::ops::Range;
 use crate::ratio::Rat;
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
-use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::ratio::polynomial::RationalPolynomial;
@@ -72,7 +71,7 @@ fn certified_work(
     work
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ExactRatMatrix {
     rows: usize,
     columns: usize,
@@ -178,8 +177,7 @@ impl ExactRatMatrix {
         &self.entries
     }
 
-    /// The entries as dense rows — the shape the physical laws' own signatures and serialized
-    /// certificates speak in.
+    /// The entries as dense rows — the shape the physical laws' own signatures speak in.
     ///
     /// This is a presentation of the same operator and not a second carrier: it round-trips
     /// through `new` exactly, including the degenerate `0 x 0` case, which is what lets a law
@@ -1059,7 +1057,7 @@ impl ExactRatMatrix {
 ///
 /// **All four faces at once**, so a caller cannot read the rank and forget that the map collapses
 /// something or that its exterior is open.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LinearFactorization {
     pub rows: usize,
     pub columns: usize,
@@ -1074,7 +1072,7 @@ pub struct LinearFactorization {
 }
 
 /// One exact rank factorization and the gauge and fibres which keep it interpretable.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ExactRankFactorization {
     pub rows: usize,
     pub columns: usize,
@@ -1110,8 +1108,6 @@ impl LinearFactorization {
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
 pub enum ExactLinearError {
-    #[error("joint receivers do not share the same retained product core")]
-    DifferentProductCores,
     #[error("an exact matrix cannot have ragged rows")]
     RaggedMatrix,
     #[error("an exact matrix address lies outside its shape")]

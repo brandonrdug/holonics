@@ -119,7 +119,7 @@
 //! \[implemented-exact\] [`NavigatorFamily`], [`SourcePopulation`], [`StandingLaw`],
 //! [`ReceiverReading`], [`FutureObservation`], [`TimedFace`], [`MemoryLaw`], [`ApertureChain`] and
 //! [`ContractionCertificate`] carry invariants, so each has private fields, exactly one validating
-//! constructor, no `Default` and no `Deserialize`. [`SufficiencyVerdict`], [`Fidelity`] and
+//! constructor and no `Default`. [`SufficiencyVerdict`], [`Fidelity`] and
 //! [`ExtinctionVerdict`] are **returns** with public fields and no invariant: nothing in this
 //! module consumes one, so a hand-built verdict grants no capability. A
 //! [`ContractionCertificate`] is not trusted on construction either — [`extinction`] calls
@@ -128,7 +128,6 @@
 use crate::ratio::Rat;
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
-use serde::Serialize;
 use thiserror::Error;
 
 use crate::holon::restriction::{FactorDescent, LinearRestriction, factor_descent_over};
@@ -197,8 +196,8 @@ fn one() -> Rat {
 ///
 /// \[implemented-exact\] Every field is private and the only constructor is [`Self::declared`],
 /// which checks the extent, the navigator count, the squareness of every map and the agreement of
-/// the declared names with the declared maps. There is no `Default` and no `Deserialize`, so a
-/// wire cannot mint a family whose names and maps disagree.
+/// the declared names with the declared maps. There is no `Default`, so nothing mints a family
+/// whose names and maps disagree.
 ///
 /// \[definition; agent-inferred\] **The linear-map chart of a navigator family.** Each member is
 /// the finite exact linear passage a navigator induces on this carrier, not the navigator itself:
@@ -206,7 +205,7 @@ fn one() -> Rat {
 /// lift) enters here only through its induced map, e.g. one Cayley tick of a `Transport::Linear`
 /// is the member `(I − hA/2)⁻¹(I + hA/2)`. The initial configuration, clock and winding are not
 /// retained by this chart; standing sufficiency is read over the passages alone.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct NavigatorFamily {
     lineage: String,
     extent: usize,
@@ -398,9 +397,8 @@ impl NavigatorFamily {
 
 /// **An enumerated lineage**: the exact source states whose standing is being compared.
 ///
-/// \[implemented-exact\] Private fields, one validating constructor, no `Default` and no
-/// `Deserialize`.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+/// \[implemented-exact\] Private fields, one validating constructor and no `Default`.
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SourcePopulation {
     lineage: String,
     extent: usize,
@@ -474,7 +472,7 @@ impl SourcePopulation {
 /// \[definition\] `retain` is a quotient, not a decoder. Nothing requires it to be injective and
 /// nothing requires the passage history to be recoverable from it — AGENTS.md: *"Causal origin
 /// does not prescribe an event archive."* What it owes is [`sufficiency`].
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct StandingLaw {
     lineage: String,
     retain: ExactRatMatrix,
@@ -533,7 +531,7 @@ impl StandingLaw {
 /// \[implemented-exact\] Private fields and one validating constructor. It implements
 /// [`crate::receiver::face::Reading`], so every width taken here is the release owner's width
 /// and not a second diameter.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReceiverReading {
     receiver: String,
     matrix: ExactRatMatrix,
@@ -626,7 +624,7 @@ impl Reading for ReceiverReading {
 ///
 /// \[definition\] The family of these is the Lean owner's `causalSignature`, enumerated at the
 /// finitely many `(ρ, w)` a caller declares.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FutureObservation {
     word: Vec<usize>,
     reading: ReceiverReading,
@@ -660,8 +658,7 @@ impl FutureObservation {
 /// \[definition\] `NotSufficient` is a **refutation with its witness**: the two lineage members
 /// whose standing agrees, the receiver and history that separate them, and the two faces. It is
 /// the Rust form of `StandingLaw.separating_future_refutes_the_standing`.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
-#[serde(tag = "sufficiency", rename_all = "kebab-case")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum SufficiencyVerdict {
     /// Every admitted future observation factors through the standing.
     Sufficient {
@@ -868,7 +865,7 @@ pub fn sufficiency_descent(
 /// and the face an original occurrence carried cannot be compared by `=` at all. Rust has no such
 /// dependent type, so the time is carried as data and [`TimedFace::occurs_at`] is the reading that
 /// separates them. A reconstruction is a **new occurrence**: it occurs now.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TimedFace {
     time: usize,
     value: Vec<Rat>,
@@ -905,7 +902,7 @@ impl TimedFace {
 /// \[definition\] `m_t = D_t(S_t, c_t)`: it takes the standing and the present context and
 /// *constitutes* a face at the present time. It receives no original. Both parts are exact linear
 /// maps, so the whole generation is exact.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MemoryLaw {
     present: usize,
     from_standing: ExactRatMatrix,
@@ -1000,8 +997,7 @@ impl MemoryLaw {
 /// agree with the original at receiver `ρ` **exactly when** `ρ` factors through what standing
 /// retained; `NotRetained` carries the two lineage members that refute the factoring, which is
 /// `Foundation/Receiver.ReceiverInsufficiency` returned as data.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
-#[serde(tag = "fidelity", rename_all = "kebab-case")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Fidelity {
     /// The receiver factors through the standing: a faithful reconstruction exists.
     Faithful {
@@ -1095,7 +1091,7 @@ pub fn fidelity(
 /// while the source does nothing at all. Its link law is
 /// `face(coarse, face(fine, x)) = face(coarse, x)` for `coarse ≤ fine`, which is the zero
 /// changing-receiver defect of `Transport/ChangingReceiver.defect`.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ApertureChain {
     lineage: String,
     extent: usize,
@@ -1186,7 +1182,7 @@ impl ApertureChain {
 /// [`Self::verify`] **checks** against every navigator that the chart is invariant and that every
 /// chart row sums to at most `λ`. Nothing is assumed: a tower whose steps do not actually contract
 /// is refused by name with the row that refutes it.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ContractionCertificate {
     chart: Vec<usize>,
     factor: Rat,
@@ -1366,8 +1362,7 @@ impl ContractionCertificate {
 /// infinite word family; `Separated` is a refutation carrying its witness; and
 /// `NotDecidedWithinBound` says plainly that the search reached its declared horizon without
 /// either.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
-#[serde(tag = "extinction", rename_all = "kebab-case")]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ExtinctionVerdict {
     /// Every admitted future word keeps every declared receiver inside the tolerance, proved by
     /// the certificate rather than by a finite search.

@@ -54,7 +54,6 @@ pub mod restriction;
 use crate::geometry::winding::WindingError;
 use crate::ratio::Rat;
 use num_traits::Zero;
-use serde::Serialize;
 use thiserror::Error;
 
 use crate::geometry::complex::{CellComplex, ConnectionIncidence};
@@ -142,7 +141,7 @@ impl From<WindingError> for HolonError {
 
 /// [definition] The port counts of the four kinds, laid out `σ ⊕ ρ ⊕ π ⊕ α`
 /// (`Holon/Element.Ports`).
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct PortCounts {
     pub storage: usize,
     pub resistive: usize,
@@ -178,7 +177,7 @@ pub struct KindBonds {
 }
 
 /// [definition] **A port Holon** (`Holon/Element.PortHolon`).
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PortHolon {
     dirac: DiracStructure,
     counts: PortCounts,

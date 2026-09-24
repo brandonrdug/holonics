@@ -1278,7 +1278,7 @@ impl FibreSplitting {
 /// level a caller names is a level this tower really presents.
 ///
 /// The consequence is that the *caller* owns the bound. A chart index taken from untrusted or
-/// deserialized material must be measured with [`Self::modulus_bits`] — which is a multiplication
+/// exterior material must be measured with [`Self::modulus_bits`] — which is a multiplication
 /// on two integers and allocates nothing — and refused against the caller's own declared ceiling
 /// **before** it reaches [`Self::modulus`], [`Tower::carries`], [`Tower::restrict`] or
 /// [`EnumerableTower::adjacent_preimage`]. `u32::MAX` at base two is a half-gigabyte carrier;
@@ -1336,7 +1336,7 @@ impl ResidueTower {
     ///
     /// `ceiling_bits` is the caller's declared aperture on the *fine* chart's carrier, measured by
     /// [`Self::modulus_bits`]. It is checked before anything of that width is built, so a chart
-    /// index taken from hostile or deserialized material returns
+    /// index taken from hostile or exterior material returns
     /// [`SplittingRefusal::CarrierAboveCeiling`] rather than exhausting memory.
     pub fn split_fibre(
         &self,

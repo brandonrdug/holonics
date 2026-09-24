@@ -6,11 +6,10 @@
 //! rotation here is a rational point of `SO(3)` and no angle is formed.
 
 use num_traits::{One, Zero};
-use serde::{Deserialize, Serialize};
 
 use crate::ratio::{Rat, integer};
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RatVec3 {
     pub x: Rat,
     pub y: Rat,
@@ -59,7 +58,7 @@ impl RatVec3 {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RatMat3 {
     pub rows: [[Rat; 3]; 3],
 }
@@ -170,7 +169,7 @@ impl RatMat3 {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct AffineMap3 {
     pub linear: RatMat3,
     pub translation: RatVec3,
@@ -242,7 +241,7 @@ pub fn cayley_rotation_z(parameter: &Rat) -> RatMat3 {
 }
 
 /// A coordinate axis of the frame: the rotation axis of a revolute joint, or a hinge.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Axis {
     X,
     Y,

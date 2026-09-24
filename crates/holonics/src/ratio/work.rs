@@ -35,12 +35,11 @@
 
 use crate::ratio::Rat;
 use num_bigint::BigUint;
-use serde::{Deserialize, Serialize};
 
 use crate::ratio::ExactOrdering;
 
 /// **The work an exact deed performed.** Every coordinate is counted; none is timed.
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct ExactWork {
     /// Rational additions and subtractions.
     pub additions: BigUint,
