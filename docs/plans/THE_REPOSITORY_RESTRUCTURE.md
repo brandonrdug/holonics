@@ -793,13 +793,20 @@ roots in §0.11.
       behaviour change: engine modules become crate modules, and the HNN crate becomes
       `holonics_cuda::hnn`. This removes the engine→CUDA cycle and the `holonics-hna` name at
       once. The workbench depends on `holonics` and `holonics-cuda`.
-   3. Prune at item level with the compiler. Make every module `pub(crate)` except the public
-      HNN session/stream API that the workbench and the kept Athena examples use. Delete what
-      `dead_code` reports, and repeat until it reports nothing. Tests of deleted items go with
-      them.
+   3. Prune at item level with the compiler. Make every module `pub(crate)` except the HNN
+      machine's own session interface (the field session and the generator session) and the CUDA
+      driver. Delete what `dead_code` reports, and repeat until it reports nothing. Tests of
+      deleted items go with them.
    4. Afterwards, K2 extracts the backend-neutral HNN law into `holonics::hnn`, method by method.
 
-   The result is two libraries (`holonics`, `holonics-cuda`) and the workbench.
+   The result is two libraries: `holonics` and `holonics-cuda`.
+
+   **No applications survive the cut** (Brandon, September 24). The workbench CLI, the JSONL
+   stream protocol, the exposure source and the Athena example applications were prototypes, never
+   functional or useful enough to keep. They retire with this step. What they taught is kept in
+   the
+   [lessons record](../../research/records/2026-09-24_LESSONS_FROM_THE_WORKBENCH_AND_ATHENA_PROTOTYPES.md).
+   Any workbench or Athena application is rebuilt on the restructured library.
 4. **C: phase 14** (the cultivated body) on the moved tree.
 5. **R3 remainder and M2 (Lean).** Remove the duplicate and wrapper theorems the audit found, cut
    the Physics research ingress, then move to `lean/` as `Holonics` + `HolonicsResearch`.
