@@ -20,7 +20,7 @@ use body::medium::FORM_WORDS;
 use body::num::COG_WORDS;
 use soma_abi::emission::{DeedEmission, DEED_WORDS};
 use soma_abi::live_event_cuda as cuda;
-use soma_membrane::{
+use holonics::membrane::{
     canonical_event_incidences, form_executed_regional_relation, regional_contact_pairs,
     CurrentExecutionRequest, CurrentGeometry, CurrentLineage, DirectedExecutionRequest,
     EventIncidenceRadiation, ExecutedContemporaryEvent, ExecutedDirectedRelation,

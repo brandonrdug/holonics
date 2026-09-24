@@ -13,7 +13,7 @@ use body::manifold::{
 use body::medium::RegionalForm;
 use body::place::Place;
 
-use crate::ChartAddress;
+use crate::membrane::ChartAddress;
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub(crate) struct ExactCount {
@@ -123,9 +123,9 @@ impl RankedOwnCell {
     pub fn from_flat_at_rank(
         rank: u64,
         cell: SparseOwnCell,
-    ) -> Result<Self, crate::ChartAddressError> {
+    ) -> Result<Self, crate::membrane::ChartAddressError> {
         if rank > 16 {
-            return Err(crate::ChartAddressError::FlatGripExtent);
+            return Err(crate::membrane::ChartAddressError::FlatGripExtent);
         }
         let axis = 1u32 << rank;
         Ok(Self {
@@ -169,8 +169,8 @@ impl GrowingRankedOwn {
 
     fn grounded(rank: u64, position: Place) -> Result<ChartAddress, RankedOwnError> {
         ChartAddress::ground(position, rank).map_err(|error| match error {
-            crate::ChartAddressError::ResourceReservation => RankedOwnError::ResourceReservation,
-            crate::ChartAddressError::ResourceExtent | crate::ChartAddressError::RankExtent => {
+            crate::membrane::ChartAddressError::ResourceReservation => RankedOwnError::ResourceReservation,
+            crate::membrane::ChartAddressError::ResourceExtent | crate::membrane::ChartAddressError::RankExtent => {
                 RankedOwnError::ResourceExtent
             }
             _ => RankedOwnError::Geometry,
@@ -214,11 +214,11 @@ impl GrowingRankedOwn {
                 cell.address
                     .zero_extend(new_rank)
                     .map_err(|error| match error {
-                        crate::ChartAddressError::ResourceReservation => {
+                        crate::membrane::ChartAddressError::ResourceReservation => {
                             RankedOwnError::ResourceReservation
                         }
-                        crate::ChartAddressError::ResourceExtent
-                        | crate::ChartAddressError::RankExtent => RankedOwnError::ResourceExtent,
+                        crate::membrane::ChartAddressError::ResourceExtent
+                        | crate::membrane::ChartAddressError::RankExtent => RankedOwnError::ResourceExtent,
                         _ => RankedOwnError::Geometry,
                     })?
             };

@@ -1,5 +1,5 @@
 use super::*;
-use soma_membrane::SparseStandingSurface;
+use holonics::membrane::SparseStandingSurface;
 
 const TEST_SCHEMA: u64 = 0x5445_5354_4745_524d;
 const INFORMANT_SCHEMA: u64 = 0x5445_5354_494e_464f;

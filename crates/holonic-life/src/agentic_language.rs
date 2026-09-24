@@ -24,7 +24,7 @@ use holonic_language::{
 };
 use holonics::structure::{CausalMembrane, LocalSet};
 use soma_abi::active::ActionCurrent;
-use soma_membrane::{LiveCurrentExecutor, ParallelCpuLiveCurrentExecutor};
+use holonics::membrane::{LiveCurrentExecutor, ParallelCpuLiveCurrentExecutor};
 
 use crate::presentation_quotient::{
     divide, PresentationDivision, PresentationMaterial, PresentedCandidate,

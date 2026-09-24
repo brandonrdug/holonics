@@ -9,7 +9,7 @@ use body::num::Cog;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use soma_abi::active::{ActionCurrent, RelationAtom};
-use soma_membrane::{
+use holonics::membrane::{
     ContemporaryEvent, ContemporaryRadiation, CurrentBoundaryPort, CurrentEvent, CurrentGeometry,
     CurrentLineage, InterfaceCapability, LiveBoundaryTransition, LiveConstituent,
     LiveCurrentMachine, LiveMemory, RegionalRelationArc, RegionalRelationCell,

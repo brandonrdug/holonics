@@ -452,10 +452,10 @@ impl ResonanceEcology {
                     .enumerate()
                     .map(|(slot, (from, antecedent_fiber, consequent_fiber))| {
                         let passage = ReceiverCausalPassage::with_fiber(
-                            soma_membrane::ReceiverChartIdentity::new(GERM_RECEIVER_CHART),
+                            holonics::membrane::ReceiverChartIdentity::new(GERM_RECEIVER_CHART),
                             antecedent_fiber,
                             occurrence.source_order,
-                            soma_membrane::ReceiverChartIdentity::new(CAPACITIVE_RECEIVER_CHART),
+                            holonics::membrane::ReceiverChartIdentity::new(CAPACITIVE_RECEIVER_CHART),
                             consequent_fiber,
                             consequent_order,
                         )

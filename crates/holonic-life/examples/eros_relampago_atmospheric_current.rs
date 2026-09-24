@@ -31,7 +31,7 @@ use num_traits::{ToPrimitive, Zero};
 use holonics::geometry::{Rat, ReceiverId};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use soma_membrane::{
+use holonics::membrane::{
     ContemporaryRadiation, CpuLiveCurrentExecutor, LiveCurrentExecutor, LiveCurrentMachine,
     LiveCurrentRestImage, SparseStandingSurface,
 };

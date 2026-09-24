@@ -7,13 +7,13 @@ and follow the actual source/consumer map.
 
 | Library | Responsibility |
 |---|---|
-| `holonics` | Main Holon law, structural carriers, receiver-relative geometry and source-neutral exact operators. |
+| `holonics` | Main Holon law, structural carriers, receiver-relative geometry, live receiving/standing and source-neutral exact operators. |
 | `holonics-hna` | Native application/session API, exterior codecs and bounded artifact adapters. |
 | `holonics-workspace` | The specialized persistent snapshot/workspace artifact family. |
 | `holonic-engine` | Native mathematical computation, resident CUDA laws, operator ecology, dismantling and comparison owners. |
 | `holonic-life` | Earlier lifecycle/package, source transport and application-boundary owners (Cargo package `life`). |
 | `holonic-language` | Reflective substrate owner. |
-| `holonic-body`, `holonic-abi`, `holonic-membrane` | Exact low-level laws and boundary carriers. |
+| `holonic-body`, `holonic-abi` | Shared exact substrate and host/device wire carriers, pending the portable kernel-law consolidation. |
 | `holonic-mount` | CUDA apparatus. |
 
 The [architecture map](../docs/ARCHITECTURE_MAP.md) gives exact ownership and scope. A crate's

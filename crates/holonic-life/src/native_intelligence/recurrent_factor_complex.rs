@@ -10,7 +10,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use body::num::COG_WORDS;
-use soma_membrane::ReceiverFiberIdentity;
+use holonics::membrane::ReceiverFiberIdentity;
 
 use crate::{
     resonance_ecology::ResonanceGerm,

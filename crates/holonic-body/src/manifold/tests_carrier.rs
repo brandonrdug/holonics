@@ -422,7 +422,7 @@ fn the_carried_frame_layout_is_the_reservations_own() {
 
 /// A fixed compatibility row cannot turn its physical edge into darkness. The exact depth pressure
 /// is reported and later atoms stop; the production membrane supplies a growable carrier and its
-/// parity against a sufficiently deep sibling is gated in `soma-membrane`.
+/// parity against a sufficiently deep sibling is gated in `holonics::membrane`.
 #[test]
 fn a_fixed_carrier_reports_depth_pressure_instead_of_retiring_the_brick() {
     const AXIS: i64 = 1 << 8;

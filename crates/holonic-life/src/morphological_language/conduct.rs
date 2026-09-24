@@ -7,7 +7,7 @@
 
 use body::num::COG_WORDS;
 use holonics::structure::{LocalRelations, LocalSequence, LocalSet};
-use soma_membrane::ReceiverFiberIdentity;
+use holonics::membrane::ReceiverFiberIdentity;
 
 use crate::suffix_ecology::{
     ExactLabeledSuffixBranch, ExactLabeledSuffixMaterialEdge, SuffixBranchSupport,

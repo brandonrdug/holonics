@@ -4,7 +4,7 @@
 //! A plate holds form codecs that already exist and defines none of its own — that is the sentence
 //! `applications/holon-plate/src/lib.rs` opens with — so the codec belongs here, beside the type it
 //! encodes, exactly as `HTEC` lives in `crates/holonic-life/src/holonic_training.rs` and `ERST` in
-//! `crates/holonic-membrane/src/live_current.rs`.
+//! `crates/holonics/src/membrane/live_current.rs`.
 //!
 //! # What is deposited, and what is not
 //!

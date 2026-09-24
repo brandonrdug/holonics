@@ -7,7 +7,7 @@ use body::manifold::FeltDeed;
 use body::num::Cog;
 use serde::Serialize;
 use soma_abi::active::{ActionCurrent, RelationAtom};
-use soma_membrane::{
+use holonics::membrane::{
     ContemporaryEvent, CurrentBoundaryPort, CurrentEvent, CurrentGeometry, CurrentLineage,
     InterfaceCapability, LiveBoundaryTransition, LiveConstituent, LiveCurrentError,
     LiveCurrentMachine, LiveMemory, RegionalRelationArc, RegionalRelationCell, SparseStandingError,
@@ -491,7 +491,7 @@ fn constituent_read(constituent: &LiveConstituent) -> ConstituentRead {
     }
 }
 
-type Formed = soma_membrane::FormedPin;
+type Formed = holonics::membrane::FormedPin;
 
 fn machine_read(machine: &LiveCurrentMachine) -> MachineRead {
     let LiveMemory {

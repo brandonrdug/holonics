@@ -11,7 +11,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use body::num::COG_WORDS;
 use mount::{DeviceBuffer, Dim3, Stream};
 use soma_abi::morphological_condition_cuda as wire;
-use soma_membrane::ReceiverFiberIdentity;
+use holonics::membrane::ReceiverFiberIdentity;
 
 use crate::{
     live_current_cuda::CudaLiveCurrentExecutor,

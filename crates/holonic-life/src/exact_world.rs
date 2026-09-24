@@ -8,7 +8,7 @@
 use holonic_engine::{
     CausalWorld, EventSuccessor, ExactEventLaw, ThroughTransitionError, TransitionReceipt,
 };
-use soma_membrane::{
+use holonics::membrane::{
     ContemporaryRadiation, LiveCurrentError, LiveCurrentExecutor, LiveCurrentMachine,
 };
 

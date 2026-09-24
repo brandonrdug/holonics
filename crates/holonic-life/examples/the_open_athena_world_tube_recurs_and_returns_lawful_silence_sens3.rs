@@ -30,7 +30,7 @@ use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
 use serde::Serialize;
 use sha2::{Digest, Sha256};
-use soma_membrane::ReceiverChartIdentity;
+use holonics::membrane::ReceiverChartIdentity;
 
 const PREDECESSOR: &str = concat!(
     ".local/artifacts/the_synchronized_sensory_world_tube_cultivates_one_athena_body_sens2/",

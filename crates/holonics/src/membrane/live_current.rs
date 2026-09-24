@@ -324,15 +324,15 @@ use body::manifold::{
 use body::medium::{RegionalForm, COMPACT_FORM_LAYOUT_VERSION, COMPACT_FORM_WORDS};
 use body::num::{cog_packed_word, packed_cog_is_canonical, read_cog, Cog, COG_WORDS};
 use body::place::Place;
-use holonics::structure::{CausalMembrane, OrdinalAtlasError, SparseOrdinalAtlas};
+use crate::structure::{CausalMembrane, OrdinalAtlasError, SparseOrdinalAtlas};
 use soma_abi::active::{ActionCurrent, RelationAtom};
 
-use crate::live_constituent::{
+use crate::membrane::live_constituent::{
     cellular_cycle_edges, PopulationSectionOrigin, SharedOccurrenceKey, StandingIncidenceAperture,
 };
-use crate::sparse_standing::CellularStandingChange;
-use crate::support_family::LiveSupportExpression;
-use crate::{
+use crate::membrane::sparse_standing::CellularStandingChange;
+use crate::membrane::support_family::LiveSupportExpression;
+use crate::membrane::{
     ChartAddress, ChartAddressError, GrowingCarrier, GrowingRankedOwn, InterfaceCapability,
     LiveBoundary, LiveBoundaryTransition, LiveCarrierError, LiveCarrierSnapshot, LiveCell,
     LiveConstituent, LiveConstituentError, LiveIncidence, LiveIncidenceKind, LivePath,
@@ -5952,7 +5952,7 @@ mod tests {
         let seed_arcs =
             receiver_caused_triangle_arcs(lineages, seed_charts, 10, IncidenceHand::Against);
         assert!(seed_arcs.iter().all(|arc| {
-            arc.interface().origin() == crate::InterfaceCapabilityOrigin::ReceiverCaused
+            arc.interface().origin() == crate::membrane::InterfaceCapabilityOrigin::ReceiverCaused
         }));
         let seed_region = [RegionalRelationCell::new(lineages[2], &seed_arcs)];
         let seed_currents = [
@@ -5974,7 +5974,7 @@ mod tests {
             .iter()
             .filter_map(|pin| pin.interface())
             .all(
-                |interface| interface.origin() == crate::InterfaceCapabilityOrigin::ReceiverCaused
+                |interface| interface.origin() == crate::membrane::InterfaceCapabilityOrigin::ReceiverCaused
             ));
 
         let wire = seed_machine
@@ -6035,7 +6035,7 @@ mod tests {
             .iter()
             .any(|pin| {
                 pin.interface().is_some_and(|interface| {
-                    interface.origin() == crate::InterfaceCapabilityOrigin::ReceiverCaused
+                    interface.origin() == crate::membrane::InterfaceCapabilityOrigin::ReceiverCaused
                 }) && pin
                     .formed()
                     .is_some_and(|formed| formed.deed() == FeltDeed::Ride)

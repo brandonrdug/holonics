@@ -17,7 +17,7 @@ use life::form_mouth::deposit_form_or_message;
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 use soma_abi::active::ActionCurrent;
-use soma_membrane::{
+use holonics::membrane::{
     CpuLiveCurrentExecutor, CurrentBoundaryPort, CurrentExecutionRequest, DirectedExecutionRequest,
     ExecutedContemporaryEvent, InterfaceCapability, LiveBoundaryTransition, LiveConstituent,
     LiveCurrentError, LiveCurrentExecutor, LiveCurrentMachine, LiveCurrentRestImage, LiveMemory,

@@ -13,7 +13,7 @@ use num_rational::BigRational;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use soma_abi::active::{ActionCurrent, RelationAtom};
-use soma_membrane::{
+use holonics::membrane::{
     ContemporaryEvent, CurrentBoundaryPort, CurrentEvent, CurrentGeometry, CurrentLineage,
     InterfaceCapability, LiveConstituent, LiveCurrentMachine, LiveCurrentRestImage, LiveMemory,
     RegionalRelationArc, RegionalRelationCell, SparseStandingSurface,
@@ -1860,7 +1860,7 @@ fn profiled_ending(
     semantic_words: usize,
     pair: [CurrentLineage; 2],
     arcs: &[RegionalRelationArc],
-) -> Result<(soma_membrane::ContemporaryRadiation, EventRead), String> {
+) -> Result<(holonics::membrane::ContemporaryRadiation, EventRead), String> {
     budget.require_open()?;
     if arcs.len() > MAX_ARCS_PER_CELL {
         return Err(format!(

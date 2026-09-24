@@ -27,7 +27,7 @@ use num_bigint::BigInt;
 use num_rational::BigRational;
 use sha2::{Digest, Sha256};
 use soma_abi::active::{ActionCurrent, RelationAtom};
-use soma_membrane::{
+use holonics::membrane::{
     ContemporaryRadiation, CpuLiveCurrentExecutor, CurrentBoundaryPort, LiveBoundaryTransition,
     LiveCurrentError, LiveCurrentExecutor, LiveCurrentMachine, LiveCurrentRestImage,
     ReceiverCausalPassage, ReceiverChartIdentity, ReceiverFiberIdentity, RegionalSupportSection,

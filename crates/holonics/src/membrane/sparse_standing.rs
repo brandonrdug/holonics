@@ -12,9 +12,9 @@ use body::manifold::{SparseStandingCell as FlatStandingCell, StandingQuery};
 use body::medium::RegionalForm;
 use body::place::{Grip, Place};
 
-use crate::growing_ranked::ExactCount;
-use crate::live_constituent::StandingConstituentAccess;
-use crate::{ChartAddress, ChartAddressError, LiveConstituent};
+use crate::membrane::growing_ranked::ExactCount;
+use crate::membrane::live_constituent::StandingConstituentAccess;
+use crate::membrane::{ChartAddress, ChartAddressError, LiveConstituent};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum SparseStandingError {
@@ -245,14 +245,14 @@ impl StandingConstituentAccess for PersistentConstituentStanding {
         self.get(ordinal)
     }
 
-    fn standing_key_at(&self, ordinal: usize) -> Result<Arc<[u32]>, crate::LiveConstituentError> {
+    fn standing_key_at(&self, ordinal: usize) -> Result<Arc<[u32]>, crate::membrane::LiveConstituentError> {
         self.key_at(ordinal)
-            .ok_or(crate::LiveConstituentError::Topology)
+            .ok_or(crate::membrane::LiveConstituentError::Topology)
     }
 
-    fn standing_key_range(&self, key: &[u32]) -> Result<Range<usize>, crate::LiveConstituentError> {
+    fn standing_key_range(&self, key: &[u32]) -> Result<Range<usize>, crate::membrane::LiveConstituentError> {
         self.key_range(key)
-            .ok_or(crate::LiveConstituentError::Topology)
+            .ok_or(crate::membrane::LiveConstituentError::Topology)
     }
 }
 
@@ -655,7 +655,7 @@ impl SparseStandingSurface {
     /// Exact higher-grain recurrence read. This is used while the next regional cell is still
     /// borrowed so a receiver can RIDE an already-founded pin rather than allocate a duplicate
     /// direction. It is a local geometric comparison, not provenance or a semantic lookup.
-    pub fn contains_pin(&self, pin: crate::LivePin) -> bool {
+    pub fn contains_pin(&self, pin: crate::membrane::LivePin) -> bool {
         (0..self.constituents.len()).any(|ordinal| {
             self.constituents
                 .get(ordinal)
@@ -928,7 +928,7 @@ mod tests {
     use body::manifold::{DirectedEventContact, EventReceiver, Face};
     use body::num::Cog;
 
-    use crate::{
+    use crate::membrane::{
         InterfaceCapability, LiveBoundary, LiveCell, LiveIncidence, LiveIncidenceKind, LivePath,
         LivePathStep, LivePin, LocalAxis,
     };

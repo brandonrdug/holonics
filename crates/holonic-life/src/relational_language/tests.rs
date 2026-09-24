@@ -1,6 +1,6 @@
 use super::*;
 use super::{codec::*, transport::*};
-use soma_membrane::{
+use holonics::membrane::{
     CurrentExecutionRequest, DirectedExecutionRequest, ExecutedContemporaryEvent, LiveCurrentError,
     RegionalExecutionRequest,
 };

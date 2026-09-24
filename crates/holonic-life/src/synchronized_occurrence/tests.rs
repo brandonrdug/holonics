@@ -1,6 +1,6 @@
 use super::chart::{derive_occurrence, section_face};
 use super::*;
-use soma_membrane::SparseStandingSurface;
+use holonics::membrane::SparseStandingSurface;
 
 const AUDIO: SynchronizedReceiverId = SynchronizedReceiverId(1);
 const VIDEO: SynchronizedReceiverId = SynchronizedReceiverId(2);

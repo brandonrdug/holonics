@@ -12,7 +12,7 @@ use body::{
     },
 };
 use soma_abi::active::{ActionCurrent, RelationAtom};
-use soma_membrane::{
+use holonics::membrane::{
     ContemporaryEvent, ContemporaryRadiation, CpuLiveCurrentExecutor, CurrentBoundaryPort,
     CurrentEvent, CurrentGeometry, CurrentLineage, DirectedCurrentRelation, InterfaceCapability,
     LiveCurrentError, LiveCurrentExecutor, LiveCurrentMachine, ReceiverCausalPassage,
@@ -923,7 +923,7 @@ impl StreamedOctetOrgan {
 mod tests {
     use super::*;
     use body::num::Cog;
-    use soma_membrane::SparseStandingSurface;
+    use holonics::membrane::SparseStandingSurface;
 
     #[derive(Clone, Copy, Debug, PartialEq, Eq)]
     enum ProgramLaw {
@@ -1002,7 +1002,7 @@ mod tests {
     /// The bounded program world owns this composition. Soma supplies only its body wire and each
     /// organ supplies only its capability wire; no generic world serializer enters the mouth.
     fn encode_program_rest(
-        machine: &soma_membrane::LiveCurrentRestImage,
+        machine: &holonics::membrane::LiveCurrentRestImage,
         left: NativeRelationOrganImage,
         right: NativeRelationOrganImage,
         world: ProgramWorldImage,
@@ -1069,7 +1069,7 @@ mod tests {
         if expected != bytes.len() {
             return Err(LiveCurrentError::InvalidRestWire);
         }
-        let image = soma_membrane::LiveCurrentRestImage::from_native_bytes(
+        let image = holonics::membrane::LiveCurrentRestImage::from_native_bytes(
             &bytes[PROGRAM_REST_HEADER_BYTES..machine_end],
         )?;
         let machine = LiveCurrentMachine::from_rest_image(image)?;
@@ -1492,7 +1492,7 @@ mod tests {
         let target_b_wire = target_b.checkpoint().encode_native_bytes();
         let machine_wire = machine_image.encode_native_bytes().unwrap();
         let reopened_image =
-            soma_membrane::LiveCurrentRestImage::from_native_bytes(&machine_wire).unwrap();
+            holonics::membrane::LiveCurrentRestImage::from_native_bytes(&machine_wire).unwrap();
         let mut reopened = LiveCurrentMachine::from_rest_image(reopened_image).unwrap();
         let mut reopened_source = NativeRelationOrgan::recover(
             NativeRelationOrganImage::from_native_bytes(&source_wire, &reopened).unwrap(),

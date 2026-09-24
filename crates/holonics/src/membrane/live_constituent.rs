@@ -11,7 +11,7 @@ use std::ops::Range;
 use std::sync::Arc;
 
 use body::channel::WindingQuantum;
-use holonics::structure::CountedCrossing;
+use crate::structure::CountedCrossing;
 
 /// In-flight reading for the co-present seam closure, gated on `EROS_TRACE` and resolved once.
 ///
@@ -54,7 +54,7 @@ use body::num::{
 use body::place::Place;
 use body::soul::Chi;
 
-use crate::support_family::{
+use crate::membrane::support_family::{
     LiveSupportExpression, LiveSupportFamily, LiveSupportSection, SupportFamilyError,
 };
 
@@ -4413,50 +4413,50 @@ fn compose_population_component(
             ARRIVING_NULL.load(core::sync::atomic::Ordering::Relaxed),
             HELD_NULL.load(core::sync::atomic::Ordering::Relaxed),
             ZERO_REACH.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::POLE_ON_FROM.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::POLE_ON_TO.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::POLE_DISTINCT.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::POLE_SWEEP_IDLE.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::RELATA_COINCIDE.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::BASIS_IDENTITY.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::DISTINCT_PLACES
+            crate::membrane::live_current::POLE_ON_FROM.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::POLE_ON_TO.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::POLE_DISTINCT.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::POLE_SWEEP_IDLE.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::RELATA_COINCIDE.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::BASIS_IDENTITY.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::DISTINCT_PLACES
                 .get()
                 .and_then(|m| m.lock().ok().map(|s| s.len()))
                 .unwrap_or(0),
-            crate::live_current::CENSUS_PLACES
+            crate::membrane::live_current::CENSUS_PLACES
                 .get()
                 .and_then(|m| m.lock().ok().map(|s| s.len()))
                 .unwrap_or(0),
-            crate::live_current::CENSUS_TRIPLES
+            crate::membrane::live_current::CENSUS_TRIPLES
                 .get()
                 .and_then(|m| m.lock().ok().map(|s| s.len()))
                 .unwrap_or(0),
-            crate::live_current::TRIANGLE.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::TRIANGLE_WITH_AREA.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::TRIANGLE_COLLINEAR.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::WOULD_FOUND.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::ARROW_AT_HORIZON.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::EVENT_WHOLLY_DARK.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::FOUNDER_CELL.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::FOUNDER_COMPLEX.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::FOUNDER_FOLDED.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::CHANNEL_MOVED.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::CHANNEL_STILL.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::GRAIN_ONE.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::GRAIN_DEEPER.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::HELD_LIVE_AFTER_FOUNDER.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::HELD_DEAD_AFTER_FOUNDER.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::HELD_LIVE_ANY.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::ARMED.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::ARMED_HELD_NOT_LIVE.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::ARMED_NO_EMISSION.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::ARMED_RIDE.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::ARMED_FOUND.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::BPRIME_HELD_SUPPLIED.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::BPRIME_CHI_FORMS.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::BPRIME_CHI_NONE.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::BPRIME_WOUND.load(core::sync::atomic::Ordering::Relaxed),
-            crate::live_current::BPRIME_FLAT.load(core::sync::atomic::Ordering::Relaxed)
+            crate::membrane::live_current::TRIANGLE.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::TRIANGLE_WITH_AREA.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::TRIANGLE_COLLINEAR.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::WOULD_FOUND.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::ARROW_AT_HORIZON.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::EVENT_WHOLLY_DARK.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::FOUNDER_CELL.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::FOUNDER_COMPLEX.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::FOUNDER_FOLDED.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::CHANNEL_MOVED.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::CHANNEL_STILL.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::GRAIN_ONE.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::GRAIN_DEEPER.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::HELD_LIVE_AFTER_FOUNDER.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::HELD_DEAD_AFTER_FOUNDER.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::HELD_LIVE_ANY.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::ARMED.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::ARMED_HELD_NOT_LIVE.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::ARMED_NO_EMISSION.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::ARMED_RIDE.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::ARMED_FOUND.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::BPRIME_HELD_SUPPLIED.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::BPRIME_CHI_FORMS.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::BPRIME_CHI_NONE.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::BPRIME_WOUND.load(core::sync::atomic::Ordering::Relaxed),
+            crate::membrane::live_current::BPRIME_FLAT.load(core::sync::atomic::Ordering::Relaxed)
         ));
     }
     let section_lineages = body

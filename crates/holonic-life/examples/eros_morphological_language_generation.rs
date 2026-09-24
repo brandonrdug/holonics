@@ -27,7 +27,7 @@ use life::{
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use soma_abi::active::ActionCurrent;
-use soma_membrane::live_current::{LiveCurrentExecutor, ParallelCpuLiveCurrentExecutor};
+use holonics::membrane::live_current::{LiveCurrentExecutor, ParallelCpuLiveCurrentExecutor};
 
 /// This driver's name at the plate mouth:
 /// `.local/artifacts/eros_morphological_language_generation/<name>-<sha256>.form`.

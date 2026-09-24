@@ -23,8 +23,8 @@ use holonics::structure::{GrowingKeyAtlas, LocalQueue, LocalRelations, LocalSequ
 use num_bigint::BigUint;
 use soma_abi::active::{ActionCurrent, RelationAtom};
 #[cfg(test)]
-use soma_membrane::CpuLiveCurrentExecutor;
-use soma_membrane::{
+use holonics::membrane::CpuLiveCurrentExecutor;
+use holonics::membrane::{
     LiveCurrentExecutor, LiveCurrentMachine, LiveMemory, ParallelCpuLiveCurrentExecutor,
     SparseStandingSurface,
 };

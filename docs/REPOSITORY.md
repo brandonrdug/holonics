@@ -44,15 +44,16 @@ The old `soma/` parent no longer divides host Rust libraries, device targets, fo
 tools into a parallel tree. Package names for older substrate components remain stable; the
 public HNN implementation currently lives in `holonics-hna`. The main `holonics` crate owns the
 Holon facets and source-neutral exact operators after the M1 core source move. Its dependency cut
-removed the native feature and HNN/engine/life forwarding paths. `structure` and `geometry` now
-own their source inside main. See the
+removed the native feature and HNN/engine/life forwarding paths. `structure`, `geometry`, `ratio` and the live `membrane` runtime now own their source inside main. See the
 [Rust API map](RUST_FRAMEWORK.md).
 
 [project-postulate] The [September 23 restructure](plans/THE_REPOSITORY_RESTRUCTURE.md)
 supersedes this layout as a **target**, while this page maps the present checkout. It reduces
 the maintained Rust library graph to a substantive main `holonics` (Holon laws, geometry,
 extraction and the backend-neutral HNN law and port) → `holonics-cuda` (driver, kernels and the
-resident HNN). `holonic-words` survives only while a Rust device kernel consumes it. Brandon's
+resident HNN), over a portable `no_std` leaf shared with the detached Rust CUDA kernel.
+`holonics-portable` is its working name; it consolidates the surviving `body`, `soma-abi` and
+`holonic-words` laws after classification. Brandon's
 later `holonics-apple` package implements the same port on his separate branch. The Lean target is one top-level
 `lean/` Lake package with `Holonics` and dependent `HolonicsResearch`. Until verified moves land,
 `crates/` and `formal/` above are the correct source paths. The operator guides distinguish
@@ -62,7 +63,8 @@ current owner from target owner throughout the migration.
 
 | Former location | Current location |
 |---|---|
-| `soma/{body,abi,membrane,surface,mount,life}` | Corresponding `crates/holonic-*` libraries |
+| `soma/{body,abi,surface,mount,life}` | Corresponding `crates/holonic-*` libraries |
+| `soma/membrane` | `crates/holonics/src/membrane` |
 | `applications/athena-alpha` | `crates/holonics-hna` |
 | `applications/holonics-application` | `crates/holonics-workspace` |
 | `soma/kernel`, device-only mount children | `accelerators/` |

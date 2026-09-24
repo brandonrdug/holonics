@@ -6,7 +6,7 @@
 //! ```
 //!
 //! The old laboratory had a `.holon` plate with the magic `HLON` that froze an ongoing weave and
-//! thawed it back living. Its codecs were superseded — `crates/holonic-membrane/src/live_current.rs` and
+//! thawed it back living. Its codecs were superseded — `crates/holonics/src/membrane/live_current.rs` and
 //! `crates/holonic-life/src/holonic_training.rs` carry the successors, each with its own native word wire
 //! and its own remount gate — but nothing in this body wrote one to disk under an agreed suffix.
 //! This crate is that mouth and nothing else. It defines no codec; it holds schemas that already

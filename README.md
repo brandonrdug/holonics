@@ -26,12 +26,12 @@ composition. The intended generally useful Athena assistant is still under const
 
 ## The checkout today
 
-The root `Cargo.toml` currently declares **14 workspace packages** (11 libraries and three applications).
+The root `Cargo.toml` currently declares **13 workspace packages** (10 libraries and three applications).
 The restructuring work is in progress; these are the paths that exist now.
 
 | Path | Current role |
 |---|---|
-| `crates/holonics/` | Main Holon law, structural carriers, receiver-relative geometry and exact operators |
+| `crates/holonics/` | Main Holon law, structural carriers, receiver-relative geometry, live receiving/standing and exact operators |
 | `crates/holonic-engine/`, `crates/holonics-hna/`, `crates/holonic-life/` | Native field, HNN sessions, equation extraction and inherited implementation layers |
 | `crates/holonic-mount/`, `crates/holonic-words/` | CUDA driver/launch boundary and exact word arithmetic |
 | `formal/elementary-holonics/` | Current Lean/Lake project; the final `Holonics` and `HolonicsResearch` roots remain an M2 move |
@@ -52,10 +52,12 @@ laws and HNN**, organized by elementary object rather than acting as a facade:
 |---|---|
 | `holonics` | Ratio/remainder, geometric transport and pair/tube charts, the Holon law and its operators, receivers and receipts, the Holarchy returned by interconnection, equation extraction, and the backend-neutral HNN law and execution port |
 | `holonics-cuda` | CUDA realization: driver, sections, kernels and the resident HNN field |
+| `holonics-portable` (working name) | Shared `no_std` body/ABI laws and exact words compiled by both the host and detached Rust CUDA kernel |
 | `holonics-apple` (later) | Apple silicon implementation on Brandon's separate branch |
 
-That is two maintained Rust libraries now and three after Apple. A small `no_std`
-`holonic-words` crate remains only if a Rust device kernel still consumes it. The main library
+That is three maintained Rust libraries on Linux after consolidation and four after Apple.
+The portable leaf replaces the current `body`, `soma-abi` and `holonic-words` packages after
+their shared host/device laws are classified. The main library
 builds without CUDA; its HNN host reference is built after the move, one method at a time
 against the CUDA return.
 Its physical instances must carry fluid stress/pressure, wave propagation, spacetime

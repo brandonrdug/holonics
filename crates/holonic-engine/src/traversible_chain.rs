@@ -660,7 +660,7 @@ impl Relating for Crossing {
 // The junction law over integer populations MOVED to `holonics::structure::CountedCrossing` on
 // 2026-08-15, and re-exported here so every consumer of this module is unchanged.
 //
-// It moved because `crates/holonic-membrane` needs the same law for its co-present seam closure and cannot
+// It moved because `holonics::membrane` needs the same law for its co-present seam closure and cannot
 // see this crate — `membrane` depends on `holonics::structure`, not on the engine. Two crates that
 // cannot see each other both needing one law is the definition of a substrate carrier. The exact
 // rational chart stays here, and the parity gate between the two charts stays here with it — and

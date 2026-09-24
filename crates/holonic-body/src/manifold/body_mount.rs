@@ -954,7 +954,7 @@ impl<'a> ContinuingBody<'a> {
     ///
     /// **THIS PATH STILL DEPOSITS NOTHING, and an earlier form of this doc said otherwise.** The
     /// deposit was wired on 2026-08-15, moved 12 frame words and 7 carrier words, and was **reverted
-    /// whole** after the carrier refused it: `crates/holonic-membrane/src/live_carrier.rs:357-368` requires a
+    /// whole** after the carrier refused it: `crates/holonics/src/membrane/live_carrier.rs:357-368` requires a
     /// **born stance** before a flywheel may be live, and this path founds no stance. The doc was
     /// left behind describing the repair as landed — *grade the implementation, not the receipt*,
     /// committed on a doc comment, which is the same defect the paragraph above convicts. Corrected

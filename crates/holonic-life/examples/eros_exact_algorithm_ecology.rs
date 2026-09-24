@@ -18,7 +18,7 @@ use serde::Deserialize;
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use soma_abi::active::{ActionCurrent, RelationAtom};
-use soma_membrane::{
+use holonics::membrane::{
     ContemporaryEvent, CurrentBoundaryPort, CurrentEvent, CurrentGeometry, CurrentLineage,
     InterfaceCapability, LiveConstituent, LiveCurrentMachine, LiveMemory, RegionalRelationArc,
     RegionalRelationCell, SparseStandingSurface,
@@ -1867,7 +1867,7 @@ fn profiled_event(
     semantic_words: usize,
     arcs: &[PendingArc],
     outgoing_factor_slots: Option<&[u32]>,
-) -> Result<(soma_membrane::ContemporaryRadiation, Value), String> {
+) -> Result<(holonics::membrane::ContemporaryRadiation, Value), String> {
     budget.require_open()?;
     if arcs.len() > MAX_ARCS_PER_EVENT {
         return Err(format!(
@@ -1948,7 +1948,7 @@ fn primed_pair(machine: &mut LiveCurrentMachine) -> Result<[CurrentLineage; 2], 
 }
 
 fn regional_constituent<'a>(
-    radiation: &'a soma_membrane::ContemporaryRadiation,
+    radiation: &'a holonics::membrane::ContemporaryRadiation,
     context: &str,
 ) -> Result<&'a LiveConstituent, String> {
     match radiation.regional() {

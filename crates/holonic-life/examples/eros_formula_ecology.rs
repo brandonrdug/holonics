@@ -12,7 +12,7 @@ use num_rational::BigRational;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use soma_abi::active::{ActionCurrent, RelationAtom};
-use soma_membrane::{
+use holonics::membrane::{
     ContemporaryEvent, CpuLiveCurrentExecutor, CurrentBoundaryPort, CurrentEvent,
     CurrentExecutionRequest, CurrentGeometry, CurrentLineage, DirectedExecutionRequest,
     ExecutedContemporaryEvent, InterfaceCapability, LiveConstituent, LiveCurrentError,
@@ -1619,7 +1619,7 @@ fn deposit_laws(
 ) -> Result<
     (
         FormulaEcology,
-        soma_membrane::LiveCurrentRestImage,
+        holonics::membrane::LiveCurrentRestImage,
         DepositRead,
     ),
     String,
@@ -2672,7 +2672,7 @@ fn is_prime(value: u32) -> bool {
 }
 
 fn refusal_probe(
-    checkpoint: &soma_membrane::LiveCurrentRestImage,
+    checkpoint: &holonics::membrane::LiveCurrentRestImage,
     handle: ArtifactHandle,
     objective: &InvocationWire,
     event_identity: &[u8],
@@ -3975,7 +3975,7 @@ fn profiled_receive(
     event_name: &str,
     semantic_atoms: usize,
     event: ContemporaryEvent<'_>,
-) -> Result<(soma_membrane::ContemporaryRadiation, EventTimingRead), String> {
+) -> Result<(holonics::membrane::ContemporaryRadiation, EventTimingRead), String> {
     budget.require_open()?;
     let preflight = event_preflight(event)?;
     let before = usage_snapshot();
@@ -5008,7 +5008,7 @@ fn profiled_regional_ending(
     semantic_atoms: usize,
     pair: [CurrentLineage; 2],
     arcs: &[RegionalRelationArc],
-) -> Result<(soma_membrane::ContemporaryRadiation, EventTimingRead), String> {
+) -> Result<(holonics::membrane::ContemporaryRadiation, EventTimingRead), String> {
     let currents = [
         CurrentEvent::ending(pair[0], relation(181)?, action()),
         CurrentEvent::ending(pair[1], relation(191)?, action()),

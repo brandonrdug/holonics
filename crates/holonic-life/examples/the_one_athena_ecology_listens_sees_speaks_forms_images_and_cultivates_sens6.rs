@@ -47,7 +47,7 @@ use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use soma_membrane::ReceiverChartIdentity;
+use holonics::membrane::ReceiverChartIdentity;
 
 const SENS5_REST: &str = concat!(
     ".local/artifacts/the_athena_radiation_forms_an_optical_field_and_its_image_returns_sens5/",

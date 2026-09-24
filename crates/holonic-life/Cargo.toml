@@ -19,7 +19,6 @@ holonic-engine = { path = "../holonic-engine", default-features = false }
 # The Holon core: restriction fibres and separators (plan phase 10).
 holonics = { path = "../holonics" }
 soma-abi = { path = "../holonic-abi" }
-soma-membrane = { path = "../holonic-membrane" }
 mount = { path = "../holonic-mount" }
 serde = { version = "1", features = ["derive", "rc"] }
 serde_json = "1"

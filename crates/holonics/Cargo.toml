@@ -10,6 +10,8 @@ num-rational = { workspace = true }
 ron = { workspace = true }
 sha2 = { workspace = true }
 holonic-words = { workspace = true }
+body = { path = "../holonic-body" }
+soma-abi = { path = "../holonic-abi" }
 num-bigint = { workspace = true }
 num-traits = { workspace = true }
 serde = { workspace = true }

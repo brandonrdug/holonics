@@ -16,8 +16,8 @@ use holonics::structure::{
 };
 use soma_abi::active::{ActionCurrent, RelationAtom};
 #[cfg(test)]
-use soma_membrane::LiveBoundaryTransition;
-use soma_membrane::{
+use holonics::membrane::LiveBoundaryTransition;
+use holonics::membrane::{
     ContemporaryRadiation, CpuLiveCurrentExecutor, CurrentBoundaryPort, InterfaceCapabilityOrigin,
     LiveConstituent, LiveCurrentError, LiveCurrentExecutor, LiveCurrentMachine,
     LiveCurrentRestImage, ReceiverCausalPassage, ReceiverFiberIdentity, RegionalRelationRadiation,

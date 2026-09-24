@@ -10,7 +10,7 @@ use body::manifold::{
 };
 use body::register::REGISTER;
 
-use crate::GrowingCarrier;
+use crate::membrane::GrowingCarrier;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum LiveCarrierError {
@@ -396,11 +396,11 @@ mod tests {
 
     #[test]
     fn native_snapshot_reopens_and_branches_without_changing_its_predecessor() {
-        let standing = crate::SparseStandingSurface::empty(64).unwrap();
+        let standing = crate::membrane::SparseStandingSurface::empty(64).unwrap();
         // Repeated exact co-presence remains plural and live; no completed lower constituent is
         // retained merely to force this native-only carrier posture.
         let arrivals = vec![atom_node(Cog::lit(3)); 20];
-        let mut own = crate::GrowingSparseOwn::new();
+        let mut own = crate::membrane::GrowingSparseOwn::new();
         let mut carrier = GrowingCarrier::with_depth(1).unwrap();
         let header;
         {
@@ -425,7 +425,7 @@ mod tests {
 
         let continue_once = |snapshot: &LiveCarrierSnapshot| {
             let mut carrier = snapshot.carrier().branch_shared();
-            let mut own = crate::GrowingSparseOwn::new();
+            let mut own = crate::membrane::GrowingSparseOwn::new();
             let (header, own_cells);
             {
                 let mut body = ContinuingBody::resume_standing_world_storage_from_live_header(

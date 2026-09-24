@@ -64,7 +64,7 @@ impl GrowingCarrier {
     }
 
     /// Form one complete native carrier from its exact enclosure cores and dynamic co-presence.
-    /// Structural validation belongs to [`crate::LiveCarrierSnapshot`]; this constructor only
+    /// Structural validation belongs to [`crate::membrane::LiveCarrierSnapshot`]; this constructor only
     /// closes physical extents without inventing or dropping a row.
     pub(crate) fn from_parts(
         words: Vec<u32>,
@@ -190,8 +190,8 @@ mod tests {
     }
 
     fn run(initial_depth: usize) -> Face {
-        let standing = crate::SparseStandingSurface::empty(128).unwrap();
-        let mut own = crate::GrowingSparseOwn::new();
+        let standing = crate::membrane::SparseStandingSurface::empty(128).unwrap();
+        let mut own = crate::membrane::GrowingSparseOwn::new();
         let mut carrier = GrowingCarrier::with_depth(initial_depth).unwrap();
         let stream: [&[u8]; 16] = [
             b"the", b"cat", b"sat", b"on", b"my", b"mat", b"and", b"then", b"it", b"ran", b"to",
@@ -246,11 +246,11 @@ mod tests {
 
     #[test]
     fn shared_branch_changes_only_its_returned_carrier() {
-        let standing = crate::SparseStandingSurface::empty(64).unwrap();
+        let standing = crate::membrane::SparseStandingSurface::empty(64).unwrap();
         // Repeated exact co-presence remains plural but never completes the lower construction.
         // It therefore exercises live overflow without retaining constituents after a cut.
         let arrivals = vec![atom_node(Cog::lit(3)); 23];
-        let mut own = crate::GrowingSparseOwn::new();
+        let mut own = crate::membrane::GrowingSparseOwn::new();
         let mut carrier = GrowingCarrier::with_depth(1).unwrap();
         let header;
         {
@@ -284,7 +284,7 @@ mod tests {
         let next = atom_node(Cog::lit(101));
         let exact_faces;
         {
-            let mut exact_own = crate::GrowingSparseOwn::new();
+            let mut exact_own = crate::membrane::GrowingSparseOwn::new();
             let mut exact = ContinuingBody::resume_standing_world_storage_from_live_header(
                 &standing,
                 &mut exact_own,

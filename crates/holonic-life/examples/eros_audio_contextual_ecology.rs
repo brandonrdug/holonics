@@ -20,7 +20,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use soma_abi::active::ActionCurrent;
-use soma_membrane::{
+use holonics::membrane::{
     CurrentBoundaryPort, InterfaceCapability, LiveBoundaryTransition, LiveConstituent,
     LiveCurrentMachine, LiveMemory, ParallelCpuLiveCurrentExecutor, RegionalArcRadiation,
     RegionalSupportSection, SparseStandingSurface,

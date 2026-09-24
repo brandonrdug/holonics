@@ -248,7 +248,7 @@ impl CudaLiveCurrentExecutor {
     ) -> Result<ResidentStanding, LiveCurrentError> {
         if &before.logical == successor {
             return Err(LiveCurrentError::Standing(
-                soma_membrane::SparseStandingError::StandingChanged,
+                holonics::membrane::SparseStandingError::StandingChanged,
             ));
         }
         let (axis, cpu) = standing_words(successor)?;

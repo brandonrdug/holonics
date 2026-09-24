@@ -27,7 +27,7 @@ use holonic_engine::{
     CoupledInformantRadiationKind, CoupledInformantStanding, EventSuccessor, ReturnedCellCoverage,
 };
 use soma_abi::active::{ActionCurrent, RelationAtom};
-use soma_membrane::{
+use holonics::membrane::{
     ContemporaryRadiation, CurrentLineage, LiveCurrentError, LiveCurrentExecutor,
     LiveCurrentMachine,
 };
@@ -716,7 +716,7 @@ mod tests {
     use holonic_engine::{AtmosphericContactSelection, AtmosphericInverseResolution, AtmosphericInverseWork, AtmosphericLayerId, AtmosphericProfileId, AtmosphericReceiverBody, AtmosphericResolutionId, AtmosphericVerticalCoordinate, AtmosphericVerticalFiber, CausalWorld, CoupledInformantEvent, CoupledInformantLaw, CoupledInformantStanding, CoupledPhaseChart, ExactDifferenceVector, HydrostaticChordReceipt, LearnedPartitionRelation, OpaqueThermalChordDoctrine, PredictedReceiverRelation, ReceiverCoordinateFamilyId, ReceiverPredictionId, ReceiverRelationPrediction, ReceiverRelationState, ReceiverTestimonyId, ReturnedAlgorithmId, ReturnedCellCoverage, ReturnedCellId, ReturnedReceiverCell, ReturnedReceiverPartition, SpectralAddressStatus, SpectralBandId, SpectralContactTemporality, SpectralReceiverContact, SpectralReceiverOccurrence, SpectralScanId, VerticalFiberSupport};
     use num_bigint::BigInt;
     use holonics::geometry::{Rat, ReceiverId};
-    use soma_membrane::{
+    use holonics::membrane::{
         CpuLiveCurrentExecutor, CurrentExecutionRequest, DirectedExecutionRequest,
         ExecutedContemporaryEvent, LiveCurrentError, LiveCurrentExecutor, LiveCurrentMachine,
         LiveCurrentRestImage, RegionalExecutionRequest, SparseStandingSurface,

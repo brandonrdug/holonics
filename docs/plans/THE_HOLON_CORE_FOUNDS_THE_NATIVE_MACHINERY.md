@@ -281,7 +281,7 @@ standing request is consolidation onto the Holon objects with all mathematics an
 Kept distinct: phase-4 (c) objects; the content of each event law (only its scaffolding unifies);
 within-cycle adjoint checkpoints; the traversal frontier; retention-law-conformant rests
 (`condition_contact`, `preimage`); receiver-history compression frames (the quotient itself);
-`holonic-membrane`/`holonic-body` register carriage until the chart exists; `DepositLedger`; legacy wire
+`holonics::membrane`/`holonic-body` register carriage until the chart exists; `DepositLedger`; legacy wire
 decoders. Each phase: disposition table, equality tests, caller migration, deletion, full suites.
 
 ### Phase 9 disposition: the normal constitution stack is one Holon

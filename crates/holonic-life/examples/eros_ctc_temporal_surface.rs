@@ -11,7 +11,7 @@ use num_bigint::BigUint;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use soma_abi::active::{ActionCurrent, RelationAtom};
-use soma_membrane::{
+use holonics::membrane::{
     ContemporaryEvent, CurrentBoundaryPort, CurrentEvent, CurrentExecutionRequest, CurrentGeometry,
     DirectedExecutionRequest, ExecutedContemporaryEvent, InterfaceCapability,
     LiveBoundaryTransition, LiveConstituent, LiveCurrentError, LiveCurrentExecutor,

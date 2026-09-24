@@ -21,7 +21,7 @@ use holonics::structure::{LocalRelations, LocalSequence, LocalSet};
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
 use soma_abi::active::{ActionCurrent, RelationAtom};
-use soma_membrane::{
+use holonics::membrane::{
     LiveCurrentExecutor, LiveCurrentMachine, ParallelCpuLiveCurrentExecutor, ReceiverFiberIdentity,
     SparseStandingSurface,
 };
@@ -2228,7 +2228,7 @@ mod lexical_aperture_tests {
 mod tests {
     use super::*;
 
-    use soma_membrane::{
+    use holonics::membrane::{
         CurrentExecutionRequest, DirectedExecutionRequest, ExecutedContemporaryEvent,
         LiveCurrentError, RegionalExecutionRequest,
     };

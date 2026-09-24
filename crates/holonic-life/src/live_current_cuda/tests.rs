@@ -10,7 +10,7 @@ use body::incidence::{
 };
 use body::num::Cog;
 use soma_abi::active::{ActionCurrent, RelationAtom};
-use soma_membrane::{
+use holonics::membrane::{
     ContemporaryEvent, ContemporaryRadiation, CpuLiveCurrentExecutor, CurrentBoundaryPort,
     CurrentEvent, DirectedCurrentRelation, InterfaceCapability, LiveCurrentMachine,
     ParallelCpuLiveCurrentExecutor,
@@ -27,7 +27,7 @@ fn action() -> ActionCurrent {
 fn assert_live_equal(
     cpu: &LiveCurrentMachine,
     card: &LiveCurrentMachine,
-    lineages: &[(soma_membrane::CurrentLineage, soma_membrane::CurrentLineage)],
+    lineages: &[(holonics::membrane::CurrentLineage, holonics::membrane::CurrentLineage)],
 ) {
     assert_eq!(cpu.standing(), card.standing());
     assert_eq!(cpu.memory(), card.memory());
@@ -487,7 +487,7 @@ fn one_resident_card_body_sustains_return_rest_departure_and_durable_remount() {
     drop(cuda);
 
     let reopened_image =
-        soma_membrane::LiveCurrentRestImage::from_native_bytes(&card_rest_bytes).unwrap();
+        holonics::membrane::LiveCurrentRestImage::from_native_bytes(&card_rest_bytes).unwrap();
     let mut reopened = LiveCurrentMachine::from_rest_image(reopened_image).unwrap();
     let reopened_organ_image =
         NativeRelationOrganImage::from_native_bytes(&card_right_bytes, &reopened).unwrap();
@@ -714,7 +714,7 @@ fn large_residue_chart_world_streams_only_participating_current_through_resident
     drop(cuda);
 
     let reopened_image =
-        soma_membrane::LiveCurrentRestImage::from_native_bytes(&machine_bytes).unwrap();
+        holonics::membrane::LiveCurrentRestImage::from_native_bytes(&machine_bytes).unwrap();
     let mut reopened = LiveCurrentMachine::from_rest_image(reopened_image).unwrap();
     let reopened_organ_image =
         NativeRelationOrganImage::from_native_bytes(&organ_bytes, &reopened).unwrap();
@@ -1027,7 +1027,7 @@ fn graded_triangle_junction_is_exact_across_one_core_many_cores_cuda_and_rest() 
     assert_eq!(one_rest, many_rest);
     assert_eq!(one_rest, card_rest);
     let rest_words = card_rest.encode_native_words().unwrap();
-    let reopened_image = soma_membrane::LiveCurrentRestImage::from_native_words(&rest_words)
+    let reopened_image = holonics::membrane::LiveCurrentRestImage::from_native_words(&rest_words)
         .expect("the joint cellular successor crosses one exact durable rest boundary");
     let reopened = LiveCurrentMachine::from_rest_image(reopened_image).unwrap();
     assert_eq!(reopened.standing(), card.standing());
@@ -1162,8 +1162,8 @@ fn one_cuda_mouth_matches_cpu_through_found_departure_and_later_ride() {
 fn directed_current_hand_is_formed_on_card_and_matches_cpu() {
     fn primed_pair() -> (
         LiveCurrentMachine,
-        soma_membrane::CurrentLineage,
-        soma_membrane::CurrentLineage,
+        holonics::membrane::CurrentLineage,
+        holonics::membrane::CurrentLineage,
     ) {
         let first = [relation(13)];
         let mut machine = LiveCurrentMachine::new(SparseStandingSurface::empty_rank(6).unwrap());

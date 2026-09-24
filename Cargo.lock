@@ -592,6 +592,7 @@ dependencies = [
 name = "holonics"
 version = "0.1.0"
 dependencies = [
+ "body",
  "holonic-words",
  "num-bigint",
  "num-rational",
@@ -600,6 +601,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2 0.10.9",
+ "soma-abi",
  "thiserror",
 ]
 
@@ -764,7 +766,6 @@ dependencies = [
  "serde_json",
  "sha2 0.11.0",
  "soma-abi",
- "soma-membrane",
  "thiserror",
 ]
 
@@ -1263,15 +1264,6 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2 0.10.9",
-]
-
-[[package]]
-name = "soma-membrane"
-version = "0.0.0"
-dependencies = [
- "body",
- "holonics",
- "soma-abi",
 ]
 
 [[package]]

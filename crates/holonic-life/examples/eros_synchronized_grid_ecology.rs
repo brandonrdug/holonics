@@ -37,7 +37,7 @@ use num_rational::BigRational;
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 use soma_abi::active::ActionCurrent;
-use soma_membrane::{LiveCurrentMachine, ReceiverChartIdentity, SparseStandingSurface};
+use holonics::membrane::{LiveCurrentMachine, ReceiverChartIdentity, SparseStandingSurface};
 
 /// This driver's name at the plate mouth: `.local/artifacts/eros_synchronized_grid_ecology/<name>-<sha256>.form`.
 const FORM_DRIVER: &str = "eros_synchronized_grid_ecology";

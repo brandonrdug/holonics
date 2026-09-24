@@ -49,7 +49,7 @@ use life::agentic_language::{
 };
 use life::morphological_language::MorphologicalLanguagePassage;
 use soma_abi::active::ActionCurrent;
-use soma_membrane::{
+use holonics::membrane::{
     CurrentExecutionRequest, DirectedExecutionRequest, ExecutedContemporaryEvent, LiveCurrentError,
     LiveCurrentExecutor, ParallelCpuLiveCurrentExecutor, RegionalExecutionRequest,
     SparseStandingSurface,

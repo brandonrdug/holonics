@@ -998,11 +998,11 @@ impl LiveCurrentExecutor for CountingCpuExecutor {
     fn enact(
         &mut self,
         physical_revision: u64,
-        standing: &soma_membrane::SparseStandingSurface,
-        currents: &[soma_membrane::CurrentExecutionRequest<'_>],
-        relations: &[soma_membrane::DirectedExecutionRequest],
-        regional: &[soma_membrane::RegionalExecutionRequest<'_>],
-    ) -> Result<soma_membrane::ExecutedContemporaryEvent, soma_membrane::LiveCurrentError> {
+        standing: &holonics::membrane::SparseStandingSurface,
+        currents: &[holonics::membrane::CurrentExecutionRequest<'_>],
+        relations: &[holonics::membrane::DirectedExecutionRequest],
+        regional: &[holonics::membrane::RegionalExecutionRequest<'_>],
+    ) -> Result<holonics::membrane::ExecutedContemporaryEvent, holonics::membrane::LiveCurrentError> {
         self.enactments += 1;
         self.cpu
             .enact(physical_revision, standing, currents, relations, regional)
@@ -1018,13 +1018,13 @@ impl LiveCurrentExecutor for RefusingExecutor {
     fn enact(
         &mut self,
         _physical_revision: u64,
-        _standing: &soma_membrane::SparseStandingSurface,
-        _currents: &[soma_membrane::CurrentExecutionRequest<'_>],
-        _relations: &[soma_membrane::DirectedExecutionRequest],
-        _regional: &[soma_membrane::RegionalExecutionRequest<'_>],
-    ) -> Result<soma_membrane::ExecutedContemporaryEvent, soma_membrane::LiveCurrentError> {
+        _standing: &holonics::membrane::SparseStandingSurface,
+        _currents: &[holonics::membrane::CurrentExecutionRequest<'_>],
+        _relations: &[holonics::membrane::DirectedExecutionRequest],
+        _regional: &[holonics::membrane::RegionalExecutionRequest<'_>],
+    ) -> Result<holonics::membrane::ExecutedContemporaryEvent, holonics::membrane::LiveCurrentError> {
         self.consulted += 1;
-        Err(soma_membrane::LiveCurrentError::PhysicalSettlement)
+        Err(holonics::membrane::LiveCurrentError::PhysicalSettlement)
     }
 }
 

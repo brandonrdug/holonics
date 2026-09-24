@@ -23,7 +23,7 @@ use life::resonance_ecology::{
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use soma_abi::active::{ActionCurrent, RelationAtom};
-use soma_membrane::{
+use holonics::membrane::{
     LiveBoundaryTransition, LiveCurrentMachine, LiveMemory, ParallelCpuLiveCurrentExecutor,
     ReceiverFiberIdentity, SparseStandingSurface,
 };
@@ -638,7 +638,7 @@ fn transition_read(transitions: &[Vec<LiveBoundaryTransition>]) -> TransitionRea
     read
 }
 
-fn constituent_sha256(constituent: &soma_membrane::LiveConstituent) -> Result<String, String> {
+fn constituent_sha256(constituent: &holonics::membrane::LiveConstituent) -> Result<String, String> {
     let mut digest = Sha256::new();
     for word in constituent.native_words().map_err(debug)? {
         digest.update(word.to_le_bytes());

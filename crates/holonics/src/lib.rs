@@ -51,6 +51,7 @@ pub mod generator;
 pub mod geometry;
 pub mod holon;
 pub mod law;
+pub mod membrane;
 pub mod port;
 pub mod reaction;
 pub mod ratio;

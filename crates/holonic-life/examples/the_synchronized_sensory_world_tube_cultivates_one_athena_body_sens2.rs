@@ -34,7 +34,7 @@ use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use soma_membrane::ReceiverChartIdentity;
+use holonics::membrane::ReceiverChartIdentity;
 
 const PREDECESSOR: &str = concat!(
     ".local/artifacts/the_returned_membrane_action_cultivates_one_source_detached_athena_rest_mem4/",

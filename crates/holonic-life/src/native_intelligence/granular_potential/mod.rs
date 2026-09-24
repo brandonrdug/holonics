@@ -16,7 +16,7 @@ use num_rational::BigRational as Rat;
 use num_traits::{ToPrimitive, Zero};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use soma_membrane::ReceiverFiberIdentity;
+use holonics::membrane::ReceiverFiberIdentity;
 use thiserror::Error;
 
 use holonic_engine::{

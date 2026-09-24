@@ -15,7 +15,7 @@ use holonics::structure::{
     RelationAtlasError, RelationSpan,
 };
 use soma_abi::active::RelationAtom;
-use soma_membrane::ReceiverFiberIdentity;
+use holonics::membrane::ReceiverFiberIdentity;
 
 use crate::resonance_ecology::ResonanceGerm;
 

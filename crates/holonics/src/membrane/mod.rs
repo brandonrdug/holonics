@@ -1,21 +1,11 @@
-//! The live, organ-neutral execution membrane.
+//! The live, organ-neutral receiving and standing runtime.
 //!
-//! Source organs own their material grains and transform encountered world material into native
-//! relation atoms and event actions. [`LiveCurrentMachine`] is the production lifetime owner: it
-//! retains standing topology and genuinely live current carriers only. This crate has no text,
-//! filesystem, image, renderer, corpus, scheduler, or semantic dependency.
-//!
-//! **The `historical` namespace was removed 2026-08-15.** It re-exported eleven modules —
-//! `active_cut`, `active_topology`, `co_present`, `contact_cycle`, `cut_surface`,
-//! `directed_contact`, `emission_journal`, `event_mouth`, `event_surface`, `live_holon`,
-//! `recovery` — 11,214 of this crate's then 27,104 lines, declaring of itself that they "do not
-//! feed, reconstruct, or own [`LiveCurrentMachine`]". They did not: `grep -rn "historical::"
-//! crates soma --include='*.rs'` returned zero outside the declaration, none of the eighty-two
-//! names it exported occurred anywhere outside `crates/holonic-membrane/src/`, and the eleven referenced
-//! only each other — the single edge into a live module was
-//! `sparse_standing::prepare_successor`, whose own callers were all inside the island. A retired
-//! interface is refused rather than deprecated, and git history is the recovery surface
-//! (`CLAUDE.md` §13 rule 3). They are recoverable at `09b55d9` and earlier.
+//! Source organs turn encountered material into native relation atoms and event actions.
+//! [`LiveCurrentMachine`] owns the continuing standing topology and live current carriers;
+//! [`SparseStandingSurface`] is its concrete storage chart. The general standing law belongs
+//! to the Holon/restriction owners. This module has no source-organ, renderer or corpus dependency.
+//! Its former `soma-membrane` package and the already retired historical replay namespace are
+//! recorded in `docs/plans/census/R2_MEMBRANE_EDGE.md`.
 
 pub mod chart_address;
 pub mod growing_carrier;
