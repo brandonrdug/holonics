@@ -28,7 +28,10 @@ This retirement does not remove the active grammar or any shared wire records. `
 
 ## Verification status
 
-No build or test was run for this source move. Focused gates are the moved active grammar's unit
-tests, main membrane receive tests, and the `life` all-target caller check. CUDA/PTX sources are
+The moved action grammar tests passed 5/5; main membrane live-current tests passed 22/22; retained
+`soma-abi` tests passed 19/19. The locked all-target check for `holonics` and `life` passed in 4m01s.
+`cargo tree --locked -p holonics -e normal` shows only `holonics-portable` among the in-repository
+dependencies and no `soma-abi` edge. Commands and outputs are recorded in
+`docs/VERIFICATION_RECEIPTS.tsv`. `git diff --check` passed after rebase. CUDA/PTX sources are
 unchanged; the existing CUDA wire and link gates remain the parity check for the separate wire
 owner campaign.
