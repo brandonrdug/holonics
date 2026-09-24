@@ -70,6 +70,28 @@ and outcomes are pinned in `docs/VERIFICATION_RECEIPTS.tsv` against this packet 
 
 HNA all-targets and Phase14 integration remain separate gates.
 
+## Third packet: coupled-wave session envelope
+
+The production writer in `NativeCoupledWaveSession::checkpoint_stream` emits only
+`HNA-COUPLED-WAVE-SESSION\x03`. The outer reader previously accepted `\x01` and `\x02` as well,
+constructing an affine-only session from an older `NormalWaveRest`. A whole-repository Rust source
+search found no production writer for those envelope tags; the only in-repo positive fixture was
+the ignored `coupled_session_reads_legacy_affine_frames` test. The cut removes those two readers and
+the affine fallback from `NativeCoupledWaveSavedSession::read`, keeps the affine import in
+`from_model_directory` (a distinct current model-directory input), and replaces the positive old
+wire fixture with explicit v1/v2 refusal. A current v3 checkpoint still crosses the public stream
+resume path and retains its pending emission.
+
+Nested writer formats remain as recorded above: coupled `NormalWaveRest` v7/v12 and dependent
+`CoupledConstitutiveRest` v7; plain normal v1–v4, v6 Applied, v11 pending; nested relation v2/v4/v5.
+The separate outer `HNA-FIELD-SESSION` keeps its writer-selected v3/v4/v5. This packet does not
+retire or reinterpret any of those nested charts.
+
+**Verification pending.** After ABI/Lean owner gates, run the host v1/v2 refusal test and the
+GPU-locked coupled-session tests for current v3 process resume, delayed base prediction return,
+observed-next reception, source-pair actuation/reentry, and incorporation. Do not run broad HNA or
+Phase14 suites as part of this packet.
+
 The current-history source, contextual lift/material transport, HNA session contract, behavior
 measurement and `NormalWaveHolon` reception/actuation chart remain open; Phase 14 also remains open.
 This source cut does not claim their acceptance or the final M1/M2 library layout.

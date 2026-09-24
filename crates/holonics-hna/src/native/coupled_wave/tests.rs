@@ -591,6 +591,8 @@ fn coupled_session_process_resume_drains_the_pending_emission_once() {
     session
         .checkpoint_stream(directory.join("saved.session"), stream.state())
         .unwrap();
+    let saved = std::fs::read(directory.join("saved.session")).unwrap();
+    assert!(saved.starts_with(MAGIC_V3));
     let child=std::process::Command::new(std::env::current_exe().unwrap()).args(["--exact","native::coupled_wave::tests::coupled_session_process_resume_drains_the_pending_emission_once","--ignored","--test-threads=1"]).env(CHILD,&directory).output().unwrap();
     assert!(
         child.status.success(),
@@ -700,40 +702,15 @@ fn coupled_session_keeps_and_compares_its_producing_family() {
 }
 
 #[test]
-#[ignore = "requires CUDA; v3 sessions keep the legacy affine checkpoint reader"]
-fn coupled_session_reads_legacy_affine_frames() {
-    let ro = ResidentReadout::new().unwrap();
-    let s = ResidentSurface::on(&ro).unwrap();
-    let mut session = session(&s);
-    session.predict_symbol(false).unwrap();
-    let native = session.wave.rest().unwrap();
-    let current = session.project_current(true).unwrap();
-    let fresh = path("v3-source");
-    session
-        .checkpoint_stream(&fresh, &HnaStreamState::default())
-        .unwrap();
-    let saved = NativeCoupledWaveSavedSession::read(&fresh).unwrap();
-    let header = serde_json::to_vec(&saved.header).unwrap();
-    for magic in [MAGIC, MAGIC_V2] {
-        let legacy = path("legacy-reader");
-        let mut file = File::create(&legacy).unwrap();
-        file.write_all(magic).unwrap();
-        file.write_all(&(header.len() as u64).to_le_bytes())
-            .unwrap();
-        file.write_all(&header).unwrap();
-        let SavedCoupledBody::Affine(rest) = &native else {
-            panic!("expected affine fixture")
-        };
-        rest.write(&mut file).unwrap();
-        drop(file);
-        NativeCoupledWaveSavedSession::read(&legacy)
-            .unwrap()
-            .with_session(|loaded, _| {
-                assert_eq!(loaded.wave.rest()?, native);
-                assert_eq!(loaded.project_current(true)?, current);
-                Ok(())
-            })
-            .unwrap();
+fn retired_coupled_session_v1_v2_tags_refuse() {
+    let directory = tempfile::tempdir().unwrap();
+    for version in [1u8, 2] {
+        let path = directory.path().join(format!("retired-v{version}.session"));
+        let mut bytes = b"HNA-COUPLED-WAVE-SESSION".to_vec();
+        bytes.push(version);
+        bytes.extend_from_slice(&0u64.to_le_bytes());
+        std::fs::write(&path, bytes).unwrap();
+        assert!(NativeCoupledWaveSavedSession::read(&path).is_err());
     }
 }
 

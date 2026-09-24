@@ -31,8 +31,6 @@ pub use body::{
     ReactionDepositRecord, ReactionLaw,
 };
 
-const MAGIC: &[u8] = b"HNA-COUPLED-WAVE-SESSION\x01";
-const MAGIC_V2: &[u8] = b"HNA-COUPLED-WAVE-SESSION\x02";
 const MAGIC_V3: &[u8] = b"HNA-COUPLED-WAVE-SESSION\x03";
 fn invalid(message: impl ToString) -> NativeSessionError {
     NativeSessionError::Application(message.to_string())
@@ -522,13 +520,13 @@ impl NativeCoupledWaveSavedSession {
     pub fn read(path: impl AsRef<Path>) -> Result<Self, NativeSessionError> {
         let mut f = File::open(path)?;
         let len = f.metadata()?.len();
-        let prefix = (MAGIC.len() + 8) as u64;
+        let prefix = (MAGIC_V3.len() + 8) as u64;
         if len < prefix {
             return Err(invalid("truncated coupled session"));
         }
-        let mut m = vec![0; MAGIC.len()];
+        let mut m = vec![0; MAGIC_V3.len()];
         f.read_exact(&mut m)?;
-        if m != MAGIC && m != MAGIC_V2 && m != MAGIC_V3 {
+        if m != MAGIC_V3 {
             return Err(invalid("coupled session magic"));
         }
         let mut n = [0; 8];
@@ -541,11 +539,7 @@ impl NativeCoupledWaveSavedSession {
         let mut b = vec![0; usize::try_from(count).map_err(invalid)?];
         f.read_exact(&mut b)?;
         let h: Header = serde_json::from_slice(&b)?;
-        let r = if m == MAGIC_V3 {
-            SavedCoupledBody::read(&mut f, rem)?
-        } else {
-            SavedCoupledBody::Affine(NormalWaveRest::read(&mut f, rem)?)
-        };
+        let r = SavedCoupledBody::read(&mut f, rem)?;
         Self::validate(&h, &r)?;
         Ok(Self { header: h, rest: r })
     }
