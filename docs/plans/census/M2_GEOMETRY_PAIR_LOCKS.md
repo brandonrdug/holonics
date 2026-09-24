@@ -1,7 +1,6 @@
 # M2 pair-lock owner cut
 
-This bounded cut follows the verified Geometry carry curation at `765123cd`. Lake verification is
-pending coordination with the root; no Lake builds were run for this cut.
+This bounded cut follows the verified Geometry carry curation at `765123cd`. Focused Lake verification passed; the completed gates and limits are recorded below.
 
 ## Declaration ownership
 
@@ -43,7 +42,7 @@ These are source graph counts, not Lake jobs. `Framework.Geometry` retains separ
 imports, including `Millennium.HolonicComposition` and `Millennium.Rigidity`; this cut does not
 make that facade research-free. The broad umbrella still imports HelicalPairInteraction directly.
 
-## Focused Lake gates (pending)
+## Focused Lake gates (verified)
 
 Run from `formal/elementary-holonics`:
 
@@ -56,9 +55,13 @@ lake build ElementaryHolonics.Framework.Objects
 lake build ElementaryHolonics.Framework.Dynamics
 lake build ElementaryHolonics.Framework.Geometry
 lake build ElementaryHolonics.Framework
-lake build ElementaryHolonics
 ```
 
-The first two gates check the moved theorem declarations and the research-free arithmetic owner;
-the remaining gates cover direct importers and affected public facades. Record completed commands
-and logs after root coordination.
+The first two owners, GeneratorTraceFaces, ZeroPairLock, the Objects/Dynamics/Geometry facades,
+and the combined Framework built successfully; the final Framework gate completed 9,197 jobs.
+The affected logs contain no error, declaration using `sorry`, or `sorryAx`. Existing linter
+suggestions in imported research modules retain their earlier scope. The broad
+`ElementaryHolonics` umbrella was built on the immediately preceding geometry-carry cut; it was
+not rerun here because this cut changed no umbrella import and all direct theorem consumers plus
+the combined Framework built. The eventual `Holonics`/`HolonicsResearch` roots remain unbuilt.
+Commands and logs are pinned in `docs/VERIFICATION_RECEIPTS.tsv`.
