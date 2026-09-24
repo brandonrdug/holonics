@@ -521,13 +521,10 @@ constitution is the phase-12 frozen-receiver question and is left to it.
 constitutive_fibre/resident{,.rs}/**` and its callers (engine `material_transport/normal/direct/
 wave/coupled{,/comparison/constitutive,/**/tests}.rs`; hna `examples/athena_field.rs`,
 `field_session{,/native_source}.rs`, `coupled_wave/tests{,/boundary}.rs` — the hna and coupled
-edits are the minimal compile fixes of the refusal change). Before: 35 files, 9,546 lines, 58
-struct/enum definitions (43 public), no aliases. After: 37 files, 10,275 lines, 62 definitions (44
-public; two are test-only wire witnesses) and 3 compatibility aliases. The growth is the host
-relation object, the contact law and their equality tests (≈420 lines of tests and facet
-documentation); the duplicated views, decoders and the second consequence law are deleted. No
-kernel, device layout or `SLOT_WORDS` receipt changed; one new wave-relation wire version (v5)
-was added and v1–v4 still decode.
+edits are the minimal compile fixes of the refusal change). The resident relation host reading and
+one contact reaction are added; duplicate views, decoders, the former consequence law and three
+compatibility types are gone. No kernel, device layout or `SLOT_WORDS` receipt changed. The
+source-map codec retains its current v2/v4/v5 forms; the superseded v1 and v3 readers are refused.
 
 **The one object.** The resident constitutive fibre carries one linear relation
 `R = span{(x_i, y_i)} ⊂ S × T` (`Computation/HolonicConstitutiveFibre.lean::pairedCurrentSubmodule`).
@@ -553,22 +550,17 @@ imported in `Framework/HolonObject.lean`. Its one resident section and decoder i
 `ResidentContactReaction`; `AffineContactReading::is_lossless_exchange` reads the law, and the
 wave-relation rest checks it on the retained words.
 
-**Retention.** A wave source map anchored, beside its generating reaction, the producing law's
-prediction (`Rc`) and whole arrival family at the map's cut; every retained transport word and
-every v3 rest carried both. Nothing future read them: the map's basis is `source_basis(reaction)`,
-the coupled remount rebinds the last map from its **source operand** against the contemporary
-neighborhood, and the step's predictions are returned at the passage. They are retired: a source
-map retains its source operand, field row and reaction; `read_source_passage` returns the
-prediction and arrival as readings (`ResidentWaveSourcePassage`), and `NormalCoupledStep::predictions`
-now also carries the point-source prediction. Wave rest v5 writes the anchor-free map (row in the
-header, contact law and offered joint checked on decode); a v3 map still decodes, its anchors are
-validated and checked to produce the retained reaction at remount, then dropped
-(`legacy_anchored_source_map_decodes_into_the_same_map`: the remounted v3 map equals the v5 map
-word for word). The chart's anchor coordinates (the family's original `z0`, carried through every
-map) are the phase-9 anchored affine family's restriction coordinates and a device layout; they are
-kept. The observed-next snapshot is the operand the coupled remount re-reads; kept.
-`StandingLaw` is not applied here: the retained data is the map's own generator and operand, not a
-linear quotient of a state, and sufficiency is witnessed by the v3→v5 equality.
+**Retention.** A wave source map retains its source operand, field row and reaction; its basis is
+`source_basis(reaction)`. `read_source_passage` returns the producing prediction and arrival as
+readings (`ResidentWaveSourcePassage`), and `NormalCoupledStep::predictions` carries the point-source
+prediction. Current v5 writes the source map from those operands and remount checks its reaction and
+basis. The former v3 wire also carried the producing prediction and whole arrival family; that
+save-format reader is retired under restructure §0.2 and v3 now returns a typed rest refusal. The
+chart's anchor coordinates (the family's original `z0`, carried through every map) are the phase-9
+anchored affine family's restriction coordinates and a device layout; they are kept. The
+observed-next snapshot is the operand the coupled remount re-reads; kept. `StandingLaw` is not
+applied here: the retained data is the map's own generator and operand, not a linear quotient of a
+state.
 
 | Former type / member | Facet | Disposition |
 |---|---|---|
@@ -578,9 +570,9 @@ linear quotient of a state, and sufficiency is witnessed by the v3→v5 equality
 | `ResidentConstitutiveReturn`, `ConstitutiveReturnRest` | the fibre report and its wire | kept; one allocator (`allocate`; the method form delegates; the preimage's hand-built copy deleted) |
 | `ResidentConstitutiveCurrent`, `ResidentConstitutiveSection`, `ResidentDifferenceSection`, `ResidentSourcePairs`, `ResidentBilinearFeatures` | port charts and derived source sections | kept: distinct device charts (comparison triples, source pairs, bilinear features with their adjoint) |
 | `ConstitutiveDifferentialReading`, `PreparedConstitutiveFormation` | receiver reading; staged deposition | kept |
-| `AffineContactReading`, `ConditionContactReading` | the contact reading | **merged**: one struct, `contact: Option<u64>` omitted when absent; `ConditionContactReading` alias; both former JSON faces byte-identical |
+| `AffineContactReading`, former `ConditionContactReading` | the contact reading | one struct; `contact: Option<u64>` is omitted when absent, preserving both former JSON faces byte-for-byte; no alias |
 | new: `ResidentContactReaction` | the contact element's one section | new; `ResidentAffineContact`, `ResidentConditionContact`, `ResidentWaveSourceContact` hold it; their three block-view copies and two decoders deleted |
-| `ResidentConditionCurrent`, `ResidentConditionStanding` | the retained condition (successor block of its latest reaction) | **merged**: `ResidentConditionStanding` alias; a clone is the standing a producing passage reads |
+| `ResidentConditionCurrent` | the retained condition (successor block of its latest reaction) | one owner; `standing()` returns a clone sharing its reaction section |
 | `PreparedConditionContact`, `ConditionCurrentRest`, `ConditionContactMetric`, `ConditionContactStatus` | staged contact; rest (current only); metric; status | kept |
 | `ResidentConditionPreimage`, `ConditionPreimageRest` | fibre of the derived condition relation; compact rest | kept |
 | `ResidentConditionImage`, `ResidentConstitutiveImage`, `ResidentConstitutiveRefinement`, `ConditionImageReading`, `ConstitutiveImageReading`, `ConditionCoverage` | two images over one `AffineImageData` | kept: distinct kernels (bilinear condition image, linear fibre image) and public field names read by hna `mathematical` |
@@ -596,34 +588,45 @@ linear quotient of a state, and sufficiency is witnessed by the v3→v5 equality
 | `FieldReactionEnclosure{,Rest}`, `PreparedFieldReaction` | producing reaction receipt | kept, **not retired**: it retains the producing normal material, the frozen cut of hna `FieldProducingSection` (phase 12) |
 | `ResidentWaveRelation`, `ResidentWavePullback`, `WaveSourceReceiver`, `ResidentWaveSourceGeometry` | derived wave map, pullback, receiver chart, geometry cache | kept |
 | `ResidentWaveSourceContact` | source map | anchors retired (above); new `ResidentWaveSourcePassage` returns them |
-| `NormalWaveRelationRest` | map wire | v5 added; v1–v4 decode; `LegacySourceAnchors` is the v3 decoder's record |
+| `NormalWaveRelationRest` | map wire | v5 source map added; current v2/v4/v5 forms read and write; superseded v1/v3 readers refuse |
 | per-rest `error`/`invalid` helpers (three) | rest refusal | one `rest_refusal` |
 
 Equality evidence: host `resident::relation` (fibre = translate of the vertical fibre; readings
 as core fibres), `resident::condition_contact::reaction` (both former JSON faces byte-identical;
-the lossless law on the device witness `h = (7,4)`), `wave_relation::rest` (unchanged wire tests);
+the lossless law on the device witness `h = (7,4)`), `wave_relation::rest`
+(`v1_wave_relation_is_refused_as_a_typed_rest_error`,
+`v3_anchored_source_map_is_refused_as_a_typed_rest_error`, v2/v4 codec cases);
 device `resident::relation::every_resident_reading_is_the_fibre_of_the_one_relation` (every unique,
 plural and outside reading of two fixtures equals the core fibre of the detached relation, number
-for number for unique readings), `wave_relation::rest::legacy_anchored_source_map_decodes_into_the_same_map`,
-and every existing device test of `constitutive_fibre::resident`, `material_transport::normal` and the
-hna coupled-wave, normal-wave, mathematical and native-source suites unchanged in its assertions
-(the contact numbers, balances and statuses read through the one reaction), except three: the two
-coupled tests that read the retired anchors now read the step's prediction, and
-`source_rest_rejects_changed_returned_normal` now sees the changed returned normal refused at decode
-by the contact law (it was refused at remount by the anchored prediction).
+for number for unique readings), `condition_contact::tests` (native oblique and quarter-turn contacts,
+refusal preservation), and `wave_relation::rest::current_source_map_v5_round_trips_and_remounts_from_its_operands`
+plus `source_rest_rejects_changed_returned_normal` (the v5 map checks its source/reaction relation
+and refuses a corrupted returned normal at decode).
 
 **Continuation verification, September 23, on `codex/consolidation-phase-11` from `de6a5300`.**
 Lean built `ElementaryHolonics.Holon.AffineContact` and
 `ElementaryHolonics.Framework.HolonObject`; the contact theorems report only the standard
 `propext`, `Classical.choice` and `Quot.sound` axioms. Rust host test
-`the_relation_fibre_is_the_translate_of_its_vertical_fibre` passed. GPU tests
-`every_resident_reading_is_the_fibre_of_the_one_relation`,
-`oblique_family_preserves_tangent_and_returns_normal_current`,
-`affine_origin_and_direction_scale_are_not_selected_as_actual_cause`,
-`legacy_anchored_source_map_decodes_into_the_same_map` and
-`source_rest_rejects_changed_returned_normal` passed serially. The public HNA caller test
-`field_interiors_form_and_feed_the_coupled_prediction` also passed. Full
-`material_transport::normal` and HNA consumer suites remain to run.
+`the_relation_fibre_is_the_translate_of_its_vertical_fibre` passed. On source commit
+`a6c0c95d` (the v3 decoder and both compatibility aliases retired, before the v1 reader cut), the
+full engine `material_transport::normal` suite passed 172/172 in 54.99s. The resident relation,
+condition-contact and wave-rest suites passed 2/2, 10/10 and 6/6; the v5 source-map remount and
+lossless-reaction refusal passed in that pre-v1 tree. Their logs are
+`.local/p11-continuation-logs/engine-normal.log`, `engine-relation.log`,
+`engine-condition-contact.log` and `engine-wave-rest.log`.
+
+The full HNA library suite was started on `a6c0c95d` with 216 tests and serialized CUDA. The user
+stopped it under resource pressure while `native::field_session::generator_application::deposition_probe::deposition_split_synthetic_long_control`
+was active. The log contains 115 completed passing tests before that probe and no suite result;
+record this as **interrupted**, not passed. Log:
+`.local/p11-continuation-logs/hna-lib.log`. The active probe matched the existing
+`.local/campaign-deposition/synthetic.log` result of 4,192.42s, with CPU and GPU utilization active.
+
+On source commit `53e085eb` (v1 reader removed), the post-v1 host wave-rest filter passed 4/4
+with 2 CUDA tests ignored: typed v1 and v3 refusals plus v2/v4 round trips. The run completed in
+49.94s including the cached-target compilation and launched no NVCC. Log:
+`.local/p11-continuation-logs/engine-wave-rest-host-postv1.log`. Post-v1 CUDA remount and HNA
+consumer suites remain unverified under the resource stop.
 
 **Not done, with reasons.** (1) The frozen producing material in `FieldReactionEnclosure` and the
 coupled continuation's retained transport word are phase-12 retention debt (hna field session). (2)
@@ -878,7 +881,7 @@ since been transplanted to an isolated continuation branch:
 
 | Phase | Branch (worktree) | Base | Last step reached | Remaining |
 |---|---|---|---|---|
-| 11 resident constitutive views | Original `wip/consolidation-phase-11` (`.local/p11-wt`) remains untouched; continued on `codex/consolidation-phase-11` (`.local/p11-continuation`) | `5b7c89ab` WIP transplanted onto `de6a5300` | Lean AffineContact and HolonObject import built; host relation equality, resident relation/contact GPU checks and one HNA field caller passed | run full `material_transport::normal` and HNA consumer suites; close phase #68 with final receipt |
+| 11 resident constitutive views | Original `wip/consolidation-phase-11` (`.local/p11-wt`) remains untouched; continued on `codex/consolidation-phase-11` (`.local/p11-continuation`) | `5b7c89ab` WIP transplanted onto `de6a5300`; pre-v1 source `a6c0c95d`; current source `53e085eb` | Lean AffineContact/HolonObject import built; engine normal 172/172; resident relation/contact/rest 2/10/6; post-v1 host rest 4 passed, 2 CUDA ignored; HNA full suite interrupted by user resource stop | post-v1 GPU v5 remount and focused HNA remount consumers remain unverified; retain HNA interruption receipt and close #68 only after its remaining acceptance scope is resolved |
 | 12a field body and session | `wip/consolidation-phase-12a` (`.local/p12a-wt`) | `5b7c89ab` | incident body/session edits for the joint `\x01` frozen-cut retirement, machine episode, `ResidentHolonChart`; about to add chart equality tests | packets 1–6 of the brief: contemporary-read tests (delayed = immediate at the same constitution), `\x01` decode test, `FieldProducingSection`, ladder consolidation, disposition, CLAUDE.md stale statements, suites, exposure sample (counts and bits only) |
 | 12b coupled continuation and field internals | `wip/consolidation-phase-12b` (`.local/p12b-wt`) | `7e204283` | coupled continuation retirement in progress: `continuation.rs` deleted, dependent/comparison/rest rewritten; writing coupled wave rest v12 with legacy v9/v10 decode (likely does not compile yet) | finish v12 rest; hna `coupled_wave.rs` session contract restated; contemporary-read tests; behaviour measurement; `NormalWaveHolon` reception/actuation chart; then packet 2 (junction, material_transport/{complete,contextual,moment,support}, archive, current_history_source, contextual_lift, rest) |
 
