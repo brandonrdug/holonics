@@ -12,7 +12,7 @@
 # without the nvptx target present because the .ptx artifact is committed alongside, exactly as
 # mount_smoke_kernel.ptx is the separate smoke boundary.
 #
-# `body` reaches a native u64 divide on some paths, so build-std carries compiler_builtins as well
+# `holonics-portable` reaches a native u64 divide on some paths, so build-std carries compiler_builtins as well
 # as core (the smoke kernel needed only core). Both lower to PTX; ptxas is the final judge.
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -20,7 +20,9 @@ cd "$(dirname "$0")"
 PTXAS="${PTXAS:-/opt/cuda/bin/ptxas}"
 TARGET="nvptx64-nvidia-cuda"
 # sm_89 = Ada (RTX 4080 SUPER); +ptx78 pairs with CUDA 13.2's ptxas.
-export RUSTFLAGS="-C target-cpu=sm_89 -C target-feature=+ptx78"
+# Keep `file!()` and source-path payloads stable across worktree and checkout locations.
+REPOSITORY_ROOT="$(cd ../.. && pwd)"
+export RUSTFLAGS="-C target-cpu=sm_89 -C target-feature=+ptx78 --remap-path-prefix=${REPOSITORY_ROOT}=/holonics"
 
 cargo build --release --target "$TARGET" -Z build-std=core,compiler_builtins
 

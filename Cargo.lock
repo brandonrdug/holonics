@@ -121,10 +121,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "holonics-portable"
-version = "0.0.0"
-
-[[package]]
 name = "bumpalo"
 version = "3.20.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -544,9 +540,9 @@ checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 name = "holon-plate"
 version = "0.1.0"
 dependencies = [
- "holonics-portable",
  "holonic-engine",
  "holonics",
+ "holonics-portable",
  "life",
  "num-bigint",
  "sha2 0.10.9",
@@ -592,8 +588,8 @@ dependencies = [
 name = "holonics"
 version = "0.1.0"
 dependencies = [
- "holonics-portable",
  "holonic-words",
+ "holonics-portable",
  "num-bigint",
  "num-rational",
  "num-traits",
@@ -609,8 +605,8 @@ dependencies = [
 name = "holonics-cuda"
 version = "0.1.0"
 dependencies = [
- "holonics-portable",
  "holonic-words",
+ "holonics-portable",
  "soma-abi",
 ]
 
@@ -631,6 +627,10 @@ dependencies = [
  "thiserror",
  "tokenizers",
 ]
+
+[[package]]
+name = "holonics-portable"
+version = "0.0.0"
 
 [[package]]
 name = "holonics-workbench"
@@ -758,11 +758,11 @@ checksum = "3eaf3ede3fee6db1a4c2ee091bf8a8b4dccdc6d17f656fb07896ee72867612f2"
 name = "life"
 version = "0.0.0"
 dependencies = [
- "holonics-portable",
  "holonic-engine",
  "holonic-language",
  "holonics",
  "holonics-cuda",
+ "holonics-portable",
  "hound",
  "image",
  "libc",
