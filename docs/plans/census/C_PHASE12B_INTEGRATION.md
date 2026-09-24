@@ -60,7 +60,8 @@ material and continuation assertions; file-placement fault/checksum tests are re
 file-placement mechanism.
 
 **Archive packet verification, September 24.** `cargo check -p holonic-engine --lib` and
-`cargo check -p holonic-engine --all-targets` pass. Under `.local/gpu.lock`, the seven field rest
+`cargo check --locked -p holonic-engine --all-targets` pass on the final source after the
+remount-test mutable binding correction (`0c851a35`). Under `.local/gpu.lock`, the seven field rest
 tests pass, including source-only refusal and the 12-occurrence ordinary rest/remount test. The
 dedicated writer test passes for all six current tags (`\x01`–`\x06`). Focused current-history,
 contextual-lift, complete/contextual/moment material, packed-v2 report support, operative source
