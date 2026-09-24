@@ -1,6 +1,6 @@
 //! Exact output topology emitted by native active events.
 //!
-//! Input events and their source material stand once in [`crate::active`].  This module records
+//! Input events and their source material stand once in the host's `holonics::generator::action` grammar. This module records
 //! only accepted Soma deeds: one immutable ordered journal per current, partitioned at every event
 //! boundary so arbitrary sparse incidences can reference lived subspans without re-enacting the
 //! source event or scanning a dense OWN chart.  Durable word spelling is testimony and device ABI;
