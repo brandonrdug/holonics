@@ -26,5 +26,11 @@ owner commit. The source schema and field layout are unaffected by this carrier 
 
 Import census: all in-repository Rust imports and fully-qualified type references to the six moved
 types now use `holonics::receiver::native`; no forwarding exports remain in the engine compression
-modules. Rust source parsing was checked with `rustfmt --emit stdout` on each changed Rust file;
-Cargo gates are intentionally left to the parent review of this broad import migration.
+modules. Rust source parsing was checked with `rustfmt --emit stdout` on each changed Rust file.
+The locked `cargo check -j2 --workspace --all-targets` passed on the complete stacked carrier cut,
+including engine, life, HNA, workspace and workbench. During review, the first compile exposed an
+implicit sibling-module import in `receiver_history_compression/compression.rs`; the next reached
+the missing direct `holonics` dependency in `holonics-workspace`; the third reached two workbench
+imports outside `crates/`. Those edges were fixed in separate commits before the final passing
+gate. The moved carriers preserve their derives, field shape and serde representation; this gate
+does not claim a behavioral HNN or CUDA card result.
