@@ -213,6 +213,7 @@ mod receiver_tests {
     use super::*;
     use crate::grown_cell::{ComplexAperture, Schedule, found_complex, grow, standard_cells};
     use holonics::inertia::{Inertia, congruence, inertia};
+    use num_traits::{One, Zero};
 
     #[test]
     fn a_grown_circuit_read_on_a_cyclic_receiver_returns_its_passages_by_winding() {
