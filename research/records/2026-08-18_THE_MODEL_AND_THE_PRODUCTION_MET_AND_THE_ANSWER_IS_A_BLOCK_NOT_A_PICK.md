@@ -10,7 +10,7 @@ sense that they are **conditioned ecological neural networks stored and able to 
 active processes**."* And 2026-08-18: *"there is surely an equivalent logit vector as you call it, I
 do not know why you would not simply derive this as necessary."*
 **Plan:** stations three and eight of
-[`blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`](../../archive/plans/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md),
+[`blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/plans/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md),
 which sits under [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md).
 
 ---

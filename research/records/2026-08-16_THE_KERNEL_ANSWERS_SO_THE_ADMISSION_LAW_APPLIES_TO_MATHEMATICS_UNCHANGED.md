@@ -10,7 +10,7 @@ this machine (`lake` and `lean` on PATH, 7,890 oleans, mathlib cache present), t
 **Provenance:** Brandon, 2026-08-16, asking whether the admission law just built could be applied to
 mathematics proofs as the existing drivers do.
 **Plan:** this record schedules nothing. It follows
-[`blueprint/THE_ADMISSION_IS_A_QUOTIENT_AND_THE_BREADTH_IS_A_GROUP.md`](../../archive/plans/THE_ADMISSION_IS_A_QUOTIENT_AND_THE_BREADTH_IS_A_GROUP.md),
+[`blueprint/THE_ADMISSION_IS_A_QUOTIENT_AND_THE_BREADTH_IS_A_GROUP.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/plans/THE_ADMISSION_IS_A_QUOTIENT_AND_THE_BREADTH_IS_A_GROUP.md),
 which sits under [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md).
 
 ---

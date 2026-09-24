@@ -498,7 +498,7 @@ pullback and producing paired return retain their original scope. This is recove
 composition of existing mechanisms, not the installation of a new nonlinear law.
 
 [historical] The field/model wrapper and byte-cultivation adapters were
-[removed from the live SDK](../archive/implementations/2026-09-09-byte-field-cultivation/README.md).
+[removed from the live SDK](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/implementations/2026-09-09-byte-field-cultivation/README.md).
 The [representation audit](../research/records/2026-09-09_THE_BYTE_CLOCK_AND_OCCURRENCE_EXPANSION_ARE_NOT_GENERATOR_CULTIVATION.md)
 records why generic API factoring, per-occurrence material and source archive persistence did
 not establish productive generator organization. Their local comparisons remain evidence.

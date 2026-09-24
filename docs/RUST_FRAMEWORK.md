@@ -66,7 +66,7 @@ Its rest carries learned basis, source chart and chronology, without an occurren
 The [native guide](NATIVE_HNA.md) states the point/family and whole-model boundaries.
 
 [historical] The former generic field/model wrapper and byte-field cultivation adapters were
-[retired](../archive/implementations/2026-09-09-byte-field-cultivation/README.md) after the
+[retired](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/implementations/2026-09-09-byte-field-cultivation/README.md) after the
 [representation audit](../research/records/2026-09-09_THE_BYTE_CLOCK_AND_OCCURRENCE_EXPANSION_ARE_NOT_GENERATOR_CULTIVATION.md).
 `NativeFieldModelSpec`, `NativeSavedField`, `with_native_field`, and the alpha text/material/session
 modules are no longer exported by the SDK. Core field mathematics and older phase-session APIs

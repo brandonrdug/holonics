@@ -13,7 +13,7 @@ today over three materials.
 and braces? … It's just fucking text."* and *"Authoritatively supersede whatever the 'parser' thing
 you just identified is, it has been a contaminant that you passed off as something foundational
 during experiments."*
-**Plan:** [`blueprint/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md`](../../archive/plans/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md),
+**Plan:** [`blueprint/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/plans/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md),
 all eight stations. It sits under [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md).
 
 ---

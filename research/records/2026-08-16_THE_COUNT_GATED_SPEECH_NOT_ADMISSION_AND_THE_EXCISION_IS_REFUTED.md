@@ -5,7 +5,7 @@
 `proved-standard` for Haynsworth additivity and the cyclic-subgroup statement; `proved-derived` for
 the two-sided standing being derivable from what the conditioning path already computes.
 **Evidence:** `measured` — every figure below was produced by a run on this machine the same day.
-**Plan:** [`blueprint/THE_ADMISSION_IS_A_QUOTIENT_AND_THE_BREADTH_IS_A_GROUP.md`](../../archive/plans/THE_ADMISSION_IS_A_QUOTIENT_AND_THE_BREADTH_IS_A_GROUP.md),
+**Plan:** [`blueprint/THE_ADMISSION_IS_A_QUOTIENT_AND_THE_BREADTH_IS_A_GROUP.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/plans/THE_ADMISSION_IS_A_QUOTIENT_AND_THE_BREADTH_IS_A_GROUP.md),
 executed to completion. It sits under [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md),
 which with `CONSTRUCTION_STATE.md` remains the only construction authority.
 

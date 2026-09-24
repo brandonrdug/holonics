@@ -9,7 +9,7 @@ advances no Rust, CUDA, Eros, or Athena capability grade.
 
 [definition] The temporary use of `HNA0--HNA4` for this Lean sequence was a scheduling error. HNA
 means the live Holonic Neural Athena engine campaign under
-[`THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](../../archive/plans/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
+[`THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/plans/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
 The formal files below remain valid prerequisite law, but their temporary phase labels are
 withdrawn and schedule nothing.
 

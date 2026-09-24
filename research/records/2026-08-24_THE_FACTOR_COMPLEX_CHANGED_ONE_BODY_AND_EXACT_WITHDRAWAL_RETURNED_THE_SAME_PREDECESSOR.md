@@ -2,13 +2,13 @@
 
 **Date:** 2026-08-24  
 **Authority:** admission record for the fourth station of
-[`../../blueprint/THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md`](../../archive/plans/THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md)  
+[`../../blueprint/THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/plans/THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md)  
 **Engine owner:**
 [`session_factor_complex.rs`](https://github.com/brandonrdug/holonics/blob/7b0d1b4982d0b99556adce0e23dacebabad0a8f8/crates/holonic-engine/src/phoenix/session_factor_complex.rs)  
 **Same-body seam:**
-[`../../archive/retired-phoenix-rust/holonic-engine/runtime.rs`](../../archive/retired-phoenix-rust/holonic-engine/runtime.rs)
+[`../../archive/retired-phoenix-rust/holonic-engine/runtime.rs`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/retired-phoenix-rust/holonic-engine/runtime.rs)
 **Driver:**
-[`../../archive/retired-phoenix-rust/life-examples/the_factor_complex_changes_the_same_body.rs`](../../archive/retired-phoenix-rust/life-examples/the_factor_complex_changes_the_same_body.rs)
+[`../../archive/retired-phoenix-rust/life-examples/the_factor_complex_changes_the_same_body.rs`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/retired-phoenix-rust/life-examples/the_factor_complex_changes_the_same_body.rs)
 **Returned artifact:** `output/the_factor_complex_changes_the_same_body/`  
 **Artifact identity:** `da9d35f80387ee532153fed774d77ba172ba1917115e23663a4c429f89c7c8e0`
 

@@ -48,7 +48,7 @@ development, a usable application/interface and durable integrated native eviden
 ## Preserved experiment, separate from construction
 
 [historical; source-inspected] The inherited tied-next-arrival draft and its integration are
-[archived](../../archive/experiments/2026-09-05-tied-next-arrival/README.md). The captured original
+[archived](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/experiments/2026-09-05-tied-next-arrival/README.md). The captured original
 patch applies to `e92d24bc`, checked in an independent temporary index; archived source snapshots
 were byte-compared before active copies were removed. Its uncommitted module, API, wire-v2 and
 application hooks no longer enter the active crate. Measurement files were not deleted. The

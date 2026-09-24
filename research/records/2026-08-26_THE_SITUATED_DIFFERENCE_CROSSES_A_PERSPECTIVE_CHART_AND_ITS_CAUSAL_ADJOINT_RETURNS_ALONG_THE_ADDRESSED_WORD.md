@@ -3,7 +3,7 @@
 ## Scope and grade
 
 [established-bounded; implemented-exact; measured] L0 of
-[`blueprint/THE_SITUATED_DIFFERENCE_RETURNS_THROUGH_PERSPECTIVE_CHARTS_AND_ATHENA_CULTIVATES_PROSE_MATHEMATICS_AND_CODE_AS_ONE_CAUSAL_ECOLOGY.md`](../../archive/plans/THE_SITUATED_DIFFERENCE_RETURNS_THROUGH_PERSPECTIVE_CHARTS_AND_ATHENA_CULTIVATES_PROSE_MATHEMATICS_AND_CODE_AS_ONE_CAUSAL_ECOLOGY.md)
+[`blueprint/THE_SITUATED_DIFFERENCE_RETURNS_THROUGH_PERSPECTIVE_CHARTS_AND_ATHENA_CULTIVATES_PROSE_MATHEMATICS_AND_CODE_AS_ONE_CAUSAL_ECOLOGY.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/plans/THE_SITUATED_DIFFERENCE_RETURNS_THROUGH_PERSPECTIVE_CHARTS_AND_ATHENA_CULTIVATES_PROSE_MATHEMATICS_AND_CODE_AS_ONE_CAUSAL_ECOLOGY.md)
 returned.  The construction is the narrow composition seam requested by the governing derivation:
 one dependent returned difference, its lawful chart transport or concrete defect, and its causal
 adjoint over an actual addressed word.  It does not apply morphology; its exact open boundary is

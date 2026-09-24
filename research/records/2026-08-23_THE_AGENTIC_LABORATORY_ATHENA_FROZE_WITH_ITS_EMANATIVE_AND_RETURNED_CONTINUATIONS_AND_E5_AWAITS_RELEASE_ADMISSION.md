@@ -5,7 +5,7 @@
 **Truth status:** each material claim is graded inline; this record does not advance the construction
 state.
 
-[implemented-exact] [`the_agentic_laboratory_athena_freezes.rs`](../../archive/retired-phoenix-rust/life-examples/the_agentic_laboratory_athena_freezes.rs)
+[implemented-exact] [`the_agentic_laboratory_athena_freezes.rs`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/retired-phoenix-rust/life-examples/the_agentic_laboratory_athena_freezes.rs)
 composes the admitted E0 recurrence, E1 optical hierarchy, E2 complete inherited-organ return, E3
 returned cultivation, E4 native membrane and N4 native mathematical rest. It copies no superseded
 N4 heterogeneous or flat optical wire into the final body. The mathematics member contains only

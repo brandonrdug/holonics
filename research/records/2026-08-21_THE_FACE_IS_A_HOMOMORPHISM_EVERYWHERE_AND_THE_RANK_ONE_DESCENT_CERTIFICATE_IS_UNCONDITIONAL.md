@@ -10,7 +10,7 @@ forms) before encoding.  **It schedules nothing.**
 authorities.
 **Position under the active plan.** Exterior mathematical material for the mathematics
 codec arm of
-[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../archive/plans/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
+[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/plans/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
 Its Deed M6 poses the machine-side question over exactly this material — the theorem name
 `Descent.TheFaceIsAHomomorphismEverywhere`, the case complex, the exceptional
 conventions — and admits its source as a content-addressed snapshot, so which occurrence

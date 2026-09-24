@@ -15,7 +15,7 @@ and classical identities retain their `proved-standard` grade. The generator/ker
 flow-globality slogan, and the Difference-Galois/prime-wheel identification are `interpretation`
 or `conditional` unless their hypotheses are stated.
 **Companion:** the pure laws are deposited in
-[`archive/equation-atlas/`](../../archive/equation-atlas) — 23 equations and 25 relations appended to the
+[`archive/equation-atlas/`](https://github.com/brandonrdug/holonics/tree/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/equation-atlas) — 23 equations and 25 relations appended to the
 2026-08-19 atlas, joining its existing `turn.*`, `polygon.*`, `normalization.*` and `optics.*`
 nodes. This record carries the derivations and the readings; the atlas carries the statements.
 

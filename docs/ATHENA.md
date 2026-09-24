@@ -106,7 +106,7 @@ Its native checkpoint retains a reversible input trace and historical carriers u
 This has not realized the requested productive generator organization. The AC completion
 assessment is corrected; local arithmetic, learning and persistence evidence retain their scope.
 
-[definition] The [retirement boundary](../archive/implementations/2026-09-09-byte-field-cultivation/README.md)
+[definition] The [retirement boundary](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/implementations/2026-09-09-byte-field-cultivation/README.md)
 removes that path from the live SDK/examples. The new [blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
 starts with the existing resident local relation as productive generator material, its compact
 `ConstitutiveFibreRest`, and direct current composition. This local construction is not yet the
@@ -658,7 +658,7 @@ map word at its latent input port. The [contextual audit](../research/records/20
 withdraws its promotion into native HNN foundations. It supplies no contextual applicability
 relation for that globally applied word. Zero address contrast is zero at that receiver, not
 proof of no relevant internal difference. Its uncommitted API and CLI promotion were removed;
-the [recoverable draft](../archive/experiments/2026-09-05-tied-next-arrival/README.md), finite
+the [recoverable draft](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/experiments/2026-09-05-tied-next-arrival/README.md), finite
 algebra and rest v2 observations remain available for inspection, not as a new construction order.
 
 [established-bounded; measured] The actual document run formed five maps and produced a coherent

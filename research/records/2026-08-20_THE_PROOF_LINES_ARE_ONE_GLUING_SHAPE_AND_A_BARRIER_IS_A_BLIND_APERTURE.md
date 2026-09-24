@@ -5,14 +5,14 @@
 [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction authorities.
 **Position under the active plan.** This is exterior mathematical material for
-[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../archive/plans/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md),
+[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/plans/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md),
 whose Deed M2 names *Lean exterior testimony* as one of the mathematics codec's return faces.
 **It changes no engine source, adds no owner, and proposes no driver.** The active deed remains
 W1; M0–M3 remain blocked until W5 passes.
 **Truth status:** `proved-derived` for every Lean theorem, each kernel-checked and audited to be
 free of `sorryAx`; `established-bounded` for the survey; `interpretation` for the readings;
 `open` for every named conjecture, none of which is formalized here.
-**Companion:** the laws are in [`archive/equation-atlas/`](../../archive/equation-atlas) — nine equations
+**Companion:** the laws are in [`archive/equation-atlas/`](https://github.com/brandonrdug/holonics/tree/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/equation-atlas) — nine equations
 and seven relations appended, each citing its Lean owner.
 
 ## Provenance

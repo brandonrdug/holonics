@@ -40,7 +40,7 @@ becomes an acceptance criterion merely by appearing in the application history.
 ## Historical disposition
 
 [historical] The September 1 workspace-first disposition and its WB/VWS receipts are retained in
-[the prior application document](../../archive/operations/WORKBENCH_BEFORE_HNA_CONSOLIDATION.md).
+[the prior application document](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/operations/WORKBENCH_BEFORE_HNA_CONSOLIDATION.md).
 The rejected Ratatui interface and removed per-event Gemma lift are not revived. The native HNN
 command now supplies the previously missing full-operator application seam without claiming the
 older workspace stores its device overlays.

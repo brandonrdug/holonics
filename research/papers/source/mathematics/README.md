@@ -5,9 +5,9 @@ application. A paper may import an object, restate it in a local diagram, or ref
 new object; it must not silently copy and alter the claim.
 
 The historical orientation is pinned at
-[`MATHEMATICAL_HOLONICS.md`](../../../../archive/reference/holobrochos-a07ff376/src/soma/MATHEMATICAL_HOLONICS.md).
+[`MATHEMATICAL_HOLONICS.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/reference/holobrochos-a07ff376/src/soma/MATHEMATICAL_HOLONICS.md).
 The external mechanism atlas is pinned at
-[`MATHEMATICAL_RESEARCH_NETWORK.md`](../../../../archive/reference/minimum-mechanics-a07ff376/src/soma/MATHEMATICAL_RESEARCH_NETWORK.md).
+[`MATHEMATICAL_RESEARCH_NETWORK.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/reference/minimum-mechanics-a07ff376/src/soma/MATHEMATICAL_RESEARCH_NETWORK.md).
 This directory owns neither document; it supplies the exact reusable objects they route into.
 
 ## Object contract
@@ -37,7 +37,7 @@ computational, and open objects remain typed apart.
 ## Exterior equation material
 
 The curated machine-readable equation and relation store lives at
-[`archive/equation-atlas/README.md`](../../../../archive/equation-atlas/README.md), outside this reusable object
+[`archive/equation-atlas/README.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/equation-atlas/README.md), outside this reusable object
 registry. That store contains exterior formulation occurrences, contexts, receiver scopes and
 graded research correspondences. It is material for a later codec intake, not a second theorem
 library and not the semantic owner of its formulas.

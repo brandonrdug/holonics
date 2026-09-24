@@ -85,7 +85,7 @@ material is attached and adds normal payloads in v2. Coupled-rest validation now
 actual action's construction cut, separately from empirical observations and compatibility
 formation counts. The old private fitted-wave adapter was removed from live source; its
 patch and unique kernel/port source are preserved in
-[the implementation archive](../../archive/implementations/2026-09-13-fitted-wave-adapter/README.md).
+[the implementation archive](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/implementations/2026-09-13-fitted-wave-adapter/README.md).
 Its local experimental evidence remains recoverable and does not schedule further trials.
 
 ## The physical derivation and formal return

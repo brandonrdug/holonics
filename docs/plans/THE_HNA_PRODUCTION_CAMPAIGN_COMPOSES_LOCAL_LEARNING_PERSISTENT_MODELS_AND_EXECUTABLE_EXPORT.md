@@ -78,8 +78,8 @@ This is this campaign's dependency map, not a new generated catalogue or a claim
 [reasoning cycle](../canon/TABLET_THE_REASONING_CYCLE.md), [hexis](../canon/TABLET_THE_HEXIS.md),
 [circulating cartographer](../canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md),
 [compression](../canon/TABLET_THE_COMPRESSION.md) and [manifold](../canon/TABLET_THE_MANIFOLD.md).
-The completed [HNA](../../archive/plans/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md)
-and [SKE](../../archive/plans/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md)
+The completed [HNA](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/plans/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md)
+and [SKE](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/plans/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md)
 contracts retain their bounded results. The Eros instantiation's §4b reflection interpretation
 does not provide a termination law until actual native admittances are founded; its count-based
 substitute was refuted. Neither that substitute nor the foreign-tower prohibition returns here.

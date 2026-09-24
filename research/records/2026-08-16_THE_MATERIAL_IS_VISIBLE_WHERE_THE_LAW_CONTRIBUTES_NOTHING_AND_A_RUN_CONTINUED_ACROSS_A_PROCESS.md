@@ -4,7 +4,7 @@
 **Truth status:** `established-bounded` for every measured return; `implemented-exact` throughout;
 `interpretation` for the readings attached to them.
 **Evidence:** `measured`. Every figure below was produced by a run on this machine the same day.
-**Plan:** [`blueprint/THE_EROS_INFORMATION_ENGINE.md`](../../archive/plans/THE_EROS_INFORMATION_ENGINE.md),
+**Plan:** [`blueprint/THE_EROS_INFORMATION_ENGINE.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/plans/THE_EROS_INFORMATION_ENGINE.md),
 ratified by Brandon 2026-08-16 and executed to completion. It sits under
 [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md).
 

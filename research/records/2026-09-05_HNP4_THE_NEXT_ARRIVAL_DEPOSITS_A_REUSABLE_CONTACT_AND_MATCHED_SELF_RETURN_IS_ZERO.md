@@ -9,7 +9,7 @@ route or a construction order. Read the
 [audit](2026-09-05_CONTEXTUAL_TRANSPORT_PRECEDES_INHERITED_MODEL_PRODUCTION.md).
 
 [historical; source-inspected] The implementation and integration are now
-[archived](../../archive/experiments/2026-09-05-tied-next-arrival/README.md) against their original
+[archived](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/experiments/2026-09-05-tied-next-arrival/README.md) against their original
 base. Commands and API names below describe that revision, not the active crate. The recorded
 version-two boundary artifacts require that archived implementation; measurements were preserved.
 

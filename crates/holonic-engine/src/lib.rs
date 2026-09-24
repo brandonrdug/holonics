@@ -131,7 +131,6 @@ pub mod continuing_tube;
 // never glob-exported: it names `Kind`, `Stratum`, `SurfaceId`, `tokenize` and `classify`, none of
 // which say at the crate root which carrier they belong to, and `Stratum` would collide with the
 // geometry family. `CLAUDE.md` §13 rule 2 — a scalar that measures is lawful.
-pub mod corpus_census;
 pub mod coupled_informant;
 #[cfg(target_os = "linux")]
 pub mod cuda_aperture;
@@ -494,7 +493,6 @@ pub mod structure_group;
 // population is iron and a shattered one exhibits the shortest word that shattered it. Declared,
 // never glob-exported: `ItemId`, `ReceiverId`, `Observation`, `Step`, `Verdict` and `window` reach
 // it from `receiver_exact_compression` and collide at the crate root.
-pub mod token_invariance;
 // Receiver R5: persistence over the exact aperture filtration, and linking where an embedding
 // exists. Declared, never glob-exported: `Crossing`, `Coefficients`, `OrderLaw` and
 // `ProjectionDirection` say nothing at the crate root about which carrier they belong to.

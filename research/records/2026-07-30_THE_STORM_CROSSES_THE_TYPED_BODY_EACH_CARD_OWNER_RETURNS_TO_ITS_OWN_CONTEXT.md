@@ -5,7 +5,7 @@ COUPLED-INFORMANT CURRENT NATIVE / CARD-PRIMARY AND HOST-EXACT PARITY /
 TYPED AND LIVE REST-REMOUNT CLOSED / DURABLE SOURCE MEMBRANE RESTORED**
 
 This record completes ownership migration 6 from
-[`archive/reference/engine-a07ff376/HOLONIC_MACHINE_OWNERSHIP.md`](../../archive/reference/engine-a07ff376/HOLONIC_MACHINE_OWNERSHIP.md).
+[`archive/reference/engine-a07ff376/HOLONIC_MACHINE_OWNERSHIP.md`](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/reference/engine-a07ff376/HOLONIC_MACHINE_OWNERSHIP.md).
 It supersedes the prior RELAMPAGO record only for application ownership,
 execution topology, source/output paths, and current rest receipts. The
 earlier experimental conclusions and physical qualifications remain in

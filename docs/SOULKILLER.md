@@ -51,7 +51,7 @@ letting record order select an identity.
 
 [historical; source-inspected] Brandon's September 4 ruling explicitly admits the resident HNA1
 realization as apparatus and the restricted SKE bodies as Athena material. The former blanket
-foreign-tower restriction is superseded. The [SKE contract](../archive/plans/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md)
+foreign-tower restriction is superseded. The [SKE contract](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/plans/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md)
 and its linked corrections retain the full evidence.
 
 ## Transformers, diffusion and state-space models

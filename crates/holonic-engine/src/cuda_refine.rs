@@ -40,8 +40,6 @@ use std::ptr;
 
 mod cuda_executor;
 pub use cuda_executor::CudaRefineExecutor;
-mod partition_refinement;
-pub use partition_refinement::{DeviceCorpus, ReadingIdentities};
 
 mod addressed_complex_junction;
 mod affine_barycentric_transport;
@@ -182,7 +180,6 @@ use crate::addressed_current::{
     AddressedGeneratedPortJunctionOccurrence, AddressedGeneratedPortJunctionPassage,
     AddressedGeneratedPortSlot,
 };
-use crate::corpus_census::CorpusCensus;
 use holonics::exact_linear::ExactRatMatrix;
 use crate::factored_moment::{
     AddressedDiagonalCurrentStep, FactoredMomentSection, SparseQuadraticMomentAction,
@@ -193,7 +190,6 @@ use crate::receiver_history_compression::{
     AddressedFactoredIntegralReceiverComplex, AddressedPrimitiveReceiverFrame,
     IntegralFormFrameFactor, ObservableIntegralFormFrame, ReceiverHistoryCompression,
 };
-use crate::token_invariance::ConductAtlas;
 pub use cuda_driver::CudaRefineError;
 use cuda_driver::{
     Buffer, CuDevicePtr, cuCtxSetCurrent, cuCtxSynchronize, cuLaunchKernel, cuMemcpyDtoDAsync_v2,

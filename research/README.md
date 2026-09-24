@@ -36,5 +36,5 @@ its subject route. Preserve older evidence and explain the changed claim. The
 actual occurrences are recovered without publishing raw captures.
 
 The old August-heavy thematic index is retained as a
-[historical navigation snapshot](../archive/operations/RESEARCH_NAVIGATION_BEFORE_2026-09-20.md).
+[historical navigation snapshot](https://github.com/brandonrdug/holonics/blob/f901c3188a0ec01126b73aa7d3171ecd3c1d20a9/archive/operations/RESEARCH_NAVIGATION_BEFORE_2026-09-20.md).
 It is useful provenance; the routes above carry current mathematical context.
