@@ -351,6 +351,24 @@ theorem phaseTransport_add_period (S P : G) {n : ℤ} (hclose : S ^ n = 1) (d : 
   rw [phaseTransport_add, _root_.zpow_neg, hclose]
   simp
 
+/-- [proved-derived; formal-checked] **Carried material factors through the phase.** If the carry
+commutes with the material, advancing a whole turn leaves the carried material unchanged even
+though the state has moved to the next level. The torus chart of the material forgets the
+winding; the helix of the state keeps it. -/
+theorem phaseTransport_add_carried_period (S P C : G) (n : ℤ) (hcarry : S ^ n = C)
+    (hcomm : Commute C P) (d : ℤ) :
+    phaseTransport S P (d + n) = phaseTransport S P d := by
+  rw [phaseTransport_add, _root_.zpow_neg, hcarry]
+  have hP : C⁻¹ * phaseTransport S P d * C = phaseTransport S P d := by
+    have hS : Commute C S := by
+      rw [← hcarry]
+      exact (Commute.refl S).zpow_left n
+    have hT : Commute C (phaseTransport S P d) := by
+      unfold phaseTransport
+      exact ((hS.zpow_right (-d)).mul_right hcomm).mul_right (hS.zpow_right d)
+    rw [mul_assoc, ← hT.eq, ← mul_assoc, inv_mul_cancel, one_mul]
+  exact hP
+
 /-- [proved-derived; formal-checked] **A stepped word is a power of one act-and-advance
 generator.** Reading a stream of `n` occurrences through fixed material `P`, with the phase
 advanced once per occurrence, composes to the `n`-th power of the single generator `P S⁻¹`

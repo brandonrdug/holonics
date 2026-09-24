@@ -305,3 +305,13 @@ Millennium modules. `Framework.Objects` falls from 110 / 24 to 110 / 23; the bro
 stays at 279 Millennium modules because other Research paths still reach Turn. Full counts and the
 focused gates (not yet run for this cut) are in
 [`M2_RATIO_EXPONENTIAL_KERNEL.md`](M2_RATIO_EXPONENTIAL_KERNEL.md).
+
+## M2 geometry carry and pair-resonance curation
+
+[`M2_GEOMETRY_CARRY_CURATION.md`](M2_GEOMETRY_CARRY_CURATION.md) moves only the
+carried-material periodicity theorem from `Geometry.PhaseCarry` beside its `phaseTransport`
+owner in `Transport.HelicalPairInteraction`. The generic carry owner then drops its transitive
+research path through that owner. `Geometry.PairResonance` also drops an unused direct
+`Millennium.Farey` import; its elementary determinant characterization stays in Geometry. The
+source closure counts, direct importers, and exact Lake gate list are recorded there. Verification
+is pending root coordination; no Lake builds were run for this cut.

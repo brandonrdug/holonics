@@ -1,5 +1,4 @@
 import ElementaryHolonics.Transport.HelicalPairInteraction
-import ElementaryHolonics.Millennium.Farey
 import Mathlib.Data.ZMod.Basic
 import Mathlib.LinearAlgebra.Matrix.Adjugate
 import Mathlib.Tactic
@@ -9,12 +8,12 @@ import Mathlib.Tactic
 
 [definition] Two phases coupled by a contact either lock at a rational rate ratio or wind
 without closing. A lock is a direction in the pair's parameter plane; on a dissipative face it
-is exactly the zero-power kernel of `HelicalPairInteraction`. Locks are addressed by words in the
-modular group, already owned by `Millennium/Farey`: two locks are neighbours exactly when their
-determinant is one, their mediant is a neighbour of both, and every ratio strictly between two
-neighbours costs at least the mediant's period. A unimodular word recharts the pair's two
-windings without changing their intersection number. Independent coprime phases form a torus on
-which the single diagonal step visits every joint phase.
+is exactly the zero-power kernel of `HelicalPairInteraction`. Two locks are neighbours exactly
+when their determinant is one, their mediant is a neighbour of both, and every ratio strictly
+between two neighbours costs at least the mediant's period. This file proves those elementary
+determinant and period statements; the broader Farey address theory remains in `Millennium/Farey`.
+A unimodular word recharts the pair's two windings without changing their intersection number.
+Independent coprime phases form a torus on which the single diagonal step visits every joint phase.
 
 [established-bounded; formal-checked] Scope: integer and rational arithmetic, `ZMod` and 2×2
 integer matrices. The rotation number of a driven pair, its mode-locking plateaus and any
@@ -73,8 +72,8 @@ theorem between_neighbours_costs_at_least_the_mediant (p q p' q' a b : ℤ)
     linear_combination (-b) * hadj
   nlinarith [mul_le_mul_of_nonneg_left hy hq.le, mul_le_mul_of_nonneg_left hx hq'.le]
 
-/-- [proved-derived; formal-checked] Neighbouring locks are exactly the unimodular pairs of
-`Millennium/Farey`: the address of a lock is a word in the modular group. -/
+/-- [proved-derived; formal-checked] Neighbouring locks are exactly the unimodular pairs in their
+integer determinant chart. -/
 theorem neighbours_iff_unimodular (p q p' q' : ℤ) :
     p' * q - p * q' = 1 ↔ (!![p', p; q', q]).det = 1 := by
   simp [Matrix.det_fin_two]

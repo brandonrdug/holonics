@@ -32,7 +32,7 @@ digits_succ, odometer_iterate                +1 in the digit chart is the odomet
                                              advanced by the winding (a+k)/n
 closed_loop_has_integer_winding              increments closing mod n sum to n·w
 zpow_add_mul_carry       S^(d+n·k) = S^d · C^k            when Sⁿ = C
-phaseTransport_add_carried_period            carried material returns after a turn when C commutes with it
+phaseTransport_add_carried_period            `Transport/HelicalPairInteraction`: carried material returns after a turn when C commutes with it
 ```
 
 [definition] The carry is the exact defect of additivity of the winding. It is the 2-cocycle
