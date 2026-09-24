@@ -694,7 +694,7 @@ existing suites (§0.9):
    The live structural carriers now belong to internal `holonics::structure`, with their callers
    retargeted. [Structure](census/M1_STRUCTURE_OWNER_MOVE.md) and
    [geometry](census/M1_GEOMETRY_OWNER_MOVE.md) now have internal main-library source and measured
-   gates. The exact causal-chord equation extractor now belongs to `holonics::causal_chord`; its
+   gates. The exact causal-chord equation extractor now belongs to `holonics::receiver::causal_chord`; its
    portable laws move with it and engine-owner comparisons remain engine integration tests.
    [Causal chord](census/M1_CAUSAL_CHORD_OWNER_MOVE.md) records its source split and pending gate.
    The [ratio and information operators](census/M1_RATIO_OWNER_MOVE.md) now live under `holonics::ratio`;

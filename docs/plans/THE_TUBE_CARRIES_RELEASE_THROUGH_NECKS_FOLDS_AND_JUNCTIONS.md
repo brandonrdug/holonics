@@ -154,7 +154,7 @@ and [`continuing_tube.rs`](../../crates/holonic-engine/src/continuing_tube.rs): 
 `Migration.naturality`, `Wormhole`, circuit holonomy on declared circuits, and the p-adic tube whose
 end is `Z_p`. Width, release, `Ask` and the coarser release are
 [`receiver_release`](../../crates/holonic-engine/src/receiver_release.rs). Exact Laurent data at a
-pole, half-plane counts and the resolvent are [`causal_chord`](../../crates/holonics/src/causal_chord.rs);
+pole, half-plane counts and the resolvent are [`causal_chord`](../../crates/holonics/src/receiver/causal_chord.rs);
 the constraint Jacobian, its motions and self-stress are
 [`rigidity_receiver`](../../crates/holonic-engine/src/rigidity_receiver.rs); exact linking is
 [`topological_receiver`](../../crates/holonic-engine/src/topological_receiver.rs); growth exponents

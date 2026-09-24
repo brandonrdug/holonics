@@ -67,7 +67,7 @@ use holonics::geometry::Rat;
 
 use crate::algebraic::{CausalChain, ComparativeMultiplicity, GradedCausalComplex};
 use crate::causal::EventId;
-use holonics::causal_chord::{ChordRefusal, Linearization, causal_chord, transfer_function};
+use holonics::receiver::causal_chord::{ChordRefusal, Linearization, causal_chord, transfer_function};
 use holonics::restriction::tower::Transition;
 use holonics::exact_linear::ExactRatMatrix;
 use crate::grain_tower::{GrainFace, GrainPair, GrainSelection, SelectionResidual};

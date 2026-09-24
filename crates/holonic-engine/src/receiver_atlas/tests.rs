@@ -749,7 +749,7 @@ use num_traits::One;
 
 use crate::algebraic::{CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex};
 use crate::causal::EventId;
-use holonics::causal_chord::{Linearization, separate_under_probe, transfer_function};
+use holonics::receiver::causal_chord::{Linearization, separate_under_probe, transfer_function};
 use holonics::exact_linear::ExactRatMatrix;
 use holonics::exact_value::ExactInterval;
 use crate::hodge_receiver::{
@@ -1536,7 +1536,7 @@ fn a_chart_that_reads_only_one_occurrence_separates_nothing() {
 
 use std::path::{Path, PathBuf};
 
-use holonics::causal_chord::{NetworkForm, elastic_network};
+use holonics::receiver::causal_chord::{NetworkForm, elastic_network};
 use holonics::law::receiver::DiameterNorm;
 use holonics::law::receiver::ExactFace;
 use holonics::law::receiver::Reading;

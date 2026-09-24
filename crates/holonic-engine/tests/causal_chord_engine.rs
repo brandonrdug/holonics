@@ -9,17 +9,12 @@ use holonic_engine::lattice_gauge;
 use holonic_engine::physical_constraint_complex::{ConstraintEdge, ConstraintVertexId};
 use holonic_engine::physical_constraint_grading::EdgeProvenance;
 use holonic_engine::rigidity_receiver::{ExactConfiguration, RigidityJacobian, rigidity_reading};
-use holonics::causal_chord::*;
+use holonics::receiver::causal_chord::*;
 use holonics::exact_linear::ExactRatMatrix;
 use holonics::geometry::Rat;
-use holonics::rational_polynomial::RationalPolynomial;
 
 fn integer(value: i64) -> Rat {
     Rat::from_integer(BigInt::from(value))
-}
-
-fn ratio(numerator: i64, denominator: i64) -> Rat {
-    Rat::new(BigInt::from(numerator), BigInt::from(denominator))
 }
 
 fn matrix(rows: &[&[i64]]) -> ExactRatMatrix {
@@ -30,49 +25,6 @@ fn matrix(rows: &[&[i64]]) -> ExactRatMatrix {
     )
     .expect("a declared integer matrix is rectangular")
 }
-
-/// Ascending coefficients, as the polynomial owner stores them.
-fn polynomial(ascending: &[i64]) -> RationalPolynomial {
-    RationalPolynomial::new(ascending.iter().copied().map(integer).collect())
-}
-
-fn column(entries: &[i64]) -> ExactRatMatrix {
-    ExactRatMatrix::shaped(
-        entries.len(),
-        1,
-        entries.iter().map(|value| vec![integer(*value)]).collect(),
-    )
-    .expect("a column is rectangular")
-}
-
-fn row(entries: &[i64]) -> ExactRatMatrix {
-    ExactRatMatrix::shaped(
-        1,
-        entries.len(),
-        vec![entries.iter().copied().map(integer).collect()],
-    )
-    .expect("a row is rectangular")
-}
-
-fn declared(lineage: &str, state: &[&[i64]], excite: &[i64], read: &[i64]) -> Linearization {
-    Linearization::declared(
-        lineage,
-        matrix(state),
-        column(excite),
-        row(read),
-        vec!["u".to_owned()],
-        vec!["y".to_owned()],
-    )
-    .expect("the declared linearization is well shaped")
-}
-
-// ---------------------------------------------------------------------------------------------
-// the expansion
-// ---------------------------------------------------------------------------------------------
-
-/// **The recurrence agrees with the owner it is not replacing.**
-///
-/// `exact_linear.rs:336` already computes the characteristic polynomial by the same recurrence and
 
 /// **The mode population agrees with the existing spectrum owner.**
 ///

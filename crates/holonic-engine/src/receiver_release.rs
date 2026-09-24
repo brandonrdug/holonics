@@ -58,7 +58,7 @@
 //!
 //! # Why an enclosure is exact here
 //!
-//! [implemented-exact] The first real dynamics is [`holonics::causal_chord::Linearization`]'s
+//! [implemented-exact] The first real dynamics is [`holonics::receiver::causal_chord::Linearization`]'s
 //! `x_{t+1} = A x_t + B u_t` over `Q`. The image of a box under an exact linear map is **not** a
 //! box, but it *is* an exact zonotope: `A·(c + G e) = A c + (A G) e`. [`ExactZonotope`] carries
 //! that centre and those generators exactly, [`horizon_image`] pushes a box of compatible states
@@ -97,7 +97,7 @@ use num_traits::{Signed, Zero};
 use holonics::geometry::Rat;
 use serde::{Deserialize, Serialize};
 
-use holonics::causal_chord::Linearization;
+use holonics::receiver::causal_chord::Linearization;
 use holonics::exact_linear::ExactRatMatrix;
 
 /// [definition] **The receiver face, moved to the core** (plan phase 7): the exact face, the norm,

@@ -10,6 +10,7 @@
 
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
+use crate::rational_polynomial::HALF_PLANE_REFINEMENT_CEILING;
 
 use super::*;
 use crate::inertia::inertia;
@@ -1422,4 +1423,3 @@ fn an_atlas_separation_wire_must_still_separate() {
         "the refusal names the disagreement: {refusal}"
     );
 }
-

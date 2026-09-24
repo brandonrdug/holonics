@@ -21,7 +21,7 @@
 //! | `contactForm_quad_eq_zero_iff`, `contactForm_quad_eq_zero_iff_no_slip` | [`ContactDissipation::zero_slip_kernel`] |
 //! | `contactForm_mulVec_eq_zero_of_no_slip`, `contactForm_kernel_iff` | [`ContactDissipation::kernel_basis`] compared against the zero-slip kernel |
 //! | `clockedEnergy`, `clockedEnergy_eq_duration_times_power`, `clockedEnergy_scales_inversely` | [`ContactDissipation::clocked_energy`] and [`Clock`] |
-//! | `rateFormQ`, `portGenerator`, `port_storage_rate` | [`Medium::generator`] and [`StorageRateReading`], read through [`holonics::causal_chord::rate_form`] |
+//! | `rateFormQ`, `portGenerator`, `port_storage_rate` | [`Medium::generator`] and [`StorageRateReading`], read through [`holonics::receiver::causal_chord::rate_form`] |
 //! | `port_storage_rate_zero_of_no_dissipation` | [`StorageRateReading::is_conservative`] |
 //! | `quad_congruence`, `storage_rate_reading`, `storage_rate_nonpos`, `storage_rate_neg_of_active_slip` | [`StorageRateReading::predicted`] and [`SpectralReading`] |
 //! | `indefiniteStorage_rate_form_vanishes`, `swapGenerator_has_a_right_half_plane_mode`, `vanishing_rate_form_places_no_spectrum` | [`StructuralPlacement::PontryaginBounded`], the arm that bounds where it used to fall silent |
@@ -84,9 +84,9 @@
 //! ```
 //!
 //! [`HolonicInteraction::linearization`] hands `(A, B, C_R)` to
-//! [`holonics::causal_chord::Linearization::declared`], so the transfer function, the pole atlas and
+//! [`holonics::receiver::causal_chord::Linearization::declared`], so the transfer function, the pole atlas and
 //! the rate form are **read from that owner** and not re-implemented here.
-//! [`HolonicInteraction::storage_rate`] calls [`holonics::causal_chord::rate_form`] and compares it
+//! [`HolonicInteraction::storage_rate`] calls [`holonics::receiver::causal_chord::rate_form`] and compares it
 //! with `−2 G M G` entry by entry; conservation at `M = 0` and strict decay on the slip-active
 //! subspace are consequences of the identity, not separate code.
 //!
@@ -157,7 +157,7 @@ use holonics::geometry::Rat;
 use serde::Serialize;
 use thiserror::Error;
 
-use holonics::causal_chord::{
+use holonics::receiver::causal_chord::{
     ChordRefusal, Linearization, PoleAtlas, PoleReading, TransferFunction,
     half_plane_count, pole_atlas, rate_form, transfer_function,
 };
@@ -1725,7 +1725,7 @@ impl Carrier {
 ///
 /// [definition] The excitation map `B` of the joint linearization is this incidence embedded into
 /// the joint chart. The port names are declarations checked against the matrix shape, never
-/// trusted: they become the source names [`holonics::causal_chord::Linearization`] carries.
+/// trusted: they become the source names [`holonics::receiver::causal_chord::Linearization`] carries.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct SourceCurrent {
     lineage: String,
@@ -2589,7 +2589,7 @@ impl HolonicInteraction {
     ///
     /// `A` is the port-Hamiltonian generator, `B` the source's incidence and `C_R` the
     /// perspective's aperture — all three derived from this unit's declared data and none of them
-    /// supplied. [`holonics::causal_chord::Linearization::declared`] re-checks every shape.
+    /// supplied. [`holonics::receiver::causal_chord::Linearization::declared`] re-checks every shape.
     pub fn linearization(&self) -> Result<Linearization, InteractionRefusal> {
         Ok(Linearization::declared(
             format!("{}|port-hamiltonian", self.lineage),
@@ -3033,7 +3033,7 @@ impl StorageRateReading {
         &self.lineage
     }
 
-    /// `Σ_G = AᵀG + GA`, from [`holonics::causal_chord::rate_form`].
+    /// `Σ_G = AᵀG + GA`, from [`holonics::receiver::causal_chord::rate_form`].
     pub fn rate(&self) -> &SymmetricForm {
         &self.rate
     }
@@ -3325,11 +3325,11 @@ pub enum SpectralLicence {
 /// attains.
 ///
 /// [definition] **Owners this reading composes rather than restates.** The rate form itself is
-/// `Foundation/CausalChord.lean::rateForm`, read through [`holonics::causal_chord::rate_form`]; the
-/// exact count is [`holonics::causal_chord::half_plane_count`]; whether a conserving receiver exists
+/// `Foundation/CausalChord.lean::rateForm`, read through [`holonics::receiver::causal_chord::rate_form`]; the
+/// exact count is [`holonics::receiver::causal_chord::half_plane_count`]; whether a conserving receiver exists
 /// at all — the positive definite member of `{G : AᵀG + GA = 0}`, with its refutation exhibited —
-/// is [`holonics::causal_chord::conserving_receiver_space`], and the semisimplicity the seam slogan
-/// drops is [`holonics::causal_chord::is_semisimple`]. On the mathematics side: a lossless chain is
+/// is [`holonics::receiver::causal_chord::conserving_receiver_space`], and the semisimplicity the seam slogan
+/// drops is [`holonics::receiver::causal_chord::is_semisimple`]. On the mathematics side: a lossless chain is
 /// a Foster reactance and its tanks resonate on the seam exactly when the inductance is positive
 /// (`RH/FosterTanks.lean`); the zero-counting law the half-plane count is the finite face of is
 /// `RH/HurwitzPolynomial.lean`, and a limit of on-seam families stays on the seam

@@ -2525,7 +2525,7 @@ fn right_half_plane_count_axis_free(
 /// When the operator is symmetric the whole question is already answered by Sylvester's signature
 /// and `causal_chord::half_plane_from_symmetric` routes to `crate::inertia::inertia` instead. The
 /// two are held to exact agreement by
-/// `causal_chord::tests::the_half_plane_count_agrees_with_the_inertia_of_a_symmetric_operator`.
+/// `receiver::causal_chord::tests::the_half_plane_count_agrees_with_the_inertia_of_a_symmetric_operator`.
 pub fn half_plane_count(
     polynomial: &RationalPolynomial,
 ) -> Result<HalfPlaneCount, ExactPolynomialError> {

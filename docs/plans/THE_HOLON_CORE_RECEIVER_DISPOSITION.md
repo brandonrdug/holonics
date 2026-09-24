@@ -77,7 +77,7 @@ extents; no kernel, launch or returned value changed (device tests
 | `CausalBodyReceiverStanding` | struct | `holonic-engine/src/causal_body.rs` | different object | an event/world/program chart of a receiver-named system (the occurrence Holon's event chart), not a port object (name-inferred) |
 | `CausalProjectionReceiverReceipt` | struct | `holonic-engine/src/causal_body.rs` | receiver face (codec) | a readout/face value (codec projection) of a receiver (name-inferred) |
 | `CausalReceiverReturn` | struct | `holonic-engine/src/causal_body.rs` | receiver face (codec) | a readout/face value (codec projection) of a receiver (name-inferred) |
-| `ConservingReceiverSpace` | struct | `holonics/src/causal_chord.rs` | receiver face (codec) | a receiver chart/aperture geometry (where a face is read), not a port object (name-inferred) |
+| `ConservingReceiverSpace` | struct | `holonics/src/receiver/causal_chord.rs` | receiver face (codec) | a receiver chart/aperture geometry (where a face is read), not a port object (name-inferred) |
 | `ReceiverWindow` | struct | `holonic-engine/src/certified_face.rs` | receiver face (codec) | a receiver chart/aperture geometry (where a face is read), not a port object (name-inferred) |
 | `CodecIndexReceiver` | struct | `holonic-engine/src/codec_system.rs` | passive coholon | a declared reading (name-inferred): a passive coholon unless it returns a current |
 | `ReceiverFamily` | struct | `holonic-engine/src/cuda_realizer_search.rs` | different object | three unrelated objects (prime family, monomial family, axis bitset) (source-inspected) |
