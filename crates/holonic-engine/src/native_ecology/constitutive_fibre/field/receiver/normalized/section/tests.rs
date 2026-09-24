@@ -189,3 +189,143 @@ fn row_sectioned_face_and_pullback_agree_with_the_normalized_kernel() {
         );
     }
 }
+
+/// Law: the loss is the logarithm of the Holon ratio; its return carries the phase face and the
+/// gap-weighted covector (ELEMENTARY_OBJECTS §9).
+#[test]
+#[ignore = "requires CUDA; the complex receiving potential's ratio return, exact on a common face"]
+fn ratio_return_carries_the_phase_face_and_the_gap_weighted_covector() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    // One group of four classes with a common real potential, so p = 1/4 exactly (the only
+    // exact exponential control), and distinct imaginary potentials: Im s = (2, -1, 6, 0).
+    let produced = balls(
+        &surface,
+        &[(
+            vec![UNIT, 2 * UNIT, UNIT, -UNIT, UNIT, 6 * UNIT, UNIT, 0],
+            0,
+        )],
+        8,
+    );
+    // The observed packet: the one-hot target class 2.
+    let observed = balls(&surface, &[(vec![0, 0, 0, 0, UNIT, 0, 0, 0], 0)], 8);
+    // Target Holon potentials: Im s^T_2 = 4, so phi^T_2 = 2 against phi^H_2 = 3.
+    let target_at = |im2: i128| {
+        balls(
+            &surface,
+            &[(vec![0, 5 * UNIT, 0, 0, 0, im2, 0, -3 * UNIT], 0)],
+            8,
+        )
+    };
+    let target = target_at(4 * UNIT);
+    let face = produced
+        .normalized_ratio_return(&observed, &target, &[0], 4, SeriesAperture(32))
+        .unwrap();
+    let quarter = Rat::new(1.into(), 4.into());
+    let half = Rat::new(1.into(), 2.into());
+    let reading = face.inspect().unwrap().remove(0);
+    for (c, p) in reading.prediction.iter().enumerate() {
+        assert_eq!(p, &ExactInterval::point(quarter.clone()), "class {c}");
+    }
+    // phi = Im s / 2, exactly, for both Holons.
+    let phase = face.read_phase().unwrap().remove(0);
+    let expected_phase = [rat(1), Rat::new((-1).into(), 2.into()), rat(3), Rat::zero()];
+    for (c, value) in phase.iter().enumerate() {
+        assert_eq!(
+            value,
+            &ExactInterval::point(expected_phase[c].clone()),
+            "phase {c}"
+        );
+    }
+    let target_phase = NativeNormalizedSection::read_phase_ball(face.target_phase().unwrap())
+        .unwrap()
+        .remove(0);
+    assert_eq!(target_phase[2], ExactInterval::point(rat(2)));
+    // Exact reference: Re slot q - p; Im slot (1/2) q Delta with Delta_2 = 2 - 3 = -1; zero on
+    // the unsupported classes whatever their phase gap.
+    let covector = |face: &NativeNormalizedSection<'_>| {
+        face.ratio_covector()
+            .unwrap()
+            .row(0)
+            .unwrap()
+            .inspect()
+            .unwrap()
+    };
+    let value = covector(&face);
+    assert_eq!(value.radius, Rat::zero());
+    for (c, v) in value.center.iter().enumerate() {
+        let q = if c == 2 { Rat::one() } else { Rat::zero() };
+        assert_eq!(v.real, &q - &quarter, "real covector of class {c}");
+        let phase_part = if c == 2 { -half.clone() } else { Rat::zero() };
+        assert_eq!(v.imaginary, phase_part, "phase covector of class {c}");
+    }
+    let difference = face
+        .returned_difference()
+        .unwrap()
+        .row(0)
+        .unwrap()
+        .inspect()
+        .unwrap();
+    for (a, b) in value.center.iter().zip(&difference.center) {
+        assert_eq!(a.real, b.real);
+    }
+    // Agreeing phases: the phase covector vanishes.
+    let agree = produced
+        .normalized_ratio_return(&observed, &target_at(6 * UNIT), &[0], 4, SeriesAperture(32))
+        .unwrap();
+    assert!(
+        covector(&agree)
+            .center
+            .iter()
+            .all(|v| v.imaginary.is_zero())
+    );
+    // The gap reverses: phi^T_2 = 4 gives Delta_2 = +1 and the covector +1/2.
+    let reversed = produced
+        .normalized_ratio_return(&observed, &target_at(8 * UNIT), &[0], 4, SeriesAperture(32))
+        .unwrap();
+    assert_eq!(covector(&reversed).center[2].imaginary, half);
+    // A winding branch n = 1 adds 2 pi to the gap: (1/2)(2 pi - 1), enclosed outward.
+    let wound = produced
+        .normalized_ratio_return(&observed, &target, &[1], 4, SeriesAperture(32))
+        .unwrap();
+    let wound = covector(&wound);
+    let pi = holonics::geometry::pi_interval(GRAIN + 16);
+    let lower = (&pi.lower * rat(2) - Rat::one()) * &half;
+    let upper = (&pi.upper * rat(2) - Rat::one()) * &half;
+    let centre = &wound.center[2].imaginary;
+    assert!(centre - &wound.radius <= lower && upper <= centre + &wound.radius);
+    assert!(wound.radius > Rat::zero() && wound.radius < Rat::new(1.into(), (1u64 << 40).into()));
+    // Exact reference for the magnitude part: the principal log of the real amplitude ratio 2.
+    let config = holonics::geometry::ExactSeriesConfig::default();
+    let log_ratio =
+        holonics::geometry::complex_log_point(&rat(2), &Rat::zero(), &config)
+            .unwrap();
+    let half_log_q_over_p = holonics::geometry::complex_log_point(
+        &(Rat::one() / &quarter),
+        &Rat::zero(),
+        &config,
+    )
+    .unwrap()
+    .re
+    .scale(&half);
+    assert!(
+        log_ratio.re.lower <= half_log_q_over_p.upper
+            && half_log_q_over_p.lower <= log_ratio.re.upper
+    );
+    // An open produced ball returns an open phase and an open covector radius.
+    let open = balls(&surface, &[(vec![0; 8], 1i128 << 60)], 8)
+        .normalized_ratio_return(&observed, &target, &[0], 4, SeriesAperture(32))
+        .unwrap();
+    assert!(
+        open.read_phase().unwrap()[0]
+            .iter()
+            .all(|v| v.lower < v.upper)
+    );
+    assert!(covector(&open).radius > Rat::zero());
+    // Shapes: the target and branch declare the same rows.
+    assert!(
+        produced
+            .normalized_ratio_return(&observed, &target, &[0, 0], 4, SeriesAperture(32))
+            .is_err()
+    );
+}
