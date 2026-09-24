@@ -96,42 +96,107 @@ archive root. Brandon's Metal port stays on its own branch, `codex/apple-silicon
 - **Port deliberately.** A law or kernel is ported from history (`13f8c734`) when a step needs it.
   It is read, rewritten against the current objects, and tested by the law it implements. Nothing
   is restored wholesale, and nothing is kept for compatibility.
+  - Where to look: the census at `13f8c734` locates history's owners
+    ([`RUST_R0.tsv`](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/census/RUST_R0.tsv), [`LEAN_R0.tsv`](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/census/LEAN_R0.tsv)),
+    and so does the manifest on `archive/leftovers-2026-09-24`.
+  - Each port is recorded in its step's issue as history path → new owner → law → test.
+- **Do not port** what the retention audit and the lessons record retired:
+  - the per-occurrence tape and frozen-cut replay;
+  - `returns` journals and completed-update archives;
+  - slot, session and episode wires;
+  - byte and nibble codecs;
+  - Q/K/V caches and foreign forward graphs taken whole;
+  - any Lean in the HNN pipeline;
+  - floats inside a law.
 - **One library for the laws, one backend for the card.** `holonics` builds without CUDA.
-  `holonics-cuda` depends on it and realizes its operations. `holonics-apple` follows later from
-  Brandon's `codex/apple-silicon` branch.
+  `holonics-cuda` depends on it and realizes its operations. Brandon's `codex/apple-silicon`
+  (September 7, built on the retired engine) becomes `holonics-apple`. It implements the HNN
+  execution port only after the host reference exists, with parity per law.
 - **Lean first for new mathematics.** A new law lands with its Lean statement, or names its
   obligation in #62.
 - **Tests are written per law** as each owner is built: one fast test per stated law, plus one
-  host/device parity check per kernel family.
+  host/device parity check per kernel family. An inherited test stays only if it checks a stated
+  law of its owner.
+- **Exact arithmetic.** No floats inside a law or the machine (CLAUDE/AGENTS, governing laws).
 
 ## Order
 
-1. **The `holonics` operator layout.** Reorganize the existing library into five operator modules:
-   - `ratio/`: one per two, with remainder, residue, inversion, lift, jet and rings;
-   - `geometry/`: complex, frame, clock, carry, screw, pair and tube charts, winding;
-   - `holon/`: law, ports, Dirac, elements, restrictions, deposition, reaction;
-   - `navigator/`: initial configuration, clock, carry, restriction family, address words, trace
-     faces and the dynamical zeta, lock addresses. Today's `generator` moves here.
-   - `receiver/`: roles, receipts, the relevance kernel, standing as the retention quotient,
-     release.
+0. **Repair the guides.** The kept guides still describe the retired engine as current, and about
+   157 links are broken. Agents read the guides, so this comes first.
+   - Remove retired code stated as current fact from THE_MACHINE, HNN_FORMULA, HOLON,
+     HELICAL_GEOMETRY and the operator contract. The laws stay; their retired Rust addresses become
+     permalinks at `13f8c734`.
+   - Fold in the governing prose that lives only in history:
+     - **tube, necks, folds, junctions and prediction** ("when tubes will transport") into
+       ELEMENTARY_OBJECTS §6, from [the tube plan](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md);
+     - **the receiver atlas** into RECEIVER_HOLARCHY, from [the atlas plan](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_RECEIVER_ATLAS_SEPARATES_WHAT_ONE_FACE_CANNOT.md);
+     - **context, state-space and diffusion charts, joint prediction, grain, Holonic Encoding, and
+       the tensor as operation chart** into HNN_FORMULA, from [HNN_COMPOSITION](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/HNN_COMPOSITION.md);
+     - **classical learning as the ratio family**, and reflection and leaders, into HNN_FORMULA, from
+       [MATHEMATICS_AND_NATIVE_CONDUCT](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/MATHEMATICS_AND_NATIVE_CONDUCT.md);
+     - **equation extraction's six steps** (intake → realization recovery → excitation →
+       intervention → identification → native return) and its adapter obligations into HOLON, from
+       [SOULKILLER](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/SOULKILLER.md);
+     - **robotics and the simulator interface** into HOLON, and the workstation into THE_MACHINE,
+       from [the boundaries guide](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/HARDWARE_AND_MODALITY_BOUNDARIES.md);
+     - **measurement conventions** (face delivery vs owner update, `bits/s = occ/s × bits/occ`,
+       `H(p,q)=H(p)+D(p‖q)`, missing counters are unknown) into ELEMENTARY_OBJECTS §10, from
+       [DEVELOPMENT](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/DEVELOPMENT.md).
+   - In ELEMENTARY_OBJECTS: state the Swing and conservation of faces, and add Parametron and
+     Pair-contact rows to the operator contract.
+   - Carry the navigator vocabulary through the guides, keeping "generator" where it means a group
+     generator, the Lie generator `ξ` or a generating function.
+   - Repair every broken link (`formal/elementary-holonics/` → `lean/`; deleted documents →
+     permalinks), including the records README. Mark the canon as historical doctrine governed by
+     the elementary objects.
+   - Port the checked files of history's `formal/rh-source-transport` into `lean/`; the paper
+     `divisor-source-transport-boundary` cites them.
+1. **The operator layout and the Lean package.**
+   - **Rust.** Reorganize `holonics` into five operator modules:
+     - `ratio/`: one per two, with remainder, residue, inversion, lift, jet and rings;
+     - `geometry/`: complex, frame, clock, carry, screw, pair and tube charts, winding, the Swing;
+     - `holon/`: law, ports, Dirac, elements, restrictions, deposition, reaction, plus
+       `contact` (the pair contact: `J`, `DQ`, `M_contact`, lock address) and `parametron` (the
+       ring: `C`, `L`, pump, half-turn sheets, Ising lock);
+     - `navigator/`: initial configuration, clock, carry, restriction family, address words, trace
+       faces and the dynamical zeta, lock addresses. Today's `generator` moves here.
+     - `receiver/`: roles, receipts, the relevance kernel, standing as the retention quotient,
+       release.
 
-   Exact algebra sits privately beside the operators that use it. Retire what no operator needs.
-2. **K1: Holarchy, Aeon/Epoch/Cycle, complete interconnection and joint reception** (#72). Lean
-   first (the obligations in #62), then `holonics::{holarchy, aeon}`.
+     Exact algebra sits privately beside the operators that use it, and whatever no operator needs
+     is retired. The inherited tests are audited against the laws. Port sources for contact and
+     parametron: `holonic_interaction/helical.rs`, `holonic_chain/serial.rs`, `exact_contact`,
+     `cuda_refine/complex_parametron.rs`.
+   - **Lean** (#70). Move the package mechanically, so that new Lean is written under its final
+     names:
+     - package `holonics`;
+     - library `Holonics`, the `Framework` closure;
+     - library `HolonicsResearch`, the rest;
+     - namespace `Soma.Holonics` → `Holonics`.
+
+     Subject renames and duplicate curation wait for step 7.
+2. **K1: Holarchy, Aeon/Epoch/Cycle, relative completeness, complete interconnection and joint
+   reception** (#72).
+   - Lean first (the obligations in #62), then `holonics::{holarchy, aeon}`.
+   - Relative completeness (the globe) is stated here, relative to a receiver family
+     (`Objects/RelativeCompleteness`). Its full theorem is owed in #62.
 3. **Holonic Compression and landmark discovery** (#145).
    - **Lean first.** State a navigator's face map against terrain and a receiver family by its
      kernel and cokernel. Join `CausalRelevance`, `ReceiverHistoryCompression`,
      `GeneratorModeQuotient`, `ReceiverCodeCost`, `GeneratorInference` and `CokernelCalculus`, and
      add the cost split between resonating and emanating.
    - **Then `holonics::compression`.** It carries navigator inference by loop closure, the split
-     between resonating and emanating, and a landmark search whose coverage is checked. The
-     identity atlas taught the check: a chart on one winding invents identities, and the
-     multi-winding family refuses them.
+     between resonating and emanating, and a landmark search whose coverage is checked.
+   - **The identity atlas.** Its design ([plan](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_IDENTITIES_OF_A_CONFIGURATION_ARE_THE_KERNEL_OF_ITS_FACE_MAP.md):
+     an identity is two constructions with one face, within Hilbert/Gröbner finiteness and
+     Richardson undecidability) is the landmark search's specification. Its lesson is the coverage
+     check: a chart on one winding invents identities, and the multi-winding family refuses them.
    - **First consumers.** π and `e`, through their partial navigators (`RatioSeriesTransport`,
      `RadixWindowReceiver`), and the existing Lean receivers of the targets.
    - **Port from history as needed.** `receiver_history_compression`, `winding_inertia`,
      `identity_atlas`, `exact_linear::kernel_modes`.
-4. **The HNN law in `holonics::hnn`, over aeons.** The HNN is the compression machine at scale:
+4. **The HNN law in `holonics::hnn`, over aeons** (#73). The HNN is the compression machine at
+   scale:
    - its retention is step 3's kernel quotient;
    - its learning is locating keys;
    - its release is the split between resonating and emanating.
@@ -143,18 +208,38 @@ archive root. Brandon's Metal port stays on its own branch, `codex/apple-silicon
    - loss as the logarithm of the Holon ratio;
    - retention as the future-sufficient quotient at aeon boundaries.
 
-   It is built with a host reference, porting its equations from history's `native_ecology` and
-   the prototype body as needed (#73).
-5. **The resident HNN in `holonics-cuda::hnn`.** Kernels are ported per law, each with its parity
-   check against the host reference.
+   It is built with a host reference, in the machine's own order
+   ([objects table](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-machine-in-the-elementary-objects)):
+   1. ratio and one cut;
+   2. rings gain storage and flow (`C`, `L`, pump);
+   3. keys: configuration and clock inference by loop closure, and Farey lock addresses;
+   4. the motor chart (serial screw words);
+   5. Holonic Encoding, context, joint prediction and release (HNN_FORMULA).
+
+   Its equations are ported from history's `native_ecology` and the prototype body, subject to the
+   do-not-port list.
+5. **The resident HNN in `holonics-cuda::hnn`.** Kernels are ported per law under the hardware law,
+   each with its parity check against the host reference. The device debts of #76 (#12–#15, #50)
+   are paid here.
 6. **Targets, physics and extraction.**
    - The targets continue as landmark discovery on the rebuilt library and their Lean.
-   - The physics instances are K3–K4 (#74, #75).
-   - Equation extraction compresses a foreign realization into navigators and element relations.
-7. **Lean.**
-   - Curate the `Holonics` foundation versus research, and remove the duplicate theorems the audit
-     found.
-   - Rename the namespace. Directories named after the prize ("Millennium", "RH") are renamed by
-     subject, and generator names become navigator names where they mean the object.
-8. **Applications** (a workbench, an Athena application), rebuilt on the library under the lessons
-   record's requirements.
+   - Physics instances K3–K4 (#74, #75) supply objects the framework needs. They are not
+     applications. Their contracts are in the [restructure plan](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_REPOSITORY_RESTRUCTURE.md):
+     - §3.5, the battle tests: square/cube join, `1+(−1)=0` interference, control-volume
+       Navier–Stokes, complex fluid versus the Fourier chart, the moving receiver;
+     - §3.6, heat, spacetime and plural clocks.
+   - Equation extraction compresses a foreign realization into navigators and element relations
+     (the six steps in HOLON).
+7. **Lean curation.**
+   - Remove the duplicate theorems the audit found.
+   - Rename the directories named after the prize ("Millennium", "RH") by subject.
+   - Rename generator names to navigator names where they mean the object.
+8. **Applications** (a workbench, an Athena application, a simulator), rebuilt on the library
+   under the lessons record's requirements.
+   - An outcome is one of:
+     - a trainable model;
+     - a first usable Athena;
+     - frontier-level usefulness on consumer hardware.
+   - Each outcome freezes its task split and shows failure outputs.
+   - Conversation data follows the [data rules](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/CONVERSATION_DATA.md).
+   - The simulator follows the [interface table](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/HARDWARE_AND_MODALITY_BOUNDARIES.md#robotics-and-simulation-boundary).
