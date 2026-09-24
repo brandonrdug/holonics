@@ -23,7 +23,6 @@ members = [
   "applications/holonics-workbench",
   "crates/holonic-engine",
   "crates/holonics-portable",
-  "crates/holonic-abi",
   "crates/holonic-life",
   "crates/holonics-cuda",
   "applications/derivation-atlas",

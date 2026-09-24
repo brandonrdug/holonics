@@ -296,7 +296,7 @@ here. Owners:
 with [its tests](../../crates/holonics-cuda/src/section_layout/tests.rs), paired with
 [`SectionLayout.lean`](../../formal/elementary-holonics/ElementaryHolonics/Foundation/SectionLayout.lean)
 (`Soma.Holonics.Foundation.SectionLayout`); each cites the other by declaration name, and the shared
-device wire is `soma_abi::section_layout_cuda`. **The declaration is an `IncidenceDeclaration`** — a
+device wire is `holonics_portable::section_layout_cuda`. **The declaration is an `IncidenceDeclaration`** — a
 global address extent, a strictly increasing offsets table and a flat region-major address table —
 and everything else is derived from it: the gather index table (which *is* the address table), the
 `TileExtents` (region and slot populations, the widest region, the common width when there is one,

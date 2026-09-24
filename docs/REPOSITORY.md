@@ -54,8 +54,9 @@ extraction and the backend-neutral HNN law and port) → `holonics-cuda` (driver
 resident HNN), over the shared `no_std` `holonics-portable` leaf used by the detached Rust CUDA
 kernel. The current leaf contains the renamed dependency-free `holonic-body` source, shared section
 arithmetic/ABI, and kernel-shared wire schemas formerly owned by `soma-abi`. Those rows live under
-`holonics_portable::wire`, directly consumed by host code and the detached kernel. The `soma-abi`
-package retains only current, Holon, and presentation schemas pending separate disposition. The
+`holonics_portable::wire`, directly consumed by host code and the detached kernel. The remaining
+`soma-abi` current, Holon, and presentation schemas had no production consumers and have been
+retired with their package. The
 active generator/action grammar belongs to `holonics::generator::action`; the live receiver consumes
 it from `holonics::membrane`. Exact host rings belong to `holonics::ratio::ring`, while section
 admission errors belong to the CUDA section owner. Brandon's

@@ -54,11 +54,10 @@ the complete body and radiation remain authoritative beside it.
 ## Active current versus durable record
 
 Plan, manifest, journal, receipt, and observer JSON belong to the durable world/listener boundary.
-They are not automatically active light. A world consequence crosses the code-workshop membrane
-through `soma-abi::current::EventHeader`: one world-local event tag, exact payload-word extent, and
-an explicit ordered value payload. Rust field names, enum names, schema keys, paths, labels, and
-punctuation remain outside the current unless they are themselves the material value being
-presented.
+They are not automatically active light. A typed consequence carries the values admitted by its
+receiver; paths, labels, schema keys, and listener provenance do not become physical current unless
+they are themselves the material value being presented. No shared event-header ABI is used by the
+live boundary runner.
 
 Raw source and candidate material remain byte-for-byte raw. Typed consequences retain the exact
 values needed by their concrete receiver. A shared face may stand once while distinct physical
@@ -628,8 +627,7 @@ life boundary arc-spectral-observe SNAPSHOT.json passage/ observer/
 rational-complex quadratic passages, closed rational-box section residuals and contacts, complete
 return arcs, invertible affine state/section/return re-bases, and complete shared-state
 changed-parameter foils. Ratios are decimal integer or `numerator/denominator` strings; floats are
-not admitted. Every generated current uses `soma-abi::current::EventHeader`; labels, schemas, and
-human statements remain listener provenance.
+not admitted. Labels, schemas, and human statements remain listener provenance.
 
 The builder validates every recurrence, section incidence, affine commutation, and foil successor
 before atomically creating the event population, snapshot, catalog, passage plan, and durable human

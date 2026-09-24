@@ -54,8 +54,8 @@ Each is backed by a measurement at `d3b8b509`.
    owner without changing device arithmetic. The exact section arithmetic and CUDA entry ABI moved
    to the portable leaf; host ring math moved into `holonics::ratio::ring`; CUDA owns section
    refusals; and `holonic-words` is retired. The host/device wire rows now live under
-   `holonics_portable::wire`; `soma-abi` retains only current, Holon and presentation schemas
-   pending separate disposition.
+   `holonics_portable::wire`; the remaining test-only current, Holon and presentation schemas
+   were retired with the unused `soma-abi` package after the wire move.
    The kernel's committed PTX is embedded at compile time by `holonics-cuda`
    library/tests/gates, loaded from those bytes by engine `section_layout_adoption` tests, and
    used by `holonic-life`'s Soma CUDA lineage. Its launch owners (`SOMA_PTX`, `register_launch`,
@@ -264,7 +264,7 @@ The target is three maintained libraries on this branch, four when Brandon adds 
 
 | Package | Internal ownership | Existing sources to sort at R0 |
 |---|---|---|
-| `holonics-portable` (§0.4) | A dependency-free `no_std` leaf for exact body/ABI laws compiled by both host and detached Rust CUDA kernel. | Former `body`, shared section arithmetic, and kernel-shared wire schemas live here (`holonics_portable::wire`); host exact rings live in `holonics::ratio::ring`, section refusals in `holonics-cuda::section_layout`, and only `current`, `holon`, and `presentation` schemas remain under `soma-abi` pending disposition. |
+| `holonics-portable` (§0.4) | A dependency-free `no_std` leaf for exact body/ABI laws compiled by both host and detached Rust CUDA kernel. | Former `body`, shared section arithmetic, and kernel-shared wire schemas live here (`holonics_portable::wire`); host exact rings live in `holonics::ratio::ring`, section refusals in `holonics-cuda::section_layout`. The unused `soma-abi` current, Holon, and presentation schemas were retired after the production wire move left them with test-only consumers. |
 | `holonics` | Main library: typed ratio/remainder/inversion and jets; geometric frames, exterior cells, pair and tube/tower charts; the one Holon law with active receiving, composition, restriction and deposition; a proposed receiver-relative `Holarchy`; fluid, wave, spacetime and thermal constitutive instances; equation extraction as a Holon boundary; and the backend-neutral HNN: field law, source moments, adjoint contracts, execution-port trait and host reference, the last built in K2. The complex-parametron chart is an HNN physical chart. No CUDA dependency and no `nvcc`. | `holonic-core`, `relational-geometry`, live `holonic-structure`, the source-neutral parts of `holonic-engine` (extraction included), and the law/declaration parts of `holonics-hna` and live `holonic-life`. |
 | `holonics-cuda` | CUDA realization: driver, allocation, transfer completion, section layout and partition, hardware cover, the `.cu` kernels and their `build.rs`, and `hnn/`, the resident HNN field moved as it is (§0.3). It depends on `holonics` and implements the HNN execution port as K2 defines it. It does not redefine the material or loss law. | the former `holonic-mount` owner (now moved), engine `cuda_refine`, `resident_section`, `kernels/`, `hardware_cover`, `section_partition`, the resident `native_ecology/**` and `embedding_fiber`, the resident `holonics-hna` `native/**`, and the device files of `holonic_intelligence`. |
 | `holonics-apple` (later) | Apple silicon implementation behind the same typed execution port, with its own kernels and placement. Create it only on Brandon's Mac branch after its actual implementation is ready. | No Linux-branch move. |
@@ -714,6 +714,8 @@ existing suites (§0.9):
    the active relation/action grammar now lives under `holonics::generator::action`, with the
    unused ABI conduct dispatcher retired and its no-caller/no-test evidence recorded in
    [the action owner audit](census/M1_GENERATOR_ACTION_OWNER_MOVE.md);
+   the remaining `soma-abi` schemas had no production consumers and the package is retired in
+   [the ABI disposition](census/M1_PORTABLE_WIRE_MOVE.md#follow-up-retire-the-former-abi-package);
    exact words and the remaining source-neutral engine/HNN laws still need disposition. Resident
    engine/HNN execution moves to CUDA. The [CUDA apparatus](census/M1_CUDA_MOUNT_OWNER_MOVE.md)
    now lives in `crates/holonics-cuda` as the `holonics-cuda` package (`holonics_cuda` library);

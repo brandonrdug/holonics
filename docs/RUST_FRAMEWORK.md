@@ -24,7 +24,7 @@ general model architecture.
 | `holonics::{exact_linear,exact_value,exact_work,inertia,prime_image_algebra,rational_polynomial}` | Source-neutral exact operators owned by the main crate |
 | `holonics::ratio::ring` | Exact ring trait, checked integers, modular words, typed modulus refusal and accumulation law; this is the canonical host owner and calls the portable section arithmetic for `MERSENNE61`. |
 | `holonics::generator::action` | Typed relation atoms, action currents, active-cut spans/incidence and whole-view validation; consumed by the live receiving runtime and source adapters. |
-| `holonics::membrane` | Live receiving, concrete standing storage, constituent and current runtime; `holonics-portable::wire` owns rows shared by host and detached NVPTX code. `soma-abi` retains current, Holon-sweep and presentation schemas pending separate disposition. |
+| `holonics::membrane` | Live receiving, concrete standing storage, constituent and current runtime; `holonics-portable::wire` owns rows shared by host and detached NVPTX code. The unused `soma-abi` current, Holon-sweep and presentation schemas were retired with their package. |
 | `holonics-cuda::section_layout` | CUDA section refusal vocabulary and canonical-table admission; uses exact rings from `holonics::ratio::ring`. |
 | `holonics::structure` | Structural relation, chain, local population, gauge and membrane carriers owned inside the main crate |
 | `holonics::geometry` | Exact frames, screw pairs, phase carry, receiver maps and projection fibres owned inside the main crate |

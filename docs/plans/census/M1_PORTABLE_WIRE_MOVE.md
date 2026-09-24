@@ -12,14 +12,14 @@ Their row layouts, constants, version words, discriminants, entry symbols, check
 and kernel behavior are retained. The `live_event_cuda -> emission` module dependency moves as a
 single closure. Internal imports now use the portable crate's local modules; no forwarding paths
 remain. The detached NVPTX kernel, `holonics-cuda`, `life`, and application manifests call the
-portable owner directly. Their direct `soma-abi` dependencies have been removed. The package
-remains in the workspace without those rows for the separate disposition of `current`, `holon`,
-and `presentation`.
+portable owner directly. Their direct `soma-abi` dependencies have been removed. At this cut,
+the package remained in the workspace for a separate disposition of `current`, `holon`, and
+`presentation`.
 
 The moved source modules carry their inline unit tests. The two package-level REGISTER tests and
 the cooperative CONTACT extent test moved from `soma-abi/src/tests.rs` to `holonics-portable`'s
-`wire::tests`. `soma-abi`'s `current`, `holon`, and `presentation` modules and their tests are kept
-unchanged. No kernel source behavior, entry signature or serialized identifier is intentionally
+`wire::tests`. At the wire move, `soma-abi`'s `current`, `holon`, and `presentation`
+modules and their tests were kept unchanged. No kernel source behavior, entry signature or serialized identifier is intentionally
 changed. The pinned PTX regeneration and parity checks below establish the bounded result of
 that source move.
 
@@ -42,3 +42,16 @@ that source move.
   `mount-register-gate`, and `mount-register-remount-gate` all passed against the regenerated
   artifact. The link, scope, and register gates report exact card/reference results; the
   remount gate reports exact fresh-context continuation.
+
+## Follow-up: retire the former ABI package
+
+The follow-on ABI disposition inspected the three modules left after this move: `current`,
+`holon`, and `presentation`. No production source depended on them; only their own package tests
+remained. The package and workspace member were therefore removed, along with its empty lockfile
+entry. Their schemas were unused prototypes, not active current/runtime contracts. The live
+boundary guide no longer attributes generated currents to `soma-abi::current::EventHeader`.
+
+This follow-up is a source/documentation cut only. No Cargo build, test, or device gate was run in
+the retirement worktree; focused workspace verification is coordinated after the portable-wire
+stack is restacked.
+>>>>>>> 43ac2a55 (Retire unused substrate ABI package)

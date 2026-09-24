@@ -138,10 +138,10 @@ mod tests {
     /// Entries compiled into the artifact and reachable by NOTHING. Measured 2026-08-15.
     ///
     /// These four are defined as `extern "ptx-kernel"` in `soma-kernel-cuda/src/lib.rs`, listed in
-    /// `soma-kernel-cuda/build-ptx.sh`, and emitted into the PTX. They have **no `soma_abi` entry
-    /// symbol, no `Module::function` resolution, and no launcher** anywhere in `soma/` or
-    /// `crates/` — `holonics_portable::wire::register::Entry` names five register entries and none of these is
-    /// among them. The `link` family has three cpu gates (`mount-link-gate` for
+    /// `soma-kernel-cuda/build-ptx.sh`, and emitted into the PTX. They have **no portable register
+    /// entry, no `Module::function` resolution, and no launcher** anywhere in `soma/` or
+    /// `crates/` — `holonics_portable::wire::register::Entry` names five register entries and none
+    /// of these is among them. The `link` family has three cpu gates (`mount-link-gate` for
     /// `link_{grain,sum,finish}`, `mount-founded-gate` for the founded pair); the *registered*
     /// third arm was compiled but its gate was never built, and `mount-chart-gate` resolves
     /// `chart_{mark,count,recast}` without `chart_register_mark`. The same four are orphaned

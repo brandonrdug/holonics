@@ -58,9 +58,9 @@ laws and HNN**, organized by elementary object rather than acting as a facade:
 
 That is three maintained Rust libraries on Linux after consolidation and four after Apple.
 The portable leaf began by replacing `body` and now owns the shared section arithmetic and CUDA
-section ABI. `soma-abi` retains its other wire records, exact rings belong to
-`holonics::ratio::ring`, and CUDA section refusals belong to `holonics-cuda::section_layout`; the
-host-only `holonic-words` package is retired. The main library
+section ABI. The former `soma-abi` schemas had no production consumers and its package is retired;
+exact rings belong to `holonics::ratio::ring`, and CUDA section refusals belong to
+`holonics-cuda::section_layout`. The host-only `holonic-words` package is retired. The main library
 builds without CUDA; its HNN host reference is built after the move, one method at a time
 against the CUDA return.
 Its physical instances must carry fluid stress/pressure, wave propagation, spacetime
