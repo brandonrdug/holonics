@@ -1,6 +1,6 @@
 //! Exact reflective runtime beneath learnable surface codecs.
 //!
-//! This crate deliberately defines no universal syntax and no semantic token. A visible language,
+//! This module deliberately defines no universal syntax and no semantic token. A visible language,
 //! file format, theorem prover, machine instruction set, or sensor representation is a codec body
 //! supplied as `Program`; its material is a receiver face supplied as `Face`; and its live local
 //! bindings are an `Environment`. The runtime owns only their causal relationship:

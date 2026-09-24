@@ -14,8 +14,8 @@ existing refusal values, IDs, lineage rules and rest/remount validation. `life::
 and `life::decomposing_codec` call the main-library owner directly. The former crate and its
 forwarding surface are removed; its focused integration tests move to `crates/holonics/tests`.
 
-The implementation and focused integration tests have not been built in this owner commit. Run
-`cargo test -p holonics --test reflective_runtime` and focused life tests for
-`agentic_language` and `decomposing_codec`, followed by the locked workspace all-target check
-after this branch is rebased onto the serial M1 stack. No behavioral change or wire/version change
-is intended.
+Verified after rebase onto the portable owner rename: the moved integration tests pass 2/2,
+`life::agentic_language::tests` pass 17/17, `life::decomposing_codec::tests` pass 27/27, and the
+locked workspace all-target check passes. The root README now counts 12 workspace packages (9
+libraries and 3 applications). These gates establish compilation and preserved focused behavior;
+no behavioral change or wire/version change is intended.
