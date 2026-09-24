@@ -45,6 +45,9 @@ Passed on the pre-standing-receipt base `27ab48c5` before the parent restacks th
   exact engine CUDA laws for compute_89.
 - Engine focused tests: `lean_citations::` 3 passed; `receiver_atlas::` 36 passed / 1 ignored;
   `neck::` 21 passed; `continuing_tube::` 42 passed.
+- After rebasing onto the verified standing tip `c776fcea`,
+  `cargo check --locked -j2 --workspace --all-targets` passed in 4m27s. This checks the moved
+  owner through engine, CUDA, life, HNA and the application targets on the stacked graph.
 
 No Lean declaration changed. The Lean source-owner comments now point at their distinct Rust owners;
 no separate Lake build was needed for this relocation. The matrix-to-zonotope construction and its
