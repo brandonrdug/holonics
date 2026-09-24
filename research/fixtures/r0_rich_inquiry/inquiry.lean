@@ -1,6 +1,6 @@
-import ElementaryHolonics.Millennium.FamilySupport
+import HolonicsResearch.Millennium.FamilySupport
 
-open Soma.Holonics.Millennium.FamilySupport
+open Holonics.Millennium.FamilySupport
 
 #check theSlotClassesAreSupportedAtEveryModulus
 

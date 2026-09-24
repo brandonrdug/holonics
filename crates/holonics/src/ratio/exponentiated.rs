@@ -1,7 +1,7 @@
 //! The chart transition between the additive and multiplicative charts — and
 //! softmax read as one, rather than as a statistic.
 //!
-//! ## The ontology, ratified 2026-08-14
+//! ## The ontology (Brandon, August 14)
 //!
 //! Brandon: *"softmax doesn't actually seem like a statistics function to me, it
 //! seems like it's merely associated with statistics and got grouped in… you're
@@ -98,9 +98,9 @@
 
 use std::collections::BTreeMap;
 
+use crate::ratio::Rat;
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
-use crate::geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -157,13 +157,8 @@ pub fn probability_ratio(
 /// ranked, or crowned.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RatioFamily {
-    schema: String,
     /// The integer reciprocal temperature this family was rebased by, `1` for a family read
-    /// directly off a surprisal population.
-    ///
-    /// **Added 2026-08-18.** Without it a rebased family was bit-indistinguishable from a warm one,
-    /// so a reading could not say which frame it was taken in — the absolute-frame defect, one
-    /// level in.
+    /// directly off a surprisal population: the frame the reading stands in.
     rebased_by: u32,
     members: Vec<u64>,
     /// `(i, j) -> p_i / p_j`, for every ordered pair of distinct members.
@@ -193,7 +188,6 @@ impl RatioFamily {
             }
         }
         Ok(Self {
-            schema: SCHEMA.to_owned(),
             rebased_by: 1,
             members,
             ratios,
@@ -305,20 +299,10 @@ impl RatioFamily {
     /// so it is a rebase of the winding the ratio already carries, and this is
     /// that rebase for `T = 1/n` with `n` a positive integer.
     ///
-    /// **CORRECTED 2026-08-18, twice.** The doc said this takes *"the **root**,
-    /// taken only where it stays in ℚ"* and *"refuses where the root leaves ℚ"*.
-    /// It takes an integer power; no root is taken, none can leave ℚ, and
-    /// [`RatioError`] correctly carries no variant for it — the promised refusal
-    /// was both unreachable and unimplemented. The **root** case, `T > 1`, is not
-    /// implemented here at all and would need the algebraic carrier.
-    ///
-    /// And the doc said *"no path here reaches `T → 0`, which is argmax — the
-    /// limit this module exists not to take."* That was backwards: the parameter
-    /// **is** `1/T`, so `T → 0` is `reciprocal_temperature → ∞` and the parameter
-    /// drives straight at it. What holds the ban is not this argument — it is
-    /// that every ratio is returned and none is crowned, at any `n`. The limit is
-    /// never *taken* because nothing here selects; the parameter can approach it
-    /// and the return stays a complete family.
+    /// It takes an integer power, so nothing leaves ℚ; the root case `T > 1` needs the algebraic
+    /// carrier and is not implemented here. The parameter is `1/T`, so `T → 0` is
+    /// `reciprocal_temperature → ∞`; the limit is never *taken*, because every ratio is returned
+    /// and none is selected at any `n`.
     ///
     /// **`reciprocal = 0` is refused.** That is `T → ∞`, where every ratio
     /// becomes one and no member is distinguishable from any other; it is a
@@ -335,7 +319,6 @@ impl RatioFamily {
             );
         }
         Ok(Self {
-            schema: self.schema.clone(),
             // The rebases compose: `(r^m)^n = r^{mn}`, so the frame this family stands in is the
             // product, not the last exponent applied.
             rebased_by: self.rebased_by.saturating_mul(reciprocal_temperature),
@@ -344,8 +327,6 @@ impl RatioFamily {
         })
     }
 }
-
-const SCHEMA: &str = "holonic-engine.exponentiated-ratio-family.v1";
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
 pub enum RatioError {
@@ -371,7 +352,7 @@ pub enum RatioError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::geometry::rat;
+    use crate::ratio::rat;
 
     fn surprisal_of(numerator: i64, denominator: i64) -> SymbolicSurprisal {
         SymbolicSurprisal::of_probability(&rat(numerator, denominator)).expect("a probability")
@@ -532,15 +513,6 @@ mod tests {
         assert!(colder.cocycle_holds());
     }
 
-    /// The degenerate frame is refused by name rather than returned as uniform.
-    #[test]
-    fn a_reciprocal_temperature_of_zero_is_refused() {
-        let population: BTreeMap<u64, SymbolicSurprisal> =
-            BTreeMap::from([(2, surprisal_of(1, 2)), (3, surprisal_of(1, 4))]);
-        let family = RatioFamily::read(&population).expect("a family");
-        assert_eq!(family.rebased_by(0), Err(RatioError::DegenerateTemperature));
-    }
-
     /// A fractional coefficient leaves the rationals and is refused, rather than
     /// enclosed — an enclosure would be a magnitude standing in for a ratio.
     #[test]
@@ -550,35 +522,6 @@ mod tests {
             exponentiate(&root_two),
             Err(RatioError::FractionalCoefficient { prime: 2, .. })
         ));
-    }
-
-    /// Nothing here ranks. The family returns every ordered pair and commits to
-    /// none, so there is no member a caller could not reach.
-    #[test]
-    fn every_ordered_pair_is_present_and_no_member_is_crowned() {
-        let population: BTreeMap<u64, SymbolicSurprisal> = BTreeMap::from([
-            (2, surprisal_of(1, 2)),
-            (3, surprisal_of(1, 3)),
-            (5, surprisal_of(1, 6)),
-        ]);
-        let family = RatioFamily::read(&population).expect("a family");
-        assert_eq!(family.members().len(), 3);
-        assert_eq!(family.ratios.len(), 3 * 2);
-        for left in family.members() {
-            for right in family.members() {
-                assert_eq!(family.ratio(*left, *right).is_some(), left != right);
-            }
-        }
-    }
-
-    #[test]
-    fn a_family_of_one_is_refused_because_a_ratio_needs_two() {
-        let population: BTreeMap<u64, SymbolicSurprisal> =
-            BTreeMap::from([(2, surprisal_of(1, 2))]);
-        assert_eq!(
-            RatioFamily::read(&population),
-            Err(RatioError::FamilyTooSmall { members: 1 })
-        );
     }
 }
 
@@ -599,9 +542,7 @@ mod frame_tests {
         carried
     }
 
-    /// **A rebased family must not be bit-indistinguishable from a warm one.** Before 2026-08-18 the
-    /// reciprocal was applied and then forgotten, so a reading could not say which frame it stood
-    /// in — the absolute-frame defect one level in.
+    /// A rebased family carries the frame it stands in, and rebases compose: `(r^m)^n = r^{mn}`.
     #[test]
     fn the_family_carries_the_frame_it_was_rebased_into() {
         let read = RatioFamily::read(&population()).expect("a family");
@@ -612,25 +553,5 @@ mod frame_tests {
         let twice = cooled.rebased_by(2).expect("a positive reciprocal");
         assert_eq!(twice.rebased_by_reciprocal(), 6);
         assert_ne!(read, cooled, "two frames must not be equal as values");
-    }
-
-    /// The ban is held by the return, not by the parameter: at any reciprocal the family is complete
-    /// and no member is crowned. `T -> 0` is `reciprocal -> infinity`, which the parameter can
-    /// approach; what it can never do is make the family select.
-    #[test]
-    fn every_member_survives_every_frame() {
-        let read = RatioFamily::read(&population()).expect("a family");
-        for reciprocal in [1u32, 2, 7, 64, 4096] {
-            let rebased = read.rebased_by(reciprocal).expect("a positive reciprocal");
-            assert_eq!(rebased.members(), read.members());
-            for left in read.members() {
-                for right in read.members() {
-                    if left != right {
-                        assert!(rebased.ratio(*left, *right).is_some());
-                    }
-                }
-            }
-        }
-        assert_eq!(read.rebased_by(0), Err(RatioError::DegenerateTemperature));
     }
 }

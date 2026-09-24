@@ -1,0 +1,227 @@
+import HolonicsResearch.Millennium.GeneralMordell
+
+/-!
+# GeneralTwoTorsion: the four two-torsion points and the halving fibre
+
+Step three of the ordered worktrack.  Two facts the descent leans on implicitly and
+which are worth having explicitly:
+
+* **`theTwoTorsionIsExactlyTheFourPoints`** — on `y² = x(x−a)(x−b)` a point is killed
+  by two exactly when it is the identity or has ordinate zero, and the ordinates
+  vanish exactly at the three roots.  So `E[2](ℚ) = {O, (0,0), (a,0), (b,0)}`, of
+  order four, and the two-torsion is entirely rational — which is what puts this
+  family in the descent's reach at all.
+* **`theHalvingFibreIsATorsor`** — a nonempty halving fibre is a torsor for `E[2]`:
+  translating one half by a two-torsion point gives another, and any two halves differ
+  by one.  So a point that is a double is a double in exactly four ways.
+
+Every `theorem` is discharged and none depends on `sorryAx`.
+-/
+
+noncomputable section
+
+namespace Holonics.Millennium.GeneralTwoTorsion
+
+open WeierstrassCurve.Affine
+open Holonics.Millennium
+open Holonics.Millennium.GeneralFace
+
+variable {a b : ℚ}
+
+/-! ## 1. The two-torsion is exactly the four points -/
+
+/-- A point is killed by two exactly when it is the identity or its ordinate
+vanishes. -/
+theorem theTwoTorsionIsTheVanishingOrdinate (P : (E a b).Point) :
+    P + P = 0 ↔ (P = 0 ∨ ∃ (x : ℚ) (h : (E a b).Nonsingular x 0), P = Point.some _ _ h) := by
+  constructor
+  · intro h
+    rcases P with _ | @⟨x, y, hns⟩
+    · exact Or.inl rfl
+    · right
+      have hneg : (Point.some _ _ hns : (E a b).Point) = -Point.some _ _ hns := by
+        rw [eq_neg_iff_add_eq_zero]
+        exact h
+      rw [Point.neg_some] at hneg
+      have hy : y = (E a b).negY x y := by
+        have := congrArg (fun P => match P with
+          | Point.zero => (0 : ℚ)
+          | Point.some _ (y := yy) _ => yy) hneg
+        simpa using this
+      simp only [negY, E] at hy
+      have hy0 : y = 0 := by linarith
+      subst hy0
+      exact ⟨x, hns, rfl⟩
+  · rintro (rfl | ⟨x, hns, rfl⟩)
+    · simp
+    · refine Point.add_self_of_Y_eq ?_
+      simp only [negY, E]
+      ring
+
+/-- **THE TWO-TORSION IS EXACTLY THE FOUR POINTS**: the identity and the three roots.
+The two-torsion of this family is entirely rational, which is what puts it in the
+descent's reach. -/
+theorem theTwoTorsionIsExactlyTheFourPoints (ha : a ≠ 0) (hb : b ≠ 0)
+    (hab : a - b ≠ 0) (P : (E a b).Point) :
+    P + P = 0 ↔ (P = 0 ∨
+      (∃ h : (E a b).Nonsingular 0 0, P = Point.some _ _ h) ∨
+      (∃ h : (E a b).Nonsingular a 0, P = Point.some _ _ h) ∨
+      (∃ h : (E a b).Nonsingular b 0, P = Point.some _ _ h)) := by
+  rw [theTwoTorsionIsTheVanishingOrdinate]
+  constructor
+  · rintro (rfl | ⟨x, hns, rfl⟩)
+    · exact Or.inl rfl
+    · have hcurve := onCurve hns
+      have hroots : x * (x - a) * (x - b) = 0 := by linear_combination -hcurve
+      rcases mul_eq_zero.mp hroots with h' | h'
+      · rcases mul_eq_zero.mp h' with h'' | h''
+        · subst h''
+          exact Or.inr (Or.inl ⟨hns, rfl⟩)
+        · have : x = a := by linarith [sub_eq_zero.mp h'']
+          subst this
+          exact Or.inr (Or.inr (Or.inl ⟨hns, rfl⟩))
+      · have : x = b := by linarith [sub_eq_zero.mp h']
+        subst this
+        exact Or.inr (Or.inr (Or.inr ⟨hns, rfl⟩))
+  · rintro (rfl | ⟨h, rfl⟩ | ⟨h, rfl⟩ | ⟨h, rfl⟩)
+    · exact Or.inl rfl
+    · exact Or.inr ⟨0, h, rfl⟩
+    · exact Or.inr ⟨a, h, rfl⟩
+    · exact Or.inr ⟨b, h, rfl⟩
+
+/-! ## 2. The halving fibre is a torsor -/
+
+/-- **THE HALVING FIBRE IS A TORSOR FOR THE TWO-TORSION**: translating a half by a
+two-torsion point gives another half, and any two halves differ by a two-torsion
+point.  A point that is a double is a double in exactly `|E[2]|` ways. -/
+theorem theHalvingFibreIsATorsor (P Q Q' : (E a b).Point) (T : (E a b).Point)
+    (hT : T + T = 0) (hQ : Q + Q = P) :
+    ((Q + T) + (Q + T) = P) ∧ ((Q' + Q' = P) → (Q' - Q) + (Q' - Q) = 0) := by
+  constructor
+  · calc (Q + T) + (Q + T) = (Q + Q) + (T + T) := by abel
+      _ = P + 0 := by rw [hQ, hT]
+      _ = P := add_zero P
+  · intro hQ'
+    calc (Q' - Q) + (Q' - Q) = (Q' + Q') - (Q + Q) := by abel
+      _ = P - P := by rw [hQ, hQ']
+      _ = 0 := sub_self P
+
+/-- **THE HALVES ARE THE TRANSLATES**: given one half, every half is that one
+translated by a two-torsion point, and every such translate is a half.  This is the
+reconstruction fibre of the descent, exhibited. -/
+theorem theHalvesAreExactlyTheTranslates (P Q : (E a b).Point) (hQ : Q + Q = P)
+    (Q' : (E a b).Point) :
+    Q' + Q' = P ↔ ∃ T : (E a b).Point, T + T = 0 ∧ Q' = Q + T := by
+  constructor
+  · intro hQ'
+    refine ⟨Q' - Q, ?_, by abel⟩
+    exact (theHalvingFibreIsATorsor P Q Q' 0 (by simp) hQ).2 hQ'
+  · rintro ⟨T, hT, rfl⟩
+    exact (theHalvingFibreIsATorsor P Q Q T hT hQ).1
+
+
+/-! ## 3. The rank exists as a number
+
+Finite generation plus the descent bound make the rank a **well-defined natural
+number** on this family, which is what makes the conjecture's rank clause a
+well-posed question here at all: before Mordell–Weil nothing guaranteed that any `r`
+satisfied `RankIsOn`. -/
+
+open Holonics.Millennium.UniversalBSD
+open Holonics.Millennium.GeneralMordell
+
+/-- Rank zero always holds: the empty family is independent. -/
+lemma rankAtLeastOn_zero (E' : WeierstrassCurve.Affine ℚ) : RankAtLeastOn E' 0 :=
+  ⟨fun i => i.elim0, fun c _ i => i.elim0⟩
+
+/-- **THE RANK EXISTS ON EVERY FULL-TWO-TORSION CURVE**: there is a natural number
+that *is* the rank.  Rank zero supplies the lower end, the descent bound supplies the
+upper, and the least unattained value minus one is the rank. -/
+theorem theRankExistsOnEveryFullTwoTorsionCurve {a b : ℤ} (ha : a ≠ 0) (hb : b ≠ 0)
+    (hab : a - b ≠ 0) :
+    ∃ r : ℕ, RankIsOn (E ((a : ℚ)) ((b : ℚ))) r := by
+  classical
+  set N : ℕ := 4 * (a * b * (a - b)).natAbs.divisors.card
+    * (a * b * (a - b)).natAbs.divisors.card with hN
+  have hbound : ∀ r : ℕ, RankAtLeastOn (E ((a : ℚ)) ((b : ℚ))) r → r ≤ N := by
+    intro r hr
+    by_contra hlt
+    push_neg at hlt
+    refine theRankIsBoundedOnEveryFullTwoTorsionCurve r ha hb hab ?_ hr
+    calc N < r := hlt
+      _ < 2 ^ r := Nat.lt_two_pow_self
+  have hex : ∃ r : ℕ, ¬ RankAtLeastOn (E ((a : ℚ)) ((b : ℚ))) r := by
+    refine ⟨N + 1, fun hc => ?_⟩
+    have := hbound _ hc
+    omega
+  set r₁ : ℕ := Nat.find hex with hr₁
+  have h1 : ¬ RankAtLeastOn (E ((a : ℚ)) ((b : ℚ))) r₁ := Nat.find_spec hex
+  have h2 : r₁ ≠ 0 := by
+    intro h0
+    rw [h0] at h1
+    exact h1 (rankAtLeastOn_zero _)
+  have h3 : RankAtLeastOn (E ((a : ℚ)) ((b : ℚ))) (r₁ - 1) := by
+    by_contra hc
+    have hle : r₁ ≤ r₁ - 1 := by
+      rw [hr₁]
+      exact Nat.find_le hc
+    omega
+  refine ⟨r₁ - 1, h3, ?_⟩
+  rw [Nat.sub_add_cancel (by omega)]
+  exact h1
+
+/-- **THE RANK CLAUSE IS WELL POSED ON THIS FAMILY**: the algebraic side of the
+conjecture is a definite natural number for every curve with full rational
+two-torsion, and it is at most the divisor count.  What the conjecture then asserts
+is that the analytic side returns the same number. -/
+theorem theRankClauseIsWellPosedOnEveryFullTwoTorsionCurve {a b : ℤ} (ha : a ≠ 0)
+    (hb : b ≠ 0) (hab : a - b ≠ 0) :
+    ∃ r : ℕ, RankIsOn (E ((a : ℚ)) ((b : ℚ))) r ∧
+      2 ^ r ≤ 4 * (a * b * (a - b)).natAbs.divisors.card
+        * (a * b * (a - b)).natAbs.divisors.card := by
+  obtain ⟨r, hr⟩ := theRankExistsOnEveryFullTwoTorsionCurve ha hb hab
+  refine ⟨r, hr, ?_⟩
+  by_contra hlt
+  push_neg at hlt
+  exact theRankIsBoundedOnEveryFullTwoTorsionCurve r ha hb hab hlt hr.1
+
+
+/-! ## 4. The family inside the universal pose
+
+The two-parameter family has an integral model over `ℤ`, so everything proved about
+its rank is a statement about the universally quantified conjecture rather than about
+a private object. -/
+
+/-- The integral model of the full-2-torsion curve. -/
+def abModel (a b : ℤ) : WeierstrassCurve ℤ := ⟨0, -(a + b), 0, a * b, 0⟩
+
+lemma rationalModel_abModel (a b : ℤ) :
+    rationalModel (abModel a b) = E ((a : ℚ)) ((b : ℚ)) := by
+  unfold rationalModel abModel E WeierstrassCurve.map
+  norm_num
+
+lemma rankIsOn_abModel (a b : ℤ) (r : ℕ) :
+    RankIsOn (rationalModel (abModel a b)) r ↔ RankIsOn (E ((a : ℚ)) ((b : ℚ))) r := by
+  rw [rationalModel_abModel]
+
+/-- **THE CONJECTURE BOUNDS THE ANALYTIC RANK BY THE DIVISOR COUNT**: under the
+universal rank clause, the order of vanishing at the center of **any** analytic datum
+carried by a full-2-torsion curve is the curve's algebraic rank, and the descent
+bounds it — `2^(analytic rank) ≤ 4·τ(|ab(a−b)|)²`.
+
+This is an **effective** consequence of the conjecture on this family: the analytic
+side, about which the descent knows nothing directly, inherits a bound computed from
+the coefficients alone. -/
+theorem theConjectureBoundsTheAnalyticRankByTheDivisorCount
+    (hBSD : TheBirchSwinnertonDyerRankConjecture) {a b : ℤ} (ha : a ≠ 0) (hb : b ≠ 0)
+    (hab : a - b ≠ 0) (M : ℕ) (D : LDatumOn (abModel a b) M) :
+    ∃ r : ℕ, analyticOrderAt D.L 1 = (r : ℕ∞) ∧
+      RankIsOn (E ((a : ℚ)) ((b : ℚ))) r ∧
+      2 ^ r ≤ 4 * (a * b * (a - b)).natAbs.divisors.card
+        * (a * b * (a - b)).natAbs.divisors.card := by
+  obtain ⟨r, hrank, hbound⟩ :=
+    theRankClauseIsWellPosedOnEveryFullTwoTorsionCurve ha hb hab
+  refine ⟨r, ?_, hrank, hbound⟩
+  exact (hBSD (abModel a b) M D r).mpr ((rankIsOn_abModel a b r).mpr hrank)
+
+end Holonics.Millennium.GeneralTwoTorsion

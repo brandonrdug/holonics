@@ -4,8 +4,10 @@
 > theorem inventory and open mathematical fibres of that date. It is not a current build report,
 > roadmap, or construction authority; every “next”, “current”, and “present” below is historical
 > testimony. Construction order is [`docs/plans/THE_REBUILD.md`](../docs/plans/THE_REBUILD.md).
-> The current subject entry point is `ElementaryHolonics.Framework`; `ElementaryHolonics` retains
-> the complete research surface. See the [current Lean guide](README.md) for source organization,
+> The current subject entry point is `Holonics.Framework` in the foundation library `Holonics`;
+> the library `HolonicsResearch` retains the complete research surface. At the snapshot date both
+> were the single library `ElementaryHolonics`, under the namespace `Soma.Holonics` (now
+> `Holonics`). See the [current Lean guide](README.md) for source organization,
 > pinned verification and scope. Build claims below belong to the snapshot date.
 >
 > The targets catalogued here are instances of Holonic Compression and landmark discovery
@@ -13,11 +15,12 @@
 > separate category.
 
 **Date:** 2026-08-28
-**Scope:** exterior Lean theorem station under `ElementaryHolonics`; this document schedules no
+**Scope:** exterior Lean theorem station under `ElementaryHolonics` (now `Holonics` and
+`HolonicsResearch`); this document schedules no
 Rust/CUDA construction and does not alter `CONSTRUCTION_STATE.md`.
 **Catalog owner:** `lean/MILLENNIUM_FORMAL_CATALOG.md` (at the snapshot date,
 `formal/elementary-holonics/MILLENNIUM_FORMAL_CATALOG.md`)
-**Snapshot research import face:** `ElementaryHolonics.lean`
+**Snapshot research import face:** `ElementaryHolonics.lean` (now `lean/HolonicsResearch.lean`)
 
 ## 1. Purpose and provenance discipline
 
@@ -76,22 +79,24 @@ foundation and official-pose owners used below, but no current claim may cite th
 as a station-wide proof receipt until those failures are repaired and the `sorryAx` emissions in
 the failing targets are removed.
 
-[definition] The reproducible inventory receiver, run from `lean/`, is:
+[definition] The reproducible inventory receiver, run from `lean/`, is below. The snapshot ran
+it over `ElementaryHolonics/`, whose modules are now split between `Holonics/` and
+`HolonicsResearch/` with the same subdirectories.
 
 ```bash
-rg --files ElementaryHolonics -g '*.lean' | wc -l
-rg -n '^\s*(theorem|lemma)\s+' ElementaryHolonics -g '*.lean' | wc -l
+rg --files Holonics HolonicsResearch -g '*.lean' | wc -l
+rg -n '^\s*(theorem|lemma)\s+' Holonics HolonicsResearch -g '*.lean' | wc -l
 rg -n '^\s*(theorem|lemma|def|abbrev|structure|class|inductive)\s+' \
-  ElementaryHolonics -g '*.lean' | wc -l
-rg --files ElementaryHolonics/Millennium -g '*.lean' | wc -l
-rg -n '^\s*(theorem|lemma)\s+' ElementaryHolonics/Millennium -g '*.lean' | wc -l
+  Holonics HolonicsResearch -g '*.lean' | wc -l
+rg --files Holonics/Millennium HolonicsResearch/Millennium -g '*.lean' | wc -l
+rg -n '^\s*(theorem|lemma)\s+' Holonics/Millennium HolonicsResearch/Millennium -g '*.lean' | wc -l
 rg -n '^\s*(theorem|lemma|def|abbrev|structure|class|inductive)\s+' \
-  ElementaryHolonics/Millennium -g '*.lean' | wc -l
-rg -n '^#print axioms' ElementaryHolonics/Millennium -g '*.lean' | wc -l
+  Holonics/Millennium HolonicsResearch/Millennium -g '*.lean' | wc -l
+rg -n '^#print axioms' Holonics/Millennium HolonicsResearch/Millennium -g '*.lean' | wc -l
 ```
 
 [definition] Verification of a target is `bash tools/lean_check.sh <module>` from the repository
-root, or `bash tools/lean_check.sh ElementaryHolonics` for the complete research import face.
+root, or `bash tools/lean_check.sh HolonicsResearch` for the complete research surface.
 Counts establish the size of the source population only.  A declaration count is not
 a theorem-strength metric, and an axiom-audit command is not itself proof that every declaration in
 the library has the same dependency boundary.  The per-worktrack rows below name the mathematical

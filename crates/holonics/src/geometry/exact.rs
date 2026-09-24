@@ -1,298 +1,14 @@
-//! Exact arithmetic carried by the relational geometry kernel.
+//! **Exact frame carriers: rational points, linear maps and rigid transports of one frame.**
 //!
-//! This module deliberately has no rendering scalar.  Bevy-compatible
-//! approximations are produced only by the application membrane after an
-//! exact receiver projection has been formed.
+//! A frame is a local chart joined to others by declared exact maps; [`AffineMap3`] is such a map,
+//! and its `followed_by` and `inverse` are the group operation cell holonomy reads. Rotations are
+//! reached through the Cayley chart of the circle, `t ↦ ((1 − t²)/(1 + t²), 2t/(1 + t²))`, so every
+//! rotation here is a rational point of `SO(3)` and no angle is formed.
 
-use std::fmt;
-
-use num_bigint::BigInt;
-use num_rational::BigRational;
-use num_traits::{One, Signed, Zero};
+use num_traits::{One, Zero};
 use serde::{Deserialize, Serialize};
 
-pub type Rat = BigRational;
-
-pub fn rat(numerator: i64, denominator: i64) -> Rat {
-    assert_ne!(
-        denominator, 0,
-        "an exact ratio cannot have denominator zero"
-    );
-    Rat::new(BigInt::from(numerator), BigInt::from(denominator))
-}
-
-pub fn integer(value: i64) -> Rat {
-    Rat::from_integer(BigInt::from(value))
-}
-
-pub fn ratio(numerator: BigInt, denominator: BigInt) -> Rat {
-    assert!(
-        !denominator.is_zero(),
-        "an exact ratio cannot have denominator zero"
-    );
-    Rat::new(numerator, denominator)
-}
-
-pub fn format_rat(value: &Rat) -> String {
-    if value.denom().is_one() {
-        value.numer().to_string()
-    } else {
-        format!("{}/{}", value.numer(), value.denom())
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub enum ExactExpr {
-    Rational(Rat),
-    Symbol(String),
-    Neg(Box<ExactExpr>),
-    Sum(Vec<ExactExpr>),
-    Product(Vec<ExactExpr>),
-    Power {
-        base: Box<ExactExpr>,
-        exponent: i32,
-    },
-    Root {
-        degree: u32,
-        radicand: Box<ExactExpr>,
-    },
-    Function {
-        name: String,
-        arguments: Vec<ExactExpr>,
-    },
-    FormalSeries {
-        index: String,
-        start: BigInt,
-        term: Box<ExactExpr>,
-        condition: String,
-    },
-}
-
-impl ExactExpr {
-    pub fn rational(value: Rat) -> Self {
-        Self::Rational(value)
-    }
-
-    pub fn symbol(name: impl Into<String>) -> Self {
-        Self::Symbol(name.into())
-    }
-
-    pub fn root(degree: u32, radicand: ExactExpr) -> Self {
-        assert!(degree > 1, "a radical degree must exceed one");
-        Self::Root {
-            degree,
-            radicand: Box::new(radicand),
-        }
-    }
-
-    pub fn sqrt_int(value: i64) -> Self {
-        Self::root(2, Self::rational(integer(value)))
-    }
-
-    pub fn function(name: impl Into<String>, arguments: Vec<ExactExpr>) -> Self {
-        Self::Function {
-            name: name.into(),
-            arguments,
-        }
-    }
-
-    pub fn formal_series(
-        index: impl Into<String>,
-        start: BigInt,
-        term: ExactExpr,
-        condition: impl Into<String>,
-    ) -> Self {
-        Self::FormalSeries {
-            index: index.into(),
-            start,
-            term: Box::new(term),
-            condition: condition.into(),
-        }
-    }
-
-    pub fn neg(self) -> Self {
-        match self {
-            Self::Rational(value) => Self::Rational(-value),
-            Self::Neg(inner) => *inner,
-            other => Self::Neg(Box::new(other)),
-        }
-    }
-
-    pub fn add(self, other: Self) -> Self {
-        match (self, other) {
-            (Self::Rational(left), Self::Rational(right)) => Self::Rational(left + right),
-            (Self::Rational(left), right) if left.is_zero() => right,
-            (left, Self::Rational(right)) if right.is_zero() => left,
-            (Self::Sum(mut left), Self::Sum(right)) => {
-                left.extend(right);
-                Self::Sum(left)
-            }
-            (Self::Sum(mut terms), right) => {
-                terms.push(right);
-                Self::Sum(terms)
-            }
-            (left, Self::Sum(mut terms)) => {
-                terms.insert(0, left);
-                Self::Sum(terms)
-            }
-            (left, right) => Self::Sum(vec![left, right]),
-        }
-    }
-
-    pub fn subtract(self, other: Self) -> Self {
-        self.add(other.neg())
-    }
-
-    pub fn multiply(self, other: Self) -> Self {
-        match (self, other) {
-            (Self::Rational(left), Self::Rational(right)) => Self::Rational(left * right),
-            (Self::Rational(left), _) if left.is_zero() => Self::Rational(Rat::zero()),
-            (_, Self::Rational(right)) if right.is_zero() => Self::Rational(Rat::zero()),
-            (Self::Rational(left), right) if left.is_one() => right,
-            (left, Self::Rational(right)) if right.is_one() => left,
-            (Self::Product(mut left), Self::Product(right)) => {
-                left.extend(right);
-                Self::Product(left)
-            }
-            (Self::Product(mut factors), right) => {
-                factors.push(right);
-                Self::Product(factors)
-            }
-            (left, Self::Product(mut factors)) => {
-                factors.insert(0, left);
-                Self::Product(factors)
-            }
-            (left, right) => Self::Product(vec![left, right]),
-        }
-    }
-
-    pub fn divide(self, other: Self) -> Self {
-        self.multiply(Self::Power {
-            base: Box::new(other),
-            exponent: -1,
-        })
-    }
-
-    pub fn pow(self, exponent: i32) -> Self {
-        if exponent == 1 {
-            self
-        } else if exponent == 0 {
-            Self::Rational(Rat::one())
-        } else {
-            Self::Power {
-                base: Box::new(self),
-                exponent,
-            }
-        }
-    }
-
-    pub fn as_rational(&self) -> Option<&Rat> {
-        match self {
-            Self::Rational(value) => Some(value),
-            _ => None,
-        }
-    }
-}
-
-impl From<Rat> for ExactExpr {
-    fn from(value: Rat) -> Self {
-        Self::Rational(value)
-    }
-}
-
-impl fmt::Display for ExactExpr {
-    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Rational(value) => formatter.write_str(&format_rat(value)),
-            Self::Symbol(name) => formatter.write_str(name),
-            Self::Neg(inner) => write!(formatter, "-({inner})"),
-            Self::Sum(terms) => {
-                formatter.write_str("(")?;
-                for (index, term) in terms.iter().enumerate() {
-                    if index > 0 {
-                        formatter.write_str(" + ")?;
-                    }
-                    write!(formatter, "{term}")?;
-                }
-                formatter.write_str(")")
-            }
-            Self::Product(factors) => {
-                formatter.write_str("(")?;
-                for (index, factor) in factors.iter().enumerate() {
-                    if index > 0 {
-                        formatter.write_str(" · ")?;
-                    }
-                    write!(formatter, "{factor}")?;
-                }
-                formatter.write_str(")")
-            }
-            Self::Power { base, exponent } => write!(formatter, "({base})^{exponent}"),
-            Self::Root { degree, radicand } if *degree == 2 => {
-                write!(formatter, "sqrt({radicand})")
-            }
-            Self::Root { degree, radicand } => write!(formatter, "root_{degree}({radicand})"),
-            Self::Function { name, arguments } => {
-                write!(formatter, "{name}(")?;
-                for (index, argument) in arguments.iter().enumerate() {
-                    if index > 0 {
-                        formatter.write_str(", ")?;
-                    }
-                    write!(formatter, "{argument}")?;
-                }
-                formatter.write_str(")")
-            }
-            Self::FormalSeries {
-                index,
-                start,
-                term,
-                condition,
-            } => write!(
-                formatter,
-                "sum_{{{index}={start}}}^infinity ({term})  [{condition}]"
-            ),
-        }
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct RatVec2 {
-    pub x: Rat,
-    pub y: Rat,
-}
-
-impl RatVec2 {
-    pub fn new(x: Rat, y: Rat) -> Self {
-        Self { x, y }
-    }
-
-    pub fn zero() -> Self {
-        Self::new(Rat::zero(), Rat::zero())
-    }
-
-    pub fn add(&self, other: &Self) -> Self {
-        Self::new(&self.x + &other.x, &self.y + &other.y)
-    }
-
-    pub fn subtract(&self, other: &Self) -> Self {
-        Self::new(&self.x - &other.x, &self.y - &other.y)
-    }
-
-    pub fn scale(&self, scalar: &Rat) -> Self {
-        Self::new(&self.x * scalar, &self.y * scalar)
-    }
-
-    pub fn cross(&self, other: &Self) -> Rat {
-        &self.x * &other.y - &self.y * &other.x
-    }
-
-    pub fn dot(&self, other: &Self) -> Rat {
-        &self.x * &other.x + &self.y * &other.y
-    }
-
-    pub fn norm_squared(&self) -> Rat {
-        self.dot(self)
-    }
-}
+use crate::ratio::{Rat, integer};
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RatVec3 {
@@ -340,18 +56,6 @@ impl RatVec3 {
 
     pub fn norm_squared(&self) -> Rat {
         self.dot(self)
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ExactVec2 {
-    pub x: ExactExpr,
-    pub y: ExactExpr,
-}
-
-impl ExactVec2 {
-    pub fn new(x: ExactExpr, y: ExactExpr) -> Self {
-        Self { x, y }
     }
 }
 
@@ -537,6 +241,36 @@ pub fn cayley_rotation_z(parameter: &Rat) -> RatMat3 {
     ])
 }
 
+/// A coordinate axis of the frame: the rotation axis of a revolute joint, or a hinge.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum Axis {
+    X,
+    Y,
+    Z,
+}
+
+impl Axis {
+    /// The unit vector along the axis.
+    pub fn unit(self) -> RatVec3 {
+        match self {
+            Self::X => RatVec3::from_i64(1, 0, 0),
+            Self::Y => RatVec3::from_i64(0, 1, 0),
+            Self::Z => RatVec3::from_i64(0, 0, 1),
+        }
+    }
+
+    /// The rotation about this axis at a Cayley half-angle parameter.
+    pub fn cayley_rotation(self, parameter: &Rat) -> RatMat3 {
+        match self {
+            Self::X => cayley_rotation_x(parameter),
+            Self::Y => cayley_rotation_y(parameter),
+            Self::Z => cayley_rotation_z(parameter),
+        }
+    }
+}
+
+/// The Cayley chart of the circle, `t ↦ ((1 − t²)/(1 + t²), 2t/(1 + t²))`: a rational point of the
+/// unit circle for every rational half-angle parameter `t`.
 pub fn rational_circle(parameter: &Rat) -> (Rat, Rat) {
     let square = parameter * parameter;
     let denominator = Rat::one() + &square;
@@ -545,19 +279,10 @@ pub fn rational_circle(parameter: &Rat) -> (Rat, Rat) {
     (cosine, sine)
 }
 
-pub fn sign(value: &Rat) -> i8 {
-    if value.is_positive() {
-        1
-    } else if value.is_negative() {
-        -1
-    } else {
-        0
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::ratio::rat;
 
     #[test]
     fn rational_circle_is_an_exact_unit_point() {

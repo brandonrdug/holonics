@@ -1,14 +1,15 @@
-//! Elementary Euclidean screw generators and the local quadrance of two generated curves.
+//! **The screw: the Lie generator of a helix, and the pair chart of two generated curves.**
 //!
-//! This composes `RatVec3` and `AffineMap3`; it does not introduce another frame or matrix owner.
-//! All operands belong to one declared oriented Euclidean frame and one parameter/unit chart.
-//! A generator is `(omega, advance)` with velocity `omega cross point + advance`. Its initial
-//! point is separate: the same screw has different-radius orbits. No sampled helix or float
-//! angle is required to read its exact local first and second variation.
+//! A screw's Lie generator is `ξ = (ω, v)` with velocity `V_ξ(x) = ω × x + v`; a helix is that
+//! generator **and** an initial configuration, so the same screw has different-radius orbits
+//! ([`SituatedScrew`]). All operands belong to one declared oriented Euclidean frame and one
+//! parameter chart, built on [`crate::geometry::RatVec3`] and [`crate::geometry::AffineMap3`]. Two
+//! situated screws are a [`ScrewPair`]; [`PairQuadranceJet`] reads the exact first and second
+//! variation of their quadrance `Q(s, t) = |x_a(s) − x_b(t)|²` without sampling a helix or forming
+//! an angle. The contact on the pair is [`crate::holon::contact`]; physical force or heat needs the
+//! consumer's constitutive law.
 //!
-//! Formal owner: `Geometry/ScrewGeometry.lean`. The identity atlas consumes `angular_pairing`
-//! and `reciprocal_pairing`; `PairQuadranceJet` supplies the source-derived contact differential
-//! and geometric second term. Physical force/heat requires the consumer's constitutive law.
+//! Lean `Geometry/ScrewGeometry`:
 //!
 //! | Lean | Rust |
 //! |---|---|
@@ -19,9 +20,8 @@
 //! | `pairQuadrance_twoJet_exchange` | exchanged pair jets |
 //! | `pair_quadrance_is_existing_moment_contraction` | quadrance as an existing quadratic receiver |
 
-use crate::geometry::{
-    AffineMap3, ExactAnalysisError, Rat, RatComplex, RatVec3, polygon_winding, rational_circle,
-};
+use crate::geometry::{AffineMap3, RatVec3, rational_circle};
+use crate::ratio::Rat;
 use num_traits::Zero;
 use thiserror::Error;
 
@@ -162,27 +162,6 @@ pub struct RationalPhase {
     extra_turns: i64,
 }
 
-#[derive(Debug, Error)]
-pub enum RationalPhaseError {
-    #[error("phase chart power {period} does not close; endpoint is ({real}, {imaginary})")]
-    NotClosedAtPeriod {
-        period: usize,
-        real: Rat,
-        imaginary: Rat,
-    },
-    #[error("phase winding lift overflowed at period {period} and extra turns {extra_turns}")]
-    WindingOverflow { period: usize, extra_turns: i64 },
-    #[error(transparent)]
-    Analysis(#[from] ExactAnalysisError),
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct RationalPhaseWinding {
-    pub polygon: i64,
-    pub extra_turns: i64,
-    pub lifted: i64,
-}
-
 impl RationalPhase {
     pub fn new(parameter: Rat, extra_turns: i64) -> Self {
         Self {
@@ -206,63 +185,6 @@ impl RationalPhase {
     /// The exact unit-circle face owned by the rational Cayley chart.
     pub fn chart(&self) -> (Rat, Rat) {
         rational_circle(&self.parameter)
-    }
-
-    /// Read the oriented phase through the existing exact winding receiver. The polygon is the
-    /// admitted finite word of the Cayley point, so a result is supplied only at the declared
-    /// word length; no generic torus closure is inferred.
-    pub fn chart_winding(&self, period: usize) -> Result<i32, RationalPhaseError> {
-        if period == 0 {
-            return Err(RationalPhaseError::NotClosedAtPeriod {
-                period,
-                real: Rat::from_integer(1.into()),
-                imaginary: Rat::from_integer(0.into()),
-            });
-        }
-        let (cosine, sine) = self.chart();
-        let mut points = Vec::with_capacity(period);
-        let mut current = RatComplex::new(Rat::from_integer(1.into()), Rat::from_integer(0.into()));
-        let phase = RatComplex::new(cosine, sine);
-        for _ in 0..period {
-            points.push(current.clone());
-            current = RatComplex::new(
-                &current.re * &phase.re - &current.im * &phase.im,
-                &current.re * &phase.im + &current.im * &phase.re,
-            );
-        }
-        if current.re != Rat::from_integer(1.into()) || !current.im.is_zero() {
-            return Err(RationalPhaseError::NotClosedAtPeriod {
-                period,
-                real: current.re,
-                imaginary: current.im,
-            });
-        }
-        Ok(polygon_winding(&points)?.0.winding())
-    }
-
-    /// Lift the polygon winding by the declared number of extra full turns on each elementary
-    /// passage. The polygon is read only after the finite chart closes.
-    pub fn lifted_winding(
-        &self,
-        period: usize,
-    ) -> Result<RationalPhaseWinding, RationalPhaseError> {
-        let polygon = i64::from(self.chart_winding(period)?);
-        let periods = i64::try_from(period).map_err(|_| RationalPhaseError::WindingOverflow {
-            period,
-            extra_turns: self.extra_turns,
-        })?;
-        let lifted = periods
-            .checked_mul(self.extra_turns)
-            .and_then(|turns| polygon.checked_add(turns))
-            .ok_or(RationalPhaseError::WindingOverflow {
-                period,
-                extra_turns: self.extra_turns,
-            })?;
-        Ok(RationalPhaseWinding {
-            polygon,
-            extra_turns: self.extra_turns,
-            lifted,
-        })
     }
 }
 
@@ -521,7 +443,8 @@ impl PairQuadranceJet {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::geometry::{RatMat3, cayley_rotation_z, integer};
+    use crate::geometry::{RatMat3, cayley_rotation_z};
+    use crate::ratio::integer;
 
     #[test]
     fn translation_and_stationary_limits_are_retained() {
@@ -665,32 +588,6 @@ mod tests {
             .unwrap()
             .closes_after(4)
         );
-        assert_eq!(
-            RationalPhase::new(integer(1), 1).chart_winding(4).unwrap(),
-            1
-        );
-        assert_eq!(
-            RationalPhase::new(integer(1), 0)
-                .lifted_winding(4)
-                .unwrap()
-                .lifted,
-            1
-        );
-        assert_eq!(
-            RationalPhase::new(integer(1), 1)
-                .lifted_winding(4)
-                .unwrap()
-                .lifted,
-            5
-        );
-        assert_eq!(
-            RationalPhase::new(integer(0), 0).chart_winding(1).unwrap(),
-            0
-        );
-        assert!(matches!(
-            RationalPhase::new(integer(1), 1).chart_winding(3),
-            Err(RationalPhaseError::NotClosedAtPeriod { period: 3, .. })
-        ));
         let pair = ScrewPair::new(rotating, translating);
         let moved = pair
             .transported(&quarter)

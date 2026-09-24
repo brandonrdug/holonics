@@ -1,65 +1,32 @@
-//! **The Holon core: one object, the law and its ports.**
+//! **Holonics: the Holon law and its operators, exact over ℚ.**
 //!
-//! [project-postulate] Brandon, September 22: the Holon is the foundational class of the Rust
-//! codebase ([plan](../../../docs/plans/THE_HOLON_CORE_FOUNDS_THE_NATIVE_MACHINERY.md),
-//! [object](../../../docs/ELEMENTARY_OBJECTS.md#the-holon-as-one-object)). A Holon is
+//! A Holon is the law and its ports, not its state
+//! ([object](../../../docs/ELEMENTARY_OBJECTS.md#the-holon-as-one-object)):
 //!
 //! ```text
 //! H = (K, ∂_A;  Π;  𝒟;  𝓔;  G;  π)
 //! ```
 //!
-//! and a state is a point on it. The modules below mirror the Lean foundation
-//! `formal/elementary-holonics/ElementaryHolonics/Holon/` (namespace
-//! `Soma.Holonics.HolonCore`) facet by facet; each module header names its Lean owner, and the
-//! engine's `lean_citations` test checks those citations.
+//! The library is five operator modules, each implementing rows of the
+//! [operator contract](../../../docs/ELEMENTARY_OBJECTS.md#operator-contract):
 //!
-//! [definition] This is the main `holonics` library. Its Holon facets and exact operators
-//! build without CUDA; resident HNN execution remains in the backend until its move.
+//! - [`ratio`]: one per two. The exact rational, rings, the exponentiated/log chart, surprisal,
+//!   and the exact linear carrier whose inversion keeps its nonunit fibre.
+//! - [`geometry`]: the complex, frames and exact carriers, the screw and pair charts, winding and
+//!   carry, cell holonomy and the Swing.
+//! - [`holon`]: the law and its facets — ports, Dirac structure, elements, restrictions (tube,
+//!   tower, fibre, descent), deposition, reaction — with the helical pair [`holon::contact`] and the
+//!   ring [`holon::parametron`].
+//! - [`navigator`]: transport with an initial configuration and its own clock, phase lift, address
+//!   words and lock addresses, trace faces and the dynamical zeta, the reflective continuation.
+//! - [`receiver`]: roles and faces, width and release, standing as the retention quotient, and the
+//!   causal chord.
 //!
-//! **The exact base** (phase 2): the exact rational linear carrier [`exact_linear::ExactRatMatrix`]
-//! with its certified prime-image reading ([`prime_image_algebra`], computing in
-//! `crate::ratio::ring::ModularWords`, the device's own ring, over the declared [`hardware_cover`]),
-//! symmetric forms and their [`inertia`], the integer Smith reduction ([`rebase_invariants`]),
-//! [`exact_value`], [`exact_work`], [`rational_polynomial`] and [`primality`]. These are
-//! existing source-neutral operators now owned by the main library.
-//!
-//! **The facets** (phase 3a): [`port`] (bonds, power, units), [`dirac`] (kernel-form Dirac
-//! structures, composition, interconnection, pushforward), [`complex`] (validated cell complexes,
-//! connection incidence and curvature), [`element`] (storage, certified resistance, source, active,
-//! pump), [`generator`] (transport, initial configuration, clock, phase lift), [`restriction`] (port
-//! maps, scale square, Kron), [`holon`] (the port Holon, the medium, the Holon and its state),
-//! [`law`] (`HolonLaw`, `EnergyBalance`, the exact reference motion), [`deposition`] (commit
-//! balance, deposit ledger, exact passive projection) and [`conformance`]. Everything computes over
-//! `Rat`; the engine consumers adopt them in the later phases.
+//! Every law computes over exact rationals; no float enters a law. Each module header names its
+//! Lean owner relative to the Lean library root.
 
-pub mod exact_linear;
-pub mod exact_value;
-pub mod exact_work;
-pub mod hardware_cover;
-pub mod inertia;
-pub mod primality;
-pub mod prime_image_algebra;
-pub mod rational_polynomial;
-pub mod rebase_invariants;
-
-pub mod complex;
-pub mod conformance;
-pub mod deposition;
-pub mod dirac;
-pub mod element;
-pub mod generator;
 pub mod geometry;
-/// Receiver-specific constructions, including exact linear response and pole readings.
-pub mod receiver;
 pub mod holon;
-pub mod law;
-pub mod port;
-pub mod reaction;
+pub mod navigator;
 pub mod ratio;
-pub mod restriction;
-pub mod scalar;
-pub mod structure;
-
-pub use holon::Holon;
-
-extern crate alloc;
+pub mod receiver;

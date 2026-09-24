@@ -4,16 +4,17 @@
 # This is an exterior formal receiver, never an inference phase. It deliberately has no archived
 # `.olean` fallback and does not reinterpret missing aggregator imports as success.
 #
-#   bash tools/lean_check.sh
-#   bash tools/lean_check.sh ElementaryHolonics.Framework.Geometry
-#   bash tools/lean_check.sh ElementaryHolonics
+#   bash tools/lean_check.sh                              # the foundation library `Holonics`
+#   bash tools/lean_check.sh Holonics.Framework.Geometry  # one subject or changed module
+#   bash tools/lean_check.sh HolonicsResearch             # every research module
+#   bash tools/lean_check.sh Holonics HolonicsResearch    # both libraries
 
 set -u -o pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROJECT="$ROOT/lean"
 if [ "$#" -eq 0 ]; then
-    set -- ElementaryHolonics.Framework
+    set -- Holonics
 fi
 
 if [ ! -f "$PROJECT/lakefile.toml" ] || [ ! -f "$PROJECT/lean-toolchain" ]; then

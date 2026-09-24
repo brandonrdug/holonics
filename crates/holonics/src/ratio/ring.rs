@@ -1,12 +1,14 @@
-//! Exact machine rings used for ratio arithmetic and the portable section realization.
+//! **Exact machine rings: division with remainder and the residue face.**
 //!
-//! `ModularWords` is a host-side chart over `Z/modulus`. At `MERSENNE61`, its reduction dispatches
-//! to the exact section arithmetic in [`section`], which the CUDA kernels mirror; every other
-//! modulus uses the general exact `u128` path.
+//! Modulo is the residue face of division with remainder. [`ModularWords`] is the chart `ℤ/m`,
+//! total in both operations; at the Mersenne modulus `2^61 − 1` its reduction is the
+//! shift-and-mask fold the device compiles from the same code, and every other modulus uses the
+//! general exact `u128` path. [`CheckedIntegers`] refuses rather than wraps when a result leaves
+//! its carrier.
 
 use std::fmt;
 
-pub mod section;
+pub(crate) mod section;
 
 use self::section as section_cuda;
 use thiserror::Error;

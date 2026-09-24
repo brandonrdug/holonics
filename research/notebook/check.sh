@@ -24,7 +24,7 @@ typst compile \
   "${notebook_root}/build/attempt-sheet.pdf"
 
 (
-  cd "${repository_root}/formal/elementary-holonics"
+  cd "${repository_root}/lean"
   lake env lean "${notebook_root}/lean/U001Trace.lean"
 )
 

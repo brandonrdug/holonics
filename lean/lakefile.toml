@@ -1,18 +1,14 @@
-name = "soma_elementary_holonics"
-defaultTargets = ["ElementaryHolonics.Framework"]
+name = "holonics"
+defaultTargets = ["Holonics"]
 
+# The foundation: the transitive import closure of `Holonics.Framework`.
 [[lean_lib]]
-name = "ElementaryHolonics"
+name = "Holonics"
 
-[[lean_exe]]
-name = "m6_lean_causal_return"
-root = "M6CausalReturn"
-supportInterpreter = true
-
-[[lean_exe]]
-name = "derivation_atlas"
-root = "DerivationAtlas"
-supportInterpreter = true
+# Every other module. It imports `Holonics`; nothing in `Holonics` imports it.
+[[lean_lib]]
+name = "HolonicsResearch"
+globs = ["HolonicsResearch.*"]
 
 [[require]]
 name = "mathlib"

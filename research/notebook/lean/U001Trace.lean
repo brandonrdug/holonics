@@ -1,4 +1,4 @@
-import ElementaryHolonics.Foundation.Presentation
+import HolonicsResearch.Foundation.Presentation
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring
 
@@ -135,12 +135,12 @@ theorem repeatedRoot_nonScalar {r n : ℤ} (hn : n ≠ 0) :
   exact hn hb
 
 theorem repeatedRoot_receiverFiber {r n : ℤ} (hn : n ≠ 0) :
-    Soma.Holonics.FaceEq
+    Holonics.FaceEq
         (fun M : Matrix2 ↦ (trace M, determinant M))
         (repeatedRootFiber r n) (scalarFiber r) ∧
       repeatedRootFiber r n ≠ scalarFiber r := by
   constructor
-  · simp [Soma.Holonics.FaceEq, repeatedRootFiber, scalarFiber, trace, determinant]
+  · simp [Holonics.FaceEq, repeatedRootFiber, scalarFiber, trace, determinant]
   · exact repeatedRoot_nonScalar hn
 
 theorem linearReceiver_cayleyHamilton

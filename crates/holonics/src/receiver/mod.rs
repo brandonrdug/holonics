@@ -1,10 +1,17 @@
-//! Receiver-specific constructions over the shared Holon laws.
+//! **The receiver: a role of a participating Holon, and what it returns.**
 //!
-//! [`law::receiver`](crate::law::receiver) remains the owner of passive linear readings, widths
-//! and release vocabulary. [`causal_chord`] is the specialized exact linear-response and pole
-//! receiver. Joint active reception and its receipt are separate construction work.
+//! A receiver is a Holon joined at ports ([object](../../../../docs/ELEMENTARY_OBJECTS.md#10-receipt)).
+//! Reception changes both participants and returns a face with its receipt. The present owners:
+//!
+//! - [`face`]: the passive coholon, the active receiver with its power, and the exact faces a
+//!   reading returns (width, horizon, relation rung);
+//! - [`release`]: width over a compatible family, and release at a declared tolerance;
+//! - [`standing`]: standing as the future-sufficient retention quotient, memory and extinction;
+//! - [`causal_chord`]: the exact transfer object `C(sI − A)⁻¹B` of a linearization and its poles.
+//!
+//! Lean: `Foundation/{Receiver,ReceiverRelease,Standing,CausalChord}`, `Holon/Law`.
 
 pub mod causal_chord;
-pub mod native;
+pub mod face;
 pub mod release;
 pub mod standing;

@@ -161,6 +161,6 @@
    "inputRev": "main",
    "inherited": true,
    "configFile": "lakefile.lean"}],
- "name": "soma_elementary_holonics",
+ "name": "holonics",
  "lakeDir": ".lake",
  "fixedToolchain": false}

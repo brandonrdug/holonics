@@ -1,7 +1,6 @@
 //! **The causal chord: the exact transfer object of a linearization, and its resolvent.**
 //!
-//! [definition] This is receiver **R1** of
-//! `docs/plans/THE_RECEIVER_ATLAS_SEPARATES_WHAT_ONE_FACE_CANNOT.md`. For a local linearization
+//! [definition] For a local linearization
 //!
 //! ```text
 //! x' = A x + B u,    y = C x
@@ -9,7 +8,7 @@
 //!
 //! the receiver-relative transfer object is `H(s) = C (sI − A)^{-1} B`. This module owns it as an
 //! **exact matrix of rational functions over `Q`** — never a float, never a sampled frequency
-//! response — together with everything the plan says a returned component must carry: its source
+//! response — together with everything a returned component must carry: its source
 //! lineage, its excitation (which column of `B`), its transport path (which row of `C`), its
 //! approximation error (exactly zero, or a stated isolating interval used only as a readout) and
 //! its residual (exactly zero, certified **coefficientwise**: `(sI−A)·adj(sI−A) = det(sI−A)·I` and
@@ -17,13 +16,13 @@
 //! per power of `s`, not sampled at a point).
 //!
 //! The paired Lean owner is
-//! `formal/elementary-holonics/ElementaryHolonics/Foundation/CausalChord.lean`
-//! (`Soma.Holonics.Foundation.CausalChord`). Each theorem there appears here as a test or an
+//! `Foundation/CausalChord`
+//!. Each theorem there appears here as a test or an
 //! invariant; each definition here is the executable equivalent of the Lean object.
 //!
 //! # The governing correction: no object has one intrinsic chord
 //!
-//! [definition] The plan's first clause is that **isospectral objects exist**, so one global
+//! [definition] **Isospectral objects exist**, so one global
 //! spectrum cannot identify an arbitrary source. That is not a caveat attached to this module, it
 //! is the reason the module returns what it returns. [`separate_under_probe`] takes two
 //! linearizations with *identical characteristic polynomials* and returns the probe/readout pair at
@@ -46,19 +45,18 @@
 //!
 //! the characteristic polynomial is `det(sI−A) = Σ_k c_k s^k` and the adjugate is
 //! `adj(sI−A) = Σ_{k=1}^{n} M_k s^{n−k}`. [`ResolventExpansion`] carries both. The scalar half is
-//! already owned by [`crate::exact_linear::ExactRatMatrix::characteristic_polynomial`]
-//! (`exact_linear.rs:336`), which discards the intermediate `M_k`; this module recomputes the
+//! already owned by [`crate::ratio::linear::ExactRatMatrix::characteristic_polynomial`]
+//!, which discards the intermediate `M_k`; this module recomputes the
 //! recurrence because it needs them, and
 //! `the_expansion_agrees_with_the_existing_characteristic_owner` holds the two to exact agreement
 //! at every reading. Nothing here reimplements rank, kernel, inverse or spectrum: those are
-//! `exact_linear.rs:761/770/543`. Cross-owner comparisons to the engine-side lattice-gauge
-//! spectrum remain integration tests outside this mathematical owner.
+//! the exact linear carrier's.
 //!
 //! # Cancellation is reported, never lost
 //!
 //! [definition] `C_i adj(sI−A) B_j / det(sI−A)` is not in lowest terms. The common factor is
 //! exactly the modes that source `j` cannot excite or receiver `i` cannot observe — the
-//! uncontrollable and unobservable directions — and the plan requires them **visible as
+//! uncontrollable and unobservable directions — and they must stay **visible as
 //! cancellations and reported**. [`TransferEntry`] therefore carries the raw numerator and
 //! denominator, the exact polynomial `cancelled` gcd, and the reduced pair. [`TransferFunction`]
 //! additionally carries `atlas_cancellation`: `det(sI−A)` divided by the least common multiple of
@@ -70,12 +68,12 @@
 //! # Poles: the polynomial factor is the exact object, an interval is only a readout
 //!
 //! [definition] [`pole_atlas`] squarefree-factors the reduced denominator with
-//! [`crate::rational_polynomial::RationalPolynomial::squarefree_decomposition`], so each pole
+//! [`crate::ratio::polynomial::RationalPolynomial::squarefree_decomposition`], so each pole
 //! carries its **multiplicity as an index, not a guess**. Rational poles are returned as exact
 //! rationals. Every other pole is named by the exact squarefree factor it is a root of. Under
 //! [`PoleReading::Certified`] each factor additionally reports Sturm-certified isolating boxes for
 //! its real roots — obtained from the existing owner
-//! [`crate::rational_polynomial::rational_root_census`] (`rational_polynomial.rs:1110`), whose
+//! [`crate::ratio::polynomial::rational_root_census`], whose
 //! isolation is for the monic companion `c^{n−1}A(z/c)` and is rescaled here by the leading
 //! coefficient — and a sign-certified half-plane count. **The interval is a readout. The factor is
 //! the pole's name.**
@@ -84,7 +82,7 @@
 //! machinery this module had to write, because the repository had no owner for it. **It is no
 //! longer this module's**: the signed remainder sequence a Cauchy index reads is the Sturm chain
 //! read at `±∞` instead of at a point, so the routine lives in
-//! [`crate::rational_polynomial`] beside [`crate::exact_value::SturmChain`] and the root census,
+//! [`crate::ratio::polynomial`] beside [`crate::ratio::algebraic::SturmChain`] and the root census,
 //! and [`half_plane_count`] here is re-entry into it at the same signature. The three steps are
 //! unchanged and are stated at the owner; in outline:
 //!
@@ -111,15 +109,14 @@
 //!
 //! [definition] When `A` is symmetric the whole question is already owned: the spectrum is real and
 //! the half-plane count **is** Sylvester's signature. [`half_plane_from_symmetric`] routes to
-//! [`crate::inertia::inertia`] (`inertia.rs:375`), and [`rate_form_congruence`] routes a chart
-//! change to [`crate::inertia::congruence`] (`inertia.rs:597`), which refuses a singular chart by
-//! name. This is the connection
-//! `research/records/2026-09-15_INTEGRATING_AND_DIFFERENTIATING_ROLES_SHARE_ONE_CURRENT.md` asks
-//! for — "the intention is to connect that owner to the rate reading, not to build a second one."
+//! [`crate::ratio::linear::inertia::inertia`], and [`rate_form_congruence`] routes a chart
+//! change to [`crate::ratio::linear::inertia::congruence`], which refuses a singular chart by
+//! name. The rate reading
+//! is read through that owner rather than a second one.
 //!
 //! # Non-normal operators: the resolvent, not the spectrum, governs response
 //!
-//! [proved-derived; implemented-exact] The plan is explicit that for a non-normal `A` the
+//! [proved-derived; implemented-exact] For a non-normal `A` the
 //! eigenvalues omit the transient amplification, so the receiver must read the resolvent.
 //! [`resolvent_probe`] builds `(sI − A)^{-1}` **exactly at a Gaussian-rational probe point**
 //! `s = σ + iω`, by realifying `sI − A` over `Q` as the `2n × 2n` block matrix
@@ -154,34 +151,34 @@
 //! semisimplicity, and [`jordan_realification`] is the counterexample — purely imaginary spectrum,
 //! non-squarefree minimal polynomial, and no positive definite `G` making it `G`-skew.
 //! [`is_semisimple`] decides that exactly, as "the minimal polynomial equals its own squarefree
-//! part", through [`crate::exact_linear::ExactRatMatrix::minimal_polynomial`]
-//! (`exact_linear.rs:367`). A defective generator can sit on the seam spectrally and still have no
+//! part", through [`crate::ratio::linear::ExactRatMatrix::minimal_polynomial`]
+//!. A defective generator can sit on the seam spectrally and still have no
 //! conserving receiver.
 
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeSet;
 
+use crate::ratio::Rat;
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
-use crate::geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
-use crate::exact_value::{ExactInterval, ExactValueError};
-use crate::inertia::{Inertia, InertiaError, SymmetricForm, congruence, inertia};
-use crate::rational_polynomial::{
+use crate::ratio::algebraic::{ExactInterval, ExactValueError};
+use crate::ratio::linear::inertia::{Inertia, InertiaError, SymmetricForm, congruence, inertia};
+use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
+use crate::ratio::polynomial::{
     ExactPolynomialError, RationalPolynomial, rational_root_census, rational_roots_by_lifting,
 };
 
 /// Serialized schema name for a returned chord.
-pub const CAUSAL_CHORD_SCHEMA: &str = "holonics.causal-chord.v1";
+pub(crate) const CAUSAL_CHORD_SCHEMA: &str = "holonics.causal-chord.v1";
 
 // -------------------------------------------------------------------------------------------------
 // the linearization
 
 /// **A local linearization `(A, B, C)` in exact rationals, with named ports.**
 ///
-/// The names are not decoration: the plan requires every returned component to carry its source and
+/// Every returned component carries its source and
 /// its transport path, so a column of `B` and a row of `C` each carry the name the caller declared
 /// for it, and [`ChordComponent`] repeats both.
 ///
@@ -355,7 +352,7 @@ impl Linearization {
         self.excitation.columns()
     }
 
-    pub fn receiver_count(&self) -> usize {
+    pub(crate) fn receiver_count(&self) -> usize {
         self.readout.rows()
     }
 
@@ -364,7 +361,7 @@ impl Linearization {
     /// The Lean owner's `rebase_numerator` / `rebase_denominator` / `rebase_transfer` prove that the
     /// transfer object is invariant under this, which is exactly why it is a *chart* change and not
     /// a different object. A singular `T` is refused by name, for the same reason
-    /// [`crate::inertia::congruence`] refuses one.
+    /// [`crate::ratio::linear::inertia::congruence`] refuses one.
     pub fn rebased(&self, chart: &ExactRatMatrix) -> Result<Self, ChordRefusal> {
         if !chart.is_square() || chart.rows() != self.extent() {
             return Err(ChordRefusal::ChartShape {
@@ -373,9 +370,7 @@ impl Linearization {
                 columns: chart.columns(),
             });
         }
-        let inverse = chart
-            .inverse()
-            .map_err(|_| ChordRefusal::SingularChart)?;
+        let inverse = chart.inverse().map_err(|_| ChordRefusal::SingularChart)?;
         Ok(Self {
             schema: self.schema.clone(),
             lineage: format!("{}|rebased", self.lineage),
@@ -509,7 +504,9 @@ impl ResolventExpansion {
 }
 
 /// The exact Faddeev–LeVerrier recurrence, keeping the intermediate matrices.
-pub fn resolvent_expansion(state: &ExactRatMatrix) -> Result<ResolventExpansion, ChordRefusal> {
+pub(crate) fn resolvent_expansion(
+    state: &ExactRatMatrix,
+) -> Result<ResolventExpansion, ChordRefusal> {
     if !state.is_square() {
         return Err(ChordRefusal::StateNotSquare {
             rows: state.rows(),
@@ -707,7 +704,11 @@ impl TryFrom<TransferEntryWire> for TransferEntry {
                 derived: "1".to_owned(),
             });
         }
-        if wire.numerator.degree().is_some_and(|degree| degree >= extent) {
+        if wire
+            .numerator
+            .degree()
+            .is_some_and(|degree| degree >= extent)
+        {
             return Err(ChordRefusal::TransferWireDisagrees {
                 relation: "the numerator's degree, which `C adj(sI−A) B` holds below the extent",
                 declared: format!("{:?}", wire.numerator.degree()),
@@ -860,11 +861,12 @@ fn check_entry_grid(entries: &[TransferEntry]) -> Result<(), ChordRefusal> {
         .map(|entry| entry.excitation)
         .max()
         .map_or(0, |top| top + 1);
-    let expected = receivers
-        .checked_mul(sources)
-        .ok_or_else(|| ChordRefusal::StateExtentOverflows {
-            extent: receivers.max(sources),
-        })?;
+    let expected =
+        receivers
+            .checked_mul(sources)
+            .ok_or_else(|| ChordRefusal::StateExtentOverflows {
+                extent: receivers.max(sources),
+            })?;
     if entries.len() != expected {
         return Err(ChordRefusal::TransferWireDisagrees {
             relation: "the entry count against the port grid the indices declare",
@@ -921,7 +923,9 @@ impl TransferFunction {
 }
 
 /// `H(s) = C adj(sI−A) B / det(sI−A)`, entry by entry, with the cancellations named.
-pub fn transfer_function(linearization: &Linearization) -> Result<TransferFunction, ChordRefusal> {
+pub(crate) fn transfer_function(
+    linearization: &Linearization,
+) -> Result<TransferFunction, ChordRefusal> {
     let expansion = resolvent_expansion(&linearization.state)?;
     let extent = expansion.extent;
     let denominator = expansion.characteristic.clone();
@@ -1033,27 +1037,27 @@ fn polynomial_lcm(
 
 /// **The half-plane counter now lives beside the root-counting owner.**
 ///
-/// [definition] The shared half-plane counter is owned by `crate::rational_polynomial`, beside the Sturm chain the Cauchy index is built from
+/// [definition] The shared half-plane counter is owned by `crate::ratio::polynomial`, beside the Sturm chain the Cauchy index is built from
 /// and beside `rational_root_census`, because those are the same machinery: the signed remainder
-/// sequence over `Z` with tracked signs is [`crate::exact_value::SturmChain`], and reading it at
+/// sequence over `Z` with tracked signs is [`crate::ratio::algebraic::SturmChain`], and reading it at
 /// `±∞` rather than at a point is the only difference between a Sturm count and a Cauchy index.
 /// The chart adapters below map refusals into [`ChordRefusal`]'s own species so a caller matching on
 /// [`ChordRefusal::HalfPlaneParityFailure`] or
 /// [`ChordRefusal::HalfPlaneRefinementExhausted`] still sees them.
-use crate::rational_polynomial::HalfPlaneCount;
+use crate::ratio::polynomial::HalfPlaneCount;
 
 /// The number of roots of `p` on the imaginary axis, with multiplicity.
 ///
-/// Re-entry into [`crate::rational_polynomial::axis_root_count`].
+/// Re-entry into [`crate::ratio::polynomial::axis_root_count`].
 pub fn axis_root_count(polynomial: &RationalPolynomial) -> Result<usize, ChordRefusal> {
-    crate::rational_polynomial::axis_root_count(polynomial).map_err(chord_refusal)
+    crate::ratio::polynomial::axis_root_count(polynomial).map_err(chord_refusal)
 }
 
 /// **The exact half-plane population of a real polynomial's roots, with multiplicity.**
 ///
-/// Re-entry into [`crate::rational_polynomial::half_plane_count`], which is the owner.
+/// Re-entry into [`crate::ratio::polynomial::half_plane_count`], which is the owner.
 pub fn half_plane_count(polynomial: &RationalPolynomial) -> Result<HalfPlaneCount, ChordRefusal> {
-    crate::rational_polynomial::half_plane_count(polynomial).map_err(chord_refusal)
+    crate::ratio::polynomial::half_plane_count(polynomial).map_err(chord_refusal)
 }
 
 /// Map the two refusals this module named before the owner moved back onto its own species, so the
@@ -1073,8 +1077,8 @@ fn chord_refusal(error: ExactPolynomialError) -> ChordRefusal {
 /// **The half-plane count of a symmetric operator, from Sylvester's signature.**
 ///
 /// A symmetric rational `A` has real spectrum, so `Re λ > 0`, `= 0` and `< 0` are exactly the
-/// positive, null and negative indices of the form. This routes to [`crate::inertia::inertia`]
-/// (`inertia.rs:375`) rather than running the Routh–Hurwitz machinery, which is both cheaper and
+/// positive, null and negative indices of the form. This routes to [`crate::ratio::linear::inertia::inertia`]
+/// rather than running the Routh–Hurwitz machinery, which is both cheaper and
 /// the connection the September 15 record asks for.
 pub fn half_plane_from_symmetric(state: &ExactRatMatrix) -> Result<HalfPlaneCount, ChordRefusal> {
     let form = SymmetricForm::from_rows(state.to_rows())?;
@@ -1198,8 +1202,10 @@ impl TryFrom<PoleFactorWire> for PoleFactor {
             if pair[0].upper > pair[1].lower {
                 return Err(ChordRefusal::PoleWireDisagrees {
                     relation: "the isolating readouts, which are ascending and pairwise disjoint",
-                    declared: format!("[{}, {}] then [{}, {}]",
-                        pair[0].lower, pair[0].upper, pair[1].lower, pair[1].upper),
+                    declared: format!(
+                        "[{}, {}] then [{}, {}]",
+                        pair[0].lower, pair[0].upper, pair[1].lower, pair[1].upper
+                    ),
                     derived: "ascending, disjoint".to_owned(),
                 });
             }
@@ -1420,20 +1426,17 @@ impl PoleAtlas {
     }
 }
 
-
 /// Every rational root of a polynomial, by the prime-lifting route rather than the Sturm census.
 ///
-/// [`rational_root_census`] (`rational_polynomial.rs:1110`) is complete and certified, but its
+/// [`rational_root_census`] is complete and certified, but its
 /// descent runs from an absolute Cauchy bound that, on a characteristic polynomial built from a
 /// physical network operator, is astronomically wider than the roots themselves — the same
 /// pathology the former lattice-gauge receiver records and rebases away. [`rational_roots_by_lifting`]
-/// (`rational_polynomial.rs:906`) answers the same question through one prime receiver and
+/// answers the same question through one prime receiver and
 /// verifies every returned candidate by exact evaluation, so it is a certificate and not a
 /// heuristic. When no prime leaves every residue root simple it refuses by name, and the census is
 /// the declared fallback.
-fn rational_poles_by_lifting(
-    polynomial: &RationalPolynomial,
-) -> Result<Vec<Rat>, ChordRefusal> {
+fn rational_poles_by_lifting(polynomial: &RationalPolynomial) -> Result<Vec<Rat>, ChordRefusal> {
     if polynomial.degree().unwrap_or(0) == 0 {
         return Ok(Vec::new());
     }
@@ -1684,9 +1687,7 @@ fn rational_laurent(
         remaining = remaining.divided_exactly_by(&linear)?;
     }
     if remaining.evaluate(pole).is_zero() {
-        return Err(ChordRefusal::PoleOrderDisagrees {
-            order,
-        });
+        return Err(ChordRefusal::PoleOrderDisagrees { order });
     }
     let shift = RationalPolynomial::new(vec![pole.clone(), Rat::one()]);
     let shifted_numerator = numerator.composed_with(&shift);
@@ -1952,10 +1953,9 @@ impl ModeSupport {
 /// The rational eigenvalues of `A` with their modes, their supports and their port reachability.
 ///
 /// The eigenvalue population comes from [`rational_poles_by_lifting`] and the kernels from
-/// `exact_linear.rs:770`; the multiplicities are read by exact division. The engine-side
-/// spectrum census is compared against this route by a separate integration test. Nothing here
+/// the exact linear carrier; the multiplicities are read by exact division. Nothing here
 /// recomputes a kernel, a rank or a root.
-pub fn rational_mode_supports(
+pub(crate) fn rational_mode_supports(
     linearization: &Linearization,
 ) -> Result<Vec<ModeSupport>, ChordRefusal> {
     let characteristic = linearization.state.characteristic_polynomial()?;
@@ -1977,9 +1977,7 @@ pub fn rational_mode_supports(
     let identity = ExactRatMatrix::identity(extent)?;
     let mut supports = Vec::new();
     for (eigenvalue, multiplicity) in &population {
-        let shifted = linearization
-            .state
-            .subtract(&identity.scaled(eigenvalue))?;
+        let shifted = linearization.state.subtract(&identity.scaled(eigenvalue))?;
         let eigenvectors = shifted.kernel_basis()?;
         let left_eigenvectors = shifted.transpose()?.kernel_basis()?;
         let mut support = BTreeSet::new();
@@ -2315,7 +2313,7 @@ pub fn seam_form(
 /// The rate form under a chart change, through the existing congruence owner.
 ///
 /// `Σ_{G'} = P^T Σ_G P` for `G' = P^T G P` and `A' = P^{-1} A P`. The singular case is
-/// [`crate::inertia::congruence`]'s refusal, by name, and is not re-implemented here.
+/// [`crate::ratio::linear::inertia::congruence`]'s refusal, by name, and is not re-implemented here.
 pub fn rate_form_congruence(
     state: &ExactRatMatrix,
     metric: &SymmetricForm,
@@ -2342,7 +2340,7 @@ pub fn is_semisimple(state: &ExactRatMatrix) -> Result<bool, ChordRefusal> {
 /// **The space of metrics that make a generator `G`-skew, with the refutation exhibited.**
 ///
 /// `{G symmetric : AᵀG + GA = 0}` is a linear subspace of the symmetric forms, and it is solved
-/// here exactly through `exact_linear.rs:770`. The plan's biconditional says a positive definite
+/// here exactly through the exact linear carrier. The biconditional says a positive definite
 /// member exists exactly when `A` is semisimple with purely imaginary spectrum. Both halves are
 /// answered concretely:
 ///
@@ -2353,7 +2351,7 @@ pub fn is_semisimple(state: &ExactRatMatrix) -> Result<bool, ChordRefusal> {
 ///   [`jordan_realification`] is exactly the case it refutes.
 /// - **Exhibition.** The declared candidate set is the solved basis, its sum, and the Euclidean
 ///   metric when that is admissible. A positive definite member found among them is returned, and
-///   [`crate::inertia::inertia`] certifies it.
+///   [`crate::ratio::linear::inertia::inertia`] certifies it.
 ///
 /// When neither happens the answer is `None`. Deciding whether a linear subspace of symmetric
 /// forms meets the positive definite cone is a feasibility question this receiver does not claim
@@ -2362,7 +2360,7 @@ pub fn is_semisimple(state: &ExactRatMatrix) -> Result<bool, ChordRefusal> {
 /// **A remounted space re-derives both of its answers.** A vanishing diagonal is a diagonal
 /// coordinate on which the *whole* subspace vanishes, which the exhibited basis decides completely,
 /// so the list is recomputed from the basis and refused on disagreement. An exhibited witness is
-/// re-certified through [`crate::inertia::inertia`] and re-solved for membership in the span of the
+/// re-certified through [`crate::ratio::linear::inertia::inertia`] and re-solved for membership in the span of the
 /// basis, because a positive definite form that is not in the subspace is not a conserving
 /// receiver. The subspace is a statement about a generator the struct does not carry, so which
 /// forms are in it at all is testimony; everything the exhibited basis decides is decided.
@@ -2447,7 +2445,7 @@ impl TryFrom<ConservingReceiverSpaceWire> for ConservingReceiverSpace {
 /// Whether a symmetric form is a rational combination of the given ones, decided exactly.
 ///
 /// The forms are flattened to their `extent²` coordinates and the membership question is one
-/// preimage solve through `exact_linear.rs:823`. An empty basis spans only the zero form.
+/// preimage solve through the exact linear carrier. An empty basis spans only the zero form.
 fn form_is_spanned(form: &SymmetricForm, basis: &[SymmetricForm]) -> Result<bool, ChordRefusal> {
     let extent = form.extent();
     let coordinates = conserving_equation_count(extent)?;
@@ -2557,8 +2555,8 @@ pub fn conserving_receiver_space(
             }
             for row in 0..extent {
                 for column in 0..extent {
-                    accumulated[row][column] = &accumulated[row][column]
-                        + coefficient * &basis_forms[index][row][column];
+                    accumulated[row][column] =
+                        &accumulated[row][column] + coefficient * &basis_forms[index][row][column];
                 }
             }
         }
@@ -2605,24 +2603,14 @@ pub fn conserving_receiver_space(
 /// Characteristic polynomial `(s²+1)²`, spectrum `{i, i, −i, −i}` — entirely on the imaginary axis
 /// — and minimal polynomial `(s²+1)²`, so **not semisimple**.
 pub fn jordan_realification() -> ExactRatMatrix {
-    integer_matrix(&[
-        &[0, 1, -1, 0],
-        &[0, 0, 0, -1],
-        &[1, 0, 0, 1],
-        &[0, 1, 0, 0],
-    ])
+    integer_matrix(&[&[0, 1, -1, 0], &[0, 0, 0, -1], &[1, 0, 0, 1], &[0, 1, 0, 0]])
 }
 
 /// The realification over `Q` of `diag(i, i)` — the same spectrum, semisimple.
 ///
 /// Characteristic polynomial `(s²+1)²`, minimal polynomial `s²+1`.
 pub fn semisimple_realification() -> ExactRatMatrix {
-    integer_matrix(&[
-        &[0, 0, -1, 0],
-        &[0, 0, 0, -1],
-        &[1, 0, 0, 0],
-        &[0, 1, 0, 0],
-    ])
+    integer_matrix(&[&[0, 0, -1, 0], &[0, 0, 0, -1], &[1, 0, 0, 0], &[0, 1, 0, 0]])
 }
 
 fn integer_matrix(rows: &[&[i64]]) -> ExactRatMatrix {
@@ -2703,7 +2691,8 @@ impl TryFrom<ChordComponentWire> for ChordComponent {
         if wire.multiplicity == 0 {
             return Err(ChordRefusal::PoleOrderDisagrees { order: 0 });
         }
-        if wire.pole_factor.degree().is_none_or(|degree| degree == 0) || !wire.pole_factor.is_monic()
+        if wire.pole_factor.degree().is_none_or(|degree| degree == 0)
+            || !wire.pole_factor.is_monic()
         {
             return Err(ChordRefusal::ChordWireDisagrees {
                 object: "a chord component",
@@ -2717,7 +2706,12 @@ impl TryFrom<ChordComponentWire> for ChordComponent {
             });
         }
         match (&wire.rational_pole, &wire.residue) {
-            (Some(pole), ChordResidue::Rational { pole: named, order, .. }) => {
+            (
+                Some(pole),
+                ChordResidue::Rational {
+                    pole: named, order, ..
+                },
+            ) => {
                 if named != pole {
                     return Err(ChordRefusal::ChordWireDisagrees {
                         object: "a chord component",
@@ -2897,10 +2891,7 @@ impl TryFrom<CausalChordWire> for CausalChord {
                 return Err(ChordRefusal::ChordWireDisagrees {
                     object: "a causal chord",
                     relation: "a component's port pair against the transfer matrix's entries",
-                    declared: format!(
-                        "({}, {})",
-                        component.transport_path, component.excitation
-                    ),
+                    declared: format!("({}, {})", component.transport_path, component.excitation),
                     derived: "a port pair the atlas carries".to_owned(),
                 });
             };
@@ -2979,7 +2970,7 @@ pub fn causal_chord(linearization: &Linearization) -> Result<CausalChord, ChordR
 }
 
 /// The chord at a declared reading.
-pub fn causal_chord_read(
+pub(crate) fn causal_chord_read(
     linearization: &Linearization,
     reading: PoleReading,
 ) -> Result<CausalChord, ChordRefusal> {
@@ -3031,11 +3022,10 @@ pub fn causal_chord_read(
             // Whatever the rational roots do not account for.
             let mut algebraic = factor.factor.clone();
             for pole in &factor.rational_poles {
-                algebraic = algebraic
-                    .divided_exactly_by(&RationalPolynomial::new(vec![
-                        -pole.clone(),
-                        Rat::one(),
-                    ]))?;
+                algebraic = algebraic.divided_exactly_by(&RationalPolynomial::new(vec![
+                    -pole.clone(),
+                    Rat::one(),
+                ]))?;
             }
             if algebraic.degree().unwrap_or(0) == 0 {
                 continue;
@@ -3232,39 +3222,6 @@ pub fn separate_under_probe(
 // -------------------------------------------------------------------------------------------------
 // the elastic network of a rigidity Jacobian
 
-/// Which linearized network response is being built from a constraint Jacobian.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case")]
-pub enum NetworkForm {
-    /// `A = −JᵀJ`: the overdamped relaxation of the quadratic constraint energy `|J v|²/2` at unit
-    /// mobility. Symmetric negative semidefinite, so the spectrum is real and
-    /// [`half_plane_from_symmetric`] reads it through [`crate::inertia::inertia`]. Its kernel is
-    /// exactly the infinitesimal motion space `ker J` the rigidity receiver already returns.
-    OverdampedRelaxation,
-}
-
-/// **The linearized network response of a constraint Jacobian, as a probed linearization.**
-///
-/// The Jacobian is the exact rational matrix an engine rigidity receiver returns; nothing is
-/// recomputed here. `probe` and `readout_site` are *coordinate* indices into the flattened `d·n` configuration
-/// space, so a caller declares an occurrence and an axis by their flattened address.
-pub fn elastic_network(
-    lineage: impl Into<String>,
-    jacobian: &ExactRatMatrix,
-    form: NetworkForm,
-    probe: usize,
-    readout_site: usize,
-) -> Result<Linearization, ChordRefusal> {
-    match form {
-        NetworkForm::OverdampedRelaxation => {}
-    }
-    let state = jacobian
-        .transpose()?
-        .multiply(jacobian)?
-        .scaled(&(-Rat::one()));
-    Linearization::single_probe(lineage, state, probe, readout_site)
-}
-
 // -------------------------------------------------------------------------------------------------
 // refusals
 
@@ -3383,18 +3340,5 @@ impl PartialEq for ChordRefusal {
     }
 }
 
-/// A convenience for callers that want the components grouped by transport path.
-pub fn components_by_path(chord: &CausalChord) -> BTreeMap<usize, Vec<&ChordComponent>> {
-    let mut grouped: BTreeMap<usize, Vec<&ChordComponent>> = BTreeMap::new();
-    for component in &chord.components {
-        grouped
-            .entry(component.transport_path)
-            .or_default()
-            .push(component);
-    }
-    grouped
-}
-
 #[cfg(test)]
-#[path = "causal_chord/tests.rs"]
 mod tests;

@@ -1,19 +1,17 @@
 //! **Receiver width and release: uncertainty as a structure, not a scalar.**
 //!
-//! [definition] This module is the executable owner of item **R6** of
-//! `docs/plans/THE_RECEIVER_ATLAS_SEPARATES_WHAT_ONE_FACE_CANNOT.md`. Its Lean counterpart is
-//! `formal/elementary-holonics/ElementaryHolonics/Foundation/ReceiverRelease.lean`
-//! (namespace `Soma.Holonics.Foundation.ReceiverRelease`), and the correspondence is the
-//! deliverable:
+//! [definition] A navigator runs until its receiver face is within tolerance; then it is released.
+//! Uncertainty is the width of a reading over a compatible family, and release is a declared law
+//! over lawful returns. The Lean counterpart is `Foundation/ReceiverRelease`:
 //!
 //! | Lean | Rust |
 //! |---|---|
-//! | `width` | [`width`] and [`crate::law::receiver::ReceiverWidth`] |
-//! | `width_nonneg` | [`crate::law::receiver::ReceiverWidth::diameter`] is a maximum of absolute separations |
-//! | `abs_sub_le_width` | [`crate::law::receiver::ReceiverWidth::attaining`], the pair that attains it |
+//! | `width` | [`width`] and [`crate::receiver::face::ReceiverWidth`] |
+//! | `width_nonneg` | [`crate::receiver::face::ReceiverWidth::diameter`] is a maximum of absolute separations |
+//! | `abs_sub_le_width` | [`crate::receiver::face::ReceiverWidth::attaining`], the pair that attains it |
 //! | `width_le_of_bounds` | [`ExactZonotope::supremum_diameter`], the enclosure route |
 //! | `width_mono` | `the_width_is_monotone_under_fibre_inclusion` |
-//! | `width_eq_zero_iff` | [`crate::law::receiver::ReceiverWidth::is_zero`] |
+//! | `width_eq_zero_iff` | [`crate::receiver::face::ReceiverWidth::is_zero`] |
 //! | `releasable_at_every_tolerance_iff_width_zero` | `width_zero_releases_at_every_tolerance` |
 //! | `NonExpansive`, `width_nonExpansive_factor` | [`FactorMap`], [`FactoredReading::verify_non_expansive`] and `a_non_expansive_coarser_receiver_has_no_larger_width` |
 //! | `expansive_factor_increases_width` | `an_expansive_factor_map_widens_the_reading` |
@@ -21,33 +19,24 @@
 //! | `ReleaseLaw`, `ReleaseLaw.sound`, `ReleaseLaw.widenSound` | [`DecisionLaw`] and [`release`], which refuses a release outside tolerance by name |
 //! | `every_lawful_return_other_than_hold_ask_or_no_continuation_is_inside_its_tolerance` | [`release`]'s `Released`, `Widen` and `ReleaseCoarser` arms, and [`LawfulOptions::assemble`]'s tolerance check |
 //! | `coarser_receiver_factors`, `releaseCoarser` | [`CoarseningTower`], [`release_coarser`] and [`CoarserRelease`], which carries the tolerance it was searched under |
-//! | `Releasable` | [`crate::law::receiver::ReceiverWidth::releasable_at`] |
+//! | `Releasable` | [`crate::receiver::face::ReceiverWidth::releasable_at`] |
 //! | `no_default_among_the_lawful_returns` | `two_lawful_laws_return_different_arms` |
 //! | `future_stable_event_with_unstable_timing` | `an_event_is_future_stable_while_its_timing_is_not` |
 //! | `timingInsufficiency` | `the_coarse_event_reading_does_not_determine_the_timing` |
 //!
-//! Item **T5** of `docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md` adds
-//! the horizon's second coordinate. The same Lean owner carries it, and the tube-side consumer is
-//! `crates/holonic-engine/src/continuing_tube.rs`.
+//! The horizon's second coordinate (the tower index) is carried by the same Lean owner:
 //!
 //! | Lean | Rust |
 //! |---|---|
-//! | `Horizon`, `Horizon.longitudinalOnly`, `Horizon.Within` | [`crate::law::receiver::Horizon`], [`crate::law::receiver::Horizon::longitudinal_only`], [`crate::law::receiver::Horizon::contains`] |
-//! | `horizonWithin_is_not_total` | `the_horizon_has_two_coordinates_that_are_not_one_scale`; [`crate::law::receiver::Horizon`] derives no `Ord` |
-//! | `ChainDistanceAtMost`, `chainDistance_symm`, `chainDistance_trans` | `continuing_tube::index_distance` and `continuing_tube::IndexReading` |
-//! | `Comparable`, `chainDistance_orderDual` | `continuing_tube::IndexDirection`, which names the direction the same distance is walked in |
-//! | `TwoAxisReach`, `twoAxisWidth` | `continuing_tube::{HorizonReach, two_axis_width}` |
-//! | `twoAxisWidth_mono`, `twoAxisWidth_mono_longitudinal`, `twoAxisWidth_mono_index` | `the_two_axis_width_is_monotone_in_each_coordinate` |
-//! | `twoAxisWidth_at_index_zero_is_the_longitudinal_width`, `longitudinal_case_is_the_existing_width_law` | `the_longitudinal_only_case_is_the_existing_width` |
-//! | `coarseReach`, `coarse_width_eq_zero`, `fineFibre` | `continuing_tube::{IndexDirection, Plurality}` |
-//! | `looking_toward_the_coarse_is_determined_and_toward_the_fine_is_plural` | `the_reach_is_a_face_toward_the_coarse_and_a_fibre_toward_the_fine` |
+//! | `Horizon`, `Horizon.longitudinalOnly`, `Horizon.Within` | [`crate::receiver::face::Horizon`], [`crate::receiver::face::Horizon::longitudinal_only`], [`crate::receiver::face::Horizon::contains`] |
+//! | `horizonWithin_is_not_total` | `the_horizon_has_two_coordinates_that_are_not_one_scale`; [`crate::receiver::face::Horizon`] derives no `Ord` |
 //! | `width` over already-read faces | [`width_over_readings`], which [`width_enumerated`] now is |
 //!
 //! # The object
 //!
 //! [definition] For a **compatible family** — the preimage/observation fibre of
 //! the receiver-atlas preimage fibre, carried here either enumerated
-//! ([`CompatibleFamily::Finite`]) or enclosed ([`CompatibleFamily::Enclosed`]) — an exact `h`-step
+//! ([`CompatibleFamily::enumerated`]) or enclosed ([`CompatibleFamily::enclosed`]) — an exact `h`-step
 //! map `Φ_h` and a receiver reading `R`, the **width** is
 //!
 //! ```text
@@ -58,7 +47,7 @@
 //!
 //! # Why an enclosure is exact here
 //!
-//! [implemented-exact] The first real dynamics is [`holonics::receiver::causal_chord::Linearization`]'s
+//! [implemented-exact] The first real dynamics is [`crate::receiver::causal_chord::Linearization`]'s
 //! `x_{t+1} = A x_t + B u_t` over `Q`. The image of a box under an exact linear map is **not** a
 //! box, but it *is* an exact zonotope: `A·(c + G e) = A c + (A G) e`. [`ExactZonotope`] carries
 //! that centre and those generators exactly, [`horizon_image`] pushes a box of compatible states
@@ -107,23 +96,21 @@
 use std::collections::BTreeMap;
 use std::fmt::{self, Debug};
 
+use crate::ratio::Rat;
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
-use crate::geometry::Rat;
 use serde::{Deserialize, Serialize};
 
+use crate::ratio::linear::ExactRatMatrix;
 use crate::receiver::causal_chord::Linearization;
-use crate::exact_linear::ExactRatMatrix;
 
-/// The face, norm, passive linear reading, width and witness, two-axis horizon, and their validated
-/// wire forms remain owned by `holonics::law::receiver`. This module owns the executable dynamics,
-/// compatible-family carriers, coarsening and declared release law that consume those faces.
-/// `LinearReading` remains the passive coholon (`passive_coholon`,
-/// `Holon/Law.lean::passive_reading`).
-use crate::law::receiver::{
+// The faces, norm, passive linear reading, width, witness and two-axis horizon are
+// `crate::receiver::face`; this module owns the dynamics, compatible families, coarsening and the
+// declared release law that consume them.
+use crate::receiver::face::{
     CoarserClaim, CoarserToleranceClaim, DiameterNorm, ExactFace, FAMILY_CEILING, HORIZON_CEILING,
-    LinearReading, Reading, ReceiverWidth,
-    ReleasedClaim, WidthRefusal, WidthWitness, WidenClaim, width_over_readings,
+    LinearReading, Reading, ReceiverWidth, ReleasedClaim, WidenClaim, WidthRefusal, WidthWitness,
+    width_over_readings,
 };
 
 /// The ceiling on the number of uncertainty generators an enclosure may carry.
@@ -132,7 +119,7 @@ use crate::law::receiver::{
 /// [`horizon_image`] multiplies the admitted-input generator count by the declared horizon. The
 /// ceiling is checked with checked arithmetic **before** any allocation, so a hostile horizon
 /// declaration is a typed refusal and never a memory request.
-pub const GENERATOR_CEILING: usize = 4096;
+pub(crate) const GENERATOR_CEILING: usize = 4096;
 
 /// The ceiling on the carrier extent a declared linearization may present to [`horizon_image`].
 ///
@@ -148,21 +135,18 @@ pub const EXTENT_CEILING: usize = 256;
 /// [definition] The two axis ceilings above bound each declaration separately; this bounds the
 /// work, which is what a hostile declaration actually buys. The product is formed with checked
 /// arithmetic, so a declaration whose product overflows `usize` is refused rather than wrapping.
-pub const MULTIPLY_WORK_CEILING: usize = 1 << 24;
+pub(crate) const MULTIPLY_WORK_CEILING: usize = 1 << 24;
 
 /// The ceiling on the number of steps a declared coarsening tower may carry to one search.
 ///
 /// [definition] [`release_coarser`] checks the factoring of every step over every unordered pair
 /// of the fibre, so the work is `steps · n(n−1)/2` with `n` bounded by [`FAMILY_CEILING`]. This
 /// ceiling bounds the step count before the first step runs.
-pub const TOWER_STEP_CEILING: usize = 256;
+pub(crate) const TOWER_STEP_CEILING: usize = 256;
 
 /// The ceiling on the number of candidate observations one [`narrowing_observation`] call may
-/// declare.
-///
-/// [definition] Every candidate partitions the fibre and re-reads the target width inside each
-/// level set, so the work is linear in the candidate count and quadratic in the fibre. This
-/// ceiling bounds the candidate count before the first candidate is read.
+/// declare: every candidate partitions the fibre and re-reads the target width inside each level
+/// set, so the work is linear in the candidate count and quadratic in the fibre.
 pub const CANDIDATE_CEILING: usize = 1024;
 
 // -------------------------------------------------------------------------------------------
@@ -199,11 +183,9 @@ impl fmt::Display for GeneratorSource {
 
 /// One generator of an exact zonotope: a column of exact rationals with the source it came from.
 ///
-/// A zonotope column is a direction of an exact set, not a clocked transport like
-/// `crate::generator::Generator`. Its serde name and shape are `Generator` for existing
-/// current-format zonotope packets.
+/// A zonotope generator is a direction of an exact set (the algebraic sense of the word), not a
+/// clocked transport like [`crate::navigator::Navigator`].
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename = "Generator")]
 pub struct ZonotopeGenerator {
     /// Where the unresolved direction came from.
     pub source: GeneratorSource,
@@ -335,7 +317,7 @@ impl ExactZonotope {
     }
 
     /// The image under an exact linear map. Exact: `M·(c + G e) = M c + (M G) e`.
-    pub fn mapped(&self, map: &ExactRatMatrix) -> Result<Self, WidthRefusal> {
+    pub(crate) fn mapped(&self, map: &ExactRatMatrix) -> Result<Self, WidthRefusal> {
         if map.columns() != self.dimension {
             return Err(WidthRefusal::DimensionMismatch {
                 declared: self.dimension,
@@ -397,19 +379,16 @@ impl ExactZonotope {
     }
 
     /// The exact half-extent of the enclosure along one coordinate: `Σ_j |G_ij|`.
-    pub fn coordinate_half_extent(&self, coordinate: usize) -> Result<Rat, WidthRefusal> {
+    pub(crate) fn coordinate_half_extent(&self, coordinate: usize) -> Result<Rat, WidthRefusal> {
         if coordinate >= self.dimension {
             return Err(WidthRefusal::DimensionMismatch {
                 declared: self.dimension,
                 found: coordinate,
             });
         }
-        Ok(self
-            .generators
-            .iter()
-            .fold(Rat::zero(), |sum, generator| {
-                sum + generator.column[coordinate].abs()
-            }))
+        Ok(self.generators.iter().fold(Rat::zero(), |sum, generator| {
+            sum + generator.column[coordinate].abs()
+        }))
     }
 
     /// **The exact sup-norm diameter** `2·max_i Σ_j |G_ij|`, with the coordinate attaining it.
@@ -495,22 +474,20 @@ pub fn horizon_image(
             ceiling: HORIZON_CEILING,
         });
     }
-    let input_total = horizon
-        .checked_mul(inputs.generators().len())
-        .ok_or(WidthRefusal::GeneratorCountOverflows {
+    let input_total = horizon.checked_mul(inputs.generators().len()).ok_or(
+        WidthRefusal::GeneratorCountOverflows {
             states: states.generators().len(),
             inputs: inputs.generators().len(),
             horizon,
-        })?;
-    let total = states
-        .generators()
-        .len()
-        .checked_add(input_total)
-        .ok_or(WidthRefusal::GeneratorCountOverflows {
+        },
+    )?;
+    let total = states.generators().len().checked_add(input_total).ok_or(
+        WidthRefusal::GeneratorCountOverflows {
             states: states.generators().len(),
             inputs: inputs.generators().len(),
             horizon,
-        })?;
+        },
+    )?;
     if total > GENERATOR_CEILING {
         return Err(WidthRefusal::GeneratorCeiling {
             requested: total,
@@ -692,9 +669,7 @@ impl CompatibleFamily {
     /// law; only defined between two enumerated families.
     pub fn is_subfamily_of(&self, other: &Self) -> Option<bool> {
         match (self.members(), other.members()) {
-            (Some(mine), Some(theirs)) => {
-                Some(mine.iter().all(|member| theirs.contains(member)))
-            }
+            (Some(mine), Some(theirs)) => Some(mine.iter().all(|member| theirs.contains(member))),
             _ => None,
         }
     }
@@ -1062,14 +1037,14 @@ pub fn release_coarser(
 }
 
 /// The quotient a finer reading makes of an enumerated family: member `k` transports its face and
-/// retains itself. It is the core restriction's [`Transition`](crate::restriction::tower::Transition)
+/// retains itself. It is the core restriction's [`Transition`](crate::holon::restriction::tower::Transition)
 /// over which [`CoarseningTower::descent`] asks each step to factor; the residual is the member,
 /// which is exactly what a later finer receiver reopens.
 struct FaceQuotient {
     faces: Vec<ExactFace>,
 }
 
-impl crate::restriction::tower::Transition for FaceQuotient {
+impl crate::holon::restriction::tower::Transition for FaceQuotient {
     type Source = usize;
     type Target = Option<ExactFace>;
     type Residual = usize;
@@ -1090,15 +1065,15 @@ impl crate::restriction::tower::Transition for FaceQuotient {
 /// One step of a coarsening tower read as the core restriction's factor descent: the step's
 /// reading factors through the reading below it (the witness carries the induced map on its
 /// faces), or the pairs it separates that the finer reading identified.
-pub type CoarseningDescent =
-    crate::restriction::FactorDescent<Option<ExactFace>, usize, ExactFace>;
+pub(crate) type CoarseningDescent =
+    crate::holon::restriction::FactorDescent<Option<ExactFace>, usize, ExactFace>;
 
 impl CoarseningTower {
     /// **The tower read as core descents**, one per step up to and including the first step that
     /// does not factor — the step at which [`release_coarser`] refuses with
     /// [`WidthRefusal::CoarserDoesNotFactor`], whose `(left, right)` is that descent's first
-    /// break (`Foundation/ReceiverRelease.lean::coarser_receiver_factors`,
-    /// `Foundation/Standing.lean::standingLaw_exists_iff_future_factors`).
+    /// break (`Foundation/ReceiverRelease.coarser_receiver_factors`,
+    /// `Foundation/Standing.standingLaw_exists_iff_future_factors`).
     pub fn descent(
         &self,
         fine: &dyn Reading,
@@ -1127,7 +1102,7 @@ impl CoarseningTower {
                 .map(|member| step.reading.read(member))
                 .collect::<Result<Vec<_>, _>>()?;
             let quotient = FaceQuotient { faces: previous };
-            let descent = crate::restriction::factor_descent(
+            let descent = crate::holon::restriction::factor_descent(
                 &quotient,
                 |member: &usize| coarse[*member].clone(),
                 &indices,
@@ -1192,7 +1167,10 @@ impl Reading for FactoredReading<'_> {
     fn read(&self, state: &[Rat]) -> Result<ExactFace, WidthRefusal> {
         match self.fine.read(state)? {
             ExactFace::Vector(values) => Ok(ExactFace::Vector(
-                values.iter().map(|value| self.factor.apply(value)).collect(),
+                values
+                    .iter()
+                    .map(|value| self.factor.apply(value))
+                    .collect(),
             )),
             other => Err(WidthRefusal::FactorNeedsVectorFace {
                 factor: self.factor.name().to_owned(),
@@ -1260,7 +1238,7 @@ impl FactoredReading<'_> {
 /// against the tolerance each arm names; `Hold`, `Ask` and `NoContinuationBridges` remain the
 /// caller's decisions, subject only to their offered-input and offered-coarser checks.
 ///
-/// Lean counterpart: `Foundation/ReceiverRelease.lean::ReleaseReturn`.
+/// Lean counterpart: `Foundation/ReceiverRelease.ReleaseReturn`.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "release", rename_all = "kebab-case")]
 pub enum ReleaseReturn {
@@ -1444,7 +1422,7 @@ pub fn release(
                 // inequality is recomputed here rather than inherited.
                 //
                 // Lean counterpart: the `releaseCoarser` constructor of
-                // `Foundation/ReceiverRelease.lean::ReleaseReturn` carries
+                // `Foundation/ReceiverRelease.ReleaseReturn` carries
                 // `coarserWidth ≤ tolerance` as an argument, and
                 // `every_lawful_return_other_than_hold_ask_or_no_continuation_is_inside_its_tolerance`
                 // collects the three arms that name a tolerance.
@@ -1485,5 +1463,4 @@ pub fn release(
 // -------------------------------------------------------------------------------------------
 
 #[cfg(test)]
-#[path = "release/tests.rs"]
 mod tests;

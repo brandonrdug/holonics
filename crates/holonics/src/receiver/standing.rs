@@ -1,11 +1,9 @@
 //! **Standing, memory and extinction: what a lineage retains, what it generates now, and when a
 //! difference has stopped reaching a receiver.**
 //!
-//! \[definition\] This module is the executable owner of item **T2** of
-//! `docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md`. Its Lean
-//! counterpart is
-//! `formal/elementary-holonics/ElementaryHolonics/Foundation/Standing.lean`
-//! (namespace `Soma.Holonics.Foundation.Standing`), and the correspondence is the deliverable:
+//! \[definition\] Retention is the future-sufficient quotient of the constitution, never an event
+//! archive: a standing is lawful exactly when every admitted future receiver reading factors
+//! through it. The Lean counterpart is `Foundation/Standing`:
 //!
 //! | Lean | Rust |
 //! |---|---|
@@ -28,9 +26,9 @@
 //! | `compatibleFibre`, `compatibleFibre_antitone` | [`ApertureChain::compatible`] and `the_compatible_fibre_is_antitone_in_the_step` |
 //! | `the_fibre_is_never_a_singleton_and_a_later_step_separates` | [`ApertureChain::first_separating_step`] and `what_one_step_cannot_separate_a_later_step_can` |
 //! | `Extinct` | [`extinction`] and [`ExtinctionVerdict`] |
-//! | `extinct_iff_release_width_inside_tolerance` | [`extinction`] computes every width through `crate::law::receiver::width_over_readings` on the two-point family and decides with `crate::law::receiver::ReceiverWidth::releasable_at` |
+//! | `extinct_iff_release_width_inside_tolerance` | [`extinction`] computes every width through `crate::receiver::face::width_over_readings` on the two-point family and decides with `crate::receiver::face::ReceiverWidth::releasable_at` |
 //! | `extinct_mono_tolerance`, `extinct_mono_receivers` | `extinction_is_monotone_in_the_tolerance`, `extinction_is_monotone_in_the_receiver_family` |
-//! | `fossilStep`, `fossilState` | [`GeneratorFamily`] built from the damped state matrix, in `the_fossil_instance_has_exact_numbers` |
+//! | `fossilStep`, `fossilState` | [`NavigatorFamily`] built from the damped state matrix, in `the_fossil_instance_has_exact_numbers` |
 //! | `the_wave_is_extinct_at_horizon_three` | `the_wave_chart_is_extinct_at_horizon_three` |
 //! | `the_medium_separates_what_the_wave_chart_declared_extinct` | `the_medium_separates_what_the_wave_chart_declared_extinct` |
 //! | `the_fossil_is_durable` | `the_fossil_is_durable` |
@@ -56,8 +54,8 @@
 //!
 //! and that is exactly the core receiver law's width inside tolerance on the two-point family
 //! `{T_w x, T_w 0}`. [`extinction`] computes it that way: it builds
-//! [`crate::law::receiver::width_over_readings`] over those two members in the sup norm and decides with
-//! [`crate::law::receiver::ReceiverWidth::releasable_at`]. No second diameter is founded here.
+//! [`crate::receiver::face::width_over_readings`] over those two members in the sup norm and decides with
+//! [`crate::receiver::face::ReceiverWidth::releasable_at`]. No second diameter is founded here.
 //!
 //! # Why `Extinct` is a verdict and not a search that ran out
 //!
@@ -66,7 +64,7 @@
 //! [`ExtinctionVerdict::Separated`] is exactly that refutation, carrying the word and receiver
 //! that separate. To **affirm** extinction, [`extinction`] requires a
 //! [`ContractionCertificate`]: a declared coordinate chart and an exact rational factor `λ ≤ 1`,
-//! **checked** against every generator, such that
+//! **checked** against every navigator, such that
 //!
 //! * the chart is invariant — for `i` in the chart and `j` outside it, `A[i][j] = 0`, so the
 //!   chart's future depends on the chart alone; and
@@ -90,14 +88,14 @@
 //! # Where this sits on the relation ladder
 //!
 //! \[definition\] Item **T1** of the same plan, the relation-ladder owner and
-//! `Foundation/RelationLadder.lean`, places identity, continuation, isomorphism, receiver
+//! `Foundation/RelationLadder`, places identity, continuation, isomorphism, receiver
 //! equality, equal potential and tolerance on one typed scale. This owner is stated against the
 //! same underlying owners, and the Lean file restates its results there:
-//! `Foundation/Standing.lean::causalSignature_eq_potential` identifies the causal signature with
-//! the ladder's potential, `Foundation/Standing.lean::retain_eq_establishes_equalPotential` puts
-//! equal standing at rung 5, `Foundation/Standing.lean::extinct_iff_withinTolerance_after_every_history`
+//! `Foundation/Standing.causalSignature_eq_potential` identifies the causal signature with
+//! the ladder's potential, `Foundation/Standing.retain_eq_establishes_equalPotential` puts
+//! equal standing at rung 5, `Foundation/Standing.extinct_iff_withinTolerance_after_every_history`
 //! identifies extinction with rung 6 after every admitted history, and
-//! `Foundation/Standing.lean::extinct_at_zero_iff_equalPotential` shows the two rungs coincide at
+//! `Foundation/Standing.extinct_at_zero_iff_equalPotential` shows the two rungs coincide at
 //! `ε = 0`. Nothing here founds a second scale.
 //!
 //! # No floats
@@ -109,34 +107,34 @@
 //!
 //! \[implemented-exact\] Every caller-declared extent is checked against a ceiling with checked
 //! arithmetic **before** any allocation or loop it would size: [`EXTENT_CEILING`],
-//! [`GENERATOR_CEILING`], [`WORD_LENGTH_CEILING`], [`WORD_COUNT_CEILING`],
+//! [`NAVIGATOR_CEILING`], [`WORD_LENGTH_CEILING`], [`WORD_COUNT_CEILING`],
 //! [`POPULATION_CEILING`], [`OBSERVATION_CEILING`], [`CHECK_WORK_CEILING`] and
 //! [`SEARCH_WORK_CEILING`]. The word family a horizon names grows as `Σ_{k≤h} g^k`;
-//! [`GeneratorFamily::words_within`] forms that sum with `checked_add`/`checked_mul` and refuses
+//! [`NavigatorFamily::words_within`] forms that sum with `checked_add`/`checked_mul` and refuses
 //! by name before reserving anything. Two of the ceilings bound *products* rather than single
 //! declarations, because a product is what a hostile pair of declarations actually buys.
 //!
 //! # What carries an invariant and what does not
 //!
-//! \[implemented-exact\] [`GeneratorFamily`], [`SourcePopulation`], [`StandingLaw`],
+//! \[implemented-exact\] [`NavigatorFamily`], [`SourcePopulation`], [`StandingLaw`],
 //! [`ReceiverReading`], [`FutureObservation`], [`TimedFace`], [`MemoryLaw`], [`ApertureChain`] and
 //! [`ContractionCertificate`] carry invariants, so each has private fields, exactly one validating
 //! constructor, no `Default` and no `Deserialize`. [`SufficiencyVerdict`], [`Fidelity`] and
 //! [`ExtinctionVerdict`] are **returns** with public fields and no invariant: nothing in this
 //! module consumes one, so a hand-built verdict grants no capability. A
 //! [`ContractionCertificate`] is not trusted on construction either — [`extinction`] calls
-//! [`ContractionCertificate::verify`] against the actual generators before it decides anything.
+//! [`ContractionCertificate::verify`] against the actual navigators before it decides anything.
 
-use crate::geometry::Rat;
+use crate::ratio::Rat;
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
 use serde::Serialize;
 use thiserror::Error;
 
-use crate::restriction::{FactorDescent, LinearRestriction, factor_descent_over};
+use crate::holon::restriction::{FactorDescent, LinearRestriction, factor_descent_over};
 
-use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
-use crate::law::receiver::{
+use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
+use crate::receiver::face::{
     DiameterNorm, ExactFace, PassiveCoholon, Reading, WidthRefusal, width_over_readings,
 };
 
@@ -146,19 +144,19 @@ use crate::law::receiver::{
 /// is `rows × extent`; the extent is a caller declaration and sizes both.
 pub const EXTENT_CEILING: usize = 256;
 
-/// The ceiling on the number of admitted generators.
+/// The ceiling on the number of admitted navigators.
 ///
 /// \[definition\] The word family a horizon names is `Σ_{k≤h} g^k`, exponential in the horizon with
 /// base `g`. This bounds the base before [`WORD_COUNT_CEILING`] bounds the sum.
-pub const GENERATOR_CEILING: usize = 32;
+pub const NAVIGATOR_CEILING: usize = 32;
 
 /// The ceiling on a declared horizon, which is the maximum admitted word length.
 pub const WORD_LENGTH_CEILING: usize = 32;
 
 /// The ceiling on the **number of words** an enumeration may materialize.
 ///
-/// \[definition\] A horizon inside [`WORD_LENGTH_CEILING`] with a generator count inside
-/// [`GENERATOR_CEILING`] still names `32^32` words. This ceiling bounds what is actually formed,
+/// \[definition\] A horizon inside [`WORD_LENGTH_CEILING`] with a navigator count inside
+/// [`NAVIGATOR_CEILING`] still names `32^32` words. This ceiling bounds what is actually formed,
 /// and the sum is computed with checked arithmetic before the first allocation.
 pub const WORD_COUNT_CEILING: usize = 1 << 14;
 
@@ -195,28 +193,28 @@ fn one() -> Rat {
 // T2 (a) — the admitted passages and their ordered words
 // -------------------------------------------------------------------------------------------
 
-/// **The admitted generator family**: finitely many exact linear passages on one carrier.
+/// **The admitted navigator family**: finitely many exact linear passages on one carrier.
 ///
 /// \[implemented-exact\] Every field is private and the only constructor is [`Self::declared`],
-/// which checks the extent, the generator count, the squareness of every map and the agreement of
+/// which checks the extent, the navigator count, the squareness of every map and the agreement of
 /// the declared names with the declared maps. There is no `Default` and no `Deserialize`, so a
 /// wire cannot mint a family whose names and maps disagree.
 ///
-/// \[definition; agent-inferred\] **The linear-map chart of a generator family.** Each member is
-/// the finite exact linear passage a generator induces on this carrier, not the generator itself:
-/// a core [`crate::generator::Generator`] (transport, initial configuration, clock, phase
+/// \[definition; agent-inferred\] **The linear-map chart of a navigator family.** Each member is
+/// the finite exact linear passage a navigator induces on this carrier, not the navigator itself:
+/// a core [`crate::navigator::Navigator`] (transport, initial configuration, clock, phase
 /// lift) enters here only through its induced map, e.g. one Cayley tick of a `Transport::Linear`
 /// is the member `(I − hA/2)⁻¹(I + hA/2)`. The initial configuration, clock and winding are not
 /// retained by this chart; standing sufficiency is read over the passages alone.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
-pub struct GeneratorFamily {
+pub struct NavigatorFamily {
     lineage: String,
     extent: usize,
     names: Vec<String>,
     maps: Vec<ExactRatMatrix>,
 }
 
-impl GeneratorFamily {
+impl NavigatorFamily {
     /// A declared family. The extent is read from the first map and every other map is checked
     /// against it; the name vector is an exterior declaration and is checked against the map
     /// count rather than trusted.
@@ -226,16 +224,16 @@ impl GeneratorFamily {
         maps: Vec<ExactRatMatrix>,
     ) -> Result<Self, StandingRefusal> {
         if maps.is_empty() {
-            return Err(StandingRefusal::EmptyGeneratorFamily);
+            return Err(StandingRefusal::EmptyNavigatorFamily);
         }
-        if maps.len() > GENERATOR_CEILING {
-            return Err(StandingRefusal::GeneratorCeiling {
+        if maps.len() > NAVIGATOR_CEILING {
+            return Err(StandingRefusal::NavigatorCeiling {
                 declared: maps.len(),
-                ceiling: GENERATOR_CEILING,
+                ceiling: NAVIGATOR_CEILING,
             });
         }
         if names.len() != maps.len() {
-            return Err(StandingRefusal::GeneratorNameCount {
+            return Err(StandingRefusal::NavigatorNameCount {
                 names: names.len(),
                 maps: maps.len(),
             });
@@ -252,7 +250,7 @@ impl GeneratorFamily {
         }
         for map in &maps {
             if !map.is_square() || map.rows() != extent {
-                return Err(StandingRefusal::GeneratorShape {
+                return Err(StandingRefusal::NavigatorShape {
                     extent,
                     rows: map.rows(),
                     columns: map.columns(),
@@ -277,23 +275,23 @@ impl GeneratorFamily {
         self.extent
     }
 
-    /// How many generators are admitted.
+    /// How many navigators are admitted.
     pub fn count(&self) -> usize {
         self.maps.len()
     }
 
-    /// The generators' declared names, in declaration order.
+    /// The navigators' declared names, in declaration order.
     pub fn names(&self) -> &[String] {
         &self.names
     }
 
     /// One admitted passage applied to one exact state.
-    pub fn step(&self, generator: usize, state: &[Rat]) -> Result<Vec<Rat>, StandingRefusal> {
+    pub fn step(&self, navigator: usize, state: &[Rat]) -> Result<Vec<Rat>, StandingRefusal> {
         let map = self
             .maps
-            .get(generator)
-            .ok_or(StandingRefusal::GeneratorAbsent {
-                index: generator,
+            .get(navigator)
+            .ok_or(StandingRefusal::NavigatorAbsent {
+                index: navigator,
                 carried: self.maps.len(),
             })?;
         if state.len() != self.extent {
@@ -307,10 +305,10 @@ impl GeneratorFamily {
 
     /// **The ordered transport word.**
     ///
-    /// The convention is the Lean owner's `Foundation/TransportWord.lean::transportWord`: the
+    /// The convention is the Lean owner's `Foundation/TransportWord.transportWord`: the
     /// word is read right to left, so the last letter acts first. A word longer than
     /// [`WORD_LENGTH_CEILING`] is refused by name before the first application.
-    pub fn transport_word(
+    pub(crate) fn transport_word(
         &self,
         word: &[usize],
         state: &[Rat],
@@ -349,7 +347,7 @@ impl GeneratorFamily {
                 ceiling: WORD_LENGTH_CEILING,
             });
         }
-        let generators = self.maps.len();
+        let navigators = self.maps.len();
         let mut total: usize = 0;
         let mut level: usize = 1;
         for _ in 0..=horizon {
@@ -357,21 +355,21 @@ impl GeneratorFamily {
                 .checked_add(level)
                 .ok_or(StandingRefusal::WordCountCeiling {
                     horizon,
-                    generators,
+                    navigators,
                     ceiling: WORD_COUNT_CEILING,
                 })?;
             if total > WORD_COUNT_CEILING {
                 return Err(StandingRefusal::WordCountCeiling {
                     horizon,
-                    generators,
+                    navigators,
                     ceiling: WORD_COUNT_CEILING,
                 });
             }
             level = level
-                .checked_mul(generators)
+                .checked_mul(navigators)
                 .ok_or(StandingRefusal::WordCountCeiling {
                     horizon,
-                    generators,
+                    navigators,
                     ceiling: WORD_COUNT_CEILING,
                 })?;
         }
@@ -381,9 +379,9 @@ impl GeneratorFamily {
         for _ in 0..horizon {
             let mut next: Vec<Vec<usize>> = Vec::new();
             for word in &frontier {
-                for generator in 0..generators {
+                for navigator in 0..navigators {
                     let mut extended = word.clone();
-                    extended.push(generator);
+                    extended.push(navigator);
                     next.push(extended);
                 }
             }
@@ -533,7 +531,7 @@ impl StandingLaw {
 /// **An exact linear reading**, with the receiver's declared name.
 ///
 /// \[implemented-exact\] Private fields and one validating constructor. It implements
-/// [`crate::law::receiver::Reading`], so every width taken here is the release owner's width
+/// [`crate::receiver::face::Reading`], so every width taken here is the release owner's width
 /// and not a second diameter.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct ReceiverReading {
@@ -601,7 +599,7 @@ impl ReceiverReading {
 }
 
 impl ReceiverReading {
-    /// **This reading as the core passive coholon** (plan phase 7, `Holon/Law.lean::passive_reading`):
+    /// **This reading as the core passive coholon** (`Holon/Law.passive_reading`):
     /// the same name and reader; the coholon reads the state as the effort under the unit storage
     /// chart, so [`Self::face`] and the coholon's value are equal entry for entry, at zero power.
     /// This type is the validated core linear receiver reading with declared extents.
@@ -703,10 +701,10 @@ pub enum SufficiencyVerdict {
 pub fn sufficiency(
     standing: &StandingLaw,
     population: &SourcePopulation,
-    generators: &GeneratorFamily,
+    navigators: &NavigatorFamily,
     observations: &[FutureObservation],
 ) -> Result<SufficiencyVerdict, StandingRefusal> {
-    check_sufficiency_declaration(standing, population, generators, observations)?;
+    check_sufficiency_declaration(standing, population, navigators, observations)?;
     let members = population.members();
     let count = members.len();
 
@@ -724,9 +722,9 @@ pub fn sufficiency(
             equal_pairs += 1;
             for observation in observations {
                 let advanced_left =
-                    generators.transport_word(observation.word(), &members[left])?;
+                    navigators.transport_word(observation.word(), &members[left])?;
                 let advanced_right =
-                    generators.transport_word(observation.word(), &members[right])?;
+                    navigators.transport_word(observation.word(), &members[right])?;
                 let left_face = observation.reading().face(&advanced_left)?;
                 let right_face = observation.reading().face(&advanced_right)?;
                 if left_face != right_face {
@@ -753,7 +751,7 @@ pub fn sufficiency(
 fn check_sufficiency_declaration(
     standing: &StandingLaw,
     population: &SourcePopulation,
-    generators: &GeneratorFamily,
+    navigators: &NavigatorFamily,
     observations: &[FutureObservation],
 ) -> Result<(), StandingRefusal> {
     if standing.source_extent() != population.extent() {
@@ -762,9 +760,9 @@ fn check_sufficiency_declaration(
             found: population.extent(),
         });
     }
-    if generators.extent() != population.extent() {
+    if navigators.extent() != population.extent() {
         return Err(StandingRefusal::ExtentMismatch {
-            declared: generators.extent(),
+            declared: navigators.extent(),
             found: population.extent(),
         });
     }
@@ -796,10 +794,10 @@ fn check_sufficiency_declaration(
     }
     for observation in observations {
         for letter in observation.word() {
-            if *letter >= generators.count() {
-                return Err(StandingRefusal::GeneratorAbsent {
+            if *letter >= navigators.count() {
+                return Err(StandingRefusal::NavigatorAbsent {
                     index: *letter,
-                    carried: generators.count(),
+                    carried: navigators.count(),
                 });
             }
         }
@@ -815,7 +813,7 @@ fn check_sufficiency_declaration(
 
 impl StandingLaw {
     /// **The standing as a core restriction**: `S` transports the retained residue and retains the
-    /// kernel component `x − σ S x` (`crate::restriction::LinearRestriction`), which, with
+    /// kernel component `x − σ S x` (`crate::holon::restriction::LinearRestriction`), which, with
     /// the standing, reopens the source exactly. Nothing requires `S` to be injective.
     pub fn restriction(&self) -> Result<LinearRestriction, StandingRefusal> {
         Ok(LinearRestriction::new(self.retain.clone())?)
@@ -824,9 +822,9 @@ impl StandingLaw {
 
 /// The sufficiency check read as the core restriction's factor descent: the reading of one member
 /// is its face under every declared observation, in declaration order.
-pub type SufficiencyDescent = FactorDescent<Vec<Rat>, Vec<Rat>, Vec<Vec<Rat>>>;
+pub(crate) type SufficiencyDescent = FactorDescent<Vec<Rat>, Vec<Rat>, Vec<Vec<Rat>>>;
 
-/// **Sufficiency as descent** (`Foundation/Standing.lean::standingLaw_exists_iff_future_factors`):
+/// **Sufficiency as descent** (`Foundation/Standing.standingLaw_exists_iff_future_factors`):
 /// the admitted future factors through the standing — a witness carrying the induced reading on
 /// the retained residues — or the pairs of members with equal standing that some observation
 /// separates, with the kernel residuals that still separate them. [`sufficiency`]'s
@@ -835,16 +833,16 @@ pub type SufficiencyDescent = FactorDescent<Vec<Rat>, Vec<Rat>, Vec<Vec<Rat>>>;
 pub fn sufficiency_descent(
     standing: &StandingLaw,
     population: &SourcePopulation,
-    generators: &GeneratorFamily,
+    navigators: &NavigatorFamily,
     observations: &[FutureObservation],
 ) -> Result<SufficiencyDescent, StandingRefusal> {
-    check_sufficiency_declaration(standing, population, generators, observations)?;
+    check_sufficiency_declaration(standing, population, navigators, observations)?;
     let members = population.members();
     let mut readings = Vec::with_capacity(members.len());
     for member in members {
         let mut faces = Vec::with_capacity(observations.len());
         for observation in observations {
-            let advanced = generators.transport_word(observation.word(), member)?;
+            let advanced = navigators.transport_word(observation.word(), member)?;
             faces.push(observation.reading().face(&advanced)?);
         }
         readings.push(faces);
@@ -861,7 +859,7 @@ pub fn sufficiency_descent(
 }
 
 // -------------------------------------------------------------------------------------------
-// T2 (d) — memory as a generator
+// T2 (d) — memory as a navigator
 // -------------------------------------------------------------------------------------------
 
 /// **A face carried at a declared time.**
@@ -1001,7 +999,7 @@ impl MemoryLaw {
 /// \[definition\] Lean: `faithfulAt_iff_receiver_factors_through_standing`. A reconstruction can
 /// agree with the original at receiver `ρ` **exactly when** `ρ` factors through what standing
 /// retained; `NotRetained` carries the two lineage members that refute the factoring, which is
-/// `Foundation/Receiver.lean::ReceiverInsufficiency` returned as data.
+/// `Foundation/Receiver.ReceiverInsufficiency` returned as data.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 #[serde(tag = "fidelity", rename_all = "kebab-case")]
 pub enum Fidelity {
@@ -1096,7 +1094,7 @@ pub fn fidelity(
 /// source and returns zero beyond them, so `t ↦ face(t, ·)` is a chain that acquires distinctions
 /// while the source does nothing at all. Its link law is
 /// `face(coarse, face(fine, x)) = face(coarse, x)` for `coarse ≤ fine`, which is the zero
-/// changing-receiver defect of `Transport/ChangingReceiver.lean::defect`.
+/// changing-receiver defect of `Transport/ChangingReceiver.defect`.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct ApertureChain {
     lineage: String,
@@ -1185,7 +1183,7 @@ impl ApertureChain {
 /// **A contraction certificate on a declared coordinate chart.**
 ///
 /// \[definition\] The chart is a set of coordinates and `factor` is an exact rational `λ ≤ 1`.
-/// [`Self::verify`] **checks** against every generator that the chart is invariant and that every
+/// [`Self::verify`] **checks** against every navigator that the chart is invariant and that every
 /// chart row sums to at most `λ`. Nothing is assumed: a tower whose steps do not actually contract
 /// is refused by name with the row that refutes it.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -1254,12 +1252,12 @@ impl ContractionCertificate {
         self.chart.binary_search(&coordinate).is_ok()
     }
 
-    /// **Check the certificate against every admitted generator.**
+    /// **Check the certificate against every admitted navigator.**
     ///
     /// Two obligations, both exact: the chart is invariant (`A[i][j] = 0` for `i` inside and `j`
     /// outside), and every chart row sums in absolute value to at most `λ`.
-    pub fn verify(&self, generators: &GeneratorFamily) -> Result<(), StandingRefusal> {
-        let extent = generators.extent();
+    pub fn verify(&self, navigators: &NavigatorFamily) -> Result<(), StandingRefusal> {
+        let extent = navigators.extent();
         if let Some(last) = self.chart.last()
             && *last >= extent
         {
@@ -1268,7 +1266,7 @@ impl ContractionCertificate {
                 extent,
             });
         }
-        for (index, map) in generators.maps.iter().enumerate() {
+        for (index, map) in navigators.maps.iter().enumerate() {
             for row in self.chart.iter().copied() {
                 let mut sum = zero();
                 for column in 0..extent {
@@ -1277,7 +1275,7 @@ impl ContractionCertificate {
                         sum += entry.abs();
                     } else if !entry.is_zero() {
                         return Err(StandingRefusal::ChartNotInvariant {
-                            generator: generators.names[index].clone(),
+                            navigator: navigators.names[index].clone(),
                             row,
                             column,
                         });
@@ -1285,7 +1283,7 @@ impl ContractionCertificate {
                 }
                 if sum > self.factor {
                     return Err(StandingRefusal::ChartDoesNotContract {
-                        generator: generators.names[index].clone(),
+                        navigator: navigators.names[index].clone(),
                         row,
                         sum: sum.to_string(),
                         factor: self.factor.to_string(),
@@ -1301,7 +1299,7 @@ impl ContractionCertificate {
     /// A reading with a nonzero entry outside the chart is refused by name: the certificate says
     /// nothing about coordinates it does not cover, and pretending otherwise is how a false
     /// extinction verdict would be manufactured.
-    pub fn reading_gain(&self, reading: &ReceiverReading) -> Result<Rat, StandingRefusal> {
+    pub(crate) fn reading_gain(&self, reading: &ReceiverReading) -> Result<Rat, StandingRefusal> {
         let columns = reading.matrix.columns();
         if let Some(last) = self.chart.last()
             && *last >= columns
@@ -1334,7 +1332,11 @@ impl ContractionCertificate {
     }
 
     /// The exact sup-norm separation of two states restricted to the chart.
-    pub fn chart_separation(&self, left: &[Rat], right: &[Rat]) -> Result<Rat, StandingRefusal> {
+    pub(crate) fn chart_separation(
+        &self,
+        left: &[Rat],
+        right: &[Rat],
+    ) -> Result<Rat, StandingRefusal> {
         if left.len() != right.len() {
             return Err(StandingRefusal::ExtentMismatch {
                 declared: left.len(),
@@ -1409,16 +1411,16 @@ pub enum ExtinctionVerdict {
 /// **Effective extinction of a perturbation against a reference.**
 ///
 /// \[implemented-exact\] Lean: `Extinct` and `extinct_iff_release_width_inside_tolerance`. Every
-/// width is taken by [`crate::law::receiver::width_over_readings`] over the two-point family
-/// `{T_w x, T_w z}` through the core [`crate::law::receiver::width_over_readings`] law in the sup norm, and the decision is
-/// [`crate::law::receiver::ReceiverWidth::releasable_at`]. This module computes no diameter of
+/// width is taken by [`crate::receiver::face::width_over_readings`] over the two-point family
+/// `{T_w x, T_w z}` through the core [`crate::receiver::face::width_over_readings`] law in the sup norm, and the decision is
+/// [`crate::receiver::face::ReceiverWidth::releasable_at`]. This module computes no diameter of
 /// its own.
 ///
 /// The certificate route is tried first because it is cheap and decides the whole infinite family;
 /// the enumeration is tried second and can only refute. See the module header for the exact
 /// inequality the certificate discharges.
 pub fn extinction(
-    generators: &GeneratorFamily,
+    navigators: &NavigatorFamily,
     receivers: &[ReceiverReading],
     perturbation: &[Rat],
     reference: &[Rat],
@@ -1440,7 +1442,7 @@ pub fn extinction(
             declared: tolerance.to_string(),
         });
     }
-    let extent = generators.extent();
+    let extent = navigators.extent();
     if perturbation.len() != extent {
         return Err(StandingRefusal::ExtentMismatch {
             declared: extent,
@@ -1466,7 +1468,7 @@ pub fn extinction(
     let mut certificate_reason =
         "no contraction certificate was supplied for this receiver family".to_owned();
     if let Some(certificate) = certificate {
-        certificate.verify(generators)?;
+        certificate.verify(navigators)?;
         let separation = certificate.chart_separation(perturbation, reference)?;
         let mut bound = zero();
         let mut covered = true;
@@ -1505,7 +1507,7 @@ pub fn extinction(
     }
 
     // The enumeration route. It can only refute, and it returns the first witness it finds.
-    let words = generators.words_within(horizon)?;
+    let words = navigators.words_within(horizon)?;
     let search_work =
         words
             .len()
@@ -1525,8 +1527,8 @@ pub fn extinction(
     let mut widest = zero();
     let mut widest_receiver = receivers[0].receiver().to_owned();
     for word in &words {
-        let advanced_perturbation = generators.transport_word(word, perturbation)?;
-        let advanced_reference = generators.transport_word(word, reference)?;
+        let advanced_perturbation = navigators.transport_word(word, perturbation)?;
+        let advanced_reference = navigators.transport_word(word, reference)?;
         for reading in receivers {
             let faces = [
                 reading.read(&advanced_perturbation)?,
@@ -1534,7 +1536,7 @@ pub fn extinction(
             ];
             let width = width_over_readings(
                 reading.receiver(),
-                &format!("{}|{{x,0}}", generators.lineage()),
+                &format!("{}|{{x,0}}", navigators.lineage()),
                 &faces,
                 DiameterNorm::Supremum,
             )?;
@@ -1569,28 +1571,28 @@ pub fn extinction(
 /// as content; nothing here panics on a declaration.
 #[derive(Debug, Error)]
 pub enum StandingRefusal {
-    /// A generator family with no generator transports nothing.
-    #[error("a generator family with no generator transports nothing")]
-    EmptyGeneratorFamily,
-    /// The declared generator count is past its ceiling.
-    #[error("a declared generator count of {declared} is past the ceiling of {ceiling}")]
-    GeneratorCeiling {
+    /// A navigator family with no navigator transports nothing.
+    #[error("a navigator family with no navigator transports nothing")]
+    EmptyNavigatorFamily,
+    /// The declared navigator count is past its ceiling.
+    #[error("a declared navigator count of {declared} is past the ceiling of {ceiling}")]
+    NavigatorCeiling {
         /// What was declared.
         declared: usize,
         /// The ceiling.
         ceiling: usize,
     },
-    /// The declared generator names and maps disagree in number.
-    #[error("{names} declared generator names do not match {maps} declared maps")]
-    GeneratorNameCount {
+    /// The declared navigator names and maps disagree in number.
+    #[error("{names} declared navigator names do not match {maps} declared maps")]
+    NavigatorNameCount {
         /// How many names.
         names: usize,
         /// How many maps.
         maps: usize,
     },
-    /// A declared generator is not a square map of the family's extent.
-    #[error("a generator of extent {extent} cannot be a {rows} by {columns} map")]
-    GeneratorShape {
+    /// A declared navigator is not a square map of the family's extent.
+    #[error("a navigator of extent {extent} cannot be a {rows} by {columns} map")]
+    NavigatorShape {
         /// The family's extent.
         extent: usize,
         /// The map's rows.
@@ -1598,9 +1600,9 @@ pub enum StandingRefusal {
         /// The map's columns.
         columns: usize,
     },
-    /// A word names a generator the family does not carry.
-    #[error("generator {index} is absent from a family of {carried}")]
-    GeneratorAbsent {
+    /// A word names a navigator the family does not carry.
+    #[error("navigator {index} is absent from a family of {carried}")]
+    NavigatorAbsent {
         /// The index named.
         index: usize,
         /// How many the family carries.
@@ -1635,14 +1637,14 @@ pub enum StandingRefusal {
     },
     /// The word family a horizon names is past the ceiling.
     #[error(
-        "a horizon of {horizon} over {generators} generators names more words than the ceiling \
+        "a horizon of {horizon} over {navigators} navigators names more words than the ceiling \
          of {ceiling}"
     )]
     WordCountCeiling {
         /// The declared horizon.
         horizon: usize,
-        /// The generator count.
-        generators: usize,
+        /// The navigator count.
+        navigators: usize,
         /// The ceiling.
         ceiling: usize,
     },
@@ -1729,27 +1731,27 @@ pub enum StandingRefusal {
         /// What was declared.
         declared: String,
     },
-    /// The chart is not invariant under a declared generator.
+    /// The chart is not invariant under a declared navigator.
     #[error(
-        "the generator {generator} carries a nonzero entry at row {row}, column {column}, so the \
+        "the navigator {navigator} carries a nonzero entry at row {row}, column {column}, so the \
          certified chart is not invariant under it"
     )]
     ChartNotInvariant {
-        /// The generator's declared name.
-        generator: String,
+        /// The navigator's declared name.
+        navigator: String,
         /// The chart row.
         row: usize,
         /// The column outside the chart.
         column: usize,
     },
-    /// The chart does not contract under a declared generator.
+    /// The chart does not contract under a declared navigator.
     #[error(
-        "the generator {generator} has chart row {row} summing to {sum}, which is past the \
+        "the navigator {navigator} has chart row {row} summing to {sum}, which is past the \
          declared factor {factor}"
     )]
     ChartDoesNotContract {
-        /// The generator's declared name.
-        generator: String,
+        /// The navigator's declared name.
+        navigator: String,
         /// The chart row.
         row: usize,
         /// The exact row sum.
@@ -1788,5 +1790,4 @@ impl PartialEq for StandingRefusal {
 }
 
 #[cfg(test)]
-#[path = "standing_tests.rs"]
 mod tests;

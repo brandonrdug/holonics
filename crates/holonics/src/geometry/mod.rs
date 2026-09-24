@@ -1,30 +1,21 @@
-//! Exact, receiver-relative geometry of the Holonics library.
+//! **Geometry: the complex, frames, carriers and charts on which the Holon is placed.**
 //!
-//! This module is intentionally independent of Bevy, glam, and rendering
-//! scalars.  It owns exact local frames, relations, algebraic faces,
-//! receiver maps, projection fibers, crossings, and discrete event history.
+//! - [`complex`]: oriented cells, `∂² = 0`, connection-valued incidence and its curvature;
+//! - the exact frame carriers ([`RatVec3`], [`RatMat3`], [`AffineMap3`]) and the Cayley chart of
+//!   rotations;
+//! - [`screw`]: the Lie generator `ξ = (ω, v)` of a helix, situated screws, the screw pair and its
+//!   quadrance jet;
+//! - [`winding`]: phase, winding and carry, the odometer, and the holonomy around a cell;
+//! - [`swing`]: the Swing, its composition to a translation, the pantograph and the projective
+//!   Swing as a cross ratio.
+//!
+//! Lean: `Holon/Complex`, `Geometry/{ScrewGeometry,PhaseCarry,AffineSwing,CrossRatio}`,
+//! `Transport/CellHolonomy`.
 
-pub mod decorated_path;
-pub mod eta_atlas;
+pub mod complex;
 mod exact;
-mod exact_analysis;
-pub mod model;
-pub mod projection;
-pub mod receiver_atlas;
-pub mod receiver_topology;
-pub mod scene;
 pub mod screw;
+pub mod swing;
 pub mod winding;
-pub mod winding_inertia;
 
-pub use decorated_path::*;
-pub use eta_atlas::*;
 pub use exact::*;
-pub use exact_analysis::*;
-pub use model::*;
-pub use projection::*;
-pub use receiver_atlas::*;
-pub use receiver_topology::*;
-pub use scene::*;
-pub use screw::*;
-pub use winding::*;

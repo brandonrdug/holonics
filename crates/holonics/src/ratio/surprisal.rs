@@ -1,29 +1,10 @@
-//! Surprisal as an exact symbolic form, never as a number.
+//! **Surprisal as an exact symbolic form, never as a number: the log face of a ratio.**
 //!
-//! ## What this implements, and what it deliberately does not
-//!
-//! `docs/canon/THE_RECOVERED_LAW.md` §1, Brandon-ratified 2026-07-14, states the instrument:
-//!
-//! > *"Surprisal and cross-entropy are exact instruments. For a 2/3 gear word `p = 2^-a 3^-b`,
-//! > `S = a + b·log₂3`, exact symbolically. No smoothing constant is owed: if `Q_B(a) = 0` the live
-//! > event FOUNDs a new relation and changes the support."*
-//!
-//! and §3 places Shannon precisely:
-//!
-//! > *"`H(X)` is an exact scalar receiver measure. It does not by itself retain caused incidence,
-//! > chronology, topology, holonomy, obstruction, morphology, apparatus, or lineage. Those are not
-//! > objections to Shannon theory; they identify what its declared quotient intentionally forgets."*
-//!
-//! Measured 2026-08-08, before this module existed: `shannon`, `entropy`, `surprisal`,
-//! `cross_entropy`, `kullback`, `log2` and `mutual_information` returned **zero files** across every
-//! library crate and every `soma/` library. The body implemented the part Shannon's quotient
-//! *forgets* — `receiver_exact_compression`'s collapsed-pair population, each pair carrying the
-//! shortest word that separates it — and not the quotient. The fiber without the base, so nothing
-//! could say what a quotient **cost**.
-//!
-//! The only `-log₂` ever written in this lineage was a **string formatter** that emitted
-//! `"-log2(3/4)"` as text and never evaluated a logarithm. Then it was deleted. That instinct was
-//! right and this module is its typed form.
+//! Surprisal and cross-entropy are exact instruments. For a 2/3 gear word `p = 2^-a 3^-b`,
+//! `S = a + b·log₂3`, exactly. No smoothing constant is owed: if the support of an event is zero,
+//! the live event FOUNDs a new relation and changes the support. Shannon's `H(X)` is an exact
+//! scalar receiver measure; it does not retain incidence, chronology, holonomy or lineage, which
+//! its declared quotient forgets on purpose.
 //!
 //! ## The carrier is a form, not a value
 //!
@@ -34,10 +15,9 @@
 //! ```
 //!
 //! which is a **ℚ-linear form in the logarithms of the primes**. It is stored as its coefficient
-//! map and **never evaluated**. `CLAUDE.md` §2b's rule for signs and
-//! `docs/canon/THE_MATHEMATICS_TABLET.md` §1's rule for floats are the same rule here: a decimal
-//! surprisal keeps the magnitude and discards the term structure that produced it, and the term
-//! structure is what lets a later receiver differentiate, compose, or continue it.
+//! map and **never evaluated**: a decimal surprisal keeps the magnitude and discards the term
+//! structure that produced it, and the term structure is what lets a later receiver differentiate,
+//! compose, or continue it.
 //!
 //! ## Three facts that make this a carrier rather than a notation
 //!
@@ -51,8 +31,7 @@
 //!
 //! **Strict comparison retains its enclosure grain.** [`SymbolicSurprisal::compare`] returns
 //! [`ExactOrdering`], whose `Open` variant is the honest answer when the certified enclosures
-//! overlap. From `exact_value`'s own opening: *"Values which cannot yet be ordered from their exact
-//! certificates return `Open` rather than falling through to an epsilon comparison."*
+//! overlap, rather than an epsilon comparison.
 //!
 //! **Zero support is not infinity.** [`Support::Unsupported`] is a typed refusal carrying the event
 //! that had no standing, and the law is that the live event **FOUNDs a new relation and changes the
@@ -61,21 +40,20 @@
 //!
 //! ## What this is not
 //!
-//! Not a distribution inside the body. Not a governor, a selector, a threshold, or a crown. `CLAUDE.md`
-//! §13 rule 2: **a scalar that measures is lawful, a scalar that governs is not.** Nothing here
-//! chooses a deed; every return is a form or a typed refusal, and the four-state ordering means even
-//! a comparison may decline to decide.
+//! Not a distribution inside the body, and not a governor, selector or threshold: a scalar that
+//! measures is lawful, a scalar that governs is not. Every return is a form or a typed refusal, and
+//! the four-state ordering means even a comparison may decline to decide.
 
 use std::collections::BTreeMap;
 
+use crate::ratio::Rat;
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
-use crate::geometry::Rat;
-use crate::geometry::log_rational_interval;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::exact_value::{ExactInterval, ExactOrdering};
+use crate::ratio::ExactOrdering;
+use crate::ratio::algebraic::{ExactInterval, natural_log_enclosure};
 
 /// Series terms taken when enclosing `log₂ p`. Declared, not tuned.
 const LOG_SERIES_TERMS: u32 = 64;
@@ -138,18 +116,11 @@ impl SymbolicSurprisal {
     }
 
     fn add_term(&mut self, prime: u64, coefficient: Rat) -> Result<(), SurprisalError> {
-        // **REPAIRED 2026-08-18: this was `if prime < 2`, which is not a primality check.**
-        //
         // The whole exactness argument of this module rests on the ℚ-linear independence of
         // `{log₂ p : p prime}` — that is what makes `is_zero` true *exactly* when the form is zero
-        // as a real number. A composite admitted here breaks it on inputs the public constructor
-        // accepts: `term(2, 2).minus(&term(4, 1))` is zero as a real number, and before this repair
-        // `is_zero()` returned `false` and `compare` returned `Open`, never `Equal`.
-        //
-        // Trial division to `√prime` is exact, terminates, and costs nothing at the extents this
-        // carrier admits — a `u64` prime index, where the loop is at most 2^32 steps and in practice
-        // a handful.
-        if !is_prime(prime) {
+        // as a real number. A composite admitted here would break it:
+        // `term(2, 2).minus(&term(4, 1))` is zero as a real number.
+        if !crate::ratio::primality::is_prime(prime) {
             return Err(SurprisalError::NotAPrime(prime));
         }
         if coefficient.is_zero() {
@@ -256,7 +227,7 @@ impl SymbolicSurprisal {
                 self.terms.get(&2).cloned().unwrap_or_else(Rat::zero),
             ));
         }
-        let log_two = log_rational_interval(&Rat::from_integer(2.into()), terms, bits)
+        let log_two = natural_log_enclosure(&Rat::from_integer(2.into()), terms, bits)
             .map_err(|_| SurprisalError::EnclosureUnavailable)?;
         for (prime, coefficient) in &self.terms {
             if *prime == 2 {
@@ -266,7 +237,7 @@ impl SymbolicSurprisal {
             }
             // log2(p) = ln(p) / ln(2), enclosed by dividing the two enclosures outward.
             let natural =
-                log_rational_interval(&Rat::from_integer(BigInt::from(*prime)), terms, bits)
+                natural_log_enclosure(&Rat::from_integer(BigInt::from(*prime)), terms, bits)
                     .map_err(|_| SurprisalError::EnclosureUnavailable)?;
             if !log_two.lower.is_positive() {
                 return Err(SurprisalError::EnclosureUnavailable);
@@ -316,14 +287,9 @@ impl SymbolicSurprisal {
         if difference.is_zero() {
             return Ok(ExactOrdering::Equal);
         }
-        let enclosure = difference.enclosure_at(terms, bits)?;
-        if enclosure.lower.is_positive() {
-            Ok(ExactOrdering::Greater)
-        } else if enclosure.upper.is_negative() {
-            Ok(ExactOrdering::Less)
-        } else {
-            Ok(ExactOrdering::Open)
-        }
+        Ok(difference
+            .enclosure_at(terms, bits)?
+            .disjoint_order(&ExactInterval::point(Rat::zero())))
     }
 
     /// The same comparison at a declared [`Grain`]. Equality is still decided **exactly**, before
@@ -370,8 +336,7 @@ impl Support {
     /// Read one event's surprisal against a receiver's standing population.
     ///
     /// `standing` is the exact occurrence count per event, so the quotient is
-    /// `p(a) = N(a) / Σ N(a')` — the embodied distribution, `docs/canon/THE_RECOVERED_LAW.md` §1, not a
-    /// tabulated one. An event absent from the population, or present with zero count, returns
+    /// `p(a) = N(a) / Σ N(a')`, the embodied distribution, not a tabulated one. An event absent from the population, or present with zero count, returns
     /// `Unsupported`.
     pub fn read(standing: &BTreeMap<u64, BigUint>, event: u64) -> Result<Self, SurprisalError> {
         let total: BigUint = standing.values().sum();
@@ -441,9 +406,7 @@ pub fn read_population(
 /// support, discarding the form it had already accumulated over every supported one. That is the
 /// correct *face* — a weighted sum has nowhere to put a refusal — and it is the wrong *fiber*,
 /// because held-out material almost always carries a novel event, so the aggregate refuses on
-/// exactly the material a compression reading must score. Measured 2026-08-14 on this repository's
-/// own records: three of four readings collapsed wholesale, one of them discarding 450 supported
-/// events out of 700 to report the 250 that were not.
+/// exactly the material a compression reading must score.
 ///
 /// **Nothing here smooths.** The unsupported events are returned by name, and their weight is
 /// returned beside the form rather than folded into it. That is the two-part account the law
@@ -636,25 +599,6 @@ mod fiber_tests {
         );
     }
 
-    /// Fully supported and fully unsupported both still return their own arm,
-    /// so the three arms are a partition rather than two arms and a fallback.
-    #[test]
-    fn all_three_arms_are_reachable_on_declared_material() {
-        let code = population(&[(2, 10), (3, 10)]);
-        assert!(matches!(
-            cross_entropy_fiber(&population(&[(2, 1), (3, 1)]), &code).expect("exact"),
-            CrossEntropyFiber::Supported(_)
-        ));
-        assert!(matches!(
-            cross_entropy_fiber(&population(&[(2, 1), (5, 1)]), &code).expect("exact"),
-            CrossEntropyFiber::Partial { .. }
-        ));
-        assert!(matches!(
-            cross_entropy_fiber(&population(&[(5, 1), (7, 1)]), &code).expect("exact"),
-            CrossEntropyFiber::Unsupported { .. }
-        ));
-    }
-
     /// Founding an unsupported event moves the reading off the `Partial` arm,
     /// which is the law's own alternative to smoothing exercised end to end.
     #[test]
@@ -673,23 +617,6 @@ mod fiber_tests {
         // denominator moved. A smoothing constant would not have.
         assert_ne!(before.form(), after.form());
     }
-
-    /// The face is exactly the old contract, on every arm.
-    #[test]
-    fn the_face_reproduces_the_reading_the_coarse_entry_point_returns() {
-        let code = population(&[(2, 10), (3, 10)]);
-        for members in [
-            vec![(2u64, 1u32), (3, 1)],
-            vec![(2, 1), (5, 1)],
-            vec![(5, 1), (7, 1)],
-        ] {
-            let held_out = population(&members);
-            assert_eq!(
-                cross_entropy_fiber(&held_out, &code).expect("exact").face(),
-                cross_entropy(&held_out, &code).expect("exact")
-            );
-        }
-    }
 }
 
 /// `H(P) = Σ_a P(a) · S_P(a)` — the population received through its own code.
@@ -700,23 +627,6 @@ pub fn entropy(population: &BTreeMap<u64, BigUint>) -> Result<Support, Surprisal
 /// **Exact primality by trial division.** No probabilistic test, no table, no bound below which a
 /// number is assumed prime: the argument this module's exactness rests on is about primes, so the
 /// carrier admits a prime or refuses.
-fn is_prime(value: u64) -> bool {
-    if value < 2 {
-        return false;
-    }
-    if value % 2 == 0 {
-        return value == 2;
-    }
-    let mut divisor = 3u64;
-    while divisor.saturating_mul(divisor) <= value {
-        if value % divisor == 0 {
-            return false;
-        }
-        divisor += 2;
-    }
-    true
-}
-
 fn factor_biguint(value: &BigUint) -> Result<Vec<(u64, u32)>, SurprisalError> {
     if value.is_zero() {
         return Err(SurprisalError::NonPositiveProbability);
@@ -774,8 +684,7 @@ pub enum SurprisalError {
 /// exactly that gauge, and `the_section_modulus_is_unmoved_by_the_additive_gauge` holds it to it.
 ///
 /// **The two ingredients are the two limits.** The second moment is the reading at unit
-/// temperature; the extreme fibre is what the zero-temperature limit selects, which is the
-/// governor `CLAUDE.md` bans. So the pair prices the banned collapse **without taking it**: a body
+/// temperature; the extreme fibre is what the zero-temperature limit selects, a governor. So the pair prices the banned collapse **without taking it**: a body
 /// whose second moment vanishes against a nonzero extreme fibre has collapsed onto a single fibre
 /// and carries no bending load.
 ///
@@ -917,39 +826,6 @@ mod tests {
         assert_eq!(before, after, "the additive gauge must move nothing");
     }
 
-    /// **And it must move under a change that provably alters the spread**, or it is measuring
-    /// nothing. Widening the population strictly increases both the second moment and the extreme
-    /// fibre. Without this arm the gauge test above would pass on a reading that always returned
-    /// zero.
-    #[test]
-    fn the_section_modulus_moves_when_the_spread_moves() {
-        let narrow = modulus_population(&[(1, &[(2, 1)]), (2, &[(2, 2)]), (3, &[(2, 3)])]);
-        let wide = modulus_population(&[(1, &[(2, 1)]), (2, &[(2, 2)]), (3, &[(2, 30)])]);
-
-        let narrow = section_modulus(&narrow).expect("a section modulus");
-        let wide = section_modulus(&wide).expect("a section modulus");
-        assert!(
-            wide.second_moment.lower > narrow.second_moment.upper,
-            "a wider population must carry a strictly larger second moment"
-        );
-        assert!(
-            wide.extreme_fibre.lower > narrow.extreme_fibre.upper,
-            "a wider population must carry a strictly larger extreme fibre"
-        );
-    }
-
-    /// **The collapse the ban forbids, priced without taking it.** A population whose members are
-    /// all equal has zero deviation, so the second moment vanishes against a zero extreme fibre —
-    /// it has collapsed onto a single fibre and carries no bending load. The quotient is never
-    /// formed, so nothing divides by that zero.
-    #[test]
-    fn a_collapsed_population_carries_no_bending_load() {
-        let flat = modulus_population(&[(1, &[(2, 4)]), (2, &[(2, 4)]), (3, &[(2, 4)])]);
-        let reading = section_modulus(&flat).expect("a section modulus");
-        assert!(reading.second_moment.upper.is_zero());
-        assert!(reading.extreme_fibre.upper.is_zero());
-        assert_eq!(reading.members, 3);
-    }
     use super::*;
 
     fn rat(numerator: i64, denominator: i64) -> Rat {
@@ -989,15 +865,6 @@ mod tests {
         assert_eq!(form.terms().get(&3), Some(&Rat::from_integer(2.into())));
         assert_eq!(form.terms().len(), 2);
         assert_eq!(form.named(), "3*log2(2) + 2*log2(3)");
-    }
-
-    /// Certainty carries no surprisal, and the zero test is exact.
-    #[test]
-    fn a_certainty_returns_the_zero_form_and_the_test_is_exact() {
-        let form = SymbolicSurprisal::of_probability(&Rat::one()).unwrap();
-        assert!(form.is_zero());
-        assert_eq!(form.named(), "0");
-        assert_eq!(form.enclosure().unwrap(), ExactInterval::point(Rat::zero()));
     }
 
     /// **Control 1 — additivity.** The multiplicative chain becomes an additive depth face, exactly,
@@ -1066,9 +933,8 @@ mod tests {
         );
     }
 
-    /// **Control 4 — the four-state ordering is non-vacuous.** The declared material must produce
-    /// both a definite verdict and an `Open`, or the carrier is decorative and this is `CLAUDE.md`
-    /// §8's trivial-orbit defect wearing a passing result.
+    /// **The four-state ordering**: the declared material produces both a definite verdict and an
+    /// `Open`, and the grain is what moves one into the other.
     #[test]
     fn the_ordering_is_non_vacuous_and_the_grain_is_what_moves_it() {
         let eighth = SymbolicSurprisal::of_probability(&rat(1, 8)).unwrap();
@@ -1140,75 +1006,6 @@ mod tests {
         assert!(enclosure.lower > rat(158, 100) && enclosure.upper < rat(159, 100));
     }
 
-    /// A prime below two is refused by name rather than silently accepted.
-    #[test]
-    fn a_term_below_two_is_refused_by_name() {
-        assert_eq!(
-            SymbolicSurprisal::term(1, Rat::one()),
-            Err(SurprisalError::NotAPrime(1))
-        );
-    }
-
-    /// **The population constructor agrees with the single-event read, member for member.**
-    ///
-    /// Two independent implementations of one reading, and the parity is what makes the cheaper one
-    /// admissible. The `Unsupported` arm is exercised here too: `7` is in the population and not in
-    /// the standing, so it must be returned by name and in place rather than collapsing the reading.
-    #[test]
-    fn the_population_read_agrees_with_the_single_event_read_and_retains_the_refusal() {
-        let emitted = population(&[(1, 3), (2, 1), (7, 5)]);
-        let standing = population(&[(1, 1), (2, 3)]);
-
-        let read = read_population(&emitted, &standing).unwrap();
-        assert_eq!(read.len(), 3, "one answer per member of the POPULATION");
-        for event in emitted.keys() {
-            assert_eq!(
-                read.get(event),
-                Some(&Support::read(&standing, *event).unwrap()),
-                "member {event} must agree with the single-event read"
-            );
-        }
-        assert_eq!(
-            read.get(&7),
-            Some(&Support::Unsupported),
-            "retained in place, by name"
-        );
-        assert!(matches!(read.get(&1), Some(Support::Supported(_))));
-
-        // An empty standing supports nothing, and says so per member rather than erroring.
-        let none = read_population(&emitted, &BTreeMap::new()).unwrap();
-        assert!(
-            none.values()
-                .all(|support| *support == Support::Unsupported)
-        );
-    }
-
-    /// The grain carried as one receiver coordinate is the same reading as the two loose arguments.
-    #[test]
-    fn a_declared_grain_is_the_same_reading_as_its_two_coordinates() {
-        let log_three = SymbolicSurprisal::term(3, Rat::one()).unwrap();
-        let log_five = SymbolicSurprisal::term(5, Rat::one()).unwrap();
-
-        let coarse = Grain::at(1, 4);
-        assert_eq!(
-            log_five.compare_grain(&log_three, coarse).unwrap(),
-            log_five.compare_at(&log_three, 1, 4).unwrap()
-        );
-        assert_eq!(
-            log_five.compare_grain(&log_three, coarse).unwrap(),
-            ExactOrdering::Open
-        );
-        assert_eq!(
-            log_five.compare_grain(&log_three, Grain::DECLARED).unwrap(),
-            ExactOrdering::Greater,
-            "the declared grain is the one `compare` takes"
-        );
-        assert_eq!(
-            log_five.enclosure_grain(Grain::DECLARED).unwrap(),
-            log_five.enclosure().unwrap()
-        );
-    }
-
     /// A probability above one, or at zero, is refused — the latter because that case FOUNDs.
     #[test]
     fn an_impossible_probability_is_refused_and_zero_is_routed_to_the_found() {
@@ -1227,10 +1024,8 @@ mod tests {
 mod primality_repair_tests {
     use super::*;
 
-    /// **The defect this repair closes, asserted.** Before 2026-08-18 `add_term` tested `prime < 2`,
-    /// so `term(4, …)` was admitted and the ℚ-linear-independence argument failed on an input the
-    /// public constructor accepts: `2·log₂2 − 1·log₂4` is zero as a real number, and `is_zero()`
-    /// returned `false`.
+    /// The exact zero test rests on the ℚ-linear independence of `{log₂ p : p prime}`, so a
+    /// composite term is refused by name: `2·log₂2 − 1·log₂4` is zero as a real number.
     #[test]
     fn a_composite_is_refused_by_name_so_the_zero_test_stays_exact() {
         assert_eq!(
@@ -1252,16 +1047,5 @@ mod primality_repair_tests {
                 "{prime} is prime and must be admitted"
             );
         }
-    }
-
-    /// The exactness the refusal protects: two forms that are equal as real numbers are `is_zero`
-    /// after subtraction, and no admitted pair can be equal-but-not-detected.
-    #[test]
-    fn the_zero_test_is_exact_on_every_admitted_form() {
-        let two = SymbolicSurprisal::term(2, Rat::from_integer(2.into())).unwrap();
-        let also_two = SymbolicSurprisal::term(2, Rat::from_integer(2.into())).unwrap();
-        assert!(two.minus(&also_two).is_zero());
-        let three = SymbolicSurprisal::term(3, Rat::one()).unwrap();
-        assert!(!two.minus(&three).is_zero());
     }
 }

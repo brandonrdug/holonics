@@ -35,7 +35,11 @@ fn the_section_ring_is_total_on_every_boundary_pair() {
     let modulus = section_layout_cuda::MODULUS as u128;
     for value in RING_PROBES {
         let canonical = section_layout_cuda::canonical(value);
-        assert_eq!(canonical, ((value as u128) % modulus) as u64, "canonical({value})");
+        assert_eq!(
+            canonical,
+            ((value as u128) % modulus) as u64,
+            "canonical({value})"
+        );
         assert!(
             section_layout_cuda::is_canonical(canonical),
             "canonical({value}) is canonical"
@@ -110,8 +114,14 @@ fn the_section_ring_is_associative_and_commutative_over_non_canonical_words() {
     // commutativity are owed over the **whole** `u64` domain and not only over `[0, p)`.
     for a in RING_PROBES {
         for b in RING_PROBES {
-            assert_eq!(section_layout_cuda::add(a, b), section_layout_cuda::add(b, a));
-            assert_eq!(section_layout_cuda::mul(a, b), section_layout_cuda::mul(b, a));
+            assert_eq!(
+                section_layout_cuda::add(a, b),
+                section_layout_cuda::add(b, a)
+            );
+            assert_eq!(
+                section_layout_cuda::mul(a, b),
+                section_layout_cuda::mul(b, a)
+            );
             for c in RING_PROBES {
                 assert_eq!(
                     section_layout_cuda::add(section_layout_cuda::add(a, b), c),

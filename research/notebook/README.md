@@ -47,7 +47,7 @@ This produces:
 - `research/notebook/build/attempt-sheet.pdf`, a reusable symbolic algebra canvas.
 
 The command also checks `research/notebook/lean/U001Trace.lean` through the repository's pinned
-`formal/elementary-holonics` Lean/Mathlib environment without modifying that package.
+`lean` Lean/Mathlib environment without modifying that package.
 
 ## Figure grammar
 

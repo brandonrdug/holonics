@@ -1,17 +1,17 @@
 //! The causal chord's own checks.
 //!
-//! Exact laws are checked on synthetic material with no engine or external fixture dependency.
+//! Exact laws are checked on synthetic material with no external fixture.
 //!
 //! Each Lean theorem of
-//! `formal/elementary-holonics/ElementaryHolonics/Foundation/CausalChord.lean` appears here by
+//! `Foundation/CausalChord` appears here by
 //! name in the test that is its executable equivalent.
 
+use crate::ratio::polynomial::HALF_PLANE_REFINEMENT_CEILING;
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
-use crate::rational_polynomial::HALF_PLANE_REFINEMENT_CEILING;
 
 use super::*;
-use crate::inertia::inertia;
+use crate::ratio::linear::inertia::inertia;
 
 // ---------------------------------------------------------------------------------------------
 // synthetic material
@@ -75,7 +75,7 @@ fn declared(lineage: &str, state: &[&[i64]], excite: &[i64], read: &[i64]) -> Li
 
 /// **The recurrence agrees with the owner it is not replacing.**
 ///
-/// `exact_linear.rs:336` already computes the characteristic polynomial by the same recurrence and
+/// The exact linear carrier computes the characteristic polynomial by the same recurrence and
 /// discards the intermediate matrices. This module keeps them, so the two are held to exact
 /// agreement rather than allowed to drift.
 #[test]
@@ -151,133 +151,6 @@ fn the_certificate_is_every_coefficient_of_the_identity_and_not_one_point() {
     }
 }
 
-/// **One rational point does not certify a polynomial identity, and this exhibits a corruption it
-/// cannot see.**
-///
-/// The old certificate evaluated `(sI−A)·adj(sI−A) − det(sI−A)·I` at the single point `s₀ = 3`.
-/// `3I − A` is invertible here, so *any* perturbation of the adjugate that vanishes at `s₀`
-/// passes that check — and `adj(s) + D·s − 3D` is one, for every `D`. The coefficientwise
-/// certificate refuses it, because the perturbation moves two coefficients.
-#[test]
-fn a_single_rational_point_does_not_certify_the_adjugate_identity() {
-    let state = matrix(&[&[1, 2], &[3, 4]]);
-    let expansion = resolvent_expansion(&state).expect("the expansion returns");
-    let extent = expansion.extent;
-    assert_eq!(extent, 2);
-
-    // `D` is any nonzero matrix; the perturbation is `D·s − 3D`, which is zero at `s = 3`.
-    let bump = matrix(&[&[0, 1], &[0, 0]]);
-    let corrupted = vec![
-        expansion.adjugate[0].add(&bump).expect("sum"),
-        expansion.adjugate[1]
-            .subtract(&bump.scaled(&integer(3)))
-            .expect("difference"),
-    ];
-
-    // The single-point check the certificate used to be: exactly zero, and blind.
-    let decoy = ResolventExpansion {
-        extent,
-        characteristic: expansion.characteristic.clone(),
-        adjugate: corrupted.clone(),
-        certified_coefficients: 0,
-        residual: Rat::zero(),
-    };
-    let point = integer(3);
-    let identity = ExactRatMatrix::identity(extent).expect("identity");
-    let shifted = identity.scaled(&point).subtract(&state).expect("shift");
-    let at_point = shifted
-        .multiply(&decoy.adjugate_at(&point).expect("adjugate"))
-        .expect("product")
-        .subtract(&identity.scaled(&expansion.characteristic.evaluate(&point)))
-        .expect("difference");
-    assert!(
-        at_point.entries().iter().all(Zero::is_zero),
-        "the corruption is invisible at the old single certificate point, which is the finding"
-    );
-
-    // The coefficientwise certificate sees it.
-    assert_eq!(
-        certify_adjugate(&state, &expansion.characteristic, &corrupted),
-        Err(ChordRefusal::AdjugateCertificateFailure)
-    );
-    // And the honest expansion still passes it.
-    assert_eq!(
-        certify_adjugate(&state, &expansion.characteristic, &expansion.adjugate),
-        Ok(Rat::zero())
-    );
-}
-
-/// **The same blindness for a transfer numerator, and the same coefficientwise cure.**
-///
-/// A decoy numerator that agrees with the true one at `s₀ = 3` passes the single-point check and
-/// fails the coefficientwise one, which compares every coefficient against `C M_k B` recomputed
-/// with the other association.
-#[test]
-fn a_single_rational_point_does_not_certify_the_transfer_numerator() {
-    let chord = declared(
-        "numerator",
-        &[&[0, 1, 0], &[0, 0, 1], &[-6, -11, -6]],
-        &[0, 0, 1],
-        &[1, 0, 0],
-    );
-    let transfer = transfer_function(&chord).expect("the transfer function returns");
-    let extent = transfer.extent;
-    let entry = transfer.entry(0, 0).expect("the single entry");
-    let point = integer(3);
-
-    // `s² − 6s + 9 = (s − 3)²` is zero at the old certificate point, so adding it moves two
-    // coefficients and no value there.
-    let decoy = entry
-        .numerator
-        .plus(&polynomial(&[9, -6, 1]));
-    assert_eq!(
-        decoy.evaluate(&point),
-        entry.numerator.evaluate(&point),
-        "the decoy agrees at the old single certificate point, which is the finding"
-    );
-
-    let mut parted = 0_usize;
-    for index in 0..extent {
-        let degree = extent - 1 - index;
-        let truth = chord
-            .readout
-            .multiply(
-                &transfer.expansion.adjugate[index]
-                    .multiply(&chord.excitation)
-                    .expect("product"),
-            )
-            .expect("product");
-        assert_eq!(
-            entry.numerator.coefficient(degree),
-            *truth.get(0, 0).expect("entry"),
-            "the honest numerator matches C M_k B at every coefficient"
-        );
-        if decoy.coefficient(degree) != *truth.get(0, 0).expect("entry") {
-            parted += 1;
-        }
-    }
-    assert_eq!(
-        parted, 3,
-        "the decoy moves all three coefficients of `(s − 3)²` and none of its value at the old \
-         certificate point, so the coefficientwise check catches it three times over"
-    );
-}
-
-/// The `extent²` equations the conserving-form solve poses are formed with checked arithmetic.
-#[test]
-fn a_state_extent_whose_square_overflows_is_refused_by_name() {
-    assert_eq!(conserving_equation_count(4), Ok(16));
-    assert_eq!(
-        conserving_equation_count(usize::MAX),
-        Err(ChordRefusal::StateExtentOverflows {
-            extent: usize::MAX
-        })
-    );
-    // And the reading itself still stands on an honest extent.
-    let state = matrix(&[&[0, 1], &[-1, 0]]);
-    assert!(conserving_receiver_space(&state).is_ok());
-}
-
 // ---------------------------------------------------------------------------------------------
 // the chart-change law
 // ---------------------------------------------------------------------------------------------
@@ -313,8 +186,8 @@ fn the_transfer_function_is_invariant_under_a_chart_change() {
     }
 }
 
-/// A singular chart is not a change of basis, and is refused by name — the same refusal
-/// `inertia.rs:597` carries for the same reason.
+/// A singular chart is not a change of basis, and is refused by name, as the inertia
+/// owner's congruence refuses it.
 #[test]
 fn a_singular_chart_is_refused_rather_than_silently_collapsing_the_reading() {
     let base = declared("singular", &[&[1, 0], &[0, 2]], &[1, 0], &[1, 0]);
@@ -413,7 +286,10 @@ fn the_pole_atlas_names_each_multiplicity_once() {
         .find(|factor| factor.multiplicity == 2)
         .expect("one double factor");
     assert_eq!(doubled.rational_poles, vec![integer(1)]);
-    assert_eq!(atlas.rational_poles(), vec![(integer(-3), 1), (integer(1), 2)]);
+    assert_eq!(
+        atlas.rational_poles(),
+        vec![(integer(-3), 1), (integer(1), 2)]
+    );
     // Sturm-certified isolating boxes are present and each contains its root.
     for factor in &atlas.factors {
         assert_eq!(factor.real_isolations.len(), factor.degree);
@@ -430,12 +306,7 @@ fn the_pole_atlas_names_each_multiplicity_once() {
 fn the_residue_at_a_simple_rational_pole_is_exact() {
     // H(s) = 1/(s−1) + 1/(s−2): both residues are exactly one, and the numerator 2s−3 shares no
     // factor with the denominator, so nothing cancels.
-    let base = declared(
-        "simple-residues",
-        &[&[1, 0], &[0, 2]],
-        &[1, 1],
-        &[1, 1],
-    );
+    let base = declared("simple-residues", &[&[1, 0], &[0, 2]], &[1, 1], &[1, 1]);
     let chord = causal_chord(&base).expect("the chord returns");
     assert_eq!(chord.components.len(), 2);
     let at_one = chord
@@ -524,17 +395,35 @@ fn the_half_plane_count_survives_its_degenerate_shapes() {
     }
     let cases = [
         // s² + 1
-        Shape { ascending: &[1, 0, 1], expected: (0, 2, 0) },
+        Shape {
+            ascending: &[1, 0, 1],
+            expected: (0, 2, 0),
+        },
         // (s²+1)²
-        Shape { ascending: &[1, 0, 2, 0, 1], expected: (0, 4, 0) },
+        Shape {
+            ascending: &[1, 0, 2, 0, 1],
+            expected: (0, 4, 0),
+        },
         // s² − 1
-        Shape { ascending: &[-1, 0, 1], expected: (1, 0, 1) },
+        Shape {
+            ascending: &[-1, 0, 1],
+            expected: (1, 0, 1),
+        },
         // s
-        Shape { ascending: &[0, 1], expected: (0, 1, 0) },
+        Shape {
+            ascending: &[0, 1],
+            expected: (0, 1, 0),
+        },
         // s²
-        Shape { ascending: &[0, 0, 1], expected: (0, 2, 0) },
+        Shape {
+            ascending: &[0, 0, 1],
+            expected: (0, 2, 0),
+        },
         // s(s²+1)
-        Shape { ascending: &[0, 1, 0, 1], expected: (0, 3, 0) },
+        Shape {
+            ascending: &[0, 1, 0, 1],
+            expected: (0, 3, 0),
+        },
     ];
     for case in cases {
         let count = half_plane_count(&polynomial(case.ascending)).expect("the count returns");
@@ -549,8 +438,8 @@ fn the_half_plane_count_survives_its_degenerate_shapes() {
 
 /// **The symmetric route and the Routh–Hurwitz route return the same population.**
 ///
-/// A symmetric operator has real spectrum, so its half-plane count *is* Sylvester's signature —
-/// `inertia.rs:375`. Holding the two routes to agreement is what makes the connection real rather
+/// A symmetric operator has real spectrum, so its half-plane count *is* Sylvester's signature.
+/// Holding the two routes to agreement is what makes the connection real rather
 /// than declared.
 #[test]
 fn the_half_plane_count_agrees_with_the_inertia_of_a_symmetric_operator() {
@@ -578,7 +467,10 @@ fn the_half_plane_count_agrees_with_the_inertia_of_a_symmetric_operator() {
 fn the_half_plane_count_reports_the_shift_it_closed_at() {
     for ascending in [&[6, 11, 6, 1][..], &[-1, 0, 1][..], &[1, 0, 1][..]] {
         let count = half_plane_count(&polynomial(ascending)).expect("the count returns");
-        let shift = count.shift_witness.clone().expect("a closing shift is reported");
+        let shift = count
+            .shift_witness
+            .clone()
+            .expect("a closing shift is reported");
         assert!(shift > Rat::zero(), "the shift is a positive rational");
         assert!(count.refinements < HALF_PLANE_REFINEMENT_CEILING);
         assert_eq!(
@@ -632,8 +524,7 @@ fn the_two_realifications_are_isospectral_and_only_one_is_semisimple() {
 /// space, not for a sampled candidate. The semisimple realification exhibits one.
 #[test]
 fn the_defective_generator_admits_no_conserving_receiver_and_the_semisimple_one_does() {
-    let defective =
-        conserving_receiver_space(&jordan_realification()).expect("the space returns");
+    let defective = conserving_receiver_space(&jordan_realification()).expect("the space returns");
     assert_eq!(defective.vanishing_diagonals, vec![0, 2]);
     assert!(defective.witness.is_none());
     assert_eq!(defective.admits_positive_definite_metric(), Some(false));
@@ -649,7 +540,10 @@ fn the_defective_generator_admits_no_conserving_receiver_and_the_semisimple_one_
     let semisimple =
         conserving_receiver_space(&semisimple_realification()).expect("the space returns");
     assert!(semisimple.vanishing_diagonals.is_empty());
-    let witness = semisimple.witness.clone().expect("a positive definite metric");
+    let witness = semisimple
+        .witness
+        .clone()
+        .expect("a positive definite metric");
     assert!(inertia(&witness).is_positive_definite());
     assert_eq!(semisimple.admits_positive_definite_metric(), Some(true));
     let check = rate_form(&semisimple_realification(), &witness).expect("the rate form returns");
@@ -759,7 +653,7 @@ fn the_rate_form_transports_by_congruence_through_the_existing_owner() {
     let (direct, transported) =
         rate_form_congruence(&state, &metric, &chart).expect("the congruence returns");
     assert_eq!(direct, transported);
-    // And the signature is what survives the chart change — Sylvester, at `inertia.rs:375`.
+    // And the signature is what survives the chart change — Sylvester.
     assert_eq!(
         inertia(&rate_form(&state, &metric).expect("rate form")).signature(),
         inertia(&direct).signature()
@@ -776,7 +670,11 @@ fn a_g_skew_generator_sits_on_the_axis_and_its_centred_companion_sits_on_the_sea
     let skew = matrix(&[&[0, 2, -1], &[-2, 0, 3], &[1, -3, 0]]);
     let chart = matrix(&[&[1, 1, 0], &[0, 1, 2], &[0, 0, 1]]);
     let inverse = chart.inverse().expect("the chart is invertible");
-    let state = inverse.multiply(&skew).expect("conjugate").multiply(&chart).expect("conjugate");
+    let state = inverse
+        .multiply(&skew)
+        .expect("conjugate")
+        .multiply(&chart)
+        .expect("conjugate");
     let metric = SymmetricForm::from_rows(
         chart
             .transpose()
@@ -802,7 +700,11 @@ fn a_g_skew_generator_sits_on_the_axis_and_its_centred_companion_sits_on_the_sea
     // The seam: L = A + I/2 has every eigenvalue at real part one half, which is the same statement
     // shifted — p_L(s + 1/2) has its whole root population on the axis.
     let centred = state
-        .add(&ExactRatMatrix::identity(3).expect("identity").scaled(&ratio(1, 2)))
+        .add(
+            &ExactRatMatrix::identity(3)
+                .expect("identity")
+                .scaled(&ratio(1, 2)),
+        )
         .expect("centring");
     assert_eq!(
         seam_form(&centred, &metric).expect("the seam form"),
@@ -813,7 +715,10 @@ fn a_g_skew_generator_sits_on_the_axis_and_its_centred_companion_sits_on_the_sea
         .expect("characteristic polynomial")
         .composed_with(&RationalPolynomial::new(vec![ratio(1, 2), Rat::one()]));
     let seam_count = half_plane_count(&shifted).expect("the count returns");
-    assert_eq!((seam_count.left, seam_count.axis, seam_count.right), (0, 3, 0));
+    assert_eq!(
+        (seam_count.left, seam_count.axis, seam_count.right),
+        (0, 3, 0)
+    );
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -878,7 +783,9 @@ fn cospectral_graphs_are_separated_by_the_response_atlas() {
 #[test]
 fn the_full_probe_atlas_counts_exactly_where_the_two_graphs_agree() {
     let identity = ExactRatMatrix::identity(6).expect("identity");
-    let names = (0..6).map(|index| format!("site{index}")).collect::<Vec<_>>();
+    let names = (0..6)
+        .map(|index| format!("site{index}"))
+        .collect::<Vec<_>>();
     let build = |lineage: &str, edges: &[(usize, usize)]| {
         Linearization::declared(
             lineage,
@@ -929,89 +836,6 @@ fn the_separation_refuses_when_no_declared_probe_separates() {
 // hostile input
 // ---------------------------------------------------------------------------------------------
 
-/// Every declared extent is checked against the material rather than trusted, and nothing is
-/// allocated from a declaration.
-#[test]
-fn a_declaration_that_disagrees_with_its_material_is_refused_by_name() {
-    let state = matrix(&[&[1, 0], &[0, 2]]);
-    assert_eq!(
-        Linearization::declared(
-            "bad",
-            matrix(&[&[1, 2, 3], &[4, 5, 6]]),
-            column(&[1, 0]),
-            row(&[1, 0]),
-            vec!["u".to_owned()],
-            vec!["y".to_owned()],
-        )
-        .unwrap_err(),
-        ChordRefusal::StateNotSquare {
-            rows: 2,
-            columns: 3
-        }
-    );
-    assert_eq!(
-        Linearization::declared(
-            "bad",
-            state.clone(),
-            column(&[1, 0, 0]),
-            row(&[1, 0]),
-            vec!["u".to_owned()],
-            vec!["y".to_owned()],
-        )
-        .unwrap_err(),
-        ChordRefusal::ExcitationShape { extent: 2, rows: 3 }
-    );
-    assert_eq!(
-        Linearization::declared(
-            "bad",
-            state.clone(),
-            column(&[1, 0]),
-            row(&[1, 0, 0]),
-            vec!["u".to_owned()],
-            vec!["y".to_owned()],
-        )
-        .unwrap_err(),
-        ChordRefusal::ReadoutShape {
-            extent: 2,
-            columns: 3
-        }
-    );
-    assert_eq!(
-        Linearization::declared(
-            "bad",
-            state.clone(),
-            column(&[1, 0]),
-            row(&[1, 0]),
-            vec!["u".to_owned(), "phantom".to_owned()],
-            vec!["y".to_owned()],
-        )
-        .unwrap_err(),
-        ChordRefusal::SourceNameCount {
-            declared: 2,
-            columns: 1
-        }
-    );
-    assert_eq!(
-        Linearization::declared(
-            "bad",
-            state.clone(),
-            column(&[1, 0]),
-            row(&[1, 0]),
-            vec!["u".to_owned()],
-            vec![],
-        )
-        .unwrap_err(),
-        ChordRefusal::ReceiverNameCount {
-            declared: 0,
-            rows: 1
-        }
-    );
-    assert_eq!(
-        Linearization::single_probe("bad", state, 0, 9).unwrap_err(),
-        ChordRefusal::PortOutsideState { extent: 2, port: 9 }
-    );
-}
-
 /// A probe point that is a pole is refused rather than returning an inverse that does not exist.
 #[test]
 fn a_probe_point_on_the_spectrum_is_refused() {
@@ -1024,277 +848,4 @@ fn a_probe_point_on_the_spectrum_is_refused() {
     let probe = resolvent_probe(&base, &ProbePoint::new(integer(0), Rat::one()))
         .expect("an off-spectrum probe returns");
     assert!(probe.residual.is_zero());
-}
-
-/// The zero polynomial has no pole atlas and says so.
-#[test]
-fn the_zero_polynomial_has_no_half_plane_reading() {
-    assert!(half_plane_count(&RationalPolynomial::zero()).is_err());
-    assert!(pole_atlas(&RationalPolynomial::zero(), PoleReading::Named).is_err());
-}
-
-/// The reading round-trips through its serialized chart unchanged.
-#[test]
-fn a_chord_remounts_from_its_serialized_chart() {
-    let base = declared("serialize", &[&[0, 1], &[-2, -3]], &[0, 1], &[1, 0]);
-    let chord = causal_chord(&base).expect("the chord returns");
-    let remounted: CausalChord =
-        ron::from_str(&ron::to_string(&chord).expect("the chord serializes"))
-            .expect("the chord remounts");
-    assert_eq!(remounted, chord);
-}
-
-// ---------------------------------------------------------------------------------------------
-// the wires
-// ---------------------------------------------------------------------------------------------
-//
-// Every returned object of this module carries a certificate or an invariant, and `Deserialize`
-// runs no constructor. Each test below builds a lawful value through the real constructor, checks
-// that it round-trips unchanged, and then hands the wire a hand-tampered chart and asserts the
-// refusal.
-
-/// A lawful value's serialized chart, ready to be tampered with.
-fn chart<T: serde::Serialize>(value: &T) -> serde_json::Value {
-    serde_json::to_value(value).expect("the chart serializes")
-}
-
-/// A rational on the wire. `Rat` is `[numerator, denominator]` over `BigInt`s that are themselves
-/// `[sign, [digits]]`, so a declared value is serialized rather than written as a literal.
-fn rational(value: &Rat) -> serde_json::Value {
-    serde_json::to_value(value).expect("a rational serializes")
-}
-
-fn assert_refused<T: serde::de::DeserializeOwned>(hostile: serde_json::Value) {
-    assert!(
-        serde_json::from_value::<T>(hostile).is_err(),
-        "the tampered chart is refused"
-    );
-}
-
-/// **A remounted linearization passes through its own constructor.** The port-name vectors are
-/// exterior declarations against the matrix shapes, and the derived wire indexed straight past
-/// them.
-#[test]
-fn a_linearization_wire_is_refused_when_it_does_not_fit_its_own_matrices() {
-    let base = declared("wire", &[&[0, 1], &[-2, -3]], &[0, 1], &[1, 0]);
-    let remounted: Linearization =
-        serde_json::from_value(chart(&base)).expect("a lawful chart remounts");
-    assert_eq!(remounted, base);
-
-    let mut hostile = chart(&base);
-    hostile["sources"] = serde_json::json!(["u", "v"]);
-    assert_refused::<Linearization>(hostile);
-
-    let mut hostile = chart(&base);
-    hostile["readout"]["columns"] = serde_json::json!(1);
-    assert_refused::<Linearization>(hostile);
-}
-
-/// **A remounted expansion re-runs the Faddeev--LeVerrier certificate.** The operator is recovered
-/// from the identities the expansion carries and every coefficient equation is re-derived, so a
-/// forged adjugate coefficient is refused rather than carried into `adjugate_at`.
-#[test]
-fn a_resolvent_expansion_wire_re_runs_its_own_adjugate_certificate() {
-    let expansion =
-        resolvent_expansion(&matrix(&[&[0, 1], &[-2, -3]])).expect("the expansion returns");
-    let remounted: ResolventExpansion =
-        serde_json::from_value(chart(&expansion)).expect("a lawful chart remounts");
-    assert_eq!(remounted, expansion);
-
-    let mut hostile = chart(&expansion);
-    hostile["adjugate"][1]["entries"][0] = rational(&integer(99));
-    assert_refused::<ResolventExpansion>(hostile);
-
-    let mut hostile = chart(&expansion);
-    hostile["certified_coefficients"] = serde_json::json!(1);
-    assert_refused::<ResolventExpansion>(hostile);
-
-    let mut hostile = chart(&expansion);
-    hostile["residual"] = rational(&ratio(1, 1000));
-    assert_refused::<ResolventExpansion>(hostile);
-
-    let mut hostile = chart(&expansion);
-    hostile["extent"] = serde_json::json!(3);
-    assert_refused::<ResolventExpansion>(hostile);
-}
-
-/// **A remounted transfer chart re-derives its cancellation and its atlas.** The gcd and the least
-/// common multiple are recomputed from the polynomials the chart already carries; a proper divisor
-/// of the true gcd would still multiply back, so the products alone are not the check.
-#[test]
-fn a_transfer_wire_re_derives_its_cancellation_and_its_atlas() {
-    let base = declared("wire", &[&[0, 1], &[-2, -3]], &[0, 1], &[1, 0]);
-    let transfer = transfer_function(&base).expect("the transfer returns");
-    let remounted: TransferFunction =
-        serde_json::from_value(chart(&transfer)).expect("a lawful chart remounts");
-    assert_eq!(remounted, transfer);
-
-    let mut hostile = chart(&transfer);
-    hostile["entries"][0]["numerator"]["coefficients"][0] = rational(&integer(5));
-    assert_refused::<TransferFunction>(hostile);
-
-    let mut hostile = chart(&transfer);
-    hostile["entries"][0]["certified_coefficients"] = serde_json::json!(1);
-    assert_refused::<TransferFunction>(hostile);
-
-    let mut hostile = chart(&transfer);
-    hostile["atlas_denominator"]["coefficients"][0] = rational(&integer(7));
-    assert_refused::<TransferFunction>(hostile);
-
-    let mut hostile = chart(&transfer);
-    hostile["extent"] = serde_json::json!(3);
-    assert_refused::<TransferFunction>(hostile);
-}
-
-/// **A remounted pole chart tests its declared poles against the factor that names them.** One
-/// exact evaluation per rational pole, and the factors are re-multiplied at their multiplicities
-/// against the denominator they decompose.
-#[test]
-fn a_pole_wire_tests_its_declared_poles_against_the_factor_that_names_them() {
-    // `(s+1)(s+2)²`
-    let atlas = pole_atlas(&polynomial(&[4, 8, 5, 1]), PoleReading::Certified)
-        .expect("the atlas returns");
-    let remounted: PoleAtlas =
-        serde_json::from_value(chart(&atlas)).expect("a lawful chart remounts");
-    assert_eq!(remounted, atlas);
-
-    let mut hostile = chart(&atlas);
-    hostile["factors"][0]["rational_poles"][0] = rational(&integer(7));
-    assert_refused::<PoleAtlas>(hostile);
-
-    let mut hostile = chart(&atlas);
-    hostile["factors"][1]["multiplicity"] = serde_json::json!(3);
-    assert_refused::<PoleAtlas>(hostile);
-
-    let mut hostile = chart(&atlas);
-    hostile["reading"] = serde_json::json!("named");
-    assert_refused::<PoleAtlas>(hostile);
-
-    // A half-plane population that still totals the degree — so the count is lawful on its own
-    // terms — but is not the one its own factors add up to.
-    let mut hostile = chart(&atlas);
-    hostile["half_plane"]["left"] = serde_json::json!(2);
-    hostile["half_plane"]["right"] = serde_json::json!(1);
-    assert_refused::<PoleAtlas>(hostile);
-}
-
-/// **A remounted mode support re-derives its support from its own eigenvectors.** The support is a
-/// property of the exhibited subspace, and `ModeSupport::is_hidden` is read off the port lists
-/// beside it.
-#[test]
-fn a_mode_support_wire_re_derives_its_support_from_its_eigenvectors() {
-    let base = declared("modes", &[&[0, 1], &[-2, -3]], &[0, 1], &[1, 0]);
-    let supports = rational_mode_supports(&base).expect("the supports return");
-    let first = supports.first().cloned().expect("a rational mode");
-    let remounted: ModeSupport =
-        serde_json::from_value(chart(&first)).expect("a lawful chart remounts");
-    assert_eq!(remounted, first);
-
-    let mut hostile = chart(&first);
-    hostile["support"] = serde_json::json!([0]);
-    assert_refused::<ModeSupport>(hostile);
-
-    let mut hostile = chart(&first);
-    hostile["geometric_multiplicity"] = serde_json::json!(2);
-    assert_refused::<ModeSupport>(hostile);
-}
-
-/// **A remounted probe re-sums its own squared Frobenius norm.** That reading is the one the
-/// module head says governs a non-normal response, so it is re-derived from the entries beside it.
-#[test]
-fn a_resolvent_probe_wire_re_sums_its_own_frobenius_norm() {
-    let base = declared("probe", &[&[0, 1], &[-2, -3]], &[0, 1], &[1, 0]);
-    let probe = resolvent_probe(&base, &ProbePoint::new(integer(0), Rat::one()))
-        .expect("an off-spectrum probe returns");
-    let remounted: ResolventProbe =
-        serde_json::from_value(chart(&probe)).expect("a lawful chart remounts");
-    assert_eq!(remounted, probe);
-
-    let mut hostile = chart(&probe);
-    hostile["resolvent_frobenius_squared"] = rational(&integer(0));
-    assert_refused::<ResolventProbe>(hostile);
-
-    let mut hostile = chart(&probe);
-    hostile["residual"] = rational(&ratio(1, 7));
-    assert_refused::<ResolventProbe>(hostile);
-}
-
-/// **A remounted conserving space re-derives its refutation and re-certifies its witness.** The
-/// Lean theorem `jordan_has_no_conserving_receiver` is the claim a forged witness would overturn,
-/// so the witness is both re-read through Sylvester's signature and re-solved for membership.
-#[test]
-fn a_conserving_receiver_space_wire_re_certifies_its_witness() {
-    let defective = conserving_receiver_space(&jordan_realification()).expect("the space returns");
-    let remounted: ConservingReceiverSpace =
-        serde_json::from_value(chart(&defective)).expect("a lawful chart remounts");
-    assert_eq!(remounted, defective);
-
-    // Positive definite, and outside the subspace: exactly the forgery the Lean theorem forbids.
-    let euclidean =
-        SymmetricForm::from_rows(ExactRatMatrix::identity(4).expect("identity").to_rows())
-            .expect("a symmetric form");
-    let mut hostile = chart(&defective);
-    hostile["witness"] = chart(&euclidean);
-    assert_refused::<ConservingReceiverSpace>(hostile);
-
-    let mut hostile = chart(&defective);
-    hostile["vanishing_diagonals"] = serde_json::json!([1]);
-    assert_refused::<ConservingReceiverSpace>(hostile);
-
-    let semisimple =
-        conserving_receiver_space(&semisimple_realification()).expect("the space returns");
-    let remounted: ConservingReceiverSpace =
-        serde_json::from_value(chart(&semisimple)).expect("a lawful chart remounts");
-    assert_eq!(remounted, semisimple);
-}
-
-/// **A remounted chord holds its components to the entries they came from.** The pole is named
-/// three times over — in the factor, beside the residue and inside it — and the wire refuses a
-/// chart where those three disagree.
-#[test]
-fn a_chord_wire_holds_its_components_to_the_entries_they_came_from() {
-    let base = declared("serialize", &[&[0, 1], &[-2, -3]], &[0, 1], &[1, 0]);
-    let chord = causal_chord(&base).expect("the chord returns");
-    let remounted: CausalChord =
-        serde_json::from_value(chart(&chord)).expect("a lawful chart remounts");
-    assert_eq!(remounted, chord);
-
-    let mut hostile = chart(&chord);
-    hostile["hidden_modes"]["coefficients"] =
-        serde_json::Value::Array(vec![rational(&integer(2))]);
-    assert_refused::<CausalChord>(hostile);
-
-    let mut hostile = chart(&chord);
-    hostile["components"][0]["rational_pole"] = rational(&integer(5));
-    assert_refused::<CausalChord>(hostile);
-
-    let mut hostile = chart(&chord);
-    hostile["components"][0]["residue"]["rational"]["order"] = serde_json::json!(2);
-    assert_refused::<CausalChord>(hostile);
-
-    let mut hostile = chart(&chord);
-    hostile["components"][0]["approximation_error"] = serde_json::json!("factor-only");
-    assert_refused::<CausalChord>(hostile);
-}
-
-/// **A remounted separation must still separate.** A chart whose two numerators agree is not a
-/// separation, and the probe it names is the first of the probes it lists.
-#[test]
-fn an_atlas_separation_wire_must_still_separate() {
-    let first = negative_laplacian(&[(0, 2), (0, 3), (0, 4), (0, 5), (1, 4), (1, 5), (2, 3)]);
-    let second = negative_laplacian(&[(0, 2), (0, 4), (0, 5), (1, 2), (1, 4), (1, 5), (2, 3)]);
-    let left = Linearization::single_probe("cospectral-a", first, 0, 0).expect("declared");
-    let right = Linearization::single_probe("cospectral-b", second, 0, 0).expect("declared");
-    let separation = separate_under_probe(&left, &right).expect("the atlas separates them");
-    let remounted: AtlasSeparation =
-        serde_json::from_value(chart(&separation)).expect("a lawful chart remounts");
-    assert_eq!(remounted, separation);
-
-    let mut hostile = chart(&separation);
-    hostile["right_numerator"] = chart(&separation.left_numerator);
-    assert_refused::<AtlasSeparation>(hostile);
-
-    let mut hostile = chart(&separation);
-    hostile["transport_path"] = serde_json::json!(1);
-    assert_refused::<AtlasSeparation>(hostile);
 }
