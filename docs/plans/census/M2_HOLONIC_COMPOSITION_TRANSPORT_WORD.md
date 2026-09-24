@@ -1,7 +1,6 @@
 # M2 group-valued TransportWord owner
 
-This bounded owner move follows verified pair-lock curation at `eb0f76b7`. Lake verification is
-pending root coordination; no Lake builds were run for this cut.
+This bounded owner move follows the verified M2 receiver extraction at `c512d37f` (PR #130). The cut was rebased onto that exact source before verification.
 
 ## Declaration ownership
 
@@ -43,7 +42,7 @@ directly; indirect callers updated here are named above.
 ## Source import closure
 
 Counts follow project `import ElementaryHolonics.*` lines, include the root itself, and exclude
-Mathlib and Lake jobs. The before graph is verified source at `eb0f76b7`; after reflects this packet.
+Mathlib and Lake jobs. The before graph was measured at predecessor source `eb0f76b7`; after reflects this packet. The receiver-extraction rebase does not alter these owner-edge counts.
 
 | Source root | Before modules / lines / Millennium | After modules / lines / Millennium | Effect |
 |---|---:|---:|---|
@@ -57,27 +56,18 @@ The follow-up facade cut can remove `Framework.Geometry → Millennium.HolonicCo
 remaining generic AddressedPassage, connection, and route-comparison declarations have core owners.
 This packet alone does not claim a smaller public-root closure.
 
-## Focused Lake gates (pending)
+## Focused Lake gates (verified)
 
 Run from `formal/elementary-holonics`:
 
 ```sh
-lake build ElementaryHolonics.Foundation.TransportWord
-lake build ElementaryHolonics.Millennium.HolonicComposition
-lake build ElementaryHolonics.Millennium.HolonicAlternatingGeometry
-lake build ElementaryHolonics.Millennium.HolonicCurvedArcEinstein
-lake build ElementaryHolonics.Millennium.HolonicDiscreteMaxwellOperator
-lake build ElementaryHolonics.Millennium.HolonicClockedPantographicSwing
-lake build ElementaryHolonics.Millennium.HolonicFourForceSectorCarrier
-lake build ElementaryHolonics.Millennium.HolonicUnknotting
-lake build ElementaryHolonics.Millennium.HolonicSlingTransport
-lake build ElementaryHolonics.Millennium.HolonicTorusParametronRealization
-lake build ElementaryHolonics.Millennium.HolonicConnectionCurvature
-lake build ElementaryHolonics.Millennium.HolonicPolygonGyroWinding
-lake build ElementaryHolonics.Framework.Geometry
-lake build ElementaryHolonics.Framework
-lake build ElementaryHolonics
+lake build ElementaryHolonics.Foundation.TransportWord ElementaryHolonics.Millennium.HolonicComposition ElementaryHolonics.Millennium.HolonicCurvedArcEinstein ElementaryHolonics.Millennium.HolonicDiscreteMaxwellOperator ElementaryHolonics.Millennium.HolonicFourForceSectorCarrier ElementaryHolonics.Millennium.HolonicConnectionCurvature ElementaryHolonics.Millennium.HolonicPolygonGyroWinding ElementaryHolonics.Framework.Geometry ElementaryHolonics.Framework
 ```
 
-These gates cover the core owner, all eight direct Research consumers, two indirect group-word
-consumers, and the subject/public facades. Record completed commands and logs after root coordination.
+The combined command passed, building 9,199 Lake jobs. It covers the core owner, the Research
+composition owner, all five changed direct group-word consumers, and the Geometry and public
+Framework facades. The remaining direct Research importers and the umbrella were not separately
+requested or claimed in this packet. The final build log is `/tmp/m2-transport-word-build.log`; it
+contains no `sorry` or build error. The changed Lean source files also contain no `sorry`/`sorryAx`.
+The existing `propext`, `Classical.choice`, and `Quot.sound` axiom reports are standard imported
+proof machinery; no new axiom was introduced by the moved declarations.
