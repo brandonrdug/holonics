@@ -795,7 +795,7 @@ impl std::error::Error for MorphologicalConductRefusal {}
 #[cfg(test)]
 mod tests {
     use holonics_portable::num::Cog;
-    use soma_abi::active::RelationAtom;
+    use holonics::generator::action::RelationAtom;
 
     use crate::{resonance_ecology::ResonanceGerm, suffix_ecology::ExactLabeledSuffixEcology};
 

@@ -26,7 +26,7 @@ use holonics_portable::{
 use num_bigint::BigInt;
 use num_rational::BigRational;
 use sha2::{Digest, Sha256};
-use soma_abi::active::{ActionCurrent, RelationAtom};
+use holonics::generator::action::{ActionCurrent, RelationAtom};
 use holonics::membrane::{
     ContemporaryRadiation, CpuLiveCurrentExecutor, CurrentBoundaryPort, LiveBoundaryTransition,
     LiveCurrentError, LiveCurrentExecutor, LiveCurrentMachine, LiveCurrentRestImage,

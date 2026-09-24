@@ -19,7 +19,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use holonics_portable::num::Cog;
 use life::causal_language::{fiber_bytes, CausalLanguageEcology, CausalLanguagePassage};
-use soma_abi::active::ActionCurrent;
+use holonics::generator::action::ActionCurrent;
 
 fn main() {
     if let Err(reason) = run() {

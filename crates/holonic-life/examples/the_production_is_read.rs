@@ -37,7 +37,7 @@ use life::{
     },
     text_material::{ExactTextMaterialAtlas, TextMaterialRole},
 };
-use soma_abi::active::ActionCurrent;
+use holonics::generator::action::ActionCurrent;
 
 const DECLARED_FAMILY: &[&str] = &[
     "research/papers/source/mathematics/definitions/receiver-indexed-holonic-system.typ",

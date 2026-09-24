@@ -14,7 +14,7 @@ use life::current_world::{
 use life::form_mouth::deposit_form_or_message;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use soma_abi::active::{ActionCurrent, RelationAtom};
+use holonics::generator::action::{ActionCurrent, RelationAtom};
 use holonics::membrane::{
     CurrentBoundaryPort, InterfaceCapability, LiveBoundaryTransition, LiveConstituent,
     LiveCurrentMachine, LiveCurrentRestImage, LiveIncidenceKind, LiveMemory,

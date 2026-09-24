@@ -21,7 +21,7 @@ use holonic_engine::{
 };
 use holonics::structure::{GrowingKeyAtlas, LocalQueue, LocalRelations, LocalSequence, LocalSet};
 use num_bigint::BigUint;
-use soma_abi::active::{ActionCurrent, RelationAtom};
+use holonics::generator::action::{ActionCurrent, RelationAtom};
 #[cfg(test)]
 use holonics::membrane::CpuLiveCurrentExecutor;
 use holonics::membrane::{

@@ -75,7 +75,7 @@ use life::{
     morphological_language::{MorphologicalGenerationSpec, MorphologicalLanguagePassage},
     text_material::{ExactTextMaterialAtlas, ExactTextMaterialCorpus, ParsedTextDocument},
 };
-use soma_abi::active::ActionCurrent;
+use holonics::generator::action::ActionCurrent;
 
 /// The exterior organ the language body must emit a deed against before it may answer.
 const RESEARCH_CAPABILITY: &str = "conditioned-laboratory-history";

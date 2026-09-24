@@ -17,7 +17,7 @@ use life::causal_language::{
     fiber_bytes, lexical_tokens, token_germs_public, CausalLanguageEcology, CausalLanguagePassage,
 };
 use life::suffix_ecology::ExactSuffixEcology;
-use soma_abi::active::ActionCurrent;
+use holonics::generator::action::ActionCurrent;
 
 const MATERIAL: &[(&str, u64)] = &[
     ("docs/canon/THE_DOCUMENT_LAW.md", 1),

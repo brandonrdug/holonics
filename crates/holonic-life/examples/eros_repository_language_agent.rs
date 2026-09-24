@@ -48,7 +48,7 @@ use life::{
 };
 use serde::Serialize;
 use sha2::{Digest, Sha256};
-use soma_abi::active::ActionCurrent;
+use holonics::generator::action::ActionCurrent;
 
 const SEARCH_CAPABILITY: &str = "repository-search";
 const LOCAL_ORGAN_WORKER_APERTURE: usize = 2;

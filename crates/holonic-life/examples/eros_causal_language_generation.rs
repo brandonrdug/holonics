@@ -48,7 +48,7 @@ use life::causal_language::{
 use life::suffix_ecology::ExactSuffixEcology;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use soma_abi::active::ActionCurrent;
+use holonics::generator::action::ActionCurrent;
 
 const REPORT_SCHEMA: &str = "soma.causal-language.report.v4-ported";
 

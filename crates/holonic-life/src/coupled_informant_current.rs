@@ -26,7 +26,7 @@ use holonic_engine::{
     CoupledInformantEvent, CoupledInformantGrade, CoupledInformantLaw, CoupledInformantPrediction,
     CoupledInformantRadiationKind, CoupledInformantStanding, EventSuccessor, ReturnedCellCoverage,
 };
-use soma_abi::active::{ActionCurrent, RelationAtom};
+use holonics::generator::action::{ActionCurrent, RelationAtom};
 use holonics::membrane::{
     ContemporaryRadiation, CurrentLineage, LiveCurrentError, LiveCurrentExecutor,
     LiveCurrentMachine,

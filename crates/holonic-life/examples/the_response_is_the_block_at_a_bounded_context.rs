@@ -27,7 +27,7 @@ use life::presentation_quotient::{
     divide_junction, PresentationGround, PresentationReceiver, PresentedCandidate,
 };
 use life::suffix_ecology::ExactSuffixEcology;
-use soma_abi::active::ActionCurrent;
+use holonics::generator::action::ActionCurrent;
 
 const MATERIAL: &[(&str, u64)] = &[
     ("docs/canon/THE_DOCUMENT_LAW.md", 1),

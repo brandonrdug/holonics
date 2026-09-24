@@ -28,7 +28,7 @@ use life::{
     text_material::{ExactTextMaterialAtlas, TextMaterialRole},
 };
 use serde::Serialize;
-use soma_abi::active::ActionCurrent;
+use holonics::generator::action::ActionCurrent;
 
 const DRIVER: &str = "the_conditioned_section_returns_after_detachment";
 const REST_FORM: &str = "recurrent-section-native-rest";

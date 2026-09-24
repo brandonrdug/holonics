@@ -20,7 +20,7 @@ use std::{
 
 use holonics_portable::num::Cog;
 use holonics::structure::{BranchLineage, LocalSequence, LocalSet};
-use soma_abi::active::{ActionCurrent, RelationAtom};
+use holonics::generator::action::{ActionCurrent, RelationAtom};
 use holonics::membrane::{
     LiveCurrentExecutor, LiveCurrentMachine, ParallelCpuLiveCurrentExecutor, ReceiverFiberIdentity,
     SparseStandingSurface,

@@ -874,7 +874,7 @@ pub fn answer_causes(answer: &AgenticLanguageAnswer) -> BTreeSet<String> {
 mod tests {
     use super::*;
     use holonics_portable::num::Cog;
-    use soma_abi::active::ActionCurrent;
+    use holonics::generator::action::ActionCurrent;
 
     use crate::{
         agentic_language::{AgenticLanguageCapability, AgenticLanguageSpec},

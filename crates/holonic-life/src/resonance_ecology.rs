@@ -14,7 +14,7 @@ use holonics::structure::{
     GrowingKeyAtlas, KeyAtlasError, LocalRelations, LocalSequence, LocalSet, LocalStructureError,
     RelationAtlasError,
 };
-use soma_abi::active::{ActionCurrent, RelationAtom};
+use holonics::generator::action::{ActionCurrent, RelationAtom};
 #[cfg(test)]
 use holonics::membrane::LiveBoundaryTransition;
 use holonics::membrane::{

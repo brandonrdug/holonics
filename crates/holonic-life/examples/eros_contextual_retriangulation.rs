@@ -12,7 +12,7 @@ use num_bigint::{BigInt, Sign};
 use num_rational::BigRational;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use soma_abi::active::{ActionCurrent, RelationAtom};
+use holonics::generator::action::{ActionCurrent, RelationAtom};
 use holonics::membrane::{
     ContemporaryEvent, CurrentBoundaryPort, CurrentEvent, CurrentGeometry, CurrentLineage,
     InterfaceCapability, LiveConstituent, LiveCurrentMachine, LiveCurrentRestImage, LiveMemory,

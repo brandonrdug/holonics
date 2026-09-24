@@ -24,7 +24,7 @@ use holonics_portable::num::Cog;
 use life::causal_language::{
     fiber_bytes, lexical_tokens, CausalLanguageEcology, CausalLanguagePassage,
 };
-use soma_abi::active::ActionCurrent;
+use holonics::generator::action::ActionCurrent;
 
 const MATERIAL: &[(&str, u64)] = &[
     ("docs/canon/THE_DOCUMENT_LAW.md", 1),

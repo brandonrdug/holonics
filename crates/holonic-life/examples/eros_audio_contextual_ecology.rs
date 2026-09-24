@@ -19,7 +19,7 @@ use life::form_mouth::deposit_form_or_message;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
-use soma_abi::active::ActionCurrent;
+use holonics::generator::action::ActionCurrent;
 use holonics::membrane::{
     CurrentBoundaryPort, InterfaceCapability, LiveBoundaryTransition, LiveConstituent,
     LiveCurrentMachine, LiveMemory, ParallelCpuLiveCurrentExecutor, RegionalArcRadiation,

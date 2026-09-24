@@ -23,7 +23,7 @@ use holonics::generator::reflection::{
     ReceiverId, ReflectiveCodecExecutor, ReflectiveRuntime, ReflectiveRuntimeError,
 };
 use holonics::structure::{CausalMembrane, LocalSet};
-use soma_abi::active::ActionCurrent;
+use holonics::generator::action::ActionCurrent;
 use holonics::membrane::{LiveCurrentExecutor, ParallelCpuLiveCurrentExecutor};
 
 use crate::presentation_quotient::{

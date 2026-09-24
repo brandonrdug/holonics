@@ -14,7 +14,7 @@ use holonics::structure::{
     FrozenRelationAtlas, FrozenRelationBuilder, LocalRelations, LocalSequence, LocalSet,
     RelationAtlasError, RelationSpan,
 };
-use soma_abi::active::RelationAtom;
+use holonics::generator::action::RelationAtom;
 use holonics::membrane::ReceiverFiberIdentity;
 
 use crate::resonance_ecology::ResonanceGerm;
@@ -2593,7 +2593,7 @@ fn join_u64(low: u32, high: u32) -> Option<u64> {
 #[cfg(test)]
 mod tests {
     use holonics_portable::num::Cog;
-    use soma_abi::active::RelationAtom;
+    use holonics::generator::action::RelationAtom;
 
     use super::*;
 

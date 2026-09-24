@@ -44,7 +44,7 @@ use holonic_engine::receiver_exact_compression::{
 use holonic_engine::supported_realizers::RealizerId;
 use life::resonance_ecology::{fiber_from_bytes, ResonanceGerm};
 use life::suffix_ecology::ExactSuffixEcology;
-use soma_abi::active::RelationAtom;
+use holonics::generator::action::RelationAtom;
 
 const MARK_SCHEMA: u64 = 0x4d41_524b;
 /// Surfaces shorter than this carry too little conduct to be worth placing, and longer than this

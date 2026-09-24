@@ -619,7 +619,7 @@ impl NativeRecurrenceComplex {
             }
             germs.push(ResonanceGerm::new(
                 ReceiverFiberIdentity::new(schema, identity),
-                soma_abi::active::RelationAtom::from_words(phase)
+                holonics::generator::action::RelationAtom::from_words(phase)
                     .ok_or(NativeCirculationError::Standing)?,
             ));
         }
@@ -776,7 +776,7 @@ fn take<'a>(
 #[cfg(test)]
 mod tests {
     use holonics_portable::num::Cog;
-    use soma_abi::active::RelationAtom;
+    use holonics::generator::action::RelationAtom;
 
     use super::*;
 

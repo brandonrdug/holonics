@@ -6,7 +6,7 @@ use holonics_portable::incidence::IncidenceHand;
 use holonics_portable::manifold::FeltDeed;
 use holonics_portable::num::Cog;
 use serde::Serialize;
-use soma_abi::active::{ActionCurrent, RelationAtom};
+use holonics::generator::action::{ActionCurrent, RelationAtom};
 use holonics::membrane::{
     ContemporaryEvent, CurrentBoundaryPort, CurrentEvent, CurrentGeometry, CurrentLineage,
     InterfaceCapability, LiveBoundaryTransition, LiveConstituent, LiveCurrentError,

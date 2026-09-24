@@ -39,6 +39,8 @@ use crate::scalar::{add, at, matrix, rat, scale};
 
 /// Source-neutral codec reflection and continuation transitions.
 pub mod reflection;
+/// Situated action currents, relation atoms, and their admitted active-cut incidence.
+pub mod action;
 
 /// [definition] **A clock**: a positive step `h` per tick and a tick odometer whose overflow is the
 /// jump (section-crossing) count.

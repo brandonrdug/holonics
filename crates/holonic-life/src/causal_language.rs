@@ -20,7 +20,7 @@ use holonics::ratio::surprisal::{
 use holonics::structure::{LocalRelations, LocalSequence, LocalSet};
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
-use soma_abi::active::{ActionCurrent, RelationAtom};
+use holonics::generator::action::{ActionCurrent, RelationAtom};
 use holonics::membrane::{
     LiveCurrentExecutor, LiveCurrentMachine, ParallelCpuLiveCurrentExecutor, ReceiverFiberIdentity,
     SparseStandingSurface,

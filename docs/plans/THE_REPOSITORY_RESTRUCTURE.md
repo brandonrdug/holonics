@@ -709,6 +709,9 @@ existing suites (§0.9):
    [Causal chord](census/M1_CAUSAL_CHORD_OWNER_MOVE.md) records its source split and pending gate.
    The [ratio and information operators](census/M1_RATIO_OWNER_MOVE.md) now live under `holonics::ratio`;
    the [live membrane runtime](census/M1_MEMBRANE_OWNER_MOVE.md) now lives under `holonics::membrane`;
+   the active relation/action grammar now lives under `holonics::generator::action`, with the
+   unused ABI conduct dispatcher retired and its no-caller/no-test evidence recorded in
+   [the action owner audit](census/M1_GENERATOR_ACTION_OWNER_MOVE.md);
    exact words and the remaining source-neutral engine/HNN laws still need disposition. Resident
    engine/HNN execution moves to CUDA. The [CUDA apparatus](census/M1_CUDA_MOUNT_OWNER_MOVE.md)
    now lives in `crates/holonics-cuda` as the `holonics-cuda` package (`holonics_cuda` library);

@@ -11,7 +11,7 @@ use holonics_portable::{
         EventCell, EventCellId, EventComplex, EventPort, IncidenceHand, OrientedIncidence,
     },
 };
-use soma_abi::active::{ActionCurrent, RelationAtom};
+use holonics::generator::action::{ActionCurrent, RelationAtom};
 use holonics::membrane::{
     ContemporaryEvent, ContemporaryRadiation, CpuLiveCurrentExecutor, CurrentBoundaryPort,
     CurrentEvent, CurrentGeometry, CurrentLineage, DirectedCurrentRelation, InterfaceCapability,

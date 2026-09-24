@@ -9,7 +9,7 @@ use holonics_portable::incidence::{
     IncidenceKind, OrientedIncidence,
 };
 use holonics_portable::num::Cog;
-use soma_abi::active::{ActionCurrent, RelationAtom};
+use holonics::generator::action::{ActionCurrent, RelationAtom};
 use holonics::membrane::{
     ContemporaryEvent, ContemporaryRadiation, CpuLiveCurrentExecutor, CurrentBoundaryPort,
     CurrentEvent, DirectedCurrentRelation, InterfaceCapability, LiveCurrentMachine,

@@ -61,7 +61,7 @@ use life::{
     text_material::{ExactTextMaterialAtlas, TextMaterialRole},
 };
 use serde::Serialize;
-use soma_abi::active::ActionCurrent;
+use holonics::generator::action::ActionCurrent;
 
 const DRIVER: &str = "the_deposit_licenses_the_re_emission";
 const GRADE_FORM: &str = "re-emission-grade";

@@ -764,7 +764,7 @@ fn stage_suffix(
     let material_symbols = key_population
         .iter()
         .map(|key| {
-            let phase = soma_abi::active::RelationAtom::from_words(key.phase)
+            let phase = holonics::generator::action::RelationAtom::from_words(key.phase)
                 .ok_or(MorphologicalConditionCudaError::Extent)?;
             Ok(ResonanceGerm::new(key.identity.clone(), phase))
         })

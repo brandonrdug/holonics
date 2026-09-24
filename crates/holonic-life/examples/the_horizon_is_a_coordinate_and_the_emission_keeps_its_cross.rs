@@ -47,7 +47,7 @@ use life::causal_language::{
     CausalLanguageGenerationSpec, CausalLanguagePassage, ContinuationReading, ContinuationReceiver,
 };
 use life::presentation_quotient::{PresentationMaterial, SpanIndex};
-use soma_abi::active::ActionCurrent;
+use holonics::generator::action::ActionCurrent;
 
 /// The aperture the sweep runs at. Three is the shallowest depth at which the window test is not a
 /// tautology.

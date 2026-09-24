@@ -31,7 +31,7 @@ use life::{
     text_material::{ExactTextMaterialAtlas, TextMaterialRole},
 };
 use serde::Serialize;
-use soma_abi::active::ActionCurrent;
+use holonics::generator::action::ActionCurrent;
 
 const DRIVER: &str = "the_code_material_returns_its_world_line";
 const REST_FORM: &str = "algorithmic-material-native-rest";

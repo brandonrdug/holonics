@@ -13,7 +13,7 @@ use std::{
 use holonics_portable::num::Cog;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use soma_abi::active::ActionCurrent;
+use holonics::generator::action::ActionCurrent;
 
 use crate::causal_language::{lexical_tokens, render_tokens};
 

@@ -26,7 +26,7 @@ use life::{
 };
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use soma_abi::active::ActionCurrent;
+use holonics::generator::action::ActionCurrent;
 use holonics::membrane::live_current::{LiveCurrentExecutor, ParallelCpuLiveCurrentExecutor};
 
 /// This driver's name at the plate mouth:

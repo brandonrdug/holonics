@@ -10,7 +10,7 @@ use holonics_portable::num::Cog;
 use num_bigint::BigUint;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use soma_abi::active::{ActionCurrent, RelationAtom};
+use holonics::generator::action::{ActionCurrent, RelationAtom};
 use holonics::membrane::{
     ContemporaryEvent, CurrentBoundaryPort, CurrentEvent, CurrentExecutionRequest, CurrentGeometry,
     DirectedExecutionRequest, ExecutedContemporaryEvent, InterfaceCapability,

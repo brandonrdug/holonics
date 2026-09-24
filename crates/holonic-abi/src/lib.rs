@@ -6,10 +6,6 @@
 //! other card substrates, and exact gates. It owns no carriage law, allocation, launch sizing,
 //! sharding, world policy, persistence, or observer interpretation.
 
-/// Native execution mouth for relation atoms, event/current extents, sparse cuts, and incidence.
-pub mod active;
-/// Allocation-free conduct of one validated native current.
-pub mod conduct;
 /// Transient cooperative REGISTER-contact sheet.
 pub mod contact;
 /// Fixed word transport for the consequence of one live event.

@@ -28,7 +28,7 @@ use life::{
 };
 use serde::Serialize;
 use sha2::{Digest, Sha256};
-use soma_abi::active::ActionCurrent;
+use holonics::generator::action::ActionCurrent;
 use holonics::membrane::{LiveCurrentMachine, SparseStandingSurface};
 
 const PREDECESSOR: &str = concat!(

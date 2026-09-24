@@ -325,7 +325,7 @@ use holonics_portable::medium::{RegionalForm, COMPACT_FORM_LAYOUT_VERSION, COMPA
 use holonics_portable::num::{cog_packed_word, packed_cog_is_canonical, read_cog, Cog, COG_WORDS};
 use holonics_portable::place::Place;
 use crate::structure::{CausalMembrane, OrdinalAtlasError, SparseOrdinalAtlas};
-use soma_abi::active::{ActionCurrent, RelationAtom};
+use crate::generator::action::{ActionCurrent, RelationAtom};
 
 use crate::membrane::live_constituent::{
     cellular_cycle_edges, PopulationSectionOrigin, SharedOccurrenceKey, StandingIncidenceAperture,

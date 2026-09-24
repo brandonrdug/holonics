@@ -12,7 +12,7 @@ and follow the actual source/consumer map.
 | `holonics-workspace` | The specialized persistent snapshot/workspace artifact family. |
 | `holonic-engine` | Native mathematical computation, resident CUDA laws, operator ecology, dismantling and comparison owners. |
 | `holonic-life` | Earlier lifecycle/package, source transport and application-boundary owners (Cargo package `life`). |
-| `holonics-portable`, `holonic-abi` | Shared `no_std` body and section laws; remaining host/device wire records await consolidation. |
+| `holonics-portable`, `holonic-abi` | Shared `no_std` body/section laws and host/device wire records; active generator/action grammar is owned by `holonics`. |
 | `holonics-cuda` | CUDA driver, device sections and launch apparatus. |
 
 The [architecture map](../docs/ARCHITECTURE_MAP.md) gives exact ownership and scope. A crate's

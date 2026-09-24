@@ -48,7 +48,7 @@ use life::agentic_language::{
     AgenticLanguageWorldReturn,
 };
 use life::morphological_language::MorphologicalLanguagePassage;
-use soma_abi::active::ActionCurrent;
+use holonics::generator::action::ActionCurrent;
 use holonics::membrane::{
     CurrentExecutionRequest, DirectedExecutionRequest, ExecutedContemporaryEvent, LiveCurrentError,
     LiveCurrentExecutor, ParallelCpuLiveCurrentExecutor, RegionalExecutionRequest,
