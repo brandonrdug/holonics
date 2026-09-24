@@ -28,7 +28,8 @@ Research module for other declarations; those edges are not part of this cut.
 
 ## Source import closure
 
-Counts below follow only project `import ElementaryHolonics.*` lines, including the root itself;
+Counts below describe this first cut (before the following Ratio exponential-kernel cut) and follow
+only project `import ElementaryHolonics.*` lines, including the root itself;
 they exclude Mathlib modules and Lake jobs. “Before” substitutes the pre-cut
 `HolonicAdjointNormalization → Millennium.SituatedReturnedDifference` edge into the current graph;
 the current graph also includes the new `Framework.Dynamics → Transport.AddressedLinearizedPassage`

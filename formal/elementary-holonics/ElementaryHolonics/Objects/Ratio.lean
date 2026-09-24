@@ -1,8 +1,8 @@
 import ElementaryHolonics.Physics.InformationDifference
 import ElementaryHolonics.Computation.HolonicAdjointNormalization
 import ElementaryHolonics.Geometry.CrossRatio
+import ElementaryHolonics.Objects.Ratio.ExponentialKernel
 import ElementaryHolonics.Objects.Ratio.GaugeCalculus
-import ElementaryHolonics.Millennium.Turn
 import ElementaryHolonics.Transport.JetStaircase
 import Mathlib.Analysis.Quaternion
 
@@ -11,8 +11,8 @@ import Mathlib.Analysis.Quaternion
 
 [definition] Object 9 of `docs/ELEMENTARY_OBJECTS.md`. A ratio compares two Holon readings and is
 carried as the undivided pair (`Geometry/CrossRatio.RatioPresentation`). Its logarithm is a lift
-carried as data, with the winding as its branch (`Millennium/Turn`); its first order is the
-Maurer–Cartan form `R⁻¹dR`, which is the pure-gauge term of the gauge owner
+carried as data, with the winding as its branch (`Objects/Ratio/ExponentialKernel`); its first
+order is the Maurer–Cartan form `R⁻¹dR`, which is the pure-gauge term of the gauge owner
 (`Objects/Ratio/GaugeCalculus`); its higher orders are the jet of the log ratio, read
 continuously by `iteratedDeriv` and on the tick lattice by `Transport/JetStaircase`.
 
@@ -309,7 +309,7 @@ theorem liftedCrossEntropy_windShift_im (p q : PositiveProbabilitySection Index)
   ring
 
 /-- [proved-derived; formal-checked] A whole-turn shift is invisible to the amplitude
-(`Turn.theWholeTurnIsWhatTheExponentialDeletes`). -/
+(`ExponentialKernel.exp_eq_one_iff_integer_period`). -/
 theorem amplitude_windShift (q : PositiveProbabilitySection Index) (phase : Index → ℝ)
     (turns : Index → ℤ) (i : Index) :
     amplitude q (windShift phase turns) i = amplitude q phase i := by
@@ -319,7 +319,7 @@ theorem amplitude_windShift (q : PositiveProbabilitySection Index) (phase : Inde
     push_cast
     ring
   have hturn : Complex.exp ((turns i : ℂ) * (2 * Real.pi * Complex.I)) = 1 :=
-    (Millennium.Turn.theWholeTurnIsWhatTheExponentialDeletes _).mpr ⟨turns i, rfl⟩
+    (ExponentialKernel.exp_eq_one_iff_integer_period _).mpr ⟨turns i, rfl⟩
   rw [← exp_liftedLog, ← exp_liftedLog, hshift, Complex.exp_add, hturn, mul_one]
 
 /-- [proved-derived; formal-checked] **The amplitude loses exactly the winding.** Two lifts give
@@ -333,7 +333,7 @@ theorem amplitude_eq_iff_winding (q : PositiveProbabilitySection Index)
     rw [← exp_liftedLog, ← exp_liftedLog] at h
     have h1 : Complex.exp (liftedLog q phase' i - liftedLog q phase i) = 1 := by
       rw [Complex.exp_sub, ← h, div_self (Complex.exp_ne_zero _)]
-    obtain ⟨k, hk⟩ := (Millennium.Turn.theWholeTurnIsWhatTheExponentialDeletes _).mp h1
+    obtain ⟨k, hk⟩ := (ExponentialKernel.exp_eq_one_iff_integer_period _).mp h1
     refine ⟨k, ?_⟩
     have him := congrArg Complex.im hk
     simp [liftedLog] at him
@@ -442,7 +442,7 @@ theorem logFibre_torsor {r : RatioPresentation ℂ} (hden : r.den ≠ 0) {ℓ �
       mul_right_cancel₀ hden (h'.trans hℓ'.symm)
     have h1 : Complex.exp (ℓ' - ℓ) = 1 := by
       rw [Complex.exp_sub, heq, div_self (Complex.exp_ne_zero _)]
-    obtain ⟨n, hn⟩ := (Millennium.Turn.theWholeTurnIsWhatTheExponentialDeletes _).mp h1
+    obtain ⟨n, hn⟩ := (ExponentialKernel.exp_eq_one_iff_integer_period _).mp h1
     exact ⟨n, by rw [← hn]; ring⟩
   · rintro ⟨n, rfl⟩
     change Complex.exp (ℓ + n * (2 * Real.pi * Complex.I)) * r.den = r.num

@@ -1,5 +1,4 @@
 import ElementaryHolonics.Millennium.HolonicTorusKnots
-import ElementaryHolonics.Millennium.Turn
 import ElementaryHolonics.Foundation.BoundaryReceiver
 
 /-!

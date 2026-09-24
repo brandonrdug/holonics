@@ -277,9 +277,31 @@ only restated the moved theorem. `Framework.Dynamics` imports the new owner. `Mi
 connection-square and returned-difference rebase theorem. `WorldTube` and
 `SituatedMachineLearning` still import that Research owner for separate uses.
 
-The static source import closure for `Objects.Ratio` drops from 16 modules / 2 Millennium modules
-to 14 / 1; `HolonicAdjointNormalization` drops from 6 / 1 to 3 / 0. `Framework.Information` drops
-from 155 / 107 to 154 / 106. `Framework.Objects` remains at 24 Millennium modules through its
-separate `Transport.WorldTube → Millennium.SituatedReturnedDifference` edge. These are source
-import-line counts, not Lake jobs. The focused Lake command and full root gates are recorded in
-[`M2_ADDRESSED_LINEARIZED_PASSAGE.md`](M2_ADDRESSED_LINEARIZED_PASSAGE.md); verification is pending.
+Immediately after this addressed-passage cut, the static source import closure for `Objects.Ratio`
+dropped from 16 modules / 2 Millennium modules to 14 / 1; `HolonicAdjointNormalization` dropped
+from 6 / 1 to 3 / 0. `Framework.Information` dropped from 155 / 107 to 154 / 106.
+`Framework.Objects` remained at 24 Millennium modules through its separate
+`Transport.WorldTube → Millennium.SituatedReturnedDifference` edge. The following
+[Ratio exponential-kernel cut](M2_RATIO_EXPONENTIAL_KERNEL.md) removes the remaining direct
+`Ratio → Millennium.Turn` edge. These are source import-line counts, not Lake jobs. The focused
+Lake command and full root gates are recorded in
+[`M2_ADDRESSED_LINEARIZED_PASSAGE.md`](M2_ADDRESSED_LINEARIZED_PASSAGE.md); the focused owner and
+consumer checks passed, while the future-root gates remain pending.
+
+## M2 Ratio exponential-kernel owner
+
+`Objects/Ratio/ExponentialKernel.lean` now owns the generic integer-period characterization of the
+complex exponential kernel. `Objects/Ratio` imports that owner and no longer imports
+`Millennium/Turn` for winding recovery; all three ratio proof sites use the core declaration.
+`Millennium/Turn` retains its geometric turn calibration, half-angle charts, golden-clock result
+and source-specific theorem uses, but no longer declares the generic kernel theorem. The two
+remaining direct Turn importers are `Millennium/Coupling` and
+`Millennium/NavierStokesH2TriadMultiplierSwing`. Source-unused direct imports were removed from
+`Millennium/HolonicPolygonalTorusCarrier` and `Millennium/HolonicSnellInteraction`.
+
+After this cut the static source closure of `Objects.Ratio` remains 14 modules while its Millennium
+count falls from 1 to 0. `RatioPhase` and `RatioBlock` each remain 15 modules and fall from 1 to 0
+Millennium modules. `Framework.Objects` falls from 110 / 24 to 110 / 23; the broader `Framework`
+stays at 279 Millennium modules because other Research paths still reach Turn. Full counts and the
+focused gates (not yet run for this cut) are in
+[`M2_RATIO_EXPONENTIAL_KERNEL.md`](M2_RATIO_EXPONENTIAL_KERNEL.md).
