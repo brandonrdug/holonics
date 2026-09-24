@@ -26,17 +26,17 @@ composition. The intended generally useful Athena assistant is still under const
 
 ## The checkout today
 
-The root `Cargo.toml` currently declares **10 workspace packages** (7 libraries and three applications).
-The restructuring work is in progress; these are the paths that exist now.
+The root `Cargo.toml` declares **five workspace packages**: four libraries and the workbench
+application. The restructuring work is in progress; these are the paths that exist now.
 
 | Path | Current role |
 |---|---|
-| `crates/holonics/` | Main Holon law, structural carriers, receiver-relative geometry, live receiving/standing and exact operators |
-| `crates/holonic-engine/`, `crates/holonics-hna/`, `crates/holonic-life/` | Native field, HNN sessions, equation extraction and inherited implementation layers |
-| `crates/holonics-cuda/` | CUDA driver/launch boundary and section realization |
-| `crates/holonics-portable/` | Shared `no_std` body laws and exact section arithmetic compiled by host and detached NVPTX |
+| `crates/holonics/` | Main Holon law, exact ratio and ring arithmetic, receiver-relative geometry, receivers, standing and release |
+| `crates/holonic-engine/` | Constitutive field and resident HNN operators, equation extraction and exact operators still awaiting their main-library or CUDA owner |
+| `crates/holonics-hna/` | The HNN field sessions, stream and Athena field examples (crate name retires in M1) |
+| `crates/holonics-cuda/` | CUDA driver, launch law and section realization |
 | `formal/elementary-holonics/` | Current Lean/Lake project; the final `Holonics` and `HolonicsResearch` roots remain an M2 move |
-| `applications/`, `accelerators/` | CLI, data/tools and device-specific targets |
+| `applications/` | The workbench CLI and conversation-data tooling |
 | `docs/`, `research/` | Maintained contracts, plans, derivations, experiments and papers |
 
 [Repository organization](docs/REPOSITORY.md) maps the remaining directories and historical
@@ -53,14 +53,11 @@ laws and HNN**, organized by elementary object rather than acting as a facade:
 |---|---|
 | `holonics` | Ratio/remainder and exact ring arithmetic, geometric transport and pair/tube charts, the Holon law and its operators, receivers and receipts, the Holarchy returned by interconnection, equation extraction, and the backend-neutral HNN law and execution port |
 | `holonics-cuda` | CUDA realization: driver, section contracts and kernels, and the resident HNN field |
-| `holonics-portable` | Shared `no_std` laws compiled by both the host and detached Rust CUDA kernel; it owns the former body source and exact section ABI |
 | `holonics-apple` (later) | Apple silicon implementation on Brandon's separate branch |
 
-That is three maintained Rust libraries on Linux after consolidation and four after Apple.
-The portable leaf began by replacing `body` and now owns the shared section arithmetic and CUDA
-section ABI. The former `soma-abi` schemas had no production consumers and its package is retired;
-exact rings belong to `holonics::ratio::ring`, and CUDA section refusals belong to
-`holonics-cuda::section_layout`. The host-only `holonic-words` package is retired. The main library
+That is two maintained Rust libraries on Linux and three after Apple. Exact rings and the
+section arithmetic the CUDA kernels mirror belong to `holonics::ratio::ring`, and CUDA section
+refusals belong to `holonics-cuda::section_layout`. The main library
 builds without CUDA; its HNN host reference is built after the move, one method at a time
 against the CUDA return.
 Its physical instances must carry fluid stress/pressure, wave propagation, spacetime

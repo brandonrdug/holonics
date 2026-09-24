@@ -80,32 +80,13 @@ Each is backed by a measurement at `d3b8b509`.
    backend-neutral field law, source moments, adjoint contracts, execution-port methods, host
    reference, and method-by-method relation to the resident CUDA return. `holonics-apple`
    implements that port later.
-4. **Crate count: three maintained Linux libraries, Apple later.** At the R0 source census, the
-   detached Rust NVPTX kernel compiled shared `no_std` laws from both `body` and `soma-abi`, including
-   carriage, manifold, medium, number, register, active-current and section-layout operators.
-   Host `holonic-words` called `soma-abi::section_layout_cuda` for the same exact residue arithmetic,
-   but the kernel did not consume the host crate. Folding `body`/`soma-abi` straight into
-   `holonics` would have left the detached kernel unable to compile them and created a Cargo cycle.
-   The revised target is a dependency-free, portable `no_std` leaf (`holonics-portable`), the
-   substantive `holonics`, and `holonics-cuda`. The
-   detached kernel and host consume the same leaf directly. `holonics-apple` comes later on Brandon's
-   Mac branch. The portable leaf is justified by actual shared source and stays limited to laws and
-   wire-neutral carriers that both sides compile. R2/M1 move host owners first; a separate cut
-   classified and consolidated the shared portion of `body`, `soma-abi` and the host `holonic-words`
-   owner without changing device arithmetic. The exact section arithmetic and CUDA entry ABI moved
-   to the portable leaf; host ring math moved into `holonics::ratio::ring`; CUDA owns section
-   refusals; and `holonic-words` is retired. The host/device wire rows now live under
-   `holonics_portable::wire`; the remaining test-only current, Holon and presentation schemas
-   were retired with the unused `soma-abi` package after the wire move.
-   The kernel's committed PTX is embedded at compile time by `holonics-cuda`
-   library/tests/gates, loaded from those bytes by engine `section_layout_adoption` tests, and
-   used by `holonic-life`'s Soma CUDA lineage. Its launch owners (`SOMA_PTX`, `register_launch`,
-   `live_event_launch`) cannot be retired by removing `life` alone. The HNN uses the C++ kernels
-   in `holonic-engine/kernels/`, generated through the engine's NVCC build script. Host/device
-   parity remains a measured gate. `accelerators/rust-gpu` (Vulkan, already ruled out for
-   production) retired with its unconsumed `holonic-surface` host crate and SPIR-V artifact in R2.
-   The 2026-08-09 stale-artifact record is historical evidence; its then-current recommendation
-   not to remove the path is superseded by this September 23 disposition.
+4. **Crate count: `holonics` and `holonics-cuda`, Apple later** (restored September 24). The
+   draft stack had kept a `no_std` `holonics-portable` crate, made of the former `body` and
+   `soma-abi` plus their NVPTX kernel wire, because the Soma NVPTX kernel compiled it. Only
+   `holonic-life`'s superseded native-circulation lineage consumed that kernel, and that lineage
+   is retired. Its section arithmetic now lives in `holonics::ratio::ring::section`, and the Soma
+   PTX, gate binaries and register/live-event launchers are gone. The HNN keeps its C++ kernels,
+   which `holonic-engine/build.rs` compiles.
 5. **Minimal features.** Each feature combination compiles its own copy of the crate. On
    September 23 the engine had 39 incremental directories (150 GB). Main `holonics` has no
    feature that changes its dependency graph. R1 re-charts both type-level X11 callers before
@@ -185,6 +166,43 @@ Each is backed by a measurement at `d3b8b509`.
     a source-import traversal from `Framework.Core` reaches 26 in-package modules and no
     `Millennium` or `RH` module. The full `Framework` facade still has the distinct Ratio and
     MomentStorage research ingress listed above; those cuts remain R3 work.
+
+## 0.11 Status and method, September 24
+
+[established-bounded; measured] The audit of the Codex stack (67 draft PRs, #77–#143) found its
+changes correct but almost entirely moves: Rust −2%, Lean +0.5%, 59 files deleted in 159
+commits. The census defaulted to *keep*, counting any reference as proof of liveness, even a
+reference from other dead code or from a superseded machine. On `restructure/retire` the stack
+tips were joined and retirement run by **reachability from declared roots**, with the compiler
+as the test.
+
+- **Roots:** the main library, the HNN crate's field/native sessions and stream, the workbench,
+  the six current Athena field examples, the CUDA driver, the elementary-object owners the
+  operator contract names, and equation extraction.
+- **Retired:**
+  - `holonic-life`, the native-circulation machine and its Soma lineage (membrane, body,
+    `soma-abi`, the NVPTX kernel and its PTX, the register/live-event launchers);
+  - `holonics-workspace`, `holonics-portable`, `holon-plate`, `derivation-atlas`;
+  - 53 unreachable engine modules;
+  - every engine and main-library example and 28 superseded HNN examples;
+  - the September 4–5 HNA recurrent-token session API;
+  - `archive/`, whose 194 Markdown links are rewritten as permalinks.
+- **Result:** Rust went from 1,181,217 to about 537,000 lines, and crates from 16 to 4. The
+  workspace all-target check and the host suites pass; GPU results are recorded in the receipts.
+
+**Method from here:** declare the roots, delete everything they cannot reach in large batches,
+run one workspace build per batch, and restore only what the build proves is needed. Behaviour
+suites (GPU) run once per step and for any change to HNN behaviour. Use one PR per plan step,
+not one per module.
+
+**Remaining:**
+- R4: remove the HNN's positional/old-length rest decoders and serde defaults for absent legacy
+  fields.
+- The HNN crate's non-field sessions: native, wave, coupled-wave and mathematical, checked
+  against the field.
+- Lean: the duplicates and wrappers the audit found, the Physics research ingress, and the M2 move.
+- M1: move the resident HNN into `holonics-cuda` and retire the `holonics-hna` name.
+- R5 records and D (docs, README).
 
 ## 1. Why the tree looks like this
 

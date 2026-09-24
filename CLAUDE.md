@@ -19,8 +19,8 @@ describe today's tree until a verified move lands. The substantive main `holonic
 will own the Holon, exact geometry, elementary operations and the backend-neutral `hnn` law
 and execution port. `holonics-cuda` receives the device-resident HNN as it is and implements the
 port; `holonics-apple` (later, on Brandon's branch) implements it for Apple silicon. Exact host
-rings are owned by `holonics::ratio::ring`; the shared low-level CUDA section ABI is in
-`holonics-portable`, and section refusals are in `holonics-cuda::section_layout`. Main builds
+rings and the exact section arithmetic the CUDA kernels mirror are owned by
+`holonics::ratio::ring` (`ring::section`); section refusals are in `holonics-cuda::section_layout`. Main builds
 without CUDA; its HNN host reference is construction campaign
 K2, not a precondition of the move. Lean becomes one Lake package with `Holonics` and dependent
 `HolonicsResearch`. Moving its paths and changing the current `Soma.Holonics` declaration
@@ -283,8 +283,8 @@ port and source fibre.
 | Normalization and adjoints | `field/receiver/normalized{,.rs}`, `normalized/phase.rs`, `field/material_transport/normal/direct/section{,/composition}.rs`, `resident/section/bilinear_features.rs`; exact reference `exponentiated_ratio::transport::NormalizedKernel` |
 | Kernels and their Rust binders | `crates/holonic-engine/kernels/{exact_resident_section.cu,field_normalized_receiver.cuh,normal_applied_condition.cuh,section_bilinear_adjoint.cuh}`; `src/resident_section/` |
 | Hardware law | `hardware_cover`, `section_partition`; `crates/holonics-cuda/src/{cuda,launch_law,section_layout}.rs` |
-| Exact geometry and helical pair | `crates/relational-geometry/src/{exact,model,screw,exact_analysis}.rs`; `holonic-engine/src/{identity_atlas,exact_contact,holonic_interaction,holonic_chain}.rs`; `receiver_history_compression/observable.rs::HelicalMomentReuse` binds finite pair actions to the existing moment decoder. `holonic_interaction/helical.rs` now joins `ScrewPair` to the checked `HolonicInteraction` with an explicit rate port; `holonic_chain/serial.rs` supplies exact Cayley/prismatic chains, contact rows and constrained target fibres. `Transport/{HelicalPairInteraction,SerialScrewChain}.lean` owns their checked algebra; the full HNN generator-machine binding remains #17 |
-| Winding, carry, address, trace faces and cell holonomy | Lean `Geometry/{PhaseCarry,PairResonance}`, `Transport/{GeneratorTraceFaces,CellHolonomy}` over the existing `Millennium/{Farey,LocalFactor,TraceSequence,HodgeIndex,PlaceLedger,WindingLedger}`, `RH/{FosterTanks,HeatFlowStackedSeam}`, `Foundation/{HodgeReceiver,IwasawaTower,FractalPacking}`; Rust `crates/relational-geometry/src/winding.rs` (`Odometer`, `LockAddress`, `SiteFactor`, `Machine`, `triangle_holonomy`) |
+| Exact geometry and helical pair | `crates/holonics/src/geometry/{exact,model,screw,exact_analysis}.rs`; `holonic-engine/src/{identity_atlas,exact_contact,holonic_interaction,holonic_chain}.rs`; `receiver_history_compression/observable.rs::HelicalMomentReuse` binds finite pair actions to the existing moment decoder. `holonic_interaction/helical.rs` now joins `ScrewPair` to the checked `HolonicInteraction` with an explicit rate port; `holonic_chain/serial.rs` supplies exact Cayley/prismatic chains, contact rows and constrained target fibres. `Transport/{HelicalPairInteraction,SerialScrewChain}.lean` owns their checked algebra; the full HNN generator-machine binding remains #17 |
+| Winding, carry, address, trace faces and cell holonomy | Lean `Geometry/{PhaseCarry,PairResonance}`, `Transport/{GeneratorTraceFaces,CellHolonomy}` over the existing `Millennium/{Farey,LocalFactor,TraceSequence,HodgeIndex,PlaceLedger,WindingLedger}`, `RH/{FosterTanks,HeatFlowStackedSeam}`, `Foundation/{HodgeReceiver,IwasawaTower,FractalPacking}`; Rust `crates/holonics/src/geometry/winding.rs` (`Odometer`, `LockAddress`, `SiteFactor`, `Machine`, `triangle_holonomy`) |
 | Algebra and economical continuation | `holonics::receiver::native` owns canonical receiver/native quotient carriers and the validated source-detached `GeneratorNativeRest`/`NativeGenerator` execution face; `holonic-engine::{receiver_exact_compression,receiver_history_compression}` retain source-qualified discovery and its assignments, fibres and shortest separators. The rest preserves the induced finite action and receiver factors, not the source quotient certificate or discovery witnesses. Lean naturality peer: `ElementaryHolonics.Foundation.ReceiverHistoryCompression`, proving ordered-word quotient commutation. `exact_linear`, `prime_image_algebra`, and `winding_inertia` keep their current owners; resident bilinear/normal/word/mode owners remain at their separate call boundaries. |
 | Retained availability and predictive release | `holonics/src/receiver/standing.rs`; `holonics/src/receiver/release.rs`, `exact_linear/{contextual,kernel_modes}.rs`; `field/internal_mode.rs` retains the equal-drive specialization and explicitly refuses incompatible operative currents; `Foundation/{Standing,CausalRelevance,ReceiverHistoryCompression}.lean` supplies future sufficiency |
 | Public framework | `crates/holonics/src/lib.rs`: `geometry` and `structure` without default native features; `holonics-hna` for HNN |
@@ -391,7 +391,7 @@ Commands below use Bash; invoke Bash explicitly if the active shell is fish. CUD
 ```bash
 cargo check -p holonic-engine --lib
 cargo test -p <crate> --lib <module>::
-cargo test -p holonic-engine -p holonics-hna -p relational-geometry --lib
+cargo test -p holonic-engine -p holonics-hna -p holonics --lib
 flock .local/gpu.lock cargo test -p <crate> --lib <module>:: -- --include-ignored --test-threads=1
 bash tools/lean_check.sh ElementaryHolonics.Framework.Geometry
 bash tools/lean_check.sh ElementaryHolonics  # complete research umbrella when that scope changed
