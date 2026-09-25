@@ -59,11 +59,11 @@ built. Each rebuild step updates this table in the same commit.
 |---|---|---|---|
 | Ratio | `present`, `compare`, `compose`, `invert` (nonunit fibre), `div_rem`, `residue`, `lift`, `jet`, `log` with branch | Lean `Objects/{Ratio,RatioPhase,RatioBlock}`, `Foundation/TransportLift`, `Geometry/{PhaseCarry,CrossRatio}`, `Geometry/Farey`; Rust `holonics::ratio::{Rat,Presentation,ExactOrdering}` (the undivided pair, compared by cross-multiplication), `holonics::ratio::linear` (inversion with its fibre), `holonics::geometry::winding::Odometer`, `holonics::navigator::address::LockAddress`, `holonics::ratio::ring::{ExactRing,ModularWords}`, `holonics::ratio::exponentiated::{RatioFamily,NormalizedKernel}`, `holonics::ratio::surprisal`, `holonics::holon::contact::Alignment` (the undivided squared-cosine face); `holonics::ratio::exponentiated::CarriedPower` (`2^(n + k/L)` as a carry and a phase in `ℚ(θ)`, Lean `Objects/Ratio/CarriedPower`); `ratio::linear`'s integral chart (products summed over integers and reduced once per entry; a fraction-free inverse) | `holonics::ratio`; `Holonics.Ratio` |
 | Complex, frame, clock, carry | `boundary`, `transport`, `transport_rate`, `join_axes` (commuting square or defect), phase lift | Lean `Holon/Complex`, `Geometry/*`; Rust `holonics::geometry::complex`, `holonics::navigator::Clock`, the frame carriers `holonics::geometry::{RatVec3,RatMat3,AffineMap3,Axis}` over `holonics::ratio::Rat`; block transports in `geometry::complex::ConnectionIncidence` (Lean `Holon/Complex.{blockIncidence, blockWalkRead_incidence, block_cell_curvature, block_flat_closed}`) | `holonics::geometry`; `Holonics.Geometry` |
-| Swing | `swing` (half-turn about an anchor), `compose` (two Swings are a translation; odd words are Swings), `pantograph` (scale about an anchor), `tick` (oriented section crossing), inner fibre of a coarse Swing | Lean `Geometry/{AffineSwing,SwingPotential}`, `Geometry/{Swing,SwingBridges,Navigation,HolonicPantographicSwingJets,HolonicClockedPantographicSwing,HolonicClockedPantographicSwingApparatus}`; Rust `holonics::geometry::swing` (`swing`, `composed_translation`, `pantograph`, `harmonic_conjugate`, `swing_pair`); `holonics::geometry::swing` over `ℚ^d` anchors (`RationalPoint`), which the HNN junction calls | `holonics::geometry`; `Holonics.Geometry` |
+| Swing | `swing` (half-turn about an anchor), `compose` (two Swings are a translation; odd words are Swings), `pantograph` (scale about an anchor), `tick` (oriented section crossing), inner fibre of a coarse Swing | Lean `Geometry/{AffineSwing,SwingPotential}`, `HolonicsResearch/Zeta/Seam` (ξ is Swing-invariant about ½), `Geometry/{Swing,SwingBridges,Navigation,HolonicPantographicSwingJets,HolonicClockedPantographicSwing,HolonicClockedPantographicSwingApparatus}`; Rust `holonics::geometry::swing` (`swing`, `composed_translation`, `pantograph`, `harmonic_conjugate`, `swing_pair`); `holonics::geometry::swing` over `ℚ^d` anchors (`RationalPoint`), which the HNN junction calls | `holonics::geometry`; `Holonics.Geometry` |
 | Pair and tube charts | `screw_pair` (two motions, relative jet), `tube` (longitudinal transfer), `restrict` (transverse, gluing unique/plural/obstructed), neck, fold, junction | Lean `Transport/{HelicalPairInteraction,ContinuingTube,WorldTube,Neck,Fold,JunctionLaw,JetStaircase}`, `Geometry/PairResonance`, `Foundation/{ContinuingTower,IwasawaTower}`; Rust `holonics::geometry::screw`, `holonics::holon::restriction::{tube,tower}` | `holonics::geometry`; `Holonics.Geometry` |
 | Pair contact | `slip` (`J=[v_a\|−v_b]`), `quadrance` (`Q`, `DQ=2J*Δ`, `D²Q`), `material` (`M_contact=ΣwJ*DJ`), `power` (resistive element on slip), `lock_address` (Farey), `chain` (serial screw words and contact rows) | Lean `Transport/{HelicalPairInteraction,HolonicInteraction,HolonicChain,SerialScrewChain}`, `Geometry/PairResonance`, `Holon/Conformance.pairContact_resistive`; Rust `holonics::geometry::screw::{ScrewPair,PairQuadranceJet,SituatedScrew}` (the pair geometry), `holonics::holon::contact` (`PairContact`, `ContactMaterial`, `Alignment`, `SerialChain`), `holonics::navigator::address::LockAddress` | `holonics::holon::contact`; `Holonics.Holon` |
 | Parametron | `store`/`exchange` (`C`, `L`, `ω=1/√(LC)`, mode energy), `pump`, `lock` (half-turn sheets, Ising pairing), `tick` (section crossing), `read` (the perceptron face) | Lean `Objects/Parametron`, `Physics/{PhaseCarrier,CoupledIncidence,HolonicMeasuredParametron,HolonicTorusParametronRealization}`; Rust `holonics::holon::parametron` (`Parametron`, `Carrier`, `Population`, `pump_storage`, `ring_crossings`) and the pumped-LC witness of `holonics::holon::conformance` | `holonics::holon::parametron`; `Holonics.Holon` |
-| Navigator | `configure` (initial configuration: the key), `advance` (own clock, carry), `restrict` (scale square), `address` (source word), trace faces and the dynamical zeta, lock address, `release` at tolerance | Lean `Holon/Generator`, `Foundation/{FractalPacking,GeneratorInference}`, `Transport/{GeneratorTraceFaces,SourceMoment,ReflectiveContinuation}`; Rust `holonics::navigator` (`Navigator`, `Transport`, `Clock`, `PhaseLift`, `reflection`, `address`), `holonics::navigator::trace::{SiteFactor,Machine}`; `holonics::navigator::Transport::Map`, a finite-order port map on `ℤ/d` with `order` and `compose` (Lean `Holon/Generator.{map_pow_mod_order, map_turn_lossless, map_compose_order_pos, map_compose_order_dvd, mapRotor_order}`) | `holonics::navigator`; `Holonics.Navigator` |
+| Navigator | `configure` (initial configuration: the key), `advance` (own clock, carry), `restrict` (scale square), `address` (source word), trace faces and the dynamical zeta, lock address, carry word at a real rate (lock or never-lock), scale zeta and complex dimensions, `release` at tolerance | Lean `Holon/Generator`, `Foundation/{FractalPacking,FractalString,GeneratorInference}`, `Geometry/MechanicalWord`, `Transport/{GeneratorTraceFaces,SourceMoment,ReflectiveContinuation}`; Rust `holonics::navigator` (`Navigator`, `Transport`, `Clock`, `PhaseLift`, `reflection`, `address`), `holonics::navigator::trace::{SiteFactor,Machine}`; `holonics::navigator::Transport::Map`, a finite-order port map on `ℤ/d` with `order` and `compose` (Lean `Holon/Generator.{map_pow_mod_order, map_turn_lossless, map_compose_order_pos, map_compose_order_dvd, mapRotor_order}`) | `holonics::navigator`; `Holonics.Navigator` |
 | Holon | `advance` (state, bond, energy balance), `interconnect -> Holarchy`, `contact` (a pair contact as element), `continue` (through a tube), `restrict`, `depose`, `pullback` | Lean `Holon/{Law,Port,Dirac,Element,Generator,Restriction,Deposition,Reaction,Cayley,Conformance}`, `Foundation/{Holon,Lineage,ConnectionLineage}`, `Objects/Deposition`; Rust `holonics::holon` (`law`, `port`, `dirac`, `element`, `restriction`, `deposition`, `reaction`, `conformance`, `contact`, `parametron`), `holonics::navigator` | `holonics::holon`; `Holonics.Holon` |
 | Receiver and receipt | `interact`/`receive -> InteractionReturn` (both participants' next states, face, receipt, boundary currents, power balance, unresolved fibre); `Ratio::between(receipts)`; `width`, `release` (caller-declared decision and tolerance checks); `chord` (transfer object) | Lean `Holarchy/{Reception,Receipt}`, `Foundation/{Receiver,ReceiverRelease,Standing,CausalChord,ReceiverAtlas,PresentationCost,SituatedInformationRate}`, `Transport/ChangingReceiver`, `Objects/Pairing`; Rust `holonics::receiver::reception` (`JointLaw::interact -> InteractionReturn` on the solved joint step, `ReceiverFace` and its three-term `FaceMotion`, `JointLaw::of_holarchy`; `HolonLaw::receive` is its zero-storage specialization `JointLaw::reading`), `holonics::receiver::receipt` (`Receipt`, `ReceiptLaw`, `ReceiptRatio::between` and `follow`, with `ratio::Presentation::follow`), `holonics::receiver::face` (faces and passive law), `holonics::receiver::{release,standing,causal_chord}`, `holonics::ratio::work::ExactWork`; history [`presentation_cost.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/presentation_cost.rs), [`landauer.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/landauer.rs); guide [RECEIVER_HOLARCHY](RECEIVER_HOLARCHY.md); the generic `receiver::reception::InteractionReturn<Fw, Pb, Dp, Ph, Rc>` of `Component`s and `receiver::release::DecisionRule` (the data form of `DecisionLaw`) | `holonics::receiver` (release operations); `Holonics.Receiver` |
 | Holarchy | `interconnect -> Holarchy` (typed port/cellular gluing); `whole`, `view(receiver, grain, clock)`, `count` (receiver-certified finite partition), `refine` (commuting square or defect), `parametric` (the aeons' clock lift) | Lean `Holarchy/{Join,View,Receipt,Reception,Globe}` (`Constituent`, `interconnect_ok_iff`, `join_power_balance`, `shared_face_cancels`, `Holarchy.parametric`, `HolarchyGlobe`); Rust `holonics::holarchy` (`Holon::interconnect -> Result<Holarchy, GluingDefect>` over a `Gluing` checked against both Holons' own units, complexes and pumps, navigators joined; `Holarchy::{whole, interface_fibre, power_balance, flux, pump_lock, parametric}`), `holonics::holarchy::view` (`Holarchy::{view, count, refine, block_boundaries, interface_flux}`); Rust has no globe consumer; `Holarchy` keeps its constituents, gluing and layout and assembles its whole only when read (block-local certification) | `holonics::holarchy`; `Holonics.Holarchy` |
@@ -154,7 +154,11 @@ exact drop, `HolonicDiscreteInduction.emf_ne_exactDrop_of_fluxDifference_ne_zero
 clock. The guides called it a *generator*. That word keeps only its algebraic senses: a group
 generator, the Lie generator `ξ` of a helix, a generating function. Lean and Rust names change
 when the rebuild reaches them. A navigator acts on Holons; its adjoint `Ĝ*` acts on coholons, `⟨Ĝ*Ȟ|H⟩=⟨Ȟ|ĜH⟩`, and the learning
-covector travels along that adjoint. A helix is circle + carry (`PhaseCarry`: winding cocycle). A
+covector travels along that adjoint. A helix is circle + carry (`PhaseCarry`: winding cocycle). [proved-derived; formal-checked] At a
+real rate `α` its carry is the mechanical word `s_n=⌊(n+1)α+ρ⌋−⌊nα+ρ⌋` (`Geometry/MechanicalWord`): a rational rate `p/q` locks
+with period `q` (a crystal), an irrational rate never locks and its address never closes (a
+quasicrystal), the lattice points in the tube `nα+ρ−1<m≤nα+ρ` are the carry's graph, and the
+physical projection `n+βm`, injective for irrational `β`, spaces them by `1+βs_n` ([record](../research/records/2026-09-25_THE_MUSIC_IS_IN_THE_HOLES_HEARING_MULTIPLIES_BY_ZETA_AND_A_QUASICRYSTAL_IS_A_HELIX_THAT_NEVER_LOCKS.md)). A
 **fractal navigator** is a family of maps with parameters, restriction maps, composition order,
 scale square `r∘T_fine=T_coarse∘r` and first-arrival populations of one full recurrence
 (`FractalPacking`, `HolonicRecurrentEcology.FirstArrival`); an ordered source word is its
@@ -163,7 +167,10 @@ collapse to a multiset). Recursive description and branch/address information ar
 compression operands. A navigator runs until its receiver face is within tolerance
 (`ReceiverRelease.Releasable`, `Standing.Extinct`); then it is released and a new one is founded.
 Holonic Compression couples a fractal navigator's resonating modes with terrain
-([the line](plans/THE_REBUILD.md#the-line-the-rebuild-serves)).
+([the line](plans/THE_REBUILD.md#the-line-the-rebuild-serves)). [definition; agent-inferred] For a
+self-similar navigator with ratios `r_i` its resonating modes in scale are its complex dimensions, the roots of `Σ_i r_i^ω=1`
+(`Foundation/FractalString.selfSimilarZeta_eq`): the real part is a dilation, the imaginary part a
+rotation in the log chart (Cantor: `log 2/log 3 + 2πik/log 3`; the golden string: `2^(−ω)+2^(−φω)=1`).
 
 [established-bounded; source-inspected] The source-neutral continuation contract is a chart of
 Navigator and Receiver operations, not a new elementary object. A running continuation receives a
@@ -218,6 +225,12 @@ relates what moves to an anchor on a board; its word, clock and carry are how it
 Navigating is choosing that word, and landmarks are where the words' paths converge.
 [proved-standard] A translation is two point Swings, and every Euclidean isometry is a word of
 reflections about hyperplanes (Cartan–Dieudonné).
+[proved-standard; formal-checked] The completed zeta is invariant under the Swing about ½,
+`ξ(S_½ s)=ξ(s)` (`Zeta/Seam.completedRiemannZeta_swing_half`, through the derived join
+`combReflection_eq_swing`); the critical line is the fixed set of that Swing after the conjugation
+mirror, not of the Swing alone, which fixes only ½. [proved-standard; interpretation] Mellin's ½ (a
+half-density weight) and spin's ½ (a half-angle) are different halves; an intertwiner, not a shared
+numeral, would join them ([record](../research/records/2026-09-25_THE_MUSIC_IS_IN_THE_HOLES_HEARING_MULTIPLIES_BY_ZETA_AND_A_QUASICRYSTAL_IS_A_HELIX_THAT_NEVER_LOCKS.md#4-the-half-and-the-pivot-three-different-halves)).
 
 [proved-derived; formal-checked] **Conservation of faces.** Carrying material to another phase
 conjugates it, `M ↦ S⁻ᵈMSᵈ`, so every class function of the material is a face conserved along the
@@ -524,6 +537,26 @@ is dilated to what witnessed it. A moving receiver adds its own variation term
 transport, keeping both operands and the winding. The present `HolonLaw::receive` is the passive,
 zero-storage specialization of this operation.
 
+[definition; formal-checked where named] **Hearing, listening and nullity** ([record](../research/records/2026-09-25_THE_MUSIC_IS_IN_THE_HOLES_HEARING_MULTIPLIES_BY_ZETA_AND_A_QUASICRYSTAL_IS_A_HELIX_THAT_NEVER_LOCKS.md#7-hearing-listening-nullity-and-response-typed)).
+A difference is **heard** by a receiver when its current face separates it (`F_now δ≠0`). It is
+**null** to that receiver at its grain when the face cannot separate it; nullity is always relative
+to a declared receiver, grain and admitted future, and `ker F_fut ⊆ ker F_now` when the current
+receiver is among the admitted ones
+(`Foundation/CausalRelevance.futureCollapsed_le_presentCollapsed`). It is **listened to** when a
+reached-action map `A_R` carries it into a locus's retained state (constitution entries, carried
+remainders, clock);
+heard-but-not-listened is `ker A_R ∖ ker F_now`. The HNN's deposit is the instance: an update below
+half the locus's fine grain is reported exactly and released whole, leaving that entry of the
+constitution unchanged (`HNN/LatticeDeposit.carry_entry_below_grain`), while the locus's clock
+still counts the nonzero deposit, so the difference is counted, not deposited; the grain refines as
+the locus ages (`listening_grain_refines`). What changes no retained state cannot change a response:
+equal standing forces every admitted future face to agree
+(`Foundation/Standing.StandingLaw.futureAgreement_of_retain_eq`).
+[proved-standard; formal-checked] Hearing a string of holes multiplies its face by ζ,
+`ζ_ν=ζ·ζ_ℒ`, and the full count is inverted exactly by Möbius (`Foundation/FractalString`).
+[proved-standard] The zeros of ζ are the dimensions at which the asymptotic receiver cannot hear a
+geometric oscillation (Lapidus–Maier 1995).
+
 [definition] **Measurement conventions**
 ([history](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/DEVELOPMENT.md#performance-and-information-measurements)). A timing, rate or
 energy reading is an exterior face of a receipt: it is recorded and compared, and it is never a
@@ -684,3 +717,7 @@ coholon classes are realized by actual Holon cycles. Spectral placement: `Foster
 LC tanks and `ZeroPairLock` gives lock ⇔ `σ=½` ⇔ positive Foster inductance — a parametron
 condition. Whether the relevance theorem yields relative completeness in the spectral chart is open:
 it needs a persistent frontier current (see §7).
+[proved-standard] Hearing the shape of a fractal string is an RH receiver: for `D∈(0,1)` the inverse
+spectral problem `(ISP)_D` holds iff ζ has no zero on `Re s=D`, so RH is equivalent to every such
+receiver except dimension ½ hearing the geometry (Lapidus–Maier 1995; Lean owns the finite spectral
+identities in `Foundation/FractalString`, the theorem itself is owed in #62).

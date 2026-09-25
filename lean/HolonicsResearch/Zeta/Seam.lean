@@ -1,5 +1,6 @@
 import Mathlib.NumberTheory.LSeries.RiemannZeta
 import HolonicsResearch.Zeta.Hand
+import Holonics.Geometry.AffineSwing
 
 /-!
 # The seam — the placement law, and the one factor that is in another chart
@@ -67,6 +68,37 @@ def theSelfConjugateSeam : Set ℂ := {s : ℂ | conjugateReflection s = s}
 
 theorem mem_seam_iff (s : ℂ) : s ∈ theSelfConjugateSeam ↔ s.re = 1 / 2 :=
   theSeamIsTheFixedLocusOfTheConjugateReflection s
+
+/-! ## 1b. The reflection is the Swing about the half
+
+The functional equation's reflection is the elementary Swing `S_a x = 2a − x`
+(`Geometry/AffineSwing.swing`) with anchor `a = ½`: a half-turn `e^{iπ}` about the half.  The
+critical line is the fixed set of that half-turn composed with the conjugation mirror.  The real
+part `½` is the anchor of the half-turn; the imaginary part is what the mirror leaves free. -/
+
+/-- [proved-derived; formal-checked] **The comb's reflection is the Swing about the half.**
+`1 − s = 2·½ − s`. -/
+theorem combReflection_eq_swing :
+    combReflection = Holonics.Geometry.AffineSwing.swing (1 / 2 : ℂ) := by
+  funext s
+  simp only [combReflection, Holonics.Geometry.AffineSwing.swing]
+  ring
+
+/-- [proved-derived; formal-checked] **The conjugate reflection is the Swing about the half after
+the conjugation mirror.** -/
+theorem conjugateReflection_eq_swing_conj (s : ℂ) :
+    conjugateReflection s =
+      Holonics.Geometry.AffineSwing.swing (1 / 2 : ℂ) ((starRingEnd ℂ) s) := by
+  simp only [conjugateReflection, Holonics.Geometry.AffineSwing.swing]
+  ring
+
+/-- [proved-standard; formal-checked] **`ξ` is invariant under the Swing about the half.**
+Mathlib's `completedRiemannZeta_one_sub`, read through `combReflection_eq_swing`. -/
+theorem completedRiemannZeta_swing_half (s : ℂ) :
+    completedRiemannZeta (Holonics.Geometry.AffineSwing.swing (1 / 2 : ℂ) s) =
+      completedRiemannZeta s := by
+  rw [← combReflection_eq_swing]
+  exact completedRiemannZeta_one_sub s
 
 /-! ## 2. The comb obeys the reflection law, and the standard statement is the composed one -/
 

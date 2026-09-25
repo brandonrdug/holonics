@@ -78,10 +78,12 @@ below `u/2` since the locus's founding.
    `carried_gram_posDef_rule`): every entry of a carried Gram is within one unit of the exact
    Gram `H_exact ⪰ I`, so `|vᵀ(H − H_exact)v| ≤ u(Σ|v_i|)² ≤ n·u·|v|²`, and under the lattice rule
    with the Gram width `n ≤ X_ℓ`, `H ⪰ (1 − 1/(2L_R)) I` since the locus's founding, with no clamp.
-6. **A zero update moves nothing** (`carry_zero`: the whole locus, clock included;
-   `carry_entry_zero`: an entry whose update is zero inside a nonzero deposit keeps its value and
-   remainder and releases nothing, because its remainder already lies on the coarser fine lattice
-   of an earlier clock).
+6. **A zero update moves nothing** (`carry_zero`: the whole locus, clock included), and **a
+   below-grain update is heard and counted, not deposited** (`carry_entry_below_grain`: an entry
+   whose update lies in the half-cell of the fine grain `2^(−L−k_m)` keeps its value and remainder
+   and releases the update whole, while the clock still counts the nonzero deposit;
+   `carry_entry_zero` is its case `Δ_i = 0`). The grain refines as the clock advances
+   (`listening_grain_refines`).
 7. **Bits** (`lattice_entry_bits`, `lattice_bits_bounded`, `lattice_rat_bits_bounded`): a lattice
    entry of magnitude at most `M` has an integer coordinate of at most `⌈log₂(⌊M·2^L⌋ + 1)⌉` bits,
    and so at most `⌈log₂(⌊M·2^L⌋ + 1)⌉ + 1` with its sign; as a reduced rational (the Rust count,
@@ -410,30 +412,63 @@ theorem run_onLattice (s : Carried L E) (Δs : List (E → ℚ)) {i : E}
     simp only [run, List.foldl_cons]
     exact ih (carry s Δ) (carry_onLattice s Δ h)
 
-/-- [proved-derived; formal-checked] **`carry_entry_zero`.** An entry whose update is zero keeps
-its value and remainder and releases nothing, even when the deposit moves other entries: its
-remainder lies on the fine lattice of an earlier clock, which the refined lattice contains. -/
-theorem carry_entry_zero (s : Carried L E) (Δ : E → ℚ) {i : E} (h : Δ i = 0) :
-    (carry s Δ).value i = s.value i ∧ (carry s Δ).rem i = s.rem i ∧ release s Δ i = 0 := by
+/-- [proved-derived; formal-checked] **`carry_entry_below_grain`: heard and counted, not
+deposited.** At the deposit that advances the locus's clock to `m`, an entry whose update lies in
+the half-open cell of the fine grain `2^(−L−k_m)` keeps its value and its carried remainder, and
+the deposit releases the update whole: `e = Δ_i`. The receipt reports the difference exactly and
+that entry of the constitution does not change. The locus's clock still counts any nonzero deposit
+(`carry_clock_of_ne`), so a deposit whose only nonzero entry lies below the grain refines the grain
+of every later deposit. -/
+theorem carry_entry_below_grain (s : Carried L E) (Δ : E → ℚ) {i : E}
+    (h : -(unit (L + gammaLength (s.clock + 1)) / 2) ≤ Δ i ∧
+      Δ i < unit (L + gammaLength (s.clock + 1)) / 2) :
+    (carry s Δ).value i = s.value i ∧ (carry s Δ).rem i = s.rem i ∧ release s Δ i = Δ i := by
   by_cases hΔ : Δ = 0
-  · simp [carry, release, hΔ]
+  · subst hΔ
+    simp [carry, release]
   · set k := gammaLength (s.clock + 1)
-    have hfine : OnLattice (L + k) (s.rem i) :=
+    obtain ⟨q₀, hq₀⟩ : OnLattice (L + k) (s.rem i) :=
       (s.rem_fine i).mono (Nat.add_le_add_left (gammaLength_mono (Nat.le_succ _)) L)
-    have hzero : rem (L + k) (s.rem i) = 0 := rem_of_onLattice hfine
-    have hpoint : fine L k (s.rem i) = s.rem i := by
-      have := div_rem_spec (L + k) (s.rem i)
+    have hu := (unit_pos (L + k)).ne'
+    have hquot : quot (L + k) (Δ i + s.rem i) = q₀ := by
+      have h0 : quot (L + k) (Δ i) = 0 := quot_eq_zero_of_bounds h
+      unfold quot at h0 ⊢
+      rw [hq₀, add_div, mul_div_cancel_right₀ _ hu, round_add_intCast, h0, zero_add]
+    have hpoint : fine L k (Δ i + s.rem i) = s.rem i := by
       unfold fine
-      linarith
+      rw [hquot, hq₀]
     have hq : quot L (s.rem i) = 0 := quot_eq_zero_of_bounds (s.rem_bounded i)
-    simp only [carry, release, if_neg hΔ, step, h, zero_add]
-    refine ⟨?_, ?_, hzero⟩
+    simp only [carry, release, if_neg hΔ, step]
+    refine ⟨?_, ?_, ?_⟩
     · rw [hpoint, hq]
       simp
     · rw [hpoint]
       unfold rem
       rw [hq]
       simp
+    · unfold rem
+      rw [hquot, hq₀]
+      ring
+
+/-- [proved-derived; formal-checked] **`carry_entry_zero`.** An entry whose update is zero keeps
+its value and remainder and releases nothing, even when the deposit moves other entries: the case
+`Δ_i = 0` of `carry_entry_below_grain`, since the remainder already lies on the fine lattice of an
+earlier clock, which the refined lattice contains. -/
+theorem carry_entry_zero (s : Carried L E) (Δ : E → ℚ) {i : E} (h : Δ i = 0) :
+    (carry s Δ).value i = s.value i ∧ (carry s Δ).rem i = s.rem i ∧ release s Δ i = 0 := by
+  have hu := unit_pos (L + gammaLength (s.clock + 1))
+  have := carry_entry_below_grain s Δ (i := i) (by rw [h]; constructor <;> linarith)
+  rwa [h] at this
+
+/-- [proved-derived; formal-checked] **`listening_grain_refines`: the grain a locus listens at
+refines with its age.** The half-cell below which an update is released whole shrinks as the
+deposit clock advances: a mature locus deposits finer differences, while the total it releases
+since its founding stays below `u/2` (`release_bounded_since_founding`). -/
+theorem listening_grain_refines {a b : ℕ} (hab : a ≤ b) :
+    unit (L + gammaLength b) ≤ unit (L + gammaLength a) := by
+  unfold unit
+  apply inv_anti₀ (by positivity)
+  exact pow_le_pow_right₀ (by norm_num) (Nat.add_le_add_left (gammaLength_mono hab) L)
 
 /-! ## 4. The remainder's bound and bits -/
 
@@ -836,6 +871,8 @@ section Audit
 #print axioms lattice_deposit_accounting
 #print axioms run_onLattice
 #print axioms carry_entry_zero
+#print axioms carry_entry_below_grain
+#print axioms listening_grain_refines
 #print axioms carried_remainder_bounded
 #print axioms remainder_numerator_bounded
 #print axioms remainder_rat_bits_bounded
