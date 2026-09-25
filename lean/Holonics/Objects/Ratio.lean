@@ -2,6 +2,7 @@ import Holonics.Physics.InformationDifference
 import Holonics.Computation.HolonicAdjointNormalization
 import Holonics.Geometry.CrossRatio
 import Holonics.Objects.Ratio.ExponentialKernel
+import Holonics.Objects.Ratio.CarriedPower
 import Holonics.Objects.Ratio.GaugeCalculus
 import Holonics.Transport.JetStaircase
 import Mathlib.Analysis.Quaternion
@@ -16,7 +17,9 @@ carried as the undivided pair (`Geometry/CrossRatio.RatioPresentation`). Its log
 carried as data, with the winding as its branch (`Objects/Ratio/ExponentialKernel`); its first
 order is the Maurer–Cartan form `R⁻¹dR`, which is the pure-gauge term of the gauge owner
 (`Objects/Ratio/GaugeCalculus`); its higher orders are the jet of the log ratio, read
-continuously by `iteratedDeriv` and on the tick lattice by `Transport/JetStaircase`.
+continuously by `iteratedDeriv` and on the tick lattice by `Transport/JetStaircase`. Its
+exponentiated chart at a grain `L` is the carried power `2^(n + k/L) = 2^n θ^k` in
+`ℚ(θ)`, `θ^L = 2` (`Objects/Ratio/CarriedPower`).
 
 This module joins those owners; it founds no second softmax, cross-entropy or gauge.
 

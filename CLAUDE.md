@@ -143,11 +143,18 @@ adjoint uses the operands that produced the forward carriers.
   receiving face, `A_H⁻¹A_T` on a material block, and `g_H⁻¹g_T` on a pair.
 - The loss is `ℓ=log R` in the additive chart. Its winding is the branch of the log:
   `log(ψ_T/ψ_H)=½log(q/p)+i(φ_T−φ_H+2πn)`.
-- Its calculus is the logarithmic derivative `R⁻¹dR`, which is the learning covector. `p−q` is only
-  its real, codec-chart part.
+- Its calculus is the logarithmic derivative `R⁻¹dR`, which is the learning covector.
+- **The classical loss is the perceived difference.** Cross-entropy read at the receiver's face,
+  `−log₂ p̂(t)` at its grain, is the surprise that crosses the receiver's section: the news, the
+  only difference learning lives on (the laboratory's foil `κ = S ⊖ E`; what the receiver already
+  predicts cancels). Its gradient `p−q` is the real, grain-level part of `R⁻¹dR`, and the adjoint
+  pulls it back in a declared chart (at a grain `L_R > 1` the HNN's odometer chart `p̃ − q`, a strict
+  descent direction for the scored face); the phase part completes it. Minimizing expected cross-entropy is minimizing
+  expected description length exactly (Kraft–McMillan and Shannon: the excess is `D(p‖q)`), which
+  is why it trains language models.
 - Scalars (lifted cross-entropy, `log det R`, a twist in rad/m, bits per observation) are limit
-  readings of the ratio, with units. They are valid measurements, but they are neither the operand
-  the adjoint pulls back nor the retained state. Classical cross-entropy alone is insufficient.
+  readings of the ratio, with units, and valid measurements. None is the retained state, and the
+  classical loss without its phase part is incomplete.
 
 [definition] **Cross-entropy is physical.** It is flux across crossing sections and axes of time,
 not a statistic.
@@ -274,6 +281,9 @@ After a compaction, act on the newest human message, not on a retained view of a
 - physics #74–#75;
 - device debts #76;
 - the Lean package #70;
+- equation extraction #146;
+- Lean curation #147;
+- applications #148;
 - formal obligations #62.
 
 Close an issue with the commit, the verification, and the remaining scope.

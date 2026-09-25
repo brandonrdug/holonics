@@ -1,6 +1,9 @@
 import Holonics.Physics.PhaseCarrier
 import Holonics.Geometry.PhaseCarry
 import Holonics.Geometry.HolonicClockedPantographicSwing
+import Mathlib.GroupTheory.OrderOfElement
+import Mathlib.GroupTheory.Perm.Basic
+import Mathlib.Data.ZMod.Basic
 
 /-!
 # Holon.Generator: lifted phases, lossless clock jumps and carries
@@ -16,6 +19,16 @@ counts are carries and compose as a cocycle (`jumps_are_carries`: `PhaseCarry.wi
 `carry_cocycle`, `carry_le_one`), and a `RationalClockPassage` jumps losslessly: the target
 carrier at the accumulated phase equals its carrier at the retained residue
 (`clockPassage_jumps_lossless`, via `denominator_mul_targetTicks_add_phaseResidue`).
+
+[proved-derived; formal-checked] **A closing navigator's transport is a finite-order port map**
+(`Transport::Map`, rebuild step 4 addition 1): a permutation `σ` of a finite port chart has a
+positive order (`map_order_pos`), its powers read only the tick's class modulo that order
+(`map_pow_mod_order`), so a full turn is lossless and the winding is the lift's alone
+(`map_turn_lossless`, the map's face of `jump_lossless`); two maps compose to a map of positive
+order (`map_compose_order_pos`), which for commuting maps divides the least common multiple of
+their orders (`map_compose_order_dvd`). The rotor `(· + 1)` on `ℤ/d` has order exactly `d`
+(`mapRotor_order`, with `mapRotor_pow`): a Cayley image has no eigenvalue `−1`, so an even period is
+not a flow's Cayley step, and the map is carried as itself.
 -/
 
 noncomputable section
@@ -97,5 +110,61 @@ theorem clockPassage_jumps_lossless {ClockAddress : Type*}
       2 * Real.pi * (passage.phaseResidue r s : ℝ) / passage.denominator +
         2 * Real.pi * ((passage.targetTicks r s : ℤ) : ℝ) by push_cast; field_simp; ring]
   exact phaseCarrier_add_int_turns _ _
+
+/-! ## 3. A closing navigator: a finite-order port map -/
+
+section Map
+
+variable {α : Type*}
+
+/-- [proved-derived; formal-checked] **A finite-order map reads only the tick's class**: its `n`-th
+power is its power at `n` modulo its order. -/
+theorem map_pow_mod_order (σ : Equiv.Perm α) (n : ℕ) : σ ^ n = σ ^ (n % orderOf σ) :=
+  (pow_mod_orderOf σ n).symm
+
+/-- [proved-derived; formal-checked] **A full turn of a finite-order map is lossless**: advancing
+`w` whole turns of the order moves nothing, so the winding is carried by the lift alone. -/
+theorem map_turn_lossless (σ : Equiv.Perm α) (r w : ℕ) : σ ^ (r + orderOf σ * w) = σ ^ r := by
+  rw [pow_add, pow_mul, pow_orderOf_eq_one, one_pow, mul_one]
+
+/-- [proved-derived; formal-checked] **A map of commuting finite-order maps**: the composite's order
+divides the least common multiple of the two orders. -/
+theorem map_compose_order_dvd (σ τ : Equiv.Perm α) (h : Commute σ τ) :
+    orderOf (σ * τ) ∣ Nat.lcm (orderOf σ) (orderOf τ) :=
+  h.orderOf_mul_dvd_lcm
+
+variable [Finite α]
+
+/-- [proved-derived; formal-checked] A permutation of a finite port chart has a positive order. -/
+theorem map_order_pos (σ : Equiv.Perm α) : 0 < orderOf σ := orderOf_pos σ
+
+/-- [proved-derived; formal-checked] **Two maps compose to a map**: the composite of two
+permutations of a finite port chart is again of positive order. -/
+theorem map_compose_order_pos (σ τ : Equiv.Perm α) : 0 < orderOf (σ * τ) := orderOf_pos _
+
+end Map
+
+/-- [proved-derived; formal-checked] The rotor's powers are the additions on `ℤ/d`. -/
+theorem mapRotor_pow (d k : ℕ) :
+    (Equiv.addRight (1 : ZMod d)) ^ k = Equiv.addRight (k : ZMod d) := by
+  induction k with
+  | zero => ext x; simp
+  | succ k ih =>
+      ext x
+      rw [pow_succ, Equiv.Perm.mul_apply, ih]
+      simp only [Equiv.coe_addRight, Nat.cast_succ]
+      ring
+
+/-- [proved-derived; formal-checked] **The rotor of period `d` has order exactly `d`**: the closing
+ring's navigator returns after `d` ticks and not before. -/
+theorem mapRotor_order (d : ℕ) [NeZero d] : orderOf (Equiv.addRight (1 : ZMod d)) = d := by
+  rw [orderOf_eq_iff (NeZero.pos d)]
+  refine ⟨?_, ?_⟩
+  · rw [mapRotor_pow]; ext x; simp
+  · intro m hm hm0 h
+    have := congrArg (fun f : Equiv.Perm (ZMod d) => f 0) h
+    simp at this
+    rw [ZMod.natCast_eq_zero_iff] at this
+    exact absurd (Nat.le_of_dvd hm0 this) (not_le.mpr hm)
 
 end Holonics.HolonCore

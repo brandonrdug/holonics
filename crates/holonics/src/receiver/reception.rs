@@ -12,10 +12,14 @@
 //! the step does not determine the motion (Lean `Holarchy/Reception.interact`, `interact_ok_iff`:
 //! a singular step matrix `1 − (h/2)(J − R)Q` is refused).
 //!
-//! [`JointLaw::interact`] returns an [`InteractionReturn`]: both participants' next states, the
-//! receiver's face and its motion, the receipt, the port bond at the external ports (the supply
-//! and the pulled-back midpoint effort, Lean `InteractionReturn.boundaryBond`), the stored energy of each
-//! participant before and after, the certified balance and the unresolved fibre. The face is `ρ(t, x_S, x_R) = C_S x_S + C_R x_R + o + t·c` ([`ReceiverFace`]); over the
+//! [`JointLaw::interact`] returns an [`InteractionReturn`] whose forward is the solved
+//! [`JointStep`]: both participants' next states, the receiver's face and its motion, the port bond
+//! at the external ports (the supply and the pulled-back midpoint effort, Lean
+//! `InteractionReturn.boundaryBond`), the stored energy of each participant before and after, the
+//! certified balance and the unresolved fibre; and whose receipt is the receipt law's.
+//! [`InteractionReturn`] is generic in its forward, pullback and deposit payloads, each a
+//! [`Component`] present or declared absent (rebuild step 4 addition 6), so that every consumer
+//! (the joint law here, the HNN's execution port) returns the one owner's type. The face is `ρ(t, x_S, x_R) = C_S x_S + C_R x_R + o + t·c` ([`ReceiverFace`]); over the
 //! solved step its change splits exactly into the source's motion, the receiver's own motion and
 //! the chart's explicit motion, `Δy = C_S Δx_S + C_R Δx_R + h c`, the discrete moving-receiver
 //! rate on the law's own field ([`FaceMotion`]).
@@ -31,8 +35,8 @@
 //! |---|---|
 //! | `JointLaw`, `JointLaw.Q`, `stepMatrix`, `stepSource`, `jointStep_iff`, `solveStep_unique` | [`JointLaw`], [`JointLaw::interact`] |
 //! | `interact`, `interact_ok_iff`, `interact_solves`, `StepRefusal.singular`, `singular_step_refused` | [`JointLaw::interact`] |
-//! | `InteractionReturn`, `readStep`, `boundaryBond_power` | [`InteractionReturn`], [`InteractionReturn::boundary`] |
-//! | `InteractionReturn.balance`, `readStep_stored_split` | [`InteractionReturn::balance`], [`InteractionReturn::stored_before`] |
+//! | `InteractionReturn`, `readStep`, `boundaryBond_power` | [`InteractionReturn`], [`JointStep::boundary`] |
+//! | `InteractionReturn.balance`, `readStep_stored_split` | [`JointStep::balance`], [`JointStep::stored_before`] |
 //! | `readStep_passive`, `active_element_is_not_passive` | tests |
 //! | `readStep_unresolved_face`, `unresolved_fibre_is_plural` | [`UnresolvedFibre`] |
 //! | `JointLaw.field`, `moving_receiver_rate_of_law` | [`FaceMotion`] |
@@ -50,6 +54,8 @@
 //! in #62.
 
 use num_traits::{One, Zero};
+
+use crate::aeon::Reading;
 
 use crate::holarchy::Holarchy;
 use crate::holon::dirac::DiracStructure;
@@ -233,7 +239,7 @@ impl JointLaw {
         input: &[Rat],
         face: &ReceiverFace,
         receipt: &ReceiptLaw,
-    ) -> Result<InteractionReturn, HolonError> {
+    ) -> Result<InteractionReturn<JointStep>, HolonError> {
         let (sigma_s, sigma_r) = (self.source, self.receiver_extent());
         if face.source.columns() != sigma_s || face.receiver.columns() != sigma_r {
             return Err(HolonError::Shape {
@@ -263,20 +269,28 @@ impl JointLaw {
         );
         let directions = face.receiver.kernel_basis()?;
         Ok(InteractionReturn {
-            next_source: source_after.to_vec(),
-            next_receiver: receiver_after.to_vec(),
-            commit: advance.state.commit,
-            face: face_after,
-            face_motion: motion,
+            forward: Component::Present(JointStep {
+                next_source: source_after.to_vec(),
+                next_receiver: receiver_after.to_vec(),
+                commit: advance.state.commit,
+                face: face_after,
+                face_motion: motion,
+                boundary: self.law.kinds(&advance)?.external,
+                stored_before: self.stored(before, state.commit)?,
+                stored_after: self.stored(after, advance.state.commit)?,
+                balance: advance.balance,
+                unresolved: UnresolvedFibre {
+                    point: receiver_after.to_vec(),
+                    directions,
+                },
+            }),
+            pullback: Component::Absent("a joint step returns no covector"),
+            deposit: Component::Absent(
+                "a joint step stages no material; its deposition work is in its balance",
+            ),
+            order: Component::Absent("a joint step reads no source order"),
+            phases: Component::Absent("a joint step is bound to no receiving phases"),
             receipt: receipt.receive(after)?,
-            boundary: self.law.kinds(&advance)?.external,
-            stored_before: self.stored(before, state.commit)?,
-            stored_after: self.stored(after, advance.state.commit)?,
-            balance: advance.balance,
-            unresolved: UnresolvedFibre {
-                point: receiver_after.to_vec(),
-                directions,
-            },
         })
     }
 }
@@ -371,17 +385,65 @@ pub struct UnresolvedFibre {
     pub directions: Vec<Vec<Rat>>,
 }
 
-/// [definition] **What an interaction returns** (Lean `Holarchy/Reception.InteractionReturn`). Only
-/// [`JointLaw::interact`] builds one, and only when the balance closes, so the balance is
-/// certified.
+/// [definition] **A component of an interaction's return**: present, or a declared absence with
+/// its reason, never a default value (rebuild step 4 addition 6).
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct InteractionReturn {
+pub enum Component<T> {
+    Absent(&'static str),
+    Present(T),
+}
+
+impl<T> Component<T> {
+    /// The present value, if any.
+    pub fn present(&self) -> Option<&T> {
+        match self {
+            Component::Present(value) => Some(value),
+            Component::Absent(_) => None,
+        }
+    }
+
+    /// The present value by value, if any.
+    pub fn into_present(self) -> Option<T> {
+        match self {
+            Component::Present(value) => Some(value),
+            Component::Absent(_) => None,
+        }
+    }
+
+    /// Whether the component is present.
+    pub fn is_present(&self) -> bool {
+        matches!(self, Component::Present(_))
+    }
+
+    /// The declared reason of an absence.
+    pub fn reason(&self) -> Option<&'static str> {
+        match self {
+            Component::Absent(reason) => Some(reason),
+            Component::Present(_) => None,
+        }
+    }
+}
+
+/// [definition] **The source order of a return**: each region's clock read in turns of its
+/// period, as an aeon reading (windings and open phase), and the cells counted.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SourceOrder {
+    pub rings: Vec<Reading>,
+    pub cells: u64,
+}
+
+/// [definition] **The solved joint step of a reception** `(|H'_S⟩, |H'_R⟩, f_R)`: both participants'
+/// next states, the joint commit, the receiver's face and its motion, the port bond at the external
+/// ports (Lean `InteractionReturn.boundaryBond`), each participant's stored energy before and after,
+/// the certified balance and the unresolved fibre. Only [`JointLaw::interact`] builds one, and only
+/// when the balance closes.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct JointStep {
     next_source: Vec<Rat>,
     next_receiver: Vec<Rat>,
     commit: u64,
     face: Vec<Rat>,
     face_motion: FaceMotion,
-    receipt: Receipt,
     boundary: Bond,
     stored_before: StoredEnergy,
     stored_after: StoredEnergy,
@@ -389,7 +451,7 @@ pub struct InteractionReturn {
     unresolved: UnresolvedFibre,
 }
 
-impl InteractionReturn {
+impl JointStep {
     pub fn next_source(&self) -> &[Rat] {
         &self.next_source
     }
@@ -410,10 +472,6 @@ impl InteractionReturn {
 
     pub fn face_motion(&self) -> &FaceMotion {
         &self.face_motion
-    }
-
-    pub fn receipt(&self) -> &Receipt {
-        &self.receipt
     }
 
     /// The port bond at the external ports: flow `Bᵀ ē` against the declared effort `u`, whose
@@ -438,6 +496,36 @@ impl InteractionReturn {
 
     pub fn unresolved(&self) -> &UnresolvedFibre {
         &self.unresolved
+    }
+}
+
+/// [definition] **What an interaction returns** (Lean `Holarchy/Reception.InteractionReturn`;
+/// rebuild step 4 addition 6), generic in its owner over its payloads so that this module never
+/// depends on a consumer: the **forward** (what the passage produced), the **pullback** (the
+/// covectors it returns), the **deposit** (the material it stages or applies), each a
+/// [`Component`], present or a declared absence; the **source order**; the **receiving phases** it
+/// was bound to (`Ph`); and the **receipt** (`Rc`): per-region readings in their own clocks, with
+/// whatever balance, fibres and work the owner's receipt carries.
+///
+/// The joint law's return is `InteractionReturn<JointStep>`: its forward is the solved step, its
+/// pullback and deposit are declared absences, it has no source order or receiving phases, and its
+/// receipt is the [`Receipt`] of its [`ReceiptLaw`]. The HNN's execution port fills every
+/// component (`crate::hnn::port`), returning faces, ratios, readings and handles, never its
+/// resident's state.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct InteractionReturn<Fw = (), Pb = (), Dp = (), Ph = (), Rc = Receipt> {
+    pub forward: Component<Fw>,
+    pub pullback: Component<Pb>,
+    pub deposit: Component<Dp>,
+    pub order: Component<SourceOrder>,
+    pub phases: Component<Ph>,
+    pub receipt: Rc,
+}
+
+impl<Pb, Dp, Ph, Rc> InteractionReturn<JointStep, Pb, Dp, Ph, Rc> {
+    /// The solved joint step, when the forward is present.
+    pub fn step(&self) -> Option<&JointStep> {
+        self.forward.present()
     }
 }
 
@@ -520,6 +608,9 @@ mod tests {
                 &ReceiverFace::receiver_state(1, 1).unwrap(),
                 &no_receipt(2),
             )
+            .unwrap()
+            .forward
+            .into_present()
             .unwrap();
         let energy = |x: &[Rat], commit| {
             crate::holon::element::storage_energy(law.law().holon().storage_at(commit), x).unwrap()
@@ -559,6 +650,9 @@ mod tests {
                 &ReceiverFace::receiver_state(1, 1).unwrap(),
                 &no_receipt(2),
             )
+            .unwrap()
+            .forward
+            .into_present()
             .unwrap();
         let grown = returned.stored_after().joint() - returned.stored_before().joint();
         assert!(returned.balance().dissipated.is_positive());
@@ -583,6 +677,9 @@ mod tests {
                 &ReceiverFace::receiver_state(1, 1).unwrap(),
                 &no_receipt(2),
             )
+            .unwrap()
+            .forward
+            .into_present()
             .unwrap();
         assert_eq!(returned.next_source(), &ints(&[3]));
         assert_eq!(returned.stored_before().joint(), rat(1, 2));
@@ -599,7 +696,7 @@ mod tests {
     fn reception_changes_both_participants() {
         let law = joint(&[&[0, -1], &[1, 0]], &zero(2, 2), &zero(2, 0), None);
         let receipt = ReceiptLaw::new(2, vec![ints(&[0, 5])], vec![RegionChart::rate()]).unwrap();
-        let returned = law
+        let full = law
             .interact(
                 &HolonState::new(ints(&[1, 0])),
                 &[],
@@ -607,6 +704,7 @@ mod tests {
                 &receipt,
             )
             .unwrap();
+        let returned = full.step().unwrap();
         assert_eq!(returned.next_source(), &[rat(3, 5)]);
         assert_eq!(returned.next_receiver(), &[rat(4, 5)]);
         assert_eq!(returned.face(), &[rat(4, 5)]);
@@ -619,7 +717,7 @@ mod tests {
             rat(8, 25)
         );
         assert!(returned.balance().port.is_zero() && returned.balance().dissipated.is_zero());
-        assert_eq!(returned.receipt().readings(), &[integer(4)]);
+        assert_eq!(full.receipt.readings(), &[integer(4)]);
     }
 
     /// `Holarchy/Reception.moving_receiver_rate_of_law`, over the solved step: the returned face
@@ -642,7 +740,12 @@ mod tests {
         )
         .unwrap();
         let (state, input) = (HolonState::new(ints(&[2, 1])), ints(&[1]));
-        let returned = law.interact(&state, &input, &face, &no_receipt(2)).unwrap();
+        let returned = law
+            .interact(&state, &input, &face, &no_receipt(2))
+            .unwrap()
+            .forward
+            .into_present()
+            .unwrap();
         let h = law.law().step().clone();
         assert_eq!(
             (returned.next_source(), returned.next_receiver()),
@@ -736,6 +839,9 @@ mod tests {
                 &face,
                 &no_receipt(3),
             )
+            .unwrap()
+            .forward
+            .into_present()
             .unwrap();
         assert_eq!(returned.unresolved().directions, vec![ints(&[0, 1])]);
     }

@@ -53,6 +53,15 @@ reached-edge work law.
    T (log Z_Θ' − log Z_Θ)` (`work_on_reached_edges`, composing `thermal_first_law` and
    `Deposition.unreached_edge_unchanged`).
 
+8. **The ledger read on enclosed code lengths** (the HNN's receiver reads its code lengths only as
+   exact enclosures, its faces lying in `ℚ(θ)`). Along any walk whose steps each move the source or
+   the constitution, exchange plus deposition telescopes to the change of code length
+   (`ledger_telescopes`), and with cross-entropies whose steps move one law at a time the two sums
+   are `first_law_aeon`'s (`ledger_is_first_law`). Read on enclosures `lo k ≤ C k ≤ hi k`, each
+   step's Minkowski difference sums to an enclosure of its exact sum (`enclosed_contains`), and the
+   two kinds together are the enclosed change widened by the interior occurrences' widths, exactly
+   (`enclosed_telescopes`). Rust `holonics::aeon::EnclosedLedger`.
+
 [agent-inferred] The names exchange/deposition read the record's heat/work structure of learning;
 the identities hold as stated whatever reading is chosen.
 
@@ -314,6 +323,117 @@ theorem work_on_reached_edges {m : ℕ} (L : DepositionLaw k) (hzero : ∀ e, L.
 
 end Reached
 
+/-! ## 7. The ledger read on enclosed code lengths -/
+
+section Ledger
+
+/-- [definition] **The ledger's exchange**: along occurrences `0, …, N` with code lengths `C k`, the
+steps that move the source (`dep k = false`: new targets through the unchanged constitution),
+summed. -/
+def ledgerExchange (C : ℕ → ℝ) (dep : ℕ → Bool) (N : ℕ) : ℝ :=
+  ∑ k ∈ range N, if dep k = true then 0 else C (k + 1) - C k
+
+/-- [definition] **The ledger's deposition**: the steps that move the constitution (`dep k = true`:
+the arrived targets at the successor), summed. -/
+def ledgerDeposition (C : ℕ → ℝ) (dep : ℕ → Bool) (N : ℕ) : ℝ :=
+  ∑ k ∈ range N, if dep k = true then C (k + 1) - C k else 0
+
+/-- [proved-derived; formal-checked] **The ledger telescopes**: whatever the steps' kinds, exchange
+plus deposition is the change of code length between the bounding occurrences. -/
+theorem ledger_telescopes (C : ℕ → ℝ) (dep : ℕ → Bool) (N : ℕ) :
+    ledgerExchange C dep N + ledgerDeposition C dep N = C N - C 0 := by
+  unfold ledgerExchange ledgerDeposition
+  rw [← sum_add_distrib, ← sum_range_sub C]
+  refine sum_congr rfl fun k _ => ?_
+  cases dep k <;> simp
+
+/-- [proved-derived; formal-checked] **The ledger is the first law.** When each step moves only the
+source (an exchange: the receiver unchanged) or only the receiver (a deposition: the source
+unchanged), and the code length is the cross-entropy, the ledger's two sums are the exchange and
+deposition sums of `first_law_aeon`. -/
+theorem ledger_is_first_law (p q : ℕ → PositiveProbabilitySection Index) (dep : ℕ → Bool)
+    (N : ℕ) (hex : ∀ k, dep k = false → q (k + 1) = q k)
+    (hdep : ∀ k, dep k = true → p (k + 1) = p k) :
+    ledgerExchange (fun k => crossEntropy (p k) (q k)) dep N =
+        ∑ k ∈ range N, exchange (p k) (p (k + 1)) (q k) ∧
+      ledgerDeposition (fun k => crossEntropy (p k) (q k)) dep N =
+        ∑ k ∈ range N, deposition (p (k + 1)) (q k) (q (k + 1)) := by
+  constructor
+  · unfold ledgerExchange
+    refine sum_congr rfl fun k _ => ?_
+    cases h : dep k
+    · simp only [Bool.false_eq_true, if_false]
+      rw [exchange_eq_crossEntropy_change, hex k h]
+    · simp only [if_true]
+      rw [hdep k h, exchange_eq_crossEntropy_change, sub_self]
+  · unfold ledgerDeposition
+    refine sum_congr rfl fun k _ => ?_
+    cases h : dep k
+    · simp only [Bool.false_eq_true, if_false]
+      rw [hex k h, deposition_eq_crossEntropy_change, sub_self]
+    · simp only [if_true]
+      rw [deposition_eq_crossEntropy_change, hdep k h]
+
+/-- [definition] **The enclosed ledger's lower ends**: code lengths read as enclosures
+`lo k ≤ C k ≤ hi k`, each step of kind `b` the lower end `lo (k+1) − hi k` of its Minkowski
+difference, summed. -/
+def enclosedLower (lo hi : ℕ → ℝ) (dep : ℕ → Bool) (b : Bool) (N : ℕ) : ℝ :=
+  ∑ k ∈ range N, if dep k = b then lo (k + 1) - hi k else 0
+
+/-- [definition] **The enclosed ledger's upper ends**: `hi (k+1) − lo k` per step of kind `b`. -/
+def enclosedUpper (lo hi : ℕ → ℝ) (dep : ℕ → Bool) (b : Bool) (N : ℕ) : ℝ :=
+  ∑ k ∈ range N, if dep k = b then hi (k + 1) - lo k else 0
+
+/-- [proved-derived; formal-checked] **Each enclosed sum contains its exact sum.** -/
+theorem enclosed_contains (C lo hi : ℕ → ℝ) (dep : ℕ → Bool) (N : ℕ)
+    (hlo : ∀ k, lo k ≤ C k) (hhi : ∀ k, C k ≤ hi k) :
+    (enclosedLower lo hi dep false N ≤ ledgerExchange C dep N ∧
+        ledgerExchange C dep N ≤ enclosedUpper lo hi dep false N) ∧
+      (enclosedLower lo hi dep true N ≤ ledgerDeposition C dep N ∧
+        ledgerDeposition C dep N ≤ enclosedUpper lo hi dep true N) := by
+  unfold enclosedLower enclosedUpper ledgerExchange ledgerDeposition
+  refine ⟨⟨?_, ?_⟩, ⟨?_, ?_⟩⟩ <;>
+  · apply sum_le_sum
+    intro k _
+    have := hlo k
+    have := hhi k
+    have := hlo (k + 1)
+    have := hhi (k + 1)
+    cases dep k <;> simp only [Bool.false_eq_true, Bool.true_eq_false, if_true, if_false] <;>
+      linarith
+
+/-- The Minkowski sums of a chain of steps telescope, widened by the interior occurrences. -/
+theorem telescope_widened (lo hi : ℕ → ℝ) {N : ℕ} (hN : 1 ≤ N) :
+    ∑ k ∈ range N, (lo (k + 1) - hi k) = (lo N - hi 0) - ∑ k ∈ Ico 1 N, (hi k - lo k) ∧
+      ∑ k ∈ range N, (hi (k + 1) - lo k) = (hi N - lo 0) + ∑ k ∈ Ico 1 N, (hi k - lo k) := by
+  induction N, hN using Nat.le_induction with
+  | base => simp
+  | succ n hn ih =>
+    obtain ⟨h1, h2⟩ := ih
+    rw [sum_range_succ, sum_range_succ, h1, h2, sum_Ico_succ_top hn]
+    constructor <;> ring
+
+/-- [proved-derived; formal-checked] **The enclosed ledger telescopes, widened by its interior.**
+For `N ≥ 1` steps, the two kinds' lower sums total the enclosed change's lower end `lo N − hi 0`
+less the widths `W = Σ_(0<k<N) (hi k − lo k)` of the interior occurrences, and the upper sums its
+upper end `hi N − lo 0` plus `W`, exactly. -/
+theorem enclosed_telescopes (lo hi : ℕ → ℝ) (dep : ℕ → Bool) {N : ℕ} (hN : 1 ≤ N) :
+    enclosedLower lo hi dep false N + enclosedLower lo hi dep true N =
+        (lo N - hi 0) - ∑ k ∈ Ico 1 N, (hi k - lo k) ∧
+      enclosedUpper lo hi dep false N + enclosedUpper lo hi dep true N =
+        (hi N - lo 0) + ∑ k ∈ Ico 1 N, (hi k - lo k) := by
+  have split : ∀ f : ℕ → ℝ, (∑ k ∈ range N, if dep k = false then f k else 0) +
+      (∑ k ∈ range N, if dep k = true then f k else 0) = ∑ k ∈ range N, f k := by
+    intro f
+    rw [← sum_add_distrib]
+    refine sum_congr rfl fun k _ => ?_
+    cases dep k <;> simp
+  unfold enclosedLower enclosedUpper
+  rw [split (fun k => lo (k + 1) - hi k), split (fun k => hi (k + 1) - lo k)]
+  exact telescope_widened lo hi hN
+
+end Ledger
+
 section Audit
 
 #print axioms first_law_epoch
@@ -326,6 +446,10 @@ section Audit
 #print axioms first_law_integral
 #print axioms thermal_first_law
 #print axioms work_on_reached_edges
+#print axioms ledger_telescopes
+#print axioms ledger_is_first_law
+#print axioms enclosed_contains
+#print axioms enclosed_telescopes
 
 end Audit
 

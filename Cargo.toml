@@ -30,3 +30,12 @@ thiserror = "2"
 opt-level = 3
 lto = true
 
+# Exact arithmetic dominates the tests' time, and the big-integer kernels are the dependencies'
+# non-generic code: optimize them in debug and test builds (the workspace's own code stays at the
+# debug level). The HNN tests run about four times faster.
+[profile.dev.package.num-bigint]
+opt-level = 3
+
+[profile.dev.package.num-integer]
+opt-level = 3
+

@@ -22,6 +22,7 @@
 //! | `Aeon/Clock/Reading.chainOf`, `cycle_reading_factors_through_homology` | [`FiniteComplex::chain`] |
 //! | `Aeon/Clock/Reading.rate`, `Admitted`, `rate_swap`, `rate_through`, `rate_through_projectivelyEq`, `rate_through_zero`, `rate_iterate` | [`rate`], [`Aeon::repeated`] |
 //! | `Aeon/Clock/Winding.clockLift`, `navigatorClock`, `torusPoint`, `torus_closes_iff` | [`ClockLift`], [`TorusClock`], [`Cycle`] |
+//! | `Aeon/Clock/Winding.reading_navigatorClock`, `Aeon/Clock/Epoch.signed_count_is_flux` | [`ClockLift::forward`] (an aeon carried by its two lift points) |
 //! | `Aeon/Clock/Winding.windings`, `openPhase`, `carry`, `windings_add`, `ratio_split`, `carry_of_microsteps`, `jump_iterate` | [`Reading`] |
 //! | `Aeon/Clock/Lock.jointReading`, `IsCycle`, `lock_at_address`, `cycle_iff_period_dvd`, `convergent_near_return` | [`TwoClocks`], [`Convergent`], on the lift |
 //! | `Aeon/Clock/Epoch.crossingTicks`, `aeonSection`, `epochOf`, `epoch`, `coarsen`, `epochOf_coarse`, `coarsen_tower`, `odometer_tower`, `CutClock`, `reading_eq_crossings`, `crossings_concat`, `sectionForm`, `signed_count_is_flux`, `ring_count_is_flux` | [`Epochs`], [`epochs`], [`EpochTower`], [`ClockLift::ring_section`] |
@@ -32,6 +33,7 @@
 //! | `Physics/Information/ClockJoin.join_silent_on_cycles`, `join_of_silent_on_cycles`, `join_iff_silent`, `triangle_defect` | [`join_axes`], [`AxesJoin`], [`AxisComponent`], [`AxisRate`], [`ClockAxis`] |
 //! | Mathlib `Matrix.charpolyRev`; `Aeon/Production/Zeta.cycleLog`, `zeta_eq_exp`, `machine_charpolyRev`, `machine_zeta` | [`ReturnMap`], [`zeta`], [`cycle_exponential`] |
 //! | `Aeon/Production/FirstLaw.exchange`, `deposition`, `first_law_epoch`, `first_law_aeon` | [`PositiveLaw`], [`exchange`], [`deposition`], [`learning_balance`] |
+//! | `Aeon/Production/FirstLaw.ledger_telescopes`, `ledger_is_first_law`, `enclosed_contains`, `enclosed_telescopes` | [`EnclosedLedger`], [`EnclosedBalance`], [`LiteralComparison`] |
 
 use thiserror::Error;
 
@@ -53,7 +55,10 @@ mod zeta;
 
 pub use epoch::{EpochTower, Epochs, Tick, epochs};
 pub(crate) use first_law::weighted_surprisal;
-pub use first_law::{LearningBalance, PositiveLaw, deposition, exchange, learning_balance};
+pub use first_law::{
+    EnclosedBalance, EnclosedLedger, LearningBalance, LiteralComparison, PositiveLaw, deposition,
+    exchange, learning_balance,
+};
 pub use groupoid::{
     Aeon, ClockLift, Cycle, FiniteComplex, LiftPassage, LiftSquare, ParametricComplex, Step,
 };
@@ -119,6 +124,10 @@ pub enum AeonError {
     NotStochastic { state: usize, reason: &'static str },
     #[error("a law must be positive with total mass one: {reason}")]
     NotAPositiveLaw { reason: &'static str },
+    #[error("the ledger has read no occurrence to step from")]
+    NoOccurrence,
+    #[error("navigator {navigator} ends behind where it starts: a forward aeon only advances")]
+    NotForward { navigator: usize },
     #[error("the step {from} → {to} has no reverse transition, so the reversed aeon has no law")]
     IrreversibleStep { from: usize, to: usize },
     #[error(

@@ -20,6 +20,18 @@
 //! stepping of the Holon law (`Holon/Element.midpoint_balance` with `J = A` skew, `R = 0`,
 //! `Q = I`), norm preserving for a skew `A` with `b = 0`.
 //!
+//! [definition] **A closing navigator's transport is a finite-order port map**
+//! ([`Transport::Map`], rebuild step 4 addition 1, review C6): a permutation `P` of the `d` ports of
+//! `ℤ/d`, acting on the configuration `ℚ^d` by carrying coordinate `i` to `P(i)`. One tick is the
+//! map itself, never a Cayley step: a Cayley image `(I − hA/2)⁻¹(I + hA/2)` never has eigenvalue
+//! `−1`, so an even period, and the half-turn itself, is no flow's tick. Its order is the least
+//! common multiple of its cycle lengths ([`Transport::order`]); its powers read only the tick's
+//! class modulo that order, so a whole turn moves nothing and the winding is the lift's alone
+//! (Lean `Holon/Generator.map_pow_mod_order`, `map_turn_lossless`); two maps on one port chart
+//! compose to a map ([`Transport::compose`], `map_compose_order_pos`, and for commuting maps
+//! `map_compose_order_dvd`). The rotor `(· + 1)` of a ring of period `d` has order exactly `d`
+//! ([`Navigator::rotor`], `mapRotor_order`).
+//!
 //! The submodules carry the navigator's words: [`address`] (Stern–Brocot addresses and lock
 //! addresses), [`trace`] (trace faces and the dynamical zeta of a machine of sites) and
 //! [`reflection`] (the reflective continuation, whose codec can be revised mid-passage).
@@ -29,6 +41,9 @@
 //! | `LiftedPhase`, `LiftedPhase.chart`, `LiftedPhase.jump` | [`PhaseLift`] |
 //! | `jump_lossless`, `jump_carries_winding` | [`PhaseLift::jump`], [`PhaseLift::jump_is_lossless`] |
 //! | `jumps_are_carries`, `clockPassage_jumps_lossless` | [`Clock::advance`], [`jump_cocycle`] |
+//! | `map_pow_mod_order`, `map_turn_lossless`, `map_order_pos` | [`Transport::Map`], [`Transport::order`], [`Navigator::advance`] |
+//! | `map_compose_order_pos`, `map_compose_order_dvd` | [`Transport::compose`] |
+//! | `mapRotor_pow`, `mapRotor_order` | [`Navigator::rotor`] |
 
 use crate::geometry::RatVec3;
 use crate::geometry::screw::{RationalPhase, ScrewGenerator, SituatedScrew};
@@ -38,6 +53,7 @@ use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
 
 use crate::holon::HolonError;
+use crate::holon::contact::menu::PortPermutation;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{add, at, matrix, scale};
 use crate::ratio::rat;
@@ -222,6 +238,10 @@ pub enum Transport {
     },
     /// `ω × x + v`, through `crate::geometry::screw::ScrewGenerator` (boxed: six exact rationals).
     Screw(Box<ScrewGenerator>),
+    /// **A finite-order exact port map** on `ℤ/d` (module header): the permutation of the `d`
+    /// ports, acting on `ℚ^d` by carrying coordinate `i` to `P(i)`. It is not a flow and has no
+    /// generator; its tick is the map.
+    Map(PortPermutation),
 }
 
 impl Transport {
@@ -230,12 +250,51 @@ impl Transport {
         match self {
             Self::Linear(a) | Self::Affine { linear: a, .. } => a.rows(),
             Self::Screw(_) => 3,
+            Self::Map(map) => map.ports(),
         }
     }
 
-    /// `(A, b)` with `ẋ = A x + b`; a screw gives `A = hat(ω)`, `b = v`.
+    /// **The order of a finite-order map**: the least common multiple of its cycle lengths, the
+    /// period of its powers (Lean `Holon/Generator.map_order_pos`). A flow declares no order: its
+    /// Cayley step's powers are not claimed periodic.
+    pub fn order(&self) -> Option<BigUint> {
+        match self {
+            Self::Map(map) => Some(map.order()),
+            _ => None,
+        }
+    }
+
+    /// **Two maps compose to a map**: `self ∘ other`, the permutation `x ↦ self(other(x))`, again
+    /// of finite order (Lean `Holon/Generator.map_compose_order_pos`; for commuting maps its order
+    /// divides the least common multiple, `map_compose_order_dvd`). Refused for a flow, whose
+    /// composite is not a transport of this form, and for maps on different port charts.
+    pub fn compose(&self, other: &Self) -> Result<Self, HolonError> {
+        match (self, other) {
+            (Self::Map(left), Self::Map(right)) => {
+                if left.ports() != right.ports() {
+                    return Err(HolonError::Shape {
+                        what: "composed port maps (one port chart)",
+                        expected: left.ports(),
+                        found: right.ports(),
+                    });
+                }
+                Ok(Self::Map(compose_maps(left, right)))
+            }
+            _ => Err(HolonError::Unsupported {
+                what: "a composite transport",
+                reason: "only finite-order port maps compose to a transport of their own form",
+            }),
+        }
+    }
+
+    /// `(A, b)` with `ẋ = A x + b`; a screw gives `A = hat(ω)`, `b = v`. A port map has no
+    /// generator and is refused.
     pub(crate) fn affine_parts(&self) -> Result<(ExactRatMatrix, Vec<Rat>), HolonError> {
         match self {
+            Self::Map(_) => Err(HolonError::Unsupported {
+                what: "the flow of a port map",
+                reason: "a finite-order map has no generator; its tick is the map itself",
+            }),
             Self::Linear(a) => {
                 check_square(a)?;
                 Ok((a.clone(), crate::ratio::linear::vector::zeros(a.rows())))
@@ -271,11 +330,35 @@ impl Transport {
         }
     }
 
-    /// The navigator's velocity `A x + b` at a configuration.
+    /// The navigator's velocity `A x + b` at a configuration; refused for a port map.
     pub fn velocity(&self, configuration: &[Rat]) -> Result<Vec<Rat>, HolonError> {
         let (a, b) = self.affine_parts()?;
         Ok(add(&a.apply(configuration)?, &b))
     }
+
+    /// Validate the transport's own form: a flow's generator is square, a map is a bijection
+    /// (checked at its construction).
+    fn check(&self) -> Result<(), HolonError> {
+        match self {
+            Self::Map(_) => Ok(()),
+            _ => self.affine_parts().map(|_| ()),
+        }
+    }
+}
+
+/// `left ∘ right` of two maps on one port chart.
+fn compose_maps(left: &PortPermutation, right: &PortPermutation) -> PortPermutation {
+    PortPermutation::new(right.images().iter().map(|x| left.images()[*x]).collect())
+        .expect("the composite of two bijections of one chart is a bijection")
+}
+
+/// **A map's action on a configuration**: coordinate `i` moves to `P(i)`.
+fn carried(map: &PortPermutation, configuration: &[Rat]) -> Vec<Rat> {
+    let mut image = vec![Rat::zero(); configuration.len()];
+    for (port, value) in configuration.iter().enumerate() {
+        image[map.images()[port]] = value.clone();
+    }
+    image
 }
 
 fn check_square(a: &ExactRatMatrix) -> Result<(), HolonError> {
@@ -314,7 +397,7 @@ impl Navigator {
         clock: Clock,
         lift: PhaseLift,
     ) -> Result<Self, HolonError> {
-        transport.affine_parts()?;
+        transport.check()?;
         if initial.len() != transport.dimension() {
             return Err(HolonError::Shape {
                 what: "initial configuration",
@@ -343,6 +426,59 @@ impl Navigator {
             clock,
             lift,
         )
+    }
+
+    /// [definition] **The closing rotor of a ring of period `d ≥ 2`**: the map `(· + 1)` on `ℤ/d`
+    /// (order exactly `d`, Lean `Holon/Generator.mapRotor_order`), its key the port `key` as the
+    /// one-hot configuration `e_key ∈ ℚ^d`, its clock a ring of period `d` and step `h`, and its
+    /// lift at rest (phase `0`, no winding). The rotor's powers are its phase classes.
+    pub fn rotor(period: u64, key: u64, step: Rat) -> Result<Self, HolonError> {
+        let ports = usize::try_from(period).map_err(|_| HolonError::Shape {
+            what: "a rotor's period (the machine word)",
+            expected: usize::MAX,
+            found: 0,
+        })?;
+        if ports < 2 || key >= period {
+            return Err(HolonError::Shape {
+                what: "a rotor of period at least 2 with its key on its ports",
+                expected: ports.max(2),
+                found: usize::try_from(key).unwrap_or(usize::MAX),
+            });
+        }
+        let map = PortPermutation::new((0..ports).map(|port| (port + 1) % ports).collect())
+            .expect("the cyclic shift is a bijection");
+        let mut initial = vec![Rat::zero(); ports];
+        initial[usize::try_from(key).expect("the key lies below the period")] = Rat::one();
+        Self::new(
+            Transport::Map(map),
+            initial,
+            Clock::ring(step, period)?,
+            PhaseLift::new(RationalPhase::new(Rat::zero(), 0), BigInt::zero()),
+        )
+    }
+
+    /// The finite-order map, when the transport is one.
+    pub fn map(&self) -> Option<&PortPermutation> {
+        match &self.transport {
+            Transport::Map(map) => Some(map),
+            _ => None,
+        }
+    }
+
+    /// **The port the navigator sits on after `ticks`**: its key's port carried by the map's
+    /// `ticks`-th power, read modulo the order (Lean `Holon/Generator.map_pow_mod_order`); `None`
+    /// for a flow, or a key that is not one port.
+    pub fn port_after(&self, ticks: &BigUint) -> Option<usize> {
+        let map = self.map()?;
+        let mut key = None;
+        for (port, value) in self.initial.iter().enumerate() {
+            if value.is_one() && key.is_none() {
+                key = Some(port);
+            } else if !value.is_zero() {
+                return None;
+            }
+        }
+        Some(map.power(ticks).images()[key?])
     }
 
     /// The situated screw, when the transport is a screw.
@@ -377,9 +513,19 @@ impl Navigator {
         &self.lift
     }
 
-    /// **One Cayley tick** `(I − hA/2) x⁺ = (I + hA/2) x + h b`, exact. Refuses a singular left
-    /// side (the step meets an eigenvalue `2/h` of `A`).
+    /// **One tick**: a flow's Cayley step `(I − hA/2) x⁺ = (I + hA/2) x + h b`, exact, refusing a
+    /// singular left side (the step meets an eigenvalue `2/h` of `A`); a map's tick is the map.
     pub fn tick(&self, configuration: &[Rat]) -> Result<Vec<Rat>, HolonError> {
+        if let Transport::Map(map) = &self.transport {
+            if configuration.len() != map.ports() {
+                return Err(HolonError::Shape {
+                    what: "configuration",
+                    expected: map.ports(),
+                    found: configuration.len(),
+                });
+            }
+            return Ok(carried(map, configuration));
+        }
         let (a, b) = self.transport.affine_parts()?;
         let n = a.rows();
         if configuration.len() != n {
@@ -410,17 +556,30 @@ impl Navigator {
         }
     }
 
-    /// Advance `ticks` Cayley ticks from `configuration`, counting the clock's jumps into the
-    /// winding of the phase lift. Only the reached configuration is returned.
+    /// Advance `ticks` ticks from `configuration`, counting the clock's jumps into the winding of
+    /// the phase lift. Only the reached configuration is returned. A map advances by its
+    /// `ticks`-th power at once, read modulo its order (Lean `Holon/Generator.map_turn_lossless`).
     pub fn advance(
         &mut self,
         configuration: &[Rat],
         ticks: u64,
     ) -> Result<NavigatorAdvance, HolonError> {
-        let mut current = configuration.to_vec();
-        for _ in 0..ticks {
-            current = self.tick(&current)?;
-        }
+        let current = if let Transport::Map(map) = &self.transport {
+            if configuration.len() != map.ports() {
+                return Err(HolonError::Shape {
+                    what: "configuration",
+                    expected: map.ports(),
+                    found: configuration.len(),
+                });
+            }
+            carried(&map.power(&BigUint::from(ticks)), configuration)
+        } else {
+            let mut current = configuration.to_vec();
+            for _ in 0..ticks {
+                current = self.tick(&current)?;
+            }
+            current
+        };
         let jumps = self.clock.advance(&BigUint::from(ticks));
         self.lift = self.lift.jumps(&jumps);
         Ok(NavigatorAdvance {
@@ -484,6 +643,44 @@ mod tests {
         assert_eq!(ring.elapsed(), rat(7, 5));
         assert_eq!(ring.odometer().levels(), 1);
         assert!(Clock::unwound(Rat::zero()).is_err());
+    }
+
+    /// `Holon/Generator.{map_pow_mod_order, map_turn_lossless, mapRotor_order,
+    /// map_compose_order_pos}`: the rotor of an even period (no Cayley step reaches it) has order
+    /// exactly its period, a whole turn moves nothing while the lift counts it, its powers read the
+    /// tick's class, and two maps compose to a map whose order divides the lcm when they commute.
+    #[test]
+    fn a_finite_order_map_reads_its_ticks_modulo_its_order_and_composes() {
+        let mut rotor = Navigator::rotor(4, 1, integer(1)).unwrap();
+        let transport = rotor.transport().clone();
+        assert_eq!(transport.order(), Some(BigUint::from(4u32)));
+        assert!(transport.velocity(&ints(&[1, 0, 0, 0])).is_err());
+        let key = rotor.initial().to_vec();
+        assert_eq!(rotor.tick(&key).unwrap(), ints(&[0, 0, 1, 0]));
+        let reached = rotor.advance(&key, 9).unwrap();
+        assert_eq!(reached.configuration, rotor.tick(&key).unwrap());
+        assert_eq!(reached.jumps, BigUint::from(2u32));
+        assert_eq!(rotor.lift().winding(), &BigInt::from(2));
+        assert_eq!(rotor.port_after(&BigUint::from(9u32)), Some(2));
+        assert_eq!(rotor.port_after(&BigUint::from(1u32)), Some(2));
+        // The half-turn on two ports: order 2, the map no Cayley step realizes.
+        let half = Navigator::rotor(2, 0, integer(1)).unwrap();
+        assert_eq!(half.transport().order(), Some(BigUint::from(2u32)));
+        assert_eq!(half.tick(&ints(&[3, 5])).unwrap(), ints(&[5, 3]));
+        // Composition: the rotor with itself is its square; a reflection with the rotor is a map
+        // of finite order; maps on different charts and flows are refused.
+        let square = transport.compose(&transport).unwrap();
+        assert_eq!(square.order(), Some(BigUint::from(2u32)));
+        let reflection = Transport::Map(PortPermutation::new(vec![0, 3, 2, 1]).unwrap());
+        let composite = reflection.compose(&transport).unwrap();
+        assert_eq!(composite.order(), Some(BigUint::from(2u32)));
+        let other = Navigator::rotor(3, 0, integer(1)).unwrap();
+        assert!(transport.compose(other.transport()).is_err());
+        let flow = Transport::Linear(ExactRatMatrix::identity(4).unwrap());
+        assert!(transport.compose(&flow).is_err());
+        assert_eq!(flow.order(), None);
+        assert!(Navigator::rotor(1, 0, integer(1)).is_err());
+        assert!(Navigator::rotor(3, 3, integer(1)).is_err());
     }
 
     /// A skew (rotation) navigator's Cayley tick preserves `|x|²` exactly, and the screw carries

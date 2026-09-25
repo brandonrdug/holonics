@@ -1,4 +1,4 @@
-import HolonicsResearch.Computation.HolonicConstitutiveCirculation
+import Holonics.Computation.HolonicConstitutiveCirculation
 import Holonics.Computation.HolonicConstitutiveFibre
 import Mathlib.Tactic
 

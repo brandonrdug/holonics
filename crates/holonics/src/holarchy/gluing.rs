@@ -50,13 +50,13 @@ use thiserror::Error;
 use crate::geometry::complex::{CellComplex, ConnectionIncidence};
 use crate::holarchy::Side;
 use crate::holon::dirac::DiracStructure;
-use crate::holon::element::{Pump, PumpSchedule, ResistiveRelation};
+use crate::holon::element::{Pump, PumpSchedule};
 use crate::holon::port::{Bond, PortUnits};
 use crate::holon::{Holon, HolonError, PortCounts, PortHolon};
 use crate::navigator::Clock;
 use crate::ratio::Rat;
 use crate::ratio::linear::ExactRatMatrix;
-use crate::ratio::linear::vector::{at, block_diagonal, from_blocks};
+use crate::ratio::linear::vector::{at, from_blocks};
 
 /// [definition] **The typed gluing defect** (Lean `Holarchy/Join.GluingDefect`): the first failed
 /// check with its witness, read from the two Holons, or a declaration that does not fit them.
@@ -441,27 +441,51 @@ impl Gluing {
 
     /// Check 2: `EᵀF = 1`, or the shared bond `(f = δ_j, e = δ_i)` at an entry where
     /// `(1 − EᵀF)_(ij) ≠ 0`, whose interface power is that entry (`interfacePower_eq`).
+    ///
+    /// [definition; agent-inferred] The product is read shared port by shared port: entry
+    /// `(EᵀF)_(ij) = Σ_k E_ki F_kj` sums only over the ports `k` where both gains are nonzero, so
+    /// the unit join `F = E = 1` costs one term per shared port.
     pub(crate) fn check_power(&self) -> Result<(), GluingDefect> {
         let t = self.shared.len();
-        let product = self
-            .effort_gain
-            .transpose()
-            .and_then(|e| e.multiply(&self.flow_gain))
-            .map_err(|error| GluingDefect::Malformed(error.into()))?;
-        for i in 0..t {
-            for j in 0..t {
-                let expected = if i == j { Rat::one() } else { Rat::zero() };
-                if at(&product, i, j) != expected {
-                    let mut flow = vec![Rat::zero(); t];
-                    let mut effort = vec![Rat::zero(); t];
-                    flow[j] = Rat::one();
-                    effort[i] = Rat::one();
-                    let bond = Bond::new(flow, effort).map_err(GluingDefect::Malformed)?;
-                    let power = self
-                        .interface_power(&bond)
-                        .map_err(GluingDefect::Malformed)?;
-                    return Err(GluingDefect::UncancelledPower { bond, power });
+        let nonzero = |gain: &ExactRatMatrix| -> Vec<Vec<(usize, Rat)>> {
+            (0..t)
+                .map(|k| {
+                    (0..t)
+                        .filter_map(|column| {
+                            let value = at(gain, k, column);
+                            (!value.is_zero()).then_some((column, value))
+                        })
+                        .collect()
+                })
+                .collect()
+        };
+        let (effort, flow) = (nonzero(&self.effort_gain), nonzero(&self.flow_gain));
+        let mut product: std::collections::BTreeMap<(usize, usize), Rat> = Default::default();
+        for k in 0..t {
+            for (i, e) in &effort[k] {
+                for (j, f) in &flow[k] {
+                    *product.entry((*i, *j)).or_default() += e * f;
                 }
+            }
+        }
+        // Every other entry is zero off the diagonal, as `1` requires; the first failed entry in
+        // row-major order is among these.
+        let entries: std::collections::BTreeSet<(usize, usize)> = (0..t)
+            .map(|i| (i, i))
+            .chain(product.keys().copied())
+            .collect();
+        for (i, j) in entries {
+            let expected = if i == j { Rat::one() } else { Rat::zero() };
+            if product.get(&(i, j)).cloned().unwrap_or_default() != expected {
+                let mut flow = vec![Rat::zero(); t];
+                let mut effort = vec![Rat::zero(); t];
+                flow[j] = Rat::one();
+                effort[i] = Rat::one();
+                let bond = Bond::new(flow, effort).map_err(GluingDefect::Malformed)?;
+                let power = self
+                    .interface_power(&bond)
+                    .map_err(GluingDefect::Malformed)?;
+                return Err(GluingDefect::UncancelledPower { bond, power });
             }
         }
         Ok(())
@@ -655,10 +679,7 @@ pub(crate) fn join_port_holons(
         dirac,
         layout.counts(),
         left.storage().direct_sum(right.storage()),
-        ResistiveRelation::new(block_diagonal(
-            left.resistance().resistance(),
-            right.resistance().resistance(),
-        )?)?,
+        left.resistance().direct_sum(right.resistance())?,
     )
 }
 
@@ -676,7 +697,7 @@ pub(crate) fn check_units(
     right: &Holon,
     gluing: &Gluing,
 ) -> Result<(), GluingDefect> {
-    let (a, b) = (left.port_holon().counts(), right.port_holon().counts());
+    let (a, b) = (left.counts(), right.counts());
     for (index, (i, j)) in gluing.shared.iter().enumerate() {
         let left_units = port_units(left, a.external_offset() + i);
         let right_units = port_units(right, b.external_offset() + j);
@@ -721,7 +742,7 @@ pub(crate) fn check_cell_shapes(
             });
         }
         holon_interior(holon)?;
-        if holon.port_faces().is_none() && holon.port_holon().counts().external > 0 {
+        if holon.port_faces().is_none() && holon.counts().external > 0 {
             return Err(HolonError::Unsupported {
                 what: "a constituent on a glued complex",
                 reason: "it declares no face for its external ports",

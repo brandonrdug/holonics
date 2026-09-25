@@ -10,10 +10,138 @@
 //! bounded linear step).
 
 use crate::ratio::Rat;
-use num_traits::Zero;
+use num_bigint::BigInt;
+use num_traits::{One, Zero};
 
 use crate::ratio::linear::inertia::SymmetricForm;
 use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
+
+/// A vector in the integral chart ([`integral`]): integer numerators over one positive denominator.
+pub(crate) type Chart = (Vec<BigInt>, BigInt);
+
+/// [definition; agent-inferred] **A matrix in the integral chart**: integer numerators over one
+/// common denominator, `M = N / D` exactly. A sum of many rank-one terms is formed over integers and
+/// each entry normalized once when read out; a reduced ratio is canonical, so the entries equal the
+/// termwise rational sums.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) struct IntegralMatrix {
+    rows: usize,
+    columns: usize,
+    numerators: Vec<BigInt>,
+    denominator: BigInt,
+}
+
+impl IntegralMatrix {
+    /// **`Σ_t w_t l_t r_tᵀ`** over terms whose vectors are already in the integral chart
+    /// ([`integral`]), with rational weights.
+    pub(crate) fn outer_sum<'a>(
+        rows: usize,
+        columns: usize,
+        terms: impl IntoIterator<Item = (&'a Rat, &'a Chart, &'a Chart)>,
+    ) -> Self {
+        let terms: Vec<_> = terms
+            .into_iter()
+            .filter(|(weight, _, _)| !weight.is_zero())
+            .map(|(weight, left, right)| {
+                let scale = weight.denom() * &left.1 * &right.1;
+                (weight, left, right, scale)
+            })
+            .collect();
+        let denominator = terms
+            .iter()
+            .fold(BigInt::one(), |d, (.., scale)| lcm(&d, scale));
+        let mut numerators = vec![BigInt::zero(); rows * columns];
+        for (weight, (left, _), (right, _), scale) in terms {
+            let factor = weight.numer() * (&denominator / scale);
+            for (i, l) in left.iter().enumerate().take(rows) {
+                if l.is_zero() {
+                    continue;
+                }
+                let scaled = l * &factor;
+                let row = &mut numerators[i * columns..(i + 1) * columns];
+                for (entry, r) in row.iter_mut().zip(right) {
+                    if !r.is_zero() {
+                        *entry += &scaled * r;
+                    }
+                }
+            }
+        }
+        Self {
+            rows,
+            columns,
+            numerators,
+            denominator,
+        }
+    }
+
+    /// The entries as normalized rows.
+    pub(crate) fn to_rows(&self) -> Vec<Vec<Rat>> {
+        (0..self.rows)
+            .map(|i| {
+                self.numerators[i * self.columns..(i + 1) * self.columns]
+                    .iter()
+                    .map(|n| Rat::new(n.clone(), self.denominator.clone()))
+                    .collect()
+            })
+            .collect()
+    }
+
+    /// **`(N + Nᵀ) F / D`** for a square `N / D` and a factor `F` (`rows × m`): the pull of a
+    /// gradient of the symmetric form `F Fᵀ` onto its factor, with `sign` folded in.
+    pub(crate) fn symmetric_times(
+        &self,
+        factor: &ExactRatMatrix,
+        negate: bool,
+    ) -> Result<Vec<Vec<Rat>>, ExactLinearError> {
+        let n = self.rows;
+        if self.columns != n || factor.rows() != n {
+            return Err(ExactLinearError::ShapeMismatch);
+        }
+        let m = factor.columns();
+        let (values, factor_denominator) = integral(factor.entries());
+        let denominator = &self.denominator * &factor_denominator;
+        let mut rows = Vec::with_capacity(n);
+        for i in 0..n {
+            let mut sums = vec![BigInt::zero(); m];
+            for k in 0..n {
+                let weight = &self.numerators[i * n + k] + &self.numerators[k * n + i];
+                if weight.is_zero() {
+                    continue;
+                }
+                for (sum, value) in sums.iter_mut().zip(&values[k * m..(k + 1) * m]) {
+                    if !value.is_zero() {
+                        *sum += &weight * value;
+                    }
+                }
+            }
+            rows.push(
+                sums.into_iter()
+                    .map(|sum| Rat::new(if negate { -sum } else { sum }, denominator.clone()))
+                    .collect(),
+            );
+        }
+        Ok(rows)
+    }
+}
+
+/// **`Σ_c w_c v_c`** of vectors in the integral chart with rational weights, each entry normalized
+/// once.
+pub(crate) fn combination<'a>(
+    width: usize,
+    terms: impl IntoIterator<Item = (&'a Rat, &'a Chart)>,
+) -> Vec<Rat> {
+    let one = (vec![BigInt::one()], BigInt::one());
+    let terms: Vec<(&Rat, &Chart, &Chart)> = terms
+        .into_iter()
+        .map(|(weight, vector)| (weight, vector, &one))
+        .collect();
+    let transposed = IntegralMatrix::outer_sum(width, 1, terms);
+    transposed
+        .to_rows()
+        .into_iter()
+        .map(|mut row| row.remove(0))
+        .collect()
+}
 
 /// A vector of integers as rationals.
 #[cfg(test)]
@@ -26,8 +154,86 @@ pub(crate) fn ints(values: &[i64]) -> Vec<Rat> {
 
 /// `⟨a, b⟩`. The caller owns equal lengths; a mismatch reads the shorter prefix, so every public
 /// facet checks its extents before calling this.
+///
+/// [definition; agent-inferred] Read in the integral chart: each vector as integers over its least
+/// common denominator ([`integral`]), the integer sum formed, and the ratio normalized once. A
+/// reduced ratio is canonical, so this is the same value as the termwise sum, with one `gcd` in
+/// place of one per term.
 pub(crate) fn dot(a: &[Rat], b: &[Rat]) -> Rat {
-    a.iter().zip(b).fold(Rat::zero(), |sum, (x, y)| sum + x * y)
+    let (left, left_denominator) = integral(a);
+    let (right, right_denominator) = integral(b);
+    Rat::new(
+        integer_dot(&left, &right),
+        left_denominator * right_denominator,
+    )
+}
+
+/// `lcm(a, b)` of positive denominators, with the equal and unit cases read without a `gcd`.
+pub(crate) fn lcm(left: &BigInt, right: &BigInt) -> BigInt {
+    if right.is_one() || left == right {
+        return left.clone();
+    }
+    if left.is_one() {
+        return right.clone();
+    }
+    let divisor = crate::ratio::gcd(left, right);
+    (left / divisor) * right
+}
+
+/// The least common denominator of a family of ratios.
+pub(crate) fn common_denominator<'a>(values: impl IntoIterator<Item = &'a Rat>) -> BigInt {
+    values
+        .into_iter()
+        .fold(BigInt::one(), |denominator, value| {
+            lcm(&denominator, value.denom())
+        })
+}
+
+/// [definition; agent-inferred] **The integral chart of a rational vector**: its entries as integers
+/// over their least common denominator `D`, `v = n / D` exactly. A fixed operand is charted once and
+/// applied with one normalization per output entry.
+pub(crate) fn integral(values: &[Rat]) -> Chart {
+    let denominator = common_denominator(values);
+    let numerators = values
+        .iter()
+        .map(|value| {
+            if value.denom() == &denominator {
+                value.numer().clone()
+            } else {
+                value.numer() * (&denominator / value.denom())
+            }
+        })
+        .collect();
+    (numerators, denominator)
+}
+
+/// `Σ a_i b_i` over integers, skipping zero terms.
+pub(crate) fn integer_dot(a: &[BigInt], b: &[BigInt]) -> BigInt {
+    let mut sum = BigInt::zero();
+    for (x, y) in a.iter().zip(b) {
+        if !x.is_zero() && !y.is_zero() {
+            sum += x * y;
+        }
+    }
+    sum
+}
+
+/// `⟨row, n/D⟩` for a rational row against an integral vector `n` over `D`: the row's own common
+/// denominator read inline, one normalization.
+pub(crate) fn row_dot(row: &[Rat], values: &[BigInt], denominator: &BigInt) -> Rat {
+    let row_denominator = common_denominator(row);
+    let mut sum = BigInt::zero();
+    for (entry, value) in row.iter().zip(values) {
+        if entry.is_zero() || value.is_zero() {
+            continue;
+        }
+        if entry.denom() == &row_denominator {
+            sum += entry.numer() * value;
+        } else {
+            sum += entry.numer() * (&row_denominator / entry.denom()) * value;
+        }
+    }
+    Rat::new(sum, row_denominator * denominator)
 }
 
 pub(crate) fn add(a: &[Rat], b: &[Rat]) -> Vec<Rat> {

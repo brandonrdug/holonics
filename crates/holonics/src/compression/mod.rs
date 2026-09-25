@@ -45,6 +45,7 @@
 //! | `Keys.fibre_cons`, `fibre_append_subset`, `fibre_depends_only_on_port_images` | [`Menu::extended`], [`Menu::candidates`] and `keys` tests |
 //! | `Keys.Gauge`, `Gauge.act`, `Gauge.closes_iff`, `Gauge.closureMap_act`, `fibre_gauge_invariant`, `iterate_mem_fibre_iff`, `fibre_gauge_truth`, `fibre_eq_orbit` | [`Gauge`], `keys` tests |
 //! | `Keys.Machine.*`, `Machine.rotorGauge` | [`ReflectorMachine`], [`ReflectorMachine::gauge`], `keys` tests |
+//! | `HNN/Keys.propagation_eq_edge_fibre` | [`Edge`], [`Menu::propagate`], [`Propagation`] |
 //!
 //! [definition; agent-inferred] Where this owner departs from the Lean it says so: [`FaceMap`]
 //! admits receivers of different face extents (Lean's face space `#requests · dim V` is the
@@ -70,7 +71,7 @@ pub use cost::{
     Alphabet, CodecFamily, CodecPivot, CompressionCost, NavigatorCodec, PivotForm, literal_bits,
 };
 pub use face_map::{Cokernel, FaceLedger, FaceMap, FiniteFaceMap, Request, Retention};
-pub use keys::{Candidate, Gauge, Loop, Menu, PortImages, ReflectorMachine};
+pub use keys::{Candidate, Edge, Gauge, Loop, Menu, PortImages, Propagation, ReflectorMachine};
 pub use resonance::{ResonanceSplit, resonance_split};
 
 use thiserror::Error;
@@ -127,6 +128,12 @@ pub enum CompressionError {
     NotInjective { port: usize },
     #[error("loop {loop_index} is not conjugated by the gauge's boundary turn at key {key_index}")]
     NotCovariant { loop_index: usize, key_index: usize },
+    #[error("edge {edge_index} is not conjugated by the gauge's boundary turn at key {key_index}")]
+    EdgeNotCovariant { edge_index: usize, key_index: usize },
+    #[error(
+        "the stage of edge {edge} at key {key_index} is not an involution, so it has no reverse"
+    )]
+    StageNotInvolution { edge: usize, key_index: usize },
     #[error("{ports} ports take too many images at {at} menu ports: past the ceiling of {ceiling}")]
     ImageFamilyCeiling {
         ports: usize,

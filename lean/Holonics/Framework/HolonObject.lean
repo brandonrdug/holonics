@@ -70,6 +70,13 @@ open Holonics.HolonCore
 #print axioms jump_carries_winding
 #print axioms jumps_are_carries
 #print axioms clockPassage_jumps_lossless
+#print axioms map_pow_mod_order
+#print axioms map_turn_lossless
+#print axioms map_compose_order_dvd
+#print axioms map_order_pos
+#print axioms map_compose_order_pos
+#print axioms mapRotor_pow
+#print axioms mapRotor_order
 #print axioms power_pushforward
 #print axioms IsMorphism.comp
 #print axioms scale_square_pow
@@ -98,6 +105,10 @@ open Holonics.HolonCore
 #print axioms walkRead_connection
 #print axioms cell_curvature
 #print axioms connectionIncidence_isDirac
+#print axioms blockWalkRead_incidence
+#print axioms block_cell_curvature
+#print axioms block_flat_closed
+#print axioms blockIncidence_eq_connectionIncidence
 #print axioms seam_curvature_witness
 #print axioms PortHolon.energy_balance_fderiv
 #print axioms quartic_storage_effort

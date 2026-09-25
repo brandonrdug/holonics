@@ -230,6 +230,11 @@ impl KernelForm {
 
     /// The kernel-form Dirac test (`Holon/Dirac.kernelForm_isDirac`): `F Eᵀ + E Fᵀ = 0` and
     /// `rank [F | E] = n`. Returns the obstruction as a typed refusal.
+    ///
+    /// [definition; agent-inferred] The cross form is read port by port: with `A = F Eᵀ`,
+    /// `A_(rs) = Σ_k F_rk E_sk` sums only over the ports where row `r` carries a flow and row `s`
+    /// an effort, and the test is `A + Aᵀ = 0`. A block-sparse structure (a skew graph, a ring's
+    /// port rows) costs its nonzero pairs per port, never a dense product.
     pub fn certify_dirac(&self) -> Result<(), HolonError> {
         if self.rank() != self.ports {
             return Err(HolonError::NotMaximal {
@@ -237,13 +242,34 @@ impl KernelForm {
                 ports: self.ports,
             });
         }
-        let flow = self.flow_matrix()?;
-        let effort = self.effort_matrix()?;
-        let cross = flow
-            .multiply(&effort.transpose()?)?
-            .add(&effort.multiply(&flow.transpose()?)?)?;
-        if !is_zero(cross.entries()) {
-            return Err(HolonError::NotIsotropic);
+        let n = self.ports;
+        let mut flow_at: Vec<Vec<(usize, &Rat)>> = vec![Vec::new(); n];
+        let mut effort_at: Vec<Vec<(usize, &Rat)>> = vec![Vec::new(); n];
+        for row in 0..self.rank() {
+            for (column, value) in self.constraints.row(row)?.iter().enumerate() {
+                if value.is_zero() {
+                    continue;
+                }
+                if column < n {
+                    flow_at[column].push((row, value));
+                } else {
+                    effort_at[column - n].push((row, value));
+                }
+            }
+        }
+        let mut cross: std::collections::BTreeMap<(usize, usize), Rat> = Default::default();
+        for (flows, efforts) in flow_at.iter().zip(&effort_at) {
+            for (r, f) in flows {
+                for (s, e) in efforts {
+                    *cross.entry((*r, *s)).or_default() += *f * *e;
+                }
+            }
+        }
+        for ((r, s), value) in &cross {
+            let transposed = cross.get(&(*s, *r)).cloned().unwrap_or_default();
+            if !(value + transposed).is_zero() {
+                return Err(HolonError::NotIsotropic);
+            }
         }
         Ok(())
     }
@@ -379,11 +405,17 @@ impl DiracStructure {
         if !is_skew(structure) {
             return Err(HolonError::NotSkew);
         }
+        // `[1 | −J]` is already in reduced row echelon form (its pivots are the identity block),
+        // so it is the canonical kernel form (`Holon/Dirac.skewGraph_eq_kernelForm`) with no
+        // elimination.
         let n = structure.rows();
-        let form = KernelForm::new(
-            &ExactRatMatrix::identity(n)?,
-            &structure.scaled(&-Rat::one()),
-        )?;
+        let form = KernelForm {
+            ports: n,
+            constraints: hstack(
+                &ExactRatMatrix::identity(n)?,
+                &structure.scaled(&-Rat::one()),
+            )?,
+        };
         Self::certified(
             form,
             DiracPresentation::SkewGraph {

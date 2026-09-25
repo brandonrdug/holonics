@@ -16,7 +16,7 @@
 //! | `NonExpansive`, `width_nonExpansive_factor` | [`FactorMap`], [`FactoredReading::verify_non_expansive`] and `a_non_expansive_coarser_receiver_has_no_larger_width` |
 //! | `expansive_factor_increases_width` | `an_expansive_factor_map_widens_the_reading` |
 //! | `ReleaseReturn` | [`ReleaseReturn`] |
-//! | `ReleaseLaw`, `ReleaseLaw.sound`, `ReleaseLaw.widenSound` | [`DecisionLaw`] and [`release`], which refuses a release outside tolerance by name |
+//! | `ReleaseLaw`, `ReleaseLaw.sound`, `ReleaseLaw.widenSound` | [`DecisionLaw`] and [`release`], which refuses a release outside tolerance by name; its data form [`DecisionRule`] |
 //! | `every_lawful_return_other_than_hold_ask_or_no_continuation_is_inside_its_tolerance` | [`release`]'s `Released`, `Widen` and `ReleaseCoarser` arms, and [`LawfulOptions::assemble`]'s tolerance check |
 //! | `coarser_receiver_factors`, `releaseCoarser` | [`CoarseningTower`], [`release_coarser`] and [`CoarserRelease`], which carries the tolerance it was searched under |
 //! | `Releasable` | [`crate::receiver::face::ReceiverWidth::releasable_at`] |
@@ -1349,6 +1349,110 @@ pub trait DecisionLaw {
     fn name(&self) -> &str;
     /// The decision.
     fn decide(&self, options: &LawfulOptions) -> ReleaseReturn;
+}
+
+/// [definition] **What a declared rule returns inside its tolerance.**
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum WithinTolerance {
+    /// Release the face at its width.
+    Release,
+    /// Retain the plural fibre and emit nothing.
+    Hold,
+}
+
+/// [definition] **What a declared rule returns outside its tolerance**: never a release of that
+/// face.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum BeyondTolerance {
+    /// Retain the plural fibre and emit nothing.
+    Hold,
+    /// Declare the named wider tolerance (refused by [`release`] when the width is still outside).
+    Widen(Rat),
+    /// Ask the probe the options offer, holding when none is offered.
+    Ask,
+    /// Release the coarser invariant the options offer, holding when none is offered.
+    ReleaseCoarser,
+    /// Report that no admitted continuation bridges the gap, with the declared reason; held when
+    /// the options say one does.
+    NoContinuation(String),
+}
+
+/// [definition] **The data form of a declared decision law** (rebuild step 4 addition 8): a
+/// declared name and the return it takes inside and beyond the tolerance, as data, so a backend
+/// that cannot run a caller's code takes the decision as a value. It implements [`DecisionLaw`];
+/// it is not a default, and its every return is checked by [`release`] like any other law's (Lean
+/// `Foundation/ReceiverRelease.ReleaseLaw.sound`).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DecisionRule {
+    name: String,
+    within: WithinTolerance,
+    beyond: BeyondTolerance,
+}
+
+impl DecisionRule {
+    /// A declared rule.
+    pub fn new(name: impl Into<String>, within: WithinTolerance, beyond: BeyondTolerance) -> Self {
+        Self {
+            name: name.into(),
+            within,
+            beyond,
+        }
+    }
+
+    /// The return inside the tolerance.
+    pub fn within(&self) -> &WithinTolerance {
+        &self.within
+    }
+
+    /// The return beyond it.
+    pub fn beyond(&self) -> &BeyondTolerance {
+        &self.beyond
+    }
+}
+
+impl DecisionLaw for DecisionRule {
+    fn name(&self) -> &str {
+        &self.name
+    }
+
+    /// The rule's return, read from the options' own exact width and tolerance (the flag is not
+    /// trusted); an offer the options do not carry falls back to holding.
+    fn decide(&self, options: &LawfulOptions) -> ReleaseReturn {
+        if options.width() <= options.tolerance() {
+            return match self.within {
+                WithinTolerance::Release => ReleaseReturn::Released {
+                    width: options.width().clone(),
+                    tolerance: options.tolerance().clone(),
+                },
+                WithinTolerance::Hold => ReleaseReturn::Hold,
+            };
+        }
+        match &self.beyond {
+            BeyondTolerance::Hold => ReleaseReturn::Hold,
+            BeyondTolerance::Widen(tolerance) => ReleaseReturn::Widen {
+                tolerance: tolerance.clone(),
+            },
+            BeyondTolerance::Ask => match options.ask() {
+                Some(probe) => ReleaseReturn::Ask {
+                    probe: probe.clone(),
+                },
+                None => ReleaseReturn::Hold,
+            },
+            BeyondTolerance::ReleaseCoarser => match options.coarser() {
+                Some(offered) => ReleaseReturn::ReleaseCoarser {
+                    receiver: offered.receiver().to_owned(),
+                    width: offered.width().clone(),
+                },
+                None => ReleaseReturn::Hold,
+            },
+            BeyondTolerance::NoContinuation(reason) if !options.bridges() => {
+                ReleaseReturn::NoContinuationBridges {
+                    reason: reason.clone(),
+                }
+            }
+            BeyondTolerance::NoContinuation(_) => ReleaseReturn::Hold,
+        }
+    }
 }
 
 /// **Take the declared law's decision, and check the one thing the library owns.**

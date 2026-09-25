@@ -55,7 +55,7 @@ use crate::ratio::linear::inertia::SymmetricForm;
 use crate::ratio::linear::vector::{at, dot, form_matrix, matrix, neg, quad, sub};
 use crate::ratio::rat;
 use crate::receiver::receipt::ReceiptLaw;
-use crate::receiver::reception::{InteractionReturn, JointLaw, ReceiverFace};
+use crate::receiver::reception::{InteractionReturn, JointLaw, JointStep, ReceiverFace};
 
 /// [definition] **One energy balance**, every term exact:
 /// `stored_change = −dissipated + port + active + deposition_work + discretization_defect + residual`.
@@ -179,7 +179,7 @@ pub trait HolonLaw {
         input: &[Rat],
         reader: &ExactRatMatrix,
         receipt: &ReceiptLaw,
-    ) -> Result<InteractionReturn, HolonError>;
+    ) -> Result<InteractionReturn<JointStep>, HolonError>;
 
     /// **restrict**: the pushforward of the interconnection along a port map
     /// (`Holon/Restriction.pushforwardD_isDirac`).
@@ -190,10 +190,10 @@ pub trait HolonLaw {
     /// **pullback**: a coarse effort (covector) returns to the fine ports by `Pᵀ`
     /// (`Holon/Law.pullback_law`).
     fn pullback(&self, map: &PortMap, effort: &[Rat]) -> Result<Vec<Rat>, HolonError> {
-        if map.source_ports() != self.holon().port_holon().counts().total() {
+        if map.source_ports() != self.holon().counts().total() {
             return Err(HolonError::Shape {
                 what: "pullback map source ports",
-                expected: self.holon().port_holon().counts().total(),
+                expected: self.holon().counts().total(),
                 found: map.source_ports(),
             });
         }
@@ -419,8 +419,8 @@ impl HolonLaw for ReferenceHolon {
         input: &[Rat],
         reader: &ExactRatMatrix,
         receipt: &ReceiptLaw,
-    ) -> Result<InteractionReturn, HolonError> {
-        let sigma = self.holon.port_holon().counts().storage;
+    ) -> Result<InteractionReturn<JointStep>, HolonError> {
+        let sigma = self.holon.counts().storage;
         if state.configuration.len() != sigma {
             return Err(HolonError::Shape {
                 what: "source configuration",

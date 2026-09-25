@@ -2,7 +2,16 @@
 //!
 //! [definition] Oriented cells with boundary `∂`, `∂∘∂ = 0` validated at construction
 //! ([`CellComplex`]). A connection twists the incidence: `(d_A φ)_e = g_e φ(t e) − φ(s e)`
-//! (`Holon/Complex.connectionIncidence`, `Holon/Complex.connectionIncidence_mulVec`).
+//! (`Holon/Complex.connectionIncidence`, `Holon/Complex.connectionIncidence_mulVec`). Its transports
+//! may be **blocks** (rebuild step 4 addition 2, review F4): vertex `v` carries `ℚ^(n_v)` and edge
+//! `e` a nonzero `n_(s e) × n_(t e)` matrix `T_e`, not necessarily invertible, with
+//! `(d_A φ)_e = T_e φ(t e) − φ(s e)` (`Holon/Complex.blockIncidence`). The telescoping, the curvature
+//! face and the Dirac property hold verbatim with matrix transports (`blockWalkRead_incidence`,
+//! `block_cell_curvature`, and `Holon/Dirac.kirchhoff_isDirac` for every incidence); a flat block
+//! connection closes every exact effort, so the covariant face coboundary composes with `d_A` to
+//! zero (`block_flat_closed`, [`ConnectionIncidence::face_coboundary`]). The HNN's contacts are
+//! such blocks: the partial isometry `U_aᵀ = ι_(a,g) ι_(a,h)ᵀ` of contact `a = (g→h)` is its
+//! transport from ring `h`'s realified nodes to ring `g`'s (`crate::hnn::Field::connection`).
 //! The covariant difference telescopes along a walk (`Holon/Complex.walkRead_connection`),
 //! so on every cell given as a closed walk the exact effort reads `(hol − 1) φ(base)`
 //! (`Holon/Complex.cell_curvature`; the triangle form is `Holon/Complex.dA_squared`):
@@ -21,11 +30,12 @@
 //!
 //! | Lean | Rust |
 //! |---|---|
-//! | `connectionIncidence`, `connectionIncidence_mulVec` | [`ConnectionIncidence::matrix`] |
+//! | `connectionIncidence`, `connectionIncidence_mulVec`; `blockIncidence`, `blockIncidence_eq_connectionIncidence` | [`ConnectionIncidence::matrix`], [`ConnectionIncidence::blocks`] |
 //! | `IsWalk` | [`ConnectionIncidence::is_walk`] |
-//! | `walkRead`, `walkTransport`, `walkRead_connection` | [`ConnectionIncidence::walk_read`], [`ConnectionIncidence::walk_transport`] |
-//! | `cell_curvature`, `dA_squared` | [`ConnectionIncidence::curvature`], [`ConnectionIncidence::cell_reading`] |
-//! | `connectionIncidence_isDirac`, `connection_isDirac` | [`ConnectionIncidence::kirchhoff`] |
+//! | `walkRead`, `walkTransport`, `walkRead_connection`; `blockWalkRead`, `blockWalkTransport`, `blockWalkRead_incidence` | [`ConnectionIncidence::walk_read`], [`ConnectionIncidence::walk_transport`] |
+//! | `cell_curvature`, `dA_squared`, `block_cell_curvature` | [`ConnectionIncidence::curvature`], [`ConnectionIncidence::cell_reading`] |
+//! | `block_flat_closed` | [`ConnectionIncidence::face_coboundary`] |
+//! | `connectionIncidence_isDirac`, `connection_isDirac`; `Holon/Dirac.kirchhoff_isDirac` (every block matrix) | [`ConnectionIncidence::kirchhoff`] |
 //! | `curved_witness`, `seam_curvature_witness` | tests |
 
 use crate::ratio::Rat;
@@ -35,7 +45,7 @@ use crate::holon::HolonError;
 use crate::holon::dirac::DiracStructure;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::inertia::{SymmetricForm, inertia};
-use crate::ratio::linear::vector::{at, form_matrix, is_zero, matrix};
+use crate::ratio::linear::vector::{add, at, form_matrix, is_zero, matrix};
 
 /// [definition] **An oriented cell complex**: cell counts per degree and boundary matrices
 /// `∂_(k+1) : C_(k+1) → C_k` (`cells[k] × cells[k+1]`), with `∂_k ∂_(k+1) = 0` checked.
@@ -288,17 +298,21 @@ impl CellComplex {
     }
 }
 
-/// [definition] **A graph with edge transports** `g_e ≠ 0`
-/// (`Holon/Complex.connectionIncidence`).
+/// [definition] **A graph with edge transports**, scalar or block (`Holon/Complex.connectionIncidence`,
+/// `blockIncidence`). Each vertex `v` carries a space `ℚ^(n_v)` (`n_v = 1` for a scalar
+/// connection) and each edge `e` a transport `T_e : ℚ^(n_(t e)) → ℚ^(n_(s e))`, a nonzero exact
+/// matrix: `(d_A φ)_e = T_e φ(t e) − φ(s e) ∈ ℚ^(n_(s e))`. A scalar connection is the block one
+/// with `1 × 1` transports `g_e ≠ 0`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ConnectionIncidence {
-    vertices: usize,
+    dimensions: Vec<usize>,
     source: Vec<usize>,
     target: Vec<usize>,
-    transport: Vec<Rat>,
+    transport: Vec<ExactRatMatrix>,
 }
 
 impl ConnectionIncidence {
+    /// A scalar connection: one transport `g_e ≠ 0` per edge.
     pub fn new(
         vertices: usize,
         source: Vec<usize>,
@@ -313,23 +327,59 @@ impl ConnectionIncidence {
                 found: target.len().min(transport.len()),
             });
         }
+        let blocks = transport
+            .into_iter()
+            .map(|g| Ok(ExactRatMatrix::from_diagonal(vec![g])?))
+            .collect::<Result<Vec<_>, HolonError>>()?;
+        Self::blocks(vec![1; vertices], source, target, blocks)
+    }
+
+    /// [definition] **A block connection** (rebuild step 4 addition 2, review F4): vertex `v` carries
+    /// `ℚ^(dimensions[v])` and edge `e` the transport `T_e`, a `n_(s e) × n_(t e)` exact matrix that
+    /// is not zero (a partial isometry is admitted: it need not be invertible). Refuses a shape
+    /// that does not fit its ends and a zero transport.
+    pub fn blocks(
+        dimensions: Vec<usize>,
+        source: Vec<usize>,
+        target: Vec<usize>,
+        transport: Vec<ExactRatMatrix>,
+    ) -> Result<Self, HolonError> {
+        let edges = source.len();
+        if target.len() != edges || transport.len() != edges {
+            return Err(HolonError::Shape {
+                what: "edge targets and transports",
+                expected: edges,
+                found: target.len().min(transport.len()),
+            });
+        }
+        let vertices = dimensions.len();
         for edge in 0..edges {
             if source[edge] >= vertices || target[edge] >= vertices {
                 return Err(HolonError::NotAGraphEdge { edge });
             }
-            if transport[edge].is_zero() {
+            let block = &transport[edge];
+            if block.rows() != dimensions[source[edge]]
+                || block.columns() != dimensions[target[edge]]
+            {
+                return Err(HolonError::Shape {
+                    what: "edge transport (source dimension × target dimension)",
+                    expected: dimensions[source[edge]] * dimensions[target[edge]],
+                    found: block.rows() * block.columns(),
+                });
+            }
+            if is_zero(block.entries()) {
                 return Err(HolonError::ZeroTransport { edge });
             }
         }
         Ok(Self {
-            vertices,
+            dimensions,
             source,
             target,
             transport,
         })
     }
 
-    /// The trivial connection (every transport `1`).
+    /// The trivial scalar connection (every transport `1`).
     pub fn flat(
         vertices: usize,
         source: Vec<usize>,
@@ -344,7 +394,7 @@ impl ConnectionIncidence {
     }
 
     pub fn vertices(&self) -> usize {
-        self.vertices
+        self.dimensions.len()
     }
 
     /// Each edge's source vertex.
@@ -357,29 +407,66 @@ impl ConnectionIncidence {
         &self.target
     }
 
-    /// Each edge's transport `g_e`.
-    pub fn transports(&self) -> &[Rat] {
-        &self.transport
+    /// Edge `e`'s transport `T_e : ℚ^(n_(t e)) → ℚ^(n_(s e))`.
+    pub fn transport(&self, edge: usize) -> Option<&ExactRatMatrix> {
+        self.transport.get(edge)
     }
 
-    /// The underlying one-dimensional complex ([`CellComplex::graph`]); at the trivial connection
-    /// its incidence is [`Self::matrix`].
+    /// The offset of each vertex's block in `⊕_v ℚ^(n_v)`, and of each edge's in `⊕_e ℚ^(n_(s e))`.
+    fn offsets(&self) -> (Vec<usize>, Vec<usize>) {
+        let running = |sizes: &mut dyn Iterator<Item = usize>| -> Vec<usize> {
+            let mut total = 0;
+            sizes
+                .map(|size| {
+                    let at = total;
+                    total += size;
+                    at
+                })
+                .collect()
+        };
+        let vertex = running(&mut self.dimensions.iter().copied());
+        let edge = running(&mut self.source.iter().map(|s| self.dimensions[*s]));
+        (vertex, edge)
+    }
+
+    /// The extent of the edge cochains `⊕_e ℚ^(n_(s e))`.
+    pub fn edge_extent(&self) -> usize {
+        self.source.iter().map(|s| self.dimensions[*s]).sum()
+    }
+
+    /// The extent of the vertex cochains `⊕_v ℚ^(n_v)`.
+    pub fn vertex_extent(&self) -> usize {
+        self.dimensions.iter().sum()
+    }
+
+    /// The underlying one-dimensional complex ([`CellComplex::graph`]); at the trivial scalar
+    /// connection its incidence is [`Self::matrix`].
     pub fn cell_complex(&self) -> Result<CellComplex, HolonError> {
-        CellComplex::graph(self.vertices, &self.source, &self.target)
+        CellComplex::graph(self.vertices(), &self.source, &self.target)
     }
 
-    /// `d_A` as an `edges × vertices` matrix: `(d_A φ)_e = g_e φ(t e) − φ(s e)`.
+    /// `d_A` as a block matrix `(Σ_e n_(s e)) × (Σ_v n_v)`: row block `e` holds `T_e` at the
+    /// target's columns and `−I` at the source's, `(d_A φ)_e = T_e φ(t e) − φ(s e)`. At scalar
+    /// dimensions it is the `edges × vertices` matrix of `connectionIncidence`.
     pub fn matrix(&self) -> Result<ExactRatMatrix, HolonError> {
-        Ok(matrix(self.edges(), self.vertices, |edge, vertex| {
-            let mut entry = Rat::zero();
-            if vertex == self.target[edge] {
-                entry += &self.transport[edge];
+        let (vertex, edge) = self.offsets();
+        let mut rows = vec![vec![Rat::zero(); self.vertex_extent()]; self.edge_extent()];
+        for e in 0..self.edges() {
+            let (s, t) = (self.source[e], self.target[e]);
+            let block = &self.transport[e];
+            for i in 0..self.dimensions[s] {
+                let row = &mut rows[edge[e] + i];
+                for j in 0..self.dimensions[t] {
+                    row[vertex[t] + j] += at(block, i, j);
+                }
+                row[vertex[s] + i] -= Rat::one();
             }
-            if vertex == self.source[edge] {
-                entry -= Rat::one();
-            }
-            entry
-        })?)
+        }
+        Ok(ExactRatMatrix::shaped(
+            self.edge_extent(),
+            self.vertex_extent(),
+            rows,
+        )?)
     }
 
     /// `Holon/Complex.IsWalk`: consecutive edges chain from `from` to `to`.
@@ -394,59 +481,119 @@ impl ConnectionIncidence {
         at_vertex == to
     }
 
-    /// `Holon/Complex.walkRead`: `ω_e + g_e · read(rest)`, transported to the start.
-    pub fn walk_read(&self, cochain: &[Rat], walk: &[usize]) -> Result<Rat, HolonError> {
-        if cochain.len() != self.edges() {
+    /// `Holon/Complex.walkRead` (`blockWalkRead`): `ω_e + T_e · read(rest)`, transported to the
+    /// start, a vector of the walk's first source. Refuses a sequence that is not a walk.
+    pub fn walk_read(&self, cochain: &[Rat], walk: &[usize]) -> Result<Vec<Rat>, HolonError> {
+        if cochain.len() != self.edge_extent() {
             return Err(HolonError::Shape {
                 what: "edge cochain",
-                expected: self.edges(),
+                expected: self.edge_extent(),
                 found: cochain.len(),
             });
         }
-        let mut read = Rat::zero();
-        for edge in walk.iter().rev() {
-            if *edge >= self.edges() {
-                return Err(HolonError::NotAGraphEdge { edge: *edge });
+        let Some(first) = walk.first() else {
+            return Ok(Vec::new());
+        };
+        let start = *self
+            .source
+            .get(*first)
+            .ok_or(HolonError::NotAGraphEdge { edge: *first })?;
+        let end = walk.iter().try_fold(start, |at_vertex, edge| {
+            match (self.source.get(*edge), self.target.get(*edge)) {
+                (Some(s), Some(t)) if *s == at_vertex => Ok(*t),
+                _ => Err(HolonError::NotAGraphEdge { edge: *edge }),
             }
-            read = &cochain[*edge] + &self.transport[*edge] * read;
+        })?;
+        let (_, edge) = self.offsets();
+        let mut read = vec![Rat::zero(); self.dimensions[end]];
+        for e in walk.iter().rev() {
+            let own = &cochain[edge[*e]..edge[*e] + self.dimensions[self.source[*e]]];
+            read = add(own, &self.transport[*e].apply(&read)?);
         }
         Ok(read)
     }
 
-    /// `Holon/Complex.walkTransport`: the product of the transports along a walk.
-    pub fn walk_transport(&self, walk: &[usize]) -> Result<Rat, HolonError> {
-        walk.iter().try_fold(Rat::one(), |product, edge| {
-            self.transport
-                .get(*edge)
-                .map(|g| product * g)
-                .ok_or(HolonError::NotAGraphEdge { edge: *edge })
-        })
+    /// `Holon/Complex.walkTransport` (`blockWalkTransport`): the product `T_(e₁) ⋯ T_(e_k)` along a
+    /// walk, from its end's space to its start's. Refuses a sequence that is not a walk.
+    pub fn walk_transport(&self, walk: &[usize]) -> Result<ExactRatMatrix, HolonError> {
+        let Some(first) = walk.first() else {
+            return Err(HolonError::NotAClosedWalk);
+        };
+        let start = *self
+            .source
+            .get(*first)
+            .ok_or(HolonError::NotAGraphEdge { edge: *first })?;
+        let mut product = ExactRatMatrix::identity(self.dimensions[start])?;
+        let mut at_vertex = start;
+        for edge in walk {
+            match (self.source.get(*edge), self.target.get(*edge)) {
+                (Some(s), Some(t)) if *s == at_vertex => {
+                    product = product.multiply(&self.transport[*edge])?;
+                    at_vertex = *t;
+                }
+                _ => return Err(HolonError::NotAGraphEdge { edge: *edge }),
+            }
+        }
+        Ok(product)
     }
 
     /// [definition] **The curvature face** of a cell given as a closed walk at `base`:
-    /// `hol − 1` (`Holon/Complex.cell_curvature`). Refuses a walk that does not close.
-    pub fn curvature(&self, cell: &[usize], base: usize) -> Result<Rat, HolonError> {
-        if !self.is_walk(base, base, cell) {
+    /// `hol − I` (`Holon/Complex.cell_curvature`, `block_cell_curvature`). Refuses a walk that does
+    /// not close.
+    pub fn curvature(&self, cell: &[usize], base: usize) -> Result<ExactRatMatrix, HolonError> {
+        if !self.is_walk(base, base, cell) || cell.is_empty() {
             return Err(HolonError::NotAClosedWalk);
         }
-        Ok(self.walk_transport(cell)? - Rat::one())
+        Ok(self
+            .walk_transport(cell)?
+            .subtract(&ExactRatMatrix::identity(self.dimensions[base])?)?)
     }
 
     /// The two sides of `Holon/Complex.cell_curvature` on a potential `φ`: the covariant
-    /// face reading of the exact effort `d_A φ` and `(hol − 1) φ(base)`. They are equal.
+    /// face reading of the exact effort `d_A φ` and `(hol − I) φ(base)`. They are equal.
     pub fn cell_reading(
         &self,
         potential: &[Rat],
         cell: &[usize],
         base: usize,
-    ) -> Result<(Rat, Rat), HolonError> {
+    ) -> Result<(Vec<Rat>, Vec<Rat>), HolonError> {
         let curvature = self.curvature(cell, base)?;
         let effort = self.matrix()?.apply(potential)?;
-        Ok((self.walk_read(&effort, cell)?, curvature * &potential[base]))
+        let (vertex, _) = self.offsets();
+        let at_base = &potential[vertex[base]..vertex[base] + self.dimensions[base]];
+        Ok((self.walk_read(&effort, cell)?, curvature.apply(at_base)?))
+    }
+
+    /// [definition] **The covariant face coboundary** `d_A¹` of cells given as closed walks
+    /// `(walk, base)`: row block `c` is the walk reading `ω ↦ walkRead(ω, walk_c) ∈ ℚ^(n_base)`, so
+    /// `d_A¹ d_A⁰ φ` is the block of curvatures `(hol_c − I) φ(base_c)`
+    /// (`Holon/Complex.block_cell_curvature`). A flat connection (`hol_c = I` on every cell) has
+    /// `d_A¹ d_A⁰ = 0`: `∂² = 0` holds covariantly (`block_flat_closed`).
+    pub fn face_coboundary(
+        &self,
+        cells: &[(Vec<usize>, usize)],
+    ) -> Result<ExactRatMatrix, HolonError> {
+        let extent = self.edge_extent();
+        let mut rows: Vec<Vec<Rat>> = Vec::new();
+        for (walk, base) in cells {
+            if !self.is_walk(*base, *base, walk) || walk.is_empty() {
+                return Err(HolonError::NotAClosedWalk);
+            }
+            let mut columns = Vec::with_capacity(extent);
+            for coordinate in 0..extent {
+                let mut unit = vec![Rat::zero(); extent];
+                unit[coordinate] = Rat::one();
+                columns.push(self.walk_read(&unit, walk)?);
+            }
+            for i in 0..self.dimensions[*base] {
+                rows.push(columns.iter().map(|column| column[i].clone()).collect());
+            }
+        }
+        Ok(ExactRatMatrix::shaped(rows.len(), extent, rows)?)
     }
 
     /// The Kirchhoff structure of `d_A`, Dirac for every connection
-    /// (`Holon/Complex.connectionIncidence_isDirac`).
+    /// (`Holon/Complex.connectionIncidence_isDirac`; for blocks `Holon/Dirac.kirchhoff_isDirac`).
     pub fn kirchhoff(&self) -> Result<DiracStructure, HolonError> {
         DiracStructure::kirchhoff(&self.matrix()?)
     }
@@ -498,17 +645,17 @@ mod tests {
         let (reading, curvature_side) = connection
             .cell_reading(&ints(&[1, 0, 0]), &[0, 1, 2], 0)
             .unwrap();
-        assert_eq!(reading, integer(1));
+        assert_eq!(reading, ints(&[1]));
         assert_eq!(reading, curvature_side);
         // A flat (pure-gauge) connection closes every exact effort (exact_closed_iff_flat).
         let flat = complex
             .connection(vec![integer(2), integer(3), crate::ratio::rat(1, 6)])
             .unwrap();
-        assert!(flat.curvature(&[0, 1, 2], 0).unwrap().is_zero());
+        assert!(is_zero(flat.curvature(&[0, 1, 2], 0).unwrap().entries()));
         let (reading, _) = flat
             .cell_reading(&ints(&[5, -7, 2]), &[0, 1, 2], 0)
             .unwrap();
-        assert!(reading.is_zero());
+        assert!(is_zero(&reading));
     }
 
     /// `Holon/Complex.seam_curvature_witness`: an orientation-reversing seam reads `−2`.
@@ -518,7 +665,7 @@ mod tests {
             ConnectionIncidence::new(2, vec![0, 1], vec![1, 0], vec![integer(1), integer(-1)])
                 .unwrap();
         let (reading, side) = seam.cell_reading(&ints(&[1, 0]), &[0, 1], 0).unwrap();
-        assert_eq!(reading, integer(-2));
+        assert_eq!(reading, ints(&[-2]));
         assert_eq!(reading, side);
         assert_eq!(seam.curvature(&[0], 0), Err(HolonError::NotAClosedWalk));
     }
@@ -599,6 +746,103 @@ mod tests {
         let phi = ints(&[4, -1, 6]);
         let effort = c.matrix().unwrap().apply(&phi).unwrap();
         let read = c.walk_read(&effort, &[0, 1]).unwrap();
-        assert_eq!(read, c.walk_transport(&[0, 1]).unwrap() * &phi[2] - &phi[0]);
+        let transport = c.walk_transport(&[0, 1]).unwrap();
+        assert_eq!(read, vec![at(&transport, 0, 0) * &phi[2] - &phi[0]]);
+    }
+
+    /// `Holon/Complex.{blockIncidence_eq_connectionIncidence, blockWalkRead_incidence,
+    /// block_cell_curvature, block_flat_closed}`, `Holon/Dirac.kirchhoff_isDirac`: with partial-isometry
+    /// blocks on vertices of different widths the incidence telescopes along a walk, the face
+    /// coboundary of every flat cell composes with `d_A` to zero (`∂² = 0` covariantly), a cell that
+    /// drops a coordinate reads its curvature `hol − I`, the Kirchhoff structure is Dirac, and the
+    /// underlying complex keeps `∂∘∂ = 0`. A zero or misshapen block is refused.
+    #[test]
+    fn block_transports_telescope_and_a_flat_cell_closes() {
+        // A partial matching `n_s × n_t`: row i of the source takes column i of the target.
+        let matching = |rows: usize, columns: usize, width: usize| {
+            matrix(rows, columns, |i, j| {
+                if i == j && i < width {
+                    Rat::one()
+                } else {
+                    Rat::zero()
+                }
+            })
+            .unwrap()
+        };
+        // A triangle of vertices of widths 2, 3, 2; edges 0→1, 1→2, 2→0.
+        let dimensions = vec![2, 3, 2];
+        let flat = ConnectionIncidence::blocks(
+            dimensions.clone(),
+            vec![0, 1, 2],
+            vec![1, 2, 0],
+            vec![matching(2, 3, 2), matching(3, 2, 2), matching(2, 2, 2)],
+        )
+        .unwrap();
+        let d = flat.matrix().unwrap();
+        assert_eq!((d.rows(), d.columns()), (7, 7));
+        let phi = ints(&[1, -2, 3, 5, -1, 4, 2]);
+        let effort = d.apply(&phi).unwrap();
+        let read = flat.walk_read(&effort, &[0, 1]).unwrap();
+        let hol01 = flat.walk_transport(&[0, 1]).unwrap();
+        assert_eq!(
+            read,
+            add(&hol01.apply(&phi[5..7]).unwrap(), &ints(&[-1, 2]))
+        );
+        let cell = (vec![0, 1, 2], 0);
+        assert!(is_zero(flat.curvature(&cell.0, 0).unwrap().entries()));
+        let closed = flat
+            .face_coboundary(std::slice::from_ref(&cell))
+            .unwrap()
+            .multiply(&d)
+            .unwrap();
+        assert!(is_zero(closed.entries()));
+        // Narrow the last edge to one coordinate: the cell drops vertex 0's second coordinate.
+        let curved = ConnectionIncidence::blocks(
+            dimensions,
+            vec![0, 1, 2],
+            vec![1, 2, 0],
+            vec![matching(2, 3, 2), matching(3, 2, 2), matching(2, 2, 1)],
+        )
+        .unwrap();
+        let hol = curved.curvature(&cell.0, 0).unwrap();
+        assert_eq!(
+            hol,
+            matching(2, 2, 2)
+                .subtract(&matching(2, 2, 1))
+                .unwrap()
+                .scaled(&integer(-1))
+        );
+        let (reading, side) = curved.cell_reading(&phi, &cell.0, 0).unwrap();
+        assert_eq!(reading, side);
+        assert_eq!(reading, ints(&[0, 2]));
+        let face = curved.face_coboundary(&[cell]).unwrap();
+        assert_eq!(
+            face.multiply(&curved.matrix().unwrap())
+                .unwrap()
+                .apply(&phi)
+                .unwrap(),
+            reading
+        );
+        assert!(curved.kirchhoff().is_ok());
+        let complex = curved.cell_complex().unwrap();
+        assert_eq!(complex.betti(1).unwrap(), 1);
+        // The scalar connection is the block one at unit widths.
+        let scalar = ConnectionIncidence::new(2, vec![0], vec![1], vec![integer(3)]).unwrap();
+        let unit = ConnectionIncidence::blocks(
+            vec![1, 1],
+            vec![0],
+            vec![1],
+            vec![ExactRatMatrix::from_diagonal(vec![integer(3)]).unwrap()],
+        )
+        .unwrap();
+        assert_eq!(scalar, unit);
+        assert_eq!(
+            ConnectionIncidence::blocks(vec![2, 2], vec![0], vec![1], vec![matching(2, 2, 0)]),
+            Err(HolonError::ZeroTransport { edge: 0 })
+        );
+        assert!(matches!(
+            ConnectionIncidence::blocks(vec![2, 3], vec![0], vec![1], vec![matching(2, 2, 2)]),
+            Err(HolonError::Shape { .. })
+        ));
     }
 }

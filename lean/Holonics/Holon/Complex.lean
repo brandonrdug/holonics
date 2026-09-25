@@ -20,6 +20,17 @@ telescopes along any walk (`walkRead_connection`), so on every cell given as a c
 exact effort reads `(hol − 1) φ(base)` (`cell_curvature`), while the Kirchhoff structure is Dirac
 for every connection (`connectionIncidence_isDirac`). Witness: an orientation-reversing seam
 (`hol = −1`) reads `−2` (`seam_curvature_witness`).
+
+[proved-derived; formal-checked] **Block transports** (rebuild step 4 addition 2, review F4): each
+vertex carries a value in a module `V` and each edge a linear transport `T_e : V → V`, not
+necessarily invertible (a partial isometry is admitted), with `(d_A φ)_e = T_e φ(t e) − φ(s e)`
+(`blockIncidence`). The scalar incidence is its unit-width case
+(`blockIncidence_eq_connectionIncidence`). The covariant difference telescopes along every walk
+(`blockWalkRead_incidence`), so on a cell given as a closed walk the exact effort reads
+`(hol − 1) φ(base)` (`block_cell_curvature`), and a flat cell (`hol = 1`) closes every exact
+effort: the covariant face coboundary composes with `d_A` to zero (`block_flat_closed`, `∂² = 0`
+covariantly). Vertices of different widths embed in one `V`; the Kirchhoff structure of the block
+matrix is Dirac for every block (`Holon/Dirac.kirchhoff_isDirac`, stated for every incidence).
 -/
 
 noncomputable section
@@ -151,6 +162,69 @@ theorem connectionIncidence_isDirac [DecidableEq ε] (src tgt : ε → ν) (g : 
   kirchhoff_isDirac _
 
 end General
+
+/-! ## Block transports -/
+
+section Block
+
+variable {ν ε V : Type*} [AddCommGroup V] [Module 𝕜 V]
+
+/-- [definition] **The block incidence**: each edge carries a linear transport `T_e : V → V` from
+its target's value to its source's, `(d_A φ)_e = T_e φ(t e) − φ(s e)`. -/
+def blockIncidence (src tgt : ε → ν) (T : ε → V →ₗ[𝕜] V) (φ : ν → V) : ε → V :=
+  fun e => T e (φ (tgt e)) - φ (src e)
+
+/-- [definition] The covariant reading of a block edge cochain along a walk, transported to its
+start. -/
+def blockWalkRead (T : ε → V →ₗ[𝕜] V) (ω : ε → V) : List ε → V
+  | [] => 0
+  | e :: rest => ω e + T e (blockWalkRead T ω rest)
+
+/-- [definition] The block transport along a walk, `T_(e₁) ∘ ⋯ ∘ T_(e_k)`. -/
+def blockWalkTransport (T : ε → V →ₗ[𝕜] V) : List ε → V →ₗ[𝕜] V
+  | [] => LinearMap.id
+  | e :: rest => (T e).comp (blockWalkTransport T rest)
+
+/-- [proved-derived; formal-checked] **The block difference telescopes along a walk**:
+`Σ_walk d_A φ = T_walk φ(b) − φ(a)`, with no inverse of any transport. -/
+theorem blockWalkRead_incidence (src tgt : ε → ν) (T : ε → V →ₗ[𝕜] V) (φ : ν → V) :
+    ∀ (walk : List ε) (a b : ν), IsWalk src tgt a b walk →
+      blockWalkRead T (blockIncidence src tgt T φ) walk = blockWalkTransport T walk (φ b) - φ a
+  | [], a, b, h => by
+      simp only [IsWalk] at h; subst h; simp [blockWalkRead, blockWalkTransport]
+  | e :: rest, a, b, h => by
+      obtain ⟨hs, hrest⟩ := h
+      rw [blockWalkRead, blockWalkRead_incidence src tgt T φ rest (tgt e) b hrest, blockIncidence,
+        hs, blockWalkTransport, LinearMap.comp_apply, map_sub]
+      abel
+
+/-- [proved-derived; formal-checked] **`d_A² = F_A` on every cell, for block transports**: the
+covariant face reading of an exact effort on a cell given as a closed walk at `a` is
+`(hol − 1) φ(a)`. -/
+theorem block_cell_curvature (src tgt : ε → ν) (T : ε → V →ₗ[𝕜] V) (φ : ν → V) (cell : List ε)
+    (a : ν) (hcell : IsWalk src tgt a a cell) :
+    blockWalkRead T (blockIncidence src tgt T φ) cell = blockWalkTransport T cell (φ a) - φ a :=
+  blockWalkRead_incidence src tgt T φ cell a a hcell
+
+/-- [proved-derived; formal-checked] **A flat block cell closes every exact effort**: when the
+transport around the cell is the identity, the covariant face coboundary of `d_A φ` vanishes
+(`∂² = 0`, covariantly), whatever the transports' ranks. -/
+theorem block_flat_closed (src tgt : ε → ν) (T : ε → V →ₗ[𝕜] V) (φ : ν → V) (cell : List ε)
+    (a : ν) (hcell : IsWalk src tgt a a cell) (hflat : blockWalkTransport T cell = LinearMap.id) :
+    blockWalkRead T (blockIncidence src tgt T φ) cell = 0 := by
+  rw [block_cell_curvature src tgt T φ cell a hcell, hflat, LinearMap.id_apply, sub_self]
+
+/-- [proved-derived; formal-checked] **The scalar incidence is the unit-width block**: with `V = 𝕜`
+and `T_e = g_e · 1`, the block incidence is `connectionIncidence`. -/
+theorem blockIncidence_eq_connectionIncidence [Fintype ν] [DecidableEq ν] (src tgt : ε → ν)
+    (g : ε → 𝕜ˣ) (φ : ν → 𝕜) :
+    blockIncidence src tgt (fun e => (g e : 𝕜) • (LinearMap.id : 𝕜 →ₗ[𝕜] 𝕜)) φ =
+      connectionIncidence src tgt g *ᵥ φ := by
+  funext e
+  rw [connectionIncidence_mulVec]
+  simp [blockIncidence]
+
+end Block
 
 /-- [counterexample; formal-checked] **Witness on a two-edge loop.** Vertices `0, 1`, edges
 `0 → 1` with transport `1` and `1 → 0` with transport `−1` (an orientation-reversing seam): the

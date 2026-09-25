@@ -5,7 +5,18 @@
 //! [`Holon::interconnect`] returns: the joined whole, again a [`Holon`], with its retained
 //! constituents, the port provenance of every whole port, and the typed [`Gluing`]; or, when the
 //! join does not close, a typed [`GluingDefect`] ([`gluing`] runs the nine checks of Lean
-//! `Holarchy/Join.interconnect` on the two Holons' own data). The whole joins
+//! `Holarchy/Join.interconnect` on the two Holons' own data, shared port by shared port).
+//!
+//! [definition] **The parts and the gluing are the Holarchy; the dense whole is a chart of them.**
+//! Lean's `Holarchy/Join.Holarchy` keeps only the declaration and its proof that it glues, and
+//! `Holarchy.whole` is a function of the constituents (`joinHolon A.holon B.holon F E`, Dirac by
+//! `joinD_isDirac`). So [`Holarchy`] retains the join (both constituents, the gluing and the port
+//! layout) and its whole, whose counts, active block, pumps, named ports, cells and navigators are
+//! read at the join, while its port Holon (the composed Dirac structure with block storage and
+//! resistance) is assembled from the retained join only when it is read, and kept
+//! ([`Holon::port_holon`]). A constituent may be the unassembled whole of an earlier join, so a
+//! Holarchy of many small Holons (the HNN field's rings and contacts, `hnn::Field::holon`) is
+//! certified block by block and costs what its blocks cost (guard 14). The whole joins
 //! (`Holarchy/Join.Holarchy.wholeConstituent`):
 //!
 //! - **ports**: the port Holon of both constituents composed through the gain link at the shared
@@ -32,7 +43,7 @@
 //! | `interconnect`, `interconnect_ok_iff`, `GluingDefect`, `GluingDefect.not_glues` | [`Holon::interconnect`], [`GluingDefect`] |
 //! | `interconnect_ok_retains` | [`Holarchy::left`], [`Holarchy::right`], [`Holarchy::gluing`] |
 //! | `joinBond`, `interfacePower`, `interfacePower_eq`, `interfacePower_cancels_iff` | [`Gluing::join_bond`], [`Gluing::interface_power`], check 2 of [`gluing`] |
-//! | `gainLink_isDirac`, `joinD_isDirac`, `joinHolon`, `joinHolon_one`, `Holarchy.wholeConstituent` | [`Holarchy::whole`] |
+//! | `gainLink_isDirac`, `joinD_isDirac`, `joinHolon`, `joinHolon_one`, `Holarchy.whole`, `Holarchy.wholeConstituent` | [`Holarchy::whole`] (its port Holon assembled on first read) |
 //! | `Holarchy.power_balance`, `Holarchy.balance_is_sum` | [`Holarchy::power_balance`] |
 //! | `interfaceFibre`, `interface_obstructed_iff`, `interface_plural_iff` | [`Holarchy::interface_fibre`] |
 //! | `CellEmbedding.flux_pullback`, `Holarchy.wholeInterior`, `Holarchy.whole_flux`, `Holarchy.sharedFace_silent` | [`Holarchy::flux`] |
@@ -55,17 +66,18 @@ mod tests;
 pub use gluing::{CellGluing, CellularMap, Gluing, GluingDefect, JointClock};
 pub use view::{Block, Count, Grain, GrainRestriction, RegionReceiver, TickView, Unresolved};
 
+use std::sync::Arc;
+
 use num_bigint::BigInt;
 use num_traits::Zero;
 
 use crate::aeon::ClockLift;
-use crate::holon::element::ActiveRelation;
 use crate::holon::port::Bond;
 use crate::holon::{Holon, HolonError, PowerBalance};
 use crate::navigator::address::{AddressError, LockAddress};
 use crate::ratio::Rat;
 use crate::ratio::linear::ExactRatMatrix;
-use crate::ratio::linear::vector::{at, block_diagonal, dot, matrix};
+use crate::ratio::linear::vector::{at, dot, matrix};
 use gluing::{Layout, Slot, check_cell_shapes, check_cells, check_clocks, check_units};
 
 /// [definition] Which constituent (Lean `Holarchy/Join.Side`).
@@ -75,15 +87,48 @@ pub enum Side {
     Right,
 }
 
-/// [definition] **A Holarchy of two constituents**: the retained constituents, the typed gluing,
-/// the joined whole and the provenance of its ports.
-#[derive(Clone, Debug, PartialEq, Eq)]
+/// [definition] **A Holarchy of two constituents**: the retained constituents and the typed
+/// gluing, which determine the whole (Lean `Holarchy/Join.Holarchy` keeps only `decl` and `glues`;
+/// `Holarchy.whole` is a function of them), and the whole as a Holon whose port Holon is assembled
+/// from them on first read.
+#[derive(Clone, Debug)]
 pub struct Holarchy {
+    join: Arc<Join>,
+    whole: Holon,
+}
+
+impl PartialEq for Holarchy {
+    /// The same constituents under the same gluing: the whole is a function of them.
+    fn eq(&self, other: &Self) -> bool {
+        Arc::ptr_eq(&self.join, &other.join) || self.join == other.join
+    }
+}
+
+impl Eq for Holarchy {}
+
+/// [definition] **A join as declared**: the two retained constituents, the gluing that passed the
+/// nine checks, and the port layout it induces. It is the complete representation of the whole's
+/// port Holon ([`Join::assemble`], Lean `Holarchy.whole = joinHolon A.holon B.holon F E`).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) struct Join {
     left: Holon,
     right: Holon,
     gluing: Gluing,
-    whole: Holon,
     layout: Layout,
+}
+
+impl Join {
+    /// [definition] **The whole's port Holon** (Lean `Holarchy/Join.joinHolon`): both structures
+    /// side by side, composed with the gain link at the shared ports, the kinds merged; block
+    /// storage and resistance. A constituent that is itself a join is assembled first.
+    pub(crate) fn assemble(&self) -> Result<crate::holon::PortHolon, HolonError> {
+        gluing::join_port_holons(
+            self.left.port_holon(),
+            self.right.port_holon(),
+            &self.gluing,
+            &self.layout,
+        )
+    }
 }
 
 impl Holon {
@@ -92,43 +137,37 @@ impl Holon {
     /// on the Holons' own units, gains, complexes, interiors, port faces and pumps, in Lean's
     /// order; return the Holarchy exactly when all nine pass, or the first failed check as a typed
     /// defect with a computed witness (`GluingDefect.not_glues`).
+    ///
+    /// [definition] **The checks are local to the shared ports and the two Holons' own data**, and
+    /// nothing dense is assembled: the whole's port Holon is built from the retained join only when
+    /// it is read ([`Holon::port_holon`] on [`Holarchy::whole`]). A constituent may itself be the
+    /// whole of an earlier join, still unassembled, so a Holarchy of many small Holons costs what
+    /// its blocks cost.
     pub fn interconnect(&self, other: &Holon, gluing: &Gluing) -> Result<Holarchy, GluingDefect> {
-        let layout = Layout::new(
-            self.port_holon().counts(),
-            other.port_holon().counts(),
-            gluing.shared(),
-        )
-        .map_err(GluingDefect::Malformed)?;
+        let layout = Layout::new(self.counts(), other.counts(), gluing.shared())
+            .map_err(GluingDefect::Malformed)?;
         check_cell_shapes(self, other, gluing).map_err(GluingDefect::Malformed)?;
         check_units(self, other, gluing)?;
         gluing.check_power()?;
         check_cells(self, other, gluing)?;
         check_clocks(self, other, gluing)?;
-        let whole = join_holons(self, other, gluing, &layout).map_err(GluingDefect::Malformed)?;
-        Ok(Holarchy {
+        let join = Arc::new(Join {
             left: self.clone(),
             right: other.clone(),
             gluing: gluing.clone(),
-            whole,
             layout,
-        })
+        });
+        let whole = join_holons(&join).map_err(GluingDefect::Malformed)?;
+        Ok(Holarchy { join, whole })
     }
 }
 
-/// The joined whole as a Holon: ports, elements, pumps, named ports, cells and navigators.
-fn join_holons(
-    left: &Holon,
-    right: &Holon,
-    gluing: &Gluing,
-    layout: &Layout,
-) -> Result<Holon, HolonError> {
-    let port_holon =
-        gluing::join_port_holons(left.port_holon(), right.port_holon(), gluing, layout)?;
-    let active = ActiveRelation::new(block_diagonal(
-        left.active().relation(),
-        right.active().relation(),
-    )?)?;
-    let mut whole = Holon::new(port_holon)?.with_active(active)?;
+/// The joined whole as a Holon (Lean `Holarchy/Join.Holarchy.wholeConstituent`): its port Holon
+/// the join's, assembled on first read; elements, pumps, named ports, cells and navigators.
+fn join_holons(join: &Arc<Join>) -> Result<Holon, HolonError> {
+    let (left, right, gluing, layout) = (&join.left, &join.right, &join.gluing, &join.layout);
+    let active = left.active().direct_sum(right.active())?;
+    let mut whole = Holon::joined(layout.counts(), Arc::clone(join), active)?;
     if let Some(pump) = gluing::joint_pump(left, right, gluing)? {
         whole = whole.with_pump(pump)?;
     }
@@ -152,7 +191,7 @@ fn join_holons(
         whole = whole
             .with_complex(cells.glued().clone(), cells.connection().cloned())
             .with_interior(interior)?;
-        let (a, b) = (left.port_holon().counts(), right.port_holon().counts());
+        let (a, b) = (left.counts(), right.counts());
         let faces: Vec<usize> = layout
             .provenance
             .iter()
@@ -161,7 +200,7 @@ fn join_holons(
                     Side::Left => (left, a.external_offset()),
                     Side::Right => (right, b.external_offset()),
                 };
-                let external = holon.port_holon().counts().external;
+                let external = holon.counts().external;
                 let own = port.checked_sub(offset).filter(|e| *e < external)?;
                 let face = holon.port_faces()?[own];
                 Some(cells.map(*side).image(d.saturating_sub(1))[face])
@@ -229,35 +268,38 @@ pub struct FluxSplit {
 impl Holarchy {
     /// The left constituent, retained.
     pub fn left(&self) -> &Holon {
-        &self.left
+        &self.join.left
     }
 
     /// The right constituent, retained.
     pub fn right(&self) -> &Holon {
-        &self.right
+        &self.join.right
     }
 
     pub fn constituent(&self, side: Side) -> &Holon {
         match side {
-            Side::Left => &self.left,
-            Side::Right => &self.right,
+            Side::Left => &self.join.left,
+            Side::Right => &self.join.right,
         }
     }
 
     /// The typed gluing, retained.
     pub fn gluing(&self) -> &Gluing {
-        &self.gluing
+        &self.join.gluing
     }
 
     /// [definition] **The joined whole** (Lean `Holarchy/Join.Holarchy.whole`,
-    /// `Holarchy.wholeConstituent`), again a Holon, so it can be joined again.
+    /// `Holarchy.wholeConstituent`), again a Holon, so it can be joined again. Its counts,
+    /// elements' active block, pumps, named ports, cells and navigators are read from the
+    /// constituents at the join; its port Holon (the composed Dirac structure with block storage and
+    /// resistance) is assembled from the retained join on its first read and kept.
     pub fn whole(&self) -> &Holon {
         &self.whole
     }
 
     /// Whole port `i` is port `.1` of constituent `.0`.
     pub fn provenance(&self) -> &[(Side, usize)] {
-        &self.layout.provenance
+        &self.join.layout.provenance
     }
 
     /// [definition] **The Holarchy's parametric orientation** (Lean
@@ -289,8 +331,11 @@ impl Holarchy {
             Bond::new(flow, effort)
         };
         Ok((
-            assemble(&self.layout.left_slots, shared)?,
-            assemble(&self.layout.right_slots, &self.gluing.join_bond(shared)?)?,
+            assemble(&self.join.layout.left_slots, shared)?,
+            assemble(
+                &self.join.layout.right_slots,
+                &self.gluing().join_bond(shared)?,
+            )?,
         ))
     }
 
@@ -298,7 +343,7 @@ impl Holarchy {
     /// (`interfaceFibre`, `interface_obstructed_iff`, `interface_plural_iff`): solve the two
     /// constituents' constraint rows for the shared bond exactly.
     pub fn interface_fibre(&self, whole: &Bond) -> Result<InterfaceGluing, HolonError> {
-        let total = self.whole.port_holon().counts().total();
+        let total = self.whole.counts().total();
         if whole.ports() != total {
             return Err(HolonError::Shape {
                 what: "whole bond",
@@ -306,35 +351,32 @@ impl Holarchy {
                 found: whole.ports(),
             });
         }
-        let t = self.gluing.shared().len();
+        let t = self.gluing().shared().len();
         // Each constituent's bond with every shared slot zero: its known part.
         let zero = Bond::zero(t);
         let (left_known, right_known) = self.constituent_bonds(whole, &zero)?;
         let (fa, ea) = (
-            self.left.port_holon().dirac().form().flow_matrix()?,
-            self.left.port_holon().dirac().form().effort_matrix()?,
+            self.left().port_holon().dirac().form().flow_matrix()?,
+            self.left().port_holon().dirac().form().effort_matrix()?,
         );
         let (fb, eb) = (
-            self.right.port_holon().dirac().form().flow_matrix()?,
-            self.right.port_holon().dirac().form().effort_matrix()?,
+            self.right().port_holon().dirac().form().flow_matrix()?,
+            self.right().port_holon().dirac().form().effort_matrix()?,
         );
-        let (a, b) = (
-            self.left.port_holon().counts(),
-            self.right.port_holon().counts(),
-        );
+        let (a, b) = (self.left().counts(), self.right().counts());
         let left_ports: Vec<usize> = self
-            .gluing
+            .gluing()
             .shared()
             .iter()
             .map(|(i, _)| a.external_offset() + i)
             .collect();
         let right_ports: Vec<usize> = self
-            .gluing
+            .gluing()
             .shared()
             .iter()
             .map(|(_, j)| b.external_offset() + j)
             .collect();
-        let (gain_f, gain_e) = (self.gluing.flow_gain(), self.gluing.effort_gain());
+        let (gain_f, gain_e) = (self.gluing().flow_gain(), self.gluing().effort_gain());
         let rows = fa.rows() + fb.rows();
         // Variables q = (f_q, e_q). Left rows read q directly; right rows read (−F f_q, E e_q).
         let coefficient = matrix(rows, 2 * t, |row, column| {
@@ -410,22 +452,19 @@ impl Holarchy {
             InterfaceGluing::Plural { particular, .. } => particular,
             InterfaceGluing::Obstructed { .. } => return Err(HolonError::NotAdmitted),
         };
-        let (a, b) = (
-            self.left.port_holon().counts(),
-            self.right.port_holon().counts(),
-        );
+        let (a, b) = (self.left().counts(), self.right().counts());
         let (left_bond, right_bond) = self.constituent_bonds(&bond, &shared)?;
         let external_of = |bond: &Bond, offset: usize, count: usize| {
             bond.select(&(offset..offset + count).collect::<Vec<_>>())
         };
-        let left = self.left.port_holon().power_balance(
+        let left = self.left().port_holon().power_balance(
             &x[..a.storage],
             &v[..a.storage],
             &resistive_flow[..a.resistive],
             &external_of(&left_bond, a.external_offset(), a.external)?,
             &active.select(&(0..a.active).collect::<Vec<_>>())?,
         )?;
-        let right = self.right.port_holon().power_balance(
+        let right = self.right().port_holon().power_balance(
             &x[a.storage..],
             &v[a.storage..],
             &resistive_flow[a.resistive..],
@@ -442,7 +481,7 @@ impl Holarchy {
 
     /// The cellular gluing and its region degree `d ≥ 1`, or a refusal naming what is missing.
     pub(crate) fn regions(&self) -> Result<(&CellGluing, usize), HolonError> {
-        let Some(cells) = self.gluing.cells() else {
+        let Some(cells) = self.gluing().cells() else {
             return Err(HolonError::Unsupported {
                 what: "a flux or a view",
                 reason: "the Holarchy declares no glued complex",
@@ -511,9 +550,9 @@ impl Holarchy {
     /// pumps.
     pub fn pump_lock(&self) -> Result<Option<LockAddress>, AddressError> {
         let (Some(left), Some(right), Some(joint)) = (
-            self.left.pump(),
-            self.right.pump(),
-            self.gluing.joint_clock(),
+            self.left().pump(),
+            self.right().pump(),
+            self.gluing().joint_clock(),
         ) else {
             return Ok(None);
         };

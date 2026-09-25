@@ -47,11 +47,11 @@
 //! is returned. That is measurement, not governance.
 
 use crate::ratio::Rat;
-use num_traits::{Signed, Zero};
+use num_bigint::BigInt;
+use num_traits::{One, Signed, Zero};
 use thiserror::Error;
 
 use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
-use crate::ratio::work::ExactWork;
 
 // -------------------------------------------------------------------------------------------
 // the form
@@ -260,64 +260,30 @@ pub(crate) fn inertia_with_schedule(
     form: &SymmetricForm,
     order: PivotOrder,
 ) -> (Inertia, InertiaSchedule) {
-    let (tally, schedule, _) = inertia_with_work(form, order);
-    (tally, schedule)
-}
-
-/// **The same elimination, returning what it cost.**
-///
-/// The dominating quantity of an exact elimination is the intermediate entry width, so the work is
-/// counted inside the elimination, on every entry it writes.
-///
-/// The pivot count is not the dominating quantity: a form can take `k` pivots whose entries stay
-/// narrow, or `k` pivots whose entries are `k × k` minors. The steps say how many; only
-/// [`ExactWork::peak_bits`] says how wide.
-///
-/// The counting is exact and adds no arithmetic: every operation was already performed, and this
-/// records that it was.
-pub(crate) fn inertia_with_work(
-    form: &SymmetricForm,
-    order: PivotOrder,
-) -> (Inertia, InertiaSchedule, ExactWork) {
-    let mut work = ExactWork::nothing();
-    let extent = form.extent();
-    work.resident(u64::try_from(extent.saturating_mul(extent)).unwrap_or(u64::MAX));
-    // The form as handed in is the widest thing that stands before a single step is taken, so its
-    // own entries enter the peak. A deed whose INPUT is wide has already paid for that width.
-    for row in 0..extent {
-        for column in 0..extent {
-            work.wrote(form.at(row, column));
-        }
-    }
-    let mut working = form.rows();
+    let mut working = Chart::of(form);
     let mut alive: Vec<usize> = (0..form.extent()).collect();
     let mut tally = Inertia::default();
     let mut steps = Vec::new();
 
     while !alive.is_empty() {
-        if let Some(index) = choose_diagonal(&working, &alive, order) {
-            let pivot = working[index][index].clone();
-            let negative = pivot.is_negative();
+        if let Some(index) = working.choose_diagonal(&alive, order) {
+            let negative = working.numerators[index][index].is_negative();
             if negative {
                 tally.negative += 1;
             } else {
                 tally.positive += 1;
             }
             steps.push(PivotStep::Diagonal { index, negative });
-            // Each pivot depends on the last: the span of a serial elimination is its pivot count.
-            work.stepped();
-            eliminate_diagonal(&mut working, &alive, index, &pivot, &mut work);
+            working.eliminate_diagonal(&alive, index);
             alive.retain(|surviving| *surviving != index);
             continue;
         }
-        if let Some((low, high)) = choose_off_diagonal(&working, &alive, order) {
-            let pivot = working[low][high].clone();
+        if let Some((low, high)) = working.choose_off_diagonal(&alive, order) {
             // `[[0, a], [a, 0]]` has eigenvalues `+a` and `-a`. One of each, for every nonzero `a`.
             tally.positive += 1;
             tally.negative += 1;
             steps.push(PivotStep::ZeroDiagonalPair { low, high });
-            work.stepped();
-            eliminate_pair(&mut working, &alive, low, high, &pivot, &mut work);
+            working.eliminate_pair(&alive, low, high);
             alive.retain(|surviving| *surviving != low && *surviving != high);
             continue;
         }
@@ -328,121 +294,193 @@ pub(crate) fn inertia_with_work(
         alive.clear();
     }
 
-    (tally, InertiaSchedule { order, steps }, work)
+    (tally, InertiaSchedule { order, steps })
 }
 
-/// `a'_jk = a_jk - a_ji · a_ik / a_ii` over the survivors.
-///
-/// The pivot row and column are read from a snapshot and are outside the region written, so the
-/// update cannot see its own partial results. That is what makes the order a free parameter.
-fn eliminate_diagonal(
-    working: &mut [Vec<Rat>],
-    alive: &[usize],
-    index: usize,
-    pivot: &Rat,
-    work: &mut ExactWork,
-) {
-    let survivors: Vec<(usize, Rat)> = alive
-        .iter()
-        .filter(|surviving| **surviving != index)
-        .map(|surviving| (*surviving, working[*surviving][index].clone()))
-        .collect();
-    for (row, to_pivot_row) in &survivors {
-        for (column, to_pivot_column) in &survivors {
-            // `a_ik == a_ki`, so one snapshot serves both factors.
-            let delta = (to_pivot_row * to_pivot_column) / pivot;
-            working[*row][*column] -= delta;
-            // One multiply, one divide (which normalises), one subtract, one entry written.
-            work.multiplied(1);
-            work.divided(1);
-            work.added(1);
-            work.wrote(&working[*row][*column]);
+/// [definition; agent-inferred] **The surviving Schur complement in the integral chart.** Row `j` is
+/// `N_j / D_j` with integer numerators and a positive denominator. A step multiplies each coupled
+/// row through by the pivot instead of dividing by it (fraction-free), then divides the row by the
+/// greatest common divisor of its surviving numerators and its denominator: one integer reduction
+/// per row where the rational elimination normalizes every entry several times. Every entry keeps
+/// its exact value, so every zero test, sign and magnitude comparison reads what the rational
+/// elimination reads, and the tally and schedule are the same.
+struct Chart {
+    numerators: Vec<Vec<BigInt>>,
+    denominators: Vec<BigInt>,
+}
+
+/// A magnitude `|N| / D` held as the pair `(|N|, D)`.
+type Magnitude<'a> = (BigInt, &'a BigInt);
+
+impl Chart {
+    fn of(form: &SymmetricForm) -> Self {
+        let (numerators, denominators) = form
+            .rows()
+            .iter()
+            .map(|row| crate::ratio::linear::vector::integral(row))
+            .unzip();
+        Self {
+            numerators,
+            denominators,
         }
     }
-}
 
-/// `a'_kl = a_kl - (a_ki · a_jl + a_kj · a_il) / a` for the block `[[0, a], [a, 0]]` on `(i, j)`.
-///
-/// This is the Schur complement of a `2x2` block whose inverse is `[[0, 1/a], [1/a, 0]]`, which is
-/// where the crossed product comes from.
-fn eliminate_pair(
-    working: &mut [Vec<Rat>],
-    alive: &[usize],
-    low: usize,
-    high: usize,
-    pivot: &Rat,
-    work: &mut ExactWork,
-) {
-    let survivors: Vec<usize> = alive
-        .iter()
-        .copied()
-        .filter(|surviving| *surviving != low && *surviving != high)
-        .collect();
-    let to_low: Vec<Rat> = survivors
-        .iter()
-        .map(|surviving| working[*surviving][low].clone())
-        .collect();
-    let to_high: Vec<Rat> = survivors
-        .iter()
-        .map(|surviving| working[*surviving][high].clone())
-        .collect();
-    for (left, row) in survivors.iter().enumerate() {
-        for (right, column) in survivors.iter().enumerate() {
-            let crossed = &to_low[left] * &to_high[right] + &to_high[left] * &to_low[right];
-            working[*row][*column] -= crossed / pivot;
-            // Two multiplies, one add for the cross, one divide, one subtract, one entry written.
-            work.multiplied(2);
-            work.added(2);
-            work.divided(1);
-            work.wrote(&working[*row][*column]);
+    /// `|a_ij|` as the pair `(|N_ij|, D_i)`, compared by cross multiplication.
+    fn magnitude(&self, row: usize, column: usize) -> Magnitude<'_> {
+        (self.numerators[row][column].abs(), &self.denominators[row])
+    }
+
+    fn choose_diagonal(&self, alive: &[usize], order: PivotOrder) -> Option<usize> {
+        let candidates: Vec<(usize, Magnitude<'_>)> = alive
+            .iter()
+            .filter(|index| !self.numerators[**index][**index].is_zero())
+            .map(|index| (*index, self.magnitude(*index, *index)))
+            .collect();
+        pick_magnitude(&candidates, order)
+    }
+
+    fn choose_off_diagonal(&self, alive: &[usize], order: PivotOrder) -> Option<(usize, usize)> {
+        let mut candidates: Vec<((usize, usize), Magnitude<'_>)> = Vec::new();
+        for (position, low) in alive.iter().enumerate() {
+            for high in &alive[position + 1..] {
+                if !self.numerators[*low][*high].is_zero() {
+                    candidates.push(((*low, *high), self.magnitude(*low, *high)));
+                }
+            }
+        }
+        pick_magnitude(&candidates, order)
+    }
+
+    /// `a'_jk = a_jk - a_ji · a_ik / a_ii` over the survivors, as
+    /// `N'_jk = N_jk N_ii − N_ji N_ik` over `D'_j = D_j N_ii`.
+    ///
+    /// The pivot row is read from a snapshot and is outside the region written, so the update
+    /// cannot see its own partial results. That is what makes the order a free parameter. A
+    /// survivor whose entry to the pivot is zero receives a zero update and is not written (a
+    /// block form eliminates block by block).
+    fn eliminate_diagonal(&mut self, alive: &[usize], index: usize) {
+        let pivot_row = self.numerators[index].clone();
+        let pivot = pivot_row[index].clone();
+        let columns: Vec<usize> = alive.iter().copied().filter(|k| *k != index).collect();
+        for &row in &columns {
+            let coupling = self.numerators[row][index].clone();
+            if coupling.is_zero() {
+                continue;
+            }
+            let numerators = &mut self.numerators[row];
+            for &column in &columns {
+                let scaled = &numerators[column] * &pivot;
+                numerators[column] = if pivot_row[column].is_zero() {
+                    scaled
+                } else {
+                    scaled - &coupling * &pivot_row[column]
+                };
+            }
+            self.denominators[row] = &self.denominators[row] * &pivot;
+            self.settle(row, &columns);
         }
     }
-}
 
-fn choose_diagonal(working: &[Vec<Rat>], alive: &[usize], order: PivotOrder) -> Option<usize> {
-    let candidates: Vec<(usize, Rat)> = alive
-        .iter()
-        .filter(|index| !working[**index][**index].is_zero())
-        .map(|index| (*index, working[*index][*index].clone()))
-        .collect();
-    pick(&candidates, order)
-}
+    /// `a'_kl = a_kl - (a_ki · a_jl + a_kj · a_il) / a` for the block `[[0, a], [a, 0]]` on
+    /// `(i, j)`, `a = N_ij / D_i`, as `N'_kl = N_kl D_j N_ij − N_ki N_jl D_i − N_kj N_il D_j` over
+    /// `D'_k = D_k D_j N_ij`.
+    ///
+    /// This is the Schur complement of a `2x2` block whose inverse is `[[0, 1/a], [1/a, 0]]`, which
+    /// is where the crossed product comes from. A survivor coupled to neither index is not written.
+    fn eliminate_pair(&mut self, alive: &[usize], low: usize, high: usize) {
+        let (low_row, high_row) = (self.numerators[low].clone(), self.numerators[high].clone());
+        let (low_denominator, high_denominator) = (
+            self.denominators[low].clone(),
+            self.denominators[high].clone(),
+        );
+        let pivot = low_row[high].clone();
+        let scale = &high_denominator * &pivot;
+        let columns: Vec<usize> = alive
+            .iter()
+            .copied()
+            .filter(|k| *k != low && *k != high)
+            .collect();
+        for &row in &columns {
+            let (to_low, to_high) = (
+                self.numerators[row][low].clone(),
+                self.numerators[row][high].clone(),
+            );
+            if to_low.is_zero() && to_high.is_zero() {
+                continue;
+            }
+            let (from_low, from_high) = (&to_low * &low_denominator, &to_high * &high_denominator);
+            let numerators = &mut self.numerators[row];
+            for &column in &columns {
+                numerators[column] = &numerators[column] * &scale
+                    - &from_low * &high_row[column]
+                    - &from_high * &low_row[column];
+            }
+            self.denominators[row] = &self.denominators[row] * &scale;
+            self.settle(row, &columns);
+        }
+    }
 
-fn choose_off_diagonal(
-    working: &[Vec<Rat>],
-    alive: &[usize],
-    order: PivotOrder,
-) -> Option<(usize, usize)> {
-    let mut candidates: Vec<((usize, usize), Rat)> = Vec::new();
-    for (position, low) in alive.iter().enumerate() {
-        for high in &alive[position + 1..] {
-            if !working[*low][*high].is_zero() {
-                candidates.push(((*low, *high), working[*low][*high].clone()));
+    /// Keep the row's denominator positive and divide the row by the greatest common divisor of
+    /// its surviving numerators and its denominator.
+    fn settle(&mut self, row: usize, columns: &[usize]) {
+        if self.denominators[row].is_negative() {
+            self.denominators[row] = -&self.denominators[row];
+            for &column in columns {
+                self.numerators[row][column] = -&self.numerators[row][column];
+            }
+        }
+        let mut divisor = self.denominators[row].clone();
+        for &column in columns {
+            if divisor.is_one() {
+                return;
+            }
+            let value = &self.numerators[row][column];
+            if !value.is_zero() {
+                divisor = crate::ratio::gcd(&divisor, value);
+            }
+        }
+        if divisor.is_one() {
+            return;
+        }
+        self.denominators[row] = &self.denominators[row] / &divisor;
+        for &column in columns {
+            let value = &self.numerators[row][column];
+            if !value.is_zero() {
+                self.numerators[row][column] = value / &divisor;
             }
         }
     }
-    pick(&candidates, order)
 }
 
+/// The declared order's choice among the candidates, their magnitudes held as `(|N|, D)` and
+/// compared by cross multiplication (`|N_a|/D_a < |N_b|/D_b` iff `|N_a| D_b < |N_b| D_a`).
 /// Deterministic in every order, including the tie-breaks: a magnitude order that fell back on
 /// iteration order would make the schedule an accident of storage rather than a declaration.
-fn pick<K: Copy + Ord>(candidates: &[(K, Rat)], order: PivotOrder) -> Option<K> {
-    let mut best: Option<(K, &Rat)> = None;
+fn pick_magnitude<K: Copy + Ord>(
+    candidates: &[(K, Magnitude<'_>)],
+    order: PivotOrder,
+) -> Option<K> {
+    let mut best: Option<(K, &Magnitude<'_>)> = None;
     for (key, value) in candidates {
         let take = match &best {
             None => true,
-            Some((best_key, best_value)) => match order {
-                PivotOrder::FirstNonzero => *key < *best_key,
-                PivotOrder::LastNonzero => *key > *best_key,
-                PivotOrder::SmallestMagnitude => {
-                    let (here, there) = (value.abs(), best_value.abs());
-                    here < there || (here == there && *key < *best_key)
+            Some((best_key, best_value)) => {
+                let compare = || (&value.0 * best_value.1).cmp(&(&best_value.0 * value.1));
+                match order {
+                    PivotOrder::FirstNonzero => *key < *best_key,
+                    PivotOrder::LastNonzero => *key > *best_key,
+                    PivotOrder::SmallestMagnitude => match compare() {
+                        std::cmp::Ordering::Less => true,
+                        std::cmp::Ordering::Equal => *key < *best_key,
+                        std::cmp::Ordering::Greater => false,
+                    },
+                    PivotOrder::LargestMagnitude => match compare() {
+                        std::cmp::Ordering::Greater => true,
+                        std::cmp::Ordering::Equal => *key < *best_key,
+                        std::cmp::Ordering::Less => false,
+                    },
                 }
-                PivotOrder::LargestMagnitude => {
-                    let (here, there) = (value.abs(), best_value.abs());
-                    here > there || (here == there && *key < *best_key)
-                }
-            },
+            }
         };
         if take {
             best = Some((*key, value));

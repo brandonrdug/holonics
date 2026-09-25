@@ -27,7 +27,7 @@ use crate::holon::HolonError;
 use crate::navigator::Clock;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::inertia::{Inertia, SymmetricForm, inertia};
-use crate::ratio::linear::vector::{dot, form_matrix, quad, symmetric_part};
+use crate::ratio::linear::vector::{block_diagonal, dot, form_matrix, quad, symmetric_part};
 use crate::ratio::rat;
 
 /// `½⟨x, Qx⟩` (`Holon/Element.storageEnergy`).
@@ -45,6 +45,15 @@ pub fn storage_energy(storage: &SymmetricForm, x: &[Rat]) -> Result<Rat, HolonEr
 /// The storage effort `Qx`.
 pub fn storage_effort(storage: &SymmetricForm, x: &[Rat]) -> Result<Vec<Rat>, HolonError> {
     Ok(form_matrix(storage).apply(x)?)
+}
+
+/// The inertia of a block-diagonal symmetric form: the blocks' inertias added.
+fn sum_inertia(left: Inertia, right: Inertia) -> Inertia {
+    Inertia {
+        positive: left.positive + right.positive,
+        zero: left.zero + right.zero,
+        negative: left.negative + right.negative,
+    }
 }
 
 /// [definition] **A certified resistive relation** `e_R = −R f_R` with `⟨f, R f⟩ ≥ 0`.
@@ -65,6 +74,16 @@ impl ResistiveRelation {
         Ok(Self {
             resistance,
             inertia: reading,
+        })
+    }
+
+    /// [definition] **The block relation of two certified relations**, `R_A ⊕ R_B`, passive with
+    /// no new decision: the symmetric part of a block-diagonal is block-diagonal, so its inertia is
+    /// the sum of the blocks' (Sylvester, blockwise congruence).
+    pub fn direct_sum(&self, other: &Self) -> Result<Self, HolonError> {
+        Ok(Self {
+            resistance: block_diagonal(&self.resistance, &other.resistance)?,
+            inertia: sum_inertia(self.inertia, other.inertia),
         })
     }
 
@@ -96,6 +115,15 @@ impl ActiveRelation {
         Ok(Self {
             relation,
             inertia: reading,
+        })
+    }
+
+    /// [definition] **The block relation** `L_A ⊕ L_B`, its inertia the sum of the blocks'
+    /// (Sylvester, blockwise congruence), read without a new reduction.
+    pub fn direct_sum(&self, other: &Self) -> Result<Self, HolonError> {
+        Ok(Self {
+            relation: block_diagonal(&self.relation, &other.relation)?,
+            inertia: sum_inertia(self.inertia, other.inertia),
         })
     }
 

@@ -19,7 +19,7 @@
 use std::fmt;
 
 use num_bigint::{BigInt, BigUint};
-use num_traits::{One, Signed, Zero};
+use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::aeon::AeonError;
 use crate::geometry::complex::CellComplex;
@@ -519,6 +519,37 @@ impl ClockLift {
         Aeon::new(self, start, steps)
     }
 
+    /// [definition] **The forward aeon between two lift points**: each navigator's micro-steps from
+    /// `start` to `end`, navigator by navigator. Refused unless `end ≥ start` coordinatewise, a
+    /// motion that only advances. It is one representative of the motion's class: two navigators
+    /// commute around every square of the lift (`clockLift_wellFormed`), and every clock and section
+    /// of the lift reads it as the motion itself, since a navigator's clock reads its displacement
+    /// (`Winding.reading_navigatorClock`) and a ring section's flux is the difference of whole
+    /// windings of the two endpoints (`Epoch.signed_count_is_flux`). So an aeon is carried by its
+    /// two lift points, and the word is built only where a reading needs it.
+    pub fn forward(&self, start: Vec<BigInt>, end: &[BigInt]) -> Result<Aeon<Self>, AeonError> {
+        if start.len() != self.navigators() || end.len() != self.navigators() {
+            return Err(AeonError::Shape {
+                what: "lift point (one coordinate per navigator)",
+                expected: self.navigators(),
+                found: if start.len() == self.navigators() {
+                    end.len()
+                } else {
+                    start.len()
+                },
+            });
+        }
+        let mut moves = Vec::new();
+        for (navigator, (from, to)) in start.iter().zip(end).enumerate() {
+            let steps = (to - from)
+                .to_biguint()
+                .ok_or(AeonError::NotForward { navigator })?;
+            let steps = steps.to_usize().ok_or(AeonError::BeyondAddressSpace)?;
+            moves.extend(std::iter::repeat_n((navigator, true), steps));
+        }
+        self.walk(start, &moves)
+    }
+
     /// The torus point of a lift point: each coordinate's residue modulo its period. Lean
     /// `torusPoint`.
     pub fn torus_point(&self, point: &[BigInt]) -> Vec<BigUint> {
@@ -639,5 +670,51 @@ mod tests {
             Aeon::rest(gamma.end().clone())
         );
         assert_eq!(epsilon.concat(&gamma), Err(AeonError::NotComposable));
+    }
+
+    /// **The forward aeon between two lift points** ends where it is asked to, every clock reads it
+    /// as any other aeon between the two points (here an interleaved walk), and a point behind the
+    /// start is refused. Lean `Winding.reading_navigatorClock`, `Epoch.signed_count_is_flux`.
+    #[test]
+    fn the_forward_aeon_reads_as_the_motion() {
+        use crate::aeon::epoch::epochs;
+        use crate::aeon::reading::{TorusClock, reading};
+        let lift = ClockLift::new(vec![BigUint::from(3u32), BigUint::from(4u32)]).unwrap();
+        let motion = lift
+            .walk(
+                lattice(&[2, 1]),
+                &[
+                    (1, true),
+                    (0, true),
+                    (0, true),
+                    (1, true),
+                    (0, true),
+                    (1, true),
+                ],
+            )
+            .unwrap();
+        let forward = lift.forward(lattice(&[2, 1]), motion.end()).unwrap();
+        assert_eq!(
+            (forward.start(), forward.end()),
+            (motion.start(), motion.end())
+        );
+        assert_ne!(forward, motion);
+        for navigator in 0..2 {
+            let clock = TorusClock::navigator(&lift, navigator).unwrap();
+            assert_eq!(
+                reading(&clock, &forward).unwrap(),
+                reading(&clock, &motion).unwrap()
+            );
+            let period = lift.periods()[navigator].clone();
+            let section = || lift.ring_section(navigator, period.clone()).unwrap();
+            assert_eq!(
+                epochs(&forward, section()).flux(),
+                epochs(&motion, section()).flux()
+            );
+        }
+        assert_eq!(
+            lift.forward(lattice(&[2, 1]), &lattice(&[1, 5])),
+            Err(AeonError::NotForward { navigator: 0 })
+        );
     }
 }

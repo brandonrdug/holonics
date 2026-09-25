@@ -895,12 +895,12 @@ explicit; arbitrary native imaginary channels are not original machine coordinat
 [consumer record](../research/records/2026-09-21_THE_FIXED_GENERATOR_MACHINE_CONSUMES_ITS_AFFINE_CURRENT_CHART.md)
 connects these laws to the prototype's current/refinement implementation.
 
-[established-bounded; formal-proof] `Transport/GeneratorSourceEpisode.lean` adds the directed
-pooled-contrast adjoint, affine standing/tangent injection law, and finite reverse telescope
-with independent state/source/condition dimensions. Producing linearized maps and matching
-input lengths are explicit hypotheses. Dynamics imports it; the prototype's
-[source consumer](../research/records/2026-09-21_ORDERED_SOURCE_AND_PHASE_RECEIVING_ENTER_THE_PUBLIC_GENERATOR_SESSION.md)
-used the same incidence and source/condition return.
+[definition] `Transport/GeneratorSourceEpisode.lean` was retired with rebuild step 4 (#73,
+campaign 1). Its directed-contrast law moved into `HNN/Moment.lean`, where
+`pooledContrast_pairing_adjoint` is now the genuine incidence adjoint (kinds and multiplicity
+kept). Its ordered tape (the supplied-linearized recurrence and its reverse telescope) is history
+at `13f8c734`; the generic reverse telescope is `dualMap_comp_reverse_order`, and a word's exact
+return over its own trajectory is `HNN/Propagation.word_variation_exact`.
 
 [established-bounded; formal-proof] `Transport/ContactFactorScale.lean` proves rectangular
 amplitude variation and cotangent pairing, quadratic Gram scaling and the unchanged null kernel
@@ -911,12 +911,11 @@ positivity of the proposed relative step, and amplitude composition retains the 
 These laws constrained the prototype's positive-amplitude publication; they do not assert
 finite-step objective improvement. [Return and scope](../research/records/2026-09-21_THE_PAIR_RESPONSE_RETURNS_ITS_RECTANGULAR_FACTOR_COTANGENT.md).
 
-[proved-derived; formal-checked] `Transport/ContactAmplitudeState.lean` instantiates
-`StandingLaw` for completed update sequences mapped to their complete current state, proving
-the fold/transport correspondence and equality of declared future consequences. Pending
-comparison operands remain separate. `Transport/{AffineJointBall,PairJointBall}.lean` proves
+[definition] `Transport/ContactAmplitudeState.lean`, a fold over an update list, was retired with
+rebuild step 4 (history at `13f8c734`); the field's standing binding is
+`HNN/Retention.fieldStanding`. `Transport/{AffineJointBall,PairJointBall}.lean` proves
 conditional affine/adjoint, projection, simplex and perturbation bounds for joint enclosures.
-All three are imported by Dynamics. Matrix-norm and integer-rounding correspondence,
+Both are imported by Dynamics. Matrix-norm and integer-rounding correspondence,
 nonlinear source descent and geometric/clock derivatives remain #62 obligations. The
 [amplitude consumer and scope](../research/records/2026-09-22_PAIR_MATERIAL_LEARNS_WITHOUT_A_COMPLETED_UPDATE_ARCHIVE.md)
 bound these laws to the prototype's observation, current state and numerical tests.
@@ -929,9 +928,8 @@ separation `moment [a,b] = moment [b,a] ↔ (U − 1) I (E a − E b) = 0`, with
 merging every permutation and a quarter-turn witness separating; the oriented δ=1 offset moment
 separating what the identity-advance moment merges; and the moment and the constant-size stream
 state `(moment, last, offset)` as `ReceiverHistoryCompression` instances for the append action
-with generator `U_u(x) = U x + I E u`. `Transport/ContactAmplitudeState.lean` is a generic
-fold/current-state identity, not the standing counterpart of the pair machine; that binding
-remains #17/#62. The [retention audit](../research/records/2026-09-22_RETENTION_IS_A_QUOTIENT_NOT_A_TAPE_AND_THE_SOURCE_ENTERS_AS_PHASE_CARRIED_MOMENTS.md)
+with generator `U_u(x) = U x + I E u`. The HNN's standing counterpart is
+`HNN/Retention.fieldStanding` (rebuild step 4). The [retention audit](../research/records/2026-09-22_RETENTION_IS_A_QUOTIENT_NOT_A_TAPE_AND_THE_SOURCE_ENTERS_AS_PHASE_CARRIED_MOMENTS.md)
 names the prototype's tape these laws replace.
 
 [proved-derived; formal-checked] **Elementary objects** (`Framework/Objects.lean`, September 22).

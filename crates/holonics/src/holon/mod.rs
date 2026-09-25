@@ -20,7 +20,9 @@
 //! external ports returns a [`crate::holarchy::Holarchy`]: the joined whole, again a Holon, with
 //! its retained constituents and typed gluing, or a typed [`crate::holarchy::GluingDefect`]
 //! ([`Holon::interconnect`], defined in [`crate::holarchy`]; Lean `Holarchy/Join`). The whole's
-//! port Holon has block storage and resistance and the composed Dirac structure
+//! port Holon is a function of the retained join, assembled when first read ([`Holon::port_holon`];
+//! its counts are read without it, [`Holon::counts`]); it has block storage and resistance and the
+//! composed Dirac structure
 //! (`Holarchy/Join.joinHolon`; at the equal-effort, opposite-flow join it is
 //! `Holon/Law.PortHolon.interconnect`, `Holarchy/Join.joinHolon_one`); energy and dissipation are
 //! additive (`Holon/Law.storageEnergy_blocks`, `Holon/Law.dissipation_blocks`). A passive coholon
@@ -53,6 +55,8 @@ pub mod parametron;
 pub mod port;
 pub mod reaction;
 pub mod restriction;
+
+use std::sync::{Arc, OnceLock};
 
 use crate::geometry::winding::WindingError;
 use crate::ratio::Rat;
@@ -447,12 +451,67 @@ pub fn medium_structure(
     })?)
 }
 
+/// [definition] **The port Holon a Holon stands on: declared, or the join of a Holarchy's two
+/// constituents, assembled on first read.** Lean `Holarchy/Join.Holarchy.whole` is a function of
+/// the retained constituents and the declaration (`joinHolon A.holon B.holon F E`), Dirac by
+/// `joinD_isDirac` once check 2 of `interconnect` holds; so the constituents and the gluing are a
+/// complete representation of the whole's port Holon, and its dense kernel form is a chart of them,
+/// built only when a reader asks for it ([`Holon::port_holon`]). The port counts are read without
+/// assembling it ([`Holon::counts`]).
+#[derive(Clone, Debug)]
+enum PortLaw {
+    Declared(PortHolon),
+    Joined {
+        counts: PortCounts,
+        join: Arc<crate::holarchy::Join>,
+        assembled: Arc<OnceLock<PortHolon>>,
+    },
+}
+
+impl PortLaw {
+    fn counts(&self) -> PortCounts {
+        match self {
+            Self::Declared(port_holon) => port_holon.counts,
+            Self::Joined { counts, .. } => *counts,
+        }
+    }
+
+    fn get(&self) -> &PortHolon {
+        match self {
+            Self::Declared(port_holon) => port_holon,
+            Self::Joined {
+                join, assembled, ..
+            } => assembled.get_or_init(|| {
+                join.assemble().expect(
+                    "the constituents' structures are certified Dirac and check 2 of \
+                     `interconnect` admitted `EᵀF = 1`, so the join is Dirac \
+                     (Lean `Holarchy/Join.joinD_isDirac`) on the ports its layout counts",
+                )
+            }),
+        }
+    }
+}
+
+impl PartialEq for PortLaw {
+    /// The same law: the same join (the whole is a function of it), or equal port Holons.
+    fn eq(&self, other: &Self) -> bool {
+        if let (Self::Joined { join: a, .. }, Self::Joined { join: b, .. }) = (self, other)
+            && (Arc::ptr_eq(a, b) || a == b)
+        {
+            return true;
+        }
+        self.counts() == other.counts() && self.get() == other.get()
+    }
+}
+
+impl Eq for PortLaw {}
+
 /// [definition] **The Holon (the law)**: the port Holon and its element relations, placed on its
 /// complex and connection with its oriented interior chain and the face each external port sits
 /// on, with its named ports, navigators and restrictions (Lean `Holarchy/Join.Constituent`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Holon {
-    port_holon: PortHolon,
+    port: PortLaw,
     active: ActiveRelation,
     pump: Option<Pump>,
     ports: Option<Vec<Port>>,
@@ -469,8 +528,41 @@ impl Holon {
     pub fn new(port_holon: PortHolon) -> Result<Self, HolonError> {
         let alpha = port_holon.counts.active;
         Ok(Self {
-            port_holon,
+            port: PortLaw::Declared(port_holon),
             active: ActiveRelation::new(ExactRatMatrix::zero(alpha, alpha)?)?,
+            pump: None,
+            ports: None,
+            complex: None,
+            connection: None,
+            interior: None,
+            port_faces: None,
+            navigators: Vec::new(),
+            restrictions: Vec::new(),
+        })
+    }
+
+    /// [definition] **The whole of a join, on its declared active relation**: its port Holon is
+    /// the join's, assembled on first read ([`PortLaw`]); nothing dense is built here.
+    pub(crate) fn joined(
+        counts: PortCounts,
+        join: Arc<crate::holarchy::Join>,
+        active: ActiveRelation,
+    ) -> Result<Self, HolonError> {
+        let l = active.relation();
+        if l.rows() != counts.active || l.columns() != counts.active {
+            return Err(HolonError::Shape {
+                what: "active relation extent",
+                expected: counts.active,
+                found: l.rows(),
+            });
+        }
+        Ok(Self {
+            port: PortLaw::Joined {
+                counts,
+                join,
+                assembled: Arc::new(OnceLock::new()),
+            },
+            active,
             pump: None,
             ports: None,
             complex: None,
@@ -484,7 +576,7 @@ impl Holon {
 
     /// Declare the active relation `e_A = L f_A` on the active ports.
     pub fn with_active(mut self, relation: ActiveRelation) -> Result<Self, HolonError> {
-        let alpha = self.port_holon.counts.active;
+        let alpha = self.counts().active;
         let l = relation.relation();
         if l.rows() != alpha || l.columns() != alpha {
             return Err(HolonError::Shape {
@@ -499,10 +591,10 @@ impl Holon {
 
     /// Declare a storage pump; its schedule must match the storage extent.
     pub fn with_pump(mut self, pump: Pump) -> Result<Self, HolonError> {
-        if pump.schedule.extent() != self.port_holon.counts.storage {
+        if pump.schedule.extent() != self.counts().storage {
             return Err(HolonError::Shape {
                 what: "pump storage extent",
-                expected: self.port_holon.counts.storage,
+                expected: self.counts().storage,
                 found: pump.schedule.extent(),
             });
         }
@@ -512,10 +604,10 @@ impl Holon {
 
     /// Name the ports; one per port of `D`.
     pub fn with_ports(mut self, ports: Vec<Port>) -> Result<Self, HolonError> {
-        if ports.len() != self.port_holon.counts.total() {
+        if ports.len() != self.counts().total() {
             return Err(HolonError::Shape {
                 what: "named ports",
-                expected: self.port_holon.counts.total(),
+                expected: self.counts().total(),
                 found: ports.len(),
             });
         }
@@ -563,7 +655,7 @@ impl Holon {
             what: "port faces",
             reason: "the Holon is placed on no complex",
         })?;
-        let external = self.port_holon.counts.external;
+        let external = self.counts().external;
         if faces.len() != external {
             return Err(HolonError::Shape {
                 what: "port faces (one per external port)",
@@ -589,10 +681,10 @@ impl Holon {
 
     /// Declare a restriction; its source must be this Holon's ports.
     pub fn with_restriction(mut self, map: PortMap) -> Result<Self, HolonError> {
-        if map.source_ports() != self.port_holon.counts.total() {
+        if map.source_ports() != self.counts().total() {
             return Err(HolonError::Shape {
                 what: "restriction source ports",
-                expected: self.port_holon.counts.total(),
+                expected: self.counts().total(),
                 found: map.source_ports(),
             });
         }
@@ -600,8 +692,14 @@ impl Holon {
         Ok(self)
     }
 
+    /// The port Holon: the declared one, or a join's, assembled on this first read.
     pub fn port_holon(&self) -> &PortHolon {
-        &self.port_holon
+        self.port.get()
+    }
+
+    /// The port counts of the four kinds, read without assembling a join's port Holon.
+    pub fn counts(&self) -> PortCounts {
+        self.port.counts()
     }
 
     pub fn active(&self) -> &ActiveRelation {
@@ -646,19 +744,20 @@ impl Holon {
     pub fn storage_at(&self, commit: u64) -> &SymmetricForm {
         match &self.pump {
             Some(pump) => pump.schedule.storage_at(commit),
-            None => self.port_holon.storage(),
+            None => self.port_holon().storage(),
         }
     }
 
     /// The element relations as a list, each on its kind.
     pub fn elements(&self) -> Vec<ElementRelation> {
+        let port_holon = self.port_holon();
         let mut out = vec![
             ElementRelation::Storage {
-                form: self.port_holon.storage.clone(),
+                form: port_holon.storage.clone(),
             },
-            ElementRelation::Resistive(self.port_holon.resistance.clone()),
+            ElementRelation::Resistive(port_holon.resistance.clone()),
             ElementRelation::Source {
-                ports: self.port_holon.counts.external,
+                ports: port_holon.counts.external,
             },
             ElementRelation::Active(self.active.clone()),
         ];
@@ -680,7 +779,7 @@ impl Holon {
 
     /// `⟨f, R f⟩` on the resistive ports.
     pub fn dissipation(&self, flow: &[Rat]) -> Result<Rat, HolonError> {
-        Ok(quad(self.port_holon.resistance.resistance(), flow)?)
+        Ok(quad(self.port_holon().resistance.resistance(), flow)?)
     }
 }
 

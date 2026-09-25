@@ -7,7 +7,7 @@
 //! H = (K, ∂_A;  Π;  𝒟;  𝓔;  G;  π)
 //! ```
 //!
-//! The library is eight operator modules, each implementing rows of the
+//! The library is ten modules, each implementing rows of the
 //! [operator contract](../../../docs/ELEMENTARY_OBJECTS.md#operator-contract):
 //!
 //! - [`ratio`]: one per two. The exact rational, rings, the exponentiated/log chart, surprisal,
@@ -31,6 +31,11 @@
 //!   against terrain, whose kernel quotient is retention and whose cokernel is the residual; the
 //!   resonating/emanating split of a drive; the cost `Kt` against the literal; and locating keys
 //!   by loop closure.
+//! - [`hnn`]: the HNN law over aeons — closing rotor rings joined by pair contacts, the change that
+//!   opens at zero and propagates one contact per tick, deposition, retention at the aeon
+//!   boundary, and the exact host reference of the execution port.
+//! - [`physics`]: the physical instances — fluid, wave, thermal, spacetime and the information
+//!   port — each with its constitutive equations, clocks, balances and participating receiver.
 //!
 //! Every law computes over exact rationals; no float enters a law. Each module header names its
 //! Lean owner relative to the Lean library root.
@@ -38,6 +43,7 @@
 pub mod aeon;
 pub mod compression;
 pub mod geometry;
+pub mod hnn;
 pub mod holarchy;
 pub mod holon;
 pub mod navigator;

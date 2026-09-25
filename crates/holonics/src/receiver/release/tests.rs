@@ -888,6 +888,98 @@ fn two_lawful_laws_return_different_arms() {
     assert_ne!(held, asked);
 }
 
+/// Rebuild step 4 addition 8 (Lean `ReleaseLaw.sound`): **the decision as data.** A declared
+/// [`DecisionRule`] releases inside its tolerance and takes its declared arm beyond it; every
+/// return passes [`release`], a widening too narrow is refused like any law's, an offer the
+/// options do not carry falls back to holding, and two rules on one width return different arms.
+#[test]
+fn a_decision_rule_is_a_declared_law_as_data() {
+    let options = plural_options();
+    let family = CompatibleFamily::enumerated("fibre", vec![vec![integer(0)], vec![ratio(1, 2)]])
+        .expect("a family");
+    let reading = Coordinate {
+        receiver: "x".to_owned(),
+        at: 0,
+    };
+    let narrow = LawfulOptions::assemble(
+        &width_enumerated(&reading, &family, DiameterNorm::Supremum).expect("a width"),
+        integer(1),
+        None,
+        None,
+        true,
+    )
+    .expect("coherent options");
+    let releasing = DecisionRule::new(
+        "release, else widen to 4",
+        WithinTolerance::Release,
+        BeyondTolerance::Widen(integer(4)),
+    );
+    assert_eq!(releasing.name(), "release, else widen to 4");
+    assert_eq!(
+        release(&releasing, &narrow).expect("lawful"),
+        ReleaseReturn::Released {
+            width: ratio(1, 2),
+            tolerance: integer(1)
+        }
+    );
+    assert_eq!(
+        release(&releasing, &options).expect("lawful"),
+        ReleaseReturn::Widen {
+            tolerance: integer(4)
+        }
+    );
+    let too_narrow = DecisionRule::new(
+        "widen to 2",
+        WithinTolerance::Hold,
+        BeyondTolerance::Widen(integer(2)),
+    );
+    assert!(matches!(
+        release(&too_narrow, &options),
+        Err(WidthRefusal::WidenTooNarrow(_))
+    ));
+    assert_eq!(
+        release(&too_narrow, &narrow).expect("lawful"),
+        ReleaseReturn::Hold
+    );
+    for beyond in [
+        BeyondTolerance::Ask,
+        BeyondTolerance::ReleaseCoarser,
+        BeyondTolerance::NoContinuation("bridged".to_owned()),
+        BeyondTolerance::Hold,
+    ] {
+        let rule = DecisionRule::new("offer-bound", WithinTolerance::Release, beyond);
+        assert_eq!(
+            release(&rule, &options).expect("lawful"),
+            ReleaseReturn::Hold
+        );
+    }
+    let unbridged = LawfulOptions::assemble(
+        &width_enumerated(
+            &reading,
+            &CompatibleFamily::enumerated("fibre", vec![vec![integer(0)], vec![integer(4)]])
+                .expect("a family"),
+            DiameterNorm::Supremum,
+        )
+        .expect("a width"),
+        integer(1),
+        None,
+        None,
+        false,
+    )
+    .expect("coherent options");
+    let reporting = DecisionRule::new(
+        "report",
+        WithinTolerance::Release,
+        BeyondTolerance::NoContinuation("no admitted continuation".to_owned()),
+    );
+    assert_eq!(
+        release(&reporting, &unbridged).expect("lawful"),
+        ReleaseReturn::NoContinuationBridges {
+            reason: "no admitted continuation".to_owned()
+        }
+    );
+}
+
 /// Lean: `ReleaseLaw.sound`. **The one thing the library owns.** A law claiming release outside its
 /// own declared tolerance is refused by name.
 #[test]

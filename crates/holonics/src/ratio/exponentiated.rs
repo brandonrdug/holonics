@@ -105,7 +105,9 @@ use thiserror::Error;
 
 use super::surprisal::SymbolicSurprisal;
 
+mod carried;
 mod transport;
+pub use carried::{CarriedPower, PhaseField, READING_BITS, power_of_two};
 pub use transport::{NormalizedKernel, NormalizedKernelError};
 
 /// `2^form`, exactly, when the form's coefficients are integers.
@@ -346,6 +348,20 @@ pub enum RatioError {
         "a reciprocal temperature of zero sends every ratio to one, which is no distinction at all"
     )]
     DegenerateTemperature,
+    #[error(
+        "a carried power needs a grain L ≥ 1 and a phase class below it; found phase {phase} of grain {grain}"
+    )]
+    Grain { phase: u64, grain: u64 },
+    #[error("values of Q(theta) at grains {left} and {right} do not combine")]
+    GrainMismatch { left: u64, right: u64 },
+    #[error("zero has no inverse in Q(theta)")]
+    ZeroHasNoInverse,
+    #[error("an enclosure's bounds are out of order")]
+    Enclosure,
+    #[error("the carry {carry} of 2^carry is past the machine word; it is refused, never rounded")]
+    CarryTooWide { carry: num_bigint::BigInt },
+    #[error(transparent)]
+    Linear(#[from] crate::ratio::linear::ExactLinearError),
 }
 
 #[cfg(test)]

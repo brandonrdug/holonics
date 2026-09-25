@@ -127,7 +127,7 @@ pub fn check_interaction<L: HolonLaw>(
     }
     let advance = check_exact_advance(&composite, &HolonState::new(configuration), input)?;
     let resistive = port_holon.split(&advance.bond)?.resistive;
-    let split = a.holon().port_holon().counts().resistive;
+    let split = a.holon().counts().resistive;
     let (flow_a, flow_b) = resistive.flow().split_at(split);
     let sum = a.holon().dissipation(flow_a)? + b.holon().dissipation(flow_b)?;
     if composite.holon().dissipation(resistive.flow())? != sum {
@@ -588,6 +588,9 @@ mod tests {
                 &reader,
                 &ReceiptLaw::new(3, Vec::new(), Vec::new()).unwrap(),
             )
+            .unwrap()
+            .forward
+            .into_present()
             .unwrap();
         let own = law.advance(&state, &input).unwrap();
         let effort = law.kinds(&own).unwrap().storage.effort().to_vec();

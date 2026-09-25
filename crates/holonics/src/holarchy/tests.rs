@@ -335,9 +335,30 @@ fn the_unit_gain_join_is_the_dirac_interconnection() {
             &[(a.external_offset() + 1, b.external_offset())],
         )
         .unwrap()
-        .relabel(&holarchy.layout.composed_order())
+        .relabel(&holarchy.join.layout.composed_order())
         .unwrap();
     assert!(holarchy.whole().port_holon().dirac().same_subspace(&direct));
+}
+
+/// `Holarchy/Join.Holarchy.whole` is a function of the retained join, so the whole joins again
+/// (`Holarchy.wholeConstituent`) before its port Holon is assembled: three media chained through
+/// the first join's unread whole have exactly the port Holon of the same chain joined through that
+/// whole once it is read.
+#[test]
+fn a_whole_joins_again_before_its_port_holon_is_assembled() {
+    let (a, b, c) = (medium(2, 2), medium(3, 2), medium(5, 1));
+    let first = a.interconnect(&b, &shared(&[(1, 0)])).unwrap();
+    let unread = first.whole().interconnect(&c, &shared(&[(1, 0)])).unwrap();
+    assert_eq!(unread.whole().counts().storage, 3);
+    let read = Holon::new(first.whole().port_holon().clone()).unwrap();
+    let joined = read.interconnect(&c, &shared(&[(1, 0)])).unwrap();
+    let (unread, joined) = (unread.whole().port_holon(), joined.whole().port_holon());
+    assert_eq!(unread.counts(), joined.counts());
+    assert!(unread.dirac().same_subspace(joined.dirac()));
+    assert_eq!(
+        (unread.storage(), unread.resistance()),
+        (joined.storage(), joined.resistance())
+    );
 }
 
 /// `Holarchy/Join.Holarchy.power_balance`, `Holarchy.balance_is_sum`: at an admitted point of the whole,

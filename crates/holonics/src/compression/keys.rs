@@ -49,6 +49,10 @@ use crate::holon::contact::menu::{
 };
 use crate::navigator::Clock;
 
+mod edges;
+
+pub use edges::{Edge, Propagation};
+
 /// The ceiling on the candidate boundary images one enumeration forms.
 ///
 /// \[definition; agent-inferred\] `n` ports take `n!/(n − m)!` injective images at `m` menu ports;
@@ -213,11 +217,13 @@ impl<Key> Loop<Key> {
     }
 }
 
-/// [definition] **A menu**: a finite family of loops over a declared port population.
+/// [definition] **A menu**: a finite family of loops, and of edges (its one-stage open paths,
+/// [`Edge`]), over a declared port population.
 #[derive(Debug)]
 pub struct Menu<Key> {
     ports: usize,
     loops: Vec<Loop<Key>>,
+    edges: Vec<Edge<Key>>,
 }
 
 impl<Key: Clone> Menu<Key> {
@@ -226,7 +232,38 @@ impl<Key: Clone> Menu<Key> {
         for current in &loops {
             check_port(current.port, ports)?;
         }
-        Ok(Self { ports, loops })
+        Ok(Self {
+            ports,
+            loops,
+            edges: Vec::new(),
+        })
+    }
+
+    /// **A menu of edges** on `ports` ports (addition 7 of the step-4 design): the open paths the
+    /// data forms; an edge port outside them is refused. Its closed paths are its loops.
+    pub fn of_edges(ports: usize, edges: Vec<Edge<Key>>) -> Result<Self, CompressionError> {
+        for edge in &edges {
+            check_port(edge.from(), ports)?;
+            check_port(edge.to(), ports)?;
+        }
+        Ok(Self {
+            ports,
+            loops: Vec::new(),
+            edges,
+        })
+    }
+
+    /// The edges, in menu order.
+    pub fn edges(&self) -> &[Edge<Key>] {
+        &self.edges
+    }
+
+    /// **The menu with one more observed edge** at its end.
+    pub fn with_edge(mut self, observed: Edge<Key>) -> Result<Self, CompressionError> {
+        check_port(observed.from(), self.ports)?;
+        check_port(observed.to(), self.ports)?;
+        self.edges.push(observed);
+        Ok(self)
     }
 
     /// The port population.
@@ -239,9 +276,10 @@ impl<Key: Clone> Menu<Key> {
         &self.loops
     }
 
-    /// The menu's ports: the distinct loop ports, sorted.
+    /// The menu's ports: the distinct loop and edge ports, sorted.
     pub fn menu_ports(&self) -> Vec<usize> {
         let mut ports: Vec<usize> = self.loops.iter().map(Loop::port).collect();
+        ports.extend(self.edges.iter().flat_map(|edge| [edge.from(), edge.to()]));
         ports.sort_unstable();
         ports.dedup();
         ports
@@ -334,9 +372,9 @@ impl<Key> std::fmt::Debug for Gauge<Key> {
 
 impl<Key: Clone> Gauge<Key> {
     /// **A gauge of a menu**, checked: the boundary turn acts on the menu's ports, and at every
-    /// declared key every loop's stage word under `γ k` is its word under `k` conjugated by `ρ`
-    /// (Lean `Gauge.covariant`). A relabelling that breaks covariance is refused with the loop and
-    /// key where it breaks.
+    /// declared key every loop's stage word, and every edge's stage, under `γ k` is its word under
+    /// `k` conjugated by `ρ` (Lean `Gauge.covariant`). A relabelling that breaks covariance is
+    /// refused with the loop or edge and the key where it breaks.
     pub fn new(
         menu: &Menu<Key>,
         keys: &[Key],
@@ -361,6 +399,17 @@ impl<Key: Clone> Gauge<Key> {
                 if current.stages(&relabel(key))? != conjugated {
                     return Err(CompressionError::NotCovariant {
                         loop_index,
+                        key_index,
+                    });
+                }
+            }
+        }
+        for (edge_index, edge) in menu.edges().iter().enumerate() {
+            for (key_index, key) in keys.iter().enumerate() {
+                let conjugated = inverse.multiply(&edge.stage(key)?)?.multiply(&boundary)?;
+                if edge.stage(&relabel(key))? != conjugated {
+                    return Err(CompressionError::EdgeNotCovariant {
+                        edge_index,
                         key_index,
                     });
                 }
@@ -469,6 +518,16 @@ impl ReflectorMachine {
         let machine = self.clone();
         Loop::new(port, move |key: &Clock| {
             Ok(vec![machine.stage(&machine.position(key, &step))?])
+        })
+    }
+
+    /// **The one-stage edge `from — to` reached `step` ticks after the key**: the reflected return
+    /// at that rotor position, `S(to) = ρ^{−m} F ρ^m S(from)` with `m = key + step`. Its stage is
+    /// an involution whenever the reflector is, so the edge is traversed both ways.
+    pub fn edge_at(&self, from: usize, to: usize, step: BigUint) -> Edge<Clock> {
+        let machine = self.clone();
+        Edge::new(from, to, move |key: &Clock| {
+            machine.stage(&machine.position(key, &step))
         })
     }
 

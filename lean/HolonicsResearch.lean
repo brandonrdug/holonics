@@ -69,7 +69,6 @@ import Holonics.Computation.CslibExecutionReceiver
 import Holonics.Computation.HolonicMachineLearning
 import Holonics.Computation.HolonicRecurrentEcology
 import Holonics.Computation.HolonicConstitutiveFibre
-import HolonicsResearch.Computation.HolonicConstitutiveCirculation
 import HolonicsResearch.Computation.HolonicConstitutiveRechart
 import HolonicsResearch.Computation.HolonicResidentRestriction
 import HolonicsResearch.Computation.HolonicCausalTailLens

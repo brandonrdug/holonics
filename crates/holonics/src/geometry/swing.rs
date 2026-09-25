@@ -17,9 +17,15 @@
 //! The cross ratio is carried as its undivided [`Presentation`] (`swingPair`), so a vanishing
 //! denominator is a named fibre rather than an invented infinity.
 //!
+//! [definition] **The anchor lives in any exact affine space over ℚ** ([`RationalPoint`]): a frame
+//! point [`RatVec3`] or a vector of `ℚ^d`. Lean `Geometry/AffineSwing` states the Swing and its laws
+//! over every `AddCommGroup`, so one statement covers both; the HNN's junction Swing
+//! `o = 2v − a` about the participation anchor `v ∈ ℚ^(2d_r)` is this Swing
+//! (`crate::hnn::propagation::junction_swing`).
+//!
 //! | Lean | Rust |
 //! |---|---|
-//! | `Geometry/AffineSwing.swing`, `theSwingNegatesTheDisplacementFromTheAnchor`, `theSwingIsAnInvolution`, `theAnchorIsFixed` | [`swing`] |
+//! | `Geometry/AffineSwing.swing`, `theSwingNegatesTheDisplacementFromTheAnchor`, `theSwingIsAnInvolution`, `theAnchorIsFixed` | [`swing`], on every [`RationalPoint`] |
 //! | `Geometry/AffineSwing.twoSwingsAreADoubledTranslation`, `theSwingsDoNotCommute` | [`composed_translation`] |
 //! | `Geometry/HolonicPantographicSwingJets.pantographicPoint`, `pantographicPoint_neg_one_eq_swing` | [`pantograph`] |
 //! | `Geometry/Swing.constraintChart`, `harmonicConjugate`, `theSwingIsNegationInTheConstraintChart` | [`constraint_chart`], [`harmonic_conjugate`] |
@@ -30,21 +36,69 @@ use num_traits::Zero;
 use crate::geometry::RatVec3;
 use crate::ratio::{Presentation, Rat, integer};
 
-/// **The Swing** `S_a x = 2a − x`: the half-turn of `x` about the anchor `a`.
-pub fn swing(anchor: &RatVec3, body: &RatVec3) -> RatVec3 {
-    anchor.scale(&integer(2)).subtract(body)
+/// [definition] **A point of an exact affine space over ℚ**: what a Swing's anchor and body are
+/// (Lean `Geometry/AffineSwing` is stated over every `AddCommGroup`). Two points of one space have
+/// one dimension; the operations below are defined for such a pair.
+pub trait RationalPoint: Clone + PartialEq {
+    /// The space's dimension.
+    fn dimension(&self) -> usize;
+    /// `self + other`.
+    fn plus(&self, other: &Self) -> Self;
+    /// `self − other`.
+    fn minus(&self, other: &Self) -> Self;
+    /// `s · self`.
+    fn scaled(&self, factor: &Rat) -> Self;
+}
+
+impl RationalPoint for RatVec3 {
+    fn dimension(&self) -> usize {
+        3
+    }
+    fn plus(&self, other: &Self) -> Self {
+        self.add(other)
+    }
+    fn minus(&self, other: &Self) -> Self {
+        self.subtract(other)
+    }
+    fn scaled(&self, factor: &Rat) -> Self {
+        self.scale(factor)
+    }
+}
+
+/// `ℚ^d`: coordinatewise, for two vectors of one dimension `d`.
+impl RationalPoint for Vec<Rat> {
+    fn dimension(&self) -> usize {
+        self.len()
+    }
+    fn plus(&self, other: &Self) -> Self {
+        debug_assert_eq!(self.len(), other.len(), "two points of one space");
+        self.iter().zip(other).map(|(a, b)| a + b).collect()
+    }
+    fn minus(&self, other: &Self) -> Self {
+        debug_assert_eq!(self.len(), other.len(), "two points of one space");
+        self.iter().zip(other).map(|(a, b)| a - b).collect()
+    }
+    fn scaled(&self, factor: &Rat) -> Self {
+        self.iter().map(|a| a * factor).collect()
+    }
+}
+
+/// **The Swing** `S_a x = 2a − x`: the half-turn of `x` about the anchor `a`, in any exact affine
+/// space over ℚ (anchor and body of one dimension).
+pub fn swing<P: RationalPoint>(anchor: &P, body: &P) -> P {
+    anchor.scaled(&integer(2)).minus(body)
 }
 
 /// The translation two Swings compose to: `S_second ∘ S_first` moves every point by
 /// `2(second − first)`.
-pub fn composed_translation(first: &RatVec3, second: &RatVec3) -> RatVec3 {
-    second.subtract(first).scale(&integer(2))
+pub fn composed_translation<P: RationalPoint>(first: &P, second: &P) -> P {
+    second.minus(first).scaled(&integer(2))
 }
 
 /// **The pantograph** `O + s (P − O)`: scaling about the anchor `O`. Serial passages multiply
 /// their scales, and the scale `−1` is the Swing.
-pub fn pantograph(anchor: &RatVec3, scale: &Rat, input: &RatVec3) -> RatVec3 {
-    anchor.add(&input.subtract(anchor).scale(scale))
+pub fn pantograph<P: RationalPoint>(anchor: &P, scale: &Rat, input: &P) -> P {
+    anchor.plus(&input.minus(anchor).scaled(scale))
 }
 
 /// The chart the anchor `b` and the board `d` declare on a line: `x ↦ (x − b)/(x − d)`, sending
@@ -100,6 +154,29 @@ mod tests {
         assert_eq!(ba, x.add(&composed_translation(&a, &b)));
         let ab = swing(&a, &swing(&b, &x));
         assert_eq!(ba.subtract(&ab), b.subtract(&a).scale(&integer(4)));
+    }
+
+    /// Lean `Geometry/AffineSwing` over `ℚ^d`: the Swing about a vector anchor of any dimension is
+    /// the same half-turn, an involution fixing its anchor, and two such Swings compose to the
+    /// doubled translation.
+    #[test]
+    fn the_swing_acts_on_vectors_of_any_dimension() {
+        let anchor: Vec<Rat> = vec![rat(1, 2), integer(-3), integer(0), rat(7, 5), integer(2)];
+        let other: Vec<Rat> = vec![integer(4), rat(-1, 3), integer(1), integer(0), integer(-2)];
+        let body: Vec<Rat> = vec![integer(3), integer(1), rat(2, 9), integer(-4), integer(5)];
+        let swung = swing(&anchor, &body);
+        assert_eq!(
+            swung.minus(&anchor),
+            body.minus(&anchor).scaled(&integer(-1))
+        );
+        assert_eq!(swing(&anchor, &swung), body);
+        assert_eq!(swing(&anchor, &anchor), anchor);
+        assert_eq!(
+            swing(&other, &swing(&anchor, &body)),
+            body.plus(&composed_translation(&anchor, &other))
+        );
+        assert_eq!(pantograph(&anchor, &integer(-1), &body), swung);
+        assert_eq!(anchor.dimension(), 5);
     }
 
     /// Lean `pantographicPoint_neg_one_eq_swing` and composition: scale `−1` is the Swing, and two

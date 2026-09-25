@@ -1,0 +1,24 @@
+# The HNN's guards 7 and 12 (docs/plans/THE_REBUILD.md, step 4 design (g)): no float and no file
+# system or process inside the machinery. `hnn` denies both lints; the rest of the crate is clean
+# of them and warns. An exterior boundary (a notebook reading a file) allows them where it reads.
+disallowed-types = [
+    { path = "f32", reason = "exact arithmetic: no float inside a law (guard 12)" },
+    { path = "f64", reason = "exact arithmetic: no float inside a law (guard 12)" },
+    { path = "std::fs::File", reason = "no file system inside the machinery (guard 7)" },
+    { path = "std::fs::OpenOptions", reason = "no file system inside the machinery (guard 7)" },
+    { path = "std::process::Command", reason = "no process inside the machinery (guard 7)" },
+    { path = "std::process::Child", reason = "no process inside the machinery (guard 7)" },
+]
+disallowed-methods = [
+    { path = "std::fs::read", reason = "no file system inside the machinery (guard 7)" },
+    { path = "std::fs::read_to_string", reason = "no file system inside the machinery (guard 7)" },
+    { path = "std::fs::read_dir", reason = "no file system inside the machinery (guard 7)" },
+    { path = "std::fs::write", reason = "no file system inside the machinery (guard 7)" },
+    { path = "std::fs::create_dir_all", reason = "no file system inside the machinery (guard 7)" },
+    { path = "std::fs::remove_file", reason = "no file system inside the machinery (guard 7)" },
+    { path = "std::fs::File::open", reason = "no file system inside the machinery (guard 7)" },
+    { path = "std::fs::File::create", reason = "no file system inside the machinery (guard 7)" },
+    { path = "std::process::Command::new", reason = "no process inside the machinery (guard 7)" },
+    { path = "std::process::exit", reason = "no process inside the machinery (guard 7)" },
+    { path = "std::process::abort", reason = "no process inside the machinery (guard 7)" },
+]

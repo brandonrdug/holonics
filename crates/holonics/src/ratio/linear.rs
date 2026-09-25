@@ -314,20 +314,42 @@ impl ExactRatMatrix {
         let mut work = crate::ratio::work::ExactWork::nothing();
         work.resident(u64::try_from(self.rows.saturating_mul(other.columns)).unwrap_or(u64::MAX));
         work.stepped();
-        let mut result = Self::zero(self.rows, other.columns)?;
-        for row in 0..self.rows {
-            for column in 0..other.columns {
-                let mut value = Rat::zero();
-                for inner in 0..self.columns {
-                    value += self.get(row, inner)? * other.get(inner, column)?;
-                    work.multiplied(1);
-                    work.added(1);
-                }
+        // The integral chart: each row of `self` and each column of `other` as integers over its
+        // own least common denominator, so each entry is one integer sum normalized once. A reduced
+        // ratio is canonical, so the entries are the termwise sums'.
+        let left: Vec<(Vec<BigInt>, BigInt)> = (0..self.rows)
+            .map(|row| vector::integral(&self.entries[self.span(row)]))
+            .collect();
+        let right: Vec<(Vec<BigInt>, BigInt)> = (0..other.columns)
+            .map(|column| {
+                let values: Vec<Rat> = (0..other.rows)
+                    .map(|inner| other.entries[inner * other.columns + column].clone())
+                    .collect();
+                vector::integral(&values)
+            })
+            .collect();
+        let inner = u64::try_from(self.columns).unwrap_or(u64::MAX);
+        let mut entries = Vec::with_capacity(self.rows.saturating_mul(other.columns));
+        for (row, row_denominator) in &left {
+            for (column, column_denominator) in &right {
+                let value = Rat::new(
+                    vector::integer_dot(row, column),
+                    row_denominator * column_denominator,
+                );
+                work.multiplied(inner);
+                work.added(inner);
                 work.wrote(&value);
-                result.set(row, column, value)?;
+                entries.push(value);
             }
         }
-        Ok((result, work))
+        Ok((
+            Self {
+                rows: self.rows,
+                columns: other.columns,
+                entries,
+            },
+            work,
+        ))
     }
 
     /// The monic characteristic polynomial, computed by exact Faddeev--LeVerrier recurrence.
@@ -523,24 +545,20 @@ impl ExactRatMatrix {
         Ok((Self::new(rows)?, work))
     }
 
+    /// `M v`, read in the integral chart: `v` as integers over its least common denominator, each
+    /// row's integer sum normalized once (the same values as the termwise sums).
     pub fn apply(&self, vector: &[Rat]) -> Result<Vec<Rat>, ExactLinearError> {
         if self.columns != vector.len() {
             return Err(ExactLinearError::ShapeMismatch);
         }
-        let mut result = Vec::with_capacity(self.rows);
-        for row in 0..self.rows {
-            let value = self
-                .row(row)?
-                .iter()
-                .zip(vector)
-                .fold(Rat::zero(), |sum, (coefficient, value)| {
-                    sum + coefficient * value
-                });
-            result.push(value);
-        }
-        Ok(result)
+        let (values, denominator) = vector::integral(vector);
+        Ok((0..self.rows)
+            .map(|row| vector::row_dot(&self.entries[self.span(row)], &values, &denominator))
+            .collect())
     }
 
+    /// **The inverse**, certified against the identity on both sides. An integral matrix is
+    /// inverted by fraction-free elimination; a rational one through its integral chart.
     pub fn inverse(&self) -> Result<Self, ExactLinearError> {
         if !self.is_square() {
             return Err(ExactLinearError::NonsquareMatrix);
@@ -548,60 +566,15 @@ impl ExactRatMatrix {
         if self.entries.iter().all(|entry| entry.denom().is_one()) {
             return self.inverse_integral_fraction_free();
         }
-        let extent = self.rows;
-        let mut left = (0..extent)
-            .map(|row| self.row(row).map(ToOwned::to_owned))
-            .collect::<Result<Vec<_>, _>>()?;
-        let mut right = (0..extent)
-            .map(|row| {
-                (0..extent)
-                    .map(|column| {
-                        if row == column {
-                            Rat::one()
-                        } else {
-                            Rat::zero()
-                        }
-                    })
-                    .collect::<Vec<_>>()
-            })
-            .collect::<Vec<_>>();
-
-        for column in 0..extent {
-            let pivot = (column..extent)
-                .find(|row| !left[*row][column].is_zero())
-                .ok_or(ExactLinearError::SingularMatrix)?;
-            if pivot != column {
-                left.swap(pivot, column);
-                right.swap(pivot, column);
-            }
-            let divisor = left[column][column].clone();
-            for entry in &mut left[column] {
-                *entry /= &divisor;
-            }
-            for entry in &mut right[column] {
-                *entry /= &divisor;
-            }
-            let pivot_left = left[column].clone();
-            let pivot_right = right[column].clone();
-            for row in 0..extent {
-                if row == column || left[row][column].is_zero() {
-                    continue;
-                }
-                let factor = left[row][column].clone();
-                for (entry, pivot_entry) in left[row].iter_mut().zip(&pivot_left) {
-                    *entry -= &factor * pivot_entry;
-                }
-                for (entry, pivot_entry) in right[row].iter_mut().zip(&pivot_right) {
-                    *entry -= &factor * pivot_entry;
-                }
-            }
-        }
-        let inverse = Self::new(right)?;
-        let identity = Self::identity(extent)?;
-        if self.multiply(&inverse)? != identity || inverse.multiply(self)? != identity {
-            return Err(ExactLinearError::InverseCertificateFailure);
-        }
-        Ok(inverse)
+        // A rational matrix is its integral chart over the entries' common denominator `D`:
+        // `M⁻¹ = D (D M)⁻¹`, the unique inverse, with the fraction-free elimination's certificate
+        // checked on `D M` in both directions (`(DM)X = X(DM) = I` is `M(DX) = (DX)M = I`).
+        let denominator = vector::common_denominator(&self.entries);
+        let scale = Rat::from_integer(denominator);
+        Ok(self
+            .scaled(&scale)
+            .inverse_integral_fraction_free()?
+            .scaled(&scale))
     }
 
     /// Fraction-free Gauss--Jordan (Montante/Bareiss) for an integral presentation.  The
