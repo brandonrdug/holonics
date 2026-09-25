@@ -543,8 +543,9 @@ passivity is proved, not assumed.
 
 ### The constitutive scattering operator
 
-[definition] With incident current `u`, stored interior current `b` and contact material `D`, the
-normalized unit-admittance chart is
+[definition] **A global chart, not the machine's step.** With incident current `u`, stored interior
+current `b` and contact material `D`, the normalized unit-admittance chart of the whole contact
+graph is
 
 ```text
 A = I + D D*,
@@ -553,8 +554,12 @@ w = v − u,                 b_next = D* v − b.
 ```
 
 This couples exterior and interior currents; `D` is constitution, not a descriptor appended to a
-separate example. A model built from this operation computes those currents directly; fitting a
-second matrix to its outputs is a distinct surrogate task.
+separate example. It is also a global instantaneous solve over the contact graph, which is action
+at a distance, so the HNN never takes it as its step (light record §8.1). The step 4 word below
+is local: the junction Swing about the participation anchor, one contact hop per tick. This
+global scattering survives in two roles only:
+- as the overdamped continuum-limit reading of that local law (atlas `heat.telegraph-relaxation`);
+- as the prototype's history.
 
 [proved-derived; formal-checked] The scattering is the Swing
 `R_G x=2P_G x−x=Swing_(P_G x)(x)`, where
@@ -582,22 +587,34 @@ flowchart LR
 
 ### The incident word
 
-[definition] At site `r`, with standing `q` and admitted incoming ports `i`:
+[definition] **The step 4 word** ([the step 4 design](plans/THE_REBUILD.md#step-4-design-the-hnn-law)).
+- **The medium.** It is `(Θ, λ)`, fixed at the cut. `Θ` holds each ring's standing `q`.
+- **The open.** The word opens at zero change and receives the source moment on the source rings'
+  storage ports.
+- **The tick.** The word then runs one contact hop per tick:
 
 ```text
-u_ri = U_(r←i) q_i,          Δ_ri = u_ri − q_r,
-p_r  = softmax(β Re⟨q_r,u_ri⟩),     y_r = Σ_i p_ri u_ri,
-f_r  = Φ(q_r, Δ_r),          a_r = y_r + M_r f_r,          Φ(s,c) = s ⊕ c ⊕ (c ⊗ s),
-(w, b_ref) = S_D(a, b)       one global D and one interior b in the contact chart,
-z_next = H̄ z_anchor + (I−H̄)((1−μ) z_anchor + μ(w, b_ref)),     μ = 2^(−k).
+junction  v_r = (Y_r s_r + Σ_a G_a a_(r←a)) / (Y_r + Σ_a G_a),   G_a = κ_a Y_a,   κ_a = 2^(s_a), one exponent per contact
+          o_(r→a) = 2 v_r − a_(r←a)                                        the junction Swing
+element   (I − ½K_r) s_r′ = (I + ½K_r) b_r + W_c,r c_r,   b_r = 2 v_r − s_r,   c_r = v_r − s_r,   K_r = W_s,r + Σ_ρ σ_ρ,r A_ρ,r
+          (the contrast port drives inside the midpoint: Holon/Cayley.drive_balance; THE_REBUILD step 4 design)
+transit   the contact's midpoint two-port (C_a, K_a, D_a) on its channel, U_a = ι_(a,h) ι_(a,g)ᵀ
+receive   f_j = R[P_R^(τ_R) v_R(e_j)] at the receiving epochs, read at the receiver's grain
 ```
 
-Participation supplies the drive `y`; the local reaction reads standing `q` and transported
-differences `Δ`; one global `D/b` scatters their sum; `H̄` holds the declared boundary coordinates
-through every stage. The quadrance chart replaces the bilinear score by the pair receiver's
-`s_i=−β‖q_r−u_ri‖²/2`, the pair at zero advance and unit radii; a bilinear score is the pair
-quadrance up to the two self-energies (`HelicalPairInteraction.bilinear_score_eq_polarized_quadrance`,
-finite remainder `pairScore_add_sub`).
+- **Participation is the Swing's anchor.** The weights `G_a / (Y_r + Σ_a G_a)` are ring `r`'s
+  normalized participation. With one exponent `β_a` per contact, the tick conserves the global
+  power exactly when the elements are lossless.
+- **The score** `Q_a` is the pair quadrance of the two rings' screws. The current-space
+  `‖q_r − u_ri‖²` is its collapse at zero advance and unit radii. A bilinear score is the pair
+  quadrance up to the two self-energies (`HelicalPairInteraction.bilinear_score_eq_polarized_quadrance`,
+  finite remainder `pairScore_add_sub`).
+- **The sheet classes** `σ` are read from the standing's contrast `Δ_r = Σ_a U_(r←a) q_a − q_r`.
+- **At the word's end** the unread change is released, and nothing is carried to the next word.
+  The standing `q` moves only by deposition.
+- **What the word lacks.** It has no global `D/b`, no softmax drive, no boundary hold `H̄` and no
+  relaxation `μ`. Those belonged to the prototype's word, which is kept in history at
+  [`13f8c734`](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/HNN_FORMULA.md#the-incident-word).
 
 [proved-derived; formal-checked] **The reaction is power-neutral.** A complex-bilinear block
 `c⊗s` cannot be workless for every complex contrast `c`
@@ -607,35 +624,45 @@ skew, `J(c)=Σ_r c_r A_r` over the real coordinates of `c` with every slice skew
 explicitly, `x⁺=(I+hJ)x` gains `|x⁺|²=|x|²+h²|Jx|²`; the word therefore takes the Cayley step
 `C=(I−½hJ)⁻¹(I+½hJ)`, an isometry, and with resistance the midpoint balance
 `½|x⁺|²−½|x|²=−h⟨x̄,Rx̄⟩≤0` (`Holon/Cayley`; Rust `holonics::holon::reaction`). This is the
-power-neutral reaction step 4 builds; the learned material on `Φ` enters through it.
+power-neutral ring element of the step 4 word, taken at its sheet-class operands.
 
-[proved-derived] The producing carriers give the return. For the bilinear score,
-`r_j=Re⟨g_y,u_j⟩+Re(g_p[j])`, `h=(diag(p)−ppᵀ)r`, `g_q=βΣ_j h_j u_j`,
-`g_u[j]=p_j g_y+βh_j q`, `g_k[j]=U_j* g_u[j]`. For the quadrance score, with
-`h=J_p(⟨g_y,u_i⟩+g_p[i])`, `g_q=−βΣ_i h_i(q−u_i)` and `g_u[i]=p_i g_y+βh_i(q−u_i)`; both source
-roles join before `U_i*`. The condition contributes `−Σ_i g_Δi` at the query and `+g_Δi` at
-neighbour `i` before `U_i*`. The global reflection returns one interior covector and two material
-outer-product factors per stage. Refinement adds `[H̄+(I−H̄)(1−μ)]g` to the anchor and `(I−H̄)μg`
-through the scattered output. Every producing operand stays fixed until the return completes, and
-all local reaction targets are staged together before one normal update: `M` never changes midway
-through its own return.
+[proved-derived] **The return** runs the word's ticks in reverse over the word's own per-tick waves,
+or over its checkpoints. No inverse is claimed: `Holon/Cayley.cayley_bijective` makes each step
+well defined, not invertible. The adjoints compose in reverse order
+(`HolonicAdjointNormalization.dualMap_comp_reverse_order`). Every producing operand stays fixed
+until the return completes. All local targets are staged together before one per-locus normal
+update, so no locus changes midway through its own return. The covector reaches:
+- the moment and so `E`;
+- each contact's constitution and its `(λ_Δ, λ_Q, λ_DQ)`;
+- each ring's reaction material;
+- the standing `q`, through the declared lock chart;
+- `R`.
 
-[definition] **Source and condition.** The source restriction is `s=x_r`, and each admitted
-condition component is `c_i=U_(r←i)x_i−x_r`, so `x_i=U_(r←i)^(−1)(s+c_i)` on the participating
-ports. A fixed machine advances and injects `q_k⁺=U_step(q_k)+I E(u_k)`, with each source kind
-supplying the common-frame contrast
-`c_(k,kind,g)=Σ_(e:to(e)=k, kind(e)=kind)(E_g(u_k)−E_g(u_from(e)))`. `E` is a tangent increment;
-affine translation advances standing `q` only. Exterior codec maps are boundary material in the
-same normal/adjoint transaction, and alphabet size belongs to exterior ports, not to field width.
+The prototype's softmax-participation return is in history at `13f8c734`.
 
-[definition] **Retention.** The source enters as the moment `m_g` with one word on the joint
-field, never as a per-occurrence word interposed between occurrences and kept as a reverse tape.
-A comparison observed after an update is read through the contemporary constitution. Pair
-material is `D_a=ρ_a B_a`, a fixed rectangular template `B_a` with positive amplitude `ρ_a`; an
-old cotangent is contracted against the current relative basis (`Transport/ContactFactorScale`),
-and a completed update adds no history operand. The
-[retention audit](../research/records/2026-09-22_RETENTION_IS_A_QUOTIENT_NOT_A_TAPE_AND_THE_SOURCE_ENTERS_AS_PHASE_CARRIED_MOMENTS.md)
-names what this replaces.
+[definition] **Source and condition.**
+- **The moment.** The source enters as the phase-binned moment
+  `m̃_g = Σ_c P_g^(−c) I_g E_g M_g[c]`, on closing source rings under selective stepping. It is never
+  a per-occurrence advance of the state.
+- **The offsets.** The offset counts `C_g(δ)` on the exterior chart enter through a pair port
+  `E_g^(δ)`.
+- **The kinded directed contrasts** `c_(kind,g)` (`DirectedContact`, `pooledContrast`) keep their
+  law and enter with declared actions.
+- **The codec.** Exterior codec maps are boundary material in the same normal/adjoint transaction.
+  Alphabet size belongs to exterior ports, not to field width.
+
+[definition] **Retention.**
+- **The source.** It enters as the moment `m_g`, with one word on the joint field. It never enters
+  as a per-occurrence word interposed between occurrences and kept as a reverse tape. A comparison
+  observed after an update is read through the contemporary constitution.
+- **Pair material** is each contact's own constitution: storage `C_a`, stiffness `K_a` and
+  dissipation `D_a` on its slip, carried as squares with no clamp. It is not a fixed template
+  scaled by one amplitude. A completed update adds no history operand.
+- **The medium** changes only by deposition and, at an aeon boundary, by the collapse onto what the
+  admitted future distinguishes.
+- **What this replaces.** The
+  [retention audit](../research/records/2026-09-22_RETENTION_IS_A_QUOTIENT_NOT_A_TAPE_AND_THE_SOURCE_ENTERS_AS_PHASE_CARRIED_MOMENTS.md)
+  names what this replaces.
 
 [established-bounded; source-inspected] The prototype realized this word at `13f8c734` in
 [`hnn/coupled_wave/body/field/incident.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/hnn/coupled_wave/body/field/incident.rs)
@@ -974,14 +1001,20 @@ alone does not complete it. Lean states identities, domains and hypotheses; Rust
 implement them and are checked at their representation. Lean is exterior verification and never
 enters the HNN.
 
-[project-postulate] Step 4 builds this law in the machine's own order, each stage with its host
-reference and a test of the law it implements
-([objects table](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-machine-in-the-elementary-objects)):
-1. ratio and one cut: the Holon ratio at one receiving cut and its covector;
-2. rings gain storage and flow: the parametron's `C`, `L` and pump;
-3. keys: configuration and clock inference by loop closure, and Farey lock addresses;
+[project-postulate] Step 4 builds this law in five campaigns, keys leading. Each campaign has its
+host reference, its Lean laws first, and a test of each law it implements
+([the step 4 design](plans/THE_REBUILD.md#step-4-design-the-hnn-law), (d)):
+1. keys, the change on a medium, and the collapse:
+   - ring keys located by loop closure;
+   - the local tick;
+   - the Holon ratio at the receiver's grain;
+   - per-locus deposition;
+   - the collapse at aeon boundaries;
+2. rings and contacts store, lock and flow: the parametron's `C`, `L` and pump; the contact's site
+   kinds, boosts included; Farey lock addresses;
+3. release through modes, dormancy and far fields;
 4. the motor chart: serial screw words;
-5. Holonic Encoding, context, joint prediction and release (§0).
+5. Holonic Encoding, context and joint prediction (§0).
 
 Its current and material refer to the same evolving contact geometry. Completion is judged from
 the invoked model and its generated product, with accuracy and execution cost.

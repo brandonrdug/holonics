@@ -44,9 +44,10 @@ restore wholesale. [THE_REBUILD](docs/plans/THE_REBUILD.md) gives the order.
 
 RH, Hodge, complex Euler/Navier–Stokes and BSD are targets advanced enough to apply Holonics to.
 They are never a separate "Millennium" category: work on them is landmark discovery and
-compression in the same objects. Their Lean (`Zeta`, `Hodge`, `Fluid`, `EllipticCurve`, `Gauge`, `Coupling`, `Mathematics`, `Computation` under `lean/Holonics/` and `lean/HolonicsResearch/`)
-stays attached to every rebuild step. A campaign names the navigators, terrain, kernel, cokernel
-and landmarks it touches.
+compression in the same objects. Their Lean (`Zeta`, `Hodge`, `Fluid`, `EllipticCurve`, `Gauge`,
+`Coupling`, `Landmarks`, `Mathematics`, `Computation` under `lean/Holonics/` and
+`lean/HolonicsResearch/`) stays attached to every rebuild step. A campaign names the navigators,
+terrain, kernel, cokernel and landmarks it touches.
 
 ## The elementary objects — the only design vocabulary
 

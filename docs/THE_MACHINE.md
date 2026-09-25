@@ -154,11 +154,15 @@ relation**; nonclosing transport remains exact transport. π/e, the golden mode 
 Copson and Newman boundaries have source owners in the
 [constraint-mode guide](CONSTRAINT_MODES_AND_RECEIVER_FACES.md).
 
-[definition] A numerical enclosure is another receiving construction over a kept difference. For
-the global solve, `r=rhs−(I+DD*)v` bounds deviation from the field equation, and the returned ball
-`B(c,ε)` keeps that realization/source family. A target loss compares the produced face with an
-observed or requested face. The [Compression tablet](canon/TABLET_THE_COMPRESSION.md#7-what-this-tablet-refuses)
-states that a scalar loss is one receiver's face of a residual, never the residual itself.
+[definition] A numerical enclosure is another receiving construction over a kept difference.
+- **The residual.** For a solve, the residual of that solve's own system, `r = rhs − A v`, bounds
+  deviation from its equation. The returned ball `B(c,ε)` keeps that realization/source family.
+- **The HNN's solves** are local only: a junction's admittance sum, an element's `I − ½K` and a
+  contact's `M_a`.
+- **No global solve.** The prototype's global `r=rhs−(I+DD*)v` is history at `13f8c734`.
+- **The loss.** A target loss compares the produced face with an observed or requested face. The
+  [Compression tablet](canon/TABLET_THE_COMPRESSION.md#7-what-this-tablet-refuses) states that a
+  scalar loss is one receiver's face of a residual, never the residual itself.
 
 ## How the geometry reaches the implementation
 
