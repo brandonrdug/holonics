@@ -2,7 +2,7 @@
 
 **Status:** active, September 24. This plan replaces the restructure plan, which is in git history
 at [`13f8c734`](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_REPOSITORY_RESTRUCTURE.md).
-Tracked in #63. Steps 0, 1 and 2 (K1) are done (September 24); step 3 is next.
+Tracked in #63. Steps 0–3 are done (September 24); step 4 (the HNN law, #73) is next.
 
 ## The line the rebuild serves
 

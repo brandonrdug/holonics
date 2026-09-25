@@ -91,23 +91,23 @@ rebuild, the elementary objects' "Emanation and resonance" and "Keys, locks and 
 - [Zero navigation is divisor transport and certified generator inference](2026-09-23_ZERO_NAVIGATION_IS_DIVISOR_TRANSPORT_AND_CERTIFIED_GENERATOR_INFERENCE.md): what finite observations of zeros can and cannot decide.
 - [Relevance, loss and realized classes](2026-09-09_RELEVANCE_LOSS_AND_REALIZED_CLASSES.md): the relevance kernel.
 
-Lean owners (rebuild step 3, #145): the kernel side
-[`Foundation/CausalRelevance`](../../lean/Holonics/Foundation/CausalRelevance.lean),
+Owners (rebuild step 3, #145): Lean [`Holonics.Compression`](../../lean/Holonics/Compression.lean)
+(`Core/{FaceMap,Resonance,Cost,Keys}`: the face map's kernel as the relevance kernel and its quotient
+as retention, the cokernel with its horizon, the resonance/emanation split, compression cost as
+description plus work against the literal, keys by loop closure; `Landmark/{SiteKind,FixedPoint,
+Identity,ConstraintIdentity,PrimitiveCycle}`) over the foundation owners
+[`CausalRelevance`](../../lean/Holonics/Foundation/CausalRelevance.lean),
 [`ReceiverHistoryCompression`](../../lean/Holonics/Foundation/ReceiverHistoryCompression.lean),
-[`GeneratorModeQuotient`](../../lean/Holonics/Foundation/GeneratorModeQuotient.lean); cost
-and inference [`ReceiverCodeCost`](../../lean/Holonics/Foundation/ReceiverCodeCost.lean),
-[`GeneratorInference`](../../lean/Holonics/Foundation/GeneratorInference.lean); the cokernel
-side [`Millennium/CokernelCalculus`](../../lean/HolonicsResearch/Millennium/CokernelCalculus.lean),
-[`FamilyKernel`](../../lean/HolonicsResearch/Millennium/FamilyKernel.lean); landmarks and partial
-navigators [`Mathematics/RatioSeriesTransport`](../../lean/Holonics/Mathematics/RatioSeriesTransport.lean),
-[`RadixWindowReceiver`](../../lean/HolonicsResearch/Mathematics/RadixWindowReceiver.lean),
-[`Computation/ZeroNavigation`](../../lean/Holonics/Computation/ZeroNavigation.lean) and
-[`Geometry/TwoSidedIdentityAtlas`](../../lean/HolonicsResearch/Geometry/TwoSidedIdentityAtlas.lean).
-Rust: the prototype's [`winding_inertia`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/winding_inertia.rs) and
-[`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs) were retired in rebuild step 1 and are ported in step 3; the history owners
-[`receiver_history_compression`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/receiver_history_compression.rs)
-and [`identity_atlas`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/identity_atlas.rs)
-are port sources for `holonics::compression`.
+[`ReceiverCodeCost`](../../lean/Holonics/Foundation/ReceiverCodeCost.lean) and
+[`RatioSeriesTransport`](../../lean/Holonics/Mathematics/RatioSeriesTransport.lean); the joins to the
+targets in [`HolonicsResearch.Landmarks`](../../lean/HolonicsResearch/Landmarks.lean) (`ZeroPairSite`,
+`IntegralCokernel` over [`CokernelCalculus`](../../lean/HolonicsResearch/Millennium/CokernelCalculus.lean),
+`HasseSite`, `PrimeCycles`, `Sieve`). Rust [`holonics::compression`](../../crates/holonics/src/compression/)
+and site kinds in `holonics::navigator::trace`. The prototype's `kernel_modes` is superseded by
+`compression::face_map`; its `winding_inertia` was not needed and stays in
+[history](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/winding_inertia.rs).
+The [null-cone record](2026-09-24_THE_NULL_CONE_IS_THE_CONSTITUTIONS_LOCK_AND_CLOSURE_IS_A_RECEIVER_READING.md)
+states the landmark readings (site kinds, Hasse sites, primes as primitive cycles).
 
 ## Situated modes, recall, predictive release and action
 

@@ -131,8 +131,8 @@ machine_trace_sequence                               tr((⊕M_g)ᵏ) = Σ tr(M_g
 ℝ to a rotation scaled by `√q` in an adapted metric; `TraceSequence.theRootHasSquaredModulusQ`
 and `LocalFactor.companion_preserves_scaled_metric` own these readings. `a²=4q` permits a
 nontrivial Jordan shear; `a²>4q` gives distinct real eigenvalues, including negative or zero
-ones when admitted. `holonics::navigator::trace::SiteKind::{Rotation,Marginal,Dilation}` names these discriminant
-branches, not a universal Euclidean polar decomposition. A `SituatedScrew` does not determine
+ones when admitted. `holonics::navigator::trace::SiteKind` names these branches (the sign of `q` first: `Reflection`,
+`Degenerate`; then `Rotation`, `Null`, `Boost` by the discriminant), not a universal Euclidean polar decomposition. A `SituatedScrew` does not determine
 a `SiteFactor`: the model must supply the represented two-dimensional material block. Larger
 or coupled blocks retain their own operator and faces.
 
