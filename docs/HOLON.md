@@ -273,7 +273,7 @@ operations on Holons, with familiar vector/tensor realizations where applicable.
 | Superpose | α\|A⟩+β\|B⟩ in one compatible current space; phase combines before an intensity reading | exact current addition over `Rat` |
 | Assemble | \|A⊕B⟩ keeps both port blocks; direct sum is distinct from adding them in one space | `holon::PortHolon` port blocks, `holon::dirac` interconnection |
 | Tensor-compose | \|A⊗B⟩ has components A^i B^j, retaining their axis roles and shared parameters | Lean `Foundation/HolonTensorLens`; the prototype's [`BilinearProductCore`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/bilinear.rs) |
-| Interact | \|C⟩=𝓘_(K,Θ)(\|A⟩,\|B⟩); a bilinear chart is C^c=I^c_ab A^a B^b | `holon::law::HolonLaw::interact`; the prototype's [`BilinearRealization::apply`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/bilinear.rs) |
+| Interact | \|C⟩=𝓘_(K,Θ)(\|A⟩,\|B⟩); a bilinear chart is C^c=I^c_ab A^a B^b | `receiver::reception::JointLaw::interact` (joint reception); `holon::law::HolonLaw::interconnect` (the whole's law); the prototype's [`BilinearRealization::apply`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/bilinear.rs) |
 | Receive/contract | ⟨r\|H⟩, or a partial tensor contraction leaving specified output axes | `holon::law::HolonLaw::receive` |
 | Receive then emit | (\|B⟩⟨r\|)\|A⟩=⟨r\|A⟩\|B⟩; a rank-one operator, with an explicitly declared bra | `ratio::linear` exact maps |
 | Compose transports | Ĝ₂Ĝ₁\|H⟩; the output port of the first joins the input of the second | `navigator::Transport` |
