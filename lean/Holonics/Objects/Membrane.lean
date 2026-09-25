@@ -1,6 +1,6 @@
 import Holonics.Objects.RelativeCompleteness
 import Holonics.Objects.Deposition
-import Holonics.Millennium.Reflection
+import Holonics.Geometry.Reflection
 import Mathlib.Data.Matrix.Block
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 
@@ -35,7 +35,7 @@ Dirichlet-to-Neumann map. This module supplies both joins.
    (`solves_iff_laplacian`); for any declared split of the nodes `Fin p ≃ I ⊕ B`, a solve with no
    interior source returns the boundary source as `σ_B = Λ_DN φ_B` (`solves_boundary_is_dtn`),
    and the boundary source at a node is the flux face on that node's coboundary (its star)
-   (`boundary_source_is_star_face`). The one-site case is `Millennium/Reflection`'s transported
+   (`boundary_source_is_star_face`). The one-site case is `Geometry/Reflection`'s transported
    row (`reflection_row_is_schur`). Witness: the path `b₀ —1— i —2— b₁` eliminates to the series
    conductance `2/3` (`series_path_dtn`).
 
@@ -235,7 +235,7 @@ theorem solves_boundary_is_dtn {I B : Type} [Fintype I] [Fintype B] [DecidableEq
   obtain ⟨h1, h2⟩ := interior_elimination _ hA _ hbal
   exact ⟨h1, by rw [← h2, hL]⟩
 
-/-- [proved-derived; formal-checked] **One interior site is `Millennium/Reflection`'s transported
+/-- [proved-derived; formal-checked] **One interior site is `Geometry/Reflection`'s transported
 row.** With interior capacity `m` coupled by `c₁, c₂` to two boundary sites and boundary diagonal
 `p`, eliminating the interior returns the row `(p − c₁²/m, −c₁c₂/m)`, which is
 `Reflection.theBoundaryRowCarriesTheTransportAndTheSource` at zero interior source. -/
@@ -243,11 +243,11 @@ theorem reflection_row_is_schur (p' c₁ c₂ m q' : ℚ) (hm : m ≠ 0) (u₁ u
     (dtn (fromBlocks (!![m] : Matrix (Fin 1) (Fin 1) ℚ) (!![-c₁, -c₂] : Matrix (Fin 1) (Fin 2) ℚ)
         (!![-c₁; -c₂] : Matrix (Fin 2) (Fin 1) ℚ) (!![p', 0; 0, q'] : Matrix (Fin 2) (Fin 2) ℚ)) *ᵥ
         ![u₁, u₂]) 0 =
-      p' * u₁ - c₁ * Millennium.Reflection.interiorSolve c₁ c₂ m u₁ u₂ 0 := by
+      p' * u₁ - c₁ * Geometry.Reflection.interiorSolve c₁ c₂ m u₁ u₂ 0 := by
   have hinv : (!![m] : Matrix (Fin 1) (Fin 1) ℚ)⁻¹ = !![m⁻¹] := by
     apply inv_eq_left_inv
     ext i j; fin_cases i; fin_cases j; simp [inv_mul_cancel₀ hm]
-  rw [Millennium.Reflection.theBoundaryRowCarriesTheTransportAndTheSource p' c₁ c₂ m u₁ u₂ 0 hm]
+  rw [Geometry.Reflection.theBoundaryRowCarriesTheTransportAndTheSource p' c₁ c₂ m u₁ u₂ 0 hm]
   simp [dtn, hinv, mulVec, dotProduct, Fin.sum_univ_two]
   field_simp
   ring

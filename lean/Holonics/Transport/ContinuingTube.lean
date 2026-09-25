@@ -91,9 +91,9 @@ not the identity on the nose — which is the atlas, not the tube: `ChartwiseMig
 `CocycleDefect.defect_is_holonomy_not_loss` is the statement that both routes reopen their own
 source exactly and only the presented face differs. `flipCircuit` is the smallest instance, and
 `flipCircuit_carries_no_invariant_end` proves the continuing objects that survive it are empty —
-which is `Millennium/HolonicDirectedPassage.lean::boolFlipCoherent_isEmpty` read on a tube closed on
+which is `Foundation/HolonicDirectedPassage.lean::boolFlipCoherent_isEmpty` read on a tube closed on
 itself. Interlinked toroidal modes are tubes closed on themselves; they are not towers.
-`Millennium/HolonicClockedPantographicSwing.lean::ClockRouteComparison.returnedHolonomy_eq_one_iff`
+`Geometry/HolonicClockedPantographicSwing.lean::ClockRouteComparison.returnedHolonomy_eq_one_iff`
 owns the clock-route form of the same fact and is cited, not rebuilt.
 
 ## What the existing tube owners already prove, that the carrier should have cited
@@ -138,8 +138,8 @@ namespace Holonics.Transport.ContinuingTube
 
 open Holonics
 open Holonics.Foundation.ContinuingTower
-open Holonics.Millennium.HolonicSensoryWorldTube
-open Holonics.Millennium.HolonicGranularBoundaryRadiation
+open Holonics.Transport.HolonicSensoryWorldTube
+open Holonics.Foundation.HolonicGranularBoundaryRadiation
 
 universe u v v₂ w uS
 
@@ -603,7 +603,7 @@ theorem circuit_defect_is_holonomy_not_loss {Index : Type u} [Preorder Index]
   (c.cocycleDefect hx).defect_is_holonomy_not_loss
 
 /-- [definition] The smallest circuit with nontrivial holonomy: the Boolean flip on a constant
-transverse section. Its composite is `Millennium/HolonicDirectedPassage.lean::boolFlip`. -/
+transverse section. Its composite is `Foundation/HolonicDirectedPassage.lean::boolFlip`. -/
 def flipCircuit : Circuit (twoChartTower Bool) where
   face _ b := !b
   naturality _ _ := rfl
@@ -614,7 +614,7 @@ theorem flipCircuit_hasDefect : flipCircuit.HasDefect :=
 
 /-- [counterexample; formal-checked] **A tube closed on itself with nontrivial holonomy carries no
 continuing object that survives the circuit.** This is
-`Millennium/HolonicDirectedPassage.lean::boolFlipCoherent_isEmpty` read on the tube, through
+`Foundation/HolonicDirectedPassage.lean::boolFlipCoherent_isEmpty` read on the tube, through
 `Foundation/ContinuingTower.lean::boolFlipSelfLoop_isEmpty`; the obstruction stays with its existing
 owner and is not rebuilt. Non-orientability lives here — on a longitudinal axis closed on itself —
 and never in the transverse ladder, which `Tower.restrict_roundTrip` already excludes. -/

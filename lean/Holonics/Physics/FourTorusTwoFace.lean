@@ -19,7 +19,7 @@ open scoped BigOperators
 open Holonics
 open Holonics.Physics.FourTorusCurrentChart
 open Holonics.Physics.TwoFaceConstitutive
-open Holonics.Millennium.HolonicFourTorusCarrier
+open Holonics.Physics.HolonicFourTorusCarrier
 
 abbrev TwoFace := Fin 2 → ℚ
 

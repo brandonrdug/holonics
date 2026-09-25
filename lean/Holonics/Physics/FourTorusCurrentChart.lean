@@ -1,4 +1,4 @@
-import Holonics.Millennium.HolonicFourTorusParametronRealization
+import Holonics.Physics.HolonicFourTorusParametronRealization
 import Holonics.Foundation.BoundaryScalePassage
 import Mathlib.Tactic
 
@@ -21,10 +21,10 @@ noncomputable section
 
 open scoped BigOperators
 open Holonics
-open Holonics.Millennium.HolonicFourTorusCarrier
-open Holonics.Millennium.HolonicFourTorusParametronRealization
-open Holonics.Millennium.HolonicTorusMonodromyReceiver
-open Holonics.Millennium.HolonicGranularBoundaryRadiation
+open Holonics.Physics.HolonicFourTorusCarrier
+open Holonics.Physics.HolonicFourTorusParametronRealization
+open Holonics.Geometry.HolonicTorusMonodromyReceiver
+open Holonics.Foundation.HolonicGranularBoundaryRadiation
 
 abbrev RationalLattice := Direction → ℚ
 
@@ -296,7 +296,7 @@ theorem vertexBoundary_c1_eq_zero (grain : ℕ) :
 
 /-! ## Receiver-relative scale passage -/
 
-open Holonics.Millennium.HolonicGranularBoundaryRadiation
+open Holonics.Foundation.HolonicGranularBoundaryRadiation
 
 def fourCutScalePassage (fineGrain coarseGrain : ℕ) :
     BoundaryScalePassage ℚ (RationalCurrent fineGrain) RationalLattice

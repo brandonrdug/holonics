@@ -11,7 +11,7 @@ curvature. Curvature identities and their physical/research consumers remain in 
 
 noncomputable section
 
-namespace Holonics.Millennium.HolonicConnectionCurvature
+namespace Holonics.Geometry.HolonicConnectionCurvature
 
 variable {n : ℕ} {𝔤 : Type*} [NormedRing 𝔤] [NormedAlgebra ℝ 𝔤]
 
@@ -71,4 +71,4 @@ theorem differential_mul {f g : Base n → 𝔤} {x : Base n} (hf : Differentiab
   refine (differential_eq_hasFDerivAt (hf.hasFDerivAt.mul' hg.hasFDerivAt) i).trans ?_
   simp [differential, smul_eq_mul, add_apply, smul_apply]
 
-end Holonics.Millennium.HolonicConnectionCurvature
+end Holonics.Geometry.HolonicConnectionCurvature

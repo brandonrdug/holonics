@@ -12,28 +12,28 @@ separate source obligations.
 noncomputable section
 
 open Holonics
-open Holonics.Millennium.NavierStokesFiniteFourierHeat
-open Holonics.Millennium.NavierStokesFiniteGalerkinLocalPicard
-open Holonics.Millennium.NavierStokesFinitePicardChronology
-open Holonics.Millennium.NavierStokesTorusFourier
-open Holonics.Millennium.NavierStokesDyadicFlowCommutator
-open Holonics.Millennium.NavierStokesFourierTriads
-open Holonics.Millennium.NavierStokesMildFourierNonlinearity
+open Holonics.Fluid.NavierStokesFiniteFourierHeat
+open Holonics.Fluid.NavierStokesFiniteGalerkinLocalPicard
+open Holonics.Fluid.NavierStokesFinitePicardChronology
+open Holonics.Fluid.NavierStokesTorusFourier
+open Holonics.Fluid.NavierStokesDyadicFlowCommutator
+open Holonics.Fluid.NavierStokesFourierTriads
+open Holonics.Fluid.NavierStokesMildFourierNonlinearity
 open Holonics.Physics.FluidReceiverClosure
 
 namespace Holonics.Physics.ConductiveFluidReflection
 
-variable {carrier : Finset Holonics.Millennium.NavierStokesTorusFourier.SpatialFrequency}
-  (aperture : Finset Holonics.Millennium.NavierStokesTorusFourier.SpatialFrequency)
+variable {carrier : Finset Holonics.Fluid.NavierStokesTorusFourier.SpatialFrequency}
+  (aperture : Finset Holonics.Fluid.NavierStokesTorusFourier.SpatialFrequency)
 
-abbrev State (carrier : Finset Holonics.Millennium.NavierStokesTorusFourier.SpatialFrequency) :=
+abbrev State (carrier : Finset Holonics.Fluid.NavierStokesTorusFourier.SpatialFrequency) :=
   FiniteGalerkinState carrier
 
-def B (carrier aperture : Finset Holonics.Millennium.NavierStokesTorusFourier.SpatialFrequency)
+def B (carrier aperture : Finset Holonics.Fluid.NavierStokesTorusFourier.SpatialFrequency)
     (u v : State carrier) : State carrier :=
   finiteGalerkinProjectedInteraction carrier aperture u v
 
-def S (carrier : Finset Holonics.Millennium.NavierStokesTorusFourier.SpatialFrequency)
+def S (carrier : Finset Holonics.Fluid.NavierStokesTorusFourier.SpatialFrequency)
     (nu : ℝ) (u : State carrier) : State carrier :=
   finiteGalerkinStokesPart nu u
 
@@ -51,17 +51,17 @@ theorem diffusion_minus (nu eta : ℝ) (u b : State carrier) :
   simp [S, finiteGalerkinStokesPart, Pi.add_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
   ring
 
-def Fu (carrier aperture : Finset Holonics.Millennium.NavierStokesTorusFourier.SpatialFrequency)
+def Fu (carrier aperture : Finset Holonics.Fluid.NavierStokesTorusFourier.SpatialFrequency)
     (nu : ℝ) (u b : State carrier) : State carrier :=
   S carrier nu u - B carrier aperture u u + B carrier aperture b b
 
-def Fb (carrier aperture : Finset Holonics.Millennium.NavierStokesTorusFourier.SpatialFrequency)
+def Fb (carrier aperture : Finset Holonics.Fluid.NavierStokesTorusFourier.SpatialFrequency)
     (eta : ℝ) (u b : State carrier) : State carrier :=
   S carrier eta b - B carrier aperture u b + B carrier aperture b u
 
-def zPlus (carrier : Finset Holonics.Millennium.NavierStokesTorusFourier.SpatialFrequency)
+def zPlus (carrier : Finset Holonics.Fluid.NavierStokesTorusFourier.SpatialFrequency)
     (u b : State carrier) : State carrier := u + b
-def zMinus (carrier : Finset Holonics.Millennium.NavierStokesTorusFourier.SpatialFrequency)
+def zMinus (carrier : Finset Holonics.Fluid.NavierStokesTorusFourier.SpatialFrequency)
     (u b : State carrier) : State carrier := u - b
 
 theorem elsasser_identity_plus (nu eta : ℝ) (u b : State carrier) :
@@ -85,7 +85,7 @@ theorem elsasser_identity_minus (nu eta : ℝ) (u b : State carrier) :
   abel
 
 def complexImaginaryEvolution
-    (carrier aperture : Finset Holonics.Millennium.NavierStokesTorusFourier.SpatialFrequency)
+    (carrier aperture : Finset Holonics.Fluid.NavierStokesTorusFourier.SpatialFrequency)
     (nu : ℝ) (u b : State carrier) : State carrier :=
   S carrier nu b - B carrier aperture u b - B carrier aperture b u
 

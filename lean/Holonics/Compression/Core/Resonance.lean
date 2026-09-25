@@ -163,7 +163,7 @@ end Split
 
 section Parametron
 
-open Holonics.Millennium.HolonicComplexParametron
+open Holonics.Physics.HolonicComplexParametron
 open Holonics.Objects.Parametron
 
 variable {Node Branch : Type*} [Fintype Node] [Fintype Branch]

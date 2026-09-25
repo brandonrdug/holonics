@@ -10,7 +10,7 @@ their historical namespace until the Lean path and namespace migration (M2).
 
 universe u
 
-namespace Holonics.Millennium.HolonicDirectedPassage
+namespace Holonics.Foundation.HolonicDirectedPassage
 
 /-- [definition] A sequential local-witness system retains the witness type at every depth and
 the exact fine-to-coarse restriction. `restrict_surjective` is the constitutive extension law:
@@ -94,4 +94,4 @@ section Audit
 
 end Audit
 
-end Holonics.Millennium.HolonicDirectedPassage
+end Holonics.Foundation.HolonicDirectedPassage

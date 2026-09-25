@@ -66,7 +66,7 @@ namespace Holonics.Objects.Deposition
 open Holonics
 open Holonics.Foundation.HodgeReceiver
 open Holonics.Foundation.Standing
-open Holonics.Millennium.Chronology
+open Holonics.Foundation.Chronology
 open Matrix
 
 variable {p q : ℕ}

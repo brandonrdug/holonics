@@ -74,7 +74,7 @@ before it is used.
 namespace Holonics.Foundation.DesignSelection
 
 open Holonics
-open Holonics.Millennium.Chronology
+open Holonics.Foundation.Chronology
 open Holonics.Foundation.RelationLadder
 open Holonics.Foundation.AperturedGradedComplex (ContactClass)
 

@@ -12,8 +12,8 @@ generator.  The existing lineage theorem then carries the square through every o
 namespace Holonics.Computation.MachineLearningChart
 
 open Holonics
-open Holonics.Millennium.Chronology
-open Holonics.Millennium.LineageCompression
+open Holonics.Foundation.Chronology
+open Holonics.Foundation.LineageCompression
 
 universe uG uR uH uC uF
 

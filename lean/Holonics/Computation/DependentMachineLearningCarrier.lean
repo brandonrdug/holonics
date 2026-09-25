@@ -48,8 +48,8 @@ def exactTotalizationChart :
 /-- Every dependent transport word therefore has an exact fixed sigma-type presentation. -/
 theorem totalizationEveryWordExact (word : List Generator) (state : TotalState Carrier) :
     (exactTotalizationChart D).quotient
-        (Holonics.Millennium.Chronology.transportWord (totalStep D) word state) =
-      Holonics.Millennium.Chronology.transportWord (totalStep D) word
+        (Holonics.Foundation.Chronology.transportWord (totalStep D) word state) =
+      Holonics.Foundation.Chronology.transportWord (totalStep D) word
         ((exactTotalizationChart D).quotient state) :=
   (exactTotalizationChart D).everyOrderedWordExact word state
 

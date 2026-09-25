@@ -72,7 +72,7 @@ in this order.
    crossing populations are *computed* from two admissible directions rather than declared. The
    averaged writhe is a different object and neither owner claims it.
 
-[definition] `HolonicsResearch/Millennium/Crossings.lean` already owns the *combinatorial* arm:
+[definition] `HolonicsResearch/Fluid/Crossings.lean` already owns the *combinatorial* arm:
 a finite table of addressed signed crossings with `net`, `total` and `linkingNet`, and its own
 boundary clause — *"No link appears either. The crossing population is a finite table of addressed
 signed crossings. This file builds no planar diagram … no projection of any curve in `ℚ³` is

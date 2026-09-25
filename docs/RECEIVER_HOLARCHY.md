@@ -289,7 +289,7 @@ r₁(B₁)−r₀(B₀) = r₀(ΔB)+Δr(B₀)+Δr(ΔB).
 ```
 
 The last term is a genuine finite mixed difference. The existing
-[discrete induction](../lean/Holonics/Millennium/HolonicDiscreteInduction.lean)
+[discrete induction](../lean/Holonics/Physics/HolonicDiscreteInduction.lean)
 retains oriented face circulation and the full EMF fibre on its fixed carrier. Moving-face
 transport must supply the additional map; a new scalar flux label would not implement it.
 The exact bilinear difference/pullback library now exposes the corresponding elementary

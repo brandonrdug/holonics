@@ -2,7 +2,7 @@ import Holonics.Computation.ExactForeignWeight
 import Holonics.Computation.HolonicCultivationCharts
 import Holonics.Computation.HolonicNeuralEcology
 import Holonics.Computation.NativeTransportScaffold
-import Holonics.Millennium.LineageCompression
+import Holonics.Foundation.ReceiverHistoryCompression
 import Mathlib.Tactic
 
 /-!
@@ -31,7 +31,7 @@ structure FaithfulLocalSectionLift
   foreign :
     Holonics.Computation.HolonicIntelligence.ExactForeignWeightPassage Source Code Native
   history :
-    Holonics.Millennium.LineageCompression.ReceiverHistoryCompression
+    Holonics.Foundation.LineageCompression.ReceiverHistoryCompression
       Generator Receiver Source Native Face
   quotientIsStored : ∀ source,
     history.present.quotient source = foreign.storedValue (foreign.encode source)
@@ -59,9 +59,9 @@ theorem source_mem_preimageFibre (source : Source) :
 /-- Ordered foreign conduct descends through the same local lift for every admitted generator word. -/
 theorem everyGeneratorWordExact (word : List Generator) (source : Source) :
     lift.history.present.quotient
-        (Holonics.Millennium.Chronology.transportWord
+        (Holonics.Foundation.Chronology.transportWord
           lift.history.sourceTransport word source) =
-      Holonics.Millennium.Chronology.transportWord
+      Holonics.Foundation.Chronology.transportWord
         lift.history.quotientTransport word (lift.history.present.quotient source) :=
   lift.history.quotientCommutesWithEveryOrderedWord word source
 
@@ -72,7 +72,7 @@ theorem storedValue_and_everyReceiverHistoryExact (source : Source)
     lift.foreign.storedValue (lift.foreign.encode source) + lift.foreign.residual source =
         lift.foreign.sourceValue source ∧
       lift.history.present.receiver receiver
-          (Holonics.Millennium.Chronology.transportWord
+          (Holonics.Foundation.Chronology.transportWord
             lift.history.sourceTransport word source) =
         lift.history.futureFactor (receiver, word) (lift.history.present.quotient source) := by
   constructor

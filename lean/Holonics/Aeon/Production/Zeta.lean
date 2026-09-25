@@ -234,7 +234,7 @@ theorem zeta_eq_exp (M : Matrix n n ℚ) :
 
 section Machine
 
-open Holonics.Transport.GeneratorTraceFaces Holonics.Millennium.LocalFactor
+open Holonics.Transport.GeneratorTraceFaces Holonics.Geometry.LocalFactor
 
 variable {σ : Type*} [Fintype σ] [DecidableEq σ]
 
@@ -260,7 +260,7 @@ theorem machine_charpolyRev {R : Type*} [CommRing R] (a q : σ → R) :
 /-- [proved-derived; formal-checked] **The machine's cycle counts are the site trace
 sequences:** `N_n = tr(Mⁿ) = Σ_g t_n(a_g, q_g)`. -/
 theorem machine_cycle_count (a q : σ → ℤ) (k : ℕ) :
-    trace (machine a q ^ k) = ∑ g, Holonics.Millennium.TraceSequence.trace (a g) (q g) k := by
+    trace (machine a q ^ k) = ∑ g, Holonics.Geometry.TraceSequence.trace (a g) (q g) k := by
   rw [machine, machine_trace_sequence]
   exact sum_congr rfl fun g _ => theCompanionPowersCarryTheSequence (a g) (q g) k
 

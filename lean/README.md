@@ -9,11 +9,11 @@ realization. The [framework guide](../docs/FORMAL_FRAMEWORK.md) explains the con
 [definition] The Lake package is `holonics`, with two libraries. `Holonics` (sources under
 `Holonics/`, the default target) is the foundation: the transitive import closure of
 `Holonics.Framework`. `HolonicsResearch` (sources under `HolonicsResearch/`) is every other module;
-it imports `Holonics`, and nothing in `Holonics` imports it. Both keep the same subdirectories
-(`Foundation/`, `Holon/`, `Millennium/`, `RH/`, …), so a subject can span the two libraries.
-Declarations live under the namespace `Holonics`. Module names such as `Holon/Generator` and
-`Foundation/GeneratorInference` keep their spelling until step 7 renames the navigator owners and
-the directories named after the prize.
+it imports `Holonics`, and nothing in `Holonics` imports it. Both use the same subject
+subdirectories (`Foundation/`, `Geometry/`, `Physics/`, `Fluid/`, `Hodge/`, …), so a subject can
+span the two libraries. Declarations live under the namespace `Holonics`, and a module's namespace
+is `Holonics.<Subject>.<Name>`. Module names such as `Holon/Generator` and
+`Foundation/GeneratorInference` keep their spelling until step 7 renames the navigator owners.
 
 ## Import by mathematical subject
 
@@ -53,13 +53,13 @@ through admitted parameter changes. The port Holon `H=(K,∂_A; Π; 𝒟; 𝓔; 
 `Foundation/ReceiverHistoryCompression.lean` extends receiver factorization through every admitted
 finite word; `Foundation/CompleteReceiverHistory.lean` adds completeness, identifying quotient
 equality with equality of all declared receiver/history faces and returning a separating history
-when quotients differ (its declarations keep the `Holonics.Millennium.ReceiverHistory`
+when quotients differ (its declarations keep the `Holonics.Foundation.ReceiverHistory`
 namespace). Commutation can make an endpoint insensitive to order without erasing the carrying
 occurrences. Neither a number nor a theorem's printed name is a Holon's identity.
 
 [definition] `Transport/AddressedLinearizedPassage.lean` owns the linearized differential on an
 addressed passage, its pullback-joined two-step composition, reverse-order adjoint, receiver
-radical and complete preimage fibres; `Millennium/SituatedReturnedDifference.lean` keeps the
+radical and complete preimage fibres; `Transport/SituatedReturnedDifference.lean` keeps the
 dependent connection-square return. `Transport/ChangingReceiver`, with its mechanical and
 nonlinear-fluid instances `Physics/MechanicalReceiver` and `Physics/FluidReceiverClosure`, joins
 changing constitutive geometry, receiver scales and retained feedback in one difference calculus
@@ -72,12 +72,23 @@ changing conformation and internal current to the complete coupled response.
 [definition] `lake build HolonicsResearch` builds every module under `HolonicsResearch/` (the
 library declares the glob `HolonicsResearch.*`), including the modules the import face below does
 not import. `HolonicsResearch.lean` is the research import face: `Holonics.Framework` plus the
-`RH/`, `Mathematics/`, `Millennium/` and `Computation/` owners of the targets (RH, Hodge, complex
-Euler/Navier–Stokes, BSD). The targets are instances of Holonic Compression and landmark
-discovery ([the line](../docs/plans/THE_REBUILD.md#the-line-the-rebuild-serves)), not a separate
-category; step 7 renames the directories named after the prize by subject. Author and conjecture
-names stay as source attribution and statement coordinates. The
-[catalogue](MILLENNIUM_FORMAL_CATALOG.md) is historical scope testimony; order and position
+subject owners the targets (RH, Hodge, complex Euler/Navier–Stokes, BSD) use. The targets are
+instances of Holonic Compression and landmark discovery
+([the line](../docs/plans/THE_REBUILD.md#the-line-the-rebuild-serves)), not a separate category,
+so their Lean is filed by subject:
+
+| Directory | Subject |
+|---|---|
+| `Zeta/` | ξ and ζ, zeros, Foster tanks, de Bruijn–Newman heat flow, Weil explicit formula, the critical line |
+| `Hodge/` | finite Hodge decomposition, cycles and cohomology, barycentric and stellar subdivision, the Hodge index |
+| `Fluid/` | Navier–Stokes and complex Euler: vorticity, enstrophy, Fourier/Duhamel charts, dyadic Hodge bands, helicity |
+| `EllipticCurve/` | Birch–Swinnerton-Dyer: descent, congruent numbers, Selmer, Tunnell, Brandt, Jacobi/theta, heights |
+| `Gauge/` | Yang–Mills energy, flow and gap, gauge covariance, lattice gauge nets |
+| `Coupling/` | the receiver forms the targets share: positivity is realization, the chain and its remainders, the Hilbert transport chain, the target statements |
+| `Geometry/`, `Physics/`, `Foundation/`, `Transport/`, `Computation/`, `Mathematics/`, `Landmarks/`, `Holon/` | the existing subjects; winding (Farey, LocalFactor, TraceSequence, ledgers), the Swing, Poincaré/Ricci, P versus NP, primes |
+
+Author and conjecture names stay as source attribution and statement coordinates. The
+[catalogue](TARGETS_FORMAL_CATALOG.md) is historical scope testimony; order and position
 belong to [THE_REBUILD](../docs/plans/THE_REBUILD.md) and [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md).
 
 [definition] Lean's exact `ℝ` and `ℂ`, classical mathematics and Mathlib are admitted

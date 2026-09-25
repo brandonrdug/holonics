@@ -1,15 +1,15 @@
-import HolonicsResearch.Millennium.GaussCoefficient
-import HolonicsResearch.Millennium.FamilyWitness
-import HolonicsResearch.Millennium.FiveTwist
+import HolonicsResearch.EllipticCurve.GaussCoefficient
+import HolonicsResearch.EllipticCurve.FamilyWitness
+import HolonicsResearch.EllipticCurve.FiveTwist
 import Holonics.Compression.Landmark.SiteKind
 
 /-!
 # Hasse sites: the literal point counts of the congruent-number curves are rotations
 
 [definition] Rebuild step 3 (#145), the null-cone record §4. At a good prime `p` the local factor
-of `E_n : y² = x³ − n²x` is the site `1 − a_p T + p T²` (`Millennium/LocalFactor.companion`), with
+of `E_n : y² = x³ − n²x` is the site `1 − a_p T + p T²` (`Geometry/LocalFactor.companion`), with
 trace face `a_p = p − #E_n^aff(𝔽_p)`, the literal point count of
-`Millennium/BirchSwinnertonDyer.traceOfFrobenius` computed over `ZMod p`, and determinant face `p`.
+`EllipticCurve/BirchSwinnertonDyer.traceOfFrobenius` computed over `ZMod p`, and determinant face `p`.
 `Compression/Landmark/SiteKind.hasse_site_is_rotation` says a site with prime determinant inside
 the Hasse interval is a rotation. This module supplies the Hasse interval from the tree's own point
 counts, so the join is unconditional on this family.
@@ -41,8 +41,8 @@ No `axiom`, no `sorry`.
 
 namespace Holonics.Landmarks.HasseSite
 
-open Holonics.Millennium.BirchSwinnertonDyer
-open Holonics.Millennium.GaussCoefficient
+open Holonics.EllipticCurve.BirchSwinnertonDyer
+open Holonics.EllipticCurve.GaussCoefficient
 open Holonics.Compression.Landmark.SiteKind (discriminant)
 
 variable {p : ℕ} [Fact p.Prime]
@@ -85,7 +85,7 @@ theorem hasse_bound (n : ℕ) (hp2 : p ≠ 2) (hpn : ¬ p ∣ n) :
   have hn0 : ((n : ℕ) : ZMod p) ≠ 0 := by
     rw [Ne, ZMod.natCast_eq_zero_iff]
     exact hpn
-  rw [Holonics.Millennium.FamilyWitness.theTraceTwistLawAtEveryModulus n hp2 hpn, mul_pow,
+  rw [Holonics.EllipticCurve.FamilyWitness.theTraceTwistLawAtEveryModulus n hp2 hpn, mul_pow,
     quadraticChar_sq_one hn0, one_mul]
   exact hasse_bound_one hp2
 
@@ -105,25 +105,25 @@ theorem congruent_site_is_rotation (n : ℕ) (hp2 : p ≠ 2) (hpn : ¬ p ∣ n) 
 `1 − a_p T + p T² = (1 − αT)(1 − ᾱT)` with `|α|² = p`. -/
 theorem congruent_factor_splits (n : ℕ) (hp2 : p ≠ 2) (hpn : ¬ p ∣ n) (T : ℂ) :
     1 - ((traceOfFrobenius n p : ℤ) : ℂ) * T + ((p : ℤ) : ℂ) * T ^ 2
-        = (1 - Holonics.Millennium.TraceSequence.alpha (traceOfFrobenius n p) p * T)
-          * (1 - (starRingEnd ℂ) (Holonics.Millennium.TraceSequence.alpha
+        = (1 - Holonics.Geometry.TraceSequence.alpha (traceOfFrobenius n p) p * T)
+          * (1 - (starRingEnd ℂ) (Holonics.Geometry.TraceSequence.alpha
               (traceOfFrobenius n p) p) * T) ∧
-      Complex.normSq (Holonics.Millennium.TraceSequence.alpha (traceOfFrobenius n p) p) = p := by
+      Complex.normSq (Holonics.Geometry.TraceSequence.alpha (traceOfFrobenius n p) p) = p := by
   have hb : ((traceOfFrobenius n p : ℤ) : ℝ) ^ 2 ≤ 4 * (((p : ℤ)) : ℝ) := by
     exact_mod_cast hasse_bound n hp2 hpn
-  exact ⟨Holonics.Millennium.LocalFactor.theFactorSplitsThroughTheWeilRoot _ _ hb T,
-    Holonics.Millennium.TraceSequence.theRootHasSquaredModulusQ _ _ hb⟩
+  exact ⟨Holonics.Geometry.LocalFactor.theFactorSplitsThroughTheWeilRoot _ _ hb T,
+    Holonics.Geometry.TraceSequence.theRootHasSquaredModulusQ _ _ hb⟩
 
 /-- [proved-derived; formal-checked] **The thirteen instance**: the kernel-computed count
 `a₁₃(E₅) = −6` is a rotation site, `36 < 52`, whose Weil root is `−3 + 2i`, of squared modulus
 `13`. -/
 theorem thirteen_site :
     traceOfFrobenius 5 13 = -6 ∧ discriminant ((-6 : ℤ) : ℚ) ((13 : ℕ) : ℚ) = -16 ∧
-      Holonics.Millennium.TraceSequence.alpha (-6) 13 = ⟨-3, 2⟩ ∧
+      Holonics.Geometry.TraceSequence.alpha (-6) 13 = ⟨-3, 2⟩ ∧
       Complex.normSq ⟨-3, 2⟩ = 13 := by
-  refine ⟨Holonics.Millennium.FiveTwist.theTwistInstanceAtThirteen, by
+  refine ⟨Holonics.EllipticCurve.FiveTwist.theTwistInstanceAtThirteen, by
     rw [discriminant]; norm_num, ?_, by simp [Complex.normSq]; norm_num⟩
-  unfold Holonics.Millennium.TraceSequence.alpha
+  unfold Holonics.Geometry.TraceSequence.alpha
   have h16 : Real.sqrt 16 = 4 := by
     rw [show (16 : ℝ) = 4 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
   apply Complex.ext

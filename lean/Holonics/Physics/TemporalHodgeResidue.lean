@@ -1,4 +1,4 @@
-import Holonics.Millennium.HodgeGreenOperator
+import Holonics.Hodge.HodgeGreenOperator
 
 /-!
 # Temporal Hodge residues
@@ -14,12 +14,12 @@ noncomputable section
 
 namespace Holonics.Physics
 
-open Holonics.Millennium.HodgeFiniteDecomposition
+open Holonics.Hodge.HodgeFiniteDecomposition
 
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
   [FiniteDimensional ℝ E]
 
-open Holonics.Millennium.HodgeFiniteDecomposition.Differential
+open Holonics.Hodge.HodgeFiniteDecomposition.Differential
 
 structure TemporalHodgeEvolution (D : Differential E) where
   T : E →L[ℝ] E

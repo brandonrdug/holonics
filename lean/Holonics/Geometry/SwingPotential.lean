@@ -18,7 +18,7 @@ open Holonics
 open Holonics.Geometry.AffineSwing
 open Holonics.Transport.ReceiverPotential
 open Holonics.Foundation.JointReceiverDescent
-open Holonics.Millennium.LineageCompression
+open Holonics.Foundation.LineageCompression
 
 universe u
 
@@ -89,8 +89,8 @@ theorem swing_word_joint_receiver_exact
     {Generator Receiver X V Anchor : Type u} [AddCommGroup X] [AddCommGroup V]
     (J : JointReceiverHistory Generator Receiver X V) (anchors : Anchor → X)
     (word : List Anchor) (source : X) :
-    J.quotient (Millennium.Chronology.transportWord (fun i ↦ swing (anchors i)) word source) =
-      Millennium.Chronology.transportWord (fun i ↦ swing (J.quotient (anchors i))) word
+    J.quotient (Foundation.Chronology.transportWord (fun i ↦ swing (anchors i)) word source) =
+      Foundation.Chronology.transportWord (fun i ↦ swing (J.quotient (anchors i))) word
         (J.quotient source) :=
   (swingHistoryCompression J anchors).quotientCommutesWithEveryOrderedWord word source
 

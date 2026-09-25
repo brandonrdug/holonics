@@ -21,7 +21,7 @@ noncomputable section
 namespace Holonics.Physics.ConstitutiveModulation
 
 open scoped BigOperators
-open Holonics.Millennium.HolonicComplexParametron
+open Holonics.Physics.HolonicComplexParametron
 
 variable {Node Branch : Type*} [Fintype Node] [Fintype Branch]
 

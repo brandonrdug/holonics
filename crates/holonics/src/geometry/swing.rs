@@ -21,8 +21,8 @@
 //! |---|---|
 //! | `Geometry/AffineSwing.swing`, `theSwingNegatesTheDisplacementFromTheAnchor`, `theSwingIsAnInvolution`, `theAnchorIsFixed` | [`swing`] |
 //! | `Geometry/AffineSwing.twoSwingsAreADoubledTranslation`, `theSwingsDoNotCommute` | [`composed_translation`] |
-//! | `Millennium/HolonicPantographicSwingJets.pantographicPoint`, `pantographicPoint_neg_one_eq_swing` | [`pantograph`] |
-//! | `Millennium/Swing.constraintChart`, `harmonicConjugate`, `theSwingIsNegationInTheConstraintChart` | [`constraint_chart`], [`harmonic_conjugate`] |
+//! | `Geometry/HolonicPantographicSwingJets.pantographicPoint`, `pantographicPoint_neg_one_eq_swing` | [`pantograph`] |
+//! | `Geometry/Swing.constraintChart`, `harmonicConjugate`, `theSwingIsNegationInTheConstraintChart` | [`constraint_chart`], [`harmonic_conjugate`] |
 //! | `Geometry/CrossRatio.swingPair`, `crossRatio`, `swingPair_affine_projectively` | [`swing_pair`] |
 
 use num_traits::Zero;
@@ -118,7 +118,7 @@ mod tests {
         );
     }
 
-    /// Lean `Millennium/Swing.theSwingIsNegationInTheConstraintChart` (with `b ≠ d`): in the chart
+    /// Lean `Geometry/Swing.theSwingIsNegationInTheConstraintChart` (with `b ≠ d`): in the chart
     /// sending the anchor to `0` and the board to `∞`, the harmonic conjugate is negation, and its
     /// cross ratio with anchor and board is `−1`. An anchor equal to its board declares no chart
     /// and is refused.

@@ -392,12 +392,12 @@ pub(crate) fn check_declared_sturm_work(
 /// integer either way.
 ///
 /// The Lean owner of the invariance is
-/// `Foundation/RootCount` (library `HolonicsResearch`, as is `Millennium/Sturm`):
+/// `Foundation/RootCount` (library `HolonicsResearch`, as is `Mathematics/Sturm`):
 /// `theReadingIsInvariantUnderPerEntryPositiveRescaling` closes the boundary
-/// `Millennium/Sturm` names open, and
+/// `Mathematics/Sturm` names open, and
 /// `theReadingIsInvariantUnderCommonNonzeroRescaling` is why a non-squarefree polynomial's chain
 /// still counts *distinct* roots. Sturm's theorem itself is that file's cited classical fact and
-/// `Millennium/Sturm`'s `TheReadingEqualsThePopulation`.
+/// `Mathematics/Sturm`'s `TheReadingEqualsThePopulation`.
 ///
 /// A sign at a rational point `u/v` is taken by **integer** Horner on the homogenized member:
 /// `sign(S(u/v)) = sign(Σ s_i u^i v^(d−i))` because `v > 0`. No rational arithmetic occurs in a
@@ -603,7 +603,7 @@ impl SturmChain {
     /// The number of sign variations of the chain's values at one rational point.
     ///
     /// Zeros are dropped rather than counted, exactly as
-    /// `Millennium/Sturm`'s `variationCount` drops them.
+    /// `Mathematics/Sturm`'s `variationCount` drops them.
     pub(crate) fn sign_variations(&self, point: &Rat) -> u32 {
         let numerator = point.numer();
         let denominator = point.denom();

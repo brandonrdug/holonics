@@ -54,7 +54,7 @@ compression owners; none is newly founded by this specialization.
 sequential passage from an inhabited base and surjective adjacent restrictions to one compatible
 section. `Foundation/ContinuingTower` joins that law to all-gap tower compatibility. The associated
 Boolean flip loop witness is generic Foundation material; addressed-current composition and
-null-current limit laws remain in `Millennium/HolonicDirectedPassage`. `Transport/WorldTube`
+null-current limit laws remain in `Foundation/HolonicDirectedPassage`. `Transport/WorldTube`
 retains that research import because it consumes `AddressedPassage`.
 
 [proved-derived; formal-checked] `Framework.Dynamics` imports
@@ -83,10 +83,10 @@ zero-slip direction (zero power under its definiteness hypothesis), unimodular n
 winding of coprime circles) are imported by `Framework.Geometry`;
 `Transport/GeneratorTraceFaces` (determinant, trace sequence and transfer determinant conserved
 by phase carriage; the machine's product factor and summed trace sequence, over
-`Millennium/LocalFactor`) and `Transport/CellHolonomy` (gauge conjugation of a cell's holonomy,
+`Geometry/LocalFactor`) and `Transport/CellHolonomy` (gauge conjugation of a cell's holonomy,
 gauge-free class functions, cell flux, the dormant harmonic mode over `Foundation/HodgeReceiver`)
 are imported by `Framework.Dynamics`. The default target passes at 9,206 jobs. The research
-umbrella additionally imports `RH/ZeroPairLock`, which joins the pair face to `RH/FosterTanks`:
+umbrella additionally imports `Zeta/ZeroPairLock`, which joins the pair face to `Zeta/FosterTanks`:
 the reflected pair `(σ,γ)`, `(1−σ,γ)` is locked exactly on the seam, and for `γ ≠ 0` exactly when
 the tank's inductance is a positive real.
 
@@ -170,7 +170,7 @@ refine it; an exact rebase carries it through every ordered history; explicit re
 can determine one future face while source causes stay plural. Whole-family tolerance transports
 through a declared Lipschitz receiver, and shrinking bounds force compatible readouts to converge.
 
-[definition; source-cut, formal-checked] `Foundation/Receiver.lean` extends the existing receiver owner with additive receiver-family laws: the collapsed kernel, joint reading, its application lemma, kernel equivalence, and difference-based indistinguishability. `Foundation/JointReceiverDescent` imports it directly. The source-specific chain placement and theta-complex identities remain in `Millennium/Receiver`; the five extracted declarations keep their current `Holonics.Millennium.Receiver` namespace until the subject renames of rebuild step 7. The focused receiver closure passed at 3,139 Lake jobs, `Framework.Core` at 8,738, and top-level `ElementaryHolonics` at 10,105. The extracted declarations use standard axioms (`propext`, `Classical.choice`, `Quot.sound`).
+[definition; source-cut, formal-checked] `Foundation/Receiver.lean` extends the existing receiver owner with additive receiver-family laws: the collapsed kernel, joint reading, its application lemma, kernel equivalence, and difference-based indistinguishability. `Foundation/JointReceiverDescent` imports it directly. The source-specific chain placement and theta-complex identities remain in `Coupling/Receiver`; the five extracted declarations live in `Holonics.Foundation.Receiver`. The focused receiver closure passed at 3,139 Lake jobs, `Framework.Core` at 8,738, and top-level `ElementaryHolonics` at 10,105. The extracted declarations use standard axioms (`propext`, `Classical.choice`, `Quot.sound`).
 
 [proved-derived; formal-checked] The joint additive construction uses
 `N=intersection_i ker(read_i)` and `Q=X/N`. Preservation of N is exactly the receiver-transformer
@@ -317,7 +317,7 @@ the specific representation law that a consuming application must establish.
 [bounded toolkit return](../research/records/2026-09-11_THRESHOLD_REFINEMENT_AND_PARTITIONED_ENERGY_RETURN_HOLONIC_TOOLKITS.md)
 adds the phase-sensitive energy ledger for arbitrary finite cuts and an explicit cycle whose
 globally cancelling mixed terms remain locally measurable. `PartitionedHodgeEnergy` belongs to
-the Physics entry point. `RH/ThresholdRefinement` states the exact square-closure criterion on
+the Physics entry point. `Zeta/ThresholdRefinement` states the exact square-closure criterion on
 the actual seam set and checks a sharp polynomial heat witness; the ξ bound is unchanged.
 These are reusable source/receiver constructions, with the larger Hodge, fluid, spectral and
 arithmetic realizations retaining their own domains.
@@ -336,16 +336,16 @@ hidden through the whole admitted generator family.
 
 [definition] The generic receiver-family carrier and its induced collapse are owned by
 [`Foundation/ReceiverFamily.lean`](../lean/Holonics/Foundation/ReceiverFamily.lean).
-`Foundation/CausalRelevance` imports this minimal owner directly; the names remain in
-`Holonics.Millennium.Separation` until the declaration-namespace migration. The research
-module [`Millennium/Separation.lean`](../lean/HolonicsResearch/Millennium/Separation.lean)
+`Foundation/CausalRelevance` imports this minimal owner directly; its names live in
+`Holonics.Foundation.Separation`. The research
+module [`Foundation/Separation.lean`](../lean/HolonicsResearch/Foundation/Separation.lean)
 imports that owner and keeps its distinct algebraic, polynomial, and receiver-separation results.
 
 [definition] The generic `GluingPassage` obstruction carrier is owned by
 [`Foundation/GluingPassage.lean`](../lean/Holonics/Foundation/GluingPassage.lean).
-`Foundation/ContinuingTower` imports it directly; `Millennium/Gluing` retains additive passages
-and its research-specific obstruction and pairing results. Declaration names remain in
-`Holonics.Millennium` until the later namespace migration.
+`Foundation/ContinuingTower` imports it directly; `Foundation/Gluing` retains additive passages
+and its research-specific obstruction and pairing results. Both declare their names directly in
+`Holonics.Foundation`.
 
 [definition] Loss belongs to the same framework. `Foundation/ComparisonLoss` reads an existing
 addressed comparison cell through a declared gauge, with both comparands and the signed
@@ -842,7 +842,7 @@ name locates the particular mathematical test of it.
 | What can a compressed description actually compute? | `PVersusNP` retains fixed binary encodings, polynomial-time deciders/verifiers and certificate length. Execution/simulation and compression must retain the machine and decoder cost; a compact description alone supplies no polynomial-time algorithm. |
 
 [established-bounded; source-inspected] The statement boundary is
-[`OfficialProblems`](../lean/HolonicsResearch/Millennium/OfficialProblems.lean).
+[`OfficialProblems`](../lean/HolonicsResearch/Coupling/OfficialProblems.lean).
 The application headers and selected source owners were inspected alongside the elementary
 spine; this review is not a fresh theorem-by-theorem audit of every historical derivation. The
 full research build checks import/proof integration, while each result retains its own hypotheses.
@@ -949,10 +949,10 @@ and in #62.
 `Geometry/ConnectionCalculus`. These core operators retain their historical declaration namespaces
 for now. Curvature variation, Ricci, gauge covariance of curvature and Yang–Mills applications
 remain in their research owners. `Objects/Ratio` therefore has no import edge through
-`Millennium/HolonicGaugeCovariance` into the connection-variation research closure.
+`Gauge/HolonicGaugeCovariance` into the connection-variation research closure.
 
 `Objects/Ratio/ExponentialKernel` owns the generic complex exponential-kernel law used to retain
-the ratio logarithm's whole-turn branch. `Millennium/Turn` remains the owner of metric turn
+the ratio logarithm's whole-turn branch. `Geometry/Turn` remains the owner of metric turn
 calibration, half-angle constructions and their geometric applications; Ratio no longer imports
 that Research module for the generic kernel fact.
 

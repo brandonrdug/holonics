@@ -21,8 +21,8 @@ namespace Holonics.Foundation.GeneratorInference
 
 open scoped BigOperators
 open Holonics.Computation.HolonicInformationTheory
-open Holonics.Millennium.LineageCompression
-open Holonics.Millennium.Chronology
+open Holonics.Foundation.LineageCompression
+open Holonics.Foundation.Chronology
 
 open Holonics.Computation.HolonicAdjointNormalization
 open Holonics.Physics

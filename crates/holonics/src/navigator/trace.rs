@@ -9,8 +9,8 @@
 //!
 //! | Lean | Rust |
 //! |---|---|
-//! | `Millennium/LocalFactor.companion`, `theLocalFactorIsTheTransferDeterminant` | [`SiteFactor`] |
-//! | `Millennium/TraceSequence.trace`, `LocalFactor.theCompanionPowersCarryTheSequence` | [`SiteFactor::trace_sequence`] |
+//! | `Geometry/LocalFactor.companion`, `theLocalFactorIsTheTransferDeterminant` | [`SiteFactor`] |
+//! | `Geometry/TraceSequence.trace`, `LocalFactor.theCompanionPowersCarryTheSequence` | [`SiteFactor::trace_sequence`] |
 //! | `Transport/GeneratorTraceFaces.machine_factor_of_companions`, `machine_trace_sequence` | [`Machine`] |
 //! | `Transport/GeneratorTraceFaces.carried_material_conserves_{determinant,trace_sequence,transfer_determinant}` | tests |
 //! | `Compression/Landmark/SiteKind.Kind`, `siteKind`, `siteKind_eq_{reflection,degenerate,rotation,null,boost}_iff` | [`SiteKind`], [`SiteFactor::kind`] |

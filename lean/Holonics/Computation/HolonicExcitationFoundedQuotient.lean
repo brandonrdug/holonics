@@ -30,7 +30,7 @@ type and whose native identity is exactly the family's signature quotient.  That
 necessary and **not** sufficient: `identityLift` inhabits `FaithfulLocalSectionLift`, and
 `manifestationReturn` inhabits `ExcitationFoundedReturn` over any family that separates its own
 occurrences, so this type does not refuse a manifestation.  What is owed and open is the decoder
-cost `Millennium/LineageCompression.lean` already names — "a codec compression additionally owes
+cost `Foundation/ReceiverHistoryCompression.lean` already names — "a codec compression additionally owes
 an exterior presentation and decoder cost".
 
 Formal owners composed: `FiniteLocalCurrentEcology` (the excited body),
@@ -44,9 +44,9 @@ noncomputable section
 namespace Holonics.Computation.HolonicExcitationFoundedQuotient
 
 open scoped Classical
-open Holonics.Millennium.Chronology
-open Holonics.Millennium.LineageCompression
-open Holonics.Millennium.ReceiverHistory
+open Holonics.Foundation.Chronology
+open Holonics.Foundation.LineageCompression
+open Holonics.Foundation.ReceiverHistory
 open Holonics.Computation.HolonicNeuralEcology
 
 universe uS uC uM uG uR uF uO
@@ -547,7 +547,7 @@ It exists to exhibit, rather than hide, what that type does not refuse.  A manif
 resident foreign operator copied with its names removed — inhabits `FaithfulLocalSectionLift`:
 nothing bounds `residual`, nothing forbids `quotient = id`, nothing requires `Code` to be smaller
 than `Source`.  The obligation that would refuse it is the decoder cost the tree already names in
-`Millennium/LineageCompression.lean` — "a codec compression additionally owes an exterior
+`Foundation/ReceiverHistoryCompression.lean` — "a codec compression additionally owes an exterior
 presentation and decoder cost" — and it is open. -/
 def identityLift {Native : Type uNative} [AddCommGroup Native]
     (transport : Generator → Native → Native) (read : Receiver → Native → Face)

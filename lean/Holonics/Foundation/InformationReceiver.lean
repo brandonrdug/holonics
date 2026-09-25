@@ -155,8 +155,8 @@ theorem entropyFace_doesNotDetermineSection :
 /-! ## Physical crossing precedes scalar cross-entropy -/
 
 /-- The minimal exact physical crossing interface used here.  It has the same target-fibre
-potential-drop law as the standing membrane theorem but does not import that actively edited
-Millennium dependency closure. -/
+potential-drop law as the standing membrane theorem but does not import that research dependency
+closure. -/
 structure AddressedPhysicalCrossing
     (Occurrence ExteriorBoundary InteriorBoundary ExteriorPotential InteriorPotential Current :
       Type*)

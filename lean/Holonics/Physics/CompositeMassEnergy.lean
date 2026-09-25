@@ -1,4 +1,4 @@
-import Holonics.Millennium.HolonicMassShellFace
+import Holonics.Physics.HolonicMassShellFace
 
 /-! # Composite mass--energy and recoil faces
 
@@ -11,7 +11,7 @@ noncomputable section
 
 namespace Holonics.Physics.CompositeMassEnergy
 
-open Holonics.Millennium.HolonicMassShellFace
+open Holonics.Physics.HolonicMassShellFace
 
 theorem lorentzNorm_exchange (c : ℝ) (P dP : FourMomentum) :
     lorentzPairing c (P + dP) (P + dP) - lorentzPairing c P P =

@@ -12,7 +12,7 @@ The single axiom is that realization lands inside local admissibility. The conte
 passage is whether the converse holds; this generic owner does not assume it.
 -/
 
-namespace Holonics.Millennium
+namespace Holonics.Foundation
 
 universe u v
 
@@ -68,4 +68,4 @@ theorem not_glues_iff_obstruction_nonempty : ¬ P.Glues ↔ Nonempty P.Obstructi
   rw [glues_iff_obstruction_isEmpty, not_isEmpty_iff]
 
 end GluingPassage
-end Holonics.Millennium
+end Holonics.Foundation

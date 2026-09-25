@@ -14,7 +14,7 @@ noncomputable section
 
 open scoped BigOperators
 
-namespace Holonics.Millennium.HolonicMembraneActionTransport
+namespace Holonics.Foundation.HolonicMembraneActionTransport
 
 /-- Conventional finite cross-entropy. Positivity and normalization belong to a receiver chart;
 this raw expression is kept separate so its exact quotient can be inspected. -/
@@ -75,11 +75,11 @@ theorem no_successor_factor_of_equal_face
 
 end FiniteCrossEntropyReceiver
 
-end Holonics.Millennium.HolonicMembraneActionTransport
+end Holonics.Foundation.HolonicMembraneActionTransport
 
 section Audit
 
-#print axioms Holonics.Millennium.HolonicMembraneActionTransport.FiniteCrossEntropyReceiver.same_fibre_of_equal_face
-#print axioms Holonics.Millennium.HolonicMembraneActionTransport.FiniteCrossEntropyReceiver.no_successor_factor_of_equal_face
+#print axioms Holonics.Foundation.HolonicMembraneActionTransport.FiniteCrossEntropyReceiver.same_fibre_of_equal_face
+#print axioms Holonics.Foundation.HolonicMembraneActionTransport.FiniteCrossEntropyReceiver.no_successor_factor_of_equal_face
 
 end Audit

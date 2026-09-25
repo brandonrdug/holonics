@@ -1,6 +1,6 @@
 import Holonics.Physics.PhaseCarrier
 import Holonics.Geometry.PhaseCarry
-import Holonics.Millennium.HolonicClockedPantographicSwing
+import Holonics.Geometry.HolonicClockedPantographicSwing
 
 /-!
 # Holon.Generator: lifted phases, lossless clock jumps and carries
@@ -22,9 +22,9 @@ noncomputable section
 
 namespace Holonics.HolonCore
 
-open Holonics.Millennium.HolonicParametron
+open Holonics.Physics.HolonicParametron
 open Holonics.Geometry.PhaseCarry
-open Holonics.Millennium.HolonicClockedPantographicSwing
+open Holonics.Geometry.HolonicClockedPantographicSwing
 
 /-! ## 1. A lifted phase and its lossless jump -/
 

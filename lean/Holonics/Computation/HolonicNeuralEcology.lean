@@ -24,7 +24,7 @@ noncomputable section
 namespace Holonics.Computation.HolonicNeuralEcology
 
 open scoped BigOperators
-open Holonics.Millennium.Chronology
+open Holonics.Foundation.Chronology
 open Holonics.Computation.MachineLearningChart
 
 universe uS uC uM uG uR uF uD uE

@@ -39,7 +39,7 @@ Read [HOLON](../../docs/HOLON.md), [HNN_FORMULA](../../docs/HNN_FORMULA.md) and 
 - [Pair contact, serial kinematics and the resident quadrance return](2026-09-21_PAIR_CONTACT_SERIAL_KINEMATICS_AND_THE_RESIDENT_QUADRANCE_RETURN.md): checked pair/media rate ports and full feature return, exact serial target/contact consumers, matching Lean laws, and the resident quadrance score/adjoint.
 - [The generator machine retains its source and receiving laws](2026-09-21_THE_GENERATOR_MACHINE_RETAINS_ITS_SOURCE_AND_RECEIVING_LAWS.md): **final design iteration of the prototype machine.** Explicit rate/configuration/current charts, ordered source moments and future-receiver descent, complete feature return, tagged receiving phases, PSD contact kernel, unique harmonic representatives and a formal spectral-insufficiency witness.
 - [The helical pair interaction is the HNN site and phase carries context](2026-09-21_THE_HELICAL_PAIR_INTERACTION_IS_THE_HNN_SITE_AND_PHASE_CARRIES_CONTEXT.md): **the confirmed design object.** The unit's equations, rotor/Bombe/articulated-body instances, the navigator-machine geometry, the checked `Transport/HelicalPairInteraction` laws, the Lean audit and the campaign packets.
-- [Winding, carry, faces and placement generalize the helical pair](2026-09-21_WINDING_CARRY_FACES_AND_PLACEMENT_GENERALIZE_THE_HELICAL_PAIR.md): the general objects behind the unit (carry cocycle, modular lock address, conserved trace faces, cell holonomy and dormant harmonic class, tube, continuation), their `Millennium/`/`RH/` owners, four checked Lean modules and the graded arithmetic instances. Definitions: [winding guide](../../docs/WINDING_CARRY_AND_PLACEMENT.md).
+- [Winding, carry, faces and placement generalize the helical pair](2026-09-21_WINDING_CARRY_FACES_AND_PLACEMENT_GENERALIZE_THE_HELICAL_PAIR.md): the general objects behind the unit (carry cocycle, modular lock address, conserved trace faces, cell holonomy and dormant harmonic class, tube, continuation), their `Geometry/`/`Zeta/` owners, four checked Lean modules and the graded arithmetic instances. Definitions: [winding guide](../../docs/WINDING_CARRY_AND_PLACEMENT.md).
 - [The HNN formula joins the library to the model](2026-09-14_THE_HNN_FORMULA_JOINS_THE_LIBRARY_TO_THE_MODEL.md): the field/operator composition.
 - [Eros unifies faces, landmarks and the continuing machine](2026-09-15_EROS_UNIFIES_FACES_LANDMARKS_AND_THE_CONTINUING_MACHINE.md): the purpose and whole/part construction behind the model.
 - [The geometric field refines and returns its complete paired current](2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md): validated analytic source arcs, the resident geometric word and paired return, lifted helical phase and the bounded real-source experiment.
@@ -103,7 +103,7 @@ Identity,ConstraintIdentity,PrimitiveCycle}`) over the foundation owners
 [`ReceiverCodeCost`](../../lean/Holonics/Foundation/ReceiverCodeCost.lean) and
 [`RatioSeriesTransport`](../../lean/Holonics/Mathematics/RatioSeriesTransport.lean); the joins to the
 targets in [`HolonicsResearch.Landmarks`](../../lean/HolonicsResearch/Landmarks.lean) (`ZeroPairSite`,
-`IntegralCokernel` over [`CokernelCalculus`](../../lean/HolonicsResearch/Millennium/CokernelCalculus.lean),
+`IntegralCokernel` over [`CokernelCalculus`](../../lean/HolonicsResearch/Landmarks/CokernelCalculus.lean),
 `HasseSite`, `PrimeCycles`, `Sieve`). Rust [`holonics::compression`](../../crates/holonics/src/compression/)
 and site kinds in `holonics::navigator::trace`. The prototype's `kernel_modes` is superseded by
 `compression::face_map`; its `winding_inertia` was not needed and stays in
@@ -262,8 +262,8 @@ hypotheses when its material or receiver changes.
 Read [mass/energy and causal transport](../../docs/MASS_ENERGY_AND_CAUSAL_TRANSPORT.md),
 [the formal framework](../../docs/FORMAL_FRAMEWORK.md) and [RH source transport](../../docs/RH_CENTERED_CURRENT_UPPER_BOUND.md).
 The divisor-source transport of the paper `divisor-source-transport-boundary` is checked in
-[`RH/DivisorSourceTransport`](../../lean/HolonicsResearch/RH/DivisorSourceTransport.lean) and
-[`RH/DivisorQuotientFamily`](../../lean/HolonicsResearch/RH/DivisorQuotientFamily.lean).
+[`Zeta/DivisorSourceTransport`](../../lean/HolonicsResearch/Zeta/DivisorSourceTransport.lean) and
+[`Zeta/DivisorQuotientFamily`](../../lean/HolonicsResearch/Zeta/DivisorQuotientFamily.lean).
 
 - [Mass-energy and Maxwell bounds unify transport](2026-09-12_MASS_ENERGY_AND_MAXWELL_BOUNDS_UNIFY_TRANSPORT.md): units, source/receiver frames and the physical current.
 - [Compact fibres return charge and recover the physics](2026-09-13_COMPACT_FIBRES_RETURN_CHARGE_AND_THE_RESEARCH_WORKFLOW_RECOVERS_ITS_PHYSICS.md): the compactification, gauge and matter-Hamiltonian chain.

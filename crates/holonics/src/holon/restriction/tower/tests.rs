@@ -440,7 +440,7 @@ fn a_tower_restriction_reopens_the_fine_face_from_its_residual() {
 
 /// Mirrors `Tower.restrict_self_eq_id` and `Tower.restrict_roundTrip`: a tower's one-chart
 /// restriction is the identity, which is why the loop obstruction of
-/// `Millennium/HolonicDirectedPassage` cannot be carried by a tower.
+/// `Foundation/HolonicDirectedPassage` cannot be carried by a tower.
 #[test]
 fn a_one_chart_restriction_is_the_identity() {
     let tower = ResidueTower::new(nat(7)).expect("7 is a usable base");

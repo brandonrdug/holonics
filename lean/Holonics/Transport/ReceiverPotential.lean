@@ -199,7 +199,7 @@ def historyOutcomes {Source Observation Generator Result : Type*}
     (entering : Source → Observation) (observed : Set.range entering)
     (transport : Generator → Source → Source) (word : List Generator)
     (receiver : Source → Result) : Set Result :=
-  outcomes entering observed (receiver ∘ Millennium.Chronology.transportWord transport word)
+  outcomes entering observed (receiver ∘ Foundation.Chronology.transportWord transport word)
 
 /-- The same productive generators expressed through a declared source equivalence. -/
 def rebaseTransport {Source Target Generator : Type*} (rebase : Source ≃ Target)
@@ -215,13 +215,13 @@ theorem historyOutcomes_rebase {Source Target Observation Generator Result : Typ
     historyOutcomes (entering ∘ rebase.symm) (rebaseObservation rebase entering observed)
       (rebaseTransport rebase transport) word (receiver ∘ rebase.symm) =
       historyOutcomes entering observed transport word receiver := by
-  have natural := Millennium.Chronology.generatorEquivarianceExtendsToEveryTransportWord
+  have natural := Foundation.Chronology.generatorEquivarianceExtendsToEveryTransportWord
     (rebaseTransport rebase transport) transport rebase.symm
     (by intros; simp [rebaseTransport]) word
   have hfunction :
       (receiver ∘ rebase.symm) ∘
-          Millennium.Chronology.transportWord (rebaseTransport rebase transport) word =
-        (receiver ∘ Millennium.Chronology.transportWord transport word) ∘ rebase.symm := by
+          Foundation.Chronology.transportWord (rebaseTransport rebase transport) word =
+        (receiver ∘ Foundation.Chronology.transportWord transport word) ∘ rebase.symm := by
     funext target
     exact congrArg receiver (natural target)
   unfold historyOutcomes

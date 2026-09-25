@@ -1,5 +1,5 @@
-import HolonicsResearch.Millennium.CokernelCalculus
-import HolonicsResearch.Millennium.FamilyImage
+import HolonicsResearch.Landmarks.CokernelCalculus
+import HolonicsResearch.EllipticCurve.FamilyImage
 import Holonics.Compression.Core.FaceMap
 import Mathlib.Algebra.Module.ZMod
 
@@ -9,7 +9,7 @@ import Mathlib.Algebra.Module.ZMod
 [definition] Rebuild step 3 (#145). `Compression/Core/FaceMap` states the face map's kernel,
 exact sequence and reachability over a **field**. BSD's descent and the integral Hodge conjecture
 carry **integral** face maps (ℤ-modules), whose cokernel can hold torsion: a class reachable only
-in a multiple (`Millennium/CokernelCalculus.ReachableOnlyInMultiple`). This module states them as
+in a multiple (`Landmarks/CokernelCalculus.ReachableOnlyInMultiple`). This module states them as
 instances of the face-map law and names the ℤ-module versus field gap exactly.
 
 [proved-derived; formal-checked] What is proved.
@@ -61,8 +61,8 @@ noncomputable section
 
 namespace Holonics.Landmarks.IntegralCokernel
 
-open Holonics.Millennium
-open Holonics.Millennium.CokernelCalculus
+open Holonics.EllipticCurve
+open Holonics.Landmarks.CokernelCalculus
 
 /-! ## 1. The integral face map -/
 
@@ -176,7 +176,7 @@ theorem integral_rational_gap (S : Set V) (α : V) (m : ℤ)
   rw [← Holonics.Compression.Core.FaceMap.reachable_iff_cokernelClass_zero, range_rationalFace]
   exact theMultipleReachableClassIsRationallyReachable S α m h.1 h.2.1
 
-open Holonics.Millennium.HodgeConjecture in
+open Holonics.Hodge.HodgeConjecture in
 /-- [proved-derived; formal-checked] **A Kollár class on a Hodge datum**: reachable only in a
 multiple of integral cycle classes, it has a nonzero torsion integral cokernel class, while its
 cokernel class for the datum's cycle class map (the field face map) is zero: it is algebraic over

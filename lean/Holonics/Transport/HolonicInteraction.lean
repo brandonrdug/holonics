@@ -1,4 +1,4 @@
-import Holonics.Millennium.HolonicSnellInteraction
+import Holonics.Physics.HolonicSnellInteraction
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Data.Matrix.Mul
 import Mathlib.LinearAlgebra.Matrix.Notation
@@ -517,7 +517,7 @@ theorem vanishing_rate_form_places_no_spectrum :
 
 /-! ## 6. The interface between two media -/
 
-open Holonics.Millennium.HolonicSnellInteraction in
+open Holonics.Physics.HolonicSnellInteraction in
 /-- [proved-derived; formal-checked] **Tangential agreement at a shared face retains the normal
 remainder.** The existing Snell owner's pair is exhibited in the form the chain of media consumes:
 the interface condition is a condition on the tangential face alone, and the normal face carries

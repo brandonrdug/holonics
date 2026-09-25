@@ -29,7 +29,7 @@ here, in this order.
    `square_thirdDifference`: the quadratic coordinate `n ↦ n²` has the constant second difference
    `2` and the vanishing third. That is the staircase the
    [August 24 record](../../../../research/records/2026-08-24_THE_HOLONIC_INTERACTION_IS_A_COVARIANT_STORAGE_FLUX_COMPLEX_AND_THE_CUSP_RAISES_DIFFERENCE_ORDER.md)
-   reads on the induced flux face, where `Millennium/HolonicInteractionExterior.lean` proves
+   reads on the induced flux face, where `Geometry/HolonicInteractionExterior.lean` proves
    `cuspFluxOrbit_secondDifference = 2 e₂₃` and `cuspFluxOrbit_thirdDifference = 0` for the orbit
    itself. This owner does not restate the cusp; it states the difference law that orbit satisfies.
 

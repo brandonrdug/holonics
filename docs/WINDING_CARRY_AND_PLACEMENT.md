@@ -51,7 +51,7 @@ Its `chart_winding`/`lifted_winding` require a separately checked finite closure
 Cayley point need not close at any finite period. `winding::Odometer` is the mixed-radix cascade
 for declared finite levels; a nonclosing phase retains its exact transport or enclosure and
 unreduced lift instead of acquiring an invented radix. `Foundation/IwasawaTower` owns the
-compatible-section tower over a prime and `Millennium/PlaceLedger` the product over places. A screw dislocation is the same
+compatible-section tower over a prime and `Geometry/PlaceLedger` the product over places. A screw dislocation is the same
 object in a lattice: one step along the axis per circuit, the Burgers step, is the carry of the
 loop. The [August 13 record](../research/records/2026-08-13_THE_DEPOSITED_MAP_IS_READ_BY_RATIO_AND_WINDING_THE_ARCHETYPE_IS_A_FINITE_TYPE_WITH_INFINITE_MODULI.md)
 set aside cascade decompositions because irreducible factors discard the gluing; the carry
@@ -87,7 +87,7 @@ null direction on `im J_f`. `pair_lock` checks the kinematic equation at the ret
 configuration, independently of material. A persistent lock must satisfy it along the admitted
 trajectory. Zero velocities, a stationary partner and opposite signs retain their kernel
 directions even though `LockAddress` currently represents only strictly positive ratios.
-A positive rational lock's address is a word in the modular group, already owned by `Millennium/Farey`: Euclid's algorithm on the rate
+A positive rational lock's address is a word in the modular group, already owned by `Geometry/Farey`: Euclid's algorithm on the rate
 ratio is divide (`Tᵃ`), invert (`S`), repeat, and the resulting `L`/`R` word is the lock's path
 in the Farey tree. Neighbouring locks have determinant one; their mediant is the cheapest lock
 between them, so a nonempty rational tolerance interval has a least-denominator representative.
@@ -127,7 +127,7 @@ machine_trace_sequence                               tr((⊕M_g)ᵏ) = Σ tr(M_g
 ```
 
 [definition] A real two-by-two material has trace `a` and determinant `q`.
-`Millennium/LocalFactor.companion a q` realizes those faces. When `a²<4q` it is similar over
+`Geometry/LocalFactor.companion a q` realizes those faces. When `a²<4q` it is similar over
 ℝ to a rotation scaled by `√q` in an adapted metric; `TraceSequence.theRootHasSquaredModulusQ`
 and `LocalFactor.companion_preserves_scaled_metric` own these readings. `a²=4q` permits a
 nontrivial Jordan shear; `a²>4q` gives distinct real eigenvalues, including negative or zero
@@ -153,7 +153,7 @@ pairing and bridge between these readings must be declared. For a nondegenerate 
 signature `(p,q)`, the Pontryagin arm (realized by the prototype's `StructuralPlacement::PontryaginBounded` in
 [`holonic_interaction.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/holonic_interaction.rs)) requires
 `A*G+GA=0` and bounds open-right-half-plane modes by `min(p,q)`; its spectral symmetry is
-`λ ↦ −conj λ`. `Millennium/HodgeIndex` and `ReflectedPositivity` give related signature
+`λ ↦ −conj λ`. `Hodge/HodgeIndex` and `Coupling/ReflectedPositivity` give related signature
 constructions, and #54 owns the corresponding Lean lift. A general dissipative
 `A=(Ω−M_contact)G` does not satisfy that equality. Signature alone neither makes it a rotation
 nor transfers the conservative bound to all of its off-axis modes. The exact rate form
@@ -200,13 +200,13 @@ their declared representation/linearization before their fields can be identifie
 [proved-standard] An integral flux class is the first Chern class of a line bundle; the divisor
 of a section is its zero locus, and local section winding around the divisor is related to curvature by the Poincaré–Lelong
 current identity, with its metric and normalization. For a smooth projective complex variety, an integral degree-two `(1,1)` class is a
-line-bundle Chern class and hence a divisor class (Lefschetz (1,1)); `Millennium/HodgeDivisorExponentialPassage` owns that passage. On the unit Hodge circle, a component of type `(p,q)` has character `z^p z̄^q`,
+line-bundle Chern class and hence a divisor class (Lefschetz (1,1)); `Hodge/HodgeDivisorExponentialPassage` owns that passage. On the unit Hodge circle, a component of type `(p,q)` has character `z^p z̄^q`,
 so the net winding is `p−q`; a `(p,p)` class has zero net winding.
 Index invariance supplies another face: the Fredholm index of a Toeplitz operator with
 continuous invertible matrix symbol is minus the winding of its determinant (Gohberg–Krein).
 The Lefschetz number `Σ(−1)ⁱ tr(M | Hⁱ)` reads graph/diagonal intersection with the applicable
 compactness, orientation and intersection multiplicities
-(`Millennium/GraphTrace`, `Crossings`, `WindingLedger`).
+(`Geometry/GraphTrace`, `Fluid/Crossings`, `Geometry/WindingLedger`).
 
 ## 5. Tube = transfer between cross-section charts
 
@@ -218,11 +218,11 @@ supplying units, `t` can be an inverse-temperature parameter. A trace-class clos
 `tr(e^{−tH})`. A torus or exchange of its clock cycles requires the additional periodic
 geometric and boundary structure; a general tube does not supply it automatically. **Integration by reflection** eliminates
 the interior to the boundary; that Schur complement is the discrete Dirichlet-to-Neumann map
-and the reflection coefficient of `Millennium/Horizon.smith` (`Physics/ReflectedBoundaryMemory`;
+and the reflection coefficient of `Geometry/Horizon.smith` (`Physics/ReflectedBoundaryMemory`;
 the prototype realized it in [`diffusion.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/diffusion.rs) and
 ordered transfer matrices in [`traversible_chain.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/traversible_chain.rs)).
 `Transport/ContinuingTube` and `WorldTube` own the continuing tube,
-`RH/FosterTanks` the lossless reading in which every zero pair is an LC tank.
+`Zeta/FosterTanks` the lossless reading in which every zero pair is an LC tank.
 
 [proved-standard] The cusp of the modular surface is such a tube: the wave
 `y^s + φ(s)y^{1−s}` with `φ(s) = ξ_c(2s−1)/ξ_c(2s)`, where
@@ -240,7 +240,7 @@ their own hypotheses. A germ continues along admissible paths; singularities or 
 boundary can obstruct extension, and monodromy records path dependence where continuation
 exists. Slice data has a unique development only for the specified well-posed equation and
 boundary/gauge conditions. A coherent thread through a tower lifts level by level, uniquely
-when the required lifting condition holds (Hensel; `Millennium/FamilyTunnellBrandtPadicHensel`, `Foundation/ContinuingTower`).
+when the required lifting condition holds (Hensel; `EllipticCurve/FamilyTunnellBrandtPadicHensel`, `Foundation/ContinuingTower`).
 Holon : tensor : matrix is a section with its navigator : its value in a chart : its components
 in a frame. An admitted [D-finite function](https://math.mit.edu/~rstan/pubs/pubfiles/45.pdf) is an algorithmic instance: a navigator (an annihilating
 operator) with finite initial data, closed under sum, product and integral, with a supplied annihilator and sufficient exact initial data deciding equality on the
@@ -266,7 +266,7 @@ these same owners.
 | `n ↦ (n mod p)_p` is diagonal winding on a finite product of residue circles (CRT); a growing sieve removes multiples of admitted primes, with coverage through `√n` needed to decide primality | proved-standard (CRT, sieve); §2 `diagonal_step_generates_the_coprime_torus` | `PlaceLedger`, `FamilyGauss`, recursion law of `THE_MACHINE` |
 | At good reduction, elliptic Frobenius has characteristic roots of modulus `√p`; after a complex embedding their normalized phases include the real boundary cases. Hasse bounds its trace by `2√p` | proved-standard (Hasse; Weil) | `LocalFactor`, `TraceSequence`, `HeightLattice` |
 | Weil's placement for curves is the Hodge index theorem on `C×C` | proved-standard | `HodgeIndex`, `LorentzianPerp` |
-| On simple-zero branches of the declared backward heat flow, `ż_k = 2Σ_{j≠k} 1/(z_k−z_j)` with the source's convergence/regularization; collisions need their limiting law. The pair potential reads `−log Q`; separately `Λ_DN ≥ 0` | proved-standard (de Bruijn; Csordas–Smith–Varga; Rodgers–Tao) | `RH/HeatFlowStackedSeam`; helical guide `U=Φ(Q)` |
+| On simple-zero branches of the declared backward heat flow, `ż_k = 2Σ_{j≠k} 1/(z_k−z_j)` with the source's convergence/regularization; collisions need their limiting law. The pair potential reads `−log Q`; separately `Λ_DN ≥ 0` | proved-standard (de Bruijn; Csordas–Smith–Varga; Rodgers–Tao) | `Zeta/HeatFlowStackedSeam`; helical guide `U=Φ(Q)` |
 | Zero count in a finite strip rectangle is the winding of `ξ` on its positively oriented boundary, when that boundary has no zeros; multiplicities are retained | proved-standard (argument principle) | `WindingLedger` |
 | `x^ρ` is a helix on `ℂ^×` with advance `σ` and angular rate `γ`; the functional equation pairs `(σ,γ)` with `(1−σ,γ)`; RH is the collapse of each pair onto advance `½` | interpretation | see below |
 | Primes as knots: Legendre symbols as linking numbers | interpretation (Mazur; Morishita dictionary) | `Crossings`, `TopologicalReceiver` |
@@ -283,7 +283,7 @@ reflected pair with distinct advances that reads zero power on the declared face
 pair whose tank is not lossless, would break the correspondence.
 
 [proved-derived; formal-checked] The first derivation target is returned by
-[`RH/ZeroPairLock.lean`](../lean/HolonicsResearch/RH/ZeroPairLock.lean):
+[`Zeta/ZeroPairLock.lean`](../lean/HolonicsResearch/Zeta/ZeroPairLock.lean):
 on the isotropic unit face the reflected pair's power is the squared advance defect
 `(2σ−1)²` (`reflectedPairPower_eq`); the pair is locked exactly when `σ = ½`
 (`reflected_pair_locked_iff_on_seam`); and for `γ ≠ 0` that is exactly when the `FosterTanks`

@@ -83,8 +83,8 @@ stated here, in this order.
    A lattice-protein pivot is `pivot_preserves_squared_lengths` with `pivot_fixes_the_axis`.
 
 [definition] What this file does **not** do: it states no milestone, schedules nothing, and founds
-no second reflection algebra. `Millennium/Swing.lean`'s frozen-board point reflection `A ↦ 2B − A`
-and `Millennium/Seam.lean`'s `conjugateReflection` remain their own owners; this file is the
+no second reflection algebra. `Geometry/Swing.lean`'s frozen-board point reflection `A ↦ 2B − A`
+and `Zeta/Seam.lean`'s `conjugateReflection` remain their own owners; this file is the
 *hyperplane* reflection of `ℚ^d` and its one-sided application, which neither of those carries.
 
 Rust owner: `crates/holonic-engine/src/fold.rs`.

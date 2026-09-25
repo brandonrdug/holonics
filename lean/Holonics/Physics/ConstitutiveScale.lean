@@ -17,10 +17,10 @@ open Holonics
 open Holonics.Physics.TwoFaceConstitutive
 open Holonics.Physics.ConstitutiveCurrentReduction
 open Holonics.Physics.ConstitutiveWorldTube
-open Holonics.Millennium.LineageCompression
-open Holonics.Millennium.Chronology
+open Holonics.Foundation.LineageCompression
+open Holonics.Foundation.Chronology
 open Holonics.Transport.ReceiverPotential
-open Holonics.Millennium.HolonicGranularBoundaryRadiation
+open Holonics.Foundation.HolonicGranularBoundaryRadiation
 
 noncomputable section
 

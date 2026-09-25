@@ -45,8 +45,8 @@ with the machine's declared generator phase transport is the [definition] above.
 namespace Holonics.Transport.SourceMoment
 
 open Holonics
-open Holonics.Millennium.Chronology
-open Holonics.Millennium.LineageCompression
+open Holonics.Foundation.Chronology
+open Holonics.Foundation.LineageCompression
 open scoped TensorProduct
 
 variable {R : Type*} [CommRing R]

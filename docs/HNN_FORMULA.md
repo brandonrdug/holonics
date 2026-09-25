@@ -934,7 +934,7 @@ friction constructions. A biological or astronomical model additionally supplies
 material and boundary laws.
 
 [established-bounded; source-inspected] The
-[discrete induction owner](../lean/Holonics/Millennium/HolonicDiscreteInduction.lean)
+[discrete induction owner](../lean/Holonics/Physics/HolonicDiscreteInduction.lean)
 states `d_1 e=−ΔΦ`, proves `d_1 d_0=0`, and separates induced electromotive circulation from
 conductive response `j=σ e`; a nonzero divergence-free branch current is an eddy at that declared
 receiver. Magnetic order, conductivity, inductance, excitation frequency and geometry are distinct

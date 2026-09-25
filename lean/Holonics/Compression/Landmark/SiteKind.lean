@@ -6,7 +6,7 @@ import Mathlib.Tactic
 # Site kinds: a navigator site is a rotation, a null lock or a boost, read from its matrix
 
 [definition] A navigator site is a two-state material `M` read through its two conserved faces,
-the trace `a = tr M` and the determinant `q = det M` (`Millennium/LocalFactor.companion`,
+the trace `a = tr M` and the determinant `q = det M` (`Geometry/LocalFactor.companion`,
 `Transport/GeneratorTraceFaces`). Its factor is `1 − aT + qT²`, its characteristic polynomial is
 `λ² − aλ + q` (`det_sub_eq`), and its **discriminant face** is `a² − 4q`. The null-cone record §4
 classifies a site of **positive determinant** by that face; a site of negative determinant
@@ -51,7 +51,7 @@ material (`lorentz_factor_sq_smul`), and only at `det = 1` is `γ = tr/2`.
    (`carried_site_kind`, from `GeneratorTraceFaces`), and a companion site has its factor's kind
    (`companion_siteKind`).
 5. **The trace counts of a determinant-one integer site.** With `t_n = tr(Mⁿ)` (the recurrence
-   `Millennium/TraceSequence.trace`, `trace_pow_eq`), `|t_n| ≤ 2` for every `n` exactly when the
+   `Geometry/TraceSequence.trace`, `trace_pow_eq`), `|t_n| ≤ 2` for every `n` exactly when the
    site is not a boost (`bounded_iff_not_boost`); a boost's counts grow, `n + 2 ≤ |t_n|`
    (`boost_counts_grow`); with `k + k⁻¹ = a`, `t_n = kⁿ + k⁻ⁿ` and `kⁿ ≤ t_n ≤ 2kⁿ` for `k ≥ 1`
    (`boost_counts_are_doppler_powers`, `boost_counts_sandwich`), so the growth rate is exactly the
@@ -77,7 +77,7 @@ No `axiom`, no `sorry`.
 namespace Holonics.Compression.Landmark.SiteKind
 
 open Matrix
-open Holonics.Millennium.LocalFactor Holonics.Transport.GeneratorTraceFaces
+open Holonics.Geometry.LocalFactor Holonics.Transport.GeneratorTraceFaces
 open Holonics.Transport.HelicalPairInteraction
 
 /-! ## 1. The traceless part squares to the discriminant -/
@@ -284,14 +284,14 @@ modulus `q` (the placement face, `LocalFactor.theFactorSplitsThroughTheWeilRoot`
 theorem rotation_splits_through_weil_root (a q : ℤ)
     (h : siteKind (a : ℚ) (q : ℚ) = .rotation) (T : ℂ) :
     1 - (a : ℂ) * T + (q : ℂ) * T ^ 2
-        = (1 - Holonics.Millennium.TraceSequence.alpha a q * T)
-          * (1 - (starRingEnd ℂ) (Holonics.Millennium.TraceSequence.alpha a q) * T) ∧
-      Complex.normSq (Holonics.Millennium.TraceSequence.alpha a q) = q := by
+        = (1 - Holonics.Geometry.TraceSequence.alpha a q * T)
+          * (1 - (starRingEnd ℂ) (Holonics.Geometry.TraceSequence.alpha a q) * T) ∧
+      Complex.normSq (Holonics.Geometry.TraceSequence.alpha a q) = q := by
   rw [siteKind_eq_rotation_iff] at h
   have hz : a ^ 2 < 4 * q := by exact_mod_cast h
   have hr : (a : ℝ) ^ 2 ≤ 4 * (q : ℝ) := by exact_mod_cast hz.le
   exact ⟨theFactorSplitsThroughTheWeilRoot a q hr T,
-    Holonics.Millennium.TraceSequence.theRootHasSquaredModulusQ a q hr⟩
+    Holonics.Geometry.TraceSequence.theRootHasSquaredModulusQ a q hr⟩
 
 /-! ### The kinds from the matrix -/
 
@@ -461,7 +461,7 @@ theorem boost_doppler_ratio (M : Matrix (Fin 2) (Fin 2) ℝ) (hdet : M.det = 1)
       ((k - k⁻¹) / 2) ^ 2 = discriminant M.trace M.det / 4 := by
   have hq : 4 * (1 : ℝ) < M.trace ^ 2 := by nlinarith
   obtain ⟨x, hx, hx2⟩ :=
-    Holonics.Millennium.TraceSequence.theOvershootProducesARealRootBeyondTheCircle M.trace 1 hq
+    Holonics.Geometry.TraceSequence.theOvershootProducesARealRootBeyondTheCircle M.trace 1 hq
       (by linarith)
   have hxpos : 0 < x := by nlinarith
   have hx1 : 1 < x := by nlinarith
@@ -489,13 +489,13 @@ boost preserves the Lorentz norm of every four-momentum
 theorem boost_site_is_a_lorentz_boost (M : Matrix (Fin 2) (Fin 2) ℝ) (hdet : M.det = 1)
     (htr : 2 < M.trace) :
     ∃ k : ℝ, 1 < k ∧ M.trace / 2 = (k + k⁻¹) / 2 ∧
-      ∀ P : Holonics.Millennium.HolonicMassShellFace.FourMomentum,
-        Holonics.Millennium.HolonicMassShellFace.lorentzPairing 1
+      ∀ P : Holonics.Physics.HolonicMassShellFace.FourMomentum,
+        Holonics.Physics.HolonicMassShellFace.lorentzPairing 1
             (Holonics.Physics.CompositeMassEnergy.unitBoost ((k - k⁻¹) / (k + k⁻¹))
               (M.trace / 2) P)
             (Holonics.Physics.CompositeMassEnergy.unitBoost ((k - k⁻¹) / (k + k⁻¹))
               (M.trace / 2) P) =
-          Holonics.Millennium.HolonicMassShellFace.lorentzPairing 1 P P := by
+          Holonics.Physics.HolonicMassShellFace.lorentzPairing 1 P P := by
   obtain ⟨k, hk, htk, -, -, -⟩ := boost_doppler_ratio M hdet htr
   refine ⟨k, hk, by rw [htk], fun P => ?_⟩
   rw [htk]
@@ -565,7 +565,7 @@ end Joined
 
 section Counts
 
-open Holonics.Millennium.TraceSequence
+open Holonics.Geometry.TraceSequence
 
 /-- [proved-derived; formal-checked] Reversing the trace reverses every odd count:
 `t_n(−a, q) = (−1)ⁿ t_n(a, q)`. -/

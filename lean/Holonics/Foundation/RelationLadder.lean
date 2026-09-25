@@ -121,7 +121,7 @@ namespace Holonics.Foundation.RelationLadder
 
 open Holonics
 open Holonics.Foundation.ContinuingTower
-open Holonics.Millennium.Chronology
+open Holonics.Foundation.Chronology
 open Holonics.Foundation.CausalRelevance.NonLinear
 
 universe u v w

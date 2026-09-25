@@ -22,7 +22,7 @@ namespace Holonics.Computation.HolonicNeuralMorphologyContinuation
 open Holonics.Computation.HolonicIntelligence
 open Holonics.Computation.MachineLearningChart
 open Holonics.Computation.NativeMorphologyVariant
-open Holonics.Millennium.Chronology
+open Holonics.Foundation.Chronology
 
 /-- A cultivation passage and a projection which identifies its two morphologies return the
 existing projected-export witness at the passage's own later-conduct separator. -/

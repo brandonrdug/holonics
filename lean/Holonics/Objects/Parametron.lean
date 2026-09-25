@@ -1,7 +1,7 @@
 import Holonics.Physics.PhaseCarrier
 import Holonics.Physics.CoupledIncidence
-import Holonics.Millennium.HolonicMeasuredParametron
-import Holonics.Millennium.HolonicClockedPantographicSwing
+import Holonics.Physics.HolonicMeasuredParametron
+import Holonics.Geometry.HolonicClockedPantographicSwing
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
 
 /-!
@@ -10,8 +10,8 @@ import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
 [definition] Object 5 of `docs/ELEMENTARY_OBJECTS.md`. The complex parametron is the ring whose
 owners are `Physics/PhaseCarrier` (carrier `e^{iθ}`, pump, half-turn sheets, Ising lock),
 `Physics/CoupledIncidence` (oriented incidence, diagonal storage, generalized modes
-`K v = ω² C v`), `Millennium/HolonicMeasuredParametron` (measured coefficients) and
-`Millennium/HolonicClockedPantographicSwing` (section crossings and rational clock passages).
+`K v = ω² C v`), `Physics/HolonicMeasuredParametron` (measured coefficients) and
+`Geometry/HolonicClockedPantographicSwing` (section crossings and rational clock passages).
 This module joins them; it founds no second energy, mode or clock.
 
 1. **Storage↔flow exchange.** [proved-derived; formal-checked] For `q(t) = A cos(ωt + φ)`,
@@ -57,8 +57,8 @@ namespace Holonics.Objects.Parametron
 
 open scoped BigOperators
 open Holonics
-open Holonics.Millennium.HolonicParametron
-open Holonics.Millennium.HolonicComplexParametron
+open Holonics.Physics.HolonicParametron
+open Holonics.Physics.HolonicComplexParametron
 
 /-! ## 1. Storage and flow exchange -/
 
@@ -138,7 +138,7 @@ theorem lc_flow_constant_iff {A ω φ L : ℝ} (hL : 0 < L) (hω : ω ≠ 0) :
   · rintro rfl t s
     simp [inductiveFlow, lcCurrent]
 
-open Holonics.Millennium.HolonicMeasuredParametron in
+open Holonics.Physics.HolonicMeasuredParametron in
 /-- [proved-derived; formal-checked] The owner's measured angular frequency of the ring phase
 `ωt + φ` between any two distinct times is `ω`. -/
 theorem lc_measuredAngularFrequency (ω φ : ℝ) {s t : ℝ} (hst : s ≠ t) :
@@ -316,7 +316,7 @@ end Exchange
 
 section Clock
 
-open Holonics.Millennium.HolonicClockedPantographicSwing
+open Holonics.Geometry.HolonicClockedPantographicSwing
 
 variable {ClockAddress : Type*}
 

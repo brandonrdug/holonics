@@ -19,7 +19,7 @@ A rotor is the finite specialization of this object: fixed material carried by a
 with a discrete torus of states and stepping as a winding. An articulated body is an ordered
 chain of these objects. [The pair below is a Holonic Interaction contact](#the-pair-is-a-holonic-interaction-contact)
 states both. Homeostasis refers to the actual driven return/stability law. The existing
-[`Horizon.smith`](../lean/Holonics/Millennium/Horizon.lean)
+[`Horizon.smith`](../lean/Holonics/Geometry/Horizon.lean)
 and [`RatioPresentation.blockTransport`](../lean/Holonics/Geometry/CrossRatio.lean)
 connect projective charting to ordered cascades, while the prototype's
 [`traversible_chain`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/traversible_chain.rs) kept the physical
@@ -302,7 +302,7 @@ the action and metric needed for each extension.
 |---|---|
 | Phase closure, windings and arithmetic landmarks | `LandmarksAndModuli`, `Farey`, `Polarity`, the retired [`winding_inertia`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/winding_inertia.rs); period/modulus and doubled-angle relations already connect finite navigators to exact algebraic faces |
 | π/e as normalized generating constraints | `PiIterationConstraint`, `MachinPhaseConstraint`, the retired [`exact_analysis`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/exact_analysis.rs); [September 11 recovery](../research/records/2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md) retains branch, winding, independent navigators and remainder |
-| Named critical parameter | The actual `CopsonDeBruijn*` or `RH/DeBruijn*` source family; [the maintained distinction](CONSTRAINT_MODES_AND_RECEIVER_FACES.md) prevents conflating the two constants |
+| Named critical parameter | The actual `CopsonDeBruijn*` or `Zeta/DeBruijn*` source family; [the maintained distinction](CONSTRAINT_MODES_AND_RECEIVER_FACES.md) prevents conflating the two constants |
 | Inferred navigator/factor family | `GeneratorInference`, `GeneratorFactorization`, `GeneratorObservationScope`, `holonics::ratio::linear` factor owners (the bilinear owner is [history](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/bilinear.rs)); supplied navigators and inferred parameters are stated separately |
 | Lossless continuation at the admitted receivers | `ReceiverHistoryCompression`, `GeneratorModeQuotient`, `JointReceiverDescent`, the retired [receiver factorization](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/contextual.rs); preserve `E T_g=U_g E` and the decoder, not merely a present rank |
 | Cost, mass and tolerance | `ReceiverCodeCost`, `AttentionModeCompression`, `AccumulatedReceiverDefect`; retain encoding/decoder work, complete class mass and transported residuals |

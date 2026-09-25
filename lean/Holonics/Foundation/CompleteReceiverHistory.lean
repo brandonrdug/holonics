@@ -11,10 +11,10 @@ derives the exact equivalence and constructive separating-history law.
 Nothing here treats a token window, prompt hash, transcript, or proof language as state.
 -/
 
-namespace Holonics.Millennium.ReceiverHistory
+namespace Holonics.Foundation.ReceiverHistory
 
-open Holonics.Millennium.Chronology
-open Holonics.Millennium.LineageCompression
+open Holonics.Foundation.Chronology
+open Holonics.Foundation.LineageCompression
 
 universe u v w x y
 
@@ -79,10 +79,10 @@ theorem quotientEqualityRetainsBothOccurrences {left right : Source}
 
 end CompleteReceiverHistoryQuotient
 
-end Holonics.Millennium.ReceiverHistory
+end Holonics.Foundation.ReceiverHistory
 
 section Audit
-open Holonics.Millennium.ReceiverHistory
+open Holonics.Foundation.ReceiverHistory
 #print axioms CompleteReceiverHistoryQuotient.quotientEq_iff_causalSignatureEq
 #print axioms CompleteReceiverHistoryQuotient.quotientNe_returnsSeparatingReceiverHistory
 #print axioms CompleteReceiverHistoryQuotient.quotientEqualityRetainsBothOccurrences

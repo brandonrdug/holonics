@@ -14,7 +14,7 @@ an eliminated source direction through the admitted future family.
 namespace Holonics.Foundation.GeneratorModeQuotient
 
 open scoped BigOperators
-open Holonics.Millennium.Chronology
+open Holonics.Foundation.Chronology
 
 section IndependentModes
 

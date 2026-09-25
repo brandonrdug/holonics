@@ -13,7 +13,7 @@ silently identify that port with a particular folding or biochemical law.
 
 noncomputable section
 
-namespace Holonics.Millennium.HolonicComplexParametron
+namespace Holonics.Physics.HolonicComplexParametron
 
 structure ReactionState where
   enzyme : ℝ
@@ -159,4 +159,4 @@ theorem reactionSource_labeled_emission_distinguishes :
         (reactionSource catalyticOnly).substrate := by
   norm_num [reactionSource]
 
-end Holonics.Millennium.HolonicComplexParametron
+end Holonics.Physics.HolonicComplexParametron

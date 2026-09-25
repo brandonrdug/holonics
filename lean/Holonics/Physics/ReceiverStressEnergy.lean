@@ -1,4 +1,4 @@
-import Holonics.Millennium.HolonicMassShellFace
+import Holonics.Physics.HolonicMassShellFace
 
 /-!
 # Finite observer stress--energy and angular-current algebra
@@ -181,14 +181,14 @@ theorem massShell_positiveRestBranch
   nlinarith [sq_nonneg (E - m₀ * c ^ 2)]
 
 theorem massShell_positiveRestBranch_from_owner
-    (c m₀ : ℝ) (P : Holonics.Millennium.HolonicMassShellFace.FourMomentum)
+    (c m₀ : ℝ) (P : Holonics.Physics.HolonicMassShellFace.FourMomentum)
     (hc : 0 < c) (hm : 0 ≤ m₀)
-    (hshell : Holonics.Millennium.HolonicMassShellFace.lorentzPairing c P P =
+    (hshell : Holonics.Physics.HolonicMassShellFace.lorentzPairing c P P =
       (m₀ * c ^ 2) ^ 2)
     (hrest : ∀ i, P.momentum i = 0) (hE : 0 ≤ P.energy) :
     P.energy = m₀ * c ^ 2 := by
   have hsq :=
-    (Holonics.Millennium.HolonicMassShellFace.massShell_iff c m₀ P).mp hshell
+    (Holonics.Physics.HolonicMassShellFace.massShell_iff c m₀ P).mp hshell
   exact massShell_positiveRestBranch c m₀ P.energy P.momentum hc hm hsq hrest hE
 
 end Holonics.Physics.ReceiverStressEnergy

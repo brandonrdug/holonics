@@ -18,9 +18,9 @@ receiver exactness for every finite ordered successor history.
 namespace Holonics.Foundation.JointReceiverDescent
 
 open Holonics
-open Holonics.Millennium.Receiver
-open Holonics.Millennium.Chronology
-open Holonics.Millennium.LineageCompression
+open Holonics.Foundation.Receiver
+open Holonics.Foundation.Chronology
+open Holonics.Foundation.LineageCompression
 
 universe u
 
@@ -66,8 +66,8 @@ structure JointReceiverHistory
   transport : Generator → (X →+ X)
   /-- Every source generator preserves what the complete receiver family cannot distinguish. -/
   preservesCollapsed : ∀ generator x,
-    x ∈ Holonics.Millennium.Receiver.collapsedPopulation read →
-      transport generator x ∈ Holonics.Millennium.Receiver.collapsedPopulation read
+    x ∈ Holonics.Foundation.Receiver.collapsedPopulation read →
+      transport generator x ∈ Holonics.Foundation.Receiver.collapsedPopulation read
 
 namespace JointReceiverHistory
 
@@ -77,7 +77,7 @@ variable {Generator : Type u} {Receiver : Type u}
 
 /-- The canonical blind subgroup of the complete receiver family. -/
 abbrev collapsed : AddSubgroup X :=
-  Holonics.Millennium.Receiver.collapsedPopulation J.read
+  Holonics.Foundation.Receiver.collapsedPopulation J.read
 
 /-- The canonical joint receiver quotient. -/
 abbrev JointQuotient := X ⧸ collapsed J

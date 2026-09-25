@@ -5,7 +5,7 @@ import Holonics.Holon.QuadraticMoment
 # Holon.MomentStorage: the quadratic moment is one storage element
 
 [proved-derived; formal-checked] The weighted second moment `C = Σ_s w_s f_s f_sᵀ`
-(`Millennium/HolonicQuadraticMomentCondensation.lean::quadraticMoment`) is a symmetric storage
+(`Holon/HolonicQuadraticMomentCondensation.lean::quadraticMoment`) is a symmetric storage
 form, and its storage energy is the energy of the rank-one family itself:
 
 `storageEnergy C x = ½ Σ_s w_s ⟨f_s, x⟩²`.
@@ -28,7 +28,7 @@ namespace Holonics.HolonCore
 
 open Matrix
 open scoped BigOperators
-open Holonics.Millennium.HolonicQuadraticMomentCondensation
+open Holonics.Holon.HolonicQuadraticMomentCondensation
 
 variable {𝕜 : Type*} [Field 𝕜] {Support σ : Type*} [Fintype Support] [Fintype σ]
 

@@ -13,7 +13,7 @@ that additional lineage.  The
 change its endpoint result.  It does not identify distinct words or separately retained occurrence lineage.
 -/
 
-namespace Holonics.Millennium.Chronology
+namespace Holonics.Foundation.Chronology
 
 universe u v
 
@@ -144,11 +144,11 @@ section Audit
 
 end Audit
 
-end Holonics.Millennium.Chronology
+end Holonics.Foundation.Chronology
 
 namespace Holonics.Foundation.TransportWord
 
-open Holonics.Millennium.Chronology
+open Holonics.Foundation.Chronology
 
 /-! ## Generic order, additive, and group-valued word transport
 

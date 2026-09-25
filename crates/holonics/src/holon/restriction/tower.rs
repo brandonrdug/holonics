@@ -621,7 +621,7 @@ pub trait EnumerableTower: Tower {
     /// Every face at `fine` that restricts to `face` at `coarse`, exactly and finitely.
     ///
     /// Lean counterpart: the population `SuccessorWitnessSystem.restrict_surjective` asserts to be
-    /// nonempty in `Millennium/HolonicDirectedPassage`. An empty return here is precisely the
+    /// nonempty in `Foundation/HolonicDirectedPassage`. An empty return here is precisely the
     /// failure of that hypothesis, which is `shiftTower_adjacent_not_surjective`.
     fn adjacent_preimage(
         &self,

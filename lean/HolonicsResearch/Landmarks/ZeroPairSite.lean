@@ -1,5 +1,5 @@
-import HolonicsResearch.RH.ZeroPairLock
-import HolonicsResearch.RH.DeBruijnNewmanPolynomial
+import HolonicsResearch.Zeta.ZeroPairLock
+import HolonicsResearch.Zeta.DeBruijnNewmanPolynomial
 import Holonics.Compression.Landmark.SiteKind
 import Holonics.Compression.Landmark.FixedPoint
 
@@ -7,7 +7,7 @@ import Holonics.Compression.Landmark.FixedPoint
 # The reflected zero pair is a site: null on the seam, a boost off it in the strip, and the collision is its fold
 
 [definition] Rebuild step 3 (#145), the null-cone record §4. The reflected pair of `ρ = σ + iγ` is
-`(ρ, 1 − ρ̄)`, the helical pair of `RH/ZeroPairLock` with advances `σ` and `1 − σ` and one angular
+`(ρ, 1 − ρ̄)`, the helical pair of `Zeta/ZeroPairLock` with advances `σ` and `1 − σ` and one angular
 rate `γ`. It is read as a navigator site (`Compression/Landmark/SiteKind`: trace face, determinant
 face and discriminant face `a² − 4q`) in three charts. Every classification below states its
 determinant sign explicitly: a kind is claimed only at a positive determinant, a negative
@@ -56,16 +56,16 @@ heat chart      companion(2γ, γ²+(σ−½)²)  roots γ ∓ i(σ−½)     di
 5. **The finite fold: the collision is the null event.** In the heat chart `s = ½ + iz` the
    reflected pair is the real quadratic `(z − γ)² + (σ − ½)²` (`pairQuadratic_map`), whose
    discriminant face is `−P`, the quarter-turn of the advance chart's (`heat_discriminant`). Under
-   the backward heat flow of `RH/PairDescent.heatR` (the finite face of the de Bruijn–Newman flow)
+   the backward heat flow of `Zeta/PairDescent.heatR` (the finite face of the de Bruijn–Newman flow)
    it is `(z − γ)² + (σ − ½)² − 2t` exactly (`heatR_pairQuadratic`), with discriminant face
    `8t − P` (`flowed_discriminant`). Before `t = P/8` the pair is conjugate (off the seam), at
    `t = P/8` it is the double root `(z − γ)²` (`collision_is_a_double_root`), a positive-determinant
    null site when `γ ≠ 0` (`collision_site`), and after it the two roots are real (on the seam).
    The real-rooted times of the pair are exactly `[P/8, ∞)` (`realRootedTimes_pairQuadratic`), so
-   the polynomial de Bruijn–Newman threshold of `RH/DeBruijnNewmanPolynomial` is
+   the polynomial de Bruijn–Newman threshold of `Zeta/DeBruijnNewmanPolynomial` is
    **`λ(pair) = P/8 = (2σ − 1)²/8`** (`lambda_pairQuadratic`), which is at most zero exactly on the
    seam (`lambda_pair_nonpos_iff_seam`). For one pair the collision time equals the height bound
-   `y₀²/2` of `RH/PairDescent` (`y₀ = |σ − ½|`), which a crowd of other roots only shortens.
+   `y₀²/2` of `Zeta/PairDescent` (`y₀ = |σ − ½|`), which a crowd of other roots only shortens.
 
 [counterexample; formal-checked] The tank of the rational zero `ρ′ = ½ + i` (off the seam, off the
 axis) has no real determinant face (`tank_off_axis_not_real`), so the ordered trichotomy cannot be
@@ -75,7 +75,7 @@ generator of the strip. The height hypothesis `γ ≠ 0` of the join is load-bea
 
 [established-bounded; formal-checked] Scope: one reflected pair of rational generators, and the
 algebraic locus only. Nothing here locates a zero of any function, and nothing is claimed about
-`Λ_DN` beyond the existing owners (`RH/DeBruijnSeal`). No `axiom`, no `sorry`.
+`Λ_DN` beyond the existing owners (`Zeta/DeBruijnSeal`). No `axiom`, no `sorry`.
 -/
 
 noncomputable section
@@ -83,8 +83,8 @@ noncomputable section
 namespace Holonics.Landmarks.ZeroPairSite
 
 open Matrix Polynomial Complex
-open Holonics.Millennium.LocalFactor
-open Holonics.RH.ZeroPairLock
+open Holonics.Geometry.LocalFactor
+open Holonics.Zeta.ZeroPairLock
 open Holonics.Compression.Landmark.SiteKind (discriminant traceless_sq Kind siteKind
   siteKind_eq_reflection_iff siteKind_eq_degenerate_iff siteKind_eq_null_iff siteKind_eq_boost_iff
   siteKind_eq_rotation_iff)
@@ -311,7 +311,7 @@ the advance site is null exactly when the tank of `ρ′ = (σ − ½) + iγ` ha
 theorem advance_null_iff_foster (σ γ : ℚ) (hγ : γ ≠ 0) :
     discriminant (advanceSite σ).trace (advanceSite σ).det = 0 ↔
       ∃ L : ℝ, 0 < L ∧
-        Holonics.RH.FosterTanks.inductance
+        Holonics.Zeta.FosterTanks.inductance
           (((σ - 1 / 2 : ℚ) : ℂ) + ((γ : ℚ) : ℂ) * Complex.I) = (L : ℂ) := by
   rw [advance_discriminant σ γ]
   exact locked_iff_foster_inductance_positive σ γ hγ
@@ -329,11 +329,11 @@ theorem tankSite_det (ρ' : ℂ) : (tankSite ρ').det = -ρ' ^ 2 :=
   (theCompanionHasTraceAndDeterminant _ _).2
 
 /-- [proved-derived; formal-checked] **The tank site's determinant face is `1/(L_F C_F)`**, the
-squared resonance of the parallel LC tank of `RH/FosterTanks`. -/
+squared resonance of the parallel LC tank of `Zeta/FosterTanks`. -/
 theorem tankSite_det_eq_inv_LC (ρ' : ℂ) (hρ : ρ' ≠ 0) :
     (tankSite ρ').det =
-      1 / (Holonics.RH.FosterTanks.inductance ρ' * Holonics.RH.FosterTanks.capacitance) := by
-  rw [tankSite_det, Holonics.RH.FosterTanks.inductance, Holonics.RH.FosterTanks.capacitance]
+      1 / (Holonics.Zeta.FosterTanks.inductance ρ' * Holonics.Zeta.FosterTanks.capacitance) := by
+  rw [tankSite_det, Holonics.Zeta.FosterTanks.inductance, Holonics.Zeta.FosterTanks.capacitance]
   have h2 : ρ' ^ 2 ≠ 0 := pow_ne_zero 2 hρ
   field_simp
 
@@ -346,18 +346,18 @@ theorem tankSite_charpoly (ρ' : ℂ) : (tankSite ρ').charpoly = X ^ 2 - C (ρ'
 /-- [proved-derived; formal-checked] **The tank impedance is the logarithmic derivative of the
 tank site's characteristic polynomial**: `2w/(w² − ρ′²) = χ′(w)/χ(w)`. -/
 theorem tank_eq_logDeriv_charpoly (ρ' w : ℂ) :
-    Holonics.RH.FosterTanks.tank ρ' w =
+    Holonics.Zeta.FosterTanks.tank ρ' w =
       (derivative (tankSite ρ').charpoly).eval w / ((tankSite ρ').charpoly).eval w := by
-  rw [tankSite_charpoly, Holonics.RH.FosterTanks.tank, derivative_sub, derivative_C,
+  rw [tankSite_charpoly, Holonics.Zeta.FosterTanks.tank, derivative_sub, derivative_C,
     derivative_X_pow]
   simp
 
 /-- [proved-derived; formal-checked] **Foster lossless ⇔ the tank is a real site of positive
 determinant.** -/
 theorem foster_iff_tank_det_pos (ρ' : ℂ) :
-    (∃ L : ℝ, 0 < L ∧ Holonics.RH.FosterTanks.inductance ρ' = (L : ℂ)) ↔
+    (∃ L : ℝ, 0 < L ∧ Holonics.Zeta.FosterTanks.inductance ρ' = (L : ℂ)) ↔
       ∃ q : ℝ, 0 < q ∧ (tankSite ρ').det = (q : ℂ) := by
-  rw [Holonics.RH.FosterTanks.inductance_pos_real_iff, ← Holonics.RH.FosterTanks.sq_eq_neg_real_iff,
+  rw [Holonics.Zeta.FosterTanks.inductance_pos_real_iff, ← Holonics.Zeta.FosterTanks.sq_eq_neg_real_iff,
     tankSite_det]
   constructor
   · rintro ⟨c, hc, h⟩
@@ -490,8 +490,8 @@ theorem quad_ne_zero (b c : ℝ) : quad b c ≠ 0 := by
 discriminant face is nonnegative**: its count of non-real roots (`PolyaStep.nonreal`) is zero
 exactly when `4c ≤ b²`. -/
 theorem nonreal_quad_eq_zero_iff (b c : ℝ) :
-    Holonics.RH.PolyaStep.nonreal (quad b c) = 0 ↔ 0 ≤ discriminant b c := by
-  unfold Holonics.RH.PolyaStep.nonreal
+    Holonics.Zeta.PolyaStep.nonreal (quad b c) = 0 ↔ 0 ≤ discriminant b c := by
+  unfold Holonics.Zeta.PolyaStep.nonreal
   rw [quad_natDegree, discriminant]
   constructor
   · intro h
@@ -570,10 +570,10 @@ theorem heat_discriminant (σ γ : ℚ) :
   ring
 
 /-- [proved-derived; formal-checked] **The backward heat flow of the pair**: `heatR t` of
-`RH/PairDescent` lowers the constant face by `2t`, exactly. -/
+`Zeta/PairDescent` lowers the constant face by `2t`, exactly. -/
 theorem heatR_quad (b c t : ℝ) :
-    Holonics.RH.PairDescent.heatR t (quad b c) = quad b (c - 2 * t) := by
-  rw [Holonics.RH.HeatSemigroup.heatR_eq_sum_of_le (quad_natDegree b c).le]
+    Holonics.Zeta.PairDescent.heatR t (quad b c) = quad b (c - 2 * t) := by
+  rw [Holonics.Zeta.HeatSemigroup.heatR_eq_sum_of_le (quad_natDegree b c).le]
   simp only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add]
   have h4 : derivative^[2 * 2] (quad b c) = 0 :=
     iterate_derivative_eq_zero (by rw [quad_natDegree]; norm_num)
@@ -586,7 +586,7 @@ theorem heatR_quad (b c t : ℝ) :
   ring
 
 theorem heatR_pairQuadratic (σ γ : ℚ) (t : ℝ) :
-    Holonics.RH.PairDescent.heatR t (pairQuadratic σ γ) =
+    Holonics.Zeta.PairDescent.heatR t (pairQuadratic σ γ) =
       quad (2 * (γ : ℝ)) ((γ : ℝ) ^ 2 + ((σ : ℝ) - 1 / 2) ^ 2 - 2 * t) :=
   heatR_quad _ _ t
 
@@ -601,7 +601,7 @@ theorem flowed_discriminant (σ γ : ℚ) (t : ℝ) :
 /-- [proved-derived; formal-checked] **The collision is a double root**: at `t = P/8` the flowed
 pair is `(z − γ)²`, the fold where the discriminant face vanishes. -/
 theorem collision_is_a_double_root (σ γ : ℚ) :
-    Holonics.RH.PairDescent.heatR (((reflectedPairPower σ γ : ℚ) : ℝ) / 8) (pairQuadratic σ γ) =
+    Holonics.Zeta.PairDescent.heatR (((reflectedPairPower σ γ : ℚ) : ℝ) / 8) (pairQuadratic σ γ) =
       (X - C (γ : ℝ)) ^ 2 := by
   rw [heatR_pairQuadratic, reflectedPairPower_eq, quad]
   push_cast
@@ -627,25 +627,25 @@ theorem collision_site (σ γ : ℚ) (hγ : γ ≠ 0) :
 /-- [proved-derived; formal-checked] **The real-rooted times of the pair are `[P/8, ∞)`**: before
 the collision the pair is conjugate, from it on both roots are real. -/
 theorem realRootedTimes_pairQuadratic (σ γ : ℚ) :
-    Holonics.RH.DeBruijnNewmanPolynomial.realRootedTimes (pairQuadratic σ γ) =
+    Holonics.Zeta.DeBruijnNewmanPolynomial.realRootedTimes (pairQuadratic σ γ) =
       Set.Ici (((reflectedPairPower σ γ : ℚ) : ℝ) / 8) := by
   ext t
-  rw [Holonics.RH.DeBruijnNewmanPolynomial.mem_realRootedTimes, heatR_pairQuadratic,
+  rw [Holonics.Zeta.DeBruijnNewmanPolynomial.mem_realRootedTimes, heatR_pairQuadratic,
     nonreal_quad_eq_zero_iff, flowed_discriminant, Set.mem_Ici]
   constructor <;> intro h <;> linarith
 
 /-- [proved-derived; formal-checked] **The polynomial de Bruijn–Newman threshold of the reflected
-pair is `P/8 = (2σ − 1)²/8`**, `RH/DeBruijnNewmanPolynomial.lambda` read exactly. -/
+pair is `P/8 = (2σ − 1)²/8`**, `Zeta/DeBruijnNewmanPolynomial.lambda` read exactly. -/
 theorem lambda_pairQuadratic (σ γ : ℚ) :
-    Holonics.RH.DeBruijnNewmanPolynomial.lambda (pairQuadratic σ γ) =
+    Holonics.Zeta.DeBruijnNewmanPolynomial.lambda (pairQuadratic σ γ) =
       ((reflectedPairPower σ γ : ℚ) : ℝ) / 8 := by
-  rw [Holonics.RH.DeBruijnNewmanPolynomial.lambda, realRootedTimes_pairQuadratic, csInf_Ici]
+  rw [Holonics.Zeta.DeBruijnNewmanPolynomial.lambda, realRootedTimes_pairQuadratic, csInf_Ici]
 
 /-- [proved-derived; formal-checked] **The pair's threshold is at most zero exactly on the seam**,
 where it is zero: the finite face of `RH ⇔ Λ ≤ 0 ⇔ Λ = 0` for one reflected pair. -/
 theorem lambda_pair_nonpos_iff_seam (σ γ : ℚ) :
-    (Holonics.RH.DeBruijnNewmanPolynomial.lambda (pairQuadratic σ γ) ≤ 0 ↔ σ = 1 / 2) ∧
-      0 ≤ Holonics.RH.DeBruijnNewmanPolynomial.lambda (pairQuadratic σ γ) := by
+    (Holonics.Zeta.DeBruijnNewmanPolynomial.lambda (pairQuadratic σ γ) ≤ 0 ↔ σ = 1 / 2) ∧
+      0 ≤ Holonics.Zeta.DeBruijnNewmanPolynomial.lambda (pairQuadratic σ γ) := by
   rw [lambda_pairQuadratic, ← reflected_pair_locked_iff_on_seam σ γ, reflectedPairPower_eq]
   push_cast
   constructor

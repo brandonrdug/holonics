@@ -12,7 +12,7 @@ unimodular word recharts the pair's two windings without changing their intersec
 Independent coprime phases form a torus on which the single diagonal step visits every joint phase.
 The contact-power lock criteria live with the pair contact in
 `Transport/HelicalPairInteraction`; the broader Farey address theory remains in
-`Millennium/Farey`.
+`Geometry/Farey`.
 
 [established-bounded; formal-checked] Scope: integer and rational arithmetic, `ZMod` and 2×2
 integer matrices. The rotation number of a driven pair, its mode-locking plateaus and any

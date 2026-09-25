@@ -22,7 +22,7 @@ open scoped BigOperators fwdDiff
 namespace Holonics.HigherDifferenceTransport
 
 open Holonics
-open Holonics.Millennium.Chronology
+open Holonics.Foundation.Chronology
 
 universe u v w x
 

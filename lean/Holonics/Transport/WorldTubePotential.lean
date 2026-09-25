@@ -18,8 +18,8 @@ No inverse, surjectivity, or singleton source fibre is introduced.
 namespace Holonics.Transport.WorldTubePotential
 
 open Holonics
-open Holonics.Millennium.Chronology
-open Holonics.Millennium.HolonicSensoryWorldTube
+open Holonics.Foundation.Chronology
+open Holonics.Transport.HolonicSensoryWorldTube
 open Holonics.Transport.ReceiverPotential
 
 /-! ## Exact split/rejoin equivalence for a clocked composite -/
@@ -258,7 +258,7 @@ theorem associator_historyOutcomes_rebase
 
 /-! ## Boundary-scale family images -/
 
-open Holonics.Millennium.HolonicGranularBoundaryRadiation
+open Holonics.Foundation.HolonicGranularBoundaryRadiation
 
 theorem boundaryScale_boundary_image_natural
     {Scalar FineInterior FineBoundary CoarseInterior CoarseBoundary : Type*}

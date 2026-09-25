@@ -1,7 +1,9 @@
 import Holonics.Foundation.Holon
-import Holonics.Millennium.HolonicDirectedPassage
+import Holonics.Foundation.HolonicDirectedPassage
 import Holonics.Foundation.ReceiverHistoryCompression
-import Holonics.Millennium.SituatedReturnedDifference
+import Holonics.Transport.SituatedReturnedDifference
+
+open Holonics.Foundation
 
 /-!
 # Addressed world-tubes, clocks, and returned interaction
@@ -25,11 +27,11 @@ All introduced carriers are `[definition]`.  Every theorem is
 
 noncomputable section
 
-namespace Holonics.Millennium.HolonicSensoryWorldTube
+namespace Holonics.Transport.HolonicSensoryWorldTube
 
 open Holonics
-open Holonics.Millennium.LineageCompression
-open Holonics.Millennium.SituatedReturnedDifference
+open Holonics.Foundation.LineageCompression
+open Holonics.Transport.SituatedReturnedDifference
 
 /-! ## Exact local clocks remain addressed -/
 
@@ -321,4 +323,4 @@ section Audit
 
 end Audit
 
-end Holonics.Millennium.HolonicSensoryWorldTube
+end Holonics.Transport.HolonicSensoryWorldTube

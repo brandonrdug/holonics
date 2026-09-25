@@ -10,7 +10,7 @@ creating an import cycle.
 
 noncomputable section
 
-namespace Holonics.Millennium.HolonicQuadraticMomentCondensation
+namespace Holonics.Holon.HolonicQuadraticMomentCondensation
 
 open scoped BigOperators
 
@@ -64,4 +64,4 @@ theorem contract_quadraticMoment_eq_enumerateQuadraticReceiver
       intro right _
       ring
 
-end Holonics.Millennium.HolonicQuadraticMomentCondensation
+end Holonics.Holon.HolonicQuadraticMomentCondensation

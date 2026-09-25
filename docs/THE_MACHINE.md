@@ -164,7 +164,7 @@ states that a scalar loss is one receiver's face of a residual, never the residu
 
 | Source relation | Lean owner | `holonics` today | Rebuild target; history at `13f8c734` |
 |---|---|---|---|
-| Toroidal domains, shared cells, phase connection | `Holon/Complex`, connection owners, `Millennium/HolonicTorusKnots` | `holonics::geometry::complex` | step 4; prototype `analytic_field.rs`, `hnn/field_geometry/` |
+| Toroidal domains, shared cells, phase connection | `Holon/Complex`, connection owners, `Geometry/HolonicTorusKnots` | `holonics::geometry::complex` | step 4; prototype `analytic_field.rs`, `hnn/field_geometry/` |
 | Helical pair and contact variation | `Geometry/ScrewGeometry`, `Transport/{HelicalPairInteraction,SerialScrewChain}` | `holonics::geometry::screw`, `holonics::holon::contact` | `holon::contact` (step 1); prototype `holonic_interaction/helical.rs`, `holonic_chain/serial.rs`, `exact_contact.rs` |
 | Winding, carry, lock address, trace faces, cell holonomy | `Geometry/{PhaseCarry,PairResonance}`, `Transport/{GeneratorTraceFaces,CellHolonomy}`, joined to `Farey`, `LocalFactor`, `HodgeReceiver`, `IwasawaTower` | `holonics::geometry::winding` (`Odometer`, `LockAddress`, `SiteFactor`, `Machine`, `triangle_holonomy`) | `navigator/` (step 1); dynamic carry tower, lock-address inference and dormant-class consumer are #17/#62 |
 | Parametron ring: `C`, `L`, pump, half-turn sheets, Ising lock | `Objects/Parametron`, `Physics/{PhaseCarrier,CoupledIncidence}` | none | `holon::parametron` (step 1); prototype `cuda_refine/complex_parametron.rs` |

@@ -10,9 +10,9 @@ import Holonics.Foundation.SectionResidual
 import Holonics.Transport.GaussianRebase
 import Holonics.Computation.HolonicAdjointNormalization
 import Holonics.Foundation.CompleteReceiverHistory
-import Holonics.Millennium.PhysicalRealization
+import Holonics.Physics.PhysicalRealization
 import Holonics.Holon.QuadraticMoment
-import Holonics.Millennium.HolonicEntropyActionInduction
+import Holonics.Physics.HolonicEntropyActionInduction
 
 /-!
 # Receiver-relative information, normalization, and compression

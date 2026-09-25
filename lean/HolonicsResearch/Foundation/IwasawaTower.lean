@@ -1,6 +1,6 @@
 import Holonics.Foundation.ContinuingTower
-import HolonicsResearch.Millennium.NormRelation
-import HolonicsResearch.Millennium.SelmerCalculus
+import HolonicsResearch.Mathematics.NormRelation
+import HolonicsResearch.EllipticCurve.SelmerCalculus
 import Mathlib.NumberTheory.Cyclotomic.Gal
 import Mathlib.RingTheory.PowerSeries.Basic
 import Mathlib.RingTheory.AdjoinRoot
@@ -23,7 +23,7 @@ explicit finite abelian groups through `rebase_invariants`' Smith normal form.
 
 ## What is proved here
 
-**1. The blocker named in the plan is discharged.**  `Millennium/NormRelation.lean` states
+**1. The blocker named in the plan is discharged.**  `Mathematics/NormRelation.lean` states
 `TheRelativeOrbitFillsTheCoprimeLevel` as an unused `Prop` and locates the gap at
 `Irreducible (cyclotomic n K)` over a base other than `ℚ`.  Both halves are now closed:
 
@@ -182,7 +182,7 @@ theorem theRelativeCyclotomicDegreeIsTheTotient (hm : 0 < m) (hn : 0 < n)
   rw [h1, h2, Nat.totient_mul hmn] at h3
   exact Nat.eq_of_mul_eq_mul_left (Nat.totient_pos.2 hm) h3
 
-/-- [proved-derived; formal-checked] **The blocker named in `Millennium/NormRelation.lean`,
+/-- [proved-derived; formal-checked] **The blocker named in `Mathematics/NormRelation.lean`,
 discharged.**  For coprime `m` and `n`, `cyclotomic n` is irreducible over `ℚ(ζ_m)`.
 
 The proof does not repeat an irreducibility argument.  It is degree bookkeeping: the minimal
@@ -316,8 +316,8 @@ end PPowerLayer
 
 /-! ## 1c. `NormRelation.TheRelativeOrbitFillsTheCoprimeLevel`, discharged -/
 
-open Holonics.Millennium.NormRelation in
-/-- [proved-derived; formal-checked] **The relative-orbit step of `Millennium/NormRelation.lean`,
+open Holonics.Mathematics.NormRelation in
+/-- [proved-derived; formal-checked] **The relative-orbit step of `Mathematics/NormRelation.lean`,
 proved.**  `TheRelativeOrbitFillsTheCoprimeLevel` was deposited there as an unused `Prop` with the
 Mathlib gap located; this is that `Prop`.
 
@@ -750,7 +750,7 @@ end OmegaTower
 
 /-! ## 4. Levelwise Selmer, with the control kernel and cokernel **retained**
 
-`Millennium/SelmerCalculus.lean` owns `selmer = ⋂ᵢ rᵢ⁻¹(Lᵢ)` over abstract additive groups with an
+`EllipticCurve/SelmerCalculus.lean` owns `selmer = ⋂ᵢ rᵢ⁻¹(Lᵢ)` over abstract additive groups with an
 abstract receiver family.  That is the level of abstraction used here, and it is stated plainly: no
 Galois cohomology of an elliptic curve is constructed, and none is claimed.  What is added is the
 tower direction — restriction up, corestriction down, `cores ∘ res = [degree]` — and the control
@@ -777,12 +777,12 @@ structure SelmerTowerData (A : ℕ → Type v) [∀ n, AddCommGroup (A n)]
   degree : ℕ → ℕ → ℕ
   /-- restriction carries admitted classes to admitted classes -/
   res_admits : ∀ {i j : ℕ} (h : i ≤ j) {x : A i},
-    x ∈ Holonics.Millennium.SelmerCalculus.selmer (r i) (cond i) →
-      res h x ∈ Holonics.Millennium.SelmerCalculus.selmer (r j) (cond j)
+    x ∈ Holonics.EllipticCurve.SelmerCalculus.selmer (r i) (cond i) →
+      res h x ∈ Holonics.EllipticCurve.SelmerCalculus.selmer (r j) (cond j)
   /-- and so does corestriction -/
   cores_admits : ∀ {i j : ℕ} (h : i ≤ j) {x : A j},
-    x ∈ Holonics.Millennium.SelmerCalculus.selmer (r j) (cond j) →
-      cores h x ∈ Holonics.Millennium.SelmerCalculus.selmer (r i) (cond i)
+    x ∈ Holonics.EllipticCurve.SelmerCalculus.selmer (r j) (cond j) →
+      cores h x ∈ Holonics.EllipticCurve.SelmerCalculus.selmer (r i) (cond i)
   /-- corestricting to the same level changes nothing -/
   cores_refl : ∀ (i : ℕ) (x : A i), cores (le_refl i) x = x
   /-- corestriction composes -/
@@ -800,7 +800,7 @@ variable (S : SelmerTowerData A ι T)
 /-- [definition] The Selmer group at one layer, through `SelmerCalculus.selmer` — cited, not
 rebuilt. -/
 def level (n : ℕ) : AddSubgroup (A n) :=
-  Holonics.Millennium.SelmerCalculus.selmer (S.r n) (S.cond n)
+  Holonics.EllipticCurve.SelmerCalculus.selmer (S.r n) (S.cond n)
 
 /-- [proved-derived; formal-checked] **The levelwise Selmer family is a `Tower`.**  Faces are the
 layers' Selmer groups; the restriction from finer to coarser is corestriction. -/
@@ -924,12 +924,12 @@ def flatSelmerTower :
   degree := fun _ _ => 1
   res_admits := by
     intro i j h x _
-    rw [Holonics.Millennium.SelmerCalculus.mem_selmer]
+    rw [Holonics.EllipticCurve.SelmerCalculus.mem_selmer]
     intro _
     exact AddSubgroup.mem_top _
   cores_admits := by
     intro i j h x _
-    rw [Holonics.Millennium.SelmerCalculus.mem_selmer]
+    rw [Holonics.EllipticCurve.SelmerCalculus.mem_selmer]
     intro _
     exact AddSubgroup.mem_top _
   cores_refl := fun _ _ => rfl
@@ -940,7 +940,7 @@ def flatSelmerTower :
 its Selmer group is the whole group. -/
 theorem flatSelmerTower_level (n : ℕ) : flatSelmerTower.level n = ⊤ := by
   refine eq_top_iff.2 (fun x _ => ?_)
-  rw [SelmerTowerData.level, Holonics.Millennium.SelmerCalculus.mem_selmer]
+  rw [SelmerTowerData.level, Holonics.EllipticCurve.SelmerCalculus.mem_selmer]
   intro _
   exact AddSubgroup.mem_top _
 

@@ -50,7 +50,7 @@ open phases vanish (`IsCycle`, over `Winding.openPhase`).
 
 [open] The strict form `|q_n α − p_n| < 1/q_(n+1)` and the three-distance theorem are not proved
 here; Mathlib states the non-strict bound. The Farey address theory beyond neighbours and mediants
-lives in `HolonicsResearch/Millennium/Farey`, which this foundation module does not import.
+lives in `HolonicsResearch/Geometry/Farey`, which this foundation module does not import.
 
 No `axiom`, no `sorry`, no `native_decide`.
 -/

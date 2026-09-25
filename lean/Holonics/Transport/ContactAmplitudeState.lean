@@ -23,7 +23,7 @@ namespace Holonics.Transport.ContactAmplitudeState
 open Holonics
 open Holonics.Foundation
 open Holonics.Foundation.Standing
-open Holonics.Millennium.Chronology
+open Holonics.Foundation.Chronology
 open Holonics.Transport.ContactFactorScale
 
 variable {Update State Generator Face Parameter : Type*}

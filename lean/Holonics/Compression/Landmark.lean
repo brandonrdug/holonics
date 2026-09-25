@@ -10,7 +10,7 @@ import Holonics.Compression.Landmark.PrimitiveCycle
 [definition] Rebuild step 3 (#145). **Landmarks** are faces where navigator paths converge: lock
 addresses and fixed points, constraint identities, and the primitive cycles (primes) of a return
 map. **Landmark discovery** locates them. This root gathers the general laws, stated over the
-existing owners (`Transport/GeneratorTraceFaces`, `Millennium/{LocalFactor,TraceSequence}`,
+existing owners (`Transport/GeneratorTraceFaces`, `Geometry/{LocalFactor,TraceSequence}`,
 `Geometry/{CrossRatio,TwoSidedIdentityAtlas}`, `Mathematics/{RatioSeriesTransport,
 RadixWindowReceiver}`, `Physics/CompositeMassEnergy`, `Aeon/Production/Zeta`).
 

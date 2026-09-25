@@ -7,9 +7,9 @@ import Mathlib.Data.Set.Operations
 # Receivers and receiver-exact compression
 
 This file formalizes the elementary relational carrier. It does not make receiver
-dependence into an axiom of ordinary mathematics. It owns the generic shared-junction kernel law;
-the additive receiver-family kernel and joint-reading laws remain in their historical Millennium
-namespace until their M2 extraction.
+dependence into an axiom of ordinary mathematics. It owns the generic shared-junction kernel law
+and the additive receiver-family kernel and joint-reading laws, both under
+`Holonics.Foundation.Receiver`.
 -/
 
 namespace Holonics
@@ -233,7 +233,7 @@ end SharedJunction
 
 end Holonics.Foundation.Receiver
 
-namespace Holonics.Millennium.Receiver
+namespace Holonics.Foundation.Receiver
 
 /-! ## 1. An additive receiver family and what it collapses -/
 
@@ -268,4 +268,4 @@ theorem unseparatedIffDifferenceCollapsed (a b : X) :
     sub_eq_zero]
   exact forall_congr' fun _ => eq_comm
 
-end Holonics.Millennium.Receiver
+end Holonics.Foundation.Receiver

@@ -23,7 +23,7 @@ open Holonics
 open Holonics.Physics.TwoFaceConstitutive
 open Holonics.Physics.ConstitutiveCurrentReduction
 open Holonics.Transport.WorldTubePotential
-open Holonics.Millennium.HolonicSensoryWorldTube
+open Holonics.Transport.HolonicSensoryWorldTube
 
 abbrev Cut := TwoFaceConstitutive.Cut
 abbrev Face := TwoFaceConstitutive.Face

@@ -23,7 +23,7 @@ negative for a reflection, zero for degenerate).
 | `Landmarks/Sieve` | The sieve of Eratosthenes as a nested epoch tower of prime digit clocks; the survivors at grain `√N` are the primes in `(√N, N]`, the epoch-one first arrivals of `m ↦ m / minFac m`. |
 
 [open] Owed in #62. The full integral cokernel ledger (a finite-dimensional `𝔽₂` ledger for `E/2E`
-needs the weak Mordell–Weil bound of `Millennium/GeneralCollision` carried to the twist family
+needs the weak Mordell–Weil bound of `EllipticCurve/GeneralCollision` carried to the twist family
 `FamilyFace.E n = GeneralFace.E n (−n)`); the per-site-clock machine for an L-function
 `∏_p (1 − a_p p^(−s) + p^(1−2s))⁻¹` (the two-state sites of `Aeon/Production/Zeta.machine` with
 their own clocks); the infinite product of the cycle machine beyond Mathlib's Euler product; and

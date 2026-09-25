@@ -14,7 +14,7 @@ claimed here.
 
 noncomputable section
 
-namespace Holonics.Millennium.HolonicComplexParametron
+namespace Holonics.Physics.HolonicComplexParametron
 
 abbrev ComplexPorts := ℂ × ℂ
 
@@ -56,4 +56,4 @@ theorem attenuationHeat_nonneg
     add_nonneg (Complex.normSq_nonneg _) (Complex.normSq_nonneg _)
   exact mul_nonneg hfactor hpower
 
-end Holonics.Millennium.HolonicComplexParametron
+end Holonics.Physics.HolonicComplexParametron

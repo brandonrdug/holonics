@@ -92,7 +92,7 @@ declared fixtures. No `axiom`, no `sorry`, no `native_decide`.
 namespace Holonics.Foundation.Standing
 
 open Holonics
-open Holonics.Millennium.Chronology
+open Holonics.Foundation.Chronology
 open Holonics.Foundation.CausalRelevance.NonLinear
 
 /-! ## 1. Standing is the retained residue of passages -/

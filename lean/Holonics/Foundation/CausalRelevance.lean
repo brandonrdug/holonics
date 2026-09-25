@@ -15,11 +15,11 @@ construction, not a scalar loss and not a claim about nonlinear or categorical r
 namespace Holonics.Foundation.CausalRelevance
 
 open Holonics
-open Holonics.Millennium.Chronology
-open Holonics.Millennium.Receiver
-open Holonics.Millennium.LineageCompression
+open Holonics.Foundation.Chronology
+open Holonics.Foundation.Receiver
+open Holonics.Foundation.LineageCompression
 open Holonics.Foundation.JointReceiverDescent
-open Holonics.Millennium.ReceiverHistory
+open Holonics.Foundation.ReceiverHistory
 
 universe u
 
@@ -174,8 +174,8 @@ end Holonics.Foundation.CausalRelevance
 
 namespace Holonics.Foundation.CausalRelevance.NonLinear
 
-open Holonics.Millennium.Chronology
-open Holonics.Millennium.Separation
+open Holonics.Foundation.Chronology
+open Holonics.Foundation.Separation
 
 universe uG uR uS uF
 

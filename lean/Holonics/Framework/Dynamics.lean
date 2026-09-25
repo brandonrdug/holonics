@@ -21,9 +21,9 @@ import Holonics.Transport.CellHolonomy
 import Holonics.Mathematics.AffineOrbitDivisor
 import Holonics.Mathematics.AnalyticNavigation
 import Holonics.Mathematics.AnalyticReceiving
-import Holonics.Millennium.HolonicDifferenceCalculus
-import Holonics.Millennium.HolonicDirectedPassage
-import Holonics.Millennium.HolonicClockedPantographicSwing
+import Holonics.Foundation.HolonicDifferenceCalculus
+import Holonics.Foundation.HolonicDirectedPassage
+import Holonics.Geometry.HolonicClockedPantographicSwing
 import Holonics.Computation.HolonicConstructiveDifferentialBoundary
 import Holonics.Physics.ConstitutiveModulation
 

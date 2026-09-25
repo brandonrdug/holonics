@@ -186,7 +186,7 @@ structure relevant to the stated receiver.
 - Brad Rodgers and Terence Tao, “The de Bruijn–Newman constant is non-negative,” arXiv:1801.05914
   — the backward-heat zero dynamics, the time-zero energy control, and the pair-correlation
   contradiction: <https://arxiv.org/abs/1801.05914>. The repository's flow owners under
-  `lean/HolonicsResearch/RH/` cite it; the sign of the threshold is
+  `lean/HolonicsResearch/Zeta/` cite it; the sign of the threshold is
   its separate theorem and is not reproved here.
 - Youness Lamzouri, “A new proof that more than 2/3 of the zeros of the Riemann zeta function are
   simple and on the critical line,” arXiv:2609.02882 (2026) — a Hilbert-space inequality on any

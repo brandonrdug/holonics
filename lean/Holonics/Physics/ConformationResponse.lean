@@ -23,7 +23,7 @@ noncomputable section
 
 namespace Holonics.Physics.ConformationResponse
 
-open Holonics.Millennium.Chronology
+open Holonics.Foundation.Chronology
 
 /-! ## The scalar constitutive chart -/
 

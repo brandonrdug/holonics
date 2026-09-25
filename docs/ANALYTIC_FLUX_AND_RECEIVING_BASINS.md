@@ -25,7 +25,7 @@ be globally exact on a punctured domain: a positively oriented simple boundary m
 Here π is the circle-period constraint; a numerical enclosure is only a receiver face.
 
 [proved-derived; formal-checked] The repository already supplies the actual argument-principle
-owners in `RH/Winding`, `RH/RectangleArgumentPrinciple` and `RH/WeightedArgumentPrinciple`.
+owners in `Zeta/Winding`, `Zeta/RectangleArgumentPrinciple` and `Zeta/WeightedArgumentPrinciple`.
 The last one binds the weighted contour to ξ. `HodgeFiniteDecomposition`, `HodgeGreenOperator`
 and `TemporalHodgeResidue` supply the cellular/metric decomposition and its evolution.
 The analytic one-form gives a concrete field and circulation population to discretize on
@@ -68,7 +68,7 @@ and a physical receiver's proper time are distinct until a map between them is s
 uses a declared rate κ and residual equation `F_s v=−κF−u_dot F_u`; setting κ to one is a
 choice of time unit, not an intrinsic physical rate.
 
-[proved-derived; formal-checked] `RH/ZeroDynamicsEntire` now proves
+[proved-derived; formal-checked] `Zeta/ZeroDynamicsEntire` now proves
 `hasDerivAt_heatE_comp_residual_guided` and its actual ξ specialization from the existing
 heat-flow chain theorem, with the same growth and differentiable-curve hypotheses and a
 nonzero source derivative. This joins the source evolution to residual refinement directly.

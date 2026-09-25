@@ -19,7 +19,7 @@ requires the caller to supply the corresponding unit chart.
 
 noncomputable section
 
-namespace Holonics.Millennium.HolonicComplexParametron
+namespace Holonics.Physics.HolonicComplexParametron
 
 /-- A two-coordinate port state for a capacitive/inductive storage pair. -/
 abbrev PortState := ℝ × ℝ
@@ -181,4 +181,4 @@ theorem changingCapacitiveEnergy_deriv_eq_voltage_current
       ((capacitiveVoltage k q time) * q' + (1 / 2 : ℝ) * k' * (q time) ^ 2) time :=
   hasDerivAt_changingCapacitiveEnergy k q time k' q' hk hq
 
-end Holonics.Millennium.HolonicComplexParametron
+end Holonics.Physics.HolonicComplexParametron

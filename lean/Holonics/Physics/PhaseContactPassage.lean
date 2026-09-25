@@ -11,7 +11,7 @@ connection and is not inferred from raster proximity.
 
 noncomputable section
 
-namespace Holonics.Millennium.HolonicComplexParametron
+namespace Holonics.Physics.HolonicComplexParametron
 
 def seamDifference (u x y : ℂ) : ℂ := y - u * x
 
@@ -179,4 +179,4 @@ theorem interpolation_intensity_defect_nonneg
   exact mul_nonneg (mul_nonneg ht₀ (sub_nonneg.mpr ht₁))
     (Complex.normSq_nonneg _)
 
-end Holonics.Millennium.HolonicComplexParametron
+end Holonics.Physics.HolonicComplexParametron

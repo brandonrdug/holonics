@@ -18,7 +18,7 @@ open Matrix
 
 namespace Holonics.Geometry.ScrewGeometry
 
-open Holonics.Millennium.HolonicQuadraticMomentCondensation
+open Holonics.Holon.HolonicQuadraticMomentCondensation
 
 abbrev Vec := Fin 3 → ℚ
 

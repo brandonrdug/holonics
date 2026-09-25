@@ -24,10 +24,10 @@ import Holonics.Physics.FourTorusParametronCurrent
 import Holonics.Physics.AccumulatedNormalResponse
 import Holonics.Physics.InformationDifference
 import Holonics.Physics.TwoCellEntropyTransport
-import Holonics.Millennium.HolonicCurvedArcEinstein
-import Holonics.Millennium.HolonicTypedOriginDimensions
-import Holonics.Millennium.HolonicCosmologicalInference
-import Holonics.Millennium.HolonicFourForceSectorCarrier
+import Holonics.Geometry.HolonicCurvedArcEinstein
+import Holonics.Physics.HolonicTypedOriginDimensions
+import Holonics.Physics.HolonicCosmologicalInference
+import Holonics.Physics.HolonicFourForceSectorCarrier
 import Holonics.Computation.HolonicQuantumTransport
 import Holonics.Computation.HolonicPolarizedCrystalTransport
 import Holonics.Computation.HolonicEvolutionKinds

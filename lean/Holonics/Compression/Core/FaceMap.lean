@@ -82,13 +82,13 @@ most `1 = dim X − 2`, yet the word of length `2` reads it.
 joined in `HolonicsResearch/Landmarks/IntegralCokernel` (`reachableOnlyInMultiple_iff`: reachable
 only in the multiple `m` exactly when the cokernel class is nonzero `m`-torsion; over ℤ the cocycle
 test above fails and torsion coefficients are needed), over `Foundation/LatticeTransport` and
-`HolonicsResearch/Millennium/CokernelCalculus`.
+`HolonicsResearch/Landmarks/CokernelCalculus`.
 -/
 
 namespace Holonics.Compression.Core.FaceMap
 
-open Holonics.Millennium.Chronology
-open Holonics.Millennium.Receiver
+open Holonics.Foundation.Chronology
+open Holonics.Foundation.Receiver
 open Holonics.Foundation.CausalRelevance
 open Holonics.Foundation.CausalRelevance.NonLinear
 open Holonics.Foundation.Standing
@@ -232,7 +232,7 @@ def descendedNavigator (g : Navigator) :
 /-- [definition] **Retention carries the navigators** (`ReceiverHistoryCompression`): the present
 receivers factor through the kernel quotient, and every navigator descends to it. -/
 def kernelHistoryCompression :
-    Holonics.Millennium.LineageCompression.ReceiverHistoryCompression Navigator Receiver X
+    Holonics.Foundation.LineageCompression.ReceiverHistoryCompression Navigator Receiver X
       (X ⧸ LinearMap.ker (faceMap read transport)) V where
   present :=
     { quotient := (LinearMap.ker (faceMap read transport)).mkQ

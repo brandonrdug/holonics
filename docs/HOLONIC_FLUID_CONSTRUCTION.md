@@ -239,8 +239,8 @@ retained in their respective kernels. This use of the Hodge viscosity is the fla
 specialization above; the curved Newtonian operator follows the stress calculation.
 
 [proved-derived; formal-checked] The existing finite
-[Hodge decomposition](../lean/Holonics/Millennium/HodgeFiniteDecomposition.lean)
-and [Green operator](../lean/Holonics/Millennium/HodgeGreenOperator.lean)
+[Hodge decomposition](../lean/Holonics/Hodge/HodgeFiniteDecomposition.lean)
+and [Green operator](../lean/Holonics/Hodge/HodgeGreenOperator.lean)
 split exact, coexact and harmonic sections. The
 [temporal owner](../lean/Holonics/Physics/TemporalHodgeResidue.lean)
 preserves the cohomology class under its heat step, with step stability a separate spectral
@@ -278,7 +278,7 @@ proves the two `swing_even/odd` identities and `moving_swing_galerkin_rate_defec
 These statements use the actual Galerkin operators, not a stand-in bilinear law.
 
 [established-bounded; source-inspected] The earlier
-[clocked nonlinear-source Swing](../lean/HolonicsResearch/Millennium/NavierStokesClockedPantographicSourceSwing.lean)
+[clocked nonlinear-source Swing](../lean/HolonicsResearch/Fluid/NavierStokesClockedPantographicSourceSwing.lean)
 also telescopes oriented source differences along dyadically approaching times and retains
 their reconstruction fibre. Compact-interior continuity controls that source increment.
 A terminal-uniform estimate at a potential singular time is a distinct unclosed analytic
@@ -453,7 +453,7 @@ Hstd_t(z) = (1/8) heatE(−t/4, ξ, 1/2+iz/2),
 Λ_std = 4Λ_DN.
 ```
 
-[CriticalChart](../lean/HolonicsResearch/RH/CriticalChart.lean)
+[CriticalChart](../lean/HolonicsResearch/Zeta/CriticalChart.lean)
 proves these source, coordinate and time identities. Thus the shared heat calculus is
 usable, but physical viscosity time cannot silently replace the reversed entire-function
 time. The zero-location statement requires this source and its analytic domain; a harmonic
@@ -468,8 +468,8 @@ t₀=2, t₁=a,                 t_(n+2)=a t_(n+1)−q t_n,
 tr(M^n)=t_n.
 ```
 
-[LocalFactor](../lean/Holonics/Millennium/LocalFactor.lean)
-and [TraceSequence](../lean/Holonics/Millennium/TraceSequence.lean)
+[LocalFactor](../lean/Holonics/Geometry/LocalFactor.lean)
+and [TraceSequence](../lean/Holonics/Geometry/TraceSequence.lean)
 prove those equalities and, under `a²≤4q`, the root pair with `|α|²=q`.
 
 [proved-derived; formal-checked] The exact quadratic form

@@ -15,7 +15,7 @@ noncomputable section
 
 open scoped BigOperators
 
-namespace Holonics.Millennium.HolonicParametron
+namespace Holonics.Physics.HolonicParametron
 
 /-! ## Direct and reflected modulation of a complex carrier
 
@@ -304,20 +304,20 @@ theorem phaseNetworkEnergy_binaryPhase
   simp only
   exact phaseCoupling_binaryPhase (weight edge.1 edge.2) (state edge.1) (state edge.2)
 
-end Holonics.Millennium.HolonicParametron
+end Holonics.Physics.HolonicParametron
 
-#print axioms Holonics.Millennium.HolonicParametron.pumpStorage_halfTurnSheet
-#print axioms Holonics.Millennium.HolonicParametron.modulatedCarrier_compose
-#print axioms Holonics.Millennium.HolonicParametron.modulatedCarrier_mirror_twice
-#print axioms Holonics.Millennium.HolonicParametron.modulatedCarrier_real_determinant
-#print axioms Holonics.Millennium.HolonicParametron.realReceiver_null_reopens
-#print axioms Holonics.Millennium.HolonicParametron.phaseCarrier_halfTurnSheet
-#print axioms Holonics.Millennium.HolonicParametron.phaseNetworkEnergy_binaryPhase
-#print axioms Holonics.Millennium.HolonicParametron.exp_windingLogI
-#print axioms Holonics.Millennium.HolonicParametron.phaseCarrier_windingI
-#print axioms Holonics.Millennium.HolonicParametron.logarithmicWindingReconstruction
-#print axioms Holonics.Millennium.HolonicParametron.logarithmicWindingHolon_hasDistinctOccurrences
-#print axioms Holonics.Millennium.HolonicParametron.windingIPowerI_eq
-#print axioms Holonics.Millennium.HolonicParametron.iPowerIChartHolon_exponentialFace
-#print axioms Holonics.Millennium.HolonicParametron.iPowerIChartHolon_powerCurrent
-#print axioms Holonics.Millennium.HolonicParametron.iPowerIHolon_receive
+#print axioms Holonics.Physics.HolonicParametron.pumpStorage_halfTurnSheet
+#print axioms Holonics.Physics.HolonicParametron.modulatedCarrier_compose
+#print axioms Holonics.Physics.HolonicParametron.modulatedCarrier_mirror_twice
+#print axioms Holonics.Physics.HolonicParametron.modulatedCarrier_real_determinant
+#print axioms Holonics.Physics.HolonicParametron.realReceiver_null_reopens
+#print axioms Holonics.Physics.HolonicParametron.phaseCarrier_halfTurnSheet
+#print axioms Holonics.Physics.HolonicParametron.phaseNetworkEnergy_binaryPhase
+#print axioms Holonics.Physics.HolonicParametron.exp_windingLogI
+#print axioms Holonics.Physics.HolonicParametron.phaseCarrier_windingI
+#print axioms Holonics.Physics.HolonicParametron.logarithmicWindingReconstruction
+#print axioms Holonics.Physics.HolonicParametron.logarithmicWindingHolon_hasDistinctOccurrences
+#print axioms Holonics.Physics.HolonicParametron.windingIPowerI_eq
+#print axioms Holonics.Physics.HolonicParametron.iPowerIChartHolon_exponentialFace
+#print axioms Holonics.Physics.HolonicParametron.iPowerIChartHolon_powerCurrent
+#print axioms Holonics.Physics.HolonicParametron.iPowerIHolon_receive

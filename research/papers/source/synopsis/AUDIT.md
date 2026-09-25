@@ -32,8 +32,8 @@ Lean/Mathlib, no `sorry`, exact receiver factorization, situated transition path
 rebase, telescoping, the exact numerator--denominator Swing carrier, and Mathlib's actual
 `RiemannHypothesis` proposition. The divisor-source transport of
 `divisor-source-transport-boundary.typ` is checked in
-`lean/HolonicsResearch/RH/DivisorSourceTransport.lean` (the finite proportional-transport
-implication and its subset-overload converse) and `RH/DivisorQuotientFamily.lean` (the exact
+`lean/HolonicsResearch/Zeta/DivisorSourceTransport.lean` (the finite proportional-transport
+implication and its subset-overload converse) and `Zeta/DivisorQuotientFamily.lean` (the exact
 integer quotient re-indexing), ported on September 24, 2026 from the former side project
 `formal/rh-source-transport/`. It remains an exact finite conditional result whose proportional
 candidate is rejected at the claimed analytic scope (the primorial obstruction, whose analytic

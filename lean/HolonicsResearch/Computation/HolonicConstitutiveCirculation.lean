@@ -1,6 +1,6 @@
 import Holonics.Geometry.AffineSwing
 import Holonics.Computation.HolonicConstitutiveFibre
-import Holonics.Millennium.Swing
+import Holonics.Geometry.Swing
 import Mathlib.Tactic
 
 /-!

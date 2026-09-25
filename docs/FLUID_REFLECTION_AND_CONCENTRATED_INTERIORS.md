@@ -303,7 +303,7 @@ can enter and leave that receiver's resolution. A diverging physical norm at an 
 its own scale/clock and regularity analysis; changing coordinates alone does not prove it bounded.
 
 [established-bounded; source-inspected] The existing
-[dynamic rescaling](../lean/HolonicsResearch/Millennium/NavierStokesDynamicRescaling.lean)
+[dynamic rescaling](../lean/HolonicsResearch/Fluid/NavierStokesDynamicRescaling.lean)
 uses moving centre, scale, amplitude and physical time together. It retains the scale drift,
 centre velocity, amplitude rate, viscosity conversion and forcing. The endpoint owners retain
 conditions under which a nonvanishing normalized value or gradient obstructs smooth extension.

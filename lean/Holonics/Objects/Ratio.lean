@@ -604,8 +604,8 @@ end LossIsLogRatio
 
 section LogDerivative
 
-open Holonics.Millennium.HolonicGaugeCovariance
-open Holonics.Millennium.HolonicConnectionCurvature
+open Holonics.Objects.HolonicGaugeCovariance
+open Holonics.Geometry.HolonicConnectionCurvature
   (differential differential_mul Base Connection direction)
 
 variable {n : ℕ} {𝔤 : Type*} [NormedRing 𝔤] [NormedAlgebra ℝ 𝔤]
@@ -680,8 +680,8 @@ end LogDerivative
 
 section QuaternionWitness
 
-open Quaternion Holonics.Millennium.HolonicGaugeCovariance
-open Holonics.Millennium.HolonicConnectionCurvature
+open Quaternion Holonics.Objects.HolonicGaugeCovariance
+open Holonics.Geometry.HolonicConnectionCurvature
   (differential differential_mul Base Connection direction)
 
 /-- The quaternion unit `i`. -/

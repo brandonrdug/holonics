@@ -58,7 +58,7 @@ namespace Holonics.Aeon.Clock.Winding
 
 open Holonics.Aeon.Clock.Groupoid Holonics.Aeon.Clock.Reading
 open Holonics.Geometry
-open Holonics.Millennium.HolonicClockedPantographicSwing
+open Holonics.Geometry.HolonicClockedPantographicSwing
 
 /-! ## 1. The lift of the navigators' joint clock torus -/
 
@@ -372,7 +372,7 @@ theorem jump_iterate (p : LiftedPhase) (m : ℕ) :
       ring
     · rw [(jump_carries_winding _).2.1, h3]
 
-open Holonics.HolonCore Holonics.Millennium.HolonicParametron in
+open Holonics.HolonCore Holonics.Physics.HolonicParametron in
 /-- [proved-derived; formal-checked] **The carrier reads only the open phase.** The phase carrier
 `e^{2πi t}` of a reading equals that of its open phase: the whole windings are what the circle
 forgets and the lift retains. -/

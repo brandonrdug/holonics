@@ -1,6 +1,6 @@
-import HolonicsResearch.Millennium.FamilySupport
+import HolonicsResearch.EllipticCurve.FamilySupport
 
-open Holonics.Millennium.FamilySupport
+open Holonics.EllipticCurve.FamilySupport
 
 #check theSlotClassesAreSupportedAtEveryModulus
 

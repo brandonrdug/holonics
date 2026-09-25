@@ -19,8 +19,8 @@ open scoped BigOperators
 open Holonics.Physics.FourTorusCurrentChart
 open Holonics.Physics.FourTorusTwoFace
 open Holonics.Physics.TwoFaceConstitutive
-open Holonics.Millennium.HolonicFourTorusCarrier
-open Holonics.Millennium.HolonicComplexParametron
+open Holonics.Physics.HolonicFourTorusCarrier
+open Holonics.Physics.HolonicComplexParametron
 
 def realCurrent (current : RationalCurrent grain) : Edge grain → ℝ :=
   fun edge ↦ (current edge : ℝ)
@@ -52,7 +52,7 @@ theorem coupledResponse_current (grain : ℕ) (mu nu : ℚ)
 open Holonics.Physics.ConstitutiveCurrentReduction
 open Holonics.Physics.ConstitutiveWorldTube
 open Holonics.Physics.ConstitutiveScale
-open Holonics.Millennium.HolonicGranularBoundaryRadiation
+open Holonics.Foundation.HolonicGranularBoundaryRadiation
 
 /-- Both grains use their actual proved square/winding chart. This is a receiver quotient
 passage; the source's cold residual remains a source fibre, not a geometric refinement map. -/

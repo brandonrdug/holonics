@@ -132,11 +132,11 @@ concerns the reusable paths and navigators across these different presentations.
 operation. Name the four slots — **source geometry → receiver map → transport → returned
 residual** — and the material is visibly the variable. Commonalities across subjects are the
 expected case and may be new; recover the existing owner before treating one as a discovery.
-RH is the landmark law (the critical line is the unitary seam; `RH/` holds the heat-flow zero
+RH is the landmark law (the critical line is the unitary seam; `Zeta/` holds the heat-flow zero
 dynamics, Hurwitz limits, Foster classes and the explicit formula). Hodge is the realization law
-(the obstruction lives in the cokernel of the cycle class map; `Millennium/Hodge*` holds the
+(the obstruction lives in the cokernel of the cycle class map; `Hodge/Hodge*` holds the
 finite decomposition, harmonic representatives and the `(1, n−1)` index). Navier–Stokes and
-complex Euler are the transport law with and without dissipation (`Millennium/NavierStokes*`).
+complex Euler are the transport law with and without dissipation (`Fluid/NavierStokes*`).
 Iwasawa theory is the tower of levels and its growth law (`Foundation/IwasawaTower.lean`). None is
 a separate track, and none is a prerequisite for an application: each is an instance of
 compression and landmark discovery.

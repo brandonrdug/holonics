@@ -38,7 +38,7 @@ it realizes; the correspondence is bidirectional and is the deliverable.
   every gap) and `Tower.nonempty_compatibleSection_of_surjectiveAdjacent`, which *calls*
   `SuccessorWitnessSystem.nonempty_coherentSection` instead of reproving it.
 * `Foundation/GluingPassage.lean` owns the generic `GluingPassage` and its *obstruction
-  population*; `Millennium/Gluing.lean` keeps additive and named research passages.
+  population*; `Foundation/Gluing.lean` keeps additive and named research passages.
   `Tower.gluingPassage` presents a tower at one chart as that passage, and
   `Tower.carried_iff_observationFibre` identifies its `Carried` predicate with inhabitation of the
   `ObservationFibre`. `Tower.obstruction_nonempty_iff` is therefore the tower's obstruction read
@@ -129,10 +129,10 @@ joined boundary. It is cited, never rebuilt here; this file deposits no cost law
 namespace Holonics.Foundation.ContinuingTower
 
 open Holonics
-open Holonics.Millennium
-open Holonics.Millennium.HolonicDirectedPassage
-open Holonics.Millennium.Chronology
-open Holonics.Millennium.LineageCompression
+open Holonics.Foundation
+open Holonics.Foundation.HolonicDirectedPassage
+open Holonics.Foundation.Chronology
+open Holonics.Foundation.LineageCompression
 
 universe u v w
 

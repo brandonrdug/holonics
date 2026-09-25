@@ -31,7 +31,7 @@ parametron ring's section is for `d ≥ 2`.
    `d ≥ 2` are the owner's crossing records and equal the whole windings of the reading counted
    from the last crossing (`ring_count_is_flux`, over `Objects/Parametron.ownerCrossings_eq_targetTicks`).
    A crossing population read without its section is not the object: in
-   `Millennium/WindingLedger.theApertureMovesThePopulationAndNotTheNet` the population moves with
+   `Geometry/WindingLedger.theApertureMovesThePopulationAndNotTheNet` the population moves with
    the aperture while the net winding stays; a transversal section on a monotone ring fixes the
    count to the windings.
 4. **The Odometer is a tower of epochs.** With ticks at the multiples of `n`, the epoch of a
@@ -78,7 +78,7 @@ namespace Holonics.Aeon.Clock.Epoch
 
 open Finset
 open Holonics.Geometry
-open Holonics.Millennium.HolonicClockedPantographicSwing
+open Holonics.Geometry.HolonicClockedPantographicSwing
 
 /-! ## 1. Ticks partition an aeon into epochs -/
 

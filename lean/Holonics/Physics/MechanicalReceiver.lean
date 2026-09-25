@@ -19,7 +19,7 @@ namespace Holonics.Physics.MechanicalReceiver
 open Holonics
 open Holonics.Physics.ConformationResponse
 open Holonics.Transport.ChangingReceiver
-open Holonics.Millennium.HolonicComplexParametron
+open Holonics.Physics.HolonicComplexParametron
 
 /-- The material term is literally the standing coupled-incidence response for the strain
 Jacobian `B = 2x`. The complete stiffness additionally retains the geometric/prestress term. -/

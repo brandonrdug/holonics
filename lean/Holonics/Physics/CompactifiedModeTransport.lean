@@ -1,4 +1,4 @@
-import Holonics.Millennium.HolonicTorusKnots
+import Holonics.Geometry.HolonicTorusKnots
 import Mathlib.Tactic
 
 /-!
@@ -19,7 +19,7 @@ explicit source map, not an identification of every torus slope with a physical 
 noncomputable section
 namespace Holonics.Physics.CompactifiedModeTransport
 
-open Holonics.Millennium.HolonicTorusKnots
+open Holonics.Geometry.HolonicTorusKnots
 
 /-- Integral charges in the same carrier as the existing addressed torus lift. -/
 abbrev Charges := Fin 2 → ℤ

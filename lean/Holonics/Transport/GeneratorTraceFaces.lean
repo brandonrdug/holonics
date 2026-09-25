@@ -1,5 +1,5 @@
 import Holonics.Transport.HelicalPairInteraction
-import Holonics.Millennium.LocalFactor
+import Holonics.Geometry.LocalFactor
 import Mathlib.LinearAlgebra.Matrix.Block
 import Mathlib.LinearAlgebra.Matrix.Trace
 import Mathlib.Tactic
@@ -10,7 +10,7 @@ import Mathlib.Tactic
 [definition] A site's material is a matrix. Carrying it to another phase conjugates it, so every
 class function of the material is a face conserved along the winding: its determinant, its
 transfer determinant `det(1 − T·M)` and the whole trace sequence `tr(Mᵏ)`. For a two-by-two
-site the existing `Millennium/LocalFactor` companion already reads these as the rotation–dilation
+site the existing `Geometry/LocalFactor` companion already reads these as the rotation–dilation
 pair: trace `a` and determinant `q`, with `det(1 − T·M) = 1 − aT + qT²`. A machine of
 independent sites is their block-diagonal material: its transfer determinant is the product of
 the site factors and its closed-word count is the sum of the site trace sequences.
@@ -26,7 +26,7 @@ open Matrix
 namespace Holonics.Transport.GeneratorTraceFaces
 
 open Holonics.Transport.HelicalPairInteraction
-open Holonics.Millennium.LocalFactor
+open Holonics.Geometry.LocalFactor
 
 /-! ## 1. Powers of carried material are carried powers -/
 

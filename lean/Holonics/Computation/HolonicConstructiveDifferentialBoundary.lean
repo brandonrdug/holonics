@@ -1,5 +1,5 @@
-import Holonics.Millennium.Chronology
-import Holonics.Millennium.HolonicDifferenceCalculus
+import Holonics.Foundation.Chronology
+import Holonics.Foundation.HolonicDifferenceCalculus
 import Mathlib.Algebra.DualNumber
 import Mathlib.Analysis.Calculus.Deriv.MeanValue
 import Mathlib.Analysis.SpecificLimits.Basic
@@ -82,7 +82,7 @@ end DualJet
 
 section ExactPath
 
-open Holonics.Millennium.HolonicDifferenceCalculus
+open Holonics.Foundation.HolonicDifferenceCalculus
 
 variable {Scalar Tangent Value Face : Type*}
 variable [Semiring Scalar]
@@ -228,7 +228,7 @@ theorem ReceiverSqueezeCertificate.standardFace_tendsto
     {Index Residue : Type*} {l : Filter Index}
     (certificate : ReceiverSqueezeCertificate Index Residue l) :
     Tendsto certificate.standardFace l (𝓝 certificate.limit) :=
-  Holonics.Millennium.Chronology.theBodyIsPlacedWhenTheConstraintsClose
+  Holonics.Foundation.Chronology.theBodyIsPlacedWhenTheConstraintsClose
     certificate.lower_tendsto certificate.upper_tendsto certificate.lower_le certificate.face_le
 
 /-- The proved limit is exactly the first projection; the residue remains in the combined carrier. -/

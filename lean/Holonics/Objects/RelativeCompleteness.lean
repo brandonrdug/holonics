@@ -2,7 +2,7 @@ import Holonics.Foundation.CausalRelevance
 import Holonics.Foundation.Standing
 import Holonics.Geometry.ExteriorBoundary
 import Holonics.Transport.WorldTube
-import Holonics.Millennium.Ricci
+import Holonics.Geometry.Ricci
 import Mathlib.LinearAlgebra.Charpoly.Basic
 import Mathlib.LinearAlgebra.Dual.Lemmas
 
@@ -70,7 +70,7 @@ relatively complete:
 
 * a cold lattice `A = 0`, and a quench `A = −1` (the Euler step sends the interior to zero), fail
   (2), although both are coupled with a nonzero fibre;
-* the `Millennium/Ricci.lean` triangle flow read by its conserved total fails (2): its fibre is
+* the `Geometry/Ricci.lean` triangle flow read by its conserved total fails (2): its fibre is
   nonzero and moving, but it contracts at `1 − 3τ` (`theDeviationContractsAtTheWindingRate`);
 * a fully observable interior fails (2), and a sealed interior `C = 0` fails (1);
 * the lateral membrane of a strip with open ends fails (3), as does a hollow cycle that is closed
@@ -95,7 +95,7 @@ noncomputable section
 
 namespace Holonics.Objects.RelativeCompleteness
 
-open Holonics.Millennium.Chronology
+open Holonics.Foundation.Chronology
 open Holonics.Foundation.CausalRelevance
 open Holonics.Foundation.CausalRelevance.NonLinear
 
@@ -643,7 +643,7 @@ theorem observabilityKernel_eq_horizonKernel_finrank [FiniteDimensional K I]
         exact lt_of_lt_of_le hdeg (by exact_mod_cast not_lt.mp hi)
       rw [this, zero_smul]
 
-open Holonics.Millennium.HolonicSensoryWorldTube in
+open Holonics.Transport.HolonicSensoryWorldTube in
 /-- [proved-derived; formal-checked] **Join to `WorldTube`.** When a world tube's outward receiver
 is `C`, a nonzero interior current in the unobservable subspace is lawful silence
 (`WorldTube.IsLawfulSilence`), and `C` also vanishes on its image under every `Aᵏ`. Only
@@ -834,7 +834,7 @@ theorem quench_fails :
 
 section Ricci
 
-open Holonics.Millennium.Ricci
+open Holonics.Geometry.Ricci
 
 /-- [definition] The generator whose unit-clock step is `Ricci.flow (1/6)`. -/
 def ricciA : Tri →ₗ[ℚ] Tri where

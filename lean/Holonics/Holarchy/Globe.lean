@@ -62,7 +62,7 @@ namespace Holonics.HolarchyCore
 open Matrix
 open Holonics.Objects.RelativeCompleteness
 open Holonics.Foundation.CausalRelevance
-open Holonics.Millennium.Chronology (transportWord transportWord_nil transportWord_cons)
+open Holonics.Foundation.Chronology (transportWord transportWord_nil transportWord_cons)
 
 universe u
 

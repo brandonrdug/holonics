@@ -11,7 +11,7 @@
 //! | `Geometry/PairResonance.mediant_neighbours_both`, `neighbours_iff_unimodular` | [`mediant`], [`are_neighbours`] |
 //! | `Geometry/PairResonance.between_neighbours_costs_at_least_the_mediant` | [`simplest_between`], [`LockAddress::period`] |
 //! | `Geometry/PairResonance.unimodular_rechart_is_invertible` | [`IntMat2::unimodular_inverse`] |
-//! | `Millennium/Farey.sbL`, `sbR`, `theProductCarriesTheConvergents` | [`LockAddress`] |
+//! | `Geometry/Farey.sbL`, `sbR`, `theProductCarriesTheConvergents` | [`LockAddress`] |
 
 use crate::ratio::Rat;
 use num_bigint::{BigInt, BigUint};

@@ -92,10 +92,10 @@ theorem norm_passageDefect_comp_le {X Y Z A B C : Type*}
 theorem word_defect_zero {Generator X A : Type*} [AddGroup A]
     (T : Generator → X → X) (U : Generator → A → A) (q : X → A)
     (commutes : ∀ i x, q (T i x) = U i (q x)) (word : List Generator) (x : X) :
-    defect q (fun x ↦ q (Millennium.Chronology.transportWord T word x))
-      (Millennium.Chronology.transportWord U word) x = 0 := by
+    defect q (fun x ↦ q (Foundation.Chronology.transportWord T word x))
+      (Foundation.Chronology.transportWord U word) x = 0 := by
   apply (defect_zero_iff _ _ _ _).mpr
-  exact Millennium.Chronology.generatorEquivarianceExtendsToEveryTransportWord
+  exact Foundation.Chronology.generatorEquivarianceExtendsToEveryTransportWord
     T U q commutes word x
 
 /-- Changing carrier types and changing receiver charts preserve an actual supplied history

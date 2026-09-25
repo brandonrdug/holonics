@@ -1,7 +1,7 @@
 import Holonics.Computation.MachineLearningStrictLift
 import Holonics.Foundation.Receiver
 import Holonics.Physics.CoupledIncidence
-import Holonics.Millennium.SituatedReturnedDifference
+import Holonics.Transport.SituatedReturnedDifference
 import Mathlib.Tactic
 
 /-!
@@ -20,7 +20,7 @@ definition of inference throughout HNA. The complete developing operation is own
 namespace Holonics.Computation.SituatedMachineLearning
 
 open Holonics.Computation.MachineLearningChart
-open Holonics.Millennium.HolonicComplexParametron
+open Holonics.Physics.HolonicComplexParametron
 
 universe uB uE uD uL
 
@@ -148,9 +148,9 @@ def fixedRealPhaseChart (gain : ℝ) :
 
 theorem fixedRealPhaseChart_everyRecurrence (gain : ℝ) (word : List Unit) (current : ℂ) :
     (fixedRealPhaseChart gain).quotient
-        (Holonics.Millennium.Chronology.transportWord
+        (Holonics.Foundation.Chronology.transportWord
           (fixedRealPhaseChart gain).nativeStep word current) =
-      Holonics.Millennium.Chronology.transportWord
+      Holonics.Foundation.Chronology.transportWord
         (fixedRealPhaseChart gain).classicalStep word
         ((fixedRealPhaseChart gain).quotient current) :=
   (fixedRealPhaseChart gain).everyOrderedWordExact word current
@@ -179,7 +179,7 @@ end ParametronChart
 
 namespace OrientationControl
 
-open Holonics.Millennium.HolonicComplexParametron
+open Holonics.Physics.HolonicComplexParametron
 
 /-- One scalar node coordinate shared by two branch-orientation charts. -/
 def scalarState : Unit → ℝ := fun _ ↦ 1

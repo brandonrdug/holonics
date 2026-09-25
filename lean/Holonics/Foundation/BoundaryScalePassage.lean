@@ -9,7 +9,7 @@ statement.  It lets chain, topology, and physical realizations share the same bo
 law without importing any one constitutive realization.
 -/
 
-namespace Holonics.Millennium.HolonicGranularBoundaryRadiation
+namespace Holonics.Foundation.HolonicGranularBoundaryRadiation
 
 /-- One scale passage transports both interior and boundary sections and makes boundary formation
 commute.  It does not prescribe how either grain was founded. -/
@@ -102,4 +102,4 @@ section Audit
 
 end Audit
 
-end Holonics.Millennium.HolonicGranularBoundaryRadiation
+end Holonics.Foundation.HolonicGranularBoundaryRadiation

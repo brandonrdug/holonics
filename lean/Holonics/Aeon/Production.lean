@@ -47,5 +47,5 @@ identification of the induced shift's Kolmogorov–Sinai entropy with the per-wo
 here; the converse of Kolmogorov's criterion (zero cycle affinities ⇒ detailed balance); the
 continuum Hodge theorem; the record's agent-inferred reading of relative completeness as exact
 reading. `PositiveCellHodge` lives only
-in `HolonicsResearch` (`Millennium/HolonicDiscreteMaxwellOperator`) and is not joined here.
+in `HolonicsResearch` (`Physics/HolonicDiscreteMaxwellOperator`) and is not joined here.
 -/

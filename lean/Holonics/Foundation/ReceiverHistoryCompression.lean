@@ -17,10 +17,10 @@ receiver and quotient, then separate after one successor transport.  Every theor
 Nothing here asserts a result about a named Millennium problem.
 -/
 
-namespace Holonics.Millennium.LineageCompression
+namespace Holonics.Foundation.LineageCompression
 
 open Holonics
-open Holonics.Millennium.Chronology
+open Holonics.Foundation.Chronology
 
 universe u v w x y
 
@@ -149,10 +149,10 @@ end StaticControl
 
 end ReceiverHistoryCompression
 
-end Holonics.Millennium.LineageCompression
+end Holonics.Foundation.LineageCompression
 
 section Audit
-open Holonics.Millennium.LineageCompression
+open Holonics.Foundation.LineageCompression
 #print axioms ReceiverHistoryCompression.quotientCommutesWithEveryOrderedWord
 #print axioms ReceiverHistoryCompression.quotientEqForcesEverySuccessorFace
 #print axioms ReceiverHistoryCompression.separatingSuccessorReopensTheProposedQuotient

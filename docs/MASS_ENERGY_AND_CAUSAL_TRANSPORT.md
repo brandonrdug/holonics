@@ -352,7 +352,7 @@ e^{-tA}=\frac1{\sqrt{4\pi t}}
 To prove it, diagonalize A in an orthonormal eigenbasis. For every eigenvalue λ≥0, the
 Gaussian Fourier identity gives the scalar integral \(e^{-t\lambda}\); finite summation
 then reconstructs the operator equality. The scalar complex-Gaussian identity is already
-checked in `RH/FlowedGamma.gaussian_fourier`; this finite spectral extension follows by the
+checked in `Zeta/FlowedGamma.gaussian_fourier`; this finite spectral extension follows by the
 displayed diagonalization argument.[^2]
 
 [proved-derived] For a finite differential with d²=0 and adjoint δ, the self-adjoint
@@ -573,7 +573,7 @@ Hermiticity, occupation and consuming-Hamiltonian results are recorded in the re
 
 ## 13. Mass gaps, retained modes and navigation
 
-[proved-derived; formal-checked] `Millennium/MassGap.lean` transports a known quadratic lower
+[proved-derived; formal-checked] `Gauge/MassGap.lean` transports a known quadratic lower
 bound through an oriented return. If `F(v,v)>=Delta||v||^2` and
 `G(v,v)-F(v,v)>=-epsilon||v||^2`, then `G(v,v)>=(Delta-epsilon)||v||^2`.
 The upper-return theorem independently uses the other polarity. The signed difference and

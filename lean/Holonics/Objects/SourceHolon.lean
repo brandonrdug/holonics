@@ -65,7 +65,7 @@ noncomputable section
 namespace Holonics.Objects.SourceHolon
 
 open Holonics
-open Holonics.Millennium.Chronology
+open Holonics.Foundation.Chronology
 open Holonics.Transport.SourceMoment
 open Holonics.Foundation.Standing
 open Holonics.Foundation.CausalRelevance.NonLinear

@@ -21,9 +21,9 @@ noncomputable section
 
 open scoped BigOperators
 
-namespace Holonics.Millennium.HolonicComplexParametron
+namespace Holonics.Physics.HolonicComplexParametron
 
-open Holonics.Millennium.HolonicParametron
+open Holonics.Physics.HolonicParametron
 
 variable {Node Branch : Type*}
 
@@ -683,23 +683,23 @@ theorem mutualParametronHolon_totalReceiver_diagonal_offDiagonal
   rw [Finset.sum_union (Finset.disjoint_diag_offDiag (Finset.univ : Finset Branch)),
     Finset.sum_diag]
 
-end Holonics.Millennium.HolonicComplexParametron
+end Holonics.Physics.HolonicComplexParametron
 
-#print axioms Holonics.Millennium.HolonicComplexParametron.diagonalStorage_reorient
-#print axioms Holonics.Millennium.HolonicComplexParametron.isGeneralizedMode_reorient_iff
-#print axioms Holonics.Millennium.HolonicComplexParametron.coupledResponse_additive
-#print axioms Holonics.Millennium.HolonicComplexParametron.coupledResponse_rankOne
-#print axioms Holonics.Millennium.HolonicComplexParametron.reorientCoupling_rankOne
-#print axioms Holonics.Millennium.HolonicComplexParametron.coupledResponse_rankOne_eq_zero_of_null_contraction
-#print axioms Holonics.Millennium.HolonicComplexParametron.driveAction_reorientBoth
-#print axioms Holonics.Millennium.HolonicComplexParametron.branchDrop_endpointIncidence
-#print axioms Holonics.Millennium.HolonicComplexParametron.complexBranchDrop_endpointIncidence
-#print axioms Holonics.Millennium.HolonicComplexParametron.complexParametronHolon_totalComplexCurrent
-#print axioms Holonics.Millennium.HolonicComplexParametron.complexParametronHolon_totalDiagonalContribution
-#print axioms Holonics.Millennium.HolonicComplexParametron.mutualParametronHolon_totalReceiver
-#print axioms Holonics.Millennium.HolonicComplexParametron.diagonalMutualParametronHolon_receive
-#print axioms Holonics.Millennium.HolonicComplexParametron.diagonalMutualParametronHolon_totalReceiver
-#print axioms Holonics.Millennium.HolonicComplexParametron.mutualParametronHolon_totalReceiver_diagonal_offDiagonal
-#print axioms Holonics.Millennium.HolonicComplexParametron.coupledResponse_reorient
-#print axioms Holonics.Millennium.HolonicComplexParametron.isCoupledGeneralizedMode_reorient_iff
-#print axioms Holonics.Millennium.HolonicComplexParametron.phaseSuperposition_halfTurn
+#print axioms Holonics.Physics.HolonicComplexParametron.diagonalStorage_reorient
+#print axioms Holonics.Physics.HolonicComplexParametron.isGeneralizedMode_reorient_iff
+#print axioms Holonics.Physics.HolonicComplexParametron.coupledResponse_additive
+#print axioms Holonics.Physics.HolonicComplexParametron.coupledResponse_rankOne
+#print axioms Holonics.Physics.HolonicComplexParametron.reorientCoupling_rankOne
+#print axioms Holonics.Physics.HolonicComplexParametron.coupledResponse_rankOne_eq_zero_of_null_contraction
+#print axioms Holonics.Physics.HolonicComplexParametron.driveAction_reorientBoth
+#print axioms Holonics.Physics.HolonicComplexParametron.branchDrop_endpointIncidence
+#print axioms Holonics.Physics.HolonicComplexParametron.complexBranchDrop_endpointIncidence
+#print axioms Holonics.Physics.HolonicComplexParametron.complexParametronHolon_totalComplexCurrent
+#print axioms Holonics.Physics.HolonicComplexParametron.complexParametronHolon_totalDiagonalContribution
+#print axioms Holonics.Physics.HolonicComplexParametron.mutualParametronHolon_totalReceiver
+#print axioms Holonics.Physics.HolonicComplexParametron.diagonalMutualParametronHolon_receive
+#print axioms Holonics.Physics.HolonicComplexParametron.diagonalMutualParametronHolon_totalReceiver
+#print axioms Holonics.Physics.HolonicComplexParametron.mutualParametronHolon_totalReceiver_diagonal_offDiagonal
+#print axioms Holonics.Physics.HolonicComplexParametron.coupledResponse_reorient
+#print axioms Holonics.Physics.HolonicComplexParametron.isCoupledGeneralizedMode_reorient_iff
+#print axioms Holonics.Physics.HolonicComplexParametron.phaseSuperposition_halfTurn

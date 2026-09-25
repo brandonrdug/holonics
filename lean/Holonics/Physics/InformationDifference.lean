@@ -18,7 +18,7 @@ namespace Holonics.Physics.InformationDifference
 open scoped BigOperators
 open Holonics.Computation.HolonicInformationTheory
 open Holonics.Computation.HolonicInformationTheory.PositiveProbabilitySection
-open Holonics.Millennium.HolonicMembraneActionTransport
+open Holonics.Foundation.HolonicMembraneActionTransport
 
 variable {Index : Type*} [Fintype Index]
 

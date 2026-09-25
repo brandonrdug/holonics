@@ -5,14 +5,14 @@ import Mathlib.Tactic.NoncommRing
 # Gauge calculus used by ratio jets
 
 This is the generic unit-valued connection transport used by the ratio's logarithmic derivative.
-Curvature covariance remains a research theorem in `Millennium/HolonicGaugeCovariance`.
+Curvature covariance remains a research theorem in `Gauge/HolonicGaugeCovariance`.
 -/
 
 noncomputable section
 
-namespace Holonics.Millennium.HolonicGaugeCovariance
+namespace Holonics.Objects.HolonicGaugeCovariance
 
-open Holonics.Millennium.HolonicConnectionCurvature
+open Holonics.Geometry.HolonicConnectionCurvature
 
 variable {n : ℕ} {𝔤 : Type*} [NormedRing 𝔤] [NormedAlgebra ℝ 𝔤]
 
@@ -94,4 +94,4 @@ theorem differential_gaugeTransform (G : Gauge n 𝔤) (A : Connection n 𝔤)
   rw [hfun, hd1, hd2, hd3, hd4]
   noncomm_ring
 
-end Holonics.Millennium.HolonicGaugeCovariance
+end Holonics.Objects.HolonicGaugeCovariance

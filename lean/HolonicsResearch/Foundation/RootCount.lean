@@ -1,13 +1,13 @@
 import Mathlib.Algebra.Polynomial.FieldDivision
 import Mathlib.FieldTheory.Perfect
 import Mathlib.Tactic
-import HolonicsResearch.Millennium.Sturm
+import HolonicsResearch.Mathematics.Sturm
 
 /-! # Root counting: the gauge a sign-variation reading is blind to, and the squarefree part
 
 [definition] This owner states the two laws the Rust module
 `crates/holonic-engine/src/exact_value.rs::SturmChain` rests on, and closes the boundary
-`HolonicsResearch.Millennium.Sturm` names open.
+`HolonicsResearch.Mathematics.Sturm` names open.
 
 That module carries the classical instrument: a chart is a coefficient list, `remainderChain` is the
 negated-remainder chain, `readingAt` is its sign-variation count at a rational point, and
@@ -48,7 +48,7 @@ interval is the number of distinct real roots in it — is a **cited classical f
 [established-classical; not-formalized-here]: C. Sturm, *Mémoire sur la résolution des équations
 numériques*, Bull. des Sciences de Férussac **11** (1829); see also Basu–Pollack–Roy,
 *Algorithms in Real Algebraic Geometry*, 2nd ed., Theorem 2.61. It is stated in this repository as
-the named-open proposition `Holonics.Millennium.Sturm.TheReadingEqualsThePopulation` and is not
+the named-open proposition `Holonics.Mathematics.Sturm.TheReadingEqualsThePopulation` and is not
 assumed anywhere below: every theorem in this file is about the *reading*, which is a finite
 combinatorial object, and none of them needs the theorem that interprets it. Mathlib has no Sturm
 theory (its `Polynomial.signVariations` serves Descartes' rule of signs, which is a bound and not a
@@ -65,7 +65,7 @@ Plan: `docs/plans/THE_RECEIVER_ATLAS_SEPARATES_WHAT_ONE_FACE_CANNOT.md`, **R1** 
 
 namespace Holonics.Foundation.RootCount
 
-open Holonics.Millennium.Sturm
+open Holonics.Mathematics.Sturm
 
 /-! ## 1. The per-entry positive gauge -/
 
@@ -121,7 +121,7 @@ theorem theContinuingCountIsInvariantUnderPerEntryPositiveRescaling :
 
 /-- **The reading is invariant under a per-entry positive rescaling.**
 
-[proved-derived; formal-checked] This is the boundary `Millennium/Sturm.lean` named open, closed.
+[proved-derived; formal-checked] This is the boundary `Mathematics/Sturm.lean` named open, closed.
 It is the whole licence for the Rust owner's pseudo-remainder chain: its `i`-th entry is a
 *different* positive multiple of the classical `i`-th entry, and the reading cannot see that. The
 positivity is not decoration — the per-entry statement is false for a negative factor, which is why
@@ -153,7 +153,7 @@ theorem thePerEntryGaugeIsSharpAtItsPositivity :
 
 /-- **The continuing count is invariant under a common nonzero rescaling.**
 
-`Millennium/Sturm.lean` proves this for `0 < c`. A common factor enters every adjacent product
+`Mathematics/Sturm.lean` proves this for `0 < c`. A common factor enters every adjacent product
 squared — `(c u)(c v) = c² (u v)` — so its *sign* cannot matter, and the hypothesis weakens to
 `c ≠ 0`. -/
 theorem theContinuingCountIsInvariantUnderCommonNonzeroRescaling {c : ℚ} (hc : c ≠ 0) :
