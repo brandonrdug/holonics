@@ -615,7 +615,7 @@ fn the_jordan_resolvent_grows_two_orders_faster_than_the_semisimple_one_at_the_s
     let mut defective_readings = Vec::new();
     let mut semisimple_readings = Vec::new();
     for offset in [ratio(1, 10), ratio(1, 100), ratio(1, 1000)] {
-        let point = ProbePoint::new(offset.clone(), Rat::one());
+        let point = GaussianRat::new(offset.clone(), Rat::one());
         let one = resolvent_probe(&defective, &point).expect("the exact resolvent returns");
         let two = resolvent_probe(&semisimple, &point).expect("the exact resolvent returns");
         assert!(one.residual.is_zero());
@@ -886,11 +886,11 @@ fn the_separation_refuses_when_no_declared_probe_separates() {
 fn a_probe_point_on_the_spectrum_is_refused() {
     let base = declared("pole", &[&[1, 0], &[0, 2]], &[1, 0], &[1, 0]);
     assert_eq!(
-        resolvent_probe(&base, &ProbePoint::new(integer(1), Rat::zero())).unwrap_err(),
+        resolvent_probe(&base, &GaussianRat::new(integer(1), Rat::zero())).unwrap_err(),
         ChordRefusal::ProbePointIsAPole
     );
     // And one strictly off it returns exactly, with a zero certificate.
-    let probe = resolvent_probe(&base, &ProbePoint::new(integer(0), Rat::one()))
+    let probe = resolvent_probe(&base, &GaussianRat::new(integer(0), Rat::one()))
         .expect("an off-spectrum probe returns");
     assert!(probe.residual.is_zero());
 }

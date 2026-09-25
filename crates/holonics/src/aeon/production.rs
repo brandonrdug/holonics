@@ -433,7 +433,8 @@ impl MarkovChain {
                 if back.is_zero() {
                     return Err(AeonError::IrreversibleStep { from: x, to: y });
                 }
-                production = production.plus(&bits(&(&flow / back))?.scaled(&flow));
+                production = production
+                    .plus(&SymbolicSurprisal::log2_of_ratio(&(&flow / back))?.scaled(&flow));
             }
         }
         Ok(production)
@@ -472,8 +473,10 @@ impl MarkovChain {
         for states in frontier {
             let aeon = self.walk(&states)?;
             let probability = self.path_law(law, &aeon)?;
-            production =
-                production.plus(&bits(&self.production(law, &aeon)?)?.scaled(&probability));
+            production = production.plus(
+                &SymbolicSurprisal::log2_of_ratio(&self.production(law, &aeon)?)?
+                    .scaled(&probability),
+            );
         }
         Ok(production)
     }
@@ -504,20 +507,6 @@ fn tree_path(parent: &[Option<usize>], state: usize) -> Vec<usize> {
         current = up;
     }
     path
-}
-
-/// `log₂ r` of a positive rational as its exact form: `−S(r)` for `r ≤ 1`, `S(1/r)` above.
-fn bits(ratio: &Rat) -> Result<SymbolicSurprisal, AeonError> {
-    if !ratio.is_positive() {
-        return Err(AeonError::NotAPositiveLaw {
-            reason: "a logarithm of a nonpositive ratio",
-        });
-    }
-    if *ratio <= Rat::one() {
-        Ok(SymbolicSurprisal::of_probability(ratio)?.scaled(&-Rat::one()))
-    } else {
-        Ok(SymbolicSurprisal::of_probability(&ratio.recip())?)
-    }
 }
 
 #[cfg(test)]

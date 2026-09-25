@@ -38,7 +38,7 @@
 //!
 //! | Lean `Compression/Landmark/FixedPoint` | Rust |
 //! |---|---|
-//! | `Mobius`, `Mobius.act`, `trace`, `det`, `Fixed`, `act_eq_blockTransport`, `act_eq_self_iff` | [`MobiusNavigator`] |
+//! | `Mobius`, `Mobius.act`, `trace`, `det`, `Fixed`, `act_eq_blockTransport`, `act_eq_self_iff` | [`MobiusNavigator`] (over `ℚ` and `ℚ(i)`), [`MobiusNavigator::act`], [`MobiusNavigator::fixes`] |
 //! | `sub_fixed`, `act_sub_fixed`, `other_multiplier`, `fixed_points_at_most_two`, `multipliers_sum`, `multipliers_prod`, `discriminant_eq_sq`, `chart_conjugates` | [`MobiusNavigator::fixed_points`], [`MobiusNavigator::chart`] |
 //! | `two_fixed_points_disc_pos`, `two_fixed_points_is_boost` (with `det > 0`); `SiteKind.siteKind_eq_reflection_iff` (`det < 0`) | [`MobiusNavigator::kind`] |
 //! | `multipliers_ne`, `attracting_iff_trace_ne_zero`, `act_ne_fixed`, `iterate_tendsto_fixed` (`c ≠ 0`) | [`MobiusNavigator::attraction`] |
@@ -55,7 +55,7 @@ use crate::compression::landmark::quadratic::QuadraticSurd;
 use crate::compression::landmark::site::lorentz_factor_squared;
 use crate::navigator::trace::{SiteFactor, SiteKind};
 use crate::ratio::polynomial::RationalPolynomial;
-use crate::ratio::{Rat, integer};
+use crate::ratio::{ExactField, GaussianRat, Rat, integer};
 
 /// [definition] **A point of the projective line**: a finite value in its quadratic field, or `∞`.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -106,40 +106,106 @@ pub enum Attraction {
     Identity,
 }
 
-/// [definition] **A Möbius navigator** `z ↦ (αz + β)/(γz + δ)` with `det ≠ 0`.
+/// [definition] **A Möbius navigator** `z ↦ (αz + β)/(γz + δ)` with `det ≠ 0`, over an exact
+/// field of scalars (`ℚ` by default, or `ℚ(i)`; Lean `Mobius K` over a field `K`). The block, its
+/// trace, determinant, discriminant, action and fixed-point test are written once for both fields;
+/// the fixed points, attraction and site kind below are read over `ℚ`.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct MobiusNavigator {
-    alpha: Rat,
-    beta: Rat,
-    gamma: Rat,
-    delta: Rat,
+pub struct MobiusNavigator<S = Rat> {
+    alpha: S,
+    beta: S,
+    gamma: S,
+    delta: S,
 }
 
-impl MobiusNavigator {
+impl<S: ExactField> MobiusNavigator<S> {
     /// The navigator of the block `[[α, β], [γ, δ]]`; a singular block is refused.
-    pub fn new(alpha: Rat, beta: Rat, gamma: Rat, delta: Rat) -> Result<Self, LandmarkError> {
+    pub fn new(alpha: S, beta: S, gamma: S, delta: S) -> Result<Self, LandmarkError> {
         let navigator = Self {
             alpha,
             beta,
             gamma,
             delta,
         };
-        if navigator.determinant().is_zero() {
+        if navigator.determinant().vanishes() {
             return Err(LandmarkError::SingularNavigator);
         }
         Ok(navigator)
     }
 
+    /// [definition] **A one-parameter generator** `X = [[a, b], [c, −a]]`, the traceless block
+    /// whose navigators are `1 + tX` to first order and its Cayley block (Lean
+    /// `Physics/Fluid/Singularity.generator`, `parabolic`, each a `Mobius ℂ`). It is admitted
+    /// singular: a nilpotent generator (a doublet's) still moves every point off its one fixed
+    /// line.
+    pub fn generator(a: S, b: S, c: S) -> Self {
+        Self {
+            delta: S::from_rat(Rat::zero()).minus(&a),
+            alpha: a,
+            beta: b,
+            gamma: c,
+        }
+    }
+
+    /// The entries `[α, β, γ, δ]`.
+    pub fn entries(&self) -> [&S; 4] {
+        [&self.alpha, &self.beta, &self.gamma, &self.delta]
+    }
+
     /// `tr = α + δ`.
-    pub fn trace(&self) -> Rat {
-        &self.alpha + &self.delta
+    pub fn trace(&self) -> S {
+        self.alpha.plus(&self.delta)
     }
 
     /// `det = αδ − βγ`.
-    pub fn determinant(&self) -> Rat {
-        &self.alpha * &self.delta - &self.beta * &self.gamma
+    pub fn determinant(&self) -> S {
+        self.alpha
+            .times(&self.delta)
+            .minus(&self.beta.times(&self.gamma))
     }
 
+    /// The discriminant face `Δ = tr² − 4 det = (δ − α)² + 4βγ` (Lean `discriminant_eq_sq`,
+    /// `Physics/Fluid/Singularity.discriminant`).
+    pub fn discriminant(&self) -> S {
+        let trace = self.trace();
+        trace
+            .times(&trace)
+            .minus(&S::from_rat(integer(4)).times(&self.determinant()))
+    }
+
+    /// **One step** at a finite point, refused at the pole `γz + δ = 0` (Lean `Mobius.act`).
+    pub fn act(&self, point: &S) -> Result<S, LandmarkError> {
+        let denominator = self.gamma.times(point).plus(&self.delta);
+        let inverse = denominator.reciprocal().ok_or(LandmarkError::Pole {
+            point: point.as_gaussian(),
+        })?;
+        Ok(self.alpha.times(point).plus(&self.beta).times(&inverse))
+    }
+
+    /// `z` is an undivided fixed point: `αz + β = z(γz + δ)` (Lean `Mobius.Fixed`,
+    /// `act_eq_self_iff`).
+    pub fn fixes(&self, point: &S) -> bool {
+        self.alpha.times(point).plus(&self.beta)
+            == point.times(&self.gamma.times(point).plus(&self.delta))
+    }
+}
+
+impl MobiusNavigator<GaussianRat> {
+    /// The navigator over `ℚ` when every entry is real; `None` otherwise.
+    pub fn real(&self) -> Option<MobiusNavigator<Rat>> {
+        self.entries()
+            .iter()
+            .all(|entry| entry.is_real())
+            .then(|| MobiusNavigator {
+                alpha: self.alpha.re.clone(),
+                beta: self.beta.re.clone(),
+                gamma: self.gamma.re.clone(),
+                delta: self.delta.re.clone(),
+            })
+    }
+}
+
+impl MobiusNavigator<Rat> {
     /// The site faces `(tr, det)`, defined up to the projective scaling `(λ tr, λ² det)`.
     pub fn site(&self) -> SiteFactor {
         SiteFactor::new(self.trace(), self.determinant())
@@ -156,22 +222,11 @@ impl MobiusNavigator {
         lorentz_factor_squared(&self.site())
     }
 
-    /// **One step** at a finite rational point, refused at the pole `γz + δ = 0`.
-    pub fn act(&self, point: &Rat) -> Result<Rat, LandmarkError> {
-        let denominator = &self.gamma * point + &self.delta;
-        if denominator.is_zero() {
-            return Err(LandmarkError::Pole {
-                point: point.clone(),
-            });
-        }
-        Ok((&self.alpha * point + &self.beta) / denominator)
-    }
-
     /// **The fixed points, exactly** (Lean `fixed_points_at_most_two`, `multipliers_sum`,
     /// `multipliers_prod`, `discriminant_eq_sq`).
     pub fn fixed_points(&self) -> Result<FixedPoints, LandmarkError> {
         let trace = self.trace();
-        let discriminant = &trace * &trace - integer(4) * self.determinant();
+        let discriminant = self.discriminant();
         if self.gamma.is_zero() {
             // Affine: `∞` is the eigenline of `α`, and `β/(δ − α)` that of `δ`.
             let at_infinity = FixedPoint {
@@ -515,7 +570,9 @@ mod tests {
         );
         assert_eq!(
             navigator(1, 2, 2, 1).act(&rat(-1, 2)),
-            Err(LandmarkError::Pole { point: rat(-1, 2) })
+            Err(LandmarkError::Pole {
+                point: GaussianRat::real(rat(-1, 2))
+            })
         );
     }
 

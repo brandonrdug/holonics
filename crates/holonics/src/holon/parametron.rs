@@ -45,7 +45,7 @@ use thiserror::Error;
 use crate::geometry::rational_circle;
 use crate::geometry::screw::RationalPhase;
 use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
-use crate::ratio::{Rat, integer};
+use crate::ratio::{GaussianRat, Rat, integer};
 
 /// Every refusal of a parametron. Bad input is a typed return, never a panic.
 #[derive(Debug, Error, PartialEq, Eq)]
@@ -261,6 +261,13 @@ impl Carrier {
 
     pub fn sin(&self) -> &Rat {
         &self.sin
+    }
+
+    /// **The carrier as its unit amplitude** `e^{iθ} = cos θ + i sin θ` in `ℚ(i)`: the unit circle
+    /// of the Gaussian rationals. Transport along a connection is multiplication by it (Lean
+    /// `Physics/Wave/Interference.common_phase_invariant`).
+    pub fn as_gaussian(&self) -> GaussianRat {
+        GaussianRat::new(self.cos.clone(), self.sin.clone())
     }
 
     /// `cos(θ − φ)` between two carriers.

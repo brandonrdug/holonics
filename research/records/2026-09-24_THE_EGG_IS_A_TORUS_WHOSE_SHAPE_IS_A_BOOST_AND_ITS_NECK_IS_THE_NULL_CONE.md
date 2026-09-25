@@ -72,7 +72,7 @@ aeon sense (null-cone record, §5). `[interpretation]`
 ## 4. Flux: the converging and diverging pair is the logarithm of a Möbius ratio
 
 - **Potential of a source/sink pair.** For a planar source–sink pair of strengths `±m` with circulations
-  `±Γ` at `z₁, z₂`, the complex potential is `F = ((m + iΓ)/2π) · log((z − z₁)/(z − z₂))`: the logarithm
+  `±Γ` at `z₁, z₂`, the complex potential is `F = ((m + iΓ)/2π) · log((z − z₁)/(z − z₂))`, with `Γ` the clockwise circulation (for counterclockwise `Γ`, write `m − iΓ`; `Physics/Fluid/Singularity.circulation_flux_jump`): the logarithm
   of a ratio, the same chart as loss `ℓ = log R`.
   - `Re F` (log of the distance ratio) is the potential: Apollonian circles.
   - `Im F` (the winding) is the stream function: circles through both points.

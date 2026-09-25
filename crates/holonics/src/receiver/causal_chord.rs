@@ -157,7 +157,7 @@
 
 use std::collections::BTreeSet;
 
-use crate::ratio::Rat;
+use crate::ratio::{GaussianRat, Rat};
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
 use thiserror::Error;
@@ -1192,28 +1192,13 @@ pub(crate) fn rational_mode_supports(
 // -------------------------------------------------------------------------------------------------
 // the resolvent at a Gaussian-rational probe point
 
-/// A Gaussian-rational probe point `σ + iω`. Exact; there is no float anywhere near it.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct ProbePoint {
-    pub real: Rat,
-    pub imaginary: Rat,
-}
-
-impl ProbePoint {
-    pub fn new(real: Rat, imaginary: Rat) -> Self {
-        Self { real, imaginary }
-    }
-
-    pub fn is_real(&self) -> bool {
-        self.imaginary.is_zero()
-    }
-}
-
 /// `(sI − A)^{-1}` and `C (sI − A)^{-1} B` at one exact probe point.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ResolventProbe {
     pub lineage: String,
-    pub point: ProbePoint,
+    /// The probe point `s = σ + iω`, a Gaussian rational ([`GaussianRat`]): exact, with no float
+    /// anywhere near it.
+    pub point: GaussianRat,
     pub resolvent_real: ExactRatMatrix,
     pub resolvent_imaginary: ExactRatMatrix,
     pub response_real: ExactRatMatrix,
@@ -1231,14 +1216,12 @@ pub struct ResolventProbe {
 /// inverse is `[[X, −Y], [Y, X]]` for `(sI−A)^{-1} = X + iY`.
 pub fn resolvent_probe(
     linearization: &Linearization,
-    point: &ProbePoint,
+    point: &GaussianRat,
 ) -> Result<ResolventProbe, ChordRefusal> {
     let extent = linearization.extent();
     let identity = ExactRatMatrix::identity(extent)?;
-    let real_block = identity
-        .scaled(&point.real)
-        .subtract(&linearization.state)?;
-    let imaginary_block = identity.scaled(&point.imaginary);
+    let real_block = identity.scaled(&point.re).subtract(&linearization.state)?;
+    let imaginary_block = identity.scaled(&point.im);
     let doubled = 2 * extent;
     let mut rows = vec![vec![Rat::zero(); doubled]; doubled];
     for row in 0..extent {

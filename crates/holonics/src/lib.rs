@@ -41,5 +41,6 @@ pub mod geometry;
 pub mod holarchy;
 pub mod holon;
 pub mod navigator;
+pub mod physics;
 pub mod ratio;
 pub mod receiver;

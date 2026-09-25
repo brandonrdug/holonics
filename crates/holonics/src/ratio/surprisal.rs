@@ -161,6 +161,20 @@ impl SymbolicSurprisal {
         Ok(form)
     }
 
+    /// **`log₂ r` of a positive rational as its exact form**: `−S(r)` for `r ≤ 1`, `S(1/r)` above.
+    /// The crate's one owner of it (the log face of a ratio; Lean `Objects/Ratio.logFibre` on the
+    /// positive reals). Refused unless `r > 0`.
+    pub fn log2_of_ratio(ratio: &Rat) -> Result<Self, SurprisalError> {
+        if !ratio.is_positive() {
+            return Err(SurprisalError::NonPositiveRatio);
+        }
+        if *ratio <= Rat::one() {
+            Ok(Self::of_probability(ratio)?.scaled(&-Rat::one()))
+        } else {
+            Self::of_probability(&ratio.recip())
+        }
+    }
+
     /// The terms, in ascending prime order. The returned artifact.
     pub fn terms(&self) -> &BTreeMap<u64, Rat> {
         &self.terms
@@ -662,6 +676,8 @@ pub enum SurprisalError {
     NonPositiveProbability,
     #[error("a probability may not exceed one")]
     ProbabilityAboveOne,
+    #[error("a logarithm needs a positive ratio")]
+    NonPositiveRatio,
     #[error("the certified logarithm enclosure was unavailable at the declared grain")]
     EnclosureUnavailable,
     #[error("a residual prime factor exceeded the machine-word carrier")]

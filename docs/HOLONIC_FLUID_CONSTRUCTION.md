@@ -76,7 +76,7 @@ This is exactly the scattering equation `Kv=2(u+Db)`, `w=v−u`, `b'=D†v−b`,
 ([HNN formula](HNN_FORMULA.md#the-constitutive-scattering-operator)).
 Indeed `K⁻¹(a+D D†a)=a`, so `P_G²=P_G`; linearity then gives
 `R_G²=4P_G²−4P_G+I=I`.
-[HolonicConstitutiveCirculation](../lean/HolonicsResearch/Computation/HolonicConstitutiveCirculation.lean)
+[HolonicConstitutiveCirculation](../lean/Holonics/Computation/HolonicConstitutiveCirculation.lean)
 proves `graphProjection_idempotent`, `graphScattering_involutive`, and
 `graphScattering_eq_swing`, using the actual solve identity and the original Swing definition.
 The algebraic proof allows a supplied transpose-like map; orthogonality additionally uses the

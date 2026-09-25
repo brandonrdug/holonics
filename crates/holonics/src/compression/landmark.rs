@@ -46,9 +46,9 @@ pub use site::{DopplerRatio, lorentz_factor_squared, torus_fixed_points};
 use thiserror::Error;
 
 use crate::aeon::AeonError;
-use crate::ratio::Rat;
 use crate::ratio::algebraic::ExactValueError;
 use crate::ratio::linear::ExactLinearError;
+use crate::ratio::{GaussianRat, Rat};
 
 /// Every refusal of a landmark law. Bad input is a typed return, never a panic.
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
@@ -75,8 +75,8 @@ pub enum LandmarkError {
     NotAUnitBoost { trace: Rat, determinant: Rat },
     #[error("a singular block is not a Möbius navigator")]
     SingularNavigator,
-    #[error("the navigator's pole is at {point}")]
-    Pole { point: Rat },
+    #[error("the navigator's pole is at {point:?}")]
+    Pole { point: GaussianRat },
     #[error("the navigator has no two finite fixed points to chart")]
     NoFixedPointChart,
     #[error(

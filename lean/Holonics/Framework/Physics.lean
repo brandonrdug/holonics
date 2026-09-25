@@ -24,6 +24,9 @@ import Holonics.Physics.FourTorusParametronCurrent
 import Holonics.Physics.AccumulatedNormalResponse
 import Holonics.Physics.InformationDifference
 import Holonics.Physics.TwoCellEntropyTransport
+import Holonics.Physics.Fluid
+import Holonics.Physics.Wave
+import Holonics.Physics.Thermal
 import Holonics.Geometry.HolonicCurvedArcEinstein
 import Holonics.Physics.HolonicTypedOriginDimensions
 import Holonics.Physics.HolonicCosmologicalInference
