@@ -54,7 +54,11 @@ when the interval closes into a loop**, and the exact law has one classical owne
 - The trapezoidal rule's error is carried entirely by boundary derivative differences (the
   Euler–Maclaurin corrections, whose coefficients are zeta values).  **Reflection deletes
   the boundary** — fold the interval onto a circle (the method of images; classically,
-  Clenshaw–Curtis quadrature), and every correction cancels.
+  Clenshaw–Curtis quadrature), and the Euler–Maclaurin endpoint corrections cancel.
+  (Correction, Sol, September 25: the periodic trapezoidal rule still carries the aliasing error
+  of the Fourier modes that the sample count divides, which Poisson summation states exactly;
+  exactness needs a band limit. Clenshaw–Curtis is a cosine change of variable, not the periodic
+  equal-spacing rule itself.)
 - On a closed loop, equal-spacing summation is exact on the winding band and blind exactly
   to the windings the frame divides: `Σ_{j<n} ζⁿ-th-root^{jk} = n·[n ∣ k]` — aliasing.
   **This is the same mechanism as reduction at a prime in the torsion census**: a compact

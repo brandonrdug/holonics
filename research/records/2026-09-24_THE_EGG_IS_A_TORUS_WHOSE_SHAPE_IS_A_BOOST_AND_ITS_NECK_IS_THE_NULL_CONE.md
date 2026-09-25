@@ -52,22 +52,57 @@ the Ising lock's `ℤ/2`.
 As a closed simple curve on the complex torus, the egg oval is a **primitive cycle**, "prime" in the
 aeon sense (null-cone record, §5). `[interpretation]`
 
-## 3. The neck is the degeneration, and its monodromy is null
+## 3. The two singular fibres, and the neck as an exchange
 
-- **`β → 1` (`w → a`).** The asymptote reaches the egg's pointed tip, and the cubic factors as
-  `(a + x)(2a y² − b²(a − x))`: a line and a parabola. The oval and the branch meet in nodes at `(−a, ±b)`.
-  The egg opens: its tip becomes a wall, and its interior joins the unbounded branch. `[proved-derived]`
-- **The torus picture.** A cycle of the torus pinches to a node: the vanishing cycle. That pinch is the
-  neck, where convergence meets divergence. `[proved-standard]` (nodal degeneration)
-- **Monodromy.** Around the degeneration the monodromy is unipotent, a Dehn twist of trace 2: a **null**
-  site in the trace classification (the null-cone record §4; `navigator::trace::SiteKind::Null`).
-  `[proved-standard]` (Picard–Lefschetz)
-- **Time around the egg.** In the curve's invariant clock `dx/y`, the time around the egg (the period of
-  the oval) grows like `log(1/λ) = 4 log k` as `β → 1`. It is linear in the rapidity `χ = log k`, up to a
-  fixed scale: critical slowing down at the neck. `[proved-standard]` (logarithmic period near a nodal
-  fibre); the rapidity reading is `[interpretation]`.
-- **`β → 0`.** The asymptote runs to `−∞`, the divergent sheet leaves, and the curve drops to the conic:
-  the symmetric, closed rest-frame ellipse.
+Settled with Sol (GPT-6), September 25; the first version of this section had the wrong
+differential and counted the neck as one node.
+
+`[proved-derived]` **The projective family.** Homogenizing gives
+`𝓕_w = ((a²+w²)Z + 2wX)Y² − b²Z(a²Z² − X²)`.
+
+**At `w = a`: the neck, Kodaira `I₄`.**
+- `𝓕_a = (X + aZ)(2aY² + b²Z(X − aZ))`: a line and a conic.
+- They meet transversely at `[−a : ±b : 1]`, with separate points at infinity `[0:1:0]` and
+  `[1:0:0]`.
+- The total surface has an ordinary double point over each crossing. Resolving both inserts two
+  components, so the minimal smooth fibre is a cycle of four rational curves.
+- The positively oriented monodromy on `H₁` is conjugate to `[[1,4],[0,1]]`, trace 2: two visible
+  nodes, four twists counted with smoothing multiplicity, and one independent primitive vanishing
+  class `δ`.
+- `[proved-standard]` for the `I_n` classification (Kodaira 1963; Tate 1975).
+
+**At `w = 0`: the ellipse, Kodaira `I₂`.**
+- The complete projective fibre is `Z(a²Y² + b²X² − a²b²Z²) = 0`: the line at infinity plus the
+  ellipse, meeting at `[a : ±ib : 0]`, where the total surface is smooth.
+- The monodromy is conjugate to `[[1,2],[0,1]]`, trace 2. The affine ellipse is one component of a
+  singular fibre, not a smooth genus-one fibre.
+
+**The Legendre check.**
+- With `A = (a−w)²` and `B = (a+w)²`, the generic fibre is `V² = u(u−A)(u−B)`, with
+  `Δ = 256a²w²(a²−w²)⁴` and `c₄ = 16(a⁴ + 14a²w² + w⁴)`.
+- `c₄ ≠ 0` at `w = 0, a`, so the discriminant orders 2 and 4 give `I₂` and `I₄` independently.
+- `λ = A/B` approaches 1 once at `w = 0` and 0 twice at `w = a`. The Legendre fibre at `∞` is
+  `I₂*`, outside `0 < w ≤ a`.
+
+**The period that grows.**
+- The regular differential is `ω = dx/F_y = dx/(2(a²+w²+2wx)y)`.
+- The real egg oval is the cycle crossing the neck, dual to the vanishing cycle around the colliding
+  branch points `u = 0, A`:
+  `∫_egg ω = (2/(b(a+w)))·K(√(1−λ)) = (1/(ab))·log(8a/(a−w)) + O((a−w)log(1/(a−w))) = (1/(2ab))·log(1/λ) + O(1)`.
+- In the rapidity chart (`λ = k⁻⁴`, `χ = log k`) the leading term is `2χ/(ab)`: the time around the
+  egg is linear in the rapidity.
+- The vanishing cycle's own period tends to `iπ/(2ab)`: its loop shrinks, its period does not.
+- The old form `dx/y` is not the regular differential. Its egg period stays finite.
+- `[proved-standard]` for the complete-elliptic-integral asymptotic (DLMF §19.12).
+
+**What "null" means here** `[definition]` (Brandon, September 25: "it's not that there's literally
+nothing there, it's an exchange/transport").
+- Trace 2 is the lightlike class of the site classification: zero interval, pure transport at the
+  characteristic.
+- The neck is where the family's topology changes: the level at which interior and exterior
+  exchange. It is not an absence.
+- The scalar face (trace 2) does not distinguish the two boundary parameters; their return words
+  do, `T_δ²` at the ellipse and `T_δ⁴` at the neck.
 
 ## 4. Flux: the converging and diverging pair is the logarithm of a Möbius ratio
 
@@ -151,5 +186,6 @@ The joint object is a **real elliptic fibration over an aeon's parameter**. In t
   - a closed body ⇔ zero net strength;
   - Schnakenberg production at a neck.
 - **#62:**
-  - the Picard–Lefschetz null monodromy and the logarithmic period at the neck;
+  - the `I₄`/`I₂` fibres, their monodromies `T_δ⁴`, `T_δ²` and the egg period `2χ/(ab)` (§3, settled
+    with Sol; the Lean statements are owed);
   - Norbury's torus-to-sphere vortex-ring family.

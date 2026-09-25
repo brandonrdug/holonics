@@ -298,7 +298,8 @@ with `T_g` a Swing, edit or transport and `C_k` a newly admitted constraint
 point at the receiver's grain while plural inside, `∀ a,a' ∈ F_k: π_B(a) ~ π_B(a')` (width zero).
 
 [proved-derived; formal-checked] **Necks.** Under a positive constant flux a narrower section
-carries a faster density, and étendue survives a focus of zero transverse extent (`Transport/Neck`).
+carries a faster density, and a point focus keeps its angular spread while its width is zero; a bundle
+of positive phase area keeps that area through any unimodular station (`Transport/Neck`).
 In a chain the neck is `rank A_↗`, the rank of the cross block between consecutive media: every
 upstream-to-downstream transfer `C(sI−A)⁻¹B`, at each `s` off the joint poles, has at most that rank, rank one is the pinhole, and a
 closed neck zeroes every Markov parameter (`Transport/HolonicChain`). The conservative coupling
@@ -428,6 +429,51 @@ units and its presentation. Its arithmetic includes the operations that reading 
 - **Jets** are its rates of change: a ratio of differences is a derivative.
 
 Exactness is the default; nothing here is an approximation that destroys information.
+
+[proved-derived] **Radix division carries a remainder and emits digits** (Brandon, September 25:
+"`3 % 8` … the return is defined simply as `3`, it doesn't seem right to me … there are directions to
+it that you have to choose as an operator"; audited by Sol).
+- For `a ≥ 0`, `b > 0` and base `β ≥ 2`, write `a = bq₀ + r₀` with `0 ≤ r₀ < b`. Then
+  `βrₙ = b·dₙ₊₁ + rₙ₊₁`, with `0 ≤ dₙ₊₁ < β` and `0 ≤ rₙ₊₁ < b`. At every depth,
+  `a/b = q₀ + Σ_(j≤N) dⱼβ^(−j) + r_N/(bβ^N)`.
+- The digit is that step's quotient (the carry); the remainder is its residue face.
+  `3/8 = (0.375)₁₀ = (0.011)₂` is exact finite-radix notation.
+- `3 mod 8 = 3` reports the remainder correctly. The typed division also keeps the divisor `8`, the
+  quotient `0`, the operand direction and the reconstruction equation
+  (`Foundation/EuclideanResidueTransport`).
+- The remainder navigator is multiplication, `r ↦ βr mod b`, not the addition odometer of
+  `Geometry/PhaseCarry` (`+1` with an upper carry). In base 2, `3/8` runs `3 → 6 → 4 → 0`: not
+  invertible, so no conjugacy to the odometer exists in general.
+- **Termination and period** (on the reduced denominator). Reduce to `a′/d` with
+  `d = b/gcd(a, b)`, and split `d = d∥·d⊥`, where `d∥` holds the prime powers whose primes divide
+  `β` and `gcd(d⊥, β) = 1`.
+  - The expansion terminates exactly when `d⊥ = 1`. The preperiod is
+    `max_(p | d∥) ⌈v_p(d)/v_p(β)⌉`.
+  - If `d⊥ > 1`, the eventual period is `ord_(d⊥)(β)`, the multiplicative order of `β` modulo `d⊥`.
+  - `3/6 = 1/2` terminates in base 10 although `3 | 6`. `1/7` repeats with period 6 in base 10.
+
+[proved-standard] **Euclid supplies one directed address.**
+- Repeated floor division of a positive rational gives its regular continued fraction, whose
+  quotients are the run lengths of its Farey/Stern–Brocot word (`Geometry/Farey`,
+  `navigator::LockAddress`). That word's lock denominator is distinct from a radix expansion's
+  multiplicative-order period.
+- Bézout: `aℤ + bℤ = gcd(a,b)ℤ`, the smallest additive subgroup containing both. For reduced
+  denominators `b, d`, `(1/lcm(b,d))ℤ` is the coarsest grid carrying both fractions.
+- The rounding rule chooses a different descent:
+  - floor gives the regular continued fraction;
+  - nearest, with a declared tie rule, gives the nearest-integer continued fraction. The lattice
+    split (Decision 22) uses nearest rounding but constructs no such word.
+  - ceiling gives the negative, Hirzebruch–Jung, expansion `x = b₁ − 1/(b₂ − …)` with `bᵢ ≥ 2`.
+    For the cyclic quotient surface singularity of type `1/n(1,q)`, the expansion of `n/q` gives the
+    minimal resolution's chain of rational curves with self-intersections `−bᵢ`.
+
+[interpretation; design obligation] **Where the word is kept.**
+- Carry a reduction as a directed navigator word when an admitted receiver can distinguish its
+  operands, rounding rule, quotient sequence or reconstruction fibre.
+- When every admitted future reads only the rational value, a canonical representative suffices,
+  once the action is shown to descend through that quotient.
+- In the Rust core, `ratio::Presentation` keeps the undivided pair, while `Rat` is a reduced scalar.
+  The hot paths carry integers over a shared denominator and reduce once per entry.
 
 [definition] A **ratio** compares two Holons, two coholons or two transports and always has
 types/units: it says "this happens as it relates to that happening". It is carried as the undivided

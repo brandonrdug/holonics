@@ -23,14 +23,16 @@ stated here, in this order, and each one carries its hypotheses in the open.
    `flux_constant_of_sourceless_balance` proves that the flux really is constant once the sources
    vanish and the residual does. Nothing about a speed-up is available from the residual alone.
 
-3. **Étendue survives the focus that the geometric width does not.** A ray transfer is an exact
-   `2 × 2` rational matrix; `transverseExtent` is the half-width of the image of the box bundle
-   `[−y, y] × [−θ, θ]` and `phaseArea` is four times `|det|` times `y θ`.
-   `focus_has_zero_extent` locates the focus of a point source at `B = 0`, and
-   `etendue_survives_the_focus` is the pinhole reading made exact: at that station the transverse
-   extent is **zero**, the angular extent is **strictly positive** — the bundle is a point at the
-   receiver's grain while still plural inside — and the determinant, which is the étendue, is
-   untouched. `phaseArea_comp` is the composition law and `reducedEtendue_interface` is the
+3. **A point focus keeps its angular spread.** A ray transfer is an exact `2 × 2` rational matrix;
+   `transverseExtent` is the half-width of the image of the box bundle `[−y, y] × [−θ, θ]` and
+   `phaseArea` is four times `|det|` times `y θ`. `focus_has_zero_extent` locates the focus of a
+   point source at `B = 0`, and `point_focus_keeps_angular_spread` is the pinhole reading made
+   exact: at that station the transverse extent is **zero** and the angular extent is **strictly
+   positive**, so the bundle is a point at the receiver's grain while still plural inside, and the
+   map's determinant stays one. A point source has **zero** phase area before and after the focus,
+   so this is not positive étendue passing a zero-width section (corrected September 25, with
+   Sol): a bundle of positive phase area keeps it (`phaseArea_unmoved_at_the_focus`) and cannot
+   reach zero width with bounded angle under an invertible map. `phaseArea_comp` is the composition law and `reducedEtendue_interface` is the
    `n₁/n₂` form across a refracting interface.
 
 [definition] The jet order at a neck is `Transport/JetStaircase.lean`'s reading of `A(s) − A_min`,
@@ -146,8 +148,9 @@ theorem focus_has_zero_extent (M : RayTransfer) (hB : M 0 1 = 0) (θ : ℚ) :
 
 /-- **The pinhole reading, exactly.** At a unimodular station whose `B` element vanishes, a point
 source's transverse extent is zero — a point at the receiver's grain — while its angular extent is
-strictly positive — plural inside — and the determinant, which is the étendue, is untouched. -/
-theorem etendue_survives_the_focus (M : RayTransfer) (hdet : M.det = 1) (hB : M 0 1 = 0)
+strictly positive — plural inside — and the map's determinant stays one. The point source's phase
+area is zero on both sides. -/
+theorem point_focus_keeps_angular_spread (M : RayTransfer) (hdet : M.det = 1) (hB : M 0 1 = 0)
     {θ : ℚ} (hθ : 0 < θ) :
     transverseExtent M 0 θ = 0 ∧ 0 < angularExtent M 0 θ ∧ M.det = 1 := by
   refine ⟨focus_has_zero_extent M hB θ, ?_, hdet⟩
@@ -190,7 +193,7 @@ section Audit
 #print axioms phaseArea_comp
 #print axioms reducedEtendue_interface
 #print axioms focus_has_zero_extent
-#print axioms etendue_survives_the_focus
+#print axioms point_focus_keeps_angular_spread
 #print axioms phaseArea_unmoved_at_the_focus
 #print axioms neck_jet_order_is_a_truncation_reading
 

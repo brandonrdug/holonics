@@ -77,6 +77,23 @@ content, as in a bitwise shift. Write `A_↗` for upstream→downstream and `A_�
 lines of derivative `+1` and `e^{iπ}`); along one axis `→ ← ↑ ↓`. The six signed unit shifts of
 three axes are the octahedron's vertices. This extends `Ĝ_(F'←F)`; it replaces no owner's API.
 
+[definition] **"Null" is typed by its owner.** A nonzero vector is *Lorentz null* when its declared
+Lorentz form gives `g(v,v) = 0`; it can carry nonzero energy and flux. A navigator site is
+`SiteKind::Null` when its positive-determinant two-dimensional material has discriminant
+`a² − 4q = 0`, a repeated root. A trace-2, determinant-one monodromy is unipotent: the identity or a
+nontrivial shear. None of these implies another without a constructed transport and metric. A zero
+cross-port rank can genuinely close a neck; a zero scalar reading can hide nonzero interior motion.
+Name the metric, port and receiver whenever "null" is used; there is no vacuum and no nothing (the
+null-cone record §3).
+
+[interpretation] Brandon, September 25: a neck is an exchange ("it's not that there's literally
+nothing there, it's an exchange/transport"). A constituted current converges to a section and
+diverges from it, and its power balance accounts for the ports on both sides, the changing storage,
+the active sources and the dissipation (`PortHolon.power_balance`). A Morse cone, a light cone, an
+optical waist and a repeated-root monodromy are distinct charts of such an exchange, each with its
+own source map. Say "lightlike" only for a declared Lorentz-null object, and "exchange" for the
+neck's participating transport.
+
 ## Every expression has a figure
 
 [definition] An oriented line carries a ket or port index, a propagator its transport, a vertex
