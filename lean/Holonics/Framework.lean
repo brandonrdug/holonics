@@ -8,6 +8,7 @@ import Holonics.Framework.Objects
 import Holonics.Framework.HolonObject
 import Holonics.Holarchy
 import Holonics.Aeon
+import Holonics.Compression
 
 /-!
 # Holonics as a reusable mathematical framework

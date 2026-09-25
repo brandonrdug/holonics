@@ -6,36 +6,41 @@ import Mathlib.Tactic.Ring
 /-!
 # The certified identities of the two-sided angle, and of a helical triple
 
-This file is **exterior verification** of what `holonic_engine::identity_atlas` discovered. Nothing
-here searches: each theorem is one basis vector the exact kernel returned, restated as a statement
-about the chart's own parametrization, and each lowers to `linear_combination`, `field_simp` or
-`ring`. The denominator and domain obligations of the atlas's charts travel as hypotheses rather
-than being assumed away.
+[historical] These identities were returned by the retired engine's identity atlas
+(`crates/holonics-cuda/src/identity_atlas.rs` at `13f8c734`) as basis vectors of the exact kernel
+of a declared face map. This module restates each one as a statement about the chart's own
+parametrization; each lowers to `linear_combination`, `field_simp` or `ring`. Nothing here
+searches. The denominator and domain obligations of the charts travel as hypotheses rather than
+being assumed away. The identity search that will consume them is `holonics::compression` (the
+landmark identity atlas); its law and coverage certificate are `Compression/Landmark/Identity`.
 
 ## What is stated
 
-* `twoSidedPythagorasNumerator` and `twoSidedPythagoras` — the T0 generator `C² + k S² = 1`, over a
-  variable curvature `k`, in the winding-`e` half-angle chart. The numerator form is exactly the
-  certificate the atlas returns (a zero polynomial); the divided form carries the nonvanishing
+[proved-standard; formal-checked]
+* `twoSidedPythagorasNumerator` and `twoSidedPythagoras`: the T0 generator `C² + k S² = 1`, over a
+  variable curvature `k`, in the winding-`e` half-angle chart. The numerator form is a zero
+  polynomial (the certificate form of the identity); the divided form carries the nonvanishing
   denominator as a hypothesis.
-* `twoSidedCosineAddition` and `twoSidedSineAddition` — the T1 addition laws, **uniformly in `k`**.
+* `twoSidedCosineAddition` and `twoSidedSineAddition`: the T1 addition laws, **uniformly in `k`**.
   Setting `k = 1, 0, -1` is the circular, Galilean and hyperbolic collapse and needs no separate
-  proof.
-* `galileanPrincipalChartIsNotTheFibre` — the coverage falsifier. At `k = 0` the fibre `C² = 1` has
-  the two components `C = 1` and `C = -1`; the half-turn winding lands on the second, so `C - 1` is
-  *not* an identity of the fibre although the principal winding alone certifies it. This is
-  `V(xy)`'s `y = 0` chart wrongly certifying `y`, in the configuration the atlas walks.
-* `transferredLawOfSinesKillingPart` and `transferredLawOfSinesReciprocalPart` — the T2 relations
+  proof. The sine law holds without denominator hypotheses (division by zero is `0` on both
+  sides); the cosine law carries them.
+* `transferredLawOfCosinesKillingPart` and `transferredLawOfSinesReciprocalPart`: the T2 relations
   for three helical axes. Jacobi's adjugate theorem holds over any commutative ring, hence over
   `A_k = A[ι]/(ι² - k)`; splitting it into its `1`-part and its `ι`-part gives the transferred law
   of cosines and the transferred law of sines for the triple, carrying the Killing form, the
   reciprocal (Klein) form, the pitches, the spreads and the quadrances. At `k = 0` this is the
   Euclidean screw (dual-number) case.
 
+[counterexample; formal-checked] `galileanPrincipalChartIsNotTheFibre`: the coverage falsifier.
+At `k = 0` the fibre `C² = 1` has the two components `C = 1` and `C = -1`; the half-turn winding
+lands on the second, so `C - 1` is *not* an identity of the fibre although the principal winding
+alone certifies it. This is `V(xy)`'s `y = 0` chart wrongly certifying `y`. It is stated once,
+here; `Compression/Landmark/Identity.principal_winding_invents_an_identity` reads it.
+
 None of these theorems is new mathematics: the first four are the rational parametrization of a
 conic and the group law of `A_k`, and the last two are Jacobi's adjugate identity transported by
-the classical transfer principle. What is new here is that a machine returned them as the kernel of
-a declared face map and certified every basis vector of that kernel.
+the classical transfer principle.
 -/
 
 namespace Holonics.IdentityAtlas
@@ -52,9 +57,8 @@ def twoSidedCos (e t k : F) : F := e * (1 - k * t ^ 2) / (1 + k * t ^ 2)
 def twoSidedSin (e t k : F) : F := e * (2 * t) / (1 + k * t ^ 2)
 
 /--
-**The certificate the atlas returns for the T0 generator: a zero polynomial.**
-
-This is the substituted numerator, before any division, and it is what the Rust owner checks.
+**The T0 generator as a zero polynomial**: the substituted numerator, before any division (the
+certificate form in which the retired identity atlas returned it).
 -/
 theorem twoSidedPythagorasNumerator (e t k : F) (he : e ^ 2 = 1) :
     (e * (1 - k * t ^ 2)) ^ 2 + k * (e * (2 * t)) ^ 2 - (1 + k * t ^ 2) ^ 2 = 0 := by
@@ -97,10 +101,10 @@ theorem twoSidedCosineAddition (e₁ e₂ t₁ t₂ k : F)
   ring
 
 /--
-**The addition law for the two-sided sine, uniformly in the curvature.**
+**The addition law for the two-sided sine, uniformly in the curvature.** No denominator hypothesis
+is needed: where a denominator vanishes both sides are `0`.
 -/
-theorem twoSidedSineAddition (e₁ e₂ t₁ t₂ k : F)
-    (h₁ : 1 + k * t₁ ^ 2 ≠ 0) (h₂ : 1 + k * t₂ ^ 2 ≠ 0) :
+theorem twoSidedSineAddition (e₁ e₂ t₁ t₂ k : F) :
     sumSin e₁ e₂ t₁ t₂ k =
       twoSidedSin e₁ t₁ k * twoSidedCos e₂ t₂ k
         + twoSidedCos e₁ t₁ k * twoSidedSin e₂ t₂ k := by
@@ -158,7 +162,7 @@ The statement is the `1`-component of Jacobi's adjugate identity
 `(G₁₁G₂₂ - G₁₂²)(G₁₁G₃₃ - G₁₃²) - (G₁₁G₂₃ - G₁₂G₁₃)² = G₁₁ · det G` for the two-sided Gram
 `G = K + ι R` with `ι² = k`.
 -/
-theorem transferredLawOfSinesKillingPart
+theorem transferredLawOfCosinesKillingPart
     (K₁₁ K₁₂ K₁₃ K₂₂ K₂₃ K₃₃ R₁₁ R₁₂ R₁₃ R₂₂ R₂₃ R₃₃ k : A) :
     (K₁₁ * K₂₂ + k * (R₁₁ * R₂₂) - K₁₂ * K₁₂ - k * (R₁₂ * R₁₂))
           * (K₁₁ * K₃₃ + k * (R₁₁ * R₃₃) - K₁₃ * K₁₃ - k * (R₁₃ * R₁₃))
@@ -206,5 +210,5 @@ end Holonics.IdentityAtlas
 #print axioms Holonics.IdentityAtlas.twoSidedCosineAddition
 #print axioms Holonics.IdentityAtlas.twoSidedSineAddition
 #print axioms Holonics.IdentityAtlas.galileanPrincipalChartIsNotTheFibre
-#print axioms Holonics.IdentityAtlas.transferredLawOfSinesKillingPart
+#print axioms Holonics.IdentityAtlas.transferredLawOfCosinesKillingPart
 #print axioms Holonics.IdentityAtlas.transferredLawOfSinesReciprocalPart
