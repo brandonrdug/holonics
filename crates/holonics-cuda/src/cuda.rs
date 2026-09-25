@@ -122,8 +122,17 @@ impl DeviceAttribute {
     pub const MAX_GRID_DIM_X: DeviceAttribute = DeviceAttribute(5);
     pub const MAX_GRID_DIM_Y: DeviceAttribute = DeviceAttribute(6);
     pub const MAX_GRID_DIM_Z: DeviceAttribute = DeviceAttribute(7);
+    pub const MAX_SHARED_MEMORY_PER_BLOCK: DeviceAttribute = DeviceAttribute(8);
+    pub const WARP_SIZE: DeviceAttribute = DeviceAttribute(10);
+    pub const MAX_REGISTERS_PER_BLOCK: DeviceAttribute = DeviceAttribute(12);
     pub const MULTIPROCESSOR_COUNT: DeviceAttribute = DeviceAttribute(16);
     pub const CONCURRENT_KERNELS: DeviceAttribute = DeviceAttribute(31);
+    pub const MAX_THREADS_PER_MULTIPROCESSOR: DeviceAttribute = DeviceAttribute(39);
+    pub const COMPUTE_CAPABILITY_MAJOR: DeviceAttribute = DeviceAttribute(75);
+    pub const COMPUTE_CAPABILITY_MINOR: DeviceAttribute = DeviceAttribute(76);
+    pub const MAX_SHARED_MEMORY_PER_MULTIPROCESSOR: DeviceAttribute = DeviceAttribute(81);
+    pub const MAX_REGISTERS_PER_MULTIPROCESSOR: DeviceAttribute = DeviceAttribute(82);
+    pub const MAX_SHARED_MEMORY_PER_BLOCK_OPTIN: DeviceAttribute = DeviceAttribute(97);
     pub const MAX_BLOCKS_PER_MULTIPROCESSOR: DeviceAttribute = DeviceAttribute(106);
     pub const VIRTUAL_MEMORY_MANAGEMENT_SUPPORTED: DeviceAttribute = DeviceAttribute(102);
 
@@ -1304,6 +1313,8 @@ pub unsafe trait DeviceZeroable: Copy {}
 
 unsafe impl DeviceZeroable for u32 {}
 unsafe impl DeviceZeroable for u64 {}
+unsafe impl DeviceZeroable for i64 {}
+unsafe impl DeviceZeroable for i128 {}
 
 fn checked_round_up(value: usize, multiple: usize, context: &'static str) -> Result<usize> {
     if multiple == 0 {
@@ -1647,7 +1658,7 @@ impl<T> Drop for VirtualDeviceBuffer<T> {
     }
 }
 
-fn device_dword_count<T: DeviceZeroable>(len: usize) -> usize {
+pub(crate) fn device_dword_count<T: DeviceZeroable>(len: usize) -> usize {
     let bytes = len
         .checked_mul(core::mem::size_of::<T>())
         .expect("byte size overflow");
@@ -1999,6 +2010,21 @@ mod tests {
             DeviceAttribute::VIRTUAL_MEMORY_MANAGEMENT_SUPPORTED.raw(),
             102
         );
+        // The hardware-law census (`hnn::card::DeviceCensus`), against `cuda.h`'s
+        // `CUdevice_attribute`.
+        assert_eq!(DeviceAttribute::MAX_SHARED_MEMORY_PER_BLOCK.raw(), 8);
+        assert_eq!(DeviceAttribute::WARP_SIZE.raw(), 10);
+        assert_eq!(DeviceAttribute::MAX_REGISTERS_PER_BLOCK.raw(), 12);
+        assert_eq!(DeviceAttribute::MAX_THREADS_PER_MULTIPROCESSOR.raw(), 39);
+        assert_eq!(DeviceAttribute::COMPUTE_CAPABILITY_MAJOR.raw(), 75);
+        assert_eq!(DeviceAttribute::COMPUTE_CAPABILITY_MINOR.raw(), 76);
+        assert_eq!(
+            DeviceAttribute::MAX_SHARED_MEMORY_PER_MULTIPROCESSOR.raw(),
+            81
+        );
+        assert_eq!(DeviceAttribute::MAX_REGISTERS_PER_MULTIPROCESSOR.raw(), 82);
+        assert_eq!(DeviceAttribute::MAX_SHARED_MEMORY_PER_BLOCK_OPTIN.raw(), 97);
+        assert_eq!(DeviceAttribute::MAX_BLOCKS_PER_MULTIPROCESSOR.raw(), 106);
         assert_eq!(DeviceAttribute::from_raw(123).raw(), 123);
     }
 

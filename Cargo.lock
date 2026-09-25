@@ -23,6 +23,9 @@ name = "holonics-cuda"
 version = "0.1.0"
 dependencies = [
  "holonics",
+ "num-bigint",
+ "num-traits",
+ "thiserror",
 ]
 
 [[package]]

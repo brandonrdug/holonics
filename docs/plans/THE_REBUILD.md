@@ -246,7 +246,7 @@ archive root. Brandon's Metal port stays on its own branch, `codex/apple-silicon
 
    Its equations are ported from history's `native_ecology` and the prototype body, subject to the
    do-not-port list.
-5. **The resident HNN in `holonics-cuda::hnn`.** Kernels are ported per law under the hardware law,
+5. **The resident HNN in `holonics-cuda::hnn`** (advancing with step 4 since September 25, Decision 25). Kernels are ported per law under the hardware law,
    each with its parity check against the host reference. The device debts of #76 (#12–#15, #50)
    are paid here.
 6. **Targets, physics and extraction.**
@@ -2406,3 +2406,43 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
     partition. A first pinning took the held-out cells from the evaluation partition; review found
     that it would spend step 8's split, and it was replaced before any receipt. Brandon may
     override it.
+
+24. **Every transient and every inverse inside the HNN is carried on a declared lattice with a
+    certified residual.** Measured September 25 on the standing real cut: 6.7 s per receiving
+    window on one CPU core, because each ring's Cayley element `2(I − E/2)⁻¹ − I` and each contact
+    solve were exact rational inverses whose determinant denominators (about 1 kbit) compounded
+    across ticks, carrying 3.5–7 kbit numerators and denominators through the word and its adjoint,
+    and because the normal laws carried exact solved charts `H⁻¹` growing by the Hadamard bound.
+    Decision 22 bounded the constitution, not the word. The exact-representation law applies:
+    - **Transients** (each ring's state and the adjoint inside a word) are carried on
+      `2^(−L_w)ℤ` with error feedback: each tick's exact image of the carried state plus the
+      carried remainder is split at the nearest lattice point, the remainder carried, and the word
+      releases and reports the remainder at its end (the word already releases its unread change).
+    - **Inverses** (`(I − E/2)⁻¹`, the contact solve `m⁻¹`, and each normal law's `H⁻¹`) are carried
+      as lattice charts `X̂` with a certified residual `R = I − A X̂`, `‖R‖ ≤ δ`. They are refined by
+      Newton–Schulz, `X̂ ← X̂(2I − AX̂)`, whose exact residual is `R²`, and rounded onto the chart's
+      lattice with the rounding term added to the certificate; each window warm-starts from the
+      last chart, since `A` moves by one deposit.
+    - **The adjoint** pulls the covector back through the linear maps actually executed (the
+      lattice charts), so the paired adjoint keeps its operands; rounding enters only as released
+      residuals.
+    - **The balances.** The ring's power balance and the prox identity
+      `(W + ΔW)H' = WH' + γΣ w g fᵀ` hold up to the released residuals, reported per word and per
+      deposit; the precisions are declared by rule so that a read moves by less than the receiver's
+      grain, as `L_ℓ` is. The first law's telescoping is unaffected: code lengths are read exactly
+      from the executed faces. Guard 15 is unaffected: word transients are never retained.
+    - **Consequence.** Every quantity inside a window is a fixed-width integer coordinate (64- or
+      128-bit words with carrier refusal), and the window's work is integer matrix products and
+      small certified refinements: the realization the card executes.
+
+    Source: agent-inferred from CLAUDE.md's exact-representation law and the measurement, after
+    Brandon's September 25 ruling (Decision 25). Lean `HNN/LatticeWord` states the residual
+    squaring, the error-feedback accounting, the balances up to the residual and the executed
+    adjoint. Brandon may override it.
+
+25. **The hardware surfaces advance with the laws.** Brandon, September 25: "you should not have
+    been neglecting the hardware surfaces." The resident realization (step 5, `holonics-cuda`, and
+    later `holonics-apple`) is no longer scheduled after step 4: each campaign's laws land with
+    their device kernels and host parity checks, and an exposure runs resident. The host reference
+    stays the parity target; the measurement that took one core for hours (Decision 24) is the
+    lesson.
