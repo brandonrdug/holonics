@@ -94,7 +94,7 @@ The four questions have one mathematical shape: a quadratic form (a stiffness, a
 
 ## 8. Rulings for the HNN (step 4)
 
-`[project-postulate]` These settle the step 4 design review's open decisions, where the mathematics above decides them:
+`[definition; agent-inferred]` These are inferences from Brandon's derivation ("the geometry is one thing but the light we see is the change itself"; "the shockwave of local changes moving across a global object"; "we want the classes of energy diffusion patterns to collapse into finite sets … that's where the HNN comes from"), not rulings he stated for step 4. They settle the step 4 design review's open decisions where the mathematics above decides them, and Brandon may override any of them:
 
 1. **Local propagation.** A change moves one contact per tick, inside a causal cone: the light is the change. There is no global solve over the contact graph. Each junction applies its local Swing (reflection `2P_D − I`). This settles review A1 and item 3.
 2. **Changes, not states.** The machine reads and emits propagated differences. What a receiver sees is the change's front crossing its section.
