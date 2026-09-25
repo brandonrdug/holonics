@@ -28,7 +28,7 @@
 //! | Lean | Rust |
 //! |---|---|
 //! | `passiveCoholon`, `passiveCoholon_isDirac` | [`PassiveCoholon::dirac`] |
-//! | `passive_reading` | [`PassiveCoholon::read`], [`crate::holon::law::HolonLaw::receive`] |
+//! | `passive_reading` | [`PassiveCoholon::read`]; within reception, [`crate::holon::law::HolonLaw::receive`] |
 //! | `coholon_reading_power` | [`coholon_bond`], [`PassiveCoholon::read_face`] |
 //! | `exterior_drive_balance` | [`ActiveReceiver::drive_balance`] |
 //! | `learned_receiver_balance` | [`ActiveReceiver::learned_balance`] |

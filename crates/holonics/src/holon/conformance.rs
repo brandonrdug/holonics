@@ -4,8 +4,9 @@
 //! (`Holon/Dirac.tellegen`, `Holon/Dirac.IsDirac.power_eq_zero`); an exact advance
 //! (`Holon/Law.advance_law`: residual zero, step bond admitted); a run whose aggregated
 //! balance closes; interconnection closure and additivity (`Holon/Law.PortHolon.interconnect`,
-//! `Holon/Law.storageEnergy_blocks`, `Holon/Law.dissipation_blocks`); the passive
-//! coholon reading (`Holon/Law.passive_reading`); restriction and pullback
+//! `Holon/Law.storageEnergy_blocks`, `Holon/Law.dissipation_blocks`); reception at a zero-storage
+//! receiver (`Holarchy/Reception.zero_storage_receiver_is_passive_reading`,
+//! `Holon/Law.passive_reading`); restriction and pullback
 //! (`Holon/Restriction.pushforwardD_isDirac`, `Holon/Law.pullback_law`).
 //!
 //! [definition] The witnesses mirror `Holon/Conformance`: the medium
@@ -29,6 +30,7 @@
 use crate::ratio::Rat;
 use num_traits::Zero;
 
+use crate::holarchy::Gluing;
 use crate::holon::dirac::DiracStructure;
 use crate::holon::element::storage_energy;
 use crate::holon::law::{Advance, EnergyBalance, HolonLaw};
@@ -106,12 +108,12 @@ pub fn check_run<L: HolonLaw>(
 pub fn check_interaction<L: HolonLaw>(
     a: &L,
     b: &L,
-    joined: &[(usize, usize)],
+    gluing: &Gluing,
     state_a: &[Rat],
     state_b: &[Rat],
     input: &[Rat],
 ) -> Result<(L, Advance), HolonError> {
-    let composite = a.interact(b, joined)?;
+    let composite = a.interconnect(b, gluing)?;
     let port_holon = composite.holon().port_holon();
     check_tellegen(port_holon.dirac())?;
     let mut configuration = state_a.to_vec();
@@ -181,6 +183,8 @@ mod tests {
         from_blocks, integer_matrix, ints, is_zero, matrix, quad, sub,
     };
     use crate::ratio::rat;
+    use crate::receiver::receipt::ReceiptLaw;
+    use crate::receiver::reception::JointLaw;
 
     fn form(rows: &[Vec<i64>]) -> SymmetricForm {
         SymmetricForm::from_integers(rows).unwrap()
@@ -537,8 +541,15 @@ mod tests {
                 integer(1),
             )
         };
-        let (composite, advance) =
-            check_interaction(&one(2), &one(3), &[(0, 0)], &ints(&[3]), &ints(&[-2]), &[]).unwrap();
+        let (composite, advance) = check_interaction(
+            &one(2),
+            &one(3),
+            &Gluing::at_ports(vec![(0, 0)]).unwrap(),
+            &ints(&[3]),
+            &ints(&[-2]),
+            &[],
+        )
+        .unwrap();
         assert_eq!(composite.holon().port_holon().counts().external, 0);
         assert_eq!(
             composite
@@ -555,24 +566,69 @@ mod tests {
         assert!(advance.balance.dissipated.is_positive());
     }
 
-    /// `Holon/Law.passive_reading`.
+    /// `Holarchy/Reception.zero_storage_receiver_is_passive_reading` through
+    /// [`HolonLaw::receive`]: the source advances by its own law with its own balance, the
+    /// receiver reaches `h C ē_S`, and its midpoint effort in the solved joint step is zero, so it
+    /// injects no flow into the source (`Holon/Law.passive_reading`).
     #[test]
-    fn a_passive_coholon_reads_with_zero_power() {
+    fn a_zero_storage_receiver_is_a_passive_reading() {
         let law = medium_law(
-            &zero(2, 2),
-            &zero(2, 2),
+            &integer_matrix(&[&[0, 1], &[-1, 0]]).unwrap(),
+            &integer_matrix(&[&[1, 0], &[0, 2]]).unwrap(),
             form(&[vec![2, 1], vec![1, 1]]),
-            &zero(2, 0),
-            integer(1),
+            &integer_matrix(&[&[1], &[-1]]).unwrap(),
+            rat(1, 2),
         );
-        let reading = law
+        let state = HolonState::new(ints(&[1, 1]));
+        let (input, reader) = (ints(&[3]), integer_matrix(&[&[1, -1]]).unwrap());
+        let received = law
             .receive(
-                &HolonState::new(ints(&[1, 1])),
-                &integer_matrix(&[&[1, -1]]).unwrap(),
+                &state,
+                &input,
+                &reader,
+                &ReceiptLaw::new(3, Vec::new(), Vec::new()).unwrap(),
             )
             .unwrap();
-        assert_eq!(reading.value, ints(&[1]));
-        assert!(reading.power.is_zero());
+        let own = law.advance(&state, &input).unwrap();
+        let effort = law.kinds(&own).unwrap().storage.effort().to_vec();
+        assert_eq!(received.next_source(), own.state.configuration);
+        assert_eq!(
+            received.next_receiver(),
+            crate::ratio::linear::vector::scale(law.step(), &reader.apply(&effort).unwrap())
+        );
+        let joint = received.balance();
+        assert_eq!(
+            (
+                &joint.stored_change,
+                &joint.dissipated,
+                &joint.port,
+                &joint.active
+            ),
+            (
+                &own.balance.stored_change,
+                &own.balance.dissipated,
+                &own.balance.port,
+                &own.balance.active
+            )
+        );
+        // The solved joint step, read again from the joint law: the receiver's midpoint effort is
+        // zero, so the source flow it injects, `−Cᵀ ē_R`, vanishes and it exerts no back-action.
+        let joint = JointLaw::reading(&law, &reader).unwrap();
+        let mut configuration = state.configuration.clone();
+        configuration.push(Rat::zero());
+        let step = joint
+            .law()
+            .advance(&HolonState::new(configuration), &input)
+            .unwrap();
+        let mut reached = received.next_source().to_vec();
+        reached.extend_from_slice(received.next_receiver());
+        assert_eq!(step.state.configuration, reached);
+        let storage = joint.law().kinds(&step).unwrap().storage;
+        assert!(is_zero(&storage.effort()[joint.source_extent()..]));
+        assert_eq!(
+            &storage.effort()[..joint.source_extent()],
+            effort.as_slice()
+        );
     }
 
     /// `Holon/Law.active_receiver_law`.

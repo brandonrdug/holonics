@@ -94,6 +94,16 @@ impl Clock {
         &self.ticks
     }
 
+    /// The ring period: the ticks between two jumps, `Π radices` (`1` for an unwound clock, whose
+    /// every tick is a jump). It is the period of this navigator's circle in the joint clock
+    /// torus that `crate::aeon::ClockLift` lifts.
+    pub fn period(&self) -> BigUint {
+        self.ticks
+            .radices()
+            .iter()
+            .fold(BigUint::one(), |product, radix| product * radix)
+    }
+
     /// The ticks taken since rest: the odometer's value `Σ digits·radices + winding·Π radices`
     /// (`Geometry/PhaseCarry.value_digits`).
     pub fn ticks(&self) -> BigUint {

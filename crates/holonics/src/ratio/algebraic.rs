@@ -392,9 +392,9 @@ pub(crate) fn check_declared_sturm_work(
 /// integer either way.
 ///
 /// The Lean owner of the invariance is
-/// `Foundation/RootCount`:
+/// `Foundation/RootCount` (library `HolonicsResearch`, as is `Millennium/Sturm`):
 /// `theReadingIsInvariantUnderPerEntryPositiveRescaling` closes the boundary
-/// `HolonicsResearch/Millennium/Sturm` names open, and
+/// `Millennium/Sturm` names open, and
 /// `theReadingIsInvariantUnderCommonNonzeroRescaling` is why a non-squarefree polynomial's chain
 /// still counts *distinct* roots. Sturm's theorem itself is that file's cited classical fact and
 /// `Millennium/Sturm`'s `TheReadingEqualsThePopulation`.

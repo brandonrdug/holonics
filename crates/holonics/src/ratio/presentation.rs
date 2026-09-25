@@ -11,6 +11,7 @@
 //! | `RatioPresentation` | [`Presentation`] |
 //! | `RatioPresentation.ProjectivelyEq` | [`Presentation::projectively_equal`] |
 //! | `RatioPresentation.scale`, `ratioPresentation_projectivelyEq_scale` | [`Presentation::scaled`] |
+//! | `RatioPresentation.blockTransport` (diagonal), `Holarchy/Receipt.followRatio`, `followRatio_eq` | [`Presentation::follow`] |
 
 use num_traits::{Signed, Zero};
 
@@ -44,6 +45,22 @@ impl Presentation {
         Self::new(factor * &self.numerator, factor * &self.denominator)
     }
 
+    /// [definition] **The ratio's own composition**: `self` followed by `next`, the diagonal block
+    /// transport with `next`'s entries, `(n'·n : d'·d)` (`Holarchy/Receipt.followRatio_eq`). Both
+    /// pairs stay undivided; a composite whose two entries vanish is the degenerate `(0 : 0)`, which
+    /// [`Self::projectively_equal`] never promotes to equality.
+    pub fn follow(&self, next: &Self) -> Self {
+        Self::new(
+            &next.numerator * &self.numerator,
+            &next.denominator * &self.denominator,
+        )
+    }
+
+    /// Whether both comparands vanish: the pair `(0 : 0)`, which names no point.
+    pub fn is_degenerate(&self) -> bool {
+        self.numerator.is_zero() && self.denominator.is_zero()
+    }
+
     /// `p.num · q.den = q.num · p.den`: equality in the projective line, decided without
     /// division. The degenerate pair `(0, 0)` names no point and is equal to nothing.
     pub fn projectively_equal(&self, other: &Self) -> bool {
@@ -68,10 +85,6 @@ impl Presentation {
     /// The scalar face, when the denominator is a unit of ℚ.
     pub fn quotient(&self) -> Option<Rat> {
         (!self.denominator.is_zero()).then(|| &self.numerator / &self.denominator)
-    }
-
-    fn is_degenerate(&self) -> bool {
-        self.numerator.is_zero() && self.denominator.is_zero()
     }
 }
 

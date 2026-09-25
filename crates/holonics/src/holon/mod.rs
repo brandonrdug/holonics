@@ -16,12 +16,15 @@
 //! and then the storage rate is dissipation, port and active power
 //! (`Holon/Element.PortHolon.power_balance`, from `Holon/Element.power_assemble`).
 //!
-//! [definition] **Interaction is the recursion.** Interconnecting two port Holons through shared
-//! external ports is a port Holon with block storage and resistance and the interconnected Dirac
-//! structure (`Holon/Law.PortHolon.interconnect`, `Holon/Law.PortHolon.mem_interconnect`);
-//! energy and dissipation are additive (`Holon/Law.storageEnergy_blocks`,
-//! `Holon/Law.dissipation_blocks`). A passive coholon is the zero-storage receiver
-//! (`Holon/Law.passiveCoholon`).
+//! [definition] **Interaction is the recursion.** Interconnecting two Holons through shared
+//! external ports returns a [`crate::holarchy::Holarchy`]: the joined whole, again a Holon, with
+//! its retained constituents and typed gluing, or a typed [`crate::holarchy::GluingDefect`]
+//! ([`Holon::interconnect`], defined in [`crate::holarchy`]; Lean `Holarchy/Join`). The whole's
+//! port Holon has block storage and resistance and the composed Dirac structure
+//! (`Holarchy/Join.joinHolon`; at the equal-effort, opposite-flow join it is
+//! `Holon/Law.PortHolon.interconnect`, `Holarchy/Join.joinHolon_one`); energy and dissipation are
+//! additive (`Holon/Law.storageEnergy_blocks`, `Holon/Law.dissipation_blocks`). A passive coholon
+//! is the zero-storage receiver (`Holon/Law.passiveCoholon`).
 //!
 //! [definition] **The medium** `q̇ = (Ω − M + L) G q + B u` is the port Holon on the skew
 //! interconnection `f_S = −Ω e_S − e_R − B e_P − e_A`, `f_R = e_S`, `f_P = Bᵀ e_S`, `f_A = e_S`
@@ -36,8 +39,8 @@
 //! |---|---|
 //! | `PortHolon`, `Ports`, `assemble` | [`PortHolon`], [`PortCounts`], [`PortHolon::assemble`] |
 //! | `PortHolon.Admits`, `PortHolon.power_balance` | [`PortHolon::admits`], [`PortHolon::power_balance`] |
-//! | `PortHolon.interconnect`, `mem_interconnect` | [`PortHolon::interconnect`] |
-//! | `storageEnergy_blocks`, `dissipation_blocks` | tests of [`PortHolon::interconnect`] |
+//! | `PortHolon.interconnect`, `mem_interconnect` | [`Holon::interconnect`] at unit gains ([`crate::holarchy`]) |
+//! | `storageEnergy_blocks`, `dissipation_blocks` | tests of [`Holon::interconnect`] |
 //! | `mediumJ`, `mediumHolon`, `medium_admits` | [`medium_structure`], [`PortHolon::medium`] |
 
 pub mod conformance;
@@ -65,7 +68,7 @@ use crate::holon::port::{Bond, Port};
 use crate::holon::restriction::PortMap;
 use crate::navigator::Navigator;
 use crate::ratio::linear::inertia::{Inertia, InertiaError, SymmetricForm};
-use crate::ratio::linear::vector::{at, block_diagonal, dot, form_matrix, matrix, neg, quad};
+use crate::ratio::linear::vector::{at, dot, form_matrix, matrix, neg, quad};
 use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
 
 /// Every refusal of the Holon facets. Bad input is a typed return, never a panic.
@@ -124,6 +127,15 @@ pub enum HolonError {
         what: &'static str,
         reason: &'static str,
     },
+    #[error("cell {cell} lies outside {cells} regions")]
+    CellOutside { cell: usize, cells: usize },
+    #[error("column {cell} of the degree-{degree} cellular map is not one unit entry")]
+    NotACellularMap { degree: usize, cell: usize },
+    #[error("fine block {block} does not lie inside the coarse block it restricts to")]
+    BlockOutside { block: usize },
+    /// Boxed: a gluing defect carries its witness bond, units or rates.
+    #[error(transparent)]
+    Gluing(Box<crate::holarchy::GluingDefect>),
     #[error(transparent)]
     Linear(#[from] ExactLinearError),
     #[error(transparent)]
@@ -380,65 +392,6 @@ impl PortHolon {
             active: active.power(),
         })
     }
-
-    /// [definition] **Interconnect two port Holons** (`Holon/Law.PortHolon.interconnect`):
-    /// each `(a, b)` in `joined` identifies external port `a` of `self` with external port `b` of
-    /// `other`. Storage and resistance are block diagonal; the ports are merged kind by kind,
-    /// `self`'s before `other`'s within each kind (`Holon/Law.mergeKinds`).
-    pub fn interconnect(
-        &self,
-        other: &Self,
-        joined: &[(usize, usize)],
-    ) -> Result<Self, HolonError> {
-        let (a, b) = (self.counts, other.counts);
-        for (i, j) in joined {
-            if *i >= a.external {
-                return Err(HolonError::PortOutside {
-                    port: *i,
-                    ports: a.external,
-                });
-            }
-            if *j >= b.external {
-                return Err(HolonError::PortOutside {
-                    port: *j,
-                    ports: b.external,
-                });
-            }
-        }
-        let global: Vec<(usize, usize)> = joined
-            .iter()
-            .map(|(i, j)| (a.external_offset() + i, b.external_offset() + j))
-            .collect();
-        let joined_dirac = self.dirac.interconnect(&other.dirac, &global)?;
-        // Ports of `joined_dirac`: self's unjoined (σA, ρA, πA free, αA), then other's.
-        let a_free_external = a.external - joined.len();
-        let b_free_external = b.external - joined.len();
-        let a_total = a.storage + a.resistive + a_free_external + a.active;
-        let a_at = |kind_offset: usize, k: usize| kind_offset + k;
-        let b_at = |kind_offset: usize, k: usize| a_total + kind_offset + k;
-        let mut order = Vec::with_capacity(a_total + b.total() - joined.len());
-        order.extend((0..a.storage).map(|k| a_at(0, k)));
-        order.extend((0..b.storage).map(|k| b_at(0, k)));
-        order.extend((0..a.resistive).map(|k| a_at(a.storage, k)));
-        order.extend((0..b.resistive).map(|k| b_at(b.storage, k)));
-        order.extend((0..a_free_external).map(|k| a_at(a.storage + a.resistive, k)));
-        order.extend((0..b_free_external).map(|k| b_at(b.storage + b.resistive, k)));
-        order.extend((0..a.active).map(|k| a_at(a.storage + a.resistive + a_free_external, k)));
-        order.extend((0..b.active).map(|k| b_at(b.storage + b.resistive + b_free_external, k)));
-        let dirac = joined_dirac.relabel(&order)?;
-        let counts = PortCounts {
-            storage: a.storage + b.storage,
-            resistive: a.resistive + b.resistive,
-            external: a_free_external + b_free_external,
-            active: a.active + b.active,
-        };
-        let storage = self.storage.direct_sum(&other.storage);
-        let resistance = ResistiveRelation::new(block_diagonal(
-            self.resistance.resistance(),
-            other.resistance.resistance(),
-        )?)?;
-        Self::new(dirac, counts, storage, resistance)
-    }
 }
 
 /// [definition] **The skew interconnection of the medium** (`Holon/Conformance.mediumJ`) on
@@ -495,7 +448,8 @@ pub fn medium_structure(
 }
 
 /// [definition] **The Holon (the law)**: the port Holon and its element relations, placed on its
-/// complex and connection, with its named ports, navigators and restrictions.
+/// complex and connection with its oriented interior chain and the face each external port sits
+/// on, with its named ports, navigators and restrictions (Lean `Holarchy/Join.Constituent`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Holon {
     port_holon: PortHolon,
@@ -504,6 +458,8 @@ pub struct Holon {
     ports: Option<Vec<Port>>,
     complex: Option<CellComplex>,
     connection: Option<ConnectionIncidence>,
+    interior: Option<Vec<Rat>>,
+    port_faces: Option<Vec<usize>>,
     navigators: Vec<Navigator>,
     restrictions: Vec<PortMap>,
 }
@@ -519,6 +475,8 @@ impl Holon {
             ports: None,
             complex: None,
             connection: None,
+            interior: None,
+            port_faces: None,
             navigators: Vec::new(),
             restrictions: Vec::new(),
         })
@@ -565,6 +523,8 @@ impl Holon {
         Ok(self)
     }
 
+    /// Place the Holon on a complex; an interior chain or port faces declared on an earlier
+    /// complex are dropped, since they name its cells.
     pub fn with_complex(
         mut self,
         complex: CellComplex,
@@ -572,7 +532,54 @@ impl Holon {
     ) -> Self {
         self.complex = Some(complex);
         self.connection = connection;
+        self.interior = None;
+        self.port_faces = None;
         self
+    }
+
+    /// [definition] Declare its **oriented interior chain**: one coefficient per region (top-degree
+    /// cell) of its complex (Lean `Holarchy/Join.Constituent.interior`).
+    pub fn with_interior(mut self, interior: Vec<Rat>) -> Result<Self, HolonError> {
+        let complex = self.complex.as_ref().ok_or(HolonError::Unsupported {
+            what: "an interior chain",
+            reason: "the Holon is placed on no complex",
+        })?;
+        let regions = complex.cells(complex.dimension());
+        if interior.len() != regions {
+            return Err(HolonError::Shape {
+                what: "interior chain (one coefficient per region)",
+                expected: regions,
+                found: interior.len(),
+            });
+        }
+        self.interior = Some(interior);
+        Ok(self)
+    }
+
+    /// [definition] Declare **the face each external port sits on**: one cell of its complex one
+    /// degree below the regions per external port (Lean `Holarchy/Join.Constituent.portFace`).
+    pub fn with_port_faces(mut self, faces: Vec<usize>) -> Result<Self, HolonError> {
+        let complex = self.complex.as_ref().ok_or(HolonError::Unsupported {
+            what: "port faces",
+            reason: "the Holon is placed on no complex",
+        })?;
+        let external = self.port_holon.counts.external;
+        if faces.len() != external {
+            return Err(HolonError::Shape {
+                what: "port faces (one per external port)",
+                expected: external,
+                found: faces.len(),
+            });
+        }
+        let cells = complex
+            .dimension()
+            .checked_sub(1)
+            .map_or(0, |face_degree| complex.cells(face_degree));
+        if let Some(face) = faces.iter().find(|face| **face >= cells) {
+            return Err(HolonError::CellOutside { cell: *face, cells });
+        }
+        self.port_faces = Some(faces);
+        Ok(self)
     }
 
     pub fn with_navigator(mut self, navigator: Navigator) -> Self {
@@ -617,6 +624,16 @@ impl Holon {
         self.connection.as_ref()
     }
 
+    /// Its oriented interior chain on the regions of its complex, when declared.
+    pub fn interior(&self) -> Option<&[Rat]> {
+        self.interior.as_deref()
+    }
+
+    /// The face of its complex each external port sits on, when declared.
+    pub fn port_faces(&self) -> Option<&[usize]> {
+        self.port_faces.as_deref()
+    }
+
     pub fn navigators(&self) -> &[Navigator] {
         &self.navigators
     }
@@ -649,36 +666,6 @@ impl Holon {
             out.push(ElementRelation::Pump(pump.clone()));
         }
         out
-    }
-
-    /// [definition] **Interaction** (`Holon/Law.PortHolon.interconnect`): the joined port
-    /// Holon, block active relation, and both navigator families. A pumped Holon, a complex, named
-    /// ports and restrictions are refused or dropped as stated: their joins need the joined
-    /// complex and the typed gluing of a Holarchy.
-    pub fn interconnect(
-        &self,
-        other: &Self,
-        joined: &[(usize, usize)],
-    ) -> Result<Self, HolonError> {
-        if self.pump.is_some() || other.pump.is_some() {
-            return Err(HolonError::Unsupported {
-                what: "interconnecting pumped Holons",
-                reason: "the joined pump clock is not declared",
-            });
-        }
-        let port_holon = self.port_holon.interconnect(&other.port_holon, joined)?;
-        let active = ActiveRelation::new(block_diagonal(
-            self.active.relation(),
-            other.active.relation(),
-        )?)?;
-        let mut joined_holon = Self::new(port_holon)?.with_active(active)?;
-        joined_holon.navigators = self
-            .navigators
-            .iter()
-            .chain(&other.navigators)
-            .cloned()
-            .collect();
-        Ok(joined_holon)
     }
 
     /// `⟨f, L f⟩` on the active ports.
@@ -793,9 +780,14 @@ mod tests {
     /// `Holon/Conformance.two_media_witness`, `Holon/Law.storageEnergy_blocks`.
     #[test]
     fn two_media_joined_are_a_holon_with_additive_energy() {
-        let joined = one_medium(2)
-            .interconnect(&one_medium(3), &[(0, 0)])
+        let holarchy = Holon::new(one_medium(2))
+            .unwrap()
+            .interconnect(
+                &Holon::new(one_medium(3)).unwrap(),
+                &crate::holarchy::Gluing::at_ports(vec![(0, 0)]).unwrap(),
+            )
             .unwrap();
+        let joined = holarchy.whole().port_holon();
         assert_eq!(joined.counts().external, 0);
         assert_eq!(joined.counts().storage, 2);
         assert!(joined.dirac().form().is_dirac().unwrap());

@@ -183,6 +183,23 @@ impl LockAddress {
         &self.runs
     }
 
+    /// The partial quotients `[a₀; a₁, …, a_N]` of the addressed ratio, recovered from the runs:
+    /// a leading `L` run means `a₀ = 0`, and the last quotient is one longer than its run (the
+    /// Euclidean descent's final step lands on the node itself). The root `1/1` is `[1]`.
+    /// `crate::aeon::TwoClocks::convergents` reads the near-return grains from them.
+    pub fn partial_quotients(&self) -> Vec<BigUint> {
+        let mut quotients: Vec<BigUint> = Vec::with_capacity(self.runs.len() + 1);
+        if self.runs.first().is_some_and(|run| run.turn == Turn::L) {
+            quotients.push(BigUint::zero());
+        }
+        quotients.extend(self.runs.iter().map(|run| run.length.clone()));
+        match quotients.last_mut() {
+            Some(last) => *last += BigUint::one(),
+            None => quotients.push(BigUint::one()),
+        }
+        quotients
+    }
+
     /// The total number of turns: the Stern–Brocot depth.
     pub fn depth(&self) -> BigUint {
         self.runs

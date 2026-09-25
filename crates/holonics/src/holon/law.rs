@@ -1,13 +1,17 @@
-//! **The Holon law: advance, receive, interact, restrict, pull back — with its energy balance.**
+//! **The Holon law: advance, receive, interconnect, restrict, pull back — with its energy balance.**
 //!
 //! [definition] The five statements (`Holon/Law`): **advance** — one implicit-midpoint step
 //! has zero balance residual (`Holon/Law.advance_law`, from
 //! `Holon/Element.midpoint_balance`), and backward Euler carries the defect
-//! `−½⟨Δq, QΔq⟩` (`Holon/Element.backwardEuler_balance`); **receive** — the passive coholon
-//! reads an effort by a linear functional with zero power (`Holon/Law.passive_reading`), and
-//! an active receiver through an interface conductance `G` satisfies `P_H + P_R = −D_Σ`,
-//! `D_Σ = ⟨Δ, GΔ⟩ ≥ 0` for passive `G` (`Holon/Law.active_receiver_law`); **interact** — a
-//! Holon of Holons is a Holon (`Holon/Law.PortHolon.interconnect`); **restrict** — the
+//! `−½⟨Δq, QΔq⟩` (`Holon/Element.backwardEuler_balance`); **receive** — the zero-storage
+//! specialization of joint reception ([`crate::receiver::reception`],
+//! `Holarchy/Reception.zero_storage_receiver_is_passive_reading`): the receiver reads the
+//! source's effort at zero power (`Holon/Law.passive_reading`) while the source advances by its
+//! own law, and an active receiver through an interface conductance `G` satisfies
+//! `P_H + P_R = −D_Σ`, `D_Σ = ⟨Δ, GΔ⟩ ≥ 0` for passive `G` (`Holon/Law.active_receiver_law`);
+//! **interconnect** — a Holon of Holons is a Holon: the law on the whole of the Holarchy
+//! [`Holon::interconnect`] returns (`Holon/Law.PortHolon.interconnect`,
+//! `Holarchy/Join.joinHolon`); **restrict** — the
 //! pushforward (`Holon/Restriction.pushforwardD_isDirac`), scale square and Kron reduction;
 //! **pullback** — efforts move by the transpose and power is preserved
 //! (`Holon/Law.pullback_law`). The continuous balance is
@@ -29,7 +33,8 @@
 //! | `advance_law`, `midpoint_balance` | [`ReferenceHolon`] with [`Scheme::Midpoint`] |
 //! | `backwardEuler_balance`, `backwardEuler_defect_witness` | [`Scheme::BackwardEuler`] |
 //! | `commit_balance`, `deposition_work` | [`ReferenceHolon::commit`] |
-//! | `passive_reading`, `passiveCoholon` | [`HolonLaw::receive`] |
+//! | `passive_reading`, `Holarchy/Reception.zero_storage_receiver_is_passive_reading` | [`HolonLaw::receive`] |
+//! | `PortHolon.interconnect`, `Holarchy/Join.joinHolon` | [`HolonLaw::interconnect`] |
 //! | `active_receiver_law` | [`active_receiver`] |
 //! | `pullback_law` | [`HolonLaw::pullback`] |
 //!
@@ -39,6 +44,7 @@
 use crate::ratio::Rat;
 use num_traits::{One, Zero};
 
+use crate::holarchy::Gluing;
 use crate::holon::dirac::DiracStructure;
 use crate::holon::element::{ResistiveRelation, storage_energy};
 use crate::holon::port::Bond;
@@ -48,6 +54,8 @@ use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::inertia::SymmetricForm;
 use crate::ratio::linear::vector::{at, dot, form_matrix, matrix, neg, quad, sub};
 use crate::ratio::rat;
+use crate::receiver::receipt::ReceiptLaw;
+use crate::receiver::reception::{InteractionReturn, JointLaw, ReceiverFace};
 
 /// [definition] **One energy balance**, every term exact:
 /// `stored_change = −dissipated + port + active + deposition_work + discretization_defect + residual`.
@@ -152,22 +160,26 @@ pub trait HolonLaw {
     /// One word of motion from `state` under the external efforts `input`, with its balance.
     fn advance(&self, state: &HolonState, input: &[Rat]) -> Result<Advance, HolonError>;
 
-    /// Join another law at shared external ports.
-    fn interact(&self, other: &Self, joined: &[(usize, usize)]) -> Result<Self, HolonError>
+    /// **interconnect**: the law on the whole of the Holarchy that [`Holon::interconnect`] returns
+    /// for this law's Holon and another's under a declared gluing; a gluing defect is returned
+    /// inside [`HolonError::Gluing`]. Reception between two participants is
+    /// [`JointLaw::interact`], which solves a step of such a whole.
+    fn interconnect(&self, other: &Self, gluing: &Gluing) -> Result<Self, HolonError>
     where
         Self: Sized;
 
-    /// **receive**: a passive coholon joined at the storage efforts reads `C · Qx` and draws zero
-    /// power: its bond is `(0, Qx)` (`Holon/Law.passive_reading`).
+    /// **receive**: the zero-storage specialization of joint reception
+    /// (`Holarchy/Reception.zero_storage_receiver_is_passive_reading`). A receiver at rest that
+    /// stores nothing, coupled at the storage efforts by `reader = C`, is joined to this law
+    /// ([`JointLaw::reading`]) and one joint step is solved: the source advances by its own law,
+    /// the receiver reaches `h C ē_S` at zero power, and the joint balance is the source's own.
     fn receive(
         &self,
         state: &HolonState,
+        input: &[Rat],
         reader: &ExactRatMatrix,
-    ) -> Result<PassiveReading, HolonError> {
-        let storage = self.holon().storage_at(state.commit);
-        let effort = form_matrix(storage).apply(&state.configuration)?;
-        crate::receiver::face::PassiveCoholon::new("receive", reader.clone()).read(&effort)
-    }
+        receipt: &ReceiptLaw,
+    ) -> Result<InteractionReturn, HolonError>;
 
     /// **restrict**: the pushforward of the interconnection along a port map
     /// (`Holon/Restriction.pushforwardD_isDirac`).
@@ -384,7 +396,7 @@ impl HolonLaw for ReferenceHolon {
         )
     }
 
-    fn interact(&self, other: &Self, joined: &[(usize, usize)]) -> Result<Self, HolonError> {
+    fn interconnect(&self, other: &Self, gluing: &Gluing) -> Result<Self, HolonError> {
         if self.step != other.step || self.scheme != other.scheme {
             return Err(HolonError::Unsupported {
                 what: "joining reference laws",
@@ -392,9 +404,38 @@ impl HolonLaw for ReferenceHolon {
             });
         }
         Self::new(
-            self.holon.interconnect(&other.holon, joined)?,
+            self.holon
+                .interconnect(&other.holon, gluing)?
+                .whole()
+                .clone(),
             self.step.clone(),
             self.scheme,
+        )
+    }
+
+    fn receive(
+        &self,
+        state: &HolonState,
+        input: &[Rat],
+        reader: &ExactRatMatrix,
+        receipt: &ReceiptLaw,
+    ) -> Result<InteractionReturn, HolonError> {
+        let sigma = self.holon.port_holon().counts().storage;
+        if state.configuration.len() != sigma {
+            return Err(HolonError::Shape {
+                what: "source configuration",
+                expected: sigma,
+                found: state.configuration.len(),
+            });
+        }
+        let joint = JointLaw::reading(self, reader)?;
+        let mut configuration = state.configuration.clone();
+        configuration.extend(crate::ratio::linear::vector::zeros(reader.rows()));
+        joint.interact(
+            &HolonState::at(configuration, state.commit),
+            input,
+            &ReceiverFace::receiver_state(sigma, reader.rows())?,
+            receipt,
         )
     }
 }

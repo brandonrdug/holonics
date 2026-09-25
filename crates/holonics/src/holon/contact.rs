@@ -40,7 +40,7 @@
 //! | `Transport/HelicalPairInteraction.lock_iff_zero_power` | [`pair_lock`], [`ContactMaterial::definite_on_slips`] |
 //! | `Holon/Conformance.pairContact_resistive` | [`ContactMaterial::element`], [`ContactMaterial::bond`] |
 //! | `Geometry/PairResonance` (neighbours, mediant) | [`PairContact::lock`] through [`LockAddress`] |
-//! | `HolonicsResearch/Transport/Fold.lagrange_identity` | [`Alignment`] |
+//! | `Transport/Fold.lagrange_identity` (library `HolonicsResearch`) | [`Alignment`] |
 //! | `Transport/SerialScrewChain.serialConfiguration`, `serialPrefixes`, `cayleyZChart` | [`SerialChain`] |
 //!
 //! [proved-derived; implemented-exact] The chain's derivative has no Lean counterpart:
@@ -449,7 +449,8 @@ pub fn contact_material(
 
 /// **The alignment of two velocities, undivided.** `cohere = ⟨a|b⟩²` and `turn = |a × b|²` over
 /// the one denominator `|a|²|b|²`, with the hand `⟨a|b⟩` kept beside the square that erases it.
-/// The faces close by Lagrange's identity, Lean `HolonicsResearch/Transport/Fold.lagrange_identity`.
+/// The faces close by Lagrange's identity, Lean `Transport/Fold.lagrange_identity` (library
+/// `HolonicsResearch`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Alignment {
     pub cohere: Rat,

@@ -7,7 +7,7 @@
 //! H = (K, ∂_A;  Π;  𝒟;  𝓔;  G;  π)
 //! ```
 //!
-//! The library is five operator modules, each implementing rows of the
+//! The library is seven operator modules, each implementing rows of the
 //! [operator contract](../../../docs/ELEMENTARY_OBJECTS.md#operator-contract):
 //!
 //! - [`ratio`]: one per two. The exact rational, rings, the exponentiated/log chart, surprisal,
@@ -19,13 +19,21 @@
 //!   ring [`holon::parametron`].
 //! - [`navigator`]: transport with an initial configuration and its own clock, phase lift, address
 //!   words and lock addresses, trace faces and the dynamical zeta, the reflective continuation.
-//! - [`receiver`]: roles and faces, width and release, standing as the retention quotient, and the
-//!   causal chord.
+//! - [`receiver`]: roles and faces, width and release, standing as the retention quotient, the
+//!   causal chord, joint reception and the receipt ratio.
+//! - [`holarchy`]: what `Holon::interconnect` returns — the joined whole with its constituents,
+//!   typed gluing (or a gluing defect) and parametric orientation, and its receiver-relative
+//!   `view`/`count`/`refine`.
+//! - [`aeon`]: aeon, epoch and cycle — clock readings with carry, epochs and their towers at a
+//!   receiver's section with the oriented flux, two-clock locks, the Hodge split of a clock,
+//!   production, the dynamical zeta and the first law of learning.
 //!
 //! Every law computes over exact rationals; no float enters a law. Each module header names its
 //! Lean owner relative to the Lean library root.
 
+pub mod aeon;
 pub mod geometry;
+pub mod holarchy;
 pub mod holon;
 pub mod navigator;
 pub mod ratio;
