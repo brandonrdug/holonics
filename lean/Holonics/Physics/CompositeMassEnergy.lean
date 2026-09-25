@@ -103,12 +103,13 @@ theorem rational_boost_parameters :
 
 /-! ## Multiplicative scale as a Lorentz face -/
 
-/-- A positive multiplicative scale supplies the normalized Lorentz hyperbola without evaluating
+/-- A nonzero multiplicative scale supplies the normalized Lorentz hyperbola without evaluating
 the logarithm/rapidity: `k` is the exponential scale face, while `γ` and `ξ` are its symmetric and
-antisymmetric combinations. -/
-theorem multiplicativeScale_lorentz_identity (k : ℝ) (hk : 0 < k) :
-    ((k + k⁻¹) / 2) ^ 2 - ((k - k⁻¹) / 2) ^ 2 = 1 := by
-  field_simp [ne_of_gt hk]
+antisymmetric combinations. Over any field of characteristic zero; the one owner of the hyperbola
+`γ² − (γβ)² = 1` in the Doppler chart (`Physics/Spacetime/Boost`, `Physics/Spacetime/Wigner`). -/
+theorem multiplicativeScale_lorentz_identity {K : Type*} [Field K] [CharZero K] {k : K}
+    (hk : k ≠ 0) : ((k + k⁻¹) / 2) ^ 2 - ((k - k⁻¹) / 2) ^ 2 = 1 := by
+  field_simp
   ring
 
 /-- The same positive scale gives the normalized boost parameters directly. -/

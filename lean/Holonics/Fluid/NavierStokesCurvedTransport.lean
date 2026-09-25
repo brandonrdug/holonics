@@ -13,9 +13,13 @@ This module turns three adjacent subjects into explicit interfaces over the mate
 * `PolygonGaussBonnet` retains a bulk curvature population and every boundary turn;
   `TriangulatedGaussBonnetLedger` derives the bulk-plus-boundary theorem from local triangle budgets
   and an Euler incidence return.
+* `einsteinResidual` `𝓡 = G + Λg − κT` and its conservation return `κ∇·T = −∇·𝓡` over any linear
+  divergence with the Bianchi and metric ports (`conservation_return`, `conservation_return_eq`,
+  `conserved_of_residual_zero`): the one owner of the law, consumed by `Physics/Spacetime/Einstein`.
 * `EinsteinFluidDynamics` is the coupling interface through which the actual velocity and pressure
   constitute a covariant bilinear source field.  Its supplied Einstein tensor, covariant
-  divergence, field equation, Bianchi return, and metric compatibility derive source conservation;
+  divergence, field equation, Bianchi return, and metric compatibility make its residual zero
+  (`residual_eq_zero`), so the return derives source conservation (`stressEnergy_conserved`);
   declared receivers read both the field equation and conservation.
 
 The interfaces make the named laws available for subsequent analytic and geometric construction.
@@ -194,6 +198,61 @@ theorem TriangulatedGaussBonnetLedger.gaussBonnet
 
 /-! ## 3. Einstein dynamics as curvature-to-fluid conservation transport -/
 
+/-! ### The Einstein residual and its conservation return (the one owner) -/
+
+section Residual
+
+variable {R M N : Type*} [CommRing R] [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
+
+/-- [definition] **The Einstein residual** `𝓡 = G + Λg − κT` (`Physics/Spacetime/Einstein`). -/
+def einsteinResidual (einstein metric stress : M) (cosmological coupling : R) : M :=
+  einstein + cosmological • metric - coupling • stress
+
+/-- [proved-derived; formal-checked] The field equation is the zero residual. -/
+theorem einsteinResidual_eq_zero_iff (einstein metric stress : M) (cosmological coupling : R) :
+    einsteinResidual einstein metric stress cosmological coupling = 0 ↔
+      einstein + cosmological • metric = coupling • stress :=
+  sub_eq_zero
+
+/-- [proved-derived; formal-checked] **The conservation return**: with the contracted Bianchi
+port and metric compatibility, `κ ∇·T = −∇·𝓡` over any linear divergence. -/
+theorem conservation_return (covDiv : M →ₗ[R] N) {einstein metric stress : M}
+    (cosmological coupling : R) (bianchi : covDiv einstein = 0)
+    (metricCompatible : covDiv metric = 0) :
+    coupling • covDiv stress =
+      -covDiv (einsteinResidual einstein metric stress cosmological coupling) := by
+  simp [einsteinResidual, map_sub, map_add, map_smul, bianchi, metricCompatible]
+
+end Residual
+
+section ResidualField
+
+variable {R M N : Type*} [Field R] [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
+
+/-- [proved-derived; formal-checked] For `κ ≠ 0` the source's divergence is `−κ⁻¹` times the
+residual's: an approximate realization's conservation defect is exactly the divergence of its
+Einstein residual. -/
+theorem conservation_return_eq (covDiv : M →ₗ[R] N) {einstein metric stress : M}
+    (cosmological : R) {coupling : R} (hcoupling : coupling ≠ 0)
+    (bianchi : covDiv einstein = 0) (metricCompatible : covDiv metric = 0) :
+    covDiv stress =
+      -(coupling⁻¹ • covDiv (einsteinResidual einstein metric stress cosmological coupling)) := by
+  rw [← smul_neg, ← conservation_return covDiv cosmological coupling bianchi metricCompatible,
+    inv_smul_smul₀ hcoupling]
+
+/-- [proved-derived; formal-checked] A zero residual conserves the source. -/
+theorem conserved_of_residual_zero (covDiv : M →ₗ[R] N) {einstein metric stress : M}
+    (cosmological : R) {coupling : R} (hcoupling : coupling ≠ 0)
+    (bianchi : covDiv einstein = 0) (metricCompatible : covDiv metric = 0)
+    (field : einsteinResidual einstein metric stress cosmological coupling = 0) :
+    covDiv stress = 0 := by
+  rw [conservation_return_eq covDiv cosmological hcoupling bianchi metricCompatible, field]
+  simp
+
+end ResidualField
+
+/-! ### The receiver-indexed Einstein/fluid interface -/
+
 /-- A space-time event on the current fluid chart. -/
 abbrev FluidEvent := Space × ℝ
 
@@ -240,23 +299,27 @@ def EinsteinFluidDynamics.stressEnergy
   fun event ↦ dynamics.stressLaw event.1 event.2
     (velocity event.1 event.2) (pressure event.1 event.2)
 
-/-- **Einstein-to-fluid conservation transport.**  The field equation, contracted Bianchi return,
-metric compatibility, and nonzero coupling force covariant conservation of the constituted source
-field. -/
+/-- The interface's field equation is the zero residual: the field equation, contracted Bianchi
+return, metric compatibility, and nonzero coupling then force covariant conservation of the
+constituted source field. -/
+theorem EinsteinFluidDynamics.residual_eq_zero
+    {velocity : VelocityField} {pressure : PressureField}
+    {V Receiver : Type*} [AddCommGroup V] [Module ℝ V]
+    (dynamics : EinsteinFluidDynamics velocity pressure V Receiver) :
+    einsteinResidual dynamics.einstein dynamics.metric dynamics.stressEnergy
+      dynamics.cosmologicalConstant dynamics.coupling = 0 :=
+  (einsteinResidual_eq_zero_iff _ _ _ _ _).mpr dynamics.fieldEquation
+
+/-- **Einstein-to-fluid conservation transport**, the owner's `conserved_of_residual_zero` on the
+interface's zero residual. -/
 theorem EinsteinFluidDynamics.stressEnergy_conserved
     {velocity : VelocityField} {pressure : PressureField}
     {V Receiver : Type*} [AddCommGroup V] [Module ℝ V]
     (dynamics : EinsteinFluidDynamics velocity pressure V Receiver) :
-    dynamics.covDiv dynamics.stressEnergy = 0 := by
-  have h := congrArg (fun tensor ↦ dynamics.covDiv tensor) dynamics.fieldEquation
-  change dynamics.covDiv
-      (dynamics.einstein + dynamics.cosmologicalConstant • dynamics.metric) =
-    dynamics.covDiv (dynamics.coupling • dynamics.stressEnergy) at h
-  simp only [map_add, LinearMap.map_smul_of_tower, dynamics.contractedBianchi,
-    dynamics.metricCompatible, smul_zero, add_zero] at h
-  rw [← inv_smul_smul₀ dynamics.coupling_ne_zero
-    (dynamics.covDiv dynamics.stressEnergy)]
-  rw [← h, smul_zero]
+    dynamics.covDiv dynamics.stressEnergy = 0 :=
+  conserved_of_residual_zero dynamics.covDiv dynamics.cosmologicalConstant
+    dynamics.coupling_ne_zero dynamics.contractedBianchi dynamics.metricCompatible
+    dynamics.residual_eq_zero
 
 /-- Every declared current receiver reads the derived conservation return as zero. -/
 theorem EinsteinFluidDynamics.everyReceiver_reads_conservation
@@ -300,6 +363,10 @@ section Audit
 #print axioms PolygonGaussBonnet.angleExcess_eq_sum_curvature
 #print axioms PolygonTurnLedger.toGaussBonnetZero_angleExcess
 #print axioms TriangulatedGaussBonnetLedger.gaussBonnet
+#print axioms conservation_return
+#print axioms conservation_return_eq
+#print axioms conserved_of_residual_zero
+#print axioms EinsteinFluidDynamics.residual_eq_zero
 #print axioms EinsteinFluidDynamics.stressEnergy_conserved
 #print axioms EinsteinFluidDynamics.everyReceiver_reads_conservation
 #print axioms EinsteinFluidDynamics.receiverEquation_fourArcOverDifferential

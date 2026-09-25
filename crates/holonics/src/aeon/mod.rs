@@ -29,6 +29,7 @@
 //! | `Aeon/Production/PathReversal.pathLaw`, `production`, `epochProduction`, `pathLogRatio_split`, `detailedBalance_cycle_affinity_zero` | [`MarkovChain`], [`MarkovChain::production`], [`MarkovChain::heat`], [`MarkovChain::reversible_law`] |
 //! | `Aeon/Production/Kac.FirstReturnEquations`, `firstReturn_existsUnique`, `kac_single_state`, `kac_grain_ratio` | [`MarkovChain::mean_return`], [`MarkovChain::grain_ratio`] |
 //! | `Aeon/Production/Kac.epochEntropy`, `wordEntropy_succ`, `wordEntropy_eq_sum`, `abramov_ledger`, `abramov` | [`MarkovChain::epoch_entropy`], [`MarkovChain::word_entropy`], [`MarkovChain::abramov`] |
+//! | `Physics/Information/ClockJoin.join_silent_on_cycles`, `join_of_silent_on_cycles`, `join_iff_silent`, `triangle_defect` | [`join_axes`], [`AxesJoin`], [`AxisComponent`], [`AxisRate`], [`ClockAxis`] |
 //! | Mathlib `Matrix.charpolyRev`; `Aeon/Production/Zeta.cycleLog`, `zeta_eq_exp`, `machine_charpolyRev`, `machine_zeta` | [`ReturnMap`], [`zeta`], [`cycle_exponential`] |
 //! | `Aeon/Production/FirstLaw.exchange`, `deposition`, `first_law_epoch`, `first_law_aeon` | [`PositiveLaw`], [`exchange`], [`deposition`], [`learning_balance`] |
 
@@ -44,17 +45,20 @@ mod epoch;
 mod first_law;
 mod groupoid;
 mod hodge;
+mod join;
 mod lock;
 mod production;
 mod reading;
 mod zeta;
 
 pub use epoch::{EpochTower, Epochs, Tick, epochs};
+pub(crate) use first_law::weighted_surprisal;
 pub use first_law::{LearningBalance, PositiveLaw, deposition, exchange, learning_balance};
 pub use groupoid::{
     Aeon, ClockLift, Cycle, FiniteComplex, LiftPassage, LiftSquare, ParametricComplex, Step,
 };
 pub use hodge::{TimeSplit, hodge_split};
+pub use join::{AxesJoin, AxisComponent, AxisRate, ClockAxis, join_axes};
 pub use lock::{Convergent, TwoClocks};
 pub use production::{MarkovChain, SectionEntropy, Transition};
 pub use reading::{Clock, ClosedForm, Form, Reading, TorusClock, rate, reading};
@@ -133,6 +137,18 @@ pub enum AeonError {
     CycleObstruction { cycle: Vec<usize>, product: Rat },
     #[error("the split's harmonic remainder fails its certificate")]
     NotHarmonic,
+    #[error("no rate is declared between any two clock axes")]
+    NoDeclaredRate,
+    #[error("the clock axis {axis:?} is not joined to the reference by any declared rate")]
+    AxisNotJoined { axis: ClockAxis },
+    #[error(
+        "the clock axes do not join: the cycle {cycle:?} reads the holonomy {holonomy:?}, not one"
+    )]
+    AxesDefect {
+        cycle: Vec<ClockAxis>,
+        /// Boxed: the undivided pair of two exact rationals.
+        holonomy: Box<crate::ratio::Presentation>,
+    },
     #[error("the transfer determinant has no unit constant term")]
     NotAUnitSeries,
     #[error(transparent)]

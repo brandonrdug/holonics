@@ -58,8 +58,10 @@ impl PositiveLaw {
     }
 }
 
-/// `Σ wᵢ S(qᵢ)` for any rational weights.
-fn weighted_surprisal(
+/// `Σ wᵢ S(qᵢ)` for any rational weights: the owner of the weighted surprisal that exchange,
+/// deposition and cross-entropy share, and of the infinitesimal exchange of a population's rate
+/// (`physics::information::cross_entropy_rate`).
+pub(crate) fn weighted_surprisal(
     weights: &[Rat],
     receiver: &PositiveLaw,
 ) -> Result<SymbolicSurprisal, AeonError> {

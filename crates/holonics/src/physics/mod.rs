@@ -4,5 +4,7 @@
 //! participating receiver. Exact over `Rat`; no float enters a law.
 
 pub mod fluid;
+pub mod information;
+pub mod spacetime;
 pub mod thermal;
 pub mod wave;
