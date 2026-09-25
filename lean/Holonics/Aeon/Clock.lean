@@ -3,6 +3,7 @@ import Holonics.Aeon.Clock.Reading
 import Holonics.Aeon.Clock.Winding
 import Holonics.Aeon.Clock.Lock
 import Holonics.Aeon.Clock.Epoch
+import Holonics.Aeon.Clock.CarryWord
 
 /-!
 # Aeon clocks: the groupoid, the pairing, windings, two-clock locks and epoch towers
@@ -29,6 +30,13 @@ a receiver's clock with an aeon; no clock is privileged.
   the epochs of an aeon at a receiver's cut clock, count as **oriented** flux (forward minus
   backward crossings, the change of whole windings), the Odometer as a tower, and the barring
   counterexamples.
+- `Aeon/Clock/CarryWord`: the carry word of a rate-`α` clock read at the unit clock's sections,
+  `s_n = windings α + Winding.carry (n α + ρ) α`; it is the aeon's epoch reading (its ones are the
+  arrivals of a certified section, and the epoch count is the winding; at rate `1/n` it is the
+  Odometer's digit section), it is eventually periodic
+  with period `T` exactly when `Lock.jointReading α T` is a cycle (a crystal at the Farey lock; an
+  irrational rate has no cycle, the quasicrystal), with balance, the tube and window, the physical
+  projection, the golden approximants and the Beatty/Wythoff positions.
 
 One aeon: the Hodge split (`Aeon/Production/HodgeTime.Matches`), the lock
 (`Lock.isCycle_iff_torus_closes`), the epochs (`Epoch.aeonSection`), the Markov paths
@@ -77,5 +85,12 @@ section Audit
 #print axioms Holonics.Aeon.Clock.Epoch.odometer_tower
 #print axioms Holonics.Aeon.Clock.Epoch.declared_ticks_do_not_partition
 #print axioms Holonics.Aeon.Clock.Epoch.nontransversal_subsection_does_not_coarsen
+#print axioms Holonics.Aeon.Clock.CarryWord.carry_eq_windings_add_carry
+#print axioms Holonics.Aeon.Clock.CarryWord.eventually_periodic_iff_isCycle
+#print axioms Holonics.Aeon.Clock.CarryWord.never_locks_iff_irrational
+#print axioms Holonics.Aeon.Clock.CarryWord.epochOf_carrySection_eq_windings
+#print axioms Holonics.Aeon.Clock.CarryWord.carrySection_epochs_attained
+#print axioms Holonics.Aeon.Clock.CarryWord.odometer_counts_carrySection_epochs
+#print axioms Holonics.Aeon.Clock.CarryWord.carry_rational_eq_phaseCarry
 
 end Audit

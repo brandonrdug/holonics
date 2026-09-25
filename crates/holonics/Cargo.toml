@@ -16,3 +16,9 @@ thiserror = { workspace = true }
 [[example]]
 name = "hnn_lattice_growth"
 path = "../../research/notebook/hnn_design/hnn_lattice_growth.rs"
+
+# The notebook's exposure of campaign 1 on the pinned cut (`Reference::expose` and its complete
+# readout; research/notebook/hnn_design/README.md): a measurement run once in release, never a test.
+[[example]]
+name = "hnn_exposure"
+path = "../../research/notebook/hnn_design/hnn_exposure.rs"

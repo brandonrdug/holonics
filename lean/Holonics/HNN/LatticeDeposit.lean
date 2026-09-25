@@ -1,4 +1,5 @@
 import Holonics.HNN.Retention
+import Holonics.Holarchy.Hearing
 import Mathlib.Algebra.Order.Round
 import Mathlib.Data.Nat.Log
 import Mathlib.Data.Nat.Size
@@ -83,7 +84,9 @@ below `u/2` since the locus's founding.
    whose update lies in the half-cell of the fine grain `2^(−L−k_m)` keeps its value and remainder
    and releases the update whole, while the clock still counts the nonzero deposit;
    `carry_entry_zero` is its case `Δ_i = 0`). The grain refines as the clock advances
-   (`listening_grain_refines`).
+   (`listening_grain_refines`). On the Receiver object's predicates (`Holarchy/Hearing`) a nonzero
+   below-grain update is heard in the release, not listened in its entry, and listened in the
+   clock (`below_grain_heard_counted_not_deposited`, §9).
 7. **Bits** (`lattice_entry_bits`, `lattice_bits_bounded`, `lattice_rat_bits_bounded`): a lattice
    entry of magnitude at most `M` has an integer coordinate of at most `⌈log₂(⌊M·2^L⌋ + 1)⌉` bits,
    and so at most `⌈log₂(⌊M·2^L⌋ + 1)⌉ + 1` with its sign; as a reduced rational (the Rust count,
@@ -888,5 +891,62 @@ section Audit
 #print axioms lattice_deposit_descends
 
 end Audit
+
+end Holonics.HNN.LatticeDeposit
+
+namespace Holonics.HNN.LatticeDeposit
+
+/-! ## 9. The deposit is an instance of hearing, listening and nullity -/
+
+section Hearing
+
+open Holonics.Receiver.Hearing (Heard Listened)
+
+variable {L : ℕ} {E : Type*}
+
+/-- [definition] **The reached action of a deposit at entry `i`**: the change the deposit of `Δ`
+makes to that entry of the constitution, its value and its carried remainder (`Holarchy/Hearing`'s
+`A_i`). -/
+noncomputable def entryAction (s : Carried L E) (i : E) (Δ : E → ℚ) : ℚ × ℚ :=
+  ((carry s Δ).value i - s.value i, (carry s Δ).rem i - s.rem i)
+
+/-- [definition] **The reached action of a deposit on the locus's clock**: the epochs the deposit
+of `Δ` adds at the locus's section. -/
+noncomputable def clockAction (s : Carried L E) (Δ : E → ℚ) : ℕ := (carry s Δ).clock - s.clock
+
+/-- [proved-derived; formal-checked] **A below-grain update is heard and counted, not deposited**
+(`carry_entry_below_grain`, `carry_clock_of_ne`, in the typed predicates of `Holarchy/Hearing`).
+At the deposit that advances the clock to `m`, a nonzero update `Δ_i` in the half-cell of the fine
+grain `2^(−L−k_m)` is heard by the receipt, whose release at `i` reports it exactly (`e = Δ_i`);
+it lies in the kernel of the entry map `A_i = (value_i, rem_i)`, so it is not listened to at that
+entry. The locus's clock does count it: the clock component of the reached action is not null for
+a nonzero deposit. The difference is counted, not deposited, and "not listened" holds for the
+entry, not for the whole locus. -/
+theorem below_grain_heard_counted_not_deposited (s : Carried L E) (Δ : E → ℚ) {i : E}
+    (hΔi : Δ i ≠ 0)
+    (h : -(unit (L + gammaLength (s.clock + 1)) / 2) ≤ Δ i ∧
+      Δ i < unit (L + gammaLength (s.clock + 1)) / 2) :
+    Heard (fun Δ' => release s Δ' i) Δ ∧ release s Δ i = Δ i ∧
+      ¬ Listened (entryAction s i) Δ ∧ Listened (clockAction s) Δ := by
+  obtain ⟨hvalue, hrem, hrel⟩ := carry_entry_below_grain s Δ h
+  have hΔ : Δ ≠ 0 := fun h0 => hΔi (by rw [h0]; rfl)
+  refine ⟨?_, hrel, ?_, ?_⟩
+  · show release s Δ i ≠ 0
+    rw [hrel]
+    exact hΔi
+  · intro hlisten
+    apply hlisten
+    simp [entryAction, hvalue, hrem]
+  · show clockAction s Δ ≠ 0
+    rw [clockAction, carry_clock_of_ne hΔ]
+    omega
+
+end Hearing
+
+section AuditHearing
+
+#print axioms below_grain_heard_counted_not_deposited
+
+end AuditHearing
 
 end Holonics.HNN.LatticeDeposit

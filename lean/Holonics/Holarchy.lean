@@ -2,6 +2,7 @@ import Holonics.Holarchy.Join
 import Holonics.Holarchy.View
 import Holonics.Holarchy.Receipt
 import Holonics.Holarchy.Reception
+import Holonics.Holarchy.Hearing
 import Holonics.Holarchy.Globe
 
 /-!
@@ -29,6 +30,12 @@ because reception joins two Holons, a source and a receiver, the smallest Holarc
   singular step, and returns the face, the receipt, the boundary bond, the certified power
   balance and the unresolved fibre; the moving-receiver rate along the law; `HolonLaw.receive` is
   the zero-storage specialization.
+* `Holarchy.Hearing` — hearing, listening and nullity on the receiver: `Heard`, `Null` and
+  `Listened` against a present face and a reached-action map; `HearingLaw` with its present face
+  and admitted future family; the future-null differences are null now, what changes no retained
+  state is future-null, the reached action is a lawful standing exactly when every unlistened
+  difference is future-null (so heard-but-not-listened refutes it), `range F* = (ker F)^⊥`, and the
+  zero-storage receiver hears without storing (namespace `Holonics.Receiver.Hearing`).
 * `Holarchy.Globe` — a block of a Holarchy's grain is a constituent region whose boundary map is
   the view's interface; a globe exactly when coupled and not determined, with the linear criterion
   and a globe of an actual Holarchy. The relative completeness theorem stays owed in #62.
@@ -126,6 +133,14 @@ open Holonics.HolarchyCore Holonics.Receiver
 #print axioms singular_step_refused
 #print axioms active_element_is_not_passive
 #print axioms unresolved_fibre_is_plural
+#print axioms Hearing.null_of_factors
+#print axioms Hearing.HearingLaw.future_nil
+#print axioms Hearing.HearingLaw.futureNull_le_ker_present
+#print axioms Hearing.HearingLaw.futureNull_of_retain_eq
+#print axioms Hearing.HearingLaw.act_is_standing_iff
+#print axioms Hearing.HearingLaw.heard_not_listened_refutes_standing
+#print axioms Hearing.mem_pulledBack_iff
+#print axioms Hearing.zero_storage_receiver_hears_without_storing
 #print axioms constituentMembrane_boundsInterior
 #print axioms constituent_no_exact_flux
 #print axioms blockMembrane_gauss

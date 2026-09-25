@@ -32,7 +32,9 @@ carry) and **open phase** `openPhase t = t − ⌊t⌋ ∈ [0, 1)` (the remainde
    `openPhase_add`). Along aeons: `aeon_windings_concat`.
 4. **The split is the ratio's division with remainder.** For a reading presented as the ratio
    `m / d` (`m` micro-steps of a `d`-step ring), `windings = m / d` and `d · openPhase = m % d`
-   (`ratio_split`); in the natural chart these are `PhaseCarry.winding` and `PhaseCarry.phase`
+   (`ratio_split`). The split and the carry commute with the rational chart: a rational reading has
+   the same whole windings and carry read in `ℚ` or in `ℝ` (`windings_ratCast`,
+   `jointCarry_ratCast`). In the natural chart these are `PhaseCarry.winding` and `PhaseCarry.phase`
    (`windings_of_microsteps`, `openPhase_of_microsteps`), the reading's carry is the Odometer's
    carry `PhaseCarry.carry` (`carry_of_microsteps`), and the split is the rational clock passage's
    quotient–residue state (`split_eq_clockPassage_normalize`).
@@ -283,6 +285,16 @@ theorem ratio_split (m : ℤ) (d : ℕ) (hd : 0 < d) :
     Int.emod_nonneg _ hdz.ne', Int.emod_lt_of_pos _ hdz⟩
   rw [openPhase, Int.fract_div_intCast_eq_div_intCast_mod]
   field_simp
+
+/-- [proved-derived; formal-checked] **The split commutes with the rational chart.** The whole
+windings of a rational reading are read alike in the rational and the real chart. -/
+theorem windings_ratCast (x : ℚ) : windings (x : ℝ) = windings x :=
+  Rat.floor_cast x
+
+/-- [proved-derived; formal-checked] The joint clock's carry of two rational readings is read alike
+in the rational and the real chart. -/
+theorem jointCarry_ratCast (x y : ℚ) : carry (x : ℝ) (y : ℝ) = carry x y := by
+  rw [carry, carry, ← Rat.cast_fract, ← Rat.cast_fract, ← Rat.cast_add, Rat.floor_cast]
 
 /-- [proved-derived; formal-checked] In the natural micro-step chart the whole windings are the
 Odometer's winding `PhaseCarry.winding`. -/

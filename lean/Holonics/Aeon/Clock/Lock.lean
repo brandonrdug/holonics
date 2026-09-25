@@ -20,8 +20,12 @@ open phases vanish (`IsCycle`, over `Winding.openPhase`).
    (`v_a = α·v`, `v_b = v`): `q · v_a = p · v_b`, so on every definite dissipative face it reads
    zero power (`lock_at_address`, through `Transport/HelicalPairInteraction.lock_iff_zero_power`);
    with `p, q` coprime an aeon is a cycle exactly when `q` divides its tick count
-   (`cycle_iff_period_dvd`). For irrational `α` no aeon of nonzero ticks is a cycle
-   (`no_cycle_of_irrational`).
+   (`cycle_iff_period_dvd`). A joint cycle is read alike in the rational and the real chart of the
+   rate (`isCycle_ratCast_iff`), so the lock at `p / q` is a cycle of the real joint clock
+   (`isCycle_of_rational`). For irrational `α` no aeon of nonzero ticks is a cycle
+   (`no_cycle_of_irrational`). When the aeon of `T` ticks is a cycle of `c` whole windings, an
+   address `p / q` is compared with the rate by cross-multiplication against the cycle, without a
+   division (`div_lt_rate_iff`, `rate_lt_div_iff`).
 1b. **A cycle of two clocks is a closed loop of their torus.** On the lift `clockLift ι` of the
    clock torus with periods `d`, an aeon's readings in turns have zero open phase exactly when it
    closes on the torus (`openPhases_zero_iff_torus_closes`); for two clocks this is
@@ -201,6 +205,61 @@ theorem no_cycle_of_irrational {α : ℝ} (hα : Irrational α) {k : ℤ} (hk : 
   rw [jointReading_isCycle_iff]
   rintro ⟨m, hm⟩
   exact (hα.intCast_mul hk).ne_int m hm
+
+/-- [proved-derived; formal-checked] A joint cycle is read alike in the rational and the real chart
+of the rate. -/
+theorem isCycle_ratCast_iff (x : ℚ) (k : ℤ) :
+    IsCycle (jointReading (x : ℝ) k) ↔ IsCycle (jointReading x k) := by
+  rw [jointReading_isCycle_iff, jointReading_isCycle_iff]
+  constructor <;> rintro ⟨m, hm⟩ <;> exact ⟨m, by exact_mod_cast hm⟩
+
+/-- [proved-derived; formal-checked] **The Farey lock is a cycle of the real joint clock.** At rate
+`p / q` the aeon of `q` ticks is the cycle of `lock_at_address`. -/
+theorem isCycle_of_rational {α : ℝ} {p : ℤ} {q : ℕ} (hq : 0 < q) (hα : α = (p : ℝ) / q) :
+    IsCycle (jointReading α (q : ℤ)) := by
+  have hlock := (lock_at_address p q hq 1).2.1
+  rw [mul_one] at hlock
+  rw [hα, show ((p : ℝ) / q) = (((p : ℚ) / q : ℚ) : ℝ) by norm_cast, isCycle_ratCast_iff]
+  exact hlock
+
+/-- [proved-derived; formal-checked] **An address below the rate of a cycle, cross-multiplied.**
+When the aeon of `T` ticks is a cycle of `c` whole windings (`T α = c`), `p / q < α` exactly when
+`p T < c q`: the comparison of two addresses without a division. -/
+theorem div_lt_rate_iff {α : ℝ} {T : ℕ} {c : ℤ} (hc : (T : ℝ) * α = c) (hT : 0 < T) {p q : ℤ}
+    (hq : 0 < q) : (p : ℝ) / q < α ↔ p * (T : ℤ) < c * q := by
+  have hTr : (0 : ℝ) < T := by exact_mod_cast hT
+  have hqr : (0 : ℝ) < q := by exact_mod_cast hq
+  have hb : α * q * T = c * q := by rw [← hc]; ring
+  rw [div_lt_iff₀ hqr]
+  constructor
+  · intro h
+    have a := mul_lt_mul_of_pos_right h hTr
+    have h' : (p : ℝ) * T < c * q := by linarith
+    exact_mod_cast h'
+  · intro h
+    have h' : (p : ℝ) * T < c * q := by exact_mod_cast h
+    by_contra hne
+    have a := mul_le_mul_of_nonneg_right (not_lt.mp hne) hTr.le
+    linarith
+
+/-- [proved-derived; formal-checked] **An address above the rate of a cycle, cross-multiplied.**
+When `T α = c`, `α < p / q` exactly when `c q < p T`. -/
+theorem rate_lt_div_iff {α : ℝ} {T : ℕ} {c : ℤ} (hc : (T : ℝ) * α = c) (hT : 0 < T) {p q : ℤ}
+    (hq : 0 < q) : α < (p : ℝ) / q ↔ c * q < p * (T : ℤ) := by
+  have hTr : (0 : ℝ) < T := by exact_mod_cast hT
+  have hqr : (0 : ℝ) < q := by exact_mod_cast hq
+  have hb : α * q * T = c * q := by rw [← hc]; ring
+  rw [lt_div_iff₀ hqr]
+  constructor
+  · intro h
+    have a := mul_lt_mul_of_pos_right h hTr
+    have h' : (c : ℝ) * q < p * T := by linarith
+    exact_mod_cast h'
+  · intro h
+    have h' : (c : ℝ) * q < p * T := by exact_mod_cast h
+    by_contra hne
+    have a := mul_le_mul_of_nonneg_right (not_lt.mp hne) hTr.le
+    linarith
 
 /-! ## 2. The convergents of the frequency ratio -/
 

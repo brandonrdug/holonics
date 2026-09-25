@@ -183,8 +183,8 @@ complex part is like the kind of face that is pivoting/swinging maybe?"**
 
 [definition] **The carry word of a helix at a real rate.** A helix of rate `α` and phase `ρ`,
 read against the integer section clock, winds `⌊nα + ρ⌋` sections by tick `n`. Its carry is
-`s_n = ⌊(n+1)α + ρ⌋ − ⌊nα + ρ⌋`: the classical mechanical word. Owner:
-`Geometry/MechanicalWord`.
+`s_n = ⌊(n+1)α + ρ⌋ − ⌊nα + ρ⌋`: the classical mechanical word. Owner: `Aeon/Clock/CarryWord` (first written the same day as `Geometry/MechanicalWord`, which
+duplicated the Aeon clock owner and was folded into it; the names below are the Aeon owner's).
 
 [proved-derived; formal-checked] What it proves:
 - **Helix = circle + carry.** The carries count the winding (`sum_carry`); each carry is `⌊α⌋` or
@@ -195,7 +195,7 @@ read against the integer section clock, winds `⌊nα + ρ⌋` sections by tick 
   carrying exactly `p` per period (`carry_periodic_of_rational`,
   `sum_carry_period_of_rational`).
 - **An irrational rate never locks: a quasicrystal.** An eventually periodic word forces a
-  rational rate (`rational_of_eventually_periodic`, `eventually_periodic_iff`), so an irrational
+  rational rate (`isCycle_of_eventually_periodic`, `eventually_periodic_iff_isCycle`), so an irrational
   rate's address never closes (`not_eventually_periodic_of_irrational`).
 - **The mediant bounds the period.** A lock strictly between two Farey neighbours recurs no
   sooner than their mediant's period (`period_ge_mediant_of_between`, joined to
@@ -392,19 +392,25 @@ missing terms exist:
 ## 10. What was built, and the receipt
 
 [proved-derived; formal-checked] New and extended Lean owners, all without `sorry` or new axioms
-(the first three in the `Holonics` library, the last in `HolonicsResearch`):
+(all but the last in the `Holonics` library, the last in `HolonicsResearch`):
 - `Foundation/FractalString`, registered in `Framework/Geometry`: the two counts, hearing,
   listening, the ζ factorization, self-similar strings, the Cantor string and its complex
   dimensions, and the golden string.
-- `Geometry/MechanicalWord`, registered in `Framework/Geometry`: the carry word, locks, the
-  quasicrystal, balance, the mediant, the tube and window, the physical projection, the golden
-  approximants, and the Beatty/Wythoff positions.
+- `Aeon/Clock/CarryWord` (folded the same day from `Geometry/MechanicalWord` into the Aeon clock
+  owner): the carry word as the epoch reading of two clocks, recurrence ⇔ a cycle of the joint
+  reading, the quasicrystal, balance, the mediant, the tube and window, the physical projection,
+  the golden approximants, and the Beatty/Wythoff positions.
+- The same-day unification into the objects: the scale zeta through the Aeon transfer determinant
+  (`FractalString.*_transfer`, graph-directed words), the typed hearing law on the Receiver object
+  (`Holarchy/Hearing`, with the HNN corollary `below_grain_heard_counted_not_deposited`), and
+  FractalPacking's reflection as the Swing about ½ (`reflect_eq_swing`).
 - `HNN/LatticeDeposit`: `carry_entry_below_grain` (with `carry_entry_zero` now its corollary)
   and `listening_grain_refines`.
 - `HolonicsResearch/Zeta/Seam`: the Swing about ½.
 
-Receipt: `bash tools/lean_check.sh Holonics HolonicsResearch.Zeta.Seam` completes with 9,271 jobs,
-with no new warnings; `cargo check --workspace --all-targets` passes.
+Receipt, after the unification into the objects: `bash tools/lean_check.sh Holonics
+HolonicsResearch` completes with 10,213 jobs, with no new warnings; `cargo check --workspace
+--all-targets` passes and `cargo test -p holonics` passes (720 tests).
 
 [definition; agent-inferred] No Rust is added. No runtime consumer exists yet for a spectral
 receiver, an irrational address, a diffraction receiver or a growth simulator, and unconsumed Rust

@@ -4,7 +4,8 @@
 at [`13f8c734`](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_REPOSITORY_RESTRUCTURE.md).
 Tracked in #63. Steps 0–3 are done (September 24), and so are step 6's physics (K3 #74, K4 #75)
 and step 7's renames by subject (September 25). Step 4 (the HNN law, #73) is under way: campaign 1
-is built.
+is built, and its exposure on the standing real cut (pinned September 25, Decision 23) is the
+next receipt.
 
 ## The line the rebuild serves
 
@@ -270,6 +271,24 @@ archive root. Brandon's Metal port stays on its own branch, `codex/apple-silicon
    - Each outcome freezes its task split and shows failure outputs.
    - Conversation data follows the [data rules](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/CONVERSATION_DATA.md).
    - The simulator follows the [interface table](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/HARDWARE_AND_MODALITY_BOUNDARIES.md#robotics-and-simulation-boundary).
+
+## Laws found alongside the steps
+
+[project-postulate] Work on the targets and Brandon's derivations proceeds alongside any step (the
+line above). A law found there lands in its elementary object's owner, the object map of
+`Holonics.Framework.Objects` and the operator contract, with its atlas rows and its consumer, and
+is listed here. A law written beside the objects is folded into them; a record is its history.
+
+| Date | Law | Object and owner | Record, issue |
+|---|---|---|---|
+| Sep 25 | Deposition on a carrier lattice; a below-grain update is heard and counted, not deposited | Deposition: `HNN/LatticeDeposit` (Decision 22; `carry_entry_below_grain`, `below_grain_heard_counted_not_deposited`) | [perceived difference](../../research/records/2026-09-25_THE_CLASSICAL_LOSS_IS_THE_PERCEIVED_DIFFERENCE_AND_THE_DEPOSITION_REMAINDER_IS_A_REPRESENTATION_RESIDUAL.md), #73 |
+| Sep 25 | The enclosed first law over an aeon | Aeon: `Aeon/Production/FirstLaw`, Rust `aeon::EnclosedLedger` | step 4 additions, #73 |
+| Sep 25 | The natural grain is the future quotient; integration by reflection over a fractal packing, whose reflection is the Swing about ½ | Compression: `Compression/Core/FaceMap`; Navigator and Swing: `Foundation/FractalPacking` (`reflect_eq_swing`) | [natural grain](../../research/records/2026-09-25_THE_NATURAL_GRAIN_IS_THE_FUTURE_QUOTIENT_AND_REFLECTION_INTEGRATES_A_FRACTAL_PACKING.md), #145 |
+| Sep 25 | Seasons are rotations, generations boosts, the prime wheel a product of residue rings | Aeon (clocks) and Ratio (residue rings): `HolonicsResearch/Mathematics/TwinWheel` (the twin local factors); no new owner | [seasons](../../research/records/2026-09-25_SEASONS_ARE_ROTATIONS_GENERATIONS_ARE_BOOSTS_AND_THE_PRIME_WHEEL_IS_A_PRODUCT_OF_RESIDUE_RINGS.md), #145, #72 |
+| Sep 25 | Fractal strings: hearing multiplies by ζ, listening is Möbius inversion; the scale zeta's denominator is the transfer determinant of the epoch return map | Navigator: `Foundation/FractalString` over Aeon `Aeon/Production/Zeta` | [music in the holes](../../research/records/2026-09-25_THE_MUSIC_IS_IN_THE_HOLES_HEARING_MULTIPLIES_BY_ZETA_AND_A_QUASICRYSTAL_IS_A_HELIX_THAT_NEVER_LOCKS.md), #145, #62 |
+| Sep 25 | The carry word is the epoch reading of two clocks; it recurs iff the joint reading closes (crystal), never at an irrational rate (quasicrystal) | Aeon: `Aeon/Clock/CarryWord` over `Winding`, `Lock`, `Epoch` (folded from a same-day `Geometry/MechanicalWord` duplicate); Rust `aeon::TwoClocks` consumes the joint reading, the word itself has no runtime consumer yet | same record, #62, #147 |
+| Sep 25 | Hearing, nullity and listening typed on the Receiver object | Receiver: `Holarchy/Hearing` | same record, #62 |
+| Sep 25 | ξ is invariant under the Swing about ½ | Swing: `HolonicsResearch/Zeta/Seam` over `Geometry/AffineSwing` | same record |
 
 ## Step 4 design: the HNN law
 
@@ -1603,9 +1622,9 @@ regression controls are controls, never milestones:
   | Sign generator | entry `(i, j)` of locus `ℓ` is `+1` or `−1` by the low bit of SplitMix64 of `(0, ℓ, i, j)` | exact, deterministic and recorded; no float |
   | Crib | the `W_crib = 64` cells that closed each aeon (its last cells, already ingested and scored), at offset `δ = 1`, truncated after its last held-out cell | past cells only, so no key is learned from a cell later scored (review D1); well below the aeon; 63 edges per ring against at most 13 port classes |
   | `n*` | 6,148 cells | the counting formula above |
-  | Cut | the pinned development cut (`.local/`), with its held-out positions, recorded by scope and counts | `Field::declare` refuses it if shorter than `n*` |
+  | Cut | the standing real cut (Decision 23): `.local/cuts/standing-real-cut-campaign-1.bin`, written by `research/notebook/hnn_design/standing_cut.py`, the development stream's last 6,148 cells with the final 1,190 held out; population 6,148 = `n*`; recorded by scope and counts, its hashes in #73 | `Field::declare` refuses it if shorter than `n*`; the held-out cells are the stream's own later occurrences; the evaluation partition stays unspent |
   | Constitution budget | `B_Θ = 2^33` exact bits (1 GiB of numerators and denominators, statistics included) | the host reference's declared memory for the constitution |
-  | Carrier lattices `L_ℓ` | `L_ℓ = ⌈log₂(2 L_R X_ℓ)⌉`: 9, 9, 10, 10 for the four rings' elements and standings; 10 for ring 2's `R`; 9, 9, 10, 9 for the four channels; `⌈log₂(32 · population)⌉` for ring 0's ports (22 on a cut of 2^17 cells; 23 on the notebook's pinned cut) | `X_ℓ` bounds the ℓ1 norm of the operand one read of the locus sums: its fan-in (`2d_g`, `k_a`) for unit-scale waves, the population for the moment's counts. For the linear loci (`E`, `R`, `W_c`) a carried remainder then moves one read by at most `1/(4L_R)`, below the grain (`remainder_below_grain`), and a carried Gram stays positive definite. The factor loci enter the word quadratically or trilinearly (`C = ccᵀ`, `K = bbᵀ`, `D = FFᵀ`, `W_s = −ffᵀ`, the slices, the pair port), so the same `L_ℓ` does not give that bound for them: their product bound is part of the word-level certificate owed in #62. Never tuned on held-out bits (Decision 22) |
+  | Carrier lattices `L_ℓ` | `L_ℓ = ⌈log₂(2 L_R X_ℓ)⌉`: 9, 9, 10, 10 for the four rings' elements and standings; 10 for ring 2's `R`; 9, 9, 10, 9 for the four channels; `⌈log₂(32 · population)⌉` for ring 0's ports (22 on a cut of 2^17 cells; 23 on the notebook's pinned cut; 18 on the standing real cut of 6,148 cells) | `X_ℓ` bounds the ℓ1 norm of the operand one read of the locus sums: its fan-in (`2d_g`, `k_a`) for unit-scale waves, the population for the moment's counts. For the linear loci (`E`, `R`, `W_c`) a carried remainder then moves one read by at most `1/(4L_R)`, below the grain (`remainder_below_grain`), and a carried Gram stays positive definite. The factor loci enter the word quadratically or trilinearly (`C = ccᵀ`, `K = bbᵀ`, `D = FFᵀ`, `W_s = −ffᵀ`, the slices, the pair port), so the same `L_ℓ` does not give that bound for them: their product bound is part of the word-level certificate owed in #62. Never tuned on held-out bits (Decision 22) |
 
 - **The initial constitution and its priors (R3 D2).** A linear locus starts at zero where another
   map carries its covector, and at declared signs otherwise. A square or product factor starts at a
@@ -2365,3 +2384,25 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
     Source: agent-inferred from CLAUDE.md's exact-representation and retention laws, after
     Brandon's September 25 messages (the release point is a mathematics question; aeons carry flux
     and entropy, and the conservation of faces is what they need). Lean `HNN/LatticeDeposit`. Brandon may override it.
+
+23. **The standing real cut is the tail of the conversation data's development stream.** The design
+    names one pinned *development* cut of the conversation data with held-out targets (review E1,
+    Decision 16). The private exposure dataset (`holonics.conversation-exposure.v1`, 24,768
+    occurrence families) declares its own partition at its temporal cut: 22,449 development families
+    before it, 617 evaluation families at or after it, 1,702 deferred. The cut is the development
+    stream's last 6,148 cells, of which the final 1,190 are held out: the stream's own later
+    occurrences, so no held-out cell precedes a training cell. The evaluation partition is not read
+    into it and stays unspent for the outcomes' frozen task splits (step 8). Cells are the UTF-8
+    bytes of each family's first view's visible parts in the dataset's declared order; roles and
+    provenance are not encoded. The population is `n* = 6,148`, the smallest the declared field
+    admits, which keeps the exposure near the projected six hours (3,074 windows); the held-out
+    length is one mean aeon of the joint clock on uniform bytes, `⌈5·7·11·13·2⁸/1,077⌉ = 1,190`, set
+    from the field, not the data. `research/notebook/hnn_design/standing_cut.py` writes the cut and
+    its manifest (hashes, counts, held-out range) to `.local/cuts/`; `hnn_exposure -- cut-file`
+    reads the held-out range from the manifest; the notebook reports the cut by scope and counts
+    only, and #73 records its hashes.
+
+    Source: agent-inferred from the design's review E1 and Decision 16 and the dataset's declared
+    partition. A first pinning took the held-out cells from the evaluation partition; review found
+    that it would spend step 8's split, and it was replaced before any receipt. Brandon may
+    override it.

@@ -1,5 +1,6 @@
 import Mathlib.Tactic
 import Mathlib.Analysis.SpecificLimits.Basic
+import Holonics.Geometry.AffineSwing
 
 /-!
 # Exact addressed fractal packing
@@ -17,7 +18,10 @@ separation laws before consuming that pattern.
 
 The second part integrates over the packing by conjugate reflection.  The cells are the images of
 the unit cell under the Cantor maps `S₀ x = x/3`, `S₁ x = (x+2)/3` (`descend_root_eq_wordMap`),
-and the half-turn `J x = 1 − x` conjugates them, `S₁ = J S₀ J`.  The depth-`n` word partition is
+and the half-turn `J x = 1 − x` conjugates them, `S₁ = J S₀ J`.  That half-turn is the elementary
+Swing about `½`, `J = S_½` with `S_a x = 2a − x` (`reflect_eq_swing`, `Geometry/AffineSwing`): the
+same Swing under which the completed zeta `ξ` is invariant
+(`HolonicsResearch/Zeta/Seam.completedRiemannZeta_swing_half`).  The depth-`n` word partition is
 a receiver's grain; the word average `A_n(f, x₀) = 2^(−n) Σ_(|w|=n) f(S_w x₀)` is its reading and
 `K·3^(−n)` is the residual it leaves for a `K`-Lipschitz `f`.  Every finite law there is exact in
 any linearly ordered field, hence over `ℚ`; only the limit, the integral against the equal-weight
@@ -182,8 +186,11 @@ theorem restriction_word_cannot_collapse_to_a_multiset :
 
 The cells above are the images of the unit cell under the two Cantor maps `S₀ x = x/3` and
 `S₁ x = (x+2)/3`.  The half-turn `J x = 1 − x` about the centre `½` conjugates one into the other,
-`S₁ = J S₀ J`, and `J J = id`.  Along a restriction word `w` the composite `S_w` contracts every
-distance by exactly `3^(−|w|)`.
+`S₁ = J S₀ J`, and `J J = id`.  The reflection `J` is the elementary Swing about `½`
+(`reflect_eq_swing`): a half-turn `e^{iπ}` about the anchor `½`, the same Swing under which `ξ` is
+invariant (`HolonicsResearch/Zeta/Seam.completedRiemannZeta_swing_half`).  Integration by
+reflection is integration by the Swing about `½`.  Along a restriction word `w` the composite `S_w`
+contracts every distance by exactly `3^(−|w|)`.
 
 The finite word partition at depth `n` is a receiver's grain: it reads a function `f` only through
 the word average `A_n(f, x₀) = 2^(−n) Σ_(|w|=n) f(S_w x₀)`.  What the grain leaves is the residual
@@ -216,13 +223,25 @@ def cantorMap : Hand → 𝕜 → 𝕜
   | .left, x => x / 3
   | .right, x => (x + 2) / 3
 
-/-- [definition] The reflection `J x = 1 − x`: the half-turn of the unit cell about `½`. -/
+/-- [definition] The reflection `J x = 1 − x`: the half-turn of the unit cell about `½`, the
+elementary Swing `S_½` (`reflect_eq_swing`). -/
 def reflect (x : 𝕜) : 𝕜 := 1 - x
 
-omit [LinearOrder 𝕜] [IsStrictOrderedRing 𝕜] in
-/-- [proved-derived; formal-checked] `J ∘ J = id`: the reflection is an involution. -/
+/-- [proved-derived; formal-checked] **The reflection is the Swing about `½`.**
+`J x = 1 − x = 2·½ − x = S_½ x` (`Geometry/AffineSwing.swing`, anchor `½`). The reflection that
+conjugates the two Cantor maps, `S₁ = J S₀ J` (`cantorMap_right_eq_conj`), is the elementary Swing
+about `½`: the same Swing under which the completed zeta is invariant,
+`ξ(S_½ s) = ξ(s)` (`HolonicsResearch/Zeta/Seam.completedRiemannZeta_swing_half`). -/
+theorem reflect_eq_swing (x : 𝕜) : reflect x = Geometry.AffineSwing.swing (1 / 2) x := by
+  simp only [reflect, Geometry.AffineSwing.swing]
+  ring
+
+/-- [proved-derived; formal-checked] `J ∘ J = id`: the reflection is an involution, because it is
+the Swing about `½` (`reflect_eq_swing`) and every Swing is an involution
+(`Geometry/AffineSwing.theSwingIsAnInvolution`). -/
 theorem reflect_reflect (x : 𝕜) : reflect (reflect x) = x := by
-  simp [reflect]
+  rw [reflect_eq_swing, reflect_eq_swing]
+  exact Geometry.AffineSwing.theSwingIsAnInvolution _ x
 
 /-- [proved-derived; formal-checked] `S₁ = J ∘ S₀ ∘ J`: the right restriction is the left one
 conjugated by the half-turn. -/
@@ -758,6 +777,7 @@ section Audit
 #print axioms polarized_descendants_are_separated
 #print axioms restriction_word_cannot_collapse_to_a_multiset
 #print axioms reflect_reflect
+#print axioms reflect_eq_swing
 #print axioms cantorMap_right_eq_conj
 #print axioms reflect_cantorMap
 #print axioms wordMap_sub

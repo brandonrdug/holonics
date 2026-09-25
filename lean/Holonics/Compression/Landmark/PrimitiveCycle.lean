@@ -20,7 +20,9 @@ repetition of exactly one of them.
 2. **The counting identity** `N_n = tr(M_fⁿ) = Σ_(d ∣ n) d · p_d` for `n ≥ 1`
    (`periodic_count`, `trace_pow_eq_primitive`).
 3. **Möbius inversion** recovers the primes from the counts:
-   `d · p_d = Σ_(ab = d) μ(a) N_b` (`primitive_count_moebius`).
+   `d · p_d = Σ_(ab = d) μ(a) N_b` (`primitive_count_moebius`), the divisor form; the multiples
+   form that inverts hearing is `Foundation/FractalString.sum_moebius_smul_sum_mul`, and both read
+   Mathlib's `μ * ζ = 1`.
 4. **The Euler product.** The transfer determinant is the product over primitive cycles,
    `det(1 − T·M_f) = ∏_d (1 − T^d)^(p_d)` as polynomials (`transfer_determinant_euler_product`).
    The proof is the log/trace identity: the logarithmic derivative of one primitive factor
@@ -238,7 +240,14 @@ theorem trace_pow_eq_primitive (n : ℕ) (hn : 0 < n) :
   rfl
 
 /-- [proved-derived; formal-checked] **Möbius inversion: the primes of the machine from its
-counts,** `d · p_d = Σ_(ab = d) μ(a) N_b`. -/
+counts,** `d · p_d = Σ_(ab = d) μ(a) N_b`.
+
+This is the **divisor form** (Mathlib's `ArithmeticFunction.sum_eq_iff_sum_mul_moebius_eq`): a
+cycle count carries the primitive cycles over the divisors of its period, a finite down-set, and
+inverts with no hypothesis. `Foundation/FractalString.sum_moebius_smul_sum_mul` is the **multiples
+form**: hearing carries a count over the multiples of a scale, an infinite up-set, and inverts only
+under a finite support. Neither is an instance of the other; both read one law,
+`Σ_(k∣N) μ(k) = [N = 1]`, which Mathlib owns (`ArithmeticFunction.moebius_mul_coe_zeta`). -/
 theorem primitive_count_moebius (d : ℕ) (hd : 0 < d) :
     ((d * primitiveCount f d : ℕ) : ℤ) = ∑ x ∈ d.divisorsAntidiagonal,
       (ArithmeticFunction.moebius x.1 : ℤ) * ((univ.filter fun y => f^[x.2] y = y).card : ℤ) := by

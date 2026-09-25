@@ -237,6 +237,58 @@ fn the_exposure_deposits_on_its_training_part_until_its_budget_stop_and_runs_to_
     assert!(aeon.depositions >= 1 && aeon.arrivals > aeon.depositions);
 }
 
+/// Design (d): a timeout is an unfinished run at its deadline. Under a deadline of `k` receiving
+/// windows the exposure reads exactly the cut's first `k` windows and stops, reported incomplete at
+/// the cell it stopped at, with its literal over the cells read. The deadline changes nothing it
+/// read: a shorter deadline's readout is the longer one's prefix, exactly.
+#[test]
+fn the_exposure_stops_at_its_deadline_and_changes_nothing_it_read() {
+    let length = cut_length();
+    let field = chain_of(length as u64);
+    let cut = Cut {
+        cells: source(length, 81),
+        held_out: vec![2..4, length - 4..length],
+    };
+    let reference = Reference::new(64, Steps::campaign_one(), 1_000);
+    let run = |windows: u64| {
+        reference
+            .clone()
+            .with_deadline(windows)
+            .expose(&field, &cut)
+            .unwrap()
+    };
+    let (three, two, none) = (run(3), run(2), run(0));
+    for (exposure, windows, deposits) in [(&three, 3, 2), (&two, 2, 1), (&none, 0, 0)] {
+        assert!(!exposure.complete && exposure.stop.is_none());
+        assert_eq!(exposure.deadline, Some(2 * windows));
+        assert_eq!((exposure.windows, exposure.compares), (windows, windows));
+        assert_eq!(
+            exposure.training.cells + exposure.held_out.cells,
+            2 * windows
+        );
+        assert_eq!(exposure.literal_bits, 4 * windows);
+        assert_eq!(exposure.state.source_bits, 4 * windows);
+        // Windows 0 and 4 deposit; window 2 is held out.
+        assert_eq!(exposure.deposits, deposits);
+        assert_eq!(
+            exposure.constitution_curve.len() as u64,
+            exposure.deposits + 1
+        );
+    }
+    assert_eq!(
+        (
+            three.held_out.cells,
+            two.held_out.cells,
+            none.held_out.cells
+        ),
+        (2, 2, 0)
+    );
+    // The two-window run is the three-window run's prefix: its curve, and its held-out bits,
+    // since the third window is a training one.
+    assert_eq!(two.constitution_curve[..], three.constitution_curve[..2]);
+    assert_eq!(two.held_out, three.held_out);
+}
+
 /// Review D2, D1: the exposure refuses a cut that is not exactly the declared population (so the
 /// `n*` guard of `Field::declare` cannot be bypassed), and the crib that closes an aeon reads only
 /// cells before the boundary, from the aeon's own opening, and never a held-out cell.

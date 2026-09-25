@@ -54,8 +54,10 @@
 //! held-out part; then those cells are ingested; the aeon boundary is the joint clock's carry-out,
 //! and after it keys are located on the crib that closed the aeon: its last `W_crib` cells, past
 //! and already scored, truncated after the last held-out cell so no held-out cell is read (review
-//! D1). The budget stop admits no further deposit and the run continues, reported incomplete. Its
-//! readout ([`Exposure`]) is design (f)'s measurement, with `Kt` charging the published keys.
+//! D1). The budget stop admits no further deposit and the run continues, reported incomplete. A
+//! deadline ([`Reference::with_deadline`]) ends the reading after its windows, reported incomplete
+//! at the cell it stopped at. Its readout ([`Exposure`]) is design (f)'s measurement, with `Kt`
+//! charging the published keys.
 
 use std::collections::BTreeMap;
 use std::ops::Range;
@@ -303,12 +305,13 @@ impl Resident {
 // the reference
 
 /// [definition] **The exact host reference** of the execution port, with its declared pending
-/// capacity, steps and constitution budget.
+/// capacity, steps and constitution budget, and an exposure's deadline if one is set.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Reference {
     pending_capacity: usize,
     steps: Steps,
     budget: u64,
+    deadline: Option<u64>,
 }
 
 impl Reference {
@@ -322,6 +325,24 @@ impl Reference {
             pending_capacity,
             steps,
             budget,
+            deadline: None,
+        }
+    }
+
+    /// [definition; agent-inferred] **An exposure's deadline** (design (d), the budget and stop
+    /// rule: "a timeout is reported the same way: an unfinished run at its deadline"). With one set,
+    /// [`Reference::expose`] reads at most `windows` receiving windows of its cut, then stops and
+    /// reports the run incomplete at the cell it stopped at ([`Exposure::deadline`]). The cut is
+    /// still exactly the declared population, so the `n*` guard holds; the deadline only cuts the
+    /// reading short and changes nothing it reads. The deadline is counted in the exposure's own
+    /// windows, not in wall time. It limits one run from outside: it enters no law of the port and
+    /// no description (`Field::describe`). [agent-inferred: a smoke run on campaign 1's field needs
+    /// a limit below `n*`, which a shorter cut cannot give, since the field refuses any population
+    /// shorter than `n*`.]
+    pub fn with_deadline(self, windows: u64) -> Self {
+        Self {
+            deadline: Some(windows),
+            ..self
         }
     }
 
@@ -1683,10 +1704,12 @@ pub struct CurvePoint {
 /// first law and the face against the literal), the constitution's bits per deposit by carrier with
 /// each deposit's released and stepped entries, the receiving windows whose source-to-receiver path
 /// was open at their cut against all windows read (the refine receipt's located cause, review C2),
-/// the peak bits of the change inside any word, the budget stop, the description bits (`Field::describe`, the constitution's declared steps, budget and
-/// the pending capacity included), the located keys' bits (`⌈log₂ d_g⌉` per published key: the
-/// model pays for what learning located) and `Kt = |describe| + key bits + L_target|model +
-/// ⌈log₂ work⌉` against the literal, the work counted and the state against the source.
+/// the peak bits of the change inside any word, the budget stop, the deadline, the description bits
+/// (`Field::describe`, the constitution's declared steps, budget and the pending capacity
+/// included), the located keys' bits (`⌈log₂ d_g⌉` per published key: the model pays for what
+/// learning located) and `Kt = |describe| + key bits + L_target|model + ⌈log₂ work⌉` against the
+/// literal over the cells read, the work counted and the state against the source. The run is
+/// complete when it read the whole cut with no budget stop.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Exposure {
     pub training: Bits,
@@ -1698,6 +1721,8 @@ pub struct Exposure {
     pub open_windows: u64,
     pub peak_word_bits: u64,
     pub stop: Option<(BudgetStop, u64)>,
+    /// The cell at which the run stopped at its deadline ([`Reference::with_deadline`]), if it did.
+    pub deadline: Option<u64>,
     pub complete: bool,
     pub description_bits: u64,
     pub key_bits: u64,
@@ -1871,7 +1896,8 @@ impl Baselines {
 impl Reference {
     /// **Run campaign 1's exposure protocol on a cut** and read its measurement (module header).
     /// The admitted family is the field's declared receivers throughout. Refused unless the cut is
-    /// exactly the field's declared population, which `Field::declare` checked against `n*`.
+    /// exactly the field's declared population, which `Field::declare` checked against `n*`. Under a
+    /// deadline ([`Reference::with_deadline`]) the reading stops after that many receiving windows.
     pub fn expose(&self, field: &Field, cut: &Cut) -> Result<Exposure, HnnError> {
         if cut.cells.len() as u64 != field.population() {
             return Err(HnnError::Shape {
@@ -1923,10 +1949,16 @@ impl Reference {
         let mut stop = None;
         let mut work = ExactWork::nothing();
         let (mut compares, mut deposits) = (0u64, 0u64);
+        let mut deadline = None;
         let mut position = 0usize;
         while position < cells.len() {
             let end = (position + aperture).min(cells.len());
             let window = &cells[position..end];
+            if window.len() == aperture && self.deadline.is_some_and(|windows| compares >= windows)
+            {
+                deadline = Some(position as u64);
+                break;
+            }
             if window.len() == aperture {
                 let (pending, refined) = self.refine(&mut resident, &moment, &phases)?;
                 work = work.then(&refined.receipt.work);
@@ -2049,12 +2081,13 @@ impl Reference {
             windows,
             open_windows,
             peak_word_bits,
-            complete: stop.is_none(),
+            complete: stop.is_none() && deadline.is_none(),
             stop,
+            deadline,
             description_bits,
             key_bits,
             kt,
-            literal_bits: symbol * cells.len() as u64,
+            literal_bits: symbol * position as u64,
             work,
             state,
             compares,
