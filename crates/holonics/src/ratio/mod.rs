@@ -51,6 +51,19 @@ pub fn integer(value: i64) -> Rat {
     Rat::from_integer(BigInt::from(value))
 }
 
+/// **Euclid's greatest common divisor** of two integers, nonnegative, with `gcd(0, 0) = 0`: the
+/// remainder face of division, iterated. The crate's one owner of it.
+pub(crate) fn gcd(left: &BigInt, right: &BigInt) -> BigInt {
+    use num_traits::{Signed, Zero};
+    let mut a = left.abs();
+    let mut b = right.abs();
+    while !b.is_zero() {
+        let remainder = &a % &b;
+        a = std::mem::replace(&mut b, remainder);
+    }
+    a
+}
+
 /// **The four-state order of two exact readings.** `Open` is not a tie: it is returned when the
 /// exact certificates cannot separate the two, and it keeps both operands rather than breaking the
 /// tie by an epsilon.

@@ -42,6 +42,7 @@
 //! | `Geometry/PairResonance` (neighbours, mediant) | [`PairContact::lock`] through [`LockAddress`] |
 //! | `Transport/Fold.lagrange_identity` (library `HolonicsResearch`) | [`Alignment`] |
 //! | `Transport/SerialScrewChain.serialConfiguration`, `serialPrefixes`, `cayleyZChart` | [`SerialChain`] |
+//! | `Transport/HelicalPairInteraction.reflectedReturn`, `boundary_conj_list_prod`, `menu_loop_closure` | [`menu`]: the boundary ports read as permutations, the Enigma/Bombe reading |
 //!
 //! [proved-derived; implemented-exact] The chain's derivative has no Lean counterpart:
 //! [`JointMotion::parameter_generator`], [`SerialChain::spatial_jacobian`],
@@ -63,6 +64,8 @@ use crate::navigator::address::LockAddress;
 use crate::ratio::linear::inertia::{InertiaError, SymmetricForm, inertia};
 use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
 use crate::ratio::{Presentation, Rat, integer};
+
+pub mod menu;
 
 /// Every refusal of a contact. Bad input is a typed return, never a panic.
 #[derive(Debug, Error, PartialEq, Eq)]

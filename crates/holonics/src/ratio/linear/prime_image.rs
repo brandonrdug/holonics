@@ -103,7 +103,7 @@
 //!   the first twelve prime bases, exact for every `u64` (below `ψ₁₂`). This module calls it; it declares no base set.
 //! - **The ring** is [`crate::ratio::ring::ModularWords`], as above.
 
-use crate::ratio::Rat;
+use crate::ratio::{Rat, gcd};
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 use thiserror::Error;
@@ -421,16 +421,6 @@ impl IntegralPresentation {
         }
         total
     }
-}
-
-fn gcd(left: &BigInt, right: &BigInt) -> BigInt {
-    let mut a = left.abs();
-    let mut b = right.abs();
-    while !b.is_zero() {
-        let remainder = &a % &b;
-        a = std::mem::replace(&mut b, remainder);
-    }
-    a
 }
 
 /// `floor(sqrt(value))` for a nonnegative integer, by Newton descent from a bit-length seed.

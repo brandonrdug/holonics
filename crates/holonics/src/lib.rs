@@ -7,7 +7,7 @@
 //! H = (K, ∂_A;  Π;  𝒟;  𝓔;  G;  π)
 //! ```
 //!
-//! The library is seven operator modules, each implementing rows of the
+//! The library is eight operator modules, each implementing rows of the
 //! [operator contract](../../../docs/ELEMENTARY_OBJECTS.md#operator-contract):
 //!
 //! - [`ratio`]: one per two. The exact rational, rings, the exponentiated/log chart, surprisal,
@@ -27,11 +27,16 @@
 //! - [`aeon`]: aeon, epoch and cycle — clock readings with carry, epochs and their towers at a
 //!   receiver's section with the oriented flux, two-clock locks, the Hodge split of a clock,
 //!   production, the dynamical zeta and the first law of learning.
+//! - [`compression`]: compression is intelligence is navigation — a navigator family's face map
+//!   against terrain, whose kernel quotient is retention and whose cokernel is the residual; the
+//!   resonating/emanating split of a drive; the cost `Kt` against the literal; and locating keys
+//!   by loop closure.
 //!
 //! Every law computes over exact rationals; no float enters a law. Each module header names its
 //! Lean owner relative to the Lean library root.
 
 pub mod aeon;
+pub mod compression;
 pub mod geometry;
 pub mod holarchy;
 pub mod holon;

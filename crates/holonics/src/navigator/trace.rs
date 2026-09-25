@@ -13,21 +13,32 @@
 //! | `Millennium/TraceSequence.trace`, `LocalFactor.theCompanionPowersCarryTheSequence` | [`SiteFactor::trace_sequence`] |
 //! | `Transport/GeneratorTraceFaces.machine_factor_of_companions`, `machine_trace_sequence` | [`Machine`] |
 //! | `Transport/GeneratorTraceFaces.carried_material_conserves_{determinant,trace_sequence,transfer_determinant}` | tests |
+//! | `Compression/Landmark/SiteKind.Kind`, `siteKind`, `siteKind_eq_{reflection,degenerate,rotation,null,boost}_iff` | [`SiteKind`], [`SiteFactor::kind`] |
 
 use crate::ratio::Rat;
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
-/// [definition] The dichotomy of the site's transfer: where its characteristic root sits.
-/// Lean: `TraceSequence` — the circle of radius `√q` against the hyperbola.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+/// [definition] **The five kinds of a navigator site.** Only a site of positive determinant is a
+/// rotation, a null lock or a boost; the sign of the determinant `q` is read first, then the
+/// discriminant `a² − 4q`: the circle of radius `√q` against the hyperbola. Lean
+/// `Compression/Landmark/SiteKind.Kind` and `siteKind`, each kind characterized by
+/// `siteKind_eq_{reflection,degenerate,rotation,null,boost}_iff` and read from the eigenvalues by
+/// `reflection_iff_opposite_eigenvalues`, `degenerate_iff_zero_eigenvalue`,
+/// `rotation_iff_no_real_eigenvalue`, `null_iff_traceless_nilpotent` and
+/// `boost_iff_two_real_eigenvalues`. This is the one Rust owner of the site kinds.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum SiteKind {
-    /// `a² < 4q`: the root is off the real line and the sequence circulates.
+    /// `q > 0`, `a² < 4q`: the roots are off the real line and the counts circulate.
     Rotation,
-    /// `a² = 4q`: the boundary case, a repeated real root.
-    Marginal,
-    /// `a² > 4q`: two real roots and the sequence goes hyperbolic.
-    Dilation,
+    /// `q > 0`, `a² = 4q`: a double root; the traceless part is nilpotent (a shear, the lock).
+    Null,
+    /// `q > 0`, `a² > 4q`: two real roots of one sign; the sequence goes hyperbolic.
+    Boost,
+    /// `q < 0`: two real roots of opposite sign; the site reverses orientation (the Swing).
+    Reflection,
+    /// `q = 0`: a singular site.
+    Degenerate,
 }
 
 /// [definition] One site of the machine, read through its two conserved faces: the trace `a` and
@@ -86,16 +97,27 @@ impl SiteFactor {
         [Rat::one(), -self.trace.clone(), self.determinant.clone()]
     }
 
-    /// The site's dichotomy, decided exactly on `a²` against `4q`.
+    /// The discriminant face `a² − 4q`.
+    pub fn discriminant(&self) -> Rat {
+        &self.trace * &self.trace - Rat::from_integer(BigInt::from(4)) * &self.determinant
+    }
+
+    /// The site's kind: the sign of `q`, then the sign of `a² − 4q`, decided exactly (Lean
+    /// `SiteKind.siteKind`).
     pub fn kind(&self) -> SiteKind {
-        let discriminant =
-            &self.trace * &self.trace - Rat::from_integer(BigInt::from(4)) * &self.determinant;
+        if self.determinant.is_negative() {
+            return SiteKind::Reflection;
+        }
+        if self.determinant.is_zero() {
+            return SiteKind::Degenerate;
+        }
+        let discriminant = self.discriminant();
         if discriminant.is_negative() {
             SiteKind::Rotation
         } else if discriminant.is_zero() {
-            SiteKind::Marginal
+            SiteKind::Null
         } else {
-            SiteKind::Dilation
+            SiteKind::Boost
         }
     }
 }
@@ -302,16 +324,27 @@ mod tests {
         );
         assert_eq!(
             SiteFactor::new(integer(4), integer(4)).kind(),
-            SiteKind::Marginal
+            SiteKind::Null
         );
         assert_eq!(
             SiteFactor::new(integer(5), integer(4)).kind(),
-            SiteKind::Dilation
+            SiteKind::Boost
         );
         assert_eq!(
             SiteFactor::new(rat(1, 2), rat(1, 16)).kind(),
-            SiteKind::Marginal,
+            SiteKind::Null,
             "a^2 = 1/4 = 4q exactly"
+        );
+        // Lean `siteKind_of_neg`, `siteKind_of_zero`: the sign of q is read before the discriminant.
+        assert_eq!(
+            SiteFactor::new(integer(0), integer(-1)).kind(),
+            SiteKind::Reflection,
+            "the Swing: a^2 - 4q = 4 > 0, yet q < 0"
+        );
+        assert_eq!(
+            SiteFactor::new(integer(0), integer(0)).kind(),
+            SiteKind::Degenerate,
+            "a^2 = 4q = 0, yet q = 0"
         );
         assert_eq!(
             Machine::new(vec![

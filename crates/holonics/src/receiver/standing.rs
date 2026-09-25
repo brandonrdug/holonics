@@ -284,6 +284,11 @@ impl NavigatorFamily {
         &self.names
     }
 
+    /// The admitted passages, in declaration order.
+    pub fn maps(&self) -> &[ExactRatMatrix] {
+        &self.maps
+    }
+
     /// One admitted passage applied to one exact state.
     pub fn step(&self, navigator: usize, state: &[Rat]) -> Result<Vec<Rat>, StandingRefusal> {
         let map = self
