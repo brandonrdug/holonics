@@ -2906,6 +2906,18 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
 
     Source: agent-inferred, from campaign 2's controls and the Kraft form (`kraft_and_dominance`).
 
+    **Measured (September 26).** The development cells choose `½`: of the 256 laws declared (the
+    global ladder `j = 1..16` and the root-and-below pairs), every other law codes above it, from
+    `+32 + 7/16` to `+2063 + 7/16` bits, charged 11 bits.
+    - Held out, the chosen tree reads `3 + 1/16 + ε` a cell. It is above the uncharged `½` tree by
+      exactly its 8 family bits.
+    - The 133 bits of campaign 2's controls are a choice of stop weight per digit tree: the control
+      is the per-depth law `(1, r + 1)` joined with the `½` tree in each dyadic cell. Picking the best
+      law per digit tree reads `−244 + 9/16` bits before its naming cost.
+    - The law that could capture it is a mixture of stop weights inside each digit tree. That is
+      still Kraft-complete, since each tree pays at most `−log₂` of its weight. It is a measured lead,
+      not adopted (Lean `stop_mixture_over_trees`, `stop_kraft_and_dominance`).
+
 33. **The wave reads by the Born rule: reception applies the cell's operator to the ring's state.**
     Campaigns 1 and 2 showed that the direct-sum wave earns only the mixture's few bits: the rings
     add coordinates, and the text's information lies in the joint correlations of its cells. Brandon,
