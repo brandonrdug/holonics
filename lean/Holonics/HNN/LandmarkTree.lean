@@ -112,7 +112,11 @@ likelihood of what reached it (`standing_is_routed_counts`).
     executed step is the weight's ratio times a rebase factor `γ ∈ [1 − r, 1]` with
     `β' = β k/q̂' · (1 − r)`, and a node's passage telescopes to the weight's ratio times those
     factors; a rebase's residual is `ln(x/⌊x⌋) < 1/⌊x⌋`, and `|log₂(1 − r)| < 2^(3−W)` for
-    `r < 2^(1−W)`.
+    `r < 2^(1−W)`. **The executed face's bound** (`executed_face_bound`, campaign 2): the executed
+    face at the executed address lies within `ε/(μ − ε) + ρ_A` in `ln` of the ideal face at the
+    ideal address, `ε` the lattice deviation, `μ` the ideal face's floor and `ρ_A` the address
+    residual, zero when host and card read the same bundle codes (`HNN/LandmarkAddress`); the
+    carriers' rebase past `u128` is `HNN/LandmarkCarrier`.
 
 11. **The receiver's mixture of two faces** (`sequential_mixture`, `sequential_mixture_bounds`,
     `sequential_mixture_executed`; section 10): for positive faces `a_t`, `b_t` of the targets with
@@ -1822,6 +1826,44 @@ theorem rebase_log_residual :
     have hr2 : 0 ≤ (2 : ℝ) ^ (1 - (W : ℤ)) := by positivity
     nlinarith
 
+/-- [proved-derived; formal-checked] **`executed_face_bound`: the executed face against the ideal
+face at the ideal address, with the lattice and the address residuals.** Let the executed path be
+the lattice path under the stop weights `λ̂` at the executed address, the ideal path the exact
+path under `λ` at the same address, and `q'` the ideal face at the ideal address. When the ideal
+path's face is at least `μ > 0` and the lattice deviation `(m + 1) 2^(−M−1) + Σ|λ̂ − λ|`
+(`lattice_path_deviation`) is at most `ε < μ`, and the ideal faces at the two addresses differ by at
+most `ρ_A` in `ln`, then `|ln q̂ − ln q'| ≤ ε/(μ − ε) + ρ_A` (`digit_log_residual`). When the executed
+address is the ideal address (the host's and the card's bundle codes are the executed operands'),
+`ρ_A = 0`. -/
+theorem executed_face_bound {M : ℕ} (hM : 1 ≤ M) (k lam lamh : ℕ → ℚ)
+    (hk : ∀ d, 1 / 2 ^ M ≤ k d ∧ k d ≤ 1 - 1 / 2 ^ M)
+    (hl : ∀ d, 0 ≤ lam d ∧ lam d ≤ 1) (hlh : ∀ d, 0 ≤ lamh d ∧ lamh d ≤ 1) (m d : ℕ)
+    {μ ε ρA q' : ℝ} (hμ : 0 < μ) (hq : μ ≤ (exactFrom k lam m d : ℝ))
+    (hdev : ((((m : ℚ) + 1) / 2 ^ (M + 1) +
+      ∑ i ∈ Finset.range m, |lamh (d + i) - lam (d + i)| : ℚ) : ℝ) ≤ ε)
+    (hεμ : ε < μ) (hA : |Real.log (exactFrom k lam m d : ℝ) - Real.log q'| ≤ ρA) :
+    0 < (latticeFrom M k lamh m d : ℝ) ∧
+      |Real.log (latticeFrom M k lamh m d : ℝ) - Real.log q'| ≤ ε / (μ - ε) + ρA := by
+  have hlat := lattice_path_deviation hM k lam lamh hk hl hlh m d
+  have hdevR : |(latticeFrom M k lamh m d : ℝ) - (exactFrom k lam m d : ℝ)| ≤ ε := by
+    have : |((latticeFrom M k lamh m d - exactFrom k lam m d : ℚ) : ℝ)| ≤
+        ((((m : ℚ) + 1) / 2 ^ (M + 1) +
+          ∑ i ∈ Finset.range m, |lamh (d + i) - lam (d + i)| : ℚ) : ℝ) := by
+      rw [← Rat.cast_abs]
+      exact_mod_cast hlat
+    have e : (((latticeFrom M k lamh m d - exactFrom k lam m d : ℚ) : ℝ)) =
+        (latticeFrom M k lamh m d : ℝ) - (exactFrom k lam m d : ℝ) := by push_cast; ring
+    rw [e] at this
+    exact this.trans hdev
+  obtain ⟨hpos, hlog, -⟩ := digit_log_residual hμ hq hεμ hdevR
+  refine ⟨hpos, ?_⟩
+  calc |Real.log (latticeFrom M k lamh m d : ℝ) - Real.log q'|
+      = |(Real.log (latticeFrom M k lamh m d : ℝ) - Real.log (exactFrom k lam m d : ℝ)) +
+          (Real.log (exactFrom k lam m d : ℝ) - Real.log q')| := by ring_nf
+    _ ≤ |Real.log (latticeFrom M k lamh m d : ℝ) - Real.log (exactFrom k lam m d : ℝ)| +
+          |Real.log (exactFrom k lam m d : ℝ) - Real.log q'| := abs_add_le _ _
+    _ ≤ ε / (μ - ε) + ρA := add_le_add hlog hA
+
 end Lattice
 
 /-! ## 7. The path cochain and the local autogradient -/
@@ -2584,6 +2626,7 @@ section Audit
 #print axioms lattice_step_telescope
 #print axioms lattice_node_telescope
 #print axioms rebase_log_residual
+#print axioms executed_face_bound
 #print axioms path_cochain
 #print axioms edge_log_derivative
 #print axioms path_telescope_exact
