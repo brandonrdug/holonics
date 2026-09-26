@@ -3,8 +3,9 @@
 //! laws ([`hnn`]; rebuild step 5, `docs/plans/THE_REBUILD.md`).
 //!
 //! [`hnn`] holds the card's ownership of its context and buffers, its census and the launches
-//! derived from it, the exact integer core (`kernels/exact_integer.cuh`), the lattice read and the
-//! resident moment's ingest, each with its host-parity test, and, in its header, the device
+//! derived from it, the exact integer core (`kernels/exact_integer.cuh`), the lattice read, the
+//! resident moment's ingest, and the word's carried tick, its adjoint and the Newton–Schulz inverse
+//! charts (Decision 24), each with its host-parity test, and, in its header, the device
 //! execution-port plan: what of `holonics::hnn::ExecutionPort` runs resident, what stays on the
 //! host, and what crosses the bus per window, together with the port records for #76.
 

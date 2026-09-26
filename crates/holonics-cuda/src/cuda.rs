@@ -342,6 +342,27 @@ impl Stream {
         }
     }
 
+    /// **A device→host copy ordered on this stream**, into page-locked host standing: the mirror of
+    /// [`Stream::copy_host_to_device_async`], with the same contract.
+    ///
+    /// # Safety
+    /// `destination` must point at `bytes` writable octets of [`PinnedHost`] that stay valid and
+    /// are neither read nor written until this stream has passed the copy (a stream
+    /// synchronization or an event after it).
+    pub unsafe fn copy_device_to_host_async(
+        &self,
+        destination: *mut c_void,
+        source: ffi::CUdeviceptr,
+        bytes: usize,
+    ) -> Result<()> {
+        unsafe {
+            check(
+                ffi::cuMemcpyDtoHAsync_v2(destination, source, bytes, self.stream),
+                "cuMemcpyDtoHAsync_v2",
+            )
+        }
+    }
+
     /// The raw stream handle, for a sibling owner in this workspace that carries its own minimal
     /// binding of the same driver (`holonic_engine::embedding_fiber`) and must order its launches
     /// on this same current rather than on the default one.
@@ -405,6 +426,11 @@ impl PinnedHost {
     /// The whole slot as octets, for a reader filling it from an exterior container.
     pub fn as_mut_octets(&mut self) -> &mut [u8] {
         unsafe { core::slice::from_raw_parts_mut(self.pointer.cast::<u8>(), self.octets) }
+    }
+
+    /// The whole slot as octets, for a reader of what a device→host copy left in it.
+    pub fn as_octets(&self) -> &[u8] {
+        unsafe { core::slice::from_raw_parts(self.pointer.cast::<u8>(), self.octets) }
     }
 }
 

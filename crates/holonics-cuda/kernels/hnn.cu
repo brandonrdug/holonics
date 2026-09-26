@@ -1,10 +1,15 @@
-// **The resident HNN's kernels** (rebuild step 5, #76; owners `src/hnn/{lattice,moment}.rs`).
+// **The resident HNN's kernels** (rebuild step 5, #76; owners `src/hnn/{lattice,moment,word}.rs`).
 //
-// Each entry realizes one law of `holonics::hnn` on the card, with no float and no rounding, and
-// its host-parity test is in `src/hnn/tests.rs`. The launch of each is derived from the card's
-// census by its owner (`src/hnn/card.rs`), which also reports the realization.
+// Each entry realizes one law of `holonics::hnn` on the card with exact integers and no float; the
+// only rounding is the word's nearest-point split (Decision 24), whose remainder is carried or
+// bounded, never dropped unreported. Each entry's parity test against an exact host oracle is in
+// `src/hnn/tests.rs`. The launch of each is derived from the card's census by its owner
+// (`src/hnn/card.rs`), which also reports the realization.
 
 #include "exact_integer.cuh"
+
+// Each launch's dynamic shared surface, sized by its layout (`src/hnn/card.rs`).
+extern __shared__ __align__(16) unsigned char hnn_shared[];
 
 // -------------------------------------------------------------------------------------------------
 // the lattice read
@@ -33,7 +38,6 @@ extern "C" __global__ void hnn_lattice_read(
     const uint32_t *gather,
     wide *y, uint32_t *status
 ) {
-    extern __shared__ __align__(16) unsigned char hnn_shared[];
     uwide *ring = (uwide *)hnn_shared;
     uwide *bound = ring + blockDim.x;
     __shared__ uint32_t malformed;
@@ -62,13 +66,7 @@ extern "C" __global__ void hnn_lattice_read(
     ring[t] = word;
     bound[t] = certificate;
     __syncthreads();
-    for (uint32_t stride = blockDim.x >> 1; stride > 0; stride >>= 1) {
-        if (t < stride) {
-            ring[t] += ring[t + stride];
-            bound[t] = hnn_certify(bound[t], bound[t + stride]);
-        }
-        __syncthreads();
-    }
+    hnn_block_sum(ring, bound, t);
     if (t == 0) {
         uint32_t read = malformed ? HNN_REFUSED_MALFORMED : HNN_EXACT;
         const wide value = hnn_certified(ring[0], bound[0], &read);
@@ -116,7 +114,6 @@ extern "C" __global__ void hnn_moment_ingest(
     unsigned long long *paired, const unsigned long long *paired_base,
     unsigned long long *receipt
 ) {
-    extern __shared__ __align__(16) unsigned char hnn_shared[];
     unsigned long long *advance = (unsigned long long *)hnn_shared;
     uint32_t *base = (uint32_t *)(advance + rings);
     uint32_t *inclusive = base + rings;
@@ -217,5 +214,342 @@ extern "C" __global__ void hnn_moment_ingest(
         }
         receipt[0] = consumed;
         receipt[1] = carried ? 1ull : 0ull;
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+// the word: the carried tick and its adjoint
+// -------------------------------------------------------------------------------------------------
+//
+// [definition] Decision 24, Lean `HNN/LatticeWord.{feedback_tick, feedback_accounting,
+// executed_adjoint_pairing}`. A region `g` of a word (a ring or a contact) carries a chart
+// `Q_g = q · 2^(−L_c)` (`n × n` signed 64-bit words), a state `x_g = ξ · 2^(−L_w)` (`n` words) and a
+// remainder `r_g` (`n` words on the fine lattice `2^(−(L_c + L_w))ℤ`). One tick is
+//
+//   s_i = Σ_j q_ij ξ_j + r_i           exact; its certificate is Σ_j |q_ij ξ_j| + |r_i|
+//   s_i = ξ'_i · 2^(L_c) + r'_i        the nearest-point split, ties upward
+//
+// so `ξ'_i 2^(L_c) + r'_i = (qξ)_i + r_i` exactly and `−2^(L_c−1) ≤ r'_i < 2^(L_c−1)`; `L_c ≤ 64`
+// keeps the remainder a word. The adjoint tick splits `Σ_j q_ji λ_j + ρ_i`: the transpose of the
+// executed chart, the only covector that pairs exactly with it. `L_w` never enters the integers.
+//
+// Refusals, per entry, in this order: an entry whose region's state has a refused coordinate
+// (operand); a certificate reaching 2^127 (carrier); a `ξ'_i` outside the signed 64-bit word
+// (word). A refused entry's state and remainder are zero.
+//
+// Realization: block `e` is one output entry, row `i` of region `g = row_region[e]` with
+// `e = state_base[g] + i`; its `blockDim.x` threads divide the row (thread `t` takes `j ≡ t`), the
+// block reduces the ring words and certificates by the shared tree, and thread 0 adds the
+// remainder and splits. Every block reads the immutable charts and the state it is handed and
+// writes only its own entry of the next state, its status and its own remainder, so the blocks
+// commute; the state alternates between two buffers from tick to tick, the remainder stays in
+// place.
+//
+// Region tables: `widths[g]`, `chart_base[g]` (offset of `q_g`, row-major), `state_base[g]`,
+// `shifts[g] = L_c`. Shared: 2 · blockDim.x words of 16 octets.
+template <bool TRANSPOSED>
+__device__ __forceinline__ void hnn_word_tick_entry(
+    const int64_t *charts, const uint32_t *widths, const unsigned long long *chart_base,
+    const unsigned long long *state_base, const uint32_t *shifts,
+    const uint32_t *row_region, uint32_t entries,
+    const int64_t *state, const uint32_t *state_status,
+    int64_t *next, uint32_t *next_status, int64_t *remainder
+) {
+    uwide *ring = (uwide *)hnn_shared;
+    uwide *bound = ring + blockDim.x;
+    __shared__ uint32_t inherited;
+    const uint32_t e = blockIdx.x, t = threadIdx.x;
+    if (e >= entries) {
+        return;  // uniform over the block
+    }
+    if (t == 0) {
+        inherited = 0;
+    }
+    __syncthreads();
+    const uint32_t g = row_region[e];
+    const uint32_t n = widths[g];
+    const unsigned long long base = state_base[g];
+    const uint32_t i = (uint32_t)(e - base);
+    const int64_t *q = charts + chart_base[g];
+    uwide word = 0, certificate = 0;
+    uint32_t refused = 0;
+    for (uint32_t j = t; j < n; j += blockDim.x) {
+        const int64_t coefficient = TRANSPOSED ? q[(size_t)j * n + i] : q[(size_t)i * n + j];
+        refused |= state_status[base + j];
+        const wide product = hnn_word_product(coefficient, state[base + j]);
+        word += (uwide)product;
+        certificate = hnn_certify(certificate, hnn_magnitude(product));
+    }
+    if (refused) {
+        atomicOr(&inherited, 1u);
+    }
+    ring[t] = word;
+    bound[t] = certificate;
+    __syncthreads();
+    hnn_block_sum(ring, bound, t);
+    if (t == 0) {
+        const int64_t carried = remainder[e];
+        uint32_t read = inherited ? HNN_REFUSED_OPERAND : HNN_EXACT;
+        int64_t x = 0, r = 0;
+        if (read == HNN_EXACT) {
+            const wide s = hnn_certified(
+                ring[0] + (uwide)(wide)carried,
+                hnn_certify(bound[0], hnn_magnitude((wide)carried)),
+                &read
+            );
+            if (read == HNN_EXACT) {
+                wide split;
+                const wide quotient = hnn_nearest(s, shifts[g], &split);
+                if (hnn_is_word(quotient)) {
+                    x = (int64_t)quotient;
+                    r = (int64_t)split;
+                } else {
+                    read = HNN_REFUSED_WORD;
+                }
+            }
+        }
+        next[e] = x;
+        next_status[e] = read;
+        remainder[e] = r;
+    }
+}
+
+extern "C" __global__ void hnn_word_tick(
+    const int64_t *charts, const uint32_t *widths, const unsigned long long *chart_base,
+    const unsigned long long *state_base, const uint32_t *shifts,
+    const uint32_t *row_region, uint32_t entries,
+    const int64_t *state, const uint32_t *state_status,
+    int64_t *next, uint32_t *next_status, int64_t *remainder
+) {
+    hnn_word_tick_entry<false>(
+        charts, widths, chart_base, state_base, shifts, row_region, entries,
+        state, state_status, next, next_status, remainder
+    );
+}
+
+extern "C" __global__ void hnn_word_adjoint_tick(
+    const int64_t *charts, const uint32_t *widths, const unsigned long long *chart_base,
+    const unsigned long long *state_base, const uint32_t *shifts,
+    const uint32_t *row_region, uint32_t entries,
+    const int64_t *state, const uint32_t *state_status,
+    int64_t *next, uint32_t *next_status, int64_t *remainder
+) {
+    hnn_word_tick_entry<true>(
+        charts, widths, chart_base, state_base, shifts, row_region, entries,
+        state, state_status, next, next_status, remainder
+    );
+}
+
+// -------------------------------------------------------------------------------------------------
+// the inverse charts: the Newton–Schulz refinement and the certificate
+// -------------------------------------------------------------------------------------------------
+//
+// [definition] Decision 24, Lean `HNN/LatticeWord.{nsStep, newton_schulz_right,
+// rounded_refinement_certificate}`. A pair `g` carries an operator `A = a · 2^(−L_A)` and its
+// inverse chart `X̂ = ξ · 2^(−L_c)` (`n × n` signed 64-bit words each), with `S = L_A + L_c ≤ 126`
+// so that `2^S` is a carrier word. The residual `R = 1 − A X̂` on `2^(−S)ℤ` is
+//
+//   ρ_ij = 2^S δ_ij − Σ_k a_ik ξ_kj ,    certificate 2^S δ_ij + Σ_k |a_ik ξ_kj|
+//
+// The refinement `X̂(2 − A X̂) = X̂ + X̂R` on `2^(−(S + L_c))ℤ` is `2^S ξ + ξρ`, and its split at
+// `2^S` onto `2^(−L_c)ℤ` (ties upward; the split commutes with adding the lattice point `2^S ξ`) is
+//
+//   Σ_k ξ_ik ρ_kj = q_ij 2^S + e_ij ,    ξ''_ij = ξ_ij + q_ij ,    −2^(S−1) ≤ e_ij < 2^(S−1)
+//
+// with `e` discarded: the rounding term `|Δ_ij| ≤ 2^(−L_c)/2` of `rounded_refinement_certificate`.
+// Each term `ξ_ik ρ_kj` is a word times a carrier word, certified by `hnn_bounded_product`. The
+// certificate of a chart is the exact rational `‖1 − A X̂‖∞ = max_i Σ_j |ρ_ij| / 2^S`.
+//
+// Refusals, per entry, in this order: an entry reading a refused chart or residual coordinate
+// (operand); a certificate reaching 2^127 (carrier); a `ξ''_ij` outside the signed 64-bit word
+// (word).
+//
+// Realization (residual and refinement): block `(e, j)` is one output entry, flattened row `e`
+// (row `i = e − row_base[g]` of pair `g = row_region[e]`) and column `j`; a block with `j ≥ n_g`
+// returns at once. Its threads divide the contraction index (`k ≡ t`) and reduce by the shared
+// tree. Every block reads the immutable operator, chart and residual and writes only its own
+// entry (the refinement writes the other of two chart buffers), so the blocks commute.
+//
+// Pair tables: `widths[g]`, `chart_base[g]` (offset of the `n × n` block, one for `a`, `ξ` and `ρ`),
+// `row_base[g]`, `shifts[g] = S`. Shared: 2 · blockDim.x words of 16 octets.
+extern "C" __global__ void hnn_inverse_residual(
+    const int64_t *operators, const int64_t *charts, const uint32_t *chart_status,
+    const uint32_t *widths, const unsigned long long *chart_base,
+    const unsigned long long *row_base, const uint32_t *shifts,
+    const uint32_t *row_region, uint32_t rows,
+    wide *residual, uint32_t *residual_status
+) {
+    uwide *ring = (uwide *)hnn_shared;
+    uwide *bound = ring + blockDim.x;
+    __shared__ uint32_t inherited;
+    const uint32_t e = blockIdx.x, j = blockIdx.y, t = threadIdx.x;
+    if (e >= rows) {
+        return;  // uniform over the block
+    }
+    const uint32_t g = row_region[e];
+    const uint32_t n = widths[g];
+    if (j >= n) {
+        return;  // uniform over the block
+    }
+    if (t == 0) {
+        inherited = 0;
+    }
+    __syncthreads();
+    const uint32_t i = (uint32_t)(e - row_base[g]);
+    const unsigned long long at = chart_base[g];
+    const int64_t *a = operators + at;
+    const int64_t *x = charts + at;
+    const uint32_t *x_status = chart_status + at;
+    uwide word = 0, certificate = 0;
+    uint32_t refused = 0;
+    for (uint32_t k = t; k < n; k += blockDim.x) {
+        refused |= x_status[(size_t)k * n + j];
+        const wide product = hnn_word_product(a[(size_t)i * n + k], x[(size_t)k * n + j]);
+        word += (uwide)product;
+        certificate = hnn_certify(certificate, hnn_magnitude(product));
+    }
+    if (refused) {
+        atomicOr(&inherited, 1u);
+    }
+    ring[t] = word;
+    bound[t] = certificate;
+    __syncthreads();
+    hnn_block_sum(ring, bound, t);
+    if (t == 0) {
+        const uwide diagonal = i == j ? (uwide)1 << shifts[g] : (uwide)0;
+        uint32_t read = inherited ? HNN_REFUSED_OPERAND : HNN_EXACT;
+        wide value = 0;
+        if (read == HNN_EXACT) {
+            value = hnn_certified(diagonal - ring[0], hnn_certify(bound[0], diagonal), &read);
+        }
+        const size_t out = at + (size_t)i * n + j;
+        residual[out] = read == HNN_EXACT ? value : (wide)0;
+        residual_status[out] = read;
+    }
+}
+
+extern "C" __global__ void hnn_inverse_refine(
+    const int64_t *charts, const uint32_t *chart_status,
+    const wide *residual, const uint32_t *residual_status,
+    const uint32_t *widths, const unsigned long long *chart_base,
+    const unsigned long long *row_base, const uint32_t *shifts,
+    const uint32_t *row_region, uint32_t rows,
+    int64_t *next, uint32_t *next_status
+) {
+    uwide *ring = (uwide *)hnn_shared;
+    uwide *bound = ring + blockDim.x;
+    __shared__ uint32_t inherited;
+    const uint32_t e = blockIdx.x, j = blockIdx.y, t = threadIdx.x;
+    if (e >= rows) {
+        return;  // uniform over the block
+    }
+    const uint32_t g = row_region[e];
+    const uint32_t n = widths[g];
+    if (j >= n) {
+        return;  // uniform over the block
+    }
+    if (t == 0) {
+        inherited = 0;
+    }
+    __syncthreads();
+    const uint32_t i = (uint32_t)(e - row_base[g]);
+    const unsigned long long at = chart_base[g];
+    const int64_t *x = charts + at;
+    const uint32_t *x_status = chart_status + at;
+    const wide *rho = residual + at;
+    const uint32_t *rho_status = residual_status + at;
+    uwide word = 0, certificate = 0;
+    uint32_t refused = 0;
+    for (uint32_t k = t; k < n; k += blockDim.x) {
+        refused |= x_status[(size_t)i * n + k] | rho_status[(size_t)k * n + j];
+        uwide magnitude;
+        const wide product =
+            hnn_bounded_product(x[(size_t)i * n + k], rho[(size_t)k * n + j], &magnitude);
+        word += (uwide)product;
+        certificate = hnn_certify(certificate, magnitude);
+    }
+    if (refused) {
+        atomicOr(&inherited, 1u);
+    }
+    ring[t] = word;
+    bound[t] = certificate;
+    __syncthreads();
+    hnn_block_sum(ring, bound, t);
+    if (t == 0) {
+        uint32_t read = inherited ? HNN_REFUSED_OPERAND : HNN_EXACT;
+        int64_t refined = 0;
+        if (read == HNN_EXACT) {
+            const wide s = hnn_certified(ring[0], bound[0], &read);
+            if (read == HNN_EXACT) {
+                wide discarded;
+                const wide q = hnn_nearest(s, shifts[g], &discarded);
+                // |q| < 2^64 keeps ξ + q below 2^65 in magnitude, with no wrap; |q| ≥ 2^64 already
+                // puts ξ + q outside the word.
+                const bool near = hnn_magnitude(q) < ((uwide)1 << 64);
+                const wide moved = near ? (wide)x[(size_t)i * n + j] + q : (wide)0;
+                if (near && hnn_is_word(moved)) {
+                    refined = (int64_t)moved;
+                } else {
+                    read = HNN_REFUSED_WORD;
+                }
+            }
+        }
+        const size_t out = at + (size_t)i * n + j;
+        next[out] = refined;
+        next_status[out] = read;
+    }
+}
+
+// Realization (certificate): block `g` is one chart; thread `t` takes the rows `i ≡ t`, each summing
+// `|ρ_ij|` over the row's `n` columns with the saturated addition, and the block keeps the largest
+// row sum by a shared tree of maxima (associative and commutative). A sum reaching 2^127 is refused
+// (carrier); a refused residual entry refuses its chart (operand). The reading is `2 · charts`
+// words: the numerators, then the status words, so the host reads it in one transfer. Shared:
+// blockDim.x words of 16 octets.
+extern "C" __global__ void hnn_inverse_certificate(
+    const wide *residual, const uint32_t *residual_status,
+    const uint32_t *widths, const unsigned long long *chart_base, uint32_t charts,
+    uwide *reading
+) {
+    uwide *largest = (uwide *)hnn_shared;
+    __shared__ uint32_t inherited;
+    const uint32_t g = blockIdx.x, t = threadIdx.x;
+    if (g >= charts) {
+        return;  // uniform over the block
+    }
+    if (t == 0) {
+        inherited = 0;
+    }
+    __syncthreads();
+    const uint32_t n = widths[g];
+    const unsigned long long at = chart_base[g];
+    uwide best = 0;
+    uint32_t refused = 0;
+    for (uint32_t i = t; i < n; i += blockDim.x) {
+        uwide row = 0;
+        for (uint32_t j = 0; j < n; ++j) {
+            const size_t entry = at + (size_t)i * n + j;
+            refused |= residual_status[entry];
+            row = hnn_certify(row, hnn_magnitude(residual[entry]));
+        }
+        best = row > best ? row : best;
+    }
+    if (refused) {
+        atomicOr(&inherited, 1u);
+    }
+    largest[t] = best;
+    __syncthreads();
+    for (uint32_t stride = blockDim.x >> 1; stride > 0; stride >>= 1) {
+        if (t < stride && largest[t + stride] > largest[t]) {
+            largest[t] = largest[t + stride];
+        }
+        __syncthreads();
+    }
+    if (t == 0) {
+        const uint32_t read = inherited
+            ? HNN_REFUSED_OPERAND
+            : (largest[0] >= HNN_CARRIER_BOUND ? HNN_REFUSED_CARRIER : HNN_EXACT);
+        reading[g] = read == HNN_EXACT ? largest[0] : (uwide)0;
+        reading[charts + g] = (uwide)read;
     }
 }

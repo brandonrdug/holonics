@@ -30,10 +30,10 @@ use crate::cuda::{Dim3, MemoryInfo};
 // fixtures
 
 /// SplitMix64: exact, deterministic, no float.
-struct Draw(u64);
+pub(super) struct Draw(pub(super) u64);
 
 impl Draw {
-    fn next(&mut self) -> u64 {
+    pub(super) fn next(&mut self) -> u64 {
         self.0 = self.0.wrapping_add(0x9E37_79B9_7F4A_7C15);
         let mut z = self.0;
         z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
@@ -41,12 +41,12 @@ impl Draw {
         z ^ (z >> 31)
     }
 
-    fn below(&mut self, bound: usize) -> usize {
+    pub(super) fn below(&mut self, bound: usize) -> usize {
         (self.next() % bound as u64) as usize
     }
 
     /// A signed integer of magnitude below `2^bits`.
-    fn signed(&mut self, bits: u32) -> i64 {
+    pub(super) fn signed(&mut self, bits: u32) -> i64 {
         let magnitude = (self.next() >> (64 - bits)) as i64;
         if self.next() & 1 == 1 {
             -magnitude
@@ -83,7 +83,7 @@ impl Draw {
 }
 
 /// The RTX 4080 SUPER's census as its driver reports it (`the_card_opens_with_its_census`).
-fn census() -> DeviceCensus {
+pub(super) fn census() -> DeviceCensus {
     DeviceCensus {
         name: "fixture".into(),
         compute_capability: (8, 9),
@@ -109,7 +109,11 @@ fn census() -> DeviceCensus {
     }
 }
 
-fn entry(name: &'static str, max_threads_per_block: u32, static_shared: u32) -> EntryCensus {
+pub(super) fn entry(
+    name: &'static str,
+    max_threads_per_block: u32,
+    static_shared: u32,
+) -> EntryCensus {
     EntryCensus {
         name,
         max_threads_per_block,
@@ -180,7 +184,7 @@ fn chain() -> Field {
     .unwrap()
 }
 
-fn card() -> Card {
+pub(super) fn card() -> Card {
     Card::open(0).expect("a CUDA card at ordinal 0 with the HNN kernels built")
 }
 
@@ -385,7 +389,15 @@ fn the_card_opens_with_its_census() {
     let census = card.census();
     eprintln!("kernels: {KERNELS}");
     eprintln!("census: {census:#?}");
-    for name in [lattice::READ_ENTRY, moment::INGEST_ENTRY] {
+    for name in [
+        lattice::READ_ENTRY,
+        moment::INGEST_ENTRY,
+        word::TICK_ENTRY,
+        word::ADJOINT_ENTRY,
+        word::RESIDUAL_ENTRY,
+        word::REFINE_ENTRY,
+        word::CERTIFICATE_ENTRY,
+    ] {
         eprintln!("entry: {:?}", card.entry(name).unwrap());
     }
     assert!(census.multiprocessors > 0 && census.warp > 0);

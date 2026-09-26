@@ -145,6 +145,14 @@ unsafe extern "C" {
         hStream: CUstream,
     ) -> CUresult;
     pub fn cuMemcpyDtoH_v2(dst: *mut c_void, src: CUdeviceptr, bytes: usize) -> CUresult;
+    /// A device→host copy ordered on a stream, into page-locked host memory (the resident word's
+    /// release: one synchronization per word).
+    pub fn cuMemcpyDtoHAsync_v2(
+        dst: *mut c_void,
+        src: CUdeviceptr,
+        bytes: usize,
+        hStream: CUstream,
+    ) -> CUresult;
     pub fn cuMemcpyDtoD_v2(dst: CUdeviceptr, src: CUdeviceptr, bytes: usize) -> CUresult;
 
     pub fn cuLaunchKernel(
