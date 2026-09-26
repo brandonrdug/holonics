@@ -21,7 +21,11 @@
 //!   chart's size `|A|` (read only by the capacity), the hop `h`, the exponent grain `L`, the
 //!   admitted receivers, the crib, and the carrier lattice `2^(−L_ℓ)ℤ` of every learned locus
 //!   ([`FieldDeclaration::lattice_by_rule`]). [`Field::declare`] computes the capacity `n*` by
-//!   counting and refuses a declared population shorter than it (guard 1). Its contacts are the
+//!   counting and refuses a declared population shorter than it (guard 1), and declares the word's
+//!   precisions by rule ([`Field::word_lattice`], [`crate::hnn::WordLattice::by_rule`], Decision 24):
+//!   the certificate's target `2^(−D_c)`, the charts' lattice `L_c = 2D_c` and the transients'
+//!   lattice `L_w`, from the finest receiver grain, the receiving fan-in, the widest local solve
+//!   and the junction steps; [`Field::describe`] codes them. Its contacts are the
 //!   blocks of its connection incidence `d_A` ([`Field::connection`]), and the rings and contacts
 //!   joined through it are the read-only Holarchy chart [`Field::holon`], built from the one
 //!   constitution;
@@ -66,6 +70,7 @@ use crate::geometry::RatVec3;
 use crate::geometry::complex::{CellComplex, ConnectionIncidence};
 use crate::geometry::screw::{ScrewAxis, ScrewGenerator, ScrewPair, SituatedScrew};
 use crate::hnn::HnnError;
+use crate::hnn::chart::WordLattice;
 use crate::hnn::constitution::{Lattice, Locus, Steps};
 use crate::hnn::moment::{Capacity, PairPort, capacity};
 use crate::holarchy::{Gluing, Holarchy};
@@ -219,7 +224,9 @@ impl FieldDeclaration {
     /// lattices follow [`FieldDeclaration::lattice_by_rule`]: `L = 9, 9, 10, 10` for the four rings'
     /// elements and standings, `10` for ring 2's receiving map, `9, 9, 10, 9` for the four channels,
     /// and `⌈log₂(32 · population)⌉` for ring 0's source ports (`22` on a cut of 2^17 cells, `23`
-    /// on the notebook's pinned 171,754-byte cut).
+    /// on the notebook's pinned 171,754-byte cut). The word's precisions follow by rule at
+    /// [`Field::declare`] (Decision 24): `L_R = 16`, `X_w = 22`, the widest solve `26` and
+    /// `e_max = 4` give the target `2^(−19)`, `L_c = 38` and `L_w = 15`.
     pub fn campaign_one(population: u64) -> Self {
         let periods = [5u64, 7, 11, 13];
         let axis = ScrewGenerator::new(RatVec3::from_i64(0, 0, 1), RatVec3::zero());
@@ -800,6 +807,9 @@ pub struct Field {
     capacity: Capacity,
     distances: Vec<Vec<Option<usize>>>,
     lattices: BTreeMap<Locus, Lattice>,
+    /// The word's declared precisions by rule ([`WordLattice::by_rule`]); `None` only for the
+    /// exact law's own tests (`Field::with_exact_word`).
+    word: Option<WordLattice>,
 }
 
 impl Field {
@@ -944,6 +954,13 @@ impl Field {
         offsets.dedup();
         let periods: Vec<u64> = rings.iter().map(Ring::period).collect();
         let capacity = capacity(&periods, &sources, declared.alphabet, &offsets)?;
+        let word = Some(word_by_rule(
+            &rings,
+            &contacts,
+            &sources,
+            &distances,
+            &declared.receivers,
+        ));
         if declared.population < capacity.n_star() {
             return Err(HnnError::BelowCapacity {
                 population: declared.population,
@@ -969,7 +986,24 @@ impl Field {
             capacity,
             distances,
             lattices,
+            word,
         })
+    }
+
+    /// **The word's declared precisions** (Decision 24; [`WordLattice::by_rule`]): the charts'
+    /// lattice `L_c`, the certificate's target `2^(−D_c)` and the transients' lattice `L_w`. `None`
+    /// is the exact law, which only the law's own tests declare (`Field::with_exact_word`).
+    pub fn word_lattice(&self) -> Option<&WordLattice> {
+        self.word.as_ref()
+    }
+
+    /// **The field with its word executed by the exact law**: every inverse exact and every
+    /// transient unsplit, the law the lattice word's certificates are read against. Only the law's
+    /// own tests declare it; every declared field carries the rule's lattices.
+    #[cfg(test)]
+    pub(crate) fn with_exact_word(mut self) -> Self {
+        self.word = None;
+        self
     }
 
     /// The declared carrier lattice of a learned locus; `None` for a declared locus (a junction or
@@ -1444,8 +1478,9 @@ impl Field {
         )?)?)
     }
 
-    /// **The field's exact self-delimiting code**: every declared value, the recorded `n*`, the
-    /// gauge convention and the sign generator's rule, and the constitution's declared values (the
+    /// **The field's exact self-delimiting code**: every declared value, the word's precisions
+    /// (`L_c`, `D_c`, `L_w`; none for the exact law), the recorded `n*`, the gauge convention and
+    /// the sign generator's rule, and the constitution's declared values (the
     /// steps `γ_U` and `η_x`, the budget `B_Θ`) with the pending capacity, as Elias-gamma naturals,
     /// zig-zag integers and rationals as (numerator, denominator). It is the one exact code of the
     /// declaration (guard 13), and `Kt` pays for every part of it (design (f), review D3).
@@ -1522,6 +1557,18 @@ impl Field {
             natural(&mut code, index as u64);
             natural(&mut code, u64::from(lattice.exponent()));
         }
+        // The word's precisions (Decision 24): `L_c`, `D_c`, `L_w`; none for the exact law.
+        match &self.word {
+            Some(word) => naturals(
+                &mut code,
+                &[
+                    u64::from(word.chart_exponent()),
+                    u64::from(word.target_exponent()),
+                    u64::from(word.transient_exponent()),
+                ],
+            ),
+            None => naturals(&mut code, &[]),
+        }
         natural(&mut code, self.capacity.n_star());
         // The gauge convention (design R3 K2): 0 names "S_g(p_0) = 0 at the least visited port".
         natural(&mut code, 0);
@@ -1535,6 +1582,49 @@ impl Field {
         natural(&mut code, pending_capacity as u64);
         code
     }
+}
+
+/// **The word's precisions by rule** ([`WordLattice::by_rule`]): the finest receiver grain
+/// `L_R = ⌈1/ε_bits⌉`, the widest receiving fan-in `X_w = 2d_R`, the widest local solve (a ring's
+/// `2d_g` or a channel's `k_a`) and the most junction steps `e_max = e_0 + A` of an admitted
+/// receiver.
+fn word_by_rule(
+    rings: &[Ring],
+    contacts: &[Contact],
+    sources: &[usize],
+    distances: &[Vec<Option<usize>>],
+    receivers: &[ReceiverDeclaration],
+) -> WordLattice {
+    let grain = receivers
+        .iter()
+        .filter(|receiver| receiver.tolerance.is_positive())
+        .filter_map(|receiver| receiver.tolerance.recip().ceil().to_integer().to_u64())
+        .max()
+        .unwrap_or(1);
+    let fan_in = receivers
+        .iter()
+        .filter_map(|receiver| rings.get(receiver.ring))
+        .map(|ring| ring.width() as u64)
+        .max()
+        .unwrap_or(1);
+    let width = rings
+        .iter()
+        .map(Ring::width)
+        .chain(contacts.iter().map(Contact::width))
+        .max()
+        .unwrap_or(1) as u64;
+    let steps = receivers
+        .iter()
+        .filter_map(|receiver| {
+            sources
+                .iter()
+                .filter_map(|source| distances[*source][receiver.ring])
+                .min()
+                .map(|first| (first + receiver.aperture) as u64)
+        })
+        .max()
+        .unwrap_or(1);
+    WordLattice::by_rule(grain, fan_in, width, steps)
 }
 
 /// Holons joined side by side, the first leftmost, sharing no port: each join's whole again a

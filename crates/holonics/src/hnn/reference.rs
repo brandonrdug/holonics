@@ -2,8 +2,29 @@
 //!
 //! [definition] [`Reference`] implements [`ExecutionPort`] exactly (design (c), "The host
 //! reference"). Its [`Resident`] holds the field, the lift point, the constitution, the open
-//! moments, the open pending ratios and the staged deposits. Every value is in ℚ, in `ℚ(θ)` at a
-//! face, or an enclosure read at the exterior; nothing is committed or rounded, and no float exists.
+//! moments, the open pending ratios, the staged deposits and the executed charts ([`Charts`]).
+//! Every value is in ℚ, in `ℚ(θ)` at a face, or an enclosure read at the exterior, and no float
+//! exists. A word carries its inverses as certified lattice charts and its transients on the
+//! field's declared lattice with error feedback (Decision 24; [`crate::hnn::chart`]): nothing is
+//! rounded away unreported, since every chart's certificate and every released remainder is in the
+//! receipts, and every tick's balance closes up to its reported residual within its certified bound.
+//!
+//! [definition; agent-inferred] **The word's declared precisions** ([`crate::hnn::WordLattice`],
+//! coded in [`Field::describe`]), by rule from the finest receiver grain `L_R`, the receiving fan-in
+//! `X_w = 2d_R`, the widest local solve `w` and the junction steps `e_max`: the certificate's target
+//! `δ = 2^(−D_c)`, `D_c = ⌈log₂(8 L_R X_w w e_max)⌉`; the charts' lattice `L_c = 2D_c`; the
+//! transients' lattice `L_w = ⌈log₂(4 L_R X_w e_max s)⌉`, `s = 3` splits a tick. A chart moves one
+//! read by at most `1/(4L_R)` over a word (`inverse_chart_deviation`, `executed_adjoint_deviation`
+//! with `‖A⁻¹‖∞ ≤ w` by passivity), and the transients by less than `1/(4L_R)`
+//! (`feedback_tick_deviation`, at most three splits a tick), so a read moves by less than
+//! `1/(2L_R)`, below the grain; the assumptions are `L_ℓ`'s (unit-scale waves) and a non-expansive
+//! propagation through the later ticks (the counterfactual bound owed in #62). Campaign 1: `D_c = 19`, `L_c = 38`, `L_w = 15`. Each window
+//! warm-starts every chart from the one the resident kept for its operator (a ring's `I − ½K_r`, a
+//! contact's `m_a` per conductance carry), refines it by rounded Newton–Schulz steps while its
+//! certificate is above the target, and starts cold from the scaled transpose where the warm
+//! certificate is above `1/2` (a deposit moves campaign 1's ring elements by 1.4 to 2.3 in the
+//! certificate's norm); a chart at an unchanged operator is read again with no step, so a word is a
+//! function of the pending ratio's operands, the published constitution and the kept charts.
 //!
 //! [definition] **The resident's clock law** (design (c), R2 M12). `ingest` stops at the joint
 //! clock's carry-out and the resident then refuses further cells until `close_aeon`, which it refuses
@@ -66,7 +87,8 @@
 //! takes them when that commit is still the published one and reads again otherwise (a comparison
 //! observed after an update is read through the contemporary constitution); a deposit and a
 //! collapse publish a constitution and drop every kept read. A word is a function of the pending
-//! ratio's operands and the published constitution, so the kept read is that function's value and
+//! ratio's operands, the published constitution and the resident's kept charts (a chart at an
+//! unchanged operator is read again with no step), so the kept read is that function's value and
 //! the compare returns the same either way (the test
 //! `a_compare_returns_the_same_with_and_without_the_refines_kept_read`). The pending ratio still
 //! holds operands only (guard 3), the kept word is consumed by its own return (guard 2), and the
@@ -82,18 +104,22 @@
 //!
 //! | Where | Regions that run together | Why they commute |
 //! |---|---|---|
-//! | a word's open (`refine`, `compare`'s read, the deposit's re-read) | the rings' operands, then the contacts'; within them, a Gram's rows and a solved chart's product's columns | each reads its own material (the standings, its own screws) and writes its own operands |
-//! | a tick of the word | the junctions, then the elements, then the transits; each fixed operand's rows; the rings' and contacts' power terms | a junction reads its own storage and arrivals, an element its own junction, a transit its two ends' outgoing waves and its own state; the balance terms and the power are summed afterwards in ring, then contact, order |
+//! | a word's open (`refine`, `compare`'s read, the deposit's re-read) | the rings' operands, then the contacts', each refining its own chart from its own kept chart; within them, a Gram's rows | each reads its own material (the standings, its own screws) and its own kept chart, and writes its own operands; the refined charts are kept afterwards, by key |
+//! | a tick of the word | the junctions, then the elements, then the transits; the rings' and contacts' power terms | a junction reads its own storage, arrivals and anchor remainder, an element its own junction and storage remainder, a transit its two ends' outgoing waves, its own state and its own remainders; the balance terms and the power are summed afterwards in ring, then contact, order |
 //! | the receiving read | the receiving epochs; within each, the map's `2\|A\|` rows, then the classes' grain cells | each row and class reads the shared anchor and writes its own logit or cell |
 //! | the faces and the Holon ratio | the receiving phases' faces, then their ratios and code lengths | each reads its own read and target |
-//! | `pull_back` | the rings' transposed solves and the contacts' `M_a⁻¹`; per step in reverse, the junctions, then the elements (and each transposed solve's rows), then the transits (and each channel coordinate), then the junctions' reverse Swings (and each coordinate) | each reads its step's record and its own covectors, and writes its own; the conductance terms are added afterwards, in contact, then ring and incidence, order |
+//! | `pull_back` | per step in reverse, the junctions at their recorded anchors, then the elements (each through its executed chart's transpose), then the transits (each through its executed chart's transpose, and each channel coordinate), then the junctions' reverse Swings at their executed weights (and each coordinate) | each reads its step's record, its own covectors and its own adjoint remainders, and writes its own; the conductance terms are added afterwards, in contact, then ring and incidence, order |
 //! | [`compose`] | the receiving map's gradient by row blocks; the rings (their ticks' charts, slices and contrast port's rows); the standings; the source ring's phases and pair-port ranks; the contacts (their ticks' charts and three forms) | each reads the word's return and its own material; the parts are joined in ring and contact order, so the deposit's steps stand in the serial order |
 //! | `deposit` ([`Constitution::deposited`]) | the loci the deposit names, each running its own steps in the deposit's order with its own budgeted carry; within a normal law, its samples' terms, its map update's row blocks, its Gram's rows and its carried entries | loci share no material, remainder or budgeted carry, and entries share nothing; the refusal returned is the first in the deposit's order |
 //!
-//! The regions stay serial where their arithmetic is another owner's: an exact inversion and
-//! `IntegralMatrix::{outer_sum, symmetric_times}` (`crate::ratio::linear`) run on one worker each,
-//! and are the widest ring's serial path. The receipt (24 windows of the standing real cut, before
-//! and after, identical readouts) is the notebook's (`research/notebook/hnn_design/README.md`).
+//! The regions stay serial where their arithmetic is one owner's integer loop: a chart's
+//! refinement and product (`crate::hnn::chart`, 64-bit words and 128-bit sums under the ℓ1
+//! certificate) and `IntegralMatrix::{outer_sum, symmetric_times}` (`crate::ratio::linear`) run on
+//! one worker each; the exact inversion runs only where a chart's cold start fails (never on the
+//! standing real cut's first 24 windows) and in the observability rank at the mount. The receipts
+//! (24 windows of the standing real cut: the host realization's, serial against parallel with
+//! identical readouts; and Decision 24's, before and after the lattice word) are the notebook's
+//! (`research/notebook/hnn_design/README.md`).
 //!
 //! [open] **`ExactWork`'s operation counts.** The exposure's work counts the entries written, their
 //! bits, the peak, the resident entries and the span; its additions, multiplications and divisions
@@ -110,12 +136,13 @@ use std::ops::Range;
 use std::time::{Duration, Instant};
 
 use num_bigint::{BigInt, BigUint};
-use num_traits::{One, Zero};
+use num_traits::{One, Signed, Zero};
 
 use crate::aeon::{ClockLift, EnclosedLedger};
 use crate::compression::cost::ceil_log2;
 use crate::geometry::RatVec3;
 use crate::hnn::HnnError;
+use crate::hnn::chart::{ChartReading, ChartStart, Charts, Remainders};
 use crate::hnn::constitution::{
     CAMPAIGN_ONE_BUDGET, CarrierBits, Constitution, DepositReading, FactorGradient, FactorStep,
     LinearLocus, LinearStep, Locus, Sample, Steps,
@@ -219,16 +246,21 @@ struct Arrived {
 }
 
 impl Arrived {
-    /// The arrived targets' code length at a constitution.
+    /// The arrived targets' code length at a constitution, read from the executed faces (the
+    /// resident's charts warm-started and refined), with the charts' readings.
     fn code_length(
         &self,
         field: &Field,
         constitution: &Constitution,
-    ) -> Result<ExactInterval, HnnError> {
+        charts: &mut Charts,
+    ) -> Result<(ExactInterval, Vec<ChartReading>), HnnError> {
         let phases = self.ratio.phases();
-        let (_, faces) = self.ratio.read(field, constitution)?;
+        let (word, faces) = self.ratio.read_charted(field, constitution, charts)?;
         let anchors = target_phases(field, self.ratio.anchor(), phases.ring(), &self.targets)?;
-        HolonRatio::compare(faces, &self.targets, &anchors)?.code_length()
+        Ok((
+            HolonRatio::compare(faces, &self.targets, &anchors)?.code_length()?,
+            word.operands().charts(),
+        ))
     }
 
     fn bits(&self) -> u64 {
@@ -272,7 +304,54 @@ pub struct Resident {
     arrived: Option<Arrived>,
     released_bits: u64,
     stop: Option<BudgetStop>,
+    charts: Charts,
+    tally: ChartTally,
     wall: WallTimes,
+}
+
+/// [definition] **The executed charts' tally** over a resident's words (Decision 24): the chart
+/// refinements read, how many started cold (from the scaled transpose) and how many from one exact
+/// inverse, the rounded Newton–Schulz steps they took, and the largest certificate read against the
+/// declared target.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ChartTally {
+    pub reads: u64,
+    pub cold: u64,
+    pub seeded: u64,
+    pub steps: u64,
+    pub largest: Rat,
+    pub target: Rat,
+}
+
+impl ChartTally {
+    fn new(field: &Field) -> Self {
+        Self {
+            reads: 0,
+            cold: 0,
+            seeded: 0,
+            steps: 0,
+            largest: Rat::zero(),
+            target: field
+                .word_lattice()
+                .map_or_else(Rat::zero, |word| word.target()),
+        }
+    }
+
+    /// Count one word's chart readings.
+    fn read(&mut self, readings: &[ChartReading]) {
+        for reading in readings {
+            self.reads += 1;
+            match reading.start {
+                ChartStart::Warm => {}
+                ChartStart::Transpose => self.cold += 1,
+                ChartStart::Exact => self.seeded += 1,
+            }
+            self.steps += u64::from(reading.steps);
+            if reading.certificate > self.largest {
+                self.largest = reading.certificate.clone();
+            }
+        }
+    }
 }
 
 /// [definition; agent-inferred] **The host's wall time by phase**, summed over the resident's
@@ -443,15 +522,31 @@ impl Resident {
     }
 
     /// The exact bits of the resident's state: the lift point, the open moments, the pending
-    /// ratios with their emitted logits, the staged deposits, the first law's arrived operand and
-    /// the constitution.
+    /// ratios with their emitted logits, the staged deposits, the first law's arrived operand, the
+    /// constitution and the executed charts ([`Charts`], the representation of the solves the
+    /// words execute).
     pub fn state_bits(&self) -> u64 {
         let lift: u64 = self.current.lift().iter().map(|x| x.bits() + 1).sum();
         let moments: u64 = self.moments.values().map(SourceMoment::dense_bits).sum();
         let pending: u64 = self.pending.values().map(PendingSlot::bits).sum();
         let staged: u64 = self.staged.values().map(|slot| slot.deposit.bits()).sum();
         let arrived = self.arrived.as_ref().map_or(0, Arrived::bits);
-        lift + moments + pending + staged + arrived + self.constitution.exact_bits()
+        lift + moments
+            + pending
+            + staged
+            + arrived
+            + self.constitution.exact_bits()
+            + self.charts.bits()
+    }
+
+    /// **The executed charts** the resident keeps between windows (Decision 24).
+    pub fn charts(&self) -> &Charts {
+        &self.charts
+    }
+
+    /// The executed charts' tally since the mount.
+    pub fn tally(&self) -> &ChartTally {
+        &self.tally
     }
 
     /// **The state's bits without the collapse**: the state's bits plus every locus the collapses
@@ -553,6 +648,8 @@ impl Reference {
             arrived: None,
             released_bits: 0,
             stop: None,
+            charts: Charts::new(),
+            tally: ChartTally::new(field),
             wall: WallTimes::default(),
         })
     }
@@ -842,10 +939,12 @@ impl ExecutionPort for Reference {
         );
         let field = &resident.field;
         let start = Instant::now();
-        let (word, faces) = ratio.read(field, &resident.constitution)?;
+        let (word, faces) =
+            ratio.read_charted(field, &resident.constitution, &mut resident.charts)?;
         let read = start.elapsed();
         let start = Instant::now();
         let released = word.released()?;
+        resident.tally.read(&released.charts);
         let path = path_attenuation(
             field,
             ratio.anchor(),
@@ -874,6 +973,9 @@ impl ExecutionPort for Reference {
                 released_power: released.power.clone(),
                 peak_bits: released.peak_bits,
                 path,
+                charts: released.charts.clone(),
+                remainders: released.remainders.clone(),
+                last: released.last.clone(),
             },
         )?;
         receipt.balances = released.balances;
@@ -952,7 +1054,9 @@ impl ExecutionPort for Reference {
             Some(KeptRead { word, faces, .. }) => (word.resume(&field), faces),
             None => {
                 let start = Instant::now();
-                let read = ratio.read(&field, &resident.constitution)?;
+                let read =
+                    ratio.read_charted(&field, &resident.constitution, &mut resident.charts)?;
+                resident.tally.read(&read.0.operands().charts());
                 wall.compare_read = start.elapsed();
                 read
             }
@@ -992,6 +1096,7 @@ impl ExecutionPort for Reference {
             windings: holon.phases().iter().map(PhaseRatio::winding).collect(),
             residual,
             reached: deposit.loci(),
+            released: back.released.clone(),
         };
         let steps = phases.junction_steps() as u64;
         let ticks = vec![steps; field.rings().len()];
@@ -1070,7 +1175,8 @@ impl ExecutionPort for Reference {
         // leaves the predecessor, the ledger and the staged deposit as they were (review S12).
         let deposited = start.elapsed();
         let start = Instant::now();
-        let reread = arrived.code_length(&field, &next)?;
+        let (reread, readings) = arrived.code_length(&field, &next, &mut resident.charts)?;
+        resident.tally.read(&readings);
         let reread_time = start.elapsed();
         let mut work = ExactWork::nothing();
         work.stepped();
@@ -1118,7 +1224,10 @@ impl ExecutionPort for Reference {
         let field = &resident.field;
         let phases = slot.ratio.phases().clone();
         let current = slot.ratio.current(field)?;
-        let mut word = slot.ratio.open(field, &resident.constitution)?;
+        let mut word =
+            slot.ratio
+                .open_charted(field, &resident.constitution, &mut resident.charts)?;
+        resident.tally.read(&word.operands().charts());
         let anchors = word.forward(&phases)?;
         let reads = anchors
             .iter()
@@ -1237,7 +1346,9 @@ impl ExecutionPort for Reference {
         if let Some(arrived) = &resident.arrived {
             let reads = Diamond::of(&field, arrived.ratio.phases()).retained(&field);
             if collapsed.released.iter().any(|locus| reads.contains(locus)) {
-                let reread = arrived.code_length(&field, &resident.constitution)?;
+                let (reread, readings) =
+                    arrived.code_length(&field, &resident.constitution, &mut resident.charts)?;
+                resident.tally.read(&readings);
                 resident.ledger.release(reread)?;
             }
         }
@@ -2049,8 +2160,27 @@ pub struct Exposure {
     pub state: StateReport,
     pub compares: u64,
     pub deposits: u64,
+    /// The executed word's readout (Decision 24).
+    pub word: WordReport,
     /// The host's wall time by phase (exterior).
     pub wall: WallTimes,
+}
+
+/// [definition] **The executed word's readout over an exposure** (Decision 24): the charts' tally
+/// (reads, seeds, rounded Newton–Schulz steps, the largest certificate against the target), the
+/// carried remainders the refines' words released at their ends (`forward`) and the compares'
+/// returns released at their opens (`adjoint`), joined over the run; and over every refine's full
+/// ticks, how many balances were read, whether every one closed up to its residual within its
+/// certified bound, and the largest residual in magnitude with the bound at that tick.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct WordReport {
+    pub charts: ChartTally,
+    pub forward: Remainders,
+    pub adjoint: Remainders,
+    pub balances: u64,
+    pub closed: bool,
+    pub largest_residual: Rat,
+    pub residual_bound: Rat,
 }
 
 /// The online Krichevsky–Trofimov code length of one cell, `−log₂((count + ½)/(total + |A|/2))`.
@@ -2265,6 +2395,9 @@ impl Reference {
             stepped: 0,
         }];
         let (mut windows, mut open_windows, mut peak_word_bits) = (0u64, 0u64, 0u64);
+        let (mut forward, mut adjoint) = (Remainders::default(), Remainders::default());
+        let (mut balances, mut closed) = (0u64, true);
+        let (mut largest_residual, mut residual_bound) = (Rat::zero(), Rat::zero());
         let mut stop = None;
         let mut work = ExactWork::nothing();
         let (mut compares, mut deposits) = (0u64, 0u64);
@@ -2282,15 +2415,30 @@ impl Reference {
                 let (pending, refined) = self.refine(&mut resident, &moment, &phases)?;
                 work = work.then(&refined.receipt.work);
                 if let ReceiptDetail::Refine {
-                    path, peak_bits, ..
+                    path,
+                    peak_bits,
+                    remainders,
+                    ..
                 } = &refined.receipt.detail
                 {
                     windows += 1;
                     open_windows += u64::from(path.open);
                     peak_word_bits = peak_word_bits.max(*peak_bits);
+                    forward = forward.join(remainders);
+                }
+                for balance in &refined.receipt.balances {
+                    balances += 1;
+                    closed &= balance.closes();
+                    if balance.residual.abs() > largest_residual {
+                        largest_residual = balance.residual.abs();
+                        residual_bound = balance.bound.clone();
+                    }
                 }
                 let (staged, compared) = self.compare(&mut resident, pending, &one_hot(window))?;
                 work = work.then(&compared.receipt.work);
+                if let ReceiptDetail::Compare { released, .. } = &compared.receipt.detail {
+                    adjoint = adjoint.join(released);
+                }
                 compares += 1;
                 let holon = compared
                     .forward
@@ -2411,6 +2559,15 @@ impl Reference {
             state,
             compares,
             deposits,
+            word: WordReport {
+                charts: resident.tally().clone(),
+                forward,
+                adjoint,
+                balances,
+                closed,
+                largest_residual,
+                residual_bound,
+            },
             wall: *resident.wall(),
         })
     }

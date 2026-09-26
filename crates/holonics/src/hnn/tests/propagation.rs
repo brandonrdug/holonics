@@ -2,13 +2,14 @@
 //! power balance, the causal cone and the contact exponent.
 
 use num_bigint::BigInt;
-use num_traits::{One, Zero};
+use num_traits::{One, Signed, Zero};
 
 use super::learning::chain;
 use super::support::{
     Draw, Medium, Parts, chorded_field, injection, lift, ring, six_cycle, small_field,
 };
 use crate::hnn::HnnError;
+use crate::hnn::chart::{ChartKey, WordLattice};
 use crate::hnn::field::{Current, Field, FieldDeclaration};
 use crate::hnn::propagation::{
     ContactOperands, ExponentReading, Operands, RingOperands, contact_exponent, element_step,
@@ -364,23 +365,202 @@ fn run(
 }
 
 /// Lean `HNN/Word.word_tick_balance`, lossless: with lossless contacts, `W_s = 0` and `W_c = 0` the
-/// global power is constant exactly over every tick, on a chorded field with proper partial
-/// isometries and contacts that store and stiffen.
+/// exact law keeps the global power constant exactly over every tick, on a chorded field with
+/// proper partial isometries and contacts that store and stiffen. The executed word on its
+/// lattices (Decision 24) moves it at each tick by exactly its residual (the executed anchors,
+/// charts and splits), within the bound its certificates and cells give (Lean
+/// `HNN/LatticeWord.{chart_energy_identity, cayley_chart_energy, feedback_tick}`), and by a nonzero
+/// residual: the chart is not the exact inverse.
 #[test]
-fn a_lossless_word_keeps_its_global_power_exactly() {
-    let field = chorded_field();
+fn a_lossless_word_keeps_its_global_power_up_to_its_certified_residual() {
     let parts = Parts {
         stiff: true,
         store: true,
         standing: true,
         ..Parts::default()
     };
-    let balances = run(&field, parts, 11, 6);
-    let initial = balances[0].before.clone();
+    let exact = run(&chorded_field().with_exact_word(), parts, 11, 6);
+    let initial = exact[0].before.clone();
     assert!(!initial.is_zero());
-    for balance in &balances {
+    for balance in &exact {
         assert_eq!(balance.after, initial);
+        assert!(balance.residual.is_zero() && balance.bound.is_zero());
         assert!(balance.closes());
+    }
+    let executed = run(&chorded_field(), parts, 11, 6);
+    let mut power = executed[0].before.clone();
+    for balance in &executed {
+        assert!(
+            balance.dissipation.is_zero() && balance.resist.is_zero() && balance.contrast.is_zero()
+        );
+        assert_eq!(balance.before, power);
+        assert_eq!(balance.after, &balance.before + &balance.residual);
+        assert!(
+            balance.closes(),
+            "the residual lies within its certified bound"
+        );
+        power = balance.after.clone();
+    }
+    assert!(executed.iter().any(|balance| !balance.residual.is_zero()));
+}
+
+/// Lean `HNN/LatticeWord.cayley_chart_energy_rowNorm`: the skew element executed through its
+/// certified lattice chart `X̂` of `(I − ½K)⁻¹` (`‖1 − (I − ½K)X̂‖∞ ≤ δ`, at most the target) moves
+/// the energy by at most `(4nδ + 4(nδ)²)|b|²`, and its balance closes exactly with the chart term
+/// `⟨x̄, e⟩` inside its bound `‖x̄‖₁ δ ‖2b‖∞`; the exact law's isometry is the zero chart term.
+#[test]
+fn the_skew_element_on_its_chart_keeps_its_energy_within_its_certificate() {
+    let mut draw = Draw::new(12);
+    let lattice = WordLattice::by_rule(16, 6, 6, 4);
+    let n = 6;
+    let zero = ExactRatMatrix::zero(n, n).unwrap();
+    for _ in 0..4 {
+        let slices: Vec<(Vec<Rat>, Vec<Rat>)> = (0..n)
+            .map(|_| (draw.dyadic_vector(n), draw.dyadic_vector(n)))
+            .collect();
+        let contrast = draw.dyadic_vector(n);
+        let ring = RingOperands::charted(
+            integer(2),
+            &contrast,
+            &zero,
+            &zero,
+            &slices,
+            ChartKey::Ring(0),
+            &lattice,
+            None,
+        )
+        .unwrap();
+        let reading = ring.chart().unwrap().clone();
+        assert!(reading.certificate <= lattice.target());
+        let wave = draw.dyadic_vector(n);
+        let step = element_step(&ring, &wave, &draw.dyadic_vector(n)).unwrap();
+        let (energy, before) = (dot(&step.next, &step.next), dot(&wave, &wave));
+        let spread = integer(n as i64) * &reading.certificate;
+        let bound = (integer(4) * &spread + integer(4) * &spread * &spread) * &before;
+        assert!(
+            (&energy - &before).abs() <= bound,
+            "cayley_chart_energy_rowNorm"
+        );
+        let half = rat(1, 2);
+        assert_eq!(
+            &half * &energy - &half * &before,
+            &step.resist + &step.drive + &step.defect
+        );
+        assert!(step.defect.abs() <= step.bound);
+        assert!(!step.defect.is_zero(), "the chart is not the exact inverse");
+    }
+}
+
+/// The full element on its chart (Lean `HNN/Word.reaction_stage_balance` at an executed chart, the
+/// item #62 owes in Lean): with a passive part and a contrast port,
+/// `½|s′|² − ½|b|² = ⟨x̄, W_s x̄⟩ + ⟨x̄, W_c c⟩ + ⟨x̄, e⟩` exactly, `e = −R(2b + W_c c)` the chart's
+/// equation residual, with `|⟨x̄, e⟩| ≤ ‖x̄‖₁ δ ‖2b + W_c c‖∞`.
+#[test]
+fn the_element_balance_on_its_chart_closes_with_its_certified_chart_term() {
+    let mut draw = Draw::new(13);
+    let lattice = WordLattice::by_rule(16, 6, 6, 4);
+    let n = 6;
+    for _ in 0..4 {
+        let slices: Vec<(Vec<Rat>, Vec<Rat>)> = (0..n)
+            .map(|_| (draw.dyadic_vector(n), draw.dyadic_vector(n)))
+            .collect();
+        let ring = RingOperands::charted(
+            integer(2),
+            &draw.dyadic_vector(n),
+            &draw.dyadic_matrix(n, n),
+            &draw.dyadic_matrix(n, n).scaled(&rat(1, 8)),
+            &slices,
+            ChartKey::Ring(0),
+            &lattice,
+            None,
+        )
+        .unwrap();
+        let (wave, drive) = (draw.dyadic_vector(n), draw.dyadic_vector(n));
+        let step = element_step(&ring, &wave, &drive).unwrap();
+        let half = rat(1, 2);
+        assert_eq!(
+            &half * dot(&step.next, &step.next) - &half * dot(&wave, &wave),
+            &step.resist + &step.drive + &step.defect
+        );
+        assert!(step.resist <= Rat::zero());
+        assert!(step.defect.abs() <= step.bound);
+        // e = −R(2b + W_c c), R the chart's right residual.
+        let left = ExactRatMatrix::identity(n)
+            .unwrap()
+            .subtract(&ring.element().scaled(&half))
+            .unwrap();
+        let residual = ExactRatMatrix::identity(n)
+            .unwrap()
+            .subtract(&left.multiply(&ring.solve().unwrap()).unwrap())
+            .unwrap();
+        let operand = add(
+            &scale(&integer(2), &wave),
+            &ring.contrast().apply(&drive).unwrap(),
+        );
+        let e = scale(&-Rat::one(), &residual.apply(&operand).unwrap());
+        assert_eq!(dot(&step.midpoint, &e), step.defect);
+    }
+}
+
+/// Every solve the executed word reads at a cut is a lattice chart whose certificate, read again
+/// in ℚ from its exact values, `‖1 − A X̂‖∞`, is the reported one and at most the declared target;
+/// the junctions' executed weights sum to one exactly, within their certificate `‖ŵ − w‖₁` of the
+/// participation weights.
+#[test]
+fn every_solve_the_word_executes_is_certified_below_its_target() {
+    let field = chorded_field();
+    let lattice = *field.word_lattice().unwrap();
+    let parts = Parts {
+        dissipative: true,
+        resist: true,
+        contrast: true,
+        stiff: true,
+        store: true,
+        standing: true,
+    };
+    let medium = Medium::generic(&field, 14, parts);
+    let current = Current::at(&field, lift(&[0, 1, 0, 0, 0])).unwrap();
+    let operands = Operands::at_cut(&field, &medium, &current).unwrap();
+    let row_norm = |m: &ExactRatMatrix| {
+        (0..m.rows())
+            .map(|i| m.row(i).unwrap().iter().map(|x| x.abs()).sum::<Rat>())
+            .max()
+            .unwrap()
+    };
+    let certify = |operator: &ExactRatMatrix, chart: &ExactRatMatrix| {
+        let n = operator.rows();
+        row_norm(
+            &ExactRatMatrix::identity(n)
+                .unwrap()
+                .subtract(&operator.multiply(chart).unwrap())
+                .unwrap(),
+        )
+    };
+    for ring in operands.rings() {
+        let n = ring.width();
+        let left = ExactRatMatrix::identity(n)
+            .unwrap()
+            .subtract(&ring.element().scaled(&rat(1, 2)))
+            .unwrap();
+        let reading = ring.chart().unwrap();
+        assert_eq!(certify(&left, &ring.solve().unwrap()), reading.certificate);
+        assert!(reading.certificate <= lattice.target());
+    }
+    for contact in operands.contacts() {
+        let reading = contact.chart().unwrap();
+        assert_eq!(
+            certify(contact.operator(), &contact.solve().unwrap()),
+            reading.certificate
+        );
+        assert!(reading.certificate <= lattice.target());
+    }
+    for ring in 0..field.rings().len() {
+        let (executed, exact) = (operands.weights(ring), operands.exact_weights(ring));
+        assert_eq!(executed.iter().sum::<Rat>(), Rat::one());
+        let spread: Rat = executed.iter().zip(exact).map(|(a, b)| (a - b).abs()).sum();
+        assert_eq!(&spread, operands.junction_certificate(ring));
+        let unit = lattice.chart().unit();
+        assert!(spread <= integer(executed.len() as i64) * unit);
     }
 }
 

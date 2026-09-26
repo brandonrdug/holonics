@@ -10,7 +10,7 @@ use crate::hnn::field::{Current, Field};
 use crate::hnn::moment::SourceMoment;
 use crate::hnn::receiving::ReceivingPhases;
 use crate::hnn::word::Word;
-use crate::ratio::Rat;
+use crate::ratio::{Rat, integer};
 
 /// A cut of the chain control (rings of periods 2, 3, 2, source ring 0, receiving ring 2 with
 /// aperture 2): a constitution with a nonzero encoder, and a moment of 40 cells that fit no lock
@@ -51,40 +51,66 @@ fn a_word_opens_at_zero_change_whatever_preceded_it() {
 
 /// The forward word runs `e_max = e_0 + A` junction steps on its own hop clock, reads the receiving
 /// ring at `e_0 … e_last` (the front reaches it no earlier than `e_0`), every full tick's balance
-/// closes, and its end releases the change with the power it carried after the last junction.
+/// closes up to its residual within its certified bound, and its end releases the change with the
+/// power it carried after the last junction: the last junction is a `W`-isometry about the
+/// participation mean, so its power moves only by the executed anchor's residual, zero under the
+/// exact law. On the word's lattices every carried remainder it releases lies in its half-open
+/// cell (Lean `HNN/LatticeWord.feedback_rem_bounds`); under the exact law it releases none.
 #[test]
 fn the_forward_word_reads_its_epochs_and_releases_its_change() {
-    let field = &chain();
-    let (medium, current, moment) = cut(field);
-    let phases = ReceivingPhases::declare(field, &medium, &current, &field.receivers()[0]).unwrap();
-    assert_eq!(
-        (
-            phases.first_epoch(),
-            phases.last_epoch(),
-            phases.junction_steps()
-        ),
-        (2, 3, 4)
-    );
-    let mut word = Word::open(field, &medium, &current, &moment).unwrap();
-    let reads = word.forward(&phases).unwrap();
-    assert_eq!(reads.len(), 2);
-    assert!(reads.iter().all(|read| read.iter().any(|x| !x.is_zero())));
-    for early in 0..2 {
-        assert!(word.anchor(early, 2).unwrap().iter().all(Zero::is_zero));
+    for field in [chain(), chain().with_exact_word()] {
+        let field = &field;
+        let (medium, current, moment) = cut(field);
+        let phases =
+            ReceivingPhases::declare(field, &medium, &current, &field.receivers()[0]).unwrap();
+        assert_eq!(
+            (
+                phases.first_epoch(),
+                phases.last_epoch(),
+                phases.junction_steps()
+            ),
+            (2, 3, 4)
+        );
+        let mut word = Word::open(field, &medium, &current, &moment).unwrap();
+        let reads = word.forward(&phases).unwrap();
+        assert_eq!(reads.len(), 2);
+        assert!(reads.iter().all(|read| read.iter().any(|x| !x.is_zero())));
+        for early in 0..2 {
+            assert!(word.anchor(early, 2).unwrap().iter().all(Zero::is_zero));
+        }
+        assert_eq!(word.ticks(), 4);
+        assert_eq!(word.clock().ticks(), 4u32.into());
+        assert_eq!(word.balances().len(), 3);
+        assert!(word.balances().iter().all(|balance| balance.closes()));
+        let before_last = word.balances()[2].after.clone();
+        assert!(matches!(word.tick(), Err(HnnError::WordEnded { ticks: 4 })));
+        let released = word.release().unwrap();
+        assert_eq!(
+            released.power,
+            &before_last + &released.last,
+            "the last junction moves the power only by its executed anchor's residual"
+        );
+        assert_eq!(released.ticks, 4);
+        assert!(released.peak_bits > 0);
+        match field.word_lattice() {
+            Some(lattice) => {
+                assert!(released.remainders.entries > 0);
+                assert!(released.remainders.largest <= lattice.transient().unit() / integer(2));
+                assert_eq!(released.charts.len(), 5, "three rings and two contacts");
+                assert!(
+                    released
+                        .charts
+                        .iter()
+                        .all(|chart| chart.certificate <= lattice.target())
+                );
+            }
+            None => {
+                assert!(released.last.is_zero());
+                assert_eq!(released.remainders.entries, 0);
+                assert!(released.charts.is_empty());
+            }
+        }
     }
-    assert_eq!(word.ticks(), 4);
-    assert_eq!(word.clock().ticks(), 4u32.into());
-    assert_eq!(word.balances().len(), 3);
-    assert!(word.balances().iter().all(|balance| balance.closes()));
-    let before_last = word.balances()[2].after.clone();
-    assert!(matches!(word.tick(), Err(HnnError::WordEnded { ticks: 4 })));
-    let released = word.release().unwrap();
-    assert_eq!(
-        released.power, before_last,
-        "the last junction is a W-isometry"
-    );
-    assert_eq!(released.ticks, 4);
-    assert!(released.peak_bits > 0);
 }
 
 /// The declared initial constitution has `E = 0`, so its first word carries no change and every

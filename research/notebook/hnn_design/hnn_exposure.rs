@@ -39,6 +39,9 @@
 //!
 //! [established-bounded; measured] **The readout** is the complete `Exposure`, with every quantity
 //! design (f) names:
+//! - the executed word (Decision 24): the declared precisions, the charts' refinements (their starts,
+//!   the rounded Newton–Schulz steps, the largest certificate against the target), the remainders
+//!   the words and their returns released, and the tick balances' residuals against their bounds;
 //! - the bits on the training and the held-out targets against each online baseline (uniform,
 //!   order-0 and order-1 Krichevsky–Trofimov, PPM of order 2), and the verdict against order-0;
 //! - `Kt` with the published keys, against the literal over the cells read;
@@ -104,11 +107,16 @@ fn read_cut_file(path: &str) -> Vec<u8> {
 /// the numbers after their keys (the manifest is exterior JSON; no parser enters the crate).
 #[allow(clippy::disallowed_types, clippy::disallowed_methods)]
 fn read_cut_manifest(path: &str) -> (usize, Range<usize>) {
-    let manifest_path = path.strip_suffix(".bin").map_or_else(|| format!("{path}.json"), |stem| format!("{stem}.json"));
+    let manifest_path = path
+        .strip_suffix(".bin")
+        .map_or_else(|| format!("{path}.json"), |stem| format!("{stem}.json"));
     let manifest = std::fs::read_to_string(&manifest_path)
         .unwrap_or_else(|error| panic!("read the cut manifest {manifest_path}: {error}"));
     let numbers_after = |key: &str| -> Vec<usize> {
-        let start = manifest.find(key).unwrap_or_else(|| panic!("the manifest names {key}")) + key.len();
+        let start = manifest
+            .find(key)
+            .unwrap_or_else(|| panic!("the manifest names {key}"))
+            + key.len();
         let rest = manifest[start..].trim_start();
         let value = if rest.starts_with('[') {
             &rest[..rest.find(']').expect("a closed list")]
@@ -239,10 +247,17 @@ fn main() {
         Some(path) => {
             let text = read_cut_file(path);
             let (population, range) = read_cut_manifest(path);
-            assert_eq!(text.len(), population, "the cut file's length is the manifest's population");
+            assert_eq!(
+                text.len(),
+                population,
+                "the cut file's length is the manifest's population"
+            );
             assert_eq!(range.end, population, "the held-out range closes the cut");
             held_out = range.end - range.start;
-            (text, format!("the cut file {path} (held out {range:?} from its manifest)"))
+            (
+                text,
+                format!("the cut file {path} (held out {range:?} from its manifest)"),
+            )
         }
         None => (pinned_cut(), format!("{CUT_COMMIT}:{CUT_PATH}")),
     };
@@ -379,6 +394,52 @@ fn report(field: &Field, exposure: &Exposure) {
         exposure.open_windows,
         exposure.windows,
         exposure.peak_word_bits
+    );
+
+    println!();
+    println!("== the executed word (Decision 24) ==");
+    match field.word_lattice() {
+        Some(lattice) => println!(
+            "declared precisions: charts on 2^-{}Z, certificate target 2^-{}, transients on 2^-{}Z",
+            lattice.chart_exponent(),
+            lattice.target_exponent(),
+            lattice.transient_exponent()
+        ),
+        None => println!("declared precisions: none (the exact law)"),
+    }
+    let word = &exposure.word;
+    println!(
+        "charts: {} refinements read ({} cold from the scaled transpose, {} from one exact inverse, {} rounded Newton-Schulz steps); the largest certificate ||1 - A X||_inf = {} (decimal {}) against the target {}",
+        word.charts.reads,
+        word.charts.cold,
+        word.charts.seeded,
+        word.charts.steps,
+        exact(&word.charts.largest),
+        decimal(&word.charts.largest, true),
+        exact(&word.charts.target)
+    );
+    for (label, released) in [
+        ("the words' released remainders (forward)", &word.forward),
+        ("the returns' released remainders (adjoint)", &word.adjoint),
+    ] {
+        println!(
+            "{label}: {} nonzero, the largest {} (decimal {}), l1 sum {} (decimal {}), {} exact bits",
+            released.entries,
+            exact(&released.largest),
+            decimal(&released.largest, true),
+            exact(&released.total),
+            decimal(&released.total, true),
+            released.bits
+        );
+    }
+    println!(
+        "tick balances: {} read, every one closed up to its residual within its certified bound: {}; the largest residual {} (decimal {}) against its bound {} (decimal {})",
+        word.balances,
+        word.closed,
+        exact(&word.largest_residual),
+        decimal(&word.largest_residual, true),
+        exact(&word.residual_bound),
+        decimal(&word.residual_bound, true)
     );
 
     println!();

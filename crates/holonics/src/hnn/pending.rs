@@ -37,6 +37,7 @@
 use num_bigint::BigInt;
 
 use crate::hnn::HnnError;
+use crate::hnn::chart::Charts;
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::moment::SourceMoment;
 use crate::hnn::ratio::Faces;
@@ -95,25 +96,54 @@ impl PendingRatio {
         Current::at(field, self.anchor.clone())
     }
 
-    /// **Open the word at the contemporary constitution** on the anchor and the moment's counts.
+    /// **Open the word at the contemporary constitution** on the anchor and the moment's counts,
+    /// every solve seeded afresh.
     pub fn open<'c>(
         &self,
         field: &'c Field,
         constitution: &impl ConstitutionRead,
     ) -> Result<Word<'c>, HnnError> {
-        Word::open(field, constitution, &self.current(field)?, &self.moment)
+        self.open_charted(field, constitution, &mut Charts::new())
+    }
+
+    /// **Open the word, its solves warm-started from a resident's charts** (Decision 24).
+    pub fn open_charted<'c>(
+        &self,
+        field: &'c Field,
+        constitution: &impl ConstitutionRead,
+        charts: &mut Charts,
+    ) -> Result<Word<'c>, HnnError> {
+        Word::open_charted(
+            field,
+            constitution,
+            &self.current(field)?,
+            &self.moment,
+            charts,
+        )
     }
 
     /// **The contemporary read**: the word run over its receiving window and the faces read at the
-    /// receiver's grain. Returns the word (for its return) and the faces. The receiving epochs'
-    /// reads each read only their own anchor and run together (`hnn::realization`).
+    /// receiver's grain, every solve seeded afresh. Returns the word (for its return) and the faces.
     pub fn read<'c>(
         &self,
         field: &'c Field,
         constitution: &impl ConstitutionRead,
     ) -> Result<(Word<'c>, Faces), HnnError> {
+        self.read_charted(field, constitution, &mut Charts::new())
+    }
+
+    /// **The contemporary read, warm-started from a resident's charts**: what [`PendingRatio::read`]
+    /// returns, each solve refined from the chart its key last left (the charts are replaced by the
+    /// refined ones). The receiving epochs' reads each read only their own anchor and run together
+    /// (`hnn::realization`).
+    pub fn read_charted<'c>(
+        &self,
+        field: &'c Field,
+        constitution: &impl ConstitutionRead,
+        charts: &mut Charts,
+    ) -> Result<(Word<'c>, Faces), HnnError> {
         let current = self.current(field)?;
-        let mut word = self.open(field, constitution)?;
+        let mut word = self.open_charted(field, constitution, charts)?;
         let anchors = word.forward(&self.phases)?;
         let reads = indexed(anchors.len(), |j| {
             self.phases.read(field, constitution, &current, &anchors[j])

@@ -69,10 +69,11 @@ fn injected(
 
 /// Design (d), "Word adjoint": `⟨g, T v⟩ = ⟨T* g, v⟩` exactly up to the logits, with `T` the word's
 /// tangent map from the opening storage of every ring (Lean
-/// `HolonicAdjointNormalization.dualMap_comp_reverse_order`, `HNN/Word.reaction_stage_adjoint`).
+/// `HolonicAdjointNormalization.dualMap_comp_reverse_order`, `HNN/Word.reaction_stage_adjoint`),
+/// under the exact law.
 #[test]
 fn the_word_return_is_the_exact_adjoint_of_its_tangent_map() {
-    let field = chain();
+    let field = chain().with_exact_word();
     let theta = generic(&field, 61);
     let (storage, logits, covector, current) = injected(&field, &theta, 62);
     let phases = phases(&field, &theta, &current);
@@ -91,6 +92,72 @@ fn the_word_return_is_the_exact_adjoint_of_its_tangent_map() {
         pairing(&back.opening, &storage)
     );
     assert!(!pairing(&back.opening, &storage).is_zero());
+}
+
+/// Lean `HNN/LatticeWord.{executed_adjoint_pairing, executed_adjoint_unique}` on the word: the return
+/// pulls the covector back through the transposes of the charts the word executed (the lattice
+/// charts of `(I − ½K)⁻¹` and `m⁻¹`, the junctions' charted weights), not through exact inverses.
+/// On the executed charts with no transient split, `⟨g, T̂ v⟩ = ⟨T̂ᵀ g, v⟩` exactly; the exact law's
+/// return, a different adjoint, pairs exactly only with its own word. On the lattices the return's
+/// released remainders lie in their half-open cells.
+#[test]
+fn the_word_return_pulls_back_through_the_executed_charts() {
+    let field = chain();
+    let theta = generic(&field, 61);
+    let (storage, _, _, current) = injected(&field.clone().with_exact_word(), &theta, 62);
+    let phases = phases(&field, &theta, &current);
+    let pulled = |operands: Operands| {
+        let mut word = Word::on_operands(&field, operands, storage.clone()).unwrap();
+        let anchors = word.forward(&phases).unwrap();
+        let reads: Vec<_> = anchors
+            .iter()
+            .map(|anchor| phases.read(&field, &theta, &current, anchor).unwrap())
+            .collect();
+        let faces = Faces::of_reads(&reads, phases.grain()).unwrap();
+        let logits = faces.logits.clone();
+        let covector = HolonRatio::compare(
+            faces,
+            &[1, 3],
+            &TargetPhases {
+                branch: BigInt::from(3),
+                phases: vec![rat(1, 3), rat(4, 3)],
+            },
+        )
+        .unwrap()
+        .covector()
+        .unwrap();
+        let back = word
+            .pull_back(
+                &covector,
+                theta.receiving_map(2).unwrap(),
+                &current.lift()[2],
+                &phases,
+            )
+            .unwrap();
+        (logits, covector, back)
+    };
+    let charted = Operands::at_cut(&field, &theta, &current).unwrap();
+    let (logits, covector, back) = pulled(charted.clone().unsplit().unwrap());
+    assert_eq!(
+        pairing(covector.logits(), &logits),
+        pairing(&back.opening, &storage),
+        "the executed adjoint pairs exactly with the executed charts"
+    );
+    assert_eq!(back.released.entries, 0, "no split, no remainder");
+    let exact = Operands::exact_at_cut(&field, &theta, &current).unwrap();
+    let (exact_logits, exact_covector, exact_back) = pulled(exact);
+    assert_eq!(
+        pairing(exact_covector.logits(), &exact_logits),
+        pairing(&exact_back.opening, &storage)
+    );
+    assert_ne!(
+        exact_back.opening, back.opening,
+        "the charts are not the exact inverses"
+    );
+    let (_, _, lattice_back) = pulled(charted);
+    let unit = field.word_lattice().unwrap().transient().unit();
+    assert!(lattice_back.released.entries > 0);
+    assert!(lattice_back.released.largest <= unit / integer(2));
 }
 
 /// The compare at one cut: its pending ratio, fixed covector and complete pullback.
@@ -148,7 +215,7 @@ fn cut_at(field: Field, theta: Constitution) -> Cut {
 fn cut() -> &'static Cut {
     static CUT: std::sync::OnceLock<Cut> = std::sync::OnceLock::new();
     CUT.get_or_init(|| {
-        let field = chain();
+        let field = chain().with_exact_word();
         let theta = generic(&field, 65);
         cut_at(field, theta)
     })
@@ -644,8 +711,8 @@ fn the_conductance_gradient_is_the_derivative_in_the_admittance() {
     assert_eq!(
         tangent(
             cut,
-            (&chain_with(integer(3)), theta),
-            (&chain_with(integer(1)), theta)
+            (&chain_with(integer(3)).with_exact_word(), theta),
+            (&chain_with(integer(1)).with_exact_word(), theta)
         ),
         &cut.back.conductance[0] * power_of_two(&exponent.carry).unwrap(),
         "the conductance"
@@ -670,7 +737,10 @@ fn the_moment_covector_is_the_derivative_in_the_phase_counts() {
         pair.earlier_reads().to_vec(),
     )
     .unwrap();
-    let quiet = cut_at(chain(), theta.clone().with_pair(0, 1, silent).unwrap());
+    let quiet = cut_at(
+        chain().with_exact_word(),
+        theta.clone().with_pair(0, 1, silent).unwrap(),
+    );
     let covector = quiet.pullback.rings[0].moment.as_ref().unwrap();
     let (_, other) = moment(&quiet.field, 68, 21);
     let moved = PendingRatio::produce(&current, &other, quiet.pending.phases(), 0);

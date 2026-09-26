@@ -14,6 +14,9 @@
 //!   the contact's midpoint two-port, the global power and the causal cone;
 //! - [`word`]: a [`Word`], one evaluation at one cut's fixed operands, opening at zero change and
 //!   releasing it at its end;
+//! - [`chart`]: the word on its declared lattices (Decision 24): every inverse a certified lattice
+//!   chart refined by rounded Newton–Schulz steps, every transient carried with error feedback, the
+//!   integer products under the carrier's ℓ1 certificate, and the declared precisions by rule;
 //! - [`receiving`]: [`ReceivingPhases`] and the read at the receiver's grain `L_R`;
 //! - [`keys`]: the data → menu map, key location per ring in carry order, and gauge fixing.
 //!
@@ -36,6 +39,7 @@
 //! | the junction Swing | `HNN/Propagation.{anchor_is_participation, junctionSwing_involutive, junctionSwing_isometry}` | [`propagation::junction_swing`] |
 //! | the contact two-port | `HNN/Propagation.{partialIsometry_transit, transit_balance, tick_well_defined}` | [`propagation::transit`], [`Contact`] |
 //! | the causal cone | `HNN/Word.word_tick_cone` (the concrete tick) | [`Word::support`] |
+//! | the word on declared lattices: certified inverse charts, error feedback, the executed adjoint, the balance up to the residual | `HNN/LatticeWord.{nsStep, rounded_refinement_certificate, roundedIter_certificate, warm_start_certificate, inverse_chart_deviation, feedback_tick, carried_word_accounting, executed_adjoint_unique, executed_adjoint_deviation, cayley_chart_energy}` | [`chart`], [`Word`], [`Word::pull_back`], [`propagation::TickBalance`] |
 //! | the moment | `HNN/Moment.{encoderMoment_contract, encoder_covector_tape_free, closingRing_moment_is_phaseBinned, exteriorOffset_independent_of_E, selective_position, moment_capacity}` | [`SourceMoment`], [`moment::capacity`] |
 //! | the word opens at zero | structural: [`Current`] has no wave field (`HNN/Retention.word_opens_at_zero` is the abstract trajectory's linearity) | [`Word::open`] |
 //! | keys | `HNN/Keys.{field_loop_fibre, selective_step_dormant, propagation_eq_edge_fibre, gauge_fix_unique}` | [`keys`], [`crate::compression::Menu::propagate`] |
@@ -56,6 +60,7 @@
     clippy::disallowed_methods
 )]
 
+pub mod chart;
 pub mod constitution;
 pub mod field;
 pub mod keys;
@@ -70,6 +75,7 @@ pub mod reference;
 pub mod retention;
 pub mod word;
 
+pub use chart::{ChartKey, ChartReading, ChartStart, ChartWords, Charts, Remainders, WordLattice};
 pub use constitution::{Carrier, CarrierBits, Constitution, Lattice, Locus, NormalLaw, Steps};
 
 pub use field::{
@@ -258,6 +264,16 @@ pub enum HnnError {
     CellNotOneHot { position: usize },
     #[error("the release was refused: {0}")]
     ReleaseRefused(#[from] WidthRefusal),
+    #[error("the carrier refused {what}: nothing is rounded")]
+    Carrier { what: &'static str },
+    #[error(
+        "the chart {chart:?} did not refine below its certificate {certificate}: the target is {target}"
+    )]
+    ChartCertificate {
+        chart: ChartKey,
+        certificate: Box<Rat>,
+        target: Box<Rat>,
+    },
 }
 
 macro_rules! boxed_from {

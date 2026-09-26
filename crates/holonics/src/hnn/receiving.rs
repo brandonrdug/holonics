@@ -159,16 +159,19 @@ impl ReceivingPhases {
         Ok(phases)
     }
 
-    /// **The receiving ring's observability rank over the word**: the rank of the exact linear map
-    /// from the source rings' open storage to the anchors `(v_R(e_0), …, v_R(e_last))`, one word per
-    /// source coordinate.
+    /// **The receiving ring's observability rank over the word**: the rank of the exact law's linear
+    /// map from the source rings' open storage to the anchors `(v_R(e_0), …, v_R(e_last))`, one
+    /// word per source coordinate. [agent-inferred] The rank is the medium's, read under the exact
+    /// law ([`Operands::exact_at_cut`]): the executed word carries its transients on a lattice and
+    /// is linear only up to its released remainders, so a rank read through it would count the
+    /// splits, not the medium.
     pub fn observability(
         &self,
         field: &Field,
         constitution: &impl ConstitutionRead,
         current: &Current,
     ) -> Result<usize, HnnError> {
-        let operands = Operands::at_cut(field, constitution, current)?;
+        let operands = Operands::exact_at_cut(field, constitution, current)?;
         let mut columns: Vec<Vec<Rat>> = Vec::new();
         for &source in field.sources() {
             for coordinate in 0..field.ring(source).width() {
