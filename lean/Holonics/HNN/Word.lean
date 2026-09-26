@@ -48,6 +48,14 @@ standing, and `W_c` is the learned contrast port.
    output vanishes when the block and every block one tick carries into it vanished
    (`fieldTick_local`), so a change supported on blocks `Z` is supported after `t` ticks within `t`
    hops of `Z` on the word's ring/contact block graph `blockAdj` (`word_tick_cone`).
+7. **The executed tick, every defect stated** (campaign 2, Lean item 8; Decision 24). A junction
+   about any executed anchor moves the weighted power by `4W⟨v̂, v̂ − v*⟩`
+   (`junctionSwing_executed`); an element at any executed output adds its chart defect `⟨x̄, e⟩`
+   (`element_executed_balance`); a transit at any executed rate adds `⟨ω, M ω − r⟩`
+   (`transit_executed_balance`). Summed, the field's power moves by the contacts' dissipation, the
+   rings' passive work, `Π_c`, and the junction, element and transit defects, none set to zero
+   (`field_executed_balance_with_defects`); at the law's values it is `word_tick_balance`. Its
+   executed consumer is `hnn::word`'s field balance, which adds the carried outputs' splits.
 
 [open] The diamond and retention laws (`Propagation` §4, `Retention`) are proved for the abstract
 `BlockOp` word, not for `fieldTick`. Writing `fieldTick` as a linear block operator family on
@@ -710,6 +718,251 @@ theorem word_tick_cone {μ : Medium endRing V Ch ρ} (hμ : μ.Admissible) (X : 
 
 end Tick
 
+/-! ## 3. The executed tick: every defect stated -/
+
+section Executed
+
+/-- [proved-derived; formal-checked] **The junction Swing about an executed anchor.** For any anchor
+`v̂` (the carried anchor, split on its lattice), the `W`-weighted power of the swung waves moves by
+exactly `4W⟨v̂, v̂ − v*⟩`, `W = Y + Σ G` the admittance sum and `v*` the participation anchor: zero at
+the law's anchor (`junctionSwing_isometry`). -/
+theorem junctionSwing_executed {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V]
+    {ι : Type*} [Fintype ι] (Y : ℝ) (G : ι → ℝ) (hsum : admittanceSum Y G ≠ 0) (s : V)
+    (a : ι → V) (v : V) :
+    Y * ‖swing v s‖ ^ 2 + ∑ p, G p * ‖swing v (a p)‖ ^ 2 =
+      Y * ‖s‖ ^ 2 + ∑ p, G p * ‖a p‖ ^ 2 +
+        4 * admittanceSum Y G * inner ℝ v (v - anchor Y G s a) := by
+  have hv : admittanceSum Y G • anchor Y G s a = Y • s + ∑ p, G p • a p :=
+    admittanceSum_smul_anchor Y G hsum s a
+  have hpair : Y * inner ℝ v s + ∑ p, G p * inner ℝ v (a p) =
+      admittanceSum Y G * inner ℝ v (anchor Y G s a) := by
+    have := congrArg (fun x => inner ℝ v x) hv
+    simp only [inner_add_right, inner_sum, inner_smul_right] at this
+    linarith
+  simp only [norm_swing_sq]
+  have hexp : ∑ p, G p * (‖a p‖ ^ 2 - 4 * inner ℝ v (a p) + 4 * ‖v‖ ^ 2) =
+      ∑ p, G p * ‖a p‖ ^ 2 - 4 * ∑ p, G p * inner ℝ v (a p) + 4 * (∑ p, G p) * ‖v‖ ^ 2 := by
+    simp only [mul_add, mul_sub, Finset.sum_add_distrib, Finset.sum_sub_distrib, Finset.mul_sum,
+      Finset.sum_mul]
+    congr 1
+    · congr 1
+      exact Finset.sum_congr rfl fun p _ => by ring
+    · exact Finset.sum_congr rfl fun p _ => by ring
+  rw [hexp, inner_sub_right, real_inner_self_eq_norm_sq]
+  simp only [admittanceSum] at hpair ⊢
+  nlinarith [hpair]
+
+/-- [proved-derived; formal-checked] **The element at an executed output.** For any output `ŝ′` (the
+chart's image), with `x̄ = ½(b + ŝ′)` and the equation residual `e = ŝ′ − b − K x̄ − W_c c`:
+`½|ŝ′|² − ½|b|² = ⟨x̄, W_s x̄⟩ + ⟨x̄, W_c c⟩ + ⟨x̄, e⟩`; `e = 0` is the law's step
+(`reaction_stage_balance`). -/
+theorem element_executed_balance {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+    {Cn : Type*} [NormedAddCommGroup Cn] [InnerProductSpace ℝ Cn] {ρ : Type*} [Fintype ρ]
+    (Ws : E →L[ℝ] E) {A : ρ → E →L[ℝ] E} (hA : ∀ r v, inner ℝ v (A r v) = 0) (σ : ρ → ℝ)
+    (Wc : Cn →L[ℝ] E) (b s' : E) (c : Cn) :
+    (1 / 2 : ℝ) * ‖s'‖ ^ 2 - (1 / 2 : ℝ) * ‖b‖ ^ 2 =
+      inner ℝ (midpoint b s') (Ws (midpoint b s')) + inner ℝ (midpoint b s') (Wc c) +
+        inner ℝ (midpoint b s') (s' - b - devK Ws A σ (midpoint b s') - Wc c) := by
+  have hK := inner_devK Ws A hA σ (midpoint b s')
+  have hl : inner ℝ (midpoint b s') (s' - b) = (1 / 2 : ℝ) * ‖s'‖ ^ 2 - (1 / 2 : ℝ) * ‖b‖ ^ 2 := by
+    simp only [midpoint, inner_smul_left, inner_add_left, inner_sub_right,
+      real_inner_self_eq_norm_sq, conj_trivial, real_inner_comm b s']
+    ring
+  rw [← hl]
+  simp only [inner_sub_right]
+  rw [hK]
+  ring
+
+/-- [proved-derived; formal-checked] **The transit at an executed rate.** For any rate `ω` (the
+executed chart's image, split on a lattice), symmetric `C`, `K` and `G ≠ 0`:
+`E_a′ − E_a + h⟨ω, D ω⟩ = (hG/4)(|α_g|² + |α_h|² − |α_g,out|² − |α_h,out|²) + ⟨ω, M_a ω − r⟩`, with
+`r = 2C w + h(α_g − α_h) − h K u`; the chart defect vanishes at the law's solve
+(`Propagation.transit_balance`). -/
+theorem transit_executed_balance {Ch : Type*} [NormedAddCommGroup Ch] [InnerProductSpace ℝ Ch]
+    (C D K : Ch →L[ℝ] Ch) (hC : ∀ x y, inner ℝ (C x) y = inner ℝ x (C y))
+    (hK : ∀ x y, inner ℝ (K x) y = inner ℝ x (K y)) {G h : ℝ} (hG : G ≠ 0) (u w αg αh ω : Ch) :
+    contactEnergy C K (u + h • ω) ((2 : ℝ) • ω - w) - contactEnergy C K u w +
+        h * inner ℝ ω (D ω) =
+      h * G / 4 * (‖αg‖ ^ 2 + ‖αh‖ ^ 2 - ‖αg - (2 / G) • ω‖ ^ 2 - ‖αh + (2 / G) • ω‖ ^ 2) +
+        inner ℝ ω (transitOperator C D K G h ω - ((2 : ℝ) • C w + h • (αg - αh) - h • K u)) := by
+  have hCw : inner ℝ w (C ω) = inner ℝ ω (C w) := by rw [← hC, real_inner_comm]
+  have hKu : inner ℝ u (K ω) = inner ℝ ω (K u) := by rw [← hK, real_inner_comm]
+  have hR : h * G / 4 * (‖αg‖ ^ 2 + ‖αh‖ ^ 2 - ‖αg - (2 / G) • ω‖ ^ 2 -
+      ‖αh + (2 / G) • ω‖ ^ 2) = h * (inner ℝ ω αg - inner ℝ ω αh) - 2 * h / G * ‖ω‖ ^ 2 := by
+    rw [norm_sub_smul_sq, norm_add_smul_sq, real_inner_comm αg ω, real_inner_comm αh ω]
+    field_simp
+    ring
+  rw [hR]
+  simp only [contactEnergy, transitOperator, map_add, map_sub, map_smul, inner_add_left,
+    inner_add_right, inner_sub_left, inner_sub_right, inner_smul_left, inner_smul_right,
+    conj_trivial, hCw, hKu, _root_.add_apply, _root_.smul_apply, ContinuousLinearMap.id_apply,
+    real_inner_self_eq_norm_sq]
+  ring
+
+variable {Ring Contact ρ : Type*} [Fintype Ring] [DecidableEq Ring] [Fintype Contact] [Fintype ρ]
+variable {V : Ring → Type*} [∀ r, NormedAddCommGroup (V r)] [∀ r, InnerProductSpace ℝ (V r)]
+  [∀ r, FiniteDimensional ℝ (V r)]
+variable {Ch : Contact → Type*} [∀ a, NormedAddCommGroup (Ch a)] [∀ a, InnerProductSpace ℝ (Ch a)]
+  [∀ a, FiniteDimensional ℝ (Ch a)]
+variable {endRing : Contact × Bool → Ring}
+
+/-- [definition] The executed junction's wave leaving at a contact end, about the executed anchor
+`v̂` of its ring. -/
+def endOutAt (v : (r : Ring) → V r) (arr : (e : Contact × Bool) → V (endRing e))
+    (e : Contact × Bool) : V (endRing e) :=
+  swing (v (endRing e)) (arr e)
+
+omit [Fintype Ring] [DecidableEq Ring] [Fintype Contact] [∀ r, InnerProductSpace ℝ (V r)]
+  [∀ r, FiniteDimensional ℝ (V r)] in
+theorem norm_portWave_swing (v : (r : Ring) → V r) (arr : (e : Contact × Bool) → V (endRing e))
+    (r : Ring) (p : Port endRing r) :
+    ‖swing (v r) (portWave endRing arr r p)‖ = ‖endOutAt v arr p.1‖ := by
+  obtain ⟨e, he⟩ := p
+  subst he
+  rfl
+
+/-- [proved-derived; formal-checked] **The field's executed balance with every defect stated**
+(Decision 24's executed word; Sol's review §1, "Committed balance"). One executed tick: each ring's
+junction Swings about its **executed** anchor `v̂_r`, each element returns any executed output `ŝ′_r`
+(its chart's image), and each transit runs at any executed rate `ω̂_a`. Then the field's power
+`P = (h/4)[Σ Y_r|s_r|² + Σ G_a|a|²] + Σ E_a` moves by exactly
+
+```text
+− h Σ_a ⟨ω̂_a, D_a ω̂_a⟩                          contact dissipation
++ (h/2) Σ_r Y_r ⟨x̄_r, W_s,r x̄_r⟩                 ring passive work
++ Π_c = (h/2) Σ_r Y_r ⟨x̄_r, W_c,r ĉ_r⟩            contrast-port power
++ h Σ_r W_r ⟨v̂_r, v̂_r − v*_r⟩                     junction defect (executed anchor against the participation mean)
++ (h/2) Σ_r Y_r ⟨x̄_r, e_r⟩                        element chart defect, e_r = ŝ′_r − b̂_r − K_r x̄_r − W_c,r ĉ_r
++ Σ_a ⟨ω̂_a, M_a ω̂_a − r_a⟩                        transit chart defect
+```
+
+with `b̂_r = 2v̂_r − s_r`, `ĉ_r = v̂_r − s_r`, `x̄_r = ½(b̂_r + ŝ′_r)`. None is set to zero; each
+vanishes exactly at the law's value, and there the balance is `word_tick_balance`. The splits of the
+carried outputs and the words' released remainders are exact differences the executed consumer adds
+(`hnn::word`), and the deposition work at a commit is `Holon/Deposition.deposition_work` at the change
+the word carries into it. -/
+theorem field_executed_balance_with_defects
+    (channel : (e : Contact × Bool) → Ch e.1 →L[ℝ] V (endRing e))
+    (Y : Ring → ℝ) (G : Contact → ℝ) (h : ℝ)
+    (Ws : (r : Ring) → V r →L[ℝ] V r) (A : (r : Ring) → ρ → V r →L[ℝ] V r) (σ : Ring → ρ → ℝ)
+    (Wc : (r : Ring) → V r →L[ℝ] V r) (C D K : (a : Contact) → Ch a →L[ℝ] Ch a)
+    (s : (r : Ring) → V r) (arr : (e : Contact × Bool) → V (endRing e))
+    (u w : (a : Contact) → Ch a)
+    (v s' : (r : Ring) → V r) (ω : (a : Contact) → Ch a)
+    (hsum : ∀ r, admittanceSum (Y r) (fun p : Port endRing r => G p.1.1) ≠ 0)
+    (hA : ∀ r i v, inner ℝ v (A r i v) = 0)
+    (hC : ∀ a x y, inner ℝ (C a x) y = inner ℝ x (C a y))
+    (hK : ∀ a x y, inner ℝ (K a x) y = inner ℝ x (K a y))
+    (hι : ∀ e, IsChannelEmbedding (channel e)) (hG : ∀ a, G a ≠ 0) :
+    fieldPower Y G h C K s' (endArrive channel G (endOutAt v arr) ω)
+        (fun a => u a + h • ω a) (fun a => (2 : ℝ) • ω a - w a) =
+      fieldPower Y G h C K s arr u w - h * ∑ a, inner ℝ (ω a) (D a (ω a)) +
+        h / 2 * ∑ r, Y r * inner ℝ (midpoint (swing (v r) (s r)) (s' r))
+          (Ws r (midpoint (swing (v r) (s r)) (s' r))) +
+        h / 2 * ∑ r, Y r * inner ℝ (midpoint (swing (v r) (s r)) (s' r))
+          (Wc r (v r - s r)) +
+        h * ∑ r, admittanceSum (Y r) (fun p : Port endRing r => G p.1.1) *
+          inner ℝ (v r) (v r - ringAnchor Y G s arr r) +
+        h / 2 * ∑ r, Y r * inner ℝ (midpoint (swing (v r) (s r)) (s' r))
+          (s' r - swing (v r) (s r) - devK (Ws r) (A r) (σ r)
+            (midpoint (swing (v r) (s r)) (s' r)) - Wc r (v r - s r)) +
+        ∑ a, inner ℝ (ω a) (transitOperator (C a) (D a) (K a) (G a) h (ω a) -
+          ((2 : ℝ) • C a (w a) +
+            h • (ContinuousLinearMap.adjoint (channel (a, true)) (endOutAt v arr (a, true)) -
+              ContinuousLinearMap.adjoint (channel (a, false)) (endOutAt v arr (a, false))) -
+            h • K a (u a))) := by
+  set o := endOutAt v arr
+  set b : (r : Ring) → V r := fun r => swing (v r) (s r)
+  set arr' := endArrive channel G o ω
+  -- the junctions: the executed anchor's defect
+  have hJ : ∑ r, Y r * ‖b r‖ ^ 2 + ∑ e, G e.1 * ‖o e‖ ^ 2 =
+      ∑ r, Y r * ‖s r‖ ^ 2 + ∑ e, G e.1 * ‖arr e‖ ^ 2 +
+        4 * ∑ r, admittanceSum (Y r) (fun p : Port endRing r => G p.1.1) *
+          inner ℝ (v r) (v r - ringAnchor Y G s arr r) := by
+    rw [← Fintype.sum_fiberwise endRing (fun e => G e.1 * ‖o e‖ ^ 2),
+      ← Fintype.sum_fiberwise endRing (fun e => G e.1 * ‖arr e‖ ^ 2), Finset.mul_sum,
+      ← Finset.sum_add_distrib, ← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
+    refine Finset.sum_congr rfl fun r _ => ?_
+    have hr := junctionSwing_executed (Y r) (fun p : Port endRing r => G p.1.1) (hsum r) (s r)
+      (portWave endRing arr r) (v r)
+    simp only [norm_portWave_swing, norm_portWave] at hr
+    have hanchor : anchor (Y r) (fun p : Port endRing r => G p.1.1) (s r) (portWave endRing arr r) =
+        ringAnchor Y G s arr r := rfl
+    rw [hanchor] at hr
+    change Y r * ‖swing (v r) (s r)‖ ^ 2 + ∑ p : Port endRing r, G p.1.1 * ‖o p.1‖ ^ 2 = _
+    have ho : ∀ p : Port endRing r, ‖o p.1‖ = ‖endOutAt v arr p.1‖ := fun p => rfl
+    simp only [ho]
+    linarith
+  -- the elements: their chart defects
+  have hE : ∀ r, ‖s' r‖ ^ 2 = ‖b r‖ ^ 2 +
+      2 * inner ℝ (midpoint (b r) (s' r)) (Ws r (midpoint (b r) (s' r))) +
+      2 * inner ℝ (midpoint (b r) (s' r)) (Wc r (v r - s r)) +
+      2 * inner ℝ (midpoint (b r) (s' r)) (s' r - b r - devK (Ws r) (A r) (σ r)
+        (midpoint (b r) (s' r)) - Wc r (v r - s r)) := by
+    intro r
+    have := element_executed_balance (Ws r) (hA r) (σ r) (Wc r) (b r) (s' r) (v r - s r)
+    linarith
+  -- the transits: their chart defects
+  have hT : ∀ a, contactEnergy (C a) (K a) (u a + h • ω a) ((2 : ℝ) • ω a - w a) -
+      contactEnergy (C a) (K a) (u a) (w a) + h * inner ℝ (ω a) (D a (ω a)) =
+        h / 4 * (G a * ‖o (a, true)‖ ^ 2 + G a * ‖o (a, false)‖ ^ 2 -
+          (G a * ‖arr' (a, true)‖ ^ 2 + G a * ‖arr' (a, false)‖ ^ 2)) +
+        inner ℝ (ω a) (transitOperator (C a) (D a) (K a) (G a) h (ω a) -
+          ((2 : ℝ) • C a (w a) +
+            h • (ContinuousLinearMap.adjoint (channel (a, true)) (o (a, true)) -
+              ContinuousLinearMap.adjoint (channel (a, false)) (o (a, false))) -
+            h • K a (u a))) := by
+    intro a
+    rw [transit_executed_balance (C a) (D a) (K a) (hC a) (hK a) (hG a)]
+    congr 1
+    have hg : ‖arriveG (channel (a, true)) (G a) (o (a, true)) (ω a)‖ ^ 2 =
+        ‖o (a, true)‖ ^ 2 -
+          2 * (2 / G a) * inner ℝ (ContinuousLinearMap.adjoint (channel (a, true)) (o (a, true)))
+            (ω a) + (2 / G a) ^ 2 * ‖ω a‖ ^ 2 := by
+      rw [arriveG, @norm_sub_sq_real, inner_smul_right, norm_smul, mul_pow, Real.norm_eq_abs,
+        sq_abs, channel_norm_sq (hι (a, true)), ContinuousLinearMap.adjoint_inner_left]
+      ring
+    have hh : ‖arriveH (channel (a, false)) (G a) (o (a, false)) (ω a)‖ ^ 2 =
+        ‖o (a, false)‖ ^ 2 +
+          2 * (2 / G a) * inner ℝ (ContinuousLinearMap.adjoint (channel (a, false)) (o (a, false)))
+            (ω a) + (2 / G a) ^ 2 * ‖ω a‖ ^ 2 := by
+      rw [arriveH, @norm_add_sq_real, inner_smul_right, norm_smul, mul_pow, Real.norm_eq_abs,
+        sq_abs, channel_norm_sq (hι (a, false)), ContinuousLinearMap.adjoint_inner_left]
+      ring
+    simp only [arr', endArrive, hg, hh, norm_sub_smul_sq, norm_add_smul_sq]
+    rw [real_inner_comm (ω a), real_inner_comm (ω a)]
+    ring_nf
+  have hTsum : ∑ a, (contactEnergy (C a) (K a) (u a + h • ω a) ((2 : ℝ) • ω a - w a) -
+      contactEnergy (C a) (K a) (u a) (w a)) + h * ∑ a, inner ℝ (ω a) (D a (ω a)) =
+        h / 4 * (∑ e, G e.1 * ‖o e‖ ^ 2 - ∑ e, G e.1 * ‖arr' e‖ ^ 2) +
+        ∑ a, inner ℝ (ω a) (transitOperator (C a) (D a) (K a) (G a) h (ω a) -
+          ((2 : ℝ) • C a (w a) +
+            h • (ContinuousLinearMap.adjoint (channel (a, true)) (o (a, true)) -
+              ContinuousLinearMap.adjoint (channel (a, false)) (o (a, false))) -
+            h • K a (u a))) := by
+    have := Finset.sum_congr rfl fun a (_ : a ∈ Finset.univ) => hT a
+    rw [sum_ends (fun e => G e.1 * ‖o e‖ ^ 2), sum_ends (fun e => G e.1 * ‖arr' e‖ ^ 2),
+      Finset.mul_sum, ← Finset.sum_add_distrib, ← Finset.sum_sub_distrib, Finset.mul_sum,
+      ← Finset.sum_add_distrib]
+    rw [← this]
+  have hEsum : ∑ r, Y r * ‖s' r‖ ^ 2 = ∑ r, Y r * ‖b r‖ ^ 2 +
+      2 * ∑ r, Y r * inner ℝ (midpoint (b r) (s' r)) (Ws r (midpoint (b r) (s' r))) +
+      2 * ∑ r, Y r * inner ℝ (midpoint (b r) (s' r)) (Wc r (v r - s r)) +
+      2 * ∑ r, Y r * inner ℝ (midpoint (b r) (s' r)) (s' r - b r - devK (Ws r) (A r) (σ r)
+        (midpoint (b r) (s' r)) - Wc r (v r - s r)) := by
+    simp only [hE, mul_add, Finset.sum_add_distrib, Finset.mul_sum]
+    congr 1
+    · congr 1
+      · congr 1
+        exact Finset.sum_congr rfl fun r _ => by ring
+      · exact Finset.sum_congr rfl fun r _ => by ring
+    · exact Finset.sum_congr rfl fun r _ => by ring
+  simp only [fieldPower]
+  rw [Finset.sum_sub_distrib] at hTsum
+  linear_combination (h / 4) * hJ + hTsum + (h / 4) * hEsum
+
+end Executed
+
 section Audit
 
 #print axioms reaction_stage_balance
@@ -723,6 +976,10 @@ section Audit
 #print axioms fieldTick_balance
 #print axioms fieldTick_local
 #print axioms word_tick_cone
+#print axioms junctionSwing_executed
+#print axioms element_executed_balance
+#print axioms transit_executed_balance
+#print axioms field_executed_balance_with_defects
 
 end Audit
 

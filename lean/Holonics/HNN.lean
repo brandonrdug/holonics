@@ -14,12 +14,15 @@ import Holonics.HNN.LandmarkAddress
 import Holonics.HNN.LandmarkCarrier
 import Holonics.HNN.Retention
 import Holonics.HNN.Keys
+import Holonics.HNN.Ring
+import Holonics.HNN.Contact
+import Holonics.HNN.ContactBreak
 
 /-!
 # The HNN law
 
 [definition] Rebuild step 4 (#73), campaign 1: the laws of `docs/plans/THE_REBUILD.md`, "Step 4
-design: the HNN law", table (b) rows 1–7, stated before their Rust owners in `holonics::hnn`.
+design: the HNN law", table (b) rows 1–8, stated before their Rust owners in `holonics::hnn`.
 
 | Module | Design item | Rust consumer |
 |---|---|---|
@@ -39,4 +42,7 @@ design: the HNN law", table (b) rows 1–7, stated before their Rust owners in `
 | `HNN/LandmarkCarrier` | Campaign 2, item 14: the tree's carriers rebase past their width with an enclosed released remainder | `hnn::landmark` |
 | `HNN/Retention` | 6. retention as the collapse onto what the admitted future distinguishes | `hnn::{retention, pending}` |
 | `HNN/Keys` | 7. keys by loop closure, and selective stepping | `hnn::keys` |
+| `HNN/Ring` | campaign 2, item 8: the ring's mode tick keeps `Q = diag(K, C)`, its denominator, its executed balance with pump and port work, the two-port reference change, crossings as epoch ticks, the pump and the sheets | `hnn::ring` |
+| `HNN/Contact` | campaign 2, item 8: the contact's transfer and site kind by its stiffness's sign, the boost's certified solve or singular direction, the signed-storage balance, the lock address from the measured winding pair | `hnn::contact`, `hnn::propagation` |
+| `HNN/ContactBreak` | campaign 2, item 8: the released storage `R = E_a + W_a − D_a − E_a′`, the advance `R ≥ J`, Griffith's closed-port case, the parted face's typed gluing defect | `hnn::contact`, `hnn::field` |
 -/
