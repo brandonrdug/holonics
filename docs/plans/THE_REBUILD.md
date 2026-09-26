@@ -2476,3 +2476,38 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
     stays the parity target; the measurement that took one core for hours (Decision 24) is the
     lesson. Campaign 1's word, return and charts run resident with every return equal to the host;
     the declared crossings above stay on the host, so the HNN is not yet wholly card-resident.
+
+26. **Campaign 1's repair: the receiving law regresses the log Holon ratio onto the target's code
+    face; the face reads a standing coordinate; the source opens on its indexed, normalized
+    counts.** From the located failure and the loss law (loss is `ℓ = log R`; its additive chart's
+    real part is the difference of log faces, of which `p − q` is the codec-chart part):
+    - **The target's code face.** A one-hot target has no finite logit, so the receiver declares
+      a finite, gauge-fixed chart `χ_R(T) = m·e_t`: the target Holon's face at the receiver's
+      grain. `m` is the least integer whose face codes the target within the receiver's
+      tolerance of one grain per cell, `(2^m + |A| − 1)^(L_R) ≤ 2^(m L_R + 1)` (exact in
+      integers; `m = 13` at `|A| = 2^8`, `L_R = 2^4`).
+    - **The receiving locus's normal law** retains the statistic `(H, B)`, with
+      `H' = H + Σ w f fᵀ`, `B' = B + Σ w χ_R(T) fᵀ`, from comparisons whose covectors reached it,
+      and executes `W' = W + (T − W F) X̂` at the certified chart (Decision 24). Its exact receipt
+      is `W'H' − B' = −(T − WF)(1 − X̂H')`. The prior decays exactly as `W_0 H_0 H_n⁻¹`. The loss it
+      descends is the squared additive-chart log ratio, named as such; descent of the
+      cross-entropy face is not claimed, and the exposure's receipt decides. Internal loci keep
+      the prox step on their reached covectors.
+    - **The standing read.** The face reads the receiving parametron's bound harmonic coordinate
+      `h_R` (`P_R h_R = h_R`), a constitution coordinate changed only by deposition:
+      `f = R P_R^(τ_R)(v_R + h_R)`. Its return is `Rᵀg` projected onto the harmonic coordinate.
+    - **The indexed, normalized open.** The source opens on its phase counts normalized by their
+      population, `M_g[c,x]/n_g` as exact ratios with remainder, and on the pair-port slice
+      addressed by the retained window, `C^δ_g[c,x,a]/N_(g,δ,a)`. A zero population leaves an
+      unsupported fibre and contributes nothing. No tape is added; the window is already retained.
+    - Each feature-law change starts a fresh constitution, since an old statistic cannot be
+      re-read through new features without the samples retention forbids. The device port keeps
+      exact parity with every change.
+
+    Success, stated exactly: on the unchanged held-out cells, the model's code length is strictly
+    less than online order-0's, decided by disjoint exact enclosures or an algebraic sign
+    certificate.
+
+    Source: agent-inferred, from the located failure, Sol's derivation (the finite-chart
+    obstruction, the prior-weight identity, the harmonic standing read, the indexed pair read)
+    and CLAUDE.md's loss law. Brandon may override it.
