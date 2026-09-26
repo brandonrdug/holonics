@@ -32,9 +32,9 @@
 //! `Δx = (η_x / h_x') G_x` (the product `rate_times` reads by Euclid's remainder), and checks the
 //! carry's accounting on every carried entry of the constitution, `x' + r' + e = x + r + Δ`
 //! (Lean `HNN/LatticeDeposit.carry_accounting`), which holds exactly when the published update is
-//! the termwise one. It checks each normal law's solved chart: where the carried Gram took `ΔH`
-//! exactly, against the termwise Sherman–Morrison steps from the predecessor's chart (whose base,
-//! the unit prior's, is `I`); otherwise against the carried Gram's certified inverse.
+//! the termwise one. It checks each normal law's solved chart against its certificate: the exact
+//! left residual `‖1 − X̂H‖∞` is at most the chart's certified `δ` (Decision 24, Lean
+//! `HNN/LatticeWord.rounded_refinement_certificate_left`).
 //!
 //! [established-bounded; measured] **`openness`** reads campaign 1's declared field (review C2): the
 //! least source-to-receiver path attenuation `2^(−Σ_a β_a Q_a / 2)` within the receiver's last
@@ -721,44 +721,27 @@ fn termwise(
                 }
             }
         }
-        let exact =
-            (0..n).all(|i| (0..n).all(|j| gram_after[i][j] == &gram_before[i][j] + &gram[i][j]));
-        if exact {
-            // Sherman–Morrison, termwise, from the predecessor's chart.
-            let mut chart = rows(was.solved());
-            for sample in &step.samples {
-                if sample.weight.is_zero() || sample.feature.iter().all(Zero::is_zero) {
-                    continue;
-                }
-                let reach = apply(&chart, &sample.feature);
-                let denominator = Rat::one()
-                    + &sample.weight
-                        * sample
-                            .feature
-                            .iter()
-                            .zip(&reach)
-                            .map(|(f, s)| f * s)
-                            .sum::<Rat>();
-                let factor = &sample.weight / denominator;
-                for (row, left) in chart.iter_mut().zip(&reach) {
-                    for (entry, right) in row.iter_mut().zip(&reach) {
-                        *entry -= &factor * left * right;
-                    }
-                }
-            }
-            assert_eq!(chart, solved, "{locus:?}: the Sherman–Morrison chart");
-            branches[0] += 1;
-        } else {
-            assert_eq!(
-                law.gram()
-                    .inverse()
-                    .expect("a positive definite carried Gram")
-                    .to_rows(),
-                solved,
-                "{locus:?}: the solved chart"
-            );
-            branches[1] += 1;
-        }
+        // Decision 24: the solved chart is a lattice chart with an exactly certified left residual
+        // `‖1 − X̂H‖∞ ≤ δ` within its declared target; the exact Sherman–Morrison and inversion
+        // branches are retired.
+        let _ = &gram_before;
+        let product = rows(law.solved().multiply(&law.gram()).expect("square charts"));
+        let residual = (0..n)
+            .map(|i| {
+                (0..n)
+                    .map(|j| {
+                        let identity = if i == j { Rat::one() } else { Rat::zero() };
+                        (identity - &product[i][j]).abs()
+                    })
+                    .sum::<Rat>()
+            })
+            .max()
+            .unwrap_or_else(Rat::zero);
+        assert!(
+            &residual <= law.chart().certificate(),
+            "{locus:?}: the solved chart's certificate"
+        );
+        branches[usize::from(gram_after != gram_before)] += 1;
         for (i, row) in gram.into_iter().enumerate() {
             for (j, value) in row.into_iter().enumerate() {
                 add((locus, Carrier::Gram, i * n + j), value);
@@ -892,7 +875,7 @@ fn equality(which: &str, deposits: usize, steps: &Steps) {
             solved[0] += branches[0];
             solved[1] += branches[1];
             println!(
-                "deposit {done}: {} carried entries equal their termwise accounting ({} updated); solved charts: {} Sherman–Morrison, {} inverse",
+                "deposit {done}: {} carried entries equal their termwise accounting ({} updated); solved charts certified: {} on an unmoved Gram, {} on a moved one",
                 now.len(),
                 updates.len(),
                 branches[0],
@@ -903,7 +886,7 @@ fn equality(which: &str, deposits: usize, steps: &Steps) {
         |_, _, (), _| {},
     );
     println!(
-        "every value equal over {done} deposits: {entries} carried entries checked, {} solved charts by Sherman–Morrison and {} by inversion, in {} ms",
+        "every value equal over {done} deposits: {entries} carried entries checked, {} solved charts certified on an unmoved Gram and {} on a moved one, in {} ms",
         solved[0],
         solved[1],
         clock.elapsed().as_millis()

@@ -92,33 +92,43 @@
 //! `K` of the deposit map, which is owed. Brandon may override this choice.
 //!
 //! A [`NormalLaw`] keeps `W` and its Gram `H` of the locus's own width (no global Gram), each
-//! carried, and the solved chart `H⁻¹` of the carried Gram: by Sherman–Morrison when a deposit
-//! applies its rank-one terms exactly (integer counts at `E`), and by one exact inversion when the
-//! split moved it otherwise. [proved-derived; formal-checked] **The carried Gram stays positive
+//! carried, and the **solved chart** `X̂ ≈ H⁻¹` of the carried Gram (Decision 24, Lean
+//! `HNN/LatticeWord`; [`SolvedChart`]): a lattice matrix on `2^(−L_s)ℤ` with its certified left
+//! residual `δ = ‖1 − X̂H‖∞`, computed exactly, warm-started from the previous chart at each deposit
+//! and refined by rounded Newton–Schulz steps until `δ ≤ δ_ℓ`, both declared by rule
+//! ([`ChartRule`]) so that the prox identity's released residual moves a read by less than the
+//! receiver's grain. The exact solved chart it replaces grew by the Hadamard bound of the carried
+//! Gram (0.40 Mbit over 24 windows of the standing real cut, still growing). [proved-derived;
+//! formal-checked] **The carried Gram stays positive
 //! definite with no clamp** (Lean `carried_gram_posDef`, `carried_gram_posDef_rule`): every entry
 //! of `H` is within one unit of the exact Gram `H_exact = I + Σ w f fᵀ ⪰ I`
 //! (`within_one_unit_since_founding`), so `|vᵀ(H − H_exact)v| ≤ u(Σ|v_i|)² ≤ n·u·|v|²` for its
 //! width `n`, and since the lattice rule's `X_ℓ` is at least `n`, `n·u ≤ 1/(2L_R)` and
 //! `H ⪰ (1 − 1/(2L_R)) I` since the locus's founding. `B` is not carried: under `W H = B` it is
-//! `W H`, and the prox step `W' = W + γ G H'⁻¹` (Lean `HNN/Normal.normal_prox_step`) needs only
-//! `W`, `H'` and `G`. The factor carriers keep `C`, `K`, `D` and `−W_s` positive semidefinite as
+//! `W H`, and the prox step `W' = W + γ G X̂` (Lean `HNN/Normal.normal_prox_step` at the exact
+//! inverse, `HNN/LatticeWord.prox_chart_residual` at the chart) needs only `W`, the chart of `H'` and
+//! `G`. The factor carriers keep `C`, `K`, `D` and `−W_s` positive semidefinite as
 //! squares, with no clamp and no projection (Lean `factorCarrier_psd`). [agent-inferred] `h_x` is a
 //! statistic like `H`: it accumulates over deposits, starting at 1, so a factor step is
 //! preconditioned by its family's own feature energy.
 //!
 //! [definition] **The budget and stop rule** (design (d), R3 §5): the successor is computed exactly
 //! and its exact bits (every numerator and denominator: the lattice entries, the carried remainders,
-//! the statistics and the solved charts) are counted before publication. Past `B_Θ` the deposit is
-//! refused with [`HnnError::ConstitutionBudget`], naming the loci that grew most; the predecessor
+//! the statistics and the solved charts at their lattices) are counted before publication. Past
+//! `B_Θ` the deposit is refused with [`HnnError::ConstitutionBudget`], naming the loci that grew most; the predecessor
 //! stays published. The lattice bounds the entries' bits (`lattice_bits_bounded`) and the clock the
 //! remainders' (`remainder_rat_bits_bounded`); [`Constitution::carrier_bits`] reads the three parts
-//! separately, and [`DepositReading`] the released residuals and their bits. The deposit clocks,
+//! separately, and [`DepositReading`] the released residuals and their bits, with each chart's
+//! certificate and released prox residual ([`ChartReading`]). The deposit clocks,
 //! like the commit counter, are counters of `⌈log₂ m⌉` bits and are not counted against `B_Θ`.
 //!
 //! | Lean | Rust |
 //! |---|---|
 //! | `HNN/Normal.normal_prox_step` at the carried Gram, with `HNN/LatticeDeposit.within_one_unit_since_founding` | [`NormalLaw`]: `W` is the prox iterate at the carried Gram `H'` (`B` is not carried, so `W` is not the minimizer of the accumulated `J(W)`), and `H` stays within one unit of the exact statistic `I + Σ w f fᵀ` |
-//! | `HNN/Normal.normal_prox_step`, `depositLocus_solves` | [`NormalLaw::deposited`] (the exact step at the carried Gram) |
+//! | `HNN/Normal.normal_prox_step`, `depositLocus_solves`; `HNN/LatticeWord.{prox_chart_residual, prox_chart_certificate}` | [`NormalLaw::deposited`] (the step at the carried Gram through the executed chart, its residual released and reported: [`ChartReading`]) |
+//! | `HNN/LatticeWord.{nsStep, newton_schulz_left, rounded_refinement_residual_left, rounded_refinement_certificate_left, rowNorm, latticeChart}` | [`SolvedChart`] (the certificate and the rounded refinement) |
+//! | `HNN/LatticeWord.{warm_start_residual, warm_start_certificate}` | [`SolvedChart`] (why the warm start takes the window's rank-one steps) |
+//! | `HNN/LatticeWord.{roundedIter_certificate, newton_schulz_iter_left, inverse_chart_deviation}` | [`ChartRule`] (the lattice `L_s`, the target `δ_ℓ`, the refinement count) |
 //! | `HNN/Normal.normalStatistic_standing`, `objective_eq_statisticObjective`, for its statistic `H` only (carried on the lattice) | [`NormalLaw::gram`] (keeps `H`, never the samples) |
 //! | `HNN/Normal.deposit_local`, `windowGram_apply_eq_zero` | [`Constitution::deposited`] (per locus, only its window) |
 //! | `HNN/Normal.reaction_deposit_storage_unchanged`, `reaction_deposits_keep_committed_energy` | [`DepositReading::growth`] |
@@ -136,7 +146,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use num_bigint::BigInt;
-use num_traits::{One, Signed, Zero};
+use num_traits::{One, Signed, ToPrimitive, Zero};
 use rayon::prelude::*;
 
 use crate::hnn::HnnError;
@@ -146,8 +156,8 @@ use crate::hnn::port::Deposit;
 use crate::hnn::propagation::gram;
 use crate::hnn::realization::{indexed, outer_rows};
 use crate::holon::deposition::CommittedEnergyBound;
-use crate::ratio::linear::ExactRatMatrix;
-use crate::ratio::linear::vector::{Chart, integral, lcm, matrix_form, row_dot};
+use crate::ratio::linear::vector::{Chart, integral, lcm, matrix_form};
+use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
 use crate::ratio::{Rat, rat};
 
 /// The declared constitution budget of campaign 1: `B_Θ = 2^33` exact bits.
@@ -312,7 +322,6 @@ impl Carry {
     /// entry moves by `q·2^(−L)`, `r` is carried and `e` is staged for release. A zero update moves
     /// nothing and releases nothing (`carry_entry_zero`). A residual staged by an earlier step of the
     /// same deposit at this entry is taken back into `y`, so the deposit releases once per entry.
-    /// Returns whether the step applied `Δ` exactly (`q·2^(−L) = Δ`).
     fn deposit(
         &mut self,
         at: &mut BudgetedCarry,
@@ -320,9 +329,9 @@ impl Carry {
         index: usize,
         entry: &mut Rat,
         update: &Rat,
-    ) -> bool {
+    ) {
         if update.is_zero() {
-            return true;
+            return;
         }
         at.moved = true;
         let staged = at.staged.remove(&(carrier, index));
@@ -331,7 +340,7 @@ impl Carry {
         self.adopt(at, carrier, index, entry, carried)
     }
 
-    /// Carry a whole flat array's update, entry by entry. Returns whether every step was exact.
+    /// Carry a whole flat array's update, entry by entry.
     ///
     /// [definition; agent-inferred] Each entry's step reads only its own update, staged residual
     /// and carried remainder, and writes only its own: the entries run together
@@ -343,7 +352,7 @@ impl Carry {
         carrier: Carrier,
         entries: &mut [Rat],
         updates: &[Rat],
-    ) -> bool {
+    ) {
         let moving: Vec<(usize, Option<Staged>, Option<Rat>)> =
             (0..entries.len().min(updates.len()))
                 .filter(|&index| !updates[index].is_zero())
@@ -356,7 +365,7 @@ impl Carry {
                 })
                 .collect();
         if moving.is_empty() {
-            return true;
+            return;
         }
         at.moved = true;
         let (lattice, precision) = (at.lattice, at.precision());
@@ -377,15 +386,12 @@ impl Carry {
                 )
             })
             .collect();
-        let mut exact = true;
         for (index, step) in carried {
-            exact &= self.adopt(at, carrier, index, &mut entries[index], step);
+            self.adopt(at, carrier, index, &mut entries[index], step);
         }
-        exact
     }
 
-    /// Take one entry's carried step into the array, the carry and the budgeted carry. Returns
-    /// whether the step applied its update exactly.
+    /// Take one entry's carried step into the array, the carry and the budgeted carry.
     fn adopt(
         &mut self,
         at: &mut BudgetedCarry,
@@ -393,7 +399,7 @@ impl Carry {
         index: usize,
         entry: &mut Rat,
         step: CarriedEntry,
-    ) -> bool {
+    ) {
         *entry = step.entry;
         if !step.remainder.is_zero() {
             self.0.insert(index, step.remainder);
@@ -401,7 +407,6 @@ impl Carry {
         if let Some(staged) = step.staged {
             at.staged.insert((carrier, index), staged);
         }
-        step.exactly
     }
 
     /// The remainder at an entry.
@@ -418,13 +423,11 @@ impl Carry {
 type Staged = (Rat, BigInt);
 
 /// **One entry's carried step**, read alone: the entry moved by `q·2^(−L)`, the remainder `r` to
-/// carry, the residual and coordinate to stage (none when both are zero), and whether the step
-/// applied its update exactly.
+/// carry, and the residual and coordinate to stage (none when both are zero).
 struct CarriedEntry {
     entry: Rat,
     remainder: Rat,
     staged: Option<Staged>,
-    exactly: bool,
 }
 
 /// **One entry's budgeted deposit** of a nonzero update ([`Carry::deposit`], Lean `carry`,
@@ -461,11 +464,6 @@ fn carried_entry(
     // y_f = P·2^(−L−k): its coordinate at the lattice, nearest, ties upward.
     let (quotient, coordinate) = lattice.div_rem_coordinate(&point, precision);
     let remainder = Rat::new(coordinate, BigInt::one() << exponent as usize);
-    let exactly = if staged.is_zero() {
-        residual.is_zero() && remainder == previous
-    } else {
-        &remainder + &residual == previous + staged
-    };
     let entry = entry + Rat::new(quotient.clone(), lattice.scale());
     let applied = applied + quotient;
     let staged = (!residual.is_zero() || !applied.is_zero()).then_some((residual, applied));
@@ -473,7 +471,6 @@ fn carried_entry(
         entry,
         remainder,
         staged,
-        exactly,
     }
 }
 
@@ -516,8 +513,9 @@ fn flat_matrix(rows: usize, columns: usize, entries: Vec<Rat>) -> Result<ExactRa
 }
 
 /// [definition] **The constitution's bits by carrier** (the budget's parts): the lattice entries
-/// (maps, factors, statistics), their carried remainders, and the solved charts `H⁻¹` of the
-/// carried Grams; each value counted by its numerator's and denominator's bits.
+/// (maps, factors, statistics), their carried remainders, and the solved charts `X̂ ≈ H⁻¹` of the
+/// carried Grams at their lattices, with their certificates; each value counted by its numerator's
+/// and denominator's bits.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct CarrierBits {
     pub entries: u64,
@@ -594,6 +592,753 @@ impl Steps {
 }
 
 // -------------------------------------------------------------------------------------------
+// the solved chart
+
+/// `⌈log₂ x⌉` for `x ≥ 1` (`0` at `x ≤ 1`).
+fn ceil_log2(x: u128) -> u32 {
+    if x <= 1 {
+        0
+    } else {
+        128 - (x - 1).leading_zeros()
+    }
+}
+
+/// The widest shift a residual's coordinates take: `2^(L_s + e_H)` with its sign and one more bit
+/// of headroom stays inside the `i128` carrier.
+const RESIDUAL_SHIFT: u32 = 125;
+
+/// [definition; agent-inferred] **The chart rule of a normal law's locus** (Decision 24; Lean
+/// `HNN/LatticeWord.{prox_chart_certificate, rounded_refinement_certificate_left,
+/// roundedIter_certificate}`), declared from the locus's carrier lattice `L_ℓ` and the finest
+/// admitted receiver grain `L_R`, as `L_ℓ` is from `L_R` and `X_ℓ`:
+///
+/// ```text
+/// target     δ_ℓ = 2^(−D_ℓ) ,   D_ℓ = 2L_ℓ + 1 − ⌊log₂ L_R⌋        (so δ_ℓ ≤ L_R·2^(−2L_ℓ−1))
+/// lattice    L_s = D_ℓ + ⌈log₂ n⌉ + ⌈log₂ ‖H'‖∞⌉ + 2                (n the Gram's width)
+/// ```
+///
+/// **Why the target.** At an executed chart `X̂` of the carried successor Gram `H'`, the map step
+/// `ΔW = γ Σ w g fᵀX̂` leaves the prox identity `(W + ΔW)H' = WH' + γG` (`G = Σ w g fᵀ`) with the
+/// released residual `ρ = γG(1 − X̂H')` (`prox_chart_residual`, summed over the window's returns),
+/// `‖ρ‖∞ ≤ ‖γG‖∞ δ` (`prox_chart_certificate`). The map differs from the exact prox step's by
+/// `−ρH'⁻¹`, so a read at an operand `x` moves by `|ρ_i H'⁻¹ x| ≤ ‖ρ_i‖₂‖x‖₂/λ_min(H') ≤
+/// ‖ρ‖∞‖x‖₁/c`, with `c = 1 − 1/(2L_R)` the carried Gram's margin (`carried_gram_posDef_rule`).
+/// One return of a unit-scale covector (`‖wγg‖∞ ≤ 1`, the lattice rule's assumption) and a feature
+/// `‖f‖₁ ≤ X_ℓ` read at an operand `‖x‖₁ ≤ X_ℓ` therefore moves by at most `X_ℓ²δ/c`; the lattice
+/// rule's `2L_R X_ℓ ≤ 2^(L_ℓ)` makes that at most `2^(2L_ℓ)δ/(2L_R(2L_R − 1)) ≤ 1/(4L_R)` at
+/// `δ ≤ δ_ℓ`: the chart's release moves a read by no more than a carried remainder does
+/// (`remainder_below_grain`), below the receiver's grain. Each deposit reports the bound its own
+/// returns reach ([`ChartReading::read`]), so the unit-scale assumption is measured, as the lattice
+/// rule's is.
+///
+/// **Why the lattice.** A rounded refinement adds to the certificate the chart's rounding
+/// `‖ΔH'‖∞ ≤ n·2^(−L_s)/2·‖H'‖∞` (`rounded_refinement_certificate_left`) and the residual's rounding at
+/// the chart's lattice, `‖(R̃ − R)X̂H'‖∞ ≤ n·2^(−L_s)/2·(1 + δ)`; together at most
+/// `2n·2^(−L_s)‖H'‖∞ ≤ δ_ℓ/2`, so from any certificate at most `δ_ℓ` every rounded refinement stays
+/// at most `δ_ℓ` (`roundedIter_certificate` at `c = δ_ℓ ≤ 1/2`), and from above it the certificates
+/// fall to the fixed point near `δ_ℓ/2`. The Gram's own norm is read at each deposit, as the clock's
+/// Elias-gamma length is: the lattice refines as the Gram grows, and never coarsens (a coarser chart
+/// is a finer one's lattice point). Brandon may override the rule.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct ChartRule {
+    lattice: Lattice,
+    grain: u128,
+}
+
+impl ChartRule {
+    /// At a locus's carrier lattice and the finest admitted receiver grain `L_R ≥ 1`.
+    pub fn new(lattice: Lattice, grain: u128) -> Self {
+        Self {
+            lattice,
+            grain: grain.max(1),
+        }
+    }
+
+    /// `L_ℓ`'s lattice.
+    pub fn lattice(&self) -> Lattice {
+        self.lattice
+    }
+
+    /// `L_R`.
+    pub fn grain(&self) -> u128 {
+        self.grain
+    }
+
+    /// `D_ℓ = 2L_ℓ + 1 − ⌊log₂ L_R⌋` (at least 1).
+    pub fn target_exponent(&self) -> u32 {
+        (2 * self.lattice.exponent() + 1)
+            .saturating_sub(self.grain.ilog2())
+            .max(1)
+    }
+
+    /// `δ_ℓ = 2^(−D_ℓ)`.
+    pub fn target(&self) -> Rat {
+        Lattice::new(self.target_exponent()).unit()
+    }
+
+    /// `L_s = D_ℓ + ⌈log₂ n⌉ + ⌈log₂ ‖H'‖∞⌉ + 2` for a Gram of width `n` whose norm has
+    /// `⌈log₂ ‖H'‖∞⌉ = norm`.
+    pub fn exponent(&self, width: usize, norm: u32) -> u32 {
+        self.target_exponent() + ceil_log2(width as u128) + norm + 2
+    }
+
+    /// **The most a released prox residual of norm `‖ρ‖∞ ≤ released` moves a read** at an operand
+    /// of ℓ1 norm `X_ℓ ≤ 2^(L_ℓ)/(2L_R)`: `released · X_ℓ/c ≤ released · 2^(L_ℓ)/(2L_R − 1)`.
+    pub fn read(&self, released: &Rat) -> Rat {
+        released * Rat::new(self.lattice.scale(), BigInt::from(2 * self.grain - 1))
+    }
+
+    /// **The refinements one phase may take**: from the scaled identity `2^(−a)I`,
+    /// `a = ⌈log₂ ‖H'‖∞⌉`, the residual `1 − 2^(−a)H'` has spectrum in `[0, 1 − 2^(−a)c]`, and
+    /// `k` refinements raise it to the `2^k`-th power (`newton_schulz_iter_left`); its row
+    /// certificate is at most `√n` times its spectral radius, so
+    /// `a + ⌈log₂(D_ℓ + ⌈log₂ n⌉ + 2)⌉ + 4` refinements reach `δ_ℓ` with the rounding's margin.
+    fn refinements(&self, width: usize, norm: u32) -> u32 {
+        let depth = u128::from(self.target_exponent() + ceil_log2(width as u128) + 2);
+        norm + ceil_log2(depth) + 4
+    }
+}
+
+/// [definition; agent-inferred] **The solved chart** `X̂ ≈ H⁻¹` of a normal law's carried Gram
+/// (Decision 24; Lean `HNN/LatticeWord`): a symmetric lattice matrix on `2^(−L_s)ℤ` with its certified
+/// left residual `δ = ‖1 − X̂H‖∞`, computed exactly. The Gram is the identity off its **support**
+/// (the rows where a deposit moved it: `H = I + Σ w f fᵀ` moves only rows some feature reached), and
+/// so is the chart; the chart is carried on the support as integer coordinates (`i128`, with the
+/// carrier refused past it), and every product it takes is an integer product. The founding chart is
+/// exact: `H_0 = I`, `X̂ = I`, `δ = 0`.
+///
+/// A deposit ([`SolvedChart::deposited`]) moves the Gram to `H' = H + Σ w f fᵀ` (carried) and the
+/// chart in three stages, each on the successor's lattice:
+///
+/// ```text
+/// warm start   X₀ = X̂ − X̂F(Ω⁻¹ + FᵀX̂F)⁻¹FᵀX̂      the window's returns F, Ω = diag(w), one rank-one step each, rounded
+///              1 − X₀(H + FΩFᵀ) = (1 − X̂FS⁻¹Fᵀ)(1 − X̂H)                                              (exact identity)
+/// certificate  δ = ‖1 − X₀H'‖∞                      exact, from integer products
+/// refinement   X ← round((2 − XH')X) = round(X + R X) ,  R = 1 − XH'     until δ ≤ δ_ℓ ;  1 − X'H' = R² − (rounding)H'
+/// ```
+///
+/// [agent-inferred] The previous chart alone is not a warm start: after a deposit it has residual
+/// `(1 − X̂H) − X̂ΔH` (`warm_start_residual`), whose certificate `δ + ‖ΔH‖∞‖X̂‖∞`
+/// (`warm_start_certificate`) passes 1 whenever a return's feature is large (`‖f fᵀ‖∞` up to
+/// `X_ℓ²`), and the exact residual `−H⁻¹ΔH` then has spectral radius above 1, where Newton–Schulz
+/// diverges. The window's rank-one steps (Sherman–Morrison, read at the chart's lattice) carry the
+/// residual instead: with `S = Ω⁻¹ + FᵀX̂F` the identity above holds in any ring (it expands to
+/// `X̂F[Ω − S⁻¹(Ω⁻¹ + FᵀX̂F)Ω]Fᵀ = 0`), so an exact chart stays exact and a certified one keeps its
+/// residual up to `1 − X̂FS⁻¹Fᵀ` (near `H'⁻¹H`). The Lean statement of that identity is owed in #62
+/// ("Step 4 (#73) owed"); nothing rests on it, since the certificate is computed exactly afterwards.
+/// When the warm start's certificate is not below 1, or a refinement does not lower it, the chart
+/// restarts from the scaled identity `2^(−a)I`, whose residual is contracting (spectrum in `[0, 1)`).
+/// A refinement that does not reach `δ_ℓ` within the rule's count is refused. Sherman–Morrison and the
+/// exact inversion are retired as solves: the rank-one steps are only the warm start.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SolvedChart {
+    /// `L_s`: every entry lies on `2^(−L_s)ℤ`.
+    exponent: u32,
+    /// The Gram's support `S`, ascending; off it the chart is the identity.
+    support: Vec<usize>,
+    /// The chart on `S × S` as integer coordinates at `2^(−L_s)`, row-major and symmetric.
+    block: Vec<i128>,
+    /// `δ = ‖1 − X̂H‖∞`, exact.
+    certificate: Rat,
+}
+
+/// What one deposit's refinement of a chart read: the warm start's certificate (`None` when it left
+/// the `i128` carrier), the refinements taken, whether it restarted from the scaled identity, and the
+/// bits of the certified residual `1 − X̂H'` (its nonzero entries, reduced).
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct Refinement {
+    warm: Option<Rat>,
+    refinements: u32,
+    cold: bool,
+    residual_bits: u64,
+}
+
+/// A carried Gram read on its support: the support, the finest dyadic exponent `e_H` of its entries
+/// there, their integer coordinates at `2^(−e_H)` (row-major), and `⌈log₂ ‖H‖∞⌉` (0 at most 1).
+struct GramBlock {
+    support: Vec<usize>,
+    exponent: u32,
+    coordinates: Vec<i128>,
+    norm: u32,
+}
+
+impl GramBlock {
+    /// Read a carried Gram (every entry on a dyadic lattice), refusing a coordinate past `i128` and an
+    /// entry off every dyadic lattice (a Gram that is not carried has no chart).
+    fn of(gram: &[Vec<Rat>]) -> Result<Self, HnnError> {
+        let support: Vec<usize> = (0..gram.len())
+            .filter(|&i| {
+                gram[i].iter().enumerate().any(
+                    |(j, x)| {
+                        if i == j { !x.is_one() } else { !x.is_zero() }
+                    },
+                )
+            })
+            .collect();
+        let s = support.len();
+        let mut exponent = 0u32;
+        for &i in &support {
+            for &j in &support {
+                let denominator = gram[i][j].denom();
+                let twos = denominator.trailing_zeros().unwrap_or(0);
+                if denominator.bits() != twos + 1 {
+                    return Err(ExactLinearError::InverseCertificateFailure.into());
+                }
+                exponent = exponent.max(twos as u32);
+            }
+        }
+        let overflow = || HnnError::from(ExactLinearError::ExtentOverflow);
+        let mut coordinates = Vec::with_capacity(s * s);
+        let mut widest = 1u128 << exponent;
+        for &i in &support {
+            let mut row = 0u128;
+            for &j in &support {
+                let value = &gram[i][j];
+                let twos = value.denom().trailing_zeros().unwrap_or(0) as u32;
+                let coordinate = (value.numer() << (exponent - twos) as usize)
+                    .to_i128()
+                    .ok_or_else(overflow)?;
+                row = row
+                    .checked_add(coordinate.unsigned_abs())
+                    .ok_or_else(overflow)?;
+                coordinates.push(coordinate);
+            }
+            widest = widest.max(row);
+        }
+        let norm = ceil_log2(widest).saturating_sub(exponent);
+        Ok(Self {
+            support,
+            exponent,
+            coordinates,
+            norm,
+        })
+    }
+}
+
+/// One row of an integer product, exact: in the `i128` carrier while every partial sum fits it,
+/// otherwise in bounded-bit integers (the row's bits are at most the operands' plus `⌈log₂ s⌉`).
+enum ProductRow {
+    Narrow(Vec<i128>),
+    Wide(Vec<BigInt>),
+}
+
+impl ProductRow {
+    /// Row `row · B` of an `s × s` row-major `B`.
+    fn of(row: &[i128], matrix: &[i128], s: usize) -> Self {
+        let mut sums = vec![0i128; s];
+        let narrow = 'narrow: {
+            for (k, &left) in row.iter().enumerate() {
+                if left == 0 {
+                    continue;
+                }
+                for (sum, &right) in sums.iter_mut().zip(&matrix[k * s..(k + 1) * s]) {
+                    match left
+                        .checked_mul(right)
+                        .and_then(|term| sum.checked_add(term))
+                    {
+                        Some(value) => *sum = value,
+                        None => break 'narrow false,
+                    }
+                }
+            }
+            true
+        };
+        if narrow {
+            return ProductRow::Narrow(sums);
+        }
+        let mut sums = vec![BigInt::zero(); s];
+        for (k, &left) in row.iter().enumerate() {
+            if left == 0 {
+                continue;
+            }
+            let left = BigInt::from(left);
+            for (sum, &right) in sums.iter_mut().zip(&matrix[k * s..(k + 1) * s]) {
+                if right != 0 {
+                    *sum += &left * right;
+                }
+            }
+        }
+        ProductRow::Wide(sums)
+    }
+
+    /// Entry `j` with `offset − entry` taken, in the `i128` carrier or `None`.
+    fn subtracted_from(&self, j: usize, offset: i128) -> Option<i128> {
+        match self {
+            ProductRow::Narrow(sums) => offset.checked_sub(sums[j]),
+            ProductRow::Wide(sums) => (BigInt::from(offset) - &sums[j]).to_i128(),
+        }
+    }
+
+    /// Entry `j` at the nearest point of `2^(−k)` coarser, ties upward, in the `i128` carrier or
+    /// `None`.
+    fn nearest(&self, j: usize, k: u32) -> Option<i128> {
+        match self {
+            ProductRow::Narrow(sums) => nearest_shift(sums[j], k),
+            ProductRow::Wide(sums) => nearest_shift_wide(&sums[j], k).to_i128(),
+        }
+    }
+}
+
+/// `x·2^(−k)` at its nearest integer, ties upward (Lean `quot` at a coordinate).
+fn nearest_shift(x: i128, k: u32) -> Option<i128> {
+    if k == 0 {
+        return Some(x);
+    }
+    x.checked_add(1i128 << (k - 1)).map(|y| y >> k)
+}
+
+/// `x·2^(−k)` at its nearest integer, ties upward, in bounded-bit integers.
+fn nearest_shift_wide(x: &BigInt, k: u32) -> BigInt {
+    if k == 0 {
+        return x.clone();
+    }
+    (x + (BigInt::one() << (k - 1) as usize)) >> k as usize
+}
+
+/// `numerator / denominator` at its nearest integer, ties upward (`denominator > 0`).
+fn nearest_quotient(numerator: &BigInt, denominator: &BigInt) -> BigInt {
+    let top: BigInt = (numerator << 1usize) + denominator;
+    let bottom: BigInt = denominator << 1usize;
+    let (mut quotient, residue) = (&top / &bottom, &top % &bottom);
+    if residue.is_negative() {
+        quotient -= 1;
+    }
+    quotient
+}
+
+/// A symmetric `s × s` block from its upper-triangle rows (row `i` holds columns `i..s`).
+fn mirrored(s: usize, upper: Vec<Vec<i128>>) -> Vec<i128> {
+    let mut block = vec![0i128; s * s];
+    for (i, row) in upper.into_iter().enumerate() {
+        for (offset, value) in row.into_iter().enumerate() {
+            let j = i + offset;
+            block[i * s + j] = value;
+            block[j * s + i] = value;
+        }
+    }
+    block
+}
+
+/// **The certified residual** of a chart block `X` (at `2^(−L_s)`) against a Gram block `H` (at
+/// `2^(−e_H)`): `P = 2^(L_s + e_H)(1 − XH)` exactly, with `δ = max_i Σ_j |P_ij| · 2^(−L_s − e_H)`
+/// (Lean `rowNorm`). Each row reads only the shared blocks and writes only its own: the rows run
+/// together. `None` when an entry leaves the `i128` carrier.
+fn certified(block: &[i128], gram: &[i128], s: usize, shift: u32) -> Option<(Vec<i128>, Rat)> {
+    let one = 1i128 << shift;
+    let rows: Vec<Option<(Vec<i128>, u128)>> = (0..s)
+        .into_par_iter()
+        .map(|i| {
+            let product = ProductRow::of(&block[i * s..(i + 1) * s], gram, s);
+            let mut row = Vec::with_capacity(s);
+            let mut sum = 0u128;
+            for j in 0..s {
+                let value = product.subtracted_from(j, if i == j { one } else { 0 })?;
+                sum = sum.checked_add(value.unsigned_abs())?;
+                row.push(value);
+            }
+            Some((row, sum))
+        })
+        .collect();
+    let mut residual = Vec::with_capacity(s * s);
+    let mut widest = 0u128;
+    for row in rows {
+        let (row, sum) = row?;
+        widest = widest.max(sum);
+        residual.extend(row);
+    }
+    Some((
+        residual,
+        Rat::new(BigInt::from(widest), BigInt::one() << shift as usize),
+    ))
+}
+
+/// **One rounded Newton–Schulz refinement, left form** (Lean `nsStep`, `newton_schulz_left`,
+/// `rounded_refinement_certificate_left`): `X' = round(X + R̃X)` on `2^(−L_s)ℤ`, with `R̃` the certified
+/// residual `P·2^(−L_s−e_H)` read at the chart's lattice. `X + RX = (2 − XH)X` is symmetric for a
+/// symmetric `X` and `H`, so the upper triangle is formed and mirrored. The rows run together. `None`
+/// when an entry leaves the `i128` carrier.
+fn refined(
+    block: &[i128],
+    residual: &[i128],
+    s: usize,
+    gram_exponent: u32,
+    exponent: u32,
+) -> Option<Vec<i128>> {
+    let rounded: Vec<i128> = residual
+        .iter()
+        .map(|&p| nearest_shift(p, gram_exponent))
+        .collect::<Option<_>>()?;
+    let upper: Vec<Option<Vec<i128>>> = (0..s)
+        .into_par_iter()
+        .map(|i| {
+            let product = ProductRow::of(&rounded[i * s..(i + 1) * s], block, s);
+            (i..s)
+                .map(|j| block[i * s + j].checked_add(product.nearest(j, exponent)?))
+                .collect()
+        })
+        .collect();
+    Some(mirrored(s, upper.into_iter().collect::<Option<_>>()?))
+}
+
+/// **The warm start's rank-one steps** at the chart's lattice (Sherman–Morrison): for each return
+/// `(w, f)`, with `f̃` the feature at `2^(−L_s)` and `v = X̂f̃` rounded there,
+/// `X̂ ← X̂ − w v vᵀ/(1 + w f̃ᵀv)`, each entry at its nearest lattice point (upper triangle, mirrored).
+/// A step whose denominator is not positive is skipped (the certificate then decides). The rows of
+/// each step run together.
+fn corrected(
+    mut block: Vec<i128>,
+    s: usize,
+    exponent: u32,
+    features: &[(&Rat, Vec<BigInt>)],
+) -> Result<Vec<i128>, HnnError> {
+    let overflow = || HnnError::from(ExactLinearError::ExtentOverflow);
+    let shift = exponent as usize;
+    for (weight, feature) in features {
+        let reach: Vec<BigInt> = (0..s)
+            .into_par_iter()
+            .map(|i| {
+                let mut sum = BigInt::zero();
+                for (k, value) in feature.iter().enumerate() {
+                    let c = block[i * s + k];
+                    if c != 0 && !value.is_zero() {
+                        sum += value * c;
+                    }
+                }
+                nearest_shift_wide(&sum, exponent)
+            })
+            .collect();
+        let energy: BigInt = feature.iter().zip(&reach).map(|(f, v)| f * v).sum();
+        let denominator: BigInt = (weight.denom() << (2 * shift)) + weight.numer() * &energy;
+        if !denominator.is_positive() {
+            continue;
+        }
+        let scaled: Vec<BigInt> = reach
+            .iter()
+            .map(|v| (weight.numer() * v) << shift)
+            .collect();
+        let current = &block;
+        let upper: Vec<Result<Vec<i128>, HnnError>> = (0..s)
+            .into_par_iter()
+            .map(|i| {
+                (i..s)
+                    .map(|j| {
+                        let step = nearest_quotient(&(&scaled[i] * &reach[j]), &denominator)
+                            .to_i128()
+                            .ok_or_else(overflow)?;
+                        current[i * s + j].checked_sub(step).ok_or_else(overflow)
+                    })
+                    .collect()
+            })
+            .collect();
+        block = mirrored(s, upper.into_iter().collect::<Result<_, _>>()?);
+    }
+    Ok(block)
+}
+
+/// The bits of a residual's nonzero entries `P·2^(−shift)`, each as a reduced ratio.
+fn residual_bits(residual: &[i128], shift: u32) -> u64 {
+    residual
+        .iter()
+        .filter(|p| **p != 0)
+        .map(|&p| lattice_bits(p, shift))
+        .sum()
+}
+
+/// The bits of the lattice value `c·2^(−L)` as a reduced ratio (numerator and denominator), as
+/// [`bits`] counts it.
+fn lattice_bits(c: i128, exponent: u32) -> u64 {
+    if c == 0 {
+        return 1;
+    }
+    let twos = c.trailing_zeros().min(exponent);
+    let magnitude = c.unsigned_abs() >> twos;
+    u64::from(128 - magnitude.leading_zeros()) + u64::from(exponent - twos + 1)
+}
+
+impl SolvedChart {
+    /// **The founding chart**: `H_0 = I`, so `X̂ = I` exactly, `δ = 0`.
+    pub fn identity() -> Self {
+        Self {
+            exponent: 0,
+            support: Vec::new(),
+            block: Vec::new(),
+            certificate: Rat::zero(),
+        }
+    }
+
+    /// `L_s`.
+    pub fn exponent(&self) -> u32 {
+        self.exponent
+    }
+
+    /// `δ = ‖1 − X̂H‖∞`, exact.
+    pub fn certificate(&self) -> &Rat {
+        &self.certificate
+    }
+
+    /// The Gram's support the chart is carried on.
+    pub fn support(&self) -> &[usize] {
+        &self.support
+    }
+
+    /// The chart as rows of width `n`.
+    pub fn dense(&self, n: usize) -> Vec<Vec<Rat>> {
+        let mut rows: Vec<Vec<Rat>> = (0..n).map(|i| unit(n, i)).collect();
+        let (s, scale) = (self.support.len(), BigInt::one() << self.exponent as usize);
+        for (a, &i) in self.support.iter().enumerate() {
+            for (b, &j) in self.support.iter().enumerate() {
+                rows[i][j] = Rat::new(BigInt::from(self.block[a * s + b]), scale.clone());
+            }
+        }
+        rows
+    }
+
+    /// Its bits at its lattice as a matrix of width `n`, each entry a reduced ratio as [`bits`]
+    /// counts the other carriers (off the support: `1` on the diagonal, `0` elsewhere), with the
+    /// certificate's.
+    fn bits(&self, n: usize) -> u64 {
+        let s = self.support.len();
+        let outside = (n * n - s * s) as u64 + (n - s) as u64;
+        let block: u64 = self
+            .block
+            .iter()
+            .map(|&c| lattice_bits(c, self.exponent))
+            .sum();
+        outside + block + bits(&self.certificate)
+    }
+
+    /// **The reach `X̂f`** of a feature in the integral chart (`F / d`), in the integral chart
+    /// (`over d·2^(L_s)`): the identity off the support.
+    fn reach(&self, (values, denominator): &Chart) -> Chart {
+        let shift = self.exponent as usize;
+        let mut reach: Vec<BigInt> = values.iter().map(|value| value << shift).collect();
+        let s = self.support.len();
+        for (a, &i) in self.support.iter().enumerate() {
+            let mut sum = BigInt::zero();
+            for (b, &k) in self.support.iter().enumerate() {
+                let c = self.block[a * s + b];
+                if c != 0 && !values[k].is_zero() {
+                    sum += &values[k] * c;
+                }
+            }
+            reach[i] = sum;
+        }
+        (reach, denominator << shift)
+    }
+
+    /// The chart carried onto another support at a lattice at least as fine: an entry both
+    /// supports hold moves by `2^(L − L_s)` exactly, and an index the chart did not hold enters as the
+    /// identity's.
+    fn carried_to(&self, support: &[usize], exponent: u32) -> Result<Vec<i128>, HnnError> {
+        let s = support.len();
+        // Every chart and the rule's lattice lie within the residual's shift, so the move fits.
+        let shift = exponent - self.exponent;
+        if exponent > RESIDUAL_SHIFT {
+            return Err(ExactLinearError::ExtentOverflow.into());
+        }
+        let scale = 1i128 << shift;
+        let held: BTreeMap<usize, usize> = self
+            .support
+            .iter()
+            .enumerate()
+            .map(|(a, &i)| (i, a))
+            .collect();
+        let width = self.support.len();
+        let mut block = vec![0i128; s * s];
+        for (a, i) in support.iter().enumerate() {
+            for (b, j) in support.iter().enumerate() {
+                let value = match (held.get(i), held.get(j)) {
+                    (Some(&p), Some(&q)) => self.block[p * width + q],
+                    _ if a == b => 1i128 << self.exponent,
+                    _ => 0,
+                };
+                block[a * s + b] = value
+                    .checked_mul(scale)
+                    .ok_or(ExactLinearError::ExtentOverflow)?;
+            }
+        }
+        Ok(block)
+    }
+
+    /// **The successor's chart** (the type's header): the Gram `gram` is the carried successor, and
+    /// `features` the window's returns `(w, f)` in the integral chart. Refused past the `i128` carrier
+    /// or when the refinement does not reach `δ_ℓ` within the rule's count.
+    fn deposited(
+        &self,
+        gram: &[Vec<Rat>],
+        features: &[(&Rat, &Chart)],
+        rule: &ChartRule,
+    ) -> Result<(Self, Refinement), HnnError> {
+        let n = gram.len();
+        let carried = GramBlock::of(gram)?;
+        let s = carried.support.len();
+        let exponent = rule.exponent(n, carried.norm).max(self.exponent);
+        let shift = exponent + carried.exponent;
+        if shift > RESIDUAL_SHIFT {
+            return Err(ExactLinearError::ExtentOverflow.into());
+        }
+        if s == 0 {
+            let chart = Self {
+                exponent,
+                ..Self::identity()
+            };
+            let refinement = Refinement {
+                warm: Some(Rat::zero()),
+                refinements: 0,
+                cold: false,
+                residual_bits: 0,
+            };
+            return Ok((chart, refinement));
+        }
+        // The returns on the support at the chart's lattice.
+        let features: Vec<(&Rat, Vec<BigInt>)> = features
+            .iter()
+            .map(|(weight, (values, denominator))| {
+                let feature = carried
+                    .support
+                    .iter()
+                    .map(|&k| {
+                        let value = &values[k] << exponent as usize;
+                        if denominator.is_one() {
+                            value
+                        } else {
+                            nearest_quotient(&value, denominator)
+                        }
+                    })
+                    .collect();
+                (*weight, feature)
+            })
+            .collect();
+        let target = rule.target();
+        let warm = corrected(
+            self.carried_to(&carried.support, exponent)?,
+            s,
+            exponent,
+            &features,
+        )?;
+        let mut residual = certified(&warm, &carried.coordinates, s, shift);
+        let certificate = residual.as_ref().map(|(_, delta)| delta.clone());
+        let mut block = warm;
+        let limit = rule.refinements(n, carried.norm);
+        let (mut refinements, mut phase, mut cold, mut stalled) = (0u32, 0u32, false, false);
+        loop {
+            if let Some((_, delta)) = &residual
+                && *delta <= target
+            {
+                break;
+            }
+            let contracting = residual
+                .as_ref()
+                .is_some_and(|(_, delta)| *delta < Rat::one());
+            if !cold && (!contracting || stalled || phase >= limit) {
+                // The scaled identity 2^(−a)I: its residual 1 − 2^(−a)H' is contracting.
+                cold = true;
+                phase = 0;
+                block = vec![0i128; s * s];
+                for a in 0..s {
+                    block[a * s + a] = 1i128 << (exponent - carried.norm);
+                }
+                residual = certified(&block, &carried.coordinates, s, shift);
+                continue;
+            }
+            let failure = || HnnError::from(ExactLinearError::InverseCertificateFailure);
+            if phase >= limit {
+                return Err(failure());
+            }
+            let (p, delta) = residual.as_ref().ok_or_else(failure)?;
+            let Some(next) = refined(&block, p, s, carried.exponent, exponent) else {
+                // A warm refinement that leaves the carrier restarts; a cold one is refused.
+                if cold {
+                    return Err(failure());
+                }
+                stalled = true;
+                continue;
+            };
+            let next_residual = certified(&next, &carried.coordinates, s, shift);
+            stalled = next_residual
+                .as_ref()
+                .is_none_or(|(_, next_delta)| next_delta >= delta);
+            block = next;
+            residual = next_residual;
+            refinements += 1;
+            phase += 1;
+        }
+        let (p, delta) = residual.expect("certified above");
+        let chart = Self {
+            exponent,
+            support: carried.support,
+            block,
+            certificate: delta,
+        };
+        let refinement = Refinement {
+            warm: certificate,
+            refinements,
+            cold,
+            residual_bits: residual_bits(&p, shift),
+        };
+        Ok((chart, refinement))
+    }
+}
+
+/// **One rounded refinement of a dense chart** (a test fixture's reading of the certified residual
+/// and the refinement): a symmetric chart on `2^(−exponent)ℤ` against a carried Gram, returning the
+/// refined chart with the certificates before and after. `None` when the chart is off its lattice or
+/// an entry leaves the `i128` carrier.
+#[cfg(test)]
+pub(crate) fn refined_once(
+    chart: &[Vec<Rat>],
+    exponent: u32,
+    gram: &[Vec<Rat>],
+) -> Option<(Vec<Vec<Rat>>, Rat, Rat)> {
+    let carried = GramBlock::of(gram).ok()?;
+    let s = carried.support.len();
+    let scale = Rat::from_integer(BigInt::one() << exponent as usize);
+    let mut block = Vec::with_capacity(s * s);
+    for &i in &carried.support {
+        for &j in &carried.support {
+            let coordinate = &chart[i][j] * &scale;
+            if !coordinate.is_integer() {
+                return None;
+            }
+            block.push(coordinate.to_integer().to_i128()?);
+        }
+    }
+    let shift = exponent + carried.exponent;
+    let (residual, before) = certified(&block, &carried.coordinates, s, shift)?;
+    let next = refined(&block, &residual, s, carried.exponent, exponent)?;
+    let (_, after) = certified(&next, &carried.coordinates, s, shift)?;
+    let chart = SolvedChart {
+        exponent,
+        support: carried.support,
+        block: next,
+        certificate: after.clone(),
+    };
+    Some((chart.dense(gram.len()), before, after))
+}
+
+/// [definition] **One normal law's solved chart at a deposit** (Decision 24; Lean
+/// `HNN/LatticeWord.prox_chart_certificate`): the chart's lattice `L_s`, the declared target `δ_ℓ`,
+/// the warm start's certificate (`None` when it left the `i128` carrier), the executed chart's
+/// certificate `δ = ‖1 − X̂H'‖∞` (exact), the refinements taken and whether the chart restarted from
+/// the scaled identity; the **released prox residual** `ρ = γ G (1 − X̂H')` by its certificate
+/// `‖ρ‖∞ ≤ Σ_t |wγ| ‖g_t‖∞ ‖f_t‖₁ · δ` (exact; `prox_chart_certificate` per return, summed) and the most
+/// it moves a read ([`ChartRule::read`]); and the bits of its factor `1 − X̂H'` (nonzero entries,
+/// reduced), the part of `ρ` the deposit's own covectors do not already carry. The release is
+/// reported, never silent.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ChartReading {
+    pub exponent: u32,
+    pub target: Rat,
+    pub warm: Option<Rat>,
+    pub certificate: Rat,
+    pub refinements: u32,
+    pub cold: bool,
+    pub released: Rat,
+    pub read: Rat,
+    pub residual_bits: u64,
+}
+
+// -------------------------------------------------------------------------------------------
 // the normal law
 
 /// [definition] **One observed return at a linear locus**: its weight `w`, its feature `f_t` and
@@ -607,35 +1352,33 @@ pub struct Sample {
 
 /// [definition] **One locus's deposition owner** (design (c), `NormalLaw`): the map `W` (`m × n`)
 /// and its Gram `H` (`n × n`, the locus's own width), each on the locus's lattice with its carried
-/// remainders, and the solved chart `H⁻¹` of the carried Gram. `B = W H` is not carried (module
-/// header). Its law is the prox step at the carried Gram (Lean `HNN/Normal.normal_prox_step`,
-/// `W' = W + γ G H'⁻¹`) with the carried Gram within one unit of the exact statistic since the
-/// locus's founding (`HNN/LatticeDeposit.within_one_unit_since_founding`): `W` is the prox iterate,
-/// not the minimizer of the accumulated objective `tr(WHWᵀ) − 2tr(WBᵀ) + C`, which
-/// `normalStatistic_standing` states for an exact `(H, B)`.
+/// remainders, and the solved chart `X̂ ≈ H⁻¹` of the carried Gram on its own lattice with its
+/// certified residual ([`SolvedChart`], Decision 24). `B = W H` is not carried (module header). Its
+/// law is the prox step at the carried Gram through the executed chart (Lean
+/// `HNN/Normal.normal_prox_step`, `HNN/LatticeWord.prox_chart_residual`: `W' = W + γ G X̂`, the prox
+/// identity holding up to the released residual `γG(1 − X̂H')`) with the carried Gram within one unit
+/// of the exact statistic since the locus's founding
+/// (`HNN/LatticeDeposit.within_one_unit_since_founding`): `W` is the prox iterate, not the minimizer
+/// of the accumulated objective `tr(WHWᵀ) − 2tr(WBᵀ) + C`, which `normalStatistic_standing` states for
+/// an exact `(H, B)`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct NormalLaw {
     map: ExactRatMatrix,
     gram: Vec<Vec<Rat>>,
-    solved: Vec<Vec<Rat>>,
+    chart: SolvedChart,
     map_carry: Carry,
     gram_carry: Carry,
 }
 
 impl NormalLaw {
-    /// **The unit prior at a map**: `H_0 = I` (so `B_0 = W_0`), no remainder.
+    /// **The unit prior at a map**: `H_0 = I` (so `B_0 = W_0`), no remainder, and the founding chart
+    /// `X̂ = I` exact (`δ = 0`).
     pub fn with_prior(map: ExactRatMatrix) -> Self {
         let n = map.columns();
-        let identity: Vec<Vec<Rat>> = (0..n)
-            .map(|i| {
-                (0..n)
-                    .map(|j| if i == j { Rat::one() } else { Rat::zero() })
-                    .collect()
-            })
-            .collect();
+        let identity: Vec<Vec<Rat>> = (0..n).map(|i| unit(n, i)).collect();
         Self {
-            gram: identity.clone(),
-            solved: identity,
+            gram: identity,
+            chart: SolvedChart::identity(),
             map,
             map_carry: Carry::default(),
             gram_carry: Carry::default(),
@@ -652,9 +1395,15 @@ impl NormalLaw {
         rows_matrix(&self.gram)
     }
 
-    /// `H⁻¹`, the solved chart of the carried Gram.
+    /// `X̂ ≈ H⁻¹`, the solved chart of the carried Gram, dense: within `δ` of the inverse in its
+    /// left residual, `‖1 − X̂H‖∞ = δ` ([`NormalLaw::chart`]).
     pub fn solved(&self) -> ExactRatMatrix {
-        rows_matrix(&self.solved)
+        rows_matrix(&self.chart.dense(self.gram.len()))
+    }
+
+    /// The solved chart, with its lattice and certificate.
+    pub fn chart(&self) -> &SolvedChart {
+        &self.chart
     }
 
     /// `W`'s carried remainders, dense.
@@ -677,35 +1426,32 @@ impl NormalLaw {
         )
     }
 
-    /// **The carried prox step** over a window's samples (Lean `HNN/Normal.normal_prox_step` at
-    /// the carried operands, `HNN/LatticeDeposit.carry`): `ΔH = Σ w f fᵀ` carried onto `H` gives
-    /// `H'`; `ΔW = γ Σ w g (H'⁻¹ f)ᵀ`, so `(W + ΔW) H' = W H' + γ Σ w g fᵀ` exactly; `ΔW` is carried
-    /// onto `W`, each at the budgeted carry `at` of the locus's deposit (its residuals staged there).
-    /// `H'⁻¹` follows by exact rank-one (Sherman–Morrison) solves when `H'` took `ΔH` exactly
-    /// (`q·2^(−L) = Δ` at every entry), and by one exact inversion otherwise; a singular carried Gram
-    /// is refused.
+    /// **The carried prox step through the solved chart** over a window's samples (Lean
+    /// `HNN/Normal.normal_prox_step` at the carried operands, `HNN/LatticeDeposit.carry`,
+    /// `HNN/LatticeWord.prox_chart_residual`): `ΔH = Σ w f fᵀ` carried onto `H` gives `H'`; the chart
+    /// of `H'` follows from the previous chart ([`SolvedChart`]: the warm start, its exact
+    /// certificate and the rounded refinements to `δ ≤ δ_ℓ` of the locus's [`ChartRule`]); then
+    /// `ΔW = γ Σ w g (X̂f)ᵀ`, so `(W + ΔW)H' = WH' + γG − γG(1 − X̂H')` exactly, with `G = Σ w g fᵀ`;
+    /// `ΔW` is carried onto `W`. Each carry is at the budgeted carry `at` of the locus's deposit (its
+    /// residuals staged there). Returns the successor with its chart's reading, `None` when the
+    /// window reached nothing (no nonzero weighted feature), which moves nothing.
     ///
     /// [definition; agent-inferred] **The sums are read in the integral chart**: each sample's
-    /// feature, covector and reach is charted once as integers over its least common denominator
-    /// (`ratio::linear::vector::integral`), each sum of rank-one terms is formed over integers and
-    /// each entry normalized once (`ΔW` by `IntegralMatrix::outer_sum`, the symmetric `ΔH` on its
-    /// upper triangle and mirrored), and each reach `H'⁻¹ f` is one normalized integer dot per row
-    /// over the feature's support. A reduced ratio is canonical, so every value equals the termwise
-    /// rational sum's (receipt: `cargo run --release -p holonics --example hnn_lattice_growth --
-    /// equality chain 32 declared`, `… chain 32 normal` and `… campaign 8 declared`, on the
-    /// notebook's pinned cut: at every deposit every carried entry satisfies the carry's accounting
-    /// against the termwise update, and each solved chart equals its termwise Sherman–Morrison
-    /// steps or the carried Gram's inverse; `research/notebook/hnn_design/README.md`). The samples'
-    /// exact bits (the word's receiving reads and the
-    /// ratio's covectors, thousands of bits each) made the termwise sums, several `gcd`s per term,
-    /// the cost; what remains is one normalization per entry of the update, whose residual the carry
+    /// feature and covector is charted once as integers over its least common denominator
+    /// (`ratio::linear::vector::integral`), each reach `X̂f` is an integer product over the feature's
+    /// denominator times `2^(L_s)`, each sum of rank-one terms is formed over integers and each entry
+    /// normalized once (`ΔW` by `IntegralMatrix::outer_sum`, the symmetric `ΔH` on its upper triangle
+    /// and mirrored). A reduced ratio is canonical, so every value equals the termwise rational sum's.
+    /// The samples' exact bits (the word's receiving reads and the ratio's covectors, thousands of
+    /// bits each) make the update's normalization, one per entry, the cost; its residual the carry
     /// releases exactly.
     pub fn deposited(
         &self,
         samples: &[Sample],
         proxy: &Rat,
+        rule: &ChartRule,
         at: &mut BudgetedCarry,
-    ) -> Result<Self, HnnError> {
+    ) -> Result<(Self, Option<ChartReading>), HnnError> {
         let (m, n) = (self.map.rows(), self.map.columns());
         for sample in samples {
             if sample.feature.len() != n || sample.covector.len() != m {
@@ -716,19 +1462,14 @@ impl NormalLaw {
                 });
             }
         }
-        let active: Vec<(&Sample, Vec<usize>, Chart)> = samples
+        let active: Vec<(&Sample, Chart)> = samples
             .iter()
             .filter(|sample| !sample.weight.is_zero())
-            .map(|sample| {
-                let support: Vec<usize> =
-                    (0..n).filter(|j| !sample.feature[*j].is_zero()).collect();
-                (sample, support)
-            })
-            .filter(|(_, support)| !support.is_empty())
-            .map(|(sample, support)| (sample, support, integral(&sample.feature)))
+            .filter(|sample| sample.feature.iter().any(|x| !x.is_zero()))
+            .map(|sample| (sample, integral(&sample.feature)))
             .collect();
         if active.is_empty() {
-            return Ok(self.clone());
+            return Ok((self.clone(), None));
         }
         let mut next = self.clone();
         // ΔH = Σ w f fᵀ, carried onto H.
@@ -736,71 +1477,54 @@ impl NormalLaw {
             n,
             active
                 .iter()
-                .map(|(sample, _, feature)| (&sample.weight, feature)),
+                .map(|(sample, feature)| (&sample.weight, feature)),
         );
         let mut gram: Vec<Rat> = self.gram.iter().flatten().cloned().collect();
-        let exact = next
-            .gram_carry
+        next.gram_carry
             .deposit_all(at, Carrier::Gram, &mut gram, &gram_update);
         next.gram = gram.chunks(n).map(<[Rat]>::to_vec).collect();
-        // `H⁻¹ f` over the feature's support, one normalized integer dot per row.
-        let reach = |solved: &[Vec<Rat>], support: &[usize], (values, denominator): &Chart| {
-            let values: Vec<BigInt> = support.iter().map(|&j| values[j].clone()).collect();
-            solved
-                .iter()
-                .map(|row| {
-                    let row: Vec<Rat> = support.iter().map(|&j| row[j].clone()).collect();
-                    row_dot(&row, &values, denominator)
-                })
-                .collect::<Vec<Rat>>()
-        };
-        // H'⁻¹ of the carried Gram.
-        if exact {
-            for (sample, support, feature) in &active {
-                let solved = reach(&next.solved, support, feature);
-                let denominator = Rat::one()
-                    + &sample.weight
-                        * support
-                            .iter()
-                            .map(|&j| &sample.feature[j] * &solved[j])
-                            .sum::<Rat>();
-                let factor = &sample.weight / denominator;
-                for i in 0..n {
-                    if solved[i].is_zero() {
-                        continue;
-                    }
-                    let scaled = &factor * &solved[i];
-                    for j in 0..n {
-                        if !solved[j].is_zero() {
-                            next.solved[i][j] -= &scaled * &solved[j];
-                        }
-                    }
-                }
-            }
-        } else {
-            next.solved = rows_matrix(&next.gram).inverse()?.to_rows();
-        }
-        // ΔW = γ Σ w g (H'⁻¹ f)ᵀ at the carried successor's H'⁻¹, carried onto W.
-        // Each sample's term reads only its own covector and reach: the samples run together.
-        let moving: Vec<&(&Sample, Vec<usize>, Chart)> = active
+        // The chart of H', from the previous chart.
+        let features: Vec<(&Rat, &Chart)> = active
             .iter()
-            .filter(|(sample, ..)| !sample.covector.iter().all(Zero::is_zero))
+            .map(|(sample, feature)| (&sample.weight, feature))
             .collect();
-        let solved = &next.solved;
-        let terms: Vec<(Rat, Chart, Chart)> = indexed(moving.len(), |t| {
-            let (sample, support, feature) = moving[t];
-            Ok((
-                proxy * &sample.weight,
-                integral(&sample.covector),
-                integral(&reach(solved, support, feature)),
-            ))
+        let (chart, refinement) = self.chart.deposited(&next.gram, &features, rule)?;
+        next.chart = chart;
+        // ΔW = γ Σ w g (X̂f)ᵀ at the successor's chart, carried onto W. Each sample's term reads only
+        // its own covector and reach: the samples run together. Each term's `|wγ| ‖g‖∞ ‖f‖₁` bounds its
+        // share of the released prox residual.
+        let moving: Vec<&(&Sample, Chart)> = active
+            .iter()
+            .filter(|(sample, _)| !sample.covector.iter().all(Zero::is_zero))
+            .collect();
+        let chart = &next.chart;
+        let terms: Vec<(Rat, Chart, Chart, Rat)> = indexed(moving.len(), |t| {
+            let (sample, feature) = moving[t];
+            let weight = proxy * &sample.weight;
+            let covector = integral(&sample.covector);
+            let widest = covector
+                .0
+                .iter()
+                .map(|x| x.magnitude())
+                .max()
+                .cloned()
+                .unwrap_or_default();
+            let mass: BigInt = feature
+                .0
+                .iter()
+                .map(|x| BigInt::from(x.magnitude().clone()))
+                .sum();
+            let share = weight.abs()
+                * Rat::new(BigInt::from(widest), covector.1.clone())
+                * Rat::new(mass, feature.1.clone());
+            Ok((weight, covector, chart.reach(feature), share))
         })?;
         let map_update: Vec<Rat> = outer_rows(
             m,
             n,
             &terms
                 .iter()
-                .map(|(weight, covector, reach)| (weight, covector, reach))
+                .map(|(weight, covector, reach, _)| (weight, covector, reach))
                 .collect::<Vec<_>>(),
         )
         .into_iter()
@@ -810,7 +1534,20 @@ impl NormalLaw {
         next.map_carry
             .deposit_all(at, Carrier::Map, &mut map, &map_update);
         next.map = flat_matrix(m, n, map)?;
-        Ok(next)
+        let released =
+            next.chart.certificate() * terms.iter().map(|(.., share)| share).sum::<Rat>();
+        let reading = ChartReading {
+            exponent: next.chart.exponent(),
+            target: rule.target(),
+            warm: refinement.warm,
+            certificate: next.chart.certificate().clone(),
+            refinements: refinement.refinements,
+            cold: refinement.cold,
+            read: rule.read(&released),
+            released,
+            residual_bits: refinement.residual_bits,
+        };
+        Ok((next, Some(reading)))
     }
 
     /// Its bits by carrier.
@@ -824,7 +1561,7 @@ impl NormalLaw {
                 .map(bits)
                 .sum(),
             remainders: self.map_carry.bits() + self.gram_carry.bits(),
-            solved: self.solved.iter().flatten().map(bits).sum(),
+            solved: self.chart.bits(self.gram.len()),
         }
     }
 
@@ -1157,7 +1894,9 @@ pub struct FactorStep {
 /// reached, the successor's exact bits against the budget, the loci reached, and the budgeted
 /// carry's report: every residual the deposit released (exact and sparse, with its locus, carrier
 /// and entry; Lean `HNN/LatticeDeposit.release`), their bits, and the number of entries whose
-/// lattice coordinate moved (`q ≠ 0`, review R5). The release is reported, never silent.
+/// lattice coordinate moved (`q ≠ 0`, review R5); and each normal law's solved chart with the prox
+/// residual its chart released ([`ChartReading`], Decision 24). The release is reported, never
+/// silent.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DepositReading {
     pub growth: Option<Rat>,
@@ -1169,6 +1908,7 @@ pub struct DepositReading {
     pub released: Vec<(Locus, Carrier, usize, Rat)>,
     pub released_bits: u64,
     pub stepped: u64,
+    pub charts: Vec<(Locus, ChartReading)>,
 }
 
 // -------------------------------------------------------------------------------------------
@@ -1191,6 +1931,8 @@ pub struct Constitution {
     /// Each locus's deposit clock: the deposits that reached it with a nonzero update since its
     /// founding.
     clocks: BTreeMap<Locus, u64>,
+    /// `L_R`, the finest admitted receiver grain (the field's), which the chart rule reads.
+    grain: u128,
 }
 
 /// SplitMix64's finalizer after one golden-gamma step.
@@ -1250,6 +1992,19 @@ impl Constitution {
     /// locus takes the field's declared lattice ([`Field::lattice`]).
     pub fn initial(field: &Field, steps: Steps, budget: u64) -> Result<Self, HnnError> {
         let lattices = field.lattices().clone();
+        // L_R = ⌈1/ε_bits⌉, the finest admitted receiver's (`FieldDeclaration::lattice_by_rule`).
+        let grain = field
+            .receivers()
+            .iter()
+            .filter(|receiver| receiver.tolerance.is_positive())
+            .filter_map(|receiver| {
+                (Rat::one() / &receiver.tolerance)
+                    .ceil()
+                    .to_integer()
+                    .to_u128()
+            })
+            .max()
+            .unwrap_or(1);
         let a = field.alphabet();
         let receivers: BTreeSet<usize> = field.receivers().iter().map(|r| r.ring).collect();
         let rings = field
@@ -1353,6 +2108,7 @@ impl Constitution {
             lattices,
             carries: Carries::new(),
             clocks: BTreeMap::new(),
+            grain,
         })
     }
 
@@ -1566,7 +2322,7 @@ impl Constitution {
 
     /// **The constitution's exact bits by carrier** per retained locus: every numerator and
     /// denominator of its lattice entries (values and statistics), of their carried remainders and
-    /// of its solved charts.
+    /// of its solved charts at their lattices.
     pub fn carrier_bits_by_locus(&self) -> Vec<(Locus, CarrierBits)> {
         let values = |values: &mut dyn Iterator<Item = &Rat>| -> u64 { values.map(bits).sum() };
         let mut loci: Vec<(Locus, CarrierBits)> = Vec::new();
@@ -1819,17 +2575,27 @@ impl Constitution {
         Ok(exact)
     }
 
+    /// `L_R`, the finest admitted receiver grain the chart rule reads.
+    pub fn grain(&self) -> u128 {
+        self.grain
+    }
+
+    /// **The chart rule of a normal law's locus** ([`ChartRule`]): its lattice and `L_R`.
+    pub fn chart_rule(&self, locus: Locus) -> Result<ChartRule, HnnError> {
+        Ok(ChartRule::new(self.lattice(locus)?, self.grain))
+    }
+
     /// The declared lattice of a learned locus.
     pub fn lattice(&self, locus: Locus) -> Result<Lattice, HnnError> {
         self.lattices
             .get(&locus)
             .copied()
-            .ok_or_else(|| HnnError::Lattice { locus })
+            .ok_or(HnnError::Lattice { locus })
     }
 
     /// **Whether every retained entry lies on its locus's lattice** (Lean `run_onLattice`): the
-    /// maps, factors and statistics; the solved charts are read from the carried Grams, and the
-    /// remainders are the carried residuals.
+    /// maps, factors and statistics; the solved charts live on their own lattices `2^(−L_s)ℤ` by
+    /// construction (integer coordinates), and the remainders are the carried residuals.
     pub fn on_lattice(&self) -> bool {
         let retained = |locus: Locus| !self.released.contains(&locus);
         let all = |lattice: Option<&Lattice>, values: &mut dyn Iterator<Item = &Rat>| {
@@ -1987,10 +2753,12 @@ impl Constitution {
             return Err(refusal);
         }
         let mut strokes: BTreeMap<Locus, BudgetedCarry> = BTreeMap::new();
+        let mut charts: Vec<(Locus, ChartReading)> = Vec::new();
         next.carries = rest;
-        for (locus, carries, at) in deposited {
+        for (locus, carries, (at, read)) in deposited {
             next.carries.extend(carries);
             strokes.insert(locus, at);
+            charts.extend(read.into_iter().map(|reading| (locus, reading)));
         }
         next.carries.retain(|_, carry| !carry.0.is_empty());
         next.commit += 1;
@@ -2050,14 +2818,15 @@ impl Constitution {
             released,
             released_bits,
             stepped,
+            charts,
         };
         Ok((next, reading))
     }
 
     /// **One locus's steps of a deposit**, in the deposit's order, on the locus's material and
     /// carried remainders alone, with the locus's budgeted carry opened at the clock the deposit
-    /// would advance it to. A refusal returns with the place of the step that met it in the
-    /// deposit's order.
+    /// would advance it to, and its normal law's chart readings. A refusal returns with the place of
+    /// the step that met it in the deposit's order.
     fn deposit_at(
         &self,
         locus: Locus,
@@ -2066,8 +2835,9 @@ impl Constitution {
         carries: &mut Carries,
         proxy: &Rat,
         eta: &Rat,
-    ) -> Result<BudgetedCarry, (usize, HnnError)> {
+    ) -> Result<(BudgetedCarry, Vec<ChartReading>), (usize, HnnError)> {
         let mut stroke: Option<BudgetedCarry> = None;
+        let mut charts = Vec::new();
         let budgeted = |stroke: &mut Option<BudgetedCarry>| -> Result<(), HnnError> {
             if stroke.is_none() {
                 *stroke = Some(BudgetedCarry::new(
@@ -2097,7 +2867,12 @@ impl Constitution {
                         .map_err(refused)?;
                     budgeted(&mut stroke).map_err(refused)?;
                     let at = stroke.as_mut().expect("opened above");
-                    *law = law.deposited(&step.samples, proxy, at).map_err(refused)?;
+                    let rule = self.chart_rule(locus).map_err(refused)?;
+                    let (next, reading) = law
+                        .deposited(&step.samples, proxy, &rule, at)
+                        .map_err(refused)?;
+                    *law = next;
+                    charts.extend(reading);
                 }
                 LocusStep::Factor(step) => {
                     budgeted(&mut stroke).map_err(refused)?;
@@ -2111,6 +2886,7 @@ impl Constitution {
             }
         }
         stroke
+            .map(|at| (at, charts))
             .ok_or(HnnError::Lattice { locus })
             .map_err(|refusal| (0, refusal))
     }
@@ -2170,9 +2946,9 @@ impl Constitution {
     }
 }
 
-/// One locus's deposited carried remainders and budgeted carry, or the refusal its steps met with
-/// the place of the refusing step in the deposit's order.
-type LocusDeposit = Result<(Locus, Carries, BudgetedCarry), (usize, HnnError)>;
+/// One locus's deposited carried remainders, budgeted carry and chart readings, or the refusal its
+/// steps met with the place of the refusing step in the deposit's order.
+type LocusDeposit = Result<(Locus, Carries, (BudgetedCarry, Vec<ChartReading>)), (usize, HnnError)>;
 
 /// One step of a deposit at its locus.
 #[derive(Clone, Copy)]

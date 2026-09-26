@@ -112,7 +112,7 @@
 //! - #13's `IntegerAdd` enclosure radius: the device carries exact values, no radius.
 //! - #14's per-region operator registry: each locus is its own [`ResidentLattice`]; no consumer
 //!   needs a registry yet.
-//! - #50's modular elimination: its HNN consumer, the solved chart `H'⁻¹`, stays exact on the host.
+//! - #50's modular elimination: its HNN consumer, the solved chart `H'⁻¹`, is now a certified lattice chart (Decision 24), so no modular elimination is needed.
 //!
 //! [open] Owed in #62: the ring law's formal statement (for integers `p_j` with
 //! `Σ_j |p_j| < 2^(w−1)`, the `ℤ/2^w` residue of `Σ_j p_j` read on `(−2^(w−1), 2^(w−1))` equals the

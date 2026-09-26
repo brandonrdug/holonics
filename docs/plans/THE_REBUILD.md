@@ -233,8 +233,8 @@ archive root. Brandon's Metal port stays on its own branch, `codex/apple-silicon
      declared carrier lattices whose remainders refine with each locus's deposit count
      (Decision 22). Its lattice values stay within one unit of the exact accumulation of what
      reached them (the counterfactual bound through the word's sensitivity is owed, #62); its
-     entries' and remainders' bits grow logarithmically, and the solved charts follow the Hadamard
-     bound of the carried Grams.
+     entries' and remainders' bits grow logarithmically, and the solved charts are lattice charts
+     with a certified residual (Decision 24).
 
    It is built with a host reference and an execution port, in five campaigns
    ([the step 4 design](#step-4-design-the-hnn-law), (d); keys lead):
@@ -1056,8 +1056,10 @@ What these show:
     the logits: passivity gives `‖dCay‖ ≤ ‖dK‖` for an element whose symmetric part is `⪯ 0`, and the
     contrast port `W_c`, which is active, needs its own bound. `Objects/CommitRebase` carries the
     counterfactual chain bound once `K` exists.
-  - **The solved charts.** `H⁻¹` is carried exactly; its bits follow the Hadamard bound of the
-    carried Gram as it fills in, and are reported per deposit.
+  - **The solved charts.** `H⁻¹` is a lattice chart `X̂` on `2^(−L_s)ℤ` with an exactly certified
+    left residual `‖1 − X̂H‖∞ ≤ δ_ℓ = 2^(−(2L_ℓ+1−⌊log₂ L_R⌋))` (Decision 24): warm-started by the
+    window's rank-one steps and refined by rounded Newton–Schulz; the prox residual is released and
+    reported per deposit (`ChartReading`).
   - Every campaign reports the constitution's bits per deposit by carrier (entries, remainders,
     solved charts) beside the state bits per source bit, and campaign 1 keeps its budget and stop
     rule, which refuses and reports, never rounds.

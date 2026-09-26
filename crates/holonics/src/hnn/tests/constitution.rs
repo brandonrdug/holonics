@@ -1,4 +1,5 @@
-//! Deposition, per locus: the prox step, the statistic's standing, the budgeted carry (its
+//! Deposition, per locus: the prox step through the solved chart and its released residual, the
+//! chart's certificate, warm start and refinement, the statistic's standing, the budgeted carry (its
 //! accounting, its bound since the founding, remainder bits, the carried Gram's positivity and the
 //! zero update), the squares' positivity with no clamp, the energy growth of reaction deposits,
 //! the budget's refusal, the standing's lock chart, the causal diamond's window, the declared
@@ -14,8 +15,9 @@ use super::learning::{OPEN_BUDGET, chain, generic, moment, phases, six_path};
 use super::support::Draw;
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{
-    BudgetedCarry, Carrier, Constitution, DepositReading, FactorGradient, FactorStep, Lattice,
-    LinearLocus, LinearStep, Locus, NormalLaw, Sample, Steps, declared_sign, gamma_length,
+    BudgetedCarry, Carrier, ChartRule, Constitution, DepositReading, FactorGradient, FactorStep,
+    Lattice, LinearLocus, LinearStep, Locus, NormalLaw, Sample, Steps, declared_sign, gamma_length,
+    refined_once,
 };
 use crate::hnn::field::{ConstitutionRead, Current};
 use crate::hnn::pending::PendingRatio;
@@ -36,17 +38,45 @@ fn sample(weight: Rat, feature: Vec<Rat>, covector: Vec<Rat>) -> Sample {
     }
 }
 
-/// Lean `HNN/Normal.normal_prox_step` at the carried operands, `HNN/LatticeDeposit.carry`,
+/// `‖A‖∞`, the largest absolute row sum (Lean `HNN/LatticeWord.rowNorm`).
+fn row_norm(matrix: &ExactRatMatrix) -> Rat {
+    (0..matrix.rows())
+        .map(|i| {
+            (0..matrix.columns())
+                .map(|j| matrix.get(i, j).unwrap().abs())
+                .sum::<Rat>()
+        })
+        .max()
+        .unwrap_or_else(Rat::zero)
+}
+
+/// `1 − X H`, the left residual of a chart `X` of `H⁻¹`.
+fn left_residual(chart: &ExactRatMatrix, gram: &ExactRatMatrix) -> ExactRatMatrix {
+    ExactRatMatrix::identity(gram.rows())
+        .unwrap()
+        .subtract(&chart.multiply(gram).unwrap())
+        .unwrap()
+}
+
+/// The chart rule of the fixtures: the lattice `L`, and the grain `L_R = 16` of campaign 1.
+fn rule(lattice: Lattice) -> ChartRule {
+    ChartRule::new(lattice, 16)
+}
+
+/// Lean `HNN/Normal.normal_prox_step` at the carried operands through the executed chart,
+/// `HNN/LatticeWord.{prox_chart_residual, prox_chart_certificate}`, `HNN/LatticeDeposit.carry`,
 /// `carry_accounting`: over three deposits (clocks 1, 2, 3), the carried Gram moves by exactly
-/// `Σ w f fᵀ` less its released residuals (value plus remainder), the map by exactly
-/// `γ Σ w g fᵀ H'⁻¹` less its released residuals at the carried successor Gram `H'`, so
-/// `(W + ΔW) H' = W H' + γ G`; `H'⁻¹` is the carried Gram's exact inverse; every entry stays on the
-/// lattice, every remainder in its half-open cell on the fine lattice of its clock, and every
-/// residual within half a fine unit.
+/// `Σ w f fᵀ` less its released residuals (value plus remainder); the solved chart `X̂` of the carried
+/// successor Gram `H'` is symmetric, on its lattice, and certified, `‖1 − X̂H'‖∞ = δ ≤ δ_ℓ`; the map
+/// moves by exactly `γ Σ w g fᵀX̂` less its released residuals, so `(W + ΔW)H' = WH' + γG − ρ` with the
+/// released prox residual `ρ = γG(1 − X̂H')`, whose norm is within the reading's certificate; every
+/// entry stays on the lattice, every remainder in its half-open cell on the fine lattice of its clock,
+/// and every residual within half a fine unit.
 #[test]
-fn the_prox_step_is_exact_at_the_carried_operands() {
+fn the_prox_step_releases_its_charts_residual_at_the_carried_operands() {
     let mut draw = Draw::new(3);
     let lattice = Lattice::new(4);
+    let rule = rule(lattice);
     let mut law = NormalLaw::with_prior(draw.dyadic_matrix(3, 4));
     let proxy = rat(1, 2);
     let carried = |law: &NormalLaw| -> (ExactRatMatrix, ExactRatMatrix) {
@@ -66,7 +96,8 @@ fn the_prox_step_is_exact_at_the_carried_operands() {
             })
             .collect();
         let mut at = BudgetedCarry::new(lattice, clock);
-        let next = law.deposited(&samples, &proxy, &mut at).unwrap();
+        let (next, reading) = law.deposited(&samples, &proxy, &rule, &mut at).unwrap();
+        let reading = reading.unwrap();
         assert!(at.moved());
         let released = |carrier: Carrier, rows: usize, columns: usize| {
             let mut dense = vec![vec![Rat::zero(); columns]; rows];
@@ -103,9 +134,17 @@ fn the_prox_step_is_exact_at_the_carried_operands() {
                 .unwrap(),
             gram_update
         );
-        let solved = next.gram().inverse().unwrap();
-        assert_eq!(next.solved(), solved);
-        let step = gradient.multiply(&solved).unwrap().scaled(&proxy);
+        // The chart: symmetric, on its lattice, certified below the rule's target.
+        let chart = next.solved();
+        assert_eq!(chart, chart.transpose().unwrap());
+        let chart_lattice = Lattice::new(reading.exponent);
+        assert!(chart.entries().iter().all(|x| chart_lattice.contains(x)));
+        let residual = left_residual(&chart, &next.gram());
+        assert_eq!(row_norm(&residual), reading.certificate);
+        assert_eq!(&reading.certificate, next.chart().certificate());
+        assert!(reading.certificate <= rule.target() && reading.target == rule.target());
+        // The map moves by the executed chart's step.
+        let step = gradient.multiply(&chart).unwrap().scaled(&proxy);
         assert_eq!(
             next_map
                 .subtract(&map)
@@ -114,6 +153,8 @@ fn the_prox_step_is_exact_at_the_carried_operands() {
                 .unwrap(),
             step
         );
+        // The prox identity up to the released residual ρ = γ G (1 − X̂H').
+        let rho = gradient.multiply(&residual).unwrap().scaled(&proxy);
         assert_eq!(
             law.map()
                 .add(&step)
@@ -125,7 +166,11 @@ fn the_prox_step_is_exact_at_the_carried_operands() {
                 .unwrap()
                 .add(&gradient.scaled(&proxy))
                 .unwrap()
+                .subtract(&rho)
+                .unwrap()
         );
+        assert!(row_norm(&rho) <= reading.released);
+        assert_eq!(reading.read, rule.read(&reading.released));
         let half = lattice.unit() / integer(2);
         let fine = Lattice::new(lattice.exponent() + gamma_length(clock));
         for value in next.map().entries().iter().chain(next.gram().entries()) {
@@ -164,6 +209,7 @@ fn the_normal_law_keeps_the_statistic_not_the_samples() {
                 sample(Rat::one(), one(), one()),
             ],
             &Rat::one(),
+            &rule(lattice),
             &mut at,
         )
         .unwrap();
@@ -175,6 +221,7 @@ fn the_normal_law_keeps_the_statistic_not_the_samples() {
                 sample(Rat::one(), minus(), minus()),
             ],
             &Rat::one(),
+            &rule(lattice),
             &mut again,
         )
         .unwrap();
@@ -312,28 +359,32 @@ fn deposits_keep_every_entry_on_its_lattice_with_its_remainder_bounded() {
     assert!(!theta.carried_remainders().is_empty());
 }
 
-/// Every normal law of a constitution: the source ports, the contrast ports and the receiving maps.
-fn solved_laws(theta: &Constitution, rings: usize) -> Vec<&NormalLaw> {
+/// Every normal law of a constitution, with its locus: the source ports, the contrast ports and the
+/// receiving maps.
+fn solved_laws(theta: &Constitution, rings: usize) -> Vec<(Locus, &NormalLaw)> {
     (0..rings)
         .flat_map(|g| {
             [
-                theta.source_law(g),
-                Some(theta.contrast_law(g)),
-                theta.receiving_law(g),
+                theta.source_law(g).map(|law| (Locus::SourcePort(g), law)),
+                Some((Locus::Element(g), theta.contrast_law(g))),
+                theta
+                    .receiving_law(g)
+                    .map(|law| (Locus::ReceivingMap(g), law)),
             ]
         })
         .flatten()
         .collect()
 }
 
-/// `HNN/Normal.normal_prox_step`'s solved chart by rank-one steps: integer features at unit weight
-/// make `ΔH = Σ f fᵀ` land on the lattice, so the carried Gram takes it exactly and `H'⁻¹` follows
-/// by Sherman–Morrison, sample by sample; over two deposits (clocks 1 and 2, the second from a
-/// non-identity Gram) it is the carried Gram's true inverse, and the Gram is `I + Σ f fᵀ` exactly,
-/// releasing nothing there.
+/// Lean `HNN/LatticeWord.{prox_chart_certificate, inverse_chart_deviation}` on a normal law's solved
+/// chart: integer features at unit weight make `ΔH = Σ f fᵀ` land on the lattice, so the carried Gram
+/// is `I + Σ f fᵀ` exactly (releasing nothing there); over two deposits (clocks 1 and 2, the second
+/// from a non-identity Gram) the chart `X̂` is symmetric with `H'X̂` within `δ ≤ δ_ℓ` of `1` in both
+/// residuals (`1 − H'X̂ = (1 − X̂H')ᵀ`), and within `‖X̂‖∞δ/(1 − δ)` of the exact inverse.
 #[test]
-fn the_rank_one_solve_is_the_carried_grams_inverse() {
+fn the_solved_chart_certifies_the_carried_grams_inverse() {
     let lattice = Lattice::new(4);
+    let rule = rule(lattice);
     let mut law = NormalLaw::with_prior(ExactRatMatrix::zero(2, 3).unwrap());
     let mut exact = ExactRatMatrix::identity(3).unwrap();
     for (clock, features) in [(1, [[1, 2, 0], [0, 1, -1]]), (2, [[2, 0, 1], [1, 1, 1]])] {
@@ -348,7 +399,9 @@ fn the_rank_one_solve_is_the_carried_grams_inverse() {
             })
             .collect();
         let mut at = BudgetedCarry::new(lattice, clock);
-        let next = law.deposited(&samples, &Rat::one(), &mut at).unwrap();
+        let (next, reading) = law
+            .deposited(&samples, &Rat::one(), &rule, &mut at)
+            .unwrap();
         for s in &samples {
             let f =
                 ExactRatMatrix::shaped(3, 1, s.feature.iter().map(|x| vec![x.clone()]).collect())
@@ -363,9 +416,134 @@ fn the_rank_one_solve_is_the_carried_grams_inverse() {
                 .iter()
                 .all(|(carrier, ..)| *carrier != Carrier::Gram)
         );
-        assert_eq!(next.solved(), exact.inverse().unwrap());
+        let chart = next.solved();
+        let delta = next.chart().certificate().clone();
+        assert_eq!(Some(&delta), reading.as_ref().map(|r| &r.certificate));
+        assert!(delta <= rule.target());
+        let left = left_residual(&chart, &exact);
+        let right = ExactRatMatrix::identity(3)
+            .unwrap()
+            .subtract(&exact.multiply(&chart).unwrap())
+            .unwrap();
+        assert_eq!(right, left.transpose().unwrap());
+        assert_eq!(row_norm(&left), delta);
+        let inverse = exact.inverse().unwrap();
+        let deviation = row_norm(&inverse.subtract(&chart).unwrap());
+        assert!(deviation <= row_norm(&chart) * &delta / (Rat::one() - &delta));
         law = next;
     }
+}
+
+/// Lean `HNN/LatticeWord.{warm_start_residual, warm_start_certificate}` and the warm start's rank-one
+/// steps: after a deposit of a large return, the previous chart alone has residual exactly
+/// `(1 − X̂H) − X̂ΔH`, within `δ + ‖ΔH‖∞‖X̂‖∞` and past 1 (outside Newton–Schulz's contraction); the
+/// rank-one steps at the chart's lattice carry the residual instead, so the warm start's certificate
+/// is small, and the chart reaches its target by refinement with no restart.
+#[test]
+fn the_warm_start_carries_the_residual_through_the_rank_one_steps() {
+    let lattice = Lattice::new(4);
+    let rule = rule(lattice);
+    let law = NormalLaw::with_prior(ExactRatMatrix::zero(2, 4).unwrap());
+    let ints = |values: [i64; 4]| values.iter().map(|x| integer(*x)).collect::<Vec<Rat>>();
+    let covector = || vec![rat(1, 3), rat(-1, 2)];
+    let (first, _) = law
+        .deposited(
+            &[
+                sample(Rat::one(), ints([1, 2, 0, 0]), covector()),
+                sample(Rat::one(), ints([0, 1, 1, 0]), covector()),
+            ],
+            &Rat::one(),
+            &rule,
+            &mut BudgetedCarry::new(lattice, 1),
+        )
+        .unwrap();
+    let (second, reading) = first
+        .deposited(
+            &[sample(Rat::one(), ints([6, 0, 3, 9]), covector())],
+            &Rat::one(),
+            &rule,
+            &mut BudgetedCarry::new(lattice, 2),
+        )
+        .unwrap();
+    let reading = reading.unwrap();
+    let (chart, before, after) = (first.solved(), first.gram(), second.gram());
+    let moved = after.subtract(&before).unwrap();
+    let plain = left_residual(&chart, &after);
+    assert_eq!(
+        plain,
+        left_residual(&chart, &before)
+            .subtract(&chart.multiply(&moved).unwrap())
+            .unwrap()
+    );
+    let delta = first.chart().certificate();
+    assert!(row_norm(&plain) <= delta + row_norm(&moved) * row_norm(&chart));
+    assert!(row_norm(&plain) > Rat::one());
+    let warm = reading.warm.unwrap();
+    assert!(warm < rat(1, 4), "the warm start's certificate {warm}");
+    assert!(!reading.cold);
+    assert!(reading.certificate <= rule.target());
+    assert_eq!(
+        row_norm(&left_residual(&second.solved(), &after)),
+        reading.certificate
+    );
+}
+
+/// Lean `HNN/LatticeWord.{newton_schulz_left, rounded_refinement_certificate_left}`: one
+/// refinement `X' = (2 − XH)X` squares the left residual exactly, `1 − X'H = (1 − XH)²`; on a lattice
+/// fine enough to hold it the executed refinement is that `X'` with certificate `‖R²‖∞ ≤ δ²`, and on a
+/// coarse one its certificate stays within `δ² + 2n·2^(−L)‖H‖∞` (the chart rule's rounding bound).
+#[test]
+fn a_rounded_refinement_squares_the_residual() {
+    let gram = ExactRatMatrix::shaped(
+        3,
+        3,
+        vec![
+            vec![integer(3), integer(1), Rat::zero()],
+            vec![integer(1), integer(4), rat(1, 2)],
+            vec![Rat::zero(), rat(1, 2), integer(2)],
+        ],
+    )
+    .unwrap();
+    let coarse = Lattice::new(3);
+    let chart = ExactRatMatrix::shaped(
+        3,
+        3,
+        gram.inverse()
+            .unwrap()
+            .to_rows()
+            .iter()
+            .map(|row| {
+                row.iter()
+                    .map(|x| Rat::from_integer(coarse.div_rem(x).0) * coarse.unit())
+                    .collect()
+            })
+            .collect(),
+    )
+    .unwrap();
+    let residual = left_residual(&chart, &gram);
+    let delta = row_norm(&residual);
+    assert!(delta > Rat::zero() && delta < rat(1, 2));
+    let two = ExactRatMatrix::identity(3).unwrap().scaled(&integer(2));
+    let exact = two
+        .subtract(&chart.multiply(&gram).unwrap())
+        .unwrap()
+        .multiply(&chart)
+        .unwrap();
+    let squared = residual.multiply(&residual).unwrap();
+    assert_eq!(left_residual(&exact, &gram), squared);
+    let rows = gram.to_rows();
+    // Fine enough: the executed refinement is the exact one.
+    let (refined, before, after) = refined_once(&chart.to_rows(), 20, &rows).unwrap();
+    assert_eq!(before, delta);
+    assert_eq!(ExactRatMatrix::shaped(3, 3, refined).unwrap(), exact);
+    assert_eq!(after, row_norm(&squared));
+    assert!(after <= &delta * &delta);
+    // Coarse: the rounding enters, within the rule's bound.
+    let (refined, _, after) = refined_once(&chart.to_rows(), 6, &rows).unwrap();
+    let executed = ExactRatMatrix::shaped(3, 3, refined).unwrap();
+    assert_eq!(after, row_norm(&left_residual(&executed, &gram)));
+    let rounding = integer(6) * Lattice::new(6).unit() * row_norm(&gram);
+    assert!(after <= &delta * &delta + rounding && after < delta);
 }
 
 /// The number of chain deposits the budgeted carry's tests read: four, the fewest whose clocks
@@ -409,10 +587,14 @@ fn chain_run() -> &'static [Deposited] {
                     .into_present()
                     .unwrap();
                 let after = resident.constitution().clone();
-                // Every normal law's solved chart is its carried Gram's true inverse, whichever
-                // branch (Sherman–Morrison or one inversion) the deposit took.
-                for law in solved_laws(&after, field.rings().len()) {
-                    assert_eq!(law.solved(), law.gram().inverse().unwrap());
+                // Every normal law's solved chart is certified against its carried Gram, below its
+                // locus's target, and symmetric.
+                for (locus, law) in solved_laws(&after, field.rings().len()) {
+                    let chart = law.solved();
+                    let delta = law.chart().certificate();
+                    assert_eq!(&row_norm(&left_residual(&chart, &law.gram())), delta);
+                    assert!(*delta <= after.chart_rule(locus).unwrap().target());
+                    assert_eq!(chart, chart.transpose().unwrap());
                 }
                 (before, deposit, after, reading)
             })
@@ -462,8 +644,8 @@ fn entries(theta: &Constitution, locus: Locus, carrier: Carrier) -> Vec<Rat> {
 }
 
 /// **The exact updates of a deposit** per carried array (the laws of `NormalLaw::deposited` and
-/// the factor steps, recomputed): `ΔH = Σ w f fᵀ`, `ΔW = γ Σ w g (H'⁻¹ f)ᵀ` at the successor's
-/// solved chart, `Δh_x = Σ w|f|²` and `Δx = (η_x / h_x') G_x` at the successor's statistic.
+/// the factor steps, recomputed): `ΔH = Σ w f fᵀ`, `ΔW = γ Σ w g (X̂f)ᵀ` at the successor's solved
+/// chart `X̂`, `Δh_x = Σ w|f|²` and `Δx = (η_x / h_x') G_x` at the successor's statistic.
 fn updates(deposit: &Deposit, next: &Constitution) -> Vec<((Locus, Carrier), Vec<Rat>)> {
     let steps = next.steps();
     let mut out = Vec::new();
