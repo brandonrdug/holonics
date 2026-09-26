@@ -2568,3 +2568,32 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
 
     Source: agent-inferred, from the measurement and Sol's derivation (choice (c): the receiving
     parametron's class-mass storage). Brandon may override it.
+
+28. **The receiving face compresses landmarks: context-tree weighting over typed navigator
+    addresses, with merges priced by their code-length pair.** Brandon, September 25: the
+    compression "is of landmarks connecting generators … when relevant they expand and are open for
+    a time"; a cache is "more like a cocycle in a natural autogradient"; tokenizers and BPE are
+    "partials without complete mathematics". The law, derived with Sol
+    ([record](../../research/records/2026-09-25_THE_COMPRESSION_IS_OF_LANDMARKS_A_TREE_COCYCLE_AND_MERGES_PRICED_BY_THEIR_CODE_LENGTH_PAIR.md)):
+    - landmarks are nodes of the tree of typed address words (cells with their odometer digits,
+      ring phase classes, key-located configurations), founded at first arrival;
+    - each holds KT masses, and the face is the tree's weighting along the one path the current
+      address opens (Willems–Shtarkov–Tjalkens), exact in ℚ and read at the grain;
+    - the path's edge log ratios are an additive cochain, a deposit is local to the path, and its
+      covector is the log-derivative of the edge ratios, with no pullback through a network;
+    - release is the retention law's future quotient, never a budget alone;
+    - Decision 27's region table is the depth-one case;
+    - the wave earns its computation by supplying address letters the tree weights in, and any
+      wave correction is measured against the count-only face;
+    - merges (tokenizers) are accepted by `W_(G′)(z′)/W_G(z) > 2^d` and belong to campaign 5 with
+      segmentation lattices.
+
+    Lean first: the typed suffix restriction and scale square; KT and likelihood-ratio identities;
+    the recursive mixture's normalization; the opened-path update and telescope; the first law's
+    deposition join; the release rule; and, for campaign 5, `expand_merge`, `merge_cost_iff`,
+    `segmentation_mass`, `encoding_square_or_separator` and
+    `release_merge_iff_future_equivalent`. Success: the count-only tree face below online order-0,
+    order-1 and PPM-2 on the standing real cut, each an exact strict ordering.
+
+    Source: Brandon's direction and Sol's derivation; the tree's form (CTW) and the build order are
+    agent-inferred. Brandon may override it.
