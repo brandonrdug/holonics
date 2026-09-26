@@ -476,14 +476,14 @@ harmless because its waves are released at the word's end (R2 C2c).
     `n* = 6,148` cells;
   - one byte ring of period 7 with `Δ = {1}`: `n* = 8,577`;
   - eight source rings of period 16 over bytes with one offset (8,421,376 slots):
-    `n* = 3,641,698 ≈ 3.6 × 10⁶` cells.
+    `n* = 3,641,698` cells.
 
   The moment's exact dense code (each slot self-delimited) is a reading, not the capacity. It is
-  longer than `log₂N(n)`, so it crosses later: 138 bits at `n = 144` on the control; about
-  1.17 × 10⁵ cells for the period-7 ring; and for the eight rings, with uniform counts, below the
-  source for good only from 4,243,457 ≈ 4.24 × 10⁶ cells (and briefly from 3.19 × 10⁶ to
-  3.67 × 10⁶, since its bit lengths step). The third check's "≈ 4.3 × 10⁶" read this dense code,
-  and the second revision's "4.5 × 10⁶" was wrong.
+  longer than `log₂N(n)`, so it crosses later: 138 bits at `n = 144` on the control; between
+  2^16 and 2^17 cells for the period-7 ring; and for the eight rings, with uniform counts, below the
+  source for good only from 4,243,457 cells (and briefly on a stretch between 2^21 and 2^22 cells,
+  since its bit lengths step). The third check's reading read this dense code, and the second
+  revision's was wrong.
 - **The admitted regime is lossy by construction.** `Field::declare` refuses a declared population
   shorter than `n*`. Every receipt reports `log₂N(n)` per source bit against 1, and the moment's
   exact bits per source bit as a reading.
@@ -695,9 +695,9 @@ close    at an aeon boundary: the collapse onto what the admitted future disting
     its neighbours. They stay ring-relative through the normalization.
   - `G_a = κ_a Y_a` is the contact's port conductance at both ends. The first design put the
     exponent on the ring (`β_r`), so a wave's weight changed in transit and the global power was
-    not conserved: measured 38.1 → 51.0 → 43.5
+    not conserved: it rose, then fell, over three ticks
     (R2 [`swing_power.py`](../../research/notebook/hnn_design/swing_power.py), re-run). With one
-    exponent per contact it is exactly 28.147 at every tick.
+    exponent per contact it is exactly the same at every tick.
   - `o = 2v − a` is the point Swing about that anchor (objects §3): the reflection `2P_D − I` onto
     the junction's common-potential subspace, with `P_D` the `W`-orthogonal projector,
     `W = diag(Y_r, G_a)`.
@@ -1313,7 +1313,7 @@ released and reported at each deposit, and its total stays below half a unit ove
       least two classes (Lean `HNN/Ratio.odometer_covector_descends`). At an integer cell it is the
       face (`odometer_eq_face_at_integer_cells`), and its weight dominates the face's,
       `2^(n + k/L) ≤ 2^n(1 + k/L)` (`face_weight_le_odometer`), by at most the factor
-      `max_x (1 + x)/2^x ≈ 1.0615` (a reading). At `L_R = 1` the two agree.
+      `max_x (1 + x)/2^x = 2/(e ln 2)`, attained at `1 + x = 1/ln 2`. At `L_R = 1` the two agree.
     - The face `p̂` that is read, scored and reported stays exact in `ℚ(θ_R)`.
     - The word-adjoint test covers the word up to the logits `f`, not through the grain.
   - Base 2 is a declared chart. Temperature is a root on the ratio family for real `β`, but a rational
@@ -1602,7 +1602,7 @@ every campaign from campaign 1 on, against the same baselines (f). A campaign su
 beating the online order-0 held-out bits on it. Otherwise it records the failure with its located
 cause (source, relation, encoding or decoder) before the next campaign begins. The synthetic
 regression controls are controls, never milestones:
-- the `ab`/`ba` six-cycle, recorded at 0/6 and 0.085 bits;
+- the `ab`/`ba` six-cycle, recorded at 0/6 (its bits in git history);
 - the three-word edit.
 
 #### Campaign 1. Keys, the change on a medium, and the collapse
@@ -1720,8 +1720,8 @@ regression controls are controls, never milestones:
   - [established-bounded; measured] Under the exact law the chain control reached a budget in two
     or three deposits (1,126 → 10,883 → 623,415 bits). With the remainders kept exact on the
     lattice, campaign 1's declared field reached 250 Mbit after 21 deposits, at 21 s a deposit.
-    Under Decision 22's refining remainder it grows from 0.19 to 1.37 Mbit over 40 deposits on the
-    pinned cut, far below `B_Θ = 2^33`
+    Under Decision 22's refining remainder it grows from 388,880 bits at the mount to 1,211,919
+    bits after 40 deposits on the pinned cut (under Decision 27's receiving law), far below `B_Θ = 2^33`
     ([`hnn_lattice_growth`](../../research/notebook/hnn_design/README.md),
     `growth campaign 40 declared`).
 - **Data → menu (review D2; R2 H4).** Run per ring, in carry order `g = 0, …, G−1`, with the existing
@@ -1959,6 +1959,27 @@ resident on the card.
 
 #### Campaign 2. Rings and contacts store, lock and flow
 
+[definition; agent-inferred, revised September 26 after campaign 1's repair] Campaign 1's
+criterion is met by the landmark tree. The wave earns `5 − 13/16 − ε` bits over the held-out
+cells, against `114 rem 3063 over 3074` ms a window on the card. Campaign 2 is the wave's own
+physics, and it is judged by what the rings and contacts add to the receiving face that the tree
+does not already say (Decisions 28 and 30).
+
+- **Navigators, terrain, kernel, cokernel, landmarks.**
+  - Navigators: the closing rings (rotor clocks with carry) and the contacts' helical pair words.
+  - Terrain: the standing real cut's cells, entering through the normalized moments.
+  - Landmarks, the faces where the navigators' paths converge:
+    - the contacts' site kinds (rotation, null, boost; `Compression/Landmark/SiteKind`,
+      `compression::landmark::site`);
+    - the lock addresses `q v_a = p v_b` and their mediants (`Aeon/Clock/Lock`);
+    - two clocks locked at an address, and their convergent grains (`aeon::TwoClocks`).
+  - Kernel: the ring modes no admitted receiver reads, released in campaign 3.
+  - Cokernel: the combined face's residual against the tree (the mixture's `L_C − L_T`).
+- **Attached targets.**
+  - The two-clock locks, convergents and never-locking rates join the carry word and the zeta seam
+    (`Aeon/Clock/CarryWord.never_locks_iff_irrational`, `HolonicsResearch/Zeta/Seam`).
+  - The contact's fold and boost join the fluid singularity's site kinds
+    (`Physics/Fluid/Singularity`).
 - **Laws:** Lean item 8, and:
   - each ring is a complex parametron: `C_g = Bᵀ W_C B`, `K_g = Bᵀ W_K B`, with modes
     `K v = ω² C v`;
@@ -1969,8 +1990,10 @@ resident on the card.
   - multi-rate rings form an `EpochTower` with the Kac grain ratio;
   - the pump `−p cos(2θ − ψ)` is blind to the half-turn sheets, the sheets carry the Ising lock, and
     the perceptron is one receiver face;
-  - the contact's constitution resonates at `ω_a² = K_a/C_a`, folds where `K_a` crosses zero and
-    breaks in the boost region (Griffith). Its site kind is read each word.
+  - the contact's constitution resonates at `ω_a² = K_a/C_a` and folds where `K_a` crosses zero. Its
+    site kind is read each word. **The break in the boost region has no owner yet:** it is derived
+    here in the objects, as the contact's released storage against its gluing (a Holarchy gluing
+    defect when the contact parts), with its Lean. The name Griffith marks the classical case only.
   - Boosts `K_a ⋡ 0` are admitted from here (R2 H3). `K_a` is then carried unsquared, and:
     - a declaration or deposit that makes `M_a` singular is refused with its singular direction;
     - the expanding part is released at the word's end like all of the change;
@@ -1979,11 +2002,29 @@ resident on the card.
     between neighbours;
   - two ring clocks lock at their address, and otherwise their natural epoch grains are the
     convergents (`aeon::TwoClocks`);
-  - the field's committed balance is exact. The word's power balance is exact per word, with the
-    contrast ports' power `Π_c` stated, and passivity is proved per word wherever every `K_a ⪰ 0`
-    and every `W_c = 0`;
+  - the field's committed balance is exact. The word's power balance closes exactly with its
+    stated chart, junction and split defects (Decision 24), and with the contrast ports' power
+    `Π_c` stated. Passivity is proved per word wherever every `K_a ⪰ 0` and every `W_c = 0`;
   - the reaction material is factored through its bilinear cores and the mode quotient. In the
-    prototype this material was 95% of the state (D6).
+    prototype this material held most of the state (D6).
+- **The join to the receiving face** (Decision 28's first design).
+  - The rings' and contacts' landmarks enter the landmark tree as typed address letters: a ring's
+    phase class at the cell's tick, a contact's lock address, and a contact's site kind.
+  - `hnn::landmark::Letter` gains these variants with their consumer, placed after the cell
+    letters in the restriction order, so the scale square holds and the tree mixes them in by
+    depth.
+  - The tree weighs each letter by its code length, so a ring's letter earns its place only by
+    lowering `L_T`. A letter no path finds useful costs at most its nodes' weighting (Lean
+    `kraft_and_dominance`).
+  - The combined face (the tree plus the wave's correction) stays in Decision 30's mixture.
+- **Hardware** (Decision 25).
+  - The ring and contact ticks run resident.
+  - The tree read ports to the card (#76: `1727 rem 2244 over 3074` µs a window against the word's
+    `2113 rem 276 over 3074` µs).
+  - The host's compare and deposit phases, which hold most of a window's time, are placed by the
+    hardware law and reported per phase.
+  - The tree's lattice carriers rebase when they outgrow `u128` (from 87,382 cells at `D = 4`): a
+    rebase with its certified residual, as every carrier does.
 - **Tests:**
   - the ring tick conserves the mode energy exactly;
   - the ring's clock ticks equal `ring_crossings`;
@@ -1991,12 +2032,19 @@ resident on the card.
   - the contact's site kind follows the sign of `K_a`;
   - lock addresses and mediants are correct;
   - two locked clocks read whole windings on every cycle;
-  - the whole-field balance residual is exactly 0 at every word.
-- **Done when**, on the standing real cut:
-  - the held-out bits are reported against campaign 1 and the baselines;
-  - the contact site-kind census after learning is reported (rotation, null, boost);
-  - the balance residual is exactly 0 at every word;
-  - state bits per source bit are reported against campaign 1.
+  - the whole-field balance closes with its stated defects at every word;
+  - a ring letter the source does not inform leaves the tree's face within its weighting cost.
+- **Done when**, on the standing real cut. The held-out cells were seen when Decision 30's laws
+  were chosen, so every campaign 2 choice is made on the development cells only, and each law
+  tried is charged its description bits.
+  - At least one strict ordering holds on the held-out cells, by disjoint exact enclosures:
+    - the tree with the ring letters codes below the tree with cells only; or
+    - the wave's gain `L_T − L_model` exceeds campaign 1's `7 − 13/16 − ε`.
+    
+    Otherwise the failure is recorded with its located cause.
+  - The contact site-kind census after learning is reported (rotation, null, boost).
+  - The balance closes with its stated defects at every word.
+  - State bits per source bit and wall time per window are reported against campaign 1.
 
   Pump/Floquet locking stays open in #62.
 
@@ -2199,7 +2247,7 @@ A timeout is an unfinished run at its deadline.
 | Campaign | Declared receiver | Success |
 |---|---|---|
 | 1 | The receiving faces on the standing real cut; the menu's loop-closure faces; the law tests | Every law identity holds exactly. The key fibre is reported with its orbits and failing loops. The held-out bits beat online order-0, or the failure is recorded with its located cause. State bits are reported with and without the collapse, the moment's total bits against `n*`, and the constitution's bits per deposit. |
-| 2 | The same cut; the ring mode-energy face and the whole-field balance | The balance residual is exactly 0 at every word. The site-kind census and the held-out bits against campaign 1 are reported. |
+| 2 | The same cut; the ring mode-energy face, the whole-field balance, and the landmark tree with the rings' letters | The balance closes with its stated defects at every word. On the held-out cells, the tree with the ring letters codes below the tree with cells only, or the wave's gain exceeds campaign 1's, by disjoint exact enclosures (choices made on the development cells). The site-kind census is reported. |
 | 3 | The same cut; a cycle receiver | Dormant rings are kept and read later, with their bits reported. Release is at width zero or refused. The held-out bits against campaign 2 are reported. |
 | 4 | A pinned real motion recording; the same cut | A requested face returns its complete joint fibre and residual. The held-out endpoint faces are reported against constant velocity. The text cut shows no regression. |
 | 5 | The same cut through Holonic Encoding; the two squares | Each square holds or returns its separator. The held-out bits are reported against every baseline. State bits per source bit are below 1, and the outputs are read. |
@@ -2509,7 +2557,7 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
     certified residual.** Measured September 25 on the standing real cut: 6.7 s per receiving
     window on one CPU core, because each ring's Cayley element `2(I − E/2)⁻¹ − I` and each contact
     solve were exact rational inverses whose determinant denominators (about 1 kbit) compounded
-    across ticks, carrying 3.5–7 kbit numerators and denominators through the word and its adjoint,
+    across ticks, carrying numerators and denominators of between 2^11 and 2^13 bits through the word and its adjoint,
     and because the normal laws carried exact solved charts `H⁻¹` growing by the Hadamard bound.
     Decision 22 bounded the constitution, not the word. The exact-representation law applies:
     - **Transients** (each ring's state and the adjoint inside a word) are carried on
