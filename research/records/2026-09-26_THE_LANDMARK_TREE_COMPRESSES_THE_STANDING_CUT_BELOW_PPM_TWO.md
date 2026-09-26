@@ -122,3 +122,41 @@ landmark tree's, not Decision 27's region table, which is its depth-one case.
   whether as address letters the tree weighs in or as a correction.
 - The HNN's exposure moves to the prequential protocol (Decision 29), with per-cell causal
   addresses in place of the aperture-two window's pooled region.
+
+## 6. The fixed-width lattice law (same day)
+
+[definition; agent-inferred] The measured law read an exact ℚ path face whose rationals reached
+about 3,000 bits. A receiving read needs all 256 classes in every window, so every quantity on the
+hot path now sits on a declared dyadic lattice with a certified residual (Lean `HNN/LandmarkTree`,
+section 6′).
+- **The executed recursion.**
+  - Path faces are rounded on `2^(−M_p)`: `q̂_d = ⟦λ̂_d k_d + (1 − λ̂_d) q̂_(d+1)⟧`, with
+    `λ̂ = ⟦β/(1+β)⟧` in `[0, 1]`.
+  - The mixture ratio steps on the executed faces, `β' = β k/q̂_(d+1)`, in `u128`.
+  - The executed tree is the ideal recursion run on executed quantities, so rounding and rebases
+    add over the subtree and do not compound down the depths.
+- **The bounds.**
+  - `lattice_path_deviation` bounds the executed face: `|q̂ − q| ≤ (m+1)·2^(−M−1) + Σ|λ̂ − λ|`.
+  - `rebase_log_residual` bounds a rebase: `|log₂(1 − r)| < 2^(3−W)`.
+  - Composing these over the passage into the per-cell rule is owed in #62. The Rust tests check
+    it, and so does every cell of the cut.
+- **The derived widths.** Each source of error is held to a quarter grain.
+  - `M_p` is the least `M` with `2^M ≥ 3 B L_R (2n*+2)(n* D² + 2D + 1)`.
+  - `W` is the least `W` with `2^W ≥ 12 B L_R n* D²`.
+  - At `D = 4` these give `M_p = 39` and `W = 28`, and the rule's bound is
+    `6192141373081/2^48` bits a cell.
+- **The receipt is unchanged at the grain.**
+  - Held out: `3 + 1/16 + ε` bits a cell, below order-0, order-1 and PPM-2 by the same disjoint
+    enclosures.
+  - Against the ideal, the lattice face codes shorter, by less than `2^(−16)` bits in all on the
+    held-out cells.
+  - One sweep reading moved: `D = 3` in all on development is now `18152 + 8/16 + ε`.
+- **Wall time.**
+  - The tree's prequential passage takes 42 ms, and the five-depth sweep 846 ms (from 216,970).
+  - One all-class face read takes 91 µs.
+  - The prequential run's 49,653 ms is the baselines' reading, which moves to the same certified
+    integer logarithm.
+- **The exact-β oracle** runs at scale only on a 130-bit carrier, which stays within `2^(−96)` of the
+  ideal over the passage. An exact β reaches about 10^5 bits a node. The oracle stays exact on the
+  fixtures (`95/32768`).
+- **The whole-cell emission is retired.** Lean `depth_one_is_decision_27` keeps its law.

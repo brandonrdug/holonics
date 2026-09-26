@@ -1171,7 +1171,7 @@ port. No other noun enters.
 | `Word<'c>` | `hnn/word.rs` | One evaluation of the ticks at one cut's fixed operands, opening at zero change. It borrows `&'c Field` and owns the change: the waves, the contact states and their per-tick values or checkpoints, which its return reads in reverse. Its end releases the change. | `hnn::propagation` |
 | (functions) | `hnn/propagation.rs` | The junction Swing, the ring element step and the contact transit. | `geometry::swing`; the midpoint scheme of `holon::law::ReferenceHolon`, realized directly and equated with it in two tests (reception item 1) |
 | `ReceivingPhases` | `hnn/receiving.rs` | The receiving ring, its epochs `e_j`, aperture `A`, grain `L_R`, its regions (Decision 27) and the shared map `R`; it reads the combined face `grain(log₂ C_r/N_r) + R P_R^(τ_R) v_R` (`ReceivingRead::combined`). It refuses `A` beyond the rank of the receiving ring's observability over the word, which it reports (review C7). | `receiver::reception::ReceiverFace` |
-| `Landmarks` | `hnn/landmark.rs` | The receiving parametron's storage as a tree of landmarks (Decision 28): typed address letters (`Boundary`, `Cell`) read per cell, nodes founded at first arrival holding Krichevsky–Trofimov masses in half-units and the carried mixture ratio `β` (rebased on its derived carrier width `W` with a certified residual), the face along the one opened path (context-tree weighting), the executed `Digits` face as a dyadic partition of the unit cell (width `M_f`, derived), and the prequential measurement against the baselines (Decision 29). Count-only: `ReceivingPhases` still reads Decision 27's masses until the tree replaces them there. | `hnn::masses::grain_exponent`; `hnn::reference::Baselines`; Lean `HNN/LandmarkTree` |
+| `Landmarks` | `hnn/landmark.rs` | The receiving parametron's storage as a tree of landmarks (Decision 28): typed address letters (`Boundary`, `Cell`) read per cell, nodes founded at first arrival holding Krichevsky–Trofimov masses in half-units and the carried mixture ratio `β` (rebased on its derived carrier width `W` with a certified residual), the face along the one opened path (context-tree weighting) on the fixed-width lattice `2^(−M_p)`, the cell's odometer digits emitted as a dyadic partition of the unit cell, `M_p` and `W` derived from `n*`, `L_R`, `B` and `D`, and the prequential measurement against the baselines (Decision 29). Count-only: `ReceivingPhases` still reads Decision 27's masses until the tree replaces them there. | `hnn::masses::grain_exponent`; `hnn::reference::Baselines`; Lean `HNN/LandmarkTree` |
 | `HolonRatio` | `hnn/ratio.rs` | `R_j = Ĝ_(T←H)` at each receiving phase, as undivided pairs, with `ℓ`, its branch and the receiver's fibre. | `ratio::Presentation`, `ratio::surprisal::SymbolicSurprisal`, `ratio::exponentiated::{RatioFamily, CarriedPower}` |
 | `RatioCovector` | `hnn/ratio.rs` | `R⁻¹dR` at the face: the magnitude part `p̂ − q` and the phase part `−q_c Δ_c`, in units of `ln 2` carried as a declared factor. Only a `HolonRatio` constructs it. | — |
 | `PendingRatio` | `hnn/pending.rs` | The producing anchor `λ`, the encoder moment `M`, the `ReceivingPhases` and the commit it was produced at. It is owned by the resident and addressed by `PendingId`. | the types above |
@@ -2616,9 +2616,12 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
     = 4` chosen on the development cells) reads held out `3 + 1/16 + ε` bits a cell, prequentially
     (Decision 29), below online order-0 (`4 + 12/16 + ε`), order-1 (`4 + 5/16 + ε`) and PPM-2 (`3 +
     4/16 + ε`), each by disjoint exact enclosures. The `Cell` emission never earns a split: its
-    256-ary KT prior outweighs a sparse context. Its executed face is a dyadic partition of the unit
-    cell (width `M_f = 23`, derived), and its mixture ratio `β` a carried chart (width `W = 20`,
-    derived); both residuals are certified below one grain. The next receiving face is this tree's:
+    256-ary KT prior outweighs a sparse context, and is retired. Its executed face is a dyadic
+    partition of the unit cell, and every quantity on the hot path is a fixed-width lattice value
+    (path faces on `2^(−M_p)`, the mixture ratio `β` stepped on the executed faces and rebased at
+    width `W`; `M_p = 39`, `W = 28` at `D = 4`, derived, each source held to a quarter grain; Lean
+    `lattice_path_deviation`, `rebase_log_residual`): the tree's passage takes 42 ms and a 256-class
+    face read 91 µs. The next receiving face is this tree's:
     it replaces Decision 27's region table (its depth-one case) in `ReceivingPhases`, and the wave is
     measured against it.
 
