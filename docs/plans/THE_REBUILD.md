@@ -1171,6 +1171,7 @@ port. No other noun enters.
 | `Word<'c>` | `hnn/word.rs` | One evaluation of the ticks at one cut's fixed operands, opening at zero change. It borrows `&'c Field` and owns the change: the waves, the contact states and their per-tick values or checkpoints, which its return reads in reverse. Its end releases the change. | `hnn::propagation` |
 | (functions) | `hnn/propagation.rs` | The junction Swing, the ring element step and the contact transit. | `geometry::swing`; the midpoint scheme of `holon::law::ReferenceHolon`, realized directly and equated with it in two tests (reception item 1) |
 | `ReceivingPhases` | `hnn/receiving.rs` | The receiving ring, its epochs `e_j`, aperture `A`, grain `L_R`, its regions (Decision 27) and the shared map `R`; it reads the combined face `grain(log₂ C_r/N_r) + R P_R^(τ_R) v_R` (`ReceivingRead::combined`). It refuses `A` beyond the rank of the receiving ring's observability over the word, which it reports (review C7). | `receiver::reception::ReceiverFace` |
+| `Landmarks` | `hnn/landmark.rs` | The receiving parametron's storage as a tree of landmarks (Decision 28): typed address letters (`Boundary`, `Cell`) read per cell, nodes founded at first arrival holding Krichevsky–Trofimov masses in half-units and the carried mixture ratio `β` (rebased on its derived carrier width `W` with a certified residual), the face along the one opened path (context-tree weighting), the executed `Digits` face as a dyadic partition of the unit cell (width `M_f`, derived), and the prequential measurement against the baselines (Decision 29). Count-only: `ReceivingPhases` still reads Decision 27's masses until the tree replaces them there. | `hnn::masses::grain_exponent`; `hnn::reference::Baselines`; Lean `HNN/LandmarkTree` |
 | `HolonRatio` | `hnn/ratio.rs` | `R_j = Ĝ_(T←H)` at each receiving phase, as undivided pairs, with `ℓ`, its branch and the receiver's fibre. | `ratio::Presentation`, `ratio::surprisal::SymbolicSurprisal`, `ratio::exponentiated::{RatioFamily, CarriedPower}` |
 | `RatioCovector` | `hnn/ratio.rs` | `R⁻¹dR` at the face: the magnitude part `p̂ − q` and the phase part `−q_c Δ_c`, in units of `ln 2` carried as a declared factor. Only a `HolonRatio` constructs it. | — |
 | `PendingRatio` | `hnn/pending.rs` | The producing anchor `λ`, the encoder moment `M`, the `ReceivingPhases` and the commit it was produced at. It is owned by the resident and addressed by `PendingId`. | the types above |
@@ -1682,7 +1683,8 @@ regression controls are controls, never milestones:
     stream; the machine keeps none;
   - at each receiving window, `refine` runs on the moment and `compare` runs against the next `A`
     cells. On the training part the return is deposited; then those cells are ingested;
-  - the cut's pinned held-out targets are compared and reported, and never deposited;
+  - the cut's pinned held-out targets are compared and reported, and never deposited (retired by
+    Decision 29 with the next exposure: every comparison is scored, then deposited);
   - the aeon boundary is the joint clock's carry-out (R2 M12).
 - **The budget and stop rule (R3 §5; #62 "Step 4 (#73) owed").**
   - **The check.** `deposit` computes the successor constitution exactly and counts its exact bits
@@ -1889,14 +1891,27 @@ regression controls are controls, never milestones:
 
 [definition; agent-inferred] Campaign 1's exposure failed design (f) and its cause is located
 ([record](../../research/records/2026-09-25_CAMPAIGN_ONE_LOCATED_FAILURE.md)). Campaign 2's laws
-touch none of the three missing terms, and every later campaign is judged against the same online
-order-0, so the repair precedes campaign 2:
-- **the normal law's target:** an exogenous target in `B` (the comparison's own target face), so
-  the starting prior is divided by the growing Gram instead of kept at full weight (2.55 bits);
-- **the face's standing read:** the receiving face reads a standing value, not only the change
-  (0.25 bits);
-- **the source's index:** the moment's open reads the window's index (the preceding cells), not
-  only its table of counts, normalized by the population.
+do not reach the receiving face, and every later campaign is judged against the same online
+order-0, so the repair precedes campaign 2. Its course:
+- **Decision 26** (an exogenous target in the normal law, a standing read, the indexed open) was
+  measured at its first term and retired from Rust: the log-chart average of the one-hot code
+  face settles far flatter than the probability average. Its Lean stays (`HNN/TargetFace`,
+  `HNN/StandingRead`, `HNN/IndexedOpen`).
+- **Decision 27** (the receiving parametron's region class masses, corrected by the wave) is
+  implemented, host and card in parity. Its receipt (#73), held-out per cell at the grain: the
+  model carry 5, phase 15/16; the count face alone carry 4, phase 15/16; online order-0 carry 4,
+  phase 12/16; order-1 carry 4, phase 5/16; PPM-2 carry 3, phase 4/16. The wave raises the code
+  length above the count face alone. Located: the wave's starting prior on `R` injects large
+  logits; the aperture-two window reads both its cells at one region, pooling lags one and two;
+  and the held-out cells were never deposited while the baselines learned on them.
+- **Decision 28** (the landmark tree) replaces the region table by context-tree weighting over
+  per-cell causal addresses, count-only first. Measured: held out `3 + 1/16 + ε` bits a cell,
+  below online order-0, order-1 and PPM-2 by disjoint exact enclosures. **Decision 29** makes
+  every comparison prequential, held-out cells included.
+- **Next:** the tree becomes the receiving face of `ReceivingPhases` (retiring the region table),
+  the exposure turns prequential with per-cell addresses, and the wave is kept only where it
+  lowers the code length below the tree's face (as address letters or as a correction), host
+  and card in parity.
 
 Each lands Lean first with its consumer, and the exposure is re-run on the standing real cut,
 resident on the card.
@@ -2593,3 +2608,38 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
 
     Source: Brandon's direction and Sol's derivation; the tree's form (CTW) and the build order are
     agent-inferred. Brandon may override it.
+
+    **Measured (September 26):** the count-only tree meets the criterion
+    ([record](../../research/records/2026-09-26_THE_LANDMARK_TREE_COMPRESSES_THE_STANDING_CUT_BELOW_PPM_TWO.md);
+    Lean `HNN/LandmarkTree`, Rust `hnn::landmark`, notebook `hnn_landmark`). The `Digits` emission
+    (the cell's odometer digits, each read at its dyadic cell and mixed over the preceding cells, `D
+    = 4` chosen on the development cells) reads held out `3 + 1/16 + ε` bits a cell, prequentially
+    (Decision 29), below online order-0 (`4 + 12/16 + ε`), order-1 (`4 + 5/16 + ε`) and PPM-2 (`3 +
+    4/16 + ε`), each by disjoint exact enclosures. The `Cell` emission never earns a split: its
+    256-ary KT prior outweighs a sparse context. Its executed face is a dyadic partition of the unit
+    cell (width `M_f = 23`, derived), and its mixture ratio `β` a carried chart (width `W = 20`,
+    derived); both residuals are certified below one grain. The next receiving face is this tree's:
+    it replaces Decision 27's region table (its depth-one case) in `ReceivingPhases`, and the wave is
+    measured against it.
+
+29. **Every comparison is scored prequentially: at the standing before its own deposit, held-out
+    cells included.** Decision 27's receipt located an asymmetry: the exposure compared the
+    held-out cells and never deposited them, while the online baselines (order-0, order-1, PPM-2)
+    kept learning on those same cells after scoring each. The retention and deposition laws settle
+    the protocol:
+    - deposition is the only law changing a constitution, and a comparison whose covector reached
+      a locus deposits there; withholding a scored comparison is an exterior choice with no law;
+    - a cell scored before its own deposit has not been learned from, so scoring then depositing
+      leaks nothing: the sum of those code lengths is the receiver's prequential description
+      length of the held-out cells given the development cells (the sequential chain rule);
+    - "held out" keeps its one meaning: no design choice (depth, precision, step, grain) is made
+      on those cells.
+
+    Every coder, the model and each baseline, is therefore scored the same way on the same cells
+    in the same order. The exposure's rule "compared and reported, never deposited" (campaign 1's
+    protocol, `hnn::reference::Cut`) is retired with the next exposure; the crib rule (review D1:
+    no key learned from a cell before it is scored) is unchanged, since a crib holds only cells
+    already scored.
+
+    Source: agent-inferred, from the retention and deposition laws and Decision 27's receipt.
+    Brandon may override it.
