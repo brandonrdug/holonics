@@ -22,13 +22,22 @@ bound is half the square of the greatest off-seam height.
 
 ## 2. Four exact readings in the objects
 
-1. **The blurred ear** [derived: a functional-calculus corollary of `seamTimes_eq_Ici`].
-   - `F_t(∂_c) = ∫ e^(−tu²) Φ(u) e^((∂_c − ½)u) du` superposes scale shifts with a Gaussian
-     weight.
-   - `Λ_DN = inf{t : F_t(∂_c)` quasi-invertible for every real `c ≠ ½}`. The quantifier is over
-     all real `c`, because the flowed zeros leave the strip.
-   - [open] Which fractal strings the blurred ear hears needs a new law: `F_t` is no Dirichlet
-     series of the holes' windings, so Lapidus–Maier's theorem does not carry over.
+1. **The ear and its blur** [derived: a functional-calculus corollary of `seamTimes_eq_Ici`;
+   direction corrected the same day].
+   - The seam times use `heatE(−τ) ξ = ∫ e^(τu²) e^((s−½)u) Φ(u) du` (`DeBruijnSeal`). So the operator
+     at seam time `τ` is `G_τ(∂_c) = ∫ e^(τu²) Φ(u) e^((∂_c − ½)u) du`: the palette of scale
+     shifts `Φ`, reweighted by a Gaussian.
+   - Along the seam (`s = ½ + iz`), weighting the palette by `e^(τu²)` is the Gaussian
+     un-convolution of `ξ` in frequency (`e^(−τ∂_z²)`).
+     - `τ > 0` sharpens the ear: the palette's far scales are raised.
+     - `τ < 0` blurs it: frequencies are smeared with a Gaussian of variance `−2τ`, the forward heat
+       flow along the seam.
+   - `Λ_DN = inf{τ : G_τ(∂_c)` is quasi-invertible for every real `c ≠ ½}`: the least sharpening at
+     which the ear hears every dimension except ½. Rodgers–Tao says every blur (`τ < 0`) leaves it
+     deaf somewhere off ½, and RH says the unsharpened ear (`τ = 0`) already hears. The quantifier
+     is over all real `c`, because the flowed zeros leave the strip.
+   - [open] Which fractal strings the ear hears after the flow needs a new law: the flowed symbol is
+     no Dirichlet series of the holes' windings, so Lapidus–Maier's theorem does not carry over.
 2. **The zero gas is a complex Burgers flow** [derived].
    - `u = −2∂ log F_t` solves `∂_t u − u ∂u = −∂²u` (Cole–Hopf). The zeros are its poles, and they
      move by `ż_k = F″/F′ (z_k)`, which is `2Σ_(j≠k) 1/(z_k − z_j)` on a finite comb.
@@ -89,7 +98,7 @@ bound is half the square of the greatest off-seam height.
 Hodge's cycle-source receiver and the complex-fluid neck receiver are separate test instances.
 
 **The Lean, by name:**
-- `Zeta.Hearing.{quasiInvertible_iff_verticalZeroFree, threshold_eq_blurredHearingInf}`;
+- `Zeta.Hearing.{quasiInvertible_iff_verticalZeroFree, threshold_eq_sharpenedHearingInf}`;
 - `Zeta.ZeroTube.{finitePairInertia_rate, windowPairInertia_balance}`;
 - `Zeta.CarryTick.defect_eq_offSeamCount_addMultiplicityDefect`;
 - the proposed new law `Zeta.PrimeRing.sourceNeckSquare`, which relates a prime-ring source face,
