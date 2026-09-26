@@ -396,7 +396,8 @@ fn grain_of(tolerance: &Rat) -> Result<u64, HnnError> {
 /// bound is the two-child case of Lean `HNN/LandmarkTree.kraft_and_dominance`. `q_C(x)` lives in
 /// `ℚ(θ)`, so `β` steps by a declared rational chart of it: the lower endpoint of its exact
 /// enclosure at the carried power's reading bits, whose certified residual `|log₂ q_C − log₂ q̃_C|`
-/// is at most `(hi − lo)/lo · 3/2` (`|ln x| ≤ |x − 1|/min(x, 1)`, `log₂ e < 3/2`). `β` is carried
+/// is at most `(hi − lo)/lo · 3/2` (`|ln x| ≤ |x − 1|/min(x, 1)`, `log₂ e < 3/2`), carried rounded
+/// up on the dyadic grid `2^(−128)` so the drift's sum keeps one denominator. `β` is carried
 /// on the landmark β chart (`hnn::landmark::Beta`: odd over odd times `2^e`) at the tree's carrier
 /// width `W`, rebased to its `W`-bit mantissa when its odd parts outgrow it, with the certified
 /// residual `|log₂(1 − r)| < 3 · 2^(−W)` a rebase. Its drift (the sum of both residuals over its
@@ -539,15 +540,19 @@ impl Mixture {
             let lower = &weight * &q_tree + &rest * &q_combined.lower;
             let upper = &weight * &q_tree + &rest * &q_combined.upper;
             let (short, long) = (code_length(&upper)?, code_length(&lower)?);
-            scored.model.push(
-                ExactInterval::new(short.lower, long.upper).map_err(|_| HnnError::Shape {
-                    what: "an ordered enclosure of the mixture's code length",
-                    expected: 0,
-                    found: 1,
-                })?,
+            scored
+                .model
+                .push(ExactInterval::new(short.lower, long.upper).map_err(|_| {
+                    HnnError::Shape {
+                        what: "an ordered enclosure of the mixture's code length",
+                        expected: 0,
+                        found: 1,
+                    }
+                })?);
+            let residual = grid_ceiling(
+                &((&q_combined.upper - &q_combined.lower) / &q_combined.lower
+                    * Rat::new(BigInt::from(3), BigInt::from(2))),
             );
-            let residual = (&q_combined.upper - &q_combined.lower) / &q_combined.lower
-                * Rat::new(BigInt::from(3), BigInt::from(2));
             scored.steps.push(MixtureStep {
                 ring,
                 tree: q_tree,
@@ -557,6 +562,17 @@ impl Mixture {
         }
         Ok(scored)
     }
+}
+
+/// [definition; agent-inferred] **A residual bound carried on the drift's dyadic grid**
+/// `2^(−2·READING_BITS)` (twice the carried power's reading bits, which bound the chart's residual
+/// from below by about `2^(−READING_BITS)`), rounded up: the drift's sum over a passage keeps one
+/// bounded denominator instead of the least common multiple of every step's.
+fn grid_ceiling(value: &Rat) -> Rat {
+    let bits = 2 * crate::ratio::exponentiated::READING_BITS as usize;
+    let scale = BigInt::one() << bits;
+    let scaled = value * Rat::from_integer(scale.clone());
+    Rat::new(scaled.ceil().to_integer(), scale)
 }
 
 /// **A positive ratio carried on the landmark β chart at width `W`**: exactly when its odd parts
@@ -595,7 +611,9 @@ fn carry_ratio(value: &Rat, width: u64) -> (Beta, bool) {
         mantissa = floor(shift);
     }
     let (beta, _) = Beta::carry(
-        mantissa.to_u128().expect("a mantissa within the carrier width"),
+        mantissa
+            .to_u128()
+            .expect("a mantissa within the carrier width"),
         1,
         exponent - shift,
         width,
