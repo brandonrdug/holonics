@@ -9,13 +9,22 @@
 //! M_g[c] += x_k                                      phase-binned counts           (d_g × |A|)
 //! C_g(δ)[c] += x_k ⊗ win[δ],  δ ∈ Δ                    offset counts on the exterior (d_g × |A|²)
 //! win ← shift(win, x_k)                               the window: the last max Δ cells, overwritten
-//! m̃_g = Σ_c P_g^(−c) (E_g M_g[c] + Σ_δ E_g^(δ) C_g(δ)[c])       the source moment, never stored
+//! n_g = Σ_(c,x) M_g[c,x] ,  N_(g,δ,a) = Σ_(c,x) C_g(δ)[c,x,a] ,  a_δ = win[δ]      populations, the address
+//! m̃_g = Σ_c P_g^(−c) (E_g M_g[c] ν̂(n_g) + Σ_δ E_g^(δ)(C_g(δ)[c,·,a_δ] ν̂(N_(g,δ,a_δ)) ⊗ e_(a_δ)))   never stored
 //! s_g(0) = P_g^(τ_g) m̃_g                                          the word's open on g ∈ 𝒮
 //! ```
 //!
+//! [definition; agent-inferred] **The open is indexed and normalized** (the primary's ruling B,
+//! Decision 26's open; Lean `HNN/IndexedOpen`): the marginal reads the phase counts over their
+//! population, and the pair port reads only the column of its offset counts at the address the
+//! retained window supplies, over that column's population, so the open's amplitude no longer grows
+//! with the ingested cells (the located failure's third cause; `normalized_open_population_invariant`).
+//! Each `1/n` is carried by the [`PopulationChart`] on its declared lattice, so the open stays
+//! dyadic and the card carries it in parity; an empty population contributes nothing.
+//!
 //! Every slot is sized once from the field; nothing grows with the cells but the counts'
 //! `O(log n)` bits. The window is a shift register of raw cells, whose overwrite law is distinct
-//! from the counts' accumulate law, and it enters the open only through `C_g(δ)`. Ingest stops at a
+//! from the counts' accumulate law, and it enters the open only as the pair port's address. Ingest stops at a
 //! carry-out of the joint clock: the aeon boundary belongs to the winding, not to a caller counter.
 //!
 //! [definition] **The pair port** [`PairPort`] `E_g^(δ) = Σ_(ρ<m) e_ρ (a_ρ·x)(b_ρ·y)` is carried
@@ -41,7 +50,8 @@
 //! | `closingRing_moment_is_phaseBinned`, `selective_position` | [`SourceMoment::ingest`] |
 //! | `encoderMoment_contract` (`m̃_g = ⟨M_g, E_g⟩`) | [`SourceMoment::encode`] |
 //! | `encoder_covector_tape_free` | [`SourceMoment::encoder_covector`] |
-//! | `exteriorOffset_independent_of_E` | [`SourceMoment::offset_counts`], [`PairPort::apply`] |
+//! | `exteriorOffset_independent_of_E` | [`SourceMoment::offset_counts`], [`PairPort::apply_column`] |
+//! | `HNN/IndexedOpen.{normalized_phase_counts_mass, indexed_pair_read_eq_column_contraction, normalized_open_population_invariant, normalized_zero_population, indexed_read_zero_population}` (ruling B) | [`PopulationChart`], [`SourceMoment::normalized_counts`], [`SourceMoment::indexed_column`], [`SourceMoment::encode`] |
 //! | `moment_capacity` | [`capacity`], [`Capacity`] |
 
 use num_bigint::{BigInt, BigUint};
@@ -271,18 +281,25 @@ impl PairPort {
         &self.earlier
     }
 
-    /// **`E^(δ)` on one phase's offset counts** (`|A| × |A|`, row the current cell, column the
-    /// earlier): `Σ_ρ e_ρ (a_ρᵀ C b_ρ)`, over the nonzero counts only.
-    pub fn apply(&self, counts: &[u64], alphabet: usize, width: usize) -> Vec<Rat> {
+    /// **`E^(δ)` on one phase's indexed normalized column** (ruling B, Lean
+    /// `HNN/IndexedOpen.indexed_pair_read_eq_column_contraction`): at the address `a`, with the
+    /// column's counts `C[c, x, a]` and its chart weight `ν̂_a`,
+    /// `Σ_ρ e_ρ (Σ_x C[c, x, a] ν̂_a a_ρ[x]) b_ρ[a]`, over the nonzero counts only.
+    pub fn apply_column(
+        &self,
+        column: &IndexedColumn,
+        phase: usize,
+        alphabet: usize,
+        width: usize,
+    ) -> Vec<Rat> {
         let mut weights = vec![Rat::zero(); self.rank()];
-        for (slot, &count) in counts.iter().enumerate() {
+        for (x, &count) in column.phase(phase, alphabet).iter().enumerate() {
             if count == 0 {
                 continue;
             }
-            let (x, y) = (slot / alphabet, slot % alphabet);
-            let count = Rat::from_integer(BigInt::from(count));
+            let count = Rat::from_integer(BigInt::from(count)) * &column.weight;
             for (rho, weight) in weights.iter_mut().enumerate() {
-                *weight += &count * &self.current[rho][x] * &self.earlier[rho][y];
+                *weight += &count * &self.current[rho][x] * &self.earlier[rho][column.address];
             }
         }
         let mut output = vec![Rat::zero(); width];
@@ -295,6 +312,84 @@ impl PairPort {
             }
         }
         output
+    }
+}
+
+// -------------------------------------------------------------------------------------------
+// the population chart and the indexed column
+
+/// [definition; agent-inferred] **The population chart** (the primary's ruling B: Decision 26's
+/// normalized open, carried by Decision 24's rule for an inverse): `1/n` read on the lattice
+/// `2^(−L_ν)`, `ν̂(n) = ⌊2^(L_ν)/n + ½⌋ 2^(−L_ν)` (nearest, ties up) with `|ν̂ − 1/n| ≤ 2^(−L_ν−1)`,
+/// and `ν̂(0) = 0` (an unsupported fibre contributes nothing, Lean
+/// `HNN/IndexedOpen.normalized_zero_population`). `L_ν = ⌈log₂(2 L_R n*)⌉` over the finest
+/// admitted grain `L_R` and the declared population `n*`, so a normalized table of population
+/// `n ≤ n*` moves by at most `n 2^(−L_ν−1) ≤ 1/(4 L_R)` in ℓ1 against the exact ratios, below the
+/// grain for unit-scale ports (the rule's assumption, as `L_ℓ`'s). The word stays dyadic, so the
+/// card carries the same chart and the open stays in parity.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct PopulationChart {
+    exponent: u32,
+}
+
+impl PopulationChart {
+    /// The chart a field declares by rule.
+    pub fn of(field: &Field) -> Self {
+        let grain = field
+            .receivers()
+            .iter()
+            .filter_map(|receiver| receiver.tolerance.recip().ceil().to_integer().to_u64())
+            .max()
+            .unwrap_or(1);
+        let reach = BigUint::from(2u32) * BigUint::from(grain) * BigUint::from(field.population());
+        Self {
+            exponent: u32::try_from(crate::compression::cost::ceil_log2(&reach))
+                .expect("a population chart within 32 bits"),
+        }
+    }
+
+    /// `L_ν`.
+    pub fn exponent(&self) -> u32 {
+        self.exponent
+    }
+
+    /// `⌊2^(L_ν)/n + ½⌋`, the chart's numerator; `0` at `n = 0`.
+    pub fn numerator(&self, population: u64) -> u64 {
+        if population == 0 {
+            return 0;
+        }
+        let scale = 1u128 << self.exponent;
+        let n = u128::from(population);
+        u64::try_from((2 * scale + n) / (2 * n)).expect("a chart numerator within 64 bits")
+    }
+
+    /// `ν̂(n)`, exact.
+    pub fn value(&self, population: u64) -> Rat {
+        Rat::new(
+            BigInt::from(self.numerator(population)),
+            BigInt::one() << self.exponent as usize,
+        )
+    }
+
+    /// The certified residual `|ν̂ − 1/n| ≤ 2^(−L_ν−1)`.
+    pub fn residual(&self) -> Rat {
+        Rat::new(BigInt::one(), BigInt::one() << (self.exponent as usize + 1))
+    }
+}
+
+/// [definition] **One offset's indexed normalized column** (ruling B): the address `a` the window
+/// supplies, the column's counts `C_g(δ)[c, x, a]` (phase-major) and its chart weight `ν̂_a`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct IndexedColumn {
+    pub address: usize,
+    pub counts: Vec<u64>,
+    pub weight: Rat,
+}
+
+impl IndexedColumn {
+    /// The phase's counts `C_g(δ)[c, ·, a]`.
+    pub fn phase(&self, phase: usize, alphabet: usize) -> &[u64] {
+        &self.counts[phase * alphabet..(phase + 1) * alphabet]
     }
 }
 
@@ -475,8 +570,90 @@ impl SourceMoment {
             .collect()
     }
 
+    /// **The population `n_g = Σ_(c,x) M_g[c, x]`** of a source ring's phase counts.
+    pub fn population(&self, ring: usize) -> Result<u64, HnnError> {
+        Ok(self.counts(ring)?.first.iter().sum())
+    }
+
+    /// **The address `a_δ`** the retained window supplies at offset `δ`: the cell `δ` back
+    /// (`window[δ − 1]`), `None` before enough cells or past the window.
+    pub fn address(&self, offset: usize) -> Option<usize> {
+        earlier(&self.window, self.cursor, offset)
+    }
+
+    /// **The pair counts' column at the address `a`**: `C_g(δ)[c, x, a]` for each phase `c` and
+    /// current cell `x` (phase-major), and its population `N_(g,δ,a) = Σ_(c,x) C_g(δ)[c, x, a]`.
+    pub fn column(
+        &self,
+        ring: usize,
+        offset: usize,
+        address: usize,
+    ) -> Result<(Vec<u64>, u64), HnnError> {
+        let counts = self.counts(ring)?;
+        let index = self
+            .offsets
+            .iter()
+            .position(|declared| *declared == offset)
+            .ok_or(HnnError::Offset { offset })?;
+        let a = self.alphabet;
+        if address >= a {
+            return Err(HnnError::CellOutside {
+                code: address,
+                alphabet: a,
+            });
+        }
+        let table = &counts.offset[index];
+        let column: Vec<u64> = (0..counts.period * a)
+            .map(|slot| table[slot * a + address])
+            .collect();
+        let population = column.iter().sum();
+        Ok((column, population))
+    }
+
+    /// **The normalized phase counts** `M_g[c] ν̂(n_g)` of one phase (ruling B): the counts times
+    /// the population chart of `1/n_g`, zero at an empty population.
+    pub fn normalized_counts(
+        &self,
+        field: &Field,
+        ring: usize,
+        phase: usize,
+    ) -> Result<Vec<Rat>, HnnError> {
+        let nu = PopulationChart::of(field).value(self.population(ring)?);
+        Ok(self
+            .phase_counts(ring, phase)?
+            .iter()
+            .map(|&count| Rat::from_integer(BigInt::from(count)) * &nu)
+            .collect())
+    }
+
+    /// **The indexed normalized pair read** (ruling B, Lean
+    /// `HNN/IndexedOpen.indexed_pair_read_eq_column_contraction`): at offset `δ`, the address
+    /// `a_δ` and its column's population chart `ν̂_a = ν̂(N_(g,δ,a))`, each phase's normalized column
+    /// `C_g(δ)[c, ·, a] ν̂_a`; `None` at an unsupported fibre (no address, or an empty column), which
+    /// contributes nothing.
+    pub fn indexed_column(
+        &self,
+        field: &Field,
+        ring: usize,
+        offset: usize,
+    ) -> Result<Option<IndexedColumn>, HnnError> {
+        let Some(address) = self.address(offset) else {
+            return Ok(None);
+        };
+        let (counts, population) = self.column(ring, offset, address)?;
+        if population == 0 {
+            return Ok(None);
+        }
+        Ok(Some(IndexedColumn {
+            address,
+            counts,
+            weight: PopulationChart::of(field).value(population),
+        }))
+    }
+
     /// **The source moment `m̃_g`** of one source ring at the constitution's ports, computed from
-    /// the counts and never stored: `Σ_c P_g^(−c)(E_g M_g[c] + Σ_δ E_g^(δ) C_g(δ)[c])`.
+    /// the counts and never stored, on the indexed normalized open (ruling B, Decision 26's; Lean
+    /// `HNN/IndexedOpen`): `Σ_c P_g^(−c)(E_g M_g[c] ν̂(n_g) + Σ_δ E_g^(δ)(C_g(δ)[c, ·, a_δ] ν̂_a ⊗ e_(a_δ)))`.
     pub fn encode(
         &self,
         field: &Field,
@@ -484,6 +661,12 @@ impl SourceMoment {
         ring: usize,
     ) -> Result<Vec<Rat>, HnnError> {
         let counts = self.counts(ring)?;
+        let nu = PopulationChart::of(field).value(self.population(ring)?);
+        let columns = self
+            .offsets
+            .iter()
+            .map(|&offset| self.indexed_column(field, ring, offset))
+            .collect::<Result<Vec<_>, _>>()?;
         let geometry = field.ring(ring);
         let width = geometry.width();
         let port = constitution
@@ -504,21 +687,19 @@ impl SourceMoment {
                 if count == 0 {
                     continue;
                 }
-                let count = Rat::from_integer(BigInt::from(count));
+                let count = Rat::from_integer(BigInt::from(count)) * &nu;
                 for (row, value) in binned.iter_mut().enumerate() {
                     *value += &count * port.get(row, code)?;
                 }
             }
-            for (index, &offset) in self.offsets.iter().enumerate() {
+            for (&offset, column) in self.offsets.iter().zip(&columns) {
+                let Some(column) = column else {
+                    continue;
+                };
                 let pair = constitution
                     .pair_port(ring, offset)
                     .ok_or(HnnError::MissingSourcePort { ring })?;
-                let block = a * a;
-                let driven = pair.apply(
-                    &counts.offset[index][phase * block..(phase + 1) * block],
-                    a,
-                    width,
-                );
+                let driven = pair.apply_column(column, phase, a, width);
                 for (value, add) in binned.iter_mut().zip(driven) {
                     *value += add;
                 }
@@ -555,7 +736,8 @@ impl SourceMoment {
 
     /// **The encoder covector, tape-free** (Lean `HNN/Moment.encoder_covector_tape_free`): for a
     /// covector `g` on the open storage `s_g(0)`, the derivative of `⟨g, s_g(0)⟩` in `E_g` is
-    /// `Σ_c (P_g^(c−τ_g) g) ⊗ M_g[c]` (`2d_g × |A|`), read from the counts and `g` alone.
+    /// `Σ_c (P_g^(c−τ_g) g) ⊗ M_g[c] ν̂(n_g)` (`2d_g × |A|`; ruling B's normalized marginal), read
+    /// from the counts, the population chart and `g` alone.
     ///
     /// [definition; agent-inferred] `g` is read once in the integral chart (integers over its least
     /// common denominator); each phase's `P_g^(c−τ_g)` permutes those integers, the counts multiply
@@ -568,6 +750,9 @@ impl SourceMoment {
         covector: &[Rat],
     ) -> Result<ExactRatMatrix, HnnError> {
         let counts = self.counts(ring)?;
+        let chart = PopulationChart::of(field);
+        let nu = BigInt::from(chart.numerator(self.population(ring)?));
+        let scale = BigInt::one() << chart.exponent() as usize;
         let geometry = field.ring(ring);
         let width = geometry.width();
         if covector.len() != width {
@@ -609,7 +794,7 @@ impl SourceMoment {
             .into_iter()
             .map(|row| {
                 row.into_iter()
-                    .map(|sum| Rat::new(sum, denominator.clone()))
+                    .map(|sum| Rat::new(sum * &nu, &denominator * &scale))
                     .collect()
             })
             .collect();

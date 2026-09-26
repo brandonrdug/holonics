@@ -65,7 +65,7 @@ use num_traits::One;
 
 use crate::hnn::DeviceError;
 use crate::hnn::card::{Card, Layout};
-use crate::hnn::execute::{ResidentWord, WordPlan};
+use crate::hnn::execute::{ResidentWord, SourceOpen, WordPlan};
 use crate::hnn::moment::{MomentSnapshot, ResidentMoment};
 use crate::hnn::publication::{ContactOperator, Loci, Publication};
 use crate::hnn::readout::{self, Executed};
@@ -265,7 +265,9 @@ impl<'c> Mounted<'c> {
     ) -> Result<(ExecutedWord<'c>, Faces), HnnError> {
         let field = &self.field;
         let current = ratio.current(field)?;
-        let plan = WordPlan::form(field, &current, publication, ratio.phases(), moment)?;
+        // The indexed normalized open (ruling B), read from the pending ratio's copy of the moment.
+        let opens = SourceOpen::of(field, ratio.moment())?;
+        let plan = WordPlan::form(field, &current, publication, ratio.phases(), moment, &opens)?;
         let loci = &publication.loci;
         let mut operators = Vec::with_capacity(plan.contacts.len());
         for (a, contact) in plan.contacts.iter().enumerate() {

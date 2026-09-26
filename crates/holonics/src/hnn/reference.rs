@@ -42,10 +42,11 @@
 //! R        sample (P_R^(τ_R) v_R(e_j), −g_j) per receiving phase                   normal law
 //! tree     each target t_j on the paths its address a_j opens, in cell order        landmark tree (Decision 28)
 //! W_c,g    sample (c_t, −u_t) at each tick of the element's window                  normal law
-//! E_g      sample (M_g[c], −P^(c−τ_g) s̄_g(0)) per phase with counts                  normal law
+//! E_g      sample (M_g[c] ν̂(n_g), −P^(c−τ_g) s̄_g(0)) per phase with counts           normal law (ruling B's normalized marginal)
 //! f_g      G = (K̄ + K̄ᵀ) f,  K̄ = Σ_t u_t x̄_tᵀ;   slices ∂/∂u_ρ = σ_ρ[(x̄·v)u − (u·v)x̄], ∂/∂v_ρ likewise
 //! q_g      the class covector g_σρ = Σ_t Re⟨u_t, A_ρ x̄_t⟩ carried to q by the transpose of q ↦ Δ
-//! E_g^(δ)  ∂/∂e_ρ = Σ_c w_ρc h_c,  ∂/∂a_ρ = Σ_c (e_ρ·h_c) C_g(δ)[c] b_ρ, ∂/∂b_ρ likewise, h_c = P^(c−τ) s̄(0)
+//! E_g^(δ)  ∂/∂e_ρ = Σ_c w_ρc h_c,  ∂/∂a_ρ = Σ_c (e_ρ·h_c) Ĉ_c b_ρ, ∂/∂b_ρ likewise, h_c = P^(c−τ) s̄(0),
+//!          Ĉ_c = C_g(δ)[c, ·, a_δ] ν̂(N_a) ⊗ e_(a_δ), the indexed normalized column (ruling B)
 //! c,b,F    C̄ = Σ 2 r̄ (w − ω)ᵀ,  K̄ = −h Σ r̄ (u + ½hω)ᵀ,  D̄ = −h Σ r̄ ωᵀ;  ∂/∂c = (C̄ + C̄ᵀ) c, …
 //! ```
 //!
@@ -157,7 +158,7 @@ use crate::hnn::constitution::{
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::keys::{self, KeyLocation};
 use crate::hnn::landmark::{Letter, code_length};
-use crate::hnn::moment::{Ingested, SourceMoment};
+use crate::hnn::moment::{Ingested, PopulationChart, SourceMoment};
 use crate::hnn::pending::PendingRatio;
 use crate::hnn::port::{
     Census, ContactPullback, Deposit, ExecutionPort, Handle, MomentId, PendingId, PortReceipt,
@@ -1636,7 +1637,15 @@ pub fn compose(
             .ok_or(HnnError::MissingSourcePort { ring: g })?;
         let gradient = moment.encoder_covector(field, &current, g, opening)?;
         let source_t = source.transpose()?;
-        let moment_covector = indexed(turned.len(), |c| apply_rows(&source_t, &turned[c]))?;
+        // The covector on the moment's counts at their population (ruling B: the open reads
+        // `M ν̂(n)`, so `∂/∂M = ν̂ Eᵀ h` with the population held).
+        let nu = PopulationChart::of(field).value(moment.population(g)?);
+        let moment_covector = indexed(turned.len(), |c| {
+            Ok(apply_rows(&source_t, &turned[c])?
+                .into_iter()
+                .map(|x| x * &nu)
+                .collect())
+        })?;
         let mut source_samples = Vec::new();
         for (c, h) in turned.iter().enumerate() {
             let counts = moment.phase_counts(g, c)?;
@@ -1645,10 +1654,7 @@ pub fn compose(
             }
             source_samples.push(Sample {
                 weight: one.clone(),
-                feature: counts
-                    .iter()
-                    .map(|x| Rat::from_integer(BigInt::from(*x)))
-                    .collect(),
+                feature: moment.normalized_counts(field, g, c)?,
                 covector: negated(h),
             });
         }
@@ -1659,23 +1665,25 @@ pub fn compose(
                 .pair_port(g, offset)
                 .ok_or(HnnError::MissingSourcePort { ring: g })?;
             let rank = pair.rank();
-            // The nonzero offset counts of each phase `(x, y, C_c[x, y])`, read once.
+            // The indexed normalized column of each phase `(x, a, C_c[x, a] ν̂_a)` (ruling B), read
+            // once; none at an unsupported fibre.
+            let column = moment.indexed_column(field, g, offset)?;
             let mut nonzero: Vec<Vec<(usize, usize, Rat)>> = Vec::with_capacity(d);
-            let mut squares = BigInt::zero();
+            let mut energy = Rat::zero();
             for c in 0..d {
-                let counts = moment.offset_counts(g, offset, c)?;
                 let mut slots = Vec::new();
-                for (slot, &count) in counts.iter().enumerate() {
-                    if count == 0 {
-                        continue;
+                if let Some(column) = &column {
+                    for (x, &count) in column.phase(c, alphabet).iter().enumerate() {
+                        if count == 0 {
+                            continue;
+                        }
+                        let value = Rat::from_integer(BigInt::from(count)) * &column.weight;
+                        energy += &value * &value;
+                        slots.push((x, column.address, value));
                     }
-                    let count = BigInt::from(count);
-                    squares += &count * &count;
-                    slots.push((slot / alphabet, slot % alphabet, Rat::from_integer(count)));
                 }
                 nonzero.push(slots);
             }
-            let energy = Rat::from_integer(squares);
             // Each rank reads only its own reads `a_ρ`, `b_ρ`, `e_ρ`: the ranks run together.
             let ranks = indexed(rank, |rho| {
                 let (a_rho, b_rho, e_rho) = (

@@ -637,7 +637,8 @@ fn moment_ingest_matches_the_host_moment() {
 
 /// Campaign 1's declared shapes (`FieldDeclaration::campaign_one` at `n* = 6,148`): the ingest of
 /// `n*` drawn bytes equals the host moment's; `E_0 M_0[c]` (`10 × 256` on its lattice, against the
-/// resident counts) equals the host's product per phase and folds to `SourceMoment::encode`; and
+/// resident counts) equals the host's product per phase and, over the population chart (ruling B),
+/// folds to `SourceMoment::encode`; and
 /// `R P_R^(τ_R) v` (`512 × 22` on `2^(−10)ℤ`, the initial and a drawn map, against lattice anchors
 /// with the rotation as a gather) equals `ReceivingPhases::read`'s logits.
 #[test]
@@ -726,7 +727,10 @@ fn campaign_one_reads_and_ingest_match_the_host() {
             *value += add;
         }
     }
-    // The pair port's outputs are zero at the initial constitution, so its part adds nothing.
+    // The pair port's outputs are zero at the initial constitution, so its part adds nothing; the
+    // open reads the counts over their population's chart (ruling B), a common factor.
+    let nu = holonics::hnn::moment::PopulationChart::of(&field).value(host.population(0).unwrap());
+    let folded: Vec<Rat> = folded.into_iter().map(|value| value * &nu).collect();
     assert_eq!(folded, host.encode(&field, &theta, 0).unwrap());
 
     // R on 2^(−10)ℤ: the initial map and a drawn one, against two lattice anchors on 2^(−20)ℤ,

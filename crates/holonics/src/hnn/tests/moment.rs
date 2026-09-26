@@ -2,7 +2,7 @@
 //! closed form, the encoder contract and its tape-free covector, the window, and the carry-out.
 
 use num_bigint::{BigInt, BigUint};
-use num_traits::Zero;
+use num_traits::{Signed, Zero};
 
 use super::learning::chain;
 use super::support::{Draw, Medium, Parts, contact, small_field};
@@ -113,8 +113,11 @@ fn per_cell_ingest_equals_the_clocked_closed_form() {
     assert_eq!(moment.opening(), opening.lift());
 }
 
-/// Lean `HNN/Moment.encoderMoment_contract`: for any rational encoder and pair port, the open
-/// storage from the counts equals the streamed sum `Σ_k P^(τ_cut − τ_k)(E x_k + E^(1)(x_k, x_(k−1)))`.
+/// Lean `HNN/Moment.encoderMoment_contract` with `HNN/IndexedOpen` (ruling B): for any rational
+/// encoder and pair port, the open storage from the counts equals the streamed sum
+/// `Σ_k P^(τ_cut − τ_k)(ν̂(n) E x_k + [x_(k−1) = a] ν̂(N_a) E^(1)(x_k, a))`: the marginal over its
+/// population `n`, and the pair port read only on the pairs whose earlier cell is the address `a`
+/// the window supplies (the last cell), over that column's population `N_a`.
 #[test]
 fn the_moment_contracts_to_the_streamed_encoder_sum() {
     let field = small_field(&[3, 2], vec![contact(0, 1, 1, 0)], 1);
@@ -140,15 +143,28 @@ fn the_moment_contracts_to_the_streamed_encoder_sum() {
     let ring = field.ring(0);
     let port = medium.source_port(0).unwrap();
     let pair = medium.pair_port(0, 1).unwrap();
+    let chart = crate::hnn::moment::PopulationChart::of(&field);
+    let address = *cells.last().unwrap();
+    let column = (1..cells.len())
+        .filter(|&k| cells[k - 1] == address)
+        .count() as u64;
+    assert_eq!(moment.address(1), Some(address));
+    assert_eq!(moment.population(0).unwrap(), cells.len() as u64);
+    let (nu, nu_a) = (chart.value(cells.len() as u64), chart.value(column));
     let mut streamed = vec![Rat::zero(); ring.width()];
     for (k, &code) in cells.iter().enumerate() {
         let mut x = vec![Rat::zero(); 2];
         x[code] = Rat::from_integer(1.into());
-        let mut driven = port.apply(&x).unwrap();
-        if k > 0 {
-            let mut counts = vec![0u64; 4];
-            counts[code * 2 + cells[k - 1]] = 1;
-            driven = add(&driven, &pair.apply(&counts, 2, ring.width()));
+        let mut driven: Vec<Rat> = port.apply(&x).unwrap().iter().map(|v| v * &nu).collect();
+        if k > 0 && cells[k - 1] == address {
+            for rho in 0..pair.rank() {
+                let weight =
+                    &pair.current_reads()[rho][code] * &pair.earlier_reads()[rho][address] * &nu_a;
+                driven = add(
+                    &driven,
+                    &crate::ratio::linear::vector::scale(&weight, &pair.outputs()[rho]),
+                );
+            }
         }
         let shift = &current.lift()[0] - &phases[k];
         streamed = add(&streamed, &ring.rotate(&driven, &shift));
@@ -223,4 +239,61 @@ fn ingest_stops_at_the_carry_out() {
     let rest = moment.ingest(&field, &mut current, &[1, 1]).unwrap();
     assert!(!rest.carry_out);
     assert_eq!(rest.cells, 2);
+}
+
+/// **The population chart and the indexed normalized open** (ruling B; Lean
+/// `HNN/IndexedOpen.{normalized_phase_counts_mass, conditional_mass, normalized_zero_population,
+/// indexed_read_zero_population}`): `ν̂(n)` is the nearest point of `2^(−L_ν)ℤ` to `1/n`
+/// (`|ν̂ − 1/n| ≤ 2^(−L_ν−1)`), zero at `n = 0`; `L_ν = ⌈log₂(2 L_R n*)⌉` (18 on campaign 1:
+/// `2 · 16 · 6,148 = 196,736 ≤ 2^18`); the normalized phase counts carry the mass `n ν̂(n)`, within
+/// `n 2^(−L_ν−1)` of 1; the indexed column at the window's address has the population of the pairs
+/// whose earlier cell is that address; and before any pair there is no column, so the pair port
+/// contributes nothing.
+#[test]
+fn the_open_reads_the_indexed_normalized_counts() {
+    use crate::hnn::field::FieldDeclaration;
+    use crate::hnn::moment::PopulationChart;
+    use crate::ratio::rat;
+    let campaign = Field::declare(FieldDeclaration::campaign_one(6_148)).unwrap();
+    assert_eq!(PopulationChart::of(&campaign).exponent(), 18);
+    let field = &chain();
+    let chart = PopulationChart::of(field);
+    let scale = BigInt::from(1u64 << chart.exponent());
+    for n in [1u64, 2, 3, 7, 13, 1_000, 65_536] {
+        let exact = Rat::new(BigInt::from(1), BigInt::from(n));
+        let read = chart.value(n);
+        assert!((&read - &exact).abs() <= chart.residual());
+        // The nearest point: one lattice step either way is farther.
+        let step = Rat::new(BigInt::from(1), scale.clone());
+        assert!((&read + &step - &exact).abs() >= (&read - &exact).abs());
+        assert!((&read - &step - &exact).abs() >= (&read - &exact).abs());
+    }
+    assert_eq!(chart.value(0), Rat::zero());
+    let mut current = Current::at_rest(field);
+    let mut moment = SourceMoment::open(field, &current);
+    assert_eq!(moment.indexed_column(field, 0, 1).unwrap(), None);
+    let cells = [1usize, 3, 1, 1, 0, 3, 1, 2, 1];
+    let mut fed = 0;
+    while fed < cells.len() {
+        fed += moment
+            .ingest(field, &mut current, &cells[fed..])
+            .unwrap()
+            .cells;
+    }
+    let n = cells.len() as u64;
+    assert_eq!(moment.population(0).unwrap(), n);
+    let mass: Rat = (0..field.ring(0).period() as usize)
+        .flat_map(|phase| moment.normalized_counts(field, 0, phase).unwrap())
+        .sum();
+    assert_eq!(mass, Rat::from_integer(BigInt::from(n)) * chart.value(n));
+    assert!(
+        (&mass - Rat::from_integer(1.into())).abs()
+            <= Rat::from_integer(BigInt::from(n)) * chart.residual()
+    );
+    // The address is the last cell, 1; the pairs whose earlier cell is 1: (3,1), (1,1), (0,1), (2,1).
+    let column = moment.indexed_column(field, 0, 1).unwrap().unwrap();
+    assert_eq!(column.address, 1);
+    assert_eq!(column.counts.iter().sum::<u64>(), 4);
+    assert_eq!(column.weight, chart.value(4));
+    assert_eq!(chart.value(4), rat(1, 4));
 }

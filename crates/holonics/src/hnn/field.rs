@@ -75,8 +75,8 @@ use crate::hnn::HnnError;
 use crate::hnn::chart::WordLattice;
 use crate::hnn::constitution::{Lattice, Locus, Steps};
 use crate::hnn::landmark::Landmarks;
-use crate::hnn::receiving::Mixture;
 use crate::hnn::moment::{Capacity, PairPort, capacity};
+use crate::hnn::receiving::Mixture;
 use crate::holarchy::{Gluing, Holarchy};
 use crate::holon::contact::PairContact;
 use crate::holon::contact::menu::PortPermutation;
@@ -1498,7 +1498,8 @@ impl Field {
 
     /// **The field's exact self-delimiting code**: every declared value, each receiver's tree depth
     /// `D` (Decision 28), the word's precisions (`L_c`, `D_c`, `L_w`; none for the exact law),
-    /// the recorded `n*`, the gauge convention, the sign generator's rule, the receiving law's code
+    /// the recorded `n*`, the open's law with its population chart's lattice `L_ν` (ruling B), the
+    /// gauge convention, the sign generator's rule, the receiving law's code
     /// ([`RECEIVING_LAW`]) with the tree's Krichevsky–Trofimov prior `α`, and the constitution's declared values (the
     /// steps `γ_U` and `η_x`, the budget `B_Θ`) with the pending capacity, as Elias-gamma naturals,
     /// zig-zag integers and rationals as (numerator, denominator). It is the one exact code of the
@@ -1590,6 +1591,13 @@ impl Field {
             None => naturals(&mut code, &[]),
         }
         natural(&mut code, self.capacity.n_star());
+        // The source's open (the primary's ruling B, Decision 26's): 1 names "the indexed
+        // normalized open", with its population chart's lattice `L_ν` (`hnn::moment::PopulationChart`).
+        natural(&mut code, 1);
+        natural(
+            &mut code,
+            u64::from(crate::hnn::moment::PopulationChart::of(self).exponent()),
+        );
         // The gauge convention (design R3 K2): 0 names "S_g(p_0) = 0 at the least visited port".
         natural(&mut code, 0);
         // The sign generator's rule (design (d)): 0 names "the low bit of SplitMix64 over

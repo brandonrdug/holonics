@@ -25,8 +25,9 @@ use std::rc::Rc;
 
 use core::ffi::c_void;
 
+use holonics::hnn::moment::PopulationChart;
 use holonics::hnn::propagation::{contact_exponent, junction_weights};
-use holonics::hnn::{Current, Field, HnnError, ReceivingPhases, WordLattice};
+use holonics::hnn::{Current, Field, HnnError, ReceivingPhases, SourceMoment, WordLattice};
 use holonics::ratio::Rat;
 use holonics::ratio::exponentiated::power_of_two as rat_power_of_two;
 use num_bigint::BigInt;
@@ -115,7 +116,7 @@ const WC_SHIFT_GAIN: usize = 17;
 const WC_SHIFT_GAIN_EXP: usize = 18;
 const WC_ZETA_EXP: usize = 19;
 
-const WS_STRIDE: usize = 9;
+const WS_STRIDE: usize = 10;
 const WQ_STRIDE: usize = 8;
 
 /// The word buffer's arrays, in the kernels' `WL_*` order.
@@ -187,8 +188,10 @@ pub(crate) struct WordPlan {
     pub(crate) map_rows: usize,
     pub(crate) logit_exp: u32,
     pub(crate) grain: u64,
-    /// Per pair port entry `(source ring index, offset index, phases, rank, weights offset)`.
-    pub(crate) pairs: Vec<(usize, usize, usize, usize, usize)>,
+    /// Per pair port entry `(source ring index, offset index, phases, rank, weights offset)` and
+    /// its indexed column (ruling B): the address and the population chart's numerator, `0` at an
+    /// unsupported fibre.
+    pub(crate) pairs: Vec<(usize, usize, usize, usize, usize, u32, u64)>,
     pub(crate) pair_weights: usize,
 }
 
@@ -235,7 +238,9 @@ impl WordPlan {
         publication: &Publication<'_>,
         phases: &ReceivingPhases,
         moment: &MomentSnapshot<'_>,
+        opens: &[SourceOpen],
     ) -> Result<Self, HnnError> {
+        let population = PopulationChart::of(field).exponent();
         let lattice = *field
             .word_lattice()
             .ok_or_else(|| refused("a field whose word runs on no declared lattice"))?;
@@ -327,7 +332,7 @@ impl WordPlan {
                 .sources
                 .iter()
                 .find(|source| source.ring == g)
-                .map(open_exponent);
+                .map(|source| open_exponent(source, population));
             let storage_exp = (lc + swc + lw).max(open_exp.unwrap_or(0));
             let anchor_exp = lw + swc.max(h_shift);
             let incident: Vec<(usize, usize, usize)> = field
@@ -513,7 +518,11 @@ impl WordPlan {
             for c in 0..phases_g {
                 plan.extend(gather(field, g, &(&lift[g] - BigInt::from(c))));
             }
-            let open_exp = open_exponent(source);
+            let open_exp = open_exponent(source, population);
+            let open = opens
+                .get(s)
+                .filter(|open| open.ring == g && open.columns.len() == source.pairs.len())
+                .ok_or_else(|| refused("the source's indexed normalized open against its loci"))?;
             let first_pair = pair_entries.len();
             for (o, pair) in source.pairs.iter().enumerate() {
                 let rank = pair.rank;
@@ -526,10 +535,11 @@ impl WordPlan {
                     pair.earlier.offset as i64,
                     counts,
                     pair_weights as i64,
-                    i64::from(open_exp) - 3 * i64::from(sigma),
+                    i64::from(open_exp) - 3 * i64::from(sigma) - i64::from(population),
                     phases_g as i64,
                 ]);
-                pairs.push((s, o, phases_g, rank, pair_weights));
+                let (address, nu) = open.columns[o].unwrap_or((0, 0));
+                pairs.push((s, o, phases_g, rank, pair_weights, address, nu));
                 pair_weights += phases_g * rank;
             }
             let record = &mut plan[source_at + s * WS_STRIDE..source_at + (s + 1) * WS_STRIDE];
@@ -539,9 +549,13 @@ impl WordPlan {
             record[3] = moment.first_base(s) as i64;
             record[4] = gathers_at as i64;
             record[5] = i64::from(open_exp);
-            record[6] = i64::from(open_exp) - i64::from(source.port.matrix.exponent);
+            record[6] = i64::from(open_exp)
+                - i64::from(source.port.matrix.exponent)
+                - i64::from(population);
             record[7] = source.pairs.len() as i64;
             record[8] = first_pair as i64;
+            record[9] = i64::try_from(open.marginal)
+                .map_err(|_| refused("a population chart numerator past the signed word"))?;
         }
         let pair_at = plan.len();
         for entry in &pair_entries {
@@ -621,14 +635,60 @@ impl WordPlan {
     }
 }
 
-/// A source ring's opening scale: its port's lattice, or three of it with a pair port (`e (a·x)(b·y)`).
-fn open_exponent(source: &crate::hnn::publication::SourceLoci) -> u32 {
+/// A source ring's opening scale: its port's lattice, or three of it with a pair port (`e (a·x)(b·y)`),
+/// and the population chart's lattice `L_ν` beside either (ruling B: the counts enter times `ν̂`).
+fn open_exponent(source: &crate::hnn::publication::SourceLoci, population: u32) -> u32 {
     let port = source.port.matrix.exponent;
     source
         .pairs
         .iter()
         .map(|pair| 3 * pair.outputs.matrix.exponent)
         .fold(port, u32::max)
+        + population
+}
+
+/// [definition] **One source ring's indexed normalized open, as the plan reads it** (ruling B;
+/// `holonics::hnn::moment`): its ring, the marginal's population chart numerator
+/// `⌊2^(L_ν)/n_g + ½⌋`, and per declared offset the address and its column's chart numerator, or
+/// `None` at an unsupported fibre. The host forms it from its mirror of the moment.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) struct SourceOpen {
+    pub(crate) ring: usize,
+    pub(crate) marginal: u64,
+    pub(crate) columns: Vec<Option<(u32, u64)>>,
+}
+
+impl SourceOpen {
+    /// The open of every source ring of a field from a moment (the host's mirror), in the order of
+    /// the published sources (the field's source rings).
+    pub(crate) fn of(field: &Field, moment: &SourceMoment) -> Result<Vec<Self>, HnnError> {
+        let chart = PopulationChart::of(field);
+        field
+            .sources()
+            .iter()
+            .map(|&ring| {
+                let columns = field
+                    .offsets()
+                    .iter()
+                    .map(|&offset| {
+                        Ok(match moment.indexed_column(field, ring, offset)? {
+                            Some(column) => Some((
+                                u32::try_from(column.address)
+                                    .map_err(|_| refused("an address past 32 bits"))?,
+                                chart.numerator(column.counts.iter().sum()),
+                            )),
+                            None => None,
+                        })
+                    })
+                    .collect::<Result<Vec<_>, HnnError>>()?;
+                Ok(Self {
+                    ring,
+                    marginal: chart.numerator(moment.population(ring)?),
+                    columns,
+                })
+            })
+            .collect()
+    }
 }
 
 // -------------------------------------------------------------------------------------------
@@ -953,7 +1013,7 @@ impl<'c> ResidentWord<'c> {
         let weight_status = card
             .alloc::<u32>(plan.pair_weights.max(1))
             .map_err(device)?;
-        for &(s, o, phases, rank, at) in &plan.pairs {
+        for &(s, o, phases, rank, at, address, nu) in &plan.pairs {
             let pair = &publication.loci.sources[s].pairs[o];
             let entry = card.entry(PAIR_ENTRY).map_err(device)?;
             let alphabet = pair.current.matrix.columns;
@@ -965,6 +1025,8 @@ impl<'c> ResidentWord<'c> {
             let mut alphabet_wire = alphabet as u32;
             let mut rank_wire = rank as u32;
             let mut phases_wire = phases as u32;
+            let mut address_wire = address;
+            let mut nu_wire = nu;
             let mut out = weights.device_ptr() + 16 * at as u64;
             let mut status = weight_status.device_ptr() + 4 * at as u64;
             let mut params = arguments![
@@ -974,6 +1036,8 @@ impl<'c> ResidentWord<'c> {
                 alphabet_wire,
                 rank_wire,
                 phases_wire,
+                address_wire,
+                nu_wire,
                 out,
                 status
             ];

@@ -744,8 +744,9 @@ fn the_moment_covector_is_the_derivative_in_the_phase_counts() {
     let pair = theta.pair_port(0, 1).unwrap();
     let current = cut.pending.current(field).unwrap();
     // The moment covector, at a constitution whose pair port emits nothing (so the offset counts
-    // do not enter `J`): moving the counts from one stream's to another's at the same anchor moves
-    // `J` by their pairing with it.
+    // do not enter `J`): moving the counts from one stream's to another's of the same population at
+    // the same anchor moves `J` by their pairing with it (ruling B: the open reads `M ν̂(n)`, linear
+    // in the counts at a held population).
     let silent = PairPort::new(
         vec![vec![Rat::zero(); 4]; pair.rank()],
         pair.current_reads().to_vec(),
@@ -757,7 +758,11 @@ fn the_moment_covector_is_the_derivative_in_the_phase_counts() {
         theta.clone().with_pair(0, 1, silent).unwrap(),
     );
     let covector = quiet.pullback.rings[0].moment.as_ref().unwrap();
-    let (_, other) = moment(&quiet.field, 68, 21);
+    let (_, other) = moment(&quiet.field, 68, 13);
+    assert_eq!(
+        other.population(0).unwrap(),
+        quiet.pending.moment().population(0).unwrap()
+    );
     let moved = PendingRatio::produce(
         &current,
         &other,

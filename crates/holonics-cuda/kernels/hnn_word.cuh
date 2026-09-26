@@ -124,7 +124,7 @@
 #define WA_COORD 3
 #define WA_CHANNEL 4
 
-#define WS_STRIDE 9
+#define WS_STRIDE 10
 #define WS_RING 0
 #define WS_PHASES 1
 #define WS_E 2
@@ -134,6 +134,7 @@
 #define WS_E_SHIFT 6
 #define WS_PAIRS 7
 #define WS_PAIR_BASE 8
+#define WS_NU 9
 
 #define WQ_STRIDE 8
 #define WQ_RANK 0
@@ -347,7 +348,7 @@ extern "C" __global__ void hnn_scatter_words(
 // weight and status. Shared: 2 · blockDim.x words of 16 octets.
 extern "C" __global__ void hnn_pair_weights(
     const unsigned long long *counts, const int64_t *current, const int64_t *earlier,
-    uint32_t alphabet, uint32_t rank, uint32_t phases,
+    uint32_t alphabet, uint32_t rank, uint32_t phases, uint32_t address, unsigned long long nu,
     wide *weights, uint32_t *status
 ) {
     uwide *ring = (uwide *)hnn_shared;
@@ -360,21 +361,21 @@ extern "C" __global__ void hnn_pair_weights(
     const int64_t *a = current + (size_t)rho * alphabet;
     const int64_t *b = earlier + (size_t)rho * alphabet;
     uwide word = 0, certificate = 0;
-    for (uint32_t x = t; x < alphabet; x += blockDim.x) {
-        const unsigned long long *row = phase + (size_t)x * alphabet;
-        for (uint32_t y = 0; y < alphabet; ++y) {
-            const unsigned long long count = row[y];
-            if (count == 0) {
-                continue;
-            }
-            uwide magnitude;
-            // The moment's word certificate keeps every count below 2^63.
-            const wide p = hnn_bounded_product(
-                (int64_t)count, hnn_word_product(a[x], b[y]), &magnitude
-            );
-            word += (uwide)p;
-            certificate = hnn_certify(certificate, magnitude);
+    // The indexed normalized column (ruling B): only the earlier cell at the address, each count
+    // times the column's population chart numerator (zero at an unsupported fibre).
+    for (uint32_t x = t; x < alphabet && nu != 0; x += blockDim.x) {
+        const unsigned long long count = phase[(size_t)x * alphabet + address];
+        if (count == 0) {
+            continue;
         }
+        uwide magnitude;
+        // A column's count is at most its population N_a, so count · ⌊2^L/N_a + ½⌋ < 2^(L+1) + N_a,
+        // within the signed word.
+        const wide p = hnn_bounded_product(
+            (int64_t)(count * nu), hnn_word_product(a[x], b[address]), &magnitude
+        );
+        word += (uwide)p;
+        certificate = hnn_certify(certificate, magnitude);
     }
     ring[t] = word;
     bound[t] = certificate;
@@ -489,6 +490,8 @@ extern "C" __global__ void hnn_word_forward(
             const int64_t *E = published + src[WS_E];
             const unsigned long long *counts = moment + src[WS_COUNTS];
             const long long *gather = plan + src[WS_GATHER];
+            // The marginal's population chart numerator (ruling B): M[c, x] ν̂ on the lattice.
+            const long long nu = src[WS_NU];
             for (long long i = t; i < n; i += T) {
                 uint32_t st = 0;
                 HnnSum image = hnn_sum();
@@ -499,7 +502,8 @@ extern "C" __global__ void hnn_word_forward(
                     const unsigned long long *m = counts + c * alphabet;
                     for (long long x = 0; x < alphabet; ++x) {
                         if (m[x] != 0) {
-                            hnn_add_words(em, row[x], (int64_t)m[x]);
+                            // m[x] ≤ n, so m[x] · ⌊2^L/n + ½⌋ < 2^(L+1) + n, within the word.
+                            hnn_add_words(em, row[x], (int64_t)m[x] * (int64_t)nu);
                         }
                     }
                     hnn_add(image, hnn_shifted(hnn_read(em, &st), src[WS_E_SHIFT], &st));

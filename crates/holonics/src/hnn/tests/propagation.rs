@@ -1035,7 +1035,7 @@ fn the_integral_chart_equals_the_termwise_arithmetic() {
         assert_eq!(integer(cell.phase as i64), phase);
         assert_eq!(cell.fibre, (scaled - phase) / integer(grain as i64));
     }
-    // The encoder covector: Σ_c (P^(c−τ) g) ⊗ M[c], termwise.
+    // The encoder covector: Σ_c (P^(c−τ) g) ⊗ M[c] ν̂(n), termwise (ruling B's normalized marginal).
     let field = small_field(&[3, 2], vec![super::support::contact(0, 1, 1, 0)], 1);
     let mut current = Current::at_rest(&field);
     let mut moment = SourceMoment::open(&field, &current);
@@ -1052,7 +1052,7 @@ fn the_integral_chart_equals_the_termwise_arithmetic() {
                 .map(|phase| {
                     let turned =
                         ring.rotate(&covector, &(BigInt::from(phase) - &current.lift()[0]));
-                    &turned[row] * integer(moment.phase_counts(0, phase).unwrap()[code] as i64)
+                    &turned[row] * &moment.normalized_counts(&field, 0, phase).unwrap()[code]
                 })
                 .sum();
             assert_eq!(chart.get(row, code).unwrap(), &termwise);
