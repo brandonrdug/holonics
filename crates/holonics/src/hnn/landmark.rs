@@ -1,5 +1,6 @@
 //! **The receiving parametron's storage as a tree of landmarks, executed on a declared dyadic
-//! lattice, addressed by typed bundles** (Decision 28; campaign 2's receiving letters; #73).
+//! lattice, addressed by typed bundles, weighing every face locally** (Decision 28; campaign 2's
+//! receiving letters; Decisions 32 and 34; #73).
 //!
 //! [definition] The computational object is the helical pair interaction; this owner is the
 //! receiving parametron's storage, read as a tree of landmarks. Of the winding guide's six general
@@ -213,6 +214,34 @@
 //! controls are the per-depth law `(j_0, j_(≥1)) = (1, r + 1)` exactly in the ideal weighting (the
 //! test `landmark_constant_slots_are_the_per_depth_prior`).
 //!
+//! [definition; agent-inferred] **Weighing is local** (Decision 34; Lean `HNN/LocalWeighing`). A
+//! mixture of whole passages telescopes to `½W_T + ½W_X` and uses a face only where it beats the
+//! tree over the whole passage; the tree's own law weighs every landmark by its own evidence, and
+//! two of Decision 34's three local laws live here (the third, the switching mixture across epochs,
+//! is `hnn::receiving::Mixture::switching`):
+//! - **at each landmark** ([`LocalLaw`], [`Landmarks::local`]): each founded node carries a second
+//!   chart, its own ratio `γ` (founded at `γ₀ ½/x̂(b)` from `γ₀ = 2^j − 1`, stepped `γ' = γ k(b)/x̂(b)`),
+//!   and its own face `ê = ⟦μ̂ k(0) + (1 − μ̂) x̂(0)⟧` takes the KT face's place in the path
+//!   (`q̂_d = ⟦λ̂ ê + (1 − λ̂) q̂'⟧`, `β' = β ê(b)/q̂'(b)`; an unfounded node reads
+//!   `⟦μ̂₀ ½ + (1 − μ̂₀) x̂⟧`). The external face `x̂` is given per opened digit, read causally at that
+//!   digit ([`Landmarks::receive_with`]); its chart on the tree's lattice is [`rescale_split`]. The
+//!   certificates add each node's own drift and own rounding `2^(−M)/min(ê, k, x̂)`, and the widths
+//!   are the rule's at `2P + 1` levels ([`Widths::local`]);
+//! - **in each digit tree** ([`StopMixture`], [`JoinTree`], [`FaceJoins`]): `K` trees under the
+//!   declared stop priors, and in each dyadic cell a join tree of two-face joins mixing their digit
+//!   faces by that digit tree's evidence, each join's chart and certificates the enlarged tree's
+//!   join's. The joins run on any faces' digit-0 numerators ([`FaceJoins::receive`]), so the
+//!   development harness measures every member on the trees' executed faces, which the mixture does
+//!   not change.
+//!
+//! [established-bounded; measured] **On the standing cut** (notebook `hnn_landmark -- … local`,
+//! development cells, prequential, each law charged `⌈log₂⌉` of its family): the node-local law
+//! (`j = 2`, the Born `Dyadic` `χ = 1` digit split) codes `−52 + 11/16 + ε` bits below the `½` tree
+//! and the stop-weight mixture (`½` with `(1, 3)` at `π_½ = ½`) `−121 + 7/16 + ε`. Held out, only the
+//! stop-weight mixture stays below: `3 + 1/16 + ε` a cell, `−7 + 12/16 + ε` bits below the `½` tree
+//! charged, and below online order-0, order-1 and PPM-2; the node-local law reads `+17 + 3/16 + ε`
+//! above the tree.
+//!
 //! [definition; agent-inferred] **The depth, the family and the prior** are chosen on the development
 //! cells only ([`choose_depth`], [`choose_prior`]): `D` increases from `max(1, forced)` while the
 //! development prequential code length decreases strictly (disjoint exact enclosures), every `D`
@@ -250,6 +279,8 @@
 //! | the ideal tree weighting (the oracle) | `HNN/LandmarkTree.{landmark_step, mixture_is_probability, kraft_and_dominance, sequential_mixture}` | [`IdealLandmarks`] |
 //! | the declared stop prior: the mixture over pruned trees with its prior, the weights summing to one, the dominance, the founding at `β₀ = 2^(j_d) − 1` and the step unchanged; `½` the corollary | `HNN/LandmarkTree.{stop_mixture_over_trees, PrunedTree.prior_const, PrunedTree.prior_sum, stop_kraft_and_dominance, stop_weight_step, stop_ratio_step, stop_founding_step, ladder_founding, stopWeight_half}` | [`StopPrior`], [`LandmarkDeclaration::prior`], the founding charts (`Law::founding`, [`ArenaView::founding`]), [`IdealLandmarks`] |
 //! | the prior chosen on the development cells, charged `⌈log₂⌉` of the laws and of each law's depths | (a measurement, not a theorem) | [`ladder_top`], [`prior_family`], [`choose_prior`], [`PriorSweep`] |
+//! | the node-local law: the tree over own weights (the stop law its KT case), Kraft-complete, each landmark paying at most `−log₂` of its prior weight; its step with the own face in the KT face's place; an own face normalized; an unfounded landmark's prior own face; the two-face prior founding at `2^j − 1` | `HNN/LocalWeighing.{own_mixture_over_trees, ownWeight_kt, ownWeight_one, own_kraft_and_dominance, node_local_dominance, own_weight_step, own_ratio_step, own_face_normalized, node_local_founding, two_face_prior}` | [`LocalLaw`], [`Landmarks::local`], [`Landmarks::receive_with`], [`Widths::local`], [`IdealLandmarks::local`] |
+//! | the stop-weight mixture per digit tree: the mixture over (law, pruned tree), its prior complete, within `−log₂ π_k − log₂ prior_(w_k)(S)`; the joins telescope to the Bayesian mixture, the executed chart's drift once | `HNN/LocalWeighing.{stop_mixture_per_tree, static_mixture, forward_executed}` | [`StopMixture`], [`JoinTree`], [`FaceJoins`] |
 //! | a window's phases in cell order: each reads the standing after the earlier phases' deposits | `HNN/LandmarkTree.{landmark_step, treeWeight_arrive_off}` | [`Landmarks::window_faces`] |
 //!
 //! [open] Owed in #62 (Lean `HNN/LandmarkTree`'s `[open]`): the passage-level composition of the
@@ -673,6 +704,60 @@ pub fn prior_family(top: u32) -> Vec<StopPrior> {
 }
 
 // -------------------------------------------------------------------------------------------
+// Decision 34: the node-local law
+
+/// [definition; agent-inferred] **The node-local law** (Decision 34, "at each landmark"; Lean
+/// `HNN/LocalWeighing.{own_mixture_over_trees, node_local_dominance, own_weight_step,
+/// two_face_prior}`): each landmark's own face is the sequential mixture, over the digits routed to
+/// it, of its KT face and an admitted external face read causally at the same digit. The KT face
+/// holds the prior weight `1 − 2^(−j)` and the external face `2^(−j)`, so the node's own ratio
+/// `γ = (1 − 2^(−j)) KT_s/(2^(−j) X_s)` is founded at `γ₀ = 2^j − 1`, an odd integer carried exactly,
+/// and steps `γ' = γ k(b)/x̂(b)`; its own face is `ê = ⟦μ̂ k(0) + (1 − μ̂) x̂(0)⟧`, `μ̂ = ⟦γ/(1 + γ)⟧`. The
+/// tree's stop weights and steps are the declared stop prior's with the own face in place of the
+/// KT face (`β' = β ê(b)/q̂'(b)`), so the tree stays normalized and Kraft-complete and each landmark
+/// pays at most `−log₂` of its own face's prior weight. An unfounded node reads the prior own face
+/// `⟦μ̂₀ ½ + (1 − μ̂₀) x̂⟧` (`node_local_founding`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct LocalLaw {
+    rung: u32,
+}
+
+impl LocalLaw {
+    /// **The law at rung `j`**, refused outside `1..=63` (`γ₀ = 2^j − 1` fits a word).
+    pub fn new(rung: u32) -> Result<Self, HnnError> {
+        if rung == 0 || rung > MAX_RUNG {
+            return Err(shape(
+                "a node-local rung of the dyadic ladder within 1..=63",
+                MAX_RUNG as usize,
+                rung as usize,
+            ));
+        }
+        Ok(Self { rung })
+    }
+
+    /// The rung `j`.
+    pub fn rung(&self) -> u32 {
+        self.rung
+    }
+
+    /// The KT face's prior weight `1 − 2^(−j)`, exact.
+    pub fn weight(&self) -> Rat {
+        Rat::one() - two_power(-i64::from(self.rung))
+    }
+
+    /// The founding ratio `γ₀ = 2^j − 1`.
+    pub fn founding(&self) -> u64 {
+        (1u64 << self.rung) - 1
+    }
+}
+
+impl std::fmt::Display for LocalLaw {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "local j = {}", self.rung)
+    }
+}
+
+// -------------------------------------------------------------------------------------------
 // the declaration and its derived widths
 
 /// [definition] **A landmark tree's declaration**: the exterior chart's `|A|`, the address depth
@@ -809,25 +894,29 @@ pub struct Widths {
 impl Widths {
     /// The widths the rule derives from a declaration.
     pub fn derived(declaration: &LandmarkDeclaration) -> Self {
-        let digits = odometer_digits(declaration.alphabet);
-        let carrier = carrier_width(
-            declaration.population,
-            digits,
-            declaration.grain,
-            declaration.path_depth(),
-        );
-        Self::with_carrier(declaration, carrier)
+        Self::at_depth(declaration, declaration.path_depth(), None)
+    }
+
+    /// [definition; agent-inferred] **The widths under the node-local law** (Decision 34): each
+    /// node's own face is one more lattice mixture on the read (its KT face against the external
+    /// face, with its own ratio's drift), so a path of `P` mixing levels and `P + 1` own mixtures
+    /// reads as a path of `P_local = 2P + 1` levels, and the rule derives `M_p` and `W` at it.
+    pub fn local(declaration: &LandmarkDeclaration) -> Self {
+        Self::at_depth(declaration, 2 * declaration.path_depth() + 1, None)
     }
 
     /// The derived widths with a declared carrier `W` in place of the rule's.
     fn with_carrier(declaration: &LandmarkDeclaration, carrier: u64) -> Self {
+        Self::at_depth(declaration, declaration.path_depth(), Some(carrier))
+    }
+
+    /// The widths at a path depth `P`, with the rule's carrier or a declared one.
+    fn at_depth(declaration: &LandmarkDeclaration, depth: u64, carrier: Option<u64>) -> Self {
         let digits = odometer_digits(declaration.alphabet);
-        let face = face_bits(
-            declaration.population,
-            digits,
-            declaration.grain,
-            declaration.path_depth(),
-        );
+        let carrier = carrier.unwrap_or_else(|| {
+            carrier_width(declaration.population, digits, declaration.grain, depth)
+        });
+        let face = face_bits(declaration.population, digits, declaration.grain, depth);
         let kappa = floor_reciprocal(declaration.population).bits();
         let rebase = if 2 * carrier + kappa + face + 1 > u64::from(u128::BITS) {
             126u64.saturating_sub(carrier)
@@ -891,6 +980,74 @@ fn two_power(exponent: i64) -> Rat {
 /// `⌈a/b⌉` in `u128`.
 fn ceil_div(a: u128, b: u128) -> u128 {
     a.div_ceil(b)
+}
+
+/// `⟦2^M u/v⟧`: the lattice numerator nearest `u/v` (ties up), inside `[1, 2^M − 1]`.
+fn lattice_round(widths: &Widths, numerator: u128, denominator: u128) -> u64 {
+    let rounded = (2 * numerator + denominator) / (2 * denominator);
+    (rounded as u64).clamp(1, (1u64 << widths.face) - 1)
+}
+
+/// `⟦λ̂ a + (1 − λ̂) b⟧` of two lattice faces with the stop weight `λ̂` (numerators of `2^(−M)`).
+fn lattice_blend(widths: &Widths, stop: u64, a: u64, b: u64) -> u64 {
+    let full = 1u128 << widths.face;
+    let stop = u128::from(stop);
+    lattice_round(
+        widths,
+        stop * u128::from(a) + (full - stop) * u128::from(b),
+        full,
+    )
+}
+
+/// **One carried β step** on `2^(−C)`: `β' = β u/(v x) 2^s`, with its rebase units `⌈2^C/m'⌉` and
+/// `⌈2^C/D̂⌉` (a mantissa kept, a carrier released).
+fn carried_step(
+    widths: &Widths,
+    beta: Beta,
+    u: u128,
+    v: u128,
+    x: u128,
+    shift: i64,
+) -> (Carried, u128) {
+    let (n, d, e) = beta.parts();
+    let carried = Beta::step(
+        u128::from(n) * u,
+        u128::from(d) * v * x,
+        e + shift,
+        widths.carrier,
+        widths.rebase,
+    );
+    let units = carried
+        .mantissa
+        .map_or(0, |m| ceil_div(1u128 << widths.certificate, m))
+        .saturating_add(
+            carried
+                .released
+                .map_or(0, |kept| ceil_div(1u128 << widths.certificate, kept)),
+        );
+    (carried, units)
+}
+
+/// A certificate on `2^(−C)` in `ln`, read in bits: times `3/2 > log₂ e`.
+fn certified(widths: &Widths, units: u128) -> Rat {
+    Rat::new(
+        BigInt::from(units) * 3,
+        BigInt::from(2u32) << widths.certificate as usize,
+    )
+}
+
+/// **A lattice split's numerator on another lattice**: `x/2^from` on `2^(−to)`, exact when
+/// `to ≥ from`, otherwise the nearest (ties up), inside `[1, 2^to − 1]` (the external face's chart on
+/// the tree's lattice).
+pub fn rescale_split(numerator: u64, from: u64, to: u64) -> u64 {
+    let top = (1u64 << to) - 1;
+    let value = if to >= from {
+        u128::from(numerator) << (to - from)
+    } else {
+        let shift = from - to;
+        (u128::from(numerator) + (1u128 << (shift - 1))) >> shift
+    };
+    (value as u64).clamp(1, top)
 }
 
 /// The greatest common divisor of two odd integers (binary: subtract, then shed twos).
@@ -1300,8 +1457,12 @@ trait Standing: Topology {
     fn join(&self, dyadic: usize) -> &Chart;
     fn join_mut(&mut self, dyadic: usize) -> &mut Chart;
     fn halves_mut(&mut self, node: u32) -> &mut [u32; 2];
+    /// A node's own chart (the node-local law, Decision 34): its own ratio `γ` and certificates.
+    fn own(&self, node: u32) -> &Chart;
+    fn own_mut(&mut self, node: u32) -> &mut Chart;
     /// Found a node at `depth` of `branch` in tree `t`, its root (`parent` absent) or the child
-    /// behind `(parent, letter)`, with the prior masses `[1, 1]` and `chart`.
+    /// behind `(parent, letter)`, with the prior masses `[1, 1]`, `chart`, and under the node-local
+    /// law its own chart.
     fn found(
         &mut self,
         tree: usize,
@@ -1309,6 +1470,7 @@ trait Standing: Topology {
         parent: Option<(u32, u32)>,
         depth: usize,
         chart: Chart,
+        own: Option<Chart>,
     ) -> u32;
     fn passed(&self) -> u64;
     fn pass(&mut self);
@@ -1316,12 +1478,14 @@ trait Standing: Topology {
     fn released(&mut self);
 }
 
-/// The executed tree's own standing: the arena, each node's chart, each dyadic cell's join chart
-/// (enlarged trees), the rebases, the carrier's releases and the cells passed.
+/// The executed tree's own standing: the arena, each node's chart, each node's own chart (the
+/// node-local law only; empty otherwise), each dyadic cell's join chart (enlarged trees), the
+/// rebases, the carrier's releases and the cells passed.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct Nodes {
     arena: Arena,
     charts: Vec<Chart>,
+    own: Vec<Chart>,
     joins: Vec<Chart>,
     rebases: u64,
     releases: u64,
@@ -1367,6 +1531,14 @@ impl Standing for Nodes {
         &mut self.arena.halves[node as usize]
     }
 
+    fn own(&self, node: u32) -> &Chart {
+        &self.own[node as usize]
+    }
+
+    fn own_mut(&mut self, node: u32) -> &mut Chart {
+        &mut self.own[node as usize]
+    }
+
     fn found(
         &mut self,
         tree: usize,
@@ -1374,9 +1546,13 @@ impl Standing for Nodes {
         parent: Option<(u32, u32)>,
         depth: usize,
         chart: Chart,
+        own: Option<Chart>,
     ) -> u32 {
         let node = self.arena.found(branch, depth);
         self.charts.push(chart);
+        if let Some(own) = own {
+            self.own.push(own);
+        }
         match parent {
             None => self.arena.roots[tree] = Some(node),
             Some((parent, letter)) => {
@@ -1411,9 +1587,10 @@ impl Standing for Nodes {
 struct Working<'a> {
     base: &'a Nodes,
     charts: HashMap<u32, Chart>,
+    own: HashMap<u32, Chart>,
     joins: HashMap<usize, Chart>,
     halves: HashMap<u32, [u32; 2]>,
-    founded: Vec<([u32; 2], Chart)>,
+    founded: Vec<([u32; 2], Chart, Option<Chart>)>,
     roots: HashMap<usize, u32>,
     children: HashMap<u64, u32>,
     passed: u64,
@@ -1424,6 +1601,7 @@ impl<'a> Working<'a> {
         Self {
             base,
             charts: HashMap::new(),
+            own: HashMap::new(),
             joins: HashMap::new(),
             halves: HashMap::new(),
             founded: Vec::new(),
@@ -1491,6 +1669,29 @@ impl Standing for Working<'_> {
         }
     }
 
+    fn own(&self, node: u32) -> &Chart {
+        match self.fresh(node) {
+            Some(index) => self.founded[index]
+                .2
+                .as_ref()
+                .expect("a node-local tree founds each node with its own chart"),
+            None => self.own.get(&node).unwrap_or_else(|| self.base.own(node)),
+        }
+    }
+
+    fn own_mut(&mut self, node: u32) -> &mut Chart {
+        match self.fresh(node) {
+            Some(index) => self.founded[index]
+                .2
+                .as_mut()
+                .expect("a node-local tree founds each node with its own chart"),
+            None => {
+                let base = self.base;
+                self.own.entry(node).or_insert_with(|| *base.own(node))
+            }
+        }
+    }
+
     fn join(&self, dyadic: usize) -> &Chart {
         self.joins
             .get(&dyadic)
@@ -1521,9 +1722,10 @@ impl Standing for Working<'_> {
         parent: Option<(u32, u32)>,
         _depth: usize,
         chart: Chart,
+        own: Option<Chart>,
     ) -> u32 {
         let node = u32::try_from(self.len()).expect("the arena is checked within 31 bits");
-        self.founded.push(([1, 1], chart));
+        self.founded.push(([1, 1], chart, own));
         match parent {
             None => {
                 self.roots.insert(tree, node);
@@ -1649,6 +1851,25 @@ fn check_declaration(declaration: &LandmarkDeclaration) -> Result<(), HnnError> 
 pub struct CellReading {
     pub executed: Rat,
     pub residual: Rat,
+}
+
+/// [definition] **One opened digit's reading** ([`Landmarks::receive_digits`]): its dyadic cell
+/// `h`, its digit `b`, the executed digit-0 numerator `q̂_h(0)` on `2^(−M_p)` (the observed side is
+/// `q̂_h(b)`), its read certificate and its deposit's top excess increment, each on `2^(−C)`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct DigitReading {
+    pub dyadic: usize,
+    pub symbol: usize,
+    pub split: u64,
+    pub certificate: u128,
+    pub increment: u128,
+}
+
+/// [definition] **A cell received digit by digit**: its reading and each opened digit's.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DigitsReading {
+    pub reading: CellReading,
+    pub digits: Vec<DigitReading>,
 }
 
 /// [definition] **One opened path**: the dyadic cell `h` whose tree it descends and the branch (`0`
@@ -1794,7 +2015,9 @@ struct Chart {
 
 /// One branch's executed read at an address: the tree it descends, the founded nodes from the
 /// root, and the lattice faces of the digit `0`, `q̂_d(0)` as numerators of `2^(−M_p)`, at
-/// `d = 0, …, min(f, D_b)` (the first unfounded depth `f` reads the prior `2^(M_p − 1)`).
+/// `d = 0, …, min(f, D_b)` (the first unfounded depth `f` reads the prior `2^(M_p − 1)`, or under
+/// the node-local law the prior own face). Under the node-local law it also holds the external
+/// face's digit-0 numerator `x̂` and each founded node's own face `ê_d(0)` (zero at a forced depth).
 #[derive(Clone, Debug)]
 struct LatticeRead {
     tree: usize,
@@ -1802,6 +2025,8 @@ struct LatticeRead {
     symbol: usize,
     nodes: Vec<u32>,
     faces: Vec<u64>,
+    own: Vec<u64>,
+    external: Option<u64>,
 }
 
 /// One digit's executed read: its dyadic cell, its digit, each branch's read and the digit-0 face
@@ -1822,9 +2047,10 @@ struct Branch {
 }
 
 /// The tree's law, apart from its standing: the declaration, its derived widths, the odometer, the
-/// branches and the founding chart at each depth (the declared stop prior's `β₀ = 2^(j_d) − 1` with
-/// its stop weight `λ̂ = ⟦1 − 2^(−j_d)⟧`). Its reads and its deposit act on any [`Standing`], the
-/// tree's own or a working overlay.
+/// branches, the founding chart at each depth (the declared stop prior's `β₀ = 2^(j_d) − 1` with
+/// its stop weight `λ̂ = ⟦1 − 2^(−j_d)⟧`), and under the node-local law (Decision 34) its rung with
+/// the own chart every node is founded from (`γ₀ = 2^j − 1`, `μ̂₀ = ⟦1 − 2^(−j)⟧`). Its reads and its
+/// deposit act on any [`Standing`], the tree's own or a working overlay.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct Law {
     declaration: LandmarkDeclaration,
@@ -1832,6 +2058,7 @@ struct Law {
     odometer: Odometer,
     branches: Vec<Branch>,
     founding: Vec<Chart>,
+    local: Option<(LocalLaw, Chart)>,
 }
 
 /// [definition] **The landmark tree, executed** (module header): the declaration, its derived
@@ -1843,7 +2070,7 @@ pub struct Landmarks {
 }
 
 impl Law {
-    fn new(declaration: LandmarkDeclaration, widths: Widths) -> Self {
+    fn new(declaration: LandmarkDeclaration, widths: Widths, local: Option<LocalLaw>) -> Self {
         let odometer = Odometer {
             alphabet: declaration.alphabet,
             digits: widths.digits,
@@ -1858,30 +2085,33 @@ impl Law {
             })
             .collect::<Vec<Branch>>();
         let deepest = branches.iter().map(|b| b.depth).max().unwrap_or(0);
+        let chart_of = |ratio: u64| {
+            let beta = Beta {
+                numerator: ratio,
+                denominator: 1,
+                exponent: 0,
+            };
+            Chart {
+                beta,
+                stop: beta.stop_weight(widths.face, widths.carrier),
+                rebases: 0,
+                drift: 0,
+                excess: 0,
+            }
+        };
         // `β₀ = 2^(j_d) − 1`, odd, carried exactly: within `W` bits at every mixing depth (the
         // declaration is refused otherwise), and never stepped at a leaf.
         let founding = (0..=deepest)
-            .map(|depth| {
-                let beta = Beta {
-                    numerator: declaration.prior.founding(depth),
-                    denominator: 1,
-                    exponent: 0,
-                };
-                Chart {
-                    beta,
-                    stop: beta.stop_weight(widths.face, widths.carrier),
-                    rebases: 0,
-                    drift: 0,
-                    excess: 0,
-                }
-            })
+            .map(|depth| chart_of(declaration.prior.founding(depth)))
             .collect();
+        let local = local.map(|law| (law, chart_of(law.founding())));
         Self {
             declaration,
             widths,
             odometer,
             branches,
             founding,
+            local,
         }
     }
 
@@ -1897,6 +2127,21 @@ impl Law {
         self.branches.len() > 1
     }
 
+    fn is_local(&self) -> bool {
+        self.local.is_some()
+    }
+
+    /// The path depth the widths' rule reads: the declaration's `P`, or `2P + 1` under the
+    /// node-local law ([`Widths::local`]).
+    fn path_depth(&self) -> u64 {
+        let depth = self.declaration.path_depth();
+        if self.is_local() {
+            2 * depth + 1
+        } else {
+            depth
+        }
+    }
+
     /// Tree `t = branch · 2^B + h`.
     fn tree(&self, branch: usize, dyadic: usize) -> usize {
         branch * self.cells() + dyadic
@@ -1909,16 +2154,12 @@ impl Law {
 
     /// `⟦2^M u/v⟧`: the lattice numerator nearest `u/v` (ties up), inside `[1, 2^M − 1]`.
     fn round(&self, numerator: u128, denominator: u128) -> u64 {
-        let rounded = (2 * numerator + denominator) / (2 * denominator);
-        (rounded as u64).clamp(1, self.full() - 1)
+        lattice_round(&self.widths, numerator, denominator)
     }
 
     /// A certificate on `2^(−C)` in `ln`, read in bits: times `3/2 > log₂ e`.
     fn certified_bits(&self, units: u128) -> Rat {
-        Rat::new(
-            BigInt::from(units) * 3,
-            BigInt::from(2u32) << self.widths.certificate as usize,
-        )
+        certified(&self.widths, units)
     }
 
     /// A join's fresh chart: `β = 1`, `λ̂ = 1/2`, no certificate (the join's own two-face mixture).
@@ -1938,29 +2179,43 @@ impl Law {
         self.round(u128::from(u) << self.widths.face, u128::from(v))
     }
 
-    /// The mixing node's lattice face `⟦λ̂ k(0) + (1 − λ̂) q̂'⟧`, on `2^M v` as the common
-    /// denominator.
-    fn mix(&self, nodes: &impl Standing, node: u32, below: u64) -> u64 {
-        let (u, v) = nodes.kt(node, 0);
+    /// `⟦λ̂ u/v + (1 − λ̂) x⟧` with the stop weight `λ̂` and a lattice face `x`, on `2^M v` as the
+    /// common denominator.
+    fn mix_stop(&self, stop: u64, u: u64, v: u64, below: u64) -> u64 {
         let face = self.widths.face;
-        let stop = u128::from(nodes.chart(node).stop);
+        let stop = u128::from(stop);
         let full = u128::from(self.full());
         let numerator =
             ((stop * u128::from(u)) << face) + (full - stop) * u128::from(below) * u128::from(v);
         self.round(numerator, u128::from(v) << face)
     }
 
-    /// The join's lattice face `⟦λ̂_h q̂_cells + (1 − λ̂_h) q̂_bundles⟧`.
-    fn join_face(&self, nodes: &impl Standing, dyadic: usize, cells: u64, bundles: u64) -> u64 {
-        let stop = u128::from(nodes.join(dyadic).stop);
-        let full = u128::from(self.full());
-        self.round(
-            stop * u128::from(cells) + (full - stop) * u128::from(bundles),
-            full,
-        )
+    /// The mixing node's lattice face `⟦λ̂ k(0) + (1 − λ̂) q̂'⟧`.
+    fn mix(&self, nodes: &impl Standing, node: u32, below: u64) -> u64 {
+        let (u, v) = nodes.kt(node, 0);
+        self.mix_stop(nodes.chart(node).stop, u, v, below)
     }
 
-    /// **One branch's executed read** at its letters in tree `t`, at most `limit` founded nodes.
+    /// **A founded node's own face** under the node-local law: `⟦μ̂ k(0) + (1 − μ̂) x̂(0)⟧`.
+    fn own_face(&self, nodes: &impl Standing, node: u32, external: u64) -> u64 {
+        let (u, v) = nodes.kt(node, 0);
+        self.mix_stop(nodes.own(node).stop, u, v, external)
+    }
+
+    /// **An unfounded node's own face**: `⟦μ̂₀ ½ + (1 − μ̂₀) x̂(0)⟧` (Lean `node_local_founding`).
+    fn unfounded_face(&self, external: u64) -> u64 {
+        let (_, founding) = self.local.as_ref().expect("the node-local law");
+        self.mix_stop(founding.stop, 1, 2, external)
+    }
+
+    /// The join's lattice face `⟦λ̂_h q̂_cells + (1 − λ̂_h) q̂_bundles⟧`.
+    fn join_face(&self, nodes: &impl Standing, dyadic: usize, cells: u64, bundles: u64) -> u64 {
+        lattice_blend(&self.widths, nodes.join(dyadic).stop, cells, bundles)
+    }
+
+    /// **One branch's executed read** at its letters in tree `t`, at most `limit` founded nodes;
+    /// under the node-local law each founded node's own face mixes its KT face with `external`.
+    #[allow(clippy::too_many_arguments)]
     fn read(
         &self,
         nodes: &impl Standing,
@@ -1969,20 +2224,41 @@ impl Law {
         symbol: usize,
         letters: &[u32],
         limit: usize,
+        external: Option<u64>,
     ) -> LatticeRead {
         let Branch { depth, forced } = self.branches[branch];
         let tree = self.tree(branch, dyadic);
         let path = nodes.open(tree, letters, limit);
         let top = path.len().min(depth);
+        let own: Vec<u64> = match external {
+            Some(x) => (0..path.len())
+                .map(|d| {
+                    if d < forced {
+                        0
+                    } else {
+                        self.own_face(nodes, path[d], x)
+                    }
+                })
+                .collect(),
+            None => Vec::new(),
+        };
         let mut faces = vec![0u64; top + 1];
-        faces[top] = if path.len() == depth + 1 {
-            self.leaf(nodes, path[depth])
-        } else {
-            self.full() / 2
+        faces[top] = match (path.len() == depth + 1, external) {
+            (true, Some(_)) => own[depth],
+            (true, None) => self.leaf(nodes, path[depth]),
+            (false, Some(x)) => self.unfounded_face(x),
+            (false, None) => self.full() / 2,
         };
         for d in (0..top).rev() {
             faces[d] = if d < forced {
                 faces[d + 1]
+            } else if external.is_some() {
+                lattice_blend(
+                    &self.widths,
+                    nodes.chart(path[d]).stop,
+                    own[d],
+                    faces[d + 1],
+                )
             } else {
                 self.mix(nodes, path[d], faces[d + 1])
             };
@@ -1993,6 +2269,8 @@ impl Law {
             symbol,
             nodes: path,
             faces,
+            own,
+            external,
         }
     }
 
@@ -2004,6 +2282,7 @@ impl Law {
         symbol: usize,
         letters: &[Vec<u32>],
         limits: &[usize],
+        external: Option<u64>,
     ) -> DigitRead {
         let reads: Vec<LatticeRead> = (0..self.branches.len())
             .map(|branch| {
@@ -2014,6 +2293,7 @@ impl Law {
                     symbol,
                     &letters[branch],
                     limits[branch],
+                    external,
                 )
             })
             .collect();
@@ -2030,14 +2310,45 @@ impl Law {
         }
     }
 
-    /// Every digit a class opens, read at the standing.
-    fn reads(&self, nodes: &impl Standing, address: &[Letter], class: usize) -> Vec<DigitRead> {
+    /// Refused unless the external faces fit the law: none for a tree without the node-local law,
+    /// one numerator inside `[1, 2^(M_p) − 1]` per opened digit (or splitting dyadic cell) with it.
+    fn check_external(&self, external: &[u64], expected: usize) -> Result<(), HnnError> {
+        let wanted = if self.is_local() { expected } else { 0 };
+        if external.len() != wanted {
+            return Err(shape(
+                "one external digit-0 face per opened digit under the node-local law, none otherwise",
+                wanted,
+                external.len(),
+            ));
+        }
+        if let Some(&x) = external.iter().find(|&&x| x == 0 || x >= self.full()) {
+            return Err(shape(
+                "an external digit-0 face inside the lattice's open unit interval",
+                self.full() as usize,
+                x as usize,
+            ));
+        }
+        Ok(())
+    }
+
+    /// Every digit a class opens, read at the standing (with its external face, node-local law).
+    fn reads(
+        &self,
+        nodes: &impl Standing,
+        address: &[Letter],
+        class: usize,
+        external: &[u64],
+    ) -> Vec<DigitRead> {
         let letters = self.flatten(address);
         let limits: Vec<usize> = self.branches.iter().map(|b| b.depth + 1).collect();
         self.odometer
             .emitted(class)
             .into_iter()
-            .map(|(dyadic, symbol)| self.digit(nodes, dyadic, symbol, &letters, &limits))
+            .enumerate()
+            .map(|(index, (dyadic, symbol))| {
+                let x = external.get(index).copied();
+                self.digit(nodes, dyadic, symbol, &letters, &limits, x)
+            })
             .collect()
     }
 
@@ -2052,7 +2363,9 @@ impl Law {
 
     /// **A level's rounding bound** `θ_d` of `symbol` on `2^(−C)`: `2^(−M)/min(q̂_d, k_d, q̂_(d+1))`
     /// at a mixing node, `2^(−M−1)/min(q̂_D, k_D)` at a founded leaf, zero at a forced or unfounded
-    /// depth (their faces pass exactly).
+    /// depth (their faces pass exactly). Under the node-local law the node's own face `ê_d` takes
+    /// the KT face's place: `2^(−M)/min(q̂_d, ê_d, q̂_(d+1))` at a mixing node and zero at the leaf,
+    /// whose face is its own face (`own_rounding`).
     fn rounding(&self, nodes: &impl Standing, read: &LatticeRead, d: usize) -> u128 {
         let Widths {
             face, certificate, ..
@@ -2060,6 +2373,15 @@ impl Law {
         let Branch { depth, forced } = self.branches[read.branch];
         if d >= read.nodes.len() || d < forced {
             return 0;
+        }
+        if read.external.is_some() {
+            if d == depth {
+                return 0;
+            }
+            let own = u128::from(self.side(read.own[d], read.symbol));
+            let here = u128::from(self.side(read.faces[d], read.symbol));
+            let below = u128::from(self.side(read.faces[d + 1], read.symbol));
+            return ceil_div(1u128 << certificate, here.min(below).min(own));
         }
         let (u, v) = nodes.kt(read.nodes[d], read.symbol);
         let here = u128::from(self.side(read.faces[d], read.symbol));
@@ -2075,6 +2397,37 @@ impl Law {
         }
     }
 
+    /// **The own face's rounding bound** under the node-local law, on `2^(−C)`:
+    /// `2^(−M)/min(ê_d, k_d, x̂)` at a founded node, and at the first unfounded depth
+    /// `2^(−M)/min(ê₀, ½, x̂)` (the prior own face is rounded once; `μ̂₀ = 1 − 2^(−j)` is exact on the
+    /// lattice); zero without the law.
+    fn own_rounding(&self, nodes: &impl Standing, read: &LatticeRead, d: usize) -> u128 {
+        let Widths {
+            face, certificate, ..
+        } = self.widths;
+        let Some(x) = read.external else {
+            return 0;
+        };
+        let Branch { depth, forced } = self.branches[read.branch];
+        let external = u128::from(self.side(x, read.symbol));
+        if d < read.nodes.len() {
+            if d < forced {
+                return 0;
+            }
+            let (u, v) = nodes.kt(read.nodes[d], read.symbol);
+            let own = u128::from(self.side(read.own[d], read.symbol));
+            let kt = ceil_div(u128::from(v) << (certificate - face), u128::from(u));
+            ceil_div(1u128 << certificate, own.min(external)).max(kt)
+        } else if d == read.nodes.len() && d <= depth {
+            let top = read.faces.len() - 1;
+            let own = u128::from(self.side(read.faces[top], read.symbol));
+            let half = u128::from(self.full() / 2);
+            ceil_div(1u128 << certificate, own.min(external).min(half))
+        } else {
+            0
+        }
+    }
+
     /// **The join's rounding bound** `θ_h = 2^(−M)/min(q̂_h, q̂_cells, q̂_bundles)` on `2^(−C)`.
     fn join_rounding(&self, digit: &DigitRead) -> u128 {
         let side = |zero: u64| u128::from(self.side(zero, digit.symbol));
@@ -2084,16 +2437,26 @@ impl Law {
         ceil_div(1u128 << self.widths.certificate, least)
     }
 
-    /// `ρ ≤ Σ drift + Σ θ` of one branch's read on `2^(−C)`.
+    /// `ρ ≤ Σ drift + Σ θ` of one branch's read on `2^(−C)`; under the node-local law each founded
+    /// node's own drift and own rounding, and the unfounded depth's own rounding, add.
     fn certificate(&self, nodes: &impl Standing, read: &LatticeRead) -> u128 {
         let Branch { depth, forced } = self.branches[read.branch];
         let mixing = read.nodes.len().min(depth);
         let drift = (forced..mixing)
             .map(|d| nodes.chart(read.nodes[d]).drift)
             .fold(0u128, u128::saturating_add);
-        (0..read.faces.len())
+        let mut total = (0..read.faces.len())
             .map(|d| self.rounding(nodes, read, d))
-            .fold(drift, u128::saturating_add)
+            .fold(drift, u128::saturating_add);
+        if read.external.is_some() {
+            for d in forced..read.nodes.len() {
+                total = total
+                    .saturating_add(nodes.own(read.nodes[d]).drift)
+                    .saturating_add(self.own_rounding(nodes, read, d));
+            }
+            total = total.saturating_add(self.own_rounding(nodes, read, read.nodes.len()));
+        }
+        total
     }
 
     /// One digit's certificate: its branches' and, in an enlarged tree, the join's drift and
@@ -2128,8 +2491,10 @@ impl Law {
     }
 
     /// **The splits at an address** (module header, "Faces"): each splitting dyadic cell's digit-0
-    /// face, heap-ordered, each branch's read bounded by its splitting ancestor's founded depth.
-    fn splits(&self, nodes: &impl Standing, address: &[Letter]) -> Splits {
+    /// face, heap-ordered, each branch's read bounded by its splitting ancestor's founded depth;
+    /// under the node-local law `external` holds each splitting dyadic cell's external digit-0
+    /// face in the same order.
+    fn splits(&self, nodes: &impl Standing, address: &[Letter], external: &[u64]) -> Splits {
         let letters = self.flatten(address);
         let branches = self.branches.len();
         let cells = self.cells();
@@ -2146,7 +2511,8 @@ impl Law {
                 let h = (1usize << level) | prefix;
                 if self.odometer.splits(level, prefix) {
                     let limits: Vec<usize> = (0..branches).map(|b| limit[b][h]).collect();
-                    let digit = self.digit(nodes, h, 0, &letters, &limits);
+                    let x = external.get(numerators.len()).copied();
+                    let digit = self.digit(nodes, h, 0, &letters, &limits, x);
                     for (branch, read) in digit.reads.iter().enumerate() {
                         limit[branch][2 * h] = read.nodes.len();
                         limit[branch][2 * h + 1] = read.nodes.len();
@@ -2171,36 +2537,19 @@ impl Law {
         nodes: &impl Standing,
         address: &[Letter],
         grain: u64,
+        external: &[u64],
     ) -> Result<LandmarkFace, HnnError> {
-        LandmarkFace::of_splits(&self.declaration, &self.splits(nodes, address), grain)
+        LandmarkFace::of_splits(
+            &self.declaration,
+            &self.splits(nodes, address, external),
+            grain,
+        )
     }
 
     /// **One carried β step** on `2^(−C)`: the step `β' = β u/(v x) 2^s`, its rebase units
     /// `⌈2^C/m'⌉` and `⌈2^C/D̂⌉` (a mantissa kept, a carrier released), and whether it rebased.
     fn beta_step(&self, beta: Beta, u: u128, v: u128, x: u128, shift: i64) -> (Carried, u128) {
-        let Widths {
-            carrier,
-            certificate,
-            rebase,
-            ..
-        } = self.widths;
-        let (n, d, e) = beta.parts();
-        let carried = Beta::step(
-            u128::from(n) * u,
-            u128::from(d) * v * x,
-            e + shift,
-            carrier,
-            rebase,
-        );
-        let units = carried
-            .mantissa
-            .map_or(0, |m| ceil_div(1u128 << certificate, m))
-            .saturating_add(
-                carried
-                    .released
-                    .map_or(0, |kept| ceil_div(1u128 << certificate, kept)),
-            );
-        (carried, units)
+        carried_step(&self.widths, beta, u, v, x, shift)
     }
 
     /// Record a carried step's rebases on the standing and its chart.
@@ -2214,46 +2563,114 @@ impl Law {
         u32::from(carried.mantissa.is_some())
     }
 
+    /// **The node-local own step** at one founded node: `γ' = γ k(b)/x̂(b)` with its rebase units,
+    /// the own chart's drift and excess growing; returns the own face's excess increment on the
+    /// grid (its rounding plus twice its rebase units).
+    fn own_step(&self, nodes: &mut impl Standing, read: &LatticeRead, d: usize) -> u128 {
+        let node = read.nodes[d];
+        let theta = self.own_rounding(nodes, read, d);
+        let (u, v) = nodes.kt(node, read.symbol);
+        let x = self.side(read.external.expect("the node-local law"), read.symbol);
+        let gamma = nodes.own(node).beta;
+        let (step, units) = self.beta_step(
+            gamma,
+            u128::from(u),
+            u128::from(v),
+            u128::from(x),
+            self.widths.face as i64,
+        );
+        let rebased = Self::record(nodes, &step);
+        let increment = theta.saturating_add(units.saturating_mul(2));
+        let own = nodes.own_mut(node);
+        own.beta = step.beta;
+        own.stop = step.beta.stop_weight(self.widths.face, self.widths.carrier);
+        own.rebases += rebased;
+        own.drift = own.drift.saturating_add(units);
+        own.excess = own.excess.saturating_add(increment);
+        increment
+    }
+
     /// **Deposit one branch's read** on a standing: each mixing node's β steps by `k(b)/q̂_(d+1)(b)`
-    /// bottom-up and its certificates grow, the path's missing nodes are founded at their depth's
-    /// `β₀` (the declared stop prior), then each node's mass of the digit grows. Returns the root's
-    /// excess increment.
+    /// (under the node-local law by `ê(b)/q̂_(d+1)(b)`, each founded node's own ratio by
+    /// `k(b)/x̂(b)`) bottom-up and its certificates grow, the path's missing nodes are founded at
+    /// their depth's `β₀` (the declared stop prior; under the node-local law with `γ₀` stepped by the
+    /// empty KT face against `x̂`, `γ₀ ½/x̂(b)`), then each node's mass of the digit grows. Returns the
+    /// root's excess increment.
     fn apply_branch(&self, nodes: &mut impl Standing, letters: &[u32], read: LatticeRead) -> u128 {
         let face = self.widths.face;
         let Branch { depth, forced } = self.branches[read.branch];
+        let local = read.external.is_some();
+        // The first unfounded depth's own face is rounded once under the node-local law.
+        let unfounded = if local {
+            self.own_rounding(nodes, &read, read.nodes.len())
+        } else {
+            0
+        };
         // Bottom-up over the founded nodes: θ and the rebases add to the excess, the child's
-        // excess increment and the rebases to the drift.
-        let mut carried = 0u128;
+        // excess increment and the rebases to the drift (and the own face's increment, node-local).
+        let mut carried = unfounded;
         for d in (forced..read.nodes.len()).rev() {
             let theta = self.rounding(nodes, &read, d);
             let node = read.nodes[d];
+            let own = if local {
+                self.own_step(nodes, &read, d)
+            } else {
+                0
+            };
             let mut rebase = 0u128;
             if d < depth {
-                let (u, v) = nodes.kt(node, read.symbol);
                 let below = self.side(read.faces[d + 1], read.symbol);
                 let beta = nodes.chart(node).beta;
-                let (step, units) = self.beta_step(
-                    beta,
-                    u128::from(u),
-                    u128::from(v),
-                    u128::from(below),
-                    face as i64,
-                );
+                let (step, units) = if local {
+                    let own_side = self.side(read.own[d], read.symbol);
+                    self.beta_step(beta, u128::from(own_side), 1, u128::from(below), 0)
+                } else {
+                    let (u, v) = nodes.kt(node, read.symbol);
+                    self.beta_step(
+                        beta,
+                        u128::from(u),
+                        u128::from(v),
+                        u128::from(below),
+                        face as i64,
+                    )
+                };
                 rebase = units;
                 let rebased = Self::record(nodes, &step);
                 let chart = nodes.chart_mut(node);
                 chart.beta = step.beta;
                 chart.stop = step.beta.stop_weight(face, self.widths.carrier);
                 chart.rebases += rebased;
-                chart.drift = chart.drift.saturating_add(carried).saturating_add(rebase);
+                chart.drift = chart
+                    .drift
+                    .saturating_add(carried)
+                    .saturating_add(rebase)
+                    .saturating_add(own);
             }
             let increment = theta
                 .saturating_add(rebase.saturating_mul(2))
-                .saturating_add(carried);
+                .saturating_add(carried)
+                .saturating_add(own);
             let chart = nodes.chart_mut(node);
             chart.excess = chart.excess.saturating_add(increment);
             carried = increment;
         }
+        // The founded nodes' own chart: `γ₀` stepped by `½/x̂(b)` (the empty KT face).
+        let own_founding = self
+            .local
+            .as_ref()
+            .zip(read.external)
+            .map(|((_, chart), x)| {
+                let side = self.side(x, read.symbol);
+                let (step, units) = self.beta_step(chart.beta, 1, 2, u128::from(side), face as i64);
+                let own = Chart {
+                    beta: step.beta,
+                    stop: step.beta.stop_weight(face, self.widths.carrier),
+                    rebases: u32::from(step.mantissa.is_some()),
+                    drift: units,
+                    excess: unfounded.saturating_add(units.saturating_mul(2)),
+                };
+                (own, step)
+            });
         let LatticeRead {
             tree,
             branch,
@@ -2261,19 +2678,32 @@ impl Law {
             nodes: mut path,
             ..
         } = read;
+        let chart_at = |depth: usize| {
+            let mut chart = self.founding[depth];
+            chart.excess = unfounded;
+            chart
+        };
+        let own_at = own_founding.map(|(own, _)| own);
         if path.is_empty() {
-            path.push(nodes.found(tree, branch, None, 0, self.founding[0]));
+            if let Some((_, step)) = &own_founding {
+                Self::record(nodes, step);
+            }
+            path.push(nodes.found(tree, branch, None, 0, chart_at(0), own_at));
         }
         while path.len() < letters.len() + 1 {
             let parent = *path.last().expect("a root");
             let letter = letters[path.len() - 1];
             let depth = path.len();
+            if let Some((_, step)) = &own_founding {
+                Self::record(nodes, step);
+            }
             path.push(nodes.found(
                 tree,
                 branch,
                 Some((parent, letter)),
                 depth,
-                self.founding[depth],
+                chart_at(depth),
+                own_at,
             ));
         }
         for &node in path.iter().skip(forced) {
@@ -2283,15 +2713,17 @@ impl Law {
     }
 
     /// **Deposit one cell's reads** on a standing (module header): each branch's opened path, then
-    /// each join's β by `q̂_cells(b)/q̂_bundles(b)` with its certificates. Refused before anything
-    /// moves once the standing has passed `admitted` cells, or past 31-bit node numbers.
+    /// each join's β by `q̂_cells(b)/q̂_bundles(b)` with its certificates. Returns each opened digit's
+    /// top excess increment on `2^(−C)` (the join's in an enlarged tree, the cell branch root's
+    /// otherwise). Refused before anything moves once the standing has passed `admitted` cells, or
+    /// past 31-bit node numbers.
     fn apply(
         &self,
         nodes: &mut impl Standing,
         address: &[Letter],
         digits: Vec<DigitRead>,
         admitted: u64,
-    ) -> Result<(), HnnError> {
+    ) -> Result<Vec<u128>, HnnError> {
         if nodes.passed() >= admitted {
             return Err(HnnError::PopulationReached {
                 population: self.declaration.population,
@@ -2301,6 +2733,7 @@ impl Law {
         let founding: usize = letters.iter().map(|l| l.len() + 1).sum();
         nodes.founded_within(digits.len() * founding)?;
         let face = self.widths.face;
+        let mut tops = Vec::with_capacity(digits.len());
         for digit in digits {
             let theta = if self.joined() {
                 self.join_rounding(&digit)
@@ -2333,15 +2766,17 @@ impl Law {
                 chart.stop = step.beta.stop_weight(face, self.widths.carrier);
                 chart.rebases += rebased;
                 chart.drift = chart.drift.saturating_add(increments).saturating_add(units);
-                chart.excess = chart
-                    .excess
-                    .saturating_add(theta)
+                let increment = theta
                     .saturating_add(units.saturating_mul(2))
                     .saturating_add(increments);
+                chart.excess = chart.excess.saturating_add(increment);
+                tops.push(increment);
+            } else {
+                tops.push(increments);
             }
         }
         nodes.pass();
-        Ok(())
+        Ok(tops)
     }
 }
 
@@ -2354,7 +2789,19 @@ impl Landmarks {
     pub fn new(declaration: LandmarkDeclaration) -> Result<Self, HnnError> {
         check_declaration(&declaration)?;
         let widths = Widths::derived(&declaration);
-        Self::with_widths(declaration, widths)
+        Self::with_widths(declaration, widths, None)
+    }
+
+    /// **Declare a tree under the node-local law** (Decision 34, [`LocalLaw`]), empty: every node's
+    /// own face mixes its KT face with the external face its reads are given
+    /// ([`Landmarks::receive_with`]), the KT face at the prior weight `1 − 2^(−j)`. Refused as
+    /// [`Landmarks::new`] refuses, and at a rung past the carrier `W` or the lattice `M_p` (`γ₀` and
+    /// `μ̂₀ = 1 − 2^(−j)` are then carried exactly). Its widths are the rule's at the node-local path
+    /// depth `2P + 1` ([`Widths::local`]).
+    pub fn local(declaration: LandmarkDeclaration, law: LocalLaw) -> Result<Self, HnnError> {
+        check_declaration(&declaration)?;
+        let widths = Widths::local(&declaration);
+        Self::with_widths(declaration, widths, Some(law))
     }
 
     /// **Declare a tree at a declared carrier width `W`** in place of the rule's. A width below the
@@ -2363,10 +2810,14 @@ impl Landmarks {
     pub fn with_carrier(declaration: LandmarkDeclaration, carrier: u64) -> Result<Self, HnnError> {
         check_declaration(&declaration)?;
         let widths = Widths::with_carrier(&declaration, carrier);
-        Self::with_widths(declaration, widths)
+        Self::with_widths(declaration, widths, None)
     }
 
-    fn with_widths(declaration: LandmarkDeclaration, widths: Widths) -> Result<Self, HnnError> {
+    fn with_widths(
+        declaration: LandmarkDeclaration,
+        widths: Widths,
+        local: Option<LocalLaw>,
+    ) -> Result<Self, HnnError> {
         let operands = widths.operand_bits(declaration.population);
         if !(2..=63).contains(&widths.carrier)
             || widths.face > 62
@@ -2392,7 +2843,16 @@ impl Landmarks {
                 widest as usize,
             ));
         }
-        let law = Law::new(declaration, widths);
+        if let Some(law) = local
+            && u64::from(law.rung()) > widths.carrier.min(widths.face)
+        {
+            return Err(shape(
+                "a node-local rung whose founding ratio 2^j − 1 fits the carrier's W bits and the lattice",
+                widths.carrier.min(widths.face) as usize,
+                law.rung() as usize,
+            ));
+        }
+        let law = Law::new(declaration, widths, local);
         let trees = law.branches.len() * law.cells();
         let joins = if law.joined() {
             vec![law.unit(); law.cells()]
@@ -2403,6 +2863,7 @@ impl Landmarks {
             nodes: Nodes {
                 arena: Arena::new(trees),
                 charts: Vec::new(),
+                own: Vec::new(),
                 joins,
                 rebases: 0,
                 releases: 0,
@@ -2451,8 +2912,8 @@ impl Landmarks {
     /// `bits(2C) + 2`, at the nodes of depth at least their branch's `forced`; at each mixing node
     /// (depth below its branch's) and each join, β's odd numerator and odd denominator,
     /// `max(1, bits) + 1` each, and its exponent, `max(1, bits|e|) + 2` with its sign; each founded
-    /// child's letter, `max(1, bits(letter)) + 1`; and one bit a splitting dyadic cell and branch
-    /// for its root's presence. The totals (the masses' sum), the cached stop weight (read from β)
+    /// child's letter, `max(1, bits(letter)) + 1`; one bit a splitting dyadic cell and branch for
+    /// its root's presence; and under the node-local law each node's own ratio `γ`, as β. The totals (the masses' sum), the cached stop weight (read from β)
     /// and the certificates are readings kept beside them and are not counted.
     pub fn bits(&self) -> u64 {
         let slot = |value: u64| u64::from((u64::BITS - value.leading_zeros()).max(1)) + 1;
@@ -2477,7 +2938,12 @@ impl Landmarks {
                 } else {
                     0
                 };
-                masses + beta
+                let own = self
+                    .nodes
+                    .own
+                    .get(node)
+                    .map_or(0, |own| beta_bits(&own.beta));
+                masses + beta + own
             })
             .sum();
         let letters: u64 = arena
@@ -2499,7 +2965,12 @@ impl Landmarks {
 
     /// **The β chart's report** (module header).
     pub fn chart(&self) -> ChartReport {
-        let charts = self.nodes.charts.iter().chain(&self.nodes.joins);
+        let charts = self
+            .nodes
+            .charts
+            .iter()
+            .chain(&self.nodes.own)
+            .chain(&self.nodes.joins);
         let (mut drift, mut node_rebases) = (0u128, 0u64);
         for chart in charts {
             drift = drift.max(chart.drift);
@@ -2529,7 +3000,7 @@ impl Landmarks {
         let declaration = &self.law.declaration;
         let (n, d) = (
             BigInt::from(declaration.population),
-            BigInt::from(declaration.path_depth()),
+            BigInt::from(self.law.path_depth()),
         );
         let paths = &n * &d * &d;
         let floor = (BigInt::one() << face as usize)
@@ -2549,22 +3020,54 @@ impl Landmarks {
         Ok(self.score(address, class)?.executed)
     }
 
+    /// The node-local law the tree was declared under, if any (Decision 34).
+    pub fn local_law(&self) -> Option<LocalLaw> {
+        self.law.local.as_ref().map(|(law, _)| *law)
+    }
+
+    /// Checks an address, a class and its external faces: one per digit the class opens under the
+    /// node-local law, none otherwise.
+    fn check_with(
+        &self,
+        address: &[Letter],
+        class: usize,
+        external: &[u64],
+    ) -> Result<(), HnnError> {
+        check(&self.law.declaration, address, class)?;
+        self.law
+            .check_external(external, self.law.odometer.emitted(class).len())
+    }
+
     /// **Score one class** at an address at the current standing: its executed face and its
     /// certified residual, with nothing deposited.
     pub fn score(&self, address: &[Letter], class: usize) -> Result<CellReading, HnnError> {
-        check(&self.law.declaration, address, class)?;
-        let reads = self.law.reads(&self.nodes, address, class);
+        self.score_with(address, class, &[])
+    }
+
+    /// **Score one class under the node-local law** (Decision 34): `external[i]` is the external
+    /// face's digit-0 numerator on `2^(−M_p)` at the `i`-th digit the class opens
+    /// ([`LandmarkDeclaration::emitted`] order), read causally at that digit (an external receiver
+    /// that walks the class's earlier digits, as the Born face does, supplies each at the state
+    /// they left). Empty for a tree without the law.
+    pub fn score_with(
+        &self,
+        address: &[Letter],
+        class: usize,
+        external: &[u64],
+    ) -> Result<CellReading, HnnError> {
+        self.check_with(address, class, external)?;
+        let reads = self.law.reads(&self.nodes, address, class, external);
         Ok(self.law.reading(&self.nodes, &reads))
     }
 
     /// **The opened paths of one class** at an address, with their executed lattice faces: per
     /// opened digit, each branch's path.
     pub fn opened(&self, address: &[Letter], class: usize) -> Result<Vec<OpenedPath>, HnnError> {
-        check(&self.law.declaration, address, class)?;
+        self.check_with(address, class, &[])?;
         let law = &self.law;
         let scale = BigInt::one() << law.widths.face as usize;
         Ok(law
-            .reads(&self.nodes, address, class)
+            .reads(&self.nodes, address, class, &[])
             .into_iter()
             .flat_map(|digit| {
                 let dyadic = digit.dyadic;
@@ -2600,15 +3103,37 @@ impl Landmarks {
     /// **The splits at an address** (module header, "Faces"): each splitting dyadic cell's
     /// executed digit-0 numerator, heap-ordered.
     pub fn splits(&self, address: &[Letter]) -> Result<Splits, HnnError> {
+        self.splits_with(address, &[])
+    }
+
+    /// **The splits under the node-local law**: `external` holds each splitting dyadic cell's
+    /// external digit-0 numerator on `2^(−M_p)`, heap-ordered ([`Landmarks::splitting`]); empty for
+    /// a tree without the law.
+    pub fn splits_with(&self, address: &[Letter], external: &[u64]) -> Result<Splits, HnnError> {
         check(&self.law.declaration, address, 0)?;
-        Ok(self.law.splits(&self.nodes, address))
+        self.law
+            .check_external(external, self.law.odometer.splitting().len())?;
+        Ok(self.law.splits(&self.nodes, address, external))
     }
 
     /// **All classes' executed faces at an address**, with their grain exponents at `grain`
     /// (module header, "Faces").
     pub fn face(&self, address: &[Letter], grain: u64) -> Result<LandmarkFace, HnnError> {
+        self.face_with(address, grain, &[])
+    }
+
+    /// **All classes' executed faces under the node-local law** (`external` as
+    /// [`Landmarks::splits_with`]).
+    pub fn face_with(
+        &self,
+        address: &[Letter],
+        grain: u64,
+        external: &[u64],
+    ) -> Result<LandmarkFace, HnnError> {
         check(&self.law.declaration, address, 0)?;
-        self.law.face(&self.nodes, address, grain)
+        self.law
+            .check_external(external, self.law.odometer.splitting().len())?;
+        self.law.face(&self.nodes, address, grain, external)
     }
 
     /// [definition; agent-inferred] **A window's faces in cell order** (module header, "A window
@@ -2618,7 +3143,8 @@ impl Landmarks {
     /// deposits wrote; the tree itself is unchanged. With nothing known every phase reads the
     /// current standing. The overlays are built in cell order, then the phases read together
     /// (`hnn::realization`: each reads its own overlay, and nothing is written). Refused at an
-    /// address or class outside the declaration.
+    /// address or class outside the declaration, and for a tree under the node-local law (its
+    /// phases would need their external faces).
     pub fn window_faces(
         &self,
         addresses: &[Vec<Letter>],
@@ -2637,6 +3163,13 @@ impl Landmarks {
         known: &[usize],
     ) -> Result<Vec<Splits>, HnnError> {
         let law = &self.law;
+        if law.is_local() {
+            return Err(shape(
+                "a window read of a tree without the node-local law",
+                0,
+                1,
+            ));
+        }
         for address in addresses {
             check(&law.declaration, address, 0)?;
         }
@@ -2648,14 +3181,14 @@ impl Landmarks {
         let mut working = Working::on(&self.nodes);
         let mut standings = Vec::with_capacity(deposits);
         for (address, &class) in addresses.iter().zip(known).take(deposits) {
-            let reads = law.reads(&working, address, class);
+            let reads = law.reads(&working, address, class, &[]);
             law.apply(&mut working, address, reads, admitted)?;
             standings.push(working.clone());
         }
         indexed(addresses.len(), |j| {
             Ok::<_, HnnError>(match j.min(deposits).checked_sub(1) {
-                Some(index) => law.splits(&standings[index], &addresses[j]),
-                None => law.splits(&self.nodes, &addresses[j]),
+                Some(index) => law.splits(&standings[index], &addresses[j], &[]),
+                None => law.splits(&self.nodes, &addresses[j], &[]),
             })
         })
     }
@@ -2682,21 +3215,74 @@ impl Landmarks {
     /// each join's β steps. Refused before anything moves at a bad address or class, or past the
     /// declared population.
     pub fn deposit(&mut self, address: &[Letter], class: usize) -> Result<(), HnnError> {
-        check(&self.law.declaration, address, class)?;
-        let reads = self.law.reads(&self.nodes, address, class);
+        self.deposit_with(address, class, &[])
+    }
+
+    /// **Deposit one cell under the node-local law** (`external` as [`Landmarks::score_with`]): each
+    /// founded node's own ratio steps by `k(b)/x̂(b)` and each mixing node's β by `ê(b)/q̂_(d+1)(b)`.
+    pub fn deposit_with(
+        &mut self,
+        address: &[Letter],
+        class: usize,
+        external: &[u64],
+    ) -> Result<(), HnnError> {
+        self.check_with(address, class, external)?;
+        let reads = self.law.reads(&self.nodes, address, class, external);
         let population = self.law.declaration.population;
-        self.law.apply(&mut self.nodes, address, reads, population)
+        self.law
+            .apply(&mut self.nodes, address, reads, population)
+            .map(|_| ())
     }
 
     /// **Receive one cell**: score it at the current standing, then deposit it.
     pub fn receive(&mut self, address: &[Letter], class: usize) -> Result<CellReading, HnnError> {
-        check(&self.law.declaration, address, class)?;
-        let reads = self.law.reads(&self.nodes, address, class);
+        self.receive_with(address, class, &[])
+    }
+
+    /// **Receive one cell under the node-local law** (`external` as [`Landmarks::score_with`]).
+    pub fn receive_with(
+        &mut self,
+        address: &[Letter],
+        class: usize,
+        external: &[u64],
+    ) -> Result<CellReading, HnnError> {
+        Ok(self.receive_digits(address, class, external)?.reading)
+    }
+
+    /// **Receive one cell, digit by digit** (the development harness's and a join's reading): the
+    /// cell's reading, and per opened digit its dyadic cell, its digit, its executed digit-0
+    /// numerator on `2^(−M_p)`, its certificate and the deposit's top excess increment on `2^(−C)`.
+    pub fn receive_digits(
+        &mut self,
+        address: &[Letter],
+        class: usize,
+        external: &[u64],
+    ) -> Result<DigitsReading, HnnError> {
+        self.check_with(address, class, external)?;
+        let reads = self.law.reads(&self.nodes, address, class, external);
         let reading = self.law.reading(&self.nodes, &reads);
+        let digits: Vec<DigitReading> = reads
+            .iter()
+            .map(|digit| DigitReading {
+                dyadic: digit.dyadic,
+                symbol: digit.symbol,
+                split: digit.face,
+                certificate: self.law.digit_certificate(&self.nodes, digit),
+                increment: 0,
+            })
+            .collect();
         let population = self.law.declaration.population;
-        self.law
+        let increments = self
+            .law
             .apply(&mut self.nodes, address, reads, population)?;
-        Ok(reading)
+        Ok(DigitsReading {
+            reading,
+            digits: digits
+                .into_iter()
+                .zip(increments)
+                .map(|(digit, increment)| DigitReading { increment, ..digit })
+                .collect(),
+        })
     }
 
     /// **The nodes and joins a deposit touches** (the mirror's per-deposit lockstep): the founded
@@ -2708,9 +3294,9 @@ impl Landmarks {
         address: &[Letter],
         class: usize,
     ) -> Result<(Vec<u32>, Vec<usize>), HnnError> {
-        check(&self.law.declaration, address, class)?;
+        self.check_with(address, class, &[])?;
         let (mut nodes, mut dyadic) = (Vec::new(), Vec::new());
-        for digit in self.law.reads(&self.nodes, address, class) {
+        for digit in self.law.reads(&self.nodes, address, class, &[]) {
             dyadic.push(digit.dyadic);
             for read in digit.reads {
                 nodes.extend(read.nodes);
@@ -2984,7 +3570,10 @@ fn dyadic_grain_exponent(
 /// `q_d = (β k_d + q_(d+1))/(1 + β)`, each node founded at its depth's `β₀ = 2^(j_d) − 1` (the
 /// declared stop prior), the deposit `β' = β k/q_(d+1)` on the exact faces, and in an enlarged tree
 /// each join `q_h = (β_h q_cells + q_bundles)/(1 + β_h)` from `β_h = 1`,
-/// `β'_h = β_h q_cells/q_bundles`.
+/// `β'_h = β_h q_cells/q_bundles`. Under the node-local law (Decision 34) each node's own face
+/// `e = (γ k + x)/(1 + γ)` takes the KT face's place, its own ratio founded at `γ₀ ½/x(b)` and stepped
+/// `γ' = γ k(b)/x(b)`, and an unfounded node reads `e₀ = (γ₀ ½ + x)/(1 + γ₀)`; the external face `x`
+/// is the one the executed tree reads, exact.
 /// With no width `β` is exact (the tests); at a width it is rebased past it with the residual
 /// `1/m'`.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -2994,7 +3583,9 @@ pub struct IdealLandmarks {
     branches: Vec<Branch>,
     arena: Arena,
     beta: Vec<Rat>,
+    own: Vec<Rat>,
     joins: Vec<Rat>,
+    local: Option<LocalLaw>,
     width: Option<u64>,
     rebases: u64,
 }
@@ -3003,6 +3594,7 @@ struct IdealRead {
     branch: usize,
     nodes: Vec<u32>,
     faces: Vec<Rat>,
+    own: Vec<Rat>,
 }
 
 struct IdealDigit {
@@ -3010,11 +3602,29 @@ struct IdealDigit {
     symbol: usize,
     reads: Vec<IdealRead>,
     face: Rat,
+    external: Option<Rat>,
 }
 
 impl IdealLandmarks {
     /// **Declare the oracle**, empty, with `β` exact (`width = None`) or carried at a width.
     pub fn new(declaration: LandmarkDeclaration, width: Option<u64>) -> Result<Self, HnnError> {
+        Self::declare(declaration, width, None)
+    }
+
+    /// **Declare the oracle under the node-local law** (Decision 34).
+    pub fn local(
+        declaration: LandmarkDeclaration,
+        width: Option<u64>,
+        law: LocalLaw,
+    ) -> Result<Self, HnnError> {
+        Self::declare(declaration, width, Some(law))
+    }
+
+    fn declare(
+        declaration: LandmarkDeclaration,
+        width: Option<u64>,
+        local: Option<LocalLaw>,
+    ) -> Result<Self, HnnError> {
         check_declaration(&declaration)?;
         let digits = odometer_digits(declaration.alphabet);
         let branches: Vec<Branch> = declaration
@@ -3041,7 +3651,9 @@ impl IdealLandmarks {
             branches,
             declaration,
             beta: Vec::new(),
+            own: Vec::new(),
             joins,
+            local,
             width,
             rebases: 0,
         })
@@ -3087,38 +3699,87 @@ impl IdealLandmarks {
         self.declaration.letters(address)
     }
 
-    fn read(&self, branch: usize, dyadic: usize, symbol: usize, letters: &[u32]) -> IdealRead {
+    /// The unfounded own face `e₀(b) = (γ₀ ½ + x(b))/(1 + γ₀)` under the node-local law.
+    fn unfounded(&self, external: &Rat) -> Rat {
+        let founding = Rat::from_integer(BigInt::from(
+            self.local.expect("the node-local law").founding(),
+        ));
+        (&founding * Rat::new(BigInt::one(), BigInt::from(2)) + external) / (Rat::one() + founding)
+    }
+
+    fn read(
+        &self,
+        branch: usize,
+        dyadic: usize,
+        symbol: usize,
+        letters: &[u32],
+        external: Option<&Rat>,
+    ) -> IdealRead {
         let Branch { depth, forced } = self.branches[branch];
         let tree = branch * (1usize << self.odometer.digits) + dyadic;
         let nodes = self.arena.open(tree, letters, depth + 1);
         let top = nodes.len().min(depth);
-        let mut faces = vec![Rat::new(BigInt::one(), BigInt::from(2)); top + 1];
+        let own: Vec<Rat> = match external {
+            Some(x) => (0..nodes.len())
+                .map(|d| {
+                    if d < forced {
+                        Rat::zero()
+                    } else {
+                        let gamma = &self.own[nodes[d] as usize];
+                        (gamma * self.kt(nodes[d], symbol) + x) / (Rat::one() + gamma)
+                    }
+                })
+                .collect(),
+            None => Vec::new(),
+        };
+        let prior = match external {
+            Some(x) => self.unfounded(x),
+            None => Rat::new(BigInt::one(), BigInt::from(2)),
+        };
+        let mut faces = vec![prior; top + 1];
         if nodes.len() == depth + 1 {
-            faces[depth] = self.kt(nodes[depth], symbol);
+            faces[depth] = match external {
+                Some(_) => own[depth].clone(),
+                None => self.kt(nodes[depth], symbol),
+            };
         }
         for d in (0..top).rev() {
             faces[d] = if d < forced {
                 faces[d + 1].clone()
             } else {
                 let beta = &self.beta[nodes[d] as usize];
-                (beta * self.kt(nodes[d], symbol) + &faces[d + 1]) / (Rat::one() + beta)
+                let face = match external {
+                    Some(_) => own[d].clone(),
+                    None => self.kt(nodes[d], symbol),
+                };
+                (beta * face + &faces[d + 1]) / (Rat::one() + beta)
             };
         }
         IdealRead {
             branch,
             nodes,
             faces,
+            own,
         }
     }
 
-    fn reads(&self, address: &[Letter], class: usize) -> Vec<IdealDigit> {
+    fn reads(&self, address: &[Letter], class: usize, external: &[Rat]) -> Vec<IdealDigit> {
         let letters = self.flatten(address);
         self.odometer
             .emitted(class)
             .into_iter()
-            .map(|(dyadic, symbol)| {
+            .enumerate()
+            .map(|(index, (dyadic, symbol))| {
+                // The external face of the observed side.
+                let x = external.get(index).map(|zero| {
+                    if symbol == 0 {
+                        zero.clone()
+                    } else {
+                        Rat::one() - zero
+                    }
+                });
                 let reads: Vec<IdealRead> = (0..self.branches.len())
-                    .map(|branch| self.read(branch, dyadic, symbol, &letters[branch]))
+                    .map(|branch| self.read(branch, dyadic, symbol, &letters[branch], x.as_ref()))
                     .collect();
                 let face = if reads.len() > 1 {
                     let beta = &self.joins[dyadic];
@@ -3131,16 +3792,49 @@ impl IdealLandmarks {
                     symbol,
                     reads,
                     face,
+                    external: x,
                 }
             })
             .collect()
     }
 
+    fn check_external(&self, class: usize, external: &[Rat]) -> Result<(), HnnError> {
+        let wanted = if self.local.is_some() {
+            self.odometer.emitted(class).len()
+        } else {
+            0
+        };
+        if external.len() != wanted
+            || external
+                .iter()
+                .any(|x| !x.is_positive() || x >= &Rat::one())
+        {
+            return Err(shape(
+                "one external digit-0 face in (0, 1) per opened digit under the node-local law",
+                wanted,
+                external.len(),
+            ));
+        }
+        Ok(())
+    }
+
     /// **The ideal face of one class** at an address, exact.
     pub fn probability(&self, address: &[Letter], class: usize) -> Result<Rat, HnnError> {
+        self.probability_with(address, class, &[])
+    }
+
+    /// **The ideal face of one class under the node-local law**: `external[i]` the external face's
+    /// digit-0 face at the `i`-th opened digit, exact (the executed tree's numerator over `2^(M_p)`).
+    pub fn probability_with(
+        &self,
+        address: &[Letter],
+        class: usize,
+        external: &[Rat],
+    ) -> Result<Rat, HnnError> {
         check(&self.declaration, address, class)?;
+        self.check_external(class, external)?;
         Ok(self
-            .reads(address, class)
+            .reads(address, class, external)
             .iter()
             .map(|digit| digit.face.clone())
             .product())
@@ -3149,8 +3843,9 @@ impl IdealLandmarks {
     /// **The opened paths of one class** at an address, with their ideal faces.
     pub fn opened(&self, address: &[Letter], class: usize) -> Result<Vec<OpenedPath>, HnnError> {
         check(&self.declaration, address, class)?;
+        self.check_external(class, &[])?;
         let mut paths = Vec::new();
-        for digit in self.reads(address, class) {
+        for digit in self.reads(address, class, &[]) {
             for read in digit.reads {
                 paths.push(OpenedPath {
                     dyadic: digit.dyadic,
@@ -3176,8 +3871,20 @@ impl IdealLandmarks {
 
     /// **Receive one cell**: its ideal face at the current standing, then its deposit.
     pub fn receive(&mut self, address: &[Letter], class: usize) -> Result<Rat, HnnError> {
+        self.receive_with(address, class, &[])
+    }
+
+    /// **Receive one cell under the node-local law** (`external` as
+    /// [`IdealLandmarks::probability_with`]).
+    pub fn receive_with(
+        &mut self,
+        address: &[Letter],
+        class: usize,
+        external: &[Rat],
+    ) -> Result<Rat, HnnError> {
         check(&self.declaration, address, class)?;
-        let digits = self.reads(address, class);
+        self.check_external(class, external)?;
+        let digits = self.reads(address, class, external);
         let letters = self.flatten(address);
         let founding: usize = letters.iter().map(|l| l.len() + 1).sum();
         self.arena.founded_within(digits.len() * founding)?;
@@ -3195,11 +3902,23 @@ impl IdealLandmarks {
                 let Branch { depth, forced } = self.branches[read.branch];
                 for d in (forced..read.nodes.len().min(depth)).rev() {
                     let node = read.nodes[d] as usize;
-                    let stepped = &self.beta[node] * self.kt(read.nodes[d], digit.symbol)
-                        / &read.faces[d + 1];
+                    let own = match digit.external {
+                        Some(_) => read.own[d].clone(),
+                        None => self.kt(read.nodes[d], digit.symbol),
+                    };
+                    let stepped = &self.beta[node] * own / &read.faces[d + 1];
                     let (beta, rebased) = carried_ratio(&stepped, self.width);
                     self.beta[node] = beta;
                     self.rebases += u64::from(rebased);
+                }
+                if let Some(x) = &digit.external {
+                    for d in forced..read.nodes.len() {
+                        let node = read.nodes[d] as usize;
+                        let stepped = &self.own[node] * self.kt(read.nodes[d], digit.symbol) / x;
+                        let (gamma, rebased) = carried_ratio(&stepped, self.width);
+                        self.own[node] = gamma;
+                        self.rebases += u64::from(rebased);
+                    }
                 }
                 let IdealRead {
                     branch, mut nodes, ..
@@ -3208,12 +3927,21 @@ impl IdealLandmarks {
                 let founded = self
                     .arena
                     .extend(tree, branch, &letters[branch], &mut nodes);
-                // Each founded node at its depth's β₀ = 2^(j_d) − 1 (the declared stop prior).
+                // Each founded node at its depth's β₀ = 2^(j_d) − 1 (the declared stop prior), and
+                // under the node-local law its own ratio γ₀ ½/x(b) (its first arrival).
                 let prior = &self.declaration.prior;
                 self.beta.extend(
                     (nodes.len() - founded..nodes.len())
                         .map(|depth| Rat::from_integer(BigInt::from(prior.founding(depth)))),
                 );
+                if let (Some(law), Some(x)) = (self.local, &digit.external) {
+                    let first = Rat::from_integer(BigInt::from(law.founding()))
+                        * Rat::new(BigInt::one(), BigInt::from(2))
+                        / x;
+                    let (gamma, rebased) = carried_ratio(&first, self.width);
+                    self.rebases += u64::from(rebased) * founded as u64;
+                    self.own.extend(std::iter::repeat_n(gamma, founded));
+                }
                 self.arena.count(&nodes, forced, digit.symbol);
             }
         }
@@ -3254,6 +3982,447 @@ fn mantissa(a: &BigUint, b: &BigUint, width: u64) -> (BigUint, i64) {
     }
     debug_assert_eq!(m.bits(), width);
     (m, shift)
+}
+
+// -------------------------------------------------------------------------------------------
+// Decision 34: the stop-weight mixture per digit tree
+
+/// One side of a join: a face, or an earlier join (post-order).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+enum Side {
+    Face(usize),
+    Join(usize),
+}
+
+/// One join: its two sides and its founding ratio `β₀ = π_left/π_right`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+struct Joint {
+    left: Side,
+    right: Side,
+    founding: u64,
+}
+
+/// [definition; agent-inferred] **A join tree over `K` faces** (Decision 34; Lean
+/// `HNN/LocalWeighing.{static_mixture, two_face_prior}`): every join is a two-face sequential
+/// mixture of its sides' faces, founded at `β₀ = π_left/π_right` and stepped by
+/// `β' = β q_left(b)/q_right(b)`, so the joins telescope to the Bayesian mixture of the `K` faces
+/// with the tree's prior: each face's prior weight is the product of the join weights
+/// `β₀/(1 + β₀)` (left) and `1/(1 + β₀)` (right) down to it ([`JoinTree::prior`]), and they sum to
+/// one. The joins are held in post-order, the root last.
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct JoinTree {
+    faces: usize,
+    joints: Vec<Joint>,
+    root: Side,
+}
+
+impl JoinTree {
+    fn build(joints: &mut Vec<Joint>, low: usize, high: usize) -> Side {
+        if high - low == 1 {
+            return Side::Face(low);
+        }
+        let middle = low + (high - low) / 2;
+        let left = Self::build(joints, low, middle);
+        let right = Self::build(joints, middle, high);
+        joints.push(Joint {
+            left,
+            right,
+            founding: 1,
+        });
+        Side::Join(joints.len() - 1)
+    }
+
+    /// **The balanced join tree** over `K ≥ 1` faces, every join founded at `β₀ = 1`: each face's
+    /// prior is `2^(−depth)`, uniform when `K` is a power of two.
+    pub fn balanced(faces: usize) -> Result<Self, HnnError> {
+        if faces == 0 {
+            return Err(shape("a join tree over at least one face", 1, 0));
+        }
+        let mut joints = Vec::with_capacity(faces - 1);
+        let root = Self::build(&mut joints, 0, faces);
+        Ok(Self {
+            faces,
+            joints,
+            root,
+        })
+    }
+
+    /// **The incumbent's join tree** over `K ≥ 2` faces: face 0 (the incumbent) against the
+    /// balanced join of faces `1..K`, the root founded at `β₀ = 2^j − 1` (the incumbent's prior
+    /// `1 − 2^(−j)`, the dyadic ladder), every inner join at `1`. Refused outside `1..=63`.
+    pub fn incumbent(faces: usize, rung: u32) -> Result<Self, HnnError> {
+        if faces < 2 {
+            return Err(shape(
+                "an incumbent's join tree over at least two faces",
+                2,
+                faces,
+            ));
+        }
+        if rung == 0 || rung > MAX_RUNG {
+            return Err(shape(
+                "a join rung of the dyadic ladder within 1..=63",
+                MAX_RUNG as usize,
+                rung as usize,
+            ));
+        }
+        let mut joints = Vec::with_capacity(faces - 1);
+        let right = Self::build(&mut joints, 1, faces);
+        joints.push(Joint {
+            left: Side::Face(0),
+            right,
+            founding: (1u64 << rung) - 1,
+        });
+        Ok(Self {
+            faces,
+            root: Side::Join(joints.len() - 1),
+            joints,
+        })
+    }
+
+    /// `K`, the faces.
+    pub fn faces(&self) -> usize {
+        self.faces
+    }
+
+    /// The joins, `K − 1`.
+    pub fn joins(&self) -> usize {
+        self.joints.len()
+    }
+
+    /// **Each face's prior weight**, exact: the product of the join weights down to it; they sum to
+    /// one.
+    pub fn prior(&self) -> Vec<Rat> {
+        let mut prior = vec![Rat::zero(); self.faces];
+        let mut stack = vec![(self.root, Rat::one())];
+        while let Some((side, weight)) = stack.pop() {
+            match side {
+                Side::Face(face) => prior[face] = weight,
+                Side::Join(join) => {
+                    let joint = self.joints[join];
+                    let founding = Rat::from_integer(BigInt::from(joint.founding));
+                    let total = Rat::one() + &founding;
+                    stack.push((joint.left, &weight * &founding / &total));
+                    stack.push((joint.right, &weight / &total));
+                }
+            }
+        }
+        prior
+    }
+
+    /// The widest founding ratio's bits.
+    fn widest(&self) -> u64 {
+        self.joints
+            .iter()
+            .map(|joint| u64::from(u64::BITS - joint.founding.leading_zeros()))
+            .max()
+            .unwrap_or(0)
+    }
+}
+
+/// [definition] **One digit through a mixture's joins** ([`FaceJoins::receive`]): the mixed
+/// digit-0 numerator on `2^(−M)`, its read certificate and the root's excess increment on
+/// `2^(−C)`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct JoinReceipt {
+    pub split: u64,
+    pub certificate: u128,
+    pub increment: u128,
+}
+
+/// [definition; agent-inferred] **A mixture's joins on the lattice** (Decision 34): per dyadic
+/// cell, each join of a [`JoinTree`] carries its chart as a node or an enlarged tree's join does
+/// (the carried `β` of `W` bits, the stop weight `λ̂ = ⟦β/(1 + β)⟧`, its rebases, its drift and
+/// excess certificates on `2^(−C)`). A join's face is `⟦λ̂ q̂_left + (1 − λ̂) q̂_right⟧` on the
+/// faces' lattice, a positive normalized split for any `λ̂` (`path_face_normalized`); its step is
+/// `β' = β q̂_left(b)/q̂_right(b)`, the drift growing by both sides' excess increments and the
+/// rebases, the excess by its rounding `2^(−M)/min(q̂, q̂_left, q̂_right)`, twice the rebases and
+/// both sides' increments (the enlarged tree's join accounting; Lean
+/// `HNN/LocalWeighing.forward_executed`). A read's certificate is the faces' plus each join's drift
+/// and rounding. Each dyadic cell is its own digit tree, weighed by its own evidence.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct FaceJoins {
+    tree: JoinTree,
+    widths: Widths,
+    charts: Vec<Vec<Chart>>,
+    rebases: u64,
+    releases: u64,
+}
+
+impl FaceJoins {
+    /// **The joins of a mixture on a tree's lattice**, every dyadic cell's at its founding. Refused
+    /// at a founding ratio past the carrier `W`.
+    pub fn new(tree: JoinTree, widths: Widths) -> Result<Self, HnnError> {
+        if tree.widest() > widths.carrier {
+            return Err(shape(
+                "a join tree whose founding ratios fit the carrier's W bits",
+                widths.carrier as usize,
+                tree.widest() as usize,
+            ));
+        }
+        let founding: Vec<Chart> = tree
+            .joints
+            .iter()
+            .map(|joint| {
+                let beta = Beta {
+                    numerator: joint.founding,
+                    denominator: 1,
+                    exponent: 0,
+                };
+                Chart {
+                    beta,
+                    stop: beta.stop_weight(widths.face, widths.carrier),
+                    rebases: 0,
+                    drift: 0,
+                    excess: 0,
+                }
+            })
+            .collect();
+        let cells = 1usize << widths.digits;
+        Ok(Self {
+            charts: vec![founding; cells],
+            tree,
+            widths,
+            rebases: 0,
+            releases: 0,
+        })
+    }
+
+    /// The join tree.
+    pub fn tree(&self) -> &JoinTree {
+        &self.tree
+    }
+
+    /// The rebases so far, and the carrier's releases.
+    pub fn rebases(&self) -> (u64, u64) {
+        (self.rebases, self.releases)
+    }
+
+    /// The largest drift certificate over every dyadic cell's joins, in bits.
+    pub fn drift(&self) -> Rat {
+        let largest = self
+            .charts
+            .iter()
+            .flatten()
+            .map(|chart| chart.drift)
+            .max()
+            .unwrap_or(0);
+        certified(&self.widths, largest)
+    }
+
+    fn check(&self, dyadic: usize, faces: &[u64]) -> Result<(), HnnError> {
+        let full = 1u64 << self.widths.face;
+        if faces.len() != self.tree.faces || dyadic >= self.charts.len() {
+            return Err(shape(
+                "one digit-0 face per face of the join tree, at a dyadic cell of the odometer",
+                self.tree.faces,
+                faces.len(),
+            ));
+        }
+        if let Some(&x) = faces.iter().find(|&&x| x == 0 || x >= full) {
+            return Err(shape(
+                "a digit-0 face inside the lattice's open unit interval",
+                full as usize,
+                x as usize,
+            ));
+        }
+        Ok(())
+    }
+
+    /// Each join's digit-0 face at a dyadic cell, post-order.
+    fn values(&self, dyadic: usize, faces: &[u64]) -> Vec<u64> {
+        let charts = &self.charts[dyadic];
+        let mut values = Vec::with_capacity(self.tree.joints.len());
+        for (join, joint) in self.tree.joints.iter().enumerate() {
+            let left = side_value(&values, faces, joint.left);
+            let right = side_value(&values, faces, joint.right);
+            values.push(lattice_blend(&self.widths, charts[join].stop, left, right));
+        }
+        values
+    }
+
+    /// **The mixed digit-0 face** at a dyadic cell from the faces' digit-0 numerators.
+    pub fn split(&self, dyadic: usize, faces: &[u64]) -> Result<u64, HnnError> {
+        self.check(dyadic, faces)?;
+        let values = self.values(dyadic, faces);
+        Ok(side_value(&values, faces, self.tree.root))
+    }
+
+    /// **Receive one digit** at a dyadic cell: the mixed split read before the step, its
+    /// certificate (the faces' `certificates` plus each join's drift and rounding), then every join
+    /// steps by the observed digit `symbol`, its certificates growing by the faces' excess
+    /// `increments` (zeros when the faces are exterior and exact).
+    pub fn receive(
+        &mut self,
+        dyadic: usize,
+        faces: &[u64],
+        symbol: usize,
+        certificates: &[u128],
+        increments: &[u128],
+    ) -> Result<JoinReceipt, HnnError> {
+        self.check(dyadic, faces)?;
+        if certificates.len() != faces.len() || increments.len() != faces.len() || symbol > 1 {
+            return Err(shape(
+                "one certificate and one increment per face, and a binary digit",
+                faces.len(),
+                certificates.len(),
+            ));
+        }
+        let widths = self.widths;
+        let full = 1u64 << widths.face;
+        let side = |zero: u64| u128::from(if symbol == 0 { zero } else { full - zero });
+        let values = self.values(dyadic, faces);
+        let split = side_value(&values, faces, self.tree.root);
+        let mut certificate = certificates.iter().fold(0u128, |a, &b| a.saturating_add(b));
+        let mut increment = vec![0u128; self.tree.joints.len()];
+        let side_increment = |increment: &[u128], at: Side| match at {
+            Side::Face(face) => increments[face],
+            Side::Join(join) => increment[join],
+        };
+        for (join, joint) in self.tree.joints.iter().enumerate() {
+            let (left, right) = (
+                side_value(&values, faces, joint.left),
+                side_value(&values, faces, joint.right),
+            );
+            let theta = ceil_div(
+                1u128 << widths.certificate,
+                side(values[join]).min(side(left)).min(side(right)),
+            );
+            let chart = self.charts[dyadic][join];
+            certificate = certificate
+                .saturating_add(chart.drift)
+                .saturating_add(theta);
+            let (step, units) = carried_step(&widths, chart.beta, side(left), 1, side(right), 0);
+            self.rebases += u64::from(step.mantissa.is_some());
+            self.releases += u64::from(step.released.is_some());
+            let children = side_increment(&increment, joint.left)
+                .saturating_add(side_increment(&increment, joint.right));
+            let grown = theta
+                .saturating_add(units.saturating_mul(2))
+                .saturating_add(children);
+            let chart = &mut self.charts[dyadic][join];
+            chart.beta = step.beta;
+            chart.stop = step.beta.stop_weight(widths.face, widths.carrier);
+            chart.rebases += u32::from(step.mantissa.is_some());
+            chart.drift = chart.drift.saturating_add(children).saturating_add(units);
+            chart.excess = chart.excess.saturating_add(grown);
+            increment[join] = grown;
+        }
+        Ok(JoinReceipt {
+            split,
+            certificate,
+            increment: side_increment(&increment, self.tree.root),
+        })
+    }
+}
+
+/// A side's digit-0 face: a face's own, or an earlier join's value.
+fn side_value(values: &[u64], faces: &[u64], side: Side) -> u64 {
+    match side {
+        Side::Face(face) => faces[face],
+        Side::Join(join) => values[join],
+    }
+}
+
+/// [definition; agent-inferred] **The stop-weight mixture per digit tree** (Decision 34, "in each
+/// digit tree"; Lean `HNN/LocalWeighing.stop_mixture_per_tree`): `K` trees over one declaration,
+/// one per declared stop prior (their widths agree: the prior enters only at the founding), and in
+/// each dyadic cell a [`JoinTree`]'s joins ([`FaceJoins`]) mixing the trees' digit faces by that
+/// digit tree's own evidence. Each digit tree's weight is `Σ_k π_k W_(h,k)`, the mixture over
+/// (law, pruned tree) with prior `π_k prior_(w_k)(S)`, which sums to one; it codes within
+/// `−log₂ π_k` of each law's tree in that dyadic cell. The mixed face is a positive normalized
+/// split at every digit, so the cells' faces partition the unit cell.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct StopMixture {
+    trees: Vec<Landmarks>,
+    joins: FaceJoins,
+}
+
+impl StopMixture {
+    /// **Declare the mixture**, empty: one tree per prior (`declaration` with each prior), joined by
+    /// `tree`. Refused unless there is one prior per face of the join tree, or as each tree and the
+    /// joins are refused.
+    pub fn new(
+        declaration: LandmarkDeclaration,
+        priors: Vec<StopPrior>,
+        tree: JoinTree,
+    ) -> Result<Self, HnnError> {
+        if priors.len() != tree.faces() {
+            return Err(shape(
+                "one stop prior per face of the join tree",
+                tree.faces(),
+                priors.len(),
+            ));
+        }
+        let trees = priors
+            .into_iter()
+            .map(|prior| {
+                Landmarks::new(LandmarkDeclaration {
+                    prior,
+                    ..declaration.clone()
+                })
+            })
+            .collect::<Result<Vec<Landmarks>, HnnError>>()?;
+        let widths = trees[0].widths();
+        let joins = FaceJoins::new(tree, widths)?;
+        Ok(Self { trees, joins })
+    }
+
+    /// Each tree's declared stop prior, in the join tree's face order.
+    pub fn priors(&self) -> Vec<StopPrior> {
+        self.trees
+            .iter()
+            .map(|tree| tree.declaration().prior.clone())
+            .collect()
+    }
+
+    /// The trees.
+    pub fn trees(&self) -> &[Landmarks] {
+        &self.trees
+    }
+
+    /// The joins.
+    pub fn joins(&self) -> &FaceJoins {
+        &self.joins
+    }
+
+    /// **Receive one cell**: every tree's digits read at the current standing and deposited, then
+    /// in each opened dyadic cell the joins read the trees' pre-deposit splits and step by the
+    /// digit. The cell's executed face is the product of the mixed digits' sides; its residual the
+    /// digits' certificates in bits.
+    pub fn receive(&mut self, address: &[Letter], class: usize) -> Result<CellReading, HnnError> {
+        for tree in &self.trees {
+            tree.check_with(address, class, &[])?;
+        }
+        let readings = self
+            .trees
+            .iter_mut()
+            .map(|tree| tree.receive_digits(address, class, &[]))
+            .collect::<Result<Vec<DigitsReading>, HnnError>>()?;
+        let widths = self.trees[0].widths();
+        let full = 1u64 << widths.face;
+        let digits = readings[0].digits.len();
+        let (mut numerator, mut certificate) = (BigUint::one(), 0u128);
+        for i in 0..digits {
+            let DigitReading { dyadic, symbol, .. } = readings[0].digits[i];
+            let faces: Vec<u64> = readings.iter().map(|r| r.digits[i].split).collect();
+            let certificates: Vec<u128> =
+                readings.iter().map(|r| r.digits[i].certificate).collect();
+            let increments: Vec<u128> = readings.iter().map(|r| r.digits[i].increment).collect();
+            let receipt = self
+                .joins
+                .receive(dyadic, &faces, symbol, &certificates, &increments)?;
+            numerator *= if symbol == 0 {
+                receipt.split
+            } else {
+                full - receipt.split
+            };
+            certificate = certificate.saturating_add(receipt.certificate);
+        }
+        Ok(CellReading {
+            executed: dyadic(numerator, digits as u64 * widths.face),
+            residual: certified(&widths, certificate),
+        })
+    }
 }
 
 // -------------------------------------------------------------------------------------------
@@ -3316,6 +4485,23 @@ pub fn code_length(probability: &Rat) -> Result<ExactInterval, HnnError> {
     if !probability.is_positive() {
         return Err(shape("a positive face's code length", 1, 0));
     }
+    ratio_code_length(
+        probability.numer().magnitude(),
+        probability.denom().magnitude(),
+    )
+}
+
+/// **The code length of an unreduced ratio** `−log₂(n/d) = log₂ d − log₂ n`, enclosed as
+/// [`code_length`] encloses a face (each logarithm by the certified [`binary_log`] at `O + 1`
+/// fraction bits), without reducing the ratio: the harness's products of many faces are read this
+/// way, with no greatest common divisor of their numerators. Refused at a zero part.
+pub fn ratio_code_length(
+    numerator: &BigUint,
+    denominator: &BigUint,
+) -> Result<ExactInterval, HnnError> {
+    if numerator.is_zero() || denominator.is_zero() {
+        return Err(shape("a positive ratio's code length", 1, 0));
+    }
     let bits = LOG_OCTAVES + 1;
     let bounds = |value: &BigUint| -> (Rat, Rat) {
         let log = binary_log(value, bits, |_| false);
@@ -3325,10 +4511,7 @@ pub fn code_length(probability: &Rat) -> Result<ExactInterval, HnnError> {
         let upper = if log.exact { lower.clone() } else { &lower + 1 };
         (Rat::new(lower, scale.clone()), Rat::new(upper, scale))
     };
-    let (numerator, denominator) = (
-        bounds(probability.numer().magnitude()),
-        bounds(probability.denom().magnitude()),
-    );
+    let (numerator, denominator) = (bounds(numerator), bounds(denominator));
     ExactInterval::new(&denominator.0 - &numerator.1, &denominator.1 - &numerator.0)
         .map_err(|_| shape("an ordered enclosure of a code length", 0, 1))
 }

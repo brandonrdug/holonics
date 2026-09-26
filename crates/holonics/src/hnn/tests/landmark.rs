@@ -13,16 +13,19 @@
 //! stop prior on the dyadic ladder (the block recursion at any stop weights, the founding ratio
 //! `2^j − 1`, the lattice law, the faces and windows under a prior), campaign 2's constant-slot
 //! controls as the per-depth prior `(1, r + 1)`, and the prior sweep on the development cells.
+//! Decision 34: the node-local law against the own-weight block recursion, its faces normalized and
+//! certified, its refusals; the join tree's prior; the joins as the Bayesian mixture per dyadic
+//! cell; and the stop-weight mixture per digit tree telescoping per dyadic cell.
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
 
 use crate::hnn::HnnError;
 use crate::hnn::landmark::{
-    Beta, Bundle, Feature, IdealLandmarks, LandmarkDeclaration, LandmarkFace, Landmarks, Letter,
-    LetterFamily, StopPrior, address, binary_log, carrier_width, cell_letters, choose_depth,
-    choose_prior, code_length, face_bits, ladder_top, letter_address, prequential, prior_family,
-    tree_prequential,
+    Beta, Bundle, DigitsReading, FaceJoins, Feature, IdealLandmarks, JoinTree, LandmarkDeclaration,
+    LandmarkFace, Landmarks, Letter, LetterFamily, LocalLaw, StopMixture, StopPrior, address,
+    binary_log, carrier_width, cell_letters, choose_depth, choose_prior, code_length, face_bits,
+    ladder_top, letter_address, prequential, prior_family, tree_prequential,
 };
 use crate::hnn::ratio::log2_enclosure;
 use crate::hnn::receiving::grain_exponent;
@@ -1224,4 +1227,384 @@ fn landmark_prior_sweep_reads_the_development_cells_only() {
     );
     assert_eq!(run, both.run);
     assert!(run.largest_residual <= run.face_rule);
+}
+
+// -------------------------------------------------------------------------------------------
+// Decision 34: weighing is local
+
+/// An external digit-0 face on the tree's lattice `2^(−M)`: a declared odd numerator pattern,
+/// never a tuned value, inside the open unit interval.
+fn external_split(face_bits: u64, t: usize, h: usize) -> u64 {
+    let eighths = 1 + ((t * 5 + h * 3) % 7) as u64;
+    eighths << (face_bits - 3)
+}
+
+/// **The own-weight block recursion** (Lean `HNN/LocalWeighing.{ownWeight,
+/// own_mixture_over_trees}`), independent of the path law: `W_s = E_s` at depth `D`, otherwise
+/// `W_s = w_d E_s + (1 − w_d) Π_b W_bs`, with the node-local own weight
+/// `E_s = π KT_s + (1 − π) X_s` over the digits routed to `s` (`X_s` the external faces' product).
+fn own_block_weight(
+    stream: &[usize],
+    external: &[Rat],
+    past: usize,
+    context: &[usize],
+    depth: usize,
+    prior: &StopPrior,
+    law: &LocalLaw,
+) -> Rat {
+    let routed: Vec<usize> = (past..stream.len())
+        .filter(|&t| {
+            context
+                .iter()
+                .enumerate()
+                .all(|(back, &x)| stream[t - 1 - back] == x)
+        })
+        .collect();
+    let symbols: Vec<usize> = routed.iter().map(|&t| stream[t]).collect();
+    let foreign: Rat = routed
+        .iter()
+        .map(|&t| {
+            if stream[t] == 0 {
+                external[t].clone()
+            } else {
+                Rat::one() - &external[t]
+            }
+        })
+        .product();
+    let pi = law.weight();
+    let estimate = &pi * kt_block(&symbols) + (Rat::one() - &pi) * foreign;
+    if context.len() == depth {
+        return estimate;
+    }
+    let split: Rat = (0..2)
+        .map(|b| {
+            let mut child = context.to_vec();
+            child.push(b);
+            own_block_weight(stream, external, past, &child, depth, prior, law)
+        })
+        .product();
+    let stop = prior.weight(context.len());
+    &stop * estimate + (Rat::one() - &stop) * split
+}
+
+/// **The node-local law is the own-weight recursion** (Lean `HNN/LocalWeighing.{own_weight_step,
+/// own_ratio_step, node_local_founding, two_face_prior}`): on a binary stream with a declared
+/// external face, the oracle (`β` and `γ` exact, each node's own ratio founded at `γ₀ ½/x(b)`)
+/// multiplies to the block recursion with `E_s = π KT_s + (1 − π) X_s` at every depth up to 3,
+/// under Decision 28's `½` and a per-depth prior, at two rungs; and the executed tree stays within
+/// its certificate of the oracle at every cell.
+#[test]
+fn landmark_local_law_is_the_own_weight_recursion() {
+    let stream: Vec<usize> = (0..22u64)
+        .map(|t| usize::from((t * t + 5 * t) % 7 < 3))
+        .collect();
+    for law in [LocalLaw::new(1).unwrap(), LocalLaw::new(3).unwrap()] {
+        for prior in [StopPrior::half(), StopPrior::per_depth(vec![1, 3]).unwrap()] {
+            for depth in 0..=3 {
+                let declared = LandmarkDeclaration {
+                    prior: prior.clone(),
+                    ..declaration(2, depth)
+                };
+                let mut oracle = IdealLandmarks::local(declared.clone(), None, law).unwrap();
+                let mut tree = Landmarks::local(declared, law).unwrap();
+                let bits = tree.face_bits();
+                let scale = Rat::from_integer(BigInt::one() << bits as usize);
+                let splits: Vec<u64> = (0..stream.len())
+                    .map(|t| external_split(bits, t, 1))
+                    .collect();
+                let external: Vec<Rat> = splits
+                    .iter()
+                    .map(|&x| Rat::from_integer(BigInt::from(x)) / &scale)
+                    .collect();
+                let mut ideal = Rat::one();
+                for t in depth..stream.len() {
+                    let here = address(&stream, t, depth);
+                    let face = oracle
+                        .receive_with(&here, stream[t], &external[t..=t])
+                        .unwrap();
+                    let reading = tree.receive_with(&here, stream[t], &splits[t..=t]).unwrap();
+                    assert!(
+                        within(&reading.executed, &face, &reading.residual),
+                        "{law}, {prior}, D = {depth}, cell {t}"
+                    );
+                    ideal *= face;
+                }
+                assert_eq!(
+                    ideal,
+                    own_block_weight(&stream, &external, depth, &[], depth, &prior, &law),
+                    "{law}, {prior}, D = {depth}"
+                );
+            }
+        }
+    }
+}
+
+/// **The node-local tree's faces are normalized exactly and certified** over five classes (the
+/// third digit forced where the upper half is empty): the all-class face under the external
+/// faces sums to 1, each class's face is the one-class read with that class's opened digits'
+/// external faces, and each cell's certificate holds against the oracle.
+#[test]
+fn landmark_local_faces_are_normalized_and_certified() {
+    let alphabet = 5;
+    let stream: Vec<usize> = (0..36u64).map(|t| ((t * 7 + t / 3) % 5) as usize).collect();
+    let law = LocalLaw::new(2).unwrap();
+    let declared = declaration(alphabet, 2);
+    let mut tree = Landmarks::local(declared.clone(), law).unwrap();
+    let mut oracle = IdealLandmarks::local(declared.clone(), None, law).unwrap();
+    let bits = tree.face_bits();
+    let scale = Rat::from_integer(BigInt::one() << bits as usize);
+    for (position, &cell) in stream.iter().enumerate() {
+        let here = address(&stream, position, 2);
+        let by_dyadic: Vec<u64> = tree
+            .splitting()
+            .iter()
+            .map(|&h| external_split(bits, position, h))
+            .collect();
+        let face = tree.face_with(&here, 16, &by_dyadic).unwrap();
+        let sum: Rat = face.probabilities.iter().cloned().sum();
+        assert_eq!(sum, Rat::one());
+        let opened = |class: usize| -> Vec<u64> {
+            declared
+                .emitted(class)
+                .iter()
+                .map(|&(h, _)| external_split(bits, position, h))
+                .collect()
+        };
+        let ideal: Rat = (0..alphabet)
+            .map(|class| {
+                let external: Vec<Rat> = opened(class)
+                    .iter()
+                    .map(|&x| Rat::from_integer(BigInt::from(x)) / &scale)
+                    .collect();
+                oracle.probability_with(&here, class, &external).unwrap()
+            })
+            .sum();
+        assert_eq!(ideal, Rat::one());
+        for class in 0..alphabet {
+            let p = &face.probabilities[class];
+            assert!(p > &Rat::zero());
+            assert_eq!(
+                p,
+                &tree
+                    .score_with(&here, class, &opened(class))
+                    .unwrap()
+                    .executed
+            );
+        }
+        let external: Vec<Rat> = opened(cell)
+            .iter()
+            .map(|&x| Rat::from_integer(BigInt::from(x)) / &scale)
+            .collect();
+        let reading = tree.receive_with(&here, cell, &opened(cell)).unwrap();
+        let ideal = oracle.receive_with(&here, cell, &external).unwrap();
+        assert!(within(&reading.executed, &ideal, &reading.residual));
+    }
+    assert!(tree.bits() > 0);
+}
+
+/// **The node-local law's refusals**: a tree under the law refuses a read without its external
+/// faces, a window read, and external faces outside the lattice's open unit interval; a tree
+/// without the law refuses external faces; a rung outside the ladder or past the carrier is
+/// refused.
+#[test]
+fn landmark_local_refusals() {
+    let declared = declaration(4, 1);
+    let law = LocalLaw::new(2).unwrap();
+    let mut local = Landmarks::local(declared.clone(), law).unwrap();
+    let mut plain = Landmarks::new(declared.clone()).unwrap();
+    let here = address(&[1, 2], 1, 1);
+    let full = 1u64 << local.face_bits();
+    assert!(local.receive(&here, 2).is_err());
+    assert!(
+        local
+            .window_splits(std::slice::from_ref(&here), &[])
+            .is_err()
+    );
+    assert!(local.receive_with(&here, 2, &[0, 5]).is_err());
+    assert!(local.receive_with(&here, 2, &[full, 5]).is_err());
+    assert!(local.receive_with(&here, 2, &[5]).is_err());
+    assert!(plain.receive_with(&here, 2, &[5, 5]).is_err());
+    assert!(local.receive_with(&here, 2, &[5, full - 5]).is_ok());
+    assert!(plain.receive(&here, 2).is_ok());
+    assert_eq!(local.local_law(), Some(law));
+    assert_eq!(plain.local_law(), None);
+    assert!(LocalLaw::new(0).is_err());
+    assert!(LocalLaw::new(64).is_err());
+    let wide = LocalLaw::new(u32::try_from(local.widths().carrier).unwrap() + 1).unwrap();
+    assert!(Landmarks::local(declared, wide).is_err());
+}
+
+/// **A join tree's prior sums to one** (Lean `HNN/LocalWeighing.static_mixture`): the balanced
+/// tree over `2^m` faces is uniform, over five faces its weights are `2^(−depth)`; the incumbent's
+/// tree gives face 0 the prior `1 − 2^(−j)` and shares `2^(−j)` among the rest.
+#[test]
+fn landmark_join_tree_prior_sums_to_one() {
+    let uniform = JoinTree::balanced(4).unwrap().prior();
+    assert_eq!(uniform, vec![rat(1, 4); 4]);
+    let five = JoinTree::balanced(5).unwrap().prior();
+    assert_eq!(
+        five,
+        vec![rat(1, 4), rat(1, 4), rat(1, 4), rat(1, 8), rat(1, 8)]
+    );
+    let incumbent = JoinTree::incumbent(3, 3).unwrap().prior();
+    assert_eq!(incumbent, vec![rat(7, 8), rat(1, 16), rat(1, 16)]);
+    for tree in [
+        JoinTree::balanced(1).unwrap(),
+        JoinTree::balanced(7).unwrap(),
+        JoinTree::incumbent(2, 1).unwrap(),
+        JoinTree::incumbent(6, 4).unwrap(),
+    ] {
+        let sum: Rat = tree.prior().into_iter().sum();
+        assert_eq!(sum, Rat::one());
+        assert_eq!(tree.joins() + 1, tree.faces());
+    }
+    assert!(JoinTree::balanced(0).is_err());
+    assert!(JoinTree::incumbent(1, 1).is_err());
+    assert!(JoinTree::incumbent(3, 0).is_err());
+}
+
+/// **The joins are the Bayesian mixture of their faces, digit by digit** (Lean
+/// `HNN/LocalWeighing.{static_mixture, forward_executed}`): three declared lattice faces in two
+/// dyadic cells, joined by the incumbent's tree; each digit's mixed face lies within its
+/// certificate of the exact posterior mixture `Σ_k π_k A_k q_k/Σ_k π_k A_k` (each dyadic cell its
+/// own evidence `A_k`), and the mixed faces' product within the certificates' sum of the
+/// telescoped `Σ_k π_k Π q_k`.
+#[test]
+fn landmark_joins_are_the_bayes_mixture_per_dyadic_cell() {
+    let declared = declaration(4, 1);
+    let widths = Landmarks::new(declared).unwrap().widths();
+    let tree = JoinTree::incumbent(3, 2).unwrap();
+    let prior = tree.prior();
+    let mut joins = FaceJoins::new(tree, widths).unwrap();
+    let bits = widths.face;
+    let scale = Rat::from_integer(BigInt::one() << bits as usize);
+    let full = 1u64 << bits;
+    let mut evidence = [vec![Rat::one(); 3], vec![Rat::one(); 3]];
+    let (mut executed, mut residual) = ([Rat::one(), Rat::one()], [Rat::zero(), Rat::zero()]);
+    for t in 0..40usize {
+        let cell = t % 2;
+        let dyadic = 2 + cell;
+        let symbol = (t * t / 3) % 2;
+        let faces: Vec<u64> = (0..3).map(|k| external_split(bits, t + k * 4, k)).collect();
+        let sides: Vec<Rat> = faces
+            .iter()
+            .map(|&x| {
+                let side = if symbol == 0 { x } else { full - x };
+                Rat::from_integer(BigInt::from(side)) / &scale
+            })
+            .collect();
+        let weights: Vec<Rat> = (0..3).map(|k| &prior[k] * &evidence[cell][k]).collect();
+        let total: Rat = weights.iter().cloned().sum();
+        let ideal: Rat = (0..3).map(|k| &weights[k] * &sides[k]).sum::<Rat>() / &total;
+        let receipt = joins
+            .receive(dyadic, &faces, symbol, &[0; 3], &[0; 3])
+            .unwrap();
+        let side = if symbol == 0 {
+            receipt.split
+        } else {
+            full - receipt.split
+        };
+        let mixed = Rat::from_integer(BigInt::from(side)) / &scale;
+        let bound = Rat::new(
+            BigInt::from(receipt.certificate) * 3,
+            BigInt::from(2u32) << widths.certificate as usize,
+        );
+        assert!(within(&mixed, &ideal, &bound), "digit {t}");
+        executed[cell] *= mixed;
+        residual[cell] += bound;
+        for k in 0..3 {
+            evidence[cell][k] *= &sides[k];
+        }
+    }
+    for cell in 0..2 {
+        let telescoped: Rat = (0..3).map(|k| &prior[k] * &evidence[cell][k]).sum();
+        assert!(within(&executed[cell], &telescoped, &residual[cell]));
+    }
+    assert!(joins.receive(1, &[1, 2], 0, &[0; 2], &[0; 2]).is_err());
+    assert!(
+        joins
+            .receive(1, &[1, 2, full], 0, &[0; 3], &[0; 3])
+            .is_err()
+    );
+}
+
+/// **The stop-weight mixture per digit tree** (Lean `HNN/LocalWeighing.stop_mixture_per_tree`):
+/// one law alone is its tree exactly; a law joined with itself is its tree exactly (a join of two
+/// equal faces is that face); and two laws' mixture multiplies, in each dyadic cell, to within its
+/// certificates of `Σ_k π_k Π q̂_k` over the trees' own executed faces there.
+#[test]
+fn landmark_stop_mixture_is_the_bayes_mixture_per_digit_tree() {
+    let alphabet = 5;
+    let stream: Vec<usize> = (0..48u64).map(|t| ((t * t + t / 3) % 5) as usize).collect();
+    let declared = declaration(alphabet, 2);
+    let half = StopPrior::half();
+    let other = StopPrior::per_depth(vec![1, 3]).unwrap();
+    let mut alone = StopMixture::new(
+        declared.clone(),
+        vec![half.clone()],
+        JoinTree::balanced(1).unwrap(),
+    )
+    .unwrap();
+    let mut twice = StopMixture::new(
+        declared.clone(),
+        vec![half.clone(), half.clone()],
+        JoinTree::incumbent(2, 3).unwrap(),
+    )
+    .unwrap();
+    let tree = JoinTree::incumbent(2, 2).unwrap();
+    let prior = tree.prior();
+    let mut mixture =
+        StopMixture::new(declared.clone(), vec![half.clone(), other.clone()], tree).unwrap();
+    assert_eq!(mixture.priors(), vec![half.clone(), other.clone()]);
+    let mut trees = [
+        Landmarks::new(declared.clone()).unwrap(),
+        Landmarks::new(LandmarkDeclaration {
+            prior: other,
+            ..declared.clone()
+        })
+        .unwrap(),
+    ];
+    let bits = trees[0].face_bits();
+    let scale = Rat::from_integer(BigInt::one() << bits as usize);
+    let cells = 1usize << trees[0].digits();
+    let mut evidence = vec![[Rat::one(), Rat::one()]; cells];
+    let (mut executed, mut residual) = (Rat::one(), Rat::zero());
+    for (position, &cell) in stream.iter().enumerate() {
+        let here = address(&stream, position, 2);
+        let single = trees[0].score(&here, cell).unwrap();
+        assert_eq!(
+            alone.receive(&here, cell).unwrap().executed,
+            single.executed
+        );
+        assert_eq!(
+            twice.receive(&here, cell).unwrap().executed,
+            single.executed
+        );
+        let reading = mixture.receive(&here, cell).unwrap();
+        executed *= &reading.executed;
+        residual += &reading.residual;
+        let digits: Vec<DigitsReading> = trees
+            .iter_mut()
+            .map(|tree| tree.receive_digits(&here, cell, &[]).unwrap())
+            .collect();
+        for i in 0..digits[0].digits.len() {
+            let h = digits[0].digits[i].dyadic;
+            for (k, reading) in digits.iter().enumerate() {
+                let digit = reading.digits[i];
+                let side = if digit.symbol == 0 {
+                    digit.split
+                } else {
+                    (1u64 << bits) - digit.split
+                };
+                evidence[h][k] *= Rat::from_integer(BigInt::from(side)) / &scale;
+            }
+        }
+    }
+    // Each dyadic cell is its own digit tree: the passage telescopes to Π_h Σ_k π_k A_(h,k).
+    let telescoped: Rat = evidence
+        .iter()
+        .map(|pair| &prior[0] * &pair[0] + &prior[1] * &pair[1])
+        .product();
+    assert!(within(&executed, &telescoped, &residual));
+    assert!(residual > Rat::zero());
 }
