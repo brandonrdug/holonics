@@ -1355,7 +1355,7 @@ released and reported at each deposit, and its total stays below half a unit ove
 | 10 | The motor chart | `Transport/SerialScrewChain` | the chain Jacobian in `Transport/SerialScrewChain`; `HNN/Motor.lean`: `motor_pullback` (`⟨w, Jθ̇⟩ = ⟨Jᵀw, θ̇⟩`) | `hnn::motor` | 4; 2 |
 | 11 | Joint prediction as a boundary section | `Computation/JointReceiverWitness`; `Foundation/Holon.{ofEvolution, ofEvolution_receive_eq_encoded}`; `HolonicsResearch/Transport/ArtifactRelease.{step, stepMulti, restriction_never_widens}`, moved into `Holonics/Transport` | `HNN/Prediction.lean`: `jointSection`; `station_faces`; `joint_not_marginals`; `release_width_zero` | `hnn::prediction` | 5; 4 |
 | 12 | Holonic Encoding: `E_next T = U E`, `D E = ρ` | `Physics/ReflectedBoundaryMemory.{boundary_reduction_iff, boundary_reduction_with_forcing}`; `Foundation/JointReceiverDescent.joint_generator_descends_iff`; `Holon/Restriction.{descent_total, scale_square_pow}` | `HNN/Encoding.lean`: `injection_square`; `encoding_reduced_recurrence`; `encoding_separator` | `hnn::encoding` | 5; 4 |
-| 13 | The receiving letters: typed bundles of cells, ring phase classes, lock addresses and site kinds | `HNN/LandmarkTree.{address_scale_square, kraft_and_dominance, mixture_is_probability, landmark_step}`; `HNN/Retention.fieldStanding` | `HNN/LandmarkAddress.lean`: `bundle_causal`, `bundle_restrict`, `feature_scale_square` (with its commutation hypothesis), `address_descends_retention`, `phase_partition_finite`, `farey_partition_finite`, `bundle_code_injective`, `cell_only_dominance_with_feature_charge`; `HNN/LandmarkTree`: the executed face's bound with address and lattice residuals | `hnn::{landmark, receiving}` | 2 |
+| 13 | The receiving letters: typed bundles of cells, ring phase classes, lock addresses and site kinds | `HNN/LandmarkTree.{address_scale_square, kraft_and_dominance, mixture_is_probability, landmark_step}`; `HNN/Retention.fieldStanding`; `HNN/Contact.contact_lock_address` | `HNN/LandmarkAddress.lean`: `bundle_causal`, `bundle_restrict`, `feature_scale_square` (with its commutation hypothesis), `address_descends_retention`, `phase_partition_finite`, `lock_partition_finite` (the contact's lock letters, a box `0 < p ≤ P`, `0 < q ≤ Q` in the contact's orientation, its horizon clause `contact_lock_address`'s cycles), `bundle_code_injective`, `cell_only_dominance_with_feature_charge`; `HNN/LandmarkTree`: the executed face's bound with address and lattice residuals | `hnn::{landmark, receiving, contact}` | 2 |
 | 14 | The tree's carriers rebase past their width | `HNN/LandmarkTree.{rebase_log_residual, lattice_path_deviation, lattice_node_telescope}` | `HNN/LandmarkCarrier.lean`: `rebase_decode`, `rebase_ratio_enclosed`, `rebase_step_enclosed`, `rebase_log_residual_sum`, `width_or_rebase_total` | `hnn::landmark` | 2; the landmark lattice's drift over the passage |
 
 [project-postulate; agent-inferred] **Retired with campaign 1, in this order.**
@@ -2028,7 +2028,9 @@ receiving law. It is judged by what they add that the tree does not already say 
     - a phase class is `⌊g·phase⌋ mod g` at the ring's declared grain `g`, with its fibre;
     - a lock address is `Unlocked` at the declared tolerance, or a reduced `(p, q)` with
       `0 < q ≤ Q`, where `Q` is the greatest denominator whose first return is observable before
-      the admitted horizon;
+      the admitted horizon, and `0 < p ≤ P`, the first ring's bound alike (the contact reads its
+      rate in its declared orientation, above one where its first ring winds faster; Lean
+      `lock_partition_finite`);
     - a site kind ranges over the proved `SiteKind` cases.
   - **The cost of a letter.** A letter is not free. The enlarged tree codes within the embedded
     cell-only tree's `Γ` charge, plus the features' description and the certified lattice drift.

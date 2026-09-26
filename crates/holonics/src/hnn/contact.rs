@@ -50,7 +50,18 @@
 //! either ring has not wound. `Q` is the greatest denominator whose first return (`q` turns of ring
 //! `h`) is observable before the admitted horizon ([`LockDeclaration::derived`]: within one aeon of
 //! the joint clock ring `h` winds fewer than `∏_(j>h) d_j` times, the carry chain's bound, so
-//! `Q = ∏_(j>h) d_j − 1`, and the numerator is held to ring `g`'s bound alike).
+//! `Q = ∏_(j>h) d_j − 1`, and the numerator is held to ring `g`'s bound `P` alike).
+//!
+//! [definition; agent-inferred] **The lock letters** (the receiving join's contact letter,
+//! `hnn::landmark::Feature::Contact`). The addresses a contact can read form the finite family
+//! `{Unlocked} ∪ {(p, q) reduced : 1 ≤ p ≤ P, 1 ≤ q ≤ Q}` (Lean
+//! `HNN/LandmarkAddress.lock_partition_finite`, whose observability clause is derived from
+//! `contact_lock_address`'s cycles): a box, not the Farey family `F_Q` of `[0, 1]`, since the
+//! contact `g → h` reads its rate in its declared orientation, which lies above one where ring `g`
+//! winds faster (campaign 1's `0 → 1` and `1 → 2`). Its letter is `0` unlocked and `1 +` the rank
+//! ordered by `(q, p)` ([`ContactLock::code`]), and a contact's reading is that letter times its
+//! site kind's ([`ContactReading::letter`], `5` kinds). The rank is one to one onto the family's
+//! letters ([`LockDeclaration::letters`]); the tests check it, Lean states the family.
 //!
 //! [definition] **The break** ([`BreakReceipt`], Lean `HNN/ContactBreak`). The contact's parting of
 //! `j` matched nodes at the declared surface-storage density `γ` (`ConstitutionRead::
@@ -68,11 +79,12 @@
 //! | `HNN/Contact.contact_boost_solve_or_singular_direction` | [`certify_boost`], [`signed_form_certifies`] |
 //! | `HNN/Contact.contact_signed_storage_balance`, `boost_grows_at_conserved_signed_storage` | tests (the transit's balance at an indefinite `K`) |
 //! | `HNN/Contact.contact_lock_address`; `Geometry/PairResonance` | [`lock_address`], [`ContactLock`] |
+//! | `HNN/LandmarkAddress.lock_partition_finite` (the finite family the address lands in) | [`LockDeclaration::letters`], [`ContactLock::code`], [`ContactReading::letter`] |
 //! | `HNN/ContactBreak.{break_release_balance, break_iff_release_covers_gluing, griffith_closed_port_case}` | [`BreakReceipt`] |
 //! | `HNN/ContactBreak.parting_returns_gluing_defect` | [`crate::hnn::Field::parted_holon`] |
 
 use num_bigint::{BigInt, BigUint};
-use num_traits::{One, Signed, Zero};
+use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::hnn::HnnError;
 use crate::hnn::field::{ConstitutionRead, Current, Field};
@@ -312,8 +324,8 @@ pub enum ContactLock {
 }
 
 /// [definition] **The finite lock family's bound**: `Q`, the greatest denominator whose first return
-/// is observable before the admitted horizon, and the numerator's bound alike.
-#[derive(Clone, Debug, PartialEq, Eq)]
+/// is observable before the admitted horizon, and the numerator's bound `P` alike.
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct LockDeclaration {
     pub denominator: BigUint,
     pub numerator: BigUint,
@@ -342,6 +354,75 @@ impl LockDeclaration {
             numerator: bound(g),
         }
     }
+
+    /// `(P, Q)` as machine words, refused past 64 bits (the partition's letters are counted and
+    /// ranked on them).
+    fn words(&self) -> Result<(u64, u64), HnnError> {
+        let word = |bound: &BigUint| {
+            bound.to_u64().ok_or(HnnError::Shape {
+                what: "a lock bound within 64 bits",
+                expected: u64::MAX as usize,
+                found: usize::MAX,
+            })
+        };
+        Ok((word(&self.numerator)?, word(&self.denominator)?))
+    }
+
+    /// **The lock family's letters** (module header, "The lock letters"): `1 + #{(p, q) : 1 ≤ p ≤ P,
+    /// 1 ≤ q ≤ Q, gcd(p, q) = 1}`, `Unlocked` with the reduced addresses in the box (Lean
+    /// `HNN/LandmarkAddress.lock_partition_finite`).
+    pub fn letters(&self) -> Result<u64, HnnError> {
+        let (p_bound, q_bound) = self.words()?;
+        Ok(1 + (1..=q_bound)
+            .map(|q| coprime_up_to(p_bound, q))
+            .sum::<u64>())
+    }
+}
+
+fn gcd(mut a: u64, mut b: u64) -> u64 {
+    while b != 0 {
+        (a, b) = (b, a % b);
+    }
+    a
+}
+
+/// The distinct prime factors of `n ≥ 1`, by trial division.
+fn prime_factors(mut n: u64) -> Vec<u64> {
+    let mut primes = Vec::new();
+    let mut d = 2u64;
+    while d * d <= n {
+        if n.is_multiple_of(d) {
+            primes.push(d);
+            while n.is_multiple_of(d) {
+                n /= d;
+            }
+        }
+        d += 1;
+    }
+    if n > 1 {
+        primes.push(n);
+    }
+    primes
+}
+
+/// `#{p ∈ [1, n] : gcd(p, q) = 1}` for `q ≥ 1`, by inclusion and exclusion over the distinct
+/// primes of `q`: `Σ_(d | rad q) μ(d) ⌊n/d⌋`.
+fn coprime_up_to(n: u64, q: u64) -> u64 {
+    let primes = prime_factors(q);
+    let mut count: i128 = 0;
+    for subset in 0u32..(1 << primes.len()) {
+        let divisor: u64 = (0..primes.len())
+            .filter(|&i| subset >> i & 1 == 1)
+            .map(|i| primes[i])
+            .product();
+        let term = i128::from(n / divisor);
+        count += if subset.count_ones() % 2 == 0 {
+            term
+        } else {
+            -term
+        };
+    }
+    u64::try_from(count).expect("a count of integers is nonnegative")
 }
 
 /// **The lock address of a measured winding pair** (module header): the simplest rate in the open
@@ -374,16 +455,112 @@ pub fn lock_address(first: &BigInt, second: &BigInt, bound: &LockDeclaration) ->
     }
 }
 
+impl ContactLock {
+    /// **Its letter in the lock family** (module header, "The lock letters"): `0` unlocked, else
+    /// `1 +` its rank among the reduced addresses of the box ordered by `(q, p)`,
+    /// `Σ_(q′ < q) #{p ≤ P coprime to q′} + #{p′ < p coprime to q}`. One to one onto
+    /// `[0, bound.letters())`; refused for an address outside the family (not reduced, or past a
+    /// bound).
+    pub fn code(&self, bound: &LockDeclaration) -> Result<u64, HnnError> {
+        let ContactLock::Locked {
+            numerator,
+            denominator,
+        } = self
+        else {
+            return Ok(0);
+        };
+        let (p_bound, q_bound) = bound.words()?;
+        let outside = || HnnError::Shape {
+            what: "a reduced lock address (p, q) with 1 ≤ p ≤ P and 1 ≤ q ≤ Q",
+            expected: usize::try_from(q_bound).unwrap_or(usize::MAX),
+            found: usize::try_from(denominator).unwrap_or(usize::MAX),
+        };
+        let (Some(p), Some(q)) = (numerator.to_u64(), denominator.to_u64()) else {
+            return Err(outside());
+        };
+        if p == 0 || q == 0 || p > p_bound || q > q_bound || gcd(p, q) != 1 {
+            return Err(outside());
+        }
+        let below: u64 = (1..q).map(|earlier| coprime_up_to(p_bound, earlier)).sum();
+        Ok(1 + below + coprime_up_to(p - 1, q))
+    }
+}
+
 // -------------------------------------------------------------------------------------------
 // the readings the receiving join consumes
 
 /// [definition] **One contact's reading at a cell's tick**: its lock address and its site kind,
-/// both read from retained state before the cell (the lift point and the constitution).
+/// both read from retained state before the cell (the lift point and the constitution). It is the
+/// receiving join's contact letter (`hnn::landmark::Feature::Contact`): its value in the slot is
+/// [`ContactReading::letter`].
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ContactReading {
     pub contact: usize,
     pub lock: ContactLock,
     pub kind: SiteKind,
+}
+
+/// The proved site kinds (`Compression/Landmark/SiteKind.Kind`), the kind letter's alphabet.
+pub const SITE_KINDS: u64 = 5;
+
+/// **A site kind's letter**: rotation, null, boost, reflection, degenerate.
+pub fn kind_letter(kind: SiteKind) -> u64 {
+    match kind {
+        SiteKind::Rotation => 0,
+        SiteKind::Null => 1,
+        SiteKind::Boost => 2,
+        SiteKind::Reflection => 3,
+        SiteKind::Degenerate => 4,
+    }
+}
+
+impl ContactReading {
+    /// **The contact letters at a bound**: the lock family's letters times the five site kinds.
+    pub fn letters(bound: &LockDeclaration) -> Result<u64, HnnError> {
+        bound
+            .letters()?
+            .checked_mul(SITE_KINDS)
+            .ok_or(HnnError::Shape {
+                what: "a contact's letters within 64 bits",
+                expected: u64::MAX as usize,
+                found: usize::MAX,
+            })
+    }
+
+    /// **Its letter**: `code(lock) · 5 + kind`, one to one onto `[0, letters(bound))`.
+    pub fn letter(&self, bound: &LockDeclaration) -> Result<u64, HnnError> {
+        Ok(self.lock.code(bound)? * SITE_KINDS + kind_letter(self.kind))
+    }
+}
+
+/// **Every contact's site reading** from its constitution's storage and signed stiffness
+/// ([`site_reading`]): the part of a contact's reading that the constitution, not the clock,
+/// carries; each commit's kind census (the exposure's constitution curve).
+pub fn site_readings(
+    field: &Field,
+    constitution: &impl ConstitutionRead,
+) -> Result<Vec<SiteReading>, HnnError> {
+    (0..field.contacts().len())
+        .map(|contact| {
+            let storage = gram(constitution.contact_storage(contact))?;
+            let stiffness = signed_stiffness(
+                constitution.contact_stiffness(contact),
+                constitution.contact_stiffness_signature(contact),
+            )?;
+            site_reading(&storage, &stiffness)
+        })
+        .collect()
+}
+
+/// **Every contact's site kind** ([`site_readings`]' kinds).
+pub fn site_kinds(
+    field: &Field,
+    constitution: &impl ConstitutionRead,
+) -> Result<Vec<SiteKind>, HnnError> {
+    Ok(site_readings(field, constitution)?
+        .into_iter()
+        .map(|reading| reading.kind)
+        .collect())
 }
 
 /// **Every contact's reading at a cell's tick** (the readings the receiving join consumes, campaign
@@ -404,23 +581,20 @@ pub fn contact_readings(
             None => now,
         })
     };
-    (0..field.contacts().len())
-        .map(|contact| {
+    site_kinds(field, constitution)?
+        .into_iter()
+        .enumerate()
+        .map(|(contact, kind)| {
             let (g, h) = field.contact(contact).ends();
             let lock = lock_address(
                 &windings(g)?,
                 &windings(h)?,
                 &LockDeclaration::derived(field, contact),
             );
-            let storage = gram(constitution.contact_storage(contact))?;
-            let stiffness = signed_stiffness(
-                constitution.contact_stiffness(contact),
-                constitution.contact_stiffness_signature(contact),
-            )?;
             Ok(ContactReading {
                 contact,
                 lock,
-                kind: site_reading(&storage, &stiffness)?.kind,
+                kind,
             })
         })
         .collect()

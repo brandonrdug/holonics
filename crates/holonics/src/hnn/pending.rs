@@ -4,7 +4,10 @@
 //! read"; guard 3): the anchor, the lift point `λ` at the cut; a copy of the encoder moment's counts
 //! `M` at the cut (never `m̃`, and never a handle to a moment that later ingests extend); a copy of
 //! the receiving parametron's active suffix address at the cut (`hnn::receiving::ActiveAddress`,
-//! its receiver's `D` letters); its [`ReceivingPhases`]; and the commit it was produced at. Every
+//! its receiver's `D` letters and the reader of the next ones: the clock's phases, the windings
+//! since the aeon's opening and the contacts' site kinds its contact letters read, so every
+//! bundle of the window's known targets is read from the state at the cut; campaign 2); its
+//! [`ReceivingPhases`]; and the commit it was produced at. Every
 //! word opens at zero change, so the anchor needs no waves. A read ([`PendingRatio::open`])
 //! recomputes `m̃ = ⟨M, E_now⟩` and runs the word at the contemporary constitution, `q` included;
 //! at compare, the contemporary landmark tree is read at each phase's causal address, the copied

@@ -43,12 +43,15 @@
 //! - a ring's **phase class** `⌊g·phase⌋ mod g` at the ring's declared grain `g` (its period `d_g`,
 //!   the ring's own port chart, where the fibre is empty; or the half-turn sheet `g = 2` of its
 //!   parametron), `g` letters (Lean `phase_partition_finite`);
-//! - a contact's **lock address**, `Unlocked` at the declared tolerance or a reduced `(p, q)`,
-//!   `0 ≤ p ≤ q`, `0 < q ≤ Q`, with `Q` the greatest denominator whose first return (`q` ticks, Lean
-//!   `Aeon/Clock/Lock.cycle_iff_period_dvd`) is observable before the admitted horizon
-//!   ([`LockAddress`], `farey_partition_finite`), times its **site kind** over the proved
-//!   `SiteKind` cases (`navigator::trace::SiteKind`, five), read through the plain-data input
-//!   [`ContactReading`] `(contact, lock, kind)` per tick.
+//! - a contact's **reading** (its owner's, `hnn::contact::ContactReading`, read by
+//!   `hnn::receiving::LetterReader` from the retained clock and constitution): its **lock address**,
+//!   `Unlocked` at the declared tolerance or a reduced `(p, q)`, `1 ≤ p ≤ P`, `1 ≤ q ≤ Q`, with `Q`
+//!   the greatest denominator whose first return (`q` turns of the contact's second ring, Lean
+//!   `Aeon/Clock/Lock.cycle_iff_period_dvd`) is observable within the aeon and `P` the first ring's
+//!   bound alike (`hnn::contact::LockDeclaration::derived`; Lean `lock_partition_finite`), times
+//!   its **site kind** over the proved `SiteKind` cases (`navigator::trace::SiteKind`, five). The
+//!   slot's letter is the contact owner's (`ContactReading::letter`), so the partition and its rank
+//!   have one owner.
 //!
 //! [definition; agent-inferred, Sol's review §2] **The enlarged tree keeps the cell-only branch.**
 //! With no features declared the tree is campaign 1's cell tree, unchanged. With `r ≥ 1` features
@@ -208,7 +211,7 @@
 //! | Law | Lean | Rust |
 //! |---|---|---|
 //! | the typed suffix address; an unfounded node reads the prior, and founding at first arrival keeps the law | `HNN/LandmarkTree.{unfounded_reads_prior, founded_tree_same_law}` | [`Letter`], [`address`], [`Landmarks::deposit`] |
-//! | the bundle: causal, restricted by whole bundles, its code injective, its partitions finite | `HNN/LandmarkAddress.{bundle_causal, bundle_restrict, feature_scale_square, bundle_code_injective, phase_partition_finite, farey_partition_finite}` | [`Bundle`], [`LetterFamily`], [`LockAddress`], [`letter_address`] |
+//! | the bundle: causal, restricted by whole bundles, its code injective, its partitions finite | `HNN/LandmarkAddress.{bundle_causal, bundle_restrict, feature_scale_square, bundle_code_injective, phase_partition_finite, lock_partition_finite}` | [`Bundle`], [`LetterFamily`], [`Feature`] (the contact slot's letter is `hnn::contact::ContactReading::letter`), [`letter_address`] |
 //! | the enlarged tree keeps the cell-only branch | `HNN/LandmarkAddress.cell_only_dominance_with_feature_charge` | the join (`Law::digit`), [`Landmarks::face_rule`] |
 //! | the path face is positive and normalized for any `λ ∈ [0, 1]`; on the lattice too | `HNN/LandmarkTree.{path_face_normalized, lattice_path_laws}` | [`Landmarks::face`], [`Landmarks::probability`] |
 //! | the lattice path's floor, its deviation adding down the path, and the executed face's bound with the address residual | `HNN/LandmarkTree.{lattice_path_floor, lattice_path_deviation, executed_face_bound}` | [`face_bits`], [`CellReading::residual`] |
@@ -234,11 +237,12 @@ use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::compression::cost::ceil_log2;
 use crate::hnn::HnnError;
+use crate::hnn::contact::{ContactReading, LockDeclaration};
+use crate::hnn::field::Field;
 use crate::hnn::ratio::{LOG_OCTAVES, interval_sum};
 use crate::hnn::realization::indexed;
 use crate::hnn::receiving::grain_exponent;
 use crate::hnn::reference::{BaselineCodes, Baselines, Cut};
-use crate::navigator::trace::SiteKind;
 use crate::ratio::Rat;
 use crate::ratio::algebraic::ExactInterval;
 
@@ -280,119 +284,44 @@ impl Letter {
     }
 }
 
-/// [definition] **A contact's lock address** at a declared denominator bound `Q`: `Unlocked` at the
-/// declared tolerance, or a reduced `(p, q)` with `0 ≤ p ≤ q` and `0 < q ≤ Q` (the Farey family
-/// `F_Q`; Lean `HNN/LandmarkAddress.farey_partition_finite`).
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum LockAddress {
-    Unlocked,
-    Locked { p: u64, q: u64 },
-}
-
-fn gcd(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        (a, b) = (b, a % b);
-    }
-    a
-}
-
-/// The reduced numerators `p ∈ [0, q]` with `gcd(p, q) = 1`: `2` at `q = 1`, `φ(q)` above.
-fn reduced_numerators(q: u64) -> u64 {
-    (0..=q).filter(|&p| gcd(p, q) == 1).count() as u64
-}
-
-impl LockAddress {
-    /// **A lock at `(p, q)`**, refused unless reduced with `0 ≤ p ≤ q` and `0 < q ≤ Q`.
-    pub fn locked(p: u64, q: u64, denominators: u64) -> Result<Self, HnnError> {
-        if q == 0 || q > denominators || p > q || gcd(p, q) != 1 {
-            return Err(shape(
-                "a reduced lock address (p, q) with 0 ≤ p ≤ q and 0 < q ≤ Q",
-                usize::try_from(denominators).unwrap_or(usize::MAX),
-                usize::try_from(q).unwrap_or(usize::MAX),
-            ));
-        }
-        Ok(LockAddress::Locked { p, q })
-    }
-
-    /// **The letters at `Q`**: `1 + |F_Q|`, `|F_Q| = 1 + Σ_(q ≤ Q) φ(q)`.
-    pub fn letters(denominators: u64) -> u64 {
-        1 + (1..=denominators).map(reduced_numerators).sum::<u64>()
-    }
-
-    /// **Its letter**: `0` unlocked, else `1 +` its rank in `F_Q` ordered by `(q, p)`.
-    pub fn code(self, denominators: u64) -> Result<u64, HnnError> {
-        match self {
-            LockAddress::Unlocked => Ok(0),
-            LockAddress::Locked { p, q } => {
-                Self::locked(p, q, denominators)?;
-                let below: u64 = (1..q).map(reduced_numerators).sum();
-                let rank = (0..p).filter(|&p| gcd(p, q) == 1).count() as u64;
-                Ok(1 + below + rank)
-            }
-        }
-    }
-}
-
-/// The site kind's letter: rotation, null, boost, reflection, degenerate.
-fn kind_code(kind: SiteKind) -> u64 {
-    match kind {
-        SiteKind::Rotation => 0,
-        SiteKind::Null => 1,
-        SiteKind::Boost => 2,
-        SiteKind::Reflection => 3,
-        SiteKind::Degenerate => 4,
-    }
-}
-
-/// The proved site kinds (`Compression/Landmark/SiteKind.Kind`).
-const SITE_KINDS: u64 = 5;
-
-/// [definition] **One contact's reading at a tick**, the plain-data input of a contact letter: its
-/// lock address and its site kind, read by the contact's owner from the executed operands.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub struct ContactReading {
-    pub contact: usize,
-    pub lock: LockAddress,
-    pub kind: SiteKind,
-}
-
 /// [definition] **One declared feature slot of a bundle**.
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Feature {
     /// Ring `ring`'s phase class `⌊g·phase⌋ mod g` at its declared grain `g`.
     Phase { ring: usize, grain: u64 },
-    /// Contact `contact`'s lock address at the bound `Q` and its site kind.
-    Contact { contact: usize, denominators: u64 },
+    /// Contact `contact`'s reading (`hnn::contact::ContactReading`): its lock address in the lock
+    /// family at its derived bound `(P, Q)`, and its site kind.
+    Contact {
+        contact: usize,
+        bound: LockDeclaration,
+    },
 }
 
 impl Feature {
-    /// **A contact's letter at an admitted horizon of `H` ticks** of its slower clock: a reduced
-    /// lock `(p, q)` first returns after `q` ticks (Lean `Aeon/Clock/Lock.cycle_iff_period_dvd`), so
-    /// its return is observable before the horizon exactly when `q ≤ H`, and the bound is `Q = H`
-    /// (Lean `HNN/LandmarkAddress.farey_partition_finite`), derived, never a literal.
-    pub fn contact(contact: usize, horizon: u64) -> Self {
+    /// **A contact's letter**, its bound derived from the field (`LockDeclaration::derived`: `Q`
+    /// the greatest denominator whose first return, `q` turns of the contact's second ring, Lean
+    /// `Aeon/Clock/Lock.cycle_iff_period_dvd`, is observable within the aeon, and `P` the first
+    /// ring's alike; Lean `HNN/LandmarkAddress.lock_partition_finite`), never a literal.
+    pub fn contact(field: &Field, contact: usize) -> Self {
         Feature::Contact {
             contact,
-            denominators: horizon,
+            bound: LockDeclaration::derived(field, contact),
         }
     }
 
-    /// **The slot's finite alphabet**: `g` phase classes, or `(1 + |F_Q|) · 5` contact letters.
-    pub fn size(&self) -> u64 {
+    /// **The slot's finite alphabet**: `g` phase classes, or the contact's letters (its lock
+    /// family's letters times the five site kinds, `hnn::contact::ContactReading::letters`).
+    pub fn size(&self) -> Result<u64, HnnError> {
         match self {
-            Feature::Phase { grain, .. } => *grain,
-            Feature::Contact { denominators, .. } => {
-                LockAddress::letters(*denominators) * SITE_KINDS
-            }
+            Feature::Phase { grain, .. } => Ok(*grain),
+            Feature::Contact { bound, .. } => ContactReading::letters(bound),
         }
     }
 
-    /// A contact reading's value in this slot.
+    /// A contact reading's value in this slot (`hnn::contact::ContactReading::letter`).
     pub fn contact_value(&self, reading: &ContactReading) -> Result<u64, HnnError> {
         match self {
-            Feature::Contact { denominators, .. } => {
-                Ok(reading.lock.code(*denominators)? * SITE_KINDS + kind_code(reading.kind))
-            }
+            Feature::Contact { bound, .. } => reading.letter(bound),
             Feature::Phase { .. } => Err(shape("a contact slot for a contact reading", 1, 0)),
         }
     }
@@ -403,6 +332,8 @@ impl Feature {
 #[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct LetterFamily {
     features: Vec<Feature>,
+    /// Each slot's alphabet `s_i`, read once at the declaration.
+    sizes: Vec<u64>,
 }
 
 impl LetterFamily {
@@ -414,8 +345,9 @@ impl LetterFamily {
     /// **Declare a family**, refused at an empty slot or when the slots' product passes 32 bits.
     pub fn new(features: Vec<Feature>) -> Result<Self, HnnError> {
         let mut product = 1u64;
+        let mut sizes = Vec::with_capacity(features.len());
         for feature in &features {
-            let size = feature.size();
+            let size = feature.size()?;
             if size == 0 {
                 return Err(shape("a feature slot of at least one letter", 1, 0));
             }
@@ -427,12 +359,18 @@ impl LetterFamily {
                     usize::try_from(product).unwrap_or(usize::MAX),
                 ));
             }
+            sizes.push(size);
         }
-        Ok(Self { features })
+        Ok(Self { features, sizes })
     }
 
     pub fn features(&self) -> &[Feature] {
         &self.features
+    }
+
+    /// Each slot's alphabet `s_i`.
+    pub fn sizes(&self) -> &[u64] {
+        &self.sizes
     }
 
     /// `r`, the feature slots.
@@ -444,9 +382,16 @@ impl LetterFamily {
         self.features.is_empty()
     }
 
+    /// Whether a slot reads a contact (its readings need the constitution's site kinds).
+    pub fn reads_contacts(&self) -> bool {
+        self.features
+            .iter()
+            .any(|feature| matches!(feature, Feature::Contact { .. }))
+    }
+
     /// `Π_i s_i`, the features' codes.
     pub fn codes(&self) -> u64 {
-        self.features.iter().map(Feature::size).product()
+        self.sizes.iter().product()
     }
 
     /// **The features' mixed-radix code** `Σ_i v_i Π_(k<i) s_k`, refused at a value outside its slot.
@@ -460,8 +405,7 @@ impl LetterFamily {
         }
         let mut code = 0u64;
         let mut radix = 1u64;
-        for (value, feature) in values.iter().zip(&self.features) {
-            let size = feature.size();
+        for (value, &size) in values.iter().zip(&self.sizes) {
             if *value >= size {
                 return Err(shape(
                     "a feature value within its slot",
@@ -478,10 +422,9 @@ impl LetterFamily {
     /// The slot values of a features' code.
     pub fn decode(&self, code: u32) -> Vec<u64> {
         let mut rest = u64::from(code);
-        self.features
+        self.sizes
             .iter()
-            .map(|feature| {
-                let size = feature.size();
+            .map(|&size| {
                 let value = rest % size;
                 rest /= size;
                 value
@@ -1499,9 +1442,9 @@ fn check_declaration(declaration: &LandmarkDeclaration) -> Result<(), HnnError> 
     }
     let largest = declaration
         .family
-        .features()
+        .sizes()
         .iter()
-        .map(Feature::size)
+        .copied()
         .max()
         .unwrap_or(0);
     if largest >= u64::from(u32::MAX) {

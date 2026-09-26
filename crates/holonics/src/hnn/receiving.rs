@@ -66,13 +66,18 @@
 //! tick's letter after the tick, and never reads it again; a pending ratio copies the register, its
 //! clock included, at its cut, so each phase's letters of the window's known targets are read by a
 //! copy of that clock (`bundle_causal`). A ring's phase class at its declared grain is read by
-//! [`GrainCell::of`] of the phase in turns; a contact's lock address and site kind arrive as the
-//! plain-data [`ContactReading`] `(contact, lock, kind)` per tick ([`ActiveAddress::receive_read`]).
-//! The clock-only letters of a passage are replayed without the wave ([`clock_letters`]: the
-//! resident's clock law with its key location and re-keying at each carry-out), the development
-//! harness's letters (Decision 31). The field's declared family ([`letter_family`]) is the harness's
-//! choice: on the standing cut's development cells no clock-only family lowered the code length by
-//! its description charge, so it is the cell-only family, and the register is campaign 1's.
+//! [`GrainCell::of`] of the phase in turns. A contact's letter is its owner's reading
+//! ([`ContactReading`], `hnn::contact`): its lock address from its rings' whole windings since the
+//! aeon's opening, which the reader keeps with the phases (every ring, so the carry-out that opens
+//! the next aeon is its own), and its site kind from the constitution the reader last refreshed
+//! from ([`LetterReader::refresh`], which the resident takes after each ingest: the kinds step only
+//! between ingests, so the compare's copy and the ingest read one letter per tick).
+//! The letters of a passage are replayed without the wave ([`clock_letters`]: the resident's clock
+//! law with its key location and re-keying at each carry-out, the site kinds given per tick), the
+//! development harness's letters (Decision 31). The field's declared family ([`letter_family`]) is
+//! the harness's choice: on the standing cut's development cells no clock-only and no contact
+//! family coded below both the cell-only tree and the constant control of its slots by its
+//! description charge, so it is the cell-only family, and the register is campaign 1's.
 //!
 //! [definition; agent-inferred] **The combined face** (Decision 27's combined read, with the tree's
 //! face in place of the region table's). The scored logits are the tree face's grain logits
@@ -116,16 +121,17 @@ use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::compression::cost::ceil_log2;
 use crate::hnn::HnnError;
+use crate::hnn::contact::{ContactReading, LockDeclaration, lock_address, site_kinds};
 use crate::hnn::field::{ConstitutionRead, Current, Field, ReceiverDeclaration};
 use crate::hnn::keys;
 use crate::hnn::landmark::{
-    Beta, Bundle, ContactReading, Feature, LandmarkDeclaration, LandmarkFace, Letter, LetterFamily,
-    code_length,
+    Beta, Bundle, Feature, LandmarkDeclaration, LandmarkFace, Letter, LetterFamily, code_length,
 };
 use crate::hnn::propagation::Operands;
 use crate::hnn::ratio::{Face, Faces};
 use crate::hnn::realization::{apply_rows, indexed};
 use crate::hnn::word::Word;
+use crate::navigator::trace::SiteKind;
 use crate::ratio::algebraic::ExactInterval;
 use crate::ratio::exponentiated::CarriedPower;
 use crate::ratio::linear::ExactRatMatrix;
@@ -307,17 +313,36 @@ struct ClockRing {
 }
 
 /// [definition; agent-inferred] **The letters' reader** (module header, "The receiving letters"):
-/// the declared family, the clock law of the rings its phase letters read (rings `0 ..= g_max` in
-/// carry order, since a ring's step reads its predecessors' carries: Lean
-/// `HNN/Moment.selective_position`), and their phases `λ_g mod d_g` at the register's cut. It is
-/// the retained sufficient clock state the letters are read from (Lean
-/// `HNN/LandmarkAddress.address_descends_retention`): a tick's letter is read after the tick,
-/// before the cell it predicts, and nothing of the past is kept.
+/// the declared family, the clock law of the rings its letters read (rings `0 ..= g_max` in carry
+/// order, since a ring's step reads its predecessors' carries: Lean
+/// `HNN/Moment.selective_position`; every ring when a contact is read, so the joint clock's
+/// carry-out, which opens the next aeon, is the reader's own), their phases `λ_g mod d_g` and whole
+/// windings since the aeon's opening at the register's cut, and each contact's site kind as the
+/// constitution read at the reader's last refresh. It is the retained sufficient state the letters
+/// are read from (Lean `HNN/LandmarkAddress.address_descends_retention`): a tick's letter is read
+/// after the tick, before the cell it predicts, and nothing of the past is kept.
+///
+/// [definition; agent-inferred] **A contact's letter** is its owner's reading
+/// (`hnn::contact::ContactReading`): its lock address from its two rings' windings since the
+/// aeon's opening (`hnn::contact::lock_address` at the derived bound; the carry-out resets them,
+/// as the aeon's opening moves there), and its site kind from the kinds held
+/// (`hnn::contact::site_kinds`). The kinds are the constitution's at the reader's last
+/// [`LetterReader::refresh`], which the resident takes after each ingest, never inside one: a
+/// deposit between a window's cut and its ingest therefore reaches no letter of that window's
+/// ticks, so the letters the compare reads by a copy of the register ([`ActiveAddress::phase`])
+/// are the letters the register reads at the ingest, and the site kinds step only between ticks,
+/// as a re-keying does (Lean `bundle_causal`: the letters already read keep their ticks' values).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LetterReader {
     family: LetterFamily,
     rings: Vec<ClockRing>,
     phases: Vec<u64>,
+    /// Each kept ring's whole windings since the aeon's opening (read only by contact letters).
+    windings: Vec<u64>,
+    /// Each contact's site kind at the last refresh; `None` before one (a contact family refuses).
+    kinds: Option<Vec<SiteKind>>,
+    /// Each contact's ends `(g, h)`, for the contact slots.
+    ends: Vec<(usize, usize)>,
 }
 
 impl LetterReader {
@@ -327,11 +352,17 @@ impl LetterReader {
             family: LetterFamily::cells(),
             rings: Vec::new(),
             phases: Vec::new(),
+            windings: Vec::new(),
+            kinds: None,
+            ends: Vec::new(),
         }
     }
 
-    /// **The reader of a declared family at a lift point**. Refused at a phase letter of a ring
-    /// outside the field, at a grain that is zero, or at a contact slot of a contact outside it.
+    /// **The reader of a declared family at a lift point that opens an aeon** (the mount, or the
+    /// re-keyed lift point after a carry-out): the windings since the opening start at zero.
+    /// Refused at a phase letter of a ring outside the field, at a grain that is zero, or at a
+    /// contact slot of a contact outside it. A family with contact letters reads its site kinds
+    /// from the first [`LetterReader::refresh`].
     pub fn of(field: &Field, family: LetterFamily, current: &Current) -> Result<Self, HnnError> {
         let mut reach = 0usize;
         for feature in family.features() {
@@ -356,6 +387,7 @@ impl LetterReader {
                             found: contact,
                         });
                     }
+                    reach = field.rings().len();
                 }
             }
         }
@@ -372,6 +404,13 @@ impl LetterReader {
             family,
             rings,
             phases: vec![0; reach],
+            windings: vec![0; reach],
+            kinds: None,
+            ends: field
+                .contacts()
+                .iter()
+                .map(|contact| contact.ends())
+                .collect(),
         };
         reader.synchronize(field, current)?;
         Ok(reader)
@@ -381,7 +420,8 @@ impl LetterReader {
         &self.family
     }
 
-    /// **Take the rings' phases from a lift point** (at the mount, and after a re-keying).
+    /// **Take the rings' phases from a lift point** (at the mount, and after a re-keying, which
+    /// keeps every winding).
     pub fn synchronize(&mut self, field: &Field, current: &Current) -> Result<(), HnnError> {
         for (ring, phase) in self.phases.iter_mut().enumerate() {
             *phase = current.phase(field, ring)?;
@@ -389,25 +429,72 @@ impl LetterReader {
         Ok(())
     }
 
-    /// Whether the register's clock is the lift point's (the resident checks it at every ingest).
-    pub fn agrees(&self, field: &Field, current: &Current) -> bool {
-        self.phases
-            .iter()
-            .enumerate()
-            .all(|(ring, phase)| current.phase(field, ring).ok() == Some(*phase))
+    /// **Read the contacts' site kinds from a constitution** (`hnn::contact::site_kinds`): the
+    /// kinds every later tick's contact letter carries until the next refresh (the resident's, after
+    /// each ingest). A family without contact letters reads nothing.
+    pub fn refresh(
+        &mut self,
+        field: &Field,
+        constitution: &impl ConstitutionRead,
+    ) -> Result<(), HnnError> {
+        if self.family.reads_contacts() {
+            self.kinds = Some(site_kinds(field, constitution)?);
+        }
+        Ok(())
+    }
+
+    /// **Hold given site kinds** (the development harness's replay of a passage's kinds, one per
+    /// contact), refused at a count that is not the field's contacts'.
+    pub fn hold_kinds(&mut self, kinds: Vec<SiteKind>) -> Result<(), HnnError> {
+        if kinds.len() != self.ends.len() {
+            return Err(HnnError::Shape {
+                what: "one site kind per declared contact",
+                expected: self.ends.len(),
+                found: kinds.len(),
+            });
+        }
+        self.kinds = Some(kinds);
+        Ok(())
+    }
+
+    /// Whether the register's clock is the lift point's: every kept ring's phase, and, where
+    /// contacts are read, its windings since the aeon's opening (`opening`, the resident's opening
+    /// lift point, or the carry-out's lift point when the ingest just carried out; the resident
+    /// checks it at every ingest).
+    pub fn agrees(&self, field: &Field, current: &Current, opening: &[BigInt]) -> bool {
+        let Ok(opening) = Current::at(field, opening.to_vec()) else {
+            return false;
+        };
+        let contacts = self.family.reads_contacts();
+        self.phases.iter().enumerate().all(|(ring, phase)| {
+            current.phase(field, ring).ok() == Some(*phase)
+                && (!contacts
+                    || match (current.winding(field, ring), opening.winding(field, ring)) {
+                        (Ok(now), Ok(then)) => now - then == BigInt::from(self.windings[ring]),
+                        _ => false,
+                    })
+        })
     }
 
     /// **One cell's selective step on the kept rings** (`hnn::field::Field::selective_step`):
-    /// ring `g` advances `[port_g(x) ∈ N_g]` plus its predecessor's carry.
-    fn step(&mut self, cell: usize) {
+    /// ring `g` advances `[port_g(x) ∈ N_g]` plus its predecessor's carry, and winds when it
+    /// passes its period. Returns whether the last ring carried out.
+    fn step(&mut self, cell: usize) -> bool {
         let mut carry = 0u64;
-        for (ring, phase) in self.rings.iter().zip(self.phases.iter_mut()) {
+        for ((ring, phase), windings) in self
+            .rings
+            .iter()
+            .zip(self.phases.iter_mut())
+            .zip(self.windings.iter_mut())
+        {
             let port = (cell as u64 % ring.period) as usize;
             let advance = u64::from(ring.lock[port]) + carry;
             let next = *phase + advance;
             carry = u64::from(next >= ring.period);
+            *windings += carry;
             *phase = next % ring.period;
         }
+        carry == 1
     }
 
     /// **Ring `g`'s phase class at grain `g_R`**: `⌊g_R·phase⌋ mod g_R` of the phase `λ_g/d_g` in
@@ -421,11 +508,32 @@ impl LetterReader {
         .phase
     }
 
+    /// **Contact `a`'s reading after the tick**: its lock address from its rings' windings since
+    /// the aeon's opening at its bound, and its site kind as held. Refused before a refresh.
+    fn contact(&self, contact: usize, bound: &LockDeclaration) -> Result<ContactReading, HnnError> {
+        let kinds = self.kinds.as_ref().ok_or(HnnError::Shape {
+            what: "the site kinds a contact letter reads (the register's refresh)",
+            expected: self.ends.len(),
+            found: 0,
+        })?;
+        let (g, h) = self.ends[contact];
+        Ok(ContactReading {
+            contact,
+            lock: lock_address(
+                &BigInt::from(self.windings[g]),
+                &BigInt::from(self.windings[h]),
+                bound,
+            ),
+            kind: kinds[contact],
+        })
+    }
+
     /// **The letter of one tick**: the cell's selective step, then its bundle read after the tick
-    /// (the cell alone for the cell-only family), each contact slot from its reading. Refused when
-    /// a declared contact slot has no reading.
-    pub fn tick(&mut self, cell: usize, contacts: &[ContactReading]) -> Result<Letter, HnnError> {
-        self.step(cell);
+    /// (the cell alone for the cell-only family), each phase slot from the clock and each contact
+    /// slot from its reading; at the joint clock's carry-out the windings then restart, as the next
+    /// aeon opens there.
+    pub fn tick(&mut self, cell: usize) -> Result<Letter, HnnError> {
+        let carry_out = self.step(cell);
         if self.family.is_empty() {
             return Ok(Letter::Cell(cell));
         }
@@ -433,33 +541,46 @@ impl LetterReader {
             .family
             .features()
             .iter()
-            .map(|feature| match *feature {
-                Feature::Phase { ring, grain } => Ok(self.class(ring, grain)),
-                Feature::Contact { contact, .. } => {
-                    let reading = contacts
-                        .iter()
-                        .find(|reading| reading.contact == contact)
-                        .ok_or(HnnError::Shape {
-                            what: "a contact reading for each declared contact letter",
-                            expected: contact,
-                            found: contacts.len(),
-                        })?;
-                    feature.contact_value(reading)
+            .map(|feature| match feature {
+                Feature::Phase { ring, grain } => Ok(self.class(*ring, *grain)),
+                Feature::Contact { contact, bound } => {
+                    feature.contact_value(&self.contact(*contact, bound)?)
                 }
             })
             .collect::<Result<Vec<u64>, HnnError>>()?;
+        if carry_out && self.family.reads_contacts() {
+            self.windings.iter_mut().for_each(|windings| *windings = 0);
+        }
         Ok(Letter::Bundle(Bundle {
             cell,
             features: self.family.encode(&values)?,
         }))
     }
 
-    /// Its exact bits: each kept ring's phase, `⌈log₂ d_g⌉`.
+    /// Its exact bits: each kept ring's phase, `⌈log₂ d_g⌉`, and, where contacts are read, each
+    /// kept ring's windings since the opening (fewer than `∏_(j>g) d_j`, `⌈log₂ ∏_(j>g) d_j⌉`) and
+    /// each contact's site kind (`⌈log₂ 5⌉`).
     pub fn bits(&self) -> u64 {
-        self.rings
+        let phases: u64 = self
+            .rings
             .iter()
             .map(|ring| ceil_log2(&BigUint::from(ring.period)))
-            .sum()
+            .sum();
+        if !self.family.reads_contacts() {
+            return phases;
+        }
+        let windings: u64 = (0..self.rings.len())
+            .map(|g| {
+                let bound: BigUint = self.rings[g + 1..]
+                    .iter()
+                    .map(|ring| BigUint::from(ring.period))
+                    .product();
+                ceil_log2(&bound)
+            })
+            .sum();
+        phases
+            + windings
+            + self.ends.len() as u64 * ceil_log2(&BigUint::from(crate::hnn::contact::SITE_KINDS))
     }
 }
 
@@ -481,19 +602,25 @@ impl ActiveAddress {
         }
     }
 
-    /// **The resident's address register** for a field at a lift point: at the deepest declared
-    /// receiver's depth, each receiver reading its own first `D` letters, with the field's declared
-    /// letter family ([`letter_family`]).
-    pub fn of_field(field: &Field, current: &Current) -> Result<Self, HnnError> {
+    /// **The resident's address register** for a field at a lift point and its constitution: at
+    /// the deepest declared receiver's depth, each receiver reading its own first `D` letters, with
+    /// the field's declared letter family ([`letter_family`]) and the constitution's site kinds.
+    pub fn of_field(
+        field: &Field,
+        current: &Current,
+        constitution: &impl ConstitutionRead,
+    ) -> Result<Self, HnnError> {
         let depth = field
             .receivers()
             .iter()
             .map(|receiver| receiver.depth)
             .max()
             .unwrap_or(0);
+        let mut reader = LetterReader::of(field, letter_family(field), current)?;
+        reader.refresh(field, constitution)?;
         Ok(Self {
             letters: vec![Letter::Boundary; depth],
-            reader: LetterReader::of(field, letter_family(field), current)?,
+            reader,
         })
     }
 
@@ -520,20 +647,10 @@ impl ActiveAddress {
         &self.reader
     }
 
-    /// **Receive one cell** (the clock-only letters): its tick's letter becomes the newest, and the
-    /// oldest leaves. Refused when the family declares contact letters (their readings are
-    /// [`ActiveAddress::receive_read`]'s).
+    /// **Receive one cell**: its tick's letter, read by the register's reader after the tick (its
+    /// contacts' readings included), becomes the newest, and the oldest leaves.
     pub fn receive(&mut self, cell: usize) -> Result<(), HnnError> {
-        self.receive_read(cell, &[])
-    }
-
-    /// **Receive one cell with its contacts' readings at its tick**.
-    pub fn receive_read(
-        &mut self,
-        cell: usize,
-        contacts: &[ContactReading],
-    ) -> Result<(), HnnError> {
-        let letter = self.reader.tick(cell, contacts)?;
+        let letter = self.reader.tick(cell)?;
         if !self.letters.is_empty() {
             self.letters.pop();
             self.letters.insert(0, letter);
@@ -545,6 +662,16 @@ impl ActiveAddress {
     /// ticks' values: Lean `bundle_causal`).
     pub fn synchronize(&mut self, field: &Field, current: &Current) -> Result<(), HnnError> {
         self.reader.synchronize(field, current)
+    }
+
+    /// **Read the contacts' site kinds from the published constitution** (the resident's, after
+    /// each ingest: [`LetterReader::refresh`]).
+    pub fn refresh(
+        &mut self,
+        field: &Field,
+        constitution: &impl ConstitutionRead,
+    ) -> Result<(), HnnError> {
+        self.reader.refresh(field, constitution)
     }
 
     /// **The address's first `depth` letters** (a receiver of a shallower tree), with its reader,
@@ -565,18 +692,19 @@ impl ActiveAddress {
 
     /// **Phase `j`'s address** (module header; Lean `HNN/LandmarkAddress.bundle_causal`): the
     /// letters of the window's cells before phase `j` that are known, newest first (read by a copy
-    /// of the register's clock stepped over `known[0], …, known[j−1]`, at most the `known.len()` of
-    /// them), then this suffix, truncated to its depth. At a compare every earlier target is known,
-    /// so this is `hnn::landmark::letter_address` of the passage's letters at `p + j`; at a release
-    /// no cell of the window is known and every phase reads the window's opening address
-    /// (`hnn::port`'s release). The target of phase `j` is never read. Refused when the family
-    /// declares contact letters.
+    /// of the register's reader, its clock and held site kinds, stepped over `known[0], …,
+    /// known[j−1]`, at most the `known.len()` of them), then this suffix, truncated to its depth. At
+    /// a compare every earlier target is known, so this is `hnn::landmark::letter_address` of the
+    /// passage's letters at `p + j`, contact letters included (the register reads the same kinds at
+    /// the window's ingest: [`LetterReader`]); at a release no cell of the window is known and every
+    /// phase reads the window's opening address (`hnn::port`'s release). The target of phase `j`
+    /// is never read.
     pub fn phase(&self, known: &[usize], j: usize) -> Result<Vec<Letter>, HnnError> {
         let depth = self.letters.len();
         let mut reader = self.reader.clone();
         let mut window = known[..j.min(known.len())]
             .iter()
-            .map(|&cell| reader.tick(cell, &[]))
+            .map(|&cell| reader.tick(cell))
             .collect::<Result<Vec<Letter>, HnnError>>()?;
         window.reverse();
         Ok(window
@@ -588,7 +716,7 @@ impl ActiveAddress {
 
     /// **Its exact bits**: each letter one of the family's bundle codes with the boundary
     /// (`1 + |A| Π_i s_i`, [`LetterFamily::bundle_codes`]; `|A| + 1` for the cell-only family), and
-    /// the reader's clock.
+    /// the reader's state.
     pub fn bits(&self, alphabet: usize) -> u64 {
         self.letters.len() as u64
             * ceil_log2(&BigUint::from(self.reader.family.bundle_codes(alphabet)))
@@ -599,32 +727,44 @@ impl ActiveAddress {
 /// [definition; agent-inferred] **The field's declared letter family** (campaign 2, decided on the
 /// development cells by `hnn_landmark`'s harness, Decision 31): the receiving letters every
 /// receiver's tree is addressed by. The harness's receipt (the notebook README's `hnn_landmark`
-/// row) chose the cell-only family: no clock-only family lowered the development code length by its
-/// description charge.
+/// row) chose the cell-only family: no clock-only family and no contact family lowered the
+/// development code length by its description charge.
 pub fn letter_family(_field: &Field) -> LetterFamily {
     LetterFamily::cells()
 }
 
-/// [definition; agent-inferred] **The clock-only letters of a passage** (the development harness's
-/// letters, Decision 31): the resident's clock law replayed without the wave. Each cell steps the
-/// lift point (`Current::step`) and its tick's letter is read after the step; at the joint clock's
+/// [definition; agent-inferred] **The letters of a passage replayed without the wave** (the
+/// development harness's letters, Decision 31): the resident's clock law. Each cell steps the lift
+/// point (`Current::step`) and its tick's letter is read after the step; at the joint clock's
 /// carry-out the keys are located on the closing crib (its last `W_crib` cells, the aeon's own,
 /// read at the declared offset: `keys::locate_closing`, as the exposure locates them) and re-key
-/// the lift point, which the reader takes. A family with contact letters is refused (their
-/// readings need the word).
+/// the lift point, which the reader takes. A family with contact letters reads its site kinds from
+/// `kinds`, the kinds the register held at each cell's tick (one entry per cell, the resident's
+/// refreshes of a development pass: the exposure's constitution curve); it is refused without them.
 pub fn clock_letters(
     field: &Field,
     family: &LetterFamily,
     cells: &[usize],
+    kinds: &[Vec<SiteKind>],
 ) -> Result<Vec<Letter>, HnnError> {
+    if family.reads_contacts() && kinds.len() < cells.len() {
+        return Err(HnnError::Shape {
+            what: "the site kinds held at each tick of a contact family's passage",
+            expected: cells.len(),
+            found: kinds.len(),
+        });
+    }
     let mut current = Current::at_rest(field);
     let mut reader = LetterReader::of(field, family.clone(), &current)?;
     let crib = field.crib();
     let mut aeon_start = 0usize;
     let mut letters = Vec::with_capacity(cells.len());
     for (at, &cell) in cells.iter().enumerate() {
+        if family.reads_contacts() && reader.kinds.as_ref() != Some(&kinds[at]) {
+            reader.hold_kinds(kinds[at].clone())?;
+        }
         let step = current.step(field, cell)?;
-        letters.push(reader.tick(cell, &[])?);
+        letters.push(reader.tick(cell)?);
         if step.carry_out {
             let end = at + 1;
             let from = end.saturating_sub(crib.window).max(aeon_start);

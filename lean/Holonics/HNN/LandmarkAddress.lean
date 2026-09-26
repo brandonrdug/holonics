@@ -1,4 +1,5 @@
 import Holonics.HNN.LandmarkTree
+import Holonics.HNN.Contact
 import Holonics.Aeon.Clock.Lock
 
 /-!
@@ -22,7 +23,7 @@ address     a_D(h) = [b(h), b(tail h), …]_D            newest bundle first, bo
 window      a_D(w ++ h) = (bundles of w from σ_h ++ a_D(h)).take D     phase j reads w = its known targets
 restriction a_d(h) = a_D(h).take d ;  flat(a_d) = flat(a_D).take (d (1 + r))
 phase class ⌊g · fract x⌋ ∈ [0, g) ;  at x = k/d, g = d: k mod d ;  g' ∣ g: ⌊g' y⌋ = ⌊g y⌋ / (g/g')
-lock        Unlocked, or reduced (p, q), 0 ≤ p ≤ q, 0 < q ≤ Q ;  Q = the horizon H: a first return by H iff q ≤ H
+lock        Unlocked, or reduced (p, q), 0 < p ≤ P, 0 < q ≤ Q ;  Q = the horizon H: a first return by H iff q ≤ H
 code        0 (boundary) ,  1 + x + |A| · f  (injective) ;  f = Σ v_i Π_(k<i) s_k  (mixed radix, injective)
 dominance   W_enlarged = ½ W_cells + ½ W_bundles  (the join's sequential mixture)
             −log₂ ∏ q_join ≤ Γ(S) + 1 − log₂ ∏_(leaves of S) E + description + ρ
@@ -52,11 +53,15 @@ dominance   W_enlarged = ½ W_cells + ½ W_bundles  (the join's sequential mixtu
 5. **`phase_partition_finite`.** At a grain `g > 0` the phase class lies in `[0, g)`, its fibre is
    the interval `[k/g, (k+1)/g)` of the open phase, every class is read, and the ring's exact
    phase `j/d` at its own grain `d` reads `j mod d` (an empty fibre).
-6. **`farey_partition_finite`.** The lock letters at a bound `Q` (`Unlocked` and the reduced
-   `(p, q)`, `0 ≤ p ≤ q`, `0 < q ≤ Q`) are finite, at most `(Q + 1)² + 1`; a rate `r ∈ [0, 1]` of
-   reduced denominator at most `Q` has exactly one address; and for a reduced rate the first return
-   of the two clocks (`Aeon/Clock/Lock.cycle_iff_period_dvd`) falls within a horizon `H` exactly
-   when `q ≤ H`, so `Q = H` is the greatest denominator whose first return is observable before it.
+6. **`lock_partition_finite`.** The lock letters at bounds `(P, Q)` (`Unlocked` and the reduced
+   `(p, q)`, `0 < p ≤ P`, `0 < q ≤ Q`: the addresses a contact reads in its declared orientation,
+   a box and not the Farey family of `[0, 1]`) are finite, at most `(P + 1)(Q + 1) + 1`; a positive
+   rate of reduced numerator at most `P` and denominator at most `Q` has exactly one address; and
+   for a reduced rate the first return of the two clocks falls within a horizon `H` exactly when
+   `q ≤ H`, so `Q = H` is the greatest denominator whose first return is observable before it. The
+   last clause is the contact's own law, `HNN/Contact.contact_lock_address` (its cycles are the
+   multiples of `q`), read at the horizon: the contact's lock address and this partition are one
+   object, the reading and the finite family it lands in.
 7. **`bundle_code_injective`.** The bundle code (`0` the boundary, `1 + x + n f` a cell `x < n` with
    feature code `f`) is injective when the feature code is; the features' mixed-radix code is
    injective on values within their slots and lies below the slots' product.
@@ -74,13 +79,15 @@ The ideal join's weight is `½ W_cells + ½ W_bundles`; a tighter charge needs a
 weight for the cell branch.
 
 [open] The lock letter's reading (the contact's measured winding pair and the address selected
-from it) is the contact owner's (campaign 2, `HNN/Contact`), and is consumed here only as the
-finite partition it lands in. The executed rank of a reduced pair in Rust
-(`hnn::landmark::LockAddress::code`) is checked by the tests, not stated here.
+from it) is the contact owner's (`HNN/Contact.contact_lock_address`), consumed here as the finite
+partition it lands in. The executed rank of a reduced pair in Rust
+(`hnn::contact::ContactLock::code`, ordered by `(q, p)`) is checked by the tests, not stated here.
 
-The Rust consumer is `crates/holonics/src/hnn/landmark.rs` (`Letter`, `Bundle`, `LetterFamily`,
-`LockAddress`, `letter_address`, the join of the enlarged tree) and
-`crates/holonics/src/hnn/receiving.rs` (`LetterReader`, `ActiveAddress`, `clock_letters`).
+The Rust consumers are `crates/holonics/src/hnn/landmark.rs` (`Letter`, `Bundle`, `LetterFamily`,
+`Feature`, `letter_address`, the join of the enlarged tree), `crates/holonics/src/hnn/contact.rs`
+(`LockDeclaration::letters`, `ContactLock::code`, `ContactReading::letter`: the contact letter's
+partition and rank) and `crates/holonics/src/hnn/receiving.rs` (`LetterReader`, `ActiveAddress`,
+`clock_letters`).
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
@@ -391,59 +398,56 @@ theorem phaseClass_of_exact (g' d k : ℕ) (hk : k < d) :
   unfold phaseClass
   rw [hfract, ← mul_div_assoc, ← Nat.cast_mul, Nat.floor_div_eq_div]
 
-/-- [definition] **A reduced lock address within the bound `Q`**: `(p, q)` with `0 < q`, `p ≤ q`
-and `gcd(p, q) = 1`, both below `Q + 1`. -/
-def FareyLock (Q : ℕ) : Type :=
-  {pq : Fin (Q + 1) × Fin (Q + 1) // 0 < pq.2.val ∧ pq.1.val ≤ pq.2.val ∧
+/-- [definition] **A reduced lock address within the bounds `(P, Q)`**: `(p, q)` with `0 < p ≤ P`,
+`0 < q ≤ Q` and `gcd(p, q) = 1`, the addresses a contact `g → h` can read in its declared
+orientation (`HNN/Contact.contact_lock_address`: `p` turns of ring `g` per `q` of ring `h`); a box,
+not the Farey family of `[0, 1]`, since ring `g` may wind faster than ring `h`. -/
+def LockPair (P Q : ℕ) : Type :=
+  {pq : Fin (P + 1) × Fin (Q + 1) // 0 < pq.1.val ∧ 0 < pq.2.val ∧
     Nat.Coprime pq.1.val pq.2.val}
 
-instance (Q : ℕ) : Fintype (FareyLock Q) := by
-  unfold FareyLock; infer_instance
+instance (P Q : ℕ) : Fintype (LockPair P Q) := by
+  unfold LockPair; infer_instance
 
 /-- [definition] **A lock letter**: `Unlocked` (`none`) at the declared tolerance, or a reduced
-address within the bound. -/
-abbrev LockLetter (Q : ℕ) := Option (FareyLock Q)
+address within the bounds. -/
+abbrev LockLetter (P Q : ℕ) := Option (LockPair P Q)
 
-open Holonics.Aeon.Clock.Lock (IsCycle jointReading cycle_iff_period_dvd) in
-/-- [proved-derived; formal-checked] **`farey_partition_finite`.**
-* The lock letters at `Q` are finite: at most `(Q + 1)² + 1` of them.
-* A rate `r ∈ [0, 1]` of reduced denominator at most `Q` has exactly one reduced address: the
-  rates within the bound are partitioned by their addresses.
-* For a reduced rate `p/q` the two clocks' first return (the least positive cycle,
-  `Aeon/Clock/Lock.cycle_iff_period_dvd`) falls within a horizon `H` exactly when `q ≤ H`: the
-  bound `Q = H` is the greatest denominator whose first return is observable before the admitted
-  horizon. -/
-theorem farey_partition_finite (Q : ℕ) :
-    Fintype.card (LockLetter Q) ≤ (Q + 1) ^ 2 + 1 ∧
-      (∀ r : ℚ, 0 ≤ r → r ≤ 1 → r.den ≤ Q →
-        ∃! ℓ : FareyLock Q, ((ℓ.1.1.val : ℚ) / ℓ.1.2.val) = r) ∧
-      ∀ (p q H : ℕ), 0 < q → Nat.Coprime p q →
+open Holonics.Aeon.Clock.Lock (IsCycle jointReading) in
+/-- [proved-derived; formal-checked] **`lock_partition_finite`: the contact's lock letters are a
+finite partition, and the bound is the horizon.**
+* The lock letters at `(P, Q)` are finite: at most `(P + 1)(Q + 1) + 1` of them.
+* A positive rate of reduced numerator at most `P` and reduced denominator at most `Q` has exactly
+  one reduced address: the rates within the bounds are partitioned by their addresses.
+* For a reduced rate `p/q` the two clocks' first return falls within a horizon of `H` turns of the
+  second clock exactly when `q ≤ H`: the bound `Q = H` is the greatest denominator whose first
+  return is observable before the admitted horizon. The cycles are the contact's own:
+  `HNN/Contact.contact_lock_address` at the measured pair `(p, q)` (its gcd is one) says they are
+  exactly the multiples of `q`, so this clause is that theorem's, read at the horizon. -/
+theorem lock_partition_finite (P Q : ℕ) :
+    Fintype.card (LockLetter P Q) ≤ (P + 1) * (Q + 1) + 1 ∧
+      (∀ r : ℚ, 0 < r → r.num ≤ P → r.den ≤ Q →
+        ∃! ℓ : LockPair P Q, ((ℓ.1.1.val : ℚ) / ℓ.1.2.val) = r) ∧
+      ∀ (p : ℤ) (q H : ℕ), 0 < q → IsCoprime (q : ℤ) p →
         ((∃ k : ℤ, 0 < k ∧ k ≤ H ∧ IsCycle (jointReading ((p : ℚ) / q) k)) ↔ q ≤ H) := by
-  refine ⟨?_, fun r hr0 hr1 hden => ?_, fun p q H hq hcop => ?_⟩
+  refine ⟨?_, fun r hr0 hnumP hden => ?_, fun p q H hq hcop => ?_⟩
   · rw [Fintype.card_option]
-    have : Fintype.card (FareyLock Q) ≤ (Q + 1) ^ 2 := by
-      unfold FareyLock
+    have : Fintype.card (LockPair P Q) ≤ (P + 1) * (Q + 1) := by
+      unfold LockPair
       refine (Fintype.card_subtype_le _).trans ?_
-      simp [sq]
+      simp
     omega
-  · have hnum : 0 ≤ r.num := Rat.num_nonneg.mpr hr0
-    have hnle : r.num.toNat ≤ r.den := by
-      have : r.num ≤ r.den := by
-        have h := Rat.num_div_den r
-        have hd : (0 : ℚ) < r.den := by exact_mod_cast r.den_pos
-        have : (r.num : ℚ) ≤ r.den := by
-          rw [← h] at hr1
-          rwa [div_le_one hd] at hr1
-        exact_mod_cast this
-      omega
+  · have hnum : 0 < r.num := Rat.num_pos.mpr hr0
     have hcopr : Nat.Coprime r.num.toNat r.den := by
       have := r.reduced
       rwa [show r.num.natAbs = r.num.toNat by omega] at this
-    refine ⟨⟨(⟨r.num.toNat, by omega⟩, ⟨r.den, by omega⟩), r.den_pos, hnle, hcopr⟩, ?_, ?_⟩
+    refine ⟨⟨(⟨r.num.toNat, by omega⟩, ⟨r.den, by omega⟩), by simp only; omega, r.den_pos,
+      hcopr⟩, ?_, ?_⟩
     · show ((r.num.toNat : ℕ) : ℚ) / (r.den : ℚ) = r
-      rw [show ((r.num.toNat : ℕ) : ℚ) = (r.num : ℚ) by exact_mod_cast Int.toNat_of_nonneg hnum]
+      rw [show ((r.num.toNat : ℕ) : ℚ) = (r.num : ℚ) by
+        exact_mod_cast Int.toNat_of_nonneg hnum.le]
       exact Rat.num_div_den r
-    · rintro ⟨⟨p, q⟩, hq, hpq, hc⟩ he
+    · rintro ⟨⟨p, q⟩, hp, hq, hc⟩ he
       have hq' : (0 : ℤ) < (q.val : ℤ) := by exact_mod_cast hq
       have hc' : Nat.Coprime (p.val : ℤ).natAbs (q.val : ℤ).natAbs := by simpa using hc
       have e : ((p.val : ℤ) : ℚ) / ((q.val : ℤ) : ℚ) = r := by simpa using he
@@ -458,21 +462,17 @@ theorem farey_partition_finite (Q : ℕ) :
       · apply Fin.ext
         simp only
         omega
-  · have hq' : 0 < q := hq
-    have hcop' : IsCoprime (q : ℤ) (p : ℤ) :=
-      Int.isCoprime_iff_gcd_eq_one.mpr (by simpa [Int.gcd, Nat.coprime_comm] using hcop)
-    have hcast : (((p : ℤ) : ℚ)) = (p : ℚ) := Int.cast_natCast p
+  · have hg : Int.gcd p (q : ℤ) = 1 := by
+      rw [Int.gcd_comm]
+      exact Int.isCoprime_iff_gcd_eq_one.mp hcop
+    have hcycles := (Holonics.HNN.Contact.contact_lock_address p q hq).2.2.2.2.2.2
+    simp only [hg, Nat.cast_one, Int.ediv_one, Nat.div_one] at hcycles
     constructor
     · rintro ⟨k, hk0, hkH, hcyc⟩
-      have hcyc' : IsCycle (jointReading (((p : ℤ) : ℚ) / q) k) := by rw [hcast]; exact hcyc
-      have hdvd := (cycle_iff_period_dvd (p : ℤ) q hq' hcop' k).mp hcyc'
-      have := Int.le_of_dvd hk0 hdvd
+      have := Int.le_of_dvd hk0 ((hcycles k).mp hcyc)
       omega
     · intro hqH
-      refine ⟨q, by exact_mod_cast hq, by exact_mod_cast hqH, ?_⟩
-      have := (cycle_iff_period_dvd (p : ℤ) q hq' hcop' q).mpr (dvd_refl _)
-      rw [hcast] at this
-      exact this
+      exact ⟨q, by exact_mod_cast hq, by exact_mod_cast hqH, (hcycles q).mpr (dvd_refl _)⟩
 
 /-- [definition] **The features' mixed-radix code**, least significant slot first:
 `v₀ + s₀ (v₁ + s₁ (…))`. -/
@@ -602,7 +602,7 @@ section Audit
 #print axioms phase_partition_finite
 #print axioms phaseClass_coarsen
 #print axioms phaseClass_of_exact
-#print axioms farey_partition_finite
+#print axioms lock_partition_finite
 #print axioms bundle_code_injective
 #print axioms cell_only_dominance_with_feature_charge
 

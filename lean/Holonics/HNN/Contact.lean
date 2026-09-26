@@ -43,7 +43,11 @@ T = (1/m) [[m − h²k, 2hc], [−2hk, 4c − m]] ,   tr T = (4c − h²k)/m ,  
 5. **The lock address from the measured winding pair** (`contact_lock_address`): whole windings
    `(m_g, m_h)`, `m_h > 0`, reduce to the coprime address `p/q` with `m_g = p·gcd`, `m_h = q·gcd`; the
    measured passage reads `(m_g, m_h)` and is a cycle of the two clocks at `p/q`, whose cycles are
-   exactly the multiples of `q` (`Aeon/Clock/Lock.{lock_at_address, cycle_iff_period_dvd}`).
+   exactly the multiples of `q` (`Aeon/Clock/Lock.{lock_at_address, cycle_iff_period_dvd}`). The
+   finite family these addresses land in, `Unlocked` and the reduced `(p, q)` within the derived
+   bounds `(P, Q)`, is `HNN/LandmarkAddress.lock_partition_finite`, whose observability clause
+   (`Q` is the horizon) is this theorem's cycles read at the horizon: one object, its reading here
+   and its partition there (the receiving join's contact letter).
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/

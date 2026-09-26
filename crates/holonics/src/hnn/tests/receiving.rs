@@ -770,7 +770,7 @@ fn the_bundle_letters_are_read_from_the_clock_before_the_cell_they_predict() {
     let family = clock_family();
     let mut draw = Draw::new(29);
     let cells: Vec<usize> = (0..3_000).map(|_| (draw.next() % 256) as usize).collect();
-    let letters = clock_letters(&field, &family, &cells).unwrap();
+    let letters = clock_letters(&field, &family, &cells, &[]).unwrap();
     assert!(matches!(letters[0], Letter::Bundle(_)));
     let depth = 3;
     let aperture = 2;
@@ -799,7 +799,7 @@ fn the_bundle_letters_are_read_from_the_clock_before_the_cell_they_predict() {
         for (offset, &cell) in targets.iter().enumerate() {
             let step = current.step(&field, cell).unwrap();
             register.receive(cell).unwrap();
-            assert!(register.reader().agrees(&field, &current));
+            assert!(register.reader().agrees(&field, &current, current.lift()));
             if step.carry_out {
                 let end = p + offset + 1;
                 let from = end.saturating_sub(crib.window).max(aeon_start);
@@ -819,7 +819,7 @@ fn the_bundle_letters_are_read_from_the_clock_before_the_cell_they_predict() {
         for cell in &mut changed[j..] {
             *cell = 255 - *cell;
         }
-        let again = clock_letters(&field, &family, &changed).unwrap();
+        let again = clock_letters(&field, &family, &changed, &[]).unwrap();
         assert_eq!(
             letter_address(&again, j, depth),
             letter_address(&letters, j, depth),
@@ -845,8 +845,8 @@ fn the_address_restricts_by_whole_bundles_and_the_sheets_are_a_scale_square() {
     .unwrap();
     let mut draw = Draw::new(41);
     let cells: Vec<usize> = (0..1_500).map(|_| (draw.next() % 256) as usize).collect();
-    let letters = clock_letters(&field, &family, &cells).unwrap();
-    let coarse = clock_letters(&field, &sheets, &cells).unwrap();
+    let letters = clock_letters(&field, &family, &cells, &[]).unwrap();
+    let coarse = clock_letters(&field, &sheets, &cells, &[]).unwrap();
     let declared = |family: LetterFamily| crate::hnn::landmark::LandmarkDeclaration {
         alphabet: 256,
         depth: 4,
@@ -889,16 +889,19 @@ fn the_address_restricts_by_whole_bundles_and_the_sheets_are_a_scale_square() {
 }
 
 /// **The letters' partitions are finite and their codes injective** (Lean
-/// `HNN/LandmarkAddress.{phase_partition_finite, farey_partition_finite, bundle_code_injective}`):
+/// `HNN/LandmarkAddress.{phase_partition_finite, lock_partition_finite, bundle_code_injective}`):
 /// a ring's phases `k/d` read at grain `g ≤ d` fall in `[0, g)`, cover it, and each fibre is below
-/// `1/g`; the lock letters at `Q` are `Unlocked` and the reduced `(p, q)`, `0 ≤ p ≤ q ≤ Q`, coded
-/// onto `[0, 2 + Σ_(q ≤ Q) φ(q))` one to one, a non-reduced address refused; the contact slot's
-/// value `lock · 5 + kind` is one to one onto its size; the features' mixed-radix code round-trips
-/// and is one to one; and the bundle code `1 + x + |A| f` is one to one with the boundary at 0.
+/// `1/g`; the lock letters at `(P, Q)` are `Unlocked` and the reduced `(p, q)`, `1 ≤ p ≤ P`,
+/// `1 ≤ q ≤ Q` (the contact owner's family, `hnn::contact::ContactLock::code`), coded onto
+/// `[0, 1 + #box)` one to one, an address outside the family refused; the contact slot's value
+/// `lock · 5 + kind` is one to one onto its size; the features' mixed-radix code round-trips and is
+/// one to one; and the bundle code `1 + x + |A| f` is one to one with the boundary at 0.
 #[test]
 fn the_letter_partitions_are_finite_and_their_codes_injective() {
-    use crate::hnn::landmark::{Bundle, ContactReading, LockAddress};
+    use crate::hnn::contact::{ContactLock, ContactReading, LockDeclaration};
+    use crate::hnn::landmark::Bundle;
     use crate::navigator::trace::SiteKind;
+    use num_bigint::BigUint;
     use std::collections::BTreeSet;
     for period in [5u64, 7, 11, 13] {
         for grain in [2u64, period] {
@@ -919,27 +922,48 @@ fn the_letter_partitions_are_finite_and_their_codes_injective() {
         }
         a
     };
-    for denominators in 1u64..=9 {
-        let totients: u64 = (1..=denominators)
-            .map(|q| (1..=q).filter(|&p| gcd(p, q) == 1).count() as u64)
-            .sum();
-        assert_eq!(LockAddress::letters(denominators), 2 + totients);
-        let mut codes = BTreeSet::new();
-        codes.insert(LockAddress::Unlocked.code(denominators).unwrap());
-        for q in 1..=denominators {
-            for p in 0..=q {
-                match LockAddress::locked(p, q, denominators) {
-                    Ok(lock) => assert!(codes.insert(lock.code(denominators).unwrap())),
-                    Err(_) => assert_ne!(gcd(p, q), 1),
+    let bound = |p: u64, q: u64| LockDeclaration {
+        numerator: BigUint::from(p),
+        denominator: BigUint::from(q),
+    };
+    let locked = |p: u64, q: u64| ContactLock::Locked {
+        numerator: BigUint::from(p),
+        denominator: BigUint::from(q),
+    };
+    for p_bound in [0u64, 1, 4, 9, 30] {
+        for q_bound in [0u64, 1, 3, 9, 13] {
+            let at = bound(p_bound, q_bound);
+            let reduced = (1..=q_bound)
+                .flat_map(|q| (1..=p_bound).map(move |p| (p, q)))
+                .filter(|&(p, q)| gcd(p, q) == 1)
+                .count() as u64;
+            assert_eq!(at.letters().unwrap(), 1 + reduced);
+            let mut codes = BTreeSet::from([ContactLock::Unlocked.code(&at).unwrap()]);
+            for q in 0..=q_bound + 1 {
+                for p in 0..=p_bound + 1 {
+                    let inside = p >= 1 && q >= 1 && p <= p_bound && q <= q_bound;
+                    match locked(p, q).code(&at) {
+                        Ok(code) => {
+                            assert!(inside && gcd(p, q) == 1, "({p}, {q})");
+                            assert!(codes.insert(code));
+                        }
+                        Err(_) => assert!(!inside || gcd(p, q) != 1, "({p}, {q})"),
+                    }
                 }
             }
+            assert_eq!(codes, (0..at.letters().unwrap()).collect());
         }
-        assert_eq!(codes, (0..LockAddress::letters(denominators)).collect());
-        assert!(LockAddress::locked(1, denominators + 1, denominators).is_err());
     }
+    // Campaign 1's derived bounds: contact 0 → 1 reads rates above one (P = 1000, Q = 142).
+    let field = campaign_field();
+    let derived = LockDeclaration::derived(&field, 0);
+    assert_eq!(derived.numerator, BigUint::from(7u32 * 11 * 13 - 1));
+    assert_eq!(derived.denominator, BigUint::from(11u32 * 13 - 1));
+    assert!(locked(8, 5).code(&derived).is_ok());
+    let at = bound(3, 3);
     let slot = Feature::Contact {
         contact: 0,
-        denominators: 3,
+        bound: at.clone(),
     };
     let kinds = [
         SiteKind::Rotation,
@@ -949,40 +973,33 @@ fn the_letter_partitions_are_finite_and_their_codes_injective() {
         SiteKind::Degenerate,
     ];
     let mut values = BTreeSet::new();
-    for q in 1..=3u64 {
-        for p in 0..=q {
-            if let Ok(lock) = LockAddress::locked(p, q, 3) {
-                for kind in kinds {
-                    let reading = ContactReading {
-                        contact: 0,
-                        lock,
-                        kind,
-                    };
-                    assert!(values.insert(slot.contact_value(&reading).unwrap()));
-                }
-            }
+    let locks = (1..=3u64)
+        .flat_map(|q| (1..=3u64).map(move |p| (p, q)))
+        .filter(|&(p, q)| gcd(p, q) == 1)
+        .map(|(p, q)| locked(p, q))
+        .chain([ContactLock::Unlocked]);
+    for lock in locks {
+        for kind in kinds {
+            let reading = ContactReading {
+                contact: 0,
+                lock: lock.clone(),
+                kind,
+            };
+            assert!(values.insert(slot.contact_value(&reading).unwrap()));
         }
     }
-    for kind in kinds {
-        let reading = ContactReading {
-            contact: 0,
-            lock: LockAddress::Unlocked,
-            kind,
-        };
-        assert!(values.insert(slot.contact_value(&reading).unwrap()));
-    }
-    assert_eq!(values, (0..slot.size()).collect());
+    assert_eq!(values, (0..slot.size().unwrap()).collect());
     let family = LetterFamily::new(vec![
         Feature::Phase { ring: 0, grain: 3 },
-        slot,
+        slot.clone(),
         Feature::Phase { ring: 1, grain: 2 },
     ])
     .unwrap();
-    assert_eq!(family.codes(), 3 * LockAddress::letters(3) * 5 * 2);
+    assert_eq!(family.codes(), 3 * at.letters().unwrap() * 5 * 2);
     let mut codes = BTreeSet::new();
     let mut bundles = BTreeSet::from([family.bundle_code(Letter::Boundary, 4)]);
     for a in 0..3 {
-        for b in 0..family.features()[1].size() {
+        for b in 0..slot.size().unwrap() {
             for c in 0..2 {
                 let code = family.encode(&[a, b, c]).unwrap();
                 assert_eq!(family.decode(code), vec![a, b, c]);
@@ -1007,4 +1024,140 @@ fn the_letter_partitions_are_finite_and_their_codes_injective() {
         }])
         .is_err()
     );
+}
+
+/// **The contact letters are the contact owner's readings, read from the register's retained state
+/// before the cell they predict** (campaign 2; Lean `HNN/LandmarkAddress.bundle_causal`,
+/// `HNN/Contact.contact_lock_address`). Over a passage through carry-outs and re-keyings, with the
+/// register refreshed from a constitution after each window's ingest (the site kinds changing where
+/// a boost is declared on contact 0 for a stretch of windows):
+/// - each tick's contact letters are `hnn::contact::contact_readings` of the lift point after the
+///   tick, from the aeon's opening, at the constitution of the last refresh (`ContactReading::letter`);
+/// - each phase's address, read at the window's cut by a copy of the register (as a pending ratio
+///   copies it), is the address the register's own letters give at `p + j`: the compare and the
+///   ingest read the same letters, since no refresh falls inside a window;
+/// - the register's clock agrees with the lift point, windings since the opening included;
+/// - the replay `clock_letters` with the kinds held at each tick gives the register's letters, and
+///   changing every cell from `j` on changes no letter of the address at `j`.
+#[test]
+fn the_contact_letters_are_read_from_the_register_before_the_cell_they_predict() {
+    use crate::hnn::contact::{LockDeclaration, contact_readings, site_kinds};
+    use crate::navigator::trace::SiteKind;
+    let field = campaign_field();
+    let theta = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET).unwrap();
+    let width = field.contact(0).width();
+    let boosted = theta
+        .clone()
+        .with_contact_signature(&field, 0, (0..width).map(|j| j != 0).collect())
+        .unwrap();
+    assert_eq!(site_kinds(&field, &boosted).unwrap()[0], SiteKind::Boost);
+    let family = LetterFamily::new(vec![
+        Feature::contact(&field, 1),
+        Feature::contact(&field, 0),
+    ])
+    .unwrap();
+    let bounds: Vec<(usize, LockDeclaration)> = family
+        .features()
+        .iter()
+        .map(|feature| match feature {
+            Feature::Contact { contact, bound } => (*contact, bound.clone()),
+            Feature::Phase { .. } => unreachable!("a contact family"),
+        })
+        .collect();
+    let mut draw = Draw::new(53);
+    let cells: Vec<usize> = (0..3_000).map(|_| (draw.next() % 256) as usize).collect();
+    let (depth, aperture) = (3, 2);
+    let mut current = Current::at_rest(&field);
+    let mut opening = current.clone();
+    let mut reader = LetterReader::of(&field, family.clone(), &current).unwrap();
+    assert!(
+        reader.clone().tick(cells[0]).is_err(),
+        "a contact letter reads the kinds of a refresh"
+    );
+    reader.refresh(&field, &theta).unwrap();
+    let mut register = ActiveAddress::of_reader(depth, reader);
+    let (mut received, mut held, mut predicted) = (Vec::new(), Vec::new(), Vec::new());
+    let (mut aeon_start, mut rekeyed, mut locked) = (0usize, 0usize, 0usize);
+    let crib = field.crib();
+    let mut p = 0;
+    while p + aperture <= cells.len() {
+        let window = p / aperture;
+        // Published after this window's ingest; the window's ticks hold the previous window's.
+        let published = if (300..700).contains(&window) {
+            &boosted
+        } else {
+            &theta
+        };
+        let holding = if (301..701).contains(&window) {
+            &boosted
+        } else {
+            &theta
+        };
+        let targets = &cells[p..p + aperture];
+        let cut = register.clone();
+        for j in 0..aperture {
+            predicted.push((p + j, cut.phase(targets, j).unwrap()));
+        }
+        for &cell in targets {
+            let step = current.step(&field, cell).unwrap();
+            register.receive(cell).unwrap();
+            let letter = register.letters()[0];
+            received.push(letter);
+            held.push(site_kinds(&field, holding).unwrap());
+            let readings = contact_readings(&field, holding, &current, Some(&opening)).unwrap();
+            let Letter::Bundle(bundle) = letter else {
+                panic!("a bundle letter")
+            };
+            let values = family.decode(bundle.features);
+            for ((contact, bound), value) in bounds.iter().zip(&values) {
+                assert_eq!(*value, readings[*contact].letter(bound).unwrap());
+                if readings[*contact].lock != crate::hnn::contact::ContactLock::Unlocked {
+                    locked += 1;
+                }
+            }
+            let carry = if step.carry_out {
+                current.lift().to_vec()
+            } else {
+                opening.lift().to_vec()
+            };
+            assert!(register.reader().agrees(&field, &current, &carry));
+            if step.carry_out {
+                let end = received.len();
+                let from = end.saturating_sub(crib.window).max(aeon_start);
+                let location =
+                    keys::locate_closing(&field, &current, &cells[from..end], crib.offset).unwrap();
+                location.rekey(&field, &mut current).unwrap();
+                register.synchronize(&field, &current).unwrap();
+                opening = current.clone();
+                aeon_start = end;
+                rekeyed += 1;
+            }
+        }
+        // The resident refreshes after the window's ingest, from the constitution then published.
+        register.refresh(&field, published).unwrap();
+        p += aperture;
+    }
+    assert!(rekeyed >= 1, "the passage crossed an aeon boundary");
+    assert!(locked > 0, "some contact locked within an aeon");
+    for (position, address) in &predicted {
+        assert_eq!(
+            address,
+            &letter_address(&received, *position, depth),
+            "cell {position}"
+        );
+    }
+    let replayed = clock_letters(&field, &family, &cells[..received.len()], &held).unwrap();
+    assert_eq!(replayed, received);
+    for j in [1usize, 17, 400, 1_500, 2_999] {
+        let mut changed = cells[..received.len()].to_vec();
+        for cell in &mut changed[j..] {
+            *cell = 255 - *cell;
+        }
+        let again = clock_letters(&field, &family, &changed, &held).unwrap();
+        assert_eq!(
+            letter_address(&again, j, depth),
+            letter_address(&received, j, depth),
+            "the address at {j} reads no cell from {j} on"
+        );
+    }
 }

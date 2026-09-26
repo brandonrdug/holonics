@@ -6,6 +6,7 @@
 //! ```sh
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin letters
+//! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin letters contacts
 //! ```
 //!
 //! [definition; agent-inferred] **The development harness** (`letters`; campaign 2's receiving
@@ -18,11 +19,20 @@
 //!   ring's period `d_g` (its own port chart, an empty fibre) or its parametron's half-turn sheet
 //!   `2`, so `2 (2^4 − 1) = 30` families; each is declared (`LetterFamily`) and read with its own
 //!   depth sweep (`choose_depth`), prequentially, every cell scored before its own deposit;
-//! - each family's description charge: `⌈log₂(30 + 1)⌉ = 5` bits for the family chosen among the
-//!   30 and the cell-only one, plus `⌈log₂⌉` of its depths tried;
+//! - each family's description charge: `⌈log₂(N + 1)⌉` bits for the family chosen among the `N`
+//!   tried and the cell-only one (`5` bits for the 30 clock families alone, `6` with the 12
+//!   declarable contact families), plus `⌈log₂⌉` of its depths tried;
 //! - `Δ_tree = L_(tree+letters) − L_(tree, cells) + description`, an exact enclosure, and its
-//!   sign when decided; the family chosen is the least charged code length, kept only when its
-//!   `Δ_tree < 0` is decided, the cell-only tree otherwise;
+//!   sign when decided;
+//! - with `contacts`, the contact families (every set of the field's contacts whose code fits 32
+//!   bits, each contact's letter its owner's reading, `hnn::contact::ContactReading`), their site
+//!   kinds read from the exposure's development part on the host (its deadline the development's
+//!   last window: only its constitution curve's contact site readings are read);
+//! - the constant-slot controls (`r` slots of one letter each, a phase class at grain 1), whose
+//!   difference from the cell-only tree is the enlarged tree's own reweighting, and each family's
+//!   `Δ_letters = L_(tree+letters) − L_(control, r slots) + description`; the family chosen is the
+//!   least charged one with both `Δ_tree < 0` and `Δ_letters < 0` decided, the cell-only tree
+//!   otherwise;
 //! - the widths each family derives (its path depth `P = D + D(1 + r) + 2`) and its wall time.
 //!
 //! [definition] **What it runs** (the owner's header, `hnn::landmark`):
@@ -57,14 +67,15 @@ mod exterior;
 use std::time::Instant;
 
 use holonics::hnn::landmark::{
-    Coded, DepthSweep, Feature, IdealLandmarks, LandmarkDeclaration, Landmarks, LetterFamily,
-    OracleCost, TreeRun, Widths, address, cell_letters, choose_depth, code_length, development,
-    oracle_cost, prequential,
+    Coded, DepthSweep, Feature, IdealLandmarks, LandmarkDeclaration, Landmarks, Letter,
+    LetterFamily, OracleCost, TreeRun, Widths, address, cell_letters, choose_depth, code_length,
+    development, oracle_cost, prequential,
 };
 use holonics::hnn::ratio::interval_sum;
 use holonics::hnn::receiving::clock_letters;
 use holonics::hnn::reference::PPM_ORDER;
-use holonics::hnn::{Cut, Field, FieldDeclaration};
+use holonics::hnn::{Cut, Field, FieldDeclaration, Reference};
+use holonics::navigator::trace::SiteKind;
 use holonics::ratio::Rat;
 use holonics::ratio::algebraic::ExactInterval;
 use num_bigint::BigInt;
@@ -351,6 +362,19 @@ struct FamilyRun {
     bits: ExactInterval,
     description: u64,
     wall: u128,
+    /// The distinct feature codes the family read over the development passage.
+    distinct: usize,
+}
+
+/// The sign of an enclosure, when decided.
+fn decided(delta: &ExactInterval) -> &'static str {
+    if delta.upper < Rat::from_integer(BigInt::from(0)) {
+        "< 0 (decided)"
+    } else if delta.lower > Rat::from_integer(BigInt::from(0)) {
+        "> 0 (decided)"
+    } else {
+        "undecided"
+    }
 }
 
 fn chosen_bits(sweep: &DepthSweep) -> ExactInterval {
@@ -362,8 +386,70 @@ fn chosen_bits(sweep: &DepthSweep) -> ExactInterval {
         .expect("the chosen depth was tried")
 }
 
+/// **The site kinds of the development pass** (module header, "The contact letters"): the exposure's
+/// development part on the host (the reference, its deadline the development's last window, so no
+/// held-out cell is read), whose constitution curve carries each commit's contact site readings;
+/// the kinds the register holds at cell `i` are the commit after the deposits of the windows
+/// before `i`'s (the register refreshes after each ingest). Only the kinds are read of it.
+fn development_kinds(field: &Field, full: &Cut, development: usize) -> Vec<Vec<SiteKind>> {
+    let aperture = field.receivers()[0].aperture;
+    let windows = (development / aperture) as u64;
+    let clock = Instant::now();
+    let exposure = Reference::campaign_one()
+        .with_deadline(windows)
+        .expose(field, full)
+        .expect("the exposure's development pass");
+    let wall = clock.elapsed().as_millis();
+    let stopped = exposure
+        .deadline
+        .expect("the development pass ends at its deadline");
+    assert!(
+        stopped as usize <= development,
+        "the development pass read no held-out cell"
+    );
+    let curve = &exposure.constitution_curve;
+    println!(
+        "the site kinds: the exposure's development part on the host, {} windows, stopped at cell {stopped} (the held-out range opens at {development}); {} commits; budget stop: {}; {wall} ms wall",
+        exposure.compares,
+        curve.len(),
+        if exposure.stop.is_some() {
+            "yes"
+        } else {
+            "none"
+        }
+    );
+    for contact in 0..field.contacts().len() {
+        let mut seen: Vec<(String, usize)> = Vec::new();
+        for point in curve {
+            let reading = &point.contacts[contact];
+            let label = format!(
+                "{:?} (rotations {}, nulls {}, boosts {})",
+                reading.kind, reading.census.rotation, reading.census.null, reading.census.boost
+            );
+            match seen.iter_mut().find(|(seen, _)| *seen == label) {
+                Some((_, count)) => *count += 1,
+                None => seen.push((label, 1)),
+            }
+        }
+        let (from, to) = field.contact(contact).ends();
+        println!(
+            "  contact {contact} ({from} → {to}): {}",
+            seen.iter()
+                .map(|(label, count)| format!("{label} at {count} commits"))
+                .collect::<Vec<_>>()
+                .join("; ")
+        );
+    }
+    (0..development)
+        .map(|cell| {
+            let point = &curve[(cell / aperture).min(curve.len() - 1)];
+            point.contacts.iter().map(|reading| reading.kind).collect()
+        })
+        .collect()
+}
+
 /// **The development harness** (module header, "The development harness").
-fn letters_harness(path: &str) {
+fn letters_harness(path: &str, contacts: bool) {
     let setup = Instant::now();
     let (bytes, count, held) = read_cut(path);
     let field = Field::declare(FieldDeclaration::campaign_one(count as u64))
@@ -373,6 +459,16 @@ fn letters_harness(path: &str) {
     let full = Cut {
         cells: bytes.iter().map(|&byte| usize::from(byte)).collect(),
         held_out: vec![held.clone()],
+    };
+    println!(
+        "hnn_landmark letters: the development harness (campaign 2's receiving letters, Decision 31) over the cut file {path}"
+    );
+    // The contact letters' site kinds need the learned constitution: the exposure's development
+    // part, stopped before the held-out range.
+    let kinds = if contacts {
+        development_kinds(&field, &full, held.start)
+    } else {
+        Vec::new()
     };
     // The development cells alone: nothing after this line reads a held-out cell.
     let cut = Cut {
@@ -389,9 +485,6 @@ fn letters_harness(path: &str) {
         grain,
         family: LetterFamily::cells(),
     };
-    println!(
-        "hnn_landmark letters: the development harness (campaign 2's receiving letters, Decision 31) over the cut file {path}"
-    );
     println!(
         "development: {cells} cells (the manifest's held-out range {}..{} is cut away before any reading); |A| = {alphabet}, n* = {count}, L_R = {grain}",
         held.start, held.end
@@ -437,6 +530,38 @@ fn letters_harness(path: &str) {
             ));
         }
     }
+    if contacts {
+        // Every set of contacts whose letters' code fits the bundle's 32 bits, each contact's
+        // letter its lock address at its derived bound times its site kind.
+        let count = field.contacts().len();
+        for subset in 1u32..(1 << count) {
+            let chosen: Vec<usize> = (0..count).filter(|a| subset >> a & 1 == 1).collect();
+            let features: Vec<Feature> = chosen
+                .iter()
+                .map(|&contact| Feature::contact(&field, contact))
+                .collect();
+            let name = chosen
+                .iter()
+                .map(|&contact| {
+                    let (from, to) = field.contact(contact).ends();
+                    let Feature::Contact { bound, .. } = Feature::contact(&field, contact) else {
+                        unreachable!("a contact feature")
+                    };
+                    format!(
+                        "contact {contact} ({from} → {to}, P = {}, Q = {})",
+                        bound.numerator, bound.denominator
+                    )
+                })
+                .collect::<Vec<_>>()
+                .join(", ");
+            match LetterFamily::new(features) {
+                Ok(family) => families.push((name, family)),
+                Err(refusal) => {
+                    println!("not declared (its code passes 32 bits): {name}: {refusal}")
+                }
+            }
+        }
+    }
     // ⌈log₂(N + 1)⌉: the family chosen among the N tried and the cell-only tree.
     let choice_bits = u64::from(64 - (families.len() as u64).leading_zeros());
     println!(
@@ -444,10 +569,18 @@ fn letters_harness(path: &str) {
         families.len(),
         families.len()
     );
-    let mut runs = Vec::new();
-    for (name, family) in families {
+    let run_family = |name: String, family: LetterFamily, charge: u64| -> FamilyRun {
         let clock = Instant::now();
-        let letters = clock_letters(&field, &family, &cut.cells).expect("the clock letters");
+        let letters =
+            clock_letters(&field, &family, &cut.cells, &kinds).expect("the passage's letters");
+        let distinct = letters
+            .iter()
+            .filter_map(|letter| match letter {
+                Letter::Bundle(bundle) => Some(bundle.features),
+                _ => None,
+            })
+            .collect::<std::collections::BTreeSet<u32>>()
+            .len();
         let at = LandmarkDeclaration {
             family: family.clone(),
             ..declared.clone()
@@ -455,15 +588,55 @@ fn letters_harness(path: &str) {
         let family_sweep = choose_depth(&cut, &letters, &at).expect("a family's sweep");
         let wall = clock.elapsed().as_millis();
         let bits = chosen_bits(&family_sweep);
-        let description = choice_bits + family_sweep.description_bits;
-        runs.push(FamilyRun {
+        let description = charge + family_sweep.description_bits;
+        FamilyRun {
             name,
             family,
             sweep: family_sweep,
             bits,
             description,
             wall,
-        });
+            distinct,
+        }
+    };
+    let runs: Vec<FamilyRun> = families
+        .into_iter()
+        .map(|(name, family)| run_family(name, family, choice_bits))
+        .collect();
+    // [agent-inferred] **The constant-slot controls**: `r` slots that read one letter at every tick
+    // (a ring's phase class at grain 1). They carry no information, so their code length against
+    // the cell-only tree is the enlarged tree's own reweighting (`r` constant slots after each cell
+    // make the stop weight at every cell depth past the first `1 − 2^(−(r+1))` instead of `1/2`,
+    // joined with the cell tree), not a letter's; a family's letters are credited only with what
+    // they code below the control of its slots,
+    // `Δ_letters = L_(tree+letters) − L_(control, r slots) + description`.
+    let widest = runs.iter().map(|run| run.family.slots()).max().unwrap_or(0);
+    let controls: Vec<FamilyRun> = (1..=widest)
+        .map(|slots| {
+            run_family(
+                format!("the constant control of {slots} slots"),
+                LetterFamily::new(vec![Feature::Phase { ring: 0, grain: 1 }; slots])
+                    .expect("a constant family"),
+                0,
+            )
+        })
+        .collect();
+    println!();
+    println!(
+        "the constant-slot controls against the cell-only tree (no letter information: the enlarged tree's reweighting, uncharged):"
+    );
+    for control in &controls {
+        let delta = ExactInterval {
+            lower: &control.bits.lower - &cell_bits.upper,
+            upper: &control.bits.upper - &cell_bits.lower,
+        };
+        println!(
+            "  {} ({} distinct letters): chosen D = {}; L_control − L_(tree, cells): {}",
+            control.name,
+            control.distinct,
+            control.sweep.chosen,
+            enclosure(&delta, grain)
+        );
     }
     println!();
     println!(
@@ -518,7 +691,29 @@ fn letters_harness(path: &str) {
             enclosure(&uncharged, grain)
         );
         println!("    Δ_tree {}: {}", sign, enclosure(&delta, grain));
+        let control = &controls[run.family.slots() - 1];
+        let against = ExactInterval {
+            lower: &charged.lower - &control.bits.upper,
+            upper: &charged.upper - &control.bits.lower,
+        };
+        println!(
+            "    distinct feature codes read: {}; Δ_letters (against the constant control of {} slots, charged) {}: {}",
+            run.distinct,
+            run.family.slots(),
+            decided(&against),
+            enclosure(&against, grain)
+        );
     }
+    // The choice: the least charged family whose letters pay their description beyond both the
+    // cell-only tree and the constant control of their slots, each decided by disjoint enclosures.
+    let admitted: Vec<&FamilyRun> = runs
+        .iter()
+        .filter(|run| {
+            let charged = charged(&run.bits, run.description);
+            let control = &controls[run.family.slots() - 1];
+            charged.upper < cell_bits.lower && charged.upper < control.bits.lower
+        })
+        .collect();
     let best = runs
         .iter()
         .min_by(|a, b| {
@@ -550,16 +745,19 @@ fn letters_harness(path: &str) {
         cells,
         grain,
     );
-    if best_charged.upper < cell_bits.lower {
-        println!(
-            "the choice: {} at D = {} (Δ_tree < 0 decided)",
-            best.name, best.sweep.chosen
-        );
-    } else {
-        println!(
-            "the choice: the cell-only family at D = {} (no family's Δ_tree < 0 is decided)",
+    match admitted.iter().min_by(|a, b| {
+        charged(&a.bits, a.description)
+            .upper
+            .cmp(&charged(&b.bits, b.description).upper)
+    }) {
+        Some(chosen) => println!(
+            "the choice: {} at D = {} (Δ_tree < 0 and Δ_letters < 0 decided)",
+            chosen.name, chosen.sweep.chosen
+        ),
+        None => println!(
+            "the choice: the cell-only family at D = {} (no family's letters code below both the cell-only tree and the constant control of their slots by their description)",
             cell_sweep.chosen
-        );
+        ),
     }
     println!();
     println!(
@@ -573,11 +771,17 @@ fn main() {
     let path = match arguments.as_slice() {
         [key, value] if key == "cut-file" => value.clone(),
         [key, value, mode] if key == "cut-file" && mode == "letters" => {
-            letters_harness(value);
+            letters_harness(value, false);
+            return;
+        }
+        [key, value, mode, with]
+            if key == "cut-file" && mode == "letters" && with == "contacts" =>
+        {
+            letters_harness(value, true);
             return;
         }
         _ => {
-            println!("usage: hnn_landmark cut-file <path> [letters]");
+            println!("usage: hnn_landmark cut-file <path> [letters [contacts]]");
             return;
         }
     };

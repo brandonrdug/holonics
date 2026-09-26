@@ -564,7 +564,7 @@ impl<'c> Resident<'c> {
         Ok(Mounted {
             field: field.clone(),
             current: current.clone(),
-            address: ActiveAddress::of_field(field, current)?,
+            address: ActiveAddress::of_field(field, current, &constitution)?,
             constitution,
             moments: BTreeMap::new(),
             pending: BTreeMap::new(),
@@ -897,17 +897,28 @@ impl<'c> ExecutionPort for Resident<'c> {
                 what: "the card's ingest against the host's moment",
             });
         }
-        // The receiving parametron's active suffix address receives the cells the moment took.
+        // The receiving parametron's active suffix address receives the cells the moment took,
+        // and its contact letters' site kinds refresh after the ingest, as the reference's.
         for &code in &codes[..ingested.cells] {
             resident.address.receive(code)?;
         }
-        if !resident.address.reader().agrees(&field, &resident.current) {
+        let opening = if ingested.carry_out {
+            resident.current.lift()
+        } else {
+            &resident.aeon.opening
+        };
+        if !resident
+            .address
+            .reader()
+            .agrees(&field, &resident.current, opening)
+        {
             return Err(HnnError::Shape {
                 what: "the address register's clock against the lift point",
                 expected: field.rings().len(),
                 found: 0,
             });
         }
+        resident.address.refresh(&field, &resident.constitution)?;
         // Every other open moment steps from the one lift point: its card's phases follow it.
         if ingested.cells > 0 && resident.moments.len() > 1 {
             for (other, moment) in resident.moments.iter_mut() {

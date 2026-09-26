@@ -97,7 +97,8 @@ pub mod word;
 pub use chart::{ChartKey, ChartReading, ChartStart, ChartWords, Charts, Remainders, WordLattice};
 pub use constitution::{Carrier, CarrierBits, Constitution, Lattice, Locus, NormalLaw, Steps};
 pub use contact::{
-    BreakReceipt, ContactLock, ContactReading, KindCensus, SiteReading, contact_readings,
+    BreakReceipt, ContactLock, ContactReading, KindCensus, LockDeclaration, SiteReading,
+    contact_readings, site_kinds, site_readings,
 };
 
 pub use field::{
@@ -105,10 +106,7 @@ pub use field::{
     RingDeclaration,
 };
 pub use keys::{KeyLocation, RingKeys, locate_keys};
-pub use landmark::{
-    Bundle, ContactReading, Feature, LandmarkDeclaration, Landmarks, Letter, LetterFamily,
-    LockAddress,
-};
+pub use landmark::{Bundle, Feature, LandmarkDeclaration, Landmarks, Letter, LetterFamily};
 pub use moment::{Capacity, PairPort, SourceMoment};
 pub use pending::PendingRatio;
 pub use port::{

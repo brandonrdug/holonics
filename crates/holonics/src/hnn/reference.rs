@@ -156,6 +156,7 @@ use crate::hnn::constitution::{
     CAMPAIGN_ONE_BUDGET, CarrierBits, Constitution, DepositReading, FactorGradient, FactorStep,
     LandmarkStep, LinearLocus, LinearStep, Locus, Sample, Steps,
 };
+use crate::hnn::contact::{SiteReading, site_readings};
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::keys::{self, KeyLocation};
 use crate::hnn::landmark::{Letter, code_length};
@@ -736,7 +737,7 @@ impl Reference {
         Ok(Resident {
             field: field.clone(),
             current: current.clone(),
-            address: ActiveAddress::of_field(field, current)?,
+            address: ActiveAddress::of_field(field, current, &constitution)?,
             constitution,
             moments: BTreeMap::new(),
             pending: BTreeMap::new(),
@@ -878,17 +879,30 @@ impl ExecutionPort for Reference {
         let start = Instant::now();
         let ingested = open.ingest(&field, &mut resident.current, &codes)?;
         // The receiving parametron's active suffix address receives the cells the moment took, each
-        // tick's letter read by its register's clock, which stays the lift point's.
+        // tick's letter read by its register's clock, which stays the lift point's (its windings
+        // since the aeon's opening, which the carry-out moves to its own lift point), and its
+        // contact letters' site kinds then refresh from the published constitution, after the
+        // ingest and never inside it (`hnn::receiving::LetterReader`).
         for &code in &codes[..ingested.cells] {
             resident.address.receive(code)?;
         }
-        if !resident.address.reader().agrees(&field, &resident.current) {
+        let opening = if ingested.carry_out {
+            resident.current.lift()
+        } else {
+            &resident.aeon.opening
+        };
+        if !resident
+            .address
+            .reader()
+            .agrees(&field, &resident.current, opening)
+        {
             return Err(HnnError::Shape {
                 what: "the address register's clock against the lift point",
                 expected: field.rings().len(),
                 found: 0,
             });
         }
+        resident.address.refresh(&field, &resident.constitution)?;
         resident.wall.ingest += start.elapsed();
         if ingested.cells > 0 {
             resident.aeon.keys_admitted = false;
@@ -2297,14 +2311,17 @@ pub struct StateReport {
 
 /// [definition] **One point of the constitution's curve** (design (f) item 4): the commit reached,
 /// the constitution's exact bits by carrier (lattice entries, carried remainders, solved charts),
-/// and what the deposit that reached it released (its residuals' exact bits) and stepped (the
-/// entries whose lattice coordinate moved). The mount's point releases and steps nothing.
+/// what the deposit that reached it released (its residuals' exact bits) and stepped (the entries
+/// whose lattice coordinate moved), and each contact's site reading at the commit (campaign 2's
+/// contact-kind census, `hnn::contact::site_readings`: the kinds a register refreshed after the
+/// next ingest reads). The mount's point releases and steps nothing.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CurvePoint {
     pub commit: u64,
     pub bits: CarrierBits,
     pub released_bits: u64,
     pub stepped: u64,
+    pub contacts: Vec<SiteReading>,
 }
 
 /// [definition] **The exposure's readout** (design (f)): bits on the training and held-out targets
@@ -2793,6 +2810,7 @@ where
         bits: resident.constitution().carrier_bits(),
         released_bits: 0,
         stepped: 0,
+        contacts: site_readings(field, resident.constitution())?,
     }];
     let (mut windows, mut open_windows, mut peak_word_bits) = (0u64, 0u64, 0u64);
     let (mut forward, mut adjoint) = (Remainders::default(), Remainders::default());
@@ -2902,6 +2920,7 @@ where
                             bits: resident.constitution().carrier_bits(),
                             released_bits,
                             stepped,
+                            contacts: site_readings(field, resident.constitution())?,
                         });
                     }
                     Err(refusal @ HnnError::ConstitutionBudget { .. }) => {
