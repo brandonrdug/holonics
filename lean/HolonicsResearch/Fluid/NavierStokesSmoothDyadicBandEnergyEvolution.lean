@@ -80,7 +80,7 @@ theorem complexVectorHermitianPairing_self_eq
   intro component _hcomponent
   exact Complex.normSq_eq_conj_mul_self.symm
 
-private theorem complexVectorHermitianPairing_add_right
+theorem complexVectorHermitianPairing_add_right
     (left first second : ComplexVector) :
     complexVectorHermitianPairing left (first + second) =
       complexVectorHermitianPairing left first +
@@ -118,7 +118,7 @@ private theorem complexVectorHermitianPairing_smul_left
   simp only [Pi.smul_apply, smul_eq_mul, map_mul]
   ring
 
-private theorem complexVectorSymmetricPhasePairing_add_right
+theorem complexVectorSymmetricPhasePairing_add_right
     (left first second : ComplexVector) :
     complexVectorSymmetricPhasePairing left (first + second) =
       complexVectorSymmetricPhasePairing left first +
@@ -274,7 +274,7 @@ theorem openSmoothDyadicBandSignedWork_aperture_independent
 
 /-- The derivative of the Hermitian square along real time is twice the symmetric complex phase
 pairing. -/
-private theorem hasDerivAt_complexVectorHermitianSquare
+theorem hasDerivAt_complexVectorHermitianSquare
     {coefficient : ℝ → ComplexVector} {derivative : ComplexVector} {time : ℝ}
     (hcoefficient : HasDerivAt coefficient derivative time) :
     HasDerivAt

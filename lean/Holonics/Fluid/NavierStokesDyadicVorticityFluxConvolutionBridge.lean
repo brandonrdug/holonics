@@ -284,21 +284,6 @@ theorem openVelocityH3State_mode_eq_openPeriodicVelocityFourierMode
   rw [smoothSliceSobolevCoefficients, smoothSliceFourierL2_apply]
   rfl
 
-/-- The complete endpoint of the same actual coefficient population is the existing nonlinear
-vorticity source.  No finite-aperture convergence assertion is needed or made here. -/
-theorem vorticityNonlinearMode_eq_completeActualAdvectionConvolution
-    {T nu : ℝ} {initial : InitialVelocity} {velocity : VelocityField}
-    {pressure : PressureField}
-    (solution :
-      OpenPeriodicSolutionOn T nu initial (0 : VelocityField) velocity pressure)
-    (t : Ioo 0 T) (k : SpatialFrequency) :
-    vorticityNonlinearMode solution t k =
-      -frequencyCurlMultiplier k
-        (vectorCoefficientAt
-          (h3AdvectiveConvolution (openVelocityH3State solution t)
-            (openVelocityH3State solution t)) k) :=
-  vorticityNonlinearMode_eq_h3AdvectiveConvolution solution t k
-
 /-- The actual nonlinear vorticity source truncated on one finite advecting aperture. -/
 def finiteOpenVorticityNonlinearCoefficient
     {T nu : ℝ} {initial : InitialVelocity} {velocity : VelocityField}
@@ -420,7 +405,6 @@ section Audit
 #print axioms finiteOpenVorticityFluxCoefficient_eq_projectedSource_add_transport
 #print axioms finiteOpenVorticityFluxCoefficient_pairedCompletion
 #print axioms openVelocityH3State_mode_eq_openPeriodicVelocityFourierMode
-#print axioms vorticityNonlinearMode_eq_completeActualAdvectionConvolution
 
 end Audit
 

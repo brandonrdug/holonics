@@ -85,7 +85,7 @@ private theorem norm_weightedAbsoluteCoefficientThree_apply_sq
     abs_of_nonneg (mul_nonneg (sobolevThreeAmplitude_nonneg k) (norm_nonneg _)),
     mul_pow, sobolevThreeAmplitude_sq]
 
-private theorem periodicRealFourierL2_norm_le_of_pointwise_sq_le
+theorem periodicRealFourierL2_norm_le_of_pointwise_sq_le
     (left right : PeriodicRealFourierL2)
     (hpoint : ∀ k, ‖left k‖ ^ 2 ≤ ‖right k‖ ^ 2) :
     ‖left‖ ≤ ‖right‖ := by

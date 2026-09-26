@@ -83,7 +83,6 @@ open Holonics.HolonCore
 #print axioms shift_has_no_coarse_generator
 #print axioms diagonal_square
 #print axioms kron_exact
-#print axioms series_path_restriction
 #print axioms storageEnergy_blocks
 #print axioms dissipation_blocks
 #print axioms PortHolon.mem_interconnect

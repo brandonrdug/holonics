@@ -32,22 +32,6 @@ open Holonics.Fluid.NavierStokesTransportedPantographicSwingBand
 
 /-! ## Exact source identification -/
 
-/-- Before any norm is taken, the complete finite-depth pantographic population is the negative
-actual nonlinear mild-source band. -/
-theorem compactPantographicIntegratedPopulationBand_eq_neg_mildSource
-    {T nu s t : ℝ} {initial : InitialVelocity} {velocity : VelocityField}
-    {pressure : PressureField}
-    (solution :
-      OpenPeriodicSolutionOn T nu initial (0 : VelocityField) velocity pressure)
-    (hnu : 0 < nu) (hs : 0 < s) (hst : s ≤ t) (ht : t < T)
-    (depth : ℕ) (modes : Finset SpatialFrequency) :
-    compactPantographicIntegratedPopulationBand solution hs hst ht depth modes =
-      -compactMildSourceIntegratedBand solution hs hst ht modes := by
-  rw [compactMildSourceIntegratedBand_eq_neg_chain_add_residual_add_boundary
-    solution hnu hs hst ht depth modes]
-  simp only [neg_neg]
-  rfl
-
 /-- The norm of one combined pantographic shell is exactly the norm of the actual signed
 nonlinear mild-source shell.  No componentwise triangle inequality occurs. -/
 theorem norm_compactPantographicIntegratedPopulationBand_eq_mildSource
@@ -164,25 +148,10 @@ theorem compactPantographicTerminalShellPacking_eq_mildSource
   rw [compactPantographicDyadicShellPopulation_eq_mildSource
     solution hnu hs depth t]
 
-theorem compactPantographicTerminalShellPacking_depth_independent
-    {T nu s : ℝ} {initial : InitialVelocity} {velocity : VelocityField}
-    {pressure : PressureField}
-    (solution :
-      OpenPeriodicSolutionOn T nu initial (0 : VelocityField) velocity pressure)
-    (hnu : 0 < nu) (hs : 0 < s) (firstDepth secondDepth : ℕ) :
-    compactPantographicTerminalShellPacking solution hs firstDepth =
-      compactPantographicTerminalShellPacking solution hs secondDepth := by
-  rw [compactPantographicTerminalShellPacking_eq_mildSource
-      solution hnu hs firstDepth,
-    compactPantographicTerminalShellPacking_eq_mildSource
-      solution hnu hs secondDepth]
-
 section Audit
 
-#print axioms compactPantographicIntegratedPopulationBand_eq_neg_mildSource
 #print axioms compactPantographicDyadicShellPopulationOn_eq_mildSource
 #print axioms compactPantographicTerminalShellPacking_eq_mildSource
-#print axioms compactPantographicTerminalShellPacking_depth_independent
 
 end Audit
 

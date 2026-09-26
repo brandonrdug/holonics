@@ -85,15 +85,7 @@ theorem ownModeHermitianHorizontalJet_zero
 
 /-! ## Gauge covariance -/
 
-private theorem hermitianPairing_add_right
-    (left first second : ComplexVector) :
-    complexVectorHermitianPairing left (first + second) =
-      complexVectorHermitianPairing left first +
-        complexVectorHermitianPairing left second := by
-  unfold complexVectorHermitianPairing
-  simp only [Pi.add_apply, mul_add, Finset.sum_add_distrib]
-
-private theorem hermitianPairing_smul_right
+theorem hermitianPairing_smul_right
     (left right : ComplexVector) (scale : ℂ) :
     complexVectorHermitianPairing left (scale • right) =
       scale * complexVectorHermitianPairing left right := by
@@ -104,7 +96,7 @@ private theorem hermitianPairing_smul_right
   simp only [Pi.smul_apply, smul_eq_mul]
   ring
 
-private theorem hermitianPairing_smul_left
+theorem hermitianPairing_smul_left
     (left right : ComplexVector) (scale : ℂ) :
     complexVectorHermitianPairing (scale • left) right =
       (starRingEnd ℂ) scale * complexVectorHermitianPairing left right := by
@@ -137,7 +129,7 @@ theorem ownModeHermitianConnection_gauge
       ownModeHermitianConnection mode modeJet + gaugeJet / gauge := by
   have hself := hermitianPairing_self_ne_zero hmode
   unfold ownModeHermitianConnection
-  rw [hermitianPairing_add_right,
+  rw [complexVectorHermitianPairing_add_right,
     hermitianPairing_smul_left, hermitianPairing_smul_right,
     hermitianPairing_smul_left, hermitianPairing_smul_right,
     hermitianPairing_smul_left, hermitianPairing_smul_right]

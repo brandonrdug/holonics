@@ -155,7 +155,7 @@ theorem weightedLerayDivergenceConvolution_coefficient
     coefficientWeightedRealization_apply]
   congr 1
 
-private theorem lerayProjectMode_add
+theorem lerayProjectMode_add
     (k : SpatialFrequency) (left right : ComplexVector) :
     lerayProjectMode k (left + right) =
       lerayProjectMode k left + lerayProjectMode k right := by
@@ -169,7 +169,7 @@ private theorem lerayProjectMode_add
       complexDot, dotProduct_add]
     ring
 
-private theorem lerayProjectMode_smul
+theorem lerayProjectMode_smul
     (c : ℂ) (k : SpatialFrequency) (mode : ComplexVector) :
     lerayProjectMode k (c • mode) = c • lerayProjectMode k mode := by
   by_cases hk : k = 0
@@ -181,7 +181,7 @@ private theorem lerayProjectMode_smul
       dotProduct_smul]
     ring
 
-private theorem summable_scalarConvolutionTerms
+theorem summable_scalarConvolutionTerms
     (left right : PeriodicSobolevCoefficients 3) (k : SpatialFrequency) :
     Summable fun p ↦ left.1 p * right.1 (k - p) := by
   apply Summable.of_norm
@@ -194,7 +194,7 @@ private theorem summable_scalarConvolutionTerms
     (lp.norm_apply_le_norm (by norm_num : (2 : ℝ≥0∞) ≠ 0) right.1 (k - p))
     (norm_nonneg _)
 
-private theorem h3DivergenceConvolution_unweighted_add_left_coefficient
+theorem h3DivergenceConvolution_unweighted_add_left_coefficient
     (first second transported : PeriodicVectorWeightedSobolev 3)
     (output : Fin 3) (k : SpatialFrequency) :
     (h3DivergenceConvolution
@@ -229,7 +229,7 @@ private theorem h3DivergenceConvolution_unweighted_add_left_coefficient
   rw [hinner]
   ring
 
-private theorem h3DivergenceConvolution_unweighted_add_right_coefficient
+theorem h3DivergenceConvolution_unweighted_add_right_coefficient
     (advecting first second : PeriodicVectorWeightedSobolev 3)
     (output : Fin 3) (k : SpatialFrequency) :
     (h3DivergenceConvolution
@@ -264,7 +264,7 @@ private theorem h3DivergenceConvolution_unweighted_add_right_coefficient
   rw [hinner]
   ring
 
-private theorem h3DivergenceConvolution_unweighted_smul_left_coefficient
+theorem h3DivergenceConvolution_unweighted_smul_left_coefficient
     (c : ℂ) (advecting transported : PeriodicVectorWeightedSobolev 3)
     (output : Fin 3) (k : SpatialFrequency) :
     (h3DivergenceConvolution
@@ -295,7 +295,7 @@ private theorem h3DivergenceConvolution_unweighted_smul_left_coefficient
   rw [hinner]
   ring
 
-private theorem h3DivergenceConvolution_unweighted_smul_right_coefficient
+theorem h3DivergenceConvolution_unweighted_smul_right_coefficient
     (c : ℂ) (advecting transported : PeriodicVectorWeightedSobolev 3)
     (output : Fin 3) (k : SpatialFrequency) :
     (h3DivergenceConvolution

@@ -23,7 +23,7 @@ open Holonics.Fluid.NavierStokesPeriodicCubeInterpolation
 open Holonics.Fluid.NavierStokesH3Production
 open Holonics.Fluid.NavierStokesVorticity
 
-private theorem coordinate_fderiv (i : Fin 3) (x : Space) :
+theorem coordinate_fderiv (i : Fin 3) (x : Space) :
     fderiv ℝ (fun y : Space ↦ y i) x = EuclideanSpace.proj i := by
   convert (EuclideanSpace.proj i : Space →L[ℝ] ℝ).fderiv (x := x) using 1 <;> rfl
 

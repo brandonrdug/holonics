@@ -114,13 +114,6 @@ theorem dormant_mode_is_not_a_potential {h : Fin q → ℚ} (hh : h ∈ C.harmon
   have hexact : h ∈ C.exactPart := (C.mem_exactPart_iff h).mpr ⟨φ, hφ⟩
   exact (Submodule.disjoint_def.mp C.disjoint_exact_harmonic) h hexact hh
 
-/-- [proved-derived; formal-checked] **Every closed field retains a dormant representative.**
-Each cocycle differs from a harmonic representative by a potential; uniqueness is stated by
-`closed_field_retains_unique_harmonic_mode` below. -/
-theorem closed_field_retains_one_dormant_mode {z : Fin q → ℚ} (hz : z ∈ C.cocycles) :
-    ∃ h ∈ C.harmonic, z - h ∈ C.exactPart :=
-  C.harmonic_meets_every_class hz
-
 /-- [proved-derived; formal-checked] **A closed field retains a unique harmonic representative.**
 Every cocycle has one and only one harmonic mode whose difference from the field is exact. The
 uniqueness is in the cohomology class; the harmonic subspace itself may have any finite dimension. -/

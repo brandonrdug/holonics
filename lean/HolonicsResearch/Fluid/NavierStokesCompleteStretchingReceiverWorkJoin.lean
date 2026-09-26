@@ -75,7 +75,7 @@ theorem complexVectorSymmetricPhasePairing_finsetSum_right
       simp [complexVectorSymmetricPhasePairing, complexVectorHermitianPairing]
   | @insert parent aperture hparent inductionHypothesis =>
       rw [Finset.sum_insert hparent, Finset.sum_insert hparent,
-        complexVectorSymmetricPhasePairing_add_right_public,
+        complexVectorSymmetricPhasePairing_add_right,
         inductionHypothesis]
 
 /-- The finite stretching coefficient work is exactly the finite sum of complete stretching

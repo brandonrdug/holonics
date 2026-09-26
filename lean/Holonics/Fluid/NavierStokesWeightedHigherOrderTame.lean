@@ -824,31 +824,6 @@ theorem periodicSobolevDerivativeIntoPred_apply
       (2 * (Real.pi : ℂ) * Complex.I * (k coordinate : ℂ)) * coeff.1 k :=
   rfl
 
-private theorem periodicRealFourierL2_norm_le_of_pointwise_sq_le
-    (left right : PeriodicRealFourierL2)
-    (hpoint : ∀ k, ‖left k‖ ^ 2 ≤ ‖right k‖ ^ 2) :
-    ‖left‖ ≤ ‖right‖ := by
-  have hleftSummable : Summable fun k ↦ ‖left k‖ ^ 2 := by
-    have h := (lp.memℓp left).summable
-      (by norm_num : 0 < (2 : ℝ≥0∞).toReal)
-    simpa only [ENNReal.toReal_ofNat, Real.rpow_two] using h
-  have hrightSummable : Summable fun k ↦ ‖right k‖ ^ 2 := by
-    have h := (lp.memℓp right).summable
-      (by norm_num : 0 < (2 : ℝ≥0∞).toReal)
-    simpa only [ENNReal.toReal_ofNat, Real.rpow_two] using h
-  have hsum : (∑' k, ‖left k‖ ^ 2) ≤ ∑' k, ‖right k‖ ^ 2 :=
-    hleftSummable.tsum_le_tsum hpoint hrightSummable
-  have hleftNorm : (∑' k, ‖left k‖ ^ 2) = ‖left‖ ^ 2 := by
-    have h := lp.norm_rpow_eq_tsum
-      (by norm_num : 0 < (2 : ℝ≥0∞).toReal) left
-    simpa only [ENNReal.toReal_ofNat, Real.rpow_two] using h.symm
-  have hrightNorm : (∑' k, ‖right k‖ ^ 2) = ‖right‖ ^ 2 := by
-    have h := lp.norm_rpow_eq_tsum
-      (by norm_num : 0 < (2 : ℝ≥0∞).toReal) right
-    simpa only [ENNReal.toReal_ofNat, Real.rpow_two] using h.symm
-  rw [hleftNorm, hrightNorm] at hsum
-  nlinarith [norm_nonneg left, norm_nonneg right]
-
 private theorem norm_weightedAbsoluteCoefficientAtOrder_apply_sq
     (order : ℕ) (coeff : PeriodicSobolevCoefficients order)
     (k : SpatialFrequency) :
@@ -868,7 +843,7 @@ theorem periodicSobolevCoefficientNorm_derivativeIntoPred_le
         (periodicSobolevDerivativeIntoPred order hpositive coordinate coeff) ≤
       periodicSobolevCoefficientNorm order coeff := by
   unfold periodicSobolevCoefficientNorm
-  apply periodicRealFourierL2_norm_le_of_pointwise_sq_le
+  apply Holonics.Fluid.NavierStokesH3LerayBilinearNorm.periodicRealFourierL2_norm_le_of_pointwise_sq_le
   intro k
   rw [norm_weightedAbsoluteCoefficientAtOrder_apply_sq,
     norm_weightedAbsoluteCoefficientAtOrder_apply_sq,
@@ -1211,18 +1186,6 @@ theorem norm_periodicVectorWeightedLerayProject_le
   intro output
   exact norm_periodicVectorWeightedLerayProjectComponent_le order state output
 
-private theorem lerayProjectMode_smul_native
-    (c : ℂ) (k : SpatialFrequency) (mode : ComplexVector) :
-    lerayProjectMode k (c • mode) = c • lerayProjectMode k mode := by
-  by_cases hk : k = 0
-  · subst k
-    simp
-  · rw [lerayProjectMode, if_neg hk, lerayProjectMode, if_neg hk]
-    ext output
-    simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul, complexDot,
-      dotProduct_smul]
-    ring
-
 /-- Forget only the native scalar weight while retaining every mode and component. -/
 def nativeVectorUnderlyingAtOrder
     (order : ℕ) (state : PeriodicVectorWeightedSobolev order) :
@@ -1242,7 +1205,7 @@ theorem vectorCoefficientAt_nativeVectorUnderlyingAtOrder_lerayProject
   let scale : ℂ :=
     (((Real.sqrt (periodicSobolevWeight order k))⁻¹ : ℝ) : ℂ)
   have hsmul := congrFun
-    (lerayProjectMode_smul_native scale k (fun component ↦ state component k)) output
+    (lerayProjectMode_smul scale k (fun component ↦ state component k)) output
   have hmode :
       scale • (fun component ↦ state component k) =
         (fun component ↦ scale * state component k) := by

@@ -257,21 +257,6 @@ theorem openPeriodicSolutionOn_hasDerivAt_combinedProjectiveOuterHalfLengthSquar
     exact map_zero _
   simp [complexScalarRealInner, hboundaryZero]
 
-/-- The dissipation coefficient itself is nonnegative for nonnegative viscosity. -/
-theorem combinedProjectiveOuterLength_dissipationCoefficient_nonneg
-    {nu : ℝ} (hnu : 0 ≤ nu) (address : CompleteTransportAddress)
-    (leg : PhysicalH2InsertionLeg) :
-    0 ≤ physicalH2OuterTestStokesClock nu address leg :=
-  physicalH2OuterTestStokesClock_nonneg hnu address leg
-
-/-- The dissipation coefficient itself is strictly positive for positive viscosity at a nonzero
-address. -/
-theorem combinedProjectiveOuterLength_dissipationCoefficient_pos
-    {nu : ℝ} (hnu : 0 < nu) (address : CompleteTransportAddress)
-    (haddress : address ≠ (0, 0)) (leg : PhysicalH2InsertionLeg) :
-    0 < physicalH2OuterTestStokesClock nu address leg :=
-  physicalH2OuterTestStokesClock_pos hnu address haddress leg
-
 theorem combinedProjectiveOuterLengthDissipation_nonneg
     {nu : ℝ} (hnu : 0 ≤ nu) (velocity : VelocityField)
     (address : CompleteTransportAddress) (leg : PhysicalH2InsertionLeg)
@@ -393,8 +378,6 @@ section Audit
 #print axioms hasDerivAt_complexScalarHalfLengthSquare
 #print axioms openPeriodicSolutionOn_hasDerivAt_combinedProjectiveOuterHalfLengthSquare
 #print axioms openPeriodicSolutionOn_hasDerivAt_combinedProjectiveOuterHalfLengthSquare_zeroCrossing
-#print axioms combinedProjectiveOuterLength_dissipationCoefficient_nonneg
-#print axioms combinedProjectiveOuterLength_dissipationCoefficient_pos
 #print axioms combinedProjectiveOuterLengthDissipation_nonneg
 #print axioms combinedProjectiveOuterLengthDissipation_pos
 #print axioms integral_combinedProjectiveOuterLength_boundary_add_dissipation_eq_powers

@@ -182,13 +182,6 @@ theorem compactSmoothMildSourceIntegratedBandSpatialSup_le_actual_add_initialHea
 
 /-! ## The finite fixed-restart payment -/
 
-private theorem adjacentDyadicFrequencyShell_disjoint (scale : ℕ) :
-    Disjoint (dyadicFrequencyShell scale) (dyadicFrequencyShell (scale + 1)) := by
-  rw [Finset.disjoint_left]
-  intro frequency hfirst hsecond
-  rw [mem_dyadicFrequencyShell_iff] at hfirst hsecond
-  exact hsecond.2 hfirst.1
-
 /-- One smooth restart band is paid by the two adjacent sharp coefficient shells on the fixed
 restart slice. -/
 theorem compactSmoothInitialVorticityHeatBandSpatialSup_le_adjacentRestartCoefficientMass

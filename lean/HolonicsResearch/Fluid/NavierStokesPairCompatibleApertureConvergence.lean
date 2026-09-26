@@ -280,7 +280,7 @@ theorem tendsto_finiteOpenVorticityNonlinearCoefficient_pairCompatible
     tendsto_finiteOpenAdvectiveCoefficient_pairCompatible solution t k
   have hcurl :=
     ((frequencyCurlMultiplierCLM k).continuous.continuousAt.tendsto.comp hadvection).neg
-  rw [vorticityNonlinearMode_eq_completeActualAdvectionConvolution solution t k]
+  rw [vorticityNonlinearMode_eq_h3AdvectiveConvolution solution t k]
   simpa only [finiteOpenVorticityNonlinearCoefficient,
     Function.comp_apply, frequencyCurlMultiplierCLM_apply] using hcurl
 

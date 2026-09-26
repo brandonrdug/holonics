@@ -1685,27 +1685,6 @@ theorem trianglePrismHolon_totalTarget
   rw [Finset.sum_add_distrib]
   rfl
 
-/--
-The generic boundary-holon local-to-global theorem reconstructs the full common-star prism law.
-This is the same exact output as `boundary_refinedPrismCurrent`, now derived through the elementary
-holon interface rather than by a construction-specific summation proof.
--/
-theorem trianglePrismHolon_returns_globalBoundary
-    {chain : SphereChain 2}
-    {lebesgue :
-      Holonics.Hodge.HodgeFiniteClosedStarLabeling.StarLebesgueLabel}
-    (family : RefinedAffineCarrierFamily chain lebesgue) :
-    SphereSingularChainComplex.d 3 2 (refinedPrismCurrent family) =
-      refinedPrismUpperCurrent family - refinedPrismLowerCurrent family +
-        refinedPrismLateralCurrent family := by
-  have returned :=
-    Holonics.BoundaryHolon.boundary_totalCurrent (trianglePrismHolon family)
-  rw [trianglePrismHolon_totalCurrent,
-    trianglePrismHolon_totalSource,
-    trianglePrismHolon_totalTarget] at returned
-  change SphereSingularChainComplex.d 3 2 (refinedPrismCurrent family) = _ at returned
-  simpa [sub_eq_add_neg, add_assoc, add_left_comm, add_comm] using returned
-
 #print axioms prismCylinderMap_internal_first
 #print axioms prismCylinderMap_internal_second
 #print axioms triangleHomotopyLateralBoundary_eq_facePrisms
@@ -1737,6 +1716,5 @@ theorem trianglePrismHolon_returns_globalBoundary
 #print axioms trianglePrismHolon
 #print axioms trianglePrismHolon_totalCurrent
 #print axioms trianglePrismHolon_totalTarget
-#print axioms trianglePrismHolon_returns_globalBoundary
 
 end Holonics.Hodge.HodgeTriangleHomotopyPrism

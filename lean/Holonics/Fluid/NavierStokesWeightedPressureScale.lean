@@ -222,7 +222,7 @@ theorem isScalarWeightedFourierReal_nativePressureAtOrder
 
 /-! ## Exact compatibility under order restriction -/
 
-private theorem periodicWeightedSobolev_eq_of_coefficients_eq
+theorem periodicWeightedSobolev_eq_of_coefficients_eq
     {order : ℕ} {left right : PeriodicWeightedSobolev order}
     (hcoeff : ∀ k,
       (weightedSobolevCoefficients order left).1 k =

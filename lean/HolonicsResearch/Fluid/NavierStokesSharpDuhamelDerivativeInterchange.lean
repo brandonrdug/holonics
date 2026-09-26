@@ -308,24 +308,6 @@ theorem hasFDerivAt_reconstructedHeatH2FirstFDerivCLM
     2 0 (by omega) (fun i ↦ Fin.elim0 i)
       (vectorHeatH2ToH5 nu dt h source) component x
 
-private theorem norm_reconstructedComponent_le_coefficientMass
-    (state : PeriodicVectorWeightedSobolev 3) (component : Fin 3) (x : Space) :
-    ‖reconstructedTorusComplexComponent state component (euclideanToSpatialTorus x)‖ ≤
-      ∑' k : SpatialFrequency, ‖nativeUnweightedComponent state component k‖ := by
-  rw [reconstructedTorusComplexComponent_apply]
-  have hterms : Summable fun k : SpatialFrequency ↦
-      ‖nativeUnweightedComponent state component k *
-        UnitAddTorus.mFourier k (euclideanToSpatialTorus x)‖ := by
-    apply (summable_norm_nativeUnweightedComponent state component).congr
-    intro k
-    rw [norm_mul]
-    simp [UnitAddTorus.mFourier, norm_prod, Circle.norm_coe]
-  exact (norm_tsum_le_tsum_norm hterms).trans_eq (by
-    apply tsum_congr
-    intro k
-    rw [norm_mul]
-    simp [UnitAddTorus.mFourier, norm_prod, Circle.norm_coe])
-
 private theorem norm_firstCoordinateMultiplier_le_stokes
     (coordinate : Fin 3) (k : SpatialFrequency) :
     ‖orderedDerivativeMultiplier 1 (![coordinate]) k‖ ≤ torusStokesEigenvalue k := by
@@ -361,25 +343,6 @@ private theorem norm_firstCoordinateMultiplier_le_stokes
     _ ≤ (2 * Real.pi) ^ 2 * frequencySquared k := by
       apply mul_le_mul_of_nonneg_right _ hfrequency
       nlinarith
-
-private theorem receiverTerm_eq_kernelNormMulH2
-    (a : ℝ) (ha : 0 < a) (state : PeriodicWeightedSobolev 2)
-    (k : SpatialFrequency) :
-    torusStokesEigenvalue k * Real.exp (-a * torusStokesEigenvalue k) *
-        ‖weightedSobolevRawCoefficients 2 state k‖ =
-      ‖heatSecondDerivativeH2Kernel a ha k‖ * ‖weightedStateAbsolute 2 state k‖ := by
-  have hsqrt : 0 < Real.sqrt (periodicSobolevWeight 2 k) :=
-    Real.sqrt_pos.2 (periodicSobolevWeight_pos 2 k)
-  have hk : 0 ≤ torusStokesEigenvalue k * Real.exp (-a * torusStokesEigenvalue k) /
-      Real.sqrt (periodicSobolevWeight 2 k) :=
-    div_nonneg (mul_nonneg (torusStokesEigenvalue_nonneg k) (Real.exp_pos _).le) hsqrt.le
-  change torusStokesEigenvalue k * Real.exp (-a * torusStokesEigenvalue k) *
-      ‖((((Real.sqrt (periodicSobolevWeight 2 k))⁻¹ : ℝ) : ℂ) * state k)‖ =
-    ‖torusStokesEigenvalue k * Real.exp (-a * torusStokesEigenvalue k) /
-      Real.sqrt (periodicSobolevWeight 2 k)‖ * ‖‖state k‖‖
-  rw [norm_mul, Complex.norm_real, Real.norm_of_nonneg hk,
-    Real.norm_of_nonneg (norm_nonneg _), Real.norm_eq_abs, abs_inv, abs_of_pos hsqrt]
-  field_simp
 
 /-- Every addressed first derivative is bounded by the already sharp second-derivative
 coefficient mass.  The zero mode vanishes and every nonzero first symbol is dominated by the

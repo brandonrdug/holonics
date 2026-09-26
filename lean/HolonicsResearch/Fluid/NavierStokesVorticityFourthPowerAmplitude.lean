@@ -1,4 +1,5 @@
 import Holonics.Fluid.NavierStokesDissipationHodgeEnstrophy
+import Holonics.Fluid.NavierStokesOpenEnergySpacetime
 
 /-!
 # The fourth-power receiver retains an amplitude direction
@@ -111,14 +112,6 @@ theorem periodicVorticityDissipation_amplitudeScaledVelocity
     norm_smul, Real.norm_eq_abs]
   nlinarith [sq_abs amplitude]
 
-/-- Kinetic energy is nonnegative at the totalized unit-cube receiver without any equation of
-motion. -/
-theorem periodicKineticEnergy_nonneg_receiver
-    (velocity : VelocityField) (t : ℝ) :
-    0 ≤ periodicKineticEnergy velocity t := by
-  unfold periodicKineticEnergy kineticEnergyDensity
-  exact integral_nonneg fun _ ↦ mul_nonneg (by norm_num) (sq_nonneg _)
-
 /-- On a nonnegative amplitude ray, the kinetic-energy/enstrophy base carries exact cubic
 homogeneity. -/
 theorem energyEnstrophyBase_amplitudeScaledVelocity
@@ -133,7 +126,7 @@ theorem energyEnstrophyBase_amplitudeScaledVelocity
   rw [periodicKineticEnergy_amplitudeScaledVelocity,
     periodicEnstrophy_amplitudeScaledVelocity]
   have henergy : 0 ≤ 2 * periodicKineticEnergy velocity t :=
-    mul_nonneg (by norm_num) (periodicKineticEnergy_nonneg_receiver velocity t)
+    mul_nonneg (by norm_num) (Holonics.Fluid.NavierStokesOpenEnergySpacetime.periodicKineticEnergy_nonneg velocity t)
   have hsqrt :
       Real.sqrt (2 * (amplitude ^ 2 * periodicKineticEnergy velocity t)) =
         amplitude * Real.sqrt (2 * periodicKineticEnergy velocity t) := by

@@ -254,32 +254,6 @@ private theorem higherOrderDivergenceMode_smul_right
   rw [hinner]
   ring
 
-private theorem lerayProjectMode_add_native
-    (k : SpatialFrequency) (left right : ComplexVector) :
-    lerayProjectMode k (left + right) =
-      lerayProjectMode k left + lerayProjectMode k right := by
-  by_cases hk : k = 0
-  · subst k
-    simp
-  · rw [lerayProjectMode, if_neg hk, lerayProjectMode, if_neg hk,
-      lerayProjectMode, if_neg hk]
-    ext output
-    simp only [Pi.add_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul,
-      complexDot, dotProduct_add]
-    ring
-
-private theorem lerayProjectMode_smul_native
-    (c : ℂ) (k : SpatialFrequency) (mode : ComplexVector) :
-    lerayProjectMode k (c • mode) = c • lerayProjectMode k mode := by
-  by_cases hk : k = 0
-  · subst k
-    simp
-  · rw [lerayProjectMode, if_neg hk, lerayProjectMode, if_neg hk]
-    ext output
-    simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul, complexDot,
-      dotProduct_smul]
-    ring
-
 private theorem vectorCoefficientAt_higherOrderLerayDivergenceConvolution
     (order : ℕ) (horder : 3 ≤ order)
     (advecting transported : PeriodicVectorWeightedSobolev order)
@@ -328,7 +302,7 @@ theorem periodicVectorWeightedLerayDivergenceConvolution_add_left
       order horder second transported,
     higherOrderDivergenceMode_add_left
       order horder first second transported k,
-    lerayProjectMode_add_native]
+    Holonics.Fluid.NavierStokesWeightedLerayBilinear.lerayProjectMode_add]
   rfl
 
 theorem periodicVectorWeightedLerayDivergenceConvolution_add_right
@@ -364,7 +338,7 @@ theorem periodicVectorWeightedLerayDivergenceConvolution_add_right
       order horder advecting second,
     higherOrderDivergenceMode_add_right
       order horder advecting first second k,
-    lerayProjectMode_add_native]
+    Holonics.Fluid.NavierStokesWeightedLerayBilinear.lerayProjectMode_add]
   rfl
 
 theorem periodicVectorWeightedLerayDivergenceConvolution_smul_left
@@ -393,7 +367,7 @@ theorem periodicVectorWeightedLerayDivergenceConvolution_smul_left
       order horder advecting transported,
     higherOrderDivergenceMode_smul_left
       order horder c advecting transported k,
-    lerayProjectMode_smul_native]
+    Holonics.Fluid.NavierStokesWeightedLerayBilinear.lerayProjectMode_smul]
   rfl
 
 theorem periodicVectorWeightedLerayDivergenceConvolution_smul_right
@@ -422,7 +396,7 @@ theorem periodicVectorWeightedLerayDivergenceConvolution_smul_right
       order horder advecting transported,
     higherOrderDivergenceMode_smul_right
       order horder c advecting transported k,
-    lerayProjectMode_smul_native]
+    Holonics.Fluid.NavierStokesWeightedLerayBilinear.lerayProjectMode_smul]
   rfl
 
 /-! ## The bundled continuous bilinear return -/

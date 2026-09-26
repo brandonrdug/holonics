@@ -227,16 +227,6 @@ private theorem heatFirstDerivativeH2CoefficientMass_le_kernelNorm_mul
     _ = ‖heatFirstDerivativeH2Kernel a ha‖ * ‖source‖ := by
       rw [norm_weightedStateAbsolute]
 
-private theorem sqrt_mul_rpow_neg_half
-    (C x : ℝ) (hC : 0 ≤ C) (hx : 0 < x) :
-    Real.sqrt (C * x ^ (-1 / 2 : ℝ)) =
-      Real.sqrt C * x ^ (-1 / 4 : ℝ) := by
-  rw [Real.sqrt_mul hC]
-  congr 1
-  rw [Real.sqrt_eq_rpow, ← Real.rpow_mul hx.le]
-  congr 1
-  norm_num
-
 /-- **Sharp one-derivative `H2` heat edge.**  The complete spectral first-derivative
 coefficient population has the locally integrable positive-time scale, expressed only through
 the standing heat clock, spectral eigenvalue, and named calibration receiver. -/

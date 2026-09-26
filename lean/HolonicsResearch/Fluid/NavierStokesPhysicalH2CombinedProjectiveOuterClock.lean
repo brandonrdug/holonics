@@ -372,14 +372,6 @@ theorem integral_combinedProjectiveOuter_boundary_add_stokes_eq_horizontal_add_n
     intervalIntegral.integral_add hhorizontal hnonlinear] at hftc
   linear_combination -hftc
 
-/-- The Stokes coefficient appearing in the integrated balance is strictly positive at every
-nonzero address under positive viscosity. -/
-theorem combinedProjectiveOuter_stokesCoefficient_pos
-    {nu : ℝ} (hnu : 0 < nu) (address : CompleteTransportAddress)
-    (haddress : address ≠ (0, 0)) (leg : PhysicalH2InsertionLeg) :
-    0 < physicalH2OuterTestStokesClock nu address leg :=
-  physicalH2OuterTestStokesClock_pos hnu address haddress leg
-
 section Audit
 
 #print axioms physicalH2CombinedProjectiveOuterBoundary_eq_projectiveBoundary
@@ -387,7 +379,6 @@ section Audit
 #print axioms openPeriodicSolutionOn_hasDerivAt_combinedProjectiveOuterBoundary
 #print axioms openPeriodicSolutionOn_hasDerivAt_combinedProjectiveOuterBoundary_zeroCrossing
 #print axioms integral_combinedProjectiveOuter_boundary_add_stokes_eq_horizontal_add_nonlinear
-#print axioms combinedProjectiveOuter_stokesCoefficient_pos
 
 end Audit
 

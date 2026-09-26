@@ -30,10 +30,11 @@ whole level.  Same identity; different orbit; the Euler factor is the difference
 ## What is proved
 
 * `theWholeOrbitProductIsOneMinusTheLevelPower` — the identity above, over any integral domain.
+  It is also the ramified reading, product over `range l` against `1 − ξ^l`, which is
+  `N(c_{ml}) = c_m` once `ξ^l = ζ_m`: with `l ∣ m` the relative orbit of `ζ_{ml}` over `K_m` is
+  the whole level, so the norm carries no Euler factor.
 * `theHigherUnitDescendsThroughTheEulerFactor` — the unramified reading, product over `Ico 1 l`
   against `1 − ξ^l`, which is `N(c_{ml}) · c_m = σ_l(c_m)`.
-* `theRamifiedLayerCarriesNoEulerFactor` — the ramified reading, product over `range l` against
-  `1 − ξ^l`, which is `N(c_{ml}) = c_m` once `ξ^l = ζ_m`.
 * `theTwoLayerDescentComposesToOneLevel` — two coprime levels descend to their product level.
   This is the transport chain: adjacent layers compose, and the composite is the relation at the
   composed level, with no extra hypothesis beyond coprimality of the two levels.
@@ -143,18 +144,6 @@ theorem theHigherUnitDescendsThroughTheEulerFactor {l : ℕ} (hl : 0 < l) {eta :
   rw [← theWholeOrbitProductIsOneMinusTheLevelPower hl heta xi, hbot]
   simp
 
-/-- **The ramified layer: the norm carries no Euler factor.**  With `ξ = ζ_{ml}` and `l ∣ m`, the
-relative Galois orbit of `ζ_{ml}` over `K_m` is the *whole* level `{η^j : j < l}`, and `ξ^l` is
-`ζ_m`.  So the product over `range l` is the relative norm outright and equals `1 − ζ_m = c_m`.
-
-Algebraically this is the same identity as the unramified case.  **The partition between the two
-is arithmetic — which exponents form the orbit — and nothing in the algebra decides it.**  Stating
-one of the two and calling it "the norm relation" authors the partition; both are stated. -/
-theorem theRamifiedLayerCarriesNoEulerFactor {l : ℕ} (hl : 0 < l) {eta : R}
-    (heta : IsPrimitiveRoot eta l) (xi : R) :
-    ∏ j ∈ range l, (1 - xi * eta ^ j) = 1 - xi ^ l :=
-  theWholeOrbitProductIsOneMinusTheLevelPower hl heta xi
-
 /-! ## 2. The chain — two coprime layers compose to their product layer
 
 The Euler system is not one relation but an indexed compatible family, and the content of the
@@ -202,7 +191,7 @@ law, obtained by applying the general theorem — not by evaluating a product by
 theorem theRamifiedNormInTheModelIsTheLowerUnit :
     ∏ j ∈ range 3, (1 - (4 : ZMod 19) * 7 ^ j) = 1 - (7 : ZMod 19) := by
   haveI : Fact (Nat.Prime 19) := ⟨by norm_num⟩
-  rw [theRamifiedLayerCarriesNoEulerFactor (by norm_num) theCubeRootIsPrimitiveInTheModel
+  rw [theWholeOrbitProductIsOneMinusTheLevelPower (by norm_num) theCubeRootIsPrimitiveInTheModel
     (4 : ZMod 19), theNinthRootCubesToTheCubeRootInTheModel]
 
 /-- **The partition falsifier, run.**  If the unramified relation held at `m = l = 3` it would

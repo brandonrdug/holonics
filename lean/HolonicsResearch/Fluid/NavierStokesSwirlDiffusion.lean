@@ -1,4 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesSwirlCirculation
+import HolonicsResearch.Fluid.NavierStokesLocalEnergyFlux
 
 /-!
 # Squared-radius swirl diffusion
@@ -170,14 +171,6 @@ theorem gradient_product (f g : Space → ℝ) (hf : Differentiable ℝ f)
   rw [inner_gradient_left, fderiv_fun_mul (hf x) (hg x)]
   simp [inner_add_left, real_inner_smul_left, inner_gradient_left]
 
-theorem divergence_sum (u v : InitialVelocity) (x : Space)
-    (hu : DifferentiableAt ℝ u x) (hv : DifferentiableAt ℝ v x) :
-    divergence (fun y ↦ u y + v y) x = divergence u x + divergence v x := by
-  unfold divergence
-  rw [fderiv_fun_add hu hv]
-  change LinearMap.trace ℝ Space ((fderiv ℝ u x).toLinearMap + (fderiv ℝ v x).toLinearMap) = _
-  rw [map_add]
-
 theorem laplacian_product (f g : Space → ℝ) (hf : ContDiff ℝ 2 f)
     (hg : ContDiff ℝ 2 g) (x : Space) :
     Δ (fun y ↦ f y * g y) x =
@@ -189,7 +182,7 @@ theorem laplacian_product (f g : Space → ℝ) (hf : ContDiff ℝ 2 f)
   have hfg : DifferentiableAt ℝ (fun y ↦ f y • gradient g y) x := (hfd x).smul (hggrad x)
   have hgf : DifferentiableAt ℝ (fun y ↦ g y • gradient f y) x := (hgd x).smul (hfgrad x)
   rw [← divergence_gradient_eq_laplacian _ (hf.mul hg) x, gradient_product f g hfd hgd,
-    divergence_sum (fun y ↦ f y • gradient g y) (fun y ↦ g y • gradient f y) x hfg hgf,
+    Holonics.Fluid.NavierStokesLocalEnergyFlux.divergence_add (fun y ↦ f y • gradient g y) (fun y ↦ g y • gradient f y) x hfg hgf,
     divergence_pressureFlux _ _ x (hggrad x) (hfd x),
     divergence_pressureFlux _ _ x (hfgrad x) (hgd x),
     divergence_gradient_eq_laplacian g hg x, divergence_gradient_eq_laplacian f hf x,

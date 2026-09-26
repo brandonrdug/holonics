@@ -174,11 +174,4 @@ theorem hasDerivAt_changingCapacitiveEnergy
   simp only [changingCapacitiveEnergy, capacitiveVoltage]
   ring
 
-theorem changingCapacitiveEnergy_deriv_eq_voltage_current
-    (k q : ℝ → ℝ) (time k' q' : ℝ)
-    (hk : HasDerivAt k k' time) (hq : HasDerivAt q q' time) :
-    HasDerivAt (fun t ↦ changingCapacitiveEnergy k q t)
-      ((capacitiveVoltage k q time) * q' + (1 / 2 : ℝ) * k' * (q time) ^ 2) time :=
-  hasDerivAt_changingCapacitiveEnergy k q time k' q' hk hq
-
 end Holonics.Physics.HolonicComplexParametron

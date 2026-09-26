@@ -497,7 +497,7 @@ theorem norm_weightedSobolevThreeCoefficientTail_le
   nlinarith [norm_nonneg (weightedSobolevThreeCoefficientTail coeff radius),
     norm_nonneg (weightedSobolevThreeCoefficient coeff), hsum']
 
-private theorem coordinateReciprocal_mul_weightedTail_eq
+theorem coordinateReciprocal_mul_weightedTail_eq
     (coeff : PeriodicSobolevCoefficients 3) (coordinate : Fin 3)
     (radius : ℕ) (frequency : FrequencyCubeComplement radius) :
     ‖coordinateReciprocalSobolevThreeSqrtTail coordinate radius frequency‖ *

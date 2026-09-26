@@ -130,13 +130,6 @@ theorem advectingLowSector_highPins_mem_highGradeCube
   ⟨transported_mem_advectingLowHighGradeCube triad,
     receiver_mem_advectingLowHighGradeCube triad⟩
 
-theorem advectingLowSector_highGradeDifference_le_one
-    {triad : AddressedClosedFourierTriad}
-    (hsector : AdvectingLowSector triad) :
-    transportedGrade triad ≤ receiverGrade triad + 1 ∧
-      receiverGrade triad ≤ transportedGrade triad + 1 :=
-  advectingLowSector_highGrades_proximate hsector
-
 theorem advectingLowSector_lowGrade_zero_iff_lowFrequencyMode
     {triad : AddressedClosedFourierTriad}
     (_hsector : AdvectingLowSector triad) :
@@ -248,7 +241,6 @@ section Audit
 #print axioms dyadicGrade_low_mul_high_eq_ratio_mul_high_sq
 #print axioms advectingLowSector_lowGrade_lt_highGrade
 #print axioms advectingLowSector_highPins_mem_highGradeCube
-#print axioms advectingLowSector_highGradeDifference_le_one
 #print axioms norm_h2ExchangedTriadTransfer_le_advectingLowGradeRatio
 #print axioms norm_completePhysicalH2ExchangedTransportFace_le_advectingLowGradeRatio
 #print axioms abs_re_completePhysicalH2ExchangedTransportFace_le_advectingLowGradeRatio

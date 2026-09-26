@@ -203,12 +203,6 @@ theorem phaseRotate_normSquare
   dsimp [phaseNormSquare, phaseRotate]
   nlinarith
 
-/-- Simultaneous rational phase rechart preserves the scalar norm of each incidence. -/
-theorem phase_weighted_square_energy_norm_covariant
-    {c s : ℚ} (unit : c ^ 2 + s ^ 2 = 1) (phase : Phase) :
-    phaseNormSquare (phaseRotate c s phase) = phaseNormSquare phase :=
-  phaseRotate_normSquare unit phase
-
 theorem phaseEmitted_rotate_covariant
     {a b c s : ℚ} (hab : a + b ≠ 0) (incoming held : Phase) :
     phaseEmitted a b (phaseRotate c s incoming) (phaseRotate c s held) =

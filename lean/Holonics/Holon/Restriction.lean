@@ -18,7 +18,7 @@ along a projection gives the passive coholon, `gyrator_projection_witness`); a s
 Kron/Schur elimination of a network's interior is an exact restriction: interior-balanced states
 have boundary bonds on the graph of `Λ_DN` with the full power preserved, and every boundary value
 extends (`kron_exact`, composing `Objects/Membrane`); witness the series path
-(`series_path_restriction`). The pointwise square is the operator defect read at a state
+(`MembraneJoin.series_path_dtn`). The pointwise square is the operator defect read at a state
 (`squareDefect_mulVec_eq_zero_iff`), and every reading either descends through a restriction or
 exhibits a merged pair it separates (`Descent`, `descent_total`); that pair, in its fibre, refutes
 every coarse reading (`descent_defect_refutes_factoring`), and a retained affine fibre lies in the
@@ -297,14 +297,6 @@ theorem kron_exact (L : Matrix (I ⊕ B) (I ⊕ B) K) (hA : IsUnit L.toBlocks₁
     rw [mulVec_neg, mulVec_mulVec, ← Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hA,
       Matrix.one_mul]
     simp
-
-/-- [proved-derived; formal-checked] **Witness: the series path.** The path with conductances `1`
-and `2` restricts to the boundary relation `Λ_DN = (2/3)[[1,−1],[−1,1]]`
-(`MembraneJoin.series_path_dtn`). -/
-theorem series_path_restriction :
-    dtn ((laplacian pathIncidence pathΘ).submatrix pathSplit.symm pathSplit.symm) =
-      !![2 / 3, -(2 / 3); -(2 / 3), 2 / 3] :=
-  series_path_dtn
 
 end Kron
 

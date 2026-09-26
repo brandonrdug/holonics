@@ -406,47 +406,6 @@ def openSmoothDyadicLinearBandActualSignedWorkRate
     (t : Set.Ioo 0 T) (scale : ℕ) : ℝ :=
   (openSmoothDyadicLinearBandActualSignedWork solution t scale).re
 
-private theorem complexVectorSymmetricPhasePairing_add_right
-    (left first second : ComplexVector) :
-    complexVectorSymmetricPhasePairing left (first + second) =
-      complexVectorSymmetricPhasePairing left first +
-        complexVectorSymmetricPhasePairing left second := by
-  unfold complexVectorSymmetricPhasePairing complexVectorHermitianPairing
-  simp only [Pi.add_apply, mul_add, map_add, add_mul, Finset.sum_add_distrib]
-  ring
-
-private theorem hasDerivAt_complexVectorHermitianSquare
-    {coefficient : ℝ → ComplexVector} {derivative : ComplexVector} {time : ℝ}
-    (hcoefficient : HasDerivAt coefficient derivative time) :
-    HasDerivAt
-      (fun τ ↦ complexVectorHermitianPairing (coefficient τ) (coefficient τ))
-      (complexVectorHermitianPairing derivative (coefficient time) +
-        complexVectorHermitianPairing (coefficient time) derivative) time := by
-  unfold complexVectorHermitianPairing
-  have hcomponent : ∀ component : Fin 3,
-      HasDerivAt
-        (fun τ ↦ (starRingEnd ℂ) (coefficient τ component) *
-          coefficient τ component)
-        ((starRingEnd ℂ) (derivative component) * coefficient time component +
-          (starRingEnd ℂ) (coefficient time component) * derivative component) time := by
-    intro component
-    have hcoordinate :=
-      (((ContinuousLinearMap.proj component : ComplexVector →L[ℝ] ℂ).hasFDerivAt.comp
-        time hcoefficient.hasFDerivAt).hasDerivAt)
-    simp only [ContinuousLinearMap.comp_apply,
-      ContinuousLinearMap.toSpanSingleton_apply_one,
-      ContinuousLinearMap.proj_apply] at hcoordinate
-    have hconjugate :=
-      (Complex.conjCLE.hasFDerivAt.comp time hcoordinate.hasFDerivAt).hasDerivAt
-    convert! hconjugate.mul hcoordinate using 1 <;>
-      simp only [Function.comp_apply, Complex.conjCLE_apply,
-        ContinuousLinearMap.comp_apply,
-        ContinuousLinearMap.toSpanSingleton_apply_one,
-        ContinuousLinearMap.proj_apply] <;> rfl
-  have hsum := HasDerivAt.fun_sum (u := (Finset.univ : Finset (Fin 3)))
-    fun component _hcomponent ↦ hcomponent component
-  simpa only [Finset.sum_add_distrib] using hsum
-
 private theorem symmetricPhasePairing_unfiltered_viscous_eq
     (coefficient : ComplexVector) (nu eigenvalue : ℝ) :
     complexVectorSymmetricPhasePairing coefficient

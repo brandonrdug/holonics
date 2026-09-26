@@ -1,5 +1,6 @@
 import HolonicsResearch.Fluid.NavierStokesPairCompatibleApertureConvergence
 import HolonicsResearch.Fluid.NavierStokesPhysicalH2ReciprocalClockRenormalization
+import HolonicsResearch.Fluid.NavierStokesCompleteDyadicTriadSectorPartition
 
 /-!
 # Clocked physical-H2 quartic interaction pullback
@@ -145,21 +146,6 @@ theorem physicalH2InsertionFrequency_reality
   | transported => simp [physicalH2RealityAddress]
   | receiver => exact completeTransportReceiver_realityAddress address
 
-/-- Membership in a coordinate cube is invariant under frequency reversal. -/
-theorem neg_mem_frequencyCube_iff_local
-    (frequency : SpatialFrequency) (radius : ℕ) :
-    -frequency ∈ frequencyCube radius ↔ frequency ∈ frequencyCube radius := by
-  rw [mem_frequencyCube_iff, mem_frequencyCube_iff]
-  constructor
-  · intro h component
-    have hc := h component
-    simp only [Pi.neg_apply] at hc
-    omega
-  · intro h component
-    have hc := h component
-    simp only [Pi.neg_apply]
-    omega
-
 /-- The complete finite outer cube retains the reality-reflected occurrence. -/
 theorem physicalH2RealityAddress_mem_velocityTriadAperture_iff
     (outerRadius : ℕ) (address : CompleteTransportAddress) :
@@ -176,8 +162,8 @@ theorem physicalH2RealityAddress_mem_velocityTriadAperture_iff
         address.2 ∈ frequencyCube outerRadius ∧
         completeTransportReceiver address ∈ frequencyCube outerRadius
   rw [completeTransportReceiver_realityAddress,
-    neg_mem_frequencyCube_iff_local, neg_mem_frequencyCube_iff_local,
-    neg_mem_frequencyCube_iff_local]
+    Holonics.Fluid.NavierStokesCompleteDyadicTriadSectorPartition.neg_mem_frequencyCube_iff, Holonics.Fluid.NavierStokesCompleteDyadicTriadSectorPartition.neg_mem_frequencyCube_iff,
+    Holonics.Fluid.NavierStokesCompleteDyadicTriadSectorPartition.neg_mem_frequencyCube_iff]
 
 /-- An inner convolution address retains both oriented parents and their exact joining equality. -/
 structure OrientedInnerConvolutionAddress (output : SpatialFrequency) where

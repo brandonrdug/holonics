@@ -144,13 +144,6 @@ theorem compactOpenSmoothDyadicAdaptiveOffDiagonalBandIntegral_le_initialHeat_ad
 
 /-! ## Exact adaptive heat-clock service -/
 
-private theorem adjacentDyadicFrequencyShell_disjoint (scale : ℕ) :
-    Disjoint (dyadicFrequencyShell scale) (dyadicFrequencyShell (scale + 1)) := by
-  rw [Finset.disjoint_left]
-  intro frequency hscale hnext
-  rw [mem_dyadicFrequencyShell_iff] at hscale hnext
-  exact hnext.2 hscale.1
-
 private theorem intervalIntegral_adaptiveInitialHeatMode_le_scaleClock
     {T nu a b : ℝ} {initial : InitialVelocity} {velocity : VelocityField}
     {pressure : PressureField}
@@ -261,7 +254,7 @@ theorem compactAdaptiveOffDiagonalInitialHeatContribution_le_clockBudget_mul_res
             openPeriodicVorticityDyadicShellCoefficientMass solution
               ⟨a, ha, hab.trans_lt hbT⟩ (scale + 1)) := by
         unfold openPeriodicVorticityDyadicShellCoefficientMass
-        rw [Finset.sum_union (adjacentDyadicFrequencyShell_disjoint scale)]
+        rw [Finset.sum_union (Holonics.Fluid.NavierStokesTerminalSmoothDyadicVorticityPacking.adjacentDyadicFrequencyShell_disjoint scale)]
         rw [← Finset.mul_sum, ← Finset.mul_sum]
         ring
   · intro frequency _hfrequency

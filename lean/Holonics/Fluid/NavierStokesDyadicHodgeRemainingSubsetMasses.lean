@@ -539,22 +539,13 @@ theorem dyadicHodgeSubsetMass_empty_eq_coefficientMass
               firstIndex secondIndex thirdIndex‖ := by
   rfl
 
-/-- The direct aperture count is bounded by eight copies of its originating dyadic radius. -/
-theorem dyadicHodgeApertureCount_le_eight_mul_radius (scale : ℕ) :
-    dyadicHodgeApertureCount scale ≤ 8 * dyadicRadius scale := by
-  rw [dyadicHodgeApertureCount_eq]
-  have hradius : dyadicRadius (scale + 3) = 8 * dyadicRadius scale := by
-    simp [dyadicRadius, pow_add, mul_comm]
-  rw [hradius]
-  omega
-
 /-- One reconstructed coordinate costs at most `72 R²` at dyadic radius `R`.  Both factors come
 from the exact two-prefix gluing; `8R` and `9R` are proved aperture bounds, not estimates. -/
 theorem dyadicHodgeApertureReconstructionFactor_le (scale : ℕ) :
     (dyadicHodgeApertureCount scale : ℝ) *
         (dyadicHodgeApertureCount scale + 1 : ℕ) ≤
       72 * (dyadicRadius scale : ℝ) ^ 2 := by
-  have hcount := dyadicHodgeApertureCount_le_eight_mul_radius scale
+  have hcount := Holonics.Fluid.NavierStokesDyadicTensorBandSubsetVariation.dyadicHodgeApertureCount_le_eight_mul_radius scale
   have hradius : 1 ≤ dyadicRadius scale := by
     unfold dyadicRadius
     exact one_le_pow₀ (by norm_num : (1 : ℕ) ≤ 2)
@@ -581,7 +572,7 @@ theorem dyadicHodgeSubsetMass_empty_le
         scale component coordinate input
     _ ≤ (8 * (dyadicRadius scale : ℝ)) ^ 3 := by
       gcongr
-      exact_mod_cast dyadicHodgeApertureCount_le_eight_mul_radius scale
+      exact_mod_cast Holonics.Fluid.NavierStokesDyadicTensorBandSubsetVariation.dyadicHodgeApertureCount_le_eight_mul_radius scale
     _ = 512 * coordinateSubsetScale
         (dyadicRadius scale : ℝ) (∅ : CoordinateFace 3) := by
       simp [coordinateSubsetScale]
@@ -899,7 +890,6 @@ section Audit
 #print axioms dyadicHodgeSubsetMass_second_le_firstSecond
 #print axioms dyadicHodgeSubsetMass_first_le_firstSecond
 #print axioms dyadicHodgeSubsetMass_empty_eq_coefficientMass
-#print axioms dyadicHodgeApertureCount_le_eight_mul_radius
 #print axioms dyadicHodgeApertureReconstructionFactor_le
 #print axioms dyadicHodgeSubsetMass_empty_le
 #print axioms dyadicHodgeSubsetMass_firstSecond_eq

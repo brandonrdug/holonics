@@ -133,17 +133,6 @@ def openPeriodicCanonicalVorticityDistanceCrossModulus
       simpa only [pow_one] using
         openPeriodic_receiverCrossDifference_le_canonicalDistance solution t q y)
 
-/-- The infinite-depth spatial carrier no longer depends on any selected Lipschitz witness. -/
-theorem openPeriodicCanonicalDyadicSpatialCrossCoherenceSummable_inhabited
-    {T nu : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
-    {pressure : PressureField}
-    (solution : OpenPeriodicSolutionOn T nu initial force velocity pressure)
-    (t : Set.Ioo 0 T) (q : SpatialTorus) :
-    OpenPeriodicDyadicSpatialCrossCoherenceSummable solution t q := by
-  exact openPeriodicDyadicSpatialCrossCoherenceSummable_of_modulusMoments
-    solution t q (openPeriodicCanonicalVorticityDistanceCrossModulus solution t q)
-      summableDyadicHodgeJacobianKernelDistanceMoments_inhabited
-
 /-- The complete cross-coherence mass is reconstructed through the canonical derivative norm. -/
 theorem openPeriodicFullSpatialCrossCoherenceMass_le_canonicalDistanceMoments
     {T nu : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
@@ -263,7 +252,7 @@ theorem abs_openPeriodicPhysicalVortexStretchingAt_le_canonicalEnstrophyDensity
   have hphysical :=
     abs_openPeriodicPhysicalVortexStretchingAt_le_fullSpatialCrossCoherence_kineticEnergy
       solution t q
-        (openPeriodicCanonicalDyadicSpatialCrossCoherenceSummable_inhabited solution t q)
+        (openPeriodicDyadicSpatialCrossCoherenceSummable_inhabited solution t q)
   change
     |openPeriodicPhysicalVortexStretchingAt solution t q| ≤
       openPeriodicCanonicalVorticityDirectionEnstrophyCoefficient solution t *
@@ -431,7 +420,6 @@ section Audit
 #print axioms nnnorm_fderiv_vorticity_le_canonical
 #print axioms openPeriodicCanonicalVorticityLipschitzOn_closedBall
 #print axioms openPeriodic_receiverCrossDifference_le_canonicalDistance
-#print axioms openPeriodicCanonicalDyadicSpatialCrossCoherenceSummable_inhabited
 #print axioms openPeriodicFullSpatialCrossCoherenceMass_le_canonicalDistanceMoments
 #print axioms openPeriodicCanonicalVorticityDirectionEnstrophyCoefficient_nonneg
 #print axioms abs_openPeriodicPhysicalVortexStretchingAt_le_canonicalEnstrophyDensity

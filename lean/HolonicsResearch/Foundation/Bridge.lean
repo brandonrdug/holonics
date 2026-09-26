@@ -266,39 +266,16 @@ theorem sharedReceiverFace_entails_coPresence :
 The `decide` proofs below state that the *declared* order omits the implication. Each is paired
 with a construction that shows the omission is forced. -/
 
-/-- [counterexample; formal-checked] **A shared receiver face does not yield an actual map.** -/
+/-- [counterexample; formal-checked] **A shared receiver face does not yield an actual map.**
+The witness is `Foundation/ReceiverAtlas`'s blind chart on `Bool`: it identifies `false` and
+`true`, which the faithful receiver separates, so no map from the shared face to the faithful
+reading exists (`Atlas.SeparatingAtlas.no_transformer_from_the_blind_chart`). -/
 theorem sharedReceiverFace_not_actualMap :
     BridgeStatus.sharedReceiverFace.entails .actualMap = false := by decide
-
-/-- [counterexample; formal-checked] The witness: the blind receiver on `Bool` identifies `false`
-and `true`, which the faithful receiver separates, so **no** map from the shared face to the
-faithful reading exists. This is `Foundation/Receiver.lean`'s
-`ReceiverTransformer.excludesInsufficiency`, cited rather than rebuilt. -/
-def sharedFaceInsufficiency :
-    ReceiverInsufficiency (fun _ : Bool => PUnit.unit) (fun x : Bool => x) where
-  left := false
-  right := true
-  sameEntering := rfl
-  differentReturned := by decide
-
-/-- [counterexample; formal-checked] Hence the shared face supplies no map at all. -/
-theorem sharedReceiverFace_supplies_no_map :
-    IsEmpty (ReceiverTransformer (fun _ : Bool => PUnit.unit) (fun x : Bool => x)) :=
-  ⟨fun t => t.excludesInsufficiency sharedFaceInsufficiency⟩
 
 /-- [counterexample; formal-checked] **An actual map need not preserve structure.** -/
 theorem actualMap_not_structurePreserving :
     BridgeStatus.actualMap.entails .structurePreservingMap = false := by decide
-
-/-- [counterexample; formal-checked] The witness is
-`Foundation/ContinuingTower.lean::naturality_is_genuine_content`: two perfectly good injective face
-maps, each a lawful `Transition` with zero residual, whose square with the tower's own restriction
-does not commute. Being a map is not preserving a diagram. -/
-theorem actualMap_does_not_preserve_structure :
-    ∃ (g₀ g₁ : ℕ → ℕ) (x : ℕ), Function.Injective g₀ ∧ Function.Injective g₁ ∧
-      shiftTower.restrict (Nat.zero_le 1) (g₁ x)
-        ≠ g₀ (shiftTower.restrict (Nat.zero_le 1) x) :=
-  naturality_is_genuine_content
 
 /-- [counterexample; formal-checked] **An equivalence of objects does not give a natural family.**
 -/
@@ -779,9 +756,7 @@ open Holonics.Foundation.Bridges
 #print axioms naturalFamily_entails_structurePreserving
 #print axioms sharedReceiverFace_entails_coPresence
 #print axioms sharedReceiverFace_not_actualMap
-#print axioms sharedReceiverFace_supplies_no_map
 #print axioms actualMap_not_structurePreserving
-#print axioms actualMap_does_not_preserve_structure
 #print axioms equivalence_not_naturalFamily
 #print axioms equivalence_does_not_give_a_natural_family
 #print axioms numericalResemblance_not_sharedReceiverFace

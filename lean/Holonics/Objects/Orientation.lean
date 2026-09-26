@@ -6,8 +6,8 @@ import Holonics.Objects.Pairing
 [definition] Object 1 of `docs/ELEMENTARY_OBJECTS.md`: orientation exists only in the pairing, and
 a cycle of cells whose `±1` joint relations multiply to `−1` admits no orientation
 (`Objects/Pairing.no_orientation_of_reversing_cycle`). This module restates that theorem for
-cycles of named faces on any carrier and derives from it the intended content of
-`Transport/JunctionLaw.no_consistent_orientation_on_a_reversing_loop`.
+cycles of named faces on any carrier and derives from it the intended content of the retired
+`Transport/JunctionLaw` statement that a reversing loop admits no consistent orientation.
 
 [proved-derived; formal-checked] What is proved.
 
@@ -19,8 +19,7 @@ cycles of named faces on any carrier and derives from it the intended content of
    (`preserving_simple_cycle_has_orientation`), extending `orientation_of_preserving_cycle`
    off the cycle by `+1`.
 3. **The Junction statement is the one-face case.** With one face and the relation `−1` on its
-   self-joint, (1) returns exactly the proposition of
-   `JunctionLaw.no_consistent_orientation_on_a_reversing_loop`
+   self-joint, (1) returns exactly the proposition the retired JunctionLaw statement asserted
    (`junction_statement_from_cycle`). That proposition carries no loop datum: the unit clause
    alone forces `s () · s () = 1` for every sign (`junction_hypothesis_is_refuted_by_unit_alone`),
    so its `−1` conjunct is refuted before any loop is read; it is subsumed, not strengthened.

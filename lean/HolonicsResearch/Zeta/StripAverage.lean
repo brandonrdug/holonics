@@ -183,9 +183,6 @@ theorem prod_σ'_of_invariant (hc : ConjSymm f) {t : Finset ↥(upper f)}
   · intro i _; exact σ'_σ' hc i
   · intro i _; rfl
 
-theorem sym_invariant (hc : ConjSymm f) (s : Finset ↥(upper f)) (i : ↥(upper f)) :
-    σ' hc i ∈ sym hc s ↔ i ∈ sym hc s := σ'_mem_sym_iff hc s i
-
 /-- The square of a symmetric product is the product of the paired factors. -/
 theorem sq_prod_eq (hc : ConjSymm f) {t : Finset ↥(upper f)} (ht : ∀ i, σ' hc i ∈ t ↔ i ∈ t)
     (w : ℂ) :
@@ -271,7 +268,7 @@ theorem norm_translate_lt (hc : ConjSymm f) (hnr : NoRealZero f) {Δ μ : ℝ} (
   have hfin : ∀ s : Finset ↥(upper f), i₀ ∈ s →
       ∏ i ∈ sym hc s, ‖1 + a (i : Idx f) (ζ + μ)‖ ≤
         ρ * ∏ i ∈ sym hc s, ‖1 + a (i : Idx f) (ζ - μ)‖ :=
-    fun s hs' => prod_le_margin hc hμ hΔ hζ hs.le i₀ (sym_invariant hc s) (subset_sym hc s hs')
+    fun s hs' => prod_le_margin hc hμ hΔ hζ hs.le i₀ (σ'_mem_sym_iff hc s) (subset_sym hc s hs')
       hρ0 hρ
   have hp : Tendsto (fun s : Finset ↥(upper f) => ‖∏ i ∈ sym hc s, (1 + a (i : Idx f) (ζ + μ))‖)
       atTop (𝓝 ‖Qplus f (ζ + μ)‖) :=

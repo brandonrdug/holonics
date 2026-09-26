@@ -97,20 +97,6 @@ def dyadicHodgeSubsetGap (face : CoordinateFace 3) (q : UnitAddTorus (Fin 3)) : 
 
 /-! ## Exact Abel returns on all eight faces -/
 
-/-- Empty face: the direct kernel is already the centered finite synthesis. -/
-theorem dyadicHodgeJacobianKernelEntry_emptyAbel
-    (scale : ℕ) (component coordinate input : Fin 3)
-    (q : UnitAddTorus (Fin 3)) :
-    dyadicHodgeJacobianKernelEntry scale component coordinate input q =
-      UnitAddTorus.mFourier (dyadicHodgeApertureBaseFrequency scale) q *
-        finiteCharacterSynthesisThree
-          (dyadicHodgeCubeCoefficient scale component coordinate input)
-          (fourier 1 (q 0)) (fourier 1 (q 1)) (fourier 1 (q 2))
-          (dyadicHodgeApertureCount scale) (dyadicHodgeApertureCount scale)
-          (dyadicHodgeApertureCount scale) :=
-  dyadicHodgeJacobianKernelEntry_eq_centeredSynthesis
-    scale component coordinate input q
-
 /-- Singleton face `{1}`. -/
 theorem dyadicHodgeJacobianKernelEntry_secondAbel
     (scale : ℕ) (component coordinate input : Fin 3)
@@ -335,7 +321,7 @@ theorem dyadicHodgeJacobianKernelEntry_subsetAbel
     subst face
     simpa [dyadicHodgeSubsetGap, dyadicHodgeCubeSubsetDifference,
       dyadicHodgeSubsetCount] using
-        dyadicHodgeJacobianKernelEntry_emptyAbel
+        dyadicHodgeJacobianKernelEntry_eq_centeredSynthesis
           scale component coordinate input q
 
 /-- The seven identities above together with the already proved first-coordinate and full mixed

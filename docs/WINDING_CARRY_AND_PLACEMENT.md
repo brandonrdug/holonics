@@ -173,7 +173,7 @@ holonomy_trace_is_gauge_free, holonomy_determinant_is_gauge_free
 cell_flux_is_gauge_free              d₁(A + d₀φ) = d₁A
 dormant_mode_is_locally_silent       harmonic ⇒ no flux through any cell, no divergence at any node
 dormant_mode_is_not_a_potential      a harmonic gradient is zero
-closed_field_retains_one_dormant_mode (existence); closed_field_retains_unique_harmonic_mode (uniqueness)
+HodgeReceiver.harmonic_meets_every_class (existence); closed_field_retains_unique_harmonic_mode (uniqueness)
 ```
 
 [definition] For matrix transports the gauge-free faces are the class functions of §3, which

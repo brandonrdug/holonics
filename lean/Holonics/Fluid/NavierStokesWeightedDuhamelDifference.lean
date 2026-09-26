@@ -66,25 +66,6 @@ theorem norm_weightedLerayQuadratic_sub_le
 
 /-! ## Heat transport of a two-path difference -/
 
-/-- Componentwise heat smoothing obeys the scalar one-derivative operator bound. -/
-private theorem norm_vectorHeatTwoToThree_le
-    (nu tau : ℝ≥0) (hviscous : 0 < (nu : ℝ) * (tau : ℝ))
-    (state : PeriodicVectorWeightedSobolev 2) :
-    ‖periodicVectorWeightedHeatTwoToThree nu tau hviscous state‖ ≤
-      Real.sqrt (heatOneStepSquaredConstant (nu : ℝ) (tau : ℝ)) * ‖state‖ := by
-  have hconstant : 0 ≤
-      Real.sqrt (heatOneStepSquaredConstant (nu : ℝ) (tau : ℝ)) * ‖state‖ :=
-    mul_nonneg (Real.sqrt_nonneg _) (norm_nonneg _)
-  rw [pi_norm_le_iff_of_nonneg hconstant]
-  intro component
-  calc
-    ‖periodicWeightedHeatTwoToThree nu tau hviscous (state component)‖ ≤
-        Real.sqrt (heatOneStepSquaredConstant (nu : ℝ) (tau : ℝ)) *
-          ‖state component‖ :=
-      norm_periodicWeightedHeatTwoToThree_le nu tau hviscous (state component)
-    _ ≤ Real.sqrt (heatOneStepSquaredConstant (nu : ℝ) (tau : ℝ)) * ‖state‖ :=
-      mul_le_mul_of_nonneg_left (norm_le_pi_norm state component) (Real.sqrt_nonneg _)
-
 /-- Before imposing a path ball, the actual endpoint-totalized Duhamel integrands have the exact
 two-path heat-kernel bound. -/
 theorem norm_weightedDuhamelIntegrand_sub_le
@@ -105,7 +86,7 @@ theorem norm_weightedDuhamelIntegrand_sub_le
         Real.sqrt (heatOneStepSquaredConstant (nu : ℝ) (t - s)) *
           ‖weightedLerayQuadratic (u s) - weightedLerayQuadratic (v s)‖ := by
         simpa only [coe_positiveElapsed] using
-          norm_vectorHeatTwoToThree_le nu (positiveElapsed t s hs)
+          norm_periodicVectorWeightedHeatTwoToThree_le nu (positiveElapsed t s hs)
             (mul_pos hnu (sub_pos.mpr hs))
             (weightedLerayQuadratic (u s) - weightedLerayQuadratic (v s))
       _ ≤ Real.sqrt (heatOneStepSquaredConstant (nu : ℝ) (t - s)) *

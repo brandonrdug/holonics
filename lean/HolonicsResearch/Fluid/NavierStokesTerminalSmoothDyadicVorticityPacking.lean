@@ -440,7 +440,7 @@ theorem openPeriodicSmoothDyadicVorticityBandSpatialSup_le_sqrt_card_mul_sqrt_se
   exact mul_le_mul_of_nonneg_left (Real.sqrt_le_sqrt hcoeff)
     (Real.sqrt_nonneg _)
 
-private theorem adjacentDyadicFrequencyShell_disjoint (scale : ℕ) :
+theorem adjacentDyadicFrequencyShell_disjoint (scale : ℕ) :
     Disjoint (dyadicFrequencyShell scale) (dyadicFrequencyShell (scale + 1)) := by
   rw [Finset.disjoint_left]
   intro frequency hfirst hsecond

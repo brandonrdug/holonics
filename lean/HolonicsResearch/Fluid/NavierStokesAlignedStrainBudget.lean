@@ -210,7 +210,7 @@ theorem vorticitySquare_law
   have htS : t < S := by rw [hS]; linarith [ht.2]
   have hbal := smoothSolutionOn_pointwiseVorticityBalance_inner
     (solution.toClosedInterior hS0 hST).toSmoothSolutionOn ht.1 htS x
-  rw [vorticityField_zero, inner_zero_left, add_zero] at hbal
+  rw [Holonics.Fluid.NavierStokesVorticityThreeStrands.vorticityField_zero, inner_zero_left, add_zero] at hbal
   -- time differential
   have hnhds : openTimeSlab T ∈ 𝓝 t :=
     Filter.mem_of_superset (Ioo_mem_nhds ht.1 ht.2) Ioo_subset_Ico_self

@@ -60,28 +60,6 @@ theorem projectiveTransportHermitianHalfLengthSquare_eq_ofReal
 
 /-! ## Exact horizontal conservation -/
 
-private theorem hermitianPairing_smul_right
-    (left right : ComplexVector) (scale : ℂ) :
-    complexVectorHermitianPairing left (scale • right) =
-      scale * complexVectorHermitianPairing left right := by
-  unfold complexVectorHermitianPairing
-  rw [Finset.mul_sum]
-  apply Finset.sum_congr rfl
-  intro component _hcomponent
-  simp only [Pi.smul_apply, smul_eq_mul]
-  ring
-
-private theorem hermitianPairing_smul_left
-    (left right : ComplexVector) (scale : ℂ) :
-    complexVectorHermitianPairing (scale • left) right =
-      (starRingEnd ℂ) scale * complexVectorHermitianPairing left right := by
-  unfold complexVectorHermitianPairing
-  rw [Finset.mul_sum]
-  apply Finset.sum_congr rfl
-  intro component _hcomponent
-  simp only [Pi.smul_apply, smul_eq_mul, map_mul]
-  ring
-
 private theorem hermitianPairing_swap
     (left right : ComplexVector) :
     complexVectorHermitianPairing right left =
@@ -92,41 +70,6 @@ private theorem hermitianPairing_swap
   intro component _hcomponent
   simp only [map_mul, starRingEnd_self_apply]
   ring
-
-/-- The derivative of the Hermitian square along real time. -/
-private theorem hasDerivAt_complexVectorHermitianSquare
-    {coefficient : ℝ → ComplexVector} {derivative : ComplexVector} {time : ℝ}
-    (hcoefficient : HasDerivAt coefficient derivative time) :
-    HasDerivAt
-      (fun τ ↦ complexVectorHermitianPairing (coefficient τ) (coefficient τ))
-      (complexVectorHermitianPairing derivative (coefficient time) +
-        complexVectorHermitianPairing (coefficient time) derivative) time := by
-  unfold complexVectorHermitianPairing
-  have hcomponent : ∀ component : Fin 3,
-      HasDerivAt
-        (fun τ ↦ (starRingEnd ℂ) (coefficient τ component) *
-          coefficient τ component)
-        ((starRingEnd ℂ) (derivative component) * coefficient time component +
-          (starRingEnd ℂ) (coefficient time component) * derivative component) time := by
-    intro component
-    have hcoordinate :=
-      (((ContinuousLinearMap.proj component : ComplexVector →L[ℝ] ℂ).hasFDerivAt.comp
-        time hcoefficient.hasFDerivAt).hasDerivAt)
-    simp only [ContinuousLinearMap.comp_apply,
-          ContinuousLinearMap.toSpanSingleton_apply_one,
-          ContinuousLinearMap.proj_apply] at hcoordinate
-    have hconjugate :=
-      (Complex.conjCLE.hasFDerivAt.comp time hcoordinate.hasFDerivAt).hasDerivAt
-    convert! hconjugate.mul hcoordinate using 1
-    all_goals
-      simp only [Function.comp_apply, Complex.conjCLE_apply,
-        ContinuousLinearMap.comp_apply,
-        ContinuousLinearMap.toSpanSingleton_apply_one,
-        ContinuousLinearMap.proj_apply]
-      rfl
-  have hsum := HasDerivAt.fun_sum (u := (Finset.univ : Finset (Fin 3)))
-    fun component _hcomponent ↦ hcomponent component
-  simpa only [Finset.sum_add_distrib] using hsum
 
 private theorem transported_horizontal_pairing_eq_zero
     (transport : ℂ) (mode modeJet : ComplexVector) :

@@ -872,7 +872,7 @@ def sharpHeatSecondDerivativeH2Constant : ℝ :=
   Real.sqrt (8 * gaussianLineUnitMass ^ 3 *
     (1 + Real.pi ^ (3 / 2 : ℝ)))
 
-private theorem sqrt_mul_rpow_neg_half
+theorem sqrt_mul_rpow_neg_half
     (C x : ℝ) (hC : 0 ≤ C) (hx : 0 < x) :
     Real.sqrt (C * x ^ (-1 / 2 : ℝ)) =
       Real.sqrt C * x ^ (-1 / 4 : ℝ) := by

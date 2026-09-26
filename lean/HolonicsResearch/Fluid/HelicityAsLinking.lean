@@ -68,9 +68,6 @@ theorem helicityForm_reading (p : Population) (Γ : Carrier 3) :
 
 /-! ## The reconnection jump -/
 
-theorem net_cons (c : Crossing) (p : Population) : net (c :: p) = handSign c.hand + net p := by
-  simp [net]
-
 /-- One crossing moves the pairwise reading by its sign exactly on the pairs it meets. -/
 theorem linkingNet_cons (c : Crossing) (p : Population) (i j : Strand) :
     linkingNet (c :: p) i j =

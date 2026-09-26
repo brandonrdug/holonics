@@ -287,7 +287,7 @@ theorem continuous_positiveElapsedBefore (t : ℝ) :
   exact (continuous_real_toNNReal.comp
     (continuous_const.sub continuous_subtype_val)).subtype_mk _
 
-private theorem positiveElapsedBefore_eq
+theorem positiveElapsedBefore_eq
     (t : ℝ) (s : Iio t) :
     (positiveElapsedBefore t s).1 = positiveElapsed t s.1 s.2 := by
   apply NNReal.eq

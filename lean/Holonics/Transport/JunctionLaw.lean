@@ -462,19 +462,6 @@ theorem closed_walk_holonomy_one (sign : Face → ℤ) (unit : ∀ f, sign f * s
     walkHolonomy sign (first :: rest) = 1 := by
   rw [walkHolonomy_telescopes sign unit first rest, closed, unit first]
 
-/-- [historical; formal-checked] Vacuous as stated: `sign () * sign () = −1` is refuted by the unit
-clause alone and carries no loop datum (`Objects/Orientation.junction_hypothesis_is_refuted_by_unit_alone`).
-The content is `Objects/Orientation.reversing_closed_walk_has_no_orientation`; this is its one-face case
-(`junction_statement_from_cycle`). Original heading: **And a reversing loop admits no consistent assignment.** A
-dual edge whose required relation is `−1` between a face and itself — the Möbius seam — has no
-sign. Non-orientability is exhibited by the closed path, never counted. The tube-level form of the
-same obstruction is `Transport/ContinuingTube.lean::flipCircuit_carries_no_invariant_end`. -/
-theorem no_consistent_orientation_on_a_reversing_loop :
-    ¬ ∃ sign : Unit → ℤ, (∀ f, sign f * sign f = 1) ∧ sign () * sign () = -1 := by
-  rintro ⟨sign, unit, reversing⟩
-  rw [unit ()] at reversing
-  exact absurd reversing (by decide)
-
 /-- [proved-derived; formal-checked] **A circuit of `k` reflections has determinant `(−1)^k`.** -/
 theorem reflection_circuit_determinant (k : ℕ) :
     (List.replicate k (-1 : ℤ)).prod = (-1) ^ k := by
@@ -783,7 +770,6 @@ section Audit
 #print axioms each_junction_costs_one_euler
 #print axioms walkHolonomy_telescopes
 #print axioms closed_walk_holonomy_one
-#print axioms no_consistent_orientation_on_a_reversing_loop
 #print axioms reflection_circuit_determinant
 #print axioms orientation_reversing_iff_odd
 #print axioms innerQ_self_nonneg

@@ -219,14 +219,6 @@ theorem tailCrossEntropyReceiver_no_identitySuccessorFactor :
   exact tailCrossEntropyReceiver.no_successor_factor_of_equal_face id
     tailCrossEntropyReceiver_equalFace Bool.false_ne_true
 
-/-- The already-proved binary normalized exponential quotient supplies the common-shift gauge face
-used by a two-member probability receiver. -/
-theorem binaryNormalizedExponential_commonShift
-    (firstPotential secondPotential common : ℝ) :
-    binaryExponentialFace (firstPotential + common) (secondPotential + common) =
-      binaryExponentialFace firstPotential secondPotential :=
-  binaryExponentialFace_add_common firstPotential secondPotential common
-
 section Audit
 
 #print axioms membraneCurrent_rebase
@@ -238,7 +230,6 @@ section Audit
 #print axioms distinct_sections_equal_crossEntropy
 #print axioms tailCrossEntropyReceiver_equalFace
 #print axioms tailCrossEntropyReceiver_no_identitySuccessorFactor
-#print axioms binaryNormalizedExponential_commonShift
 
 end Audit
 

@@ -131,7 +131,7 @@ theorem dyadicParabolicClockBudget_eq_viscosityInv_mul_quarterPow
       nu⁻¹ * ((4 : ℝ)⁻¹) ^ scale := by
   simp [dyadicParabolicClockBudget, mul_inv_rev, inv_pow, mul_comm]
 
-private theorem intervalIntegral_reflected_heatStokesMultiplier_le_scaleBudget
+theorem intervalIntegral_reflected_heatStokesMultiplier_le_scaleBudget
     {nu s t : ℝ} (hnu : 0 < nu) (hst : s ≤ t)
     {scale : ℕ} {frequency : SpatialFrequency}
     (hfrequency : frequency ∈

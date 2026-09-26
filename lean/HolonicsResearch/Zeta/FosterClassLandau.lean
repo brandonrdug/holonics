@@ -81,12 +81,6 @@ structure SymmetricZeroFactorizationOf (f : ℂ → ℂ) (r : ℝ) extends
   /-- The multiplicities are the divisor's. -/
   mult_eq_div : ∀ ρ, (mult ρ : ℤ) = MeromorphicOn.divisor f (ball (1 / 2 : ℂ) r) ρ
 
-theorem one_sub_mem_ball_half_iff {R : ℝ} (u : ℂ) :
-    (1 - u) ∈ ball (1 / 2 : ℂ) R ↔ u ∈ ball (1 / 2 : ℂ) R := by
-  simp only [Metric.mem_ball, Complex.dist_eq]
-  have : (1 - u) - (1 / 2 : ℂ) = -(u - 1 / 2) := by ring
-  rw [this, norm_neg]
-
 /-- The divisor on an open disc centred at `½` is reflection symmetric. -/
 theorem divisor_one_sub_ball [hf : FosterClass f A B σ] {R : ℝ} (u : ℂ) :
     MeromorphicOn.divisor f (ball (1 / 2 : ℂ) R) (1 - u) =

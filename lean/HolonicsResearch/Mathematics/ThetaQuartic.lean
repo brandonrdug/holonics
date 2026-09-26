@@ -55,25 +55,6 @@ private lemma norm_shift {t : ℝ} (ht : 0 < t) (a : ℝ) :
 
 /-! ## 1. The lattice face of the shifted square -/
 
-private lemma T2_sq {t : ℝ} (ht : 0 < t) :
-    T2 t ^ 2 = ∑' p : ℤ × ℤ,
-      rexp (-π * t * (((p.1 : ℝ) + 1 / 2) ^ 2 + ((p.2 : ℝ) + 1 / 2) ^ 2)) := by
-  rw [T2, sq, tsum_mul_tsum_of_summable_norm (norm_shift ht (1 / 2))
-    (norm_shift ht (1 / 2))]
-  refine tsum_congr fun p => ?_
-  rw [← Real.exp_add]
-  congr 1
-  ring
-
-private lemma summable_L2 {t : ℝ} (ht : 0 < t) :
-    Summable fun p : ℤ × ℤ =>
-      rexp (-π * t * (((p.1 : ℝ) + 1 / 2) ^ 2 + ((p.2 : ℝ) + 1 / 2) ^ 2)) := by
-  refine (summable_mul_of_summable_norm (norm_shift ht (1 / 2))
-    (norm_shift ht (1 / 2))).congr fun p => ?_
-  rw [← Real.exp_add]
-  congr 1
-  ring
-
 /-! ## 2. The even and odd cells both carry the product -/
 
 private def D : ℤ × ℤ → ℤ × ℤ := fun q => (q.1 + q.2, q.1 - q.2)

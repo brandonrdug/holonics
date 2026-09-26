@@ -27,69 +27,6 @@ open Holonics.Hodge.HodgeSphereChainCurrent
 open Holonics.Hodge.HodgeSphereProductRulingCycles
 open Holonics.Hodge.HodgeSphereLowDegreeHomology
 
-/-- Exact coefficient product of two finite occurrence populations. -/
-def pairCurrent {Left Right : Type*} (left : Current Left) (right : Current Right) :
-    Current (Left × Right) :=
-  finsuppTensorFinsupp' ℚ Left Right (left ⊗ₜ[ℚ] right)
-
-@[simp]
-theorem pairCurrent_generator {Left Right : Type*} (left : Left) (right : Right) :
-    pairCurrent (generator left) (generator right) = generator (left, right) := by
-  simp [pairCurrent, generator]
-
-@[simp]
-theorem pairCurrent_add_left {Left Right : Type*}
-    (left₁ left₂ : Current Left) (right : Current Right) :
-    pairCurrent (left₁ + left₂) right =
-      pairCurrent left₁ right + pairCurrent left₂ right := by
-  simp [pairCurrent, TensorProduct.add_tmul]
-
-@[simp]
-theorem pairCurrent_add_right {Left Right : Type*}
-    (left : Current Left) (right₁ right₂ : Current Right) :
-    pairCurrent left (right₁ + right₂) =
-      pairCurrent left right₁ + pairCurrent left right₂ := by
-  simp [pairCurrent, TensorProduct.tmul_add]
-
-@[simp]
-theorem pairCurrent_smul_left {Left Right : Type*}
-    (coefficient : ℚ) (left : Current Left) (right : Current Right) :
-    pairCurrent (coefficient • left) right = coefficient • pairCurrent left right := by
-  simp [pairCurrent, TensorProduct.smul_tmul]
-
-@[simp]
-theorem pairCurrent_smul_right {Left Right : Type*}
-    (coefficient : ℚ) (left : Current Left) (right : Current Right) :
-    pairCurrent left (coefficient • right) = coefficient • pairCurrent left right := by
-  simp [pairCurrent, TensorProduct.tmul_smul]
-
-@[simp]
-theorem pairCurrent_zero_right {Left Right : Type*} (left : Current Left) :
-    pairCurrent left (0 : Current Right) = 0 := by
-  simpa using pairCurrent_smul_right (Left := Left) (Right := Right) 0 left 0
-
-@[simp]
-theorem pairCurrent_neg_left {Left Right : Type*}
-    (left : Current Left) (right : Current Right) :
-    pairCurrent (-left) right = -pairCurrent left right := by
-  simpa only [neg_smul, one_smul] using
-    pairCurrent_smul_left (Left := Left) (Right := Right) (-1) left right
-
-@[simp]
-theorem pairCurrent_neg_right {Left Right : Type*}
-    (left : Current Left) (right : Current Right) :
-    pairCurrent left (-right) = -pairCurrent left right := by
-  simpa only [neg_smul, one_smul] using
-    pairCurrent_smul_right (Left := Left) (Right := Right) (-1) left right
-
-@[simp]
-theorem pairCurrent_sub_right {Left Right : Type*}
-    (left : Current Left) (right₁ right₂ : Current Right) :
-    pairCurrent left (right₁ - right₂) =
-      pairCurrent left right₁ - pairCurrent left right₂ := by
-  rw [sub_eq_add_neg, pairCurrent_add_right, pairCurrent_neg_right]
-  simp only [sub_eq_add_neg]
-
 /-- [definition] Reverse the presented orientation of a pair current.  This is the exact
 polarity change for the pair axis; it changes no occurrence coefficient and forgets no lineage. -/
 def flipPair {Left Right : Type*} :
@@ -142,92 +79,22 @@ theorem flipPair_involutive {Left Right : Type*}
           coefficient • generator (left, right) by simp [generator]]
       simp
 
-/-- [definition] Apply a linear transport to the incidence currently presented first. -/
-def mapPairLeft {Left Left' Right : Type*}
-    (transport : Current Left →ₗ[ℚ] Current Left') :
-    Current (Left × Right) →ₗ[ℚ] Current (Left' × Right) :=
-  extend fun pair => pairCurrent (transport (generator pair.1)) (generator pair.2)
-
-/-- [definition] Apply a linear transport to the incidence presented second.  This is not a
-second implementation: reverse the pair orientation, use the first-incidence action, then reverse
-the receiver orientation back. -/
-def mapPairRight {Left Right Right' : Type*}
-    (transport : Current Right →ₗ[ℚ] Current Right') :
-    Current (Left × Right) →ₗ[ℚ] Current (Left × Right') :=
-  flipPair.comp ((mapPairLeft transport).comp flipPair)
-
-@[simp]
-theorem mapPairLeft_generator {Left Left' Right : Type*}
-    (transport : Current Left →ₗ[ℚ] Current Left') (left : Left) (right : Right) :
-    mapPairLeft transport (generator (left, right)) =
-      pairCurrent (transport (generator left)) (generator right) := by
-  exact extend_generator _ _
-
-@[simp]
-theorem mapPairRight_generator {Left Right Right' : Type*}
-    (transport : Current Right →ₗ[ℚ] Current Right') (left : Left) (right : Right) :
-    mapPairRight transport (generator (left, right)) =
-      pairCurrent (generator left) (transport (generator right)) := by
-  simp [mapPairRight, LinearMap.comp_apply]
-
-/-- [proved-derived; formal-checked] Pair transport acts on the complete left current, not only
-on generators. -/
-theorem mapPairLeft_pairCurrent {Left Left' Right : Type*}
-    (transport : Current Left →ₗ[ℚ] Current Left')
-    (left : Current Left) (right : Current Right) :
-    mapPairLeft transport (pairCurrent left right) =
-      pairCurrent (transport left) right := by
-  induction left using Finsupp.induction_linear generalizing right with
-  | zero => simp [pairCurrent]
-  | add left₁ left₂ hleft₁ hleft₂ =>
-      simp only [pairCurrent_add_left, map_add, hleft₁, hleft₂]
-  | single leftOccurrence leftCoefficient =>
-      induction right using Finsupp.induction_linear with
-      | zero => simp [pairCurrent]
-      | add right₁ right₂ hright₁ hright₂ =>
-          simp only [pairCurrent_add_right, map_add, hright₁, hright₂]
-      | single rightOccurrence rightCoefficient =>
-          rw [show Finsupp.single leftOccurrence leftCoefficient =
-              leftCoefficient • generator leftOccurrence by simp [generator],
-            show Finsupp.single rightOccurrence rightCoefficient =
-              rightCoefficient • generator rightOccurrence by simp [generator]]
-          simp only [pairCurrent_smul_left, pairCurrent_smul_right, map_smul,
-            pairCurrent_generator, mapPairLeft_generator]
-
-/-- [proved-derived; formal-checked] Pair transport acts on the complete right current. -/
-theorem mapPairRight_pairCurrent {Left Right Right' : Type*}
+/-- [proved-derived; formal-checked] The second-incidence action is the first-incidence action read
+through the pair flip: `mapPairRight` (owned by `Foundation/ProductDegreeTwo`) is not a second
+implementation. -/
+theorem mapPairRight_eq_flip {Left Right Right' : Type*}
     (transport : Current Right →ₗ[ℚ] Current Right')
-    (left : Current Left) (right : Current Right) :
-    mapPairRight transport (pairCurrent left right) =
-      pairCurrent left (transport right) := by
-  simp [mapPairRight, LinearMap.comp_apply, mapPairLeft_pairCurrent]
-
-/-- [proved-derived; formal-checked] Successive transports on one pair incidence compose. -/
-theorem mapPairLeft_comp {Left Middle Target Right : Type*}
-    (outer : Current Middle →ₗ[ℚ] Current Target)
-    (inner : Current Left →ₗ[ℚ] Current Middle)
     (current : Current (Left × Right)) :
-    mapPairLeft outer (mapPairLeft inner current) =
-      mapPairLeft (outer.comp inner) current := by
+    mapPairRight transport current = flipPair (mapPairLeft transport (flipPair current)) := by
   induction current using Finsupp.induction_linear with
   | zero => simp
-  | add left right hleft hright => simp [hleft, hright]
+  | add left right hleft hright => simp only [map_add, hleft, hright]
   | single pair coefficient =>
       rcases pair with ⟨leftOccurrence, rightOccurrence⟩
       rw [show Finsupp.single (leftOccurrence, rightOccurrence) coefficient =
           coefficient • generator (leftOccurrence, rightOccurrence) by simp [generator]]
-      simp only [map_smul, mapPairLeft_generator,
-        mapPairLeft_pairCurrent, LinearMap.comp_apply]
-
-/-- [proved-derived; formal-checked] Successive right-incidence transports compose. -/
-theorem mapPairRight_comp {Left Right Middle Target : Type*}
-    (outer : Current Middle →ₗ[ℚ] Current Target)
-    (inner : Current Right →ₗ[ℚ] Current Middle)
-    (current : Current (Left × Right)) :
-    mapPairRight outer (mapPairRight inner current) =
-      mapPairRight (outer.comp inner) current := by
-  simp only [mapPairRight, LinearMap.comp_apply]
-  rw [flipPair_involutive, mapPairLeft_comp]
+      simp only [map_smul, flipPair_generator, mapPairRight_generator, mapPairLeft_generator,
+        flipPair_pairCurrent]
 
 /-- [proved-derived; formal-checked] Acting on the second incidence after reorientation is exactly
 reorientation after acting on the presented incidence. -/
@@ -237,25 +104,7 @@ theorem mapPairRight_flipPair
     (current : Current (Left × Right)) :
     mapPairRight transport (flipPair current) =
       flipPair (mapPairLeft transport current) := by
-  simp [mapPairRight, LinearMap.comp_apply]
-
-/-- [proved-derived; formal-checked] Independent incidence transports commute exactly. -/
-theorem mapPairLeft_right_commute
-    {Left Left' Right Right' : Type*}
-    (leftTransport : Current Left →ₗ[ℚ] Current Left')
-    (rightTransport : Current Right →ₗ[ℚ] Current Right')
-    (current : Current (Left × Right)) :
-    mapPairLeft leftTransport (mapPairRight rightTransport current) =
-      mapPairRight rightTransport (mapPairLeft leftTransport current) := by
-  induction current using Finsupp.induction_linear with
-  | zero => simp
-  | add left right hleft hright => simp [hleft, hright]
-  | single pair coefficient =>
-      rcases pair with ⟨leftOccurrence, rightOccurrence⟩
-      rw [show Finsupp.single (leftOccurrence, rightOccurrence) coefficient =
-          coefficient • generator (leftOccurrence, rightOccurrence) by simp [generator]]
-      simp only [map_smul, mapPairLeft_generator, mapPairRight_generator,
-        mapPairLeft_pairCurrent, mapPairRight_pairCurrent]
+  rw [mapPairRight_eq_flip, flipPair_involutive]
 
 /-! ## Exact degree-zero contraction at the geometric ruling basepoint -/
 
@@ -548,7 +397,7 @@ theorem mapPairRight_sphereOneContraction_boundary
       current -
         mapPairRight sphereZeroContraction
           (mapPairRight (sphereCurrentBoundary 0) current) := by
-  simp only [mapPairRight, LinearMap.comp_apply]
+  simp only [mapPairRight_eq_flip]
   rw [flipPair_involutive,
     mapPairLeft_sphereOneContraction_boundary,
     map_sub, flipPair_involutive]
@@ -719,7 +568,7 @@ theorem mapPairRight_sphereBoundary_sq
     (current : Current (Left × SphereSimplex 2)) :
     mapPairRight (sphereCurrentBoundary 0)
         (mapPairRight (sphereCurrentBoundary 1) current) = 0 := by
-  simp only [mapPairRight, LinearMap.comp_apply]
+  simp only [mapPairRight_eq_flip]
   rw [flipPair_involutive, mapPairLeft_sphereBoundary_sq, map_zero]
 
 /-! ## Graded polarity of the total product complex -/

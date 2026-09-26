@@ -166,20 +166,6 @@ theorem openPeriodicDyadicSpatialCrossCoherenceMass_le_canonicalBalancedScaleCur
           solution t q scale hLpos hhighPos hlowPos
         simpa [canonicalBalancedScaleCurrent, L, high, low] using hbound
 
-/-- An alternative unconditional inhabitant of the strict-interior spatial receiver, obtained by
-factoring every actual cross-coherence mass through the canonical balanced direction current. -/
-theorem openPeriodicDyadicSpatialCrossCoherenceSummable_canonical
-    {T nu : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
-    {pressure : PressureField}
-    (solution : OpenPeriodicSolutionOn T nu initial force velocity pressure)
-    (t : Set.Ioo 0 T) (q : SpatialTorus) :
-    OpenPeriodicDyadicSpatialCrossCoherenceSummable solution t q := by
-  exact Summable.of_nonneg_of_le
-    (fun scale ↦ openPeriodicDyadicSpatialCrossCoherenceMass_nonneg solution t q scale)
-    (openPeriodicDyadicSpatialCrossCoherenceMass_le_canonicalBalancedScaleCurrent
-      solution t q)
-    ((summable_canonicalBalancedScaleCurrent solution t q).mul_left 18)
-
 /-- The complete infinite-depth spatial cross mass is quantitatively paid by the complete
 canonical balanced-current word. -/
 theorem openPeriodicFullSpatialCrossCoherenceMass_le_canonicalBalancedScaleCurrent
@@ -194,7 +180,7 @@ theorem openPeriodicFullSpatialCrossCoherenceMass_le_canonicalBalancedScaleCurre
     (∑' scale : ℕ,
         openPeriodicDyadicSpatialCrossCoherenceMass solution t q scale) ≤
         ∑' scale : ℕ, 18 * canonicalBalancedScaleCurrent solution t q scale :=
-      (openPeriodicDyadicSpatialCrossCoherenceSummable_canonical solution t q).tsum_le_tsum
+      (Holonics.Fluid.NavierStokesVorticityDirectionSourceModulus.openPeriodicDyadicSpatialCrossCoherenceSummable_inhabited solution t q).tsum_le_tsum
         (openPeriodicDyadicSpatialCrossCoherenceMass_le_canonicalBalancedScaleCurrent
           solution t q)
         ((summable_canonicalBalancedScaleCurrent solution t q).mul_left 18)
@@ -230,7 +216,7 @@ theorem abs_openPeriodicPhysicalVortexStretchingAt_le_canonicalBalancedScaleCurr
             complexVectorL1 (openPeriodicComplexVorticityAt solution t q) ^ 2 :=
       abs_openPeriodicPhysicalVortexStretchingAt_le_fullSpatialCrossCoherence
         solution t q
-          (openPeriodicDyadicSpatialCrossCoherenceSummable_canonical solution t q)
+          (Holonics.Fluid.NavierStokesVorticityDirectionSourceModulus.openPeriodicDyadicSpatialCrossCoherenceSummable_inhabited solution t q)
     _ ≤ _ := by
       have hfull :=
         openPeriodicFullSpatialCrossCoherenceMass_le_canonicalBalancedScaleCurrent
@@ -250,7 +236,6 @@ theorem abs_openPeriodicPhysicalVortexStretchingAt_le_canonicalBalancedScaleCurr
 section Audit
 
 #print axioms openPeriodicDyadicSpatialCrossCoherenceMass_le_canonicalBalancedScaleCurrent
-#print axioms openPeriodicDyadicSpatialCrossCoherenceSummable_canonical
 #print axioms openPeriodicFullSpatialCrossCoherenceMass_le_canonicalBalancedScaleCurrent
 #print axioms abs_openPeriodicPhysicalVortexStretchingAt_le_canonicalBalancedScaleCurrent
 

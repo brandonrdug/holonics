@@ -1,6 +1,7 @@
 import HolonicsResearch.Fluid.NavierStokesFiniteNativeQuadraticCoefficientBridge
 import Holonics.Fluid.NavierStokesWeightedMildInvariantRestart
 import Mathlib.MeasureTheory.Integral.DominatedConvergence
+import Holonics.Fluid.NavierStokesFinitePicardVolterraMass
 
 /-!
 # Finite Picard chronology as native continuous weighted paths
@@ -122,112 +123,6 @@ theorem weightedH3State_eq_of_physicalCoefficient_eq
 
 /-! ## Clock continuity of the finite chronology -/
 
-theorem continuous_finiteProjectedAdvectiveCoefficient
-    (aperture : Finset SpatialFrequency)
-    (advecting transported : ℝ → ComplexFourierModePopulation)
-    (output : SpatialFrequency)
-    (hadvecting : ∀ frequency,
-      Continuous fun time ↦ advecting time frequency)
-    (htransported : ∀ frequency,
-      Continuous fun time ↦ transported time frequency) :
-    Continuous fun time ↦
-      finiteProjectedAdvectiveCoefficient aperture
-        (advecting time) (transported time) output := by
-  unfold finiteProjectedAdvectiveCoefficient finiteAdvectiveCoefficient
-  by_cases houtput : output = 0
-  · subst output
-    simp only [lerayProjectMode_zero]
-    apply continuous_finsetSum
-    intro parent _hparent
-    unfold complexAdvectiveInteraction complexDot
-    fun_prop
-  · simp_rw [lerayProjectMode, if_neg houtput]
-    unfold complexAdvectiveInteraction complexDot
-    fun_prop
-
-theorem continuous_diagonalHeatModeTransport_fixedTarget
-    (nu targetTime : ℝ) (field : ℝ → ComplexFourierModePopulation)
-    (frequency : SpatialFrequency)
-    (hfield : Continuous fun sourceTime ↦ field sourceTime frequency) :
-    Continuous fun sourceTime ↦
-      diagonalHeatModeTransport nu (targetTime - sourceTime)
-        (field sourceTime) frequency := by
-  unfold diagonalHeatModeTransport heatStokesMultiplier
-  fun_prop
-
-/-- Every fixed Fourier mode of every finite heat-seeded generation varies continuously with the
-target clock. -/
-theorem continuous_finiteHeatSeededPicardGeneration_mode
-    (nu restartTime : ℝ) (aperture : Finset SpatialFrequency)
-    (seed : ComplexFourierModePopulation) :
-    ∀ depth frequency,
-      Continuous fun targetTime ↦
-        finiteHeatSeededPicardGeneration nu restartTime aperture
-          seed depth targetTime frequency := by
-  intro depth
-  induction depth with
-  | zero =>
-      intro frequency
-      unfold finiteHeatSeededPicardGeneration diagonalHeatModeTransport
-      unfold heatStokesMultiplier
-      fun_prop
-  | succ depth inductionHypothesis =>
-      intro frequency
-      unfold finiteHeatSeededPicardGeneration
-      apply Continuous.sub
-      · unfold diagonalHeatModeTransport heatStokesMultiplier
-        fun_prop
-      · apply intervalIntegral.continuous_parametric_intervalIntegral_of_continuous
-        · unfold Function.uncurry finiteHeatTransportedProjectedInteraction
-            diagonalHeatModeTransport
-          change Continuous fun times : ℝ × ℝ ↦
-            (heatStokesMultiplier nu (times.1 - times.2) frequency : ℂ) •
-              finiteProjectedAdvectiveCoefficient aperture
-                (finiteHeatSeededPicardGeneration nu restartTime aperture
-                  seed depth times.2)
-                (finiteHeatSeededPicardGeneration nu restartTime aperture
-                  seed depth times.2) frequency
-          exact (Complex.continuous_ofReal.comp (by
-            unfold heatStokesMultiplier
-            fun_prop)).smul
-            ((continuous_finiteProjectedAdvectiveCoefficient aperture
-              (fun sourceTime ↦
-                finiteHeatSeededPicardGeneration nu restartTime aperture
-                  seed depth sourceTime)
-              (fun sourceTime ↦
-                finiteHeatSeededPicardGeneration nu restartTime aperture
-                  seed depth sourceTime)
-              frequency inductionHypothesis inductionHypothesis).comp continuous_snd)
-        · exact continuous_id
-
-/-- The vector-valued finite source at one output mode is interval integrable on every clock
-interval. -/
-theorem intervalIntegrable_finiteHeatTransportedProjectedInteraction_mode
-    (nu restartTime targetTime : ℝ) (aperture : Finset SpatialFrequency)
-    (seed : ComplexFourierModePopulation) (depth : ℕ)
-    (output : SpatialFrequency) :
-    IntervalIntegrable
-      (fun sourceTime ↦
-        finiteHeatTransportedProjectedInteraction nu targetTime sourceTime aperture
-          (finiteHeatSeededPicardGeneration nu restartTime aperture
-            seed depth sourceTime)
-          (finiteHeatSeededPicardGeneration nu restartTime aperture
-            seed depth sourceTime) output)
-      volume restartTime targetTime := by
-  apply Continuous.intervalIntegrable
-  exact continuous_diagonalHeatModeTransport_fixedTarget nu targetTime
-    (fun sourceTime ↦
-      finiteProjectedAdvectiveCoefficient aperture
-        (finiteHeatSeededPicardGeneration nu restartTime aperture
-          seed depth sourceTime)
-        (finiteHeatSeededPicardGeneration nu restartTime aperture
-          seed depth sourceTime)) output
-    (continuous_finiteProjectedAdvectiveCoefficient aperture _ _ output
-      (continuous_finiteHeatSeededPicardGeneration_mode
-        nu restartTime aperture seed depth)
-      (continuous_finiteHeatSeededPicardGeneration_mode
-        nu restartTime aperture seed depth))
-
 /-- Component evaluation commutes with the finite vector-valued interval integral in the
 successor chronology. -/
 theorem finiteHeatSeededPicardGeneration_succ_component
@@ -255,7 +150,7 @@ theorem finiteHeatSeededPicardGeneration_succ_component
   let projection : ComplexVector →L[ℂ] ℂ :=
     ContinuousLinearMap.proj component
   have hintegrable : IntervalIntegrable interaction volume restartTime targetTime :=
-    intervalIntegrable_finiteHeatTransportedProjectedInteraction_mode
+    Holonics.Fluid.NavierStokesFinitePicardVolterraMass.intervalIntegrable_finiteHeatTransportedProjectedInteraction_mode
       nu restartTime targetTime aperture seed depth frequency
   have hcommute := projection.intervalIntegral_comp_comm hintegrable
   change
@@ -296,7 +191,7 @@ def finiteHeatSeededPicardNativePath
   continuous_toFun :=
     (continuous_finiteCubeNativeH3State (dyadicRadius (baseLevel + depth))
       (finiteHeatSeededPicardGeneration nu 0 aperture seed depth)
-      (continuous_finiteHeatSeededPicardGeneration_mode nu 0 aperture seed depth)).comp
+      (Holonics.Fluid.NavierStokesFinitePicardVolterraMass.continuous_finiteHeatSeededPicardGeneration_mode nu 0 aperture seed depth)).comp
         continuous_subtype_val
 
 @[simp]
@@ -648,7 +543,6 @@ theorem finiteHeatSeededPicardNativePath_eq_weightedMildRestartMap_iterate
 section Audit
 
 #print axioms weightedPhysicalCoefficient_finiteCubeNativeH3State
-#print axioms continuous_finiteHeatSeededPicardGeneration_mode
 #print axioms finiteHeatSeededPicardGeneration_succ_component
 #print axioms weightedPhysicalCoefficient_finiteHeatSeededPicardNativePath
 #print axioms weightedPhysicalCoefficient_weightedDuhamelReturn_finitePicardNativePath

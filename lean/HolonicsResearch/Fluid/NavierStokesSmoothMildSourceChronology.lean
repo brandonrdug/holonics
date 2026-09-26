@@ -138,32 +138,6 @@ theorem continuous_compactSmoothDyadicVorticityNonlinearClockedSourceMassAt
     (continuous_compactVorticityNonlinearMode
       solution hs hst ht frequency).norm
 
-private theorem intervalIntegral_reflected_heatStokesMultiplier_le_scaleBudget
-    {nu s t : ℝ} (hnu : 0 < nu) (hst : s ≤ t)
-    {scale : ℕ} {frequency : SpatialFrequency}
-    (hfrequency : frequency ∈
-      (dyadicFrequencyShell scale ∪ dyadicFrequencyShell (scale + 1))) :
-    (∫ sourceTime in s..t,
-      heatStokesMultiplier nu (t - sourceTime) frequency) ≤
-        dyadicParabolicClockBudget nu scale := by
-  have hreflect :
-      (∫ sourceTime in s..t,
-        heatStokesMultiplier nu (t - sourceTime) frequency) =
-      ∫ elapsed in (0 : ℝ)..(t - s),
-        heatStokesMultiplier nu elapsed frequency := by
-    simpa only [sub_self] using
-      (intervalIntegral.integral_comp_sub_left
-        (fun elapsed : ℝ ↦ heatStokesMultiplier nu elapsed frequency) t
-        (a := s) (b := t))
-  rw [hreflect]
-  rw [Finset.mem_union] at hfrequency
-  rcases hfrequency with hfrequency | hfrequency
-  · exact intervalIntegral_heatStokesMultiplier_le_dyadicParabolicClockBudget
-      hnu (sub_nonneg.mpr hst) hfrequency
-  · exact (intervalIntegral_heatStokesMultiplier_le_dyadicParabolicClockBudget
-      hnu (sub_nonneg.mpr hst) hfrequency).trans
-        (dyadicParabolicClockBudget_succ_le hnu scale)
-
 private theorem norm_weighted_compactMildSourceIntegratedCoefficient_le_history
     {T nu s t : ℝ} {initial : InitialVelocity} {velocity : VelocityField}
     {pressure : PressureField}

@@ -112,151 +112,6 @@ theorem norm_weightedUnprojectedDivergenceConvolution_le
     _ = (1296 * periodicH3EmbeddingConstant) * ‖advecting‖ * ‖transported‖ := by
       ring
 
-private theorem summable_unprojectedScalarConvolutionTerms
-    (left right : PeriodicSobolevCoefficients 3) (k : SpatialFrequency) :
-    Summable fun p ↦ left.1 p * right.1 (k - p) := by
-  apply Summable.of_norm
-  have hleft := summable_norm_periodicSobolevThreeCoefficient left
-  have hbound : Summable fun p ↦ ‖left.1 p‖ * ‖right.1‖ :=
-    hleft.mul_right ‖right.1‖
-  refine Summable.of_nonneg_of_le (fun p ↦ norm_nonneg _) (fun p ↦ ?_) hbound
-  rw [norm_mul]
-  exact mul_le_mul_of_nonneg_left
-    (lp.norm_apply_le_norm (by norm_num : (2 : ℝ≥0∞) ≠ 0) right.1 (k - p))
-    (norm_nonneg _)
-
-private theorem unprojected_raw_add_left
-    (first second transported : PeriodicVectorWeightedSobolev 3)
-    (output : Fin 3) (k : SpatialFrequency) :
-    (h3DivergenceConvolution
-      (unweightedVectorThree (first + second))
-      (unweightedVectorThree transported) output).1 k =
-      (h3DivergenceConvolution
-        (unweightedVectorThree first) (unweightedVectorThree transported) output).1 k +
-      (h3DivergenceConvolution
-        (unweightedVectorThree second) (unweightedVectorThree transported) output).1 k := by
-  rw [h3DivergenceConvolution_apply, h3DivergenceConvolution_apply,
-    h3DivergenceConvolution_apply, ← Finset.sum_add_distrib]
-  apply Finset.sum_congr rfl
-  intro coordinate _
-  let right := unweightedVectorThree transported output
-  let leftFirst := unweightedVectorThree first coordinate
-  let leftSecond := unweightedVectorThree second coordinate
-  have hfirst := summable_unprojectedScalarConvolutionTerms leftFirst right k
-  have hsecond := summable_unprojectedScalarConvolutionTerms leftSecond right k
-  have hinner :
-      (∑' p, (unweightedVectorThree (first + second) coordinate).1 p *
-        (unweightedVectorThree transported output).1 (k - p)) =
-        (∑' p, (unweightedVectorThree first coordinate).1 p *
-          (unweightedVectorThree transported output).1 (k - p)) +
-        ∑' p, (unweightedVectorThree second coordinate).1 p *
-          (unweightedVectorThree transported output).1 (k - p) := by
-    rw [← hfirst.tsum_add hsecond]
-    apply tsum_congr
-    intro p
-    simp only [unweightedVectorThree_coefficient, Pi.add_apply, lp.coeFn_add]
-    dsimp [leftFirst, leftSecond, right]
-    ring
-  rw [hinner]
-  ring
-
-private theorem unprojected_raw_add_right
-    (advecting first second : PeriodicVectorWeightedSobolev 3)
-    (output : Fin 3) (k : SpatialFrequency) :
-    (h3DivergenceConvolution
-      (unweightedVectorThree advecting)
-      (unweightedVectorThree (first + second)) output).1 k =
-      (h3DivergenceConvolution
-        (unweightedVectorThree advecting) (unweightedVectorThree first) output).1 k +
-      (h3DivergenceConvolution
-        (unweightedVectorThree advecting) (unweightedVectorThree second) output).1 k := by
-  rw [h3DivergenceConvolution_apply, h3DivergenceConvolution_apply,
-    h3DivergenceConvolution_apply, ← Finset.sum_add_distrib]
-  apply Finset.sum_congr rfl
-  intro coordinate _
-  let left := unweightedVectorThree advecting coordinate
-  let rightFirst := unweightedVectorThree first output
-  let rightSecond := unweightedVectorThree second output
-  have hfirst := summable_unprojectedScalarConvolutionTerms left rightFirst k
-  have hsecond := summable_unprojectedScalarConvolutionTerms left rightSecond k
-  have hinner :
-      (∑' p, (unweightedVectorThree advecting coordinate).1 p *
-        (unweightedVectorThree (first + second) output).1 (k - p)) =
-        (∑' p, (unweightedVectorThree advecting coordinate).1 p *
-          (unweightedVectorThree first output).1 (k - p)) +
-        ∑' p, (unweightedVectorThree advecting coordinate).1 p *
-          (unweightedVectorThree second output).1 (k - p) := by
-    rw [← hfirst.tsum_add hsecond]
-    apply tsum_congr
-    intro p
-    simp only [unweightedVectorThree_coefficient, Pi.add_apply, lp.coeFn_add]
-    dsimp [left, rightFirst, rightSecond]
-    ring
-  rw [hinner]
-  ring
-
-private theorem unprojected_raw_smul_left
-    (c : ℂ) (advecting transported : PeriodicVectorWeightedSobolev 3)
-    (output : Fin 3) (k : SpatialFrequency) :
-    (h3DivergenceConvolution
-      (unweightedVectorThree (c • advecting))
-      (unweightedVectorThree transported) output).1 k =
-      c * (h3DivergenceConvolution
-        (unweightedVectorThree advecting)
-        (unweightedVectorThree transported) output).1 k := by
-  rw [h3DivergenceConvolution_apply, h3DivergenceConvolution_apply,
-    Finset.mul_sum]
-  apply Finset.sum_congr rfl
-  intro coordinate _
-  let left := unweightedVectorThree advecting coordinate
-  let right := unweightedVectorThree transported output
-  have hterms := summable_unprojectedScalarConvolutionTerms left right k
-  have hinner :
-      (∑' p, (unweightedVectorThree (c • advecting) coordinate).1 p *
-        (unweightedVectorThree transported output).1 (k - p)) =
-        c * ∑' p, (unweightedVectorThree advecting coordinate).1 p *
-          (unweightedVectorThree transported output).1 (k - p) := by
-    rw [← hterms.tsum_mul_left c]
-    apply tsum_congr
-    intro p
-    simp only [unweightedVectorThree_coefficient, Pi.smul_apply, lp.coeFn_smul,
-      smul_eq_mul]
-    dsimp [left, right]
-    ring
-  rw [hinner]
-  ring
-
-private theorem unprojected_raw_smul_right
-    (c : ℂ) (advecting transported : PeriodicVectorWeightedSobolev 3)
-    (output : Fin 3) (k : SpatialFrequency) :
-    (h3DivergenceConvolution
-      (unweightedVectorThree advecting)
-      (unweightedVectorThree (c • transported)) output).1 k =
-      c * (h3DivergenceConvolution
-        (unweightedVectorThree advecting)
-        (unweightedVectorThree transported) output).1 k := by
-  rw [h3DivergenceConvolution_apply, h3DivergenceConvolution_apply,
-    Finset.mul_sum]
-  apply Finset.sum_congr rfl
-  intro coordinate _
-  let left := unweightedVectorThree advecting coordinate
-  let right := unweightedVectorThree transported output
-  have hterms := summable_unprojectedScalarConvolutionTerms left right k
-  have hinner :
-      (∑' p, (unweightedVectorThree advecting coordinate).1 p *
-        (unweightedVectorThree (c • transported) output).1 (k - p)) =
-        c * ∑' p, (unweightedVectorThree advecting coordinate).1 p *
-          (unweightedVectorThree transported output).1 (k - p) := by
-    rw [← hterms.tsum_mul_left c]
-    apply tsum_congr
-    intro p
-    simp only [unweightedVectorThree_coefficient, Pi.smul_apply, lp.coeFn_smul,
-      smul_eq_mul]
-    dsimp [left, right]
-    ring
-  rw [hinner]
-  ring
-
 theorem weightedUnprojectedDivergenceConvolution_add_left
     (first second transported : PeriodicVectorWeightedSobolev 3) :
     weightedUnprojectedDivergenceConvolution (first + second) transported =
@@ -267,7 +122,7 @@ theorem weightedUnprojectedDivergenceConvolution_add_left
   funext k
   simp only [weightedUnprojectedDivergenceConvolution,
     coefficientWeightedRealization_apply, lp.coeFn_add, Pi.add_apply]
-  rw [unprojected_raw_add_left]
+  rw [h3DivergenceConvolution_unweighted_add_left_coefficient]
   ring
 
 theorem weightedUnprojectedDivergenceConvolution_add_right
@@ -280,7 +135,7 @@ theorem weightedUnprojectedDivergenceConvolution_add_right
   funext k
   simp only [weightedUnprojectedDivergenceConvolution,
     coefficientWeightedRealization_apply, lp.coeFn_add, Pi.add_apply]
-  rw [unprojected_raw_add_right]
+  rw [h3DivergenceConvolution_unweighted_add_right_coefficient]
   ring
 
 theorem weightedUnprojectedDivergenceConvolution_smul_left
@@ -293,7 +148,7 @@ theorem weightedUnprojectedDivergenceConvolution_smul_left
   simp only [weightedUnprojectedDivergenceConvolution,
     coefficientWeightedRealization_apply, lp.coeFn_smul, Pi.smul_apply,
     smul_eq_mul]
-  rw [unprojected_raw_smul_left]
+  rw [h3DivergenceConvolution_unweighted_smul_left_coefficient]
   ring
 
 theorem weightedUnprojectedDivergenceConvolution_smul_right
@@ -306,7 +161,7 @@ theorem weightedUnprojectedDivergenceConvolution_smul_right
   simp only [weightedUnprojectedDivergenceConvolution,
     coefficientWeightedRealization_apply, lp.coeFn_smul, Pi.smul_apply,
     smul_eq_mul]
-  rw [unprojected_raw_smul_right]
+  rw [h3DivergenceConvolution_unweighted_smul_right_coefficient]
   ring
 
 /-- The complete unprojected `H³ × H³ → H²` source as a bounded bilinear passage. -/

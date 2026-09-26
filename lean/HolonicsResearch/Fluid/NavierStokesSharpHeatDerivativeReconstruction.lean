@@ -193,7 +193,7 @@ private theorem norm_secondCoordinateMultiplier_le_stokes
   norm_num
   nlinarith [sq_nonneg (2 * Real.pi), Real.pi_pos]
 
-private theorem norm_reconstructedComponent_le_coefficientMass
+theorem norm_reconstructedComponent_le_coefficientMass
     (state : PeriodicVectorWeightedSobolev 3) (component : Fin 3) (x : Space) :
     ‖reconstructedTorusComplexComponent state component (euclideanToSpatialTorus x)‖ ≤
       ∑' k : SpatialFrequency, ‖nativeUnweightedComponent state component k‖ := by
@@ -331,7 +331,7 @@ theorem norm_reconstructedHeatH3SecondDerivativeChart_sharp
       (heatSecondDerivativeCoefficientMass_from_weightedH3_le
         ((nu : ℝ) * (dt : ℝ)) h hlocal (state component))
 
-private theorem receiverTerm_eq_kernelNormMulH2
+theorem receiverTerm_eq_kernelNormMulH2
     (a : ℝ) (ha : 0 < a) (state : PeriodicWeightedSobolev 2)
     (k : SpatialFrequency) :
     torusStokesEigenvalue k * Real.exp (-a * torusStokesEigenvalue k) *

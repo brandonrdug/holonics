@@ -403,13 +403,6 @@ theorem compactOpenSmoothDyadicOffDiagonalBandIntegral_le_initialHeat_add_nonlin
 
 /-! ## Exact heat-clock service of the earlier face -/
 
-private theorem adjacentDyadicFrequencyShell_disjoint (scale : ℕ) :
-    Disjoint (dyadicFrequencyShell scale) (dyadicFrequencyShell (scale + 1)) := by
-  rw [Finset.disjoint_left]
-  intro frequency hscale hnext
-  rw [mem_dyadicFrequencyShell_iff] at hscale hnext
-  exact hnext.2 hscale.1
-
 private theorem intervalIntegral_initialHeatMode_le_scaleClock
     {T nu a b windowStart : ℝ} {initial : InitialVelocity} {velocity : VelocityField}
     {pressure : PressureField}

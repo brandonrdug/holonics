@@ -65,15 +65,6 @@ theorem finiteDepthBoundaryWeight_complex
   rw [finiteDepthBoundaryWeight, smoothDyadicCumulativeBoundaryMultiplier,
     Complex.ofReal_sub]
 
-theorem complexVectorSymmetricPhasePairing_add_right_public
-    (left first second : ComplexVector) :
-    complexVectorSymmetricPhasePairing left (first + second) =
-      complexVectorSymmetricPhasePairing left first +
-        complexVectorSymmetricPhasePairing left second := by
-  unfold complexVectorSymmetricPhasePairing complexVectorHermitianPairing
-  simp only [Pi.add_apply, map_add, add_mul, mul_add, Finset.sum_add_distrib]
-  ring
-
 theorem complexVectorSymmetricPhasePairing_sub_right
     (left first second : ComplexVector) :
     complexVectorSymmetricPhasePairing left (first - second) =
@@ -248,7 +239,7 @@ theorem finitePairCompatibleReceiverStretchingWork_eq_filtered_add_boundary
   intro k _hk
   rw [← complexVectorSymmetricPhasePairing_real_smul_right]
   unfold finiteMultiplierFlowCommutatorCoefficient multiplierFilter
-  rw [← complexVectorSymmetricPhasePairing_add_right_public]
+  rw [← complexVectorSymmetricPhasePairing_add_right]
   congr 1
   abel
 
@@ -270,7 +261,7 @@ theorem finitePairCompatibleReceiverTransportWork_eq_crossBoundary_add_boundary
   intro k _hk
   rw [← complexVectorSymmetricPhasePairing_real_smul_right]
   unfold finiteMultiplierFlowCommutatorCoefficient multiplierFilter
-  rw [← complexVectorSymmetricPhasePairing_add_right_public]
+  rw [← complexVectorSymmetricPhasePairing_add_right]
   congr 1
   abel
 

@@ -103,7 +103,7 @@ theorem weightedDuhamelIntegrand_of_not_lt
 /-! ## Pointwise transport through the singular heat face -/
 
 /-- The componentwise vector smoothing map inherits the scalar one-derivative norm bound. -/
-private theorem norm_periodicVectorWeightedHeatTwoToThree_le
+theorem norm_periodicVectorWeightedHeatTwoToThree_le
     (nu tau : ℝ≥0) (hviscous : 0 < (nu : ℝ) * (tau : ℝ))
     (state : PeriodicVectorWeightedSobolev 2) :
     ‖periodicVectorWeightedHeatTwoToThree nu tau hviscous state‖ ≤

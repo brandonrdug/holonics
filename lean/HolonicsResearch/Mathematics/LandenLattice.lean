@@ -117,7 +117,7 @@ private lemma T4_sq {t : ℝ} (ht : 0 < t) :
   rw [zpow_add₀ (by norm_num : (-1 : ℝ) ≠ 0), ← exp_merge t]
   ring
 
-private lemma T2_sq {t : ℝ} (ht : 0 < t) :
+lemma T2_sq {t : ℝ} (ht : 0 < t) :
     T2 t ^ 2 = ∑' p : ℤ × ℤ,
       rexp (-π * t * (((p.1 : ℝ) + 1 / 2) ^ 2 + ((p.2 : ℝ) + 1 / 2) ^ 2)) := by
   rw [T2, sq, tsum_mul_tsum_of_summable_norm (norm_g2 ht) (norm_g2 ht)]
@@ -217,7 +217,7 @@ theorem theSumFaceIsTheDoubledEvenCell {t : ℝ} (ht : 0 < t) :
 
 /-! ## 6. The difference face -/
 
-private lemma summable_L2' {t : ℝ} (ht : 0 < t) :
+lemma summable_L2 {t : ℝ} (ht : 0 < t) :
     Summable fun p : ℤ × ℤ =>
       rexp (-π * t * (((p.1 : ℝ) + 1 / 2) ^ 2 + ((p.2 : ℝ) + 1 / 2) ^ 2)) := by
   refine (summable_mul_of_summable_norm (norm_g2 ht) (norm_g2 ht)).congr fun p => ?_
@@ -286,7 +286,7 @@ theorem theDifferenceFaceIsTheDoubledOddCell {t : ℝ} (ht : 0 < t) :
     rw [hexp2]
     ring
   have hcomp : Summable (g ∘ Do) := by
-    refine (((summable_L2' h2t)).mul_left 2).congr fun q => ?_
+    refine (((summable_L2 h2t)).mul_left 2).congr fun q => ?_
     exact (hterm q).symm
   have hkey : ∑' p : ℤ × ℤ, g p = ∑' q : ℤ × ℤ, g (Do q) :=
     ((Do_injective.hasSum_iff hsupp).mp hcomp.hasSum).tsum_eq

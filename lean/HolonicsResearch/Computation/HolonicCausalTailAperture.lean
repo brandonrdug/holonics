@@ -148,11 +148,6 @@ theorem tailSurface_project_silentExtend {N : ℕ}
       tailSurface (lens.project currents) := by
   rw [project_silentExtend, tailSurface_zeroExtend]
 
-/-- Padding by one silent final depth cannot decrease the sharp receiver coefficient. -/
-theorem finiteSharpCoefficient_padding_mono (N : ℕ) :
-    finiteSharpCoefficient N ≤ finiteSharpCoefficient (N + 1) :=
-  finiteSharpCoefficient_mono N
-
 /-! ## Activated-new-pair control -/
 
 /-- Turn on exactly the new `(none, none)` addressed pair. -/
@@ -233,7 +228,6 @@ open Holonics.Computation.HolonicCausalTailLens.HNA1
 #print axioms tailRadius_project_silentExtend_castSucc
 #print axioms mass_project_silentExtend
 #print axioms tailSurface_project_silentExtend
-#print axioms finiteSharpCoefficient_padding_mono
 #print axioms project_activateNewPair_ne_silentExtend
 #print axioms tailEnergy_project_activateNewPair_last_ne_silent
 end Audit

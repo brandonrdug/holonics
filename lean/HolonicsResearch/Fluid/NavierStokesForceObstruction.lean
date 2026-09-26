@@ -1,4 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesOpenEnstrophy
+import Holonics.Fluid.NavierStokesVorticityThreeStrands
 
 /-!
 # Future-force obstruction to open-lifespan continuation
@@ -132,15 +133,6 @@ theorem zeroOpenPeriodicSolution_isMaximal (T nu : ℝ) (hT : 0 < T) :
   simpa using hsmooth
 
 /-! ## Zero interior critical receivers -/
-
-@[simp]
-theorem vorticityField_zero (x : Space) (t : ℝ) :
-    vorticityField (0 : VelocityField) x t = 0 := by
-  change derivativeCurlLinearMap
-      (fderiv ℝ (fun _ : Space => (0 : Space)) x) = 0
-  ext i
-  fin_cases i <;> simp [derivativeCurlLinearMap_apply, curlFromJacobian,
-    jacobianMatrix_apply]
 
 /-- The counterexample has an accumulated Jacobian receiver with envelope, integral budget, and
 curl-forcing work all exactly zero on the entire tail `Ico (T/2) T`. -/

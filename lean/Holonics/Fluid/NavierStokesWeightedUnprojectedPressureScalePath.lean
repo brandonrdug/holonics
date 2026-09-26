@@ -40,25 +40,6 @@ open Holonics.Fluid.NavierStokesWeightedSobolevHilbert
 
 /-! ## Native coefficient linearity -/
 
-private theorem periodicWeightedSobolev_eq_of_coefficients_eq
-    {order : ℕ} {left right : PeriodicWeightedSobolev order}
-    (hcoeff : ∀ k,
-      (weightedSobolevCoefficients order left).1 k =
-        (weightedSobolevCoefficients order right).1 k) :
-    left = right := by
-  calc
-    left = coefficientWeightedRealization order
-        (weightedSobolevCoefficients order left) :=
-      (coefficientWeightedRealization_weightedSobolevCoefficients order left).symm
-    _ = coefficientWeightedRealization order
-        (weightedSobolevCoefficients order right) := by
-      congr 1
-      apply Subtype.ext
-      apply Subtype.ext
-      funext k
-      exact hcoeff k
-    _ = right := coefficientWeightedRealization_weightedSobolevCoefficients order right
-
 private theorem weightedSobolevCoefficients_add_apply
     (order : ℕ) (left right : PeriodicWeightedSobolev order)
     (k : SpatialFrequency) :

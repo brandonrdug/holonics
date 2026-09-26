@@ -423,22 +423,6 @@ theorem norm_coordinateReciprocalSobolevThreeSqrtTail_dyadic_le
     _ ≤ Real.sqrt (250 * ((dyadicRadius depth : ℝ))⁻¹) :=
       Real.sqrt_le_sqrt hsquare
 
-private theorem coordinateReciprocal_mul_weightedTail_eq_at
-    (coeff : PeriodicSobolevCoefficients 3) (coordinate : Fin 3)
-    (radius : ℕ) (frequency : FrequencyCubeComplement radius) :
-    ‖coordinateReciprocalSobolevThreeSqrtTail coordinate radius frequency‖ *
-        ‖weightedSobolevThreeCoefficientTail coeff radius frequency‖ =
-      |(frequency.1 coordinate : ℝ)| * ‖coeff.1 frequency.1‖ := by
-  have hweightPos : 0 < periodicSobolevWeight 3 frequency.1 :=
-    periodicSobolevWeight_pos 3 frequency.1
-  have hsqrtPos : 0 < Real.sqrt (periodicSobolevWeight 3 frequency.1) :=
-    Real.sqrt_pos.2 hweightPos
-  simp only [coordinateReciprocalSobolevThreeSqrtTail,
-    weightedSobolevThreeCoefficientTail, norm_mul, Complex.norm_real,
-    Real.norm_eq_abs, abs_div, abs_of_nonneg (abs_nonneg _),
-    abs_of_pos hsqrtPos]
-  field_simp
-
 /-- Sharp generic `H³` derivative coefficient tail beyond the dyadic cube.  Since
 `dyadicRadius depth = 2^depth`, the displayed factor is exactly `O(2^(-depth/2))`. -/
 theorem tsum_coordinate_mul_norm_compl_dyadicCube_le
@@ -460,7 +444,7 @@ theorem tsum_coordinate_mul_norm_compl_dyadicCube_le
           ‖reciprocal frequency‖ * ‖weighted frequency‖ := by
       apply tsum_congr
       intro frequency
-      exact (coordinateReciprocal_mul_weightedTail_eq_at
+      exact (coordinateReciprocal_mul_weightedTail_eq
         coeff coordinate (dyadicRadius depth) frequency).symm
     _ ≤ ‖reciprocal‖ * ‖weighted‖ :=
       lp.tsum_mul_le_mul_norm' hholder reciprocal weighted

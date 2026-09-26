@@ -53,26 +53,6 @@ theorem scalarDiagonalAtOrder_apply
     scalarDiagonalAtOrder order state component = state :=
   rfl
 
-private theorem scalarWeightedSobolev_eq_of_coefficients_eq
-    {order : ℕ} {left right : PeriodicWeightedSobolev order}
-    (hcoeff : ∀ k,
-      (weightedSobolevCoefficients order left).1 k =
-        (weightedSobolevCoefficients order right).1 k) :
-    left = right := by
-  calc
-    left = coefficientWeightedRealization order
-        (weightedSobolevCoefficients order left) :=
-      (coefficientWeightedRealization_weightedSobolevCoefficients order left).symm
-    _ = coefficientWeightedRealization order
-        (weightedSobolevCoefficients order right) := by
-      congr 1
-      apply Subtype.ext
-      apply Subtype.ext
-      funext k
-      exact hcoeff k
-    _ = right :=
-      coefficientWeightedRealization_weightedSobolevCoefficients order right
-
 /-- The order-zero pressure path repeated in vector slots is the base reconstruction carrier. -/
 def pressureDiagonalBasePath
     {T : ℝ} {base : WeightedH3Path T}
@@ -111,7 +91,7 @@ theorem nativePressurePathAtOrder_zero_eq_weighted
     (t : Icc (0 : ℝ) T) :
     CoherentWeightedSmoothPathTower.nativePressurePathAtOrder tower 0 t =
       weightedNativePressurePath base t := by
-  apply scalarWeightedSobolev_eq_of_coefficients_eq
+  apply periodicWeightedSobolev_eq_of_coefficients_eq
   intro k
   rw [CoherentWeightedSmoothPathTower.nativePressurePathAtOrder_coefficient_eq_base,
     weightedNativePressurePath_apply hT,

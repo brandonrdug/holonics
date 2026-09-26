@@ -1,6 +1,7 @@
 import HolonicsResearch.Fluid.NavierStokesRescalingPeriodObstruction
 import HolonicsResearch.Fluid.NavierStokesPeriodicPressureRigidity
 import HolonicsResearch.Fluid.NavierStokesRescalingClock
+import HolonicsResearch.Fluid.NavierStokesLinearFrameDynamics
 
 /-!
 # The source momentum excludes a growing global stationary profile on the torus
@@ -28,17 +29,6 @@ open Holonics.Fluid.NavierStokesRescalingPeriodObstruction
 open Holonics.Fluid.NavierStokesPeriodicPressureRigidity
 open Holonics.Fluid.NavierStokesRescalingClock
 
-theorem pressureSlice_contDiff
-    {T nu : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
-    {pressure : PressureField}
-    (solution : OpenSmoothSolutionOn T nu initial force velocity pressure)
-    {t : ℝ} (ht : t ∈ openTimeSlab T) :
-    ContDiff ℝ ∞ (fun x ↦ pressure x t) := by
-  rw [← contDiffOn_univ]
-  exact solution.pressureSmooth.comp (s := (Set.univ : Set Space))
-    (contDiff_id.prodMk (contDiff_const (c := t))).contDiffOn
-    (by intro x _hx; exact ⟨Set.mem_univ x, ht⟩)
-
 theorem rescaledPressure_slice_contDiff
     {T nu : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
     {pressure : PressureField}
@@ -46,7 +36,7 @@ theorem rescaledPressure_slice_contDiff
     (centre : ℝ → Space) (length amplitude clock : ℝ → ℝ)
     (s : ℝ) (ht : clock s ∈ openTimeSlab T) :
     ContDiff ℝ ∞ (fun y ↦ rescaledPressure centre length amplitude clock pressure y s) := by
-  have hp := pressureSlice_contDiff solution ht
+  have hp := Holonics.Fluid.NavierStokesLinearFrameDynamics.OpenSmoothSolutionOn.pressureSlice_contDiff solution ht
   have hmap : ContDiff ℝ ∞ (fun y : Space ↦ centre s + length s • y) :=
     contDiff_const.add (contDiff_id.const_smul (length s))
   exact contDiff_const.mul (hp.comp hmap)
@@ -145,7 +135,6 @@ theorem OpenPeriodicSolutionOn.exponential_stationaryProfile_eq_zero
     (mul_ne_zero hq₀.ne' (Real.exp_ne_zero _))
     (mul_ne_zero (neg_ne_zero.mpr halpha.ne') (mul_ne_zero hq₀.ne' (Real.exp_ne_zero _)))
 
-#print axioms pressureSlice_contDiff
 #print axioms OpenPeriodicSolutionOn.stationaryProfile_eq_zero
 #print axioms OpenPeriodicSolutionOn.exponential_stationaryProfile_eq_zero
 

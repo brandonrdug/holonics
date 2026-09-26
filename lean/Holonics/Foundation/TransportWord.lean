@@ -206,15 +206,6 @@ theorem parallelTransport_append {X : Type*} (left right : List (Equiv.Perm X)) 
   | nil => simp [parallelTransport]
   | cons transport left ih => simp [parallelTransport, ih, mul_assoc]
 
-/-- The identity loop returns the identity transport. -/
-theorem identityLoop_holonomy {X : Type*} :
-    parallelTransport ([] : List (Equiv.Perm X)) = 1 := rfl
-
-/-- Serial loop joining composes the two loop returns. -/
-theorem serialLoop_holonomy {X : Type*} (left right : List (Equiv.Perm X)) :
-    parallelTransport (left ++ right) = parallelTransport left * parallelTransport right :=
-  parallelTransport_append left right
-
 /-- Reversing a route and every elementary orientation inverts its parallel transport. -/
 theorem reversal_holonomy {X : Type*} (word : List (Equiv.Perm X)) :
     parallelTransport (word.reverse.map Inv.inv) = (parallelTransport word)⁻¹ := by

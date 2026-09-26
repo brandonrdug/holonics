@@ -32,8 +32,8 @@ coboundary is founded here; every statement composes the named owners.
    obstruction is the product of a `±1` joint relation around a cycle: product `−1` admits no
    unit sign assignment (`no_orientation_of_reversing_cycle`), product `+1` admits one
    (`orientation_of_preserving_cycle`); 3-cycle and Möbius-seam witnesses in
-   `three_cycle_orientation_witness`. (This replaces a use of
-   `JunctionLaw.no_consistent_orientation_on_a_reversing_loop`, whose hypothesis
+   `three_cycle_orientation_witness`. (This replaces a use of the
+   retired JunctionLaw reversing-loop statement (`Orientation.junction_statement_from_cycle`), whose hypothesis
    `s () * s () = −1` is unsatisfiable in `ℤ`, so it carries no content.)
 3. **The class pairing descends.** `⟨ω + dη, z⟩ = ⟨ω, z⟩` for a cycle, `⟨ω, z + ∂c⟩ = ⟨ω, z⟩`
    for a cocycle (`pairing_add_coboundary`, `pairing_add_boundary`, over any `Module.Dual`), hence

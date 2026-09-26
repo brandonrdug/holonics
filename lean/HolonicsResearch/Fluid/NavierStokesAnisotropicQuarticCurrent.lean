@@ -125,10 +125,6 @@ theorem anisotropicQuarticPressure_contDiff (epsilon D b c : ℝ) :
   unfold anisotropicQuarticPressure anisotropicHax Hcos Hsin radiusSq
   fun_prop
 
-private theorem coordinate_fderiv (i : Fin 3) (x : Space) :
-    fderiv ℝ (fun y : Space ↦ y i) x = EuclideanSpace.proj i := by
-  convert (EuclideanSpace.proj i : Space →L[ℝ] ℝ).fderiv (x := x) using 1 <;> rfl
-
 theorem anisotropicQuarticPressure_fderiv (epsilon D b c : ℝ) (x : Space) :
     fderiv ℝ (anisotropicQuarticPressure epsilon D b c) x =
       (D * (-6 * epsilon * x 0 * x 2 ^ 2 +

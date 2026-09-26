@@ -135,7 +135,7 @@ private theorem continuous_heatStokesMultiplier_sub
   unfold heatStokesMultiplier
   fun_prop
 
-private theorem continuous_diagonalHeatModeTransport_fixedTarget
+theorem continuous_diagonalHeatModeTransport_fixedTarget
     (nu targetTime : ℝ) (field : ℝ → ComplexFourierModePopulation)
     (frequency : SpatialFrequency)
     (hfield : Continuous fun sourceTime ↦ field sourceTime frequency) :
@@ -146,7 +146,7 @@ private theorem continuous_diagonalHeatModeTransport_fixedTarget
   exact (Complex.continuous_ofReal.comp
     (continuous_heatStokesMultiplier_sub nu targetTime frequency)).smul hfield
 
-private theorem continuous_finiteProjectedAdvectiveCoefficient
+theorem continuous_finiteProjectedAdvectiveCoefficient
     (aperture : Finset SpatialFrequency)
     (advecting transported : ℝ → ComplexFourierModePopulation)
     (output : SpatialFrequency)
@@ -169,7 +169,7 @@ private theorem continuous_finiteProjectedAdvectiveCoefficient
     unfold complexAdvectiveInteraction complexDot
     fun_prop
 
-private theorem continuous_finiteHeatSeededPicardGeneration_mode
+theorem continuous_finiteHeatSeededPicardGeneration_mode
     (nu restartTime : ℝ) (aperture : Finset SpatialFrequency)
     (seed : ComplexFourierModePopulation) :
     ∀ depth frequency,
@@ -212,7 +212,7 @@ private theorem continuous_finiteHeatSeededPicardGeneration_mode
               frequency inductionHypothesis inductionHypothesis).comp continuous_snd)
         · exact continuous_id
 
-private theorem intervalIntegrable_finiteHeatTransportedProjectedInteraction_mode
+theorem intervalIntegrable_finiteHeatTransportedProjectedInteraction_mode
     (nu restartTime targetTime : ℝ) (aperture : Finset SpatialFrequency)
     (seed : ComplexFourierModePopulation) (depth : ℕ)
     (output : SpatialFrequency) :

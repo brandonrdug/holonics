@@ -264,14 +264,6 @@ theorem continuous_higherOrderHeatLiftJoint
   exact (continuous_periodicWeightedHeatSuccJoint base nu hnu).comp
     (continuous_fst.prodMk (continuous_apply component |>.comp continuous_snd))
 
-private theorem positiveElapsedBefore_eq_positiveElapsed
-    (t : ℝ) (s : Iio t) :
-    (positiveElapsedBefore t s).1 = positiveElapsed t s.1 s.2 := by
-  apply NNReal.eq
-  rw [show ((positiveElapsedBefore t s).1 : ℝ) = t - s.1 by
-    exact Real.coe_toNNReal (t - s.1) (sub_nonneg.mpr s.2.le)]
-  rfl
-
 /-- The endpoint-totalized nonlinear scale word at terminal time `t`. -/
 def higherOrderDuhamelIntegrand
     (base : ℕ) (hbase : 2 ≤ base)
@@ -423,7 +415,7 @@ theorem continuousOn_higherOrderDuhamelIntegrand_Ioo
       (⟨positiveElapsed t s.1 s.2.2, sub_pos.mpr s.2.2⟩ :
         PositiveElapsedTime) := by
     apply Subtype.ext
-    exact positiveElapsedBefore_eq_positiveElapsed t ⟨s.1, s.2.2⟩
+    exact positiveElapsedBefore_eq t ⟨s.1, s.2.2⟩
   rw [helapsedEq]
   rfl
 
