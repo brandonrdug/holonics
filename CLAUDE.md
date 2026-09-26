@@ -278,20 +278,19 @@ After a compaction, act on the newest human message, not on a retained view of a
 - The primary inspects source and integrates the returns; worker measurements are receipts.
 
 [project-postulate] Each campaign has a GitHub issue and cites it in its plan and commits
-(`Refs #n` / `Closes #n`). The issues are:
+(`Refs #n` / `Closes #n`). The milestones are the rebuild's open steps (4–5, 6, 7, 8). The open
+issues are:
 - the rebuild parent #63;
-- K1 #72;
-- compression and landmarks #145;
-- the HNN #73;
-- physics #74–#75;
-- device debts #76;
-- the Lean package #70;
-- equation extraction #146;
-- Lean curation #147;
-- applications #148;
-- formal obligations #62.
+- steps 4–5, the HNN #73 and device debts #76; campaign 2's contact issues #28, #30, #31 and #48
+  (label `campaign-2`), and campaign 4's serial chain #27 (label `campaign-4`);
+- step 6, equation extraction #146 and the target laws #20, #22, #23 and #32;
+- step 7, Lean curation #147;
+- step 8, applications #148;
+- formal obligations #62, which carries every owed Lean statement.
 
-Close an issue with the commit, the verification, and the remaining scope.
+Closed and done: K1 #72, compression and landmarks #145, physics #74–#75, the Lean package #70.
+Every open issue has a milestone or is #62 or #63. Close an issue with the commit, the verification
+and the remaining scope, and carry any surviving obligation into #62.
 
 [project-postulate] **Git.**
 - Stage explicit paths.

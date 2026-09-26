@@ -2047,6 +2047,13 @@ receiving law. It is judged by what they add that the tree does not already say 
     - Widths are never reduced to fit the carrier.
   - Report the word, tree, compare, deposit and transfer times separately, the state bits per
     source bit, and the contact-kind census.
+- **Owners and issues.** The pair contact's Rust owner is `holon::contact` (`PairContact`,
+  `ContactMaterial`, `SerialChain`, the Farey lock), with `menu::{reflected_return,
+  menu_loop_closure}`; the HNN's contact transit composes it and does not restate it. The
+  campaign's issues are #28 (contact faces from the slip map and measured geometry), #30 (the
+  port-Hamiltonian medium to the storage–flux closure), #31 (the contact balance's elastic,
+  surface-storage and radiation terms; the break's gluing work `J` is its surface storage) and
+  #48 (elementary helical pairs), label `campaign-2`.
 - **Lean first:** Lean items 8, 13 and 14 ((b)).
 - **Done when**, on the standing real cut. Every feature family, grain, depth, carrier width and
   law choice is fixed on the development cells, and each is charged its description bits. Then one
@@ -2099,6 +2106,9 @@ receiving law. It is judged by what they add that the tree does not already say 
   - the held-out bits are reported against campaign 2 and the baselines.
 
 #### Campaign 4. The motor chart: serial screw words
+
+[definition] Its issue is #27 (multi-neck chains and the ordered chain of situated screws), label
+`campaign-4`.
 
 - **Laws:** Lean item 10, and:
   - a `SerialChain` of situated screws is a source and receiver chart of the same field;
