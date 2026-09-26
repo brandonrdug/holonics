@@ -665,7 +665,7 @@ fn the_mixture_codes_within_one_bit_of_the_better_face() {
                 }
             })
             .collect(),
-        held_out: vec![length - 4..length],
+        held_out: std::iter::once(length - 4..length).collect(),
     };
     let exposure = Reference::new(64, Steps::campaign_one(), OPEN_BUDGET)
         .expose(&field, &cut)

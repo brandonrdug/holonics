@@ -344,8 +344,14 @@ impl ActiveAddress {
 
 /// [definition; agent-inferred] **The landmark tree a receiver declares** (module header): the
 /// field's exterior chart `|A|` (the cell emitted as its odometer digits), the receiver's depth `D`
-/// with no forced split, the field's declared population (the passage the tree's certificates hold within) and
-/// the receiver's grain `L_R = ⌈1/ε_bits⌉`.
+/// with no forced split, the field's declared population (the passage the tree's certificates hold
+/// within) and the receiver's grain `L_R = ⌈1/ε_bits⌉`.
+///
+/// [open] **The tree's widths grow with `log n*` and outgrow `u128`** (`Landmarks::new` refuses the
+/// derived widths whose operands pass 128 bits): at `L_R = 16` the least refused population is
+/// 428,079 cells at `|A| = 4`, `D = 2` (the test fields, which declare `2^16` cells) and 87,382 cells
+/// at campaign 1's `|A| = 256`, `D = 4` (the standing cut declares 6,148). The carrier law that
+/// lifts it (a rebase of the path lattice, or a wider fixed width) is owed in #76.
 pub fn landmark_declaration(
     field: &Field,
     receiver: &ReceiverDeclaration,

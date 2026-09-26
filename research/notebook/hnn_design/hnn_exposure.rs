@@ -60,10 +60,12 @@
 //!   the words and their returns released, and the tick balances' residuals against their bounds;
 //! - the bits on the training and the held-out targets against each online baseline (uniform,
 //!   order-0 and order-1 Krichevsky–Trofimov, PPM of order 2), and the verdict against order-0;
-//!   beside the model's, the landmark tree's face alone (Decision 28: the receiving parametron's
-//!   tree at each cell's causal address read at the grain, no wave, at the model's constitution and
-//!   address; the compare's receipt), each baseline against it, and the model against it: the
-//!   wave's contribution;
+//!   the model's face is the mixture of the tree's face and the combined face (the primary's ruling
+//!   A); beside it, the landmark tree's face alone (Decision 28: the receiving parametron's tree at
+//!   each cell's causal address read at the grain, no wave, at the model's constitution and address;
+//!   the compare's receipt) and the combined face alone (tree plus wave), each baseline against
+//!   them, the combined face against the tree (the wave's contribution), the course by aeon, and
+//!   the mixture's end (`log₂ β`, rebases, drift);
 //! - `Kt` with the published keys, against the literal over the cells read;
 //! - each key location with its fibres per ring;
 //! - each aeon's boundary: its length and lift points, readings, collapse, first law (exchange plus
@@ -504,6 +506,27 @@ fn report(field: &Field, exposure: &Exposure) {
     );
     bits("training", &exposure.training, false, grain);
     bits("held out", &exposure.held_out, true, grain);
+    println!();
+    println!(
+        "== the receiving face's course by aeon (ruling A: each aeon's cells under the model, the tree face alone and the combined face alone; log2 beta at its boundary) =="
+    );
+    for (index, leg) in exposure.course.iter().enumerate() {
+        println!(
+            "aeon {index}: closed at cell {}, {} cells; model {} (a cell {}); tree {} (a cell {}); combined {} (a cell {}); combined − tree {}; log2 beta {}",
+            leg.cell,
+            leg.cells,
+            per(&leg.model, 1, grain),
+            per(&leg.model, leg.cells, grain),
+            per(&leg.tree, 1, grain),
+            per(&leg.tree, leg.cells, grain),
+            per(&leg.combined, 1, grain),
+            per(&leg.combined, leg.cells, grain),
+            difference(&leg.combined, &leg.tree, grain),
+            leg.log2_beta
+                .as_ref()
+                .map_or_else(|| "-".to_string(), |log| per(log, 1, grain))
+        );
+    }
     match &exposure.mixture {
         Some(mixture) => println!(
             "the receiver's mixture at the end (ruling A): log2 beta {} (beta = W_tree/W_combined), carried at W = {}, {} rebases, certified drift {} bits",

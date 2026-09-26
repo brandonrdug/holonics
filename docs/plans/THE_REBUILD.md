@@ -1171,10 +1171,10 @@ port. No other noun enters.
 | `Constitution` | `hnn/constitution.rs` | Θ, the standings `q` and each receiving ring's landmark tree (Decision 28) included, with a commit counter, the declared steps `γ_U` and `η_x`, and its bit budget `B_Θ`. Its fields are private, and only `deposit` and the collapse change it. | `holon::element::{ActiveRelation, ResistiveRelation, Pump}`, `holon::deposition::{project_passive, CommittedEnergyBound}` |
 | `NormalLaw` | `hnn/constitution.rs` | One locus's deposition owner, `W H = B`, with factored statistics of the locus's own width. There is no global Gram (review A6). `W` and `H` are carried on the locus's lattice with their remainders. `B = W H` is not carried (Decision 22) and `W` moves by the prox step (`NormalLaw::deposited`), the receiving map included (Decision 27 retired Decision 26's exogenous law). | `ratio::linear`; Lean `Holon/MomentStorage` |
 | `Current` | `hnn/field.rs` | The lift point `λ`: the rings' continuing motion, the only current that persists between words. It has no wave field (R2 C3). | `aeon::ClockLift` |
-| `SourceMoment` | `hnn/moment.rs` | On closing source rings only: the phase-binned counts `M_g`, the offset counts `C_g(δ)` on the exterior chart, the window `win_g` and its opening lift point; its capacity crossover `n*`. `m̃` is computed, never stored. | `navigator::Navigator`, `ratio::linear` |
+| `SourceMoment` | `hnn/moment.rs` | On closing source rings only: the phase-binned counts `M_g`, the offset counts `C_g(δ)` on the exterior chart, the window `win_g` and its opening lift point; its capacity crossover `n*`. `m̃` is computed, never stored, on the indexed normalized open (the primary's ruling B, Lean `HNN/IndexedOpen`): the counts over their population and the pair port at the window's address over its column's, each `1/n` on the `PopulationChart`'s lattice. | `navigator::Navigator`, `ratio::linear` |
 | `Word<'c>` | `hnn/word.rs` | One evaluation of the ticks at one cut's fixed operands, opening at zero change. It borrows `&'c Field` and owns the change: the waves, the contact states and their per-tick values or checkpoints, which its return reads in reverse. Its end releases the change. | `hnn::propagation` |
 | (functions) | `hnn/propagation.rs` | The junction Swing, the ring element step and the contact transit. | `geometry::swing`; the midpoint scheme of `holon::law::ReferenceHolon`, realized directly and equated with it in two tests (reception item 1) |
-| `ReceivingPhases` | `hnn/receiving.rs` | The receiving ring, its epochs `e_j`, aperture `A`, grain `L_R`, its tree's address depth `D` and the shared map `R`; it reads the wave `R P_R^(τ_R) v_R` at refine and, at compare, the combined face `grain(log₂ q(· \| a_j)) + R P_R^(τ_R) v_R` with the landmark tree's face at each phase's causal address `a_j` (`tree_faces`, `combine`, `ReceivingRead::combined`; Decision 28). It refuses `A` beyond the rank of the receiving ring's observability over the word, which it reports (review C7). Beside it, `ActiveAddress`: the receiving parametron's active suffix address, the last `D` cells received, which the resident shifts at every ingested cell, a pending ratio copies at its cut, the state bits count and the collapse keeps; not the moment's state, so `n*` is unchanged. `grain_exponent` (the grain's integer comparison) lives here. | `receiver::reception::ReceiverFace` |
+| `ReceivingPhases` | `hnn/receiving.rs` | The receiving ring, its epochs `e_j`, aperture `A`, grain `L_R`, its tree's address depth `D` and the shared map `R`; it reads the wave `R P_R^(τ_R) v_R` at refine and, at compare, the combined face `grain(log₂ q(· \| a_j)) + R P_R^(τ_R) v_R` with the landmark tree's face at each phase's causal address `a_j` (`tree_faces`, `combine`, `ReceivingRead::combined`; Decision 28); the scored face is `Mixture`'s, the tree's face against the combined face weighted by their likelihood ratio `β` in Θ (the primary's ruling A). It refuses `A` beyond the rank of the receiving ring's observability over the word, which it reports (review C7). Beside it, `ActiveAddress`: the receiving parametron's active suffix address, the last `D` cells received, which the resident shifts at every ingested cell, a pending ratio copies at its cut, the state bits count and the collapse keeps; not the moment's state, so `n*` is unchanged. `grain_exponent` (the grain's integer comparison) lives here. | `receiver::reception::ReceiverFace` |
 | `Landmarks` | `hnn/landmark.rs` | The receiving parametron's storage as a tree of landmarks (Decision 28): typed address letters (`Boundary`, `Cell`) read per cell, nodes founded at first arrival holding Krichevsky–Trofimov masses in half-units and the carried mixture ratio `β` (rebased on its derived carrier width `W` with a certified residual), the face along the one opened path (context-tree weighting) on the fixed-width lattice `2^(−M_p)`, the cell's odometer digits emitted as a dyadic partition of the unit cell, `M_p` and `W` derived from `n*`, `L_R`, `B` and `D`, and the prequential measurement against the baselines (Decision 29). It is the receiving parametron's storage in Θ (`ReceivingPhases` reads it; Decision 27's region table, its depth-one case, is retired from Rust). | `hnn::receiving::grain_exponent`; `hnn::reference::Baselines`; Lean `HNN/LandmarkTree` |
 | `HolonRatio` | `hnn/ratio.rs` | `R_j = Ĝ_(T←H)` at each receiving phase, as undivided pairs, with `ℓ`, its branch and the receiver's fibre. | `ratio::Presentation`, `ratio::surprisal::SymbolicSurprisal`, `ratio::exponentiated::{RatioFamily, CarriedPower}` |
 | `RatioCovector` | `hnn/ratio.rs` | `R⁻¹dR` at the face: the magnitude part `p̂ − q` and the phase part `−q_c Δ_c`, in units of `ln 2` carried as a declared factor. Only a `HolonRatio` constructs it. | — |
@@ -1665,6 +1665,7 @@ regression controls are controls, never milestones:
   | `E_0^(δ)` | `Σ_(ρ<m) e_ρ (a_ρ·x)(b_ρ·y)` on the pair `x ⊗ y`, rank `m = 2d_0 = 10` | `e_ρ = 0`; `a_ρ`, `b_ρ` from the sign generator | factor steps on `e`, `a`, `b` (`E_0^(δ)` is carried in this factored form, R3 §5) |
   | `R` (`512 × 22`) | linear | 0 (Decision 28's openings) | normal law, `H_0 = I`, `B_0 = 0` |
   | the landmark tree on ring 2 | the receiving parametron's storage, depth `D = 4`, the path lattice `M_p = 39` and the β carrier `W = 28` (derived) | empty: every node unfounded, every face uniform | the landmark deposit, each compared cell on its opened paths |
+  | the mixture on ring 2 (ruling A) | `β = W_T/W_C` on the landmark β chart at `W = 28` | 1: the prior ½/½ | `β' = β q_T(x)/q̃_C(x)`, each compared cell in order |
   | `W_c,g` (`2d_g × 2d_g`) | linear | 0 | normal law: feature the contrast `c_t`, covector the element adjoint's `u_t`; `H_0 = I`, `B_0 = 0` |
   | `W_s,g = −f_g f_g*` | square | `f_g = ½I`, so `W_s,g = −¼I` | factor step |
   | Slices `A_ρ,g = u_ρ v_ρ* − v_ρ u_ρ*`, `ρ < 2d_g`, rank 1 | skew | `u_ρ = e_ρ`, `v_ρ = e_(ρ+1 mod 2d_g)`; with every class `+1`, `Σ_ρ A_ρ,g` is the skew cyclic shift of the realified ring | factor steps on `u`, `v` |
@@ -1922,10 +1923,35 @@ order-0, so the repair precedes campaign 2. Its course:
   per-cell causal addresses, count-only first. Measured: held out `3 + 1/16 + ε` bits a cell,
   below online order-0, order-1 and PPM-2 by disjoint exact enclosures. **Decision 29** makes
   every comparison prequential, held-out cells included.
-- **Next:** the tree becomes the receiving face of `ReceivingPhases` (retiring the region table),
-  the exposure turns prequential with per-cell addresses, and the wave is kept only where it
-  lowers the code length below the tree's face (as address letters or as a correction), host
-  and card in parity.
+- **The tree is the receiving face** (built; #73): the receiving parametron's storage in Θ is the
+  landmark tree (`D = 4`), read at each phase's per-cell causal address (the window's earlier
+  targets, then the receiver's active suffix address, which the resident keeps beside the tree;
+  the moment's window and `n*` are unchanged), its grain logits added to the wave at compare; the
+  region table retires from Rust; `R_0 = 0` and `E_0` the sign generator times ½ (with both maps at
+  zero the wave would never move); the exposure is prequential. Two rulings of the primary follow,
+  each from the laws: **(A)** the scored face is the mixture of the tree's face and the combined
+  face (tree plus wave) weighted by their likelihood ratio `β`, as a tree node weighs its own face
+  against its split (`hnn::receiving::Mixture`); **(B)** the source opens on its indexed,
+  normalized counts (Decision 26's open, Lean `HNN/IndexedOpen`), each `1/n` carried by a
+  population chart on its declared lattice (`hnn::moment::PopulationChart`). Measured on the
+  standing real cut, host and card in parity (identical readouts outside the wall times), held out
+  per cell at the grain:
+  - before (A) and (B): the combined face `13 + 11/16 + ε` against the tree's `3 + 1/16 + ε`: the
+    unnormalized open's features grow with the counts and the wave's reading with them;
+  - with (A): the model `3 + 1/16 + ε` (in all, model − order-0 `−1989 + 1/16 + ε` bits: the
+    campaign criterion met; model − tree `−1 + 9/16 + ε`); the combined face `13 + 10/16 + ε`, and
+    `log₂ β = 35109 + 9/16 + ε` at the end: the wave carries no weight;
+  - with (A) and (B): the model, the combined face and the tree each `3 + 1/16 + ε` a cell; in all,
+    model − tree `−7 + 1/16 + ε` (`−18 + 9/16 + ε` on the development cells), model − order-0
+    `−1996 + 9/16 + ε`, model − order-1 `−1494 + 8/16 + ε`, model − PPM-2 `−252 + 1/16 + ε`; combined −
+    tree below zero in every aeon (`−1 + 3/16`, `−6 + 0/16`, `−5 + 3/16`, `−6 + 13/16`, `−6 + 9/16`,
+    `−4 + 12/16`, each `+ ε`), and `log₂ β` at the boundaries `−2 + 12/16`, `−7 + 2/16`,
+    `−12 + 11/16`, `−17 + 5/16`, `−22 + 11/16` and `−25 + 6/16` at the end (each `+ ε`): the wave
+    earns its weight, a few bits over the cut.
+
+  Owed in #76: the tree read's card port (1,720 µs a window on the host against the card's word at
+  2,110 µs) and the tree's carrier past `u128` (its widths refuse 87,382 cells at `|A| = 256`,
+  `D = 4`).
 
 Each lands Lean first with its consumer, and the exposure is re-run on the standing real cut,
 resident on the card.

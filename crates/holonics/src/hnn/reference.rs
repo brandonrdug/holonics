@@ -2237,6 +2237,9 @@ pub struct Exposure {
     pub held_out: Bits,
     pub keys: Vec<KeyReport>,
     pub aeons: Vec<AeonBoundary>,
+    /// The receiving face's course by aeon (ruling A): each aeon's model, tree and combined code
+    /// lengths and the mixture's `log₂ β` at its boundary, the run's last, open aeon at its end.
+    pub course: Vec<AeonCourse>,
     pub constitution_curve: Vec<CurvePoint>,
     pub windows: u64,
     pub open_windows: u64,
@@ -2271,6 +2274,77 @@ pub struct MixtureReport {
     pub width: u64,
     pub rebases: u64,
     pub drift: Rat,
+}
+
+/// [definition] **One aeon's leg of the receiving face's course** (ruling A): the cell at which it
+/// closed (the joint clock's carry-out, or the run's end), the cells compared since the previous
+/// boundary (every phase of the windows compared in it, a window counted in the aeon its compare
+/// ran in), their code lengths under the model (the mixture), the tree face alone and the combined
+/// face alone, and the mixture's `log₂ β` at the boundary: whether the combined face stops losing as
+/// its features stop growing.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct AeonCourse {
+    pub cell: u64,
+    pub cells: u64,
+    pub model: ExactInterval,
+    pub tree: ExactInterval,
+    pub combined: ExactInterval,
+    pub log2_beta: Option<ExactInterval>,
+}
+
+/// The sums of the aeon in progress.
+struct Leg {
+    cells: u64,
+    model: ExactInterval,
+    tree: ExactInterval,
+    combined: ExactInterval,
+}
+
+impl Leg {
+    fn open() -> Self {
+        let zero = ExactInterval::point(Rat::zero());
+        Self {
+            cells: 0,
+            model: zero.clone(),
+            tree: zero.clone(),
+            combined: zero,
+        }
+    }
+
+    fn add(
+        &mut self,
+        model: &ExactInterval,
+        tree: &ExactInterval,
+        combined: &ExactInterval,
+    ) -> Result<(), HnnError> {
+        self.cells += 1;
+        self.model = interval_sum(&self.model, model)?;
+        self.tree = interval_sum(&self.tree, tree)?;
+        self.combined = interval_sum(&self.combined, combined)?;
+        Ok(())
+    }
+
+    /// Close the leg at a cell, with the mixture's `log₂ β` read off the published constitution,
+    /// and open the next.
+    fn close(
+        &mut self,
+        cell: u64,
+        constitution: &Constitution,
+        ring: usize,
+    ) -> Result<AeonCourse, HnnError> {
+        let leg = std::mem::replace(self, Self::open());
+        Ok(AeonCourse {
+            cell,
+            cells: leg.cells,
+            model: leg.model,
+            tree: leg.tree,
+            combined: leg.combined,
+            log2_beta: constitution
+                .mixture(ring)
+                .map(|mixture| mixture.log2_beta())
+                .transpose()?,
+        })
+    }
 }
 
 /// [definition] **The executed word's readout over an exposure** (Decision 24): the charts' tally
@@ -2619,6 +2693,8 @@ where
     let mut held_out = Bits::empty();
     let mut baselines = Baselines::new(alphabet)?;
     let mut aeons = Vec::new();
+    let mut course = Vec::new();
+    let mut leg = Leg::open();
     let mut curve = vec![CurvePoint {
         commit: resident.constitution().commit(),
         bits: resident.constitution().carrier_bits(),
@@ -2707,6 +2783,7 @@ where
                 bits.tree = interval_sum(&bits.tree, tree)?;
                 bits.combined = interval_sum(&bits.combined, &phase.code_length)?;
                 baselines.code(bits, code)?;
+                leg.add(model, tree, &phase.code_length)?;
             }
             // Prequential (Decision 29): every compared window is deposited, held-out windows
             // included; only the budget stop discards.
@@ -2746,9 +2823,10 @@ where
             let ingested = ingested.forward.into_present().expect("ingest returns");
             fed += ingested.cells;
             if ingested.carry_out {
+                let at = position + fed;
+                course.push(leg.close(at as u64, resident.constitution(), phases.ring())?);
                 let closed = port.close_aeon(&mut resident, &family)?;
                 aeons.push(closed.forward.into_present().expect("a boundary"));
-                let at = position + fed;
                 locate(&mut resident, cut.closing_crib(aeon_start, at, crib.window))?;
                 aeon_start = at;
             }
@@ -2797,6 +2875,10 @@ where
         held_out,
         keys,
         aeons,
+        course: {
+            course.push(leg.close(position as u64, resident.constitution(), phases.ring())?);
+            course
+        },
         constitution_curve: curve,
         windows,
         open_windows,

@@ -13,6 +13,9 @@ use crate::ratio::{Rat, integer, rat};
 /// A generous budget for the laws' tests: the budget itself is tested on its own.
 pub(super) const OPEN_BUDGET: u64 = 1 << 40;
 
+/// The test fields declare `2^16` cells: the receiving tree's widths refuse a population past
+/// 428,078 cells at `|A| = 4`, `D = 2` (`hnn::receiving::landmark_declaration`; owed in #76).
+///
 /// **The six-ring path of `release.py`**: rings of period 2 (realified width 4) joined `(g, g+1)` on
 /// node 0 (channel width 2), exponents 0 (so `G_a = Y_a`), source ring 0, receiving ring 2 with
 /// the declared aperture, `|A| = 2`, junction admittances `Y_g` and contact admittances `Y_a`.

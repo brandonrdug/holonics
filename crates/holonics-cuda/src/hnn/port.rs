@@ -15,6 +15,13 @@
 //! | the word's return (`hnn_word_reverse`) | the Holon ratio and its covector, the return's source through `Rᵀ` (the covector lives on `(1/W)ℤ`), the composition onto the loci (`reference::compose`) |
 //! | | keys, the collapse, the first law's ledger, the handles, every refusal's reason |
 //!
+//! [open] **The tree read stays on the host, a #76 debt** (Decision 28; the primary's ruling): the
+//! landmark tree's 256-class face at each phase's causal address took 1,720 µs a window on the host
+//! (`WallTimes::tree_read`, 5,288,453 µs over the standing cut's 3,074 windows) against the card's
+//! word at 2,110 µs a window (the refine read, 6,488,213 µs), not small against it; its card port is
+//! owed in #76. The host phases around it (the Holon ratio with the tree-alone and mixture readings,
+//! the deposit, the re-read) dominate the wall.
+//!
 //! [definition] **The current stays on the card between methods** (the hardware law): the
 //! moment's counts, the published loci, the kept charts, and a refine's word (its record and its
 //! operands) until its compare reads its return. What crosses the bus per window is counted in
