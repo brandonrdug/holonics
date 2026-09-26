@@ -87,6 +87,8 @@
 //! | `HNN/Propagation.partialIsometry_transit`, `transit_balance`, `tick_well_defined` | [`transit`], [`transit_solve`], [`transit_update`], [`ContactOperands`] |
 //! | `HNN/Word.word_tick_balance`; `HNN/LatticeWord.{chart_energy_identity, feedback_tick}` | [`global_power`], [`TickBalance`] |
 //! | `Holon/Law.advance_law` (the midpoint scheme the element and a stored transit realize) | [`element_step`], [`transit`] (equated with `holon::law::ReferenceHolon` in the tests) |
+//! | `HNN/Contact.contact_boost_solve_or_singular_direction` (a declared boost's solve, certified at the cut or refused with its direction) | [`ContactOperands`] through `hnn::contact::certify_boost` |
+//! | `HNN/Ring.two_port_reference_balance` | [`Operands::port_scatterings`] |
 //!
 //! [definition; agent-inferred] **The path attenuation** ([`path_attenuation`], review C2) reads, at
 //! a cut, the least `Σ_a β_a Q_a / 2` over the source-to-receiver walks within the receiver's last
@@ -102,6 +104,7 @@ use crate::hnn::chart::{ChartKey, ChartReading, ChartWords, Charts, WordLattice,
 use crate::hnn::constitution::Lattice;
 use crate::hnn::field::{ConstitutionRead, Current, End, Field};
 use crate::hnn::realization::{entries, indexed};
+use crate::hnn::ring::{PortScattering, ResonatorOperands, port_scattering};
 use crate::ratio::exponentiated::power_of_two;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{add, dot, integer_dot, integral, lcm, scale, sub};
@@ -581,6 +584,7 @@ impl ContactOperands {
             step,
             [storage_factor, stiffness_factor, dissipation_factor],
             None,
+            None,
         )
     }
 
@@ -605,10 +609,12 @@ impl ContactOperands {
             conductance,
             step,
             factors,
+            None,
             Some((lattice, key, start)),
         )
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn build(
         ends: (usize, usize),
         selection: (Vec<usize>, Vec<usize>),
@@ -616,6 +622,7 @@ impl ContactOperands {
         conductance: Rat,
         step: &Rat,
         [storage_factor, stiffness_factor, dissipation_factor]: [&ExactRatMatrix; 3],
+        signature: Option<(usize, &[bool])>,
         lattice: Option<(&WordLattice, ChartKey, Option<&ChartWords>)>,
     ) -> Result<Self, HnnError> {
         let k = selection.0.len();
@@ -630,10 +637,34 @@ impl ContactOperands {
             gram(factor)
         };
         let storage = square(storage_factor)?;
-        let stiffness = square(stiffness_factor)?;
+        // A declared signature makes the stiffness `b diag(σ) bᵀ` (a boost where a column is
+        // negative, `hnn::contact`); it is certified at this cut's conductance before its solve.
+        let stiffness = match signature {
+            Some((_, signs)) => {
+                if stiffness_factor.rows() != k {
+                    return Err(HnnError::Shape {
+                        what: "contact factor rows (the channel width)",
+                        expected: k,
+                        found: stiffness_factor.rows(),
+                    });
+                }
+                crate::hnn::contact::signed_stiffness(stiffness_factor, Some(signs))?
+            }
+            None => square(stiffness_factor)?,
+        };
         let dissipation = square(dissipation_factor)?;
         if !conductance.is_positive() || !step.is_positive() {
             return Err(HnnError::NonpositiveDeclaration);
+        }
+        if let Some((contact, signs)) = signature
+            && signs.iter().any(|positive| !positive)
+        {
+            crate::hnn::contact::certify_boost(
+                contact,
+                [&storage, &stiffness, &dissipation],
+                &conductance,
+                step,
+            )?;
         }
         let operator = contact_operator(&storage, &stiffness, &dissipation, &conductance, step)?;
         let operator_norm = (0..k)
@@ -752,6 +783,13 @@ pub struct Operands {
     step: Rat,
     rings: Vec<RingOperands>,
     contacts: Vec<ContactOperands>,
+    /// Each ring's resonator (campaign 2, `hnn::ring`), where the constitution declares one. Its
+    /// charts are kept apart from [`Operands::charts`]: the resonator receives the storage wave
+    /// and moves none of the word's waves or readings.
+    resonators: Vec<Option<ResonatorOperands>>,
+    /// Each contact's declared surface-storage density `γ` (#31), where the constitution declares
+    /// its break law (`hnn::contact::BreakReceipt`).
+    surfaces: Vec<Option<Rat>>,
     incident: Vec<Vec<usize>>,
     weights: Vec<Vec<Rat>>,
     exact_weights: Vec<Vec<Rat>>,
@@ -930,9 +968,29 @@ impl Operands {
                     constitution.contact_stiffness(index),
                     constitution.contact_dissipation(index),
                 ],
+                constitution
+                    .contact_stiffness_signature(index)
+                    .map(|signs| (index, signs)),
                 lattice.as_ref().map(|lattice| (lattice, key, start)),
             )
         })?;
+        let resonators = indexed(field.rings().len(), |index| {
+            constitution
+                .ring_resonator(index)
+                .map(|material| {
+                    ResonatorOperands::at_cut(
+                        index,
+                        material,
+                        field.ring(index).admittance(),
+                        field.step(),
+                        lattice.as_ref(),
+                    )
+                })
+                .transpose()
+        })?;
+        let surfaces: Vec<Option<Rat>> = (0..field.contacts().len())
+            .map(|contact| constitution.contact_surface_storage(contact).cloned())
+            .collect();
         let incident: Vec<Vec<usize>> = (0..field.rings().len())
             .map(|ring| field.incident(ring).to_vec())
             .collect();
@@ -955,6 +1013,8 @@ impl Operands {
             step: field.step().clone(),
             rings,
             contacts,
+            resonators,
+            surfaces,
             incident,
             weights,
             exact_weights,
@@ -974,6 +1034,29 @@ impl Operands {
 
     pub fn contacts(&self) -> &[ContactOperands] {
         &self.contacts
+    }
+
+    /// Each ring's resonator operands, where one is declared.
+    pub fn resonators(&self) -> &[Option<ResonatorOperands>] {
+        &self.resonators
+    }
+
+    /// Each contact's declared surface-storage density, where its break law is declared.
+    pub fn surfaces(&self) -> &[Option<Rat>] {
+        &self.surfaces
+    }
+
+    /// **The reference change at every port of ring `r`'s junction** (Lean
+    /// `HNN/Ring.two_port_reference_balance`; [`crate::hnn::ring::port_scattering`]): the storage
+    /// port's first, then each incident contact's, each with `Γ² + T = 1`.
+    pub fn port_scatterings(&self, ring: usize) -> Result<Vec<PortScattering>, HnnError> {
+        let conductances: Vec<&Rat> = self.incident[ring]
+            .iter()
+            .map(|&a| self.contacts[a].conductance())
+            .collect();
+        (0..=conductances.len())
+            .map(|port| port_scattering(self.rings[ring].admittance(), &conductances, port))
+            .collect()
     }
 
     /// The contacts meeting a ring.

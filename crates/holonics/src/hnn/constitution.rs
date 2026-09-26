@@ -170,6 +170,9 @@ use num_traits::{One, Signed, ToPrimitive, Zero};
 use rayon::prelude::*;
 
 use crate::hnn::HnnError;
+use crate::hnn::contact::{
+    certify_boost, contact_conductances, signed_form_certifies, signed_stiffness,
+};
 use crate::hnn::field::{ConstitutionRead, Field};
 use crate::hnn::landmark::{Landmarks, Letter};
 use crate::hnn::moment::PairPort;
@@ -177,6 +180,7 @@ use crate::hnn::port::Deposit;
 use crate::hnn::propagation::gram;
 use crate::hnn::realization::{indexed, outer_rows};
 use crate::hnn::receiving::{Mixture, MixtureStep, landmark_declaration};
+use crate::hnn::ring::ResonatorMaterial;
 use crate::holon::deposition::CommittedEnergyBound;
 use crate::ratio::linear::vector::{Chart, integral, lcm, matrix_form};
 use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
@@ -1718,6 +1722,8 @@ struct RingMaterial {
     /// The receiver's mixture of the tree's face and the combined face (ruling A), on a receiving
     /// ring: its carried likelihood ratio `β`.
     mixture: Option<Mixture>,
+    /// The ring's resonator (campaign 2, `hnn::ring`), declared, not learned.
+    resonator: Option<ResonatorMaterial>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -1726,6 +1732,76 @@ struct ContactMaterial {
     stiffness: ExactRatMatrix,
     dissipation: ExactRatMatrix,
     scales: [Rat; 3],
+    /// A declared boost (campaign 2, `hnn::contact`): the stiffness factor's column signs and the
+    /// certification context its every solve is checked in.
+    boost: Option<Boost>,
+    /// The declared surface-storage density `γ` of the contact's break law (#31).
+    surface: Option<Rat>,
+}
+
+/// [definition] **A declared boost**: the signature `σ` of the stiffness factor's columns
+/// (`K = b diag(σ) bᵀ`), the conductances the contact can take (`None` when a screw's pitch makes the
+/// family infinite; then the signed form must certify every conductance at once) and the hop.
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct Boost {
+    signature: Vec<bool>,
+    conductances: Option<Vec<Rat>>,
+    step: Rat,
+}
+
+impl Boost {
+    /// **Certify a boost's material** (Lean `HNN/Contact.contact_boost_solve_or_singular_direction`):
+    /// the signed form certifies every conductance at once, or else each admitted conductance's
+    /// operator is nonsingular; a refusal carries the singular direction.
+    fn certify(&self, contact: usize, material: &ContactMaterial) -> Result<(), HnnError> {
+        let storage = gram(&material.storage)?;
+        let stiffness = signed_stiffness(&material.stiffness, Some(&self.signature))?;
+        let dissipation = gram(&material.dissipation)?;
+        if signed_form_certifies(&storage, &stiffness, &dissipation, &self.step)? {
+            return Ok(());
+        }
+        let Some(conductances) = &self.conductances else {
+            return Err(HnnError::UncertifiedBoost { contact });
+        };
+        for conductance in conductances {
+            certify_boost(
+                contact,
+                [&storage, &stiffness, &dissipation],
+                conductance,
+                &self.step,
+            )?;
+        }
+        Ok(())
+    }
+}
+
+/// A gradient on a signed factor: `∂⟨K̄, b diag(σ) bᵀ⟩/∂b = (K̄ + K̄ᵀ) b diag(σ)`, the Gram factor's
+/// gradient with each column multiplied by its sign.
+fn signed_columns(
+    gradient: &ExactRatMatrix,
+    signature: &[bool],
+) -> Result<ExactRatMatrix, HnnError> {
+    if signature.len() != gradient.columns() {
+        return Err(HnnError::Shape {
+            what: "a stiffness signature (one sign per factor column)",
+            expected: gradient.columns(),
+            found: signature.len(),
+        });
+    }
+    Ok(ExactRatMatrix::shaped(
+        gradient.rows(),
+        gradient.columns(),
+        (0..gradient.rows())
+            .map(|i| {
+                (0..gradient.columns())
+                    .map(|j| {
+                        let entry = gradient.get(i, j).expect("in range").clone();
+                        if signature[j] { entry } else { -entry }
+                    })
+                    .collect()
+            })
+            .collect(),
+    )?)
 }
 
 /// [definition] **A carried array of a locus**: an array whose entries live on the locus's
@@ -2160,6 +2236,7 @@ impl Constitution {
                     receiving,
                     mixture: receivers.contains(&g).then(|| Mixture::new(carrier(g))),
                     tree: tree(g)?,
+                    resonator: None,
                 })
             })
             .collect::<Result<Vec<_>, HnnError>>()?;
@@ -2173,6 +2250,8 @@ impl Constitution {
                     stiffness: scaled_identity(k, rat(1, 2)),
                     dissipation: scaled_identity(k, rat(1, 2)),
                     scales: [Rat::one(), Rat::one(), Rat::one()],
+                    boost: None,
+                    surface: None,
                 }
             })
             .collect();
@@ -2336,6 +2415,101 @@ impl Constitution {
                 .remove(&(Locus::Channel(contact), Carrier::Factor(family)));
         }
         Ok(self)
+    }
+
+    /// **Declare a contact's boost** (campaign 2, `hnn::contact`): the signs of its stiffness
+    /// factor's columns, `K_a = b_a diag(σ) b_aᵀ`, certified before it is admitted (the signed form
+    /// `2C + hD + (h²/2)K ⪰ 0`, or a nonsingular operator at every conductance the contact can take
+    /// on the field), and refused with the singular direction otherwise. Every later deposit is
+    /// certified again, and a deposit that would make a solve singular is refused.
+    pub fn with_contact_signature(
+        mut self,
+        field: &Field,
+        contact: usize,
+        signature: Vec<bool>,
+    ) -> Result<Self, HnnError> {
+        let columns = self.contacts[contact].stiffness.columns();
+        if signature.len() != columns {
+            return Err(HnnError::Shape {
+                what: "a stiffness signature (one sign per factor column)",
+                expected: columns,
+                found: signature.len(),
+            });
+        }
+        let boost = Boost {
+            signature,
+            conductances: contact_conductances(field, contact)?,
+            step: field.step().clone(),
+        };
+        boost.certify(contact, &self.contacts[contact])?;
+        self.contacts[contact].boost = Some(boost);
+        Ok(self)
+    }
+
+    /// **Declare a contact's break law** (#31, `hnn::contact::BreakReceipt`): its surface-storage
+    /// density `γ ≥ 0`, the gluing work of each parted node.
+    pub fn with_surface_storage(mut self, contact: usize, density: Rat) -> Result<Self, HnnError> {
+        if density.is_negative() {
+            return Err(HnnError::NonpositiveDeclaration);
+        }
+        self.contacts[contact].surface = Some(density);
+        Ok(self)
+    }
+
+    /// **Declare a ring's resonator** (campaign 2, `hnn::ring`), certified at every pump phase at the
+    /// field's hop on the ring's realified width.
+    pub fn with_ring_resonator(
+        mut self,
+        field: &Field,
+        ring: usize,
+        material: ResonatorMaterial,
+    ) -> Result<Self, HnnError> {
+        if material.width() != field.ring(ring).width() {
+            return Err(HnnError::Shape {
+                what: "a resonator (the ring's realified width)",
+                expected: field.ring(ring).width(),
+                found: material.width(),
+            });
+        }
+        material.certify(ring, field.step())?;
+        self.rings[ring].resonator = Some(material);
+        Ok(self)
+    }
+
+    /// **The campaign-2 declarations' exact bits** (a reading the code length charges): each boost's
+    /// signature, each surface density, and each resonator's forms and pump, as numerator and
+    /// denominator bits.
+    pub fn declared_bits(&self) -> u64 {
+        let matrix_bits = |m: &ExactRatMatrix| m.entries().iter().map(bits).sum::<u64>();
+        let rings: u64 = self
+            .rings
+            .iter()
+            .filter_map(|ring| ring.resonator.as_ref())
+            .map(|resonator| {
+                let (c, k, d) = resonator.forms();
+                matrix_bits(c)
+                    + matrix_bits(k)
+                    + matrix_bits(d)
+                    + resonator.pump().map_or(0, |pump| {
+                        bits(pump.strength())
+                            + bits(pump.axis().cos())
+                            + bits(pump.axis().sin())
+                            + 2
+                    })
+            })
+            .sum();
+        let contacts: u64 = self
+            .contacts
+            .iter()
+            .map(|contact| {
+                contact
+                    .boost
+                    .as_ref()
+                    .map_or(0, |boost| boost.signature.len() as u64)
+                    + contact.surface.as_ref().map_or(0, bits)
+            })
+            .sum();
+        rings + contacts
     }
 
     /// **Replace one ring's standing, source port or receiving map** (a test and control chart).
@@ -2876,6 +3050,12 @@ impl Constitution {
             charts.extend(read.into_iter().map(|reading| (locus, reading)));
         }
         next.carries.retain(|_, carry| !carry.0.is_empty());
+        // A deposit that would make a boost's solve singular is refused, with its direction.
+        for (contact, material) in next.contacts.iter().enumerate() {
+            if let Some(boost) = &material.boost {
+                boost.certify(contact, material)?;
+            }
+        }
         next.commit += 1;
         // The clocks of the loci whose update was nonzero advance; the released residuals and the
         // stepped entries are read off the budgeted carries.
@@ -3151,6 +3331,7 @@ impl<'a> LocusMaterial<'a> {
                 receiving,
                 tree,
                 mixture,
+                resonator: _,
             } = material;
             let width = standing.len();
             if named.contains_key(&Locus::Element(g)) {
@@ -3376,6 +3557,12 @@ fn factor_step(
                 energy,
                 eta,
             )?;
+            // A boost's stiffness factor carries its signature: its gradient's columns take their
+            // signs (`signed_columns`).
+            let gradient = match (index, &material.boost) {
+                (1, Some(boost)) => signed_columns(gradient, &boost.signature)?,
+                _ => gradient.clone(),
+            };
             let factor = match index {
                 0 => &mut material.storage,
                 1 => &mut material.stiffness,
@@ -3386,7 +3573,7 @@ fn factor_step(
                 at,
                 Carrier::Factor(index),
                 factor,
-                &rate_matrix(&rate, gradient)?,
+                &rate_matrix(&rate, &gradient)?,
                 "a channel factor gradient",
             )?;
         }
@@ -3472,6 +3659,18 @@ fn certify_growth(
 impl ConstitutionRead for Constitution {
     fn standing(&self, ring: usize) -> &[Rat] {
         &self.rings[ring].standing
+    }
+    fn contact_stiffness_signature(&self, contact: usize) -> Option<&[bool]> {
+        self.contacts[contact]
+            .boost
+            .as_ref()
+            .map(|boost| boost.signature.as_slice())
+    }
+    fn contact_surface_storage(&self, contact: usize) -> Option<&Rat> {
+        self.contacts[contact].surface.as_ref()
+    }
+    fn ring_resonator(&self, ring: usize) -> Option<&ResonatorMaterial> {
+        self.rings[ring].resonator.as_ref()
     }
     fn passive_factor(&self, ring: usize) -> &ExactRatMatrix {
         &self.rings[ring].passive

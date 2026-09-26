@@ -23,7 +23,13 @@
 //! - [`landmark`]: the receiving parametron's storage as a tree of landmarks ([`Landmarks`]): typed
 //!   address letters, KT masses at nodes founded at first arrival, the path face mixed along the
 //!   opened path, its deposit and its prequential measurement (Decision 28);
-//! - [`keys`]: the data → menu map, key location per ring in carry order, and gauge fixing.
+//! - [`keys`]: the data → menu map, key location per ring in carry order, and gauge fixing;
+//! - [`ring`] (campaign 2): the ring's parametron resonator at its storage port (its mode storage
+//!   `Q = diag(K, C)`, its pump and sheets), its rotor clock's epoch ticks, and the junction's
+//!   reference change;
+//! - [`contact`] (campaign 2): the contact's transfer and site kind, its certified boost, its lock
+//!   address and its break receipt, with [`contact_readings`], the lock and site readings the
+//!   receiving join consumes.
 //!
 //! The learning side (constitution, ratio, pending, retention, port, reference) composes these.
 //! `realization` runs the regions whose effects commute together on the host's cores (the hardware
@@ -50,6 +56,9 @@
 //! | the receiving face compresses landmarks: the tree's path face, its opened-path deposit and telescope, the executed dyadic face (Decision 28) | `HNN/LandmarkTree.{path_face_normalized, weight_step, landmark_step, path_telescope_exact, depth_one_is_decision_27, executed_split_laws, cell_faces_partition, digit_log_residual}` ([`landmark`]'s header has the rest) | [`landmark`] |
 //! | the word opens at zero | structural: [`Current`] has no wave field (`HNN/Retention.word_opens_at_zero` is the abstract trajectory's linearity) | [`Word::open`] |
 //! | keys | `HNN/Keys.{field_loop_fibre, selective_step_dormant, propagation_eq_edge_fibre, gauge_fix_unique}` | [`keys`], [`crate::compression::Menu::propagate`] |
+//! | the ring's mode tick, its pump and sheets, its clock, the junction's reference change (campaign 2) | `HNN/Ring.{ring_tick_conserves_mode_energy, ring_descriptor_tick_conserves, ring_cayley_denominator_nonsingular, ring_tick_executed_energy_balance, two_port_reference_balance, ring_crossings_are_epoch_ticks, pump_half_turn_invariant, pump_blind_to_sheets, locked_sheet_receiver_face}` | [`ring`] |
+//! | the contact's transfer and site kind, its boost, its lock address, its break (campaign 2) | `HNN/Contact.{contact_transfer_kind_by_storage_sign, contact_mode_transfer, contact_boost_solve_or_singular_direction, contact_signed_storage_balance, contact_lock_address}`, `HNN/ContactBreak.{break_release_balance, break_iff_release_covers_gluing, griffith_closed_port_case, parting_returns_gluing_defect}` | [`contact`], [`contact_readings`], [`Field::parted_holon`] |
+//! | the executed tick's field balance, every defect stated (campaign 2) | `HNN/Word.field_executed_balance_with_defects` | [`word::FieldBalance`], [`word::WordBalance`] |
 //! | the ring's navigator | `Holon/Generator.{mapRotor_order, map_pow_mod_order, map_turn_lossless}` | [`Ring::navigator`] over `navigator::Transport::Map` |
 //! | the block incidence, the contrast map read from its blocks, and the Holarchy chart | `Holon/Complex.{blockIncidence, block_flat_closed}`, `Holarchy/Join.interconnect` | [`Field::connection`], [`Field::contrast`], [`Field::holon`] |
 //! | the port's returns | `Holarchy/Reception.InteractionReturn` (the owner's, generic in its payloads) | [`ExecutionPort`] |
@@ -69,6 +78,7 @@
 
 pub mod chart;
 pub mod constitution;
+pub mod contact;
 pub mod field;
 pub mod keys;
 pub mod landmark;
@@ -81,10 +91,14 @@ pub(crate) mod realization;
 pub mod receiving;
 pub mod reference;
 pub mod retention;
+pub mod ring;
 pub mod word;
 
 pub use chart::{ChartKey, ChartReading, ChartStart, ChartWords, Charts, Remainders, WordLattice};
 pub use constitution::{Carrier, CarrierBits, Constitution, Lattice, Locus, NormalLaw, Steps};
+pub use contact::{
+    BreakReceipt, ContactLock, ContactReading, KindCensus, SiteReading, contact_readings,
+};
 
 pub use field::{
     ConstitutionRead, Contact, ContactDeclaration, Current, Field, FieldDeclaration, Ring,
@@ -104,6 +118,7 @@ pub use ratio::{Faces, HolonRatio, RatioCovector};
 pub use receiving::{ActiveAddress, GrainCell, LetterReader, ReceivingPhases, ReceivingRead};
 pub use reference::{Cut, Exposure, Reference, Resident};
 pub use retention::AeonBoundary;
+pub use ring::{PumpDeclaration, ResonatorMaterial, RingClock};
 pub use word::{Released, Word};
 
 #[cfg(test)]
@@ -284,6 +299,28 @@ pub enum HnnError {
     Carrier { what: &'static str },
     #[error("the execution port's realization refused: {what}")]
     Realization { what: &'static str },
+    #[error(
+        "the contact's transfer has no Cayley chart: its denominator 2c + p + hd + h²k/2 is zero"
+    )]
+    SingularTransfer,
+    #[error(
+        "contact {contact}'s boost has no solve at conductance {conductance}: its operator sends {direction:?} to zero"
+    )]
+    SingularContact {
+        contact: usize,
+        conductance: Box<Rat>,
+        direction: Vec<Rat>,
+    },
+    #[error(
+        "contact {contact}'s boost is not certified: its signed form is not positive semidefinite and its conductances are not a finite family"
+    )]
+    UncertifiedBoost { contact: usize },
+    #[error(
+        "ring {ring}'s resonator is not certified at pump phase {phase}: its signed form 2C + hD + (h²/2)K is not positive semidefinite"
+    )]
+    UncertifiedResonator { ring: usize, phase: usize },
+    #[error("ring {ring}'s resonator material is malformed: {what}")]
+    Resonator { ring: usize, what: &'static str },
     #[error(
         "the chart {chart:?} did not refine below its certificate {certificate}: the target is {target}"
     )]

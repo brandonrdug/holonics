@@ -59,6 +59,8 @@
 //! | `Holarchy/Join.interconnect`, `Holon/Dirac.kirchhoff_isDirac`, `Holarchy/Join.Holarchy.parametric` | [`Field::holon`] (certified at the mount) |
 //! | `HNN/Propagation.partialIsometry_transit` | [`Field::connection`]'s blocks `U_aᵀ`, read by [`Field::contrast`] and by the transit's channel selections ([`Contact::selection`]) |
 //! | `Transport/HelicalPairInteraction.pairFeatureAt_gradient` | [`Contact::pair`] through [`PairContact`] |
+//! | `HNN/ContactBreak.parting_returns_gluing_defect` | [`Field::parted_holon`] |
+//! | `HNN/Contact.contact_signed_storage_balance` (a boost's signed stiffness in the chart) | [`Field::holon`] through `hnn::contact::signed_stiffness` |
 //! | `HNN/Moment.moment_capacity` | [`Field::declare`] through [`crate::hnn::moment::capacity`] |
 
 use std::collections::BTreeMap;
@@ -77,7 +79,7 @@ use crate::hnn::constitution::{Lattice, Locus, Steps};
 use crate::hnn::landmark::Landmarks;
 use crate::hnn::moment::{Capacity, PairPort, capacity};
 use crate::hnn::receiving::Mixture;
-use crate::holarchy::{Gluing, Holarchy};
+use crate::holarchy::{Gluing, GluingDefect, Holarchy};
 use crate::holon::contact::PairContact;
 use crate::holon::contact::menu::PortPermutation;
 use crate::holon::dirac::DiracStructure;
@@ -130,6 +132,22 @@ pub trait ConstitutionRead: Sync {
     /// `hnn::receiving::Mixture`) on a receiving ring, which scores the window at compare; `None`
     /// elsewhere.
     fn mixture(&self, ring: usize) -> Option<&Mixture>;
+    /// **A contact's stiffness signature** (campaign 2, `hnn::contact`): the sign of each column of
+    /// its stiffness factor, `K_a = b_a diag(σ) b_aᵀ`. `None`, every constitution of campaign 1, is
+    /// every column positive (`K_a = b_a b_aᵀ ⪰ 0`).
+    fn contact_stiffness_signature(&self, _contact: usize) -> Option<&[bool]> {
+        None
+    }
+    /// **A contact's surface-storage density** `γ` (#31, `hnn::contact::BreakReceipt`): the gluing
+    /// work of each parted node. `None` declares no break law.
+    fn contact_surface_storage(&self, _contact: usize) -> Option<&Rat> {
+        None
+    }
+    /// **A ring's resonator** (campaign 2, `hnn::ring`): its parametron's mode storage, dissipation
+    /// and pump at its storage port. `None`, every constitution of campaign 1, declares none.
+    fn ring_resonator(&self, _ring: usize) -> Option<&crate::hnn::ring::ResonatorMaterial> {
+        None
+    }
 }
 
 // -------------------------------------------------------------------------------------------
@@ -1366,6 +1384,89 @@ impl Field {
             .map_err(glued)
     }
 
+    /// **A parted contact's shared face returns its typed gluing defect** (Lean
+    /// `HNN/ContactBreak.parting_returns_gluing_defect`, over `Holarchy/Join.{interconnect_ok_iff,
+    /// GluingDefect.not_glues}`). The field's Holarchy chart ([`Field::holon`]) is declared again with
+    /// no flow transmitted through the parted contact's shared ports (its flow gain's columns zero,
+    /// `partedAt`), and `interconnect` returns the failed check with its witness: the join no longer
+    /// cancels the interface power ([`GluingDefect::UncancelledPower`]). An unparted contact (index
+    /// outside the field) is refused; a parted declaration that glued would contradict the law and
+    /// is refused as a realization defect.
+    pub fn parted_holon(
+        &self,
+        constitution: &impl ConstitutionRead,
+        parted: usize,
+    ) -> Result<GluingDefect, HnnError> {
+        if parted >= self.contacts.len() {
+            return Err(HnnError::Shape {
+                what: "a parted contact",
+                expected: self.contacts.len(),
+                found: parted,
+            });
+        }
+        let ends: Vec<Vec<(usize, End)>> = (0..self.rings.len())
+            .map(|g| {
+                self.contacts
+                    .iter()
+                    .enumerate()
+                    .filter_map(|(a, contact)| {
+                        if contact.from == g {
+                            Some((a, End::From))
+                        } else if contact.to == g {
+                            Some((a, End::To))
+                        } else {
+                            None
+                        }
+                    })
+                    .collect()
+            })
+            .collect();
+        let rings = (0..self.rings.len())
+            .map(|g| self.ring_holon(constitution, g, &ends[g]))
+            .collect::<Result<Vec<_>, _>>()?;
+        let contacts = (0..self.contacts.len())
+            .map(|a| self.contact_holon(constitution, a))
+            .collect::<Result<Vec<_>, _>>()?;
+        let mut contact_port = Vec::with_capacity(self.contacts.len());
+        let mut offset = 0;
+        for contact in &self.contacts {
+            contact_port.push(offset);
+            offset += 2 * contact.width();
+        }
+        let mut shared = Vec::new();
+        let mut parted_ports = Vec::new();
+        let mut ring_port = 0;
+        for incident in &ends {
+            for &(a, end) in incident {
+                let k = self.contacts[a].width();
+                let at = contact_port[a] + if end == End::From { 0 } else { k };
+                for j in 0..k {
+                    if a == parted {
+                        parted_ports.push(shared.len());
+                    }
+                    shared.push((ring_port + j, at + j));
+                }
+                ring_port += k;
+            }
+        }
+        let t = shared.len();
+        let flow_gain = crate::ratio::linear::vector::matrix(t, t, |i, j| {
+            if i == j && !parted_ports.contains(&j) {
+                Rat::one()
+            } else {
+                Rat::zero()
+            }
+        })?;
+        let gluing =
+            Gluing::at_ports(shared)?.with_gains(flow_gain, ExactRatMatrix::identity(t)?)?;
+        match side_by_side(rings)?.interconnect(&side_by_side(contacts)?, &gluing) {
+            Err(defect) => Ok(defect),
+            Ok(_) => Err(HnnError::Realization {
+                what: "a parted shared face glued; the parting law refutes it",
+            }),
+        }
+    }
+
     /// Ring `g`'s own Holon: storage `σ = 2d_g`, resistive `σ`, one external block per contact end
     /// in `ends`, active `σ`, on the kernel form
     /// `f_S + B_g f_P + Ω e_S + e_R + e_A = 0; f_R − e_S = 0; e_P − B_gᵀ e_S = 0; f_A − e_S = 0`,
@@ -1468,7 +1569,12 @@ impl Field {
         a: usize,
     ) -> Result<Holon, HnnError> {
         let k = self.contacts[a].width();
-        let stiffness = crate::hnn::propagation::gram(constitution.contact_stiffness(a))?;
+        // The signed stiffness `b diag(σ) bᵀ` where a signature is declared (a boost,
+        // `hnn::contact`); `b bᵀ` otherwise.
+        let stiffness = crate::hnn::contact::signed_stiffness(
+            constitution.contact_stiffness(a),
+            constitution.contact_stiffness_signature(a),
+        )?;
         let dissipation = crate::hnn::propagation::gram(constitution.contact_dissipation(a))?;
         let compliance =
             crate::hnn::propagation::gram(constitution.contact_storage(a))?.inverse()?;
