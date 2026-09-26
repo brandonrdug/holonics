@@ -117,8 +117,13 @@ mathematics, not a style.
 - Algebraic and transcendental quantities are their constraint identities. π and `e` are
   navigators; a float is a face of one, and error enters only in how a face is attained.
 - Estimation is replaced by partition.
-- A float appears only at an exterior boundary: matching external data, or reading a measurement
-  for a person. Nothing inside a law, an owner or the HNN consumes one.
+- A float appears only at an exterior boundary where foreign data arrives as floats (matching
+  external data). A measurement is never reported as a float or a decimal, not even for a
+  person: a decimal is a collapse (Brandon, September 25). Report readings exactly: integers
+  with their factorization, ratios with their remainder, enclosures with exact endpoints,
+  a reading at a declared grain (carry, phase class and the unresolved fibre, as `GrainCell`),
+  and comparisons as exact orderings or exact differences. Nothing inside a law, an owner or the
+  HNN consumes a float.
 - A percentage is a rate, which is motion; state the motion.
 - No unjustified literal or magic number enters a law.
 
