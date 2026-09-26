@@ -3003,3 +3003,40 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
       one held-out pass, host and card.
 
     Source: agent-inferred, from Decisions 30, 32 and 33, and from Decision 28's weighing law.
+
+    **Measured (September 26).** Lean `HNN/LocalWeighing` has 44 declarations. The forward
+    mixture, its telescope and its dominance underlie all three laws, with fixed-share,
+    landmark-local own weights and the stop mixture per digit tree. Each law was chosen on the
+    development cells and charged its family:
+
+    | Law | Development, charged, vs the `½` tree | Held out, charged, vs the `½` tree |
+    |---|---|---|
+    | the stop mixture per digit tree (`½` joined with `(1, 3)` at `π = ½`) | `−121 + 7/16 + ε` | **`−7 + 12/16 + ε`**, below order-0, order-1 and PPM-2 |
+    | landmark-local weighing with the Born face | `−52 + 11/16 + ε` | `+17 + 3/16 + ε` |
+    | switching across epochs | `−98 + 9/16 + ε` | `+11 + 4/16 + ε` |
+
+    - The stop mixture is adopted as the count face's law. Its uncharged development gain is
+      exactly campaign 2's one-slot control. Mixing all 256 laws per digit tree was refused: its
+      naming would cost 1,232 bits against a gain of `244 + 9/16`.
+    - The other two gained on the development cells and lost held out. Selection among hundreds of
+      members on 4,958 development cells does not transfer to 1,190 held-out cells.
+    - This located the measurement's own limit: the standing cut is too small to choose among
+      large families (Decision 35).
+
+35. **The count-only receiver is measured on a larger development cut.**
+    - **Why.** Decision 34 showed that choosing among families of hundreds of laws on 4,958
+      development cells does not transfer to 1,190 held-out cells. The development stream holds
+      15,462,581 cells, and the standing cut uses its last 6,148. Campaign 2's rebase lifted the
+      tree's carrier limit.
+    - **The cut.** A second pinned development cut holds the stream's last `2^20` cells, which
+      include the standing cut. Its final `2^17` cells are held out, the same one-eighth ratio as
+      the standing cut. `2^20` is the largest power of two whose tree fits the workstation's memory
+      budget at the measured bytes a node; the worker derives it and refuses a larger cut. The
+      evaluation partition stays unspent.
+    - **What runs on it.** The count-only receivers' laws are chosen on its development cells, then
+      one held-out pass is read: the tree, Decisions 32 and 34's laws, the Born face and the
+      baselines.
+    - **What stays.** The HNN's full exposure stays on the standing cut until its cost per window
+      falls.
+
+    Source: agent-inferred, from Decision 34's measurement.
