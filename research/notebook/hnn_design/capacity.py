@@ -16,44 +16,39 @@
 # n* = the least n with N(n) < |A|^n.  Past n* the map from A^n to the state is not injective
 # (pigeonhole), so the moment is lossy by construction.  f(n) = n log2|A| - log2 N(n) is convex with
 # f(0) <= 0 (each -log C(n + S - 1, S - 1) and -log(2n + d) is convex), so f > 0 holds at every
-# n >= n* once it holds at n*: n* is found by bisection and certified by the exact integer test
-# N(n) < |A|^n  <=>  N(n).bit_length() <= n log2|A|   (|A| a power of two).
+# n >= n* once it holds at n*: n* is found by integer bisection on the exact integer test
+# N(n) < |A|^n  <=>  N(n).bit_length() <= n log2|A|   (|A| a power of two),
+# the bracket found by doubling n under the same test, and certified again at n* - 1 and n*.
+# Every step is an integer; no magnitude is estimated.
 #
 # The moment's exact dense code (each slot self-delimited, max(1, bit length) + 1 bits) is a reading,
 # not the capacity: it is longer than log2 N(n), so it crosses later.
 import math, random
+from collections import Counter
 from fractions import Fraction as F
 from field import exact
 
-def log2N_float(n, rings, src, A, deltas):
-    """A float bracket only; every n* below is certified by exact integers."""
-    lg = lambda m, k: (math.lgamma(m + 1) - math.lgamma(k + 1) - math.lgamma(m - k + 1)) / math.log(2)
-    v = (max(deltas) if deltas else 0) * math.log2(A) + sum(math.log2(2 * n + d) for d in rings)
-    for g in src:
-        d = rings[g]
-        v += lg(n + d * A - 1, d * A - 1)
-        v += sum(lg(n - dl + d * A * A - 1, d * A * A - 1) for dl in deltas)
-    return v
-
 def N_exact(n, rings, src, A, deltas):
+    # Source rings of one period contribute the same counting factor: it is computed once per period
+    # and raised to that period's multiplicity (an exact identity, which keeps the eight-ring case's
+    # integer bisection within minutes).
     v = A ** (max(deltas) if deltas else 0)
     for d in rings:
         v *= 2 * n + d
-    for g in src:
-        d = rings[g]
-        v *= math.comb(n + d * A - 1, d * A - 1)
+    for d, m in Counter(rings[g] for g in src).items():
+        c = math.comb(n + d * A - 1, d * A - 1)
         for dl in deltas:
-            v *= math.comb(n - dl + d * A * A - 1, d * A * A - 1)
+            c *= math.comb(n - dl + d * A * A - 1, d * A * A - 1)
+        v *= c ** m
     return v
 
 def lossy(n, rings, src, A, deltas):
     assert A & (A - 1) == 0, "|A| a power of two"
     return N_exact(n, rings, src, A, deltas).bit_length() <= n * (A.bit_length() - 1)
 
-def nstar(rings, src, A, deltas, exact_search=True):
+def nstar(rings, src, A, deltas):
+    f = lambda n: lossy(n, rings, src, A, deltas)
     hi = 1
-    f = (lambda n: lossy(n, rings, src, A, deltas)) if exact_search else \
-        (lambda n: log2N_float(n, rings, src, A, deltas) < n * math.log2(A))
     while not f(hi):
         hi *= 2
     lo = hi // 2
@@ -112,8 +107,8 @@ rings = [16] * 8
 d, G = 16, 8
 first, second = d * A, d * A * A
 print(f"campaign-scale illustration (eight source rings of period 16): {G * (first + second):,} slots")
-lo = nstar(rings, list(range(8)), A, [1], exact_search=False)   # float bracket, certified exactly
-print(f"  n* = {lo:,} cells by counting (certified by exact integers at n* - 1 and n*)")
+ns = nstar(rings, list(range(8)), A, [1])   # integer bisection, certified at n* - 1 and n*
+print(f"  n* = {ns:,} cells by counting (certified by exact integers at n* - 1 and n*)")
 # the dense code with uniform counts is a step function of n, and its ratio is not monotone:
 def mb(n): return G * (first * slot_bits(round(F(n, first))) + second * slot_bits(round(F(n, second))))
 def first_below(n, step):

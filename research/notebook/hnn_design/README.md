@@ -3,8 +3,8 @@
 [established-bounded; measured] The exact-arithmetic scripts behind the measured numbers in the
 [step 4 design](../../../docs/plans/THE_REBUILD.md#step-4-design-the-hnn-law) and its #62 item on
 bounded bit growth ("Step 4 (#73) owed"). Every measured value is a `fractions.Fraction` or an exact
-integer, so each number is exact and seeded; `capacity.py` uses a float only to bracket a bisection,
-never prints one, and certifies each `n*` by exact integers. No script prints a float or a decimal
+integer, so each number is exact and seeded; `capacity.py` bisects on the exact integer test and
+certifies each `n*` at `n* − 1` and `n*`, with no float anywhere. No script prints a float or a decimal
 (a decimal is a collapse): `field.exact` prints a short ratio as `n/d (q rem r over d)`, its integer
 quotient and remainder, and a long one as its integer quotient `q` plus its remainder's exact
 enclosure between continued-fraction convergents with denominators at most `2^12`,
@@ -103,7 +103,7 @@ scripts come from four rounds: the first revision's re-run of the first review's
 (`bits2.py`), the second review, R2 (`swing_power.py`, `critical_cayley.py`, `collapse_check.py`),
 the second revision (the rest), and the third revision, answering R3 (`power.py`'s contrast-port
 cases, the counting `capacity.py` and the time-indexed `release.py`). `word_bits.py` takes about
-90 s and `capacity.py` about 3 min; the rest take seconds.
+90 s and `capacity.py` about 6 min (375,000 ms in the last run); the rest take seconds.
 
 | Script | What it measures | The design's number it reproduces |
 |---|---|---|
