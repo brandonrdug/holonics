@@ -93,7 +93,7 @@ pub use field::{
     RingDeclaration,
 };
 pub use keys::{KeyLocation, RingKeys, locate_keys};
-pub use landmark::{Emission, LandmarkDeclaration, Landmarks, Letter};
+pub use landmark::{LandmarkDeclaration, Landmarks, Letter};
 pub use masses::{ClassMasses, CountFace, MassStep, Regions};
 pub use moment::{Capacity, PairPort, SourceMoment};
 pub use pending::PendingRatio;

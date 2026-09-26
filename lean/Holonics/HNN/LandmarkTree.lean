@@ -32,6 +32,7 @@ trees      W_s = Σ_S 2^(−Γ(S)) ∏_(leaves ℓ of S) E_(s ℓ) ,   Σ_S 2^(�
 cochain    q_0 = q_D ∏_(d<D) q_d/q_(d+1) ;
            −log₂ q_0 = −log₂ q_D + Σ_(d<D) log₂ R_d ,  R_d = q_(d+1)/q_d
 digits     q(c) = ∏_(i<w) q(prefix_i c, bit_i c) ;   q̂(0) = clamp_[1, 2^M − 1](round(2^M q(0)))/2^M
+lattice    q̂_D = ⟦k_D⟧ ;  q̂_d = ⟦λ̂_d k_d + (1 − λ̂_d) q̂_(d+1)⟧ ;  β'_d = β_d k_d(c)/q̂_(d+1)(c) (1 − r)
 ```
 
 The standing is the count table at every node (`TreeStanding`): no occurrence list is retained.
@@ -98,6 +99,18 @@ likelihood of what reached it (`standing_is_routed_counts`).
    law as the materialized tree. Replacing a tree standing preserves every admitted future face
    exactly when the causal signatures agree (`Foundation/Standing`), a retention is lawful exactly
    when it refines the signature, and nodes deeper than the admitted depth are releasable.
+10. **The lattice chart** (`lattice_path_laws`, `lattice_path_floor`, `lattice_path_deviation`,
+    `mix_ratio_bound`, `weight_log_lipschitz`, `lattice_step_telescope`, `lattice_node_telescope`,
+    `rebase_log_residual`; section 6′): the executed path rounds every level to `2^(−M)ℤ`
+    (`latticeFrom`); for any stop weights its faces are lattice points in `[2^(−M), 1 − 2^(−M)]`, the
+    digit's split is positive and normalized and the cells' executed faces partition the unit cell;
+    the faces never fall below the lattice floor of the KT floor; the absolute deviation from the
+    exact path adds down the path, `(m + 1) 2^(−M−1) + Σ|λ̂ − λ|`; in logarithms the mixture moves by
+    at most the drift of `β` plus the child's, and the node weight by at most its split mass's; one
+    executed step is the weight's ratio times a rebase factor `γ ∈ [1 − r, 1]` with
+    `β' = β k/q̂' · (1 − r)`, and a node's passage telescopes to the weight's ratio times those
+    factors; a rebase's residual is `ln(x/⌊x⌋) < 1/⌊x⌋`, and `|log₂(1 − r)| < 2^(3−W)` for
+    `r < 2^(1−W)`.
 
 [counterexample; formal-checked]
 * `budget_eviction_changes_face`: evicting an occupied child by budget alone changes a later face
@@ -120,14 +133,20 @@ gradient only once a metric is supplied.
 
 [open] Owed in #62 ("Step 4 (#73) owed"): the KT parameter redundancy
 `−log₂ KT(x) ≤ −log₂ P_θ(x) + ½ log₂ n + 1` (binary), which with `kraft_and_dominance` gives CTW's
-full bound. The finite-cut orderings (the count-only tree below online order-0, order-1 and PPM-2
+full bound. **The lattice chart's passage-level drift** (#62, "the landmark lattice's drift"): the
+composition over the tree and the passage of `lattice_node_telescope`, `weight_log_lipschitz` and
+`mix_ratio_bound` into `|ln β̂_s − ln β_s| ≤ Σ_(subtree)(θ + 2|ln(1 − r)|) + Σ_s |ln(1 − r)|` and the
+per-cell rule `(3/2) B [(n* D² + 2D + 1) 2^(−M−1)/μ̂ + n* D² 2^(1−W)]` (Rust `landmark::face_bits`,
+`carrier_width`, `Landmarks::face_rule`), and **the certified binary logarithm's squaring
+invariant** (Rust `landmark::binary_log`); both are checked by the Rust tests. The finite-cut orderings (the count-only tree below online order-0, order-1 and PPM-2
 on the standing real cut) are measurement receipts, not theorems. The campaign 5 merge laws are not
 stated here: they have no consumer yet.
 
 The Rust consumer is `crates/holonics/src/hnn/landmark.rs` (`hnn::landmark`, written beside this
-owner): `Landmarks` (the tree, its path face `Landmarks::face`, `probability` and
-`ideal_probability`, its deposit `Landmarks::receive`), `Beta` (the carried β chart),
-`OpenedPath::edge_ratios` (the cochain) and `face_bits` (the executed digit split).
+owner): `Landmarks` (the tree executed on the lattice: its all-class face `Landmarks::face`,
+`probability`, `score`, its deposit `Landmarks::deposit` and `receive`, the certificates),
+`IdealLandmarks` (the ideal tree weighting in ℚ, the reference oracle), `Beta` (the carried β chart),
+`OpenedPath::edge_ratios` (the cochain) and `face_bits`, `carrier_width` (the derived widths).
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
@@ -1461,6 +1480,333 @@ theorem host_digit_bound_fails_downward :
 
 end Digits
 
+/-! ## 6′. The lattice chart: the executed path on `2^(−M)ℤ` -/
+
+section Lattice
+
+/-- [definition] **The lattice path from depth `d` with `m` levels below** (the digit `0`, Rust
+`hnn::landmark::Landmarks`): the leaf reads its KT face rounded to the lattice `2^(−M)ℤ`,
+`⟦k_d⟧`, and a node its rounded mixture `⟦λ̂_d k_d + (1 − λ̂_d) q̂_(d+1)⟧`, each by `executedSplit`
+(nearest, ties up, clamped into `[2^(−M), 1 − 2^(−M)]`). The first unfounded depth reads the prior
+(`k = 1/2`, which rounds to itself), a forced depth has `λ̂ = 0`. -/
+def latticeFrom (M : ℕ) (k lam : ℕ → ℚ) : ℕ → ℕ → ℚ
+  | 0, d => executedSplit M (k d) false
+  | m + 1, d => executedSplit M (lam d * k d + (1 - lam d) * latticeFrom M k lam m (d + 1)) false
+
+/-- [definition] **The exact path of one digit**: the path face `mixFrom` at one class
+(`exactFrom_eq_mixFrom`). -/
+def exactFrom (k lam : ℕ → ℚ) : ℕ → ℕ → ℚ
+  | 0, d => k d
+  | m + 1, d => lam d * k d + (1 - lam d) * exactFrom k lam m (d + 1)
+
+theorem exactFrom_eq_mixFrom {A : Type*} (k : ℕ → A → ℚ) (lam : ℕ → ℚ) (c : A) :
+    ∀ m d, exactFrom (fun d => k d c) lam m d = mixFrom k lam m d c
+  | 0, _ => rfl
+  | m + 1, d => by simp only [exactFrom, mixFrom, exactFrom_eq_mixFrom k lam c m (d + 1)]
+
+/-- [definition] **The value the lattice path's top rounds**: the digit's executed split is
+`executedSplit M (latticeTop …)` (`latticeFrom_top`). -/
+def latticeTop (M : ℕ) (k lam : ℕ → ℚ) : ℕ → ℚ
+  | 0 => k 0
+  | m + 1 => lam 0 * k 0 + (1 - lam 0) * latticeFrom M k lam m 1
+
+theorem latticeFrom_top (M : ℕ) (k lam : ℕ → ℚ) (m : ℕ) :
+    latticeFrom M k lam m 0 = executedSplit M (latticeTop M k lam m) false := by
+  cases m <;> rfl
+
+theorem latticeFrom_split (M : ℕ) (k lam : ℕ → ℚ) :
+    ∀ m d, ∃ x, latticeFrom M k lam m d = executedSplit M x false
+  | 0, d => ⟨k d, rfl⟩
+  | _ + 1, _ => ⟨_, rfl⟩
+
+theorem executedSplit_false (M : ℕ) (x : ℚ) :
+    executedSplit M x false = (splitNumerator M x : ℚ) / 2 ^ M := by
+  simp [executedSplit]
+
+/-- [proved-derived; formal-checked] **`lattice_path_laws`.** At `M ≥ 1`, for any KT faces and
+**any** stop weights (the lattice chart's `λ̂`, or anything else):
+* every face of the lattice path is a lattice point `n/2^M` with `1 ≤ n ≤ 2^M − 1`;
+* the digit's executed split `(q̂_0, 1 − q̂_0)` is positive and sums to one;
+* over the odometer digits of the cells `c < 2^w`, each digit prefix `π` with its own path, the
+  cells' executed faces are positive and sum to one (`cell_faces_partition`). -/
+theorem lattice_path_laws {M : ℕ} (hM : 1 ≤ M) (k lam : ℕ → ℚ) (D : ℕ) :
+    (∀ m d, ∃ n : ℤ, 1 ≤ n ∧ n ≤ 2 ^ M - 1 ∧ latticeFrom M k lam m d = n / 2 ^ M) ∧
+      (∀ b, 0 < executedSplit M (latticeTop M k lam D) b) ∧
+      executedSplit M (latticeTop M k lam D) false +
+          executedSplit M (latticeTop M k lam D) true = 1 ∧
+      ∀ (w : ℕ) (kπ lamπ : List Bool → ℕ → ℚ),
+        (∀ c, 0 < emit (fun π b => executedSplit M (latticeTop M (kπ π) (lamπ π) D) b) []
+          (toBits w c)) ∧
+          ∑ c ∈ Finset.range (2 ^ w),
+            emit (fun π b => executedSplit M (latticeTop M (kπ π) (lamπ π) D) b) []
+              (toBits w c) = 1 := by
+  refine ⟨fun m d => ?_, (executed_split_laws hM _).2.1, (executed_split_laws hM _).2.2.1,
+    fun w kπ lamπ => ((cell_faces_partition (fun _ _ => (1 / 2 : ℚ)) (fun _ => by norm_num)
+      w).2.2 hM fun π => latticeTop M (kπ π) (lamπ π) D)⟩
+  obtain ⟨x, hx⟩ := latticeFrom_split M k lam m d
+  obtain ⟨⟨h1, h2⟩, -⟩ := executed_split_laws hM x
+  exact ⟨splitNumerator M x, h1, h2, by rw [hx, executedSplit_false]⟩
+
+/-- Every lattice face lies in `[2^(−M), 1 − 2^(−M)]`. -/
+theorem lattice_mem {M : ℕ} (hM : 1 ≤ M) (k lam : ℕ → ℚ) (m d : ℕ) :
+    1 / 2 ^ M ≤ latticeFrom M k lam m d ∧ latticeFrom M k lam m d ≤ 1 - 1 / 2 ^ M := by
+  obtain ⟨n, h1, h2, hq⟩ := (lattice_path_laws hM k lam 0).1 m d
+  have hP : (0 : ℚ) < 2 ^ M := by positivity
+  have h1' : (1 : ℚ) ≤ n := by exact_mod_cast h1
+  have h2' : (n : ℚ) ≤ 2 ^ M - 1 := by exact_mod_cast h2
+  rw [hq]
+  constructor
+  · exact div_le_div_of_nonneg_right h1' hP.le
+  · rw [div_le_iff₀ hP, sub_mul, one_div_mul_cancel hP.ne']
+    linarith
+
+/-- Rounding to nearest never crosses a lattice point `N/2^M ≤ x` below it. -/
+theorem executedSplit_ge {M : ℕ} {N : ℤ} {x : ℚ} (hN : N ≤ 2 ^ M - 1) (hx : (N : ℚ) / 2 ^ M ≤ x) :
+    (N : ℚ) / 2 ^ M ≤ executedSplit M x false := by
+  have hP : (0 : ℚ) < 2 ^ M := by positivity
+  rw [executedSplit_false]
+  apply div_le_div_of_nonneg_right _ hP.le
+  have hfl : N ≤ ⌊x * 2 ^ M⌋ := by
+    rw [Int.le_floor]
+    rwa [div_le_iff₀ hP] at hx
+  have hround : ⌊x * 2 ^ M⌋ ≤ round (x * 2 ^ M) := by
+    rw [round_eq]
+    exact Int.floor_mono (by linarith)
+  have : N ≤ splitNumerator M x := by
+    unfold splitNumerator
+    exact le_max_of_le_right (le_min hN (hfl.trans hround))
+  exact_mod_cast this
+
+/-- [proved-derived; formal-checked] **`lattice_path_floor`.** When every KT face on the path is
+at least `μ` (`digit_face_ge`: `μ = 1/(2n + 2)`) and every stop weight lies in `[0, 1]`, every
+lattice face is at least `⌊2^M μ⌋/2^M` (when that numerator is at most `2^M − 1`): a convex
+combination of values at least a lattice point rounds to at least it. The floor `μ̂` of the widths'
+rule (Rust `landmark::face_bits`) does not decay down the path. -/
+theorem lattice_path_floor {M : ℕ} (k lam : ℕ → ℚ) {μ : ℚ}
+    (hk : ∀ d, μ ≤ k d) (hl : ∀ d, 0 ≤ lam d ∧ lam d ≤ 1)
+    (hμ : ⌊μ * 2 ^ M⌋ ≤ 2 ^ M - 1) :
+    ∀ m d, (⌊μ * 2 ^ M⌋ : ℚ) / 2 ^ M ≤ latticeFrom M k lam m d := by
+  have hP : (0 : ℚ) < 2 ^ M := by positivity
+  have hfloor : (⌊μ * 2 ^ M⌋ : ℚ) / 2 ^ M ≤ μ := by
+    rw [div_le_iff₀ hP]
+    exact Int.floor_le _
+  intro m
+  induction m with
+  | zero => intro d; exact executedSplit_ge hμ (hfloor.trans (hk d))
+  | succ m ih =>
+    intro d
+    refine executedSplit_ge hμ ?_
+    have h1 := hfloor.trans (hk d)
+    have h2 := ih (d + 1)
+    obtain ⟨hl0, hl1⟩ := hl d
+    nlinarith
+
+/-- [proved-derived; formal-checked] **`lattice_path_deviation`: the absolute deviation adds down
+the path.** For KT faces in `[2^(−M), 1 − 2^(−M)]` and stop weights `λ, λ̂ ∈ [0, 1]`, the lattice
+path under `λ̂` stays within `(m + 1) 2^(−M−1) + Σ_(i<m) |λ̂_(d+i) − λ_(d+i)|` of the exact path under
+`λ`: convex combinations do not amplify a deviation, and each level adds its rounding. With the
+stop weights rounded on the lattice too, `|q̂_0 − q_0| ≤ (2D + 1) 2^(−M−1)`. -/
+theorem lattice_path_deviation {M : ℕ} (hM : 1 ≤ M) (k lam lamh : ℕ → ℚ)
+    (hk : ∀ d, 1 / 2 ^ M ≤ k d ∧ k d ≤ 1 - 1 / 2 ^ M)
+    (hl : ∀ d, 0 ≤ lam d ∧ lam d ≤ 1) (hlh : ∀ d, 0 ≤ lamh d ∧ lamh d ≤ 1) :
+    ∀ m d, |latticeFrom M k lamh m d - exactFrom k lam m d| ≤
+      ((m : ℚ) + 1) / 2 ^ (M + 1) + ∑ i ∈ Finset.range m, |lamh (d + i) - lam (d + i)| := by
+  intro m
+  induction m with
+  | zero =>
+    intro d
+    obtain ⟨h1, h2⟩ := hk d
+    have := ((executed_split_laws hM (k d)).2.2.2 h1 h2).1
+    simpa [latticeFrom, exactFrom] using this
+  | succ m ih =>
+    intro d
+    set qh := latticeFrom M k lamh m (d + 1) with hqh
+    set q := exactFrom k lam m (d + 1) with hq
+    obtain ⟨hq1, hq2⟩ := lattice_mem hM k lamh m (d + 1)
+    obtain ⟨hk1, hk2⟩ := hk d
+    obtain ⟨hl0, hl1⟩ := hl d
+    obtain ⟨hh0, hh1⟩ := hlh d
+    set v := lamh d * k d + (1 - lamh d) * qh with hv
+    have hv1 : 1 / 2 ^ M ≤ v := by rw [hv]; nlinarith
+    have hv2 : v ≤ 1 - 1 / 2 ^ M := by rw [hv]; nlinarith
+    have hround := ((executed_split_laws hM v).2.2.2 hv1 hv2).1
+    have hih := ih (d + 1)
+    have hkq : |k d - qh| ≤ 1 := by
+      rw [abs_le]
+      have : (0 : ℚ) < 1 / 2 ^ M := by positivity
+      constructor <;> linarith
+    have hmix : |v - (lam d * k d + (1 - lam d) * q)| ≤ |lamh d - lam d| + |qh - q| := by
+      have e : v - (lam d * k d + (1 - lam d) * q) =
+          (lamh d - lam d) * (k d - qh) + (1 - lam d) * (qh - q) := by rw [hv]; ring
+      rw [e]
+      calc |(lamh d - lam d) * (k d - qh) + (1 - lam d) * (qh - q)|
+          ≤ |(lamh d - lam d) * (k d - qh)| + |(1 - lam d) * (qh - q)| := abs_add_le _ _
+        _ = |lamh d - lam d| * |k d - qh| + (1 - lam d) * |qh - q| := by
+          rw [abs_mul, abs_mul, abs_of_nonneg (sub_nonneg.mpr hl1)]
+        _ ≤ |lamh d - lam d| * 1 + 1 * |qh - q| := by
+          have ha := abs_nonneg (lamh d - lam d)
+          have hb := abs_nonneg (qh - q)
+          nlinarith [mul_le_mul_of_nonneg_left hkq ha, mul_nonneg hl0 hb]
+        _ = |lamh d - lam d| + |qh - q| := by ring
+    have hsum : ∑ i ∈ Finset.range (m + 1), |lamh (d + i) - lam (d + i)| =
+        ∑ i ∈ Finset.range m, |lamh (d + 1 + i) - lam (d + 1 + i)| + |lamh d - lam d| := by
+      rw [Finset.sum_range_succ']
+      simp only [add_zero]
+      congr 1
+      refine Finset.sum_congr rfl fun i _ => ?_
+      rw [show d + (i + 1) = d + 1 + i by omega]
+    have e : latticeFrom M k lamh (m + 1) d - exactFrom k lam (m + 1) d =
+        (executedSplit M v false - v) + (v - (lam d * k d + (1 - lam d) * q)) := by
+      simp only [latticeFrom, exactFrom, hv, hqh, hq]
+      ring
+    rw [e, hsum]
+    push_cast
+    calc |(executedSplit M v false - v) + (v - (lam d * k d + (1 - lam d) * q))|
+        ≤ |executedSplit M v false - v| + |v - (lam d * k d + (1 - lam d) * q)| := abs_add_le _ _
+      _ ≤ 1 / 2 ^ (M + 1) + (|lamh d - lam d| + |qh - q|) := add_le_add hround hmix
+      _ ≤ 1 / 2 ^ (M + 1) + (|lamh d - lam d| + (((m : ℚ) + 1) / 2 ^ (M + 1) +
+            ∑ i ∈ Finset.range m, |lamh (d + 1 + i) - lam (d + 1 + i)|)) := by linarith
+      _ = ((m : ℚ) + 1 + 1) / 2 ^ (M + 1) + (∑ i ∈ Finset.range m,
+            |lamh (d + 1 + i) - lam (d + 1 + i)| + |lamh d - lam d|) := by ring
+
+/-- [proved-derived; formal-checked] **`mix_ratio_bound`: the mixture moves by at most the
+factors of its two inputs.** For the path mixture `(β k + q)/(1 + β) = λ k + (1 − λ) q`
+(`λ = β/(1 + β)`, `lamAt_eq_beta`), if `β̂` lies within the factor `ρ_β ≥ 1` of `β` and `q̂` within
+`ρ_q ≥ 1` of `q`, the mixture of `(β̂, q̂)` lies within `ρ_β ρ_q` of that of `(β, q)`. In logarithms,
+`|ln q̂_d − ln q_d| ≤ |ln β̂_d − ln β_d| + |ln q̂_(d+1) − ln q_(d+1)|`: down the path the chart's drift
+adds, never compounds. -/
+theorem mix_ratio_bound {k β βh q qh ρβ ρq : ℚ} (hk : 0 ≤ k) (hβ : 0 < β) (hβh : 0 < βh)
+    (hq : 0 < q) (hqh : 0 < qh) (hρβ : 1 ≤ ρβ) (hρq : 1 ≤ ρq)
+    (h1 : βh ≤ ρβ * β) (h2 : β ≤ ρβ * βh) (h3 : qh ≤ ρq * q) (h4 : q ≤ ρq * qh) :
+    (βh * k + qh) / (1 + βh) ≤ ρβ * ρq * ((β * k + q) / (1 + β)) ∧
+      (β * k + q) / (1 + β) ≤ ρβ * ρq * ((βh * k + qh) / (1 + βh)) := by
+  have key : ∀ {b bh p ph : ℚ}, 0 < b → 0 < bh → 0 < p → 0 < ph → bh ≤ ρβ * b → b ≤ ρβ * bh →
+      ph ≤ ρq * p → (bh * k + ph) / (1 + bh) ≤ ρβ * ρq * ((b * k + p) / (1 + b)) := by
+    intro b bh p ph hb hbh hp hph e1 e2 e3
+    rw [mul_div_assoc', div_le_div_iff₀ (by linarith) (by linarith)]
+    have s1 : bh * k + ph ≤ ρq * (bh * k + p) := by
+      nlinarith [mul_nonneg (mul_nonneg (sub_nonneg.2 hρq) hbh.le) hk]
+    have s2 : (bh * k + p) * (1 + b) ≤ ρβ * ((b * k + p) * (1 + bh)) := by
+      nlinarith [mul_le_mul_of_nonneg_right e1 hk, mul_le_mul_of_nonneg_right e2 hp.le,
+        mul_nonneg (sub_nonneg.2 hρβ) (mul_nonneg (mul_nonneg hb.le hbh.le) hk),
+        mul_nonneg (sub_nonneg.2 hρβ) hp.le]
+    calc (bh * k + ph) * (1 + b) ≤ ρq * (bh * k + p) * (1 + b) :=
+          mul_le_mul_of_nonneg_right s1 (by linarith)
+      _ = ρq * ((bh * k + p) * (1 + b)) := by ring
+      _ ≤ ρq * (ρβ * ((b * k + p) * (1 + bh))) :=
+          mul_le_mul_of_nonneg_left s2 (by linarith)
+      _ = ρβ * ρq * (b * k + p) * (1 + bh) := by ring
+  exact ⟨key hβ hβh hq hqh h1 h2 h3, key hβh hβ hqh hq h2 h1 h4⟩
+
+/-- [proved-derived; formal-checked] **`weight_log_lipschitz`.** The node weight `(E + P)/2` moves
+by at most the factor by which the split mass `P` moves: `ln(E + e^y)` is 1-Lipschitz in `y`. So
+a node's code length drifts from the ideal by at most its children's drift and its own rounding
+(`lattice_node_telescope`). -/
+theorem weight_log_lipschitz {E P Ph ρ : ℚ} (hE : 0 < E) (hρ : 1 ≤ ρ) (h1 : Ph ≤ ρ * P)
+    (h2 : P ≤ ρ * Ph) :
+    E + Ph ≤ ρ * (E + P) ∧ E + P ≤ ρ * (E + Ph) := by
+  constructor <;> nlinarith
+
+/-- [proved-derived; formal-checked] **`lattice_step_telescope`: one executed step at a node.**
+With the carried `β = E/P` (`P` the executed split mass, the child's executed faces multiplied), a
+KT face `k` and the child's executed face `x`, the step `E' = E k`, `P' = P x/(1 − r)` with a
+rebase's relative residual `r ∈ [0, 1)`:
+* the mixture `(β k + x)/(1 + β)` is `(E' + (1 − r) P')/(E + P)`, the weight's ratio times a factor
+  `γ ∈ [1 − r, 1]`;
+* the carried ratio is `β' = β k/x · (1 − r)` (the deposit's step on the lattice face). -/
+theorem lattice_step_telescope {E P k x r : ℚ} (hE : 0 < E) (hP : 0 < P) (hk : 0 < k)
+    (hx : 0 < x) (hr0 : 0 ≤ r) (hr1 : r < 1) :
+    (E / P * k + x) / (1 + E / P) = (E * k + (1 - r) * (P * x / (1 - r))) / (E + P) ∧
+      E * k / (P * x / (1 - r)) = E / P * k / x * (1 - r) ∧
+      1 - r ≤ (E * k + (1 - r) * (P * x / (1 - r))) / (E * k + P * x / (1 - r)) ∧
+      (E * k + (1 - r) * (P * x / (1 - r))) / (E * k + P * x / (1 - r)) ≤ 1 := by
+  have hr : (0 : ℚ) < 1 - r := by linarith
+  have hb : 0 < P * x / (1 - r) := by positivity
+  have ha : 0 < E * k := by positivity
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · field_simp
+    ring
+  · field_simp
+  · rw [le_div_iff₀ (by linarith)]
+    nlinarith
+  · rw [div_le_one (by linarith)]
+    nlinarith
+
+/-- [proved-derived; formal-checked] **`lattice_node_telescope`: a node over its passage.** Over
+`n` steps the product of the node's mixtures (its executed faces before their own rounding) is the
+weight's ratio `(E_n + P_n)/(E_0 + P_0)` times the rebases' factors `γ_t ∈ [1 − r_t, 1]`: the
+executed tree is the ideal tree's recursion on the executed quantities, so its drift is the
+rounding and rebases summed over the subtree, never compounded. -/
+theorem lattice_node_telescope (E P k x r : ℕ → ℚ) (hE : ∀ t, 0 < E t) (hP : ∀ t, 0 < P t)
+    (hr : ∀ t, r t < 1) (hEs : ∀ t, E (t + 1) = E t * k t)
+    (hPs : ∀ t, P (t + 1) = P t * x t / (1 - r t)) (n : ℕ) :
+    ∏ t ∈ Finset.range n, (E t / P t * k t + x t) / (1 + E t / P t) =
+      (E n + P n) / (E 0 + P 0) *
+        ∏ t ∈ Finset.range n, (E (t + 1) + (1 - r t) * P (t + 1)) / (E (t + 1) + P (t + 1)) := by
+  induction n with
+  | zero =>
+    have := (add_pos (hE 0) (hP 0)).ne'
+    simp [this]
+  | succ n ih =>
+    rw [Finset.prod_range_succ, Finset.prod_range_succ, ih]
+    have h0 := (add_pos (hE 0) (hP 0)).ne'
+    have hn := (add_pos (hE n) (hP n)).ne'
+    have hn1 := (add_pos (hE (n + 1)) (hP (n + 1))).ne'
+    have hPn := (hP n).ne'
+    have hrn : (1 : ℚ) - r n ≠ 0 := by have := hr n; linarith
+    have hn' : P n + E n ≠ 0 := by rw [add_comm]; exact hn
+    have step : (E n / P n * k n + x n) / (1 + E n / P n) =
+        (E (n + 1) + (1 - r n) * P (n + 1)) / (E n + P n) := by
+      rw [hEs, hPs, mul_div_cancel₀ _ hrn]
+      have h1 : 1 + E n / P n ≠ 0 := by have := hE n; have := hP n; positivity
+      rw [div_eq_div_iff h1 hn]
+      field_simp
+      ring
+    rw [step]
+    field_simp
+
+/-- [proved-derived; formal-checked] **`rebase_log_residual`.** A rebase keeps the mantissa
+`m = ⌊x⌋ ≥ 1` of the scaled ratio `x`: its relative residual in `ln` is `ln(x/m) ∈ [0, 1/m)`, below
+`2^(1−W)` for a `W`-bit mantissa (Rust `landmark::Beta::carry`). For a relative residual
+`r ∈ [0, 2^(1−W))` at `W ≥ 2`, `|log₂(1 − r)| < 2^(3−W)`. -/
+theorem rebase_log_residual :
+    (∀ {x m : ℝ}, 1 ≤ m → m ≤ x → x < m + 1 →
+      0 ≤ Real.log (x / m) ∧ Real.log (x / m) < 1 / m) ∧
+    ∀ {r : ℝ} {W : ℕ}, 2 ≤ W → 0 ≤ r → r < 2 ^ (1 - (W : ℤ)) →
+      |Real.logb 2 (1 - r)| < 2 ^ (3 - (W : ℤ)) := by
+  refine ⟨fun {x m} hm hx hx1 => ?_, fun {r W} hW hr0 hr => ?_⟩
+  · have hm0 : 0 < m := by linarith
+    have hxm : 1 ≤ x / m := by rw [le_div_iff₀ hm0]; linarith
+    refine ⟨Real.log_nonneg hxm, ?_⟩
+    calc Real.log (x / m) ≤ x / m - 1 := Real.log_le_sub_one_of_pos (by positivity)
+      _ = (x - m) / m := by field_simp
+      _ < 1 / m := div_lt_div_of_pos_right (by linarith) hm0
+  · have hW' : (2 : ℝ) ^ (1 - (W : ℤ)) ≤ 1 / 2 := by
+      have : (1 - (W : ℤ)) ≤ -1 := by omega
+      calc (2 : ℝ) ^ (1 - (W : ℤ)) ≤ 2 ^ (-1 : ℤ) := zpow_le_zpow_right₀ (by norm_num) this
+        _ = 1 / 2 := by norm_num
+    have hr1 : r < 1 / 2 := lt_of_lt_of_le hr hW'
+    have hpos : 0 < 1 - r := by linarith
+    have hlog_le : Real.log (1 - r) ≤ 0 := Real.log_nonpos hpos.le (by linarith)
+    have hlog_ge : -(r / (1 - r)) ≤ Real.log (1 - r) := by
+      have := Real.one_sub_inv_le_log_of_pos hpos
+      have e : 1 - (1 - r)⁻¹ = -(r / (1 - r)) := by field_simp; ring
+      linarith
+    have hfrac : r / (1 - r) ≤ 2 * r := by
+      rw [div_le_iff₀ hpos]; nlinarith
+    have hl2 : (1 : ℝ) / 2 < Real.log 2 := by
+      have := Real.log_two_gt_d9; norm_num at this ⊢; linarith
+    have hlog2 : 0 < Real.log 2 := by linarith
+    rw [Real.logb, abs_div, abs_of_pos hlog2, abs_of_nonpos hlog_le, div_lt_iff₀ hlog2]
+    have e3 : (2 : ℝ) ^ (3 - (W : ℤ)) = 4 * 2 ^ (1 - (W : ℤ)) := by
+      rw [show (3 - (W : ℤ)) = 2 + (1 - (W : ℤ)) by ring, zpow_add₀ (by norm_num)]
+      norm_num
+    rw [e3]
+    have hr2 : 0 ≤ (2 : ℝ) ^ (1 - (W : ℤ)) := by positivity
+    nlinarith
+
+end Lattice
+
 /-! ## 7. The path cochain and the local autogradient -/
 
 section Cochain
@@ -1937,6 +2283,14 @@ section Audit
 #print axioms digit_log_residual
 #print axioms digit_log_residual_kt
 #print axioms host_digit_bound_fails_downward
+#print axioms lattice_path_laws
+#print axioms lattice_path_floor
+#print axioms lattice_path_deviation
+#print axioms mix_ratio_bound
+#print axioms weight_log_lipschitz
+#print axioms lattice_step_telescope
+#print axioms lattice_node_telescope
+#print axioms rebase_log_residual
 #print axioms path_cochain
 #print axioms edge_log_derivative
 #print axioms path_telescope_exact
