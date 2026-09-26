@@ -397,3 +397,35 @@ fn one_worker_and_many_return_the_same_values() {
     assert!(serial.deposits >= 2 && serial.compares == 4);
     assert_eq!(serial, parallel);
 }
+
+/// The baselines read their code lengths by the certified integer binary logarithm
+/// (`landmark::code_length`): every enclosure contains the exact value the series enclosure
+/// (`ratio::log2_enclosure`) contains, so the two meet, and both read the same grain cell wherever
+/// their widths lie inside one; uniform over 2^k classes reads exactly `k`.
+#[test]
+fn the_baselines_read_their_exact_code_lengths_by_the_binary_logarithm() {
+    use crate::hnn::landmark::code_length;
+    use crate::hnn::ratio::log2_enclosure;
+    use crate::hnn::reference::{Baselines, Ppm, kt_probability};
+    let cells = source(64, 3);
+    let mut baselines = Baselines::new(4).unwrap();
+    let mut ppm = Ppm::new(2, 4);
+    let mut counts = [0u64; 4];
+    for (seen, &cell) in cells.iter().enumerate() {
+        let kt = kt_probability(counts[cell], seen as u64, 4);
+        let series = log2_enclosure(&kt.recip()).unwrap();
+        let binary = code_length(&kt).unwrap();
+        assert!(binary.lower <= series.upper && series.lower <= binary.upper);
+        let mass = ppm.mass(cell);
+        let (series, binary) = (
+            log2_enclosure(&mass.recip()).unwrap(),
+            code_length(&mass).unwrap(),
+        );
+        assert!(binary.lower <= series.upper && series.lower <= binary.upper);
+        let codes = baselines.code_cell(cell).unwrap();
+        assert_eq!(codes.order_zero, code_length(&kt).unwrap());
+        assert_eq!(codes.uniform, ExactInterval::point(Rat::from_integer(2.into())));
+        ppm.update(cell);
+        counts[cell] += 1;
+    }
+}

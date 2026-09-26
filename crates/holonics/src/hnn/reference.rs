@@ -156,7 +156,7 @@ use crate::hnn::constitution::{
 };
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::keys::{self, KeyLocation};
-use crate::hnn::landmark::Letter;
+use crate::hnn::landmark::{Letter, code_length};
 use crate::hnn::moment::{Ingested, SourceMoment};
 use crate::hnn::pending::PendingRatio;
 use crate::hnn::port::{
@@ -165,9 +165,7 @@ use crate::hnn::port::{
     release_width, resonance_reading, source_order, wrote_all,
 };
 use crate::hnn::propagation::{contact_exponent, path_attenuation};
-use crate::hnn::ratio::{
-    Faces, HolonRatio, PhaseRatio, interval_sum, log2_enclosure, target_phases,
-};
+use crate::hnn::ratio::{Faces, HolonRatio, PhaseRatio, interval_sum, target_phases};
 use crate::hnn::realization::{apply_rows, indexed, outer_rows};
 use crate::hnn::receiving::{ActiveAddress, ReceivingPhases, tree_code_length};
 use crate::hnn::retention::{AeonBoundary, Diamond, aeon_readings, collapse, contained, separator};
@@ -1380,7 +1378,8 @@ impl ExecutionPort for Reference {
             }
         }
         let first_law = resident.ledger.close();
-        let literal = first_law.against_literal(&log2_enclosure(&Rat::from_integer(
+        let literal = first_law.against_literal(&code_length(&Rat::new(
+            BigInt::one(),
             BigInt::from(field.alphabet()),
         ))?);
         let opening = resident.aeon.opening.clone();
@@ -2251,9 +2250,11 @@ pub fn kt_probability(count: u64, total: u64, alphabet: usize) -> Rat {
     )
 }
 
-/// The online Krichevsky–Trofimov code length of one cell, `−log₂((count + ½)/(total + |A|/2))`.
+/// The online Krichevsky–Trofimov code length of one cell, `−log₂((count + ½)/(total + |A|/2))`,
+/// enclosed by the certified integer binary logarithm (`hnn::landmark::code_length`): the same exact
+/// value as `log2_enclosure` encloses, read in microseconds against milliseconds.
 fn kt_bits(count: u64, total: u64, alphabet: usize) -> Result<ExactInterval, HnnError> {
-    log2_enclosure(&kt_probability(count, total, alphabet).recip())
+    code_length(&kt_probability(count, total, alphabet))
 }
 
 /// [definition; agent-inferred] **The PPM baseline's declared order**: two context cells, the
@@ -2333,9 +2334,10 @@ impl Ppm {
         }
     }
 
-    /// **The cell's code length** `−log₂ P`, enclosed, then its count.
+    /// **The cell's code length** `−log₂ P`, enclosed by the certified integer binary logarithm
+    /// (`hnn::landmark::code_length`), then its count.
     pub fn code(&mut self, symbol: usize) -> Result<ExactInterval, HnnError> {
-        let bits = log2_enclosure(&self.mass(symbol).recip())?;
+        let bits = code_length(&self.mass(symbol))?;
         self.update(symbol);
         Ok(bits)
     }
@@ -2376,7 +2378,7 @@ impl Baselines {
     pub fn new(alphabet: usize) -> Result<Self, HnnError> {
         Ok(Self {
             alphabet,
-            uniform: log2_enclosure(&Rat::from_integer(BigInt::from(alphabet)))?,
+            uniform: code_length(&Rat::new(BigInt::one(), BigInt::from(alphabet)))?,
             order_zero: vec![0; alphabet],
             order_one: BTreeMap::new(),
             order_one_totals: vec![0; alphabet + 1],
