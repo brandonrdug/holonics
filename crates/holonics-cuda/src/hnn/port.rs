@@ -9,9 +9,9 @@
 //! | On the card | On the host |
 //! |---|---|
 //! | the moment and its ingest (`hnn_moment_ingest`, [`ResidentMoment`]); a pending ratio's counts frozen at its cut ([`MomentSnapshot`]) | the lift point `λ` and the host's mirror of the moment (the pending ratio's operand, which the deposit's samples and the state's bits read), checked equal at every ingest |
-//! | the published constitution's loci at their lattices, the moved words scattered at each publication (`hnn::publication`) | the constitution `Θ`, the normal laws' prox steps, the budgeted carry and its remainders, the budget (`Constitution::deposited`), and the operators `I − ½K`, `m_a` formed from it |
+//! | the published constitution's loci at their lattices, the receiving parametron's bound harmonic coordinate `h_R` among them (Decision 26), the moved words scattered at each publication (`hnn::publication`) | the constitution `Θ`, the normal laws' steps (the receiving map's exogenous step with its statistic `B`, the internal loci's prox steps), the harmonic step, the budgeted carry and its remainders, the budget (`Constitution::deposited`), and the operators `I − ½K`, `m_a` formed from it |
 //! | the keyed charts, their rounded Newton–Schulz steps and exact certificates (`hnn::store`) | each refinement's decisions from the certificates (warm, cold, fallback, target), the cold start's transpose and the exact fallback |
-//! | the word's open (`E_g M_g[c]`, the pair port), its ticks, its receiving read (`hnn_pair_weights`, `hnn_word_forward`) | the faces in `ℚ(θ)`, each tick's balance, the release (`hnn::readout`) |
+//! | the word's open (`E_g M_g[c]`, the pair port), its ticks, its receiving read `R P_R^(τ_R)(v_R + h_R)` (`hnn_pair_weights`, `hnn_word_forward`) | the faces in `ℚ(θ)`, each tick's balance, the release (`hnn::readout`) |
 //! | the word's return (`hnn_word_reverse`) | the Holon ratio and its covector, the return's source through `Rᵀ` (the covector lives on `(1/W)ℤ`), the composition onto the loci (`reference::compose`) |
 //! | | keys, the collapse, the first law's ledger, the handles, every refusal's reason |
 //!
@@ -620,7 +620,7 @@ impl<'c> Resident<'c> {
         );
         wall.pull_back = start.elapsed();
         let start = Instant::now();
-        let (pullback, deposit) = compose(field, &resident.constitution, ratio, &back)?;
+        let (pullback, deposit) = compose(field, &resident.constitution, ratio, &back, targets)?;
         wall.compose = start.elapsed();
         let code_length = holon.code_length()?;
         let order = source_order(field, ratio.anchor(), ratio.moment().cells());

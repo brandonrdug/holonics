@@ -241,7 +241,7 @@ fn deposited(field: &Field, theta: &Constitution, pending: &PendingRatio) -> Con
             pending.phases(),
         )
         .unwrap();
-    let (_, deposit) = compose(field, theta, pending, &back).unwrap();
+    let (_, deposit) = compose(field, theta, pending, &back, &targets).unwrap();
     theta.deposited(&deposit).unwrap().0
 }
 

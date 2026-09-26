@@ -382,7 +382,8 @@ K   the complex: rings g (0-cells); contacts a = (g→h) (1-cells); declared loo
       D_a dissipation on the rate), carried as C_a = c_a c_a*, K_a = b_a b_a*, D_a = F_a F_a* (K_a ⪰ 0 in
       campaign 1; a boost K_a ⋡ 0 from campaign 2, R2 H3); its reference admittance Y_a; its participation
       exponent β_a on its lattice, one per contact and read at both ends (R2 C1);
-    - the receiving map R.
+    - the receiving map R, an exogenous normal law that retains (H, B) (Decision 26), and the receiving
+      parametron's bound harmonic coordinate h_R (P_R h_R = h_R), the standing the face reads (Decision 26).
     Every learned map carries its normal statistics, per locus and factored (`Holon/MomentStorage`).
 x   the current: the lift point λ ∈ ℤ^G of the rings' joint clock torus (`aeon::ClockLift`), the one owner of
     every ring's phase class and winding (review C9). Nothing else persists between words.
@@ -518,17 +519,26 @@ tick     one contact hop per tick, t = 0, 1, …, e_max − 1 (the last stops af
                     off the channel each wave reflects straight back to its own ring
 receive  at the receiving ring's epochs e_j = e_0 + j, j < A, each read by tick e_j's junction; the last is
          e_last = e_0 + A − 1, so the word evaluates e_max = e_0 + A junction steps (R3 R1):
-           f_j = R[P_R^(τ_R) v_R(e_j)] ,  read at the receiver's grain L_R as the face p̂_j with its fibre ε_R
+           f_j = R[P_R^(τ_R)(v_R(e_j) + h_R)] ,  read at the receiver's grain L_R as the face p̂_j with its fibre ε_R;
+                 the standing read (Decision 26): P_R h_R = h_R, so f_j = R P_R^(τ_R) v_R(e_j) + R h_R
 release  at the word's end every wave and contact state is released: the unread change leaves as the
          word's emitted exchange, with its power in the receipt; nothing is carried to the next word
 compare  |T⟩ is read through the same E and Ĝ ;  R_j = Ĝ_(T←H) at phase j ;  ℓ_j = log R_j , the winding its branch
 return   R⁻¹dR at the face → the ticks in reverse, over the word's own per-tick waves → the open → the moment
-         → E, R, Θ_a, the reaction material, q; the key covector as a reading
+         → E, R, Θ_a, the reaction material, q, h_R (Π Rᵀ Σ_j ∂ℓ/∂f_j); the key covector as a reading
 deposit  only at loci inside the causal diamond of the source rings and the receiver (retention, below), each
          update Δ exact at the lattice-valued operands (Decision 22):
-           ΔH_U = Σ_t w f_t f_t* ,  ΔW_U = γ_U Σ_t w g_t (H_U'⁻¹ f_t)* ,  H_U' the carried successor Gram   per linear locus
-                 (E_g, R, W_c), summed over the ticks t at which U's output is read within the word (R3 R3);
+           ΔH_U = Σ_t w f_t f_t* ,  ΔW_U = γ_U Σ_t w g_t (H_U'⁻¹ f_t)* ,  H_U' the carried successor Gram   per internal linear
+                 locus (E_g, W_c), summed over the ticks t at which U's output is read within the word (R3 R3);
                  B_U = W_U H_U is not carried: the prox step needs only W_U, H_U' and the covector (normal_prox_step)
+           ΔH_R = Σ_j w z_j z_j* ,  ΔB_R = Σ_j w χ_R(t_j) z_j* ,  ΔR = Σ_j w (χ_R(t_j) − R z_j)(X̂_R z_j)*     the receiving map
+                 (Decision 26), read at z_j = P_R^(τ_R)(v_R(e_j) + h_R): an exogenous normal law, B_R carried on R's lattice;
+                 χ_R(t) = m·e_t the target's code face at the receiver's margin m; X̂_R the certified chart of H_R'
+                 (Decision 24); exact receipt R'H_R' − B_R' = (R H_R − B_R) − (T − R F)(1 − X̂_R H_R'),
+                 T = Σ_j w χ_R(t_j) z_j*, F = Σ_j w z_j z_j*; the declared prior R_0 decays as R_0 H_0 H_n⁻¹
+           Δh_x = Σ_j tr(Π Rᵀ 𝒥_j R Π) ,  Δh_R = η_x Π Rᵀ Σ_j g_j / h_x'          the receiving parametron's bound harmonic
+                 coordinate (Decision 26), on R's locus and lattice: Π projects onto the fixed space of P_R, so P_R h_R = h_R
+                 is kept; 𝒥_j the scored face's curvature in the odometer chart; g_j the descent covector at f_j
            Δh_x = Σ_t w|f_t|² (h_x from 1) ,  Δx = η_x G_x / h_x'                 per factor family x: c_a, b_a, F_a, the
                  slices' u, v, W_s's factor, E_g^(δ)'s factors, q_r; G_x its covector; no clamp: C_a, K_a, D_a, −W_s stay PSD as squares
            every entry of locus ℓ on its declared lattice 2^(−L_ℓ)ℤ, at the locus's m-th deposit (Decision 22):
@@ -556,7 +566,8 @@ close    at an aeon boundary: the collapse onto what the admitted future disting
 - **Steps and weights.** They are local declarations with named sources, never one global gate
   (first review C10):
   - `w = 1` per compare return: each observed target counts once;
-  - `γ_U` is linear locus `U`'s proxy step and `η_x` factor family `x`'s step. Each is a declared
+  - `γ_U` is internal linear locus `U`'s proxy step (the receiving map's exogenous law reads none,
+    Decision 26) and `η_x` factor family `x`'s step (the harmonic coordinate `h_R`'s too). Each is a declared
     rational, part of `Field::describe`, not learned in campaign 1 and reported with its value.
   - Campaign 1 declares `γ_U = 1`: the normal law's pure solve. Under the exact law its bits stay
     slow only for a map that is not an operand of its own covector (`R`: 155 → 196 bits over 8 →
@@ -583,7 +594,10 @@ close    at an aeon boundary: the collapse onto what the admitted future disting
   covector about 34 against magnitude entries of at most 1). In the cut's frame `φ^T_j ∈ [0, 1 +
   2(j+1)/d_R)`. Only the target's class carries phase weight (`q_c = 0` elsewhere), so the phase part
   is `−q_(t_j) Δ_(t_j)` with the windowed gap `Δ = φ^T − φ^H` (`alignCost`, Lean
-  `HNN/Ratio.alignCost_turns`).
+  `HNN/Ratio.alignCost_turns`). The receiving map's exogenous law (Decision 26) reads the target
+  instead through its finite code face `χ_R(t_j) = m·e_(t_j)` (a one-hot face has no finite logit;
+  Lean `HNN/TargetFace.finite_chart_obstruction`), with the receiver's margin `m` the least integer
+  with `(2^m + |A| − 1)^(L_R) ≤ 2^(m L_R + 1)` (`hnn::ratio::code_margin`; `m = 13` in campaign 1).
 - **Notation.** `o` is a wave leaving a junction, `a` a wave arriving at one, and `z_a = (u_a, w_a)`
   a contact's state. `k_a` is a contact's channel width. `c_a`, `b_a` and `F_a` are the square
   factors of `C_a`, `K_a` and `D_a`. `φ_a ∈ ℤ/L` is the phase class of a contact's exponent. `ε_R` is a receiver's fibre, and `ε_k` a deposit's energy-growth bound
@@ -1033,25 +1047,36 @@ What these show:
     README run once in release:
     `cargo run --release -p holonics --example hnn_lattice_growth -- <mode>`. Campaign 1's field
     reads the pinned cut, `docs/plans/THE_REBUILD.md` at `fed5488c` (171,754 bytes).
+    Rerun under Decision 26's receiving law (the exogenous normal law and the standing read); the
+    earlier law's receipts are in git history.
     - `growth chain 128 declared`: on the chain control the constitution levels at about 30 kbit
-      (29,899 bits at deposit 128), the widest remainder takes 51 bits, a deposit takes 28 ms on
-      average, and the 22 aeon boundaries release nothing.
+      (30,288 bits at deposit 128, its largest), the widest remainder takes 51 bits, a deposit takes
+      `10 rem 97 over 128` ms on average, and the 22 aeon boundaries release nothing.
     - `growth campaign 40 declared`: on campaign 1's declared field the constitution grows from
-      0.19 to 1.37 Mbit over 40 deposits against `B_Θ = 2^33`. The widest remainder takes 45 bits,
-      and the solved charts take 0.56 Mbit and grow as the Grams fill in. A refine takes 0.49 s, a
-      compare 4.7 s and a deposit 1.8 s on average, so the full `n*` exposure (6,148 cells, 3,074
-      windows) projects to 21,773 s, about 6 h. These are the costs of the integral chart: products
-      summed over integers with each entry reduced once, a fraction-free inverse, integer tick sums
-      in the compose, and only the nonzero offset counts read.
+      225,836 bits at deposit 1 to 1,333,881 at deposit 40 against `B_Θ = 2^33`. The widest remainder
+      takes 45 bits, and the solved charts take 217,363 bits and grow as the Grams fill in. A refine
+      takes `12 rem 35 over 40` ms, a compare `22 rem 21 over 40` ms and a deposit `83 rem 39 over 40`
+      ms on average, so the full `n*` exposure (6,148 cells, 3,074 windows) projects to
+      `366,958 rem 30 over 40` ms. These are the costs of the integral chart: products summed over
+      integers with each entry reduced once, a fraction-free inverse, integer tick sums in the
+      compose, and only the nonzero offset counts read.
     - `equality chain 32 declared`, `equality chain 32 normal` and `equality campaign 8 declared`:
       the integral chart changes no value. At every deposit each update is recomputed termwise over
-      `Rat` and the carry's accounting is checked on every carried entry: 19,008 entries are equal in
-      each chain run, and 760,648 over 8 deposits on campaign 1's field.
+      `Rat` (the receiving map's `ΔB` and `ΔR` and the harmonic coordinate's step included) and the
+      carry's accounting is checked on every carried entry: 20,192 entries are equal in each chain
+      run, and 850,944 over 8 deposits on campaign 1's field. At every deposit whose window reached
+      the receiving map (30 on the declared chain, 16 with the factor steps off, 7 on campaign 1's
+      field) the law's receipt `(R'H' − B') − (RH − B) = −(T − RF)(1 − X̂H')` holds exactly at the
+      termwise step, the chart term at the carried Gram lies within its released bound, and the
+      reading's `‖R'H' − B'‖∞` and prior weight `tr(X̂)/n` recompute equal. The prior weight never
+      rose on the declared runs; with the factor steps off it rose once, by `1/2^17`.
 - [open] **What stays owed (#62, "Step 4 (#73) owed").**
   - **The word-level certificate.** `remainder_below_grain` bounds one read of one locus with
     unit-scale operands. The receiver reads the whole word, which composes loci over its ticks: on
-    the chain, the carried remainders move the admitted logits by up to 0.72 of a grain at the first
-    six boundaries (`growth chain 128 declared`, reading `Θ` against `Θ + r`). The
+    the chain, the carried remainders moved the admitted logits by less than one grain at the first
+    six boundaries under the earlier receiving law, and under Decision 26's by more than one grain at
+    four of them, at most `653668119/2^28` grains (`2 rem 116797207 over 2^28`; `growth chain 128
+    declared`, reading `Θ` against `Θ + r`). The
     certificate is `Σ_ℓ K_ℓ 2^(−L_ℓ) < 1/(2L_R)`, with `K_ℓ` the word's sensitivity from locus `ℓ` to
     the logits: passivity gives `‖dCay‖ ≤ ‖dK‖` for an element whose symmetric part is `⪯ 0`, and the
     contrast port `W_c`, which is active, needs its own bound. `Objects/CommitRebase` carries the
@@ -1143,18 +1168,18 @@ port. No other noun enters.
 | `Ring` | `hnn/field.rs` | A closing rotor ring: its `Parametron`, its navigator (`Transport::Map`, key, clock, lift), its screw generator with `d_g` node placements, its lock `N_g` and reflector `F_g` on the port chart `ℤ/d_g`, its storage admittance `Y_g`, its standing `q_g`, and its reaction material; on a source ring, its source ports `E_g`, `E_g^(δ)` and injection `I_g`. Campaign 1 has no non-closing form. | `holon::parametron::Parametron`, `navigator::Navigator`, `geometry::screw::{ScrewGenerator, SituatedScrew}`, `holon::restriction::PortMap` |
 | `Contact` | `hnn/field.rs` | A pair contact `a = (g→h)`: its channel width `k_a` and partial matchings `ι_(a,g)`, `ι_(a,h)` (so `U_a` and `U_aᵀ`), its block of `d_A`, its constitution `(c_a, b_a, F_a)`, its reference admittance `Y_a`, its participation exponent `β_a` and its pair geometry read from the two rings' screws. It has no scalar conductance. | `holon::contact::{PairContact, ContactMaterial}`, `geometry::screw::ScrewPair`, `holon::parametron::Parametron::lc` |
 | `Field` | `hnn/field.rs` | The HNN law: the complex, the rings and contacts, the `Constitution`, the admitted receivers, the founding and pending capacities. `Field::holon()` returns a read-only `Holarchy` chart built from the `Constitution`, `Field::parametric()` the `ClockLift`, and `Field::describe()` the field's exact self-delimiting code. | `geometry::complex::CellComplex`, `holarchy::{Holarchy, Gluing}`, `aeon::ClockLift` |
-| `Constitution` | `hnn/constitution.rs` | Θ, the standings `q` included, with a commit counter, the declared steps `γ_U` and `η_x`, and its bit budget `B_Θ`. Its fields are private, and only `deposit` and the collapse change it. | `holon::element::{ActiveRelation, ResistiveRelation, Pump}`, `holon::deposition::{project_passive, CommittedEnergyBound}` |
-| `NormalLaw` | `hnn/constitution.rs` | One locus's deposition owner, `W H = B`, with factored statistics of the locus's own width. There is no global Gram (review A6). `W` and `H` are carried on the locus's lattice with their remainders, and `B = W H` is not carried (Decision 22). | `ratio::linear`; Lean `Holon/MomentStorage` |
+| `Constitution` | `hnn/constitution.rs` | Θ, the standings `q` and each receiving ring's bound harmonic coordinate `h_R` (Decision 26) included, with a commit counter, the declared steps `γ_U` and `η_x`, and its bit budget `B_Θ`. Its fields are private, and only `deposit` and the collapse change it. | `holon::element::{ActiveRelation, ResistiveRelation, Pump}`, `holon::deposition::{project_passive, CommittedEnergyBound}` |
+| `NormalLaw` | `hnn/constitution.rs` | One locus's deposition owner, `W H = B`, with factored statistics of the locus's own width. There is no global Gram (review A6). `W` and `H` are carried on the locus's lattice with their remainders. At an internal locus `B = W H` is not carried (Decision 22) and `W` moves by the prox step (`NormalLaw::deposited`). The receiving map's law is exogenous (Decision 26, `NormalLaw::exogenous`): `B = B_0 + Σ w χ_R(T) zᵀ` is carried on the same lattice, `W' = W + (T − WF)X̂` (`NormalLaw::exogenous_step`), and its `ExogenousReading` carries `‖W'H' − B'‖∞` and the prior weight `tr(X̂)/n`. | `ratio::linear`; Lean `Holon/MomentStorage`, `HNN/TargetFace` |
 | `Current` | `hnn/field.rs` | The lift point `λ`: the rings' continuing motion, the only current that persists between words. It has no wave field (R2 C3). | `aeon::ClockLift` |
 | `SourceMoment` | `hnn/moment.rs` | On closing source rings only: the phase-binned counts `M_g`, the offset counts `C_g(δ)` on the exterior chart, the window `win_g` and its opening lift point; its capacity crossover `n*`. `m̃` is computed, never stored. | `navigator::Navigator`, `ratio::linear` |
 | `Word<'c>` | `hnn/word.rs` | One evaluation of the ticks at one cut's fixed operands, opening at zero change. It borrows `&'c Field` and owns the change: the waves, the contact states and their per-tick values or checkpoints, which its return reads in reverse. Its end releases the change. | `hnn::propagation` |
 | (functions) | `hnn/propagation.rs` | The junction Swing, the ring element step and the contact transit. | `geometry::swing`; the midpoint scheme of `holon::law::ReferenceHolon`, realized directly and equated with it in two tests (reception item 1) |
-| `ReceivingPhases` | `hnn/receiving.rs` | The receiving ring, its epochs `e_j`, aperture `A`, grain `L_R` and the shared map `R`. It refuses `A` beyond the rank of the receiving ring's observability over the word, which it reports (review C7). | `receiver::reception::ReceiverFace` |
+| `ReceivingPhases` | `hnn/receiving.rs` | The receiving ring, its epochs `e_j`, aperture `A`, grain `L_R`, the margin `m` of the target's code face (Decision 26) and the shared map `R`; it reads `f = R P_R^(τ_R)(v_R + h_R)`, the standing read, whose return is `standing_return` (Decision 26). It refuses `A` beyond the rank of the receiving ring's observability over the word, which it reports (review C7). | `receiver::reception::ReceiverFace` |
 | `HolonRatio` | `hnn/ratio.rs` | `R_j = Ĝ_(T←H)` at each receiving phase, as undivided pairs, with `ℓ`, its branch and the receiver's fibre. | `ratio::Presentation`, `ratio::surprisal::SymbolicSurprisal`, `ratio::exponentiated::{RatioFamily, CarriedPower}` |
 | `RatioCovector` | `hnn/ratio.rs` | `R⁻¹dR` at the face: the magnitude part `p̂ − q` and the phase part `−q_c Δ_c`, in units of `ln 2` carried as a declared factor. Only a `HolonRatio` constructs it. | — |
 | `PendingRatio` | `hnn/pending.rs` | The producing anchor `λ`, the encoder moment `M`, the `ReceivingPhases` and the commit it was produced at. It is owned by the resident and addressed by `PendingId`. | the types above |
-| `Pullback` | `hnn/port.rs` | Covectors on `M`; per contact `(λ_Δ, λ_Q, λ_DQ)` and its constitution; per ring its reaction material, its standing `q` (through the declared lock chart) and `E_g`, `E_g^(δ)`; `R`. The key covector is a reading only. | `holon::contact::PairContact::feature_pullback`, `holon::law::HolonLaw::pullback` |
-| `Deposit` | `hnn/port.rs` | The staged material return, keyed by locus, inside the causal diamond, addressed by `StagedId`. | `holon::deposition` |
+| `Pullback` | `hnn/port.rs` | Covectors on `M`; per contact `(λ_Δ, λ_Q, λ_DQ)` and its constitution; per ring its reaction material, its standing `q` (through the declared lock chart) and `E_g`, `E_g^(δ)`; `R`; and the bound harmonic coordinate's return `Π Rᵀ Σ_j ∂ℓ/∂f_j` (Decision 26). The key covector is a reading only. | `holon::contact::PairContact::feature_pullback`, `holon::law::HolonLaw::pullback` |
+| `Deposit` | `hnn/port.rs` | The staged material return, keyed by locus, inside the causal diamond, addressed by `StagedId`: the linear loci's samples (the receiving map's each carrying its target's code face, Decision 26), the factor steps and the harmonic steps (`HarmonicStep`). | `holon::deposition` |
 | `AeonBoundary` | `hnn/retention.rs` | What the collapse returns: `V = ⊕V_g`, the descended constitution, the released loci and directions with their dimension and bits (structural, and the value kernel as a reading), the first-law split, each receiver's aeon reading, and the pending ratios carried or refused. | `compression::{FaceMap, Retention}` (specification and the dual face map), `aeon::{exchange, deposition}` |
 | (functions) | `hnn/keys.rs` | The data → menu map, key location per ring in carry order, and the gauge fixing. | `compression::keys::{Menu, Loop, Candidate, Gauge, ReflectorMachine}`, the new menu edges and propagation |
 | (functions) | `hnn/release.rs` | Release through modes and founding (campaign 3). | `compression::resonance_split`, `receiver::release`, `holarchy` |

@@ -64,7 +64,9 @@
 //! - each aeon's boundary: its length and lift points, readings, collapse, first law (exchange plus
 //!   deposition, telescoping to the change of code length), and the face against the literal;
 //! - the state and constitution bits against the source, with and without the collapse;
-//! - the constitution's curve, one point per commit;
+//! - the constitution's curve, one point per commit, with the receiving map's prior weight
+//!   `tr(X̂)/n` after it (Decision 26, `CurvePoint::prior`: `1` at the mount, not rising as the Gram
+//!   grows up to the chart's certificate and the Gram's carry);
 //! - the budget stop or deadline, the work counted, and the wall time: the exposure's, and the
 //!   host's by phase (`Exposure::wall`: refine read, release, compare read, holon and covector,
 //!   `pull_back`, `compose`, `deposited`, re-read and ingest), with the rest of the exposure.
@@ -744,17 +746,20 @@ fn report(field: &Field, exposure: &Exposure) {
         "== the constitution's curve ({} points, one per published commit) ==",
         exposure.constitution_curve.len()
     );
-    println!("commit\tbits\tentries\tremainders\tsolved\treleased_bits\tstepped");
+    println!(
+        "commit\tbits\tentries\tremainders\tsolved\treleased_bits\tstepped\tprior (the receiving map's prior weight tr(X̂)/n, Decision 26; - where the window reached nothing there)"
+    );
     for point in &exposure.constitution_curve {
         println!(
-            "{}\t{}\t{}\t{}\t{}\t{}\t{}",
+            "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}",
             point.commit,
             point.bits.total(),
             point.bits.entries,
             point.bits.remainders,
             point.bits.solved,
             point.released_bits,
-            point.stepped
+            point.stepped,
+            point.prior.as_ref().map_or("-".to_string(), ratio)
         );
     }
 

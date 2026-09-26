@@ -48,6 +48,23 @@
 //! | `alignCost_turns` (the windowed gap in turns; the cut's winding the branch) | [`target_phases`], [`PhaseRatio`] |
 //! | `odometer_covector_descends`, `odometer_eq_face_at_integer_cells` (the magnitude part); `receivingPhase_phase_pullback` (the phase part) | [`RatioCovector`], [`Face::odometer_masses`] |
 //! | `Objects/Ratio.logFibre` (the undivided pair with its winding) | [`HolonRatio::log_ratio`] |
+//! | `HNN/TargetFace.{finite_chart_obstruction, MarginCodes, margin_rule_codeLength, marginLeast, margin_campaign_one, codeFace}` (Decision 26) | [`code_margin`], [`code_face`] |
+//!
+//! [definition; agent-inferred] **The target's code face** (Decision 26). A one-hot target `q_t` has
+//! no finite logit: every finite logit vector gives every class positive mass. The receiver
+//! therefore declares a finite, gauge-fixed chart of the target Holon at its grain,
+//! `χ_R(T) = m·e_t` in the realified logits (`Re f_t = m`, every other entry `0`: the common shift
+//! fixed by the classes the target does not name, the phase part zero), with the **margin** `m` the
+//! least integer whose face codes the target within the receiver's tolerance of one grain per cell:
+//!
+//! ```text
+//! p̂_t(χ) = 2^m / (2^m + |A| − 1),   −log₂ p̂_t(χ) ≤ 1/L_R   ⇔   (2^m + |A| − 1)^(L_R) ≤ 2^(m·L_R + 1)
+//! ```
+//!
+//! read in exact integers ([`code_margin`]; `m = 13` at `|A| = 2^8`, `L_R = 2^4`). It is the
+//! exogenous side of the receiving map's normal law (`hnn::constitution::NormalLaw::exogenous`),
+//! whose loss is the squared additive-chart log ratio `½|χ_R(T) − f|²`, named as such: descent of
+//! the cross-entropy face is not claimed by it (the exposure's receipt decides).
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
@@ -189,6 +206,40 @@ fn round_out(value: ExactInterval) -> Result<ExactInterval, HnnError> {
         expected: 0,
         found: 1,
     })
+}
+
+// -------------------------------------------------------------------------------------------
+// the target's code face
+
+/// **The receiver's declared margin** (module header): the least `m ≥ 0` with
+/// `(2^m + |A| − 1)^(L_R) ≤ 2^(m·L_R + 1)`, decided in exact integers. The left side falls toward
+/// `2^(m·L_R)` as `m` grows, so the least `m` exists for every alphabet and grain.
+pub fn code_margin(alphabet: usize, grain: u64) -> u64 {
+    let others = BigUint::from(alphabet.saturating_sub(1));
+    let grain = u32::try_from(grain.max(1)).expect("a receiver's grain within 32 bits");
+    let mut margin = 0u64;
+    loop {
+        let face = ((BigUint::one() << margin as usize) + &others).pow(grain);
+        let bound = BigUint::one() << (margin * u64::from(grain) + 1) as usize;
+        if face <= bound {
+            return margin;
+        }
+        margin += 1;
+    }
+}
+
+/// **The target's code face `χ_R(T) = m·e_t`** in the realified logits `[Re f_0, Im f_0, …]` over
+/// `alphabet` classes (module header): `m` at `Re f_t`, zero elsewhere.
+pub fn code_face(margin: u64, class: usize, alphabet: usize) -> Result<Vec<Rat>, HnnError> {
+    if class >= alphabet {
+        return Err(HnnError::CellOutside {
+            code: class,
+            alphabet,
+        });
+    }
+    let mut face = vec![Rat::zero(); 2 * alphabet];
+    face[2 * class] = Rat::from_integer(BigInt::from(margin));
+    Ok(face)
 }
 
 // -------------------------------------------------------------------------------------------

@@ -2,19 +2,20 @@
 //! target's phase and its winding, a common rechart, exact normalization in `ℚ(θ)`, the face's
 //! constancy on its fibre, the code tolerance of the grain, and the uniform first face.
 
-use num_bigint::BigInt;
+use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
 
 use super::learning::chain;
 use super::support::Draw;
-use crate::hnn::field::Current;
+use crate::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Constitution, Steps};
+use crate::hnn::field::{Current, Field, FieldDeclaration};
 use crate::hnn::moment::SourceMoment;
 use crate::hnn::port::ExecutionPort;
 use crate::hnn::ratio::{
-    Face, Faces, HolonRatio, TargetPhases, interval_difference, log2_of_enclosure,
-    power_of_two_enclosure, target_phases,
+    Face, Faces, HolonRatio, TargetPhases, code_face, code_margin, interval_difference,
+    log2_of_enclosure, power_of_two_enclosure, target_phases,
 };
-use crate::hnn::receiving::{GrainCell, ReceivingRead};
+use crate::hnn::receiving::{GrainCell, ReceivingPhases, ReceivingRead};
 use crate::hnn::reference::{Reference, one_hot};
 use crate::ratio::algebraic::ExactInterval;
 use crate::ratio::exponentiated::{CarriedPower, PhaseField, power_of_two};
@@ -379,4 +380,61 @@ fn the_initial_faces_are_uniform_at_the_log_of_the_alphabet() {
             );
         }
     }
+}
+
+/// Decision 26, the target's code face: the receiver's margin is the least integer `m` whose face
+/// `χ_R(T) = m·e_t` codes its own target within one grain, `(2^m + |A| − 1)^(L_R) ≤ 2^(m·L_R + 1)`,
+/// read in exact integers: 13 at campaign 1's `|A| = 2^8`, `L_R = 2^4` (12 does not hold), 7 on the
+/// chain's `|A| = 4`; the fields declare it by rule and the receiving phases carry it; the face's
+/// code length of its target is at most `1/L_R` at `m` and more at `m − 1`.
+#[test]
+fn the_margin_is_the_least_code_face_within_one_grain() {
+    let holds = |m: u64, alphabet: usize, grain: u64| {
+        let face = (BigUint::one() << m as usize) + BigUint::from(alphabet - 1);
+        face.pow(grain as u32) <= BigUint::one() << (m * grain + 1) as usize
+    };
+    for (alphabet, grain) in [
+        (256usize, 16u64),
+        (4, 16),
+        (2, 1),
+        (1, 16),
+        (256, 1),
+        (3, 5),
+    ] {
+        let m = code_margin(alphabet, grain);
+        assert!(holds(m, alphabet, grain), "{alphabet} {grain}");
+        assert!(
+            m == 0 || !holds(m - 1, alphabet, grain),
+            "{alphabet} {grain}"
+        );
+    }
+    assert_eq!(code_margin(256, 16), 13);
+    assert_eq!(code_margin(4, 16), 7);
+    let campaign = Field::declare(FieldDeclaration::campaign_one(6_148)).unwrap();
+    assert_eq!(campaign.margins(), &[13]);
+    let chain = chain();
+    assert_eq!(chain.margins(), &[7]);
+    let theta = Constitution::initial(&chain, Steps::campaign_one(), CAMPAIGN_ONE_BUDGET).unwrap();
+    let phases = ReceivingPhases::declare(
+        &chain,
+        &theta,
+        &Current::at_rest(&chain),
+        &chain.receivers()[0],
+    )
+    .unwrap();
+    assert_eq!(phases.margin(), 7);
+    let face = code_face(13, 5, 256).unwrap();
+    assert_eq!(face.len(), 512);
+    assert_eq!(face[10], integer(13));
+    assert!(
+        face.iter()
+            .enumerate()
+            .all(|(entry, value)| entry == 10 || value.is_zero())
+    );
+    let grain = rat(1, 16);
+    let within = Face::of_read(&read(face, 16), 16).unwrap();
+    assert!(within.code_length(5).unwrap().upper <= grain);
+    let below = Face::of_read(&read(code_face(12, 5, 256).unwrap(), 16), 16).unwrap();
+    assert!(below.code_length(5).unwrap().lower > grain);
+    assert!(code_face(13, 256, 256).is_err());
 }

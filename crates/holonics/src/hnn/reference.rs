@@ -37,7 +37,8 @@
 //! ([`crate::hnn::Word::pull_back`]) is carried to every locus:
 //!
 //! ```text
-//! R        sample (P_R^(τ_R) v_R(e_j), −g_j) per receiving phase                   normal law
+//! R        sample (P_R^(τ_R)(v_R(e_j) + h_R), −g_j, χ_R(t_j)) per receiving phase     exogenous normal law
+//! h_R      Π Rᵀ Σ_j (−g_j) with the face's curvature Σ_j tr(Π Rᵀ 𝒥_j R Π)            harmonic step
 //! W_c,g    sample (c_t, −u_t) at each tick of the element's window                  normal law
 //! E_g      sample (M_g[c], −P^(c−τ_g) s̄_g(0)) per phase with counts                  normal law
 //! f_g      G = (K̄ + K̄ᵀ) f,  K̄ = Σ_t u_t x̄_tᵀ;   slices ∂/∂u_ρ = σ_ρ[(x̄·v)u − (u·v)x̄], ∂/∂v_ρ likewise
@@ -145,7 +146,7 @@ use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartReading, ChartStart, Charts, Remainders};
 use crate::hnn::constitution::{
     CAMPAIGN_ONE_BUDGET, CarrierBits, Constitution, DepositReading, FactorGradient, FactorStep,
-    LinearLocus, LinearStep, Locus, Sample, Steps,
+    HarmonicStep, LinearLocus, LinearStep, Locus, Sample, Steps,
 };
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::keys::{self, KeyLocation};
@@ -158,10 +159,10 @@ use crate::hnn::port::{
 };
 use crate::hnn::propagation::{contact_exponent, path_attenuation};
 use crate::hnn::ratio::{
-    Faces, HolonRatio, PhaseRatio, interval_sum, log2_enclosure, target_phases,
+    Faces, HolonRatio, PhaseRatio, code_face, interval_sum, log2_enclosure, target_phases,
 };
 use crate::hnn::realization::{apply_rows, indexed, outer_rows};
-use crate::hnn::receiving::ReceivingPhases;
+use crate::hnn::receiving::{ReceivingPhases, standing_energy, standing_return};
 use crate::hnn::retention::{AeonBoundary, Diamond, aeon_readings, collapse, contained, separator};
 use crate::hnn::word::KeptWord;
 use crate::holon::contact::FeatureCovector;
@@ -1056,7 +1057,7 @@ impl ExecutionPort for Reference {
         let back = word.pull_back(&covector, &map, &ratio.anchor()[phases.ring()], &phases)?;
         wall.pull_back = start.elapsed();
         let start = Instant::now();
-        let (pullback, deposit) = compose(&field, &resident.constitution, ratio, &back)?;
+        let (pullback, deposit) = compose(&field, &resident.constitution, ratio, &back, &targets)?;
         wall.compose = start.elapsed();
         let code_length = holon.code_length()?;
         let order = source_order(&field, ratio.anchor(), ratio.moment().cells());
@@ -1427,7 +1428,8 @@ fn matrix_of(rows: Vec<Vec<Rat>>, columns: usize) -> Result<ExactRatMatrix, HnnE
 }
 
 /// **The compare's composition** (module header): the complete pullback and the deposit staged
-/// inside the pending ratio's causal diamond.
+/// inside the pending ratio's causal diamond, the receiving map's samples carrying the compared
+/// targets' code faces (Decision 26).
 ///
 /// [definition; agent-inferred] **Its exact chart.** Each gradient is a sum of rank-one terms over
 /// the word's ticks (`Σ_t u_t x̄_tᵀ`, `Σ_t 2 r̄_t (w − ω)_tᵀ`, the slices' `σ[(x̄·v)u − (u·v)x̄]`, …)
@@ -1450,6 +1452,7 @@ pub fn compose(
     constitution: &Constitution,
     ratio: &PendingRatio,
     back: &WordReturn,
+    targets: &[usize],
 ) -> Result<(Pullback, Deposit), HnnError> {
     use crate::ratio::linear::vector::{Chart, combination, integral};
     let phases = ratio.phases();
@@ -1465,13 +1468,33 @@ pub fn compose(
     let mut factors: Vec<FactorStep> = Vec::new();
     let one = Rat::one();
 
-    // The receiving map: Σ_j g_j ⊗ P_R^(τ_R) v_R(e_j), by row blocks.
+    // The receiving map's operand: the word's read of the change and the bound harmonic
+    // coordinate, P_R^(τ_R)(v_R + h_R) = P_R^(τ_R) v_R + h_R (Decision 26, the standing read).
     let receiving = phases.ring();
-    let width_r = field.ring(receiving).width();
+    let receiving_ring = field.ring(receiving);
+    let width_r = receiving_ring.width();
+    if targets.len() != back.reads.len() {
+        return Err(HnnError::Shape {
+            what: "the compared targets against the receiving reads",
+            expected: back.reads.len(),
+            found: targets.len(),
+        });
+    }
+    let standing = constitution.harmonic(receiving);
+    let features: Vec<Vec<Rat>> = back
+        .reads
+        .iter()
+        .map(|(feature, _)| match standing {
+            Some(harmonic) => add(feature, harmonic),
+            None => feature.clone(),
+        })
+        .collect();
+    // The receiving map's gradient Σ_j ∇_j ⊗ P_R^(τ_R)(v_R + h_R), by row blocks.
     let read_charts: Vec<[Chart; 2]> = back
         .reads
         .iter()
-        .map(|(feature, gradient)| [integral(gradient), integral(feature)])
+        .zip(&features)
+        .map(|((_, gradient), feature)| [integral(gradient), integral(feature)])
         .collect();
     let map_gradient = outer_rows(
         2 * alphabet,
@@ -1481,19 +1504,56 @@ pub fn compose(
             .map(|[gradient, feature]| (&one, gradient, feature))
             .collect::<Vec<_>>(),
     );
+    // Its exogenous samples: each read's operand, the comparison's descent covector and the
+    // target's code face χ_R(t_j) = m·e_(t_j) at the receiver's margin.
     let samples = back
         .reads
         .iter()
-        .map(|(feature, gradient)| Sample {
-            weight: one.clone(),
-            feature: feature.clone(),
-            covector: negated(gradient),
+        .zip(&features)
+        .zip(targets)
+        .map(|(((_, gradient), feature), &target)| {
+            Ok(Sample {
+                weight: one.clone(),
+                feature: feature.clone(),
+                covector: negated(gradient),
+                target: Some(code_face(phases.margin(), target, alphabet)?),
+            })
         })
-        .collect();
+        .collect::<Result<_, HnnError>>()?;
     linear.push(LinearStep {
         locus: LinearLocus::Receiving(receiving),
         samples,
     });
+    // The bound harmonic coordinate's return, Π Rᵀ Σ_j ∇_j, and its step on the descent side with
+    // the read's energy on the fixed space.
+    let mut harmonic_steps = Vec::new();
+    let harmonic = match standing {
+        Some(_) => {
+            let map = constitution
+                .receiving_map(receiving)
+                .ok_or(HnnError::MissingReceivingMap { ring: receiving })?;
+            let gradients: Vec<&[Rat]> = back
+                .reads
+                .iter()
+                .map(|(_, gradient)| gradient.as_slice())
+                .collect();
+            let returned = standing_return(receiving_ring, map, &gradients)?;
+            if retained(Locus::ReceivingMap(receiving)) {
+                let reads: Vec<(&[Rat], usize)> = gradients
+                    .iter()
+                    .copied()
+                    .zip(targets.iter().copied())
+                    .collect();
+                harmonic_steps.push(HarmonicStep {
+                    ring: receiving,
+                    gradient: negated(&returned),
+                    energy: standing_energy(receiving_ring, map, &reads)?,
+                });
+            }
+            Some(returned)
+        }
+        None => None,
+    };
 
     // The rings' element material and class covectors, the rings together.
     let parts = indexed(field.rings().len(), |g| {
@@ -1556,6 +1616,7 @@ pub fn compose(
                     .map(|x| Rat::from_integer(BigInt::from(*x)))
                     .collect(),
                 covector: negated(h),
+                target: None,
             });
         }
         let mut pair_pullbacks = Vec::new();
@@ -1683,10 +1744,11 @@ pub fn compose(
         rings: ring_pullbacks,
         contacts: contact_pullbacks,
         receiving: (receiving, matrix_of(map_gradient, width_r)?),
+        harmonic,
     };
     Ok((
         pullback,
-        Deposit::new(constitution.commit(), linear, factors, reached),
+        Deposit::new(constitution.commit(), linear, factors, reached).with_harmonic(harmonic_steps),
     ))
 }
 
@@ -1811,6 +1873,7 @@ fn compose_ring(
                 weight: one.clone(),
                 feature: tick.contrast.clone(),
                 covector: negated(&tick.adjoint),
+                target: None,
             });
         }
     }
@@ -2088,14 +2151,18 @@ pub struct StateReport {
 
 /// [definition] **One point of the constitution's curve** (design (f) item 4): the commit reached,
 /// the constitution's exact bits by carrier (lattice entries, carried remainders, solved charts),
-/// and what the deposit that reached it released (its residuals' exact bits) and stepped (the
-/// entries whose lattice coordinate moved). The mount's point releases and steps nothing.
+/// what the deposit that reached it released (its residuals' exact bits) and stepped (the entries
+/// whose lattice coordinate moved), and the receiving map's prior weight after it (Decision 26,
+/// `constitution::ExogenousReading::prior`: `tr(X̂)/n` of the executed chart of `H_n⁻¹`, the mean
+/// over the Gram's eigen-directions of the factor `H_0 H_n⁻¹` of the declared prior's reading; `None` when the deposit's window reached nothing at
+/// the receiving map). The mount's point releases and steps nothing, and its prior weight is `1`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CurvePoint {
     pub commit: u64,
     pub bits: CarrierBits,
     pub released_bits: u64,
     pub stepped: u64,
+    pub prior: Option<Rat>,
 }
 
 /// [definition] **The exposure's readout** (design (f)): bits on the training and held-out targets
@@ -2452,6 +2519,7 @@ where
         bits: resident.constitution().carrier_bits(),
         released_bits: 0,
         stepped: 0,
+        prior: Some(Rat::one()),
     }];
     let (mut windows, mut open_windows, mut peak_word_bits) = (0u64, 0u64, 0u64);
     let (mut forward, mut adjoint) = (Remainders::default(), Remainders::default());
@@ -2527,11 +2595,19 @@ where
                             .deposit
                             .present()
                             .map_or((0, 0), |reading| (reading.released_bits, reading.stepped));
+                        let prior = returned.deposit.present().and_then(|reading| {
+                            reading.charts.iter().find_map(|(locus, chart)| {
+                                (*locus == Locus::ReceivingMap(phases.ring()))
+                                    .then(|| chart.exogenous.as_ref().map(|e| e.prior.clone()))
+                                    .flatten()
+                            })
+                        });
                         curve.push(CurvePoint {
                             commit: resident.constitution().commit(),
                             bits: resident.constitution().carrier_bits(),
                             released_bits,
                             stepped,
+                            prior,
                         });
                     }
                     Err(refusal @ HnnError::ConstitutionBudget { .. }) => {

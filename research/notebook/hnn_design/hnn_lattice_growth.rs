@@ -5,6 +5,7 @@
 //! ```sh
 //! cargo run --release -p holonics --example hnn_lattice_growth -- growth chain 128 declared
 //! cargo run --release -p holonics --example hnn_lattice_growth -- growth campaign 40 declared
+//! cargo run --release -p holonics --example hnn_lattice_growth -- equality chain 8 declared
 //! cargo run --release -p holonics --example hnn_lattice_growth -- equality chain 32 declared
 //! cargo run --release -p holonics --example hnn_lattice_growth -- equality chain 32 normal
 //! cargo run --release -p holonics --example hnn_lattice_growth -- equality campaign 8 declared
@@ -27,14 +28,22 @@
 //!
 //! [established-bounded; measured] **`equality`** is the receipt that the integral chart changes no
 //! value (the protocol: "a check that an optimization changes no value runs once on the real
-//! case"). At every deposit it recomputes each update termwise, over `Rat` alone: each normal law's
-//! `ΔH = Σ w f fᵀ` and `ΔW = γ Σ w g (H'⁻¹ f)ᵀ`, each factor family's `Δh_x = Σ w|f|²` and
-//! `Δx = (η_x / h_x') G_x` (the product `rate_times` reads by Euclid's remainder), and checks the
-//! carry's accounting on every carried entry of the constitution, `x' + r' + e = x + r + Δ`
-//! (Lean `HNN/LatticeDeposit.carry_accounting`), which holds exactly when the published update is
-//! the termwise one. It checks each normal law's solved chart against its certificate: the exact
-//! left residual `‖1 − X̂H‖∞` is at most the chart's certified `δ` (Decision 24, Lean
-//! `HNN/LatticeWord.rounded_refinement_certificate_left`).
+//! case"). At every deposit it recomputes each update termwise, over `Rat` alone: each prox law's
+//! `ΔH = Σ w f fᵀ` and `ΔW = γ Σ w g (X̂ f)ᵀ`; the receiving map's exogenous law (Decision 26)
+//! `ΔH = Σ w f fᵀ`, `ΔB = Σ w χ fᵀ` and `ΔW = Σ w (χ − W f)(X̂ f)ᵀ`, with `χ = χ_R(T)` the target's
+//! code face each sample carries; each factor family's `Δh_x = Σ w|f|²` and `Δx = (η_x / h_x') G_x`
+//! (the product `rate_times` reads by Euclid's remainder), and the receiving parametron's bound
+//! harmonic coordinate by the same law, `Δh_x = energy` and `Δh_R = (η_x / h_x') · gradient`. It
+//! checks the carry's accounting on every carried entry of the constitution (`W`, `H` and `B`, `h_R`
+//! and its statistic included), `x' + r' + e = x + r + Δ` (Lean
+//! `HNN/LatticeDeposit.carry_accounting`), which holds exactly when the published update is the
+//! termwise one. It checks each normal law's solved chart against its certificate: the exact left
+//! residual `‖1 − X̂H‖∞` is at most the chart's certified `δ` (Decision 24, Lean
+//! `HNN/LatticeWord.rounded_refinement_certificate_left`). At the exogenous locus it checks the law's
+//! exact receipt `(W'H' − B') − (WH − B) = −(T − WF)(1 − X̂H')` at the termwise step, `T − WF` read
+//! as matrices; the chart term at the carried Gram within the released bound
+//! `δ Σ_t |w| ‖χ_t − W f_t‖∞ ‖f_t‖₁`, which equals the deposit's `ChartReading::released`; and the
+//! reading's `‖W'H' − B'‖∞` and prior weight `tr(X̂)/n` (`ExogenousReading`), each recomputed.
 //!
 //! [established-bounded; measured] **`openness`** reads campaign 1's declared field (review C2): the
 //! least source-to-receiver path attenuation `2^(−Σ_a β_a Q_a / 2)` within the receiver's last
@@ -693,7 +702,19 @@ fn values(field: &Field, theta: &Constitution) -> BTreeMap<Entry, Rat> {
             );
         }
         if let Some(receiving) = theta.receiving_law(g) {
-            law(&mut put, Locus::ReceivingMap(g), receiving);
+            // The receiving locus (Decision 26): the exogenous law's `W`, `H` and `B`, and the
+            // receiving parametron's bound harmonic coordinate `h_R` with its statistic.
+            let locus = Locus::ReceivingMap(g);
+            law(&mut put, locus, receiving);
+            if let Some(target) = receiving.target() {
+                put(locus, Carrier::Target, target.entries().to_vec());
+            }
+            if let Some(harmonic) = theta.harmonic(g) {
+                put(locus, Carrier::Harmonic, harmonic.to_vec());
+            }
+            if let Some(scale) = theta.harmonic_scale(g) {
+                put(locus, Carrier::HarmonicScale, vec![scale.clone()]);
+            }
         }
     }
     for a in 0..field.contacts().len() {
@@ -741,13 +762,198 @@ fn apply(matrix: &[Vec<Rat>], vector: &[Rat]) -> Vec<Rat> {
         .collect()
 }
 
+/// `A B`, termwise over `Rat`.
+fn product(a: &[Vec<Rat>], b: &[Vec<Rat>]) -> Vec<Vec<Rat>> {
+    let columns = b.first().map_or(0, Vec::len);
+    a.iter()
+        .map(|row| {
+            (0..columns)
+                .map(|j| {
+                    row.iter()
+                        .zip(b)
+                        .filter(|(x, _)| !x.is_zero())
+                        .map(|(x, brow)| x * &brow[j])
+                        .sum()
+                })
+                .collect()
+        })
+        .collect()
+}
+
+/// `A + s B`, termwise over `Rat`.
+fn combine(a: &[Vec<Rat>], s: i64, b: &[Vec<Rat>]) -> Vec<Vec<Rat>> {
+    let s = integer(s);
+    a.iter()
+        .zip(b)
+        .map(|(x, y)| x.iter().zip(y).map(|(x, y)| x + &s * y).collect())
+        .collect()
+}
+
+/// `1 − A` for a square `A`.
+fn complement(a: &[Vec<Rat>]) -> Vec<Vec<Rat>> {
+    a.iter()
+        .enumerate()
+        .map(|(i, row)| {
+            row.iter()
+                .enumerate()
+                .map(|(j, x)| if i == j { Rat::one() - x } else { -x })
+                .collect()
+        })
+        .collect()
+}
+
+/// `‖A‖∞`, the largest absolute row sum.
+fn row_norm(a: &[Vec<Rat>]) -> Rat {
+    a.iter()
+        .map(|row| row.iter().map(Signed::abs).sum::<Rat>())
+        .max()
+        .unwrap_or_else(Rat::zero)
+}
+
+/// [definition] **An exogenous locus's receipt at one deposit** (Decision 26; `NormalLaw::exogenous`),
+/// recomputed termwise over `Rat` from the predecessor `(W, H, B)`, the samples and the executed chart
+/// `X̂` of the carried `H'`:
+///
+/// - the law's identity at the exact step `W'_e = W + ΔW`, `H'_e = H + F`, `B'_e = B + T`, with
+///   `ΔW = Σ_t w (χ_t − W f_t)(X̂ f_t)ᵀ` read sample by sample and `T − WF` read as matrices:
+///   `(W'_e H'_e − B'_e) − (W H − B) = −(T − WF)(1 − X̂ H'_e)`, checked equal entry by entry;
+/// - `term`: the executed chart term `‖(T − WF)(1 − X̂H')‖∞` at the carried Gram `H'`, which the
+///   chart's certificate `δ` bounds by `released = δ Σ_t |w| ‖χ_t − W f_t‖∞ ‖f_t‖₁` (checked, and
+///   `released` checked equal to the deposit's `ChartReading::released`);
+/// - `statistic`: the published law's `‖W'H' − B'‖∞`, checked equal to `ExogenousReading::statistic`;
+/// - `prior`: `tr(X̂)/n`, checked equal to `ExogenousReading::prior`.
+struct Receipt {
+    locus: Locus,
+    term: Rat,
+    released: Rat,
+    statistic: Rat,
+    prior: Rat,
+}
+
+/// **The exogenous step's updates and receipt, termwise** ([`Receipt`]): each sample's
+/// `ΔB = w χ fᵀ` and `ΔW = w (χ − W f)(X̂ f)ᵀ` added by entry, then the receipt checked against the
+/// deposit's reading.
+fn exogenous(
+    locus: Locus,
+    was: &NormalLaw,
+    law: &NormalLaw,
+    samples: &[holonics::hnn::constitution::Sample],
+    reading: &holonics::hnn::constitution::DepositReading,
+    add: &mut impl FnMut(Entry, Rat),
+) -> Option<Receipt> {
+    let (m, n) = (law.map().rows(), law.map().columns());
+    let map = was.map().to_rows();
+    let (gram_before, gram_after) = (was.gram().to_rows(), law.gram().to_rows());
+    let statistic_before = was.target().expect("an exogenous law carries B").to_rows();
+    let solved = law.solved().to_rows();
+    let (mut target, mut feature_gram) =
+        (vec![vec![Rat::zero(); n]; m], vec![vec![Rat::zero(); n]; n]);
+    let mut step = vec![vec![Rat::zero(); n]; m];
+    let mut shares = Rat::zero();
+    for sample in samples {
+        let chi = sample
+            .target
+            .as_ref()
+            .expect("an exogenous sample carries its target face");
+        let residual: Vec<Rat> = chi
+            .iter()
+            .zip(apply(&map, &sample.feature))
+            .map(|(chi, read)| chi - read)
+            .collect();
+        let reach = apply(&solved, &sample.feature);
+        for (row, left) in feature_gram.iter_mut().zip(&sample.feature) {
+            for (entry, right) in row.iter_mut().zip(&sample.feature) {
+                *entry += &sample.weight * left * right;
+            }
+        }
+        for i in 0..m {
+            for j in 0..n {
+                let b = &sample.weight * &chi[i] * &sample.feature[j];
+                target[i][j] += &b;
+                add((locus, Carrier::Target, i * n + j), b);
+                let w = &sample.weight * &residual[i] * &reach[j];
+                step[i][j] += &w;
+                add((locus, Carrier::Map, i * n + j), w);
+            }
+        }
+        if sample.feature.iter().any(|x| !x.is_zero()) {
+            let widest = residual
+                .iter()
+                .map(Signed::abs)
+                .max()
+                .unwrap_or_else(Rat::zero);
+            let mass: Rat = sample.feature.iter().map(Signed::abs).sum();
+            shares += sample.weight.abs() * widest * mass;
+        }
+    }
+    // The law's identity at the exact step, T − WF read as matrices.
+    let innovation = combine(&target, -1, &product(&map, &feature_gram));
+    let (next_map, next_gram, next_statistic) = (
+        combine(&map, 1, &step),
+        combine(&gram_before, 1, &feature_gram),
+        combine(&statistic_before, 1, &target),
+    );
+    let before = combine(&product(&map, &gram_before), -1, &statistic_before);
+    let after = combine(&product(&next_map, &next_gram), -1, &next_statistic);
+    let chart_term = product(&innovation, &complement(&product(&solved, &next_gram)));
+    assert_eq!(
+        combine(&after, -1, &before),
+        combine(&vec![vec![Rat::zero(); n]; m], -1, &chart_term),
+        "{locus:?}: (W'H' − B') − (WH − B) = −(T − WF)(1 − X̂H') at the exact step"
+    );
+    let chart = reading
+        .charts
+        .iter()
+        .find_map(|(at, chart)| (*at == locus).then_some(chart));
+    let Some(chart) = chart else {
+        // The window reached nothing at the locus: nothing moved.
+        assert!(
+            shares.is_zero(),
+            "{locus:?}: a reached window reads its chart"
+        );
+        return None;
+    };
+    let receipt = chart
+        .exogenous
+        .as_ref()
+        .expect("an exogenous locus's chart reading carries its receipt");
+    let released = law.chart().certificate() * &shares;
+    assert_eq!(released, chart.released, "{locus:?}: the released bound");
+    let term = row_norm(&product(
+        &innovation,
+        &complement(&product(&solved, &gram_after)),
+    ));
+    assert!(
+        term <= released,
+        "{locus:?}: the chart term within its bound"
+    );
+    let statistic = row_norm(&combine(
+        &product(&law.map().to_rows(), &gram_after),
+        -1,
+        &law.target().expect("an exogenous law carries B").to_rows(),
+    ));
+    assert_eq!(statistic, receipt.statistic, "{locus:?}: ‖W'H' − B'‖∞");
+    let prior = (0..n).map(|i| solved[i][i].clone()).sum::<Rat>() / integer(n as i64);
+    assert_eq!(prior, receipt.prior, "{locus:?}: tr(X̂)/n");
+    Some(Receipt {
+        locus,
+        term,
+        released,
+        statistic,
+        prior,
+    })
+}
+
 /// **One deposit's updates, termwise** (module header), with each normal law's solved chart
-/// checked; returns the updates by entry and the count of solved charts checked by each branch.
+/// checked and each exogenous locus's receipt checked against the deposit's reading ([`Receipt`]);
+/// returns the updates by entry, the count of solved charts checked by each branch, the exogenous
+/// receipts and the count of harmonic steps.
 fn termwise(
     before: &Constitution,
     deposit: &Deposit,
     after: &Constitution,
-) -> (BTreeMap<Entry, Rat>, [usize; 2]) {
+    reading: &holonics::hnn::constitution::DepositReading,
+) -> (BTreeMap<Entry, Rat>, [usize; 2], Vec<Receipt>, usize) {
     let steps = after.steps();
     let mut updates: BTreeMap<Entry, Rat> = BTreeMap::new();
     let mut add = |key: Entry, value: Rat| {
@@ -756,11 +962,17 @@ fn termwise(
         }
     };
     let mut branches = [0usize; 2];
+    let mut receipts = Vec::new();
     for step in deposit.linear() {
         let locus = step.locus.locus();
         let (was, law) = (
             normal_law(before, step.locus),
             normal_law(after, step.locus),
+        );
+        assert_eq!(
+            was.is_exogenous(),
+            law.is_exogenous(),
+            "{locus:?}: one law across the deposit"
         );
         let (m, n) = (law.map().rows(), law.map().columns());
         let rows = |matrix: holonics::ratio::linear::ExactRatMatrix| matrix.to_rows();
@@ -799,6 +1011,11 @@ fn termwise(
             for (j, value) in row.into_iter().enumerate() {
                 add((locus, Carrier::Gram, i * n + j), value);
             }
+        }
+        if was.is_exogenous() {
+            // Decision 26: `ΔB = Σ w χ fᵀ`, `ΔW = Σ w (χ − W f)(X̂ f)ᵀ`, and the law's receipt.
+            receipts.extend(exogenous(locus, was, law, &step.samples, reading, &mut add));
+            continue;
         }
         for sample in &step.samples {
             let reach = apply(&solved, &sample.feature);
@@ -883,7 +1100,20 @@ fn termwise(
             }
         }
     }
-    (updates, branches)
+    // The receiving parametron's bound harmonic coordinate (Decision 26): the factor step's law at
+    // the receiving locus, `h_x' = h_x + energy` and `Δh_R = (η_x / h_x') · gradient`.
+    for step in deposit.harmonic() {
+        let locus = Locus::ReceivingMap(step.ring);
+        add((locus, Carrier::HarmonicScale, 0), step.energy.clone());
+        let statistic = after
+            .harmonic_scale(step.ring)
+            .expect("a receiving ring carries its harmonic statistic");
+        let rate = &steps.factor / statistic;
+        for (entry, value) in step.gradient.iter().enumerate() {
+            add((locus, Carrier::Harmonic, entry), &rate * value);
+        }
+    }
+    (updates, branches, receipts, deposit.harmonic().len())
 }
 
 /// **The equality receipt** (module header).
@@ -894,6 +1124,10 @@ fn equality(which: &str, deposits: usize, steps: &Steps) {
         steps.proxy, steps.factor
     );
     let (mut entries, mut solved) = (0usize, [0usize; 2]);
+    let (mut receipts, mut harmonic) = (0usize, 0usize);
+    // The prior weight's readings in order, to count where it rose (a reading: the chart's
+    // certificate and the Gram's carry may move it, `ExogenousReading::prior`).
+    let (mut prior, mut rose): (Option<Rat>, usize) = (None, 0);
     let clock = Instant::now();
     let (done, _) = expose(
         &field,
@@ -901,7 +1135,8 @@ fn equality(which: &str, deposits: usize, steps: &Steps) {
         steps,
         deposits,
         |done, step, _| {
-            let (updates, branches) = termwise(step.before, step.deposit, step.after);
+            let (updates, branches, exogenous, steps) =
+                termwise(step.before, step.deposit, step.after, step.reading);
             let (was, now) = (values(&field, step.before), values(&field, step.after));
             let (carried, carries) = (remainders(step.before), remainders(step.after));
             let released: BTreeMap<Entry, Rat> = step
@@ -914,7 +1149,12 @@ fn equality(which: &str, deposits: usize, steps: &Steps) {
                 map.get(key).cloned().unwrap_or_else(Rat::zero)
             };
             assert_eq!(was.len(), now.len(), "one carried shape");
-            for key in updates.keys().chain(released.keys()) {
+            for key in updates
+                .keys()
+                .chain(released.keys())
+                .chain(carried.keys())
+                .chain(carries.keys())
+            {
                 assert!(now.contains_key(key), "{key:?} is a carried entry");
             }
             for (key, value) in &now {
@@ -927,19 +1167,35 @@ fn equality(which: &str, deposits: usize, steps: &Steps) {
             entries += now.len();
             solved[0] += branches[0];
             solved[1] += branches[1];
+            receipts += exogenous.len();
+            harmonic += steps;
             println!(
-                "deposit {done}: {} carried entries equal their termwise accounting ({} updated); solved charts certified: {} on an unmoved Gram, {} on a moved one",
+                "deposit {done}: {} carried entries equal their termwise accounting ({} updated); solved charts certified: {} on an unmoved Gram, {} on a moved one; harmonic steps {steps}",
                 now.len(),
                 updates.len(),
                 branches[0],
                 branches[1]
             );
+            for receipt in &exogenous {
+                if prior.as_ref().is_some_and(|last| &receipt.prior > last) {
+                    rose += 1;
+                }
+                prior = Some(receipt.prior.clone());
+                println!(
+                    "  {:?} exogenous receipt: (W'H' − B') − (WH − B) = −(T − WF)(1 − X̂H') at the exact step; the chart term ‖(T − WF)(1 − X̂H')‖∞ at the carried Gram {} ≤ released {}; ‖W'H' − B'‖∞ = {}; prior weight tr(X̂)/n = {}",
+                    receipt.locus,
+                    exact(&receipt.term),
+                    exact(&receipt.released),
+                    exact(&receipt.statistic),
+                    ratio(&receipt.prior)
+                );
+            }
         },
         |_, _, _| {},
         |_, _, (), _| {},
     );
     println!(
-        "every value equal over {done} deposits: {entries} carried entries checked, {} solved charts certified on an unmoved Gram and {} on a moved one, in {} ms",
+        "every value equal over {done} deposits: {entries} carried entries checked, {} solved charts certified on an unmoved Gram and {} on a moved one, {receipts} exogenous receipts (the prior weight rose at {rose} of them) and {harmonic} harmonic steps checked, in {} ms",
         solved[0],
         solved[1],
         clock.elapsed().as_millis()

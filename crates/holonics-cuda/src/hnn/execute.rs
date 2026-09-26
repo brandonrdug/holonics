@@ -50,7 +50,7 @@ fn device(error: DeviceError) -> HnnError {
 // -------------------------------------------------------------------------------------------
 // the plan's layout (the kernels' `WP_*` … words)
 
-const WP_HEADER: usize = 29;
+const WP_HEADER: usize = 31;
 const WP_RINGS: usize = 0;
 const WP_CONTACTS: usize = 1;
 const WP_STEPS: usize = 2;
@@ -80,6 +80,8 @@ const WP_ALPHABET: usize = 25;
 const WP_PAIR_TABLE: usize = 26;
 const WP_INCIDENCES: usize = 27;
 const WP_MAP: usize = 28;
+const WP_HARMONIC: usize = 29;
+const WP_HARMONIC_SHIFT: usize = 30;
 
 const WR_STRIDE: usize = 12;
 const WR_WIDTH: usize = 0;
@@ -498,6 +500,18 @@ impl WordPlan {
         let map = loci.maps[receiver]
             .as_ref()
             .ok_or(HnnError::MissingReceivingMap { ring: receiver })?;
+        // The bound harmonic coordinate (Decision 26), added to the anchor before the map reads it:
+        // its words at the receiving locus's lattice, lifted onto the transients' `2^(−L_w)ℤ`.
+        let (harmonic_at, harmonic_shift) = match &loci.harmonics[receiver] {
+            Some(placed) if placed.matrix.exponent > lw => {
+                return Err(refused(
+                    "a harmonic coordinate finer than the transients' lattice (the read adds it to \
+                     the anchor on 2^(−L_w)ℤ)",
+                ));
+            }
+            Some(placed) => (placed.offset as i64, i64::from(lw - placed.matrix.exponent)),
+            None => (-1, 0),
+        };
         let gather_at = plan.len();
         plan.extend(gather(field, receiver, &lift[receiver]));
         // The source rings: their ports, pair ports and phase gathers.
@@ -578,6 +592,8 @@ impl WordPlan {
             (WP_PAIR_TABLE, pair_at as i64),
             (WP_INCIDENCES, incidences as i64),
             (WP_MAP, map.offset as i64),
+            (WP_HARMONIC, harmonic_at),
+            (WP_HARMONIC_SHIFT, harmonic_shift),
         ];
         for (at, value) in header {
             plan[at] = value;

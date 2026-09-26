@@ -13,6 +13,7 @@
 //! | source ring `g`'s port `E_g` | `2d_g × |A|` | `L_SourcePort(g)` |
 //! | its pair port `(e_ρ, a_ρ, b_ρ)` per offset | `m × 2d_g`, `m × |A|`, `m × |A|` | `L_SourcePort(g)` |
 //! | receiving ring `R`'s map | `2|A| × 2d_R` | `L_ReceivingMap(R)` |
+//! | receiving ring `R`'s bound harmonic coordinate `h_R` (Decision 26) | `1 × 2d_R` | `L_ReceivingMap(R)` |
 //!
 //! The host keeps what only the host reads (the element `K_g`, `W_s,g`, the dissipation `D_a`, the
 //! exact operators `I − ½K_g` and `m_a` from which the chart store's operator words are read) and a
@@ -107,6 +108,9 @@ pub(crate) struct Loci {
     pub(crate) sources: Vec<SourceLoci>,
     /// The receiving map per ring (`None` off the receiving rings).
     pub(crate) maps: Vec<Option<Placed>>,
+    /// The bound harmonic coordinate `h_R` per ring (Decision 26; `None` where the ring carries
+    /// none), a `1 × 2d_R` row at the receiving locus's lattice.
+    pub(crate) harmonics: Vec<Option<Placed>>,
     pub(crate) words: Vec<i64>,
     /// Each placed array's `(offset, length, exponent)`, in order: two publications with equal
     /// layouts differ only in their words.
@@ -268,6 +272,7 @@ impl Loci {
             });
         }
         let mut maps = vec![None; field.rings().len()];
+        let mut harmonics = vec![None; field.rings().len()];
         for receiver in field.receivers() {
             let ring = receiver.ring;
             if maps[ring].is_some() {
@@ -276,17 +281,26 @@ impl Loci {
             let map = constitution
                 .receiving_map(ring)
                 .ok_or(HnnError::MissingReceivingMap { ring })?;
+            let exponent = lattice(field, Locus::ReceivingMap(ring))?;
             maps[ring] = Some(words.place(DyadicMatrix::at(
                 map,
-                lattice(field, Locus::ReceivingMap(ring))?,
+                exponent,
                 "a receiving map entry off its lattice or past the word",
             )?));
+            if let Some(harmonic) = constitution.harmonic(ring) {
+                harmonics[ring] = Some(words.place(DyadicMatrix::at(
+                    &vectors(&[harmonic.to_vec()], harmonic.len())?,
+                    exponent,
+                    "a harmonic coordinate entry off its lattice or past the word",
+                )?));
+            }
         }
         Ok(Self {
             rings,
             contacts,
             sources,
             maps,
+            harmonics,
             words: words.words,
             layout: words.layout,
             operators: RefCell::new(BTreeMap::new()),

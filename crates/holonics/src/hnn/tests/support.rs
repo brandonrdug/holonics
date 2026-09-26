@@ -478,6 +478,9 @@ impl ConstitutionRead for Medium {
     fn receiving_map(&self, ring: usize) -> Option<&ExactRatMatrix> {
         self.receiving[ring].as_ref()
     }
+    fn harmonic(&self, _ring: usize) -> Option<&[Rat]> {
+        None
+    }
 }
 
 /// A lift point with the declared phase classes.

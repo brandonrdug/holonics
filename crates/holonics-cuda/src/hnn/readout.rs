@@ -7,7 +7,8 @@
 //! enclosure, the Holon ratio"). Each is the host owner's formula read on the record's coordinates:
 //!
 //! - **the faces** (`holonics::hnn::receiving::ReceivingPhases::read`, `ratio::Faces::of_reads`):
-//!   the logits are the card's (`R · P_R^(τ_R) v_R(e_j)`, exact), and the grain cells and the
+//!   the logits are the card's (`R · P_R^(τ_R)(v_R(e_j) + h_R)`, exact; Decision 26's standing
+//!   read), and the grain cells and the
 //!   faces in `ℚ(θ)` are the host's;
 //! - **each tick's balance** (`holonics::hnn::word::Word::tick`, `propagation::TickBalance`): the
 //!   power before and after, the dissipation, the passive and contrast terms, and the executed

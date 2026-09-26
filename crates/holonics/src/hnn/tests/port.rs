@@ -197,7 +197,7 @@ fn cut_at(field: Field, theta: Constitution) -> Cut {
             &phases,
         )
         .unwrap();
-    let (pullback, _) = compose(&field, &theta, &pending, &back).unwrap();
+    let (pullback, _) = compose(&field, &theta, &pending, &back, &targets).unwrap();
     let base = pairing(covector.logits(), &faces_logits);
     Cut {
         field,

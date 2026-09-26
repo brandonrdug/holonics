@@ -12,6 +12,10 @@
 //! exposure's chain (no pair offset, so its capacity and cut are 17 and 18 cells: one aeon, nine
 //! receiving windows), declare a budget two deposits pass, which is the stop rule's own case and
 //! keeps the exact deposits few, and the rest of the cut runs on the last published constitution.
+//!
+//! [measured] Under Decision 26 (the receiving map's `B` and the bound harmonic coordinate carried)
+//! the chain's constitution reads 973 bits at the mount, 976, 1,050 and 1,723 after one, two and
+//! three deposits of this cut: [`CHAIN_BUDGET`] = 1,100 passes two.
 
 use super::learning::{chain, chain_of};
 use super::support::Draw;
@@ -23,6 +27,9 @@ use crate::hnn::reference::{Cut, Exposure, Reference, WallTimes, one_hot};
 use crate::ratio::Rat;
 use crate::ratio::algebraic::ExactInterval;
 use crate::receiver::reception::Component;
+
+/// The chain cut's declared budget: two deposits pass, the third is refused (module header).
+const CHAIN_BUDGET: u64 = 1_100;
 
 fn ordered(interval: &crate::ratio::algebraic::ExactInterval) -> bool {
     interval.lower <= interval.upper
@@ -189,6 +196,11 @@ fn stopped(exposure: &Exposure) {
             .iter()
             .all(|point| point.bits.entries > 0 && point.bits.solved > 0)
     );
+    // The receiving map's prior weight (Decision 26) is 1 at the mount.
+    assert_eq!(
+        exposure.constitution_curve[0].prior,
+        Some(crate::ratio::integer(1))
+    );
     assert!(*cell < exposure.training.cells + exposure.held_out.cells);
 }
 
@@ -212,7 +224,7 @@ fn the_exposure_deposits_on_its_training_part_until_its_budget_stop_and_runs_to_
         cells: source(length, 81),
         held_out: vec![2..4, length - 4..length],
     };
-    let exposure = Reference::new(64, Steps::campaign_one(), 1_000)
+    let exposure = Reference::new(64, Steps::campaign_one(), CHAIN_BUDGET)
         .expose(&field, &cut)
         .unwrap();
     read_out(&exposure, length as u64, 6);
@@ -250,7 +262,7 @@ fn the_exposure_stops_at_its_deadline_and_changes_nothing_it_read() {
         cells: source(length, 81),
         held_out: vec![2..4, length - 4..length],
     };
-    let reference = Reference::new(64, Steps::campaign_one(), 1_000);
+    let reference = Reference::new(64, Steps::campaign_one(), CHAIN_BUDGET);
     let run = |windows: u64| {
         reference
             .clone()
@@ -371,7 +383,7 @@ fn one_worker_and_many_return_the_same_values() {
         cells: source(length, 81),
         held_out: vec![2..4, length - 4..length],
     };
-    let reference = Reference::new(64, Steps::campaign_one(), 1_000).with_deadline(4);
+    let reference = Reference::new(64, Steps::campaign_one(), CHAIN_BUDGET).with_deadline(4);
     let run = |workers: usize| {
         let pool = rayon::ThreadPoolBuilder::new()
             .num_threads(workers)
