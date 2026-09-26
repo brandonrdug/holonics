@@ -267,7 +267,8 @@ fn the_field_declares_the_tree_and_codes_it() {
 }
 
 /// The read is `f_j = k(a_j)/L_R + R · P_R^(τ_R) v_R` (the combined face): the wave rotated to the
-/// receiving ring's phase, plus the tree face's grain logits at phase `j`'s address; each class's
+/// receiving ring's phase, plus the tree face's grain logits at phase `j`'s address, read after the
+/// window's earlier targets (cell order); each class's
 /// real logit read at the grain, its imaginary logit (the wave's alone) halved into turns. The
 /// tree logits lie on the grain, so each cell is the wave's shifted by `k_c/L_R` exactly and keeps
 /// the wave's fibre; the tree's face sums to one exactly and its grain logits alone code each class
@@ -276,11 +277,12 @@ fn the_field_declares_the_tree_and_codes_it() {
 fn the_read_adds_the_trees_face_to_the_rotated_wave() {
     let field = &chain();
     let mut medium = Medium::encoding(field, 12);
-    // A tree that received a short passage, so its face differs from address to address.
+    // A tree that received a short passage, so its face differs from address to address; the
+    // window's two cells are not yet deposited.
     let declared = landmark_declaration(field, &field.receivers()[0]).unwrap();
     let mut tree = Landmarks::new(declared).unwrap();
     let passage = [1usize, 1, 3, 0, 1, 2, 1, 1, 3, 0, 1];
-    for position in 0..passage.len() {
+    for position in 0..9 {
         tree.receive(&address(&passage, position, 2), passage[position])
             .unwrap();
     }
@@ -300,8 +302,12 @@ fn the_read_adds_the_trees_face_to_the_rotated_wave() {
     let targets = [passage[9], passage[10]];
     let faces = phases.tree_faces(&medium, &register, &targets).unwrap();
     assert_eq!(faces.len(), 2);
+    // Phase j reads the tree after the window's earlier targets (cell order).
+    let mut deposited = tree.clone();
     for (j, face) in faces.iter().enumerate() {
-        assert_eq!(face, &tree.face(&address(&passage, 9 + j, 2), 16).unwrap());
+        let here = address(&passage, 9 + j, 2);
+        assert_eq!(face, &deposited.face(&here, 16).unwrap());
+        deposited.deposit(&here, passage[9 + j]).unwrap();
         assert_eq!(face.probabilities.iter().sum::<Rat>(), Rat::one());
         for (class, p) in face.probabilities.iter().enumerate() {
             let code = tree_code_length(face, class).unwrap();
@@ -461,7 +467,8 @@ fn the_wave_is_inert_when_every_map_opens_at_zero() {
 
 /// **`R` opens at zero and learns from the first deposit** (Decision 28's declared openings): at
 /// the declared initial constitution (`R_0 = 0`, `E_0` the sign generator times ½) the first
-/// compare's face is the tree's exactly (the model's code length equals the tree face alone's), its
+/// compare's combined face is the tree's at the grain exactly (its code length equals the tree's
+/// grain face alone's), its
 /// covector reaches no upstream locus (`Rᵀ g = 0`), and its deposit moves `R`; the second compare's
 /// covector reaches `E`, which its deposit moves. So the first commit at which an upstream locus
 /// moves is the second.
@@ -497,7 +504,7 @@ fn r_opens_at_zero_and_learns_from_the_first_deposit() {
             .compare(resident, pending, &one_hot(&cells[at..at + 2]))
             .unwrap();
         let tree = match &compared.receipt.detail {
-            ReceiptDetail::Compare { tree, .. } => tree.clone(),
+            ReceiptDetail::Compare { tree_grain, .. } => tree_grain.clone(),
             _ => panic!("a compare's receipt"),
         };
         let holon = compared.forward.present().unwrap().clone();
@@ -509,7 +516,10 @@ fn r_opens_at_zero_and_learns_from_the_first_deposit() {
     };
     let (holon, tree, pullback, before) = window(&mut resident, 6);
     for (phase, tree) in holon.phases().iter().zip(&tree) {
-        assert_eq!(&phase.code_length, tree, "the first face is the tree's");
+        assert_eq!(
+            &phase.code_length, tree,
+            "the first combined face is the tree's at the grain"
+        );
     }
     let zero = |matrix: &ExactRatMatrix| matrix.entries().iter().all(Zero::is_zero);
     assert!(zero(pullback.rings[0].source.as_ref().unwrap()));
@@ -557,12 +567,15 @@ fn tree_face(probabilities: &[Rat], grain: u64) -> crate::hnn::landmark::Landmar
     }
 }
 
-/// **The mixture weighs the tree against the combined face** (ruling A; Lean
-/// `HNN/LandmarkTree.{path_face_normalized, weight_step, kraft_and_dominance}` at two children): it
-/// opens at `β = 1`, `λ = 1/2`; a window's phases read one `β`, and each phase's code length encloses
-/// `−log₂(λ q_T + (1 − λ) q_C)` with `q_C` the combined face's exact class mass; the steps multiply
-/// `β` by `q_T(x)/q̃_C(x)` in cell order, exactly while the odd parts fit `W`, and past it the
-/// carried `β` is rebased with its drift reported; `log₂ β` is enclosed.
+/// **The mixture weighs the tree against the combined face, cell by cell** (ruling A; Lean
+/// `HNN/LandmarkTree.{path_face_normalized, sequential_mixture, sequential_mixture_executed}`): it
+/// opens at `β = 1`, `λ = 1/2`; phase `j` of a window reads the ratio after the earlier phases'
+/// steps, so the window's product is `½ A + ½ B` (the tree's and the combined face's likelihoods),
+/// within the steps' residuals, and a weight read before phase 0's step (`β = 1` at phase 1) is
+/// excluded; each phase's code length encloses `−log₂(λ_j q_T + (1 − λ_j) q_C)` with `q_C` the
+/// combined face's exact class mass, and the tree's own `−log₂ q_T` is returned beside it; the
+/// steps multiply `β` by `q_T(x)/q̃_C(x)` in cell order, exactly while the odd parts fit `W`, and
+/// past it the carried `β` is rebased with its drift reported; `log₂ β` is enclosed.
 #[test]
 fn the_mixture_weighs_the_tree_against_the_combined_face() {
     let grain = 16;
@@ -570,8 +583,8 @@ fn the_mixture_weighs_the_tree_against_the_combined_face() {
         tree_face(&[rat(1, 2), rat(1, 4), rat(1, 8), rat(1, 8)], grain),
         tree_face(&[rat(1, 4), rat(1, 4), rat(1, 4), rat(1, 4)], grain),
     ];
-    // Combined logits on the grain (no fibre), so q_C is exact in ℚ: 2^(−1), 2^(−2), 2^(−3), 2^(−3)
-    // up to a common shift for the first phase; uniform for the second.
+    // Combined logits on the grain (no fibre), so q_C is exact in ℚ: (8, 2, 2, 4)/16 for the first
+    // phase, (1, 1, 1, 2)/5 for the second.
     let logits = |exponents: [i64; 4]| -> Vec<Rat> {
         exponents
             .iter()
@@ -580,17 +593,30 @@ fn the_mixture_weighs_the_tree_against_the_combined_face() {
     };
     let reads = [
         ReceivingRead::of_logits(logits([3, 1, 1, 2]), grain),
-        ReceivingRead::of_logits(logits([0, 0, 0, 0]), grain),
+        ReceivingRead::of_logits(logits([0, 0, 0, 1]), grain),
     ];
     let combined = crate::hnn::ratio::Faces::of_reads(&reads, grain).unwrap();
     let mut mixture = crate::hnn::receiving::Mixture::new(28);
     assert_eq!((mixture.beta(), mixture.weight()), (integer(1), rat(1, 2)));
-    let targets = [0usize, 3];
+    let targets = [1usize, 3];
     let scored = mixture.score(2, &combined, &trees, &targets).unwrap();
-    // Phase 0: q_T = 1/2, q_C = 8/(8 + 2 + 2 + 4) = 1/2, so q = 1/2: one bit exactly enclosed.
-    assert!(scored.model[0].lower <= integer(1) && integer(1) <= scored.model[0].upper);
-    // Phase 1: q_T = 1/4 and q_C = 1/4: two bits.
-    assert!(scored.model[1].lower <= integer(2) && integer(2) <= scored.model[1].upper);
+    let code = |p: Rat| crate::hnn::landmark::code_length(&p).unwrap();
+    // Phase 0 at β = 1: q_T = 1/4, q_C = 1/8, q = 3/16.
+    assert!(scored.model[0].lower <= code(rat(3, 16)).upper);
+    assert!(code(rat(3, 16)).lower <= scored.model[0].upper);
+    // The tree's own code lengths: two bits each.
+    assert_eq!(scored.tree, vec![code(rat(1, 4)), code(rat(1, 4))]);
+    // Phase 1 at β_1 = (1/4)/(1/8) = 2 (λ = 2/3): q_T = 1/4, q_C = 2/5, q = 3/10. The window's
+    // product is (A + B)/2 = (1/16 + 1/20)/2 = 9/160; a weight left at β = 1 would read
+    // 3/16 · 13/40 = 39/640.
+    let drift: Rat = scored.steps.iter().map(|step| step.residual.clone()).sum();
+    let window = crate::hnn::reference::window_code_length(&scored.model).unwrap();
+    let (ideal, stale) = (code(rat(9, 160)), code(rat(39, 640)));
+    assert!(window.lower <= &ideal.upper + &drift && ideal.lower <= &window.upper + &drift);
+    assert!(
+        &stale.upper + &drift < window.lower,
+        "the stale weight (which codes this window shorter) is excluded"
+    );
     assert_eq!(scored.steps.len(), 2);
     assert!(scored.steps.iter().all(|step| step.ring == 2));
     for step in &scored.steps {
@@ -622,7 +648,10 @@ fn the_mixture_weighs_the_tree_against_the_combined_face() {
         .unwrap();
     assert_eq!(exact_mixture.beta(), rat(3, 2));
     assert_eq!(exact_mixture.weight(), rat(3, 5));
-    assert_eq!((exact_mixture.rebases(), exact_mixture.drift()), (0, &Rat::zero()));
+    assert_eq!(
+        (exact_mixture.rebases(), exact_mixture.drift()),
+        (0, &Rat::zero())
+    );
     // Past the carrier width the ratio is rebased to its W-bit mantissa, with 3·2^(−W) of drift.
     let mut narrow = crate::hnn::receiving::Mixture::new(4);
     narrow
@@ -636,17 +665,17 @@ fn the_mixture_weighs_the_tree_against_the_combined_face() {
     assert_eq!(narrow.rebases(), 1);
     assert_eq!(narrow.drift(), &rat(3, 16));
     assert_eq!(narrow.beta(), integer(1));
-    assert!(
-        mixture
-            .score(2, &combined, &trees[..1], &targets)
-            .is_err()
-    );
+    assert!(mixture.score(2, &combined, &trees[..1], &targets).is_err());
 }
 
-/// **The mixture codes within one bit of the better face** (Lean
-/// `HNN/LandmarkTree.kraft_and_dominance` at two children, plus the carried chart's drift): on the
-/// exposure's chain, over the whole cut, the model's code length is at most the smaller of the
-/// tree's and the combined face's plus one bit plus the reported drift.
+/// **The mixture codes within one bit of the better face, and the tree is read in cell order**
+/// (Lean `HNN/LandmarkTree.{sequential_mixture_bounds, sequential_mixture_executed}`): on the
+/// exposure's chain, over the whole cut, against the tree's executed face `L_T` (the face the
+/// mixture weighs) and the combined face `L_C`, `min(L_T, L_C) − drift ≤ L_model ≤ min(L_T, L_C) +
+/// 1 + drift`, each half read on the enclosure endpoints that can refute it (a half fails only when
+/// the law is violated); `log₂ β` is `L_C − L_T` within the drift; and the tree's code length is
+/// exactly the count-only prequential tree's over the same cut (`hnn::landmark::prequential`), so
+/// every phase of every window read the tree after every earlier cell.
 #[test]
 fn the_mixture_codes_within_one_bit_of_the_better_face() {
     use super::learning::chain_of;
@@ -670,15 +699,35 @@ fn the_mixture_codes_within_one_bit_of_the_better_face() {
     let exposure = Reference::new(64, Steps::campaign_one(), OPEN_BUDGET)
         .expose(&field, &cut)
         .unwrap();
-    let total = |pick: fn(&crate::hnn::reference::Bits) -> &crate::ratio::algebraic::ExactInterval| {
-        let (a, b) = (pick(&exposure.training), pick(&exposure.held_out));
-        (&a.lower + &b.lower, &a.upper + &b.upper)
-    };
+    assert!(exposure.complete, "every window deposited");
+    let total =
+        |pick: fn(&crate::hnn::reference::Bits) -> &crate::ratio::algebraic::ExactInterval| {
+            let (a, b) = (pick(&exposure.training), pick(&exposure.held_out));
+            (&a.lower + &b.lower, &a.upper + &b.upper)
+        };
     let model = total(|bits| &bits.model);
     let tree = total(|bits| &bits.tree);
     let combined = total(|bits| &bits.combined);
     let report = exposure.mixture.as_ref().unwrap();
-    let better = if tree.1 < combined.1 { tree.1 } else { combined.1 };
-    assert!(model.0 <= better + integer(1) + &report.drift);
-    assert!(report.drift >= Rat::zero());
+    let drift = &report.drift;
+    assert!(*drift >= Rat::zero());
+    let lowest = |a: &Rat, b: &Rat| if a < b { a.clone() } else { b.clone() };
+    // L_model ≤ min(L_T, L_C) + 1 + drift, refuted only if the lower endpoint passes the upper ones.
+    assert!(model.0 <= lowest(&tree.1, &combined.1) + integer(1) + drift);
+    // min(L_T, L_C) − drift ≤ L_model, refuted only if the upper endpoint falls below the lower ones.
+    assert!(lowest(&tree.0, &combined.0) - drift <= model.1);
+    // log₂ β = L_C − L_T within the drift (the mixture's evidence).
+    let log = &report.log2_beta;
+    assert!(log.lower <= &combined.1 - &tree.0 + drift);
+    assert!(&combined.0 - &tree.1 - drift <= log.upper);
+    // The tree read in cell order is the count-only prequential tree, exactly.
+    let receiver = &field.receivers()[0];
+    let declared = landmark_declaration(&field, receiver).unwrap();
+    let alone = crate::hnn::landmark::prequential(&cut, &declared).unwrap();
+    assert_eq!(exposure.training.tree, alone.development.tree);
+    assert_eq!(exposure.held_out.tree, alone.held_out.tree);
+    assert_eq!(
+        (exposure.training.cells, exposure.held_out.cells),
+        (alone.development.cells, alone.held_out.cells)
+    );
 }

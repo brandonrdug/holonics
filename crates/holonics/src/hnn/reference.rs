@@ -114,7 +114,7 @@
 //! | a word's open (`refine`, `compare`'s read, the deposit's re-read) | the rings' operands, then the contacts', each refining its own chart from its own kept chart; within them, a Gram's rows | each reads its own material (the standings, its own screws) and its own kept chart, and writes its own operands; the refined charts are kept afterwards, by key |
 //! | a tick of the word | the junctions, then the elements, then the transits; the rings' and contacts' power terms | a junction reads its own storage, arrivals and anchor remainder, an element its own junction and storage remainder, a transit its two ends' outgoing waves, its own state and its own remainders; the balance terms and the power are summed afterwards in ring, then contact, order |
 //! | the receiving read | the receiving epochs; within each, the map's `2\|A\|` rows, then the classes' grain cells | each row and class reads the shared anchor and writes its own logit or cell |
-//! | the tree read at compare | the receiving phases, each reading the published tree at its own address | the tree is read, never written, until the deposit |
+//! | the tree read at compare | the receiving phases, each reading the published tree at its own address through its own working overlay (the window's earlier phases' deposits, built first in cell order, `hnn::landmark::Landmarks::window_faces`) | the published tree and every overlay are read, never written, until the deposit |
 //! | the faces and the Holon ratio | the receiving phases' faces, then their ratios and code lengths | each reads its own read and target |
 //! | `pull_back` | per step in reverse, the junctions at their recorded anchors, then the elements (each through its executed chart's transpose), then the transits (each through its executed chart's transpose, and each channel coordinate), then the junctions' reverse Swings at their executed weights (and each coordinate) | each reads its step's record, its own covectors and its own adjoint remainders, and writes its own; the conductance terms are added afterwards, in contact, then ring and incidence, order |
 //! | [`compose`] | the receiving map's gradient by row blocks; the rings (their ticks' charts, slices and contrast port's rows); the standings; the source ring's phases and pair-port ranks; the contacts (their ticks' charts and three forms) | each reads the word's return and its own material; the parts are joined in ring and contact order, so the deposit's steps stand in the serial order |
@@ -1086,13 +1086,14 @@ impl ExecutionPort for Reference {
             .zip(&slot.emitted)
             .map(|(now, then)| now.iter().zip(then).map(|(a, b)| a - b).collect())
             .collect();
-        let tree = against
+        let tree_grain = against
             .trees
             .iter()
             .zip(&targets)
             .map(|(face, &target)| tree_code_length(face, target))
             .collect::<Result<Vec<_>, _>>()?;
-        // The receiver's scored face: the mixture of the tree's and the combined face (ruling A).
+        // The receiver's scored face: the mixture of the tree's and the combined face (ruling A),
+        // its ratio stepped phase by phase; beside it the tree's executed face alone.
         let scored = ratio.scored(&resident.constitution, &against, &targets)?;
         let anchors = target_phases(&field, ratio.anchor(), phases.ring(), &targets)?;
         let holon = HolonRatio::compare(against.faces, &targets, &anchors)?;
@@ -1130,7 +1131,8 @@ impl ExecutionPort for Reference {
             residual,
             reached: deposit.loci(),
             released: back.released.clone(),
-            tree,
+            tree: scored.tree,
+            tree_grain,
             model: scored.model,
         };
         let steps = phases.junction_steps() as u64;
@@ -2145,11 +2147,18 @@ impl Cut {
 
 /// [definition] **Bits on a population of targets**: the model's code length on its scored face,
 /// the receiver's mixture of the tree's face and the combined face (ruling A); the landmark tree's
-/// face alone (Decision 28: the receiving parametron's tree at each cell's causal address, read at
-/// the grain, with no wave, at the same constitution and address as the model's face); the combined
-/// face alone (the tree's grain logits plus the wave, whose covector the wave learns from), so
-/// `combined − tree` is the wave's contribution and `model − tree` what the mixture keeps of it;
-/// and the online baselines' (uniform;
+/// executed face alone (`tree`, Decision 28: the receiving parametron's tree at each cell's causal
+/// address and at the standing after every earlier cell, with no wave: the face `q_T` the mixture
+/// weighs); the same tree's face at the grain (`tree_grain`: its grain logits alone, the face the
+/// combined read opens at when the wave reads zero); the combined face alone (the tree's grain
+/// logits plus the wave, whose covector the wave learns from). So `combined − tree` (`L_C − L_T`)
+/// is the wave's contribution against the tree's executed face, the population's share of the
+/// mixture's evidence `log₂ β` within the chart's drift (it includes the grain's rounding,
+/// `tree_grain − tree`, which the combined face inherits), and `model − tree` (`L_model − L_T`) is
+/// what the mixture keeps of it: over the whole passage (both populations) `L_model` lies between
+/// `min(L_T, L_C)` and one bit above it, each within the chart's drift (Lean
+/// `HNN/LandmarkTree.{sequential_mixture_bounds, sequential_mixture_executed}`); and the online
+/// baselines' (uniform;
 /// order-0 and order-1 with the Krichevsky–Trofimov prior; PPM of order [`PPM_ORDER`] with escape
 /// rule C), each an enclosure, over `cells` targets. xz and zstd, with their description cost, are
 /// exterior codecs: the crate runs no process, so they are owed to the application, computed there
@@ -2158,6 +2167,7 @@ impl Cut {
 pub struct Bits {
     pub model: ExactInterval,
     pub tree: ExactInterval,
+    pub tree_grain: ExactInterval,
     pub combined: ExactInterval,
     pub uniform: ExactInterval,
     pub order_zero: ExactInterval,
@@ -2172,6 +2182,7 @@ impl Bits {
         Self {
             model: zero.clone(),
             tree: zero.clone(),
+            tree_grain: zero.clone(),
             combined: zero.clone(),
             uniform: zero.clone(),
             order_zero: zero.clone(),
@@ -2279,9 +2290,10 @@ pub struct MixtureReport {
 /// [definition] **One aeon's leg of the receiving face's course** (ruling A): the cell at which it
 /// closed (the joint clock's carry-out, or the run's end), the cells compared since the previous
 /// boundary (every phase of the windows compared in it, a window counted in the aeon its compare
-/// ran in), their code lengths under the model (the mixture), the tree face alone and the combined
-/// face alone, and the mixture's `log₂ β` at the boundary: whether the combined face stops losing as
-/// its features stop growing.
+/// ran in), their code lengths under the model (the mixture), the tree's executed face alone and
+/// the combined face alone, and the mixture's `log₂ β` at the boundary (the sum of `L_C − L_T` over
+/// every cell so far, within the chart's drift): whether the combined face stops losing as its
+/// features stop growing.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct AeonCourse {
     pub cell: u64,
@@ -2480,10 +2492,13 @@ pub struct BaselineCodes {
 /// [definition] **The online baselines, fitted on the same stream in the same order** as the model
 /// they are read beside: every cell is coded at the current counts, then counted (prequential).
 /// [agent-inferred] The order-1 baseline's contexts are the preceding cell's address letter
-/// (`hnn::landmark::Letter`: `1 + code`, and the boundary `0` before the stream's first cell), so a
-/// depth-one landmark tree with its root's split forced has order-1's law exactly (Lean
-/// `HNN/LandmarkTree.depth_one_is_decision_27`). The exposure ([`expose`]) and the landmark tree's
-/// prequential measurement (`hnn::landmark::prequential`) read them.
+/// (`hnn::landmark::Letter`: `1 + code`, and the boundary `0` before the stream's first cell): the
+/// preceding cell's region. Order-1 is the depth-one forced case of the whole-cell emission
+/// (`|A|`-ary KT masses at a node, Decision 27's region table; Lean
+/// `HNN/LandmarkTree.depth_one_is_decision_27`), which lives in Lean only; the executed tree
+/// (`hnn::landmark::Landmarks`) emits the cell's odometer digits, and its depth-one forced case is
+/// a product of binary KT faces at the preceding cell, a different law. The exposure ([`expose`])
+/// and the landmark tree's prequential measurement (`hnn::landmark::prequential`) read them.
 #[derive(Clone, Debug)]
 pub struct Baselines {
     alphabet: usize,
@@ -2751,13 +2766,17 @@ where
                 .forward
                 .into_present()
                 .expect("a compare returns its ratio");
-            // The tree face alone (Decision 28): the compare's reading of the tree at each
-            // phase's causal address, before the deposit and the window's ingest.
-            // The model's (the mixture's) and the tree face alone's code lengths (ruling A,
-            // Decision 28): the compare's readings, before the deposit and the window's ingest;
-            // the combined face's are the Holon ratio's.
-            let (tree, model) = match &compared.receipt.detail {
-                ReceiptDetail::Compare { tree, model, .. } => (tree.clone(), model.clone()),
+            // The model's (the mixture's) and the tree face alone's code lengths, its executed face
+            // and its face at the grain (ruling A, Decision 28): the compare's readings, each
+            // phase at the standing after the window's earlier phases, before the deposit and the
+            // window's ingest; the combined face's are the Holon ratio's.
+            let (tree, tree_grain, model) = match &compared.receipt.detail {
+                ReceiptDetail::Compare {
+                    tree,
+                    tree_grain,
+                    model,
+                    ..
+                } => (tree.clone(), tree_grain.clone(), model.clone()),
                 _ => {
                     return Err(HnnError::Shape {
                         what: "a compare's receipt with the tree face and the mixture",
@@ -2766,10 +2785,11 @@ where
                     });
                 }
             };
-            for (offset, (((phase, tree), model), &code)) in holon
+            for (offset, ((((phase, tree), grained), model), &code)) in holon
                 .phases()
                 .iter()
                 .zip(&tree)
+                .zip(&tree_grain)
                 .zip(&model)
                 .zip(window)
                 .enumerate()
@@ -2781,6 +2801,7 @@ where
                 };
                 bits.model = interval_sum(&bits.model, model)?;
                 bits.tree = interval_sum(&bits.tree, tree)?;
+                bits.tree_grain = interval_sum(&bits.tree_grain, grained)?;
                 bits.combined = interval_sum(&bits.combined, &phase.code_length)?;
                 baselines.code(bits, code)?;
                 leg.add(model, tree, &phase.code_length)?;

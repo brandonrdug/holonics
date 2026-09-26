@@ -21,9 +21,11 @@
 //! | the receiving map `R` and the receiving parametron's landmark tree | always |
 //!
 //! [definition; agent-inferred] **The collapse keeps the whole tree and the active address**
-//! (Decision 28). The tree sits at the receiving locus beside `R`, which is never released, and
-//! Lean `HNN/LandmarkTree.release_rule` releases only nodes deeper than the address depth `D`, of
-//! which the tree has none; the receiving parametron's active suffix address
+//! (Decision 28). The tree sits at the receiving locus beside `R`, which is never released. Lean
+//! `HNN/LandmarkTree.release_rule` proves that nodes deeper than the address depth `D` are
+//! releasable, of which the tree founds none, and that a retention is lawful exactly when it
+//! refines the causal signature; it does not prove that no shallower merge is lawful, and the
+//! collapse attempts none. The receiving parametron's active suffix address
 //! (`hnn::receiving::ActiveAddress`) is resident state beside it, which the collapse does not
 //! touch.
 //!

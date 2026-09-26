@@ -43,6 +43,7 @@ use holonics::aeon::{ClockLift, EnclosedLedger};
 use holonics::compression::cost::ceil_log2;
 use holonics::hnn::constitution::{CAMPAIGN_ONE_BUDGET, DepositReading};
 use holonics::hnn::keys::{self, KeyLocation};
+use holonics::hnn::landmark::code_length;
 use holonics::hnn::moment::Ingested;
 use holonics::hnn::port::{
     Census, Deposit, ExecutionPort, Handle, MomentId, PendingId, PortReceipt, Pullback,
@@ -50,7 +51,7 @@ use holonics::hnn::port::{
     source_order, stepped, wrote_all,
 };
 use holonics::hnn::propagation::path_attenuation;
-use holonics::hnn::ratio::{HolonRatio, PhaseRatio, log2_enclosure, target_phases};
+use holonics::hnn::ratio::{HolonRatio, PhaseRatio, target_phases};
 use holonics::hnn::receiving::tree_code_length;
 use holonics::hnn::reference::{
     BudgetStop, ChartTally, Cut, Declared, ExposedResident, Exposure, WallTimes, compose, expose,
@@ -608,14 +609,15 @@ impl<'c> Resident<'c> {
             .zip(&slot.emitted)
             .map(|(now, then)| now.iter().zip(then).map(|(a, b)| a - b).collect())
             .collect();
-        let tree = against
+        let tree_grain = against
             .trees
             .iter()
             .zip(targets)
             .map(|(face, &target)| tree_code_length(face, target))
             .collect::<Result<Vec<_>, _>>()?;
         // The receiver's scored face: the mixture of the tree's and the combined face (ruling A),
-        // scored on the host as the reference scores it.
+        // its ratio stepped phase by phase, scored on the host as the reference scores it; beside
+        // it the tree's executed face alone.
         let scored = ratio.scored(&resident.constitution, &against, targets)?;
         let anchors = target_phases(field, ratio.anchor(), phases.ring(), targets)?;
         let holon = HolonRatio::compare(against.faces, targets, &anchors)?;
@@ -679,7 +681,8 @@ impl<'c> Resident<'c> {
             residual,
             reached: deposit.loci(),
             released: back.released.clone(),
-            tree,
+            tree: scored.tree,
+            tree_grain,
             model: scored.model,
         };
         let steps = phases.junction_steps() as u64;
@@ -1357,7 +1360,10 @@ impl<'c> ExecutionPort for Resident<'c> {
             }
         }
         let first_law = resident.ledger.close();
-        let literal = first_law.against_literal(&log2_enclosure(&Rat::from_integer(
+        // The literal `log₂|A|` a cell, read as the host reads it (the certified binary logarithm of
+        // `1/|A|`), so the boundary's parity holds at any `|A|`, a power of two or not.
+        let literal = first_law.against_literal(&code_length(&Rat::new(
+            BigInt::one(),
             BigInt::from(field.alphabet()),
         ))?);
         let opening = resident.aeon.opening.clone();

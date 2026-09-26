@@ -19,8 +19,11 @@
 //!
 //! [definition; agent-inferred] **The receiving parametron's storage is the landmark tree**
 //! (Decision 28, `hnn::landmark::Landmarks`, held in `Θ` at the receiving locus beside `R`). It
-//! replaces Decision 27's region table, which is its depth-one case (Lean
-//! `HNN/LandmarkTree.depth_one_is_decision_27`; Decision 27's laws stay in Lean `HNN/RegionCounts`).
+//! replaces Decision 27's region table, whose laws stay in Lean (`HNN/RegionCounts`). The region
+//! table is the depth-one forced case of the whole-cell emission (`|A|`-ary masses at a node; Lean
+//! `HNN/LandmarkTree.depth_one_is_decision_27`), which lives in Lean only; this tree emits the
+//! cell's odometer digits, and its depth-one forced case is a product of binary KT faces at the
+//! preceding cell, not the region table's `|A|`-ary face.
 //! The tree is declared from the receiver ([`landmark_declaration`]): the cell emitted as its
 //! odometer digits, the depth `D` (4 on campaign 1, chosen on the development cells in the landmark
 //! receipt), no forced split, the field's declared population `n*` and the receiver's grain, from
@@ -33,14 +36,24 @@
 //! cell. It is not the source moment's state: the word never reads it, so the moment's window
 //! stays `max Δ` and the capacity `n*` (which counts the source state the word reads) is unchanged
 //! by construction. Its bits count in the resident's state bits, and the aeon collapse keeps it
-//! with the tree (Lean `HNN/LandmarkTree.release_rule`: only nodes deeper than `D` are releasable,
-//! and there are none). A pending ratio copies it at its cut, an operand like the moment's counts.
+//! with the tree whole (Lean `HNN/LandmarkTree.release_rule` proves that nodes deeper than `D` are
+//! releasable, of which the tree founds none, and that a retention is lawful exactly when it
+//! refines the causal signature; it does not prove that no shallower merge is lawful, and the
+//! collapse attempts none). A pending ratio copies it at its cut, an operand like the moment's
+//! counts.
 //! **The address is per cell and causal**: phase `j` of the window opening at `p` reads the tree at
 //! `a_j = [x_(p+j−1), …, x_p]` (the window's own earlier targets, known at compare) followed by the
 //! copied suffix `[x_(p−1), …]`, truncated to `D` ([`ActiveAddress::phase`]). It equals
 //! `hnn::landmark::address(cells, p + j, D)` exactly (the test
 //! `the_phase_address_is_the_trees_causal_address`), so an aperture-two window reads its two
 //! phases at their own addresses (the located failure pooled lags one and two at one region).
+//! **The window is read in cell order** (Decision 29 within a window): phase `j`'s tree face is read
+//! at the standing after the window's earlier phases' tree deposits (their targets are known at
+//! compare), on a working overlay of the nodes those deposits write
+//! (`hnn::landmark::Landmarks::window_faces`); the deposit then applies exactly those steps to the
+//! published tree, in cell order, so the tree it publishes is the overlay's last standing plus the
+//! last phase's step. The wave's part of a window is the one refine's, read at the window's opening
+//! standing: the wave's maps are deposited once a window, by the normal law.
 //!
 //! [definition; agent-inferred] **The combined face** (Decision 27's combined read, with the tree's
 //! face in place of the region table's). The scored logits are the tree face's grain logits
@@ -57,7 +70,8 @@
 //! [definition; agent-inferred] **The scored face is the mixture** ([`Mixture`], the primary's ruling
 //! A): the receiver scores the two-way mixture of the tree's face and the combined face, weighted by
 //! their prequential likelihood ratio `β` in Θ at the receiving locus, as a tree node weighs its own
-//! face against its split. The wave keeps learning from the combined face's covector.
+//! face against its split, `β` stepped after every cell in cell order, within a window too. The
+//! wave keeps learning from the combined face's covector.
 //!
 //! [definition] **Exact inside, grain only at the face.** The logits are exact rationals. The grain
 //! reading returns the carry `n_c`, the phase class `k_c ∈ ℤ/L_R` and the fibre `ε_c`, the
@@ -73,6 +87,7 @@
 //! | `receiver::reception::ReceiverFace::read` with `C_S = R P_R^(τ_R) Π_R` | [`ReceivingPhases::read`] |
 //! | `HNN/RegionCounts.{combinedLogits, combined_face_pullback, combined_code_pullback}` | [`ReceivingRead::combined`], [`ReceivingPhases::combine`] |
 //! | `HNN/LandmarkTree.{unfounded_reads_prior, founded_tree_same_law, release_rule}` (the typed suffix address, kept whole by the collapse) | [`ActiveAddress`], [`ReceivingPhases::tree_faces`] |
+//! | `HNN/LandmarkTree.{sequential_mixture, sequential_mixture_bounds, sequential_mixture_executed}` (the two-face mixture stepped cell by cell, within one bit of the better face plus the chart's drift) | [`Mixture`] |
 
 use std::ops::Range;
 
@@ -150,9 +165,11 @@ pub fn grain_logits(face: &LandmarkFace) -> Vec<Rat> {
         .collect()
 }
 
-/// **The tree face alone's code length** `−log₂ p̂(c)` of one class, enclosed: the scored face of
-/// its grain logits alone, `θ^(k_c)/Σ_d θ^(k_d)` in `ℚ(θ)` (`hnn::ratio::Face`), the face the
-/// combined read opens at when the wave reads zero.
+/// **The tree face at the grain**: the code length `−log₂ p̂(c)` of one class, enclosed, under the
+/// face of the tree's grain logits alone, `θ^(k_c)/Σ_d θ^(k_d)` in `ℚ(θ)` (`hnn::ratio::Face`), the
+/// face the combined read opens at when the wave reads zero. It is not the tree's executed face
+/// `q_T(c)`, which the mixture weighs ([`Scored::tree`] reads that one): the two differ by the
+/// grain's rounding of the exponents and the renormalization.
 pub fn tree_code_length(face: &LandmarkFace, class: usize) -> Result<ExactInterval, HnnError> {
     let read = ReceivingRead::of_logits(grain_logits(face), face.grain);
     Face::of_read(&read, face.grain)?.code_length(class)
@@ -393,23 +410,28 @@ fn grain_of(tolerance: &Rat) -> Result<u64, HnnError> {
 ///
 /// ```text
 /// q = λ q_T + (1 − λ) q_C ,   λ = β/(1 + β) ,   β = W_T/W_C = 1 at the opening (prior ½/½)
-/// β' = β · q_T(x)/q_C(x)      after each cell x, in cell order; every phase of a window reads one β
-/// L_model ≤ min(L_T, L_C) + 1 bit + the chart's certified residual
+/// β' = β · q_T(x)/q_C(x)      after each cell x, in cell order: phase j of a window reads β after phases < j
+/// ∏ q = ½ W_T + ½ W_C ,       min(L_T, L_C) ≤ L_model ≤ min(L_T, L_C) + 1 bit          (ideal)
+/// L_model ≤ min(L_T, L_C) + 1 bit + Σ |log₂ ρ|      the executed chart, ρ its factor a step
 /// ```
 ///
 /// Any `λ ∈ [0, 1]` keeps `q` a positive normalized face (Lean
-/// `HNN/LandmarkTree.path_face_normalized`), so the executed mixture is exactly scored; the ideal
-/// bound is the two-child case of Lean `HNN/LandmarkTree.kraft_and_dominance`. `q_C(x)` lives in
+/// `HNN/LandmarkTree.path_face_normalized`), so the executed mixture is exactly scored. The
+/// telescope and the bounds are Lean `HNN/LandmarkTree.{sequential_mixture,
+/// sequential_mixture_bounds}` (the two-child case of `kraft_and_dominance`), which hold only when
+/// each cell's weight is the ratio after every earlier cell; with the ratio carried by a chart they
+/// are `sequential_mixture_executed`, the drift `Σ_t |log₂ ρ_t|` added once. `q_C(x)` lives in
 /// `ℚ(θ)`, so `β` steps by a declared rational chart of it: the lower endpoint of its exact
 /// enclosure at the carried power's reading bits, whose certified residual `|log₂ q_C − log₂ q̃_C|`
 /// is at most `(hi − lo)/lo · 3/2` (`|ln x| ≤ |x − 1|/min(x, 1)`, `log₂ e < 3/2`), carried rounded
 /// up on the dyadic grid `2^(−128)` so the drift's sum keeps one denominator. `β` is carried
 /// on the landmark β chart (`hnn::landmark::Beta`: odd over odd times `2^e`) at the tree's carrier
 /// width `W`, rebased to its `W`-bit mantissa when its odd parts outgrow it, with the certified
-/// residual `|log₂(1 − r)| < 3 · 2^(−W)` a rebase. Its drift (the sum of both residuals over its
-/// steps) is reported, never silent. The wave still learns from its own comparison, the covector of
-/// `q_C` against the target, and the tree's face is stored, not pulled back; the mixture is scored
-/// on the host at compare, beside the tree read, on every realization.
+/// residual `|log₂(1 − r)| < 3 · 2^(−W)` a rebase. A step's factor is `ρ = q̃_C/(q_C (1 − r))`, so
+/// its drift (the sum of both residuals over its steps) bounds `Σ |log₂ ρ|`, and it is reported,
+/// never silent. The wave still learns from its own comparison, the covector of `q_C` against the
+/// target, and the tree's face is stored, not pulled back; the mixture is scored on the host at
+/// compare, beside the tree read, on every realization.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Mixture {
     beta: Beta,
@@ -430,10 +452,13 @@ pub struct MixtureStep {
 }
 
 /// [definition] **A window scored by the mixture**: each phase's code length under the mixture
-/// `q` (the model's), and the steps its deposit applies to `β` in cell order.
+/// `q` (the model's) and under the tree's executed face `q_T` alone (the face the mixture weighs,
+/// `hnn::landmark::code_length` of `q_T(t_j)`), and the steps its deposit applies to `β` in cell
+/// order.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Scored {
     pub model: Vec<ExactInterval>,
+    pub tree: Vec<ExactInterval>,
     pub steps: Vec<MixtureStep>,
 }
 
@@ -507,12 +532,16 @@ impl Mixture {
         Ok(())
     }
 
-    /// **Score a window** (module header of this section): each phase `j` reads the one `β`, the
-    /// tree's face `q_T,j(t_j)` and the combined face's exact enclosure `q_C,j(t_j) ∈ [lo, hi]`,
-    /// so the mixture `q_j(t_j) ∈ [λ q_T + (1 − λ) lo, λ q_T + (1 − λ) hi]` and its code length is
-    /// enclosed by the certified binary logarithm; each phase stages its step with the chart
-    /// `q̃_C = lo`. Refused unless there is one combined face, one tree face and one target per
-    /// phase.
+    /// **Score a window in cell order** (module header of this section; Lean
+    /// `HNN/LandmarkTree.sequential_mixture`): phase `j` reads `β_j`, the carried ratio after the
+    /// window's earlier phases' steps (their targets are known at compare), the tree's face
+    /// `q_T,j(t_j)` and the combined face's exact enclosure `q_C,j(t_j) ∈ [lo, hi]`, so the mixture
+    /// `q_j(t_j) ∈ [λ_j q_T + (1 − λ_j) lo, λ_j q_T + (1 − λ_j) hi]` and its code length is enclosed
+    /// by the certified binary logarithm. Its step `β_(j+1) = β_j q_T/q̃_C` (the chart `q̃_C = lo`)
+    /// is taken on a local copy of the ratio by [`Mixture::step`] and staged, so the deposit, which
+    /// applies the staged steps in cell order by the same step, reaches the same carried `β`. The
+    /// tree's own code length `−log₂ q_T,j(t_j)` is returned beside it. Refused unless there is one
+    /// combined face, one tree face and one target per phase.
     pub fn score(
         &self,
         ring: usize,
@@ -527,13 +556,15 @@ impl Mixture {
                 found: targets.len(),
             });
         }
-        let weight = self.weight();
-        let rest = Rat::one() - &weight;
+        let mut local = self.clone();
         let mut scored = Scored {
             model: Vec::with_capacity(targets.len()),
+            tree: Vec::with_capacity(targets.len()),
             steps: Vec::with_capacity(targets.len()),
         };
         for ((face, tree), &target) in combined.faces.iter().zip(trees).zip(targets) {
+            let weight = local.weight();
+            let rest = Rat::one() - &weight;
             let q_tree = tree
                 .probabilities
                 .get(target)
@@ -559,12 +590,15 @@ impl Mixture {
                 &((&q_combined.upper - &q_combined.lower) / &q_combined.lower
                     * Rat::new(BigInt::from(3), BigInt::from(2))),
             );
-            scored.steps.push(MixtureStep {
+            scored.tree.push(code_length(&q_tree)?);
+            let step = MixtureStep {
                 ring,
                 tree: q_tree,
                 combined: q_combined.lower,
                 residual,
-            });
+            };
+            local.step(&step)?;
+            scored.steps.push(step);
         }
         Ok(scored)
     }
@@ -861,10 +895,13 @@ impl ReceivingPhases {
             .collect())
     }
 
-    /// **The tree faces of one window** (module header): the receiving parametron's tree read at
-    /// each phase's address, every class's executed face with its grain exponent. The phases each
-    /// read only their own address and run together (`hnn::realization`). Refused when the
-    /// constitution carries no tree on the receiving ring.
+    /// **The tree faces of one window, in cell order** (module header): the receiving parametron's
+    /// tree read at each phase's address, every class's executed face with its grain exponent,
+    /// phase `j` at the standing after the deposits of the known earlier phases' targets
+    /// (`hnn::landmark::Landmarks::window_faces`: a working overlay, the published tree unchanged;
+    /// at a release nothing is known and every phase reads the published standing). The phases then
+    /// read together (`hnn::realization`). Refused when the constitution carries no tree on the
+    /// receiving ring.
     pub fn tree_faces(
         &self,
         constitution: &impl ConstitutionRead,
@@ -875,7 +912,7 @@ impl ReceivingPhases {
             .landmarks(self.ring)
             .ok_or(HnnError::MissingReceivingMap { ring: self.ring })?;
         let addresses = self.addresses(address, known)?;
-        indexed(addresses.len(), |j| tree.face(&addresses[j], self.grain))
+        tree.window_faces(&addresses, known, self.grain)
     }
 
     /// **The combined faces of one window** (module header): each phase's wave logits plus its tree

@@ -43,11 +43,15 @@
 //! causal address opens ([`LandmarkStep`], in cell order); its counts are integers of half-units
 //! and its mixture ratios are carried by the owner's β chart, so no lattice carry and no clock is
 //! read for it. It shares the locus's diamond row (retained always) and its collapse rule (never
-//! released; Lean `HNN/LandmarkTree.release_rule`: only nodes deeper than `D` are releasable, and
-//! there are none). Decision 27's region table, its depth-one case, is retired from Rust; its laws
-//! stay in Lean `HNN/RegionCounts`. Decision 26's exogenous law and standing read are retired: the
-//! tree's face contains the marginal (Lean `HNN/TargetFace`'s finite-chart obstruction stays a
-//! theorem).
+//! released): Lean `HNN/LandmarkTree.release_rule` proves that nodes deeper than `D` are releasable
+//! (the tree founds none) and that a retention is lawful exactly when it refines the causal
+//! signature; it does not prove that no shallower merge is lawful, and the collapse attempts none.
+//! Decision 27's region table is retired from Rust, its laws staying in Lean `HNN/RegionCounts`; it
+//! is the depth-one forced case of the whole-cell emission (`|A|`-ary masses at a node; Lean
+//! `HNN/LandmarkTree.depth_one_is_decision_27`), not of this tree, which emits the cell's odometer
+//! digits (its depth-one forced case is a product of binary KT faces). Decision 26's exogenous law
+//! and standing read are retired: the tree's face contains the marginal (Lean `HNN/TargetFace`'s
+//! finite-chart obstruction stays a theorem).
 //!
 //! [definition; agent-inferred] **The carrier lattice and the budgeted release** (Lean
 //! `HNN/LatticeDeposit`). Exact rational deposition compounds: the maps that form each other's

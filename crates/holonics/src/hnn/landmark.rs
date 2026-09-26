@@ -33,8 +33,10 @@
 //! half-units. A dyadic cell whose upper half holds no class of the chart forces its digit with
 //! face 1 and stores nothing, so every `|A| ≥ 2` is normalized. The whole-cell emission
 //! (`|A|`-ary masses at each node) is retired: on the standing cut it never earned a split (the
-//! record of September 26), and its depth-one forced case, Decision 27's region table, keeps its
-//! law in Lean (`HNN/LandmarkTree.depth_one_is_decision_27`).
+//! record of September 26). Its depth-one forced case is Decision 27's region table (order-1's
+//! `|A|`-ary KT face), whose law is kept in Lean only (`HNN/LandmarkTree.depth_one_is_decision_27`).
+//! This tree's depth-one forced case is not the region table: it is the product, over the cell's
+//! opened digits, of binary KT faces at the preceding cell.
 //!
 //! [definition; agent-inferred, the primary's law] **Every quantity on the hot path is a
 //! fixed-width integer on a declared dyadic lattice, with certified residuals, and the executed
@@ -91,9 +93,32 @@
 //! rebases and its two certificates. `roots[h]` is the root of the tree at dyadic cell `h` (the heap
 //! index `2^i + prefix`), and `children` a hash table from `(parent << 32) | letter code` to the
 //! child. An unfounded node reads as the prior: a path read stops at its first unfounded node, whose
-//! face is exactly `1/2`. `Clone` copies the arena, linear in the founded nodes (about a hundred
-//! bytes a node with its table entry: at the standing cut's 63,320 nodes a few megabytes, about a
-//! millisecond), and `PartialEq` compares the table as a map (std's `HashMap`).
+//! face is exactly `1/2`. `Clone` copies the arena, linear in the founded nodes: 92 bytes a node in
+//! the flat vectors on x86-64 (the chart 80, the masses 8, the depth 4) and a 16-byte table entry
+//! with its control byte, so at the standing cut's 63,320 nodes `92 · 63,320 = 5,825,440` bytes of
+//! flat vectors; `PartialEq` compares the table as a map (std's `HashMap`). The reads and the
+//! deposit are one law (`Law`) acting on any standing (`Standing`): the tree's own, or a window's
+//! working overlay (below).
+//!
+//! [definition; agent-inferred] **A window in cell order** ([`Landmarks::window_faces`], Decision 29
+//! within a window; consumed by `hnn::receiving::ReceivingPhases::tree_faces`). A receiving window
+//! compares `A` cells at once, and phase `j` reads the tree at the standing after the window's
+//! earlier phases' deposits: their targets are known at compare, so those deposits are applied, in
+//! cell order, to a working overlay (`Working`). The nodes a deposit writes are copied from the tree
+//! at their first write, the nodes it founds are numbered after the tree's, and every other node
+//! reads through to the tree, which is never written. A deposit writes at most `B (D + 1)` nodes, so
+//! a window's overlay holds at most `(A − 1) B (D + 1)` of them (`1 · 8 · 5 = 40` at campaign 1),
+//! against a clone's copy of every founded node. The deposit then applies the same steps to the
+//! published tree in the same order, by the same law, so each overlay's face is the face the
+//! deposited tree reads (the test `landmark_window_faces_read_each_phase_after_the_earlier_deposits`).
+//! [established-bounded; measured] On the standing cut's tree before its last window (63,280 nodes;
+//! exterior wall time on one host, the mean over 50 runs, in integer µs): a clone takes 211 µs; the
+//! window's two faces read in cell order take 122 µs and read with nothing known 73 µs, so the
+//! overlay costs `122 − 73 = 49` µs a window; a clone, a deposit and the two faces read serially
+//! take 375 µs. [agent-inferred] An overlay admits arrivals past the declared population by the
+//! window's own earlier cells while the widths' operands at that count fit `u128` (a deposit's
+//! re-read at its successor reads the window's cells again); its faces are exact executed faces,
+//! normalized for any stop weight, and its certificates are not read.
 //!
 //! [definition] **Faces.** [`Landmarks::probability`] is one class's executed face, exact;
 //! [`Landmarks::face`] all classes with their grain exponents, `Σ_c q̂(c) = 1` exactly: the face the
@@ -105,9 +130,10 @@
 //!
 //! [definition; agent-inferred] **The ideal tree weighting is a reference oracle**
 //! ([`IdealLandmarks`]): the same arena with `β` in ℚ and every face exact, consumed by the tests
-//! and by the notebook's report of the executed face's cost. It is never on the hot path. Over the
-//! standing cut an exact `β` reaches about `10^5` bits a node (the KT mass of thousands of routed
-//! cells) and each face a sum of such, so at scale the oracle carries `β` at the reference width
+//! and by the notebook's report of the executed face's cost. It is never on the hot path. An exact
+//! `β` grows with the cells routed through its node (its KT masses' denominators are the products
+//! `∏_(j<n)(2j + 2)` in half-units over the `n` routed cells), and each face is a sum of such, so at
+//! scale the oracle carries `β` at the reference width
 //! `W_o = O + ⌈log₂(3 B n*² D²)⌉` ([`IdealLandmarks::reference_width`], `O` the enclosure grid's
 //! octaves), whose rebases keep its code length within `2^(−O)` of the ideal over the whole
 //! passage. On the tests it carries `β` exactly.
@@ -143,6 +169,7 @@
 //! | the executed dyadic split and the cells' partition; the forced digits when `\|A\| < 2^B` | `executed_split_laws`, `cell_faces_partition`, `forced_digits_normalized` | [`Landmarks::probability`], [`Landmarks::face`] |
 //! | a digit face's floor and the rounding's residual (the first-order bound fails downward) | `digit_face_ge`, `digit_log_residual`, `host_digit_bound_fails_downward` | [`Landmarks::face_rule`] |
 //! | the ideal tree weighting (the oracle) | `landmark_step`, `mixture_is_probability`, `kraft_and_dominance` | [`IdealLandmarks`] |
+//! | a window's phases in cell order: each reads the standing after the earlier phases' deposits (the deposit's own law, on an overlay) | `landmark_step`, `treeWeight_arrive_off` | [`Landmarks::window_faces`] |
 //!
 //! [open] Owed in #62 (Lean `HNN/LandmarkTree`'s `[open]`): the passage-level composition of the
 //! drift bound (the subtree sum over the tree and the passage, from `lattice_node_telescope`,
@@ -158,6 +185,7 @@ use num_traits::{One, Signed, ToPrimitive, Zero};
 use crate::compression::cost::ceil_log2;
 use crate::hnn::HnnError;
 use crate::hnn::ratio::{LOG_OCTAVES, interval_sum};
+use crate::hnn::realization::indexed;
 use crate::hnn::receiving::grain_exponent;
 use crate::hnn::reference::{BaselineCodes, Baselines, Cut};
 use crate::ratio::Rat;
@@ -526,19 +554,15 @@ fn key(parent: u32, letter: Letter) -> u64 {
     (u64::from(parent) << 32) | letter.code()
 }
 
-impl Arena {
-    fn new(cells: usize) -> Self {
-        Self {
-            roots: vec![None; cells],
-            children: HashMap::new(),
-            depths: Vec::new(),
-            halves: Vec::new(),
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.halves.len()
-    }
+/// **The founded nodes as a read opens them**: the root of each dyadic cell's tree, the child
+/// behind a letter, each node's two half-unit masses and the count of founded nodes. The arena
+/// answers them (for the oracle and the executed tree), and so does a window's working overlay
+/// ([`Working`]).
+trait Topology {
+    fn root(&self, dyadic: usize) -> Option<u32>;
+    fn child(&self, parent: u32, letter: Letter) -> Option<u32>;
+    fn halves(&self, node: u32) -> [u32; 2];
+    fn len(&self) -> usize;
 
     /// The founded nodes along an address in the tree at dyadic cell `h`, from its root, at most
     /// `limit` of them.
@@ -547,7 +571,7 @@ impl Arena {
         if limit == 0 {
             return nodes;
         }
-        let Some(root) = self.roots[dyadic] else {
+        let Some(root) = self.root(dyadic) else {
             return nodes;
         };
         nodes.push(root);
@@ -555,11 +579,8 @@ impl Arena {
             if nodes.len() >= limit {
                 break;
             }
-            match self
-                .children
-                .get(&key(*nodes.last().expect("a root"), *letter))
-            {
-                Some(&child) => nodes.push(child),
+            match self.child(*nodes.last().expect("a root"), *letter) {
+                Some(child) => nodes.push(child),
                 None => break,
             }
         }
@@ -568,11 +589,52 @@ impl Arena {
 
     /// `(2C_b, 2N)`, the node's KT mass of `b` and its total, in half-units.
     fn kt(&self, node: u32, symbol: usize) -> (u64, u64) {
-        let [zero, one] = self.halves[node as usize];
+        let [zero, one] = self.halves(node);
         (
-            u64::from(self.halves[node as usize][symbol]),
+            u64::from([zero, one][symbol]),
             u64::from(zero) + u64::from(one),
         )
+    }
+
+    /// Refused when founding `nodes` more would pass 32-bit node numbers.
+    fn founded_within(&self, nodes: usize) -> Result<(), HnnError> {
+        if self.len() + nodes >= u32::MAX as usize {
+            return Err(shape(
+                "a landmark arena within 32-bit node numbers",
+                u32::MAX as usize,
+                self.len(),
+            ));
+        }
+        Ok(())
+    }
+}
+
+impl Topology for Arena {
+    fn root(&self, dyadic: usize) -> Option<u32> {
+        self.roots[dyadic]
+    }
+
+    fn child(&self, parent: u32, letter: Letter) -> Option<u32> {
+        self.children.get(&key(parent, letter)).copied()
+    }
+
+    fn halves(&self, node: u32) -> [u32; 2] {
+        self.halves[node as usize]
+    }
+
+    fn len(&self) -> usize {
+        self.halves.len()
+    }
+}
+
+impl Arena {
+    fn new(cells: usize) -> Self {
+        Self {
+            roots: vec![None; cells],
+            children: HashMap::new(),
+            depths: Vec::new(),
+            halves: Vec::new(),
+        }
     }
 
     fn found(&mut self, depth: usize) -> u32 {
@@ -608,17 +670,227 @@ impl Arena {
             self.halves[node as usize][symbol] += 2;
         }
     }
+}
 
-    fn founded_within(&self, nodes: usize) -> Result<(), HnnError> {
-        if self.len() + nodes >= u32::MAX as usize {
-            return Err(shape(
-                "a landmark arena within 32-bit node numbers",
-                u32::MAX as usize,
-                self.len(),
-            ));
-        }
-        Ok(())
+/// **The executed tree's standing as a deposit moves it** (module header, "The arena"): the
+/// founded nodes with their charts, the rebases and the cells passed. The tree's own [`Nodes`]
+/// carry it, and so does a window's working overlay ([`Working`]).
+trait Standing: Topology {
+    fn chart(&self, node: u32) -> &Chart;
+    fn chart_mut(&mut self, node: u32) -> &mut Chart;
+    fn halves_mut(&mut self, node: u32) -> &mut [u32; 2];
+    /// Found a node at `depth` in the tree at dyadic cell `h`, its root (`parent` absent) or the
+    /// child behind `(parent, letter)`, with the prior masses `[1, 1]` and `chart`.
+    fn found(
+        &mut self,
+        dyadic: usize,
+        parent: Option<(u32, Letter)>,
+        depth: usize,
+        chart: Chart,
+    ) -> u32;
+    fn passed(&self) -> u64;
+    fn pass(&mut self);
+    fn rebased(&mut self);
+}
+
+/// The executed tree's own standing: the arena, each node's chart, the rebases and the cells
+/// passed.
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct Nodes {
+    arena: Arena,
+    charts: Vec<Chart>,
+    rebases: u64,
+    passed: u64,
+}
+
+impl Topology for Nodes {
+    fn root(&self, dyadic: usize) -> Option<u32> {
+        self.arena.root(dyadic)
     }
+
+    fn child(&self, parent: u32, letter: Letter) -> Option<u32> {
+        self.arena.child(parent, letter)
+    }
+
+    fn halves(&self, node: u32) -> [u32; 2] {
+        self.arena.halves[node as usize]
+    }
+
+    fn len(&self) -> usize {
+        self.arena.len()
+    }
+}
+
+impl Standing for Nodes {
+    fn chart(&self, node: u32) -> &Chart {
+        &self.charts[node as usize]
+    }
+
+    fn chart_mut(&mut self, node: u32) -> &mut Chart {
+        &mut self.charts[node as usize]
+    }
+
+    fn halves_mut(&mut self, node: u32) -> &mut [u32; 2] {
+        &mut self.arena.halves[node as usize]
+    }
+
+    fn found(
+        &mut self,
+        dyadic: usize,
+        parent: Option<(u32, Letter)>,
+        depth: usize,
+        chart: Chart,
+    ) -> u32 {
+        let node = self.arena.found(depth);
+        self.charts.push(chart);
+        match parent {
+            None => self.arena.roots[dyadic] = Some(node),
+            Some((parent, letter)) => {
+                self.arena.children.insert(key(parent, letter), node);
+            }
+        }
+        node
+    }
+
+    fn passed(&self) -> u64 {
+        self.passed
+    }
+
+    fn pass(&mut self) {
+        self.passed += 1;
+    }
+
+    fn rebased(&mut self) {
+        self.rebases += 1;
+    }
+}
+
+/// [definition; agent-inferred] **A working overlay on the tree** (module header, "A window in
+/// cell order"): the nodes a window's earlier phases' deposits wrote, each copied from the tree at
+/// its first write, and the nodes they founded, numbered after the tree's; every other node reads
+/// through to the tree, which is never written. A deposit writes at most `B (D + 1)` nodes, so a
+/// window's overlay holds at most `(A − 1) B (D + 1)` of them.
+#[derive(Clone, Debug)]
+struct Working<'a> {
+    base: &'a Nodes,
+    charts: HashMap<u32, Chart>,
+    halves: HashMap<u32, [u32; 2]>,
+    founded: Vec<([u32; 2], Chart)>,
+    roots: HashMap<usize, u32>,
+    children: HashMap<u64, u32>,
+    passed: u64,
+}
+
+impl<'a> Working<'a> {
+    fn on(base: &'a Nodes) -> Self {
+        Self {
+            base,
+            charts: HashMap::new(),
+            halves: HashMap::new(),
+            founded: Vec::new(),
+            roots: HashMap::new(),
+            children: HashMap::new(),
+            passed: 0,
+        }
+    }
+
+    /// The index of a node the overlay founded, or `None` for a node of the tree.
+    fn fresh(&self, node: u32) -> Option<usize> {
+        (node as usize).checked_sub(self.base.len())
+    }
+}
+
+impl Topology for Working<'_> {
+    fn root(&self, dyadic: usize) -> Option<u32> {
+        self.roots
+            .get(&dyadic)
+            .copied()
+            .or_else(|| self.base.root(dyadic))
+    }
+
+    fn child(&self, parent: u32, letter: Letter) -> Option<u32> {
+        self.children
+            .get(&key(parent, letter))
+            .copied()
+            .or_else(|| self.base.child(parent, letter))
+    }
+
+    fn halves(&self, node: u32) -> [u32; 2] {
+        match self.fresh(node) {
+            Some(index) => self.founded[index].0,
+            None => self
+                .halves
+                .get(&node)
+                .copied()
+                .unwrap_or_else(|| self.base.halves(node)),
+        }
+    }
+
+    fn len(&self) -> usize {
+        self.base.len() + self.founded.len()
+    }
+}
+
+impl Standing for Working<'_> {
+    fn chart(&self, node: u32) -> &Chart {
+        match self.fresh(node) {
+            Some(index) => &self.founded[index].1,
+            None => self
+                .charts
+                .get(&node)
+                .unwrap_or_else(|| self.base.chart(node)),
+        }
+    }
+
+    fn chart_mut(&mut self, node: u32) -> &mut Chart {
+        match self.fresh(node) {
+            Some(index) => &mut self.founded[index].1,
+            None => {
+                let base = self.base;
+                self.charts.entry(node).or_insert_with(|| *base.chart(node))
+            }
+        }
+    }
+
+    fn halves_mut(&mut self, node: u32) -> &mut [u32; 2] {
+        match self.fresh(node) {
+            Some(index) => &mut self.founded[index].0,
+            None => {
+                let base = self.base;
+                self.halves.entry(node).or_insert_with(|| base.halves(node))
+            }
+        }
+    }
+
+    fn found(
+        &mut self,
+        dyadic: usize,
+        parent: Option<(u32, Letter)>,
+        _depth: usize,
+        chart: Chart,
+    ) -> u32 {
+        let node = u32::try_from(self.len()).expect("the arena is checked within 32 bits");
+        self.founded.push(([1, 1], chart));
+        match parent {
+            None => {
+                self.roots.insert(dyadic, node);
+            }
+            Some((parent, letter)) => {
+                self.children.insert(key(parent, letter), node);
+            }
+        }
+        node
+    }
+
+    fn passed(&self) -> u64 {
+        self.base.passed + self.passed
+    }
+
+    fn pass(&mut self) {
+        self.passed += 1;
+    }
+
+    fn rebased(&mut self) {}
 }
 
 fn check(
@@ -751,17 +1023,303 @@ struct LatticeRead {
     faces: Vec<u64>,
 }
 
+/// The tree's law, apart from its standing: the declaration, its derived widths and the odometer.
+/// Its reads and its deposit act on any [`Standing`], the tree's own or a working overlay.
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct Law {
+    declaration: LandmarkDeclaration,
+    widths: Widths,
+    odometer: Odometer,
+}
+
 /// [definition] **The landmark tree, executed** (module header): the declaration, its derived
 /// widths, the arena with each node's chart, and the chart's counts.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Landmarks {
-    declaration: LandmarkDeclaration,
-    widths: Widths,
-    odometer: Odometer,
-    arena: Arena,
-    charts: Vec<Chart>,
-    rebases: u64,
-    passed: u64,
+    law: Law,
+    nodes: Nodes,
+}
+
+impl Law {
+    fn full(&self) -> u64 {
+        1u64 << self.widths.face
+    }
+
+    /// `⟦2^M u/v⟧`: the lattice numerator nearest `u/v` (ties up), inside `[1, 2^M − 1]`.
+    fn round(&self, numerator: u128, denominator: u128) -> u64 {
+        let rounded = (2 * numerator + denominator) / (2 * denominator);
+        (rounded as u64).clamp(1, self.full() - 1)
+    }
+
+    /// A certificate on `2^(−C)` in `ln`, read in bits: times `3/2 > log₂ e`.
+    fn certified_bits(&self, units: u128) -> Rat {
+        Rat::new(
+            BigInt::from(units) * 3,
+            BigInt::from(2u32) << self.widths.certificate as usize,
+        )
+    }
+
+    /// The leaf's lattice face `⟦k(0)⟧`.
+    fn leaf(&self, nodes: &impl Standing, node: u32) -> u64 {
+        let (u, v) = nodes.kt(node, 0);
+        self.round(u128::from(u) << self.widths.face, u128::from(v))
+    }
+
+    /// The mixing node's lattice face `⟦λ̂ k(0) + (1 − λ̂) q̂'⟧`, on `2^M v` as the common
+    /// denominator.
+    fn mix(&self, nodes: &impl Standing, node: u32, below: u64) -> u64 {
+        let (u, v) = nodes.kt(node, 0);
+        let face = self.widths.face;
+        let stop = u128::from(nodes.chart(node).stop);
+        let full = u128::from(self.full());
+        let numerator =
+            ((stop * u128::from(u)) << face) + (full - stop) * u128::from(below) * u128::from(v);
+        self.round(numerator, u128::from(v) << face)
+    }
+
+    /// **One tree's executed read** at an address, at most `limit` founded nodes.
+    fn read(
+        &self,
+        nodes: &impl Standing,
+        dyadic: usize,
+        symbol: usize,
+        address: &[Letter],
+        limit: usize,
+    ) -> LatticeRead {
+        let depth = self.declaration.depth;
+        let path = nodes.open(dyadic, address, limit);
+        let top = path.len().min(depth);
+        let mut faces = vec![0u64; top + 1];
+        faces[top] = if path.len() == depth + 1 {
+            self.leaf(nodes, path[depth])
+        } else {
+            self.full() / 2
+        };
+        for d in (0..top).rev() {
+            faces[d] = if d < self.declaration.forced {
+                faces[d + 1]
+            } else {
+                self.mix(nodes, path[d], faces[d + 1])
+            };
+        }
+        LatticeRead {
+            dyadic,
+            symbol,
+            nodes: path,
+            faces,
+        }
+    }
+
+    /// Every tree a class opens, read at the standing.
+    fn reads(&self, nodes: &impl Standing, address: &[Letter], class: usize) -> Vec<LatticeRead> {
+        let limit = self.declaration.depth + 1;
+        self.odometer
+            .emitted(class)
+            .into_iter()
+            .map(|(dyadic, symbol)| self.read(nodes, dyadic, symbol, address, limit))
+            .collect()
+    }
+
+    /// A lattice face of `symbol` from the digit-`0` numerator.
+    fn side(&self, zero: u64, symbol: usize) -> u64 {
+        if symbol == 0 {
+            zero
+        } else {
+            self.full() - zero
+        }
+    }
+
+    /// **A level's rounding bound** `θ_d` of `symbol` on `2^(−C)`: `2^(−M)/min(q̂_d, k_d, q̂_(d+1))`
+    /// at a mixing node, `2^(−M−1)/min(q̂_D, k_D)` at a founded leaf, zero at a forced or unfounded
+    /// depth (their faces pass exactly).
+    fn rounding(&self, nodes: &impl Standing, read: &LatticeRead, d: usize) -> u128 {
+        let Widths {
+            face, certificate, ..
+        } = self.widths;
+        if d >= read.nodes.len() || d < self.declaration.forced {
+            return 0;
+        }
+        let (u, v) = nodes.kt(read.nodes[d], read.symbol);
+        let here = u128::from(self.side(read.faces[d], read.symbol));
+        let kt =
+            |shift: u64| ceil_div(u128::from(v) << (certificate - face - shift), u128::from(u));
+        if d == self.declaration.depth {
+            let lattice = ceil_div(1u128 << (certificate - 1), here);
+            lattice.max(kt(1))
+        } else {
+            let below = u128::from(self.side(read.faces[d + 1], read.symbol));
+            let lattice = ceil_div(1u128 << certificate, here.min(below));
+            lattice.max(kt(0))
+        }
+    }
+
+    /// `ρ_0 ≤ Σ drift + Σ θ` of one read on `2^(−C)`.
+    fn certificate(&self, nodes: &impl Standing, read: &LatticeRead) -> u128 {
+        let mixing = read.nodes.len().min(self.declaration.depth);
+        let drift = (self.declaration.forced..mixing)
+            .map(|d| nodes.chart(read.nodes[d]).drift)
+            .fold(0u128, u128::saturating_add);
+        (0..read.faces.len())
+            .map(|d| self.rounding(nodes, read, d))
+            .fold(drift, u128::saturating_add)
+    }
+
+    /// The cell's reading from its trees' reads.
+    fn reading(&self, nodes: &impl Standing, reads: &[LatticeRead]) -> CellReading {
+        let mut numerator = BigUint::one();
+        let mut certificate = 0u128;
+        for read in reads {
+            numerator *= self.side(read.faces[0], read.symbol);
+            certificate = certificate.saturating_add(self.certificate(nodes, read));
+        }
+        CellReading {
+            executed: dyadic(numerator, reads.len() as u64 * self.widths.face),
+            residual: self.certified_bits(certificate),
+        }
+    }
+
+    /// **All classes' executed faces at an address** (module header, "Faces").
+    fn face(
+        &self,
+        nodes: &impl Standing,
+        address: &[Letter],
+        grain: u64,
+    ) -> Result<LandmarkFace, HnnError> {
+        let digits = self.widths.digits;
+        let cells = 1usize << digits;
+        // The heap over dyadic cells: each cell's founded bound, and each class's descent.
+        let mut limit = vec![0usize; 2 * cells];
+        let mut numerators: Vec<Option<BigUint>> = vec![None; 2 * cells];
+        let mut opened = vec![0u64; 2 * cells];
+        limit[1] = self.declaration.depth + 1;
+        numerators[1] = Some(BigUint::one());
+        for level in 0..digits {
+            for prefix in 0..(1usize << level) {
+                if !self.odometer.holds(level, prefix) {
+                    continue;
+                }
+                let h = (1usize << level) | prefix;
+                let numerator = numerators[h].take().expect("a held cell's descent");
+                if self.odometer.splits(level, prefix) {
+                    let read = self.read(nodes, h, 0, address, limit[h]);
+                    let zero = read.faces[0];
+                    let founded = read.nodes.len();
+                    for (child, split) in [(2 * h, zero), (2 * h + 1, self.full() - zero)] {
+                        limit[child] = founded;
+                        numerators[child] = Some(&numerator * split);
+                        opened[child] = opened[h] + 1;
+                    }
+                } else {
+                    limit[2 * h] = limit[h];
+                    opened[2 * h] = opened[h];
+                    numerators[2 * h] = Some(numerator);
+                }
+            }
+        }
+        let mut probabilities = Vec::with_capacity(self.declaration.alphabet);
+        let mut exponents = Vec::with_capacity(self.declaration.alphabet);
+        for class in 0..self.declaration.alphabet {
+            let leaf = cells | class;
+            let numerator = numerators[leaf].take().expect("a class's descent");
+            let exponent = opened[leaf] * self.widths.face;
+            exponents.push(dyadic_grain_exponent(&numerator, exponent, grain)?);
+            probabilities.push(dyadic(numerator, exponent));
+        }
+        Ok(LandmarkFace {
+            grain,
+            probabilities,
+            exponents,
+        })
+    }
+
+    /// **Deposit one cell's reads** on a standing (module header): each mixing node's β steps by
+    /// `k(b)/q̂_(d+1)(b)` bottom-up and its certificates grow, the path's missing nodes are founded
+    /// with `β = 1`, then each node's mass of the digit grows. Refused before anything moves once
+    /// the standing has passed `admitted` cells, or past 32-bit node numbers.
+    fn apply(
+        &self,
+        nodes: &mut impl Standing,
+        address: &[Letter],
+        reads: Vec<LatticeRead>,
+        admitted: u64,
+    ) -> Result<(), HnnError> {
+        if nodes.passed() >= admitted {
+            return Err(HnnError::PopulationReached {
+                population: self.declaration.population,
+            });
+        }
+        nodes.founded_within(reads.len() * (address.len() + 1))?;
+        let Widths {
+            face,
+            carrier,
+            certificate,
+            ..
+        } = self.widths;
+        let (depth, forced) = (self.declaration.depth, self.declaration.forced);
+        for read in reads {
+            // Bottom-up over the founded nodes: θ and the rebases add to the excess, the child's
+            // excess increment and the rebase to the drift.
+            let mut carried = 0u128;
+            for d in (forced..read.nodes.len()).rev() {
+                let theta = self.rounding(nodes, &read, d);
+                let node = read.nodes[d];
+                let mut rebase = 0u128;
+                if d < depth {
+                    let (u, v) = nodes.kt(node, read.symbol);
+                    let below = self.side(read.faces[d + 1], read.symbol);
+                    let chart = nodes.chart_mut(node);
+                    let (beta, rebased) = Beta::carry(
+                        u128::from(chart.beta.numerator) * u128::from(u),
+                        u128::from(chart.beta.denominator) * u128::from(v) * u128::from(below),
+                        chart.beta.exponent + face as i64,
+                        carrier,
+                    );
+                    chart.beta = beta;
+                    chart.stop = beta.stop_weight(face, carrier);
+                    if let Some(mantissa) = rebased {
+                        rebase = ceil_div(1u128 << certificate, mantissa);
+                        chart.rebases += 1;
+                    }
+                    chart.drift = chart.drift.saturating_add(carried).saturating_add(rebase);
+                    if rebased.is_some() {
+                        nodes.rebased();
+                    }
+                }
+                let increment = theta
+                    .saturating_add(rebase.saturating_mul(2))
+                    .saturating_add(carried);
+                let chart = nodes.chart_mut(node);
+                chart.excess = chart.excess.saturating_add(increment);
+                carried = increment;
+            }
+            let LatticeRead {
+                dyadic,
+                symbol,
+                nodes: mut path,
+                ..
+            } = read;
+            let fresh = Chart {
+                beta: Beta::ONE,
+                stop: self.full() / 2,
+                rebases: 0,
+                drift: 0,
+                excess: 0,
+            };
+            if path.is_empty() {
+                path.push(nodes.found(dyadic, None, 0, fresh));
+            }
+            while path.len() < address.len() + 1 {
+                let parent = *path.last().expect("a root");
+                let letter = address[path.len() - 1];
+                path.push(nodes.found(dyadic, Some((parent, letter)), path.len(), fresh));
+            }
+            for &node in path.iter().skip(forced) {
+                nodes.halves_mut(node)[symbol] += 2;
+            }
+        }
+        nodes.pass();
+        Ok(())
+    }
 }
 
 impl Landmarks {
@@ -802,72 +1360,76 @@ impl Landmarks {
             digits: widths.digits,
         };
         Ok(Self {
-            declaration,
-            widths,
-            odometer,
-            arena: Arena::new(1 << widths.digits),
-            charts: Vec::new(),
-            rebases: 0,
-            passed: 0,
+            nodes: Nodes {
+                arena: Arena::new(1 << widths.digits),
+                charts: Vec::new(),
+                rebases: 0,
+                passed: 0,
+            },
+            law: Law {
+                declaration,
+                widths,
+                odometer,
+            },
         })
     }
 
     /// The declaration.
     pub fn declaration(&self) -> &LandmarkDeclaration {
-        &self.declaration
+        &self.law.declaration
     }
 
     /// The derived widths.
     pub fn widths(&self) -> Widths {
-        self.widths
+        self.law.widths
     }
 
     /// `B = ⌈log₂|A|⌉`, the odometer digits of a cell.
     pub fn digits(&self) -> u64 {
-        self.widths.digits
+        self.law.widths.digits
     }
 
     /// `M_p`, the path lattice's width.
     pub fn face_bits(&self) -> u64 {
-        self.widths.face
+        self.law.widths.face
     }
 
     /// The founded nodes.
     pub fn nodes(&self) -> usize {
-        self.arena.len()
+        self.nodes.len()
     }
 
     /// The cells passed (deposited).
     pub fn passed(&self) -> u64 {
-        self.passed
+        self.nodes.passed
     }
 
-    /// **The tree's exact stored bits**, in `ClassMasses::bits`' style: every half-unit mass `2C`
-    /// (odd) as the ratio `(2C)/2`, `bits(2C) + 2`, at the nodes of depth at least `forced`; at
-    /// each mixing node (depth in `[forced, D)`), β's odd numerator and odd denominator,
-    /// `max(1, bits) + 1` each, and its exponent, `max(1, bits|e|) + 2` with its sign; each founded
-    /// child's letter, `max(1, bits(code)) + 1`; and one bit a splitting dyadic cell for its root's
-    /// presence.
+    /// **The tree's exact stored bits**: every half-unit mass `2C` (odd) as the ratio `(2C)/2`,
+    /// `bits(2C) + 2`, at the nodes of depth at least `forced`; at each mixing node (depth in
+    /// `[forced, D)`), β's odd numerator and odd denominator, `max(1, bits) + 1` each, and its
+    /// exponent, `max(1, bits|e|) + 2` with its sign; each founded child's letter,
+    /// `max(1, bits(code)) + 1`; and one bit a splitting dyadic cell for its root's presence.
     /// The totals (the masses' sum), the cached stop weight (read from β) and the certificates are
     /// readings kept beside them and are not counted.
     pub fn bits(&self) -> u64 {
         let slot = |value: u64| u64::from((u64::BITS - value.leading_zeros()).max(1)) + 1;
         let (forced, depth) = (
-            self.declaration.forced as u32,
-            self.declaration.depth as u32,
+            self.law.declaration.forced as u32,
+            self.law.declaration.depth as u32,
         );
-        let nodes: u64 = (0..self.arena.len())
+        let arena = &self.nodes.arena;
+        let nodes: u64 = (0..arena.len())
             .map(|node| {
-                let at = self.arena.depths[node];
+                let at = arena.depths[node];
                 if at < forced {
                     return 0;
                 }
-                let masses: u64 = self.arena.halves[node]
+                let masses: u64 = arena.halves[node]
                     .iter()
                     .map(|&units| u64::from(u32::BITS - units.leading_zeros()) + 2)
                     .sum();
                 let beta = if at < depth {
-                    let beta = &self.charts[node].beta;
+                    let beta = &self.nodes.charts[node].beta;
                     slot(beta.numerator)
                         + slot(beta.denominator)
                         + slot(beta.exponent.unsigned_abs())
@@ -878,46 +1440,32 @@ impl Landmarks {
                 masses + beta
             })
             .sum();
-        let letters: u64 = self
-            .arena
+        let letters: u64 = arena
             .children
             .keys()
             .map(|key| slot(key & u64::from(u32::MAX)))
             .sum();
-        let splitting = (0..self.widths.digits)
+        let splitting = (0..self.law.widths.digits)
             .flat_map(|level| (0..1usize << level).map(move |prefix| (level, prefix)))
-            .filter(|&(level, prefix)| self.odometer.splits(level, prefix))
+            .filter(|&(level, prefix)| self.law.odometer.splits(level, prefix))
             .count() as u64;
         nodes + letters + splitting
     }
 
     /// **The β chart's report** (module header).
     pub fn chart(&self) -> ChartReport {
-        let drift = self
-            .charts
-            .iter()
-            .map(|chart| chart.drift)
-            .max()
-            .unwrap_or(0);
+        let charts = &self.nodes.charts;
+        let drift = charts.iter().map(|chart| chart.drift).max().unwrap_or(0);
         ChartReport {
-            carrier: self.widths.carrier,
-            rebases: self.rebases,
-            node_rebases: self
-                .charts
+            carrier: self.law.widths.carrier,
+            rebases: self.nodes.rebases,
+            node_rebases: charts
                 .iter()
                 .map(|chart| u64::from(chart.rebases))
                 .max()
                 .unwrap_or(0),
-            drift: self.certified_bits(drift),
+            drift: self.law.certified_bits(drift),
         }
-    }
-
-    /// A certificate on `2^(−C)` in `ln`, read in bits: times `3/2 > log₂ e`.
-    fn certified_bits(&self, units: u128) -> Rat {
-        Rat::new(
-            BigInt::from(units) * 3,
-            BigInt::from(2u32) << self.widths.certificate as usize,
-        )
     }
 
     /// **The rule's a-priori bound per cell**, in bits (module header, "The widths"):
@@ -929,140 +1477,19 @@ impl Landmarks {
             face,
             carrier,
             ..
-        } = self.widths;
+        } = self.law.widths;
+        let declaration = &self.law.declaration;
         let (n, d) = (
-            BigInt::from(self.declaration.population),
-            BigInt::from(self.declaration.depth),
+            BigInt::from(declaration.population),
+            BigInt::from(declaration.depth),
         );
         let paths = &n * &d * &d;
         let floor = (BigInt::one() << face as usize)
-            / BigInt::from(floor_reciprocal(self.declaration.population));
+            / BigInt::from(floor_reciprocal(declaration.population));
         let rounding = Rat::new(&paths + &d * 2 + 1, floor * 2);
         let rebases = Rat::from_integer(paths) * two_power(1 - carrier as i64);
         let grid = Rat::one() + two_power(-(face.min(carrier) as i64));
         grid * log2_e_bound() * Rat::from_integer(BigInt::from(digits)) * (rounding + rebases)
-    }
-
-    fn full(&self) -> u64 {
-        1u64 << self.widths.face
-    }
-
-    /// `⟦2^M u/v⟧`: the lattice numerator nearest `u/v` (ties up), inside `[1, 2^M − 1]`.
-    fn round(&self, numerator: u128, denominator: u128) -> u64 {
-        let rounded = (2 * numerator + denominator) / (2 * denominator);
-        (rounded as u64).clamp(1, self.full() - 1)
-    }
-
-    /// The leaf's lattice face `⟦k(0)⟧`.
-    fn leaf(&self, node: u32) -> u64 {
-        let (u, v) = self.arena.kt(node, 0);
-        self.round(u128::from(u) << self.widths.face, u128::from(v))
-    }
-
-    /// The mixing node's lattice face `⟦λ̂ k(0) + (1 − λ̂) q̂'⟧`, on `2^M v` as the common
-    /// denominator.
-    fn mix(&self, node: u32, below: u64) -> u64 {
-        let (u, v) = self.arena.kt(node, 0);
-        let face = self.widths.face;
-        let stop = u128::from(self.charts[node as usize].stop);
-        let full = u128::from(self.full());
-        let numerator =
-            ((stop * u128::from(u)) << face) + (full - stop) * u128::from(below) * u128::from(v);
-        self.round(numerator, u128::from(v) << face)
-    }
-
-    /// **One tree's executed read** at an address, at most `limit` founded nodes.
-    fn read(&self, dyadic: usize, symbol: usize, address: &[Letter], limit: usize) -> LatticeRead {
-        let depth = self.declaration.depth;
-        let nodes = self.arena.open(dyadic, address, limit);
-        let top = nodes.len().min(depth);
-        let mut faces = vec![0u64; top + 1];
-        faces[top] = if nodes.len() == depth + 1 {
-            self.leaf(nodes[depth])
-        } else {
-            self.full() / 2
-        };
-        for d in (0..top).rev() {
-            faces[d] = if d < self.declaration.forced {
-                faces[d + 1]
-            } else {
-                self.mix(nodes[d], faces[d + 1])
-            };
-        }
-        LatticeRead {
-            dyadic,
-            symbol,
-            nodes,
-            faces,
-        }
-    }
-
-    /// Every tree a class opens, read at the current standing.
-    fn reads(&self, address: &[Letter], class: usize) -> Vec<LatticeRead> {
-        let limit = self.declaration.depth + 1;
-        self.odometer
-            .emitted(class)
-            .into_iter()
-            .map(|(dyadic, symbol)| self.read(dyadic, symbol, address, limit))
-            .collect()
-    }
-
-    /// A lattice face of `symbol` from the digit-`0` numerator.
-    fn side(&self, zero: u64, symbol: usize) -> u64 {
-        if symbol == 0 {
-            zero
-        } else {
-            self.full() - zero
-        }
-    }
-
-    /// **A level's rounding bound** `θ_d` of `symbol` on `2^(−C)`: `2^(−M)/min(q̂_d, k_d, q̂_(d+1))`
-    /// at a mixing node, `2^(−M−1)/min(q̂_D, k_D)` at a founded leaf, zero at a forced or unfounded
-    /// depth (their faces pass exactly).
-    fn rounding(&self, read: &LatticeRead, d: usize) -> u128 {
-        let Widths {
-            face, certificate, ..
-        } = self.widths;
-        if d >= read.nodes.len() || d < self.declaration.forced {
-            return 0;
-        }
-        let (u, v) = self.arena.kt(read.nodes[d], read.symbol);
-        let here = u128::from(self.side(read.faces[d], read.symbol));
-        let kt =
-            |shift: u64| ceil_div(u128::from(v) << (certificate - face - shift), u128::from(u));
-        if d == self.declaration.depth {
-            let lattice = ceil_div(1u128 << (certificate - 1), here);
-            lattice.max(kt(1))
-        } else {
-            let below = u128::from(self.side(read.faces[d + 1], read.symbol));
-            let lattice = ceil_div(1u128 << certificate, here.min(below));
-            lattice.max(kt(0))
-        }
-    }
-
-    /// `ρ_0 ≤ Σ drift + Σ θ` of one read on `2^(−C)`.
-    fn certificate(&self, read: &LatticeRead) -> u128 {
-        let mixing = read.nodes.len().min(self.declaration.depth);
-        let drift = (self.declaration.forced..mixing)
-            .map(|d| self.charts[read.nodes[d] as usize].drift)
-            .fold(0u128, u128::saturating_add);
-        (0..read.faces.len())
-            .map(|d| self.rounding(read, d))
-            .fold(drift, u128::saturating_add)
-    }
-
-    /// The cell's reading from its trees' reads.
-    fn reading(&self, reads: &[LatticeRead]) -> CellReading {
-        let mut numerator = BigUint::one();
-        let mut certificate = 0u128;
-        for read in reads {
-            numerator *= self.side(read.faces[0], read.symbol);
-            certificate = certificate.saturating_add(self.certificate(read));
-        }
-        CellReading {
-            executed: dyadic(numerator, reads.len() as u64 * self.widths.face),
-            residual: self.certified_bits(certificate),
-        }
     }
 
     /// **The executed face of one class** at an address, exact.
@@ -1073,16 +1500,18 @@ impl Landmarks {
     /// **Score one class** at an address at the current standing: its executed face and its
     /// certified residual, with nothing deposited.
     pub fn score(&self, address: &[Letter], class: usize) -> Result<CellReading, HnnError> {
-        check(&self.declaration, address, class)?;
-        Ok(self.reading(&self.reads(address, class)))
+        check(&self.law.declaration, address, class)?;
+        let reads = self.law.reads(&self.nodes, address, class);
+        Ok(self.law.reading(&self.nodes, &reads))
     }
 
     /// **The opened paths of one class** at an address, with their executed lattice faces.
     pub fn opened(&self, address: &[Letter], class: usize) -> Result<Vec<OpenedPath>, HnnError> {
-        check(&self.declaration, address, class)?;
-        let scale = BigInt::one() << self.widths.face as usize;
-        Ok(self
-            .reads(address, class)
+        check(&self.law.declaration, address, class)?;
+        let law = &self.law;
+        let scale = BigInt::one() << law.widths.face as usize;
+        Ok(law
+            .reads(&self.nodes, address, class)
             .into_iter()
             .map(|read| OpenedPath {
                 dyadic: read.dyadic,
@@ -1091,22 +1520,20 @@ impl Landmarks {
                 faces: read
                     .faces
                     .iter()
-                    .map(|&zero| {
-                        Rat::new(BigInt::from(self.side(zero, read.symbol)), scale.clone())
-                    })
+                    .map(|&zero| Rat::new(BigInt::from(law.side(zero, read.symbol)), scale.clone()))
                     .collect(),
                 masses: read
                     .nodes
                     .iter()
                     .map(|&node| {
-                        let (u, v) = self.arena.kt(node, read.symbol);
+                        let (u, v) = self.nodes.kt(node, read.symbol);
                         Rat::new(BigInt::from(u), BigInt::from(v))
                     })
                     .collect(),
                 betas: read
                     .nodes
                     .iter()
-                    .map(|&node| self.charts[node as usize].beta.value())
+                    .map(|&node| self.nodes.charts[node as usize].beta.value())
                     .collect(),
             })
             .collect())
@@ -1115,52 +1542,61 @@ impl Landmarks {
     /// **All classes' executed faces at an address**, with their grain exponents at `grain`
     /// (module header, "Faces").
     pub fn face(&self, address: &[Letter], grain: u64) -> Result<LandmarkFace, HnnError> {
-        check(&self.declaration, address, 0)?;
-        let digits = self.widths.digits;
-        let cells = 1usize << digits;
-        // The heap over dyadic cells: each cell's founded bound, and each class's descent.
-        let mut limit = vec![0usize; 2 * cells];
-        let mut numerators: Vec<Option<BigUint>> = vec![None; 2 * cells];
-        let mut opened = vec![0u64; 2 * cells];
-        limit[1] = self.declaration.depth + 1;
-        numerators[1] = Some(BigUint::one());
-        for level in 0..digits {
-            for prefix in 0..(1usize << level) {
-                if !self.odometer.holds(level, prefix) {
-                    continue;
-                }
-                let h = (1usize << level) | prefix;
-                let numerator = numerators[h].take().expect("a held cell's descent");
-                if self.odometer.splits(level, prefix) {
-                    let read = self.read(h, 0, address, limit[h]);
-                    let zero = read.faces[0];
-                    let founded = read.nodes.len();
-                    for (child, split) in [(2 * h, zero), (2 * h + 1, self.full() - zero)] {
-                        limit[child] = founded;
-                        numerators[child] = Some(&numerator * split);
-                        opened[child] = opened[h] + 1;
-                    }
-                } else {
-                    limit[2 * h] = limit[h];
-                    opened[2 * h] = opened[h];
-                    numerators[2 * h] = Some(numerator);
-                }
-            }
+        check(&self.law.declaration, address, 0)?;
+        self.law.face(&self.nodes, address, grain)
+    }
+
+    /// [definition; agent-inferred] **A window's faces in cell order** (module header, "A window
+    /// in cell order"; Decision 29 within a window): phase `j`'s all-class face at `addresses[j]`,
+    /// read at the standing after the deposits of the phases before it whose classes are known
+    /// (`known[i]` at `addresses[i]`, `i < j`), each on a working overlay of the nodes those
+    /// deposits wrote; the tree itself is unchanged. With nothing known every phase reads the
+    /// current standing. The overlays are built in cell order, then the phases read together
+    /// (`hnn::realization`: each reads its own overlay, and nothing is written). Refused at an
+    /// address or class outside the declaration.
+    pub fn window_faces(
+        &self,
+        addresses: &[Vec<Letter>],
+        known: &[usize],
+        grain: u64,
+    ) -> Result<Vec<LandmarkFace>, HnnError> {
+        let law = &self.law;
+        for address in addresses {
+            check(&law.declaration, address, 0)?;
         }
-        let mut probabilities = Vec::with_capacity(self.declaration.alphabet);
-        let mut exponents = Vec::with_capacity(self.declaration.alphabet);
-        for class in 0..self.declaration.alphabet {
-            let leaf = cells | class;
-            let numerator = numerators[leaf].take().expect("a class's descent");
-            let exponent = opened[leaf] * self.widths.face;
-            exponents.push(dyadic_grain_exponent(&numerator, exponent, grain)?);
-            probabilities.push(dyadic(numerator, exponent));
+        let deposits = known.len().min(addresses.len().saturating_sub(1));
+        for (address, &class) in addresses.iter().zip(known).take(deposits) {
+            check(&law.declaration, address, class)?;
         }
-        Ok(LandmarkFace {
-            grain,
-            probabilities,
-            exponents,
+        let admitted = self.working_admission(deposits as u64);
+        let mut working = Working::on(&self.nodes);
+        let mut standings = Vec::with_capacity(deposits);
+        for (address, &class) in addresses.iter().zip(known).take(deposits) {
+            let reads = law.reads(&working, address, class);
+            law.apply(&mut working, address, reads, admitted)?;
+            standings.push(working.clone());
+        }
+        indexed(addresses.len(), |j| match j.min(deposits).checked_sub(1) {
+            Some(index) => law.face(&standings[index], &addresses[j], grain),
+            None => law.face(&self.nodes, &addresses[j], grain),
         })
+    }
+
+    /// [agent-inferred] **The arrivals a working overlay admits**: the declared population, and
+    /// past it the window's own earlier cells (a deposit's re-read at its successor reads the
+    /// window's cells again) while the widths' operands at that count still fit `u128`. A working
+    /// read's faces are exact executed faces, normalized for any stop weight; its certificates are
+    /// not read.
+    fn working_admission(&self, deposits: u64) -> u64 {
+        let population = self.law.declaration.population;
+        let reach = population + deposits;
+        if reach < u64::from(u32::MAX / 2)
+            && self.law.widths.operand_bits(reach) <= u64::from(u128::BITS)
+        {
+            reach
+        } else {
+            population
+        }
     }
 
     /// **Deposit one cell** on the paths it opens, read at the current standing (module header):
@@ -1168,90 +1604,21 @@ impl Landmarks {
     /// path's missing nodes are founded with `β = 1`, then each node's mass of the digit grows.
     /// Refused before anything moves at a bad address or class, or past the declared population.
     pub fn deposit(&mut self, address: &[Letter], class: usize) -> Result<(), HnnError> {
-        check(&self.declaration, address, class)?;
-        let reads = self.reads(address, class);
-        self.apply(address, reads)
+        check(&self.law.declaration, address, class)?;
+        let reads = self.law.reads(&self.nodes, address, class);
+        let population = self.law.declaration.population;
+        self.law.apply(&mut self.nodes, address, reads, population)
     }
 
     /// **Receive one cell**: score it at the current standing, then deposit it.
     pub fn receive(&mut self, address: &[Letter], class: usize) -> Result<CellReading, HnnError> {
-        check(&self.declaration, address, class)?;
-        let reads = self.reads(address, class);
-        let reading = self.reading(&reads);
-        self.apply(address, reads)?;
+        check(&self.law.declaration, address, class)?;
+        let reads = self.law.reads(&self.nodes, address, class);
+        let reading = self.law.reading(&self.nodes, &reads);
+        let population = self.law.declaration.population;
+        self.law
+            .apply(&mut self.nodes, address, reads, population)?;
         Ok(reading)
-    }
-
-    fn apply(&mut self, address: &[Letter], reads: Vec<LatticeRead>) -> Result<(), HnnError> {
-        if self.passed >= self.declaration.population {
-            return Err(HnnError::PopulationReached {
-                population: self.declaration.population,
-            });
-        }
-        self.arena
-            .founded_within(reads.len() * (address.len() + 1))?;
-        let Widths {
-            face,
-            carrier,
-            certificate,
-            ..
-        } = self.widths;
-        let (depth, forced) = (self.declaration.depth, self.declaration.forced);
-        for read in reads {
-            // Bottom-up over the founded nodes: θ and the rebases add to the excess, the child's
-            // excess increment and the rebase to the drift.
-            let mut carried = 0u128;
-            for d in (forced..read.nodes.len()).rev() {
-                let theta = self.rounding(&read, d);
-                let node = read.nodes[d] as usize;
-                let mut rebase = 0u128;
-                if d < depth {
-                    let (u, v) = self.arena.kt(read.nodes[d], read.symbol);
-                    let below = self.side(read.faces[d + 1], read.symbol);
-                    let chart = &mut self.charts[node];
-                    let (beta, rebased) = Beta::carry(
-                        u128::from(chart.beta.numerator) * u128::from(u),
-                        u128::from(chart.beta.denominator) * u128::from(v) * u128::from(below),
-                        chart.beta.exponent + face as i64,
-                        carrier,
-                    );
-                    chart.beta = beta;
-                    chart.stop = beta.stop_weight(face, carrier);
-                    if let Some(mantissa) = rebased {
-                        rebase = ceil_div(1u128 << certificate, mantissa);
-                        chart.rebases += 1;
-                        self.rebases += 1;
-                    }
-                    chart.drift = chart.drift.saturating_add(carried).saturating_add(rebase);
-                }
-                let increment = theta
-                    .saturating_add(rebase.saturating_mul(2))
-                    .saturating_add(carried);
-                let chart = &mut self.charts[node];
-                chart.excess = chart.excess.saturating_add(increment);
-                carried = increment;
-            }
-            let LatticeRead {
-                dyadic,
-                symbol,
-                mut nodes,
-                ..
-            } = read;
-            let founded = self.arena.extend(dyadic, address, &mut nodes);
-            self.charts.extend(std::iter::repeat_n(
-                Chart {
-                    beta: Beta::ONE,
-                    stop: self.full() / 2,
-                    rebases: 0,
-                    drift: 0,
-                    excess: 0,
-                },
-                founded,
-            ));
-            self.arena.count(&nodes, forced, symbol);
-        }
-        self.passed += 1;
-        Ok(())
     }
 }
 

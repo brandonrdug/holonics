@@ -4,7 +4,8 @@
 //! against a recomputation in ℚ, and its certificate against the oracle cell by cell; the stop
 //! weight's rounding; the β chart's rebase and its certified residual; the opened path's telescope;
 //! the certified binary logarithm and the grain exponents; the derived widths; the stored bits;
-//! score and deposit against receive; the refusals; and the prequential measurement.
+//! score and deposit against receive; a window's faces in cell order on a working overlay against
+//! the deposited tree; the refusals; and the prequential measurement.
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
@@ -427,10 +428,9 @@ fn landmark_widths_follow_the_passage_and_the_grain() {
     assert_eq!(IdealLandmarks::reference_width(&declared), 130);
 }
 
-/// **The stored bits** (`ClassMasses::bits`' style): the empty tree stores one bit a splitting
-/// dyadic cell;
-/// one arrival at depth 1 over two classes founds a root (masses `3/2`, `1/2` and `β = 1`) and
-/// a leaf (masses only) behind the letter `Boundary`.
+/// **The stored bits**: the empty tree stores one bit a splitting dyadic cell; one arrival at depth
+/// 1 over two classes founds a root (masses `3/2`, `1/2` and `β = 1`) and a leaf (masses only)
+/// behind the letter `Boundary`.
 #[test]
 fn landmark_bits_count_the_stored_parts() {
     let mut tree = Landmarks::new(declaration(2, 1)).unwrap();
@@ -458,6 +458,55 @@ fn landmark_score_and_deposit_is_receive() {
     }
     assert_eq!(once.clone(), once);
     assert_eq!(once.passed(), stream.len() as u64);
+}
+
+/// **A window's faces in cell order** (`Landmarks::window_faces`): phase `j` reads the face of a
+/// clone into which the earlier phases' targets were deposited, exactly, founded nodes and rebased
+/// charts included (a narrow carrier forces rebases); the tree is unchanged; with nothing known
+/// every phase reads the current standing; the window past the declared population is still read
+/// (a deposit's re-read at its successor), and a bad class is refused.
+#[test]
+fn landmark_window_faces_read_each_phase_after_the_earlier_deposits() {
+    let stream: Vec<usize> = (0..90u64)
+        .map(|t| ((t * 7 + t / 3 + t * t / 11) % 5) as usize)
+        .collect();
+    let declared = LandmarkDeclaration {
+        population: 90,
+        ..declaration(5, 2)
+    };
+    let mut tree = Landmarks::with_carrier(declared.clone(), 6).unwrap();
+    let aperture = 3;
+    for start in (0..stream.len()).step_by(aperture) {
+        let window = start..(start + aperture).min(stream.len());
+        let addresses: Vec<Vec<Letter>> = window
+            .clone()
+            .map(|position| address(&stream, position, 2))
+            .collect();
+        let known = &stream[window.clone()];
+        let before = tree.clone();
+        let faces = tree.window_faces(&addresses, known, 16).unwrap();
+        assert_eq!(tree, before, "the tree is unchanged");
+        let mut deposited = tree.clone();
+        for (j, (here, &cell)) in addresses.iter().zip(known).enumerate() {
+            assert_eq!(faces[j], deposited.face(here, 16).unwrap(), "phase {j}");
+            deposited.deposit(here, cell).unwrap();
+        }
+        let unknown = tree.window_faces(&addresses, &[], 16).unwrap();
+        for (face, here) in unknown.iter().zip(&addresses) {
+            assert_eq!(face, &tree.face(here, 16).unwrap());
+        }
+        tree = deposited;
+    }
+    assert!(tree.chart().rebases > 0, "the narrow carrier rebased");
+    assert_eq!(tree.passed(), 90);
+    // Past the population: the window's earlier cells are read again, as a re-read does.
+    let last = [address(&stream, 88, 2), address(&stream, 89, 2)];
+    let again = tree.window_faces(&last, &stream[88..90], 16).unwrap();
+    assert_eq!(again.len(), 2);
+    assert!(matches!(
+        tree.window_faces(&last, &[5, 0], 16),
+        Err(HnnError::CellOutside { .. })
+    ));
 }
 
 /// **The refusals**: an address of the wrong depth, a class or letter outside the chart, a forced

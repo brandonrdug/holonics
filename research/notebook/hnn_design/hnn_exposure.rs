@@ -12,8 +12,9 @@
 //! ```
 //!
 //! [definition] **The standing real cut** (`cut-file <path>`) is campaign 1's exposure (Decisions 16
-//! and 23): its held-out range is read from the manifest beside the cut (`<path>` with `.json`), and
-//! the file's length must equal the manifest's population.
+//! and 23): its held-out range is the manifest's `held_out_range` itself (the manifest beside the
+//! cut, `<path>` with `.json`), the file's length must equal the manifest's population, and the
+//! cells read must close at the range's end (`cells all`), so the range is the cut's own.
 //!
 //! [definition] **The development control** is `docs/plans/THE_REBUILD.md` at [`CUT_COMMIT`] as UTF-8 bytes
 //! (171,754 bytes). It is read by `git show`, as `hnn_lattice_growth` reads it, never from the live
@@ -26,11 +27,12 @@
 //!   the control at the standing cut's population.
 //! - `cells all` is the whole cut: 85,877 windows, `9,343,417 rem 24 over 40` ms at those means.
 //!
-//! [definition; agent-inferred] **The held-out part** is the cut's tail of [`HELD_OUT`] cells. That
-//! is one mean aeon of campaign 1's joint clock on uniform bytes, `⌈1,281,280/1,077⌉ = 1,190` cells
-//! (design (d), "Locks"), and a whole number of receiving windows. It is declared from the field's
-//! clock, not from the cut, and never tuned on held-out bits. `held-out H` declares a tail of `H`
-//! cells instead. Prequential (Decision 29): its targets are compared at the standing before their
+//! [definition; agent-inferred] **The held-out part** of the pinned cut is its tail of [`HELD_OUT`]
+//! cells. That is one mean aeon of campaign 1's joint clock on uniform bytes,
+//! `⌈1,281,280/1,077⌉ = 1,190` cells (design (d), "Locks"), and a whole number of receiving
+//! windows. It is declared from the field's clock, not from the cut, and never tuned on held-out
+//! bits; `held-out H` declares a tail of `H` cells instead. A cut file's is its manifest's range
+//! (above). Prequential (Decision 29): its targets are compared at the standing before their
 //! own deposit and then deposited, as every baseline counts them after scoring; "held out" means
 //! that no design choice was made on them, and no crib reads them (review D1).
 //!
@@ -61,11 +63,14 @@
 //! - the bits on the training and the held-out targets against each online baseline (uniform,
 //!   order-0 and order-1 Krichevsky–Trofimov, PPM of order 2), and the verdict against order-0;
 //!   the model's face is the mixture of the tree's face and the combined face (the primary's ruling
-//!   A); beside it, the landmark tree's face alone (Decision 28: the receiving parametron's tree at
-//!   each cell's causal address read at the grain, no wave, at the model's constitution and address;
-//!   the compare's receipt) and the combined face alone (tree plus wave), each baseline against
-//!   them, the combined face against the tree (the wave's contribution), the course by aeon, and
-//!   the mixture's end (`log₂ β`, rebases, drift);
+//!   A); beside it, the landmark tree's executed face alone (Decision 28: the receiving parametron's
+//!   tree at each cell's causal address, at the standing after every earlier cell, no wave: the face
+//!   `q_T` the mixture weighs; the compare's receipt), the same tree's face at the grain (its grain
+//!   logits alone, the face the combined read opens at when the wave reads zero) and the combined
+//!   face alone (tree plus wave); each baseline against them, `L_C − L_T` (the wave's contribution
+//!   against the tree's executed face, the mixture's evidence) and `L_model − L_T` (what the
+//!   mixture keeps of it), the tree at the grain against the tree (the grain's rounding), the
+//!   course by aeon, and the mixture's end (`log₂ β`, rebases, drift);
 //! - `Kt` with the published keys, against the literal over the cells read;
 //! - each key location with its fibres per ring;
 //! - each aeon's boundary: its length and lift points, readings, collapse, first law (exchange plus
@@ -174,15 +179,15 @@ fn component<T>(value: &Component<T>, present: impl Fn(&T) -> String) -> String 
 
 fn main() {
     let arguments: Vec<String> = std::env::args().skip(1).collect();
-    let (mut cells, mut held_out, mut deadline): (Option<String>, usize, Option<u64>) =
-        (None, HELD_OUT, None);
+    let (mut cells, mut held_out, mut deadline): (Option<String>, Option<usize>, Option<u64>) =
+        (None, None, None);
     let mut cut_file: Option<String> = None;
     let mut realization = String::from("host");
     for pair in arguments.chunks(2) {
         match pair {
             [key, value] if key == "cells" => cells = Some(value.clone()),
             [key, value] if key == "held-out" => {
-                held_out = value.parse().expect("a held-out tail in cells");
+                held_out = Some(value.parse().expect("a held-out tail in cells"));
             }
             [key, value] if key == "cut-file" => cut_file = Some(value.clone()),
             [key, value] if key == "windows" => {
@@ -201,16 +206,16 @@ fn main() {
     }
 
     let setup = Instant::now();
-    let (text, source) = match cut_file.as_deref() {
+    let (text, source, manifest) = match cut_file.as_deref() {
         Some(path) => {
             let (text, _, range) = read_cut(path);
-            held_out = range.end - range.start;
             (
                 text,
                 format!("the cut file {path} (held out {range:?} from its manifest)"),
+                Some(range),
             )
         }
-        None => (pinned_cut(), format!("{CUT_COMMIT}:{CUT_PATH}")),
+        None => (pinned_cut(), format!("{CUT_COMMIT}:{CUT_PATH}"), None),
     };
     let n_star = Field::declare(FieldDeclaration::campaign_one(text.len() as u64))
         .expect("campaign 1's declared field over the whole cut")
@@ -228,7 +233,22 @@ fn main() {
     );
     let field = Field::declare(FieldDeclaration::campaign_one(length as u64))
         .expect("campaign 1's declared field (refused below n*)");
-    let tail = length.saturating_sub(held_out)..length;
+    // With a cut file the held-out range is the manifest's own, which must close the cells read;
+    // otherwise the declared tail.
+    let tail = match manifest {
+        Some(range) => {
+            assert!(
+                held_out.is_none(),
+                "a cut file's held-out range is its manifest's; held-out declares the pinned cut's tail"
+            );
+            assert_eq!(
+                range.end, length,
+                "the manifest's held-out range closes the cut: read it whole (cells all)"
+            );
+            range
+        }
+        None => length.saturating_sub(held_out.unwrap_or(HELD_OUT))..length,
+    };
     let cut = Cut {
         cells: text[..length]
             .iter()
@@ -251,7 +271,7 @@ fn main() {
         length.div_ceil(aperture)
     );
     println!(
-        "held out: cells {}..{} ({} cells, the declared tail); training: cells 0..{}",
+        "held out: cells {}..{} ({} cells, the manifest's range or the declared tail); training: cells 0..{}",
         tail.start,
         tail.end,
         tail.len(),
@@ -508,11 +528,11 @@ fn report(field: &Field, exposure: &Exposure) {
     bits("held out", &exposure.held_out, true, grain);
     println!();
     println!(
-        "== the receiving face's course by aeon (ruling A: each aeon's cells under the model, the tree face alone and the combined face alone; log2 beta at its boundary) =="
+        "== the receiving face's course by aeon (ruling A: each aeon's cells under the model, the tree's executed face alone and the combined face alone; log2 beta at its boundary) =="
     );
     for (index, leg) in exposure.course.iter().enumerate() {
         println!(
-            "aeon {index}: closed at cell {}, {} cells; model {} (a cell {}); tree {} (a cell {}); combined {} (a cell {}); combined − tree {}; log2 beta {}",
+            "aeon {index}: closed at cell {}, {} cells; model {} (a cell {}); tree {} (a cell {}); combined {} (a cell {}); L_C − L_T {}; L_model − L_T {}; log2 beta {}",
             leg.cell,
             leg.cells,
             per(&leg.model, 1, grain),
@@ -522,6 +542,7 @@ fn report(field: &Field, exposure: &Exposure) {
             per(&leg.combined, 1, grain),
             per(&leg.combined, leg.cells, grain),
             difference(&leg.combined, &leg.tree, grain),
+            difference(&leg.model, &leg.tree, grain),
             leg.log2_beta
                 .as_ref()
                 .map_or_else(|| "-".to_string(), |log| per(log, 1, grain))
@@ -669,7 +690,8 @@ fn bits(label: &str, bits: &Bits, criterion: bool, grain: u64) {
     let ppm = format!("PPM order {PPM_ORDER}");
     let rows = [
         ("model q", &bits.model),
-        ("tree face", &bits.tree),
+        ("tree", &bits.tree),
+        ("tree at the grain", &bits.tree_grain),
         ("combined", &bits.combined),
         ("uniform", &bits.uniform),
         ("order-0 KT", &bits.order_zero),
@@ -678,7 +700,7 @@ fn bits(label: &str, bits: &Bits, criterion: bool, grain: u64) {
     ];
     for (name, interval) in rows {
         println!(
-            "  {name:<11} {}; per cell at L_R = {grain}: {}",
+            "  {name:<17} {}; per cell at L_R = {grain}: {}",
             enclosure(interval, grain),
             per(interval, bits.cells, grain)
         );
@@ -690,17 +712,32 @@ fn bits(label: &str, bits: &Bits, criterion: bool, grain: u64) {
             difference(&bits.model, baseline, grain)
         );
     }
-    for (name, baseline) in &rows[3..] {
+    for (name, baseline) in &rows[4..] {
         println!(
-            "  the tree face alone is {} {name}; tree − {name}: {}",
+            "  the tree's executed face alone is {} {name}; tree − {name}: {}",
             against(&bits.tree, baseline),
             difference(&bits.tree, baseline, grain)
         );
     }
     println!(
-        "  the combined face (tree + wave) is {} the tree face; combined − tree: {}",
+        "  L_C − L_T, the combined face (tree + wave) against the tree's executed face: {} it; {}",
         against(&bits.combined, &bits.tree),
         difference(&bits.combined, &bits.tree, grain)
+    );
+    println!(
+        "  L_model − L_T, the mixture against the tree's executed face: {} it; {}",
+        against(&bits.model, &bits.tree),
+        difference(&bits.model, &bits.tree, grain)
+    );
+    println!(
+        "  the grain's rounding, the tree at the grain against the tree: {} it; {}",
+        against(&bits.tree_grain, &bits.tree),
+        difference(&bits.tree_grain, &bits.tree, grain)
+    );
+    println!(
+        "  L_C − L_T at the grain, the combined face against the tree at the grain: {} it; {}",
+        against(&bits.combined, &bits.tree_grain),
+        difference(&bits.combined, &bits.tree_grain, grain)
     );
     println!(
         "  against online order-0: {}",
@@ -712,7 +749,7 @@ fn bits(label: &str, bits: &Bits, criterion: bool, grain: u64) {
         }
     );
     println!(
-        "  the wave's contribution (the combined face against the tree face alone): {}",
+        "  the wave's contribution (the combined face against the tree's executed face): {}",
         match against(&bits.combined, &bits.tree) {
             "below" => "the wave lowers the code length",
             "above" => "the wave raises the code length",
@@ -720,7 +757,7 @@ fn bits(label: &str, bits: &Bits, criterion: bool, grain: u64) {
         }
     );
     println!(
-        "  the mixture (ruling A: the model against the tree face alone): {}",
+        "  the mixture (ruling A: the model against the tree's executed face): {}",
         match against(&bits.model, &bits.tree) {
             "below" => "the mixture codes below the tree",
             "above" => "the mixture codes above the tree",

@@ -67,7 +67,9 @@ likelihood of what reached it (`standing_is_routed_counts`).
 5. **Depth one is Decision 27** (`depth_one_is_decision_27`): at depth one with the forced split
    `λ_0 = 0`, the face is `RegionCounts.countFace` of the KT masses the region word deposits at the
    preceding cell (`regionRun_local`, `count_face_eq_kt`); ordinary CTW at depth one mixes in the
-   root face with `0 < λ_0 < 1`.
+   root face with `0 < λ_0 < 1`. This is the whole-cell emission (`|A|`-ary masses at a node),
+   whose law lives here only; the digit emission's depth-one forced case (section 6) is a product
+   over the cell's opened digits of binary KT faces at the preceding cell, not this `|A|`-ary face.
 6. **The digit emission** (`digit_emission_normalized`, `forced_digits_normalized`,
    `face_cell_width`, `cell_faces_partition`): the product of binary faces normalized at every digit
    prefix sums to one over the cells `c < 2^w`, and over `K < 2^w` classes when the digits whose
@@ -112,6 +114,16 @@ likelihood of what reached it (`standing_is_routed_counts`).
     factors; a rebase's residual is `ln(x/⌊x⌋) < 1/⌊x⌋`, and `|log₂(1 − r)| < 2^(3−W)` for
     `r < 2^(1−W)`.
 
+11. **The receiver's mixture of two faces** (`sequential_mixture`, `sequential_mixture_bounds`,
+    `sequential_mixture_executed`; section 10): for positive faces `a_t`, `b_t` of the targets with
+    `A_t = ∏_(s<t) a_s`, `B_t = ∏_(s<t) b_s`, the mixture `q_t = λ_t a_t + (1 − λ_t) b_t` with
+    `λ_t = A_t/(A_t + B_t) = β_t/(1 + β_t)` (`β_0 = 1`, `β_(t+1) = β_t a_t/b_t`, stepped after every
+    cell) telescopes, `∏_(t<n) q_t = ½ A_n + ½ B_n`, so
+    `min(−log₂ A, −log₂ B) ≤ −log₂ ∏ q ≤ min(−log₂ A, −log₂ B) + 1`. With the ratio carried by a
+    chart whose step at cell `t` carries a factor `ρ_t > 0`, `A_n ≤ 2 ∏ max(1, ρ_t) ∏ q̂_t` and
+    `B_n ≤ 2 ∏ max(1, 1/ρ_t) ∏ q̂_t`, so the executed code length is within
+    `min + 1 + Σ_t |log₂ ρ_t|`: the chart's drift adds once over the passage.
+
 [counterexample; formal-checked]
 * `budget_eviction_changes_face`: evicting an occupied child by budget alone changes a later face
   (`3/4` against `7/12`), so no lawful retention identifies the two standings: a storage budget
@@ -143,10 +155,13 @@ on the standing real cut) are measurement receipts, not theorems. The campaign 5
 stated here: they have no consumer yet.
 
 The Rust consumer is `crates/holonics/src/hnn/landmark.rs` (`hnn::landmark`, written beside this
-owner): `Landmarks` (the tree executed on the lattice: its all-class face `Landmarks::face`,
-`probability`, `score`, its deposit `Landmarks::deposit` and `receive`, the certificates),
+owner): `Landmarks` (the tree executed on the lattice: its all-class face `Landmarks::face`, a
+window's faces in cell order `Landmarks::window_faces`, `probability`, `score`, its deposit
+`Landmarks::deposit` and `receive`, the certificates),
 `IdealLandmarks` (the ideal tree weighting in ℚ, the reference oracle), `Beta` (the carried β chart),
-`OpenedPath::edge_ratios` (the cochain) and `face_bits`, `carrier_width` (the derived widths).
+`OpenedPath::edge_ratios` (the cochain) and `face_bits`, `carrier_width` (the derived widths). Section 10's
+consumer is `hnn::receiving::Mixture` (the receiver's scored face, its ratio stepped phase by phase
+across a window).
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
@@ -914,7 +929,9 @@ split `λ_0 = 0`, the tree's face at an address `a` is the face of the depth-one
 Decision 27's region face: `RegionCounts.countFace` of the KT masses the region word deposited at
 the region `a.take 1` (`regionRun_local`, `count_face_eq_kt`), which is KT's
 `(n_c + 1/2)/(n + |A|/2)` over that region's routed classes. Ordinary CTW at depth one instead
-weighs in the root's context-free face with `0 < λ_0 < 1` (`lamAt_mem`). -/
+weighs in the root's context-free face with `0 < λ_0 < 1` (`lamAt_mem`). The node faces here are
+the whole-cell emission's `|A|`-ary KT faces; the digit emission's depth-one forced case multiplies
+binary KT faces over the cell's opened digits and is not this face. -/
 theorem depth_one_is_decision_27 [Nonempty A] (obs : List (List Ltr × A)) {a : List Ltr}
     (ha : 1 ≤ a.length) (lam : ℕ → ℚ) (h0 : lam 0 = 0) (c : A) :
     pathFace (kAt (nodeCounts obs) a) lam 1 0 c =
@@ -2252,6 +2269,282 @@ theorem budget_eviction_changes_face :
 
 end Release
 
+/-! ## 10. The receiver's mixture of two faces over a passage -/
+
+section SequentialMixture
+
+open Finset
+
+/-- [definition] **A face's prequential likelihood** over the first `n` cells, `A_n = ∏_(t<n) a_t`
+(`A_0 = 1`). -/
+def seqLik (a : ℕ → ℚ) (n : ℕ) : ℚ := ∏ t ∈ range n, a t
+
+/-- [definition] **The mixture's likelihood ratio** `β_t = A_t/B_t` of two faces. -/
+def seqRatio (a b : ℕ → ℚ) (t : ℕ) : ℚ := seqLik a t / seqLik b t
+
+/-- [definition] **The sequential two-face mixture** at cell `t`: `q_t = λ_t a_t + (1 − λ_t) b_t`
+with `λ_t = A_t/(A_t + B_t)`, the posterior weight of the first face under the prior ½/½. -/
+def seqMix (a b : ℕ → ℚ) (t : ℕ) : ℚ :=
+  seqLik a t / (seqLik a t + seqLik b t) * a t +
+    (1 - seqLik a t / (seqLik a t + seqLik b t)) * b t
+
+theorem seqLik_zero (a : ℕ → ℚ) : seqLik a 0 = 1 := prod_range_zero _
+
+theorem seqLik_succ (a : ℕ → ℚ) (n : ℕ) : seqLik a (n + 1) = seqLik a n * a n :=
+  prod_range_succ _ _
+
+theorem seqLik_pos {a : ℕ → ℚ} (ha : ∀ t, 0 < a t) (n : ℕ) : 0 < seqLik a n :=
+  prod_pos fun t _ => ha t
+
+/-- [proved-derived; formal-checked] **`sequential_mixture`: the receiver's mixture of two faces,
+stepped cell by cell.** For positive faces `a_t`, `b_t` of the cells' targets with prequential
+likelihoods `A_t = ∏_(s<t) a_s`, `B_t = ∏_(s<t) b_s`:
+* the ratio opens at `β_0 = 1` (the prior ½/½) and steps by `β_(t+1) = β_t a_t/b_t` after each
+  cell, in cell order;
+* the weight is `λ_t = A_t/(A_t + B_t) = β_t/(1 + β_t)`;
+* the mixture's product telescopes: `∏_(t<n) q_t = ½ A_n + ½ B_n`.
+
+The weight at cell `t` must be the ratio after every earlier cell: a weight read before an earlier
+cell's step breaks the telescope. -/
+theorem sequential_mixture {a b : ℕ → ℚ} (ha : ∀ t, 0 < a t) (hb : ∀ t, 0 < b t) :
+    seqRatio a b 0 = 1 ∧
+      (∀ t, seqRatio a b (t + 1) = seqRatio a b t * a t / b t) ∧
+      (∀ t, seqLik a t / (seqLik a t + seqLik b t) = seqRatio a b t / (1 + seqRatio a b t)) ∧
+      ∀ n, ∏ t ∈ range n, seqMix a b t = seqLik a n / 2 + seqLik b n / 2 := by
+  refine ⟨by simp [seqRatio, seqLik_zero], fun t => ?_, fun t => ?_, fun n => ?_⟩
+  · have hA := seqLik_pos ha t
+    have hB := seqLik_pos hb t
+    have := hb t
+    simp only [seqRatio, seqLik_succ]
+    field_simp
+  · have hA := seqLik_pos ha t
+    have hB := seqLik_pos hb t
+    simp only [seqRatio]
+    field_simp
+    ring
+  · induction n with
+    | zero => simp [seqLik_zero]; norm_num
+    | succ n ih =>
+      rw [prod_range_succ, ih, seqLik_succ, seqLik_succ]
+      have hA := seqLik_pos ha n
+      have hB := seqLik_pos hb n
+      have hAB : seqLik a n + seqLik b n ≠ 0 := by positivity
+      simp only [seqMix]
+      field_simp
+      ring
+
+/-- [proved-derived; formal-checked] **`sequential_mixture_bounds`: within one bit of the better
+face.** `½ max(A_n, B_n) ≤ ∏_(t<n) q_t ≤ max(A_n, B_n)`, so the mixture's code length lies
+between the better face's and one bit above it:
+`min(−log₂ A_n, −log₂ B_n) ≤ −log₂ ∏ q ≤ min(−log₂ A_n, −log₂ B_n) + 1`. -/
+theorem sequential_mixture_bounds {a b : ℕ → ℚ} (ha : ∀ t, 0 < a t) (hb : ∀ t, 0 < b t)
+    (n : ℕ) :
+    max (seqLik a n) (seqLik b n) / 2 ≤ ∏ t ∈ range n, seqMix a b t ∧
+      ∏ t ∈ range n, seqMix a b t ≤ max (seqLik a n) (seqLik b n) ∧
+      min (-Real.logb 2 (seqLik a n : ℝ)) (-Real.logb 2 (seqLik b n : ℝ)) ≤
+        -Real.logb 2 ((∏ t ∈ range n, seqMix a b t : ℚ) : ℝ) ∧
+      -Real.logb 2 ((∏ t ∈ range n, seqMix a b t : ℚ) : ℝ) ≤
+        min (-Real.logb 2 (seqLik a n : ℝ)) (-Real.logb 2 (seqLik b n : ℝ)) + 1 := by
+  have hP := (sequential_mixture ha hb).2.2.2 n
+  have hA := seqLik_pos ha n
+  have hB := seqLik_pos hb n
+  set P := ∏ t ∈ range n, seqMix a b t with hPdef
+  set A := seqLik a n
+  set B := seqLik b n
+  have lo : max A B / 2 ≤ P := by
+    rw [hP]; rcases le_total A B with h | h
+    · rw [max_eq_right h]; linarith
+    · rw [max_eq_left h]; linarith
+  have hi : P ≤ max A B := by
+    rw [hP]; rcases le_total A B with h | h
+    · rw [max_eq_right h]; linarith
+    · rw [max_eq_left h]; linarith
+  have hAR : (0 : ℝ) < A := by exact_mod_cast hA
+  have hBR : (0 : ℝ) < B := by exact_mod_cast hB
+  have hPR : (0 : ℝ) < P := by
+    have : (0 : ℚ) < P := lt_of_lt_of_le (by positivity) lo
+    exact_mod_cast this
+  have loA : (A : ℝ) / 2 ≤ P := by
+    have : A / 2 ≤ P := le_trans (by have := le_max_left A B; linarith) lo
+    exact_mod_cast this
+  have loB : (B : ℝ) / 2 ≤ P := by
+    have : B / 2 ≤ P := le_trans (by have := le_max_right A B; linarith) lo
+    exact_mod_cast this
+  have half : ∀ {x : ℝ}, 0 < x → Real.logb 2 (x / 2) = Real.logb 2 x - 1 := by
+    intro x hx
+    rw [Real.logb_div hx.ne' (by norm_num), Real.logb_self_eq_one (by norm_num)]
+  have gA := Real.logb_le_logb_of_le (b := 2) (by norm_num) (by positivity) loA
+  have gB := Real.logb_le_logb_of_le (b := 2) (by norm_num) (by positivity) loB
+  rw [half hAR] at gA
+  rw [half hBR] at gB
+  refine ⟨lo, hi, ?_, ?_⟩
+  · rcases le_total A B with h | h
+    · have : P ≤ B := by rw [max_eq_right h] at hi; exact hi
+      have hR : (P : ℝ) ≤ B := by exact_mod_cast this
+      have := Real.logb_le_logb_of_le (b := 2) (by norm_num) hPR hR
+      exact le_trans (min_le_right _ _) (by linarith)
+    · have : P ≤ A := by rw [max_eq_left h] at hi; exact hi
+      have hR : (P : ℝ) ≤ A := by exact_mod_cast this
+      have := Real.logb_le_logb_of_le (b := 2) (by norm_num) hPR hR
+      exact le_trans (min_le_left _ _) (by linarith)
+  · have : -Real.logb 2 (P : ℝ) - 1 ≤ min (-Real.logb 2 (A : ℝ)) (-Real.logb 2 (B : ℝ)) :=
+      le_min (by linarith) (by linarith)
+    linarith
+
+/-- [definition] **The executed ratio**: `β̂_0 = 1` and `β̂_(t+1) = β̂_t a_t/(b_t ρ_t)`, the carried
+ratio stepped with the chart's factor `ρ_t > 0` at each cell (the rational chart of `b_t` and a
+rebase). -/
+def execRatio (a b ρ : ℕ → ℚ) : ℕ → ℚ
+  | 0 => 1
+  | t + 1 => execRatio a b ρ t * a t / (b t * ρ t)
+
+/-- [definition] **The executed mixture** at cell `t`: `q̂_t = (β̂_t a_t + b_t)/(1 + β̂_t)`, the
+weight `λ̂_t = β̂_t/(1 + β̂_t)` read from the carried ratio. -/
+def execMix (a b ρ : ℕ → ℚ) (t : ℕ) : ℚ :=
+  (execRatio a b ρ t * a t + b t) / (1 + execRatio a b ρ t)
+
+/-- [proved-derived; formal-checked] **`sequential_mixture_executed`: the carried ratio's drift
+adds once over the passage.** With the ratio stepped by the chart's factors `ρ_t > 0`, the executed
+mixture's product dominates each face's likelihood up to the factors on its own side:
+`A_n ≤ 2 ∏ max(1, ρ_t) · ∏ q̂_t` and `B_n ≤ 2 ∏ max(1, 1/ρ_t) · ∏ q̂_t`; in bits,
+`−log₂ ∏_(t<n) q̂_t ≤ min(−log₂ A_n, −log₂ B_n) + 1 + Σ_(t<n) |log₂ ρ_t|`. At `ρ ≡ 1` it is
+`sequential_mixture_bounds`' upper half. -/
+theorem sequential_mixture_executed {a b ρ : ℕ → ℚ} (ha : ∀ t, 0 < a t) (hb : ∀ t, 0 < b t)
+    (hρ : ∀ t, 0 < ρ t) (n : ℕ) :
+    seqLik a n ≤ 2 * (∏ t ∈ range n, max 1 (ρ t)) * ∏ t ∈ range n, execMix a b ρ t ∧
+      seqLik b n ≤ 2 * (∏ t ∈ range n, max 1 (ρ t)⁻¹) * ∏ t ∈ range n, execMix a b ρ t ∧
+      -Real.logb 2 ((∏ t ∈ range n, execMix a b ρ t : ℚ) : ℝ) ≤
+        min (-Real.logb 2 (seqLik a n : ℝ)) (-Real.logb 2 (seqLik b n : ℝ)) + 1 +
+          ∑ t ∈ range n, |Real.logb 2 (ρ t : ℝ)| := by
+  -- The carried ratio is `A_t/B̂_t` with `B̂_t = ∏_(s<t) b_s ρ_s`.
+  set Bh : ℕ → ℚ := seqLik (fun t => b t * ρ t) with hBh
+  have hbρ : ∀ t, 0 < b t * ρ t := fun t => mul_pos (hb t) (hρ t)
+  have hratio : ∀ t, execRatio a b ρ t = seqLik a t / Bh t := by
+    intro t
+    induction t with
+    | zero => simp [execRatio, hBh, seqLik_zero]
+    | succ t ih =>
+      have hA := seqLik_pos ha t
+      have hB := seqLik_pos hbρ t
+      have := hb t
+      have := hρ t
+      rw [execRatio, ih, hBh, seqLik_succ, seqLik_succ]
+      field_simp
+  have hmix : ∀ t, execMix a b ρ t =
+      (seqLik a t * a t + Bh t * b t) / (seqLik a t + Bh t) := by
+    intro t
+    have hA := seqLik_pos ha t
+    have hB : 0 < Bh t := seqLik_pos hbρ t
+    rw [execMix, hratio]
+    field_simp
+    ring
+  -- The invariant `A_n + B̂_n ≤ 2 ∏ max(1, ρ_t) · ∏ q̂_t`.
+  have hinv : ∀ n, seqLik a n + Bh n ≤
+      2 * (∏ t ∈ range n, max 1 (ρ t)) * ∏ t ∈ range n, execMix a b ρ t := by
+    intro n
+    induction n with
+    | zero => simp [hBh, seqLik_zero]; norm_num
+    | succ n ih =>
+      have hA := seqLik_pos ha n
+      have hB := seqLik_pos hbρ n
+      have hAB : 0 < seqLik a n + Bh n := by positivity
+      have hm : 0 ≤ max 1 (ρ n) := le_trans zero_le_one (le_max_left _ _)
+      have hq : 0 < execMix a b ρ n := by
+        rw [hmix]; have := ha n; have := hb n; positivity
+      rw [prod_range_succ, prod_range_succ, seqLik_succ, hBh, seqLik_succ, ← hBh]
+      have step : seqLik a n * a n + Bh n * (b n * ρ n) ≤
+          max 1 (ρ n) * ((seqLik a n + Bh n) * execMix a b ρ n) := by
+        rw [hmix, mul_div_cancel₀ _ hAB.ne']
+        have h1 : seqLik a n * a n ≤ max 1 (ρ n) * (seqLik a n * a n) := by
+          have := ha n
+          nlinarith [le_max_left 1 (ρ n), mul_pos hA (ha n)]
+        have h2 : Bh n * (b n * ρ n) ≤ max 1 (ρ n) * (Bh n * b n) := by
+          have := hb n
+          have e : Bh n * (b n * ρ n) = ρ n * (Bh n * b n) := by ring
+          rw [e]
+          exact mul_le_mul_of_nonneg_right (le_max_right _ _) (by positivity)
+        nlinarith
+      calc seqLik a n * a n + Bh n * (b n * ρ n)
+          ≤ max 1 (ρ n) * ((seqLik a n + Bh n) * execMix a b ρ n) := step
+        _ ≤ max 1 (ρ n) * ((2 * (∏ t ∈ range n, max 1 (ρ t)) *
+              ∏ t ∈ range n, execMix a b ρ t) * execMix a b ρ n) :=
+          mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right ih hq.le) hm
+        _ = 2 * ((∏ t ∈ range n, max 1 (ρ t)) * max 1 (ρ n)) *
+              ((∏ t ∈ range n, execMix a b ρ t) * execMix a b ρ n) := by ring
+  have hA := seqLik_pos ha n
+  have hBhn := seqLik_pos hbρ n
+  have hP : 0 < ∏ t ∈ range n, execMix a b ρ t := prod_pos fun t _ => by
+    rw [hmix]
+    have := seqLik_pos ha t; have := seqLik_pos hbρ t; have := ha t; have := hb t
+    positivity
+  set P := ∏ t ∈ range n, execMix a b ρ t with hPdef
+  set U := ∏ t ∈ range n, max 1 (ρ t) with hU
+  set V := ∏ t ∈ range n, max 1 (ρ t)⁻¹ with hV
+  have hUpos : 0 < U := prod_pos fun t _ => lt_of_lt_of_le one_pos (le_max_left _ _)
+  have hVpos : 0 < V := prod_pos fun t _ => lt_of_lt_of_le one_pos (le_max_left _ _)
+  have hApart : seqLik a n ≤ 2 * U * P := by
+    have := hinv n; linarith
+  -- `B_n = B̂_n ∏ ρ_t⁻¹` and `max(1, ρ) ρ⁻¹ = max(1, ρ⁻¹)`.
+  have hBsplit : seqLik b n * ∏ t ∈ range n, ρ t = Bh n := by
+    simp only [hBh, seqLik, prod_mul_distrib]
+  have hUV : U * (∏ t ∈ range n, ρ t)⁻¹ = V := by
+    rw [hU, hV, ← prod_inv_distrib, ← prod_mul_distrib]
+    refine prod_congr rfl fun t _ => ?_
+    have := hρ t
+    rcases le_total 1 (ρ t) with h | h
+    · rw [max_eq_right h, max_eq_left (inv_le_one_of_one_le₀ h), mul_inv_cancel₀ this.ne']
+    · rw [max_eq_left h, max_eq_right (one_le_inv₀ this |>.mpr h), one_mul]
+  have hρprod : 0 < ∏ t ∈ range n, ρ t := prod_pos fun t _ => hρ t
+  have hBpart : seqLik b n ≤ 2 * V * P := by
+    have hb' : Bh n ≤ 2 * U * P := by have := hinv n; linarith
+    have e : seqLik b n = Bh n * (∏ t ∈ range n, ρ t)⁻¹ := by
+      rw [← hBsplit, mul_inv_cancel_right₀ hρprod.ne']
+    rw [e, ← hUV]
+    have hi : 0 < (∏ t ∈ range n, ρ t)⁻¹ := inv_pos.mpr hρprod
+    calc Bh n * (∏ t ∈ range n, ρ t)⁻¹ ≤ 2 * U * P * (∏ t ∈ range n, ρ t)⁻¹ :=
+          mul_le_mul_of_nonneg_right hb' hi.le
+      _ = 2 * (U * (∏ t ∈ range n, ρ t)⁻¹) * P := by ring
+  refine ⟨hApart, hBpart, ?_⟩
+  -- In bits: `log₂ max(1, ρ) ≤ |log₂ ρ|` and `log₂ max(1, ρ⁻¹) ≤ |log₂ ρ|`, summed.
+  have hlogU : Real.logb 2 (U : ℝ) ≤ ∑ t ∈ range n, |Real.logb 2 (ρ t : ℝ)| := by
+    rw [hU]; push_cast
+    rw [Real.logb_prod]
+    · refine sum_le_sum fun t _ => ?_
+      have hr : (0 : ℝ) < ρ t := by exact_mod_cast hρ t
+      rcases le_total 1 (ρ t : ℝ) with h | h
+      · rw [max_eq_right h]; exact le_abs_self _
+      · rw [max_eq_left h, Real.logb_one]; exact abs_nonneg _
+    · intro t _; exact (lt_of_lt_of_le one_pos (le_max_left _ _)).ne'
+  have hlogV : Real.logb 2 (V : ℝ) ≤ ∑ t ∈ range n, |Real.logb 2 (ρ t : ℝ)| := by
+    rw [hV]; push_cast
+    rw [Real.logb_prod]
+    · refine sum_le_sum fun t _ => ?_
+      have hr : (0 : ℝ) < ρ t := by exact_mod_cast hρ t
+      rcases le_total 1 (ρ t : ℝ)⁻¹ with h | h
+      · rw [max_eq_right h, Real.logb_inv]; exact neg_le_abs _
+      · rw [max_eq_left h, Real.logb_one]; exact abs_nonneg _
+    · intro t _; exact (lt_of_lt_of_le one_pos (le_max_left _ _)).ne'
+  have hPR : (0 : ℝ) < P := by exact_mod_cast hP
+  have hUR : (0 : ℝ) < U := by exact_mod_cast hUpos
+  have hVR : (0 : ℝ) < V := by exact_mod_cast hVpos
+  have hAR : (0 : ℝ) < seqLik a n := by exact_mod_cast hA
+  have hBR : (0 : ℝ) < seqLik b n := by exact_mod_cast seqLik_pos hb n
+  have bound : ∀ {X W : ℝ}, 0 < X → 0 < W → X ≤ 2 * W * P →
+      -Real.logb 2 (P : ℝ) ≤ -Real.logb 2 X + 1 + Real.logb 2 W := by
+    intro X W hX hW h
+    have := Real.logb_le_logb_of_le (b := 2) (by norm_num) hX h
+    rw [Real.logb_mul (by positivity) hPR.ne', Real.logb_mul (by norm_num) hW.ne',
+      Real.logb_self_eq_one (by norm_num)] at this
+    linarith
+  have bA := bound hAR hUR (by exact_mod_cast hApart)
+  have bB := bound hBR hVR (by exact_mod_cast hBpart)
+  have : -Real.logb 2 (P : ℝ) - 1 - ∑ t ∈ range n, |Real.logb 2 (ρ t : ℝ)| ≤
+      min (-Real.logb 2 (seqLik a n : ℝ)) (-Real.logb 2 (seqLik b n : ℝ)) :=
+    le_min (by linarith) (by linarith)
+  linarith
+
+end SequentialMixture
+
 section Audit
 
 #print axioms address_scale_square
@@ -2303,6 +2596,9 @@ section Audit
 #print axioms founded_tree_same_law
 #print axioms release_rule
 #print axioms budget_eviction_changes_face
+#print axioms sequential_mixture
+#print axioms sequential_mixture_bounds
+#print axioms sequential_mixture_executed
 
 end Audit
 

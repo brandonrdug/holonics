@@ -183,13 +183,16 @@ pub enum ReceiptDetail {
     },
     /// `compare`: the window's code length (the KL part, enclosed), phase excess, each phase's
     /// winding, the residual of the wave's logits against the emitted ones, the loci reached, the
-    /// remainders the return's carried adjoint released at the open (Decision 24), and each phase's
-    /// code length under the landmark tree's face alone at the grain, at the same constitution and
-    /// address as the combined face (Decision 28; `hnn::receiving::tree_code_length`), and each
-    /// phase's code length under the receiver's scored face, the mixture of the tree's and the
-    /// combined face (ruling A; `hnn::receiving::Mixture`), whose sum is the window's code length.
-    /// The Holon ratio (its phases' code lengths, excess and windings) is the combined face's, whose
-    /// covector the wave learns from.
+    /// remainders the return's carried adjoint released at the open (Decision 24); each phase's
+    /// code length under the landmark tree's executed face alone (`tree`: `−log₂ q_T(t_j)`, the
+    /// face the mixture weighs; `hnn::receiving::Scored::tree`) and under the face of its grain
+    /// logits alone (`tree_grain`: `hnn::receiving::tree_code_length`, the face the combined read
+    /// opens at when the wave reads zero), each at the same standing and address as the combined
+    /// face (Decision 28, the window read in cell order); and each phase's code length under the
+    /// receiver's scored face, the mixture of the tree's and the combined face (ruling A;
+    /// `hnn::receiving::Mixture`), whose sum is the window's code length. The Holon ratio (its
+    /// phases' code lengths, excess and windings) is the combined face's, whose covector the wave
+    /// learns from.
     Compare {
         code_length: crate::ratio::algebraic::ExactInterval,
         excess: Rat,
@@ -198,6 +201,7 @@ pub enum ReceiptDetail {
         reached: Vec<Locus>,
         released: Remainders,
         tree: Vec<crate::ratio::algebraic::ExactInterval>,
+        tree_grain: Vec<crate::ratio::algebraic::ExactInterval>,
         model: Vec<crate::ratio::algebraic::ExactInterval>,
     },
     /// `deposit`: the applied reading and the re-read code length of the deposit's own targets at

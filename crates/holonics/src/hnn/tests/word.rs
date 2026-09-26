@@ -118,7 +118,7 @@ fn the_forward_word_reads_its_epochs_and_releases_its_change() {
 /// logit is zero; the receiving parametron's tree is empty, so its face is uniform at every
 /// address (Decision 28): every real logit of the combined read is `log₂(1/|A|) = −2` on the
 /// chain's `|A| = 4`, carry `−2` and phase class `0`, every imaginary logit zero. The first faces
-/// are uniform.
+/// are uniform (read with no target known, so no phase reads an earlier phase's deposit).
 #[test]
 fn the_initial_constitution_opens_an_empty_word() {
     let field = &chain();
@@ -129,7 +129,7 @@ fn the_initial_constitution_opens_an_empty_word() {
     // of this moment is zero.
     let phases = phases.unwrap();
     let tree = phases
-        .tree_faces(&medium, &ActiveAddress::boundary(phases.depth()), &[1, 3])
+        .tree_faces(&medium, &ActiveAddress::boundary(phases.depth()), &[])
         .unwrap();
     let mut word = Word::open(field, &medium, &current, &moment).unwrap();
     assert_eq!(word.power().unwrap(), Rat::zero());

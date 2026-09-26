@@ -440,7 +440,8 @@ fn the_dyadic_readings_are_exact() {
 
 /// Decision 28 on the card's publication (no card needed to form it): the receiving parametron's
 /// tree is not a published locus (no kernel reads it); the host reads it from the constitution at
-/// compare, at each phase's causal address, and the device's formula is the reference's
+/// compare, at each phase's causal address and in cell order (phase 1 after phase 0's target is
+/// deposited, on a working overlay), and the device's formula is the reference's
 /// (`PendingRatio::against`): the wave's faces plus the tree's grain logits.
 #[test]
 fn the_tree_is_read_on_the_host_at_each_phases_address() {
@@ -464,9 +465,15 @@ fn the_tree_is_read_on_the_host_at_each_phases_address() {
     let trees = phases.tree_faces(&theta, &address, &[1, 2]).unwrap();
     assert_eq!(against.trees, trees);
     assert_eq!(against.faces, phases.combine(&wave, &trees).unwrap());
+    let addresses = pending.addresses(&[1, 2]).unwrap();
+    assert_eq!(addresses[1], vec![Letter::Cell(1), Letter::Cell(3)]);
+    let mut deposited = tree.clone();
+    deposited.deposit(&addresses[0], 1).unwrap();
+    assert_eq!(trees[1], deposited.face(&addresses[1], 16).unwrap());
     assert_eq!(
-        trees[1],
-        tree.face(&[Letter::Cell(1), Letter::Cell(3)], 16).unwrap()
+        theta.landmarks(2).unwrap(),
+        tree,
+        "the published tree is unchanged"
     );
 }
 
