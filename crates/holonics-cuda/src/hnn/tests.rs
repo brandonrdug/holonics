@@ -794,3 +794,199 @@ fn campaign_one_reads_and_ingest_match_the_host() {
     }
     eprintln!("campaign 1 parity in {} us", started.elapsed().as_micros());
 }
+
+// -------------------------------------------------------------------------------------------
+// the landmark tree on the card (campaign 2)
+
+/// One tree's run on the card against the host: at every window of `aperture` cells, the card's
+/// splits of every phase in cell order equal the host's (`Landmarks::window_splits`), known
+/// targets and none; each window is then deposited on both, and every `check` windows the card's
+/// arena equals the host's. Returns the card's times.
+fn tree_parity(
+    card: &Card,
+    mut tree: holonics::hnn::Landmarks,
+    letters: &[holonics::hnn::Letter],
+    cells: &[usize],
+    aperture: usize,
+    check: usize,
+) -> TreeTimes {
+    use holonics::hnn::landmark::letter_address;
+    let depth = tree.declaration().depth;
+    let mut mirror = CardTree::mirror(card, &tree, aperture - 1).expect("the mirror");
+    assert!(mirror.agrees(&tree).unwrap(), "the mirror at its upload");
+    let mut position = 0;
+    let mut windows = 0;
+    while position + aperture <= cells.len() {
+        let addresses: Vec<Vec<holonics::hnn::Letter>> = (position..position + aperture)
+            .map(|at| letter_address(letters, at, depth))
+            .collect();
+        let known = &cells[position..position + aperture];
+        let host = tree.window_splits(&addresses, known).unwrap();
+        let carded = mirror.window_splits(&addresses, known).unwrap();
+        assert_eq!(carded, host, "the window at {position}");
+        let host = tree.window_splits(&addresses, &[]).unwrap();
+        let carded = mirror.window_splits(&addresses, &[]).unwrap();
+        assert_eq!(carded, host, "the window at {position}, nothing known");
+        let steps: Vec<(Vec<holonics::hnn::Letter>, usize)> =
+            addresses.into_iter().zip(known.iter().copied()).collect();
+        for (address, class) in &steps {
+            tree.deposit(address, *class).unwrap();
+        }
+        mirror.deposit(&steps).unwrap();
+        windows += 1;
+        if windows % check == 0 {
+            assert!(
+                mirror.agrees(&tree).unwrap(),
+                "the arena after the window at {position}"
+            );
+        }
+        position += aperture;
+    }
+    assert!(mirror.agrees(&tree).unwrap(), "the arena at the end");
+    mirror.times()
+}
+
+/// **The landmark tree on the card reads and deposits as the host's** (campaign 2; Decision 25;
+/// `kernels/tree.cu`): the cell-only tree at campaign 1's `|A| = 256`, `D = 4` and at five classes
+/// with a forced split (the odometer's forced digits), a narrow carrier forcing the β chart's
+/// rebases; and the enlarged tree (the cell branch and the bundle branch joined at every dyadic
+/// cell) with two phase slots. Every window's splits in cell order are the host's, word for word,
+/// and after the deposits the card's arena (roots, children, masses, charts, joins) is the host's.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_card_tree_reads_and_deposits_as_the_host_tree() {
+    use holonics::hnn::landmark::{
+        Bundle, Feature, LandmarkDeclaration, Landmarks, Letter, LetterFamily, cell_letters,
+    };
+    let card = card();
+    let mut draw = Draw(97);
+    // A text-like stream over bytes.
+    let words: Vec<Vec<usize>> = (0..24)
+        .map(|_| {
+            (0..2 + draw.below(6))
+                .map(|_| 97 + draw.below(26))
+                .collect()
+        })
+        .collect();
+    let mut bytes = Vec::new();
+    while bytes.len() < 1_200 {
+        bytes.extend(words[draw.below(24)].iter().copied().chain([32]));
+    }
+    bytes.truncate(1_200);
+    let declared =
+        |alphabet: usize, depth: usize, forced: usize, population: u64| LandmarkDeclaration {
+            alphabet,
+            depth,
+            forced,
+            population,
+            grain: 16,
+            family: LetterFamily::cells(),
+        };
+    let campaign = Landmarks::new(declared(256, 4, 0, 1_200)).unwrap();
+    let times = tree_parity(&card, campaign, &cell_letters(&bytes), &bytes, 2, 50);
+    println!(
+        "cell-only |A| = 256, D = 4: {} reads {} µs, {} deposits {} µs, transfers {} µs",
+        times.reads,
+        times.read.as_micros(),
+        times.deposits,
+        times.deposit.as_micros(),
+        times.transfer.as_micros()
+    );
+    let small: Vec<usize> = (0..400).map(|t| (t * 7 + t / 3 + t * t / 11) % 5).collect();
+    let narrow = Landmarks::with_carrier(declared(5, 2, 1, 400), 6).unwrap();
+    tree_parity(&card, narrow, &cell_letters(&small), &small, 2, 10);
+    let family = LetterFamily::new(vec![
+        Feature::Phase { ring: 0, grain: 3 },
+        Feature::Phase { ring: 1, grain: 2 },
+    ])
+    .unwrap();
+    let bundle = |stream: &[usize]| -> Vec<Letter> {
+        stream
+            .iter()
+            .enumerate()
+            .map(|(i, &cell)| {
+                Letter::Bundle(Bundle {
+                    cell,
+                    features: family
+                        .encode(&[(i % 3) as u64, ((i / 3) % 2) as u64])
+                        .unwrap(),
+                })
+            })
+            .collect()
+    };
+    let enlarged = Landmarks::with_carrier(
+        LandmarkDeclaration {
+            family: family.clone(),
+            ..declared(5, 2, 0, 400)
+        },
+        6,
+    )
+    .unwrap();
+    tree_parity(&card, enlarged, &bundle(&small), &small, 2, 10);
+    let wide = Landmarks::new(LandmarkDeclaration {
+        family: family.clone(),
+        ..declared(256, 2, 0, 1_200)
+    })
+    .unwrap();
+    let times = tree_parity(&card, wide, &bundle(&bytes), &bytes, 3, 50);
+    println!(
+        "enlarged |A| = 256, D = 2, r = 2 (aperture 3): {} reads {} µs, {} deposits {} µs",
+        times.reads,
+        times.read.as_micros(),
+        times.deposits,
+        times.deposit.as_micros()
+    );
+}
+
+/// **The card's β step is the host's** (`hnn_tree_beta_steps` against `landmark::Beta::step`,
+/// Lean `HNN/LandmarkCarrier.{rebase_decode, rebase_ratio_enclosed}`): exact carries, mantissa
+/// rebases, and the carrier's rebase at `R = 126 − W` bits with its released remainder, at the
+/// widths of a 131,072-cell declaration (`W = 32`, `M_p = 48`) and a narrow carrier.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_card_beta_step_is_the_hosts() {
+    use holonics::hnn::landmark::Beta;
+    let card = card();
+    let mut draw = Draw(211);
+    for (width, face) in [(32u64, 48u64), (6, 20)] {
+        let rebase = 126 - width;
+        let mut operands = Vec::new();
+        for _ in 0..4_000 {
+            // The node step's carrier: β's odd parts within W bits, a KT face in half-units, a
+            // child face on the lattice; wide ones force the carrier's rebase.
+            let beta_n = u128::from(draw.next() >> (64 - width)) | 1;
+            let beta_d = u128::from(draw.next() >> (64 - width)) | 1;
+            let v = u128::from(draw.next() >> 45).max(2);
+            let u = (u128::from(draw.next()) % v).max(1);
+            let below = u128::from(draw.next() >> (64 - face)).max(1);
+            let denominator = beta_d * v * below;
+            let wide = u128::BITS - denominator.leading_zeros();
+            if u64::from(wide) + width > 128 {
+                continue;
+            }
+            operands.push((beta_n * u, denominator, draw.signed(20) + face as i64));
+        }
+        // Forced carrier rebases: denominators past `128 − W` bits.
+        for _ in 0..500 {
+            let numerator = u128::from(draw.next() | 1) << 8;
+            let denominator = (u128::from(draw.next() | (1 << 63)) << (64 - width + 2))
+                | u128::from(draw.next() | 1);
+            operands.push((numerator, denominator, draw.signed(20)));
+        }
+        let host: Vec<(u64, u64, i64, u64)> = operands
+            .iter()
+            .map(|&(n, d, e)| {
+                let carried = Beta::step(n, d, e, width, rebase);
+                let (a, b, c) = carried.beta.parts();
+                (a, b, c, carried.beta.stop_weight(face, width))
+            })
+            .collect();
+        let released = operands
+            .iter()
+            .filter(|&&(n, d, e)| Beta::step(n, d, e, width, rebase).released.is_some())
+            .count();
+        assert!(released > 0, "the carrier's rebase was exercised");
+        let carded = super::tree::beta_steps(&card, &operands, width, rebase, face).unwrap();
+        assert_eq!(carded, host, "W = {width}, M = {face}");
+    }
+}

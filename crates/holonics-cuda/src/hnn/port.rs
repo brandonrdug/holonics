@@ -9,18 +9,21 @@
 //! | On the card | On the host |
 //! |---|---|
 //! | the moment and its ingest (`hnn_moment_ingest`, [`ResidentMoment`]); a pending ratio's counts frozen at its cut ([`MomentSnapshot`]) | the lift point `λ`, the receiving parametron's active suffix address (`hnn::receiving::ActiveAddress`, shifted at every ingested cell) and the host's mirror of the moment (the pending ratio's operand, which the deposit's samples and the state's bits read), checked equal at every ingest |
-//! | the published constitution's loci at their lattices, the moved words scattered at each publication (`hnn::publication`) | the constitution `Θ`, the normal laws' prox steps, the receiving parametron's landmark tree and its deposit (Decision 28), the budgeted carry and its remainders, the budget (`Constitution::deposited`), and the operators `I − ½K`, `m_a` formed from it |
+//! | the published constitution's loci at their lattices, the moved words scattered at each publication (`hnn::publication`) | the constitution `Θ`, the normal laws' prox steps, the receiving parametron's landmark tree and its deposit with its certificates (Decision 28), the budgeted carry and its remainders, the budget (`Constitution::deposited`), and the operators `I − ½K`, `m_a` formed from it |
 //! | the keyed charts, their rounded Newton–Schulz steps and exact certificates (`hnn::store`) | each refinement's decisions from the certificates (warm, cold, fallback, target), the cold start's transpose and the exact fallback |
-//! | the word's open (`E_g M_g[c]`, the pair port), its ticks, its receiving read (`hnn_pair_weights`, `hnn_word_forward`) | the landmark tree's face read at each phase's causal address at compare and its grain exponents added to the card's logits (Decision 28: the tree stays with the host's constitution, as Decision 27's masses did; the host's tree read per window is timed as `WallTimes::tree_read` beside the card's word), the faces in `ℚ(θ)`, each tick's balance, the release (`hnn::readout`) |
-//! | the word's return (`hnn_word_reverse`) | the Holon ratio and its covector, the return's source through `Rᵀ` (the covector lives on `(1/W)ℤ`), the composition onto the loci (`reference::compose`) |
+//! | the word's open (`E_g M_g[c]`, the pair port), its ticks, its receiving read (`hnn_pair_weights`, `hnn_word_forward`) | the faces in `ℚ(θ)`, each tick's balance, the release (`hnn::readout`) |
+//! | the receiving parametron's landmark tree mirrored (`hnn::tree::CardTree`, campaign 2): each window's splits at every phase's causal address in cell order (the known targets' deposits applied and undone on the card), and each deposit's opened-path update | the class faces from the splits and their grain exponents (`landmark::faces_of_splits`), added to the card's wave at the grain (`ReceivingPhases::combine`); the mirror's founded count checked against the host's tree after every deposit |
+//! | the word's return (`hnn_word_reverse`) | the compare phase under the hardware law (`reference::compare_phase`: the tree at the grain beside the mixture score, the Holon ratio and its covector), the return's source through `Rᵀ` (the covector lives on `(1/W)ℤ`), the composition onto the loci (`reference::compose`) |
 //! | | keys, the collapse, the first law's ledger, the handles, every refusal's reason |
 //!
-//! [open] **The tree read stays on the host, a #76 debt** (Decision 28; the primary's ruling): the
-//! landmark tree's 256-class face at each phase's causal address took 1,720 µs a window on the host
-//! (`WallTimes::tree_read`, 5,288,453 µs over the standing cut's 3,074 windows) against the card's
-//! word at 2,110 µs a window (the refine read, 6,488,213 µs), not small against it; its card port is
-//! owed in #76. The host phases around it (the Holon ratio with the tree-alone and mixture readings,
-//! the deposit, the re-read) dominate the wall.
+//! [definition; agent-inferred] **The tree read moved to the card** (campaign 2; Decision 25; the
+//! #76 debt of campaign 1, whose host read took 1,720 µs a window against the card's word at 2,110
+//! µs). The mirror is uploaded at the mount, moved by the same steps as the host's tree at every
+//! deposit, and read at every compare, release and re-read; the host completes the class faces
+//! from the card's splits, and the tree's transfers, reads and updates are timed apart
+//! (`WallTimes::{tree_transfer, tree_read, tree_deposit}`). The host's tree stays the owner: its
+//! deposit keeps the certificates, and the collapse keeps it whole (the mirror is uploaded again
+//! should it ever move).
 //!
 //! [definition] **The current stays on the card between methods** (the hardware law): the
 //! moment's counts, the published loci, the kept charts, and a refine's word (its record and its
@@ -41,21 +44,24 @@ use std::time::Instant;
 
 use holonics::aeon::{ClockLift, EnclosedLedger};
 use holonics::compression::cost::ceil_log2;
+use holonics::hnn::constitution::LandmarkStep;
 use holonics::hnn::constitution::{CAMPAIGN_ONE_BUDGET, DepositReading};
 use holonics::hnn::keys::{self, KeyLocation};
-use holonics::hnn::landmark::code_length;
+use holonics::hnn::landmark::{
+    LandmarkDeclaration, Landmarks, Letter, code_length, faces_of_splits,
+};
 use holonics::hnn::moment::Ingested;
+use holonics::hnn::pending::Against;
 use holonics::hnn::port::{
     Census, Deposit, ExecutionPort, Handle, MomentId, PendingId, PortReceipt, Pullback,
     ReceiptDetail, StagedId, Transpose, port_receipt, release_width, resonance_reading,
     source_order, stepped, wrote_all,
 };
 use holonics::hnn::propagation::path_attenuation;
-use holonics::hnn::ratio::{HolonRatio, PhaseRatio, target_phases};
-use holonics::hnn::receiving::tree_code_length;
+use holonics::hnn::ratio::{HolonRatio, PhaseRatio};
 use holonics::hnn::reference::{
-    BudgetStop, ChartTally, Cut, Declared, ExposedResident, Exposure, WallTimes, compose, expose,
-    window_code_length,
+    BudgetStop, ChartTally, ComparePhase, Cut, Declared, ExposedResident, Exposure, WallTimes,
+    compare_phase, compose, expose, window_code_length,
 };
 use holonics::hnn::retention::{Diamond, aeon_readings, collapse, contained, separator};
 use holonics::hnn::{
@@ -78,6 +84,7 @@ use crate::hnn::moment::{MomentSnapshot, ResidentMoment};
 use crate::hnn::publication::{ContactOperator, Loci, Publication};
 use crate::hnn::readout::{self, Executed};
 use crate::hnn::store::{ChartStore, Pair};
+use crate::hnn::tree::{CardTree, TreeTimes};
 
 fn device(error: DeviceError) -> HnnError {
     error.into_hnn()
@@ -200,6 +207,11 @@ pub struct Mounted<'c> {
     traffic: Rc<Cell<Traffic>>,
     /// The word's and the return's layouts as last derived, shared with the port.
     layouts: Rc<Cell<Option<(Layout, Layout)>>>,
+    /// The receiving parametron's landmark tree mirrored on the card (campaign 2), at the first
+    /// admitted receiver's ring, moved by every deposit's steps as the host's tree is.
+    tree: Option<(usize, CardTree<'c>)>,
+    /// The tree's wall time by part, shared with the port.
+    tree_times: Rc<Cell<TreeTimes>>,
 }
 
 impl<'c> Mounted<'c> {
@@ -227,6 +239,13 @@ impl<'c> Mounted<'c> {
     fn fresh(&mut self) -> u64 {
         self.next += 1;
         self.next
+    }
+
+    /// Share the tree's wall time by part with the port (exterior).
+    fn publish_tree_times(&self) {
+        if let Some((_, tree)) = &self.tree {
+            self.tree_times.set(tree.times());
+        }
     }
 
     fn forget_kept_reads(&mut self) {
@@ -353,10 +372,10 @@ impl<'c> Mounted<'c> {
         })?;
         let read = self.execute(&arrived.ratio, &arrived.moment, publication, card);
         let constitution = successor.unwrap_or(&self.constitution);
+        let tree = self.tree.as_mut();
         let result = read.and_then(|(word, wave)| {
-            let against = arrived
-                .ratio
-                .against(constitution, &wave, &arrived.targets)?;
+            let (against, _, _) =
+                tree_against(tree, constitution, &arrived.ratio, &wave, &arrived.targets)?;
             let scored = arrived
                 .ratio
                 .scored(constitution, &against, &arrived.targets)?;
@@ -411,6 +430,7 @@ pub struct Resident<'c> {
     deadline: Option<u64>,
     traffic: Rc<Cell<Traffic>>,
     layouts: Rc<Cell<Option<(Layout, Layout)>>>,
+    tree_times: Rc<Cell<TreeTimes>>,
 }
 
 /// One-hot exterior cells as their codes (the reference's reading of a cell).
@@ -450,6 +470,7 @@ impl<'c> Resident<'c> {
             deadline: None,
             traffic: Rc::new(Cell::new(Traffic::default())),
             layouts: Rc::new(Cell::new(None)),
+            tree_times: Rc::new(Cell::new(TreeTimes::default())),
         }
     }
 
@@ -464,6 +485,11 @@ impl<'c> Resident<'c> {
     /// (exterior; [`Traffic`]).
     pub fn traffic(&self) -> Traffic {
         self.traffic.get()
+    }
+
+    /// The landmark tree's wall time by part on the last mounted resident (exterior; [`TreeTimes`]).
+    pub fn tree_times(&self) -> TreeTimes {
+        self.tree_times.get()
     }
 
     /// An exposure's deadline in windows (`Reference::with_deadline`).
@@ -516,6 +542,19 @@ impl<'c> Resident<'c> {
             .map(|receiver| ReceivingPhases::declare(field, &constitution, current, receiver))
             .collect::<Result<Vec<_>, _>>()?;
         let publication = Publication::publish(self.card, Loci::of(field, &constitution)?, None)?;
+        // The receiving parametron's tree mirrored on the card, with room for a window's overlay
+        // and a re-read's (`A − 1` deposits past the population).
+        let tree = match admitted.first() {
+            Some(phases) => match constitution.landmarks(phases.ring()) {
+                Some(tree) => Some((
+                    phases.ring(),
+                    CardTree::mirror(self.card, tree, phases.aperture().max(2) - 1)
+                        .map_err(device)?,
+                )),
+                None => None,
+            },
+            None => None,
+        };
         let octets = publication.octets as u64;
         let traffic = Rc::clone(&self.traffic);
         traffic.set(Traffic {
@@ -525,7 +564,7 @@ impl<'c> Resident<'c> {
         Ok(Mounted {
             field: field.clone(),
             current: current.clone(),
-            address: ActiveAddress::of_field(field),
+            address: ActiveAddress::of_field(field, current)?,
             constitution,
             moments: BTreeMap::new(),
             pending: BTreeMap::new(),
@@ -550,8 +589,49 @@ impl<'c> Resident<'c> {
             store: ChartStore::new(self.card, &lattice)?,
             traffic,
             layouts: Rc::clone(&self.layouts),
+            tree,
+            tree_times: Rc::clone(&self.tree_times),
         })
     }
+}
+
+/// **The tree part of a window's faces** (Decision 28; `PendingRatio::against`): on the card's
+/// mirror when it holds the receiving ring's tree, its splits in cell order (the known targets'
+/// deposits applied and undone on the card) completed into class faces on the host
+/// (`landmark::faces_of_splits`) and added to the wave's faces at the grain; otherwise the host's
+/// read. Returns the faces, the read's wall time and the transfers' apart.
+fn tree_against(
+    tree: Option<&mut (usize, CardTree<'_>)>,
+    constitution: &Constitution,
+    ratio: &PendingRatio,
+    wave: &Faces,
+    known: &[usize],
+) -> Result<(Against, std::time::Duration, std::time::Duration), HnnError> {
+    let start = Instant::now();
+    let phases = ratio.phases();
+    let Some((ring, tree)) = tree.filter(|(ring, _)| *ring == phases.ring()) else {
+        let against = ratio.against(constitution, wave, known)?;
+        return Ok((against, start.elapsed(), std::time::Duration::ZERO));
+    };
+    let declaration: &LandmarkDeclaration = constitution
+        .landmarks(*ring)
+        .ok_or(HnnError::MissingReceivingMap { ring: *ring })?
+        .declaration();
+    let before = tree.times().transfer;
+    let addresses = ratio.addresses(known)?;
+    let splits = tree.window_splits(&addresses, known).map_err(device)?;
+    let completing = Instant::now();
+    let trees = faces_of_splits(declaration, &splits, phases.grain())?;
+    let complete = completing.elapsed();
+    let combining = Instant::now();
+    let faces = phases.combine(wave, &trees)?;
+    tree.completed(complete, combining.elapsed());
+    let transfer = tree.times().transfer - before;
+    Ok((
+        Against { faces, trees },
+        start.elapsed() - transfer,
+        transfer,
+    ))
 }
 
 fn zero_ticks(field: &Field) -> Vec<u64> {
@@ -597,11 +677,19 @@ impl<'c> Resident<'c> {
                 read
             }
         };
-        // The tree part of the combined face at each phase's causal address (Decision 28), read
-        // on the host from the published constitution's tree.
-        let start = Instant::now();
-        let against = ratio.against(&resident.constitution, &faces, targets)?;
-        wall.tree_read = start.elapsed();
+        // The tree part of the combined face at each phase's causal address (Decision 28): the
+        // splits read on the card's mirror of the published tree, the class faces completed on the
+        // host.
+        let (against, read, transfer) = tree_against(
+            resident.tree.as_mut(),
+            &resident.constitution,
+            ratio,
+            &faces,
+            targets,
+        )?;
+        wall.tree_read = read;
+        wall.tree_transfer = transfer;
+        resident.publish_tree_times();
         let start = Instant::now();
         let residual: Vec<Vec<Rat>> = faces
             .logits
@@ -609,19 +697,16 @@ impl<'c> Resident<'c> {
             .zip(&slot.emitted)
             .map(|(now, then)| now.iter().zip(then).map(|(a, b)| a - b).collect())
             .collect();
-        let tree_grain = against
-            .trees
-            .iter()
-            .zip(targets)
-            .map(|(face, &target)| tree_code_length(face, target))
-            .collect::<Result<Vec<_>, _>>()?;
         // The receiver's scored face: the mixture of the tree's and the combined face (ruling A),
         // its ratio stepped phase by phase, scored on the host as the reference scores it; beside
-        // it the tree's executed face alone.
-        let scored = ratio.scored(&resident.constitution, &against, targets)?;
-        let anchors = target_phases(field, ratio.anchor(), phases.ring(), targets)?;
-        let holon = HolonRatio::compare(against.faces, targets, &anchors)?;
-        let covector = holon.covector()?;
+        // it the tree's executed face alone, the tree at the grain, the Holon ratio and its
+        // covector, under the hardware law (`reference::compare_phase`).
+        let ComparePhase {
+            tree_grain,
+            scored,
+            holon,
+            covector,
+        } = compare_phase(field, &resident.constitution, ratio, against, targets)?;
         resident.constitution.receiving_map(phases.ring()).ok_or(
             HnnError::MissingReceivingMap {
                 ring: phases.ring(),
@@ -814,7 +899,14 @@ impl<'c> ExecutionPort for Resident<'c> {
         }
         // The receiving parametron's active suffix address receives the cells the moment took.
         for &code in &codes[..ingested.cells] {
-            resident.address.receive(code);
+            resident.address.receive(code)?;
+        }
+        if !resident.address.reader().agrees(&field, &resident.current) {
+            return Err(HnnError::Shape {
+                what: "the address register's clock against the lift point",
+                expected: field.rings().len(),
+                found: 0,
+            });
         }
         // Every other open moment steps from the one lift point: its card's phases follow it.
         if ingested.cells > 0 && resident.moments.len() > 1 {
@@ -895,6 +987,7 @@ impl<'c> ExecutionPort for Resident<'c> {
         }
         let location = keys::locate_closing(&field, &resident.current, &codes, offset)?;
         let jumps = location.rekey(&field, &mut resident.current)?;
+        resident.address.synchronize(&field, &resident.current)?;
         // Re-keying moves only the lift's phase classes: every resident moment steps from them.
         for moment in resident.moments.values_mut() {
             moment
@@ -1177,6 +1270,23 @@ impl<'c> ExecutionPort for Resident<'c> {
             Err(refusal) => return Err(refusal),
         };
         let deposited = start.elapsed();
+        // The card's mirror of the tree moved by the deposit's steps, as the host's moved.
+        let start = Instant::now();
+        if let Some((ring, tree)) = resident.tree.as_mut() {
+            let steps: Vec<(Vec<Letter>, usize)> = slot
+                .landmarks()
+                .iter()
+                .filter(|step: &&LandmarkStep| step.ring == *ring)
+                .map(|step| (step.address.clone(), step.class))
+                .collect();
+            tree.deposit(&steps).map_err(device)?;
+            if next.landmarks(*ring).map(Landmarks::nodes) != Some(tree.nodes()) {
+                return Err(HnnError::Realization {
+                    what: "the card's landmark tree against the host's after a deposit",
+                });
+            }
+        }
+        let tree_deposit = start.elapsed();
         let start = Instant::now();
         // The successor's loci on the card (the moved words), then the arrived re-read on them.
         let successor = Rc::new(Publication::publish(
@@ -1208,7 +1318,9 @@ impl<'c> ExecutionPort for Resident<'c> {
         resident.publication = successor;
         resident.forget_kept_reads();
         resident.wall.deposited += deposited;
+        resident.wall.tree_deposit += tree_deposit;
         resident.wall.reread += reread_time;
+        resident.publish_tree_times();
         Ok(InteractionReturn {
             forward: Component::Present(()),
             pullback: Component::Absent("a deposit consumes covectors"),
@@ -1239,7 +1351,15 @@ impl<'c> ExecutionPort for Resident<'c> {
         resident.tally.read(&word.readings);
         // No cell of the window is released yet: every phase reads the tree at the window's
         // opening address (`ActiveAddress::phase`), as the reference's release does.
-        let faces = ratio.against(&resident.constitution, &wave, &[])?.faces;
+        let faces = tree_against(
+            resident.tree.as_mut(),
+            &resident.constitution,
+            &ratio,
+            &wave,
+            &[],
+        )?
+        .0
+        .faces;
         let field = &resident.field;
         let phases = ratio.phases().clone();
         let anchors = readout::anchors(&word.word.plan, &word.word.record);
@@ -1305,6 +1425,14 @@ impl<'c> ExecutionPort for Resident<'c> {
         let field = resident.field.clone();
         resident.forget_kept_reads();
         let collapsed = collapse(&field, &mut resident.constitution, admitted)?;
+        // The collapse keeps the tree whole (`hnn::retention`); the mirror is uploaded again should
+        // it ever move.
+        if let Some((ring, tree)) = resident.tree.as_mut()
+            && resident.constitution.landmarks(*ring).map(Landmarks::nodes) != Some(tree.nodes())
+            && let Some(host) = resident.constitution.landmarks(*ring)
+        {
+            tree.upload(&host.arena()).map_err(device)?;
+        }
         // The descended constitution published on the card at the same commit.
         let descended = Rc::new(Publication::publish(
             self.card,

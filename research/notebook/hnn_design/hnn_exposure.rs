@@ -357,6 +357,7 @@ fn card_exposure(deadline: Option<u64>, field: &Field, cut: &Cut) -> (Exposure, 
     };
     let exposure = port.expose(field, cut).expect("the exposure on the card");
     let traffic = port.traffic();
+    let tree = port.tree_times();
     let windows = u128::from(exposure.compares);
     let per_window = |octets: u64| mean(u128::from(octets), windows);
     let realized = port.word_layouts().map_or_else(
@@ -379,7 +380,8 @@ fn card_exposure(deadline: Option<u64>, field: &Field, cut: &Cut) -> (Exposure, 
          returns (carried reads and records): {} ({} a window, {} returns)\n\
          publications (the loci's moved words): {} ({} a window)\n\
          ingests (cells and receipts): {} ({} a window)\n\
-         realization (the hardware law's report): {realized}",
+         realization (the hardware law's report): {realized}\n\
+         the landmark tree on the card (campaign 2; exterior wall time, µs, per window as quotient rem remainder): {} phases read, {} cells deposited; transfers {} a window, the card's reads {} a window, the host's class faces from the splits {} a window, the combined faces {} a window, the deposits' updates {} a window",
         exposure.compares,
         traffic.words,
         per_window(traffic.words),
@@ -390,7 +392,14 @@ fn card_exposure(deadline: Option<u64>, field: &Field, cut: &Cut) -> (Exposure, 
         traffic.publications,
         per_window(traffic.publications),
         traffic.ingest,
-        per_window(traffic.ingest)
+        per_window(traffic.ingest),
+        tree.reads,
+        tree.deposits,
+        mean(tree.transfer.as_micros(), windows),
+        mean(tree.read.as_micros(), windows),
+        mean(tree.complete.as_micros(), windows),
+        mean(tree.combine.as_micros(), windows),
+        mean(tree.deposit.as_micros(), windows)
     );
     (exposure, Some(line))
 }
@@ -424,15 +433,16 @@ fn phases(exposure: &Exposure, wall: u128) {
     let sum = exposure.wall.total().as_millis();
     row("phases' sum", sum);
     row("rest of exposure", wall.saturating_sub(sum));
-    // The host's tree read against the word, per window in microseconds (Decision 28: the tree's
-    // card port is a #76 debt only if its read is not small against the word).
+    // The tree read against the word, per window in microseconds (Decision 28; campaign 2: on the
+    // card, the mirror's launches and the host's completion of the class faces, the transfers and
+    // the deposits' updates apart).
     let micros = |time: std::time::Duration| time.as_micros();
     let (tree, word) = (
         micros(exposure.wall.tree_read),
         micros(exposure.wall.refine_read),
     );
     println!(
-        "the host's tree read per window: {} us; the word (refine read) per window: {} us; tree read over word: {}",
+        "the tree read per window: {} us; the word (refine read) per window: {} us; tree read over word: {}",
         mean(tree, windows),
         mean(word, windows),
         if word == 0 {
@@ -440,6 +450,13 @@ fn phases(exposure: &Exposure, wall: u128) {
         } else {
             format!("{} rem {} over {word}", tree / word, tree % word)
         }
+    );
+    println!(
+        "the tree's transfers per window: {} us; its deposits' updates per window: {} us; the compare phase (holon and covector) per window: {} us; the host's deposit (deposited) per window: {} us",
+        mean(micros(exposure.wall.tree_transfer), windows),
+        mean(micros(exposure.wall.tree_deposit), windows),
+        mean(micros(exposure.wall.holon), windows),
+        mean(micros(exposure.wall.deposited), windows)
     );
 }
 

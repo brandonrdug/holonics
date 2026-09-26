@@ -1,6 +1,7 @@
 //! Compile the resident HNN's kernels (`kernels/hnn.cu`, with `kernels/exact_integer.cuh`) to PTX
 //! with `nvcc`, for the existing driver to load (`Module::load_ptx`; the driver lowers the PTX for
-//! the mounted card).
+//! the mounted card); and the landmark tree's kernels (`kernels/tree.cu`, campaign 2) as their own
+//! image, `tree.ptx`, which `src/hnn/tree.rs` loads.
 //!
 //! Ported from `13f8c734:crates/holonics-cuda/build.rs`, cut to one translation unit. Two of its
 //! laws are kept:
@@ -24,10 +25,11 @@ use std::process::Command;
 /// lowers its PTX for any newer card.
 const UNATTENDED_FLOOR: &str = "compute_75";
 
-const SOURCES: [&str; 3] = [
+const SOURCES: [&str; 4] = [
     "kernels/hnn.cu",
     "kernels/exact_integer.cuh",
     "kernels/hnn_word.cuh",
+    "kernels/tree.cu",
 ];
 
 /// Ask the mounted device what it is: `nvidia-smi` reports `8.9`, `nvcc` wants `compute_89`.
@@ -94,8 +96,12 @@ fn main() {
     }
     let output =
         PathBuf::from(env::var_os("OUT_DIR").expect("Cargo supplies OUT_DIR")).join("hnn.ptx");
+    // The landmark tree's kernels are their own translation unit (`src/hnn/tree.rs` loads them).
+    let tree_output =
+        PathBuf::from(env::var_os("OUT_DIR").expect("Cargo supplies OUT_DIR")).join("tree.ptx");
     let absent = |reason: &str| {
         std::fs::write(&output, b"").expect("OUT_DIR is writable");
+        std::fs::write(&tree_output, b"").expect("OUT_DIR is writable");
         println!("cargo:warning=the HNN kernels are not built: {reason}");
         println!("cargo:rustc-env=HOLONICS_CUDA_KERNELS=absent: {reason}");
     };
@@ -123,5 +129,18 @@ fn main() {
         .status()
         .unwrap_or_else(|error| panic!("{} could not run: {error}", nvcc.display()));
     assert!(status.success(), "nvcc refused kernels/hnn.cu");
+    let status = Command::new(&nvcc)
+        .args([
+            "--ptx",
+            "-O3",
+            "--std=c++20",
+            &format!("--gpu-architecture={architecture}"),
+            "kernels/tree.cu",
+            "-o",
+        ])
+        .arg(&tree_output)
+        .status()
+        .unwrap_or_else(|error| panic!("{} could not run: {error}", nvcc.display()));
+    assert!(status.success(), "nvcc refused kernels/tree.cu");
     println!("cargo:rustc-env=HOLONICS_CUDA_KERNELS={architecture}");
 }

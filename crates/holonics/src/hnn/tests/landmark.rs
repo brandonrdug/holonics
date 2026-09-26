@@ -5,15 +5,20 @@
 //! weight's rounding; the β chart's rebase and its certified residual; the opened path's telescope;
 //! the certified binary logarithm and the grain exponents; the derived widths; the stored bits;
 //! score and deposit against receive; a window's faces in cell order on a working overlay against
-//! the deposited tree; the refusals; and the prequential measurement.
+//! the deposited tree; the refusals; and the prequential measurement. Campaign 2: the enlarged tree
+//! addressed by typed bundles (its faces normalized and certified against the oracle with its join,
+//! the cell-only branch kept within one bit a dyadic cell, a window in cell order, the letters
+//! refused outside their family), the carrier's rebase with its enclosure, and a declaration past
+//! the old `u128` refusal whose certified residual stays within the grain.
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
 
 use crate::hnn::HnnError;
 use crate::hnn::landmark::{
-    Beta, IdealLandmarks, LandmarkDeclaration, Landmarks, Letter, address, binary_log,
-    carrier_width, choose_depth, code_length, face_bits, prequential,
+    Beta, Bundle, Feature, IdealLandmarks, LandmarkDeclaration, LandmarkFace, Landmarks, Letter,
+    LetterFamily, address, binary_log, carrier_width, cell_letters, choose_depth, code_length,
+    face_bits, letter_address, prequential,
 };
 use crate::hnn::ratio::log2_enclosure;
 use crate::hnn::receiving::grain_exponent;
@@ -27,6 +32,7 @@ fn declaration(alphabet: usize, depth: usize) -> LandmarkDeclaration {
         forced: 0,
         population: 64,
         grain: 16,
+        family: LetterFamily::cells(),
     }
 }
 
@@ -566,7 +572,7 @@ fn landmark_prequential_partitions_the_cut() {
         held_out: vec![tail],
     };
     let declared = declaration(4, 2);
-    let run = prequential(&cut, &declared).unwrap();
+    let run = prequential(&cut, &cell_letters(&cut.cells), &declared).unwrap();
     assert_eq!(run.development.cells, 36);
     assert_eq!(run.held_out.cells, 12);
     let mut tree = Landmarks::new(declared.clone()).unwrap();
@@ -584,15 +590,337 @@ fn landmark_prequential_partitions_the_cut() {
     assert_eq!(run.run.bits, tree.bits());
     assert!(run.run.largest_residual <= run.run.face_rule);
 
-    let sweep = choose_depth(&cut, &declared).unwrap();
+    let sweep = choose_depth(&cut, &cell_letters(&cut.cells), &declared).unwrap();
     let mut other = cut.clone();
     for cell in &mut other.cells[36..] {
         *cell = 3 - *cell;
     }
-    assert_eq!(choose_depth(&other, &declared).unwrap(), sweep);
+    assert_eq!(
+        choose_depth(&other, &cell_letters(&other.cells), &declared).unwrap(),
+        sweep
+    );
     assert!(!sweep.tried.is_empty());
     assert_eq!(
         sweep.description_bits,
         crate::compression::cost::ceil_log2(&BigUint::from(sweep.tried.len()))
     );
+}
+
+// -------------------------------------------------------------------------------------------
+// campaign 2: typed bundles, the enlarged tree that keeps the cell-only branch, and the carrier
+
+/// A family of two phase slots (grains 3 and 2).
+fn phase_family() -> LetterFamily {
+    LetterFamily::new(vec![
+        Feature::Phase { ring: 0, grain: 3 },
+        Feature::Phase { ring: 1, grain: 2 },
+    ])
+    .unwrap()
+}
+
+/// Each tick's bundle: its cell with the features `(i mod 3, ⌊i/3⌋ mod 2)`.
+fn bundles(stream: &[usize], family: &LetterFamily) -> Vec<Letter> {
+    stream
+        .iter()
+        .enumerate()
+        .map(|(i, &cell)| {
+            Letter::Bundle(Bundle {
+                cell,
+                features: family
+                    .encode(&[(i % 3) as u64, ((i / 3) % 2) as u64])
+                    .unwrap(),
+            })
+        })
+        .collect()
+}
+
+fn bundle_declaration(alphabet: usize, depth: usize) -> LandmarkDeclaration {
+    LandmarkDeclaration {
+        family: phase_family(),
+        ..declaration(alphabet, depth)
+    }
+}
+
+/// **The enlarged tree's faces are normalized and certified** (Lean `HNN/LandmarkTree.{
+/// lattice_path_laws, cell_faces_partition, executed_face_bound}`, `HNN/LandmarkAddress`): with a
+/// declared family each dyadic cell joins the cell tree and the bundle tree, and at every step the
+/// all-class face sums to 1 exactly, each class's face is the one-class read and a dyadic of at
+/// most `B · M_p` bits, each grain exponent is `grain_exponent`'s, the splits rebuild the face, the
+/// ideal oracle (the join in ℚ) sums to 1, and each cell's certificate lies within the rule and
+/// holds against the oracle.
+#[test]
+fn landmark_bundle_tree_is_normalized_and_certified() {
+    let alphabet = 5;
+    let stream: Vec<usize> = (0..60u64).map(|t| ((t * 7 + t / 3) % 5) as usize).collect();
+    for forced in [0, 1] {
+        let declared = LandmarkDeclaration {
+            forced,
+            ..bundle_declaration(alphabet, 2)
+        };
+        let letters = bundles(&stream, &declared.family);
+        let mut tree = Landmarks::new(declared.clone()).unwrap();
+        let mut oracle = IdealLandmarks::new(declared.clone(), None).unwrap();
+        assert_eq!(declared.branch_depths(), vec![2, 6]);
+        assert_eq!(declared.path_depth(), 10);
+        assert!(tree.face_rule() < rat(1, 32));
+        let bits = tree.digits() * tree.face_bits();
+        for (position, &cell) in stream.iter().enumerate() {
+            let here = letter_address(&letters, position, 2);
+            let face = tree.face(&here, 16).unwrap();
+            let sum: Rat = face.probabilities.iter().cloned().sum();
+            assert_eq!(sum, Rat::one());
+            let rebuilt =
+                LandmarkFace::of_splits(&declared, &tree.splits(&here).unwrap(), 16).unwrap();
+            assert_eq!(rebuilt, face);
+            let ideal: Rat = (0..alphabet)
+                .map(|class| oracle.probability(&here, class).unwrap())
+                .sum();
+            assert_eq!(ideal, Rat::one());
+            for class in 0..alphabet {
+                let p = &face.probabilities[class];
+                assert!(p > &Rat::zero());
+                assert_eq!(p, &tree.probability(&here, class).unwrap());
+                assert!(p.denom() <= &(BigInt::one() << bits as usize));
+                let exact = grain_exponent(p.numer().magnitude(), p.denom().magnitude(), 16);
+                assert_eq!(face.exponents[class], exact.unwrap());
+            }
+            let reading = tree.receive(&here, cell).unwrap();
+            let ideal = oracle.receive(&here, cell).unwrap();
+            assert!(reading.residual <= tree.face_rule());
+            assert!(within(&reading.executed, &ideal, &reading.residual));
+        }
+        // Both branches opened: the cell tree's and the bundle tree's paths.
+        let here = letter_address(&letters, stream.len(), 2);
+        let paths = tree.opened(&here, 3).unwrap();
+        assert!(paths.iter().any(|path| path.branch == 0));
+        assert!(paths.iter().any(|path| path.branch == 1));
+    }
+}
+
+/// **The enlarged tree keeps the cell-only branch** (Lean
+/// `HNN/LandmarkAddress.cell_only_dominance_with_feature_charge`, on the ideal oracles with `β`
+/// exact): over any stream the join at each dyadic cell is the sequential mixture of the two
+/// branches (`sequential_mixture`), so the enlarged code is at most the cell tree's plus one bit per
+/// dyadic cell opened, `∏ q_enlarged · 2^H ≥ ∏ q_cells`. And where the features carry what the
+/// cells do not (the next cell's parity is its tick's phase, which the previous cell leaves plural),
+/// the enlarged executed tree codes strictly shorter, by disjoint exact enclosures.
+#[test]
+fn landmark_enlarged_tree_keeps_the_cell_only_branch() {
+    let mut draw = super::support::Draw::new(5);
+    let stream: Vec<usize> = (0..240)
+        .map(|i| 2 * (draw.next() % 2) as usize + usize::from(i % 3 == 0))
+        .collect();
+    let cells_only = LandmarkDeclaration {
+        population: 240,
+        ..declaration(4, 1)
+    };
+    let enlarged = LandmarkDeclaration {
+        population: 240,
+        ..bundle_declaration(4, 1)
+    };
+    let letters = bundles(&stream, &enlarged.family);
+    let mut cell_oracle = IdealLandmarks::new(cells_only.clone(), None).unwrap();
+    let mut oracle = IdealLandmarks::new(enlarged.clone(), None).unwrap();
+    let (mut product, mut cell_product) = (Rat::one(), Rat::one());
+    let mut opened = std::collections::BTreeSet::new();
+    for (position, &cell) in stream.iter().enumerate() {
+        product *= oracle
+            .receive(&letter_address(&letters, position, 1), cell)
+            .unwrap();
+        cell_product *= cell_oracle
+            .receive(&address(&stream, position, 1), cell)
+            .unwrap();
+        for path in oracle
+            .opened(&letter_address(&letters, position, 1), cell)
+            .unwrap()
+        {
+            opened.insert(path.dyadic);
+        }
+        let joins = Rat::from_integer(BigInt::one() << opened.len());
+        assert!(&product * joins >= cell_product, "cell {position}");
+    }
+    // The features carry the parity: the enlarged executed tree codes shorter than the cell tree.
+    let executed = |declared: &LandmarkDeclaration, letters: &[Letter]| {
+        let mut tree = Landmarks::new(declared.clone()).unwrap();
+        let mut sum = crate::ratio::algebraic::ExactInterval::point(Rat::zero());
+        for (position, &cell) in stream.iter().enumerate() {
+            let reading = tree
+                .receive(&letter_address(letters, position, 1), cell)
+                .unwrap();
+            sum = crate::hnn::ratio::interval_sum(&sum, &code_length(&reading.executed).unwrap())
+                .unwrap();
+        }
+        sum
+    };
+    let with_letters = executed(&enlarged, &letters);
+    let cells = executed(&cells_only, &cell_letters(&stream));
+    assert!(with_letters.upper < cells.lower);
+}
+
+/// **A window's faces in cell order on the enlarged tree** (`Landmarks::window_faces`): phase `j`
+/// reads exactly the face of a clone into which the earlier phases' targets were deposited, the
+/// joins included; the tree is unchanged.
+#[test]
+fn landmark_bundle_window_faces_read_each_phase_after_the_earlier_deposits() {
+    let stream: Vec<usize> = (0..60u64)
+        .map(|t| ((t * 7 + t / 3 + t * t / 11) % 5) as usize)
+        .collect();
+    let declared = LandmarkDeclaration {
+        population: 60,
+        ..bundle_declaration(5, 2)
+    };
+    let letters = bundles(&stream, &declared.family);
+    let mut tree = Landmarks::with_carrier(declared, 6).unwrap();
+    for start in (0..stream.len()).step_by(3) {
+        let window = start..(start + 3).min(stream.len());
+        let addresses: Vec<Vec<Letter>> = window
+            .clone()
+            .map(|position| letter_address(&letters, position, 2))
+            .collect();
+        let known = &stream[window];
+        let before = tree.clone();
+        let faces = tree.window_faces(&addresses, known, 16).unwrap();
+        assert_eq!(tree, before);
+        let mut deposited = tree.clone();
+        for (j, (here, &cell)) in addresses.iter().zip(known).enumerate() {
+            assert_eq!(faces[j], deposited.face(here, 16).unwrap(), "phase {j}");
+            deposited.deposit(here, cell).unwrap();
+        }
+        tree = deposited;
+    }
+    assert!(tree.chart().rebases > 0);
+}
+
+/// **The letters are refused outside their family**: a cell letter where bundles are declared, a
+/// bundle where cells are, and a bundle's features past the family's codes.
+#[test]
+fn landmark_letters_are_refused_outside_their_family() {
+    let mut cells = Landmarks::new(declaration(3, 1)).unwrap();
+    let bundle = Letter::Bundle(Bundle {
+        cell: 0,
+        features: 0,
+    });
+    assert!(matches!(
+        cells.receive(&[bundle], 0),
+        Err(HnnError::Shape { .. })
+    ));
+    let mut tree = Landmarks::new(bundle_declaration(3, 1)).unwrap();
+    assert!(matches!(
+        tree.receive(&[Letter::Cell(0)], 0),
+        Err(HnnError::Shape { .. })
+    ));
+    let past = Letter::Bundle(Bundle {
+        cell: 0,
+        features: 6,
+    });
+    assert!(matches!(
+        tree.receive(&[past], 0),
+        Err(HnnError::Shape { .. })
+    ));
+    tree.receive(&[bundle], 0).unwrap();
+    tree.receive(&[Letter::Boundary], 1).unwrap();
+}
+
+/// **The carrier rebases with its enclosure** (Lean `HNN/LandmarkCarrier.{rebase_decode,
+/// rebase_ratio_enclosed}`, `HNN/LandmarkTree.rebase_log_residual`): at the widths of a 131,072-cell
+/// declaration (`W = 32`, `R = 94`) a β step whose carrier `(N, D)` has a 99-bit odd denominator
+/// passes the mantissa's division, so `D` rebases to its top `R` bits and releases its remainder;
+/// the carried `β'` lies in `[v(1 − 1/m'), v(1 + 1/D̂))` of the exact step `v`, and a carrier within
+/// the division is carried as before.
+#[test]
+fn landmark_carrier_rebases_with_its_enclosure() {
+    let (width, rebase) = (32u64, 94u64);
+    // β = (2^31 + 1)/(2^32 − 1), a KT face 262,145/262,146 in half-units, a child face near 2^48.
+    let (beta_n, beta_d) = ((1u128 << 31) + 1, (1u128 << 32) - 1);
+    let (u, v, below) = (262_145u128, 262_146u128, (1u128 << 48) - 59);
+    let (numerator, denominator) = (beta_n * u, beta_d * v * below);
+    assert!(width + 128 - u64::from(denominator.leading_zeros()) > 128);
+    let carried = Beta::step(numerator, denominator, 48, width, rebase);
+    let kept = carried.released.expect("the carrier rebased");
+    let mantissa = carried.mantissa.expect("a mantissa");
+    assert_eq!(128 - kept.leading_zeros(), 94);
+    let exact = Rat::new(
+        BigInt::from(numerator) << 48usize,
+        BigInt::from(denominator),
+    );
+    let value = carried.beta.value();
+    let one = Rat::one();
+    assert!(value < &exact * (&one + Rat::new(BigInt::one(), BigInt::from(kept))));
+    assert!(value >= &exact * (&one - Rat::new(BigInt::one(), BigInt::from(mantissa))));
+    // Within the division the step is `carry`'s, exact or at its mantissa, releasing nothing.
+    let small = Beta::step(1000, 7, 0, 4, 0);
+    assert!(small.released.is_none());
+    assert_eq!((small.beta, small.mantissa), Beta::carry(1000, 7, 0, 4));
+}
+
+/// **The tree declares past the old refusal and stays within its grain** (Sol's review §4; Lean
+/// `HNN/LandmarkCarrier.width_or_rebase_total`): campaign 1's `|A| = 256`, `D = 4`, `L_R = 16` was
+/// refused from 87,382 cells, where the β step's product `2W + κ + M_p + 1` passed 128 bits. At
+/// 131,072 cells the widths stay the rule's (`M_p = 48`, `W = 32`, never reduced), the carrier
+/// rebases at `R = 94` bits, and over the whole passage every cell's certified residual lies within
+/// the rule, which lies below half the declared grain; the declaration reaches `2^19` cells.
+#[test]
+fn landmark_tree_declares_past_the_old_refusal_and_stays_within_the_grain() {
+    let population = 131_072u64;
+    let declared = LandmarkDeclaration {
+        population,
+        ..declaration(256, 4)
+    };
+    let mut tree = Landmarks::new(declared.clone()).unwrap();
+    let widths = tree.widths();
+    assert_eq!(widths.face, face_bits(population, 8, 16, 4));
+    assert_eq!(widths.carrier, carrier_width(population, 8, 16, 4));
+    assert_eq!((widths.face, widths.carrier, widths.rebase), (48, 32, 94));
+    let kappa = 64 - (2 * population + 2).leading_zeros() as u64;
+    assert!(
+        2 * widths.carrier + kappa + widths.face + 1 > 128,
+        "the old refusal"
+    );
+    let rule = tree.face_rule();
+    assert!(rule < rat(1, 32));
+    // The declaration reaches 2^19 cells before a lattice product itself passes 128 bits.
+    assert!(
+        Landmarks::new(LandmarkDeclaration {
+            population: 1 << 19,
+            ..declaration(256, 4)
+        })
+        .is_ok()
+    );
+    // A text-like passage: words drawn from a small vocabulary, separated by spaces.
+    let mut draw = super::support::Draw::new(1_024);
+    let words: Vec<Vec<usize>> = (0..96)
+        .map(|_| {
+            let length = 2 + (draw.next() % 7) as usize;
+            (0..length)
+                .map(|_| 97 + (draw.next() % 26) as usize)
+                .collect()
+        })
+        .collect();
+    let mut stream = Vec::with_capacity(population as usize);
+    while stream.len() < population as usize {
+        let word = &words[(draw.next() % 96) as usize];
+        stream.extend(word.iter().copied().chain([32]));
+    }
+    stream.truncate(population as usize);
+    let mut largest = Rat::zero();
+    for (position, &cell) in stream.iter().enumerate() {
+        let reading = tree.receive(&address(&stream, position, 4), cell).unwrap();
+        if reading.residual > largest {
+            largest = reading.residual;
+        }
+    }
+    assert!(largest <= rule);
+    assert_eq!(tree.passed(), population);
+    let chart = tree.chart();
+    assert!(chart.drift <= rule);
+    println!(
+        "131,072 cells: {} nodes, {} rebases, {} carrier releases, largest residual {largest} bits, rule {rule} bits",
+        tree.nodes(),
+        chart.rebases,
+        chart.released
+    );
+    assert!(matches!(
+        tree.receive(&address(&stream, 0, 4), 0),
+        Err(HnnError::PopulationReached { .. })
+    ));
 }

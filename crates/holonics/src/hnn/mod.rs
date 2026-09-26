@@ -91,14 +91,17 @@ pub use field::{
     RingDeclaration,
 };
 pub use keys::{KeyLocation, RingKeys, locate_keys};
-pub use landmark::{LandmarkDeclaration, Landmarks, Letter};
+pub use landmark::{
+    Bundle, ContactReading, Feature, LandmarkDeclaration, Landmarks, Letter, LetterFamily,
+    LockAddress,
+};
 pub use moment::{Capacity, PairPort, SourceMoment};
 pub use pending::PendingRatio;
 pub use port::{
     Deposit, ExecutionPort, Handle, MomentId, PendingId, Pullback, StagedId, Transpose,
 };
 pub use ratio::{Faces, HolonRatio, RatioCovector};
-pub use receiving::{ActiveAddress, GrainCell, ReceivingPhases, ReceivingRead};
+pub use receiving::{ActiveAddress, GrainCell, LetterReader, ReceivingPhases, ReceivingRead};
 pub use reference::{Cut, Exposure, Reference, Resident};
 pub use retention::AeonBoundary;
 pub use word::{Released, Word};

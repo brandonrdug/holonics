@@ -5,7 +5,25 @@
 //!
 //! ```sh
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin
+//! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin letters
 //! ```
+//!
+//! [definition; agent-inferred] **The development harness** (`letters`; campaign 2's receiving
+//! letters, Decision 31): on the **development cells only** (the manifest's held-out range is cut
+//! away before anything is read, and no held-out cell reaches any choice or reading), the tree
+//! addressed by typed bundles (each tick's cell with its declared rings' phase classes, read by the
+//! clock-only replay `hnn::receiving::clock_letters`, the resident's clock law with its key
+//! location and re-keying at each carry-out, without the wave) against the tree with cells only:
+//! - the families tried: every nonempty set of campaign 1's four rings at one declared grain, the
+//!   ring's period `d_g` (its own port chart, an empty fibre) or its parametron's half-turn sheet
+//!   `2`, so `2 (2^4 − 1) = 30` families; each is declared (`LetterFamily`) and read with its own
+//!   depth sweep (`choose_depth`), prequentially, every cell scored before its own deposit;
+//! - each family's description charge: `⌈log₂(30 + 1)⌉ = 5` bits for the family chosen among the
+//!   30 and the cell-only one, plus `⌈log₂⌉` of its depths tried;
+//! - `Δ_tree = L_(tree+letters) − L_(tree, cells) + description`, an exact enclosure, and its
+//!   sign when decided; the family chosen is the least charged code length, kept only when its
+//!   `Δ_tree < 0` is decided, the cell-only tree otherwise;
+//! - the widths each family derives (its path depth `P = D + D(1 + r) + 2`) and its wall time.
 //!
 //! [definition] **What it runs** (the owner's header, `hnn::landmark`):
 //! - the cut file and its manifest (`exterior::read_cut`): the cells and the held-out range;
@@ -39,10 +57,12 @@ mod exterior;
 use std::time::Instant;
 
 use holonics::hnn::landmark::{
-    Coded, DepthSweep, IdealLandmarks, LandmarkDeclaration, Landmarks, OracleCost, TreeRun, Widths,
-    address, choose_depth, code_length, oracle_cost, prequential,
+    Coded, DepthSweep, Feature, IdealLandmarks, LandmarkDeclaration, Landmarks, LetterFamily,
+    OracleCost, TreeRun, Widths, address, cell_letters, choose_depth, code_length, development,
+    oracle_cost, prequential,
 };
 use holonics::hnn::ratio::interval_sum;
+use holonics::hnn::receiving::clock_letters;
 use holonics::hnn::reference::PPM_ORDER;
 use holonics::hnn::{Cut, Field, FieldDeclaration};
 use holonics::ratio::Rat;
@@ -322,12 +342,242 @@ fn hot_path(cut: &Cut, declared: &LandmarkDeclaration, held: &std::ops::Range<us
     );
 }
 
+/// One family's development sweep: its declaration's features, its sweep, the chosen depth's code
+/// length, its description bits, and its wall time.
+struct FamilyRun {
+    name: String,
+    family: LetterFamily,
+    sweep: DepthSweep,
+    bits: ExactInterval,
+    description: u64,
+    wall: u128,
+}
+
+fn chosen_bits(sweep: &DepthSweep) -> ExactInterval {
+    sweep
+        .tried
+        .iter()
+        .find(|(depth, _)| *depth == sweep.chosen)
+        .map(|(_, bits)| bits.clone())
+        .expect("the chosen depth was tried")
+}
+
+/// **The development harness** (module header, "The development harness").
+fn letters_harness(path: &str) {
+    let setup = Instant::now();
+    let (bytes, count, held) = read_cut(path);
+    let field = Field::declare(FieldDeclaration::campaign_one(count as u64))
+        .expect("campaign 1's declared field over the cut");
+    let grain = receiver_grain(&field);
+    let alphabet = field.alphabet();
+    let full = Cut {
+        cells: bytes.iter().map(|&byte| usize::from(byte)).collect(),
+        held_out: vec![held.clone()],
+    };
+    // The development cells alone: nothing after this line reads a held-out cell.
+    let cut = Cut {
+        cells: development(&full),
+        held_out: Vec::new(),
+    };
+    drop(full);
+    let cells = cut.cells.len() as u64;
+    let declared = LandmarkDeclaration {
+        alphabet,
+        depth: 1,
+        forced: 0,
+        population: count as u64,
+        grain,
+        family: LetterFamily::cells(),
+    };
+    println!(
+        "hnn_landmark letters: the development harness (campaign 2's receiving letters, Decision 31) over the cut file {path}"
+    );
+    println!(
+        "development: {cells} cells (the manifest's held-out range {}..{} is cut away before any reading); |A| = {alphabet}, n* = {count}, L_R = {grain}",
+        held.start, held.end
+    );
+    println!("setup: {} ms wall", setup.elapsed().as_millis());
+    println!();
+
+    let clock = Instant::now();
+    let letters = cell_letters(&cut.cells);
+    let cell_sweep = choose_depth(&cut, &letters, &declared).expect("the cell-only sweep");
+    let cell_wall = clock.elapsed().as_millis();
+    sweep(&cell_sweep, &declared, cells, grain);
+    let cell_bits = chosen_bits(&cell_sweep);
+    println!("the cell-only tree: {cell_wall} ms wall");
+    println!();
+
+    let rings = field.rings();
+    let mut families: Vec<(String, LetterFamily)> = Vec::new();
+    for sheet in [false, true] {
+        for subset in 1u32..(1 << rings.len()) {
+            let chosen: Vec<usize> = (0..rings.len()).filter(|g| subset >> g & 1 == 1).collect();
+            let features = chosen
+                .iter()
+                .map(|&ring| Feature::Phase {
+                    ring,
+                    grain: if sheet { 2 } else { rings[ring].period() },
+                })
+                .collect();
+            let name = chosen
+                .iter()
+                .map(|&ring| {
+                    format!(
+                        "ring {ring} (d = {}) at grain {}",
+                        rings[ring].period(),
+                        if sheet { 2 } else { rings[ring].period() }
+                    )
+                })
+                .collect::<Vec<_>>()
+                .join(", ");
+            families.push((
+                name,
+                LetterFamily::new(features).expect("a declared family"),
+            ));
+        }
+    }
+    // ⌈log₂(N + 1)⌉: the family chosen among the N tried and the cell-only tree.
+    let choice_bits = u64::from(64 - (families.len() as u64).leading_zeros());
+    println!(
+        "families tried: {}; the family's description: ⌈log₂({} + 1)⌉ = {choice_bits} bits, plus ⌈log₂⌉ of its depths tried",
+        families.len(),
+        families.len()
+    );
+    let mut runs = Vec::new();
+    for (name, family) in families {
+        let clock = Instant::now();
+        let letters = clock_letters(&field, &family, &cut.cells).expect("the clock letters");
+        let at = LandmarkDeclaration {
+            family: family.clone(),
+            ..declared.clone()
+        };
+        let family_sweep = choose_depth(&cut, &letters, &at).expect("a family's sweep");
+        let wall = clock.elapsed().as_millis();
+        let bits = chosen_bits(&family_sweep);
+        let description = choice_bits + family_sweep.description_bits;
+        runs.push(FamilyRun {
+            name,
+            family,
+            sweep: family_sweep,
+            bits,
+            description,
+            wall,
+        });
+    }
+    println!();
+    println!(
+        "each family against the cell-only tree at its chosen depth, Δ_tree = L_(tree+letters) − L_(tree, cells) + description:"
+    );
+    for run in &runs {
+        let tried: Vec<String> = run
+            .sweep
+            .tried
+            .iter()
+            .map(|(depth, bits)| format!("D = {depth}: {}", per(bits, cells, grain)))
+            .collect();
+        let charged = charged(&run.bits, run.description);
+        let delta = ExactInterval {
+            lower: &charged.lower - &cell_bits.upper,
+            upper: &charged.upper - &cell_bits.lower,
+        };
+        let sign = if delta.upper < Rat::from_integer(BigInt::from(0)) {
+            "Δ_tree < 0 (decided)"
+        } else if delta.lower > Rat::from_integer(BigInt::from(0)) {
+            "Δ_tree > 0 (decided)"
+        } else {
+            "Δ_tree undecided"
+        };
+        let tree = Landmarks::new(LandmarkDeclaration {
+            depth: run.sweep.chosen,
+            family: run.family.clone(),
+            ..declared.clone()
+        })
+        .expect("the chosen declaration");
+        println!(
+            "  {} ({} slots, {} bundle codes):",
+            run.name,
+            run.family.slots(),
+            run.family.bundle_codes(alphabet)
+        );
+        println!("    sweep {}", tried.join("; "));
+        println!(
+            "    chosen D = {} ({}, P = {}); description {} bits; {} ms wall",
+            run.sweep.chosen,
+            widths(&tree.widths()),
+            tree.declaration().path_depth(),
+            run.description,
+            run.wall
+        );
+        let uncharged = ExactInterval {
+            lower: &run.bits.lower - &cell_bits.upper,
+            upper: &run.bits.upper - &cell_bits.lower,
+        };
+        println!(
+            "    uncharged L_(tree+letters) − L_(tree, cells): {}",
+            enclosure(&uncharged, grain)
+        );
+        println!("    Δ_tree {}: {}", sign, enclosure(&delta, grain));
+    }
+    let best = runs
+        .iter()
+        .min_by(|a, b| {
+            let (a, b) = (
+                charged(&a.bits, a.description),
+                charged(&b.bits, b.description),
+            );
+            a.upper.cmp(&b.upper)
+        })
+        .expect("a family");
+    let best_charged = charged(&best.bits, best.description);
+    println!();
+    println!(
+        "the least charged family: {} at D = {}: {} a cell charged ({} bits in all)",
+        best.name,
+        best.sweep.chosen,
+        per(&best_charged, cells, grain),
+        exact(&best_charged.upper)
+    );
+    println!(
+        "the cell-only tree at D = {}: {} a cell",
+        cell_sweep.chosen,
+        per(&cell_bits, cells, grain)
+    );
+    ordering(
+        "least charged family against the cell-only tree",
+        &best_charged,
+        &cell_bits,
+        cells,
+        grain,
+    );
+    if best_charged.upper < cell_bits.lower {
+        println!(
+            "the choice: {} at D = {} (Δ_tree < 0 decided)",
+            best.name, best.sweep.chosen
+        );
+    } else {
+        println!(
+            "the choice: the cell-only family at D = {} (no family's Δ_tree < 0 is decided)",
+            cell_sweep.chosen
+        );
+    }
+    println!();
+    println!(
+        "wall time (exterior): the harness {} ms",
+        setup.elapsed().as_millis()
+    );
+}
+
 fn main() {
     let arguments: Vec<String> = std::env::args().skip(1).collect();
     let path = match arguments.as_slice() {
         [key, value] if key == "cut-file" => value.clone(),
+        [key, value, mode] if key == "cut-file" && mode == "letters" => {
+            letters_harness(value);
+            return;
+        }
         _ => {
-            println!("usage: hnn_landmark cut-file <path>");
+            println!("usage: hnn_landmark cut-file <path> [letters]");
             return;
         }
     };
@@ -347,6 +597,7 @@ fn main() {
         forced: 0,
         population: count as u64,
         grain,
+        family: LetterFamily::cells(),
     };
     let setup = setup.elapsed().as_millis();
     let development = (count - held.len()) as u64;
@@ -366,7 +617,8 @@ fn main() {
     println!();
 
     let clock = Instant::now();
-    let chosen = choose_depth(&cut, &declared).expect("the sweep");
+    let letters = cell_letters(&cut.cells);
+    let chosen = choose_depth(&cut, &letters, &declared).expect("the sweep");
     let sweep_wall = clock.elapsed().as_millis();
     sweep(&chosen, &declared, development, grain);
     println!("the sweep: {sweep_wall} ms wall");
@@ -377,7 +629,7 @@ fn main() {
         ..declared.clone()
     };
     let clock = Instant::now();
-    let run = prequential(&cut, &at).expect("the prequential measurement");
+    let run = prequential(&cut, &letters, &at).expect("the prequential measurement");
     let run_wall = clock.elapsed().as_millis();
     let chosen_bits = chosen
         .tried
@@ -414,7 +666,7 @@ fn main() {
     println!();
 
     let clock = Instant::now();
-    let cost = oracle_cost(&cut, &at).expect("the oracle's run");
+    let cost = oracle_cost(&cut, &letters, &at).expect("the oracle's run");
     let oracle_wall = clock.elapsed().as_millis();
     println!(
         "the oracle's reference width at D = {}: {}",

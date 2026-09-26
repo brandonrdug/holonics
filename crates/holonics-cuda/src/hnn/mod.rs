@@ -23,6 +23,9 @@
 //!   window's word as one graph with its load and release copies); and the inverse charts'
 //!   Newton–Schulz refinement with its exact certificate `‖1 − AX̂‖∞`, warm-started when a deposit
 //!   moves the operator;
+//! - [`tree`] (campaign 2): **the receiving parametron's landmark tree mirrored on the card**, its
+//!   windows' splits in cell order and its deposits' opened-path updates (`kernels/tree.cu`, its own
+//!   translation unit and stream);
 //! - [`port`] (Decision 25): **the execution port resident on the card**, [`Resident`] with its
 //!   resident [`Mounted`], every `InteractionReturn` the host reference's; the exposure protocol
 //!   runs over it (`holonics::hnn::reference::expose`), and [`Traffic`] reads what crossed the bus.
@@ -46,6 +49,8 @@
 //! | `hnn_pair_weights` | one weight `(phase c, rank ρ)`; grid `(d_g, m)` | one residue class `x ≡ t` of the current cells; `threads` as the read's over `|A|` | the earlier cells, `C_c[x, y] a_ρ[x] b_ρ[y]` | the shared tree |
 //! | `hnn_copy_words` | one copy (a chart gathered into a word's operands, or kept) | a residue class of the copy's words | `⌈words/threads⌉` words | none |
 //! | `hnn_scatter_words` | a grid striding a publication's moved words | one moved word | — | none |
+//! | `hnn_tree_splits` ([`tree`]) | one phase's all-class read; grid = the window's phases read together | one splitting dyadic cell (`i ≡ t`); `threads` = the least power of two covering them, at least a warp, within the entry's census | each cell's opened paths (at most `D_b + 1` hash lookups a branch) and the join | none: each split is its own thread's word |
+//! | `hnn_tree_deposit`, `hnn_tree_undo` ([`tree`]) | one cell's deposit (one block of one warp) | one opened digit (its dyadic cell's trees) | the digit's paths bottom-up: β steps, founding, masses | a block prefix sum of the founded counts (the host's numbering) |
 //!
 //! Campaign 1 on the RTX 4080 SUPER (census in the GPU test's output): `E_0 M_0[c]` is `10 × 5`
 //! blocks of 256 threads, one column each; `R P v` is `512 × A` blocks of 32 threads (one warp; 22
@@ -99,6 +104,7 @@
 //! | none (new) | `kernels/hnn.cu::hnn_moment_ingest`, [`moment`] | `SourceMoment::ingest` with `Field::selective_step` | `tests::moment_ingest_matches_the_host_moment`, `tests::campaign_one_reads_and_ingest_match_the_host` (GPU) |
 //! | none (new) | `kernels/hnn.cu::{hnn_word_tick, hnn_word_adjoint_tick}`, `exact_integer.cuh::hnn_nearest`, [`word`] | Lean `HNN/LatticeWord.{feedback_tick, feedback_accounting, executed_adjoint_pairing}` | `word_tests::the_tick_accounts_exactly`; GPU: `word_tick_matches_the_oracle_on_small_fixtures`, `word_tick_accounting_holds_on_the_card`, `word_ticks_match_the_oracle_at_campaign_one_shapes`, `resident_word_equals_the_oracle_word_and_is_measured` |
 //! | none (new; history's float proposal is not ported, below) | `kernels/hnn.cu::{hnn_inverse_residual, hnn_inverse_refine, hnn_inverse_certificate}`, `exact_integer.cuh::hnn_bounded_product`, [`word`] | Lean `HNN/LatticeWord.{nsStep, newton_schulz_right, rounded_refinement_certificate, warm_start_certificate}` | GPU: `word_tests::newton_schulz_matches_the_oracle_on_small_fixtures`, `newton_schulz_matches_the_oracle_at_campaign_one_shapes` |
+//! | none (new; campaign 2) | `kernels/tree.cu::{hnn_tree_splits, hnn_tree_deposit, hnn_tree_undo}`, [`tree`] | `holonics::hnn::landmark::{Landmarks::window_splits, Landmarks::deposit, Beta::step}` | GPU: `tests::the_card_tree_reads_and_deposits_as_the_host_tree`; the port's lockstep tests |
 //! | none (new) | `kernels/hnn_word.cuh::{hnn_word_forward, hnn_word_reverse, hnn_pair_weights, hnn_copy_words, hnn_scatter_words}`, [`port`] | `holonics::hnn::{word::Word, port::Word::pull_back, receiving::ReceivingPhases::read, moment::SourceMoment::open_storage, chart::refine}` and the reference's `ExecutionPort` | GPU: `port_tests::the_card_port_returns_the_reference_on_{the_chain, a_generic_constitution, campaign_one, the_standing_cut}`, `the_card_port_refuses_as_the_reference` |
 //!
 //! **Not ported**, with the reason:
@@ -129,6 +135,7 @@ pub mod port;
 mod publication;
 mod readout;
 mod store;
+pub mod tree;
 pub mod word;
 
 #[cfg(test)]
@@ -145,6 +152,7 @@ pub use card::{
 pub use lattice::{Gather, LatticeCoordinates, LatticeRead, ResidentLattice, ResidentRead};
 pub use moment::{MomentCounts, MomentSnapshot, ResidentMoment};
 pub use port::{Mounted, Resident, Traffic};
+pub use tree::{CardTree, TreeTimes};
 pub use word::{
     CarryRelease, Certificate, ChartRelease, InversePair, Orientation, Refusal, ResidentCarry,
     ResidentCharts, ResidentInverses, WordChart, WordGraph,

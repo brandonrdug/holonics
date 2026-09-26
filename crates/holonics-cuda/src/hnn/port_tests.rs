@@ -439,12 +439,13 @@ fn the_dyadic_readings_are_exact() {
 }
 
 /// Decision 28 on the card's publication (no card needed to form it): the receiving parametron's
-/// tree is not a published locus (no kernel reads it); the host reads it from the constitution at
-/// compare, at each phase's causal address and in cell order (phase 1 after phase 0's target is
-/// deposited, on a working overlay), and the device's formula is the reference's
-/// (`PendingRatio::against`): the wave's faces plus the tree's grain logits.
+/// tree is not a published locus of the word (its own mirror, `tree::CardTree`, carries it); the
+/// reference reads it from the constitution at compare, at each phase's causal address and in cell
+/// order (phase 1 after phase 0's target is deposited, on a working overlay), and the device's
+/// formula is the reference's (`PendingRatio::against`): the wave's faces plus the tree's grain
+/// logits, the tree's faces the class faces of the mirror's splits.
 #[test]
-fn the_tree_is_read_on_the_host_at_each_phases_address() {
+fn the_tree_is_read_at_each_phases_address_in_cell_order() {
     let field = chain();
     let theta = generic(&field, 5);
     assert!(super::publication::Loci::of(&field, &theta).is_ok());
@@ -457,7 +458,7 @@ fn the_tree_is_read_on_the_host_at_each_phases_address() {
             .unwrap();
     let moment = holonics::hnn::SourceMoment::open(&field, &current);
     let mut address = holonics::hnn::ActiveAddress::boundary(phases.depth());
-    address.receive(3);
+    address.receive(3).unwrap();
     let pending =
         holonics::hnn::PendingRatio::produce(&current, &moment, &address, &phases, 0).unwrap();
     let (_, wave) = pending.read(&field, &theta).unwrap();

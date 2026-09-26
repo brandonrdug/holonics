@@ -3,7 +3,10 @@
 //! the receiver and coded in the description; the active suffix address and each phase's causal
 //! address; the combined read of the tree's face and the wave through `R P_R^(τ_R)`; the compare's
 //! landmark steps and their deposit; and the maps' openings (Decision 28: `R_0 = 0`, `E_0` the sign
-//! generator times ½), with the deadlock they avoid.
+//! generator times ½), with the deadlock they avoid. Campaign 2: the receiving letters read from the
+//! clock before the cell they predict (through aeon boundaries and re-keying), restricted by whole
+//! bundles, the sheet grain a scale square of the period grain, and the letters' partitions finite
+//! with injective codes.
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
@@ -13,13 +16,16 @@ use super::support::{Draw, Medium, Parts, lift, small_field};
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Constitution, Locus, Steps};
 use crate::hnn::field::{ConstitutionRead, Current, Field, FieldDeclaration, ReceiverDeclaration};
-use crate::hnn::landmark::{Landmarks, Letter, Widths, address};
+use crate::hnn::keys;
+use crate::hnn::landmark::{
+    Feature, Landmarks, Letter, LetterFamily, Widths, address, letter_address,
+};
 use crate::hnn::pending::PendingRatio;
 use crate::hnn::port::{ExecutionPort, Handle, ReceiptDetail};
 use crate::hnn::ratio::{HolonRatio, log2_enclosure, target_phases};
 use crate::hnn::receiving::{
-    ActiveAddress, GrainCell, ReceivingPhases, ReceivingRead, grain_exponent, grain_logits,
-    landmark_declaration, tree_code_length,
+    ActiveAddress, GrainCell, LetterReader, ReceivingPhases, ReceivingRead, clock_letters,
+    grain_exponent, grain_logits, landmark_declaration, tree_code_length,
 };
 use crate::hnn::reference::{Reference, compose, one_hot};
 use crate::ratio::linear::ExactRatMatrix;
@@ -193,15 +199,15 @@ fn the_phase_address_is_the_trees_causal_address() {
                 let targets = &cells[p..p + aperture];
                 for j in 0..aperture {
                     assert_eq!(
-                        register.phase(targets, j),
+                        register.phase(targets, j).unwrap(),
                         address(&cells, p + j, depth),
                         "depth {depth}, aperture {aperture}, cell {}",
                         p + j
                     );
-                    assert_eq!(register.phase(&[], j), address(&cells, p, depth));
+                    assert_eq!(register.phase(&[], j).unwrap(), address(&cells, p, depth));
                 }
                 for &cell in targets {
-                    register.receive(cell);
+                    register.receive(cell).unwrap();
                 }
                 p += aperture;
             }
@@ -209,7 +215,7 @@ fn the_phase_address_is_the_trees_causal_address() {
         }
     }
     let mut register = ActiveAddress::boundary(3);
-    register.receive(7);
+    register.receive(7).unwrap();
     assert_eq!(
         register.letters(),
         &[Letter::Cell(7), Letter::Boundary, Letter::Boundary]
@@ -297,7 +303,7 @@ fn the_read_adds_the_trees_face_to_the_rotated_wave() {
     .unwrap();
     let mut register = ActiveAddress::boundary(2);
     for &cell in &passage[..9] {
-        register.receive(cell);
+        register.receive(cell).unwrap();
     }
     let targets = [passage[9], passage[10]];
     let faces = phases.tree_faces(&medium, &register, &targets).unwrap();
@@ -365,7 +371,7 @@ fn the_compare_deposits_its_targets_on_their_own_addresses() {
     let phases = phases(&field, &theta, &current);
     let mut register = ActiveAddress::boundary(2);
     for cell in [2usize, 3] {
-        register.receive(cell);
+        register.receive(cell).unwrap();
     }
     let pending = PendingRatio::produce(&current, &open, &register, &phases, 0).unwrap();
     let targets = [1usize, 1];
@@ -723,11 +729,282 @@ fn the_mixture_codes_within_one_bit_of_the_better_face() {
     // The tree read in cell order is the count-only prequential tree, exactly.
     let receiver = &field.receivers()[0];
     let declared = landmark_declaration(&field, receiver).unwrap();
-    let alone = crate::hnn::landmark::prequential(&cut, &declared).unwrap();
+    let letters = crate::hnn::landmark::cell_letters(&cut.cells);
+    let alone = crate::hnn::landmark::prequential(&cut, &letters, &declared).unwrap();
     assert_eq!(exposure.training.tree, alone.development.tree);
     assert_eq!(exposure.held_out.tree, alone.held_out.tree);
     assert_eq!(
         (exposure.training.cells, exposure.held_out.cells),
         (alone.development.cells, alone.held_out.cells)
+    );
+}
+
+// -------------------------------------------------------------------------------------------
+// campaign 2: the receiving letters
+
+/// Campaign 1's field (four closing rings of periods 5, 7, 11, 13) over a declared population.
+fn campaign_field() -> Field {
+    Field::declare(FieldDeclaration::campaign_one(6_148)).unwrap()
+}
+
+/// Rings 0 and 1's phase classes at their declared periods.
+fn clock_family() -> LetterFamily {
+    LetterFamily::new(vec![
+        Feature::Phase { ring: 0, grain: 5 },
+        Feature::Phase { ring: 1, grain: 7 },
+    ])
+    .unwrap()
+}
+
+/// **The bundle letters are read from the clock before the cell they predict** (Lean
+/// `HNN/LandmarkAddress.{bundle_causal, address_descends_retention}`): over a passage long enough
+/// for the joint clock's carry-outs and their re-keyings, a register that receives each cell (its
+/// clock stepping as the lift point does, synchronized after each re-keying) holds
+/// `letter_address` of the replayed clock letters at every window, and each phase's address, read
+/// by a copy of the register's clock over the window's earlier targets, is the letter address at
+/// `p + j`. Changing every cell from `j` on changes no letter of the address at `j`: no bundle reads
+/// the cell it predicts. The register's clock agrees with the lift point throughout.
+#[test]
+fn the_bundle_letters_are_read_from_the_clock_before_the_cell_they_predict() {
+    let field = campaign_field();
+    let family = clock_family();
+    let mut draw = Draw::new(29);
+    let cells: Vec<usize> = (0..3_000).map(|_| (draw.next() % 256) as usize).collect();
+    let letters = clock_letters(&field, &family, &cells).unwrap();
+    assert!(matches!(letters[0], Letter::Bundle(_)));
+    let depth = 3;
+    let aperture = 2;
+    let mut current = Current::at_rest(&field);
+    let mut register = ActiveAddress::of_reader(
+        depth,
+        LetterReader::of(&field, family.clone(), &current).unwrap(),
+    );
+    let (mut aeon_start, mut rekeyed) = (0usize, 0usize);
+    let crib = field.crib();
+    let mut p = 0;
+    while p + aperture <= cells.len() {
+        assert_eq!(
+            register.letters(),
+            letter_address(&letters, p, depth).as_slice()
+        );
+        let targets = &cells[p..p + aperture];
+        for j in 0..aperture {
+            assert_eq!(
+                register.phase(targets, j).unwrap(),
+                letter_address(&letters, p + j, depth),
+                "cell {}",
+                p + j
+            );
+        }
+        for (offset, &cell) in targets.iter().enumerate() {
+            let step = current.step(&field, cell).unwrap();
+            register.receive(cell).unwrap();
+            assert!(register.reader().agrees(&field, &current));
+            if step.carry_out {
+                let end = p + offset + 1;
+                let from = end.saturating_sub(crib.window).max(aeon_start);
+                let location =
+                    keys::locate_closing(&field, &current, &cells[from..end], crib.offset).unwrap();
+                location.rekey(&field, &mut current).unwrap();
+                register.synchronize(&field, &current).unwrap();
+                aeon_start = end;
+                rekeyed += 1;
+            }
+        }
+        p += aperture;
+    }
+    assert!(rekeyed >= 1, "the passage crossed an aeon boundary");
+    for j in [1usize, 17, 400, 1_500, 2_999] {
+        let mut changed = cells.clone();
+        for cell in &mut changed[j..] {
+            *cell = 255 - *cell;
+        }
+        let again = clock_letters(&field, &family, &changed).unwrap();
+        assert_eq!(
+            letter_address(&again, j, depth),
+            letter_address(&letters, j, depth),
+            "the address at {j} reads no cell from {j} on"
+        );
+    }
+}
+
+/// **The address restricts by whole bundles, and the sheet grain is a scale square** (Lean
+/// `HNN/LandmarkAddress.{bundle_restrict, feature_scale_square}`): restricting the address at `D`
+/// to `d` bundles is the address at `d`, and the bundle tree's letters of the restricted address
+/// are the first `d(1 + r)` letters of the full one's; the half-turn sheet letters (grain 2) are the
+/// coarsening `k ↦ ⌊2k/d_g⌋` of the period-grain letters, tick by tick, so coarsening commutes
+/// with the restriction.
+#[test]
+fn the_address_restricts_by_whole_bundles_and_the_sheets_are_a_scale_square() {
+    let field = campaign_field();
+    let family = clock_family();
+    let sheets = LetterFamily::new(vec![
+        Feature::Phase { ring: 0, grain: 2 },
+        Feature::Phase { ring: 1, grain: 2 },
+    ])
+    .unwrap();
+    let mut draw = Draw::new(41);
+    let cells: Vec<usize> = (0..1_500).map(|_| (draw.next() % 256) as usize).collect();
+    let letters = clock_letters(&field, &family, &cells).unwrap();
+    let coarse = clock_letters(&field, &sheets, &cells).unwrap();
+    let declared = |family: LetterFamily| crate::hnn::landmark::LandmarkDeclaration {
+        alphabet: 256,
+        depth: 4,
+        forced: 0,
+        population: 6_148,
+        grain: 16,
+        family,
+    };
+    let tree = Landmarks::new(declared(family.clone())).unwrap();
+    let coarsen = |letter: Letter| match letter {
+        Letter::Bundle(bundle) => {
+            let values = family.decode(bundle.features);
+            Letter::Bundle(crate::hnn::landmark::Bundle {
+                cell: bundle.cell,
+                features: sheets
+                    .encode(&[(2 * values[0]) / 5, (2 * values[1]) / 7])
+                    .unwrap(),
+            })
+        }
+        other => other,
+    };
+    for position in [0usize, 1, 5, 333, 1_499] {
+        let full = letter_address(&letters, position, 4);
+        for d in 0..=4 {
+            assert_eq!(full[..d], letter_address(&letters, position, d)[..]);
+            let restricted = [full[..d].to_vec(), vec![Letter::Boundary; 4 - d]].concat();
+            let flat = tree.arena().letters(&full);
+            let cut = tree.arena().letters(&restricted);
+            assert_eq!(flat[0][..d], cut[0][..d]);
+            assert_eq!(flat[1][..3 * d], cut[1][..3 * d]);
+        }
+        let coarse_address = letter_address(&coarse, position, 4);
+        let mapped: Vec<Letter> = full.iter().map(|&letter| coarsen(letter)).collect();
+        assert_eq!(mapped, coarse_address);
+        for d in 0..=4 {
+            let restricted: Vec<Letter> = full[..d].iter().map(|&l| coarsen(l)).collect();
+            assert_eq!(restricted, letter_address(&coarse, position, d));
+        }
+    }
+}
+
+/// **The letters' partitions are finite and their codes injective** (Lean
+/// `HNN/LandmarkAddress.{phase_partition_finite, farey_partition_finite, bundle_code_injective}`):
+/// a ring's phases `k/d` read at grain `g ≤ d` fall in `[0, g)`, cover it, and each fibre is below
+/// `1/g`; the lock letters at `Q` are `Unlocked` and the reduced `(p, q)`, `0 ≤ p ≤ q ≤ Q`, coded
+/// onto `[0, 2 + Σ_(q ≤ Q) φ(q))` one to one, a non-reduced address refused; the contact slot's
+/// value `lock · 5 + kind` is one to one onto its size; the features' mixed-radix code round-trips
+/// and is one to one; and the bundle code `1 + x + |A| f` is one to one with the boundary at 0.
+#[test]
+fn the_letter_partitions_are_finite_and_their_codes_injective() {
+    use crate::hnn::landmark::{Bundle, ContactReading, LockAddress};
+    use crate::navigator::trace::SiteKind;
+    use std::collections::BTreeSet;
+    for period in [5u64, 7, 11, 13] {
+        for grain in [2u64, period] {
+            let classes: BTreeSet<u64> = (0..period)
+                .map(|k| {
+                    let cell = GrainCell::of(&rat(k as i64, period as i64), grain);
+                    assert!(cell.fibre < rat(1, grain as i64));
+                    assert_eq!(cell.carry, BigInt::zero());
+                    cell.phase
+                })
+                .collect();
+            assert_eq!(classes, (0..grain).collect::<BTreeSet<u64>>());
+        }
+    }
+    let gcd = |mut a: u64, mut b: u64| {
+        while b != 0 {
+            (a, b) = (b, a % b);
+        }
+        a
+    };
+    for denominators in 1u64..=9 {
+        let totients: u64 = (1..=denominators)
+            .map(|q| (1..=q).filter(|&p| gcd(p, q) == 1).count() as u64)
+            .sum();
+        assert_eq!(LockAddress::letters(denominators), 2 + totients);
+        let mut codes = BTreeSet::new();
+        codes.insert(LockAddress::Unlocked.code(denominators).unwrap());
+        for q in 1..=denominators {
+            for p in 0..=q {
+                match LockAddress::locked(p, q, denominators) {
+                    Ok(lock) => assert!(codes.insert(lock.code(denominators).unwrap())),
+                    Err(_) => assert_ne!(gcd(p, q), 1),
+                }
+            }
+        }
+        assert_eq!(codes, (0..LockAddress::letters(denominators)).collect());
+        assert!(LockAddress::locked(1, denominators + 1, denominators).is_err());
+    }
+    let slot = Feature::Contact {
+        contact: 0,
+        denominators: 3,
+    };
+    let kinds = [
+        SiteKind::Rotation,
+        SiteKind::Null,
+        SiteKind::Boost,
+        SiteKind::Reflection,
+        SiteKind::Degenerate,
+    ];
+    let mut values = BTreeSet::new();
+    for q in 1..=3u64 {
+        for p in 0..=q {
+            if let Ok(lock) = LockAddress::locked(p, q, 3) {
+                for kind in kinds {
+                    let reading = ContactReading {
+                        contact: 0,
+                        lock,
+                        kind,
+                    };
+                    assert!(values.insert(slot.contact_value(&reading).unwrap()));
+                }
+            }
+        }
+    }
+    for kind in kinds {
+        let reading = ContactReading {
+            contact: 0,
+            lock: LockAddress::Unlocked,
+            kind,
+        };
+        assert!(values.insert(slot.contact_value(&reading).unwrap()));
+    }
+    assert_eq!(values, (0..slot.size()).collect());
+    let family = LetterFamily::new(vec![
+        Feature::Phase { ring: 0, grain: 3 },
+        slot,
+        Feature::Phase { ring: 1, grain: 2 },
+    ])
+    .unwrap();
+    assert_eq!(family.codes(), 3 * LockAddress::letters(3) * 5 * 2);
+    let mut codes = BTreeSet::new();
+    let mut bundles = BTreeSet::from([family.bundle_code(Letter::Boundary, 4)]);
+    for a in 0..3 {
+        for b in 0..family.features()[1].size() {
+            for c in 0..2 {
+                let code = family.encode(&[a, b, c]).unwrap();
+                assert_eq!(family.decode(code), vec![a, b, c]);
+                assert!(codes.insert(code));
+                for cell in 0..4 {
+                    let letter = Letter::Bundle(Bundle {
+                        cell,
+                        features: code,
+                    });
+                    assert!(bundles.insert(family.bundle_code(letter, 4)));
+                }
+            }
+        }
+    }
+    assert_eq!(u64::from(*codes.iter().max().unwrap()) + 1, family.codes());
+    assert_eq!(bundles.len() as u64, family.bundle_codes(4));
+    assert!(family.encode(&[3, 0, 0]).is_err());
+    assert!(
+        LetterFamily::new(vec![Feature::Phase {
+            ring: 0,
+            grain: 1 << 33
+        }])
+        .is_err()
     );
 }

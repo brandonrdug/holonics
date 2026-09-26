@@ -116,6 +116,7 @@
 //! | the receiving read | the receiving epochs; within each, the map's `2\|A\|` rows, then the classes' grain cells | each row and class reads the shared anchor and writes its own logit or cell |
 //! | the tree read at compare | the receiving phases, each reading the published tree at its own address through its own working overlay (the window's earlier phases' deposits, built first in cell order, `hnn::landmark::Landmarks::window_faces`) | the published tree and every overlay are read, never written, until the deposit |
 //! | the faces and the Holon ratio | the receiving phases' faces, then their ratios and code lengths | each reads its own read and target |
+//! | the compare phase ([`compare_phase`], campaign 2) | the tree face at the grain's code lengths (its phases together), beside the mixture score, the target phases, the Holon ratio and its covector (the mixture's steps in cell order inside) | both read the shared immutable faces and targets and write their own readings |
 //! | `pull_back` | per step in reverse, the junctions at their recorded anchors, then the elements (each through its executed chart's transpose), then the transits (each through its executed chart's transpose, and each channel coordinate), then the junctions' reverse Swings at their executed weights (and each coordinate) | each reads its step's record, its own covectors and its own adjoint remainders, and writes its own; the conductance terms are added afterwards, in contact, then ring and incidence, order |
 //! | [`compose`] | the receiving map's gradient by row blocks; the rings (their ticks' charts, slices and contrast port's rows); the standings; the source ring's phases and pair-port ranks; the contacts (their ticks' charts and three forms) | each reads the word's return and its own material; the parts are joined in ring and contact order, so the deposit's steps stand in the serial order |
 //! | `deposit` ([`Constitution::deposited`]) | the loci the deposit names, each running its own steps in the deposit's order with its own budgeted carry; within a normal law, its samples' terms, its map update's row blocks, its Gram's rows and its carried entries | loci share no material, remainder or budgeted carry, and entries share nothing; the refusal returned is the first in the deposit's order |
@@ -159,16 +160,20 @@ use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::keys::{self, KeyLocation};
 use crate::hnn::landmark::{Letter, code_length};
 use crate::hnn::moment::{Ingested, PopulationChart, SourceMoment};
-use crate::hnn::pending::PendingRatio;
+use crate::hnn::pending::{Against, PendingRatio};
 use crate::hnn::port::{
     Census, ContactPullback, Deposit, ExecutionPort, Handle, MomentId, PendingId, PortReceipt,
     Pullback, ReceiptDetail, RingPullback, StagedId, Transpose, WordReturn, port_receipt,
     release_width, resonance_reading, source_order, wrote_all,
 };
 use crate::hnn::propagation::{contact_exponent, path_attenuation};
-use crate::hnn::ratio::{Faces, HolonRatio, PhaseRatio, interval_sum, target_phases};
+use crate::hnn::ratio::{
+    Faces, HolonRatio, PhaseRatio, RatioCovector, interval_sum, target_phases,
+};
 use crate::hnn::realization::{apply_rows, indexed, outer_rows};
-use crate::hnn::receiving::{ActiveAddress, MixtureStep, ReceivingPhases, tree_code_length};
+use crate::hnn::receiving::{
+    ActiveAddress, MixtureStep, ReceivingPhases, Scored, tree_code_length,
+};
 use crate::hnn::retention::{AeonBoundary, Diamond, aeon_readings, collapse, contained, separator};
 use crate::hnn::word::KeptWord;
 use crate::holon::contact::FeatureCovector;
@@ -386,8 +391,12 @@ pub struct WallTimes {
     /// commit.
     pub compare_read: Duration,
     /// `compare`: the landmark tree read at each phase's causal address and added to the wave's
-    /// faces (Decision 28; `PendingRatio::against`).
+    /// faces (Decision 28; `PendingRatio::against`); on a card, its launches and the host's
+    /// completion of the class faces, the transfers apart.
     pub tree_read: Duration,
+    /// `compare`: a card's transfers of the tree read (the letters and digits up, the splits
+    /// down); zero on the host.
+    pub tree_transfer: Duration,
     /// `compare`: the residual, the target phases, the Holon ratio and its covector, and the tree
     /// face alone's code lengths.
     pub holon: Duration,
@@ -397,6 +406,10 @@ pub struct WallTimes {
     pub compose: Duration,
     /// `deposit`: the successor constitution ([`Constitution::deposited`]).
     pub deposited: Duration,
+    /// `deposit`: a card's mirror of the landmark tree moved by the deposit's steps (the
+    /// opened-path update, its transfers included); zero on the host, whose tree moves inside
+    /// `deposited`.
+    pub tree_deposit: Duration,
     /// `deposit`: the arrived targets re-read at the successor.
     pub reread: Duration,
     /// `ingest`: the cells taken into the moment.
@@ -405,16 +418,18 @@ pub struct WallTimes {
 
 impl WallTimes {
     /// The phases by name, in the order the methods run them.
-    pub fn phases(&self) -> [(&'static str, Duration); 10] {
+    pub fn phases(&self) -> [(&'static str, Duration); 12] {
         [
             ("refine read", self.refine_read),
             ("release", self.release),
             ("compare read", self.compare_read),
+            ("tree transfer", self.tree_transfer),
             ("tree read", self.tree_read),
             ("holon and covector", self.holon),
             ("pull_back", self.pull_back),
             ("compose", self.compose),
             ("deposited", self.deposited),
+            ("tree deposit", self.tree_deposit),
             ("re-read", self.reread),
             ("ingest", self.ingest),
         ]
@@ -432,13 +447,70 @@ impl std::ops::AddAssign for WallTimes {
         self.release += other.release;
         self.compare_read += other.compare_read;
         self.tree_read += other.tree_read;
+        self.tree_transfer += other.tree_transfer;
         self.holon += other.holon;
         self.pull_back += other.pull_back;
         self.compose += other.compose;
         self.deposited += other.deposited;
+        self.tree_deposit += other.tree_deposit;
         self.reread += other.reread;
         self.ingest += other.ingest;
     }
+}
+
+/// [definition] **The compare phase's readings** ([`compare_phase`]): the tree face at the grain's
+/// code lengths, the window scored by the receiver's mixture, the Holon ratio and its covector.
+#[derive(Clone, Debug)]
+pub struct ComparePhase {
+    pub tree_grain: Vec<ExactInterval>,
+    pub scored: Scored,
+    pub holon: HolonRatio,
+    pub covector: RatioCovector,
+}
+
+/// [definition; agent-inferred] **The compare phase under the hardware law** (CLAUDE.md; campaign
+/// 2): the tree face at the grain's code length of each phase (`tree_code_length`, a reading of the
+/// exposure), and, beside it, the receiver's mixture score, the target phases, the Holon ratio and
+/// its covector. The two regions read the shared immutable faces and targets and write their own
+/// readings, so they run together (`rayon::join`), and the phases of the first run together
+/// (`hnn::realization`); the mixture's steps stay in cell order inside the second. Every value is
+/// the serial realization's. The host reference and every device realization call it.
+pub fn compare_phase(
+    field: &Field,
+    constitution: &impl ConstitutionRead,
+    ratio: &PendingRatio,
+    against: Against,
+    targets: &[usize],
+) -> Result<ComparePhase, HnnError> {
+    if against.trees.len() != targets.len() {
+        return Err(HnnError::Shape {
+            what: "one tree face per target",
+            expected: targets.len(),
+            found: against.trees.len(),
+        });
+    }
+    let phases = ratio.phases();
+    let (tree_grain, rest) = rayon::join(
+        || {
+            indexed(against.trees.len(), |j| {
+                tree_code_length(&against.trees[j], targets[j])
+            })
+        },
+        || -> Result<(Scored, HolonRatio, RatioCovector), HnnError> {
+            let scored = ratio.scored(constitution, &against, targets)?;
+            let anchors = target_phases(field, ratio.anchor(), phases.ring(), targets)?;
+            let holon = HolonRatio::compare(against.faces.clone(), targets, &anchors)?;
+            let covector = holon.covector()?;
+            Ok((scored, holon, covector))
+        },
+    );
+    let (scored, holon, covector) = rest?;
+    Ok(ComparePhase {
+        tree_grain: tree_grain?,
+        scored,
+        holon,
+        covector,
+    })
 }
 
 /// [definition] **The budget stop** (design (d), R3 §5): the refused successor's exact bits, the
@@ -664,7 +736,7 @@ impl Reference {
         Ok(Resident {
             field: field.clone(),
             current: current.clone(),
-            address: ActiveAddress::of_field(field),
+            address: ActiveAddress::of_field(field, current)?,
             constitution,
             moments: BTreeMap::new(),
             pending: BTreeMap::new(),
@@ -805,9 +877,17 @@ impl ExecutionPort for Reference {
             .expect("the moment was checked or opened");
         let start = Instant::now();
         let ingested = open.ingest(&field, &mut resident.current, &codes)?;
-        // The receiving parametron's active suffix address receives the cells the moment took.
+        // The receiving parametron's active suffix address receives the cells the moment took, each
+        // tick's letter read by its register's clock, which stays the lift point's.
         for &code in &codes[..ingested.cells] {
-            resident.address.receive(code);
+            resident.address.receive(code)?;
+        }
+        if !resident.address.reader().agrees(&field, &resident.current) {
+            return Err(HnnError::Shape {
+                what: "the address register's clock against the lift point",
+                expected: field.rings().len(),
+                found: 0,
+            });
         }
         resident.wall.ingest += start.elapsed();
         if ingested.cells > 0 {
@@ -878,6 +958,7 @@ impl ExecutionPort for Reference {
         }
         let location = keys::locate_closing(&field, &resident.current, &codes, offset)?;
         let jumps = location.rekey(&field, &mut resident.current)?;
+        resident.address.synchronize(&field, &resident.current)?;
         resident.aeon.opening = resident.current.lift().to_vec();
         // The published ring clocks: each published ring's clock at the boundary, its phase class
         // the carried key and its winding kept; none where the ring fell back.
@@ -1086,18 +1167,15 @@ impl ExecutionPort for Reference {
             .zip(&slot.emitted)
             .map(|(now, then)| now.iter().zip(then).map(|(a, b)| a - b).collect())
             .collect();
-        let tree_grain = against
-            .trees
-            .iter()
-            .zip(&targets)
-            .map(|(face, &target)| tree_code_length(face, target))
-            .collect::<Result<Vec<_>, _>>()?;
-        // The receiver's scored face: the mixture of the tree's and the combined face (ruling A),
-        // its ratio stepped phase by phase; beside it the tree's executed face alone.
-        let scored = ratio.scored(&resident.constitution, &against, &targets)?;
-        let anchors = target_phases(&field, ratio.anchor(), phases.ring(), &targets)?;
-        let holon = HolonRatio::compare(against.faces, &targets, &anchors)?;
-        let covector = holon.covector()?;
+        // The tree face at the grain, the receiver's scored face (the mixture of the tree's and
+        // the combined face, ruling A, its ratio stepped phase by phase; beside it the tree's
+        // executed face alone), the Holon ratio and its covector ([`compare_phase`]).
+        let ComparePhase {
+            tree_grain,
+            scored,
+            holon,
+            covector,
+        } = compare_phase(&field, &resident.constitution, ratio, against, &targets)?;
         let map = resident
             .constitution
             .receiving_map(phases.ring())

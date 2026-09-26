@@ -1,0 +1,769 @@
+//! **The landmark tree on the card** (campaign 2; #73 with #76; `kernels/tree.cu`).
+//!
+//! [definition] The receiving parametron's storage, the tree of landmarks
+//! (`holonics::hnn::landmark::Landmarks`), mirrored on the card with the host's exact integer law.
+//! The computational object is the helical pair interaction; of the winding guide's objects this
+//! realization touches the receiving face (faces and placement), the bundle restriction (the tower
+//! thread: each branch's letters), the edge ratios of each opened path (the pair) and the β chart's
+//! carry (the helix). The host's constitution owns the tree and its certificates; the card carries
+//! what the reads need, the masses, each node's and each join's `(β, λ̂)` and the topology, and
+//! moves it by the same deposits in the same order.
+//!
+//! | On the card | On the host |
+//! |---|---|
+//! | the all-class read: at each splitting dyadic cell, each branch's opened path and the join (`hnn_tree_splits`) | the class faces from the splits (`LandmarkFace::of_splits`: the products down the dyadic heap and the grain exponents, whose certified logarithm reads integers past the card's words) |
+//! | the opened-path update of each deposit (`hnn_tree_deposit`): the β steps with the carrier's rebase, the stop weights, the founding at the host's numbers, the masses | the certificates (the host's tree, `Constitution::deposited`) |
+//! | a window's phases in cell order: the earlier phases' deposits applied with an undo log, the later phase read, the log undone (`hnn_tree_undo`) | the addresses' letters (`LandmarkDeclaration::letters`) and the digits each target opens |
+//!
+//! [definition; agent-inferred] **The realization** (the hardware law, CLAUDE.md). The read is one
+//! block per phase with one thread per splitting dyadic cell (`threads` the least power of two
+//! covering them, at least a warp, within the entry's census): each thread reads the shared
+//! immutable arena and writes its own split, so the regions commute; each path is serial in its
+//! thread, at most `D_b + 1` hash lookups a branch. The update is one block of one warp, a thread
+//! per opened digit: the digits of one cell descend different dyadic cells, so they write disjoint
+//! trees, nodes and joins; their insertions take distinct keys by `atomicCAS`; their founded
+//! numbers are the host's, by a block prefix sum in the host's founding order (digit, then
+//! branch). The tree's launches run on the tree's own stream: they read and write only the tree's
+//! buffers, disjoint from the word's, so they commute with the word's launches on the card's
+//! stream. Every transfer is timed apart from the launches ([`TreeTimes`]).
+//!
+//! [definition] **Parity** (`src/hnn/tests.rs`, `port_tests.rs`): the card's splits equal the host's
+//! (`Landmarks::window_splits`) exactly, window by window, on the cell-only and the enlarged tree,
+//! and after every deposit the card's arena (roots, children, masses, charts, joins) equals the
+//! host's ([`CardTree::agrees`]).
+
+use core::ffi::c_void;
+use std::time::{Duration, Instant};
+
+use holonics::hnn::HnnError;
+use holonics::hnn::landmark::{
+    ArenaView, ChartWords, LandmarkDeclaration, Landmarks, Letter, Splits, Widths,
+};
+
+use crate::cuda::{Dim3, Module, Stream};
+use crate::ffi::CUdeviceptr;
+use crate::hnn::DeviceError;
+use crate::hnn::card::{Card, CardBuffer};
+
+/// The tree's kernels, their own translation unit (`build.rs`).
+const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/tree.ptx"));
+
+/// An unfounded root, or no child.
+const NONE: u32 = u32::MAX;
+
+/// A free slot of the child table.
+const EMPTY: u64 = u64::MAX;
+
+/// The deepest branch the kernels' paths hold (`TREE_MAX_DEPTH`).
+const MAX_DEPTH: usize = 64;
+
+/// The digits one deposit launch opens at most (`hnn_tree_deposit`'s shared prefix: 32 digits).
+const MAX_DIGITS: usize = 32;
+
+/// One chart as the card holds it (`TreeChart`).
+#[repr(C)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+struct TreeChart {
+    numerator: u64,
+    denominator: u64,
+    exponent: i64,
+    stop: u64,
+}
+
+impl From<ChartWords> for TreeChart {
+    fn from(words: ChartWords) -> Self {
+        Self {
+            numerator: words.numerator,
+            denominator: words.denominator,
+            exponent: words.exponent,
+            stop: words.stop,
+        }
+    }
+}
+
+/// The law's words as the kernels read them (`TreeLaw`).
+#[repr(C)]
+#[derive(Clone, Copy, Debug)]
+struct TreeLaw {
+    table_mask: u64,
+    face: u32,
+    carrier: u32,
+    rebase: u32,
+    branches: u32,
+    depth0: u32,
+    depth1: u32,
+    forced0: u32,
+    forced1: u32,
+    cells: u32,
+    stride: u32,
+    log_stride: u32,
+    pad: u32,
+}
+
+/// The undo log's device pointers (`TreeLog`).
+#[repr(C)]
+#[derive(Clone, Copy, Debug)]
+struct TreeLog {
+    nodes: CUdeviceptr,
+    halves: CUdeviceptr,
+    charts: CUdeviceptr,
+    slots: CUdeviceptr,
+    roots: CUdeviceptr,
+    joins: CUdeviceptr,
+    counts: CUdeviceptr,
+}
+
+/// One undo log's buffers.
+struct LogBuffers<'c> {
+    nodes: CardBuffer<'c, u32>,
+    halves: CardBuffer<'c, u32>,
+    charts: CardBuffer<'c, TreeChart>,
+    slots: CardBuffer<'c, u64>,
+    roots: CardBuffer<'c, u32>,
+    joins: CardBuffer<'c, TreeChart>,
+    counts: CardBuffer<'c, u32>,
+}
+
+impl LogBuffers<'_> {
+    fn pointers(&self) -> TreeLog {
+        TreeLog {
+            nodes: self.nodes.device_ptr(),
+            halves: self.halves.device_ptr(),
+            charts: self.charts.device_ptr(),
+            slots: self.slots.device_ptr(),
+            roots: self.roots.device_ptr(),
+            joins: self.joins.device_ptr(),
+            counts: self.counts.device_ptr(),
+        }
+    }
+}
+
+/// [definition] **The tree's wall time by part** (exterior; no law reads it): the transfers (the
+/// letters and digits up, the splits and the parity reads down), the card's reads (the launches to
+/// their completion), the host's completion of the class faces from the splits, the combined faces
+/// formed at the grain (wave plus tree), and the deposits' updates; with the phases read and the
+/// cells deposited.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct TreeTimes {
+    pub transfer: Duration,
+    pub read: Duration,
+    pub complete: Duration,
+    pub combine: Duration,
+    pub deposit: Duration,
+    pub reads: u64,
+    pub deposits: u64,
+}
+
+/// `(key, child)` placed in an open-addressing table of `2^k` slots by linear probing, with the
+/// kernels' hash.
+fn hash(key: u64) -> u64 {
+    let mut z = key.wrapping_add(0x9E37_79B9_7F4A_7C15);
+    z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+    z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+    z ^ (z >> 31)
+}
+
+fn table(children: &[(u64, u32)], slots: usize) -> (Vec<u64>, Vec<u32>) {
+    let mask = slots as u64 - 1;
+    let (mut keys, mut values) = (vec![EMPTY; slots], vec![NONE; slots]);
+    for &(key, child) in children {
+        let mut slot = hash(key) & mask;
+        while keys[slot as usize] != EMPTY {
+            slot = (slot + 1) & mask;
+        }
+        keys[slot as usize] = key;
+        values[slot as usize] = child;
+    }
+    (keys, values)
+}
+
+fn launch_error(clause: &'static str) -> DeviceError {
+    DeviceError::Launch {
+        entry: "hnn_tree",
+        clause,
+    }
+}
+
+/// [definition] **The landmark tree mirrored on the card** (module header).
+pub struct CardTree<'c> {
+    card: &'c Card,
+    module: Module,
+    stream: Stream,
+    declaration: LandmarkDeclaration,
+    law: TreeLaw,
+    splitting: Vec<usize>,
+    splitting_buffer: CardBuffer<'c, u32>,
+    capacity: usize,
+    roots: CardBuffer<'c, u32>,
+    keys: CardBuffer<'c, u64>,
+    values: CardBuffer<'c, u32>,
+    halves: CardBuffer<'c, u32>,
+    charts: CardBuffer<'c, TreeChart>,
+    joins: CardBuffer<'c, TreeChart>,
+    count: CardBuffer<'c, u32>,
+    letters: CardBuffer<'c, u32>,
+    digits: CardBuffer<'c, u32>,
+    out: CardBuffer<'c, u64>,
+    logs: Vec<LogBuffers<'c>>,
+    nodes: usize,
+    times: TreeTimes,
+    read_threads: u32,
+}
+
+impl Drop for CardTree<'_> {
+    fn drop(&mut self) {
+        // The module and the stream are released in the card's context.
+        let _ = self.card.current();
+    }
+}
+
+impl<'c> CardTree<'c> {
+    /// **Mirror a host tree on the card**: its law's words, the arena at its current standing, and
+    /// room for every node a passage of the declared population founds, plus `window` cells a
+    /// window's overlay and a re-read found past it (`B Σ_b (D_b + 1)` nodes a cell), the child
+    /// table at twice that, a power of two. Refused at a branch deeper than the kernels' paths.
+    pub fn mirror(card: &'c Card, tree: &Landmarks, window: usize) -> Result<Self, DeviceError> {
+        let declaration = tree.declaration().clone();
+        let widths: Widths = tree.widths();
+        let depths = declaration.branch_depths();
+        if depths.iter().any(|&depth| depth + 1 > MAX_DEPTH) || depths.len() > 2 {
+            return Err(launch_error(
+                "a branch within the kernels' path of 64 nodes",
+            ));
+        }
+        let digits = widths.digits as usize;
+        if digits > MAX_DIGITS {
+            return Err(launch_error("a cell of at most 32 odometer digits"));
+        }
+        let per_cell: usize = digits * depths.iter().map(|d| d + 1).sum::<usize>();
+        let cells_passed = declaration.population as usize + window + 1;
+        let capacity = cells_passed * per_cell;
+        let slots = (2 * capacity).next_power_of_two().max(64);
+        let stride = depths.iter().copied().max().unwrap_or(1).max(1);
+        let log_stride = depths.iter().map(|d| d + 1).sum::<usize>().max(1);
+        let cells = 1usize << digits;
+        let law = TreeLaw {
+            table_mask: slots as u64 - 1,
+            face: widths.face as u32,
+            carrier: widths.carrier as u32,
+            rebase: widths.rebase as u32,
+            branches: depths.len() as u32,
+            depth0: depths[0] as u32,
+            depth1: depths.get(1).copied().unwrap_or(0) as u32,
+            forced0: declaration.forced as u32,
+            forced1: 0,
+            cells: cells as u32,
+            stride: stride as u32,
+            log_stride: log_stride as u32,
+            pad: 0,
+        };
+        card.current()?;
+        let module = Module::load_ptx(IMAGE)?;
+        let stream = Stream::create()?;
+        let splitting = declaration.splitting();
+        let splitting_words: Vec<u32> = splitting.iter().map(|&h| h as u32).collect();
+        let entry = module.function("hnn_tree_splits")?;
+        let ceiling = entry.max_threads_per_block()?;
+        let covering = (splitting.len() as u32).next_power_of_two().max(32);
+        let read_threads = covering
+            .min(ceiling)
+            .min(card.census().max_threads_per_block);
+        let window_phases = window.max(1) + 1;
+        let log = |card: &'c Card| -> Result<LogBuffers<'c>, DeviceError> {
+            let entries = MAX_DIGITS * log_stride;
+            Ok(LogBuffers {
+                nodes: card.alloc(entries)?,
+                halves: card.alloc(2 * entries)?,
+                charts: card.alloc(entries)?,
+                slots: card.alloc(entries)?,
+                roots: card.alloc(2 * MAX_DIGITS)?,
+                joins: card.alloc(MAX_DIGITS)?,
+                counts: card.alloc(2 * MAX_DIGITS + 1)?,
+            })
+        };
+        let logs = (0..window.max(1))
+            .map(|_| log(card))
+            .collect::<Result<Vec<_>, _>>()?;
+        let mut mirrored = Self {
+            card,
+            module,
+            stream,
+            law,
+            splitting_buffer: card.upload(&splitting_words)?,
+            splitting,
+            capacity,
+            roots: card.alloc(depths.len() * cells)?,
+            keys: card.alloc(slots)?,
+            values: card.alloc(slots)?,
+            halves: card.alloc(2 * capacity)?,
+            charts: card.alloc(capacity)?,
+            joins: card.alloc(cells)?,
+            count: card.alloc(1)?,
+            letters: card.alloc(window_phases * depths.len() * stride)?,
+            digits: card.alloc(window_phases * 2 * MAX_DIGITS)?,
+            out: card.alloc(window_phases * declaration.splitting().len().max(1))?,
+            logs,
+            nodes: 0,
+            times: TreeTimes::default(),
+            read_threads,
+            declaration,
+        };
+        mirrored.upload(&tree.arena())?;
+        Ok(mirrored)
+    }
+
+    /// **Upload the host's arena whole** (the mount, or a re-mirror).
+    pub fn upload(&mut self, arena: &ArenaView<'_>) -> Result<(), DeviceError> {
+        let start = Instant::now();
+        let halves = arena.halves();
+        if halves.len() > self.capacity {
+            return Err(launch_error("a tree within the mirror's capacity"));
+        }
+        let (keys, values) = table(&arena.children(), self.keys.len());
+        let flat: Vec<u32> = halves
+            .iter()
+            .flat_map(|pair| pair.iter().copied())
+            .collect();
+        let charts: Vec<TreeChart> = arena.charts().into_iter().map(TreeChart::from).collect();
+        let mut joins: Vec<TreeChart> = arena.joins().into_iter().map(TreeChart::from).collect();
+        joins.resize(self.law.cells as usize, TreeChart::default());
+        self.card.write(&self.roots, 0, &arena.roots())?;
+        self.card.write(&self.keys, 0, &keys)?;
+        self.card.write(&self.values, 0, &values)?;
+        self.card.write(&self.halves, 0, &flat)?;
+        self.card.write(&self.charts, 0, &charts)?;
+        self.card.write(&self.joins, 0, &joins)?;
+        self.card.write(&self.count, 0, &[halves.len() as u32])?;
+        self.nodes = halves.len();
+        self.times.transfer += start.elapsed();
+        Ok(())
+    }
+
+    /// The tree's wall time by part since the mirror.
+    pub fn times(&self) -> TreeTimes {
+        self.times
+    }
+
+    /// Add the host's completion and combine times of a read.
+    pub fn completed(&mut self, complete: Duration, combine: Duration) {
+        self.times.complete += complete;
+        self.times.combine += combine;
+    }
+
+    /// The founded nodes the host tracks the mirror at.
+    pub fn nodes(&self) -> usize {
+        self.nodes
+    }
+
+    /// The letters of an address, each branch at the stride.
+    fn letter_words(&self, address: &[Letter]) -> Vec<u32> {
+        let stride = self.law.stride as usize;
+        let mut words = vec![0u32; self.law.branches as usize * stride];
+        for (branch, letters) in self.declaration.letters(address).iter().enumerate() {
+            words[branch * stride..branch * stride + letters.len()].copy_from_slice(letters);
+        }
+        words
+    }
+
+    /// The digits a class opens, as `(h, b)` words.
+    fn digit_words(&self, class: usize) -> Vec<u32> {
+        self.declaration
+            .emitted(class)
+            .into_iter()
+            .flat_map(|(h, b)| [h as u32, b as u32])
+            .collect()
+    }
+
+    /// Refused unless `cells` more deposits fit the mirror.
+    fn room(&self, cells: usize) -> Result<(), DeviceError> {
+        let per_cell: usize = self.law.cells.trailing_zeros() as usize
+            * (self.law.depth0 as usize
+                + 1
+                + if self.law.branches > 1 {
+                    self.law.depth1 as usize + 1
+                } else {
+                    0
+                });
+        if self.nodes + cells * per_cell > self.capacity {
+            return Err(launch_error("deposits within the mirror's capacity"));
+        }
+        Ok(())
+    }
+
+    fn launch(
+        &self,
+        entry: &'static str,
+        grid: u32,
+        block: u32,
+        params: &mut [*mut c_void],
+    ) -> Result<(), DeviceError> {
+        self.card.current()?;
+        let function = self.module.function(entry)?;
+        function.launch_on_shared(
+            &self.stream,
+            Dim3 {
+                x: grid,
+                y: 1,
+                z: 1,
+            },
+            Dim3 {
+                x: block,
+                y: 1,
+                z: 1,
+            },
+            0,
+            params,
+        )?;
+        Ok(())
+    }
+
+    /// Launch the read of `phases` phases whose letters start at phase `from` of the letters
+    /// buffer, into the output at the same phases.
+    fn launch_read(&self, from: usize, phases: usize) -> Result<(), DeviceError> {
+        let mut law = self.law;
+        let mut roots = self.roots.device_ptr();
+        let mut keys = self.keys.device_ptr();
+        let mut values = self.values.device_ptr();
+        let mut halves = self.halves.device_ptr();
+        let mut charts = self.charts.device_ptr();
+        let mut joins = self.joins.device_ptr();
+        let mut splitting = self.splitting_buffer.device_ptr();
+        let mut count = self.splitting.len() as u32;
+        let phase_words = (self.law.branches * self.law.stride) as u64;
+        let mut letters = self.letters.device_ptr() + from as u64 * phase_words * 4;
+        let mut out = self.out.device_ptr() + (from * self.splitting.len()) as u64 * 8;
+        let mut params: [*mut c_void; 11] = [
+            (&mut law as *mut TreeLaw).cast(),
+            (&mut roots as *mut CUdeviceptr).cast(),
+            (&mut keys as *mut CUdeviceptr).cast(),
+            (&mut values as *mut CUdeviceptr).cast(),
+            (&mut halves as *mut CUdeviceptr).cast(),
+            (&mut charts as *mut CUdeviceptr).cast(),
+            (&mut joins as *mut CUdeviceptr).cast(),
+            (&mut splitting as *mut CUdeviceptr).cast(),
+            (&mut count as *mut u32).cast(),
+            (&mut letters as *mut CUdeviceptr).cast(),
+            (&mut out as *mut CUdeviceptr).cast(),
+        ];
+        self.launch(
+            "hnn_tree_splits",
+            phases as u32,
+            self.read_threads,
+            &mut params,
+        )
+    }
+
+    /// Launch one cell's deposit at phase `phase` of the letters and digits buffers, logging into
+    /// `log` when given.
+    fn launch_deposit(
+        &self,
+        phase: usize,
+        digits: usize,
+        log: Option<&LogBuffers<'c>>,
+    ) -> Result<(), DeviceError> {
+        let mut law = self.law;
+        let mut roots = self.roots.device_ptr();
+        let mut keys = self.keys.device_ptr();
+        let mut values = self.values.device_ptr();
+        let mut halves = self.halves.device_ptr();
+        let mut charts = self.charts.device_ptr();
+        let mut joins = self.joins.device_ptr();
+        let mut count_ptr = self.count.device_ptr();
+        let phase_words = (self.law.branches * self.law.stride) as u64;
+        let mut letters = self.letters.device_ptr() + phase as u64 * phase_words * 4;
+        let mut digit_words = self.digits.device_ptr() + (phase * 2 * MAX_DIGITS) as u64 * 4;
+        let mut count = digits as u32;
+        let mut pointers = log.map_or(
+            TreeLog {
+                nodes: 0,
+                halves: 0,
+                charts: 0,
+                slots: 0,
+                roots: 0,
+                joins: 0,
+                counts: 0,
+            },
+            LogBuffers::pointers,
+        );
+        let mut logging = u32::from(log.is_some());
+        let mut params: [*mut c_void; 13] = [
+            (&mut law as *mut TreeLaw).cast(),
+            (&mut roots as *mut CUdeviceptr).cast(),
+            (&mut keys as *mut CUdeviceptr).cast(),
+            (&mut values as *mut CUdeviceptr).cast(),
+            (&mut halves as *mut CUdeviceptr).cast(),
+            (&mut charts as *mut CUdeviceptr).cast(),
+            (&mut joins as *mut CUdeviceptr).cast(),
+            (&mut count_ptr as *mut CUdeviceptr).cast(),
+            (&mut letters as *mut CUdeviceptr).cast(),
+            (&mut digit_words as *mut CUdeviceptr).cast(),
+            (&mut count as *mut u32).cast(),
+            (&mut pointers as *mut TreeLog).cast(),
+            (&mut logging as *mut u32).cast(),
+        ];
+        self.launch("hnn_tree_deposit", 1, MAX_DIGITS as u32, &mut params)
+    }
+
+    /// Launch the undo of one logged deposit at phase `phase` of the digits buffer.
+    fn launch_undo(
+        &self,
+        phase: usize,
+        digits: usize,
+        log: &LogBuffers<'c>,
+    ) -> Result<(), DeviceError> {
+        let mut law = self.law;
+        let mut roots = self.roots.device_ptr();
+        let mut keys = self.keys.device_ptr();
+        let mut halves = self.halves.device_ptr();
+        let mut charts = self.charts.device_ptr();
+        let mut joins = self.joins.device_ptr();
+        let mut count_ptr = self.count.device_ptr();
+        let mut digit_words = self.digits.device_ptr() + (phase * 2 * MAX_DIGITS) as u64 * 4;
+        let mut count = digits as u32;
+        let mut pointers = log.pointers();
+        let mut params: [*mut c_void; 10] = [
+            (&mut law as *mut TreeLaw).cast(),
+            (&mut roots as *mut CUdeviceptr).cast(),
+            (&mut keys as *mut CUdeviceptr).cast(),
+            (&mut halves as *mut CUdeviceptr).cast(),
+            (&mut charts as *mut CUdeviceptr).cast(),
+            (&mut joins as *mut CUdeviceptr).cast(),
+            (&mut count_ptr as *mut CUdeviceptr).cast(),
+            (&mut digit_words as *mut CUdeviceptr).cast(),
+            (&mut count as *mut u32).cast(),
+            (&mut pointers as *mut TreeLog).cast(),
+        ];
+        self.launch("hnn_tree_undo", 1, MAX_DIGITS as u32, &mut params)
+    }
+
+    fn synchronize(&self) -> Result<(), DeviceError> {
+        self.card.current()?;
+        Ok(self.stream.synchronize()?)
+    }
+
+    /// **A window's splits in cell order** (`Landmarks::window_splits` on the card): phase `j`'s
+    /// splits at `addresses[j]`, read after the deposits of the known earlier phases, each applied
+    /// with its undo log; the logs are undone in reverse after the last read, so the mirror is
+    /// unchanged. Refused at more phases than the mirror's window, or past its capacity.
+    pub fn window_splits(
+        &mut self,
+        addresses: &[Vec<Letter>],
+        known: &[usize],
+    ) -> Result<Vec<Splits>, DeviceError> {
+        let phases = addresses.len();
+        if phases == 0 {
+            return Ok(Vec::new());
+        }
+        let deposits = known.len().min(phases.saturating_sub(1));
+        if phases > self.logs.len() + 1 || deposits > self.logs.len() {
+            return Err(launch_error("a window within the mirror's phases"));
+        }
+        self.room(deposits)?;
+        let start = Instant::now();
+        let letters: Vec<u32> = addresses
+            .iter()
+            .flat_map(|address| self.letter_words(address))
+            .collect();
+        self.card.write(&self.letters, 0, &letters)?;
+        let mut digit_counts = Vec::with_capacity(deposits);
+        if deposits > 0 {
+            let mut words = vec![0u32; deposits * 2 * MAX_DIGITS];
+            for (phase, &class) in known.iter().take(deposits).enumerate() {
+                let digits = self.digit_words(class);
+                digit_counts.push(digits.len() / 2);
+                words[phase * 2 * MAX_DIGITS..phase * 2 * MAX_DIGITS + digits.len()]
+                    .copy_from_slice(&digits);
+            }
+            self.card.write(&self.digits, 0, &words)?;
+        }
+        let uploaded = start.elapsed();
+        let start = Instant::now();
+        self.launch_read(0, 1)?;
+        for phase in 1..phases {
+            if phase <= deposits {
+                self.launch_deposit(
+                    phase - 1,
+                    digit_counts[phase - 1],
+                    Some(&self.logs[phase - 1]),
+                )?;
+            }
+            self.launch_read(phase, 1)?;
+        }
+        for phase in (0..deposits).rev() {
+            self.launch_undo(phase, digit_counts[phase], &self.logs[phase])?;
+        }
+        self.synchronize()?;
+        let read = start.elapsed();
+        let start = Instant::now();
+        let count = self.splitting.len();
+        let words = self.card.fetch_range(&self.out, 0, phases * count)?;
+        self.times.transfer += uploaded + start.elapsed();
+        self.times.read += read;
+        self.times.reads += phases as u64;
+        let face_bits = u64::from(self.law.face);
+        Ok(words
+            .chunks(count.max(1))
+            .take(phases)
+            .map(|numerators| Splits {
+                face_bits,
+                numerators: numerators.to_vec(),
+            })
+            .collect())
+    }
+
+    /// **Deposit cells on the mirror** (`Landmarks::deposit`'s opened-path update, in order), as the
+    /// host's constitution deposits them. Refused past the mirror's capacity.
+    pub fn deposit(&mut self, steps: &[(Vec<Letter>, usize)]) -> Result<(), DeviceError> {
+        let window = self.logs.len() + 1;
+        for chunk in steps.chunks(window) {
+            self.room(chunk.len())?;
+            let start = Instant::now();
+            let letters: Vec<u32> = chunk
+                .iter()
+                .flat_map(|(address, _)| self.letter_words(address))
+                .collect();
+            self.card.write(&self.letters, 0, &letters)?;
+            let mut words = vec![0u32; chunk.len() * 2 * MAX_DIGITS];
+            let mut counts = Vec::with_capacity(chunk.len());
+            for (phase, (_, class)) in chunk.iter().enumerate() {
+                let digits = self.digit_words(*class);
+                counts.push(digits.len() / 2);
+                words[phase * 2 * MAX_DIGITS..phase * 2 * MAX_DIGITS + digits.len()]
+                    .copy_from_slice(&digits);
+            }
+            self.card.write(&self.digits, 0, &words)?;
+            let uploaded = start.elapsed();
+            let start = Instant::now();
+            for (phase, &digits) in counts.iter().enumerate() {
+                self.launch_deposit(phase, digits, None)?;
+            }
+            self.synchronize()?;
+            self.times.transfer += uploaded;
+            self.times.deposit += start.elapsed();
+            self.times.deposits += chunk.len() as u64;
+        }
+        let start = Instant::now();
+        let count = self.card.fetch_range(&self.count, 0, 1)?;
+        self.nodes = count[0] as usize;
+        self.times.transfer += start.elapsed();
+        Ok(())
+    }
+
+    /// **The mirror against the host's arena**: the founded count, every root, every child (the
+    /// table read back as a map), every node's masses and chart, and every join. A parity reading.
+    pub fn agrees(&mut self, tree: &Landmarks) -> Result<bool, DeviceError> {
+        self.synchronize()?;
+        let start = Instant::now();
+        let arena = tree.arena();
+        let nodes = arena.halves().len();
+        let count = self.card.fetch_range(&self.count, 0, 1)?[0] as usize;
+        let mut same = count == nodes && self.nodes == nodes;
+        if same {
+            same &= self.card.fetch(&self.roots)? == arena.roots();
+            let halves = self.card.fetch_range(&self.halves, 0, 2 * nodes)?;
+            let flat: Vec<u32> = arena
+                .halves()
+                .iter()
+                .flat_map(|p| p.iter().copied())
+                .collect();
+            same &= halves == flat;
+            let charts = self.card.fetch_range(&self.charts, 0, nodes)?;
+            let host: Vec<TreeChart> = arena.charts().into_iter().map(TreeChart::from).collect();
+            same &= charts == host;
+            let joins = self.card.fetch(&self.joins)?;
+            let host_joins: Vec<TreeChart> =
+                arena.joins().into_iter().map(TreeChart::from).collect();
+            same &= joins[..host_joins.len()] == host_joins[..];
+            let keys = self.card.fetch(&self.keys)?;
+            let values = self.card.fetch(&self.values)?;
+            let mut card_children: Vec<(u64, u32)> = keys
+                .iter()
+                .zip(&values)
+                .filter(|(key, _)| **key != EMPTY)
+                .map(|(&key, &child)| (key, child))
+                .collect();
+            let mut host_children = arena.children();
+            card_children.sort_unstable();
+            host_children.sort_unstable();
+            same &= card_children == host_children;
+        }
+        self.times.transfer += start.elapsed();
+        Ok(same)
+    }
+}
+
+/// **The card's β steps** on operand pairs `(N, D, e)` at width `W`, rebase `R` and lattice `M`
+/// (`hnn_tree_beta_steps`, the kernels' `tree_beta_step`): each step's carried `(β_n, β_d, β_e)`
+/// and stop weight, for the parity against `landmark::Beta::step`.
+pub fn beta_steps(
+    card: &Card,
+    operands: &[(u128, u128, i64)],
+    width: u64,
+    rebase: u64,
+    face: u64,
+) -> Result<Vec<(u64, u64, i64, u64)>, DeviceError> {
+    card.current()?;
+    let module = Module::load_ptx(IMAGE)?;
+    let stream = Stream::create()?;
+    let words: Vec<u64> = operands
+        .iter()
+        .flat_map(|&(n, d, _)| [(n >> 64) as u64, n as u64, (d >> 64) as u64, d as u64])
+        .collect();
+    let exponents: Vec<i64> = operands.iter().map(|&(_, _, e)| e).collect();
+    let input = card.upload(&words)?;
+    let exponent_buffer = card.upload(&exponents)?;
+    let out = card.alloc::<TreeChart>(operands.len())?;
+    let (mut a, mut b, mut c) = (
+        input.device_ptr(),
+        exponent_buffer.device_ptr(),
+        out.device_ptr(),
+    );
+    let mut count = operands.len() as u32;
+    let (mut w, mut r, mut m) = (width as u32, rebase as u32, face as u32);
+    let mut params: [*mut c_void; 7] = [
+        (&mut a as *mut CUdeviceptr).cast(),
+        (&mut b as *mut CUdeviceptr).cast(),
+        (&mut count as *mut u32).cast(),
+        (&mut w as *mut u32).cast(),
+        (&mut r as *mut u32).cast(),
+        (&mut m as *mut u32).cast(),
+        (&mut c as *mut CUdeviceptr).cast(),
+    ];
+    let threads = 128u32;
+    let blocks = (operands.len() as u32).div_ceil(threads).max(1);
+    module.function("hnn_tree_beta_steps")?.launch_on_shared(
+        &stream,
+        Dim3 {
+            x: blocks,
+            y: 1,
+            z: 1,
+        },
+        Dim3 {
+            x: threads,
+            y: 1,
+            z: 1,
+        },
+        0,
+        &mut params,
+    )?;
+    stream.synchronize()?;
+    let charts = card.fetch(&out)?;
+    drop(stream);
+    drop(module);
+    Ok(charts
+        .into_iter()
+        .map(|chart| {
+            (
+                chart.numerator,
+                chart.denominator,
+                chart.exponent,
+                chart.stop,
+            )
+        })
+        .collect())
+}
+
+/// Refused as the host refuses: a device error read as the HNN's.
+pub fn refused(error: DeviceError) -> HnnError {
+    error.into_hnn()
+}
