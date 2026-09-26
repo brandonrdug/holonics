@@ -2845,6 +2845,18 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
       
       Each campaign's new law lands at its consuming owner, and retires any duplicate in the same
       change.
+
+      **Done September 26** (`b96111d3`..`bed6e464`, #147). `Holonics` went from 552 modules and
+      211,356 lines to 339 and 117,066, still exactly the framework's closure. `Holonics/Fluid`
+      keeps 20 modules and 9,274 lines, including the finite Galerkin carrier the framework
+      consumes. Of the 130 duplicate statement groups over 60 characters, 11 remain, all distinct
+      laws; the square-class algebra alone retired 51 copies. No module is left unimported. The
+      navigator files are `Holon/Navigator`, `Foundation/{NavigatorInference,
+      NavigatorModeQuotient}`, `Mathematics/NavigatorFactorization`,
+      `Transport/{NavigatorMachineCharts, NavigatorTraceFaces}` and
+      `Computation/NavigatorObservationScope`. Still owed in #147: 53 short-statement groups, the
+      sphere re-derivations of `ProductDegreeTwo` in `Hodge/HodgeProductMixedFilling`, and the
+      doubled `BivariateSeries` and `LaurentBody` abbreviations.
     - **Issue hygiene.**
       - Every open issue has a rebuild step or campaign owner, or is closed with its evidence, or
         is closed as superseded with a pointer to #62 or a permalink.
