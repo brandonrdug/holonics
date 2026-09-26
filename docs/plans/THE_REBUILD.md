@@ -2428,17 +2428,25 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
       Newton–Schulz, `X̂ ← X̂(2I − AX̂)`, whose exact residual is `R²`, and rounded onto the chart's
       lattice with the rounding term added to the certificate; each window warm-starts from the
       last chart, since `A` moves by one deposit.
-    - **The adjoint** pulls the covector back through the linear maps actually executed (the
-      lattice charts), so the paired adjoint keeps its operands; rounding enters only as released
-      residuals.
+    - **The adjoint** pulls the covector back through the transposes of the linear charts actually
+      executed (`LatticeWord.executed_adjoint_unique`): a chart-based covector. It is not the
+      derivative of the rounded word: rounded participation weights are returned through the
+      smooth normalization at the executed anchor, a difference that needs its own residual
+      (owed, #62).
     - **The balances.** The ring's power balance and the prox identity
       `(W + ΔW)H' = WH' + γΣ w g fᵀ` hold up to the released residuals, reported per word and per
-      deposit; the precisions are declared by rule so that a read moves by less than the receiver's
-      grain, as `L_ℓ` is. The first law's telescoping is unaffected: code lengths are read exactly
-      from the executed faces. Guard 15 is unaffected: word transients are never retained.
-    - **Consequence.** Every quantity inside a window is a fixed-width integer coordinate (64- or
-      128-bit words with carrier refusal), and the window's work is integer matrix products and
-      small certified refinements: the realization the card executes.
+      deposit (the chart's share and the map and Gram carries, to be stated in one balance,
+      owed); the precisions are declared by rule so that each local solve and split moves a read
+      by less than a quarter grain under unit-scale operands and non-expansive continuation. That
+      a whole read moves below the grain needs the uniform sensitivity bound through every later
+      tick, active port and charted junction, a research obligation in #62. The first law is
+      unaffected: its exact values telescope and the ledger's enclosures widen by their interior
+      widths. Guard 15 is unaffected: word transients are never retained.
+    - **Consequence.** The word's transients and charts are fixed-width integer coordinates (64- or
+      128-bit words with the ℓ1 carrier refusal), and its work is integer matrix products and small
+      certified refinements, which the card executes. The faces in `ℚ(θ)`, the initial covector on
+      `(1/W)ℤ`, the non-dyadic participation work, the prox deposition and the rare exact-inverse
+      fallback stay exact on the host.
 
     Source: agent-inferred from CLAUDE.md's exact-representation law and the measurement, after
     Brandon's September 25 ruling (Decision 25). Lean `HNN/LatticeWord` states the residual
@@ -2450,4 +2458,5 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
     later `holonics-apple`) is no longer scheduled after step 4: each campaign's laws land with
     their device kernels and host parity checks, and an exposure runs resident. The host reference
     stays the parity target; the measurement that took one core for hours (Decision 24) is the
-    lesson.
+    lesson. Campaign 1's word, return and charts run resident with every return equal to the host;
+    the declared crossings above stay on the host, so the HNN is not yet wholly card-resident.
