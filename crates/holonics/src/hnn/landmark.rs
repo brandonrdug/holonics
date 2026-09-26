@@ -198,11 +198,28 @@
 //! `W_o = O + ⌈log₂(3 B n*² P²)⌉` ([`IdealLandmarks::reference_width`], `O` the enclosure grid's
 //! octaves), whose rebases keep its code length within `2^(−O)` of the ideal over the passage.
 //!
-//! [definition; agent-inferred] **The depth and the family** are chosen on the development cells
-//! only ([`choose_depth`]): `D` increases from `max(1, forced)` while the development prequential
-//! code length decreases strictly (disjoint exact enclosures), every `D` tried is reported, and
-//! `⌈log₂⌉` of the family tried is charged as description bits. The held-out cells never choose
-//! anything.
+//! [definition; agent-inferred] **The declared stop prior** ([`StopPrior`]; Decision 32, Lean
+//! `HNN/LandmarkTree` item 12). A node at context depth `d` (in its branch's letters) stops with
+//! `w_d = 1 − 2^(−j_d)`, a rung of the dyadic ladder, and splits with `2^(−j_d)`: the tree is the
+//! mixture over pruned trees with the prior `∏_stops w_d ∏_splits (1 − w_d)`, whose weights sum to
+//! one, and it codes within `−log₂` of its prior of every pruned tree
+//! (`stop_mixture_over_trees`, `stop_kraft_and_dominance`). The law enters the executed tree only
+//! at the founding: each node is founded at `β₀ = w_d/(1 − w_d) = 2^(j_d) − 1`, an odd integer
+//! carried exactly, with its stop weight `λ̂ = ⟦1 − 2^(−j_d)⟧` exact on the lattice
+//! (`stop_founding_step`), and every step after it is Decision 28's, `β' = β k/q̂'`
+//! (`stop_ratio_step`), so the lattice law, the widths and the certificates are unchanged. `[1]` is
+//! Decision 28's `½`. A rung at a mixing depth must fit the carrier `W` (the declaration is refused
+//! otherwise). The joins of an enlarged tree keep their own `β = 1`. Campaign 2's constant-slot
+//! controls are the per-depth law `(j_0, j_(≥1)) = (1, r + 1)` exactly in the ideal weighting (the
+//! test `landmark_constant_slots_are_the_per_depth_prior`).
+//!
+//! [definition; agent-inferred] **The depth, the family and the prior** are chosen on the development
+//! cells only ([`choose_depth`], [`choose_prior`]): `D` increases from `max(1, forced)` while the
+//! development prequential code length decreases strictly (disjoint exact enclosures), every `D`
+//! tried is reported, and `⌈log₂⌉` of the family tried is charged as description bits; each stop
+//! prior of the declared family ([`prior_family`]: the global ladder `j = 1, …, J`, then the
+//! per-depth pairs `(j_root, j_below)`, `J = ⌈log₂(n* B)⌉`, [`ladder_top`]) runs its own depth sweep,
+//! and the choice is charged `⌈log₂⌉` of the laws tried. The held-out cells never choose anything.
 //!
 //! [definition; agent-inferred, from the retention and deposition laws] **The measurement is
 //! prequential** ([`prequential`], Decision 29): every cell is scored at the current standing
@@ -231,6 +248,8 @@
 //! | the executed dyadic split and the cells' partition; the forced digits when `\|A\| < 2^B` | `HNN/LandmarkTree.{executed_split_laws, cell_faces_partition, forced_digits_normalized}` | [`Landmarks::probability`], [`Landmarks::face`] |
 //! | a digit face's floor and the rounding's residual (the first-order bound fails downward) | `HNN/LandmarkTree.{digit_face_ge, digit_log_residual, host_digit_bound_fails_downward}` | [`Landmarks::face_rule`] |
 //! | the ideal tree weighting (the oracle) | `HNN/LandmarkTree.{landmark_step, mixture_is_probability, kraft_and_dominance, sequential_mixture}` | [`IdealLandmarks`] |
+//! | the declared stop prior: the mixture over pruned trees with its prior, the weights summing to one, the dominance, the founding at `β₀ = 2^(j_d) − 1` and the step unchanged; `½` the corollary | `HNN/LandmarkTree.{stop_mixture_over_trees, PrunedTree.prior_const, PrunedTree.prior_sum, stop_kraft_and_dominance, stop_weight_step, stop_ratio_step, stop_founding_step, ladder_founding, stopWeight_half}` | [`StopPrior`], [`LandmarkDeclaration::prior`], the founding charts (`Law::founding`, [`ArenaView::founding`]), [`IdealLandmarks`] |
+//! | the prior chosen on the development cells, charged `⌈log₂⌉` of the laws and of each law's depths | (a measurement, not a theorem) | [`ladder_top`], [`prior_family`], [`choose_prior`], [`PriorSweep`] |
 //! | a window's phases in cell order: each reads the standing after the earlier phases' deposits | `HNN/LandmarkTree.{landmark_step, treeWeight_arrive_off}` | [`Landmarks::window_faces`] |
 //!
 //! [open] Owed in #62 (Lean `HNN/LandmarkTree`'s `[open]`): the passage-level composition of the
@@ -519,12 +538,148 @@ pub fn cell_letters(cells: &[usize]) -> Vec<Letter> {
 }
 
 // -------------------------------------------------------------------------------------------
+// the declared stop-weight law
+
+/// The ladder's greatest rung: `β₀ = 2^j − 1` fits a machine word.
+const MAX_RUNG: u32 = u64::BITS - 1;
+
+/// [definition; agent-inferred] **The tree's declared stop-weight law** (Decision 32; Lean
+/// `HNN/LandmarkTree` item 12): a node at context depth `d` stops with `w_d = 1 − 2^(−j_d)`, the rung
+/// `j_d ≥ 1` of the dyadic ladder, and is founded at `β₀ = w_d/(1 − w_d) = 2^(j_d) − 1`, an odd
+/// integer carried exactly (Lean `stop_founding_step`, `ladder_founding`); every later step is
+/// Decision 28's, `β' = β k/q̂'` (`stop_ratio_step`). The rungs are listed from the root, and a depth
+/// past the list reads its last rung: one rung is the global law, and `[1]` is Decision 28's `½`
+/// ([`StopPrior::half`]). A repeated last rung is dropped, so two declarations of one law compare
+/// equal.
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct StopPrior {
+    rungs: Vec<u32>,
+}
+
+impl StopPrior {
+    /// Decision 28's law: `w = ½` at every depth (rung 1, `β₀ = 1`).
+    pub fn half() -> Self {
+        Self { rungs: vec![1] }
+    }
+
+    /// **The global law at rung `j`**, refused outside `1..=63`.
+    pub fn global(rung: u32) -> Result<Self, HnnError> {
+        Self::per_depth(vec![rung])
+    }
+
+    /// **A per-depth law**: rung `j_d` at depth `d`, the last rung at every depth past the list;
+    /// refused when empty or at a rung outside `1..=63` (`β₀ = 2^j − 1` fits a word).
+    pub fn per_depth(mut rungs: Vec<u32>) -> Result<Self, HnnError> {
+        if rungs.is_empty() {
+            return Err(shape("a stop prior of at least one rung", 1, 0));
+        }
+        if let Some(&rung) = rungs.iter().find(|&&j| j == 0 || j > MAX_RUNG) {
+            return Err(shape(
+                "a rung of the dyadic ladder within 1..=63",
+                MAX_RUNG as usize,
+                rung as usize,
+            ));
+        }
+        while rungs.len() >= 2 && rungs[rungs.len() - 1] == rungs[rungs.len() - 2] {
+            rungs.pop();
+        }
+        Ok(Self { rungs })
+    }
+
+    /// The rungs from the root (the last read at every deeper depth).
+    pub fn rungs(&self) -> &[u32] {
+        &self.rungs
+    }
+
+    /// The rung `j_d` at context depth `d`.
+    pub fn rung(&self, depth: usize) -> u32 {
+        self.rungs[depth.min(self.rungs.len() - 1)]
+    }
+
+    /// Whether one rung holds at every depth.
+    pub fn is_global(&self) -> bool {
+        self.rungs.len() == 1
+    }
+
+    /// The stop weight `w_d = 1 − 2^(−j_d)`, exact.
+    pub fn weight(&self, depth: usize) -> Rat {
+        Rat::one() - two_power(-i64::from(self.rung(depth)))
+    }
+
+    /// The founding ratio `β₀ = w_d/(1 − w_d) = 2^(j_d) − 1`.
+    pub fn founding(&self, depth: usize) -> u64 {
+        (1u64 << self.rung(depth)) - 1
+    }
+
+    /// The greatest rung: the bits of the widest founding ratio.
+    pub fn widest(&self) -> u32 {
+        self.rungs.iter().copied().max().expect("at least one rung")
+    }
+}
+
+impl std::fmt::Display for StopPrior {
+    /// `j = 3` for a global law; `j_0 = 1, j_(≥1) = 4` per depth.
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let last = self.rungs.len() - 1;
+        if last == 0 {
+            return write!(f, "j = {}", self.rungs[0]);
+        }
+        for (depth, rung) in self.rungs.iter().enumerate() {
+            if depth > 0 {
+                write!(f, ", ")?;
+            }
+            if depth == last {
+                write!(f, "j_(≥{depth}) = {rung}")?;
+            } else {
+                write!(f, "j_{depth} = {rung}")?;
+            }
+        }
+        Ok(())
+    }
+}
+
+/// [definition; agent-inferred] **The ladder's top rung** `J = ⌈log₂(n* B)⌉` (Decision 32), derived
+/// from the passage: for a fixed pruned tree the best stop weight at a depth is
+/// `stops_d/(stops_d + splits_d)` (Lean `PrunedTree.prior_const`'s maximum), the rung
+/// `log₂((stops_d + splits_d)/splits_d)`, and a depth holds at most `n* B` founded nodes (each cell
+/// founds at most one node a depth in each of its `B` opened digit trees), so every such optimum lies
+/// at or below `J`. It lies below every carrier width (`W = ⌈log₂(12 B L_R n* P²)⌉ > J`), so each
+/// rung's founding ratio is carried exactly.
+pub fn ladder_top(declaration: &LandmarkDeclaration) -> u32 {
+    let nodes = BigUint::from(declaration.population)
+        * BigUint::from(odometer_digits(declaration.alphabet));
+    u32::try_from(ceil_log2(&nodes).max(1))
+        .unwrap_or(MAX_RUNG)
+        .min(MAX_RUNG)
+}
+
+/// [definition; agent-inferred] **The declared family of Decision 32's development decision**: the
+/// global ladder `j = 1, …, J` (rung 1 first, Decision 28's `½`), then the per-depth laws
+/// `(j_root, j_below)`, the root at one rung and every deeper depth at another, `j_root ≠ j_below`,
+/// in lexicographic order: `J²` laws. The per-depth shape is the one campaign 2's constant-slot
+/// controls took (the root at `½`, every cell depth past it at `1 − 2^(−(r+1))`), without their
+/// join.
+pub fn prior_family(top: u32) -> Vec<StopPrior> {
+    let top = top.clamp(1, MAX_RUNG);
+    let global = (1..=top).map(|rung| StopPrior { rungs: vec![rung] });
+    let pairs = (1..=top).flat_map(move |root| {
+        (1..=top)
+            .filter(move |&below| below != root)
+            .map(move |below| StopPrior {
+                rungs: vec![root, below],
+            })
+    });
+    global.chain(pairs).collect()
+}
+
+// -------------------------------------------------------------------------------------------
 // the declaration and its derived widths
 
 /// [definition] **A landmark tree's declaration**: the exterior chart's `|A|`, the address depth
 /// `D` in bundles, the forced splits of the cell tree (context depths `d < forced` mix nothing,
-/// `λ_d = 0`), the declared population `n*` bounding the passage, the receiver's grain `L_R`, and
-/// the declared letter family.
+/// `λ_d = 0`), the declared population `n*` bounding the passage, the receiver's grain `L_R`, the
+/// declared letter family, and the declared stop-weight law ([`StopPrior`], read at each node's
+/// depth in its branch's letters; the joins of an enlarged tree keep their own `β = 1`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LandmarkDeclaration {
     pub alphabet: usize,
@@ -533,6 +688,7 @@ pub struct LandmarkDeclaration {
     pub population: u64,
     pub grain: u64,
     pub family: LetterFamily,
+    pub prior: StopPrior,
 }
 
 impl LandmarkDeclaration {
@@ -786,7 +942,7 @@ pub struct Carried {
 }
 
 impl Beta {
-    /// `β = 1`: the ratio at first arrival.
+    /// `β = 1`: a join's ratio at first arrival, and a node's under Decision 28's `½`.
     pub const ONE: Beta = Beta {
         numerator: 1,
         denominator: 1,
@@ -1665,15 +1821,17 @@ struct Branch {
     forced: usize,
 }
 
-/// The tree's law, apart from its standing: the declaration, its derived widths, the odometer and
-/// the branches. Its reads and its deposit act on any [`Standing`], the tree's own or a working
-/// overlay.
+/// The tree's law, apart from its standing: the declaration, its derived widths, the odometer, the
+/// branches and the founding chart at each depth (the declared stop prior's `β₀ = 2^(j_d) − 1` with
+/// its stop weight `λ̂ = ⟦1 − 2^(−j_d)⟧`). Its reads and its deposit act on any [`Standing`], the
+/// tree's own or a working overlay.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct Law {
     declaration: LandmarkDeclaration,
     widths: Widths,
     odometer: Odometer,
     branches: Vec<Branch>,
+    founding: Vec<Chart>,
 }
 
 /// [definition] **The landmark tree, executed** (module header): the declaration, its derived
@@ -1698,12 +1856,32 @@ impl Law {
                 depth,
                 forced: if branch == 0 { declaration.forced } else { 0 },
             })
+            .collect::<Vec<Branch>>();
+        let deepest = branches.iter().map(|b| b.depth).max().unwrap_or(0);
+        // `β₀ = 2^(j_d) − 1`, odd, carried exactly: within `W` bits at every mixing depth (the
+        // declaration is refused otherwise), and never stepped at a leaf.
+        let founding = (0..=deepest)
+            .map(|depth| {
+                let beta = Beta {
+                    numerator: declaration.prior.founding(depth),
+                    denominator: 1,
+                    exponent: 0,
+                };
+                Chart {
+                    beta,
+                    stop: beta.stop_weight(widths.face, widths.carrier),
+                    rebases: 0,
+                    drift: 0,
+                    excess: 0,
+                }
+            })
             .collect();
         Self {
             declaration,
             widths,
             odometer,
             branches,
+            founding,
         }
     }
 
@@ -1743,8 +1921,8 @@ impl Law {
         )
     }
 
-    /// The fresh chart of a node or join: `β = 1`, `λ̂ = 1/2`, no certificate.
-    fn fresh(&self) -> Chart {
+    /// A join's fresh chart: `β = 1`, `λ̂ = 1/2`, no certificate (the join's own two-face mixture).
+    fn unit(&self) -> Chart {
         Chart {
             beta: Beta::ONE,
             stop: self.full() / 2,
@@ -2037,8 +2215,9 @@ impl Law {
     }
 
     /// **Deposit one branch's read** on a standing: each mixing node's β steps by `k(b)/q̂_(d+1)(b)`
-    /// bottom-up and its certificates grow, the path's missing nodes are founded with `β = 1`, then
-    /// each node's mass of the digit grows. Returns the root's excess increment.
+    /// bottom-up and its certificates grow, the path's missing nodes are founded at their depth's
+    /// `β₀` (the declared stop prior), then each node's mass of the digit grows. Returns the root's
+    /// excess increment.
     fn apply_branch(&self, nodes: &mut impl Standing, letters: &[u32], read: LatticeRead) -> u128 {
         let face = self.widths.face;
         let Branch { depth, forced } = self.branches[read.branch];
@@ -2082,14 +2261,20 @@ impl Law {
             nodes: mut path,
             ..
         } = read;
-        let fresh = self.fresh();
         if path.is_empty() {
-            path.push(nodes.found(tree, branch, None, 0, fresh));
+            path.push(nodes.found(tree, branch, None, 0, self.founding[0]));
         }
         while path.len() < letters.len() + 1 {
             let parent = *path.last().expect("a root");
             let letter = letters[path.len() - 1];
-            path.push(nodes.found(tree, branch, Some((parent, letter)), path.len(), fresh));
+            let depth = path.len();
+            path.push(nodes.found(
+                tree,
+                branch,
+                Some((parent, letter)),
+                depth,
+                self.founding[depth],
+            ));
         }
         for &node in path.iter().skip(forced) {
             nodes.halves_mut(node)[symbol] += 2;
@@ -2163,8 +2348,9 @@ impl Law {
 impl Landmarks {
     /// **Declare a tree**, empty: every node unfounded, so every face is uniform. Refused at an
     /// alphabet below two classes or past 31 bits, a zero population or grain, a population or
-    /// grain past 32 bits, a forced depth past the address depth, or derived widths whose
-    /// products exceed `u128` (module header, "The carrier rebases past `u128`").
+    /// grain past 32 bits, a forced depth past the address depth, derived widths whose products
+    /// exceed `u128` (module header, "The carrier rebases past `u128`"), or a stop prior's rung at a
+    /// mixing depth past the carrier `W` (its founding ratio `2^j − 1` would not be carried exactly).
     pub fn new(declaration: LandmarkDeclaration) -> Result<Self, HnnError> {
         check_declaration(&declaration)?;
         let widths = Widths::derived(&declaration);
@@ -2193,10 +2379,23 @@ impl Landmarks {
                 usize::try_from(operands).unwrap_or(usize::MAX),
             ));
         }
+        // The mixing depths' founding ratios are stepped on the carrier: each within `W` bits.
+        let deepest = declaration.branch_depths().into_iter().max().unwrap_or(0);
+        let widest = (0..deepest)
+            .map(|depth| declaration.prior.rung(depth))
+            .max()
+            .unwrap_or(0);
+        if u64::from(widest) > widths.carrier {
+            return Err(shape(
+                "a stop prior whose founding ratio 2^j − 1 fits the carrier's W bits",
+                widths.carrier as usize,
+                widest as usize,
+            ));
+        }
         let law = Law::new(declaration, widths);
         let trees = law.branches.len() * law.cells();
         let joins = if law.joined() {
-            vec![law.fresh(); law.cells()]
+            vec![law.unit(); law.cells()]
         } else {
             Vec::new()
         };
@@ -2478,7 +2677,8 @@ impl Landmarks {
 
     /// **Deposit one cell** on the paths it opens, read at the current standing (module header):
     /// each mixing node's β steps by `k(b)/q̂_(d+1)(b)` bottom-up and its certificates grow, the
-    /// path's missing nodes are founded with `β = 1`, then each node's mass of the digit grows, and
+    /// path's missing nodes are founded at their depth's `β₀ = 2^(j_d) − 1` (the declared stop prior),
+    /// then each node's mass of the digit grows, and
     /// each join's β steps. Refused before anything moves at a bad address or class, or past the
     /// declared population.
     pub fn deposit(&mut self, address: &[Letter], class: usize) -> Result<(), HnnError> {
@@ -2609,6 +2809,12 @@ impl ArenaView<'_> {
     /// One dyadic cell's join chart; `None` unless enlarged.
     pub fn join(&self, dyadic: usize) -> Option<ChartWords> {
         self.tree.nodes.joins.get(dyadic).map(chart_words)
+    }
+
+    /// **The chart a node is founded with at its depth** (Decision 32): the declared stop prior's
+    /// `β₀ = 2^(j_d) − 1` and its stop weight `λ̂ = ⟦1 − 2^(−j_d)⟧`; `None` past the deepest branch.
+    pub fn founding(&self, depth: usize) -> Option<ChartWords> {
+        self.tree.law.founding.get(depth).map(chart_words)
     }
 
     /// Each branch's letters of an address (the cells, then the flattened bundles).
@@ -2775,8 +2981,10 @@ fn dyadic_grain_exponent(
 
 /// [definition] **The ideal tree weighting, the reference oracle** (module header): the executed
 /// tree's arena with `β` in ℚ and every path face exact, `q_D = k_D`,
-/// `q_d = (β k_d + q_(d+1))/(1 + β)`, the deposit `β' = β k/q_(d+1)` on the exact faces, and in an
-/// enlarged tree each join `q_h = (β_h q_cells + q_bundles)/(1 + β_h)`, `β'_h = β_h q_cells/q_bundles`.
+/// `q_d = (β k_d + q_(d+1))/(1 + β)`, each node founded at its depth's `β₀ = 2^(j_d) − 1` (the
+/// declared stop prior), the deposit `β' = β k/q_(d+1)` on the exact faces, and in an enlarged tree
+/// each join `q_h = (β_h q_cells + q_bundles)/(1 + β_h)` from `β_h = 1`,
+/// `β'_h = β_h q_cells/q_bundles`.
 /// With no width `β` is exact (the tests); at a width it is rebased past it with the residual
 /// `1/m'`.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -3000,7 +3208,12 @@ impl IdealLandmarks {
                 let founded = self
                     .arena
                     .extend(tree, branch, &letters[branch], &mut nodes);
-                self.beta.extend(std::iter::repeat_n(Rat::one(), founded));
+                // Each founded node at its depth's β₀ = 2^(j_d) − 1 (the declared stop prior).
+                let prior = &self.declaration.prior;
+                self.beta.extend(
+                    (nodes.len() - founded..nodes.len())
+                        .map(|depth| Rat::from_integer(BigInt::from(prior.founding(depth)))),
+                );
                 self.arena.count(&nodes, forced, digit.symbol);
             }
         }
@@ -3298,6 +3511,116 @@ pub fn choose_depth(
         chosen,
         description_bits,
     })
+}
+
+/// **One tree's prequential run on a cut, the tree alone** (the held-out pass of a law measured
+/// beside another's run of the baselines): every cell scored at the current standing before its
+/// own deposit, the code lengths enclosed on `[development, held-out]`, and the tree's run.
+pub fn tree_prequential(
+    cut: &Cut,
+    letters: &[Letter],
+    declaration: &LandmarkDeclaration,
+) -> Result<([ExactInterval; 2], TreeRun), HnnError> {
+    aligned(&cut.cells, letters)?;
+    let held_out = |position: usize| cut.held_out(position);
+    run_tree(&cut.cells, letters, &held_out, declaration)
+}
+
+/// [definition] **A stop-prior sweep on the development cells** ([`choose_prior`]): every law tried
+/// with its own depth sweep, the incumbent (Decision 28's `½`), the chosen law, whether the chosen
+/// law's charged code length is decided below every other law's by disjoint enclosures, and the
+/// description bits the choice is charged, `⌈log₂⌉` of the laws tried (each law's depths are
+/// charged beside it, [`PriorSweep::charged`]).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PriorSweep {
+    pub tried: Vec<(StopPrior, DepthSweep)>,
+    pub incumbent: usize,
+    pub chosen: usize,
+    pub decided: bool,
+    pub description_bits: u64,
+}
+
+impl PriorSweep {
+    /// A law's development code length at its chosen depth.
+    pub fn bits(&self, index: usize) -> ExactInterval {
+        let sweep = &self.tried[index].1;
+        sweep
+            .tried
+            .iter()
+            .find(|(depth, _)| *depth == sweep.chosen)
+            .map(|(_, bits)| bits.clone())
+            .expect("the chosen depth was tried")
+    }
+
+    /// A law's development code length charged its depths' description bits `⌈log₂⌉` of the
+    /// depths it tried (the laws' own charge is common to every law, [`PriorSweep::description_bits`]).
+    pub fn charged(&self, index: usize) -> ExactInterval {
+        let bits = self.bits(index);
+        let depth = Rat::from_integer(BigInt::from(self.tried[index].1.description_bits));
+        ExactInterval {
+            lower: &bits.lower + &depth,
+            upper: &bits.upper + &depth,
+        }
+    }
+
+    /// The chosen law's whole description: the laws' `⌈log₂⌉` and its depths'.
+    pub fn chosen_description(&self) -> u64 {
+        self.description_bits + self.tried[self.chosen].1.description_bits
+    }
+}
+
+/// [definition; agent-inferred] **Choose the stop prior on the development cells** (Decision 32):
+/// each declared law of `family` chooses its own depth ([`choose_depth`], so the depth selection is
+/// campaign 1's) and reads its development code length there, the laws run together
+/// (`hnn::realization`: each reads the shared immutable development cells and writes its own sweep,
+/// so their effects commute). Each law is charged `⌈log₂⌉` of its depths tried, and the choice
+/// `⌈log₂ |family|⌉`. The chosen law is the least charged one (the first in the family's order at a
+/// tie) when its enclosure lies strictly below the incumbent's (Decision 28's `½`, which the family
+/// must hold), and the incumbent otherwise; `decided` records whether it lies strictly below every
+/// other law's. The held-out cells never choose anything: they are cut away before any reading.
+pub fn choose_prior(
+    cut: &Cut,
+    letters: &[Letter],
+    declaration: &LandmarkDeclaration,
+    family: &[StopPrior],
+) -> Result<PriorSweep, HnnError> {
+    aligned(&cut.cells, letters)?;
+    let half = StopPrior::half();
+    let incumbent = family.iter().position(|prior| *prior == half).ok_or(shape(
+        "a stop-prior family holding Decision 28's ½",
+        1,
+        0,
+    ))?;
+    let sweeps = indexed(family.len(), |index| {
+        let declared = LandmarkDeclaration {
+            prior: family[index].clone(),
+            ..declaration.clone()
+        };
+        choose_depth(cut, letters, &declared)
+    })?;
+    let mut sweep = PriorSweep {
+        tried: family.iter().cloned().zip(sweeps).collect(),
+        incumbent,
+        chosen: incumbent,
+        decided: false,
+        description_bits: ceil_log2(&BigUint::from(family.len())),
+    };
+    let charged: Vec<ExactInterval> = (0..family.len()).map(|i| sweep.charged(i)).collect();
+    let mut least = 0;
+    for (index, bits) in charged.iter().enumerate() {
+        if bits.upper < charged[least].upper {
+            least = index;
+        }
+    }
+    if charged[least].upper < charged[incumbent].lower {
+        sweep.chosen = least;
+    }
+    let chosen = &charged[sweep.chosen];
+    sweep.decided = charged
+        .iter()
+        .enumerate()
+        .all(|(index, bits)| index == sweep.chosen || chosen.upper < bits.lower);
+    Ok(sweep)
 }
 
 /// [definition] **The executed face's cost against the oracle** ([`oracle_cost`]), per population

@@ -50,6 +50,7 @@ fn the_grain_is_derived_from_the_receivers_code_tolerance() {
         aperture: 2,
         tolerance: rat(3, 40),
         depth: 2,
+        prior: crate::hnn::StopPrior::half(),
     };
     assert_eq!(
         ReceivingPhases::declare(field, &medium, &current, &coarse)
@@ -79,6 +80,7 @@ fn an_aperture_beyond_the_observability_rank_is_refused() {
         aperture: 5,
         tolerance: rat(1, 16),
         depth: 2,
+        prior: crate::hnn::StopPrior::half(),
     };
     match ReceivingPhases::declare(&field, &medium, &current, &wide) {
         Err(HnnError::Observability { aperture, rank }) => {
@@ -854,6 +856,7 @@ fn the_address_restricts_by_whole_bundles_and_the_sheets_are_a_scale_square() {
         population: 6_148,
         grain: 16,
         family,
+        prior: crate::hnn::StopPrior::half(),
     };
     let tree = Landmarks::new(declared(family.clone())).unwrap();
     let coarsen = |letter: Letter| match letter {

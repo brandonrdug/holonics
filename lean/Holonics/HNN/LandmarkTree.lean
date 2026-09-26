@@ -29,6 +29,9 @@ path face  q_D = k_D ;   q_d = λ_d k_d + (1 − λ_d) q_(d+1) ,   λ_d = E_d/(E
 step       W'_d = W_d q_d(c) ,  E'_d = E_d k_d(c) ,  P'_d = P_d q_(d+1)(c) ,
            β'_d = β_d k_d(c)/q_(d+1)(c)
 trees      W_s = Σ_S 2^(−Γ(S)) ∏_(leaves ℓ of S) E_(s ℓ) ,   Σ_S 2^(−Γ(S)) = 1
+stop law   W_s = w_d E_s + (1 − w_d) P_s  (d = |s|) ;  λ_d = β_d/(1 + β_d) ,  β_d = w_d E_d/((1 − w_d) P_d)
+           W_s = Σ_S prior_w(S) ∏ E ,  prior_w(S) = ∏_(stops) w_d ∏_(splits) (1 − w_d) ,  Σ_S prior_w(S) = 1
+           founding β₀ = w_d/(1 − w_d) ;  ladder w = 1 − 2^(−j): β₀ = 2^j − 1 ;  w = ½ is Decision 28's tree
 cochain    q_0 = q_D ∏_(d<D) q_d/q_(d+1) ;
            −log₂ q_0 = −log₂ q_D + Σ_(d<D) log₂ R_d ,  R_d = q_(d+1)/q_d
 digits     q(c) = ∏_(i<w) q(prefix_i c, bit_i c) ;   q̂(0) = clamp_[1, 2^M − 1](round(2^M q(0)))/2^M
@@ -63,7 +66,8 @@ likelihood of what reached it (`standing_is_routed_counts`).
    weight is a probability law on the words of every length, and each node's mass is the KT
    likelihood of its routed subsequence. **The Kraft form** (`mixture_over_trees`,
    `kraft_and_dominance`): the weight is the mixture over pruned trees with weights `2^(−Γ(S))`,
-   these weights sum to one, and `−log₂ W ≤ Γ(S) − log₂ ∏ E` for every pruned tree.
+   these weights sum to one, and `−log₂ W ≤ Γ(S) − log₂ ∏ E` for every pruned tree. Each is the
+   declared stop-weight law's at `w = ½` (item 12).
 5. **Depth one is Decision 27** (`depth_one_is_decision_27`): at depth one with the forced split
    `λ_0 = 0`, the face is `RegionCounts.countFace` of the KT masses the region word deposits at the
    preceding cell (`regionRun_local`, `count_face_eq_kt`); ordinary CTW at depth one mixes in the
@@ -98,7 +102,7 @@ likelihood of what reached it (`standing_is_routed_counts`).
 9. **Founding and release** (`unfounded_reads_prior`, `founding_step`, `founded_tree_same_law`,
    `release_rule`): an unfounded node reads as the prior (`E = P = W = β = 1`, the uniform face),
    and a node founded by an arrival keeps `β = 1`, so the tree founded at first arrival is the same
-   law as the materialized tree. Replacing a tree standing preserves every admitted future face
+   law as the materialized tree (under a declared stop-weight law, `β₀ = w_d/(1 − w_d)`, item 12). Replacing a tree standing preserves every admitted future face
    exactly when the causal signatures agree (`Foundation/Standing`), a retention is lawful exactly
    when it refines the signature, and nodes deeper than the admitted depth are releasable.
 10. **The lattice chart** (`lattice_path_laws`, `lattice_path_floor`, `lattice_path_deviation`,
@@ -127,6 +131,21 @@ likelihood of what reached it (`standing_is_routed_counts`).
     chart whose step at cell `t` carries a factor `ρ_t > 0`, `A_n ≤ 2 ∏ max(1, ρ_t) ∏ q̂_t` and
     `B_n ≤ 2 ∏ max(1, 1/ρ_t) ∏ q̂_t`, so the executed code length is within
     `min + 1 + Σ_t |log₂ ρ_t|`: the chart's drift adds once over the passage.
+
+12. **The declared stop-weight law** (Decision 32; `StopLaw`, `stopWeight`, `stopWeight_half`,
+    `stop_weight_step`, `stop_ratio_step`, `stop_mixture_over_trees`, `PrunedTree.prior_const`,
+    `PrunedTree.prior_sum`, `stop_kraft_and_dominance`, `stop_unfounded`, `stop_founding_step`,
+    `ladder_founding`). For any stop weights `w_d ∈ (0, 1)` read at the node's depth,
+    `W_s = w_d E_s + (1 − w_d) ∏_b W_(s b)` is the mixture over pruned trees with the prior
+    `∏_(stops) w_d ∏_(splits) (1 − w_d)` (at a constant `w`, `w^(stops S) (1 − w)^(splits S)`); the
+    prior weights sum to one, and `−log₂ W ≤ −log₂ prior_w(S) − log₂ ∏ E` for every pruned tree. The
+    path face is the successive likelihood ratio with `λ_d = β_d/(1 + β_d)`,
+    `β_d = w_d E_d/((1 − w_d) P_d)`, and an arrival moves `β' = β k/q'` exactly as at `½`: the law
+    enters only through the founding ratio, `β₀ = w_d/(1 − w_d)`, kept through the founding arrival.
+    On the dyadic ladder `w = 1 − 2^(−j)` it is the integer `2^j − 1`. Decision 28's step, locality,
+    split, Kraft form and founding (`weight_step`, `treeWeight_arrive_off`, `splitMass_arrive`,
+    `mixture_over_trees`, `kraft_and_dominance`, `founding_step`) are the corollaries at `w = ½`
+    (`stopWeight_half`, `stopFace_half`, `PrunedTree.prior_half`, `PrunedTree.prior_half_bits`).
 
 [counterexample; formal-checked]
 * `budget_eviction_changes_face`: evicting an occupied child by budget alone changes a later face
@@ -159,7 +178,9 @@ on the standing real cut) are measurement receipts, not theorems. The campaign 5
 stated here: they have no consumer yet.
 
 The Rust consumer is `crates/holonics/src/hnn/landmark.rs` (`hnn::landmark`, written beside this
-owner): `Landmarks` (the tree executed on the lattice: its all-class face `Landmarks::face`, a
+owner): `StopPrior` (item 12's declared law on the dyadic ladder, founding each node at
+`β₀ = 2^(j_d) − 1`; `choose_prior` chooses it on the development cells), `Landmarks` (the tree
+executed on the lattice: its all-class face `Landmarks::face`, a
 window's faces in cell order `Landmarks::window_faces`, `probability`, `score`, its deposit
 `Landmarks::deposit` and `receive`, the certificates),
 `IdealLandmarks` (the ideal tree weighting in ℚ, the reference oracle), `Beta` (the carried β chart),
@@ -695,18 +716,6 @@ theorem off_path_child {a : List Ltr} {d : ℕ} (hd : d < a.length) {b : Ltr} (h
   rw [hlen, ← restrict, restrict_succ hd, restrict] at h
   exact hb (List.singleton_inj.mp (List.append_cancel_left h)).symm
 
-/-- [proved-derived; formal-checked] **A deposit is local to the opened path**: at a node off the
-path the arrival changes no weight at any depth below it. -/
-theorem treeWeight_arrive_off (N : TreeStanding Ltr A) {a s : List Ltr}
-    (h : ¬ a.take s.length = s) (c : A) (m : ℕ) :
-    treeWeight (arrive N a c) m s = treeWeight N m s := by
-  induction m generalizing s with
-  | zero => simp [treeWeight, arrive, h]
-  | succ m ih =>
-    simp only [treeWeight, arrive, if_neg h]
-    congr 2
-    exact Finset.prod_congr rfl fun b _ => ih (off_path_descendant h [b])
-
 theorem prod_update_one {ι : Type*} [Fintype ι] [DecidableEq ι] (f g : ι → ℚ) (i0 : ι) (r : ℚ)
     (h0 : g i0 = f i0 * r) (h : ∀ i, i ≠ i0 → g i = f i) : ∏ i, g i = (∏ i, f i) * r := by
   have e : ∀ i, g i = f i * (if i = i0 then r else 1) := fun i => by
@@ -716,29 +725,188 @@ theorem prod_update_one {ι : Type*} [Fintype ι] [DecidableEq ι] (f g : ι →
   rw [Finset.prod_congr rfl fun i _ => e i, Finset.prod_mul_distrib, Finset.prod_ite_eq']
   simp
 
-/-- The split mass of an opened node moves by its opened child's factor. -/
-theorem splitMass_arrive (N : TreeStanding Ltr A) {a : List Ltr} {d : ℕ} (hd : d < a.length)
-    (c : A) (m : ℕ) (r : ℚ)
-    (hchild : treeWeight (arrive N a c) m (a.take (d + 1)) = treeWeight N m (a.take (d + 1)) * r) :
-    splitMass (arrive N a c) m (a.take d) = splitMass N m (a.take d) * r := by
-  unfold splitMass
+/-! ### The declared stop-weight law (Decision 32)
+
+A node stops with weight `w_d` and splits with `1 − w_d`, the law read at the node's depth
+`d = |s|`. Every law of this subsection holds for any `w_d ∈ (0, 1)`; Decision 28's tree is the law
+at `w = ½` (`stopWeight_half`), and its step (`weight_step`), its locality
+(`treeWeight_arrive_off`), its split (`splitMass_arrive`), its Kraft form (`mixture_over_trees`,
+`kraft_and_dominance`) and its founding (`founding_step`) are the corollaries at `½`. The declared
+family is the dyadic ladder `w = 1 − 2^(−j)` (`ladder_founding`), per depth or global. -/
+
+/-- [definition] **A stop-weight law**: every stop weight `w_d` lies in `(0, 1)`. -/
+def StopLaw (w : ℕ → ℚ) : Prop := ∀ d, 0 < w d ∧ w d < 1
+
+/-- Decision 28's `½` is a stop-weight law. -/
+theorem half_stopLaw : StopLaw fun _ => (1 / 2 : ℚ) := fun _ => by norm_num
+
+/-- [definition] **The dyadic ladder**: rung `j` stops with `w = 1 − 2^(−j)`. -/
+def ladder (j : ℕ) : ℚ := 1 - (1 / 2) ^ j
+
+/-- [proved-derived; formal-checked] **`ladder_founding`.** On the dyadic ladder at `j ≥ 1` the stop
+weight lies in `(0, 1)`, its founding ratio `w/(1 − w)` is the integer `2^j − 1`, and rung `1` is
+Decision 28's `½` (founding ratio `1`). -/
+theorem ladder_founding {j : ℕ} (hj : 1 ≤ j) :
+    0 < ladder j ∧ ladder j < 1 ∧ ladder j / (1 - ladder j) = 2 ^ j - 1 ∧ ladder 1 = 1 / 2 := by
+  have hp : (0 : ℚ) < (1 / 2) ^ j := by positivity
+  have hq : (1 / 2 : ℚ) ^ j ≤ 1 / 2 := by
+    calc (1 / 2 : ℚ) ^ j ≤ (1 / 2) ^ 1 := pow_le_pow_of_le_one (by norm_num) (by norm_num) hj
+      _ = 1 / 2 := pow_one _
+  refine ⟨by unfold ladder; linarith, by unfold ladder; linarith, ?_, by norm_num [ladder]⟩
+  unfold ladder
+  rw [sub_sub_cancel, sub_div, div_self hp.ne', one_div_pow, one_div_one_div]
+
+/-- [definition] **The tree's mixture under a stop-weight law** at node `s` with `m` levels below it:
+`W_s = E_s` at the maximum depth and `W_s = w_|s| E_s + (1 − w_|s|) ∏_b W_(s b)` above it, the stop
+weight read at the node's depth `|s|`. -/
+def stopWeight (w : ℕ → ℚ) (N : TreeStanding Ltr A) : ℕ → List Ltr → ℚ
+  | 0, s => ktMass (N s)
+  | m + 1, s => w s.length * ktMass (N s) + (1 - w s.length) * ∏ b, stopWeight w N m (s ++ [b])
+
+/-- [definition] **The split mass under the law**: `P_s = ∏_b W_(s b)`. -/
+def stopSplit (w : ℕ → ℚ) (N : TreeStanding Ltr A) (m : ℕ) (s : List Ltr) : ℚ :=
+  ∏ b, stopWeight w N m (s ++ [b])
+
+omit [DecidableEq A] [DecidableEq Ltr] in
+theorem stopWeight_succ (w : ℕ → ℚ) (N : TreeStanding Ltr A) (m : ℕ) (s : List Ltr) :
+    stopWeight w N (m + 1) s =
+      w s.length * ktMass (N s) + (1 - w s.length) * stopSplit w N m s := rfl
+
+omit [DecidableEq A] [DecidableEq Ltr] in
+theorem stopWeight_pos [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w) (N : TreeStanding Ltr A) :
+    ∀ m s, 0 < stopWeight w N m s
+  | 0, s => ktMass_pos _
+  | m + 1, s => by
+    have hE := ktMass_pos (N s)
+    have hP : 0 < ∏ b, stopWeight w N m (s ++ [b]) :=
+      Finset.prod_pos fun _ _ => stopWeight_pos hw N m _
+    obtain ⟨h0, h1⟩ := hw s.length
+    have e1 := mul_pos h0 hE
+    have e2 := mul_pos (sub_pos.mpr h1) hP
+    simp only [stopWeight]
+    linarith
+
+omit [DecidableEq A] [DecidableEq Ltr] in
+theorem stopSplit_pos [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w) (N : TreeStanding Ltr A) (m : ℕ)
+    (s : List Ltr) : 0 < stopSplit w N m s :=
+  Finset.prod_pos fun _ _ => stopWeight_pos hw N m _
+
+omit [DecidableEq A] [DecidableEq Ltr] in
+/-- [proved-derived; formal-checked] **Decision 28's tree is the law at `½`**: `W_s = ½E_s + ½P_s`. -/
+theorem stopWeight_half (N : TreeStanding Ltr A) :
+    ∀ m s, stopWeight (fun _ => (1 / 2 : ℚ)) N m s = treeWeight N m s
+  | 0, _ => rfl
+  | m + 1, s => by
+    simp only [stopWeight, treeWeight, stopWeight_half N m]
+    ring
+
+omit [DecidableEq A] [DecidableEq Ltr] in
+theorem stopSplit_half (N : TreeStanding Ltr A) (m : ℕ) (s : List Ltr) :
+    stopSplit (fun _ => (1 / 2 : ℚ)) N m s = splitMass N m s := by
+  simp only [stopSplit, splitMass, stopWeight_half]
+
+/-- [definition] **The stop weight at depth `d` of the opened path** under the law:
+`λ_d = w_d E_d/(w_d E_d + (1 − w_d) P_d)`, the posterior weight of stopping at the node. -/
+def stopLam (w : ℕ → ℚ) (N : TreeStanding Ltr A) (D : ℕ) (a : List Ltr) (d : ℕ) : ℚ :=
+  w d * ktMass (N (a.take d)) /
+    (w d * ktMass (N (a.take d)) + (1 - w d) * stopSplit w N (D - d - 1) (a.take d))
+
+/-- [definition] **The stop-to-split ratio under the law**: `β_d = w_d E_d/((1 − w_d) P_d)`. -/
+def stopRatio (w : ℕ → ℚ) (N : TreeStanding Ltr A) (D : ℕ) (a : List Ltr) (d : ℕ) : ℚ :=
+  w d * ktMass (N (a.take d)) / ((1 - w d) * stopSplit w N (D - d - 1) (a.take d))
+
+/-- [definition] **The tree's face along the opened path under the law**. -/
+def stopFace (w : ℕ → ℚ) (N : TreeStanding Ltr A) (D : ℕ) (a : List Ltr) (d : ℕ) : A → ℚ :=
+  pathFace (kAt N a) (stopLam w N D a) D d
+
+omit [DecidableEq A] [DecidableEq Ltr] in
+theorem stopLam_mem [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w) (N : TreeStanding Ltr A) (D : ℕ)
+    (a : List Ltr) (d : ℕ) : 0 < stopLam w N D a d ∧ stopLam w N D a d < 1 := by
+  have hE := ktMass_pos (N (a.take d))
+  have hP := stopSplit_pos hw N (D - d - 1) (a.take d)
+  obtain ⟨h0, h1⟩ := hw d
+  have e1 := mul_pos h0 hE
+  have e2 := mul_pos (sub_pos.mpr h1) hP
+  unfold stopLam
+  exact ⟨div_pos e1 (by linarith), (div_lt_one (by linarith)).mpr (by linarith)⟩
+
+omit [DecidableEq A] [DecidableEq Ltr] in
+/-- The stop weight is `λ = β/(1 + β)` with the stop-to-split ratio `β = w E/((1 − w) P)`. -/
+theorem stopLam_eq_ratio [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w) (N : TreeStanding Ltr A)
+    (D : ℕ) (a : List Ltr) (d : ℕ) :
+    stopLam w N D a d = stopRatio w N D a d / (1 + stopRatio w N D a d) := by
+  have hE := ktMass_pos (N (a.take d))
+  have hP := stopSplit_pos hw N (D - d - 1) (a.take d)
+  obtain ⟨h0, h1⟩ := hw d
+  have hw1 : (0 : ℚ) < 1 - w d := sub_pos.mpr h1
+  have e1 := mul_pos h0 hE
+  have e2 := mul_pos hw1 hP
+  have hden : 0 < w d * ktMass (N (a.take d)) + (1 - w d) * stopSplit w N (D - d - 1) (a.take d) :=
+    add_pos e1 e2
+  have hw1' : (1 : ℚ) - w d ≠ 0 := hw1.ne'
+  unfold stopLam stopRatio
+  field_simp
+  ring
+
+omit [DecidableEq A] [DecidableEq Ltr] in
+theorem stopFace_normalized [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w) (N : TreeStanding Ltr A)
+    (D : ℕ) (a : List Ltr) :
+    ∀ d ≤ D, (∀ c, 0 < stopFace w N D a d c) ∧ ∑ c, stopFace w N D a d c = 1 :=
+  path_face_normalized _ _ D (fun _ _ c => ktFace_pos _ c) (fun _ _ => ktFace_sum _)
+    fun d _ => ⟨(stopLam_mem hw N D a d).1.le, (stopLam_mem hw N D a d).2.le⟩
+
+omit [DecidableEq A] [DecidableEq Ltr] in
+/-- At `w = ½` the law's stop weight and face are Decision 28's. -/
+theorem stopFace_half [Nonempty A] (N : TreeStanding Ltr A) (D : ℕ) (a : List Ltr) :
+    stopLam (fun _ => (1 / 2 : ℚ)) N D a = lamAt N D a ∧
+      stopFace (fun _ => (1 / 2 : ℚ)) N D a = face N D a := by
+  have hlam : stopLam (fun _ => (1 / 2 : ℚ)) N D a = lamAt N D a := by
+    funext d
+    have hE := ktMass_pos (N (a.take d))
+    have hP := splitMass_pos N (D - d - 1) (a.take d)
+    unfold stopLam lamAt
+    rw [stopSplit_half]
+    field_simp
+    ring
+  refine ⟨hlam, ?_⟩
+  funext d
+  simp only [stopFace, face, hlam]
+
+/-- [proved-derived; formal-checked] **A deposit is local to the opened path under any law**: at a
+node off the path the arrival changes no weight at any depth below it. -/
+theorem stopWeight_arrive_off (w : ℕ → ℚ) (N : TreeStanding Ltr A) {a s : List Ltr}
+    (h : ¬ a.take s.length = s) (c : A) (m : ℕ) :
+    stopWeight w (arrive N a c) m s = stopWeight w N m s := by
+  induction m generalizing s with
+  | zero => simp [stopWeight, arrive, h]
+  | succ m ih =>
+    have hs : arrive N a c s = N s := by simp [arrive, h]
+    rw [stopWeight_succ, stopWeight_succ, hs, stopSplit, stopSplit,
+      Finset.prod_congr rfl fun b _ => ih (off_path_descendant h [b])]
+
+/-- The split mass of an opened node moves by its opened child's factor, under any law. -/
+theorem stopSplit_arrive (w : ℕ → ℚ) (N : TreeStanding Ltr A) {a : List Ltr} {d : ℕ}
+    (hd : d < a.length) (c : A) (m : ℕ) (r : ℚ)
+    (hchild : stopWeight w (arrive N a c) m (a.take (d + 1)) =
+      stopWeight w N m (a.take (d + 1)) * r) :
+    stopSplit w (arrive N a c) m (a.take d) = stopSplit w N m (a.take d) * r := by
+  unfold stopSplit
   refine prod_update_one _ _ a[d] r ?_ fun b hb =>
-    treeWeight_arrive_off N (off_path_child hd hb) c m
+    stopWeight_arrive_off w N (off_path_child hd hb) c m
   have e : a.take d ++ [a[d]] = a.take (d + 1) := (restrict_succ hd).symm
   rw [e]
   exact hchild
 
-/-- [proved-derived; formal-checked] **`weight_step`: the conditional prediction is the successive
-likelihood ratio.** For an address `a` of length at least `D` and a class `c`, at every depth
-`d ≤ D` of the opened path, `W'_d = W_d · q_d(c)`: the arrival multiplies the node's weight by the
-tree's face there, `q_D = k_D` and `q_d = λ_d k_d + (1 − λ_d) q_(d+1)` with
-`λ_d = E_d/(E_d + P_d)`. -/
-theorem weight_step [Nonempty A] (N : TreeStanding Ltr A) {D : ℕ} {a : List Ltr}
-    (hD : D ≤ a.length) (c : A) :
-    ∀ d ≤ D, treeWeight (arrive N a c) (D - d) (a.take d) =
-      treeWeight N (D - d) (a.take d) * face N D a d c := by
-  suffices h : ∀ m d, d + m = D → treeWeight (arrive N a c) m (a.take d) =
-      treeWeight N m (a.take d) * face N D a d c by
+/-- [proved-derived; formal-checked] **`stop_weight_step`: under any stop-weight law the conditional
+prediction is the successive likelihood ratio.** For an address `a` of length at least `D` and a
+class `c`, at every depth `d ≤ D` of the opened path, `W'_d = W_d · q_d(c)` with `q_D = k_D` and
+`q_d = λ_d k_d + (1 − λ_d) q_(d+1)`, `λ_d = w_d E_d/(w_d E_d + (1 − w_d) P_d)`. -/
+theorem stop_weight_step [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w) (N : TreeStanding Ltr A)
+    {D : ℕ} {a : List Ltr} (hD : D ≤ a.length) (c : A) :
+    ∀ d ≤ D, stopWeight w (arrive N a c) (D - d) (a.take d) =
+      stopWeight w N (D - d) (a.take d) * stopFace w N D a d c := by
+  suffices h : ∀ m d, d + m = D → stopWeight w (arrive N a c) m (a.take d) =
+      stopWeight w N m (a.take d) * stopFace w N D a d c by
     intro d hd
     exact h (D - d) d (by omega)
   intro m
@@ -747,27 +915,87 @@ theorem weight_step [Nonempty A] (N : TreeStanding Ltr A) {D : ℕ} {a : List Lt
     intro d hd
     have hdD : d = D := by omega
     subst hdD
-    simp only [treeWeight, arrive, if_pos (opens_take a d), ktMass_bump]
-    rw [face, pathFace_deepest]
+    simp only [stopWeight, arrive, if_pos (opens_take a d), ktMass_bump]
+    rw [stopFace, pathFace_deepest]
     rfl
   | succ m ih =>
     intro d hd
     have hda : d < a.length := by omega
-    have hsplit := splitMass_arrive N hda c m (face N D a (d + 1) c) (ih (d + 1) (by omega))
-    rw [treeWeight_succ, treeWeight_succ, hsplit]
+    have hlen : (a.take d).length = d := by simp; omega
+    have hsplit := stopSplit_arrive w N hda c m (stopFace w N D a (d + 1) c)
+      (ih (d + 1) (by omega))
+    rw [stopWeight_succ, stopWeight_succ, hsplit, hlen]
     simp only [arrive, if_pos (opens_take a d), ktMass_bump]
-    simp only [face]
+    simp only [stopFace]
     rw [pathFace_step _ _ (show d < D by omega)]
-    have hlam : lamAt N D a d =
-        ktMass (N (a.take d)) / (ktMass (N (a.take d)) + splitMass N m (a.take d)) := by
-      unfold lamAt
+    have hlam : stopLam w N D a d = w d * ktMass (N (a.take d)) /
+        (w d * ktMass (N (a.take d)) + (1 - w d) * stopSplit w N m (a.take d)) := by
+      unfold stopLam
       rw [show D - d - 1 = m by omega]
     rw [hlam]
     have hE := ktMass_pos (N (a.take d))
-    have hP := splitMass_pos N m (a.take d)
+    have hP := stopSplit_pos hw N m (a.take d)
+    obtain ⟨h0, h1⟩ := hw d
+    have hden : w d * ktMass (N (a.take d)) + (1 - w d) * stopSplit w N m (a.take d) ≠ 0 :=
+      (add_pos (mul_pos h0 hE) (mul_pos (sub_pos.mpr h1) hP)).ne'
     unfold kAt
     field_simp
     ring
+
+/-- [proved-derived; formal-checked] **`stop_ratio_step`: the executed step is the same at every
+law.** Under a stop-weight law the stop weight is `λ = β/(1 + β)` with `β_d = w_d E_d/((1 − w_d)
+P_d)`, and an arrival moves `β' = β k_d(c)/q_(d+1)(c)`: the law's factor `w_d/(1 − w_d)` is carried
+from the founding, never stepped. -/
+theorem stop_ratio_step [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w) (N : TreeStanding Ltr A)
+    {D : ℕ} {a : List Ltr} (hD : D ≤ a.length) (c : A) {d : ℕ} (hd : d < D) :
+    stopLam w N D a d = stopRatio w N D a d / (1 + stopRatio w N D a d) ∧
+      stopRatio w (arrive N a c) D a d =
+        stopRatio w N D a d * kAt N a d c / stopFace w N D a (d + 1) c := by
+  refine ⟨stopLam_eq_ratio hw N D a d, ?_⟩
+  have hda : d < a.length := by omega
+  have hE : ktMass (arrive N a c (a.take d)) = ktMass (N (a.take d)) * kAt N a d c := by
+    simp only [arrive, if_pos (opens_take a d), ktMass_bump, kAt]
+  have hchild := stop_weight_step hw N hD c (d + 1) (by omega)
+  rw [show D - (d + 1) = D - d - 1 by omega] at hchild
+  have hP := stopSplit_arrive w N hda c (D - d - 1) (stopFace w N D a (d + 1) c) hchild
+  have hq := (stopFace_normalized hw N D a (d + 1) (by omega)).1 c
+  have hPp := stopSplit_pos hw N (D - d - 1) (a.take d)
+  obtain ⟨h0, h1⟩ := hw d
+  have hw1 : (1 : ℚ) - w d ≠ 0 := (sub_pos.mpr h1).ne'
+  unfold stopRatio
+  rw [hE, hP]
+  field_simp
+
+/-- [proved-derived; formal-checked] **A deposit is local to the opened path**: at a node off the
+path the arrival changes no weight at any depth below it (the law at `½`,
+`stopWeight_arrive_off`). -/
+theorem treeWeight_arrive_off (N : TreeStanding Ltr A) {a s : List Ltr}
+    (h : ¬ a.take s.length = s) (c : A) (m : ℕ) :
+    treeWeight (arrive N a c) m s = treeWeight N m s := by
+  rw [← stopWeight_half, ← stopWeight_half, stopWeight_arrive_off _ N h c m]
+
+/-- The split mass of an opened node moves by its opened child's factor (the law at `½`,
+`stopSplit_arrive`). -/
+theorem splitMass_arrive (N : TreeStanding Ltr A) {a : List Ltr} {d : ℕ} (hd : d < a.length)
+    (c : A) (m : ℕ) (r : ℚ)
+    (hchild : treeWeight (arrive N a c) m (a.take (d + 1)) = treeWeight N m (a.take (d + 1)) * r) :
+    splitMass (arrive N a c) m (a.take d) = splitMass N m (a.take d) * r := by
+  rw [← stopWeight_half, ← stopWeight_half] at hchild
+  rw [← stopSplit_half, ← stopSplit_half]
+  exact stopSplit_arrive _ N hd c m r hchild
+
+/-- [proved-derived; formal-checked] **`weight_step`: the conditional prediction is the successive
+likelihood ratio.** For an address `a` of length at least `D` and a class `c`, at every depth
+`d ≤ D` of the opened path, `W'_d = W_d · q_d(c)`: the arrival multiplies the node's weight by the
+tree's face there, `q_D = k_D` and `q_d = λ_d k_d + (1 − λ_d) q_(d+1)` with
+`λ_d = E_d/(E_d + P_d)` (the law at `½`, `stop_weight_step`). -/
+theorem weight_step [Nonempty A] (N : TreeStanding Ltr A) {D : ℕ} {a : List Ltr}
+    (hD : D ≤ a.length) (c : A) :
+    ∀ d ≤ D, treeWeight (arrive N a c) (D - d) (a.take d) =
+      treeWeight N (D - d) (a.take d) * face N D a d c := by
+  intro d hd
+  rw [← stopWeight_half, ← stopWeight_half, ← (stopFace_half N D a).2]
+  exact stop_weight_step half_stopLaw N hD c d hd
 
 /-- [proved-derived; formal-checked] **`landmark_step`: the mixture and its step.** For an address
 `a` of length at least `D` and a class `c`:
@@ -1009,34 +1237,138 @@ theorem treeLik_pos [Nonempty A] (N : TreeStanding Ltr A) :
       simp only [treeLik, Option.elim]
       exact Finset.prod_pos fun b _ => treeLik_pos N m _ _
 
+/-- [definition] **The prior weight of a pruned tree under a stop-weight law**, its root at depth
+`d`: `w_d` at a leaf above the maximum depth, `(1 − w_d) ∏_b` of its subtrees' weights at a split,
+and `1` at the maximum depth (no decision is coded there). -/
+def PrunedTree.prior (w : ℕ → ℚ) : (m : ℕ) → ℕ → PrunedTree Ltr m → ℚ
+  | 0, _, _ => 1
+  | m + 1, d, S => Option.elim (S : Option (Ltr → PrunedTree Ltr m)) (w d)
+      fun f => (1 - w d) * ∏ b, PrunedTree.prior w m (d + 1) (f b)
+
+/-- [definition] **The stops of a pruned tree**: its leaves above the maximum depth. -/
+def PrunedTree.stops : (m : ℕ) → PrunedTree Ltr m → ℕ
+  | 0, _ => 0
+  | m + 1, S => Option.elim (S : Option (Ltr → PrunedTree Ltr m)) 1
+      fun f => ∑ b, PrunedTree.stops m (f b)
+
+/-- [definition] **The splits of a pruned tree**: its internal nodes. -/
+def PrunedTree.splits : (m : ℕ) → PrunedTree Ltr m → ℕ
+  | 0, _ => 0
+  | m + 1, S => Option.elim (S : Option (Ltr → PrunedTree Ltr m)) 0
+      fun f => 1 + ∑ b, PrunedTree.splits m (f b)
+
+omit [DecidableEq Ltr] in
+/-- The model cost counts one bit a decision: `Γ(S) = stops + splits`. -/
+theorem PrunedTree.cost_eq : ∀ m (S : PrunedTree Ltr m),
+    PrunedTree.cost m S = PrunedTree.stops m S + PrunedTree.splits m S
+  | 0, _ => rfl
+  | m + 1, S => by
+    cases hS : (S : Option (Ltr → PrunedTree Ltr m)) with
+    | none => simp only [PrunedTree.cost, PrunedTree.stops, PrunedTree.splits, Option.elim]
+    | some f =>
+      simp only [PrunedTree.cost, PrunedTree.stops, PrunedTree.splits, Option.elim,
+        fun b => PrunedTree.cost_eq m (f b), Finset.sum_add_distrib]
+      omega
+
+omit [DecidableEq Ltr] in
+/-- [proved-derived; formal-checked] **The global law's prior**: at a constant stop weight `w`, a
+pruned tree weighs `w^(stops S) (1 − w)^(splits S)`. -/
+theorem PrunedTree.prior_const (w : ℚ) : ∀ m d (S : PrunedTree Ltr m),
+    PrunedTree.prior (fun _ => w) m d S = w ^ PrunedTree.stops m S * (1 - w) ^ PrunedTree.splits m S
+  | 0, _, _ => by simp [PrunedTree.prior, PrunedTree.stops, PrunedTree.splits]
+  | m + 1, d, S => by
+    cases hS : (S : Option (Ltr → PrunedTree Ltr m)) with
+    | none => simp [PrunedTree.prior, PrunedTree.stops, PrunedTree.splits]
+    | some f =>
+      simp only [PrunedTree.prior, PrunedTree.stops, PrunedTree.splits, Option.elim,
+        fun b => PrunedTree.prior_const w m (d + 1) (f b), Finset.prod_mul_distrib,
+        Finset.prod_pow_eq_pow_sum, pow_add, pow_one]
+      ring
+
+omit [DecidableEq Ltr] in
+/-- At `w = ½` a pruned tree weighs `2^(−Γ(S))`. -/
+theorem PrunedTree.prior_half (m d : ℕ) (S : PrunedTree Ltr m) :
+    PrunedTree.prior (fun _ => (1 / 2 : ℚ)) m d S = (1 / 2 : ℚ) ^ PrunedTree.cost m S := by
+  rw [PrunedTree.prior_const, PrunedTree.cost_eq, pow_add]
+  norm_num
+
+omit [DecidableEq Ltr] in
+/-- `−log₂ 2^(−Γ(S)) = Γ(S)`: at `½` a pruned tree's prior code is its model cost. -/
+theorem PrunedTree.prior_half_bits (m d : ℕ) (S : PrunedTree Ltr m) :
+    -Real.logb 2 ((PrunedTree.prior (fun _ => (1 / 2 : ℚ)) m d S : ℚ) : ℝ) = PrunedTree.cost m S := by
+  rw [PrunedTree.prior_half]
+  push_cast
+  rw [Real.logb_pow, one_div, Real.logb_inv, Real.logb_self_eq_one (by norm_num)]
+  ring
+
+/-- [proved-derived; formal-checked] **The prior weights sum to one** under any stop weights: the
+stop/split code is complete, `Σ_S prior(S) = 1`. -/
+theorem PrunedTree.prior_sum (w : ℕ → ℚ) :
+    ∀ m d, ∑ S : PrunedTree Ltr m, PrunedTree.prior w m d S = 1
+  | 0, _ => by
+    have hc : Fintype.card (PrunedTree Ltr 0) = 1 := rfl
+    simp [PrunedTree.prior, hc]
+  | m + 1, d => by
+    have e : ∑ S : PrunedTree Ltr (m + 1), PrunedTree.prior w (m + 1) d S =
+        w d + ∑ f : Ltr → PrunedTree Ltr m,
+          (1 - w d) * ∏ b, PrunedTree.prior w m (d + 1) (f b) :=
+      Fintype.sum_option (fun S : Option (Ltr → PrunedTree Ltr m) =>
+        PrunedTree.prior w (m + 1) d S)
+    rw [e, ← Finset.mul_sum, ← Fintype.prod_sum]
+    simp only [PrunedTree.prior_sum w m (d + 1), Finset.prod_const_one]
+    ring
+
+omit [DecidableEq Ltr] in
+theorem PrunedTree.prior_pos {w : ℕ → ℚ} (hw : Holonics.HNN.LandmarkTree.StopLaw w) :
+    ∀ m d (S : PrunedTree Ltr m), 0 < PrunedTree.prior w m d S
+  | 0, _, _ => by simp [PrunedTree.prior]
+  | m + 1, d, S => by
+    cases hS : (S : Option (Ltr → PrunedTree Ltr m)) with
+    | none => simp only [PrunedTree.prior, Option.elim]; exact (hw d).1
+    | some f =>
+      simp only [PrunedTree.prior, Option.elim]
+      exact mul_pos (sub_pos.mpr (hw d).2)
+        (Finset.prod_pos fun b _ => PrunedTree.prior_pos hw m (d + 1) (f b))
+
+omit [DecidableEq A] in
+/-- [proved-derived; formal-checked] **`stop_mixture_over_trees`: under any stop-weight law the tree
+is the mixture over pruned trees with the law's prior** (Decision 32):
+`W_s = Σ_S prior_w(S) ∏_(leaves ℓ of S) E_(s ℓ)`, the prior `∏_stops w_d ∏_splits (1 − w_d)`; at a
+constant `w` it is `w^(stops S) (1 − w)^(splits S)` (`PrunedTree.prior_const`). -/
+theorem stop_mixture_over_trees (w : ℕ → ℚ) (N : TreeStanding Ltr A) :
+    ∀ m s, stopWeight w N m s =
+      ∑ S : PrunedTree Ltr m, PrunedTree.prior w m s.length S * treeLik N m s S
+  | 0, s => by
+    have hc : Fintype.card (PrunedTree Ltr 0) = 1 := rfl
+    simp [stopWeight, treeLik, PrunedTree.prior, hc]
+  | m + 1, s => by
+    rw [stopWeight_succ, stopSplit]
+    simp only [stop_mixture_over_trees w N m, List.length_append, List.length_singleton]
+    rw [Fintype.prod_sum]
+    have e : ∑ S : PrunedTree Ltr (m + 1),
+        PrunedTree.prior w (m + 1) s.length S * treeLik N (m + 1) s S =
+        w s.length * ktMass (N s) + ∑ f : Ltr → PrunedTree Ltr m,
+          ((1 - w s.length) * ∏ b, PrunedTree.prior w m (s.length + 1) (f b)) *
+            ∏ b, treeLik N m (s ++ [b]) (f b) :=
+      Fintype.sum_option (fun S : Option (Ltr → PrunedTree Ltr m) =>
+        PrunedTree.prior w (m + 1) s.length S * treeLik N (m + 1) s S)
+    rw [e, Finset.mul_sum]
+    congr 1
+    refine Finset.sum_congr rfl fun f _ => ?_
+    rw [Finset.prod_mul_distrib]
+    ring
+
 omit [DecidableEq A] in
 /-- [proved-derived; formal-checked] **`mixture_over_trees`: the recursive mixture is the mixture
 over pruned trees with the Kraft weights `2^(−Γ(S))`** (Willems–Shtarkov–Tjalkens, the model
-mixture): `W_s = Σ_S 2^(−Γ(S)) ∏_(leaves ℓ of S) E_(s ℓ)`. -/
+mixture): `W_s = Σ_S 2^(−Γ(S)) ∏_(leaves ℓ of S) E_(s ℓ)`. It is the law at `½`
+(`stop_mixture_over_trees`, `PrunedTree.prior_half`). -/
 theorem mixture_over_trees (N : TreeStanding Ltr A) :
     ∀ m s, treeWeight N m s =
-      ∑ S : PrunedTree Ltr m, (1 / 2 : ℚ) ^ PrunedTree.cost m S * treeLik N m s S
-  | 0, s => by
-    have hc : Fintype.card (PrunedTree Ltr 0) = 1 := rfl
-    simp [treeWeight, treeLik, PrunedTree.cost, hc]
-  | m + 1, s => by
-    rw [treeWeight_succ, splitMass]
-    simp only [mixture_over_trees N m]
-    rw [Fintype.prod_sum]
-    have e : ∑ S : PrunedTree Ltr (m + 1),
-        (1 / 2 : ℚ) ^ PrunedTree.cost (m + 1) S * treeLik N (m + 1) s S =
-        (1 / 2 : ℚ) ^ 1 * ktMass (N s) + ∑ f : Ltr → PrunedTree Ltr m,
-          (1 / 2 : ℚ) ^ (1 + ∑ b, PrunedTree.cost m (f b)) *
-            ∏ b, treeLik N m (s ++ [b]) (f b) :=
-      Fintype.sum_option (fun S : Option (Ltr → PrunedTree Ltr m) =>
-        (1 / 2 : ℚ) ^ PrunedTree.cost (m + 1) S * treeLik N (m + 1) s S)
-    rw [e, add_div, pow_one]
-    congr 1
-    · ring
-    · rw [Finset.sum_div]
-      refine Finset.sum_congr rfl fun f _ => ?_
-      rw [pow_add, ← Finset.prod_pow_eq_pow_sum, Finset.prod_mul_distrib]
-      ring
+      ∑ S : PrunedTree Ltr m, (1 / 2 : ℚ) ^ PrunedTree.cost m S * treeLik N m s S := by
+  intro m s
+  rw [← stopWeight_half, stop_mixture_over_trees]
+  simp only [PrunedTree.prior_half]
 
 omit [DecidableEq A] [DecidableEq Ltr] in
 theorem treeLik_empty [Nonempty A] :
@@ -1050,6 +1382,41 @@ theorem treeLik_empty [Nonempty A] :
       exact Finset.prod_eq_one fun b _ => treeLik_empty m _ _
 
 omit [DecidableEq A] in
+/-- [proved-derived; formal-checked] **`stop_kraft_and_dominance`** (Decision 32). Under any
+stop-weight law `w_d ∈ (0, 1)`:
+* **Kraft**: the prior weights of the pruned trees sum to one (the stop/split code is complete);
+* **dominance**: for every pruned tree `S`, `W_s ≥ prior_w(S) ∏_(leaves) E`, so the tree codes
+  within its prior's code of every pruned tree:
+  `−log₂ W ≤ −log₂ prior_w(S) − log₂ ∏ E`.
+
+At `w = ½` it is `kraft_and_dominance`, the prior's code `Γ(S)`. -/
+theorem stop_kraft_and_dominance [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w)
+    (N : TreeStanding Ltr A) (m : ℕ) (s : List Ltr) :
+    ∑ S : PrunedTree Ltr m, PrunedTree.prior w m s.length S = 1 ∧
+      ∀ S : PrunedTree Ltr m,
+        PrunedTree.prior w m s.length S * treeLik N m s S ≤ stopWeight w N m s ∧
+        -Real.logb 2 (stopWeight w N m s : ℝ) ≤
+          -Real.logb 2 (PrunedTree.prior w m s.length S : ℝ) -
+            Real.logb 2 (treeLik N m s S : ℝ) := by
+  have hdom : ∀ S : PrunedTree Ltr m,
+      PrunedTree.prior w m s.length S * treeLik N m s S ≤ stopWeight w N m s := by
+    intro S
+    rw [stop_mixture_over_trees w N m s]
+    exact Finset.single_le_sum
+      (f := fun S => PrunedTree.prior w m s.length S * treeLik N m s S)
+      (fun S _ => (mul_pos (PrunedTree.prior_pos hw m _ S) (treeLik_pos N m s S)).le)
+      (Finset.mem_univ S)
+  refine ⟨PrunedTree.prior_sum w m s.length, fun S => ⟨hdom S, ?_⟩⟩
+  have hpR : (0 : ℝ) < (PrunedTree.prior w m s.length S : ℝ) := by
+    exact_mod_cast PrunedTree.prior_pos hw m s.length S
+  have hLR : (0 : ℝ) < (treeLik N m s S : ℝ) := by exact_mod_cast treeLik_pos N m s S
+  have hdR : ((PrunedTree.prior w m s.length S : ℚ) : ℝ) * (treeLik N m s S : ℝ) ≤
+      (stopWeight w N m s : ℝ) := by exact_mod_cast hdom S
+  have hlog := Real.logb_le_logb_of_le (b := 2) (by norm_num) (by positivity) hdR
+  rw [Real.logb_mul hpR.ne' hLR.ne'] at hlog
+  linarith
+
+omit [DecidableEq A] in
 /-- [proved-derived; formal-checked] **`kraft_and_dominance`.**
 * **Kraft**: `Σ_S 2^(−Γ(S)) = 1` over the pruned trees of each depth (the stop/split code is
   complete);
@@ -1057,37 +1424,21 @@ omit [DecidableEq A] in
   length is at most the tree's model cost plus its leaves' KT code length,
   `−log₂ W ≤ Γ(S) − log₂ ∏ E`.
 
-This is the model-cost part of CTW's redundancy bound, exact. The parameter part (each leaf's KT
-excess over a fixed binary parameter, `½ log₂ n + 1`) stays conditional (module docstring). -/
+This is the model-cost part of CTW's redundancy bound, exact, and the law at `½`
+(`stop_kraft_and_dominance`). The parameter part (each leaf's KT excess over a fixed binary
+parameter, `½ log₂ n + 1`) stays conditional (module docstring). -/
 theorem kraft_and_dominance [Nonempty A] (N : TreeStanding Ltr A) (m : ℕ) (s : List Ltr) :
     ∑ S : PrunedTree Ltr m, (1 / 2 : ℚ) ^ PrunedTree.cost m S = 1 ∧
       ∀ S : PrunedTree Ltr m,
         (1 / 2 : ℚ) ^ PrunedTree.cost m S * treeLik N m s S ≤ treeWeight N m s ∧
         -Real.logb 2 (treeWeight N m s : ℝ) ≤
           (PrunedTree.cost m S : ℝ) - Real.logb 2 (treeLik N m s S : ℝ) := by
-  have hdom : ∀ S : PrunedTree Ltr m,
-      (1 / 2 : ℚ) ^ PrunedTree.cost m S * treeLik N m s S ≤ treeWeight N m s := by
-    intro S
-    rw [mixture_over_trees N m s]
-    exact Finset.single_le_sum (f := fun S => (1 / 2 : ℚ) ^ PrunedTree.cost m S * treeLik N m s S)
-      (fun S _ => by have := treeLik_pos N m s S; positivity) (Finset.mem_univ S)
-  refine ⟨?_, fun S => ⟨hdom S, ?_⟩⟩
-  · have := mixture_over_trees (emptyStanding : TreeStanding Ltr A) m s
-    simpa [treeWeight_empty, treeLik_empty] using this.symm
-  · have hL := treeLik_pos N m s S
-    have hW := treeWeight_pos N m s
-    have hd : ((1 / 2 : ℚ) ^ PrunedTree.cost m S * treeLik N m s S : ℚ) ≤ treeWeight N m s :=
-      hdom S
-    have hdR : (2 : ℝ) ^ (-(PrunedTree.cost m S : ℝ)) * (treeLik N m s S : ℝ) ≤
-        (treeWeight N m s : ℝ) := by
-      rw [Real.rpow_neg (by norm_num), Real.rpow_natCast, ← one_div, ← one_div_pow]
-      have := (Rat.cast_le (K := ℝ)).mpr hd
-      push_cast at this
-      exact this
-    have hLR : (0 : ℝ) < treeLik N m s S := by exact_mod_cast hL
-    have hlog := Real.logb_le_logb_of_le (b := 2) (by norm_num) (by positivity) hdR
-    rw [Real.logb_mul (by positivity) hLR.ne', Real.logb_rpow (by norm_num) (by norm_num)] at hlog
-    linarith
+  obtain ⟨hsum, hdom⟩ := stop_kraft_and_dominance half_stopLaw N m s
+  refine ⟨by simpa only [PrunedTree.prior_half] using hsum, fun S => ⟨?_, ?_⟩⟩
+  · simpa only [PrunedTree.prior_half, stopWeight_half] using (hdom S).1
+  · have h := (hdom S).2
+    rw [PrunedTree.prior_half_bits, stopWeight_half] at h
+    exact h
 
 end Kraft
 
@@ -2049,6 +2400,18 @@ section Release
 variable {Ltr : Type*} [Fintype Ltr] [DecidableEq Ltr] {A : Type*} [Fintype A] [DecidableEq A]
 
 omit [DecidableEq Ltr] [DecidableEq A] in
+/-- [proved-derived; formal-checked] **An unfounded node weighs one under any law**: a node none of
+whose descendants has received an arrival has `W = 1` at every depth, since `w·1 + (1 − w)·1 = 1`. -/
+theorem stop_unfounded [Nonempty A] (w : ℕ → ℚ) (N : TreeStanding Ltr A) :
+    ∀ m s, (∀ t, N (s ++ t) = fun _ => 0) → stopWeight w N m s = 1
+  | 0, s, h => by simpa [stopWeight, ktMass_zero] using congrArg ktMass (h [])
+  | m + 1, s, h => by
+    have hE : ktMass (N s) = 1 := by simpa [ktMass_zero] using congrArg ktMass (h [])
+    rw [stopWeight_succ, hE, stopSplit,
+      Finset.prod_eq_one fun b _ => stop_unfounded w N m _ fun t => by simpa using h (b :: t)]
+    ring
+
+omit [DecidableEq Ltr] [DecidableEq A] in
 /-- [proved-derived; formal-checked] **`unfounded_reads_prior`.** A node none of whose descendants
 has received an arrival reads as the prior: `E = 1`, `P = 1`, `W = 1` at every depth, the stop to
 split ratio `β = E/P = 1`, and its KT face is the uniform `1/|A|`. -/
@@ -2058,41 +2421,63 @@ theorem unfounded_reads_prior [Nonempty A] (N : TreeStanding Ltr A) (s : List Lt
       (∀ m, ktMass (N s) / splitMass N m s = 1) ∧ ktFace (N s) c = 1 / Fintype.card A := by
   have hs : N s = fun _ => 0 := by simpa using h []
   have hE : ktMass (N s) = 1 := by rw [hs, ktMass_zero]
-  have hW : ∀ m s', (∀ t, N (s' ++ t) = fun _ => 0) → treeWeight N m s' = 1 := by
-    intro m
-    induction m with
-    | zero => intro s' h'; simpa [treeWeight, ktMass_zero] using congrArg ktMass (h' [])
-    | succ m ih =>
-      intro s' h'
-      have hE' : ktMass (N s') = 1 := by simpa [ktMass_zero] using congrArg ktMass (h' [])
-      rw [treeWeight_succ, hE', splitMass,
-        Finset.prod_eq_one fun b _ => ih _ fun t => by simpa using h' (b :: t)]
-      norm_num
+  have hW : ∀ m s', (∀ t, N (s' ++ t) = fun _ => 0) → treeWeight N m s' = 1 := fun m s' h' => by
+    rw [← stopWeight_half]
+    exact stop_unfounded _ N m s' h'
   have hP : ∀ m, splitMass N m s = 1 := fun m =>
     Finset.prod_eq_one fun b _ => hW m _ fun t => by simpa using h (b :: t)
   refine ⟨hE, fun m => hW m s h, hP, fun m => by rw [hE, hP, div_one], ?_⟩
   rw [hs, ktFace_zero]
 
+/-- [proved-derived; formal-checked] **`stop_founding_step`: a node founded under a stop-weight law
+starts at `β₀ = w_d/(1 − w_d)`** (Decision 32). At an opened node above the maximum depth whose
+subtree has received nothing, `β = w_d/(1 − w_d)` before the arrival and still after it
+(`β' = β k_d(c)/q_(d+1)(c)` with both faces the uniform prior, `pathFace_const`). So founding at first
+arrival with `β₀` is the law's own step; on the dyadic ladder `β₀ = 2^(j_d) − 1`
+(`ladder_founding`), and at `½` it is `founding_step`'s `β = 1`. -/
+theorem stop_founding_step [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w) (N : TreeStanding Ltr A)
+    {D : ℕ} {a : List Ltr} (hD : D ≤ a.length) (c : A) {d : ℕ} (hd : d < D)
+    (h : ∀ t, N (a.take d ++ t) = fun _ => 0) :
+    stopRatio w N D a d = w d / (1 - w d) ∧
+      stopRatio w (arrive N a c) D a d = w d / (1 - w d) := by
+  have hs : N (a.take d) = fun _ => 0 := by simpa using h []
+  have hE : ktMass (N (a.take d)) = 1 := by rw [hs, ktMass_zero]
+  have hP : stopSplit w N (D - d - 1) (a.take d) = 1 :=
+    Finset.prod_eq_one fun b _ => stop_unfounded w N _ _ fun t => by simpa using h (b :: t)
+  have hβ : stopRatio w N D a d = w d / (1 - w d) := by
+    unfold stopRatio
+    rw [hE, hP, mul_one, mul_one]
+  have hK : (0 : ℚ) < Fintype.card A := by exact_mod_cast Fintype.card_pos
+  have hbelow : stopFace w N D a (d + 1) c = 1 / Fintype.card A := by
+    refine pathFace_const _ _ D c _ (d + 1) (by omega) fun d' h1 h2 => ?_
+    have e : a.take d' = a.take d ++ (a.drop d).take (d' - d) := by
+      rw [← List.take_add, show d + (d' - d) = d' by omega]
+    simp only [kAt, e, h, ktFace_zero]
+  have hk : kAt N a d c = 1 / Fintype.card A := by simp only [kAt, hs, ktFace_zero]
+  refine ⟨hβ, ?_⟩
+  rw [(stop_ratio_step hw N hD c hd).2, hβ, hk, hbelow]
+  field_simp
+
 /-- [proved-derived; formal-checked] **`founding_step`: a node founded by an arrival starts at
 `β = 1`.** At an opened node above the maximum depth whose subtree has received nothing, `β = 1`
 before the arrival and still `β' = β·k_d(c)/q_(d+1)(c) = 1` after it: the node's KT face and the
-face below it are both the uniform prior `1/|A|` (`pathFace_const`). So founding at first arrival
-with `β = 1` is the tree's own step. -/
+face below it are both the uniform prior `1/|A|`. So founding at first arrival with `β = 1` is the
+tree's own step (the law at `½`, `stop_founding_step`). -/
 theorem founding_step [Nonempty A] (N : TreeStanding Ltr A) {D : ℕ} {a : List Ltr}
     (hD : D ≤ a.length) (c : A) {d : ℕ} (hd : d < D)
     (h : ∀ t, N (a.take d ++ t) = fun _ => 0) :
     ktMass (N (a.take d)) / splitMass N (D - d - 1) (a.take d) = 1 ∧
       ktMass (arrive N a c (a.take d)) / splitMass (arrive N a c) (D - d - 1) (a.take d) = 1 := by
-  obtain ⟨_, _, _, hβ, hk⟩ := unfounded_reads_prior N (a.take d) h c
-  have hK : (0 : ℚ) < Fintype.card A := by exact_mod_cast Fintype.card_pos
-  have hbelow : face N D a (d + 1) c = 1 / Fintype.card A := by
-    refine pathFace_const _ _ D c _ (d + 1) (by omega) fun d' h1 h2 => ?_
-    have e : a.take d' = a.take d ++ (a.drop d).take (d' - d) := by
-      rw [← List.take_add, show d + (d' - d) = d' by omega]
-    simp only [kAt, e, h, ktFace_zero]
-  refine ⟨hβ (D - d - 1), ?_⟩
-  rw [((landmark_step N hD c).2.2.2.1 d hd).2.2, hβ, kAt, hk, hbelow]
-  field_simp
+  have half : ∀ M : TreeStanding Ltr A, stopRatio (fun _ => (1 / 2 : ℚ)) M D a d =
+      ktMass (M (a.take d)) / splitMass M (D - d - 1) (a.take d) := by
+    intro M
+    unfold stopRatio
+    rw [stopSplit_half]
+    ring
+  obtain ⟨h1, h2⟩ := stop_founding_step half_stopLaw N hD c hd h
+  rw [half] at h1 h2
+  norm_num at h1 h2
+  exact ⟨h1, h2⟩
 
 /-- [definition] **A nested standing**: every node holds at most its parent's counts (what reaches
 a node reaches its every restriction). -/
@@ -2598,6 +2983,13 @@ section Audit
 #print axioms path_face_ge_min
 #print axioms pathFace_const
 #print axioms lamAt_eq_beta
+#print axioms ladder_founding
+#print axioms stopWeight_half
+#print axioms stopLam_eq_ratio
+#print axioms stopFace_half
+#print axioms stopWeight_arrive_off
+#print axioms stop_weight_step
+#print axioms stop_ratio_step
 #print axioms face_normalized
 #print axioms treeWeight_arrive_off
 #print axioms weight_step
@@ -2606,7 +2998,13 @@ section Audit
 #print axioms mixture_is_probability
 #print axioms standing_is_routed_counts
 #print axioms depth_one_is_decision_27
+#print axioms PrunedTree.cost_eq
+#print axioms PrunedTree.prior_const
+#print axioms PrunedTree.prior_half_bits
+#print axioms PrunedTree.prior_sum
+#print axioms stop_mixture_over_trees
 #print axioms mixture_over_trees
+#print axioms stop_kraft_and_dominance
 #print axioms kraft_and_dominance
 #print axioms digit_emission_normalized
 #print axioms forced_digits_normalized
@@ -2634,7 +3032,9 @@ section Audit
 #print axioms deposition_is_log_ratio
 #print axioms concentrated_deposition
 #print axioms tree_deposit_is_deposition
+#print axioms stop_unfounded
 #print axioms unfounded_reads_prior
+#print axioms stop_founding_step
 #print axioms founding_step
 #print axioms founded_tree_same_law
 #print axioms release_rule

@@ -39,7 +39,7 @@ use std::time::{Duration, Instant};
 
 use holonics::hnn::HnnError;
 use holonics::hnn::landmark::{
-    ArenaView, ChartWords, LandmarkDeclaration, Landmarks, Letter, Splits, Widths,
+    ArenaView, ChartWords, LandmarkDeclaration, Landmarks, Letter, Splits, StopPrior, Widths,
 };
 
 use crate::cuda::{Dim3, Module, Stream};
@@ -240,6 +240,13 @@ impl<'c> CardTree<'c> {
     /// table at twice that, a power of two. Refused at a branch deeper than the kernels' paths.
     pub fn mirror(card: &'c Card, tree: &Landmarks, window: usize) -> Result<Self, DeviceError> {
         let declaration = tree.declaration().clone();
+        // The kernel founds every node at `β = 1` (`TreeChart{1, 1, 0, full/2}`): Decision 28's
+        // stop prior only, until it reads the law's founding charts (`ArenaView::founding`).
+        if declaration.prior != StopPrior::half() {
+            return Err(launch_error(
+                "a tree of Decision 28's stop prior, founded at β = 1",
+            ));
+        }
         let widths: Widths = tree.widths();
         let depths = declaration.branch_depths();
         if depths.iter().any(|&depth| depth + 1 > MAX_DEPTH) || depths.len() > 2 {

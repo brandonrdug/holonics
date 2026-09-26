@@ -76,7 +76,7 @@ use crate::geometry::screw::{ScrewAxis, ScrewGenerator, ScrewPair, SituatedScrew
 use crate::hnn::HnnError;
 use crate::hnn::chart::WordLattice;
 use crate::hnn::constitution::{Lattice, Locus, Steps};
-use crate::hnn::landmark::Landmarks;
+use crate::hnn::landmark::{Landmarks, StopPrior};
 use crate::hnn::moment::{Capacity, PairPort, capacity};
 use crate::hnn::receiving::Mixture;
 use crate::holarchy::{Gluing, GluingDefect, Holarchy};
@@ -195,16 +195,18 @@ pub struct ContactDeclaration {
 }
 
 /// [definition] **An admitted receiver as declared**: its receiving ring, its aperture `A`, its
-/// code tolerance `ε_bits` per cell, from which its grain `L_R = ⌈1/ε_bits⌉` is derived, and the
+/// code tolerance `ε_bits` per cell, from which its grain `L_R = ⌈1/ε_bits⌉` is derived, the
 /// depth `D` of its landmark tree's address (Decision 28; `hnn::receiving::landmark_declaration`):
 /// the receiving parametron's storage is the tree over the last `D` cells, and `D = 1` with the
-/// root's split forced is Decision 27's region table.
+/// root's split forced is Decision 27's region table; and the tree's declared stop-weight law
+/// (Decision 32; `hnn::landmark::StopPrior`, Decision 28's `½` at `StopPrior::half`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReceiverDeclaration {
     pub ring: usize,
     pub aperture: usize,
     pub tolerance: Rat,
     pub depth: usize,
+    pub prior: StopPrior,
 }
 
 /// [definition] **The crib as declared**: the `window` cells that open each aeon, read at `offset`.
@@ -308,6 +310,7 @@ impl FieldDeclaration {
                 aperture: 2,
                 tolerance: rat(1, 16),
                 depth: 4,
+                prior: StopPrior::half(),
             }],
             crib: CribDeclaration {
                 window: 64,
@@ -1603,10 +1606,11 @@ impl Field {
     }
 
     /// **The field's exact self-delimiting code**: every declared value, each receiver's tree depth
-    /// `D` (Decision 28), the word's precisions (`L_c`, `D_c`, `L_w`; none for the exact law),
-    /// the recorded `n*`, the open's law with its population chart's lattice `L_ν` (ruling B), the
-    /// gauge convention, the sign generator's rule, the receiving law's code
-    /// ([`RECEIVING_LAW`]) with the tree's Krichevsky–Trofimov prior `α`, and the constitution's declared values (the
+    /// `D` (Decision 28) and its stop-weight law's rungs (Decision 32), the word's precisions
+    /// (`L_c`, `D_c`, `L_w`; none for the exact law), the recorded `n*`, the open's law with its
+    /// population chart's lattice `L_ν` (ruling B), the gauge convention, the sign generator's rule,
+    /// the receiving law's code ([`RECEIVING_LAW`]) with the tree's Krichevsky–Trofimov prior `α`,
+    /// and the constitution's declared values (the
     /// steps `γ_U` and `η_x`, the budget `B_Θ`) with the pending capacity, as Elias-gamma naturals,
     /// zig-zag integers and rationals as (numerator, denominator). It is the one exact code of the
     /// declaration (guard 13), and `Kt` pays for every part of it (design (f), review D3).
@@ -1665,6 +1669,14 @@ impl Field {
             natural(&mut code, receiver.aperture as u64);
             rational(&mut code, &receiver.tolerance);
             natural(&mut code, receiver.depth as u64);
+            // The stop-weight law's rungs from the root (Decision 32; `[1]` is Decision 28's `½`).
+            let rungs: Vec<u64> = receiver
+                .prior
+                .rungs()
+                .iter()
+                .map(|&j| u64::from(j))
+                .collect();
+            naturals(&mut code, &rungs);
         }
         natural(&mut code, self.crib.window as u64);
         natural(&mut code, self.crib.offset as u64);

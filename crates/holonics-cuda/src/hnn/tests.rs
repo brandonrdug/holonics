@@ -172,6 +172,7 @@ fn chain() -> Field {
                 aperture: 2,
                 tolerance: rat(1, 16),
                 depth: 2,
+                prior: holonics::hnn::StopPrior::half(),
             }],
             crib: CribDeclaration {
                 window: 16,
@@ -881,6 +882,7 @@ fn the_card_tree_reads_and_deposits_as_the_host_tree() {
             population,
             grain: 16,
             family: LetterFamily::cells(),
+            prior: holonics::hnn::StopPrior::half(),
         };
     let campaign = Landmarks::new(declared(256, 4, 0, 1_200)).unwrap();
     let times = tree_parity(&card, campaign, &cell_letters(&bytes), &bytes, 2, 50);

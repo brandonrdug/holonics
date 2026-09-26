@@ -106,7 +106,9 @@ pub use field::{
     RingDeclaration,
 };
 pub use keys::{KeyLocation, RingKeys, locate_keys};
-pub use landmark::{Bundle, Feature, LandmarkDeclaration, Landmarks, Letter, LetterFamily};
+pub use landmark::{
+    Bundle, Feature, LandmarkDeclaration, Landmarks, Letter, LetterFamily, StopPrior,
+};
 pub use moment::{Capacity, PairPort, SourceMoment};
 pub use pending::PendingRatio;
 pub use port::{

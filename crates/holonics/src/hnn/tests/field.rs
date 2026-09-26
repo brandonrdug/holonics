@@ -396,8 +396,9 @@ fn the_field_reads_its_clock_torus_and_pair_geometry() {
     );
 }
 
-/// The one exact code: every declared value changes it, the constitution's declared steps, budget
-/// and the pending capacity included (review D3), and it is self-delimiting per field.
+/// The one exact code: every declared value changes it, the tree's stop-weight law, the
+/// constitution's declared steps, budget and the pending capacity included (review D3), and it is
+/// self-delimiting per field.
 #[test]
 fn describe_is_the_fields_exact_code() {
     let field = Field::declare(chain_declaration(1 << 20)).unwrap();
@@ -411,6 +412,10 @@ fn describe_is_the_fields_exact_code() {
     assert_ne!(describe(&Field::declare(declared).unwrap()), code);
     let mut declared = chain_declaration(1 << 20);
     declared.rings[2].initial = 1;
+    assert_ne!(describe(&Field::declare(declared).unwrap()), code);
+    // The tree's stop-weight law (Decision 32) is part of the code.
+    let mut declared = chain_declaration(1 << 20);
+    declared.receivers[0].prior = crate::hnn::StopPrior::per_depth(vec![1, 3]).unwrap();
     assert_ne!(describe(&Field::declare(declared).unwrap()), code);
     let mut declared = chain_declaration(1 << 20);
     declared.contacts[1].admittance = integer(3);

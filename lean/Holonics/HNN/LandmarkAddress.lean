@@ -26,7 +26,7 @@ phase class ⌊g · fract x⌋ ∈ [0, g) ;  at x = k/d, g = d: k mod d ;  g' �
 lock        Unlocked, or reduced (p, q), 0 < p ≤ P, 0 < q ≤ Q ;  Q = the horizon H: a first return by H iff q ≤ H
 code        0 (boundary) ,  1 + x + |A| · f  (injective) ;  f = Σ v_i Π_(k<i) s_k  (mixed radix, injective)
 dominance   W_enlarged = ½ W_cells + ½ W_bundles  (the join's sequential mixture)
-            −log₂ ∏ q_join ≤ Γ(S) + 1 − log₂ ∏_(leaves of S) E  per dyadic cell
+            −log₂ ∏ q_join ≤ −log₂ prior_w(S) + 1 − log₂ ∏_(leaves of S) E  per dyadic cell (Γ(S) at w = ½)
             L ≤ L_c + |H| + ρ + ρ_c  over the passage's opened dyadic cells H
 ```
 
@@ -69,10 +69,10 @@ dominance   W_enlarged = ½ W_cells + ½ W_bundles  (the join's sequential mixtu
    injective on values within their slots and lies below the slots' product.
 8. **`cell_only_dominance_with_feature_charge`.** At a dyadic cell the enlarged tree joins the cell
    branch's faces `a_t` and the bundle branch's `b_t` by the sequential mixture
-   (`LandmarkTree.sequential_mixture`); when the cell branch's product is its tree weight
-   (`LandmarkTree.mixture_is_probability`), the join codes within one bit of the cell tree, and for
-   every cell-only pruned tree `S` within `Γ(S) + 1` of its leaves' code
-   (`LandmarkTree.kraft_and_dominance`). Over the passage (`passage_join_bound`) the enlarged tree
+   (`LandmarkTree.sequential_mixture`); when the cell branch's product is its tree weight under the
+   declared stop-weight law `w` (Decision 32; `LandmarkTree.stop_weight_step`), the join codes within
+   one bit of the cell tree, and for every cell-only pruned tree `S` within `−log₂ prior_w(S) + 1` of
+   its leaves' code (`LandmarkTree.stop_kraft_and_dominance`; `Γ(S) + 1` at `w = ½`). Over the passage (`passage_join_bound`) the enlarged tree
    pays at most one bit a dyadic cell opened: `−log₂ ∏_h ∏_t q_(h,t) ≤ Σ_h −log₂ W_h + |H|`
    (`|H| ≤ 2^B − 1`, the splitting dyadic cells, `255` at `|A| = 256`); an executed enlarged code
    within its certified drift `ρ` of the ideal join, against an executed cell-only code within `ρ_c`
@@ -99,8 +99,8 @@ noncomputable section
 
 namespace Holonics.HNN.LandmarkAddress
 
-open Holonics.HNN.LandmarkTree (restrict PrunedTree treeWeight treeLik TreeStanding
-  kraft_and_dominance seqLik seqMix sequential_mixture_bounds)
+open Holonics.HNN.LandmarkTree (restrict PrunedTree StopLaw stopWeight treeLik TreeStanding
+  stop_kraft_and_dominance seqLik seqMix sequential_mixture_bounds)
 
 /-! ## 1. Bundles and the address -/
 
@@ -590,23 +590,26 @@ omit [DecidableEq A] in
 /-- [proved-derived; formal-checked] **`cell_only_dominance_with_feature_charge`.** At one dyadic
 cell, let `a_t` be the cell branch's faces of its routed digits and `b_t` the bundle branch's, joined
 by the sequential mixture `q_t` (`LandmarkTree.seqMix`, the ratio stepped after every digit). When
-the cell branch's faces multiply to its tree weight, `∏_(t<n) a_t = W_cells`
-(`LandmarkTree.mixture_is_probability`'s telescope):
+the cell branch's faces multiply to its tree weight under the declared stop-weight law `w`,
+`∏_(t<n) a_t = W_cells` (`LandmarkTree.stop_weight_step`'s telescope):
 * the join codes within one bit of the cell tree: `−log₂ ∏ q ≤ −log₂ W_cells + 1`;
-* for every cell-only pruned tree `S`, `−log₂ ∏ q ≤ (Γ(S) + 1) − log₂ ∏_(leaves of S) E`: the
-  embedded cell tree costs its own `Γ(S)` and the join's one bit;
+* for every cell-only pruned tree `S`, `−log₂ ∏ q ≤ (−log₂ prior_w(S) + 1) − log₂ ∏_(leaves of S) E`
+  (`LandmarkTree.stop_kraft_and_dominance`): the embedded cell tree costs its own prior's code and
+  the join's one bit; at `w = ½` the prior's code is `Γ(S)` (`PrunedTree.prior_half_bits`);
 * **over the passage, at most one bit a dyadic cell opened** (`passage_join_bound`): for the
   dyadic cells `H` a passage opens, an executed enlarged code `L` within its certified drift `ρ`
   of the ideal join and an executed cell-only code `L_c` within `ρ_c` of the cell tree's ideal
   code satisfy `L ≤ L_c + |H| + ρ + ρ_c`. The features' description is charged beside it. -/
 theorem cell_only_dominance_with_feature_charge [Nonempty A] {a b : ℕ → ℚ}
-    (ha : ∀ t, 0 < a t) (hb : ∀ t, 0 < b t) (N : TreeStanding Ltr A) (m : ℕ) (s : List Ltr)
-    (n : ℕ) (hcell : seqLik a n = treeWeight N m s) :
+    (ha : ∀ t, 0 < a t) (hb : ∀ t, 0 < b t) {w : ℕ → ℚ} (hw : StopLaw w)
+    (N : TreeStanding Ltr A) (m : ℕ) (s : List Ltr)
+    (n : ℕ) (hcell : seqLik a n = stopWeight w N m s) :
     -Real.logb 2 ((∏ t ∈ Finset.range n, seqMix a b t : ℚ) : ℝ) ≤
-        -Real.logb 2 (treeWeight N m s : ℝ) + 1 ∧
+        -Real.logb 2 (stopWeight w N m s : ℝ) + 1 ∧
       (∀ S : PrunedTree Ltr m,
         -Real.logb 2 ((∏ t ∈ Finset.range n, seqMix a b t : ℚ) : ℝ) ≤
-          ((PrunedTree.cost m S : ℝ) + 1) - Real.logb 2 (treeLik N m s S : ℝ)) ∧
+          (-Real.logb 2 (PrunedTree.prior w m s.length S : ℝ) + 1) -
+            Real.logb 2 (treeLik N m s S : ℝ)) ∧
       ∀ {ι : Type} (H : Finset ι) (a' b' : ι → ℕ → ℚ) (n' : ι → ℕ) (W : ι → ℚ),
         (∀ h t, 0 < a' h t) → (∀ h t, 0 < b' h t) → (∀ h ∈ H, seqLik (a' h) (n' h) = W h) →
         ∀ L Lc ρ ρc : ℝ,
@@ -620,7 +623,7 @@ theorem cell_only_dominance_with_feature_charge [Nonempty A] {a b : ℕ → ℚ}
       -Real.logb 2 (seqLik a n : ℝ) + 1 := by linarith
   rw [hcell] at hmin
   refine ⟨hmin, fun S => ?_, fun H a' b' n' W ha' hb' hW L Lc ρ ρc hL hc => ?_⟩
-  · have hdom := ((kraft_and_dominance N m s).2 S).2
+  · have hdom := ((stop_kraft_and_dominance hw N m s).2 S).2
     linarith
   · have hp := passage_join_bound H n' W ha' hb' hW
     linarith

@@ -9,7 +9,10 @@
 //! addressed by typed bundles (its faces normalized and certified against the oracle with its join,
 //! the cell-only branch kept within one bit a dyadic cell, a window in cell order, the letters
 //! refused outside their family), the carrier's rebase with its enclosure, and a declaration past
-//! the old `u128` refusal whose certified residual stays within the grain.
+//! the old `u128` refusal whose certified residual stays within the grain. Decision 32: the declared
+//! stop prior on the dyadic ladder (the block recursion at any stop weights, the founding ratio
+//! `2^j − 1`, the lattice law, the faces and windows under a prior), campaign 2's constant-slot
+//! controls as the per-depth prior `(1, r + 1)`, and the prior sweep on the development cells.
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
@@ -17,8 +20,9 @@ use num_traits::{One, Zero};
 use crate::hnn::HnnError;
 use crate::hnn::landmark::{
     Beta, Bundle, Feature, IdealLandmarks, LandmarkDeclaration, LandmarkFace, Landmarks, Letter,
-    LetterFamily, address, binary_log, carrier_width, cell_letters, choose_depth, code_length,
-    face_bits, letter_address, prequential,
+    LetterFamily, StopPrior, address, binary_log, carrier_width, cell_letters, choose_depth,
+    choose_prior, code_length, face_bits, ladder_top, letter_address, prequential, prior_family,
+    tree_prequential,
 };
 use crate::hnn::ratio::log2_enclosure;
 use crate::hnn::receiving::grain_exponent;
@@ -33,6 +37,7 @@ fn declaration(alphabet: usize, depth: usize) -> LandmarkDeclaration {
         population: 64,
         grain: 16,
         family: LetterFamily::cells(),
+        prior: StopPrior::half(),
     }
 }
 
@@ -48,9 +53,16 @@ fn kt_block(run: &[usize]) -> Rat {
 }
 
 /// **The block recursion**, independent of the path law: `W_s = E_s` at depth `D`, otherwise
-/// `W_s = ½E_s + ½ Π_b W_bs`, over the symbols of `stream[past..]` whose context (newest first)
-/// extends `context`.
-fn block_weight(stream: &[usize], past: usize, context: &[usize], depth: usize) -> Rat {
+/// `W_s = w_d E_s + (1 − w_d) Π_b W_bs` at the node's depth `d` (Lean `HNN/LandmarkTree.stopWeight`;
+/// `½` is Decision 28's), over the symbols of `stream[past..]` whose context (newest first) extends
+/// `context`.
+fn block_weight(
+    stream: &[usize],
+    past: usize,
+    context: &[usize],
+    depth: usize,
+    prior: &StopPrior,
+) -> Rat {
     let routed: Vec<usize> = (past..stream.len())
         .filter(|&t| {
             context
@@ -68,10 +80,23 @@ fn block_weight(stream: &[usize], past: usize, context: &[usize], depth: usize) 
         .map(|b| {
             let mut child = context.to_vec();
             child.push(b);
-            block_weight(stream, past, &child, depth)
+            block_weight(stream, past, &child, depth, prior)
         })
         .product();
-    rat(1, 2) * estimate + rat(1, 2) * split
+    let stop = prior.weight(context.len());
+    &stop * estimate + (Rat::one() - &stop) * split
+}
+
+/// The stop priors the laws are checked under: Decision 28's `½`, two global rungs and two
+/// per-depth laws.
+fn priors() -> Vec<StopPrior> {
+    vec![
+        StopPrior::half(),
+        StopPrior::global(2).unwrap(),
+        StopPrior::global(5).unwrap(),
+        StopPrior::per_depth(vec![1, 3]).unwrap(),
+        StopPrior::per_depth(vec![4, 1, 2]).unwrap(),
+    ]
 }
 
 /// `max(q̂/q, q/q̂) ≤ 1 + ρ` with `ρ = (2/3) R` the certificate in `ln`: then
@@ -100,7 +125,7 @@ fn landmark_oracle_reproduces_the_willems_shtarkov_tjalkens_fixture() {
         ..declaration(2, 3)
     };
     for (stream, weight) in [(paper, rat(95, 32768)), (brief, rat(7, 2048))] {
-        assert_eq!(block_weight(&stream, 3, &[], 3), weight);
+        assert_eq!(block_weight(&stream, 3, &[], 3, &StopPrior::half()), weight);
         let mut oracle = IdealLandmarks::new(fixture.clone(), None).unwrap();
         let mut tree = Landmarks::new(fixture.clone()).unwrap();
         let (mut ideal, mut executed, mut residual) = (Rat::one(), Rat::one(), Rat::zero());
@@ -117,25 +142,37 @@ fn landmark_oracle_reproduces_the_willems_shtarkov_tjalkens_fixture() {
     }
 }
 
-/// **The sequential path law is the block recursion** (the oracle, `β` exact) on a longer binary
-/// stream at every depth up to 4, and the executed tree stays within its certificate there.
+/// **The sequential path law is the block recursion at any stop prior** (Lean
+/// `HNN/LandmarkTree.{stop_weight_step, stop_founding_step}`; the oracle, `β` exact, founded at
+/// `2^(j_d) − 1`) on a longer binary stream at every depth up to 4, and the executed tree stays
+/// within its certificate there.
 #[test]
 fn landmark_oracle_path_law_is_the_block_recursion() {
     let stream: Vec<usize> = (0..24u64)
         .map(|t| usize::from((t * t + 3 * t) % 7 < 3))
         .collect();
-    for depth in 0..=4 {
-        let mut oracle = IdealLandmarks::new(declaration(2, depth), None).unwrap();
-        let mut tree = Landmarks::new(declaration(2, depth)).unwrap();
-        let mut ideal = Rat::one();
-        for t in depth..stream.len() {
-            let here = address(&stream, t, depth);
-            let face = oracle.receive(&here, stream[t]).unwrap();
-            let reading = tree.receive(&here, stream[t]).unwrap();
-            assert!(within(&reading.executed, &face, &reading.residual));
-            ideal *= face;
+    for prior in priors() {
+        for depth in 0..=4 {
+            let declared = LandmarkDeclaration {
+                prior: prior.clone(),
+                ..declaration(2, depth)
+            };
+            let mut oracle = IdealLandmarks::new(declared.clone(), None).unwrap();
+            let mut tree = Landmarks::new(declared).unwrap();
+            let mut ideal = Rat::one();
+            for t in depth..stream.len() {
+                let here = address(&stream, t, depth);
+                let face = oracle.receive(&here, stream[t]).unwrap();
+                let reading = tree.receive(&here, stream[t]).unwrap();
+                assert!(within(&reading.executed, &face, &reading.residual));
+                ideal *= face;
+            }
+            assert_eq!(
+                ideal,
+                block_weight(&stream, depth, &[], depth, &prior),
+                "{prior}, D = {depth}"
+            );
         }
-        assert_eq!(ideal, block_weight(&stream, depth, &[], depth));
     }
 }
 
@@ -150,9 +187,14 @@ fn landmark_oracle_path_law_is_the_block_recursion() {
 fn landmark_faces_are_normalized_and_certified() {
     let alphabet = 5;
     let stream: Vec<usize> = (0..40u64).map(|t| ((t * 7 + t / 3) % 5) as usize).collect();
-    for forced in [0, 1] {
+    let laws = [StopPrior::half(), StopPrior::per_depth(vec![1, 3]).unwrap()];
+    for (forced, prior) in [0, 1]
+        .into_iter()
+        .flat_map(|f| laws.clone().map(|p| (f, p)))
+    {
         let declared = LandmarkDeclaration {
             forced,
+            prior,
             ..declaration(alphabet, 2)
         };
         let mut tree = Landmarks::new(declared.clone()).unwrap();
@@ -192,10 +234,19 @@ fn landmark_faces_are_normalized_and_certified() {
 #[test]
 fn landmark_lattice_faces_follow_the_law() {
     let stream: Vec<usize> = (0..60u64).map(|t| ((t * t + t / 4) % 4) as usize).collect();
-    for forced in [0, 1] {
+    let laws = [
+        StopPrior::half(),
+        StopPrior::global(3).unwrap(),
+        StopPrior::per_depth(vec![1, 4]).unwrap(),
+    ];
+    for (forced, prior) in [0, 1]
+        .into_iter()
+        .flat_map(|f| laws.clone().map(|p| (f, p)))
+    {
         let mut tree = Landmarks::with_carrier(
             LandmarkDeclaration {
                 forced,
+                prior: prior.clone(),
                 ..declaration(4, 3)
             },
             12,
@@ -253,6 +304,15 @@ fn landmark_lattice_faces_follow_the_law() {
                     let stepped = &old.betas[d] * &old.masses[d] / &old.faces[d + 1];
                     let ratio = &new.betas[d] / &stepped;
                     assert!(ratio <= Rat::one() && ratio > Rat::one() - &rebase);
+                }
+                // A node this arrival founded keeps its depth's β₀ = 2^(j_d) − 1.
+                for d in old.founded..new.founded {
+                    let founding = BigInt::from(prior.founding(d));
+                    assert_eq!(
+                        new.betas[d],
+                        Rat::from_integer(founding),
+                        "{prior}, d = {d}"
+                    );
                 }
             }
         }
@@ -476,8 +536,16 @@ fn landmark_window_faces_read_each_phase_after_the_earlier_deposits() {
     let stream: Vec<usize> = (0..90u64)
         .map(|t| ((t * 7 + t / 3 + t * t / 11) % 5) as usize)
         .collect();
+    for prior in [StopPrior::half(), StopPrior::per_depth(vec![2, 5]).unwrap()] {
+        window_in_cell_order(&stream, prior);
+    }
+}
+
+/// One stop prior's run of `landmark_window_faces_read_each_phase_after_the_earlier_deposits`.
+fn window_in_cell_order(stream: &[usize], prior: StopPrior) {
     let declared = LandmarkDeclaration {
         population: 90,
+        prior,
         ..declaration(5, 2)
     };
     let mut tree = Landmarks::with_carrier(declared.clone(), 6).unwrap();
@@ -486,7 +554,7 @@ fn landmark_window_faces_read_each_phase_after_the_earlier_deposits() {
         let window = start..(start + aperture).min(stream.len());
         let addresses: Vec<Vec<Letter>> = window
             .clone()
-            .map(|position| address(&stream, position, 2))
+            .map(|position| address(stream, position, 2))
             .collect();
         let known = &stream[window.clone()];
         let before = tree.clone();
@@ -506,7 +574,7 @@ fn landmark_window_faces_read_each_phase_after_the_earlier_deposits() {
     assert!(tree.chart().rebases > 0, "the narrow carrier rebased");
     assert_eq!(tree.passed(), 90);
     // Past the population: the window's earlier cells are read again, as a re-read does.
-    let last = [address(&stream, 88, 2), address(&stream, 89, 2)];
+    let last = [address(stream, 88, 2), address(stream, 89, 2)];
     let again = tree.window_faces(&last, &stream[88..90], 16).unwrap();
     assert_eq!(again.len(), 2);
     assert!(matches!(
@@ -652,9 +720,14 @@ fn bundle_declaration(alphabet: usize, depth: usize) -> LandmarkDeclaration {
 fn landmark_bundle_tree_is_normalized_and_certified() {
     let alphabet = 5;
     let stream: Vec<usize> = (0..60u64).map(|t| ((t * 7 + t / 3) % 5) as usize).collect();
-    for forced in [0, 1] {
+    let laws = [StopPrior::half(), StopPrior::global(3).unwrap()];
+    for (forced, prior) in [0, 1]
+        .into_iter()
+        .flat_map(|f| laws.clone().map(|p| (f, p)))
+    {
         let declared = LandmarkDeclaration {
             forced,
+            prior,
             ..bundle_declaration(alphabet, 2)
         };
         let letters = bundles(&stream, &declared.family);
@@ -932,4 +1005,223 @@ fn landmark_tree_declares_past_the_old_refusal_and_stays_within_the_grain() {
         tree.receive(&address(&stream, 0, 4), 0),
         Err(HnnError::PopulationReached { .. })
     ));
+}
+
+// -------------------------------------------------------------------------------------------
+// Decision 32: the declared stop prior
+
+/// **The stop prior is the dyadic ladder** (Lean `HNN/LandmarkTree.ladder_founding`): rung `j`
+/// stops with `1 − 2^(−j)` and founds at `2^j − 1`; `[1]` is Decision 28's `½`; a repeated last
+/// rung is dropped, so one law compares equal however it is declared; rungs outside `1..=63` and
+/// an empty law are refused. The ladder's top at the standing cut's scope is
+/// `⌈log₂(6148 · 8)⌉ = 16`, and the declared family is the global ladder, then the per-depth pairs.
+#[test]
+fn landmark_stop_prior_is_the_dyadic_ladder() {
+    let half = StopPrior::half();
+    assert_eq!(half.rungs(), &[1]);
+    assert_eq!(half.weight(0), rat(1, 2));
+    assert_eq!(half.founding(7), 1);
+    let law = StopPrior::per_depth(vec![1, 4, 4]).unwrap();
+    assert_eq!(law.rungs(), &[1, 4]);
+    assert_eq!(law, StopPrior::per_depth(vec![1, 4]).unwrap());
+    assert_eq!(
+        StopPrior::per_depth(vec![3, 3]).unwrap(),
+        StopPrior::global(3).unwrap()
+    );
+    assert!(!law.is_global() && StopPrior::global(3).unwrap().is_global());
+    assert_eq!((law.rung(0), law.rung(1), law.rung(9)), (1, 4, 4));
+    assert_eq!(law.weight(2), rat(15, 16));
+    assert_eq!((law.founding(0), law.founding(5)), (1, 15));
+    assert_eq!(law.widest(), 4);
+    assert_eq!(law.to_string(), "j_0 = 1, j_(≥1) = 4");
+    assert_eq!(StopPrior::global(3).unwrap().to_string(), "j = 3");
+    for rung in [1u32, 2, 5, 63] {
+        let global = StopPrior::global(rung).unwrap();
+        let w = global.weight(0);
+        let beta = Rat::from_integer(BigInt::from(global.founding(0)));
+        assert_eq!(&w / (Rat::one() - &w), beta, "rung {rung}");
+    }
+    assert!(StopPrior::global(0).is_err());
+    assert!(StopPrior::global(64).is_err());
+    assert!(StopPrior::per_depth(Vec::new()).is_err());
+
+    let standing = LandmarkDeclaration {
+        population: 6_148,
+        ..declaration(256, 4)
+    };
+    assert_eq!(ladder_top(&standing), 16);
+    let family = prior_family(4);
+    assert_eq!(family.len(), 16);
+    assert_eq!(family[0], half);
+    assert!(family[..4].iter().all(StopPrior::is_global));
+    assert_eq!(family[4], StopPrior::per_depth(vec![1, 2]).unwrap());
+    let distinct: std::collections::BTreeSet<Vec<u32>> =
+        family.iter().map(|law| law.rungs().to_vec()).collect();
+    assert_eq!(distinct.len(), family.len());
+}
+
+/// **Each node is founded at its depth's ratio** (Lean `HNN/LandmarkTree.stop_founding_step`): the
+/// founding chart is `β₀ = 2^(j_d) − 1` exactly with the stop weight `λ̂ = 1 − 2^(−j_d)` on the
+/// lattice, the nodes one arrival founds carry it, and a rung past the carrier `W` is refused (its
+/// founding ratio would not be carried exactly).
+#[test]
+fn landmark_stop_prior_founds_each_node_at_its_ratio() {
+    let prior = StopPrior::per_depth(vec![2, 3, 5]).unwrap();
+    let declared = LandmarkDeclaration {
+        prior: prior.clone(),
+        ..declaration(2, 3)
+    };
+    let mut tree = Landmarks::new(declared.clone()).unwrap();
+    let face = tree.face_bits();
+    for depth in 0..=3 {
+        let words = tree.arena().founding(depth).unwrap();
+        let j = prior.rung(depth);
+        assert_eq!(
+            (words.numerator, words.denominator, words.exponent),
+            ((1u64 << j) - 1, 1, 0)
+        );
+        assert_eq!(words.stop, (1u64 << face) - (1u64 << (face - u64::from(j))));
+    }
+    assert!(tree.arena().founding(4).is_none());
+    let here = [Letter::Boundary; 3];
+    tree.receive(&here, 1).unwrap();
+    let path = &tree.opened(&here, 1).unwrap()[0];
+    assert_eq!(path.founded, 4);
+    for (depth, beta) in path.betas.iter().enumerate() {
+        assert_eq!(
+            beta,
+            &Rat::from_integer(BigInt::from(prior.founding(depth)))
+        );
+    }
+    let wide = LandmarkDeclaration {
+        prior: StopPrior::global(13).unwrap(),
+        ..declaration(4, 2)
+    };
+    assert!(Landmarks::with_carrier(wide.clone(), 12).is_err());
+    assert!(Landmarks::with_carrier(wide, 13).is_ok());
+}
+
+/// **Campaign 2's constant-slot controls are the per-depth prior `(1, r + 1)`** (Decision 32; Lean
+/// `HNN/LandmarkTree.stop_mixture_over_trees`): in the bundle branch over `r` slots of one letter, a
+/// cell node's split passes through a chain of `r` constant nodes at `½` (each routes the same
+/// counts), so every cell depth past the root stops with `1 − 2^(−(r+1))`, the root with `½`, and
+/// the bottom chain reads its leaf's face. On the ideal oracles with `β` exact, every opened digit's
+/// bundle-branch face equals the cell tree's face under that law, in ℚ, at every step.
+#[test]
+fn landmark_constant_slots_are_the_per_depth_prior() {
+    let alphabet = 4;
+    let stream: Vec<usize> = (0..80u64)
+        .map(|t| ((t * t + 3 * t + t / 5) % 4) as usize)
+        .collect();
+    let letters: Vec<Letter> = stream
+        .iter()
+        .map(|&cell| Letter::Bundle(Bundle { cell, features: 0 }))
+        .collect();
+    for (slots, depth) in [(1usize, 2usize), (2, 2), (1, 3)] {
+        let control = LandmarkDeclaration {
+            population: 80,
+            family: LetterFamily::constant_control(slots),
+            ..declaration(alphabet, depth)
+        };
+        let law = LandmarkDeclaration {
+            population: 80,
+            prior: StopPrior::per_depth(vec![1, slots as u32 + 1]).unwrap(),
+            ..declaration(alphabet, depth)
+        };
+        let mut joined = IdealLandmarks::new(control, None).unwrap();
+        let mut tree = IdealLandmarks::new(law, None).unwrap();
+        for (position, &cell) in stream.iter().enumerate() {
+            let bundled = letter_address(&letters, position, depth);
+            let here = address(&stream, position, depth);
+            for class in 0..alphabet {
+                let bundle: Vec<_> = joined
+                    .opened(&bundled, class)
+                    .unwrap()
+                    .into_iter()
+                    .filter(|path| path.branch == 1)
+                    .collect();
+                let cells = tree.opened(&here, class).unwrap();
+                assert_eq!(bundle.len(), cells.len());
+                for (b, c) in bundle.iter().zip(&cells) {
+                    assert_eq!(b.dyadic, c.dyadic);
+                    assert_eq!(
+                        b.faces[0], c.faces[0],
+                        "r = {slots}, D = {depth}, cell {position}, class {class}"
+                    );
+                }
+            }
+            joined.receive(&bundled, cell).unwrap();
+            tree.receive(&here, cell).unwrap();
+        }
+    }
+}
+
+/// **The prior sweep reads the development cells only** (Decision 32's choice): every law of the
+/// family runs its own depth sweep ([`choose_depth`]), changing the held-out cells changes nothing,
+/// the choice is charged `⌈log₂⌉` of the laws tried, the incumbent is Decision 28's `½`, the chosen
+/// law is the incumbent or the least charged law strictly below it, and a family without `½` is
+/// refused. [`tree_prequential`] is [`prequential`]'s tree.
+#[test]
+fn landmark_prior_sweep_reads_the_development_cells_only() {
+    let cells: Vec<usize> = (0..96u64)
+        .map(|t| ((t * 3 + t / 5 + t * t / 7) % 4) as usize)
+        .collect();
+    let tail = 72..96;
+    let cut = Cut {
+        cells: cells.clone(),
+        held_out: vec![tail],
+    };
+    let letters = cell_letters(&cut.cells);
+    let declared = LandmarkDeclaration {
+        population: 96,
+        ..declaration(4, 1)
+    };
+    let family = prior_family(3);
+    let sweep = choose_prior(&cut, &letters, &declared, &family).unwrap();
+    let mut other = cut.clone();
+    for cell in &mut other.cells[72..] {
+        *cell = 3 - *cell;
+    }
+    assert_eq!(
+        choose_prior(&other, &cell_letters(&other.cells), &declared, &family).unwrap(),
+        sweep
+    );
+    assert_eq!(sweep.incumbent, 0);
+    assert_eq!(sweep.description_bits, 4);
+    assert_eq!(sweep.tried.len(), 9);
+    for (prior, depths) in &sweep.tried {
+        let at = LandmarkDeclaration {
+            prior: prior.clone(),
+            ..declared.clone()
+        };
+        assert_eq!(&choose_depth(&cut, &letters, &at).unwrap(), depths);
+    }
+    let chosen = sweep.charged(sweep.chosen);
+    if sweep.chosen != sweep.incumbent {
+        assert!(chosen.upper < sweep.charged(sweep.incumbent).lower);
+        assert!((0..9).all(|index| chosen.upper <= sweep.charged(index).upper));
+    }
+    assert_eq!(
+        sweep.decided,
+        (0..9).all(|index| index == sweep.chosen || chosen.upper < sweep.charged(index).lower)
+    );
+    assert_eq!(
+        sweep.chosen_description(),
+        4 + sweep.tried[sweep.chosen].1.description_bits
+    );
+    assert!(choose_prior(&cut, &letters, &declared, &family[1..]).is_err());
+
+    let at = LandmarkDeclaration {
+        prior: StopPrior::per_depth(vec![1, 3]).unwrap(),
+        depth: 2,
+        ..declared
+    };
+    let ([development, held], run) = tree_prequential(&cut, &letters, &at).unwrap();
+    let both = prequential(&cut, &letters, &at).unwrap();
+    assert_eq!(
+        (development, held),
+        (both.development.tree, both.held_out.tree)
+    );
+    assert_eq!(run, both.run);
+    assert!(run.largest_residual <= run.face_rule);
 }

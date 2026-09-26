@@ -169,6 +169,7 @@ pub(super) fn small_field(
                 aperture: 1,
                 tolerance: rat(1, 16),
                 depth: 2,
+                prior: crate::hnn::StopPrior::half(),
             }],
             crib: CribDeclaration {
                 window: 16,

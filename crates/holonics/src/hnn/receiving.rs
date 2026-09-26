@@ -784,9 +784,10 @@ pub fn clock_letters(
 /// [definition; agent-inferred] **The landmark tree a receiver declares** (module header): the
 /// field's exterior chart `|A|` (the cell emitted as its odometer digits), the receiver's depth `D`
 /// with no forced split, the field's declared population (the passage the tree's certificates hold
-/// within), the receiver's grain `L_R = ⌈1/ε_bits⌉` and the field's letter family
-/// ([`letter_family`]), from which the owner derives its widths (the path lattice `M_p`, the β
-/// carrier `W` and, past `u128`, the carrier's rebase `R`).
+/// within), the receiver's grain `L_R = ⌈1/ε_bits⌉`, the field's letter family
+/// ([`letter_family`]) and the receiver's declared stop-weight law (Decision 32), from which the
+/// owner derives its widths (the path lattice `M_p`, the β carrier `W` and, past `u128`, the
+/// carrier's rebase `R`).
 pub fn landmark_declaration(
     field: &Field,
     receiver: &ReceiverDeclaration,
@@ -807,6 +808,7 @@ pub fn landmark_declaration_with(
         population: field.population(),
         grain: grain_of(&receiver.tolerance)?,
         family,
+        prior: receiver.prior.clone(),
     })
 }
 

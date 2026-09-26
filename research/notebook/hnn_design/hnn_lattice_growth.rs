@@ -200,6 +200,7 @@ fn chain() -> Field {
                 aperture: 2,
                 tolerance: rat(1, 16),
                 depth: 2,
+                prior: holonics::hnn::StopPrior::half(),
             }],
             crib: CribDeclaration {
                 window: 16,

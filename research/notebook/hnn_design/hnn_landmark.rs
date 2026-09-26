@@ -7,7 +7,34 @@
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin letters
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin letters contacts
+//! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin prior
 //! ```
+//!
+//! [definition; agent-inferred] **The stop-prior decision** (`prior`; Decision 32): on the
+//! **development cells only** (the manifest's held-out range is cut away before the sweep reads
+//! anything), the cell-only tree under every law of the declared family
+//! (`hnn::landmark::prior_family`: the global dyadic ladder `w = 1 − 2^(−j)`, `j = 1, …, J`, then the
+//! per-depth pairs `(j_root, j_below)`, `j_root ≠ j_below`; `J = ⌈log₂(n* B)⌉`,
+//! `hnn::landmark::ladder_top`), each law with its own depth sweep (`choose_depth`) and charged
+//! `⌈log₂⌉` of its depths tried, the choice charged `⌈log₂⌉` of the laws tried
+//! (`hnn::landmark::choose_prior`):
+//! - each law's development code length and its difference from the `½` tree (Decision 28's law),
+//!   uncharged and charged, with its sign when decided by disjoint enclosures;
+//! - the choice: the least charged law when it lies strictly below the `½` tree, the `½` tree
+//!   otherwise, and whether it lies strictly below every other law;
+//! - **where campaign 2's constant-slot controls found their bits** (development only; it chooses
+//!   nothing): every law's development code length split by dyadic cell (the digit trees), each
+//!   digit's executed face read by `Landmarks::opened` before its deposit. The controls are the
+//!   cell tree joined, per dyadic cell, with the per-depth law `(1, r + 1)` (the test
+//!   `landmark_constant_slots_are_the_per_depth_prior`), and a join codes each dyadic cell within
+//!   `[min, min + 1]` of its two branches (Lean `sequential_mixture_bounds`): so it prints, per law,
+//!   `Σ_h min(L_(½,h), L_(law,h)) − L_½` and the dyadic cells where the law is decided below `½`,
+//!   and the least law per dyadic cell over the whole family, `Σ_h min_law L_(law,h) − L_½`;
+//! - **then the held-out pass, once, for the chosen law** at its chosen depth (`prequential` over
+//!   the whole cut, every cell scored before its own deposit): the chosen tree against online
+//!   order-0, order-1, PPM-2 and the `½` tree (`tree_prequential` at its own chosen depth), each in
+//!   all and a cell at the grain, the chosen tree charged its whole description (the laws' and its
+//!   depths' `⌈log₂⌉`) and the `½` tree its depths' (Decision 28's receipt); and the wall times.
 //!
 //! [definition; agent-inferred] **The development harness** (`letters`; campaign 2's receiving
 //! letters, Decision 31): on the **development cells only** (the manifest's held-out range is cut
@@ -73,10 +100,13 @@ mod exterior;
 
 use std::time::Instant;
 
+use rayon::prelude::*;
+
 use holonics::hnn::landmark::{
     Coded, DepthSweep, Feature, IdealLandmarks, LandmarkDeclaration, Landmarks, Letter,
-    LetterFamily, OracleCost, TreeRun, Widths, address, cell_letters, choose_depth, code_length,
-    development, oracle_cost, prequential,
+    LetterFamily, OracleCost, PriorSweep, StopPrior, TreeRun, Widths, address, cell_letters,
+    choose_depth, choose_prior, code_length, development, ladder_top, odometer_digits, oracle_cost,
+    prequential, prior_family, tree_prequential,
 };
 use holonics::hnn::ratio::interval_sum;
 use holonics::hnn::receiving::clock_letters;
@@ -88,7 +118,7 @@ use holonics::ratio::algebraic::ExactInterval;
 use num_bigint::BigInt;
 use std::collections::BTreeSet;
 
-use exterior::{against, difference, enclosure, exact, per, read_cut, receiver_grain};
+use exterior::{against, difference, enclosure, exact, per, read_cut, reading_of, receiver_grain};
 
 /// The tree's code length charged its depth choice's description bits.
 fn charged(bits: &ExactInterval, description: u64) -> ExactInterval {
@@ -492,6 +522,7 @@ fn letters_harness(path: &str, contacts: bool) {
         population: count as u64,
         grain,
         family: LetterFamily::cells(),
+        prior: holonics::hnn::StopPrior::half(),
     };
     println!(
         "development: {cells} cells (the manifest's held-out range {}..{} is cut away before any reading); |A| = {alphabet}, n* = {count}, L_R = {grain}",
@@ -837,12 +868,397 @@ fn letters_harness(path: &str, contacts: bool) {
     );
 }
 
+/// One law's line of the stop-prior sweep: its depths, its development code length and its
+/// difference from the `½` tree, uncharged and charged (each law its depths' `⌈log₂⌉`).
+fn prior_line(sweep: &PriorSweep, index: usize, cells: u64, grain: u64) {
+    let (prior, depths) = &sweep.tried[index];
+    let bits = sweep.bits(index);
+    let half = sweep.bits(sweep.incumbent);
+    let uncharged = ExactInterval {
+        lower: &bits.lower - &half.upper,
+        upper: &bits.upper - &half.lower,
+    };
+    let (charged, half_charged) = (sweep.charged(index), sweep.charged(sweep.incumbent));
+    let delta = ExactInterval {
+        lower: &charged.lower - &half_charged.upper,
+        upper: &charged.upper - &half_charged.lower,
+    };
+    println!(
+        "  {prior}: D = {} of {} tried ({} depth bits); L = {} bits in all, {} a cell",
+        depths.chosen,
+        depths.tried.len(),
+        depths.description_bits,
+        exact(&bits.upper),
+        per(&bits, cells, grain)
+    );
+    println!(
+        "    L − L_½ {}: {}; charged {}",
+        decided(&uncharged),
+        reading_of(&uncharged, grain),
+        reading_of(&delta, grain)
+    );
+}
+
+/// **One law's development code length by dyadic cell**: every digit's executed face read at the
+/// standing before its cell's deposit (`Landmarks::opened`), enclosed and summed per dyadic cell.
+fn dyadic_lengths(dev: &Cut, declared: &LandmarkDeclaration) -> Vec<ExactInterval> {
+    let mut tree = Landmarks::new(declared.clone()).expect("a declared law");
+    let zero = ExactInterval::point(Rat::from_integer(BigInt::from(0)));
+    let mut sums = vec![zero; 1usize << tree.digits()];
+    for (position, &class) in dev.cells.iter().enumerate() {
+        let here = address(&dev.cells, position, declared.depth);
+        for path in tree
+            .opened(&here, class)
+            .expect("a cell within the declaration")
+        {
+            let length = code_length(&path.faces[0]).expect("a code length");
+            sums[path.dyadic] = interval_sum(&sums[path.dyadic], &length).expect("an enclosure");
+        }
+        tree.deposit(&here, class)
+            .expect("a cell within the declaration");
+    }
+    sums
+}
+
+/// **Where the constant-slot controls found their bits** (module header; development only).
+fn dyadic_split(dev: &Cut, declared: &LandmarkDeclaration, sweep: &PriorSweep, grain: u64) {
+    let clock = Instant::now();
+    let lengths: Vec<Vec<ExactInterval>> = (0..sweep.tried.len())
+        .into_par_iter()
+        .map(|index| {
+            let (prior, depths) = &sweep.tried[index];
+            dyadic_lengths(
+                dev,
+                &LandmarkDeclaration {
+                    depth: depths.chosen,
+                    prior: prior.clone(),
+                    ..declared.clone()
+                },
+            )
+        })
+        .collect();
+    let wall = clock.elapsed().as_millis();
+    let half = &lengths[sweep.incumbent];
+    let opened: Vec<usize> = (0..half.len())
+        .filter(|&h| half[h].upper > Rat::from_integer(BigInt::from(0)))
+        .collect();
+    let total = |pick: &dyn Fn(usize) -> ExactInterval| -> ExactInterval {
+        opened.iter().fold(
+            ExactInterval::point(Rat::from_integer(BigInt::from(0))),
+            |sum, &h| interval_sum(&sum, &pick(h)).expect("an enclosure"),
+        )
+    };
+    let least = |a: &ExactInterval, b: &ExactInterval| {
+        if a.upper <= b.upper {
+            a.clone()
+        } else {
+            b.clone()
+        }
+    };
+    let half_total = total(&|h| half[h].clone());
+    let whole = sweep.bits(sweep.incumbent);
+    let meets = half_total.lower <= whole.upper && whole.lower <= half_total.upper;
+    println!(
+        "where the constant-slot controls found their bits (development, {} dyadic cells opened; {wall} ms wall): per law, Σ_h min(L_(½,h), L_(law,h)) − L_½ (a join of the two codes within [that, that + {}]) and the dyadic cells where the law lies below ½:",
+        opened.len(),
+        opened.len()
+    );
+    let mut rows: Vec<(usize, ExactInterval, usize)> = (0..sweep.tried.len())
+        .filter(|&index| index != sweep.incumbent)
+        .map(|index| {
+            let law = &lengths[index];
+            let joined = total(&|h| least(&half[h], &law[h]));
+            let below = opened
+                .iter()
+                .filter(|&&h| law[h].upper < half[h].lower)
+                .count();
+            (
+                index,
+                ExactInterval {
+                    lower: &joined.lower - &half_total.upper,
+                    upper: &joined.upper - &half_total.lower,
+                },
+                below,
+            )
+        })
+        .collect();
+    println!("  check: the ½ tree's dyadic cells sum to its code length: {meets}");
+    rows.sort_by(|a, b| a.1.upper.cmp(&b.1.upper));
+    for (index, gain, below) in rows.iter().take(8) {
+        println!(
+            "  {}: {}; below ½ at {below} of {} dyadic cells",
+            sweep.tried[*index].0,
+            reading_of(gain, grain),
+            opened.len()
+        );
+    }
+    for slots in 1..=4u32 {
+        let law = StopPrior::per_depth(vec![1, slots + 1]).expect("a ladder law");
+        if let Some((index, gain, below)) = rows
+            .iter()
+            .find(|(index, _, _)| sweep.tried[*index].0 == law)
+        {
+            println!(
+                "  the control of {slots} slots, {}: {}; below ½ at {below} dyadic cells",
+                sweep.tried[*index].0,
+                reading_of(gain, grain)
+            );
+        }
+    }
+    // The least join by the odometer's digit level (the dyadic cell's depth in the tower thread).
+    let (join, _, _) = &rows[0];
+    let law = &lengths[*join];
+    println!(
+        "  by digit level, the least join ({}): Σ_(h at level i) min(L_(½,h), L_(law,h)) − L_(½,h) and the dyadic cells where the law lies below ½",
+        sweep.tried[*join].0
+    );
+    let digits = half.len().trailing_zeros();
+    for level in 0..digits {
+        let at: Vec<usize> = opened
+            .iter()
+            .copied()
+            .filter(|&h| h >> level == 1)
+            .collect();
+        let sum = |pick: &dyn Fn(usize) -> ExactInterval| {
+            at.iter().fold(
+                ExactInterval::point(Rat::from_integer(BigInt::from(0))),
+                |sum, &h| interval_sum(&sum, &pick(h)).expect("an enclosure"),
+            )
+        };
+        let (joined, alone) = (
+            sum(&|h| least(&half[h], &law[h])),
+            sum(&|h| half[h].clone()),
+        );
+        let below = at.iter().filter(|&&h| law[h].upper < half[h].lower).count();
+        println!(
+            "    level {level}: {}; below ½ at {below} of {}",
+            reading_of(
+                &ExactInterval {
+                    lower: &joined.lower - &alone.upper,
+                    upper: &joined.upper - &alone.lower,
+                },
+                grain
+            ),
+            at.len()
+        );
+    }
+    let best = total(&|h| {
+        lengths
+            .iter()
+            .map(|law| law[h].clone())
+            .reduce(|a, b| least(&a, &b))
+            .expect("a law")
+    });
+    let gain = ExactInterval {
+        lower: &best.lower - &half_total.upper,
+        upper: &best.upper - &half_total.lower,
+    };
+    println!(
+        "  the least law in every dyadic cell (uncharged; naming it costs ⌈log₂ {}⌉ bits a dyadic cell): Σ_h min_law L_(law,h) − L_½ = {}",
+        sweep.tried.len(),
+        reading_of(&gain, grain)
+    );
+}
+
+/// **The stop-prior decision** (module header, "The stop-prior decision"; Decision 32).
+fn prior_harness(path: &str) {
+    let setup = Instant::now();
+    let (bytes, count, held) = read_cut(path);
+    let field = Field::declare(FieldDeclaration::campaign_one(count as u64))
+        .expect("campaign 1's declared field over the cut");
+    let grain = receiver_grain(&field);
+    let alphabet = field.alphabet();
+    let full = Cut {
+        cells: bytes.iter().map(|&byte| usize::from(byte)).collect(),
+        held_out: vec![held.clone()],
+    };
+    // The development cells alone: the sweep reads nothing else.
+    let dev = Cut {
+        cells: development(&full),
+        held_out: Vec::new(),
+    };
+    let cells = dev.cells.len() as u64;
+    let declared = LandmarkDeclaration {
+        alphabet,
+        depth: 1,
+        forced: 0,
+        population: count as u64,
+        grain,
+        family: LetterFamily::cells(),
+        prior: StopPrior::half(),
+    };
+    let top = ladder_top(&declared);
+    let family = prior_family(top);
+    println!("hnn_landmark prior: the stop-prior decision (Decision 32) over the cut file {path}");
+    println!(
+        "development: {cells} cells (the manifest's held-out range {}..{} is cut away before the sweep); |A| = {alphabet}, n* = {count}, L_R = {grain}",
+        held.start, held.end
+    );
+    println!(
+        "the family: the global ladder j = 1..{top} and the per-depth pairs (j_0, j_(≥1)), j_0 ≠ j_(≥1): {} laws, J = ⌈log₂(n* B)⌉ = ⌈log₂({count} · {})⌉ = {top}",
+        family.len(),
+        odometer_digits(alphabet)
+    );
+    let setup = setup.elapsed().as_millis();
+    println!("setup: {setup} ms wall");
+    println!();
+
+    let clock = Instant::now();
+    let sweep = choose_prior(&dev, &cell_letters(&dev.cells), &declared, &family)
+        .expect("the stop-prior sweep");
+    let sweep_wall = clock.elapsed().as_millis();
+    println!(
+        "the sweep: every law with its own depth sweep, charged ⌈log₂⌉ of its depths; the choice ⌈log₂ {}⌉ = {} bits; {sweep_wall} ms wall",
+        family.len(),
+        sweep.description_bits
+    );
+    for index in 0..sweep.tried.len() {
+        prior_line(&sweep, index, cells, grain);
+    }
+    let mut least = 0;
+    for index in 0..sweep.tried.len() {
+        if sweep.charged(index).upper < sweep.charged(least).upper {
+            least = index;
+        }
+    }
+    let (chosen, depths) = &sweep.tried[sweep.chosen];
+    println!();
+    println!(
+        "the least charged law: {} at D = {}",
+        sweep.tried[least].0, sweep.tried[least].1.chosen
+    );
+    println!(
+        "the choice: {chosen} at D = {} ({}); strictly below every other law: {}; its description {} bits (the laws' {} and its depths' {})",
+        depths.chosen,
+        if sweep.chosen == sweep.incumbent {
+            "Decision 28's ½: no law lies strictly below it"
+        } else {
+            "strictly below the ½ tree"
+        },
+        sweep.decided,
+        sweep.chosen_description(),
+        sweep.description_bits,
+        depths.description_bits
+    );
+    let (half_depths, chosen_bits) = (&sweep.tried[sweep.incumbent].1, sweep.bits(sweep.chosen));
+    ordering(
+        "development: the chosen law (charged its whole description) against the ½ tree (charged its depths)",
+        &charged(&chosen_bits, sweep.chosen_description()),
+        &charged(&sweep.bits(sweep.incumbent), half_depths.description_bits),
+        cells,
+        grain,
+    );
+    println!();
+    dyadic_split(&dev, &declared, &sweep, grain);
+    println!();
+
+    // The held-out pass, once, for the chosen law.
+    let at = LandmarkDeclaration {
+        depth: depths.chosen,
+        prior: chosen.clone(),
+        ..declared.clone()
+    };
+    let half_at = LandmarkDeclaration {
+        depth: half_depths.chosen,
+        ..declared.clone()
+    };
+    let letters = cell_letters(&full.cells);
+    let clock = Instant::now();
+    let run = prequential(&full, &letters, &at).expect("the chosen law's prequential run");
+    let run_wall = clock.elapsed().as_millis();
+    let clock = Instant::now();
+    let ([half_development, half_held], half_run) =
+        tree_prequential(&full, &letters, &half_at).expect("the ½ tree's prequential run");
+    let half_wall = clock.elapsed().as_millis();
+    println!(
+        "the held-out pass (once): {chosen} at D = {}, every cell scored before its own deposit",
+        at.depth
+    );
+    println!(
+        "check: the run's development code length is the sweep's: {}; the ½ tree's: {}",
+        run.development.tree == chosen_bits,
+        half_development == sweep.bits(sweep.incumbent)
+    );
+    let held_cells = run.held_out.cells;
+    println!("held out ({held_cells} cells), bits a cell at L_R = {grain}:");
+    let rows: [(&str, &ExactInterval); 5] = [
+        ("the chosen tree", &run.held_out.tree),
+        ("the ½ tree (Decision 28)", &half_held),
+        ("online order-0 KT", &run.held_out.order_zero),
+        ("online order-1 KT", &run.held_out.order_one),
+        ("PPM order 2, escape C", &run.held_out.ppm),
+    ];
+    for (name, bits) in rows {
+        println!("  {name}: {}", per(bits, held_cells, grain));
+        println!(
+            "    total exact [{}, {}] bits",
+            exact(&bits.lower),
+            exact(&bits.upper)
+        );
+    }
+    let description = sweep.chosen_description();
+    let bits = charged(&run.held_out.tree, description);
+    println!("held out, the orderings: the chosen tree charged its {description} description bits");
+    ordering(
+        "chosen tree against online order-0 KT",
+        &bits,
+        &run.held_out.order_zero,
+        held_cells,
+        grain,
+    );
+    ordering(
+        "chosen tree against online order-1 KT",
+        &bits,
+        &run.held_out.order_one,
+        held_cells,
+        grain,
+    );
+    ordering(
+        &format!("chosen tree against PPM order {PPM_ORDER}"),
+        &bits,
+        &run.held_out.ppm,
+        held_cells,
+        grain,
+    );
+    ordering(
+        &format!(
+            "chosen tree against the ½ tree (charged its {} depth bits)",
+            half_depths.description_bits
+        ),
+        &bits,
+        &charged(&half_held, half_depths.description_bits),
+        held_cells,
+        grain,
+    );
+    ordering(
+        "chosen tree against the ½ tree, uncharged",
+        &run.held_out.tree,
+        &half_held,
+        held_cells,
+        grain,
+    );
+    println!();
+    tree_run(&run.run, grain);
+    println!(
+        "the ½ tree at D = {}: {} nodes founded, {} stored bits",
+        half_at.depth, half_run.nodes, half_run.bits
+    );
+    println!();
+    println!(
+        "wall time (exterior): setup {setup} ms; the sweep {sweep_wall} ms; the held-out pass: the chosen law's prequential run (the tree and the baselines together) {run_wall} ms, the ½ tree's run {half_wall} ms"
+    );
+}
+
 fn main() {
     let arguments: Vec<String> = std::env::args().skip(1).collect();
     let path = match arguments.as_slice() {
         [key, value] if key == "cut-file" => value.clone(),
         [key, value, mode] if key == "cut-file" && mode == "letters" => {
             letters_harness(value, false);
+            return;
+        }
+        [key, value, mode] if key == "cut-file" && mode == "prior" => {
+            prior_harness(value);
             return;
         }
         [key, value, mode, with]
@@ -852,7 +1268,7 @@ fn main() {
             return;
         }
         _ => {
-            println!("usage: hnn_landmark cut-file <path> [letters [contacts]]");
+            println!("usage: hnn_landmark cut-file <path> [letters [contacts] | prior]");
             return;
         }
     };
@@ -873,6 +1289,7 @@ fn main() {
         population: count as u64,
         grain,
         family: LetterFamily::cells(),
+        prior: holonics::hnn::StopPrior::half(),
     };
     let setup = setup.elapsed().as_millis();
     let development = (count - held.len()) as u64;
