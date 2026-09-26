@@ -77,6 +77,9 @@
 //! [established-bounded; measured] **Its receipt and reading** are the located-failure record,
 //! `research/records/2026-09-25_CAMPAIGN_ONE_LOCATED_FAILURE.md` (about 10 minutes on the host).
 
+#[path = "exterior.rs"]
+mod exterior;
+
 use std::collections::{BTreeMap, BTreeSet};
 use std::ops::Range;
 use std::time::Instant;
@@ -93,6 +96,8 @@ use holonics::ratio::algebraic::ExactInterval;
 use holonics::ratio::linear::ExactRatMatrix;
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
+
+use exterior::read_cut;
 
 /// The standing real cut (THE_REBUILD Decision 23), written by `standing_cut.py`.
 const STANDING_CUT: &str = ".local/cuts/standing-real-cut-campaign-1.bin";
@@ -360,35 +365,6 @@ fn median(values: &[Rat]) -> Rat {
     let mut sorted = values.to_vec();
     sorted.sort();
     sorted[(sorted.len() - 1) / 2].clone()
-}
-
-/// The read at the cut exterior: a manifest's population and held-out range, read by the numbers
-/// after their keys (exterior JSON; no parser enters the crate).
-#[allow(clippy::disallowed_types, clippy::disallowed_methods)]
-fn read_cut(path: &str) -> (Vec<u8>, usize, Range<usize>) {
-    let bytes = std::fs::read(path).unwrap_or_else(|error| panic!("read the cut file {path}: {error}"));
-    let manifest_path = path
-        .strip_suffix(".bin")
-        .map_or_else(|| format!("{path}.json"), |stem| format!("{stem}.json"));
-    let manifest = std::fs::read_to_string(&manifest_path)
-        .unwrap_or_else(|error| panic!("read the cut manifest {manifest_path}: {error}"));
-    let numbers_after = |key: &str| -> Vec<usize> {
-        let start = manifest.find(key).unwrap_or_else(|| panic!("the manifest names {key}")) + key.len();
-        let rest = manifest[start..].trim_start();
-        let value = if rest.starts_with('[') {
-            &rest[..rest.find(']').expect("a closed list")]
-        } else {
-            &rest[..rest.find([',', '\n', '}']).unwrap_or(rest.len())]
-        };
-        value
-            .split(|c: char| !c.is_ascii_digit())
-            .filter(|piece| !piece.is_empty())
-            .map(|piece| piece.parse().expect("a count"))
-            .collect()
-    };
-    let population = numbers_after("\"population\":")[0];
-    let range = numbers_after("\"held_out_range\":");
-    (bytes, population, range[0]..range[1])
 }
 
 // -------------------------------------------------------------------------------------------

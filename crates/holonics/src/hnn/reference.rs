@@ -2043,7 +2043,8 @@ pub struct Cut {
 }
 
 impl Cut {
-    fn held_out(&self, position: usize) -> bool {
+    /// Whether the cell at `position` is held out.
+    pub fn held_out(&self, position: usize) -> bool {
         self.held_out.iter().any(|range| range.contains(&position))
     }
 
@@ -2288,11 +2289,25 @@ impl Ppm {
     }
 }
 
-/// The exposure's online baselines, fitted on the same stream in the same order. [agent-inferred]
-/// The order-1 baseline's contexts are the preceding-cell regions (`hnn::masses::Regions`), the
-/// stream's first cell in the declared empty-window region, so the count face at that partition
-/// has order-1's law exactly.
-struct Baselines {
+/// [definition] **One cell's code lengths under the online baselines**, each read at the standing
+/// before the cell's own count: uniform, order-0 and order-1 Krichevsky–Trofimov, and PPM of order
+/// [`PPM_ORDER`] with escape rule C, each enclosed.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct BaselineCodes {
+    pub uniform: ExactInterval,
+    pub order_zero: ExactInterval,
+    pub order_one: ExactInterval,
+    pub ppm: ExactInterval,
+}
+
+/// [definition] **The online baselines, fitted on the same stream in the same order** as the model
+/// they are read beside: every cell is coded at the current counts, then counted (prequential).
+/// [agent-inferred] The order-1 baseline's contexts are the preceding-cell regions
+/// (`hnn::masses::Regions`), the stream's first cell in the declared empty-window region, so the
+/// count face at that partition has order-1's law exactly. The exposure ([`expose`]) and the
+/// landmark tree's prequential measurement (`hnn::landmark::prequential`) read them.
+#[derive(Clone, Debug)]
+pub struct Baselines {
     alphabet: usize,
     uniform: ExactInterval,
     order_zero: Vec<u64>,
@@ -2304,7 +2319,8 @@ struct Baselines {
 }
 
 impl Baselines {
-    fn new(alphabet: usize) -> Result<Self, HnnError> {
+    /// The baselines at their priors over `|A|` classes.
+    pub fn new(alphabet: usize) -> Result<Self, HnnError> {
         Ok(Self {
             alphabet,
             uniform: log2_enclosure(&Rat::from_integer(BigInt::from(alphabet)))?,
@@ -2332,31 +2348,37 @@ impl Baselines {
         self.seen += 1;
     }
 
-    /// Count one cell in every baseline.
-    fn update(&mut self, code: usize) {
+    /// Count one cell in every baseline, uncoded.
+    pub fn update(&mut self, code: usize) {
         self.count(code);
         self.ppm.update(code);
     }
 
-    /// Code one cell in every baseline into `bits`, then count it.
-    fn code(&mut self, bits: &mut Bits, code: usize) -> Result<(), HnnError> {
+    /// **Code one cell in every baseline at the current counts, then count it** (prequential).
+    pub fn code_cell(&mut self, code: usize) -> Result<BaselineCodes, HnnError> {
         let context = self.context();
-        bits.uniform = interval_sum(&bits.uniform, &self.uniform)?;
-        bits.order_zero = interval_sum(
-            &bits.order_zero,
-            &kt_bits(self.order_zero[code], self.seen, self.alphabet)?,
-        )?;
-        bits.order_one = interval_sum(
-            &bits.order_one,
-            &kt_bits(
+        let codes = BaselineCodes {
+            uniform: self.uniform.clone(),
+            order_zero: kt_bits(self.order_zero[code], self.seen, self.alphabet)?,
+            order_one: kt_bits(
                 self.order_one.get(&(context, code)).copied().unwrap_or(0),
                 self.order_one_totals[context],
                 self.alphabet,
             )?,
-        )?;
-        bits.ppm = interval_sum(&bits.ppm, &self.ppm.code(code)?)?;
-        bits.cells += 1;
+            ppm: self.ppm.code(code)?,
+        };
         self.count(code);
+        Ok(codes)
+    }
+
+    /// Code one cell in every baseline into `bits`, then count it.
+    fn code(&mut self, bits: &mut Bits, code: usize) -> Result<(), HnnError> {
+        let codes = self.code_cell(code)?;
+        bits.uniform = interval_sum(&bits.uniform, &codes.uniform)?;
+        bits.order_zero = interval_sum(&bits.order_zero, &codes.order_zero)?;
+        bits.order_one = interval_sum(&bits.order_one, &codes.order_one)?;
+        bits.ppm = interval_sum(&bits.ppm, &codes.ppm)?;
+        bits.cells += 1;
         Ok(())
     }
 }

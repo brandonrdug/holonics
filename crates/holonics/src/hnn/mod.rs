@@ -21,6 +21,9 @@
 //!   face of the count face and the wave (Decision 27);
 //! - [`masses`]: the receiving parametron's region class masses ([`ClassMasses`]), their deposit
 //!   and their count face read at the grain (Decision 27);
+//! - [`landmark`]: the receiving parametron's storage as a tree of landmarks ([`Landmarks`]): typed
+//!   address letters, KT masses at nodes founded at first arrival, the path face mixed along the
+//!   opened path, its deposit and its prequential measurement (Decision 28, count-only);
 //! - [`keys`]: the data → menu map, key location per ring in carry order, and gauge fixing.
 //!
 //! The learning side (constitution, ratio, pending, retention, port, reference) composes these.
@@ -45,6 +48,7 @@
 //! | the word on declared lattices: certified inverse charts, error feedback, the executed adjoint, the balance up to the residual | `HNN/LatticeWord.{nsStep, rounded_refinement_certificate, roundedIter_certificate, warm_start_certificate, inverse_chart_deviation, feedback_tick, carried_word_accounting, executed_adjoint_unique, executed_adjoint_deviation, cayley_chart_energy}` | [`chart`], [`Word`], [`Word::pull_back`], [`propagation::TickBalance`] |
 //! | the moment | `HNN/Moment.{encoderMoment_contract, encoder_covector_tape_free, closingRing_moment_is_phaseBinned, exteriorOffset_independent_of_E, selective_position, moment_capacity}` | [`SourceMoment`], [`moment::capacity`] |
 //! | the receiving face: region class masses read at the grain, plus the wave (Decision 27) | `HNN/RegionCounts.{count_step_mass, count_prior_decay, count_face_eq_kt, count_future_sufficient, grain_log_iff_pow_bounds, grain_code_residual, combined_face_pullback}` | [`masses`], [`ReceivingRead::combined`] |
+//! | the receiving face compresses landmarks: the tree's path face, its opened-path deposit and telescope, the executed dyadic face (Decision 28, count-only) | `HNN/LandmarkTree.{path_face_normalized, weight_step, landmark_step, path_telescope_exact, depth_one_is_decision_27, executed_split_laws, cell_faces_partition, digit_log_residual}` ([`landmark`]'s header has the rest) | [`landmark`] |
 //! | the word opens at zero | structural: [`Current`] has no wave field (`HNN/Retention.word_opens_at_zero` is the abstract trajectory's linearity) | [`Word::open`] |
 //! | keys | `HNN/Keys.{field_loop_fibre, selective_step_dormant, propagation_eq_edge_fibre, gauge_fix_unique}` | [`keys`], [`crate::compression::Menu::propagate`] |
 //! | the ring's navigator | `Holon/Generator.{mapRotor_order, map_pow_mod_order, map_turn_lossless}` | [`Ring::navigator`] over `navigator::Transport::Map` |
@@ -68,6 +72,7 @@ pub mod chart;
 pub mod constitution;
 pub mod field;
 pub mod keys;
+pub mod landmark;
 pub mod masses;
 pub mod moment;
 pub mod pending;
@@ -88,6 +93,7 @@ pub use field::{
     RingDeclaration,
 };
 pub use keys::{KeyLocation, RingKeys, locate_keys};
+pub use landmark::{Emission, LandmarkDeclaration, Landmarks, Letter};
 pub use masses::{ClassMasses, CountFace, MassStep, Regions};
 pub use moment::{Capacity, PairPort, SourceMoment};
 pub use pending::PendingRatio;
@@ -215,6 +221,10 @@ pub enum HnnError {
         "the receiver on ring {ring} declares the preceding-cell region, but no declared offset retains a window"
     )]
     RegionWindow { ring: usize },
+    #[error(
+        "the landmark tree's declared population n* = {population} is passed; its chart's certificates hold only within it"
+    )]
+    PopulationReached { population: u64 },
     #[error(
         "a class mass's weight {weight} is not a nonnegative multiple of 1/2; the masses are integers of half-units"
     )]

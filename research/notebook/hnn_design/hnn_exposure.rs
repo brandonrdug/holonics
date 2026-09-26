@@ -89,15 +89,16 @@
 // `cfg(holonics_card)` is declared by `holonics-cuda`'s build only (module header).
 #![allow(unexpected_cfgs)]
 
+#[path = "exterior.rs"]
+mod exterior;
+
 use std::fmt::Display;
-use std::ops::Range;
 use std::time::Instant;
 
 use holonics::aeon::{EnclosedBalance, LiteralComparison};
 use holonics::compression::cost::ceil_log2;
 use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
 use holonics::hnn::port::{ExecutionPort, ReceiptDetail};
-use holonics::hnn::receiving::GrainCell;
 use holonics::hnn::reference::{Bits, KeyReport, PPM_ORDER};
 use holonics::hnn::{AeonBoundary, Cut, Exposure, Field, FieldDeclaration, Reference, Steps};
 use holonics::ratio::Rat;
@@ -105,6 +106,10 @@ use holonics::ratio::algebraic::ExactInterval;
 use holonics::receiver::reception::Component;
 use num_bigint::{BigInt, BigUint};
 use num_traits::One;
+
+use exterior::{
+    against, difference, enclosure, exact, per, ratio, read_cut, reading, receiver_grain,
+};
 
 /// **The pinned campaign cut**: the commit whose `docs/plans/THE_REBUILD.md` is the campaign
 /// field's cut (as `hnn_lattice_growth`).
@@ -126,181 +131,6 @@ fn pinned_cut() -> Vec<u8> {
         .expect("run from the repository: git show reads the pinned cut");
     assert!(output.status.success(), "git show {CUT_COMMIT}:{CUT_PATH}");
     output.stdout
-}
-
-/// A pinned cut file (the standing real cut in `.local/cuts/`, written by `standing_cut.py`), read
-/// whole at the notebook's exterior boundary. Only its scope and counts are printed.
-#[allow(clippy::disallowed_types, clippy::disallowed_methods)]
-fn read_cut_file(path: &str) -> Vec<u8> {
-    std::fs::read(path).unwrap_or_else(|error| panic!("read the cut file {path}: {error}"))
-}
-
-/// The manifest beside a cut file (`standing_cut.py`): its population and held-out range, read by
-/// the numbers after their keys (the manifest is exterior JSON; no parser enters the crate).
-#[allow(clippy::disallowed_types, clippy::disallowed_methods)]
-fn read_cut_manifest(path: &str) -> (usize, Range<usize>) {
-    let manifest_path = path
-        .strip_suffix(".bin")
-        .map_or_else(|| format!("{path}.json"), |stem| format!("{stem}.json"));
-    let manifest = std::fs::read_to_string(&manifest_path)
-        .unwrap_or_else(|error| panic!("read the cut manifest {manifest_path}: {error}"));
-    let numbers_after = |key: &str| -> Vec<usize> {
-        let start = manifest
-            .find(key)
-            .unwrap_or_else(|| panic!("the manifest names {key}"))
-            + key.len();
-        let rest = manifest[start..].trim_start();
-        let value = if rest.starts_with('[') {
-            &rest[..rest.find(']').expect("a closed list")]
-        } else {
-            &rest[..rest.find([',', '\n', '}']).unwrap_or(rest.len())]
-        };
-        value
-            .split(|c: char| !c.is_ascii_digit())
-            .filter(|piece| !piece.is_empty())
-            .map(|piece| piece.parse().expect("a count"))
-            .collect()
-    };
-    let population = numbers_after("\"population\":")[0];
-    let range = numbers_after("\"held_out_range\":");
-    (population, range[0]..range[1])
-}
-
-// -------------------------------------------------------------------------------------------
-// presentation (exterior: for a person; every reading exact, never a decimal)
-
-/// **The receiver's grain** `L_R = ⌈1/ε_bits⌉` of the field's first receiver (campaign 1: 16), the
-/// declared grain every bit count is read at.
-fn receiver_grain(field: &Field) -> u64 {
-    field.receivers()[0]
-        .tolerance
-        .recip()
-        .ceil()
-        .to_integer()
-        .try_into()
-        .expect("a grain fits a machine word")
-}
-
-/// An exact rational: an integer, `n/2^e` on a wide dyadic denominator, `n/(2^e·m)` on a wide
-/// denominator with a power-of-two factor, or `n/d`.
-fn exact(value: &Rat) -> String {
-    let denominator = value.denom().magnitude();
-    if denominator.is_one() {
-        return value.numer().to_string();
-    }
-    let twos = denominator.trailing_zeros().unwrap_or(0);
-    let odd = denominator >> twos;
-    if denominator.bits() <= 16 {
-        format!("{}/{}", value.numer(), denominator)
-    } else if odd.is_one() {
-        format!("{}/2^{twos}", value.numer())
-    } else if twos > 0 {
-        format!("{}/(2^{twos}·{odd})", value.numer())
-    } else {
-        format!("{}/{}", value.numer(), denominator)
-    }
-}
-
-/// **A reading at the grain** `L` (`GrainCell::of`): `value = n + k/L + ε`, the carry `n`, the
-/// phase class `k ∈ ℤ/L` and the unresolved fibre `0 ≤ ε < 1/L`, each exact.
-fn reading(value: &Rat, grain: u64) -> String {
-    let cell = GrainCell::of(value, grain);
-    format!(
-        "{} + {}/{grain} + ε, ε = {} < 1/{grain}",
-        cell.carry,
-        cell.phase,
-        exact(&cell.fibre)
-    )
-}
-
-/// **An enclosure read at the grain**: both endpoints' cells; when they share their carry and
-/// phase class, that cell once with the enclosure of its fibre.
-fn reading_of(interval: &ExactInterval, grain: u64) -> String {
-    let (lower, upper) = (
-        GrainCell::of(&interval.lower, grain),
-        GrainCell::of(&interval.upper, grain),
-    );
-    if lower.carry == upper.carry && lower.phase == upper.phase {
-        format!(
-            "{} + {}/{grain} + ε, ε ∈ [{}, {}] ⊂ [0, 1/{grain})",
-            lower.carry,
-            lower.phase,
-            exact(&lower.fibre),
-            exact(&upper.fibre)
-        )
-    } else {
-        format!(
-            "[{} + {}/{grain} + {}, {} + {}/{grain} + {}] (each fibre < 1/{grain})",
-            lower.carry,
-            lower.phase,
-            exact(&lower.fibre),
-            upper.carry,
-            upper.phase,
-            exact(&upper.fibre)
-        )
-    }
-}
-
-/// An exact ratio, reduced, with its integer quotient and remainder: `n/d (q rem r over d)`.
-fn ratio(value: &Rat) -> String {
-    if value.is_integer() {
-        return value.numer().to_string();
-    }
-    let (numerator, denominator) = (value.numer(), value.denom());
-    let quotient = value.floor().to_integer();
-    let remainder = numerator - &quotient * denominator;
-    format!(
-        "{} ({quotient} rem {remainder} over {denominator})",
-        exact(value)
-    )
-}
-
-/// An enclosure of bits: its exact endpoints, then its reading at the grain.
-fn enclosure(interval: &ExactInterval, grain: u64) -> String {
-    format!(
-        "exact [{}, {}] bits; at L_R = {grain}: {}",
-        exact(&interval.lower),
-        exact(&interval.upper),
-        reading_of(interval, grain)
-    )
-}
-
-/// An enclosure divided by a count (bits a cell): the exact ratios read at the grain.
-fn per(interval: &ExactInterval, count: u64, grain: u64) -> String {
-    if count == 0 {
-        return "-".to_string();
-    }
-    let count = Rat::from_integer(BigInt::from(count));
-    reading_of(
-        &ExactInterval {
-            lower: &interval.lower / &count,
-            upper: &interval.upper / &count,
-        },
-        grain,
-    )
-}
-
-/// Where enclosure `a` lies against `b`, exactly.
-fn against(a: &ExactInterval, b: &ExactInterval) -> &'static str {
-    if a.upper < b.lower {
-        "below"
-    } else if a.lower > b.upper {
-        "above"
-    } else {
-        "undecided (the enclosures overlap)"
-    }
-}
-
-/// **The exact difference** of two enclosures, `a − b ∈ [a.lower − b.upper, a.upper − b.lower]`,
-/// with its exact endpoints and its reading at the grain.
-fn difference(a: &ExactInterval, b: &ExactInterval, grain: u64) -> String {
-    enclosure(
-        &ExactInterval {
-            lower: &a.lower - &b.upper,
-            upper: &a.upper - &b.lower,
-        },
-        grain,
-    )
 }
 
 /// Where an exact value lies against its bound, with the exact margin `bound − value`.
@@ -367,14 +197,7 @@ fn main() {
     let setup = Instant::now();
     let (text, source) = match cut_file.as_deref() {
         Some(path) => {
-            let text = read_cut_file(path);
-            let (population, range) = read_cut_manifest(path);
-            assert_eq!(
-                text.len(),
-                population,
-                "the cut file's length is the manifest's population"
-            );
-            assert_eq!(range.end, population, "the held-out range closes the cut");
+            let (text, _, range) = read_cut(path);
             held_out = range.end - range.start;
             (
                 text,

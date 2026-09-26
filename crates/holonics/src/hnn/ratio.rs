@@ -67,7 +67,7 @@ use crate::ratio::{LogRatio, Rat, integer};
 
 /// The series terms and dyadic octaves of a logarithm's enclosure.
 const LOG_TERMS: u32 = 48;
-const LOG_OCTAVES: u32 = 96;
+pub(crate) const LOG_OCTAVES: u32 = 96;
 
 // -------------------------------------------------------------------------------------------
 // enclosures of the real chart

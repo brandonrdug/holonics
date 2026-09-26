@@ -32,3 +32,11 @@ path = "../../research/notebook/hnn_design/hnn_exposure.rs"
 [[example]]
 name = "hnn_diagnose"
 path = "../../research/notebook/hnn_design/hnn_diagnose.rs"
+
+# The notebook's measurement of the landmark tree (Decision 28, count-only) on the standing real
+# cut: the depth sweeps on the development cells and the prequential run against the online
+# baselines (research/notebook/hnn_design/README.md): a measurement run once in release, never a
+# test.
+[[example]]
+name = "hnn_landmark"
+path = "../../research/notebook/hnn_design/hnn_landmark.rs"
