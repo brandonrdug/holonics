@@ -29,7 +29,11 @@
 //!   reference change;
 //! - [`contact`] (campaign 2): the contact's transfer and site kind, its certified boost, its lock
 //!   address and its break receipt, with [`contact_readings`], the lock and site readings the
-//!   receiving join consumes.
+//!   receiving join consumes;
+//! - [`born`] (Decision 33): the receiving ring's register read by the Born rule, a finitely
+//!   correlated receiver whose density is the retained state, each digit split by its pair of
+//!   operators' traces, the collapse its receipt, and the operators learned by the normal law's
+//!   Fisher-scored prox step on declared lattices.
 //!
 //! The learning side (constitution, ratio, pending, retention, port, reference) composes these.
 //! `realization` runs the regions whose effects commute together on the host's cores (the hardware
@@ -59,6 +63,7 @@
 //! | the ring's mode tick, its pump and sheets, its clock, the junction's reference change (campaign 2) | `HNN/Ring.{ring_tick_conserves_mode_energy, ring_descriptor_tick_conserves, ring_cayley_denominator_nonsingular, ring_tick_executed_energy_balance, two_port_reference_balance, ring_crossings_are_epoch_ticks, pump_half_turn_invariant, pump_blind_to_sheets, locked_sheet_receiver_face}` | [`ring`] |
 //! | the contact's transfer and site kind, its boost, its lock address, its break (campaign 2) | `HNN/Contact.{contact_transfer_kind_by_storage_sign, contact_mode_transfer, contact_boost_solve_or_singular_direction, contact_signed_storage_balance, contact_lock_address, lockAddress_unique, least_denominator_unique, lockAddress_closes}`, `HNN/ContactBreak.{break_release_balance, break_iff_release_covers_gluing, griffith_closed_port_case, parting_returns_gluing_defect}` | [`contact`], [`contact_readings`], [`Field::parted_holon`] |
 //! | the executed tick's field balance, every defect stated, the word's balance across its commit and the unloaded port's defect (campaign 2) | `HNN/Word.{field_executed_balance_with_defects, field_commit_deposition, combined_balance_unloaded_port}` | [`word::FieldBalance`], [`word::WordBalance`], [`word::PowerForm`] |
+//! | the wave read by the Born rule: the digit split and the dyadic cell face, the reception keeping a density, the density as the retained quotient, the absorbed tick, the interference zero, the covector and the Fisher-scored step (Decision 33) | `HNN/BornFace.{born_face_normalized, born_executed_partition, born_update_trace_one, born_pure_stays_pure, born_state_future_sufficient, born_unitary_invariant, born_tick_absorbed, born_interference_zero, born_covector_eq, born_fisher_bound}` | [`born`] |
 //! | the ring's navigator | `Holon/Navigator.{mapRotor_order, map_pow_mod_order, map_turn_lossless}` | [`Ring::navigator`] over `navigator::Transport::Map` |
 //! | the block incidence, the contrast map read from its blocks, and the Holarchy chart | `Holon/Complex.{blockIncidence, block_flat_closed}`, `Holarchy/Join.interconnect` | [`Field::connection`], [`Field::contrast`], [`Field::holon`] |
 //! | the port's returns | `Holarchy/Reception.InteractionReturn` (the owner's, generic in its payloads) | [`ExecutionPort`] |
@@ -76,6 +81,7 @@
     clippy::disallowed_methods
 )]
 
+pub mod born;
 pub mod chart;
 pub mod constitution;
 pub mod contact;
@@ -319,6 +325,8 @@ pub enum HnnError {
         "ring {ring}'s resonator is not certified at pump phase {phase}: its signed form 2C + hD + (h²/2)K is not positive semidefinite"
     )]
     UncertifiedResonator { ring: usize, phase: usize },
+    #[error("the Born receiver refused {what}")]
+    BornZero { what: &'static str },
     #[error("ring {ring}'s resonator material is malformed: {what}")]
     Resonator { ring: usize, what: &'static str },
     #[error(

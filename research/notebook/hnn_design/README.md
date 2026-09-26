@@ -200,9 +200,45 @@ and the `½` tree:
 cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin prior
 ```
 
+
+`hnn_born.rs` measures the Born receiver (THE_REBUILD Decision 33, `holonics::hnn::born`, Lean
+`HNN/BornFace`) on the standing cut's development cells, beside the landmark tree's current law
+(the receiver's declaration through `hnn::receiving::landmark_declaration_with`, cell-only, `D =
+4`): each cell scored before its own deposit, for the Born face alone, the tree alone and Decision
+30's likelihood mixture of the two (`hnn::receiving::Mixture`, `β` stepped by `q_T(x)/q_B(x)` on the
+landmark β chart). The declared family is both emissions (`Position`: a pair of operators per digit
+position; `Dyadic`: a pair per dyadic cell, the tree's forced split) at every register width
+`χ = 2^j`, `j ≤ J`, the cost bound (`14·4^J·B·n_dev ≤ 2^37` complex products a passage: `J = 8`),
+charged `⌈log₂⌉` of the members tried. The choice is the least charged development mixture; a held-out
+pass runs only if it codes below the tree by disjoint enclosures. It prints each member's widths,
+code lengths at the grain, the orderings mixture − tree and Born − tree, `log₂ β`, the receiver's
+chart receipts (the solve's refinements and certificate, the preconditioner's refreshes, the
+state's rebases) and the wall time a digit:
+
+```sh
+cargo run --release -p holonics --example hnn_born -- cut-file .local/cuts/standing-real-cut-campaign-1.bin
+```
+
+Receipt of September 26 (development cells only, 4,958 cells and 39,664 digits; no held-out cell
+read; wall times exterior, one host, the run alone): the tree reads `3 + 10/16 + ε` bits a cell
+(`18067 + 2/16 + ε` in all). Eighteen members were tried (both emissions, `χ = 1, …, 256`), charged
+`⌈log₂ 18⌉ = 5` bits. The Born face alone, bits a cell (`+ ε` each), by `χ = 1, 2, 4, …, 256`:
+`Position` `5 + 14/16`, `5 + 14/16`, `5 + 12/16`, `5 + 8/16`, `5 + 2/16`, `4 + 13/16`, `4 + 9/16`,
+`4 + 9/16`, `4 + 7/16`; `Dyadic` `4 + 13/16`, `4 + 13/16`, `4 + 14/16`, `4 + 10/16`, `4 + 8/16`,
+`4 + 6/16`, `4 + 5/16`, `4 + 3/16`, `4 + 4/16`. The least is `Dyadic`, `χ = 128`: Born − tree
+(charged) `2780 + 8/16 + ε` bits in all, `8/16 + ε` a cell, and `log₂ β` ends at `2775 + 8/16 + ε`.
+Every member's mixture codes above the tree by disjoint enclosures, mixture − tree (charged)
+`6 + 0/16 + ε` in all for all eighteen: the mixture's own `½` prior bit plus the charge, as the
+telescope `∏ q = ½W_T + ½W_B` gives when `L_B > L_T`. The least charged mixture is `Dyadic`,
+`χ = 16`; no member codes below the tree, so no held-out pass ran. The charts: every solve certified
+within at most 4 refinements, the largest certificate below `2^(−C)`, no preconditioner refresh, and
+a build with overflow checks reproduced every reading. A digit costs, `Dyadic`: `17 rem 5712 over
+39664` µs at `χ = 16`, `365 rem 14640 over 39664` µs at `χ = 128`, `1253 rem 22008 over 39664` µs
+at `χ = 256` (`Position` `1175 rem 6800 over 39664`); the harness took 168,717 ms.
+
 `exterior.rs` is the notebook's shared exterior boundary: the cut file and its manifest
-(`read_cut`) and the exact presentation of readings. `hnn_exposure`, `hnn_diagnose` and
-`hnn_landmark` include it by `#[path]`.
+(`read_cut`) and the exact presentation of readings. `hnn_exposure`, `hnn_diagnose`,
+`hnn_landmark` and `hnn_born` include it by `#[path]`.
 
 `field.py` is the exact reference of the revised tick: the junction Swing (a parallel adaptor), the
 Cayley ring element with its passive part `W_s` and its contrast port `W_c` driving inside the

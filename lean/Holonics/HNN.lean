@@ -17,6 +17,7 @@ import Holonics.HNN.Keys
 import Holonics.HNN.Ring
 import Holonics.HNN.Contact
 import Holonics.HNN.ContactBreak
+import Holonics.HNN.BornFace
 
 /-!
 # The HNN law
@@ -45,4 +46,5 @@ design: the HNN law", table (b) rows 1–8, stated before their Rust owners in `
 | `HNN/Ring` | campaign 2, item 8: the ring's mode tick keeps `Q = diag(K, C)`, its denominator, its executed balance with pump and port work, the two-port reference change, crossings as epoch ticks, the pump and the sheets | `hnn::ring` |
 | `HNN/Contact` | campaign 2, item 8: the contact's transfer and site kind by its stiffness's sign, the boost's certified solve or singular direction, the signed-storage balance, the lock address from the measured winding pair | `hnn::contact`, `hnn::propagation` |
 | `HNN/ContactBreak` | campaign 2, item 8: the released storage `R = E_a + W_a − D_a − E_a′`, the advance `R ≥ J`, Griffith's closed-port case, the parted face's typed gluing defect | `hnn::contact`, `hnn::field` |
+| `HNN/BornFace` | Decision 33: the wave read by the Born rule, a finitely correlated receiver on the receiving ring's register: the normalized digit split and dyadic cell face, the reception keeping a density, the density as the retained quotient, the absorbed unitary tick, the interference zero no nonnegative receiver makes, the exact covector and the Fisher-scored step | `hnn::born` |
 -/

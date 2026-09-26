@@ -40,3 +40,11 @@ path = "../../research/notebook/hnn_design/hnn_diagnose.rs"
 [[example]]
 name = "hnn_landmark"
 path = "../../research/notebook/hnn_design/hnn_landmark.rs"
+
+# The notebook's measurement of the Born receiver (Decision 33) against and beside the landmark
+# tree on the standing real cut: the register-width sweep on the development cells, the mixture,
+# and one held-out pass when a member codes below the tree (research/notebook/hnn_design/README.md):
+# a measurement run once in release, never a test.
+[[example]]
+name = "hnn_born"
+path = "../../research/notebook/hnn_design/hnn_born.rs"
