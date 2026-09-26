@@ -76,7 +76,7 @@ use num_traits::{Signed, Zero};
 use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartReading, Charts, Remainders, carry};
 use crate::hnn::constitution::Lattice;
-use crate::hnn::contact::{BreakReceipt, SiteReading, signed_stiffness, site_reading};
+use crate::hnn::contact::{BreakReceipt, signed_stiffness};
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::moment::SourceMoment;
 use crate::hnn::propagation::{
@@ -352,17 +352,6 @@ impl PowerForm {
                 .map(|ring| constitution.ring_resonator(ring).cloned())
                 .collect(),
         })
-    }
-
-    /// **Every contact's site reading** from this form's storage and signed stiffness at its hop
-    /// (`hnn::contact::site_reading`): the contact-kind census of the constitution the form was read
-    /// from, formed from the matrices the balance already read.
-    pub fn site_readings(&self) -> Result<Vec<SiteReading>, HnnError> {
-        self.storage
-            .iter()
-            .zip(&self.stiffness)
-            .map(|(storage, stiffness)| site_reading(storage, stiffness, &self.step))
-            .collect()
     }
 
     /// **The power of a change** under this form.

@@ -729,8 +729,9 @@ fn report(field: &Field, exposure: &Exposure) {
     );
 }
 
-/// **The contact-kind census** (campaign 2, `hnn::contact::site_reading`, the constitution curve's
-/// site readings at every commit): per contact, the commits at which it read each of the five proved
+/// **The contact-kind census** (campaign 2, `hnn::contact::site_readings`, the constitution curve's
+/// site readings at every commit, certified from the factors in one prime chart and read exactly
+/// otherwise): per contact, the commits at which it read each of the five proved
 /// kinds (rotation, null shear, boost, reflection, degenerate), and its modes by kind summed over
 /// the commits (the inertia of `K` under `C ≻ 0`). A boost needs a declared stiffness signature: a
 /// constitution without one (`K = b bᵀ ⪰ 0`) reads rotations and null shears only.

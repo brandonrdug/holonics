@@ -91,7 +91,7 @@
 //! | Lean | Rust |
 //! |---|---|
 //! | `HNN/Contact.{transferDen, transfer, transfer_solves, transfer_trace_det}` | [`transfer`], [`Transfer`] |
-//! | `HNN/Contact.contact_transfer_kind_by_storage_sign`, `contact_mode_transfer` | [`Transfer::site`], [`site_reading`] |
+//! | `HNN/Contact.contact_transfer_kind_by_storage_sign`, `contact_mode_transfer` | [`Transfer::site`], [`site_reading`], [`site_reading_of_factors`] |
 //! | `HNN/Contact.contact_boost_solve_or_singular_direction` | [`certify_boost`], [`signed_form_certifies`] |
 //! | `HNN/Contact.contact_signed_storage_balance`, `boost_grows_at_conserved_signed_storage` | tests (the transit's balance at an indefinite `K`) |
 //! | `HNN/Contact.{IsLockAddress, lockAddress_exists, lockAddress_unique, exists_smaller_den_between, least_denominator_unique, lockAddress_closes, contact_lock_address}` | [`lock_address`] (through [`simplest_between`]), [`ContactLock`] |
@@ -226,6 +226,121 @@ pub fn site_reading(
         SiteKind::Rotation
     };
     Ok(SiteReading { census, kind })
+}
+
+/// The Mersenne prime `2^61 − 1`, the chart the census's rank certificate reads in.
+const CENSUS_PRIME: u64 = (1 << 61) - 1;
+
+/// **A factor's full row rank, certified in one prime chart** ([proved-standard]): `f` (`k × m`)
+/// has rank `k` over ℚ when its rows, each cleared of its denominators by a nonzero integer scale,
+/// have rank `k` modulo `p = 2^61 − 1`: a nonzero `k × k` minor modulo `p` is a nonzero integer
+/// minor. `false` says only that this chart did not certify it (the rank is deficient, or `p`
+/// divides every maximal minor), and the caller reads the exact inertia instead.
+fn full_row_rank_certified(factor: &ExactRatMatrix) -> bool {
+    let (k, m) = (factor.rows(), factor.columns());
+    if k > m {
+        return false;
+    }
+    let prime = BigInt::from(CENSUS_PRIME);
+    let mut rows: Vec<Vec<u64>> = Vec::with_capacity(k);
+    for i in 0..k {
+        let Ok(row) = factor.row(i) else {
+            return false;
+        };
+        let scale = row.iter().fold(BigInt::one(), |scale, x| {
+            let common = crate::ratio::gcd(&scale, x.denom());
+            &scale / common * x.denom()
+        });
+        rows.push(
+            row.iter()
+                .map(|x| {
+                    let cleared = (x.numer() * (&scale / x.denom())) % &prime;
+                    let reduced = if cleared.is_negative() {
+                        cleared + &prime
+                    } else {
+                        cleared
+                    };
+                    reduced.to_u64().expect("a residue below the prime")
+                })
+                .collect(),
+        );
+    }
+    let mul = |a: u64, b: u64| ((u128::from(a) * u128::from(b)) % u128::from(CENSUS_PRIME)) as u64;
+    let inverse = |a: u64| {
+        // a^(p − 2) by squaring: Fermat's little theorem in the prime chart.
+        let (mut base, mut exponent, mut result) = (a, CENSUS_PRIME - 2, 1u64);
+        while exponent > 0 {
+            if exponent & 1 == 1 {
+                result = mul(result, base);
+            }
+            base = mul(base, base);
+            exponent >>= 1;
+        }
+        result
+    };
+    let mut column = 0;
+    for pivot_row in 0..k {
+        let pivot = loop {
+            if column == m {
+                return false;
+            }
+            match (pivot_row..k).find(|&r| rows[r][column] != 0) {
+                Some(r) => break r,
+                None => column += 1,
+            }
+        };
+        rows.swap(pivot_row, pivot);
+        let unit = inverse(rows[pivot_row][column]);
+        let (upper, lower) = rows.split_at_mut(pivot_row + 1);
+        let pivot_words = &upper[pivot_row];
+        for row in lower.iter_mut() {
+            let factor = mul(row[column], unit);
+            if factor != 0 {
+                for (entry, &word) in row[column..].iter_mut().zip(&pivot_words[column..]) {
+                    let product = mul(factor, word);
+                    *entry = (*entry + CENSUS_PRIME - product) % CENSUS_PRIME;
+                }
+            }
+        }
+        column += 1;
+    }
+    true
+}
+
+/// **The contact's site reading from its factors** (the census's reading at every commit): with no
+/// declared stiffness signature, `C = c cᵀ ≻ 0` exactly when `c` has full row rank and
+/// `K = b bᵀ ≻ 0` exactly when `b` does, and then every generalized mode is a rotation: the census
+/// is `(k, 0, 0)` and the kind a rotation, the reading [`site_reading`] returns, certified in one
+/// prime chart ([`full_row_rank_certified`]) without the exact inertia of the Gram matrices. Any
+/// other case (a signature, or a rank the chart does not certify) is read exactly by
+/// [`site_reading`].
+pub fn site_reading_of_factors(
+    storage: &ExactRatMatrix,
+    stiffness: &ExactRatMatrix,
+    signature: Option<&[bool]>,
+    step: &Rat,
+) -> Result<SiteReading, HnnError> {
+    let signed = signature.is_some_and(|signs| signs.iter().any(|positive| !positive));
+    if !signed
+        && storage.rows() > 0
+        && storage.rows() == stiffness.rows()
+        && full_row_rank_certified(storage)
+        && full_row_rank_certified(stiffness)
+    {
+        return Ok(SiteReading {
+            census: KindCensus {
+                rotation: stiffness.rows(),
+                null: 0,
+                boost: 0,
+            },
+            kind: SiteKind::Rotation,
+        });
+    }
+    site_reading(
+        &gram(storage)?,
+        &signed_stiffness(stiffness, signature)?,
+        step,
+    )
 }
 
 // -------------------------------------------------------------------------------------------
@@ -560,21 +675,21 @@ impl ContactReading {
     }
 }
 
-/// **Every contact's site reading** from its constitution's storage and signed stiffness
-/// ([`site_reading`]): the part of a contact's reading that the constitution, not the clock,
-/// carries; each commit's kind census (the exposure's constitution curve).
+/// **Every contact's site reading** from its constitution's storage and stiffness factors and
+/// signature ([`site_reading_of_factors`]): the part of a contact's reading that the constitution,
+/// not the clock, carries.
 pub fn site_readings(
     field: &Field,
     constitution: &impl ConstitutionRead,
 ) -> Result<Vec<SiteReading>, HnnError> {
     (0..field.contacts().len())
         .map(|contact| {
-            let storage = gram(constitution.contact_storage(contact))?;
-            let stiffness = signed_stiffness(
+            site_reading_of_factors(
+                constitution.contact_storage(contact),
                 constitution.contact_stiffness(contact),
                 constitution.contact_stiffness_signature(contact),
-            )?;
-            site_reading(&storage, &stiffness, field.step())
+                field.step(),
+            )
         })
         .collect()
 }

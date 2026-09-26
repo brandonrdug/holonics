@@ -11,7 +11,7 @@ use crate::hnn::HnnError;
 use crate::hnn::constitution::{Constitution, Steps};
 use crate::hnn::contact::{
     ContactLock, LockDeclaration, certify_boost, contact_readings, lock_address,
-    signed_form_certifies, signed_stiffness, site_reading, transfer,
+    signed_form_certifies, signed_stiffness, site_reading, site_reading_of_factors, transfer,
 };
 use crate::hnn::field::{ConstitutionRead, Current, Field, FieldDeclaration};
 use crate::hnn::landmark::Landmarks;
@@ -620,6 +620,64 @@ fn the_refine_receipt_carries_each_resonators_balance() {
 
 // -------------------------------------------------------------------------------------------
 // the contact
+
+/// The census's reading from the factors (`hnn::contact::site_reading_of_factors`): wherever the
+/// prime chart certifies both factors' full row rank it returns the exact reading of the Gram
+/// matrices (`C = c cᵀ ≻ 0`, `K = b bᵀ ≻ 0`: every mode a rotation), and elsewhere (a deficient
+/// rank, a massless direction, a declared signature) it is the exact reading itself; on random
+/// factors, on rank-deficient ones and on campaign 1's initial constitution.
+#[test]
+fn the_census_from_the_factors_is_the_exact_site_reading() {
+    let mut draw = Draw::new(97);
+    let hop = rat(1, 2);
+    for trial in 0..48 {
+        let k = 2 + trial % 3;
+        let m = k + trial % 2 + usize::from(trial % 5 == 0) * 2;
+        let storage = draw.matrix(k, m);
+        let mut stiffness = draw.matrix(k, m);
+        if trial % 4 == 1 {
+            // A repeated row: the stiffness factor loses rank, a null mode.
+            let row = stiffness.row(0).unwrap().to_vec();
+            let mut rows = stiffness.to_rows();
+            rows[1] = row;
+            stiffness = ExactRatMatrix::shaped(k, m, rows).unwrap();
+        }
+        let signature: Option<Vec<bool>> =
+            (trial % 6 == 3).then(|| (0..m).map(|j| j != 0).collect());
+        let exact = signed_stiffness(&stiffness, signature.as_deref()).and_then(|signed| {
+            site_reading(
+                &crate::hnn::propagation::gram(&storage).unwrap(),
+                &signed,
+                &hop,
+            )
+        });
+        let factors = site_reading_of_factors(&storage, &stiffness, signature.as_deref(), &hop);
+        match (exact, factors) {
+            (Ok(exact), Ok(factors)) => assert_eq!(exact, factors, "trial {trial}"),
+            (Err(_), Err(_)) => {}
+            (exact, factors) => panic!("trial {trial}: {exact:?} against {factors:?}"),
+        }
+    }
+    let field = Field::declare(FieldDeclaration::campaign_one(6148)).unwrap();
+    let theta = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET).unwrap();
+    for contact in 0..field.contacts().len() {
+        let exact = site_reading(
+            &crate::hnn::propagation::gram(theta.contact_storage(contact)).unwrap(),
+            &signed_stiffness(theta.contact_stiffness(contact), None).unwrap(),
+            field.step(),
+        )
+        .unwrap();
+        let factors = site_reading_of_factors(
+            theta.contact_storage(contact),
+            theta.contact_stiffness(contact),
+            None,
+            field.step(),
+        )
+        .unwrap();
+        assert_eq!(exact, factors);
+        assert_eq!(factors.kind, SiteKind::Rotation);
+    }
+}
 
 /// Lean `HNN/Contact.{contact_transfer_kind_by_storage_sign, transfer_trace_det}`: the closed
 /// lossless transfer has determinant 1 and is a rotation, a nonidentity null shear or a boost by the
