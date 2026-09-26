@@ -1,6 +1,6 @@
 # Campaign 1's located failure: the face can read the marginal, the deposition keeps its prior, and the source carries its table without its index
 
-**Date:** 2026-09-25. **Status:** recorded (#73, campaign 1; reviewed by the primary). **Occasion:**
+**Date:** 2026-09-25. **Status:** recorded (#73, campaign 1; reviewed by the primary); repaired September 26 by Decisions 28–30 ([record](2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md)). **Occasion:**
 campaign 1's exposure on the standing real cut does not beat the online order-0 held-out bits
 (#73's receipt: `7 + 9/16 + ε` bits a byte against order-0 KT's `4 + 12/16 + ε`, at the receiver's
 grain `L_R = 16`). The step 4 design's standing real

@@ -2686,3 +2686,37 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
 
     Source: agent-inferred, from the retention and deposition laws and Decision 27's receipt.
     Brandon may override it.
+
+30. **The wave is weighed like a landmark, and the source opens on its normalized counts.** Wired
+    into the HNN (Decisions 28 and 29, per-cell causal addresses, `R_0 = 0` with `E_0` the sign
+    generator times ½), the tree's face alone read held out `3 + 1/16 + ε` bits a cell and the
+    combined face (the tree's grain logits plus the wave's `R P_R^(τ_R) v_R`) `13 + 11/16 + ε`: the
+    unnormalized open's features grow with the moment's counts, and the map, fitted at earlier
+    scales, overshoots. Decision 28's own law settles the receiver, which weighs every landmark by
+    its code-length evidence, never by a rule:
+    - **The mixture.** The scored face is `q = λ q_T + (1 − λ) q_C`, `λ = β/(1+β)`, `β = W_T/W_C`
+      from 1 (prior ½/½), stepped after each cell by `β' = β q_T(x)/q_C(x)` on the landmark β chart
+      (`q_C` by the lower endpoint of its exact enclosure, its residual certified). Any
+      `λ ∈ [0, 1]` keeps `q` normalized (`path_face_normalized`), and ideally
+      `L ≤ min(L_T, L_C) + 1` bit (`kraft_and_dominance` with two children), plus the chart's
+      certified drift. The wave learns from its own comparison, the covector of `q_C`, as each tree
+      node's counts update from their own routed data; the tree's face is stored, not pulled back
+      (`hnn::receiving::Mixture`).
+    - **The normalized open** (Decision 26's third term, Lean `HNN/IndexedOpen`): the source opens
+      on `M_g/n_g` and the pair port on its indexed normalized slice, each `1/n` a population chart
+      on its declared lattice with its certified residual (`hnn::moment::PopulationChart`), so the
+      word stays dyadic on the card.
+
+    Measured on the standing real cut, host and card identical line for line outside the wall
+    times: held out, the model reads `3 + 1/16 + ε` bits a cell, below online order-0 by
+    `1996 + 9/16 − ε` bits in all, order-1 by `1494 + 8/16 − ε` and PPM-2 by `252 + 1/16 − ε`:
+    **campaign 1's criterion is met**, by disjoint exact enclosures. With the mixture alone the
+    wave carried no weight (`log₂ β = 35109 + 9/16 + ε`); with the normalized open the combined
+    face lies below the tree's in every aeon and `log₂ β` falls to `−25 + 6/16 + ε`: the wave earns
+    its weight, `7 − 1/16 − ε` bits over the held-out cells. Its computation (355,065 ms on the card
+    over 3,074 windows, `115 rem 1555 over 3074` ms a window, of which the word's refine read is
+    2,110 µs and the host's compare and deposit phases most of the rest) is not yet paid for by
+    those bits; campaign 2's rings and contacts are measured by the same mixture.
+
+    Source: agent-inferred, from Decision 28's weighing law and the measurement. Brandon may
+    override it.
