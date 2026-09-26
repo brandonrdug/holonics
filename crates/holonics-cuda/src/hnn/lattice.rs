@@ -670,3 +670,194 @@ impl Card {
         })
     }
 }
+
+// -------------------------------------------------------------------------------------------
+// the normal law's prox step in the port's deposit (campaign 2)
+
+/// An array's coordinates at a scale: `None` off the dyadics at it or past the word.
+fn narrow_coordinates(values: &[Rat], exponent: u32) -> Option<Vec<i64>> {
+    values
+        .iter()
+        .map(|value| crate::hnn::dyadic::coordinate(value, exponent)?.to_i64())
+        .collect()
+}
+
+/// An array's coordinates at a scale in the carrier word: `None` off the dyadics or past it.
+fn wide_coordinates(values: &[Rat], exponent: u32) -> Option<Vec<i128>> {
+    values
+        .iter()
+        .map(|value| crate::hnn::dyadic::coordinate(value, exponent)?.to_i128())
+        .collect()
+}
+
+/// [definition; agent-inferred] **What the card carried of one normal law's prox step**: whether
+/// it carried it (its samples on the dyadics and every coordinate within the card's words), and,
+/// when it did, the entries it moved in the Gram and the map.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum NormalDeposit {
+    /// The card carried the step and it equals the host's successor.
+    Carried { gram: usize, map: usize },
+    /// The card's words cannot carry it (a sample off the dyadics, a coordinate past its word, or
+    /// an entry the kernel refused): the host's step stands alone.
+    Declined,
+}
+
+/// **A normal law's prox step on the card, read against the host's successor** (campaign 2; the
+/// port's deposit, `crate::hnn::port`). The host's `holonics::hnn::constitution::NormalLaw::deposited`
+/// moved `before` to `after` over `samples` at the proxy step `γ`, the locus's lattice `2^(−L)ℤ`
+/// and its deposit clock's precision `k`, the first step of the deposit at the locus (so no
+/// residual was staged before it), and staged the released residuals `released` (by carrier and
+/// flat entry). The card forms the same step (worker A's kernels, their parity test
+/// `the_prox_deposit_on_the_card_equals_the_host_and_is_measured`):
+///
+/// ```text
+/// ΔH = Σ w f fᵀ          hnn_outer_update, carried onto H by hnn_budgeted_split at (L, k)
+/// X̂f                     hnn_lattice_read of the successor's chart (the host's, refined from H′)
+/// ΔW = Σ (γw) g (X̂f)ᵀ    hnn_outer_update, carried onto W by hnn_budgeted_split at (L, k)
+/// ```
+///
+/// and its `H′`, `W′`, both carried remainders and every released residual must equal the host's;
+/// a difference is refused as a realization defect. A step the card's words cannot carry is
+/// declined, not refused: the host's step is the successor either way (the host keeps `Θ`, as it
+/// keeps the landmark tree the card mirrors).
+#[allow(clippy::too_many_arguments)]
+pub fn normal_deposit_on_card(
+    card: &Card,
+    before: &holonics::hnn::NormalLaw,
+    after: &holonics::hnn::NormalLaw,
+    samples: &[holonics::hnn::constitution::Sample],
+    proxy: &Rat,
+    lattice: Lattice,
+    precision: u32,
+    released: &[(holonics::hnn::constitution::Carrier, usize, Rat)],
+) -> Result<NormalDeposit, holonics::hnn::HnnError> {
+    use holonics::hnn::HnnError;
+    use holonics::hnn::constitution::Carrier;
+    let defect = || HnnError::Realization {
+        what: "the card's normal-law prox step against the host's successor",
+    };
+    let (m, n) = (before.map().rows(), before.map().columns());
+    let exponent = lattice.exponent();
+    let fine = exponent + precision;
+    let weights: Vec<Rat> = samples.iter().map(|sample| sample.weight.clone()).collect();
+    let features: Vec<Vec<Rat>> = samples
+        .iter()
+        .map(|sample| sample.feature.clone())
+        .collect();
+    let covectors: Vec<Vec<Rat>> = samples
+        .iter()
+        .map(|sample| sample.covector.clone())
+        .collect();
+    let scaled: Vec<Rat> = weights.iter().map(|weight| weight * proxy).collect();
+    if samples.is_empty() {
+        return Ok(NormalDeposit::Declined);
+    }
+    // The arrays and their remainders at the lattice and the fine lattice.
+    let (Some(gram_words), Some(gram_rest), Some(map_words), Some(map_rest)) = (
+        narrow_coordinates(before.gram().entries(), exponent),
+        wide_coordinates(before.gram_remainder().entries(), fine),
+        narrow_coordinates(before.map().entries(), exponent),
+        wide_coordinates(before.map_remainder().entries(), fine),
+    ) else {
+        return Ok(NormalDeposit::Declined);
+    };
+    let Ok(gram_samples) = OuterSamples::of(&weights, &features, &features, n, n, fine) else {
+        return Ok(NormalDeposit::Declined);
+    };
+    let split_values = |split: &SplitRecord, update: &OuterUpdate| {
+        (
+            split
+                .entries
+                .iter()
+                .map(|&x| crate::hnn::dyadic::value(x, exponent))
+                .collect::<Vec<Rat>>(),
+            split
+                .remainders
+                .iter()
+                .map(|&r| crate::hnn::dyadic::value(r, fine))
+                .collect::<Vec<Rat>>(),
+            split
+                .released
+                .iter()
+                .enumerate()
+                .filter(|(_, e)| **e != 0)
+                .map(|(entry, &e)| (entry, crate::hnn::dyadic::value(e, update.exponent)))
+                .collect::<Vec<(usize, Rat)>>(),
+        )
+    };
+    let staged = |carrier: Carrier| -> Vec<(usize, Rat)> {
+        released
+            .iter()
+            .filter(|(at, ..)| *at == carrier)
+            .map(|(_, entry, residual)| (*entry, residual.clone()))
+            .collect()
+    };
+    // ΔH and its carry.
+    let gram_update = card
+        .outer_update(&gram_samples)
+        .map_err(DeviceError::into_hnn)?;
+    if gram_update.status.iter().any(|&status| status != EXACT) {
+        return Ok(NormalDeposit::Declined);
+    }
+    let gram_split = card
+        .budgeted_split(&gram_update, lattice, precision, &gram_words, &gram_rest)
+        .map_err(DeviceError::into_hnn)?;
+    if gram_split.status.iter().any(|&status| status != EXACT) {
+        return Ok(NormalDeposit::Declined);
+    }
+    let (gram, gram_remainder, gram_released) = split_values(&gram_split, &gram_update);
+    if gram != after.gram().entries()
+        || gram_remainder != after.gram_remainder().entries()
+        || gram_released != staged(Carrier::Gram)
+    {
+        return Err(defect());
+    }
+    // The reaches X̂f at the successor's chart, and ΔW with its carry.
+    let Ok(feature_exponent) =
+        crate::hnn::dyadic::common_exponent(features.iter().flatten(), "a deposit's features")
+    else {
+        return Ok(NormalDeposit::Declined);
+    };
+    let chart = after.solved();
+    let (Ok(chart_words), Ok(feature_words)) = (
+        LatticeCoordinates::of_matrix(&chart, Lattice::new(after.chart().exponent())),
+        LatticeCoordinates::of_vectors(&features, Lattice::new(feature_exponent)),
+    ) else {
+        return Ok(NormalDeposit::Declined);
+    };
+    let chart_locus = ResidentLattice::mount(card, &chart_words).map_err(DeviceError::into_hnn)?;
+    let operand = ResidentLattice::mount(card, &feature_words).map_err(DeviceError::into_hnn)?;
+    let Ok(read) = card
+        .read(&chart_locus, operand.operand(), None)
+        .and_then(|read| read.fetch())
+    else {
+        return Ok(NormalDeposit::Declined);
+    };
+    let reaches: Vec<Vec<Rat>> = (0..samples.len()).map(|t| read.vector(t)).collect();
+    let Ok(map_samples) = OuterSamples::of(&scaled, &covectors, &reaches, m, n, fine) else {
+        return Ok(NormalDeposit::Declined);
+    };
+    let map_update = card
+        .outer_update(&map_samples)
+        .map_err(DeviceError::into_hnn)?;
+    if map_update.status.iter().any(|&status| status != EXACT) {
+        return Ok(NormalDeposit::Declined);
+    }
+    let map_split = card
+        .budgeted_split(&map_update, lattice, precision, &map_words, &map_rest)
+        .map_err(DeviceError::into_hnn)?;
+    if map_split.status.iter().any(|&status| status != EXACT) {
+        return Ok(NormalDeposit::Declined);
+    }
+    let (map, map_remainder, map_released) = split_values(&map_split, &map_update);
+    if map != after.map().entries()
+        || map_remainder != after.map_remainder().entries()
+        || map_released != staged(Carrier::Map)
+    {
+        return Err(defect());
+    }
+    Ok(NormalDeposit::Carried {
+        gram: gram_split.applied.iter().filter(|q| **q != 0).count(),
+        map: map_split.applied.iter().filter(|q| **q != 0).count(),
+    })
+}

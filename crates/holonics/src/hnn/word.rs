@@ -164,6 +164,52 @@ pub struct Resonance {
     pub steps: Vec<ResonatorStep>,
 }
 
+/// [definition] **A resonator's balance over one word** (campaign 2, `hnn::ring`; Lean
+/// `HNN/Ring.ring_tick_executed_energy_balance` summed over the word's ticks): its ring, its ticks,
+/// its storage at the word's end (it opens at zero with the word), its pump, port and dissipation
+/// work, its chart defect and its split summed over the ticks, and the remainders its end
+/// releases. It is what the word's release returns of a resonator, so every realization of the
+/// port reads it alike ([`Released::resonators`]).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ResonatorBalance {
+    pub ring: usize,
+    pub ticks: usize,
+    pub end: Rat,
+    pub pump: Rat,
+    pub port: Rat,
+    pub dissipation: Rat,
+    pub chart: Rat,
+    pub split: Rat,
+    pub released: Remainders,
+}
+
+impl ResonatorBalance {
+    /// **The balance of a resonator's executed ticks** in a word.
+    pub fn of(ring: usize, resonance: &Resonance) -> Self {
+        let sum =
+            |term: fn(&ResonatorStep) -> &Rat| -> Rat { resonance.steps.iter().map(term).sum() };
+        Self {
+            ring,
+            ticks: resonance.steps.len(),
+            end: resonance
+                .steps
+                .last()
+                .map_or_else(Rat::zero, |step| step.after.clone()),
+            pump: sum(|step| &step.pump),
+            port: sum(|step| &step.port),
+            dissipation: sum(|step| &step.dissipation),
+            chart: sum(|step| &step.chart),
+            split: sum(|step| &step.split),
+            released: Remainders::of(resonance.remainders.all()),
+        }
+    }
+
+    /// **It closes**: `E_end = pump + port − dissipation + chart + split`, from zero at the open.
+    pub fn closes(&self) -> bool {
+        self.end == &self.pump + &self.port - &self.dissipation + &self.chart + &self.split
+    }
+}
+
 /// [definition] **One executed tick's field balance, every term stated** (Lean
 /// `HNN/Word.field_executed_balance_with_defects`, campaign 2's committed balance). The field's
 /// power `P` moves by the contacts' dissipation, the rings' passive work, the contrast ports'
@@ -269,8 +315,9 @@ impl WordBalance {
 /// [definition] **What a word's end releases**: the power of the unread change, which leaves as
 /// the word's emitted exchange; the junction steps taken; the peak exact bits of any entry of the
 /// change inside the word; every tick's balance; the last junction's residual; every carried
-/// remainder, released and read ([`Remainders`]); and every chart's reading (its certificate
-/// against the target, its refinement's steps and seed).
+/// remainder, released and read ([`Remainders`]); every chart's reading (its certificate against
+/// the target, its refinement's steps and seed); and each declared resonator's balance
+/// ([`ResonatorBalance`]).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Released {
     pub power: Rat,
@@ -280,6 +327,8 @@ pub struct Released {
     pub last: Rat,
     pub remainders: Remainders,
     pub charts: Vec<ChartReading>,
+    /// Each declared resonator's balance over the word, in ring order (campaign 2).
+    pub resonators: Vec<ResonatorBalance>,
 }
 
 /// One ring's junction at a step: the executed Swing, the anchor's next remainder, and the
@@ -1076,6 +1125,16 @@ impl<'c> Word<'c> {
             last: self.last.clone(),
             remainders: self.carried.released(),
             charts: self.operands.charts(),
+            resonators: self
+                .resonators
+                .iter()
+                .enumerate()
+                .filter_map(|(ring, resonance)| {
+                    resonance
+                        .as_ref()
+                        .map(|resonance| ResonatorBalance::of(ring, resonance))
+                })
+                .collect(),
         })
     }
 

@@ -13,6 +13,8 @@
 //! | the keyed charts, their rounded Newton–Schulz steps and exact certificates (`hnn::store`) | each refinement's decisions from the certificates (warm, cold, fallback, target), the cold start's transpose and the exact fallback |
 //! | the word's open (`E_g M_g[c]`, the pair port), its ticks, its receiving read (`hnn_pair_weights`, `hnn_word_forward`) | the faces in `ℚ(θ)`, each tick's balance, the release (`hnn::readout`) |
 //! | the receiving parametron's landmark tree mirrored (`hnn::tree::CardTree`, campaign 2): each window's splits at every phase's causal address in cell order (the known targets' deposits applied and undone on the card), and each deposit's opened-path update | the class faces from the splits and their grain exponents (`landmark::faces_of_splits`), added to the card's wave at the grain (`ReceivingPhases::combine`); the mirror's founded count checked against the host's tree after every deposit |
+//! | each declared ring resonator's ticks (`hnn_resonator_word`, campaign 2), driven by the storage waves the card's word sent (`readout::storage_waves`) | the resonators' operands at the cut (`ResonatorOperands::at_cut`, their charts) and their balance, read from the same ticks and checked against the card's record (`crate::hnn::word::resonate`) |
+//! | each normal law's prox step a deposit takes once at its locus (`hnn_outer_update` for `ΔH` and `ΔW`, `hnn_budgeted_split` for their carries, the reaches `X̂f` by `hnn_lattice_read`; campaign 2), read against the host's successor (`crate::hnn::lattice::normal_deposit_on_card`) | the successor constitution (`Constitution::deposited`, the owner of `Θ`), the chart of `H′`, and the steps the card's words cannot carry (a sample off the dyadics, such as `R`'s covector on `(1/W)ℤ`) |
 //! | the word's return (`hnn_word_reverse`) | the compare phase under the hardware law (`reference::compare_phase`: the tree at the grain beside the mixture score, the Holon ratio and its covector), the return's source through `Rᵀ` (the covector lives on `(1/W)ℤ`), the composition onto the loci (`reference::compose`) |
 //! | | keys, the collapse, the first law's ledger, the handles, every refusal's reason |
 //!
@@ -44,8 +46,9 @@ use std::time::Instant;
 
 use holonics::aeon::{ClockLift, EnclosedLedger};
 use holonics::compression::cost::ceil_log2;
-use holonics::hnn::constitution::LandmarkStep;
-use holonics::hnn::constitution::{CAMPAIGN_ONE_BUDGET, DepositReading};
+use holonics::hnn::constitution::{
+    CAMPAIGN_ONE_BUDGET, Carrier, DepositReading, LandmarkStep, LinearLocus, gamma_length,
+};
 use holonics::hnn::keys::{self, KeyLocation};
 use holonics::hnn::landmark::{
     LandmarkDeclaration, Landmarks, Letter, code_length, faces_of_splits,
@@ -80,6 +83,7 @@ use num_traits::One;
 use crate::hnn::DeviceError;
 use crate::hnn::card::{Card, Layout};
 use crate::hnn::execute::{ResidentWord, SourceOpen, WordPlan};
+use crate::hnn::lattice::{NormalDeposit, normal_deposit_on_card};
 use crate::hnn::moment::{MomentSnapshot, ResidentMoment};
 use crate::hnn::publication::{ContactOperator, Loci, Publication};
 use crate::hnn::readout::{self, Executed};
@@ -109,6 +113,8 @@ pub struct Traffic {
     /// The words run and the returns run.
     pub word_count: u64,
     pub return_count: u64,
+    /// The normal laws' prox steps the card carried and read equal to the host's (campaign 2).
+    pub normal_deposits: u64,
 }
 
 // -------------------------------------------------------------------------------------------
@@ -1091,13 +1097,30 @@ impl<'c> ExecutionPort for Resident<'c> {
                 .collect(),
             readings: &word.readings,
         };
-        let released = readout::released(
+        let mut released = readout::released(
             &word.word.plan,
             &publication.loci,
             &word.word.record,
             &executed,
         );
         resident.tally.read(&released.charts);
+        // The declared resonators tick resident on the card, driven by the storage waves the
+        // card's word sent, and the host reads their balance (campaign 2).
+        let resonating: Vec<usize> = (0..field.rings().len())
+            .filter(|&g| resident.constitution.ring_resonator(g).is_some())
+            .collect();
+        if !resonating.is_empty() {
+            let started = Instant::now();
+            let drives = readout::storage_waves(&word.word.plan, &word.word.record, &resonating);
+            released.resonators = crate::hnn::word::resonate(
+                self.card,
+                field,
+                &resident.constitution,
+                &resonating,
+                &drives,
+            )?;
+            resident.wall.resonators += started.elapsed();
+        }
         let path = path_attenuation(
             field,
             ratio.anchor(),
@@ -1126,6 +1149,7 @@ impl<'c> ExecutionPort for Resident<'c> {
                 charts: released.charts.clone(),
                 remainders: released.remainders.clone(),
                 last: released.last.clone(),
+                resonators: released.resonators.clone(),
             },
         )?;
         receipt.balances = released.balances;
@@ -1281,6 +1305,46 @@ impl<'c> ExecutionPort for Resident<'c> {
             Err(refusal) => return Err(refusal),
         };
         let deposited = start.elapsed();
+        // The normal laws' prox steps on the card, read against the host's successor (campaign
+        // 2): each linear locus the deposit steps once, its first step at the locus (so nothing
+        // was staged before it); a step the card's words cannot carry is declined.
+        let start = Instant::now();
+        let mut once: BTreeMap<LinearLocus, usize> = BTreeMap::new();
+        for step in slot.linear() {
+            *once.entry(step.locus).or_default() += 1;
+        }
+        for step in slot.linear() {
+            if once[&step.locus] != 1 {
+                continue;
+            }
+            let locus = step.locus.locus();
+            let (Some(before), Some(after)) = (
+                normal_law(&resident.constitution, step.locus),
+                normal_law(&next, step.locus),
+            ) else {
+                continue;
+            };
+            let released: Vec<(Carrier, usize, Rat)> = reading
+                .released
+                .iter()
+                .filter(|(at, ..)| *at == locus)
+                .map(|(_, carrier, entry, residual)| (*carrier, *entry, residual.clone()))
+                .collect();
+            let carried = normal_deposit_on_card(
+                self.card,
+                before,
+                after,
+                &step.samples,
+                &resident.constitution.steps().proxy,
+                resident.constitution.lattice(locus)?,
+                gamma_length(resident.constitution.clock(locus) + 1),
+                &released,
+            )?;
+            if let NormalDeposit::Carried { .. } = carried {
+                resident.count(|traffic| traffic.normal_deposits += 1);
+            }
+        }
+        let normal_deposit = start.elapsed();
         // The card's mirror of the tree moved by the deposit's steps, as the host's moved.
         let start = Instant::now();
         if let Some((ring, tree)) = resident.tree.as_mut() {
@@ -1329,6 +1393,7 @@ impl<'c> ExecutionPort for Resident<'c> {
         resident.publication = successor;
         resident.forget_kept_reads();
         resident.wall.deposited += deposited;
+        resident.wall.normal_deposit += normal_deposit;
         resident.wall.tree_deposit += tree_deposit;
         resident.wall.reread += reread_time;
         resident.publish_tree_times();
@@ -1584,6 +1649,18 @@ impl<'c> ExecutionPort for Resident<'c> {
                 ReceiptDetail::Discard { bits },
             )?,
         })
+    }
+}
+
+/// A linear locus's normal law in a constitution.
+fn normal_law(
+    constitution: &Constitution,
+    locus: LinearLocus,
+) -> Option<&holonics::hnn::NormalLaw> {
+    match locus {
+        LinearLocus::SourcePort(g) => constitution.source_law(g),
+        LinearLocus::Contrast(g) => Some(constitution.contrast_law(g)),
+        LinearLocus::Receiving(g) => constitution.receiving_law(g),
     }
 }
 

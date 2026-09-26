@@ -1704,3 +1704,104 @@ impl Card {
         })
     }
 }
+
+/// [definition; agent-inferred] **A word's resonators on the card, read against the host's**
+/// (campaign 2; the port's refine, `crate::hnn::port`). The declared resonators of `rings` (in ring
+/// order) take their operands at the cut exactly as the host word does
+/// (`holonics::hnn::ring::ResonatorOperands::at_cut`, each pump phase's chart refined on the word's
+/// lattices), and their drives are the storage waves the card's word sent at each full tick
+/// (`crate::hnn::readout::storage_waves`). They tick resident (`hnn_resonator_word`, one launch for
+/// the word), and the host reads their balance from the same ticks, as it reads each tick's
+/// balance from the word's record (`crate::hnn::readout`: the terms pass the card's carrier): the
+/// host's steps over the same drives are the card's reading, and every tick's `(u, w, ω)` and each
+/// row's carried solve remainder at the end are checked equal to the card's record, a difference
+/// refused as a realization defect. Returns each resonator's balance
+/// (`holonics::hnn::ResonatorBalance`), the one the host reference's word releases.
+pub(crate) fn resonate(
+    card: &Card,
+    field: &holonics::hnn::Field,
+    constitution: &impl holonics::hnn::ConstitutionRead,
+    rings: &[usize],
+    drives: &[Vec<Vec<Rat>>],
+) -> Result<Vec<holonics::hnn::ResonatorBalance>, holonics::hnn::HnnError> {
+    use holonics::hnn::HnnError;
+    use holonics::hnn::ResonatorBalance;
+    use holonics::hnn::ring::{ResonatorOperands, ResonatorRemainders};
+    use holonics::hnn::word::Resonance;
+    use num_traits::Zero;
+    if rings.is_empty() {
+        return Ok(Vec::new());
+    }
+    let lattice = field.word_lattice().ok_or(crate::hnn::dyadic::refused(
+        "a resonator word on the card runs on the word's lattices",
+    ))?;
+    let transient = lattice.transient();
+    let operands = rings
+        .iter()
+        .map(|&g| {
+            let material = constitution
+                .ring_resonator(g)
+                .ok_or(HnnError::Realization {
+                    what: "a resonator declared on each ring the port resonates",
+                })?;
+            ResonatorOperands::at_cut(
+                g,
+                material,
+                field.ring(g).admittance(),
+                field.step(),
+                Some(lattice),
+            )
+        })
+        .collect::<Result<Vec<_>, HnnError>>()?;
+    // The host's reading: the same steps over the same drives.
+    let mut resonances: Vec<Resonance> = operands
+        .iter()
+        .map(|resonator| Resonance {
+            state: [
+                vec![Rat::zero(); resonator.width()],
+                vec![Rat::zero(); resonator.width()],
+            ],
+            remainders: ResonatorRemainders::default(),
+            steps: Vec::new(),
+        })
+        .collect();
+    for (tick, drive) in drives.iter().enumerate() {
+        for (k, (resonator, resonance)) in operands.iter().zip(resonances.iter_mut()).enumerate() {
+            let step = resonator.step(
+                tick,
+                &drive[k],
+                [&resonance.state[0], &resonance.state[1]],
+                &resonance.remainders,
+                Some(&transient),
+            )?;
+            resonance.state = step.state.clone();
+            resonance.remainders = step.remainders().clone();
+            resonance.steps.push(step);
+        }
+    }
+    // The card's resident ticks, checked against the reading.
+    let references: Vec<&ResonatorOperands> = operands.iter().collect();
+    let plan = ResonatorPlan::form(&references, lattice.transient_exponent())?;
+    let record = card
+        .resonator_word(&plan, drives)
+        .map_err(DeviceError::into_hnn)?;
+    let defect = || HnnError::Realization {
+        what: "the card's resonator ticks against the host's reading of them",
+    };
+    for (k, resonance) in resonances.iter().enumerate() {
+        for (tick, step) in resonance.steps.iter().enumerate() {
+            let (state, rate) = record.state(&plan, k, tick).map_err(|_| defect())?;
+            if state != step.state || rate != step.rate {
+                return Err(defect());
+            }
+        }
+        if !drives.is_empty() && record.remainders(&plan, k) != resonance.remainders.rate {
+            return Err(defect());
+        }
+    }
+    Ok(rings
+        .iter()
+        .zip(&resonances)
+        .map(|(&g, resonance)| ResonatorBalance::of(g, resonance))
+        .collect())
+}

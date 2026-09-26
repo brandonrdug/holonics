@@ -512,7 +512,74 @@ fn the_field_balance_closes_at_every_tick_and_the_resonator_moves_no_wave() {
         let balance = word.word_balance().unwrap();
         assert!(balance.closes(), "{balance:?}");
         assert!(plain.word_balance().unwrap().closes());
-        assert_eq!(word.release().unwrap(), plain.release().unwrap());
+        // The release returns each resonator's balance (`ResonatorBalance`), which closes, and
+        // whose ends and terms sum to the word balance's; a word without resonators returns none.
+        let released = word.released().unwrap();
+        assert_eq!(released.resonators.len(), field.rings().len());
+        for resonator in &released.resonators {
+            assert!(resonator.closes(), "{resonator:?}");
+            assert_eq!(resonator.ticks, word.balances().len());
+        }
+        let total = |term: fn(&crate::hnn::word::ResonatorBalance) -> &Rat| -> Rat {
+            released.resonators.iter().map(term).sum()
+        };
+        assert_eq!(total(|r| &r.end), balance.resonator_end);
+        assert_eq!(total(|r| &r.pump), balance.pump);
+        assert_eq!(total(|r| &r.port), balance.port);
+        assert!(plain.released().unwrap().resonators.is_empty());
+        // Beside its resonators' balance, the word's release is the plain word's.
+        let mut resonant = word.release().unwrap();
+        resonant.resonators.clear();
+        assert_eq!(resonant, plain.release().unwrap());
+    }
+}
+
+/// **The port returns the resonators' balance** (campaign 2): the host reference's refine carries
+/// each declared resonator's balance over its word in its receipt (`ReceiptDetail::Refine`), the
+/// release's, each closing, and none where no resonator is declared.
+#[test]
+fn the_refine_receipt_carries_each_resonators_balance() {
+    use crate::hnn::port::{ExecutionPort, ReceiptDetail};
+    use crate::hnn::reference::{Reference, one_hot};
+    let field = chain();
+    let theta = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET).unwrap();
+    let mut resonant = theta.clone();
+    for ring in 0..field.rings().len() {
+        let period = field.ring(ring).period() as usize;
+        let parametron = cycle(period, vec![Rat::one(); period], vec![integer(2); period]);
+        let pump =
+            PumpDeclaration::new(rat(1, 16), Carrier::at(&rat(1, 2)), PumpStep::Half).unwrap();
+        resonant = resonant
+            .with_ring_resonator(
+                &field,
+                ring,
+                ResonatorMaterial::of_parametron(&parametron, &rat(1, 8), Some(pump)).unwrap(),
+            )
+            .unwrap();
+    }
+    let reference = Reference::campaign_one();
+    let cells: Vec<usize> = (0..12).map(|k| (5 * k + 1) % field.alphabet()).collect();
+    for (constitution, declared) in [(theta, false), (resonant, true)] {
+        let mut resident = reference
+            .mount_with(&field, &Current::at_rest(&field), constitution)
+            .unwrap();
+        let (moment, _) = reference
+            .ingest(&mut resident, None, &one_hot(&cells))
+            .unwrap();
+        let phases = resident.admitted()[0].clone();
+        let (_, refined) = reference.refine(&mut resident, &moment, &phases).unwrap();
+        let ReceiptDetail::Refine { resonators, .. } = &refined.receipt.detail else {
+            panic!("a refine receipt")
+        };
+        if declared {
+            assert_eq!(resonators.len(), field.rings().len());
+            for resonator in resonators {
+                assert!(resonator.closes(), "{resonator:?}");
+                assert_eq!(resonator.ticks, refined.receipt.balances.len());
+            }
+        } else {
+            assert!(resonators.is_empty());
+        }
     }
 }
 

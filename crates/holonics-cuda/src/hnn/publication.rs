@@ -9,7 +9,7 @@
 //! | Locus | Words | Scale |
 //! |---|---|---|
 //! | ring `g`'s contrast port `W_c,g` | `2d_g × 2d_g` | `L_Element(g)` |
-//! | contact `a`'s storage `C_a = c cᵀ`, stiffness `K_a = b bᵀ` | `k_a × k_a` each | `2 L_Channel(a)` |
+//! | contact `a`'s storage `C_a = c cᵀ`, stiffness `K_a = b diag(σ) bᵀ` (`σ` its declared signature, all positive without a boost) | `k_a × k_a` each | `2 L_Channel(a)` |
 //! | source ring `g`'s port `E_g` | `2d_g × |A|` | `L_SourcePort(g)` |
 //! | its pair port `(e_ρ, a_ρ, b_ρ)` per offset | `m × 2d_g`, `m × |A|`, `m × |A|` | `L_SourcePort(g)` |
 //! | receiving ring `R`'s map | `2|A| × 2d_R` | `L_ReceivingMap(R)` |
@@ -31,6 +31,7 @@ use std::rc::Rc;
 
 use core::ffi::c_void;
 
+use holonics::hnn::contact::signed_stiffness;
 use holonics::hnn::propagation::{contact_operator, element_material, gram, ring_operator};
 use holonics::hnn::{ConstitutionRead, Field, HnnError, Locus};
 use holonics::ratio::Rat;
@@ -199,9 +200,14 @@ impl Loci {
         let mut contacts = Vec::with_capacity(field.contacts().len());
         for a in 0..field.contacts().len() {
             let ch = lattice(field, Locus::Channel(a))?;
+            // The stiffness is signed where a boost is declared (`K_a = b_a diag(σ) b_aᵀ`), as the
+            // host's transit reads it (`holonics::hnn::contact::signed_stiffness`).
             let forms = [
                 gram(constitution.contact_storage(a))?,
-                gram(constitution.contact_stiffness(a))?,
+                signed_stiffness(
+                    constitution.contact_stiffness(a),
+                    constitution.contact_stiffness_signature(a),
+                )?,
                 gram(constitution.contact_dissipation(a))?,
             ];
             let at = |form: &ExactRatMatrix| {

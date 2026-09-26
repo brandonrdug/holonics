@@ -388,6 +388,9 @@ pub struct WallTimes {
     /// `refine`: the word's end read (the released change), the path at the cut and the loci
     /// reached.
     pub release: Duration,
+    /// `refine`: a card's resident resonator ticks and the host's reading of their balance
+    /// (campaign 2, `hnn::ring`); zero on the host, whose resonators tick inside the word.
+    pub resonators: Duration,
     /// `compare`: the contemporary read, when the refine's kept read is not at the published
     /// commit.
     pub compare_read: Duration,
@@ -411,6 +414,10 @@ pub struct WallTimes {
     /// opened-path update, its transfers included); zero on the host, whose tree moves inside
     /// `deposited`.
     pub tree_deposit: Duration,
+    /// `deposit`: a card's normal-law prox steps (the Gram's and the map's outer updates, their
+    /// budgeted splits and the reaches, campaign 2), read against the successor's; zero on the
+    /// host.
+    pub normal_deposit: Duration,
     /// `deposit`: the arrived targets re-read at the successor.
     pub reread: Duration,
     /// `ingest`: the cells taken into the moment.
@@ -419,10 +426,11 @@ pub struct WallTimes {
 
 impl WallTimes {
     /// The phases by name, in the order the methods run them.
-    pub fn phases(&self) -> [(&'static str, Duration); 12] {
+    pub fn phases(&self) -> [(&'static str, Duration); 14] {
         [
             ("refine read", self.refine_read),
             ("release", self.release),
+            ("resonators", self.resonators),
             ("compare read", self.compare_read),
             ("tree transfer", self.tree_transfer),
             ("tree read", self.tree_read),
@@ -431,6 +439,7 @@ impl WallTimes {
             ("compose", self.compose),
             ("deposited", self.deposited),
             ("tree deposit", self.tree_deposit),
+            ("normal deposit", self.normal_deposit),
             ("re-read", self.reread),
             ("ingest", self.ingest),
         ]
@@ -446,6 +455,7 @@ impl std::ops::AddAssign for WallTimes {
     fn add_assign(&mut self, other: Self) {
         self.refine_read += other.refine_read;
         self.release += other.release;
+        self.resonators += other.resonators;
         self.compare_read += other.compare_read;
         self.tree_read += other.tree_read;
         self.tree_transfer += other.tree_transfer;
@@ -454,6 +464,7 @@ impl std::ops::AddAssign for WallTimes {
         self.compose += other.compose;
         self.deposited += other.deposited;
         self.tree_deposit += other.tree_deposit;
+        self.normal_deposit += other.normal_deposit;
         self.reread += other.reread;
         self.ingest += other.ingest;
     }
@@ -1085,6 +1096,7 @@ impl ExecutionPort for Reference {
                 charts: released.charts.clone(),
                 remainders: released.remainders.clone(),
                 last: released.last.clone(),
+                resonators: released.resonators.clone(),
             },
         )?;
         receipt.balances = released.balances;

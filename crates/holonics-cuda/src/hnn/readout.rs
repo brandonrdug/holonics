@@ -397,6 +397,35 @@ pub(crate) fn anchors(plan: &WordPlan, record: &ForwardRecord) -> Vec<Vec<Rat>> 
         .collect()
 }
 
+/// **The storage waves the junctions sent at every full tick** (`holonics::hnn::Word::storage_waves`,
+/// the resonators' drives, campaign 2): per full tick and per ring of `rings`, `b_r = 2v_r − s_r`
+/// from the record's anchor and storage at the tick's step (the element's own `b`), on
+/// `2^(−L_w)ℤ`.
+pub(crate) fn storage_waves(
+    plan: &WordPlan,
+    record: &ForwardRecord,
+    rings: &[usize],
+) -> Vec<Vec<Vec<Rat>>> {
+    (0..plan.steps.saturating_sub(1))
+        .map(|step| {
+            rings
+                .iter()
+                .map(|&g| {
+                    let ring = &plan.rings[g];
+                    let v = slice(&record.anchors, step * plan.n + ring.rows, ring.width);
+                    let s = slice(&record.storage, step * plan.n + ring.rows, ring.width);
+                    v.iter()
+                        .zip(s)
+                        .map(|(v, s)| {
+                            rat(BigInt::from(2 * i128::from(*v) - i128::from(*s)), plan.lw)
+                        })
+                        .collect()
+                })
+                .collect()
+        })
+        .collect()
+}
+
 /// **The word's release read at its end** (`Word::released`): its unread change's power, its
 /// steps, the peak bits of its change, every full tick's balance, the last junction's residual,
 /// its carried remainders and its charts' readings.
@@ -502,6 +531,9 @@ pub(crate) fn released(
         last,
         remainders: Remainders::of(&remainders),
         charts: executed.readings.to_vec(),
+        // The port reads the resonators' balance from their own resident word
+        // (`crate::hnn::word::resonate`), after this release.
+        resonators: Vec::new(),
     }
 }
 

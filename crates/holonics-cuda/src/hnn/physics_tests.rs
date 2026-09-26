@@ -24,7 +24,7 @@ use super::word::{RESONATOR_ENTRY, ResonatorPlan};
 /// Campaign 1's field at the standing cut's population, each ring carrying its parametron's
 /// resonator (unit weights, `d = 1/4`) with a half-turn pump of strength `1/8` on the axis `1`: dyadic
 /// material, certified at both pump phases (`2C + D + ½K_j ⪰ 0` since `d ≥ p`).
-fn resonant(field: &Field) -> Constitution {
+pub(super) fn resonant(field: &Field) -> Constitution {
     let mut theta = Constitution::initial(field, Steps::campaign_one(), 1 << 40).unwrap();
     for ring in 0..field.rings().len() {
         let pump = PumpDeclaration::new(

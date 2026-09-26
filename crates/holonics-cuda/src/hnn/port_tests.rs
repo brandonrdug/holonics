@@ -537,6 +537,37 @@ fn the_card_port_returns_the_reference_on_campaign_one() {
     assert_eq!(compared.landmarks, 16);
 }
 
+/// **Campaign 2's physics through the port** (Decision 25): campaign 1's field with a resonator on
+/// every ring (`physics_tests::resonant`) and a certified boost on contact 0 (one negative
+/// stiffness column), on a drawn byte cut: every return the reference's, the refine receipts'
+/// resonator balances (the card's resident ticks read by the host, `crate::hnn::word::resonate`)
+/// and the published constitutions after every deposit included (the card's stiffness is the signed
+/// one, `publication`), and the normal laws' prox steps the card carried in the deposits
+/// (`crate::hnn::lattice::normal_deposit_on_card`) read equal to the host's successor.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_card_port_returns_the_reference_with_resonators_and_a_boost() {
+    let probe = Field::declare(FieldDeclaration::campaign_one(1 << 17)).unwrap();
+    let n_star = probe.capacity().n_star() as usize;
+    let field = Field::declare(FieldDeclaration::campaign_one(n_star as u64)).unwrap();
+    let width = field.contact(0).width();
+    let theta = super::physics_tests::resonant(&field)
+        .with_contact_signature(&field, 0, (0..width).map(|j| j != 0).collect())
+        .unwrap();
+    let mut draw = Draw(13);
+    let cells: Vec<usize> = (0..n_star).map(|_| draw.below(256)).collect();
+    let compared = lockstep(
+        &field,
+        &cut_of(cells, n_star - 1_190..n_star),
+        8,
+        Some(theta),
+        4,
+    );
+    println!("campaign 1 with resonators and a boost, drawn bytes: {compared:?}");
+    assert_eq!(compared.compares, 8);
+    assert!(compared.traffic.normal_deposits > 0);
+}
+
 /// The standing real cut's manifest numbers (its population and held-out range).
 fn manifest(path: &str) -> Option<(usize, Range<usize>)> {
     let manifest_path = path

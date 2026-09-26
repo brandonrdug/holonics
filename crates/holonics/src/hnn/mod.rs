@@ -117,7 +117,7 @@ pub use receiving::{ActiveAddress, GrainCell, LetterReader, ReceivingPhases, Rec
 pub use reference::{Cut, Exposure, Reference, Resident};
 pub use retention::AeonBoundary;
 pub use ring::{PumpDeclaration, ResonatorMaterial, RingClock};
-pub use word::{Released, Word};
+pub use word::{Released, ResonatorBalance, Word};
 
 #[cfg(test)]
 mod tests;

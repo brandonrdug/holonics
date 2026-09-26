@@ -381,7 +381,8 @@ fn card_exposure(deadline: Option<u64>, field: &Field, cut: &Cut) -> (Exposure, 
          publications (the loci's moved words): {} ({} a window)\n\
          ingests (cells and receipts): {} ({} a window)\n\
          realization (the hardware law's report): {realized}\n\
-         the landmark tree on the card (campaign 2; exterior wall time, µs, per window as quotient rem remainder): {} phases read, {} cells deposited; transfers {} a window, the card's reads {} a window, the host's class faces from the splits {} a window, the combined faces {} a window, the deposits' updates {} a window",
+         the landmark tree on the card (campaign 2; exterior wall time, µs, per window as quotient rem remainder): {} phases read, {} cells deposited; transfers {} a window, the card's reads {} a window, the host's class faces from the splits {} a window, the combined faces {} a window, the deposits' updates {} a window\n\
+         the normal laws' prox steps on the card read equal to the host's (campaign 2): {} steps; the resonators' ticks: {} µs a window; the prox steps: {} µs a window",
         exposure.compares,
         traffic.words,
         per_window(traffic.words),
@@ -399,7 +400,10 @@ fn card_exposure(deadline: Option<u64>, field: &Field, cut: &Cut) -> (Exposure, 
         mean(tree.read.as_micros(), windows),
         mean(tree.complete.as_micros(), windows),
         mean(tree.combine.as_micros(), windows),
-        mean(tree.deposit.as_micros(), windows)
+        mean(tree.deposit.as_micros(), windows),
+        traffic.normal_deposits,
+        mean(exposure.wall.resonators.as_micros(), windows),
+        mean(exposure.wall.normal_deposit.as_micros(), windows)
     );
     (exposure, Some(line))
 }
