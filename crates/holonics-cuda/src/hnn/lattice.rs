@@ -692,14 +692,70 @@ fn wide_coordinates(values: &[Rat], exponent: u32) -> Option<Vec<i128>> {
 
 /// [definition; agent-inferred] **What the card carried of one normal law's prox step**: whether
 /// it carried it (its samples on the dyadics and every coordinate within the card's words), and,
-/// when it did, the entries it moved in the Gram and the map.
+/// when it did, the entries it moved in the Gram and the map; when it did not, why.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum NormalDeposit {
     /// The card carried the step and it equals the host's successor.
     Carried { gram: usize, map: usize },
-    /// The card's words cannot carry it (a sample off the dyadics, a coordinate past its word, or
-    /// an entry the kernel refused): the host's step stands alone.
-    Declined,
+    /// The card's words cannot carry it: the host's step stands alone.
+    Declined(Decline),
+}
+
+/// [definition] **Why the card declined a prox step.**
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Decline {
+    /// The step has no samples.
+    Empty,
+    /// A sample, a feature or a reach off the dyadics the card's words carry (such as `R`'s
+    /// covector on `(1/W)ℤ`).
+    OffDyadic,
+    /// A coordinate of the Gram, the map or a remainder past its word.
+    PastWord,
+    /// An entry the outer update or the budgeted split refused (its status not exact).
+    Kernel,
+    /// The reaches' read on the card failed.
+    Read,
+}
+
+/// [definition] **The normal-law mirror's tally** (the GPU suite's parity test; the exposure's path
+/// does not run the mirror): the prox steps the card carried and read equal to the host's
+/// successor, those it declined by reason, and those it skipped, a locus the deposit stepped more
+/// than once (its later steps read a residual staged by the earlier) or a locus without a normal
+/// law on either side.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct NormalMirror {
+    pub carried: u64,
+    pub empty: u64,
+    pub off_dyadic: u64,
+    pub past_word: u64,
+    pub kernel: u64,
+    pub read: u64,
+    pub repeated: u64,
+    pub lawless: u64,
+}
+
+impl NormalMirror {
+    /// Count one step's outcome.
+    pub fn count(&mut self, outcome: NormalDeposit) {
+        match outcome {
+            NormalDeposit::Carried { .. } => self.carried += 1,
+            NormalDeposit::Declined(Decline::Empty) => self.empty += 1,
+            NormalDeposit::Declined(Decline::OffDyadic) => self.off_dyadic += 1,
+            NormalDeposit::Declined(Decline::PastWord) => self.past_word += 1,
+            NormalDeposit::Declined(Decline::Kernel) => self.kernel += 1,
+            NormalDeposit::Declined(Decline::Read) => self.read += 1,
+        }
+    }
+
+    /// The steps declined, every reason.
+    pub fn declined(&self) -> u64 {
+        self.empty + self.off_dyadic + self.past_word + self.kernel + self.read
+    }
+
+    /// The steps skipped.
+    pub fn skipped(&self) -> u64 {
+        self.repeated + self.lawless
+    }
 }
 
 /// **A normal law's prox step on the card, read against the host's successor** (campaign 2; the
@@ -718,8 +774,15 @@ pub enum NormalDeposit {
 ///
 /// and its `H′`, `W′`, both carried remainders and every released residual must equal the host's;
 /// a difference is refused as a realization defect. A step the card's words cannot carry is
-/// declined, not refused: the host's step is the successor either way (the host keeps `Θ`, as it
-/// keeps the landmark tree the card mirrors).
+/// declined, not refused, with its reason ([`Decline`]): the host's step is the successor either
+/// way (the host keeps `Θ`, as it keeps the landmark tree the card mirrors).
+///
+/// [definition] **The reaches are the host's chart's**: `X̂f` is read on the card, but through the
+/// chart of `H′` the host refined for its successor (`after.solved()`, `NormalLaw::solved`), so the
+/// map's check is not independent of the host's chart; the Gram's step and both carries are the
+/// card's own. It replaces no host owner and changes no returned value: its effects are a count or a
+/// refusal. It runs in the GPU suite's parity tests (the port's `Resident::with_normal_mirror`), off
+/// the exposure's path.
 #[allow(clippy::too_many_arguments)]
 pub fn normal_deposit_on_card(
     card: &Card,
@@ -750,7 +813,7 @@ pub fn normal_deposit_on_card(
         .collect();
     let scaled: Vec<Rat> = weights.iter().map(|weight| weight * proxy).collect();
     if samples.is_empty() {
-        return Ok(NormalDeposit::Declined);
+        return Ok(NormalDeposit::Declined(Decline::Empty));
     }
     // The arrays and their remainders at the lattice and the fine lattice.
     let (Some(gram_words), Some(gram_rest), Some(map_words), Some(map_rest)) = (
@@ -759,10 +822,10 @@ pub fn normal_deposit_on_card(
         narrow_coordinates(before.map().entries(), exponent),
         wide_coordinates(before.map_remainder().entries(), fine),
     ) else {
-        return Ok(NormalDeposit::Declined);
+        return Ok(NormalDeposit::Declined(Decline::PastWord));
     };
     let Ok(gram_samples) = OuterSamples::of(&weights, &features, &features, n, n, fine) else {
-        return Ok(NormalDeposit::Declined);
+        return Ok(NormalDeposit::Declined(Decline::OffDyadic));
     };
     let split_values = |split: &SplitRecord, update: &OuterUpdate| {
         (
@@ -797,13 +860,13 @@ pub fn normal_deposit_on_card(
         .outer_update(&gram_samples)
         .map_err(DeviceError::into_hnn)?;
     if gram_update.status.iter().any(|&status| status != EXACT) {
-        return Ok(NormalDeposit::Declined);
+        return Ok(NormalDeposit::Declined(Decline::Kernel));
     }
     let gram_split = card
         .budgeted_split(&gram_update, lattice, precision, &gram_words, &gram_rest)
         .map_err(DeviceError::into_hnn)?;
     if gram_split.status.iter().any(|&status| status != EXACT) {
-        return Ok(NormalDeposit::Declined);
+        return Ok(NormalDeposit::Declined(Decline::Kernel));
     }
     let (gram, gram_remainder, gram_released) = split_values(&gram_split, &gram_update);
     if gram != after.gram().entries()
@@ -816,14 +879,14 @@ pub fn normal_deposit_on_card(
     let Ok(feature_exponent) =
         crate::hnn::dyadic::common_exponent(features.iter().flatten(), "a deposit's features")
     else {
-        return Ok(NormalDeposit::Declined);
+        return Ok(NormalDeposit::Declined(Decline::OffDyadic));
     };
     let chart = after.solved();
     let (Ok(chart_words), Ok(feature_words)) = (
         LatticeCoordinates::of_matrix(&chart, Lattice::new(after.chart().exponent())),
         LatticeCoordinates::of_vectors(&features, Lattice::new(feature_exponent)),
     ) else {
-        return Ok(NormalDeposit::Declined);
+        return Ok(NormalDeposit::Declined(Decline::PastWord));
     };
     let chart_locus = ResidentLattice::mount(card, &chart_words).map_err(DeviceError::into_hnn)?;
     let operand = ResidentLattice::mount(card, &feature_words).map_err(DeviceError::into_hnn)?;
@@ -831,23 +894,23 @@ pub fn normal_deposit_on_card(
         .read(&chart_locus, operand.operand(), None)
         .and_then(|read| read.fetch())
     else {
-        return Ok(NormalDeposit::Declined);
+        return Ok(NormalDeposit::Declined(Decline::Read));
     };
     let reaches: Vec<Vec<Rat>> = (0..samples.len()).map(|t| read.vector(t)).collect();
     let Ok(map_samples) = OuterSamples::of(&scaled, &covectors, &reaches, m, n, fine) else {
-        return Ok(NormalDeposit::Declined);
+        return Ok(NormalDeposit::Declined(Decline::OffDyadic));
     };
     let map_update = card
         .outer_update(&map_samples)
         .map_err(DeviceError::into_hnn)?;
     if map_update.status.iter().any(|&status| status != EXACT) {
-        return Ok(NormalDeposit::Declined);
+        return Ok(NormalDeposit::Declined(Decline::Kernel));
     }
     let map_split = card
         .budgeted_split(&map_update, lattice, precision, &map_words, &map_rest)
         .map_err(DeviceError::into_hnn)?;
     if map_split.status.iter().any(|&status| status != EXACT) {
-        return Ok(NormalDeposit::Declined);
+        return Ok(NormalDeposit::Declined(Decline::Kernel));
     }
     let (map, map_remainder, map_released) = split_values(&map_split, &map_update);
     if map != after.map().entries()

@@ -12,9 +12,9 @@
 //! | the published constitution's loci at their lattices, the moved words scattered at each publication (`hnn::publication`) | the constitution `Θ`, the normal laws' prox steps, the receiving parametron's landmark tree and its deposit with its certificates (Decision 28), the budgeted carry and its remainders, the budget (`Constitution::deposited`), and the operators `I − ½K`, `m_a` formed from it |
 //! | the keyed charts, their rounded Newton–Schulz steps and exact certificates (`hnn::store`) | each refinement's decisions from the certificates (warm, cold, fallback, target), the cold start's transpose and the exact fallback |
 //! | the word's open (`E_g M_g[c]`, the pair port), its ticks, its receiving read (`hnn_pair_weights`, `hnn_word_forward`) | the faces in `ℚ(θ)`, each tick's balance, the release (`hnn::readout`) |
-//! | the receiving parametron's landmark tree mirrored (`hnn::tree::CardTree`, campaign 2): each window's splits at every phase's causal address in cell order (the known targets' deposits applied and undone on the card), and each deposit's opened-path update | the class faces from the splits and their grain exponents (`landmark::faces_of_splits`), added to the card's wave at the grain (`ReceivingPhases::combine`); the mirror's founded count checked against the host's tree after every deposit |
+//! | the receiving parametron's landmark tree mirrored (`hnn::tree::CardTree`, campaign 2): each window's splits at every phase's causal address in cell order (the known targets' deposits applied and undone on the card), and each deposit's opened-path update | the class faces from the splits and their grain exponents (`landmark::faces_of_splits`), added to the card's wave at the grain (`ReceivingPhases::combine`); after every deposit the mirror's founded count and the masses, `β` and stop weights of every node and join the deposit touched, checked against the host's tree (`CardTree::agrees_at`) |
 //! | each declared ring resonator's ticks (`hnn_resonator_word`, campaign 2), driven by the storage waves the card's word sent (`readout::storage_waves`) | the resonators' operands at the cut (`ResonatorOperands::at_cut`, their charts) and their balance, read from the same ticks and checked against the card's record (`crate::hnn::word::resonate`) |
-//! | each normal law's prox step a deposit takes once at its locus (`hnn_outer_update` for `ΔH` and `ΔW`, `hnn_budgeted_split` for their carries, the reaches `X̂f` by `hnn_lattice_read`; campaign 2), read against the host's successor (`crate::hnn::lattice::normal_deposit_on_card`) | the successor constitution (`Constitution::deposited`, the owner of `Θ`), the chart of `H′`, and the steps the card's words cannot carry (a sample off the dyadics, such as `R`'s covector on `(1/W)ℤ`) |
+//! | in the GPU suite's parity tests only ([`Resident::with_normal_mirror`]; off the exposure's path, where it replaced no host owner): each normal law's prox step a deposit takes once at its locus (`hnn_outer_update` for `ΔH` and `ΔW`, `hnn_budgeted_split` for their carries, the reaches `X̂f` by `hnn_lattice_read` through the host's successor chart; campaign 2), read against the host's successor (`crate::hnn::lattice::normal_deposit_on_card`), every step counted carried, declined by reason or skipped | the successor constitution (`Constitution::deposited`, the owner of `Θ`), the chart of `H′`, and the steps the card's words cannot carry (a sample off the dyadics, such as `R`'s covector on `(1/W)ℤ`) |
 //! | the word's return (`hnn_word_reverse`) | the compare phase under the hardware law (`reference::compare_phase`: the tree at the grain beside the mixture score, the Holon ratio and its covector), the return's source through `Rᵀ` (the covector lives on `(1/W)ℤ`), the composition onto the loci (`reference::compose`) |
 //! | | keys, the collapse, the first law's ledger, the handles, every refusal's reason |
 //!
@@ -83,7 +83,7 @@ use num_traits::One;
 use crate::hnn::DeviceError;
 use crate::hnn::card::{Card, Layout};
 use crate::hnn::execute::{ResidentWord, SourceOpen, WordPlan};
-use crate::hnn::lattice::{NormalDeposit, normal_deposit_on_card};
+use crate::hnn::lattice::{NormalMirror, normal_deposit_on_card};
 use crate::hnn::moment::{MomentSnapshot, ResidentMoment};
 use crate::hnn::publication::{ContactOperator, Loci, Publication};
 use crate::hnn::readout::{self, Executed};
@@ -113,8 +113,6 @@ pub struct Traffic {
     /// The words run and the returns run.
     pub word_count: u64,
     pub return_count: u64,
-    /// The normal laws' prox steps the card carried and read equal to the host's (campaign 2).
-    pub normal_deposits: u64,
 }
 
 // -------------------------------------------------------------------------------------------
@@ -434,6 +432,9 @@ pub struct Resident<'c> {
     steps: Steps,
     budget: u64,
     deadline: Option<u64>,
+    /// The normal-law mirror's tally when the mirror runs (the GPU suite's parity tests,
+    /// [`Resident::with_normal_mirror`]); `None` on the exposure's path, which does not run it.
+    normal_mirror: Option<Rc<Cell<NormalMirror>>>,
     traffic: Rc<Cell<Traffic>>,
     layouts: Rc<Cell<Option<(Layout, Layout)>>>,
     tree_times: Rc<Cell<TreeTimes>>,
@@ -474,6 +475,7 @@ impl<'c> Resident<'c> {
             steps,
             budget,
             deadline: None,
+            normal_mirror: None,
             traffic: Rc::new(Cell::new(Traffic::default())),
             layouts: Rc::new(Cell::new(None)),
             tree_times: Rc::new(Cell::new(TreeTimes::default())),
@@ -496,6 +498,23 @@ impl<'c> Resident<'c> {
     /// The landmark tree's wall time by part on the last mounted resident (exterior; [`TreeTimes`]).
     pub fn tree_times(&self) -> TreeTimes {
         self.tree_times.get()
+    }
+
+    /// **Run the normal-law mirror in every deposit** (the GPU suite's parity test; campaign 2's
+    /// review moved it off the exposure's path, where it replaced no host owner): each normal law's
+    /// prox step a deposit takes once at its locus is formed on the card and read against the host's
+    /// successor (`crate::hnn::lattice::normal_deposit_on_card`), and its tally
+    /// ([`Resident::normal_mirror`]) counts the steps carried, declined by reason and skipped.
+    pub fn with_normal_mirror(self) -> Self {
+        Self {
+            normal_mirror: Some(Rc::new(Cell::new(NormalMirror::default()))),
+            ..self
+        }
+    }
+
+    /// The normal-law mirror's tally since the port was made, when it runs.
+    pub fn normal_mirror(&self) -> Option<NormalMirror> {
+        self.normal_mirror.as_ref().map(|tally| tally.get())
     }
 
     /// An exposure's deadline in windows (`Reference::with_deadline`).
@@ -1150,6 +1169,7 @@ impl<'c> ExecutionPort for Resident<'c> {
                 remainders: released.remainders.clone(),
                 last: released.last.clone(),
                 resonators: released.resonators.clone(),
+                word: Box::new(holonics::hnn::word::WordBalance::of(&released)),
             },
         )?;
         receipt.balances = released.balances;
@@ -1306,43 +1326,47 @@ impl<'c> ExecutionPort for Resident<'c> {
         };
         let deposited = start.elapsed();
         // The normal laws' prox steps on the card, read against the host's successor (campaign
-        // 2): each linear locus the deposit steps once, its first step at the locus (so nothing
-        // was staged before it); a step the card's words cannot carry is declined.
+        // 2), when the mirror runs (the GPU suite's parity tests; not the exposure's path): each
+        // linear locus the deposit steps once, its first step at the locus (so nothing was staged
+        // before it); a step the card's words cannot carry is declined, and every step is counted.
         let start = Instant::now();
-        let mut once: BTreeMap<LinearLocus, usize> = BTreeMap::new();
-        for step in slot.linear() {
-            *once.entry(step.locus).or_default() += 1;
-        }
-        for step in slot.linear() {
-            if once[&step.locus] != 1 {
-                continue;
+        if let Some(mirror) = &self.normal_mirror {
+            let mut tally = mirror.get();
+            let mut once: BTreeMap<LinearLocus, usize> = BTreeMap::new();
+            for step in slot.linear() {
+                *once.entry(step.locus).or_default() += 1;
             }
-            let locus = step.locus.locus();
-            let (Some(before), Some(after)) = (
-                normal_law(&resident.constitution, step.locus),
-                normal_law(&next, step.locus),
-            ) else {
-                continue;
-            };
-            let released: Vec<(Carrier, usize, Rat)> = reading
-                .released
-                .iter()
-                .filter(|(at, ..)| *at == locus)
-                .map(|(_, carrier, entry, residual)| (*carrier, *entry, residual.clone()))
-                .collect();
-            let carried = normal_deposit_on_card(
-                self.card,
-                before,
-                after,
-                &step.samples,
-                &resident.constitution.steps().proxy,
-                resident.constitution.lattice(locus)?,
-                gamma_length(resident.constitution.clock(locus) + 1),
-                &released,
-            )?;
-            if let NormalDeposit::Carried { .. } = carried {
-                resident.count(|traffic| traffic.normal_deposits += 1);
+            for step in slot.linear() {
+                if once[&step.locus] != 1 {
+                    tally.repeated += 1;
+                    continue;
+                }
+                let locus = step.locus.locus();
+                let (Some(before), Some(after)) = (
+                    normal_law(&resident.constitution, step.locus),
+                    normal_law(&next, step.locus),
+                ) else {
+                    tally.lawless += 1;
+                    continue;
+                };
+                let released: Vec<(Carrier, usize, Rat)> = reading
+                    .released
+                    .iter()
+                    .filter(|(at, ..)| *at == locus)
+                    .map(|(_, carrier, entry, residual)| (*carrier, *entry, residual.clone()))
+                    .collect();
+                tally.count(normal_deposit_on_card(
+                    self.card,
+                    before,
+                    after,
+                    &step.samples,
+                    &resident.constitution.steps().proxy,
+                    resident.constitution.lattice(locus)?,
+                    gamma_length(resident.constitution.clock(locus) + 1),
+                    &released,
+                )?);
             }
+            mirror.set(tally);
         }
         let normal_deposit = start.elapsed();
         // The card's mirror of the tree moved by the deposit's steps, as the host's moved.
@@ -1355,9 +1379,26 @@ impl<'c> ExecutionPort for Resident<'c> {
                 .map(|step| (step.address.clone(), step.class))
                 .collect();
             tree.deposit(&steps).map_err(device)?;
-            if next.landmarks(*ring).map(Landmarks::nodes) != Some(tree.nodes()) {
+            // The lockstep: the founded count, and the masses, β and stop weights of every node
+            // and join the deposit touched, against the host's successor tree.
+            let host = next.landmarks(*ring).ok_or(HnnError::Realization {
+                what: "the host's landmark tree at the successor",
+            })?;
+            let (mut nodes, mut dyadic) = (Vec::new(), Vec::new());
+            for (address, class) in &steps {
+                let (touched, cells) = host.touched(address, *class)?;
+                nodes.extend(touched);
+                dyadic.extend(cells);
+            }
+            nodes.sort_unstable();
+            nodes.dedup();
+            dyadic.sort_unstable();
+            dyadic.dedup();
+            if host.nodes() != tree.nodes()
+                || !tree.agrees_at(host, &nodes, &dyadic).map_err(device)?
+            {
                 return Err(HnnError::Realization {
-                    what: "the card's landmark tree against the host's after a deposit",
+                    what: "the card's landmark tree against the host's after a deposit (its founded count, or a touched node's masses, β or stop weight)",
                 });
             }
         }

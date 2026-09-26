@@ -16,23 +16,30 @@
 //! clock-only replay `hnn::receiving::clock_letters`, the resident's clock law with its key
 //! location and re-keying at each carry-out, without the wave) against the tree with cells only:
 //! - the families tried: every nonempty set of campaign 1's four rings at one declared grain, the
-//!   ring's period `d_g` (its own port chart, an empty fibre) or its parametron's half-turn sheet
-//!   `2`, so `2 (2^4 − 1) = 30` families; each is declared (`LetterFamily`) and read with its own
-//!   depth sweep (`choose_depth`), prequentially, every cell scored before its own deposit;
+//!   ring's period `d_g` (its own port chart, an empty fibre) or `2` (the half of the rotor's cycle
+//!   its clock phase is in; not the parametron's half-turn sheets, which no letter reads), so
+//!   `2 (2^4 − 1) = 30` families; each is declared (`LetterFamily`) and read with its own depth
+//!   sweep (`choose_depth`), prequentially, every cell scored before its own deposit;
 //! - each family's description charge: `⌈log₂(N + 1)⌉` bits for the family chosen among the `N`
-//!   tried and the cell-only one (`5` bits for the 30 clock families alone, `6` with the 12
-//!   declarable contact families), plus `⌈log₂⌉` of its depths tried;
+//!   declared and the cell-only one, plus `⌈log₂⌉` of its depths tried; a slot of one letter is never
+//!   declared (`LetterFamily::new` refuses it: it carries nothing), so nothing is charged for one;
 //! - `Δ_tree = L_(tree+letters) − L_(tree, cells) + description`, an exact enclosure, and its
 //!   sign when decided;
 //! - with `contacts`, the contact families (every set of the field's contacts whose code fits 32
 //!   bits, each contact's letter its owner's reading, `hnn::contact::ContactReading`), their site
 //!   kinds read from the exposure's development part on the host (its deadline the development's
 //!   last window: only its constitution curve's contact site readings are read);
-//! - the constant-slot controls (`r` slots of one letter each, a phase class at grain 1), whose
-//!   difference from the cell-only tree is the enlarged tree's own reweighting, and each family's
+//! - the constant-slot controls (`LetterFamily::constant_control`: `r` slots of one letter each,
+//!   never declared and never charged), whose difference from the cell-only tree is the enlarged
+//!   tree's own reweighting, and each family's
 //!   `Δ_letters = L_(tree+letters) − L_(control, r slots) + description`; the family chosen is the
 //!   least charged one with both `Δ_tree < 0` and `Δ_letters < 0` decided, the cell-only tree
 //!   otherwise;
+//! - the passage bound of every enlarged tree, family or control (Lean
+//!   `HNN/LandmarkAddress.cell_only_dominance_with_feature_charge`, `passage_join_bound`): at its
+//!   chosen depth `D` its executed code is at most the cell-only tree's at `D` plus one bit a dyadic
+//!   cell the development cells opened, plus both trees' certified drift (each tree's a-priori rule
+//!   a cell, `Landmarks::face_rule`, times the cells), checked by exact enclosures;
 //! - the widths each family derives (its path depth `P = D + D(1 + r) + 2`) and its wall time.
 //!
 //! [definition] **What it runs** (the owner's header, `hnn::landmark`):
@@ -79,6 +86,7 @@ use holonics::navigator::trace::SiteKind;
 use holonics::ratio::Rat;
 use holonics::ratio::algebraic::ExactInterval;
 use num_bigint::BigInt;
+use std::collections::BTreeSet;
 
 use exterior::{against, difference, enclosure, exact, per, read_cut, receiver_grain};
 
@@ -556,9 +564,7 @@ fn letters_harness(path: &str, contacts: bool) {
                 .join(", ");
             match LetterFamily::new(features) {
                 Ok(family) => families.push((name, family)),
-                Err(refusal) => {
-                    println!("not declared (its code passes 32 bits): {name}: {refusal}")
-                }
+                Err(refusal) => println!("not declared: {name}: {refusal}"),
             }
         }
     }
@@ -615,8 +621,7 @@ fn letters_harness(path: &str, contacts: bool) {
         .map(|slots| {
             run_family(
                 format!("the constant control of {slots} slots"),
-                LetterFamily::new(vec![Feature::Phase { ring: 0, grain: 1 }; slots])
-                    .expect("a constant family"),
+                LetterFamily::constant_control(slots),
                 0,
             )
         })
@@ -638,6 +643,72 @@ fn letters_harness(path: &str, contacts: bool) {
             enclosure(&delta, grain)
         );
     }
+    // The passage bound (Lean `cell_only_dominance_with_feature_charge`): at its chosen depth an
+    // enlarged tree codes within one bit a dyadic cell opened of the cell-only tree at that depth,
+    // plus both trees' certified drift (the a-priori rule a cell times the cells).
+    let opened: BTreeSet<usize> = cut
+        .cells
+        .iter()
+        .flat_map(|&class| declared.emitted(class).into_iter().map(|(h, _)| h))
+        .collect();
+    let opened = opened.len() as u64;
+    let cell_bits_at = |depth: usize| -> ExactInterval {
+        cell_sweep
+            .tried
+            .iter()
+            .find(|(tried, _)| *tried == depth)
+            .map(|(_, bits)| bits.clone())
+            .unwrap_or_else(|| {
+                prequential(
+                    &cut,
+                    &letters,
+                    &LandmarkDeclaration {
+                        depth,
+                        ..declared.clone()
+                    },
+                )
+                .expect("the cell-only tree at a family's depth")
+                .development
+                .tree
+            })
+    };
+    let rule = |declaration: LandmarkDeclaration| -> Rat {
+        Landmarks::new(declaration)
+            .expect("a declared tree")
+            .face_rule()
+            * Rat::from_integer(BigInt::from(cells))
+    };
+    println!();
+    println!(
+        "the passage bound (Lean cell_only_dominance_with_feature_charge): L_(tree+letters) ≤ L_(tree, cells) at the same depth + {opened} (one bit a dyadic cell the development cells opened) + ρ_letters + ρ_cells (the rule a cell times {cells} cells):"
+    );
+    let mut bound_holds = true;
+    for run in runs.iter().chain(&controls) {
+        let depth = run.sweep.chosen;
+        let cells_at = cell_bits_at(depth);
+        let drift = rule(LandmarkDeclaration {
+            depth,
+            family: run.family.clone(),
+            ..declared.clone()
+        }) + rule(LandmarkDeclaration {
+            depth,
+            ..declared.clone()
+        });
+        let ceiling = &cells_at.lower + Rat::from_integer(BigInt::from(opened)) + &drift;
+        let holds = run.bits.upper <= ceiling;
+        bound_holds &= holds;
+        let margin = ExactInterval {
+            lower: &ceiling - &run.bits.upper,
+            upper: &ceiling - &run.bits.upper,
+        };
+        println!(
+            "  {} at D = {depth}: {}; margin (ceiling − L_(tree+letters).upper) {}",
+            run.name,
+            if holds { "holds" } else { "VIOLATED" },
+            enclosure(&margin, grain)
+        );
+    }
+    println!("  every enlarged tree within its passage bound: {bound_holds}");
     println!();
     println!(
         "each family against the cell-only tree at its chosen depth, Δ_tree = L_(tree+letters) − L_(tree, cells) + description:"

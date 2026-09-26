@@ -450,6 +450,25 @@ extern "C" __global__ void hnn_tree_undo(TreeLaw law, uint32_t* roots, uint64_t*
     if (i == 0) *nodes_count = log.counts[64];
 }
 
+// [definition] **`hnn_tree_gather`**: the parity read of a deposit's touched nodes and joins
+// (`CardTree::agrees_at`, the per-deposit lockstep): thread `i` copies node `nodes[i]`'s two
+// half-unit masses and its chart `(β, λ̂)` into output row `i`, and join `dyadic[i]`'s chart into
+// its join row `i`. It reads the shared arena and writes only its own rows, so the threads commute.
+extern "C" __global__ void hnn_tree_gather(const uint32_t* halves, const TreeChart* charts,
+                                           const TreeChart* joins, const uint32_t* nodes,
+                                           uint32_t node_count, const uint32_t* dyadic,
+                                           uint32_t dyadic_count, uint32_t* out_halves,
+                                           TreeChart* out_charts, TreeChart* out_joins) {
+    uint32_t i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i < node_count) {
+        uint32_t node = nodes[i];
+        out_halves[2 * i] = halves[2 * node];
+        out_halves[2 * i + 1] = halves[2 * node + 1];
+        out_charts[i] = charts[node];
+    }
+    if (i < dyadic_count) out_joins[i] = joins[dyadic[i]];
+}
+
 // [definition] **`hnn_tree_beta_steps`**: the card's β step (`tree_beta_step`, the carrier's rebase
 // included) on `count` operand pairs, one thread each, for its parity against the host's
 // `landmark::Beta::step`. Operands as 64-bit halves: `N = n_hi 2^64 + n_lo`, likewise `D`.

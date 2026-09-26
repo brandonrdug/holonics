@@ -954,11 +954,12 @@ fn the_letter_partitions_are_finite_and_their_codes_injective() {
             assert_eq!(codes, (0..at.letters().unwrap()).collect());
         }
     }
-    // Campaign 1's derived bounds: contact 0 → 1 reads rates above one (P = 1000, Q = 142).
+    // Campaign 1's derived bounds, the horizon: contact 0 → 1 reads rates above one (P = 1001,
+    // Q = 143).
     let field = campaign_field();
     let derived = LockDeclaration::derived(&field, 0);
-    assert_eq!(derived.numerator, BigUint::from(7u32 * 11 * 13 - 1));
-    assert_eq!(derived.denominator, BigUint::from(11u32 * 13 - 1));
+    assert_eq!(derived.numerator, BigUint::from(7u32 * 11 * 13));
+    assert_eq!(derived.denominator, BigUint::from(11u32 * 13));
     assert!(locked(8, 5).code(&derived).is_ok());
     let at = bound(3, 3);
     let slot = Feature::Contact {
@@ -1024,6 +1025,12 @@ fn the_letter_partitions_are_finite_and_their_codes_injective() {
         }])
         .is_err()
     );
+    // A slot of one letter carries nothing: no family declares one, and the constant-slot control
+    // is its own constructor, never a declared family.
+    assert!(LetterFamily::new(vec![Feature::Phase { ring: 0, grain: 1 }]).is_err());
+    let control = LetterFamily::constant_control(2);
+    assert_eq!(control.sizes(), &[1, 1]);
+    assert_eq!(control.codes(), 1);
 }
 
 /// **The contact letters are the contact owner's readings, read from the register's retained state

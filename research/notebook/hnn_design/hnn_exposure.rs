@@ -59,7 +59,10 @@
 //! design (f) names:
 //! - the executed word (Decision 24): the declared precisions, the charts' refinements (their starts,
 //!   the rounded Newton–Schulz steps, the largest certificate against the target), the remainders
-//!   the words and their returns released, and the tick balances' residuals against their bounds;
+//!   the words and their returns released, the tick balances' residuals against their bounds, and
+//!   every word's whole balance carried across its commit (campaign 2: the count, whether every
+//!   one closed, the largest residual against its bound, the deposition work and the
+//!   interconnection's defect);
 //! - the bits on the training and the held-out targets against each online baseline (uniform,
 //!   order-0 and order-1 Krichevsky–Trofimov, PPM of order 2), and the verdict against order-0;
 //!   the model's face is the mixture of the tree's face and the combined face (the primary's ruling
@@ -76,7 +79,8 @@
 //! - each aeon's boundary: its length and lift points, readings, collapse, first law (exchange plus
 //!   deposition, telescoping to the change of code length), and the face against the literal;
 //! - the state and constitution bits against the source, with and without the collapse;
-//! - the constitution's curve, one point per commit;
+//! - the constitution's curve, one point per commit, with the contact-kind census over its commits
+//!   (campaign 2: each contact's kinds, the five proved cases, and its modes by kind);
 //! - the budget stop or deadline, the work counted, and the wall time: the exposure's, and the
 //!   host's by phase (`Exposure::wall`: refine read, release, compare read, tree read, holon and
 //!   covector, `pull_back`, `compose`, `deposited`, re-read and ingest), with the rest of the
@@ -382,7 +386,7 @@ fn card_exposure(deadline: Option<u64>, field: &Field, cut: &Cut) -> (Exposure, 
          ingests (cells and receipts): {} ({} a window)\n\
          realization (the hardware law's report): {realized}\n\
          the landmark tree on the card (campaign 2; exterior wall time, µs, per window as quotient rem remainder): {} phases read, {} cells deposited; transfers {} a window, the card's reads {} a window, the host's class faces from the splits {} a window, the combined faces {} a window, the deposits' updates {} a window\n\
-         the normal laws' prox steps on the card read equal to the host's (campaign 2): {} steps; the resonators' ticks: {} µs a window; the prox steps: {} µs a window",
+         the resonators' ticks: {} µs a window; the normal-law mirror is off the exposure's path (the GPU suite's parity test): {} µs a window",
         exposure.compares,
         traffic.words,
         per_window(traffic.words),
@@ -401,7 +405,6 @@ fn card_exposure(deadline: Option<u64>, field: &Field, cut: &Cut) -> (Exposure, 
         mean(tree.complete.as_micros(), windows),
         mean(tree.combine.as_micros(), windows),
         mean(tree.deposit.as_micros(), windows),
-        traffic.normal_deposits,
         mean(exposure.wall.resonators.as_micros(), windows),
         mean(exposure.wall.normal_deposit.as_micros(), windows)
     );
@@ -415,8 +418,9 @@ fn card_exposure(_: Option<u64>, _: &Field, _: &Cut) -> (Exposure, Option<String
 
 /// **The wall time by phase** (`Exposure::wall`, exterior): each phase's milliseconds over the run
 /// and per receiving window (the integer quotient with its remainder over the windows), the phases'
-/// sum, and the rest of the exposure's wall time (key location, the aeon boundaries, the baselines
-/// and the bookkeeping).
+/// sum, the exposure's own readings (the word balances and the kind census, `Exposure::readout`),
+/// and the rest of the exposure's wall time (key location, the aeon boundaries, the baselines and
+/// the bookkeeping).
 fn phases(exposure: &Exposure, wall: u128) {
     let windows = u128::from(exposure.compares);
     println!(
@@ -436,7 +440,19 @@ fn phases(exposure: &Exposure, wall: u128) {
     }
     let sum = exposure.wall.total().as_millis();
     row("phases' sum", sum);
-    row("rest of exposure", wall.saturating_sub(sum));
+    let (balance, census) = (
+        exposure.readout.balance.as_millis(),
+        exposure.readout.census.as_millis(),
+    );
+    row("word balances", balance);
+    row("kind census", census);
+    println!(
+        "(word balances: the power forms read before and after each deposit and the commit's deposition work; kind census: the contacts' site readings at every commit; both the exposure's own readings)"
+    );
+    row(
+        "rest of exposure",
+        wall.saturating_sub(sum).saturating_sub(balance + census),
+    );
     // The tree read against the word, per window in microseconds (Decision 28; campaign 2: on the
     // card, the mirror's launches and the host's completion of the class faces, the transfers and
     // the deposits' updates apart).
@@ -538,6 +554,19 @@ fn report(field: &Field, exposure: &Exposure) {
         exact(&word.largest_residual),
         exact(&word.residual_bound),
         within(&word.largest_residual, &word.residual_bound)
+    );
+    let words = &word.words;
+    println!(
+        "word balances (campaign 2, WordBalance::closes: the field and its resonators in one identity with the deposition work at the commit and the interconnection's defect, and the executed residual within its certified bound): {} formed, {} carried across a commit, every one closed: {}; the largest executed residual (defects plus the last junction's) {} against its bound {}: {}; the deposition work summed over the commits {} (the largest in magnitude {}); the interconnection's defect summed {}",
+        words.formed,
+        words.committed,
+        words.closed,
+        exact(&words.largest_residual),
+        exact(&words.residual_bound),
+        within(&words.largest_residual, &words.residual_bound),
+        exact(&words.deposition),
+        exact(&words.largest_deposition),
+        exact(&words.interconnection)
     );
 
     let grain = receiver_grain(field);
@@ -666,6 +695,7 @@ fn report(field: &Field, exposure: &Exposure) {
         "== the constitution's curve ({} points, one per published commit) ==",
         exposure.constitution_curve.len()
     );
+    census(field, exposure);
     println!("commit\tbits\tentries\tremainders\tsolved\treleased_bits\tstepped");
     for point in &exposure.constitution_curve {
         println!(
@@ -697,6 +727,40 @@ fn report(field: &Field, exposure: &Exposure) {
     println!(
         "unknown (no receiver counted them): energy in joules, device power, bits per joule, occupancy"
     );
+}
+
+/// **The contact-kind census** (campaign 2, `hnn::contact::site_reading`, the constitution curve's
+/// site readings at every commit): per contact, the commits at which it read each of the five proved
+/// kinds (rotation, null shear, boost, reflection, degenerate), and its modes by kind summed over
+/// the commits (the inertia of `K` under `C ≻ 0`). A boost needs a declared stiffness signature: a
+/// constitution without one (`K = b bᵀ ⪰ 0`) reads rotations and null shears only.
+fn census(field: &Field, exposure: &Exposure) {
+    use holonics::navigator::trace::SiteKind;
+    let commits = exposure.constitution_curve.len();
+    println!(
+        "the contact-kind census over {commits} commits (the kinds at each commit; the modes by kind summed over the commits):"
+    );
+    for contact in 0..field.contacts().len() {
+        let (mut kinds, mut modes) = ([0u64; 5], [0u64; 3]);
+        for point in &exposure.constitution_curve {
+            let reading = &point.contacts[contact];
+            kinds[match reading.kind {
+                SiteKind::Rotation => 0,
+                SiteKind::Null => 1,
+                SiteKind::Boost => 2,
+                SiteKind::Reflection => 3,
+                SiteKind::Degenerate => 4,
+            }] += 1;
+            modes[0] += reading.census.rotation as u64;
+            modes[1] += reading.census.null as u64;
+            modes[2] += reading.census.boost as u64;
+        }
+        let (from, to) = field.contact(contact).ends();
+        println!(
+            "  contact {contact} ({from} → {to}): rotation {}, null shear {}, boost {}, reflection {}, degenerate {} commits; modes: rotation {}, null {}, boost {}",
+            kinds[0], kinds[1], kinds[2], kinds[3], kinds[4], modes[0], modes[1], modes[2]
+        );
+    }
 }
 
 /// One population's bits against the baselines, each comparison with its exact difference, and the

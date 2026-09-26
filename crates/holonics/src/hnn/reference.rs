@@ -156,7 +156,7 @@ use crate::hnn::constitution::{
     CAMPAIGN_ONE_BUDGET, CarrierBits, Constitution, DepositReading, FactorGradient, FactorStep,
     LandmarkStep, LinearLocus, LinearStep, Locus, Sample, Steps,
 };
-use crate::hnn::contact::{SiteReading, site_readings};
+use crate::hnn::contact::SiteReading;
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::keys::{self, KeyLocation};
 use crate::hnn::landmark::{Letter, code_length};
@@ -176,7 +176,7 @@ use crate::hnn::receiving::{
     ActiveAddress, MixtureStep, ReceivingPhases, Scored, tree_code_length,
 };
 use crate::hnn::retention::{AeonBoundary, Diamond, aeon_readings, collapse, contained, separator};
-use crate::hnn::word::KeptWord;
+use crate::hnn::word::{KeptWord, PowerForm, WordBalance};
 use crate::holon::contact::FeatureCovector;
 use crate::navigator::Clock;
 use crate::ratio::algebraic::ExactInterval;
@@ -414,9 +414,9 @@ pub struct WallTimes {
     /// opened-path update, its transfers included); zero on the host, whose tree moves inside
     /// `deposited`.
     pub tree_deposit: Duration,
-    /// `deposit`: a card's normal-law prox steps (the Gram's and the map's outer updates, their
-    /// budgeted splits and the reaches, campaign 2), read against the successor's; zero on the
-    /// host.
+    /// `deposit`: a card's normal-law mirror (the Gram's and the map's outer updates, their
+    /// budgeted splits and the reaches, campaign 2), read against the successor's, when the mirror
+    /// runs (the GPU suite's parity tests); zero on the exposure's path and on the host.
     pub normal_deposit: Duration,
     /// `deposit`: the arrived targets re-read at the successor.
     pub reread: Duration,
@@ -1097,6 +1097,7 @@ impl ExecutionPort for Reference {
                 remainders: released.remainders.clone(),
                 last: released.last.clone(),
                 resonators: released.resonators.clone(),
+                word: Box::new(WordBalance::of(&released)),
             },
         )?;
         receipt.balances = released.balances;
@@ -2380,6 +2381,8 @@ pub struct Exposure {
     pub mixture: Option<MixtureReport>,
     /// The host's wall time by phase (exterior).
     pub wall: WallTimes,
+    /// The exposure's own readings' wall time (exterior): the word balances and the census.
+    pub readout: ReadoutWall,
 }
 
 /// [definition] **The receiver's mixture at the end of a run** (ruling A,
@@ -2469,9 +2472,10 @@ impl Leg {
 /// [definition] **The executed word's readout over an exposure** (Decision 24): the charts' tally
 /// (reads, seeds, rounded Newton–Schulz steps, the largest certificate against the target), the
 /// carried remainders the refines' words released at their ends (`forward`) and the compares'
-/// returns released at their opens (`adjoint`), joined over the run; and over every refine's full
+/// returns released at their opens (`adjoint`), joined over the run; over every refine's full
 /// ticks, how many balances were read, whether every one closed up to its residual within its
-/// certified bound, and the largest residual in magnitude with the bound at that tick.
+/// certified bound, and the largest residual in magnitude with the bound at that tick; and every
+/// word's whole balance carried across its commit ([`WordBalances`], campaign 2).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct WordReport {
     pub charts: ChartTally,
@@ -2481,6 +2485,55 @@ pub struct WordReport {
     pub closed: bool,
     pub largest_residual: Rat,
     pub residual_bound: Rat,
+    pub words: WordBalances,
+}
+
+/// [definition] **Every word's balance over an exposure** (campaign 2, `hnn::word::WordBalance`,
+/// formed from each refine's release on every realization of the port and carried across the commit
+/// that follows it): the balances formed and carried across a commit, whether every one closed
+/// (the combined identity with the deposition work and the interconnection's defect, and the
+/// executed residual within its bound), the largest executed residual in magnitude with its bound,
+/// the deposition work summed over the commits with the largest in magnitude, and the
+/// interconnection's defect summed (the unloaded resonators' port work; zero without resonators).
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct WordBalances {
+    pub formed: u64,
+    pub committed: u64,
+    pub closed: bool,
+    pub largest_residual: Rat,
+    pub residual_bound: Rat,
+    pub deposition: Rat,
+    pub largest_deposition: Rat,
+    pub interconnection: Rat,
+}
+
+impl WordBalances {
+    fn record(&mut self, balance: &WordBalance) {
+        self.closed &= balance.closes();
+        self.formed += 1;
+        let residual = balance.residual().abs();
+        if self.formed == 1 || residual > self.largest_residual {
+            self.largest_residual = residual;
+            self.residual_bound = balance.bound.clone();
+        }
+        if let Some(commit) = &balance.commit {
+            self.committed += 1;
+            self.deposition += &commit.deposition;
+            if commit.deposition.abs() > self.largest_deposition {
+                self.largest_deposition = commit.deposition.abs();
+            }
+        }
+        self.interconnection += &balance.interconnection;
+    }
+}
+
+/// [definition] **The exposure's own readings' wall time** (exterior; no law reads it): the word
+/// balances' power forms and commits, and the contact-kind census at every commit (the contact
+/// site readings of the constitution curve).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct ReadoutWall {
+    pub balance: Duration,
+    pub census: Duration,
 }
 
 /// [definition] **The online Krichevsky–Trofimov probability** of a class seen `count` times in
@@ -2817,13 +2870,24 @@ where
     let mut aeons = Vec::new();
     let mut course = Vec::new();
     let mut leg = Leg::open();
+    let mut readout = ReadoutWall::default();
+    let started = Instant::now();
+    let mounted = PowerForm::read(field, resident.constitution(), resident.current())?;
+    readout.balance += started.elapsed();
+    let started = Instant::now();
+    let contacts = mounted.site_readings()?;
+    readout.census += started.elapsed();
     let mut curve = vec![CurvePoint {
         commit: resident.constitution().commit(),
         bits: resident.constitution().carrier_bits(),
         released_bits: 0,
         stepped: 0,
-        contacts: site_readings(field, resident.constitution())?,
+        contacts,
     }];
+    let mut words = WordBalances {
+        closed: true,
+        ..WordBalances::default()
+    };
     let (mut windows, mut open_windows, mut peak_word_bits) = (0u64, 0u64, 0u64);
     let (mut forward, mut adjoint) = (Remainders::default(), Remainders::default());
     let (mut balances, mut closed) = (0u64, true);
@@ -2864,6 +2928,17 @@ where
                     residual_bound = balance.bound.clone();
                 }
             }
+            // The word's whole balance, carried across the commit that follows (campaign 2).
+            let mut word = match &refined.receipt.detail {
+                ReceiptDetail::Refine { word, .. } => word.as_ref().clone(),
+                _ => {
+                    return Err(HnnError::Shape {
+                        what: "a refine's receipt with the word's balance",
+                        expected: 1,
+                        found: 0,
+                    });
+                }
+            };
             let (staged, compared) = port.compare(&mut resident, pending, &one_hot(window))?;
             work = work.then(&compared.receipt.work);
             if let ReceiptDetail::Compare { released, .. } = &compared.receipt.detail {
@@ -2919,6 +2994,10 @@ where
             if resident.stopped().is_some() {
                 port.discard(&mut resident, Handle::Staged(staged))?;
             } else {
+                // The power form at the word's cut before the deposit: the commit's `Θ`.
+                let started = Instant::now();
+                let before = PowerForm::read(field, resident.constitution(), resident.current())?;
+                readout.balance += started.elapsed();
                 match port.deposit(&mut resident, staged) {
                     Ok(returned) => {
                         work = work.then(&returned.receipt.work);
@@ -2927,12 +3006,20 @@ where
                             .deposit
                             .present()
                             .map_or((0, 0), |reading| (reading.released_bits, reading.stepped));
+                        let started = Instant::now();
+                        let after =
+                            PowerForm::read(field, resident.constitution(), resident.current())?;
+                        word.commit(&before, &after)?;
+                        readout.balance += started.elapsed();
+                        let started = Instant::now();
+                        let contacts = after.site_readings()?;
+                        readout.census += started.elapsed();
                         curve.push(CurvePoint {
                             commit: resident.constitution().commit(),
                             bits: resident.constitution().carrier_bits(),
                             released_bits,
                             stepped,
-                            contacts: site_readings(field, resident.constitution())?,
+                            contacts,
                         });
                     }
                     Err(refusal @ HnnError::ConstitutionBudget { .. }) => {
@@ -2941,6 +3028,7 @@ where
                     Err(other) => return Err(other),
                 }
             }
+            words.record(&word);
         } else {
             for &code in window {
                 baselines.update(code);
@@ -3032,8 +3120,10 @@ where
             closed,
             largest_residual,
             residual_bound,
+            words,
         },
         wall: *resident.wall(),
+        readout,
         mixture: resident
             .constitution()
             .mixture(phases.ring())

@@ -164,17 +164,21 @@ cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/s
 
 `letters contacts` adds the contact families: every set of campaign 1's four contacts whose code
 fits the bundle's 32 bits, each contact's letter its owner's reading (`hnn::contact::ContactReading`:
-its lock address at the bounds `LockDeclaration::derived` gives, times its site kind). The lock
+its lock address at the bounds `LockDeclaration::derived` gives, the horizon `∏_(j>r) d_j` of each
+ring, times its site kind). The lock
 addresses read the clocks alone; the site kinds read the learned constitution, so the harness first
 runs the exposure's development part on the host (`Reference::campaign_one().with_deadline(…)`, its
 deadline the development's last window, so no held-out cell is read, and only its constitution
 curve's contact site readings are read), and the register holds each commit's kinds from the
 window after it (the resident refreshes after each ingest). Beside every family it runs the
-**constant-slot controls** (`r` slots reading one letter at every tick, a phase class at grain 1):
-they carry no information, so their difference from the cell-only tree is the enlarged tree's own
-reweighting, and a family's letters are credited only with `Δ_letters = L_(tree+letters) −
-L_(control, r slots) + description`. The choice is the least charged family with both `Δ_tree < 0`
-and `Δ_letters < 0` decided, the cell-only family otherwise:
+**constant-slot controls** (`LetterFamily::constant_control`: `r` slots reading one letter at every
+tick; `LetterFamily::new` refuses a slot of one letter, so a control is never a declared family and
+never charged): they carry no information, so their difference from the cell-only tree is the
+enlarged tree's own reweighting, and a family's letters are credited only with `Δ_letters =
+L_(tree+letters) − L_(control, r slots) + description`. It checks every enlarged tree's passage bound
+(Lean `cell_only_dominance_with_feature_charge`: within one bit a dyadic cell opened of the cell-only
+tree at its depth, plus both trees' certified drift). The choice is the least charged family with
+both `Δ_tree < 0` and `Δ_letters < 0` decided, the cell-only family otherwise:
 
 ```sh
 cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin letters contacts

@@ -28,15 +28,20 @@
 //! remainder stays zero.
 //!
 //! [definition] **The field balance and the resonators** (campaign 2; Lean
-//! `HNN/Word.field_executed_balance_with_defects`, `HNN/Ring.ring_tick_executed_energy_balance`).
-//! Every full tick also records its [`FieldBalance`]: the tick balance's residual taken apart into
-//! the junctions' executed-anchor defect, the elements' and transits' chart defects and the splits
-//! of the carried outputs, with the deposition work of the tick (zero: the operands are fixed at the
-//! cut) and each declared ring resonator's terms (`hnn::ring`: pump work, port work, dissipation,
-//! chart defect, split). A resonator receives the storage wave its ring's junction sends and moves
-//! none of the word's waves, so the word's reads, tick balances and release are campaign 1's. Its
-//! state opens at zero with the word and is released with it. [`Word::word_balance`] closes the
-//! whole word, and [`Word::partings`] reads each declared contact's break receipt at every transit
+//! `HNN/Word.{field_executed_balance_with_defects, field_commit_deposition,
+//! combined_balance_unloaded_port}`, `HNN/Ring.ring_tick_executed_energy_balance`). Every full tick
+//! also records its [`FieldBalance`]: the tick balance's residual taken apart into the junctions'
+//! executed-anchor defect, the elements' and transits' chart defects and the splits of the carried
+//! outputs, with each declared ring resonator's terms (`hnn::ring`: pump work, port work,
+//! dissipation, chart defect, split). A resonator receives the storage wave its ring's junction
+//! sends and moves none of the word's waves, so the word's reads, tick balances and release are
+//! campaign 1's; the port work it draws is delivered by no field term, and the one combined balance
+//! names it as the interconnection's defect ([`FieldBalance::interconnection`]). Its state opens at
+//! zero with the word and is released with it. No deposit happens inside a word (its operands are
+//! fixed at the cut), so the deposition work is read at the commit that follows it
+//! ([`WordBalance::commit`], `½⟨x, ΔΘ x⟩` on the word's end change, [`PowerForm`]).
+//! [`WordBalance::of`] closes the whole word from its release, on every realization of the port,
+//! and [`Word::partings`] reads each declared contact's break receipt at every transit
 //! (`hnn::contact::BreakReceipt`).
 //!
 //! [definition] The word keeps its own per-tick waves, bounded by its `e_max` junction steps, for
@@ -71,17 +76,19 @@ use num_traits::{Signed, Zero};
 use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartReading, Charts, Remainders, carry};
 use crate::hnn::constitution::Lattice;
-use crate::hnn::contact::BreakReceipt;
+use crate::hnn::contact::{BreakReceipt, SiteReading, signed_stiffness, site_reading};
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::moment::SourceMoment;
 use crate::hnn::propagation::{
-    Junction, Operands, TickBalance, element_step, global_power, participation, swing_about,
-    transit_defect, transit_solve, transit_update,
+    Junction, Operands, TickBalance, contact_exponent, element_step, global_power, gram,
+    participation, swing_about, transit_defect, transit_solve, transit_update,
 };
 use crate::hnn::realization::indexed;
 use crate::hnn::receiving::ReceivingPhases;
-use crate::hnn::ring::{ResonatorRemainders, ResonatorStep};
+use crate::hnn::ring::{ResonatorMaterial, ResonatorRemainders, ResonatorStep};
 use crate::navigator::Clock;
+use crate::ratio::exponentiated::power_of_two;
+use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{add, dot, sub};
 use crate::ratio::{Rat, integer};
 
@@ -142,6 +149,8 @@ pub struct Word<'c> {
     peak_bits: u64,
     /// The last junction's residual: the executed anchors' power against the participation mean.
     last: Rat,
+    /// The last junction's certified bound on its residual.
+    last_bound: Rat,
     /// The power of the change as the last full tick left it: the next tick's `before`, read once.
     /// Only `tick` sets it and `last_junction` clears it, so it is always the current change's.
     settled: Option<Rat>,
@@ -216,11 +225,12 @@ impl ResonatorBalance {
 /// power `Π_c`, the junctions' executed-anchor defect, the elements' and transits' chart defects and
 /// the splits of the carried outputs; the resonators' storage (`hnn::ring`) moves by its pump work,
 /// its port work (drawn from the storage wave it receives), its dissipation, its chart defect and
-/// its split. The deposition work of a commit is `½⟨x, ΔΘ x⟩` at the change carried across it
-/// (`Holon/Deposition.deposition_work`); within a word the operands are fixed at the cut, so the
-/// tick's `ΔΘ` is zero and its term is that product, computed, not assumed. No term is set to zero
-/// silently: each is the exact difference it names, and [`FieldBalance::closes`] checks the
-/// identities with them.
+/// its split. The resonator's port is unloaded: the field returns no wave through it and delivers
+/// none of the port work, so the combined storage `P + E` gains that work, the interconnection's
+/// defect (Lean `HNN/Word.combined_balance_unloaded_port` at `δ = 0`), named here. No deposit
+/// happens within a tick (the operands are fixed at the cut); the deposition work is the commit's
+/// ([`WordBalance::commit`]). No term is set to zero: each is the exact difference it names, and
+/// [`FieldBalance::closes`] checks the one combined identity with them.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FieldBalance {
     pub before: Rat,
@@ -233,7 +243,6 @@ pub struct FieldBalance {
     pub element_split: Rat,
     pub transit_chart: Rat,
     pub transit_split: Rat,
-    pub deposition: Rat,
     pub resonator_before: Rat,
     pub resonator_after: Rat,
     pub pump: Rat,
@@ -241,6 +250,11 @@ pub struct FieldBalance {
     pub resonator_dissipation: Rat,
     pub resonator_chart: Rat,
     pub resonator_split: Rat,
+    /// **The interconnection's defect**: the resonators' port work less the power the field
+    /// delivers through their ports. The field returns no wave through an unloaded port, so it
+    /// delivers none, and the defect is the port work the resonators draw (loading the port is owed
+    /// in #62).
+    pub interconnection: Rat,
 }
 
 impl FieldBalance {
@@ -253,27 +267,177 @@ impl FieldBalance {
             + &self.transit_split
     }
 
-    /// **Both balances close exactly with their stated terms**: the field's
-    /// `P′ = P − dissipation + resist + Π_c + deposition + defects`, and the resonators'
-    /// `E′ − E = pump + port − dissipation + chart + split`.
+    /// **The combined balance closes exactly with its stated terms** (Lean
+    /// `combined_balance_unloaded_port`): `(P′ + E′) − (P + E) = − dissipation + resist + Π_c +
+    /// defects + pump − resonator dissipation + resonator chart + resonator split +
+    /// interconnection`.
     pub fn closes(&self) -> bool {
-        self.after
-            == &self.before - &self.dissipation
-                + &self.resist
-                + &self.contrast
-                + &self.deposition
-                + self.residual()
-            && &self.resonator_after - &self.resonator_before
-                == &self.pump + &self.port - &self.resonator_dissipation
-                    + &self.resonator_chart
-                    + &self.resonator_split
+        &self.after + &self.resonator_after - &self.before - &self.resonator_before
+            == -&self.dissipation + &self.resist + &self.contrast + self.residual() + &self.pump
+                - &self.resonator_dissipation
+                + &self.resonator_chart
+                + &self.resonator_split
+                + &self.interconnection
     }
 }
 
-/// [definition] **The whole word's balance** (campaign 2's committed balance over one word): the
-/// field's power at the open (after the opening split) and at the end, every tick's stated terms
-/// summed, the last junction's residual, the resonators' storage at the end with its terms (they
-/// open at zero), and the remainders the end releases, the word's and the resonators'.
+/// [definition] **A word's end change** (`x`, the change the word releases and its commit reads):
+/// the storage waves per ring, the arriving waves per contact (`[at from, at to]`) and the contact
+/// states `[u, w]`, as the last junction step left them.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct EndChange {
+    pub storage: Vec<Vec<Rat>>,
+    pub arrivals: Vec<[Vec<Rat>; 2]>,
+    pub states: Vec<[Vec<Rat>; 2]>,
+}
+
+/// [definition] **The field's power form at a cut**, `P(x) = (h/4)[Σ_r Y_r|s_r|² + Σ_a G_a(|a_g|² +
+/// |a_h|²)] + Σ_a ½(⟨w, C_a w⟩ + ⟨u, K_a u⟩)`: the hop, the rings' storage admittances and the
+/// contacts' conductances at the lift (declared by the field), each contact's storage `C_a = c cᵀ`
+/// and signed stiffness `K_a` (the constitution's), and each ring's declared resonator material.
+/// Read before and after a deposit at the same cut, it gives the commit's deposition work.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PowerForm {
+    step: Rat,
+    admittances: Vec<Rat>,
+    conductances: Vec<Rat>,
+    storage: Vec<ExactRatMatrix>,
+    stiffness: Vec<ExactRatMatrix>,
+    resonators: Vec<Option<ResonatorMaterial>>,
+}
+
+impl PowerForm {
+    /// **The power form at a cut** from the field, a constitution and the lift point.
+    pub fn read(
+        field: &Field,
+        constitution: &impl ConstitutionRead,
+        current: &Current,
+    ) -> Result<Self, HnnError> {
+        let contacts = field.contacts().len();
+        let conductances = (0..contacts)
+            .map(|a| {
+                let exponent = contact_exponent(field, a, current.lift())?;
+                if exponent.phase != 0 {
+                    return Err(HnnError::ExponentPhase {
+                        contact: a,
+                        phase: exponent.phase,
+                        grain: field.exponent_grain(),
+                    });
+                }
+                Ok(power_of_two(&exponent.carry)? * field.contact(a).admittance())
+            })
+            .collect::<Result<Vec<_>, HnnError>>()?;
+        let storage = (0..contacts)
+            .map(|a| gram(constitution.contact_storage(a)))
+            .collect::<Result<Vec<_>, HnnError>>()?;
+        let stiffness = (0..contacts)
+            .map(|a| {
+                signed_stiffness(
+                    constitution.contact_stiffness(a),
+                    constitution.contact_stiffness_signature(a),
+                )
+            })
+            .collect::<Result<Vec<_>, HnnError>>()?;
+        Ok(Self {
+            step: field.step().clone(),
+            admittances: field
+                .rings()
+                .iter()
+                .map(|ring| ring.admittance().clone())
+                .collect(),
+            conductances,
+            storage,
+            stiffness,
+            resonators: (0..field.rings().len())
+                .map(|ring| constitution.ring_resonator(ring).cloned())
+                .collect(),
+        })
+    }
+
+    /// **Every contact's site reading** from this form's storage and signed stiffness at its hop
+    /// (`hnn::contact::site_reading`): the contact-kind census of the constitution the form was read
+    /// from, formed from the matrices the balance already read.
+    pub fn site_readings(&self) -> Result<Vec<SiteReading>, HnnError> {
+        self.storage
+            .iter()
+            .zip(&self.stiffness)
+            .map(|(storage, stiffness)| site_reading(storage, stiffness, &self.step))
+            .collect()
+    }
+
+    /// **The power of a change** under this form.
+    pub fn power(&self, change: &EndChange) -> Result<Rat, HnnError> {
+        let mut waves = Rat::zero();
+        for (admittance, wave) in self.admittances.iter().zip(&change.storage) {
+            waves += admittance * dot(wave, wave);
+        }
+        let mut stored = Rat::zero();
+        for (a, (pair, state)) in change.arrivals.iter().zip(&change.states).enumerate() {
+            waves += &self.conductances[a] * (dot(&pair[0], &pair[0]) + dot(&pair[1], &pair[1]));
+            stored += (dot(&state[1], &self.storage[a].apply(&state[1])?)
+                + dot(&state[0], &self.stiffness[a].apply(&state[0])?))
+                / integer(2);
+        }
+        Ok(&self.step / integer(4) * waves + stored)
+    }
+
+    /// **The deposition work of the commit from this form to `after`** on the change `x` (Lean
+    /// `HNN/Word.field_commit_deposition`, `Holon/Deposition.deposition_work`): `½⟨x, ΔΘ x⟩`,
+    /// formed from the forms' differences, `(h/4)[Σ ΔY|s|² + Σ ΔG|a|²] + ½Σ_a(⟨w, ΔC_a w⟩ +
+    /// ⟨u, ΔK_a u⟩)`. Refused at a changed hop or resonator material: no law deposits either (no
+    /// covector reaches a resonator, whose port the return does not pass).
+    pub fn deposition_work(&self, after: &PowerForm, change: &EndChange) -> Result<Rat, HnnError> {
+        if self.step != after.step || self.resonators != after.resonators {
+            return Err(HnnError::Shape {
+                what: "a commit that changes neither the hop nor a resonator's material",
+                expected: 0,
+                found: 1,
+            });
+        }
+        let mut waves = Rat::zero();
+        for ((old, new), wave) in self
+            .admittances
+            .iter()
+            .zip(&after.admittances)
+            .zip(&change.storage)
+        {
+            if old != new {
+                waves += (new - old) * dot(wave, wave);
+            }
+        }
+        let mut stored = Rat::zero();
+        for (a, (pair, state)) in change.arrivals.iter().zip(&change.states).enumerate() {
+            if self.conductances[a] != after.conductances[a] {
+                waves += (&after.conductances[a] - &self.conductances[a])
+                    * (dot(&pair[0], &pair[0]) + dot(&pair[1], &pair[1]));
+            }
+            let storage = after.storage[a].subtract(&self.storage[a])?;
+            let stiffness = after.stiffness[a].subtract(&self.stiffness[a])?;
+            stored += (dot(&state[1], &storage.apply(&state[1])?)
+                + dot(&state[0], &stiffness.apply(&state[0])?))
+                / integer(2);
+        }
+        Ok(&self.step / integer(4) * waves + stored)
+    }
+}
+
+/// [definition] **The commit a word's balance is carried across** (Lean
+/// `HNN/Word.field_commit_deposition`): the deposition work `½⟨x, ΔΘ x⟩` on the word's end change,
+/// formed from the operand differences, and the end change's power under the committed
+/// constitution, formed from the committed operands alone.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CommitWork {
+    pub deposition: Rat,
+    pub committed: Rat,
+}
+
+/// [definition] **The whole word's balance** (campaign 2's committed balance over one word, formed
+/// from its release on every realization of the port, [`WordBalance::of`]): the field's power at the
+/// open (after the opening split) and at the end, every tick's stated terms summed, the defects
+/// (the ticks' residuals) and the last junction's residual with their certified bound, the
+/// resonators' storage at the end with their terms (they open at zero), the interconnection's
+/// defect (the unloaded port's work), the end change the commit reads, the commit when one follows
+/// ([`WordBalance::commit`]), and the remainders the end releases, the word's and the resonators'.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct WordBalance {
     pub open: Rat,
@@ -281,40 +445,110 @@ pub struct WordBalance {
     pub dissipation: Rat,
     pub resist: Rat,
     pub contrast: Rat,
-    pub deposition: Rat,
     pub defects: Rat,
     pub last: Rat,
+    pub bound: Rat,
     pub resonator_end: Rat,
     pub pump: Rat,
     pub port: Rat,
     pub resonator_dissipation: Rat,
     pub resonator_chart: Rat,
     pub resonator_split: Rat,
+    pub interconnection: Rat,
+    pub change: EndChange,
+    pub commit: Option<CommitWork>,
     pub released: Remainders,
     pub resonator_released: Remainders,
 }
 
 impl WordBalance {
-    /// **The word closes with its stated defects**: `P_end = P_open − dissipation + resist + Π_c +
-    /// deposition + defects + last`, and the resonators' end storage is their summed terms.
+    /// **The word's balance from its release**: the ticks' balances summed, the last junction's
+    /// residual and bound, and the resonators' balances (whose port work, delivered by no field term,
+    /// is the interconnection's defect).
+    pub fn of(released: &Released) -> Self {
+        let end = released.power.clone();
+        let open = released
+            .balances
+            .first()
+            .map_or_else(|| end.clone(), |tick| tick.before.clone());
+        let sum =
+            |term: fn(&TickBalance) -> &Rat| -> Rat { released.balances.iter().map(term).sum() };
+        let resonators = |term: fn(&ResonatorBalance) -> &Rat| -> Rat {
+            released.resonators.iter().map(term).sum()
+        };
+        let port = resonators(|r| &r.port);
+        Self {
+            open,
+            end,
+            dissipation: sum(|t| &t.dissipation),
+            resist: sum(|t| &t.resist),
+            contrast: sum(|t| &t.contrast),
+            defects: sum(|t| &t.residual),
+            last: released.last.clone(),
+            bound: sum(|t| &t.bound) + &released.last_bound,
+            resonator_end: resonators(|r| &r.end),
+            pump: resonators(|r| &r.pump),
+            interconnection: port.clone(),
+            port,
+            resonator_dissipation: resonators(|r| &r.dissipation),
+            resonator_chart: resonators(|r| &r.chart),
+            resonator_split: resonators(|r| &r.split),
+            change: released.end.clone(),
+            commit: None,
+            released: released.remainders.clone(),
+            resonator_released: released
+                .resonators
+                .iter()
+                .fold(Remainders::default(), |joined, resonator| {
+                    joined.join(&resonator.released)
+                }),
+        }
+    }
+
+    /// **Carry the balance across the commit** from the form `before` to `after` (both read at the
+    /// word's cut, before and after the deposit): the deposition work `½⟨x, ΔΘ x⟩` from the forms'
+    /// differences and the end change's power under the committed form alone.
+    pub fn commit(&mut self, before: &PowerForm, after: &PowerForm) -> Result<(), HnnError> {
+        self.commit = Some(CommitWork {
+            deposition: before.deposition_work(after, &self.change)?,
+            committed: after.power(&self.change)?,
+        });
+        Ok(())
+    }
+
+    /// The executed residual: the ticks' defects and the last junction's.
+    pub fn residual(&self) -> Rat {
+        &self.defects + &self.last
+    }
+
+    /// **The word closes with its stated defects, the combined system in one identity** (Lean
+    /// `HNN/Word.{field_executed_balance_with_defects, field_commit_deposition,
+    /// combined_balance_unloaded_port}`): `P_end + E_end = P_open − dissipation + resist + Π_c +
+    /// defects + last + pump − resonator dissipation + resonator chart + resonator split +
+    /// interconnection`, with `P_end` the committed power and `deposition` added when a commit
+    /// follows; and the executed residual lies within its certified bound.
     pub fn closes(&self) -> bool {
-        self.end
-            == &self.open - &self.dissipation
-                + &self.resist
-                + &self.contrast
-                + &self.deposition
-                + &self.defects
-                + &self.last
-            && self.resonator_end
-                == &self.pump + &self.port - &self.resonator_dissipation
-                    + &self.resonator_chart
-                    + &self.resonator_split
+        let terms = &self.open - &self.dissipation
+            + &self.resist
+            + &self.contrast
+            + self.residual()
+            + &self.pump
+            - &self.resonator_dissipation
+            + &self.resonator_chart
+            + &self.resonator_split
+            + &self.interconnection;
+        let identity = match &self.commit {
+            Some(commit) => &commit.committed + &self.resonator_end == terms + &commit.deposition,
+            None => &self.end + &self.resonator_end == terms,
+        };
+        identity && self.residual().abs() <= self.bound
     }
 }
 
 /// [definition] **What a word's end releases**: the power of the unread change, which leaves as
 /// the word's emitted exchange; the junction steps taken; the peak exact bits of any entry of the
-/// change inside the word; every tick's balance; the last junction's residual; every carried
+/// change inside the word; every tick's balance; the last junction's residual and bound; the end
+/// change itself (its commit's operand); every carried
 /// remainder, released and read ([`Remainders`]); every chart's reading (its certificate against
 /// the target, its refinement's steps and seed); and each declared resonator's balance
 /// ([`ResonatorBalance`]).
@@ -325,6 +559,10 @@ pub struct Released {
     pub peak_bits: u64,
     pub balances: Vec<TickBalance>,
     pub last: Rat,
+    /// The last junction's certified bound on its residual.
+    pub last_bound: Rat,
+    /// The change the word releases, which its commit reads ([`WordBalance::commit`]).
+    pub end: EndChange,
     pub remainders: Remainders,
     pub charts: Vec<ChartReading>,
     /// Each declared resonator's balance over the word, in ring order (campaign 2).
@@ -531,6 +769,7 @@ impl<'c> Word<'c> {
             ended: false,
             peak_bits: 0,
             last: Rat::zero(),
+            last_bound: Rat::zero(),
             settled: None,
             resonators,
             fields: Vec::new(),
@@ -970,11 +1209,12 @@ impl<'c> Word<'c> {
             element_split,
             transit_chart,
             transit_split,
-            // `½⟨x, ΔΘ x⟩` with `ΔΘ = 0`: the operands are fixed at the word's cut.
-            deposition: Rat::zero(),
             resonator_before,
             resonator_after,
             pump,
+            // The field returns no wave through the resonators' ports and delivers none of their
+            // work (its tick balance has no port term): the whole port work is the defect.
+            interconnection: port.clone(),
             port,
             resonator_dissipation,
             resonator_chart,
@@ -1020,45 +1260,9 @@ impl<'c> Word<'c> {
         )
     }
 
-    /// **The whole word's balance**, read at any point of the word ([`WordBalance`]).
+    /// **The whole word's balance**, read at any point of the word: [`WordBalance::of`] its release.
     pub fn word_balance(&self) -> Result<WordBalance, HnnError> {
-        let end = self.power()?;
-        let open = self
-            .fields
-            .first()
-            .map_or_else(|| end.clone(), |field| field.before.clone());
-        let sum = |term: fn(&FieldBalance) -> &Rat| -> Rat { self.fields.iter().map(term).sum() };
-        let resonator_end: Rat = self
-            .resonators
-            .iter()
-            .flatten()
-            .filter_map(|resonance| resonance.steps.last())
-            .map(|step| step.after.clone())
-            .sum();
-        let resonator_released = Remainders::of(
-            self.resonators
-                .iter()
-                .flatten()
-                .flat_map(|resonance| resonance.remainders.all()),
-        );
-        Ok(WordBalance {
-            open,
-            end,
-            dissipation: sum(|f| &f.dissipation),
-            resist: sum(|f| &f.resist),
-            contrast: sum(|f| &f.contrast),
-            deposition: sum(|f| &f.deposition),
-            defects: self.fields.iter().map(FieldBalance::residual).sum(),
-            last: self.last.clone(),
-            resonator_end,
-            pump: sum(|f| &f.pump),
-            port: sum(|f| &f.port),
-            resonator_dissipation: sum(|f| &f.resonator_dissipation),
-            resonator_chart: sum(|f| &f.resonator_chart),
-            resonator_split: sum(|f| &f.resonator_split),
-            released: self.carried.released(),
-            resonator_released,
-        })
+        Ok(WordBalance::of(&self.released()?))
     }
 
     /// **The last junction step**: the junctions run and are read, and the word ends there. The
@@ -1067,7 +1271,7 @@ impl<'c> Word<'c> {
     /// executed anchor's residual ([`Released::last`]).
     pub fn last_junction(&mut self) -> Result<(), HnnError> {
         self.settled = None;
-        let (junctions, residual, _) = self.junctions()?;
+        let (junctions, residual, bound) = self.junctions()?;
         for (ring, junction) in junctions.iter().enumerate() {
             self.storage[ring] = junction.storage_wave.clone();
             for (position, &a) in self.operands.incident(ring).iter().enumerate() {
@@ -1076,6 +1280,7 @@ impl<'c> Word<'c> {
             }
         }
         self.last = residual;
+        self.last_bound = bound;
         self.ended = true;
         Ok(())
     }
@@ -1123,6 +1328,12 @@ impl<'c> Word<'c> {
             peak_bits: self.peak_bits,
             balances: self.balances.clone(),
             last: self.last.clone(),
+            last_bound: self.last_bound.clone(),
+            end: EndChange {
+                storage: self.storage.clone(),
+                arrivals: self.arrivals.clone(),
+                states: self.states.clone(),
+            },
             remainders: self.carried.released(),
             charts: self.operands.charts(),
             resonators: self
@@ -1154,6 +1365,7 @@ impl<'c> Word<'c> {
             ended,
             peak_bits,
             last,
+            last_bound,
             settled,
             resonators,
             fields,
@@ -1171,6 +1383,7 @@ impl<'c> Word<'c> {
             ended,
             peak_bits,
             last,
+            last_bound,
             settled,
             resonators,
             fields,
@@ -1209,6 +1422,7 @@ pub(crate) struct KeptWord {
     ended: bool,
     peak_bits: u64,
     last: Rat,
+    last_bound: Rat,
     settled: Option<Rat>,
     resonators: Vec<Option<Resonance>>,
     fields: Vec<FieldBalance>,
@@ -1230,6 +1444,7 @@ impl KeptWord {
             ended,
             peak_bits,
             last,
+            last_bound,
             settled,
             resonators,
             fields,
@@ -1248,6 +1463,7 @@ impl KeptWord {
             ended,
             peak_bits,
             last,
+            last_bound,
             settled,
             resonators,
             fields,

@@ -30,7 +30,9 @@
 //! [definition] **Parity** (`src/hnn/tests.rs`, `port_tests.rs`): the card's splits equal the host's
 //! (`Landmarks::window_splits`) exactly, window by window, on the cell-only and the enlarged tree,
 //! and after every deposit the card's arena (roots, children, masses, charts, joins) equals the
-//! host's ([`CardTree::agrees`]).
+//! host's ([`CardTree::agrees`]). In the port's lockstep every deposit is checked at the nodes and
+//! joins it touched ([`CardTree::agrees_at`]: their masses, `β` and stop weights, gathered by
+//! `hnn_tree_gather`), besides the founded count.
 
 use core::ffi::c_void;
 use std::time::{Duration, Instant};
@@ -205,9 +207,23 @@ pub struct CardTree<'c> {
     digits: CardBuffer<'c, u32>,
     out: CardBuffer<'c, u64>,
     logs: Vec<LogBuffers<'c>>,
+    /// The per-deposit lockstep's gather: the touched nodes and dyadic cells up, their masses and
+    /// charts and the joins' charts down (`hnn_tree_gather`).
+    gather: GatherBuffers<'c>,
     nodes: usize,
     times: TreeTimes,
     read_threads: u32,
+}
+
+/// The per-deposit lockstep's gather buffers, sized for the touched nodes and joins of one deposit
+/// of a window's cells.
+struct GatherBuffers<'c> {
+    nodes: CardBuffer<'c, u32>,
+    dyadic: CardBuffer<'c, u32>,
+    halves: CardBuffer<'c, u32>,
+    charts: CardBuffer<'c, TreeChart>,
+    joins: CardBuffer<'c, TreeChart>,
+    capacity: usize,
 }
 
 impl Drop for CardTree<'_> {
@@ -284,6 +300,15 @@ impl<'c> CardTree<'c> {
         let logs = (0..window.max(1))
             .map(|_| log(card))
             .collect::<Result<Vec<_>, _>>()?;
+        let gathered = window_phases * MAX_DIGITS * log_stride;
+        let gather = GatherBuffers {
+            nodes: card.alloc(gathered)?,
+            dyadic: card.alloc(gathered)?,
+            halves: card.alloc(2 * gathered)?,
+            charts: card.alloc(gathered)?,
+            joins: card.alloc(gathered)?,
+            capacity: gathered,
+        };
         let mut mirrored = Self {
             card,
             module,
@@ -303,6 +328,7 @@ impl<'c> CardTree<'c> {
             digits: card.alloc(window_phases * 2 * MAX_DIGITS)?,
             out: card.alloc(window_phases * declaration.splitting().len().max(1))?,
             logs,
+            gather,
             nodes: 0,
             times: TreeTimes::default(),
             read_threads,
@@ -686,6 +712,111 @@ impl<'c> CardTree<'c> {
             card_children.sort_unstable();
             host_children.sort_unstable();
             same &= card_children == host_children;
+        }
+        self.times.transfer += start.elapsed();
+        Ok(same)
+    }
+}
+
+impl CardTree<'_> {
+    /// **The mirror against the host's tree at the nodes and joins a deposit touched** (the
+    /// per-deposit lockstep; `Landmarks::touched`): each touched node's two masses and its chart
+    /// (`β` and the stop weight), and each touched join's chart, gathered on the card in one launch
+    /// (`hnn_tree_gather`) and compared with the host's, besides the founded count. Chunked at the
+    /// gather's capacity.
+    pub fn agrees_at(
+        &mut self,
+        tree: &Landmarks,
+        nodes: &[u32],
+        dyadic: &[usize],
+    ) -> Result<bool, DeviceError> {
+        self.synchronize()?;
+        let start = Instant::now();
+        let arena = tree.arena();
+        let host_nodes = arena.halves().len();
+        let count = self.card.fetch_range(&self.count, 0, 1)?[0] as usize;
+        let mut same = count == host_nodes && self.nodes == host_nodes;
+        let enlarged = self.law.branches > 1;
+        let dyadic: Vec<u32> = if enlarged {
+            dyadic.iter().map(|&h| h as u32).collect()
+        } else {
+            Vec::new()
+        };
+        let chunks = nodes
+            .len()
+            .max(dyadic.len())
+            .div_ceil(self.gather.capacity.max(1));
+        for chunk in 0..chunks {
+            if !same {
+                break;
+            }
+            let range = |len: usize| {
+                let from = (chunk * self.gather.capacity).min(len);
+                from..((chunk + 1) * self.gather.capacity).min(len)
+            };
+            let (node_chunk, dyadic_chunk) =
+                (&nodes[range(nodes.len())], &dyadic[range(dyadic.len())]);
+            if node_chunk.iter().any(|&node| node as usize >= host_nodes) {
+                return Ok(false);
+            }
+            if !node_chunk.is_empty() {
+                self.card.write(&self.gather.nodes, 0, node_chunk)?;
+            }
+            if !dyadic_chunk.is_empty() {
+                self.card.write(&self.gather.dyadic, 0, dyadic_chunk)?;
+            }
+            let mut halves = self.halves.device_ptr();
+            let mut charts = self.charts.device_ptr();
+            let mut joins = self.joins.device_ptr();
+            let mut gather_nodes = self.gather.nodes.device_ptr();
+            let mut node_count = node_chunk.len() as u32;
+            let mut gather_dyadic = self.gather.dyadic.device_ptr();
+            let mut dyadic_count = dyadic_chunk.len() as u32;
+            let mut out_halves = self.gather.halves.device_ptr();
+            let mut out_charts = self.gather.charts.device_ptr();
+            let mut out_joins = self.gather.joins.device_ptr();
+            let mut params: [*mut c_void; 10] = [
+                (&mut halves as *mut CUdeviceptr).cast(),
+                (&mut charts as *mut CUdeviceptr).cast(),
+                (&mut joins as *mut CUdeviceptr).cast(),
+                (&mut gather_nodes as *mut CUdeviceptr).cast(),
+                (&mut node_count as *mut u32).cast(),
+                (&mut gather_dyadic as *mut CUdeviceptr).cast(),
+                (&mut dyadic_count as *mut u32).cast(),
+                (&mut out_halves as *mut CUdeviceptr).cast(),
+                (&mut out_charts as *mut CUdeviceptr).cast(),
+                (&mut out_joins as *mut CUdeviceptr).cast(),
+            ];
+            let threads = node_chunk.len().max(dyadic_chunk.len()) as u32;
+            let block = threads.next_power_of_two().clamp(32, 256);
+            self.launch(
+                "hnn_tree_gather",
+                threads.div_ceil(block),
+                block,
+                &mut params,
+            )?;
+            self.synchronize()?;
+            if !node_chunk.is_empty() {
+                let halves = self
+                    .card
+                    .fetch_range(&self.gather.halves, 0, 2 * node_chunk.len())?;
+                let charts = self
+                    .card
+                    .fetch_range(&self.gather.charts, 0, node_chunk.len())?;
+                for (i, &node) in node_chunk.iter().enumerate() {
+                    let host = arena.halves()[node as usize];
+                    same &= halves[2 * i] == host[0] && halves[2 * i + 1] == host[1];
+                    same &= arena.chart(node).map(TreeChart::from) == Some(charts[i]);
+                }
+            }
+            if !dyadic_chunk.is_empty() {
+                let joins = self
+                    .card
+                    .fetch_range(&self.gather.joins, 0, dyadic_chunk.len())?;
+                for (i, &h) in dyadic_chunk.iter().enumerate() {
+                    same &= arena.join(h as usize).map(TreeChart::from) == Some(joins[i]);
+                }
+            }
         }
         self.times.transfer += start.elapsed();
         Ok(same)

@@ -40,14 +40,20 @@ T = (1/m) [[m − h²k, 2hc], [−2hk, 4c − m]] ,   tr T = (4c − h²k)/m ,  
    indefinite stiffness; passivity does not follow: the closed boost at `c = 1`, `k = −1`, `h = 1`
    triples the state `(1, 1)` every tick while its signed storage `½w² − ½u²` stays `0`
    (`boost_grows_at_conserved_signed_storage`).
-5. **The lock address from the measured winding pair** (`contact_lock_address`): whole windings
-   `(m_g, m_h)`, `m_h > 0`, reduce to the coprime address `p/q` with `m_g = p·gcd`, `m_h = q·gcd`; the
-   measured passage reads `(m_g, m_h)` and is a cycle of the two clocks at `p/q`, whose cycles are
-   exactly the multiples of `q` (`Aeon/Clock/Lock.{lock_at_address, cycle_iff_period_dvd}`). The
-   finite family these addresses land in, `Unlocked` and the reduced `(p, q)` within the derived
-   bounds `(P, Q)`, is `HNN/LandmarkAddress.lock_partition_finite`, whose observability clause
-   (`Q` is the horizon) is this theorem's cycles read at the horizon: one object, its reading here
-   and its partition there (the receiving join's contact letter).
+5. **The lock address: the least-denominator rate in the measured fibre** (`contact_lock_address`,
+   the Rust owner `hnn::contact::lock_address`). Whole windings `(m_g, m_h)`, both at least one,
+   leave the passage's rate in the open fibre `(m_g/(m_h + 1), (m_g + 1)/m_h)`. Its lock address
+   (`IsLockAddress`: the least denominator of its rationals, then the least rate of that
+   denominator) exists and is unique (`lockAddress_exists`, `lockAddress_unique`); past the
+   integers the least denominator alone fixes it, because between two rationals of one denominator
+   `q ≥ 2` lies a rational of smaller denominator (`exists_smaller_den_between`,
+   `least_denominator_unique`, Bézout at the neighbour `m/t = p/q + 1/(qt)`). The address lies in
+   the box `1 ≤ p ≤ m_g`, `1 ≤ q ≤ m_h`, and it closes at its period `q`: its cycles are exactly the
+   multiples of `q` (`lockAddress_closes`, composing `Aeon/Clock/Lock.{lock_at_address,
+   cycle_iff_period_dvd}`). The finite family these addresses land in, `Unlocked` and the reduced
+   `(p, q)` within the derived bounds `(P, Q)`, is `HNN/LandmarkAddress.lock_partition_finite`, whose
+   horizon clause (`Q = H`, the windings counted up to the closing tick) is this theorem's box read
+   at the horizon: one object, its reading here and its partition there.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
@@ -301,54 +307,214 @@ theorem boost_grows_at_conserved_signed_storage :
 
 end Boost
 
-/-! ## 4. The lock address from the measured winding pair -/
+/-! ## 4. The lock address: the least-denominator rate in the measured fibre -/
 
 section Lock
 
 open Holonics.Aeon.Clock.Lock
 
-/-- [proved-derived; formal-checked] **The contact's lock address from its measured winding pair.**
-Whole windings `m_g` of the contact's first ring and `m_h > 0` of its second, over one passage,
-reduce by their greatest common divisor `g` to the coprime address `p/q` (`m_g = p g`, `m_h = q g`,
-`0 < q`). The passage reads `(m_g, m_h)` at the rate `p/q` and is a cycle of the two clocks there,
-and the cycles at `p/q` are exactly the passages of a multiple of `q` turns of the second clock
-(`Aeon/Clock/Lock.{lock_at_address, cycle_iff_period_dvd}`): `q` is the lock's period. -/
-theorem contact_lock_address (mg : ℤ) (mh : ℕ) (hmh : 0 < mh) :
-    0 < mh / Int.gcd mg mh ∧ IsCoprime ((mh / Int.gcd mg mh : ℕ) : ℤ) (mg / Int.gcd mg mh) ∧
-      mg = mg / Int.gcd mg mh * Int.gcd mg mh ∧ mh = mh / Int.gcd mg mh * Int.gcd mg mh ∧
-      jointReading (((mg / Int.gcd mg mh : ℤ) : ℚ) / (mh / Int.gcd mg mh : ℕ)) (mh : ℤ) =
-        ((mg : ℚ), ((mh : ℤ) : ℚ)) ∧
-      IsCycle (jointReading (((mg / Int.gcd mg mh : ℤ) : ℚ) / (mh / Int.gcd mg mh : ℕ)) (mh : ℤ)) ∧
-      ∀ k : ℤ, IsCycle (jointReading (((mg / Int.gcd mg mh : ℤ) : ℚ) / (mh / Int.gcd mg mh : ℕ)) k) ↔
-        ((mh / Int.gcd mg mh : ℕ) : ℤ) ∣ k := by
-  set g := Int.gcd mg mh with hg
-  have hgpos : 0 < g := Int.gcd_pos_of_ne_zero_right _ (by exact_mod_cast hmh.ne')
-  have hgmh : g ∣ mh := by
-    have := Int.gcd_dvd_right mg (mh : ℤ)
-    rw [← hg] at this
+/-- [definition] **The lock address of an open fibre `(a, b)`**: a rate `r` in it whose denominator
+is the least of any rational in it and which is the least of the fibre's rationals of that
+denominator (the Stern–Brocot ancestor the continued-fraction descent reaches first; the Rust owner
+`navigator::address::simplest_between`). The numerator's order decides only a fibre holding several
+integers (`least_denominator_unique`). -/
+def IsLockAddress (a b r : ℚ) : Prop :=
+  a < r ∧ r < b ∧ (∀ s : ℚ, a < s → s < b → r.den ≤ s.den) ∧
+    ∀ s : ℚ, a < s → s < b → s.den = r.den → r ≤ s
+
+/-- [proved-derived; formal-checked] **The lock address is unique.** -/
+theorem lockAddress_unique {a b r r' : ℚ} (hr : IsLockAddress a b r)
+    (hr' : IsLockAddress a b r') : r = r' := by
+  obtain ⟨h1, h2, h3, h4⟩ := hr
+  obtain ⟨h1', h2', h3', h4'⟩ := hr'
+  have hden : r.den = r'.den := le_antisymm (h3 r' h1' h2') (h3' r h1 h2)
+  exact le_antisymm (h4 r' h1' h2' hden.symm) (h4' r h1 h2 hden)
+
+/-- [proved-derived; formal-checked] Two rationals of one denominator are ordered as their
+numerators. -/
+theorem le_of_num_le_of_den_eq {r s : ℚ} (hden : s.den = r.den) (hnum : r.num ≤ s.num) :
+    r ≤ s := by
+  rw [← Rat.num_div_den r, ← Rat.num_div_den s, hden]
+  have hq : (0 : ℚ) < r.den := by exact_mod_cast r.den_pos
+  exact div_le_div_of_nonneg_right (by exact_mod_cast hnum) hq.le
+
+/-- [proved-derived; formal-checked] Of two rationals of one denominator the greater has the greater
+numerator. -/
+theorem num_lt_of_lt_of_den_eq {r s : ℚ} (hden : s.den = r.den) (hlt : r < s) :
+    r.num < s.num := by
+  by_contra h
+  exact absurd (le_of_num_le_of_den_eq hden.symm (not_lt.mp h)) (not_le.mpr hlt)
+
+/-- [proved-derived; formal-checked] **Every nonempty open fibre has its lock address**: the least
+denominator of its rationals (`Nat.find`), then the least numerator of that denominator, bounded
+below by `⌊a q⌋`. -/
+theorem lockAddress_exists {a b : ℚ} (hab : a < b) : ∃ r, IsLockAddress a b r := by
+  classical
+  have hS : ∃ q : ℕ, ∃ s : ℚ, a < s ∧ s < b ∧ s.den = q :=
+    ⟨((a + b) / 2).den, (a + b) / 2, by linarith, by linarith, rfl⟩
+  obtain ⟨s₀, hs₀a, hs₀b, hs₀q⟩ := Nat.find_spec hS
+  have hbdd : ∃ lb : ℤ, ∀ z : ℤ,
+      (∃ s : ℚ, a < s ∧ s < b ∧ s.den = Nat.find hS ∧ s.num = z) → lb ≤ z := by
+    refine ⟨⌊a * (Nat.find hS : ℚ)⌋, fun z ⟨s, hsa, _, hsq, hsz⟩ => ?_⟩
+    have hqpos : (0 : ℚ) < (Nat.find hS : ℚ) := by rw [← hsq]; exact_mod_cast s.den_pos
+    have hs : s = (z : ℚ) / (Nat.find hS : ℚ) := by
+      rw [← hsz, ← hsq]; exact (Rat.num_div_den s).symm
+    have haz : a * (Nat.find hS : ℚ) < z := by
+      rw [hs, lt_div_iff₀ hqpos] at hsa; exact hsa
+    have hfl := Int.floor_le (a * (Nat.find hS : ℚ))
+    have : ((⌊a * (Nat.find hS : ℚ)⌋ : ℤ) : ℚ) < z := lt_of_le_of_lt hfl haz
+    exact le_of_lt (by exact_mod_cast this)
+  obtain ⟨n, ⟨r, hra, hrb, hrq, hrn⟩, hmin⟩ :=
+    Int.exists_least_of_bdd hbdd ⟨s₀.num, s₀, hs₀a, hs₀b, hs₀q, rfl⟩
+  refine ⟨r, hra, hrb, fun s hsa hsb => ?_, fun s hsa hsb hsd => ?_⟩
+  · rw [hrq]; exact Nat.find_min' hS ⟨s, hsa, hsb, rfl⟩
+  · refine le_of_num_le_of_den_eq hsd ?_
+    rw [hrn]
+    exact hmin s.num ⟨s, hsa, hsb, hsd.trans hrq, rfl⟩
+
+/-- [proved-derived; formal-checked] **Between two rationals of one denominator `q ≥ 2` lies a
+rational of smaller denominator.** With `p/q` reduced, Bézout gives `q m − p t = 1` with
+`0 < t < q` (`t ≡ −p⁻¹ mod q`, and `t = 0` would make `q ∣ 1`), and `m/t = p/q + 1/(qt)` lies in
+`(p/q, (p + 1)/q]` with denominator at most `t` (the mediant cost of `Geometry/PairResonance`,
+read at the neighbour `m/t`). -/
+theorem exists_smaller_den_between {r s : ℚ} (hlt : r < s) (hden : s.den = r.den)
+    (htwo : 2 ≤ r.den) : ∃ x : ℚ, r < x ∧ x ≤ s ∧ x.den < r.den := by
+  set q : ℤ := (r.den : ℤ) with hqdef
+  set p : ℤ := r.num with hpdef
+  have hq : (0 : ℤ) < q := by rw [hqdef]; exact_mod_cast r.den_pos
+  have hcop : Int.gcd p q = 1 := by
+    have := r.reduced
+    rw [Int.gcd, hqdef, Int.natAbs_natCast]
+    exact this
+  have hb := Int.gcd_eq_gcd_ab p q
+  rw [hcop] at hb
+  set A := Int.gcdA p q
+  set B := Int.gcdB p q
+  set t : ℤ := (-A) % q with htdef
+  have ht0 : 0 ≤ t := Int.emod_nonneg _ (ne_of_gt hq)
+  have htq : t < q := Int.emod_lt_of_pos _ hq
+  have htexp : t = -A - q * ((-A) / q) := Int.emod_def _ _
+  have hdvd : q ∣ 1 + p * t := ⟨B - p * ((-A) / q), by rw [htexp]; push_cast at hb ⊢; linear_combination hb⟩
+  have ht1 : 0 < t := by
+    rcases ht0.lt_or_eq with h | h
+    · exact h
+    · exfalso
+      rw [← h, mul_zero, add_zero] at hdvd
+      have h1 : q = 1 := Int.eq_one_of_dvd_one hq.le hdvd
+      rw [hqdef] at h1
+      have : r.den = 1 := by exact_mod_cast h1
+      omega
+  obtain ⟨m, hm⟩ := hdvd
+  have hqQ : (0 : ℚ) < (q : ℚ) := by exact_mod_cast hq
+  have htQ : (0 : ℚ) < (t : ℚ) := by exact_mod_cast ht1
+  have hr : r = (p : ℚ) / q := (Rat.num_div_den r).symm
+  have hs : s = (s.num : ℚ) / q := by rw [hqdef, ← hden]; exact (Rat.num_div_den s).symm
+  have hps : p + 1 ≤ s.num := num_lt_of_lt_of_den_eq hden hlt
+  have hmQ : (q : ℚ) * m = 1 + p * t := by exact_mod_cast hm.symm
+  refine ⟨(m : ℚ) / t, ?_, ?_, ?_⟩
+  · -- m/t − p/q = 1/(qt) > 0
+    rw [hr, div_lt_div_iff₀ hqQ htQ]
+    nlinarith [hmQ]
+  · -- m/t = p/q + 1/(qt) ≤ (p + 1)/q ≤ s
+    rw [hs, div_le_div_iff₀ htQ hqQ]
+    have hps' : ((p : ℚ) + 1) ≤ (s.num : ℚ) := by exact_mod_cast hps
+    have ht1' : (1 : ℚ) ≤ t := by exact_mod_cast ht1
+    nlinarith [hmQ]
+  · have hd : (((m : ℚ) / t).den : ℤ) ∣ t := by
+      rw [← Rat.divInt_eq_div]; exact Rat.den_dvd m t
+    have := Int.le_of_dvd ht1 hd
+    have : (((m : ℚ) / t).den : ℤ) < (r.den : ℤ) := lt_of_le_of_lt this (hqdef ▸ htq)
     exact_mod_cast this
-  have hgmg : (g : ℤ) ∣ mg := Int.gcd_dvd_left mg mh
-  set q := mh / g with hq
-  set p := mg / (g : ℤ) with hp
-  have hqg : mh = q * g := (Nat.div_mul_cancel hgmh).symm
-  have hpg : mg = p * g := (Int.ediv_mul_cancel hgmg).symm
-  have hqpos : 0 < q := Nat.div_pos (Nat.le_of_dvd hmh hgmh) hgpos
-  have hcop : IsCoprime (q : ℤ) p := by
-    have hq' : ((q : ℕ) : ℤ) = (mh : ℤ) / (g : ℤ) := by rw [hq]; exact Int.natCast_div mh g
-    have h1 := Int.gcd_div_gcd_div_gcd (i := mg) (j := (mh : ℤ)) (by rw [← hg]; exact_mod_cast hgpos)
-    rw [← hg] at h1
-    rw [Int.isCoprime_iff_gcd_eq_one, hq', Int.gcd_comm]
-    exact h1
-  have hlock := lock_at_address p q hqpos (g : ℤ)
-  have hmhz : ((mh : ℕ) : ℤ) = (q : ℤ) * g := by exact_mod_cast hqg
-  refine ⟨hqpos, hcop, hpg, hqg, ?_, ?_, fun k => cycle_iff_period_dvd p q hqpos hcop k⟩
-  · rw [hmhz, hlock.1]
-    refine Prod.ext ?_ ?_
-    · show (((p * g : ℤ)) : ℚ) = (mg : ℚ)
-      rw [hpg]
-    · show (((q * g : ℤ)) : ℚ) = (((q : ℤ) * g : ℤ) : ℚ)
-      rfl
-  · rw [hmhz]; exact hlock.2.1
+
+/-- [proved-derived; formal-checked] **Past the integers the least denominator alone fixes the
+address**: two rationals of an open interval with its least denominator `q ≥ 2` are equal. -/
+theorem least_denominator_unique {a b r s : ℚ} (hra : a < r) (hrb : r < b) (hsa : a < s)
+    (hsb : s < b) (hden : s.den = r.den)
+    (hleast : ∀ x : ℚ, a < x → x < b → r.den ≤ x.den) (htwo : 2 ≤ r.den) : r = s := by
+  by_contra hne
+  rcases lt_or_gt_of_ne hne with hlt | hlt
+  · obtain ⟨x, hrx, hxs, hx⟩ := exists_smaller_den_between hlt hden htwo
+    exact absurd (hleast x (hra.trans hrx) (lt_of_le_of_lt hxs hsb)) (not_le.mpr hx)
+  · obtain ⟨x, hsx, hxr, hx⟩ := exists_smaller_den_between hlt hden.symm (hden ▸ htwo)
+    rw [hden] at hx
+    exact absurd (hleast x (hsa.trans hsx) (lt_of_le_of_lt hxr hrb)) (not_le.mpr hx)
+
+/-- [proved-derived; formal-checked] A rational's denominator and numerator are coprime. -/
+theorem isCoprime_den_num (r : ℚ) : IsCoprime (r.den : ℤ) r.num := by
+  rw [Int.isCoprime_iff_gcd_eq_one, Int.gcd, Int.natAbs_natCast]
+  exact r.reduced.symm
+
+/-- [proved-derived; formal-checked] **A rate closes at its reduced denominator**: at `r = p/q`
+every aeon of `q m` ticks reads `(p m, q m)` whole windings and is a cycle, and the cycles are
+exactly the aeons of a multiple of `q` ticks (`Aeon/Clock/Lock.{lock_at_address,
+cycle_iff_period_dvd}`): `q` is the lock's period. -/
+theorem lockAddress_closes (r : ℚ) :
+    (∀ m : ℤ, jointReading r (r.den * m) = (((r.num * m : ℤ) : ℚ), ((r.den * m : ℤ) : ℚ)) ∧
+      IsCycle (jointReading r (r.den * m))) ∧
+    ∀ k : ℤ, IsCycle (jointReading r k) ↔ (r.den : ℤ) ∣ k := by
+  have hr : ((r.num : ℚ) / (r.den : ℕ)) = r := Rat.num_div_den r
+  refine ⟨fun m => ?_, fun k => ?_⟩
+  · have h := lock_at_address r.num r.den r.den_pos m
+    rw [hr] at h
+    exact ⟨h.1, h.2.1⟩
+  · have h := cycle_iff_period_dvd r.num r.den r.den_pos (isCoprime_den_num r) k
+    rwa [hr] at h
+
+/-- [proved-derived; formal-checked] **The contact's lock address from its measured winding pair**
+(the Rust owner `hnn::contact::lock_address`). Over a passage the contact `g → h` reads its rings'
+whole windings `m_g, m_h ≥ 1`; their phases are the unresolved part, so the passage's rate
+`x_g/x_h` (`m_g ≤ x_g < m_g + 1`, `m_h ≤ x_h < m_h + 1`) lies in the open fibre
+`(m_g/(m_h + 1), (m_g + 1)/m_h)`, which holds the measured ratio `m_g/m_h`.
+* The fibre has exactly one lock address `r = p/q` (`IsLockAddress`: the least denominator, then
+  the least rate).
+* It lands in the box `1 ≤ p ≤ m_g`, `1 ≤ q ≤ m_h`: its denominator is at most the measured ratio's,
+  and `p/q < (m_g + 1)/m_h` bounds its numerator. So whenever the windings are within the lock
+  letters' bounds `(P, Q)` the address is one of them (`HNN/LandmarkAddress.lock_partition_finite`).
+* It closes at its period `q`: the cycles at `p/q` are exactly the passages of a multiple of `q`
+  turns of ring `h` (`lockAddress_closes`). -/
+theorem contact_lock_address (mg mh : ℕ) (hg : 0 < mg) (hh : 0 < mh) :
+    (∀ xg xh : ℚ, (mg : ℚ) ≤ xg → xg < mg + 1 → (mh : ℚ) ≤ xh → xh < mh + 1 →
+      (mg : ℚ) / (mh + 1) < xg / xh ∧ xg / xh < ((mg : ℚ) + 1) / mh) ∧
+    (∃! r : ℚ, IsLockAddress ((mg : ℚ) / (mh + 1)) (((mg : ℚ) + 1) / mh) r) ∧
+    ∀ r : ℚ, IsLockAddress ((mg : ℚ) / (mh + 1)) (((mg : ℚ) + 1) / mh) r →
+      (1 ≤ r.num ∧ r.num ≤ mg ∧ 1 ≤ r.den ∧ r.den ≤ mh) ∧
+        ∀ k : ℤ, IsCycle (jointReading r k) ↔ (r.den : ℤ) ∣ k := by
+  have hgQ : (0 : ℚ) < mg := by exact_mod_cast hg
+  have hhQ : (0 : ℚ) < mh := by exact_mod_cast hh
+  have hrate : ∀ xg xh : ℚ, (mg : ℚ) ≤ xg → xg < mg + 1 → (mh : ℚ) ≤ xh → xh < mh + 1 →
+      (mg : ℚ) / (mh + 1) < xg / xh ∧ xg / xh < ((mg : ℚ) + 1) / mh := by
+    intro xg xh hg1 hg2 hh1 hh2
+    have hxh : (0 : ℚ) < xh := lt_of_lt_of_le hhQ hh1
+    constructor
+    · rw [div_lt_div_iff₀ (by linarith) hxh]; nlinarith
+    · rw [div_lt_div_iff₀ hxh hhQ]; nlinarith
+  have hfibre : (mg : ℚ) / (mh + 1) < ((mg : ℚ) + 1) / mh := by
+    have := hrate mg mh le_rfl (by linarith) le_rfl (by linarith)
+    exact this.1.trans this.2
+  obtain ⟨r₀, hr₀⟩ := lockAddress_exists hfibre
+  refine ⟨hrate, ⟨r₀, hr₀, fun r hr => lockAddress_unique hr hr₀⟩, fun r hr => ⟨?_, (lockAddress_closes r).2⟩⟩
+  obtain ⟨hra, hrb, hleast, -⟩ := hr
+  have hmeas := hrate mg mh le_rfl (by linarith) le_rfl (by linarith)
+  have hden : r.den ≤ mh := by
+    have h1 := hleast ((mg : ℚ) / mh) hmeas.1 hmeas.2
+    have h2 : ((((mg : ℤ) : ℚ) / ((mh : ℤ) : ℚ)).den : ℤ) ∣ (mh : ℤ) := by
+      rw [← Rat.divInt_eq_div]; exact Rat.den_dvd _ _
+    have h3 := Int.le_of_dvd (by exact_mod_cast hh) h2
+    push_cast at h3
+    have : (((mg : ℚ) / (mh : ℚ)).den : ℤ) ≤ (mh : ℤ) := h3
+    omega
+  have hpos : 0 < r := lt_of_le_of_lt (by positivity) hra
+  have hnum1 : 1 ≤ r.num := Rat.num_pos.mpr hpos
+  have hrd : (0 : ℚ) < r.den := by exact_mod_cast r.den_pos
+  have hnumle : r.num ≤ mg := by
+    have hr' : r = (r.num : ℚ) / r.den := (Rat.num_div_den r).symm
+    rw [hr', div_lt_div_iff₀ hrd hhQ] at hrb
+    have hdQ : (r.den : ℚ) ≤ mh := by exact_mod_cast hden
+    have : (r.num : ℚ) * mh < ((mg : ℚ) + 1) * mh := by nlinarith
+    have : (r.num : ℚ) < (mg : ℚ) + 1 := lt_of_mul_lt_mul_right this hhQ.le
+    have : r.num < (mg : ℤ) + 1 := by exact_mod_cast this
+    omega
+  exact ⟨hnum1, hnumle, r.den_pos, hden⟩
 
 end Lock
 
@@ -362,6 +528,11 @@ section Audit
 #print axioms contact_boost_solve_or_singular_direction
 #print axioms contact_signed_storage_balance
 #print axioms boost_grows_at_conserved_signed_storage
+#print axioms lockAddress_unique
+#print axioms lockAddress_exists
+#print axioms exists_smaller_den_between
+#print axioms least_denominator_unique
+#print axioms lockAddress_closes
 #print axioms contact_lock_address
 
 end Audit

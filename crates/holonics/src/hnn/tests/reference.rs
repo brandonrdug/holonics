@@ -21,7 +21,7 @@ use crate::hnn::HnnError;
 use crate::hnn::constitution::Steps;
 use crate::hnn::field::Current;
 use crate::hnn::port::{ExecutionPort, ReceiptDetail};
-use crate::hnn::reference::{Cut, Exposure, Reference, WallTimes, one_hot};
+use crate::hnn::reference::{Cut, Exposure, ReadoutWall, Reference, WallTimes, one_hot};
 use crate::ratio::Rat;
 use crate::ratio::algebraic::ExactInterval;
 use crate::receiver::reception::Component;
@@ -391,6 +391,7 @@ fn one_worker_and_many_return_the_same_values() {
             .unwrap();
         let mut exposure = pool.install(|| reference.expose(&field, &cut)).unwrap();
         exposure.wall = WallTimes::default();
+        exposure.readout = ReadoutWall::default();
         exposure
     };
     let (serial, parallel) = (run(1), run(4));
@@ -424,7 +425,10 @@ fn the_baselines_read_their_exact_code_lengths_by_the_binary_logarithm() {
         assert!(binary.lower <= series.upper && series.lower <= binary.upper);
         let codes = baselines.code_cell(cell).unwrap();
         assert_eq!(codes.order_zero, code_length(&kt).unwrap());
-        assert_eq!(codes.uniform, ExactInterval::point(Rat::from_integer(2.into())));
+        assert_eq!(
+            codes.uniform,
+            ExactInterval::point(Rat::from_integer(2.into()))
+        );
         ppm.update(cell);
         counts[cell] += 1;
     }

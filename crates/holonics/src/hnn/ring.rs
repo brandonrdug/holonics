@@ -37,12 +37,15 @@
 //! [definition; agent-inferred] **The resonator receives the storage wave; it does not load it.** The
 //! word's return (`hnn::port`'s pull-back, the exact adjoint of the executed forward) does not pass
 //! through the resonator in campaign 2, so the resonator stands at the ring's storage port as a
-//! driven receiver: the port work it draws is stated in its own balance and enters the field's
-//! whole balance as the resonator's port work (`hnn::word::FieldBalance`), and the waves, the
-//! return and every campaign-1 reading are unchanged. Loading the port (the resonator's returned
-//! wave `β − (2/Y) ω` fed back into the ring's storage) needs the return through the resonator; it is
-//! the remaining scope (#73). A ring without a declared resonator (every campaign-1 constitution) has
-//! none, and its word is campaign 1's.
+//! driven receiver: the port work it draws is stated in its own balance, and the field, which
+//! receives no returned wave through that port, delivers none of it. The combined balance names
+//! that work as the interconnection's defect (Lean `HNN/Word.combined_balance_unloaded_port`,
+//! `hnn::word::FieldBalance::interconnection`), and the waves, the return and every campaign-1
+//! reading are unchanged. No covector reaches the resonator, so no deposit changes its material.
+//! Loading the port (the resonator's returned wave `β − (2/Y) ω` fed back into the ring's storage,
+//! which makes the defect zero) needs the return through the resonator; it is owed in #62. A ring
+//! without a declared resonator (every campaign-1 constitution) has none, and its word is
+//! campaign 1's.
 //!
 //! [definition; agent-inferred] **The pump's phases are finite.** The pump carrier advances by a
 //! declared rational rotation per tick; the only rational rotations of finite order in the plane are

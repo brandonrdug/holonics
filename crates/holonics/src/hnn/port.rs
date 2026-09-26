@@ -172,7 +172,7 @@ pub enum ReceiptDetail {
     /// a shielded receiver is reported as a located cause; and (Decision 24) every executed chart's
     /// reading (its certificate against the target, its refinement's steps and seed), the carried
     /// remainders the word released at its end, the last junction's residual, and each declared
-    /// resonator's balance over the word (campaign 2).
+    /// resonator's balance over the word and the word's whole balance (campaign 2).
     Refine {
         reached: Vec<Locus>,
         released_power: Rat,
@@ -184,6 +184,9 @@ pub enum ReceiptDetail {
         /// Each declared ring resonator's balance over the word (campaign 2,
         /// `hnn::word::ResonatorBalance`), in ring order; empty where none is declared.
         resonators: Vec<crate::hnn::word::ResonatorBalance>,
+        /// The whole word's balance (campaign 2, `hnn::word::WordBalance::of` its release), which
+        /// the exposure carries across the commit that follows and checks at every word.
+        word: Box<crate::hnn::word::WordBalance>,
     },
     /// `compare`: the window's code length (the KL part, enclosed), phase excess, each phase's
     /// winding, the residual of the wave's logits against the emitted ones, the loci reached, the

@@ -26,7 +26,8 @@ phase class ⌊g · fract x⌋ ∈ [0, g) ;  at x = k/d, g = d: k mod d ;  g' �
 lock        Unlocked, or reduced (p, q), 0 < p ≤ P, 0 < q ≤ Q ;  Q = the horizon H: a first return by H iff q ≤ H
 code        0 (boundary) ,  1 + x + |A| · f  (injective) ;  f = Σ v_i Π_(k<i) s_k  (mixed radix, injective)
 dominance   W_enlarged = ½ W_cells + ½ W_bundles  (the join's sequential mixture)
-            −log₂ ∏ q_join ≤ Γ(S) + 1 − log₂ ∏_(leaves of S) E + description + ρ
+            −log₂ ∏ q_join ≤ Γ(S) + 1 − log₂ ∏_(leaves of S) E  per dyadic cell
+            L ≤ L_c + |H| + ρ + ρ_c  over the passage's opened dyadic cells H
 ```
 
 [proved-derived; formal-checked] What is proved.
@@ -59,9 +60,10 @@ dominance   W_enlarged = ½ W_cells + ½ W_bundles  (the join's sequential mixtu
    rate of reduced numerator at most `P` and denominator at most `Q` has exactly one address; and
    for a reduced rate the first return of the two clocks falls within a horizon `H` exactly when
    `q ≤ H`, so `Q = H` is the greatest denominator whose first return is observable before it. The
-   last clause is the contact's own law, `HNN/Contact.contact_lock_address` (its cycles are the
-   multiples of `q`), read at the horizon: the contact's lock address and this partition are one
-   object, the reading and the finite family it lands in.
+   contact's own law (`HNN/Contact.contact_lock_address`: the least-denominator rate of the
+   measured fibre, closing at its `q`, in the box `p ≤ m_g`, `q ≤ m_h`) lands in this family
+   whenever the windings are read up to the horizon: the contact's lock address and this
+   partition are one object, the reading and the finite family it lands in.
 7. **`bundle_code_injective`.** The bundle code (`0` the boundary, `1 + x + n f` a cell `x < n` with
    feature code `f`) is injective when the feature code is; the features' mixed-radix code is
    injective on values within their slots and lies below the slots' product.
@@ -70,13 +72,14 @@ dominance   W_enlarged = ½ W_cells + ½ W_bundles  (the join's sequential mixtu
    (`LandmarkTree.sequential_mixture`); when the cell branch's product is its tree weight
    (`LandmarkTree.mixture_is_probability`), the join codes within one bit of the cell tree, and for
    every cell-only pruned tree `S` within `Γ(S) + 1` of its leaves' code
-   (`LandmarkTree.kraft_and_dominance`); an executed code within its certified drift `ρ` and
-   charged the features' description stays within the same bound plus both.
+   (`LandmarkTree.kraft_and_dominance`). Over the passage (`passage_join_bound`) the enlarged tree
+   pays at most one bit a dyadic cell opened: `−log₂ ∏_h ∏_t q_(h,t) ≤ Σ_h −log₂ W_h + |H|`
+   (`|H| ≤ 2^B − 1`, the splitting dyadic cells, `255` at `|A| = 256`); an executed enlarged code
+   within its certified drift `ρ` of the ideal join, against an executed cell-only code within `ρ_c`
+   of the cell tree, satisfies `L ≤ L_c + |H| + ρ + ρ_c`, the bound the development harness checks.
 
-[conditional] The dominance is per dyadic cell: over a cell's `B` digits the enlarged tree pays at
-most one bit a dyadic cell opened, once over the passage, before the description and the drift.
-The ideal join's weight is `½ W_cells + ½ W_bundles`; a tighter charge needs a prior reserving more
-weight for the cell branch.
+[conditional] The ideal join's weight is `½ W_cells + ½ W_bundles`; a tighter charge needs a prior
+reserving more weight for the cell branch.
 
 [open] The lock letter's reading (the contact's measured winding pair and the address selected
 from it) is the contact owner's (`HNN/Contact.contact_lock_address`), consumed here as the finite
@@ -421,9 +424,11 @@ finite partition, and the bound is the horizon.**
   one reduced address: the rates within the bounds are partitioned by their addresses.
 * For a reduced rate `p/q` the two clocks' first return falls within a horizon of `H` turns of the
   second clock exactly when `q ≤ H`: the bound `Q = H` is the greatest denominator whose first
-  return is observable before the admitted horizon. The cycles are the contact's own:
-  `HNN/Contact.contact_lock_address` at the measured pair `(p, q)` (its gcd is one) says they are
-  exactly the multiples of `q`, so this clause is that theorem's, read at the horizon. -/
+  return is observable before the admitted horizon. The cycles are the lock's own
+  (`Aeon/Clock/Lock.cycle_iff_period_dvd`: exactly the multiples of `q`), the period at which the
+  contact's address closes (`HNN/Contact.{contact_lock_address, lockAddress_closes}`); and since the
+  address of windings `(m_g, m_h)` lies in the box `p ≤ m_g`, `q ≤ m_h`, windings counted up to the
+  horizon's closing tick (`m_h ≤ H`) always land in the family. -/
 theorem lock_partition_finite (P Q : ℕ) :
     Fintype.card (LockLetter P Q) ≤ (P + 1) * (Q + 1) + 1 ∧
       (∀ r : ℚ, 0 < r → r.num ≤ P → r.den ≤ Q →
@@ -462,11 +467,7 @@ theorem lock_partition_finite (P Q : ℕ) :
       · apply Fin.ext
         simp only
         omega
-  · have hg : Int.gcd p (q : ℤ) = 1 := by
-      rw [Int.gcd_comm]
-      exact Int.isCoprime_iff_gcd_eq_one.mp hcop
-    have hcycles := (Holonics.HNN.Contact.contact_lock_address p q hq).2.2.2.2.2.2
-    simp only [hg, Nat.cast_one, Int.ediv_one, Nat.div_one] at hcycles
+  · have hcycles := Holonics.Aeon.Clock.Lock.cycle_iff_period_dvd p q hq hcop
     constructor
     · rintro ⟨k, hk0, hkH, hcyc⟩
       have := Int.le_of_dvd hk0 ((hcycles k).mp hcyc)
@@ -559,6 +560,32 @@ section Dominance
 
 variable {Ltr : Type*} [Fintype Ltr] [DecidableEq Ltr] {A : Type*} [Fintype A] [DecidableEq A]
 
+/-- [proved-derived; formal-checked] **`passage_join_bound`: one bit a dyadic cell over the
+passage.** Over the dyadic cells `H` a passage opens, each joining its cell branch's faces `a_h`
+(whose product over its routed digits is the cell-only tree's weight `W_h` there) with its bundle
+branch's faces `b_h` by the sequential mixture, the enlarged tree codes within `|H|` bits of the
+cell-only tree: `−log₂ ∏_h ∏_t q_(h,t) ≤ Σ_h −log₂ W_h + |H|`. -/
+theorem passage_join_bound {ι : Type*} (H : Finset ι) {a b : ι → ℕ → ℚ} (n : ι → ℕ)
+    (W : ι → ℚ) (ha : ∀ h t, 0 < a h t) (hb : ∀ h t, 0 < b h t)
+    (hW : ∀ h ∈ H, seqLik (a h) (n h) = W h) :
+    -Real.logb 2 ((∏ h ∈ H, ∏ t ∈ Finset.range (n h), seqMix (a h) (b h) t : ℚ) : ℝ) ≤
+      ∑ h ∈ H, -Real.logb 2 (W h : ℝ) + H.card := by
+  have hpos : ∀ h, (0 : ℝ) < ((∏ t ∈ Finset.range (n h), seqMix (a h) (b h) t : ℚ) : ℝ) := by
+    intro h
+    have lo := (sequential_mixture_bounds (ha h) (hb h) (n h)).1
+    have hA := Holonics.HNN.LandmarkTree.seqLik_pos (ha h) (n h)
+    have hmax : (0 : ℚ) < max (seqLik (a h) (n h)) (seqLik (b h) (n h)) / 2 :=
+      half_pos (lt_of_lt_of_le hA (le_max_left _ _))
+    exact_mod_cast lt_of_lt_of_le hmax lo
+  rw [Rat.cast_prod, Real.logb_prod _ _ (fun h _ => (hpos h).ne'), ← Finset.sum_neg_distrib,
+    show (H.card : ℝ) = ∑ _h ∈ H, (1 : ℝ) by simp, ← Finset.sum_add_distrib]
+  refine Finset.sum_le_sum fun h hh => ?_
+  have hbnd := (sequential_mixture_bounds (ha h) (hb h) (n h)).2.2.2
+  have hm := min_le_left (-Real.logb 2 (seqLik (a h) (n h) : ℝ))
+    (-Real.logb 2 (seqLik (b h) (n h) : ℝ))
+  rw [hW h hh] at hm hbnd
+  linarith
+
 omit [DecidableEq A] in
 /-- [proved-derived; formal-checked] **`cell_only_dominance_with_feature_charge`.** At one dyadic
 cell, let `a_t` be the cell branch's faces of its routed digits and `b_t` the bundle branch's, joined
@@ -568,28 +595,35 @@ the cell branch's faces multiply to its tree weight, `∏_(t<n) a_t = W_cells`
 * the join codes within one bit of the cell tree: `−log₂ ∏ q ≤ −log₂ W_cells + 1`;
 * for every cell-only pruned tree `S`, `−log₂ ∏ q ≤ (Γ(S) + 1) − log₂ ∏_(leaves of S) E`: the
   embedded cell tree costs its own `Γ(S)` and the join's one bit;
-* an executed code length `L` within its certified drift `ρ` of the join's, charged the features'
-  description `δ`, satisfies `L + δ ≤ (Γ(S) + 1) − log₂ ∏ E + δ + ρ`. -/
+* **over the passage, at most one bit a dyadic cell opened** (`passage_join_bound`): for the
+  dyadic cells `H` a passage opens, an executed enlarged code `L` within its certified drift `ρ`
+  of the ideal join and an executed cell-only code `L_c` within `ρ_c` of the cell tree's ideal
+  code satisfy `L ≤ L_c + |H| + ρ + ρ_c`. The features' description is charged beside it. -/
 theorem cell_only_dominance_with_feature_charge [Nonempty A] {a b : ℕ → ℚ}
     (ha : ∀ t, 0 < a t) (hb : ∀ t, 0 < b t) (N : TreeStanding Ltr A) (m : ℕ) (s : List Ltr)
     (n : ℕ) (hcell : seqLik a n = treeWeight N m s) :
     -Real.logb 2 ((∏ t ∈ Finset.range n, seqMix a b t : ℚ) : ℝ) ≤
         -Real.logb 2 (treeWeight N m s : ℝ) + 1 ∧
-      ∀ (S : PrunedTree Ltr m) (δ ρ L : ℝ),
-        L ≤ -Real.logb 2 ((∏ t ∈ Finset.range n, seqMix a b t : ℚ) : ℝ) + ρ →
+      (∀ S : PrunedTree Ltr m,
         -Real.logb 2 ((∏ t ∈ Finset.range n, seqMix a b t : ℚ) : ℝ) ≤
-            ((PrunedTree.cost m S : ℝ) + 1) - Real.logb 2 (treeLik N m s S : ℝ) ∧
-          L + δ ≤ ((PrunedTree.cost m S : ℝ) + 1) - Real.logb 2 (treeLik N m s S : ℝ) + δ + ρ := by
+          ((PrunedTree.cost m S : ℝ) + 1) - Real.logb 2 (treeLik N m s S : ℝ)) ∧
+      ∀ {ι : Type} (H : Finset ι) (a' b' : ι → ℕ → ℚ) (n' : ι → ℕ) (W : ι → ℚ),
+        (∀ h t, 0 < a' h t) → (∀ h t, 0 < b' h t) → (∀ h ∈ H, seqLik (a' h) (n' h) = W h) →
+        ∀ L Lc ρ ρc : ℝ,
+          L ≤ -Real.logb 2
+              ((∏ h ∈ H, ∏ t ∈ Finset.range (n' h), seqMix (a' h) (b' h) t : ℚ) : ℝ) + ρ →
+          ∑ h ∈ H, -Real.logb 2 (W h : ℝ) ≤ Lc + ρc →
+          L ≤ Lc + H.card + ρ + ρc := by
   have hjoin := (sequential_mixture_bounds ha hb n).2.2.2
   have hm := min_le_left (-Real.logb 2 (seqLik a n : ℝ)) (-Real.logb 2 (seqLik b n : ℝ))
   have hmin : -Real.logb 2 ((∏ t ∈ Finset.range n, seqMix a b t : ℚ) : ℝ) ≤
       -Real.logb 2 (seqLik a n : ℝ) + 1 := by linarith
   rw [hcell] at hmin
-  refine ⟨hmin, fun S δ ρ L hL => ?_⟩
-  have hdom := ((kraft_and_dominance N m s).2 S).2
-  have h1 : -Real.logb 2 ((∏ t ∈ Finset.range n, seqMix a b t : ℚ) : ℝ) ≤
-      ((PrunedTree.cost m S : ℝ) + 1) - Real.logb 2 (treeLik N m s S : ℝ) := by linarith
-  exact ⟨h1, by linarith⟩
+  refine ⟨hmin, fun S => ?_, fun H a' b' n' W ha' hb' hW L Lc ρ ρc hL hc => ?_⟩
+  · have hdom := ((kraft_and_dominance N m s).2 S).2
+    linarith
+  · have hp := passage_join_bound H n' W ha' hb' hW
+    linarith
 
 end Dominance
 
@@ -604,6 +638,7 @@ section Audit
 #print axioms phaseClass_of_exact
 #print axioms lock_partition_finite
 #print axioms bundle_code_injective
+#print axioms passage_join_bound
 #print axioms cell_only_dominance_with_feature_charge
 
 end Audit

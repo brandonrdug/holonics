@@ -56,6 +56,13 @@ standing, and `W_c` is the learned contrast port.
    rings' passive work, `Π_c`, and the junction, element and transit defects, none set to zero
    (`field_executed_balance_with_defects`); at the law's values it is `word_tick_balance`. Its
    executed consumer is `hnn::word`'s field balance, which adds the carried outputs' splits.
+8. **The commit and the unloaded port.** The deposit after a word moves the field's power of the
+   word's end change by exactly the deposition work of the contacts' storage and stiffness
+   (`field_commit_deposition`, `Holon/Deposition.deposition_work` on the power form); and beside a
+   receiver that draws port work `W` from a port through which the field delivers `δ`, the combined
+   storage moves by both balances plus the interconnection's defect `W − δ`
+   (`combined_balance_unloaded_port`). Their consumer is `hnn::word::WordBalance`, which the exposure
+   forms and checks at every word.
 
 [open] The diamond and retention laws (`Propagation` §4, `Retention`) are proved for the abstract
 `BlockOp` word, not for `fieldTick`. Writing `fieldTick` as a linear block operator family on
@@ -961,6 +968,37 @@ theorem field_executed_balance_with_defects
   rw [Finset.sum_sub_distrib] at hTsum
   linear_combination (h / 4) * hJ + hTsum + (h / 4) * hEsum
 
+omit [DecidableEq Ring] [∀ r, InnerProductSpace ℝ (V r)] [∀ r, FiniteDimensional ℝ (V r)]
+  [∀ a, FiniteDimensional ℝ (Ch a)] in
+/-- [proved-derived; formal-checked] **The deposition work at a commit** (`hnn::word::WordBalance`'s
+commit; `Holon/Deposition.deposition_work` on the field's power form). The deposit that follows a
+word changes the contacts' storage and stiffness, `C → C′` and `K → K′`, and leaves the admittances,
+the conductances and the hop, which the field declares and the lift reads. The field's power of the
+word's end change `(s, a, u, w)` then moves by exactly
+`½ Σ_a (⟨w_a, (C′_a − C_a) w_a⟩ + ⟨u_a, (K′_a − K_a) u_a⟩)`, the deposition work `½⟨x, ΔΘ x⟩`. -/
+theorem field_commit_deposition (Y : Ring → ℝ) (G : Contact → ℝ) (h : ℝ)
+    (C K C' K' : (a : Contact) → Ch a →L[ℝ] Ch a) (s : (r : Ring) → V r)
+    (arr : (e : Contact × Bool) → V (endRing e)) (u w : (a : Contact) → Ch a) :
+    fieldPower Y G h C' K' s arr u w = fieldPower Y G h C K s arr u w +
+      ∑ a, ((1 / 2) * inner ℝ (w a) ((C' a - C a) (w a)) +
+        (1 / 2) * inner ℝ (u a) ((K' a - K a) (u a))) := by
+  simp only [fieldPower, contactEnergy, sub_apply, inner_sub_right]
+  rw [add_assoc, ← Finset.sum_add_distrib]
+  congr 1
+  exact Finset.sum_congr rfl fun a _ => by ring
+
+/-- [proved-derived; formal-checked] **The combined balance with an unloaded port.** A field whose
+power moves by its own terms `F` less the power `δ` it delivers through a port, beside a receiver
+at that port whose storage moves by its own terms `R` plus the port work `W` it draws, has its
+combined storage `P + E` moving by `F + R + (W − δ)`: the interconnection's defect `W − δ` is zero
+exactly when the interconnection is power-neutral. Campaign 2's resonator draws its port work from
+the storage wave its junction sends without loading the word (the word's return does not pass
+through it), so the field delivers `δ = 0` and the defect is the port work itself: named in the one
+combined balance, not left between two separate identities (`hnn::word::WordBalance::closes`). -/
+theorem combined_balance_unloaded_port {P P' E E' F R W δ : ℝ} (hfield : P' = P + F - δ)
+    (hport : E' = E + R + W) : P' + E' = P + E + F + R + (W - δ) := by
+  rw [hfield, hport]; ring
+
 end Executed
 
 section Audit
@@ -980,6 +1018,8 @@ section Audit
 #print axioms element_executed_balance
 #print axioms transit_executed_balance
 #print axioms field_executed_balance_with_defects
+#print axioms field_commit_deposition
+#print axioms combined_balance_unloaded_port
 
 end Audit
 

@@ -41,8 +41,10 @@
 //! [definition; agent-inferred] **The declared family and its finite partitions** ([`LetterFamily`],
 //! [`Feature`]), each derived from a declaration, never a literal:
 //! - a ring's **phase class** `⌊g·phase⌋ mod g` at the ring's declared grain `g` (its period `d_g`,
-//!   the ring's own port chart, where the fibre is empty; or the half-turn sheet `g = 2` of its
-//!   parametron), `g` letters (Lean `phase_partition_finite`);
+//!   the ring's own port chart, where the fibre is empty; or `g = 2`, the half of the rotor's cycle
+//!   its clock phase `λ_g/d_g` is in), `g ≥ 2` letters (Lean `phase_partition_finite`). The grain-2
+//!   letter reads the rotor's clock, not the parametron's half-turn sheets (`hnn::ring::sheets`,
+//!   the sides of its mode amplitude against the pump's axis), which the letters do not read;
 //! - a contact's **reading** (its owner's, `hnn::contact::ContactReading`, read by
 //!   `hnn::receiving::LetterReader` from the retained clock and constitution): its **lock address**,
 //!   `Unlocked` at the declared tolerance or a reduced `(p, q)`, `1 ≤ p ≤ P`, `1 ≤ q ≤ Q`, with `Q`
@@ -51,7 +53,14 @@
 //!   bound alike (`hnn::contact::LockDeclaration::derived`; Lean `lock_partition_finite`), times
 //!   its **site kind** over the proved `SiteKind` cases (`navigator::trace::SiteKind`, five). The
 //!   slot's letter is the contact owner's (`ContactReading::letter`), so the partition and its rank
-//!   have one owner.
+//!   have one owner. A boost needs a declared signature (`ConstitutionRead::
+//!   contact_stiffness_signature`): a stiffness `K = b bᵀ ⪰ 0` reads rotations and null shears only,
+//!   whatever the data deposit.
+//!
+//! [definition; agent-inferred] **A slot carries at least two letters** ([`LetterFamily::new`]): a
+//! slot of one letter carries nothing, so no family declares one and none is charged for one. The
+//! development harness's constant-slot control (`r` slots of one letter each, the enlarged tree's
+//! own reweighting) is [`LetterFamily::constant_control`], a control and never a declared family.
 //!
 //! [definition; agent-inferred, Sol's review §2] **The enlarged tree keeps the cell-only branch.**
 //! With no features declared the tree is campaign 1's cell tree, unchanged. With `r ≥ 1` features
@@ -342,14 +351,19 @@ impl LetterFamily {
         Self::default()
     }
 
-    /// **Declare a family**, refused at an empty slot or when the slots' product passes 32 bits.
+    /// **Declare a family**, refused at a slot of fewer than two letters (one letter carries
+    /// nothing, module header) or when the slots' product passes 32 bits.
     pub fn new(features: Vec<Feature>) -> Result<Self, HnnError> {
         let mut product = 1u64;
         let mut sizes = Vec::with_capacity(features.len());
         for feature in &features {
             let size = feature.size()?;
-            if size == 0 {
-                return Err(shape("a feature slot of at least one letter", 1, 0));
+            if size < 2 {
+                return Err(shape(
+                    "a feature slot of at least two letters (one letter carries nothing)",
+                    2,
+                    usize::try_from(size).unwrap_or(usize::MAX),
+                ));
             }
             product = product.saturating_mul(size);
             if product > u64::from(u32::MAX) {
@@ -362,6 +376,18 @@ impl LetterFamily {
             sizes.push(size);
         }
         Ok(Self { features, sizes })
+    }
+
+    /// [definition; agent-inferred] **The constant-slot control of `slots` slots** (module header):
+    /// each slot reads one letter at every tick (ring 0's phase class at grain 1), so the family
+    /// carries no information and its code length against the cell-only tree is the enlarged tree's
+    /// own reweighting. A development harness's control, never a declared family ([`Self::new`]
+    /// refuses a slot of one letter), and never charged.
+    pub fn constant_control(slots: usize) -> Self {
+        Self {
+            features: vec![Feature::Phase { ring: 0, grain: 1 }; slots],
+            sizes: vec![1; slots],
+        }
     }
 
     pub fn features(&self) -> &[Feature] {
@@ -2473,6 +2499,30 @@ impl Landmarks {
         Ok(reading)
     }
 
+    /// **The nodes and joins a deposit touches** (the mirror's per-deposit lockstep): the founded
+    /// nodes of every branch's path of every digit `class` opens at `address`, and the opened
+    /// dyadic cells (whose joins an enlarged tree steps), read at the current standing: after the
+    /// deposit every node of its paths is founded. Each sorted, without repeats.
+    pub fn touched(
+        &self,
+        address: &[Letter],
+        class: usize,
+    ) -> Result<(Vec<u32>, Vec<usize>), HnnError> {
+        check(&self.law.declaration, address, class)?;
+        let (mut nodes, mut dyadic) = (Vec::new(), Vec::new());
+        for digit in self.law.reads(&self.nodes, address, class) {
+            dyadic.push(digit.dyadic);
+            for read in digit.reads {
+                nodes.extend(read.nodes);
+            }
+        }
+        nodes.sort_unstable();
+        nodes.dedup();
+        dyadic.sort_unstable();
+        dyadic.dedup();
+        Ok((nodes, dyadic))
+    }
+
     /// **The arena as flat words** (module header, "The arena"; the layout the card ports): the
     /// roots per tree (`u32::MAX` unfounded), the children as `(key, child)` pairs, each node's
     /// depth word and masses, each node's chart `(β_n, β_d, β_e, λ̂)`, and each join's.
@@ -2549,6 +2599,16 @@ impl ArenaView<'_> {
     /// Each dyadic cell's join chart (empty unless enlarged).
     pub fn joins(&self) -> Vec<ChartWords> {
         self.tree.nodes.joins.iter().map(chart_words).collect()
+    }
+
+    /// One node's chart; `None` past the founded nodes.
+    pub fn chart(&self, node: u32) -> Option<ChartWords> {
+        self.tree.nodes.charts.get(node as usize).map(chart_words)
+    }
+
+    /// One dyadic cell's join chart; `None` unless enlarged.
+    pub fn join(&self, dyadic: usize) -> Option<ChartWords> {
+        self.tree.nodes.joins.get(dyadic).map(chart_words)
     }
 
     /// Each branch's letters of an address (the cells, then the flattened bundles).

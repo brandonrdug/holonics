@@ -30,6 +30,7 @@ use holonics::hnn::port::{ElementTick, TransitTick, WordReturn};
 use holonics::hnn::propagation::TickBalance;
 use holonics::hnn::ratio::Faces;
 use holonics::hnn::receiving::ReceivingRead;
+use holonics::hnn::word::EndChange;
 use holonics::hnn::{ChartReading, Field, HnnError, RatioCovector, Released, Remainders};
 use holonics::ratio::Rat;
 
@@ -86,6 +87,49 @@ impl<'a> Change<'a> {
             arrivals: &record.final_arrivals,
             u: &record.final_u,
             w: &record.final_w,
+        }
+    }
+
+    /// **The change as the host's `EndChange`** (`holonics::hnn::word::EndChange`): the storage
+    /// waves per ring, the arriving waves per contact `[at from, at to]` and the states `[u, w]`,
+    /// each coordinate on `2^(−L_w)ℤ`.
+    fn end(&self, plan: &WordPlan) -> EndChange {
+        let values = |words: &[i64]| -> Vec<Rat> {
+            words
+                .iter()
+                .map(|&x| rat(BigInt::from(x), plan.lw))
+                .collect()
+        };
+        EndChange {
+            storage: plan
+                .rings
+                .iter()
+                .map(|ring| values(slice(self.storage, ring.rows, ring.width)))
+                .collect(),
+            arrivals: plan
+                .contacts
+                .iter()
+                .map(|contact| {
+                    let widths = [
+                        plan.rings[contact.ends.0].width,
+                        plan.rings[contact.ends.1].width,
+                    ];
+                    [
+                        values(slice(self.arrivals, contact.arrival[0], widths[0])),
+                        values(slice(self.arrivals, contact.arrival[1], widths[1])),
+                    ]
+                })
+                .collect(),
+            states: plan
+                .contacts
+                .iter()
+                .map(|contact| {
+                    [
+                        values(slice(self.u, contact.rows, contact.width)),
+                        values(slice(self.w, contact.rows, contact.width)),
+                    ]
+                })
+                .collect(),
         }
     }
 }
@@ -427,8 +471,8 @@ pub(crate) fn storage_waves(
 }
 
 /// **The word's release read at its end** (`Word::released`): its unread change's power, its
-/// steps, the peak bits of its change, every full tick's balance, the last junction's residual,
-/// its carried remainders and its charts' readings.
+/// steps, the peak bits of its change, every full tick's balance, the last junction's residual and
+/// bound, the end change, its carried remainders and its charts' readings.
 pub(crate) fn released(
     plan: &WordPlan,
     loci: &Loci,
@@ -474,9 +518,12 @@ pub(crate) fn released(
         });
         before = after;
     }
-    let last = (0..rings)
-        .map(|g| junction(plan, record, steps - 1, g).0)
-        .sum();
+    let (mut last, mut last_bound) = (Rat::zero(), Rat::zero());
+    for g in 0..rings {
+        let (residual, bound) = junction(plan, record, steps - 1, g);
+        last += residual;
+        last_bound += bound;
+    }
     // The peak bits of the change at the open and after each full tick.
     let mut peak = 0u64;
     for step in 0..steps {
@@ -529,6 +576,8 @@ pub(crate) fn released(
         peak_bits: peak,
         balances,
         last,
+        last_bound,
+        end: Change::after(plan, record).end(plan),
         remainders: Remainders::of(&remainders),
         charts: executed.readings.to_vec(),
         // The port reads the resonators' balance from their own resident word

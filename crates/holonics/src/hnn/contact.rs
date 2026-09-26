@@ -7,11 +7,13 @@
 //! ```text
 //! transfer   m = 2c + p + h d + (h²/2) k ,   T = (1/m) [[m − h²k, 2hc], [−2hk, 4c − m]]
 //!            tr T = (4c − h²k)/m ,   det T = (2c + h²k/2 − p − hd)/m       p = 2h/G, or 0 closed
-//! kind       closed, lossless, c > 0, 4c + h²k ≠ 0:  k > 0 rotation, k = 0 null shear, k < 0 boost
+//! kind       closed, lossless, c > 0, 4c + h²k ≠ 0:  k > 0 rotation, k = 0 null shear, k < 0 boost;
+//!            the chart's hypothesis checked on every mode (2C + (h²/2)K nonsingular), else refused
 //! boost      K = b diag(σ) bᵀ, σ ∈ {±1}; admitted only where M_a = 2C + (2h/G)I + hD + (h²/2)K is
 //!            nonsingular, a refusal carrying its singular direction
-//! lock       whole windings (m_g, m_h) over a passage: the simplest rate in their fibre
-//!            (m_g/(m_h + 1), (m_g + 1)/m_h) with denominator at most Q, or Unlocked
+//! lock       whole windings (m_g, m_h) over a passage: the least-denominator rate p/q in their fibre
+//!            (m_g/(m_h + 1), (m_g + 1)/m_h), p ≤ m_g, q ≤ m_h; Locked within (P, Q) = the horizon,
+//!            else Unlocked
 //! break      R = E_a + W_a − D_a − E_a′ ,   an advance is admitted when R ≥ J = γ·(parted extent)
 //! ```
 //!
@@ -22,7 +24,10 @@
 //! the inertia of `K` (Sylvester's law, [`crate::ratio::linear::inertia`], [proved-standard]), so the
 //! contact's **kind census** is `(n₊(K), n₀(K), n₋(K))` rotations, null shears and boosts, and its
 //! **kind** is its least stable mode's: a boost if any, else a null shear if any, else a rotation
-//! ([`site_reading`]). A contact whose storage is not definite on its channel reads
+//! ([`site_reading`]). The sign rule's Cayley-chart hypothesis `2 + (h²/2)μ ≠ 0` is checked at every
+//! mode, as the nonsingularity of `2C + (h²/2)K`, and a contact where it fails is refused, not read.
+//! Without a declared stiffness signature `K = b bᵀ ⪰ 0`, so no deposit can make a boost: the kinds
+//! are rotations and null shears. A contact whose storage is not definite on its channel reads
 //! [`SiteKind::Degenerate`]: the sign rule's hypothesis `c > 0` fails there (a massless direction's
 //! transfer is the half-turn shear, `tr = −2`, and a direction with neither storage nor stiffness has
 //! no Cayley chart). A port-loaded or damped transfer is classified by its own trace and
@@ -39,24 +44,35 @@
 //! (`boost_grows_at_conserved_signed_storage`), and the word releases the expanding change with its
 //! other unread change at its end.
 //!
-//! [definition; agent-inferred] **The lock address and its finite family.** A contact `a = (g → h)`
-//! reads its two rings' whole windings over a passage, the difference of their lift points' windings
-//! (the signed count is the flux, Lean `Aeon/Clock/Epoch.signed_count_is_flux`). The rings' phases
-//! are the unresolved part at the winding grain, so the rates consistent with the reading are the
-//! open fibre `(m_g/(m_h + 1), (m_g + 1)/m_h)`, which holds the measured ratio `m_g/m_h`, whose
-//! reduced address the passage closes at (Lean `contact_lock_address`). The lock address is the
-//! simplest rate in the fibre, the least-denominator lock (Lean `Geometry/PairResonance`, the owner
-//! [`simplest_between`]); it is **Locked** `(p, q)` when `q ≤ Q`, and **Unlocked** otherwise, or when
-//! either ring has not wound. `Q` is the greatest denominator whose first return (`q` turns of ring
-//! `h`) is observable before the admitted horizon ([`LockDeclaration::derived`]: within one aeon of
-//! the joint clock ring `h` winds fewer than `∏_(j>h) d_j` times, the carry chain's bound, so
-//! `Q = ∏_(j>h) d_j − 1`, and the numerator is held to ring `g`'s bound `P` alike).
+//! [proved-derived; implemented-exact] **The lock address** ([`lock_address`], Lean
+//! `HNN/Contact.contact_lock_address`). A contact `a = (g → h)` reads its two rings' whole windings
+//! over a passage, the difference of their lift points' windings (the signed count is the flux, Lean
+//! `Aeon/Clock/Epoch.signed_count_is_flux`). The rings' phases are the unresolved part at the
+//! winding grain, so the rates consistent with the reading are the open fibre
+//! `(m_g/(m_h + 1), (m_g + 1)/m_h)`, which holds the measured ratio `m_g/m_h`. The lock address is
+//! the fibre's least-denominator rate, the least of that denominator (Lean `IsLockAddress`; the owner
+//! [`simplest_between`], its Stern–Brocot descent). It exists and is unique
+//! (`lockAddress_exists`, `lockAddress_unique`; past the integers the denominator alone fixes it,
+//! `least_denominator_unique`), it closes at its period `q` (`lockAddress_closes`: the cycles are the
+//! multiples of `q`), and it lies in the box `1 ≤ p ≤ m_g`, `1 ≤ q ≤ m_h`. It is **Locked** `(p, q)`
+//! within the declared bounds and **Unlocked** otherwise, or when either ring has not wound.
+//!
+//! [definition; agent-inferred] **The bounds are the horizon** ([`LockDeclaration::derived`]). The
+//! carry chain's horizon is `B_r = ∏_(j>r) d_j` windings of ring `r` an aeon of the joint clock (`1`
+//! for the last ring): each winding of ring `r + 1` takes `d_(r+1)` steps, its predecessor's carries
+//! (campaign 1's readout: ring 2 winds `13 = d_3` times and ring 3 once, every aeon). The reader reads
+//! the letter of the aeon's closing tick before the carry-out restarts the windings
+//! (`hnn::receiving::LetterReader::tick`), so the windings it reads reach `B_r`. The bound is the true
+//! horizon, `Q = B_h` and `P = B_g` (Lean `lock_partition_finite`, `Q = H`): the greatest denominator
+//! whose first return (`q` turns of ring `h`) is observable within the aeon, and by the box every
+//! address of windings within the horizon lands in the family. A count past it (a ring above stepping
+//! by its own lock as well as by carries) reads **Unlocked**, a lawful letter.
 //!
 //! [definition; agent-inferred] **The lock letters** (the receiving join's contact letter,
 //! `hnn::landmark::Feature::Contact`). The addresses a contact can read form the finite family
 //! `{Unlocked} ∪ {(p, q) reduced : 1 ≤ p ≤ P, 1 ≤ q ≤ Q}` (Lean
-//! `HNN/LandmarkAddress.lock_partition_finite`, whose observability clause is derived from
-//! `contact_lock_address`'s cycles): a box, not the Farey family `F_Q` of `[0, 1]`, since the
+//! `HNN/LandmarkAddress.lock_partition_finite`, whose horizon clause is the address's period,
+//! `lockAddress_closes`): a box, not the Farey family `F_Q` of `[0, 1]`, since the
 //! contact `g → h` reads its rate in its declared orientation, which lies above one where ring `g`
 //! winds faster (campaign 1's `0 → 1` and `1 → 2`). Its letter is `0` unlocked and `1 +` the rank
 //! ordered by `(q, p)` ([`ContactLock::code`]), and a contact's reading is that letter times its
@@ -78,7 +94,8 @@
 //! | `HNN/Contact.contact_transfer_kind_by_storage_sign`, `contact_mode_transfer` | [`Transfer::site`], [`site_reading`] |
 //! | `HNN/Contact.contact_boost_solve_or_singular_direction` | [`certify_boost`], [`signed_form_certifies`] |
 //! | `HNN/Contact.contact_signed_storage_balance`, `boost_grows_at_conserved_signed_storage` | tests (the transit's balance at an indefinite `K`) |
-//! | `HNN/Contact.contact_lock_address`; `Geometry/PairResonance` | [`lock_address`], [`ContactLock`] |
+//! | `HNN/Contact.{IsLockAddress, lockAddress_exists, lockAddress_unique, exists_smaller_den_between, least_denominator_unique, lockAddress_closes, contact_lock_address}` | [`lock_address`] (through [`simplest_between`]), [`ContactLock`] |
+//! | `HNN/LandmarkAddress.lock_partition_finite` (`Q = H`, the horizon) | [`LockDeclaration::derived`] |
 //! | `HNN/LandmarkAddress.lock_partition_finite` (the finite family the address lands in) | [`LockDeclaration::letters`], [`ContactLock::code`], [`ContactReading::letter`] |
 //! | `HNN/ContactBreak.{break_release_balance, break_iff_release_covers_gluing, griffith_closed_port_case}` | [`BreakReceipt`] |
 //! | `HNN/ContactBreak.parting_returns_gluing_defect` | [`crate::hnn::Field::parted_holon`] |
@@ -168,12 +185,17 @@ pub(crate) fn symmetric(form: &ExactRatMatrix) -> Result<SymmetricForm, HnnError
         .map_err(|refusal| HnnError::from(crate::holon::contact::ContactError::from(refusal)))
 }
 
-/// **The contact's site reading** from its storage `C_a` and signed stiffness `K_a` (module
-/// header): with `C_a ≻ 0` the census is the inertia of `K_a`, and the kind a boost if any mode is,
-/// else a null shear if any is, else a rotation.
+/// **The contact's site reading** from its storage `C_a` and signed stiffness `K_a` at the hop `h`
+/// (module header): with `C_a ≻ 0` the census is the inertia of `K_a`, and the kind a boost if any
+/// mode is, else a null shear if any is, else a rotation. The sign rule's Cayley-chart hypothesis
+/// (Lean `contact_transfer_kind_by_storage_sign`, `transferDen(1, μ, 0, 0, h) = 2 + (h²/2)μ ≠ 0` at
+/// every generalized mode `K v = μ C v`) is checked: with `C ≻ 0` it holds exactly when the closed
+/// denominator `2C + (h²/2)K` is nonsingular (it sends a mode `v` to `(2 + (h²/2)μ) C v`), and a
+/// contact where it fails is refused ([`HnnError::SingularTransfer`]): no kind is read there.
 pub fn site_reading(
     storage: &ExactRatMatrix,
     stiffness: &ExactRatMatrix,
+    step: &Rat,
 ) -> Result<SiteReading, HnnError> {
     if storage.rows() == 0 || !inertia(&symmetric(storage)?).is_positive_definite() {
         return Ok(SiteReading {
@@ -182,6 +204,15 @@ pub fn site_reading(
         });
     }
     let signs = inertia(&symmetric(stiffness)?);
+    if signs.negative > 0 {
+        // Only an indefinite stiffness can meet `2 + (h²/2)μ = 0` (`μ = −4/h²`); `K ⪰ 0` never does.
+        let closed = storage
+            .scaled(&integer(2))
+            .add(&stiffness.scaled(&(step * step / integer(2))))?;
+        if inertia(&symmetric(&closed)?).zero > 0 {
+            return Err(HnnError::SingularTransfer);
+        }
+    }
     let census = KindCensus {
         rotation: signs.positive,
         null: signs.zero,
@@ -332,21 +363,16 @@ pub struct LockDeclaration {
 }
 
 impl LockDeclaration {
-    /// **The bound derived from the field** (module header): ring `r` winds fewer than
-    /// `B_r = ∏_(j>r) d_j` times within one aeon of the joint clock, so the first return of `q` turns
-    /// of the contact's second ring is observable within the aeon when `q ≤ B_h − 1`, and the first
-    /// ring's `p` turns when `p ≤ B_g − 1`.
+    /// **The bound derived from the field** (module header, "The bounds are the horizon"): ring `r`
+    /// winds at most `B_r = ∏_(j>r) d_j` times within one aeon of the joint clock, and the letter of
+    /// the aeon's closing tick is read before the windings restart, so `Q = B_h` and `P = B_g`, the
+    /// horizon (Lean `lock_partition_finite`, `Q = H`).
     pub fn derived(field: &Field, contact: usize) -> Self {
         let bound = |ring: usize| -> BigUint {
-            let horizon: BigUint = field.rings()[ring + 1..]
+            field.rings()[ring + 1..]
                 .iter()
                 .map(|later| BigUint::from(later.period()))
-                .product();
-            if horizon.is_zero() {
-                BigUint::zero()
-            } else {
-                horizon - BigUint::one()
-            }
+                .product()
         };
         let (g, h) = field.contact(contact).ends();
         Self {
@@ -425,9 +451,10 @@ fn coprime_up_to(n: u64, q: u64) -> u64 {
     u64::try_from(count).expect("a count of integers is nonnegative")
 }
 
-/// **The lock address of a measured winding pair** (module header): the simplest rate in the open
-/// fibre `(m_g/(m_h + 1), (m_g + 1)/m_h)` when both rings have wound, Locked when its reduced parts
-/// lie within the declared bounds.
+/// **The lock address of a measured winding pair** (module header; Lean
+/// `HNN/Contact.contact_lock_address`): the least-denominator rate of the open fibre
+/// `(m_g/(m_h + 1), (m_g + 1)/m_h)` when both rings have wound (`IsLockAddress`, unique, closing at
+/// its `q`, with `p ≤ m_g`, `q ≤ m_h`), Locked when its reduced parts lie within the declared bounds.
 pub fn lock_address(first: &BigInt, second: &BigInt, bound: &LockDeclaration) -> ContactLock {
     if !first.is_positive() || !second.is_positive() {
         return ContactLock::Unlocked;
@@ -547,7 +574,7 @@ pub fn site_readings(
                 constitution.contact_stiffness(contact),
                 constitution.contact_stiffness_signature(contact),
             )?;
-            site_reading(&storage, &stiffness)
+            site_reading(&storage, &stiffness, field.step())
         })
         .collect()
 }

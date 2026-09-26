@@ -755,6 +755,15 @@ fn landmark_enlarged_tree_keeps_the_cell_only_branch() {
     let with_letters = executed(&enlarged, &letters);
     let cells = executed(&cells_only, &cell_letters(&stream));
     assert!(with_letters.upper < cells.lower);
+    // The executed passage bound (`passage_join_bound`, the dominance's third clause): within one
+    // bit a dyadic cell opened of the cell tree's code, plus both trees' certified drift (the rule
+    // a cell times the cells).
+    let drift = (Landmarks::new(enlarged.clone()).unwrap().face_rule()
+        + Landmarks::new(cells_only.clone()).unwrap().face_rule())
+        * Rat::from_integer(BigInt::from(stream.len()));
+    assert!(
+        with_letters.upper <= &cells.lower + Rat::from_integer(BigInt::from(opened.len())) + drift
+    );
 }
 
 /// **A window's faces in cell order on the enlarged tree** (`Landmarks::window_faces`): phase `j`

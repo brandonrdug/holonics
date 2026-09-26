@@ -24,7 +24,7 @@ use crate::hnn::ring::{
     PumpDeclaration, PumpStep, ResonatorMaterial, ResonatorOperands, ResonatorRemainders,
     RingClock, port_scattering, sheets,
 };
-use crate::hnn::word::Word;
+use crate::hnn::word::{PowerForm, Word, WordBalance};
 use crate::holarchy::GluingDefect;
 use crate::holon::parametron::{Carrier, Parametron, Population, pump_storage};
 use crate::navigator::address::{are_neighbours, mediant};
@@ -141,10 +141,14 @@ fn quadratic(form: &ExactRatMatrix, v: &[Rat]) -> Rat {
 // the ring
 
 /// Lean `HNN/Ring.{ring_generator_qSkew, cayley_preserves_form, ring_tick_conserves_mode_energy,
-/// ring_descriptor_tick_conserves}`: for `Q = diag(K, C)` with `C` invertible the ring's generator
-/// `A = [[0, 1], [−C⁻¹K, 0]]` has `QA` skew, the Cayley tick `U = (1 + hA/2)(1 − hA/2)⁻¹` keeps
-/// `UᵀQU = Q` exactly (and does not keep the Euclidean norm), and the descriptor tick the resonator
-/// solves, with no `C⁻¹`, is `U` and conserves `E_Q` exactly on random states.
+/// cayley_forms_agree, ring_descriptor_tick_conserves}`: for `Q = diag(K, C)` with `C` invertible the
+/// ring's generator `A = [[0, 1], [−C⁻¹K, 0]]` has `QA` skew, the Cayley tick
+/// `U = (1 + hA/2)(1 − hA/2)⁻¹` keeps `UᵀQU = Q` exactly (and does not keep the Euclidean norm), and
+/// the closed descriptor form, with no `C⁻¹`, is `U` and conserves `E_Q` exactly on random states
+/// (the Lean statements, formed here). The owner that runs the closed descriptor tick is the
+/// contact's scalar transfer at `p = d = 0` (`hnn::contact::transfer`, one generalized mode,
+/// `contact_mode_transfer`), which conserves `½cw² + ½ku²` of any sign exactly; the resonator
+/// (`ResonatorOperands::step`) runs the ported tick, whose balance is `ring_tick_port_balance`.
 #[test]
 fn the_ring_tick_conserves_its_mode_energy_exactly() {
     // The grounded parametron: the cycle's capacity plus the identity is definite.
@@ -228,6 +232,20 @@ fn the_ring_tick_conserves_its_mode_energy_exactly() {
         let z: Vec<Rat> = u.iter().chain(&w).cloned().collect();
         let z2: Vec<Rat> = u2.iter().chain(&w2).cloned().collect();
         assert_eq!(u_tick.apply(&z).unwrap(), z2);
+        // The owner: the closed scalar transfer conserves its mode's storage, stiffness of any
+        // sign, wherever its Cayley chart exists.
+        let pick = draw.vector(4);
+        let (c1, k1) = (pick[0].abs() + rat(1, 8), &pick[1] - rat(1, 2));
+        let (u1, w1) = (pick[2].clone(), pick[3].clone());
+        if c1.is_positive()
+            && let Ok(closed) = transfer(&c1, &k1, &Rat::zero(), &Rat::zero(), &h)
+        {
+            let [u2, w2] = closed.apply([&u1, &w1]);
+            assert_eq!(
+                &c1 * &w2 * &w2 + &k1 * &u2 * &u2,
+                &c1 * &w1 * &w1 + &k1 * &u1 * &u1
+            );
+        }
     }
 }
 
@@ -512,6 +530,23 @@ fn the_field_balance_closes_at_every_tick_and_the_resonator_moves_no_wave() {
         let balance = word.word_balance().unwrap();
         assert!(balance.closes(), "{balance:?}");
         assert!(plain.word_balance().unwrap().closes());
+        // The unloaded port is named (Lean `combined_balance_unloaded_port`): the field delivers
+        // none of the resonators' port work, so the interconnection's defect is that work, and the
+        // one combined identity fails without it, per tick and over the word.
+        assert_eq!(balance.interconnection, balance.port);
+        assert!(!balance.interconnection.is_zero());
+        let mut unnamed = balance.clone();
+        unnamed.interconnection = Rat::zero();
+        assert!(!unnamed.closes());
+        for field_balance in word.field_balances() {
+            assert_eq!(field_balance.interconnection, field_balance.port);
+            if !field_balance.port.is_zero() {
+                let mut unnamed = field_balance.clone();
+                unnamed.interconnection = Rat::zero();
+                assert!(!unnamed.closes());
+            }
+        }
+        assert!(plain.word_balance().unwrap().interconnection.is_zero());
         // The release returns each resonator's balance (`ResonatorBalance`), which closes, and
         // whose ends and terms sum to the word balance's; a word without resonators returns none.
         let released = word.released().unwrap();
@@ -690,7 +725,8 @@ fn a_generalized_mode_is_a_plane_of_the_scalar_transfer() {
     // The census: C = I and K of inertia (2, 1, 1).
     let k = ExactRatMatrix::from_diagonal(vec![integer(2), Rat::zero(), integer(-1), rat(1, 2)])
         .unwrap();
-    let reading = site_reading(&identity(4), &k).unwrap();
+    let hop = integer(1);
+    let reading = site_reading(&identity(4), &k, &hop).unwrap();
     assert_eq!(
         (
             reading.census.rotation,
@@ -703,20 +739,80 @@ fn a_generalized_mode_is_a_plane_of_the_scalar_transfer() {
     let psd = ExactRatMatrix::from_diagonal(vec![integer(2), Rat::zero(), integer(1), rat(1, 2)])
         .unwrap();
     assert_eq!(
-        site_reading(&identity(4), &psd).unwrap().kind,
+        site_reading(&identity(4), &psd, &hop).unwrap().kind,
         SiteKind::Null
     );
     assert_eq!(
-        site_reading(&identity(4), &identity(4)).unwrap().kind,
+        site_reading(&identity(4), &identity(4), &hop).unwrap().kind,
         SiteKind::Rotation
     );
     let singular =
         ExactRatMatrix::from_diagonal(vec![integer(1), Rat::zero(), integer(1), integer(1)])
             .unwrap();
     assert_eq!(
-        site_reading(&singular, &identity(4)).unwrap().kind,
+        site_reading(&singular, &identity(4), &hop).unwrap().kind,
         SiteKind::Degenerate
     );
+    // The Cayley chart's hypothesis `2 + (h²/2)μ ≠ 0` (Lean `contact_transfer_kind_by_storage_sign`):
+    // at `h = 1` the boost mode `μ = −4` makes `2C + (h²/2)K` singular, and the reading is refused;
+    // at `h = 1/2` the same mode reads a boost.
+    let chartless =
+        ExactRatMatrix::from_diagonal(vec![integer(2), integer(-4), integer(1), integer(1)])
+            .unwrap();
+    assert!(matches!(
+        site_reading(&identity(4), &chartless, &hop),
+        Err(HnnError::SingularTransfer)
+    ));
+    assert!(transfer(&Rat::one(), &integer(-4), &Rat::zero(), &Rat::zero(), &hop).is_err());
+    assert_eq!(
+        site_reading(&identity(4), &chartless, &rat(1, 2))
+            .unwrap()
+            .kind,
+        SiteKind::Boost
+    );
+}
+
+/// Lean `HNN/Word.field_commit_deposition` (`hnn::word::{WordBalance, PowerForm}`): the word's
+/// balance, formed from its release, closes; carried across a deposit that moves the contacts'
+/// storage and stiffness, the end change's committed power is its power plus the deposition work
+/// `½⟨x, ΔΘ x⟩` formed from the forms' differences, and the balance closes with it; a misstated
+/// deposition breaks the identity; a commit that leaves `Θ` does no work; on the word's lattices and
+/// under the exact law.
+#[test]
+fn the_word_balance_closes_across_its_commit() {
+    for field in [chain(), chain().with_exact_word()] {
+        let field = &field;
+        let medium = Medium::encoding(field, 41);
+        let (current, moment) = cut(field);
+        let phases =
+            ReceivingPhases::declare(field, &medium, &current, &field.receivers()[0]).unwrap();
+        let mut word = Word::open(field, &medium, &current, &moment).unwrap();
+        word.forward(&phases).unwrap();
+        let released = word.released().unwrap();
+        let mut balance = WordBalance::of(&released);
+        assert!(balance.closes(), "{balance:?}");
+        assert_eq!(balance, word.word_balance().unwrap());
+        let mut deposited = medium.clone();
+        for contact in 0..field.contacts().len() {
+            deposited.storage[contact] = deposited.storage[contact].scaled(&rat(3, 2));
+            deposited.stiffness[contact] = deposited.stiffness[contact].scaled(&rat(1, 2));
+        }
+        let before = PowerForm::read(field, &medium, &current).unwrap();
+        let after = PowerForm::read(field, &deposited, &current).unwrap();
+        assert_eq!(before.power(&balance.change).unwrap(), balance.end);
+        balance.commit(&before, &after).unwrap();
+        let commit = balance.commit.clone().unwrap();
+        assert!(!commit.deposition.is_zero());
+        assert_eq!(commit.committed, &balance.end + &commit.deposition);
+        assert!(balance.closes(), "{balance:?}");
+        let mut misstated = balance.clone();
+        misstated.commit.as_mut().unwrap().deposition = Rat::zero();
+        assert!(!misstated.closes());
+        let mut unmoved = WordBalance::of(&released);
+        unmoved.commit(&before, &before).unwrap();
+        assert!(unmoved.commit.as_ref().unwrap().deposition.is_zero());
+        assert!(unmoved.closes());
+    }
 }
 
 /// Lean `HNN/Contact.{contact_boost_solve_or_singular_direction, contact_signed_storage_balance,
@@ -869,10 +965,12 @@ fn a_certified_boost_runs_in_the_word_and_reads_as_a_boost() {
     }
 }
 
-/// Lean `HNN/Contact.contact_lock_address`, `Geometry/PairResonance` and `Aeon/Clock/Lock`: the
-/// lock address of a measured winding pair is the least-denominator rate in its fibre, a mediant of
-/// neighbours where the fibre straddles one, Unlocked beyond the bound or before a ring winds; two
-/// clocks at the address close at its period with whole windings.
+/// Lean `HNN/Contact.{contact_lock_address, IsLockAddress, lockAddress_closes}`,
+/// `Geometry/PairResonance` and `Aeon/Clock/Lock`: the lock address of a measured winding pair is
+/// the least-denominator rate in its fibre, the least of that denominator (the brute force's first),
+/// in the box `p ≤ m_g`, `q ≤ m_h`, a mediant of neighbours where the fibre straddles one, Unlocked
+/// beyond the bound or before a ring winds; two clocks at the address close at its period with
+/// whole windings; and the derived bound is the horizon `∏_(j>r) d_j` (Lean `lock_partition_finite`).
 #[test]
 fn lock_addresses_mediants_and_whole_windings() {
     let bound = LockDeclaration {
@@ -901,7 +999,9 @@ fn lock_addresses_mediants_and_whole_windings() {
                         BigInt::from(denominator.clone()),
                     );
                     assert!(lower < address && address < upper);
-                    assert_eq!(address.denom(), least.denom());
+                    assert_eq!(address, least);
+                    assert!(numerator <= &BigUint::from(first as u64));
+                    assert!(denominator <= &BigUint::from(second as u64));
                     // Two clocks at the address close at its period with whole windings.
                     let clocks = TwoClocks::new(address.clone()).unwrap();
                     let aeon = clocks.aeon(denominator).unwrap();
@@ -939,11 +1039,26 @@ fn lock_addresses_mediants_and_whole_windings() {
         lock_address(&BigInt::from(3), &BigInt::zero(), &bound),
         ContactLock::Unlocked
     );
-    // The derived bound: ring r winds fewer than ∏_(j>r) d_j times an aeon.
+    // The derived bound is the horizon: ring r winds at most ∏_(j>r) d_j times an aeon, the last
+    // ring once, and the closing tick's letter reads them all.
     let campaign = Field::declare(FieldDeclaration::campaign_one(1 << 17)).unwrap();
     let derived = LockDeclaration::derived(&campaign, 3);
-    assert_eq!(derived.denominator, BigUint::from(7u32 * 11 * 13 - 1));
-    assert_eq!(derived.numerator, BigUint::zero());
+    assert_eq!(derived.denominator, BigUint::from(7u32 * 11 * 13));
+    assert_eq!(derived.numerator, BigUint::one());
+    let into_last = LockDeclaration::derived(&campaign, 2);
+    assert_eq!(into_last.denominator, BigUint::one());
+    assert_eq!(into_last.numerator, BigUint::from(13u32));
+    // Every contact's family carries more than one letter: no slot is constant by construction.
+    for contact in 0..campaign.contacts().len() {
+        let bound = LockDeclaration::derived(&campaign, contact);
+        assert!(bound.letters().unwrap() >= 2, "contact {contact}");
+    }
+    // At the horizon every address of windings within it lands in the family: the closing tick of
+    // contact 2 (m_2 = 13 = d_3 windings of ring 2, one of ring 3) is Locked.
+    assert!(matches!(
+        lock_address(&BigInt::from(13), &BigInt::one(), &into_last),
+        ContactLock::Locked { .. }
+    ));
 }
 
 /// **The readings worker B consumes** (`hnn::contact::contact_readings`): on campaign 1's field at

@@ -34,6 +34,7 @@ use holonics::receiver::release::{BeyondTolerance, DecisionRule, WithinTolerance
 use num_bigint::BigInt;
 
 use super::dyadic::{exponent_of, integral, power_of_two};
+use super::lattice::NormalMirror;
 use super::tests::{Draw, card};
 use super::{Resident, Traffic};
 
@@ -258,6 +259,8 @@ struct Compared {
     /// The cells the deposits added to the receiving parametron's tree (Decision 28).
     landmarks: u64,
     traffic: Traffic,
+    /// The normal-law mirror's tally: every prox step carried, declined by reason or skipped.
+    mirror: NormalMirror,
 }
 
 /// **Run the exposure protocol on both ports in lockstep** (module header) over at most `windows`
@@ -272,7 +275,9 @@ fn lockstep(
 ) -> Compared {
     let card = card();
     let host = Reference::campaign_one();
-    let device = Resident::campaign_one(&card);
+    // The lockstep runs the normal-law mirror (the parity test it moved into, off the exposure's
+    // path), and reports its tally.
+    let device = Resident::campaign_one(&card).with_normal_mirror();
     let current = Current::at_rest(field);
     let (mut h, mut d) = match constitution {
         Some(theta) => (
@@ -405,6 +410,22 @@ fn lockstep(
         holonics::hnn::reference::ExposedResident::tally(&d)
     );
     compared.traffic = d.traffic();
+    compared.mirror = device
+        .normal_mirror()
+        .expect("the lockstep runs the mirror");
+    println!(
+        "the normal-law mirror: {} carried; {} declined (empty {}, off the dyadics {}, past a word {}, the kernel {}, the read {}); {} skipped (a locus stepped again {}, no normal law {})",
+        compared.mirror.carried,
+        compared.mirror.declined(),
+        compared.mirror.empty,
+        compared.mirror.off_dyadic,
+        compared.mirror.past_word,
+        compared.mirror.kernel,
+        compared.mirror.read,
+        compared.mirror.skipped(),
+        compared.mirror.repeated,
+        compared.mirror.lawless,
+    );
     compared
 }
 
@@ -543,7 +564,9 @@ fn the_card_port_returns_the_reference_on_campaign_one() {
 /// resonator balances (the card's resident ticks read by the host, `crate::hnn::word::resonate`)
 /// and the published constitutions after every deposit included (the card's stiffness is the signed
 /// one, `publication`), and the normal laws' prox steps the card carried in the deposits
-/// (`crate::hnn::lattice::normal_deposit_on_card`) read equal to the host's successor.
+/// (`crate::hnn::lattice::normal_deposit_on_card`, the mirror the GPU suite runs, its `X̂f` read
+/// through the host's successor chart) read equal to the host's successor, with its declines and
+/// skips counted and reported.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_card_port_returns_the_reference_with_resonators_and_a_boost() {
@@ -565,7 +588,7 @@ fn the_card_port_returns_the_reference_with_resonators_and_a_boost() {
     );
     println!("campaign 1 with resonators and a boost, drawn bytes: {compared:?}");
     assert_eq!(compared.compares, 8);
-    assert!(compared.traffic.normal_deposits > 0);
+    assert!(compared.mirror.carried > 0);
 }
 
 /// The standing real cut's manifest numbers (its population and held-out range).
