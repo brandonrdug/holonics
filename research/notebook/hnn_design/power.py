@@ -9,7 +9,7 @@
 # the six-cycle plus the chord 0-3; channel widths below every end's width.
 from fractions import Fraction as F
 import random
-from field import Field
+from field import Field, exact
 
 widths = [4, 2, 4, 6, 2, 4]
 edges = [(0, 1, 2), (1, 2, 1), (2, 3, 3), (3, 4, 2), (4, 5, 1), (5, 0, 2), (0, 3, 2)]
@@ -34,18 +34,18 @@ def run(dissipative, resist=False, contrast=False, ticks=8, seed=11, start=4):
     return P, terms
 
 P, T = run(False)
-print("lossless: P constant exactly:", all(p == P[0] for p in P), " P =", float(P[0]),
+print("lossless: P constant exactly:", all(p == P[0] for p in P), " P =", exact(P[0]),
       " (bits of P:", P[0].numerator.bit_length() + P[0].denominator.bit_length(), ")")
 P, T = run(True)
 print("dissipative: P(t) - P(t+1) == dissipation(t) exactly at every tick:",
       all(P[t] - P[t + 1] == T[t]['diss'] for t in range(len(T))))
-print("dissipative: P over ticks:", [round(float(p), 4) for p in P])
+print("dissipative: P over ticks:", "; ".join(exact(p) for p in P))
 
 # the contrast port alone (lossless contacts, W_s = 0): the power changes by exactly Pi_c
 P, T = run(False, contrast=F(1, 8))
 print("contrast port W_c != 0, otherwise lossless: P(t+1) - P(t) == Pi_c(t) exactly at every tick:",
       all(P[t + 1] - P[t] == T[t]['contrast'] for t in range(len(T))))
-print("   Pi_c over ticks:", [round(float(t['contrast']), 4) for t in T])
+print("   Pi_c over ticks:", "; ".join(exact(t['contrast']) for t in T))
 # every term at once: dissipative contacts, passive W_s, contrast port W_c
 P, T = run(True, resist=True, contrast=F(1, 8))
 print("dissipation + W_s + W_c: P(t+1) - P(t) == -dissipation + resist + Pi_c exactly at every tick:",
@@ -61,4 +61,4 @@ print("   signs of Pi_c seen over 8 starting states x 8 ticks:", sorted(signs))
 P, T = run(True, resist=True, contrast=F(1))
 print("W_c entries 8x larger: balance exact:",
       all(P[t + 1] - P[t] == -T[t]['diss'] + T[t]['resist'] + T[t]['contrast'] for t in range(len(T))),
-      "; P(8)/P(0) =", round(float(P[-1] / P[0]), 1))
+      "; P(8)/P(0) =", exact(P[-1] / P[0]))

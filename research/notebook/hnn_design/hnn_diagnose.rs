@@ -1,7 +1,8 @@
 //! **Campaign 1's located failure: the diagnostics** (rebuild step 4, #73, campaign 1; design
 //! "Step 4 design: the HNN law", (d) "The standing real cut", review E1): a notebook measurement,
 //! run once in release, never a test. Campaign 1's exposure on the standing real cut does not beat
-//! the online order-0 held-out bits (#73's receipt: 7.578 bits a byte against order-0 KT's 4.762),
+//! the online order-0 held-out bits (#73's receipt, read at the receiver's grain `L_R = 16`:
+//! `7 + 9/16 + ε` bits a byte against order-0 KT's `4 + 12/16 + ε`, each `0 ≤ ε < 1/16`),
 //! and E1 asks for the failure's located cause (source, relation, encoding or decoder) before
 //! campaign 2 begins.
 //!
@@ -52,10 +53,20 @@
 //!    bytes (online KT per context against order-0); whether the source ring's bins separate the
 //!    bytes they hold; and the share of the current bin the recent cells make.
 //!
-//! [definition] **Exact inside, decimals at the print.** Every value is an exact rational, an exact
-//! integer, or an enclosure with exact endpoints (the code lengths, as the exposure reads them); a
-//! decimal appears only at the print, rounded as labelled. The cut is private: only its scope and
-//! counts are printed, never a cell.
+//! [definition] **Exact inside and at the print; no decimal** (a decimal is a collapse, CLAUDE.md's
+//! exact-arithmetic law). Every value is an exact rational, an exact integer, or an enclosure with
+//! exact endpoints (the code lengths, as the exposure reads them), and every print is exact:
+//! - bits (code lengths a cell, logit spreads and moves, `log₂ det`) are read at the receiver's
+//!   grain `L_R` (16 in campaign 1) through `GrainCell::of`, `n + k/L_R + ε`: the carry `n`, the
+//!   phase class `k` and the fibre `0 ≤ ε < 1/L_R`, exact, or enclosed exactly when it is long;
+//! - a dimensionless quantity (a share, a scale, a leverage, a mean over counts) is its reduced
+//!   ratio with its integer quotient and remainder when short, and otherwise the exact enclosure
+//!   between its continued-fraction convergent and semiconvergent with denominators at most `2^12`
+//!   (`∈ [a/b, c/d]`), with the exact ratio's size in bits;
+//! - a share of counts is the count over the count, never a percentage; a comparison is an exact
+//!   ordering with its exact difference.
+//!
+//! The cut is private: only its scope and counts are printed, never a cell.
 //!
 //! [established-bounded; measured] **Its receipt and reading** are the located-failure record,
 //! `research/records/2026-09-25_CAMPAIGN_ONE_LOCATED_FAILURE.md` (about 10 minutes on the host).
@@ -145,67 +156,180 @@ fn max_abs<'a>(values: impl IntoIterator<Item = &'a Rat>) -> Rat {
         .unwrap_or_else(Rat::zero)
 }
 
-/// An exact rational as a decimal to six places, rounded down (`up = false`) or up: a
-/// presentation computed in ℚ.
-fn decimal(value: &Rat, up: bool) -> String {
-    let million = BigInt::from(1_000_000);
-    let scaled = value * Rat::from_integer(million.clone());
-    let scaled = if up { scaled.ceil() } else { scaled.floor() }.to_integer();
-    let sign = if scaled.is_negative() { "-" } else { "" };
-    let magnitude = scaled.abs();
-    format!(
-        "{sign}{}.{:0>6}",
-        &magnitude / &million,
-        &magnitude % &million
-    )
+/// [agent-inferred] **A short exact ratio**: one whose numerator and denominator together take at
+/// most 64 bits prints whole; a fibre prints whole up to twice that. A presentation bound
+/// (exterior), never a law.
+const SHORT_BITS: u64 = 64;
+
+/// [agent-inferred] **The convergent bound**: a longer exact ratio prints as the exact enclosure
+/// between its last continued-fraction convergent with denominator at most `2^12` and the nearest
+/// semiconvergent on the value's other side within the same bound (the best enclosure by ratios of
+/// that denominator). A presentation bound (exterior), never a law.
+const CONVERGENT_DENOMINATOR: u64 = 1 << 12;
+
+/// The bits of an exact ratio's numerator and denominator together.
+fn size(value: &Rat) -> u64 {
+    value.numer().bits() + value.denom().bits()
 }
 
-/// An exact rational printed as an integer, `n/2^e` on a dyadic denominator, or `n/d` when short;
-/// otherwise its decimal, labelled.
-fn exact(value: &Rat) -> String {
-    let denominator = value.denom();
-    if denominator.is_one() {
-        value.numer().to_string()
-    } else if denominator.magnitude().count_ones() == 1 && value.numer().bits() <= 64 {
-        format!("{}/2^{}", value.numer(), denominator.bits() - 1)
-    } else if value.numer().bits() + denominator.bits() <= 48 {
-        format!("{}/{}", value.numer(), denominator)
+/// **The convergent enclosure** of an exact ratio (see [`CONVERGENT_DENOMINATOR`]): the value
+/// itself when its denominator is within the bound; otherwise `p_n/q_n`, the last convergent within
+/// the bound, and `(p_(n−1) + t p_n)/(q_(n−1) + t q_n)` with the largest `t` keeping the
+/// denominator within it, which lie on opposite sides of the value.
+fn convergents(value: &Rat) -> ExactInterval {
+    let bound = BigInt::from(CONVERGENT_DENOMINATOR);
+    // (p_(n−1), q_(n−1)) and (p_n, q_n), from (p_(−2), q_(−2)) = (0, 1) and (p_(−1), q_(−1)) = (1, 0).
+    let (mut before, mut last) = ((BigInt::zero(), BigInt::one()), (BigInt::one(), BigInt::zero()));
+    let mut rest = value.clone();
+    loop {
+        let term = rest.floor().to_integer();
+        let next = (&term * &last.0 + &before.0, &term * &last.1 + &before.1);
+        if next.1 > bound {
+            break;
+        }
+        before = std::mem::replace(&mut last, next);
+        let fraction = &rest - Rat::from_integer(term);
+        if fraction.is_zero() {
+            return ExactInterval::point(Rat::new(last.0, last.1));
+        }
+        rest = fraction.recip();
+    }
+    let t = (&bound - &before.1) / &last.1;
+    let near = Rat::new(last.0.clone(), last.1.clone());
+    let other = Rat::new(&before.0 + &t * &last.0, &before.1 + &t * &last.1);
+    if near <= other {
+        ExactInterval::new(near, other).expect("ordered")
     } else {
-        format!("{} (decimal, down; exact ratio of {} bits)", decimal(value, false), value.numer().bits() + denominator.bits())
+        ExactInterval::new(other, near).expect("ordered")
     }
 }
 
-/// An exact ratio `a/b` of two counts, with its decimal.
+/// An exact rational printed as an integer, `n/2^e` on a dyadic denominator, `n/(2^e·m)` on a
+/// denominator with a power-of-two factor, or `n/d`.
+fn exact(value: &Rat) -> String {
+    let denominator = value.denom().magnitude();
+    if denominator.is_one() {
+        return value.numer().to_string();
+    }
+    let twos = denominator.trailing_zeros().unwrap_or(0);
+    let odd = denominator >> twos;
+    if denominator.bits() <= 16 {
+        format!("{}/{}", value.numer(), denominator)
+    } else if odd.is_one() {
+        format!("{}/2^{twos}", value.numer())
+    } else if twos > 0 {
+        format!("{}/(2^{twos}·{odd})", value.numer())
+    } else {
+        format!("{}/{}", value.numer(), denominator)
+    }
+}
+
+/// **A quantity, exactly**: a short ratio reduced, with its integer quotient and remainder when it
+/// passes one (`n/d (q rem r over d)`); a long one as its integer quotient `q` and the convergent
+/// enclosure of its remainder with exact endpoints, `q + ε, ε ∈ [a/b, c/d]`, and its exact size in
+/// bits.
+fn quantity(value: &Rat) -> String {
+    let quotient = value.floor();
+    if size(value) > SHORT_BITS {
+        let enclosure = convergents(&(value - &quotient));
+        return format!(
+            "{} + ε, ε ∈ [{}, {}] (an exact ratio of {} bits)",
+            quotient.to_integer(),
+            exact(&enclosure.lower),
+            exact(&enclosure.upper),
+            size(value)
+        );
+    }
+    if value.is_integer() {
+        return value.numer().to_string();
+    }
+    let quotient = quotient.to_integer();
+    if quotient.is_zero() {
+        return exact(value);
+    }
+    let remainder = value.numer() - &quotient * value.denom();
+    format!("{} ({quotient} rem {remainder} over {})", exact(value), value.denom())
+}
+
+/// The exact ratio `a/b` of two exact quantities (a count over a count, or an energy over an
+/// energy), as a [`quantity`].
 fn share(a: &Rat, b: &Rat) -> String {
     if b.is_zero() {
         return "- (no denominator)".to_string();
     }
-    format!("{} (decimal {})", exact_short(&(a / b)), decimal(&(a / b), false))
+    quantity(&(a / b))
 }
 
-/// A short exact form for a ratio of counts or a small rational; the decimal alone when long.
-fn exact_short(value: &Rat) -> String {
-    if value.numer().bits() + value.denom().bits() <= 48 {
-        if value.denom().is_one() {
-            value.numer().to_string()
-        } else {
-            format!("{}/{}", value.numer(), value.denom())
-        }
+/// An enclosure with exact endpoints: whole when both are short, else outward on the endpoints'
+/// convergent enclosures.
+fn enclosed(interval: &ExactInterval) -> String {
+    let (lower, upper) = if size(&interval.lower) > SHORT_BITS || size(&interval.upper) > SHORT_BITS {
+        (convergents(&interval.lower).lower, convergents(&interval.upper).upper)
     } else {
-        format!("~{}", decimal(value, false))
+        (interval.lower.clone(), interval.upper.clone())
+    };
+    format!("[{}, {}]", exact(&lower), exact(&upper))
+}
+
+/// A fibre `0 ≤ ε < 1/L`: exact up to twice [`SHORT_BITS`], else its convergent enclosure.
+fn fibre(value: &Rat) -> ExactInterval {
+    if size(value) > 2 * SHORT_BITS {
+        convergents(value)
+    } else {
+        ExactInterval::point(value.clone())
     }
 }
 
-/// An enclosure of bits per cell: its decimal enclosure over a count, rounded outward.
-fn per_cell(interval: &ExactInterval, cells: usize) -> String {
+/// **A reading at the receiver's grain** `L_R` (`GrainCell::of`): `value = n + k/L_R + ε`, the carry
+/// `n`, the phase class `k ∈ ℤ/L_R` and the unresolved fibre `0 ≤ ε < 1/L_R` (exact, or enclosed
+/// exactly when long).
+fn reading(value: &Rat, grain: u64) -> String {
+    reading_of(&ExactInterval::point(value.clone()), grain)
+}
+
+/// **An enclosure read at the grain**: both endpoints' cells; when they share their carry and phase
+/// class, that cell once with the enclosure of its fibre.
+fn reading_of(interval: &ExactInterval, grain: u64) -> String {
+    let (lower, upper) = (GrainCell::of(&interval.lower, grain), GrainCell::of(&interval.upper, grain));
+    let (low, high) = (fibre(&lower.fibre).lower, fibre(&upper.fibre).upper);
+    if lower.carry == upper.carry && lower.phase == upper.phase {
+        if low == high {
+            format!("{} + {}/{grain} + ε, ε = {} < 1/{grain}", lower.carry, lower.phase, exact(&low))
+        } else {
+            format!("{} + {}/{grain} + ε, ε ∈ [{}, {}] ⊂ [0, 1/{grain})", lower.carry, lower.phase, exact(&low), exact(&high))
+        }
+    } else {
+        format!(
+            "[{} + {}/{grain} + {}, {} + {}/{grain} + {}] (each fibre < 1/{grain})",
+            lower.carry,
+            lower.phase,
+            exact(&low),
+            upper.carry,
+            upper.phase,
+            exact(&high)
+        )
+    }
+}
+
+/// **The grain cell alone** `n + k/L_R` of a value, its fibre `< 1/L_R` unresolved (the compact
+/// form of a list).
+fn cell(value: &Rat, grain: u64) -> String {
+    let cell = GrainCell::of(value, grain);
+    format!("{}+{}/{grain}", cell.carry, cell.phase)
+}
+
+/// An enclosure of bits per cell: the exact ratios `lower/n` and `upper/n` read at the grain.
+fn per_cell(interval: &ExactInterval, cells: usize, grain: u64) -> String {
     if cells == 0 {
         return "-".to_string();
     }
     let n = count(cells);
-    format!(
-        "[{}, {}]",
-        decimal(&(&interval.lower / &n), false),
-        decimal(&(&interval.upper / &n), true)
+    reading_of(
+        &ExactInterval {
+            lower: &interval.lower / &n,
+            upper: &interval.upper / &n,
+        },
+        grain,
     )
 }
 
@@ -376,16 +500,17 @@ impl Enclosed {
         self.upper += scaled.ceil().to_integer();
     }
 
-    /// The share `self / (self + other)`, enclosed from the endpoints and printed as decimals.
+    /// The share `self / (self + other)`, enclosed from the endpoints, printed outward on the
+    /// endpoints' convergent enclosures (exact endpoints).
     fn share_of(&self, other: &Self) -> String {
         let low_total = &self.lower + &other.lower;
         let high_total = &self.upper + &other.upper;
         if high_total.is_zero() || low_total.is_zero() {
             return "- (no energy)".to_string();
         }
-        let lower = Rat::new(self.lower.clone(), high_total);
-        let upper = Rat::new(self.upper.clone(), low_total);
-        format!("[{}, {}]", decimal(&lower, false), decimal(&upper, true))
+        let lower = convergents(&Rat::new(self.lower.clone(), high_total)).lower;
+        let upper = convergents(&Rat::new(self.upper.clone(), low_total)).upper;
+        format!("∈ [{}, {}]", exact(&lower), exact(&upper))
     }
 }
 
@@ -1196,7 +1321,14 @@ fn main() {
         cells: bytes.iter().map(|&byte| usize::from(byte)).collect(),
         held_out: vec![held_range.clone()],
     };
-    let grain = 16u64;
+    // The receiver's grain L_R = ⌈1/ε_bits⌉ (16 in campaign 1), at which every bit count is read.
+    let grain: u64 = field.receivers()[0]
+        .tolerance
+        .recip()
+        .ceil()
+        .to_integer()
+        .try_into()
+        .expect("a grain fits a machine word");
     let receiving = field.receivers()[0].ring;
     let width = field.ring(receiving).width();
     println!("hnn_diagnose: campaign 1's declared field over the cut file {path}");
@@ -1267,10 +1399,10 @@ fn main() {
     let (model_held, zero_held) = (sum(&held, |r| &r.model), sum(&held, |r| &r.order_zero));
     println!(
         "check against #73's receipt: held-out model {} bits a cell, order-0 KT {}; training model {}, order-0 KT {}",
-        per_cell(&model_held, held.len()),
-        per_cell(&zero_held, held.len()),
-        per_cell(&model_train, training.len()),
-        per_cell(&zero_train, training.len())
+        per_cell(&model_held, held.len(), grain),
+        per_cell(&zero_held, held.len(), grain),
+        per_cell(&model_train, training.len(), grain),
+        per_cell(&zero_train, training.len(), grain)
     );
 
     // ---- 1. the decoder ----
@@ -1296,8 +1428,8 @@ fn main() {
         println!(
             "mean logit vector over the {} {label}: spread max_c − min_c {} bits; its static face on the held-out targets {} bits a cell; common part of the logits' energy N|f̄|²/Σ|f|² {}; of the class-centred energy {}",
             sums.reads,
-            decimal(&spread, false),
-            per_cell(&code, targets_held.len()),
+            reading(&spread, grain),
+            per_cell(&code, targets_held.len(), grain),
             share(&mean_squares, &sums.squares),
             share(&mean_centred, &sums.centred_squares)
         );
@@ -1305,8 +1437,8 @@ fn main() {
     let spreads: Vec<Rat> = held.iter().map(|r| r.spread.clone()).collect();
     println!(
         "each held-out read's own spread max_c Re f_c − min_c Re f_c: median {} bits, largest {} bits",
-        decimal(&median(&spreads), false),
-        decimal(&spreads.iter().max().cloned().unwrap_or_else(Rat::zero), false)
+        reading(&median(&spreads), grain),
+        reading(&spreads.iter().max().cloned().unwrap_or_else(Rat::zero), grain)
     );
 
     // Order-0 log-frequencies of the training cells, KT prior, read at 2^-20 (exterior target).
@@ -1327,8 +1459,8 @@ fn main() {
     let static_code = score_static(&y, &targets_held);
     println!(
         "static order-0 face (the training cells' KT frequencies as log2 logits y, read at the grain): held-out {} bits a cell; the spread of y {} bits",
-        per_cell(&static_code, targets_held.len()),
-        decimal(&(y.iter().max().expect("classes") - y.iter().min().expect("classes")), false)
+        per_cell(&static_code, targets_held.len(), grain),
+        reading(&(y.iter().max().expect("classes") - y.iter().min().expect("classes")), grain)
     );
 
     // Features: rank, dormant component, energy by aeon.
@@ -1378,9 +1510,9 @@ fn main() {
     for (aeon, (sum_e, n, least, most)) in &by_aeon {
         println!(
             "  aeon {aeon}: mean |z|² {} over {n} reads (least {}, largest {})",
-            decimal(&(sum_e / count(*n)), false),
-            decimal(least, false),
-            decimal(most, false)
+            quantity(&(sum_e / count(*n))),
+            quantity(least),
+            quantity(most)
         );
     }
 
@@ -1412,16 +1544,16 @@ fn main() {
         let shut_scales: Vec<Rat> = held.iter().zip(&scales).filter(|(r, _)| !r.open).map(|(_, s)| s.clone()).collect();
         println!(
             "oracle R = y wᵀ ({label}): held-out {} bits a cell through the grain face; scales s_j = wᵀz_j on the held-out reads: median {}, least {}, largest {}, negative {}/{}, within [1/2, 2] {}/{}; median on open-path reads {}, on shielded reads {}; reads past the scale ceiling {}",
-            per_cell(&total_code, held.len()),
-            decimal(&median(&scales), false),
-            decimal(&scales.iter().min().cloned().unwrap_or_else(Rat::zero), false),
-            decimal(&scales.iter().max().cloned().unwrap_or_else(Rat::zero), false),
+            per_cell(&total_code, held.len(), grain),
+            quantity(&median(&scales)),
+            quantity(&scales.iter().min().cloned().unwrap_or_else(Rat::zero)),
+            quantity(&scales.iter().max().cloned().unwrap_or_else(Rat::zero)),
             negative,
             scales.len(),
             near,
             scales.len(),
-            decimal(&median(&open_scales), false),
-            decimal(&median(&shut_scales), false),
+            quantity(&median(&open_scales)),
+            quantity(&median(&shut_scales)),
             ceiling
         );
     }
@@ -1458,15 +1590,15 @@ fn main() {
     }
     if !held.is_empty() && !total_energy.is_zero() {
     println!(
-        "the held-out logits (class-centred) split as f = R_0 z + (R − R_0) z: the declared sign prior's reading R_0 z alone codes the held-out targets in {} bits a cell, the learned part (R − R_0) z alone in {}, the sum in {} (the machine's own read, a check); energy shares Σ|R_0 z|² : Σ|(R − R_0) z|² : Σ|f|² = {} : {} : 1; their inner product 2⟨R_0 z, (R − R_0) z⟩/Σ|f|² = {}; alignment with the order-0 log-frequencies y (Σ⟨part, ȳ⟩ over Σ|ȳ|² per read): prior {}, learned {}",
-        per_cell(&prior_code, held.len()),
-        per_cell(&learned_code, held.len()),
-        per_cell(&total_code, held.len()),
-        decimal(&(&prior_energy / &total_energy), false),
-        decimal(&(&learned_energy / &total_energy), false),
-        decimal(&(&cross * int(2) / &total_energy), false),
-        decimal(&(&marginal_prior / (&y_energy * count(held.len()))), false),
-        decimal(&(&marginal_learned / (&y_energy * count(held.len()))), false),
+        "the held-out logits (class-centred) split into f = R_0 z + (R − R_0) z: the declared sign prior's reading R_0 z alone codes the held-out targets in {} bits a cell, the learned part (R − R_0) z alone in {}, the sum in {} (the machine's own read, a check); energy shares over Σ|f|²: Σ|R_0 z|² {}, Σ|(R − R_0) z|² {}, their inner product 2⟨R_0 z, (R − R_0) z⟩ {}; alignment with the order-0 log-frequencies y (Σ⟨part, ȳ⟩ over Σ|ȳ|² per read): prior {}, learned {}",
+        per_cell(&prior_code, held.len(), grain),
+        per_cell(&learned_code, held.len(), grain),
+        per_cell(&total_code, held.len(), grain),
+        quantity(&(&prior_energy / &total_energy)),
+        quantity(&(&learned_energy / &total_energy)),
+        quantity(&(&cross * int(2) / &total_energy)),
+        quantity(&(&marginal_prior / (&y_energy * count(held.len())))),
+        quantity(&(&marginal_learned / (&y_energy * count(held.len())))),
     );
     }
 
@@ -1508,28 +1640,28 @@ fn main() {
         println!(
             "{label} ({} deposits): leverage h = zᵀX̂'z per read feature: median {}, mean {}, sum {}; the read logits' executed move max_c|(R'−R)z|: median {} bits, largest {}; against the covector's max|g|: median ratio {}",
             records.len(),
-            decimal(&median(&leverage), false),
-            decimal(&(&leverage_sum / count(leverage.len().max(1))), false),
-            decimal(&leverage_sum, false),
-            decimal(&median(&moved), false),
-            decimal(&moved.iter().max().cloned().unwrap_or_else(Rat::zero), false),
-            decimal(&median(&ratio), false),
+            quantity(&median(&leverage)),
+            quantity(&(&leverage_sum / count(leverage.len().max(1)))),
+            quantity(&leverage_sum),
+            reading(&median(&moved), grain),
+            reading(&moved.iter().max().cloned().unwrap_or_else(Rat::zero), grain),
+            quantity(&median(&ratio)),
         );
         println!(
             "    R: entries moved on the lattice per deposit {} (mean, of 11,264; exact update nonzero on {} mean); exact update's largest entry per deposit, in lattice units: median {}, largest {}; applied share of the exact update's l1 {}; released tails' share {}",
-            decimal(&(count(r_entries as usize) / &n), false),
-            decimal(&(count(r_exact_entries as usize) / &n), false),
-            decimal(&median(&r_max), false),
-            decimal(&r_max.iter().max().cloned().unwrap_or_else(Rat::zero), false),
+            quantity(&(count(r_entries as usize) / &n)),
+            quantity(&(count(r_exact_entries as usize) / &n)),
+            quantity(&median(&r_max)),
+            quantity(&r_max.iter().max().cloned().unwrap_or_else(Rat::zero)),
             share(&r_applied, &r_exact),
             share(&r_released, &r_exact),
         );
         println!(
             "    E_0: entries moved on the lattice per deposit {} (mean, of 2,560; exact update nonzero on {} mean); exact update's largest entry per deposit, in lattice units: median {}, largest {}; applied share of the exact update's l1 {}; released tails' share {}",
-            decimal(&(count(e_entries as usize) / &n), false),
-            decimal(&(count(e_exact_entries as usize) / &n), false),
-            decimal(&median(&e_max), false),
-            decimal(&e_max.iter().max().cloned().unwrap_or_else(Rat::zero), false),
+            quantity(&(count(e_entries as usize) / &n)),
+            quantity(&(count(e_exact_entries as usize) / &n)),
+            quantity(&median(&e_max)),
+            quantity(&e_max.iter().max().cloned().unwrap_or_else(Rat::zero)),
             share(&e_applied, &e_exact),
             share(&e_released, &e_exact),
         );
@@ -1537,8 +1669,8 @@ fn main() {
         let released_bits: u64 = records.iter().map(|r| r.released_bits).sum();
         println!(
             "    every locus: entries whose lattice coordinate moved {} per deposit (mean); released residuals' exact bits {} per deposit (mean)",
-            decimal(&(count(stepped as usize) / &n), false),
-            decimal(&(count(released_bits as usize) / &n), false)
+            quantity(&(count(stepped as usize) / &n)),
+            quantity(&(count(released_bits as usize) / &n))
         );
     };
     let everything: Vec<&DepositRecord> = run.deposits.iter().collect();
@@ -1548,13 +1680,31 @@ fn main() {
     // Σ h ≤ ln det H_T (H_0 = I); the read logits' executed move is γ g h per read.
     let leverage_total: Rat = run.deposits.iter().flat_map(|r| r.leverage.iter()).sum();
     let log_det = log2_enclosure(&run.gram_determinant).expect("a positive determinant");
+    // ln 2 ∈ [445/642, 1143/1649]: consecutive continued-fraction convergents of ln 2, on opposite
+    // sides of it (the convergents of [0; 1, 2, 3, 1, 6, 3, 1, 1, 2, …]).
+    let ln_det = ExactInterval::new(
+        &log_det.lower * Rat::new(BigInt::from(445), BigInt::from(642)),
+        &log_det.upper * Rat::new(BigInt::from(1143), BigInt::from(1649)),
+    )
+    .expect("det H_T ≥ 1 (H_0 = I and the Gram only grows)");
+    let leverage_point = ExactInterval::point(leverage_total.clone());
+    let side = if leverage_point.upper < ln_det.lower {
+        "below"
+    } else if leverage_point.lower > ln_det.upper {
+        "ABOVE"
+    } else {
+        "undecided against"
+    };
     println!(
-        "the prox step's leverage budget: Σ h over every read = {} against ln det H_T = log2 det H_T · ln 2 ∈ [{}, {}] (R's carried Gram at the end; log2 det H_T ∈ [{}, {}]; ln 2 enclosed in [6931/10^4, 6932/10^4])",
-        decimal(&leverage_total, false),
-        decimal(&(&log_det.lower * Rat::new(BigInt::from(6931), BigInt::from(10_000))), false),
-        decimal(&(&log_det.upper * Rat::new(BigInt::from(6932), BigInt::from(10_000))), true),
-        decimal(&log_det.lower, false),
-        decimal(&log_det.upper, true)
+        "the prox step's leverage budget: Σ h over every read {} against ln det H_T = log2 det H_T · ln 2 ∈ {} (R's carried Gram at the end; log2 det H_T: {} bits, at L_R = {grain}: {}; ln 2 ∈ [445/642, 1143/1649]); Σ h is {side} its bound, ln det H_T − Σ h ∈ {}",
+        quantity(&leverage_total),
+        enclosed(&ln_det),
+        enclosed(&log_det),
+        reading_of(&log_det, grain),
+        enclosed(&ExactInterval {
+            lower: &ln_det.lower - &leverage_total,
+            upper: &ln_det.upper - &leverage_total,
+        })
     );
     let [re, im, pulled_re, pulled_im] = &run.covector_energy;
     println!(
@@ -1578,12 +1728,14 @@ fn main() {
         println!(
             "  aeon {aeon} {}: {n} cells; model {} bits a cell, order-0 KT {}; mean logit spread {} bits",
             if *is_held { "held out" } else { "training" },
-            per_cell(model, *n),
-            per_cell(zero, *n),
-            decimal(&(spread / count(*n)), false)
+            per_cell(model, *n, grain),
+            per_cell(zero, *n, grain),
+            reading(&(spread / count(*n)), grain)
         );
     }
-    println!("training bits by block of 512 cells (model | order-0 KT):");
+    println!(
+        "training bits a cell by block of 512 cells (model | order-0 KT; the grain cells n+k/{grain} of the lower endpoints, each fibre < 1/{grain} unresolved):"
+    );
     let mut line = String::new();
     for block in training.chunks(512) {
         let model = block.iter().fold(zero_interval(), |t, r| interval_sum(&t, &r.model).expect("sum"));
@@ -1591,8 +1743,8 @@ fn main() {
         let n = count(block.len());
         line.push_str(&format!(
             " {}|{}",
-            decimal(&(&model.lower / &n), false),
-            decimal(&(&zero.lower / &n), false)
+            cell(&(&model.lower / &n), grain),
+            cell(&(&zero.lower / &n), grain)
         ));
     }
     println!(" {line}");
@@ -1613,7 +1765,7 @@ fn main() {
             let null_mean = count(null.iter().sum()) / count(null.len().max(1));
             let at_least = null.iter().filter(|&&value| value >= best).count();
             println!(
-                "  ring {} (d = {}): port fibre {} in {} orbits, {}; shortest failing loop {} edges. Menu: {} ports, {} edges, {} component(s), {} independent loops. Injective plugboards: best satisfied edges {}/{} ({}; {} by {}), so {} of the {} loops beyond a spanning forest close; by propagation {}, equal under every key: {}; local search {}. The crib shuffled ({} orders): best mean {} (share {}), largest {}; shuffles at or above the crib's best: {}/{}",
+                "  ring {} (d = {}): port fibre {} in {} orbits, {}; shortest failing loop {} edges. Menu: {} ports, {} edges, {} component(s), {} independent loops. Injective plugboards: best satisfied edges {}/{} ({} by {}), so {} of the {} loops beyond a spanning forest close; by propagation {}, equal under every key: {}; local search {}. The crib shuffled ({} orders): best mean {} (share {}), largest {}; shuffles at or above the crib's best: {}/{}",
                 ring.ring,
                 field.ring(ring.ring).period(),
                 ring.fibre,
@@ -1626,7 +1778,6 @@ fn main() {
                 loops,
                 best,
                 c.edges,
-                decimal(&(count(best) / count(c.edges.max(1))), false),
                 if c.exhaustive.is_some() { "exhaustive" } else { "local search" },
                 if c.exhaustive.is_some() { "every injective plugboard" } else { "48 starts" },
                 best.saturating_sub(forest),
@@ -1635,8 +1786,8 @@ fn main() {
                 c.key_invariant,
                 c.searched,
                 ring.null.len(),
-                decimal(&null_mean, false),
-                decimal(&(&null_mean / count(c.edges.max(1))), false),
+                quantity(&null_mean),
+                quantity(&(&null_mean / count(c.edges.max(1)))),
                 null.iter().max().unwrap_or(&0),
                 at_least,
                 null.len(),
@@ -1683,8 +1834,8 @@ fn main() {
                 "    {label}, path {}: {} reads; model {} bits a cell, order-0 KT {}",
                 if open { "open" } else { "shielded" },
                 chosen.len(),
-                per_cell(&model, chosen.len()),
-                per_cell(&zero, chosen.len())
+                per_cell(&model, chosen.len(), grain),
+                per_cell(&zero, chosen.len(), grain)
             );
         }
     }
@@ -1728,8 +1879,8 @@ fn main() {
         println!(
             "    online KT given {label}: {} contexts; training {} bits a cell, held out {}",
             tables.len(),
-            per_cell(&train_code, training.len()),
-            per_cell(&held_code, held.len())
+            per_cell(&train_code, training.len(), grain),
+            per_cell(&held_code, held.len(), grain)
         );
     }
     // The source ring's bins: does the bin a byte lands in separate it?
@@ -1751,8 +1902,8 @@ fn main() {
     }
     println!(
         "  the source ring's bins (each cell coded online by KT within the bin it lands in, against pooled order-0; no key was published, so the lift is the declared stepping): binned {} bits a cell, pooled {}; the bins' final populations {:?}",
-        per_cell(&bin_code, cut.cells.len()),
-        per_cell(&pool_code, cut.cells.len()),
+        per_cell(&bin_code, cut.cells.len(), grain),
+        per_cell(&pool_code, cut.cells.len(), grain),
         binned.iter().map(|(_, seen)| *seen).collect::<Vec<_>>()
     );
     let fractions: Vec<Rat> = run
@@ -1765,9 +1916,9 @@ fn main() {
     let runs: Vec<Rat> = run.recency.iter().map(|(r, _)| count(*r as usize)).collect();
     println!(
         "  recency: the cells since the source ring last moved (the only recent cells in its current bin): median {}; the current bin's count: median {}; their share of the bin: median {}, mean {}",
-        decimal(&median(&runs), false),
-        decimal(&median(&bins), false),
-        decimal(&median(&fractions), false),
-        decimal(&(fractions.iter().sum::<Rat>() / count(fractions.len().max(1))), false)
+        quantity(&median(&runs)),
+        quantity(&median(&bins)),
+        quantity(&median(&fractions)),
+        quantity(&(fractions.iter().sum::<Rat>() / count(fractions.len().max(1))))
     );
 }

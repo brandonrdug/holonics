@@ -28,6 +28,44 @@ def bits(x):
 def vbits(v):
     return max((bits(x) for x in v), default=0)
 
+# The print: every reading exact, never a decimal (a decimal is a collapse).  A short ratio prints
+# whole with its integer quotient and remainder; a longer one prints as its integer quotient q plus
+# its remainder's exact enclosure between the last continued-fraction convergent with denominator
+# at most 2^12 and the nearest semiconvergent on its other side within the same bound, with the
+# exact ratio's size in bits.
+# [agent-inferred] SHORT_BITS and CONVERGENT_DENOMINATOR are presentation bounds, never a law.
+SHORT_BITS = 64
+CONVERGENT_DENOMINATOR = 1 << 12
+
+def enclose(x):
+    """The exact enclosure (lo, hi) of x by its convergent and semiconvergent within the bound."""
+    x = F(x)
+    (p0, q0), (p1, q1) = (0, 1), (1, 0)
+    rest = x
+    while True:
+        a = rest.numerator // rest.denominator
+        p2, q2 = a * p1 + p0, a * q1 + q0
+        if q2 > CONVERGENT_DENOMINATOR:
+            break
+        (p0, q0), (p1, q1) = (p1, q1), (p2, q2)
+        if rest == a:
+            return F(p1, q1), F(p1, q1)
+        rest = 1 / (rest - a)
+    t = (CONVERGENT_DENOMINATOR - q0) // q1
+    near, other = F(p1, q1), F(p0 + t * p1, q0 + t * q1)
+    return min(near, other), max(near, other)
+
+def exact(x):
+    """n; n/d (q rem r over d); or, past SHORT_BITS, 'q + e, e in [lo, hi]' with the ratio's bits."""
+    x = F(x)
+    q, r = divmod(x.numerator, x.denominator)
+    if bits(x) > SHORT_BITS:
+        lo, hi = enclose(F(r, x.denominator))
+        return f"{q} + e, e in [{lo}, {hi}] (an exact ratio of {bits(x)} bits)"
+    if x.denominator == 1:
+        return str(x.numerator)
+    return f"{x} ({q} rem {r} over {x.denominator})"
+
 def solve(A, b):
     n = len(A)
     M = [list(map(F, row)) + [F(b[i])] for i, row in enumerate(A)]

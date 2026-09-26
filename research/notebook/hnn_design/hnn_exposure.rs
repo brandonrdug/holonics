@@ -22,8 +22,9 @@
 //!   (`FieldDeclaration::campaign_one(N)`: the population is the cut's length, and
 //!   `Field::declare` refuses one below `n*`).
 //! - The default is `N = n* = 6,148`, 3,074 windows, which `hnn_lattice_growth growth campaign 40
-//!   declared` projects to about 6 h: the control at the standing cut's population.
-//! - `cells all` is the whole cut: 85,877 windows, about a week at those means.
+//!   declared` projects to `334,451 rem 8 over 40` ms at its means (the notebook README's receipt):
+//!   the control at the standing cut's population.
+//! - `cells all` is the whole cut: 85,877 windows, `9,343,417 rem 24 over 40` ms at those means.
 //!
 //! [definition; agent-inferred] **The held-out part** is the cut's tail of [`HELD_OUT`] cells. That
 //! is one mean aeon of campaign 1's joint clock on uniform bytes, `⌈1,281,280/1,077⌉ = 1,190` cells
@@ -68,9 +69,19 @@
 //!   host's by phase (`Exposure::wall`: refine read, release, compare read, holon and covector,
 //!   `pull_back`, `compose`, `deposited`, re-read and ingest), with the rest of the exposure.
 //!
-//! Every value is exact: integers print as integers and rationals as `n/d` (`n/2^e` on a dyadic
-//! denominator), and bits are enclosures with exact endpoints. A decimal appears only at the print,
-//! labelled, rounded outward. Wall time is an exterior face, in milliseconds.
+//! [definition] **Every reading is exact; no decimal is printed** (a decimal is a collapse, CLAUDE.md's
+//! exact-arithmetic law). Integers print as integers and rationals as `n/d` (`n/2^e` or
+//! `n/(2^e·m)` on a wide denominator with a power-of-two factor).
+//! - Bits are enclosures with exact endpoints, each also read at the receiver's grain
+//!   `L_R = ⌈1/ε_bits⌉` (16 in campaign 1) through `GrainCell::of`: `n + k/L_R + ε`, the carry
+//!   `n`, the phase class `k` and the exact fibre `0 ≤ ε < 1/L_R`. Bits a cell are the exact
+//!   ratios, read the same way.
+//! - A comparison is the exact ordering of two enclosures with their exact difference, an
+//!   enclosure `[a.lower − b.upper, a.upper − b.lower]`, read at the grain; a certificate or a
+//!   residual is ordered against its bound with the exact margin.
+//! - A ratio (bits per source bit) is reduced, with its integer quotient and remainder.
+//! - Wall time is an exterior face in integer milliseconds; a per-window mean is the integer
+//!   quotient with its remainder over the windows (`q rem r over N`).
 
 // `cfg(holonics_card)` is declared by `holonics-cuda`'s build only (module header).
 #![allow(unexpected_cfgs)]
@@ -83,13 +94,14 @@ use holonics::aeon::{EnclosedBalance, LiteralComparison};
 use holonics::compression::cost::ceil_log2;
 use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
 use holonics::hnn::port::{ExecutionPort, ReceiptDetail};
+use holonics::hnn::receiving::GrainCell;
 use holonics::hnn::reference::{Bits, KeyReport, PPM_ORDER};
 use holonics::hnn::{AeonBoundary, Cut, Exposure, Field, FieldDeclaration, Reference, Steps};
 use holonics::ratio::Rat;
 use holonics::ratio::algebraic::ExactInterval;
 use holonics::receiver::reception::Component;
 use num_bigint::{BigInt, BigUint};
-use num_traits::{One, Signed};
+use num_traits::One;
 
 /// **The pinned campaign cut**: the commit whose `docs/plans/THE_REBUILD.md` is the campaign
 /// field's cut (as `hnn_lattice_growth`).
@@ -152,60 +164,116 @@ fn read_cut_manifest(path: &str) -> (usize, Range<usize>) {
 }
 
 // -------------------------------------------------------------------------------------------
-// presentation (exterior: for a person)
+// presentation (exterior: for a person; every reading exact, never a decimal)
 
-/// An exact rational as a decimal to six places, rounded down or up: a presentation, computed in ℚ.
-fn decimal(value: &Rat, up: bool) -> String {
-    let million = BigInt::from(1_000_000);
-    let scaled = value * Rat::from_integer(million.clone());
-    let scaled = if up { scaled.ceil() } else { scaled.floor() }.to_integer();
-    let sign = if scaled.is_negative() { "-" } else { "" };
-    let magnitude = scaled.abs();
-    format!(
-        "{sign}{}.{:0>6}",
-        &magnitude / &million,
-        &magnitude % &million
-    )
+/// **The receiver's grain** `L_R = ⌈1/ε_bits⌉` of the field's first receiver (campaign 1: 16), the
+/// declared grain every bit count is read at.
+fn receiver_grain(field: &Field) -> u64 {
+    field.receivers()[0]
+        .tolerance
+        .recip()
+        .ceil()
+        .to_integer()
+        .try_into()
+        .expect("a grain fits a machine word")
 }
 
-/// An exact rational: an integer, `n/2^e` on a wide dyadic denominator, or `n/d`.
+/// An exact rational: an integer, `n/2^e` on a wide dyadic denominator, `n/(2^e·m)` on a wide
+/// denominator with a power-of-two factor, or `n/d`.
 fn exact(value: &Rat) -> String {
-    let denominator = value.denom();
+    let denominator = value.denom().magnitude();
     if denominator.is_one() {
-        value.numer().to_string()
-    } else if denominator.bits() > 16 && denominator.magnitude().count_ones() == 1 {
-        format!("{}/2^{}", value.numer(), denominator.bits() - 1)
+        return value.numer().to_string();
+    }
+    let twos = denominator.trailing_zeros().unwrap_or(0);
+    let odd = denominator >> twos;
+    if denominator.bits() <= 16 {
+        format!("{}/{}", value.numer(), denominator)
+    } else if odd.is_one() {
+        format!("{}/2^{twos}", value.numer())
+    } else if twos > 0 {
+        format!("{}/(2^{twos}·{odd})", value.numer())
     } else {
         format!("{}/{}", value.numer(), denominator)
     }
 }
 
-/// An exact rational with its decimal beside it.
-fn ratio(value: &Rat) -> String {
-    format!("{} (decimal {})", exact(value), decimal(value, false))
-}
-
-/// An enclosure of bits: its decimal enclosure, rounded outward, then its exact endpoints.
-fn enclosure(interval: &ExactInterval) -> String {
+/// **A reading at the grain** `L` (`GrainCell::of`): `value = n + k/L + ε`, the carry `n`, the
+/// phase class `k ∈ ℤ/L` and the unresolved fibre `0 ≤ ε < 1/L`, each exact.
+fn reading(value: &Rat, grain: u64) -> String {
+    let cell = GrainCell::of(value, grain);
     format!(
-        "[{}, {}] bits (decimal, outward); exact [{}, {}]",
-        decimal(&interval.lower, false),
-        decimal(&interval.upper, true),
-        exact(&interval.lower),
-        exact(&interval.upper)
+        "{} + {}/{grain} + ε, ε = {} < 1/{grain}",
+        cell.carry,
+        cell.phase,
+        exact(&cell.fibre)
     )
 }
 
-/// An enclosure divided by a count, as a decimal enclosure.
-fn per(interval: &ExactInterval, count: u64) -> String {
+/// **An enclosure read at the grain**: both endpoints' cells; when they share their carry and
+/// phase class, that cell once with the enclosure of its fibre.
+fn reading_of(interval: &ExactInterval, grain: u64) -> String {
+    let (lower, upper) = (
+        GrainCell::of(&interval.lower, grain),
+        GrainCell::of(&interval.upper, grain),
+    );
+    if lower.carry == upper.carry && lower.phase == upper.phase {
+        format!(
+            "{} + {}/{grain} + ε, ε ∈ [{}, {}] ⊂ [0, 1/{grain})",
+            lower.carry,
+            lower.phase,
+            exact(&lower.fibre),
+            exact(&upper.fibre)
+        )
+    } else {
+        format!(
+            "[{} + {}/{grain} + {}, {} + {}/{grain} + {}] (each fibre < 1/{grain})",
+            lower.carry,
+            lower.phase,
+            exact(&lower.fibre),
+            upper.carry,
+            upper.phase,
+            exact(&upper.fibre)
+        )
+    }
+}
+
+/// An exact ratio, reduced, with its integer quotient and remainder: `n/d (q rem r over d)`.
+fn ratio(value: &Rat) -> String {
+    if value.is_integer() {
+        return value.numer().to_string();
+    }
+    let (numerator, denominator) = (value.numer(), value.denom());
+    let quotient = value.floor().to_integer();
+    let remainder = numerator - &quotient * denominator;
+    format!(
+        "{} ({quotient} rem {remainder} over {denominator})",
+        exact(value)
+    )
+}
+
+/// An enclosure of bits: its exact endpoints, then its reading at the grain.
+fn enclosure(interval: &ExactInterval, grain: u64) -> String {
+    format!(
+        "exact [{}, {}] bits; at L_R = {grain}: {}",
+        exact(&interval.lower),
+        exact(&interval.upper),
+        reading_of(interval, grain)
+    )
+}
+
+/// An enclosure divided by a count (bits a cell): the exact ratios read at the grain.
+fn per(interval: &ExactInterval, count: u64, grain: u64) -> String {
     if count == 0 {
         return "-".to_string();
     }
     let count = Rat::from_integer(BigInt::from(count));
-    format!(
-        "[{}, {}]",
-        decimal(&(&interval.lower / &count), false),
-        decimal(&(&interval.upper / &count), true)
+    reading_of(
+        &ExactInterval {
+            lower: &interval.lower / &count,
+            upper: &interval.upper / &count,
+        },
+        grain,
     )
 }
 
@@ -218,6 +286,36 @@ fn against(a: &ExactInterval, b: &ExactInterval) -> &'static str {
     } else {
         "undecided (the enclosures overlap)"
     }
+}
+
+/// **The exact difference** of two enclosures, `a − b ∈ [a.lower − b.upper, a.upper − b.lower]`,
+/// with its exact endpoints and its reading at the grain.
+fn difference(a: &ExactInterval, b: &ExactInterval, grain: u64) -> String {
+    enclosure(
+        &ExactInterval {
+            lower: &a.lower - &b.upper,
+            upper: &a.upper - &b.lower,
+        },
+        grain,
+    )
+}
+
+/// Where an exact value lies against its bound, with the exact margin `bound − value`.
+fn within(value: &Rat, bound: &Rat) -> String {
+    let side = if value <= bound {
+        "at or below"
+    } else {
+        "ABOVE"
+    };
+    format!("{side} it (bound − value = {})", exact(&(bound - value)))
+}
+
+/// A per-window mean of a whole count: its integer quotient and remainder, `q rem r over N`.
+fn mean(total: u128, count: u128) -> String {
+    if count == 0 {
+        return "-".to_string();
+    }
+    format!("{} rem {} over {count}", total / count, total % count)
 }
 
 /// Entry `g` of a per-ring vector, or `-` where the report has none.
@@ -366,9 +464,9 @@ fn main() {
     }
     println!();
     println!(
-        "wall time (exterior): setup {setup} ms; exposure {wall} ms over {} windows ({} ms a window)",
+        "wall time (exterior): setup {setup} ms; exposure {wall} ms over {} windows (per window {}, in ms)",
         exposure.compares,
-        wall.checked_div(u128::from(exposure.compares)).unwrap_or(0)
+        mean(wall, u128::from(exposure.compares))
     );
 }
 
@@ -407,7 +505,8 @@ fn card_exposure(deadline: Option<u64>, field: &Field, cut: &Cut) -> (Exposure, 
     };
     let exposure = port.expose(field, cut).expect("the exposure on the card");
     let traffic = port.traffic();
-    let windows = exposure.compares.max(1);
+    let windows = u128::from(exposure.compares);
+    let per_window = |octets: u64| mean(u128::from(octets), windows);
     let realized = port.word_layouts().map_or_else(
         || "no word ran".to_string(),
         |(forward, reverse)| {
@@ -423,7 +522,7 @@ fn card_exposure(deadline: Option<u64>, field: &Field, cut: &Cut) -> (Exposure, 
         },
     );
     let line = format!(
-        "== across the bus (exterior: octets, both directions; per window over {} windows) ==\n\
+        "== across the bus (exterior: octets, both directions; per window as quotient rem remainder over {} windows) ==\n\
          words (plans, operands, records, certificates, moved charts): {} ({} a window, {} words)\n\
          returns (carried reads and records): {} ({} a window, {} returns)\n\
          publications (the loci's moved words): {} ({} a window)\n\
@@ -431,15 +530,15 @@ fn card_exposure(deadline: Option<u64>, field: &Field, cut: &Cut) -> (Exposure, 
          realization (the hardware law's report): {realized}",
         exposure.compares,
         traffic.words,
-        traffic.words / windows,
+        per_window(traffic.words),
         traffic.word_count,
         traffic.returns,
-        traffic.returns / windows,
+        per_window(traffic.returns),
         traffic.return_count,
         traffic.publications,
-        traffic.publications / windows,
+        per_window(traffic.publications),
         traffic.ingest,
-        traffic.ingest / windows
+        per_window(traffic.ingest)
     );
     (exposure, Some(line))
 }
@@ -450,27 +549,29 @@ fn card_exposure(_: Option<u64>, _: &Field, _: &Cut) -> (Exposure, Option<String
 }
 
 /// **The wall time by phase** (`Exposure::wall`, exterior): each phase's milliseconds over the run
-/// and per receiving window (integer division, rounded down), the phases' sum, and the rest of the
-/// exposure's wall time (key location, the aeon boundaries, the baselines and the bookkeeping).
+/// and per receiving window (the integer quotient with its remainder over the windows), the phases'
+/// sum, and the rest of the exposure's wall time (key location, the aeon boundaries, the baselines
+/// and the bookkeeping).
 fn phases(exposure: &Exposure, wall: u128) {
-    let windows = u128::from(exposure.compares.max(1));
+    let windows = u128::from(exposure.compares);
     println!(
-        "== wall time by phase (exterior: the host's wall clock, milliseconds; per window over {} windows) ==",
+        "== wall time by phase (exterior: the host's wall clock, milliseconds; per window as quotient rem remainder over {} windows) ==",
         exposure.compares
     );
-    println!("{:<20}\t{:>10}\t{:>10}", "phase", "total ms", "per window");
+    println!("{:<20}\t{:>10}\t{:>12}", "phase", "total ms", "per window");
+    let row = |name: &str, ms: u128| {
+        let per = match (ms.checked_div(windows), ms.checked_rem(windows)) {
+            (Some(quotient), Some(remainder)) => format!("{quotient} rem {remainder}"),
+            _ => "-".to_string(),
+        };
+        println!("{name:<20}\t{ms:>10}\t{per:>12}");
+    };
     for (name, time) in exposure.wall.phases() {
-        let ms = time.as_millis();
-        println!("{name:<20}\t{ms:>10}\t{:>10}", ms / windows);
+        row(name, time.as_millis());
     }
     let sum = exposure.wall.total().as_millis();
-    println!("{:<20}\t{sum:>10}\t{:>10}", "phases' sum", sum / windows);
-    let rest = wall.saturating_sub(sum);
-    println!(
-        "{:<20}\t{rest:>10}\t{:>10}",
-        "rest of exposure",
-        rest / windows
-    );
+    row("phases' sum", sum);
+    row("rest of exposure", wall.saturating_sub(sum));
 }
 
 // -------------------------------------------------------------------------------------------
@@ -519,43 +620,43 @@ fn report(field: &Field, exposure: &Exposure) {
     }
     let word = &exposure.word;
     println!(
-        "charts: {} refinements read ({} cold from the scaled transpose, {} from one exact inverse, {} rounded Newton-Schulz steps); the largest certificate ||1 - A X||_inf = {} (decimal {}) against the target {}",
+        "charts: {} refinements read ({} cold from the scaled transpose, {} from one exact inverse, {} rounded Newton-Schulz steps); the largest certificate ||1 - A X||_inf = {} against the target {}: {}",
         word.charts.reads,
         word.charts.cold,
         word.charts.seeded,
         word.charts.steps,
         exact(&word.charts.largest),
-        decimal(&word.charts.largest, true),
-        exact(&word.charts.target)
+        exact(&word.charts.target),
+        within(&word.charts.largest, &word.charts.target)
     );
     for (label, released) in [
         ("the words' released remainders (forward)", &word.forward),
         ("the returns' released remainders (adjoint)", &word.adjoint),
     ] {
         println!(
-            "{label}: {} nonzero, the largest {} (decimal {}), l1 sum {} (decimal {}), {} exact bits",
+            "{label}: {} nonzero, the largest {}, l1 sum {}, {} exact bits",
             released.entries,
             exact(&released.largest),
-            decimal(&released.largest, true),
             exact(&released.total),
-            decimal(&released.total, true),
             released.bits
         );
     }
     println!(
-        "tick balances: {} read, every one closed up to its residual within its certified bound: {}; the largest residual {} (decimal {}) against its bound {} (decimal {})",
+        "tick balances: {} read, every one closed up to its residual within its certified bound: {}; the largest residual {} against its bound {}: {}",
         word.balances,
         word.closed,
         exact(&word.largest_residual),
-        decimal(&word.largest_residual, true),
         exact(&word.residual_bound),
-        decimal(&word.residual_bound, true)
+        within(&word.largest_residual, &word.residual_bound)
     );
 
+    let grain = receiver_grain(field);
     println!();
-    println!("== bits against the baselines (online, on the same stream) ==");
-    bits("training", &exposure.training, false);
-    bits("held out", &exposure.held_out, true);
+    println!(
+        "== bits against the baselines (online, on the same stream; read at the receiver's grain L_R = {grain} as n + k/{grain} + ε: carry n, phase class k, fibre 0 ≤ ε < 1/{grain}) =="
+    );
+    bits("training", &exposure.training, false, grain);
+    bits("held out", &exposure.held_out, true, grain);
 
     println!();
     println!("== cost against the literal ==");
@@ -565,20 +666,19 @@ fn report(field: &Field, exposure: &Exposure) {
         exposure.description_bits,
         exposure.key_bits,
         work_bits,
-        enclosure(&exposure.kt)
+        enclosure(&exposure.kt, grain)
     );
+    let literal = ExactInterval::point(Rat::from_integer(BigInt::from(exposure.literal_bits)));
     println!(
-        "literal ceil(log2|A|)·n over the cells read: {} bits; Kt is {} the literal{}",
+        "literal ceil(log2|A|)·n over the cells read: {} bits; Kt is {} the literal{}; Kt − literal: {}",
         exposure.literal_bits,
-        against(
-            &exposure.kt,
-            &ExactInterval::point(Rat::from_integer(BigInt::from(exposure.literal_bits)))
-        ),
-        if exposure.kt.upper < Rat::from_integer(BigInt::from(exposure.literal_bits)) {
+        against(&exposure.kt, &literal),
+        if exposure.kt.upper < literal.lower {
             " (the pivot pays off)"
         } else {
             ""
-        }
+        },
+        difference(&exposure.kt, &literal, grain)
     );
 
     println!();
@@ -596,7 +696,7 @@ fn report(field: &Field, exposure: &Exposure) {
         exposure.aeons.len()
     );
     for (index, boundary) in exposure.aeons.iter().enumerate() {
-        aeon(index, boundary);
+        aeon(index, boundary, grain);
     }
 
     println!();
@@ -677,9 +777,10 @@ fn report(field: &Field, exposure: &Exposure) {
     );
 }
 
-/// One population's bits against the baselines, and the verdict against online order-0: on the
-/// held-out targets, the campaign's criterion (design (f): not beating it is a failure).
-fn bits(label: &str, bits: &Bits, criterion: bool) {
+/// One population's bits against the baselines, each comparison with its exact difference, and the
+/// verdict against online order-0: on the held-out targets, the campaign's criterion (design (f):
+/// not beating it is a failure).
+fn bits(label: &str, bits: &Bits, criterion: bool, grain: u64) {
     println!("{label}: {} targets", bits.cells);
     if bits.cells == 0 {
         println!("  no targets read");
@@ -695,13 +796,17 @@ fn bits(label: &str, bits: &Bits, criterion: bool) {
     ];
     for (name, interval) in rows {
         println!(
-            "  {name:<11} {}; per cell {}",
-            enclosure(interval),
-            per(interval, bits.cells)
+            "  {name:<11} {}; per cell at L_R = {grain}: {}",
+            enclosure(interval, grain),
+            per(interval, bits.cells, grain)
         );
     }
     for (name, baseline) in &rows[1..] {
-        println!("  the model is {} {name}", against(&bits.model, baseline));
+        println!(
+            "  the model is {} {name}; model − {name}: {}",
+            against(&bits.model, baseline),
+            difference(&bits.model, baseline, grain)
+        );
     }
     println!(
         "  against online order-0: {}",
@@ -756,7 +861,7 @@ fn keys(field: &Field, report: &KeyReport) {
 
 /// One aeon boundary: its length, lift points, readings, collapse, first law and the face against
 /// the literal.
-fn aeon(index: usize, boundary: &AeonBoundary) {
+fn aeon(index: usize, boundary: &AeonBoundary, grain: u64) {
     println!("aeon {index}: {} cells", boundary.cells);
     let lift = |points: &[BigInt]| {
         points
@@ -812,45 +917,47 @@ fn aeon(index: usize, boundary: &AeonBoundary) {
         boundary.state_bits[0],
         boundary.state_bits[1]
     );
-    first_law(&boundary.first_law);
-    literal(&boundary.literal);
+    first_law(&boundary.first_law, grain);
+    literal(&boundary.literal, grain);
 }
 
 /// The first law over the aeon: exchange plus deposition, telescoping to its change of code length.
-fn first_law(law: &EnclosedBalance) {
+fn first_law(law: &EnclosedBalance, grain: u64) {
     let (total, change) = (law.total(), law.change());
     let telescopes = total.lower == &change.lower - &law.widening
         && total.upper == &change.upper + &law.widening;
+    let enclosed = |interval: &ExactInterval| enclosure(interval, grain);
     println!(
         "  first law: {} arrivals over {} cells; {} exchange steps, {} deposition steps",
         law.arrivals, law.cells, law.exchanges, law.depositions
     );
-    println!("    exchange   {}", enclosure(&law.exchange));
-    println!("    deposition {}", enclosure(&law.deposition));
-    println!("    total      {}", enclosure(&total));
+    println!("    exchange   {}", enclosed(&law.exchange));
+    println!("    deposition {}", enclosed(&law.deposition));
+    println!("    total      {}", enclosed(&total));
     println!(
-        "    change C(closing) - C(opening) {}; widening {}",
-        enclosure(&change),
-        ratio(&law.widening)
+        "    change C(closing) - C(opening) {}; widening {} bits (at L_R = {grain}: {})",
+        enclosed(&change),
+        exact(&law.widening),
+        reading(&law.widening, grain)
     );
     println!(
         "    opening {}; closing {}",
-        law.opening.as_ref().map_or("-".to_string(), enclosure),
-        law.closing.as_ref().map_or("-".to_string(), enclosure)
+        law.opening.as_ref().map_or("-".to_string(), enclosed),
+        law.closing.as_ref().map_or("-".to_string(), enclosed)
     );
     println!("    telescopes exactly (total = change widened by the widening): {telescopes}");
 }
 
 /// The face against the literal over the aeon: `Σ ℓ + Σ g = n·log₂|A|`.
-fn literal(face: &LiteralComparison) {
+fn literal(face: &LiteralComparison, grain: u64) {
     let balances = face.code.lower.clone() + &face.gain.upper == face.literal.upper
         && face.code.upper.clone() + &face.gain.lower == face.literal.lower;
     println!(
         "  the face against the literal over {} cells (a reading, not a budget):",
         face.cells
     );
-    println!("    code (sum of l)  {}", enclosure(&face.code));
-    println!("    gain (sum of g)  {}", enclosure(&face.gain));
-    println!("    literal n·log2|A| {}", enclosure(&face.literal));
+    println!("    code (sum of l)  {}", enclosure(&face.code, grain));
+    println!("    gain (sum of g)  {}", enclosure(&face.gain, grain));
+    println!("    literal n·log2|A| {}", enclosure(&face.literal, grain));
     println!("    code + gain = literal on the enclosures' endpoints: {balances}");
 }

@@ -48,7 +48,10 @@
 //! over **the pinned cut**: `docs/plans/THE_REBUILD.md` at commit [`CUT_COMMIT`] as UTF-8 bytes, read
 //! by `git show` (171,754 bytes), never the live file. `declared` runs the declared steps
 //! (`γ_U = 1`, `η_x = 1/2`); `normal` turns the factor steps off (`η_x = 0`). Every value in a run
-//! is exact; the only integers outside the law are the milliseconds.
+//! is exact; the only integers outside the law are the milliseconds. No decimal is printed (a
+//! decimal is a collapse): a logit move is its exact ratio in grains with its integer quotient and
+//! remainder, and its reading at the receiver's grain `L_R` (`GrainCell::of`: carry, phase class
+//! and exact fibre `< 1/L_R`); a mean of milliseconds is the integer quotient with its remainder.
 
 use std::collections::BTreeMap;
 use std::time::Instant;
@@ -59,6 +62,7 @@ use holonics::hnn::constitution::{FactorGradient, LinearLocus};
 use holonics::hnn::field::{ConstitutionRead, CribDeclaration, ReceiverDeclaration};
 use holonics::hnn::pending::PendingRatio;
 use holonics::hnn::propagation::path_attenuation;
+use holonics::hnn::receiving::GrainCell;
 use holonics::hnn::reference::one_hot;
 use holonics::hnn::{
     Carrier, Constitution, ContactDeclaration, Current, Deposit, ExecutionPort, Field,
@@ -73,14 +77,59 @@ use num_traits::{One, Signed, Zero};
 const CUT_COMMIT: &str = "fed5488ce70eb5ffbc90f2f03d23638be9d69189";
 const CUT_PATH: &str = "docs/plans/THE_REBUILD.md";
 
-/// An exact rational printed to six decimals, truncated (a presentation; no float).
-fn decimal(value: &Rat) -> String {
-    let scaled = (value * Rat::from_integer(BigInt::from(1_000_000)))
-        .floor()
-        .to_integer();
-    let million = BigInt::from(1_000_000);
-    let (whole, fraction): (BigInt, BigInt) = (&scaled / &million, (&scaled % &million).abs());
-    format!("{whole}.{fraction:0>6}")
+/// An exact rational: an integer, `n/2^e` on a wide dyadic denominator, `n/(2^e·m)` on a wide
+/// denominator with a power-of-two factor, or `n/d`.
+fn exact(value: &Rat) -> String {
+    let denominator = value.denom().magnitude();
+    if denominator.is_one() {
+        return value.numer().to_string();
+    }
+    let twos = denominator.trailing_zeros().unwrap_or(0);
+    let odd = denominator >> twos;
+    if denominator.bits() <= 16 {
+        format!("{}/{}", value.numer(), denominator)
+    } else if odd.is_one() {
+        format!("{}/2^{twos}", value.numer())
+    } else if twos > 0 {
+        format!("{}/(2^{twos}·{odd})", value.numer())
+    } else {
+        format!("{}/{}", value.numer(), denominator)
+    }
+}
+
+/// An exact ratio, reduced, with its integer quotient and remainder: `n/d (q rem r over d)`.
+fn ratio(value: &Rat) -> String {
+    if value.is_integer() {
+        return value.numer().to_string();
+    }
+    let quotient = value.floor().to_integer();
+    let remainder = value.numer() - &quotient * value.denom();
+    format!(
+        "{} ({quotient} rem {remainder} over {})",
+        exact(value),
+        value.denom()
+    )
+}
+
+/// **A reading at the grain** `L` (`GrainCell::of`): `value = n + k/L + ε`, the carry `n`, the
+/// phase class `k ∈ ℤ/L` and the unresolved fibre `0 ≤ ε < 1/L`, each exact.
+fn reading(value: &Rat, grain: u64) -> String {
+    let cell = GrainCell::of(value, grain);
+    format!(
+        "{} + {}/{grain} + ε, ε = {} < 1/{grain}",
+        cell.carry,
+        cell.phase,
+        exact(&cell.fibre)
+    )
+}
+
+/// A mean of whole milliseconds over a count: the integer quotient with its remainder.
+fn mean(total: u128, count: usize) -> String {
+    let count = count as u128;
+    match (total.checked_div(count), total.checked_rem(count)) {
+        (Some(quotient), Some(remainder)) => format!("{quotient} rem {remainder} over {count}"),
+        _ => "-".to_string(),
+    }
 }
 
 const CIRCLE: [(i64, i64); 16] = [
@@ -515,24 +564,28 @@ fn growth(which: &str, deposits: usize, steps: &Steps, graded: usize) {
                     theta.commit(),
                 );
                 let (_, faces) = pending.read(&field, &theta).expect("the read at Θ");
-                let (_, exact) = pending
+                let (_, carried) = pending
                     .read(&field, &theta.with_remainders().expect("Θ + r"))
                     .expect("the read at Θ + r");
-                let grain = Rat::from_integer(BigInt::from(phases.grain()));
+                let grain = phases.grain();
                 let largest = faces
                     .logits
                     .iter()
                     .flatten()
-                    .zip(exact.logits.iter().flatten())
-                    .map(|(a, b)| (a - b).abs() * &grain)
+                    .zip(carried.logits.iter().flatten())
+                    .map(|(a, b)| (a - b).abs())
                     .max()
                     .unwrap_or_else(Rat::zero);
-                decimal(&largest)
+                format!(
+                    "{} grains; |Δf| at L_R = {grain}: {}",
+                    ratio(&(&largest * Rat::from_integer(BigInt::from(grain)))),
+                    reading(&largest, grain)
+                )
             })
         },
         |index, done, moved: Option<String>, boundary| {
             println!(
-                "aeon {index} closed after deposit {done}: released {} loci ({} remainders); bits {} -> {}; the largest logit move to Θ + r is {} grains",
+                "aeon {index} closed after deposit {done}: released {} loci ({} remainders); bits {} -> {}; the largest logit move to Θ + r is {}",
                 boundary.collapse.released.len(),
                 boundary.collapse.released_remainders.len(),
                 boundary.collapse.bits[0],
@@ -549,23 +602,23 @@ fn growth(which: &str, deposits: usize, steps: &Steps, graded: usize) {
             );
         }
     }
-    let per = |total: u128| total / done.max(1) as u128;
     // An exposure of `n` cells reads ⌈n / A⌉ windows, each a refine, a compare and a deposit: the
-    // capacity's `n*` (the real-cut exposure) and the declared population.
+    // capacity's `n*` (the real-cut exposure) and the declared population. The projection is the
+    // exact `W · Σ / N` milliseconds, `Σ` the three phases' total over the `N` deposits read.
     let aperture = field.receivers()[0].aperture;
-    let cycle = per(totals.iter().sum());
+    let cycle: u128 = totals.iter().sum();
     let windows = |cells: u64| (cells as u128).div_ceil(aperture as u128);
     let (capacity, population) = (field.capacity().n_star(), field.population());
     println!(
-        "{done} deposits, {boundaries} aeon boundaries, {} ms in all: {} ms per refine, {} ms per compare and {} ms per deposit on average; {released_total} residuals released ({released_bits_total} bits); the widest carried remainder {widest_ever} bits; at these means n* = {capacity} cells ({} windows) project to {} s and the population's {population} cells ({} windows) to {} s",
+        "{done} deposits, {boundaries} aeon boundaries, {} ms in all: per refine {} ms, per compare {} ms and per deposit {} ms (quotient rem remainder over the deposits); {released_total} residuals released ({released_bits_total} bits); the widest carried remainder {widest_ever} bits; at these means n* = {capacity} cells ({} windows) project to {} ms and the population's {population} cells ({} windows) to {} ms",
         clock.elapsed().as_millis(),
-        per(totals[0]),
-        per(totals[1]),
-        per(totals[2]),
+        mean(totals[0], done),
+        mean(totals[1], done),
+        mean(totals[2], done),
         windows(capacity),
-        windows(capacity) * cycle / 1000,
+        mean(windows(capacity) * cycle, done),
         windows(population),
-        windows(population) * cycle / 1000
+        mean(windows(population) * cycle, done)
     );
 }
 

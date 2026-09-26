@@ -22,6 +22,8 @@
 # The moment's exact dense code (each slot self-delimited, max(1, bit length) + 1 bits) is a reading,
 # not the capacity: it is longer than log2 N(n), so it crosses later.
 import math, random
+from fractions import Fraction as F
+from field import exact
 
 def log2N_float(n, rings, src, A, deltas):
     """A float bracket only; every n* below is certified by exact integers."""
@@ -45,7 +47,8 @@ def N_exact(n, rings, src, A, deltas):
     return v
 
 def lossy(n, rings, src, A, deltas):
-    return N_exact(n, rings, src, A, deltas).bit_length() <= n * int(math.log2(A))
+    assert A & (A - 1) == 0, "|A| a power of two"
+    return N_exact(n, rings, src, A, deltas).bit_length() <= n * (A.bit_length() - 1)
 
 def nstar(rings, src, A, deltas, exact_search=True):
     hi = 1
@@ -70,7 +73,7 @@ print(f"three rings of periods 3, 4, 5, |A| = 2 (24 slots): n* = {ns} by countin
       f"N(n*) < 2^{ns}, and N(n* - 1) >= 2^{ns - 1}")
 for n in (2, 8, 32, 64, 96, 128, 256, 1024, 4096):
     print(f"  n = {n:5d}: log2 N(n) < {N_exact(n, rings, [0, 1, 2], A, []).bit_length():4d}, "
-          f"source bits {n:5d}, ratio <= {N_exact(n, rings, [0, 1, 2], A, []).bit_length() / n:.3f}")
+          f"source bits {n:5d}, ratio <= {exact(F(N_exact(n, rings, [0, 1, 2], A, []).bit_length(), n))}")
 
 def moment(src, per, notch, A):
     taus = [0] * len(per); M = [[[0] * A for _ in range(d)] for d in per]
@@ -87,7 +90,7 @@ print("  the moment's dense code, a reading (max over 50 random sources):")
 for n in (8, 32, 64, 96, 128, 144, 256, 1024, 4096):
     worst = max(sum(slot_bits(c) for M in moment([rng.randrange(A) for _ in range(n)], rings, [{1}, {0}, {1}], A)
                     for row in M for c in row) for _ in range(50))
-    print(f"    n = {n:5d}: dense code {worst:4d} bits, source bits {n:5d}, ratio {worst / n:.3f}")
+    print(f"    n = {n:5d}: dense code {worst:4d} bits, source bits {n:5d}, ratio {exact(F(worst, n))}")
 
 # 2. Campaign 1's declared field: rings of periods 5, 7, 11, 13; source ring 0; bytes; Delta = {1}.
 rings, A = [5, 7, 11, 13], 256
@@ -100,7 +103,7 @@ rings = [7]
 ns = nstar(rings, [0], A, [1])
 first, second = 7 * A, 7 * A * A
 dense = next(n for n in range(1000, 10**7, 1000)
-             if first * slot_bits(round(n / first)) + second * slot_bits(round(n / second)) < 8 * n)
+             if first * slot_bits(round(F(n, first))) + second * slot_bits(round(F(n, second))) < 8 * n)
 print(f"one byte ring of period 7, Delta = {{1}}: n* = {ns:,} by counting; the dense code "
       f"(uniform counts) first falls below the source near {dense:,}")
 
@@ -112,7 +115,7 @@ print(f"campaign-scale illustration (eight source rings of period 16): {G * (fir
 lo = nstar(rings, list(range(8)), A, [1], exact_search=False)   # float bracket, certified exactly
 print(f"  n* = {lo:,} cells by counting (certified by exact integers at n* - 1 and n*)")
 # the dense code with uniform counts is a step function of n, and its ratio is not monotone:
-def mb(n): return G * (first * slot_bits(round(n / first)) + second * slot_bits(round(n / second)))
+def mb(n): return G * (first * slot_bits(round(F(n, first))) + second * slot_bits(round(F(n, second))))
 def first_below(n, step):
     while mb(n) >= 8 * n:
         n += step
@@ -125,4 +128,4 @@ last = first_below(back, 1000)
 assert all(mb(n) < 8 * n for n in range(last, 16 * 10**6, 997))
 print(f"  the dense code (uniform counts), a reading: below the source from n = {dip:,}, above again from "
       f"about {back:,}, and below for good from n = {last:,} "
-      f"(ratio {mb(4_200_000) / (8 * 4_200_000):.3f} at 4.2 x 10^6, {mb(4_300_000) / (8 * 4_300_000):.3f} at 4.3 x 10^6)")
+      f"(ratio {exact(F(mb(4_200_000), 8 * 4_200_000))} at n = 4,200,000, {exact(F(mb(4_300_000), 8 * 4_300_000))} at n = 4,300,000)")

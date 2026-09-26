@@ -1,6 +1,7 @@
 # Is the design's tick power-neutral? Junction Swing with weights kappa_ri*Y_i, then lossless one-hop transit.
 from fractions import Fraction as F
 import random
+from field import exact
 random.seed(3)
 G=6; d=2
 nbr={g:[(g-1)%G,(g+1)%G] for g in range(G)}
@@ -34,5 +35,5 @@ asym={(g,h):F(2)**(-(beta[g]*Q[(g,h)]//2)) for g in range(G) for h in nbr[g]}   
 sym={(g,h):F(2)**(-(min(beta[g],beta[h])*Q[(g,h)]//2)) for g in range(G) for h in nbr[g]}  # one exponent per contact
 pa=run(asym); ps=run(sym)
 print("per-ring beta: kappa_gh == kappa_hg on every contact?", all(asym[(g,h)]==asym[(h,g)] for (g,h) in asym))
-print("per-ring beta, global weighted power over ticks:", [float(p) for p in pa])
-print("per-contact kappa, global weighted power over ticks:", [float(p) for p in ps])
+print("per-ring beta, global weighted power over ticks:", "; ".join(exact(p) for p in pa))
+print("per-contact kappa, global weighted power over ticks:", "; ".join(exact(p) for p in ps))

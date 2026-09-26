@@ -1,6 +1,7 @@
 # Re-run bits2.py case (5) under (a) the Bezout/spectral projector the design states and
 # (b) the certified release the design states (release only when certified inside tolerance).
 from fractions import Fraction as F
+from field import exact
 import random
 def bits(x): return x.numerator.bit_length()+x.denominator.bit_length()
 def mbits(v): return max(bits(x) for x in v)
@@ -63,4 +64,4 @@ random.seed(7)
 x=[F(0)]*7
 for e in range(8): x=stepT(x); x[random.randint(0,4)]+=1; x[5]+=F(1)
 crit=x[:5]; Xc=[sum(X[i][j]*crit[j] for j in range(5)) for i in range(2)]
-print("stable-coordinate reading before collapse:", [float(v) for v in x[5:]], " after script truncation: [0,0]  after Bezout:", [float(v) for v in Xc])
+print("stable-coordinate reading before collapse:", "; ".join(exact(v) for v in x[5:]), " after script truncation: [0,0]  after Bezout:", "; ".join(exact(v) for v in Xc))
