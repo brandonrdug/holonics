@@ -75,8 +75,8 @@
 //! The letters of a passage are replayed without the wave ([`clock_letters`]: the resident's clock
 //! law with its key location and re-keying at each carry-out, the site kinds given per tick), the
 //! development harness's letters (Decision 31). The field's declared family ([`letter_family`]) is
-//! the harness's choice: on the standing cut's development cells no clock-only and no contact
-//! family coded below both the cell-only tree and the constant control of its slots by its
+//! the harness's choice: on the standing cut's development cells, at the contacts' horizon bounds,
+//! no clock-only and no contact family coded below the constant control of its slots by its
 //! description charge, so it is the cell-only family, and the register is campaign 1's.
 //!
 //! [definition; agent-inferred] **The combined face** (Decision 27's combined read, with the tree's
@@ -727,8 +727,9 @@ impl ActiveAddress {
 /// [definition; agent-inferred] **The field's declared letter family** (campaign 2, decided on the
 /// development cells by `hnn_landmark`'s harness, Decision 31): the receiving letters every
 /// receiver's tree is addressed by. The harness's receipt (the notebook README's `hnn_landmark`
-/// row) chose the cell-only family: no clock-only family and no contact family lowered the
-/// development code length by its description charge.
+/// row) chose the cell-only family: at the horizon bounds no clock-only family and no contact
+/// family coded below the constant-slot control of its slots by its description charge (every
+/// `Δ_letters` decided positive), so no letter carried information the preceding cells do not.
 pub fn letter_family(_field: &Field) -> LetterFamily {
     LetterFamily::cells()
 }

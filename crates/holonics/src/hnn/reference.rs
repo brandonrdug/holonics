@@ -2326,8 +2326,9 @@ pub struct StateReport {
 /// the constitution's exact bits by carrier (lattice entries, carried remainders, solved charts),
 /// what the deposit that reached it released (its residuals' exact bits) and stepped (the entries
 /// whose lattice coordinate moved), and each contact's site reading at the commit (campaign 2's
-/// contact-kind census, `hnn::contact::site_readings`: the kinds a register refreshed after the
-/// next ingest reads). The mount's point releases and steps nothing.
+/// contact-kind census, `hnn::word::PowerForm::site_readings` on the commit's power form through
+/// the contact owner's `site_reading`: the kinds a register refreshed after the next ingest
+/// reads). The mount's point releases and steps nothing.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CurvePoint {
     pub commit: u64,
