@@ -14,8 +14,8 @@ use crate::hnn::landmark::{
     Beta, IdealLandmarks, LandmarkDeclaration, Landmarks, Letter, address, binary_log,
     carrier_width, choose_depth, code_length, face_bits, prequential,
 };
-use crate::hnn::masses::grain_exponent;
 use crate::hnn::ratio::log2_enclosure;
+use crate::hnn::receiving::grain_exponent;
 use crate::hnn::reference::Cut;
 use crate::ratio::{Rat, rat};
 

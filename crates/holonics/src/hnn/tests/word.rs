@@ -9,7 +9,7 @@ use super::support::Medium;
 use crate::hnn::HnnError;
 use crate::hnn::field::{Current, Field};
 use crate::hnn::moment::SourceMoment;
-use crate::hnn::receiving::ReceivingPhases;
+use crate::hnn::receiving::{ActiveAddress, ReceivingPhases, ReceivingRead, grain_logits};
 use crate::hnn::word::Word;
 use crate::ratio::{Rat, integer};
 
@@ -114,10 +114,11 @@ fn the_forward_word_reads_its_epochs_and_releases_its_change() {
     }
 }
 
-/// The declared initial constitution has `E = 0`, so its first word carries no change and every
-/// wave logit is zero; the class masses sit at their prior, so the count face is uniform
-/// (Decision 27): every real logit reads `log₂(1/|A|) = −2` on the chain's `|A| = 4`, carry `−2` and
-/// phase class `0`, every imaginary logit zero. The first faces are uniform.
+/// A medium with `E = 0` opens an empty word: its first word carries no change and every wave
+/// logit is zero; the receiving parametron's tree is empty, so its face is uniform at every
+/// address (Decision 28): every real logit of the combined read is `log₂(1/|A|) = −2` on the
+/// chain's `|A| = 4`, carry `−2` and phase class `0`, every imaginary logit zero. The first faces
+/// are uniform.
 #[test]
 fn the_initial_constitution_opens_an_empty_word() {
     let field = &chain();
@@ -127,14 +128,16 @@ fn the_initial_constitution_opens_an_empty_word() {
     // With `E = 0` the observability over the source storage is still the medium's own; the wave
     // of this moment is zero.
     let phases = phases.unwrap();
-    let count = phases.count_face(&medium, &moment).unwrap();
+    let tree = phases
+        .tree_faces(&medium, &ActiveAddress::boundary(phases.depth()), &[1, 3])
+        .unwrap();
     let mut word = Word::open(field, &medium, &current, &moment).unwrap();
     assert_eq!(word.power().unwrap(), Rat::zero());
-    for anchor in word.forward(&phases).unwrap() {
-        let read = phases
-            .read(field, &medium, &current, &anchor, &count)
-            .unwrap();
-        assert_eq!(read.logits, count.logits());
+    for (anchor, tree) in word.forward(&phases).unwrap().into_iter().zip(&tree) {
+        let wave = phases.read(field, &medium, &current, &anchor).unwrap();
+        assert!(wave.logits.iter().all(Zero::is_zero));
+        let read = ReceivingRead::combined(wave.logits, tree, phases.grain()).unwrap();
+        assert_eq!(read.logits, grain_logits(tree));
         assert!(read.logits.iter().skip(1).step_by(2).all(Zero::is_zero));
         assert!(
             read.cells

@@ -417,6 +417,11 @@ impl SourceMoment {
         })
     }
 
+    /// `|A|`, the exterior chart the moment counts on.
+    pub fn alphabet(&self) -> usize {
+        self.alphabet
+    }
+
     /// The cells ingested since the open, `n`.
     pub fn cells(&self) -> u64 {
         self.cells

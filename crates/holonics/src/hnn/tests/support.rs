@@ -10,8 +10,9 @@ use crate::hnn::field::{
     ConstitutionRead, ContactDeclaration, CribDeclaration, Field, FieldDeclaration,
     ReceiverDeclaration, RingDeclaration,
 };
-use crate::hnn::masses::{ClassMasses, Regions};
+use crate::hnn::landmark::Landmarks;
 use crate::hnn::moment::PairPort;
+use crate::hnn::receiving::landmark_declaration;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::{Rat, integer, rat};
 
@@ -167,13 +168,13 @@ pub(super) fn small_field(
                 ring: receiver,
                 aperture: 1,
                 tolerance: rat(1, 16),
-                regions: Regions::PrecedingCell,
+                depth: 2,
             }],
             crib: CribDeclaration {
                 window: 16,
                 offset: 1,
             },
-            population: 1 << 20,
+            population: 1 << 16,
             lattice: Default::default(),
         }
         .by_lattice_rule(),
@@ -231,8 +232,8 @@ pub(super) struct Medium {
     pub(super) stiffness: Vec<ExactRatMatrix>,
     pub(super) dissipation: Vec<ExactRatMatrix>,
     pub(super) receiving: Vec<Option<ExactRatMatrix>>,
-    /// The receiving parametron's class masses at their prior (Decision 27).
-    pub(super) masses: Vec<Option<ClassMasses>>,
+    /// The receiving parametron's landmark tree, empty (Decision 28).
+    pub(super) trees: Vec<Option<Landmarks>>,
 }
 
 fn diagonal(n: usize, value: Rat) -> ExactRatMatrix {
@@ -246,10 +247,12 @@ fn unit(n: usize, i: usize) -> Vec<Rat> {
 }
 
 impl Medium {
-    /// **Campaign 1's initial constitution** (design (d), "The initial constitution and its
-    /// priors"): `E = 0`; the pair port's outputs 0 with `±1` reads; `R` a `±1` pattern times 1/2;
-    /// `W_c = 0`; `W_s = −¼I`; the slices the skew cyclic shift; `q = 0`; `C = I`, `K = D = ¼I`.
-    /// The `±1` patterns here come from the test generator, not the declared sign generator.
+    /// **A medium of campaign 1's declared shapes** (design (d), "The initial constitution and its
+    /// priors", before Decision 28 moved the prior from `R` to `E`): `E = 0`; the pair port's
+    /// outputs 0 with `±1` reads; `R` a `±1` pattern times 1/2, so the wave reads a nonzero face;
+    /// `W_c = 0`; `W_s = −¼I`; the slices the skew cyclic shift; `q = 0`; `C = I`, `K = D = ¼I`;
+    /// the receiving parametron's tree empty. The `±1` patterns here come from the test generator,
+    /// not the declared sign generator.
     pub(super) fn initial(field: &Field, seed: u64) -> Self {
         let mut draw = Draw::new(seed);
         let mut sign = move || {
@@ -327,13 +330,13 @@ impl Medium {
                     })
                 })
                 .collect(),
-            masses: (0..widths.len())
+            trees: (0..widths.len())
                 .map(|g| {
                     field
                         .receivers()
                         .iter()
                         .find(|r| r.ring == g)
-                        .map(|r| ClassMasses::prior(r.regions, a))
+                        .map(|r| Landmarks::new(landmark_declaration(field, r).unwrap()).unwrap())
                 })
                 .collect(),
         }
@@ -491,8 +494,8 @@ impl ConstitutionRead for Medium {
     fn receiving_map(&self, ring: usize) -> Option<&ExactRatMatrix> {
         self.receiving[ring].as_ref()
     }
-    fn class_masses(&self, ring: usize) -> Option<&ClassMasses> {
-        self.masses[ring].as_ref()
+    fn landmarks(&self, ring: usize) -> Option<&Landmarks> {
+        self.trees[ring].as_ref()
     }
 }
 

@@ -105,7 +105,8 @@ fn a_compare_across_an_ingest_equals_one_taken_before_it() {
 }
 
 /// After a deposit the delayed compare reads the contemporary constitution: its faces are a fresh
-/// refine's at the successor, and it returns the residual against the face it emitted.
+/// refine's wave at the successor with the successor's tree at the targets' addresses (Decision
+/// 28), and it returns the wave's residual against the face it emitted.
 #[test]
 fn after_a_deposit_the_compare_returns_the_residual_against_the_emitted_face() {
     let (reference, mut resident, moment) = cut(true);
@@ -123,7 +124,14 @@ fn after_a_deposit_the_compare_returns_the_residual_against_the_emitted_face() {
         .compare(&mut resident, first, &one_hot(&[2, 0]))
         .unwrap();
     let ratio = delayed.forward.present().unwrap();
-    assert_eq!(ratio.faces(), &contemporary);
+    let address = resident.address().truncated(phases.depth()).unwrap();
+    let trees = phases
+        .tree_faces(resident.constitution(), &address, &[2, 0])
+        .unwrap();
+    assert_eq!(
+        ratio.faces(),
+        &phases.combine(&contemporary, &trees).unwrap()
+    );
     let ReceiptDetail::Compare { residual, .. } = &delayed.receipt.detail else {
         panic!("a compare's receipt");
     };

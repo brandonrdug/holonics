@@ -13,13 +13,12 @@ use super::support::Draw;
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{Constitution, Steps};
 use crate::hnn::field::{ConstitutionRead, Current, End, Field};
-use crate::hnn::masses::CountFace;
 use crate::hnn::moment::PairPort;
 use crate::hnn::pending::PendingRatio;
 use crate::hnn::port::{ExecutionPort, Handle, Pullback, ReceiptDetail, Transpose, WordReturn};
 use crate::hnn::propagation::{Operands, contact_exponent, element_step, junction_swing, transit};
 use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector, TargetPhases, target_phases};
-use crate::hnn::receiving::ReceivingPhases;
+use crate::hnn::receiving::ActiveAddress;
 use crate::hnn::reference::{Reference, compose, one_hot};
 use crate::hnn::word::Word;
 use crate::ratio::exponentiated::power_of_two;
@@ -28,28 +27,6 @@ use crate::ratio::linear::vector::{add, dot, scale, sub};
 use crate::ratio::{Rat, integer, rat};
 use crate::receiver::reception::{Component, InteractionReturn};
 use crate::receiver::release::{BeyondTolerance, DecisionRule, WithinTolerance};
-
-/// The count face at the declared empty-window region (Decision 27): a word opened on an injection
-/// has no moment, so it reads the region no window addresses.
-fn empty_window(theta: &Constitution, phases: &ReceivingPhases) -> CountFace {
-    CountFace::read(
-        theta.class_masses(phases.ring()).unwrap(),
-        0,
-        phases.grain(),
-    )
-    .unwrap()
-}
-
-/// **The wave's logits** of combined reads: the count face's grain logits taken back out, so the
-/// word's linear map from its opening storage is paired alone (the count part is a stored face and
-/// no function of the storage).
-fn wave(logits: &[Vec<Rat>], count: &CountFace) -> Vec<Vec<Rat>> {
-    let stored = count.logits();
-    logits
-        .iter()
-        .map(|read| read.iter().zip(&stored).map(|(f, k)| f - k).collect())
-        .collect()
-}
 
 /// A word opened on a storage injection on every ring, its wave's logits and a covector from a
 /// ratio against drawn targets.
@@ -72,13 +49,14 @@ fn injected(
         .collect();
     let mut word = Word::open_on(field, theta, &current, storage.clone()).unwrap();
     let anchors = word.forward(&phases).unwrap();
-    let count = empty_window(theta, &phases);
+    // The wave's reads: the tree part is a stored face and no function of the storage, so the
+    // word's linear map from its opening storage is paired alone.
     let reads: Vec<_> = anchors
         .iter()
-        .map(|anchor| phases.read(field, theta, &current, anchor, &count).unwrap())
+        .map(|anchor| phases.read(field, theta, &current, anchor).unwrap())
         .collect();
     let faces = Faces::of_reads(&reads, phases.grain()).unwrap();
-    let logits = wave(&faces.logits, &count);
+    let logits = faces.logits.clone();
     let targets = [draw.below(4), draw.below(4)];
     let ratio = HolonRatio::compare(
         faces,
@@ -134,17 +112,12 @@ fn the_word_return_pulls_back_through_the_executed_charts() {
     let pulled = |operands: Operands| {
         let mut word = Word::on_operands(&field, operands, storage.clone()).unwrap();
         let anchors = word.forward(&phases).unwrap();
-        let count = empty_window(&theta, &phases);
         let reads: Vec<_> = anchors
             .iter()
-            .map(|anchor| {
-                phases
-                    .read(&field, &theta, &current, anchor, &count)
-                    .unwrap()
-            })
+            .map(|anchor| phases.read(&field, &theta, &current, anchor).unwrap())
             .collect();
         let faces = Faces::of_reads(&reads, phases.grain()).unwrap();
-        let logits = wave(&faces.logits, &count);
+        let logits = faces.logits.clone();
         let covector = HolonRatio::compare(
             faces,
             &[1, 3],
@@ -209,13 +182,23 @@ struct Cut {
 fn cut_at(field: Field, theta: Constitution) -> Cut {
     let (current, open) = moment(&field, 66, 13);
     let phases = phases(&field, &theta, &current);
-    let pending = PendingRatio::produce(&current, &open, &phases, 0);
+    let pending = PendingRatio::produce(
+        &current,
+        &open,
+        &ActiveAddress::boundary(phases.depth()),
+        &phases,
+        0,
+    )
+    .unwrap();
     let (word, faces) = pending.read(&field, &theta).unwrap();
     let operands = word.operands().clone();
     let targets = [2usize, 1];
     let anchors = target_phases(&field, pending.anchor(), 2, &targets).unwrap();
     let faces_logits = faces.logits.clone();
-    let covector = HolonRatio::compare(faces, &targets, &anchors)
+    // The covector is the combined face's (the tree's at each phase's address plus the wave's); the
+    // functional pairs it with the wave's logits, the tree part being a stored face.
+    let combined = pending.against(&theta, &faces, &targets).unwrap().faces;
+    let covector = HolonRatio::compare(combined, &targets, &anchors)
         .unwrap()
         .covector()
         .unwrap();
@@ -515,10 +498,9 @@ fn tangent(cut: &Cut, plus: (&Field, &Constitution), minus: (&Field, &Constituti
         minus.1.receiving_map(receiving).unwrap(),
     );
     let (ring, lift) = (field.ring(receiving), &current.lift()[receiving]);
+    // The pending read is the wave's (the tree part is a stored face, added at compare).
     let (_, faces) = cut.pending.read(field, theta).unwrap();
-    // The count face is a stored face (Decision 27): the primal's wave is the read without it.
-    let count = phases.count_face(theta, cut.pending.moment()).unwrap();
-    let waves = wave(&faces.logits, &count);
+    let waves = faces.logits;
     let mut derivative = Rat::zero();
     for (j, epoch) in phases.epochs().enumerate() {
         let (v, dv) = (
@@ -776,7 +758,14 @@ fn the_moment_covector_is_the_derivative_in_the_phase_counts() {
     );
     let covector = quiet.pullback.rings[0].moment.as_ref().unwrap();
     let (_, other) = moment(&quiet.field, 68, 21);
-    let moved = PendingRatio::produce(&current, &other, quiet.pending.phases(), 0);
+    let moved = PendingRatio::produce(
+        &current,
+        &other,
+        quiet.pending.address(),
+        quiet.pending.phases(),
+        0,
+    )
+    .unwrap();
     let first = quiet.pending.moment();
     let mut predicted = Rat::zero();
     for (phase, row) in covector.iter().enumerate() {

@@ -1,8 +1,10 @@
 //! **The host reference: the exact implementation of the execution port, and the exposure.**
 //!
 //! [definition] [`Reference`] implements [`ExecutionPort`] exactly (design (c), "The host
-//! reference"). Its [`Resident`] holds the field, the lift point, the constitution, the open
-//! moments, the open pending ratios, the staged deposits and the executed charts ([`Charts`]).
+//! reference"). Its [`Resident`] holds the field, the lift point, the receiving parametron's active
+//! suffix address ([`ActiveAddress`], shifted at every ingested cell as the lift point is), the
+//! constitution, the open moments, the open pending ratios, the staged deposits and the executed
+//! charts ([`Charts`]).
 //! Every value is in ℚ, in `ℚ(θ)` at a face, or an enclosure read at the exterior, and no float
 //! exists. A word carries its inverses as certified lattice charts and its transients on the
 //! field's declared lattice with error feedback (Decision 24; [`crate::hnn::chart`]): nothing is
@@ -38,7 +40,7 @@
 //!
 //! ```text
 //! R        sample (P_R^(τ_R) v_R(e_j), −g_j) per receiving phase                   normal law
-//! C_(r,t)  +w at the window's region r and each target t_j (q = p̃ + g = e_t)        class masses (Decision 27)
+//! tree     each target t_j on the paths its address a_j opens, in cell order        landmark tree (Decision 28)
 //! W_c,g    sample (c_t, −u_t) at each tick of the element's window                  normal law
 //! E_g      sample (M_g[c], −P^(c−τ_g) s̄_g(0)) per phase with counts                  normal law
 //! f_g      G = (K̄ + K̄ᵀ) f,  K̄ = Σ_t u_t x̄_tᵀ;   slices ∂/∂u_ρ = σ_ρ[(x̄·v)u − (u·v)x̄], ∂/∂v_ρ likewise
@@ -69,11 +71,12 @@
 //! aeon's change of code length, and `close_aeon` returns the aeon's balance with the face against
 //! the literal beside it.
 //!
-//! [definition] **The exposure** ([`Reference::expose`], design (d), campaign 1's protocol): the cut,
-//! exactly the field's declared population (so the `n*` guard holds), is read in order, as one
-//! stream, into one moment; at each receiving window `refine` runs on the moment and `compare`
-//! against the next `A` cells, whose return is deposited on the training part and discarded on the
-//! held-out part; then those cells are ingested; the aeon boundary is the joint clock's carry-out,
+//! [definition] **The exposure** ([`Reference::expose`], design (d), campaign 1's protocol under
+//! Decision 29): the cut, exactly the field's declared population (so the `n*` guard holds), is
+//! read in order, as one stream, into one moment; at each receiving window `refine` runs on the
+//! moment and `compare` against the next `A` cells, whose return is then deposited, held-out
+//! windows included (prequential: every comparison is scored at the standing before its own
+//! deposit, as the online baselines are); then those cells are ingested; the aeon boundary is the joint clock's carry-out,
 //! and after it keys are located on the crib that closed the aeon: its last `W_crib` cells, past
 //! and already scored, truncated after the last held-out cell so no held-out cell is read (review
 //! D1). The budget stop admits no further deposit and the run continues, reported incomplete. A
@@ -83,7 +86,7 @@
 //! ([`WallTimes`]).
 //!
 //! [definition; agent-inferred] **The kept read.** `refine` keeps the word it ran (its operands and
-//! per-tick waves without the borrow of its field, `hnn::word::KeptWord`) and the faces it
+//! per-tick waves without the borrow of its field, `hnn::word::KeptWord`) and the wave's faces it
 //! read, in the pending slot, tagged with the commit of the constitution it read them at. `compare`
 //! takes them when that commit is still the published one and reads again otherwise (a comparison
 //! observed after an update is read through the contemporary constitution); a deposit and a
@@ -91,8 +94,10 @@
 //! ratio's operands, the published constitution and the resident's kept charts (a chart at an
 //! unchanged operator is read again with no step), so the kept read is that function's value and
 //! the compare returns the same either way (the test
-//! `a_compare_returns_the_same_with_and_without_the_refines_kept_read`). The pending ratio still
-//! holds operands only (guard 3), the kept word is consumed by its own return (guard 2), and the
+//! `a_compare_returns_the_same_with_and_without_the_refines_kept_read`). The tree part of the
+//! combined face is read at compare in either case, at the published constitution and each phase's
+//! causal address (Decision 28, `PendingRatio::against`). The pending ratio still holds operands
+//! only (guard 3), the kept word is consumed by its own return (guard 2), and the
 //! kept read is not state: the state bits do not count it, and a clone of the resident drops it.
 //!
 //! [definition; agent-inferred] **The host realization** (CLAUDE.md, the hardware law;
@@ -108,6 +113,7 @@
 //! | a word's open (`refine`, `compare`'s read, the deposit's re-read) | the rings' operands, then the contacts', each refining its own chart from its own kept chart; within them, a Gram's rows | each reads its own material (the standings, its own screws) and its own kept chart, and writes its own operands; the refined charts are kept afterwards, by key |
 //! | a tick of the word | the junctions, then the elements, then the transits; the rings' and contacts' power terms | a junction reads its own storage, arrivals and anchor remainder, an element its own junction and storage remainder, a transit its two ends' outgoing waves, its own state and its own remainders; the balance terms and the power are summed afterwards in ring, then contact, order |
 //! | the receiving read | the receiving epochs; within each, the map's `2\|A\|` rows, then the classes' grain cells | each row and class reads the shared anchor and writes its own logit or cell |
+//! | the tree read at compare | the receiving phases, each reading the published tree at its own address | the tree is read, never written, until the deposit |
 //! | the faces and the Holon ratio | the receiving phases' faces, then their ratios and code lengths | each reads its own read and target |
 //! | `pull_back` | per step in reverse, the junctions at their recorded anchors, then the elements (each through its executed chart's transpose), then the transits (each through its executed chart's transpose, and each channel coordinate), then the junctions' reverse Swings at their executed weights (and each coordinate) | each reads its step's record, its own covectors and its own adjoint remainders, and writes its own; the conductance terms are added afterwards, in contact, then ring and incidence, order |
 //! | [`compose`] | the receiving map's gradient by row blocks; the rings (their ticks' charts, slices and contrast port's rows); the standings; the source ring's phases and pair-port ranks; the contacts (their ticks' charts and three forms) | each reads the word's return and its own material; the parts are joined in ring and contact order, so the deposit's steps stand in the serial order |
@@ -146,11 +152,11 @@ use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartReading, ChartStart, Charts, Remainders};
 use crate::hnn::constitution::{
     CAMPAIGN_ONE_BUDGET, CarrierBits, Constitution, DepositReading, FactorGradient, FactorStep,
-    LinearLocus, LinearStep, Locus, Sample, Steps,
+    LandmarkStep, LinearLocus, LinearStep, Locus, Sample, Steps,
 };
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::keys::{self, KeyLocation};
-use crate::hnn::masses::{MassStep, Regions};
+use crate::hnn::landmark::Letter;
 use crate::hnn::moment::{Ingested, SourceMoment};
 use crate::hnn::pending::PendingRatio;
 use crate::hnn::port::{
@@ -163,7 +169,7 @@ use crate::hnn::ratio::{
     Faces, HolonRatio, PhaseRatio, interval_sum, log2_enclosure, target_phases,
 };
 use crate::hnn::realization::{apply_rows, indexed, outer_rows};
-use crate::hnn::receiving::ReceivingPhases;
+use crate::hnn::receiving::{ActiveAddress, ReceivingPhases, tree_code_length};
 use crate::hnn::retention::{AeonBoundary, Diamond, aeon_readings, collapse, contained, separator};
 use crate::hnn::word::KeptWord;
 use crate::holon::contact::FeatureCovector;
@@ -247,7 +253,8 @@ struct Arrived {
 
 impl Arrived {
     /// The arrived targets' code length at a constitution, read from the executed faces (the
-    /// resident's charts warm-started and refined), with the charts' readings.
+    /// resident's charts warm-started and refined) and the constitution's tree at the targets'
+    /// addresses, with the charts' readings.
     fn code_length(
         &self,
         field: &Field,
@@ -255,10 +262,12 @@ impl Arrived {
         charts: &mut Charts,
     ) -> Result<(ExactInterval, Vec<ChartReading>), HnnError> {
         let phases = self.ratio.phases();
-        let (word, faces) = self.ratio.read_charted(field, constitution, charts)?;
+        let (word, against) =
+            self.ratio
+                .read_against(field, constitution, charts, &self.targets)?;
         let anchors = target_phases(field, self.ratio.anchor(), phases.ring(), &self.targets)?;
         Ok((
-            HolonRatio::compare(faces, &self.targets, &anchors)?.code_length()?,
+            HolonRatio::compare(against.faces, &self.targets, &anchors)?.code_length()?,
             word.operands().charts(),
         ))
     }
@@ -283,8 +292,9 @@ struct AeonState {
     closed: u64,
 }
 
-/// [definition] **The resident of the host reference**: the field, the lift point, the
-/// constitution, the open moments, pending ratios and staged deposits, the admitted family of the
+/// [definition] **The resident of the host reference**: the field, the lift point, the receiving
+/// parametron's active suffix address, the constitution, the open moments, pending ratios and
+/// staged deposits, the admitted family of the
 /// last boundary, the aeon's clock state on the certified Holarchy's parametric orientation, the
 /// first law's ledger with the targets it has reached, the bits the collapses released, and the
 /// budget stop once it comes.
@@ -292,6 +302,7 @@ struct AeonState {
 pub struct Resident {
     field: Field,
     current: Current,
+    address: ActiveAddress,
     constitution: Constitution,
     moments: BTreeMap<MomentId, SourceMoment>,
     pending: BTreeMap<PendingId, PendingSlot>,
@@ -370,7 +381,11 @@ pub struct WallTimes {
     /// `compare`: the contemporary read, when the refine's kept read is not at the published
     /// commit.
     pub compare_read: Duration,
-    /// `compare`: the residual, the target phases, the Holon ratio and its covector.
+    /// `compare`: the landmark tree read at each phase's causal address and added to the wave's
+    /// faces (Decision 28; `PendingRatio::against`).
+    pub tree_read: Duration,
+    /// `compare`: the residual, the target phases, the Holon ratio and its covector, and the tree
+    /// face alone's code lengths.
     pub holon: Duration,
     /// `compare`: the word's return.
     pub pull_back: Duration,
@@ -386,11 +401,12 @@ pub struct WallTimes {
 
 impl WallTimes {
     /// The phases by name, in the order the methods run them.
-    pub fn phases(&self) -> [(&'static str, Duration); 9] {
+    pub fn phases(&self) -> [(&'static str, Duration); 10] {
         [
             ("refine read", self.refine_read),
             ("release", self.release),
             ("compare read", self.compare_read),
+            ("tree read", self.tree_read),
             ("holon and covector", self.holon),
             ("pull_back", self.pull_back),
             ("compose", self.compose),
@@ -411,6 +427,7 @@ impl std::ops::AddAssign for WallTimes {
         self.refine_read += other.refine_read;
         self.release += other.release;
         self.compare_read += other.compare_read;
+        self.tree_read += other.tree_read;
         self.holon += other.holon;
         self.pull_back += other.pull_back;
         self.compose += other.compose;
@@ -457,6 +474,12 @@ impl Resident {
 
     pub fn current(&self) -> &Current {
         &self.current
+    }
+
+    /// The receiving parametron's active suffix address (Decision 28): the last cells ingested,
+    /// newest first, at the deepest declared receiver's depth.
+    pub fn address(&self) -> &ActiveAddress {
+        &self.address
     }
 
     /// The published constitution.
@@ -522,12 +545,18 @@ impl Resident {
             .is_some_and(|slot| slot.kept.is_some())
     }
 
-    /// The exact bits of the resident's state: the lift point, the open moments, the pending
-    /// ratios with their emitted logits, the staged deposits, the first law's arrived operand, the
-    /// constitution and the executed charts ([`Charts`], the representation of the solves the
-    /// words execute).
+    /// The exact bits of the resident's state: the lift point, the active suffix address, the open
+    /// moments, the pending ratios with their emitted logits, the staged deposits, the first law's
+    /// arrived operand, the constitution and the executed charts ([`Charts`], the representation
+    /// of the solves the words execute).
     pub fn state_bits(&self) -> u64 {
-        let lift: u64 = self.current.lift().iter().map(|x| x.bits() + 1).sum();
+        let lift: u64 = self
+            .current
+            .lift()
+            .iter()
+            .map(|x| x.bits() + 1)
+            .sum::<u64>()
+            + self.address.bits(self.field.alphabet());
         let moments: u64 = self.moments.values().map(SourceMoment::dense_bits).sum();
         let pending: u64 = self.pending.values().map(PendingSlot::bits).sum();
         let staged: u64 = self.staged.values().map(|slot| slot.deposit.bits()).sum();
@@ -631,6 +660,7 @@ impl Reference {
         Ok(Resident {
             field: field.clone(),
             current: current.clone(),
+            address: ActiveAddress::of_field(field),
             constitution,
             moments: BTreeMap::new(),
             pending: BTreeMap::new(),
@@ -771,6 +801,10 @@ impl ExecutionPort for Reference {
             .expect("the moment was checked or opened");
         let start = Instant::now();
         let ingested = open.ingest(&field, &mut resident.current, &codes)?;
+        // The receiving parametron's active suffix address receives the cells the moment took.
+        for &code in &codes[..ingested.cells] {
+            resident.address.receive(code);
+        }
         resident.wall.ingest += start.elapsed();
         if ingested.cells > 0 {
             resident.aeon.keys_admitted = false;
@@ -909,9 +943,10 @@ impl ExecutionPort for Reference {
         let ratio = PendingRatio::produce(
             &resident.current,
             source,
+            &resident.address,
             phases,
             resident.constitution.commit(),
-        );
+        )?;
         let field = &resident.field;
         let start = Instant::now();
         let (word, faces) =
@@ -1036,6 +1071,10 @@ impl ExecutionPort for Reference {
                 read
             }
         };
+        // The tree part of the combined face at each phase's causal address (Decision 28).
+        let start = Instant::now();
+        let against = ratio.against(&resident.constitution, &faces, &targets)?;
+        wall.tree_read = start.elapsed();
         let start = Instant::now();
         let residual: Vec<Vec<Rat>> = faces
             .logits
@@ -1043,8 +1082,14 @@ impl ExecutionPort for Reference {
             .zip(&slot.emitted)
             .map(|(now, then)| now.iter().zip(then).map(|(a, b)| a - b).collect())
             .collect();
+        let tree = against
+            .trees
+            .iter()
+            .zip(&targets)
+            .map(|(face, &target)| tree_code_length(face, target))
+            .collect::<Result<Vec<_>, _>>()?;
         let anchors = target_phases(&field, ratio.anchor(), phases.ring(), &targets)?;
-        let holon = HolonRatio::compare(faces, &targets, &anchors)?;
+        let holon = HolonRatio::compare(against.faces, &targets, &anchors)?;
         let covector = holon.covector()?;
         let map = resident
             .constitution
@@ -1072,6 +1117,7 @@ impl ExecutionPort for Reference {
             residual,
             reached: deposit.loci(),
             released: back.released.clone(),
+            tree,
         };
         let steps = phases.junction_steps() as u64;
         let ticks = vec![steps; field.rings().len()];
@@ -1204,12 +1250,17 @@ impl ExecutionPort for Reference {
                 .open_charted(field, &resident.constitution, &mut resident.charts)?;
         resident.tally.read(&word.operands().charts());
         let anchors = word.forward(&phases)?;
-        let count = phases.count_face(&resident.constitution, slot.ratio.moment())?;
         let reads = anchors
             .iter()
-            .map(|anchor| phases.read(field, &resident.constitution, &current, anchor, &count))
+            .map(|anchor| phases.read(field, &resident.constitution, &current, anchor))
             .collect::<Result<Vec<_>, _>>()?;
-        let faces = Faces::of_reads(&reads, phases.grain())?;
+        // No cell of the window is released yet: every phase reads the tree at the window's
+        // opening address (`ActiveAddress::phase`).
+        let wave = Faces::of_reads(&reads, phases.grain())?;
+        let faces = slot
+            .ratio
+            .against(&resident.constitution, &wave, &[])?
+            .faces;
         // The width is read from the receiving phases' fibres; the tolerance is their grain.
         let width = release_width(&phases, &faces)?;
         let tolerance = Rat::new(BigInt::one(), BigInt::from(phases.grain()));
@@ -1498,9 +1549,9 @@ pub fn compose(
         locus: LinearLocus::Receiving(receiving),
         samples,
     });
-    // The receiving parametron's class masses (Decision 27): each compared target, whose reached
-    // covector `g = q − p̃` reconstructs `q = p̃ + g = e_t`, deposits its unit mass at the region
-    // of the pending ratio's retained window, when the comparison reached the receiving locus.
+    // The receiving parametron's landmark tree (Decision 28): each compared target deposits on
+    // the paths its phase's causal address opens, in cell order, when the comparison reached the
+    // receiving locus.
     if targets.len() != back.reads.len() {
         return Err(HnnError::Shape {
             what: "the compared targets against the receiving reads",
@@ -1508,15 +1559,15 @@ pub fn compose(
             found: targets.len(),
         });
     }
-    let masses = if retained(Locus::ReceivingMap(receiving)) {
-        let region = phases.regions().region(&moment.window(), alphabet)?;
-        targets
-            .iter()
-            .map(|&class| MassStep {
+    let landmarks: Vec<LandmarkStep> = if retained(Locus::ReceivingMap(receiving)) {
+        ratio
+            .addresses(targets)?
+            .into_iter()
+            .zip(targets)
+            .map(|(address, &class)| LandmarkStep {
                 ring: receiving,
-                region,
+                address,
                 class,
-                weight: one.clone(),
             })
             .collect()
     } else {
@@ -1714,7 +1765,7 @@ pub fn compose(
     };
     Ok((
         pullback,
-        Deposit::new(constitution.commit(), linear, factors, reached).with_masses(masses),
+        Deposit::new(constitution.commit(), linear, factors, reached).with_landmarks(landmarks),
     ))
 }
 
@@ -2034,8 +2085,9 @@ fn sheet_classes(
 // -------------------------------------------------------------------------------------------
 // the exposure
 
-/// [definition] **A cut**: the exterior stream's codes in order, and its pinned held-out positions
-/// (compared and reported, never deposited).
+/// [definition] **A cut**: the exterior stream's codes in order, and its pinned held-out positions.
+/// Every cell is compared and then deposited (Decision 29): "held out" means only that no design
+/// choice (depth, precision, step, grain) was made on those cells, and that no crib reads them.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Cut {
     pub cells: Vec<usize>,
@@ -2063,9 +2115,9 @@ impl Cut {
 }
 
 /// [definition] **Bits on a population of targets**: the model's code length on its committed
-/// faces; the count face alone's (Decision 27: the receiving parametron's masses at the window's
-/// region, read at the grain, with no wave, at the same constitution and window as the model's
-/// face, so `model − counts` is the wave's contribution); and the online baselines' (uniform;
+/// faces; the landmark tree's face alone (Decision 28: the receiving parametron's tree at each
+/// cell's causal address, read at the grain, with no wave, at the same constitution and address as
+/// the model's face, so `model − tree` is the wave's contribution); and the online baselines' (uniform;
 /// order-0 and order-1 with the Krichevsky–Trofimov prior; PPM of order [`PPM_ORDER`] with escape
 /// rule C), each an enclosure, over `cells` targets. xz and zstd, with their description cost, are
 /// exterior codecs: the crate runs no process, so they are owed to the application, computed there
@@ -2073,7 +2125,7 @@ impl Cut {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Bits {
     pub model: ExactInterval,
-    pub counts: ExactInterval,
+    pub tree: ExactInterval,
     pub uniform: ExactInterval,
     pub order_zero: ExactInterval,
     pub order_one: ExactInterval,
@@ -2086,7 +2138,7 @@ impl Bits {
         let zero = ExactInterval::point(Rat::zero());
         Self {
             model: zero.clone(),
-            counts: zero.clone(),
+            tree: zero.clone(),
             uniform: zero.clone(),
             order_zero: zero.clone(),
             order_one: zero.clone(),
@@ -2302,10 +2354,11 @@ pub struct BaselineCodes {
 
 /// [definition] **The online baselines, fitted on the same stream in the same order** as the model
 /// they are read beside: every cell is coded at the current counts, then counted (prequential).
-/// [agent-inferred] The order-1 baseline's contexts are the preceding-cell regions
-/// (`hnn::masses::Regions`), the stream's first cell in the declared empty-window region, so the
-/// count face at that partition has order-1's law exactly. The exposure ([`expose`]) and the
-/// landmark tree's prequential measurement (`hnn::landmark::prequential`) read them.
+/// [agent-inferred] The order-1 baseline's contexts are the preceding cell's address letter
+/// (`hnn::landmark::Letter`: `1 + code`, and the boundary `0` before the stream's first cell), so a
+/// depth-one landmark tree with its root's split forced has order-1's law exactly (Lean
+/// `HNN/LandmarkTree.depth_one_is_decision_27`). The exposure ([`expose`]) and the landmark tree's
+/// prequential measurement (`hnn::landmark::prequential`) read them.
 #[derive(Clone, Debug)]
 pub struct Baselines {
     alphabet: usize,
@@ -2326,16 +2379,16 @@ impl Baselines {
             uniform: log2_enclosure(&Rat::from_integer(BigInt::from(alphabet)))?,
             order_zero: vec![0; alphabet],
             order_one: BTreeMap::new(),
-            order_one_totals: vec![0; Regions::PrecedingCell.count(alphabet)],
+            order_one_totals: vec![0; alphabet + 1],
             previous: None,
             seen: 0,
             ppm: Ppm::new(PPM_ORDER, alphabet),
         })
     }
 
-    /// The order-1 context: the preceding cell's region.
+    /// The order-1 context: the preceding cell's address letter's code.
     fn context(&self) -> usize {
-        self.previous.map_or(0, |cell| 1 + cell)
+        self.previous.map_or(Letter::Boundary, Letter::Cell).code() as usize
     }
 
     /// Count one cell in the Krichevsky–Trofimov baselines.
@@ -2571,29 +2624,33 @@ where
                 .forward
                 .into_present()
                 .expect("a compare returns its ratio");
-            let windowed = window
-                .iter()
-                .enumerate()
-                .any(|(offset, _)| cut.held_out(position + offset));
-            // The count face alone (Decision 27): the masses the compare read, at the window's
-            // region, before the deposit and the window's ingest.
-            let count = phases.count_face(
-                resident.constitution(),
-                resident.moment(&moment).ok_or(HnnError::UnknownHandle {
-                    handle: Handle::Moment(moment),
-                })?,
-            )?;
-            for (offset, (phase, &code)) in holon.phases().iter().zip(window).enumerate() {
+            // The tree face alone (Decision 28): the compare's reading of the tree at each
+            // phase's causal address, before the deposit and the window's ingest.
+            let tree = match &compared.receipt.detail {
+                ReceiptDetail::Compare { tree, .. } => tree.clone(),
+                _ => {
+                    return Err(HnnError::Shape {
+                        what: "a compare's receipt with the tree face alone",
+                        expected: 1,
+                        found: 0,
+                    });
+                }
+            };
+            for (offset, ((phase, tree), &code)) in
+                holon.phases().iter().zip(&tree).zip(window).enumerate()
+            {
                 let bits = if cut.held_out(position + offset) {
                     &mut held_out
                 } else {
                     &mut training
                 };
                 bits.model = interval_sum(&bits.model, &phase.code_length)?;
-                bits.counts = interval_sum(&bits.counts, &count.code_length(code)?)?;
+                bits.tree = interval_sum(&bits.tree, tree)?;
                 baselines.code(bits, code)?;
             }
-            if windowed || resident.stopped().is_some() {
+            // Prequential (Decision 29): every compared window is deposited, held-out windows
+            // included; only the budget stop discards.
+            if resident.stopped().is_some() {
                 port.discard(&mut resident, Handle::Staged(staged))?;
             } else {
                 match port.deposit(&mut resident, staged) {

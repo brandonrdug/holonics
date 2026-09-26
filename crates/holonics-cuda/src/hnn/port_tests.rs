@@ -20,11 +20,12 @@ use std::ops::Range;
 
 use holonics::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Steps};
 use holonics::hnn::field::{ContactDeclaration, CribDeclaration, ReceiverDeclaration};
+use holonics::hnn::landmark::Letter;
 use holonics::hnn::port::{ExecutionPort, Handle, ReceiptDetail};
 use holonics::hnn::reference::{Cut, Reference, one_hot};
 use holonics::hnn::{
-    Constitution, ConstitutionRead, Current, Field, FieldDeclaration, HnnError, MassStep, PairPort,
-    Regions, RingDeclaration,
+    Constitution, ConstitutionRead, Current, Field, FieldDeclaration, HnnError, PairPort,
+    RingDeclaration,
 };
 use holonics::ratio::Rat;
 use holonics::ratio::linear::ExactRatMatrix;
@@ -84,7 +85,7 @@ fn chain_declaration(population: u64) -> FieldDeclaration {
             ring: 2,
             aperture: 2,
             tolerance: rat(1, 16),
-            regions: Regions::PrecedingCell,
+            depth: 2,
         }],
         crib: CribDeclaration {
             window: 16,
@@ -122,9 +123,9 @@ fn half_matrix(draw: &mut Draw, rows: usize, columns: usize) -> ExactRatMatrix {
 
 /// **A generic constitution on half-integers**: every locus drawn (the passive factor, the
 /// contrast port, generic slices, a mixed standing, the ports, nonzero pair-port outputs, the
-/// channels' factors, and the receiving parametron's class masses, Decision 27: drawn unit and
-/// half masses at every region, so the count face differs from region to region and from uniform),
-/// so every term of the word and its return is exercised from the first window.
+/// channels' factors, and the receiving parametron's landmark tree, Decision 28: a drawn passage
+/// deposited at drawn addresses, so the tree's face differs from address to address and from
+/// uniform), so every term of the word and its return is exercised from the first window.
 fn generic(field: &Field, seed: u64) -> Constitution {
     let mut draw = Draw(seed);
     let a = field.alphabet();
@@ -146,21 +147,19 @@ fn generic(field: &Field, seed: u64) -> Constitution {
             .any(|r| r.ring == g)
             .then(|| half_matrix(&mut draw, 2 * a, n));
         theta = theta.with_ports(g, standing, source, receiving).unwrap();
-        if let Some(prior) = theta.class_masses(g) {
-            let mut masses = prior.clone();
-            for region in 0..masses.region_count() {
-                for _ in 0..1 + draw.below(6) {
-                    masses
-                        .deposit(&MassStep {
-                            ring: g,
-                            region,
-                            class: draw.below(a),
-                            weight: rat(1 + draw.below(2) as i64, 2),
-                        })
-                        .unwrap();
-                }
+        if let Some(empty) = theta.landmarks(g) {
+            let mut tree = empty.clone();
+            let depth = tree.declaration().depth;
+            for _ in 0..24 {
+                let address: Vec<Letter> = (0..depth)
+                    .map(|_| match draw.below(a + 1) {
+                        0 => Letter::Boundary,
+                        cell => Letter::Cell(cell - 1),
+                    })
+                    .collect();
+                tree.receive(&address, draw.below(a)).unwrap();
             }
-            theta = theta.with_masses(g, masses).unwrap();
+            theta = theta.with_tree(g, tree).unwrap();
         }
         if field.is_source(g) {
             for &offset in field.offsets() {
@@ -256,8 +255,8 @@ struct Compared {
     boundaries: u64,
     keys: u64,
     reads: u64,
-    /// The class mass the deposits added at the receiving parametron (Decision 27), exact.
-    mass: Rat,
+    /// The cells the deposits added to the receiving parametron's tree (Decision 28).
+    landmarks: u64,
     traffic: Traffic,
 }
 
@@ -330,8 +329,9 @@ fn lockstep(
             let Some((staged, _)) = compared_return else {
                 break;
             };
-            let held = (position..end).any(|at| cut.held_out.iter().any(|r| r.contains(&at)));
-            if held || h.stopped().is_some() {
+            // Prequential (Decision 29): every compared window is deposited, the held-out tail
+            // included; only the budget stop discards.
+            if h.stopped().is_some() {
                 same(
                     "discard",
                     host.discard(&mut h, Handle::Staged(staged)),
@@ -345,12 +345,12 @@ fn lockstep(
                     device.deposit(&mut d, staged),
                 );
                 compared.deposits += 1;
-                // The class masses a deposit added (Decision 27), and the published constitutions,
-                // the masses among them, equal on both ports.
+                // The cells a deposit added to the tree (Decision 28), and the published
+                // constitutions, the tree among them, equal on both ports.
                 if let Some(reading) =
                     deposited.and_then(|returned| returned.deposit.into_present())
                 {
-                    compared.mass += reading.masses;
+                    compared.landmarks += reading.landmarks;
                 }
                 assert_eq!(
                     h.constitution(),
@@ -368,6 +368,7 @@ fn lockstep(
             )
             .expect("the ingest returns");
             compared.ingests += 1;
+            assert_eq!(h.address(), d.address(), "the active suffix addresses");
             let ingested = ingested.1.forward.into_present().expect("ingest returns");
             fed += ingested.cells;
             if ingested.carry_out {
@@ -437,44 +438,44 @@ fn the_dyadic_readings_are_exact() {
     );
 }
 
-/// Decision 27 on the card's publication (no card needed to form it): the receiving parametron's
-/// class masses are kept with the publication's host loci, equal to the constitution's, and the
-/// count face read from them is the host reference's at every region; a ring with no receiver
-/// carries none.
+/// Decision 28 on the card's publication (no card needed to form it): the receiving parametron's
+/// tree is not a published locus (no kernel reads it); the host reads it from the constitution at
+/// compare, at each phase's causal address, and the device's formula is the reference's
+/// (`PendingRatio::against`): the wave's faces plus the tree's grain logits.
 #[test]
-fn the_publication_keeps_the_class_masses_on_the_host() {
+fn the_tree_is_read_on_the_host_at_each_phases_address() {
     let field = chain();
     let theta = generic(&field, 5);
-    let loci = super::publication::Loci::of(&field, &theta).unwrap();
-    let masses = loci.masses[2].as_ref().unwrap();
-    assert_eq!(Some(masses), theta.class_masses(2));
-    assert!(loci.masses[0].is_none() && loci.masses[1].is_none());
-    let phases = holonics::hnn::ReceivingPhases::declare(
-        &field,
-        &theta,
-        &Current::at_rest(&field),
-        &field.receivers()[0],
-    )
-    .unwrap();
-    let mut current = Current::at_rest(&field);
-    let mut moment = holonics::hnn::SourceMoment::open(&field, &current);
-    for cell in [None, Some(3usize), Some(0)] {
-        if let Some(cell) = cell {
-            moment.ingest(&field, &mut current, &[cell]).unwrap();
-        }
-        assert_eq!(
-            phases.count_face_at(masses, &moment).unwrap(),
-            phases.count_face(&theta, &moment).unwrap()
-        );
-    }
+    assert!(super::publication::Loci::of(&field, &theta).is_ok());
+    let tree = theta.landmarks(2).unwrap();
+    assert!(tree.passed() > 0);
+    assert!(theta.landmarks(0).is_none() && theta.landmarks(1).is_none());
+    let current = Current::at_rest(&field);
+    let phases =
+        holonics::hnn::ReceivingPhases::declare(&field, &theta, &current, &field.receivers()[0])
+            .unwrap();
+    let moment = holonics::hnn::SourceMoment::open(&field, &current);
+    let mut address = holonics::hnn::ActiveAddress::boundary(phases.depth());
+    address.receive(3);
+    let pending =
+        holonics::hnn::PendingRatio::produce(&current, &moment, &address, &phases, 0).unwrap();
+    let (_, wave) = pending.read(&field, &theta).unwrap();
+    let against = pending.against(&theta, &wave, &[1, 2]).unwrap();
+    let trees = phases.tree_faces(&theta, &address, &[1, 2]).unwrap();
+    assert_eq!(against.trees, trees);
+    assert_eq!(against.faces, phases.combine(&wave, &trees).unwrap());
+    assert_eq!(
+        trees[1],
+        tree.face(&[Letter::Cell(1), Letter::Cell(3)], 16).unwrap()
+    );
 }
 
 // -------------------------------------------------------------------------------------------
 // the lockstep on the card
 
 /// The chain at its capacity from its declared initial constitution: every window refined,
-/// released, compared and deposited (the tail held out), the aeons closed and keys located; every
-/// return the reference's.
+/// released, compared and deposited, the held-out tail included (Decision 29), the aeons closed and
+/// keys located; every return the reference's.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_card_port_returns_the_reference_on_the_chain() {
@@ -485,11 +486,8 @@ fn the_card_port_returns_the_reference_on_the_chain() {
     let compared = lockstep(&field, &cut_of(cells, held..population), u64::MAX, None, 3);
     println!("chain, declared constitution: {compared:?}");
     assert!(compared.boundaries > 0 && compared.keys > 0 && compared.deposits > 0);
-    // Every deposited window added one unit mass per target (Decision 27).
-    assert_eq!(
-        compared.mass,
-        Rat::from_integer(BigInt::from(2 * compared.deposits))
-    );
+    // Every deposited window added its two targets to the tree (Decision 28).
+    assert_eq!(compared.landmarks, 2 * compared.deposits);
 }
 
 /// The chain from a generic constitution on half-integers (every locus live: the contrast port,
@@ -511,10 +509,7 @@ fn the_card_port_returns_the_reference_on_a_generic_constitution() {
         );
         println!("chain, generic constitution {seed}: {compared:?}");
         assert!(compared.deposits > 0);
-        assert_eq!(
-            compared.mass,
-            Rat::from_integer(BigInt::from(2 * compared.deposits))
-        );
+        assert_eq!(compared.landmarks, 2 * compared.deposits);
     }
 }
 
@@ -531,7 +526,7 @@ fn the_card_port_returns_the_reference_on_campaign_one() {
     let compared = lockstep(&field, &cut_of(cells, n_star - 1_190..n_star), 8, None, 4);
     println!("campaign 1, drawn bytes: {compared:?}");
     assert_eq!(compared.compares, 8);
-    assert_eq!(compared.mass, Rat::from_integer(BigInt::from(16)));
+    assert_eq!(compared.landmarks, 16);
 }
 
 /// The standing real cut's manifest numbers (its population and held-out range).

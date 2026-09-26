@@ -24,6 +24,7 @@ use crate::hnn::pending::PendingRatio;
 use crate::hnn::port::{Deposit, ExecutionPort};
 use crate::hnn::propagation::Operands;
 use crate::hnn::ratio::{HolonRatio, target_phases};
+use crate::hnn::receiving::ActiveAddress;
 use crate::hnn::reference::{Reference, compose, one_hot};
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::inertia::inertia;
@@ -1253,7 +1254,14 @@ fn a_deposit_reaches_only_the_diamond_and_sums_only_its_window() {
     let theta = generic(&field, 13);
     let (current, open) = moment(&field, 14, 9);
     let phases = phases(&field, &theta, &current);
-    let pending = PendingRatio::produce(&current, &open, &phases, 0);
+    let pending = PendingRatio::produce(
+        &current,
+        &open,
+        &ActiveAddress::boundary(phases.depth()),
+        &phases,
+        0,
+    )
+    .unwrap();
     let (word, faces) = pending.read(&field, &theta).unwrap();
     let targets = [1usize, 0];
     let anchors = target_phases(&field, pending.anchor(), 2, &targets).unwrap();
@@ -1345,9 +1353,10 @@ fn a_stale_deposit_is_refused() {
     );
 }
 
-/// The declared initial constitution and priors (design (d), R3 D2), on the chain control: `E = 0`
-/// (`2d_0 × |A|`), the receiving map `R` (`2|A| × 2d_R`) the declared `±1` pattern times 1/2, the
-/// pair port's outputs 0 on ring 0's width, `W_s = −½I` (the passive factor `½I`), `W_c = 0`,
+/// The declared initial constitution and priors (design (d), R3 D2, Decision 28), on the chain
+/// control: `E` (`2d_0 × |A|`) the declared `±1` pattern times 1/2 (kind 0), the receiving map `R`
+/// (`2|A| × 2d_R`) zero, the receiving parametron's tree empty, the pair port's outputs 0 on ring
+/// 0's width, `W_s = −½I` (the passive factor `½I`), `W_c = 0`,
 /// `q = 0`, the slices the skew cyclic shift, `C = I` and `K = D = ½I` on every channel.
 #[test]
 fn the_initial_constitution_is_the_declared_one() {
@@ -1355,13 +1364,18 @@ fn the_initial_constitution_is_the_declared_one() {
     let theta = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET).unwrap();
     let source = theta.source_port(0).unwrap();
     assert!((source.rows(), source.columns()) == (4, 4));
-    assert!(source.entries().iter().all(Zero::is_zero));
+    assert!(source.entries().iter().all(|x| x.abs() == rat(1, 2)));
+    assert_eq!(
+        source.get(3, 2).unwrap(),
+        &(declared_sign(0, 3, 2) * rat(1, 2))
+    );
     let map = theta.receiving_map(2).unwrap();
     assert_eq!((map.rows(), map.columns()), (8, 4));
-    assert!(map.entries().iter().all(|x| x.abs() == rat(1, 2)));
+    assert!(map.entries().iter().all(Zero::is_zero));
+    let tree = theta.landmarks(2).unwrap();
     assert_eq!(
-        map.get(3, 2).unwrap(),
-        &(declared_sign((1 << 40) + (2 << 20), 3, 2) * rat(1, 2))
+        (tree.nodes(), tree.passed(), tree.declaration().depth),
+        (0, 0, 2)
     );
     let pair = theta.pair_port(0, 1).unwrap();
     assert_eq!(pair.rank(), 4);

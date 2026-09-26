@@ -38,7 +38,7 @@ fn rotor_field(rings: &[(u64, Vec<u64>)]) -> Field {
                 ring: rings.len() - 1,
                 aperture: 1,
                 tolerance: rat(1, 16),
-                regions: crate::hnn::masses::Regions::PrecedingCell,
+                depth: 2,
             }],
             crib: CribDeclaration {
                 window: 64,

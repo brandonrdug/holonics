@@ -6,7 +6,6 @@ use crate::hnn::constitution::{Constitution, Steps};
 use crate::hnn::field::{
     ContactDeclaration, CribDeclaration, Current, Field, FieldDeclaration, ReceiverDeclaration,
 };
-use crate::hnn::masses::Regions;
 use crate::hnn::moment::{PairPort, SourceMoment};
 use crate::hnn::receiving::ReceivingPhases;
 use crate::ratio::{Rat, integer, rat};
@@ -43,13 +42,13 @@ pub(super) fn path_with(aperture: usize, junctions: &[Rat], contacts: &[Rat]) ->
                 ring: 2,
                 aperture,
                 tolerance: rat(1, 16),
-                regions: Regions::PrecedingCell,
+                depth: 2,
             }],
             crib: CribDeclaration {
                 window: 16,
                 offset: 1,
             },
-            population: 1 << 20,
+            population: 1 << 16,
             lattice: Default::default(),
         }
         .by_lattice_rule(),
@@ -66,14 +65,15 @@ pub(super) fn six_path(aperture: usize) -> Field {
 /// and 0, source ring 0, receiving ring 2 with aperture 2, `|A| = 4`, `Δ = {1}`; the first contact's
 /// admittance as declared.
 pub(super) fn chain_with(first_admittance: Rat) -> Field {
-    chain_declared(first_admittance, 1 << 20, vec![1])
+    chain_declared(first_admittance, 1 << 16, vec![1])
 }
 
 /// **The exposure's chain**: the chain with no pair offset (`Δ = ∅`), declared over a population of
 /// `population` cells (an exposure's cut is exactly its field's population). Without the offset
 /// counts its capacity is `n* = 17` cells (`71` with `Δ = {1}`), the smallest cut on which the
-/// exposure's protocol runs its aeons, keys and budget stop. With no retained window its receiver's
-/// region is the whole (Decision 27: the preceding cell needs a window).
+/// exposure's protocol runs its aeons, keys and budget stop. Its receiver's tree reads the active
+/// suffix address, which the resident keeps beside the tree whether or not the moment retains a
+/// window (Decision 28).
 pub(super) fn chain_of(population: u64) -> Field {
     chain_declared(integer(2), population, Vec::new())
 }
@@ -81,9 +81,6 @@ pub(super) fn chain_of(population: u64) -> Field {
 fn chain_declared(first_admittance: Rat, population: u64, offsets: Vec<usize>) -> Field {
     let mut declared = chain_declaration(population);
     declared.contacts[0].admittance = first_admittance;
-    if offsets.is_empty() {
-        declared.receivers[0].regions = Regions::Whole;
-    }
     declared.offsets = offsets;
     Field::declare(declared.by_lattice_rule()).unwrap()
 }
@@ -104,7 +101,7 @@ pub(super) fn chain_declaration(population: u64) -> FieldDeclaration {
             ring: 2,
             aperture: 2,
             tolerance: rat(1, 16),
-            regions: Regions::PrecedingCell,
+            depth: 2,
         }],
         crib: CribDeclaration {
             window: 16,

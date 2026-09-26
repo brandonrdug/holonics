@@ -2,9 +2,9 @@
 //!
 //! [definition] The loss is the logarithm of a ratio of Holons (design (a), `compare`; "Exact
 //! charts"). At receiving phase `j` the produced Holon `|H⟩` is the logit vector
-//! `f_j = k(r)/L_R + R P_R^(τ_R) v_R(e_j)`, the count face's grain logits at the window's region
-//! plus the wave (Decision 27, `hnn::receiving::ReceivingRead::combined`; the covector below is
-//! read on this combined face and flows back through `R` alone), and the target `|T⟩` is the byte
+//! `f_j = k(a_j)/L_R + R P_R^(τ_R) v_R(e_j)`, the landmark tree's grain logits at phase `j`'s causal
+//! address plus the wave (Decision 28, `hnn::receiving::ReceivingRead::combined`; the covector below
+//! is read on this combined face and flows back through `R` alone), and the target `|T⟩` is the byte
 //! `t_j` read in the same exterior chart that `E` reads: the one-hot `q_j`, with the receiving
 //! ring's clock `τ_R(j)` advanced by selective stepping over the targets. Both phases are read in
 //! the cut's frame: the target's is

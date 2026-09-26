@@ -382,8 +382,10 @@ K   the complex: rings g (0-cells); contacts a = (g→h) (1-cells); declared loo
       D_a dissipation on the rate), carried as C_a = c_a c_a*, K_a = b_a b_a*, D_a = F_a F_a* (K_a ⪰ 0 in
       campaign 1; a boost K_a ⋡ 0 from campaign 2, R2 H3); its reference admittance Y_a; its participation
       exponent β_a on its lattice, one per contact and read at both ends (R2 C1);
-    - the receiving map R, a prox normal law on its reached covectors, and the receiving parametron's
-      region class masses C_(r,c) with the KT prior 1/2, whose grain face the wave corrects (Decision 27).
+    - the receiving map R, a prox normal law on its reached covectors opening at zero, and the receiving
+      parametron's landmark tree (KT masses at nodes, the prior 1/2, context-tree weighting over each
+      cell's causal address of depth D), whose grain face the wave corrects (Decision 28; Decision 27's
+      region table is its depth-one case).
     Every learned map carries its normal statistics, per locus and factored (`Holon/MomentStorage`).
 x   the current: the lift point λ ∈ ℤ^G of the rings' joint clock torus (`aeon::ClockLift`), the one owner of
     every ring's phase class and winding (review C9). Nothing else persists between words.
@@ -519,14 +521,16 @@ tick     one contact hop per tick, t = 0, 1, …, e_max − 1 (the last stops af
                     off the channel each wave reflects straight back to its own ring
 receive  at the receiving ring's epochs e_j = e_0 + j, j < A, each read by tick e_j's junction; the last is
          e_last = e_0 + A − 1, so the word evaluates e_max = e_0 + A junction steps (R3 R1):
-           f_j = grain(log₂ C_(r_j)/N_(r_j)) + R P_R^(τ_R) v_R(e_j) ,  read at the receiver's grain L_R as the face p̂_j
-                 with its fibre ε_R; the count face of the region r_j (Decision 27) plus the wave's correction
+           f_j = grain(log₂ q(· | a_j)) + R P_R^(τ_R) v_R(e_j) ,  read at the receiver's grain L_R as the face p̂_j
+                 with its fibre ε_R; the landmark tree's face at phase j's causal address a_j (the window's
+                 earlier targets, then the receiver's active suffix address; Decision 28), read at compare,
+                 plus the wave's correction
 release  at the word's end every wave and contact state is released: the unread change leaves as the
          word's emitted exchange, with its power in the receipt; nothing is carried to the next word
 compare  |T⟩ is read through the same E and Ĝ ;  R_j = Ĝ_(T←H) at phase j ;  ℓ_j = log R_j , the winding its branch
 return   R⁻¹dR at the face → the ticks in reverse, over the word's own per-tick waves → the open → the moment
-         → E, R, Θ_a, the reaction material, q; the key covector as a reading; the count face is stored, not
-         pulled back (Lean `HNN/RegionCounts.combined_face_pullback`)
+         → E, R, Θ_a, the reaction material, q; the key covector as a reading; the tree's face is stored,
+         not pulled back (Lean `HNN/RegionCounts.combined_face_pullback`)
 deposit  only at loci inside the causal diamond of the source rings and the receiver (retention, below), each
          update Δ exact at the lattice-valued operands (Decision 22):
            ΔH_U = Σ_t w f_t f_t* ,  ΔW_U = γ_U Σ_t w g_t (H_U'⁻¹ f_t)* ,  H_U' the carried successor Gram   per internal linear
@@ -534,8 +538,8 @@ deposit  only at loci inside the causal diamond of the source rings and the rece
                  B_U = W_U H_U is not carried: the prox step needs only W_U, H_U' and the covector (normal_prox_step)
            ΔH_R = Σ_j w z_j z_j* ,  ΔR = γ_R Σ_j w g_j (X̂_R z_j)*            the receiving map's prox step at
                  z_j = P_R^(τ_R) v_R(e_j), X̂_R the certified chart of H_R' (Decision 24)
-           ΔC_(r_j) = w e_(t_j)                                       the receiving parametron's region class
-                 masses (Decision 27), held exactly as integers of half-units; the prior 1/2 decays exactly
+           t_j deposited on the paths a_j opens, in cell order              the receiving parametron's landmark
+                 tree (Decision 28): the KT half-unit counts and the carried mixture ratio β on the opened path
            Δh_x = Σ_t w|f_t|² (h_x from 1) ,  Δx = η_x G_x / h_x'                 per factor family x: c_a, b_a, F_a, the
                  slices' u, v, W_s's factor, E_g^(δ)'s factors, q_r; G_x its covector; no clamp: C_a, K_a, D_a, −W_s stay PSD as squares
            every entry of locus ℓ on its declared lattice 2^(−L_ℓ)ℤ, at the locus's m-th deposit (Decision 22):
@@ -564,7 +568,7 @@ close    at an aeon boundary: the collapse onto what the admitted future disting
   (first review C10):
   - `w = 1` per compare return: each observed target counts once;
   - `γ_U` is linear locus `U`'s proxy step (the receiving map's included) and `η_x` factor family `x`'s
-    step; the region class masses take unit weights (Decision 27). Each is a declared
+    step; the landmark tree takes each compared cell once (Decision 28). Each is a declared
     rational, part of `Field::describe`, not learned in campaign 1 and reported with its value.
   - Campaign 1 declares `γ_U = 1`: the normal law's pure solve. Under the exact law its bits stay
     slow only for a map that is not an operand of its own covector (`R`: 155 → 196 bits over 8 →
@@ -591,8 +595,8 @@ close    at an aeon boundary: the collapse onto what the admitted future disting
   covector about 34 against magnitude entries of at most 1). In the cut's frame `φ^T_j ∈ [0, 1 +
   2(j+1)/d_R)`. Only the target's class carries phase weight (`q_c = 0` elsewhere), so the phase part
   is `−q_(t_j) Δ_(t_j)` with the windowed gap `Δ = φ^T − φ^H` (`alignCost`, Lean
-  `HNN/Ratio.alignCost_turns`). The region class masses (Decision 27) take the target's unit mass
-  directly; no finite logit chart of the one-hot target is needed (Lean
+  `HNN/Ratio.alignCost_turns`). The landmark tree (Decision 28) takes the target cell directly on its
+  opened paths; no finite logit chart of the one-hot target is needed (Lean
   `HNN/TargetFace.finite_chart_obstruction` shows none exists).
 - **Notation.** `o` is a wave leaving a junction, `a` a wave arriving at one, and `z_a = (u_a, w_a)`
   a contact's state. `k_a` is a contact's channel width. `c_a`, `b_a` and `F_a` are the square
@@ -1164,19 +1168,19 @@ port. No other noun enters.
 | `Ring` | `hnn/field.rs` | A closing rotor ring: its `Parametron`, its navigator (`Transport::Map`, key, clock, lift), its screw generator with `d_g` node placements, its lock `N_g` and reflector `F_g` on the port chart `ℤ/d_g`, its storage admittance `Y_g`, its standing `q_g`, and its reaction material; on a source ring, its source ports `E_g`, `E_g^(δ)` and injection `I_g`. Campaign 1 has no non-closing form. | `holon::parametron::Parametron`, `navigator::Navigator`, `geometry::screw::{ScrewGenerator, SituatedScrew}`, `holon::restriction::PortMap` |
 | `Contact` | `hnn/field.rs` | A pair contact `a = (g→h)`: its channel width `k_a` and partial matchings `ι_(a,g)`, `ι_(a,h)` (so `U_a` and `U_aᵀ`), its block of `d_A`, its constitution `(c_a, b_a, F_a)`, its reference admittance `Y_a`, its participation exponent `β_a` and its pair geometry read from the two rings' screws. It has no scalar conductance. | `holon::contact::{PairContact, ContactMaterial}`, `geometry::screw::ScrewPair`, `holon::parametron::Parametron::lc` |
 | `Field` | `hnn/field.rs` | The HNN law: the complex, the rings and contacts, the `Constitution`, the admitted receivers, the founding and pending capacities. `Field::holon()` returns a read-only `Holarchy` chart built from the `Constitution`, `Field::parametric()` the `ClockLift`, and `Field::describe()` the field's exact self-delimiting code. | `geometry::complex::CellComplex`, `holarchy::{Holarchy, Gluing}`, `aeon::ClockLift` |
-| `Constitution` | `hnn/constitution.rs` | Θ, the standings `q` and each receiving ring's region class masses (Decision 27) included, with a commit counter, the declared steps `γ_U` and `η_x`, and its bit budget `B_Θ`. Its fields are private, and only `deposit` and the collapse change it. | `holon::element::{ActiveRelation, ResistiveRelation, Pump}`, `holon::deposition::{project_passive, CommittedEnergyBound}` |
+| `Constitution` | `hnn/constitution.rs` | Θ, the standings `q` and each receiving ring's landmark tree (Decision 28) included, with a commit counter, the declared steps `γ_U` and `η_x`, and its bit budget `B_Θ`. Its fields are private, and only `deposit` and the collapse change it. | `holon::element::{ActiveRelation, ResistiveRelation, Pump}`, `holon::deposition::{project_passive, CommittedEnergyBound}` |
 | `NormalLaw` | `hnn/constitution.rs` | One locus's deposition owner, `W H = B`, with factored statistics of the locus's own width. There is no global Gram (review A6). `W` and `H` are carried on the locus's lattice with their remainders. `B = W H` is not carried (Decision 22) and `W` moves by the prox step (`NormalLaw::deposited`), the receiving map included (Decision 27 retired Decision 26's exogenous law). | `ratio::linear`; Lean `Holon/MomentStorage` |
 | `Current` | `hnn/field.rs` | The lift point `λ`: the rings' continuing motion, the only current that persists between words. It has no wave field (R2 C3). | `aeon::ClockLift` |
 | `SourceMoment` | `hnn/moment.rs` | On closing source rings only: the phase-binned counts `M_g`, the offset counts `C_g(δ)` on the exterior chart, the window `win_g` and its opening lift point; its capacity crossover `n*`. `m̃` is computed, never stored. | `navigator::Navigator`, `ratio::linear` |
 | `Word<'c>` | `hnn/word.rs` | One evaluation of the ticks at one cut's fixed operands, opening at zero change. It borrows `&'c Field` and owns the change: the waves, the contact states and their per-tick values or checkpoints, which its return reads in reverse. Its end releases the change. | `hnn::propagation` |
 | (functions) | `hnn/propagation.rs` | The junction Swing, the ring element step and the contact transit. | `geometry::swing`; the midpoint scheme of `holon::law::ReferenceHolon`, realized directly and equated with it in two tests (reception item 1) |
-| `ReceivingPhases` | `hnn/receiving.rs` | The receiving ring, its epochs `e_j`, aperture `A`, grain `L_R`, its regions (Decision 27) and the shared map `R`; it reads the combined face `grain(log₂ C_r/N_r) + R P_R^(τ_R) v_R` (`ReceivingRead::combined`). It refuses `A` beyond the rank of the receiving ring's observability over the word, which it reports (review C7). | `receiver::reception::ReceiverFace` |
-| `Landmarks` | `hnn/landmark.rs` | The receiving parametron's storage as a tree of landmarks (Decision 28): typed address letters (`Boundary`, `Cell`) read per cell, nodes founded at first arrival holding Krichevsky–Trofimov masses in half-units and the carried mixture ratio `β` (rebased on its derived carrier width `W` with a certified residual), the face along the one opened path (context-tree weighting) on the fixed-width lattice `2^(−M_p)`, the cell's odometer digits emitted as a dyadic partition of the unit cell, `M_p` and `W` derived from `n*`, `L_R`, `B` and `D`, and the prequential measurement against the baselines (Decision 29). Count-only: `ReceivingPhases` still reads Decision 27's masses until the tree replaces them there. | `hnn::masses::grain_exponent`; `hnn::reference::Baselines`; Lean `HNN/LandmarkTree` |
+| `ReceivingPhases` | `hnn/receiving.rs` | The receiving ring, its epochs `e_j`, aperture `A`, grain `L_R`, its tree's address depth `D` and the shared map `R`; it reads the wave `R P_R^(τ_R) v_R` at refine and, at compare, the combined face `grain(log₂ q(· \| a_j)) + R P_R^(τ_R) v_R` with the landmark tree's face at each phase's causal address `a_j` (`tree_faces`, `combine`, `ReceivingRead::combined`; Decision 28). It refuses `A` beyond the rank of the receiving ring's observability over the word, which it reports (review C7). Beside it, `ActiveAddress`: the receiving parametron's active suffix address, the last `D` cells received, which the resident shifts at every ingested cell, a pending ratio copies at its cut, the state bits count and the collapse keeps; not the moment's state, so `n*` is unchanged. `grain_exponent` (the grain's integer comparison) lives here. | `receiver::reception::ReceiverFace` |
+| `Landmarks` | `hnn/landmark.rs` | The receiving parametron's storage as a tree of landmarks (Decision 28): typed address letters (`Boundary`, `Cell`) read per cell, nodes founded at first arrival holding Krichevsky–Trofimov masses in half-units and the carried mixture ratio `β` (rebased on its derived carrier width `W` with a certified residual), the face along the one opened path (context-tree weighting) on the fixed-width lattice `2^(−M_p)`, the cell's odometer digits emitted as a dyadic partition of the unit cell, `M_p` and `W` derived from `n*`, `L_R`, `B` and `D`, and the prequential measurement against the baselines (Decision 29). It is the receiving parametron's storage in Θ (`ReceivingPhases` reads it; Decision 27's region table, its depth-one case, is retired from Rust). | `hnn::receiving::grain_exponent`; `hnn::reference::Baselines`; Lean `HNN/LandmarkTree` |
 | `HolonRatio` | `hnn/ratio.rs` | `R_j = Ĝ_(T←H)` at each receiving phase, as undivided pairs, with `ℓ`, its branch and the receiver's fibre. | `ratio::Presentation`, `ratio::surprisal::SymbolicSurprisal`, `ratio::exponentiated::{RatioFamily, CarriedPower}` |
 | `RatioCovector` | `hnn/ratio.rs` | `R⁻¹dR` at the face: the magnitude part `p̂ − q` and the phase part `−q_c Δ_c`, in units of `ln 2` carried as a declared factor. Only a `HolonRatio` constructs it. | — |
 | `PendingRatio` | `hnn/pending.rs` | The producing anchor `λ`, the encoder moment `M`, the `ReceivingPhases` and the commit it was produced at. It is owned by the resident and addressed by `PendingId`. | the types above |
-| `Pullback` | `hnn/port.rs` | Covectors on `M`; per contact `(λ_Δ, λ_Q, λ_DQ)` and its constitution; per ring its reaction material, its standing `q` (through the declared lock chart) and `E_g`, `E_g^(δ)`; and `R` (the count face is stored, not pulled back). The key covector is a reading only. | `holon::contact::PairContact::feature_pullback`, `holon::law::HolonLaw::pullback` |
-| `Deposit` | `hnn/port.rs` | The staged material return, keyed by locus, inside the causal diamond, addressed by `StagedId`: the linear loci's samples, the factor steps and the region class masses' unit steps (`Deposit::masses`, Decision 27). | `holon::deposition` |
+| `Pullback` | `hnn/port.rs` | Covectors on `M`; per contact `(λ_Δ, λ_Q, λ_DQ)` and its constitution; per ring its reaction material, its standing `q` (through the declared lock chart) and `E_g`, `E_g^(δ)`; and `R` (the landmark tree's face is stored, not pulled back). The key covector is a reading only. | `holon::contact::PairContact::feature_pullback`, `holon::law::HolonLaw::pullback` |
+| `Deposit` | `hnn/port.rs` | The staged material return, keyed by locus, inside the causal diamond, addressed by `StagedId`: the linear loci's samples, the factor steps and the landmark steps (`Deposit::landmarks`, Decision 28: each compared cell at its phase's causal address, in cell order). | `holon::deposition` |
 | `AeonBoundary` | `hnn/retention.rs` | What the collapse returns: `V = ⊕V_g`, the descended constitution, the released loci and directions with their dimension and bits (structural, and the value kernel as a reading), the first-law split, each receiver's aeon reading, and the pending ratios carried or refused. | `compression::{FaceMap, Retention}` (specification and the dual face map), `aeon::{exchange, deposition}` |
 | (functions) | `hnn/keys.rs` | The data → menu map, key location per ring in carry order, and the gauge fixing. | `compression::keys::{Menu, Loop, Candidate, Gauge, ReflectorMachine}`, the new menu edges and propagation |
 | (functions) | `hnn/release.rs` | Release through modes and founding (campaign 3). | `compression::resonance_split`, `receiver::release`, `holarchy` |
@@ -1657,17 +1661,26 @@ regression controls are controls, never milestones:
 
   | Locus | Form | Initial value | Update |
   |---|---|---|---|
-  | `E_0` (`10 × 256`) | linear | 0 | normal law, `H_0 = I`, `B_0 = 0` |
+  | `E_0` (`10 × 256`) | linear | sign generator, times 1/2 (Decision 28's openings) | normal law, `H_0 = I`, `B_0 = E_0` |
   | `E_0^(δ)` | `Σ_(ρ<m) e_ρ (a_ρ·x)(b_ρ·y)` on the pair `x ⊗ y`, rank `m = 2d_0 = 10` | `e_ρ = 0`; `a_ρ`, `b_ρ` from the sign generator | factor steps on `e`, `a`, `b` (`E_0^(δ)` is carried in this factored form, R3 §5) |
-  | `R` (`512 × 22`) | linear | sign generator, times 1/2 | normal law, `H_0 = I`, `B_0 = R_0` |
+  | `R` (`512 × 22`) | linear | 0 (Decision 28's openings) | normal law, `H_0 = I`, `B_0 = 0` |
+  | the landmark tree on ring 2 | the receiving parametron's storage, depth `D = 4`, the path lattice `M_p = 39` and the β carrier `W = 28` (derived) | empty: every node unfounded, every face uniform | the landmark deposit, each compared cell on its opened paths |
   | `W_c,g` (`2d_g × 2d_g`) | linear | 0 | normal law: feature the contrast `c_t`, covector the element adjoint's `u_t`; `H_0 = I`, `B_0 = 0` |
   | `W_s,g = −f_g f_g*` | square | `f_g = ½I`, so `W_s,g = −¼I` | factor step |
   | Slices `A_ρ,g = u_ρ v_ρ* − v_ρ u_ρ*`, `ρ < 2d_g`, rank 1 | skew | `u_ρ = e_ρ`, `v_ρ = e_(ρ+1 mod 2d_g)`; with every class `+1`, `Σ_ρ A_ρ,g` is the skew cyclic shift of the realified ring | factor steps on `u`, `v` |
   | `q_g` | the standing | 0, so every sheet class is `+1` | preconditioned step through the lock chart |
   | `c_a`, `b_a`, `F_a` | squares | `I`, `½I`, `½I`: `C_a = I`, `K_a = ¼I`, `D_a = ¼I` | factor steps |
 
-  [agent-inferred: `E_0 = 0` makes the first faces uniform, exactly 8 bits per byte, and `R_0 ≠ 0`
-  gives `E` a nonzero first covector; if both started at zero, neither would ever move.]
+  [agent-inferred, Decision 28's openings: `R_0 = 0`, so the combined face opens exactly at the
+  tree's and the wave earns every bit it moves (the located failure read the old prior's reading
+  `R_0 z` alone at `10 + 9/16 + ε` bits a cell, a share in `[51/56, 3713/4077]` of the held-out
+  logits' energy). If `E_0` stayed 0 as well, the moment `m̃`, every wave and every feature
+  `P_R^(τ_R) v_R` would vanish, so `R`'s step and every upstream covector `Rᵀ g` would be zero at
+  every commit: the chain needs one nonzero map. `E_0` takes the sign generator's pattern at the
+  value `R_0` had. Its persistent prior reading (`B_0 = E_0`) is a fixed feature map that `R` reads,
+  not a term of the face: at `R = 0` it moves no logit. `R` moves at its first deposit whose
+  features are nonzero, and the upstream loci receive a covector from the next compare on (the
+  tests `the_wave_is_inert_when_every_map_opens_at_zero`, `r_opens_at_zero_and_learns_from_the_first_deposit`).]
 - **The exposure protocol:**
   - the cut is exactly the field's declared population, so the `n*` guard of `Field::declare`
     cannot be bypassed (`expose` refuses any other length; review D2); it is read in order, as one
@@ -1682,9 +1695,10 @@ regression controls are controls, never milestones:
     scored as targets, held-out ones included). The caller supplies the cells from the exterior
     stream; the machine keeps none;
   - at each receiving window, `refine` runs on the moment and `compare` runs against the next `A`
-    cells. On the training part the return is deposited; then those cells are ingested;
-  - the cut's pinned held-out targets are compared and reported, and never deposited (retired by
-    Decision 29 with the next exposure: every comparison is scored, then deposited);
+    cells; the return is then deposited, held-out windows included (Decision 29: every comparison
+    is scored at the standing before its own deposit, then deposited, as the online baselines are);
+    then those cells are ingested, and the receiving parametron's active suffix address receives
+    them;
   - the aeon boundary is the joint clock's carry-out (R2 M12).
 - **The budget and stop rule (R3 §5; #62 "Step 4 (#73) owed").**
   - **The check.** `deposit` computes the successor constitution exactly and counts its exact bits

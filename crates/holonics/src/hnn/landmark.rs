@@ -157,8 +157,8 @@ use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::compression::cost::ceil_log2;
 use crate::hnn::HnnError;
-use crate::hnn::masses::grain_exponent;
 use crate::hnn::ratio::{LOG_OCTAVES, interval_sum};
+use crate::hnn::receiving::grain_exponent;
 use crate::hnn::reference::{BaselineCodes, Baselines, Cut};
 use crate::ratio::Rat;
 use crate::ratio::algebraic::ExactInterval;

@@ -8,10 +8,10 @@
 //!
 //! | On the card | On the host |
 //! |---|---|
-//! | the moment and its ingest (`hnn_moment_ingest`, [`ResidentMoment`]); a pending ratio's counts frozen at its cut ([`MomentSnapshot`]) | the lift point `λ` and the host's mirror of the moment (the pending ratio's operand, which the deposit's samples and the state's bits read), checked equal at every ingest |
-//! | the published constitution's loci at their lattices, the moved words scattered at each publication (`hnn::publication`) | the constitution `Θ`, the normal laws' prox steps, the receiving parametron's class masses and their deposit (Decision 27), the budgeted carry and its remainders, the budget (`Constitution::deposited`), and the operators `I − ½K`, `m_a` formed from it |
+//! | the moment and its ingest (`hnn_moment_ingest`, [`ResidentMoment`]); a pending ratio's counts frozen at its cut ([`MomentSnapshot`]) | the lift point `λ`, the receiving parametron's active suffix address (`hnn::receiving::ActiveAddress`, shifted at every ingested cell) and the host's mirror of the moment (the pending ratio's operand, which the deposit's samples and the state's bits read), checked equal at every ingest |
+//! | the published constitution's loci at their lattices, the moved words scattered at each publication (`hnn::publication`) | the constitution `Θ`, the normal laws' prox steps, the receiving parametron's landmark tree and its deposit (Decision 28), the budgeted carry and its remainders, the budget (`Constitution::deposited`), and the operators `I − ½K`, `m_a` formed from it |
 //! | the keyed charts, their rounded Newton–Schulz steps and exact certificates (`hnn::store`) | each refinement's decisions from the certificates (warm, cold, fallback, target), the cold start's transpose and the exact fallback |
-//! | the word's open (`E_g M_g[c]`, the pair port), its ticks, its receiving read (`hnn_pair_weights`, `hnn_word_forward`) | the count face read at the grain and added to the card's logits (Decision 27), the faces in `ℚ(θ)`, each tick's balance, the release (`hnn::readout`) |
+//! | the word's open (`E_g M_g[c]`, the pair port), its ticks, its receiving read (`hnn_pair_weights`, `hnn_word_forward`) | the landmark tree's face read at each phase's causal address at compare and its grain exponents added to the card's logits (Decision 28: the tree stays with the host's constitution, as Decision 27's masses did; the host's tree read per window is timed as `WallTimes::tree_read` beside the card's word), the faces in `ℚ(θ)`, each tick's balance, the release (`hnn::readout`) |
 //! | the word's return (`hnn_word_reverse`) | the Holon ratio and its covector, the return's source through `Rᵀ` (the covector lives on `(1/W)ℤ`), the composition onto the loci (`reference::compose`) |
 //! | | keys, the collapse, the first law's ledger, the handles, every refusal's reason |
 //!
@@ -44,13 +44,14 @@ use holonics::hnn::port::{
 };
 use holonics::hnn::propagation::path_attenuation;
 use holonics::hnn::ratio::{HolonRatio, PhaseRatio, log2_enclosure, target_phases};
+use holonics::hnn::receiving::tree_code_length;
 use holonics::hnn::reference::{
     BudgetStop, ChartTally, Cut, Declared, ExposedResident, Exposure, WallTimes, compose, expose,
 };
 use holonics::hnn::retention::{Diamond, aeon_readings, collapse, contained, separator};
 use holonics::hnn::{
-    AeonBoundary, ChartKey, ChartReading, Constitution, ConstitutionRead, Current, Faces, Field,
-    HnnError, Locus, PendingRatio, ReceivingPhases, SourceMoment, Steps,
+    ActiveAddress, AeonBoundary, ChartKey, ChartReading, Constitution, ConstitutionRead, Current,
+    Faces, Field, HnnError, Locus, PendingRatio, ReceivingPhases, SourceMoment, Steps,
 };
 use holonics::navigator::Clock;
 use holonics::ratio::Rat;
@@ -169,6 +170,7 @@ struct AeonState {
 pub struct Mounted<'c> {
     field: Field,
     current: Current,
+    address: ActiveAddress,
     constitution: Constitution,
     moments: BTreeMap<MomentId, MomentSlot<'c>>,
     pending: BTreeMap<PendingId, PendingSlot<'c>>,
@@ -194,6 +196,11 @@ pub struct Mounted<'c> {
 impl<'c> Mounted<'c> {
     pub fn field(&self) -> &Field {
         &self.field
+    }
+
+    /// The receiving parametron's active suffix address (the reference's `Resident::address`).
+    pub fn address(&self) -> &ActiveAddress {
+        &self.address
     }
 
     /// What crossed the bus through this resident's port (exterior; [`Traffic`]).
@@ -222,7 +229,13 @@ impl<'c> Mounted<'c> {
     /// The exact bits of the resident's state, as the reference counts them (the kept charts' bits
     /// read from the host's mirror of the card's store).
     fn bits(&self) -> u64 {
-        let lift: u64 = self.current.lift().iter().map(|x| x.bits() + 1).sum();
+        let lift: u64 = self
+            .current
+            .lift()
+            .iter()
+            .map(|x| x.bits() + 1)
+            .sum::<u64>()
+            + self.address.bits(self.field.alphabet());
         let moments: u64 = self
             .moments
             .values()
@@ -240,8 +253,8 @@ impl<'c> Mounted<'c> {
     }
 
     /// **Execute a word on the card** at a publication (module header): the operators formed, the
-    /// charts refined on the card, the word's open, ticks and read in one launch, and its faces
-    /// read on the host.
+    /// charts refined on the card, the word's open, ticks and read in one launch, and the wave's
+    /// faces read on the host (the tree part is added at compare, `PendingRatio::against`).
     fn execute(
         &mut self,
         ratio: &PendingRatio,
@@ -301,15 +314,7 @@ impl<'c> Mounted<'c> {
         });
         self.store.octets = 0;
         word.octets = 0;
-        // The count face (Decision 27) at this publication's class masses and the ratio's window.
-        let phases = ratio.phases();
-        let masses = publication.loci.masses[phases.ring()].as_ref().ok_or(
-            HnnError::MissingReceivingMap {
-                ring: phases.ring(),
-            },
-        )?;
-        let count = phases.count_face_at(masses, ratio.moment())?;
-        let faces = readout::faces(&word.plan, &word.record, &count)?;
+        let faces = readout::faces(&word.plan, &word.record)?;
         Ok((
             ExecutedWord {
                 word,
@@ -321,10 +326,13 @@ impl<'c> Mounted<'c> {
     }
 
     /// **The arrived targets' code length at a publication**: a word on the card at the arrived
-    /// ratio's operands, its faces compared with the targets; and the charts' readings.
+    /// ratio's operands, its wave's faces with the tree of the constitution the publication
+    /// publishes (a deposit's successor, or the resident's own) at the targets' addresses, compared
+    /// with the targets; and the charts' readings.
     fn arrived_code_length(
         &mut self,
         publication: &Rc<Publication<'c>>,
+        successor: Option<&Constitution>,
         card: &'c Card,
     ) -> Result<(ExactInterval, Vec<ChartReading>), HnnError> {
         let arrived = self.arrived.take().ok_or(HnnError::Shape {
@@ -333,7 +341,12 @@ impl<'c> Mounted<'c> {
             found: 0,
         })?;
         let read = self.execute(&arrived.ratio, &arrived.moment, publication, card);
-        let result = read.and_then(|(word, faces)| {
+        let constitution = successor.unwrap_or(&self.constitution);
+        let result = read.and_then(|(word, wave)| {
+            let faces = arrived
+                .ratio
+                .against(constitution, &wave, &arrived.targets)?
+                .faces;
             let phases = arrived.ratio.phases();
             let anchors = target_phases(
                 &self.field,
@@ -509,6 +522,7 @@ impl<'c> Resident<'c> {
         Ok(Mounted {
             field: field.clone(),
             current: current.clone(),
+            address: ActiveAddress::of_field(field),
             constitution,
             moments: BTreeMap::new(),
             pending: BTreeMap::new(),
@@ -580,6 +594,11 @@ impl<'c> Resident<'c> {
                 read
             }
         };
+        // The tree part of the combined face at each phase's causal address (Decision 28), read
+        // on the host from the published constitution's tree.
+        let start = Instant::now();
+        let against = ratio.against(&resident.constitution, &faces, targets)?;
+        wall.tree_read = start.elapsed();
         let start = Instant::now();
         let residual: Vec<Vec<Rat>> = faces
             .logits
@@ -587,8 +606,14 @@ impl<'c> Resident<'c> {
             .zip(&slot.emitted)
             .map(|(now, then)| now.iter().zip(then).map(|(a, b)| a - b).collect())
             .collect();
+        let tree = against
+            .trees
+            .iter()
+            .zip(targets)
+            .map(|(face, &target)| tree_code_length(face, target))
+            .collect::<Result<Vec<_>, _>>()?;
         let anchors = target_phases(field, ratio.anchor(), phases.ring(), targets)?;
-        let holon = HolonRatio::compare(faces, targets, &anchors)?;
+        let holon = HolonRatio::compare(against.faces, targets, &anchors)?;
         let covector = holon.covector()?;
         resident.constitution.receiving_map(phases.ring()).ok_or(
             HnnError::MissingReceivingMap {
@@ -642,6 +667,7 @@ impl<'c> Resident<'c> {
             residual,
             reached: deposit.loci(),
             released: back.released.clone(),
+            tree,
         };
         let steps = phases.junction_steps() as u64;
         let ticks = vec![steps; field.rings().len()];
@@ -769,6 +795,10 @@ impl<'c> ExecutionPort for Resident<'c> {
             return Err(HnnError::Realization {
                 what: "the card's ingest against the host's moment",
             });
+        }
+        // The receiving parametron's active suffix address receives the cells the moment took.
+        for &code in &codes[..ingested.cells] {
+            resident.address.receive(code);
         }
         // Every other open moment steps from the one lift point: its card's phases follow it.
         if ingested.cells > 0 && resident.moments.len() > 1 {
@@ -922,9 +952,10 @@ impl<'c> ExecutionPort for Resident<'c> {
         let ratio = PendingRatio::produce(
             &resident.current,
             &source.host,
+            &resident.address,
             phases,
             resident.constitution.commit(),
-        );
+        )?;
         let snapshot = source.card.snapshot().map_err(device)?;
         let start = Instant::now();
         let publication = Rc::clone(&resident.publication);
@@ -1139,7 +1170,8 @@ impl<'c> ExecutionPort for Resident<'c> {
         )?);
         let octets = successor.octets as u64;
         resident.count(|traffic| traffic.publications += octets);
-        let (reread, readings) = resident.arrived_code_length(&successor, self.card)?;
+        let (reread, readings) =
+            resident.arrived_code_length(&successor, Some(&next), self.card)?;
         resident.tally.read(&readings);
         let reread_time = start.elapsed();
         let mut work = ExactWork::nothing();
@@ -1187,8 +1219,11 @@ impl<'c> ExecutionPort for Resident<'c> {
         let read = resident.execute(&slot.ratio, &slot.moment, &publication, self.card);
         let ratio = slot.ratio.clone();
         resident.pending.insert(*pending, slot);
-        let (word, faces) = read?;
+        let (word, wave) = read?;
         resident.tally.read(&word.readings);
+        // No cell of the window is released yet: every phase reads the tree at the window's
+        // opening address (`ActiveAddress::phase`), as the reference's release does.
+        let faces = ratio.against(&resident.constitution, &wave, &[])?.faces;
         let field = &resident.field;
         let phases = ratio.phases().clone();
         let anchors = readout::anchors(&word.word.plan, &word.word.record);
@@ -1302,7 +1337,8 @@ impl<'c> ExecutionPort for Resident<'c> {
         if let Some(arrived) = &resident.arrived {
             let reads = Diamond::of(&field, arrived.ratio.phases()).retained(&field);
             if collapsed.released.iter().any(|locus| reads.contains(locus)) {
-                let (reread, readings) = resident.arrived_code_length(&descended, self.card)?;
+                let (reread, readings) =
+                    resident.arrived_code_length(&descended, None, self.card)?;
                 resident.tally.read(&readings);
                 resident.ledger.release(reread)?;
             }

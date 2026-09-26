@@ -30,8 +30,9 @@
 //! is one mean aeon of campaign 1's joint clock on uniform bytes, `⌈1,281,280/1,077⌉ = 1,190` cells
 //! (design (d), "Locks"), and a whole number of receiving windows. It is declared from the field's
 //! clock, not from the cut, and never tuned on held-out bits. `held-out H` declares a tail of `H`
-//! cells instead. Its targets are compared and reported, never deposited, and no crib reads them
-//! (review D1).
+//! cells instead. Prequential (Decision 29): its targets are compared at the standing before their
+//! own deposit and then deposited, as every baseline counts them after scoring; "held out" means
+//! that no design choice was made on them, and no crib reads them (review D1).
 //!
 //! [definition] **The deadline** `windows K` ends the reading after `K` receiving windows
 //! (`Reference::with_deadline`). The cut is still the whole declared population, so the `n*` guard
@@ -59,9 +60,10 @@
 //!   the words and their returns released, and the tick balances' residuals against their bounds;
 //! - the bits on the training and the held-out targets against each online baseline (uniform,
 //!   order-0 and order-1 Krichevsky–Trofimov, PPM of order 2), and the verdict against order-0;
-//!   beside the model's, the count face's own code length (Decision 27: the receiving parametron's
-//!   masses at each window's region read at the grain, no wave, at the model's constitution and
-//!   window), each baseline against it, and the model against it: the wave's contribution;
+//!   beside the model's, the landmark tree's face alone (Decision 28: the receiving parametron's
+//!   tree at each cell's causal address read at the grain, no wave, at the model's constitution and
+//!   address; the compare's receipt), each baseline against it, and the model against it: the
+//!   wave's contribution;
 //! - `Kt` with the published keys, against the literal over the cells read;
 //! - each key location with its fibres per ring;
 //! - each aeon's boundary: its length and lift points, readings, collapse, first law (exchange plus
@@ -69,8 +71,10 @@
 //! - the state and constitution bits against the source, with and without the collapse;
 //! - the constitution's curve, one point per commit;
 //! - the budget stop or deadline, the work counted, and the wall time: the exposure's, and the
-//!   host's by phase (`Exposure::wall`: refine read, release, compare read, holon and covector,
-//!   `pull_back`, `compose`, `deposited`, re-read and ingest), with the rest of the exposure.
+//!   host's by phase (`Exposure::wall`: refine read, release, compare read, tree read, holon and
+//!   covector, `pull_back`, `compose`, `deposited`, re-read and ingest), with the rest of the
+//!   exposure, and the host's tree read per window against the word's (the refine read, the word
+//!   executed and read: on the card, the card's word with its host readout).
 //!
 //! [definition] **Every reading is exact; no decimal is printed** (a decimal is a collapse, CLAUDE.md's
 //! exact-arithmetic law). Integers print as integers and rationals as `n/d` (`n/2^e` or
@@ -398,6 +402,23 @@ fn phases(exposure: &Exposure, wall: u128) {
     let sum = exposure.wall.total().as_millis();
     row("phases' sum", sum);
     row("rest of exposure", wall.saturating_sub(sum));
+    // The host's tree read against the word, per window in microseconds (Decision 28: the tree's
+    // card port is a #76 debt only if its read is not small against the word).
+    let micros = |time: std::time::Duration| time.as_micros();
+    let (tree, word) = (
+        micros(exposure.wall.tree_read),
+        micros(exposure.wall.refine_read),
+    );
+    println!(
+        "the host's tree read per window: {} us; the word (refine read) per window: {} us; tree read over word: {}",
+        mean(tree, windows),
+        mean(word, windows),
+        if word == 0 {
+            "-".to_string()
+        } else {
+            format!("{} rem {} over {word}", tree / word, tree % word)
+        }
+    );
 }
 
 // -------------------------------------------------------------------------------------------
@@ -615,7 +636,7 @@ fn bits(label: &str, bits: &Bits, criterion: bool, grain: u64) {
     let ppm = format!("PPM order {PPM_ORDER}");
     let rows = [
         ("model p^", &bits.model),
-        ("counts", &bits.counts),
+        ("tree face", &bits.tree),
         ("uniform", &bits.uniform),
         ("order-0 KT", &bits.order_zero),
         ("order-1 KT", &bits.order_one),
@@ -637,9 +658,9 @@ fn bits(label: &str, bits: &Bits, criterion: bool, grain: u64) {
     }
     for (name, baseline) in &rows[2..] {
         println!(
-            "  the count face alone is {} {name}; counts − {name}: {}",
-            against(&bits.counts, baseline),
-            difference(&bits.counts, baseline, grain)
+            "  the tree face alone is {} {name}; tree − {name}: {}",
+            against(&bits.tree, baseline),
+            difference(&bits.tree, baseline, grain)
         );
     }
     println!(
@@ -652,8 +673,8 @@ fn bits(label: &str, bits: &Bits, criterion: bool, grain: u64) {
         }
     );
     println!(
-        "  the wave's contribution (Decision 27: the model against the count face alone): {}",
-        match against(&bits.model, &bits.counts) {
+        "  the wave's contribution (Decision 28: the model against the tree face alone): {}",
+        match against(&bits.model, &bits.tree) {
             "below" => "the wave lowers the code length",
             "above" => "the wave raises the code length",
             _ => "undecided: the enclosures overlap",

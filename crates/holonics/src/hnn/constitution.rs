@@ -20,8 +20,8 @@
 //! [definition] **Loci** ([`Locus`]). Per ring `g`: its element (the passive factor `f_g` with
 //! `W_s,g = −f_g f_gᵀ`, the contrast port `W_c,g`, the skew slices `A_ρ = u_ρ v_ρᵀ − v_ρ u_ρᵀ`), its
 //! standing `q_g`, on a source ring its source ports (`E_g` and the factored pair port `E_g^(δ)`),
-//! on a receiving ring its receiving map `R` and the receiving parametron's region class masses
-//! (Decision 27, [`ClassMasses`]), both at the receiving locus. Per contact `a`: its channel's
+//! on a receiving ring its receiving map `R` and the receiving parametron's landmark tree
+//! (Decision 28, `hnn::landmark::Landmarks`), both at the receiving locus. Per contact `a`: its channel's
 //! square factors (`C_a = c_a c_aᵀ`, `K_a = b_a b_aᵀ`, `D_a = F_a F_aᵀ`). The junction admittance `Y_g` and the
 //! contact conductance `G_a` (`Y_a`, `β_a`, the screws) are declared on the field in campaign 1; the
 //! collapse names them as loci, but they carry no learned value.
@@ -32,18 +32,22 @@
 //! ```text
 //! ΔH_U = Σ_t w f_t f_tᵀ ,            ΔW_U = γ_U Σ_t w g_t (H_U'⁻¹ f_t)ᵀ ,  H_U' the carried successor Gram    per linear locus (E_g, R, W_c)
 //! Δh_x = Σ_t w |f_t|² ,              Δx = η_x G_x / h_x' ,                 h_x' the carried successor statistic  per factor family
-//! ΔC_(r,t) = w                       per reached comparison (region r, target t)                                the class masses
+//! n_s(t) += 1, β_s ← β_s k_s(t)/q    per reached comparison, on the path its address a opens (target t)       the landmark tree
 //! ```
 //!
-//! [definition; agent-inferred] **Decision 27 at the receiving locus.** The receiving map `R` keeps
+//! [definition; agent-inferred] **Decision 28 at the receiving locus.** The receiving map `R` keeps
 //! the prox step on its reached covectors (Decisions 22 and 24), the covector of the ratio read on
 //! the combined face (`hnn::receiving::ReceivingRead::combined`). Beside it the receiving
-//! parametron stores its region class masses ([`ClassMasses`], `hnn::masses`), which each reached
-//! comparison deposits at its region and target class ([`MassStep`]); they are integers of
-//! half-units, exact with no remainder and no release, so no carry and no clock is read for them.
-//! They share the locus's diamond row (retained always) and its collapse rule (never released).
-//! Decision 26's exogenous law and standing read are retired: the count face contains the
-//! marginal (Lean `HNN/TargetFace`'s finite-chart obstruction stays a theorem).
+//! parametron stores its landmark tree (`hnn::landmark::Landmarks`, declared from the receiver by
+//! `hnn::receiving::landmark_declaration`), which each reached comparison deposits on the path its
+//! causal address opens ([`LandmarkStep`], in cell order); its counts are integers of half-units
+//! and its mixture ratios are carried by the owner's β chart, so no lattice carry and no clock is
+//! read for it. It shares the locus's diamond row (retained always) and its collapse rule (never
+//! released; Lean `HNN/LandmarkTree.release_rule`: only nodes deeper than `D` are releasable, and
+//! there are none). Decision 27's region table, its depth-one case, is retired from Rust; its laws
+//! stay in Lean `HNN/RegionCounts`. Decision 26's exogenous law and standing read are retired: the
+//! tree's face contains the marginal (Lean `HNN/TargetFace`'s finite-chart obstruction stays a
+//! theorem).
 //!
 //! [definition; agent-inferred] **The carrier lattice and the budgeted release** (Lean
 //! `HNN/LatticeDeposit`). Exact rational deposition compounds: the maps that form each other's
@@ -163,11 +167,12 @@ use rayon::prelude::*;
 
 use crate::hnn::HnnError;
 use crate::hnn::field::{ConstitutionRead, Field};
-use crate::hnn::masses::{ClassMasses, MassStep};
+use crate::hnn::landmark::{Landmarks, Letter};
 use crate::hnn::moment::PairPort;
 use crate::hnn::port::Deposit;
 use crate::hnn::propagation::gram;
 use crate::hnn::realization::{indexed, outer_rows};
+use crate::hnn::receiving::landmark_declaration;
 use crate::holon::deposition::CommittedEnergyBound;
 use crate::ratio::linear::vector::{Chart, integral, lcm, matrix_form};
 use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
@@ -1704,8 +1709,8 @@ struct RingMaterial {
     pairs: Vec<(usize, PairPort)>,
     pair_scale: Rat,
     receiving: Option<NormalLaw>,
-    /// The receiving parametron's region class masses (Decision 27), on a receiving ring.
-    masses: Option<ClassMasses>,
+    /// The receiving parametron's landmark tree (Decision 28), on a receiving ring.
+    tree: Option<Landmarks>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -1818,6 +1823,18 @@ pub struct LinearStep {
     pub samples: Vec<Sample>,
 }
 
+/// [definition] **One reached comparison's deposit into the receiving parametron's landmark tree**
+/// (Decision 28): its receiving ring, the causal address its phase read the tree at
+/// (`hnn::receiving::ActiveAddress::phase`) and its target class. The deposit applies a window's
+/// steps in cell order, each on the paths its address opens (Lean
+/// `HNN/LandmarkTree.landmark_step`), at the receiving locus.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LandmarkStep {
+    pub ring: usize,
+    pub address: Vec<Letter>,
+    pub class: usize,
+}
+
 /// [definition] **A factor family's descent direction `G_x`** (the negative gradient of the ratio's
 /// log), shaped as the family's factors.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -1910,9 +1927,9 @@ pub struct FactorStep {
 /// carry's report: every residual the deposit released (exact and sparse, with its locus, carrier
 /// and entry; Lean `HNN/LatticeDeposit.release`), their bits, and the number of entries whose
 /// lattice coordinate moved (`q ≠ 0`, review R5); and each normal law's solved chart with the prox
-/// residual its chart released ([`ChartReading`], Decision 24); and the class mass its reached
-/// comparisons added at the receiving parametrons, `Σ w` (Decision 27), exact. The release is
-/// reported, never silent.
+/// residual its chart released ([`ChartReading`], Decision 24); and the cells its reached
+/// comparisons deposited into the receiving parametrons' landmark trees (Decision 28). The release
+/// is reported, never silent.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DepositReading {
     pub growth: Option<Rat>,
@@ -1925,7 +1942,7 @@ pub struct DepositReading {
     pub released_bits: u64,
     pub stepped: u64,
     pub charts: Vec<(Locus, ChartReading)>,
-    pub masses: Rat,
+    pub landmarks: u64,
 }
 
 // -------------------------------------------------------------------------------------------
@@ -1993,18 +2010,33 @@ impl Constitution {
     ///
     /// | Locus | Initial value | Update |
     /// |---|---|---|
-    /// | `E_g` on a source ring | 0 | normal law, `H_0 = I`, `B_0 = 0` |
+    /// | `E_g` on a source ring | the sign generator times ½ | normal law, `H_0 = I`, `B_0 = E_0` |
     /// | `E_g^(δ)`, rank `2d_g` | `e_ρ = 0`; `a_ρ`, `b_ρ` from the sign generator | factor steps |
-    /// | `R` on a receiving ring | the sign generator times ½ | normal law, `H_0 = I`, `B_0 = R_0` |
-    /// | `C_(r,c)` on a receiving ring, per region of its receiver's partition | `α = ½` (Krichevsky–Trofimov) | the class-mass deposit (Decision 27) |
+    /// | `R` on a receiving ring | 0 | normal law, `H_0 = I`, `B_0 = 0` |
+    /// | the landmark tree on a receiving ring, declared from its first receiver | empty: every node unfounded, every face uniform (`α = ½` at first arrival) | the landmark deposit (Decision 28) |
     /// | `W_c,g` | 0 | normal law, `H_0 = I`, `B_0 = 0` |
     /// | `W_s,g = −f fᵀ` | `f = ½I` | factor step |
     /// | slices | `u_ρ = e_ρ`, `v_ρ = e_(ρ+1)`: the skew cyclic shift | factor steps |
     /// | `q_g` | 0 (every sheet class `+1`) | the lock chart's preconditioned step |
     /// | `c_a`, `b_a`, `F_a` | `I`, `½I`, `½I` | factor steps |
     ///
-    /// The sign generator's locus codes: `R` of ring `g` is kind 1; the pair port's current and
-    /// earlier reads of ring `g` at the `o`-th declared offset are kind 2 and 3 with part `o`.
+    /// The sign generator's locus codes: `E` of ring `g` is kind 0; the pair port's current and
+    /// earlier reads of ring `g` at the `o`-th declared offset are kind 2 and 3 with part `o` (kind
+    /// 1 was `R`'s while it opened at the sign generator, Decision 27).
+    ///
+    /// [definition; agent-inferred] **`R_0 = 0`, `E_0` the sign generator times ½.** The receiving
+    /// map opens at zero, so the combined face opens exactly at the tree's and the wave earns every
+    /// bit it moves: the located failure read the old prior's reading `R_0 z` alone at `10 + 9/16 +
+    /// ε` bits a cell, a share in `[51/56, 3713/4077]` of the held-out logits' energy. With `E_0 = 0`
+    /// and `e_ρ = 0` as well, the source moment `m̃`, the open, every wave and every feature
+    /// `f = P_R^(τ_R) v_R` would be zero, so `R`'s step `G = Σ γ g fᵀ` and every upstream covector
+    /// `Rᵀ g` would vanish at every commit: the chain of maps needs one nonzero member to carry a
+    /// covector. `E_0` takes the sign generator's pattern at the value `R_0` had. Its normal law keeps
+    /// the prior's reading (`B_0 = E_0`), a fixed feature map that `R` reads, not a term of the
+    /// face: at `R = 0` it moves no logit. `R` moves at the first deposit, and the upstream loci
+    /// receive a covector from the second compare on (the tests
+    /// `the_wave_is_inert_when_every_map_opens_at_zero` and
+    /// `r_opens_at_zero_and_learns_from_the_first_deposit`).
     ///
     /// Every initial value (0, ±½, 1, the unit vectors) lies on every lattice `L ≥ 1`, and each
     /// locus takes the field's declared lattice ([`Field::lattice`]).
@@ -2025,13 +2057,14 @@ impl Constitution {
             .unwrap_or(1);
         let a = field.alphabet();
         let receivers: BTreeSet<usize> = field.receivers().iter().map(|r| r.ring).collect();
-        // Each receiving ring's masses over its first declared receiver's partition.
-        let partition = |g: usize| {
+        // Each receiving ring's tree, declared from its first declared receiver.
+        let tree = |g: usize| -> Result<Option<Landmarks>, HnnError> {
             field
                 .receivers()
                 .iter()
                 .find(|receiver| receiver.ring == g)
-                .map(|receiver| receiver.regions)
+                .map(|receiver| Landmarks::new(landmark_declaration(field, receiver)?))
+                .transpose()
         };
         let rings = field
             .rings()
@@ -2041,7 +2074,23 @@ impl Constitution {
                 let n = ring.width();
                 let source = field
                     .is_source(g)
-                    .then(|| ExactRatMatrix::zero(n, a).map(NormalLaw::with_prior))
+                    .then(|| {
+                        let map = ExactRatMatrix::shaped(
+                            n,
+                            a,
+                            (0..n)
+                                .map(|i| {
+                                    (0..a)
+                                        .map(|j| {
+                                            declared_sign(locus_code(0, g, 0), i as u64, j as u64)
+                                                * rat(1, 2)
+                                        })
+                                        .collect()
+                                })
+                                .collect(),
+                        )?;
+                        Ok::<_, HnnError>(NormalLaw::with_prior(map))
+                    })
                     .transpose()?;
                 let pairs = if field.is_source(g) {
                     field
@@ -2075,23 +2124,7 @@ impl Constitution {
                 };
                 let receiving = receivers
                     .contains(&g)
-                    .then(|| {
-                        let map = ExactRatMatrix::shaped(
-                            2 * a,
-                            n,
-                            (0..2 * a)
-                                .map(|i| {
-                                    (0..n)
-                                        .map(|j| {
-                                            declared_sign(locus_code(1, g, 0), i as u64, j as u64)
-                                                * rat(1, 2)
-                                        })
-                                        .collect()
-                                })
-                                .collect(),
-                        )?;
-                        Ok::<_, HnnError>(NormalLaw::with_prior(map))
-                    })
+                    .then(|| ExactRatMatrix::zero(2 * a, n).map(NormalLaw::with_prior))
                     .transpose()?;
                 Ok(RingMaterial {
                     standing: vec![Rat::zero(); n],
@@ -2107,7 +2140,7 @@ impl Constitution {
                     pairs,
                     pair_scale: Rat::one(),
                     receiving,
-                    masses: partition(g).map(|regions| ClassMasses::prior(regions, a)),
+                    tree: tree(g)?,
                 })
             })
             .collect::<Result<Vec<_>, HnnError>>()?;
@@ -2316,22 +2349,22 @@ impl Constitution {
         Ok(self)
     }
 
-    /// **Replace a receiving ring's region class masses** (a test and control chart): refused off a
-    /// receiving ring, or for masses of another partition or alphabet than the ring's.
-    pub fn with_masses(mut self, ring: usize, masses: ClassMasses) -> Result<Self, HnnError> {
+    /// **Replace a receiving ring's landmark tree** (a test and control chart): refused off a
+    /// receiving ring, or for a tree of another declaration than the ring's.
+    pub fn with_tree(mut self, ring: usize, tree: Landmarks) -> Result<Self, HnnError> {
         let slot = self
             .rings
             .get_mut(ring)
-            .and_then(|material| material.masses.as_mut())
+            .and_then(|material| material.tree.as_mut())
             .ok_or(HnnError::MissingReceivingMap { ring })?;
-        if slot.regions() != masses.regions() || slot.classes() != masses.classes() {
+        if slot.declaration() != tree.declaration() {
             return Err(HnnError::Shape {
-                what: "class masses against the receiving ring's partition and alphabet",
-                expected: slot.region_count() * slot.classes(),
-                found: masses.region_count() * masses.classes(),
+                what: "a landmark tree against the receiving ring's declared tree (its depth)",
+                expected: slot.declaration().depth,
+                found: tree.declaration().depth,
             });
         }
-        *slot = masses;
+        *slot = tree;
         Ok(self)
     }
 
@@ -2415,7 +2448,7 @@ impl Constitution {
             }
             if let Some(receiving) = &material.receiving {
                 let mut parts = receiving.carrier_bits();
-                parts.entries += material.masses.as_ref().map_or(0, ClassMasses::bits);
+                parts.entries += material.tree.as_ref().map_or(0, Landmarks::bits);
                 loci.push((Locus::ReceivingMap(g), parts));
             }
         }
@@ -2757,11 +2790,11 @@ impl Constitution {
                 .push((linear + index, LocusStep::Factor(step)));
         }
         let factors = linear + deposit.factors().len();
-        for (index, step) in deposit.masses().iter().enumerate() {
+        for (index, step) in deposit.landmarks().iter().enumerate() {
             groups
                 .entry(Locus::ReceivingMap(step.ring))
                 .or_default()
-                .push((factors + index, LocusStep::Masses(step)));
+                .push((factors + index, LocusStep::Landmark(step)));
         }
         // Each locus's material and carried remainders, taken apart: a locus's steps read and
         // write only its own, so the loci run together (`hnn::realization`), each in its
@@ -2874,11 +2907,7 @@ impl Constitution {
             released_bits,
             stepped,
             charts,
-            masses: deposit
-                .masses()
-                .iter()
-                .map(|step| step.weight.clone())
-                .sum(),
+            landmarks: deposit.landmarks().len() as u64,
         };
         Ok((next, reading))
     }
@@ -2943,16 +2972,16 @@ impl Constitution {
                         .map_err(refused)?;
                     factor_step(material, carries, step, eta, at).map_err(refused)?;
                 }
-                LocusStep::Masses(step) => {
-                    // The masses carry no remainder, so the stroke is opened for the locus's
+                LocusStep::Landmark(step) => {
+                    // The tree carries no lattice remainder, so the stroke is opened for the locus's
                     // reading and nothing moves its clock.
                     budgeted(&mut stroke).map_err(refused)?;
-                    let masses = material
+                    let tree = material
                         .as_deref_mut()
-                        .and_then(LocusMaterial::masses)
+                        .and_then(LocusMaterial::tree)
                         .ok_or(HnnError::MissingReceivingMap { ring: step.ring })
                         .map_err(refused)?;
-                    masses.deposit(step).map_err(refused)?;
+                    tree.deposit(&step.address, step.class).map_err(refused)?;
                 }
             }
         }
@@ -3026,14 +3055,14 @@ type LocusDeposit = Result<(Locus, Carries, (BudgetedCarry, Vec<ChartReading>)),
 enum LocusStep<'d> {
     Linear(&'d LinearStep),
     Factor(&'d FactorStep),
-    Masses(&'d MassStep),
+    Landmark(&'d LandmarkStep),
 }
 
 /// [definition; agent-inferred] **One locus's material, borrowed apart from the rest** of the
 /// successor a deposit builds (the module header's loci): the element's passive factor, contrast
 /// port and slices with their statistics (and the ring's width, which the slices' carry indexes
 /// by); the standing and its statistic; the source port with the pair ports and their statistic;
-/// the receiving map with the receiving parametron's class masses; a contact's channel factors. No
+/// the receiving map with the receiving parametron's landmark tree; a contact's channel factors. No
 /// two loci share a part, so their steps run together.
 enum LocusMaterial<'a> {
     Element {
@@ -3055,7 +3084,7 @@ enum LocusMaterial<'a> {
     },
     ReceivingMap {
         receiving: &'a mut Option<NormalLaw>,
-        masses: &'a mut Option<ClassMasses>,
+        tree: &'a mut Option<Landmarks>,
     },
     Channel(&'a mut ContactMaterial),
 }
@@ -3081,7 +3110,7 @@ impl<'a> LocusMaterial<'a> {
                 pairs,
                 pair_scale,
                 receiving,
-                masses,
+                tree,
             } = material;
             let width = standing.len();
             if named.contains_key(&Locus::Element(g)) {
@@ -3119,7 +3148,7 @@ impl<'a> LocusMaterial<'a> {
             if named.contains_key(&Locus::ReceivingMap(g)) {
                 materials.insert(
                     Locus::ReceivingMap(g),
-                    LocusMaterial::ReceivingMap { receiving, masses },
+                    LocusMaterial::ReceivingMap { receiving, tree },
                 );
             }
         }
@@ -3145,10 +3174,10 @@ impl<'a> LocusMaterial<'a> {
         }
     }
 
-    /// The receiving parametron's class masses, when this locus carries them.
-    fn masses(&mut self) -> Option<&mut ClassMasses> {
+    /// The receiving parametron's landmark tree, when this locus carries it.
+    fn tree(&mut self) -> Option<&mut Landmarks> {
         match self {
-            LocusMaterial::ReceivingMap { masses, .. } => masses.as_mut(),
+            LocusMaterial::ReceivingMap { tree, .. } => tree.as_mut(),
             _ => None,
         }
     }
@@ -3423,7 +3452,7 @@ impl ConstitutionRead for Constitution {
     fn receiving_map(&self, ring: usize) -> Option<&ExactRatMatrix> {
         self.rings[ring].receiving.as_ref().map(NormalLaw::map)
     }
-    fn class_masses(&self, ring: usize) -> Option<&ClassMasses> {
-        self.rings[ring].masses.as_ref()
+    fn landmarks(&self, ring: usize) -> Option<&Landmarks> {
+        self.rings[ring].tree.as_ref()
     }
 }

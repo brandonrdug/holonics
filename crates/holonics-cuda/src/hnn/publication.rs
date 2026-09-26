@@ -15,9 +15,10 @@
 //! | receiving ring `R`'s map | `2|A| × 2d_R` | `L_ReceivingMap(R)` |
 //!
 //! The host keeps what only the host reads (the element `K_g`, `W_s,g`, the dissipation `D_a`, the
-//! exact operators `I − ½K_g` and `m_a` from which the chart store's operator words are read, and
-//! the receiving parametron's region class masses, Decision 27, whose count face the host reads at
-//! the grain and adds to the card's logits) and a copy of the published words. [definition] **Only
+//! exact operators `I − ½K_g` and `m_a` from which the chart store's operator words are read) and
+//! a copy of the published words. The receiving parametron's landmark tree (Decision 28) is not
+//! among the published loci: no kernel reads it, its grain read compares integers past the card's
+//! 128-bit carrier, and the host reads it from the constitution it publishes, at compare. [definition] **Only
 //! the moved words cross the bus.** A successor's words are laid out as its predecessor's (the same
 //! loci, shapes and lattices), so the successor is
 //! the predecessor copied on the card and the words a deposit moved scattered into it
@@ -31,7 +32,7 @@ use std::rc::Rc;
 use core::ffi::c_void;
 
 use holonics::hnn::propagation::{contact_operator, element_material, gram, ring_operator};
-use holonics::hnn::{ClassMasses, ConstitutionRead, Field, HnnError, Locus};
+use holonics::hnn::{ConstitutionRead, Field, HnnError, Locus};
 use holonics::ratio::Rat;
 use holonics::ratio::linear::ExactRatMatrix;
 use num_bigint::BigInt;
@@ -109,10 +110,6 @@ pub(crate) struct Loci {
     pub(crate) sources: Vec<SourceLoci>,
     /// The receiving map per ring (`None` off the receiving rings).
     pub(crate) maps: Vec<Option<Placed>>,
-    /// The receiving parametron's region class masses per ring (Decision 27; `None` off the
-    /// receiving rings), kept on the host: the count face's grain read compares `(2C)^L` with
-    /// `2^k (2N)^L`, integers past the card's 128-bit carrier, and no kernel reads the masses.
-    pub(crate) masses: Vec<Option<ClassMasses>>,
     pub(crate) words: Vec<i64>,
     /// Each placed array's `(offset, length, exponent)`, in order: two publications with equal
     /// layouts differ only in their words.
@@ -288,15 +285,11 @@ impl Loci {
                 "a receiving map entry off its lattice or past the word",
             )?));
         }
-        let masses = (0..field.rings().len())
-            .map(|ring| constitution.class_masses(ring).cloned())
-            .collect();
         Ok(Self {
             rings,
             contacts,
             sources,
             maps,
-            masses,
             words: words.words,
             layout: words.layout,
             operators: RefCell::new(BTreeMap::new()),

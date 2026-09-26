@@ -19,8 +19,8 @@
 //! |---|---|---|---|---|---|---|
 //! | `ingest` | the moment extended; `λ` stepped | absent | absent | the lift, `n` | absent | cells, moment bits against `n*`, the carry-out |
 //! | `locate_keys` | the fibres per ring, from the crib that closed the aeon | absent (discrete; the key covector is a reading) | the published ring clocks ([`Clock`] at the boundary, winding kept; none where a ring fell back) | the crib's edges | absent | fibres, orbits, failing loops, work |
-//! | `refine` | the faces `p̂_j` | absent (forward only) | absent | the moment's lift | the binding read | ticks, balances (each with its residual and certified bound), diamond, the released change, the charts' certificates, the released remainders |
-//! | `compare` | the [`HolonRatio`] | the complete [`Pullback`] | a [`Deposit`] | the anchor's | the pending binding | KL, excess, winding, residual, loci, the return's released remainders |
+//! | `refine` | the wave's faces (the tree part needs each phase's address, read at compare) | absent (forward only) | absent | the moment's lift | the binding read | ticks, balances (each with its residual and certified bound), diamond, the released change, the charts' certificates, the released remainders |
+//! | `compare` | the [`HolonRatio`] on the combined faces (the tree's at each phase's causal address plus the wave's) | the complete [`Pullback`] | a [`Deposit`] (its landmark steps included) | the anchor's | the pending binding | KL, excess, winding, residual, loci, the return's released remainders, the tree face alone's code lengths |
 //! | `deposit` | the successor constitution | absent | the applied [`DepositReading`] | unchanged | absent | work, `ε_k` product, commit, bits against `B_Θ` |
 //! | `release` | the released face, or a declared absence when the rule holds | absent | absent (FOUND is campaign 3's) | the anchor's | the pending binding | the width read from the receiving phases' fibres against the grain, the rule's decision, the RIDE/FOUND split |
 //! | `close_aeon` | the [`AeonBoundary`] (its collapse names the released loci and their remainders; the staged deposits it refuses) | the transpose of `V` per pending ratio, or its separator ([`Transpose`]) | absent (the released loci are the boundary's collapse) | the aeon readings | the admitted family | the boundary |
@@ -71,10 +71,11 @@ use crate::aeon::Reading;
 use crate::compression::{CompressionError, ResonanceSplit, resonance_split};
 use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartReading, Remainders, carry};
-use crate::hnn::constitution::{DepositReading, FactorStep, Lattice, LinearStep, Locus};
+use crate::hnn::constitution::{
+    DepositReading, FactorStep, LandmarkStep, Lattice, LinearStep, Locus,
+};
 use crate::hnn::field::{Current, Field, Ring};
 use crate::hnn::keys::KeyLocation;
-use crate::hnn::masses::MassStep;
 use crate::hnn::moment::Ingested;
 use crate::hnn::propagation::{PathAttenuation, TickBalance, swing_about};
 use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector};
@@ -181,8 +182,11 @@ pub enum ReceiptDetail {
         last: Rat,
     },
     /// `compare`: the window's code length (the KL part, enclosed), phase excess, each phase's
-    /// winding, the residual against the emitted logits, the loci reached, and the remainders the
-    /// return's carried adjoint released at the open (Decision 24).
+    /// winding, the residual of the wave's logits against the emitted ones, the loci reached, the
+    /// remainders the return's carried adjoint released at the open (Decision 24), and each phase's
+    /// code length under the landmark tree's face alone at the grain, at the same constitution and
+    /// address as the combined face (Decision 28; `hnn::receiving::tree_code_length`), so the
+    /// wave's contribution is the window's code length minus their sum.
     Compare {
         code_length: crate::ratio::algebraic::ExactInterval,
         excess: Rat,
@@ -190,6 +194,7 @@ pub enum ReceiptDetail {
         residual: Vec<Vec<Rat>>,
         reached: Vec<Locus>,
         released: Remainders,
+        tree: Vec<crate::ratio::algebraic::ExactInterval>,
     },
     /// `deposit`: the applied reading and the re-read code length of the deposit's own targets at
     /// the successor (the first law's deposition term).
@@ -431,13 +436,14 @@ pub struct Pullback {
 /// [definition] **The staged material return** (design (c), `Deposit`): keyed by locus, inside the
 /// causal diamond of the source rings and the receiver, at the constitution commit it was computed
 /// at: the linear loci's windows, the factor families' steps and the receiving parametron's
-/// class-mass steps (Decision 27), one per reached comparison. Only a compare builds one.
+/// landmark steps (Decision 28), one per reached comparison in cell order. Only a compare builds
+/// one.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Deposit {
     commit: u64,
     linear: Vec<LinearStep>,
     factors: Vec<FactorStep>,
-    masses: Vec<MassStep>,
+    landmarks: Vec<LandmarkStep>,
     reached: Vec<Locus>,
 }
 
@@ -452,19 +458,19 @@ impl Deposit {
             commit,
             linear,
             factors,
-            masses: Vec::new(),
+            landmarks: Vec::new(),
             reached,
         }
     }
 
-    /// The deposit with the receiving parametron's class-mass steps (Decision 27).
-    pub(crate) fn with_masses(self, masses: Vec<MassStep>) -> Self {
-        Self { masses, ..self }
+    /// The deposit with the receiving parametron's landmark steps (Decision 28).
+    pub(crate) fn with_landmarks(self, landmarks: Vec<LandmarkStep>) -> Self {
+        Self { landmarks, ..self }
     }
 
-    /// The receiving parametron's class-mass steps (Decision 27).
-    pub fn masses(&self) -> &[MassStep] {
-        &self.masses
+    /// The receiving parametron's landmark steps (Decision 28), in cell order.
+    pub fn landmarks(&self) -> &[LandmarkStep] {
+        &self.landmarks
     }
 
     /// The constitution commit the deposit was computed at.
@@ -488,9 +494,9 @@ impl Deposit {
     }
 
     /// Its exact bits, a reading: every entry of every linear sample (its weight, feature and
-    /// covector), of every factor step (its descent direction and feature energy) and of every
-    /// class-mass step (its weight, and its region and class as naturals), each by its
-    /// numerator's and denominator's bits.
+    /// covector), of every factor step (its descent direction and feature energy), each by its
+    /// numerator's and denominator's bits, and of every landmark step (its address letters' codes
+    /// and its class, as naturals).
     pub fn bits(&self) -> u64 {
         let bits = |x: &Rat| x.numer().bits() + x.denom().bits();
         let linear: u64 = self
@@ -510,12 +516,18 @@ impl Deposit {
             .map(|step| step.gradient.entries().map(bits).sum::<u64>() + bits(&step.energy))
             .sum();
         let natural = |x: usize| u64::from(usize::BITS - x.leading_zeros()).max(1);
-        let masses: u64 = self
-            .masses
+        let landmarks: u64 = self
+            .landmarks
             .iter()
-            .map(|step| bits(&step.weight) + natural(step.region) + natural(step.class))
+            .map(|step| {
+                step.address
+                    .iter()
+                    .map(|letter| natural(letter.code() as usize))
+                    .sum::<u64>()
+                    + natural(step.class)
+            })
             .sum();
-        linear + factors + masses
+        linear + factors + landmarks
     }
 }
 

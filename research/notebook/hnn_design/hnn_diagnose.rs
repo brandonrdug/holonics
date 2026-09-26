@@ -16,14 +16,17 @@
 //! deposit or discard, ingest, close the aeon at the joint clock's carry-out, locate keys on the
 //! crib that closed it), with the readings below taken between the port's methods. It changes no
 //! law and adds no accessor: every value it reads is a port return, the published constitution's
-//! read face ([`ConstitutionRead`], `Constitution::{receiving_law, source_law}`) or the moment.
-//! Its model and order-0 bits reproduce the exposure's (they are printed first, as the check).
+//! read face ([`ConstitutionRead`], `Constitution::{receiving_law, source_law}`), the moment or the
+//! resident's active suffix address. It keeps campaign 1's protocol, the located failure's: the
+//! held-out windows are compared and discarded, never deposited. The exposure is prequential since
+//! Decision 29 (every window deposited), so the model's held-out bits here are not the exposure's;
+//! its order-0 bits are (they are printed first, as the check).
 //!
-//! [definition] **Under Decision 27** the machine's face is the count face's grain logits plus the
-//! wave (`hnn::receiving::ReceivingRead::combined`); the decoder's readings below read the wave
-//! alone, the count face at the window's region taken out, so they diagnose `R` as before. The
-//! located-failure record's receipt was taken under campaign 1's first law (the face on the change
-//! alone), at `13d6bb92`.
+//! [definition] **Under Decision 28** the machine's face is the landmark tree's grain logits at
+//! each phase's causal address plus the wave (`hnn::receiving::ReceivingRead::combined`); the
+//! decoder's readings below read the wave alone, the tree's logits taken out, so they diagnose `R`
+//! as before. The located-failure record's receipt was taken under campaign 1's first law (the face
+//! on the change alone), at `13d6bb92`.
 //!
 //! [definition] **The diagnostics**, one section per candidate cause:
 //! 1. **The decoder** (the wave `f_j = R · P_R^(τ_R) v_R(e_j)`, no constant term). The
@@ -88,7 +91,7 @@ use holonics::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Carrier, LinearLocus, Loc
 use holonics::hnn::keys::{self, KeyLocation};
 use holonics::hnn::port::{ExecutionPort, Handle, ReceiptDetail};
 use holonics::hnn::ratio::{Face, interval_sum, log2_enclosure};
-use holonics::hnn::receiving::{GrainCell, ReceivingRead};
+use holonics::hnn::receiving::{GrainCell, ReceivingRead, grain_logits};
 use holonics::hnn::reference::{Cut, one_hot};
 use holonics::hnn::{Constitution, ConstitutionRead, Current, Field, FieldDeclaration, Reference, SourceMoment};
 use holonics::ratio::Rat;
@@ -968,14 +971,18 @@ fn expose(field: &Field, cut: &Cut, deadline: Option<u64>) -> Run {
                 .map(|step| step.samples.clone())
                 .expect("the receiving map's samples");
             let windowed = (0..window.len()).any(|offset| held(position + offset));
-            // The decoder's readings are the wave's `R z`: the count face's grain logits (Decision
-            // 27; the masses the compare read, at the window's region) are taken out of the face.
-            let count = phases
-                .count_face(resident.constitution(), resident.moment(&moment).expect("the moment"))
-                .expect("the count face");
-            let stored: Vec<Rat> = count.logits().into_iter().step_by(2).collect();
+            // The decoder's readings are the wave's `R z`: the tree's grain logits (Decision 28; the
+            // tree the compare read, at each phase's causal address) are taken out of the face.
+            let address = resident
+                .address()
+                .truncated(phases.depth())
+                .expect("the receiver's address");
+            let trees = phases
+                .tree_faces(resident.constitution(), &address, window)
+                .expect("the tree faces");
             for (offset, (phase, &code)) in holon.phases().iter().zip(window).enumerate() {
                 let logits = &holon.faces().logits[offset];
+                let stored: Vec<Rat> = grain_logits(&trees[offset]).into_iter().step_by(2).collect();
                 let real: Vec<Rat> = logits
                     .iter()
                     .step_by(2)

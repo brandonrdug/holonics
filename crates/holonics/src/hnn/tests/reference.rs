@@ -1,5 +1,6 @@
-//! The exposure protocol on small synthetic cuts: a refine and compare per receiving window,
-//! deposits on the training part only, aeon boundaries at the joint clock's carry-out, keys located
+//! The exposure protocol on small synthetic cuts: a refine and compare per receiving window, each
+//! then deposited, held-out windows included (prequential, Decision 29), aeon boundaries at the
+//! joint clock's carry-out, keys located
 //! on the crib that closed each aeon (past cells only, never a held-out one), the budget stop, the
 //! cut checked against the declared population, and design (f)'s readout with `Kt` charging the
 //! located keys.
@@ -10,10 +11,11 @@
 //! entries and remainders grow logarithmically, while the solved charts `H⁻¹` still grow with the
 //! carried Grams (`research/notebook/hnn_design/hnn_lattice_growth.rs`). These cuts run on the
 //! exposure's chain (no pair offset, so its capacity and cut are 17 and 18 cells: one aeon, nine
-//! receiving windows), declare a budget two deposits pass, which is the stop rule's own case and
-//! keeps the exact deposits few, and the rest of the cut runs on the last published constitution.
+//! receiving windows), declare a budget two deposits pass (read off the unbudgeted run's curve at
+//! its second commit, [`two_deposits`]), which is the stop rule's own case and keeps the exact
+//! deposits few, and the rest of the cut runs on the last published constitution.
 
-use super::learning::{chain, chain_of};
+use super::learning::{OPEN_BUDGET, chain, chain_of};
 use super::support::Draw;
 use crate::hnn::HnnError;
 use crate::hnn::constitution::Steps;
@@ -198,33 +200,42 @@ fn cut_length() -> usize {
     n_star + n_star % 2
 }
 
-/// Design (d), campaign 1's exposure protocol at the declared steps, with a budget two deposits
-/// pass: every training window before the stop deposits and the held-out window among them does
-/// not; the stop is reported with its commit and cell, no deposit is admitted after it, and the whole
-/// cut (its held-out tail included) is still read, compared and measured on the last published
-/// constitution; the run is reported incomplete, its curve rising, and the first aeon's first law
-/// counts its depositions among its arrivals.
+/// **A budget two deposits pass**: the constitution's exact bits at the unbudgeted run's second
+/// commit. Each deposit grows the constitution (the tree founds nodes on every deposit), so the
+/// third deposit's successor exceeds it.
+fn two_deposits(field: &crate::hnn::Field, cut: &Cut) -> u64 {
+    let open = Reference::new(64, Steps::campaign_one(), OPEN_BUDGET)
+        .with_deadline(3)
+        .expose(field, cut)
+        .unwrap();
+    let curve = &open.constitution_curve;
+    assert!(curve[3].bits.total() > curve[2].bits.total());
+    curve[2].bits.total()
+}
+
+/// Design (d), campaign 1's exposure protocol at the declared steps under Decision 29, with a
+/// budget two deposits pass: every window before the stop deposits, the held-out window among them
+/// included; the stop is reported with its commit and cell, no deposit is admitted after it, and
+/// the whole cut (its held-out tail included) is still read, compared and measured on the last
+/// published constitution; the run is reported incomplete, its curve rising, and the first aeon's
+/// first law counts its depositions among its arrivals.
 #[test]
-fn the_exposure_deposits_on_its_training_part_until_its_budget_stop_and_runs_to_the_end() {
+fn the_exposure_deposits_every_window_until_its_budget_stop_and_runs_to_the_end() {
     let length = cut_length();
     let field = chain_of(length as u64);
     let cut = Cut {
         cells: source(length, 81),
         held_out: vec![2..4, length - 4..length],
     };
-    let exposure = Reference::new(64, Steps::campaign_one(), 1_000)
+    let exposure = Reference::new(64, Steps::campaign_one(), two_deposits(&field, &cut))
         .expose(&field, &cut)
         .unwrap();
     read_out(&exposure, length as u64, 6);
     stopped(&exposure);
-    assert!(exposure.deposits >= 2);
+    assert_eq!(exposure.deposits, 2);
     let (_, stop) = exposure.stop.as_ref().unwrap();
-    let training_windows = (0..*stop as usize)
-        .step_by(2)
-        .filter(|window| !cut.held_out.iter().any(|range| range.contains(window)))
-        .count() as u64;
-    assert!(*stop > 4);
-    assert_eq!(exposure.deposits, training_windows);
+    // The third window's deposit is refused: windows 0 and 2 (held out) deposited.
+    assert_eq!(*stop, 4);
     let (first, last) = (
         exposure.constitution_curve[0].bits.total(),
         exposure.constitution_curve.last().unwrap().bits.total(),
@@ -250,7 +261,7 @@ fn the_exposure_stops_at_its_deadline_and_changes_nothing_it_read() {
         cells: source(length, 81),
         held_out: vec![2..4, length - 4..length],
     };
-    let reference = Reference::new(64, Steps::campaign_one(), 1_000);
+    let reference = Reference::new(64, Steps::campaign_one(), OPEN_BUDGET);
     let run = |windows: u64| {
         reference
             .clone()
@@ -259,7 +270,7 @@ fn the_exposure_stops_at_its_deadline_and_changes_nothing_it_read() {
             .unwrap()
     };
     let (three, two, none) = (run(3), run(2), run(0));
-    for (exposure, windows, deposits) in [(&three, 3, 2), (&two, 2, 1), (&none, 0, 0)] {
+    for (exposure, windows, deposits) in [(&three, 3, 3), (&two, 2, 2), (&none, 0, 0)] {
         assert!(!exposure.complete && exposure.stop.is_none());
         assert_eq!(exposure.deadline, Some(2 * windows));
         assert_eq!((exposure.windows, exposure.compares), (windows, windows));
@@ -269,7 +280,7 @@ fn the_exposure_stops_at_its_deadline_and_changes_nothing_it_read() {
         );
         assert_eq!(exposure.literal_bits, 4 * windows);
         assert_eq!(exposure.state.source_bits, 4 * windows);
-        // Windows 0 and 4 deposit; window 2 is held out.
+        // Every window deposits, the held-out window 2 included (Decision 29).
         assert_eq!(exposure.deposits, deposits);
         assert_eq!(
             exposure.constitution_curve.len() as u64,
@@ -286,7 +297,7 @@ fn the_exposure_stops_at_its_deadline_and_changes_nothing_it_read() {
     );
     // The two-window run is the three-window run's prefix: its curve, and its held-out bits,
     // since the third window is a training one.
-    assert_eq!(two.constitution_curve[..], three.constitution_curve[..2]);
+    assert_eq!(two.constitution_curve[..], three.constitution_curve[..3]);
     assert_eq!(two.held_out, three.held_out);
 }
 
@@ -371,7 +382,8 @@ fn one_worker_and_many_return_the_same_values() {
         cells: source(length, 81),
         held_out: vec![2..4, length - 4..length],
     };
-    let reference = Reference::new(64, Steps::campaign_one(), 1_000).with_deadline(4);
+    let reference =
+        Reference::new(64, Steps::campaign_one(), two_deposits(&field, &cut)).with_deadline(4);
     let run = |workers: usize| {
         let pool = rayon::ThreadPoolBuilder::new()
             .num_threads(workers)

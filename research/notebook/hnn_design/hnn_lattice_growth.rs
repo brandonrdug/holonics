@@ -35,10 +35,10 @@
 //! the termwise one. It checks each normal law's solved chart against its certificate: the exact
 //! left residual `‖1 − X̂H‖∞` is at most the chart's certified `δ` (Decision 24, Lean
 //! `HNN/LatticeWord.rounded_refinement_certificate_left`). It checks the receiving parametron's
-//! class masses exactly (Decision 27, [`mass_accounting`]): the staged steps are one unit mass per
-//! target of the window at the region of the window the pending ratio retained, every published
-//! mass is the predecessor's plus the weights staged at it, in half-units, and every region's total
-//! is the sum of its masses.
+//! landmark deposit exactly (Decision 28, [`landmark_accounting`]): the staged steps are one per
+//! target of the window, in cell order, each at its phase's causal address (the resident's active
+//! suffix address after the window's earlier targets), and the published tree has passed exactly
+//! those cells more, as the reading reports.
 //!
 //! [established-bounded; measured] **`openness`** reads campaign 1's declared field (review C2): the
 //! least source-to-receiver path attenuation `2^(−Σ_a β_a Q_a / 2)` within the receiver's last
@@ -62,15 +62,17 @@ use std::time::Instant;
 
 use holonics::geometry::RatVec3;
 use holonics::geometry::screw::ScrewGenerator;
+use holonics::hnn::constitution::LandmarkStep;
 use holonics::hnn::constitution::{FactorGradient, LinearLocus};
 use holonics::hnn::field::{ConstitutionRead, CribDeclaration, ReceiverDeclaration};
+use holonics::hnn::landmark::Letter;
 use holonics::hnn::pending::PendingRatio;
 use holonics::hnn::propagation::path_attenuation;
 use holonics::hnn::receiving::GrainCell;
 use holonics::hnn::reference::one_hot;
 use holonics::hnn::{
     Carrier, Constitution, ContactDeclaration, Current, Deposit, ExecutionPort, Field,
-    FieldDeclaration, Locus, MassStep, NormalLaw, Reference, Regions, RingDeclaration, Steps,
+    FieldDeclaration, Locus, NormalLaw, Reference, RingDeclaration, Steps,
 };
 use holonics::ratio::{Rat, integer, rat};
 use num_bigint::BigInt;
@@ -197,13 +199,13 @@ fn chain() -> Field {
                 ring: 2,
                 aperture: 2,
                 tolerance: rat(1, 16),
-                regions: Regions::PrecedingCell,
+                depth: 2,
             }],
             crib: CribDeclaration {
                 window: 16,
                 offset: 1,
             },
-            population: 1 << 20,
+            population: 1 << 16,
             lattice: Default::default(),
         }
         .by_lattice_rule(),
@@ -391,15 +393,15 @@ fn openness(over: &str) {
 // the exposure's runs
 
 /// One exposure step's deposit: the constitution before it, the staged deposit, the constitution
-/// after it and its reading; the receiver's ring, the region of the window the pending ratio
-/// retained and the window's targets (Decision 27's class masses read them).
+/// after it and its reading; the receiver's ring, each phase's causal address and the window's
+/// targets (Decision 28's landmark deposit reads them).
 struct Deposited<'a> {
     before: &'a Constitution,
     deposit: &'a Deposit,
     after: &'a Constitution,
     reading: &'a holonics::hnn::constitution::DepositReading,
     ring: usize,
-    region: usize,
+    addresses: Vec<Vec<Letter>>,
     targets: &'a [usize],
 }
 
@@ -439,13 +441,15 @@ fn expose<T>(
     while done < deposits && position + aperture <= cells.len() {
         let window = &cells[position..position + aperture];
         let before = resident.constitution().clone();
-        let region = phases
-            .regions()
-            .region(
-                &resident.moment(&moment).expect("the moment").window(),
-                field.alphabet(),
+        let addresses = phases
+            .addresses(
+                &resident
+                    .address()
+                    .truncated(phases.depth())
+                    .expect("the receiver's address"),
+                window,
             )
-            .expect("the window's region");
+            .expect("the window's addresses");
         let started = Instant::now();
         let (pending, _) = reference
             .refine(&mut resident, &moment, &phases)
@@ -474,7 +478,7 @@ fn expose<T>(
                 after: resident.constitution(),
                 reading: &reading,
                 ring: phases.ring(),
-                region,
+                addresses,
                 targets: window,
             },
             [refined, compared, deposited],
@@ -579,9 +583,11 @@ fn growth(which: &str, deposits: usize, steps: &Steps, graded: usize) {
                 let pending = PendingRatio::produce(
                     resident.current(),
                     resident.moment(moment).expect("the open moment"),
+                    resident.address(),
                     &phases,
                     theta.commit(),
-                );
+                )
+                .expect("the pending ratio");
                 let (_, faces) = pending.read(&field, &theta).expect("the read at Θ");
                 let (_, carried) = pending
                     .read(&field, &theta.with_remainders().expect("Θ + r"))
@@ -905,70 +911,43 @@ fn termwise(
     (updates, branches)
 }
 
-/// **The class masses' exact accounting at one deposit** (Decision 27; Lean
-/// `HNN/RegionCounts.{count_step_mass, count_lattice_exact}`): the staged class-mass steps are one
-/// unit mass per target of the window, at the region of the window the pending ratio retained; at
-/// every region and class of every receiving ring the published half-units are the predecessor's
-/// plus twice the weights staged there, each region's total likewise and equal to the sum of its
-/// masses (`Σ_c C' = N + w`); the reading reports the weight added. Returns the masses checked.
-fn mass_accounting(step: &Deposited<'_>) -> usize {
-    let expected: Vec<MassStep> = step
-        .targets
+/// **The landmark deposit's exact accounting at one deposit** (Decision 28; Lean
+/// `HNN/LandmarkTree.landmark_step`): the staged landmark steps are one per target of the window,
+/// in cell order, each at its phase's causal address; the published tree has passed exactly those
+/// cells more than its predecessor, and the reading reports them. Returns the steps checked.
+fn landmark_accounting(step: &Deposited<'_>) -> usize {
+    let expected: Vec<LandmarkStep> = step
+        .addresses
         .iter()
-        .map(|&class| MassStep {
+        .zip(step.targets)
+        .map(|(address, &class)| LandmarkStep {
             ring: step.ring,
-            region: step.region,
+            address: address.clone(),
             class,
-            weight: integer(1),
         })
         .collect();
     assert_eq!(
-        step.deposit.masses(),
+        step.deposit.landmarks(),
         &expected[..],
-        "the staged class masses"
+        "the staged landmark steps"
     );
-    let added: Rat = step.deposit.masses().iter().map(|s| s.weight.clone()).sum();
-    assert_eq!(step.reading.masses, added, "the reading's class mass");
-    let (was, now) = (
-        step.before
-            .class_masses(step.ring)
-            .expect("the receiving ring's masses"),
-        step.after
-            .class_masses(step.ring)
-            .expect("the receiving ring's masses"),
+    assert_eq!(
+        step.reading.landmarks,
+        expected.len() as u64,
+        "the reading's cells"
     );
-    let staged = |region: usize, class: Option<usize>| -> u64 {
-        step.deposit
-            .masses()
-            .iter()
-            .filter(|s| s.region == region && class.is_none_or(|c| s.class == c))
-            .map(|s| {
-                u64::try_from((&s.weight * integer(2)).to_integer()).expect("a half-unit count")
-            })
-            .sum()
+    let passed = |theta: &Constitution| {
+        theta
+            .landmarks(step.ring)
+            .expect("the receiving ring's tree")
+            .passed()
     };
-    let mut checked = 0;
-    for region in 0..now.region_count() {
-        let mut sum = 0u64;
-        for class in 0..now.classes() {
-            let units = now.half_units(region, class).expect("a mass");
-            assert_eq!(
-                units,
-                was.half_units(region, class).expect("a mass") + staged(region, Some(class)),
-                "region {region}, class {class}"
-            );
-            sum += units;
-            checked += 1;
-        }
-        let total = now.total_half_units(region).expect("a total");
-        assert_eq!(total, sum, "region {region}: the total is the masses' sum");
-        assert_eq!(
-            total,
-            was.total_half_units(region).expect("a total") + staged(region, None),
-            "region {region}: the total's deposit"
-        );
-    }
-    checked
+    assert_eq!(
+        passed(step.after),
+        passed(step.before) + expected.len() as u64,
+        "the tree's passage"
+    );
+    expected.len()
 }
 
 /// **The equality receipt** (module header).
@@ -978,7 +957,7 @@ fn equality(which: &str, deposits: usize, steps: &Steps) {
         "equality on field {which} over {name}; steps gamma = {}, eta = {}",
         steps.proxy, steps.factor
     );
-    let (mut entries, mut solved, mut masses) = (0usize, [0usize; 2], 0usize);
+    let (mut entries, mut solved, mut landmarks) = (0usize, [0usize; 2], 0usize);
     let clock = Instant::now();
     let (done, _) = expose(
         &field,
@@ -986,8 +965,8 @@ fn equality(which: &str, deposits: usize, steps: &Steps) {
         steps,
         deposits,
         |done, step, _| {
-            let checked = mass_accounting(&step);
-            masses += checked;
+            let checked = landmark_accounting(&step);
+            landmarks += checked;
             let (updates, branches) = termwise(step.before, step.deposit, step.after);
             let (was, now) = (values(&field, step.before), values(&field, step.after));
             let (carried, carries) = (remainders(step.before), remainders(step.after));
@@ -1015,20 +994,19 @@ fn equality(which: &str, deposits: usize, steps: &Steps) {
             solved[0] += branches[0];
             solved[1] += branches[1];
             println!(
-                "deposit {done}: {} carried entries equal their termwise accounting ({} updated); solved charts certified: {} on an unmoved Gram, {} on a moved one; class masses {checked} exact at region {} (+{} targets)",
+                "deposit {done}: {} carried entries equal their termwise accounting ({} updated); solved charts certified: {} on an unmoved Gram, {} on a moved one; landmark steps {checked} exact at their causal addresses {:?}",
                 now.len(),
                 updates.len(),
                 branches[0],
                 branches[1],
-                step.region,
-                step.targets.len()
+                step.addresses
             );
         },
         |_, _, _| {},
         |_, _, (), _| {},
     );
     println!(
-        "every value equal over {done} deposits: {entries} carried entries checked, {} solved charts certified on an unmoved Gram and {} on a moved one, {masses} class masses exact, in {} ms",
+        "every value equal over {done} deposits: {entries} carried entries checked, {} solved charts certified on an unmoved Gram and {} on a moved one, {landmarks} landmark steps exact, in {} ms",
         solved[0],
         solved[1],
         clock.elapsed().as_millis()

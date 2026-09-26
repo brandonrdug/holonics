@@ -17,7 +17,7 @@ use crate::hnn::pending::PendingRatio;
 use crate::hnn::port::{ExecutionPort, Handle};
 use crate::hnn::propagation::Operands;
 use crate::hnn::ratio::{HolonRatio, target_phases};
-use crate::hnn::receiving::ReceivingPhases;
+use crate::hnn::receiving::{ActiveAddress, ReceivingPhases};
 use crate::hnn::reference::{Reference, compose, one_hot};
 use crate::hnn::retention::{Diamond, collapse, loci, retained};
 use crate::hnn::word::Word;
@@ -255,10 +255,24 @@ fn deposit_descends() {
     let (current, open) = moment(&field, 52, 11);
     let phases = phases(&field, &generic(&field, 51), &current);
     let admitted = [phases.clone()];
-    let pending = PendingRatio::produce(&current, &open, &phases, 0);
+    let pending = PendingRatio::produce(
+        &current,
+        &open,
+        &ActiveAddress::boundary(phases.depth()),
+        &phases,
+        0,
+    )
+    .unwrap();
     let theta = deposited(&field, &generic(&field, 51), &pending);
     assert!(!theta.carried_remainders().is_empty());
-    let pending = PendingRatio::produce(&current, &open, &phases, 1);
+    let pending = PendingRatio::produce(
+        &current,
+        &open,
+        &ActiveAddress::boundary(phases.depth()),
+        &phases,
+        1,
+    )
+    .unwrap();
     let mut first = deposited(&field, &theta, &pending);
     collapse(&field, &mut first, &admitted).unwrap();
     let mut collapsed = theta.clone();
@@ -279,9 +293,23 @@ fn the_collapse_keeps_the_retained_remainders_and_clocks() {
     let (current, open) = moment(&field, 56, 11);
     let theta = generic(&field, 55);
     let phases = phases(&field, &theta, &current);
-    let pending = PendingRatio::produce(&current, &open, &phases, 0);
+    let pending = PendingRatio::produce(
+        &current,
+        &open,
+        &ActiveAddress::boundary(phases.depth()),
+        &phases,
+        0,
+    )
+    .unwrap();
     let once = deposited(&field, &theta, &pending);
-    let pending = PendingRatio::produce(&current, &open, &phases, 1);
+    let pending = PendingRatio::produce(
+        &current,
+        &open,
+        &ActiveAddress::boundary(phases.depth()),
+        &phases,
+        1,
+    )
+    .unwrap();
     let carried = deposited(&field, &once, &pending);
     let before = carried.carried_remainders();
     assert!(!before.is_empty());
@@ -307,7 +335,7 @@ fn the_collapse_keeps_the_retained_remainders_and_clocks() {
             ring: phases.ring(),
             aperture: 1,
             tolerance: crate::ratio::rat(1, 16),
-            regions: crate::hnn::masses::Regions::PrecedingCell,
+            depth: 2,
         },
     )
     .unwrap();
@@ -416,14 +444,14 @@ fn two_receiver_path() -> Field {
         exponent_grain: 1,
         receivers: base.receivers().to_vec(),
         crib: base.crib(),
-        population: 1 << 20,
+        population: 1 << 16,
         lattice: Default::default(),
     };
     declared.receivers.push(ReceiverDeclaration {
         ring: 5,
         aperture: 1,
         tolerance: crate::ratio::rat(1, 16),
-        regions: crate::hnn::masses::Regions::PrecedingCell,
+        depth: 2,
     });
     Field::declare(declared.by_lattice_rule()).unwrap()
 }
@@ -494,7 +522,7 @@ fn the_boundary_reaches_the_pending_ratios_and_refuses_out_of_turn() {
             ring: 3,
             aperture: 1,
             tolerance: crate::ratio::rat(1, 16),
-            regions: crate::hnn::masses::Regions::PrecedingCell,
+            depth: 2,
         },
     )
     .unwrap();

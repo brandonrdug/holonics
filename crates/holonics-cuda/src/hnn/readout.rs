@@ -7,10 +7,10 @@
 //! enclosure, the Holon ratio"). Each is the host owner's formula read on the record's coordinates:
 //!
 //! - **the faces** (`holonics::hnn::receiving::ReceivingPhases::read`, `ratio::Faces::of_reads`):
-//!   the wave's logits are the card's (`R · P_R^(τ_R) v_R(e_j)`, exact); the count face's grain
-//!   logits (Decision 27, read on the host from the publication's class masses), their sum
-//!   (`ReceivingRead::combined`, the host reference's own formula), the grain cells and the faces
-//!   in `ℚ(θ)` are the host's;
+//!   the wave's logits are the card's (`R · P_R^(τ_R) v_R(e_j)`, exact); their grain cells and
+//!   faces in `ℚ(θ)` are the host's. The landmark tree's grain logits at each phase's causal address
+//!   (Decision 28) are read on the host from its constitution's tree at compare and added there
+//!   (`PendingRatio::against`, the host reference's own formula);
 //! - **each tick's balance** (`holonics::hnn::word::Word::tick`, `propagation::TickBalance`): the
 //!   power before and after, the dissipation, the passive and contrast terms, and the executed
 //!   word's residual with its certified bound, term by term as the host forms them. [agent-inferred]
@@ -30,9 +30,7 @@ use holonics::hnn::port::{ElementTick, TransitTick, WordReturn};
 use holonics::hnn::propagation::TickBalance;
 use holonics::hnn::ratio::Faces;
 use holonics::hnn::receiving::ReceivingRead;
-use holonics::hnn::{
-    ChartReading, CountFace, Field, HnnError, RatioCovector, Released, Remainders,
-};
+use holonics::hnn::{ChartReading, Field, HnnError, RatioCovector, Released, Remainders};
 use holonics::ratio::Rat;
 
 use num_bigint::BigInt;
@@ -368,21 +366,17 @@ pub(crate) struct Executed<'a> {
     pub(crate) readings: &'a [ChartReading],
 }
 
-/// **The faces a word read** (module header).
-pub(crate) fn faces(
-    plan: &WordPlan,
-    record: &ForwardRecord,
-    count: &CountFace,
-) -> Result<Faces, HnnError> {
+/// **The wave's faces a word read** (module header).
+pub(crate) fn faces(plan: &WordPlan, record: &ForwardRecord) -> Result<Faces, HnnError> {
     let reads: Vec<ReceivingRead> = (0..plan.aperture)
         .map(|j| {
             let wave: Vec<Rat> = slice(&record.logits, j * plan.map_rows, plan.map_rows)
                 .iter()
                 .map(|l| rat(BigInt::from(*l), plan.logit_exp))
                 .collect();
-            ReceivingRead::combined(wave, count, plan.grain)
+            ReceivingRead::of_logits(wave, plan.grain)
         })
-        .collect::<Result<_, _>>()?;
+        .collect();
     Faces::of_reads(&reads, plan.grain)
 }
 
