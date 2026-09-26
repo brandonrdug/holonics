@@ -1,7 +1,7 @@
 # Mass is light paired with its reflection, and the shadows are its nodes
 
-**Date:** 2026-09-26. **Status:** a derivation with its grades, for Sol's audit (#62; step 6
-targets and physics).
+**Date:** 2026-09-26. **Status:** a derivation, audited by Sol the same day. The audit (next section)
+corrects the body; the bridge is graded **[image]** (#62; step 6 targets and physics).
 **Occasion:** Brandon asked for a bridge between mass and gravity, mass–energy equivalence and the
 stress–energy equations, dark energy and dark matter, the cosmological constant, and the zeros read
 as shadows. In his words: "maybe mass is merely the shadow of light in any context; the curvature of
@@ -15,6 +15,88 @@ Grades:
 - [derived]: follows exactly from the stated objects;
 - [conditional]: holds under a named hypothesis;
 - [image]: a reading that is not yet a derivation.
+
+## Sol's audit (same day): what stands, what was wrong
+
+[correction] The exact equations and the cited theorems stand under their stated hypotheses. The
+bridge itself is **[image]**, not **[derived]**. No operator and no source-to-receiver law connects
+the prime side to a self-adjoint "mass spectrum" of the zeros. The corrections below override the
+body where they conflict.
+
+**Mass (§1).**
+- The null-pairing identity is exact. At fixed *total* energy, the maximum is at zero total
+  momentum. For two rays it is antiparallel, and all the energy is rest energy only when the two
+  energies are equal. For more rays, pairwise antiparallel arrangements are neither necessary nor
+  generally possible.
+- "Stationary shadows and rest mass are the same condition" is **false** as stated. A stationary
+  interference node implies neither a massive object nor zero total momentum.
+- The two-mode shell in an energy chart is `[[cp, mc²],[mc², −cp]]`, with eigenvalues
+  `±√(c²p² + m²c⁴)` and full gap `2mc²` (divide every entry by `ħ` for frequencies). Chirality
+  exchange does not reverse spatial momentum. Penrose's zig-zag is a reading, not a trajectory of
+  photons.
+- The proton's mass decomposition (quark energy, gluon energy, trace anomaly) depends on the
+  decomposition and the scale. It does not show that mass is reflected light.
+
+**Zeros (§§2–3).**
+- `Ξ` is real and even on the real line. Hardy's `Z` is a phase-adjusted ζ, not a sum of `ξ(s)`
+  and `ξ(1 − s)`, which are equal. RH ⟺ `Ξ` in the Laguerre–Pólya class is exact; "standing wave"
+  is an **[image]**.
+- For the two-mode matrix, self-adjointness needs `a` real and `g′ = ḡ`, which gives `δ ≥ 0`.
+  `gg′ > 0` alone does not make it self-adjoint.
+- An exceptional point needs `M ≠ 0`. A double zero of an entire function is not thereby an
+  operator's exceptional point.
+- No theorem identifies neighbouring zeros of `Ξ` with such a matrix.
+- `δ̇ = 2` holds for an isolated quadratic in standard time (`−2` in the repository's `heatE`
+  time). Interacting zeros do not each carry an invariant with that rate.
+- Montgomery's pair correlation is proved for restricted test functions under RH. The full GUE
+  statistics and the log-gas are conjectural descriptions.
+- Rodgers–Tao's crystal mechanism is exact. It proves no thermodynamic gas, temperature or phase
+  transition, and it uses no GUE conjecture. "RH places the gas on an evaporation boundary"
+  presupposes RH: it is an **[image]**.
+
+**Curvature (§4).**
+- `(G + Λg)(k, k) = G(k, k)` for null `k` removes the explicit `Λ` term from *local* null Ricci
+  focusing. The claim that `Λ` "does not focus light at all" and "acts only on volume" is
+  **incorrect**: `Λ` shapes the metric, null paths, distances, observer frames and measured
+  lensing. In Schwarzschild–de Sitter the orbit equation has no explicit `Λ`, but its first
+  integral and the measured angle can contain it.
+- The photon ring's `e^(−π)` per half-orbit scales the successive subrings' widths and, under
+  emission assumptions, their integrated fluxes. It does **not** scale pointwise brightness.
+- Burke's odd-image theorem needs a nonsingular transparent lens (signed degree one). Point masses
+  fall outside it: for them `N₊ − N₋ = 1 − n`, with at most `5n − 5` images (Khavinson–Neumann;
+  sharp by Rhie). "The same fold" as a zero collision is an **[image]**.
+- "Matter is what converges light" overstates Raychaudhuri: shear also focuses, twist defocuses,
+  and the global geometry fixes the congruence.
+
+**Counts, cosmology, matter (§§5–7).**
+- Von Koch is `ψ(x) = x + O(√x log² x)`. The zeros contribute oscillatory terms; they are not
+  themselves the residue.
+- A Poisson count's root is a fluctuation scale, not a deterministic bound. No shared "root
+  residue" theorem joins primes and spacetime; the bridge is an **[image]**.
+- Henneaux–Teitelboim holds within unimodular gravity. Sorkin's `ΔΛ ~ V^(−2^(−1))` is conditional
+  on unimodular conjugacy, the causal-set count of volume, Poisson sprinkling and an assumed
+  quantum uncertainty. It is a fluctuation scale; it neither fixes a sign nor shows that `Λ`
+  varies.
+- DESI's evolving-dark-energy preference came from BAO *combined* with specified CMB and supernova
+  data. DESI's later full-shape Lyman-alpha result (July 2026) agreed with ΛCDM, so the hint is
+  unsettled.
+- The Bullet cluster strongly favors a collisionless gravitating component. It does not by itself
+  fix a particle identity. Milgrom's `a₀` near `cH₀/(2π)` is an order-of-magnitude coincidence,
+  not a derived tie to `Λ`.
+- Chebyshev's bias needs both the prime squares (a systematic root-scale term) and the Dirichlet
+  L-zeros' oscillations. "Rotations of the wheel" is an **[image]**.
+- Babinet, the optical theorem and Cutkosky's cuts are three distinct results. Their common
+  "shadow law" is an **[image]**.
+
+**Sound formal statements**, with their scopes:
+- `mass_sq_eq_pairwise_null_pairings` (finite null family);
+- the bound `P·P ≤ E²` with equality iff the total momentum is zero;
+- `mass_shell_is_avoided_crossing` (`M² = (c²p² + m²c⁴)·1`; the gap needs `m ≠ 0`);
+- `null_focusing_blind_to_lambda` (algebra only: not a claim about light's paths);
+- the isolated-quadratic `discriminant_rate`, with its three root cases;
+- Poisson variance, and von Koch, as separate theorems.
+
+The Khavinson–Neumann count is a substantial harmonic-map formalization.
 
 ## 1. Mass is light paired with its reflection
 
