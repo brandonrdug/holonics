@@ -2511,3 +2511,35 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
     Source: agent-inferred, from the located failure, Sol's derivation (the finite-chart
     obstruction, the prior-weight identity, the harmonic standing read, the indexed pair read)
     and CLAUDE.md's loss law. Brandon may override it.
+
+27. **The receiving face is the grain of the receiving parametron's region class masses, corrected
+    by the wave.** Decision 26's first term was measured on the standing real cut: held-out carry 7,
+    phase 2/16 per cell (from carry 7, phase 9/16), still above online order-0 (carry 4, phase
+    12/16) by disjoint exact enclosures. Averaging the one-hot code face `m e_t` in the log chart
+    settles the logits at `m p̄`, whose face is far flatter than `p̄`; order-0's face is the log of a
+    probability-chart average. Sol's derivation replaces the target term:
+    - **The storage.** For each admitted receiver region `r` (a certified finite quotient of the
+      receiver's address; for campaign 1, the retained window's preceding cell), the receiving
+      parametron stores class masses `C_(r,c) = α_(r,c) + Σ w q`, deposited only by comparisons that
+      reached it, with the positive prior `α_(r,c) = 1/2` (the Krichevsky–Trofimov mass, one per
+      two). The masses are future-sufficient for the region receiver and retain no occurrence list;
+      they are carried by Decision 22's lattice rule or as exact integers of half-units.
+    - **The face.** `p_(r,c) = C_(r,c)/N_r`, read at the grain by exact integer comparison
+      `2^k ≤ p^(L_R) < 2^(k+1)` (carry and phase class of `k`), so the scored face differs from
+      `log₂ p` by less than one grain per class. The prior decays exactly,
+      `p_r = A_r/(A_r+S_r)·p⁰_r + S_r/(A_r+S_r)·q̄_r`, and the context-free fixed point is the online
+      order-0 face; at the preceding-cell region it is order-1's.
+    - **The combined face.** The scored logits are the count face's grain logits plus the wave's
+      `R P_R^(τ_R) v_R`; the ratio's covector on the combined face flows back through `R` as before,
+      so the rings, contacts and charts learn only what the counts do not already say.
+    - Decision 26's exogenous target and standing read are retired: the count face contains the
+      marginal. The finite-chart obstruction (`HNN/TargetFace`) remains a theorem.
+
+    Success, exactly: on the unchanged held-out cells, the model's code-length enclosure lies
+    below online order-0's (the campaign criterion). The wave's own contribution is the model's
+    enclosure against the count face alone, reported beside it. A context-free fixture checks the
+    fixed point first: after `a, a, b` from `α = (1/2, 1/2)`, `C = (5/2, 3/2)`, `p = (5/8, 3/8)`, the
+    online order-0 KT probability.
+
+    Source: agent-inferred, from the measurement and Sol's derivation (choice (c): the receiving
+    parametron's class-mass storage). Brandon may override it.
