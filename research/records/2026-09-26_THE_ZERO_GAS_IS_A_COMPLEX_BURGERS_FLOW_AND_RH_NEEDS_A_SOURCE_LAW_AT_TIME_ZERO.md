@@ -116,3 +116,50 @@ code-length pair: the description of the source law against the residual it leav
 face. A landmark is a face where navigator paths meet and a decoder-preserving pivot shrinks the
 residual. Only a proved source-to-receiver identity forcing the residual pair population to vanish
 would be a solution.
+
+## 5. The first returns and the falsifier (same day, `cf6f70f4`, `114963ab`)
+
+[proved-derived; formal-checked] New owners in `HolonicsResearch/Zeta`:
+- **`ZeroTube`**:
+  - the finite pair inertia's exact rate, `Ȧ ≤ −2m`, and `A(T) + 2mT ≤ A(0)`;
+  - the window balance for `heatE t ξ` at every time, with the exterior's tail flux `T_k`;
+  - a seam-lying exterior gives `Re T_k ≥ 0`, and a non-lifting tail with a non-falling window
+    inertia forces no pairs. That hypothesis is RH outside the window, so the step is circular.
+- **`CarryTick`**: `2πi N(T) = ∮ ξ′/ξ`; `N − parityTicks = offSeam + Σ_seam(ord − ord mod 2)`;
+  **RH ⟺ the carry equals the order-weighted seam ticks**; a seam tick is a sign change exactly at
+  odd order.
+- **`Hearing`**: `Λ_DN` as the least sharpening at which every `c ≠ ½` is heard. The spectral
+  truncations are invertible exactly when the symbol has no zero on their segment (a unital
+  C⋆-algebra model).
+- **`PaletteLaw`** [counterexample]: no law of the palette that is closed under Gaussian damping
+  can force the seam. `e^(−u²)Φ` satisfies every such law, yet `heatE 1 ξ` has an off-seam zero.
+  Positivity and log-concavity of the palette are therefore ruled out as source laws.
+
+[counterexample; certified exactly] The falsifier (`research/notebook/zeta_tube/falsifier.py`)
+was run on three tests: a flowed polynomial comb, a finite primon gas over `{2, 3}` (the Euler
+surrogate), and Davenport–Heilbronn, whose off-seam zeros sit in four certified Rouché discs.
+
+| Candidate source law | Verdict |
+|---|---|
+| The tail does not lift the window (`B_W ≤ 0`) | Rejected: the control's pairs satisfy it |
+| The tail does not lift, and the window inertia is stationary | Forces emptiness, but equivalent to RH by construction |
+| The prime part `Re P ≤ 0` at a zero puts that zero on the seam | Rejected by the control's first off-seam zero |
+| **The prime part `Re P ≤ 0` at every zero** | **Survives.** ξ satisfies it at its first five zeros; the control violates it at three of its four. It is not circular, and it is not yet shown to force emptiness |
+| The Euler product together with the functional equation | Not rejected and separates the control, but it is RH for the Selberg class |
+| Palette positivity or log-concavity | Rejected, by the control's positive palette and by `PaletteLaw` |
+| The Lee–Yang property of `Φ(u)du` | Equivalent to RH by construction |
+
+**The surviving landmark.** The zero's velocity splits into a prime part `P` and an archimedean
+part. At every ξ zero checked, the prime part's real flux points toward the seam, balancing the
+archimedean part. The control's off-seam zeros have it pointing away. The open theorem is whether
+`Re P ≤ 0` at every zero forces an empty pair population.
+
+[open] Owed in #62:
+- the operator-level ear (`∂_c` on `L²(ℝ, e^(−2cx)dx)` and its Mellin–Plancherel unitary);
+- a source law for the tail that forces `A(0) = 0`;
+- the tail's boundary (Cauchy-transform) form;
+- a window-tracking owner;
+- simplicity of the lower zeros in `CarryTick`;
+- the finite primon gas's threshold being exactly zero for every prime set;
+- whether the global prime-part sign forces emptiness;
+- Bagchi's theorem.
