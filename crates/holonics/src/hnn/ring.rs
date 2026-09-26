@@ -574,6 +574,25 @@ impl ResonatorOperands {
         tick % self.phases.len()
     }
 
+    /// The pump phases the word visits.
+    pub fn phases(&self) -> usize {
+        self.phases.len()
+    }
+
+    /// `h`, the hop.
+    pub fn hop(&self) -> &Rat {
+        &self.step
+    }
+
+    /// The executed chart of pump phase `j`, when the word is on its lattices (a realization off
+    /// the host executes the same chart).
+    pub fn chart_words(&self, phase: usize) -> Option<&ChartWords> {
+        match &self.phases[phase].solve {
+            PhaseSolve::Chart(chart) => Some(chart),
+            PhaseSolve::Exact(_) => None,
+        }
+    }
+
     /// The operator `M_j` of pump phase `j`.
     pub fn operator(&self, phase: usize) -> &ExactRatMatrix {
         &self.phases[phase].operator

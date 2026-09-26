@@ -400,3 +400,273 @@ impl Card {
         })
     }
 }
+
+// -------------------------------------------------------------------------------------------
+// the normal law's deposit on the card (campaign 2)
+
+/// The deposit's entries in the image.
+pub const OUTER_ENTRY: &str = "hnn_outer_update";
+pub const SPLIT_ENTRY: &str = "hnn_budgeted_split";
+
+/// [definition] **A window's dyadic samples for one outer update** `U = Σ_t a_t l_t r_tᵀ` (kernel
+/// `hnn_outer_update`): the weights, left and right vectors as signed 64-bit coordinates at their
+/// least common dyadic exponents, the weights' raised so the update's scale `S = σ_a + σ_l + σ_r`
+/// is at least a declared floor (the budgeted split reads the update at or below its fine
+/// lattice). Refused off the dyadics or past the word.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct OuterSamples {
+    samples: usize,
+    rows: usize,
+    columns: usize,
+    weights: Vec<i64>,
+    left: Vec<i64>,
+    right: Vec<i64>,
+    exponent: u32,
+}
+
+fn dyadic_words(values: &[Rat], exponent: u32) -> Result<Vec<i64>, DeviceError> {
+    values
+        .iter()
+        .map(|value| {
+            crate::hnn::dyadic::word(value, exponent, "a deposit sample's coordinate")
+                .map_err(DeviceError::Hnn)
+        })
+        .collect()
+}
+
+impl OuterSamples {
+    /// The samples of `U = Σ_t a_t l_t r_tᵀ` (`l_t` of `rows`, `r_t` of `columns` entries), with the
+    /// update's scale raised to at least `floor`.
+    pub fn of(
+        weights: &[Rat],
+        left: &[Vec<Rat>],
+        right: &[Vec<Rat>],
+        rows: usize,
+        columns: usize,
+        floor: u32,
+    ) -> Result<Self, DeviceError> {
+        use crate::hnn::dyadic::common_exponent;
+        if left.len() != weights.len() || right.len() != weights.len() {
+            return Err(DeviceError::Shape {
+                what: "a deposit's samples (weight, left, right)",
+                expected: weights.len(),
+                found: left.len().min(right.len()),
+            });
+        }
+        if left.iter().any(|l| l.len() != rows) || right.iter().any(|r| r.len() != columns) {
+            return Err(DeviceError::Shape {
+                what: "a deposit sample's vectors",
+                expected: rows + columns,
+                found: 0,
+            });
+        }
+        let refusal = DeviceError::Hnn;
+        let sigma_l =
+            common_exponent(left.iter().flatten(), "a deposit's left vectors").map_err(refusal)?;
+        let sigma_r = common_exponent(right.iter().flatten(), "a deposit's right vectors")
+            .map_err(refusal)?;
+        let sigma_a = common_exponent(weights.iter(), "a deposit's weights").map_err(refusal)?;
+        let raised = floor.saturating_sub(sigma_a + sigma_l + sigma_r);
+        let sigma_a = sigma_a + raised;
+        Ok(Self {
+            samples: weights.len(),
+            rows,
+            columns,
+            weights: dyadic_words(weights, sigma_a)?,
+            left: dyadic_words(&left.concat(), sigma_l)?,
+            right: dyadic_words(&right.concat(), sigma_r)?,
+            exponent: sigma_a + sigma_l + sigma_r,
+        })
+    }
+
+    /// `S`, the update's scale: its entries lie on `2^(−S)ℤ`.
+    pub fn exponent(&self) -> u32 {
+        self.exponent
+    }
+}
+
+/// [definition] **An outer update read back**: its `rows × columns` entries on `2^(−S)ℤ` and their
+/// statuses.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct OuterUpdate {
+    pub rows: usize,
+    pub columns: usize,
+    pub exponent: u32,
+    pub words: Vec<i128>,
+    pub status: Vec<u32>,
+}
+
+impl OuterUpdate {
+    /// The update's entries as exact values, or the first refused entry's position.
+    pub fn values(&self) -> Result<Vec<Rat>, usize> {
+        self.words
+            .iter()
+            .zip(&self.status)
+            .enumerate()
+            .map(|(at, (&word, &status))| {
+                if status == EXACT {
+                    Ok(Rat::new(
+                        BigInt::from(word),
+                        BigInt::one() << self.exponent as usize,
+                    ))
+                } else {
+                    Err(at)
+                }
+            })
+            .collect()
+    }
+}
+
+/// [definition] **One array's budgeted split read back**: the entries' coordinates on `2^(−L)ℤ`,
+/// their carried remainders on `2^(−(L+k))ℤ`, the released residuals on `2^(−S)ℤ`, the applied
+/// coordinates and the statuses.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SplitRecord {
+    pub entries: Vec<i64>,
+    pub remainders: Vec<i128>,
+    pub released: Vec<i128>,
+    pub applied: Vec<i128>,
+    pub status: Vec<u32>,
+}
+
+impl Card {
+    /// **The outer update on the card** (kernel `hnn_outer_update`): one block per entry, its
+    /// threads over the samples.
+    pub fn outer_update(&self, samples: &OuterSamples) -> Result<OuterUpdate, DeviceError> {
+        let entry = self.entry(OUTER_ENTRY)?;
+        let base = read_layout(
+            self.census(),
+            &entry,
+            samples.rows,
+            samples.samples.max(1),
+            samples.columns,
+        )?;
+        let layout = Layout {
+            realization: crate::hnn::card::Realization::EntryOverSamples {
+                entries: (samples.rows * samples.columns) as u64,
+                threads: base.block.x,
+                per_thread: samples.samples.div_ceil(base.block.x as usize) as u32,
+            },
+            ..base
+        };
+        let weights = self.upload(&samples.weights)?;
+        let left = self.upload(&samples.left)?;
+        let right = self.upload(&samples.right)?;
+        let count = samples.rows * samples.columns;
+        let update = self.zeroed::<i128>(count)?;
+        let status = self.zeroed::<u32>(count)?;
+        let (mut weights_ptr, mut left_ptr, mut right_ptr) =
+            (weights.device_ptr(), left.device_ptr(), right.device_ptr());
+        let mut n_samples = u32::try_from(samples.samples).map_err(|_| DeviceError::Shape {
+            what: "a deposit's samples on the 32-bit wire",
+            expected: u32::MAX as usize,
+            found: samples.samples,
+        })?;
+        let (mut rows, mut columns) = (samples.rows as u32, samples.columns as u32);
+        let (mut update_ptr, mut status_ptr) = (update.device_ptr(), status.device_ptr());
+        let mut params: [*mut c_void; 8] = [
+            &mut weights_ptr as *mut _ as *mut c_void,
+            &mut left_ptr as *mut _ as *mut c_void,
+            &mut right_ptr as *mut _ as *mut c_void,
+            &mut n_samples as *mut _ as *mut c_void,
+            &mut rows as *mut _ as *mut c_void,
+            &mut columns as *mut _ as *mut c_void,
+            &mut update_ptr as *mut _ as *mut c_void,
+            &mut status_ptr as *mut _ as *mut c_void,
+        ];
+        self.launch(OUTER_ENTRY, &layout, &mut params)?;
+        Ok(OuterUpdate {
+            rows: samples.rows,
+            columns: samples.columns,
+            exponent: samples.exponent,
+            words: self.fetch(&update)?,
+            status: self.fetch(&status)?,
+        })
+    }
+
+    /// **The budgeted split on the card** (kernel `hnn_budgeted_split`) of an update on `2^(−S)ℤ`
+    /// onto an array on the lattice `2^(−L)ℤ` with its carried remainders on `2^(−(L+k))ℤ`,
+    /// `S ≥ L + k`: one thread per entry.
+    pub fn budgeted_split(
+        &self,
+        update: &OuterUpdate,
+        lattice: Lattice,
+        precision: u32,
+        entries: &[i64],
+        remainders: &[i128],
+    ) -> Result<SplitRecord, DeviceError> {
+        let fine = lattice.exponent() + precision;
+        if update.exponent < fine
+            || entries.len() != update.words.len()
+            || remainders.len() != update.words.len()
+        {
+            return Err(DeviceError::Shape {
+                what: "a budgeted split (the update at or below the fine lattice, one per entry)",
+                expected: update.words.len(),
+                found: entries.len().min(remainders.len()),
+            });
+        }
+        let count = entries.len();
+        let entry = self.entry(SPLIT_ENTRY)?;
+        // One thread per entry, a warp's worth of blocks at least: the block is the census's
+        // ceiling at most, and the entries stride the grid.
+        let threads = entry
+            .max_threads_per_block
+            .min(self.census().max_threads_per_block)
+            .clamp(1, self.census().warp.max(1) * 8);
+        let layout = Layout {
+            grid: crate::cuda::Dim3::x(
+                u32::try_from(count.div_ceil(threads as usize).max(1)).map_err(|_| {
+                    DeviceError::Launch {
+                        entry: SPLIT_ENTRY,
+                        clause: "the entries fit the grid's X extent",
+                    }
+                })?,
+            ),
+            block: crate::cuda::Dim3::x(threads),
+            shared: 0,
+            realization: crate::hnn::card::Realization::CopyPerBlock {
+                copies: count.div_ceil(threads as usize) as u64,
+                threads,
+            },
+        };
+        let words = self.upload(&update.words)?;
+        let statuses = self.upload(&update.status)?;
+        let entry_buffer = self.upload(entries)?;
+        let remainder_buffer = self.upload(remainders)?;
+        let released = self.zeroed::<i128>(count)?;
+        let applied = self.zeroed::<i128>(count)?;
+        let status = self.zeroed::<u32>(count)?;
+        let (mut words_ptr, mut statuses_ptr) = (words.device_ptr(), statuses.device_ptr());
+        let mut n = count as u32;
+        let mut down = update.exponent - fine;
+        let mut k = precision;
+        let (mut entry_ptr, mut remainder_ptr) =
+            (entry_buffer.device_ptr(), remainder_buffer.device_ptr());
+        let (mut released_ptr, mut applied_ptr, mut status_ptr) = (
+            released.device_ptr(),
+            applied.device_ptr(),
+            status.device_ptr(),
+        );
+        let mut params: [*mut c_void; 10] = [
+            &mut words_ptr as *mut _ as *mut c_void,
+            &mut statuses_ptr as *mut _ as *mut c_void,
+            &mut n as *mut _ as *mut c_void,
+            &mut down as *mut _ as *mut c_void,
+            &mut k as *mut _ as *mut c_void,
+            &mut entry_ptr as *mut _ as *mut c_void,
+            &mut remainder_ptr as *mut _ as *mut c_void,
+            &mut released_ptr as *mut _ as *mut c_void,
+            &mut applied_ptr as *mut _ as *mut c_void,
+            &mut status_ptr as *mut _ as *mut c_void,
+        ];
+        self.launch(SPLIT_ENTRY, &layout, &mut params)?;
+        Ok(SplitRecord {
+            entries: self.fetch(&entry_buffer)?,
+            remainders: self.fetch(&remainder_buffer)?,
+            released: self.fetch(&released)?,
+            applied: self.fetch(&applied)?,
+            status: self.fetch(&status)?,
+        })
+    }
+}

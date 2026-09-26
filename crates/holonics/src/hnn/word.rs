@@ -956,6 +956,21 @@ impl<'c> Word<'c> {
         &self.resonators
     }
 
+    /// **The storage waves `b_r = 2v_r − s_r` the junctions sent at junction step `step`** (the
+    /// resonators' drives), read from the word's own record: the carried anchor and the storage at
+    /// the step's start. `None` past the steps taken.
+    pub fn storage_waves(&self, step: usize) -> Option<Vec<Vec<Rat>>> {
+        let record = self.passage.get(step)?;
+        Some(
+            record
+                .anchors
+                .iter()
+                .zip(&record.storage)
+                .map(|(anchor, storage)| crate::geometry::swing::swing(anchor, storage))
+                .collect(),
+        )
+    }
+
     /// **The whole word's balance**, read at any point of the word ([`WordBalance`]).
     pub fn word_balance(&self) -> Result<WordBalance, HnnError> {
         let end = self.power()?;

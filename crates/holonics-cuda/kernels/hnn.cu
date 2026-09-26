@@ -556,3 +556,255 @@ extern "C" __global__ void hnn_inverse_certificate(
 }
 
 #include "hnn_word.cuh"
+
+// -------------------------------------------------------------------------------------------------
+// the ring's resonator
+// -------------------------------------------------------------------------------------------------
+//
+// [definition] Campaign 2, `holonics::hnn::ring` (Lean `HNN/Ring.{ring_descriptor_tick_conserves,
+// ring_tick_executed_energy_balance}`). A ring's resonator at its storage port has its storage
+// `C = c · 2^(−L_m)` and, at each pump phase `j`, its stiffness `K_j = k_j · 2^(−L_m)` and the
+// executed chart of its operator `X̂_j = χ_j · 2^(−L_c)`; its state `(u, w)` and the drive `β` (the
+// storage wave the ring's junction sends) are on `2^(−L_w)ℤ`, and the hop is `h = 2^(e_h)`,
+// `e_h ≥ 0`. Tick `t` at phase `j = t mod J`:
+//
+//   ρ_i = Σ_j (2 c_ij w_j − 2^(e_h) k_ij u_j) + 2^(e_h + L_m) β_i        r = ρ · 2^(−(L_m + L_w))
+//   (ω_i, r'_i) = split_(L_c + L_m)(Σ_j χ_ij ρ_j + r_i)                  the solve, split onto 2^(−L_w)
+//   u'_i = u_i + 2^(e_h) ω_i ,   w'_i = 2 ω_i − w_i                       exact on 2^(−L_w)ℤ
+//
+// the host's `ResonatorOperands::step` on the same operands, coordinate for coordinate: the
+// displacement's and rate's images lie on the transients' lattice, so their carried remainders stay
+// zero, and only the solve's remainder is carried (at `2^(−(L_c + L_m + L_w))`).
+//
+// Refusals, per entry: a certificate reaching 2^127 (carrier); a coordinate outside the signed
+// 64-bit word (word); an entry reading a refused coordinate (operand, which travels with the state).
+//
+// Realization: block `g` is resonator `g` (the rings' resonators run together: each reads only its
+// own material, charts, drives and state and writes only its own record and remainders); thread `i`
+// is row `i` of the resonator, looping over its row's `n` columns; the ticks are serial within the
+// block, the three stages of a tick ordered by barriers. Shared: `3 n_max` signed 64-bit words
+// (`u`, `w`, `ω`) and `n_max` carrier words (`ρ`), with `n_max ≤ blockDim.x`.
+extern "C" __global__ void hnn_resonator_word(
+    const int64_t *capacity, const int64_t *stiffness, const int64_t *charts,
+    const uint32_t *widths, const uint32_t *phases,
+    const unsigned long long *capacity_base, const unsigned long long *phase_base,
+    const unsigned long long *row_base, uint32_t rows_total,
+    const int64_t *drives, uint32_t ticks,
+    uint32_t e_h, uint32_t l_m, uint32_t l_c,
+    int64_t *record, uint32_t *status, wide *remainder
+) {
+    int64_t *u = (int64_t *)hnn_shared;
+    int64_t *w = u + blockDim.x;
+    int64_t *omega = w + blockDim.x;
+    wide *rho = (wide *)(omega + blockDim.x);
+    __shared__ uint32_t refused;
+    const uint32_t g = blockIdx.x, i = threadIdx.x;
+    const uint32_t n = widths[g];
+    const unsigned long long base = row_base[g];
+    const int64_t *c = capacity + capacity_base[g];
+    if (i < n) {
+        u[i] = 0;
+        w[i] = 0;
+        omega[i] = 0;
+    }
+    uint32_t mine = HNN_EXACT;
+    wide carried = 0;
+    const uint32_t split_shift = l_c + l_m;
+    for (uint32_t t = 0; t < ticks; t++) {
+        const uint32_t j = t % phases[g];
+        const int64_t *k = stiffness + phase_base[g] + (unsigned long long)j * n * n;
+        const int64_t *chi = charts + phase_base[g] + (unsigned long long)j * n * n;
+        if (i == 0) {
+            refused = 0;
+        }
+        __syncthreads();
+        // Stage 1: ρ_i.
+        if (i < n) {
+            uwide word = 0, bound = 0;
+            uint32_t read = mine;
+            for (uint32_t col = 0; col < n; col++) {
+                const wide cw = 2 * hnn_word_product(c[(size_t)i * n + col], w[col]);
+                const wide ku = hnn_word_product(k[(size_t)i * n + col], u[col]);
+                uwide mku = hnn_magnitude(ku);
+                wide hku = ku;
+                if (e_h > 0) {
+                    uwide scaled = mku << e_h;
+                    mku = (e_h >= 127 || (scaled >> e_h) != mku) ? HNN_CARRIER_BOUND : scaled;
+                    hku = (wide)((uwide)ku << e_h);
+                }
+                word += (uwide)cw;
+                bound = hnn_certify(bound, hnn_magnitude(cw));
+                word -= (uwide)hku;
+                bound = hnn_certify(bound, mku);
+            }
+            const int64_t beta = drives[(size_t)t * rows_total + base + i];
+            const uint32_t beta_shift = e_h + l_m;
+            uwide mbeta = hnn_magnitude((wide)beta);
+            uwide shifted = mbeta << beta_shift;
+            if (beta_shift >= 127 || (shifted >> beta_shift) != mbeta) {
+                shifted = HNN_CARRIER_BOUND;
+            }
+            word += (uwide)(((wide)beta) * ((wide)1 << beta_shift));
+            bound = hnn_certify(bound, shifted);
+            const wide value = hnn_certified(word, bound, &read);
+            rho[i] = value;
+            mine = read;
+            if (read != HNN_EXACT) {
+                atomicOr(&refused, 1u);
+            }
+        }
+        __syncthreads();
+        // Stage 2: ω_i = split(χ ρ + r).
+        if (i < n) {
+            uint32_t read = refused ? (mine ? mine : HNN_REFUSED_OPERAND) : HNN_EXACT;
+            wide q = 0, r = 0;
+            if (read == HNN_EXACT) {
+                uwide word = 0, bound = 0;
+                for (uint32_t col = 0; col < n; col++) {
+                    uwide magnitude = 0;
+                    const wide product = hnn_bounded_product(chi[(size_t)i * n + col], rho[col], &magnitude);
+                    word += (uwide)product;
+                    bound = hnn_certify(bound, magnitude);
+                }
+                word += (uwide)carried;
+                bound = hnn_certify(bound, hnn_magnitude(carried));
+                const wide s = hnn_certified(word, bound, &read);
+                if (read == HNN_EXACT) {
+                    q = hnn_nearest(s, split_shift, &r);
+                    if (!hnn_is_word(q)) {
+                        read = HNN_REFUSED_WORD;
+                        q = 0;
+                        r = 0;
+                    }
+                }
+            }
+            mine = read;
+            carried = r;
+            omega[i] = (int64_t)q;
+        }
+        __syncthreads();
+        // Stage 3: u' = u + 2^(e_h) ω, w' = 2ω − w.
+        if (i < n) {
+            const wide next_u = (wide)u[i] + ((wide)omega[i] << e_h);
+            const wide next_w = 2 * (wide)omega[i] - (wide)w[i];
+            uint32_t read = mine;
+            if (read == HNN_EXACT && (!hnn_is_word(next_u) || !hnn_is_word(next_w))) {
+                read = HNN_REFUSED_WORD;
+            }
+            u[i] = read == HNN_EXACT ? (int64_t)next_u : 0;
+            w[i] = read == HNN_EXACT ? (int64_t)next_w : 0;
+            if (read != HNN_EXACT) {
+                omega[i] = 0;
+            }
+            mine = read;
+            const size_t at = ((size_t)t * rows_total + base + i) * 3;
+            record[at] = u[i];
+            record[at + 1] = w[i];
+            record[at + 2] = omega[i];
+            status[(size_t)t * rows_total + base + i] = read;
+        }
+        __syncthreads();
+    }
+    if (i < n) {
+        remainder[base + i] = carried;
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+// the normal law's deposit: the update's outer sum and the budgeted split
+// -------------------------------------------------------------------------------------------------
+//
+// [definition] Campaign 2, the deposit phase on the card where its arithmetic is dyadic
+// (`holonics::hnn::constitution::NormalLaw::deposited`, Lean `HNN/Normal.normal_prox_step`,
+// `HNN/LatticeDeposit.carry`). A window's samples `(a_t, l_t, r_t)` with dyadic coordinates
+// `a = α·2^(−σ_a)`, `l = λ·2^(−σ_l)`, `r = ϱ·2^(−σ_r)` give the update's entries
+//
+//   U_ij = Σ_t α_t λ_(t,i) ϱ_(t,j)            on 2^(−S)ℤ, S = σ_a + σ_l + σ_r
+//
+// (the Gram's `ΔH = Σ w f fᵀ` and the map's `ΔW = γ Σ w g (X̂f)ᵀ`), each read under its l1
+// certificate. The budgeted split carries each nonzero update onto its entry `x = ξ·2^(−L)` with its
+// remainder `ρ·2^(−(L+k))` at the deposit clock's precision `k`:
+//
+//   (P, e) = split_(S − L − k)(U)            the fine split; e·2^(−S) is released (S ≥ L + k)
+//   (q, ρ') = split_k(P + ρ)                 the coarse split of the fine point
+//   ξ' = ξ + q                               the entry moves by q·2^(−L); ρ' is carried
+//
+// the host's `carried_entry` on the same operands (a zero update moves nothing and releases nothing).
+//
+// Realization (outer sum): block `(i, j)` is one entry of the update; its threads divide the
+// samples (`t ≡ τ`), and the block reduces the ring words and certificates by the shared tree.
+// Every block reads the immutable samples and writes only its own entry. (Split): thread `e` is one
+// entry; each reads and writes only its own entry, remainder, residual and status.
+extern "C" __global__ void hnn_outer_update(
+    const int64_t *weights, const int64_t *left, const int64_t *right,
+    uint32_t samples, uint32_t rows, uint32_t columns,
+    wide *update, uint32_t *status
+) {
+    uwide *ring = (uwide *)hnn_shared;
+    uwide *bound = ring + blockDim.x;
+    const uint32_t i = blockIdx.x, j = blockIdx.y, tau = threadIdx.x;
+    if (i >= rows || j >= columns) {
+        return;  // uniform over the block
+    }
+    uwide word = 0, certificate = 0;
+    for (uint32_t t = tau; t < samples; t += blockDim.x) {
+        const wide weighted = hnn_word_product(weights[t], left[(size_t)t * rows + i]);
+        uwide magnitude = 0;
+        const wide product = hnn_bounded_product(right[(size_t)t * columns + j], weighted, &magnitude);
+        word += (uwide)product;
+        certificate = hnn_certify(certificate, magnitude);
+    }
+    ring[tau] = word;
+    bound[tau] = certificate;
+    __syncthreads();
+    hnn_block_sum(ring, bound, tau);
+    if (tau == 0) {
+        uint32_t read = HNN_EXACT;
+        const wide value = hnn_certified(ring[0], bound[0], &read);
+        update[(size_t)i * columns + j] = read == HNN_EXACT ? value : 0;
+        status[(size_t)i * columns + j] = read;
+    }
+}
+
+extern "C" __global__ void hnn_budgeted_split(
+    const wide *update, const uint32_t *update_status, uint32_t entries,
+    uint32_t down, uint32_t precision,
+    int64_t *entry, wide *remainder, wide *released, wide *applied, uint32_t *status
+) {
+    const uint32_t e = blockIdx.x * blockDim.x + threadIdx.x;
+    if (e >= entries) {
+        return;
+    }
+    released[e] = 0;
+    applied[e] = 0;
+    if (update_status[e] != HNN_EXACT) {
+        status[e] = HNN_REFUSED_OPERAND;
+        return;
+    }
+    const wide u = update[e];
+    if (u == 0) {
+        status[e] = HNN_EXACT;
+        return;
+    }
+    wide residual = 0;
+    const wide point = hnn_nearest(u, down, &residual);
+    // |point| ≤ 2^127 / 2^down + 1 and |ρ| < 2^(k−1): their sum stays a carrier word below.
+    uint32_t read = HNN_EXACT;
+    const wide carried = remainder[e];
+    const uwide bound = hnn_certify(hnn_magnitude(point), hnn_magnitude(carried));
+    const wide fine = hnn_certified((uwide)point + (uwide)carried, bound, &read);
+    wide coordinate = 0, quotient = 0;
+    if (read == HNN_EXACT) {
+        quotient = hnn_nearest(fine, precision, &coordinate);
+        const wide moved = (wide)entry[e] + quotient;
+        if (hnn_is_word(moved)) {
+            entry[e] = (int64_t)moved;
+            remainder[e] = coordinate;
+            released[e] = residual;
+            applied[e] = quotient;
+        } else {
+            read = HNN_REFUSED_WORD;
+        }
+    }
+    status[e] = read;
+}

@@ -179,6 +179,23 @@ pub enum Realization {
     WordPerBlock { threads: u32, rows_per_thread: u32 },
     /// Each block is one copy of `copies`; its `threads` stride the copy's words.
     CopyPerBlock { copies: u64, threads: u32 },
+    /// Each block is one ring's resonator of `rings` (campaign 2, `hnn_resonator_word`): thread `i`
+    /// is row `i`, looping over its row's `columns` columns; the word's ticks are serial within the
+    /// block, each tick's three stages ordered by barriers.
+    RingPerBlock {
+        rings: u64,
+        threads: u32,
+        columns: u32,
+    },
+    /// Each block is one entry `(i, j)` of a normal law's map update (campaign 2,
+    /// `hnn_prox_update`): its `threads` divide the window's samples (`t ≡ τ mod threads`), each
+    /// looping over at most `per_thread` samples, and the block reduces their ring words and
+    /// certificates by a shared-memory tree; thread 0 carries the entry's budgeted split.
+    EntryOverSamples {
+        entries: u64,
+        threads: u32,
+        per_thread: u32,
+    },
 }
 
 /// [definition] **A launch derived from the census**: its grid, block, dynamic shared octets and
@@ -413,6 +430,58 @@ pub fn copy_layout(
         realization: Realization::CopyPerBlock {
             copies: u64::from(copies),
             threads,
+        },
+    })
+}
+
+/// The shared octets per thread of the resonator: three signed 64-bit words and one carrier word.
+pub const RESONATOR_SHARED_PER_THREAD: u32 =
+    3 * core::mem::size_of::<i64>() as u32 + core::mem::size_of::<i128>() as u32;
+
+/// [definition] **The resonators' layout** (`hnn_resonator_word`) for `rings` resonators of at most
+/// `width` rows: one block per resonator, as wide as the least power of two covering the widest
+/// resonator's rows (at least one warp), bounded by the entry's and the device's thread ceilings and
+/// by the shared octets per thread; a resonator wider than the block is refused (each row is one
+/// thread's). The grid is `rings` blocks, refused past the device's grid.
+pub fn resonator_layout(
+    census: &DeviceCensus,
+    entry: &EntryCensus,
+    rings: usize,
+    width: usize,
+) -> Result<Layout, DeviceError> {
+    let (Ok(rings), Ok(width)) = (u32::try_from(rings), u32::try_from(width)) else {
+        return Err(DeviceError::Launch {
+            entry: entry.name,
+            clause: "the resonators and their rows fit the kernel's 32-bit wire",
+        });
+    };
+    if rings == 0 || width == 0 || rings > census.max_grid.x {
+        return Err(DeviceError::Launch {
+            entry: entry.name,
+            clause: "at least one resonator of at least one row, within the grid's X extent",
+        });
+    }
+    let shared_threads = shared_ceiling(census, entry) / RESONATOR_SHARED_PER_THREAD;
+    let ceiling = thread_ceiling(census, entry).min(shared_threads);
+    let cover = width
+        .max(census.warp)
+        .checked_next_power_of_two()
+        .unwrap_or(u32::MAX);
+    if ceiling == 0 || floor_power_of_two(ceiling.max(1)) < cover.min(width.next_power_of_two()) {
+        return Err(DeviceError::Launch {
+            entry: entry.name,
+            clause: "one thread per row of the widest resonator, with its shared words",
+        });
+    }
+    let threads = floor_power_of_two(ceiling).min(cover);
+    Ok(Layout {
+        grid: Dim3::x(rings),
+        block: Dim3::x(threads),
+        shared: threads * RESONATOR_SHARED_PER_THREAD,
+        realization: Realization::RingPerBlock {
+            rings: u64::from(rings),
+            threads,
+            columns: width,
         },
     })
 }

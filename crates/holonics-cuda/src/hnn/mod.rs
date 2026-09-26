@@ -51,6 +51,9 @@
 //! | `hnn_scatter_words` | a grid striding a publication's moved words | one moved word | — | none |
 //! | `hnn_tree_splits` ([`tree`]) | one phase's all-class read; grid = the window's phases read together | one splitting dyadic cell (`i ≡ t`); `threads` = the least power of two covering them, at least a warp, within the entry's census | each cell's opened paths (at most `D_b + 1` hash lookups a branch) and the join | none: each split is its own thread's word |
 //! | `hnn_tree_deposit`, `hnn_tree_undo` ([`tree`]) | one cell's deposit (one block of one warp) | one opened digit (its dyadic cell's trees) | the digit's paths bottom-up: β steps, founding, masses | a block prefix sum of the founded counts (the host's numbering) |
+//! | `hnn_resonator_word` (campaign 2) | one ring's resonator; grid = the word's resonators, all at once | one row of the resonator (`threads` = the least power of two covering the widest, at least a warp) | its row's `n` columns, in each of the tick's three stages; the ticks serial within the block, ordered by barriers | none across rows; each row's sums certified in its own thread |
+//! | `hnn_outer_update` (campaign 2) | one entry `(i, j)` of a normal law's update `Σ_t a_t l_t r_tᵀ`; grid `(rows, columns)` | one residue class `t ≡ τ` of the window's samples; `threads` as the read's over the samples | `⌈samples/threads⌉` samples | the shared tree |
+//! | `hnn_budgeted_split` (campaign 2) | a grid striding the entries | one entry's fine and coarse split | — | none |
 //!
 //! Campaign 1 on the RTX 4080 SUPER (census in the GPU test's output): `E_0 M_0[c]` is `10 × 5`
 //! blocks of 256 threads, one column each; `R P v` is `512 × A` blocks of 32 threads (one warp; 22
@@ -107,6 +110,9 @@
 //! | none (new; campaign 2) | `kernels/tree.cu::{hnn_tree_splits, hnn_tree_deposit, hnn_tree_undo}`, [`tree`] | `holonics::hnn::landmark::{Landmarks::window_splits, Landmarks::deposit, Beta::step}` | GPU: `tests::the_card_tree_reads_and_deposits_as_the_host_tree`; the port's lockstep tests |
 //! | none (new) | `kernels/hnn_word.cuh::{hnn_word_forward, hnn_word_reverse, hnn_pair_weights, hnn_copy_words, hnn_scatter_words}`, [`port`] | `holonics::hnn::{word::Word, port::Word::pull_back, receiving::ReceivingPhases::read, moment::SourceMoment::open_storage, chart::refine}` and the reference's `ExecutionPort` | GPU: `port_tests::the_card_port_returns_the_reference_on_{the_chain, a_generic_constitution, campaign_one, the_standing_cut}`, `the_card_port_refuses_as_the_reference` |
 //!
+//! | none (new, campaign 2) | `kernels/hnn.cu::hnn_resonator_word`, [`word::ResonatorPlan`], [`Card::resonator_word`] | `holonics::hnn::ring::ResonatorOperands::step`; Lean `HNN/Ring.{ring_descriptor_tick_conserves, ring_tick_executed_energy_balance}` | GPU: `physics_tests::resident_resonators_equal_the_host_word_and_are_measured` |
+//! | none (new, campaign 2) | `kernels/hnn.cu::{hnn_outer_update, hnn_budgeted_split}`, [`lattice::OuterSamples`], [`Card::outer_update`], [`Card::budgeted_split`] | `holonics::hnn::constitution::NormalLaw::deposited` (the Gram's and the map's updates and their budgeted carries); Lean `HNN/Normal.normal_prox_step`, `HNN/LatticeDeposit.carry` | GPU: `physics_tests::the_prox_deposit_on_the_card_equals_the_host_and_is_measured` |
+//!
 //! **Not ported**, with the reason:
 //! - `kernels/enclosure_cayley.cuh`: its Cayley step proposes by a double-precision LU, a float
 //!   inside a law. The ring element's inverse is now the Newton–Schulz lattice chart
@@ -139,6 +145,8 @@ pub mod tree;
 pub mod word;
 
 #[cfg(test)]
+mod physics_tests;
+#[cfg(test)]
 mod port_tests;
 #[cfg(test)]
 mod tests;
@@ -147,7 +155,7 @@ mod word_tests;
 
 pub use card::{
     Card, CardBuffer, DeviceCensus, EntryCensus, KERNELS, Layout, Operand, Realization,
-    certificate_layout, copy_layout, ingest_layout, read_layout, word_layout,
+    certificate_layout, copy_layout, ingest_layout, read_layout, resonator_layout, word_layout,
 };
 pub use lattice::{Gather, LatticeCoordinates, LatticeRead, ResidentLattice, ResidentRead};
 pub use moment::{MomentCounts, MomentSnapshot, ResidentMoment};
@@ -155,7 +163,7 @@ pub use port::{Mounted, Resident, Traffic};
 pub use tree::{CardTree, TreeTimes};
 pub use word::{
     CarryRelease, Certificate, ChartRelease, InversePair, Orientation, Refusal, ResidentCarry,
-    ResidentCharts, ResidentInverses, WordChart, WordGraph,
+    ResidentCharts, ResidentInverses, ResonatorPlan, ResonatorRecord, WordChart, WordGraph,
 };
 
 use holonics::hnn::HnnError;
