@@ -1369,7 +1369,8 @@ crates/holonics/src/hnn/
 ```
 
 `lib.rs` gains `pub mod hnn;`, and its header lists ten modules (with `physics`, K3–K4). `holonics` keeps its
-four dependencies.
+four dependencies and adds `rayon` for the regions that run together under the hardware law
+(Decision 25; `hnn::realization`).
 
 [definition] **The host reference.** `Reference` implements `ExecutionPort`, and its `Resident`
 holds the `Field`, the `Current`, the `Constitution`, the open moments, the open pending ratios, the
@@ -1532,7 +1533,7 @@ releases (Decision 22; `hnn::retention`):
 |---|---|---|---|---|---|---|
 | `ingest` | `M`, `C_g(δ)` and `win_g` updated in place; `λ` advanced by selective stepping; a stop at a carry-out | absent: ingestion produces no covector. The moment's adjoint is its contraction (position `k` returns `g ∘ P^(τ(n))P^(−τ(k)) ∘ I` without stored state), which `compare`'s pullback uses (R2 L7) | absent: ingestion deposits nothing | the lift after the cells; `n` | absent: nothing is read | `n` cell accesses; the moment's exact bits, and its bits per source bit against `n*`; the carry-out, when reached |
 | `locate_keys` | per ring in carry order, on the crib that closed the aeon: the fibre of consistent key candidates with their rotor-gauge orbits. A ring's key is published, gauge-fixed, only when its fibre is one orbit; otherwise its current configuration stays | absent: key location is discrete, and the key covector is a reading | the published ring clocks: the phase classes of `λ` at the aeon's opening, windings kept | the crib's edges with their positions from the aeon's opening | absent | per ring: the fibre's size, its orbits, the minimal failing loop, the candidates checked and the propagation work |
-| `refine` | the faces `p̂_j` with fibres; nothing else is published (R2 C3) | absent (forward only): the `Word` is dropped | absent | the moment's lift | the binding read | per-ring tick counts; the tick power balances; the diamond's loci reached; the change released at the word's end, its power and its peak bits inside the word; the source-to-receiver path attenuation at the cut; the fibres; work |
+| `refine` | the faces `p̂_j` with fibres; nothing else is published (R2 C3) | absent (forward only): the `Word` is kept for its compare on the same commit, then dropped | absent | the moment's lift | the binding read | per-ring tick counts; the tick power balances; the diamond's loci reached; the change released at the word's end, its power and its peak bits inside the word; the source-to-receiver path attenuation at the cut; the fibres; work |
 | `compare` | the contemporary faces and the `HolonRatio` per phase, from the anchor `λ` and `⟨M, E_now⟩` at the contemporary constitution | complete: `M` through to `E`, `E^(δ)`; per contact `(λ_Δ, λ_Q, λ_DQ)` and its constitution; per ring the reaction material and `q` (the declared lock chart); `R`; the key covector as a reading | a `Deposit` staged inside the causal diamond | the pending ratio's and the target's | the pending binding | the ratio's faces (KL part, phase excess, winding); the residual against the emitted face; the loci reached |
 | `deposit` | the successor constitution, in one atomic publication, or a `ConstitutionBudget` refusal that leaves the predecessor published | absent: a deposit consumes covectors | the applied `DepositReading`: the energy-growth bound `ε_k` and its running product, the commit, the successor's bits against the budget, the loci reached, the released residuals with their bits, and the entries stepped | unchanged | absent | the deposition work; the energy-bound product; the commit counter; the constitution's exact bits against its budget |
 | `release` | the released face at width zero, or a refusal with its width | absent | the founded ring's material, when FOUND | the pending ratio's | the pending binding | the RIDE/FOUND split, its work form, and the width against the grain |
@@ -2144,7 +2145,9 @@ ignores the codes), and says whether its guarantee is structural. No guard is a 
    - The one other operand the resident keeps across methods is the first law's `Arrived` ((c),
      "The host reference"): the last compared pending ratio with its `A` target cells. There is at
      most one, the next compare replaces it, it is counted in the state bits, and only the ledger's
-     deposition and release steps read it.
+     deposition and release steps read it. Beside it, refine's word and faces are kept for its compare,
+     tagged with the constitution's commit and dropped by a deposit or a collapse: a cache of a
+     read on an unchanged constitution, not an operand.
 4. **No journal.** `Constitution` holds only the current parameters, the normal statistics, their
    carried remainders and each locus's deposit count: no list of deposits, updates, gradients or
    producers. Its fields are private. `deposit` and the
@@ -2158,7 +2161,7 @@ ignores the codes), and says whether its guarantee is structural. No guard is a 
    candidates (`RingKeys::fibre`; "Candidates" in the data → menu map), a reading of
    `locate_keys` that no state keeps. That aeon, epoch and cycle are the only time words is a
    review rule, not a type guarantee, and no identifier scan runs.
-7. **No Lean in the pipeline.** `holonics` keeps its four dependencies, and `clippy.toml` disallows
+7. **No Lean in the pipeline.** `holonics` keeps its four dependencies (and `rayon`, Decision 25), and `clippy.toml` disallows
    the `std::fs` and `std::process` entry points, denied in `hnn` (an exterior notebook allows
    them where it reads).
 8. **No templates.** Output faces are `ρ_R` readings, and no port method returns a string.

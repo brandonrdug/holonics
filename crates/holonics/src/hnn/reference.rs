@@ -57,10 +57,57 @@
 //! D1). The budget stop admits no further deposit and the run continues, reported incomplete. A
 //! deadline ([`Reference::with_deadline`]) ends the reading after its windows, reported incomplete
 //! at the cell it stopped at. Its readout ([`Exposure`]) is design (f)'s measurement, with `Kt`
-//! charging the published keys.
+//! charging the published keys, and beside it, exterior, the host's wall time by phase
+//! ([`WallTimes`]).
+//!
+//! [definition; agent-inferred] **The kept read.** `refine` keeps the word it ran (its operands and
+//! per-tick waves without the borrow of its field, `hnn::word::KeptWord`) and the faces it
+//! read, in the pending slot, tagged with the commit of the constitution it read them at. `compare`
+//! takes them when that commit is still the published one and reads again otherwise (a comparison
+//! observed after an update is read through the contemporary constitution); a deposit and a
+//! collapse publish a constitution and drop every kept read. A word is a function of the pending
+//! ratio's operands and the published constitution, so the kept read is that function's value and
+//! the compare returns the same either way (the test
+//! `a_compare_returns_the_same_with_and_without_the_refines_kept_read`). The pending ratio still
+//! holds operands only (guard 3), the kept word is consumed by its own return (guard 2), and the
+//! kept read is not state: the state bits do not count it, and a clone of the resident drops it.
+//!
+//! [definition; agent-inferred] **The host realization** (CLAUDE.md, the hardware law;
+//! `hnn::realization`). Within a method the host runs these regions together on its cores:
+//! the work-stealing pool of the `rayon` crate, one task per region, regions nested in regions, each
+//! region's own arithmetic on one worker. Every region reads operands no region writes and writes
+//! only its own slot; the slots are collected in index order and every reduction runs afterwards in
+//! that order, so every value is the serial realization's, which is the same code on one worker
+//! (the test `one_worker_and_many_return_the_same_values`).
+//!
+//! | Where | Regions that run together | Why they commute |
+//! |---|---|---|
+//! | a word's open (`refine`, `compare`'s read, the deposit's re-read) | the rings' operands, then the contacts'; within them, a Gram's rows and a solved chart's product's columns | each reads its own material (the standings, its own screws) and writes its own operands |
+//! | a tick of the word | the junctions, then the elements, then the transits; each fixed operand's rows; the rings' and contacts' power terms | a junction reads its own storage and arrivals, an element its own junction, a transit its two ends' outgoing waves and its own state; the balance terms and the power are summed afterwards in ring, then contact, order |
+//! | the receiving read | the receiving epochs; within each, the map's `2\|A\|` rows, then the classes' grain cells | each row and class reads the shared anchor and writes its own logit or cell |
+//! | the faces and the Holon ratio | the receiving phases' faces, then their ratios and code lengths | each reads its own read and target |
+//! | `pull_back` | the rings' transposed solves and the contacts' `M_a⁻¹`; per step in reverse, the junctions, then the elements (and each transposed solve's rows), then the transits (and each channel coordinate), then the junctions' reverse Swings (and each coordinate) | each reads its step's record and its own covectors, and writes its own; the conductance terms are added afterwards, in contact, then ring and incidence, order |
+//! | [`compose`] | the receiving map's gradient by row blocks; the rings (their ticks' charts, slices and contrast port's rows); the standings; the source ring's phases and pair-port ranks; the contacts (their ticks' charts and three forms) | each reads the word's return and its own material; the parts are joined in ring and contact order, so the deposit's steps stand in the serial order |
+//! | `deposit` ([`Constitution::deposited`]) | the loci the deposit names, each running its own steps in the deposit's order with its own budgeted carry; within a normal law, its samples' terms, its map update's row blocks, its Gram's rows and its carried entries | loci share no material, remainder or budgeted carry, and entries share nothing; the refusal returned is the first in the deposit's order |
+//!
+//! The regions stay serial where their arithmetic is another owner's: an exact inversion and
+//! `IntegralMatrix::{outer_sum, symmetric_times}` (`crate::ratio::linear`) run on one worker each,
+//! and are the widest ring's serial path. The receipt (24 windows of the standing real cut, before
+//! and after, identical readouts) is the notebook's (`research/notebook/hnn_design/README.md`).
+//!
+//! [open] **`ExactWork`'s operation counts.** The exposure's work counts the entries written, their
+//! bits, the peak, the resident entries and the span; its additions, multiplications and divisions
+//! stay zero. They are the integer multiply-adds and the normalizations (one `gcd` each) of
+//! `ratio::linear::vector::{integer_dot, row_dot, IntegralMatrix::{outer_sum, to_rows,
+//! symmetric_times}, combination}`, `ExactRatMatrix::{apply, inverse}`, the ticks'
+//! `propagation::{Rows::apply, junction_swing, element_step, transit, global_power}`, the return,
+//! [`compose`], and the deposit's `gram_sum`, normal law and carry; counting them needs an
+//! `ExactWork` threaded through each of those owners' loops (most outside `hnn`), so they are left
+//! uncounted rather than estimated from shapes.
 
 use std::collections::BTreeMap;
 use std::ops::Range;
+use std::time::{Duration, Instant};
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
@@ -86,8 +133,10 @@ use crate::hnn::propagation::{contact_exponent, path_attenuation};
 use crate::hnn::ratio::{
     Faces, HolonRatio, PhaseRatio, interval_sum, log2_enclosure, target_phases,
 };
+use crate::hnn::realization::{apply_rows, indexed, outer_rows};
 use crate::hnn::receiving::ReceivingPhases;
 use crate::hnn::retention::{AeonBoundary, Diamond, aeon_readings, collapse, contained, separator};
+use crate::hnn::word::KeptWord;
 use crate::holon::HolonError;
 use crate::holon::contact::FeatureCovector;
 use crate::navigator::Clock;
@@ -104,15 +153,40 @@ use crate::receiver::release::{DecisionRule, LawfulOptions, ReleaseReturn, relea
 // -------------------------------------------------------------------------------------------
 // the resident
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 struct PendingSlot {
     ratio: PendingRatio,
     emitted: Vec<Vec<Rat>>,
+    kept: Option<KeptRead>,
+}
+
+/// [definition; agent-inferred] **The refine's read, kept for its compare** (module header, "The
+/// kept read"): the word the refine ran, without the borrow of its field, and the faces it read,
+/// tagged with the commit of the constitution it read them at.
+#[derive(Debug)]
+struct KeptRead {
+    commit: u64,
+    word: KeptWord,
+    faces: Faces,
+}
+
+/// A clone of a slot drops its kept read: a word is not `Clone` (guard 2), and the clone's compare
+/// reads again, to the same values.
+impl Clone for PendingSlot {
+    fn clone(&self) -> Self {
+        Self {
+            ratio: self.ratio.clone(),
+            emitted: self.emitted.clone(),
+            kept: None,
+        }
+    }
 }
 
 impl PendingSlot {
     /// Its exact bits: the pending ratio's and the emitted logits' (the face a delayed compare
-    /// returns its residual against), each value by its numerator's and denominator's bits.
+    /// returns its residual against), each value by its numerator's and denominator's bits. The
+    /// kept read is not counted: it is a function of these operands at the published constitution,
+    /// and dropping it changes no value.
     fn bits(&self) -> u64 {
         self.ratio.bits()
             + self
@@ -198,6 +272,72 @@ pub struct Resident {
     arrived: Option<Arrived>,
     released_bits: u64,
     stop: Option<BudgetStop>,
+    wall: WallTimes,
+}
+
+/// [definition; agent-inferred] **The host's wall time by phase**, summed over the resident's
+/// methods: the host's wall clock read around each phase, in the exterior chart of a person
+/// (milliseconds when printed). No law, receipt, state bits or description reads it, and it holds
+/// no clock of the machine (guard 6 names those): two runs with identical exact readouts differ
+/// here. Each phase is timed only when it completes.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct WallTimes {
+    /// `refine`: the word opened at the cut, run over its window and read at the grain.
+    pub refine_read: Duration,
+    /// `refine`: the word's end read (the released change), the path at the cut and the loci
+    /// reached.
+    pub release: Duration,
+    /// `compare`: the contemporary read, when the refine's kept read is not at the published
+    /// commit.
+    pub compare_read: Duration,
+    /// `compare`: the residual, the target phases, the Holon ratio and its covector.
+    pub holon: Duration,
+    /// `compare`: the word's return.
+    pub pull_back: Duration,
+    /// `compare`: the composition onto the loci ([`compose`]).
+    pub compose: Duration,
+    /// `deposit`: the successor constitution ([`Constitution::deposited`]).
+    pub deposited: Duration,
+    /// `deposit`: the arrived targets re-read at the successor.
+    pub reread: Duration,
+    /// `ingest`: the cells taken into the moment.
+    pub ingest: Duration,
+}
+
+impl WallTimes {
+    /// The phases by name, in the order the methods run them.
+    pub fn phases(&self) -> [(&'static str, Duration); 9] {
+        [
+            ("refine read", self.refine_read),
+            ("release", self.release),
+            ("compare read", self.compare_read),
+            ("holon and covector", self.holon),
+            ("pull_back", self.pull_back),
+            ("compose", self.compose),
+            ("deposited", self.deposited),
+            ("re-read", self.reread),
+            ("ingest", self.ingest),
+        ]
+    }
+
+    /// The phases' sum.
+    pub fn total(&self) -> Duration {
+        self.phases().iter().map(|(_, time)| *time).sum()
+    }
+}
+
+impl std::ops::AddAssign for WallTimes {
+    fn add_assign(&mut self, other: Self) {
+        self.refine_read += other.refine_read;
+        self.release += other.release;
+        self.compare_read += other.compare_read;
+        self.holon += other.holon;
+        self.pull_back += other.pull_back;
+        self.compose += other.compose;
+        self.deposited += other.deposited;
+        self.reread += other.reread;
+        self.ingest += other.ingest;
+    }
 }
 
 /// [definition] **The budget stop** (design (d), R3 §5): the refused successor's exact bits, the
@@ -275,9 +415,31 @@ impl Resident {
         &self.ledger
     }
 
+    /// The host's wall time by phase since the mount (exterior; [`WallTimes`]).
+    pub fn wall(&self) -> &WallTimes {
+        &self.wall
+    }
+
     fn fresh(&mut self) -> u64 {
         self.next += 1;
         self.next
+    }
+
+    /// **Drop every kept read** when a constitution is published (a deposit's successor, a
+    /// collapse's descent): each was read at the constitution published before, so each pending
+    /// ratio's compare reads again at the contemporary one (module header, "The kept read").
+    fn forget_kept_reads(&mut self) {
+        for slot in self.pending.values_mut() {
+            slot.kept = None;
+        }
+    }
+
+    /// Whether a pending ratio holds its refine's kept read (the tests' view of the reuse).
+    #[cfg(test)]
+    pub(crate) fn holds_kept_read(&self, pending: &PendingId) -> bool {
+        self.pending
+            .get(pending)
+            .is_some_and(|slot| slot.kept.is_some())
     }
 
     /// The exact bits of the resident's state: the lift point, the open moments, the pending
@@ -391,6 +553,7 @@ impl Reference {
             arrived: None,
             released_bits: 0,
             stop: None,
+            wall: WallTimes::default(),
         })
     }
 }
@@ -534,7 +697,9 @@ impl ExecutionPort for Reference {
             .moments
             .get_mut(&id)
             .expect("the moment was checked or opened");
+        let start = Instant::now();
         let ingested = open.ingest(&field, &mut resident.current, &codes)?;
+        resident.wall.ingest += start.elapsed();
         if ingested.cells > 0 {
             resident.aeon.keys_admitted = false;
         }
@@ -676,8 +841,11 @@ impl ExecutionPort for Reference {
             resident.constitution.commit(),
         );
         let field = &resident.field;
+        let start = Instant::now();
         let (word, faces) = ratio.read(field, &resident.constitution)?;
-        let released = word.release()?;
+        let read = start.elapsed();
+        let start = Instant::now();
+        let released = word.released()?;
         let path = path_attenuation(
             field,
             ratio.anchor(),
@@ -711,19 +879,29 @@ impl ExecutionPort for Reference {
         receipt.balances = released.balances;
         receipt.unresolved = faces.faces.iter().map(|face| face.fibres()).collect();
         let order = source_order(field, ratio.anchor(), ratio.moment().cells());
+        let kept = KeptRead {
+            commit: resident.constitution.commit(),
+            word: word.keep(),
+            faces: faces.clone(),
+        };
+        resident.wall.refine_read += read;
+        resident.wall.release += start.elapsed();
         let id = PendingId(resident.fresh());
         resident.pending.insert(
             id,
             PendingSlot {
                 ratio,
                 emitted: faces.logits.clone(),
+                kept: Some(kept),
             },
         );
         Ok((
             id,
             InteractionReturn {
                 forward: Component::Present(faces),
-                pullback: Component::Absent("refine is forward only; its word is dropped"),
+                pullback: Component::Absent(
+                    "refine is forward only; its word is kept for the compare at its commit",
+                ),
                 deposit: Component::Absent("refine publishes only faces"),
                 order: Component::Present(order),
                 phases: Component::Present(vec![phases.clone()]),
@@ -747,9 +925,10 @@ impl ExecutionPort for Reference {
         // Everything is read from the borrowed pending ratio; it is consumed only once the compare
         // has succeeded, so a refused target or a refused read leaves it open (review S11).
         let field = resident.field.clone();
+        let commit = resident.constitution.commit();
         let slot = resident
             .pending
-            .get(&pending)
+            .get_mut(&pending)
             .ok_or(HnnError::UnknownHandle {
                 handle: Handle::Pending(pending),
             })?;
@@ -762,8 +941,23 @@ impl ExecutionPort for Reference {
                 found: targets.len(),
             });
         }
+        // The kept read is the contemporary read when the constitution is still the one it was
+        // read at; otherwise the word is read again at the published constitution (module header,
+        // "The kept read").
+        let kept = slot.kept.take().filter(|kept| kept.commit == commit);
+        let slot = &*slot;
         let ratio = &slot.ratio;
-        let (word, faces) = ratio.read(&field, &resident.constitution)?;
+        let mut wall = WallTimes::default();
+        let (word, faces) = match kept {
+            Some(KeptRead { word, faces, .. }) => (word.resume(&field), faces),
+            None => {
+                let start = Instant::now();
+                let read = ratio.read(&field, &resident.constitution)?;
+                wall.compare_read = start.elapsed();
+                read
+            }
+        };
+        let start = Instant::now();
         let residual: Vec<Vec<Rat>> = faces
             .logits
             .iter()
@@ -780,8 +974,13 @@ impl ExecutionPort for Reference {
                 ring: phases.ring(),
             })?
             .clone();
+        wall.holon = start.elapsed();
+        let start = Instant::now();
         let back = word.pull_back(&covector, &map, &ratio.anchor()[phases.ring()], &phases)?;
+        wall.pull_back = start.elapsed();
+        let start = Instant::now();
         let (pullback, deposit) = compose(&field, &resident.constitution, ratio, &back)?;
+        wall.compose = start.elapsed();
         let code_length = holon.code_length()?;
         let order = source_order(&field, ratio.anchor(), ratio.moment().cells());
         let mut work = ExactWork::nothing();
@@ -809,6 +1008,7 @@ impl ExecutionPort for Reference {
             });
         };
         resident.ledger.arrive(code_length, targets.len() as u64);
+        resident.wall += wall;
         let id = StagedId(resident.fresh());
         resident.staged.insert(
             id,
@@ -856,6 +1056,7 @@ impl ExecutionPort for Reference {
             expected: 1,
             found: 0,
         })?;
+        let start = Instant::now();
         let (next, reading) = match resident.constitution.deposited(&slot.deposit) {
             Ok(published) => published,
             Err(refusal @ HnnError::ConstitutionBudget { .. }) => {
@@ -867,7 +1068,10 @@ impl ExecutionPort for Reference {
         };
         // Every fallible step is taken on the successor before anything is published, so a refusal
         // leaves the predecessor, the ledger and the staged deposit as they were (review S12).
+        let deposited = start.elapsed();
+        let start = Instant::now();
         let reread = arrived.code_length(&field, &next)?;
+        let reread_time = start.elapsed();
         let mut work = ExactWork::nothing();
         work.stepped();
         work.resident(reading.bits);
@@ -886,6 +1090,9 @@ impl ExecutionPort for Reference {
         resident.ledger.deposit(reread)?;
         resident.staged.remove(&staged);
         resident.constitution = next;
+        resident.forget_kept_reads();
+        resident.wall.deposited += deposited;
+        resident.wall.reread += reread_time;
         Ok(InteractionReturn {
             forward: Component::Present(()),
             pullback: Component::Absent("a deposit consumes covectors"),
@@ -980,6 +1187,8 @@ impl ExecutionPort for Reference {
         contained(admitted, &resident.admitted)?;
         let before = resident.state_bits();
         let field = resident.field.clone();
+        // The collapse publishes the descended constitution at the same commit.
+        resident.forget_kept_reads();
         let collapsed = collapse(&field, &mut resident.constitution, admitted)?;
         let mut carried = Vec::new();
         let mut refused = Vec::new();
@@ -1145,15 +1354,20 @@ fn matrix_of(rows: Vec<Vec<Rat>>, columns: usize) -> Result<ExactRatMatrix, HnnE
 /// equals the termwise rational sum. The offset counts enter the pair port through their nonzero
 /// slots only, summed over the small counts as `C_c b_ρ`, `C_cᵀ a_ρ` and `a_ρᵀ C_c b_ρ` before the
 /// word's `e_ρ·h_c` and `h_c` multiply them (distributivity over ℚ).
+///
+/// [definition; agent-inferred] **Its realization** (module header, "The host realization"): the
+/// receiving map's gradient by row blocks, then the rings (each reading only its own ticks and
+/// material, the slices of a ring each reading only their own pair), the standings, the source
+/// rings (the pair port's ranks each reading only their own reads) and the contacts (each reading
+/// only its own ticks and factors) run together, each writing only its own part; the parts are
+/// joined afterwards in ring and contact order, so the deposit's steps stand in the serial order.
 pub fn compose(
     field: &Field,
     constitution: &Constitution,
     ratio: &PendingRatio,
     back: &WordReturn,
 ) -> Result<(Pullback, Deposit), HnnError> {
-    use crate::ratio::linear::vector::{
-        Chart, IntegralMatrix, combination, integer_dot, integral, lcm,
-    };
+    use crate::ratio::linear::vector::{Chart, combination, integral};
     let phases = ratio.phases();
     let diamond = Diamond::of(field, phases);
     let released = constitution.released();
@@ -1167,7 +1381,7 @@ pub fn compose(
     let mut factors: Vec<FactorStep> = Vec::new();
     let one = Rat::one();
 
-    // The receiving map: Σ_j g_j ⊗ P_R^(τ_R) v_R(e_j).
+    // The receiving map: Σ_j g_j ⊗ P_R^(τ_R) v_R(e_j), by row blocks.
     let receiving = phases.ring();
     let width_r = field.ring(receiving).width();
     let read_charts: Vec<[Chart; 2]> = back
@@ -1175,14 +1389,14 @@ pub fn compose(
         .iter()
         .map(|(feature, gradient)| [integral(gradient), integral(feature)])
         .collect();
-    let map_gradient = IntegralMatrix::outer_sum(
+    let map_gradient = outer_rows(
         2 * alphabet,
         width_r,
-        read_charts
+        &read_charts
             .iter()
-            .map(|[gradient, feature]| (&one, gradient, feature)),
-    )
-    .to_rows();
+            .map(|[gradient, feature]| (&one, gradient, feature))
+            .collect::<Vec<_>>(),
+    );
     let samples = back
         .reads
         .iter()
@@ -1197,148 +1411,26 @@ pub fn compose(
         samples,
     });
 
-    // The rings' element material and class covectors.
-    let mut ring_pullbacks = Vec::with_capacity(field.rings().len());
-    let mut classes_all: Vec<Vec<Rat>> = Vec::with_capacity(field.rings().len());
-    let mut midpoint_energy: Vec<Rat> = Vec::with_capacity(field.rings().len());
-    for g in 0..field.rings().len() {
-        let n = field.ring(g).width();
-        let passive = constitution.passive_factor(g);
-        let slices = constitution.slices(g);
-        let ticks = &back.elements[g];
-        // The sheet classes this word read.
-        let sheets = sheet_classes(field, constitution, g)?;
-        // Each tick's adjoint `u`, midpoint `x̄` and contrast `c`, read once in the integral chart.
-        let charts: Vec<[Chart; 3]> = ticks
-            .iter()
-            .map(|tick| {
-                [
-                    integral(&tick.adjoint),
-                    integral(&tick.midpoint),
-                    integral(&tick.contrast),
-                ]
-            })
-            .collect();
-        // K̄ = Σ_t u_t x̄_tᵀ and the contrast port's Σ_t u_t c_tᵀ.
-        let element_gradient =
-            IntegralMatrix::outer_sum(n, n, charts.iter().map(|[u, x, _]| (&one, u, x)));
-        let contrast_gradient =
-            IntegralMatrix::outer_sum(n, n, charts.iter().map(|[u, _, c]| (&one, u, c))).to_rows();
-        // The classes `Σ_t (u·s)(x̄·v) − (u·v)(x̄·s)` and the slices' gradients
-        // `σ Σ_t [(x̄·v)u − (u·v)x̄]`, `σ Σ_t [(u·s)x̄ − (x̄·s)u]`, on the common denominator
-        // `D = lcm_t(d_u d_x̄)` of the ticks' `u x̄ᵀ`.
-        let common = charts
-            .iter()
-            .fold(BigInt::one(), |d, [u, x, _]| lcm(&d, &(&u.1 * &x.1)));
-        let lifted: Vec<(Vec<BigInt>, Vec<BigInt>)> = charts
-            .iter()
-            .map(|[u, x, _]| {
-                let factor = &common / (&u.1 * &x.1);
-                (
-                    u.0.iter().map(|value| value * &factor).collect(),
-                    x.0.iter().map(|value| value * &factor).collect(),
-                )
-            })
-            .collect();
-        let mut classes = vec![Rat::zero(); n];
-        let mut slice_gradient = Vec::with_capacity(slices.len());
-        for (rho, (su, sv)) in slices.iter().enumerate() {
-            let ((su, d_su), (sv, d_sv)) = (integral(su), integral(sv));
-            let mut du = vec![BigInt::zero(); n];
-            let mut dv = vec![BigInt::zero(); n];
-            for ([u, x, _], (u_lift, x_lift)) in charts.iter().zip(&lifted) {
-                let (u_su, x_sv, u_sv, x_su) = (
-                    integer_dot(&u.0, &su),
-                    integer_dot(&x.0, &sv),
-                    integer_dot(&u.0, &sv),
-                    integer_dot(&x.0, &su),
-                );
-                classes[rho] +=
-                    Rat::new(&u_su * &x_sv - &u_sv * &x_su, &u.1 * &x.1 * &d_su * &d_sv);
-                if !(x_sv.is_zero() && u_sv.is_zero()) {
-                    for (entry, (ui, xi)) in du.iter_mut().zip(u_lift.iter().zip(x_lift)) {
-                        *entry += &x_sv * ui - &u_sv * xi;
-                    }
-                }
-                if !(u_su.is_zero() && x_su.is_zero()) {
-                    for (entry, (ui, xi)) in dv.iter_mut().zip(u_lift.iter().zip(x_lift)) {
-                        *entry += &u_su * xi - &x_su * ui;
-                    }
-                }
-            }
-            let signed = |value: BigInt| if sheets[rho] { value } else { -value };
-            slice_gradient.push((
-                du.into_iter()
-                    .map(|value| Rat::new(signed(value), &common * &d_sv))
-                    .collect::<Vec<Rat>>(),
-                dv.into_iter()
-                    .map(|value| Rat::new(signed(value), &common * &d_su))
-                    .collect::<Vec<Rat>>(),
-            ));
-        }
-        let mut energy = Rat::zero();
-        let mut contrast_samples = Vec::new();
-        for tick in ticks {
-            if diamond.element_window(g, tick.tick) {
-                energy += dot(&tick.midpoint, &tick.midpoint);
-                contrast_samples.push(Sample {
-                    weight: one.clone(),
-                    feature: tick.contrast.clone(),
-                    covector: negated(&tick.adjoint),
-                });
-            }
-        }
-        // K = −f fᵀ + …: ∂ℓ/∂f = −(K̄ + K̄ᵀ) f.
-        let passive_gradient = element_gradient.symmetric_times(passive, true)?;
-        let window = ticks
-            .iter()
-            .any(|tick| diamond.element_window(g, tick.tick));
-        if retained(Locus::Element(g)) && window {
-            linear.push(LinearStep {
-                locus: LinearLocus::Contrast(g),
-                samples: contrast_samples,
-            });
-            factors.push(FactorStep {
-                gradient: FactorGradient::Passive {
-                    ring: g,
-                    gradient: matrix_of(
-                        passive_gradient.iter().map(|row| negated(row)).collect(),
-                        passive.columns(),
-                    )?,
-                },
-                energy: energy.clone(),
-            });
-            factors.push(FactorStep {
-                gradient: FactorGradient::Slices {
-                    ring: g,
-                    gradient: slice_gradient
-                        .iter()
-                        .map(|(du, dv)| (negated(du), negated(dv)))
-                        .collect(),
-                },
-                energy: energy.clone(),
-            });
-        }
-        ring_pullbacks.push(RingPullback {
-            ring: g,
-            passive: matrix_of(passive_gradient, passive.columns())?,
-            contrast: matrix_of(contrast_gradient, n)?,
-            slices: slice_gradient,
-            classes: classes.clone(),
-            standing: Vec::new(),
-            source: None,
-            pair: Vec::new(),
-            moment: None,
-        });
-        classes_all.push(classes);
-        midpoint_energy.push(energy);
+    // The rings' element material and class covectors, the rings together.
+    let parts = indexed(field.rings().len(), |g| {
+        compose_ring(field, constitution, back, &diamond, &retained, g)
+    })?;
+    let mut ring_pullbacks = Vec::with_capacity(parts.len());
+    let mut classes_all: Vec<Vec<Rat>> = Vec::with_capacity(parts.len());
+    let mut midpoint_energy: Vec<Rat> = Vec::with_capacity(parts.len());
+    for part in parts {
+        linear.extend(part.contrast);
+        factors.extend(part.factors);
+        ring_pullbacks.push(part.pullback);
+        classes_all.push(part.classes);
+        midpoint_energy.push(part.energy);
     }
 
     // The standing, through the declared lock chart: Δ = M q with the contrast map `M`, which is
     // symmetric, so ∂ℓ/∂q = Mᵀ g_σ = M g_σ ([`Field::contrast`]).
     let class_fields: Vec<&[Rat]> = classes_all.iter().map(Vec::as_slice).collect();
-    for g in 0..field.rings().len() {
-        let standing = field.contrast(g, &class_fields)?;
+    let standings = indexed(field.rings().len(), |g| field.contrast(g, &class_fields))?;
+    for (g, standing) in standings.into_iter().enumerate() {
         if retained(Locus::Standing(g)) {
             factors.push(FactorStep {
                 gradient: FactorGradient::Standing {
@@ -1360,16 +1452,13 @@ pub fn compose(
         let turned: Vec<Vec<Rat>> = (0..d)
             .map(|c| ring.rotate(opening, &(BigInt::from(c) - &anchor[g])))
             .collect();
-        let turned_charts: Vec<Chart> = turned.iter().map(|h| integral(h)).collect();
+        let turned_charts: Vec<Chart> = indexed(turned.len(), |c| Ok(integral(&turned[c])))?;
         let source = constitution
             .source_port(g)
             .ok_or(HnnError::MissingSourcePort { ring: g })?;
         let gradient = moment.encoder_covector(field, &current, g, opening)?;
         let source_t = source.transpose()?;
-        let moment_covector = turned
-            .iter()
-            .map(|h| source_t.apply(h))
-            .collect::<Result<Vec<_>, _>>()?;
+        let moment_covector = indexed(turned.len(), |c| apply_rows(&source_t, &turned[c]))?;
         let mut source_samples = Vec::new();
         for (c, h) in turned.iter().enumerate() {
             let counts = moment.phase_counts(g, c)?;
@@ -1409,10 +1498,8 @@ pub fn compose(
                 nonzero.push(slots);
             }
             let energy = Rat::from_integer(squares);
-            let mut outputs = Vec::with_capacity(rank);
-            let mut current_reads = Vec::with_capacity(rank);
-            let mut earlier_reads = Vec::with_capacity(rank);
-            for rho in 0..rank {
+            // Each rank reads only its own reads `a_ρ`, `b_ρ`, `e_ρ`: the ranks run together.
+            let ranks = indexed(rank, |rho| {
                 let (a_rho, b_rho, e_rho) = (
                     &pair.current_reads()[rho],
                     &pair.earlier_reads()[rho],
@@ -1441,15 +1528,25 @@ pub fn compose(
                         by_earlier.push((e_h, integral(&earlier_row)));
                     }
                 }
-                current_reads.push(combination(
-                    alphabet,
-                    by_current.iter().map(|(weight, chart)| (weight, chart)),
-                ));
-                earlier_reads.push(combination(
-                    alphabet,
-                    by_earlier.iter().map(|(weight, chart)| (weight, chart)),
-                ));
-                outputs.push(combination(n, weights.iter().zip(&turned_charts)));
+                Ok((
+                    combination(n, weights.iter().zip(&turned_charts)),
+                    combination(
+                        alphabet,
+                        by_current.iter().map(|(weight, chart)| (weight, chart)),
+                    ),
+                    combination(
+                        alphabet,
+                        by_earlier.iter().map(|(weight, chart)| (weight, chart)),
+                    ),
+                ))
+            })?;
+            let mut outputs = Vec::with_capacity(rank);
+            let mut current_reads = Vec::with_capacity(rank);
+            let mut earlier_reads = Vec::with_capacity(rank);
+            for (output, current_read, earlier_read) in ranks {
+                outputs.push(output);
+                current_reads.push(current_read);
+                earlier_reads.push(earlier_read);
             }
             pair_steps.push(FactorStep {
                 gradient: FactorGradient::PairPort {
@@ -1475,104 +1572,23 @@ pub fn compose(
         ring_pullbacks[g].moment = Some(moment_covector);
     }
 
-    // The contacts: their channel factors, conductance and pair geometry.
-    let mut contact_pullbacks = Vec::with_capacity(field.contacts().len());
-    let (two, minus_h, half_h) = (integer(2), -h.clone(), &h / integer(2));
-    for (a, contact) in field.contacts().iter().enumerate() {
-        let k = contact.width();
-        let mut energies = [Rat::zero(), Rat::zero(), Rat::zero()];
-        let mut window = false;
-        // Each tick's r̄, slip w − ω, strain u + ½hω and ω, read once in the integral chart.
-        let mut charts: Vec<[Chart; 4]> = Vec::with_capacity(back.transits[a].len());
-        for tick in &back.transits[a] {
-            let (r, u, w, omega) = (&tick.solved, &tick.displacement, &tick.rate, &tick.midpoint);
-            let slip: Vec<Rat> = w.iter().zip(omega).map(|(w, o)| w - o).collect();
-            let strain = add(u, &scale(&half_h, omega));
-            if diamond.channel_window(field, a, tick.tick) {
-                window = true;
-                energies[0] += dot(&slip, &slip);
-                energies[1] += dot(&strain, &strain);
-                energies[2] += dot(omega, omega);
-            }
-            charts.push([
-                integral(r),
-                integral(&slip),
-                integral(&strain),
-                integral(omega),
-            ]);
-        }
-        // C̄ = Σ 2 r̄ (w − ω)ᵀ,  K̄ = −h Σ r̄ (u + ½hω)ᵀ,  D̄ = −h Σ r̄ ωᵀ.
-        let storage =
-            IntegralMatrix::outer_sum(k, k, charts.iter().map(|[r, slip, ..]| (&two, r, slip)));
-        let stiffness = IntegralMatrix::outer_sum(
-            k,
-            k,
-            charts.iter().map(|[r, _, strain, _]| (&minus_h, r, strain)),
-        );
-        let dissipation = IntegralMatrix::outer_sum(
-            k,
-            k,
-            charts.iter().map(|[r, .., omega]| (&minus_h, r, omega)),
-        );
-        let pulled = [
-            storage.symmetric_times(constitution.contact_storage(a), false)?,
-            stiffness.symmetric_times(constitution.contact_stiffness(a), false)?,
-            dissipation.symmetric_times(constitution.contact_dissipation(a), false)?,
-        ];
-        if retained(Locus::Channel(a)) && window {
-            let columns = [
-                constitution.contact_storage(a).columns(),
-                constitution.contact_stiffness(a).columns(),
-                constitution.contact_dissipation(a).columns(),
-            ];
-            let descent = |index: usize| {
-                matrix_of(
-                    pulled[index].iter().map(|row| negated(row)).collect(),
-                    columns[index],
-                )
-            };
-            factors.push(FactorStep {
-                gradient: FactorGradient::Storage {
-                    contact: a,
-                    gradient: descent(0)?,
-                },
-                energy: energies[0].clone(),
-            });
-            factors.push(FactorStep {
-                gradient: FactorGradient::Stiffness {
-                    contact: a,
-                    gradient: descent(1)?,
-                },
-                energy: energies[1].clone(),
-            });
-            factors.push(FactorStep {
-                gradient: FactorGradient::Dissipation {
-                    contact: a,
-                    gradient: descent(2)?,
-                },
-                energy: energies[2].clone(),
-            });
-        }
-        // λ_Q: G_a = 2^(−β Q / 2) Y_a, so ∂ℓ/∂Q = −(β/2) G_a λ_G in units of ln 2.
-        let exponent = contact_exponent(field, a, anchor)?;
-        let conductance = power_of_two(&exponent.carry)? * contact.admittance();
-        let quadrance = -(contact.exponent() / integer(2)) * &conductance * &back.conductance[a];
-        let feature = FeatureCovector {
-            delta: RatVec3::zero(),
-            quadrance,
-            gradient: [Rat::zero(), Rat::zero()],
-        };
-        let key = contact.pair(field, anchor).feature_pullback(&feature)?;
-        let [storage, stiffness, dissipation] = pulled;
-        contact_pullbacks.push(ContactPullback {
-            contact: a,
-            feature,
-            conductance: back.conductance[a].clone(),
-            storage: matrix_of(storage, constitution.contact_storage(a).columns())?,
-            stiffness: matrix_of(stiffness, constitution.contact_stiffness(a).columns())?,
-            dissipation: matrix_of(dissipation, constitution.contact_dissipation(a).columns())?,
-            key,
-        });
+    // The contacts: their channel factors, conductance and pair geometry, the contacts together.
+    let parts = indexed(field.contacts().len(), |a| {
+        compose_contact(
+            field,
+            constitution,
+            back,
+            &diamond,
+            &retained,
+            anchor,
+            &h,
+            a,
+        )
+    })?;
+    let mut contact_pullbacks = Vec::with_capacity(parts.len());
+    for (steps, pullback) in parts {
+        factors.extend(steps);
+        contact_pullbacks.push(pullback);
     }
 
     let reached: Vec<Locus> = crate::hnn::retention::loci(field)
@@ -1587,6 +1603,305 @@ pub fn compose(
     Ok((
         pullback,
         Deposit::new(constitution.commit(), linear, factors, reached),
+    ))
+}
+
+/// **One ring's part of the composition**: its contrast port's window (when retained), its
+/// passive and slice factor steps (when retained), its pullback without the standing and the
+/// source parts, its class covector and its midpoints' energy.
+struct RingPart {
+    contrast: Option<LinearStep>,
+    factors: Vec<FactorStep>,
+    pullback: RingPullback,
+    classes: Vec<Rat>,
+    energy: Rat,
+}
+
+/// **Ring `g`'s part of the composition** (see [`compose`]): its ticks' vectors read once in the
+/// integral chart, `K̄ = Σ_t u_t x̄_tᵀ`, the contrast port's `Σ_t u_t c_tᵀ`, and per slice the class
+/// and the slice's gradients, the slices together.
+fn compose_ring(
+    field: &Field,
+    constitution: &Constitution,
+    back: &WordReturn,
+    diamond: &Diamond,
+    retained: &(impl Fn(Locus) -> bool + Sync),
+    g: usize,
+) -> Result<RingPart, HnnError> {
+    use crate::ratio::linear::vector::{Chart, IntegralMatrix, integer_dot, integral, lcm};
+    let one = Rat::one();
+    let n = field.ring(g).width();
+    let passive = constitution.passive_factor(g);
+    let slices = constitution.slices(g);
+    let ticks = &back.elements[g];
+    // The sheet classes this word read.
+    let sheets = sheet_classes(field, constitution, g)?;
+    // Each tick's adjoint `u`, midpoint `x̄` and contrast `c`, read once in the integral chart.
+    let charts: Vec<[Chart; 3]> = indexed(ticks.len(), |t| {
+        let tick = &ticks[t];
+        Ok([
+            integral(&tick.adjoint),
+            integral(&tick.midpoint),
+            integral(&tick.contrast),
+        ])
+    })?;
+    // K̄ = Σ_t u_t x̄_tᵀ and the contrast port's Σ_t u_t c_tᵀ.
+    let element_gradient =
+        IntegralMatrix::outer_sum(n, n, charts.iter().map(|[u, x, _]| (&one, u, x)));
+    let contrast_gradient = outer_rows(
+        n,
+        n,
+        &charts
+            .iter()
+            .map(|[u, _, c]| (&one, u, c))
+            .collect::<Vec<_>>(),
+    );
+    // The classes `Σ_t (u·s)(x̄·v) − (u·v)(x̄·s)` and the slices' gradients
+    // `σ Σ_t [(x̄·v)u − (u·v)x̄]`, `σ Σ_t [(u·s)x̄ − (x̄·s)u]`, on the common denominator
+    // `D = lcm_t(d_u d_x̄)` of the ticks' `u x̄ᵀ`.
+    let common = charts
+        .iter()
+        .fold(BigInt::one(), |d, [u, x, _]| lcm(&d, &(&u.1 * &x.1)));
+    let lifted: Vec<(Vec<BigInt>, Vec<BigInt>)> = charts
+        .iter()
+        .map(|[u, x, _]| {
+            let factor = &common / (&u.1 * &x.1);
+            (
+                u.0.iter().map(|value| value * &factor).collect(),
+                x.0.iter().map(|value| value * &factor).collect(),
+            )
+        })
+        .collect();
+    // Each slice reads only its own pair `(s, v)` against the shared ticks: the slices run
+    // together.
+    let per_slice = indexed(slices.len(), |rho| {
+        let (su, sv) = &slices[rho];
+        let ((su, d_su), (sv, d_sv)) = (integral(su), integral(sv));
+        let mut class = Rat::zero();
+        let mut du = vec![BigInt::zero(); n];
+        let mut dv = vec![BigInt::zero(); n];
+        for ([u, x, _], (u_lift, x_lift)) in charts.iter().zip(&lifted) {
+            let (u_su, x_sv, u_sv, x_su) = (
+                integer_dot(&u.0, &su),
+                integer_dot(&x.0, &sv),
+                integer_dot(&u.0, &sv),
+                integer_dot(&x.0, &su),
+            );
+            class += Rat::new(&u_su * &x_sv - &u_sv * &x_su, &u.1 * &x.1 * &d_su * &d_sv);
+            if !(x_sv.is_zero() && u_sv.is_zero()) {
+                for (entry, (ui, xi)) in du.iter_mut().zip(u_lift.iter().zip(x_lift)) {
+                    *entry += &x_sv * ui - &u_sv * xi;
+                }
+            }
+            if !(u_su.is_zero() && x_su.is_zero()) {
+                for (entry, (ui, xi)) in dv.iter_mut().zip(u_lift.iter().zip(x_lift)) {
+                    *entry += &u_su * xi - &x_su * ui;
+                }
+            }
+        }
+        let signed = |value: BigInt| if sheets[rho] { value } else { -value };
+        Ok((
+            class,
+            (
+                du.into_iter()
+                    .map(|value| Rat::new(signed(value), &common * &d_sv))
+                    .collect::<Vec<Rat>>(),
+                dv.into_iter()
+                    .map(|value| Rat::new(signed(value), &common * &d_su))
+                    .collect::<Vec<Rat>>(),
+            ),
+        ))
+    })?;
+    let mut classes = vec![Rat::zero(); n];
+    let mut slice_gradient = Vec::with_capacity(slices.len());
+    for (rho, (class, gradient)) in per_slice.into_iter().enumerate() {
+        classes[rho] += class;
+        slice_gradient.push(gradient);
+    }
+    let mut energy = Rat::zero();
+    let mut contrast_samples = Vec::new();
+    for tick in ticks {
+        if diamond.element_window(g, tick.tick) {
+            energy += dot(&tick.midpoint, &tick.midpoint);
+            contrast_samples.push(Sample {
+                weight: one.clone(),
+                feature: tick.contrast.clone(),
+                covector: negated(&tick.adjoint),
+            });
+        }
+    }
+    // K = −f fᵀ + …: ∂ℓ/∂f = −(K̄ + K̄ᵀ) f.
+    let passive_gradient = element_gradient.symmetric_times(passive, true)?;
+    let window = ticks
+        .iter()
+        .any(|tick| diamond.element_window(g, tick.tick));
+    let (mut contrast, mut factors) = (None, Vec::new());
+    if retained(Locus::Element(g)) && window {
+        contrast = Some(LinearStep {
+            locus: LinearLocus::Contrast(g),
+            samples: contrast_samples,
+        });
+        factors.push(FactorStep {
+            gradient: FactorGradient::Passive {
+                ring: g,
+                gradient: matrix_of(
+                    passive_gradient.iter().map(|row| negated(row)).collect(),
+                    passive.columns(),
+                )?,
+            },
+            energy: energy.clone(),
+        });
+        factors.push(FactorStep {
+            gradient: FactorGradient::Slices {
+                ring: g,
+                gradient: slice_gradient
+                    .iter()
+                    .map(|(du, dv)| (negated(du), negated(dv)))
+                    .collect(),
+            },
+            energy: energy.clone(),
+        });
+    }
+    Ok(RingPart {
+        contrast,
+        factors,
+        pullback: RingPullback {
+            ring: g,
+            passive: matrix_of(passive_gradient, passive.columns())?,
+            contrast: matrix_of(contrast_gradient, n)?,
+            slices: slice_gradient,
+            classes: classes.clone(),
+            standing: Vec::new(),
+            source: None,
+            pair: Vec::new(),
+            moment: None,
+        },
+        classes,
+        energy,
+    })
+}
+
+/// **Contact `a`'s part of the composition** (see [`compose`]): its ticks' vectors read once in the
+/// integral chart, the three forms' pulls `C̄ = Σ 2 r̄ (w − ω)ᵀ`, `K̄ = −h Σ r̄ (u + ½hω)ᵀ`,
+/// `D̄ = −h Σ r̄ ωᵀ` (the three together), its factor steps (when retained) and its pullback.
+#[allow(clippy::too_many_arguments)]
+fn compose_contact(
+    field: &Field,
+    constitution: &Constitution,
+    back: &WordReturn,
+    diamond: &Diamond,
+    retained: &(impl Fn(Locus) -> bool + Sync),
+    anchor: &[BigInt],
+    h: &Rat,
+    a: usize,
+) -> Result<(Vec<FactorStep>, ContactPullback), HnnError> {
+    use crate::ratio::linear::vector::{Chart, IntegralMatrix, integral};
+    let contact = field.contact(a);
+    let k = contact.width();
+    let (two, minus_h, half_h) = (integer(2), -h.clone(), h / integer(2));
+    // Each tick's r̄, slip w − ω, strain u + ½hω and ω, read once in the integral chart, the ticks
+    // together; the window's energies are summed afterwards in tick order.
+    let ticks = &back.transits[a];
+    let read = indexed(ticks.len(), |t| {
+        let tick = &ticks[t];
+        let (r, u, w, omega) = (&tick.solved, &tick.displacement, &tick.rate, &tick.midpoint);
+        let slip: Vec<Rat> = w.iter().zip(omega).map(|(w, o)| w - o).collect();
+        let strain = add(u, &scale(&half_h, omega));
+        let energies = diamond
+            .channel_window(field, a, tick.tick)
+            .then(|| [dot(&slip, &slip), dot(&strain, &strain), dot(omega, omega)]);
+        Ok((
+            [
+                integral(r),
+                integral(&slip),
+                integral(&strain),
+                integral(omega),
+            ],
+            energies,
+        ))
+    })?;
+    let mut energies = [Rat::zero(), Rat::zero(), Rat::zero()];
+    let mut window = false;
+    let mut charts: Vec<[Chart; 4]> = Vec::with_capacity(read.len());
+    for (chart, terms) in read {
+        if let Some(terms) = terms {
+            window = true;
+            for (energy, term) in energies.iter_mut().zip(terms) {
+                *energy += term;
+            }
+        }
+        charts.push(chart);
+    }
+    // C̄ = Σ 2 r̄ (w − ω)ᵀ,  K̄ = −h Σ r̄ (u + ½hω)ᵀ,  D̄ = −h Σ r̄ ωᵀ, each pulled onto its factor.
+    let forms = [
+        constitution.contact_storage(a),
+        constitution.contact_stiffness(a),
+        constitution.contact_dissipation(a),
+    ];
+    let pulled = indexed(3, |index| {
+        let weight = if index == 0 { &two } else { &minus_h };
+        Ok(IntegralMatrix::outer_sum(
+            k,
+            k,
+            charts
+                .iter()
+                .map(|chart| (weight, &chart[0], &chart[index + 1])),
+        )
+        .symmetric_times(forms[index], false)?)
+    })?;
+    let mut steps = Vec::new();
+    if retained(Locus::Channel(a)) && window {
+        let descent = |index: usize| {
+            matrix_of(
+                pulled[index].iter().map(|row| negated(row)).collect(),
+                forms[index].columns(),
+            )
+        };
+        steps.push(FactorStep {
+            gradient: FactorGradient::Storage {
+                contact: a,
+                gradient: descent(0)?,
+            },
+            energy: energies[0].clone(),
+        });
+        steps.push(FactorStep {
+            gradient: FactorGradient::Stiffness {
+                contact: a,
+                gradient: descent(1)?,
+            },
+            energy: energies[1].clone(),
+        });
+        steps.push(FactorStep {
+            gradient: FactorGradient::Dissipation {
+                contact: a,
+                gradient: descent(2)?,
+            },
+            energy: energies[2].clone(),
+        });
+    }
+    // λ_Q: G_a = 2^(−β Q / 2) Y_a, so ∂ℓ/∂Q = −(β/2) G_a λ_G in units of ln 2.
+    let exponent = contact_exponent(field, a, anchor)?;
+    let conductance = power_of_two(&exponent.carry)? * contact.admittance();
+    let quadrance = -(contact.exponent() / integer(2)) * &conductance * &back.conductance[a];
+    let feature = FeatureCovector {
+        delta: RatVec3::zero(),
+        quadrance,
+        gradient: [Rat::zero(), Rat::zero()],
+    };
+    let key = contact.pair(field, anchor).feature_pullback(&feature)?;
+    let [storage, stiffness, dissipation]: [Vec<Vec<Rat>>; 3] =
+        pulled.try_into().expect("three forms were pulled");
+    Ok((
+        steps,
+        ContactPullback {
+            contact: a,
+            feature,
+            conductance: back.conductance[a].clone(),
+            storage: matrix_of(storage, forms[0].columns())?,
+            stiffness: matrix_of(stiffness, forms[1].columns())?,
+            dissipation: matrix_of(dissipation, forms[2].columns())?,
+            key,
+        },
     ))
 }
 
@@ -1709,7 +2024,9 @@ pub struct CurvePoint {
 /// included), the located keys' bits (`⌈log₂ d_g⌉` per published key: the model pays for what
 /// learning located) and `Kt = |describe| + key bits + L_target|model + ⌈log₂ work⌉` against the
 /// literal over the cells read, the work counted and the state against the source. The run is
-/// complete when it read the whole cut with no budget stop.
+/// complete when it read the whole cut with no budget stop. Beside the readout, exterior, the host's
+/// wall time by phase ([`WallTimes`]): it enters no law and no description, and it is the one field
+/// two runs of one cut do not share.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Exposure {
     pub training: Bits,
@@ -1732,6 +2049,8 @@ pub struct Exposure {
     pub state: StateReport,
     pub compares: u64,
     pub deposits: u64,
+    /// The host's wall time by phase (exterior).
+    pub wall: WallTimes,
 }
 
 /// The online Krichevsky–Trofimov code length of one cell, `−log₂((count + ½)/(total + |A|/2))`.
@@ -2092,6 +2411,7 @@ impl Reference {
             state,
             compares,
             deposits,
+            wall: *resident.wall(),
         })
     }
 }

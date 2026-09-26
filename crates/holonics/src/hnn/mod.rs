@@ -18,6 +18,8 @@
 //! - [`keys`]: the data → menu map, key location per ring in carry order, and gauge fixing.
 //!
 //! The learning side (constitution, ratio, pending, retention, port, reference) composes these.
+//! `realization` runs the regions whose effects commute together on the host's cores (the hardware
+//! law); the reference's header records which.
 //!
 //! [definition] **Guards** (design (g)) carried by these files: no float enters a law (the lint
 //! below, and every value is [`crate::ratio::Rat`] or an exact integer); the [`SourceMoment`] is
@@ -62,6 +64,7 @@ pub mod pending;
 pub mod port;
 pub mod propagation;
 pub mod ratio;
+pub(crate) mod realization;
 pub mod receiving;
 pub mod reference;
 pub mod retention;

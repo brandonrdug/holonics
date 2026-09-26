@@ -75,13 +75,14 @@ use crate::hnn::propagation::{
     PathAttenuation, TickBalance, element_step, junction_swing, transit,
 };
 use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector};
+use crate::hnn::realization::{apply_rows, entries, indexed};
 use crate::hnn::receiving::ReceivingPhases;
 use crate::hnn::retention::AeonBoundary;
 use crate::hnn::word::Word;
 use crate::holon::contact::FeatureCovector;
 use crate::navigator::Clock;
 use crate::ratio::linear::ExactRatMatrix;
-use crate::ratio::linear::vector::{add, dot, scale, sub};
+use crate::ratio::linear::vector::{dot, scale, sub};
 use crate::ratio::work::ExactWork;
 use crate::ratio::{Rat, integer};
 use crate::receiver::face::{DiameterNorm, ReceiverWidth, WidthWitness};
@@ -664,30 +665,24 @@ fn reverse(
     let h = operands.step().clone();
     let rings = operands.rings();
     let contacts = operands.contacts();
-    let left_t: Vec<ExactRatMatrix> = rings
-        .iter()
-        .map(|ring| transpose_inverse_left(ring.element()))
-        .collect::<Result<_, _>>()?;
-    let contrast_t: Vec<ExactRatMatrix> = rings
-        .iter()
-        .map(|ring| ring.contrast().transpose())
-        .collect::<Result<_, _>>()?;
-    let solves: Vec<ExactRatMatrix> = contacts
-        .iter()
-        .map(|contact| {
-            let (storage, stiffness, dissipation) = contact.forms();
-            let k = contact.width();
-            let m = storage
-                .scaled(&integer(2))
-                .add(
-                    &ExactRatMatrix::identity(k)?
-                        .scaled(&(integer(2) * &h / contact.conductance())),
-                )?
-                .add(&dissipation.scaled(&h))?
-                .add(&stiffness.scaled(&(&h * &h / integer(2))))?;
-            Ok::<_, HnnError>(m.inverse()?)
-        })
-        .collect::<Result<_, _>>()?;
+    // Each ring's transposed solves and each contact's `M_a⁻¹` read only their own operands: the
+    // rings, then the contacts, run together.
+    let left_t: Vec<ExactRatMatrix> =
+        indexed(rings.len(), |r| transpose_inverse_left(rings[r].element()))?;
+    let contrast_t: Vec<ExactRatMatrix> = indexed(rings.len(), |r| {
+        Ok::<_, HnnError>(rings[r].contrast().transpose()?)
+    })?;
+    let solves: Vec<ExactRatMatrix> = indexed(contacts.len(), |a| {
+        let contact = &contacts[a];
+        let (storage, stiffness, dissipation) = contact.forms();
+        let k = contact.width();
+        let m = storage
+            .scaled(&integer(2))
+            .add(&ExactRatMatrix::identity(k)?.scaled(&(integer(2) * &h / contact.conductance())))?
+            .add(&dissipation.scaled(&h))?
+            .add(&stiffness.scaled(&(&h * &h / integer(2))))?;
+        Ok::<_, HnnError>(m.inverse()?)
+    })?;
     let selections: Vec<(Vec<usize>, Vec<usize>)> = field
         .contacts()
         .iter()
@@ -712,19 +707,18 @@ fn reverse(
     let mut transits: Vec<Vec<TransitTick>> = vec![Vec::new(); contacts.len()];
     for t in (0..steps).rev() {
         let (storage, arrivals, states) = records[t];
-        let junctions = (0..rings.len())
-            .map(|r| {
-                let incoming: Vec<(&Rat, &[Rat])> = operands
-                    .incident(r)
-                    .iter()
-                    .map(|&a| {
-                        let slot = operands.end_slot(a, r);
-                        (contacts[a].conductance(), arrivals[a][slot].as_slice())
-                    })
-                    .collect();
-                junction_swing(rings[r].admittance(), &storage[r], &incoming)
-            })
-            .collect::<Result<Vec<_>, _>>()?;
+        // The step's junctions, read again from its own record: the rings run together.
+        let junctions = indexed(rings.len(), |r| {
+            let incoming: Vec<(&Rat, &[Rat])> = operands
+                .incident(r)
+                .iter()
+                .map(|&a| {
+                    let slot = operands.end_slot(a, r);
+                    (contacts[a].conductance(), arrivals[a][slot].as_slice())
+                })
+                .collect();
+            junction_swing(rings[r].admittance(), &storage[r], &incoming)
+        })?;
         let mut wave_bar: Vec<Vec<Rat>> = widths.iter().map(|n| zeros(*n)).collect();
         let mut contrast_bar = wave_bar.clone();
         let mut outgoing_bar: Vec<Vec<Vec<Rat>>> = (0..rings.len())
@@ -738,19 +732,36 @@ fn reverse(
             .collect();
         let (mut displacement_prev, mut rate_prev) = (displacement_bar.clone(), rate_bar.clone());
         if t + 1 < steps {
-            for (r, junction) in junctions.iter().enumerate() {
+            // Each element's reverse step reads only its own junction and covector, and writes only
+            // its own slot: the rings run together.
+            let reversed = indexed(rings.len(), |r| {
+                let junction = &junctions[r];
                 let step = element_step(&rings[r], &junction.storage_wave, &junction.contrast)?;
-                let adjoint = left_t[r].apply(&storage_bar[r])?;
-                wave_bar[r] = sub(&scale(&integer(2), &adjoint), &storage_bar[r]);
-                contrast_bar[r] = contrast_t[r].apply(&adjoint)?;
-                elements[r].push(ElementTick {
-                    tick: t,
-                    midpoint: step.midpoint,
-                    adjoint,
-                    contrast: junction.contrast.clone(),
-                });
+                let adjoint = apply_rows(&left_t[r], &storage_bar[r])?;
+                let wave = sub(&scale(&integer(2), &adjoint), &storage_bar[r]);
+                let contrast = apply_rows(&contrast_t[r], &adjoint)?;
+                Ok::<_, HnnError>((
+                    wave,
+                    contrast,
+                    ElementTick {
+                        tick: t,
+                        midpoint: step.midpoint,
+                        adjoint,
+                        contrast: junction.contrast.clone(),
+                    },
+                ))
+            })?;
+            for (r, (wave, contrast, tick)) in reversed.into_iter().enumerate() {
+                wave_bar[r] = wave;
+                contrast_bar[r] = contrast;
+                elements[r].push(tick);
             }
-            for (a, contact) in contacts.iter().enumerate() {
+            // Each transit's reverse step reads its two ends' junctions and its own covectors and
+            // state, and writes only its own slots (its two outgoing covectors, its previous state
+            // covectors, its conductance term): the contacts run together, and the conductance
+            // terms are added afterwards in contact order.
+            let transited = indexed(contacts.len(), |a| {
+                let contact = &contacts[a];
                 let (from, to) = contact.ends();
                 let position = |ring: usize| {
                     operands
@@ -768,83 +779,154 @@ fn reverse(
                     &states[a][0],
                     &states[a][1],
                 )?;
+                // Each channel coordinate, and each coordinate of the two ends, reads only its own
+                // covectors: the coordinates run together.
                 let (select_from, select_to) = &selections[a];
-                let exchange_bar: Vec<Rat> = select_from
-                    .iter()
-                    .zip(select_to)
-                    .map(|(&i, &j)| &arrival_bar[a][1][j] - &arrival_bar[a][0][i])
-                    .collect();
+                let channel = select_from.len().min(select_to.len());
                 let g = contact.conductance();
-                let midpoint_bar = add(
-                    &add(
-                        &scale(&integer(2), &rate_bar[a]),
-                        &scale(&h, &displacement_bar[a]),
-                    ),
-                    &scale(&(integer(2) / g), &exchange_bar),
-                );
-                let solved = solves[a].apply(&midpoint_bar)?;
-                let pushed = scale(&h, &solved);
-                let mut from_bar = arrival_bar[a][0].clone();
-                let mut to_bar = arrival_bar[a][1].clone();
-                for ((&i, &j), value) in select_from.iter().zip(select_to).zip(&pushed) {
-                    from_bar[i] += value;
-                    to_bar[j] -= value;
-                }
-                outgoing_bar[from][from_position] = from_bar;
-                outgoing_bar[to][to_position] = to_bar;
-                let (storage_form, stiffness_form, _) = contact.forms();
-                rate_prev[a] = add(
-                    &scale(&-Rat::from_integer(1.into()), &rate_bar[a]),
-                    &scale(&integer(2), &storage_form.apply(&solved)?),
-                );
-                displacement_prev[a] = sub(
-                    &displacement_bar[a],
-                    &scale(&h, &stiffness_form.apply(&solved)?),
-                );
-                let square = g * g;
-                conductance[a] += integer(2) * &h / &square * dot(&solved, &passed.midpoint)
-                    - integer(2) / &square * dot(&exchange_bar, &passed.midpoint);
-                transits[a].push(TransitTick {
-                    tick: t,
-                    solved,
-                    displacement: states[a][0].clone(),
-                    rate: states[a][1].clone(),
-                    midpoint: passed.midpoint,
+                let exchange_gain = integer(2) / g;
+                let exchange_bar: Vec<Rat> = entries(channel, |k| {
+                    &arrival_bar[a][1][select_to[k]] - &arrival_bar[a][0][select_from[k]]
                 });
+                let midpoint_bar = entries(
+                    channel
+                        .min(rate_bar[a].len())
+                        .min(displacement_bar[a].len()),
+                    |k| {
+                        integer(2) * &rate_bar[a][k]
+                            + &h * &displacement_bar[a][k]
+                            + &exchange_gain * &exchange_bar[k]
+                    },
+                );
+                let solved = apply_rows(&solves[a], &midpoint_bar)?;
+                let pushed = entries(solved.len(), |k| &h * &solved[k]);
+                let pushed_at = |selection: &[usize], width: usize| {
+                    let mut at = vec![None; width];
+                    let paired = channel.min(pushed.len());
+                    for (k, &coordinate) in selection.iter().enumerate().take(paired) {
+                        at[coordinate] = Some(k);
+                    }
+                    at
+                };
+                let (from_at, to_at) = (
+                    pushed_at(select_from, arrival_bar[a][0].len()),
+                    pushed_at(select_to, arrival_bar[a][1].len()),
+                );
+                let from_bar = entries(from_at.len(), |i| match from_at[i] {
+                    Some(k) => &arrival_bar[a][0][i] + &pushed[k],
+                    None => arrival_bar[a][0][i].clone(),
+                });
+                let to_bar = entries(to_at.len(), |j| match to_at[j] {
+                    Some(k) => &arrival_bar[a][1][j] - &pushed[k],
+                    None => arrival_bar[a][1][j].clone(),
+                });
+                let (storage_form, stiffness_form, _) = contact.forms();
+                let (stored, stiffened) = (
+                    apply_rows(storage_form, &solved)?,
+                    apply_rows(stiffness_form, &solved)?,
+                );
+                let rate = entries(rate_bar[a].len().min(stored.len()), |k| {
+                    -&rate_bar[a][k] + integer(2) * &stored[k]
+                });
+                let displacement = entries(displacement_bar[a].len().min(stiffened.len()), |k| {
+                    &displacement_bar[a][k] - &h * &stiffened[k]
+                });
+                let square = g * g;
+                let term = integer(2) * &h / &square * dot(&solved, &passed.midpoint)
+                    - integer(2) / &square * dot(&exchange_bar, &passed.midpoint);
+                Ok::<_, HnnError>((
+                    [(from, from_position, from_bar), (to, to_position, to_bar)],
+                    rate,
+                    displacement,
+                    term,
+                    TransitTick {
+                        tick: t,
+                        solved,
+                        displacement: states[a][0].clone(),
+                        rate: states[a][1].clone(),
+                        midpoint: passed.midpoint,
+                    },
+                ))
+            })?;
+            for (a, (ends, rate, displacement, term, tick)) in transited.into_iter().enumerate() {
+                for (ring, position, covector) in ends {
+                    outgoing_bar[ring][position] = covector;
+                }
+                rate_prev[a] = rate;
+                displacement_prev[a] = displacement;
+                conductance[a] += term;
+                transits[a].push(tick);
             }
         }
-        let mut storage_next: Vec<Vec<Rat>> = widths.iter().map(|n| zeros(*n)).collect();
-        let mut arrival_next = arrival_bar.clone();
-        for (r, junction) in junctions.iter().enumerate() {
-            let mut anchor_bar = add(&scale(&integer(2), &wave_bar[r]), &contrast_bar[r]);
-            for outgoing in &outgoing_bar[r] {
-                anchor_bar = add(&anchor_bar, &scale(&integer(2), outgoing));
-            }
-            if r == receiving
-                && let Some(read) = &read_covector[t]
-            {
-                anchor_bar = add(&anchor_bar, read);
-            }
+        // Each junction's reverse Swing reads only its own covectors and record, and writes only
+        // its own storage covector, its own arriving slots and its conductance terms: the rings run
+        // together, and the conductance terms are added afterwards in ring, then incidence, order.
+        let swung = indexed(rings.len(), |r| {
+            let junction = &junctions[r];
+            let read = if r == receiving {
+                read_covector[t].as_ref()
+            } else {
+                None
+            };
             let admittance = rings[r].admittance();
-            let total = operands
-                .incident(r)
-                .iter()
-                .fold(admittance.clone(), |sum, &a| {
-                    sum + contacts[a].conductance()
-                });
-            storage_next[r] = sub(
-                &scale(&(admittance / &total), &anchor_bar),
-                &add(&wave_bar[r], &contrast_bar[r]),
+            let incident = operands.incident(r);
+            let total = incident.iter().fold(admittance.clone(), |sum, &a| {
+                sum + contacts[a].conductance()
+            });
+            let (own, gains): (Rat, Vec<Rat>) = (
+                admittance / &total,
+                incident
+                    .iter()
+                    .map(|&a| contacts[a].conductance() / &total)
+                    .collect(),
             );
-            for (position, &a) in operands.incident(r).iter().enumerate() {
-                let slot = operands.end_slot(a, r);
-                let g = contacts[a].conductance();
-                arrival_next[a][slot] = sub(
-                    &scale(&(g / &total), &anchor_bar),
-                    &outgoing_bar[r][position],
-                );
-                conductance[a] +=
-                    dot(&anchor_bar, &sub(&arrivals[a][slot], &junction.anchor)) / &total;
+            // Each coordinate of the junction's reverse Swing reads only that coordinate of its
+            // covectors: the coordinates run together.
+            let coordinates = entries(widths[r], |i| {
+                let mut anchor = integer(2) * &wave_bar[r][i] + &contrast_bar[r][i];
+                for outgoing in &outgoing_bar[r] {
+                    anchor += integer(2) * &outgoing[i];
+                }
+                if let Some(read) = read {
+                    anchor += &read[i];
+                }
+                let storage = &own * &anchor - (&wave_bar[r][i] + &contrast_bar[r][i]);
+                let arriving: Vec<Rat> = gains
+                    .iter()
+                    .zip(&outgoing_bar[r])
+                    .map(|(gain, outgoing)| gain * &anchor - &outgoing[i])
+                    .collect();
+                (anchor, storage, arriving)
+            });
+            let mut anchor_bar = Vec::with_capacity(coordinates.len());
+            let mut storage = Vec::with_capacity(coordinates.len());
+            let mut covectors: Vec<Vec<Rat>> = vec![Vec::with_capacity(widths[r]); incident.len()];
+            for (anchor, stored, arriving) in coordinates {
+                anchor_bar.push(anchor);
+                storage.push(stored);
+                for (covector, value) in covectors.iter_mut().zip(arriving) {
+                    covector.push(value);
+                }
+            }
+            let arriving: Vec<(usize, usize, Vec<Rat>, Rat)> = incident
+                .iter()
+                .zip(covectors)
+                .map(|(&a, covector)| {
+                    let slot = operands.end_slot(a, r);
+                    let offset =
+                        entries(widths[r], |i| &arrivals[a][slot][i] - &junction.anchor[i]);
+                    (a, slot, covector, dot(&anchor_bar, &offset) / &total)
+                })
+                .collect();
+            Ok::<_, HnnError>((storage, arriving))
+        })?;
+        let mut storage_next: Vec<Vec<Rat>> = Vec::with_capacity(rings.len());
+        let mut arrival_next = arrival_bar.clone();
+        for (storage, arriving) in swung {
+            storage_next.push(storage);
+            for (a, slot, covector, term) in arriving {
+                arrival_next[a][slot] = covector;
+                conductance[a] += term;
             }
         }
         storage_bar = storage_next;

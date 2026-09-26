@@ -10,6 +10,9 @@ num-rational = { workspace = true }
 num-bigint = { workspace = true }
 num-traits = { workspace = true }
 thiserror = { workspace = true }
+# The host realization of the HNN's co-present regions (hardware law; `hnn::realization`): the
+# regions whose effects commute run on the host's cores, collected in index order.
+rayon = "1.12"
 
 # The notebook's exact measurement of the deposited constitution's bits under the lattice law
 # (research/notebook/hnn_design/README.md): a measurement, never a test.

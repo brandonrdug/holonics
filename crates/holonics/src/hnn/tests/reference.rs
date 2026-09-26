@@ -13,12 +13,13 @@
 //! receiving windows), declare a budget two deposits pass, which is the stop rule's own case and
 //! keeps the exact deposits few, and the rest of the cut runs on the last published constitution.
 
-use super::learning::chain_of;
+use super::learning::{chain, chain_of};
 use super::support::Draw;
 use crate::hnn::HnnError;
 use crate::hnn::constitution::Steps;
-use crate::hnn::port::ReceiptDetail;
-use crate::hnn::reference::{Cut, Exposure, Reference};
+use crate::hnn::field::Current;
+use crate::hnn::port::{ExecutionPort, ReceiptDetail};
+use crate::hnn::reference::{Cut, Exposure, Reference, WallTimes, one_hot};
 use crate::ratio::Rat;
 use crate::ratio::algebraic::ExactInterval;
 use crate::receiver::reception::Component;
@@ -315,4 +316,72 @@ fn the_exposure_reads_its_declared_population_and_a_past_crib() {
     assert_eq!(cut.closing_crib(20, 29, 16), 20..29);
     assert_eq!(cut.closing_crib(0, 12, 16), 12..12);
     assert_eq!(cut.closing_crib(0, 64, 16), 48..64);
+}
+
+/// The kept read (the reference's header): a refine keeps its word and faces for the compare at
+/// the commit it read them at, and that compare returns exactly what a compare that reads again
+/// returns (a clone of the resident drops the kept reads). A deposit publishes a successor and
+/// drops every kept read, so a pending ratio refined before it is read again at the contemporary
+/// constitution, and returns what a fresh read returns.
+#[test]
+fn a_compare_returns_the_same_with_and_without_the_refines_kept_read() {
+    let field = chain();
+    let reference = Reference::new(4, Steps::campaign_one(), 1 << 40);
+    let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
+    let (moment, _) = reference
+        .ingest(&mut resident, None, &one_hot(&[1, 2, 0, 3, 1]))
+        .unwrap();
+    let phases = resident.admitted()[0].clone();
+    let (first, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+    let (second, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+    assert!(resident.holds_kept_read(&first) && resident.holds_kept_read(&second));
+    let mut fresh = resident.clone();
+    assert!(!fresh.holds_kept_read(&first) && !fresh.holds_kept_read(&second));
+    let (staged, kept) = reference
+        .compare(&mut resident, first, &one_hot(&[1, 0]))
+        .unwrap();
+    let (_, read) = reference
+        .compare(&mut fresh, first, &one_hot(&[1, 0]))
+        .unwrap();
+    assert_eq!(kept, read);
+    assert!(resident.wall().compare_read.is_zero());
+    let before = resident.constitution().commit();
+    reference.deposit(&mut resident, staged).unwrap();
+    assert_eq!(resident.constitution().commit(), before + 1);
+    assert!(!resident.holds_kept_read(&second));
+    let mut fresh = resident.clone();
+    let (_, delayed) = reference
+        .compare(&mut resident, second, &one_hot(&[2, 3]))
+        .unwrap();
+    let (_, again) = reference
+        .compare(&mut fresh, second, &one_hot(&[2, 3]))
+        .unwrap();
+    assert_eq!(delayed, again);
+}
+
+/// The host realization (the reference's header): the regions that run together write only their
+/// own slots, collected in index order and reduced in a fixed order, so every exact value of the
+/// exposure on one worker (the serial realization of the same code) and on several is the same,
+/// bit for bit; only the host's wall times differ.
+#[test]
+fn one_worker_and_many_return_the_same_values() {
+    let length = cut_length();
+    let field = chain_of(length as u64);
+    let cut = Cut {
+        cells: source(length, 81),
+        held_out: vec![2..4, length - 4..length],
+    };
+    let reference = Reference::new(64, Steps::campaign_one(), 1_000).with_deadline(4);
+    let run = |workers: usize| {
+        let pool = rayon::ThreadPoolBuilder::new()
+            .num_threads(workers)
+            .build()
+            .unwrap();
+        let mut exposure = pool.install(|| reference.expose(&field, &cut)).unwrap();
+        exposure.wall = WallTimes::default();
+        exposure
+    };
+    let (serial, parallel) = (run(1), run(4));
+    assert!(serial.deposits >= 2 && serial.compares == 4);
+    assert_eq!(serial, parallel);
 }

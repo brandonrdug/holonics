@@ -33,6 +33,7 @@ use num_traits::{Signed, ToPrimitive, Zero};
 use crate::hnn::HnnError;
 use crate::hnn::field::{ConstitutionRead, Current, Field, ReceiverDeclaration};
 use crate::hnn::propagation::Operands;
+use crate::hnn::realization::{apply_rows, indexed};
 use crate::hnn::word::Word;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::{Rat, integer};
@@ -266,11 +267,13 @@ impl ReceivingPhases {
                 found: map.rows() * map.columns(),
             });
         }
-        let logits = map.apply(&ring.rotate(anchor, &current.lift()[self.ring]))?;
-        let cells = logits
-            .chunks(2)
-            .map(|pair| GrainCell::of(&pair[0], self.grain))
-            .collect();
+        // The map's rows, then the classes' grain cells, each read alone, run together
+        // (`hnn::realization`); the map has `2|A|` rows, so the classes pair them exactly.
+        let logits = apply_rows(map, &ring.rotate(anchor, &current.lift()[self.ring]))?;
+        let classes = logits.len() / 2;
+        let cells = indexed(classes, |class| {
+            Ok::<_, HnnError>(GrainCell::of(&logits[2 * class], self.grain))
+        })?;
         let phases = logits.chunks(2).map(|pair| &pair[1] / integer(2)).collect();
         Ok(ReceivingRead {
             logits,

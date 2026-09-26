@@ -55,6 +55,7 @@ use num_traits::{One, Signed, ToPrimitive, Zero};
 use crate::aeon::Reading;
 use crate::hnn::HnnError;
 use crate::hnn::field::{Field, phase_winding};
+use crate::hnn::realization::indexed;
 use crate::hnn::receiving::{GrainCell, ReceivingRead};
 use crate::ratio::algebraic::{ExactInterval, natural_log_enclosure};
 use crate::ratio::exponentiated::{CarriedPower, PhaseField, READING_BITS, power_of_two};
@@ -318,10 +319,7 @@ impl Faces {
     /// The faces of the receiving reads at grain `L_R`.
     pub fn of_reads(reads: &[ReceivingRead], grain: u64) -> Result<Self, HnnError> {
         Ok(Self {
-            faces: reads
-                .iter()
-                .map(|read| Face::of_read(read, grain))
-                .collect::<Result<_, _>>()?,
+            faces: indexed(reads.len(), |j| Face::of_read(&reads[j], grain))?,
             logits: reads.iter().map(|read| read.logits.clone()).collect(),
         })
     }
@@ -430,31 +428,28 @@ impl HolonRatio {
                 found: targets.len(),
             });
         }
-        let phases = faces
-            .faces
-            .iter()
-            .zip(targets.iter().zip(target_phases))
-            .map(|(face, (&target, target_phase))| {
-                let produced_phase = face
-                    .phases
-                    .get(target)
-                    .ok_or(HnnError::CellOutside {
-                        code: target,
-                        alphabet: face.phases.len(),
-                    })?
-                    .clone();
-                let gap = target_phase - &produced_phase;
-                Ok(PhaseRatio {
-                    target,
-                    target_phase: target_phase.clone(),
-                    produced_phase,
-                    code_length: face.code_length(target)?,
-                    excess: &gap * &gap / integer(2),
-                    gap: Reading::of_turns(&gap),
-                    branch: branch.clone(),
-                })
+        // Each receiving phase reads only its own face and target: the phases run together.
+        let phases = indexed(targets.len(), |j| {
+            let (face, target, target_phase) = (&faces.faces[j], targets[j], &target_phases[j]);
+            let produced_phase = face
+                .phases
+                .get(target)
+                .ok_or(HnnError::CellOutside {
+                    code: target,
+                    alphabet: face.phases.len(),
+                })?
+                .clone();
+            let gap = target_phase - &produced_phase;
+            Ok(PhaseRatio {
+                target,
+                target_phase: target_phase.clone(),
+                produced_phase,
+                code_length: face.code_length(target)?,
+                excess: &gap * &gap / integer(2),
+                gap: Reading::of_turns(&gap),
+                branch: branch.clone(),
             })
-            .collect::<Result<_, HnnError>>()?;
+        })?;
         Ok(Self { faces, phases })
     }
 

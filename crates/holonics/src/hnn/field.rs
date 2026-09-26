@@ -89,8 +89,9 @@ use crate::ratio::{Rat, integer, rat};
 /// cut, so no word holds the constitution. Every matrix is exact; every square is a factor.
 ///
 /// Ring `g`'s realified width is `2d_g`, contact `a`'s channel width is `k_a`, and `|A|` is the
-/// field's exterior chart.
-pub trait ConstitutionRead {
+/// field's exterior chart. It is `Sync`: the rings' and contacts' regions read it together, and
+/// none writes it (`hnn::realization`).
+pub trait ConstitutionRead: Sync {
     /// The standing `q_g ∈ ℚ^(2d_g)`, read only through the sheet classes of its contrast.
     fn standing(&self, ring: usize) -> &[Rat];
     /// The factor `f_g` (`2d_g × m`) of the element's passive part `W_s,g = −f_g f_gᵀ`.

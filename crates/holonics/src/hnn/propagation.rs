@@ -66,6 +66,7 @@ use num_traits::{One, Signed, ToPrimitive, Zero};
 use crate::geometry::swing::swing;
 use crate::hnn::HnnError;
 use crate::hnn::field::{ConstitutionRead, Current, End, Field};
+use crate::hnn::realization::{entries, indexed};
 use crate::ratio::exponentiated::power_of_two;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{add, dot, integer_dot, integral, lcm, scale, sub};
@@ -471,35 +472,33 @@ impl Operands {
         constitution: &impl ConstitutionRead,
         current: &Current,
     ) -> Result<Self, HnnError> {
-        let rings = (0..field.rings().len())
-            .map(|index| ring_operands(field, constitution, index))
-            .collect::<Result<Vec<_>, _>>()?;
-        let contacts = field
-            .contacts()
-            .iter()
-            .enumerate()
-            .map(|(index, contact)| {
-                let exponent = contact_exponent(field, index, current.lift())?;
-                if exponent.phase != 0 {
-                    return Err(HnnError::ExponentPhase {
-                        contact: index,
-                        phase: exponent.phase,
-                        grain: field.exponent_grain(),
-                    });
-                }
-                let conductance = power_of_two(&exponent.carry)? * contact.admittance();
-                ContactOperands::new(
-                    contact.ends(),
-                    (contact.selection(End::From), contact.selection(End::To)),
-                    exponent,
-                    conductance,
-                    field.step(),
-                    constitution.contact_storage(index),
-                    constitution.contact_stiffness(index),
-                    constitution.contact_dissipation(index),
-                )
-            })
-            .collect::<Result<Vec<_>, _>>()?;
+        // Each ring's operands read only its own material and the standings; each contact's only
+        // its own factors and its two rings' screws: the rings, then the contacts, run together.
+        let rings = indexed(field.rings().len(), |index| {
+            ring_operands(field, constitution, index)
+        })?;
+        let contacts = indexed(field.contacts().len(), |index| {
+            let contact = field.contact(index);
+            let exponent = contact_exponent(field, index, current.lift())?;
+            if exponent.phase != 0 {
+                return Err(HnnError::ExponentPhase {
+                    contact: index,
+                    phase: exponent.phase,
+                    grain: field.exponent_grain(),
+                });
+            }
+            let conductance = power_of_two(&exponent.carry)? * contact.admittance();
+            ContactOperands::new(
+                contact.ends(),
+                (contact.selection(End::From), contact.selection(End::To)),
+                exponent,
+                conductance,
+                field.step(),
+                constitution.contact_storage(index),
+                constitution.contact_stiffness(index),
+                constitution.contact_dissipation(index),
+            )
+        })?;
         Ok(Self {
             step: field.step().clone(),
             rings,
@@ -719,14 +718,32 @@ pub fn global_power(
     arrivals: &[[Vec<Rat>; 2]],
     states: &[[Vec<Rat>; 2]],
 ) -> Result<Rat, HnnError> {
+    // Each ring's and each contact's term reads only its own waves and state: they are formed
+    // together and summed afterwards in ring, then contact, order.
+    let rings = operands.rings.len().min(storage.len());
+    let contacts = operands
+        .contacts
+        .len()
+        .min(arrivals.len())
+        .min(states.len());
+    let ring_terms = indexed(rings, |r| {
+        Ok::<_, HnnError>(&operands.rings[r].admittance * dot(&storage[r], &storage[r]))
+    })?;
+    let contact_terms = indexed(contacts, |a| {
+        let (contact, pair, state) = (&operands.contacts[a], &arrivals[a], &states[a]);
+        Ok::<_, HnnError>((
+            &contact.conductance * (dot(&pair[0], &pair[0]) + dot(&pair[1], &pair[1])),
+            contact.energy(&state[0], &state[1])?,
+        ))
+    })?;
     let mut waves = Rat::zero();
-    for (ring, wave) in operands.rings.iter().zip(storage) {
-        waves += &ring.admittance * dot(wave, wave);
+    for term in ring_terms {
+        waves += term;
     }
     let mut stored = Rat::zero();
-    for ((contact, pair), state) in operands.contacts.iter().zip(arrivals).zip(states) {
-        waves += &contact.conductance * (dot(&pair[0], &pair[0]) + dot(&pair[1], &pair[1]));
-        stored += contact.energy(&state[0], &state[1])?;
+    for (wave, energy) in contact_terms {
+        waves += wave;
+        stored += energy;
     }
     Ok(&operands.step / integer(4) * waves + stored)
 }
@@ -776,25 +793,24 @@ impl Rows {
     /// `M v`, exactly.
     pub(crate) fn apply(&self, vector: &[Rat]) -> Vec<Rat> {
         let (values, denominator) = integral(vector);
-        self.numerators
-            .iter()
-            .zip(&self.denominators)
-            .map(|(row, row_denominator)| {
-                Rat::new(integer_dot(row, &values), row_denominator * &denominator)
-            })
-            .collect()
+        // Each row reads only itself and the shared vector: the rows run together.
+        let rows = self.numerators.len().min(self.denominators.len());
+        entries(rows, |row| {
+            Rat::new(
+                integer_dot(&self.numerators[row], &values),
+                &self.denominators[row] * &denominator,
+            )
+        })
     }
 
-    /// `M B` for a matrix `B`, column by column.
+    /// `M B` for a matrix `B`, column by column, the columns together.
     fn product(&self, right: &ExactRatMatrix) -> Result<ExactRatMatrix, HnnError> {
-        let columns: Vec<Vec<Rat>> = (0..right.columns())
-            .map(|column| {
-                let values: Vec<Rat> = (0..right.rows())
-                    .map(|row| right.get(row, column).expect("in range").clone())
-                    .collect();
-                self.apply(&values)
-            })
-            .collect();
+        let columns: Vec<Vec<Rat>> = entries(right.columns(), |column| {
+            let values: Vec<Rat> = (0..right.rows())
+                .map(|row| right.get(row, column).expect("in range").clone())
+                .collect();
+            self.apply(&values)
+        });
         let rows = self.numerators.len();
         Ok(ExactRatMatrix::shaped(
             rows,
@@ -822,16 +838,24 @@ fn is_zero_matrix(matrix: &ExactRatMatrix) -> bool {
 pub(crate) fn gram(factor: &ExactRatMatrix) -> Result<ExactRatMatrix, HnnError> {
     let rows = Rows::of(factor);
     let n = factor.rows();
-    let mut entries = vec![vec![Rat::zero(); n]; n];
-    for i in 0..n {
-        for j in i..n {
-            let value = Rat::new(
-                integer_dot(&rows.numerators[i], &rows.numerators[j]),
-                &rows.denominators[i] * &rows.denominators[j],
-            );
-            entries[j][i] = value.clone();
-            entries[i][j] = value;
+    // Each row of the upper triangle reads only the shared factor: the rows run together.
+    let upper = entries(n, |i| {
+        (i..n)
+            .map(|j| {
+                Rat::new(
+                    integer_dot(&rows.numerators[i], &rows.numerators[j]),
+                    &rows.denominators[i] * &rows.denominators[j],
+                )
+            })
+            .collect::<Vec<Rat>>()
+    });
+    let mut values = vec![vec![Rat::zero(); n]; n];
+    for (i, row) in upper.into_iter().enumerate() {
+        for (offset, value) in row.into_iter().enumerate() {
+            let j = i + offset;
+            values[j][i] = value.clone();
+            values[i][j] = value;
         }
     }
-    Ok(ExactRatMatrix::shaped(n, n, entries)?)
+    Ok(ExactRatMatrix::shaped(n, n, values)?)
 }

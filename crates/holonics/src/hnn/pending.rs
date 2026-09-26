@@ -40,6 +40,7 @@ use crate::hnn::HnnError;
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::moment::SourceMoment;
 use crate::hnn::ratio::Faces;
+use crate::hnn::realization::indexed;
 use crate::hnn::receiving::ReceivingPhases;
 use crate::hnn::word::Word;
 
@@ -104,7 +105,8 @@ impl PendingRatio {
     }
 
     /// **The contemporary read**: the word run over its receiving window and the faces read at the
-    /// receiver's grain. Returns the word (for its return) and the faces.
+    /// receiver's grain. Returns the word (for its return) and the faces. The receiving epochs'
+    /// reads each read only their own anchor and run together (`hnn::realization`).
     pub fn read<'c>(
         &self,
         field: &'c Field,
@@ -113,10 +115,9 @@ impl PendingRatio {
         let current = self.current(field)?;
         let mut word = self.open(field, constitution)?;
         let anchors = word.forward(&self.phases)?;
-        let reads = anchors
-            .iter()
-            .map(|anchor| self.phases.read(field, constitution, &current, anchor))
-            .collect::<Result<Vec<_>, _>>()?;
+        let reads = indexed(anchors.len(), |j| {
+            self.phases.read(field, constitution, &current, &anchors[j])
+        })?;
         Ok((word, Faces::of_reads(&reads, self.phases.grain())?))
     }
 

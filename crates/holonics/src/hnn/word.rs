@@ -16,7 +16,15 @@
 //!
 //! [definition] The word keeps its own per-tick waves, bounded by its `e_max` junction steps, for
 //! its return to read in reverse; that memory lives only in the word and is dropped with it
-//! (design R2 H2). It is one evaluation on one moment, not an occurrence tape.
+//! (design R2 H2). It is one evaluation on one moment, not an occurrence tape. A refine keeps its
+//! word, without the borrow of its field (`KeptWord`), for the compare at the same commit, whose
+//! return consumes it.
+//!
+//! [definition; agent-inferred] **Within a step the rings, then the contacts, run together** (the
+//! hardware law; `hnn::realization`): every junction reads only its own storage and
+//! arrivals, every element only its own junction, and every transit only its two ends' outgoing
+//! waves and its own state, and each writes only its own slot; the balance terms are summed after,
+//! in ring and contact order.
 //!
 //! A word is not `Clone` (guard 2):
 //!
@@ -41,6 +49,7 @@ use crate::hnn::moment::SourceMoment;
 use crate::hnn::propagation::{
     Operands, TickBalance, element_step, global_power, junction_swing, transit,
 };
+use crate::hnn::realization::indexed;
 use crate::hnn::receiving::ReceivingPhases;
 use crate::navigator::Clock;
 use crate::ratio::{Rat, integer};
@@ -285,26 +294,26 @@ impl<'c> Word<'c> {
                 ticks: self.passage.len(),
             });
         }
-        let mut junctions = Vec::with_capacity(self.storage.len());
-        for (ring, operands) in self.operands.rings().iter().enumerate() {
-            let arrivals: Vec<(&Rat, &[Rat])> = self
-                .operands
+        // Every junction reads only its own storage and arrivals: the rings run together.
+        let (operands, storage, arrivals) = (&self.operands, &self.storage, &self.arrivals);
+        let junctions = indexed(operands.rings().len(), |ring| {
+            let incoming: Vec<(&Rat, &[Rat])> = operands
                 .incident(ring)
                 .iter()
                 .map(|&a| {
-                    let slot = self.operands.end_slot(a, ring);
+                    let slot = operands.end_slot(a, ring);
                     (
-                        self.operands.contacts()[a].conductance(),
-                        self.arrivals[a][slot].as_slice(),
+                        operands.contacts()[a].conductance(),
+                        arrivals[a][slot].as_slice(),
                     )
                 })
                 .collect();
-            junctions.push(junction_swing(
-                operands.admittance(),
-                &self.storage[ring],
-                &arrivals,
-            )?);
-        }
+            junction_swing(
+                operands.rings()[ring].admittance(),
+                &storage[ring],
+                &incoming,
+            )
+        })?;
         self.passage.push(Passage {
             storage: self.storage.clone(),
             arrivals: self.arrivals.clone(),
@@ -327,32 +336,46 @@ impl<'c> Word<'c> {
         let h = self.operands.step().clone();
         let half = &h / integer(2);
         let (mut resist, mut contrast, mut dissipation) = (Rat::zero(), Rat::zero(), Rat::zero());
-        for (ring, junction) in junctions.iter().enumerate() {
-            let operands = &self.operands.rings()[ring];
-            let step = element_step(operands, &junction.storage_wave, &junction.contrast)?;
-            resist += &half * operands.admittance() * &step.resist;
-            contrast += &half * operands.admittance() * &step.drive;
+        // Every element reads only its own junction: the rings run together, and their balance
+        // terms are summed afterwards in ring order.
+        let operands = &self.operands;
+        let steps = indexed(junctions.len(), |ring| {
+            element_step(
+                &operands.rings()[ring],
+                &junctions[ring].storage_wave,
+                &junctions[ring].contrast,
+            )
+        })?;
+        for (ring, step) in steps.into_iter().enumerate() {
+            let admittance = self.operands.rings()[ring].admittance();
+            resist += &half * admittance * &step.resist;
+            contrast += &half * admittance * &step.drive;
             self.storage[ring] = step.next;
         }
-        for (a, contact) in self.operands.contacts().iter().enumerate() {
+        // Every contact reads the outgoing waves of its two ends and its own state, and writes only
+        // its own arrivals and state: the contacts run together.
+        let (operands, states) = (&self.operands, &self.states);
+        let transits = indexed(operands.contacts().len(), |a| {
+            let contact = &operands.contacts()[a];
             let (from, to) = contact.ends();
             let outgoing = |ring: usize| {
-                let position = self
-                    .operands
+                let position = operands
                     .incident(ring)
                     .iter()
                     .position(|&b| b == a)
                     .expect("a contact is incident to its ends");
                 &junctions[ring].outgoing[position]
             };
-            let passed = transit(
+            transit(
                 contact,
                 &h,
                 outgoing(from),
                 outgoing(to),
-                &self.states[a][0],
-                &self.states[a][1],
-            )?;
+                &states[a][0],
+                &states[a][1],
+            )
+        })?;
+        for (a, passed) in transits.into_iter().enumerate() {
             dissipation += &passed.dissipation;
             self.arrivals[a] = [passed.arrive_from, passed.arrive_to];
             self.states[a] = [passed.displacement, passed.rate];
@@ -416,11 +439,100 @@ impl<'c> Word<'c> {
     /// **Release the change** at the word's end: its power leaves as the word's emitted exchange,
     /// and the word, its waves and its per-tick record are dropped.
     pub fn release(self) -> Result<Released, HnnError> {
+        self.released()
+    }
+
+    /// **The release read at the word's end, the word kept**: what [`Word::release`] returns,
+    /// read without dropping the word, so that the refine that read it can keep the word for its
+    /// own return ([`Word::keep`]).
+    pub(crate) fn released(&self) -> Result<Released, HnnError> {
         Ok(Released {
             power: self.power()?,
             ticks: self.passage.len(),
             peak_bits: self.peak_bits,
-            balances: self.balances,
+            balances: self.balances.clone(),
         })
+    }
+
+    /// **Keep the word for its return**: the word without the borrow of its field
+    /// (`KeptWord`).
+    pub(crate) fn keep(self) -> KeptWord {
+        let Word {
+            field: _,
+            operands,
+            clock,
+            storage,
+            arrivals,
+            states,
+            passage,
+            balances,
+            ended,
+            peak_bits,
+            settled,
+        } = self;
+        KeptWord {
+            operands,
+            clock,
+            storage,
+            arrivals,
+            states,
+            passage,
+            balances,
+            ended,
+            peak_bits,
+            settled,
+        }
+    }
+}
+
+/// [definition; agent-inferred] **A word kept for its own return**: every part of a word but the
+/// borrow of its field, so that the resident that owns the field can hold it (design R2 H2: the
+/// word keeps its per-tick waves for its return to read in reverse, and they are dropped with it).
+/// The reference's pending slot keeps one from its refine's read, tagged with the commit it was
+/// read at, for the compare at that commit ([`crate::hnn::reference`], "The kept read"); it
+/// resumes onto the same field only to be consumed by [`Word::pull_back`] (guard 2: no word
+/// outlives its return). It is not `Clone`: a clone of the slot drops it and reads again.
+#[derive(Debug)]
+pub(crate) struct KeptWord {
+    operands: Operands,
+    clock: Clock,
+    storage: Vec<Vec<Rat>>,
+    arrivals: Vec<[Vec<Rat>; 2]>,
+    states: Vec<[Vec<Rat>; 2]>,
+    passage: Vec<Passage>,
+    balances: Vec<TickBalance>,
+    ended: bool,
+    peak_bits: u64,
+    settled: Option<Rat>,
+}
+
+impl KeptWord {
+    /// **Resume the word on its field**: the field it was read on, which the resident owns.
+    pub(crate) fn resume(self, field: &Field) -> Word<'_> {
+        let KeptWord {
+            operands,
+            clock,
+            storage,
+            arrivals,
+            states,
+            passage,
+            balances,
+            ended,
+            peak_bits,
+            settled,
+        } = self;
+        Word {
+            field,
+            operands,
+            clock,
+            storage,
+            arrivals,
+            states,
+            passage,
+            balances,
+            ended,
+            peak_bits,
+            settled,
+        }
     }
 }

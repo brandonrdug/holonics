@@ -47,7 +47,9 @@
 //!   deposition, telescoping to the change of code length), and the face against the literal;
 //! - the state and constitution bits against the source, with and without the collapse;
 //! - the constitution's curve, one point per commit;
-//! - the budget stop or deadline, the work counted, and the wall time.
+//! - the budget stop or deadline, the work counted, and the wall time: the exposure's, and the
+//!   host's by phase (`Exposure::wall`: refine read, release, compare read, holon and covector,
+//!   `pull_back`, `compose`, `deposited`, re-read and ingest), with the rest of the exposure.
 //!
 //! Every value is exact: integers print as integers and rationals as `n/d` (`n/2^e` on a dyadic
 //! denominator), and bits are enclosures with exact endpoints. A decimal appears only at the print,
@@ -313,10 +315,36 @@ fn main() {
     let wall = clock.elapsed().as_millis();
     report(&field, &exposure);
     println!();
+    phases(&exposure, wall);
+    println!();
     println!(
         "wall time (exterior): setup {setup} ms; exposure {wall} ms over {} windows ({} ms a window)",
         exposure.compares,
         wall.checked_div(u128::from(exposure.compares)).unwrap_or(0)
+    );
+}
+
+/// **The wall time by phase** (`Exposure::wall`, exterior): each phase's milliseconds over the run
+/// and per receiving window (integer division, rounded down), the phases' sum, and the rest of the
+/// exposure's wall time (key location, the aeon boundaries, the baselines and the bookkeeping).
+fn phases(exposure: &Exposure, wall: u128) {
+    let windows = u128::from(exposure.compares.max(1));
+    println!(
+        "== wall time by phase (exterior: the host's wall clock, milliseconds; per window over {} windows) ==",
+        exposure.compares
+    );
+    println!("{:<20}\t{:>10}\t{:>10}", "phase", "total ms", "per window");
+    for (name, time) in exposure.wall.phases() {
+        let ms = time.as_millis();
+        println!("{name:<20}\t{ms:>10}\t{:>10}", ms / windows);
+    }
+    let sum = exposure.wall.total().as_millis();
+    println!("{:<20}\t{sum:>10}\t{:>10}", "phases' sum", sum / windows);
+    let rest = wall.saturating_sub(sum);
+    println!(
+        "{:<20}\t{rest:>10}\t{:>10}",
+        "rest of exposure",
+        rest / windows
     );
 }
 

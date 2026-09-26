@@ -133,20 +133,21 @@
 //! | `HNN/LatticeDeposit.{lattice_bits_bounded, lattice_rat_bits_bounded}` | [`Constitution::carrier_bits`] |
 //! | `HNN/LatticeDeposit.lattice_deposit_descends` | [`Constitution::deposited`] with `hnn::retention::collapse` |
 
-use std::collections::btree_map::Entry;
 use std::collections::{BTreeMap, BTreeSet};
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
+use rayon::prelude::*;
 
 use crate::hnn::HnnError;
 use crate::hnn::field::{ConstitutionRead, Field};
 use crate::hnn::moment::PairPort;
 use crate::hnn::port::Deposit;
 use crate::hnn::propagation::gram;
+use crate::hnn::realization::{indexed, outer_rows};
 use crate::holon::deposition::CommittedEnergyBound;
 use crate::ratio::linear::ExactRatMatrix;
-use crate::ratio::linear::vector::{Chart, IntegralMatrix, integral, lcm, matrix_form, row_dot};
+use crate::ratio::linear::vector::{Chart, integral, lcm, matrix_form, row_dot};
 use crate::ratio::{Rat, rat};
 
 /// The declared constitution budget of campaign 1: `B_Θ = 2^33` exact bits.
@@ -324,49 +325,18 @@ impl Carry {
             return true;
         }
         at.moved = true;
-        let (staged, applied) = at
-            .staged
-            .remove(&(carrier, index))
-            .unwrap_or_else(|| (Rat::zero(), BigInt::zero()));
-        let previous = self.0.remove(&index).unwrap_or_else(Rat::zero);
-        let precision = at.precision();
-        let exponent = at.lattice.exponent + precision;
-        // y = Δ + staged + r_prev. The carried remainder lies on the fine lattice of an earlier
-        // clock, so it moves the fine point by its own coordinate and adds nothing to `e`.
-        let mut moving = if staged.is_zero() {
-            update.clone()
-        } else {
-            update + &staged
-        };
-        let carried = match dyadic_coordinate(&previous, exponent) {
-            Some(coordinate) => coordinate,
-            None => {
-                moving += &previous;
-                BigInt::zero()
-            }
-        };
-        let (point, residual) = Lattice::new(exponent).div_rem(&moving);
-        let point = point + carried;
-        // y_f = P·2^(−L−k): its coordinate at the lattice, nearest, ties upward.
-        let (quotient, coordinate) = at.lattice.div_rem_coordinate(&point, precision);
-        let remainder = Rat::new(coordinate, BigInt::one() << exponent as usize);
-        let exactly = if staged.is_zero() {
-            residual.is_zero() && remainder == previous
-        } else {
-            &remainder + &residual == previous + staged
-        };
-        *entry += Rat::new(quotient.clone(), at.lattice.scale());
-        if !remainder.is_zero() {
-            self.0.insert(index, remainder);
-        }
-        let applied = applied + quotient;
-        if !residual.is_zero() || !applied.is_zero() {
-            at.staged.insert((carrier, index), (residual, applied));
-        }
-        exactly
+        let staged = at.staged.remove(&(carrier, index));
+        let previous = self.0.remove(&index);
+        let carried = carried_entry(&at.lattice, at.precision(), entry, update, staged, previous);
+        self.adopt(at, carrier, index, entry, carried)
     }
 
     /// Carry a whole flat array's update, entry by entry. Returns whether every step was exact.
+    ///
+    /// [definition; agent-inferred] Each entry's step reads only its own update, staged residual
+    /// and carried remainder, and writes only its own: the entries run together
+    /// (`hnn::realization`), and their results are taken into the carry and the budgeted
+    /// carry afterwards, in entry order.
     fn deposit_all(
         &mut self,
         at: &mut BudgetedCarry,
@@ -374,11 +344,64 @@ impl Carry {
         entries: &mut [Rat],
         updates: &[Rat],
     ) -> bool {
+        let moving: Vec<(usize, Option<Staged>, Option<Rat>)> =
+            (0..entries.len().min(updates.len()))
+                .filter(|&index| !updates[index].is_zero())
+                .map(|index| {
+                    (
+                        index,
+                        at.staged.remove(&(carrier, index)),
+                        self.0.remove(&index),
+                    )
+                })
+                .collect();
+        if moving.is_empty() {
+            return true;
+        }
+        at.moved = true;
+        let (lattice, precision) = (at.lattice, at.precision());
+        let current: &[Rat] = entries;
+        let carried: Vec<(usize, CarriedEntry)> = moving
+            .into_par_iter()
+            .map(|(index, staged, previous)| {
+                (
+                    index,
+                    carried_entry(
+                        &lattice,
+                        precision,
+                        &current[index],
+                        &updates[index],
+                        staged,
+                        previous,
+                    ),
+                )
+            })
+            .collect();
         let mut exact = true;
-        for (index, (entry, update)) in entries.iter_mut().zip(updates).enumerate() {
-            exact &= self.deposit(at, carrier, index, entry, update);
+        for (index, step) in carried {
+            exact &= self.adopt(at, carrier, index, &mut entries[index], step);
         }
         exact
+    }
+
+    /// Take one entry's carried step into the array, the carry and the budgeted carry. Returns
+    /// whether the step applied its update exactly.
+    fn adopt(
+        &mut self,
+        at: &mut BudgetedCarry,
+        carrier: Carrier,
+        index: usize,
+        entry: &mut Rat,
+        step: CarriedEntry,
+    ) -> bool {
+        *entry = step.entry;
+        if !step.remainder.is_zero() {
+            self.0.insert(index, step.remainder);
+        }
+        if let Some(staged) = step.staged {
+            at.staged.insert((carrier, index), staged);
+        }
+        step.exactly
     }
 
     /// The remainder at an entry.
@@ -388,6 +411,69 @@ impl Carry {
 
     fn bits(&self) -> u64 {
         self.0.values().map(bits).sum()
+    }
+}
+
+/// An entry's staged residual `e` and applied coordinate `q` within one deposit.
+type Staged = (Rat, BigInt);
+
+/// **One entry's carried step**, read alone: the entry moved by `q·2^(−L)`, the remainder `r` to
+/// carry, the residual and coordinate to stage (none when both are zero), and whether the step
+/// applied its update exactly.
+struct CarriedEntry {
+    entry: Rat,
+    remainder: Rat,
+    staged: Option<Staged>,
+    exactly: bool,
+}
+
+/// **One entry's budgeted deposit** of a nonzero update ([`Carry::deposit`], Lean `carry`,
+/// `carry_accounting`) at the lattice and precision of its locus's deposit, from the entry, the
+/// residual and coordinate an earlier step of the same deposit staged there, and the remainder the
+/// entry carries.
+fn carried_entry(
+    lattice: &Lattice,
+    precision: u32,
+    entry: &Rat,
+    update: &Rat,
+    staged: Option<Staged>,
+    previous: Option<Rat>,
+) -> CarriedEntry {
+    let (staged, applied) = staged.unwrap_or_else(|| (Rat::zero(), BigInt::zero()));
+    let previous = previous.unwrap_or_else(Rat::zero);
+    let exponent = lattice.exponent + precision;
+    // y = Δ + staged + r_prev. The carried remainder lies on the fine lattice of an earlier
+    // clock, so it moves the fine point by its own coordinate and adds nothing to `e`.
+    let mut moving = if staged.is_zero() {
+        update.clone()
+    } else {
+        update + &staged
+    };
+    let carried = match dyadic_coordinate(&previous, exponent) {
+        Some(coordinate) => coordinate,
+        None => {
+            moving += &previous;
+            BigInt::zero()
+        }
+    };
+    let (point, residual) = Lattice::new(exponent).div_rem(&moving);
+    let point = point + carried;
+    // y_f = P·2^(−L−k): its coordinate at the lattice, nearest, ties upward.
+    let (quotient, coordinate) = lattice.div_rem_coordinate(&point, precision);
+    let remainder = Rat::new(coordinate, BigInt::one() << exponent as usize);
+    let exactly = if staged.is_zero() {
+        residual.is_zero() && remainder == previous
+    } else {
+        &remainder + &residual == previous + staged
+    };
+    let entry = entry + Rat::new(quotient.clone(), lattice.scale());
+    let applied = applied + quotient;
+    let staged = (!residual.is_zero() || !applied.is_zero()).then_some((residual, applied));
+    CarriedEntry {
+        entry,
+        remainder,
+        staged,
+        exactly,
     }
 }
 
@@ -695,25 +781,28 @@ impl NormalLaw {
             next.solved = rows_matrix(&next.gram).inverse()?.to_rows();
         }
         // ΔW = γ Σ w g (H'⁻¹ f)ᵀ at the carried successor's H'⁻¹, carried onto W.
-        let terms: Vec<(Rat, Chart, Chart)> = active
+        // Each sample's term reads only its own covector and reach: the samples run together.
+        let moving: Vec<&(&Sample, Vec<usize>, Chart)> = active
             .iter()
             .filter(|(sample, ..)| !sample.covector.iter().all(Zero::is_zero))
-            .map(|(sample, support, feature)| {
-                (
-                    proxy * &sample.weight,
-                    integral(&sample.covector),
-                    integral(&reach(&next.solved, support, feature)),
-                )
-            })
             .collect();
-        let map_update: Vec<Rat> = IntegralMatrix::outer_sum(
+        let solved = &next.solved;
+        let terms: Vec<(Rat, Chart, Chart)> = indexed(moving.len(), |t| {
+            let (sample, support, feature) = moving[t];
+            Ok((
+                proxy * &sample.weight,
+                integral(&sample.covector),
+                integral(&reach(solved, support, feature)),
+            ))
+        })?;
+        let map_update: Vec<Rat> = outer_rows(
             m,
             n,
-            terms
+            &terms
                 .iter()
-                .map(|(weight, covector, reach)| (weight, covector, reach)),
+                .map(|(weight, covector, reach)| (weight, covector, reach))
+                .collect::<Vec<_>>(),
         )
-        .to_rows()
         .into_iter()
         .flatten()
         .collect();
@@ -751,7 +840,9 @@ impl NormalLaw {
 
 /// **`Σ_t w_t f_t f_tᵀ` in the integral chart**: each feature charted once, the numerators summed
 /// over integers on the terms' common denominator, and each entry of the upper triangle normalized
-/// once; the form is symmetric, so the lower triangle is its mirror.
+/// once; the form is symmetric, so the lower triangle is its mirror. Each row of the upper triangle
+/// reads only the shared features and writes only its own entries: the rows run together
+/// (`hnn::realization`).
 fn gram_sum<'a>(n: usize, terms: impl IntoIterator<Item = (&'a Rat, &'a Chart)>) -> Vec<Rat> {
     let terms: Vec<(&Rat, &Chart, BigInt)> = terms
         .into_iter()
@@ -760,29 +851,44 @@ fn gram_sum<'a>(n: usize, terms: impl IntoIterator<Item = (&'a Rat, &'a Chart)>)
     let denominator = terms
         .iter()
         .fold(BigInt::one(), |common, (.., scale)| lcm(&common, scale));
-    let mut numerators = vec![BigInt::zero(); n * n];
-    for (weight, (values, _), scale) in &terms {
-        let factor = weight.numer() * (&denominator / scale);
-        for i in 0..n {
-            if values[i].is_zero() {
-                continue;
-            }
-            let left = &values[i] * &factor;
-            for j in i..n {
-                if !values[j].is_zero() {
-                    numerators[i * n + j] += &left * &values[j];
+    let factors: Vec<BigInt> = terms
+        .iter()
+        .map(|(weight, _, scale)| weight.numer() * (&denominator / scale))
+        .collect();
+    let rows: Vec<Vec<Rat>> = (0..n)
+        .into_par_iter()
+        .map(|i| {
+            let mut numerators = vec![BigInt::zero(); n - i];
+            for ((_, (values, _), _), factor) in terms.iter().zip(&factors) {
+                if values[i].is_zero() {
+                    continue;
+                }
+                let left = &values[i] * factor;
+                for j in i..n {
+                    if !values[j].is_zero() {
+                        numerators[j - i] += &left * &values[j];
+                    }
                 }
             }
-        }
-    }
+            numerators
+                .into_iter()
+                .map(|numerator| {
+                    if numerator.is_zero() {
+                        Rat::zero()
+                    } else {
+                        Rat::new(numerator, denominator.clone())
+                    }
+                })
+                .collect()
+        })
+        .collect();
     let mut entries = vec![Rat::zero(); n * n];
-    for i in 0..n {
-        for j in i..n {
-            let numerator = std::mem::take(&mut numerators[i * n + j]);
-            if numerator.is_zero() {
+    for (i, row) in rows.into_iter().enumerate() {
+        for (offset, value) in row.into_iter().enumerate() {
+            let j = i + offset;
+            if value.is_zero() {
                 continue;
             }
-            let value = Rat::new(numerator, denominator.clone());
             entries[j * n + i] = value.clone();
             entries[i * n + j] = value;
         }
@@ -1820,37 +1926,71 @@ impl Constitution {
         }
         let mut next = self.clone();
         let (proxy, eta) = (self.steps.proxy.clone(), self.steps.factor.clone());
-        // One budgeted carry per locus the deposit names, at the clock it would advance it to.
-        let mut strokes: BTreeMap<Locus, BudgetedCarry> = BTreeMap::new();
-        for step in deposit.linear() {
-            if self.released.contains(&step.locus.locus()) {
-                return Err(HnnError::ReleasedLocus {
-                    locus: step.locus.locus(),
-                });
-            }
-            let law = match step.locus {
-                LinearLocus::SourcePort(g) => next.rings[g].source.as_mut(),
-                LinearLocus::Contrast(g) => Some(&mut next.rings[g].contrast),
-                LinearLocus::Receiving(g) => next.rings[g].receiving.as_mut(),
-            }
-            .ok_or(HnnError::MissingSourcePort {
-                ring: match step.locus {
-                    LinearLocus::SourcePort(g)
-                    | LinearLocus::Contrast(g)
-                    | LinearLocus::Receiving(g) => g,
-                },
-            })?;
-            let at = self.budgeted(&mut strokes, step.locus.locus())?;
-            *law = law.deposited(&step.samples, &proxy, at)?;
+        // The deposit's steps by locus, each with its place in the deposit's order (its linear
+        // steps, then its factor steps).
+        let mut groups: BTreeMap<Locus, Vec<(usize, LocusStep<'_>)>> = BTreeMap::new();
+        for (index, step) in deposit.linear().iter().enumerate() {
+            groups
+                .entry(step.locus.locus())
+                .or_default()
+                .push((index, LocusStep::Linear(step)));
         }
-        for step in deposit.factors() {
-            if self.released.contains(&step.gradient.locus()) {
-                return Err(HnnError::ReleasedLocus {
-                    locus: step.gradient.locus(),
-                });
+        let linear = deposit.linear().len();
+        for (index, step) in deposit.factors().iter().enumerate() {
+            groups
+                .entry(step.gradient.locus())
+                .or_default()
+                .push((linear + index, LocusStep::Factor(step)));
+        }
+        // Each locus's material and carried remainders, taken apart: a locus's steps read and
+        // write only its own, so the loci run together (`hnn::realization`), each in its
+        // steps' order with its own budgeted carry, at the clock it would advance it to.
+        let mut local: BTreeMap<Locus, Carries> = groups
+            .keys()
+            .map(|locus| (*locus, Carries::new()))
+            .collect();
+        let mut rest = Carries::new();
+        for (key, carry) in std::mem::take(&mut next.carries) {
+            match local.get_mut(&key.0) {
+                Some(map) => {
+                    map.insert(key, carry);
+                }
+                None => {
+                    rest.insert(key, carry);
+                }
             }
-            let at = self.budgeted(&mut strokes, step.gradient.locus())?;
-            next.factor_step(step, &eta, at)?;
+        }
+        let mut materials = LocusMaterial::split(&mut next.rings, &mut next.contacts, &groups);
+        let regions: Vec<_> = groups
+            .iter()
+            .zip(local)
+            .map(|((locus, steps), (_, carries))| (*locus, steps, materials.remove(locus), carries))
+            .collect();
+        let done: Vec<LocusDeposit> = regions
+            .into_par_iter()
+            .map(|(locus, steps, mut material, mut carries)| {
+                self.deposit_at(locus, steps, material.as_mut(), &mut carries, &proxy, &eta)
+                    .map(|at| (locus, carries, at))
+            })
+            .collect();
+        drop(materials);
+        // The refusal is the first in the deposit's order: the one the steps taken in that order
+        // meet first.
+        let (mut deposited, mut refusals) = (Vec::with_capacity(done.len()), Vec::new());
+        for region in done {
+            match region {
+                Ok(region) => deposited.push(region),
+                Err(refusal) => refusals.push(refusal),
+            }
+        }
+        if let Some((_, refusal)) = refusals.into_iter().min_by_key(|(index, _)| *index) {
+            return Err(refusal);
+        }
+        let mut strokes: BTreeMap<Locus, BudgetedCarry> = BTreeMap::new();
+        next.carries = rest;
+        for (locus, carries, at) in deposited {
+            next.carries.extend(carries);
+            strokes.insert(locus, at);
         }
         next.carries.retain(|_, carry| !carry.0.is_empty());
         next.commit += 1;
@@ -1914,170 +2054,65 @@ impl Constitution {
         Ok((next, reading))
     }
 
-    /// The budgeted carry of one deposit at a locus, opened at the clock the deposit would advance
-    /// it to.
-    fn budgeted<'a>(
+    /// **One locus's steps of a deposit**, in the deposit's order, on the locus's material and
+    /// carried remainders alone, with the locus's budgeted carry opened at the clock the deposit
+    /// would advance it to. A refusal returns with the place of the step that met it in the
+    /// deposit's order.
+    fn deposit_at(
         &self,
-        strokes: &'a mut BTreeMap<Locus, BudgetedCarry>,
         locus: Locus,
-    ) -> Result<&'a mut BudgetedCarry, HnnError> {
-        Ok(match strokes.entry(locus) {
-            Entry::Occupied(open) => open.into_mut(),
-            Entry::Vacant(slot) => slot.insert(BudgetedCarry::new(
-                self.lattice(locus)?,
-                self.clock(locus) + 1,
-            )),
-        })
-    }
-
-    /// **One factor family's carried step** (module header): `h_x` carried to `h_x'`, then
-    /// `Δx = (η_x / h_x') G_x` carried onto the family's entries.
-    fn factor_step(
-        &mut self,
-        step: &FactorStep,
+        steps: &[(usize, LocusStep<'_>)],
+        mut material: Option<&mut LocusMaterial<'_>>,
+        carries: &mut Carries,
+        proxy: &Rat,
         eta: &Rat,
-        at: &mut BudgetedCarry,
-    ) -> Result<(), HnnError> {
-        let locus = step.gradient.locus();
-        let energy = &step.energy;
-        match &step.gradient {
-            FactorGradient::Passive { ring, gradient } => {
-                let material = &mut self.rings[*ring];
-                let rate = advance(
-                    &mut self.carries,
-                    at,
-                    (locus, Carrier::PassiveScale),
-                    &mut material.passive_scale,
-                    energy,
-                    eta,
-                )?;
-                material.passive = carried_matrix(
-                    self.carries.entry((locus, Carrier::Passive)).or_default(),
-                    at,
-                    Carrier::Passive,
-                    &material.passive,
-                    &rate_matrix(&rate, gradient)?,
-                    "a passive factor gradient",
-                )?;
+    ) -> Result<BudgetedCarry, (usize, HnnError)> {
+        let mut stroke: Option<BudgetedCarry> = None;
+        let budgeted = |stroke: &mut Option<BudgetedCarry>| -> Result<(), HnnError> {
+            if stroke.is_none() {
+                *stroke = Some(BudgetedCarry::new(
+                    self.lattice(locus)?,
+                    self.clock(locus) + 1,
+                ));
             }
-            FactorGradient::Slices { ring, gradient } => {
-                let material = &mut self.rings[*ring];
-                let rate = advance(
-                    &mut self.carries,
-                    at,
-                    (locus, Carrier::SliceScale),
-                    &mut material.slice_scale,
-                    energy,
-                    eta,
-                )?;
-                let n = material.standing.len();
-                let carry = self.carries.entry((locus, Carrier::Slices)).or_default();
-                for (rho, ((u, v), (du, dv))) in
-                    material.slices.iter_mut().zip(gradient).enumerate()
-                {
-                    for (side, (x, dx)) in [(u, du), (v, dv)].into_iter().enumerate() {
-                        for (i, (x, dx)) in x.iter_mut().zip(dx).enumerate() {
-                            carry.deposit(
-                                at,
-                                Carrier::Slices,
-                                (2 * rho + side) * n + i,
-                                x,
-                                &rate_times(&rate, dx),
-                            );
-                        }
-                    }
+            Ok(())
+        };
+        for (index, step) in steps {
+            let refused = |refusal: HnnError| (*index, refusal);
+            if self.released.contains(&locus) {
+                return Err(refused(HnnError::ReleasedLocus { locus }));
+            }
+            match step {
+                LocusStep::Linear(step) => {
+                    let law = material
+                        .as_deref_mut()
+                        .and_then(|material| material.law(step.locus))
+                        .ok_or(HnnError::MissingSourcePort {
+                            ring: match step.locus {
+                                LinearLocus::SourcePort(g)
+                                | LinearLocus::Contrast(g)
+                                | LinearLocus::Receiving(g) => g,
+                            },
+                        })
+                        .map_err(refused)?;
+                    budgeted(&mut stroke).map_err(refused)?;
+                    let at = stroke.as_mut().expect("opened above");
+                    *law = law.deposited(&step.samples, proxy, at).map_err(refused)?;
                 }
-            }
-            FactorGradient::Standing { ring, gradient } => {
-                let material = &mut self.rings[*ring];
-                let rate = advance(
-                    &mut self.carries,
-                    at,
-                    (locus, Carrier::StandingScale),
-                    &mut material.standing_scale,
-                    energy,
-                    eta,
-                )?;
-                let carry = self.carries.entry((locus, Carrier::Standing)).or_default();
-                for (i, (x, dx)) in material.standing.iter_mut().zip(gradient).enumerate() {
-                    carry.deposit(at, Carrier::Standing, i, x, &rate_times(&rate, dx));
+                LocusStep::Factor(step) => {
+                    budgeted(&mut stroke).map_err(refused)?;
+                    let at = stroke.as_mut().expect("opened above");
+                    let material = material
+                        .as_deref_mut()
+                        .ok_or(HnnError::Lattice { locus })
+                        .map_err(refused)?;
+                    factor_step(material, carries, step, eta, at).map_err(refused)?;
                 }
-            }
-            FactorGradient::PairPort {
-                ring,
-                offset,
-                outputs,
-                current,
-                earlier,
-            } => {
-                let material = &mut self.rings[*ring];
-                let rate = advance(
-                    &mut self.carries,
-                    at,
-                    (locus, Carrier::PairScale),
-                    &mut material.pair_scale,
-                    energy,
-                    eta,
-                )?;
-                let slot = material
-                    .pairs
-                    .iter_mut()
-                    .find(|(declared, _)| declared == offset)
-                    .ok_or(HnnError::Offset { offset: *offset })?;
-                let mut family = |index: usize, base: &[Vec<Rat>], delta: &[Vec<Rat>]| {
-                    let carrier = Carrier::Pair {
-                        offset: *offset,
-                        family: index,
-                    };
-                    carried_rows(
-                        self.carries.entry((locus, carrier)).or_default(),
-                        at,
-                        carrier,
-                        base,
-                        delta,
-                        &rate,
-                    )
-                };
-                let outputs = family(0, slot.1.outputs(), outputs);
-                let current = family(1, slot.1.current_reads(), current);
-                let earlier = family(2, slot.1.earlier_reads(), earlier);
-                slot.1 = PairPort::new(outputs, current, earlier)?;
-            }
-            FactorGradient::Storage { contact, gradient }
-            | FactorGradient::Stiffness { contact, gradient }
-            | FactorGradient::Dissipation { contact, gradient } => {
-                let index = match &step.gradient {
-                    FactorGradient::Storage { .. } => 0,
-                    FactorGradient::Stiffness { .. } => 1,
-                    _ => 2,
-                };
-                let material = &mut self.contacts[*contact];
-                let rate = advance(
-                    &mut self.carries,
-                    at,
-                    (locus, Carrier::FactorScale(index)),
-                    &mut material.scales[index],
-                    energy,
-                    eta,
-                )?;
-                let factor = match index {
-                    0 => &mut material.storage,
-                    1 => &mut material.stiffness,
-                    _ => &mut material.dissipation,
-                };
-                *factor = carried_matrix(
-                    self.carries
-                        .entry((locus, Carrier::Factor(index)))
-                        .or_default(),
-                    at,
-                    Carrier::Factor(index),
-                    factor,
-                    &rate_matrix(&rate, gradient)?,
-                    "a channel factor gradient",
-                )?;
             }
         }
-        Ok(())
+        stroke
+            .ok_or(HnnError::Lattice { locus })
+            .map_err(|refusal| (0, refusal))
     }
 
     /// **Release loci** (the collapse's only mutator, `hnn::retention`): each released locus's
@@ -2133,6 +2168,293 @@ impl Constitution {
         self.clocks.retain(|locus, _| kept(locus));
         Ok(())
     }
+}
+
+/// One locus's deposited carried remainders and budgeted carry, or the refusal its steps met with
+/// the place of the refusing step in the deposit's order.
+type LocusDeposit = Result<(Locus, Carries, BudgetedCarry), (usize, HnnError)>;
+
+/// One step of a deposit at its locus.
+#[derive(Clone, Copy)]
+enum LocusStep<'d> {
+    Linear(&'d LinearStep),
+    Factor(&'d FactorStep),
+}
+
+/// [definition; agent-inferred] **One locus's material, borrowed apart from the rest** of the
+/// successor a deposit builds (the module header's loci): the element's passive factor, contrast
+/// port and slices with their statistics (and the ring's width, which the slices' carry indexes
+/// by); the standing and its statistic; the source port with the pair ports and their statistic;
+/// the receiving map; a contact's channel factors. No two loci share a part, so their steps run
+/// together.
+enum LocusMaterial<'a> {
+    Element {
+        passive: &'a mut ExactRatMatrix,
+        passive_scale: &'a mut Rat,
+        contrast: &'a mut NormalLaw,
+        slices: &'a mut Vec<(Vec<Rat>, Vec<Rat>)>,
+        slice_scale: &'a mut Rat,
+        width: usize,
+    },
+    Standing {
+        standing: &'a mut Vec<Rat>,
+        scale: &'a mut Rat,
+    },
+    SourcePort {
+        source: &'a mut Option<NormalLaw>,
+        pairs: &'a mut Vec<(usize, PairPort)>,
+        scale: &'a mut Rat,
+    },
+    ReceivingMap {
+        receiving: &'a mut Option<NormalLaw>,
+    },
+    Channel(&'a mut ContactMaterial),
+}
+
+impl<'a> LocusMaterial<'a> {
+    /// Each locus the steps name, its material borrowed apart.
+    fn split<S>(
+        rings: &'a mut [RingMaterial],
+        contacts: &'a mut [ContactMaterial],
+        named: &BTreeMap<Locus, S>,
+    ) -> BTreeMap<Locus, Self> {
+        let mut materials = BTreeMap::new();
+        for (g, material) in rings.iter_mut().enumerate() {
+            let RingMaterial {
+                standing,
+                standing_scale,
+                passive,
+                passive_scale,
+                contrast,
+                slices,
+                slice_scale,
+                source,
+                pairs,
+                pair_scale,
+                receiving,
+            } = material;
+            let width = standing.len();
+            if named.contains_key(&Locus::Element(g)) {
+                materials.insert(
+                    Locus::Element(g),
+                    LocusMaterial::Element {
+                        passive,
+                        passive_scale,
+                        contrast,
+                        slices,
+                        slice_scale,
+                        width,
+                    },
+                );
+            }
+            if named.contains_key(&Locus::Standing(g)) {
+                materials.insert(
+                    Locus::Standing(g),
+                    LocusMaterial::Standing {
+                        standing,
+                        scale: standing_scale,
+                    },
+                );
+            }
+            if named.contains_key(&Locus::SourcePort(g)) {
+                materials.insert(
+                    Locus::SourcePort(g),
+                    LocusMaterial::SourcePort {
+                        source,
+                        pairs,
+                        scale: pair_scale,
+                    },
+                );
+            }
+            if named.contains_key(&Locus::ReceivingMap(g)) {
+                materials.insert(
+                    Locus::ReceivingMap(g),
+                    LocusMaterial::ReceivingMap { receiving },
+                );
+            }
+        }
+        for (a, material) in contacts.iter_mut().enumerate() {
+            if named.contains_key(&Locus::Channel(a)) {
+                materials.insert(Locus::Channel(a), LocusMaterial::Channel(material));
+            }
+        }
+        materials
+    }
+
+    /// The normal law a linear step deposits on, when this locus carries it.
+    fn law(&mut self, locus: LinearLocus) -> Option<&mut NormalLaw> {
+        match (locus, self) {
+            (LinearLocus::SourcePort(_), LocusMaterial::SourcePort { source, .. }) => {
+                source.as_mut()
+            }
+            (LinearLocus::Contrast(_), LocusMaterial::Element { contrast, .. }) => Some(contrast),
+            (LinearLocus::Receiving(_), LocusMaterial::ReceivingMap { receiving }) => {
+                receiving.as_mut()
+            }
+            _ => None,
+        }
+    }
+}
+
+/// **One factor family's carried step** (module header): `h_x` carried to `h_x'`, then
+/// `Δx = (η_x / h_x') G_x` carried onto the family's entries, on the family's locus's material and
+/// carried remainders.
+fn factor_step(
+    material: &mut LocusMaterial<'_>,
+    carries: &mut Carries,
+    step: &FactorStep,
+    eta: &Rat,
+    at: &mut BudgetedCarry,
+) -> Result<(), HnnError> {
+    let locus = step.gradient.locus();
+    let energy = &step.energy;
+    match (&step.gradient, material) {
+        (
+            FactorGradient::Passive { gradient, .. },
+            LocusMaterial::Element {
+                passive,
+                passive_scale,
+                ..
+            },
+        ) => {
+            let rate = advance(
+                carries,
+                at,
+                (locus, Carrier::PassiveScale),
+                passive_scale,
+                energy,
+                eta,
+            )?;
+            **passive = carried_matrix(
+                carries.entry((locus, Carrier::Passive)).or_default(),
+                at,
+                Carrier::Passive,
+                passive,
+                &rate_matrix(&rate, gradient)?,
+                "a passive factor gradient",
+            )?;
+        }
+        (
+            FactorGradient::Slices { gradient, .. },
+            LocusMaterial::Element {
+                slices,
+                slice_scale,
+                width,
+                ..
+            },
+        ) => {
+            let rate = advance(
+                carries,
+                at,
+                (locus, Carrier::SliceScale),
+                slice_scale,
+                energy,
+                eta,
+            )?;
+            let n = *width;
+            let carry = carries.entry((locus, Carrier::Slices)).or_default();
+            for (rho, ((u, v), (du, dv))) in slices.iter_mut().zip(gradient).enumerate() {
+                for (side, (x, dx)) in [(u, du), (v, dv)].into_iter().enumerate() {
+                    for (i, (x, dx)) in x.iter_mut().zip(dx).enumerate() {
+                        carry.deposit(
+                            at,
+                            Carrier::Slices,
+                            (2 * rho + side) * n + i,
+                            x,
+                            &rate_times(&rate, dx),
+                        );
+                    }
+                }
+            }
+        }
+        (
+            FactorGradient::Standing { gradient, .. },
+            LocusMaterial::Standing { standing, scale },
+        ) => {
+            let rate = advance(
+                carries,
+                at,
+                (locus, Carrier::StandingScale),
+                scale,
+                energy,
+                eta,
+            )?;
+            let carry = carries.entry((locus, Carrier::Standing)).or_default();
+            for (i, (x, dx)) in standing.iter_mut().zip(gradient).enumerate() {
+                carry.deposit(at, Carrier::Standing, i, x, &rate_times(&rate, dx));
+            }
+        }
+        (
+            FactorGradient::PairPort {
+                offset,
+                outputs,
+                current,
+                earlier,
+                ..
+            },
+            LocusMaterial::SourcePort { pairs, scale, .. },
+        ) => {
+            let rate = advance(carries, at, (locus, Carrier::PairScale), scale, energy, eta)?;
+            let slot = pairs
+                .iter_mut()
+                .find(|(declared, _)| declared == offset)
+                .ok_or(HnnError::Offset { offset: *offset })?;
+            let mut family = |index: usize, base: &[Vec<Rat>], delta: &[Vec<Rat>]| {
+                let carrier = Carrier::Pair {
+                    offset: *offset,
+                    family: index,
+                };
+                carried_rows(
+                    carries.entry((locus, carrier)).or_default(),
+                    at,
+                    carrier,
+                    base,
+                    delta,
+                    &rate,
+                )
+            };
+            let outputs = family(0, slot.1.outputs(), outputs);
+            let current = family(1, slot.1.current_reads(), current);
+            let earlier = family(2, slot.1.earlier_reads(), earlier);
+            slot.1 = PairPort::new(outputs, current, earlier)?;
+        }
+        (
+            FactorGradient::Storage { gradient, .. }
+            | FactorGradient::Stiffness { gradient, .. }
+            | FactorGradient::Dissipation { gradient, .. },
+            LocusMaterial::Channel(material),
+        ) => {
+            let index = match &step.gradient {
+                FactorGradient::Storage { .. } => 0,
+                FactorGradient::Stiffness { .. } => 1,
+                _ => 2,
+            };
+            let rate = advance(
+                carries,
+                at,
+                (locus, Carrier::FactorScale(index)),
+                &mut material.scales[index],
+                energy,
+                eta,
+            )?;
+            let factor = match index {
+                0 => &mut material.storage,
+                1 => &mut material.stiffness,
+                _ => &mut material.dissipation,
+            };
+            *factor = carried_matrix(
+                carries.entry((locus, Carrier::Factor(index))).or_default(),
+                at,
+                Carrier::Factor(index),
+                factor,
+                &rate_matrix(&rate, gradient)?,
+                "a channel factor gradient",
+            )?;
+        }
+        // A factor step's locus is its gradient's, so its material is this locus's.
+        _ => return Err(HnnError::Lattice { locus }),
+    }
+    Ok(())
 }
 
 fn joint_form(
