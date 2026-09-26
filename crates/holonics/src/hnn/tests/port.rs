@@ -13,11 +13,13 @@ use super::support::Draw;
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{Constitution, Steps};
 use crate::hnn::field::{ConstitutionRead, Current, End, Field};
+use crate::hnn::masses::CountFace;
 use crate::hnn::moment::PairPort;
 use crate::hnn::pending::PendingRatio;
 use crate::hnn::port::{ExecutionPort, Handle, Pullback, ReceiptDetail, Transpose, WordReturn};
 use crate::hnn::propagation::{Operands, contact_exponent, element_step, junction_swing, transit};
 use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector, TargetPhases, target_phases};
+use crate::hnn::receiving::ReceivingPhases;
 use crate::hnn::reference::{Reference, compose, one_hot};
 use crate::hnn::word::Word;
 use crate::ratio::exponentiated::power_of_two;
@@ -27,8 +29,30 @@ use crate::ratio::{Rat, integer, rat};
 use crate::receiver::reception::{Component, InteractionReturn};
 use crate::receiver::release::{BeyondTolerance, DecisionRule, WithinTolerance};
 
-/// A word opened on a storage injection on every ring, its logits and a covector from a ratio
-/// against drawn targets.
+/// The count face at the declared empty-window region (Decision 27): a word opened on an injection
+/// has no moment, so it reads the region no window addresses.
+fn empty_window(theta: &Constitution, phases: &ReceivingPhases) -> CountFace {
+    CountFace::read(
+        theta.class_masses(phases.ring()).unwrap(),
+        0,
+        phases.grain(),
+    )
+    .unwrap()
+}
+
+/// **The wave's logits** of combined reads: the count face's grain logits taken back out, so the
+/// word's linear map from its opening storage is paired alone (the count part is a stored face and
+/// no function of the storage).
+fn wave(logits: &[Vec<Rat>], count: &CountFace) -> Vec<Vec<Rat>> {
+    let stored = count.logits();
+    logits
+        .iter()
+        .map(|read| read.iter().zip(&stored).map(|(f, k)| f - k).collect())
+        .collect()
+}
+
+/// A word opened on a storage injection on every ring, its wave's logits and a covector from a
+/// ratio against drawn targets.
 fn injected(
     field: &Field,
     theta: &Constitution,
@@ -48,12 +72,13 @@ fn injected(
         .collect();
     let mut word = Word::open_on(field, theta, &current, storage.clone()).unwrap();
     let anchors = word.forward(&phases).unwrap();
+    let count = empty_window(theta, &phases);
     let reads: Vec<_> = anchors
         .iter()
-        .map(|anchor| phases.read(field, theta, &current, anchor).unwrap())
+        .map(|anchor| phases.read(field, theta, &current, anchor, &count).unwrap())
         .collect();
     let faces = Faces::of_reads(&reads, phases.grain()).unwrap();
-    let logits = faces.logits.clone();
+    let logits = wave(&faces.logits, &count);
     let targets = [draw.below(4), draw.below(4)];
     let ratio = HolonRatio::compare(
         faces,
@@ -109,12 +134,17 @@ fn the_word_return_pulls_back_through_the_executed_charts() {
     let pulled = |operands: Operands| {
         let mut word = Word::on_operands(&field, operands, storage.clone()).unwrap();
         let anchors = word.forward(&phases).unwrap();
+        let count = empty_window(&theta, &phases);
         let reads: Vec<_> = anchors
             .iter()
-            .map(|anchor| phases.read(&field, &theta, &current, anchor).unwrap())
+            .map(|anchor| {
+                phases
+                    .read(&field, &theta, &current, anchor, &count)
+                    .unwrap()
+            })
             .collect();
         let faces = Faces::of_reads(&reads, phases.grain()).unwrap();
-        let logits = faces.logits.clone();
+        let logits = wave(&faces.logits, &count);
         let covector = HolonRatio::compare(
             faces,
             &[1, 3],
@@ -486,6 +516,9 @@ fn tangent(cut: &Cut, plus: (&Field, &Constitution), minus: (&Field, &Constituti
     );
     let (ring, lift) = (field.ring(receiving), &current.lift()[receiving]);
     let (_, faces) = cut.pending.read(field, theta).unwrap();
+    // The count face is a stored face (Decision 27): the primal's wave is the read without it.
+    let count = phases.count_face(theta, cut.pending.moment()).unwrap();
+    let waves = wave(&faces.logits, &count);
     let mut derivative = Rat::zero();
     for (j, epoch) in phases.epochs().enumerate() {
         let (v, dv) = (
@@ -494,7 +527,7 @@ fn tangent(cut: &Cut, plus: (&Field, &Constitution), minus: (&Field, &Constituti
         );
         assert_eq!(
             apply(map, &v),
-            faces.logits[j],
+            waves[j],
             "the primal is the word's own read"
         );
         let d_logits = add(&apply(&d_map, &v), &apply(map, &dv));

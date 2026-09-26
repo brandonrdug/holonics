@@ -37,8 +37,8 @@
 //! ([`crate::hnn::Word::pull_back`]) is carried to every locus:
 //!
 //! ```text
-//! R        sample (P_R^(τ_R)(v_R(e_j) + h_R), −g_j, χ_R(t_j)) per receiving phase     exogenous normal law
-//! h_R      Π Rᵀ Σ_j (−g_j) with the face's curvature Σ_j tr(Π Rᵀ 𝒥_j R Π)            harmonic step
+//! R        sample (P_R^(τ_R) v_R(e_j), −g_j) per receiving phase                   normal law
+//! C_(r,t)  +w at the window's region r and each target t_j (q = p̃ + g = e_t)        class masses (Decision 27)
 //! W_c,g    sample (c_t, −u_t) at each tick of the element's window                  normal law
 //! E_g      sample (M_g[c], −P^(c−τ_g) s̄_g(0)) per phase with counts                  normal law
 //! f_g      G = (K̄ + K̄ᵀ) f,  K̄ = Σ_t u_t x̄_tᵀ;   slices ∂/∂u_ρ = σ_ρ[(x̄·v)u − (u·v)x̄], ∂/∂v_ρ likewise
@@ -146,10 +146,11 @@ use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartReading, ChartStart, Charts, Remainders};
 use crate::hnn::constitution::{
     CAMPAIGN_ONE_BUDGET, CarrierBits, Constitution, DepositReading, FactorGradient, FactorStep,
-    HarmonicStep, LinearLocus, LinearStep, Locus, Sample, Steps,
+    LinearLocus, LinearStep, Locus, Sample, Steps,
 };
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::keys::{self, KeyLocation};
+use crate::hnn::masses::{MassStep, Regions};
 use crate::hnn::moment::{Ingested, SourceMoment};
 use crate::hnn::pending::PendingRatio;
 use crate::hnn::port::{
@@ -159,10 +160,10 @@ use crate::hnn::port::{
 };
 use crate::hnn::propagation::{contact_exponent, path_attenuation};
 use crate::hnn::ratio::{
-    Faces, HolonRatio, PhaseRatio, code_face, interval_sum, log2_enclosure, target_phases,
+    Faces, HolonRatio, PhaseRatio, interval_sum, log2_enclosure, target_phases,
 };
 use crate::hnn::realization::{apply_rows, indexed, outer_rows};
-use crate::hnn::receiving::{ReceivingPhases, standing_energy, standing_return};
+use crate::hnn::receiving::ReceivingPhases;
 use crate::hnn::retention::{AeonBoundary, Diamond, aeon_readings, collapse, contained, separator};
 use crate::hnn::word::KeptWord;
 use crate::holon::contact::FeatureCovector;
@@ -1203,9 +1204,10 @@ impl ExecutionPort for Reference {
                 .open_charted(field, &resident.constitution, &mut resident.charts)?;
         resident.tally.read(&word.operands().charts());
         let anchors = word.forward(&phases)?;
+        let count = phases.count_face(&resident.constitution, slot.ratio.moment())?;
         let reads = anchors
             .iter()
-            .map(|anchor| phases.read(field, &resident.constitution, &current, anchor))
+            .map(|anchor| phases.read(field, &resident.constitution, &current, anchor, &count))
             .collect::<Result<Vec<_>, _>>()?;
         let faces = Faces::of_reads(&reads, phases.grain())?;
         // The width is read from the receiving phases' fibres; the tolerance is their grain.
@@ -1428,8 +1430,7 @@ fn matrix_of(rows: Vec<Vec<Rat>>, columns: usize) -> Result<ExactRatMatrix, HnnE
 }
 
 /// **The compare's composition** (module header): the complete pullback and the deposit staged
-/// inside the pending ratio's causal diamond, the receiving map's samples carrying the compared
-/// targets' code faces (Decision 26).
+/// inside the pending ratio's causal diamond.
 ///
 /// [definition; agent-inferred] **Its exact chart.** Each gradient is a sum of rank-one terms over
 /// the word's ticks (`Σ_t u_t x̄_tᵀ`, `Σ_t 2 r̄_t (w − ω)_tᵀ`, the slices' `σ[(x̄·v)u − (u·v)x̄]`, …)
@@ -1468,33 +1469,13 @@ pub fn compose(
     let mut factors: Vec<FactorStep> = Vec::new();
     let one = Rat::one();
 
-    // The receiving map's operand: the word's read of the change and the bound harmonic
-    // coordinate, P_R^(τ_R)(v_R + h_R) = P_R^(τ_R) v_R + h_R (Decision 26, the standing read).
+    // The receiving map: Σ_j g_j ⊗ P_R^(τ_R) v_R(e_j), by row blocks.
     let receiving = phases.ring();
-    let receiving_ring = field.ring(receiving);
-    let width_r = receiving_ring.width();
-    if targets.len() != back.reads.len() {
-        return Err(HnnError::Shape {
-            what: "the compared targets against the receiving reads",
-            expected: back.reads.len(),
-            found: targets.len(),
-        });
-    }
-    let standing = constitution.harmonic(receiving);
-    let features: Vec<Vec<Rat>> = back
-        .reads
-        .iter()
-        .map(|(feature, _)| match standing {
-            Some(harmonic) => add(feature, harmonic),
-            None => feature.clone(),
-        })
-        .collect();
-    // The receiving map's gradient Σ_j ∇_j ⊗ P_R^(τ_R)(v_R + h_R), by row blocks.
+    let width_r = field.ring(receiving).width();
     let read_charts: Vec<[Chart; 2]> = back
         .reads
         .iter()
-        .zip(&features)
-        .map(|((_, gradient), feature)| [integral(gradient), integral(feature)])
+        .map(|(feature, gradient)| [integral(gradient), integral(feature)])
         .collect();
     let map_gradient = outer_rows(
         2 * alphabet,
@@ -1504,55 +1485,42 @@ pub fn compose(
             .map(|[gradient, feature]| (&one, gradient, feature))
             .collect::<Vec<_>>(),
     );
-    // Its exogenous samples: each read's operand, the comparison's descent covector and the
-    // target's code face χ_R(t_j) = m·e_(t_j) at the receiver's margin.
     let samples = back
         .reads
         .iter()
-        .zip(&features)
-        .zip(targets)
-        .map(|(((_, gradient), feature), &target)| {
-            Ok(Sample {
-                weight: one.clone(),
-                feature: feature.clone(),
-                covector: negated(gradient),
-                target: Some(code_face(phases.margin(), target, alphabet)?),
-            })
+        .map(|(feature, gradient)| Sample {
+            weight: one.clone(),
+            feature: feature.clone(),
+            covector: negated(gradient),
         })
-        .collect::<Result<_, HnnError>>()?;
+        .collect();
     linear.push(LinearStep {
         locus: LinearLocus::Receiving(receiving),
         samples,
     });
-    // The bound harmonic coordinate's return, Π Rᵀ Σ_j ∇_j, and its step on the descent side with
-    // the read's energy on the fixed space.
-    let mut harmonic_steps = Vec::new();
-    let harmonic = match standing {
-        Some(_) => {
-            let map = constitution
-                .receiving_map(receiving)
-                .ok_or(HnnError::MissingReceivingMap { ring: receiving })?;
-            let gradients: Vec<&[Rat]> = back
-                .reads
-                .iter()
-                .map(|(_, gradient)| gradient.as_slice())
-                .collect();
-            let returned = standing_return(receiving_ring, map, &gradients)?;
-            if retained(Locus::ReceivingMap(receiving)) {
-                let reads: Vec<(&[Rat], usize)> = gradients
-                    .iter()
-                    .copied()
-                    .zip(targets.iter().copied())
-                    .collect();
-                harmonic_steps.push(HarmonicStep {
-                    ring: receiving,
-                    gradient: negated(&returned),
-                    energy: standing_energy(receiving_ring, map, &reads)?,
-                });
-            }
-            Some(returned)
-        }
-        None => None,
+    // The receiving parametron's class masses (Decision 27): each compared target, whose reached
+    // covector `g = q − p̃` reconstructs `q = p̃ + g = e_t`, deposits its unit mass at the region
+    // of the pending ratio's retained window, when the comparison reached the receiving locus.
+    if targets.len() != back.reads.len() {
+        return Err(HnnError::Shape {
+            what: "the compared targets against the receiving reads",
+            expected: back.reads.len(),
+            found: targets.len(),
+        });
+    }
+    let masses = if retained(Locus::ReceivingMap(receiving)) {
+        let region = phases.regions().region(&moment.window(), alphabet)?;
+        targets
+            .iter()
+            .map(|&class| MassStep {
+                ring: receiving,
+                region,
+                class,
+                weight: one.clone(),
+            })
+            .collect()
+    } else {
+        Vec::new()
     };
 
     // The rings' element material and class covectors, the rings together.
@@ -1616,7 +1584,6 @@ pub fn compose(
                     .map(|x| Rat::from_integer(BigInt::from(*x)))
                     .collect(),
                 covector: negated(h),
-                target: None,
             });
         }
         let mut pair_pullbacks = Vec::new();
@@ -1744,11 +1711,10 @@ pub fn compose(
         rings: ring_pullbacks,
         contacts: contact_pullbacks,
         receiving: (receiving, matrix_of(map_gradient, width_r)?),
-        harmonic,
     };
     Ok((
         pullback,
-        Deposit::new(constitution.commit(), linear, factors, reached).with_harmonic(harmonic_steps),
+        Deposit::new(constitution.commit(), linear, factors, reached).with_masses(masses),
     ))
 }
 
@@ -1873,7 +1839,6 @@ fn compose_ring(
                 weight: one.clone(),
                 feature: tick.contrast.clone(),
                 covector: negated(&tick.adjoint),
-                target: None,
             });
         }
     }
@@ -2097,13 +2062,17 @@ impl Cut {
 }
 
 /// [definition] **Bits on a population of targets**: the model's code length on its committed
-/// faces and the online baselines' (uniform; order-0 and order-1 with the Krichevsky–Trofimov prior;
-/// PPM of order [`PPM_ORDER`] with escape rule C), each an enclosure, over `cells` targets. xz and
-/// zstd, with their description cost, are exterior codecs: the crate runs no process, so they are
-/// owed to the application, computed there on the same cut and joined to this report.
+/// faces; the count face alone's (Decision 27: the receiving parametron's masses at the window's
+/// region, read at the grain, with no wave, at the same constitution and window as the model's
+/// face, so `model − counts` is the wave's contribution); and the online baselines' (uniform;
+/// order-0 and order-1 with the Krichevsky–Trofimov prior; PPM of order [`PPM_ORDER`] with escape
+/// rule C), each an enclosure, over `cells` targets. xz and zstd, with their description cost, are
+/// exterior codecs: the crate runs no process, so they are owed to the application, computed there
+/// on the same cut and joined to this report.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Bits {
     pub model: ExactInterval,
+    pub counts: ExactInterval,
     pub uniform: ExactInterval,
     pub order_zero: ExactInterval,
     pub order_one: ExactInterval,
@@ -2116,6 +2085,7 @@ impl Bits {
         let zero = ExactInterval::point(Rat::zero());
         Self {
             model: zero.clone(),
+            counts: zero.clone(),
             uniform: zero.clone(),
             order_zero: zero.clone(),
             order_one: zero.clone(),
@@ -2151,18 +2121,14 @@ pub struct StateReport {
 
 /// [definition] **One point of the constitution's curve** (design (f) item 4): the commit reached,
 /// the constitution's exact bits by carrier (lattice entries, carried remainders, solved charts),
-/// what the deposit that reached it released (its residuals' exact bits) and stepped (the entries
-/// whose lattice coordinate moved), and the receiving map's prior weight after it (Decision 26,
-/// `constitution::ExogenousReading::prior`: `tr(X̂)/n` of the executed chart of `H_n⁻¹`, the mean
-/// over the Gram's eigen-directions of the factor `H_0 H_n⁻¹` of the declared prior's reading; `None` when the deposit's window reached nothing at
-/// the receiving map). The mount's point releases and steps nothing, and its prior weight is `1`.
+/// and what the deposit that reached it released (its residuals' exact bits) and stepped (the
+/// entries whose lattice coordinate moved). The mount's point releases and steps nothing.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CurvePoint {
     pub commit: u64,
     pub bits: CarrierBits,
     pub released_bits: u64,
     pub stepped: u64,
-    pub prior: Option<Rat>,
 }
 
 /// [definition] **The exposure's readout** (design (f)): bits on the training and held-out targets
@@ -2223,13 +2189,18 @@ pub struct WordReport {
     pub residual_bound: Rat,
 }
 
-/// The online Krichevsky–Trofimov code length of one cell, `−log₂((count + ½)/(total + |A|/2))`.
-fn kt_bits(count: u64, total: u64, alphabet: usize) -> Result<ExactInterval, HnnError> {
-    let probability = Rat::new(
+/// [definition] **The online Krichevsky–Trofimov probability** of a class seen `count` times in
+/// `total`: `(count + ½)/(total + |A|/2)`, exact (Lean `HNN/RegionCounts.ktProb`).
+pub fn kt_probability(count: u64, total: u64, alphabet: usize) -> Rat {
+    Rat::new(
         BigInt::from(2 * count + 1),
         BigInt::from(2 * total) + BigInt::from(alphabet),
-    );
-    log2_enclosure(&probability.recip())
+    )
+}
+
+/// The online Krichevsky–Trofimov code length of one cell, `−log₂((count + ½)/(total + |A|/2))`.
+fn kt_bits(count: u64, total: u64, alphabet: usize) -> Result<ExactInterval, HnnError> {
+    log2_enclosure(&kt_probability(count, total, alphabet).recip())
 }
 
 /// [definition; agent-inferred] **The PPM baseline's declared order**: two context cells, the
@@ -2317,7 +2288,10 @@ impl Ppm {
     }
 }
 
-/// The exposure's online baselines, fitted on the same stream in the same order.
+/// The exposure's online baselines, fitted on the same stream in the same order. [agent-inferred]
+/// The order-1 baseline's contexts are the preceding-cell regions (`hnn::masses::Regions`), the
+/// stream's first cell in the declared empty-window region, so the count face at that partition
+/// has order-1's law exactly.
 struct Baselines {
     alphabet: usize,
     uniform: ExactInterval,
@@ -2336,16 +2310,21 @@ impl Baselines {
             uniform: log2_enclosure(&Rat::from_integer(BigInt::from(alphabet)))?,
             order_zero: vec![0; alphabet],
             order_one: BTreeMap::new(),
-            order_one_totals: vec![0; alphabet],
+            order_one_totals: vec![0; Regions::PrecedingCell.count(alphabet)],
             previous: None,
             seen: 0,
             ppm: Ppm::new(PPM_ORDER, alphabet),
         })
     }
 
+    /// The order-1 context: the preceding cell's region.
+    fn context(&self) -> usize {
+        self.previous.map_or(0, |cell| 1 + cell)
+    }
+
     /// Count one cell in the Krichevsky–Trofimov baselines.
     fn count(&mut self, code: usize) {
-        let context = self.previous.unwrap_or(0);
+        let context = self.context();
         self.order_zero[code] += 1;
         *self.order_one.entry((context, code)).or_insert(0) += 1;
         self.order_one_totals[context] += 1;
@@ -2361,7 +2340,7 @@ impl Baselines {
 
     /// Code one cell in every baseline into `bits`, then count it.
     fn code(&mut self, bits: &mut Bits, code: usize) -> Result<(), HnnError> {
-        let context = self.previous.unwrap_or(0);
+        let context = self.context();
         bits.uniform = interval_sum(&bits.uniform, &self.uniform)?;
         bits.order_zero = interval_sum(
             &bits.order_zero,
@@ -2519,7 +2498,6 @@ where
         bits: resident.constitution().carrier_bits(),
         released_bits: 0,
         stepped: 0,
-        prior: Some(Rat::one()),
     }];
     let (mut windows, mut open_windows, mut peak_word_bits) = (0u64, 0u64, 0u64);
     let (mut forward, mut adjoint) = (Remainders::default(), Remainders::default());
@@ -2575,6 +2553,14 @@ where
                 .iter()
                 .enumerate()
                 .any(|(offset, _)| cut.held_out(position + offset));
+            // The count face alone (Decision 27): the masses the compare read, at the window's
+            // region, before the deposit and the window's ingest.
+            let count = phases.count_face(
+                resident.constitution(),
+                resident.moment(&moment).ok_or(HnnError::UnknownHandle {
+                    handle: Handle::Moment(moment),
+                })?,
+            )?;
             for (offset, (phase, &code)) in holon.phases().iter().zip(window).enumerate() {
                 let bits = if cut.held_out(position + offset) {
                     &mut held_out
@@ -2582,6 +2568,7 @@ where
                     &mut training
                 };
                 bits.model = interval_sum(&bits.model, &phase.code_length)?;
+                bits.counts = interval_sum(&bits.counts, &count.code_length(code)?)?;
                 baselines.code(bits, code)?;
             }
             if windowed || resident.stopped().is_some() {
@@ -2595,19 +2582,11 @@ where
                             .deposit
                             .present()
                             .map_or((0, 0), |reading| (reading.released_bits, reading.stepped));
-                        let prior = returned.deposit.present().and_then(|reading| {
-                            reading.charts.iter().find_map(|(locus, chart)| {
-                                (*locus == Locus::ReceivingMap(phases.ring()))
-                                    .then(|| chart.exogenous.as_ref().map(|e| e.prior.clone()))
-                                    .flatten()
-                            })
-                        });
                         curve.push(CurvePoint {
                             commit: resident.constitution().commit(),
                             bits: resident.constitution().carrier_bits(),
                             released_bits,
                             stepped,
-                            prior,
                         });
                     }
                     Err(refusal @ HnnError::ConstitutionBudget { .. }) => {

@@ -699,6 +699,7 @@ fn quarter_turn_path(periods: &[u64], exponents: &[i64], grain: u64) -> FieldDec
             ring: periods.len() - 1,
             aperture: 1,
             tolerance: rat(1, 16),
+            regions: crate::hnn::masses::Regions::PrecedingCell,
         }],
         crib: crate::hnn::field::CribDeclaration {
             window: 16,

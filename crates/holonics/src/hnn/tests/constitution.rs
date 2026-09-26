@@ -35,7 +35,6 @@ fn sample(weight: Rat, feature: Vec<Rat>, covector: Vec<Rat>) -> Sample {
         weight,
         feature,
         covector,
-        target: None,
     }
 }
 
@@ -617,11 +616,6 @@ fn entries(theta: &Constitution, locus: Locus, carrier: Carrier) -> Vec<Rat> {
         (Locus::Element(g) | Locus::SourcePort(g) | Locus::ReceivingMap(g), Carrier::Gram) => {
             ring(g).gram().entries().to_vec()
         }
-        (Locus::ReceivingMap(g), Carrier::Target) => ring(g).target().unwrap().entries().to_vec(),
-        (Locus::ReceivingMap(g), Carrier::Harmonic) => theta.harmonic(g).unwrap().to_vec(),
-        (Locus::ReceivingMap(g), Carrier::HarmonicScale) => {
-            vec![theta.harmonic_scale(g).unwrap().clone()]
-        }
         (Locus::Element(g), Carrier::Passive) => theta.passive_factor(g).entries().to_vec(),
         (Locus::Element(g), Carrier::PassiveScale) => vec![theta.ring_scales(g)[1].clone()],
         (Locus::Element(g), Carrier::Slices) => theta
@@ -651,32 +645,20 @@ fn entries(theta: &Constitution, locus: Locus, carrier: Carrier) -> Vec<Rat> {
 
 /// **The exact updates of a deposit** per carried array (the laws of `NormalLaw::deposited` and
 /// the factor steps, recomputed): `ΔH = Σ w f fᵀ`, `ΔW = γ Σ w g (X̂f)ᵀ` at the successor's solved
-/// chart `X̂`, `Δh_x = Σ w|f|²` and `Δx = (η_x / h_x') G_x` at the successor's statistic; at the
-/// receiving map (Decision 26) `ΔB = Σ w χ fᵀ` and `ΔW = Σ w (χ − W f)(X̂f)ᵀ` at the predecessor's
-/// map, and the harmonic step `Δh_R = (η_x / h_x') Π Rᵀ Σ w g`.
-fn updates(
-    deposit: &Deposit,
-    before: &Constitution,
-    next: &Constitution,
-) -> Vec<((Locus, Carrier), Vec<Rat>)> {
+/// chart `X̂`, `Δh_x = Σ w|f|²` and `Δx = (η_x / h_x') G_x` at the successor's statistic.
+fn updates(deposit: &Deposit, next: &Constitution) -> Vec<((Locus, Carrier), Vec<Rat>)> {
     let steps = next.steps();
     let mut out = Vec::new();
     for step in deposit.linear() {
         let locus = step.locus.locus();
-        let (law, was) = match step.locus {
-            LinearLocus::SourcePort(g) => {
-                (next.source_law(g).unwrap(), before.source_law(g).unwrap())
-            }
-            LinearLocus::Contrast(g) => (next.contrast_law(g), before.contrast_law(g)),
-            LinearLocus::Receiving(g) => (
-                next.receiving_law(g).unwrap(),
-                before.receiving_law(g).unwrap(),
-            ),
+        let law = match step.locus {
+            LinearLocus::SourcePort(g) => next.source_law(g).unwrap(),
+            LinearLocus::Contrast(g) => next.contrast_law(g),
+            LinearLocus::Receiving(g) => next.receiving_law(g).unwrap(),
         };
         let (m, n) = (law.map().rows(), law.map().columns());
         let solved = law.solved();
         let (mut gram, mut map) = (vec![Rat::zero(); n * n], vec![Rat::zero(); m * n]);
-        let mut target = vec![Rat::zero(); m * n];
         for s in &step.samples {
             let reach: Vec<Rat> = (0..n)
                 .map(|i| {
@@ -690,41 +672,14 @@ fn updates(
                     gram[i * n + j] += &s.weight * &s.feature[i] * &s.feature[j];
                 }
             }
-            // The row covector: the proxy step's `γ g`, or the exogenous residual `χ − W f`.
-            let row: Vec<Rat> = match &s.target {
-                Some(face) => (0..m)
-                    .map(|i| {
-                        let read: Rat = (0..n)
-                            .map(|j| was.map().get(i, j).unwrap() * &s.feature[j])
-                            .sum();
-                        &face[i] - read
-                    })
-                    .collect(),
-                None => s.covector.iter().map(|g| &steps.proxy * g).collect(),
-            };
             for i in 0..m {
                 for j in 0..n {
-                    map[i * n + j] += &s.weight * &row[i] * &reach[j];
-                    if let Some(face) = &s.target {
-                        target[i * n + j] += &s.weight * &face[i] * &s.feature[j];
-                    }
+                    map[i * n + j] += &steps.proxy * &s.weight * &s.covector[i] * &reach[j];
                 }
             }
         }
         out.push(((locus, Carrier::Gram), gram));
         out.push(((locus, Carrier::Map), map));
-        if law.is_exogenous() {
-            out.push(((locus, Carrier::Target), target));
-        }
-    }
-    for step in deposit.harmonic() {
-        let locus = Locus::ReceivingMap(step.ring);
-        let rate = &steps.factor / next.harmonic_scale(step.ring).unwrap();
-        out.push(((locus, Carrier::HarmonicScale), vec![step.energy.clone()]));
-        out.push((
-            (locus, Carrier::Harmonic),
-            step.gradient.iter().map(|x| &rate * x).collect(),
-        ));
     }
     for step in deposit.factors() {
         let locus = step.gradient.locus();
@@ -825,8 +780,8 @@ fn ledger(run: &[Deposited]) -> Ledger {
         released: BTreeMap::new(),
         arrays: Vec::new(),
     };
-    for (before, deposit, next, reading) in run {
-        for (array, values) in updates(deposit, before, next) {
+    for (_, deposit, next, reading) in run {
+        for (array, values) in updates(deposit, next) {
             if !ledger.arrays.contains(&array) {
                 ledger.arrays.push(array);
             }
@@ -973,8 +928,8 @@ fn the_carried_gram_stays_positive_definite() {
     let grain = integer(16);
     let mut exact: BTreeMap<Locus, Vec<Rat>> = BTreeMap::new();
     let mut checked = 0;
-    for (before, deposit, next, _) in run {
-        for ((locus, carrier), values) in updates(deposit, before, next) {
+    for (_, deposit, next, _) in run {
+        for ((locus, carrier), values) in updates(deposit, next) {
             if carrier != Carrier::Gram {
                 continue;
             }
@@ -1485,279 +1440,4 @@ fn a_complex_bilinear_block_has_no_declaration() {
         power(&multiply(Rat::one(), Rat::zero())),
         &x[0] * &x[0] + &x[1] * &x[1]
     );
-}
-
-/// A target face on `m` realified rows: the margin `margin` at row `2·class` (Decision 26).
-fn face(m: usize, class: usize, margin: i64) -> Vec<Rat> {
-    let mut face = vec![Rat::zero(); m];
-    face[2 * class] = integer(margin);
-    face
-}
-
-/// An exogenous sample: a weight, a feature, a zero covector (the law does not read it) and a face.
-fn exogenous(weight: Rat, feature: Vec<Rat>, target: Vec<Rat>) -> Sample {
-    Sample {
-        weight,
-        covector: vec![Rat::zero(); target.len()],
-        feature,
-        target: Some(target),
-    }
-}
-
-/// `Σ w l rᵀ` over samples, with `l` read off each sample.
-fn outer_sum(samples: &[Sample], left: impl Fn(&Sample) -> Vec<Rat>) -> ExactRatMatrix {
-    let (rows, columns) = (left(&samples[0]).len(), samples[0].feature.len());
-    let mut sum = ExactRatMatrix::zero(rows, columns).unwrap();
-    for s in samples {
-        let l = left(s);
-        let outer = ExactRatMatrix::shaped(
-            rows,
-            columns,
-            l.iter()
-                .map(|x| s.feature.iter().map(|y| &s.weight * x * y).collect())
-                .collect(),
-        )
-        .unwrap();
-        sum = sum.add(&outer).unwrap();
-    }
-    sum
-}
-
-/// Decision 26 (`exogenous_normal_step`, `exogenous_chart_residual`): at the exogenous law, over
-/// three deposits (clocks 1, 2, 3) with remainders on every carrier, the carried Gram moves by
-/// exactly `F = Σ w f fᵀ`, the target statistic by `T = Σ w χ fᵀ`, and the map by
-/// `(T − W F) X̂` at the predecessor's map and the executed chart, each less its released residuals
-/// (value plus remainder); the chart term `(T − WF)(1 − X̂H')` lies within the reading's released
-/// bound; the reading's statistic is `‖W'H' − B'‖∞` of the published law and its prior weight the
-/// chart's mean diagonal `tr(X̂)/n`. From `WH = B` (the founding, and features and faces on the lattice, so `H` and
-/// `B` carry nothing) the step's statistic residual is exactly `W'H' − B' = −(T − WF)(1 − X̂H')` at
-/// the exact map. A prox law refuses a target face, and the exogenous law a sample without one.
-#[test]
-fn the_exogenous_step_keeps_its_statistic_up_to_the_chart_term() {
-    let (m, n) = (4, 3);
-    let mut draw = Draw::new(43);
-    let lattice = Lattice::new(4);
-    let rule = rule(lattice);
-    let prior = draw.half_matrix(m, n);
-    let mut law = NormalLaw::exogenous(prior.clone());
-    assert!(law.is_exogenous());
-    assert_eq!(law.target().unwrap(), prior);
-    let carried = |law: &NormalLaw| -> [ExactRatMatrix; 3] {
-        [
-            law.map().add(&law.map_remainder()).unwrap(),
-            law.gram().add(&law.gram_remainder()).unwrap(),
-            law.target()
-                .unwrap()
-                .add(&law.target_remainder().unwrap())
-                .unwrap(),
-        ]
-    };
-    for clock in 1..=3 {
-        let samples: Vec<Sample> = (0..2)
-            .map(|t| {
-                exogenous(
-                    draw.rational().abs() + Rat::one(),
-                    draw.vector(n),
-                    face(m, (clock as usize + t) % (m / 2), 7),
-                )
-            })
-            .collect();
-        let mut at = BudgetedCarry::new(lattice, clock);
-        let (next, reading) = law
-            .deposited(&samples, &Rat::one(), &rule, &mut at)
-            .unwrap();
-        let reading = reading.unwrap();
-        let released = |carrier: Carrier, rows: usize, columns: usize| {
-            let mut dense = vec![vec![Rat::zero(); columns]; rows];
-            for (c, entry, e) in at.released() {
-                if c == carrier {
-                    dense[entry / columns][entry % columns] = e;
-                }
-            }
-            ExactRatMatrix::shaped(rows, columns, dense).unwrap()
-        };
-        let moved = |before: &ExactRatMatrix, after: &ExactRatMatrix, carrier: Carrier| {
-            after
-                .subtract(before)
-                .unwrap()
-                .add(&released(carrier, before.rows(), before.columns()))
-                .unwrap()
-        };
-        let [map, gram, target] = carried(&law);
-        let [next_map, next_gram, next_target] = carried(&next);
-        let features = outer_sum(&samples, |s| s.feature.clone());
-        let faces = outer_sum(&samples, |s| s.target.clone().unwrap());
-        assert_eq!(moved(&gram, &next_gram, Carrier::Gram), features);
-        assert_eq!(moved(&target, &next_target, Carrier::Target), faces);
-        let chart = next.solved();
-        let driven = faces
-            .subtract(&law.map().multiply(&features).unwrap())
-            .unwrap();
-        assert_eq!(
-            moved(&map, &next_map, Carrier::Map),
-            driven.multiply(&chart).unwrap()
-        );
-        let term = driven
-            .multiply(&left_residual(&chart, &next.gram()))
-            .unwrap();
-        assert!(row_norm(&term) <= reading.released);
-        let receipt = reading.exogenous.clone().unwrap();
-        let statistic = next
-            .map()
-            .multiply(&next.gram())
-            .unwrap()
-            .subtract(&next.target().unwrap())
-            .unwrap();
-        assert_eq!(receipt.statistic, row_norm(&statistic));
-        assert_eq!(receipt.statistic, next.statistic_residual());
-        let trace: Rat = (0..n).map(|i| chart.get(i, i).unwrap().clone()).sum();
-        assert_eq!(receipt.prior, trace / integer(n as i64));
-        assert!(next.map().entries().iter().all(|x| lattice.contains(x)));
-        law = next;
-    }
-    // From WH = B, with every feature and face on the lattice.
-    let founding = NormalLaw::exogenous(prior);
-    let samples: Vec<Sample> = (0..2)
-        .map(|t| exogenous(integer(1 + t as i64), draw.dyadic_vector(n), face(m, t, 7)))
-        .collect();
-    let mut at = BudgetedCarry::new(lattice, 1);
-    let (next, _) = founding
-        .deposited(&samples, &Rat::one(), &rule, &mut at)
-        .unwrap();
-    assert!(next.gram_remainder().entries().iter().all(Zero::is_zero));
-    assert!(
-        next.target_remainder()
-            .unwrap()
-            .entries()
-            .iter()
-            .all(Zero::is_zero)
-    );
-    let features = outer_sum(&samples, |s| s.feature.clone());
-    let faces = outer_sum(&samples, |s| s.target.clone().unwrap());
-    let chart = next.solved();
-    let driven = faces
-        .subtract(&founding.map().multiply(&features).unwrap())
-        .unwrap();
-    let exact = founding
-        .map()
-        .add(&driven.multiply(&chart).unwrap())
-        .unwrap();
-    assert_eq!(
-        exact
-            .multiply(&next.gram())
-            .unwrap()
-            .subtract(&next.target().unwrap())
-            .unwrap(),
-        driven
-            .multiply(&left_residual(&chart, &next.gram()))
-            .unwrap()
-            .scaled(&-Rat::one())
-    );
-    // The laws refuse the other's samples.
-    let mut at = BudgetedCarry::new(lattice, 1);
-    let prox = NormalLaw::with_prior(ExactRatMatrix::zero(m, n).unwrap());
-    assert!(
-        prox.deposited(&samples, &Rat::one(), &rule, &mut at)
-            .is_err()
-    );
-    let bare = sample(Rat::one(), draw.vector(n), vec![Rat::zero(); m]);
-    assert!(
-        founding
-            .deposited(&[bare], &Rat::one(), &rule, &mut at)
-            .is_err()
-    );
-}
-
-/// Decision 26 (`prior_weight_identity`), on a one-dimensional fixture: from the declared prior
-/// `W_0 = 1/2` (`H_0 = 1`, `B_0 = W_0 H_0`), features `f = 1` with weights 1, 2, 4 carry the Gram to
-/// 2, 4, 8, whose charts are exact; the map is `W_n = W_0 H_0 H_n⁻¹ + T_n H_n⁻¹` exactly at every
-/// deposit, so the prior's weight is `1/H_n = 1/(1 + λ)` (`λ = Σ w f²`), which the reading reports,
-/// and the statistic `WH = B` holds exactly.
-#[test]
-fn the_prior_weight_decays_as_the_inverse_gram() {
-    let lattice = Lattice::new(10);
-    let rule = rule(lattice);
-    let prior = rat(1, 2);
-    let mut law =
-        NormalLaw::exogenous(ExactRatMatrix::shaped(1, 1, vec![vec![prior.clone()]]).unwrap());
-    let mut target = Rat::zero();
-    for (clock, (weight, face)) in [(1i64, 3i64), (2, -1), (4, 5)].into_iter().enumerate() {
-        let samples = vec![exogenous(
-            integer(weight),
-            vec![Rat::one()],
-            vec![integer(face)],
-        )];
-        let mut at = BudgetedCarry::new(lattice, clock as u64 + 1);
-        let (next, reading) = law
-            .deposited(&samples, &Rat::one(), &rule, &mut at)
-            .unwrap();
-        let receipt = reading.unwrap().exogenous.unwrap();
-        target += integer(weight * face);
-        let gram = next.gram().get(0, 0).unwrap().clone();
-        assert_eq!(next.chart().certificate(), &Rat::zero());
-        assert_eq!(next.solved().get(0, 0).unwrap(), &gram.recip());
-        assert_eq!(next.map().get(0, 0).unwrap(), &((&prior + &target) / &gram));
-        assert_eq!(receipt.prior, gram.recip());
-        assert_eq!(receipt.statistic, Rat::zero());
-        assert!(at.released().is_empty());
-        law = next;
-    }
-    assert_eq!(law.gram().get(0, 0).unwrap(), &integer(8));
-    assert_eq!(law.map().get(0, 0).unwrap(), &rat(43, 16));
-}
-
-/// Decision 26 at the receiving locus over the chain's deposits: `R`'s law is exogenous, each
-/// sample carries its target's code face at the receiver's margin, and the deposit's reading reports
-/// its receipt exactly when the window's features reached the locus; the bound harmonic coordinate stays in the fixed space of the ring's rotation after
-/// every deposit, moves only by the deposit's harmonic step, and moves.
-#[test]
-fn the_receiving_locus_regresses_the_code_face_and_moves_its_standing() {
-    let run = chain_run();
-    let field = chain();
-    let ring = field.ring(2);
-    let margin = field.margins()[0];
-    let (mut moved, mut receipts) = (false, 0);
-    for (before, deposit, after, reading) in run {
-        assert!(after.receiving_law(2).unwrap().is_exogenous());
-        let receiving = deposit
-            .linear()
-            .iter()
-            .find(|step| step.locus == LinearLocus::Receiving(2))
-            .unwrap();
-        for sample in &receiving.samples {
-            let face = sample.target.as_ref().unwrap();
-            let classes: Vec<usize> = (0..face.len()).filter(|&i| !face[i].is_zero()).collect();
-            assert_eq!(classes.len(), 1);
-            assert_eq!(classes[0] % 2, 0);
-            assert_eq!(face[classes[0]], Rat::from_integer(BigInt::from(margin)));
-        }
-        let reached = receiving
-            .samples
-            .iter()
-            .any(|sample| sample.feature.iter().any(|x| !x.is_zero()));
-        assert_eq!(
-            reading.charts.iter().any(|(locus, chart)| {
-                *locus == Locus::ReceivingMap(2) && chart.exogenous.is_some()
-            }),
-            reached
-        );
-        receipts += usize::from(reached);
-        assert!(
-            reading
-                .charts
-                .iter()
-                .filter(|(locus, _)| *locus != Locus::ReceivingMap(2))
-                .all(|(_, chart)| chart.exogenous.is_none())
-        );
-        let (was, now) = (before.harmonic(2).unwrap(), after.harmonic(2).unwrap());
-        assert!(ring.is_harmonic(now));
-        for step in deposit.harmonic() {
-            assert!(ring.is_harmonic(&step.gradient));
-        }
-        if deposit.harmonic().is_empty() {
-            assert_eq!(was, now);
-        }
-        moved |= was != now;
-    }
-    assert!(moved && receipts > 0);
 }

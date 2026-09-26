@@ -6,6 +6,7 @@ use crate::hnn::constitution::{Constitution, Steps};
 use crate::hnn::field::{
     ContactDeclaration, CribDeclaration, Current, Field, FieldDeclaration, ReceiverDeclaration,
 };
+use crate::hnn::masses::Regions;
 use crate::hnn::moment::{PairPort, SourceMoment};
 use crate::hnn::receiving::ReceivingPhases;
 use crate::ratio::{Rat, integer, rat};
@@ -42,6 +43,7 @@ pub(super) fn path_with(aperture: usize, junctions: &[Rat], contacts: &[Rat]) ->
                 ring: 2,
                 aperture,
                 tolerance: rat(1, 16),
+                regions: Regions::PrecedingCell,
             }],
             crib: CribDeclaration {
                 window: 16,
@@ -70,7 +72,8 @@ pub(super) fn chain_with(first_admittance: Rat) -> Field {
 /// **The exposure's chain**: the chain with no pair offset (`Δ = ∅`), declared over a population of
 /// `population` cells (an exposure's cut is exactly its field's population). Without the offset
 /// counts its capacity is `n* = 17` cells (`71` with `Δ = {1}`), the smallest cut on which the
-/// exposure's protocol runs its aeons, keys and budget stop.
+/// exposure's protocol runs its aeons, keys and budget stop. With no retained window its receiver's
+/// region is the whole (Decision 27: the preceding cell needs a window).
 pub(super) fn chain_of(population: u64) -> Field {
     chain_declared(integer(2), population, Vec::new())
 }
@@ -78,6 +81,9 @@ pub(super) fn chain_of(population: u64) -> Field {
 fn chain_declared(first_admittance: Rat, population: u64, offsets: Vec<usize>) -> Field {
     let mut declared = chain_declaration(population);
     declared.contacts[0].admittance = first_admittance;
+    if offsets.is_empty() {
+        declared.receivers[0].regions = Regions::Whole;
+    }
     declared.offsets = offsets;
     Field::declare(declared.by_lattice_rule()).unwrap()
 }
@@ -98,6 +104,7 @@ pub(super) fn chain_declaration(population: u64) -> FieldDeclaration {
             ring: 2,
             aperture: 2,
             tolerance: rat(1, 16),
+            regions: Regions::PrecedingCell,
         }],
         crib: CribDeclaration {
             window: 16,

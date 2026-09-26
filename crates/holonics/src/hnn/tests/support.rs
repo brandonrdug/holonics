@@ -10,6 +10,7 @@ use crate::hnn::field::{
     ConstitutionRead, ContactDeclaration, CribDeclaration, Field, FieldDeclaration,
     ReceiverDeclaration, RingDeclaration,
 };
+use crate::hnn::masses::{ClassMasses, Regions};
 use crate::hnn::moment::PairPort;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::{Rat, integer, rat};
@@ -166,6 +167,7 @@ pub(super) fn small_field(
                 ring: receiver,
                 aperture: 1,
                 tolerance: rat(1, 16),
+                regions: Regions::PrecedingCell,
             }],
             crib: CribDeclaration {
                 window: 16,
@@ -229,6 +231,8 @@ pub(super) struct Medium {
     pub(super) stiffness: Vec<ExactRatMatrix>,
     pub(super) dissipation: Vec<ExactRatMatrix>,
     pub(super) receiving: Vec<Option<ExactRatMatrix>>,
+    /// The receiving parametron's class masses at their prior (Decision 27).
+    pub(super) masses: Vec<Option<ClassMasses>>,
 }
 
 fn diagonal(n: usize, value: Rat) -> ExactRatMatrix {
@@ -321,6 +325,15 @@ impl Medium {
                         )
                         .unwrap()
                     })
+                })
+                .collect(),
+            masses: (0..widths.len())
+                .map(|g| {
+                    field
+                        .receivers()
+                        .iter()
+                        .find(|r| r.ring == g)
+                        .map(|r| ClassMasses::prior(r.regions, a))
                 })
                 .collect(),
         }
@@ -478,8 +491,8 @@ impl ConstitutionRead for Medium {
     fn receiving_map(&self, ring: usize) -> Option<&ExactRatMatrix> {
         self.receiving[ring].as_ref()
     }
-    fn harmonic(&self, _ring: usize) -> Option<&[Rat]> {
-        None
+    fn class_masses(&self, ring: usize) -> Option<&ClassMasses> {
+        self.masses[ring].as_ref()
     }
 }
 

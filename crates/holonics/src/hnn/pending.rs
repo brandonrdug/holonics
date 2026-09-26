@@ -5,7 +5,8 @@
 //! `M` at the cut (never `m̃`, and never a handle to a moment that later ingests extend); its
 //! [`ReceivingPhases`]; and the commit it was produced at. Every word opens at zero change, so the
 //! anchor needs no waves. A read ([`PendingRatio::open`]) recomputes `m̃ = ⟨M, E_now⟩` and runs the
-//! word at the contemporary constitution, `q` included:
+//! word at the contemporary constitution, `q` included, and reads the contemporary class masses at
+//! the region of the moment's retained window (the count face, Decision 27):
 //!
 //! - `refine` publishes only faces, with no commit flag, so no source is counted twice and `E` is
 //!   never mixed across two cuts;
@@ -135,7 +136,8 @@ impl PendingRatio {
     /// **The contemporary read, warm-started from a resident's charts**: what [`PendingRatio::read`]
     /// returns, each solve refined from the chart its key last left (the charts are replaced by the
     /// refined ones). The receiving epochs' reads each read only their own anchor and run together
-    /// (`hnn::realization`).
+    /// (`hnn::realization`); each adds the window's count face (Decision 27), read once at the
+    /// region of the moment's retained window.
     pub fn read_charted<'c>(
         &self,
         field: &'c Field,
@@ -143,10 +145,12 @@ impl PendingRatio {
         charts: &mut Charts,
     ) -> Result<(Word<'c>, Faces), HnnError> {
         let current = self.current(field)?;
+        let count = self.phases.count_face(constitution, &self.moment)?;
         let mut word = self.open_charted(field, constitution, charts)?;
         let anchors = word.forward(&self.phases)?;
         let reads = indexed(anchors.len(), |j| {
-            self.phases.read(field, constitution, &current, &anchors[j])
+            self.phases
+                .read(field, constitution, &current, &anchors[j], &count)
         })?;
         Ok((word, Faces::of_reads(&reads, self.phases.grain())?))
     }

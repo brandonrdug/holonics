@@ -1,6 +1,7 @@
 //! The word: it opens at zero change whatever preceded it, runs its receiving window, and releases
 //! the change at its end.
 
+use num_bigint::BigInt;
 use num_traits::Zero;
 
 use super::learning::chain;
@@ -114,25 +115,31 @@ fn the_forward_word_reads_its_epochs_and_releases_its_change() {
 }
 
 /// The declared initial constitution has `E = 0`, so its first word carries no change and every
-/// logit is zero: the first faces are uniform.
+/// wave logit is zero; the class masses sit at their prior, so the count face is uniform
+/// (Decision 27): every real logit reads `log₂(1/|A|) = −2` on the chain's `|A| = 4`, carry `−2` and
+/// phase class `0`, every imaginary logit zero. The first faces are uniform.
 #[test]
 fn the_initial_constitution_opens_an_empty_word() {
     let field = &chain();
     let medium = Medium::initial(field, 3);
     let (_, current, moment) = cut(field);
     let phases = ReceivingPhases::declare(field, &medium, &current, &field.receivers()[0]);
-    // With `E = 0` the observability over the source storage is still the medium's own; the read
+    // With `E = 0` the observability over the source storage is still the medium's own; the wave
     // of this moment is zero.
     let phases = phases.unwrap();
+    let count = phases.count_face(&medium, &moment).unwrap();
     let mut word = Word::open(field, &medium, &current, &moment).unwrap();
     assert_eq!(word.power().unwrap(), Rat::zero());
     for anchor in word.forward(&phases).unwrap() {
-        let read = phases.read(field, &medium, &current, &anchor).unwrap();
-        assert!(read.logits.iter().all(Zero::is_zero));
+        let read = phases
+            .read(field, &medium, &current, &anchor, &count)
+            .unwrap();
+        assert_eq!(read.logits, count.logits());
+        assert!(read.logits.iter().skip(1).step_by(2).all(Zero::is_zero));
         assert!(
             read.cells
                 .iter()
-                .all(|cell| cell.carry.is_zero() && cell.phase == 0)
+                .all(|cell| cell.carry == BigInt::from(-2) && cell.phase == 0)
         );
     }
 }

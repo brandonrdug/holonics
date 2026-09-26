@@ -19,8 +19,14 @@
 //! read face ([`ConstitutionRead`], `Constitution::{receiving_law, source_law}`) or the moment.
 //! Its model and order-0 bits reproduce the exposure's (they are printed first, as the check).
 //!
+//! [definition] **Under Decision 27** the machine's face is the count face's grain logits plus the
+//! wave (`hnn::receiving::ReceivingRead::combined`); the decoder's readings below read the wave
+//! alone, the count face at the window's region taken out, so they diagnose `R` as before. The
+//! located-failure record's receipt was taken under campaign 1's first law (the face on the change
+//! alone), at `13d6bb92`.
+//!
 //! [definition] **The diagnostics**, one section per candidate cause:
-//! 1. **The decoder** (the receiving face `f_j = R · P_R^(τ_R) v_R(e_j)`, no constant term). The
+//! 1. **The decoder** (the wave `f_j = R · P_R^(τ_R) v_R(e_j)`, no constant term). The
 //!    read feature `z_j = P_R^(τ_R) v_R(e_j)` is the receiving map's own sample feature
 //!    (`LinearLocus::Receiving`). Read: the mean logit vector over the reads and its code length
 //!    as one static face on the held-out targets; the logits' common part; the rank of the
@@ -986,9 +992,20 @@ fn expose(field: &Field, cut: &Cut, deadline: Option<u64>) -> Run {
                 .map(|step| step.samples.clone())
                 .expect("the receiving map's samples");
             let windowed = (0..window.len()).any(|offset| held(position + offset));
+            // The decoder's readings are the wave's `R z`: the count face's grain logits (Decision
+            // 27; the masses the compare read, at the window's region) are taken out of the face.
+            let count = phases
+                .count_face(resident.constitution(), resident.moment(&moment).expect("the moment"))
+                .expect("the count face");
+            let stored: Vec<Rat> = count.logits().into_iter().step_by(2).collect();
             for (offset, (phase, &code)) in holon.phases().iter().zip(window).enumerate() {
                 let logits = &holon.faces().logits[offset];
-                let real: Vec<Rat> = logits.iter().step_by(2).cloned().collect();
+                let real: Vec<Rat> = logits
+                    .iter()
+                    .step_by(2)
+                    .zip(&stored)
+                    .map(|(face, count)| face - count)
+                    .collect();
                 let spread = real.iter().max().expect("classes") - real.iter().min().expect("classes");
                 let is_held = held(position + offset);
                 if is_held {

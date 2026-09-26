@@ -19,14 +19,15 @@
 //!   ([`Contact::pair`]); it has no scalar conductance;
 //! - the [`Field`] is the declared complex with its source rings `𝒮`, offsets `Δ`, the exterior
 //!   chart's size `|A|` (read only by the capacity), the hop `h`, the exponent grain `L`, the
-//!   admitted receivers, the crib, and the carrier lattice `2^(−L_ℓ)ℤ` of every learned locus
+//!   admitted receivers with their region partitions (Decision 27; the preceding-cell region is
+//!   refused when no offset retains a window), the crib, and the carrier lattice `2^(−L_ℓ)ℤ` of
+//!   every learned locus
 //!   ([`FieldDeclaration::lattice_by_rule`]). [`Field::declare`] computes the capacity `n*` by
 //!   counting and refuses a declared population shorter than it (guard 1), and declares the word's
 //!   precisions by rule ([`Field::word_lattice`], [`crate::hnn::WordLattice::by_rule`], Decision 24):
 //!   the certificate's target `2^(−D_c)`, the charts' lattice `L_c = 2D_c` and the transients'
 //!   lattice `L_w`, from the finest receiver grain, the receiving fan-in, the widest local solve
-//!   and the junction steps; and each admitted receiver's margin `m` by rule
-//!   ([`Field::margins`], Decision 26); [`Field::describe`] codes them. Its contacts are the
+//!   and the junction steps; [`Field::describe`] codes them. Its contacts are the
 //!   blocks of its connection incidence `d_A` ([`Field::connection`]), and the rings and contacts
 //!   joined through it are the read-only Holarchy chart [`Field::holon`], built from the one
 //!   constitution;
@@ -54,7 +55,6 @@
 //! | `Aeon/Clock/Winding.clockLift` | [`Field::parametric`] |
 //! | `Holon/Complex` (`∂∘∂ = 0`) | [`Field::complex`] |
 //! | `Holon/Generator.{mapRotor_order, map_pow_mod_order}` | [`Ring::navigator`], [`Ring::rotate`] |
-//! | `HNN/StandingRead.{HarmonicProjection, harmonic_part_rotation_invariant, harmonic_read_rotation_invariant}` (Decision 26) | [`Ring::orbits`], [`Ring::harmonic`] (the fixed space of `P_g`) |
 //! | `Holon/Complex.{blockIncidence, block_cell_curvature, block_flat_closed}` | [`Field::connection`], consumed by [`Field::contrast`] |
 //! | `Holarchy/Join.interconnect`, `Holon/Dirac.kirchhoff_isDirac`, `Holarchy/Join.Holarchy.parametric` | [`Field::holon`] (certified at the mount) |
 //! | `HNN/Propagation.partialIsometry_transit` | [`Field::connection`]'s blocks `U_aᵀ`, read by [`Field::contrast`] and by the transit's channel selections ([`Contact::selection`]) |
@@ -74,8 +74,8 @@ use crate::geometry::screw::{ScrewAxis, ScrewGenerator, ScrewPair, SituatedScrew
 use crate::hnn::HnnError;
 use crate::hnn::chart::WordLattice;
 use crate::hnn::constitution::{Lattice, Locus, Steps};
+use crate::hnn::masses::{ClassMasses, Regions, prior};
 use crate::hnn::moment::{Capacity, PairPort, capacity};
-use crate::hnn::ratio::code_margin;
 use crate::holarchy::{Gluing, Holarchy};
 use crate::holon::contact::PairContact;
 use crate::holon::contact::menu::PortPermutation;
@@ -121,11 +121,10 @@ pub trait ConstitutionRead: Sync {
     fn contact_dissipation(&self, contact: usize) -> &ExactRatMatrix;
     /// The receiving map `R` (`2|A| × 2d_R`) of a receiving ring; `None` elsewhere.
     fn receiving_map(&self, ring: usize) -> Option<&ExactRatMatrix>;
-    /// **The receiving parametron's bound harmonic coordinate** `h_R ∈ ℚ^(2d_R)` (Decision 26), with
-    /// `P_R h_R = h_R` ([`Ring::harmonic`]): the standing the receiving face reads,
-    /// `f = R P_R^(τ_R)(v_R + h_R)`; `None` where the ring carries none (the face then reads only the
-    /// change).
-    fn harmonic(&self, ring: usize) -> Option<&[Rat]>;
+    /// **The receiving parametron's region class masses** (Decision 27, `hnn::masses`) of a
+    /// receiving ring, which the receiving face reads at the grain beside the wave; `None`
+    /// elsewhere.
+    fn class_masses(&self, ring: usize) -> Option<&ClassMasses>;
 }
 
 // -------------------------------------------------------------------------------------------
@@ -172,13 +171,16 @@ pub struct ContactDeclaration {
     pub exponent: Rat,
 }
 
-/// [definition] **An admitted receiver as declared**: its receiving ring, its aperture `A` and its
-/// code tolerance `ε_bits` per cell, from which its grain `L_R = ⌈1/ε_bits⌉` is derived.
+/// [definition] **An admitted receiver as declared**: its receiving ring, its aperture `A`, its
+/// code tolerance `ε_bits` per cell, from which its grain `L_R = ⌈1/ε_bits⌉` is derived, and its
+/// region partition (Decision 27, [`Regions`]), the certified finite quotient of its address at
+/// which the receiving parametron stores its class masses.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReceiverDeclaration {
     pub ring: usize,
     pub aperture: usize,
     pub tolerance: Rat,
+    pub regions: Regions,
 }
 
 /// [definition] **The crib as declared**: the `window` cells that open each aeon, read at `offset`.
@@ -227,7 +229,8 @@ impl FieldDeclaration {
     /// `∅` on ring 3; reflectors `p ↦ −p mod d_g`; every ring at phase 0; one axis `e_z` through the
     /// origin, pitch 0, node `k` of ring `g` at the quarter turn `⌊4k/d_g⌋` of the unit circle
     /// ([`FieldDeclaration::quarter_turn`]); `β_a = 2`, `L = 1`; `h = 1`, `Y_g = Y_a = 2`; `L_R = 16`
-    /// (tolerance 1/16 bit);
+    /// (tolerance 1/16 bit); the receiver's region the retained window's preceding cell with the
+    /// empty-window region (Decision 27, [`Regions::PrecedingCell`]);
     /// `Δ = {1}`; the crib `W_crib = 64` at offset 1. The population is the cut's length. The carrier
     /// lattices follow [`FieldDeclaration::lattice_by_rule`]: `L = 9, 9, 10, 10` for the four rings'
     /// elements and standings, `10` for ring 2's receiving map, `9, 9, 10, 9` for the four channels,
@@ -280,6 +283,7 @@ impl FieldDeclaration {
                 ring: 2,
                 aperture: 2,
                 tolerance: rat(1, 16),
+                regions: Regions::PrecedingCell,
             }],
             crib: CribDeclaration {
                 window: 64,
@@ -636,71 +640,6 @@ impl Ring {
         }
         rotated
     }
-
-    /// **The orbits of the ring's rotation on its nodes**, read off [`Ring::rotate`] itself: node
-    /// `i`'s orbit is where one step carries the unit at its real coordinate, then the next, until
-    /// it returns. A closing rotor of period `d` has one orbit, every node.
-    pub fn orbits(&self) -> Vec<Vec<usize>> {
-        let d = self.placements.len();
-        let step = BigInt::one();
-        let mut seen = vec![false; d];
-        let mut orbits = Vec::new();
-        for start in 0..d {
-            if seen[start] {
-                continue;
-            }
-            let mut orbit = Vec::new();
-            let mut node = start;
-            loop {
-                seen[node] = true;
-                orbit.push(node);
-                let mut unit = vec![Rat::zero(); 2 * d];
-                unit[2 * node] = Rat::one();
-                node = self
-                    .rotate(&unit, &step)
-                    .iter()
-                    .position(|x| !x.is_zero())
-                    .expect("a rotation carries a unit to a unit")
-                    / 2;
-                if node == start {
-                    break;
-                }
-            }
-            orbits.push(orbit);
-        }
-        orbits
-    }
-
-    /// [definition; agent-inferred] **The harmonic projection `Π`** onto the fixed space of the
-    /// ring's rotation, `{h : P_g h = h}` (Decision 26, the receiving parametron's bound harmonic
-    /// coordinate). A vector is fixed by `P_g` exactly when it is constant on each orbit of the
-    /// nodes ([`Ring::orbits`]), in its real and imaginary parts apart, so the fixed space is
-    /// spanned by each orbit's indicator in each part, and the orthogonal projection replaces each
-    /// node's coordinate by its orbit's mean: `Π = U(UᵀU)⁻¹Uᵀ`, `UᵀU = diag(|O|)`. For a closing
-    /// rotor it is the constant vector in each part, the kernel of the ring's unit-weight cycle
-    /// Laplacian (the dormant mode the located failure measured). `Π P_g = P_g Π = Π`.
-    pub fn harmonic(&self, vector: &[Rat]) -> Vec<Rat> {
-        let mut projected = vec![Rat::zero(); vector.len()];
-        for orbit in self.orbits() {
-            let size = Rat::from_integer(BigInt::from(orbit.len()));
-            for part in 0..2 {
-                let mean = orbit
-                    .iter()
-                    .map(|&node| &vector[2 * node + part])
-                    .sum::<Rat>()
-                    / &size;
-                for &node in &orbit {
-                    projected[2 * node + part] = mean.clone();
-                }
-            }
-        }
-        projected
-    }
-
-    /// Whether `P_g h = h`.
-    pub fn is_harmonic(&self, vector: &[Rat]) -> bool {
-        vector.len() == self.width() && self.rotate(vector, &BigInt::one()) == vector
-    }
 }
 
 /// `(τ mod d, ⌊τ/d⌋)` with floor semantics.
@@ -883,9 +822,6 @@ pub struct Field {
     /// The word's declared precisions by rule ([`WordLattice::by_rule`]); `None` only for the
     /// exact law's own tests (`Field::with_exact_word`).
     word: Option<WordLattice>,
-    /// Each admitted receiver's declared margin `m` by rule (Decision 26;
-    /// [`crate::hnn::ratio::code_margin`]), in the receivers' order.
-    margins: Vec<u64>,
 }
 
 impl Field {
@@ -974,6 +910,18 @@ impl Field {
                 return Err(HnnError::Offset { offset });
             }
         }
+        // The preceding-cell region is the retained window's cell (Decision 27): the moment
+        // retains a window only under a declared offset.
+        if let Some(receiver) = declared
+            .receivers
+            .iter()
+            .find(|receiver| receiver.regions == Regions::PrecedingCell)
+            && declared.offsets.is_empty()
+        {
+            return Err(HnnError::RegionWindow {
+                ring: receiver.ring,
+            });
+        }
         if declared.crib.offset == 0 {
             return Err(HnnError::Offset {
                 offset: declared.crib.offset,
@@ -1043,11 +991,6 @@ impl Field {
                 n_star: capacity.n_star(),
             });
         }
-        let margins = declared
-            .receivers
-            .iter()
-            .map(|receiver| code_margin(declared.alphabet, receiver_grain(&receiver.tolerance)))
-            .collect();
         Ok(Self {
             rings,
             contacts,
@@ -1068,7 +1011,6 @@ impl Field {
             distances,
             lattices,
             word,
-            margins,
         })
     }
 
@@ -1169,13 +1111,6 @@ impl Field {
 
     pub fn receivers(&self) -> &[ReceiverDeclaration] {
         &self.receivers
-    }
-
-    /// **Each admitted receiver's declared margin `m`** (Decision 26), in the receivers' order: the
-    /// least integer whose target code face `χ_R(T) = m·e_t` codes the target within the receiver's
-    /// tolerance of one grain per cell ([`crate::hnn::ratio::code_margin`]; `13` for campaign 1).
-    pub fn margins(&self) -> &[u64] {
-        &self.margins
     }
 
     pub fn crib(&self) -> CribDeclaration {
@@ -1567,10 +1502,10 @@ impl Field {
         )?)?)
     }
 
-    /// **The field's exact self-delimiting code**: every declared value, each receiver's margin `m`
-    /// (Decision 26), the word's precisions (`L_c`, `D_c`, `L_w`; none for the exact law), the
-    /// recorded `n*`, the gauge convention, the sign generator's rule and the receiving law's code
-    /// ([`RECEIVING_LAW`]), and the constitution's declared values (the
+    /// **The field's exact self-delimiting code**: every declared value, each receiver's region
+    /// partition (Decision 27), the word's precisions (`L_c`, `D_c`, `L_w`; none for the exact law),
+    /// the recorded `n*`, the gauge convention, the sign generator's rule, the receiving law's code
+    /// ([`RECEIVING_LAW`]) with the class masses' prior `α`, and the constitution's declared values (the
     /// steps `γ_U` and `η_x`, the budget `B_Θ`) with the pending capacity, as Elias-gamma naturals,
     /// zig-zag integers and rationals as (numerator, denominator). It is the one exact code of the
     /// declaration (guard 13), and `Kt` pays for every part of it (design (f), review D3).
@@ -1624,11 +1559,11 @@ impl Field {
         rational(&mut code, &self.step);
         natural(&mut code, self.exponent_grain);
         natural(&mut code, self.receivers.len() as u64);
-        for (receiver, margin) in self.receivers.iter().zip(&self.margins) {
+        for receiver in &self.receivers {
             natural(&mut code, receiver.ring as u64);
             natural(&mut code, receiver.aperture as u64);
             rational(&mut code, &receiver.tolerance);
-            natural(&mut code, *margin);
+            natural(&mut code, receiver.regions.code());
         }
         natural(&mut code, self.crib.window as u64);
         natural(&mut code, self.crib.offset as u64);
@@ -1666,13 +1601,9 @@ impl Field {
         // The sign generator's rule (design (d)): 0 names "the low bit of SplitMix64 over
         // (0, ℓ, i, j)" (`constitution::declared_sign`).
         natural(&mut code, 0);
-        // The receiving law (Decision 26): 1 names "the face reads the receiving parametron's bound
-        // harmonic coordinate, `f = R P^τ(v + h_R)`, and `R` retains `(H, B)` and regresses the
-        // target code face `χ_R(T) = m·e_t`" (`hnn::constitution::NormalLaw::exogenous`). Campaign
-        // 1's first law (the face on the change alone, `R` by the prox step) had no code here: each
-        // feature-law change starts a fresh constitution, and the description names which law a
-        // constitution was declared under.
+        // The receiving law (Decision 27) and the class masses' prior `α = 1/2`.
         natural(&mut code, RECEIVING_LAW);
+        rational(&mut code, &prior());
         // The constitution's declared values and the resident's pending capacity.
         rational(&mut code, &steps.proxy);
         rational(&mut code, &steps.factor);
@@ -1682,20 +1613,15 @@ impl Field {
     }
 }
 
-/// [definition] **The receiving law's code in the description** (Decision 26): 1, the exogenous
-/// normal law on the target code face with the standing read. A feature-law change takes the next
-/// code and starts a fresh constitution: an old statistic cannot be re-read through new features
-/// without the samples retention forbids.
-pub const RECEIVING_LAW: u64 = 1;
-
-/// A receiver's grain `L_R = ⌈1/ε_bits⌉` (`1` for a tolerance that declares none).
-fn receiver_grain(tolerance: &Rat) -> u64 {
-    if tolerance.is_positive() {
-        tolerance.recip().ceil().to_integer().to_u64().unwrap_or(1)
-    } else {
-        1
-    }
-}
+/// [definition; agent-inferred] **The receiving law's code in the description** (Decision 27): 2,
+/// "the receiving face is the grain of the receiving parametron's region class masses
+/// `C = α + Σ w q` (`α` coded beside it) plus the wave `R P_R^(τ_R) v_R`, and `R` moves by the prox
+/// step on its reached covectors" (`hnn::masses`, `hnn::receiving::ReceivingRead::combined`). Code
+/// 1 was Decision 26's exogenous normal law on the target code face with the standing read, and
+/// campaign 1's first law (the face on the change alone) carried none. A feature-law change takes
+/// the next code and starts a fresh constitution: an old statistic cannot be re-read through new
+/// features without the samples retention forbids.
+pub const RECEIVING_LAW: u64 = 2;
 
 /// **The word's precisions by rule** ([`WordLattice::by_rule`]): the finest receiver grain
 /// `L_R = ⌈1/ε_bits⌉`, the widest receiving fan-in `X_w = 2d_R`, the widest local solve (a ring's

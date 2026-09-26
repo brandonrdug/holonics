@@ -14,8 +14,9 @@ use holonics::geometry::screw::ScrewGenerator;
 use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
 use holonics::hnn::field::{CribDeclaration, ReceiverDeclaration};
 use holonics::hnn::{
-    Constitution, ConstitutionRead, ContactDeclaration, Current, Field, FieldDeclaration, Lattice,
-    Locus, ReceivingPhases, RingDeclaration, SourceMoment, Steps,
+    Constitution, ConstitutionRead, ContactDeclaration, CountFace, Current, Field,
+    FieldDeclaration, Lattice, Locus, ReceivingPhases, Regions, RingDeclaration, SourceMoment,
+    Steps,
 };
 use holonics::ratio::linear::ExactRatMatrix;
 use holonics::ratio::{Rat, integer, rat};
@@ -171,6 +172,7 @@ fn chain() -> Field {
                 ring: 2,
                 aperture: 2,
                 tolerance: rat(1, 16),
+                regions: Regions::PrecedingCell,
             }],
             crib: CribDeclaration {
                 window: 16,
@@ -777,11 +779,19 @@ fn campaign_one_reads_and_ingest_match_the_host() {
             "receiving phases declared in {} us",
             clock.elapsed().as_micros()
         );
+        // The host's read adds the count face's grain logits (Decision 27) to the wave the card
+        // reads; the empty-window region's are taken back out.
+        let count = CountFace::read(theta.class_masses(2).unwrap(), 0, phases.grain()).unwrap();
+        let stored = count.logits();
         for (b, anchor) in anchors.iter().enumerate() {
-            let logits = phases
-                .read(&field, &theta, &current, anchor)
+            let logits: Vec<Rat> = phases
+                .read(&field, &theta, &current, anchor, &count)
                 .unwrap()
-                .logits;
+                .logits
+                .iter()
+                .zip(&stored)
+                .map(|(f, k)| f - k)
+                .collect();
             assert_eq!(read.vector(b), logits, "{name}, anchor {b}");
         }
     }

@@ -59,14 +59,15 @@
 //!   the words and their returns released, and the tick balances' residuals against their bounds;
 //! - the bits on the training and the held-out targets against each online baseline (uniform,
 //!   order-0 and order-1 Krichevsky–Trofimov, PPM of order 2), and the verdict against order-0;
+//!   beside the model's, the count face's own code length (Decision 27: the receiving parametron's
+//!   masses at each window's region read at the grain, no wave, at the model's constitution and
+//!   window), each baseline against it, and the model against it: the wave's contribution;
 //! - `Kt` with the published keys, against the literal over the cells read;
 //! - each key location with its fibres per ring;
 //! - each aeon's boundary: its length and lift points, readings, collapse, first law (exchange plus
 //!   deposition, telescoping to the change of code length), and the face against the literal;
 //! - the state and constitution bits against the source, with and without the collapse;
-//! - the constitution's curve, one point per commit, with the receiving map's prior weight
-//!   `tr(X̂)/n` after it (Decision 26, `CurvePoint::prior`: `1` at the mount, not rising as the Gram
-//!   grows up to the chart's certificate and the Gram's carry);
+//! - the constitution's curve, one point per commit;
 //! - the budget stop or deadline, the work counted, and the wall time: the exposure's, and the
 //!   host's by phase (`Exposure::wall`: refine read, release, compare read, holon and covector,
 //!   `pull_back`, `compose`, `deposited`, re-read and ingest), with the rest of the exposure.
@@ -746,20 +747,17 @@ fn report(field: &Field, exposure: &Exposure) {
         "== the constitution's curve ({} points, one per published commit) ==",
         exposure.constitution_curve.len()
     );
-    println!(
-        "commit\tbits\tentries\tremainders\tsolved\treleased_bits\tstepped\tprior (the receiving map's prior weight tr(X̂)/n, Decision 26; - where the window reached nothing there)"
-    );
+    println!("commit\tbits\tentries\tremainders\tsolved\treleased_bits\tstepped");
     for point in &exposure.constitution_curve {
         println!(
-            "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}",
+            "{}\t{}\t{}\t{}\t{}\t{}\t{}",
             point.commit,
             point.bits.total(),
             point.bits.entries,
             point.bits.remainders,
             point.bits.solved,
             point.released_bits,
-            point.stepped,
-            point.prior.as_ref().map_or("-".to_string(), ratio)
+            point.stepped
         );
     }
 
@@ -794,6 +792,7 @@ fn bits(label: &str, bits: &Bits, criterion: bool, grain: u64) {
     let ppm = format!("PPM order {PPM_ORDER}");
     let rows = [
         ("model p^", &bits.model),
+        ("counts", &bits.counts),
         ("uniform", &bits.uniform),
         ("order-0 KT", &bits.order_zero),
         ("order-1 KT", &bits.order_one),
@@ -813,12 +812,27 @@ fn bits(label: &str, bits: &Bits, criterion: bool, grain: u64) {
             difference(&bits.model, baseline, grain)
         );
     }
+    for (name, baseline) in &rows[2..] {
+        println!(
+            "  the count face alone is {} {name}; counts − {name}: {}",
+            against(&bits.counts, baseline),
+            difference(&bits.counts, baseline, grain)
+        );
+    }
     println!(
         "  against online order-0: {}",
         match (against(&bits.model, &bits.order_zero), criterion) {
             ("below", _) => "the model beats it",
             ("above", true) => "FAILURE: the model does not beat it (design (f))",
             ("above", false) => "the model does not beat it",
+            _ => "undecided: the enclosures overlap",
+        }
+    );
+    println!(
+        "  the wave's contribution (Decision 27: the model against the count face alone): {}",
+        match against(&bits.model, &bits.counts) {
+            "below" => "the wave lowers the code length",
+            "above" => "the wave raises the code length",
             _ => "undecided: the enclosures overlap",
         }
     );

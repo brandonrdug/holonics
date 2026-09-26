@@ -6,9 +6,7 @@
 // source rings, runs `e_max − 1` full ticks (junction Swing, ring element, contact transit) and a
 // last junction, every transient carried on `2^(−L_w)ℤ` with error feedback (the nearest-point
 // split, ties upward, `hnn_nearest`), every inverse applied as its certified lattice chart, and is
-// read at the receiving epochs as `f_j = R · P_R^(τ_R)(v_R(e_j) + h_R)`, `h_R` the receiving
-// parametron's bound harmonic coordinate (Decision 26; its words at the receiving locus's lattice,
-// lifted onto `2^(−L_w)ℤ` by `WP_HARMONIC_SHIFT`; none when `WP_HARMONIC < 0`). Its return runs the ticks in
+// read at the receiving epochs as `f_j = R · P_R^(τ_R) v_R(e_j)`. Its return runs the ticks in
 // reverse through the transposes of the executed maps, its own transients carried the same way.
 // These kernels execute exactly that law in integers: every value `x` is an integer `X` on a
 // declared scale, `x = X · 2^(−σ)`, and every scale is fixed by the host before the launch (the
@@ -79,8 +77,6 @@
 #define WP_PAIR_TABLE 26
 #define WP_INCIDENCES 27
 #define WP_MAP 28
-#define WP_HARMONIC 29
-#define WP_HARMONIC_SHIFT 30
 
 #define WR_STRIDE 12
 #define WR_WIDTH 0
@@ -745,8 +741,7 @@ extern "C" __global__ void hnn_word_forward(
         }
     }
 
-    // The receiving read f_j = R · P_R^(τ_R)(v_R(e_j) + h_R), each logit a certified sum; the
-    // standing's words are lifted onto the anchor's scale and added before the map reads them.
+    // The receiving read f_j = R · P_R^(τ_R) v_R(e_j), each logit a certified sum.
     const long long receiver = plan[WP_RECEIVER];
     if (receiver >= 0) {
         const long long *ring = rings + receiver * WR_STRIDE;
@@ -755,21 +750,13 @@ extern "C" __global__ void hnn_word_forward(
         const long long epoch = plan[WP_EPOCH];
         const long long *gather = plan + plan[WP_GATHER];
         const int64_t *map = published + plan[WP_MAP];
-        const int64_t *harmonic = plan[WP_HARMONIC] >= 0 ? published + plan[WP_HARMONIC] : 0;
-        const long long lifted = plan[WP_HARMONIC_SHIFT];
         for (long long entry = t; entry < aperture * rows; entry += T) {
             uint32_t st = 0;
             const long long j = entry / rows, row = entry % rows;
             const int64_t *v = rec_anchor + (epoch + j) * N + base;
             HnnSum logit = hnn_sum();
             for (long long k = 0; k < n; ++k) {
-                int64_t operand = v[gather[k]];
-                if (harmonic) {
-                    operand = hnn_word_of(
-                        (wide)operand + hnn_shifted((wide)harmonic[gather[k]], lifted, &st), &st
-                    );
-                }
-                hnn_add_words(logit, map[row * n + k], operand);
+                hnn_add_words(logit, map[row * n + k], v[gather[k]]);
             }
             logits[entry] = hnn_read(logit, &st);
             hnn_note(st, STAGE_READ, (uint32_t)entry, &bits, &first);

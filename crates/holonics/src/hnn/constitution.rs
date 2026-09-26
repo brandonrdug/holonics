@@ -20,8 +20,9 @@
 //! [definition] **Loci** ([`Locus`]). Per ring `g`: its element (the passive factor `f_g` with
 //! `W_s,g = −f_g f_gᵀ`, the contrast port `W_c,g`, the skew slices `A_ρ = u_ρ v_ρᵀ − v_ρ u_ρᵀ`), its
 //! standing `q_g`, on a source ring its source ports (`E_g` and the factored pair port `E_g^(δ)`),
-//! on a receiving ring its receiving map `R`. Per contact `a`: its channel's square factors
-//! (`C_a = c_a c_aᵀ`, `K_a = b_a b_aᵀ`, `D_a = F_a F_aᵀ`). The junction admittance `Y_g` and the
+//! on a receiving ring its receiving map `R` and the receiving parametron's region class masses
+//! (Decision 27, [`ClassMasses`]), both at the receiving locus. Per contact `a`: its channel's
+//! square factors (`C_a = c_a c_aᵀ`, `K_a = b_a b_aᵀ`, `D_a = F_a F_aᵀ`). The junction admittance `Y_g` and the
 //! contact conductance `G_a` (`Y_a`, `β_a`, the screws) are declared on the field in campaign 1; the
 //! collapse names them as loci, but they carry no learned value.
 //!
@@ -29,20 +30,20 @@
 //! each locus at the predecessor's lattice-valued operands:
 //!
 //! ```text
-//! ΔH_U = Σ_t w f_t f_tᵀ ,            ΔW_U = γ_U Σ_t w g_t (H_U'⁻¹ f_t)ᵀ ,  H_U' the carried successor Gram    per internal linear locus (E_g, W_c)
-//! ΔH_R = Σ_t w f_t f_tᵀ ,  ΔB_R = Σ_t w χ_t f_tᵀ ,  ΔW_R = Σ_t w (χ_t − W_R f_t)(H_R'⁻¹ f_t)ᵀ           the receiving map (Decision 26)
-//! Δh_x = Σ_t w |f_t|² ,              Δx = η_x G_x / h_x' ,                 h_x' the carried successor statistic  per factor family and h_R
+//! ΔH_U = Σ_t w f_t f_tᵀ ,            ΔW_U = γ_U Σ_t w g_t (H_U'⁻¹ f_t)ᵀ ,  H_U' the carried successor Gram    per linear locus (E_g, R, W_c)
+//! Δh_x = Σ_t w |f_t|² ,              Δx = η_x G_x / h_x' ,                 h_x' the carried successor statistic  per factor family
+//! ΔC_(r,t) = w                       per reached comparison (region r, target t)                                the class masses
 //! ```
 //!
-//! [definition; agent-inferred] **Decision 26 at the receiving locus.** The receiving map `R` is an
-//! exogenous normal law ([`NormalLaw::exogenous`]): it retains `(H, B)` and regresses the targets'
-//! code faces `χ_t = χ_R(T_t) = m·e_(t_t)` (`hnn::ratio::code_face`) on the read's operand, so the
-//! declared prior `R_0` decays as `R_0 H_0 H_n⁻¹`. The same locus carries the receiving parametron's
-//! bound harmonic coordinate `h_R` (`P_R h_R = h_R`, `hnn::receiving`, the standing read) and its
-//! factor statistic, stepped by [`HarmonicStep`] on `Π Rᵀ Σ w g`. They share the locus's lattice, its
-//! diamond row (retained always) and its collapse rule (never released): the lattice rule's `X_ℓ`
-//! for `h_R` is the receiving ring's width, as for `R` (a read `R h_R` sums `2d_R` products). Every
-//! other linear locus keeps the prox step on its reached covectors.
+//! [definition; agent-inferred] **Decision 27 at the receiving locus.** The receiving map `R` keeps
+//! the prox step on its reached covectors (Decisions 22 and 24), the covector of the ratio read on
+//! the combined face (`hnn::receiving::ReceivingRead::combined`). Beside it the receiving
+//! parametron stores its region class masses ([`ClassMasses`], `hnn::masses`), which each reached
+//! comparison deposits at its region and target class ([`MassStep`]); they are integers of
+//! half-units, exact with no remainder and no release, so no carry and no clock is read for them.
+//! They share the locus's diamond row (retained always) and its collapse rule (never released).
+//! Decision 26's exogenous law and standing read are retired: the count face contains the
+//! marginal (Lean `HNN/TargetFace`'s finite-chart obstruction stays a theorem).
 //!
 //! [definition; agent-inferred] **The carrier lattice and the budgeted release** (Lean
 //! `HNN/LatticeDeposit`). Exact rational deposition compounds: the maps that form each other's
@@ -115,7 +116,7 @@
 //! of `H` is within one unit of the exact Gram `H_exact = I + Σ w f fᵀ ⪰ I`
 //! (`within_one_unit_since_founding`), so `|vᵀ(H − H_exact)v| ≤ u(Σ|v_i|)² ≤ n·u·|v|²` for its
 //! width `n`, and since the lattice rule's `X_ℓ` is at least `n`, `n·u ≤ 1/(2L_R)` and
-//! `H ⪰ (1 − 1/(2L_R)) I` since the locus's founding. At an internal (prox) locus `B` is not carried: under `W H = B` it is
+//! `H ⪰ (1 − 1/(2L_R)) I` since the locus's founding. `B` is not carried: under `W H = B` it is
 //! `W H`, and the prox step `W' = W + γ G X̂` (Lean `HNN/Normal.normal_prox_step` at the exact
 //! inverse, `HNN/LatticeWord.prox_chart_residual` at the chart) needs only `W`, the chart of `H'` and
 //! `G`. The factor carriers keep `C`, `K`, `D` and `−W_s` positive semidefinite as
@@ -135,9 +136,7 @@
 //!
 //! | Lean | Rust |
 //! |---|---|
-//! | `HNN/Normal.normal_prox_step` at the carried Gram, with `HNN/LatticeDeposit.within_one_unit_since_founding` | [`NormalLaw`]: at an internal locus `W` is the prox iterate at the carried Gram `H'` (`B` is not carried, so `W` is not the minimizer of the accumulated `J(W)`), and `H` stays within one unit of the exact statistic `I + Σ w f fᵀ` |
-//! | `HNN/TargetFace.{exogenous_normal_step, exogenous_chart_residual, exogenous_chart_certificate, prior_weight_identity, prior_weight_eigen, normal_statistic_future_sufficient}` (Decision 26) | [`NormalLaw::exogenous`], [`NormalLaw::exogenous_step`], [`ExogenousReading`] |
-//! | `HNN/StandingRead.harmonic_deposit_stays_standing` (Decision 26) | [`HarmonicStep`] (its descent direction lies in the fixed space, so `P_R h_R = h_R` is kept) |
+//! | `HNN/Normal.normal_prox_step` at the carried Gram, with `HNN/LatticeDeposit.within_one_unit_since_founding` | [`NormalLaw`]: `W` is the prox iterate at the carried Gram `H'` (`B` is not carried, so `W` is not the minimizer of the accumulated `J(W)`), and `H` stays within one unit of the exact statistic `I + Σ w f fᵀ` |
 //! | `HNN/Normal.normal_prox_step`, `depositLocus_solves`; `HNN/LatticeWord.{prox_chart_residual, prox_chart_certificate}` | [`NormalLaw::deposited`] (the step at the carried Gram through the executed chart, its residual released and reported: [`ChartReading`]) |
 //! | `HNN/LatticeWord.{nsStep, newton_schulz_left, rounded_refinement_residual_left, rounded_refinement_certificate_left, rowNorm, latticeChart}` | [`SolvedChart`] (the certificate and the rounded refinement) |
 //! | `HNN/LatticeWord.{warm_start_residual, warm_start_certificate}` | [`SolvedChart`] (why the warm start takes the window's rank-one steps) |
@@ -164,10 +163,11 @@ use rayon::prelude::*;
 
 use crate::hnn::HnnError;
 use crate::hnn::field::{ConstitutionRead, Field};
+use crate::hnn::masses::{ClassMasses, MassStep};
 use crate::hnn::moment::PairPort;
 use crate::hnn::port::Deposit;
 use crate::hnn::propagation::gram;
-use crate::hnn::realization::{apply_rows, indexed, outer_rows};
+use crate::hnn::realization::{indexed, outer_rows};
 use crate::holon::deposition::CommittedEnergyBound;
 use crate::ratio::linear::vector::{Chart, integral, lcm, matrix_form};
 use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
@@ -1106,15 +1106,6 @@ impl SolvedChart {
         rows
     }
 
-    /// **`tr(X̂)/n`**, the chart's mean diagonal as a matrix of width `n`, exact: the support's
-    /// diagonal coordinates summed, each row off the support adding the identity's `1`.
-    pub fn mean_diagonal(&self, n: usize) -> Rat {
-        let s = self.support.len();
-        let on: BigInt = (0..s).map(|a| BigInt::from(self.block[a * s + a])).sum();
-        let off = BigInt::from(n.saturating_sub(s)) << self.exponent as usize;
-        Rat::new(on + off, BigInt::from(n.max(1)) << self.exponent as usize)
-    }
-
     /// Its bits at its lattice as a matrix of width `n`, each entry a reduced ratio as [`bits`]
     /// counts the other carriers (off the support: `1` on the diagonal, `0` elsewhere), with the
     /// certificate's.
@@ -1347,10 +1338,6 @@ pub(crate) fn refined_once(
 /// it moves a read ([`ChartRule::read`]); and the bits of its factor `1 − X̂H'` (nonzero entries,
 /// reduced), the part of `ρ` the deposit's own covectors do not already carry. The release is
 /// reported, never silent.
-///
-/// At an exogenous locus (Decision 26) `released` bounds the executed step's chart term
-/// `(T − WF)(1 − X̂H')` instead, `‖·‖∞ ≤ Σ_t |w| ‖χ_t − W f_t‖∞ ‖f_t‖₁ · δ`, and the reading carries
-/// the law's own receipt ([`ExogenousReading`]).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ChartReading {
     pub exponent: u32,
@@ -1362,51 +1349,24 @@ pub struct ChartReading {
     pub released: Rat,
     pub read: Rat,
     pub residual_bits: u64,
-    pub exogenous: Option<ExogenousReading>,
-}
-
-/// [definition] **An exogenous normal law's receipt at a deposit** (Decision 26), exact:
-///
-/// - `statistic`: `‖W'H' − B'‖∞` of the published (carried) statistic and map. Under `WH = B` the
-///   executed step leaves `W'H' − B' = −(T − WF)(1 − X̂H')` (Lean
-///   `HNN/TargetFace.exogenous_chart_residual`), bounded by `released`; the carries of `W`, `H` and `B` on the
-///   lattice add their own, each entry within one unit of its exact accumulation since the locus's
-///   founding (`within_one_unit_since_founding`);
-/// - `prior`: `tr(X̂')/n`, the prior's mean weight. With `B_0 = W_0 H_0` and `H_0 = I` the law's
-///   solution is `W_n = W_0 H_0 H_n⁻¹ + T_n H_n⁻¹` (Lean `HNN/TargetFace.prior_weight_identity`), so the
-///   declared prior's reading at any operand is `W_0 H_n⁻¹ x`: its weight along an eigen-direction of
-///   the accumulated Gram `H_n = I + Σ w f fᵀ` with eigenvalue `1 + λ` is exactly `1/(1 + λ)`, and
-///   their mean over the `n` directions is `tr(H_n⁻¹)/n`, read through the certified chart
-///   `X̂ ≈ H_n⁻¹` (`|tr(X̂ − H_n⁻¹)| ≤ n·‖X̂‖∞ δ/(1 − δ)` at its certificate `δ`). It is `1` at the
-///   founding and does not rise as the Gram grows (`H' ⪰ H ⇒ H'⁻¹ ⪯ H⁻¹`), up to the chart's
-///   certificate and the Gram's carry. [agent-inferred] The chart's row norm bounds the same spectrum
-///   but is not monotone (measured: it rose from `1` toward `2` over the standing real cut's first 24
-///   deposits), so the mean is the decay's reading.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct ExogenousReading {
-    pub statistic: Rat,
-    pub prior: Rat,
 }
 
 // -------------------------------------------------------------------------------------------
 // the normal law
 
-/// [definition] **One observed return at a linear locus**: its weight `w`, its feature `f_t`, its
-/// descent covector `g_t` (Lean `HNN/Normal.Sample`), and, at an exogenous locus (the receiving map,
-/// Decision 26), the declared target face `χ_R(T)` of the comparison whose covector reached it
-/// (`hnn::ratio::code_face`); `None` at a prox locus.
+/// [definition] **One observed return at a linear locus**: its weight `w`, its feature `f_t` and
+/// its descent covector `g_t` (Lean `HNN/Normal.Sample`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Sample {
     pub weight: Rat,
     pub feature: Vec<Rat>,
     pub covector: Vec<Rat>,
-    pub target: Option<Vec<Rat>>,
 }
 
 /// [definition] **One locus's deposition owner** (design (c), `NormalLaw`): the map `W` (`m × n`)
 /// and its Gram `H` (`n × n`, the locus's own width), each on the locus's lattice with its carried
 /// remainders, and the solved chart `X̂ ≈ H⁻¹` of the carried Gram on its own lattice with its
-/// certified residual ([`SolvedChart`], Decision 24). At an internal locus `B = W H` is not carried (module header). Its
+/// certified residual ([`SolvedChart`], Decision 24). `B = W H` is not carried (module header). Its
 /// law is the prox step at the carried Gram through the executed chart (Lean
 /// `HNN/Normal.normal_prox_step`, `HNN/LatticeWord.prox_chart_residual`: `W' = W + γ G X̂`, the prox
 /// identity holding up to the released residual `γG(1 − X̂H')`) with the carried Gram within one unit
@@ -1414,26 +1374,6 @@ pub struct Sample {
 /// (`HNN/LatticeDeposit.within_one_unit_since_founding`): `W` is the prox iterate, not the minimizer
 /// of the accumulated objective `tr(WHWᵀ) − 2tr(WBᵀ) + C`, which `normalStatistic_standing` states for
 /// an exact `(H, B)`.
-///
-/// [definition; agent-inferred] **The exogenous normal law** (Decision 26; [`NormalLaw::exogenous`],
-/// the receiving map `R`'s). It retains the statistic `(H, B)`, each on the locus's lattice with its
-/// carried remainders (`B`'s lattice by the same rule as `W`'s and `H`'s: the locus's `L_ℓ`),
-/// from the comparisons whose covectors reached the locus, each sample carrying its declared target
-/// face `χ_t = χ_R(T_t)` (`hnn::ratio::code_face`):
-///
-/// ```text
-/// H' = H + F,  F = Σ_t w f_t f_tᵀ          B' = B + T,  T = Σ_t w χ_t f_tᵀ
-/// W' = W + (T − W F) X̂ ,   X̂ the certified chart of the carried H' (Decision 24)
-/// W'H' − B' = (WH − B) − (T − W F)(1 − X̂ H')        exact, for any chart
-/// ```
-///
-/// With `B_0 = W_0 H_0` the solution is `W_n = W_0 H_0 H_n⁻¹ + T_n H_n⁻¹`: the declared prior opens the
-/// return path and its weight decays as `W_0 H_0 H_n⁻¹` ([`ExogenousReading::prior`]). Its loss is
-/// the squared additive-chart log ratio `Σ_t w |χ_t − W f_t|²` (with the prior's
-/// `tr((W − W_0)H_0(W − W_0)ᵀ)`), named as such; descent of the cross-entropy face is not claimed.
-/// `W` alone is not a sufficient statistic (two states `W = 0` at `H = 1` and at `H = 2` receiving
-/// `f = χ = 1` solve to `1/2` and `1/3`), so `B` is carried; no comparison list is kept. Every other
-/// linear locus keeps the prox step on its reached covectors.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct NormalLaw {
     map: ExactRatMatrix,
@@ -1441,21 +1381,11 @@ pub struct NormalLaw {
     chart: SolvedChart,
     map_carry: Carry,
     gram_carry: Carry,
-    /// `B`, row-major `m × n`, with its carried remainders: present exactly on an exogenous locus.
-    target: Option<TargetStatistic>,
-}
-
-/// [definition] **An exogenous normal law's target statistic** `B = B_0 + Σ w χ fᵀ` (row-major
-/// `m × n`) on the locus's lattice with its carried remainders.
-#[derive(Clone, Debug, PartialEq, Eq)]
-struct TargetStatistic {
-    entries: Vec<Rat>,
-    carry: Carry,
 }
 
 impl NormalLaw {
     /// **The unit prior at a map**: `H_0 = I` (so `B_0 = W_0`), no remainder, and the founding chart
-    /// `X̂ = I` exact (`δ = 0`): the prox law, `B` not carried.
+    /// `X̂ = I` exact (`δ = 0`).
     pub fn with_prior(map: ExactRatMatrix) -> Self {
         let n = map.columns();
         let identity: Vec<Vec<Rat>> = (0..n).map(|i| unit(n, i)).collect();
@@ -1465,50 +1395,7 @@ impl NormalLaw {
             map,
             map_carry: Carry::default(),
             gram_carry: Carry::default(),
-            target: None,
         }
-    }
-
-    /// **The exogenous law at a declared prior** (type header): `H_0 = I`, `B_0 = W_0 H_0 = W_0`
-    /// carried, the founding chart `X̂ = I` exact.
-    pub fn exogenous(map: ExactRatMatrix) -> Self {
-        let target = TargetStatistic {
-            entries: map.entries().to_vec(),
-            carry: Carry::default(),
-        };
-        Self {
-            target: Some(target),
-            ..Self::with_prior(map)
-        }
-    }
-
-    /// Whether the law is exogenous (retains `B`).
-    pub fn is_exogenous(&self) -> bool {
-        self.target.is_some()
-    }
-
-    /// `B`, the exogenous law's target statistic; `None` for a prox law.
-    pub fn target(&self) -> Option<ExactRatMatrix> {
-        let n = self.map.columns();
-        self.target.as_ref().map(|target| {
-            rows_matrix(
-                &(0..self.map.rows())
-                    .map(|i| target.entries[i * n..(i + 1) * n].to_vec())
-                    .collect::<Vec<Vec<Rat>>>(),
-            )
-        })
-    }
-
-    /// `B`'s carried remainders, dense; `None` for a prox law.
-    pub fn target_remainder(&self) -> Option<ExactRatMatrix> {
-        let (m, n) = (self.map.rows(), self.map.columns());
-        self.target.as_ref().map(|target| {
-            rows_matrix(
-                &(0..m)
-                    .map(|i| (0..n).map(|j| target.carry.at(i * n + j)).collect())
-                    .collect::<Vec<Vec<Rat>>>(),
-            )
-        })
     }
 
     /// `W`.
@@ -1571,9 +1458,6 @@ impl NormalLaw {
     /// The samples' exact bits (the word's receiving reads and the ratio's covectors, thousands of
     /// bits each) make the update's normalization, one per entry, the cost; its residual the carry
     /// releases exactly.
-    ///
-    /// On an exogenous law (type header) the step is [`NormalLaw::exogenous_step`] instead, and
-    /// `proxy` is not read. A prox law refuses a sample that carries a target face.
     pub fn deposited(
         &self,
         samples: &[Sample],
@@ -1581,9 +1465,6 @@ impl NormalLaw {
         rule: &ChartRule,
         at: &mut BudgetedCarry,
     ) -> Result<(Self, Option<ChartReading>), HnnError> {
-        if self.target.is_some() {
-            return self.exogenous_step(samples, rule, at);
-        }
         let (m, n) = (self.map.rows(), self.map.columns());
         for sample in samples {
             if sample.feature.len() != n || sample.covector.len() != m {
@@ -1591,13 +1472,6 @@ impl NormalLaw {
                     what: "a normal sample (feature, covector)",
                     expected: n + m,
                     found: sample.feature.len() + sample.covector.len(),
-                });
-            }
-            if sample.target.is_some() {
-                return Err(HnnError::Shape {
-                    what: "a target face at a prox locus (only an exogenous law reads one)",
-                    expected: 0,
-                    found: 1,
                 });
             }
         }
@@ -1685,215 +1559,12 @@ impl NormalLaw {
             read: rule.read(&released),
             released,
             residual_bits: refinement.residual_bits,
-            exogenous: None,
         };
         Ok((next, Some(reading)))
-    }
-
-    /// **The exogenous step** over a window's samples (type header; Decision 26): `F = Σ w f fᵀ`
-    /// carried onto `H` gives `H'`; the chart of `H'` follows from the previous chart
-    /// ([`SolvedChart`]); `T = Σ w χ fᵀ` carried onto `B`; the residuals `r_t = χ_t − W f_t` at the
-    /// predecessor's map, and `ΔW = Σ w r_t (X̂ f_t)ᵀ = (T − W F) X̂` carried onto `W`. Each carry is at
-    /// the budgeted carry `at` of the locus's deposit. Every sum is read in the integral chart, as
-    /// the prox step's. Refused when a sample carries no target face or a mis-shaped one. Returns
-    /// the successor with its chart's reading and the law's receipt ([`ExogenousReading`]), `None`
-    /// when the window reached nothing (no nonzero weighted feature), which moves nothing.
-    pub fn exogenous_step(
-        &self,
-        samples: &[Sample],
-        rule: &ChartRule,
-        at: &mut BudgetedCarry,
-    ) -> Result<(Self, Option<ChartReading>), HnnError> {
-        let (m, n) = (self.map.rows(), self.map.columns());
-        for sample in samples {
-            let target = sample.target.as_ref().map_or(0, Vec::len);
-            if sample.feature.len() != n || sample.covector.len() != m || target != m {
-                return Err(HnnError::Shape {
-                    what: "an exogenous sample (feature, covector, target face)",
-                    expected: n + 2 * m,
-                    found: sample.feature.len() + sample.covector.len() + target,
-                });
-            }
-        }
-        let active: Vec<(&Sample, Chart)> = samples
-            .iter()
-            .filter(|sample| !sample.weight.is_zero())
-            .filter(|sample| sample.feature.iter().any(|x| !x.is_zero()))
-            .map(|sample| (sample, integral(&sample.feature)))
-            .collect();
-        if active.is_empty() {
-            return Ok((self.clone(), None));
-        }
-        let mut next = self.clone();
-        // H' = H + Σ w f fᵀ, carried.
-        let gram_update = gram_sum(
-            n,
-            active
-                .iter()
-                .map(|(sample, feature)| (&sample.weight, feature)),
-        );
-        let mut gram: Vec<Rat> = self.gram.iter().flatten().cloned().collect();
-        next.gram_carry
-            .deposit_all(at, Carrier::Gram, &mut gram, &gram_update);
-        next.gram = gram.chunks(n).map(<[Rat]>::to_vec).collect();
-        // The chart of H', from the previous chart.
-        let features: Vec<(&Rat, &Chart)> = active
-            .iter()
-            .map(|(sample, feature)| (&sample.weight, feature))
-            .collect();
-        let (chart, refinement) = self.chart.deposited(&next.gram, &features, rule)?;
-        next.chart = chart;
-        // B' = B + Σ w χ fᵀ, carried.
-        let targets: Vec<Chart> = active
-            .iter()
-            .map(|(sample, _)| integral(sample.target.as_deref().unwrap_or(&[])))
-            .collect();
-        let target_update: Vec<Rat> = outer_rows(
-            m,
-            n,
-            &active
-                .iter()
-                .zip(&targets)
-                .map(|((sample, feature), target)| (&sample.weight, target, feature))
-                .collect::<Vec<_>>(),
-        )
-        .into_iter()
-        .flatten()
-        .collect();
-        let statistic = next.target.as_mut().expect("an exogenous law carries B");
-        statistic
-            .carry
-            .deposit_all(at, Carrier::Target, &mut statistic.entries, &target_update);
-        // ΔW = Σ w (χ − W f)(X̂ f)ᵀ at the successor's chart, carried onto W. Each sample's term reads
-        // only its own feature, target and reach: the samples run together. Each term's
-        // `|w| ‖χ − W f‖∞ ‖f‖₁` bounds its share of the chart term `(T − WF)(1 − X̂H')`.
-        let chart = &next.chart;
-        let terms: Vec<(Rat, Chart, Chart, Rat)> = indexed(active.len(), |t| {
-            let (sample, feature) = &active[t];
-            let predicted = apply_rows(&self.map, &sample.feature)?;
-            let residual: Vec<Rat> = sample
-                .target
-                .as_deref()
-                .unwrap_or(&[])
-                .iter()
-                .zip(&predicted)
-                .map(|(target, read)| target - read)
-                .collect();
-            let widest = residual
-                .iter()
-                .map(Signed::abs)
-                .max()
-                .unwrap_or_else(Rat::zero);
-            let mass: Rat = sample.feature.iter().map(Signed::abs).sum();
-            let share = sample.weight.abs() * widest * mass;
-            Ok((
-                sample.weight.clone(),
-                integral(&residual),
-                chart.reach(feature),
-                share,
-            ))
-        })?;
-        let map_update: Vec<Rat> = outer_rows(
-            m,
-            n,
-            &terms
-                .iter()
-                .map(|(weight, residual, reach, _)| (weight, residual, reach))
-                .collect::<Vec<_>>(),
-        )
-        .into_iter()
-        .flatten()
-        .collect();
-        let mut map = self.map.entries().to_vec();
-        next.map_carry
-            .deposit_all(at, Carrier::Map, &mut map, &map_update);
-        next.map = flat_matrix(m, n, map)?;
-        let released =
-            next.chart.certificate() * terms.iter().map(|(.., share)| share).sum::<Rat>();
-        let receipt = ExogenousReading {
-            statistic: next.statistic_residual(),
-            prior: next.chart.mean_diagonal(n),
-        };
-        let reading = ChartReading {
-            exponent: next.chart.exponent(),
-            target: rule.target(),
-            warm: refinement.warm,
-            certificate: next.chart.certificate().clone(),
-            refinements: refinement.refinements,
-            cold: refinement.cold,
-            read: rule.read(&released),
-            released,
-            residual_bits: refinement.residual_bits,
-            exogenous: Some(receipt),
-        };
-        Ok((next, Some(reading)))
-    }
-
-    /// **`‖WH − B‖∞` of the carried law**, exact (the exogenous law's receipt, [`ExogenousReading`]):
-    /// every entry of `W`, `H` and `B` lies on a dyadic lattice, so the product is read in integer
-    /// coordinates at one scale, each row alone (the rows run together); an entry a test chart placed
-    /// off every dyadic lattice is read over ℚ instead. Zero for a prox law, which carries no `B`.
-    pub fn statistic_residual(&self) -> Rat {
-        let Some(target) = &self.target else {
-            return Rat::zero();
-        };
-        let (m, n) = (self.map.rows(), self.map.columns());
-        let (Some(a), Some(h), Some(b)) = (
-            dyadic_exponent(self.map.entries().iter()),
-            dyadic_exponent(self.gram.iter().flatten()),
-            dyadic_exponent(target.entries.iter()),
-        ) else {
-            // A chart placed an entry off every dyadic lattice: the same norm, read over ℚ.
-            let rows: Vec<Rat> = (0..m)
-                .into_par_iter()
-                .map(|i| {
-                    (0..n)
-                        .map(|j| {
-                            let read: Rat = (0..n)
-                                .map(|k| &self.map.entries()[i * n + k] * &self.gram[k][j])
-                                .sum();
-                            (read - &target.entries[i * n + j]).abs()
-                        })
-                        .sum()
-                })
-                .collect();
-            return rows.into_iter().max().unwrap_or_else(Rat::zero);
-        };
-        let scale = (a + h).max(b);
-        let map = dyadic_coordinates(self.map.entries().iter(), a);
-        let gram = dyadic_coordinates(self.gram.iter().flatten(), h);
-        let statistic = dyadic_coordinates(target.entries.iter(), scale);
-        let lift = (scale - (a + h)) as usize;
-        let rows: Vec<BigInt> = (0..m)
-            .into_par_iter()
-            .map(|i| {
-                let mut widest = BigInt::zero();
-                for j in 0..n {
-                    let mut sum = BigInt::zero();
-                    for k in 0..n {
-                        let (left, right) = (&map[i * n + k], &gram[k * n + j]);
-                        if !left.is_zero() && !right.is_zero() {
-                            sum += left * right;
-                        }
-                    }
-                    let difference: BigInt = (sum << lift) - &statistic[i * n + j];
-                    widest += difference.abs();
-                }
-                widest
-            })
-            .collect();
-        let widest = rows.into_iter().max().unwrap_or_default();
-        Rat::new(widest, BigInt::one() << scale as usize)
     }
 
     /// Its bits by carrier.
     fn carrier_bits(&self) -> CarrierBits {
-        let (target, target_remainders) = self.target.as_ref().map_or((0, 0), |target| {
-            (
-                target.entries.iter().map(bits).sum::<u64>(),
-                target.carry.bits(),
-            )
-        });
         CarrierBits {
             entries: self
                 .map
@@ -1901,59 +1572,20 @@ impl NormalLaw {
                 .iter()
                 .chain(self.gram.iter().flatten())
                 .map(bits)
-                .sum::<u64>()
-                + target,
-            remainders: self.map_carry.bits() + self.gram_carry.bits() + target_remainders,
+                .sum(),
+            remainders: self.map_carry.bits() + self.gram_carry.bits(),
             solved: self.chart.bits(self.gram.len()),
         }
     }
 
-    /// Whether every entry of `W`, `H` and (on an exogenous law) `B` lies on the lattice.
+    /// Whether every entry of `W` and `H` lies on the lattice.
     fn on_lattice(&self, lattice: &Lattice) -> bool {
         self.map
             .entries()
             .iter()
             .chain(self.gram.iter().flatten())
-            .chain(self.target.iter().flat_map(|target| target.entries.iter()))
             .all(|value| lattice.contains(value))
     }
-
-    /// The law's carried arrays by carrier: `W`'s, `H`'s and (on an exogenous law) `B`'s.
-    fn carries(&self) -> Vec<(Carrier, &Carry)> {
-        let mut carries = vec![
-            (Carrier::Map, &self.map_carry),
-            (Carrier::Gram, &self.gram_carry),
-        ];
-        if let Some(target) = &self.target {
-            carries.push((Carrier::Target, &target.carry));
-        }
-        carries
-    }
-}
-
-/// The finest dyadic exponent of some values (`2^(−e)ℤ` holds them all), `None` when one lies off
-/// every dyadic lattice.
-fn dyadic_exponent<'a>(values: impl Iterator<Item = &'a Rat>) -> Option<u32> {
-    let mut widest = 0u32;
-    for value in values {
-        let denominator = value.denom();
-        let twos = denominator.trailing_zeros().unwrap_or(0);
-        if denominator.bits() != twos + 1 {
-            return None;
-        }
-        widest = widest.max(twos as u32);
-    }
-    Some(widest)
-}
-
-/// The integer coordinates of dyadic values at `2^(−e)`, `e` at least each value's exponent.
-fn dyadic_coordinates<'a>(values: impl Iterator<Item = &'a Rat>, exponent: u32) -> Vec<BigInt> {
-    values
-        .map(|value| {
-            let twos = value.denom().trailing_zeros().unwrap_or(0) as u32;
-            value.numer() << (exponent - twos) as usize
-        })
-        .collect()
 }
 
 /// **`Σ_t w_t f_t f_tᵀ` in the integral chart**: each feature charted once, the numerators summed
@@ -2072,10 +1704,8 @@ struct RingMaterial {
     pairs: Vec<(usize, PairPort)>,
     pair_scale: Rat,
     receiving: Option<NormalLaw>,
-    /// The receiving parametron's bound harmonic coordinate `h_R` (Decision 26), on a receiving
-    /// ring, with its factor statistic.
-    harmonic: Option<Vec<Rat>>,
-    harmonic_scale: Rat,
+    /// The receiving parametron's region class masses (Decision 27), on a receiving ring.
+    masses: Option<ClassMasses>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -2088,17 +1718,12 @@ struct ContactMaterial {
 
 /// [definition] **A carried array of a locus**: an array whose entries live on the locus's
 /// lattice with their carried remainders. `Map` and `Gram` are a normal law's `W` and `H` (the
-/// contrast port's on an element, `E`'s on a source port, `R`'s on a receiving map), and `Target`
-/// an exogenous normal law's `B` (`R`'s, Decision 26); `Harmonic` and `HarmonicScale` are the
-/// receiving parametron's bound harmonic coordinate `h_R` and its statistic, at the receiving
-/// locus; the others are the factor families' entries and statistics `h_x`.
+/// contrast port's on an element, `E`'s on a source port, `R`'s on a receiving map); the others are
+/// the factor families' entries and statistics `h_x`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Carrier {
     Map,
     Gram,
-    Target,
-    Harmonic,
-    HarmonicScale,
     Passive,
     PassiveScale,
     Slices,
@@ -2278,20 +1903,6 @@ pub struct FactorStep {
     pub energy: Rat,
 }
 
-/// [definition; agent-inferred] **One step of the receiving parametron's bound harmonic coordinate**
-/// `h_R` (Decision 26; `hnn::receiving`, the standing read), at the receiving locus: its descent
-/// direction, the harmonic projection of the pulled-back descent covectors `Π Rᵀ Σ_j w g_j` (in the
-/// fixed space of the ring's rotation, so `P_R h_R = h_R` is kept exactly), and the scored face's
-/// curvature along that space `Σ_j tr(Π Rᵀ 𝒥_j R Π)` (`hnn::receiving::standing_energy`), which its
-/// statistic accumulates. The step is the factor families':
-/// `h_x' = h_x + energy` carried, then `Δh_R = (η_x / h_x') · gradient` carried.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct HarmonicStep {
-    pub ring: usize,
-    pub gradient: Vec<Rat>,
-    pub energy: Rat,
-}
-
 /// [definition] **What a deposit's publication reads**: the energy-growth bound `ε_k` certified
 /// for the storage forms (`Q_(k+1) ⪯ (1 + ε_k) Q_k`, zero when only reaction material moved, `None`
 /// when no dyadic bound up to `2^40` certifies it), the running product `∏(1 + ε_k)`, the commit
@@ -2299,8 +1910,9 @@ pub struct HarmonicStep {
 /// carry's report: every residual the deposit released (exact and sparse, with its locus, carrier
 /// and entry; Lean `HNN/LatticeDeposit.release`), their bits, and the number of entries whose
 /// lattice coordinate moved (`q ≠ 0`, review R5); and each normal law's solved chart with the prox
-/// residual its chart released ([`ChartReading`], Decision 24). The release is reported, never
-/// silent.
+/// residual its chart released ([`ChartReading`], Decision 24); and the class mass its reached
+/// comparisons added at the receiving parametrons, `Σ w` (Decision 27), exact. The release is
+/// reported, never silent.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DepositReading {
     pub growth: Option<Rat>,
@@ -2313,6 +1925,7 @@ pub struct DepositReading {
     pub released_bits: u64,
     pub stepped: u64,
     pub charts: Vec<(Locus, ChartReading)>,
+    pub masses: Rat,
 }
 
 // -------------------------------------------------------------------------------------------
@@ -2382,8 +1995,8 @@ impl Constitution {
     /// |---|---|---|
     /// | `E_g` on a source ring | 0 | normal law, `H_0 = I`, `B_0 = 0` |
     /// | `E_g^(δ)`, rank `2d_g` | `e_ρ = 0`; `a_ρ`, `b_ρ` from the sign generator | factor steps |
-    /// | `R` on a receiving ring | the sign generator times ½ | the exogenous normal law, `H_0 = I`, `B_0 = R_0` carried (Decision 26) |
-    /// | `h_R` on a receiving ring | 0 | the harmonic step (Decision 26, [`HarmonicStep`]) |
+    /// | `R` on a receiving ring | the sign generator times ½ | normal law, `H_0 = I`, `B_0 = R_0` |
+    /// | `C_(r,c)` on a receiving ring, per region of its receiver's partition | `α = ½` (Krichevsky–Trofimov) | the class-mass deposit (Decision 27) |
     /// | `W_c,g` | 0 | normal law, `H_0 = I`, `B_0 = 0` |
     /// | `W_s,g = −f fᵀ` | `f = ½I` | factor step |
     /// | slices | `u_ρ = e_ρ`, `v_ρ = e_(ρ+1)`: the skew cyclic shift | factor steps |
@@ -2412,6 +2025,14 @@ impl Constitution {
             .unwrap_or(1);
         let a = field.alphabet();
         let receivers: BTreeSet<usize> = field.receivers().iter().map(|r| r.ring).collect();
+        // Each receiving ring's masses over its first declared receiver's partition.
+        let partition = |g: usize| {
+            field
+                .receivers()
+                .iter()
+                .find(|receiver| receiver.ring == g)
+                .map(|receiver| receiver.regions)
+        };
         let rings = field
             .rings()
             .iter()
@@ -2469,10 +2090,9 @@ impl Constitution {
                                 })
                                 .collect(),
                         )?;
-                        Ok::<_, HnnError>(NormalLaw::exogenous(map))
+                        Ok::<_, HnnError>(NormalLaw::with_prior(map))
                     })
                     .transpose()?;
-                let harmonic = receivers.contains(&g).then(|| vec![Rat::zero(); n]);
                 Ok(RingMaterial {
                     standing: vec![Rat::zero(); n],
                     standing_scale: Rat::one(),
@@ -2487,8 +2107,7 @@ impl Constitution {
                     pairs,
                     pair_scale: Rat::one(),
                     receiving,
-                    harmonic,
-                    harmonic_scale: Rat::one(),
+                    masses: partition(g).map(|regions| ClassMasses::prior(regions, a)),
                 })
             })
             .collect::<Result<Vec<_>, HnnError>>()?;
@@ -2568,14 +2187,6 @@ impl Constitution {
     /// Ring `g`'s receiving-map normal law `R`.
     pub fn receiving_law(&self, ring: usize) -> Option<&NormalLaw> {
         self.rings[ring].receiving.as_ref()
-    }
-
-    /// Ring `g`'s harmonic coordinate's factor statistic `h_x` (Decision 26), on a receiving ring.
-    pub fn harmonic_scale(&self, ring: usize) -> Option<&Rat> {
-        self.rings[ring]
-            .harmonic
-            .as_ref()
-            .map(|_| &self.rings[ring].harmonic_scale)
     }
 
     /// The factor families' statistics `h_x` of ring `g`: standing, passive, slices, pair port.
@@ -2700,42 +2311,27 @@ impl Constitution {
             material.source = Some(NormalLaw::with_prior(source));
         }
         if let Some(receiving) = receiving {
-            material.receiving = Some(NormalLaw::exogenous(receiving));
+            material.receiving = Some(NormalLaw::with_prior(receiving));
         }
         Ok(self)
     }
 
-    /// **Replace a receiving ring's bound harmonic coordinate** `h_R` (a test and control chart):
-    /// refused off a receiving ring, at the wrong width, or when `P_R h ≠ h` (Decision 26: the
-    /// coordinate lives in the fixed space of the ring's rotation). Its carried remainders are
-    /// dropped with it.
-    pub fn with_harmonic(
-        mut self,
-        field: &Field,
-        ring: usize,
-        harmonic: Vec<Rat>,
-    ) -> Result<Self, HnnError> {
-        let declared = field.rings().get(ring).ok_or(HnnError::RingOutside {
-            ring,
-            rings: field.rings().len(),
-        })?;
-        let material = self
+    /// **Replace a receiving ring's region class masses** (a test and control chart): refused off a
+    /// receiving ring, or for masses of another partition or alphabet than the ring's.
+    pub fn with_masses(mut self, ring: usize, masses: ClassMasses) -> Result<Self, HnnError> {
+        let slot = self
             .rings
             .get_mut(ring)
+            .and_then(|material| material.masses.as_mut())
             .ok_or(HnnError::MissingReceivingMap { ring })?;
-        if material.harmonic.is_none() {
-            return Err(HnnError::MissingReceivingMap { ring });
-        }
-        if !declared.is_harmonic(&harmonic) {
+        if slot.regions() != masses.regions() || slot.classes() != masses.classes() {
             return Err(HnnError::Shape {
-                what: "a harmonic coordinate fixed by its ring's rotation (P h = h)",
-                expected: declared.width(),
-                found: harmonic.len(),
+                what: "class masses against the receiving ring's partition and alphabet",
+                expected: slot.region_count() * slot.classes(),
+                found: masses.region_count() * masses.classes(),
             });
         }
-        material.harmonic = Some(harmonic);
-        self.carries
-            .remove(&(Locus::ReceivingMap(ring), Carrier::Harmonic));
+        *slot = masses;
         Ok(self)
     }
 
@@ -2819,9 +2415,7 @@ impl Constitution {
             }
             if let Some(receiving) = &material.receiving {
                 let mut parts = receiving.carrier_bits();
-                if let Some(harmonic) = &material.harmonic {
-                    parts.entries += values(&mut harmonic.iter().chain([&material.harmonic_scale]));
-                }
+                parts.entries += material.masses.as_ref().map_or(0, ClassMasses::bits);
                 loci.push((Locus::ReceivingMap(g), parts));
             }
         }
@@ -2893,7 +2487,10 @@ impl Constitution {
                 (Locus::ReceivingMap(g), material.receiving.as_ref()),
             ] {
                 if let Some(law) = law {
-                    for (array, carry) in law.carries() {
+                    for (array, carry) in [
+                        (Carrier::Map, &law.map_carry),
+                        (Carrier::Gram, &law.gram_carry),
+                    ] {
                         carried.extend(
                             carry
                                 .0
@@ -2965,13 +2562,6 @@ impl Constitution {
                 (_, Carrier::PairScale) => {
                     add(std::slice::from_mut(&mut exact.rings[ring].pair_scale))?
                 }
-                (_, Carrier::HarmonicScale) => {
-                    add(std::slice::from_mut(&mut exact.rings[ring].harmonic_scale))?
-                }
-                (_, Carrier::Harmonic) => add(exact.rings[ring]
-                    .harmonic
-                    .as_mut()
-                    .ok_or(HnnError::MissingReceivingMap { ring })?)?,
                 (_, Carrier::Standing) => add(&mut exact.rings[ring].standing)?,
                 (_, Carrier::Slices) => {
                     let material = &mut exact.rings[ring];
@@ -3013,14 +2603,6 @@ impl Constitution {
                         law.gram[entry / n][entry % n] += &r;
                     }
                 }
-                (_, Carrier::Target) => {
-                    let law = exact.rings[ring]
-                        .receiving
-                        .as_mut()
-                        .and_then(|law| law.target.as_mut())
-                        .ok_or(HnnError::MissingReceivingMap { ring })?;
-                    add(&mut law.entries)?;
-                }
                 (_, Carrier::Factor(_) | Carrier::FactorScale(_)) => {}
             }
         }
@@ -3036,9 +2618,6 @@ impl Constitution {
             {
                 law.map_carry = Carry::default();
                 law.gram_carry = Carry::default();
-                if let Some(target) = &mut law.target {
-                    target.carry = Carry::default();
-                }
             }
         }
         Ok(exact)
@@ -3121,12 +2700,6 @@ impl Constitution {
                     .receiving
                     .as_ref()
                     .is_none_or(|law| receiving.is_some_and(|l| law.on_lattice(l)))
-                && material.harmonic.as_ref().is_none_or(|harmonic| {
-                    all(
-                        receiving,
-                        &mut harmonic.iter().chain([&material.harmonic_scale]),
-                    )
-                })
         });
         let contacts = self.contacts.iter().enumerate().all(|(a, material)| {
             !retained(Locus::Channel(a))
@@ -3168,7 +2741,7 @@ impl Constitution {
         let mut next = self.clone();
         let (proxy, eta) = (self.steps.proxy.clone(), self.steps.factor.clone());
         // The deposit's steps by locus, each with its place in the deposit's order (its linear
-        // steps, then its factor steps).
+        // steps, then its factor steps, then its class-mass steps).
         let mut groups: BTreeMap<Locus, Vec<(usize, LocusStep<'_>)>> = BTreeMap::new();
         for (index, step) in deposit.linear().iter().enumerate() {
             groups
@@ -3184,11 +2757,11 @@ impl Constitution {
                 .push((linear + index, LocusStep::Factor(step)));
         }
         let factors = linear + deposit.factors().len();
-        for (index, step) in deposit.harmonic().iter().enumerate() {
+        for (index, step) in deposit.masses().iter().enumerate() {
             groups
                 .entry(Locus::ReceivingMap(step.ring))
                 .or_default()
-                .push((factors + index, LocusStep::Harmonic(step)));
+                .push((factors + index, LocusStep::Masses(step)));
         }
         // Each locus's material and carried remainders, taken apart: a locus's steps read and
         // write only its own, so the loci run together (`hnn::realization`), each in its
@@ -3301,6 +2874,11 @@ impl Constitution {
             released_bits,
             stepped,
             charts,
+            masses: deposit
+                .masses()
+                .iter()
+                .map(|step| step.weight.clone())
+                .sum(),
         };
         Ok((next, reading))
     }
@@ -3365,14 +2943,16 @@ impl Constitution {
                         .map_err(refused)?;
                     factor_step(material, carries, step, eta, at).map_err(refused)?;
                 }
-                LocusStep::Harmonic(step) => {
+                LocusStep::Masses(step) => {
+                    // The masses carry no remainder, so the stroke is opened for the locus's
+                    // reading and nothing moves its clock.
                     budgeted(&mut stroke).map_err(refused)?;
-                    let at = stroke.as_mut().expect("opened above");
-                    let material = material
+                    let masses = material
                         .as_deref_mut()
+                        .and_then(LocusMaterial::masses)
                         .ok_or(HnnError::MissingReceivingMap { ring: step.ring })
                         .map_err(refused)?;
-                    harmonic_step(material, carries, step, eta, at).map_err(refused)?;
+                    masses.deposit(step).map_err(refused)?;
                 }
             }
         }
@@ -3446,15 +3026,15 @@ type LocusDeposit = Result<(Locus, Carries, (BudgetedCarry, Vec<ChartReading>)),
 enum LocusStep<'d> {
     Linear(&'d LinearStep),
     Factor(&'d FactorStep),
-    Harmonic(&'d HarmonicStep),
+    Masses(&'d MassStep),
 }
 
 /// [definition; agent-inferred] **One locus's material, borrowed apart from the rest** of the
 /// successor a deposit builds (the module header's loci): the element's passive factor, contrast
 /// port and slices with their statistics (and the ring's width, which the slices' carry indexes
 /// by); the standing and its statistic; the source port with the pair ports and their statistic;
-/// the receiving map; a contact's channel factors. No two loci share a part, so their steps run
-/// together.
+/// the receiving map with the receiving parametron's class masses; a contact's channel factors. No
+/// two loci share a part, so their steps run together.
 enum LocusMaterial<'a> {
     Element {
         passive: &'a mut ExactRatMatrix,
@@ -3475,8 +3055,7 @@ enum LocusMaterial<'a> {
     },
     ReceivingMap {
         receiving: &'a mut Option<NormalLaw>,
-        harmonic: &'a mut Option<Vec<Rat>>,
-        harmonic_scale: &'a mut Rat,
+        masses: &'a mut Option<ClassMasses>,
     },
     Channel(&'a mut ContactMaterial),
 }
@@ -3502,8 +3081,7 @@ impl<'a> LocusMaterial<'a> {
                 pairs,
                 pair_scale,
                 receiving,
-                harmonic,
-                harmonic_scale,
+                masses,
             } = material;
             let width = standing.len();
             if named.contains_key(&Locus::Element(g)) {
@@ -3541,11 +3119,7 @@ impl<'a> LocusMaterial<'a> {
             if named.contains_key(&Locus::ReceivingMap(g)) {
                 materials.insert(
                     Locus::ReceivingMap(g),
-                    LocusMaterial::ReceivingMap {
-                        receiving,
-                        harmonic,
-                        harmonic_scale,
-                    },
+                    LocusMaterial::ReceivingMap { receiving, masses },
                 );
             }
         }
@@ -3567,6 +3141,14 @@ impl<'a> LocusMaterial<'a> {
             (LinearLocus::Receiving(_), LocusMaterial::ReceivingMap { receiving, .. }) => {
                 receiving.as_mut()
             }
+            _ => None,
+        }
+    }
+
+    /// The receiving parametron's class masses, when this locus carries them.
+    fn masses(&mut self) -> Option<&mut ClassMasses> {
+        match self {
+            LocusMaterial::ReceivingMap { masses, .. } => masses.as_mut(),
             _ => None,
         }
     }
@@ -3733,47 +3315,6 @@ fn factor_step(
     Ok(())
 }
 
-/// **The harmonic coordinate's carried step** ([`HarmonicStep`]): `h_x` carried to `h_x'`, then
-/// `Δh_R = (η_x / h_x') · gradient` carried onto `h_R`, on the receiving locus's material and carried
-/// remainders. Refused off a receiving ring or at the wrong width.
-fn harmonic_step(
-    material: &mut LocusMaterial<'_>,
-    carries: &mut Carries,
-    step: &HarmonicStep,
-    eta: &Rat,
-    at: &mut BudgetedCarry,
-) -> Result<(), HnnError> {
-    let locus = Locus::ReceivingMap(step.ring);
-    let LocusMaterial::ReceivingMap {
-        harmonic: Some(harmonic),
-        harmonic_scale,
-        ..
-    } = material
-    else {
-        return Err(HnnError::MissingReceivingMap { ring: step.ring });
-    };
-    if step.gradient.len() != harmonic.len() {
-        return Err(HnnError::Shape {
-            what: "a harmonic step against its coordinate's width",
-            expected: harmonic.len(),
-            found: step.gradient.len(),
-        });
-    }
-    let rate = advance(
-        carries,
-        at,
-        (locus, Carrier::HarmonicScale),
-        harmonic_scale,
-        &step.energy,
-        eta,
-    )?;
-    let carry = carries.entry((locus, Carrier::Harmonic)).or_default();
-    for (i, (x, dx)) in harmonic.iter_mut().zip(&step.gradient).enumerate() {
-        carry.deposit(at, Carrier::Harmonic, i, x, &rate_times(&rate, dx));
-    }
-    Ok(())
-}
-
 fn joint_form(
     forms: &[[ExactRatMatrix; 2]],
 ) -> Result<crate::ratio::linear::inertia::SymmetricForm, HnnError> {
@@ -3882,7 +3423,7 @@ impl ConstitutionRead for Constitution {
     fn receiving_map(&self, ring: usize) -> Option<&ExactRatMatrix> {
         self.rings[ring].receiving.as_ref().map(NormalLaw::map)
     }
-    fn harmonic(&self, ring: usize) -> Option<&[Rat]> {
-        self.rings[ring].harmonic.as_deref()
+    fn class_masses(&self, ring: usize) -> Option<&ClassMasses> {
+        self.rings[ring].masses.as_ref()
     }
 }

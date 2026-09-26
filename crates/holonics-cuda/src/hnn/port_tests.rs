@@ -23,8 +23,8 @@ use holonics::hnn::field::{ContactDeclaration, CribDeclaration, ReceiverDeclarat
 use holonics::hnn::port::{ExecutionPort, Handle, ReceiptDetail};
 use holonics::hnn::reference::{Cut, Reference, one_hot};
 use holonics::hnn::{
-    Constitution, ConstitutionRead, Current, Field, FieldDeclaration, HnnError, PairPort,
-    RingDeclaration,
+    Constitution, ConstitutionRead, Current, Field, FieldDeclaration, HnnError, MassStep, PairPort,
+    Regions, RingDeclaration,
 };
 use holonics::ratio::Rat;
 use holonics::ratio::linear::ExactRatMatrix;
@@ -84,6 +84,7 @@ fn chain_declaration(population: u64) -> FieldDeclaration {
             ring: 2,
             aperture: 2,
             tolerance: rat(1, 16),
+            regions: Regions::PrecedingCell,
         }],
         crib: CribDeclaration {
             window: 16,
@@ -121,7 +122,9 @@ fn half_matrix(draw: &mut Draw, rows: usize, columns: usize) -> ExactRatMatrix {
 
 /// **A generic constitution on half-integers**: every locus drawn (the passive factor, the
 /// contrast port, generic slices, a mixed standing, the ports, nonzero pair-port outputs, the
-/// channels' factors), so every term of the word and its return is exercised from the first window.
+/// channels' factors, and the receiving parametron's class masses, Decision 27: drawn unit and
+/// half masses at every region, so the count face differs from region to region and from uniform),
+/// so every term of the word and its return is exercised from the first window.
 fn generic(field: &Field, seed: u64) -> Constitution {
     let mut draw = Draw(seed);
     let a = field.alphabet();
@@ -143,21 +146,21 @@ fn generic(field: &Field, seed: u64) -> Constitution {
             .any(|r| r.ring == g)
             .then(|| half_matrix(&mut draw, 2 * a, n));
         theta = theta.with_ports(g, standing, source, receiving).unwrap();
-        // The receiving parametron's bound harmonic coordinate (Decision 26): one half-integer per
-        // part, constant over the ring's one orbit, so the standing read is live from the first
-        // window.
-        if theta.harmonic(g).is_some() {
-            let (real, imaginary) = (half(&mut draw), half(&mut draw));
-            let harmonic = (0..n)
-                .map(|i| {
-                    if i % 2 == 0 {
-                        real.clone()
-                    } else {
-                        imaginary.clone()
-                    }
-                })
-                .collect();
-            theta = theta.with_harmonic(field, g, harmonic).unwrap();
+        if let Some(prior) = theta.class_masses(g) {
+            let mut masses = prior.clone();
+            for region in 0..masses.region_count() {
+                for _ in 0..1 + draw.below(6) {
+                    masses
+                        .deposit(&MassStep {
+                            ring: g,
+                            region,
+                            class: draw.below(a),
+                            weight: rat(1 + draw.below(2) as i64, 2),
+                        })
+                        .unwrap();
+                }
+            }
+            theta = theta.with_masses(g, masses).unwrap();
         }
         if field.is_source(g) {
             for &offset in field.offsets() {
@@ -253,13 +256,8 @@ struct Compared {
     boundaries: u64,
     keys: u64,
     reads: u64,
-    /// Deposits whose reading carried the receiving map's exogenous receipt (Decision 26).
-    exogenous: u64,
-    /// Deposits that moved the receiving parametron's bound harmonic coordinate (Decision 26).
-    harmonic: u64,
-    /// The receiving map's prior weight after each deposit that reached it (Decision 26:
-    /// `tr(X̂)/n` of the chart of `H_n⁻¹`), exact.
-    priors: Vec<Rat>,
+    /// The class mass the deposits added at the receiving parametron (Decision 27), exact.
+    mass: Rat,
     traffic: Traffic,
 }
 
@@ -341,26 +339,19 @@ fn lockstep(
                 );
                 compared.discards += 1;
             } else {
-                let receiving = phases.ring();
-                let before = h.constitution().harmonic(receiving).map(<[Rat]>::to_vec);
                 let deposited = same(
                     "deposit",
                     host.deposit(&mut h, staged),
                     device.deposit(&mut d, staged),
                 );
                 compared.deposits += 1;
+                // The class masses a deposit added (Decision 27), and the published constitutions,
+                // the masses among them, equal on both ports.
                 if let Some(reading) =
                     deposited.and_then(|returned| returned.deposit.into_present())
                 {
-                    for (_, chart) in &reading.charts {
-                        if let Some(receipt) = &chart.exogenous {
-                            compared.exogenous += 1;
-                            compared.priors.push(receipt.prior.clone());
-                        }
-                    }
+                    compared.mass += reading.masses;
                 }
-                let after = h.constitution().harmonic(receiving).map(<[Rat]>::to_vec);
-                compared.harmonic += u64::from(before != after);
                 assert_eq!(
                     h.constitution(),
                     holonics::hnn::reference::ExposedResident::constitution(&d),
@@ -446,33 +437,36 @@ fn the_dyadic_readings_are_exact() {
     );
 }
 
-/// Decision 26 on the card's publication (no card needed to form it): the receiving parametron's
-/// bound harmonic coordinate is placed beside the receiving map, at the receiving locus's lattice,
-/// its words `h·2^L` exactly; a ring with no receiver carries none.
+/// Decision 27 on the card's publication (no card needed to form it): the receiving parametron's
+/// class masses are kept with the publication's host loci, equal to the constitution's, and the
+/// count face read from them is the host reference's at every region; a ring with no receiver
+/// carries none.
 #[test]
-fn the_publication_places_the_harmonic_coordinate() {
+fn the_publication_keeps_the_class_masses_on_the_host() {
     let field = chain();
     let theta = generic(&field, 5);
     let loci = super::publication::Loci::of(&field, &theta).unwrap();
-    let exponent = field
-        .lattice(holonics::hnn::Locus::ReceivingMap(2))
-        .unwrap()
-        .exponent();
-    let placed = loci.harmonics[2].as_ref().unwrap();
-    assert_eq!(placed.matrix.exponent, exponent);
-    let harmonic = theta.harmonic(2).unwrap();
-    assert!(harmonic.iter().any(|x| !num_traits::Zero::is_zero(x)));
-    let scale = Rat::from_integer(BigInt::from(1u64 << exponent));
-    let words: Vec<i64> = harmonic
-        .iter()
-        .map(|x| (x * &scale).to_integer().try_into().unwrap())
-        .collect();
-    assert_eq!(placed.matrix.words, words);
-    assert_eq!(
-        loci.words[placed.offset..placed.offset + words.len()],
-        words[..]
-    );
-    assert!(loci.harmonics[0].is_none() && loci.harmonics[1].is_none());
+    let masses = loci.masses[2].as_ref().unwrap();
+    assert_eq!(Some(masses), theta.class_masses(2));
+    assert!(loci.masses[0].is_none() && loci.masses[1].is_none());
+    let phases = holonics::hnn::ReceivingPhases::declare(
+        &field,
+        &theta,
+        &Current::at_rest(&field),
+        &field.receivers()[0],
+    )
+    .unwrap();
+    let mut current = Current::at_rest(&field);
+    let mut moment = holonics::hnn::SourceMoment::open(&field, &current);
+    for cell in [None, Some(3usize), Some(0)] {
+        if let Some(cell) = cell {
+            moment.ingest(&field, &mut current, &[cell]).unwrap();
+        }
+        assert_eq!(
+            phases.count_face_at(masses, &moment).unwrap(),
+            phases.count_face(&theta, &moment).unwrap()
+        );
+    }
 }
 
 // -------------------------------------------------------------------------------------------
@@ -491,7 +485,11 @@ fn the_card_port_returns_the_reference_on_the_chain() {
     let compared = lockstep(&field, &cut_of(cells, held..population), u64::MAX, None, 3);
     println!("chain, declared constitution: {compared:?}");
     assert!(compared.boundaries > 0 && compared.keys > 0 && compared.deposits > 0);
-    assert!(compared.exogenous > 0 && compared.harmonic > 0);
+    // Every deposited window added one unit mass per target (Decision 27).
+    assert_eq!(
+        compared.mass,
+        Rat::from_integer(BigInt::from(2 * compared.deposits))
+    );
 }
 
 /// The chain from a generic constitution on half-integers (every locus live: the contrast port,
@@ -512,7 +510,11 @@ fn the_card_port_returns_the_reference_on_a_generic_constitution() {
             2,
         );
         println!("chain, generic constitution {seed}: {compared:?}");
-        assert!(compared.deposits > 0 && compared.exogenous > 0 && compared.harmonic > 0);
+        assert!(compared.deposits > 0);
+        assert_eq!(
+            compared.mass,
+            Rat::from_integer(BigInt::from(2 * compared.deposits))
+        );
     }
 }
 
@@ -529,7 +531,7 @@ fn the_card_port_returns_the_reference_on_campaign_one() {
     let compared = lockstep(&field, &cut_of(cells, n_star - 1_190..n_star), 8, None, 4);
     println!("campaign 1, drawn bytes: {compared:?}");
     assert_eq!(compared.compares, 8);
-    assert!(compared.exogenous > 0 && compared.harmonic > 0);
+    assert_eq!(compared.mass, Rat::from_integer(BigInt::from(16)));
 }
 
 /// The standing real cut's manifest numbers (its population and held-out range).

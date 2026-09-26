@@ -17,7 +17,10 @@
 //! - [`chart`]: the word on its declared lattices (Decision 24): every inverse a certified lattice
 //!   chart refined by rounded Newton–Schulz steps, every transient carried with error feedback, the
 //!   integer products under the carrier's ℓ1 certificate, and the declared precisions by rule;
-//! - [`receiving`]: [`ReceivingPhases`] and the read at the receiver's grain `L_R`;
+//! - [`receiving`]: [`ReceivingPhases`] and the read at the receiver's grain `L_R`, the combined
+//!   face of the count face and the wave (Decision 27);
+//! - [`masses`]: the receiving parametron's region class masses ([`ClassMasses`]), their deposit
+//!   and their count face read at the grain (Decision 27);
 //! - [`keys`]: the data → menu map, key location per ring in carry order, and gauge fixing.
 //!
 //! The learning side (constitution, ratio, pending, retention, port, reference) composes these.
@@ -41,6 +44,7 @@
 //! | the causal cone | `HNN/Word.word_tick_cone` (the concrete tick) | [`Word::support`] |
 //! | the word on declared lattices: certified inverse charts, error feedback, the executed adjoint, the balance up to the residual | `HNN/LatticeWord.{nsStep, rounded_refinement_certificate, roundedIter_certificate, warm_start_certificate, inverse_chart_deviation, feedback_tick, carried_word_accounting, executed_adjoint_unique, executed_adjoint_deviation, cayley_chart_energy}` | [`chart`], [`Word`], [`Word::pull_back`], [`propagation::TickBalance`] |
 //! | the moment | `HNN/Moment.{encoderMoment_contract, encoder_covector_tape_free, closingRing_moment_is_phaseBinned, exteriorOffset_independent_of_E, selective_position, moment_capacity}` | [`SourceMoment`], [`moment::capacity`] |
+//! | the receiving face: region class masses read at the grain, plus the wave (Decision 27) | `HNN/RegionCounts.{count_step_mass, count_prior_decay, count_face_eq_kt, count_future_sufficient, grain_log_iff_pow_bounds, grain_code_residual, combined_face_pullback}` | [`masses`], [`ReceivingRead::combined`] |
 //! | the word opens at zero | structural: [`Current`] has no wave field (`HNN/Retention.word_opens_at_zero` is the abstract trajectory's linearity) | [`Word::open`] |
 //! | keys | `HNN/Keys.{field_loop_fibre, selective_step_dormant, propagation_eq_edge_fibre, gauge_fix_unique}` | [`keys`], [`crate::compression::Menu::propagate`] |
 //! | the ring's navigator | `Holon/Generator.{mapRotor_order, map_pow_mod_order, map_turn_lossless}` | [`Ring::navigator`] over `navigator::Transport::Map` |
@@ -64,6 +68,7 @@ pub mod chart;
 pub mod constitution;
 pub mod field;
 pub mod keys;
+pub mod masses;
 pub mod moment;
 pub mod pending;
 pub mod port;
@@ -83,6 +88,7 @@ pub use field::{
     RingDeclaration,
 };
 pub use keys::{KeyLocation, RingKeys, locate_keys};
+pub use masses::{ClassMasses, CountFace, MassStep, Regions};
 pub use moment::{Capacity, PairPort, SourceMoment};
 pub use pending::PendingRatio;
 pub use port::{
@@ -205,6 +211,14 @@ pub enum HnnError {
     MissingSourcePort { ring: usize },
     #[error("the constitution carries no receiving map for ring {ring}")]
     MissingReceivingMap { ring: usize },
+    #[error(
+        "the receiver on ring {ring} declares the preceding-cell region, but no declared offset retains a window"
+    )]
+    RegionWindow { ring: usize },
+    #[error(
+        "a class mass's weight {weight} is not a nonnegative multiple of 1/2; the masses are integers of half-units"
+    )]
+    MassWeight { weight: Rat },
     #[error(
         "aperture {aperture} exceeds the receiving ring's observability rank {rank} over the word"
     )]

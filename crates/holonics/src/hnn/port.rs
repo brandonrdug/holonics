@@ -71,11 +71,10 @@ use crate::aeon::Reading;
 use crate::compression::{CompressionError, ResonanceSplit, resonance_split};
 use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartReading, Remainders, carry};
-use crate::hnn::constitution::{
-    DepositReading, FactorStep, HarmonicStep, Lattice, LinearStep, Locus,
-};
+use crate::hnn::constitution::{DepositReading, FactorStep, Lattice, LinearStep, Locus};
 use crate::hnn::field::{Current, Field, Ring};
 use crate::hnn::keys::KeyLocation;
+use crate::hnn::masses::MassStep;
 use crate::hnn::moment::Ingested;
 use crate::hnn::propagation::{PathAttenuation, TickBalance, swing_about};
 use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector};
@@ -420,28 +419,25 @@ pub struct ContactPullback {
 }
 
 /// [definition] **The complete geometry and feature pullback** of a compare (design (c),
-/// `Pullback`): per ring, per contact, the receiving map `R` (`Σ_j ∇_j (P^τ(v_j + h_R))ᵀ`, the
-/// gradients against the operand the map read), and the receiving parametron's bound harmonic
-/// coordinate (Decision 26: `Π Rᵀ Σ_j ∇_j`, `None` where the ring carries none). Gradients of the
-/// ratio's log (`∂ℓ/∂·`); the key covector is a reading only.
+/// `Pullback`): per ring, per contact, and the receiving map `R`. Gradients of the ratio's log
+/// (`∂ℓ/∂·`); the key covector is a reading only.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Pullback {
     pub rings: Vec<RingPullback>,
     pub contacts: Vec<ContactPullback>,
     pub receiving: (usize, ExactRatMatrix),
-    pub harmonic: Option<Vec<Rat>>,
 }
 
 /// [definition] **The staged material return** (design (c), `Deposit`): keyed by locus, inside the
 /// causal diamond of the source rings and the receiver, at the constitution commit it was computed
 /// at: the linear loci's windows, the factor families' steps and the receiving parametron's
-/// harmonic steps (Decision 26). Only a compare builds one.
+/// class-mass steps (Decision 27), one per reached comparison. Only a compare builds one.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Deposit {
     commit: u64,
     linear: Vec<LinearStep>,
     factors: Vec<FactorStep>,
-    harmonic: Vec<HarmonicStep>,
+    masses: Vec<MassStep>,
     reached: Vec<Locus>,
 }
 
@@ -456,19 +452,19 @@ impl Deposit {
             commit,
             linear,
             factors,
-            harmonic: Vec::new(),
+            masses: Vec::new(),
             reached,
         }
     }
 
-    /// The deposit with the receiving parametron's harmonic steps (Decision 26).
-    pub(crate) fn with_harmonic(self, harmonic: Vec<HarmonicStep>) -> Self {
-        Self { harmonic, ..self }
+    /// The deposit with the receiving parametron's class-mass steps (Decision 27).
+    pub(crate) fn with_masses(self, masses: Vec<MassStep>) -> Self {
+        Self { masses, ..self }
     }
 
-    /// The receiving parametron's harmonic steps (Decision 26).
-    pub fn harmonic(&self) -> &[HarmonicStep] {
-        &self.harmonic
+    /// The receiving parametron's class-mass steps (Decision 27).
+    pub fn masses(&self) -> &[MassStep] {
+        &self.masses
     }
 
     /// The constitution commit the deposit was computed at.
@@ -491,9 +487,10 @@ impl Deposit {
         self.reached.clone()
     }
 
-    /// Its exact bits, a reading: every entry of every linear sample (its weight, feature,
-    /// covector and target face) and of every factor and harmonic step (its descent direction and
-    /// feature energy), each by its numerator's and denominator's bits.
+    /// Its exact bits, a reading: every entry of every linear sample (its weight, feature and
+    /// covector), of every factor step (its descent direction and feature energy) and of every
+    /// class-mass step (its weight, and its region and class as naturals), each by its
+    /// numerator's and denominator's bits.
     pub fn bits(&self) -> u64 {
         let bits = |x: &Rat| x.numer().bits() + x.denom().bits();
         let linear: u64 = self
@@ -504,7 +501,6 @@ impl Deposit {
                 std::iter::once(&sample.weight)
                     .chain(&sample.feature)
                     .chain(&sample.covector)
-                    .chain(sample.target.iter().flatten())
             })
             .map(bits)
             .sum();
@@ -513,12 +509,13 @@ impl Deposit {
             .iter()
             .map(|step| step.gradient.entries().map(bits).sum::<u64>() + bits(&step.energy))
             .sum();
-        let harmonic: u64 = self
-            .harmonic
+        let natural = |x: usize| u64::from(usize::BITS - x.leading_zeros()).max(1);
+        let masses: u64 = self
+            .masses
             .iter()
-            .map(|step| step.gradient.iter().map(bits).sum::<u64>() + bits(&step.energy))
+            .map(|step| bits(&step.weight) + natural(step.region) + natural(step.class))
             .sum();
-        linear + factors + harmonic
+        linear + factors + masses
     }
 }
 
@@ -680,10 +677,8 @@ pub struct TransitTick {
 
 /// [definition] **What the word's return yields**: the covector on the opening storage of every
 /// ring, the element and transit ticks with their adjoints, the conductance covector `∂ℓ/∂G_a`, per
-/// receiving phase the word's read of the change `P_R^(τ_R) v_R(e_j)` with the logit gradient (the
-/// receiving map's feature adds the bound harmonic coordinate to it, `P_R^(τ_R)(v_R + h_R)`, at the
-/// composition: `hnn::reference::compose`), and the adjoint's carried remainders, released at the
-/// open ([`Remainders`]; none under the exact law).
+/// receiving phase the receiving map's feature `P_R^(τ_R) v_R(e_j)` with the logit gradient, and the
+/// adjoint's carried remainders, released at the open ([`Remainders`]; none under the exact law).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct WordReturn {
     pub opening: Vec<Vec<Rat>>,

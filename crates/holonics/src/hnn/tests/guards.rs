@@ -100,8 +100,7 @@ fn guard_fifteen_the_grain_reading_rounds_nothing() {
 
 use super::learning::{OPEN_BUDGET, chain, chain_declaration, generic};
 use crate::hnn::constitution::{
-    Constitution, FactorGradient, FactorStep, HarmonicStep, LinearLocus, LinearStep, Locus, Sample,
-    Steps,
+    Constitution, FactorGradient, FactorStep, LinearLocus, LinearStep, Locus, Sample, Steps,
 };
 use crate::hnn::field::ConstitutionRead;
 use crate::hnn::port::{Deposit, ExecutionPort};
@@ -127,7 +126,6 @@ fn guard_four_the_constitution_keeps_no_journal() {
             weight: weight.clone(),
             feature: vec![feature.clone(); features],
             covector: vec![Rat::one(); covectors],
-            target: None,
         };
         let alphabet = field.alphabet();
         let mut linear = vec![
@@ -137,10 +135,7 @@ fn guard_four_the_constitution_keeps_no_journal() {
             },
             LinearStep {
                 locus: LinearLocus::Receiving(2),
-                samples: vec![Sample {
-                    target: Some(zeros(2 * alphabet)),
-                    ..sample(field.ring(2).width(), 2 * alphabet)
-                }],
+                samples: vec![sample(field.ring(2).width(), 2 * alphabet)],
             },
         ];
         let mut factors = Vec::new();
@@ -210,13 +205,7 @@ fn guard_four_the_constitution_keeps_no_journal() {
         let mut theta = initial.clone();
         for _ in 0..3 {
             let (linear, factors) = steps();
-            let harmonic = HarmonicStep {
-                ring: 2,
-                gradient: vec![Rat::zero(); field.ring(2).width()],
-                energy: Rat::zero(),
-            };
-            let deposit = Deposit::new(theta.commit(), linear, factors, Vec::new())
-                .with_harmonic(vec![harmonic]);
+            let deposit = Deposit::new(theta.commit(), linear, factors, Vec::new());
             let (next, reading) = theta.deposited(&deposit).unwrap();
             assert!(reading.released.is_empty() && reading.stepped == 0);
             theta = next;

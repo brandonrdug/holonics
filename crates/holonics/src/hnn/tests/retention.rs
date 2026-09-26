@@ -307,6 +307,7 @@ fn the_collapse_keeps_the_retained_remainders_and_clocks() {
             ring: phases.ring(),
             aperture: 1,
             tolerance: crate::ratio::rat(1, 16),
+            regions: crate::hnn::masses::Regions::PrecedingCell,
         },
     )
     .unwrap();
@@ -422,6 +423,7 @@ fn two_receiver_path() -> Field {
         ring: 5,
         aperture: 1,
         tolerance: crate::ratio::rat(1, 16),
+        regions: crate::hnn::masses::Regions::PrecedingCell,
     });
     Field::declare(declared.by_lattice_rule()).unwrap()
 }
@@ -492,6 +494,7 @@ fn the_boundary_reaches_the_pending_ratios_and_refuses_out_of_turn() {
             ring: 3,
             aperture: 1,
             tolerance: crate::ratio::rat(1, 16),
+            regions: crate::hnn::masses::Regions::PrecedingCell,
         },
     )
     .unwrap();
