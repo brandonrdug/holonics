@@ -365,6 +365,7 @@ fn the_compare_deposits_its_targets_on_their_own_addresses() {
     let targets = [1usize, 1];
     let (word, wave) = pending.read(&field, &theta).unwrap();
     let against = pending.against(&theta, &wave, &targets).unwrap();
+    let scored = pending.scored(&theta, &against, &targets).unwrap();
     let anchors = target_phases(&field, pending.anchor(), 2, &targets).unwrap();
     let ratio = HolonRatio::compare(against.faces, &targets, &anchors).unwrap();
     let back = word
@@ -375,7 +376,8 @@ fn the_compare_deposits_its_targets_on_their_own_addresses() {
             &phases,
         )
         .unwrap();
-    let (_, deposit) = compose(&field, &theta, &pending, &back, &targets).unwrap();
+    let (_, deposit) = compose(&field, &theta, &pending, &back, &targets, &scored.steps).unwrap();
+    assert_eq!(deposit.mixture(), &scored.steps[..]);
     let steps = deposit.landmarks();
     assert_eq!(steps.len(), 2);
     assert_eq!(
@@ -534,4 +536,149 @@ fn r_opens_at_zero_and_learns_from_the_first_deposit() {
         reference.read(&resident).unwrap().2.first(),
         Some((Handle::Moment(_), _))
     ));
+}
+
+/// A tree face of given dyadic probabilities at the grain.
+fn tree_face(probabilities: &[Rat], grain: u64) -> crate::hnn::landmark::LandmarkFace {
+    crate::hnn::landmark::LandmarkFace {
+        grain,
+        probabilities: probabilities.to_vec(),
+        exponents: probabilities
+            .iter()
+            .map(|p| {
+                grain_exponent(
+                    &p.numer().to_biguint().unwrap(),
+                    &p.denom().to_biguint().unwrap(),
+                    grain,
+                )
+                .unwrap()
+            })
+            .collect(),
+    }
+}
+
+/// **The mixture weighs the tree against the combined face** (ruling A; Lean
+/// `HNN/LandmarkTree.{path_face_normalized, weight_step, kraft_and_dominance}` at two children): it
+/// opens at `β = 1`, `λ = 1/2`; a window's phases read one `β`, and each phase's code length encloses
+/// `−log₂(λ q_T + (1 − λ) q_C)` with `q_C` the combined face's exact class mass; the steps multiply
+/// `β` by `q_T(x)/q̃_C(x)` in cell order, exactly while the odd parts fit `W`, and past it the
+/// carried `β` is rebased with its drift reported; `log₂ β` is enclosed.
+#[test]
+fn the_mixture_weighs_the_tree_against_the_combined_face() {
+    let grain = 16;
+    let trees = [
+        tree_face(&[rat(1, 2), rat(1, 4), rat(1, 8), rat(1, 8)], grain),
+        tree_face(&[rat(1, 4), rat(1, 4), rat(1, 4), rat(1, 4)], grain),
+    ];
+    // Combined logits on the grain (no fibre), so q_C is exact in ℚ: 2^(−1), 2^(−2), 2^(−3), 2^(−3)
+    // up to a common shift for the first phase; uniform for the second.
+    let logits = |exponents: [i64; 4]| -> Vec<Rat> {
+        exponents
+            .iter()
+            .flat_map(|k| [Rat::from_integer(BigInt::from(*k)), Rat::zero()])
+            .collect()
+    };
+    let reads = [
+        ReceivingRead::of_logits(logits([3, 1, 1, 2]), grain),
+        ReceivingRead::of_logits(logits([0, 0, 0, 0]), grain),
+    ];
+    let combined = crate::hnn::ratio::Faces::of_reads(&reads, grain).unwrap();
+    let mut mixture = crate::hnn::receiving::Mixture::new(28);
+    assert_eq!((mixture.beta(), mixture.weight()), (integer(1), rat(1, 2)));
+    let targets = [0usize, 3];
+    let scored = mixture.score(2, &combined, &trees, &targets).unwrap();
+    // Phase 0: q_T = 1/2, q_C = 8/(8 + 2 + 2 + 4) = 1/2, so q = 1/2: one bit exactly enclosed.
+    assert!(scored.model[0].lower <= integer(1) && integer(1) <= scored.model[0].upper);
+    // Phase 1: q_T = 1/4 and q_C = 1/4: two bits.
+    assert!(scored.model[1].lower <= integer(2) && integer(2) <= scored.model[1].upper);
+    assert_eq!(scored.steps.len(), 2);
+    assert!(scored.steps.iter().all(|step| step.ring == 2));
+    for step in &scored.steps {
+        assert!(step.combined > Rat::zero() && step.residual >= Rat::zero());
+    }
+    let before = mixture.beta();
+    for step in &scored.steps {
+        mixture.step(step).unwrap();
+    }
+    let exact: Rat = scored
+        .steps
+        .iter()
+        .fold(before, |beta, step| beta * &step.tree / &step.combined);
+    // The charts' lower endpoints are rationals of many bits: β is rebased, within its drift.
+    let drift = mixture.drift().clone();
+    let log = mixture.log2_beta().unwrap();
+    let exact_log = crate::hnn::landmark::code_length(&exact.recip()).unwrap();
+    assert!(log.lower <= &exact_log.upper + &drift && exact_log.lower <= &log.upper + &drift);
+    assert!(mixture.rebases() <= 2);
+    // An exact step keeps β exact: q_T = 3/4 against q̃_C = 1/2 multiplies it by 3/2.
+    let mut exact_mixture = crate::hnn::receiving::Mixture::new(28);
+    exact_mixture
+        .step(&crate::hnn::receiving::MixtureStep {
+            ring: 2,
+            tree: rat(3, 4),
+            combined: rat(1, 2),
+            residual: Rat::zero(),
+        })
+        .unwrap();
+    assert_eq!(exact_mixture.beta(), rat(3, 2));
+    assert_eq!(exact_mixture.weight(), rat(3, 5));
+    assert_eq!((exact_mixture.rebases(), exact_mixture.drift()), (0, &Rat::zero()));
+    // Past the carrier width the ratio is rebased to its W-bit mantissa, with 3·2^(−W) of drift.
+    let mut narrow = crate::hnn::receiving::Mixture::new(4);
+    narrow
+        .step(&crate::hnn::receiving::MixtureStep {
+            ring: 2,
+            tree: rat(17, 32),
+            combined: rat(1, 2),
+            residual: Rat::zero(),
+        })
+        .unwrap();
+    assert_eq!(narrow.rebases(), 1);
+    assert_eq!(narrow.drift(), &rat(3, 16));
+    assert_eq!(narrow.beta(), integer(1));
+    assert!(
+        mixture
+            .score(2, &combined, &trees[..1], &targets)
+            .is_err()
+    );
+}
+
+/// **The mixture codes within one bit of the better face** (Lean
+/// `HNN/LandmarkTree.kraft_and_dominance` at two children, plus the carried chart's drift): on the
+/// exposure's chain, over the whole cut, the model's code length is at most the smaller of the
+/// tree's and the combined face's plus one bit plus the reported drift.
+#[test]
+fn the_mixture_codes_within_one_bit_of_the_better_face() {
+    use super::learning::chain_of;
+    use crate::hnn::reference::Cut;
+    let n_star = chain_of(1 << 16).capacity().n_star() as usize;
+    let length = n_star + n_star % 2;
+    let field = chain_of(length as u64);
+    let mut draw = Draw::new(97);
+    let cut = Cut {
+        cells: (0..length)
+            .map(|k| {
+                if draw.below(8) == 0 {
+                    draw.below(4)
+                } else {
+                    [0, 1, 2, 1][k % 4]
+                }
+            })
+            .collect(),
+        held_out: vec![length - 4..length],
+    };
+    let exposure = Reference::new(64, Steps::campaign_one(), OPEN_BUDGET)
+        .expose(&field, &cut)
+        .unwrap();
+    let total = |pick: fn(&crate::hnn::reference::Bits) -> &crate::ratio::algebraic::ExactInterval| {
+        let (a, b) = (pick(&exposure.training), pick(&exposure.held_out));
+        (&a.lower + &b.lower, &a.upper + &b.upper)
+    };
+    let model = total(|bits| &bits.model);
+    let tree = total(|bits| &bits.tree);
+    let combined = total(|bits| &bits.combined);
+    let report = exposure.mixture.as_ref().unwrap();
+    let better = if tree.1 < combined.1 { tree.1 } else { combined.1 };
+    assert!(model.0 <= better + integer(1) + &report.drift);
+    assert!(report.drift >= Rat::zero());
 }

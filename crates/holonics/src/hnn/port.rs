@@ -80,7 +80,7 @@ use crate::hnn::moment::Ingested;
 use crate::hnn::propagation::{PathAttenuation, TickBalance, swing_about};
 use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector};
 use crate::hnn::realization::{apply_rows, entries, indexed};
-use crate::hnn::receiving::ReceivingPhases;
+use crate::hnn::receiving::{MixtureStep, ReceivingPhases};
 use crate::hnn::retention::AeonBoundary;
 use crate::hnn::word::Word;
 use crate::holon::HolonError;
@@ -185,8 +185,11 @@ pub enum ReceiptDetail {
     /// winding, the residual of the wave's logits against the emitted ones, the loci reached, the
     /// remainders the return's carried adjoint released at the open (Decision 24), and each phase's
     /// code length under the landmark tree's face alone at the grain, at the same constitution and
-    /// address as the combined face (Decision 28; `hnn::receiving::tree_code_length`), so the
-    /// wave's contribution is the window's code length minus their sum.
+    /// address as the combined face (Decision 28; `hnn::receiving::tree_code_length`), and each
+    /// phase's code length under the receiver's scored face, the mixture of the tree's and the
+    /// combined face (ruling A; `hnn::receiving::Mixture`), whose sum is the window's code length.
+    /// The Holon ratio (its phases' code lengths, excess and windings) is the combined face's, whose
+    /// covector the wave learns from.
     Compare {
         code_length: crate::ratio::algebraic::ExactInterval,
         excess: Rat,
@@ -195,6 +198,7 @@ pub enum ReceiptDetail {
         reached: Vec<Locus>,
         released: Remainders,
         tree: Vec<crate::ratio::algebraic::ExactInterval>,
+        model: Vec<crate::ratio::algebraic::ExactInterval>,
     },
     /// `deposit`: the applied reading and the re-read code length of the deposit's own targets at
     /// the successor (the first law's deposition term).
@@ -444,6 +448,7 @@ pub struct Deposit {
     linear: Vec<LinearStep>,
     factors: Vec<FactorStep>,
     landmarks: Vec<LandmarkStep>,
+    mixture: Vec<MixtureStep>,
     reached: Vec<Locus>,
 }
 
@@ -459,8 +464,19 @@ impl Deposit {
             linear,
             factors,
             landmarks: Vec::new(),
+            mixture: Vec::new(),
             reached,
         }
+    }
+
+    /// The deposit with the receiver's mixture steps (ruling A).
+    pub(crate) fn with_mixture(self, mixture: Vec<MixtureStep>) -> Self {
+        Self { mixture, ..self }
+    }
+
+    /// The receiver's mixture steps (ruling A), in cell order.
+    pub fn mixture(&self) -> &[MixtureStep] {
+        &self.mixture
     }
 
     /// The deposit with the receiving parametron's landmark steps (Decision 28).
@@ -527,7 +543,12 @@ impl Deposit {
                     + natural(step.class)
             })
             .sum();
-        linear + factors + landmarks
+        let mixture: u64 = self
+            .mixture
+            .iter()
+            .map(|step| bits(&step.tree) + bits(&step.combined) + bits(&step.residual))
+            .sum();
+        linear + factors + landmarks + mixture
     }
 }
 

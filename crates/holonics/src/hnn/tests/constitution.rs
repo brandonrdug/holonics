@@ -1274,7 +1274,7 @@ fn a_deposit_reaches_only_the_diamond_and_sums_only_its_window() {
             &phases,
         )
         .unwrap();
-    let (_, deposit) = compose(&field, &theta, &pending, &back, &targets).unwrap();
+    let (_, deposit) = compose(&field, &theta, &pending, &back, &targets, &[]).unwrap();
     for step in deposit.linear() {
         if let LinearLocus::Contrast(g) = step.locus {
             assert_eq!(step.samples.len(), 1, "ring {g}'s window is one tick");

@@ -51,7 +51,7 @@ use crate::hnn::landmark::{LandmarkFace, Letter};
 use crate::hnn::moment::SourceMoment;
 use crate::hnn::ratio::Faces;
 use crate::hnn::realization::indexed;
-use crate::hnn::receiving::{ActiveAddress, ReceivingPhases};
+use crate::hnn::receiving::{ActiveAddress, ReceivingPhases, Scored};
 use crate::hnn::word::Word;
 
 /// [definition] **A pending ratio**: the producing anchor `λ`, the encoder moment `M`, the active
@@ -201,6 +201,23 @@ impl PendingRatio {
             faces: self.phases.combine(wave, &trees)?,
             trees,
         })
+    }
+
+    /// **The window scored by the receiver's mixture** (ruling A, `hnn::receiving::Mixture`): the
+    /// contemporary mixture's `β` weighs the tree's faces against the combined faces at the
+    /// targets, each phase's code length under the mixture, and the steps its deposit applies.
+    /// Refused when the constitution carries no mixture on the receiving ring.
+    pub fn scored(
+        &self,
+        constitution: &impl ConstitutionRead,
+        against: &Against,
+        targets: &[usize],
+    ) -> Result<Scored, HnnError> {
+        let ring = self.phases.ring();
+        constitution
+            .mixture(ring)
+            .ok_or(HnnError::MissingReceivingMap { ring })?
+            .score(ring, &against.faces, &against.trees, targets)
     }
 
     /// **The contemporary read against targets**: the wave's read ([`PendingRatio::read_charted`])

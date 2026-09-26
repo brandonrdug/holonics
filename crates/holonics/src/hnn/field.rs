@@ -75,6 +75,7 @@ use crate::hnn::HnnError;
 use crate::hnn::chart::WordLattice;
 use crate::hnn::constitution::{Lattice, Locus, Steps};
 use crate::hnn::landmark::Landmarks;
+use crate::hnn::receiving::Mixture;
 use crate::hnn::moment::{Capacity, PairPort, capacity};
 use crate::holarchy::{Gluing, Holarchy};
 use crate::holon::contact::PairContact;
@@ -125,6 +126,10 @@ pub trait ConstitutionRead: Sync {
     /// ring, whose face at each phase's causal address the receiving read adds to the wave at the
     /// grain (`hnn::receiving`); `None` elsewhere.
     fn landmarks(&self, ring: usize) -> Option<&Landmarks>;
+    /// **The receiver's mixture** of the tree's face and the combined face (ruling A,
+    /// `hnn::receiving::Mixture`) on a receiving ring, which scores the window at compare; `None`
+    /// elsewhere.
+    fn mixture(&self, ring: usize) -> Option<&Mixture>;
 }
 
 // -------------------------------------------------------------------------------------------
@@ -1603,11 +1608,13 @@ impl Field {
 }
 
 /// [definition; agent-inferred] **The receiving law's code in the description** (Decision 28): 3,
-/// "the receiving face is the grain of the receiving parametron's landmark tree (the `Digits`
-/// emission, Krichevsky–Trofimov masses with `α` coded beside it, context-tree weighting over the
-/// per-cell causal address of depth `D`, coded with each receiver, and the executed dyadic face)
-/// plus the wave `R P_R^(τ_R) v_R`, `R` opening at zero and moving by the prox step on its reached
-/// covectors, every comparison scored and then deposited" (`hnn::receiving`, `hnn::landmark`).
+/// "the combined face is the grain of the receiving parametron's landmark tree (the cell as its
+/// odometer digits, Krichevsky–Trofimov masses with `α` coded beside it, context-tree weighting over
+/// the per-cell causal address of depth `D`, coded with each receiver, on the tree's declared
+/// lattice) plus the wave `R P_R^(τ_R) v_R`, `R` opening at zero and moving by the prox step on its
+/// reached covectors; the scored face is the mixture of the tree's face and the combined face
+/// weighted by their likelihood ratio `β`, opening at 1 (the primary's ruling A); every comparison
+/// is scored and then deposited" (`hnn::receiving`, `hnn::landmark`).
 /// Code 2 was Decision 27's region class masses with `R` opening at the sign generator times ½;
 /// code 1 Decision 26's exogenous normal law on the target code face with the standing read; and
 /// campaign 1's first law (the face on the change alone) carried none. A feature-law change takes

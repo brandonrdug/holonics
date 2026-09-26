@@ -172,7 +172,7 @@ use crate::hnn::moment::PairPort;
 use crate::hnn::port::Deposit;
 use crate::hnn::propagation::gram;
 use crate::hnn::realization::{indexed, outer_rows};
-use crate::hnn::receiving::landmark_declaration;
+use crate::hnn::receiving::{Mixture, MixtureStep, landmark_declaration};
 use crate::holon::deposition::CommittedEnergyBound;
 use crate::ratio::linear::vector::{Chart, integral, lcm, matrix_form};
 use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
@@ -1711,6 +1711,9 @@ struct RingMaterial {
     receiving: Option<NormalLaw>,
     /// The receiving parametron's landmark tree (Decision 28), on a receiving ring.
     tree: Option<Landmarks>,
+    /// The receiver's mixture of the tree's face and the combined face (ruling A), on a receiving
+    /// ring: its carried likelihood ratio `β`.
+    mixture: Option<Mixture>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -2058,6 +2061,17 @@ impl Constitution {
         let a = field.alphabet();
         let receivers: BTreeSet<usize> = field.receivers().iter().map(|r| r.ring).collect();
         // Each receiving ring's tree, declared from its first declared receiver.
+        // The mixture's β is carried at its ring's tree's carrier width `W`.
+        let carrier = |g: usize| {
+            field
+                .receivers()
+                .iter()
+                .find(|receiver| receiver.ring == g)
+                .and_then(|receiver| landmark_declaration(field, receiver).ok())
+                .map_or(2, |declared| {
+                    crate::hnn::landmark::Widths::derived(&declared).carrier
+                })
+        };
         let tree = |g: usize| -> Result<Option<Landmarks>, HnnError> {
             field
                 .receivers()
@@ -2140,6 +2154,7 @@ impl Constitution {
                     pairs,
                     pair_scale: Rat::one(),
                     receiving,
+                    mixture: receivers.contains(&g).then(|| Mixture::new(carrier(g))),
                     tree: tree(g)?,
                 })
             })
@@ -2449,6 +2464,7 @@ impl Constitution {
             if let Some(receiving) = &material.receiving {
                 let mut parts = receiving.carrier_bits();
                 parts.entries += material.tree.as_ref().map_or(0, Landmarks::bits);
+                parts.entries += material.mixture.as_ref().map_or(0, Mixture::bits);
                 loci.push((Locus::ReceivingMap(g), parts));
             }
         }
@@ -2796,6 +2812,13 @@ impl Constitution {
                 .or_default()
                 .push((factors + index, LocusStep::Landmark(step)));
         }
+        let landmarks = factors + deposit.landmarks().len();
+        for (index, step) in deposit.mixture().iter().enumerate() {
+            groups
+                .entry(Locus::ReceivingMap(step.ring))
+                .or_default()
+                .push((landmarks + index, LocusStep::Mixture(step)));
+        }
         // Each locus's material and carried remainders, taken apart: a locus's steps read and
         // write only its own, so the loci run together (`hnn::realization`), each in its
         // steps' order with its own budgeted carry, at the clock it would advance it to.
@@ -2983,6 +3006,16 @@ impl Constitution {
                         .map_err(refused)?;
                     tree.deposit(&step.address, step.class).map_err(refused)?;
                 }
+                LocusStep::Mixture(step) => {
+                    // The mixture's β carries its own chart, so it moves no lattice clock.
+                    budgeted(&mut stroke).map_err(refused)?;
+                    let mixture = material
+                        .as_deref_mut()
+                        .and_then(LocusMaterial::mixture)
+                        .ok_or(HnnError::MissingReceivingMap { ring: step.ring })
+                        .map_err(refused)?;
+                    mixture.step(step).map_err(refused)?;
+                }
             }
         }
         stroke
@@ -3056,6 +3089,7 @@ enum LocusStep<'d> {
     Linear(&'d LinearStep),
     Factor(&'d FactorStep),
     Landmark(&'d LandmarkStep),
+    Mixture(&'d MixtureStep),
 }
 
 /// [definition; agent-inferred] **One locus's material, borrowed apart from the rest** of the
@@ -3085,6 +3119,7 @@ enum LocusMaterial<'a> {
     ReceivingMap {
         receiving: &'a mut Option<NormalLaw>,
         tree: &'a mut Option<Landmarks>,
+        mixture: &'a mut Option<Mixture>,
     },
     Channel(&'a mut ContactMaterial),
 }
@@ -3111,6 +3146,7 @@ impl<'a> LocusMaterial<'a> {
                 pair_scale,
                 receiving,
                 tree,
+                mixture,
             } = material;
             let width = standing.len();
             if named.contains_key(&Locus::Element(g)) {
@@ -3148,7 +3184,11 @@ impl<'a> LocusMaterial<'a> {
             if named.contains_key(&Locus::ReceivingMap(g)) {
                 materials.insert(
                     Locus::ReceivingMap(g),
-                    LocusMaterial::ReceivingMap { receiving, tree },
+                    LocusMaterial::ReceivingMap {
+                        receiving,
+                        tree,
+                        mixture,
+                    },
                 );
             }
         }
@@ -3170,6 +3210,14 @@ impl<'a> LocusMaterial<'a> {
             (LinearLocus::Receiving(_), LocusMaterial::ReceivingMap { receiving, .. }) => {
                 receiving.as_mut()
             }
+            _ => None,
+        }
+    }
+
+    /// The receiver's mixture, when this locus carries it.
+    fn mixture(&mut self) -> Option<&mut Mixture> {
+        match self {
+            LocusMaterial::ReceivingMap { mixture, .. } => mixture.as_mut(),
             _ => None,
         }
     }
@@ -3454,5 +3502,8 @@ impl ConstitutionRead for Constitution {
     }
     fn landmarks(&self, ring: usize) -> Option<&Landmarks> {
         self.rings[ring].tree.as_ref()
+    }
+    fn mixture(&self, ring: usize) -> Option<&Mixture> {
+        self.rings[ring].mixture.as_ref()
     }
 }

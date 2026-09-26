@@ -47,6 +47,7 @@ use holonics::hnn::ratio::{HolonRatio, PhaseRatio, log2_enclosure, target_phases
 use holonics::hnn::receiving::tree_code_length;
 use holonics::hnn::reference::{
     BudgetStop, ChartTally, Cut, Declared, ExposedResident, Exposure, WallTimes, compose, expose,
+    window_code_length,
 };
 use holonics::hnn::retention::{Diamond, aeon_readings, collapse, contained, separator};
 use holonics::hnn::{
@@ -343,21 +344,13 @@ impl<'c> Mounted<'c> {
         let read = self.execute(&arrived.ratio, &arrived.moment, publication, card);
         let constitution = successor.unwrap_or(&self.constitution);
         let result = read.and_then(|(word, wave)| {
-            let faces = arrived
+            let against = arrived
                 .ratio
-                .against(constitution, &wave, &arrived.targets)?
-                .faces;
-            let phases = arrived.ratio.phases();
-            let anchors = target_phases(
-                &self.field,
-                arrived.ratio.anchor(),
-                phases.ring(),
-                &arrived.targets,
-            )?;
-            Ok((
-                HolonRatio::compare(faces, &arrived.targets, &anchors)?.code_length()?,
-                word.readings,
-            ))
+                .against(constitution, &wave, &arrived.targets)?;
+            let scored = arrived
+                .ratio
+                .scored(constitution, &against, &arrived.targets)?;
+            Ok((window_code_length(&scored.model)?, word.readings))
         });
         self.arrived = Some(arrived);
         result
@@ -612,6 +605,9 @@ impl<'c> Resident<'c> {
             .zip(targets)
             .map(|(face, &target)| tree_code_length(face, target))
             .collect::<Result<Vec<_>, _>>()?;
+        // The receiver's scored face: the mixture of the tree's and the combined face (ruling A),
+        // scored on the host as the reference scores it.
+        let scored = ratio.scored(&resident.constitution, &against, targets)?;
         let anchors = target_phases(field, ratio.anchor(), phases.ring(), targets)?;
         let holon = HolonRatio::compare(against.faces, targets, &anchors)?;
         let covector = holon.covector()?;
@@ -653,9 +649,16 @@ impl<'c> Resident<'c> {
         );
         wall.pull_back = start.elapsed();
         let start = Instant::now();
-        let (pullback, deposit) = compose(field, &resident.constitution, ratio, &back, targets)?;
+        let (pullback, deposit) = compose(
+            field,
+            &resident.constitution,
+            ratio,
+            &back,
+            targets,
+            &scored.steps,
+        )?;
         wall.compose = start.elapsed();
-        let code_length = holon.code_length()?;
+        let code_length = window_code_length(&scored.model)?;
         let order = source_order(field, ratio.anchor(), ratio.moment().cells());
         let mut work = ExactWork::nothing();
         wrote_all(&mut work, covector.logits().iter().flatten());
@@ -668,6 +671,7 @@ impl<'c> Resident<'c> {
             reached: deposit.loci(),
             released: back.released.clone(),
             tree,
+            model: scored.model,
         };
         let steps = phases.junction_steps() as u64;
         let ticks = vec![steps; field.rings().len()];

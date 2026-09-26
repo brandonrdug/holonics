@@ -167,7 +167,7 @@ use crate::hnn::port::{
 use crate::hnn::propagation::{contact_exponent, path_attenuation};
 use crate::hnn::ratio::{Faces, HolonRatio, PhaseRatio, interval_sum, target_phases};
 use crate::hnn::realization::{apply_rows, indexed, outer_rows};
-use crate::hnn::receiving::{ActiveAddress, ReceivingPhases, tree_code_length};
+use crate::hnn::receiving::{ActiveAddress, MixtureStep, ReceivingPhases, tree_code_length};
 use crate::hnn::retention::{AeonBoundary, Diamond, aeon_readings, collapse, contained, separator};
 use crate::hnn::word::KeptWord;
 use crate::holon::contact::FeatureCovector;
@@ -250,24 +250,20 @@ struct Arrived {
 }
 
 impl Arrived {
-    /// The arrived targets' code length at a constitution, read from the executed faces (the
-    /// resident's charts warm-started and refined) and the constitution's tree at the targets'
-    /// addresses, with the charts' readings.
+    /// The arrived targets' code length at a constitution under its mixture (ruling A), read from
+    /// the executed faces (the resident's charts warm-started and refined), the constitution's tree
+    /// at the targets' addresses and its mixture's `β`, with the charts' readings.
     fn code_length(
         &self,
         field: &Field,
         constitution: &Constitution,
         charts: &mut Charts,
     ) -> Result<(ExactInterval, Vec<ChartReading>), HnnError> {
-        let phases = self.ratio.phases();
         let (word, against) =
             self.ratio
                 .read_against(field, constitution, charts, &self.targets)?;
-        let anchors = target_phases(field, self.ratio.anchor(), phases.ring(), &self.targets)?;
-        Ok((
-            HolonRatio::compare(against.faces, &self.targets, &anchors)?.code_length()?,
-            word.operands().charts(),
-        ))
+        let scored = self.ratio.scored(constitution, &against, &self.targets)?;
+        Ok((window_code_length(&scored.model)?, word.operands().charts()))
     }
 
     fn bits(&self) -> u64 {
@@ -278,6 +274,15 @@ impl Arrived {
                 .map(|target| BigInt::from(*target).bits() + 1)
                 .sum::<u64>()
     }
+}
+
+/// **A window's code length under the mixture**: the phases' enclosures summed on the grid.
+pub fn window_code_length(model: &[ExactInterval]) -> Result<ExactInterval, HnnError> {
+    model
+        .iter()
+        .try_fold(ExactInterval::point(Rat::zero()), |sum, phase| {
+            interval_sum(&sum, phase)
+        })
 }
 
 #[derive(Clone, Debug)]
@@ -1086,6 +1091,8 @@ impl ExecutionPort for Reference {
             .zip(&targets)
             .map(|(face, &target)| tree_code_length(face, target))
             .collect::<Result<Vec<_>, _>>()?;
+        // The receiver's scored face: the mixture of the tree's and the combined face (ruling A).
+        let scored = ratio.scored(&resident.constitution, &against, &targets)?;
         let anchors = target_phases(&field, ratio.anchor(), phases.ring(), &targets)?;
         let holon = HolonRatio::compare(against.faces, &targets, &anchors)?;
         let covector = holon.covector()?;
@@ -1101,9 +1108,16 @@ impl ExecutionPort for Reference {
         let back = word.pull_back(&covector, &map, &ratio.anchor()[phases.ring()], &phases)?;
         wall.pull_back = start.elapsed();
         let start = Instant::now();
-        let (pullback, deposit) = compose(&field, &resident.constitution, ratio, &back, &targets)?;
+        let (pullback, deposit) = compose(
+            &field,
+            &resident.constitution,
+            ratio,
+            &back,
+            &targets,
+            &scored.steps,
+        )?;
         wall.compose = start.elapsed();
-        let code_length = holon.code_length()?;
+        let code_length = window_code_length(&scored.model)?;
         let order = source_order(&field, ratio.anchor(), ratio.moment().cells());
         let mut work = ExactWork::nothing();
         wrote_all(&mut work, covector.logits().iter().flatten());
@@ -1116,6 +1130,7 @@ impl ExecutionPort for Reference {
             reached: deposit.loci(),
             released: back.released.clone(),
             tree,
+            model: scored.model,
         };
         let steps = phases.junction_steps() as u64;
         let ticks = vec![steps; field.rings().len()];
@@ -1504,6 +1519,7 @@ pub fn compose(
     ratio: &PendingRatio,
     back: &WordReturn,
     targets: &[usize],
+    mixture: &[MixtureStep],
 ) -> Result<(Pullback, Deposit), HnnError> {
     use crate::ratio::linear::vector::{Chart, combination, integral};
     let phases = ratio.phases();
@@ -1764,7 +1780,13 @@ pub fn compose(
     };
     Ok((
         pullback,
-        Deposit::new(constitution.commit(), linear, factors, reached).with_landmarks(landmarks),
+        Deposit::new(constitution.commit(), linear, factors, reached)
+            .with_landmarks(landmarks)
+            .with_mixture(if retained(Locus::ReceivingMap(receiving)) {
+                mixture.to_vec()
+            } else {
+                Vec::new()
+            }),
     ))
 }
 
@@ -2113,10 +2135,13 @@ impl Cut {
     }
 }
 
-/// [definition] **Bits on a population of targets**: the model's code length on its committed
-/// faces; the landmark tree's face alone (Decision 28: the receiving parametron's tree at each
-/// cell's causal address, read at the grain, with no wave, at the same constitution and address as
-/// the model's face, so `model − tree` is the wave's contribution); and the online baselines' (uniform;
+/// [definition] **Bits on a population of targets**: the model's code length on its scored face,
+/// the receiver's mixture of the tree's face and the combined face (ruling A); the landmark tree's
+/// face alone (Decision 28: the receiving parametron's tree at each cell's causal address, read at
+/// the grain, with no wave, at the same constitution and address as the model's face); the combined
+/// face alone (the tree's grain logits plus the wave, whose covector the wave learns from), so
+/// `combined − tree` is the wave's contribution and `model − tree` what the mixture keeps of it;
+/// and the online baselines' (uniform;
 /// order-0 and order-1 with the Krichevsky–Trofimov prior; PPM of order [`PPM_ORDER`] with escape
 /// rule C), each an enclosure, over `cells` targets. xz and zstd, with their description cost, are
 /// exterior codecs: the crate runs no process, so they are owed to the application, computed there
@@ -2125,6 +2150,7 @@ impl Cut {
 pub struct Bits {
     pub model: ExactInterval,
     pub tree: ExactInterval,
+    pub combined: ExactInterval,
     pub uniform: ExactInterval,
     pub order_zero: ExactInterval,
     pub order_one: ExactInterval,
@@ -2138,6 +2164,7 @@ impl Bits {
         Self {
             model: zero.clone(),
             tree: zero.clone(),
+            combined: zero.clone(),
             uniform: zero.clone(),
             order_zero: zero.clone(),
             order_one: zero.clone(),
@@ -2220,8 +2247,22 @@ pub struct Exposure {
     pub deposits: u64,
     /// The executed word's readout (Decision 24).
     pub word: WordReport,
+    /// The receiver's mixture at the end of the run (ruling A).
+    pub mixture: Option<MixtureReport>,
     /// The host's wall time by phase (exterior).
     pub wall: WallTimes,
+}
+
+/// [definition] **The receiver's mixture at the end of a run** (ruling A,
+/// `hnn::receiving::Mixture`): `log₂ β` enclosed (`β = W_T/W_C`, above zero while the tree's face
+/// has coded the passage in fewer bits than the combined face), the carrier width `W`, the rebases
+/// and the certified drift in bits.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MixtureReport {
+    pub log2_beta: ExactInterval,
+    pub width: u64,
+    pub rebases: u64,
+    pub drift: Rat,
 }
 
 /// [definition] **The executed word's readout over an exposure** (Decision 24): the charts' tally
@@ -2628,26 +2669,35 @@ where
                 .expect("a compare returns its ratio");
             // The tree face alone (Decision 28): the compare's reading of the tree at each
             // phase's causal address, before the deposit and the window's ingest.
-            let tree = match &compared.receipt.detail {
-                ReceiptDetail::Compare { tree, .. } => tree.clone(),
+            // The model's (the mixture's) and the tree face alone's code lengths (ruling A,
+            // Decision 28): the compare's readings, before the deposit and the window's ingest;
+            // the combined face's are the Holon ratio's.
+            let (tree, model) = match &compared.receipt.detail {
+                ReceiptDetail::Compare { tree, model, .. } => (tree.clone(), model.clone()),
                 _ => {
                     return Err(HnnError::Shape {
-                        what: "a compare's receipt with the tree face alone",
+                        what: "a compare's receipt with the tree face and the mixture",
                         expected: 1,
                         found: 0,
                     });
                 }
             };
-            for (offset, ((phase, tree), &code)) in
-                holon.phases().iter().zip(&tree).zip(window).enumerate()
+            for (offset, (((phase, tree), model), &code)) in holon
+                .phases()
+                .iter()
+                .zip(&tree)
+                .zip(&model)
+                .zip(window)
+                .enumerate()
             {
                 let bits = if cut.held_out(position + offset) {
                     &mut held_out
                 } else {
                     &mut training
                 };
-                bits.model = interval_sum(&bits.model, &phase.code_length)?;
+                bits.model = interval_sum(&bits.model, model)?;
                 bits.tree = interval_sum(&bits.tree, tree)?;
+                bits.combined = interval_sum(&bits.combined, &phase.code_length)?;
                 baselines.code(bits, code)?;
             }
             // Prequential (Decision 29): every compared window is deposited, held-out windows
@@ -2764,5 +2814,17 @@ where
             residual_bound,
         },
         wall: *resident.wall(),
+        mixture: resident
+            .constitution()
+            .mixture(phases.ring())
+            .map(|mixture| {
+                Ok::<_, HnnError>(MixtureReport {
+                    log2_beta: mixture.log2_beta()?,
+                    width: mixture.width(),
+                    rebases: mixture.rebases(),
+                    drift: mixture.drift().clone(),
+                })
+            })
+            .transpose()?,
     })
 }

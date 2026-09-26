@@ -504,6 +504,16 @@ fn report(field: &Field, exposure: &Exposure) {
     );
     bits("training", &exposure.training, false, grain);
     bits("held out", &exposure.held_out, true, grain);
+    match &exposure.mixture {
+        Some(mixture) => println!(
+            "the receiver's mixture at the end (ruling A): log2 beta {} (beta = W_tree/W_combined), carried at W = {}, {} rebases, certified drift {} bits",
+            enclosure(&mixture.log2_beta, grain),
+            mixture.width,
+            mixture.rebases,
+            exact(&mixture.drift)
+        ),
+        None => println!("the receiver's mixture: none"),
+    }
 
     println!();
     println!("== cost against the literal ==");
@@ -635,8 +645,9 @@ fn bits(label: &str, bits: &Bits, criterion: bool, grain: u64) {
     }
     let ppm = format!("PPM order {PPM_ORDER}");
     let rows = [
-        ("model p^", &bits.model),
+        ("model q", &bits.model),
         ("tree face", &bits.tree),
+        ("combined", &bits.combined),
         ("uniform", &bits.uniform),
         ("order-0 KT", &bits.order_zero),
         ("order-1 KT", &bits.order_one),
@@ -656,13 +667,18 @@ fn bits(label: &str, bits: &Bits, criterion: bool, grain: u64) {
             difference(&bits.model, baseline, grain)
         );
     }
-    for (name, baseline) in &rows[2..] {
+    for (name, baseline) in &rows[3..] {
         println!(
             "  the tree face alone is {} {name}; tree − {name}: {}",
             against(&bits.tree, baseline),
             difference(&bits.tree, baseline, grain)
         );
     }
+    println!(
+        "  the combined face (tree + wave) is {} the tree face; combined − tree: {}",
+        against(&bits.combined, &bits.tree),
+        difference(&bits.combined, &bits.tree, grain)
+    );
     println!(
         "  against online order-0: {}",
         match (against(&bits.model, &bits.order_zero), criterion) {
@@ -673,10 +689,18 @@ fn bits(label: &str, bits: &Bits, criterion: bool, grain: u64) {
         }
     );
     println!(
-        "  the wave's contribution (Decision 28: the model against the tree face alone): {}",
-        match against(&bits.model, &bits.tree) {
+        "  the wave's contribution (the combined face against the tree face alone): {}",
+        match against(&bits.combined, &bits.tree) {
             "below" => "the wave lowers the code length",
             "above" => "the wave raises the code length",
+            _ => "undecided: the enclosures overlap",
+        }
+    );
+    println!(
+        "  the mixture (ruling A: the model against the tree face alone): {}",
+        match against(&bits.model, &bits.tree) {
+            "below" => "the mixture codes below the tree",
+            "above" => "the mixture codes above the tree",
             _ => "undecided: the enclosures overlap",
         }
     );

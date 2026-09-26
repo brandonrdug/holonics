@@ -54,6 +54,11 @@
 //! stored grain logits): the tree part is a stored face, deposited by its own law (the reached
 //! comparisons' cells on their opened paths, `hnn::constitution::LandmarkStep`).
 //!
+//! [definition; agent-inferred] **The scored face is the mixture** ([`Mixture`], the primary's ruling
+//! A): the receiver scores the two-way mixture of the tree's face and the combined face, weighted by
+//! their prequential likelihood ratio `β` in Θ at the receiving locus, as a tree node weighs its own
+//! face against its split. The wave keeps learning from the combined face's covector.
+//!
 //! [definition] **Exact inside, grain only at the face.** The logits are exact rationals. The grain
 //! reading returns the carry `n_c`, the phase class `k_c ∈ ℤ/L_R` and the fibre `ε_c`, the
 //! receiver's unresolved remainder, which is returned and never rounded (guard 15). The normalized
@@ -72,17 +77,18 @@
 use std::ops::Range;
 
 use num_bigint::{BigInt, BigUint};
-use num_traits::{Signed, ToPrimitive, Zero};
+use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::compression::cost::ceil_log2;
 use crate::hnn::HnnError;
 use crate::hnn::field::{ConstitutionRead, Current, Field, ReceiverDeclaration};
-use crate::hnn::landmark::{LandmarkDeclaration, LandmarkFace, Letter};
+use crate::hnn::landmark::{Beta, LandmarkDeclaration, LandmarkFace, Letter, code_length};
 use crate::hnn::propagation::Operands;
 use crate::hnn::ratio::{Face, Faces};
 use crate::hnn::realization::{apply_rows, indexed};
 use crate::hnn::word::Word;
 use crate::ratio::algebraic::ExactInterval;
+use crate::ratio::exponentiated::CarriedPower;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::{Rat, integer};
 
@@ -368,6 +374,262 @@ fn grain_of(tolerance: &Rat) -> Result<u64, HnnError> {
         .ok_or(HnnError::Tolerance {
             tolerance: tolerance.clone(),
         })
+}
+
+// -------------------------------------------------------------------------------------------
+// the mixture of the tree and the combined face
+
+/// [definition; agent-inferred] **The receiver's scored face is weighed like a landmark** (the
+/// primary's ruling A, from Decision 28's own law, which weighs every landmark by its code-length
+/// evidence and not by a rule): the two-way mixture of the tree's face `q_T` and the combined face
+/// `q_C` (the tree's grain logits plus the wave), weighted by their prequential likelihood ratio,
+/// exactly as a tree node weighs its own KT face against its split:
+///
+/// ```text
+/// q = λ q_T + (1 − λ) q_C ,   λ = β/(1 + β) ,   β = W_T/W_C = 1 at the opening (prior ½/½)
+/// β' = β · q_T(x)/q_C(x)      after each cell x, in cell order; every phase of a window reads one β
+/// L_model ≤ min(L_T, L_C) + 1 bit + the chart's certified residual
+/// ```
+///
+/// Any `λ ∈ [0, 1]` keeps `q` a positive normalized face (Lean
+/// `HNN/LandmarkTree.path_face_normalized`), so the executed mixture is exactly scored; the ideal
+/// bound is the two-child case of Lean `HNN/LandmarkTree.kraft_and_dominance`. `q_C(x)` lives in
+/// `ℚ(θ)`, so `β` steps by a declared rational chart of it: the lower endpoint of its exact
+/// enclosure at the carried power's reading bits, whose certified residual `|log₂ q_C − log₂ q̃_C|`
+/// is at most `(hi − lo)/lo · 3/2` (`|ln x| ≤ |x − 1|/min(x, 1)`, `log₂ e < 3/2`). `β` is carried
+/// on the landmark β chart (`hnn::landmark::Beta`: odd over odd times `2^e`) at the tree's carrier
+/// width `W`, rebased to its `W`-bit mantissa when its odd parts outgrow it, with the certified
+/// residual `|log₂(1 − r)| < 3 · 2^(−W)` a rebase. Its drift (the sum of both residuals over its
+/// steps) is reported, never silent. The wave still learns from its own comparison, the covector of
+/// `q_C` against the target, and the tree's face is stored, not pulled back; the mixture is scored
+/// on the host at compare, beside the tree read, on every realization.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Mixture {
+    beta: Beta,
+    width: u64,
+    rebases: u64,
+    drift: Rat,
+}
+
+/// [definition] **One reached comparison's step of the mixture's ratio** `β' = β q_T(x)/q̃_C(x)`:
+/// its receiving ring, the tree's executed face of the target `q_T(x)`, the combined face's
+/// rational chart `q̃_C(x)` and the chart's certified residual in bits.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MixtureStep {
+    pub ring: usize,
+    pub tree: Rat,
+    pub combined: Rat,
+    pub residual: Rat,
+}
+
+/// [definition] **A window scored by the mixture**: each phase's code length under the mixture
+/// `q` (the model's), and the steps its deposit applies to `β` in cell order.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Scored {
+    pub model: Vec<ExactInterval>,
+    pub steps: Vec<MixtureStep>,
+}
+
+impl Mixture {
+    /// **The opening mixture**: `β = 1`, the prior ½/½, carried at width `W`.
+    pub fn new(width: u64) -> Self {
+        Self {
+            beta: Beta::ONE,
+            width,
+            rebases: 0,
+            drift: Rat::zero(),
+        }
+    }
+
+    /// `β = W_T/W_C`, exact.
+    pub fn beta(&self) -> Rat {
+        self.beta.value()
+    }
+
+    /// `λ = β/(1 + β)`, the tree's weight.
+    pub fn weight(&self) -> Rat {
+        let beta = self.beta();
+        &beta / (Rat::one() + &beta)
+    }
+
+    /// The carrier width `W`.
+    pub fn width(&self) -> u64 {
+        self.width
+    }
+
+    /// The rebases so far.
+    pub fn rebases(&self) -> u64 {
+        self.rebases
+    }
+
+    /// The certified drift of the carried `β` against the exact likelihood ratio, in bits.
+    pub fn drift(&self) -> &Rat {
+        &self.drift
+    }
+
+    /// **`log₂ β`, enclosed** by the certified binary logarithm (`hnn::landmark::code_length` of
+    /// `1/β`).
+    pub fn log2_beta(&self) -> Result<ExactInterval, HnnError> {
+        code_length(&self.beta().recip())
+    }
+
+    /// **Its exact bits**: `β`'s numerator and denominator, each by its bits.
+    pub fn bits(&self) -> u64 {
+        let beta = self.beta();
+        beta.numer().bits() + beta.denom().bits()
+    }
+
+    /// **One step** `β' = β q_T(x)/q̃_C(x)`, carried at `W` (module header of this section).
+    /// Refused at a face that is not positive.
+    pub fn step(&mut self, step: &MixtureStep) -> Result<(), HnnError> {
+        if !step.tree.is_positive() || !step.combined.is_positive() {
+            return Err(HnnError::Shape {
+                what: "positive faces in the mixture's step",
+                expected: 1,
+                found: 0,
+            });
+        }
+        let value = self.beta() * &step.tree / &step.combined;
+        let (beta, rebased) = carry_ratio(&value, self.width);
+        self.beta = beta;
+        self.drift += &step.residual;
+        if rebased {
+            self.rebases += 1;
+            self.drift += Rat::new(BigInt::from(3), BigInt::one() << self.width as usize);
+        }
+        Ok(())
+    }
+
+    /// **Score a window** (module header of this section): each phase `j` reads the one `β`, the
+    /// tree's face `q_T,j(t_j)` and the combined face's exact enclosure `q_C,j(t_j) ∈ [lo, hi]`,
+    /// so the mixture `q_j(t_j) ∈ [λ q_T + (1 − λ) lo, λ q_T + (1 − λ) hi]` and its code length is
+    /// enclosed by the certified binary logarithm; each phase stages its step with the chart
+    /// `q̃_C = lo`. Refused unless there is one combined face, one tree face and one target per
+    /// phase.
+    pub fn score(
+        &self,
+        ring: usize,
+        combined: &Faces,
+        trees: &[LandmarkFace],
+        targets: &[usize],
+    ) -> Result<Scored, HnnError> {
+        if combined.faces.len() != trees.len() || trees.len() != targets.len() {
+            return Err(HnnError::Shape {
+                what: "one combined face, one tree face and one target per phase",
+                expected: trees.len(),
+                found: targets.len(),
+            });
+        }
+        let weight = self.weight();
+        let rest = Rat::one() - &weight;
+        let mut scored = Scored {
+            model: Vec::with_capacity(targets.len()),
+            steps: Vec::with_capacity(targets.len()),
+        };
+        for ((face, tree), &target) in combined.faces.iter().zip(trees).zip(targets) {
+            let q_tree = tree
+                .probabilities
+                .get(target)
+                .ok_or(HnnError::CellOutside {
+                    code: target,
+                    alphabet: tree.probabilities.len(),
+                })?
+                .clone();
+            let q_combined = face_enclosure(face, target)?;
+            let lower = &weight * &q_tree + &rest * &q_combined.lower;
+            let upper = &weight * &q_tree + &rest * &q_combined.upper;
+            let (short, long) = (code_length(&upper)?, code_length(&lower)?);
+            scored.model.push(
+                ExactInterval::new(short.lower, long.upper).map_err(|_| HnnError::Shape {
+                    what: "an ordered enclosure of the mixture's code length",
+                    expected: 0,
+                    found: 1,
+                })?,
+            );
+            let residual = (&q_combined.upper - &q_combined.lower) / &q_combined.lower
+                * Rat::new(BigInt::from(3), BigInt::from(2));
+            scored.steps.push(MixtureStep {
+                ring,
+                tree: q_tree,
+                combined: q_combined.lower,
+                residual,
+            });
+        }
+        Ok(scored)
+    }
+}
+
+/// **A positive ratio carried on the landmark β chart at width `W`**: exactly when its odd parts
+/// fit `W` bits, otherwise rebased to its `W`-bit mantissa `m = ⌊v 2^s⌋ ∈ [2^(W−1), 2^W)`; the flag
+/// says whether it was rebased.
+fn carry_ratio(value: &Rat, width: u64) -> (Beta, bool) {
+    let (numerator, denominator) = (value.numer().magnitude(), value.denom().magnitude());
+    let (twos_n, twos_d) = (
+        numerator.trailing_zeros().unwrap_or(0),
+        denominator.trailing_zeros().unwrap_or(0),
+    );
+    let (a, b) = (numerator >> twos_n, denominator >> twos_d);
+    let exponent = twos_n as i64 - twos_d as i64;
+    if a.bits() <= width && b.bits() <= width {
+        let (beta, _) = Beta::carry(
+            a.to_u128().expect("an odd part within the carrier width"),
+            b.to_u128().expect("an odd part within the carrier width"),
+            exponent,
+            width,
+        );
+        return (beta, false);
+    }
+    // `a/b ∈ (2^(t−1), 2^(t+1))`, `t = bits(a) − bits(b)`, so `a 2^s/b ∈ (2^(W−1), 2^(W+1))` at
+    // `s = W − t`.
+    let floor = |shift: i64| -> BigUint {
+        if shift >= 0 {
+            (&a << shift as usize) / &b
+        } else {
+            &a / (&b << shift.unsigned_abs() as usize)
+        }
+    };
+    let mut shift = width as i64 - (a.bits() as i64 - b.bits() as i64);
+    let mut mantissa = floor(shift);
+    if mantissa.bits() > width {
+        shift -= 1;
+        mantissa = floor(shift);
+    }
+    let (beta, _) = Beta::carry(
+        mantissa.to_u128().expect("a mantissa within the carrier width"),
+        1,
+        exponent - shift,
+        width,
+    );
+    (beta, true)
+}
+
+/// **The exact enclosure of one class's face** `p̂_c = 2^(n_c − n_top) θ^(k_c)/Z` in the real chart
+/// `θ ↦ 2^(1/L)` at the carried power's reading bits: the carried power's enclosure over the
+/// normalizer's.
+fn face_enclosure(face: &Face, class: usize) -> Result<ExactInterval, HnnError> {
+    let cells = face.cells();
+    let cell = cells.get(class).ok_or(HnnError::CellOutside {
+        code: class,
+        alphabet: cells.len(),
+    })?;
+    let top = cells
+        .iter()
+        .map(|cell| cell.carry.clone())
+        .max()
+        .expect("a face over at least one class");
+    let power = CarriedPower::new(&cell.carry - &top, cell.phase, face.grain())?
+        .value()?
+        .enclosure()?;
+    let normalizer = face.normalizer().enclosure()?;
+    ExactInterval::new(
+        &power.lower / &normalizer.upper,
+        &power.upper / &normalizer.lower,
+    )
+    .map_err(|_| HnnError::Shape {
+        what: "an ordered enclosure of a face",
+        expected: 0,
+        found: 1,
+    })
 }
 
 // -------------------------------------------------------------------------------------------
