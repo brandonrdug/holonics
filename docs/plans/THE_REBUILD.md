@@ -2073,6 +2073,19 @@ receiving law. It is judged by what they add that the tree does not already say 
   the chart or rebase residual, parity, or the comparison. The held-out cells were seen by Decision
   30 and are not described as fresh. Pump/Floquet locking stays open in #62.
 
+**Measured (September 26):** the laws and parity gates pass, and the predictive criterion
+**fails** ([record](../../research/records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md)).
+- **Development cells.** No clock or contact letter family earned bits against its constant-slot
+  control, so the cell-only family stands.
+- **Held out.** The readings equal campaign 1's: `L_C − L_T = −7 + 13/16 + ε`, and model − PPM-2
+  `= −252 + 5/16 + ε`.
+- **Located cause.** The features carry no information beyond the preceding cells on this text.
+  No ring of campaign 1's field declares a resonator, and the resonator does not load the word
+  (#62). Every contact stayed a rotation.
+- **Parity.** The GPU suite passes, 38 of 38, and the host and card readouts are identical.
+- **Cost.** The card ran `140 rem 265 over 3074` ms a window. The normal-law mirror's `35` ms a
+  window leaves the exposure's path.
+
 #### Campaign 3. Release through modes, dormancy and far fields
 
 - **Laws:** Lean item 9, and:
