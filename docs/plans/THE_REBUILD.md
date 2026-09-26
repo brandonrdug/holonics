@@ -384,8 +384,9 @@ K   the complex: rings g (0-cells); contacts a = (g→h) (1-cells); declared loo
       exponent β_a on its lattice, one per contact and read at both ends (R2 C1);
     - the receiving map R, a prox normal law on its reached covectors opening at zero, and the receiving
       parametron's landmark tree (KT masses at nodes, the prior 1/2, context-tree weighting over each
-      cell's causal address of depth D), whose grain face the wave corrects (Decision 28; Decision 27's
-      region table is its depth-one case).
+      cell's causal address of depth D), weighed against the combined face (tree plus wave) by their
+      likelihood ratio (Decisions 28 and 30; Decision 27's region table is the depth-one case of the
+      tree's whole-cell emission, kept in Lean).
     Every learned map carries its normal statistics, per locus and factored (`Holon/MomentStorage`).
 x   the current: the lift point λ ∈ ℤ^G of the rings' joint clock torus (`aeon::ClockLift`), the one owner of
     every ring's phase class and winding (review C9). Nothing else persists between words.
@@ -1175,7 +1176,7 @@ port. No other noun enters.
 | `Word<'c>` | `hnn/word.rs` | One evaluation of the ticks at one cut's fixed operands, opening at zero change. It borrows `&'c Field` and owns the change: the waves, the contact states and their per-tick values or checkpoints, which its return reads in reverse. Its end releases the change. | `hnn::propagation` |
 | (functions) | `hnn/propagation.rs` | The junction Swing, the ring element step and the contact transit. | `geometry::swing`; the midpoint scheme of `holon::law::ReferenceHolon`, realized directly and equated with it in two tests (reception item 1) |
 | `ReceivingPhases` | `hnn/receiving.rs` | The receiving ring, its epochs `e_j`, aperture `A`, grain `L_R`, its tree's address depth `D` and the shared map `R`; it reads the wave `R P_R^(τ_R) v_R` at refine and, at compare, the combined face `grain(log₂ q(· \| a_j)) + R P_R^(τ_R) v_R` with the landmark tree's face at each phase's causal address `a_j` (`tree_faces`, `combine`, `ReceivingRead::combined`; Decision 28); the scored face is `Mixture`'s, the tree's face against the combined face weighted by their likelihood ratio `β` in Θ (the primary's ruling A). It refuses `A` beyond the rank of the receiving ring's observability over the word, which it reports (review C7). Beside it, `ActiveAddress`: the receiving parametron's active suffix address, the last `D` cells received, which the resident shifts at every ingested cell, a pending ratio copies at its cut, the state bits count and the collapse keeps; not the moment's state, so `n*` is unchanged. `grain_exponent` (the grain's integer comparison) lives here. | `receiver::reception::ReceiverFace` |
-| `Landmarks` | `hnn/landmark.rs` | The receiving parametron's storage as a tree of landmarks (Decision 28): typed address letters (`Boundary`, `Cell`) read per cell, nodes founded at first arrival holding Krichevsky–Trofimov masses in half-units and the carried mixture ratio `β` (rebased on its derived carrier width `W` with a certified residual), the face along the one opened path (context-tree weighting) on the fixed-width lattice `2^(−M_p)`, the cell's odometer digits emitted as a dyadic partition of the unit cell, `M_p` and `W` derived from `n*`, `L_R`, `B` and `D`, and the prequential measurement against the baselines (Decision 29). It is the receiving parametron's storage in Θ (`ReceivingPhases` reads it; Decision 27's region table, its depth-one case, is retired from Rust). | `hnn::receiving::grain_exponent`; `hnn::reference::Baselines`; Lean `HNN/LandmarkTree` |
+| `Landmarks` | `hnn/landmark.rs` | The receiving parametron's storage as a tree of landmarks (Decision 28): typed address letters (`Boundary`, `Cell`) read per cell, nodes founded at first arrival holding Krichevsky–Trofimov masses in half-units and the carried mixture ratio `β` (rebased on its derived carrier width `W` with a certified residual), the face along the one opened path (context-tree weighting) on the fixed-width lattice `2^(−M_p)`, the cell's odometer digits emitted as a dyadic partition of the unit cell, `M_p` and `W` derived from `n*`, `L_R`, `B` and `D`, and the prequential measurement against the baselines (Decision 29). It is the receiving parametron's storage in Θ (`ReceivingPhases` reads it; Decision 27's region table, the depth-one case of the whole-cell emission kept in Lean, is retired from Rust). | `hnn::receiving::grain_exponent`; `hnn::reference::Baselines`; Lean `HNN/LandmarkTree` |
 | `HolonRatio` | `hnn/ratio.rs` | `R_j = Ĝ_(T←H)` at each receiving phase, as undivided pairs, with `ℓ`, its branch and the receiver's fibre. | `ratio::Presentation`, `ratio::surprisal::SymbolicSurprisal`, `ratio::exponentiated::{RatioFamily, CarriedPower}` |
 | `RatioCovector` | `hnn/ratio.rs` | `R⁻¹dR` at the face: the magnitude part `p̂ − q` and the phase part `−q_c Δ_c`, in units of `ln 2` carried as a declared factor. Only a `HolonRatio` constructs it. | — |
 | `PendingRatio` | `hnn/pending.rs` | The producing anchor `λ`, the encoder moment `M`, the `ReceivingPhases` and the commit it was produced at. It is owned by the resident and addressed by `PendingId`. | the types above |
@@ -1941,13 +1942,13 @@ order-0, so the repair precedes campaign 2. Its course:
   - with (A): the model `3 + 1/16 + ε` (in all, model − order-0 `−1989 + 1/16 + ε` bits: the
     campaign criterion met; model − tree `−1 + 9/16 + ε`); the combined face `13 + 10/16 + ε`, and
     `log₂ β = 35109 + 9/16 + ε` at the end: the wave carries no weight;
-  - with (A) and (B): the model, the combined face and the tree each `3 + 1/16 + ε` a cell; in all,
-    model − tree `−7 + 1/16 + ε` (`−18 + 9/16 + ε` on the development cells), model − order-0
-    `−1996 + 9/16 + ε`, model − order-1 `−1494 + 8/16 + ε`, model − PPM-2 `−252 + 1/16 + ε`; combined −
-    tree below zero in every aeon (`−1 + 3/16`, `−6 + 0/16`, `−5 + 3/16`, `−6 + 13/16`, `−6 + 9/16`,
-    `−4 + 12/16`, each `+ ε`), and `log₂ β` at the boundaries `−2 + 12/16`, `−7 + 2/16`,
-    `−12 + 11/16`, `−17 + 5/16`, `−22 + 11/16` and `−25 + 6/16` at the end (each `+ ε`): the wave
-    earns its weight, a few bits over the cut.
+  - with (A) and (B), after the review (the window scored in cell order: each phase's tree face
+    after the earlier phases' deposits, `β` stepped per phase; the tree alone read on its exact
+    face): the model, the combined face and the tree each `3 + 1/16 + ε` a cell; in all, held out,
+    `L_model − L_T = −7 + 13/16 + ε` (development `−18 + 12/16 + ε`), model − order-0
+    `−1996 + 12/16 + ε`, model − order-1 `−1494 + 11/16 + ε`, model − PPM-2 `−252 + 5/16 + ε`;
+    `log₂ β` at the boundaries `−2 + 9/16`, `−8 + 10/16`, `−12 + 2/16`, `−17 + 2/16`, `−21 + 0/16` and
+    `−25 + 9/16` at the end (each `+ ε`): the wave earns its weight, a few bits over the cut.
 
   Owed in #76: the tree read's card port (1,720 µs a window on the host against the card's word at
   2,110 µs) and the tree's carrier past `u128` (its widths refuse 87,382 cells at `|A| = 256`,
@@ -2633,7 +2634,9 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
     - the path's edge log ratios are an additive cochain, a deposit is local to the path, and its
       covector is the log-derivative of the edge ratios, with no pullback through a network;
     - release is the retention law's future quotient, never a budget alone;
-    - Decision 27's region table is the depth-one case;
+    - Decision 27's region table is the depth-one case of the whole-cell emission (Lean
+      `depth_one_is_decision_27`); the digit tree's depth-one forced face is a product of binary KT
+      faces;
     - the wave earns its computation by supplying address letters the tree weights in, and any
       wave correction is measured against the count-only face;
     - merges (tokenizers) are accepted by `W_(G′)(z′)/W_G(z) > 2^d` and belong to campaign 5 with
@@ -2662,7 +2665,7 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
     width `W`; `M_p = 39`, `W = 28` at `D = 4`, derived, each source held to a quarter grain; Lean
     `lattice_path_deviation`, `rebase_log_residual`): the tree's passage takes 42 ms and a 256-class
     face read 91 µs. The next receiving face is this tree's:
-    it replaces Decision 27's region table (its depth-one case) in `ReceivingPhases`, and the wave is
+    it replaces Decision 27's region table (the whole-cell emission's depth-one case) in `ReceivingPhases`, and the wave is
     measured against it.
 
 29. **Every comparison is scored prequentially: at the standing before its own deposit, held-out
@@ -2698,8 +2701,8 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
       from 1 (prior ½/½), stepped after each cell by `β' = β q_T(x)/q_C(x)` on the landmark β chart
       (`q_C` by the lower endpoint of its exact enclosure, its residual certified). Any
       `λ ∈ [0, 1]` keeps `q` normalized (`path_face_normalized`), and ideally
-      `L ≤ min(L_T, L_C) + 1` bit (`kraft_and_dominance` with two children), plus the chart's
-      certified drift. The wave learns from its own comparison, the covector of `q_C`, as each tree
+      `L ≤ min(L_T, L_C) + 1` bit, plus the chart's certified drift once over the passage (Lean
+      `sequential_mixture_bounds`, `sequential_mixture_executed`). The wave learns from its own comparison, the covector of `q_C`, as each tree
       node's counts update from their own routed data; the tree's face is stored, not pulled back
       (`hnn::receiving::Mixture`).
     - **The normalized open** (Decision 26's third term, Lean `HNN/IndexedOpen`): the source opens
@@ -2708,15 +2711,25 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
       word stays dyadic on the card.
 
     Measured on the standing real cut, host and card identical line for line outside the wall
-    times: held out, the model reads `3 + 1/16 + ε` bits a cell, below online order-0 by
-    `1996 + 9/16 − ε` bits in all, order-1 by `1494 + 8/16 − ε` and PPM-2 by `252 + 1/16 − ε`:
-    **campaign 1's criterion is met**, by disjoint exact enclosures. With the mixture alone the
-    wave carried no weight (`log₂ β = 35109 + 9/16 + ε`); with the normalized open the combined
-    face lies below the tree's in every aeon and `log₂ β` falls to `−25 + 6/16 + ε`: the wave earns
-    its weight, `7 − 1/16 − ε` bits over the held-out cells. Its computation (355,065 ms on the card
-    over 3,074 windows, `115 rem 1555 over 3074` ms a window, of which the word's refine read is
-    2,110 µs and the host's compare and deposit phases most of the rest) is not yet paid for by
-    those bits; campaign 2's rings and contacts are measured by the same mixture.
+    times, with the window scored in cell order (each phase's tree face after the earlier phases'
+    deposits, `β` stepped per phase; Lean `sequential_mixture`, `sequential_mixture_bounds`,
+    `sequential_mixture_executed`): held out, the model reads `3 + 1/16 + ε` bits a cell, and in all
+    model − order-0 reads `−1996 + 12/16 + ε` bits, model − order-1 `−1494 + 11/16 + ε` and
+    model − PPM-2 `−252 + 5/16 + ε`: **campaign 1's criterion is met**, by disjoint exact enclosures.
+    With the mixture alone the wave carried no weight (`log₂ β = 35109 + 9/16 + ε`); with the
+    normalized open the combined face lies below the tree's exact face, `L_C − L_T = −7 + 13/16 + ε`
+    held out (development `−19 + 12/16 + ε`), and `log₂ β` ends at `−25 + 9/16 + ε`.
+
+    [historical] Disclosure: the mixture and the normalized open were adopted after full-cut runs
+    whose readings included the held-out cells, so the held-out cells did not choose the depth but
+    were seen when these two laws were chosen among three. The three laws tried are charged
+    `⌈log₂ 3⌉ = 2` bits: the wave's held-out gain is `L_T − L_model − 2 = 5 − 13/16 − ε` bits, still
+    positive; the orderings against the baselines, hundreds of bits, are unaffected. The wave's maps
+    are read at the window's opening standing (the normal laws deposit once a window), so Decision
+    29 holds cell by cell for the tree, `β` and the baselines, and window by window for the wave.
+    The wave's computation (353,499 ms on the card over 3,074 windows, `114 rem 3063 over 3074` ms a
+    window) is not yet paid for by those bits; campaign 2's rings and contacts are measured by the
+    same mixture.
 
     Source: agent-inferred, from Decision 28's weighing law and the measurement. Brandon may
     override it.

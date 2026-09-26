@@ -19,7 +19,8 @@ Two emissions were declared.
   lattice `2^(−M_f)`, and the cell's face is the width of its descended interval
   (`executed_split_laws`, `cell_faces_partition`).
 - `Cell`: the whole cell carries 256-ary KT masses at each node. Its depth-one forced case is
-  Decision 27's region table (`depth_one_is_decision_27`), and a test checks that equality exactly.
+  Decision 27's region table (`depth_one_is_decision_27`); a Rust test checked that equality while
+  this emission ran (retired the same day, §6).
 
 [definition; agent-inferred] Every width is derived rather than tuned.
 - **The mixture ratio `β = E/∏W`** is carried exactly while its odd parts fit `W` bits, and
@@ -54,9 +55,9 @@ coder. Each cell is scored at the standing before its own deposit.
 
 The held-out cells decide three orderings. Each is a disjoint pair of exact enclosures, with the
 tree charged its three depth bits.
-- The tree lies below order-0 by `−1987 + 15/16 + ε` bits in all (a cell: `−2 + 5/16 + ε`).
-- It lies below order-1 by `−1485 + 14/16 + ε` (a cell: `−2 + 12/16 + ε`).
-- It lies below PPM-2 by `−243 + 7/16 + ε` (a cell: `−1 + 12/16 + ε`).
+- tree − order-0 reads `−1987 + 15/16 + ε` bits in all (a cell: `−2 + 5/16 + ε`).
+- tree − order-1 reads `−1485 + 14/16 + ε` (a cell: `−2 + 12/16 + ε`).
+- tree − PPM-2 reads `−243 + 7/16 + ε` (a cell: `−1 + 12/16 + ε`).
 
 All three orderings also hold on the development cells. Decision 28's criterion holds.
 
@@ -110,14 +111,17 @@ The two emissions separate cleanly.
   weighted probability `95/32768`. The pair first briefed, `0100110` after `110`, gives `7/2048` in
   the paper's convention. The test keeps both: the paper's pair, and the briefed pair checked
   against an independent block recursion.
-- **The reading.** `log2_enclosure` of a tree face of about 3,000 bits costs about 80 ms. A certified
-  mantissa reading costs about 3 ms. The baselines' faces are never that wide on this cut
-  (`n* + |A| ≤ 2^24`), so they read exactly as before.
+- **The reading.** `log2_enclosure`'s series on the exact tree faces, thousands of bits wide,
+  dominated the first run, which was stopped. The faces were then read on a certified mantissa, and
+  since §6 every code length is read by the certified integer binary logarithm. The baselines'
+  faces are never that wide on this cut (`n* + |A| ≤ 2^24`), so they read exactly as before.
 
 ## 5. What it changes
 
 [definition; agent-inferred] The receiving face that later campaigns measure against is the
-landmark tree's, not Decision 27's region table, which is its depth-one case.
+landmark tree's, not Decision 27's region table. The region table is the depth-one case of the
+whole-cell emission (Lean `depth_one_is_decision_27`), not of the digit tree, whose depth-one
+forced face is a product of binary KT faces.
 - The wave earns its computation only by lowering the code length below this count-only face,
   whether as address letters the tree weighs in or as a correction.
 - The HNN's exposure moves to the prequential protocol (Decision 29), with per-cell causal
@@ -125,8 +129,8 @@ landmark tree's, not Decision 27's region table, which is its depth-one case.
 
 ## 6. The fixed-width lattice law (same day)
 
-[definition; agent-inferred] The measured law read an exact ℚ path face whose rationals reached
-about 3,000 bits. A receiving read needs all 256 classes in every window, so every quantity on the
+[definition; agent-inferred] The measured law read an exact ℚ path face whose rationals ran to
+thousands of bits. A receiving read needs all 256 classes in every window, so every quantity on the
 hot path now sits on a declared dyadic lattice with a certified residual (Lean `HNN/LandmarkTree`,
 section 6′).
 - **The executed recursion.**
@@ -157,6 +161,6 @@ section 6′).
   - The prequential run's 49,653 ms is the baselines' reading, which moves to the same certified
     integer logarithm.
 - **The exact-β oracle** runs at scale only on a 130-bit carrier, which stays within `2^(−96)` of the
-  ideal over the passage. An exact β reaches about 10^5 bits a node. The oracle stays exact on the
+  ideal over the passage. An exact β outgrows every fixed carrier on the cut. The oracle stays exact on the
   fixtures (`95/32768`).
 - **The whole-cell emission is retired.** Lean `depth_one_is_decision_27` keeps its law.

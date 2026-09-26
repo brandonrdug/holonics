@@ -13,8 +13,8 @@ HNN with the tree as its receiving face.
 and `hnn::reference`.
 
 - **The receiving parametron's storage is the landmark tree** (`D = 4`, the odometer-digit
-  emission, on its fixed-width lattice). It replaces Decision 27's region table, which is its
-  depth-one case (Lean `depth_one_is_decision_27`). The region table retires from Rust.
+  emission, on its fixed-width lattice). It replaces Decision 27's region table, the depth-one case
+  of the tree's whole-cell emission (Lean `depth_one_is_decision_27`), which is not the digit tree's. The region table retires from Rust.
 - **Each phase reads the tree at its own causal address.** The address is the window's earlier
   targets, then the receiver's active suffix address. The resident keeps that address beside the
   tree, shifts it at each ingest, and keeps it across the collapse. The moment's window and `n*`
@@ -41,29 +41,42 @@ grain `L_R = 16`:
 |---|---|---|---|---|
 | the tree wired in, no mixture | `13 + 11/16 + ε` | `3 + 1/16 + ε` | (the model) | `8 + 2/16 + ε` |
 | with the mixture | `3 + 1/16 + ε` | `3 + 1/16 + ε` | `13 + 10/16 + ε` | `3 + 10/16 + ε` |
-| with the mixture and the normalized open | `3 + 1/16 + ε` | `3 + 1/16 + ε` | `3 + 1/16 + ε` | `3 + 10/16 + ε` |
+| with the mixture and the normalized open, scored in cell order | `3 + 1/16 + ε` | `3 + 1/16 + ε` | `3 + 1/16 + ε` | `3 + 10/16 + ε` |
+
+The first two rows read the tree alone at the grain and step one `β` a window; the review found
+both, and the last row reads the tree on its exact face (the face the mixture weighs), each phase's
+tree face after the earlier phases' deposits, and `β` stepped per phase.
 
 The held-out baselines read order-0 `4 + 12/16 + ε`, order-1 `4 + 5/16 + ε` and PPM-2
-`3 + 4/16 + ε`. Under the final law the orderings, held out and in all, are:
-- model − order-0 is `−1996 + 9/16 + ε` bits: **the campaign criterion is met**;
-- model − order-1 is `−1494 + 8/16 + ε`;
-- model − PPM-2 is `−252 + 1/16 + ε`;
-- model − tree is `−7 + 1/16 + ε`, and `−18 + 9/16 + ε` on the development cells.
+`3 + 4/16 + ε`. Under the final law, held out and in all (each `+ ε`):
+- model − order-0 reads `−1996 + 12/16`: **the campaign criterion is met**;
+- model − order-1 reads `−1494 + 11/16`;
+- model − PPM-2 reads `−252 + 5/16`;
+- `L_C − L_T` and `L_model − L_T` each read `−7 + 13/16` (development `−19 + 12/16` and
+  `−18 + 12/16`); the tree at the grain less its exact face reads `0 + 6/16`.
 
-Each ordering is decided by disjoint exact enclosures.
+Each ordering is decided by disjoint exact enclosures. The exposure's exact tree sums equal the
+count-only tree's exactly.
 
-**The wave's course.** The combined face lies below the tree's in every aeon: `−1 + 3/16`,
-`−6 + 0/16`, `−5 + 3/16`, `−6 + 13/16`, `−6 + 9/16` and `−4 + 12/16` bits. `log₂ β` at the aeon
-boundaries reads `−2 + 12/16`, `−7 + 2/16`, `−12 + 11/16`, `−17 + 5/16` and `−22 + 11/16`, and
-`−25 + 6/16` at the end (each `+ ε`). The mixture's ratio is carried at `W = 28` with 6,146 rebases
-and a certified drift of `11686470883619335088690741741329703/2^127` bits.
+**The wave's course.** `log₂ β` at the aeon boundaries reads `−2 + 9/16`, `−8 + 10/16`,
+`−12 + 2/16`, `−17 + 2/16` and `−21 + 0/16`, and `−25 + 9/16` at the end (each `+ ε`), carried at
+`W = 28` with 6,147 rebases and a certified drift of `5844186179759863429570124736444603/2^126`
+bits.
+
+**Disclosure.** The mixture and the normalized open were adopted after full-cut runs whose readings
+included the held-out cells. The three laws tried are charged `⌈log₂ 3⌉ = 2` bits, so the wave's
+held-out gain is `5 − 13/16 − ε` bits. The margins against the baselines are unaffected. The wave's
+maps are read at the window's opening standing, so the cell-by-cell protocol holds for the tree,
+`β` and the baselines, and window by window for the wave.
 
 **Parity and cost.**
 - **Parity.** The host and the card (`holonics_cuda::hnn::Resident`) print identical readouts, line
-  for line, outside the wall times and the traffic: 3,289 lines. Every interaction return matched
+  for line, outside the wall times and the traffic: 3,303 lines. Every interaction return matched
   in lockstep, the tree's and the mixture's staged steps included.
-- **Wall time.** The host took 405,500 ms and the card 355,065 ms.
-- **The tree read** costs 1,720 µs a window, against the card's word refine read of 2,110 µs.
+- **Wall time.** The host took 399,911 ms (`130 rem 291 over 3074` ms a window) and the card
+  353,499 ms (`114 rem 3063 over 3074` ms a window).
+- **The tree read** costs `1727 rem 2244 over 3074` µs a window on the card run, against the
+  card's word refine read of `2113 rem 276 over 3074` µs; the in-window overlay adds 49 µs.
   The card port of the tree read is a #76 debt.
 - **The carrier limit.** The tree's lattice widths outgrow `u128` from 87,382 cells at campaign 1's
   `|A| = 256`, `D = 4`. A carrier law for longer passages is also owed in #76.
@@ -74,6 +87,7 @@ and a certified drift of `11686470883619335088690741741329703/2^127` bits.
 hold the passage below PPM-2.
 - The wave, the helical machinery's rings, contacts and charts, now earns weight honestly. Its
   features no longer grow with the population, and it lowers the code length in every aeon.
-- It earns only a few bits so far, far less than its computation costs.
+- It earns only a few bits so far (`5 − 13/16 − ε` after the charge), far less than its
+  computation costs.
 - Campaign 2's rings and contacts (storage, lock and flow) are therefore measured by the same
   mixture. A navigator's modes earn their place by the bits they save against the landmark tree.
