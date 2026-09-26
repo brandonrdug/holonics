@@ -112,10 +112,12 @@
 //! published tree in the same order, by the same law, so each overlay's face is the face the
 //! deposited tree reads (the test `landmark_window_faces_read_each_phase_after_the_earlier_deposits`).
 //! [established-bounded; measured] On the standing cut's tree before its last window (63,280 nodes;
-//! exterior wall time on one host, the mean over 50 runs, in integer µs): a clone takes 211 µs; the
-//! window's two faces read in cell order take 122 µs and read with nothing known 73 µs, so the
-//! overlay costs `122 − 73 = 49` µs a window; a clone, a deposit and the two faces read serially
-//! take 375 µs. [agent-inferred] An overlay admits arrivals past the declared population by the
+//! exterior wall time on one host, the mean over 50 runs in integer µs, the allocator reusing the
+//! pages each run frees): a clone takes 211 µs; the window's two faces read in cell order take
+//! 122 µs and read with nothing known 73 µs, so the overlay costs `122 − 73 = 49` µs a window; a
+//! clone, a deposit and the two faces read serially take 375 µs. A single clone of the final tree
+//! on fresh pages took 920 µs (`hnn_landmark`'s receipt). On the whole exposure the host's tree read,
+//! overlay included, took `1479 rem 2163 over 3074` µs a window. [agent-inferred] An overlay admits arrivals past the declared population by the
 //! window's own earlier cells while the widths' operands at that count fit `u128` (a deposit's
 //! re-read at its successor reads the window's cells again); its faces are exact executed faces,
 //! normalized for any stop weight, and its certificates are not read.
