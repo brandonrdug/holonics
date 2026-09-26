@@ -229,7 +229,11 @@ its atlas rows in the same commit.
 [project-postulate] **Decide from the mathematics.** Resolve routine choices from the mathematics,
 mark an inferred choice with its reason (`agent-inferred`), and proceed. Never hand Brandon a
 decision that the framework settles, and never hedge finished work with a queue of "next" items.
-Implement a relation together with its consumer, stated as an equation at the consumer: for
+Brandon supplies the framework and the ontology as a lens (September 26: "I'm more of a lens that
+aims to focus you on this research and work … the Decisions are yours, resonate with my
+messages"). Technical and mathematical decisions, the Decisions in THE_REBUILD among them, belong
+to the agents: make them, record them with their reason, and revise what fails. Implement a
+relation together with its consumer, stated as an equation at the consumer: for
 example `decode(T_native(encode x))=T(x)`, `E_next T=U E`, `D E=ρ`, or the complete residual.
 
 [project-postulate] **Lean holds the mathematics; Rust holds what runs.** Unconsumed Rust is deleted

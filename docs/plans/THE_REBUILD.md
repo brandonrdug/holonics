@@ -2888,3 +2888,57 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
 
     Source: Brandon's direction; the order and the gates are agent-inferred. Brandon may override
     it.
+
+32. **The landmark tree's stop weight is a declared prior, chosen on the development cells.**
+    Decision 28 weighs each landmark's own face against its split at `½`, the founding ratio
+    `β₀ = 1`. Campaign 2's controls showed that this weighting is not the code-length optimum:
+    constant slots, which carry nothing but raise the stop weight, coded the development cells up
+    to 133 bits below the cell-only tree.
+    - **The law.** For any stop weight `w ∈ (0, 1)`, `W_s = w E_s + (1 − w) ∏_b W_(s b)` is the
+      mixture over pruned trees with weights `w^(leaves) (1 − w)^(internal nodes)`. Those weights
+      sum to one, and the tree codes within `−log₂` of its weight of the best pruned tree. Decision
+      28's `½` is the case `w = ½`.
+    - **The founding.** The executed tree founds each node at `β₀ = w/(1 − w)`.
+    - **The family.** The declared family is the dyadic ladder `w = 1 − 2^(−j)`, with `β₀ = 2^j − 1`
+      an integer, together with its per-depth form.
+    - **The choice.** Development cells only, charged `⌈log₂⌉` of the family tried, then one
+      held-out pass.
+
+    Source: agent-inferred, from campaign 2's controls and the Kraft form (`kraft_and_dominance`).
+
+33. **The wave reads by the Born rule: reception applies the cell's operator to the ring's state.**
+    Campaigns 1 and 2 showed that the direct-sum wave earns only the mixture's few bits: the rings
+    add coordinates, and the text's information lies in the joint correlations of its cells. Brandon,
+    September 26: light and shadow as one package, composition as weaving, and diligence with
+    quantum mechanics. The law is a finitely correlated (quantum hidden Markov) receiver on the
+    receiving ring's register:
+    - **The state.** The ring's state is a density `ρ`: Hermitian, positive semidefinite, of trace
+      one, over the Gaussian rationals and carried on its lattices with certified residuals
+      (Decision 24). `ρ` is the retained quotient. It is future-sufficient for this receiver, and it
+      keeps no tape.
+    - **The face.** A cell is emitted as its odometer digits, each digit `i` with operators
+      `A_(i,0)` and `A_(i,1)`. The face is
+      `p(b | ρ) = Tr(A_(i,b) ρ A_(i,b)†) / Σ_(b′) Tr(A_(i,b′) ρ A_(i,b′)†)`: exactly normalized, and a
+      dyadic partition of the unit cell, like the tree's.
+    - **The reception.** Observing `b` changes the receiver:
+      `ρ ← A_(i,b) ρ A_(i,b)† / Tr(A_(i,b) ρ A_(i,b)†)`. This is the elementary reception
+      `I_C(|H_S⟩, |H_R⟩) = (|H′_S⟩, |H′_R⟩, f_R)`, with the collapse as its receipt. Between cells
+      the ring's power-neutral Cayley tick evolves the state: `ρ ← U ρ U†`.
+    - **The shadows.** Complex amplitudes add before they are squared, so `Tr(AρA†)` can cancel
+      toward zero without any positivity constraint on the operators. Destructive interference
+      carves the face's shadows. At equal memory this is strictly more expressive than a
+      nonnegative (hidden Markov) receiver (Glasser, Sweke, Pancotti, Eisert and Cirac, 2019).
+    - **The learning.** The ratio covector of the Born face, `R⁻¹dR` of the trace ratio, is
+      deposited into the operators by the normal law's prox step on their lattices.
+    - **The weighing.** The Born face enters Decision 30's likelihood mixture beside the tree and
+      earns its weight only by lowering the code length.
+    - **The register.** Its width `χ` is chosen on the development cells from a declared family and
+      charged.
+    - **The tensor join.** Rings as the sites of a matrix product state, with the contacts as bonds
+      of width `χ_a` and entanglement at most `log χ_a` across each, follows only if the single
+      register earns bits.
+
+    Success: on the development cells, a register family whose mixture with the tree codes below the
+    tree alone, charged; then one held-out pass, host and card.
+
+    Source: agent-inferred, from campaigns 1 and 2 and Brandon's direction.
