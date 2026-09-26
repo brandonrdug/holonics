@@ -9,6 +9,7 @@ import Holonics.HNN.TargetFace
 import Holonics.HNN.StandingRead
 import Holonics.HNN.IndexedOpen
 import Holonics.HNN.RegionCounts
+import Holonics.HNN.LandmarkTree
 import Holonics.HNN.Retention
 import Holonics.HNN.Keys
 
@@ -31,6 +32,7 @@ design: the HNN law", table (b) rows 1–7, stated before their Rust owners in `
 | `HNN/StandingRead` | Decision 26: the face reads the receiving parametron's bound harmonic coordinate | `hnn::receiving` |
 | `HNN/IndexedOpen` | Decision 26: the source opens on its indexed, normalized counts | `hnn::moment` |
 | `HNN/RegionCounts` | Decision 27: the receiving face is the grain of the receiving parametron's region class masses, corrected by the wave | `hnn::receiving` (target owner); KT baseline `hnn::reference` |
+| `HNN/LandmarkTree` | Decision 28: the receiving face compresses landmarks, context-tree weighting over typed addresses (Decision 27 is its depth-one case) | `hnn::landmark` |
 | `HNN/Retention` | 6. retention as the collapse onto what the admitted future distinguishes | `hnn::{retention, pending}` |
 | `HNN/Keys` | 7. keys by loop closure, and selective stepping | `hnn::keys` |
 -/
