@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesParabolicVorticityCurrent
-import Holonics.Fluid.NavierStokesCriticalVorticityRate
+import HolonicsResearch.Fluid.NavierStokesCriticalVorticityRate
 
 /-!
 # The BKM current is invariant under the exact parabolic cover

@@ -1,8 +1,8 @@
 import HolonicsResearch.Fluid.NavierStokesH2StorageDissipationPayment
 import HolonicsResearch.Fluid.NavierStokesH2VorticityShellDissipationBridge
-import Holonics.Fluid.NavierStokesH3LerayBilinear
+import HolonicsResearch.Fluid.NavierStokesH3LerayBilinear
 import HolonicsResearch.Fluid.NavierStokesPhysicalH2ClockedTriadNormalForm
-import Holonics.Fluid.NavierStokesVorticityDirectionBaseEnergy
+import HolonicsResearch.Fluid.NavierStokesVorticityDirectionBaseEnergy
 
 /-!
 # A fixed low output of the actual projected source is paid by kinetic energy

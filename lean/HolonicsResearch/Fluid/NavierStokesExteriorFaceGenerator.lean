@@ -1,8 +1,8 @@
 import HolonicsResearch.Fluid.NavierStokesAlignedStrainBudget
-import Holonics.Fluid.NavierStokesVorticityDirectionFullStrain
-import Holonics.Fluid.NavierStokesVorticityDirectionFiniteBandBridge
-import Holonics.Fluid.NavierStokesVorticityDirectionBaseEnergy
-import Holonics.Fluid.NavierStokesCoordinateJacobianFourierReconstruction
+import HolonicsResearch.Fluid.NavierStokesVorticityDirectionFullStrain
+import HolonicsResearch.Fluid.NavierStokesVorticityDirectionFiniteBandBridge
+import HolonicsResearch.Fluid.NavierStokesVorticityDirectionBaseEnergy
+import HolonicsResearch.Fluid.NavierStokesCoordinateJacobianFourierReconstruction
 
 /-!
 # The exterior face of the aligned strain is a circle multiplier times an integer generator

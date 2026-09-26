@@ -1,4 +1,6 @@
 import Holonics.Physics.HolonicEntropyActionInduction
+import Mathlib.Analysis.SpecialFunctions.ExpDeriv
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
 
 /-!
 # A temporal heat instance of the oriented entropy current

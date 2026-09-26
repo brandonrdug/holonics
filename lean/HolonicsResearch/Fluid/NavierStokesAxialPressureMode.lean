@@ -1,7 +1,7 @@
-import Holonics.Fluid.NavierStokesOpenFourierMildIdentity
-import Holonics.Fluid.NavierStokesH3DivergenceBilinear
-import Holonics.Fluid.NavierStokesOpenAdvectionConvolutionBridge
-import Holonics.Fluid.NavierStokesOpenAdvectionCarrierIntegration
+import HolonicsResearch.Fluid.NavierStokesOpenFourierMildIdentity
+import HolonicsResearch.Fluid.NavierStokesH3DivergenceBilinear
+import HolonicsResearch.Fluid.NavierStokesOpenAdvectionConvolutionBridge
+import HolonicsResearch.Fluid.NavierStokesOpenAdvectionCarrierIntegration
 import HolonicsResearch.Fluid.NavierStokesOpenSharpNonlinearSourceIntegration
 
 /-!

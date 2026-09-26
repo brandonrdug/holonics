@@ -1,4 +1,4 @@
-import Holonics.Fluid.NavierStokesOpenEnergySpacetime
+import HolonicsResearch.Fluid.NavierStokesOpenEnergySpacetime
 
 /-!
 # The open H2 energy and H3 viscous current

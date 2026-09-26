@@ -1,6 +1,6 @@
 import HolonicsResearch.Fluid.NavierStokesTorusHorizontalMean
 import HolonicsResearch.Fluid.NavierStokesHorizontalMean
-import Holonics.Fluid.NavierStokesOpenFourierSpatialSymbols
+import HolonicsResearch.Fluid.NavierStokesOpenFourierSpatialSymbols
 
 /-!
 # The periodic mean is the actual horizontal integral

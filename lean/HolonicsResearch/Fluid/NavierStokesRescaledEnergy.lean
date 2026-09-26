@@ -1,7 +1,7 @@
 import Holonics.Fluid.NavierStokesPeriodicFlux
 import HolonicsResearch.Fluid.NavierStokesRescalingSpace
 import HolonicsResearch.Fluid.NavierStokesDynamicRescaling
-import Holonics.Fluid.NavierStokesOpenEnergySpacetime
+import HolonicsResearch.Fluid.NavierStokesOpenEnergySpacetime
 import HolonicsResearch.Fluid.NavierStokesH2StorageDissipationPayment
 
 /-!

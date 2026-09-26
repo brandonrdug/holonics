@@ -1,7 +1,7 @@
 import HolonicsResearch.Fluid.NavierStokesAxisymmetricChart
 import Mathlib.Analysis.Calculus.BumpFunction.FiniteDimension
 import HolonicsResearch.Fluid.NavierStokesCoreVectorPotential
-import Holonics.Fluid.NavierStokesPeriodicLocalExistence
+import HolonicsResearch.Fluid.NavierStokesPeriodicLocalExistence
 
 /-!
 # A smooth periodic completion of an actual local potential

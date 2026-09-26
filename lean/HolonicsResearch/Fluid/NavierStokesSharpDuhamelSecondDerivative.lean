@@ -1,6 +1,6 @@
 import HolonicsResearch.Fluid.NavierStokesSharpNonlinearSource
-import Holonics.Fluid.NavierStokesWeightedHigherOrderDuhamelLift
-import Holonics.Fluid.NavierStokesWeightedReconstructionContinuity
+import HolonicsResearch.Fluid.NavierStokesWeightedHigherOrderDuhamelLift
+import HolonicsResearch.Fluid.NavierStokesWeightedReconstructionContinuity
 
 /-!
 # The sharp physical second-derivative Duhamel chart

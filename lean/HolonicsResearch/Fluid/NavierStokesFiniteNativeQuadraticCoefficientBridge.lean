@@ -1,6 +1,6 @@
-import Holonics.Fluid.NavierStokesFinitePicardChronology
+import HolonicsResearch.Fluid.NavierStokesFinitePicardChronology
 import HolonicsResearch.Fluid.NavierStokesOpenSharpNonlinearSourceIntegration
-import Holonics.Fluid.NavierStokesWeightedMildCoefficientEquation
+import HolonicsResearch.Fluid.NavierStokesWeightedMildCoefficientEquation
 
 /-!
 # Finite-aperture coefficients meet the native quadratic source
@@ -22,6 +22,7 @@ open scoped BigOperators ENNReal
 namespace Holonics.Fluid.NavierStokesFiniteNativeQuadraticCoefficientBridge
 
 open Holonics.Fluid.NavierStokesDyadicFlowCommutator
+open Holonics.Fluid.NavierStokesFiniteGalerkin
 open Holonics.Fluid.NavierStokesDyadicShellProjectors
 open Holonics.Fluid.NavierStokesFiniteFourierHeat
 open Holonics.Fluid.NavierStokesFinitePicardChronology

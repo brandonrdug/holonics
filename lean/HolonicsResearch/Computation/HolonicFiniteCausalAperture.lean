@@ -1,4 +1,4 @@
-import Holonics.Foundation.CoordinateSubsetReceiver
+import HolonicsResearch.Foundation.CoordinateSubsetReceiver
 import HolonicsResearch.Foundation.OrderedWordChain
 import HolonicsResearch.Computation.Aperture
 import Holonics.Foundation.CompleteReceiverHistory

@@ -1,6 +1,6 @@
 import HolonicsResearch.Fluid.NavierStokesAxisymmetricChart
 import Holonics.Fluid.NavierStokesPeriodicEnergy
-import Holonics.Fluid.NavierStokesPeriodicCubeInterpolation
+import HolonicsResearch.Fluid.NavierStokesPeriodicCubeInterpolation
 
 /-!
 # Quartic pressure currents

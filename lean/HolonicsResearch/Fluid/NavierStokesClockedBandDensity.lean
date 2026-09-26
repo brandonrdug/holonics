@@ -1,5 +1,5 @@
-import Holonics.Fluid.NavierStokesVorticityBandBernsteinAlternative
-import Holonics.Fluid.NavierStokesOpenEnergySpacetime
+import HolonicsResearch.Fluid.NavierStokesVorticityBandBernsteinAlternative
+import HolonicsResearch.Fluid.NavierStokesOpenEnergySpacetime
 
 /-!
 # Clocked mode-density payment for the vorticity low/high alternative

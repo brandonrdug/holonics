@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesDirectionBalancedScale
-import Holonics.Fluid.NavierStokesVorticityDirectionKernelScaleLimit
+import HolonicsResearch.Fluid.NavierStokesVorticityDirectionKernelScaleLimit
 
 /-!
 # The balanced direction current factors the spatial scale receiver

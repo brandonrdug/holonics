@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesClockedExtensionTower
-import Holonics.Fluid.NavierStokesOfficialBridge
+import HolonicsResearch.Fluid.NavierStokesOfficialBridge
 import HolonicsResearch.Fluid.NavierStokesForceObstruction
 
 /-!

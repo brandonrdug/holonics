@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesHighVorticityDirection
-import Holonics.Fluid.NavierStokesVorticityCanonicalModulus
+import HolonicsResearch.Fluid.NavierStokesVorticityCanonicalModulus
 
 /-!
 # Exact threshold balancing for the direction-depleted Hodge current

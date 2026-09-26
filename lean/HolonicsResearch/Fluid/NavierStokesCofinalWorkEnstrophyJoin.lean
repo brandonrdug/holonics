@@ -1,7 +1,7 @@
 import HolonicsResearch.Fluid.NavierStokesAdaptiveMatchedCofinalDiagonal
 import HolonicsResearch.Fluid.NavierStokesCofinalOutputReceiverParsevalJoin
 import HolonicsResearch.Fluid.NavierStokesEnstrophyTerminalCurrent
-import Holonics.Fluid.NavierStokesVorticityDirectionPhysicalBridge
+import HolonicsResearch.Fluid.NavierStokesVorticityDirectionPhysicalBridge
 
 /-!
 # The cofinal linear work as physical stretching with its scale-zero fibre

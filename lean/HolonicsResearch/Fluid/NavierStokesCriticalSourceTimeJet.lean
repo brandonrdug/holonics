@@ -1,7 +1,7 @@
 import HolonicsResearch.Fluid.NavierStokesCriticalTimeReflection
 import HolonicsResearch.Fluid.NavierStokesOpenWeightedPathPassage
-import Holonics.Fluid.NavierStokesWeightedDuhamelDifference
-import Holonics.Fluid.NavierStokesWeightedJointSmoothnessBootstrap
+import HolonicsResearch.Fluid.NavierStokesWeightedDuhamelDifference
+import HolonicsResearch.Fluid.NavierStokesWeightedJointSmoothnessBootstrap
 
 /-!
 # The exact PDE time jet of the critical nonlinear source

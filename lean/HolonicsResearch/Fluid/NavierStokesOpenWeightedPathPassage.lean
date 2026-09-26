@@ -1,6 +1,6 @@
 import HolonicsResearch.Fluid.NavierStokesOpenMildFieldReconstruction
-import Holonics.Fluid.NavierStokesRestartSeam
-import Holonics.Fluid.NavierStokesWeightedClassicalRestartSupply
+import HolonicsResearch.Fluid.NavierStokesRestartSeam
+import HolonicsResearch.Fluid.NavierStokesWeightedClassicalRestartSupply
 
 /-!
 # An actual open solution enters the native weighted path circulation

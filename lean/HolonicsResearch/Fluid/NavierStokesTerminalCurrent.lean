@@ -1,5 +1,5 @@
 import HolonicsResearch.Foundation.HolonicTerminalCurrent
-import Holonics.Fluid.NavierStokesCriticalVorticityRate
+import HolonicsResearch.Fluid.NavierStokesCriticalVorticityRate
 import Mathlib.Topology.Order.Monotone
 
 /-!

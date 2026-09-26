@@ -1,4 +1,4 @@
-import Holonics.Fluid.NavierStokesFiniteTimeEnstrophy
+import HolonicsResearch.Fluid.NavierStokesFiniteTimeEnstrophy
 
 /-!
 # Linear cell receivers for a jointly smooth velocity field

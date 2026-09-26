@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesDirectionBalancedScale
-import Holonics.Fluid.NavierStokesVorticityCanonicalTime
+import HolonicsResearch.Fluid.NavierStokesVorticityCanonicalTime
 
 /-!
 # Time transport of the balanced direction current

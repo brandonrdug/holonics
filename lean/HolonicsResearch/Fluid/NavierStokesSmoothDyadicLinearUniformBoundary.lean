@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesSmoothDyadicLinearScaleBoundary
-import Holonics.Fluid.NavierStokesVorticityDirectionCoherenceSummability
+import HolonicsResearch.Fluid.NavierStokesVorticityDirectionCoherenceSummability
 
 /-!
 # A depth-uniform receiver for the finite linear dyadic boundary

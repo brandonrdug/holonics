@@ -1,5 +1,5 @@
-import Holonics.Fluid.NavierStokesDyadicHodgeKernelVariation
-import Holonics.Fluid.NavierStokesSmoothSharpDyadicShellComparison
+import HolonicsResearch.Fluid.NavierStokesDyadicHodgeKernelVariation
+import HolonicsResearch.Fluid.NavierStokesSmoothSharpDyadicShellComparison
 
 /-!
 # Terminal packing of phase-bearing smooth dyadic vorticity bands

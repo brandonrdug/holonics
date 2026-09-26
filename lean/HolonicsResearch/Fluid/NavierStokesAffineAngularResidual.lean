@@ -1,6 +1,6 @@
 import HolonicsResearch.Fluid.NavierStokesExteriorTorque
 import HolonicsResearch.Fluid.NavierStokesPressureCircle
-import Holonics.Fluid.NavierStokesH3Production
+import HolonicsResearch.Fluid.NavierStokesH3Production
 
 /-!
 # The complete angular residual of an affine viscosity response

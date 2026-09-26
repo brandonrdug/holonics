@@ -1,6 +1,6 @@
 import HolonicsResearch.Fluid.NavierStokesIncoherentSource
 import Mathlib.Analysis.Calculus.IteratedDeriv.Lemmas
-import Holonics.Fluid.NavierStokesOpenAdvectionCarrierIntegration
+import HolonicsResearch.Fluid.NavierStokesOpenAdvectionCarrierIntegration
 
 /-!
 # A source-backed periodic transverse shear

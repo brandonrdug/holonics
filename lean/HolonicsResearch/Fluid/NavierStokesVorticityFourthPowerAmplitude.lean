@@ -1,5 +1,5 @@
-import Holonics.Fluid.NavierStokesDissipationHodgeEnstrophy
-import Holonics.Fluid.NavierStokesOpenEnergySpacetime
+import HolonicsResearch.Fluid.NavierStokesDissipationHodgeEnstrophy
+import HolonicsResearch.Fluid.NavierStokesOpenEnergySpacetime
 
 /-!
 # The fourth-power receiver retains an amplitude direction

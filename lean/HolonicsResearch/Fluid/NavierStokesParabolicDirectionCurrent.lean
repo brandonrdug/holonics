@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesParabolicCriticalCurrent
-import Holonics.Fluid.NavierStokesVorticityDirectionSourceModulus
+import HolonicsResearch.Fluid.NavierStokesVorticityDirectionSourceModulus
 
 /-!
 # The amplitude-normalized vorticity-direction current is subcritical

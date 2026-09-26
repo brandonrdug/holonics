@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesHighFrequencyHeatDecay
-import Holonics.Fluid.NavierStokesOpenFourierMildIdentity
+import HolonicsResearch.Fluid.NavierStokesOpenFourierMildIdentity
 
 /-!
 # Exterior-mode service inequality from the actual mild transport

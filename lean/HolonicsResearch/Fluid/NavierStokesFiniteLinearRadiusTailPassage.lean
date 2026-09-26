@@ -1,7 +1,7 @@
 import HolonicsResearch.Fluid.NavierStokesFiniteLinearSignedWorkTailLedger
 import HolonicsResearch.Fluid.NavierStokesOpenCompactWeightedPath
-import Holonics.Fluid.NavierStokesH3BilinearNorm
-import Holonics.Fluid.NavierStokesH3LerayBilinearNorm
+import HolonicsResearch.Fluid.NavierStokesH3BilinearNorm
+import HolonicsResearch.Fluid.NavierStokesH3LerayBilinearNorm
 
 /-!
 # Compact interaction-radius passage for the finite linear work
@@ -26,6 +26,7 @@ namespace Holonics.Fluid.NavierStokesFiniteLinearRadiusTailPassage
 
 open Holonics.Fluid.NavierStokes
 open Holonics.Fluid.NavierStokesDyadicFlowCommutator
+open Holonics.Fluid.NavierStokesFiniteGalerkin
 open Holonics.Fluid.NavierStokesDyadicShellProjectors
 open Holonics.Fluid.NavierStokesDyadicVorticityFluxConvolutionBridge
 open Holonics.Fluid.NavierStokesFiniteLinearSignedWorkTailLedger

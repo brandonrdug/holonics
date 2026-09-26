@@ -25,6 +25,7 @@ namespace Holonics.Fluid.NavierStokesPhysicalH2ClockedQuarticFullOrbitWitness
 open Holonics.Fluid.NavierStokes
 open Holonics.Fluid.NavierStokesCompleteTransportCofinalCancellation
 open Holonics.Fluid.NavierStokesDyadicFlowCommutator
+open Holonics.Fluid.NavierStokesFiniteGalerkin
 open Holonics.Fluid.NavierStokesFourierTriads
 open Holonics.Fluid.NavierStokesMildFourierNonlinearity
 open Holonics.Fluid.NavierStokesPhysicalFourierH2ProductionBridge

@@ -1,4 +1,4 @@
-import Holonics.Fluid.NavierStokesOverlapUniqueness
+import HolonicsResearch.Fluid.NavierStokesOverlapUniqueness
 import Holonics.Fluid.NavierStokesPeriodicEnstrophy
 import Holonics.Fluid.NavierStokesTorusVorticity
 

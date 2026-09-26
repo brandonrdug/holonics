@@ -1,6 +1,6 @@
 import HolonicsResearch.Fluid.NavierStokesAdaptiveRectangleH3Service
 import HolonicsResearch.Fluid.NavierStokesOpenH2EnergyH3Dissipation
-import Holonics.Fluid.NavierStokesTranslationDissipation
+import HolonicsResearch.Fluid.NavierStokesTranslationDissipation
 
 /-!
 # The native weighted H3 current in the coordinate H2--H3 energy chart

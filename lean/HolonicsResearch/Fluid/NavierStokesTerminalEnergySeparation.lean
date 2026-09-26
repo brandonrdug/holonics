@@ -1,4 +1,4 @@
-import Holonics.Fluid.NavierStokesWeightedSobolevHilbert
+import HolonicsResearch.Fluid.NavierStokesWeightedSobolevHilbert
 import Mathlib.Analysis.Real.Pi.Bounds
 
 /-!

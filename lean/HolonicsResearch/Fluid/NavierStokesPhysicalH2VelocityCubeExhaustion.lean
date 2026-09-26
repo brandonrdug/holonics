@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesCofinalOutputReceiverParsevalJoin
-import Holonics.Fluid.NavierStokesOpenFourierSpatialSymbols
+import HolonicsResearch.Fluid.NavierStokesOpenFourierSpatialSymbols
 import HolonicsResearch.Fluid.NavierStokesPhysicalH2VelocityCurrentJoin
 import HolonicsResearch.Fluid.NavierStokesPhysicalH2VelocityTriadJoin
 
@@ -32,6 +32,7 @@ open Holonics.Fluid.NavierStokesCompleteTransportCofinalCancellation
 open Holonics.Fluid.NavierStokesCompleteTransportReceiverWorkJoin
 open Holonics.Fluid.NavierStokesDyadicShellProjectors
 open Holonics.Fluid.NavierStokesDyadicFlowCommutator
+open Holonics.Fluid.NavierStokesFiniteGalerkin
 open Holonics.Fluid.NavierStokesDyadicVorticityFluxConvolutionBridge
 open Holonics.Fluid.NavierStokesFiniteFourierHeat
 open Holonics.Fluid.NavierStokesFourierTriads

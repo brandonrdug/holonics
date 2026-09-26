@@ -1,5 +1,5 @@
 import Holonics.Transport.ChangingReceiver
-import Holonics.Fluid.NavierStokesFiniteGalerkinLocalPicard
+import Holonics.Fluid.NavierStokesFiniteGalerkin
 
 /-!
 # Finite Galerkin fluid receiver closure
@@ -21,7 +21,7 @@ open Holonics
 open Holonics.Transport.ChangingReceiver
 open Holonics.Fluid.NavierStokes
 open Holonics.Fluid.NavierStokesFiniteFourierHeat
-open Holonics.Fluid.NavierStokesFiniteGalerkinLocalPicard
+open Holonics.Fluid.NavierStokesFiniteGalerkin
 open Holonics.Fluid.NavierStokesTorusFourier
 
 namespace Holonics.Physics.FluidReceiverClosure

@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesOpenEnstrophy
-import Holonics.Fluid.NavierStokesVorticityThreeStrands
+import HolonicsResearch.Fluid.NavierStokesVorticityThreeStrands
 
 /-!
 # Future-force obstruction to open-lifespan continuation

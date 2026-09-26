@@ -97,7 +97,7 @@ a concrete receiver-relative version of a small catalyst making a dependency vis
 not whether its implementation happens to contain addition or exponentiation instructions.
 
 [established-bounded; process-audit] The focused
-`lake env lean ElementaryHolonics/Computation/NavigatorObservationScope.lean` check passes.
+`lake env lean ElementaryHolonics/Computation/GeneratorObservationScope.lean` check passes.
 No native inference/cultivation code changed. The new formal module and the existing future
 receiver laws provide study constraints; no learned semantic classes, error-free intelligence,
 physical force identification or computational complexity bound is claimed.

@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesTransportedPantographicSwingChain
-import Holonics.Fluid.NavierStokesDyadicShellProjectors
+import HolonicsResearch.Fluid.NavierStokesDyadicShellProjectors
 
 /-!
 # Phase-bearing torus bands of the transported pantographic source swing

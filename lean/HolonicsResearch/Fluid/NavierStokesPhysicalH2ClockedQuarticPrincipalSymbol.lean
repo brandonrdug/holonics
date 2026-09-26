@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesPhysicalH2ClockedQuarticInteractionPullback
-import Holonics.Fluid.NavierStokesWeightedReality
+import HolonicsResearch.Fluid.NavierStokesWeightedReality
 
 /-!
 # Principal symbol of one clocked physical-H2 quartic occurrence
@@ -30,6 +30,7 @@ namespace Holonics.Fluid.NavierStokesPhysicalH2ClockedQuarticPrincipalSymbol
 open Holonics.Fluid.NavierStokes
 open Holonics.Fluid.NavierStokesCompleteTransportCofinalCancellation
 open Holonics.Fluid.NavierStokesDyadicFlowCommutator
+open Holonics.Fluid.NavierStokesFiniteGalerkin
 open Holonics.Fluid.NavierStokesFourierTriads
 open Holonics.Fluid.NavierStokesH2TriadMultiplierSwing
 open Holonics.Fluid.NavierStokesMildFourierNonlinearity

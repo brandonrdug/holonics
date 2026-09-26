@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesOpenWeightedPathPassage
-import Holonics.Fluid.NavierStokesQuadraticH3Energy
+import HolonicsResearch.Fluid.NavierStokesQuadraticH3Energy
 
 /-!
 # The actual weighted H³ path on an arbitrary compact interior interval

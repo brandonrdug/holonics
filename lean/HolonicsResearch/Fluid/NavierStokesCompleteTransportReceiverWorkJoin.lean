@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesCompleteTransportCofinalCancellation
-import Holonics.Fluid.NavierStokesWeightedReality
+import HolonicsResearch.Fluid.NavierStokesWeightedReality
 
 /-!
 # Complete transport contribution at the symmetric receiver work chart
@@ -26,6 +26,7 @@ open Holonics.Fluid.NavierStokes
 open Holonics.Fluid.NavierStokesCompleteTransportCofinalCancellation
 open Holonics.Fluid.NavierStokesDeLaValleePoussin
 open Holonics.Fluid.NavierStokesDyadicFlowCommutator
+open Holonics.Fluid.NavierStokesFiniteGalerkin
 open Holonics.Fluid.NavierStokesDyadicHodgeScaleChain
 open Holonics.Fluid.NavierStokesDyadicShellProjectors
 open Holonics.Fluid.NavierStokesFiniteLinearWorkDecomposition

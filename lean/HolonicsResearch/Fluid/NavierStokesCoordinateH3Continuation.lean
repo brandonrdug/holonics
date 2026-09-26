@@ -1,5 +1,5 @@
-import Holonics.Fluid.NavierStokesCoordinateH3FullEstimate
-import Holonics.Fluid.NavierStokesCriticalVorticityIntegral
+import HolonicsResearch.Fluid.NavierStokesCoordinateH3FullEstimate
+import HolonicsResearch.Fluid.NavierStokesCriticalVorticityIntegral
 
 /-!
 # Finite critical-vorticity continuation through the differentiated coordinate H³ receiver

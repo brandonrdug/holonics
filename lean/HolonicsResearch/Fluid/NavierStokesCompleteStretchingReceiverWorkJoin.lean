@@ -27,6 +27,7 @@ open Holonics.Fluid.NavierStokesCompleteTransportCofinalCancellation
 open Holonics.Fluid.NavierStokesCofinalOutputReceiverClosure
 open Holonics.Fluid.NavierStokesCompleteTransportReceiverWorkJoin
 open Holonics.Fluid.NavierStokesDyadicFlowCommutator
+open Holonics.Fluid.NavierStokesFiniteGalerkin
 open Holonics.Fluid.NavierStokesFiniteLinearWorkDecomposition
 open Holonics.Fluid.NavierStokesFourierTriads
 open Holonics.Fluid.NavierStokesOpenFourierMildIdentity

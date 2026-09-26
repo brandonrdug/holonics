@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesSharpHeatDerivativeReconstruction
-import Holonics.Fluid.NavierStokesWeightedLerayBilinear
+import HolonicsResearch.Fluid.NavierStokesWeightedLerayBilinear
 
 /-!
 # The nonlinear source for the sharp second-derivative heat edge

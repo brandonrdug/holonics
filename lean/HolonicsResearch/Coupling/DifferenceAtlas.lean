@@ -2,7 +2,7 @@ import Holonics.Foundation.MeasuredDifferenceReceiver
 import HolonicsResearch.EllipticCurve.BirchSwinnertonDyer
 import HolonicsResearch.Hodge.HodgeConjecture
 import HolonicsResearch.Gauge.MassGap
-import Holonics.Fluid.NavierStokesDyadicHodgeHaarReceiver
+import HolonicsResearch.Fluid.NavierStokesDyadicHodgeHaarReceiver
 import HolonicsResearch.Zeta.Seam
 
 /-!

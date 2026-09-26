@@ -1,8 +1,8 @@
 import HolonicsResearch.Fluid.NavierStokesFrequencyReach
 import HolonicsResearch.Fluid.NavierStokesTailRelevance
-import Holonics.Fluid.NavierStokesOpenAdvectionConvolutionBridge
-import Holonics.Fluid.NavierStokesOpenAdvectionCarrierIntegration
-import Holonics.Fluid.NavierStokesOpenFourierMildIdentity
+import HolonicsResearch.Fluid.NavierStokesOpenAdvectionConvolutionBridge
+import HolonicsResearch.Fluid.NavierStokesOpenAdvectionCarrierIntegration
+import HolonicsResearch.Fluid.NavierStokesOpenFourierMildIdentity
 import HolonicsResearch.Fluid.NavierStokesH2VorticityShellDissipationBridge
 
 /-!

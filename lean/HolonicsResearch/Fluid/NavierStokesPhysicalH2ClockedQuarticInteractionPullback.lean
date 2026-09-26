@@ -29,6 +29,7 @@ namespace Holonics.Fluid.NavierStokesPhysicalH2ClockedQuarticInteractionPullback
 open Holonics.Fluid.NavierStokes
 open Holonics.Fluid.NavierStokesCompleteTransportCofinalCancellation
 open Holonics.Fluid.NavierStokesDyadicFlowCommutator
+open Holonics.Fluid.NavierStokesFiniteGalerkin
 open Holonics.Fluid.NavierStokesDyadicShellProjectors
 open Holonics.Fluid.NavierStokesFourierTriads
 open Holonics.Fluid.NavierStokesMildFourierNonlinearity

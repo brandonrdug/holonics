@@ -1,7 +1,7 @@
 import HolonicsResearch.Fluid.NavierStokesCompleteLinearWorkCofinalLimit
 import HolonicsResearch.Fluid.NavierStokesFiniteLinearRadiusTailPassage
 import HolonicsResearch.Fluid.NavierStokesSharpNonlinearSource
-import Holonics.Fluid.NavierStokesWeightedHigherOrderTame
+import HolonicsResearch.Fluid.NavierStokesWeightedHigherOrderTame
 
 /-!
 # Compact-time strong cofinal passage for the actual linear multiplier work

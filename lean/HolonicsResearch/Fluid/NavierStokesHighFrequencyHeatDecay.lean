@@ -1,4 +1,4 @@
-import Holonics.Fluid.NavierStokesCoordinateJacobianTailDecay
+import HolonicsResearch.Fluid.NavierStokesCoordinateJacobianTailDecay
 import Holonics.Fluid.NavierStokesFiniteFourierHeat
 
 /-!

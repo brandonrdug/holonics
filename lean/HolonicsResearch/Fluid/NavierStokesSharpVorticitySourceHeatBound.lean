@@ -1,6 +1,6 @@
 import HolonicsResearch.Fluid.NavierStokesSharpNonlinearSource
 import HolonicsResearch.Fluid.NavierStokesOpenFourierExteriorMildBound
-import Holonics.Fluid.NavierStokesVorticityDirectionCoherenceSummability
+import HolonicsResearch.Fluid.NavierStokesVorticityDirectionCoherenceSummability
 
 /-!
 # Sharp positive-time heat control of the nonlinear vorticity source

@@ -70,6 +70,14 @@ changing constitutive geometry, receiver scales and retained feedback in one dif
 [`Physics/ConstitutiveModulation`](Holonics/Physics/ConstitutiveModulation.lean) connects
 changing conformation and internal current to the complete coupled response.
 
+[definition] A module belongs to `Holonics` when a framework owner consumes it. In `Fluid/` that
+is the finite Galerkin carrier the fluid receiver instance reads
+(`Fluid/NavierStokesFiniteGalerkin`), the torus Fourier and heat charts it is built on, the
+material polygon, the curved transport and the Einstein fluid dynamics; the rest of the
+Navier–Stokes target chain (the Picard, dyadic, weighted, terminal and official passages) is in
+`HolonicsResearch/Fluid`, beside the coordinate Haar/subset receivers and higher-difference
+descents it alone consumes.
+
 ## Targets and proof scope
 
 [definition] `lake build HolonicsResearch` builds every module under `HolonicsResearch/` (the

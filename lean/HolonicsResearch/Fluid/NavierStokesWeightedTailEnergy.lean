@@ -1,7 +1,7 @@
 import HolonicsResearch.Fluid.NavierStokesModeLagrange
 import HolonicsResearch.Fluid.NavierStokesHalfRadiusReach
 import HolonicsResearch.Fluid.NavierStokesTailBoundedControl
-import Holonics.Fluid.NavierStokesDyadicVorticityFluxConvolutionBridge
+import HolonicsResearch.Fluid.NavierStokesDyadicVorticityFluxConvolutionBridge
 
 /-!
 # The periodic official alternative follows from a bounded fourth-moment tail energy

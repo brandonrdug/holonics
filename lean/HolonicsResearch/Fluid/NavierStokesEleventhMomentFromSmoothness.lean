@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesVelocityMassEnergy
-import Holonics.Fluid.NavierStokesSmoothSliceWeightedAllOrders
+import HolonicsResearch.Fluid.NavierStokesSmoothSliceWeightedAllOrders
 
 /-!
 # The eleventh moment is finite at every time, from smoothness alone

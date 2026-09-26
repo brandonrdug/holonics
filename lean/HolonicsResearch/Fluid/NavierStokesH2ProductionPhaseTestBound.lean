@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesPhaseCurrentH2ProductionJoin
-import Holonics.Fluid.NavierStokesCoordinateLowerEnergyEstimate
+import HolonicsResearch.Fluid.NavierStokesCoordinateLowerEnergyEstimate
 import HolonicsResearch.Fluid.NavierStokesWeightedH3CoordinateDissipationBridge
 
 /-!

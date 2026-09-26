@@ -1,6 +1,6 @@
 import HolonicsResearch.Fluid.NavierStokesPressureEvolution
-import Holonics.Fluid.NavierStokesWeightedPressureSmoothTower
-import Holonics.Fluid.NavierStokesWeightedReconstructionContinuity
+import HolonicsResearch.Fluid.NavierStokesWeightedPressureSmoothTower
+import HolonicsResearch.Fluid.NavierStokesWeightedReconstructionContinuity
 
 /-!
 # Bounded pressure-jet receivers carry the actual time source

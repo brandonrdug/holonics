@@ -1,4 +1,4 @@
-import Holonics.Fluid.NavierStokesWeightedJointSmoothnessScale
+import HolonicsResearch.Fluid.NavierStokesWeightedJointSmoothnessScale
 
 /-!
 # Second time jet of the native projected velocity field

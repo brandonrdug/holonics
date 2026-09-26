@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesSwirlCirculation
-import Holonics.Fluid.NavierStokesScalarHeatVolterra
+import HolonicsResearch.Fluid.NavierStokesScalarHeatVolterra
 import Mathlib.Analysis.Calculus.MeanValue
 import Mathlib.Analysis.Normed.Group.Bounded
 

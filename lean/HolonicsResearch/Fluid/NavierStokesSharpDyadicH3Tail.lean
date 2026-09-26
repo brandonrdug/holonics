@@ -1,4 +1,4 @@
-import Holonics.Fluid.NavierStokesVorticityBandBernsteinAlternative
+import HolonicsResearch.Fluid.NavierStokesVorticityBandBernsteinAlternative
 
 /-!
 # Sharp dyadic `H³` derivative tails on the periodic frequency lattice

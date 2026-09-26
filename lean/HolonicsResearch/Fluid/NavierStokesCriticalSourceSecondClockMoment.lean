@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesCriticalSourceClockMoment
-import Holonics.Fluid.NavierStokesWeightedJointSmoothnessScale
+import HolonicsResearch.Fluid.NavierStokesWeightedJointSmoothnessScale
 
 /-!
 # Second clock moment of the native sharp source

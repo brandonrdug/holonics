@@ -1,6 +1,6 @@
 import HolonicsResearch.Fluid.NavierStokesDyadicHodgeBandPositivity
 import HolonicsResearch.Fluid.NavierStokesSmoothDyadicBandIntegratedBalance
-import Holonics.Fluid.NavierStokesSmoothDyadicTriadFluxCancellation
+import HolonicsResearch.Fluid.NavierStokesSmoothDyadicTriadFluxCancellation
 
 /-!
 # Linear-multiplier smooth dyadic phase bands

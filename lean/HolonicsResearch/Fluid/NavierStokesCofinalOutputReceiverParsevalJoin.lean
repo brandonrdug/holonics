@@ -31,6 +31,7 @@ open Holonics.Fluid.NavierStokesCompleteTransportReceiverWorkJoin
 open Holonics.Fluid.NavierStokesCompleteStretchingReceiverWorkJoin
 open Holonics.Fluid.NavierStokesDeLaValleePoussin
 open Holonics.Fluid.NavierStokesDyadicFlowCommutator
+open Holonics.Fluid.NavierStokesFiniteGalerkin
 open Holonics.Fluid.NavierStokesDyadicHodgeScaleChain
 open Holonics.Fluid.NavierStokesDyadicShellProjectors
 open Holonics.Fluid.NavierStokesDyadicVorticityFluxConvolutionBridge

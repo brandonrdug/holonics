@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesDirectionThresholdBalance
-import Holonics.Fluid.NavierStokesVorticityDirectionKernelMomentDecay
+import HolonicsResearch.Fluid.NavierStokesVorticityDirectionKernelMomentDecay
 
 /-!
 # The balanced direction current is summable across Hodge scales
@@ -38,7 +38,7 @@ open Holonics.Fluid.NavierStokesVorticityCanonicalModulus
 
 private theorem kernel_threshold_circle_volume_eq :
     @volume UnitAddCircle
-        Holonics.Fluid.NavierStokesVorticityDirectionKernelMoment.instMeasureSpaceUnitAddCircle_holonics =
+        Holonics.Fluid.NavierStokesVorticityDirectionKernelMoment.instMeasureSpaceUnitAddCircle_holonicsResearch =
       @volume UnitAddCircle
         Holonics.Fluid.NavierStokesDirectionThresholdBalance.instMeasureSpaceUnitAddCircle_holonicsResearch := by
   rfl
@@ -47,7 +47,7 @@ private theorem kernel_threshold_torus_volume_eq :
     @volume SpatialTorus
         (@MeasureSpace.pi (Fin 3) (Fin.fintype 3) (fun _ ↦ UnitAddCircle)
           (fun _ ↦
-            Holonics.Fluid.NavierStokesVorticityDirectionKernelMoment.instMeasureSpaceUnitAddCircle_holonics)) =
+            Holonics.Fluid.NavierStokesVorticityDirectionKernelMoment.instMeasureSpaceUnitAddCircle_holonicsResearch)) =
       @volume SpatialTorus
         (@MeasureSpace.pi (Fin 3) (Fin.fintype 3) (fun _ ↦ UnitAddCircle)
           (fun _ ↦
@@ -55,7 +55,7 @@ private theorem kernel_threshold_torus_volume_eq :
   rfl
 
 local instance : MeasureSpace UnitAddCircle :=
-  Holonics.Fluid.NavierStokesVorticityDirectionKernelMoment.instMeasureSpaceUnitAddCircle_holonics
+  Holonics.Fluid.NavierStokesVorticityDirectionKernelMoment.instMeasureSpaceUnitAddCircle_holonicsResearch
 local instance : Measure.IsAddHaarMeasure (volume : Measure UnitAddCircle) :=
   inferInstanceAs (Measure.IsAddHaarMeasure AddCircle.haarAddCircle)
 local instance : IsProbabilityMeasure (volume : Measure UnitAddCircle) :=

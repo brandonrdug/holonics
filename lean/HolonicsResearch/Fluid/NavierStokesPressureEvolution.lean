@@ -1,4 +1,4 @@
-import Holonics.Fluid.NavierStokesWeightedPressureTimeSmoothness
+import HolonicsResearch.Fluid.NavierStokesWeightedPressureTimeSmoothness
 
 /-!
 # Time evolution of scale-indexed native pressure

@@ -1,5 +1,5 @@
 import Holonics.Fluid.NavierStokesFourierTriads
-import Holonics.Fluid.NavierStokesDyadicShellProjectors
+import HolonicsResearch.Fluid.NavierStokesDyadicShellProjectors
 
 /-!
 # The periplus: relevance reaches the tail only shell by shell

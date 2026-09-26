@@ -1,6 +1,6 @@
 import HolonicsResearch.Fluid.NavierStokesCalibratedTriadicFaceBound
 import HolonicsResearch.Fluid.NavierStokesPhysicalH2ClockedQuarticInteractionPullback
-import Holonics.Fluid.NavierStokesWeightedSmoothPathTower
+import HolonicsResearch.Fluid.NavierStokesWeightedSmoothPathTower
 
 /-!
 # A time-independent complete-address envelope for the quartic source insertion

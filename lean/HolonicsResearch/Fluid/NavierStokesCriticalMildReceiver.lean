@@ -1,6 +1,6 @@
 import HolonicsResearch.Fluid.NavierStokesOpenSharpNonlinearSourceIntegration
 import HolonicsResearch.Fluid.NavierStokesSharpVorticitySourceHeatBound
-import Holonics.Fluid.NavierStokesVorticityDirectionCoherenceSummability
+import HolonicsResearch.Fluid.NavierStokesVorticityDirectionCoherenceSummability
 
 /-!
 # The critical vorticity receiver carried by the actual clocked mild passage

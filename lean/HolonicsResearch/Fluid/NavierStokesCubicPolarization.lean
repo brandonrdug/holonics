@@ -1,4 +1,4 @@
-import Holonics.Fluid.NavierStokesQuadraticH3Energy
+import HolonicsResearch.Fluid.NavierStokesQuadraticH3Energy
 import Mathlib.Analysis.Normed.Module.Multilinear.Curry
 
 /-!

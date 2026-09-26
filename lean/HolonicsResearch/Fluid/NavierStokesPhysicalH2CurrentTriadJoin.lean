@@ -30,6 +30,7 @@ open Holonics.Fluid.NavierStokesCompleteStretchingReceiverWorkJoin
 open Holonics.Fluid.NavierStokesCompleteTransportCofinalCancellation
 open Holonics.Fluid.NavierStokesCompleteTransportReceiverWorkJoin
 open Holonics.Fluid.NavierStokesDyadicFlowCommutator
+open Holonics.Fluid.NavierStokesFiniteGalerkin
 open Holonics.Fluid.NavierStokesDyadicShellProjectors
 open Holonics.Fluid.NavierStokesDyadicVorticityFluxConvolutionBridge
 open Holonics.Fluid.NavierStokesFiniteFourierHeat

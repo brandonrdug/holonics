@@ -1,7 +1,7 @@
-import Holonics.Fluid.NavierStokesOpenFourierMildIdentity
+import HolonicsResearch.Fluid.NavierStokesOpenFourierMildIdentity
 import HolonicsResearch.Fluid.NavierStokesOpenSharpNonlinearSourceIntegration
 import HolonicsResearch.Fluid.NavierStokesSharpDuhamelDerivativeInterchange
-import Holonics.Fluid.NavierStokesWeightedClassicalRestartCarrier
+import HolonicsResearch.Fluid.NavierStokesWeightedClassicalRestartCarrier
 
 /-!
 # The open mild coefficient population reconstructs one spatial field

@@ -1,6 +1,6 @@
 import HolonicsResearch.Fluid.NavierStokesDyadicSpectralClockService
-import Holonics.Fluid.NavierStokesDyadicVorticityFluxReceiver
-import Holonics.Fluid.NavierStokesOpenFourierMildIdentity
+import HolonicsResearch.Fluid.NavierStokesDyadicVorticityFluxReceiver
+import HolonicsResearch.Fluid.NavierStokesOpenFourierMildIdentity
 
 /-!
 # Projected dyadic vorticity evolution and dissipative shell service
@@ -32,6 +32,7 @@ namespace Holonics.Fluid.NavierStokesProjectedDyadicShellEvolution
 
 open Holonics.Fluid.NavierStokes
 open Holonics.Fluid.NavierStokesDyadicFlowCommutator
+open Holonics.Fluid.NavierStokesFiniteGalerkin
 open Holonics.Fluid.NavierStokesDyadicHodgeScaleChain
 open Holonics.Fluid.NavierStokesDyadicShellProjectors
 open Holonics.Fluid.NavierStokesDyadicSpectralClockService

@@ -1,6 +1,6 @@
 import HolonicsResearch.Foundation.HolonicTerminalCurrent
 import Holonics.Fluid.NavierStokesOpenLifespan
-import Holonics.Fluid.NavierStokesVorticityThreeStrands
+import HolonicsResearch.Fluid.NavierStokesVorticityThreeStrands
 import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
 
 /-!

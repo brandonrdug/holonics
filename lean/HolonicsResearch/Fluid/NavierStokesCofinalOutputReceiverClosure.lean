@@ -29,6 +29,7 @@ open Holonics.Fluid.NavierStokesCompleteTransportCofinalCancellation
 open Holonics.Fluid.NavierStokesCoordinateH1Production
 open Holonics.Fluid.NavierStokesDeLaValleePoussin
 open Holonics.Fluid.NavierStokesDyadicFlowCommutator
+open Holonics.Fluid.NavierStokesFiniteGalerkin
 open Holonics.Fluid.NavierStokesDyadicHodgeScaleChain
 open Holonics.Fluid.NavierStokesDyadicShellProjectors
 open Holonics.Fluid.NavierStokesDyadicVorticityFluxConvolutionBridge

@@ -1,5 +1,5 @@
-import Holonics.Fluid.NavierStokesAnnularHodgeCoefficientVariation
-import Holonics.Fluid.NavierStokesDyadicHodgeScaleChain
+import HolonicsResearch.Fluid.NavierStokesAnnularHodgeCoefficientVariation
+import HolonicsResearch.Fluid.NavierStokesDyadicHodgeScaleChain
 
 /-!
 # Positivity of the direct dyadic Hodge multiplier

@@ -1,6 +1,6 @@
 import HolonicsResearch.Fluid.NavierStokesSmoothDyadicLinearScaleBoundary
 import HolonicsResearch.Fluid.NavierStokesPairCompatibleApertureConvergence
-import Holonics.Fluid.NavierStokesVorticityDirectionKernelCancellation
+import HolonicsResearch.Fluid.NavierStokesVorticityDirectionKernelCancellation
 
 /-!
 # Finite linear work: phase-first transport and stretching decomposition
@@ -28,6 +28,7 @@ namespace Holonics.Fluid.NavierStokesFiniteLinearWorkDecomposition
 open Holonics.Fluid.NavierStokes
 open Holonics.Fluid.NavierStokesDeLaValleePoussin
 open Holonics.Fluid.NavierStokesDyadicFlowCommutator
+open Holonics.Fluid.NavierStokesFiniteGalerkin
 open Holonics.Fluid.NavierStokesDyadicHodgeScaleChain
 open Holonics.Fluid.NavierStokesDyadicVorticityFluxConvolutionBridge
 open Holonics.Fluid.NavierStokesOpenFourierMildIdentity

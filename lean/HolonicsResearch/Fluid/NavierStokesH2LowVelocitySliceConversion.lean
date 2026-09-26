@@ -1,7 +1,7 @@
 import HolonicsResearch.Fluid.NavierStokesH2AdvectingLowGradeFaceMass
 import HolonicsResearch.Fluid.NavierStokesSharpDyadicH3Tail
 import HolonicsResearch.Fluid.NavierStokesOpenSharpNonlinearSourceIntegration
-import Holonics.Fluid.NavierStokesDyadicVorticityFluxConvolutionBridge
+import HolonicsResearch.Fluid.NavierStokesDyadicVorticityFluxConvolutionBridge
 
 /-!
 # The actual low-velocity slice in the physical H2 current

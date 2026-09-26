@@ -2,7 +2,7 @@ import HolonicsResearch.Fluid.NavierStokesCrossCurrentCalculus
 import Holonics.Fluid.NavierStokesOpenLifespan
 import HolonicsResearch.Fluid.NavierStokesLocalEnergyFlux
 import HolonicsResearch.Fluid.NavierStokesCellCurrentLaw
-import Holonics.Fluid.NavierStokesPeriodicCubeInterpolation
+import HolonicsResearch.Fluid.NavierStokesPeriodicCubeInterpolation
 
 open Holonics.Physics
 

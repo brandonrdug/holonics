@@ -13,10 +13,8 @@ noncomputable section
 
 open Holonics
 open Holonics.Fluid.NavierStokesFiniteFourierHeat
-open Holonics.Fluid.NavierStokesFiniteGalerkinLocalPicard
-open Holonics.Fluid.NavierStokesFinitePicardChronology
+open Holonics.Fluid.NavierStokesFiniteGalerkin
 open Holonics.Fluid.NavierStokesTorusFourier
-open Holonics.Fluid.NavierStokesDyadicFlowCommutator
 open Holonics.Fluid.NavierStokesFourierTriads
 open Holonics.Fluid.NavierStokesMildFourierNonlinearity
 open Holonics.Physics.FluidReceiverClosure

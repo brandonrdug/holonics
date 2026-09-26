@@ -1,4 +1,4 @@
-import Holonics.Fluid.NavierStokesDyadicVorticityFluxConvolutionBridge
+import HolonicsResearch.Fluid.NavierStokesDyadicVorticityFluxConvolutionBridge
 import HolonicsResearch.Fluid.NavierStokesProjectedDyadicShellEvolution
 
 /-!
@@ -27,6 +27,7 @@ namespace Holonics.Fluid.NavierStokesPairCompatibleApertureConvergence
 
 open Holonics.Fluid.NavierStokes
 open Holonics.Fluid.NavierStokesDyadicFlowCommutator
+open Holonics.Fluid.NavierStokesFiniteGalerkin
 open Holonics.Fluid.NavierStokesDyadicHodgeScaleChain
 open Holonics.Fluid.NavierStokesDyadicShellProjectors
 open Holonics.Fluid.NavierStokesDyadicVorticityFluxConvolutionBridge

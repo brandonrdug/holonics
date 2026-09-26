@@ -1,4 +1,4 @@
-import Holonics.Fluid.NavierStokesPhaseLocalDyadicTerminalBridge
+import HolonicsResearch.Fluid.NavierStokesPhaseLocalDyadicTerminalBridge
 import HolonicsResearch.Fluid.NavierStokesTransportedPantographicSwingBand
 
 /-!

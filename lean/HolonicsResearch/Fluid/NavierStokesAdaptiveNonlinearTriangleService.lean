@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesAdaptiveOffDiagonalMildHeatTransport
-import Holonics.Fluid.NavierStokesVorticityDirectionProjection
+import HolonicsResearch.Fluid.NavierStokesVorticityDirectionProjection
 
 /-!
 # Adaptive nonlinear triangle service by the reciprocal shell clock

@@ -1,7 +1,7 @@
 import HolonicsResearch.Fluid.NavierStokesFiniteNativeQuadraticCoefficientBridge
-import Holonics.Fluid.NavierStokesWeightedMildInvariantRestart
+import HolonicsResearch.Fluid.NavierStokesWeightedMildInvariantRestart
 import Mathlib.MeasureTheory.Integral.DominatedConvergence
-import Holonics.Fluid.NavierStokesFinitePicardVolterraMass
+import HolonicsResearch.Fluid.NavierStokesFinitePicardVolterraMass
 
 /-!
 # Finite Picard chronology as native continuous weighted paths
@@ -27,6 +27,7 @@ namespace Holonics.Fluid.NavierStokesFinitePicardNativePathJoin
 open Holonics.Fluid.NavierStokesFiniteFourierHeat
 open Holonics.Fluid.NavierStokesFiniteNativeQuadraticCoefficientBridge
 open Holonics.Fluid.NavierStokesFinitePicardChronology
+open Holonics.Fluid.NavierStokesFiniteGalerkin
 open Holonics.Fluid.NavierStokesFiniteScaleAncestry
 open Holonics.Fluid.NavierStokesDyadicFlowCommutator
 open Holonics.Fluid.NavierStokesDyadicShellProjectors

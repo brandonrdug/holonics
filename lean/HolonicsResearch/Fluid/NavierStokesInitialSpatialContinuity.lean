@@ -1,5 +1,5 @@
-import Holonics.Fluid.NavierStokesOpenAdvectionConvolutionBridge
-import Holonics.Fluid.NavierStokesTerminalFourier
+import HolonicsResearch.Fluid.NavierStokesOpenAdvectionConvolutionBridge
+import HolonicsResearch.Fluid.NavierStokesTerminalFourier
 import Mathlib.Topology.Order.IsLocallyClosed
 
 /-!

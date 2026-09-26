@@ -1,6 +1,6 @@
 import HolonicsResearch.Fluid.NavierStokesPhaseCurrentH2ProductionJoin
 import HolonicsResearch.Fluid.NavierStokesCofinalOutputReceiverParsevalJoin
-import Holonics.Fluid.NavierStokesSmoothSliceWeightedH3
+import HolonicsResearch.Fluid.NavierStokesSmoothSliceWeightedH3
 
 /-!
 # The physical/Fourier H2 production bridge

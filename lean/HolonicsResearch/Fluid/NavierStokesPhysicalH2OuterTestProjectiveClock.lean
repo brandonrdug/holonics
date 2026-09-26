@@ -30,6 +30,7 @@ namespace Holonics.Fluid.NavierStokesPhysicalH2OuterTestProjectiveClock
 open Holonics.Fluid.NavierStokes
 open Holonics.Fluid.NavierStokesCompleteTransportCofinalCancellation
 open Holonics.Fluid.NavierStokesDyadicFlowCommutator
+open Holonics.Fluid.NavierStokesFiniteGalerkin
 open Holonics.Fluid.NavierStokesFiniteFourierHeat
 open Holonics.Fluid.NavierStokesFourierTriads
 open Holonics.Fluid.NavierStokesOpenLifespan

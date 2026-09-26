@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesCubicPolarization
-import Holonics.Fluid.NavierStokesCoordinateH1Production
+import HolonicsResearch.Fluid.NavierStokesCoordinateH1Production
 
 /-!
 # The mixed third-order Navier--Stokes production face

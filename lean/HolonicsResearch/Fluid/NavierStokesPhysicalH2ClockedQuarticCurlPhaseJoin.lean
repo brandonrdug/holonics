@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesPhysicalH2ClockedQuarticInteractionPullback
-import Holonics.Fluid.NavierStokesVorticityDirectionProjection
+import HolonicsResearch.Fluid.NavierStokesVorticityDirectionProjection
 
 /-!
 # Curl-phase join for the clocked physical-H2 quartic pullback
@@ -28,6 +28,7 @@ namespace Holonics.Fluid.NavierStokesPhysicalH2ClockedQuarticCurlPhaseJoin
 open Holonics.Fluid.NavierStokes
 open Holonics.Fluid.NavierStokesCompleteTransportCofinalCancellation
 open Holonics.Fluid.NavierStokesDyadicFlowCommutator
+open Holonics.Fluid.NavierStokesFiniteGalerkin
 open Holonics.Fluid.NavierStokesFourierTriads
 open Holonics.Fluid.NavierStokesMildFourierNonlinearity
 open Holonics.Fluid.NavierStokesPairCompatibleApertureConvergence

@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesFrozenSharpSourceBoundary
-import Holonics.Fluid.NavierStokesOpenEnergySpacetime
+import HolonicsResearch.Fluid.NavierStokesOpenEnergySpacetime
 import HolonicsResearch.Fluid.NavierStokesScaling
 
 /-!

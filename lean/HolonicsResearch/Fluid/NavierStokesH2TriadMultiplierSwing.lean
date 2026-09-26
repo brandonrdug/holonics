@@ -1,5 +1,5 @@
 import Holonics.Fluid.NavierStokesFiniteFourierHeat
-import Holonics.Fluid.NavierStokesSmoothDyadicTriadFluxCancellation
+import HolonicsResearch.Fluid.NavierStokesSmoothDyadicTriadFluxCancellation
 import Holonics.Geometry.Turn
 
 /-!

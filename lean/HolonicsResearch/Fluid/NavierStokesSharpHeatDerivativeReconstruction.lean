@@ -1,6 +1,6 @@
 import HolonicsResearch.Fluid.NavierStokesSharpHeatDerivative
-import Holonics.Fluid.NavierStokesWeightedHeatScaleWord
-import Holonics.Fluid.NavierStokesWeightedFiniteOrderFourierReconstruction
+import HolonicsResearch.Fluid.NavierStokesWeightedHeatScaleWord
+import HolonicsResearch.Fluid.NavierStokesWeightedFiniteOrderFourierReconstruction
 
 /-!
 # Reconstruction of the sharp heat second-derivative receiver

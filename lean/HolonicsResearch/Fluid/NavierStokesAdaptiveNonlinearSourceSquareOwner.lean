@@ -3,7 +3,7 @@ import HolonicsResearch.Fluid.NavierStokesOpenCompactWeightedPath
 import HolonicsResearch.Fluid.NavierStokesOpenSharpNonlinearSourceIntegration
 import HolonicsResearch.Fluid.NavierStokesSharpVorticitySourceHeatBound
 import HolonicsResearch.Fluid.NavierStokesTerminalEnergySeparation
-import Holonics.Fluid.NavierStokesVorticityDirectionKernelMomentDecay
+import HolonicsResearch.Fluid.NavierStokesVorticityDirectionKernelMomentDecay
 
 /-!
 # Square/absolute ownership of the adaptive reciprocal-clock nonlinear source

@@ -1,4 +1,4 @@
-import Holonics.Fluid.NavierStokesOpenAdvectionCarrierIntegration
+import HolonicsResearch.Fluid.NavierStokesOpenAdvectionCarrierIntegration
 import HolonicsResearch.Fluid.NavierStokesPhysicalH2VelocityTriadJoin
 
 /-!

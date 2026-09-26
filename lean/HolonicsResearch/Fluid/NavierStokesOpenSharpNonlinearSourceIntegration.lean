@@ -1,7 +1,7 @@
-import Holonics.Fluid.NavierStokesOpenAdvectionCarrierIntegration
+import HolonicsResearch.Fluid.NavierStokesOpenAdvectionCarrierIntegration
 import HolonicsResearch.Fluid.NavierStokesSharpNonlinearSource
-import Holonics.Fluid.NavierStokesWeightedDivergenceFree
-import Holonics.Fluid.NavierStokesWeightedMildPhysicalSource
+import HolonicsResearch.Fluid.NavierStokesWeightedDivergenceFree
+import HolonicsResearch.Fluid.NavierStokesWeightedMildPhysicalSource
 
 /-!
 # The actual open vorticity source is the sharp nonlinear source coefficient

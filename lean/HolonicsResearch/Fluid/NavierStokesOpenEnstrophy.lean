@@ -1,5 +1,5 @@
 import Holonics.Fluid.NavierStokesOpenLifespan
-import Holonics.Fluid.NavierStokesIntegralEnstrophy
+import HolonicsResearch.Fluid.NavierStokesIntegralEnstrophy
 
 /-!
 # Enstrophy transport on a genuine open Navier--Stokes lifespan

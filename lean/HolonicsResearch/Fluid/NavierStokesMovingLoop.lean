@@ -1,7 +1,7 @@
 import Mathlib.Analysis.Calculus.ParametricIntervalIntegral
 import Mathlib.MeasureTheory.Integral.CurveIntegral.Basic
 import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
-import Holonics.Fluid.NavierStokesHodge
+import HolonicsResearch.Fluid.NavierStokesHodge
 import HolonicsResearch.Fluid.NavierStokesKelvin
 import HolonicsResearch.Fluid.NavierStokesMaterialDerivative
 

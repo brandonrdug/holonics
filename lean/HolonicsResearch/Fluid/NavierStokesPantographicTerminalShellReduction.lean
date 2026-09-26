@@ -1,6 +1,6 @@
 import HolonicsResearch.Fluid.NavierStokesPantographicPhaseLocalShell
-import Holonics.Fluid.NavierStokesPhaseLocalLowFaceIntegrability
-import Holonics.Fluid.NavierStokesTerminalDyadicShellPacking
+import HolonicsResearch.Fluid.NavierStokesPhaseLocalLowFaceIntegrability
+import HolonicsResearch.Fluid.NavierStokesTerminalDyadicShellPacking
 
 /-!
 # The terminal shell obstruction is the signed pantographic population

@@ -1,5 +1,5 @@
 import Holonics.Fluid.NavierStokesFourierTriads
-import Holonics.Fluid.NavierStokesH3LerayBilinear
+import HolonicsResearch.Fluid.NavierStokesH3LerayBilinear
 
 /-!
 # A concrete noncollinear coherent Fourier triad

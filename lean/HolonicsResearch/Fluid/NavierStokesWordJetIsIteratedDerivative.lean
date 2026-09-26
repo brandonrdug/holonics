@@ -1,4 +1,4 @@
-import Holonics.Fluid.NavierStokesSmoothSliceWeightedAllOrders
+import HolonicsResearch.Fluid.NavierStokesSmoothSliceWeightedAllOrders
 
 /-!
 # The coordinate word jet is the iterated derivative applied to basis vectors

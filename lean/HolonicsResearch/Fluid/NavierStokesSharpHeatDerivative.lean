@@ -1,5 +1,5 @@
-import Holonics.Fluid.NavierStokesH3BilinearNorm
-import Holonics.Fluid.NavierStokesWeightedHeatSemigroup
+import HolonicsResearch.Fluid.NavierStokesH3BilinearNorm
+import HolonicsResearch.Fluid.NavierStokesWeightedHeatSemigroup
 import Mathlib.Analysis.SpecialFunctions.Gaussian.GaussianIntegral
 import Mathlib.Analysis.SumIntegralComparisons
 import Mathlib.NumberTheory.LSeries.HurwitzZetaEven

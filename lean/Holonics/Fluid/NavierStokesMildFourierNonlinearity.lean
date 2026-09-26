@@ -307,6 +307,61 @@ theorem lerayProjectMode_zero (mode : ComplexVector) :
     lerayProjectMode 0 mode = mode := by
   simp [lerayProjectMode]
 
+/-- [proved-derived; formal-checked] The Leray projection of one mode is additive. -/
+theorem lerayProjectMode_add
+    (output : SpatialFrequency) (left right : ComplexVector) :
+    lerayProjectMode output (left + right) =
+      lerayProjectMode output left + lerayProjectMode output right := by
+  by_cases houtput : output = 0
+  · subst output
+    simp
+  · rw [lerayProjectMode, if_neg houtput, lerayProjectMode, if_neg houtput,
+      lerayProjectMode, if_neg houtput]
+    ext component
+    simp only [Pi.add_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul,
+      complexDot, dotProduct_add]
+    ring
+
+/-- [proved-derived; formal-checked] The Leray projection of one mode is complex homogeneous. -/
+theorem lerayProjectMode_smul
+    (amplitude : ℂ) (output : SpatialFrequency) (mode : ComplexVector) :
+    lerayProjectMode output (amplitude • mode) =
+      amplitude • lerayProjectMode output mode := by
+  by_cases houtput : output = 0
+  · subst output
+    simp
+  · rw [lerayProjectMode, if_neg houtput, lerayProjectMode, if_neg houtput]
+    ext component
+    simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul, complexDot,
+      dotProduct_smul]
+    ring
+
+/-- [proved-derived; formal-checked] The projection commutes with a finite sum of modes. -/
+theorem lerayProjectMode_finset_sum
+    {index : Type*} [DecidableEq index]
+    (output : SpatialFrequency) (addresses : Finset index)
+    (terms : index → ComplexVector) :
+    lerayProjectMode output (∑ address ∈ addresses, terms address) =
+      ∑ address ∈ addresses, lerayProjectMode output (terms address) := by
+  induction addresses using Finset.induction_on with
+  | empty =>
+      by_cases houtput : output = 0
+      · subst output
+        simp
+      · simp [lerayProjectMode, houtput, complexDot]
+  | @insert address addresses haddress inductionHypothesis =>
+      rw [Finset.sum_insert haddress, Finset.sum_insert haddress,
+        lerayProjectMode_add, inductionHypothesis]
+
+/-- [proved-derived; formal-checked] The projection commutes with the three-component sum. -/
+theorem lerayProjectMode_sum
+    (output : SpatialFrequency) (terms : Fin 3 → ComplexVector) :
+    lerayProjectMode output (∑ component, terms component) =
+      ∑ component, lerayProjectMode output (terms component) := by
+  classical
+  exact lerayProjectMode_finset_sum output Finset.univ terms
+
+
 /-- [proved-derived] Every projected mode satisfies the exact Fourier divergence constraint,
 including the mean mode. -/
 theorem complexDot_lerayProjectMode_eq_zero

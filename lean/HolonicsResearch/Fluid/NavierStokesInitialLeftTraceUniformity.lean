@@ -1,4 +1,4 @@
-import Holonics.Fluid.NavierStokesCriticalOfficialPassage
+import HolonicsResearch.Fluid.NavierStokesCriticalOfficialPassage
 import HolonicsResearch.Fluid.NavierStokesRestartMatchedEndpointTrace
 
 /-!

@@ -1,6 +1,6 @@
 import HolonicsResearch.Fluid.NavierStokesH2TriadMultiplierSwing
-import Holonics.Fluid.NavierStokesDyadicShellProjectors
-import Holonics.Fluid.NavierStokesVorticityDirectionRemainderBound
+import HolonicsResearch.Fluid.NavierStokesDyadicShellProjectors
+import HolonicsResearch.Fluid.NavierStokesVorticityDirectionRemainderBound
 
 /-!
 # Scale-local bounds for the exact H2 triad multiplier swing

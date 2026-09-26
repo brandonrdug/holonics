@@ -1,6 +1,6 @@
 import HolonicsResearch.Fluid.NavierStokesFiniteLinearWorkPhysicalJoin
-import Holonics.Fluid.NavierStokesOpenAdvectionConvolutionBridge
-import Holonics.Fluid.NavierStokesVorticityDirectionCoherenceSummability
+import HolonicsResearch.Fluid.NavierStokesOpenAdvectionConvolutionBridge
+import HolonicsResearch.Fluid.NavierStokesVorticityDirectionCoherenceSummability
 import Mathlib.Analysis.Normed.Group.Tannery
 
 /-!

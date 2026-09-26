@@ -1,5 +1,5 @@
 import HolonicsResearch.Fluid.NavierStokesPhysicalH2ClockedTriadNormalForm
-import Holonics.Fluid.NavierStokesWeightedMildCoefficientEquation
+import HolonicsResearch.Fluid.NavierStokesWeightedMildCoefficientEquation
 import Mathlib.Analysis.ODE.ExistUnique
 
 /-!

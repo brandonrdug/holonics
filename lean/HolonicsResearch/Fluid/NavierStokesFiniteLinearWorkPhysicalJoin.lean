@@ -1,6 +1,6 @@
 import HolonicsResearch.Fluid.NavierStokesFiniteLinearWorkDecomposition
 import HolonicsResearch.Fluid.NavierStokesSmoothDyadicLinearUniformBoundary
-import Holonics.Fluid.NavierStokesVorticityDirectionBaseEnergy
+import HolonicsResearch.Fluid.NavierStokesVorticityDirectionBaseEnergy
 
 /-!
 # Physical join for the finite linear work decomposition
@@ -26,6 +26,7 @@ namespace Holonics.Fluid.NavierStokesFiniteLinearWorkPhysicalJoin
 open Holonics.Fluid.NavierStokes
 open Holonics.Fluid.NavierStokesDyadicShellProjectors
 open Holonics.Fluid.NavierStokesDyadicFlowCommutator
+open Holonics.Fluid.NavierStokesFiniteGalerkin
 open Holonics.Fluid.NavierStokesDyadicHodgeScaleChain
 open Holonics.Fluid.NavierStokesDyadicVorticityFluxConvolutionBridge
 open Holonics.Fluid.NavierStokesFiniteLinearWorkDecomposition
