@@ -187,6 +187,10 @@ import HolonicsResearch.Zeta.DeBruijnSeal
 import HolonicsResearch.Zeta.ThresholdRefinement
 import Holonics.Physics.PartitionedHodgeEnergy
 import HolonicsResearch.Zeta.CriticalChart
+import HolonicsResearch.Zeta.ZeroTube
+import HolonicsResearch.Zeta.CarryTick
+import HolonicsResearch.Zeta.Hearing
+import HolonicsResearch.Zeta.PaletteLaw
 import HolonicsResearch.Zeta.FoldedSourceZeros
 import HolonicsResearch.Zeta.LogDerivativeRemainder
 import HolonicsResearch.Zeta.LandauLemma
