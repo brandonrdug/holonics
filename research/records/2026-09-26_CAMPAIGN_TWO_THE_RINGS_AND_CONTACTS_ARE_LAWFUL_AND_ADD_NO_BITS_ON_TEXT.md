@@ -1,7 +1,8 @@
 # Campaign 2: the rings and contacts are lawful and add no bits on text
 
-**Date:** 2026-09-26. **Status:** recorded (#73, campaign 2; Decisions 28–31). The campaign's
-predictive criterion **fails**; its law and parity gates pass. **Commits:** `bff374db`..`e35882b0`
+**Date:** 2026-09-26. **Status:** recorded (#73, campaign 2; Decisions 28–31), reviewed and
+corrected the same day (§5 supersedes §2's cost and §3's causes). The campaign's predictive
+criterion **fails**; its law and parity gates pass. **Commits:** `bff374db`..`e35882b0`
 on main.
 
 ## 1. What was built
@@ -104,3 +105,45 @@ machinery is lawful, exact and resident, and it earns its few bits only through 
 - **The rings' part.** For the rings to change the face, a ring must declare a loaded resonator
   (#62) and the data must drive the contacts' kinds. Campaign 3 (release through modes) needs the
   ring modes the loaded resonator provides.
+
+## 5. After the review (same day, `a1218a59`..`a7a8c0ad`)
+
+[correction] The single reviewer found eight defects. Every one is fixed, the verdict stands, and
+the numbers below supersede §2's cost and §3's causes where they differ.
+
+- **The lock law.** Lean `HNN/Contact.contact_lock_address` now proves the rule the Rust runs. The
+  lock is the least-denominator rate in the fibre `(m_g/(m_h+1), (m_g+1)/m_h)`, with ties broken by
+  the least rate. It exists, is unique, lies in the box, and closes at its `q`.
+- **The lock bound.** `Q = ∏_(j>h) d_j`, the true horizon. A one-letter family is refused, so every
+  contact family now has at least two letters.
+- **The criterion.** The plan's rule now credits letters against a constant-slot control. The rule
+  was changed after a development run showed constant slots meeting the old rule; the change is
+  disclosed in the plan.
+  - Rerun on the development cells, every one of the 41 families is decided positive: clock
+    families at `+131 + 9/16` to `+179 + 15/16`, contacts 0 and 1 at `+148 + 7/16` to
+    `+176 + 11/16`, and contacts 2 and 3 at `+12 + 5/16` to `+12 + 8/16`.
+  - Contacts 2 and 3 lock only at the closing tick, reading two to five distinct codes.
+  - The choice is still the cell-only family.
+- **The balance.** The deposition work `½⟨x, ΔΘ x⟩` is formed at every commit (Lean
+  `field_commit_deposition`). The unloaded resonator port is named as the interconnection defect in
+  one combined identity (Lean `combined_balance_unloaded_port`). The exposure checks the word
+  balance at every word: 3,074 formed and committed, all closed, with the largest residual within
+  its bound. Tick balances: 9,222, all closed.
+- **The census.** All four contacts read rotation at all 3,075 commits: no nulls, boosts,
+  reflections or degenerate readings. A boost needs a declared signature (`K = b diag(σ) bᵀ`), which
+  campaign 1's field does not declare.
+- **Located cause, restated.** No letter family carries information beyond the preceding cells on
+  this text. No path runs from the resonator to any scored face, and the field declares no
+  resonator and no signature. So the wave is campaign 1's, and the held-out readings are equal:
+  model − order-0 `−1996 + 12/16 + ε`, model − PPM-2 `−252 + 5/16 + ε`, and `L_C − L_T`
+  `−7 + 13/16 + ε`.
+- **Parity.**
+  - Each card-tree deposit is checked against the host's masses, β and stop weights.
+  - The normal-law mirror runs only in the GPU suite: 119 steps carried, 25 declined (24 off the
+    dyadics, one empty), 0 skipped.
+  - The host and card readouts are identical outside the timing and bus sections.
+- **Cost, on an idle machine.** The first timings (§2) overlapped Lean builds and are withdrawn.
+  - Host: `116 rem 1087 over 3074` ms a window (357,671 ms in all).
+  - Card: `101 rem 398 over 3074` ms a window (310,872 ms in all), below campaign 1's
+    `114 rem 3063 over 3074`.
+  - The host's deposit is `51 rem 50` ms a window and remains the largest phase.

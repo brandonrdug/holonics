@@ -2088,8 +2088,11 @@ receiving law. It is judged by what they add that the tree does not already say 
   No ring of campaign 1's field declares a resonator, and the resonator does not load the word
   (#62). Every contact stayed a rotation.
 - **Parity.** The GPU suite passes, 38 of 38, and the host and card readouts are identical.
-- **Cost.** The card ran `140 rem 265 over 3074` ms a window. The normal-law mirror's `35` ms a
-  window leaves the exposure's path.
+- **Cost** (after the review, on an idle machine). The card runs `101 rem 398 over 3074` ms a
+  window, below campaign 1's. The normal-law mirror runs only in the GPU suite.
+- **The review's fixes.** The lock law is in Lean, the horizon bound is `∏ d_j`, the word balance
+  is checked at every word with the deposition work and the unloaded-port defect stated, and the
+  census is printed. The verdict stands.
 
 #### Campaign 3. Release through modes, dormancy and far fields
 
