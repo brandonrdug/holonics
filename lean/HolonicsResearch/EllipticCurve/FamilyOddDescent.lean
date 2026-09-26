@@ -480,14 +480,14 @@ set_option maxHeartbeats 2000000 in
 points, and the pins place the torsion. -/
 lemma classOf_mem_cells16 (hp2' : p ≠ 2)
     (P : (FamilyFace.E (((p : ℕ) : ℚ))).Point) :
-    FamilyCollision.classOf (Fact.out : p.Prime).pos P ∈ cells16 p := by
+    FamilyMordell.classOf (Fact.out : p.Prime).pos P ∈ cells16 p := by
   have hp : p.Prime := Fact.out
   have hn : 0 < p := hp.pos
   have hpq0 : (((p : ℕ) : ℚ)) ≠ 0 := by exact_mod_cast hp.pos.ne'
   have hpqpos : (0 : ℚ) < ((p : ℕ) : ℚ) := by exact_mod_cast hp.pos
-  obtain ⟨h10, h20, h1d, h2d, hsq1, hsq2⟩ := FamilyCollision.classOf_spec hn P
-  set d₁ := (FamilyCollision.classOf hn P).1 with hd₁def
-  set d₂ := (FamilyCollision.classOf hn P).2 with hd₂def
+  obtain ⟨h10, h20, h1d, h2d, hsq1, hsq2⟩ := FamilyMordell.classOf_spec hn P
+  set d₁ := (FamilyMordell.classOf hn P).1 with hd₁def
+  set d₂ := (FamilyMordell.classOf hn P).2 with hd₂def
   simp only [cells16, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq]
   rcases P with _ | @⟨x, y, hns⟩
   · -- the zero point: both slots read `1`
@@ -601,7 +601,7 @@ theorem theClassesCollideAtEveryOddPrime (hp2'' : p ≠ 2) {α : Type}
   have hp : p.Prime := Fact.out
   have hp2' : p ≠ 2 := hp2''
   have hn : 0 < p := hp.pos
-  have hmaps : ∀ a : α, FamilyCollision.classOf hn (f a) ∈ cells16 p := fun a =>
+  have hmaps : ∀ a : α, FamilyMordell.classOf hn (f a) ∈ cells16 p := fun a =>
     classOf_mem_cells16 hp2' (f a)
   have hlt : (cells16 p).card < Fintype.card α :=
     lt_of_le_of_lt (cells16_card_le p) hcard
@@ -609,8 +609,8 @@ theorem theClassesCollideAtEveryOddPrime (hp2'' : p ≠ 2) {α : Type}
     rw [Fintype.card_coe]
     exact hlt
   obtain ⟨a, b, hab, hg⟩ := Fintype.exists_ne_map_eq_of_card_lt
-    (fun a : α => (⟨FamilyCollision.classOf hn (f a), hmaps a⟩ : ↥(cells16 p))) hcard2
-  have hfab : FamilyCollision.classOf hn (f a) = FamilyCollision.classOf hn (f b) :=
+    (fun a : α => (⟨FamilyMordell.classOf hn (f a), hmaps a⟩ : ↥(cells16 p))) hcard2
+  have hfab : FamilyMordell.classOf hn (f a) = FamilyMordell.classOf hn (f b) :=
     congrArg Subtype.val hg
   exact ⟨a, b, hab, FamilyCollision.sameClass_double hn (f a) (f b) hfab⟩
 

@@ -2,6 +2,7 @@ import HolonicsResearch.EllipticCurve.FamilyFace
 import HolonicsResearch.EllipticCurve.Congruum
 import Mathlib.NumberTheory.Padics.PadicVal.Basic
 import Mathlib.Tactic
+import HolonicsResearch.EllipticCurve.FamilySupport
 
 /-!
 # StratumDescent: the completed descent for every prime in the three-mod-eight class
@@ -45,27 +46,6 @@ open WeierstrassCurve.Affine
 variable {p : ℕ}
 
 /-! ## 1. Square-class helpers and the governing characters -/
-
-private lemma sqcls_trans {a b c : ℚ} (h₁ : Descent.SqCls a b) (h₂ : Descent.SqCls b c) :
-    Descent.SqCls a c := by
-  obtain ⟨k, hk, hkv⟩ := h₁
-  obtain ⟨m, hm, hmv⟩ := h₂
-  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
-
-private lemma sqcls_mul {a b c d : ℚ} (h₁ : Descent.SqCls a c) (h₂ : Descent.SqCls b d) :
-    Descent.SqCls (a * b) (c * d) := by
-  obtain ⟨k, hk, hkv⟩ := h₁
-  obtain ⟨m, hm, hmv⟩ := h₂
-  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
-
-private lemma sqcls_sign {a d : ℚ} (h : Descent.SqCls a d) : (0 < a ↔ 0 < d) := by
-  obtain ⟨c, hc, hval⟩ := h
-  have hc2 : 0 < c ^ 2 := by positivity
-  constructor
-  · intro ha
-    nlinarith
-  · intro hd
-    nlinarith
 
 private lemma prime_int (hp : p.Prime) : Prime (p : ℤ) :=
   Nat.prime_iff_prime_int.mp hp
@@ -119,8 +99,8 @@ theorem theSignsAgreeOnTheStratum (hp : p.Prime) {x y d₁ d₂ : ℚ}
   obtain ⟨hx0, hxp, hxmp⟩ := avoidP hcurve hy
   have hppos := p_pos hp
   have hy2 : 0 < y ^ 2 := by positivity
-  have hs₁ := sqcls_sign h₁
-  have hs₂ := sqcls_sign h₂
+  have hs₁ := Descent.sqClsSign h₁
+  have hs₂ := Descent.sqClsSign h₂
   rcases lt_or_gt_of_ne hx0 with hx | hx
   · right
     constructor
@@ -149,22 +129,6 @@ theorem theSignsAgreeOnTheStratum (hp : p.Prime) {x y d₁ d₂ : ℚ}
     exact ⟨hs₁.mp hx, hs₂.mp (by linarith)⟩
 
 /-! ## 4. The support law on the stratum -/
-
-private lemma val_add_leftP {ℓ : ℕ} [Fact ℓ.Prime] {a b : ℚ} (ha : a ≠ 0)
-    (hab : a + b ≠ 0) (h : padicValRat ℓ a < padicValRat ℓ b) :
-    padicValRat ℓ (a + b) = padicValRat ℓ a := by
-  have h1 : padicValRat ℓ a ≤ padicValRat ℓ (a + b) := by
-    have hmin := padicValRat.min_le_padicValRat_add (p := ℓ) (q := a) (r := b) hab
-    omega
-  have h2 : padicValRat ℓ (a + b) ≤ padicValRat ℓ a := by
-    by_contra hcon
-    push_neg at hcon
-    have hrw : a + b + -b = a := by ring
-    have hmin := padicValRat.min_le_padicValRat_add (p := ℓ) (q := a + b) (r := -b)
-      (by rw [hrw]; exact ha)
-    rw [hrw, padicValRat.neg] at hmin
-    omega
-  omega
 
 private lemma prime_not_dvd_2p (hp : p.Prime) {ℓ : ℕ} (hℓ : ℓ.Prime)
     (h2 : ℓ ≠ 2) (hne : ℓ ≠ p) : ¬ ℓ ∣ 2 * p := by
@@ -217,24 +181,24 @@ private lemma even_slot_valP (hp : p.Prime) {ℓ : ℕ} [Fact ℓ.Prime]
   constructor
   · rcases lt_trichotomy (padicValRat ℓ x) 0 with hv | hv | hv
     · have e1 : padicValRat ℓ (x - p) = padicValRat ℓ x := by
-        have := val_add_leftP (ℓ := ℓ) hx0
+        have := FamilySupport.val_add_left (ℓ := ℓ) hx0
           (by rw [show x + -(p : ℚ) = x - p by ring]; exact hxm)
           (by rw [vmp]; exact hv)
         rw [show x + -(p : ℚ) = x - p by ring] at this
         exact this
       have e2 : padicValRat ℓ (x + p) = padicValRat ℓ x :=
-        val_add_leftP (ℓ := ℓ) hx0 hxpl (by rw [vp]; exact hv)
+        FamilySupport.val_add_left (ℓ := ℓ) hx0 hxpl (by rw [vp]; exact hv)
       rw [e1, e2] at hprod
       exact ⟨padicValRat ℓ y - padicValRat ℓ x, by linarith⟩
     · exact ⟨0, by rw [hv]; ring⟩
     · have e1 : padicValRat ℓ (x - p) = 0 := by
-        have := val_add_leftP (ℓ := ℓ) (neg_ne_zero.mpr hpne)
+        have := FamilySupport.val_add_left (ℓ := ℓ) (neg_ne_zero.mpr hpne)
           (by rw [show -(p : ℚ) + x = x - p by ring]; exact hxm)
           (by rw [vmp]; exact hv)
         rw [show -(p : ℚ) + x = x - p by ring, vmp] at this
         exact this
       have e2 : padicValRat ℓ (x + p) = 0 := by
-        have := val_add_leftP (ℓ := ℓ) hpne
+        have := FamilySupport.val_add_left (ℓ := ℓ) hpne
           (by rw [show (p : ℚ) + x = x + p by ring]; exact hxpl)
           (by rw [vp]; exact hv)
         rw [show (p : ℚ) + x = x + p by ring, vp] at this
@@ -243,13 +207,13 @@ private lemma even_slot_valP (hp : p.Prime) {ℓ : ℕ} [Fact ℓ.Prime]
       exact ⟨padicValRat ℓ y, by linarith⟩
   · rcases lt_trichotomy (padicValRat ℓ (x - p)) 0 with hv | hv | hv
     · have e1 : padicValRat ℓ x = padicValRat ℓ (x - p) := by
-        have := val_add_leftP (ℓ := ℓ) hxm
+        have := FamilySupport.val_add_left (ℓ := ℓ) hxm
           (by rw [show x - p + p = x by ring]; exact hx0)
           (by rw [vp]; exact hv)
         rw [show x - (p : ℚ) + p = x by ring] at this
         exact this
       have e2 : padicValRat ℓ (x + p) = padicValRat ℓ (x - p) := by
-        have := val_add_leftP (ℓ := ℓ) hxm
+        have := FamilySupport.val_add_left (ℓ := ℓ) hxm
           (by rw [show x - p + 2 * (p : ℚ) = x + p by ring]; exact hxpl)
           (by rw [v2p]; exact hv)
         rw [show x - (p : ℚ) + 2 * (p : ℚ) = x + p by ring] at this
@@ -258,13 +222,13 @@ private lemma even_slot_valP (hp : p.Prime) {ℓ : ℕ} [Fact ℓ.Prime]
       exact ⟨padicValRat ℓ y - padicValRat ℓ (x - p), by linarith⟩
     · exact ⟨0, by rw [hv]; ring⟩
     · have e1 : padicValRat ℓ x = 0 := by
-        have := val_add_leftP (ℓ := ℓ) hpne
+        have := FamilySupport.val_add_left (ℓ := ℓ) hpne
           (by rw [show (p : ℚ) + (x - p) = x by ring]; exact hx0)
           (by rw [vp]; exact hv)
         rw [show (p : ℚ) + (x - p) = x by ring, vp] at this
         exact this
       have e2 : padicValRat ℓ (x + p) = 0 := by
-        have := val_add_leftP (ℓ := ℓ) (by positivity : 2 * (p : ℚ) ≠ 0)
+        have := FamilySupport.val_add_left (ℓ := ℓ) (by positivity : 2 * (p : ℚ) ≠ 0)
           (by rw [show 2 * (p : ℚ) + (x - p) = x + p by ring]; exact hxpl)
           (by rw [v2p]; exact hv)
         rw [show 2 * (p : ℚ) + (x - p) = x + p by ring, v2p] at this
@@ -385,7 +349,7 @@ private lemma classFromEvenValuationsP (hp : p.Prime) (hne2 : p ≠ 2) {x : ℚ}
       · exact Or.inr (Or.inr (Or.inl (by norm_num)))
       · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inl rfl))))
       · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl (by push_cast; ring)))))))
-    · refine sqcls_trans hcls ⟨(b : ℚ), by exact_mod_cast hb0, ?_⟩
+    · refine Descent.sqClsTrans hcls ⟨(b : ℚ), by exact_mod_cast hb0, ?_⟩
       rw [hs]
       push_cast [← hab]
       ring
@@ -395,7 +359,7 @@ private lemma classFromEvenValuationsP (hp : p.Prime) (hne2 : p ≠ 2) {x : ℚ}
       · exact Or.inr (Or.inr (Or.inr (Or.inl (by norm_num))))
       · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl rfl)))))
       · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (by push_cast; ring)))))))
-    · refine sqcls_trans hcls ⟨(b : ℚ), by exact_mod_cast hb0, ?_⟩
+    · refine Descent.sqClsTrans hcls ⟨(b : ℚ), by exact_mod_cast hb0, ?_⟩
       rw [hs]
       push_cast [← hab]
       ring
@@ -1569,8 +1533,8 @@ private lemma face_addP (hp : p.Prime) {P Q : (FamilyFace.E p).Point} {a b a' b'
     Descent.SqCls (FamilyFace.slotOne p (P + Q)) t₁ ∧
     Descent.SqCls (FamilyFace.slotTwo p (P + Q)) t₂ := by
   obtain ⟨g₁, g₂⟩ := FamilyFace.theFaceIsAHomomorphismOnEveryTwist (pQ_ne hp) P Q
-  exact ⟨sqcls_trans g₁ (sqcls_trans (sqcls_mul hP.1 hQ.1) h₁),
-    sqcls_trans g₂ (sqcls_trans (sqcls_mul hP.2 hQ.2) h₂)⟩
+  exact ⟨Descent.sqClsTrans g₁ (Descent.sqClsTrans (Descent.sqClsMul hP.1 hQ.1) h₁),
+    Descent.sqClsTrans g₂ (Descent.sqClsTrans (Descent.sqClsMul hP.2 hQ.2) h₂)⟩
 
 private lemma face_T0Tp (hp : p.Prime) :
     Descent.SqCls (FamilyFace.slotOne p (torsionZeroP hp + torsionRightP hp)) (-(p : ℚ)) ∧
@@ -1591,8 +1555,8 @@ private lemma refuse_by_translation (hp : p.Prime) {d₁ d₂ k₁ k₂ A B : �
     (ht₁ : Descent.SqCls (d₁ * k₁) A) (ht₂ : Descent.SqCls (d₂ * k₂) B) : False := by
   obtain ⟨g₁, g₂⟩ := FamilyFace.theFaceIsAHomomorphismOnEveryTwist (pQ_ne hp) P R
   exact href (P + R)
-    ⟨sqcls_trans g₁ (sqcls_trans (sqcls_mul hc₁ hR.1) ht₁),
-     sqcls_trans g₂ (sqcls_trans (sqcls_mul hc₂ hR.2) ht₂)⟩
+    ⟨Descent.sqClsTrans g₁ (Descent.sqClsTrans (Descent.sqClsMul hc₁ hR.1) ht₁),
+     Descent.sqClsTrans g₂ (Descent.sqClsTrans (Descent.sqClsMul hc₂ hR.2) ht₂)⟩
 
 /-! ## 8. The completed descent on the stratum -/
 

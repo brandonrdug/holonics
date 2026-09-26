@@ -46,15 +46,6 @@ def taggedTotalFourSquareShell (n : ℕ) :
   Finset.univ.sigma fun r =>
     fourSquareResidueShell r.1 r.2.1 r.2.2.1 r.2.2.2 n
 
-private theorem quarterResidueAddress_eq_of_returns
-    (x : ℤ) (r : QuarterResidue) (h : (x : ZMod 4) = r.val) :
-    quarterResidueAddress x = r := by
-  apply Fin.ext
-  change (x : ZMod 4).val = r.val
-  calc
-    (x : ZMod 4).val = ((r.val : ℕ) : ZMod 4).val := congrArg ZMod.val h
-    _ = r.val := ZMod.val_natCast_of_lt r.isLt
-
 private theorem totalToTagged_mem {n : ℕ} {q : IntegerQuadruple}
     (hq : q ∈ totalFourSquareShell n) :
     (Sigma.mk

@@ -46,11 +46,6 @@ def thetaP (p : ℕ) [Fact p.Prime] (x : ℝ) : ℝ :=
           (4 * p * Real.sqrt 2 * x) *
        evenKernel (((d : ℝ) / (2 * p) : ℝ) : UnitAddCircle) (4 * p * Real.sqrt 2 * x))
 
-private lemma rpow_two_of_pos {t : ℝ} (ht : 0 < t) :
-    t ^ ((3 : ℝ) / 2) * t ^ ((1 : ℝ) / 2) = t ^ 2 := by
-  rw [← Real.rpow_add ht, show (3 : ℝ) / 2 + 1 / 2 = ((2 : ℕ) : ℝ) from by norm_num,
-    Real.rpow_natCast]
-
 /-! ## 2. The theta functional equation -/
 
 set_option maxHeartbeats 1000000 in
@@ -91,7 +86,7 @@ theorem theFamilyThetaFunctionalEquation (p : ℕ) [Fact p.Prime] (hp1 : p % 4 =
       Real.inv_rpow hy.le, Real.inv_rpow hy.le, one_div, one_div, inv_inv, inv_inv]
     have hpow : (x / (4 * p * Real.sqrt 2)) ^ ((3 : ℝ) / 2) *
         (x / (4 * p * Real.sqrt 2)) ^ ((1 : ℝ) / 2) = x ^ 2 / (32 * p ^ 2) := by
-      rw [rpow_two_of_pos hy, div_pow]
+      rw [FiveTheta.rpow_two_of_pos hy, div_pow]
       congr 1
       rw [mul_pow, mul_pow]
       linear_combination (16 * (p : ℝ) ^ 2) * hss
@@ -471,10 +466,10 @@ theorem theFamilyThetaIsItsLatticeSum (p : ℕ) [Fact p.Prime] (hp2' : p ≠ 2)
         = XP p 2 * XP p ((4 * k + 1) ^ 2 + 4 * l ^ 2) := by
       rw [XP_mul p, show (4 * k + 1) ^ 2 + (2 * l) ^ 2
         = (4 * k + 1) ^ 2 + 4 * l ^ 2 from by ring]
-    have henv : envF y (4 * k + 1) (2 * l)
+    have henv : FiveTheta.envF y (4 * k + 1) (2 * l)
         = rexp (-(π * Real.sqrt 2 / (4 * p)) *
             (((4 * k + 1) ^ 2 + 4 * l ^ 2 : ℤ) : ℝ) * t) := by
-      unfold envF
+      unfold FiveTheta.envF
       rw [hy_def]
       congr 1
       push_cast
@@ -563,7 +558,7 @@ theorem theFamilyThetaIsTheTwistedClassSum (p : ℕ) [Fact p.Prime] (hp2' : p �
   · have hchi : XP p (2 * (a ^ 2 + b ^ 2)) = XP p 2 * XP p (a ^ 2 + b ^ 2) :=
       XP_mul p 2 (a ^ 2 + b ^ 2)
     rw [hchi]
-    unfold envF
+    unfold FiveTheta.envF
     push_cast
     field_simp
     linear_combination (-((a : ℂ) * ((XP p (a ^ 2 + b ^ 2) : ℤ) : ℂ))) * hχ
@@ -611,7 +606,7 @@ theorem theFamilyThetaFunctionalEquationAtEveryOddPrime (p : ℕ) [Fact p.Prime]
       Real.inv_rpow hy.le, Real.inv_rpow hy.le, one_div, one_div, inv_inv, inv_inv]
     have hpow : (x / (4 * p * Real.sqrt 2)) ^ ((3 : ℝ) / 2) *
         (x / (4 * p * Real.sqrt 2)) ^ ((1 : ℝ) / 2) = x ^ 2 / (32 * p ^ 2) := by
-      rw [rpow_two_of_pos hy, div_pow]
+      rw [FiveTheta.rpow_two_of_pos hy, div_pow]
       congr 1
       rw [mul_pow, mul_pow]
       linear_combination (16 * (p : ℝ) ^ 2) * hss

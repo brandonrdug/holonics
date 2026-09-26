@@ -52,11 +52,6 @@ private def ordinate : E5.Point → ℚ
   | .zero => 0
   | .some _ y _ => y
 
-private lemma some_eq_some {x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
-    {h₁ : E5.Nonsingular x₁ y₁} {h₂ : E5.Nonsingular x₂ y₂} :
-    (Point.some x₁ y₁ h₁ : E5.Point) = Point.some x₂ y₂ h₂ := by
-  subst hx; subst hy; rfl
-
 private lemma negY_eq (x y : ℚ) : E5.negY x y = -y := by
   simp [negY, RankOne.E5]
 
@@ -217,7 +212,7 @@ private lemma chord_estimate {K : ℕ} (hK : 1 ≤ K)
       field_simp at h
       linarith [h]
     rw [Point.neg_some]
-    exact some_eq_some hxx (by rw [negY_eq]; linarith [hyy])
+    exact RankOne.some_eq_some hxx (by rw [negY_eq]; linarith [hyy])
   by_cases hu₂ : u = t₂
   · right; left
     have hsu₂ : su = s₂ := by rw [hlineu, hu₂, ← hline₂]
@@ -232,7 +227,7 @@ private lemma chord_estimate {K : ℕ} (hK : 1 ≤ K)
       field_simp at h
       linarith [h]
     rw [Point.neg_some]
-    exact some_eq_some hxx (by rw [negY_eq]; linarith [hyy])
+    exact RankOne.some_eq_some hxx (by rw [negY_eq]; linarith [hyy])
   -- the generic case: the sum formula and the depth propagation
   right; right
   have hsumf := theChordCutsTheSumFormula hP₁ hP₂ hPu ht₁₂ hu₁ hu₂
@@ -430,7 +425,7 @@ private lemma tangent_estimate {K : ℕ} (hK : 1 ≤ K)
       field_simp at h
       linarith [h]
     rw [Point.neg_some]
-    exact some_eq_some hxx (by rw [negY_eq]; linarith [hyy])
+    exact RankOne.some_eq_some hxx (by rw [negY_eq]; linarith [hyy])
   right
   have hsumf := theTangentCutsTheSumFormula hβdef hαt hP₁ hPu hu₁
   have hαdeep : Deep (2 * (K : ℤ)) α := by
@@ -715,7 +710,7 @@ private lemma kernel_point_refuses {p : ℕ} (hp : p.Prime) (hp5 : 5 ≤ p)
         · -- the multiple is the point: m = 1, tangent step
           have hmeq : pointOf hm' = R := by
             rw [hRdef]
-            exact some_eq_some hxeq hyy
+            exact RankOne.some_eq_some hxeq hyy
           have hm1' : m = 1 := by
             by_contra hne1
             have hmR : m • R = R := by rw [hQm, hmeq]
@@ -753,7 +748,7 @@ private lemma kernel_point_refuses {p : ℕ} (hp : p.Prime) (hp5 : 5 ≤ p)
           exfalso
           have hmeq : pointOf hm' = -R := by
             rw [hRdef, Point.neg_some]
-            exact some_eq_some hxeq (by rw [negY_eq]; linarith [hyy])
+            exact RankOne.some_eq_some hxeq (by rw [negY_eq]; linarith [hyy])
           have : (m + 1) • R = 0 := by
             rw [succ_nsmul, hQm, hmeq, neg_add_cancel]
           exact hmR_ne (m + 1) (by omega) (by omega) this

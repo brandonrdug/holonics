@@ -206,13 +206,6 @@ theorem zeroResidue_oddSecondThickPopulation_card_eq (hp2 : p ≠ 2) (n : ℕ) :
     rw [hempty] at hmCanonical
     simpa using hmCanonical
 
-private theorem zero_add_nonzero_card (s : Finset IntTriple) :
-    (zeroResiduePopulation (p := p) s).card +
-      (nonzeroResiduePopulation (p := p) s).card = s.card := by
-  simpa [zeroResiduePopulation, nonzeroResiduePopulation] using
-    Finset.card_filter_add_card_filter_not
-      (s := s) (fun m : IntTriple => reduceTriple (p := p) m = 0)
-
 /-- The lower incidence plate retains the thin odd-coordinate aperture. -/
 theorem oddSecondThin_incidence_defect (hp2 : p ≠ 2) (n : ℕ) :
     ((integralOrthogonalIncidencePopulation (p := p) 8

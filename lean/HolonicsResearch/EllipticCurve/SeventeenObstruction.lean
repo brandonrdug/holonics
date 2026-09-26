@@ -45,18 +45,6 @@ namespace Holonics.EllipticCurve.SeventeenObstruction
 
 open WeierstrassCurve.Affine
 
-private lemma sqcls_trans {a b c : ℚ} (h₁ : Descent.SqCls a b) (h₂ : Descent.SqCls b c) :
-    Descent.SqCls a c := by
-  obtain ⟨k, hk, hkv⟩ := h₁
-  obtain ⟨m, hm, hmv⟩ := h₂
-  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
-
-private lemma sqcls_mul {a b c d : ℚ} (h₁ : Descent.SqCls a c) (h₂ : Descent.SqCls b d) :
-    Descent.SqCls (a * b) (c * d) := by
-  obtain ⟨k, hk, hkv⟩ := h₁
-  obtain ⟨m, hm, hmv⟩ := h₂
-  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
-
 private lemma hp17 : Nat.Prime 17 := by norm_num
 
 private lemma onCurve17 {x y : ℚ} (h : (FamilyFace.E (17 : ℕ)).Nonsingular x y) :
@@ -714,9 +702,9 @@ private lemma face_T0T17' :
     Descent.SqCls (FamilyFace.slotOne (17 : ℕ) (T0' + T17')) (-17) ∧
     Descent.SqCls (FamilyFace.slotTwo (17 : ℕ) (T0' + T17')) (-34) := by
   obtain ⟨g₁, g₂⟩ := hom17 T0' T17'
-  exact ⟨sqcls_trans g₁ (sqcls_trans (sqcls_mul face_T0'.1 face_T17'.1)
+  exact ⟨Descent.sqClsTrans g₁ (Descent.sqClsTrans (Descent.sqClsMul face_T0'.1 face_T17'.1)
       ⟨1, one_ne_zero, by ring⟩),
-    sqcls_trans g₂ (sqcls_trans (sqcls_mul face_T0'.2 face_T17'.2)
+    Descent.sqClsTrans g₂ (Descent.sqClsTrans (Descent.sqClsMul face_T0'.2 face_T17'.2)
       ⟨1, one_ne_zero, by ring⟩)⟩
 
 private lemma refuse_tr {d₁ d₂ k₁ k₂ A B : ℚ}
@@ -731,8 +719,8 @@ private lemma refuse_tr {d₁ d₂ k₁ k₂ A B : ℚ}
     (ht₁ : Descent.SqCls (d₁ * k₁) A) (ht₂ : Descent.SqCls (d₂ * k₂) B) : False := by
   obtain ⟨g₁, g₂⟩ := hom17 P R
   exact href (P + R)
-    ⟨sqcls_trans g₁ (sqcls_trans (sqcls_mul hc₁ hR.1) ht₁),
-     sqcls_trans g₂ (sqcls_trans (sqcls_mul hc₂ hR.2) ht₂)⟩
+    ⟨Descent.sqClsTrans g₁ (Descent.sqClsTrans (Descent.sqClsMul hc₁ hR.1) ht₁),
+     Descent.sqClsTrans g₂ (Descent.sqClsTrans (Descent.sqClsMul hc₂ hR.2) ht₂)⟩
 
 /-! ## 4. The Selmer sixteen and the image theorem -/
 

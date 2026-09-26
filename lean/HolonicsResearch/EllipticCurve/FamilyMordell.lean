@@ -59,25 +59,7 @@ private lemma someEqAt {m x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y�
     (Point.some _ _ h₁ : (FamilyFace.E m).Point) = Point.some _ _ h₂ := by
   subst hx; subst hy; rfl
 
-private lemma sqcls_trans {a b c : ℚ} (h₁ : Descent.SqCls a b) (h₂ : Descent.SqCls b c) :
-    Descent.SqCls a c := by
-  obtain ⟨k, hk, hkv⟩ := h₁
-  obtain ⟨m, hm, hmv⟩ := h₂
-  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
-
-private lemma sqcls_mul {a b c d : ℚ} (h₁ : Descent.SqCls a c) (h₂ : Descent.SqCls b d) :
-    Descent.SqCls (a * b) (c * d) := by
-  obtain ⟨k, hk, hkv⟩ := h₁
-  obtain ⟨m, hm, hmv⟩ := h₂
-  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
-
-private lemma sqcls_ne {a b : ℚ} (h : Descent.SqCls a b) (ha : a ≠ 0) : b ≠ 0 := by
-  obtain ⟨c, hc, hv⟩ := h
-  intro hb
-  rw [hb, mul_zero] at hv
-  exact ha hv
-
-private lemma slotOneAt_ne (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) :
+lemma slotOneAt_ne (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) :
     slotOneAt ((n : ℚ)) P ≠ 0 := by
   rcases P with _ | @⟨x, y, h⟩
   · exact one_ne_zero
@@ -87,7 +69,7 @@ private lemma slotOneAt_ne (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) :
       exact neg_ne_zero.mpr (pow_ne_zero 2 h1)
     · exact hx
 
-private lemma slotTwoAt_ne (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) :
+lemma slotTwoAt_ne (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) :
     slotTwoAt ((n : ℚ)) P ≠ 0 := by
   rcases P with _ | @⟨x, y, h⟩
   · exact one_ne_zero
@@ -107,8 +89,8 @@ private lemma sameClass_diff_double (hn : 0 < n)
     (hR2 : Descent.SqCls (slotTwoAt ((n : ℚ)) R) (d₂ : ℚ)) :
     ∃ Q : (FamilyFace.E ((n : ℚ))).Point, Q + Q = X - R := by
   have hnq : (0 : ℚ) < (n : ℚ) := by exact_mod_cast hn
-  have hd₁ : (d₁ : ℚ) ≠ 0 := sqcls_ne hR1 (slotOneAt_ne hn R)
-  have hd₂ : (d₂ : ℚ) ≠ 0 := sqcls_ne hR2 (slotTwoAt_ne hn R)
+  have hd₁ : (d₁ : ℚ) ≠ 0 := Descent.sqClsNe hR1 (slotOneAt_ne hn R)
+  have hd₂ : (d₂ : ℚ) ≠ 0 := Descent.sqClsNe hR2 (slotTwoAt_ne hn R)
   have hs1 : slotOneAt ((n : ℚ)) (-R) = slotOneAt ((n : ℚ)) R := by
     rcases R with _ | @⟨x, y, h⟩
     · rw [← Point.zero_def, neg_zero]
@@ -124,9 +106,9 @@ private lemma sameClass_diff_double (hn : 0 < n)
   rw [hs1, ← sub_eq_add_neg] at hom1
   rw [hs2, ← sub_eq_add_neg] at hom2
   have h1 : Descent.SqCls (slotOneAt ((n : ℚ)) (X - R)) 1 :=
-    sqcls_trans hom1 (sqcls_trans (sqcls_mul hX1 hR1) ⟨(d₁ : ℚ), hd₁, by ring⟩)
+    Descent.sqClsTrans hom1 (Descent.sqClsTrans (Descent.sqClsMul hX1 hR1) ⟨(d₁ : ℚ), hd₁, by ring⟩)
   have h2 : Descent.SqCls (slotTwoAt ((n : ℚ)) (X - R)) 1 :=
-    sqcls_trans hom2 (sqcls_trans (sqcls_mul hX2 hR2) ⟨(d₂ : ℚ), hd₂, by ring⟩)
+    Descent.sqClsTrans hom2 (Descent.sqClsTrans (Descent.sqClsMul hX2 hR2) ⟨(d₂ : ℚ), hd₂, by ring⟩)
   exact FamilyKernel.theKernelIsTheDoublesAtEveryModulus ((n : ℚ)) hnq (X - R) h1 h2
 
 /-! ## 3. The contraction core -/
@@ -261,11 +243,11 @@ private lemma contract_core (hn : 0 < n) {C : ℕ} (hC : 0 < C)
 
 /-! ## 4. The representatives -/
 
-private def classOf (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) : ℤ × ℤ :=
+def classOf (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) : ℤ × ℤ :=
   ((FamilySupport.theSlotClassesAreSupportedAtEveryModulus n hn P).choose,
    (FamilySupport.theSlotClassesAreSupportedAtEveryModulus n hn P).choose_spec.choose)
 
-private lemma classOf_spec (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) :
+lemma classOf_spec (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) :
     (classOf hn P).1 ≠ 0 ∧ (classOf hn P).2 ≠ 0 ∧
     (classOf hn P).1.natAbs ∣ 2 * n ∧ (classOf hn P).2.natAbs ∣ 2 * n ∧
     Descent.SqCls (slotOneAt ((n : ℚ)) P) (((classOf hn P).1 : ℤ) : ℚ) ∧

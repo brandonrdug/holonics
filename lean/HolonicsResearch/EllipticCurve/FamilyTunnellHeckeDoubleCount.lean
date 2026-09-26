@@ -494,13 +494,6 @@ theorem thickNumeratorPoint_norm (hp2 : p ≠ 2) (n : ℕ)
         (mem_canonicalThickPopulation_iff_intTunnellQuadratic n lower.1).mp hl'.1.1]
       norm_cast
 
-private theorem zero_add_nonzero_card (s : Finset IntTriple) :
-    (zeroResiduePopulation (p := p) s).card +
-      (nonzeroResiduePopulation (p := p) s).card = s.card := by
-  simpa [zeroResiduePopulation, nonzeroResiduePopulation] using
-    Finset.card_filter_add_card_filter_not
-      (s := s) (fun m : IntTriple => reduceTriple (p := p) m = 0)
-
 private theorem upper_nonzero_card_thin (n : ℕ) :
     ((nonzeroResiduePopulation (p := p)
       (canonicalThinPopulation (p ^ 2 * n))).card : ℤ) =

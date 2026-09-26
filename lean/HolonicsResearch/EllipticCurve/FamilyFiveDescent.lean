@@ -1036,14 +1036,14 @@ lemma cells5_card_le (p : ℕ) : (cells5 p).card ≤ 8 := by
 points, and the six pins place the torsion. -/
 lemma classOf_mem_cells5 (hp2' : p ≠ 2) (hp8 : p % 8 = 5)
     (P : (FamilyFace.E (((p : ℕ) : ℚ))).Point) :
-    FamilyCollision.classOf (Fact.out : p.Prime).pos P ∈ cells5 p := by
+    FamilyMordell.classOf (Fact.out : p.Prime).pos P ∈ cells5 p := by
   have hp : p.Prime := Fact.out
   have hn : 0 < p := hp.pos
   have hpq0 : (((p : ℕ) : ℚ)) ≠ 0 := by exact_mod_cast hp.pos.ne'
   have hpqpos : (0 : ℚ) < ((p : ℕ) : ℚ) := by exact_mod_cast hp.pos
-  obtain ⟨h10, h20, h1d, h2d, hsq1, hsq2⟩ := FamilyCollision.classOf_spec hn P
-  set d₁ := (FamilyCollision.classOf hn P).1 with hd₁def
-  set d₂ := (FamilyCollision.classOf hn P).2 with hd₂def
+  obtain ⟨h10, h20, h1d, h2d, hsq1, hsq2⟩ := FamilyMordell.classOf_spec hn P
+  set d₁ := (FamilyMordell.classOf hn P).1 with hd₁def
+  set d₂ := (FamilyMordell.classOf hn P).2 with hd₂def
   simp only [cells5, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq]
   rcases P with _ | @⟨x, y, hns⟩
   · -- the zero point: both slots read `1`
@@ -1146,7 +1146,7 @@ theorem theClassesCollideOnTheFiveModEightBranch (hp8 : p % 8 = 5) {α : Type}
   have hp : p.Prime := Fact.out
   have hp2' : p ≠ 2 := by intro h; omega
   have hn : 0 < p := hp.pos
-  have hmaps : ∀ a : α, FamilyCollision.classOf hn (f a) ∈ cells5 p := fun a =>
+  have hmaps : ∀ a : α, FamilyMordell.classOf hn (f a) ∈ cells5 p := fun a =>
     classOf_mem_cells5 hp2' hp8 (f a)
   have hlt : (cells5 p).card < Fintype.card α :=
     lt_of_le_of_lt (cells5_card_le p) hcard

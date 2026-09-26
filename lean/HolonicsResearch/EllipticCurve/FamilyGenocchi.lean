@@ -1317,10 +1317,10 @@ private theorem coset_refused (hp8 : p % 8 = 3) {x y : ℚ}
         rw [slotOneAt_some h', if_neg hx'0] at hom1
         rw [slotTwoAt_some h', if_neg hx'n] at hom2
         refine theCosetCellIsRefusedAtTwo hpodd (onCurveAt h') hy'
-          (FamilyCollision.sqcls_trans hom1
+          (Descent.sqClsTrans hom1
             ⟨c₁ * ((p : ℕ) : ℚ), mul_ne_zero hc₁ hpq0, by
               rw [hv₁]; push_cast; ring⟩)
-          (FamilyCollision.sqcls_trans hom2
+          (Descent.sqClsTrans hom2
             ⟨c₂ * ((p : ℕ) : ℚ), mul_ne_zero hc₂ hpq0, by
               rw [hv₂]; push_cast; ring⟩)
   · -- cell (2p, p): translate by (−p, 0)
@@ -1358,10 +1358,10 @@ private theorem coset_refused (hp8 : p % 8 = 3) {x y : ℚ}
         rw [slotOneAt_some h', if_neg hx'0] at hom1
         rw [slotTwoAt_some h', if_neg hx'n] at hom2
         refine theCosetCellIsRefusedAtTwo hpodd (onCurveAt h') hy'
-          (FamilyCollision.sqcls_trans hom1
+          (Descent.sqClsTrans hom1
             ⟨c₁ * ((p : ℕ) : ℚ), mul_ne_zero hc₁ hpq0, by
               rw [hv₁]; push_cast; ring⟩)
-          (FamilyCollision.sqcls_trans hom2
+          (Descent.sqClsTrans hom2
             ⟨c₂ * ((p : ℕ) : ℚ), mul_ne_zero hc₂ hpq0, by
               rw [hv₂]; push_cast; ring⟩)
   · -- cell (−2p, −1): translate by (p, 0)
@@ -1396,10 +1396,10 @@ private theorem coset_refused (hp8 : p % 8 = 3) {x y : ℚ}
         rw [slotOneAt_some h', if_neg hx'0] at hom1
         rw [slotTwoAt_some h', if_neg hx'n] at hom2
         refine theCosetCellIsRefusedAtTwo hpodd (onCurveAt h') hy'
-          (FamilyCollision.sqcls_trans hom1
+          (Descent.sqClsTrans hom1
             ⟨c₁ * ((p : ℕ) : ℚ), mul_ne_zero hc₁ hpq0, by
               rw [hv₁]; push_cast; ring⟩)
-          (FamilyCollision.sqcls_trans hom2
+          (Descent.sqClsTrans hom2
             ⟨c₂ * ((p : ℕ) : ℚ), mul_ne_zero hc₂ hpq0, by
               rw [hv₂]; push_cast; ring⟩)
 
@@ -1455,10 +1455,10 @@ theorem theDescentStepOnTheThreeModEightBranch (hp8 : p % 8 = 3)
           at hom2
         obtain ⟨Q, hQ⟩ := theKernelIsTheDoublesAtEveryModulus (((p : ℕ) : ℚ)) hnq
           (Point.some x y h + Point.some 0 0 hT0)
-          (FamilyCollision.sqcls_trans hom1
+          (Descent.sqClsTrans hom1
             ⟨c₁ * ((p : ℕ) : ℚ), mul_ne_zero hc₁ hpq0, by
               rw [hv₁]; push_cast; ring⟩)
-          (FamilyCollision.sqcls_trans hom2
+          (Descent.sqClsTrans hom2
             ⟨c₂ * ((p : ℕ) : ℚ), mul_ne_zero hc₂ hpq0, by
               rw [hv₂]; push_cast; ring⟩)
         refine ⟨Q, Point.some 0 0 hT0, hT2, ?_⟩
@@ -1476,10 +1476,10 @@ theorem theDescentStepOnTheThreeModEightBranch (hp8 : p % 8 = 3)
         rw [slotTwoAt_some h, slotTwoAt_some hT0, if_neg hxn, if_pos rfl] at hom2
         obtain ⟨Q, hQ⟩ := theKernelIsTheDoublesAtEveryModulus (((p : ℕ) : ℚ)) hnq
           (Point.some x y h + Point.some ((p : ℕ) : ℚ) 0 hT0)
-          (FamilyCollision.sqcls_trans hom1
+          (Descent.sqClsTrans hom1
             ⟨c₁ * ((p : ℕ) : ℚ), mul_ne_zero hc₁ hpq0, by
               rw [hv₁]; push_cast; ring⟩)
-          (FamilyCollision.sqcls_trans hom2
+          (Descent.sqClsTrans hom2
             ⟨2 * c₂ * ((p : ℕ) : ℚ),
               mul_ne_zero (mul_ne_zero two_ne_zero hc₂) hpq0, by
               rw [hv₂]; push_cast; ring⟩)
@@ -1503,10 +1503,10 @@ theorem theDescentStepOnTheThreeModEightBranch (hp8 : p % 8 = 3)
             hpq0 (by linarith))] at hom2
         obtain ⟨Q, hQ⟩ := theKernelIsTheDoublesAtEveryModulus (((p : ℕ) : ℚ)) hnq
           (Point.some x y h + Point.some (-((p : ℕ) : ℚ)) 0 hT0)
-          (FamilyCollision.sqcls_trans hom1
+          (Descent.sqClsTrans hom1
             ⟨c₁ * ((p : ℕ) : ℚ), mul_ne_zero hc₁ hpq0, by
               rw [hv₁]; push_cast; ring⟩)
-          (FamilyCollision.sqcls_trans hom2
+          (Descent.sqClsTrans hom2
             ⟨2 * c₂ * ((p : ℕ) : ℚ),
               mul_ne_zero (mul_ne_zero two_ne_zero hc₂) hpq0, by
               rw [hv₂]; push_cast; ring⟩)

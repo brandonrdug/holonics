@@ -628,7 +628,7 @@ theorem zeroResidue_canonicalThickPopulation_card_eq (n : ℕ) :
     apply hdiv
     exact_mod_cast hdivZ
 
-private theorem zero_add_nonzero_card (s : Finset IntTriple) :
+theorem zero_add_nonzero_card (s : Finset IntTriple) :
     (zeroResiduePopulation (p := p) s).card +
       (nonzeroResiduePopulation (p := p) s).card = s.card := by
   simpa [zeroResiduePopulation, nonzeroResiduePopulation] using

@@ -64,9 +64,9 @@ theorem theClassesCollideAtEveryModulus (n : ℕ) (hn : 0 < n) {α : Type}
     (f : α → (FamilyFace.E ((n : ℚ))).Point) :
     ∃ a b, a ≠ b ∧ ∃ Q : (FamilyFace.E ((n : ℚ))).Point, f a - f b = Q + Q := by
   set box : Finset (ℤ × ℤ) := signedDivisors n ×ˢ signedDivisors n with hbox
-  have hmaps : ∀ a : α, FamilyCollision.classOf hn (f a) ∈ box := by
+  have hmaps : ∀ a : α, FamilyMordell.classOf hn (f a) ∈ box := by
     intro a
-    obtain ⟨h10, h20, h1d, h2d, -, -⟩ := FamilyCollision.classOf_spec hn (f a)
+    obtain ⟨h10, h20, h1d, h2d, -, -⟩ := FamilyMordell.classOf_spec hn (f a)
     rw [hbox, Finset.mem_product]
     exact ⟨mem_signedDivisors hn h10 h1d, mem_signedDivisors hn h20 h2d⟩
   have hboxcard : box.card ≤ 4 * (2 * n).divisors.card * (2 * n).divisors.card := by
@@ -78,8 +78,8 @@ theorem theClassesCollideAtEveryModulus (n : ℕ) (hn : 0 < n) {α : Type}
     rw [Fintype.card_coe]
     exact hlt
   obtain ⟨a, b, hab, hg⟩ := Fintype.exists_ne_map_eq_of_card_lt
-    (fun a : α => (⟨FamilyCollision.classOf hn (f a), hmaps a⟩ : ↥box)) hcard2
-  have hfab : FamilyCollision.classOf hn (f a) = FamilyCollision.classOf hn (f b) :=
+    (fun a : α => (⟨FamilyMordell.classOf hn (f a), hmaps a⟩ : ↥box)) hcard2
+  have hfab : FamilyMordell.classOf hn (f a) = FamilyMordell.classOf hn (f b) :=
     congrArg Subtype.val hg
   exact ⟨a, b, hab, FamilyCollision.sameClass_double hn (f a) (f b) hfab⟩
 

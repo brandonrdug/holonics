@@ -33,16 +33,10 @@ open DirectSum
 
 /-! ## 1. Local plumbing -/
 
-private lemma slotOne5_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
-    RankOne.slotOne (.some _ _ h) = if x = 0 then -25 else x := rfl
-
-private lemma slotTwo5_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
-    RankOne.slotTwo (.some _ _ h) = if x = 5 then 50 else x - 5 := rfl
-
 private lemma slotOne5_ne (P : RankOne.E5.Point) : RankOne.slotOne P ≠ 0 := by
   rcases P with _ | @⟨x, y, h⟩
   · exact one_ne_zero
-  · rw [slotOne5_some]
+  · rw [FaceHomomorphism.slotOne5_some]
     split_ifs with hx
     · norm_num
     · exact hx
@@ -50,7 +44,7 @@ private lemma slotOne5_ne (P : RankOne.E5.Point) : RankOne.slotOne P ≠ 0 := by
 private lemma slotTwo5_ne (P : RankOne.E5.Point) : RankOne.slotTwo P ≠ 0 := by
   rcases P with _ | @⟨x, y, h⟩
   · exact one_ne_zero
-  · rw [slotTwo5_some]
+  · rw [FaceHomomorphism.slotTwo5_some]
     split_ifs with hx
     · norm_num
     · exact sub_ne_zero.mpr hx
@@ -68,29 +62,6 @@ private lemma slotTwo_neg (P : RankOne.E5.Point) :
   · rw [← Point.zero_def, neg_zero]
   · rw [Point.neg_some]
     rfl
-
-private lemma sqcls_trans {a b c : ℚ} (h₁ : Descent.SqCls a b) (h₂ : Descent.SqCls b c) :
-    Descent.SqCls a c := by
-  obtain ⟨k, hk, hkv⟩ := h₁
-  obtain ⟨m, hm, hmv⟩ := h₂
-  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
-
-private lemma sqcls_symm {a b : ℚ} (h : Descent.SqCls a b) : Descent.SqCls b a := by
-  obtain ⟨c, hc, hv⟩ := h
-  exact ⟨c⁻¹, inv_ne_zero hc, by
-    rw [hv, inv_pow, inv_mul_cancel_left₀ (pow_ne_zero 2 hc)]⟩
-
-private lemma sqcls_mul {a b c d : ℚ} (h₁ : Descent.SqCls a c) (h₂ : Descent.SqCls b d) :
-    Descent.SqCls (a * b) (c * d) := by
-  obtain ⟨k, hk, hkv⟩ := h₁
-  obtain ⟨m, hm, hmv⟩ := h₂
-  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
-
-private lemma sqcls_ne {a b : ℚ} (h : Descent.SqCls a b) (ha : a ≠ 0) : b ≠ 0 := by
-  obtain ⟨c, hc, hv⟩ := h
-  intro hb
-  rw [hb, mul_zero] at hv
-  exact ha hv
 
 /-! ## 2. The square-class refutations -/
 
@@ -116,8 +87,8 @@ private lemma diff_gives_sqcls {A B Q : RankOne.E5.Point} (hAB : A - B = Q + Q)
   obtain ⟨k1, -⟩ := FaceHomomorphism.theDoublesLandInTheKernelOnTheFiveCurve Q
   have h2 : Descent.SqCls (RankOne.slotOne A * RankOne.slotOne B) pr := by
     rw [← hpr]
-    exact sqcls_mul hA hB
-  exact sqcls_trans (sqcls_trans (sqcls_symm k1) hom1) h2
+    exact Descent.sqClsMul hA hB
+  exact Descent.sqClsTrans (Descent.sqClsTrans (Descent.sqClsSymm k1) hom1) h2
 
 /-! ## 3. The torsion trio, pairwise non-congruent modulo doubles -/
 
@@ -209,17 +180,17 @@ private lemma face_collision (f : Fin 3 × Fin 3 → RankOne.E5.Point) :
   have h21 := (hidx x').1
   have h22 := (hidx x').2
   rw [← hxx] at h21 h22
-  have hda : (dv (idx x)).1 ≠ 0 := sqcls_ne h11 (slotOne5_ne _)
-  have hdb : (dv (idx x)).2 ≠ 0 := sqcls_ne h12 (slotTwo5_ne _)
+  have hda : (dv (idx x)).1 ≠ 0 := Descent.sqClsNe h11 (slotOne5_ne _)
+  have hdb : (dv (idx x)).2 ≠ 0 := Descent.sqClsNe h12 (slotTwo5_ne _)
   obtain ⟨hom1, hom2⟩ :=
     FaceHomomorphism.theRankOneFaceIsAHomomorphismEverywhereHolds (f x) (-(f x'))
   rw [slotOne_neg, ← sub_eq_add_neg] at hom1
   rw [slotTwo_neg, ← sub_eq_add_neg] at hom2
   have hface1 : Descent.SqCls (RankOne.slotOne (f x - f x')) 1 :=
-    sqcls_trans hom1 (sqcls_trans (sqcls_mul h11 h21)
+    Descent.sqClsTrans hom1 (Descent.sqClsTrans (Descent.sqClsMul h11 h21)
       ⟨(dv (idx x)).1, hda, by ring⟩)
   have hface2 : Descent.SqCls (RankOne.slotTwo (f x - f x')) 1 :=
-    sqcls_trans hom2 (sqcls_trans (sqcls_mul h12 h22)
+    Descent.sqClsTrans hom2 (Descent.sqClsTrans (Descent.sqClsMul h12 h22)
       ⟨(dv (idx x)).2, hdb, by ring⟩)
   obtain ⟨Q, hQ⟩ := FiveHalving.theKernelIsTheDoublesAtFive _ hface1 hface2
   exact ⟨Q, hQ.symm⟩

@@ -62,25 +62,6 @@ theorem theCoordinatesAreAdditive {d e : ℤ} (hd : d ≠ 0) (he : e ≠ 0)
 
 variable {a b : ℤ}
 
-private lemma sqT {u v w : ℚ} (h₁ : Descent.SqCls u v) (h₂ : Descent.SqCls v w) :
-    Descent.SqCls u w := by
-  obtain ⟨c, hc, hv⟩ := h₁
-  obtain ⟨d, hd, hw⟩ := h₂
-  exact ⟨c * d, mul_ne_zero hc hd, by rw [hv, hw]; ring⟩
-
-private lemma sqS {u v : ℚ} (h : Descent.SqCls u v) (hu : u ≠ 0) :
-    Descent.SqCls v u := by
-  obtain ⟨c, hc, hv⟩ := h
-  refine ⟨1 / c, one_div_ne_zero hc, ?_⟩
-  rw [hv]
-  field_simp
-
-private lemma sqM {u v w z : ℚ} (h₁ : Descent.SqCls u w) (h₂ : Descent.SqCls v z) :
-    Descent.SqCls (u * v) (w * z) := by
-  obtain ⟨c, hc, hu⟩ := h₁
-  obtain ⟨d, hd, hv⟩ := h₂
-  exact ⟨c * d, mul_ne_zero hc hd, by rw [hu, hv]; ring⟩
-
 /-- **THE FIRST CLASS IS MULTIPLICATIVE ALONG THE GROUP LAW**: the class of a sum is
 the product of the classes, modulo squares.  This is the descent's conservation law
 transported onto the chosen integer representatives. -/
@@ -96,8 +77,8 @@ theorem theFirstClassIsMultiplicative (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b
   obtain ⟨hom1, -⟩ :=
     GeneralHom.theFaceIsAHomomorphismOnEveryFullTwoTorsionCurve haq hbq habq P Q
   -- class(P+Q) ~ slot(P+Q) ~ slot(P)·slot(Q) ~ class(P)·class(Q)
-  refine sqT (sqS hPQcls (GeneralHom.slotOne_ne haq hbq (P + Q))) ?_
-  exact sqT hom1 (sqM hPcls hQcls)
+  refine Descent.sqClsTrans (Descent.sqClsSymm hPQcls) ?_
+  exact Descent.sqClsTrans hom1 (Descent.sqClsMul hPcls hQcls)
 
 /-- **THE SECOND CLASS IS MULTIPLICATIVE ALONG THE GROUP LAW**. -/
 theorem theSecondClassIsMultiplicative (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b ≠ 0)
@@ -111,8 +92,8 @@ theorem theSecondClassIsMultiplicative (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - 
   obtain ⟨-, hQ0, -, -, -, hQcls⟩ := classOf_spec ha hb hab Q
   obtain ⟨-, hom2⟩ :=
     GeneralHom.theFaceIsAHomomorphismOnEveryFullTwoTorsionCurve haq hbq habq P Q
-  refine sqT (sqS hPQcls (GeneralHom.slotTwo_ne haq habq (P + Q))) ?_
-  exact sqT hom2 (sqM hPcls hQcls)
+  refine Descent.sqClsTrans (Descent.sqClsSymm hPQcls) ?_
+  exact Descent.sqClsTrans hom2 (Descent.sqClsMul hPcls hQcls)
 
 /-- **THE CLASS COORDINATES ARE ADDITIVE ON POINTS**: the descent, read in
 coordinates, is a homomorphism into an `𝔽₂`-vector space.  This is the statement the

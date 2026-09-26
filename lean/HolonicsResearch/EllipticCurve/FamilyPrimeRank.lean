@@ -92,9 +92,9 @@ theorem theClassesCollideAtEveryPrimeModulus (n : ℕ) (hnp : n.Prime) {α : Typ
     ∃ a b, a ≠ b ∧ ∃ Q : (FamilyFace.E ((n : ℚ))).Point, f a - f b = Q + Q := by
   have hn : 0 < n := hnp.pos
   set box : Finset (ℤ × ℤ) := rungs n ×ˢ rungs n with hbox
-  have hmaps : ∀ a : α, FamilyCollision.classOf hn (f a) ∈ box := by
+  have hmaps : ∀ a : α, FamilyMordell.classOf hn (f a) ∈ box := by
     intro a
-    obtain ⟨h10, h20, h1d, h2d, -, -⟩ := FamilyCollision.classOf_spec hn (f a)
+    obtain ⟨h10, h20, h1d, h2d, -, -⟩ := FamilyMordell.classOf_spec hn (f a)
     rw [hbox, Finset.mem_product]
     exact ⟨mem_rungs hnp h10 h1d, mem_rungs hnp h20 h2d⟩
   have hboxcard : box.card ≤ 64 := by

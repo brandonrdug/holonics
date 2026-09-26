@@ -1,6 +1,7 @@
 import HolonicsResearch.EllipticCurve.FamilyFace
 import Mathlib.NumberTheory.Padics.PadicVal.Basic
 import Mathlib.Tactic
+import HolonicsResearch.EllipticCurve.FamilySupport
 
 /-!
 # FaceImage: the two-descent of the thirty-four twist is complete
@@ -44,33 +45,6 @@ open WeierstrassCurve.Affine
 
 /-! ## 1. Square-class helpers -/
 
-private lemma sqcls_trans {a b c : ℚ} (h₁ : Descent.SqCls a b) (h₂ : Descent.SqCls b c) :
-    Descent.SqCls a c := by
-  obtain ⟨k, hk, hkv⟩ := h₁
-  obtain ⟨m, hm, hmv⟩ := h₂
-  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
-
-private lemma sqcls_symm {a b : ℚ} (h : Descent.SqCls a b) : Descent.SqCls b a := by
-  obtain ⟨c, hc, hval⟩ := h
-  refine ⟨1 / c, one_div_ne_zero hc, ?_⟩
-  rw [hval]
-  field_simp
-
-private lemma sqcls_mul {a b c d : ℚ} (h₁ : Descent.SqCls a c) (h₂ : Descent.SqCls b d) :
-    Descent.SqCls (a * b) (c * d) := by
-  obtain ⟨k, hk, hkv⟩ := h₁
-  obtain ⟨m, hm, hmv⟩ := h₂
-  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
-
-private lemma sqcls_sign {a d : ℚ} (h : Descent.SqCls a d) : (0 < a ↔ 0 < d) := by
-  obtain ⟨c, hc, hval⟩ := h
-  have hc2 : 0 < c ^ 2 := by positivity
-  constructor
-  · intro ha
-    nlinarith
-  · intro hd
-    nlinarith
-
 /-! ## 2. The curve data at thirty-four -/
 
 private lemma onCurve34 {x y : ℚ} (h : (FamilyFace.E 34).Nonsingular x y) :
@@ -102,8 +76,8 @@ theorem theSignsAgreeAcrossTheFace {x y d₁ d₂ : ℚ}
     (0 < d₁ ∧ 0 < d₂) ∨ (d₁ < 0 ∧ d₂ < 0) := by
   obtain ⟨hx0, hx34, hxm34⟩ := avoid34 hcurve hy
   have hy2 : 0 < y ^ 2 := by positivity
-  have hs₁ := sqcls_sign h₁
-  have hs₂ := sqcls_sign h₂
+  have hs₁ := Descent.sqClsSign h₁
+  have hs₂ := Descent.sqClsSign h₂
   rcases lt_or_gt_of_ne hx0 with hx | hx
   · -- x < 0: the egg; x − 34 < 0, and x + 34 > 0 is forced by the curve
     right
@@ -134,22 +108,6 @@ theorem theSignsAgreeAcrossTheFace {x y d₁ d₂ : ℚ}
     exact ⟨hs₁.mp hx, hs₂.mp (by linarith)⟩
 
 /-! ## 4. The valuation-parity law: a distant prime sees an even valuation -/
-
-private lemma val_add_left {ℓ : ℕ} [Fact ℓ.Prime] {a b : ℚ} (ha : a ≠ 0)
-    (hab : a + b ≠ 0) (h : padicValRat ℓ a < padicValRat ℓ b) :
-    padicValRat ℓ (a + b) = padicValRat ℓ a := by
-  have h1 : padicValRat ℓ a ≤ padicValRat ℓ (a + b) := by
-    have hmin := padicValRat.min_le_padicValRat_add (p := ℓ) (q := a) (r := b) hab
-    omega
-  have h2 : padicValRat ℓ (a + b) ≤ padicValRat ℓ a := by
-    by_contra hcon
-    push_neg at hcon
-    have hrw : a + b + -b = a := by ring
-    have hmin := padicValRat.min_le_padicValRat_add (p := ℓ) (q := a + b) (r := -b)
-      (by rw [hrw]; exact ha)
-    rw [hrw, padicValRat.neg] at hmin
-    omega
-  omega
 
 private lemma prime_not_dvd_68 {ℓ : ℕ} (hℓ : ℓ.Prime) (h2 : ℓ ≠ 2) (h17 : ℓ ≠ 17) :
     ¬ ℓ ∣ 68 := by
@@ -199,24 +157,24 @@ private lemma even_slot_val {ℓ : ℕ} [Fact ℓ.Prime] (h2 : ℓ ≠ 2) (h17 :
     rcases lt_trichotomy (padicValRat ℓ x) 0 with hv | hv | hv
     · -- deep: all three factors carry the same valuation
       have e1 : padicValRat ℓ (x - 34) = padicValRat ℓ x := by
-        have := val_add_left hx0
+        have := FamilySupport.val_add_left hx0
           (by rw [show x + -34 = x - 34 by ring]; exact hxm) (by rw [vm34]; exact hv)
         rw [show x + -34 = x - 34 by ring] at this
         exact this
       have e2 : padicValRat ℓ (x + 34) = padicValRat ℓ x := by
-        have := val_add_left hx0 hxp (by rw [v34]; exact hv)
+        have := FamilySupport.val_add_left hx0 hxp (by rw [v34]; exact hv)
         exact this
       rw [e1, e2] at hprod
       refine ⟨padicValRat ℓ y - padicValRat ℓ x, by linarith⟩
     · exact ⟨0, by rw [hv]; ring⟩
     · -- shallow: the shifted factors carry valuation zero
       have e1 : padicValRat ℓ (x - 34) = 0 := by
-        have := val_add_left (by norm_num : (-34 : ℚ) ≠ 0)
+        have := FamilySupport.val_add_left (by norm_num : (-34 : ℚ) ≠ 0)
           (by rw [show -34 + x = x - 34 by ring]; exact hxm) (by rw [vm34]; exact hv)
         rw [show (-34 : ℚ) + x = x - 34 by ring, vm34] at this
         exact this
       have e2 : padicValRat ℓ (x + 34) = 0 := by
-        have := val_add_left (by norm_num : (34 : ℚ) ≠ 0)
+        have := FamilySupport.val_add_left (by norm_num : (34 : ℚ) ≠ 0)
           (by rw [show (34 : ℚ) + x = x + 34 by ring]; exact hxp) (by rw [v34]; exact hv)
         rw [show (34 : ℚ) + x = x + 34 by ring, v34] at this
         exact this
@@ -225,12 +183,12 @@ private lemma even_slot_val {ℓ : ℕ} [Fact ℓ.Prime] (h2 : ℓ ≠ 2) (h17 :
   · -- the second slot
     rcases lt_trichotomy (padicValRat ℓ (x - 34)) 0 with hv | hv | hv
     · have e1 : padicValRat ℓ x = padicValRat ℓ (x - 34) := by
-        have := val_add_left hxm
+        have := FamilySupport.val_add_left hxm
           (by rw [show x - 34 + 34 = x by ring]; exact hx0) (by rw [v34]; exact hv)
         rw [show x - 34 + 34 = x by ring] at this
         exact this
       have e2 : padicValRat ℓ (x + 34) = padicValRat ℓ (x - 34) := by
-        have := val_add_left hxm
+        have := FamilySupport.val_add_left hxm
           (by rw [show x - 34 + 68 = x + 34 by ring]; exact hxp) (by rw [v68]; exact hv)
         rw [show x - 34 + 68 = x + 34 by ring] at this
         exact this
@@ -238,12 +196,12 @@ private lemma even_slot_val {ℓ : ℕ} [Fact ℓ.Prime] (h2 : ℓ ≠ 2) (h17 :
       refine ⟨padicValRat ℓ y - padicValRat ℓ (x - 34), by linarith⟩
     · exact ⟨0, by rw [hv]; ring⟩
     · have e1 : padicValRat ℓ x = 0 := by
-        have := val_add_left (by norm_num : (34 : ℚ) ≠ 0)
+        have := FamilySupport.val_add_left (by norm_num : (34 : ℚ) ≠ 0)
           (by rw [show (34 : ℚ) + (x - 34) = x by ring]; exact hx0) (by rw [v34]; exact hv)
         rw [show (34 : ℚ) + (x - 34) = x by ring, v34] at this
         exact this
       have e2 : padicValRat ℓ (x + 34) = 0 := by
-        have := val_add_left (by norm_num : (68 : ℚ) ≠ 0)
+        have := FamilySupport.val_add_left (by norm_num : (68 : ℚ) ≠ 0)
           (by rw [show (68 : ℚ) + (x - 34) = x + 34 by ring]; exact hxp)
           (by rw [v68]; exact hv)
         rw [show (68 : ℚ) + (x - 34) = x + 34 by ring, v68] at this
@@ -352,7 +310,7 @@ private lemma classFromEvenValuations {x : ℚ} (hx : x ≠ 0)
       · exact Or.inr (Or.inr (Or.inl (by norm_num)))
       · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inl (by norm_num)))))
       · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl (by norm_num)))))))
-    · refine sqcls_trans hcls ⟨(b : ℚ), by exact_mod_cast hb0, ?_⟩
+    · refine Descent.sqClsTrans hcls ⟨(b : ℚ), by exact_mod_cast hb0, ?_⟩
       rw [hs]
       push_cast [← hab]
       ring
@@ -363,7 +321,7 @@ private lemma classFromEvenValuations {x : ℚ} (hx : x ≠ 0)
       · exact Or.inr (Or.inr (Or.inr (Or.inl (by norm_num))))
       · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl (by norm_num))))))
       · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (by norm_num)))))))
-    · refine sqcls_trans hcls ⟨(b : ℚ), by exact_mod_cast hb0, ?_⟩
+    · refine Descent.sqClsTrans hcls ⟨(b : ℚ), by exact_mod_cast hb0, ?_⟩
       rw [hs]
       push_cast [← hab]
       ring
@@ -546,8 +504,8 @@ private lemma face_add {P Q : (FamilyFace.E 34).Point} {a b a' b' t₁ t₂ : �
     Descent.SqCls (FamilyFace.slotOne 34 (P + Q)) t₁ ∧
     Descent.SqCls (FamilyFace.slotTwo 34 (P + Q)) t₂ := by
   obtain ⟨g₁, g₂⟩ := hom34 P Q
-  exact ⟨sqcls_trans g₁ (sqcls_trans (sqcls_mul hP.1 hQ.1) h₁),
-    sqcls_trans g₂ (sqcls_trans (sqcls_mul hP.2 hQ.2) h₂)⟩
+  exact ⟨Descent.sqClsTrans g₁ (Descent.sqClsTrans (Descent.sqClsMul hP.1 hQ.1) h₁),
+    Descent.sqClsTrans g₂ (Descent.sqClsTrans (Descent.sqClsMul hP.2 hQ.2) h₂)⟩
 
 private lemma face_zero :
     Descent.SqCls (FamilyFace.slotOne 34 (0 : (FamilyFace.E 34).Point)) 1 ∧
@@ -685,8 +643,8 @@ private lemma refuse_by_translation {d₁ d₂ k₁ k₂ : ℚ} (P R : (FamilyFa
     (ht₁ : Descent.SqCls (d₁ * k₁) 1) (ht₂ : Descent.SqCls (d₂ * k₂) 2) : False := by
   obtain ⟨g₁, g₂⟩ := hom34 P R
   exact theCanonicalCosetIsRefused (P + R)
-    ⟨sqcls_trans g₁ (sqcls_trans (sqcls_mul hc₁ hR.1) ht₁),
-     sqcls_trans g₂ (sqcls_trans (sqcls_mul hc₂ hR.2) ht₂)⟩
+    ⟨Descent.sqClsTrans g₁ (Descent.sqClsTrans (Descent.sqClsMul hc₁ hR.1) ht₁),
+     Descent.sqClsTrans g₂ (Descent.sqClsTrans (Descent.sqClsMul hc₂ hR.2) ht₂)⟩
 
 /-! ## 8. The image theorems -/
 

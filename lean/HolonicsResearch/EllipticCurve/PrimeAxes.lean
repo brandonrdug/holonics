@@ -154,19 +154,6 @@ theorem theCoordinateVectorDeterminesTheSquareClass {d e : ℤ} (hd : d ≠ 0) (
 
 
 
-private lemma sqTr {u v w : ℚ} (h₁ : Descent.SqCls u v) (h₂ : Descent.SqCls v w) :
-    Descent.SqCls u w := by
-  obtain ⟨c, hc, hv⟩ := h₁
-  obtain ⟨d, hd, hw⟩ := h₂
-  exact ⟨c * d, mul_ne_zero hc hd, by rw [hv, hw]; ring⟩
-
-private lemma sqSy {u v : ℚ} (h : Descent.SqCls u v) (hu : u ≠ 0) :
-    Descent.SqCls v u := by
-  obtain ⟨c, hc, hv⟩ := h
-  refine ⟨1 / c, one_div_ne_zero hc, ?_⟩
-  rw [hv]
-  field_simp
-
 /-- The coordinate vector of a point's descent face: one bit per slot per axis,
 plus one sign bit per slot. -/
 def faceVec (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b ≠ 0)
@@ -235,10 +222,10 @@ theorem theClassesCollideByDimension (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b 
   -- chain slot ~ class ~ class ~ slot
   have hslot1 : Descent.SqCls (slotOne ((a : ℚ)) ((b : ℚ)) (f p))
       (slotOne ((a : ℚ)) ((b : ℚ)) (f q)) :=
-    sqTr (sqTr hps1 hc1) (sqSy hqs1 (GeneralHom.slotOne_ne haq hbq (f q)))
+    Descent.sqClsTrans (Descent.sqClsTrans hps1 hc1) (Descent.sqClsSymm hqs1)
   have hslot2 : Descent.SqCls (slotTwo ((a : ℚ)) ((b : ℚ)) (f p))
       (slotTwo ((a : ℚ)) ((b : ℚ)) (f q)) :=
-    sqTr (sqTr hps2 hc2) (sqSy hqs2 (GeneralHom.slotTwo_ne haq habq (f q)))
+    Descent.sqClsTrans (Descent.sqClsTrans hps2 hc2) (Descent.sqClsSymm hqs2)
   exact sameClassDouble haq hbq habq (f p) (f q) hslot1 hslot2
 
 

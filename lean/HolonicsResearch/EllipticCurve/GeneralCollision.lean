@@ -33,18 +33,6 @@ open Holonics.EllipticCurve.GeneralSupport
 
 variable {a b : ℤ}
 
-private lemma sqcls_trans' {u v w : ℚ} (h₁ : Descent.SqCls u v) (h₂ : Descent.SqCls v w) :
-    Descent.SqCls u w := by
-  obtain ⟨c, hc, hv⟩ := h₁
-  obtain ⟨d, hd, hw⟩ := h₂
-  exact ⟨c * d, mul_ne_zero hc hd, by rw [hv, hw]; ring⟩
-
-private lemma sqcls_mul' {u v w z : ℚ} (h₁ : Descent.SqCls u w) (h₂ : Descent.SqCls v z) :
-    Descent.SqCls (u * v) (w * z) := by
-  obtain ⟨c, hc, hu⟩ := h₁
-  obtain ⟨d, hd, hv⟩ := h₂
-  exact ⟨c * d, mul_ne_zero hc hd, by rw [hu, hv]; ring⟩
-
 private lemma sqcls_self_one {u : ℚ} (hu : u ≠ 0) : Descent.SqCls (u * u) 1 :=
   ⟨u, hu, by ring⟩
 
@@ -79,12 +67,12 @@ theorem sameClassDouble (ha0 : (a : ℚ) ≠ 0) (hb0 : (b : ℚ) ≠ 0)
   rw [slotOne_neg, ← sub_eq_add_neg] at hom1
   rw [slotTwo_neg, ← sub_eq_add_neg] at hom2
   have k1 : Descent.SqCls (slotOne ((a : ℚ)) ((b : ℚ)) (X - R)) 1 := by
-    refine sqcls_trans' hom1 ?_
-    refine sqcls_trans' (sqcls_mul' hc₁ (Descent.sqClsRefl _)) ?_
+    refine Descent.sqClsTrans hom1 ?_
+    refine Descent.sqClsTrans (Descent.sqClsMul hc₁ (Descent.sqClsRefl _)) ?_
     exact sqcls_self_one (slotOne_ne ha0 hb0 R)
   have k2 : Descent.SqCls (slotTwo ((a : ℚ)) ((b : ℚ)) (X - R)) 1 := by
-    refine sqcls_trans' hom2 ?_
-    refine sqcls_trans' (sqcls_mul' hc₂ (Descent.sqClsRefl _)) ?_
+    refine Descent.sqClsTrans hom2 ?_
+    refine Descent.sqClsTrans (Descent.sqClsMul hc₂ (Descent.sqClsRefl _)) ?_
     exact sqcls_self_one (slotTwo_ne ha0 hab0 R)
   obtain ⟨Q, hQ⟩ :=
     theKernelIsTheDoublesOnEveryFullTwoTorsionCurve ha0 hb0 hab0 (X - R) k1 k2
@@ -132,13 +120,6 @@ lemma classOf_spec (ha0 : a ≠ 0) (hb0 : b ≠ 0) (hab0 : a - b ≠ 0)
       (((classOf ha0 hb0 hab0 P).2 : ℤ) : ℚ) :=
   (theSlotClassesAreSupportedOnEveryFullTwoTorsionCurve ha0 hb0 hab0
     P).choose_spec.choose_spec
-
-private lemma sqcls_symm' {u v : ℚ} (h : Descent.SqCls u v) (hu : u ≠ 0) :
-    Descent.SqCls v u := by
-  obtain ⟨c, hc, hv⟩ := h
-  refine ⟨1 / c, one_div_ne_zero hc, ?_⟩
-  rw [hv]
-  field_simp
 
 /-- **THE CLASSES COLLIDE ON EVERY FULL-TWO-TORSION CURVE**: any family of more than
 `(2·τ(|ab(a−b)|))²` points contains two whose difference is a double.  This is the
@@ -190,8 +171,8 @@ theorem theClassesCollideOnEveryFullTwoTorsionCurve
   have hq2 : slotTwo ((a : ℚ)) ((b : ℚ)) (f q) ≠ 0 := slotTwo_ne haq habq (f q)
   exact ⟨p, q, hpq,
     sameClassDouble haq hbq habq (f p) (f q)
-      (sqcls_trans' hs1 (sqcls_symm' ht1 hq1))
-      (sqcls_trans' hs2 (sqcls_symm' ht2 hq2))⟩
+      (Descent.sqClsTrans hs1 (Descent.sqClsSymm ht1))
+      (Descent.sqClsTrans hs2 (Descent.sqClsSymm ht2))⟩
 
 
 /-! ## 3. Weak Mordell–Weil on every full-2-torsion curve -/

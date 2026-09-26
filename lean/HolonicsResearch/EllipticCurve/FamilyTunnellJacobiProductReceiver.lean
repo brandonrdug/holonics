@@ -46,7 +46,7 @@ def jacobiProductDiagonalTheta : PowerSeries ℤ :=
 /-- An integer root of `m²+m=d` always returns a natural pronic root.  The
 negative sheet is reflected by `m ↦ -m-1`; this is the source-side swing which
 pairs the two orientations. -/
-private theorem exists_pronic_of_integer_root {d : ℕ} {m : ℤ}
+theorem exists_pronic_of_integer_root {d : ℕ} {m : ℤ}
     (hroot : m ^ 2 + m = (d : ℤ)) :
     ∃ k : ℕ, k ^ 2 + k = d := by
   by_cases hm : 0 ≤ m
@@ -66,7 +66,7 @@ private theorem exists_pronic_of_integer_root {d : ℕ} {m : ℤ}
       nlinarith
     exact ⟨k, by exact_mod_cast hkroot⟩
 
-private theorem diagonalRootPopulation_eq_empty_of_no_pronic (d : ℕ)
+theorem diagonalRootPopulation_eq_empty_of_no_pronic (d : ℕ)
     (hnone : ¬ ∃ k : ℕ, k ^ 2 + k = d) :
     diagonalRootPopulation d = ∅ := by
   rw [Finset.eq_empty_iff_forall_notMem]
@@ -74,7 +74,7 @@ private theorem diagonalRootPopulation_eq_empty_of_no_pronic (d : ℕ)
   apply hnone
   exact exists_pronic_of_integer_root (Finset.mem_filter.mp hm).2
 
-private theorem shiftedTriangularPopulation_affine_eq_singleton
+theorem shiftedTriangularPopulation_affine_eq_singleton
     {d k : ℕ} (hk : k ^ 2 + k = d) :
     shiftedTriangularPopulation (1 + 4 * d) = {k} := by
   ext j
@@ -101,7 +101,7 @@ private theorem shiftedTriangularPopulation_affine_eq_singleton
     · have hkIndex := two_mul_triangularIndex k
       nlinarith
 
-private theorem shiftedTriangularPopulation_affine_eq_empty (d : ℕ)
+theorem shiftedTriangularPopulation_affine_eq_empty (d : ℕ)
     (hnone : ¬ ∃ k : ℕ, k ^ 2 + k = d) :
     shiftedTriangularPopulation (1 + 4 * d) = ∅ := by
   rw [Finset.eq_empty_iff_forall_notMem]

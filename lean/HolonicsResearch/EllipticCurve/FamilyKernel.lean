@@ -45,15 +45,15 @@ def slotTwoAt (n : ℚ) : (FamilyFace.E n).Point → ℚ
   | .zero => 1
   | .some x _ _ => if x = n then 2 * n ^ 2 else x - n
 
-private lemma slotOneAt_some {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
+lemma slotOneAt_some {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
     slotOneAt n (.some x y h) = if x = 0 then -n ^ 2 else x := rfl
 
-private lemma slotTwoAt_some {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
+lemma slotTwoAt_some {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
     slotTwoAt n (.some x y h) = if x = n then 2 * n ^ 2 else x - n := rfl
 
 /-! ## 2. Point-level plumbing at every modulus -/
 
-private lemma onCurveAt {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
+lemma onCurveAt {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
     y ^ 2 = x ^ 3 - n ^ 2 * x := by
   have h1 := ((nonsingular_iff x y).mp h).1
   rw [equation_iff] at h1
@@ -63,7 +63,7 @@ private lemma onCurveAt {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
 private lemma negYAt (n x y : ℚ) : (FamilyFace.E n).negY x y = -y := by
   simp [negY, FamilyFace.E]
 
-private lemma someEqAt {n x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
+lemma someEqAt {n x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
     {h₁ : (FamilyFace.E n).Nonsingular x₁ y₁} {h₂ : (FamilyFace.E n).Nonsingular x₂ y₂} :
     (Point.some _ _ h₁ : (FamilyFace.E n).Point) = Point.some _ _ h₂ := by
   subst hx; subst hy; rfl

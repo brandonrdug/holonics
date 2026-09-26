@@ -429,20 +429,6 @@ def threshold (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b ≠ 0) : ℕ :=
 
 /-! ## 8. The descent step -/
 
-private lemma sqT {u v w : ℚ} (h₁ : Descent.SqCls u v) (h₂ : Descent.SqCls v w) :
-    Descent.SqCls u w := by
-  obtain ⟨c, hc, hv⟩ := h₁
-  obtain ⟨d, hd, hw⟩ := h₂
-  exact ⟨c * d, mul_ne_zero hc hd, by rw [hv, hw]; ring⟩
-
-private lemma sqS {u v : ℚ} (h : Descent.SqCls u v) (hu : u ≠ 0) :
-    Descent.SqCls v u := by
-  obtain ⟨c, hc, hv⟩ := h
-  refine ⟨1 / c, one_div_ne_zero hc, ?_⟩
-  rw [hv]
-  field_simp
-
-
 set_option maxHeartbeats 2000000 in
 /-- **THE DESCENT STEP**: above the threshold, a point is twice a strictly shorter
 point plus a bounded representative.  This is where quartic beats quadratic. -/
@@ -470,10 +456,10 @@ theorem theDescentStep (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b ≠ 0)
   -- the difference is a double
   have hs1 : Descent.SqCls (slotOne ((a : ℚ)) ((b : ℚ)) X)
       (slotOne ((a : ℚ)) ((b : ℚ)) R) := by
-    exact sqT hX1 (sqS hR1 (GeneralHom.slotOne_ne haq hbq R))
+    exact Descent.sqClsTrans hX1 (Descent.sqClsSymm hR1)
   have hs2 : Descent.SqCls (slotTwo ((a : ℚ)) ((b : ℚ)) X)
       (slotTwo ((a : ℚ)) ((b : ℚ)) R) := by
-    exact sqT hX2 (sqS hR2 (GeneralHom.slotTwo_ne haq habq R))
+    exact Descent.sqClsTrans hX2 (Descent.sqClsSymm hR2)
   obtain ⟨Q, hQ⟩ := sameClassDouble haq hbq habq X R hs1 hs2
   refine ⟨Q, R, hRh, by rw [← hQ]; abel, ?_⟩
   -- the translate is bounded quadratically, in both fibres of `R`

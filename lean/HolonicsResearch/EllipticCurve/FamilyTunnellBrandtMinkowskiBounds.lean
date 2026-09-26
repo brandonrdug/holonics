@@ -61,12 +61,6 @@ theorem brandtFirst_minkowski_level_one_box
 
 /-! The finite box is tight enough to recover the exact norm-one fibre. -/
 
-theorem brandtFirst_minkowski_level_one_classification
-    (m : IntTriple) :
-    brandtFirstQuadratic m = 1 ↔
-      m = (0, 1, 0) ∨ m = (0, -1, 0) := by
-  exact Holonics.EllipticCurve.FamilyTunnellNormOneReturn.brandtFirstQuadratic_eq_one_iff m
-
 /-! ## The completed-square chart for the second class -/
 
 theorem brandtSecond_minkowski_square_bounds
@@ -119,7 +113,6 @@ theorem brandtSecond_minkowski_level_one_classification
 
 #print axioms brandtFirst_minkowski_square_bounds
 #print axioms brandtFirst_minkowski_level_one_box
-#print axioms brandtFirst_minkowski_level_one_classification
 #print axioms brandtSecond_minkowski_square_bounds
 #print axioms brandtSecond_minkowski_level_one_box
 #print axioms brandtSecond_minkowski_level_one_classification

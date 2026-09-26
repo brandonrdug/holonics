@@ -51,40 +51,6 @@ open WeierstrassCurve.Affine
 
 /-! ## 1. Square-class helpers -/
 
-private lemma sqcls_of_mul_eq_sq {a b s : ℚ} (hb : b ≠ 0) (hs : s ≠ 0)
-    (h : a * b = s ^ 2) : Descent.SqCls a b := by
-  refine ⟨s / b, div_ne_zero hs hb, ?_⟩
-  rw [div_pow, div_mul_eq_mul_div, eq_div_iff (pow_ne_zero 2 hb)]
-  linear_combination b * h
-
-private lemma sqcls_one_mul_self {s : ℚ} (hs : s ≠ 0) : Descent.SqCls 1 (s * s) := by
-  refine ⟨1 / s, one_div_ne_zero hs, ?_⟩
-  field_simp
-
-private lemma sqcls_scale_sq {a s : ℚ} (h : Descent.SqCls a 1) (hs : s ≠ 0) :
-    Descent.SqCls a (s * s) := by
-  obtain ⟨c, hc, hval⟩ := h
-  refine ⟨c / s, div_ne_zero hc hs, ?_⟩
-  rw [hval]
-  field_simp
-
-private lemma sqcls_symm {a b : ℚ} (h : Descent.SqCls a b) : Descent.SqCls b a := by
-  obtain ⟨c, hc, hval⟩ := h
-  refine ⟨1 / c, one_div_ne_zero hc, ?_⟩
-  rw [hval]
-  field_simp
-
-private lemma sqcls_mul_sq_left {a b t : ℚ} (h : Descent.SqCls a b) (ht : t ≠ 0) :
-    Descent.SqCls (t ^ 2 * a) b := by
-  obtain ⟨c, hc, hval⟩ := h
-  exact ⟨t * c, mul_ne_zero ht hc, by rw [hval]; ring⟩
-
-private lemma sqcls_absorb_right {a b c : ℚ} (h : Descent.SqCls a (b * c))
-    (hc : Descent.SqCls c 1) : Descent.SqCls a b := by
-  obtain ⟨k, hk, hkval⟩ := h
-  obtain ⟨m, hm, hmval⟩ := hc
-  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkval, hmval]; ring⟩
-
 /-! ## 2. The family landing laws
 
 On any twist `y² = x³ − n²x` with slots read at `{0, n}`: the chord through two points off
@@ -381,14 +347,14 @@ theorem theDescentFaceIsAHomomorphismEverywhereHolds :
         someEqOne rfl (by linarith)
       rw [heq]
       obtain ⟨k1, k2⟩ := theDoublesLandInTheKernel (Point.some _ _ h₁)
-      exact ⟨sqcls_scale_sq k1 (slotOne_ne _), sqcls_scale_sq k2 (slotTwo_ne _)⟩
+      exact ⟨Descent.sqClsScaleSq k1 (slotOne_ne _), Descent.sqClsScaleSq k2 (slotTwo_ne _)⟩
     · -- y₂ = −y₁: vertical inverse or repeated half-turn
       by_cases hy0 : y₁ = 0
       · have heq : (Point.some _ _ h₂ : Descent.E.Point) = Point.some _ _ h₁ :=
           someEqOne rfl (by linarith)
         rw [heq]
         obtain ⟨k1, k2⟩ := theDoublesLandInTheKernel (Point.some _ _ h₁)
-        exact ⟨sqcls_scale_sq k1 (slotOne_ne _), sqcls_scale_sq k2 (slotTwo_ne _)⟩
+        exact ⟨Descent.sqClsScaleSq k1 (slotOne_ne _), Descent.sqClsScaleSq k2 (slotTwo_ne _)⟩
       · have hzero : (Point.some _ _ h₁ : Descent.E.Point) + Point.some _ _ h₂ = 0 :=
           Point.add_of_Y_eq rfl (by rw [negYOne]; linarith)
         have hs : Descent.slotOne (Point.some _ _ h₂) = Descent.slotOne (Point.some _ _ h₁) := by
@@ -396,7 +362,7 @@ theorem theDescentFaceIsAHomomorphismEverywhereHolds :
         have ht : Descent.slotTwo (Point.some _ _ h₂) = Descent.slotTwo (Point.some _ _ h₁) := by
           rw [slotTwo_some, slotTwo_some]
         rw [hzero, e1, e2, hs, ht]
-        exact ⟨sqcls_one_mul_self (slotOne_ne _), sqcls_one_mul_self (slotTwo_ne _)⟩
+        exact ⟨Descent.sqClsOneMulSelf (slotOne_ne _), Descent.sqClsOneMulSelf (slotTwo_ne _)⟩
   · -- distinct abscissae: a genuine chord
     by_cases hy1 : y₁ = 0
     · by_cases hy2 : y₂ = 0
@@ -506,7 +472,7 @@ theorem theDescentFaceIsAHomomorphismEverywhereHolds :
 
 /-! ## 4. The five-curve assembly: point-level plumbing on `y² = x³ − 25x` -/
 
-private lemma onCurveFive {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
+lemma onCurveFive {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
     y ^ 2 = x ^ 3 - 25 * x := by
   have h1 := ((nonsingular_iff x y).mp h).1
   rw [equation_iff] at h1
@@ -516,15 +482,10 @@ private lemma onCurveFive {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
 private lemma negYFive (x y : ℚ) : RankOne.E5.negY x y = -y := by
   simp [negY, RankOne.E5]
 
-private lemma someEqFive {x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
-    {h₁ : RankOne.E5.Nonsingular x₁ y₁} {h₂ : RankOne.E5.Nonsingular x₂ y₂} :
-    (Point.some x₁ y₁ h₁ : RankOne.E5.Point) = Point.some x₂ y₂ h₂ := by
-  subst hx; subst hy; rfl
-
-private lemma slotOne5_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
+lemma slotOne5_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
     RankOne.slotOne (.some x y h) = if x = 0 then -25 else x := rfl
 
-private lemma slotTwo5_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
+lemma slotTwo5_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
     RankOne.slotTwo (.some x y h) = if x = 5 then 50 else x - 5 := rfl
 
 private lemma slotOne5_ne (P : RankOne.E5.Point) : RankOne.slotOne P ≠ 0 := by
@@ -704,16 +665,16 @@ theorem theRankOneFaceIsAHomomorphismEverywhereHolds :
       linear_combination hB - hA
     rcases mul_eq_zero.mp hyy with hcase | hcase
     · have heq : (Point.some _ _ h₂ : RankOne.E5.Point) = Point.some _ _ h₁ :=
-        someEqFive rfl (by linarith)
+        RankOne.some_eq_some rfl (by linarith)
       rw [heq]
       obtain ⟨k1, k2⟩ := theDoublesLandInTheKernelOnTheFiveCurve (Point.some _ _ h₁)
-      exact ⟨sqcls_scale_sq k1 (slotOne5_ne _), sqcls_scale_sq k2 (slotTwo5_ne _)⟩
+      exact ⟨Descent.sqClsScaleSq k1 (slotOne5_ne _), Descent.sqClsScaleSq k2 (slotTwo5_ne _)⟩
     · by_cases hy0 : y₁ = 0
       · have heq : (Point.some _ _ h₂ : RankOne.E5.Point) = Point.some _ _ h₁ :=
-          someEqFive rfl (by linarith)
+          RankOne.some_eq_some rfl (by linarith)
         rw [heq]
         obtain ⟨k1, k2⟩ := theDoublesLandInTheKernelOnTheFiveCurve (Point.some _ _ h₁)
-        exact ⟨sqcls_scale_sq k1 (slotOne5_ne _), sqcls_scale_sq k2 (slotTwo5_ne _)⟩
+        exact ⟨Descent.sqClsScaleSq k1 (slotOne5_ne _), Descent.sqClsScaleSq k2 (slotTwo5_ne _)⟩
       · have hzero : (Point.some _ _ h₁ : RankOne.E5.Point) + Point.some _ _ h₂ = 0 :=
           Point.add_of_Y_eq rfl (by rw [negYFive]; linarith)
         have hs : RankOne.slotOne (Point.some _ _ h₂) = RankOne.slotOne (Point.some _ _ h₁) := by
@@ -721,7 +682,7 @@ theorem theRankOneFaceIsAHomomorphismEverywhereHolds :
         have ht : RankOne.slotTwo (Point.some _ _ h₂) = RankOne.slotTwo (Point.some _ _ h₁) := by
           rw [slotTwo5_some, slotTwo5_some]
         rw [hzero, e1, e2, hs, ht]
-        exact ⟨sqcls_one_mul_self (slotOne5_ne _), sqcls_one_mul_self (slotTwo5_ne _)⟩
+        exact ⟨Descent.sqClsOneMulSelf (slotOne5_ne _), Descent.sqClsOneMulSelf (slotTwo5_ne _)⟩
   · by_cases hy1 : y₁ = 0
     · by_cases hy2 : y₂ = 0
       · -- both half-turns: the Klein chords, computed literally
@@ -829,7 +790,7 @@ theorem theRankOneFaceIsAHomomorphismEverywhereHolds :
           · rw [slotOne5_some, hax, if_pos hX0]
             have h25 : (-25 : ℚ) = 5 ^ 2 * -1 := by norm_num
             rw [h25]
-            exact sqcls_mul_sq_left c1 (by norm_num)
+            exact Descent.sqClsMulSqLeft c1 (by norm_num)
           · rw [slotTwo5_some, hax, if_neg (by rw [hX0]; norm_num), hX0]
             norm_num
             exact c2
@@ -843,7 +804,7 @@ theorem theRankOneFaceIsAHomomorphismEverywhereHolds :
             · rw [slotTwo5_some, hax, if_pos hX5]
               have h50 : (50 : ℚ) = 5 ^ 2 * 2 := by norm_num
               rw [h50]
-              exact sqcls_mul_sq_left c2 (by norm_num)
+              exact Descent.sqClsMulSqLeft c2 (by norm_num)
           · obtain ⟨c1, c2⟩ :=
               theChordLandsGenerically eA' eB' hlam hx hy1 hy2 hX0 hX5
             constructor
@@ -888,10 +849,10 @@ theorem theNewPointEscapesTheTorsionAndTheDoubles :
   obtain ⟨sep0, sepT0, sepT5, sepTm5⟩ := RankOne.theFaceSeparatesTheNewPoint
   have habs1 : RankOne.SqCls (RankOne.slotOne RankOne.P) (RankOne.slotOne T) := by
     rw [← FaithfulFace.theTwoFilesDeclareOneSquareClass] at hom1 ⊢
-    exact sqcls_absorb_right hom1 k1
+    exact Descent.sqClsAbsorbRight hom1 k1
   have habs2 : RankOne.SqCls (RankOne.slotTwo RankOne.P) (RankOne.slotTwo T) := by
     rw [← FaithfulFace.theTwoFilesDeclareOneSquareClass] at hom2 ⊢
-    exact sqcls_absorb_right hom2 k2
+    exact Descent.sqClsAbsorbRight hom2 k2
   rcases hT with rfl | rfl | rfl | rfl
   · exact sep0 habs1
   · exact sepT0 habs2

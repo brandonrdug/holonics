@@ -167,14 +167,6 @@ the other, and this file states its corollaries once. -/
 theorem theTwoFilesDeclareOneSquareClass (a b : ℚ) : Descent.SqCls a b ↔ RankOne.SqCls a b :=
   Iff.rfl
 
-/-- A product identity is a square-class membership: if `a·b` is a nonzero square and `b ≠ 0`,
-then `a` and `b` share a square class, with the witness `s/b`. -/
-private lemma sqClsOfProductSquare {a b s : ℚ} (hb : b ≠ 0) (hs : s ≠ 0) (h : a * b = s ^ 2) :
-    Descent.SqCls a b := by
-  refine ⟨s / b, div_ne_zero hs hb, ?_⟩
-  field_simp
-  linear_combination h
-
 /-- Two is not a rational square, so no rational `u, c` with `c ≠ 0` satisfy `u² = 2c²`.  This is
 the one arithmetic fact that keeps a doubled point off the half-turns; it is
 `Descent.notSquareTwo` applied to `u/c`. -/
@@ -286,9 +278,9 @@ theorem theDoubledSlotsAreTheTrivialClass {x y : ℚ} (h : y ^ 2 = x ^ 3 - x) (h
   obtain ⟨hsq1, hsq2⟩ := theDoubledSlotsAreSquares h hy
   have h2y : (2 : ℚ) * y ≠ 0 := mul_ne_zero two_ne_zero hy
   constructor
-  · exact sqClsOfProductSquare one_ne_zero (s := (x ^ 2 + 1) / (2 * y))
+  · exact Descent.sqClsOfProductSquare one_ne_zero (s := (x ^ 2 + 1) / (2 * y))
       (div_ne_zero n1 h2y) (by rw [mul_one]; exact hsq1)
-  · exact sqClsOfProductSquare one_ne_zero (s := (x ^ 2 - 2 * x - 1) / (2 * y))
+  · exact Descent.sqClsOfProductSquare one_ne_zero (s := (x ^ 2 - 2 * x - 1) / (2 * y))
       (div_ne_zero n2 h2y) (by rw [mul_one]; exact hsq2)
 
 /-! ## 4. Translation by each half-turn, on `y² = x³ − x` -/
@@ -420,15 +412,15 @@ theorem theFaceLawClosesOnEveryHalfTurnTranslation {x y : ℚ} (h : y ^ 2 = x ^ 
   obtain ⟨o1, o2⟩ := theHalfTurnAtOneClosesBothSlots h hy
   obtain ⟨m1, m2⟩ := theHalfTurnAtNegativeOneClosesBothSlots h hy
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
-  · exact sqClsOfProductSquare (by rw [a1]; exact mul_ne_zero hx0 (by norm_num)) one_ne_zero z1
-  · exact sqClsOfProductSquare (by rw [a2]; exact mul_ne_zero hd1 (by norm_num))
+  · exact Descent.sqClsOfProductSquare (by rw [a1]; exact mul_ne_zero hx0 (by norm_num)) one_ne_zero z1
+  · exact Descent.sqClsOfProductSquare (by rw [a2]; exact mul_ne_zero hd1 (by norm_num))
       (div_ne_zero hy hx0) z2
-  · exact sqClsOfProductSquare (by rw [b1]; exact mul_ne_zero hx0 (by norm_num))
+  · exact Descent.sqClsOfProductSquare (by rw [b1]; exact mul_ne_zero hx0 (by norm_num))
       (div_ne_zero hy hd1) o1
-  · exact sqClsOfProductSquare (by rw [b2]; exact mul_ne_zero hd1 (by norm_num)) two_ne_zero o2
-  · exact sqClsOfProductSquare (by rw [c1]; exact mul_ne_zero hx0 (by norm_num))
+  · exact Descent.sqClsOfProductSquare (by rw [b2]; exact mul_ne_zero hd1 (by norm_num)) two_ne_zero o2
+  · exact Descent.sqClsOfProductSquare (by rw [c1]; exact mul_ne_zero hx0 (by norm_num))
       (div_ne_zero hy hd2) m1
-  · exact sqClsOfProductSquare (by rw [c2]; exact mul_ne_zero hd1 (by norm_num))
+  · exact Descent.sqClsOfProductSquare (by rw [c2]; exact mul_ne_zero hd1 (by norm_num))
       (div_ne_zero (mul_ne_zero two_ne_zero hy) hd2) m2
 
 /-! ## 6. The same two families on `y² = x³ − 25x`
@@ -590,15 +582,15 @@ theorem theFaceLawClosesOnEveryHalfTurnTranslationOnTheFiveCurve {x y : ℚ}
   obtain ⟨o1, o2⟩ := theHalfTurnAtFiveClosesBothSlots h hy
   obtain ⟨m1, m2⟩ := theHalfTurnAtNegativeFiveClosesBothSlots h hy
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
-  · exact sqClsOfProductSquare (by rw [a1]; exact mul_ne_zero hx0 (by norm_num)) (by norm_num) z1
-  · exact sqClsOfProductSquare (by rw [a2]; exact mul_ne_zero hd1 (by norm_num))
+  · exact Descent.sqClsOfProductSquare (by rw [a1]; exact mul_ne_zero hx0 (by norm_num)) (by norm_num) z1
+  · exact Descent.sqClsOfProductSquare (by rw [a2]; exact mul_ne_zero hd1 (by norm_num))
       (div_ne_zero (mul_ne_zero (by norm_num) hy) hx0) z2
-  · exact sqClsOfProductSquare (by rw [b1]; exact mul_ne_zero hx0 (by norm_num))
+  · exact Descent.sqClsOfProductSquare (by rw [b1]; exact mul_ne_zero hx0 (by norm_num))
       (div_ne_zero (mul_ne_zero (by norm_num) hy) hd1) o1
-  · exact sqClsOfProductSquare (by rw [b2]; exact mul_ne_zero hd1 (by norm_num)) (by norm_num) o2
-  · exact sqClsOfProductSquare (by rw [c1]; exact mul_ne_zero hx0 (by norm_num))
+  · exact Descent.sqClsOfProductSquare (by rw [b2]; exact mul_ne_zero hd1 (by norm_num)) (by norm_num) o2
+  · exact Descent.sqClsOfProductSquare (by rw [c1]; exact mul_ne_zero hx0 (by norm_num))
       (div_ne_zero (mul_ne_zero (by norm_num) hy) hd2) m1
-  · exact sqClsOfProductSquare (by rw [c2]; exact mul_ne_zero hd1 (by norm_num))
+  · exact Descent.sqClsOfProductSquare (by rw [c2]; exact mul_ne_zero hd1 (by norm_num))
       (div_ne_zero (mul_ne_zero (by norm_num) hy) hd2) m2
 
 /-! ## 7. The one family left open, named -/

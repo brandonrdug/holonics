@@ -31,13 +31,6 @@ open Holonics.EllipticCurve.FiveHeight
 
 /-! ## 1. Local plumbing -/
 
-private lemma onCurveFive {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
-    y ^ 2 = x ^ 3 - 25 * x := by
-  have h1 := ((nonsingular_iff x y).mp h).1
-  rw [equation_iff] at h1
-  simp only [RankOne.E5] at h1
-  linarith [h1]
-
 private lemma negYFive (x y : ℚ) : RankOne.E5.negY x y = -y := by
   simp [negY, RankOne.E5]
 
@@ -46,16 +39,10 @@ private lemma someEqFive {x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y�
     (Point.some _ _ h₁ : RankOne.E5.Point) = Point.some _ _ h₂ := by
   subst hx; subst hy; rfl
 
-private lemma slotOne5_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
-    RankOne.slotOne (.some _ _ h) = if x = 0 then -25 else x := rfl
-
-private lemma slotTwo5_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
-    RankOne.slotTwo (.some _ _ h) = if x = 5 then 50 else x - 5 := rfl
-
 private lemma slotOne5_ne (P : RankOne.E5.Point) : RankOne.slotOne P ≠ 0 := by
   rcases P with _ | @⟨x, y, h⟩
   · exact one_ne_zero
-  · rw [slotOne5_some]
+  · rw [FaceHomomorphism.slotOne5_some]
     split_ifs with hx
     · norm_num
     · exact hx
@@ -63,28 +50,10 @@ private lemma slotOne5_ne (P : RankOne.E5.Point) : RankOne.slotOne P ≠ 0 := by
 private lemma slotTwo5_ne (P : RankOne.E5.Point) : RankOne.slotTwo P ≠ 0 := by
   rcases P with _ | @⟨x, y, h⟩
   · exact one_ne_zero
-  · rw [slotTwo5_some]
+  · rw [FaceHomomorphism.slotTwo5_some]
     split_ifs with hx
     · norm_num
     · exact sub_ne_zero.mpr hx
-
-private lemma sqcls_trans {a b c : ℚ} (h₁ : Descent.SqCls a b) (h₂ : Descent.SqCls b c) :
-    Descent.SqCls a c := by
-  obtain ⟨k, hk, hkv⟩ := h₁
-  obtain ⟨m, hm, hmv⟩ := h₂
-  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
-
-private lemma sqcls_mul {a b c d : ℚ} (h₁ : Descent.SqCls a c) (h₂ : Descent.SqCls b d) :
-    Descent.SqCls (a * b) (c * d) := by
-  obtain ⟨k, hk, hkv⟩ := h₁
-  obtain ⟨m, hm, hmv⟩ := h₂
-  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
-
-private lemma sqcls_ne {a b : ℚ} (h : Descent.SqCls a b) (ha : a ≠ 0) : b ≠ 0 := by
-  obtain ⟨c, hc, hv⟩ := h
-  intro hb
-  rw [hb, mul_zero] at hv
-  exact ha hv
 
 /-! ## 2. The point height -/
 
@@ -122,7 +91,7 @@ private lemma contract_core (X R : RankOne.E5.Point)
   rcases Q with _ | @⟨u, v, hQns⟩
   · have h0 : pheight (Point.zero : RankOne.E5.Point) = 0 := rfl
     omega
-  · have hcurveQ := onCurveFive hQns
+  · have hcurveQ := FaceHomomorphism.onCurveFive hQns
     by_cases hv : v = 0
     · -- a half-turn: its abscissa is a root of the cubic
       rw [hv] at hcurveQ
@@ -247,23 +216,23 @@ private lemma descent_finite_rep {x y xk yk d₁ d₂ : ℚ}
   -- the face of the translate is trivial
   have hslN1 : RankOne.slotOne (Point.some _ _ hNk) = RankOne.slotOne (Point.some _ _ hRk) := rfl
   have hslN2 : RankOne.slotTwo (Point.some _ _ hNk) = RankOne.slotTwo (Point.some _ _ hRk) := rfl
-  have hd₁ : d₁ ≠ 0 := sqcls_ne hfR1 (slotOne5_ne _)
-  have hd₂ : d₂ ≠ 0 := sqcls_ne hfR2 (slotTwo5_ne _)
+  have hd₁ : d₁ ≠ 0 := Descent.sqClsNe hfR1 (slotOne5_ne _)
+  have hd₂ : d₂ ≠ 0 := Descent.sqClsNe hfR2 (slotTwo5_ne _)
   obtain ⟨hom1, hom2⟩ :=
     FaceHomomorphism.theRankOneFaceIsAHomomorphismEverywhereHolds
       (Point.some _ _ hX) (Point.some _ _ hNk)
   have h1' : Descent.SqCls
       (RankOne.slotOne ((Point.some _ _ hX : RankOne.E5.Point) - Point.some _ _ hRk)) 1 := by
     rw [hsub]
-    refine sqcls_trans hom1 ?_
+    refine Descent.sqClsTrans hom1 ?_
     rw [hslN1]
-    exact sqcls_trans (sqcls_mul hfX1 hfR1) ⟨d₁, hd₁, by ring⟩
+    exact Descent.sqClsTrans (Descent.sqClsMul hfX1 hfR1) ⟨d₁, hd₁, by ring⟩
   have h2' : Descent.SqCls
       (RankOne.slotTwo ((Point.some _ _ hX : RankOne.E5.Point) - Point.some _ _ hRk)) 1 := by
     rw [hsub]
-    refine sqcls_trans hom2 ?_
+    refine Descent.sqClsTrans hom2 ?_
     rw [hslN2]
-    exact sqcls_trans (sqcls_mul hfX2 hfR2) ⟨d₂, hd₂, by ring⟩
+    exact Descent.sqClsTrans (Descent.sqClsMul hfX2 hfR2) ⟨d₂, hd₂, by ring⟩
   -- the chord bound on the translate's height
   have hb : pheight ((Point.some _ _ hX : RankOne.E5.Point) - Point.some _ _ hRk)
       ≤ 105800 * pheight (Point.some _ _ hX) ^ 2 := by
@@ -277,7 +246,7 @@ private lemma descent_finite_rep {x y xk yk d₁ d₂ : ℚ}
       ring
     rw [harg]
     have hch := FiveTranslation.theChordRootIsBounded x y xk yk α β hβ hxkv
-      (onCurveFive hX) (onCurveFive hRk) hxne
+      (FaceHomomorphism.onCurveFive hX) (FaceHomomorphism.onCurveFive hRk) hxne
     calc hgt (((y + yk) / (x - xk)) ^ 2 - x - xk)
         ≤ 2 * (α.natAbs + 25 * β.natAbs) ^ 2 * hgt x ^ 2 := hch
       _ ≤ 2 * 230 ^ 2 * hgt x ^ 2 :=
@@ -317,10 +286,10 @@ theorem theDescentStep (X : RankOne.E5.Point) (hbig : 163000 < pheight X) :
     have hns : RankOne.E5.Nonsingular (25/4) (75/8) := by
       rw [nonsingular_iff, equation_iff]; norm_num [RankOne.E5]
     have hR1 : Descent.SqCls (RankOne.slotOne (Point.some _ _ hns)) 1 := by
-      rw [slotOne5_some, if_neg (by norm_num)]
+      rw [FaceHomomorphism.slotOne5_some, if_neg (by norm_num)]
       exact ⟨5/2, by norm_num, by norm_num⟩
     have hR2 : Descent.SqCls (RankOne.slotTwo (Point.some _ _ hns)) 5 := by
-      rw [slotTwo5_some, if_neg (by norm_num)]
+      rw [FaceHomomorphism.slotTwo5_some, if_neg (by norm_num)]
       exact ⟨1/2, by norm_num, by norm_num⟩
     have hhk : hgt ((25 : ℚ)/4) ≤ 45 :=
       hgt_le_of_eq_div 25 4 (by norm_num) (by norm_num) (by decide)
@@ -330,10 +299,10 @@ theorem theDescentStep (X : RankOne.E5.Point) (hbig : 163000 < pheight X) :
   · -- class (5, 2): the representative (5, 0)
     have hns : RankOne.E5.Nonsingular 5 0 := RankOne.nonsingular50
     have hR1 : Descent.SqCls (RankOne.slotOne (Point.some _ _ hns)) 5 := by
-      rw [slotOne5_some, if_neg (by norm_num)]
+      rw [FaceHomomorphism.slotOne5_some, if_neg (by norm_num)]
       exact ⟨1, by norm_num, by norm_num⟩
     have hR2 : Descent.SqCls (RankOne.slotTwo (Point.some _ _ hns)) 2 := by
-      rw [slotTwo5_some, if_pos rfl]
+      rw [FaceHomomorphism.slotTwo5_some, if_pos rfl]
       exact ⟨5, by norm_num, by norm_num⟩
     have hhk : hgt ((5 : ℚ)) ≤ 45 :=
       hgt_le_of_eq_div 5 1 (by norm_num) (by norm_num) (by decide)
@@ -344,10 +313,10 @@ theorem theDescentStep (X : RankOne.E5.Point) (hbig : 163000 < pheight X) :
     have hns : RankOne.E5.Nonsingular 45 300 := by
       rw [nonsingular_iff, equation_iff]; norm_num [RankOne.E5]
     have hR1 : Descent.SqCls (RankOne.slotOne (Point.some _ _ hns)) 5 := by
-      rw [slotOne5_some, if_neg (by norm_num)]
+      rw [FaceHomomorphism.slotOne5_some, if_neg (by norm_num)]
       exact ⟨3, by norm_num, by norm_num⟩
     have hR2 : Descent.SqCls (RankOne.slotTwo (Point.some _ _ hns)) 10 := by
-      rw [slotTwo5_some, if_neg (by norm_num)]
+      rw [FaceHomomorphism.slotTwo5_some, if_neg (by norm_num)]
       exact ⟨2, by norm_num, by norm_num⟩
     have hhk : hgt ((45 : ℚ)) ≤ 45 :=
       hgt_le_of_eq_div 45 1 (by norm_num) (by norm_num) (by decide)
@@ -357,10 +326,10 @@ theorem theDescentStep (X : RankOne.E5.Point) (hbig : 163000 < pheight X) :
   · -- class (−1, −1): the representative (−4, 6)
     have hns : RankOne.E5.Nonsingular (-4) 6 := RankOne.nonsingularP
     have hR1 : Descent.SqCls (RankOne.slotOne (Point.some _ _ hns)) (-1) := by
-      rw [slotOne5_some, if_neg (by norm_num)]
+      rw [FaceHomomorphism.slotOne5_some, if_neg (by norm_num)]
       exact ⟨2, by norm_num, by norm_num⟩
     have hR2 : Descent.SqCls (RankOne.slotTwo (Point.some _ _ hns)) (-1) := by
-      rw [slotTwo5_some, if_neg (by norm_num)]
+      rw [FaceHomomorphism.slotTwo5_some, if_neg (by norm_num)]
       exact ⟨3, by norm_num, by norm_num⟩
     have hhk : hgt ((-4 : ℚ)) ≤ 45 :=
       hgt_le_of_eq_div (-4) 1 (by norm_num) (by norm_num) (by decide)
@@ -370,10 +339,10 @@ theorem theDescentStep (X : RankOne.E5.Point) (hbig : 163000 < pheight X) :
   · -- class (−1, −5): the representative (0, 0)
     have hns : RankOne.E5.Nonsingular 0 0 := RankOne.nonsingular00
     have hR1 : Descent.SqCls (RankOne.slotOne (Point.some _ _ hns)) (-1) := by
-      rw [slotOne5_some, if_pos rfl]
+      rw [FaceHomomorphism.slotOne5_some, if_pos rfl]
       exact ⟨5, by norm_num, by norm_num⟩
     have hR2 : Descent.SqCls (RankOne.slotTwo (Point.some _ _ hns)) (-5) := by
-      rw [slotTwo5_some, if_neg (by norm_num)]
+      rw [FaceHomomorphism.slotTwo5_some, if_neg (by norm_num)]
       exact ⟨1, by norm_num, by norm_num⟩
     have hhk : hgt ((0 : ℚ)) ≤ 45 :=
       hgt_le_of_eq_div 0 1 (by norm_num) (by norm_num) (by decide)
@@ -384,10 +353,10 @@ theorem theDescentStep (X : RankOne.E5.Point) (hbig : 163000 < pheight X) :
     have hns : RankOne.E5.Nonsingular (-5/9) (100/27) := by
       rw [nonsingular_iff, equation_iff]; norm_num [RankOne.E5]
     have hR1 : Descent.SqCls (RankOne.slotOne (Point.some _ _ hns)) (-5) := by
-      rw [slotOne5_some, if_neg (by norm_num)]
+      rw [FaceHomomorphism.slotOne5_some, if_neg (by norm_num)]
       exact ⟨1/3, by norm_num, by norm_num⟩
     have hR2 : Descent.SqCls (RankOne.slotTwo (Point.some _ _ hns)) (-2) := by
-      rw [slotTwo5_some, if_neg (by norm_num)]
+      rw [FaceHomomorphism.slotTwo5_some, if_neg (by norm_num)]
       exact ⟨5/3, by norm_num, by norm_num⟩
     have hhk : hgt ((-5 : ℚ)/9) ≤ 45 :=
       hgt_le_of_eq_div (-5) 9 (by norm_num) (by norm_num) (by decide)
@@ -397,10 +366,10 @@ theorem theDescentStep (X : RankOne.E5.Point) (hbig : 163000 < pheight X) :
   · -- class (−5, −10): the representative (−5, 0)
     have hns : RankOne.E5.Nonsingular (-5) 0 := RankOne.nonsingularNeg50
     have hR1 : Descent.SqCls (RankOne.slotOne (Point.some _ _ hns)) (-5) := by
-      rw [slotOne5_some, if_neg (by norm_num)]
+      rw [FaceHomomorphism.slotOne5_some, if_neg (by norm_num)]
       exact ⟨1, by norm_num, by norm_num⟩
     have hR2 : Descent.SqCls (RankOne.slotTwo (Point.some _ _ hns)) (-10) := by
-      rw [slotTwo5_some, if_neg (by norm_num)]
+      rw [FaceHomomorphism.slotTwo5_some, if_neg (by norm_num)]
       exact ⟨1, by norm_num, by norm_num⟩
     have hhk : hgt ((-5 : ℚ)) ≤ 45 :=
       hgt_le_of_eq_div (-5) 1 (by norm_num) (by norm_num) (by decide)
@@ -474,7 +443,7 @@ theorem theBoundedHeightsAreFinite (N : ℕ) :
     rintro w ⟨P, hP, rfl⟩
     rcases P with _ | @⟨x, y, h⟩
     · exact Set.mem_insert _ _
-    · refine Set.mem_insert_of_mem _ ⟨(x, y), ⟨hP, onCurveFive h⟩, rfl⟩
+    · refine Set.mem_insert_of_mem _ ⟨(x, y), ⟨hP, FaceHomomorphism.onCurveFive h⟩, rfl⟩
   exact Set.Finite.of_finite_image
     (Set.Finite.subset ((Set.Finite.image _ hpair).insert none) himg)
     coords_injective.injOn

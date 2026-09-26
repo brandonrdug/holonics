@@ -29,12 +29,6 @@ open Holonics.EllipticCurve.FamilyKernel
 
 /-! ## 1. Valuation plumbing -/
 
-private lemma sqcls_trans {a b c : ℚ} (h₁ : Descent.SqCls a b) (h₂ : Descent.SqCls b c) :
-    Descent.SqCls a c := by
-  obtain ⟨k, hk, hkv⟩ := h₁
-  obtain ⟨m, hm, hmv⟩ := h₂
-  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
-
 lemma val_add_left {ℓ : ℕ} [Fact ℓ.Prime] {a b : ℚ} (ha : a ≠ 0)
     (hab : a + b ≠ 0) (h : padicValRat ℓ a < padicValRat ℓ b) :
     padicValRat ℓ (a + b) = padicValRat ℓ a := by
@@ -242,7 +236,7 @@ private lemma classFromEvenValuations {n : ℕ} (hn : 0 < n) {x : ℚ} (hx : x �
         by exact_mod_cast congrArg (fun m : ℤ => (m : ℚ)) habs]
       push_cast
       ring
-    exact sqcls_trans hcls hstep
+    exact Descent.sqClsTrans hcls hstep
   · exact absurd hs hm0
   · refine ⟨(a : ℤ), by exact_mod_cast ha0, by simpa using hadvd, ?_⟩
     have habs : x.num * (x.den : ℤ) = (b : ℤ) ^ 2 * (a : ℤ) := by
@@ -257,22 +251,9 @@ private lemma classFromEvenValuations {n : ℕ} (hn : 0 < n) {x : ℚ} (hx : x �
         by exact_mod_cast congrArg (fun m : ℤ => (m : ℚ)) habs]
       push_cast
       ring
-    exact sqcls_trans hcls hstep
+    exact Descent.sqClsTrans hcls hstep
 
 /-! ## 3. The support theorem at every modulus -/
-
-lemma slotOneAt_some {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
-    slotOneAt n (.some x y h) = if x = 0 then -n ^ 2 else x := rfl
-
-lemma slotTwoAt_some {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
-    slotTwoAt n (.some x y h) = if x = n then 2 * n ^ 2 else x - n := rfl
-
-lemma onCurveAt {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
-    y ^ 2 = x ^ 3 - n ^ 2 * x := by
-  have h1 := ((WeierstrassCurve.Affine.nonsingular_iff x y).mp h).1
-  rw [WeierstrassCurve.Affine.equation_iff] at h1
-  simp only [FamilyFace.E] at h1
-  linarith [h1]
 
 set_option maxHeartbeats 1000000 in
 /-- **THE SLOT CLASSES ARE SUPPORTED ON THE DISCRIMINANT AT EVERY MODULUS**: both
@@ -290,7 +271,7 @@ theorem theSlotClassesAreSupportedAtEveryModulus (n : ℕ) (hn : 0 < n)
     · simpa [slotTwoAt] using Descent.sqClsRefl (1 : ℚ)
   · by_cases hy : y = 0
     · -- the half-turns, with their conventional classes
-      have hcurve := onCurveAt h
+      have hcurve := FamilyKernel.onCurveAt h
       rw [hy] at hcurve
       have hroots : x * (x - (n : ℚ)) * (x + (n : ℚ)) = 0 := by
         linear_combination -hcurve
@@ -303,15 +284,15 @@ theorem theSlotClassesAreSupportedAtEveryModulus (n : ℕ) (hn : 0 < n)
       rcases hx3 with h' | h' | h'
       · refine ⟨-1, -(n : ℤ), by norm_num, by simpa using hn.ne', by norm_num,
           by simpa using Dvd.intro 2 rfl, ?_, ?_⟩
-        · rw [slotOneAt_some, if_pos h']
+        · rw [FamilyKernel.slotOneAt_some, if_pos h']
           exact ⟨(n : ℚ), hnq, by push_cast; ring⟩
-        · rw [slotTwoAt_some, if_neg (by rw [h']; exact fun hc => hnq hc.symm), h']
+        · rw [FamilyKernel.slotTwoAt_some, if_neg (by rw [h']; exact fun hc => hnq hc.symm), h']
           exact ⟨1, one_ne_zero, by push_cast; ring⟩
       · refine ⟨(n : ℤ), 2, by simpa using hn.ne', two_ne_zero, by
           simpa using Dvd.intro 2 rfl, by norm_num, ?_, ?_⟩
-        · rw [slotOneAt_some, if_neg (by rw [h']; exact hnq), h']
+        · rw [FamilyKernel.slotOneAt_some, if_neg (by rw [h']; exact hnq), h']
           exact ⟨1, one_ne_zero, by push_cast; ring⟩
-        · rw [slotTwoAt_some, if_pos h']
+        · rw [FamilyKernel.slotTwoAt_some, if_pos h']
           exact ⟨(n : ℚ), hnq, by push_cast; ring⟩
       · have hmn0 : x ≠ 0 := by
           rw [h']
@@ -329,12 +310,12 @@ theorem theSlotClassesAreSupportedAtEveryModulus (n : ℕ) (hn : 0 < n)
             rw [Int.natAbs_neg]
             omega
           rw [habs], ?_, ?_⟩
-        · rw [slotOneAt_some, if_neg hmn0, h']
+        · rw [FamilyKernel.slotOneAt_some, if_neg hmn0, h']
           exact ⟨1, one_ne_zero, by push_cast; ring⟩
-        · rw [slotTwoAt_some, if_neg hmnn, h']
+        · rw [FamilyKernel.slotTwoAt_some, if_neg hmnn, h']
           exact ⟨1, one_ne_zero, by push_cast; ring⟩
     · -- the general point: even valuations off the discriminant
-      have hcurve := onCurveAt h
+      have hcurve := FamilyKernel.onCurveAt h
       obtain ⟨hx0, hxn, -⟩ :=
         FaceHomomorphism.theNonzeroOrdinateAvoidsTheRoots hcurve hy
       obtain ⟨d₁, hd₁0, hd₁v, hcls₁⟩ := classFromEvenValuations hn hx0
@@ -347,9 +328,9 @@ theorem theSlotClassesAreSupportedAtEveryModulus (n : ℕ) (hn : 0 < n)
           haveI : Fact ℓ.Prime := ⟨hℓ⟩
           (even_slot_val hn hnd hcurve hy).2
       refine ⟨d₁, d₂, hd₁0, hd₂0, hd₁v, hd₂v, ?_, ?_⟩
-      · rw [slotOneAt_some, if_neg hx0]
+      · rw [FamilyKernel.slotOneAt_some, if_neg hx0]
         exact hcls₁
-      · rw [slotTwoAt_some, if_neg hxn]
+      · rw [FamilyKernel.slotTwoAt_some, if_neg hxn]
         exact hcls₂
 
 end Holonics.EllipticCurve.FamilySupport

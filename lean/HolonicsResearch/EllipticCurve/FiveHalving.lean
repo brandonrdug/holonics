@@ -31,26 +31,8 @@ open WeierstrassCurve.Affine
 
 /-! ## 1. Point-level plumbing on the five-curve -/
 
-private lemma onCurveFive {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
-    y ^ 2 = x ^ 3 - 25 * x := by
-  have h1 := ((nonsingular_iff x y).mp h).1
-  rw [equation_iff] at h1
-  simp only [RankOne.E5] at h1
-  linarith [h1]
-
 private lemma negYFive (x y : ℚ) : RankOne.E5.negY x y = -y := by
   simp [negY, RankOne.E5]
-
-private lemma someEqFive {x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
-    {h₁ : RankOne.E5.Nonsingular x₁ y₁} {h₂ : RankOne.E5.Nonsingular x₂ y₂} :
-    (Point.some x₁ y₁ h₁ : RankOne.E5.Point) = Point.some x₂ y₂ h₂ := by
-  subst hx; subst hy; rfl
-
-private lemma slotOne5_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
-    RankOne.slotOne (.some x y h) = if x = 0 then -25 else x := rfl
-
-private lemma slotTwo5_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
-    RankOne.slotTwo (.some x y h) = if x = 5 then 50 else x - 5 := rfl
 
 /-! ## 2. The halving at coordinates -/
 
@@ -144,7 +126,7 @@ private lemma halving {x₀ y₀ r s t : ℚ} (hr0 : r ≠ 0) (hs0 : s ≠ 0)
   have hL2 : ((3 * u ^ 2 - 25) / (2 * v)) ^ 2 = r ^ 2 + u + u := by
     rw [div_pow, keyX]
     exact mul_div_cancel_right₀ _ (pow_ne_zero 2 h2v)
-  refine someEqFive ?_ ?_
+  refine RankOne.some_eq_some ?_ ?_
   · -- the abscissa doubles back to `r²`
     rw [haddX, hx, hL2]
     ring
@@ -175,7 +157,7 @@ theorem theKernelIsTheDoublesAtFive (P : RankOne.E5.Point)
     · -- the half-turns have nontrivial faces: three refutations
       exfalso
       subst hy0
-      have hcurve := onCurveFive hP
+      have hcurve := FaceHomomorphism.onCurveFive hP
       have hroots : x₀ * (x₀ - 5) * (x₀ + 5) = 0 := by linear_combination -hcurve
       have hx3 : x₀ = 0 ∨ x₀ = 5 ∨ x₀ = -5 := by
         rcases mul_eq_zero.mp hroots with h' | h'
@@ -185,19 +167,19 @@ theorem theKernelIsTheDoublesAtFive (P : RankOne.E5.Point)
         · exact Or.inr (Or.inr (by linarith))
       rcases hx3 with rfl | rfl | rfl
       · obtain ⟨c, hc0, hc⟩ := h1
-        rw [slotOne5_some, if_pos rfl] at hc
+        rw [FaceHomomorphism.slotOne5_some, if_pos rfl] at hc
         nlinarith [sq_nonneg c]
       · obtain ⟨c, hc0, hc⟩ := h2
-        rw [slotTwo5_some, if_pos rfl] at hc
+        rw [FaceHomomorphism.slotTwo5_some, if_pos rfl] at hc
         apply Descent.notSquareTwo
         refine ⟨c / 5, ?_⟩
         rw [div_mul_div_comm, show c * c = 50 from by linear_combination -hc]
         norm_num
       · obtain ⟨c, hc0, hc⟩ := h1
-        rw [slotOne5_some, if_neg (by norm_num)] at hc
+        rw [FaceHomomorphism.slotOne5_some, if_neg (by norm_num)] at hc
         nlinarith [sq_nonneg c]
     · -- the sighted case: assemble the slot square-roots and halve
-      have hcurve := onCurveFive hP
+      have hcurve := FaceHomomorphism.onCurveFive hP
       have hx0 : x₀ ≠ 0 := by
         intro hc
         rw [hc] at hcurve
@@ -210,9 +192,9 @@ theorem theKernelIsTheDoublesAtFive (P : RankOne.E5.Point)
         apply hy0
         nlinarith [hcurve]
       obtain ⟨r, hr0, hr⟩ := h1
-      rw [slotOne5_some, if_neg hx0] at hr
+      rw [FaceHomomorphism.slotOne5_some, if_neg hx0] at hr
       obtain ⟨s, hs0, hs⟩ := h2
-      rw [slotTwo5_some, if_neg (fun hc => hx5 (by rw [hc]; ring))] at hs
+      rw [FaceHomomorphism.slotTwo5_some, if_neg (fun hc => hx5 (by rw [hc]; ring))] at hs
       -- `hr : x₀ = r²·1`, `hs : x₀ − 5 = s²·1`
       have hx : x₀ = r ^ 2 := by linarith [hr]
       have hs2 : s ^ 2 = r ^ 2 - 5 := by linarith [hs]

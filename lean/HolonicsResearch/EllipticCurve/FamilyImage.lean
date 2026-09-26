@@ -32,21 +32,8 @@ namespace Holonics.EllipticCurve.FamilyImage
 open WeierstrassCurve.Affine
 open Holonics.EllipticCurve.FamilyKernel
 
-private lemma onCurveAt {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
-    y ^ 2 = x ^ 3 - n ^ 2 * x := by
-  have h1 := ((nonsingular_iff x y).mp h).1
-  rw [equation_iff] at h1
-  simp only [FamilyFace.E] at h1
-  linarith [h1]
-
 private lemma negYAt (n x y : ℚ) : (FamilyFace.E n).negY x y = -y := by
   simp [negY, FamilyFace.E]
-
-private lemma slotOneAt_some' {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
-    slotOneAt n (.some x y h) = if x = 0 then -n ^ 2 else x := rfl
-
-private lemma slotTwoAt_some' {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
-    slotTwoAt n (.some x y h) = if x = n then 2 * n ^ 2 else x - n := rfl
 
 set_option maxHeartbeats 1000000 in
 /-- **THE DOUBLES LAND IN THE KERNEL AT EVERY MODULUS**: both slots of a doubled
@@ -63,7 +50,7 @@ theorem theDoublesLandInTheKernelAtEveryModulus (n : ℚ) (hn : 0 < n)
         Point.add_self_of_Y_eq (by rw [negYAt, hy]; norm_num)
       rw [hzero]
       exact ⟨Descent.sqClsRefl 1, Descent.sqClsRefl 1⟩
-    · have hcurve := onCurveAt h
+    · have hcurve := FamilyKernel.onCurveAt h
       have hyne : y ≠ (FamilyFace.E n).negY x y := by
         rw [negYAt]
         intro hc
@@ -119,9 +106,9 @@ theorem theDoublesLandInTheKernelAtEveryModulus (n : ℚ) (hn : 0 < n)
         rw [hXnval] at h1
         exact pow_ne_zero 2 (div_ne_zero hnum2 h2y) h1
       constructor
-      · rw [slotOneAt_some', if_neg hd0]
+      · rw [FamilyKernel.slotOneAt_some, if_neg hd0]
         exact ⟨(x ^ 2 + n ^ 2) / (2 * y), div_ne_zero hnum1 h2y, by rw [hXval]; ring⟩
-      · rw [slotTwoAt_some', if_neg hd1]
+      · rw [FamilyKernel.slotTwoAt_some, if_neg hd1]
         exact ⟨(x ^ 2 - 2 * n * x - n ^ 2) / (2 * y), div_ne_zero hnum2 h2y, by
           rw [hXnval]
           ring⟩

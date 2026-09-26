@@ -2,6 +2,7 @@ import Mathlib.NumberTheory.LSeries.HurwitzZetaEven
 import Mathlib.NumberTheory.LSeries.HurwitzZetaOdd
 import Mathlib.Analysis.Real.Pi.Bounds
 import Mathlib.Tactic
+import HolonicsResearch.EllipticCurve.FiveTheta
 
 /-!
 # HeckeTheta: the theta function of the congruent-number curve at one
@@ -61,22 +62,6 @@ def heckeTheta (x : ℝ) : ℝ := heckeThetaA x * heckeThetaC x
 /-! ## 2. Summability spine -/
 
 private lemma sqrt2_pos : (0 : ℝ) < Real.sqrt 2 := Real.sqrt_pos.mpr (by norm_num)
-
-private lemma summable_gauss_weight (d : ℝ) (hd : 0 < d) :
-    Summable fun n : ℤ => |(n : ℝ)| * rexp (-π * d * n ^ 2) := by
-  have h := (HurwitzZeta.hasSum_int_oddKernel 0 hd).summable.norm
-  have h0 : Summable fun n : ℤ => |(n : ℝ) + 0| * rexp (-π * ((n : ℝ) + 0) ^ 2 * d) := by
-    simpa [Real.norm_eq_abs, abs_mul, abs_of_nonneg (Real.exp_nonneg _)] using h
-  refine h0.congr fun n => ?_
-  rw [add_zero]
-  ring_nf
-
-private lemma summable_gauss (d : ℝ) (hd : 0 < d) :
-    Summable fun n : ℤ => rexp (-π * d * n ^ 2) := by
-  have h := (HurwitzZeta.hasSum_int_evenKernel 0 hd).summable
-  refine h.congr fun n => ?_
-  rw [add_zero]
-  ring_nf
 
 /-! ## 3. The kernels as explicit sums at the working scale
 
@@ -281,31 +266,10 @@ private lemma cs4_double (l : ℤ) :
 /-! ## 9. Summability -/
 
 set_option maxHeartbeats 1000000 in
-private lemma summable_master {c : ℝ} (hc : 0 < c) :
-    Summable fun p : ℤ × ℤ =>
-      (|(p.1 : ℝ)| + |(p.2 : ℝ)| + 1) * rexp (-π * c * ((p.1 : ℝ) ^ 2 + (p.2 : ℝ) ^ 2)) := by
-  have hw := summable_gauss_weight c hc
-  have hg := summable_gauss c hc
-  have h1 : Summable fun p : ℤ × ℤ =>
-      (|(p.1 : ℝ)| * rexp (-π * c * (p.1 : ℝ) ^ 2)) * rexp (-π * c * (p.2 : ℝ) ^ 2) :=
-    hw.mul_of_nonneg hg (Pi.le_def.mpr fun n => by positivity)
-      (Pi.le_def.mpr fun n => Real.exp_nonneg _)
-  have h2 : Summable fun p : ℤ × ℤ =>
-      rexp (-π * c * (p.1 : ℝ) ^ 2) * (|(p.2 : ℝ)| * rexp (-π * c * (p.2 : ℝ) ^ 2)) :=
-    hg.mul_of_nonneg hw (Pi.le_def.mpr fun n => Real.exp_nonneg _)
-      (Pi.le_def.mpr fun n => by positivity)
-  have h3 : Summable fun p : ℤ × ℤ =>
-      rexp (-π * c * (p.1 : ℝ) ^ 2) * rexp (-π * c * (p.2 : ℝ) ^ 2) :=
-    hg.mul_of_nonneg hg (Pi.le_def.mpr fun n => Real.exp_nonneg _)
-      (Pi.le_def.mpr fun n => Real.exp_nonneg _)
-  refine ((h1.add h2).add h3).congr fun p => ?_
-  rw [show -π * c * ((p.1 : ℝ) ^ 2 + (p.2 : ℝ) ^ 2)
-      = -π * c * (p.1 : ℝ) ^ 2 + -π * c * (p.2 : ℝ) ^ 2 from by ring, Real.exp_add]
-  ring
 
 private lemma summable_envelope {d : ℝ} (hd : 0 < d) :
     Summable fun p : ℤ × ℤ => (|(p.1 : ℝ)| + |(p.2 : ℝ)| + 1) * env d p.1 p.2 := by
-  refine (summable_master (show (0 : ℝ) < 2 * d by positivity)).congr fun p => ?_
+  refine (FiveTheta.summable_master (show (0 : ℝ) < 2 * d by positivity)).congr fun p => ?_
   unfold env
   congr 2
   ring
@@ -1263,7 +1227,7 @@ def heckeShell (m : ℕ) : Finset (ℤ × ℤ) :=
 /-- The `m`-th Hecke coefficient: the weight sum over the norm-`m` shell. -/
 def heckeCoeff (m : ℕ) : ℤ := ∑ p ∈ heckeShell m, p.1
 
-private lemma norm_shell_bound {m : ℕ} {a b : ℤ} (h : a ^ 2 + b ^ 2 = (m : ℤ)) :
+lemma norm_shell_bound {m : ℕ} {a b : ℤ} (h : a ^ 2 + b ^ 2 = (m : ℤ)) :
     -(m : ℤ) ≤ a ∧ a ≤ (m : ℤ) ∧ -(m : ℤ) ≤ b ∧ b ≤ (m : ℤ) := by
   have hm : (0 : ℤ) ≤ (m : ℤ) := Int.natCast_nonneg m
   refine ⟨?_, ?_, ?_, ?_⟩ <;>

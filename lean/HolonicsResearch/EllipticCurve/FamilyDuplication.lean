@@ -3,6 +3,7 @@ import HolonicsResearch.EllipticCurve.FamilyThetaOdd
 import Mathlib.NumberTheory.LSeries.HurwitzZetaEven
 import Mathlib.NumberTheory.LSeries.HurwitzZetaOdd
 import Mathlib.Tactic
+import HolonicsResearch.EllipticCurve.FiveTheta
 
 /-!
 # FamilyDuplication: the duplication identity at every split prime
@@ -73,74 +74,20 @@ private lemma norm_quarter_phase (p : ℕ) (n : ℤ) :
 
 /-! ## 2. Summability spine (modulus-free) -/
 
-private lemma summable_gauss_weight (c : ℝ) (hc : 0 < c) :
-    Summable fun n : ℤ => |(n : ℝ)| * rexp (-π * c * n ^ 2) := by
-  have h := (HurwitzZeta.hasSum_int_oddKernel 0 hc).summable.norm
-  have h0 : Summable fun n : ℤ => |(n : ℝ) + 0| * rexp (-π * ((n : ℝ) + 0) ^ 2 * c) := by
-    simpa [Real.norm_eq_abs, abs_mul, abs_of_nonneg (Real.exp_nonneg _)] using h
-  refine h0.congr fun n => ?_
-  rw [add_zero]
-  ring_nf
-
-private lemma summable_gauss (c : ℝ) (hc : 0 < c) :
-    Summable fun n : ℤ => rexp (-π * c * n ^ 2) := by
-  have h := (HurwitzZeta.hasSum_int_evenKernel 0 hc).summable
-  refine h.congr fun n => ?_
-  rw [add_zero]
-  ring_nf
-
 set_option maxHeartbeats 1000000 in
-private lemma summable_master {c : ℝ} (hc : 0 < c) :
-    Summable fun p : ℤ × ℤ =>
-      (|(p.1 : ℝ)| + |(p.2 : ℝ)| + 1) * rexp (-π * c * ((p.1 : ℝ) ^ 2 + (p.2 : ℝ) ^ 2)) := by
-  have hw := summable_gauss_weight c hc
-  have hg := summable_gauss c hc
-  have h1 : Summable fun p : ℤ × ℤ =>
-      (|(p.1 : ℝ)| * rexp (-π * c * (p.1 : ℝ) ^ 2)) * rexp (-π * c * (p.2 : ℝ) ^ 2) :=
-    hw.mul_of_nonneg hg (Pi.le_def.mpr fun n => by positivity)
-      (Pi.le_def.mpr fun n => Real.exp_nonneg _)
-  have h2 : Summable fun p : ℤ × ℤ =>
-      rexp (-π * c * (p.1 : ℝ) ^ 2) * (|(p.2 : ℝ)| * rexp (-π * c * (p.2 : ℝ) ^ 2)) :=
-    hg.mul_of_nonneg hw (Pi.le_def.mpr fun n => Real.exp_nonneg _)
-      (Pi.le_def.mpr fun n => by positivity)
-  have h3 : Summable fun p : ℤ × ℤ =>
-      rexp (-π * c * (p.1 : ℝ) ^ 2) * rexp (-π * c * (p.2 : ℝ) ^ 2) :=
-    hg.mul_of_nonneg hg (Pi.le_def.mpr fun n => Real.exp_nonneg _)
-      (Pi.le_def.mpr fun n => Real.exp_nonneg _)
-  refine ((h1.add h2).add h3).congr fun p => ?_
-  rw [show -π * c * ((p.1 : ℝ) ^ 2 + (p.2 : ℝ) ^ 2)
-      = -π * c * (p.1 : ℝ) ^ 2 + -π * c * (p.2 : ℝ) ^ 2 from by ring, Real.exp_add]
-  ring
 
-/-- The pre-fold Gaussian envelope. -/
-private def envP (y : ℝ) (u v : ℤ) : ℝ := rexp (-π * y * ((u : ℝ) ^ 2 + (v : ℝ) ^ 2))
-
-/-- The post-fold Gaussian envelope. -/
-def envF (y : ℝ) (u v : ℤ) : ℝ := rexp (-2 * π * y * ((u : ℝ) ^ 2 + (v : ℝ) ^ 2))
-
-private lemma envP_nonneg (y : ℝ) (u v : ℤ) : 0 ≤ envP y u v := Real.exp_nonneg _
-lemma envF_nonneg (y : ℝ) (u v : ℤ) : 0 ≤ envF y u v := Real.exp_nonneg _
-
-private lemma summable_envP {y : ℝ} (hy : 0 < y) :
-    Summable fun p : ℤ × ℤ => (|(p.1 : ℝ)| + |(p.2 : ℝ)| + 1) * envP y p.1 p.2 :=
-  (summable_master hy).congr fun p => rfl
-
-private lemma summable_envF {y : ℝ} (hy : 0 < y) :
-    Summable fun p : ℤ × ℤ => (|(p.1 : ℝ)| + |(p.2 : ℝ)| + 1) * envF y p.1 p.2 := by
-  refine (summable_master (show (0 : ℝ) < 2 * y by positivity)).congr fun p => ?_
-  unfold envF
-  congr 2
-  ring
+private lemma envP_nonneg (y : ℝ) (u v : ℤ) : 0 ≤ FiveTheta.envP y u v := Real.exp_nonneg _
+lemma envF_nonneg (y : ℝ) (u v : ℤ) : 0 ≤ FiveTheta.envF y u v := Real.exp_nonneg _
 
 private lemma summable_of_le_envP {y C : ℝ} (hy : 0 < y) {f : ℤ × ℤ → ℂ}
-    (hb : ∀ p : ℤ × ℤ, ‖f p‖ ≤ C * ((|(p.1 : ℝ)| + |(p.2 : ℝ)| + 1) * envP y p.1 p.2)) :
+    (hb : ∀ p : ℤ × ℤ, ‖f p‖ ≤ C * ((|(p.1 : ℝ)| + |(p.2 : ℝ)| + 1) * FiveTheta.envP y p.1 p.2)) :
     Summable f :=
-  Summable.of_norm_bounded ((summable_envP hy).mul_left C) hb
+  Summable.of_norm_bounded ((FiveTheta.summable_envP hy).mul_left C) hb
 
 private lemma summable_of_le_envF {y C : ℝ} (hy : 0 < y) {f : ℤ × ℤ → ℂ}
-    (hb : ∀ p : ℤ × ℤ, ‖f p‖ ≤ C * ((|(p.1 : ℝ)| + |(p.2 : ℝ)| + 1) * envF y p.1 p.2)) :
+    (hb : ∀ p : ℤ × ℤ, ‖f p‖ ≤ C * ((|(p.1 : ℝ)| + |(p.2 : ℝ)| + 1) * FiveTheta.envF y p.1 p.2)) :
     Summable f :=
-  Summable.of_norm_bounded ((summable_envF hy).mul_left C) hb
+  Summable.of_norm_bounded ((FiveTheta.summable_envF hy).mul_left C) hb
 
 /-! ## 3. The dual side: the grid products collapse onto one lattice family -/
 
@@ -158,10 +105,10 @@ the twist character, and the pre-fold envelope. -/
 private def dualP (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) : ℂ :=
   -I * q.1 * (2 * (p : ℂ) * cexp (π * I * (p * q.1) / 2) * oddInd q.2 *
       ((XP p (q.1 ^ 2 + q.2 ^ 2) : ℤ) : ℂ)) *
-    ((envP y q.1 q.2 : ℝ) : ℂ)
+    ((FiveTheta.envP y q.1 q.2 : ℝ) : ℂ)
 
 private lemma norm_dualP_le (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) :
-    ‖dualP p y q‖ ≤ (2 * p) * ((|(q.1 : ℝ)| + |(q.2 : ℝ)| + 1) * envP y q.1 q.2) := by
+    ‖dualP p y q‖ ≤ (2 * p) * ((|(q.1 : ℝ)| + |(q.2 : ℝ)| + 1) * FiveTheta.envP y q.1 q.2) := by
   obtain ⟨n, m⟩ := q
   unfold dualP
   simp only [norm_mul]
@@ -169,7 +116,7 @@ private lemma norm_dualP_le (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) 
   have h2 : ‖((n : ℤ) : ℂ)‖ = |(n : ℝ)| := by
     rw [show ((n : ℤ) : ℂ) = ((n : ℝ) : ℂ) from by push_cast; rfl, Complex.norm_real,
       Real.norm_eq_abs]
-  have h3 : ‖((envP y n m : ℝ) : ℂ)‖ = envP y n m := by
+  have h3 : ‖((FiveTheta.envP y n m : ℝ) : ℂ)‖ = FiveTheta.envP y n m := by
     rw [Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg (envP_nonneg y n m)]
   have h4 : ‖(2 : ℂ)‖ = 2 := by norm_num
   have h4p : ‖((p : ℕ) : ℂ)‖ = (p : ℝ) := by
@@ -196,13 +143,13 @@ private lemma norm_dualP_le (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) 
       _ ≤ (2 * p) * 1 := mul_le_mul_of_nonneg_left hab hp0
       _ = 2 * p := by ring
   calc 1 * |(n : ℝ)| * (2 * (p : ℝ) * 1 * ‖oddInd m‖ *
-        ‖((XP p (n ^ 2 + m ^ 2) : ℤ) : ℂ)‖) * envP y n m
-      = |(n : ℝ)| * envP y n m * (2 * (p : ℝ) * 1 * ‖oddInd m‖ *
+        ‖((XP p (n ^ 2 + m ^ 2) : ℤ) : ℂ)‖) * FiveTheta.envP y n m
+      = |(n : ℝ)| * FiveTheta.envP y n m * (2 * (p : ℝ) * 1 * ‖oddInd m‖ *
           ‖((XP p (n ^ 2 + m ^ 2) : ℤ) : ℂ)‖) := by ring
-    _ ≤ |(n : ℝ)| * envP y n m * (2 * p) :=
+    _ ≤ |(n : ℝ)| * FiveTheta.envP y n m * (2 * p) :=
         mul_le_mul_of_nonneg_left h5 (mul_nonneg hn he)
-    _ = (2 * p) * (|(n : ℝ)| * envP y n m) := by ring
-    _ ≤ (2 * p) * ((|(n : ℝ)| + |(m : ℝ)| + 1) * envP y n m) :=
+    _ = (2 * p) * (|(n : ℝ)| * FiveTheta.envP y n m) := by ring
+    _ ≤ (2 * p) * ((|(n : ℝ)| + |(m : ℝ)| + 1) * FiveTheta.envP y n m) :=
         mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right hb he) hp0
 
 private lemma summable_dualP (p : ℕ) [Fact p.Prime] {y : ℝ} (hy : 0 < y) :
@@ -273,9 +220,9 @@ private lemma pointwise_collapse (p : ℕ) [Fact p.Prime] (hp2 : p ≠ 2)
   show _ = dualP p y (n, m)
   unfold dualP
   have henv : ((rexp (-π * n ^ 2 * y) : ℝ) : ℂ) * ((rexp (-π * m ^ 2 * y) : ℝ) : ℂ)
-      = ((envP y n m : ℝ) : ℂ) := by
+      = ((FiveTheta.envP y n m : ℝ) : ℂ) := by
     rw [← Complex.ofReal_mul, ← Real.exp_add]
-    unfold envP
+    unfold FiveTheta.envP
     norm_cast
     congr 1
     push_cast
@@ -339,7 +286,7 @@ private def dualPOdd (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) : ℂ :
 /-- After the fold: weight `u+v`, quartic sign, twist character at `2(u²+v²)`. -/
 private def gLadderP (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) : ℂ :=
   2 * (p : ℂ) * ((q.1 + q.2 : ℤ) : ℂ) * sgn4 (q.1 + q.2) *
-    ((XP p (2 * (q.1 ^ 2 + q.2 ^ 2)) : ℤ) : ℂ) * ((envF y q.1 q.2 : ℝ) : ℂ)
+    ((XP p (2 * (q.1 ^ 2 + q.2 ^ 2)) : ℤ) : ℂ) * ((FiveTheta.envF y q.1 q.2 : ℝ) : ℂ)
 
 private def gEvenP (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) : ℂ :=
   if q.2 % 2 = 0 then gLadderP p y q else 0
@@ -350,43 +297,43 @@ private def gOddVP (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) : ℂ :=
 private def hHalfP (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) : ℂ :=
   if q.2 % 2 = 0 then
     2 * (p : ℂ) * (q.1 : ℂ) * sgn4 (q.1 + q.2) *
-      ((XP p (2 * (q.1 ^ 2 + q.2 ^ 2)) : ℤ) : ℂ) * ((envF y q.1 q.2 : ℝ) : ℂ)
+      ((XP p (2 * (q.1 ^ 2 + q.2 ^ 2)) : ℤ) : ℂ) * ((FiveTheta.envF y q.1 q.2 : ℝ) : ℂ)
   else 0
 
 def hPlusP (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) : ℂ :=
   if (q.1 + q.2) % 4 = 1 ∧ q.2 % 2 = 0 then
     2 * (p : ℂ) * (q.1 : ℂ) * ((XP p (2 * (q.1 ^ 2 + q.2 ^ 2)) : ℤ) : ℂ) *
-      ((envF y q.1 q.2 : ℝ) : ℂ)
+      ((FiveTheta.envF y q.1 q.2 : ℝ) : ℂ)
   else 0
 
 private def hMinusP (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) : ℂ :=
   if (q.1 + q.2) % 4 = 3 ∧ q.2 % 2 = 0 then
     2 * (p : ℂ) * (q.1 : ℂ) * ((XP p (2 * (q.1 ^ 2 + q.2 ^ 2)) : ℤ) : ℂ) *
-      ((envF y q.1 q.2 : ℝ) : ℂ)
+      ((FiveTheta.envF y q.1 q.2 : ℝ) : ℂ)
   else 0
 
 def hFinalP (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) : ℂ :=
   if q.1 % 4 = 1 then
     8 * (p : ℂ) * (q.1 : ℂ) * cs4 q.2 * ((XP p (2 * (q.1 ^ 2 + q.2 ^ 2)) : ℤ) : ℂ) *
-      ((envF y q.1 q.2 : ℝ) : ℂ)
+      ((FiveTheta.envF y q.1 q.2 : ℝ) : ℂ)
   else 0
 
 private def aPieceP (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) : ℂ :=
   if q.1 % 4 = 1 ∧ q.2 % 4 = 0 then
     2 * (p : ℂ) * (q.1 : ℂ) * ((XP p (2 * (q.1 ^ 2 + q.2 ^ 2)) : ℤ) : ℂ) *
-      ((envF y q.1 q.2 : ℝ) : ℂ)
+      ((FiveTheta.envF y q.1 q.2 : ℝ) : ℂ)
   else 0
 
 private def bPieceP (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) : ℂ :=
   if q.1 % 4 = 3 ∧ q.2 % 4 = 2 then
     2 * (p : ℂ) * (q.1 : ℂ) * ((XP p (2 * (q.1 ^ 2 + q.2 ^ 2)) : ℤ) : ℂ) *
-      ((envF y q.1 q.2 : ℝ) : ℂ)
+      ((FiveTheta.envF y q.1 q.2 : ℝ) : ℂ)
   else 0
 
 private def bMirrorP (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) : ℂ :=
   if q.1 % 4 = 1 ∧ q.2 % 4 = 2 then
     2 * (p : ℂ) * (q.1 : ℂ) * ((XP p (2 * (q.1 ^ 2 + q.2 ^ 2)) : ℤ) : ℂ) *
-      ((envF y q.1 q.2 : ℝ) : ℂ)
+      ((FiveTheta.envF y q.1 q.2 : ℝ) : ℂ)
   else 0
 
 /-! ## 5. Index maps -/
@@ -417,13 +364,13 @@ lemma gridEmb_injective : Function.Injective gridEmb := by
 private lemma norm_weight_le (p : ℕ) (y : ℝ) (u v w : ℤ) (c : ℝ) (s : ℂ) (hs : ‖s‖ ≤ 1)
     (hc : 0 ≤ c)
     (hw : c * |(w : ℝ)| ≤ (8 * p) * (|(u : ℝ)| + |(v : ℝ)| + 1)) :
-    ‖(c : ℂ) * ((w : ℤ) : ℂ) * s * ((envF y u v : ℝ) : ℂ)‖
-      ≤ (8 * p) * ((|(u : ℝ)| + |(v : ℝ)| + 1) * envF y u v) := by
+    ‖(c : ℂ) * ((w : ℤ) : ℂ) * s * ((FiveTheta.envF y u v : ℝ) : ℂ)‖
+      ≤ (8 * p) * ((|(u : ℝ)| + |(v : ℝ)| + 1) * FiveTheta.envF y u v) := by
   rw [norm_mul, norm_mul, norm_mul]
   have h1 : ‖((w : ℤ) : ℂ)‖ = |(w : ℝ)| := by
     rw [show ((w : ℤ) : ℂ) = ((w : ℝ) : ℂ) from by push_cast; rfl, Complex.norm_real,
       Real.norm_eq_abs]
-  have h2 : ‖((envF y u v : ℝ) : ℂ)‖ = envF y u v := by
+  have h2 : ‖((FiveTheta.envF y u v : ℝ) : ℂ)‖ = FiveTheta.envF y u v := by
     rw [Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg (envF_nonneg y u v)]
   have h3 : ‖(c : ℂ)‖ = c := by
     rw [Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg hc]
@@ -431,14 +378,14 @@ private lemma norm_weight_le (p : ℕ) (y : ℝ) (u v w : ℤ) (c : ℝ) (s : �
   have he := envF_nonneg y u v
   have hwn := abs_nonneg (w : ℝ)
   have hsn := norm_nonneg s
-  calc c * |(w : ℝ)| * ‖s‖ * envF y u v
-      ≤ c * |(w : ℝ)| * 1 * envF y u v := by
+  calc c * |(w : ℝ)| * ‖s‖ * FiveTheta.envF y u v
+      ≤ c * |(w : ℝ)| * 1 * FiveTheta.envF y u v := by
         apply mul_le_mul_of_nonneg_right _ he
         exact mul_le_mul_of_nonneg_left hs (by positivity)
-    _ = c * |(w : ℝ)| * envF y u v := by ring
-    _ ≤ (8 * p) * (|(u : ℝ)| + |(v : ℝ)| + 1) * envF y u v :=
+    _ = c * |(w : ℝ)| * FiveTheta.envF y u v := by ring
+    _ ≤ (8 * p) * (|(u : ℝ)| + |(v : ℝ)| + 1) * FiveTheta.envF y u v :=
         mul_le_mul_of_nonneg_right hw he
-    _ = (8 * p) * ((|(u : ℝ)| + |(v : ℝ)| + 1) * envF y u v) := by ring
+    _ = (8 * p) * ((|(u : ℝ)| + |(v : ℝ)| + 1) * FiveTheta.envF y u v) := by ring
 
 private lemma norm_sgn_XP_le (p : ℕ) [Fact p.Prime] (a N : ℤ) :
     ‖sgn4 a * ((XP p N : ℤ) : ℂ)‖ ≤ 1 := by
@@ -481,12 +428,12 @@ private lemma summable_gLadderP (p : ℕ) [Fact p.Prime] {y : ℝ} (hy : 0 < y) 
   refine summable_of_le_envF (C := 8 * p) hy fun q => ?_
   obtain ⟨u, v⟩ := q
   show ‖2 * (p : ℂ) * ((u + v : ℤ) : ℂ) * sgn4 (u + v) *
-      ((XP p (2 * (u ^ 2 + v ^ 2)) : ℤ) : ℂ) * ((envF y u v : ℝ) : ℂ)‖ ≤ _
+      ((XP p (2 * (u ^ 2 + v ^ 2)) : ℤ) : ℂ) * ((FiveTheta.envF y u v : ℝ) : ℂ)‖ ≤ _
   rw [show (2 : ℂ) * (p : ℂ) * ((u + v : ℤ) : ℂ) * sgn4 (u + v) *
-        ((XP p (2 * (u ^ 2 + v ^ 2)) : ℤ) : ℂ) * ((envF y u v : ℝ) : ℂ)
+        ((XP p (2 * (u ^ 2 + v ^ 2)) : ℤ) : ℂ) * ((FiveTheta.envF y u v : ℝ) : ℂ)
       = ((2 * (p : ℝ) : ℝ) : ℂ) * ((u + v : ℤ) : ℂ) *
         (sgn4 (u + v) * ((XP p (2 * (u ^ 2 + v ^ 2)) : ℤ) : ℂ)) *
-        ((envF y u v : ℝ) : ℂ) from by push_cast; ring]
+        ((FiveTheta.envF y u v : ℝ) : ℂ) from by push_cast; ring]
   exact norm_weight_le p y u v (u + v) (2 * p) _ (norm_sgn_XP_le p _ _) (by positivity)
     (weight_sum_le p u v)
 
@@ -494,7 +441,7 @@ private lemma summable_piece (p : ℕ) {y : ℝ} (hy : 0 < y) (c : ℝ) (hc : 0 
     (hc' : c ≤ 8 * p)
     (P : ℤ × ℤ → Prop) [DecidablePred P] (S : ℤ × ℤ → ℂ) (hS : ∀ q, ‖S q‖ ≤ 1) :
     Summable fun q : ℤ × ℤ =>
-      if P q then (c : ℂ) * (q.1 : ℂ) * S q * ((envF y q.1 q.2 : ℝ) : ℂ) else 0 := by
+      if P q then (c : ℂ) * (q.1 : ℂ) * S q * ((FiveTheta.envF y q.1 q.2 : ℝ) : ℂ) else 0 := by
   refine summable_of_le_envF (C := 8 * p) hy fun q => ?_
   obtain ⟨u, v⟩ := q
   split_ifs
@@ -603,14 +550,14 @@ private lemma summable_dualPOdd (p : ℕ) [Fact p.Prime] {y : ℝ} (hy : 0 < y) 
 
 /-! ## 7. Pointwise identities along the ladder -/
 
-private lemma envF_neg_snd (y : ℝ) (u v : ℤ) : envF y u (-v) = envF y u v := by
-  unfold envF; congr 1; push_cast; ring
+private lemma envF_neg_snd (y : ℝ) (u v : ℤ) : FiveTheta.envF y u (-v) = FiveTheta.envF y u v := by
+  unfold FiveTheta.envF; congr 1; push_cast; ring
 
-private lemma envF_neg_both (y : ℝ) (u v : ℤ) : envF y (-u) (-v) = envF y u v := by
-  unfold envF; congr 1; push_cast; ring
+private lemma envF_neg_both (y : ℝ) (u v : ℤ) : FiveTheta.envF y (-u) (-v) = FiveTheta.envF y u v := by
+  unfold FiveTheta.envF; congr 1; push_cast; ring
 
-private lemma envF_swap (y : ℝ) (u v : ℤ) : envF y v u = envF y u v := by
-  unfold envF; congr 1; push_cast; ring
+private lemma envF_swap (y : ℝ) (u v : ℤ) : FiveTheta.envF y v u = FiveTheta.envF y u v := by
+  unfold FiveTheta.envF; congr 1; push_cast; ring
 
 private lemma quarter_phase_odd {p k : ℕ} (hpk : p = 2 * k + 1) (t : ℤ) :
     -I * cexp (π * I * ((p : ℂ) * ((2 * t + 1 : ℤ) : ℂ)) / 2)
@@ -672,11 +619,11 @@ private lemma tsum_dualPEven_eq_zero (p : ℕ) [Fact p.Prime] (y : ℝ) :
       unfold dualP
       show -I * ((-n : ℤ) : ℂ) *
           (2 * (p : ℂ) * cexp (π * I * ((p : ℂ) * ((-n : ℤ) : ℂ)) / 2) *
-          oddInd m * ((XP p ((-n) ^ 2 + m ^ 2) : ℤ) : ℂ)) * ((envP y (-n) m : ℝ) : ℂ) = _
+          oddInd m * ((XP p ((-n) ^ 2 + m ^ 2) : ℤ) : ℂ)) * ((FiveTheta.envP y (-n) m : ℝ) : ℂ) = _
       rw [quarter_phase_neg_even hn,
         show ((-n : ℤ) : ℂ) = -((n : ℤ) : ℂ) from by push_cast; ring,
         show XP p ((-n) ^ 2 + m ^ 2) = XP p (n ^ 2 + m ^ 2) from by ring_nf,
-        show envP y (-n) m = envP y n m from by unfold envP; congr 1; push_cast; ring]
+        show FiveTheta.envP y (-n) m = FiveTheta.envP y n m from by unfold FiveTheta.envP; congr 1; push_cast; ring]
       ring
     · simp only [dualPEven]
       rw [if_neg (show ¬((-n) % 2 = 0) by omega), if_neg hn, neg_zero]
@@ -699,7 +646,7 @@ private lemma dualPOdd_comp_bothOdd (p : ℕ) [Fact p.Prime] {k : ℕ}
   show -I * ((2 * t + 1 : ℤ) : ℂ) *
       (2 * (p : ℂ) * cexp (π * I * ((p : ℂ) * ((2 * t + 1 : ℤ) : ℂ)) / 2) *
       oddInd (2 * s + 1) * ((XP p ((2 * t + 1) ^ 2 + (2 * s + 1) ^ 2) : ℤ) : ℂ)) *
-      ((envP y (2 * t + 1) (2 * s + 1) : ℝ) : ℂ) = _
+      ((FiveTheta.envP y (2 * t + 1) (2 * s + 1) : ℝ) : ℂ) = _
   have hoi : oddInd (2 * s + 1) = 1 := by
     unfold oddInd
     rw [if_neg (by omega)]
@@ -707,8 +654,8 @@ private lemma dualPOdd_comp_bothOdd (p : ℕ) [Fact p.Prime] {k : ℕ}
       = XP p (2 * ((t + s + 1) ^ 2 + (t - s) ^ 2)) := by
     rw [show (2 * t + 1) ^ 2 + (2 * s + 1) ^ 2 = 2 * ((t + s + 1) ^ 2 + (t - s) ^ 2) from
       by ring]
-  have henv : envP y (2 * t + 1) (2 * s + 1) = envF y (t + s + 1) (t - s) := by
-    unfold envP envF
+  have henv : FiveTheta.envP y (2 * t + 1) (2 * s + 1) = FiveTheta.envF y (t + s + 1) (t - s) := by
+    unfold FiveTheta.envP FiveTheta.envF
     congr 1
     push_cast
     ring
@@ -716,7 +663,7 @@ private lemma dualPOdd_comp_bothOdd (p : ℕ) [Fact p.Prime] {k : ℕ}
   have hq := quarter_phase_odd hpk t
   linear_combination (2 * (p : ℂ) * ((2 * t + 1 : ℤ) : ℂ) *
     ((XP p (2 * ((t + s + 1) ^ 2 + (t - s) ^ 2)) : ℤ) : ℂ) *
-    ((envF y (t + s + 1) (t - s) : ℝ) : ℂ)) * hq
+    ((FiveTheta.envF y (t + s + 1) (t - s) : ℝ) : ℂ)) * hq
 
 private lemma tsum_dualPOdd_eq_gLadderP (p : ℕ) [Fact p.Prime] {k : ℕ}
     (hpk : p = 2 * k + 1) (y : ℝ) :
@@ -738,7 +685,7 @@ private lemma tsum_dualPOdd_eq_gLadderP (p : ℕ) [Fact p.Prime] {k : ℕ}
       rw [if_neg hn]
       unfold dualP
       show -I * (n : ℂ) * (2 * (p : ℂ) * cexp (π * I * ((p : ℂ) * (n : ℂ)) / 2) *
-          oddInd m * ((XP p (n ^ 2 + m ^ 2) : ℤ) : ℂ)) * ((envP y n m : ℝ) : ℂ) = 0
+          oddInd m * ((XP p (n ^ 2 + m ^ 2) : ℤ) : ℂ)) * ((FiveTheta.envP y n m : ℝ) : ℂ) = 0
       rw [show oddInd m = 0 from by unfold oddInd; rw [if_pos h]]
       ring
     exact ⟨((n - 1) / 2, (m - 1) / 2), by
@@ -809,9 +756,9 @@ private lemma gEvenP_add_negSnd (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × �
   · rw [if_pos hv, if_pos (show (-v) % 2 = 0 by omega), if_pos hv]
     unfold gLadderP
     show 2 * (p : ℂ) * ((u + v : ℤ) : ℂ) * sgn4 (u + v) *
-        ((XP p (2 * (u ^ 2 + v ^ 2)) : ℤ) : ℂ) * ((envF y u v : ℝ) : ℂ) +
+        ((XP p (2 * (u ^ 2 + v ^ 2)) : ℤ) : ℂ) * ((FiveTheta.envF y u v : ℝ) : ℂ) +
         2 * (p : ℂ) * ((u + -v : ℤ) : ℂ) * sgn4 (u + -v) *
-          ((XP p (2 * (u ^ 2 + (-v) ^ 2)) : ℤ) : ℂ) * ((envF y u (-v) : ℝ) : ℂ) = _
+          ((XP p (2 * (u ^ 2 + (-v) ^ 2)) : ℤ) : ℂ) * ((FiveTheta.envF y u (-v) : ℝ) : ℂ) = _
     rw [show u + -v = u - v from by ring,
       show sgn4 (u - v) = sgn4 (u + v) from by
         unfold sgn4; rw [show (u - v) % 4 = (u + v) % 4 from by omega],
@@ -1106,12 +1053,12 @@ private lemma XP_grid (p : ℕ) [Fact p.Prime] (n' m' : ℤ) (e d : ℕ) :
         rw [XP_congr p hX]
 
 private lemma envF_grid (p : ℕ) (hp : 0 < p) (y : ℝ) (n' m' : ℤ) (e d : ℕ) :
-    envF y (4 * ((p : ℤ) * n' + (e : ℤ)) + 1) (2 * ((2 * p : ℤ) * m' + (d : ℤ)))
+    FiveTheta.envF y (4 * ((p : ℤ) * n' + (e : ℤ)) + 1) (2 * ((2 * p : ℤ) * m' + (d : ℤ)))
       = rexp (-π * ((n' : ℝ) + (4 * (e : ℝ) + 1) / (4 * p)) ^ 2 * (32 * p ^ 2 * y)) *
         rexp (-π * ((m' : ℝ) + (d : ℝ) / (2 * p)) ^ 2 * (32 * p ^ 2 * y)) := by
   have hp' : (0 : ℝ) < p := by exact_mod_cast hp
   have hpne : (p : ℝ) ≠ 0 := hp'.ne'
-  unfold envF
+  unfold FiveTheta.envF
   rw [← Real.exp_add]
   congr 1
   push_cast

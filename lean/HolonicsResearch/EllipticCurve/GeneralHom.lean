@@ -292,17 +292,6 @@ lemma slotTwo_ne (ha : a ≠ 0) (hab : a - b ≠ 0) (P : (E a b).Point) :
     · exact mul_ne_zero ha hab
     · exact sub_ne_zero.mpr hx
 
-private lemma sqcls_one_mul_self {s : ℚ} (hs : s ≠ 0) : Descent.SqCls 1 (s * s) := by
-  refine ⟨1 / s, one_div_ne_zero hs, ?_⟩
-  field_simp
-
-private lemma sqcls_scale_sq {z s : ℚ} (h : Descent.SqCls z 1) (hs : s ≠ 0) :
-    Descent.SqCls z (s * s) := by
-  obtain ⟨c, hc, hval⟩ := h
-  refine ⟨c / s, div_ne_zero hc hs, ?_⟩
-  rw [hval]
-  field_simp
-
 /-- Extract a square class from a conserved triple. -/
 private lemma sqcls_of_triple {s₁ s₂ s₃ t : ℚ} (h1 : s₁ ≠ 0) (h2 : s₂ ≠ 0)
     (ht : t ≠ 0) (h : s₁ * s₂ * s₃ = t ^ 2) : Descent.SqCls s₃ (s₁ * s₂) := by
@@ -357,22 +346,22 @@ theorem theFaceIsAHomomorphismOnEveryFullTwoTorsionCurve
       rw [hsame, hsame2, heq]
       obtain ⟨k1, k2⟩ :=
         theDoublesLandInTheKernelOnEveryFullTwoTorsionCurve ha hb hab (Point.some _ _ h₁)
-      exact ⟨sqcls_scale_sq k1 (slotOne_ne ha hb _),
-        sqcls_scale_sq k2 (slotTwo_ne ha hab _)⟩
+      exact ⟨Descent.sqClsScaleSq k1 (slotOne_ne ha hb _),
+        Descent.sqClsScaleSq k2 (slotTwo_ne ha hab _)⟩
     · by_cases hy0 : y₁ = 0
       · have heq : (Point.some _ _ h₂ : (E a b).Point) = Point.some _ _ h₁ :=
           someEq rfl (by linarith)
         rw [hsame, hsame2, heq]
         obtain ⟨k1, k2⟩ :=
           theDoublesLandInTheKernelOnEveryFullTwoTorsionCurve ha hb hab (Point.some _ _ h₁)
-        exact ⟨sqcls_scale_sq k1 (slotOne_ne ha hb _),
-          sqcls_scale_sq k2 (slotTwo_ne ha hab _)⟩
+        exact ⟨Descent.sqClsScaleSq k1 (slotOne_ne ha hb _),
+          Descent.sqClsScaleSq k2 (slotTwo_ne ha hab _)⟩
       · -- opposite points: the sum is the identity
         have hzero : (Point.some _ _ h₁ : (E a b).Point) + Point.some _ _ h₂ = 0 :=
           Point.add_of_Y_eq rfl (by rw [negY_eq]; linarith)
         rw [hsame, hsame2, hzero]
-        exact ⟨sqcls_one_mul_self (slotOne_ne ha hb _),
-          sqcls_one_mul_self (slotTwo_ne ha hab _)⟩
+        exact ⟨Descent.sqClsOneMulSelf (slotOne_ne ha hb _),
+          Descent.sqClsOneMulSelf (slotTwo_ne ha hab _)⟩
   · -- the chord case
     have hc₁ := onCurve h₁
     have hc₂ := onCurve h₂

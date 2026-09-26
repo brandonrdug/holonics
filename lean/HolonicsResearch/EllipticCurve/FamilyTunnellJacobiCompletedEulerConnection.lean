@@ -41,22 +41,6 @@ private theorem integerQpochSplit
   rw [qPoch, qPoch, qPoch, Finset.prod_range_add]
   simp [pow_add, mul_assoc]
 
-private theorem coeffMulOfTruncOne
-    (f g : PowerSeries ℤ) (m : ℕ)
-    (hg : ∀ j ≤ m, PowerSeries.coeff j g = if j = 0 then 1 else 0) :
-    PowerSeries.coeff m (f * g) = PowerSeries.coeff m f := by
-  rw [PowerSeries.coeff_mul]
-  rw [Finset.sum_eq_single_of_mem (m, 0)
-    (Finset.HasAntidiagonal.mem_antidiagonal.mpr (add_zero m))]
-  · simp [hg 0 (Nat.zero_le m)]
-  · intro b hb hne
-    have hbSum := Finset.HasAntidiagonal.mem_antidiagonal.mp hb
-    rw [hg b.2 (by omega), if_neg]
-    · simp
-    · intro hb0
-      apply hne
-      ext <;> simp_all
-
 private theorem prodCoeffDelta
     (m : ℕ) (f : ℕ → PowerSeries ℤ) (r : ℕ)
     (hf : ∀ i < r, ∀ j ≤ m,
@@ -68,7 +52,7 @@ private theorem prodCoeffDelta
   | zero => simp [PowerSeries.coeff_one]
   | succ r ih =>
       rw [Finset.prod_range_succ,
-        coeffMulOfTruncOne _ _ j
+        integerCoeffMulOfTruncOne _ _ j
           (fun j' hj' => hf r (Nat.lt_succ_self r) j' (le_trans hj' hj))]
       exact ih (fun i hi j' hj' => hf i (Nat.lt_succ_of_lt hi) j' hj')
 
@@ -118,7 +102,7 @@ private theorem scalePartialProdsCoeffStable
           (PowerSeries.X ^ k) N) := by
   obtain ⟨r, rfl⟩ := Nat.exists_eq_add_of_le hNN'
   rw [integerQpochSplit]
-  exact coeffMulOfTruncOne _ _ m
+  exact integerCoeffMulOfTruncOne _ _ m
     (scaleTailCoeffDelta k m N r · hk hbelow)
 
 private theorem scaleFactorsMultipliable (k : ℕ) (hk : k ≠ 0) :
@@ -211,7 +195,7 @@ private theorem monomialPartialProdsCoeffStable
           (PowerSeries.X ^ b) N) := by
   obtain ⟨r, rfl⟩ := Nat.exists_eq_add_of_le hNN'
   rw [integerQpochSplit]
-  exact coeffMulOfTruncOne _ _ m
+  exact integerCoeffMulOfTruncOne _ _ m
     (monomialTailCoeffDelta a b m N r · hb hbelow)
 
 private theorem monomialFactorsMultipliable

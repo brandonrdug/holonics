@@ -515,7 +515,7 @@ def theta5 (x : ℝ) : ℝ :=
 
 private lemma sqrt2_pos : (0 : ℝ) < Real.sqrt 2 := Real.sqrt_pos.mpr (by norm_num)
 
-private lemma summable_gauss_weight (c : ℝ) (hc : 0 < c) :
+lemma summable_gauss_weight (c : ℝ) (hc : 0 < c) :
     Summable fun n : ℤ => |(n : ℝ)| * rexp (-π * c * n ^ 2) := by
   have h := (HurwitzZeta.hasSum_int_oddKernel 0 hc).summable.norm
   have h0 : Summable fun n : ℤ => |(n : ℝ) + 0| * rexp (-π * ((n : ℝ) + 0) ^ 2 * c) := by
@@ -524,7 +524,7 @@ private lemma summable_gauss_weight (c : ℝ) (hc : 0 < c) :
   rw [add_zero]
   ring_nf
 
-private lemma summable_gauss (c : ℝ) (hc : 0 < c) :
+lemma summable_gauss (c : ℝ) (hc : 0 < c) :
     Summable fun n : ℤ => rexp (-π * c * n ^ 2) := by
   have h := (HurwitzZeta.hasSum_int_evenKernel 0 hc).summable
   refine h.congr fun n => ?_
@@ -532,7 +532,7 @@ private lemma summable_gauss (c : ℝ) (hc : 0 < c) :
   ring_nf
 
 set_option maxHeartbeats 1000000 in
-private lemma summable_master {c : ℝ} (hc : 0 < c) :
+lemma summable_master {c : ℝ} (hc : 0 < c) :
     Summable fun p : ℤ × ℤ =>
       (|(p.1 : ℝ)| + |(p.2 : ℝ)| + 1) * rexp (-π * c * ((p.1 : ℝ) ^ 2 + (p.2 : ℝ) ^ 2)) := by
   have hw := summable_gauss_weight c hc
@@ -555,19 +555,19 @@ private lemma summable_master {c : ℝ} (hc : 0 < c) :
   ring
 
 /-- The pre-fold Gaussian envelope. -/
-private def envP (y : ℝ) (u v : ℤ) : ℝ := rexp (-π * y * ((u : ℝ) ^ 2 + (v : ℝ) ^ 2))
+def envP (y : ℝ) (u v : ℤ) : ℝ := rexp (-π * y * ((u : ℝ) ^ 2 + (v : ℝ) ^ 2))
 
 /-- The post-fold Gaussian envelope. -/
-private def envF (y : ℝ) (u v : ℤ) : ℝ := rexp (-2 * π * y * ((u : ℝ) ^ 2 + (v : ℝ) ^ 2))
+def envF (y : ℝ) (u v : ℤ) : ℝ := rexp (-2 * π * y * ((u : ℝ) ^ 2 + (v : ℝ) ^ 2))
 
 private lemma envP_nonneg (y : ℝ) (u v : ℤ) : 0 ≤ envP y u v := Real.exp_nonneg _
 private lemma envF_nonneg (y : ℝ) (u v : ℤ) : 0 ≤ envF y u v := Real.exp_nonneg _
 
-private lemma summable_envP {y : ℝ} (hy : 0 < y) :
+lemma summable_envP {y : ℝ} (hy : 0 < y) :
     Summable fun p : ℤ × ℤ => (|(p.1 : ℝ)| + |(p.2 : ℝ)| + 1) * envP y p.1 p.2 :=
   (summable_master hy).congr fun p => rfl
 
-private lemma summable_envF {y : ℝ} (hy : 0 < y) :
+lemma summable_envF {y : ℝ} (hy : 0 < y) :
     Summable fun p : ℤ × ℤ => (|(p.1 : ℝ)| + |(p.2 : ℝ)| + 1) * envF y p.1 p.2 := by
   refine (summable_master (show (0 : ℝ) < 2 * y by positivity)).congr fun p => ?_
   unfold envF
@@ -1534,7 +1534,7 @@ theorem theFiveDuplicationIdentity {y : ℝ} (hy : 0 < y) :
 
 /-! ## 15. The functional equation of the theta at five -/
 
-private lemma rpow_two_of_pos {t : ℝ} (ht : 0 < t) :
+lemma rpow_two_of_pos {t : ℝ} (ht : 0 < t) :
     t ^ ((3 : ℝ) / 2) * t ^ ((1 : ℝ) / 2) = t ^ 2 := by
   rw [← Real.rpow_add ht, show (3 : ℝ) / 2 + 1 / 2 = ((2 : ℕ) : ℝ) from by norm_num,
     Real.rpow_natCast]

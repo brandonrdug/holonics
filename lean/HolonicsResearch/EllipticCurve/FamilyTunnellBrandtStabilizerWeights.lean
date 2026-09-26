@@ -84,13 +84,6 @@ theorem q₁_q₂_transport_card_equal :
     Fintype.card (LatticeTransport q₁) = Fintype.card (LatticeTransport q₂) := by
   rw [q₁_transport_card, q₂_transport_card]
 
-/-- The source-neutral weighted Brandt consequence available from the two
-classified additive fibres.  It is intentionally a typed equality of the
-finite transport fibres, not yet an identification with right-order units. -/
-theorem classified_transport_fibres_equal_weight :
-    Fintype.card (LatticeTransport q₁) = Fintype.card (LatticeTransport q₂) :=
-  q₁_q₂_transport_card_equal
-
 theorem classified_transport_card_cast_equal :
     (Fintype.card (LatticeTransport q₁) : ℤ) =
       (Fintype.card (LatticeTransport q₂) : ℤ) := by

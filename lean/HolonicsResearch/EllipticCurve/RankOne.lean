@@ -72,7 +72,7 @@ theorem theThreePointsAreHalfTurns : T0 + T0 = 0 ∧ T5 + T5 = 0 ∧ Tm5 + Tm5 =
    Point.add_self_of_Y_eq (by simp [E5]),
    Point.add_self_of_Y_eq (by simp [E5])⟩
 
-private lemma some_eq_some {x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
+lemma some_eq_some {x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
     {h₁ : E5.Nonsingular x₁ y₁} {h₂ : E5.Nonsingular x₂ y₂} :
     (Point.some x₁ y₁ h₁ : E5.Point) = Point.some x₂ y₂ h₂ := by
   subst hx; subst hy; rfl

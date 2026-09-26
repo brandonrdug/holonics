@@ -186,12 +186,12 @@ noncomputable def SF (p B : ℕ) : ℤ := ∑ t ∈ SolF p B, (-1 : ℤ) ^ (t.2.
 private def flipY : ℤ × ℤ × ℤ → ℤ × ℤ × ℤ := fun t => (t.1, -t.2.1, t.2.2)
 private def flipXZ : ℤ × ℤ × ℤ → ℤ × ℤ × ℤ := fun t => (-t.1, t.2.1, -t.2.2)
 
-private lemma mem_SolF {p B : ℕ} {t : ℤ × ℤ × ℤ} :
+lemma mem_SolF {p B : ℕ} {t : ℤ × ℤ × ℤ} :
     t ∈ SolF p B ↔ (t.1 ∈ Icc (-(B : ℤ)) B ∧ t.2.1 ∈ Icc (-(B : ℤ)) B ∧
       t.2.2 ∈ Icc (-(B : ℤ)) B) ∧ 2 * t.1 ^ 2 + t.2.1 ^ 2 + 8 * t.2.2 ^ 2 = (p : ℤ) := by
   simp [SolF, Finset.mem_filter, Finset.mem_product]
 
-private lemma icc_neg {B : ℕ} {x : ℤ} (h : x ∈ Icc (-(B : ℤ)) B) :
+lemma icc_neg {B : ℕ} {x : ℤ} (h : x ∈ Icc (-(B : ℤ)) B) :
     -x ∈ Icc (-(B : ℤ)) B := by
   rw [Finset.mem_Icc] at h ⊢; omega
 
@@ -654,23 +654,15 @@ lemma flipX_invol (t : ℤ × ℤ × ℤ) : flipX (flipX t) = t := by simp [flip
 lemma flipZ_invol (t : ℤ × ℤ × ℤ) : flipZ (flipZ t) = t := by simp [flipZ]
 lemma flipYb_invol (t : ℤ × ℤ × ℤ) : flipYb (flipYb t) = t := by simp [flipYb]
 
-lemma mem_SolF' {p B : ℕ} {t : ℤ × ℤ × ℤ} :
-    t ∈ SolF p B ↔ (t.1 ∈ Icc (-(B : ℤ)) B ∧ t.2.1 ∈ Icc (-(B : ℤ)) B ∧
-      t.2.2 ∈ Icc (-(B : ℤ)) B) ∧ 2 * t.1 ^ 2 + t.2.1 ^ 2 + 8 * t.2.2 ^ 2 = (p : ℤ) := by
-  simp [SolF, Finset.mem_filter, Finset.mem_product]
-
-lemma icc_neg' {B : ℕ} {x : ℤ} (h : x ∈ Icc (-(B : ℤ)) B) : -x ∈ Icc (-(B : ℤ)) B := by
-  rw [Finset.mem_Icc] at h ⊢; omega
-
 lemma flipX_mem {p B : ℕ} {t} (ht : t ∈ SolF p B) : flipX t ∈ SolF p B := by
-  obtain ⟨⟨h1, h2, h3⟩, hf⟩ := mem_SolF'.mp ht
-  exact mem_SolF'.mpr ⟨⟨icc_neg' h1, h2, h3⟩, by simp only [flipX]; linarith [hf]⟩
+  obtain ⟨⟨h1, h2, h3⟩, hf⟩ := mem_SolF.mp ht
+  exact mem_SolF.mpr ⟨⟨icc_neg h1, h2, h3⟩, by simp only [flipX]; linarith [hf]⟩
 lemma flipZ_mem {p B : ℕ} {t} (ht : t ∈ SolF p B) : flipZ t ∈ SolF p B := by
-  obtain ⟨⟨h1, h2, h3⟩, hf⟩ := mem_SolF'.mp ht
-  exact mem_SolF'.mpr ⟨⟨h1, h2, icc_neg' h3⟩, by simp only [flipZ]; linarith [hf]⟩
+  obtain ⟨⟨h1, h2, h3⟩, hf⟩ := mem_SolF.mp ht
+  exact mem_SolF.mpr ⟨⟨h1, h2, icc_neg h3⟩, by simp only [flipZ]; linarith [hf]⟩
 lemma flipYb_mem {p B : ℕ} {t} (ht : t ∈ SolF p B) : flipYb t ∈ SolF p B := by
-  obtain ⟨⟨h1, h2, h3⟩, hf⟩ := mem_SolF'.mp ht
-  exact mem_SolF'.mpr ⟨⟨h1, icc_neg' h2, h3⟩, by simp only [flipYb]; linarith [hf]⟩
+  obtain ⟨⟨h1, h2, h3⟩, hf⟩ := mem_SolF.mp ht
+  exact mem_SolF.mpr ⟨⟨h1, icc_neg h2, h3⟩, by simp only [flipYb]; linarith [hf]⟩
 
 
 
@@ -686,11 +678,11 @@ theorem theCountIsOddOnTheThreeModEightBranch {p B : ℕ} (hp : p.Prime) (h8 : p
   have hodd : Odd p := by refine ⟨p / 2, by omega⟩
   set f : ℤ × ℤ × ℤ → ℤ := fun t => (-1 : ℤ) ^ (t.2.2).natAbs with hfdef
   have hy0 : ∀ t ∈ SolF p B, t.2.1 ≠ 0 := fun t ht => by
-    obtain ⟨-, hf⟩ := mem_SolF'.mp ht
+    obtain ⟨-, hf⟩ := mem_SolF.mp ht
     exact theMiddleCoordinateNeverVanishes hodd t.1 t.2.1 t.2.2 hf
   have hx0 : ∀ t ∈ SolF p B, t.1 ≠ 0 := by
     intro t ht
-    obtain ⟨-, hf⟩ := mem_SolF'.mp ht
+    obtain ⟨-, hf⟩ := mem_SolF.mp ht
     intro hc
     exact theFirstCoordinateIsOddOnTheThreeBranch h8 hf ⟨0, by omega⟩
   -- split off the zero slice

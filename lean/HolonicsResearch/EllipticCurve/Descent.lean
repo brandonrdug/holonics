@@ -159,6 +159,65 @@ def SqCls (a b : ℚ) : Prop := ∃ c : ℚ, c ≠ 0 ∧ a = c ^ 2 * b
 
 theorem sqClsRefl (a : ℚ) : SqCls a a := ⟨1, one_ne_zero, by ring⟩
 
+/-! The square-class relation is an equivalence compatible with multiplication. Every descent
+module reads its classes through these laws; they are stated once, here, beside `SqCls`. -/
+
+theorem sqClsSymm {a b : ℚ} (h : SqCls a b) : SqCls b a := by
+  obtain ⟨c, hc, hval⟩ := h
+  refine ⟨1 / c, one_div_ne_zero hc, ?_⟩
+  rw [hval]
+  field_simp
+
+theorem sqClsTrans {a b c : ℚ} (h₁ : SqCls a b) (h₂ : SqCls b c) : SqCls a c := by
+  obtain ⟨k, hk, hkv⟩ := h₁
+  obtain ⟨m, hm, hmv⟩ := h₂
+  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
+
+theorem sqClsMul {a b c d : ℚ} (h₁ : SqCls a c) (h₂ : SqCls b d) : SqCls (a * b) (c * d) := by
+  obtain ⟨k, hk, hkv⟩ := h₁
+  obtain ⟨m, hm, hmv⟩ := h₂
+  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
+
+theorem sqClsNe {a b : ℚ} (h : SqCls a b) (ha : a ≠ 0) : b ≠ 0 := by
+  obtain ⟨c, hc, hv⟩ := h
+  intro hb
+  rw [hb, mul_zero] at hv
+  exact ha hv
+
+theorem sqClsSign {a d : ℚ} (h : SqCls a d) : (0 < a ↔ 0 < d) := by
+  obtain ⟨c, hc, hval⟩ := h
+  have hc2 : 0 < c ^ 2 := by positivity
+  constructor
+  · intro ha
+    nlinarith
+  · intro hd
+    nlinarith
+
+theorem sqClsOfProductSquare {a b s : ℚ} (hb : b ≠ 0) (hs : s ≠ 0) (h : a * b = s ^ 2) :
+    SqCls a b := by
+  refine ⟨s / b, div_ne_zero hs hb, ?_⟩
+  rw [div_pow, div_mul_eq_mul_div, eq_div_iff (pow_ne_zero 2 hb)]
+  linear_combination b * h
+
+theorem sqClsOneMulSelf {s : ℚ} (hs : s ≠ 0) : SqCls 1 (s * s) := by
+  refine ⟨1 / s, one_div_ne_zero hs, ?_⟩
+  field_simp
+
+theorem sqClsScaleSq {a s : ℚ} (h : SqCls a 1) (hs : s ≠ 0) : SqCls a (s * s) := by
+  obtain ⟨c, hc, hval⟩ := h
+  refine ⟨c / s, div_ne_zero hc hs, ?_⟩
+  rw [hval]
+  field_simp
+
+theorem sqClsMulSqLeft {a b t : ℚ} (h : SqCls a b) (ht : t ≠ 0) : SqCls (t ^ 2 * a) b := by
+  obtain ⟨c, hc, hval⟩ := h
+  exact ⟨t * c, mul_ne_zero ht hc, by rw [hval]; ring⟩
+
+theorem sqClsAbsorbRight {a b c : ℚ} (h : SqCls a (b * c)) (hc : SqCls c 1) : SqCls a b := by
+  obtain ⟨k, hk, hkval⟩ := h
+  obtain ⟨m, hm, hmval⟩ := hc
+  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkval, hmval]; ring⟩
+
 theorem notSquareTwo : ¬ IsSquare (2 : ℚ) := by
   rw [show (2 : ℚ) = ((2 : ℕ) : ℚ) by norm_num, Rat.isSquare_natCast_iff]
   exact Nat.prime_two.not_isSquare

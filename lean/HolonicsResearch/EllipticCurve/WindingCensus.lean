@@ -67,11 +67,6 @@ private def abscissa : E5.Point → ℚ
   | .zero => 0
   | .some x _ _ => x
 
-private lemma some_eq_some {x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
-    {h₁ : E5.Nonsingular x₁ y₁} {h₂ : E5.Nonsingular x₂ y₂} :
-    (Point.some x₁ y₁ h₁ : E5.Point) = Point.some x₂ y₂ h₂ := by
-  subst hx; subst hy; rfl
-
 /-- On this curve the negation face is the plain sign flip: `negY x y = −y`. -/
 private lemma negY_eq (x y : ℚ) : E5.negY x y = -y := by
   simp [negY, RankOne.E5]
@@ -184,9 +179,9 @@ theorem theSecondWindingClosesExactlyOnTheTable (Q : E5.Point) :
             · exact Or.inr (Or.inl (by linarith))
             · exact Or.inr (Or.inr (by linarith))
         rcases hx with rfl | rfl | rfl
-        · exact Or.inr (Or.inl (some_eq_some rfl rfl))
-        · exact Or.inr (Or.inr (Or.inl (some_eq_some rfl rfl)))
-        · exact Or.inr (Or.inr (Or.inr (some_eq_some rfl rfl)))
+        · exact Or.inr (Or.inl (RankOne.some_eq_some rfl rfl))
+        · exact Or.inr (Or.inr (Or.inl (RankOne.some_eq_some rfl rfl)))
+        · exact Or.inr (Or.inr (Or.inr (RankOne.some_eq_some rfl rfl)))
       · rw [Point.add_self_of_Y_ne hy] at hQQ
         exact absurd hQQ (Point.some_ne_zero _)
   · rintro (rfl | rfl | rfl | rfl)

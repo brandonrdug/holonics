@@ -102,7 +102,7 @@ def quarterResidueAddress (x : ℤ) : QuarterResidue :=
   change (x : ZMod 4) = ((x : ZMod 4).val : ZMod 4)
   exact (ZMod.natCast_zmod_val _).symm
 
-private theorem quarterResidueAddress_eq_of_returns
+theorem quarterResidueAddress_eq_of_returns
     (x : ℤ) (r : QuarterResidue)
     (h : (x : ZMod 4) = r.val) :
     quarterResidueAddress x = r := by

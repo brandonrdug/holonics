@@ -33,13 +33,6 @@ open Holonics.EllipticCurve.GeneralFace
 
 /-! ## 1. From even valuations to a supported class -/
 
-private lemma sqcls_trans {u v w : ℚ} (h₁ : Descent.SqCls u v) (h₂ : Descent.SqCls v w) :
-    Descent.SqCls u w := by
-  obtain ⟨c, hc, hv⟩ := h₁
-  obtain ⟨d, hd, hw⟩ := h₂
-  exact ⟨c * d, mul_ne_zero hc hd, by rw [hv, hw]; ring⟩
-
-
 lemma classFromEvenValuations {K : ℕ} (hK : K ≠ 0) {x : ℚ} (hx : x ≠ 0)
     (h : ∀ ℓ : ℕ, ℓ.Prime → ¬ ℓ ∣ K → Even (padicValRat ℓ x)) :
     ∃ d : ℤ, d ≠ 0 ∧ d.natAbs ∣ K ∧ Descent.SqCls x (d : ℚ) := by
@@ -121,7 +114,7 @@ lemma classFromEvenValuations {K : ℕ} (hK : K ≠ 0) {x : ℚ} (hx : x ≠ 0)
         by exact_mod_cast congrArg (fun m : ℤ => (m : ℚ)) habs]
       push_cast
       ring
-    exact sqcls_trans hcls hstep
+    exact Descent.sqClsTrans hcls hstep
   · exact absurd hs hm0
   · refine ⟨(sfA : ℤ), by exact_mod_cast ha0, by simpa using hadvd, ?_⟩
     have habs : x.num * (x.den : ℤ) = (sfB : ℤ) ^ 2 * (sfA : ℤ) := by
@@ -136,7 +129,7 @@ lemma classFromEvenValuations {K : ℕ} (hK : K ≠ 0) {x : ℚ} (hx : x ≠ 0)
         by exact_mod_cast congrArg (fun m : ℤ => (m : ℚ)) habs]
       push_cast
       ring
-    exact sqcls_trans hcls hstep
+    exact Descent.sqClsTrans hcls hstep
 
 
 

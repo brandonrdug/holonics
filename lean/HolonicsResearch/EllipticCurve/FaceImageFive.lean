@@ -1,6 +1,7 @@
 import HolonicsResearch.EllipticCurve.FamilyFace
 import Mathlib.NumberTheory.Padics.PadicVal.Basic
 import Mathlib.Tactic
+import HolonicsResearch.EllipticCurve.FamilySupport
 
 /-!
 # FaceImageFive: the two-descent of the five-curve is complete
@@ -31,46 +32,7 @@ namespace Holonics.EllipticCurve.FaceImageFive
 
 open WeierstrassCurve.Affine
 
-private lemma sqcls_trans {a b c : ℚ} (h₁ : Descent.SqCls a b) (h₂ : Descent.SqCls b c) :
-    Descent.SqCls a c := by
-  obtain ⟨k, hk, hkv⟩ := h₁
-  obtain ⟨m, hm, hmv⟩ := h₂
-  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
-
-private lemma sqcls_mul {a b c d : ℚ} (h₁ : Descent.SqCls a c) (h₂ : Descent.SqCls b d) :
-    Descent.SqCls (a * b) (c * d) := by
-  obtain ⟨k, hk, hkv⟩ := h₁
-  obtain ⟨m, hm, hmv⟩ := h₂
-  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
-
-private lemma sqcls_sign {a d : ℚ} (h : Descent.SqCls a d) : (0 < a ↔ 0 < d) := by
-  obtain ⟨c, hc, hval⟩ := h
-  have hc2 : 0 < c ^ 2 := by positivity
-  constructor
-  · intro ha
-    nlinarith
-  · intro hd
-    nlinarith
-
 /-! ## 1. The curve data at five -/
-
-private lemma onCurve5 {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
-    y ^ 2 = x ^ 3 - 25 * x := by
-  have h1 := ((nonsingular_iff x y).mp h).1
-  rw [equation_iff] at h1
-  simp only [RankOne.E5] at h1
-  linarith [h1]
-
-private lemma avoid5 {x y : ℚ} (h : y ^ 2 = x ^ 3 - 25 * x) (hy : y ≠ 0) :
-    x ≠ 0 ∧ x ≠ 5 ∧ x ≠ -5 :=
-  FaceHomomorphism.theNonzeroOrdinateAvoidsTheRoots
-    (n := 5) (by linear_combination h) hy
-
-private lemma slot5One_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
-    RankOne.slotOne (.some x y h) = if x = 0 then -25 else x := rfl
-
-private lemma slot5Two_some {x y : ℚ} (h : RankOne.E5.Nonsingular x y) :
-    RankOne.slotTwo (.some x y h) = if x = 5 then 50 else x - 5 := rfl
 
 private lemma notSquareTen : ¬ IsSquare (10 : ℚ) := by
   rw [show (10 : ℚ) = ((10 : ℕ) : ℚ) by norm_num, Rat.isSquare_natCast_iff]
@@ -84,10 +46,10 @@ theorem theSignsAgreeAcrossTheFaceAtFive {x y d₁ d₂ : ℚ}
     (hcurve : y ^ 2 = x ^ 3 - 25 * x) (hy : y ≠ 0)
     (h₁ : Descent.SqCls x d₁) (h₂ : Descent.SqCls (x - 5) d₂) :
     (0 < d₁ ∧ 0 < d₂) ∨ (d₁ < 0 ∧ d₂ < 0) := by
-  obtain ⟨hx0, hx5, hxm5⟩ := avoid5 hcurve hy
+  obtain ⟨hx0, hx5, hxm5⟩ := FaithfulFace.theNonzeroOrdinateAvoidsTheThreeRootsOnTheFiveCurve hcurve hy
   have hy2 : 0 < y ^ 2 := by positivity
-  have hs₁ := sqcls_sign h₁
-  have hs₂ := sqcls_sign h₂
+  have hs₁ := Descent.sqClsSign h₁
+  have hs₂ := Descent.sqClsSign h₂
   rcases lt_or_gt_of_ne hx0 with hx | hx
   · right
     constructor
@@ -116,22 +78,6 @@ theorem theSignsAgreeAcrossTheFaceAtFive {x y d₁ d₂ : ℚ}
     exact ⟨hs₁.mp hx, hs₂.mp (by linarith)⟩
 
 /-! ## 3. The support law at five -/
-
-private lemma val_add_left5 {ℓ : ℕ} [Fact ℓ.Prime] {a b : ℚ} (ha : a ≠ 0)
-    (hab : a + b ≠ 0) (h : padicValRat ℓ a < padicValRat ℓ b) :
-    padicValRat ℓ (a + b) = padicValRat ℓ a := by
-  have h1 : padicValRat ℓ a ≤ padicValRat ℓ (a + b) := by
-    have hmin := padicValRat.min_le_padicValRat_add (p := ℓ) (q := a) (r := b) hab
-    omega
-  have h2 : padicValRat ℓ (a + b) ≤ padicValRat ℓ a := by
-    by_contra hcon
-    push_neg at hcon
-    have hrw : a + b + -b = a := by ring
-    have hmin := padicValRat.min_le_padicValRat_add (p := ℓ) (q := a + b) (r := -b)
-      (by rw [hrw]; exact ha)
-    rw [hrw, padicValRat.neg] at hmin
-    omega
-  omega
 
 private lemma prime_not_dvd_20 {ℓ : ℕ} (hℓ : ℓ.Prime) (h2 : ℓ ≠ 2) (h5 : ℓ ≠ 5) :
     ¬ ℓ ∣ 20 := by
@@ -162,7 +108,7 @@ private lemma val_const_zero5 {ℓ : ℕ} [hf : Fact ℓ.Prime] (h2 : ℓ ≠ 2)
 private lemma even_slot_val5 {ℓ : ℕ} [Fact ℓ.Prime] (h2 : ℓ ≠ 2) (h5 : ℓ ≠ 5)
     {x y : ℚ} (hcurve : y ^ 2 = x ^ 3 - 25 * x) (hy : y ≠ 0) :
     Even (padicValRat ℓ x) ∧ Even (padicValRat ℓ (x - 5)) := by
-  obtain ⟨hx0, hx5, hxm5⟩ := avoid5 hcurve hy
+  obtain ⟨hx0, hx5, hxm5⟩ := FaithfulFace.theNonzeroOrdinateAvoidsTheThreeRootsOnTheFiveCurve hcurve hy
   have hxm : x - 5 ≠ 0 := sub_ne_zero.mpr hx5
   have hxp : x + 5 ≠ 0 := fun hc => hxm5 (by linarith)
   have hfact : y ^ 2 = x * (x - 5) * (x + 5) := by linear_combination hcurve
@@ -179,22 +125,22 @@ private lemma even_slot_val5 {ℓ : ℕ} [Fact ℓ.Prime] (h2 : ℓ ≠ 2) (h5 :
   constructor
   · rcases lt_trichotomy (padicValRat ℓ x) 0 with hv | hv | hv
     · have e1 : padicValRat ℓ (x - 5) = padicValRat ℓ x := by
-        have := val_add_left5 (ℓ := ℓ) hx0
+        have := FamilySupport.val_add_left (ℓ := ℓ) hx0
           (by rw [show x + -5 = x - 5 by ring]; exact hxm) (by rw [vm5]; exact hv)
         rw [show x + -5 = x - 5 by ring] at this
         exact this
       have e2 : padicValRat ℓ (x + 5) = padicValRat ℓ x := by
-        exact val_add_left5 (ℓ := ℓ) hx0 hxp (by rw [v5]; exact hv)
+        exact FamilySupport.val_add_left (ℓ := ℓ) hx0 hxp (by rw [v5]; exact hv)
       rw [e1, e2] at hprod
       refine ⟨padicValRat ℓ y - padicValRat ℓ x, by linarith⟩
     · exact ⟨0, by rw [hv]; ring⟩
     · have e1 : padicValRat ℓ (x - 5) = 0 := by
-        have := val_add_left5 (ℓ := ℓ) (by norm_num : (-5 : ℚ) ≠ 0)
+        have := FamilySupport.val_add_left (ℓ := ℓ) (by norm_num : (-5 : ℚ) ≠ 0)
           (by rw [show -5 + x = x - 5 by ring]; exact hxm) (by rw [vm5]; exact hv)
         rw [show (-5 : ℚ) + x = x - 5 by ring, vm5] at this
         exact this
       have e2 : padicValRat ℓ (x + 5) = 0 := by
-        have := val_add_left5 (ℓ := ℓ) (by norm_num : (5 : ℚ) ≠ 0)
+        have := FamilySupport.val_add_left (ℓ := ℓ) (by norm_num : (5 : ℚ) ≠ 0)
           (by rw [show (5 : ℚ) + x = x + 5 by ring]; exact hxp) (by rw [v5]; exact hv)
         rw [show (5 : ℚ) + x = x + 5 by ring, v5] at this
         exact this
@@ -202,12 +148,12 @@ private lemma even_slot_val5 {ℓ : ℕ} [Fact ℓ.Prime] (h2 : ℓ ≠ 2) (h5 :
       exact ⟨padicValRat ℓ y, by linarith⟩
   · rcases lt_trichotomy (padicValRat ℓ (x - 5)) 0 with hv | hv | hv
     · have e1 : padicValRat ℓ x = padicValRat ℓ (x - 5) := by
-        have := val_add_left5 (ℓ := ℓ) hxm
+        have := FamilySupport.val_add_left (ℓ := ℓ) hxm
           (by rw [show x - 5 + 5 = x by ring]; exact hx0) (by rw [v5]; exact hv)
         rw [show x - 5 + 5 = x by ring] at this
         exact this
       have e2 : padicValRat ℓ (x + 5) = padicValRat ℓ (x - 5) := by
-        have := val_add_left5 (ℓ := ℓ) hxm
+        have := FamilySupport.val_add_left (ℓ := ℓ) hxm
           (by rw [show x - 5 + 10 = x + 5 by ring]; exact hxp) (by rw [v10]; exact hv)
         rw [show x - 5 + 10 = x + 5 by ring] at this
         exact this
@@ -215,12 +161,12 @@ private lemma even_slot_val5 {ℓ : ℕ} [Fact ℓ.Prime] (h2 : ℓ ≠ 2) (h5 :
       refine ⟨padicValRat ℓ y - padicValRat ℓ (x - 5), by linarith⟩
     · exact ⟨0, by rw [hv]; ring⟩
     · have e1 : padicValRat ℓ x = 0 := by
-        have := val_add_left5 (ℓ := ℓ) (by norm_num : (5 : ℚ) ≠ 0)
+        have := FamilySupport.val_add_left (ℓ := ℓ) (by norm_num : (5 : ℚ) ≠ 0)
           (by rw [show (5 : ℚ) + (x - 5) = x by ring]; exact hx0) (by rw [v5]; exact hv)
         rw [show (5 : ℚ) + (x - 5) = x by ring, v5] at this
         exact this
       have e2 : padicValRat ℓ (x + 5) = 0 := by
-        have := val_add_left5 (ℓ := ℓ) (by norm_num : (10 : ℚ) ≠ 0)
+        have := FamilySupport.val_add_left (ℓ := ℓ) (by norm_num : (10 : ℚ) ≠ 0)
           (by rw [show (10 : ℚ) + (x - 5) = x + 5 by ring]; exact hxp)
           (by rw [v10]; exact hv)
         rw [show (10 : ℚ) + (x - 5) = x + 5 by ring, v10] at this
@@ -321,7 +267,7 @@ private lemma classFromEvenValuations5 {x : ℚ} (hx : x ≠ 0)
       · exact Or.inr (Or.inr (Or.inl (by norm_num)))
       · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inl (by norm_num)))))
       · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl (by norm_num)))))))
-    · refine sqcls_trans hcls ⟨(b : ℚ), by exact_mod_cast hb0, ?_⟩
+    · refine Descent.sqClsTrans hcls ⟨(b : ℚ), by exact_mod_cast hb0, ?_⟩
       rw [hs]
       push_cast [← hab]
       ring
@@ -331,7 +277,7 @@ private lemma classFromEvenValuations5 {x : ℚ} (hx : x ≠ 0)
       · exact Or.inr (Or.inr (Or.inr (Or.inl (by norm_num))))
       · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl (by norm_num))))))
       · exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (by norm_num)))))))
-    · refine sqcls_trans hcls ⟨(b : ℚ), by exact_mod_cast hb0, ?_⟩
+    · refine Descent.sqClsTrans hcls ⟨(b : ℚ), by exact_mod_cast hb0, ?_⟩
       rw [hs]
       push_cast [← hab]
       ring
@@ -340,7 +286,7 @@ theorem theSlotClassesAreSupportedOnTheDiscriminantAtFive {x y : ℚ}
     (hcurve : y ^ 2 = x ^ 3 - 25 * x) (hy : y ≠ 0) :
     (∃ d₁ : ℚ, OnDiscriminantFive d₁ ∧ Descent.SqCls x d₁) ∧
     (∃ d₂ : ℚ, OnDiscriminantFive d₂ ∧ Descent.SqCls (x - 5) d₂) := by
-  obtain ⟨hx0, hx5, -⟩ := avoid5 hcurve hy
+  obtain ⟨hx0, hx5, -⟩ := FaithfulFace.theNonzeroOrdinateAvoidsTheThreeRootsOnTheFiveCurve hcurve hy
   constructor
   · exact classFromEvenValuations5 hx0 fun ℓ hℓ h2 h5 =>
       haveI : Fact ℓ.Prime := ⟨hℓ⟩
@@ -462,7 +408,7 @@ theorem theFirstCanonicalCosetIsRefusedAtFive (P : RankOne.E5.Point) :
     refine Descent.notSquareTwo ⟨1 / c, ?_⟩
     field_simp
     linear_combination -h1
-  · have hcurve := onCurve5 hP
+  · have hcurve := FaceHomomorphism.onCurveFive hP
     by_cases hy : y = 0
     · rw [hy] at hcurve
       have h0 : x * (x - 5) * (x + 5) = 0 := by linear_combination -hcurve
@@ -473,18 +419,18 @@ theorem theFirstCanonicalCosetIsRefusedAtFive (P : RankOne.E5.Point) :
           · exact Or.inr (Or.inl (by linarith))
         · exact Or.inr (Or.inr (by linarith))
       rcases hx3 with rfl | rfl | rfl
-      · rw [slot5One_some, if_pos rfl] at hs1
+      · rw [FaceHomomorphism.slotOne5_some, if_pos rfl] at hs1
         obtain ⟨c, hc, hval⟩ := hs1
         nlinarith [sq_nonneg c, hval]
-      · rw [slot5One_some, if_neg (by norm_num)] at hs1
+      · rw [FaceHomomorphism.slotOne5_some, if_neg (by norm_num)] at hs1
         obtain ⟨c, hc, hval⟩ := hs1
         exact RankOne.notSquareFive ⟨c, by rw [hval]; ring⟩
-      · rw [slot5One_some, if_neg (by norm_num)] at hs1
+      · rw [FaceHomomorphism.slotOne5_some, if_neg (by norm_num)] at hs1
         obtain ⟨c, hc, hval⟩ := hs1
         nlinarith [sq_nonneg c, hval]
-    · obtain ⟨hx0, hx5, hxm5⟩ := avoid5 hcurve hy
-      rw [slot5One_some, if_neg hx0] at hs1
-      rw [slot5Two_some, if_neg hx5] at hs2
+    · obtain ⟨hx0, hx5, hxm5⟩ := FaithfulFace.theNonzeroOrdinateAvoidsTheThreeRootsOnTheFiveCurve hcurve hy
+      rw [FaceHomomorphism.slotOne5_some, if_neg hx0] at hs1
+      rw [FaceHomomorphism.slotTwo5_some, if_neg hx5] at hs2
       obtain ⟨c, hc0, hcv⟩ := hs1
       obtain ⟨e, he0, hev⟩ := hs2
       rw [mul_one] at hcv
@@ -559,7 +505,7 @@ theorem theSecondCanonicalCosetIsRefusedAtFive (P : RankOne.E5.Point) :
     refine Descent.notSquareTwo ⟨1 / c, ?_⟩
     field_simp
     linear_combination -h1
-  · have hcurve := onCurve5 hP
+  · have hcurve := FaceHomomorphism.onCurveFive hP
     by_cases hy : y = 0
     · rw [hy] at hcurve
       have h0 : x * (x - 5) * (x + 5) = 0 := by linear_combination -hcurve
@@ -570,19 +516,19 @@ theorem theSecondCanonicalCosetIsRefusedAtFive (P : RankOne.E5.Point) :
           · exact Or.inr (Or.inl (by linarith))
         · exact Or.inr (Or.inr (by linarith))
       rcases hx3 with rfl | rfl | rfl
-      · rw [slot5One_some, if_pos rfl] at hs1
+      · rw [FaceHomomorphism.slotOne5_some, if_pos rfl] at hs1
         obtain ⟨c, hc, hval⟩ := hs1
         nlinarith [sq_nonneg c, hval]
-      · rw [slot5One_some, if_neg (by norm_num)] at hs1
+      · rw [FaceHomomorphism.slotOne5_some, if_neg (by norm_num)] at hs1
         obtain ⟨c, hc, hval⟩ := hs1
         refine notSquareTen ⟨2 * c, ?_⟩
         linear_combination 2 * hval
-      · rw [slot5One_some, if_neg (by norm_num)] at hs1
+      · rw [FaceHomomorphism.slotOne5_some, if_neg (by norm_num)] at hs1
         obtain ⟨c, hc, hval⟩ := hs1
         nlinarith [sq_nonneg c, hval]
-    · obtain ⟨hx0, hx5, hxm5⟩ := avoid5 hcurve hy
-      rw [slot5One_some, if_neg hx0] at hs1
-      rw [slot5Two_some, if_neg hx5] at hs2
+    · obtain ⟨hx0, hx5, hxm5⟩ := FaithfulFace.theNonzeroOrdinateAvoidsTheThreeRootsOnTheFiveCurve hcurve hy
+      rw [FaceHomomorphism.slotOne5_some, if_neg hx0] at hs1
+      rw [FaceHomomorphism.slotTwo5_some, if_neg hx5] at hs2
       obtain ⟨c, hc0, hcv⟩ := hs1
       obtain ⟨e, he0, hev⟩ := hs2
       have hce : (2 : ℚ) * c * e ≠ 0 :=
@@ -656,7 +602,7 @@ theorem theThirdCanonicalCosetIsRefusedAtFive (P : RankOne.E5.Point) :
     refine Descent.notSquareTwo ⟨1 / c, ?_⟩
     field_simp
     linear_combination -h1
-  · have hcurve := onCurve5 hP
+  · have hcurve := FaceHomomorphism.onCurveFive hP
     by_cases hy : y = 0
     · rw [hy] at hcurve
       have h0 : x * (x - 5) * (x + 5) = 0 := by linear_combination -hcurve
@@ -667,19 +613,19 @@ theorem theThirdCanonicalCosetIsRefusedAtFive (P : RankOne.E5.Point) :
           · exact Or.inr (Or.inl (by linarith))
         · exact Or.inr (Or.inr (by linarith))
       rcases hx3 with rfl | rfl | rfl
-      · rw [slot5One_some, if_pos rfl] at hs1
+      · rw [FaceHomomorphism.slotOne5_some, if_pos rfl] at hs1
         obtain ⟨c, hc, hval⟩ := hs1
         nlinarith [sq_nonneg c, hval]
-      · rw [slot5One_some, if_neg (by norm_num)] at hs1
+      · rw [FaceHomomorphism.slotOne5_some, if_neg (by norm_num)] at hs1
         obtain ⟨c, hc, hval⟩ := hs1
         refine notSquareTen ⟨2 * c, ?_⟩
         linear_combination 2 * hval
-      · rw [slot5One_some, if_neg (by norm_num)] at hs1
+      · rw [FaceHomomorphism.slotOne5_some, if_neg (by norm_num)] at hs1
         obtain ⟨c, hc, hval⟩ := hs1
         nlinarith [sq_nonneg c, hval]
-    · obtain ⟨hx0, hx5, hxm5⟩ := avoid5 hcurve hy
-      rw [slot5One_some, if_neg hx0] at hs1
-      rw [slot5Two_some, if_neg hx5] at hs2
+    · obtain ⟨hx0, hx5, hxm5⟩ := FaithfulFace.theNonzeroOrdinateAvoidsTheThreeRootsOnTheFiveCurve hcurve hy
+      rw [FaceHomomorphism.slotOne5_some, if_neg hx0] at hs1
+      rw [FaceHomomorphism.slotTwo5_some, if_neg hx5] at hs2
       obtain ⟨c, hc0, hcv⟩ := hs1
       obtain ⟨e, he0, hev⟩ := hs2
       rw [mul_one] at hev
@@ -761,8 +707,8 @@ private lemma face_add5 {P Q : RankOne.E5.Point} {a b a' b' t₁ t₂ : ℚ}
     Descent.SqCls (RankOne.slotOne (P + Q)) t₁ ∧
     Descent.SqCls (RankOne.slotTwo (P + Q)) t₂ := by
   obtain ⟨g₁, g₂⟩ := hom5 P Q
-  exact ⟨sqcls_trans g₁ (sqcls_trans (sqcls_mul hP.1 hQ.1) h₁),
-    sqcls_trans g₂ (sqcls_trans (sqcls_mul hP.2 hQ.2) h₂)⟩
+  exact ⟨Descent.sqClsTrans g₁ (Descent.sqClsTrans (Descent.sqClsMul hP.1 hQ.1) h₁),
+    Descent.sqClsTrans g₂ (Descent.sqClsTrans (Descent.sqClsMul hP.2 hQ.2) h₂)⟩
 
 private lemma face_zero0 :
     Descent.SqCls (RankOne.slotOne (0 : RankOne.E5.Point)) 1 ∧
@@ -774,10 +720,10 @@ private lemma face_T0 :
     Descent.SqCls (RankOne.slotTwo RankOne.T0) (-5) := by
   constructor
   · rw [show RankOne.T0 = Point.some 0 0 RankOne.nonsingular00 from rfl,
-      slot5One_some, if_pos rfl]
+      FaceHomomorphism.slotOne5_some, if_pos rfl]
     exact ⟨5, by norm_num, by norm_num⟩
   · rw [show RankOne.T0 = Point.some 0 0 RankOne.nonsingular00 from rfl,
-      slot5Two_some, if_neg (by norm_num)]
+      FaceHomomorphism.slotTwo5_some, if_neg (by norm_num)]
     exact ⟨1, one_ne_zero, by norm_num⟩
 
 private lemma face_T5 :
@@ -785,10 +731,10 @@ private lemma face_T5 :
     Descent.SqCls (RankOne.slotTwo RankOne.T5) 2 := by
   constructor
   · rw [show RankOne.T5 = Point.some 5 0 RankOne.nonsingular50 from rfl,
-      slot5One_some, if_neg (by norm_num)]
+      FaceHomomorphism.slotOne5_some, if_neg (by norm_num)]
     exact ⟨1, one_ne_zero, by norm_num⟩
   · rw [show RankOne.T5 = Point.some 5 0 RankOne.nonsingular50 from rfl,
-      slot5Two_some, if_pos rfl]
+      FaceHomomorphism.slotTwo5_some, if_pos rfl]
     exact ⟨5, by norm_num, by norm_num⟩
 
 private lemma face_P :
@@ -796,10 +742,10 @@ private lemma face_P :
     Descent.SqCls (RankOne.slotTwo RankOne.P) (-1) := by
   constructor
   · rw [show RankOne.P = Point.some (-4) 6 RankOne.nonsingularP from rfl,
-      slot5One_some, if_neg (by norm_num)]
+      FaceHomomorphism.slotOne5_some, if_neg (by norm_num)]
     exact ⟨2, by norm_num, by norm_num⟩
   · rw [show RankOne.P = Point.some (-4) 6 RankOne.nonsingularP from rfl,
-      slot5Two_some, if_neg (by norm_num)]
+      FaceHomomorphism.slotTwo5_some, if_neg (by norm_num)]
     exact ⟨3, by norm_num, by norm_num⟩
 
 private lemma face_T0T5 :
@@ -829,8 +775,8 @@ private lemma refuseA {d₁ d₂ k₁ k₂ : ℚ} (P R : RankOne.E5.Point)
     (ht₁ : Descent.SqCls (d₁ * k₁) 1) (ht₂ : Descent.SqCls (d₂ * k₂) 2) : False := by
   obtain ⟨g₁, g₂⟩ := hom5 P R
   exact theFirstCanonicalCosetIsRefusedAtFive (P + R)
-    ⟨sqcls_trans g₁ (sqcls_trans (sqcls_mul hc₁ hR.1) ht₁),
-     sqcls_trans g₂ (sqcls_trans (sqcls_mul hc₂ hR.2) ht₂)⟩
+    ⟨Descent.sqClsTrans g₁ (Descent.sqClsTrans (Descent.sqClsMul hc₁ hR.1) ht₁),
+     Descent.sqClsTrans g₂ (Descent.sqClsTrans (Descent.sqClsMul hc₂ hR.2) ht₂)⟩
 
 private lemma refuseB {d₁ d₂ k₁ k₂ : ℚ} (P R : RankOne.E5.Point)
     (hR : Descent.SqCls (RankOne.slotOne R) k₁ ∧ Descent.SqCls (RankOne.slotTwo R) k₂)
@@ -839,8 +785,8 @@ private lemma refuseB {d₁ d₂ k₁ k₂ : ℚ} (P R : RankOne.E5.Point)
     (ht₁ : Descent.SqCls (d₁ * k₁) 2) (ht₂ : Descent.SqCls (d₂ * k₂) 2) : False := by
   obtain ⟨g₁, g₂⟩ := hom5 P R
   exact theSecondCanonicalCosetIsRefusedAtFive (P + R)
-    ⟨sqcls_trans g₁ (sqcls_trans (sqcls_mul hc₁ hR.1) ht₁),
-     sqcls_trans g₂ (sqcls_trans (sqcls_mul hc₂ hR.2) ht₂)⟩
+    ⟨Descent.sqClsTrans g₁ (Descent.sqClsTrans (Descent.sqClsMul hc₁ hR.1) ht₁),
+     Descent.sqClsTrans g₂ (Descent.sqClsTrans (Descent.sqClsMul hc₂ hR.2) ht₂)⟩
 
 private lemma refuseC {d₁ d₂ k₁ k₂ : ℚ} (P R : RankOne.E5.Point)
     (hR : Descent.SqCls (RankOne.slotOne R) k₁ ∧ Descent.SqCls (RankOne.slotTwo R) k₂)
@@ -849,8 +795,8 @@ private lemma refuseC {d₁ d₂ k₁ k₂ : ℚ} (P R : RankOne.E5.Point)
     (ht₁ : Descent.SqCls (d₁ * k₁) 2) (ht₂ : Descent.SqCls (d₂ * k₂) 1) : False := by
   obtain ⟨g₁, g₂⟩ := hom5 P R
   exact theThirdCanonicalCosetIsRefusedAtFive (P + R)
-    ⟨sqcls_trans g₁ (sqcls_trans (sqcls_mul hc₁ hR.1) ht₁),
-     sqcls_trans g₂ (sqcls_trans (sqcls_mul hc₂ hR.2) ht₂)⟩
+    ⟨Descent.sqClsTrans g₁ (Descent.sqClsTrans (Descent.sqClsMul hc₁ hR.1) ht₁),
+     Descent.sqClsTrans g₂ (Descent.sqClsTrans (Descent.sqClsMul hc₂ hR.2) ht₂)⟩
 
 /-! ## 6. The image theorems at five -/
 
@@ -868,7 +814,7 @@ theorem theFaceImageAtFiveIsTheRealizedEight (P : RankOne.E5.Point) :
       Descent.SqCls (RankOne.slotTwo P) d₂ := by
   rcases P with _ | @⟨x, y, hP⟩
   · exact ⟨1, 1, by simp [RealizedFive], Descent.sqClsRefl 1, Descent.sqClsRefl 1⟩
-  · have hcurve := onCurve5 hP
+  · have hcurve := FaceHomomorphism.onCurveFive hP
     by_cases hy : y = 0
     · rw [hy] at hcurve
       have h0 : x * (x - 5) * (x + 5) = 0 := by linear_combination -hcurve
@@ -880,29 +826,29 @@ theorem theFaceImageAtFiveIsTheRealizedEight (P : RankOne.E5.Point) :
         · exact Or.inr (Or.inr (by linarith))
       rcases hx3 with rfl | rfl | rfl
       · refine ⟨-1, -5, by simp [RealizedFive], ?_, ?_⟩
-        · rw [slot5One_some, if_pos rfl]
+        · rw [FaceHomomorphism.slotOne5_some, if_pos rfl]
           exact ⟨5, by norm_num, by norm_num⟩
-        · rw [slot5Two_some, if_neg (by norm_num)]
+        · rw [FaceHomomorphism.slotTwo5_some, if_neg (by norm_num)]
           exact ⟨1, one_ne_zero, by norm_num⟩
       · refine ⟨5, 2, by simp [RealizedFive], ?_, ?_⟩
-        · rw [slot5One_some, if_neg (by norm_num)]
+        · rw [FaceHomomorphism.slotOne5_some, if_neg (by norm_num)]
           exact ⟨1, one_ne_zero, by norm_num⟩
-        · rw [slot5Two_some, if_pos rfl]
+        · rw [FaceHomomorphism.slotTwo5_some, if_pos rfl]
           exact ⟨5, by norm_num, by norm_num⟩
       · refine ⟨-5, -10, by simp [RealizedFive], ?_, ?_⟩
-        · rw [slot5One_some, if_neg (by norm_num)]
+        · rw [FaceHomomorphism.slotOne5_some, if_neg (by norm_num)]
           exact ⟨1, one_ne_zero, by norm_num⟩
-        · rw [slot5Two_some, if_neg (by norm_num)]
+        · rw [FaceHomomorphism.slotTwo5_some, if_neg (by norm_num)]
           exact ⟨1, one_ne_zero, by norm_num⟩
-    · obtain ⟨hx0, hx5, hxm5⟩ := avoid5 hcurve hy
+    · obtain ⟨hx0, hx5, hxm5⟩ := FaithfulFace.theNonzeroOrdinateAvoidsTheThreeRootsOnTheFiveCurve hcurve hy
       obtain ⟨⟨d₁, hd₁, hc₁⟩, ⟨d₂, hd₂, hc₂⟩⟩ :=
         theSlotClassesAreSupportedOnTheDiscriminantAtFive hcurve hy
       have hsig := theSignsAgreeAcrossTheFaceAtFive hcurve hy hc₁ hc₂
       have hs1 : Descent.SqCls (RankOne.slotOne (Point.some _ _ hP)) d₁ := by
-        rw [slot5One_some, if_neg hx0]
+        rw [FaceHomomorphism.slotOne5_some, if_neg hx0]
         exact hc₁
       have hs2 : Descent.SqCls (RankOne.slotTwo (Point.some _ _ hP)) d₂ := by
-        rw [slot5Two_some, if_neg hx5]
+        rw [FaceHomomorphism.slotTwo5_some, if_neg hx5]
         exact hc₂
       clear hc₁ hc₂
       rcases hd₁ with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl <;>

@@ -43,49 +43,6 @@ variable {n : ℕ}
 
 /-! ## 1. Plumbing -/
 
-lemma sqcls_trans {a b c : ℚ} (h₁ : Descent.SqCls a b) (h₂ : Descent.SqCls b c) :
-    Descent.SqCls a c := by
-  obtain ⟨k, hk, hkv⟩ := h₁
-  obtain ⟨m, hm, hmv⟩ := h₂
-  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
-
-lemma sqcls_symm {a b : ℚ} (h : Descent.SqCls a b) : Descent.SqCls b a := by
-  obtain ⟨c, hc, hv⟩ := h
-  exact ⟨c⁻¹, inv_ne_zero hc, by
-    rw [hv, inv_pow, inv_mul_cancel_left₀ (pow_ne_zero 2 hc)]⟩
-
-lemma sqcls_mul {a b c d : ℚ} (h₁ : Descent.SqCls a c) (h₂ : Descent.SqCls b d) :
-    Descent.SqCls (a * b) (c * d) := by
-  obtain ⟨k, hk, hkv⟩ := h₁
-  obtain ⟨m, hm, hmv⟩ := h₂
-  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
-
-lemma sqcls_ne {a b : ℚ} (h : Descent.SqCls a b) (ha : a ≠ 0) : b ≠ 0 := by
-  obtain ⟨c, hc, hv⟩ := h
-  intro hb
-  rw [hb, mul_zero] at hv
-  exact ha hv
-
-lemma slotOneAt_ne (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) :
-    slotOneAt ((n : ℚ)) P ≠ 0 := by
-  rcases P with _ | @⟨x, y, h⟩
-  · exact one_ne_zero
-  · show (if x = 0 then -((n : ℚ)) ^ 2 else x) ≠ 0
-    split_ifs with hx
-    · have h1 : ((n : ℚ)) ≠ 0 := by exact_mod_cast hn.ne'
-      exact neg_ne_zero.mpr (pow_ne_zero 2 h1)
-    · exact hx
-
-lemma slotTwoAt_ne (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) :
-    slotTwoAt ((n : ℚ)) P ≠ 0 := by
-  rcases P with _ | @⟨x, y, h⟩
-  · exact one_ne_zero
-  · show (if x = (n : ℚ) then 2 * ((n : ℚ)) ^ 2 else x - (n : ℚ)) ≠ 0
-    split_ifs with hx
-    · have h1 : (0 : ℚ) < (n : ℚ) := by exact_mod_cast hn
-      positivity
-    · exact sub_ne_zero.mpr hx
-
 lemma slot_neg_one (P : (FamilyFace.E ((n : ℚ))).Point) :
     slotOneAt ((n : ℚ)) (-P) = slotOneAt ((n : ℚ)) P := by
   rcases P with _ | @⟨x, y, h⟩
@@ -100,39 +57,27 @@ lemma slot_neg_two (P : (FamilyFace.E ((n : ℚ))).Point) :
   · rw [Point.neg_some]
     rfl
 
-def classOf (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) : ℤ × ℤ :=
-  ((FamilySupport.theSlotClassesAreSupportedAtEveryModulus n hn P).choose,
-   (FamilySupport.theSlotClassesAreSupportedAtEveryModulus n hn P).choose_spec.choose)
-
-lemma classOf_spec (hn : 0 < n) (P : (FamilyFace.E ((n : ℚ))).Point) :
-    (classOf hn P).1 ≠ 0 ∧ (classOf hn P).2 ≠ 0 ∧
-    (classOf hn P).1.natAbs ∣ 2 * n ∧ (classOf hn P).2.natAbs ∣ 2 * n ∧
-    Descent.SqCls (slotOneAt ((n : ℚ)) P) (((classOf hn P).1 : ℤ) : ℚ) ∧
-    Descent.SqCls (slotTwoAt ((n : ℚ)) P) (((classOf hn P).2 : ℤ) : ℚ) :=
-  (FamilySupport.theSlotClassesAreSupportedAtEveryModulus n hn
-    P).choose_spec.choose_spec
-
 /-! ## 2. Same class means the difference is a double -/
 
 lemma sameClass_double (hn : 0 < n)
-    (X R : (FamilyFace.E ((n : ℚ))).Point) (hc : classOf hn X = classOf hn R) :
+    (X R : (FamilyFace.E ((n : ℚ))).Point) (hc : FamilyMordell.classOf hn X = FamilyMordell.classOf hn R) :
     ∃ Q : (FamilyFace.E ((n : ℚ))).Point, X - R = Q + Q := by
   have hnq : (0 : ℚ) < (n : ℚ) := by exact_mod_cast hn
-  obtain ⟨-, -, -, -, hX1, hX2⟩ := classOf_spec hn X
-  obtain ⟨-, -, -, -, hR1, hR2⟩ := classOf_spec hn R
+  obtain ⟨-, -, -, -, hX1, hX2⟩ := FamilyMordell.classOf_spec hn X
+  obtain ⟨-, -, -, -, hR1, hR2⟩ := FamilyMordell.classOf_spec hn R
   rw [← hc] at hR1 hR2
-  have hd₁ : (((classOf hn X).1 : ℤ) : ℚ) ≠ 0 := sqcls_ne hX1 (slotOneAt_ne hn X)
-  have hd₂ : (((classOf hn X).2 : ℤ) : ℚ) ≠ 0 := sqcls_ne hX2 (slotTwoAt_ne hn X)
+  have hd₁ : (((FamilyMordell.classOf hn X).1 : ℤ) : ℚ) ≠ 0 := Descent.sqClsNe hX1 (FamilyMordell.slotOneAt_ne hn X)
+  have hd₂ : (((FamilyMordell.classOf hn X).2 : ℤ) : ℚ) ≠ 0 := Descent.sqClsNe hX2 (FamilyMordell.slotTwoAt_ne hn X)
   obtain ⟨hom1, hom2⟩ :=
     FamilyHom.theFaceIsAHomomorphismAtEveryModulus ((n : ℚ)) hnq X (-R)
   rw [slot_neg_one, ← sub_eq_add_neg] at hom1
   rw [slot_neg_two, ← sub_eq_add_neg] at hom2
   have h1 : Descent.SqCls (slotOneAt ((n : ℚ)) (X - R)) 1 :=
-    sqcls_trans hom1 (sqcls_trans (sqcls_mul hX1 hR1)
-      ⟨(((classOf hn X).1 : ℤ) : ℚ), hd₁, by ring⟩)
+    Descent.sqClsTrans hom1 (Descent.sqClsTrans (Descent.sqClsMul hX1 hR1)
+      ⟨(((FamilyMordell.classOf hn X).1 : ℤ) : ℚ), hd₁, by ring⟩)
   have h2 : Descent.SqCls (slotTwoAt ((n : ℚ)) (X - R)) 1 :=
-    sqcls_trans hom2 (sqcls_trans (sqcls_mul hX2 hR2)
-      ⟨(((classOf hn X).2 : ℤ) : ℚ), hd₂, by ring⟩)
+    Descent.sqClsTrans hom2 (Descent.sqClsTrans (Descent.sqClsMul hX2 hR2)
+      ⟨(((FamilyMordell.classOf hn X).2 : ℤ) : ℚ), hd₂, by ring⟩)
   obtain ⟨Q, hQ⟩ :=
     FamilyKernel.theKernelIsTheDoublesAtEveryModulus ((n : ℚ)) hnq (X - R) h1 h2
   exact ⟨Q, hQ.symm⟩
@@ -149,11 +94,11 @@ theorem theClassesCollideAtEveryModulus (hn : 0 < n) {α : Type} [Fintype α]
   have h2n : 0 < 2 * n := by omega
   set box : Finset (ℤ × ℤ) :=
     Finset.Icc (-(2 * n : ℤ)) (2 * n) ×ˢ Finset.Icc (-(2 * n : ℤ)) (2 * n) with hbox
-  have hmaps : ∀ a : α, classOf hn (f a) ∈ box := by
+  have hmaps : ∀ a : α, FamilyMordell.classOf hn (f a) ∈ box := by
     intro a
-    obtain ⟨-, -, h1d, h2d, -, -⟩ := classOf_spec hn (f a)
-    have hb1 : (classOf hn (f a)).1.natAbs ≤ 2 * n := Nat.le_of_dvd h2n h1d
-    have hb2 : (classOf hn (f a)).2.natAbs ≤ 2 * n := Nat.le_of_dvd h2n h2d
+    obtain ⟨-, -, h1d, h2d, -, -⟩ := FamilyMordell.classOf_spec hn (f a)
+    have hb1 : (FamilyMordell.classOf hn (f a)).1.natAbs ≤ 2 * n := Nat.le_of_dvd h2n h1d
+    have hb2 : (FamilyMordell.classOf hn (f a)).2.natAbs ≤ 2 * n := Nat.le_of_dvd h2n h2d
     rw [hbox]
     simp only [Finset.mem_product, Finset.mem_Icc]
     omega
@@ -191,11 +136,11 @@ lemma diff_gives_sqcls (hn : 0 < n)
   | false =>
     rw [hpr]
     simp only [Bool.false_eq_true, if_false]
-    exact sqcls_trans (sqcls_symm k1) hom1
+    exact Descent.sqClsTrans (Descent.sqClsSymm k1) hom1
   | true =>
     rw [hpr]
     simp only [if_true]
-    exact sqcls_trans (sqcls_symm k2) hom2
+    exact Descent.sqClsTrans (Descent.sqClsSymm k2) hom2
 
 set_option maxHeartbeats 1000000 in
 /-- **THE TORSION TRIO DOES NOT COLLIDE AT EVERY MODULUS**: `0`, `(0,0)` and

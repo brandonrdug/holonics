@@ -59,46 +59,6 @@ def slotTwo (n : ℚ) : (E n).Point → ℚ
 
 /-! ## 2. Coordinate plumbing, family-wise -/
 
-private lemma sqcls_of_mul_eq_sq {a b s : ℚ} (hb : b ≠ 0) (hs : s ≠ 0)
-    (h : a * b = s ^ 2) : Descent.SqCls a b := by
-  refine ⟨s / b, div_ne_zero hs hb, ?_⟩
-  rw [div_pow, div_mul_eq_mul_div, eq_div_iff (pow_ne_zero 2 hb)]
-  linear_combination b * h
-
-private lemma sqcls_trans {a b c : ℚ} (h₁ : Descent.SqCls a b) (h₂ : Descent.SqCls b c) :
-    Descent.SqCls a c := by
-  obtain ⟨k, hk, hkv⟩ := h₁
-  obtain ⟨m, hm, hmv⟩ := h₂
-  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkv, hmv]; ring⟩
-
-private lemma sqcls_symm {a b : ℚ} (h : Descent.SqCls a b) : Descent.SqCls b a := by
-  obtain ⟨c, hc, hval⟩ := h
-  refine ⟨1 / c, one_div_ne_zero hc, ?_⟩
-  rw [hval]
-  field_simp
-
-private lemma sqcls_one_mul_self {s : ℚ} (hs : s ≠ 0) : Descent.SqCls 1 (s * s) := by
-  refine ⟨1 / s, one_div_ne_zero hs, ?_⟩
-  field_simp
-
-private lemma sqcls_scale_sq {a s : ℚ} (h : Descent.SqCls a 1) (hs : s ≠ 0) :
-    Descent.SqCls a (s * s) := by
-  obtain ⟨c, hc, hval⟩ := h
-  refine ⟨c / s, div_ne_zero hc hs, ?_⟩
-  rw [hval]
-  field_simp
-
-private lemma sqcls_mul_sq_left {a b t : ℚ} (h : Descent.SqCls a b) (ht : t ≠ 0) :
-    Descent.SqCls (t ^ 2 * a) b := by
-  obtain ⟨c, hc, hval⟩ := h
-  exact ⟨t * c, mul_ne_zero ht hc, by rw [hval]; ring⟩
-
-private lemma sqcls_absorb_right {a b c : ℚ} (h : Descent.SqCls a (b * c))
-    (hc : Descent.SqCls c 1) : Descent.SqCls a b := by
-  obtain ⟨k, hk, hkval⟩ := h
-  obtain ⟨m, hm, hmval⟩ := hc
-  exact ⟨k * m, mul_ne_zero hk hm, by rw [hkval, hmval]; ring⟩
-
 private lemma onCurve {n x y : ℚ} (h : (E n).Nonsingular x y) :
     y ^ 2 = x ^ 3 - n ^ 2 * x := by
   have h1 := ((nonsingular_iff x y).mp h).1
@@ -265,10 +225,6 @@ private lemma doubledTrivialClass {n x y : ℚ} (h : y ^ 2 = x ^ 3 - n ^ 2 * x)
 
 /-! ## 4. The half-turn translations, family-wise -/
 
-private lemma avoidRoots {n x y : ℚ} (h : y ^ 2 = x ^ 3 - n ^ 2 * x) (hy : y ≠ 0) :
-    x ≠ 0 ∧ x ≠ n ∧ x ≠ -n :=
-  FaceHomomorphism.theNonzeroOrdinateAvoidsTheRoots h hy
-
 /-- **The three translations, on every twist**: `x(P + (0,0)) = −n²/x`,
 `x(P + (n,0)) = n(x+n)/(x−n)`, `x(P + (−n,0)) = n(n−x)/(x+n)`. -/
 theorem theTranslationsOnEveryTwist {n x y : ℚ} (h : y ^ 2 = x ^ 3 - n ^ 2 * x)
@@ -276,7 +232,7 @@ theorem theTranslationsOnEveryTwist {n x y : ℚ} (h : y ^ 2 = x ^ 3 - n ^ 2 * x
     FaithfulFace.translatedX x y 0 = -n ^ 2 / x ∧
     FaithfulFace.translatedX x y n = n * (x + n) / (x - n) ∧
     FaithfulFace.translatedX x y (-n) = n * (n - x) / (x + n) := by
-  obtain ⟨hx0, hxn, hxm⟩ := avoidRoots h hy
+  obtain ⟨hx0, hxn, hxm⟩ := FaceHomomorphism.theNonzeroOrdinateAvoidsTheRoots h hy
   have hd1 : x - n ≠ 0 := sub_ne_zero.mpr hxn
   have hd2 : x + n ≠ 0 := fun hc => hxm (by linarith)
   refine ⟨?_, ?_, ?_⟩
@@ -304,7 +260,7 @@ theorem theTranslatedPointIsNeverAHalfTurnOnEveryTwist {n x y : ℚ} (hn : n ≠
       FaithfulFace.translatedX x y n ≠ -n) ∧
     (FaithfulFace.translatedX x y (-n) ≠ 0 ∧ FaithfulFace.translatedX x y (-n) ≠ n ∧
       FaithfulFace.translatedX x y (-n) ≠ -n) := by
-  obtain ⟨hx0, hxn, hxm⟩ := avoidRoots h hy
+  obtain ⟨hx0, hxn, hxm⟩ := FaceHomomorphism.theNonzeroOrdinateAvoidsTheRoots h hy
   have hd1 : x - n ≠ 0 := sub_ne_zero.mpr hxn
   have hd2 : x + n ≠ 0 := fun hc => hxm (by linarith)
   obtain ⟨t0, tn, tm⟩ := theTranslationsOnEveryTwist h hy
@@ -362,7 +318,7 @@ theorem theTranslationClosesTheFaceOnEveryTwist {n x y : ℚ} (hn : n ≠ 0)
     Descent.SqCls (FaithfulFace.translatedX x y n - n) ((x - n) * (2 * n ^ 2)) ∧
     Descent.SqCls (FaithfulFace.translatedX x y (-n)) (x * (-n)) ∧
     Descent.SqCls (FaithfulFace.translatedX x y (-n) - n) ((x - n) * (-2 * n)) := by
-  obtain ⟨hx0, hxn, hxm⟩ := avoidRoots h hy
+  obtain ⟨hx0, hxn, hxm⟩ := FaceHomomorphism.theNonzeroOrdinateAvoidsTheRoots h hy
   have hd1 : x - n ≠ 0 := sub_ne_zero.mpr hxn
   have hd2 : x + n ≠ 0 := fun hc => hxm (by linarith)
   obtain ⟨t0, tn, tm⟩ := theTranslationsOnEveryTwist h hy
@@ -370,29 +326,29 @@ theorem theTranslationClosesTheFaceOnEveryTwist {n x y : ℚ} (hn : n ≠ 0)
     mul_ne_zero hx0 (neg_ne_zero.mpr (pow_ne_zero 2 hn))
   have h2n2 : (2 : ℚ) * n ^ 2 ≠ 0 := mul_ne_zero two_ne_zero (pow_ne_zero 2 hn)
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
-  · refine sqcls_of_mul_eq_sq hxn2 (pow_ne_zero 2 hn) ?_
+  · refine Descent.sqClsOfProductSquare hxn2 (pow_ne_zero 2 hn) ?_
     rw [t0]
     field_simp
-  · refine sqcls_of_mul_eq_sq (mul_ne_zero hd1 (neg_ne_zero.mpr hn))
+  · refine Descent.sqClsOfProductSquare (mul_ne_zero hd1 (neg_ne_zero.mpr hn))
       (div_ne_zero (mul_ne_zero hn hy) hx0) ?_
     rw [t0]
     field_simp
     linear_combination -h
-  · refine sqcls_of_mul_eq_sq (mul_ne_zero hx0 hn)
+  · refine Descent.sqClsOfProductSquare (mul_ne_zero hx0 hn)
       (div_ne_zero (mul_ne_zero hn hy) hd1) ?_
     rw [tn]
     field_simp
     linear_combination -h
-  · refine sqcls_of_mul_eq_sq (mul_ne_zero hd1 h2n2) h2n2 ?_
+  · refine Descent.sqClsOfProductSquare (mul_ne_zero hd1 h2n2) h2n2 ?_
     rw [tn]
     field_simp
     ring
-  · refine sqcls_of_mul_eq_sq (mul_ne_zero hx0 (neg_ne_zero.mpr hn))
+  · refine Descent.sqClsOfProductSquare (mul_ne_zero hx0 (neg_ne_zero.mpr hn))
       (div_ne_zero (mul_ne_zero hn hy) hd2) ?_
     rw [tm]
     field_simp
     linear_combination -h
-  · refine sqcls_of_mul_eq_sq
+  · refine Descent.sqClsOfProductSquare
       (mul_ne_zero hd1 (mul_ne_zero (by norm_num : (-2 : ℚ) ≠ 0) hn))
       (div_ne_zero (mul_ne_zero (mul_ne_zero two_ne_zero hn) hy) hd2) ?_
     rw [tm]
@@ -409,7 +365,7 @@ private lemma chordHalfTurnRightE {n x₁ y₁ x₂ : ℚ} (hn : n ≠ 0)
     Descent.SqCls (slotTwo n (Point.some _ _ h₁ + Point.some _ _ h₂))
       (slotTwo n (Point.some _ _ h₁) * slotTwo n (Point.some _ _ h₂)) := by
   have hcurve := onCurve h₁
-  obtain ⟨hx0, hxn, hxm⟩ := avoidRoots hcurve hy₁
+  obtain ⟨hx0, hxn, hxm⟩ := FaceHomomorphism.theNonzeroOrdinateAvoidsTheRoots hcurve hy₁
   obtain ⟨q0, q1, q2, q3, q4, q5⟩ := theTranslationClosesTheFaceOnEveryTwist hn hcurve hy₁
   obtain ⟨⟨t00, t01, -⟩, ⟨t10, t11, -⟩, ⟨tm0, tm1, -⟩⟩ :=
     theTranslatedPointIsNeverAHalfTurnOnEveryTwist hn hcurve hy₁
@@ -521,13 +477,13 @@ theorem theFaceIsAHomomorphismOnEveryTwist {n : ℚ} (hn : n ≠ 0) (P Q : (E n)
         someEqE rfl (by linarith)
       rw [heq]
       obtain ⟨k1, k2⟩ := theDoublesLandInTheKernelOnEveryTwist hn (Point.some _ _ h₁)
-      exact ⟨sqcls_scale_sq k1 (slotOneE_ne hn _), sqcls_scale_sq k2 (slotTwoE_ne hn _)⟩
+      exact ⟨Descent.sqClsScaleSq k1 (slotOneE_ne hn _), Descent.sqClsScaleSq k2 (slotTwoE_ne hn _)⟩
     · by_cases hy0 : y₁ = 0
       · have heq : (Point.some _ _ h₂ : (E n).Point) = Point.some _ _ h₁ :=
           someEqE rfl (by linarith)
         rw [heq]
         obtain ⟨k1, k2⟩ := theDoublesLandInTheKernelOnEveryTwist hn (Point.some _ _ h₁)
-        exact ⟨sqcls_scale_sq k1 (slotOneE_ne hn _), sqcls_scale_sq k2 (slotTwoE_ne hn _)⟩
+        exact ⟨Descent.sqClsScaleSq k1 (slotOneE_ne hn _), Descent.sqClsScaleSq k2 (slotTwoE_ne hn _)⟩
       · have hzero : (Point.some _ _ h₁ : (E n).Point) + Point.some _ _ h₂ = 0 :=
           Point.add_of_Y_eq rfl (by rw [negYE]; linarith)
         have hs : slotOne n (Point.some _ _ h₂) = slotOne n (Point.some _ _ h₁) := by
@@ -536,7 +492,7 @@ theorem theFaceIsAHomomorphismOnEveryTwist {n : ℚ} (hn : n ≠ 0) (P Q : (E n)
           rw [slotTwoE_some, slotTwoE_some]
         rw [hzero, show slotOne n (0 : (E n).Point) = 1 by simp [slotOne],
           show slotTwo n (0 : (E n).Point) = 1 by simp [slotTwo], hs, ht]
-        exact ⟨sqcls_one_mul_self (slotOneE_ne hn _), sqcls_one_mul_self (slotTwoE_ne hn _)⟩
+        exact ⟨Descent.sqClsOneMulSelf (slotOneE_ne hn _), Descent.sqClsOneMulSelf (slotTwoE_ne hn _)⟩
   · by_cases hy1 : y₁ = 0
     · by_cases hy2 : y₂ = 0
       · -- both half-turns: the Klein chords, family-wise
@@ -659,7 +615,7 @@ theorem theFaceIsAHomomorphismOnEveryTwist {n : ℚ} (hn : n ≠ 0) (P Q : (E n)
           constructor
           · rw [slotOneE_some, hax, if_pos hX0,
               show -n ^ 2 = n ^ 2 * -1 by ring]
-            exact sqcls_mul_sq_left c1 hn
+            exact Descent.sqClsMulSqLeft c1 hn
           · rw [slotTwoE_some, hax,
               if_neg (fun hc => hn (by rw [hX0] at hc; linarith)), hX0, zero_sub]
             exact c2
@@ -672,7 +628,7 @@ theorem theFaceIsAHomomorphismOnEveryTwist {n : ℚ} (hn : n ≠ 0) (P Q : (E n)
               exact c1
             · rw [slotTwoE_some, hax, if_pos hXn,
                 show 2 * n ^ 2 = n ^ 2 * 2 by ring]
-              exact sqcls_mul_sq_left c2 hn
+              exact Descent.sqClsMulSqLeft c2 hn
           · obtain ⟨c1, c2⟩ :=
               FaceHomomorphism.theChordLandsGenerically eA eB hlam hx hy1 hy2 hX0 hXn
             constructor
@@ -759,8 +715,8 @@ theorem theFirstDirectionEscapes :
   obtain ⟨hom1, hom2⟩ := theFaceIsAHomomorphismOnEveryTwist h34ne T (Q + Q)
   rw [← hEq] at hom1 hom2
   obtain ⟨k1, k2⟩ := theDoublesLandInTheKernelOnEveryTwist h34ne Q
-  have habs1 := sqcls_absorb_right hom1 k1
-  have habs2 := sqcls_absorb_right hom2 k2
+  have habs1 := Descent.sqClsAbsorbRight hom1 k1
+  have habs2 := Descent.sqClsAbsorbRight hom2 k2
   rw [slotP1_one] at habs1
   rw [slotP1_two] at habs2
   rcases hT with rfl | rfl | rfl | rfl
@@ -794,8 +750,8 @@ theorem theSecondDirectionEscapes :
   obtain ⟨hom1, hom2⟩ := theFaceIsAHomomorphismOnEveryTwist h34ne T (Q + Q)
   rw [← hEq] at hom1 hom2
   obtain ⟨k1, k2⟩ := theDoublesLandInTheKernelOnEveryTwist h34ne Q
-  have habs1 := sqcls_absorb_right hom1 k1
-  have habs2 := sqcls_absorb_right hom2 k2
+  have habs1 := Descent.sqClsAbsorbRight hom1 k1
+  have habs2 := Descent.sqClsAbsorbRight hom2 k2
   rw [slotP2_one] at habs1
   rw [slotP2_two] at habs2
   rcases hT with rfl | rfl | rfl | rfl
@@ -830,13 +786,13 @@ theorem theSumDirectionEscapes :
   obtain ⟨hom1, hom2⟩ := theFaceIsAHomomorphismOnEveryTwist h34ne T (Q + Q)
   rw [← hEq] at hom1 hom2
   obtain ⟨k1, k2⟩ := theDoublesLandInTheKernelOnEveryTwist h34ne Q
-  have habs1 := sqcls_absorb_right hom1 k1
-  have habs2 := sqcls_absorb_right hom2 k2
+  have habs1 := Descent.sqClsAbsorbRight hom1 k1
+  have habs2 := Descent.sqClsAbsorbRight hom2 k2
   obtain ⟨g1, g2⟩ := theFaceIsAHomomorphismOnEveryTwist h34ne firstDirection secondDirection
   rw [slotP1_one, slotP2_one, show (-2 : ℚ) * -16 = 32 by norm_num] at g1
   rw [slotP1_two, slotP2_two, show (-36 : ℚ) * -50 = 1800 by norm_num] at g2
-  have hcls1 := sqcls_trans (sqcls_symm g1) habs1
-  have hcls2 := sqcls_trans (sqcls_symm g2) habs2
+  have hcls1 := Descent.sqClsTrans (Descent.sqClsSymm g1) habs1
+  have hcls2 := Descent.sqClsTrans (Descent.sqClsSymm g2) habs2
   rcases hT with rfl | rfl | rfl | rfl
   · rw [show slotOne 34 (0 : (E 34).Point) = 1 by simp [slotOne]] at hcls1
     obtain ⟨c, hc, hcv⟩ := hcls1

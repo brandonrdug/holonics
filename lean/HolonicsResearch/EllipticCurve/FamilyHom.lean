@@ -32,20 +32,8 @@ open Holonics.EllipticCurve.FamilyKernel
 
 /-! ## 1. Plumbing -/
 
-private lemma onCurveAt {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
-    y ^ 2 = x ^ 3 - n ^ 2 * x := by
-  have h1 := ((nonsingular_iff x y).mp h).1
-  rw [equation_iff] at h1
-  simp only [FamilyFace.E] at h1
-  linarith [h1]
-
 private lemma negYAt (n x y : ℚ) : (FamilyFace.E n).negY x y = -y := by
   simp [negY, FamilyFace.E]
-
-private lemma someEqAt {n x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
-    {h₁ : (FamilyFace.E n).Nonsingular x₁ y₁} {h₂ : (FamilyFace.E n).Nonsingular x₂ y₂} :
-    (Point.some _ _ h₁ : (FamilyFace.E n).Point) = Point.some _ _ h₂ := by
-  subst hx; subst hy; rfl
 
 private lemma slotOneAt_some {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y) :
     slotOneAt n (.some _ _ h) = if x = 0 then -n ^ 2 else x := rfl
@@ -75,22 +63,6 @@ private lemma slotTwoAt_ne {n : ℚ} (hn : 0 < n) (P : (FamilyFace.E n).Point) :
     · positivity
     · exact sub_ne_zero.mpr hx
 
-private lemma sqcls_one_mul_self {s : ℚ} (hs : s ≠ 0) : Descent.SqCls 1 (s * s) := by
-  refine ⟨1 / s, one_div_ne_zero hs, ?_⟩
-  field_simp
-
-private lemma sqcls_scale_sq {a s : ℚ} (h : Descent.SqCls a 1) (hs : s ≠ 0) :
-    Descent.SqCls a (s * s) := by
-  obtain ⟨c, hc, hval⟩ := h
-  refine ⟨c / s, div_ne_zero hc hs, ?_⟩
-  rw [hval]
-  field_simp
-
-private lemma sqcls_mul_sq_left {a b t : ℚ} (h : Descent.SqCls a b) (ht : t ≠ 0) :
-    Descent.SqCls (t ^ 2 * a) b := by
-  obtain ⟨c, hc, hval⟩ := h
-  exact ⟨t * c, mul_ne_zero ht hc, by rw [hval]; ring⟩
-
 private lemma slopeLineAt {n x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ ≠ x₂) :
     (FamilyFace.E n).slope x₁ x₂ y₁ y₂ * (x₂ - x₁) = y₂ - y₁ := by
   rw [slope_of_X_ne hx]
@@ -105,7 +77,7 @@ private lemma addXAt (n x₁ x₂ L : ℚ) :
 
 private lemma halfTurnAbscissaAt {n x y : ℚ} (h : (FamilyFace.E n).Nonsingular x y)
     (hy : y = 0) : x = 0 ∨ x = n ∨ x = -n := by
-  have hc := onCurveAt h
+  have hc := FamilyKernel.onCurveAt h
   rw [hy] at hc
   have h0 : x * (x - n) * (x + n) = 0 := by linear_combination -hc
   rcases mul_eq_zero.mp h0 with h' | h'
@@ -127,7 +99,7 @@ private lemma chordHalfTurnRightAt {n x₁ y₁ x₂ : ℚ} (hn : 0 < n)
       (slotOneAt n (Point.some _ _ h₁) * slotOneAt n (Point.some _ _ h₂)) ∧
     Descent.SqCls (slotTwoAt n (Point.some _ _ h₁ + Point.some _ _ h₂))
       (slotTwoAt n (Point.some _ _ h₁) * slotTwoAt n (Point.some _ _ h₂)) := by
-  have hcurve := onCurveAt h₁
+  have hcurve := FamilyKernel.onCurveAt h₁
   obtain ⟨ha1, ha2, ha3⟩ :=
     FaceHomomorphism.theNonzeroOrdinateAvoidsTheRoots hcurve hy₁
   have han : x₁ + n ≠ 0 := fun hc => ha3 (by linarith)
@@ -170,7 +142,7 @@ private lemma chordHalfTurnRightAt {n x₁ y₁ x₂ : ℚ} (hn : 0 < n)
   · -- translation by `(n, 0)`: `x ↦ n(x+n)/(x−n)`
     have h₂' : (FamilyFace.E n).Nonsingular n 0 := h0 ▸ h₂
     rw [show (Point.some _ _ h₂ : (FamilyFace.E n).Point) = Point.some _ _ h₂' from
-      someEqAt h0 rfl]
+      FamilyKernel.someEqAt h0 rfl]
     replace hx : x₁ ≠ n := h0 ▸ hx
     rw [Point.add_of_X_ne hx]
     have hL : (FamilyFace.E n).slope x₁ n y₁ 0 = y₁ / (x₁ - n) := by
@@ -203,7 +175,7 @@ private lemma chordHalfTurnRightAt {n x₁ y₁ x₂ : ℚ} (hn : 0 < n)
   · -- translation by `(−n, 0)`: `x ↦ −n(x−n)/(x+n)`
     have h₂' : (FamilyFace.E n).Nonsingular (-n) 0 := h0 ▸ h₂
     rw [show (Point.some _ _ h₂ : (FamilyFace.E n).Point) = Point.some _ _ h₂' from
-      someEqAt h0 rfl]
+      FamilyKernel.someEqAt h0 rfl]
     replace hx : x₁ ≠ -n := h0 ▸ hx
     rw [Point.add_of_X_ne hx]
     have hL : (FamilyFace.E n).slope x₁ (-n) y₁ 0 = y₁ / (x₁ + n) := by
@@ -257,25 +229,25 @@ theorem theFaceIsAHomomorphismAtEveryModulus (n : ℚ) (hn : 0 < n)
   by_cases hx : x₁ = x₂
   · subst hx
     have hyy : (y₂ - y₁) * (y₂ + y₁) = 0 := by
-      have hA := onCurveAt h₁
-      have hB := onCurveAt h₂
+      have hA := FamilyKernel.onCurveAt h₁
+      have hB := FamilyKernel.onCurveAt h₂
       linear_combination hB - hA
     rcases mul_eq_zero.mp hyy with hcase | hcase
     · have heq : (Point.some _ _ h₂ : (FamilyFace.E n).Point) = Point.some _ _ h₁ :=
-        someEqAt rfl (by linarith)
+        FamilyKernel.someEqAt rfl (by linarith)
       rw [heq]
       obtain ⟨k1, k2⟩ := FamilyImage.theDoublesLandInTheKernelAtEveryModulus n hn
         (Point.some _ _ h₁)
-      exact ⟨sqcls_scale_sq k1 (slotOneAt_ne hn _),
-        sqcls_scale_sq k2 (slotTwoAt_ne hn _)⟩
+      exact ⟨Descent.sqClsScaleSq k1 (slotOneAt_ne hn _),
+        Descent.sqClsScaleSq k2 (slotTwoAt_ne hn _)⟩
     · by_cases hy0 : y₁ = 0
       · have heq : (Point.some _ _ h₂ : (FamilyFace.E n).Point) = Point.some _ _ h₁ :=
-          someEqAt rfl (by linarith)
+          FamilyKernel.someEqAt rfl (by linarith)
         rw [heq]
         obtain ⟨k1, k2⟩ := FamilyImage.theDoublesLandInTheKernelAtEveryModulus n hn
           (Point.some _ _ h₁)
-        exact ⟨sqcls_scale_sq k1 (slotOneAt_ne hn _),
-          sqcls_scale_sq k2 (slotTwoAt_ne hn _)⟩
+        exact ⟨Descent.sqClsScaleSq k1 (slotOneAt_ne hn _),
+          Descent.sqClsScaleSq k2 (slotTwoAt_ne hn _)⟩
       · have hzero : (Point.some _ _ h₁ : (FamilyFace.E n).Point) + Point.some _ _ h₂ = 0 :=
           Point.add_of_Y_eq rfl (by rw [negYAt]; linarith)
         have hs : slotOneAt n (Point.some _ _ h₂) = slotOneAt n (Point.some _ _ h₁) := by
@@ -283,8 +255,8 @@ theorem theFaceIsAHomomorphismAtEveryModulus (n : ℚ) (hn : 0 < n)
         have ht : slotTwoAt n (Point.some _ _ h₂) = slotTwoAt n (Point.some _ _ h₁) := by
           rw [slotTwoAt_some, slotTwoAt_some]
         rw [hzero, slotOneAt_zero, slotTwoAt_zero, hs, ht]
-        exact ⟨sqcls_one_mul_self (slotOneAt_ne hn _),
-          sqcls_one_mul_self (slotTwoAt_ne hn _)⟩
+        exact ⟨Descent.sqClsOneMulSelf (slotOneAt_ne hn _),
+          Descent.sqClsOneMulSelf (slotTwoAt_ne hn _)⟩
   · by_cases hy1 : y₁ = 0
     · by_cases hy2 : y₂ = 0
       · -- both half-turns: the Klein chords, computed symbolically
@@ -300,9 +272,9 @@ theorem theFaceIsAHomomorphismAtEveryModulus (n : ℚ) (hn : 0 < n)
           have h₁' : (FamilyFace.E n).Nonsingular 0 0 := hA ▸ h₁
           have h₂' : (FamilyFace.E n).Nonsingular n 0 := hB ▸ h₂
           rw [show (Point.some _ _ h₁ : (FamilyFace.E n).Point) = Point.some _ _ h₁' from
-              someEqAt hA rfl,
+              FamilyKernel.someEqAt hA rfl,
             show (Point.some _ _ h₂ : (FamilyFace.E n).Point) = Point.some _ _ h₂' from
-              someEqAt hB rfl, Point.add_of_X_ne hn0]
+              FamilyKernel.someEqAt hB rfl, Point.add_of_X_ne hn0]
           have hsl : (FamilyFace.E n).slope 0 n 0 0 = 0 := by
             rw [slope_of_X_ne hn0]
             norm_num
@@ -319,9 +291,9 @@ theorem theFaceIsAHomomorphismAtEveryModulus (n : ℚ) (hn : 0 < n)
           have h₁' : (FamilyFace.E n).Nonsingular 0 0 := hA ▸ h₁
           have h₂' : (FamilyFace.E n).Nonsingular (-n) 0 := hB ▸ h₂
           rw [show (Point.some _ _ h₁ : (FamilyFace.E n).Point) = Point.some _ _ h₁' from
-              someEqAt hA rfl,
+              FamilyKernel.someEqAt hA rfl,
             show (Point.some _ _ h₂ : (FamilyFace.E n).Point) = Point.some _ _ h₂' from
-              someEqAt hB rfl, Point.add_of_X_ne (Ne.symm hmn0)]
+              FamilyKernel.someEqAt hB rfl, Point.add_of_X_ne (Ne.symm hmn0)]
           have hsl : (FamilyFace.E n).slope 0 (-n) 0 0 = 0 := by
             rw [slope_of_X_ne (Ne.symm hmn0)]
             norm_num
@@ -338,9 +310,9 @@ theorem theFaceIsAHomomorphismAtEveryModulus (n : ℚ) (hn : 0 < n)
           have h₁' : (FamilyFace.E n).Nonsingular n 0 := hA ▸ h₁
           have h₂' : (FamilyFace.E n).Nonsingular 0 0 := hB ▸ h₂
           rw [show (Point.some _ _ h₁ : (FamilyFace.E n).Point) = Point.some _ _ h₁' from
-              someEqAt hA rfl,
+              FamilyKernel.someEqAt hA rfl,
             show (Point.some _ _ h₂ : (FamilyFace.E n).Point) = Point.some _ _ h₂' from
-              someEqAt hB rfl, Point.add_of_X_ne hn.ne']
+              FamilyKernel.someEqAt hB rfl, Point.add_of_X_ne hn.ne']
           have hsl : (FamilyFace.E n).slope n 0 0 0 = 0 := by
             rw [slope_of_X_ne hn.ne']
             norm_num
@@ -358,9 +330,9 @@ theorem theFaceIsAHomomorphismAtEveryModulus (n : ℚ) (hn : 0 < n)
           have h₁' : (FamilyFace.E n).Nonsingular n 0 := hA ▸ h₁
           have h₂' : (FamilyFace.E n).Nonsingular (-n) 0 := hB ▸ h₂
           rw [show (Point.some _ _ h₁ : (FamilyFace.E n).Point) = Point.some _ _ h₁' from
-              someEqAt hA rfl,
+              FamilyKernel.someEqAt hA rfl,
             show (Point.some _ _ h₂ : (FamilyFace.E n).Point) = Point.some _ _ h₂' from
-              someEqAt hB rfl, Point.add_of_X_ne (Ne.symm hmnn)]
+              FamilyKernel.someEqAt hB rfl, Point.add_of_X_ne (Ne.symm hmnn)]
           have hsl : (FamilyFace.E n).slope n (-n) 0 0 = 0 := by
             rw [slope_of_X_ne (Ne.symm hmnn)]
             norm_num
@@ -377,9 +349,9 @@ theorem theFaceIsAHomomorphismAtEveryModulus (n : ℚ) (hn : 0 < n)
           have h₁' : (FamilyFace.E n).Nonsingular (-n) 0 := hA ▸ h₁
           have h₂' : (FamilyFace.E n).Nonsingular 0 0 := hB ▸ h₂
           rw [show (Point.some _ _ h₁ : (FamilyFace.E n).Point) = Point.some _ _ h₁' from
-              someEqAt hA rfl,
+              FamilyKernel.someEqAt hA rfl,
             show (Point.some _ _ h₂ : (FamilyFace.E n).Point) = Point.some _ _ h₂' from
-              someEqAt hB rfl, Point.add_of_X_ne hmn0]
+              FamilyKernel.someEqAt hB rfl, Point.add_of_X_ne hmn0]
           have hsl : (FamilyFace.E n).slope (-n) 0 0 0 = 0 := by
             rw [slope_of_X_ne hmn0]
             norm_num
@@ -396,9 +368,9 @@ theorem theFaceIsAHomomorphismAtEveryModulus (n : ℚ) (hn : 0 < n)
           have h₁' : (FamilyFace.E n).Nonsingular (-n) 0 := hA ▸ h₁
           have h₂' : (FamilyFace.E n).Nonsingular n 0 := hB ▸ h₂
           rw [show (Point.some _ _ h₁ : (FamilyFace.E n).Point) = Point.some _ _ h₁' from
-              someEqAt hA rfl,
+              FamilyKernel.someEqAt hA rfl,
             show (Point.some _ _ h₂ : (FamilyFace.E n).Point) = Point.some _ _ h₂' from
-              someEqAt hB rfl, Point.add_of_X_ne hmnn]
+              FamilyKernel.someEqAt hB rfl, Point.add_of_X_ne hmnn]
           have hsl : (FamilyFace.E n).slope (-n) n 0 0 = 0 := by
             rw [slope_of_X_ne hmnn]
             norm_num
@@ -423,8 +395,8 @@ theorem theFaceIsAHomomorphismAtEveryModulus (n : ℚ) (hn : 0 < n)
       · subst hy2
         exact chordHalfTurnRightAt hn h₁ h₂ hy1 hx
       · -- the general chord, with its three landings
-        have eA := onCurveAt h₁
-        have eB := onCurveAt h₂
+        have eA := FamilyKernel.onCurveAt h₁
+        have eB := FamilyKernel.onCurveAt h₂
         obtain ⟨ha1, ha2, -⟩ := FaceHomomorphism.theNonzeroOrdinateAvoidsTheRoots eA hy1
         obtain ⟨hb1, hb2, -⟩ := FaceHomomorphism.theNonzeroOrdinateAvoidsTheRoots eB hy2
         rw [Point.add_of_X_ne hx]
@@ -447,7 +419,7 @@ theorem theFaceIsAHomomorphismAtEveryModulus (n : ℚ) (hn : 0 < n)
           constructor
           · rw [slotOneAt_some, hax, if_pos hX0,
               show (-n ^ 2 : ℚ) = n ^ 2 * -1 from by ring]
-            exact sqcls_mul_sq_left c1 hn.ne'
+            exact Descent.sqClsMulSqLeft c1 hn.ne'
           · rw [slotTwoAt_some, hax,
               if_neg (by rw [hX0]; exact fun hc => hn.ne' hc.symm), hX0,
               show (0 : ℚ) - n = -n from by ring]
@@ -462,7 +434,7 @@ theorem theFaceIsAHomomorphismAtEveryModulus (n : ℚ) (hn : 0 < n)
               exact c1
             · rw [slotTwoAt_some, hax, if_pos hXn,
                 show (2 * n ^ 2 : ℚ) = n ^ 2 * 2 from by ring]
-              exact sqcls_mul_sq_left c2 hn.ne'
+              exact Descent.sqClsMulSqLeft c2 hn.ne'
           · obtain ⟨c1, c2⟩ :=
               FaceHomomorphism.theChordLandsGenerically eA eB hlam hx hy1 hy2 hX0 hXn
             constructor

@@ -138,24 +138,6 @@ theorem positiveFiniteDiagonalHom_apply (p : PolynomialBody) (d : ℤ) :
     simp
   simpa using hshift
 
-private def polynomialDiagonalSupport (p : PolynomialBody) (d : ℕ) : Finset ℕ :=
-  p.support.filter fun n => p.coeff n ((d : ℤ) - (n : ℤ)) ≠ 0
-
-private theorem polynomialDiagonalSupport_subset_range
-    (p : PolynomialBody) (d : ℕ)
-    (hcone : SquareCone (polynomialPowerSeriesHom p)) :
-    polynomialDiagonalSupport p d ⊆ Finset.range (2 * d + 2) := by
-  intro n hn
-  rw [polynomialDiagonalSupport, Finset.mem_filter] at hn
-  rw [Finset.mem_range]
-  have hcoeff :
-      PowerSeries.coeff n (polynomialPowerSeriesHom p)
-          ((d : ℤ) - (n : ℤ)) ≠ 0 := by
-    simpa using hn.2
-  have hdiag : (n : ℤ) + ((d : ℤ) - (n : ℤ)) = (d : ℤ) := by ring
-  have := SquareCone.diagonal_outer_le hcone hcoeff hdiag
-  omega
-
 private theorem polynomial_support_sum_eq_diagonalSupport
     (p : PolynomialBody) (d : ℕ) :
     (∑ n ∈ p.support, p.coeff n ((d : ℤ) - (n : ℤ))) =
@@ -555,30 +537,6 @@ theorem positiveFiniteDiagonalReceiver_rhs (d : ℕ) :
         rw [if_neg hnotroot]
     _ = ((diagonalRootPopulation d).card : ℤ) := by simp
 
-theorem exists_pronic_of_integer_root {d : ℕ} {m : ℤ}
-    (hroot : m ^ 2 + m = (d : ℤ)) :
-    ∃ k : ℕ, k ^ 2 + k = d := by
-  by_cases hm : 0 ≤ m
-  · refine ⟨m.toNat, ?_⟩
-    have hmcast : ((m.toNat : ℕ) : ℤ) = m := Int.toNat_of_nonneg hm
-    exact_mod_cast (show ((m.toNat : ℤ) ^ 2 + (m.toNat : ℤ)) =
-      (d : ℤ) by rw [hmcast]; exact hroot)
-  · let k : ℕ := (-m - 1).toNat
-    have hnonneg : 0 ≤ -m - 1 := by omega
-    have hkcast : ((k : ℕ) : ℤ) = -m - 1 := Int.toNat_of_nonneg hnonneg
-    refine ⟨k, ?_⟩
-    exact_mod_cast (show ((k : ℤ) ^ 2 + (k : ℤ)) = (d : ℤ) by
-      rw [hkcast]
-      nlinarith)
-
-theorem diagonalRootPopulation_eq_empty_of_no_pronic (d : ℕ)
-    (hnone : ¬ ∃ k : ℕ, k ^ 2 + k = d) :
-    diagonalRootPopulation d = ∅ := by
-  rw [Finset.eq_empty_iff_forall_notMem]
-  intro m hm
-  apply hnone
-  exact exists_pronic_of_integer_root (Finset.mem_filter.mp hm).2
-
 /-- The natural triangular address population after the reflected integer
 pair has been condensed but before affine regrading. -/
 local instance pronicAddressDecidable (d : ℕ) :
@@ -640,43 +598,6 @@ theorem card_quarterSquareOne_eq_shiftedTriangular (n : ℕ) :
   let e := (quarterSquareOneEquivJacobiOrientation n).trans
     (jacobiOrientationEquivShiftedTriangular n)
   simpa only [Fintype.card_coe] using Fintype.card_congr e
-
-private theorem shiftedTriangularPopulation_affine_eq_singleton
-    {d k : ℕ} (hk : k ^ 2 + k = d) :
-    shiftedTriangularPopulation (1 + 4 * d) = {k} := by
-  ext j
-  simp only [shiftedTriangularPopulation, Finset.mem_filter,
-    Finset.mem_range, Finset.mem_singleton]
-  constructor
-  · intro hj
-    have hjIndex := two_mul_triangularIndex j
-    have hdegree := hj.2
-    have hjpronic : j ^ 2 + j = d := by nlinarith
-    have hfactor : (j : ℤ) ^ 2 + j = (k : ℤ) ^ 2 + k := by
-      exact_mod_cast hjpronic.trans hk.symm
-    have hzero : ((j : ℤ) - k) * ((j : ℤ) + k + 1) = 0 := by
-      nlinarith
-    rcases mul_eq_zero.mp hzero with h | h
-    · exact_mod_cast (sub_eq_zero.mp h)
-    · have hpos : 0 < (j : ℤ) + k + 1 := by positivity
-      exact (hpos.ne' h).elim
-  · intro hj
-    subst j
-    constructor
-    · nlinarith
-    · have htri := two_mul_triangularIndex k
-      nlinarith
-
-private theorem shiftedTriangularPopulation_affine_eq_empty (d : ℕ)
-    (hnone : ¬ ∃ k : ℕ, k ^ 2 + k = d) :
-    shiftedTriangularPopulation (1 + 4 * d) = ∅ := by
-  rw [Finset.eq_empty_iff_forall_notMem]
-  intro k hk
-  apply hnone
-  have hkIndex := two_mul_triangularIndex k
-  have hdegree := (Finset.mem_filter.mp hk).2
-  refine ⟨k, ?_⟩
-  nlinarith
 
 private theorem quarterSquarePopulation_one_empty_of_mod_ne_one
     {n : ℕ} (hn : n % 4 ≠ 1) :
@@ -865,7 +786,7 @@ private theorem integerAntidiagSumEq
   · have hbSum := Finset.HasAntidiagonal.mem_antidiagonal.mp hb
     rw [hg b.2 (by omega), if_neg (fun h => hne (by ext <;> simp_all)), mul_zero]
 
-private theorem integerCoeffMulOfTruncOne
+theorem integerCoeffMulOfTruncOne
     (f g : PowerSeries ℤ) (m : ℕ)
     (hg : ∀ j ≤ m, PowerSeries.coeff j g = if j = 0 then 1 else 0) :
     PowerSeries.coeff m (f * g) = PowerSeries.coeff m f := by

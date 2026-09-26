@@ -284,13 +284,6 @@ private lemma latticeNorm_eq_iff {q : ℤ × ℤ} {m : ℕ} :
   have h1 : (0 : ℤ) ≤ q.1 ^ 2 + q.2 ^ 2 := by positivity
   omega
 
-private lemma norm_shell_bound {m : ℕ} {a b : ℤ} (h : a ^ 2 + b ^ 2 = (m : ℤ)) :
-    -(m : ℤ) ≤ a ∧ a ≤ (m : ℤ) ∧ -(m : ℤ) ≤ b ∧ b ≤ (m : ℤ) := by
-  have hm : (0 : ℤ) ≤ (m : ℤ) := Int.natCast_nonneg m
-  refine ⟨?_, ?_, ?_, ?_⟩ <;>
-    nlinarith [sq_nonneg a, sq_nonneg b, sq_nonneg (a + m), sq_nonneg (a - m),
-      sq_nonneg (b + m), sq_nonneg (b - m)]
-
 /-- The twisted class-sum term family, at scale `y`. -/
 private def clsTermP (p : ℕ) [Fact p.Prime] (y : ℝ) (q : ℤ × ℤ) : ℂ :=
   if (q.1 + q.2) % 4 = 1 ∧ q.2 % 2 = 0 then
@@ -313,7 +306,7 @@ private lemma fiber_hasSumP (p : ℕ) [Fact p.Prime] (y : ℝ) (m : ℕ) :
     by_cases hmem : latticeNorm (a, b) = m
     · exfalso
       apply hq
-      have hb := norm_shell_bound (latticeNorm_eq_iff.mp hmem)
+      have hb := HeckeTheta.norm_shell_bound (latticeNorm_eq_iff.mp hmem)
       rw [Finset.mem_product, Finset.mem_Icc, Finset.mem_Icc]
       exact ⟨⟨hb.1, hb.2.1⟩, ⟨hb.2.2.1, hb.2.2.2⟩⟩
     · exact Set.indicator_of_notMem (s := {r : ℤ × ℤ | latticeNorm r = m}) hmem
