@@ -24,7 +24,11 @@ use std::process::Command;
 /// lowers its PTX for any newer card.
 const UNATTENDED_FLOOR: &str = "compute_75";
 
-const SOURCES: [&str; 2] = ["kernels/hnn.cu", "kernels/exact_integer.cuh"];
+const SOURCES: [&str; 3] = [
+    "kernels/hnn.cu",
+    "kernels/exact_integer.cuh",
+    "kernels/hnn_word.cuh",
+];
 
 /// Ask the mounted device what it is: `nvidia-smi` reports `8.9`, `nvcc` wants `compute_89`.
 fn declared_architecture() -> String {
@@ -81,6 +85,10 @@ fn main() {
     for source in SOURCES {
         println!("cargo:rerun-if-changed={source}");
     }
+    // The notebook's exposure command (`research/notebook/hnn_design/hnn_exposure.rs`) is an
+    // example of both crates; built here it may run its exposure on the card (`realization card`).
+    println!("cargo:rustc-check-cfg=cfg(holonics_card)");
+    println!("cargo:rustc-cfg=holonics_card");
     for variable in ["NVCC", "CUDA_PATH", "CUDA_HOME"] {
         println!("cargo:rerun-if-env-changed={variable}");
     }

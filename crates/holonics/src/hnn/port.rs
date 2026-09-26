@@ -65,7 +65,7 @@
 //! return that consumes the word.
 
 use num_bigint::BigInt;
-use num_traits::Zero;
+use num_traits::{One, Zero};
 
 use crate::aeon::Reading;
 use crate::compression::{CompressionError, ResonanceSplit, resonance_split};
@@ -81,6 +81,7 @@ use crate::hnn::realization::{apply_rows, entries, indexed};
 use crate::hnn::receiving::ReceivingPhases;
 use crate::hnn::retention::AeonBoundary;
 use crate::hnn::word::Word;
+use crate::holon::HolonError;
 use crate::holon::contact::FeatureCovector;
 use crate::navigator::Clock;
 use crate::ratio::linear::ExactRatMatrix;
@@ -88,7 +89,7 @@ use crate::ratio::linear::vector::{dot, scale, sub};
 use crate::ratio::work::ExactWork;
 use crate::ratio::{Rat, integer};
 use crate::receiver::face::{DiameterNorm, ReceiverWidth, WidthWitness};
-use crate::receiver::receipt::Receipt;
+use crate::receiver::receipt::{Receipt, RegionChart};
 use crate::receiver::reception::{InteractionReturn, SourceOrder};
 use crate::receiver::release::{DecisionRule, ReleaseReturn};
 
@@ -97,17 +98,18 @@ use crate::receiver::reception::Component;
 // -------------------------------------------------------------------------------------------
 // handles
 
-/// A handle to an open [`crate::hnn::SourceMoment`] in the resident.
+/// A handle to an open [`crate::hnn::SourceMoment`] in the resident. Its number is public so that
+/// every backend's resident issues handles as the host reference does (one counter per resident).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct MomentId(pub(crate) u64);
+pub struct MomentId(pub u64);
 
 /// A handle to an open [`crate::hnn::PendingRatio`] in the resident.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct PendingId(pub(crate) u64);
+pub struct PendingId(pub u64);
 
 /// A handle to a staged [`Deposit`] in the resident.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct StagedId(pub(crate) u64);
+pub struct StagedId(pub u64);
 
 /// Any handle the resident holds.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -219,6 +221,65 @@ pub struct PortReceipt {
     pub work: ExactWork,
     pub unresolved: Vec<Vec<Rat>>,
     pub detail: ReceiptDetail,
+}
+
+/// **Per-ring regions in their own clocks**: each ring's tick count, a count (clock exponent 0)
+/// whose clock unit is the ring's step.
+fn ring_receipt(ticks: &[u64], unit: &Rat) -> Result<Receipt, HnnError> {
+    let charts = ticks
+        .iter()
+        .map(|_| RegionChart::new(Rat::one(), unit.clone(), 0))
+        .collect::<Result<Vec<_>, HolonError>>()?;
+    Ok(Receipt::new(
+        ticks
+            .iter()
+            .map(|t| Rat::from_integer(BigInt::from(*t)))
+            .collect(),
+        charts,
+    )?)
+}
+
+/// [definition] **A method's receipt in the port's one form**, for every backend: the rings' tick
+/// counts in their own clocks (unit the ring's step), the counted work and the method's detail;
+/// the balances and the receivers' fibres are filled by the methods that read them.
+pub fn port_receipt(
+    ticks: &[u64],
+    unit: &Rat,
+    work: ExactWork,
+    detail: ReceiptDetail,
+) -> Result<PortReceipt, HnnError> {
+    Ok(PortReceipt {
+        rings: ring_receipt(ticks, unit)?,
+        balances: Vec::new(),
+        work,
+        unresolved: Vec::new(),
+        detail,
+    })
+}
+
+/// **Count the entries a method wrote** in its work (`ExactWork`'s own counting: each entry's
+/// numerator and denominator bits), for every backend's receipt.
+pub fn wrote_all<'a>(work: &mut ExactWork, values: impl IntoIterator<Item = &'a Rat>) {
+    for value in values {
+        work.wrote(value);
+    }
+}
+
+/// **Count `steps` steps in sequence** in a method's work (its dependency span).
+pub fn stepped(work: &mut ExactWork, steps: u64) {
+    for _ in 0..steps {
+        work.stepped();
+    }
+}
+
+/// **Widen a method's resident reading** to `entries`.
+pub fn resident(work: &mut ExactWork, entries: u64) {
+    work.resident(entries);
+}
+
+/// **Count `count` additions** in a method's work.
+pub fn added(work: &mut ExactWork, count: u64) {
+    work.added(count);
 }
 
 /// [definition] **The boundary's pullback of one pending ratio** (design (c), `close_aeon`): the

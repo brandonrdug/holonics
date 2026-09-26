@@ -1222,29 +1222,37 @@ impl<'c> ResidentInverses<'c> {
             return Ok(());
         }
         let regions = &self.regions;
+        // One offset per pair serves the operator, the chart and the residual blocks; every pair
+        // moves (no mask).
         let mut operators = self.operators.device_ptr();
+        let mut operator_base = regions.chart_base_words.device_ptr();
         let mut charts = self.charts[self.current].device_ptr();
         let mut chart_status = self.chart_status[self.current].device_ptr();
-        let mut widths = regions.width_words.device_ptr();
         let mut chart_base = regions.chart_base_words.device_ptr();
+        let mut widths = regions.width_words.device_ptr();
         let mut row_base = regions.row_base_words.device_ptr();
         let mut shifts = regions.shift_words.device_ptr();
         let mut row_region = regions.row_region.device_ptr();
         let mut rows = regions.rows as u32;
+        let mut active: CUdeviceptr = 0;
         let mut residual = self.residual.device_ptr();
         let mut residual_status = self.residual_status.device_ptr();
+        let mut residual_base = regions.chart_base_words.device_ptr();
         let mut params = arguments![
             operators,
+            operator_base,
             charts,
             chart_status,
-            widths,
             chart_base,
+            widths,
             row_base,
             shifts,
             row_region,
             rows,
+            active,
             residual,
             residual_status,
+            residual_base,
         ];
         self.card
             .launch(RESIDUAL_ENTRY, &self.residual_layout, &mut params)?;
@@ -1260,29 +1268,35 @@ impl<'c> ResidentInverses<'c> {
         let (from, to) = (self.current, 1 - self.current);
         let mut charts = self.charts[from].device_ptr();
         let mut chart_status = self.chart_status[from].device_ptr();
+        let mut chart_base = regions.chart_base_words.device_ptr();
         let mut residual = self.residual.device_ptr();
         let mut residual_status = self.residual_status.device_ptr();
+        let mut residual_base = regions.chart_base_words.device_ptr();
         let mut widths = regions.width_words.device_ptr();
-        let mut chart_base = regions.chart_base_words.device_ptr();
         let mut row_base = regions.row_base_words.device_ptr();
         let mut shifts = regions.shift_words.device_ptr();
         let mut row_region = regions.row_region.device_ptr();
         let mut rows = regions.rows as u32;
+        let mut active: CUdeviceptr = 0;
         let mut next = self.charts[to].device_ptr();
         let mut next_status = self.chart_status[to].device_ptr();
+        let mut next_base = regions.chart_base_words.device_ptr();
         let mut params = arguments![
             charts,
             chart_status,
+            chart_base,
             residual,
             residual_status,
+            residual_base,
             widths,
-            chart_base,
             row_base,
             shifts,
             row_region,
             rows,
+            active,
             next,
             next_status,
+            next_base,
         ];
         self.card
             .launch(REFINE_ENTRY, &self.refine_layout, &mut params)?;
@@ -1299,16 +1313,16 @@ impl<'c> ResidentInverses<'c> {
         let regions = &self.regions;
         let mut residual = self.residual.device_ptr();
         let mut residual_status = self.residual_status.device_ptr();
+        let mut residual_base = regions.chart_base_words.device_ptr();
         let mut widths = regions.width_words.device_ptr();
-        let mut chart_base = regions.chart_base_words.device_ptr();
         let pairs = regions.widths.len();
         let mut charts = pairs as u32;
         let mut reading = self.reading.device_ptr();
         let mut params = arguments![
             residual,
             residual_status,
+            residual_base,
             widths,
-            chart_base,
             charts,
             reading,
         ];

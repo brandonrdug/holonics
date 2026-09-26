@@ -253,8 +253,9 @@ fn certified_dot(pairs: impl Iterator<Item = (i128, i128)>) -> Result<i128, HnnE
 }
 
 impl ChartWords {
-    /// A chart from its coordinates, each refused past the 64-bit word.
-    pub(crate) fn of_coordinates(
+    /// A chart from its coordinates, each refused past the 64-bit word. Public for a realization
+    /// that refines the chart off the host and returns its coordinates.
+    pub fn of_coordinates(
         rows: usize,
         columns: usize,
         exponent: u32,
@@ -637,6 +638,16 @@ impl Operator {
             bound,
         ))
     }
+}
+
+/// **The cold start of a chart of `A⁻¹`**: the scaled transpose `2^(−p)Aᵀ` on the chart's lattice
+/// `2^(−exponent)ℤ` and the cold phase's step bound `p + ⌈log₂(1 + ⌈log₂ n⌉)⌉ + 1` ([`refine`]'s
+/// own start). Public for a realization that refines the chart off the host from the same start.
+pub fn transpose_start(
+    matrix: &ExactRatMatrix,
+    exponent: u32,
+) -> Result<(ChartWords, u32), HnnError> {
+    Operator::of(matrix)?.transpose_start(exponent)
 }
 
 /// **Refine a chart of `A⁻¹` to the declared target** (module header): warm-started from `start`

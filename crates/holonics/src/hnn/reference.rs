@@ -153,8 +153,8 @@ use crate::hnn::moment::{Ingested, SourceMoment};
 use crate::hnn::pending::PendingRatio;
 use crate::hnn::port::{
     Census, ContactPullback, Deposit, ExecutionPort, Handle, MomentId, PendingId, PortReceipt,
-    Pullback, ReceiptDetail, RingPullback, StagedId, Transpose, WordReturn, release_width,
-    resonance_reading, source_order,
+    Pullback, ReceiptDetail, RingPullback, StagedId, Transpose, WordReturn, port_receipt,
+    release_width, resonance_reading, source_order, wrote_all,
 };
 use crate::hnn::propagation::{contact_exponent, path_attenuation};
 use crate::hnn::ratio::{
@@ -164,7 +164,6 @@ use crate::hnn::realization::{apply_rows, indexed, outer_rows};
 use crate::hnn::receiving::ReceivingPhases;
 use crate::hnn::retention::{AeonBoundary, Diamond, aeon_readings, collapse, contained, separator};
 use crate::hnn::word::KeptWord;
-use crate::holon::HolonError;
 use crate::holon::contact::FeatureCovector;
 use crate::navigator::Clock;
 use crate::ratio::algebraic::ExactInterval;
@@ -173,7 +172,6 @@ use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{add, dot, scale};
 use crate::ratio::work::ExactWork;
 use crate::ratio::{Rat, integer};
-use crate::receiver::receipt::{Receipt, RegionChart};
 use crate::receiver::reception::{Component, InteractionReturn, SourceOrder};
 use crate::receiver::release::{DecisionRule, LawfulOptions, ReleaseReturn, release};
 
@@ -324,7 +322,8 @@ pub struct ChartTally {
 }
 
 impl ChartTally {
-    fn new(field: &Field) -> Self {
+    /// No chart read yet, against the field's declared target.
+    pub fn new(field: &Field) -> Self {
         Self {
             reads: 0,
             cold: 0,
@@ -338,7 +337,7 @@ impl ChartTally {
     }
 
     /// Count one word's chart readings.
-    fn read(&mut self, readings: &[ChartReading]) {
+    pub fn read(&mut self, readings: &[ChartReading]) {
         for reading in readings {
             self.reads += 1;
             match reading.start {
@@ -683,20 +682,6 @@ pub fn one_hot(codes: &[usize]) -> Vec<Vec<(usize, Rat)>> {
 
 /// Per-ring regions in their own clocks: each ring's tick count, a count (clock exponent 0) whose
 /// clock unit is the ring's step.
-fn ring_receipt(ticks: &[u64], unit: &Rat) -> Result<Receipt, HnnError> {
-    let charts = ticks
-        .iter()
-        .map(|_| RegionChart::new(Rat::one(), unit.clone(), 0))
-        .collect::<Result<Vec<_>, HolonError>>()?;
-    Ok(Receipt::new(
-        ticks
-            .iter()
-            .map(|t| Rat::from_integer(BigInt::from(*t)))
-            .collect(),
-        charts,
-    )?)
-}
-
 fn receipt(
     field: &Field,
     ticks: &[u64],
@@ -705,19 +690,7 @@ fn receipt(
     detail: ReceiptDetail,
 ) -> Result<PortReceipt, HnnError> {
     let _ = field;
-    Ok(PortReceipt {
-        rings: ring_receipt(ticks, unit)?,
-        balances: Vec::new(),
-        work,
-        unresolved: Vec::new(),
-        detail,
-    })
-}
-
-fn wrote_all<'a>(work: &mut ExactWork, values: impl IntoIterator<Item = &'a Rat>) {
-    for value in values {
-        work.wrote(value);
-    }
+    port_receipt(ticks, unit, work, detail)
 }
 
 impl ExecutionPort for Reference {
@@ -2049,7 +2022,7 @@ impl Cut {
     /// **The crib that closed an aeon at cell `at`**: at most `window` cells before `at`, none
     /// before the aeon's opening `start`, and none at or before a held-out cell, so the crib holds
     /// only cells already read and never a held-out one (review D1).
-    pub(crate) fn closing_crib(&self, start: usize, at: usize, window: usize) -> Range<usize> {
+    pub fn closing_crib(&self, start: usize, at: usize, window: usize) -> Range<usize> {
         let mut from = at.saturating_sub(window).max(start);
         for range in &self.held_out {
             if range.start < at && range.end > from {
@@ -2343,232 +2316,317 @@ impl Baselines {
 }
 
 impl Reference {
-    /// **Run campaign 1's exposure protocol on a cut** and read its measurement (module header).
+    /// **Run campaign 1's exposure protocol on a cut** and read its measurement (module header):
+    /// [`expose`] on this reference, at its declared steps, budget, pending capacity and deadline.
     /// The admitted family is the field's declared receivers throughout. Refused unless the cut is
     /// exactly the field's declared population, which `Field::declare` checked against `n*`. Under a
     /// deadline ([`Reference::with_deadline`]) the reading stops after that many receiving windows.
     pub fn expose(&self, field: &Field, cut: &Cut) -> Result<Exposure, HnnError> {
-        if cut.cells.len() as u64 != field.population() {
-            return Err(HnnError::Shape {
-                what: "the cut's cells against the declared population",
-                expected: usize::try_from(field.population()).unwrap_or(usize::MAX),
-                found: cut.cells.len(),
+        expose(
+            self,
+            &Declared {
+                steps: &self.steps,
+                budget: self.budget,
+                pending_capacity: self.pending_capacity,
+                deadline: self.deadline,
+            },
+            field,
+            cut,
+        )
+    }
+}
+
+/// [definition] **What an exposure reads of a port's resident** beside the port's own methods: the
+/// admitted family, the published constitution, the budget stop, an open moment, the lift point,
+/// the state's bits with and without the collapse, the executed charts' tally and the wall time by
+/// phase. The host reference's [`Resident`] answers them, and so does a device's resident, so the
+/// exposure protocol is stated once ([`expose`]) for every realization of the port.
+pub trait ExposedResident {
+    fn admitted(&self) -> &[ReceivingPhases];
+    fn constitution(&self) -> &Constitution;
+    fn stopped(&self) -> Option<&BudgetStop>;
+    fn moment(&self, id: &MomentId) -> Option<&SourceMoment>;
+    fn current(&self) -> &Current;
+    fn state_bits(&self) -> u64;
+    fn state_bits_without_collapse(&self) -> u64;
+    fn tally(&self) -> &ChartTally;
+    fn wall(&self) -> &WallTimes;
+}
+
+impl ExposedResident for Resident {
+    fn admitted(&self) -> &[ReceivingPhases] {
+        Resident::admitted(self)
+    }
+    fn constitution(&self) -> &Constitution {
+        Resident::constitution(self)
+    }
+    fn stopped(&self) -> Option<&BudgetStop> {
+        Resident::stopped(self)
+    }
+    fn moment(&self, id: &MomentId) -> Option<&SourceMoment> {
+        Resident::moment(self, id)
+    }
+    fn current(&self) -> &Current {
+        Resident::current(self)
+    }
+    fn state_bits(&self) -> u64 {
+        Resident::state_bits(self)
+    }
+    fn state_bits_without_collapse(&self) -> u64 {
+        Resident::state_bits_without_collapse(self)
+    }
+    fn tally(&self) -> &ChartTally {
+        Resident::tally(self)
+    }
+    fn wall(&self) -> &WallTimes {
+        Resident::wall(self)
+    }
+}
+
+/// [definition] **The declarations an exposure reads off its port**: the constitution's steps and
+/// budget and the pending capacity (which [`Field::describe`] codes), and the deadline in windows
+/// ([`Reference::with_deadline`]).
+#[derive(Clone, Copy, Debug)]
+pub struct Declared<'a> {
+    pub steps: &'a Steps,
+    pub budget: u64,
+    pub pending_capacity: usize,
+    pub deadline: Option<u64>,
+}
+
+/// **Run campaign 1's exposure protocol on a cut through any execution port** (module header, "The
+/// exposure"): the one protocol the host reference ([`Reference::expose`]) and a device realization
+/// run, so their readouts are comparable line for line.
+pub fn expose<P>(
+    port: &P,
+    declared: &Declared<'_>,
+    field: &Field,
+    cut: &Cut,
+) -> Result<Exposure, HnnError>
+where
+    P: ExecutionPort,
+    P::Resident: ExposedResident,
+{
+    if cut.cells.len() as u64 != field.population() {
+        return Err(HnnError::Shape {
+            what: "the cut's cells against the declared population",
+            expected: usize::try_from(field.population()).unwrap_or(usize::MAX),
+            found: cut.cells.len(),
+        });
+    }
+    let mut resident = port.mount(field, &Current::at_rest(field))?;
+    let phases = resident
+        .admitted()
+        .first()
+        .cloned()
+        .ok_or(HnnError::Shape {
+            what: "a declared receiver for the exposure",
+            expected: 1,
+            found: 0,
+        })?;
+    let family = resident.admitted().to_vec();
+    let aperture = phases.aperture();
+    let alphabet = field.alphabet();
+    let crib = field.crib();
+    let cells = &cut.cells;
+    let mut keys = Vec::new();
+    let mut locate = |resident: &mut P::Resident, span: Range<usize>| -> Result<(), HnnError> {
+        if span.len() > crib.offset {
+            let at = span.end as u64;
+            let located = port.locate_keys(resident, &one_hot(&cells[span]), crib.offset)?;
+            keys.push(KeyReport {
+                cell: at,
+                detail: located.receipt.detail,
             });
         }
-        let mut resident = self.mount(field, &Current::at_rest(field))?;
-        let phases = resident
-            .admitted()
-            .first()
-            .cloned()
-            .ok_or(HnnError::Shape {
-                what: "a declared receiver for the exposure",
-                expected: 1,
-                found: 0,
-            })?;
-        let family = resident.admitted().to_vec();
-        let aperture = phases.aperture();
-        let alphabet = field.alphabet();
-        let crib = field.crib();
-        let cells = &cut.cells;
-        let mut keys = Vec::new();
-        let mut locate = |resident: &mut Resident, span: Range<usize>| -> Result<(), HnnError> {
-            if span.len() > crib.offset {
-                let at = span.end as u64;
-                let located = self.locate_keys(resident, &one_hot(&cells[span]), crib.offset)?;
-                keys.push(KeyReport {
-                    cell: at,
-                    detail: located.receipt.detail,
-                });
-            }
-            Ok(())
-        };
-        let (moment, _) = self.ingest(&mut resident, None, &[])?;
-        let mut aeon_start = 0usize;
-        let mut training = Bits::empty();
-        let mut held_out = Bits::empty();
-        let mut baselines = Baselines::new(alphabet)?;
-        let mut aeons = Vec::new();
-        let mut curve = vec![CurvePoint {
-            commit: resident.constitution().commit(),
-            bits: resident.constitution().carrier_bits(),
-            released_bits: 0,
-            stepped: 0,
-        }];
-        let (mut windows, mut open_windows, mut peak_word_bits) = (0u64, 0u64, 0u64);
-        let (mut forward, mut adjoint) = (Remainders::default(), Remainders::default());
-        let (mut balances, mut closed) = (0u64, true);
-        let (mut largest_residual, mut residual_bound) = (Rat::zero(), Rat::zero());
-        let mut stop = None;
-        let mut work = ExactWork::nothing();
-        let (mut compares, mut deposits) = (0u64, 0u64);
-        let mut deadline = None;
-        let mut position = 0usize;
-        while position < cells.len() {
-            let end = (position + aperture).min(cells.len());
-            let window = &cells[position..end];
-            if window.len() == aperture && self.deadline.is_some_and(|windows| compares >= windows)
-            {
-                deadline = Some(position as u64);
-                break;
-            }
-            if window.len() == aperture {
-                let (pending, refined) = self.refine(&mut resident, &moment, &phases)?;
-                work = work.then(&refined.receipt.work);
-                if let ReceiptDetail::Refine {
-                    path,
-                    peak_bits,
-                    remainders,
-                    ..
-                } = &refined.receipt.detail
-                {
-                    windows += 1;
-                    open_windows += u64::from(path.open);
-                    peak_word_bits = peak_word_bits.max(*peak_bits);
-                    forward = forward.join(remainders);
-                }
-                for balance in &refined.receipt.balances {
-                    balances += 1;
-                    closed &= balance.closes();
-                    if balance.residual.abs() > largest_residual {
-                        largest_residual = balance.residual.abs();
-                        residual_bound = balance.bound.clone();
-                    }
-                }
-                let (staged, compared) = self.compare(&mut resident, pending, &one_hot(window))?;
-                work = work.then(&compared.receipt.work);
-                if let ReceiptDetail::Compare { released, .. } = &compared.receipt.detail {
-                    adjoint = adjoint.join(released);
-                }
-                compares += 1;
-                let holon = compared
-                    .forward
-                    .into_present()
-                    .expect("a compare returns its ratio");
-                let windowed = window
-                    .iter()
-                    .enumerate()
-                    .any(|(offset, _)| cut.held_out(position + offset));
-                for (offset, (phase, &code)) in holon.phases().iter().zip(window).enumerate() {
-                    let bits = if cut.held_out(position + offset) {
-                        &mut held_out
-                    } else {
-                        &mut training
-                    };
-                    bits.model = interval_sum(&bits.model, &phase.code_length)?;
-                    baselines.code(bits, code)?;
-                }
-                if windowed || resident.stopped().is_some() {
-                    self.discard(&mut resident, Handle::Staged(staged))?;
-                } else {
-                    match self.deposit(&mut resident, staged) {
-                        Ok(returned) => {
-                            work = work.then(&returned.receipt.work);
-                            deposits += 1;
-                            let (released_bits, stepped) = returned
-                                .deposit
-                                .present()
-                                .map_or((0, 0), |reading| (reading.released_bits, reading.stepped));
-                            curve.push(CurvePoint {
-                                commit: resident.constitution().commit(),
-                                bits: resident.constitution().carrier_bits(),
-                                released_bits,
-                                stepped,
-                            });
-                        }
-                        Err(refusal @ HnnError::ConstitutionBudget { .. }) => {
-                            stop = BudgetStop::of(&refusal).map(|stop| (stop, position as u64));
-                        }
-                        Err(other) => return Err(other),
-                    }
-                }
-            } else {
-                for &code in window {
-                    baselines.update(code);
-                }
-            }
-            let mut fed = 0;
-            while fed < window.len() {
-                let (_, ingested) =
-                    self.ingest(&mut resident, Some(&moment), &one_hot(&window[fed..]))?;
-                let ingested = ingested.forward.into_present().expect("ingest returns");
-                fed += ingested.cells;
-                if ingested.carry_out {
-                    let closed = self.close_aeon(&mut resident, &family)?;
-                    aeons.push(closed.forward.into_present().expect("a boundary"));
-                    let at = position + fed;
-                    locate(&mut resident, cut.closing_crib(aeon_start, at, crib.window))?;
-                    aeon_start = at;
-                }
-            }
-            position = end;
+        Ok(())
+    };
+    let (moment, _) = port.ingest(&mut resident, None, &[])?;
+    let mut aeon_start = 0usize;
+    let mut training = Bits::empty();
+    let mut held_out = Bits::empty();
+    let mut baselines = Baselines::new(alphabet)?;
+    let mut aeons = Vec::new();
+    let mut curve = vec![CurvePoint {
+        commit: resident.constitution().commit(),
+        bits: resident.constitution().carrier_bits(),
+        released_bits: 0,
+        stepped: 0,
+    }];
+    let (mut windows, mut open_windows, mut peak_word_bits) = (0u64, 0u64, 0u64);
+    let (mut forward, mut adjoint) = (Remainders::default(), Remainders::default());
+    let (mut balances, mut closed) = (0u64, true);
+    let (mut largest_residual, mut residual_bound) = (Rat::zero(), Rat::zero());
+    let mut stop = None;
+    let mut work = ExactWork::nothing();
+    let (mut compares, mut deposits) = (0u64, 0u64);
+    let mut deadline = None;
+    let mut position = 0usize;
+    while position < cells.len() {
+        let end = (position + aperture).min(cells.len());
+        let window = &cells[position..end];
+        if window.len() == aperture && declared.deadline.is_some_and(|windows| compares >= windows)
+        {
+            deadline = Some(position as u64);
+            break;
         }
-        let description_bits = field
-            .describe(&self.steps, self.budget, self.pending_capacity)
-            .len() as u64;
-        let key_bits: u64 = keys
-            .iter()
-            .map(|report| match &report.detail {
-                ReceiptDetail::Keys { fell_back, .. } => field
-                    .rings()
-                    .iter()
-                    .zip(fell_back)
-                    .filter(|(_, fell)| !**fell)
-                    .map(|(ring, _)| ceil_log2(&BigUint::from(ring.period())))
-                    .sum(),
-                _ => 0,
-            })
-            .sum();
-        let model_bits = interval_sum(&training.model, &held_out.model)?;
-        let counted = work.entries_written.clone().max(BigUint::one());
-        let kt = interval_sum(
-            &model_bits,
-            &ExactInterval::point(Rat::from_integer(BigInt::from(
-                description_bits + key_bits + ceil_log2(&counted),
-            ))),
-        )?;
-        let open = resident.moment(&moment).expect("the exposure's moment");
-        let n = open.cells();
-        let symbol = ceil_log2(&BigUint::from(alphabet));
-        let state = StateReport {
-            lift_bits: resident.current().lift().iter().map(|x| x.bits() + 1).sum(),
-            moment_bits: open.dense_bits(),
-            moment_state_bits: field.capacity().state_bits(n),
-            constitution_bits: resident.constitution().exact_bits(),
-            resident_bits: resident.state_bits(),
-            resident_bits_without_collapse: resident.state_bits_without_collapse(),
-            source_bits: n * symbol,
-            n_star: field.capacity().n_star(),
-        };
-        Ok(Exposure {
-            training,
-            held_out,
-            keys,
-            aeons,
-            constitution_curve: curve,
-            windows,
-            open_windows,
-            peak_word_bits,
-            complete: stop.is_none() && deadline.is_none(),
-            stop,
-            deadline,
-            description_bits,
-            key_bits,
-            kt,
-            literal_bits: symbol * position as u64,
-            work,
-            state,
-            compares,
-            deposits,
-            word: WordReport {
-                charts: resident.tally().clone(),
-                forward,
-                adjoint,
-                balances,
-                closed,
-                largest_residual,
-                residual_bound,
-            },
-            wall: *resident.wall(),
-        })
+        if window.len() == aperture {
+            let (pending, refined) = port.refine(&mut resident, &moment, &phases)?;
+            work = work.then(&refined.receipt.work);
+            if let ReceiptDetail::Refine {
+                path,
+                peak_bits,
+                remainders,
+                ..
+            } = &refined.receipt.detail
+            {
+                windows += 1;
+                open_windows += u64::from(path.open);
+                peak_word_bits = peak_word_bits.max(*peak_bits);
+                forward = forward.join(remainders);
+            }
+            for balance in &refined.receipt.balances {
+                balances += 1;
+                closed &= balance.closes();
+                if balance.residual.abs() > largest_residual {
+                    largest_residual = balance.residual.abs();
+                    residual_bound = balance.bound.clone();
+                }
+            }
+            let (staged, compared) = port.compare(&mut resident, pending, &one_hot(window))?;
+            work = work.then(&compared.receipt.work);
+            if let ReceiptDetail::Compare { released, .. } = &compared.receipt.detail {
+                adjoint = adjoint.join(released);
+            }
+            compares += 1;
+            let holon = compared
+                .forward
+                .into_present()
+                .expect("a compare returns its ratio");
+            let windowed = window
+                .iter()
+                .enumerate()
+                .any(|(offset, _)| cut.held_out(position + offset));
+            for (offset, (phase, &code)) in holon.phases().iter().zip(window).enumerate() {
+                let bits = if cut.held_out(position + offset) {
+                    &mut held_out
+                } else {
+                    &mut training
+                };
+                bits.model = interval_sum(&bits.model, &phase.code_length)?;
+                baselines.code(bits, code)?;
+            }
+            if windowed || resident.stopped().is_some() {
+                port.discard(&mut resident, Handle::Staged(staged))?;
+            } else {
+                match port.deposit(&mut resident, staged) {
+                    Ok(returned) => {
+                        work = work.then(&returned.receipt.work);
+                        deposits += 1;
+                        let (released_bits, stepped) = returned
+                            .deposit
+                            .present()
+                            .map_or((0, 0), |reading| (reading.released_bits, reading.stepped));
+                        curve.push(CurvePoint {
+                            commit: resident.constitution().commit(),
+                            bits: resident.constitution().carrier_bits(),
+                            released_bits,
+                            stepped,
+                        });
+                    }
+                    Err(refusal @ HnnError::ConstitutionBudget { .. }) => {
+                        stop = BudgetStop::of(&refusal).map(|stop| (stop, position as u64));
+                    }
+                    Err(other) => return Err(other),
+                }
+            }
+        } else {
+            for &code in window {
+                baselines.update(code);
+            }
+        }
+        let mut fed = 0;
+        while fed < window.len() {
+            let (_, ingested) =
+                port.ingest(&mut resident, Some(&moment), &one_hot(&window[fed..]))?;
+            let ingested = ingested.forward.into_present().expect("ingest returns");
+            fed += ingested.cells;
+            if ingested.carry_out {
+                let closed = port.close_aeon(&mut resident, &family)?;
+                aeons.push(closed.forward.into_present().expect("a boundary"));
+                let at = position + fed;
+                locate(&mut resident, cut.closing_crib(aeon_start, at, crib.window))?;
+                aeon_start = at;
+            }
+        }
+        position = end;
     }
+    let description_bits = field
+        .describe(declared.steps, declared.budget, declared.pending_capacity)
+        .len() as u64;
+    let key_bits: u64 = keys
+        .iter()
+        .map(|report| match &report.detail {
+            ReceiptDetail::Keys { fell_back, .. } => field
+                .rings()
+                .iter()
+                .zip(fell_back)
+                .filter(|(_, fell)| !**fell)
+                .map(|(ring, _)| ceil_log2(&BigUint::from(ring.period())))
+                .sum(),
+            _ => 0,
+        })
+        .sum();
+    let model_bits = interval_sum(&training.model, &held_out.model)?;
+    let counted = work.entries_written.clone().max(BigUint::one());
+    let kt = interval_sum(
+        &model_bits,
+        &ExactInterval::point(Rat::from_integer(BigInt::from(
+            description_bits + key_bits + ceil_log2(&counted),
+        ))),
+    )?;
+    let open = resident.moment(&moment).expect("the exposure's moment");
+    let n = open.cells();
+    let symbol = ceil_log2(&BigUint::from(alphabet));
+    let state = StateReport {
+        lift_bits: resident.current().lift().iter().map(|x| x.bits() + 1).sum(),
+        moment_bits: open.dense_bits(),
+        moment_state_bits: field.capacity().state_bits(n),
+        constitution_bits: resident.constitution().exact_bits(),
+        resident_bits: resident.state_bits(),
+        resident_bits_without_collapse: resident.state_bits_without_collapse(),
+        source_bits: n * symbol,
+        n_star: field.capacity().n_star(),
+    };
+    Ok(Exposure {
+        training,
+        held_out,
+        keys,
+        aeons,
+        constitution_curve: curve,
+        windows,
+        open_windows,
+        peak_word_bits,
+        complete: stop.is_none() && deadline.is_none(),
+        stop,
+        deadline,
+        description_bits,
+        key_bits,
+        kt,
+        literal_bits: symbol * position as u64,
+        work,
+        state,
+        compares,
+        deposits,
+        word: WordReport {
+            charts: resident.tally().clone(),
+            forward,
+            adjoint,
+            balances,
+            closed,
+            largest_residual,
+            residual_bound,
+        },
+        wall: *resident.wall(),
+    })
 }

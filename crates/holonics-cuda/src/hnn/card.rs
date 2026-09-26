@@ -173,6 +173,12 @@ pub enum Realization {
         threads: u32,
         rows_per_thread: u32,
     },
+    /// One block carries a whole word (`hnn_word_forward`, `hnn_word_reverse`): its `threads`
+    /// divide each stage's rows (`row ≡ t mod threads`), each looping over at most
+    /// `rows_per_thread` rows of the widest stage; the stages are ordered by the block's barriers.
+    WordPerBlock { threads: u32, rows_per_thread: u32 },
+    /// Each block is one copy of `copies`; its `threads` stride the copy's words.
+    CopyPerBlock { copies: u64, threads: u32 },
 }
 
 /// [definition] **A launch derived from the census**: its grid, block, dynamic shared octets and
@@ -324,6 +330,89 @@ pub fn certificate_layout(
             charts: u64::from(charts),
             threads,
             rows_per_thread: width.div_ceil(threads),
+        },
+    })
+}
+
+/// [definition] **The word's layout** (`hnn_word_forward`, `hnn_word_reverse`) for a word whose
+/// widest stage has `rows` rows: one block, as wide as the least power of two covering those rows
+/// (at least one warp), bounded by the entry's and the device's thread ceilings; a wider stage is
+/// split over the threads, each looping over `⌈rows/threads⌉` of its rows. The block declares no
+/// dynamic shared octets (its two shared words are static).
+pub fn word_layout(
+    census: &DeviceCensus,
+    entry: &EntryCensus,
+    rows: usize,
+) -> Result<Layout, DeviceError> {
+    let Ok(rows) = u32::try_from(rows.max(1)) else {
+        return Err(DeviceError::Launch {
+            entry: entry.name,
+            clause: "a word's rows fit the kernel's 32-bit wire",
+        });
+    };
+    let ceiling = thread_ceiling(census, entry);
+    if ceiling == 0 {
+        return Err(DeviceError::Launch {
+            entry: entry.name,
+            clause: "the block carries at least one thread",
+        });
+    }
+    let cover = rows
+        .max(census.warp)
+        .checked_next_power_of_two()
+        .unwrap_or(u32::MAX);
+    let threads = floor_power_of_two(ceiling).min(cover);
+    Ok(Layout {
+        grid: Dim3::x(1),
+        block: Dim3::x(threads),
+        shared: 0,
+        realization: Realization::WordPerBlock {
+            threads,
+            rows_per_thread: rows.div_ceil(threads),
+        },
+    })
+}
+
+/// [definition] **The copies' layout** (`hnn_copy_words`) for `copies` copies of at most `words`
+/// words: one block per copy, as wide as the least power of two covering its words (at least one
+/// warp), bounded by the entry's and the device's thread ceilings.
+pub fn copy_layout(
+    census: &DeviceCensus,
+    entry: &EntryCensus,
+    copies: usize,
+    words: usize,
+) -> Result<Layout, DeviceError> {
+    let (Ok(copies), Ok(words)) = (u32::try_from(copies), u32::try_from(words.max(1))) else {
+        return Err(DeviceError::Launch {
+            entry: entry.name,
+            clause: "the copies fit the kernel's 32-bit wire",
+        });
+    };
+    if copies == 0 || copies > census.max_grid.x {
+        return Err(DeviceError::Launch {
+            entry: entry.name,
+            clause: "at least one copy, within the grid's X extent",
+        });
+    }
+    let ceiling = thread_ceiling(census, entry);
+    if ceiling == 0 {
+        return Err(DeviceError::Launch {
+            entry: entry.name,
+            clause: "the block carries at least one thread",
+        });
+    }
+    let cover = words
+        .max(census.warp)
+        .checked_next_power_of_two()
+        .unwrap_or(u32::MAX);
+    let threads = floor_power_of_two(ceiling).min(cover);
+    Ok(Layout {
+        grid: Dim3::x(copies),
+        block: Dim3::x(threads),
+        shared: 0,
+        realization: Realization::CopyPerBlock {
+            copies: u64::from(copies),
+            threads,
         },
     })
 }
@@ -613,6 +702,37 @@ impl Card {
             buffer.device_ptr() + offset as CUdeviceptr,
             0,
             octets / 4,
+        )?)
+    }
+
+    /// **Copy `len` elements of one resident buffer into another**, from `from` to `to`, ordered on
+    /// the card's stream: nothing crosses the bus.
+    pub(crate) fn copy_within<T: Copy>(
+        &self,
+        source: &CardBuffer<'_, T>,
+        from: usize,
+        target: &CardBuffer<'_, T>,
+        to: usize,
+        len: usize,
+    ) -> Result<(), DeviceError> {
+        self.owns(source)?;
+        self.owns(target)?;
+        if from + len > source.len || to + len > target.len {
+            return Err(DeviceError::Shape {
+                what: "a resident copy within its buffers",
+                expected: source.len.min(target.len),
+                found: (from + len).max(to + len),
+            });
+        }
+        if len == 0 {
+            return Ok(());
+        }
+        let size = core::mem::size_of::<T>();
+        self.current()?;
+        Ok(self.stream.copy_device_to_device_async(
+            target.device_ptr() + (to * size) as CUdeviceptr,
+            source.device_ptr() + (from * size) as CUdeviceptr,
+            len * size,
         )?)
     }
 

@@ -300,9 +300,10 @@ pub struct RingOperands {
     contrast_transposed: Option<Rows>,
 }
 
-/// The element material read from the constitution: the sheet classes, `W_s = −ffᵀ` and
-/// `K = W_s + Σ σ_ρ A_ρ`.
-fn element_material(
+/// **The element material read from the constitution**: the sheet classes, `W_s = −ffᵀ` and
+/// `K = W_s + Σ σ_ρ A_ρ`. Public for a realization that forms the ring's operator
+/// ([`ring_operator`]) and its balance's operands off the host (`holonics-cuda::hnn::port`).
+pub fn element_material(
     contrast_reading: &[Rat],
     passive_factor: &ExactRatMatrix,
     contrast_port: &ExactRatMatrix,
@@ -372,6 +373,34 @@ fn element_material(
     Ok((sheets, passive, element))
 }
 
+/// **The ring element's operator** `I − ½K_r`, whose inverse (exact, or its certified chart) is the
+/// element's solve. Public for a realization that charts it off the host.
+pub fn ring_operator(element: &ExactRatMatrix) -> Result<ExactRatMatrix, HnnError> {
+    Ok(ExactRatMatrix::identity(element.rows())?.subtract(&element.scaled(&rat(1, 2)))?)
+}
+
+/// **The contact's normalized operator** `m_a = 1 + (G_a/2h)(2C_a + hD_a + (h²/2)K_a)` from its
+/// squared forms, conductance and hop (`M_a = (2h/G_a) m_a`), whose inverse is the transit's solve.
+/// Public for a realization that charts it off the host.
+pub fn contact_operator(
+    storage: &ExactRatMatrix,
+    stiffness: &ExactRatMatrix,
+    dissipation: &ExactRatMatrix,
+    conductance: &Rat,
+    step: &Rat,
+) -> Result<ExactRatMatrix, HnnError> {
+    let h = step;
+    // m = 1 + (G/2h)(2C + hD + (h²/2)K) = (G/2h) M.
+    let gain = conductance / (integer(2) * h);
+    Ok(ExactRatMatrix::identity(storage.rows())?.add(
+        &storage
+            .scaled(&integer(2))
+            .add(&dissipation.scaled(h))?
+            .add(&stiffness.scaled(&(h * h / integer(2))))?
+            .scaled(&gain),
+    )?)
+}
+
 impl RingOperands {
     /// **A ring's operands under the exact law**, from its declared admittance and its element
     /// material, at the sheet classes of the standing contrast `Δ_r` (`σ_ρ = sign Δ_r[ρ]`,
@@ -426,8 +455,7 @@ impl RingOperands {
     ) -> Result<Self, HnnError> {
         let (sheets, passive, element) =
             element_material(contrast_reading, passive_factor, contrast_port, slices)?;
-        let n = element.rows();
-        let left = ExactRatMatrix::identity(n)?.subtract(&element.scaled(&rat(1, 2)))?;
+        let left = ring_operator(&element)?;
         let (solve, chart) = solve_of(&left, lattice)?;
         let contrast = !is_zero_matrix(contrast_port);
         Ok(Self {
@@ -607,16 +635,7 @@ impl ContactOperands {
         if !conductance.is_positive() || !step.is_positive() {
             return Err(HnnError::NonpositiveDeclaration);
         }
-        let h = step;
-        // m = 1 + (G/2h)(2C + hD + (h²/2)K) = (G/2h) M.
-        let gain = &conductance / (integer(2) * h);
-        let operator = ExactRatMatrix::identity(k)?.add(
-            &storage
-                .scaled(&integer(2))
-                .add(&dissipation.scaled(h))?
-                .add(&stiffness.scaled(&(h * h / integer(2))))?
-                .scaled(&gain),
-        )?;
+        let operator = contact_operator(&storage, &stiffness, &dissipation, &conductance, step)?;
         let operator_norm = (0..k)
             .map(|i| {
                 operator
@@ -1464,8 +1483,9 @@ fn is_zero_matrix(matrix: &ExactRatMatrix) -> bool {
     matrix.entries().iter().all(Zero::is_zero)
 }
 
-/// `F Fᵀ`, entry by entry over each row's common denominator.
-pub(crate) fn gram(factor: &ExactRatMatrix) -> Result<ExactRatMatrix, HnnError> {
+/// `F Fᵀ`, entry by entry over each row's common denominator. Public for a realization that forms
+/// the contact's squared forms off the host.
+pub fn gram(factor: &ExactRatMatrix) -> Result<ExactRatMatrix, HnnError> {
     let rows = Rows::of(factor);
     let n = factor.rows();
     // Each row of the upper triangle reads only the shared factor: the rows run together.

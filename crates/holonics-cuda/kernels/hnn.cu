@@ -365,19 +365,23 @@ extern "C" __global__ void hnn_word_adjoint_tick(
 // (word).
 //
 // Realization (residual and refinement): block `(e, j)` is one output entry, flattened row `e`
-// (row `i = e − row_base[g]` of pair `g = row_region[e]`) and column `j`; a block with `j ≥ n_g`
-// returns at once. Its threads divide the contraction index (`k ≡ t`) and reduce by the shared
-// tree. Every block reads the immutable operator, chart and residual and writes only its own
-// entry (the refinement writes the other of two chart buffers), so the blocks commute.
+// (row `i = e − row_base[g]` of pair `g = row_region[e]`) and column `j`; a block with `j ≥ n_g`,
+// or of a pair the mask leaves out (`active[g] = 0`), returns at once. Its threads divide the
+// contraction index (`k ≡ t`) and reduce by the shared tree. Every block reads the immutable
+// operator, chart and residual and writes only its own entry (the refinement writes a chart block
+// no block of the launch reads), so the blocks commute.
 //
-// Pair tables: `widths[g]`, `chart_base[g]` (offset of the `n × n` block, one for `a`, `ξ` and `ρ`),
-// `row_base[g]`, `shifts[g] = S`. Shared: 2 · blockDim.x words of 16 octets.
+// Pair tables: `widths[g]`, `row_base[g]`, `shifts[g] = S`, and each `n × n` block's offset in its
+// buffer: `operator_base[g]` (`a`), `chart_base[g]` (`ξ`, with its statuses at the same offset),
+// `residual_base[g]` (`ρ`) and `next_base[g]` (`ξ''`). A store keeps many pairs' blocks in one
+// buffer, two chart blocks per pair, and a word refines only its own pairs: `active` masks the
+// pairs a launch moves (a null mask moves every pair). Shared: 2 · blockDim.x words of 16 octets.
 extern "C" __global__ void hnn_inverse_residual(
-    const int64_t *operators, const int64_t *charts, const uint32_t *chart_status,
-    const uint32_t *widths, const unsigned long long *chart_base,
-    const unsigned long long *row_base, const uint32_t *shifts,
-    const uint32_t *row_region, uint32_t rows,
-    wide *residual, uint32_t *residual_status
+    const int64_t *operators, const unsigned long long *operator_base,
+    const int64_t *charts, const uint32_t *chart_status, const unsigned long long *chart_base,
+    const uint32_t *widths, const unsigned long long *row_base, const uint32_t *shifts,
+    const uint32_t *row_region, uint32_t rows, const uint32_t *active,
+    wide *residual, uint32_t *residual_status, const unsigned long long *residual_base
 ) {
     uwide *ring = (uwide *)hnn_shared;
     uwide *bound = ring + blockDim.x;
@@ -388,7 +392,7 @@ extern "C" __global__ void hnn_inverse_residual(
     }
     const uint32_t g = row_region[e];
     const uint32_t n = widths[g];
-    if (j >= n) {
+    if (j >= n || (active != nullptr && active[g] == 0)) {
         return;  // uniform over the block
     }
     if (t == 0) {
@@ -396,10 +400,9 @@ extern "C" __global__ void hnn_inverse_residual(
     }
     __syncthreads();
     const uint32_t i = (uint32_t)(e - row_base[g]);
-    const unsigned long long at = chart_base[g];
-    const int64_t *a = operators + at;
-    const int64_t *x = charts + at;
-    const uint32_t *x_status = chart_status + at;
+    const int64_t *a = operators + operator_base[g];
+    const int64_t *x = charts + chart_base[g];
+    const uint32_t *x_status = chart_status + chart_base[g];
     uwide word = 0, certificate = 0;
     uint32_t refused = 0;
     for (uint32_t k = t; k < n; k += blockDim.x) {
@@ -422,19 +425,18 @@ extern "C" __global__ void hnn_inverse_residual(
         if (read == HNN_EXACT) {
             value = hnn_certified(diagonal - ring[0], hnn_certify(bound[0], diagonal), &read);
         }
-        const size_t out = at + (size_t)i * n + j;
+        const size_t out = residual_base[g] + (size_t)i * n + j;
         residual[out] = read == HNN_EXACT ? value : (wide)0;
         residual_status[out] = read;
     }
 }
 
 extern "C" __global__ void hnn_inverse_refine(
-    const int64_t *charts, const uint32_t *chart_status,
-    const wide *residual, const uint32_t *residual_status,
-    const uint32_t *widths, const unsigned long long *chart_base,
-    const unsigned long long *row_base, const uint32_t *shifts,
-    const uint32_t *row_region, uint32_t rows,
-    int64_t *next, uint32_t *next_status
+    const int64_t *charts, const uint32_t *chart_status, const unsigned long long *chart_base,
+    const wide *residual, const uint32_t *residual_status, const unsigned long long *residual_base,
+    const uint32_t *widths, const unsigned long long *row_base, const uint32_t *shifts,
+    const uint32_t *row_region, uint32_t rows, const uint32_t *active,
+    int64_t *next, uint32_t *next_status, const unsigned long long *next_base
 ) {
     uwide *ring = (uwide *)hnn_shared;
     uwide *bound = ring + blockDim.x;
@@ -445,7 +447,7 @@ extern "C" __global__ void hnn_inverse_refine(
     }
     const uint32_t g = row_region[e];
     const uint32_t n = widths[g];
-    if (j >= n) {
+    if (j >= n || (active != nullptr && active[g] == 0)) {
         return;  // uniform over the block
     }
     if (t == 0) {
@@ -453,11 +455,10 @@ extern "C" __global__ void hnn_inverse_refine(
     }
     __syncthreads();
     const uint32_t i = (uint32_t)(e - row_base[g]);
-    const unsigned long long at = chart_base[g];
-    const int64_t *x = charts + at;
-    const uint32_t *x_status = chart_status + at;
-    const wide *rho = residual + at;
-    const uint32_t *rho_status = residual_status + at;
+    const int64_t *x = charts + chart_base[g];
+    const uint32_t *x_status = chart_status + chart_base[g];
+    const wide *rho = residual + residual_base[g];
+    const uint32_t *rho_status = residual_status + residual_base[g];
     uwide word = 0, certificate = 0;
     uint32_t refused = 0;
     for (uint32_t k = t; k < n; k += blockDim.x) {
@@ -494,7 +495,7 @@ extern "C" __global__ void hnn_inverse_refine(
                 }
             }
         }
-        const size_t out = at + (size_t)i * n + j;
+        const size_t out = next_base[g] + (size_t)i * n + j;
         next[out] = refined;
         next_status[out] = read;
     }
@@ -507,8 +508,8 @@ extern "C" __global__ void hnn_inverse_refine(
 // words: the numerators, then the status words, so the host reads it in one transfer. Shared:
 // blockDim.x words of 16 octets.
 extern "C" __global__ void hnn_inverse_certificate(
-    const wide *residual, const uint32_t *residual_status,
-    const uint32_t *widths, const unsigned long long *chart_base, uint32_t charts,
+    const wide *residual, const uint32_t *residual_status, const unsigned long long *residual_base,
+    const uint32_t *widths, uint32_t charts,
     uwide *reading
 ) {
     uwide *largest = (uwide *)hnn_shared;
@@ -522,7 +523,7 @@ extern "C" __global__ void hnn_inverse_certificate(
     }
     __syncthreads();
     const uint32_t n = widths[g];
-    const unsigned long long at = chart_base[g];
+    const unsigned long long at = residual_base[g];
     uwide best = 0;
     uint32_t refused = 0;
     for (uint32_t i = t; i < n; i += blockDim.x) {
@@ -553,3 +554,5 @@ extern "C" __global__ void hnn_inverse_certificate(
         reading[charts + g] = (uwide)read;
     }
 }
+
+#include "hnn_word.cuh"

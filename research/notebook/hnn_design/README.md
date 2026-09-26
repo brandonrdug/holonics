@@ -47,7 +47,12 @@ cargo run --release -p holonics --example hnn_exposure -- windows 8
 cargo run --release -p holonics --example hnn_exposure
 python3 research/notebook/hnn_design/standing_cut.py 6148   # n*, printed by hnn_exposure
 cargo run --release -p holonics --example hnn_exposure -- cut-file .local/cuts/standing-real-cut-campaign-1.bin cells all
+# the same exposure on the card (the device port, holonics_cuda::hnn::Resident), under the GPU lock
+flock .local/gpu.lock cargo run --release -p holonics-cuda --example hnn_exposure -- cut-file .local/cuts/standing-real-cut-campaign-1.bin cells all realization card
 ```
+
+`hnn_exposure.rs` is also an example of `holonics-cuda` (its build declares `cfg(holonics_card)`),
+so `realization card` runs the same protocol through the device port; the default stays the host.
 
 **The standing real cut** (THE_REBUILD Decision 23; campaign 1's `Cut` row). `standing_cut.py`
 reads the private exposure dataset (`holonics.conversation-exposure.v1`) and writes the pinned cut
@@ -131,3 +136,42 @@ windows on 24 workers. The tree before is `c690f76d`, the exact word.
   largest `2^(−16)`, ℓ1 sum ≈ 0.0907, 927,125 bits).
 - **Balances.** All 72 tick balances close up to their residuals within their certified bounds. The
   largest residual is ≈ 2.19·10⁻⁴, against its bound ≈ 1.63·10⁻³.
+
+**The resident exposure's receipt** (rebuild step 5, Decision 25; `holonics_cuda::hnn::Resident`,
+`crates/holonics-cuda/src/hnn/port.rs`). The device port runs every word on the card (the charts'
+Newton–Schulz refinement and certificates, the word's open, ticks and receiving read in one launch,
+its return in one launch, the moment's ingest) and keeps on the host what the port plan assigns it
+(the faces in `ℚ(θ)`, the Holon ratio, the tick balances, the composition, the deposit's prox step,
+the ledger, keys and collapse). Run from the repository root on the RTX 4080 SUPER, the host's
+command first, then the card's, back to back.
+
+- **Parity.** The readouts are identical line for line outside the wall times: 79 lines at
+  `windows 24` and 2,663 lines on the full cut. `holonics-cuda`'s `port_tests.rs` asserts every
+  `InteractionReturn` equal in lockstep (the chain control, generic constitutions, campaign 1 on
+  drawn bytes, deferred compares, a releasing collapse, refusals, and the standing cut's first 24
+  windows).
+- **Realization.** The word and its return are each one block of 256 threads (the entry's lowered
+  ceiling), four rows a thread over the widest stage (the 1,024 logits).
+- **Wall time.** 24 windows: host 120, card 113 ms a window. Full cut (3,074 windows): host
+  477,915 ms (155 ms a window), card 334,358 ms (108 ms a window). Per window, host → card:
+
+  | Phase | 24 windows | Full cut |
+  |---|---|---|
+  | refine read | 11 → 2 | 34 → 3 |
+  | release (the card's includes the tick balances, read on the host) | 0 → 2 | 0 → 2 |
+  | holon and covector | 8 → 8 | 9 → 9 |
+  | `pull_back` | 4 → 1 | 4 → 2 |
+  | `compose` | 3 → 3 | 9 → 9 |
+  | `deposited` | 47 → 45 | 38 → 39 |
+  | re-read (the card's includes the successor's publication) | 20 → 20 | 33 → 17 |
+  | ingest | 0 → 0 | 0 → 0 |
+  | the rest | 23 → 28 | 24 → 25 |
+
+  What remains is the host's exact arithmetic the port plan keeps there: the deposit's prox step
+  (38 ms), the faces' code lengths in `ℚ(θ)` (about 9 ms in the re-read and 9 in the holon), the
+  composition (9 ms).
+- **Across the bus**, per window on the full cut: 173 kB for the words (plans, operands, records
+  with the logits, certificates, moved operators and charts; two words a window), 25 kB for the
+  return, 20 kB for the publication's moved words (16 octets each), 56 octets for the ingest. The
+  full cut ran before a word's operands crossed as its weights only (its chart slots are gathered on
+  the card), which moves 18.7 kB less a word: 220 → 183 kB a window at `windows 24`.

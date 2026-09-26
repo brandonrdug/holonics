@@ -266,6 +266,8 @@ pub enum HnnError {
     ReleaseRefused(#[from] WidthRefusal),
     #[error("the carrier refused {what}: nothing is rounded")]
     Carrier { what: &'static str },
+    #[error("the execution port's realization refused: {what}")]
+    Realization { what: &'static str },
     #[error(
         "the chart {chart:?} did not refine below its certificate {certificate}: the target is {target}"
     )]

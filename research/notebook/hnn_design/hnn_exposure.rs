@@ -37,6 +37,20 @@
 //! holds, and the run is reported incomplete at the cell it stopped at: a smoke, or a run cut short
 //! at its deadline.
 //!
+//! [definition] **The realization** `realization <host|card>` (default `host`): the same exposure
+//! protocol (`holonics::hnn::reference::expose`) through the host reference, or through the device
+//! port resident on the card (`holonics_cuda::hnn::Resident`, rebuild step 5, Decision 25), whose
+//! every return is the reference's. `holonics` does not depend on the device crate, so this file is
+//! also an example of `holonics-cuda`, whose build declares `cfg(holonics_card)`; `realization card`
+//! runs only there:
+//!
+//! ```sh
+//! cargo run --release -p holonics-cuda --example hnn_exposure -- cut-file .local/cuts/standing-real-cut-campaign-1.bin cells all realization card
+//! ```
+//!
+//! The card's readout is the host's line for line but for the realization's line, the wall times
+//! and, beside them, what crossed the bus (`holonics_cuda::hnn::Traffic`).
+//!
 //! [established-bounded; measured] **The readout** is the complete `Exposure`, with every quantity
 //! design (f) names:
 //! - the executed word (Decision 24): the declared precisions, the charts' refinements (their starts,
@@ -57,6 +71,9 @@
 //! Every value is exact: integers print as integers and rationals as `n/d` (`n/2^e` on a dyadic
 //! denominator), and bits are enclosures with exact endpoints. A decimal appears only at the print,
 //! labelled, rounded outward. Wall time is an exterior face, in milliseconds.
+
+// `cfg(holonics_card)` is declared by `holonics-cuda`'s build only (module header).
+#![allow(unexpected_cfgs)]
 
 use std::fmt::Display;
 use std::ops::Range;
@@ -223,6 +240,7 @@ fn main() {
     let (mut cells, mut held_out, mut deadline): (Option<String>, usize, Option<u64>) =
         (None, HELD_OUT, None);
     let mut cut_file: Option<String> = None;
+    let mut realization = String::from("host");
     for pair in arguments.chunks(2) {
         match pair {
             [key, value] if key == "cells" => cells = Some(value.clone()),
@@ -233,9 +251,12 @@ fn main() {
             [key, value] if key == "windows" => {
                 deadline = Some(value.parse().expect("a deadline in windows"));
             }
+            [key, value] if key == "realization" && (value == "host" || value == "card") => {
+                realization = value.clone();
+            }
             _ => {
                 println!(
-                    "usage: hnn_exposure [cut-file <path>] [cells <N|all>] [held-out <cells>] [windows <deadline>]"
+                    "usage: hnn_exposure [cut-file <path>] [cells <N|all>] [held-out <cells>] [windows <deadline>] [realization <host|card>]"
                 );
                 return;
             }
@@ -325,18 +346,107 @@ fn main() {
     );
     println!("setup (cut read, fields declared): {setup} ms wall");
 
+    if realization == "card" {
+        println!("realization: {}", card_realization());
+    } else {
+        println!("realization: the host reference (holonics::hnn::Reference)");
+    }
     let clock = Instant::now();
-    let exposure = reference.expose(&field, &cut).expect("the exposure");
+    let (exposure, traffic) = if realization == "card" {
+        card_exposure(deadline, &field, &cut)
+    } else {
+        (reference.expose(&field, &cut).expect("the exposure"), None)
+    };
     let wall = clock.elapsed().as_millis();
     report(&field, &exposure);
     println!();
     phases(&exposure, wall);
+    if let Some(traffic) = traffic {
+        println!("{traffic}");
+    }
     println!();
     println!(
         "wall time (exterior): setup {setup} ms; exposure {wall} ms over {} windows ({} ms a window)",
         exposure.compares,
         wall.checked_div(u128::from(exposure.compares)).unwrap_or(0)
     );
+}
+
+/// The card the device port runs on: its name and capability, read off its census.
+#[cfg(holonics_card)]
+fn card_realization() -> String {
+    let card =
+        holonics_cuda::hnn::Card::open(0).expect("a CUDA card at ordinal 0 with its kernels");
+    let census = card.census();
+    format!(
+        "the device port resident on the card (holonics_cuda::hnn::Resident) on {} (compute {}.{}, {} multiprocessors)",
+        census.name,
+        census.compute_capability.0,
+        census.compute_capability.1,
+        census.multiprocessors
+    )
+}
+
+#[cfg(not(holonics_card))]
+fn card_realization() -> String {
+    panic!(
+        "realization card runs as the device crate's example: cargo run --release -p holonics-cuda --example hnn_exposure -- … realization card"
+    )
+}
+
+/// **Campaign 1's exposure on the card** (`holonics_cuda::hnn::Resident::expose`, the reference's
+/// protocol over the device port), with what crossed the bus beside it (exterior).
+#[cfg(holonics_card)]
+fn card_exposure(deadline: Option<u64>, field: &Field, cut: &Cut) -> (Exposure, Option<String>) {
+    let card =
+        holonics_cuda::hnn::Card::open(0).expect("a CUDA card at ordinal 0 with its kernels");
+    let port = holonics_cuda::hnn::Resident::campaign_one(&card);
+    let port = match deadline {
+        Some(windows) => port.with_deadline(windows),
+        None => port,
+    };
+    let exposure = port.expose(field, cut).expect("the exposure on the card");
+    let traffic = port.traffic();
+    let windows = exposure.compares.max(1);
+    let realized = port.word_layouts().map_or_else(
+        || "no word ran".to_string(),
+        |(forward, reverse)| {
+            format!(
+                "the word {:?} (grid {}, block {}), its return {:?} (grid {}, block {})",
+                forward.realization,
+                forward.grid.x,
+                forward.block.x,
+                reverse.realization,
+                reverse.grid.x,
+                reverse.block.x
+            )
+        },
+    );
+    let line = format!(
+        "== across the bus (exterior: octets, both directions; per window over {} windows) ==\n\
+         words (plans, operands, records, certificates, moved charts): {} ({} a window, {} words)\n\
+         returns (carried reads and records): {} ({} a window, {} returns)\n\
+         publications (the loci's moved words): {} ({} a window)\n\
+         ingests (cells and receipts): {} ({} a window)\n\
+         realization (the hardware law's report): {realized}",
+        exposure.compares,
+        traffic.words,
+        traffic.words / windows,
+        traffic.word_count,
+        traffic.returns,
+        traffic.returns / windows,
+        traffic.return_count,
+        traffic.publications,
+        traffic.publications / windows,
+        traffic.ingest,
+        traffic.ingest / windows
+    );
+    (exposure, Some(line))
+}
+
+#[cfg(not(holonics_card))]
+fn card_exposure(_: Option<u64>, _: &Field, _: &Cut) -> (Exposure, Option<String>) {
+    unreachable!("card_realization refused first")
 }
 
 /// **The wall time by phase** (`Exposure::wall`, exterior): each phase's milliseconds over the run

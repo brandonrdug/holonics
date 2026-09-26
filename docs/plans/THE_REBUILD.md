@@ -246,7 +246,7 @@ archive root. Brandon's Metal port stays on its own branch, `codex/apple-silicon
 
    Its equations are ported from history's `native_ecology` and the prototype body, subject to the
    do-not-port list.
-5. **The resident HNN in `holonics-cuda::hnn`** (advancing with step 4 since September 25, Decision 25). Kernels are ported per law under the hardware law,
+5. **The resident HNN in `holonics-cuda::hnn`** (advancing with step 4 since September 25, Decision 25; campaign 1's execution port runs resident, `holonics_cuda::hnn::Resident`, with every return equal to the host reference's). Kernels are ported per law under the hardware law,
    each with its parity check against the host reference. The device debts of #76 (#12–#15, #50)
    are paid here.
 6. **Targets, physics and extraction.**

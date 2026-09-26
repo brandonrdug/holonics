@@ -18,3 +18,9 @@ thiserror = { workspace = true }
 [[bin]]
 name = "mount-smoke"
 path = "src/bin/mount-smoke.rs"
+
+# The notebook's exposure command, built beside the device port: `realization card` runs campaign
+# 1's exposure on the card (the default stays the host reference).
+[[example]]
+name = "hnn_exposure"
+path = "../../research/notebook/hnn_design/hnn_exposure.rs"

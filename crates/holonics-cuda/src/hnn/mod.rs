@@ -5,7 +5,8 @@
 //! [definition] One library for the laws, one backend for the card: every law here is a law of
 //! `holonics::hnn`, realized on the card with exact integers, and each kernel family has a parity
 //! test against its host owner or an exact host oracle of its contract (`tests.rs`,
-//! `word_tests.rs`). What is built:
+//! `word_tests.rs`), and the execution port a parity test against the host reference return by
+//! return (`port_tests.rs`). What is built:
 //!
 //! - [`card`]: the [`Card`] (one context owning its image, stream and [`CardBuffer`]s, #15), its
 //!   [`DeviceCensus`], and the layouts derived from it with their [`Realization`];
@@ -21,7 +22,16 @@
 //!   at the word's end, resident chaining (tick by tick, a captured graph of `k` ticks, or a whole
 //!   window's word as one graph with its load and release copies); and the inverse charts'
 //!   Newton–Schulz refinement with its exact certificate `‖1 − AX̂‖∞`, warm-started when a deposit
-//!   moves the operator.
+//!   moves the operator;
+//! - [`port`] (Decision 25): **the execution port resident on the card**, [`Resident`] with its
+//!   resident [`Mounted`], every `InteractionReturn` the host reference's; the exposure protocol
+//!   runs over it (`holonics::hnn::reference::expose`), and [`Traffic`] reads what crossed the bus.
+//!   It composes `publication` (the published constitution's loci at their declared lattices, the
+//!   moved words scattered at each publication), `store` (the executed charts keyed as the host's
+//!   `Charts`, refined step for step as `holonics::hnn::chart::refine` refines them, every
+//!   Newton–Schulz step and certificate on the card), `execute` (one word's plan, buffers, launches
+//!   and record: `kernels/hnn_word.cuh`) and `readout` (the host's exact readings of the card's
+//!   record: the faces in `ℚ(θ)`, the tick balances, the release and the word's return).
 //!
 //! # The realizations (hardware law)
 //!
@@ -32,6 +42,10 @@
 //! | `hnn_word_tick`, `hnn_word_adjoint_tick` | one output entry (row `i` of region `g`); grid = the flattened rows `Σ_g n_g`, every region of the stage at once | one residue class `j ≡ t` of the row (of `Q`, or of `Qᵀ`'s column); `threads` as the read's, over the widest region | `⌈n_max/threads⌉` columns | the shared tree; thread 0 adds the remainder and splits |
 //! | `hnn_inverse_residual`, `hnn_inverse_refine` | one output entry `(i, j)` of pair `g`; grid `(Σ_g n_g, n_max)`, blocks with `j ≥ n_g` return at once | one residue class `k ≡ t` of the contraction; `threads` as the read's | `⌈n_max/threads⌉` terms | the shared tree; the refinement's thread 0 splits at `2^S` and moves the chart |
 //! | `hnn_inverse_certificate` | one chart | one residue class `i ≡ t` of the chart's rows; `threads` = the least power of two covering the widest chart, at least a warp | its rows, and within each the row's `n` columns | a shared tree of maxima |
+//! | `hnn_word_forward`, `hnn_word_reverse` | the whole word: one block runs its open, every tick (or reverse step) and its receiving read, the stages ordered by barriers | one row of the stage (`row ≡ t`): a ring row, a contact row, an arrival coordinate, an incidence, a logit; `threads` = the least power of two covering the widest stage, at least a warp, within the entry's and the census's ceilings ([`word_layout`]) | `⌈rows/threads⌉` rows of each stage, and within a row its own sums | none across rows: each row's sums are certified in its own thread; the conductance's parts are one thread's loop over its channel or ring |
+//! | `hnn_pair_weights` | one weight `(phase c, rank ρ)`; grid `(d_g, m)` | one residue class `x ≡ t` of the current cells; `threads` as the read's over `|A|` | the earlier cells, `C_c[x, y] a_ρ[x] b_ρ[y]` | the shared tree |
+//! | `hnn_copy_words` | one copy (a chart gathered into a word's operands, or kept) | a residue class of the copy's words | `⌈words/threads⌉` words | none |
+//! | `hnn_scatter_words` | a grid striding a publication's moved words | one moved word | — | none |
 //!
 //! Campaign 1 on the RTX 4080 SUPER (census in the GPU test's output): `E_0 M_0[c]` is `10 × 5`
 //! blocks of 256 threads, one column each; `R P v` is `512 × A` blocks of 32 threads (one warp; 22
@@ -43,48 +57,33 @@
 //!
 //! # The device execution port: what runs resident
 //!
-//! [definition; agent-inferred] **The plan for `holonics::hnn::ExecutionPort` on the card.** The
-//! device's `Resident` is a [`Card`] holding, per retained learned locus, its [`ResidentLattice`]
-//! (the lattice coordinates of `E_g`, `R`, `W_c,g`, the pair port's factors `e_ρ, a_ρ, b_ρ`, the
-//! element's `f_g` and slices, the channels' `c_a, b_a, F_a`), the open [`ResidentMoment`]s with
-//! the rings' phase classes, the word's charts ([`ResidentCharts`]) with its carried state and
-//! adjoint covector ([`ResidentCarry`]), the inverse charts with their operators and residuals
-//! ([`ResidentInverses`]), the pending ratios' anchors and the staged deposits' covectors. The host
-//! keeps the declaration (`Field`), the lift's unbounded words (windings), the constitution's exact
-//! remainders, the first law's ledger and the handles.
+//! [definition; agent-inferred] **The port, built** ([`port`], Decisions 24–25). Every word the port
+//! executes (a refine's, a compare's read again, a deposit's and a collapse's re-read, a release's)
+//! runs on the card, from the charts' refinement through the receiving read, in one launch after
+//! the refinement's; its return runs on the card in one launch. The host keeps what the port plan
+//! assigns it and what is not a fixed-width integer, and reads it exactly from the card's record.
+//! Parity is the law: `port_tests.rs` runs the exposure protocol on the host reference and on this
+//! port in lockstep and asserts every return equal (faces, receipts, balances, bits, code lengths,
+//! deposits, releases, boundaries, keys, refusals), on the chain control, on generic constitutions
+//! with every locus live, on campaign 1's field, and on the standing real cut's first 24 windows.
 //!
-//! [definition; agent-inferred] **Resident with Decision 24's kernels** ([`word`]): the word's
-//! ticks and their reverse (the adjoint ticks through the executed charts, stage by stage in
-//! reverse order; the charts are fixed within a window, so the reverse needs no tape of states);
-//! the error feedback, the remainders carried on the card and released at the word's end;
-//! every inverse chart (the rings' Cayley denominators `1 − E/2`, the contact solves `m`, the
-//! normal laws' `H`) refined by Newton–Schulz on the card and certified exactly, warm-started
-//! from the last window's chart when a deposit moves its operator. **What the host still does per
-//! window:** it forms the charts' words when the constitution changes (the ring element
-//! `2X̂ − 1 = (2ξ − 2^(L_c)·1)·2^(−L_c)` read off the refined chart, the junction and contact
-//! charts, each a transfer of `n²` words, and each operator a deposit moved), reads the
-//! certificates (one transfer of 32 octets per chart) and decides from them whether to refine
-//! again, loads each word's opening state and reads its release (one transfer each way), and
-//! keeps everything that is not a fixed-width integer: the lift's windings, the faces in `ℚ(θ)`,
-//! the Holon ratio and its winding, the normal law's prox step and budget, and the first law.
-//!
-//! | Method | Resident on the card | Stays on the host | Crosses the bus |
+//! | Method | On the card | On the host, and why | Crosses the bus |
 //! |---|---|---|---|
-//! | `census` | the [`DeviceCensus`] and each entry's lowered limits; the pending capacity is the card's memory over one pending ratio's resident words, now fixed width: per word a carry of `24·Σ n_g` octets plus two status blocks, and its page-locked staging | the budget `B_Θ` | nothing |
-//! | `mount` | every retained locus's coordinates ([`LatticeCoordinates::of_matrix`] at its declared lattice; off-lattice or beyond-word entries are refused at the mount, by position), the lock charts, the phase classes | the field, the lift's words, the remainders and solved charts | the coordinates once |
-//! | `ingest` | **built:** [`ResidentMoment::ingest`], the steps' scan with carries in carry order, the counts `M_g`, `C_g(δ)`, the window and the phases updated in place, the stop at the joint clock's carry-out | the lift's words `λ_g += advance_g` | in: the window's cells (4 octets each); out: the receipt `(consumed, carried out, advance_g)`, `8(2 + G)` octets |
-//! | `locate_keys` | per ring in carry order, the candidates × the crib's menu edges: permutations and phase classes in `ℤ/d_g`, a filter (fixed width today; not built) | the gauge-fixing convention and the published clocks' windings | in: the crib's cells; out: the fibres' sizes, orbits and failing loops |
-//! | `refine` | the open `s_g(0) = P_g^(τ_g) Σ_c P_g^(−c)(E_g M_g[c] + E_g^(δ) C_g(δ)[c])`: **built:** `E_g M_g[c]` as [`Card::read`] against [`ResidentMoment::phase_operand`] (the fold over phases is a permutation and an exact sum; the pair port is a two-sided read `a_ρᵀ C b_ρ` of the resident counts, the same ring and certificate); the ticks: **built:** [`Card::tick`] over every region of a stage at once, resident between ticks, launched one by one, as a captured graph of `k` ticks ([`Card::capture_word`]) or as a window's whole word with its load and release copies ([`Card::capture_window`], [`ResidentCarry::run_window`]); the inverse charts: **built:** [`ResidentInverses::refine`] and [`ResidentInverses::certificates`]; the receiving read `f = R P_R^(τ_R) v_R(e_j)`: **built:** [`Card::read`] with the rotation as a [`Gather`], for a lattice anchor; the grain cells: at `L_R = 2^4` a dyadic logit's cell is a bit slice of its word (`n = S >> e`, `k = (S >> (e − 4)) mod 16`, the fibre the low `e − 4` bits) | the faces `p̂ ∝ 2^(n + k/L_R)` in `ℚ(θ)` (`CarriedPower`) and every enclosure (`ExactInterval`) a person reads | in: each word's opening state, `8·Σ n_g` octets; out: the word's release (state, remainders, statuses), `≈ 20·Σ n_g` octets in one transfer; the certificates, 32 octets per chart; per receiving epoch the grain cells (a carry word and a phase class per class) and the largest fibre, never the logits |
-//! | `compare` | the covector's odometer chart `p̃ − q` as integer numerators `w_c − q_c W` over one denominator `W = Σ_c 2^(n_c − n_min)(L_R + k_c)`; its pullback through `R` (the transposed read), `P_R` (the inverse gather), the ticks in reverse (**built:** [`Card::adjoint_tick`], the transposes of the executed charts, `executed_adjoint_pairing`), and the encoder covector `Σ_c P^(c−τ) g ⊗ M_g[c]` against the resident counts | the Holon ratio `ℓ = log R` (its KL part `−log₂ p̂_t` in `ℚ(θ)`, its phase part and winding), the scalar `W`, the staged deposit's samples until the normal law is fixed width | in: the targets' cells; out: the ratio's readings; the covector numerators stay resident |
-//! | `deposit` | the published coordinates of the loci reached (only entries whose applied step `q` is nonzero, `DepositReading::stepped`) | the successor: the normal law's prox step at the carried Gram, the budgeted carry with its remainders and released tails, the budget stop; the solved chart `H'⁻¹` becomes a lattice chart refined on the card ([`ResidentInverses::replace_operator`], `warm_start_certificate`) in place of exact ℚ | in: the stepped entries `(index, coordinate)` per locus reached; the moved operators' words |
-//! | `release` | the width: the largest fibre over the receiving phases, a max-reduction of the bit slices | the decision rule, the RIDE/FOUND reading | out: the width |
-//! | `close_aeon` | the collapse's releases: each released locus's buffers freed; the retained loci's coordinates unchanged (the collapse releases no remainder and moves no retained entry) | the diamond's reach and observe recursions and structural rank over ℚ, the released remainders' report, the first law | in: nothing beyond the released loci's handles |
-//! | `read`, `discard` | freeing a handle's buffers | the handles' exact bits | out: the lift's words and the handles' bits |
+//! | `mount` | the constitution's loci at their declared lattices (the publication), an empty chart store | the field, the Holarchy's certificate, the admitted receivers' observability ranks (exact words, once) | the loci once, whole |
+//! | `ingest` | [`ResidentMoment::ingest`] | the lift `λ` and the host's mirror of the moment (a pending ratio's operand, which the deposit's samples and the state's bits read), checked equal to the card's at every ingest | the cells (4 octets each) and the receipt |
+//! | `locate_keys` | the moments' phases re-keyed | the key location (discrete, `keys::locate_closing`) | one word per ring |
+//! | `refine` | the counts frozen at the cut ([`MomentSnapshot`]); the charts' refinement (`store`: warm, cold and target phases, every Newton–Schulz step and certificate); the word (`execute`: the open `E_g M_g[c]` and the pair port, every tick with its splits and remainders, the receiving read) | the operators `I − ½K`, `m_a` and each step's decision from its certificate (a cold start's transpose and the exact fallback formed on the host, `n²` words); the faces in `ℚ(θ)`; each tick's balance (its terms pass the 128-bit carrier) and the release, read exactly from the record | the plan and weights (≈ 5 kB), the moved operators and charts, 32 octets per certificate, the record and logits (≈ 55 kB) |
+//! | `compare` | the word's return (`hnn_word_reverse`): every element's, transit's and junction's reverse step with their carried remainders | the Holon ratio and its covector; the covector's pull through `Rᵀ` and its first split (it lives on `(1/W)ℤ`, not a lattice); the conductance's division by each ring's admittance sum (not dyadic); the composition onto the loci (`reference::compose`) | the carried reads (`8·A·2d_R` octets), the return's record (≈ 25 kB) |
+//! | `deposit` | the successor's loci (the predecessor copied on the card, the moved words scattered), the arrived re-read | the normal laws' prox steps, the budgeted carry, the budget, the successor's operators, the code length | the moved words (16 octets each) and a word |
+//! | `release`, `close_aeon` | a word (the release's read, a collapse's re-read), the descended loci | the width and decision, the collapse, the first law, the boundary | a word, the moved words |
+//! | `read`, `discard` | freeing a handle's buffers | the handles' bits | nothing |
 //!
-//! Its census arithmetic reads: "`ℤ/2^128` ring words under the l1 certificate, extended to a word
-//! times a carrier word; lattice coordinates in signed 64-bit words; the only rounding is the
-//! nearest-point split, its remainder carried (ticks) or bounded by half a unit (charts); every
-//! refusal reported".
+//! Its census arithmetic reads: "exact integers on the card: `ℤ/2^128` ring words under the l1
+//! certificate, lattice coordinates in signed 64-bit words, the nearest-point split with its
+//! remainder carried; ℚ and ℚ(θ) on the host; every refusal reported". A declaration the card's
+//! dyadic words cannot carry is refused at the plan, never rounded: a hop that is not a power of
+//! two, a non-dyadic admittance, an exponent past the carrier (a shielded contact whose `G/2h` lies
+//! below `2^(−100)` would shift a state past `2^127`).
 //!
 //! # Port records (#76)
 //!
@@ -100,6 +99,7 @@
 //! | none (new) | `kernels/hnn.cu::hnn_moment_ingest`, [`moment`] | `SourceMoment::ingest` with `Field::selective_step` | `tests::moment_ingest_matches_the_host_moment`, `tests::campaign_one_reads_and_ingest_match_the_host` (GPU) |
 //! | none (new) | `kernels/hnn.cu::{hnn_word_tick, hnn_word_adjoint_tick}`, `exact_integer.cuh::hnn_nearest`, [`word`] | Lean `HNN/LatticeWord.{feedback_tick, feedback_accounting, executed_adjoint_pairing}` | `word_tests::the_tick_accounts_exactly`; GPU: `word_tick_matches_the_oracle_on_small_fixtures`, `word_tick_accounting_holds_on_the_card`, `word_ticks_match_the_oracle_at_campaign_one_shapes`, `resident_word_equals_the_oracle_word_and_is_measured` |
 //! | none (new; history's float proposal is not ported, below) | `kernels/hnn.cu::{hnn_inverse_residual, hnn_inverse_refine, hnn_inverse_certificate}`, `exact_integer.cuh::hnn_bounded_product`, [`word`] | Lean `HNN/LatticeWord.{nsStep, newton_schulz_right, rounded_refinement_certificate, warm_start_certificate}` | GPU: `word_tests::newton_schulz_matches_the_oracle_on_small_fixtures`, `newton_schulz_matches_the_oracle_at_campaign_one_shapes` |
+//! | none (new) | `kernels/hnn_word.cuh::{hnn_word_forward, hnn_word_reverse, hnn_pair_weights, hnn_copy_words, hnn_scatter_words}`, [`port`] | `holonics::hnn::{word::Word, port::Word::pull_back, receiving::ReceivingPhases::read, moment::SourceMoment::open_storage, chart::refine}` and the reference's `ExecutionPort` | GPU: `port_tests::the_card_port_returns_the_reference_on_{the_chain, a_generic_constitution, campaign_one, the_standing_cut}`, `the_card_port_refuses_as_the_reference` |
 //!
 //! **Not ported**, with the reason:
 //! - `kernels/enclosure_cayley.cuh`: its Cayley step proposes by a double-precision LU, a float
@@ -121,10 +121,18 @@
 #![deny(clippy::float_arithmetic)]
 
 pub mod card;
+mod dyadic;
+mod execute;
 pub mod lattice;
 pub mod moment;
+pub mod port;
+mod publication;
+mod readout;
+mod store;
 pub mod word;
 
+#[cfg(test)]
+mod port_tests;
 #[cfg(test)]
 mod tests;
 #[cfg(test)]
@@ -132,10 +140,11 @@ mod word_tests;
 
 pub use card::{
     Card, CardBuffer, DeviceCensus, EntryCensus, KERNELS, Layout, Operand, Realization,
-    certificate_layout, ingest_layout, read_layout,
+    certificate_layout, copy_layout, ingest_layout, read_layout, word_layout,
 };
 pub use lattice::{Gather, LatticeCoordinates, LatticeRead, ResidentLattice, ResidentRead};
-pub use moment::{MomentCounts, ResidentMoment};
+pub use moment::{MomentCounts, MomentSnapshot, ResidentMoment};
+pub use port::{Mounted, Resident, Traffic};
 pub use word::{
     CarryRelease, Certificate, ChartRelease, InversePair, Orientation, Refusal, ResidentCarry,
     ResidentCharts, ResidentInverses, WordChart, WordGraph,

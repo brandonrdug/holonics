@@ -342,6 +342,40 @@ impl<'c> ResidentMoment<'c> {
             .collect())
     }
 
+    /// **A copy of the counts frozen at the cut, on the card** (a pending ratio's operand: the
+    /// host's `PendingRatio` copies the moment's counts at its cut, and its later reads read that
+    /// copy, never the moment that later ingests extend). Nothing crosses the bus.
+    pub fn snapshot(&self) -> Result<MomentSnapshot<'c>, DeviceError> {
+        let card = self.card;
+        let first = card.alloc::<u64>(self.first.len())?;
+        let paired = card.alloc::<u64>(self.paired.len())?;
+        card.copy_within(&self.first, 0, &first, 0, self.first.len())?;
+        card.copy_within(&self.paired, 0, &paired, 0, self.paired.len())?;
+        Ok(MomentSnapshot {
+            first,
+            paired,
+            first_base: self.first_base.clone(),
+            paired_base: self.paired_base.clone(),
+            offsets: self.offsets.len(),
+            cells: self.cells,
+        })
+    }
+
+    /// **Re-key the rings' phase classes** at a lift point (`Current::rekey` moved only phase
+    /// classes; the counts and the window are untouched): the phases written (a transfer of one
+    /// word per ring) and the lift kept.
+    pub fn rekey(&mut self, field: &Field, current: &Current) -> Result<(), DeviceError> {
+        let phases = (0..field.rings().len())
+            .map(|g| {
+                let phase = current.phase(field, g)?;
+                Ok(u32::try_from(phase).expect("a phase lies below its period"))
+            })
+            .collect::<Result<Vec<u32>, DeviceError>>()?;
+        self.card.write(&self.phases, 0, &phases)?;
+        self.lift = current.lift().to_vec();
+        Ok(())
+    }
+
     /// **The phase rows `M_g[c]` of a source ring as a resident operand**: `d_g` vectors of `|A|`
     /// counts at `L_x = 0`, read as signed 64-bit words under the moment's word certificate.
     pub fn phase_operand(&self, ring: usize) -> Result<Operand<'_>, DeviceError> {
@@ -355,5 +389,45 @@ impl<'c> ResidentMoment<'c> {
             exponent: 0,
             _borrow: PhantomData,
         })
+    }
+}
+
+/// [definition] **A moment's counts frozen at a cut, resident on the card**
+/// ([`ResidentMoment::snapshot`]): the phase-binned and offset counts of every source ring, laid
+/// out as the moment's, and the cells they count.
+pub struct MomentSnapshot<'c> {
+    first: CardBuffer<'c, u64>,
+    paired: CardBuffer<'c, u64>,
+    first_base: Vec<u64>,
+    paired_base: Vec<u64>,
+    offsets: usize,
+    cells: u64,
+}
+
+impl MomentSnapshot<'_> {
+    /// The cells the frozen counts count.
+    pub fn cells(&self) -> u64 {
+        self.cells
+    }
+
+    /// Source `s`'s phase rows' base in the phase-binned counts.
+    pub(crate) fn first_base(&self, source: usize) -> u64 {
+        self.first_base[source]
+    }
+
+    /// Source `s`'s offset block's base at its `o`-th declared offset.
+    pub(crate) fn paired_base(&self, source: usize, offset: usize) -> u64 {
+        self.paired_base[source * self.offsets + offset]
+    }
+
+    /// The phase-binned counts on the card.
+    pub(crate) fn first_pointer(&self) -> crate::ffi::CUdeviceptr {
+        self.first.device_ptr()
+    }
+
+    /// Source `s`'s offset block at its `o`-th declared offset, on the card.
+    pub(crate) fn paired_pointer(&self, source: usize, offset: usize) -> crate::ffi::CUdeviceptr {
+        self.paired.device_ptr()
+            + self.paired_base(source, offset) * core::mem::size_of::<u64>() as u64
     }
 }
