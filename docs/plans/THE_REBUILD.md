@@ -1864,6 +1864,22 @@ regression controls are controls, never milestones:
     - the moment's bits against `n*`;
     - the released dimension at each aeon boundary.
 
+#### Campaign 1's repair (after its located failure)
+
+[definition; agent-inferred] Campaign 1's exposure failed design (f) and its cause is located
+([record](../../research/records/2026-09-25_CAMPAIGN_ONE_LOCATED_FAILURE.md)). Campaign 2's laws
+touch none of the three missing terms, and every later campaign is judged against the same online
+order-0, so the repair precedes campaign 2:
+- **the normal law's target:** an exogenous target in `B` (the comparison's own target face), so
+  the starting prior is divided by the growing Gram instead of kept at full weight (2.55 bits);
+- **the face's standing read:** the receiving face reads a standing value, not only the change
+  (0.25 bits);
+- **the source's index:** the moment's open reads the window's index (the preceding cells), not
+  only its table of counts, normalized by the population.
+
+Each lands Lean first with its consumer, and the exposure is re-run on the standing real cut,
+resident on the card.
+
 #### Campaign 2. Rings and contacts store, lock and flow
 
 - **Laws:** Lean item 8, and:

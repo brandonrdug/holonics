@@ -25,3 +25,10 @@ path = "../../research/notebook/hnn_design/hnn_lattice_growth.rs"
 [[example]]
 name = "hnn_exposure"
 path = "../../research/notebook/hnn_design/hnn_exposure.rs"
+
+# The notebook's diagnostics of campaign 1's failure on the standing real cut (review E1: the
+# located cause before campaign 2; research/notebook/hnn_design/README.md): a measurement run once
+# in release, never a test.
+[[example]]
+name = "hnn_diagnose"
+path = "../../research/notebook/hnn_design/hnn_diagnose.rs"
