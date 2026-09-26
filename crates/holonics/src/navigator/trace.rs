@@ -11,8 +11,8 @@
 //! |---|---|
 //! | `Geometry/LocalFactor.companion`, `theLocalFactorIsTheTransferDeterminant` | [`SiteFactor`] |
 //! | `Geometry/TraceSequence.trace`, `LocalFactor.theCompanionPowersCarryTheSequence` | [`SiteFactor::trace_sequence`] |
-//! | `Transport/GeneratorTraceFaces.machine_factor_of_companions`, `machine_trace_sequence` | [`Machine`] |
-//! | `Transport/GeneratorTraceFaces.carried_material_conserves_{determinant,trace_sequence,transfer_determinant}` | tests |
+//! | `Transport/NavigatorTraceFaces.machine_factor_of_companions`, `machine_trace_sequence` | [`Machine`] |
+//! | `Transport/NavigatorTraceFaces.carried_material_conserves_{determinant,trace_sequence,transfer_determinant}` | tests |
 //! | `Compression/Landmark/SiteKind.Kind`, `siteKind`, `siteKind_eq_{reflection,degenerate,rotation,null,boost}_iff` | [`SiteKind`], [`SiteFactor::kind`] |
 
 use crate::ratio::Rat;
@@ -44,7 +44,7 @@ pub enum SiteKind {
 /// [definition] One site of the machine, read through its two conserved faces: the trace `a` and
 /// the determinant `q` of its transfer material. Lean: `LocalFactor.companion` and
 /// `theCompanionHasTraceAndDeterminant`; both faces are conserved by phase carriage
-/// (`GeneratorTraceFaces.carried_material_conserves_determinant`, `..._trace_sequence`).
+/// (`NavigatorTraceFaces.carried_material_conserves_determinant`, `..._trace_sequence`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SiteFactor {
     trace: Rat,
@@ -123,7 +123,7 @@ impl SiteFactor {
 }
 
 /// [definition] A machine of independent sites: the block-diagonal material of
-/// `GeneratorTraceFaces`. Its transfer determinant is the product of the site factors and its
+/// `NavigatorTraceFaces`. Its transfer determinant is the product of the site factors and its
 /// closed-word count is the sum of the site trace sequences.
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
 pub struct Machine {
@@ -140,7 +140,7 @@ impl Machine {
     }
 
     /// The exact coefficient vector of `∏_g (1 − a_g T + q_g T²)`, lowest power first, of length
-    /// `2·sites + 1`. Lean: `GeneratorTraceFaces.machine_factor_of_companions`.
+    /// `2·sites + 1`. Lean: `NavigatorTraceFaces.machine_factor_of_companions`.
     ///
     /// Cost: one convolution per site, quadratic in the site count.
     pub fn transfer_determinant(&self) -> Vec<Rat> {
@@ -159,7 +159,7 @@ impl Machine {
     }
 
     /// The machine's closed-word count through index `degree`: the sum of the site trace
-    /// sequences. Lean: `GeneratorTraceFaces.machine_trace_sequence`.
+    /// sequences. Lean: `NavigatorTraceFaces.machine_trace_sequence`.
     pub fn trace_sequence(&self, degree: usize) -> Vec<Rat> {
         let mut total = vec![Rat::zero(); degree + 1];
         for site in &self.sites {

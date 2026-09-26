@@ -148,7 +148,7 @@ impl Reading {
 
     /// **Each whole winding is one lossless jump** of a navigator's lifted phase: the lift counts
     /// the windings and its chart point is unchanged (Lean `Winding.jump_iterate`, over
-    /// `Holon/Generator.LiftedPhase.jump`). The open phase stays with the reading: the carrier
+    /// `Holon/Navigator.LiftedPhase.jump`). The open phase stays with the reading: the carrier
     /// reads only the open phase (`carrier_reads_only_open_phase`).
     pub fn wind(&self, lift: &PhaseLift) -> PhaseLift {
         PhaseLift::new(lift.phase().clone(), lift.winding() + &self.windings)

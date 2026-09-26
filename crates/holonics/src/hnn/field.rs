@@ -54,7 +54,7 @@
 //! | `HNN/Keys.selective_step_dormant`, `HNN/Moment.selective_position` | [`Field::selective_step`] |
 //! | `Aeon/Clock/Winding.clockLift` | [`Field::parametric`] |
 //! | `Holon/Complex` (`∂∘∂ = 0`) | [`Field::complex`] |
-//! | `Holon/Generator.{mapRotor_order, map_pow_mod_order}` | [`Ring::navigator`], [`Ring::rotate`] |
+//! | `Holon/Navigator.{mapRotor_order, map_pow_mod_order}` | [`Ring::navigator`], [`Ring::rotate`] |
 //! | `Holon/Complex.{blockIncidence, block_cell_curvature, block_flat_closed}` | [`Field::connection`], consumed by [`Field::contrast`] |
 //! | `Holarchy/Join.interconnect`, `Holon/Dirac.kirchhoff_isDirac`, `Holarchy/Join.Holarchy.parametric` | [`Field::holon`] (certified at the mount) |
 //! | `HNN/Propagation.partialIsometry_transit` | [`Field::connection`]'s blocks `U_aᵀ`, read by [`Field::contrast`] and by the transit's channel selections ([`Contact::selection`]) |
@@ -648,7 +648,7 @@ impl Ring {
     }
 
     /// **`P_g^k` on the realified ring**: the navigator's map to the power `k`, read modulo its
-    /// order (Lean `Holon/Generator.map_pow_mod_order`), carries node `i`'s two coordinates to node
+    /// order (Lean `Holon/Navigator.map_pow_mod_order`), carries node `i`'s two coordinates to node
     /// `P_g^k(i)`.
     pub fn rotate(&self, vector: &[Rat], k: &BigInt) -> Vec<Rat> {
         let (shift, _) = phase_winding(k, self.period);

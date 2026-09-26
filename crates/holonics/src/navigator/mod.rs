@@ -3,7 +3,7 @@
 //! [definition] A navigator is a transport with an **initial configuration** (the key) and its
 //! own clock ([objects §3](../../../../docs/ELEMENTARY_OBJECTS.md#3-navigator)); it acts on Holons
 //! and its adjoint carries the learning covector. Its phase is lifted, `θ̃ = θ + 2πn`
-//! (Lean `Holon/Generator.LiftedPhase`, chart `LiftedPhase.chart`); the clock jump at a section
+//! (Lean `Holon/Navigator.LiftedPhase`, chart `LiftedPhase.chart`); the clock jump at a section
 //! crossing (`LiftedPhase.jump`) advances the winding by one and leaves the chart phase unchanged,
 //! so every storage read through the chart is unchanged (`jump_lossless`) while the lift retains
 //! the turn (`jump_carries_winding`). Jump counts are carries and compose as a cocycle
@@ -27,7 +27,7 @@
 //! `−1`, so an even period, and the half-turn itself, is no flow's tick. Its order is the least
 //! common multiple of its cycle lengths ([`Transport::order`]); its powers read only the tick's
 //! class modulo that order, so a whole turn moves nothing and the winding is the lift's alone
-//! (Lean `Holon/Generator.map_pow_mod_order`, `map_turn_lossless`); two maps on one port chart
+//! (Lean `Holon/Navigator.map_pow_mod_order`, `map_turn_lossless`); two maps on one port chart
 //! compose to a map ([`Transport::compose`], `map_compose_order_pos`, and for commuting maps
 //! `map_compose_order_dvd`). The rotor `(· + 1)` of a ring of period `d` has order exactly `d`
 //! ([`Navigator::rotor`], `mapRotor_order`).
@@ -147,7 +147,7 @@ impl Clock {
     }
 
     /// Advance by `ticks`; returns the number of jumps this advance made
-    /// (`Holon/Generator.jumps_are_carries`). Cost is independent of `ticks`' magnitude.
+    /// (`Holon/Navigator.jumps_are_carries`). Cost is independent of `ticks`' magnitude.
     pub fn advance(&mut self, ticks: &BigUint) -> BigUint {
         let before = self.ticks.overflow_winding().clone();
         self.ticks.advance(ticks);
@@ -156,7 +156,7 @@ impl Clock {
 }
 
 /// [proved-derived; implemented-exact] **Jump counts compose as a cocycle** on a ring of period
-/// `n` (`Holon/Generator.jumps_are_carries`): returns whether
+/// `n` (`Holon/Navigator.jumps_are_carries`): returns whether
 /// `winding(a+b) = winding a + winding b + carry(a,b)`, the carry cocycle identity for `(a, b, c)`
 /// and `carry(a,b) ≤ 1` all hold.
 pub fn jump_cocycle(
@@ -173,7 +173,7 @@ pub fn jump_cocycle(
     Ok(additive && cocycle && bounded)
 }
 
-/// [definition] **A lifted phase** (`Holon/Generator.LiftedPhase`): the Cayley chart phase and
+/// [definition] **A lifted phase** (`Holon/Navigator.LiftedPhase`): the Cayley chart phase and
 /// the winding it has counted.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PhaseLift {
@@ -195,12 +195,12 @@ impl PhaseLift {
     }
 
     /// The chart point `(cos θ, sin θ)` on the rational unit circle
-    /// (`Holon/Generator.LiftedPhase.chart`).
+    /// (`Holon/Navigator.LiftedPhase.chart`).
     pub fn chart(&self) -> (Rat, Rat) {
         self.phase.chart()
     }
 
-    /// **The clock jump** (`Holon/Generator.LiftedPhase.jump`): a full turn is counted.
+    /// **The clock jump** (`Holon/Navigator.LiftedPhase.jump`): a full turn is counted.
     pub fn jump(&self) -> Self {
         Self {
             phase: self.phase.clone(),
@@ -217,8 +217,8 @@ impl PhaseLift {
     }
 
     /// [proved-derived; implemented-exact] **The jump is lossless** for a storage read through the
-    /// chart (`Holon/Generator.jump_lossless`), carries winding and yields a new lifted state
-    /// (`Holon/Generator.jump_carries_winding`).
+    /// chart (`Holon/Navigator.jump_lossless`), carries winding and yields a new lifted state
+    /// (`Holon/Navigator.jump_carries_winding`).
     pub fn jump_is_lossless(&self, storage: impl Fn(&(Rat, Rat)) -> Rat) -> bool {
         let jumped = self.jump();
         storage(&jumped.chart()) == storage(&self.chart())
@@ -255,7 +255,7 @@ impl Transport {
     }
 
     /// **The order of a finite-order map**: the least common multiple of its cycle lengths, the
-    /// period of its powers (Lean `Holon/Generator.map_order_pos`). A flow declares no order: its
+    /// period of its powers (Lean `Holon/Navigator.map_order_pos`). A flow declares no order: its
     /// Cayley step's powers are not claimed periodic.
     pub fn order(&self) -> Option<BigUint> {
         match self {
@@ -265,7 +265,7 @@ impl Transport {
     }
 
     /// **Two maps compose to a map**: `self ∘ other`, the permutation `x ↦ self(other(x))`, again
-    /// of finite order (Lean `Holon/Generator.map_compose_order_pos`; for commuting maps its order
+    /// of finite order (Lean `Holon/Navigator.map_compose_order_pos`; for commuting maps its order
     /// divides the least common multiple, `map_compose_order_dvd`). Refused for a flow, whose
     /// composite is not a transport of this form, and for maps on different port charts.
     pub fn compose(&self, other: &Self) -> Result<Self, HolonError> {
@@ -429,7 +429,7 @@ impl Navigator {
     }
 
     /// [definition] **The closing rotor of a ring of period `d ≥ 2`**: the map `(· + 1)` on `ℤ/d`
-    /// (order exactly `d`, Lean `Holon/Generator.mapRotor_order`), its key the port `key` as the
+    /// (order exactly `d`, Lean `Holon/Navigator.mapRotor_order`), its key the port `key` as the
     /// one-hot configuration `e_key ∈ ℚ^d`, its clock a ring of period `d` and step `h`, and its
     /// lift at rest (phase `0`, no winding). The rotor's powers are its phase classes.
     pub fn rotor(period: u64, key: u64, step: Rat) -> Result<Self, HolonError> {
@@ -466,7 +466,7 @@ impl Navigator {
     }
 
     /// **The port the navigator sits on after `ticks`**: its key's port carried by the map's
-    /// `ticks`-th power, read modulo the order (Lean `Holon/Generator.map_pow_mod_order`); `None`
+    /// `ticks`-th power, read modulo the order (Lean `Holon/Navigator.map_pow_mod_order`); `None`
     /// for a flow, or a key that is not one port.
     pub fn port_after(&self, ticks: &BigUint) -> Option<usize> {
         let map = self.map()?;
@@ -558,7 +558,7 @@ impl Navigator {
 
     /// Advance `ticks` ticks from `configuration`, counting the clock's jumps into the winding of
     /// the phase lift. Only the reached configuration is returned. A map advances by its
-    /// `ticks`-th power at once, read modulo its order (Lean `Holon/Generator.map_turn_lossless`).
+    /// `ticks`-th power at once, read modulo its order (Lean `Holon/Navigator.map_turn_lossless`).
     pub fn advance(
         &mut self,
         configuration: &[Rat],
@@ -599,7 +599,7 @@ mod tests {
         PhaseLift::new(RationalPhase::new(rat(1, 2), 0), BigInt::zero())
     }
 
-    /// `Holon/Generator.jump_lossless`, `Holon/Generator.jump_carries_winding`.
+    /// `Holon/Navigator.jump_lossless`, `Holon/Navigator.jump_carries_winding`.
     #[test]
     fn the_clock_jump_is_lossless_and_carries_winding() {
         let p = lift();
@@ -610,7 +610,7 @@ mod tests {
         assert_eq!(p.jump().chart(), p.chart());
     }
 
-    /// `Holon/Generator.jumps_are_carries` over the owner's carries.
+    /// `Holon/Navigator.jumps_are_carries` over the owner's carries.
     #[test]
     fn jumps_are_carries_and_compose_as_a_cocycle() {
         let n = BigUint::from(5u32);
@@ -645,7 +645,7 @@ mod tests {
         assert!(Clock::unwound(Rat::zero()).is_err());
     }
 
-    /// `Holon/Generator.{map_pow_mod_order, map_turn_lossless, mapRotor_order,
+    /// `Holon/Navigator.{map_pow_mod_order, map_turn_lossless, mapRotor_order,
     /// map_compose_order_pos}`: the rotor of an even period (no Cayley step reaches it) has order
     /// exactly its period, a whole turn moves nothing while the lift counts it, its powers read the
     /// tick's class, and two maps compose to a map whose order divides the lcm when they commute.

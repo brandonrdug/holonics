@@ -71,10 +71,15 @@ Frobenius norm `frobSq`; a certificate is a declared rational bound, never a flo
    `W' = W + wγ g fᵀ X̂`, `W'H' − B' = −wγ g fᵀ(1 − X̂H')`, the left residual of the chart of
    `H'⁻¹`; with the exact inverse it is `HNN/Normal.normal_prox_step`.
 
-[open] Owed in #62 ("Step 4 (#73) owed"): the balance of the full element with its passive part
-and contrast port (`HNN/Word.reaction_stage_balance`) at an executed chart, and the counterfactual
-bound of the carried transient against the exact word's trajectory, which needs a sensitivity
-bound of the tick map (as `Objects/CommitRebase.commit_chain_residual` does for commits).
+The balance of the full element with its passive part and contrast port at an executed chart is
+`HNN/Word.element_executed_balance` (campaign 2): for any executed output `ŝ′`,
+`½|ŝ′|² − ½|b|² = ⟨x̄, W_s x̄⟩ + ⟨x̄, W_c c⟩ + ⟨x̄, e⟩` with `e` the chart's equation residual,
+`reaction_stage_balance` at `e = 0`; the word's executed field balance with every defect is
+`HNN/Word.field_executed_balance_with_defects`.
+
+[open] Owed in #62 ("Step 4 (#73) owed"): the counterfactual bound of the carried transient
+against the exact word's trajectory, which needs a sensitivity bound of the tick map (as
+`Objects/CommitRebase.commit_chain_residual` does for commits).
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
