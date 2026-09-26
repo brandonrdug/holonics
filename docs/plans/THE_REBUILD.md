@@ -2060,9 +2060,14 @@ receiving law. It is judged by what they add that the tree does not already say 
 - **Done when**, on the standing real cut. Every feature family, grain, depth, carrier width and
   law choice is fixed on the development cells, and each is charged its description bits. Then one
   prequential held-out pass runs, host and card. On the same cells, by disjoint exact enclosures:
-  - `Δ_tree = L_(tree+letters) − L_(tree, cells) + description(letters, tree law) < 0`; or the
-    charged incremental wave gain `L_(tree+letters) − L_mixture − description(wave laws)` exceeds
-    campaign 1's `5 − 13/16 − ε` on the same tree reference;
+  - `Δ_letters = L_(tree+letters) − L_(tree+control) + description(letters) < 0`, against a
+    constant-slot control of the same slot count and derived widths; or the charged incremental
+    wave gain `L_(tree+letters) − L_mixture − description(wave laws)` exceeds campaign 1's
+    `5 − 13/16 − ε` on the same tree reference. [historical] The first rule compared against the
+    cell-only tree (`Δ_tree`). A development run showed that constant slots alone reweight the
+    tree and score below it, so a letter that carries no information met that rule. The control
+    rule replaced it after that run and before any held-out reading, and it is disclosed here as
+    Decision 30's rule was;
   - the total model comparison against campaign 1 is reported;
   - the balances close with their certified defects at every word, the host and card are in parity,
     and the cost receipts are reported. These are completion gates: a code-length win does not
