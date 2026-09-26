@@ -2954,3 +2954,52 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
     tree alone, charged; then one held-out pass, host and card.
 
     Source: agent-inferred, from campaigns 1 and 2 and Brandon's direction.
+
+    **Measured (September 26): negative.**
+    - **The law as built** (`hnn::born`, Lean `HNN/BornFace`).
+      - The state is kept pure (a ray over the Gaussian integers), opened at the ring's harmonic
+        mode.
+      - The executed digit split sits on `2^(−M)`, so the cell's face is an exact dyadic partition.
+      - The tick is the identity: every fixed unitary is absorbed exactly into the first digit's
+        operators (`born_tick_absorbed`).
+      - The opening operators are the Walsh–Hadamard unitary with declared signs.
+      - Learning is Fisher scoring through the normal law's prox step.
+      - `born_interference_zero` exhibits two operators whose masses cancel to zero, a zero no
+        nonnegative receiver can make.
+    - **The sweep.** On the development cells, 18 members were tried (two emissions and
+      `χ = 1, …, 256`, charged 5 bits).
+      - The best Born face, one operator pair per dyadic cell at `χ = 128`, reads `4 + 3/16 + ε`
+        bits a cell. That is below order-0 and order-1 and above PPM-2 and the tree
+        (`3 + 10/16 + ε`).
+      - Every mixture with the tree codes `6 + 0/16 + ε` bits above the tree: the mixture's prior
+        bit plus the charge.
+      - No held-out pass ran.
+    - **What it located.** Decision 30's mixture telescopes over the passage to `½W_T + ½W_B`.
+      - It earns only when the second face beats the tree over the *whole* passage.
+      - A face that is better only in some contexts or epochs can never earn. That is why the wave
+        earned only its few bits.
+      - The weighing law, not only the wave, limits the machine.
+
+34. **Weighing is local: every face is weighed at each landmark, in each digit tree and across
+    epochs, by its own evidence there.** Decisions 30, 32 and 33 located one limit. A global
+    mixture of whole passages cannot use a face that is better only in some contexts or epochs.
+    Campaign 2's controls found 133 development bits that are a stop weight chosen per digit tree,
+    and the wave and the Born face lose globally while possibly winning locally. Decision 28's own
+    law already weighs locally inside the tree: each landmark weighs its face against its split by
+    that landmark's evidence. The same law extends to every face.
+    - **At each landmark.** A node's own face becomes the node-level mixture of its KT face and each
+      admitted external face (the wave's, the Born face's), weighted by that node's own likelihood
+      ratio. It stays normalized and Kraft-complete, and each node pays at most `−log₂` of its
+      prior weight.
+    - **In each digit tree.** Each dyadic cell mixes the declared stop weights by its own evidence:
+      Decision 32's measured lead.
+    - **Across epochs.** A switching (fixed-share) mixture lets the weights move between epochs of
+      the passage, at a declared price per switch.
+    - **The first falsifiable landmark.** On the development cells, the per-cell oracle
+      `Σ_t min(ℓ_T(t), ℓ_X(t)) − L_T` bounds what any local mixture of the tree with face `X` can
+      gain before its price. If it does not exceed the price, the local law is refused for that
+      face.
+    - **Success.** A local law that codes below the tree on the development cells, charged; then
+      one held-out pass, host and card.
+
+    Source: agent-inferred, from Decisions 30, 32 and 33, and from Decision 28's weighing law.
