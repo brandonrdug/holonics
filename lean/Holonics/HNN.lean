@@ -5,6 +5,9 @@ import Holonics.HNN.Normal
 import Holonics.HNN.LatticeDeposit
 import Holonics.HNN.LatticeWord
 import Holonics.HNN.Ratio
+import Holonics.HNN.TargetFace
+import Holonics.HNN.StandingRead
+import Holonics.HNN.IndexedOpen
 import Holonics.HNN.Retention
 import Holonics.HNN.Keys
 
@@ -23,6 +26,9 @@ design: the HNN law", table (b) rows 1–7, stated before their Rust owners in `
 | `HNN/LatticeDeposit` | 4. deposition on a declared carrier lattice with a carried remainder | `hnn::constitution::{Lattice, NormalLaw}` |
 | `HNN/LatticeWord` | Decision 24: transients and inverse charts on declared lattices, certified residuals | `hnn::{word, propagation, constitution}` |
 | `HNN/Ratio` | 5. the Holon ratio at the receiver's face, and the carried power | `hnn::ratio` |
+| `HNN/TargetFace` | Decision 26: the target's code face, the margin rule, the receiving locus's exogenous normal law | `hnn::{ratio, constitution}` |
+| `HNN/StandingRead` | Decision 26: the face reads the receiving parametron's bound harmonic coordinate | `hnn::receiving` |
+| `HNN/IndexedOpen` | Decision 26: the source opens on its indexed, normalized counts | `hnn::moment` |
 | `HNN/Retention` | 6. retention as the collapse onto what the admitted future distinguishes | `hnn::{retention, pending}` |
 | `HNN/Keys` | 7. keys by loop closure, and selective stepping | `hnn::keys` |
 -/
