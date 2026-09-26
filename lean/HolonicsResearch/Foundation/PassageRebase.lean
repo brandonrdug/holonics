@@ -20,7 +20,7 @@ That is the no-absolute-frame law arriving inside this development rather than b
 Every `theorem` here is discharged.
 -/
 
-namespace Holonics.Foundation.Rebase
+namespace Holonics.Foundation.PassageRebase
 
 open Holonics.Coupling.Triangle
 
@@ -119,4 +119,4 @@ def PassageRebase.id (A : AdditivePassage.{0}) : PassageRebase A A where
   realized_maps := by intro x hx; obtain ⟨y, hy, rfl⟩ := hx; exact hy
   admissible_maps := by intro x hx; obtain ⟨y, hy, rfl⟩ := hx; exact hy
 
-end Holonics.Foundation.Rebase
+end Holonics.Foundation.PassageRebase

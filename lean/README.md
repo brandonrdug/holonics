@@ -12,8 +12,11 @@ realization. The [framework guide](../docs/FORMAL_FRAMEWORK.md) explains the con
 it imports `Holonics`, and nothing in `Holonics` imports it. Both use the same subject
 subdirectories (`Foundation/`, `Geometry/`, `Physics/`, `Fluid/`, `Hodge/`, …), so a subject can
 span the two libraries. Declarations live under the namespace `Holonics`, and a module's namespace
-is `Holonics.<Subject>.<Name>`. Module names such as `Holon/Generator` and
-`Foundation/GeneratorInference` keep their spelling until step 7 renames the navigator owners.
+is `Holonics.<Subject>.<Name>`. Owners of the navigator (the fractal navigator of the elementary
+objects) carry its name (`Holon/Navigator`, `Foundation/NavigatorInference`,
+`Transport/NavigatorTraceFaces`, …); "generator" stays where it means a group or word-monoid
+generator (the `Generator` letters of transport words), the Lie generator `ξ` or a generating
+function.
 
 ## Import by mathematical subject
 
@@ -26,7 +29,7 @@ They add no axioms or alternative definitions.
 
 | Import under `Holonics.Framework` | Read it for |
 |---|---|
-| `HolonObject` | The Holon as one object: `Holon/{Port,Dirac,Complex,Element,Generator,Restriction,Law,Conformance,Deposition,Reaction,Cayley}` |
+| `HolonObject` | The Holon as one object: `Holon/{Port,Dirac,Complex,Element,Navigator,Restriction,Law,Conformance,Deposition,Reaction,Cayley}` |
 | `Objects` | The elementary objects' proved joins: `Objects/{Pairing,Deposition,Ratio,Parametron,RelativeCompleteness,…}` |
 | `Core` | Occurrences, holons, addressed interaction, receiver fibres, standing and release, natural charts and ordered transport |
 | `Geometry` | Orientation, constraints, lattices, screws, phase carry, pair resonance, recursive scale and curvature |

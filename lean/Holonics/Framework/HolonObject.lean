@@ -2,7 +2,7 @@ import Holonics.Holon.Port
 import Holonics.Holon.Dirac
 import Holonics.Holon.Complex
 import Holonics.Holon.Element
-import Holonics.Holon.Generator
+import Holonics.Holon.Navigator
 import Holonics.Holon.Restriction
 import Holonics.Holon.Law
 import Holonics.Holon.Conformance
@@ -18,7 +18,7 @@ import Holonics.Holon.MomentStorage
 [definition] The foundation of `docs/ELEMENTARY_OBJECTS.md` §"The Holon as one object": a Holon
 is its law and ports — complex and connection (`Holon.Complex`), ports and power (`Holon.Port`),
 Dirac interconnection (`Holon.Dirac`), element relations and balances (`Holon.Element`),
-generators and clock jumps (`Holon.Generator`), restrictions (`Holon.Restriction`), the five laws
+generators and clock jumps (`Holon.Navigator`), restrictions (`Holon.Restriction`), the five laws
 (`Holon.Law`), the existing owners as instances (`Holon.Conformance`) deposition under
 learning (`Holon.Deposition`) the workless reaction (`Holon.Reaction`), its implicit
 Cayley step (`Holon.Cayley`) and the lossless unit-admittance contact of a current with an affine

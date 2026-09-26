@@ -1,4 +1,4 @@
-import Holonics.Transport.GeneratorTraceFaces
+import Holonics.Transport.NavigatorTraceFaces
 import Holonics.Physics.CompositeMassEnergy
 import Mathlib.Tactic
 
@@ -7,7 +7,7 @@ import Mathlib.Tactic
 
 [definition] A navigator site is a two-state material `M` read through its two conserved faces,
 the trace `a = tr M` and the determinant `q = det M` (`Geometry/LocalFactor.companion`,
-`Transport/GeneratorTraceFaces`). Its factor is `1 − aT + qT²`, its characteristic polynomial is
+`Transport/NavigatorTraceFaces`). Its factor is `1 − aT + qT²`, its characteristic polynomial is
 `λ² − aλ + q` (`det_sub_eq`), and its **discriminant face** is `a² − 4q`. The null-cone record §4
 classifies a site of **positive determinant** by that face; a site of negative determinant
 reverses orientation (a reflection, such as the Swing) and a site of zero determinant is singular
@@ -48,7 +48,7 @@ material (`lorentz_factor_sq_smul`), and only at `det = 1` is `γ = tr/2`.
    (`boost_site_is_a_lorentz_boost`). The rational ratio `k = 3` gives `(γ, β) = (5/3, 4/5)`
    (`rational_doppler_three`).
 4. **Joined to the machine's trace faces.** The kind is conserved by phase carriage
-   (`carried_site_kind`, from `GeneratorTraceFaces`), and a companion site has its factor's kind
+   (`carried_site_kind`, from `NavigatorTraceFaces`), and a companion site has its factor's kind
    (`companion_siteKind`).
 5. **The trace counts of a determinant-one integer site.** With `t_n = tr(Mⁿ)` (the recurrence
    `Geometry/TraceSequence.trace`, `trace_pow_eq`), `|t_n| ≤ 2` for every `n` exactly when the
@@ -77,7 +77,7 @@ No `axiom`, no `sorry`.
 namespace Holonics.Compression.Landmark.SiteKind
 
 open Matrix
-open Holonics.Geometry.LocalFactor Holonics.Transport.GeneratorTraceFaces
+open Holonics.Geometry.LocalFactor Holonics.Transport.NavigatorTraceFaces
 open Holonics.Transport.HelicalPairInteraction
 
 /-! ## 1. The traceless part squares to the discriminant -/
@@ -544,7 +544,7 @@ section Joined
 variable {K : Type*} [Field K] [LinearOrder K]
 
 /-- [proved-derived; formal-checked] **Phase carriage conserves the site kind**, since it
-conserves the trace and the determinant (`GeneratorTraceFaces`). -/
+conserves the trace and the determinant (`NavigatorTraceFaces`). -/
 theorem carried_site_kind (S P : (Matrix (Fin 2) (Fin 2) K)ˣ) (d : ℤ) :
     siteKind ((phaseTransport S P d : (Matrix (Fin 2) (Fin 2) K)ˣ) : Matrix (Fin 2) (Fin 2) K).trace
         ((phaseTransport S P d : (Matrix (Fin 2) (Fin 2) K)ˣ) : Matrix (Fin 2) (Fin 2) K).det

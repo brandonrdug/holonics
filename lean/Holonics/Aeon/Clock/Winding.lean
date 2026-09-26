@@ -1,7 +1,7 @@
 import Holonics.Aeon.Clock.Reading
 import Holonics.Geometry.PhaseCarry
 import Holonics.Objects.Parametron
-import Holonics.Holon.Generator
+import Holonics.Holon.Navigator
 
 /-!
 # Windings and open phase: the lift of the clock torus, the quotient and the remainder
@@ -42,7 +42,7 @@ carry) and **open phase** `openPhase t = t − ⌊t⌋ ∈ [0, 1)` (the remainde
    `winding d (n k) + carry d r (n k)` times (`targetTicks_eq_windings_add_carry`), which is the
    whole windings of the reading counted from the last crossing and, for `d ≥ 2`, the owner's
    crossing count (`ownerCrossings_eq_windings`). Each whole winding is one lossless jump of the
-   navigator's lifted phase (`jump_iterate`, over `Holon/Generator.LiftedPhase.jump`), and the
+   navigator's lifted phase (`jump_iterate`, over `Holon/Navigator.LiftedPhase.jump`), and the
    phase carrier `e^{2πi t}` reads only the open phase (`carrier_reads_only_open_phase`).
 
 [definition] The torus itself is taken as the quotient of the lift (`torusPoint`); cycles on the

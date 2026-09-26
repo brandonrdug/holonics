@@ -81,7 +81,7 @@ ElementaryHolonics.Framework` passes at 9,206 jobs:
   mediant neighbours both, lies between and is the cheapest ratio in the gap; a unimodular
   rechart is invertible and conserves intersection numbers; the diagonal step generates the
   torus of two coprime circles.
-- [`Transport/GeneratorTraceFaces`](../../formal/elementary-holonics/ElementaryHolonics/Transport/GeneratorTraceFaces.lean):
+- [`Transport/NavigatorTraceFaces`](../../formal/elementary-holonics/ElementaryHolonics/Transport/NavigatorTraceFaces.lean):
   powers of carried material are carried powers; phase carriage conserves determinant, trace
   sequence and transfer determinant; a machine of independent sites has the product of the site
   factors and the sum of the site trace sequences.

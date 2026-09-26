@@ -18,7 +18,7 @@ preserved uncommitted operative-condition draft. It followed these sources:
 - The same directory's `main.typ`: complex Euler/NS, the omitted imaginary-field feedback,
   circulation, world-tube, contact/friction and cross-entropy differentials.
 - September 12's Transformer/fractal record and its four formal owners, especially
-  `Computation/AttentionModeCompression.lean` and `Foundation/GeneratorModeQuotient.lean`.
+  `Computation/AttentionModeCompression.lean` and `Foundation/NavigatorModeQuotient.lean`.
 - `exact_linear/kernel_modes.rs`, its callers, public exports, the three native session
   implementations, operative response/propagation and the coupled body's dispatch.
 - `Physics/ReflectedBoundaryMemory`, `PortEnergyHeat`, `CoupledIncidence`, and

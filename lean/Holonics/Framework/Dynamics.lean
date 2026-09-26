@@ -8,13 +8,13 @@ import Holonics.Transport.HolonicInteraction
 import Holonics.Transport.HolonicChain
 import Holonics.Transport.HelicalPairInteraction
 import Holonics.Transport.SerialScrewChain
-import Holonics.Transport.GeneratorMachineCharts
+import Holonics.Transport.NavigatorMachineCharts
 import Holonics.Transport.ContactFactorScale
 import Holonics.Transport.SourceMoment
 import Holonics.Transport.ReflectiveContinuation
 import Holonics.Transport.AffineJointBall
 import Holonics.Transport.PairJointBall
-import Holonics.Transport.GeneratorTraceFaces
+import Holonics.Transport.NavigatorTraceFaces
 import Holonics.Transport.CellHolonomy
 import Holonics.Mathematics.AffineOrbitDivisor
 import Holonics.Mathematics.AnalyticNavigation

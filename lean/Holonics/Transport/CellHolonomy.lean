@@ -1,5 +1,5 @@
 import Holonics.Foundation.HodgeReceiver
-import Holonics.Transport.GeneratorTraceFaces
+import Holonics.Transport.NavigatorTraceFaces
 import Mathlib.Tactic
 
 /-!

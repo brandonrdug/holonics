@@ -243,7 +243,7 @@ not establish that correspondence. The native chain consumer is #27 and the face
 [definition] The [winding guide](WINDING_CARRY_AND_PLACEMENT.md) continues these laws: the
 carry cocycle behind the winding (`Geometry/PhaseCarry`), a lock as the zero-power direction with
 its Farey address and mediant cost (`Geometry/PairResonance`), the determinant, trace sequence
-and transfer determinant that phase carriage conserves (`Transport/GeneratorTraceFaces`), and
+and transfer determinant that phase carriage conserves (`Transport/NavigatorTraceFaces`), and
 the holonomy of a cell with harmonic standing relative to node/cell receivers (`Transport/CellHolonomy`).
 `holonics::geometry::winding` (phase, carry, odometer, cell holonomy) and `holonics::navigator::{address,trace}` (lock addresses, trace faces) are their exact Rust owners.
 
@@ -301,10 +301,10 @@ the action and metric needed for each extension.
 | Required relation | Existing owner and consuming use |
 |---|---|
 | Phase closure, windings and arithmetic landmarks | `LandmarksAndModuli`, `Farey`, `Polarity`, the retired [`winding_inertia`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/winding_inertia.rs); period/modulus and doubled-angle relations already connect finite navigators to exact algebraic faces |
-| π/e as normalized generating constraints | `PiIterationConstraint`, `MachinPhaseConstraint`, the retired [`exact_analysis`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/exact_analysis.rs); [September 11 recovery](../research/records/2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md) retains branch, winding, independent navigators and remainder |
+| π/e as normalized generating constraints | `PiIterationConstraint`, `Compression/Landmark/ConstraintIdentity`, the retired [`exact_analysis`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/exact_analysis.rs); [September 11 recovery](../research/records/2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md) retains branch, winding, independent navigators and remainder |
 | Named critical parameter | The actual `CopsonDeBruijn*` or `Zeta/DeBruijn*` source family; [the maintained distinction](CONSTRAINT_MODES_AND_RECEIVER_FACES.md) prevents conflating the two constants |
-| Inferred navigator/factor family | `GeneratorInference`, `GeneratorFactorization`, `GeneratorObservationScope`, `holonics::ratio::linear` factor owners (the bilinear owner is [history](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/bilinear.rs)); supplied navigators and inferred parameters are stated separately |
-| Lossless continuation at the admitted receivers | `ReceiverHistoryCompression`, `GeneratorModeQuotient`, `JointReceiverDescent`, the retired [receiver factorization](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/contextual.rs); preserve `E T_g=U_g E` and the decoder, not merely a present rank |
+| Inferred navigator/factor family | `NavigatorInference`, `NavigatorFactorization`, `NavigatorObservationScope`, `holonics::ratio::linear` factor owners (the bilinear owner is [history](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/bilinear.rs)); supplied navigators and inferred parameters are stated separately |
+| Lossless continuation at the admitted receivers | `ReceiverHistoryCompression`, `NavigatorModeQuotient`, `JointReceiverDescent`, the retired [receiver factorization](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/contextual.rs); preserve `E T_g=U_g E` and the decoder, not merely a present rank |
 | Cost, mass and tolerance | `ReceiverCodeCost`, `AttentionModeCompression`, `AccumulatedReceiverDefect`; retain encoding/decoder work, complete class mass and transported residuals |
 
 [proved-derived] A useful helical compression bridge can be written now. For two situated initial

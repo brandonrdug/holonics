@@ -3,15 +3,15 @@ import Mathlib.Analysis.InnerProductSpace.GramMatrix
 import Mathlib.LinearAlgebra.ExteriorAlgebra.Basic
 
 /-!
-# Independent generator modes at a declared future receiver
+# Independent navigator modes at a declared future receiver
 
 The linear mode chart is an additional mathematical hypothesis. Alternation excludes a repeated
 or dependent direction as a new independent mode; it does not forbid multiple occurrences,
-nonunit amplitudes, or repeated application of a generator. Dynamic quotient exactness carries
+nonunit amplitudes, or repeated application of a navigator. Dynamic quotient exactness carries
 an eliminated source direction through the admitted future family.
 -/
 
-namespace Holonics.Foundation.GeneratorModeQuotient
+namespace Holonics.Foundation.NavigatorModeQuotient
 
 open scoped BigOperators
 open Holonics.Foundation.Chronology
@@ -73,8 +73,8 @@ theorem eliminated_mode_every_future (encode : V →ₗ[ℝ] Q)
 
 end Elimination
 
-/-- Exclusion of redundant representation does not make a generator's iteration idempotent. -/
-theorem repeated_generator_can_change_amplitude :
+/-- Exclusion of redundant representation does not make a navigator's iteration idempotent. -/
+theorem repeated_navigator_can_change_amplitude :
     let double : ℚ → ℚ := fun x => 2 * x
     double (double 1) ≠ double 1 := by norm_num
 
@@ -83,4 +83,4 @@ theorem repeated_generator_can_change_amplitude :
 #print axioms independent_mode_count_le
 #print axioms eliminated_mode_every_future
 
-end Holonics.Foundation.GeneratorModeQuotient
+end Holonics.Foundation.NavigatorModeQuotient

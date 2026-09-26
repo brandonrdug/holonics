@@ -367,7 +367,7 @@ constitutive flux laws.
 conditions. An encoding C admits decoder d_j and descended navigator U_i when
 `ρ_j=d_j C` and `C T_i=U_i C` for the admitted receiver and navigator family. The retained
 fibre describes differences behind the encoded face; it need not enumerate raw states.
-The existing `CausalRelevance`, `GeneratorModeQuotient`, boundary-scale and receiver-history
+The existing `CausalRelevance`, `NavigatorModeQuotient`, boundary-scale and receiver-history
 owners provide these relations at their stated domains.
 
 [proved-derived] Equality at one current receiver is insufficient if an admitted later

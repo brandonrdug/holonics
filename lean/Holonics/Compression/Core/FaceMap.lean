@@ -1,6 +1,6 @@
 import Holonics.Foundation.Standing
 import Holonics.Foundation.ReceiverQuotient
-import Holonics.Foundation.GeneratorModeQuotient
+import Holonics.Foundation.NavigatorModeQuotient
 import Holonics.Objects.Pairing
 import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 import Mathlib.LinearAlgebra.Dual.Lemmas
@@ -40,7 +40,7 @@ distinguishes after any word.
    retention (`kernelHistoryCompression`, `kernelClass_after_word`,
    `Foundation/ReceiverHistoryCompression`). A mode dependent at the future receiver differs from
    its elimination by a kernel element, and the elimination changes no future face
-   (`redundant_mode_in_kernel`, `eliminated_mode_same_future`, `Foundation/GeneratorModeQuotient`).
+   (`redundant_mode_in_kernel`, `eliminated_mode_same_future`, `Foundation/NavigatorModeQuotient`).
 2. **Finitely many observations read the kernel.** The horizon-`n` blind subspaces decrease, and
    once two consecutive ones agree they agree forever (`horizonBlind_stable_forever`). In finite
    dimension this happens by `n = dim X − 1`: either the present receivers are blind to all of `X`
@@ -495,9 +495,9 @@ variable {Navigator Receiver X V : Type u}
   [AddCommGroup X] [Module ℝ X] [AddCommGroup V] [Module ℝ V]
   (read : Receiver → X →ₗ[ℝ] V) (transport : Navigator → X →ₗ[ℝ] X)
 
-open Holonics.Foundation.GeneratorModeQuotient in
+open Holonics.Foundation.NavigatorModeQuotient in
 /-- [proved-derived; formal-checked] **Mode elimination is exact at the face map**
-(`GeneratorModeQuotient.eliminate_redundant_mode` with the face map as encoder): replacing a
+(`NavigatorModeQuotient.eliminate_redundant_mode` with the face map as encoder): replacing a
 dependent mode by its relation changes no future face at any receiver after any word. -/
 theorem eliminated_mode_same_future {Mode : Type*} [Fintype Mode] (modes : Mode → X) (extra : X)
     (relation coefficients : Mode → ℝ) (amplitude : ℝ)

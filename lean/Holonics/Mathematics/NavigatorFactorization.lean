@@ -2,16 +2,16 @@ import Mathlib
 import Holonics.Mathematics.RatioSeriesTransport
 
 /-!
-# Exact finite generator factorisation certificates
+# Exact finite navigator factorisation certificates
 
 This file records the elementary certificate used by a finite bilinear
-generator search.  The certificate is an equality of maps, so its proof does
+navigator search (the navigator is the found bilinear algorithm).  The certificate is an equality of maps, so its proof does
 not depend on a search procedure or on a choice of inverse.
 -/
 
 noncomputable section
 
-namespace Holonics.Mathematics.GeneratorFactorization
+namespace Holonics.Mathematics.NavigatorFactorization
 
 open Holonics.Mathematics.RatioSeriesTransport
 
@@ -211,4 +211,4 @@ theorem jetAct_step (z g dg : R) :
     jetAct z 1 g dg = (z * g, g + z * dg) := by
   simp [jetAct]
 
-end Holonics.Mathematics.GeneratorFactorization
+end Holonics.Mathematics.NavigatorFactorization

@@ -5,7 +5,7 @@ import Holonics.Computation.JointReceiverWitness
 import Holonics.Foundation.InformationReceiver
 import Holonics.Foundation.SituatedInformationRate
 import Holonics.Foundation.ReceiverCodeCost
-import Holonics.Foundation.GeneratorInference
+import Holonics.Foundation.NavigatorInference
 import Holonics.Foundation.SectionResidual
 import Holonics.Transport.GaussianRebase
 import Holonics.Computation.HolonicAdjointNormalization

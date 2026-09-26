@@ -1,21 +1,21 @@
 import Mathlib
 
 /-!
-# Generator admission and observation scope
+# Navigator admission and observation scope
 
-Finite observations constrain a family of possible generators. They do not identify a unique
+Finite observations constrain a family of possible navigators. They do not identify a unique
 continuation in an unrestricted family. A declared constitutive family can supply the missing
-constraint, and a source excitation can reveal previously invisible generator differences.
+constraint, and a source excitation can reveal previously invisible navigator differences.
 This is exterior verification, not an inference-time proof gate.
 -/
-namespace Holonics.Computation.GeneratorObservationScope
+namespace Holonics.Computation.NavigatorObservationScope
 
-abbrev Generator := ℕ → ℚ
+abbrev Navigator := ℕ → ℚ
 
-def compatible (population : Set Generator) (observed : Finset ℕ) (face : Generator) : Set Generator :=
+def compatible (population : Set Navigator) (observed : Finset ℕ) (face : Navigator) : Set Navigator :=
   { g | g ∈ population ∧ ∀ n ∈ observed, g n = face n }
 
-theorem more_observations_restrict (population : Set Generator) (face : Generator)
+theorem more_observations_restrict (population : Set Navigator) (face : Navigator)
     {old newer : Finset ℕ} (included : old ⊆ newer) :
     compatible population newer face ⊆ compatible population old face := by
   intro g hg
@@ -91,4 +91,4 @@ theorem arbitrarily_small_excitation_separates {left right : ℚ} (different : l
   exact ⟨bound / 2, half_pos, by linarith,
     nonzero_excitation_separates (ne_of_gt half_pos) different⟩
 
-end Holonics.Computation.GeneratorObservationScope
+end Holonics.Computation.NavigatorObservationScope

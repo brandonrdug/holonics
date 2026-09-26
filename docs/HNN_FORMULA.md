@@ -798,7 +798,7 @@ The inference face factors through pairwise objective differences, so a candidat
 offset is the same gauge as above. A sufficient statistic with a closed update is a
 `ReceiverHistoryCompression`, keeping every admitted future inference without recovering the past;
 coarse candidate classes carry their summed fibre mass with log-sum-exp cost. Owner:
-[`Foundation/GeneratorInference`](../lean/Holonics/Foundation/GeneratorInference.lean)
+[`Foundation/NavigatorInference`](../lean/Holonics/Foundation/NavigatorInference.lean)
 (`variational_minimum`), with the
 [September 12 record](../research/records/2026-09-12_GENERATOR_INFERENCE_CODES_FREE_ENERGY_AND_SUFFICIENT_CONTINUATION.md).
 This is navigator inference priced as description plus work.

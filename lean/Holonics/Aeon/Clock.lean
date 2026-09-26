@@ -22,7 +22,7 @@ a receiver's clock with an aeon; no clock is privileged.
 - `Aeon/Clock/Winding`: the lift `clockLift ι` of the clock torus of any navigator family,
   whole windings and open phase,
   the carry cocycle, agreement with `Geometry/PhaseCarry`, the rational clock passage and
-  `Objects/Parametron` ticks, and the navigator's lossless jumps (`Holon/Generator`).
+  `Objects/Parametron` ticks, and the navigator's lossless jumps (`Holon/Navigator`).
 - `Aeon/Clock/Lock`: two clocks, the Farey lock with the pair contact's no-slip reading, a
   two-clock cycle as a closed loop of the clock torus, and the convergent near-returns with the
   `Geometry/PairResonance` mediant cost.

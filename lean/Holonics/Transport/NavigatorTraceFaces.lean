@@ -5,7 +5,7 @@ import Mathlib.LinearAlgebra.Matrix.Trace
 import Mathlib.Tactic
 
 /-!
-# Generator trace faces: what phase carriage conserves, and the machine's transfer determinant
+# Navigator trace faces: what phase carriage conserves, and the machine's transfer determinant
 
 [definition] A site's material is a matrix. Carrying it to another phase conjugates it, so every
 class function of the material is a face conserved along the winding: its determinant, its
@@ -23,7 +23,7 @@ about where the zeros of such a product lie are outside this module. No `axiom`,
 open scoped BigOperators Matrix
 open Matrix
 
-namespace Holonics.Transport.GeneratorTraceFaces
+namespace Holonics.Transport.NavigatorTraceFaces
 
 open Holonics.Transport.HelicalPairInteraction
 open Holonics.Geometry.LocalFactor
@@ -175,4 +175,4 @@ theorem identityTwo_and_unipotentTwo_are_separated_by_source_receiver :
   norm_num [identityTwo, unipotentTwo, sourceE₂, Matrix.mulVec, dotProduct,
     Fin.sum_univ_two]
 
-end Holonics.Transport.GeneratorTraceFaces
+end Holonics.Transport.NavigatorTraceFaces

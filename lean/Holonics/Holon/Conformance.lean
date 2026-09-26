@@ -1,6 +1,6 @@
 import Holonics.Holon.Law
 import Holonics.Holon.Complex
-import Holonics.Holon.Generator
+import Holonics.Holon.Navigator
 import Holonics.Transport.HolonicInteraction
 import Holonics.Objects.Pairing
 

@@ -79,7 +79,7 @@ carry), [`Transport/CellHolonomy`](../../lean/Holonics/Transport/CellHolonomy.le
 (cycles, holonomy), [`Objects/Pairing`](../../lean/Holonics/Objects/Pairing.lean),
 [`Objects/Parametron`](../../lean/Holonics/Objects/Parametron.lean) (ring crossings as
 clock ticks), [`Physics/ObserverBoundaryCurrent`](../../lean/Holonics/Physics/ObserverBoundaryCurrent.lean)
-(the observer covector), [`Transport/GeneratorTraceFaces`](../../lean/Holonics/Transport/GeneratorTraceFaces.lean)
+(the observer covector), [`Transport/NavigatorTraceFaces`](../../lean/Holonics/Transport/NavigatorTraceFaces.lean)
 (trace faces for the zeta); Rust `holonics::geometry::winding` (`Odometer` as a tower of epochs,
 `LockAddress`). `Holonics.Aeon` and `holonics::aeon` are rebuild step 2 targets (#72); their
 Lean obligations join #62.
@@ -157,7 +157,7 @@ turns) and [the circulating cartographer](../../docs/canon/TABLET_THE_CIRCULATIN
 - [Generator meaning and campaign drift](2026-09-13_GENERATOR_MEANING_AND_CAMPAIGN_DRIFT_AUDIT.md): original messages, implementation substitutions and the source/condition attachment.
 
 `PhaseCarrier` supplies binary sheets and their coupled energy; `Chronology`/`Navigation` retain
-ordered Swing words; `Mathematics/GeneratorFactorization` infers navigators; the prototype's
+ordered Swing words; `Mathematics/NavigatorFactorization` infers navigators; the prototype's
 [`eta_atlas`](https://github.com/brandonrdug/holonics/tree/551d6c5d/crates/holonics/src/geometry/eta_atlas) was its zero-search atlas.
 
 ## Composition and participating receivers
@@ -187,7 +187,7 @@ logarithm of a Holon ratio), and in history the prototype's
 - [Generator inference, codes, free energy and sufficient continuation](2026-09-12_GENERATOR_INFERENCE_CODES_FREE_ENERGY_AND_SUFFICIENT_CONTINUATION.md): source likelihood/code relations and their future update law.
 
 Owners: Rust `holonics::ratio::exponentiated::NormalizedKernel`; Lean
-`HolonicAdjointNormalization` (`NormalizedExponential`), `GeneratorInference`, `Objects/Ratio`.
+`HolonicAdjointNormalization` (`NormalizedExponential`), `NavigatorInference`, `Objects/Ratio`.
 The prototype's normalized receivers and normal material are in history under
 [`field/`](https://github.com/brandonrdug/holonics/tree/13f8c734/crates/holonics-cuda/src/native_ecology/constitutive_fibre/field).
 Keep the declared loss, gradient/update sign, supplied statistics and actual producing operands
@@ -202,7 +202,7 @@ with the [navigator/mode source map](../../docs/HELICAL_GEOMETRY.md) in the heli
 - [Holonic Encoding retains transformation grain across modalities](2026-09-11_HOLONIC_ENCODING_RETAINS_TRANSFORMATION_GRAIN_ACROSS_MODALITIES.md): navigators and receiver-specific codecs.
 - [Fractal modes lift attention into mass-preserving generator compression](2026-09-12_FRACTAL_MODES_LIFT_ATTENTION_INTO_MASS_PRESERVING_GENERATOR_COMPRESSION.md): modal elimination, complete class mass, native/reference boundaries and future separators.
 
-Use `ReceiverHistoryCompression`, `GeneratorModeQuotient`, `JointReceiverDescent`, quadratic
+Use `ReceiverHistoryCompression`, `NavigatorModeQuotient`, `JointReceiverDescent`, quadratic
 moments, `ReceiverCodeCost`, and the prototype's [`exact_linear`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear.rs) (`factor_receiver`, `KernelModeReduction`; step 3).
 An encoder's `E_next T=U E` and its decoder state the reuse being claimed.
 
@@ -217,7 +217,7 @@ history, [the constant/source distinction](https://github.com/brandonrdug/holoni
 - [The golden reciprocal joins Gamma, zeta and spoke gaps](2026-09-12_GOLDEN_RECIPROCAL_JOINS_GAMMA_ZETA_AND_SPOKE_GAPS.md): concrete shared relations and their distinct source families.
 - [Polylogarithms and finite quantum dilogarithms](2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md#polylogarithms-and-finite-quantum-dilogarithms): classical golden special values, the supplied real-quadratic paper, finite character composition and its nonzero pentagon defect; a source comparison, not a native binding claim.
 
-`LandmarksAndModuli`, `Farey`, `Polarity`, `PiIterationConstraint`, `MachinPhaseConstraint` and
+`LandmarksAndModuli`, `Farey`, `Polarity`, `PiIterationConstraint`, the Machin navigator of `Compression/Landmark/ConstraintIdentity` and
 the prototype's [`winding_inertia`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/winding_inertia.rs) precede the landmark search of rebuild step 3. Copson's tail
 coefficient and the Newman backward-heat threshold have different formal owners, normalization and
 open consequences.

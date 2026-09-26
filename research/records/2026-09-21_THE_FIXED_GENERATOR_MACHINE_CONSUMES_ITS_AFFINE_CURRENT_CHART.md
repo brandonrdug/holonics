@@ -103,7 +103,7 @@ include cold CUDA setup; the warm four-primitive run took 1.47 seconds. These te
 figures are not per-request throughput or a complete-source memory measurement.
 
 [definition] The matching rational affine realization, adjoint, projection, normalized-mixture
-and realification statements live in `Transport/GeneratorMachineCharts.lean`, imported by
+and realification statements live in `Transport/NavigatorMachineCharts.lean`, imported by
 Framework Dynamics. The integrated Framework check passes. Native verification and its exact
 changed scope are recorded in [the receipts](../../docs/VERIFICATION_RECEIPTS.tsv).
 

@@ -1,4 +1,4 @@
-import Holonics.Transport.GeneratorTraceFaces
+import Holonics.Transport.NavigatorTraceFaces
 import Mathlib.RingTheory.PowerSeries.Exp
 import Mathlib.LinearAlgebra.Matrix.Charpoly.Coeff
 import Mathlib.LinearAlgebra.Matrix.Adjugate
@@ -13,7 +13,7 @@ set of occurrences, `tr(M_fⁿ) = #{x | fⁿ x = x}` counts the cycles of `n` ep
 (`trace_pow_mapMatrix`); for a matrix of natural numbers, `M i k` parallel restrictions from `i` to
 `k`, the words of depth `n` from `i` to `j` are `(Mⁿ)ᵢⱼ` many (`card_returnWord`), so `tr(Mⁿ)`
 counts the closed words of `n` epochs. Its **transfer determinant** is Mathlib's
-`charpolyRev M = det(1 − T·M)`, the face `Transport/GeneratorTraceFaces` conserves. Its
+`charpolyRev M = det(1 − T·M)`, the face `Transport/NavigatorTraceFaces` conserves. Its
 **dynamical zeta** is `ζ(T) = 1/det(1 − T·M)`, and its **cycle series** is
 `cycleLog M = Σ_(n≥1) N_n Tⁿ/n` (`cycleLog`).
 
@@ -33,9 +33,9 @@ counts the closed words of `n` epochs. Its **transfer determinant** is Mathlib's
    Mathlib's substitution into `PowerSeries.exp`.
 5. **Joined to the machine's trace faces.** For the machine of rotation–dilation sites,
    `det(1 − T·M) = ∏_g (1 − a_g T + q_g T²)` (`machine_charpolyRev`, from
-   `GeneratorTraceFaces.machine_factor_of_companions`), its cycle counts are the sums of the site
+   `NavigatorTraceFaces.machine_factor_of_companions`), its cycle counts are the sums of the site
    trace sequences `N_n = Σ_g t_n(a_g, q_g)` (`machine_cycle_count`, from
-   `GeneratorTraceFaces.machine_trace_sequence` and
+   `NavigatorTraceFaces.machine_trace_sequence` and
    `LocalFactor.theCompanionPowersCarryTheSequence`), and so `exp(Σ_n N_n Tⁿ/n) · ∏_g (1 − a_g T + q_g T²) = 1` (`machine_zeta`): the machine's
    conserved transfer determinant **is** the reciprocal of its dynamical zeta.
 6. **Growth of the cycle counts.** For a nonnegative return map with a positive eigenvector
@@ -58,7 +58,7 @@ counts the closed words of `n` epochs. Its **transfer determinant** is Mathlib's
 [counterexample; formal-checked] **Nonnegativity is load-bearing for the growth bound**
 (`signed_return_map_exceeds_bound`): `[[3,−2],[−2,3]]` has the positive eigenvector `(1,1)` with
 `ρ = 1`, yet `tr M = 6 > 2 · 1`. Trace faces are not a complete action certificate
-(`GeneratorTraceFaces.identityTwo_and_unipotentTwo_are_separated_by_source_receiver`), so the
+(`NavigatorTraceFaces.identityTwo_and_unipotentTwo_are_separated_by_source_receiver`), so the
 zeta is a face of the return map, not the map.
 
 [open] Owed in #62: the equality `h = log ρ(M) = limsup (1/n) log N_n` for nonnegative `M`, the
@@ -249,7 +249,7 @@ theorem zeta_eq_exp (M : Matrix n n ℚ) :
 
 section Machine
 
-open Holonics.Transport.GeneratorTraceFaces Holonics.Geometry.LocalFactor
+open Holonics.Transport.NavigatorTraceFaces Holonics.Geometry.LocalFactor
 
 variable {σ : Type*} [Fintype σ] [DecidableEq σ]
 

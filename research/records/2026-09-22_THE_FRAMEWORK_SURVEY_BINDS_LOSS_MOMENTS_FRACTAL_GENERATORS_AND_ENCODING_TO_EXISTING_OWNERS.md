@@ -59,5 +59,5 @@ statement; its z-transform `(zI−U)⁻¹I` is a `CausalChord` transfer, not yet
 `exact_linear::bilinear` factorizations (except in `mathematical/code.rs`), `grain_tower`,
 `continuing_tower`, `standing` or `receiver_release`. The reaction material `M` is the normal
 solution over `φ=[s,c,c⊗s]`; its `c⊗s` block is a `BilinearOperator` with existing product-core
-factorization, and `KernelModeReduction`/`GeneratorModeQuotient` supply future-exact reduction.
+factorization, and `KernelModeReduction`/`NavigatorModeQuotient` supply future-exact reduction.
 The encoder is a one-hot codepoint table; it is not Holonic Encoding (Sep 20 correction).

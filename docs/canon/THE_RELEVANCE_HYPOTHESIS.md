@@ -109,7 +109,7 @@ correction to constitutive relevance. The
 [π/e study](../../research/records/2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md)
 applies this reading to constraint identities, executable generators and oriented receiver faces.
 
-[proved-derived; formal-checked] `GeneratorObservationScope` supplies both boundaries: finite
+[proved-derived; formal-checked] `NavigatorObservationScope` supplies both boundaries: finite
 prefixes admit differing future generators, while a nonzero excitation identifies a constant
 multiplier in that declared law family. An arbitrarily small nonzero rational excitation exposes
 a difference hidden at zero drive to an exact receiver. Positive measurement tolerance remains

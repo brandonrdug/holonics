@@ -31,7 +31,7 @@ the finite divisor support and the nonvanishing boundary hypothesis.  This file 
 factor and circle-integral owner; those later files own the rectangle and weighted xi compositions.
 -/
 
-namespace Holonics.Zeta.Winding
+namespace Holonics.Zeta.LocalArgumentPrinciple
 
 open Complex Metric intervalIntegral
 
@@ -97,4 +97,4 @@ theorem theIndexDependsOnlyOnTheOrder (a : ℂ) {R : ℝ} (m n : ℕ) (hmn : m =
     (∮ z in C(a, R), (m : ℂ) / (z - a)) = (∮ z in C(a, R), (n : ℂ) / (z - a)) := by
   rw [hmn]
 
-end Holonics.Zeta.Winding
+end Holonics.Zeta.LocalArgumentPrinciple

@@ -33,7 +33,7 @@ everything else.
   Against a receiver family, a navigator's face map `F` has:
   - a **kernel**: the differences no admitted future receiver distinguishes. Quotienting by it is
     compression, and it is retention. Owners: `Foundation/CausalRelevance` (the relevance kernel),
-    `Foundation/ReceiverHistoryCompression` and `Foundation/GeneratorModeQuotient`.
+    `Foundation/ReceiverHistoryCompression` and `Foundation/NavigatorModeQuotient`.
   - a **cokernel**: what the navigator's image does not reach, the residual that is emanated or
     retained as a separator, interior or defect. `Landmarks/CokernelCalculus` states this calculus
     once, for the BSD descent and for integral Hodge.
@@ -46,7 +46,7 @@ everything else.
   inferring the configurations of navigators by loop closure. It is the same inference the HNN
   performs.
 - **Measurement.** A compression is measured against the literal by description plus work
-  (`Kt=|p|+log t`; `Foundation/{ReceiverCodeCost,GeneratorInference}`). It states its kernel and its
+  (`Kt=|p|+log t`; `Foundation/{ReceiverCodeCost,NavigatorInference}`). It states its kernel and its
   cokernel residual. There is no single scalar of progress.
 
 [interpretation] The targets read as instances of the line. Their records grade each claim.
@@ -197,7 +197,7 @@ archive root. Brandon's Metal port stays on its own branch, `codex/apple-silicon
 3. **Holonic Compression and landmark discovery** (#145).
    - **Lean first.** State a navigator's face map against terrain and a receiver family by its
      kernel and cokernel. Join `CausalRelevance`, `ReceiverHistoryCompression`,
-     `GeneratorModeQuotient`, `ReceiverCodeCost`, `GeneratorInference` and `CokernelCalculus`, and
+     `NavigatorModeQuotient`, `ReceiverCodeCost`, `NavigatorInference` and `CokernelCalculus`, and
      add the cost split between resonating and emanating.
    - **Then `holonics::compression`.** It carries navigator inference by loop closure, the split
      between resonating and emanating, and a landmark search whose coverage is checked.
@@ -1231,7 +1231,7 @@ The additions outside `hnn`, each in its owner and with its Lean:
 
 [established-bounded; source-inspected] **Built in campaign 1** (September 25), each with its Lean:
 - 1 as `Transport::Map` (`order`, `compose`); a `Ring` carries a `Navigator` rotor, and
-  `ReflectorMachine` is built only for keys (Lean `Holon/Generator.{map_pow_mod_order,
+  `ReflectorMachine` is built only for keys (Lean `Holon/Navigator.{map_pow_mod_order,
   map_turn_lossless, map_compose_order_pos, map_compose_order_dvd, mapRotor_order}`).
 - 2 as block transports in `ConnectionIncidence`, held by `Field::connection` and read at the
   contact's from-end, `(d_A q)_a = U_aᵀ q_h − q_g`, matching `∂₁` (Lean `Holon/Complex.{blockIncidence,
@@ -2166,7 +2166,7 @@ law → test.
 | The word's energy chain | `INC/energy.rs` | `PortReceipt::balances` (`hnn::propagation::TickBalance`) | its `f64` readings |
 | The machine as a core Holon | `INC/holon_chart.rs` (`ResidentHolonChart`) | `Field::holon()`, read-only | resident packets; the delegation table |
 | Receiving phases | `INC/machine_receiving.rs` | `hnn::receiving` | the `response_port_start` slot semantics |
-| Machine declaration and charts | `hnn/field_geometry/{machine.rs, machine_factor.rs}`, `INC/machine_transport.rs` | `Field`, `Ring`, `Contact`; Lean `GeneratorMachineCharts` | the width-12 realification as a type; the untagged legacy spelling; `GeometricFieldSpec` versions |
+| Machine declaration and charts | `hnn/field_geometry/{machine.rs, machine_factor.rs}`, `INC/machine_transport.rs` | `Field`, `Ring`, `Contact`; Lean `NavigatorMachineCharts` | the width-12 realification as a type; the untagged legacy spelling; `GeometricFieldSpec` versions |
 | Scattering and its adjoint | `NE/junction/operative/source/{reflection.rs, reflection_target.rs, reflection_commit.rs, map_action.rs}` | `hnn::propagation`, as the junction Swing | **the global solve** (§8.1; it survives only as the continuum-limit reading); the dense source factor; `recent_producers`; the frozen-cut replay |
 | Contact material | `NE/junction/operative/source/action/{contact_amplitude.rs, contact_scale.rs}` | `Contact`'s constitution, `Deposit` | the scalar amplitude `ρ_a` as the contact's whole material (§8.6); the word "template"; the dyadic upward projection (the factor carriers are PSD by construction) |
 | Material factor return | `NE/junction/operative/factor_return.rs` | `Deposit` | the `returns` journal; `NativeConstitutiveField.history` |

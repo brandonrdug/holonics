@@ -2,9 +2,9 @@ import Holonics.Transport.SerialScrewChain
 import Mathlib.Tactic
 
 /-!
-# Generator-machine spatial and current charts
+# Navigator-machine spatial and current charts
 
-This packet is the small chart joining a situated generator's initial spatial point to its
+This packet is the small chart joining a situated navigator's initial spatial point to its
 resident complex current.  A current has real and imaginary `Vec` components; only its real
 component enters the spatial chart.  An affine frame acts linearly on both components, while its
 anchor correction is real and depends on the source and receiving initial points.
@@ -18,14 +18,14 @@ of a mixture uses the explicit normalization equation `∑ w = 1`.
 open scoped BigOperators Matrix
 open Matrix
 
-namespace Holonics.Transport.GeneratorMachineCharts
+namespace Holonics.Transport.NavigatorMachineCharts
 
 open Holonics.Geometry.ScrewGeometry
 open Holonics.Transport.SerialScrewChain
 
 abbrev Mat3 := Matrix (Fin 3) (Fin 3) ℚ
 
-/-- The resident current chart at one generator: three real and three imaginary coordinates. -/
+/-- The resident current chart at one navigator: three real and three imaginary coordinates. -/
 structure ComplexCurrent3 where
   real : Vec
   imaginary : Vec
@@ -36,16 +36,16 @@ structure ComplexCurrent3 where
   cases q₂
   simp_all
 
-/-- A generator's fixed initial spatial point. -/
-structure GeneratorSite where
+/-- A navigator's fixed initial spatial point. -/
+structure NavigatorSite where
   initial : Vec
   current : ComplexCurrent3
 
 /-- The spatial chart reads the initial point plus the real current component. -/
 def spatialChart (p : Vec) (q : ComplexCurrent3) : Vec := p + q.real
 
-/-- The receiving spatial face of a situated generator site. -/
-def GeneratorSite.spatialFace (site : GeneratorSite) : Vec :=
+/-- The receiving spatial face of a situated navigator site. -/
+def NavigatorSite.spatialFace (site : NavigatorSite) : Vec :=
   spatialChart site.initial site.current
 
 /-- The componentwise linear action induced by a spatial matrix. -/
@@ -381,4 +381,4 @@ theorem flatLinear_pairing_adjoint (A : Mat6) (x c : Flat6) :
   simp only [flatPairing, flatLinear, flatCovectorPullback]
   rw [Matrix.dotProduct_mulVec, ← Matrix.vecMul_transpose]
 
-end Holonics.Transport.GeneratorMachineCharts
+end Holonics.Transport.NavigatorMachineCharts

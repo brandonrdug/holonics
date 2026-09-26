@@ -12,7 +12,7 @@ the source recovery behind this synthesis, and [THE_REBUILD](plans/THE_REBUILD.m
 **navigator** is the object with an initial configuration, its own clock and carry, and address
 words ([elementary objects §3](ELEMENTARY_OBJECTS.md#3-navigator)); **generator** here keeps its
 algebraic senses (a group generator, the Lie generator of a helix). Lean module names such as
-`GeneratorTraceFaces` keep their spelling until the rebuild renames them.
+`NavigatorTraceFaces` keep their spelling until the rebuild renames them.
 
 [project-postulate] These objects are one picture. A design or a worker brief states which of
 them it touches and keeps the others attached: phase with its carry, a pair with its address,
@@ -114,7 +114,7 @@ for driven pairs. The local lock theorem above remains independent of that analy
 
 [proved-derived; formal-checked] Carrying material to another phase conjugates it, so every class
 function of the material is conserved along the winding.
-[`Transport/GeneratorTraceFaces.lean`](../lean/Holonics/Transport/GeneratorTraceFaces.lean):
+[`Transport/NavigatorTraceFaces.lean`](../lean/Holonics/Transport/NavigatorTraceFaces.lean):
 
 ```text
 phaseTransport_pow                                   (S⁻ᵈPSᵈ)ᵏ = S⁻ᵈPᵏSᵈ

@@ -29,7 +29,7 @@ were inspected, rather than treating the common Git author name as agent attribu
 - `HelicalPairInteraction` joins the pair's relative velocity to the contact form, its jet,
   group phase carriage, conjugated reflection and permutation menu closure. The interaction,
   chain, standing and release owners now enter the default Framework target.
-- `PhaseCarry`, `PairResonance`, `GeneratorTraceFaces` and `CellHolonomy` connect existing
+- `PhaseCarry`, `PairResonance`, `NavigatorTraceFaces` and `CellHolonomy` connect existing
   arithmetic, Hodge and continuation sources to the shared objects. The Rust `winding` owner
   supplies exact carries/odometers, positive rational addresses, discriminant/trace faces and
   affine cell holonomy. `RH/ZeroPairLock` returns the algebraic reflected-pair/Foster locus.
@@ -90,7 +90,7 @@ class. General `StandingLaw` is future sufficiency and can require nonharmonic d
 [counterexample; formal-checked] `I₂` and `J=[[1,1],[0,1]]` have identical trace powers and
 transfer determinants: `tr(I₂^k)=tr(J^k)=2`, `det(1−T I₂)=det(1−T J)=(1−T)²`. But source
 `e₂` followed by receiver `e₁*` reads `0` after I and `1` after J. This pass proves the power
-formula, equal faces and separating receiver in `GeneratorTraceFaces`. Newton identities
+formula, equal faces and separating receiver in `NavigatorTraceFaces`. Newton identities
 remain spectral consistency checks. They do not replace a source/receiver intertwiner.
 
 [definition] The winding guide now carries the corresponding domains: discriminant branches
@@ -161,7 +161,7 @@ updated together. This pass finalizes the campaign; its native packets remain fo
 subsequent implementation request.
 
 [established-bounded; formal-checked] The formal additions are in the existing
-`Transport/{HelicalPairInteraction,CellHolonomy,GeneratorTraceFaces}` owners. Focused checks,
+`Transport/{HelicalPairInteraction,CellHolonomy,NavigatorTraceFaces}` owners. Focused checks,
 axiom prints and the integrated Framework return are recorded in
 [VERIFICATION_RECEIPTS](../../docs/VERIFICATION_RECEIPTS.tsv). The native winding and HNN
 receipts at their unchanged source revisions are reused; no GPU/application campaign was run.

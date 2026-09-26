@@ -791,7 +791,7 @@ consistent with every continuation. [THE_INFORMATION_ENGINE](../../docs/canon/TH
 when it carries: its coefficients; its initial conditions; its domain (which indices, which chart);
 its evidence (the prefix, as extensional samples, with lineage); its residual or counterexample
 (the first index at which it fails, if known); and the later-term cost (decode work per term). The
-`GeneratorInference` owner (`Foundation/GeneratorInference.lean:7-15`) prices exactly this
+`NavigatorInference` owner (`Foundation/NavigatorInference.lean:7-15`) prices exactly this
 description/likelihood trade and “supplies no new optimizer”; the tablet's refusal
 (“**A compression ratio quoted without its decoder is convicted**”) is the same law at the prose
 grain. A recurrence without those fields is a `numericalResemblance` bridge to the prefix, not a

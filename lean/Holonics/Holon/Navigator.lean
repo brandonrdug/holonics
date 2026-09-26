@@ -6,9 +6,9 @@ import Mathlib.GroupTheory.Perm.Basic
 import Mathlib.Data.ZMod.Basic
 
 /-!
-# Holon.Generator: lifted phases, lossless clock jumps and carries
+# Holon.Navigator: lifted phases, lossless clock jumps and carries
 
-[definition] The generator facet `G`: a lifted phase `θ̃` with its counted winding `n`; the
+[definition] The navigator facet `G`: a lifted phase `θ̃` with its counted winding `n`; the
 **clock jump** at a section crossing advances `θ̃` by a full turn and `n` by one, leaving the chart
 phase `θ̃ − 2πn` unchanged.
 
@@ -41,7 +41,7 @@ open Holonics.Geometry.HolonicClockedPantographicSwing
 
 /-! ## 1. A lifted phase and its lossless jump -/
 
-/-- [definition] A generator's lifted phase `θ̃` with the winding `n` it has counted. -/
+/-- [definition] A navigator's lifted phase `θ̃` with the winding `n` it has counted. -/
 structure LiftedPhase where
   θ : ℝ
   n : ℤ

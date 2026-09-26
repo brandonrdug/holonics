@@ -1,4 +1,4 @@
-import Holonics.Foundation.GeneratorInference
+import Holonics.Foundation.NavigatorInference
 import Holonics.Foundation.ReceiverCodeCost
 import Mathlib.Data.Nat.Log
 
@@ -47,7 +47,7 @@ neither. `Kt` is Levin's form; `⌈log₂ t⌉` is `Nat.clog 2 t`, the least `k`
    (`perronTransition_normalized`, the Kraft equality that makes `−log₂ P` a code length), the code
    of a walk of `n` steps telescopes by `perron_edge_code_balance` to
    `n·log₂ λ − Σ log₂ w + log₂ v_start − log₂ v_end` (`perron_walk_code_length`).
-4. The Gibbs/MDL posterior of `Foundation/GeneratorInference` on the two presentations prefers the
+4. The Gibbs/MDL posterior of `Foundation/NavigatorInference` on the two presentations prefers the
    navigator exactly when the pivot pays off (`posterior_prefers_iff_pays_off`): the instance of
    `posterior_mass_le_iff` at two candidates, whose objective is each presentation's bits.
 
@@ -75,7 +75,7 @@ noncomputable section
 
 namespace Holonics.Compression.Core.Cost
 
-open Holonics.Foundation.GeneratorInference
+open Holonics.Foundation.NavigatorInference
 open Holonics.Foundation.ReceiverCodeCost
 
 /-! ## 1. Fixed-width codes -/
@@ -619,7 +619,7 @@ def presentationBits (navigatorBits literal : ℕ) : Presentation → ℝ
   | .navigator => navigatorBits
   | .literal => literal
 
-/-- [proved-derived; formal-checked] The instance of `GeneratorInference.posterior_mass_le_iff` at
+/-- [proved-derived; formal-checked] The instance of `NavigatorInference.posterior_mass_le_iff` at
 two candidates: the bit-objective posterior prefers the navigator exactly when the pivot pays
 off. -/
 theorem posterior_prefers_iff_pays_off {Configuration Symbol : Type*} [Fintype Symbol]

@@ -22,7 +22,9 @@ collapsed population of the boundary reading.  **Three names, one subgroup, on a
 Every `theorem` here is discharged.
 -/
 
-namespace Holonics.Foundation.Receiver
+namespace Holonics.Coupling.ReceiverChainPosition
+
+open Holonics.Foundation.Receiver
 
 open Holonics.Coupling.Coupling
 
@@ -207,4 +209,4 @@ theorem theHollowPerpExceedsItsRadical :
     have h2 : (-1 : ℤ) = n := congrArg (fun p : Cells => p.2.1) hn
     omega
 
-end Holonics.Foundation.Receiver
+end Holonics.Coupling.ReceiverChainPosition

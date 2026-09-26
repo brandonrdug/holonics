@@ -1,4 +1,4 @@
-import HolonicsResearch.Geometry.Holon
+import HolonicsResearch.Geometry.TriangleGroupHolon
 import Holonics.Geometry.Horizon
 import Mathlib.LinearAlgebra.Dimension.Finite
 import Mathlib.LinearAlgebra.Isomorphisms

@@ -110,7 +110,7 @@ exactly when the known stage word fixes `S a` (`menu_loop_closure`, with
 word has no compatible fixed point is refuted without resolving `S`; a compatible phase leaves
 the boundary family plural. Inference of an initial configuration from pairwise loop closure is
 the training operation. Existing owners: `PairFiniteMotion::closes_after`,
-`RationalPhase::lifted_winding`, the identity atlas kernel, `GeneratorInference`,
+`RationalPhase::lifted_winding`, the identity atlas kernel, `NavigatorInference`,
 `TransportWord::descendingWord_is_optimal`. Sweeping candidate phases over co-present regions
 is the hardware cover's partition law.
 
@@ -246,7 +246,7 @@ packet below lands with its formal counterpart or names the obligation it leaves
 | 1. Pair contact | `holonic-engine/src/holonic_interaction.rs` and a `helical` submodule; `relational-geometry/src/screw.rs` unchanged | `ContactFace`/`MediumContact`/`HolonicInteraction` declared from a `ScrewPair` and its jet, with declared `D_f`, weight and `Clock`; exact tests mirror each Lean theorem | #28, #48 |
 | 2. Serial chain | `holonic-engine/src/holonic_chain.rs` consumer of packet 1 | Ordered `SituatedScrew` chain: finite motion product, recharted Jacobian columns, per-pair contacts, revolute/prismatic rows, a planar closure control | #27 |
 | 3. Machine geometry | `holonics-hna/src/native/field_geometry.rs`, `field_session/{incidence,incident_preparation,incident_application}.rs`; a new `examples/support/` machine spec | `GeometricFieldSpec` from a generator family; phase-carried source moments; receiving phases; pair-receiver participation with axial term and jet pullback; legacy ring layout preserved for saved models | #17 |
-| 4. Material and closure inference | `body/field/{formation,incident}.rs`, `field_session/native_source.rs`, `identity_atlas`, `GeneratorInference` consumers | Pair-jet features in the existing normal law; closure inference of rates, configurations and admitted pairs; plural families retained | #17, #49 |
+| 4. Material and closure inference | `body/field/{formation,incident}.rs`, `field_session/native_source.rs`, `identity_atlas`, `NavigatorInference` consumers | Pair-jet features in the existing normal law; closure inference of rates, configurations and admitted pairs; plural families retained | #17, #49 |
 | 5. Standing and release | `holonics-hna` binding of `standing.rs` and `receiver_release.rs` | A dormant generator retained through an inactive interval and re-engaged at a later phase with its future separator | #17 |
 | 6. Economy | `receiver_history_compression`, `hardware_cover`, `section_partition` | Moment accumulation as the compact source-span statistic; stepped words by generator power; resident state independent of source length; the actual launch realization reported | #18, #61 |
 | 7. Episodes | `alpha/exposure.rs`, `examples/athena_exposure_field.rs` | The recorded Athena, mathematical and code episodes on the machine; a motor-chart control that infers chain phases for a requested receiving face, without a simulator | #16 |

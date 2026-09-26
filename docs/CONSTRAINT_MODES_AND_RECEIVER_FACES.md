@@ -25,7 +25,7 @@ be carried by rational homogeneous data satisfying `c²+s²=1`; no angle mantiss
 
 [proved-derived; formal-checked] The recovered Machin constraint is
 `(5+i)^4=(239+i)(2+2i)` and `π=16 atan(1/5)-4 atan(1/239)`.
-`MachinPhaseConstraint`, `PhaseCarrier`, `RatioSeriesTransport` and `RadixWindowReceiver`
+`Compression/Landmark/ConstraintIdentity` (`machin`, `gaussian_machin_factorization`), `PhaseCarrier`, `RatioSeriesTransport` and `RadixWindowReceiver`
 retain its algebra, branch, navigator state and exact window laws. [`exact_value::CertifiedSeries`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_value.rs) carried rational partial sums and oriented remainders, as the prototype's `reopening` did at `13f8c734`.
 The [September 11 recovery](../research/records/2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md)
 connects the August exponential/kernel study to its formal owners and the code of its date.

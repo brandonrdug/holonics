@@ -25,7 +25,7 @@ be globally exact on a punctured domain: a positively oriented simple boundary m
 Here π is the circle-period constraint; a numerical enclosure is only a receiver face.
 
 [proved-derived; formal-checked] The repository already supplies the actual argument-principle
-owners in `Zeta/Winding`, `Zeta/RectangleArgumentPrinciple` and `Zeta/WeightedArgumentPrinciple`.
+owners in `Zeta/LocalArgumentPrinciple`, `Zeta/RectangleArgumentPrinciple` and `Zeta/WeightedArgumentPrinciple`.
 The last one binds the weighted contour to ξ. `HodgeFiniteDecomposition`, `HodgeGreenOperator`
 and `TemporalHodgeResidue` supply the cellular/metric decomposition and its evolution.
 The analytic one-form gives a concrete field and circulation population to discretize on

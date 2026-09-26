@@ -50,7 +50,7 @@ land on eleven; that they agree is recorded, not explained.  Brandon's `4 · 3 =
 a triangle group.
 -/
 
-namespace Holonics.Geometry.Holon
+namespace Holonics.Geometry.TriangleGroupHolon
 
 open Holonics.Geometry.AngleExcess
 
@@ -121,4 +121,4 @@ the same way three generators and four relations present a triangle group. -/
 theorem theThreePairwisePlanes : Nat.choose 3 2 = 3 ∧ 4 * 3 = rigidMotionDimension 4 + 2 := by
   refine ⟨by decide, by decide⟩
 
-end Holonics.Geometry.Holon
+end Holonics.Geometry.TriangleGroupHolon

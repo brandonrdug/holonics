@@ -1,5 +1,5 @@
 import Mathlib
-import Holonics.Foundation.GeneratorInference
+import Holonics.Foundation.NavigatorInference
 
 /-!
   Exact finite-class aggregation for normalized kernel-weighted currents.
@@ -87,19 +87,19 @@ theorem weighted_summary_associative (a b c : ℝ × V) :
 
 theorem score_face_eq_posterior (scores : I → ℝ) [Nonempty I] :
     NormalizedExponential.face scores =
-      Holonics.Foundation.GeneratorInference.posterior
+      Holonics.Foundation.NavigatorInference.posterior
         (fun i : I => -scores i / Real.log 2) := by
-  unfold Holonics.Foundation.GeneratorInference.posterior
+  unfold Holonics.Foundation.NavigatorInference.posterior
   congr 1
   funext i
-  field_simp [Holonics.Foundation.GeneratorInference.bitScale_pos.ne']
+  field_simp [Holonics.Foundation.NavigatorInference.bitScale_pos.ne']
 
 theorem attention_free_energy_minimum (scores : I → ℝ) [Nonempty I]
     (q : PositiveProbabilitySection I) :
-    GeneratorInference.variational (fun i : I => -scores i / Real.log 2)
-        (GeneratorInference.posterior (fun i : I => -scores i / Real.log 2)) ≤
-      GeneratorInference.variational (fun i : I => -scores i / Real.log 2) q := by
-  exact GeneratorInference.variational_minimum _ _
+    NavigatorInference.variational (fun i : I => -scores i / Real.log 2)
+        (NavigatorInference.posterior (fun i : I => -scores i / Real.log 2)) ≤
+      NavigatorInference.variational (fun i : I => -scores i / Real.log 2) q := by
+  exact NavigatorInference.variational_minimum _ _
 
 theorem unweighted_mean_not_associative :
     (((0 : ℝ) + 0) / 2 + 4) / 2 ≠ (0 + ((0 + 4) / 2)) / 2 := by norm_num

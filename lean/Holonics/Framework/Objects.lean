@@ -27,10 +27,10 @@ import Holonics.Objects.SourceHolon
 import Holonics.Objects.SourcePorts
 import Holonics.Objects.CommitRebase
 import Holonics.Holon.Law
-import Holonics.Holon.Generator
+import Holonics.Holon.Navigator
 import Holonics.Geometry.AffineSwing
 import Holonics.Geometry.SwingPotential
-import Holonics.Transport.GeneratorTraceFaces
+import Holonics.Transport.NavigatorTraceFaces
 import Holonics.Foundation.FractalString
 import Holonics.Holarchy
 import Holonics.Aeon
@@ -48,9 +48,9 @@ with its consumer. The operator contract in the guide lists every owner; the ent
 
 | Object | Entry owners |
 |---|---|
-| Complex, Holon and coholon | `Framework/HolonObject` (`Holon/{Complex,Port,Dirac,Element,Generator,Restriction,Law,Conformance,Deposition,Reaction,Cayley,AffineContact,MomentStorage}`), `Foundation/Holon`, `Objects/Pairing` |
+| Complex, Holon and coholon | `Framework/HolonObject` (`Holon/{Complex,Port,Dirac,Element,Navigator,Restriction,Law,Conformance,Deposition,Reaction,Cayley,AffineContact,MomentStorage}`), `Foundation/Holon`, `Objects/Pairing` |
 | Constitution and deposition | `Holon/{Element,Deposition}`, `Objects/{Deposition,Retention,CommitRebase}` |
-| Navigator | `Holon/Generator`, `Transport/{SourceMoment,GeneratorTraceFaces,ReflectiveContinuation}`, `Foundation/{FractalPacking,FractalString}` (the scale zeta read through the transfer determinant), `Aeon/Production/Zeta` (return words, word counts and the transfer determinant) |
+| Navigator | `Holon/Navigator`, `Transport/{SourceMoment,NavigatorTraceFaces,ReflectiveContinuation}`, `Foundation/{FractalPacking,FractalString}` (the scale zeta read through the transfer determinant), `Aeon/Production/Zeta` (return words, word counts and the transfer determinant) |
 | Swing | `Geometry/{AffineSwing,SwingPotential}` (FractalPacking's reflection is the Swing about ½) |
 | Pair contact, tube and tower | `Transport/{HelicalPairInteraction,CellHolonomy,ContinuingTube,WorldTube}` |
 | Parametron | `Objects/Parametron`, `Physics/{PhaseCarrier,CoupledIncidence,HolonicMeasuredParametron,HolonicTorusParametronRealization}` |

@@ -27,7 +27,7 @@ not a loss on a few sampled inputs. A zero residual gives the requested bilinear
 input in the declared ring. Finding a decomposition supplies an upper bound on product count;
 absence within a bounded candidate grammar is not a global tensor-rank lower bound.
 
-[proved-derived; formal-checked] `Mathematics/GeneratorFactorization.bilinear_factorization`
+[proved-derived; formal-checked] `Mathematics/NavigatorFactorization.bilinear_factorization`
 proves the induced identity over arbitrary commutative rings and finite input/factor populations:
 
 \[
@@ -125,7 +125,7 @@ output coefficient fibres, search scope and representative obstruction covectors
 B=\begin{pmatrix}\alpha&0\\\beta&1\end{pmatrix}.
 \]
 
-`GeneratorFactorization.blockMatrix_compose` now identifies chronological block composition
+`NavigatorFactorization.blockMatrix_compose` now identifies chronological block composition
 with the reversed matrix product. The matrix omits the index advance; `Block.length` retains
 that clock and the existing future-word theorem uses it.
 

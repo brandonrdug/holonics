@@ -1,7 +1,7 @@
 import HolonicsResearch.Mathematics.EuclideanSqrtTwo
 import HolonicsResearch.Geometry.Deviation
 import HolonicsResearch.Geometry.AngleExcess
-import HolonicsResearch.Geometry.Holon
+import HolonicsResearch.Geometry.TriangleGroupHolon
 import Holonics.Geometry.Horizon
 import HolonicsResearch.Gauge.CurvatureAndGap
 
@@ -57,8 +57,8 @@ solid's counts are `4p/D`, `2pq/D`, `4q/D`, and the two-element unit group is th
 nontrivial one — finiteness arrives as a division by the very quantity whose positivity defines
 the closing side. -/
 theorem theClosingCountIsAReciprocal :
-    Holon.holonOrder 2 3 5 = 60 ∧ Holon.holonOrder 2 3 5 = 2 / AngleExcess.excess 2 3 5 := by
-  refine ⟨(Holon.theSporadicHolonOrders).2.2, rfl⟩
+    TriangleGroupHolon.holonOrder 2 3 5 = 60 ∧ TriangleGroupHolon.holonOrder 2 3 5 = 2 / AngleExcess.excess 2 3 5 := by
+  refine ⟨(TriangleGroupHolon.theSporadicHolonOrders).2.2, rfl⟩
 
 /-- **THE THREE CLOSING LISTS, SIDE BY SIDE.**  Two units, five solids, three flat tilings — every
 closing regime this session touched is finite, and each by a different mechanism (a definite form,

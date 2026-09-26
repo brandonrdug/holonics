@@ -112,7 +112,7 @@ latest example. The review follows these existing chains rather than refounding 
 | Landmarks, moduli, periodicity and windings | `LandmarksAndModuli`, `Farey`, `Polarity`, `winding_inertia`; the August 20 landmark record and September phase/generator records |
 | π/e and analytic generator faces | `PiIterationConstraint`, `MachinPhaseConstraint`, exact analytic/recurrence owners; September 11 normalized source, branch and remainder synthesis |
 | Distinct de Bruijn boundaries | Copson tail/recurrence owners versus RH backward heat/zero-placement owners; the maintained mathematical/native source map preserves their different constants and hypotheses |
-| Generator inference and economical continuation | `GeneratorInference`, `GeneratorFactorization`, `GeneratorModeQuotient`, `ReceiverHistoryCompression`, `ReceiverCodeCost`, native factor/bilinear/receiver operations |
+| Generator inference and economical continuation | `NavigatorInference`, `NavigatorFactorization`, `NavigatorModeQuotient`, `ReceiverHistoryCompression`, `ReceiverCodeCost`, native factor/bilinear/receiver operations |
 | Interaction and variation | Rigidity's quadrance differential, `ConstitutiveModulation`, `MechanicalReceiver`, constitutive field/source/current and producing adjoints |
 | Geometry through topology and dynamics | Connection/curvature, torus/phase, Hodge and fluid owners; each contributes its map and boundary, not its filename as a universal theorem |
 | Actual HNN application | `NativeCoupledBody`, `native/field_session.rs` and `shared.rs`, resident local reaction and field reflection, held receiver, shared stream and rest |

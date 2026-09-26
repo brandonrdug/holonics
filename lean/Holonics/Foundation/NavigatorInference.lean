@@ -4,7 +4,7 @@ import Holonics.Computation.HolonicAdjointNormalization
 import Holonics.Physics.InformationDifference
 
 /-!
-# Generator inference through description, loss and sufficient representations
+# Navigator inference through description, loss and sufficient representations
 
 The candidate type may contain programs, factorizations, parameters or dependent architecture/
 parameter pairs. Feasibility is represented by its admitted subtype before this finite positive
@@ -17,7 +17,7 @@ Ideal code units are bits; literal packet overhead remains part of the supplied 
 
 noncomputable section
 
-namespace Holonics.Foundation.GeneratorInference
+namespace Holonics.Foundation.NavigatorInference
 
 open scoped BigOperators
 open Holonics.Computation.HolonicInformationTheory
@@ -301,4 +301,4 @@ end CountControl
 #print axioms code_cost_log_odds
 #print axioms posterior_coarse_eq_pushforward
 
-end Holonics.Foundation.GeneratorInference
+end Holonics.Foundation.NavigatorInference

@@ -1,5 +1,5 @@
 import HolonicsResearch.Zeta.RiemannXi
-import HolonicsResearch.Zeta.Winding
+import HolonicsResearch.Zeta.LocalArgumentPrinciple
 import HolonicsResearch.Zeta.WeilVector
 
 /-!

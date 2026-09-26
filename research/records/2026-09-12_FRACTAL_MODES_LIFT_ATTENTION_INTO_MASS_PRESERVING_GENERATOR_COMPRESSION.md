@@ -59,7 +59,7 @@ transport are different faces of this same operation.
 
 [proved-derived; formal-checked] `Computation/AttentionModeCompression` identifies finite
 softmax scores with the existing generator posterior at `J_i=-s_i/ln 2` and proves its
-free-energy minimum. Composing `GeneratorInference.variational_gap_eq_kl_bits` gives
+free-energy minimum. Composing `NavigatorInference.variational_gap_eq_kl_bits` gives
 
 `F(p)=E_p[J]-H₂(p)`,
 
@@ -147,7 +147,7 @@ has invisible subspace `N=∩_(r,w) ker(r T_w)`. A representation q closes when 
 generator has a descended U with `q T_g=U_g q`. Generator functions and their linear coordinate
 modes are related here by an explicit representation; they are not synonyms at every scope.
 
-[proved-derived; formal-checked] `Foundation/GeneratorModeQuotient` composes the existing future
+[proved-derived; formal-checked] `Foundation/NavigatorModeQuotient` composes the existing future
 quotient with Gram and alternating-map laws. For real inner-product receiver space Q,
 
 `det Gram(qv₁,…,qvₙ)=0 iff the received modes are linearly dependent`.
@@ -217,7 +217,7 @@ search. The modular linear-system example also admits polynomial Gaussian elimin
 [definition] A fractal generator here includes its restriction maps, composition order, scale
 transport and boundary/separation law. The existing `Foundation/FractalPacking` already proves
 Cantor children, positive sibling gaps, exact width `3⁻ⁿ` and different left/right word orders.
-`BoundaryScalePassage`, `HigherDifferenceScaleDescent` and `GeneratorObservationScope` provide
+`BoundaryScalePassage`, `HigherDifferenceScaleDescent` and `NavigatorObservationScope` provide
 the adjacent scope/scale machinery. Reusing those relations keeps fractals explicit, rather
 than calling every recurring computation a fractal or founding another generic generator noun.
 

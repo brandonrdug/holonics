@@ -81,7 +81,7 @@ states phase-carried material and stepping (`phaseTransport_add`, `phaseTranspor
 odometer cascade, the central carry retained by the state) and `Geometry/PairResonance` (lock =
 zero-slip direction (zero power under its definiteness hypothesis), unimodular neighbours, mediant cost, conserved intersection, the diagonal
 winding of coprime circles) are imported by `Framework.Geometry`;
-`Transport/GeneratorTraceFaces` (determinant, trace sequence and transfer determinant conserved
+`Transport/NavigatorTraceFaces` (determinant, trace sequence and transfer determinant conserved
 by phase carriage; the machine's product factor and summed trace sequence, over
 `Geometry/LocalFactor`) and `Transport/CellHolonomy` (gauge conjugation of a cell's holonomy,
 gauge-free class functions, cell flux, the dormant harmonic mode over `Foundation/HodgeReceiver`)
@@ -93,7 +93,7 @@ the tank's inductance is a positive real.
 [proved-derived; formal-checked] The final design iteration adds the pair PSD material-null
 law and its attainable-slip specialization, plus
 `CellHolonomy.closed_field_retains_unique_harmonic_mode` by the existing Hodge uniqueness law.
-`GeneratorTraceFaces` now proves that identity and a nontrivial unipotent shear have equal
+`NavigatorTraceFaces` now proves that identity and a nontrivial unipotent shear have equal
 trace powers and transfer determinants yet differ at a supplied source/receiver. These
 statements keep harmonic standing relative to node/cell receivers and spectral faces distinct
 from the full future-action certificate. The [iteration record](../research/records/2026-09-21_THE_GENERATOR_MACHINE_RETAINS_ITS_SOURCE_AND_RECEIVING_LAWS.md)
@@ -170,7 +170,7 @@ refine it; an exact rebase carries it through every ordered history; explicit re
 can determine one future face while source causes stay plural. Whole-family tolerance transports
 through a declared Lipschitz receiver, and shrinking bounds force compatible readouts to converge.
 
-[definition; source-cut, formal-checked] `Foundation/Receiver.lean` extends the existing receiver owner with additive receiver-family laws: the collapsed kernel, joint reading, its application lemma, kernel equivalence, and difference-based indistinguishability. `Foundation/JointReceiverDescent` imports it directly. The source-specific chain placement and theta-complex identities remain in `Coupling/Receiver`; the five extracted declarations live in `Holonics.Foundation.Receiver`. The focused receiver closure passed at 3,139 Lake jobs, `Framework.Core` at 8,738, and top-level `ElementaryHolonics` at 10,105. The extracted declarations use standard axioms (`propext`, `Classical.choice`, `Quot.sound`).
+[definition; source-cut, formal-checked] `Foundation/Receiver.lean` extends the existing receiver owner with additive receiver-family laws: the collapsed kernel, joint reading, its application lemma, kernel equivalence, and difference-based indistinguishability. `Foundation/JointReceiverDescent` imports it directly. The source-specific chain placement and theta-complex identities remain in `Coupling/ReceiverChainPosition`; the five extracted declarations live in `Holonics.Foundation.Receiver`. The focused receiver closure passed at 3,139 Lake jobs, `Framework.Core` at 8,738, and top-level `ElementaryHolonics` at 10,105. The extracted declarations use standard axioms (`propext`, `Classical.choice`, `Quot.sound`).
 
 [proved-derived; formal-checked] The joint additive construction uses
 `N=intersection_i ker(read_i)` and `Q=X/N`. Preservation of N is exactly the receiver-transformer
@@ -232,7 +232,7 @@ fixes the normalization before any numerical face is read: the exponential flow 
 Thus `2πi` is the primitive positive imaginary period; `π` is the constrained normalized half-turn mode. A
 phase receiver sees only the quotient face and must retain its winding fibre. The formal
 `Physics/PhaseCarrier` owner proves `exp(i(θ + 2π)) = exp(iθ)` and the half-turn sign,
-and `Mathematics/MachinPhaseConstraint` proves the exact Gaussian/Machin relations
+and `Compression/Landmark/ConstraintIdentity` proves the exact Gaussian/Machin relations
 `(5+i)^4 = (239+i)(2+2i)` and `π = 16 atan(1/5) − 4 atan(1/239)`. The prototype's
 `reopening::arctan_unit_fraction` (`13f8c734`) carried the rational partial sum and alternating
 remainder: an exact face of the π navigator at a declared term aperture, not a stored π literal.
@@ -245,7 +245,7 @@ log-potential by the normalized relation `E(s)=K`. This relation needs no stored
 logarithm and does not claim that a learner generated the supplied K. `exp(tA)` and
 Gaussian amplitude/argument shifts are instead generic operator constructions: the formal
 `Transport/GaussianRebase` owner proves the cocycle
-`a(t,L,z) a(t,M,z+2tL) = a(t,L+M,z)`, while `Mathematics/GeneratorFactorization`
+`a(t,L,z) a(t,M,z+2tL) = a(t,L+M,z)`, while `Mathematics/NavigatorFactorization`
 provides the reusable block composition for Gamma-like coefficient shifts. This preserves
 the shift law without identifying every `Gamma` name with one function.
 
@@ -273,7 +273,7 @@ it does not become the generating relation merely because it is printed or seria
 
 [proved-derived; formal-checked] The [fractal-mode/attention construction](../research/records/2026-09-12_FRACTAL_MODES_LIFT_ATTENTION_INTO_MASS_PRESERVING_GENERATOR_COMPRESSION.md)
 joins entropic contact weights, mass/current-preserving aggregation, and the future quotient.
-`GeneratorModeQuotient` identifies receiver Gram degeneracy with linear dependence and proves
+`NavigatorModeQuotient` identifies receiver Gram degeneracy with linear dependence and proves
 that eliminating a redundant direction by incorporating its amplitude remains exact through
 every admitted generator word. `AttentionModeCompression` preserves partition mass before
 normalization; `AccumulatedReceiverDefect` bounds composed approximate summaries by the
@@ -299,7 +299,7 @@ map is the same indexed navigator/decoder relation used for source-qualified enc
 
 [proved-derived; formal-checked] The [navigator-inference construction](../research/records/2026-09-12_GENERATOR_INFERENCE_CODES_FREE_ENERGY_AND_SUFFICIENT_CONTINUATION.md)
 connects exact solving, MDL/MAP, Gibbs variational inference and sufficient representations.
-`Foundation/GeneratorInference.lean`, imported by `Framework.Information`, reads a finite admitted
+`Foundation/NavigatorInference.lean`, imported by `Framework.Information`, reads a finite admitted
 candidate objective `J=L_description+L_data` through the existing normalized-exponential owner.
 Its minimizing predicate is exactly the posterior-mode predicate, including on an exact feasible
 subtype. Its variational excess is KL in bits. Candidate objects can be programs or parameter
@@ -887,7 +887,7 @@ prediction or intelligence guarantee requires its own statement and assumptions.
 return here is a navigable formal framework, shared operators and explicit comparisons that can
 continue growing across subjects.
 
-[established-bounded; formal-proof] `Transport/GeneratorMachineCharts.lean`, imported by
+[established-bounded; formal-proof] `Transport/NavigatorMachineCharts.lean`, imported by
 Framework Dynamics, checks the fixed navigator machine's rational affine spatial realization,
 changing-anchor composition, geometry/value adjoints, projection, affine normalized mixtures
 and the six-real-coordinate encoding into native complex channels. Its image hypothesis is

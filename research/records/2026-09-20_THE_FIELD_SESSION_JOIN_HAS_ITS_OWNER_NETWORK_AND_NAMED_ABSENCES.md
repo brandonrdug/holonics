@@ -169,7 +169,7 @@ already resident (`K/field_normal_material.cuh::{field_enclosed_factor,field_enc
 | Modal reduction `K=DE`, `UE=ET` | `exact_linear/kernel_modes.rs::{KernelModeReduction,compile_source_action,rebase}`; `exact_linear/contextual.rs::factor_receiver` | Host exact | No |
 | Generated gather/apply/scatter | `crates/holonic-mount/src/section_layout.rs::SectionLayout`; `section_layout_adoption.rs` | Generator with device launch requirements | Only the enclosure scatter is declared |
 | Shared-drive mode | `C/field/internal_mode.rs::condense_shared_drive_mode` | **Resident** | Adjacent, unused by the session |
-| Formal | `L/Physics/AccumulatedNormalResponse.lean`; `L/Foundation/GeneratorModeQuotient.lean` | Reference | The Lean model is the dense rank-one update |
+| Formal | `L/Physics/AccumulatedNormalResponse.lean`; `L/Foundation/NavigatorModeQuotient.lean` | Reference | The Lean model is the dense rank-one update |
 
 **Concretely absent for #18:** `NormalSourceChart` has only `Wave` and `Features`; `NormalLayout`
 has no factor frame; no factored owner has a resident section adapter. Governing record:
@@ -190,7 +190,7 @@ Kronecker-sum or symmetric-square matrix operator exists in Rust, and none is ne
 
 | Relation | Existing owner |
 |---|---|
-| `E T=U E` or its separator | `exact_linear/contextual.rs::factor_receiver`; `exact_linear/kernel_modes.rs::compile_source_action`; `L/Foundation/{ReceiverHistoryCompression,JointReceiverDescent,GeneratorModeQuotient}.lean`; `L/Transport/{ChangingReceiver,AccumulatedReceiverDefect}.lean` |
+| `E T=U E` or its separator | `exact_linear/contextual.rs::factor_receiver`; `exact_linear/kernel_modes.rs::compile_source_action`; `L/Foundation/{ReceiverHistoryCompression,JointReceiverDescent,NavigatorModeQuotient}.lean`; `L/Transport/{ChangingReceiver,AccumulatedReceiverDefect}.lean` |
 | Reduced recurrence of one operator | `exact_linear.rs::ExactRatMatrix::{minimal_polynomial,power_reduced}`; `A/mathematical.rs::MathematicalRequest::Power` |
 | Resident compression | `receiver_exact_compression.rs::compress_on_device`; `native_ecology/recurrent_condensation.rs`; `C/field/internal_mode.rs` |
 | Phase closure and landmarks | `L/Millennium/{LandmarksAndModuli,Farey,Polarity}.lean`; `winding_inertia.rs`; `relational_geometry::exact_analysis::{winding,constants}`; `arithmetic_phase/affine_orbit.rs` with `L/Mathematics/AffineOrbitDivisor.lean` |

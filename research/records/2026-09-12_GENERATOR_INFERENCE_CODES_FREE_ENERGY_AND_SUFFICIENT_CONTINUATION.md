@@ -11,7 +11,7 @@ This return composes existing formal owners and extends the existing exact code-
 parameters, receiver and required future scope. It can be a factor circuit, an indexed recurrence,
 a fixed-architecture parameter vector, or a dependent pair `(architecture, parameters)`.
 `DependentMachineLearningCarrier.TotalState` already gives the sigma-type presentation for
-changing carriers; `GeneratorFactorization` already certifies complete bilinear and block actions.
+changing carriers; `NavigatorFactorization` already certifies complete bilinear and block actions.
 Supplied source constraints define a solution/preimage fibre in this candidate population.
 
 [definition] A statistical receiver additionally supplies a likelihood, reference measure and
@@ -36,7 +36,7 @@ continuation laws. It does not claim to have invented the MDL/Bayes corresponden
 
 `Π_D(g) = 2^(-J_D(g)) / Z_D`,    `Z_D = Σ_g 2^(-J_D(g))`.
 
-`Foundation/GeneratorInference.posterior` uses the existing `NormalizedExponential.face` with
+`Foundation/NavigatorInference.posterior` uses the existing `NormalizedExponential.face` with
 potential `-(ln 2) J_D`. `posterior_of_log_description_and_likelihood` derives the normalized
 prior-times-likelihood expression. Positive unnormalized code weights are permitted; their
 normalization is included in Z. Data independence is not an assumption of this theorem: the
@@ -72,7 +72,7 @@ assign those physical quantities to an arbitrary program length.
 
 [proved-derived; formal-checked] The existing softmax common-shift law now has its converse:
 `NormalizedExponential.face_eq_iff_pairwise_differences` and
-`GeneratorInference.posterior_eq_iff_objective_differences` prove
+`NavigatorInference.posterior_eq_iff_objective_differences` prove
 
 `Π_J = Π_K  ↔  ∀ g,h, J(g)-J(h) = K(g)-K(h)`.
 

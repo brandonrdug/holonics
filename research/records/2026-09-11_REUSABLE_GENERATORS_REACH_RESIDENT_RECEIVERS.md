@@ -27,7 +27,7 @@ shared `ExactRatMatrix::factor_receiver` owner.
 `LinearMapFamily` satisfying `D S=T`, or a source-null vector that the requested target reads
 nontrivially. It verifies the returned factorization or separator. Duplicate products retain
 free decoder-row directions. The existing mathematical
-`Mathematics/GeneratorFactorization.lean` coefficient certificate and receiver/history laws
+`Mathematics/NavigatorFactorization.lean` coefficient certificate and receiver/history laws
 supply the formal interpretation; no new runtime proof-assistant binding is introduced.
 
 ## The native consumer

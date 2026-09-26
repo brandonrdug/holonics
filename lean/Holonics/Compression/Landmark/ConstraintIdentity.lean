@@ -481,6 +481,14 @@ theorem machin :
   rw [one_div, one_div]
   linarith
 
+/-- [proved-derived; formal-checked] **Machin's lifted phase is Gaussian-integer arithmetic:**
+`(5 + i)⁴ = (239 + i)(2 + 2i)`, so the phase of `(5 + i)⁴` is that of `239 + i` plus a quarter-turn
+carried by `2 + 2i`; `machin` is its arctangent reading. -/
+theorem gaussian_machin_factorization :
+    ((5 : ℂ) + Complex.I) ^ 4 = ((239 : ℂ) + Complex.I) * (2 + 2 * Complex.I) := by
+  apply Complex.ext <;> norm_num [pow_succ, Complex.mul_re, Complex.mul_im,
+    Complex.I_re, Complex.I_im]
+
 /-- [proved-derived; formal-checked] **Machin's arms enclose π:** `π = 16 arctan(1/5) − 4
 arctan(1/239)` (`Real.four_mul_arctan_inv_5_sub_arctan_inv_239`) with each arm between consecutive
 partial sums. -/

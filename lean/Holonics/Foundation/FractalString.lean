@@ -38,7 +38,7 @@ This file owns the exact counting and zeta laws of that object.
   navigator are the epochs of a return map `M`. The return-map laws are owned by
   `Aeon/Production/Zeta`: the words of depth `n` are `(Mⁿ)ᵢⱼ` many (`Zeta.card_returnWord`), all
   of them `1ᵀ Mⁿ 1` (`Zeta.wordCount`), and the transfer determinant is `det(1 − T·M)` (Mathlib's
-  `Matrix.charpolyRev`), which `Transport/GeneratorTraceFaces` conserves. This file reads them in
+  `Matrix.charpolyRev`), which `Transport/NavigatorTraceFaces` conserves. This file reads them in
   the scale chart `T = r^s`. For `N` equal ratios `r` the map is the one state `[N]` and
   `1 − N r^s = charpolyRev [N]` at `r^s` (`equalRatio_depth_face`, `equalRatioZeta_eq_transfer`); for
   any ratios, and for the nonlattice golden string, the denominator is the one-state transfer

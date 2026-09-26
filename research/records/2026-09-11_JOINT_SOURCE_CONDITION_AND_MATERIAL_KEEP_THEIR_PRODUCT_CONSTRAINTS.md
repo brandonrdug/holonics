@@ -79,7 +79,7 @@ not a kernel error or an invented point solution.
 
 ## Formal return
 
-[proved-derived; formal-checked] `Mathematics/GeneratorFactorization.lean` now proves the affine
+[proved-derived; formal-checked] `Mathematics/NavigatorFactorization.lean` now proves the affine
 bilinear expansion for a shared scalar parameter, the finite shared-parameter expansion of a
 scalar-port bilinear linear map, and its fixed-port specialization. Together with the existing
 finite tensor coefficient certificate these state the component algebra used by the constructor.

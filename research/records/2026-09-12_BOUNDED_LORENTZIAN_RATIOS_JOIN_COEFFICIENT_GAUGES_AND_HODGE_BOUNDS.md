@@ -33,7 +33,7 @@ Thus the ratio is an affine-gauge-invariant log contrast. If `p_α=P_α/Z` and
 contrast bound. The balanced ratio can stay fixed while the full normalized distribution
 changes: its gauge is receiver-relative, not equality of all predictive conduct.
 
-[definition] This composes directly with `GeneratorInference`, normalized-exponential gauges,
+[definition] This composes directly with `NavigatorInference`, normalized-exponential gauges,
 `ReceiverCodeCost`, section rebasing and the coefficient-family solver. M-convexity concerns
 the paper's exchange/valuation construction; an arbitrary vector of observed log coefficients
 is not simply declared M-convex. Tropical boundedness and the untropicalized sharp constant

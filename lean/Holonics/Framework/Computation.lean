@@ -1,12 +1,12 @@
 import Holonics.Framework.Core
-import Holonics.Mathematics.GeneratorFactorization
+import Holonics.Mathematics.NavigatorFactorization
 import Holonics.Mathematics.DependentConstitutiveReturn
 import Holonics.Computation.CslibExecutionReceiver
 import Holonics.Computation.HolonicMachineLearning
 import Holonics.Computation.HolonicArchitectureCharts
 import Holonics.Computation.AttentionModeCompression
 import Holonics.Computation.NormalizationProjectionScope
-import Holonics.Foundation.GeneratorModeQuotient
+import Holonics.Foundation.NavigatorModeQuotient
 import Holonics.Transport.AccumulatedReceiverDefect
 import Holonics.Computation.HolonicRecurrentEcology
 import Holonics.Computation.HolonicNeuralMorphologyContinuation

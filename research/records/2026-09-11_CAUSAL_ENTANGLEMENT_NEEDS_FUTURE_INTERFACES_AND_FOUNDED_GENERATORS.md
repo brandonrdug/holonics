@@ -72,7 +72,7 @@ declared scope. The directed study is algorithms for π and e as constraint iden
 to prime arithmetic, ζ and receiver-oriented tori. The following identification results remain
 valid at their stated scope and do not contest that constitutive relevance.
 
-[proved-derived; formal-checked] `Computation/GeneratorObservationScope.lean` proves that adding
+[proved-derived; formal-checked] `Computation/NavigatorObservationScope.lean` proves that adding
 observations restricts a declared compatible generator family. It also proves an explicit
 finite-data limit. For every prefix length N, the functions
 
@@ -97,7 +97,7 @@ a concrete receiver-relative version of a small catalyst making a dependency vis
 not whether its implementation happens to contain addition or exponentiation instructions.
 
 [established-bounded; process-audit] The focused
-`lake env lean ElementaryHolonics/Computation/GeneratorObservationScope.lean` check passes.
+`lake env lean ElementaryHolonics/Computation/NavigatorObservationScope.lean` check passes.
 No native inference/cultivation code changed. The new formal module and the existing future
 receiver laws provide study constraints; no learned semantic classes, error-free intelligence,
 physical force identification or computational complexity bound is claimed.

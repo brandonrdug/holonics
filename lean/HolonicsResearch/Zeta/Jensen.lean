@@ -26,7 +26,7 @@ circleAverage (log ‖Λ₀‖) c R
 Every weight `log(R/‖c − u‖)` is positive strictly inside the disc and zero on the boundary, so the
 sum is a genuine count-with-multiplicity, damped by how close each zero sits to the rim.
 
-**And it is the same invariant the winding reads.**  `Zeta.Winding` computes the index of a zero as a
+**And it is the same invariant the winding reads.**  `Zeta.LocalArgumentPrinciple` computes the index of a zero as a
 turn — `∮ f'/f = 2πi·n`, a *phase* face, with the analytic factor contributing nothing.  Jensen
 computes the same index from `log ‖f‖` on the same circle — a *magnitude* face.  One divisor, two
 receivers.  That is the corpus's own pairing: a defect legible in the phase and legible in the
@@ -93,7 +93,7 @@ theorem theBoundaryAverageDeterminesTheInteriorZeros {c : ℂ} {R : ℝ} (hR : R
   ring
 
 /-- **THE TWO FACES OF ONE INDEX.**  For the model factor the phase reading and the magnitude
-reading agree on the same number `n`: the winding is `2πi·n` (`Zeta.Winding`) and Jensen's weight at
+reading agree on the same number `n`: the winding is `2πi·n` (`Zeta.LocalArgumentPrinciple`) and Jensen's weight at
 the centre is `n · log R`.  Neither is derived from the other here; the point is that one divisor
 supports both receivers, and only the phase one carries the *location*. -/
 theorem theCentreWeightIsTheOrder {c : ℂ} {R : ℝ} (n : ℤ)

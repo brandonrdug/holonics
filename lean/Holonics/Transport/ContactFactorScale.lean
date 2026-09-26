@@ -1,4 +1,4 @@
-import Holonics.Transport.GeneratorMachineCharts
+import Holonics.Transport.NavigatorMachineCharts
 import Mathlib.Tactic
 
 /-!

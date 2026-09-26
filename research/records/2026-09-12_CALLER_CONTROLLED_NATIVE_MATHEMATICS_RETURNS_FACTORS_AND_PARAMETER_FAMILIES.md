@@ -26,7 +26,7 @@ No Athena/Hephaestus switch selects internal machinery.
 ## Recovered mathematics and executable correspondence
 
 [proved-derived; formal-checked] The existing
-`Mathematics/GeneratorFactorization.lean::bilinear_factorization` proves that a coefficient
+`Mathematics/NavigatorFactorization.lean::bilinear_factorization` proves that a coefficient
 certificate `T[o,i,j] = sum_r D[o,r] A[r,i] B[r,j]` realizes the entire bilinear action, over
 an arbitrary finite commutative-ring chart. This implementation uses the already-established
 exact `BilinearProductCore::bind` / `ExactRatMatrix::factor_receiver` to construct that
@@ -169,7 +169,7 @@ The resulting operator shares the first product core and retains its complete de
 The right port remains fixed in that constructed instance; an arbitrary varying third input
 has not been silently replaced by its previous value.
 
-[proved-derived; formal-checked] `GeneratorFactorization.fixedRight_receiver_section` proves
+[proved-derived; formal-checked] `NavigatorFactorization.fixedRight_receiver_section` proves
 the fixed-port section identity over arbitrary finite commutative-ring charts. Together with
 the existing bilinear factorization certificate and receiver composition, this yields
 `F2(F1(x,z),c)=(L_c D1)((A1 x).*(B1 z))` for the admitted source family. The executable owner is
@@ -252,7 +252,7 @@ image returns empty coverage while the original condition retains its complete o
 it no longer copies an oversized upstream residual into a smaller image prefix. The control
 also supplies an inconsistent downstream observation and verifies the retained obstruction.
 
-[proved-derived; formal-checked] `GeneratorFactorization.joined_receiver_factorization`
+[proved-derived; formal-checked] `NavigatorFactorization.joined_receiver_factorization`
 binds the stacked-receiver matrix identity to the existing core factorization. The new
 `ReceiverPotential.image_receiver_restriction` proves
 
