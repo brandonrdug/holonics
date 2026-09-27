@@ -172,7 +172,7 @@ fn chain() -> Field {
                 aperture: 2,
                 tolerance: rat(1, 16),
                 depth: 2,
-                prior: holonics::hnn::StopPrior::half(),
+                prior: holonics::compression::landmark::context::StopPrior::half(),
             }],
             crib: CribDeclaration {
                 window: 16,
@@ -839,9 +839,9 @@ fn tree_declared(
     depth: usize,
     forced: usize,
     population: u64,
-    capacity: holonics::hnn::landmark::Capacity,
-) -> holonics::hnn::landmark::LandmarkDeclaration {
-    use holonics::hnn::landmark::{LandmarkDeclaration, LetterFamily, StopPrior};
+    capacity: holonics::compression::landmark::context::Capacity,
+) -> holonics::compression::landmark::context::LandmarkDeclaration {
+    use holonics::compression::landmark::context::{LandmarkDeclaration, LetterFamily, StopPrior};
     LandmarkDeclaration {
         alphabet,
         depth,
@@ -855,8 +855,8 @@ fn tree_declared(
 }
 
 /// The enlarged tree's letter family: two phase slots, of grains 3 and 2.
-fn tree_family() -> holonics::hnn::landmark::LetterFamily {
-    use holonics::hnn::landmark::{Feature, LetterFamily};
+fn tree_family() -> holonics::compression::landmark::context::LetterFamily {
+    use holonics::compression::landmark::context::{Feature, LetterFamily};
     LetterFamily::new(vec![
         Feature::Phase { ring: 0, grain: 3 },
         Feature::Phase { ring: 1, grain: 2 },
@@ -865,8 +865,8 @@ fn tree_family() -> holonics::hnn::landmark::LetterFamily {
 }
 
 /// A stream's bundles under [`tree_family`]: cell `i` with the phases `(i mod 3, ⌊i/3⌋ mod 2)`.
-fn tree_bundles(stream: &[usize]) -> Vec<holonics::hnn::Letter> {
-    use holonics::hnn::landmark::{Bundle, Letter};
+fn tree_bundles(stream: &[usize]) -> Vec<holonics::compression::landmark::context::Letter> {
+    use holonics::compression::landmark::context::{Bundle, Letter};
     let family = tree_family();
     stream
         .iter()
@@ -896,8 +896,8 @@ struct Carried {
 /// The upper parts a deposit founded (nodes numbered from `before` whose bottom lies above their
 /// branch's depth: a leaf's bottom is the depth) holding a register below the twin's.
 fn carried_upper_parts(
-    tree: &holonics::hnn::Landmarks,
-    twin: &holonics::hnn::Landmarks,
+    tree: &holonics::compression::landmark::context::Landmarks,
+    twin: &holonics::compression::landmark::context::Landmarks,
     before: usize,
 ) -> usize {
     let (arena, reference) = (tree.arena(), twin.arena());
@@ -919,13 +919,15 @@ fn carried_upper_parts(
 /// whose topology it keeps, and returns what carried ([`Carried`]). Returns the card's times.
 fn tree_parity(
     card: &Card,
-    mut tree: holonics::hnn::Landmarks,
-    letters: &[holonics::hnn::Letter],
+    mut tree: holonics::compression::landmark::context::Landmarks,
+    letters: &[holonics::compression::landmark::context::Letter],
     cells: &[usize],
     aperture: usize,
     check: usize,
 ) -> (TreeTimes, Carried) {
-    use holonics::hnn::landmark::{Capacity, LandmarkDeclaration, Landmarks, letter_address};
+    use holonics::compression::landmark::context::{
+        Capacity, LandmarkDeclaration, Landmarks, letter_address,
+    };
     let depth = tree.declaration().depth;
     let mut twin = (tree.declaration().capacity != Capacity::Unbounded).then(|| {
         Landmarks::new(LandmarkDeclaration {
@@ -940,7 +942,8 @@ fn tree_parity(
     let mut position = 0;
     let mut windows = 0;
     while position + aperture <= cells.len() {
-        let addresses: Vec<Vec<holonics::hnn::Letter>> = (position..position + aperture)
+        let addresses: Vec<Vec<holonics::compression::landmark::context::Letter>> = (position
+            ..position + aperture)
             .map(|at| letter_address(letters, at, depth))
             .collect();
         let known = &cells[position..position + aperture];
@@ -950,7 +953,7 @@ fn tree_parity(
         let host = tree.window_splits(&addresses, &[]).unwrap();
         let carded = mirror.window_splits(&addresses, &[]).unwrap();
         assert_eq!(carded, host, "the window at {position}, nothing known");
-        let steps: Vec<(Vec<holonics::hnn::Letter>, usize)> =
+        let steps: Vec<(Vec<holonics::compression::landmark::context::Letter>, usize)> =
             addresses.into_iter().zip(known.iter().copied()).collect();
         for (address, class) in &steps {
             let before = tree.nodes();
@@ -1002,7 +1005,7 @@ fn tree_parity(
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_card_tree_reads_and_deposits_as_the_host_tree() {
-    use holonics::hnn::landmark::{
+    use holonics::compression::landmark::context::{
         Capacity, LandmarkDeclaration, Landmarks, StopPrior, cell_letters,
     };
     let card = card();
@@ -1079,7 +1082,7 @@ fn the_card_tree_reads_and_deposits_as_the_host_tree() {
 }
 
 /// **The card's register carries at its ceiling as the host's** (the register's capacity, `Capacity::carry`;
-/// Lean `HNN/LandmarkCapacity.{capCarry, cap_carry_half_units, capped_tree_laws}`; the hardware-surfaces rule:
+/// Lean `Compression/Landmark/Context/Capacity.{capCarry, cap_carry_half_units, capped_tree_laws}`; the hardware-surfaces rule:
 /// the resident realization advances with the law). At the ceilings `c ∈ {1, 2, 3}` (`L = 2, 4,
 /// 8`, small enough that the shallow registers carry at nearly every arrival): the binary stream
 /// with its flipped cell at `D = 12` and `D = 48` (chains holding carried registers split, their
@@ -1094,7 +1097,7 @@ fn the_card_tree_reads_and_deposits_as_the_host_tree() {
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_card_register_carries_at_its_ceiling_as_the_host() {
-    use holonics::hnn::landmark::{
+    use holonics::compression::landmark::context::{
         Capacity, LandmarkDeclaration, Landmarks, StopPrior, cell_letters,
     };
     let card = card();
@@ -1169,14 +1172,14 @@ fn the_card_register_carries_at_its_ceiling_as_the_host() {
     assert_eq!(runs, 3 * 8);
 }
 
-/// **The card's β step is the host's** (`hnn_tree_beta_steps` against `landmark::Beta::step`,
-/// Lean `HNN/LandmarkCarrier.{rebase_decode, rebase_ratio_enclosed}`): exact carries, mantissa
+/// **The card's β step is the host's** (`hnn_tree_beta_steps` against `context::Beta::step`,
+/// Lean `Compression/Landmark/Context/Carrier.{rebase_decode, rebase_ratio_enclosed}`): exact carries, mantissa
 /// rebases, and the carrier's rebase at `R = 126 − W` bits with its released remainder, at the
 /// widths of a 131,072-cell declaration (`W = 32`, `M_p = 48`) and a narrow carrier.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_card_beta_step_is_the_hosts() {
-    use holonics::hnn::landmark::Beta;
+    use holonics::compression::landmark::context::Beta;
     let card = card();
     let mut draw = Draw(211);
     for (width, face) in [(32u64, 48u64), (6, 20)] {
@@ -1222,8 +1225,8 @@ fn the_card_beta_step_is_the_hosts() {
     }
 }
 
-/// **The card's split is the host's** (`hnn_tree_split_ratios` against `landmark::Beta::split`
-/// with each part's stop weight; Lean `HNN/LandmarkCompaction.chain_split`): over carried ratios
+/// **The card's split is the host's** (`hnn_tree_split_ratios` against `context::Beta::split`
+/// with each part's stop weight; Lean `Compression/Landmark/Context/Compaction.chain_split`): over carried ratios
 /// `β` at the carriers `W = 6, 29, 43` (a narrow carrier, campaign 1's `D = 4` and the wide cut's
 /// `D = 48`) with rungs on both sides to 40, the exponents running to `±5000` and across the card's
 /// caps (`e = E* ± 2`, `E* = 2W + 2S + 4`, and `−e = F* ± 2`, `F* = 3W + 2S + 4`), each part's
@@ -1232,7 +1235,7 @@ fn the_card_beta_step_is_the_hosts() {
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_card_split_is_the_hosts() {
-    use holonics::hnn::landmark::Beta;
+    use holonics::compression::landmark::context::Beta;
     let card = card();
     let mut draw = Draw(37);
     let (mut rebased_all, mut kept_all) = (0usize, 0usize);

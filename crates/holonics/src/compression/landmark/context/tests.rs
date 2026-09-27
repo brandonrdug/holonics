@@ -26,22 +26,24 @@
 //! every opened path, with chains split after their registers carried; the capped executed tree
 //! within its certificate; and its windows in cell order.
 
+mod full;
+
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
 
-use crate::hnn::HnnError;
-use crate::hnn::landmark::{
+use crate::compression::landmark::context::{
     Beta, Bundle, Capacity, DigitsReading, FaceJoins, Feature, IdealLandmarks, JoinTree,
     LandmarkDeclaration, LandmarkFace, Landmarks, Letter, LetterFamily, PassageCode, StopMixture,
     StopPrior, Widths, address, binary_log, carrier_width, cell_letters, choose_depth,
     choose_prior, code_length, face_bits, ladder_top, lattice_mix, letter_address, odometer_digits,
     prequential, prior_family, ratio_code_length, tree_prequential,
 };
-use super::landmark_full::FullTree;
+use crate::hnn::HnnError;
 use crate::hnn::ratio::log2_enclosure;
 use crate::hnn::receiving::grain_exponent;
 use crate::hnn::reference::Cut;
 use crate::ratio::{Rat, rat};
+use full::FullTree;
 
 fn declaration(alphabet: usize, depth: usize) -> LandmarkDeclaration {
     LandmarkDeclaration {
@@ -68,7 +70,7 @@ fn kt_block(run: &[usize]) -> Rat {
 }
 
 /// **The block recursion**, independent of the path law: `W_s = E_s` at depth `D`, otherwise
-/// `W_s = w_d E_s + (1 − w_d) Π_b W_bs` at the node's depth `d` (Lean `HNN/LandmarkTree.stopWeight`;
+/// `W_s = w_d E_s + (1 − w_d) Π_b W_bs` at the node's depth `d` (Lean `Compression/Landmark/Context/Tree.stopWeight`;
 /// `½` is the landmark tree's), over the symbols of `stream[past..]` whose context (newest first) extends
 /// `context`.
 fn block_weight(
@@ -158,7 +160,7 @@ fn landmark_oracle_reproduces_the_willems_shtarkov_tjalkens_fixture() {
 }
 
 /// **The sequential path law is the block recursion at any stop prior** (Lean
-/// `HNN/LandmarkTree.{stop_weight_step, stop_founding_step}`; the oracle, `β` exact, founded at
+/// `Compression/Landmark/Context/Tree.{stop_weight_step, stop_founding_step}`; the oracle, `β` exact, founded at
 /// `2^(j_d) − 1`) on a longer binary stream at every depth up to 4, and the executed tree stays
 /// within its certificate there.
 #[test]
@@ -191,7 +193,7 @@ fn landmark_oracle_path_law_is_the_block_recursion() {
     }
 }
 
-/// **The executed faces are normalized exactly** (Lean `HNN/LandmarkTree.{lattice_path_laws,
+/// **The executed faces are normalized exactly** (Lean `Compression/Landmark/Context/Tree.{lattice_path_laws,
 /// cell_faces_partition, forced_digits_normalized}`) at every step of a short stream over five
 /// classes (so the odometer's third digit is forced where the upper half is empty): the face sums
 /// to 1, each class's face is positive, equals the one-class read and is a dyadic of at most
@@ -245,7 +247,7 @@ fn landmark_faces_are_normalized_and_certified() {
 /// level a stored chain, the storage where paths part): a leaf reads `⟦k_D(0)⟧`, past the last stored level the
 /// prior `1/2`, a chain above the forced depths its child, and a mixing chain
 /// `⟦λ̂ k(0) + (1 − λ̂) q̂'(0)⟧` with `λ̂ = ⟦β/(1 + β)⟧₀¹`, every face a numerator of `2^(−M_p)`
-/// inside `[1, 2^(M_p) − 1]` (Lean `HNN/LandmarkTree.lattice_path_laws`); after the deposit each
+/// inside `[1, 2^(M_p) − 1]` (Lean `Compression/Landmark/Context/Tree.lattice_path_laws`); after the deposit each
 /// mixing chain's `β` (a parting chain's upper part's split `β`) is `β k(b)/q̂'(b)`, or its rebase
 /// within `2^(1−W)` below it, and the leaf it founds keeps `D`'s `β₀ = 2^(j_D) − 1`.
 #[test]
@@ -329,7 +331,11 @@ fn landmark_lattice_faces_follow_the_law() {
                 if old.founded < old.faces.len() {
                     assert_eq!(new.founded, old.founded + 1);
                     let founding = BigInt::from(prior.founding(3));
-                    assert_eq!(new.betas[old.founded], Rat::from_integer(founding), "{prior}");
+                    assert_eq!(
+                        new.betas[old.founded],
+                        Rat::from_integer(founding),
+                        "{prior}"
+                    );
                 }
             }
         }
@@ -358,7 +364,7 @@ fn landmark_stop_weight_rounds_exactly() {
     }
 }
 
-/// **The β chart rebases** (Lean `HNN/LandmarkTree.rebase_log_residual`): a ratio whose odd parts
+/// **The β chart rebases** (Lean `Compression/Landmark/Context/Tree.rebase_log_residual`): a ratio whose odd parts
 /// outgrow `W` keeps its mantissa `m' ∈ [2^(W−1), 2^W)` with relative residual in `[0, 1/m')`, a
 /// ratio within `W` is carried exactly and reduced; at a declared carrier of 4 bits a tree rebases,
 /// its faces stay exactly normalized and its certificates grow with the rebases while holding
@@ -396,7 +402,7 @@ fn landmark_chart_rebases_with_its_certified_residual() {
     assert_eq!(sum, Rat::one());
 }
 
-/// **The telescope** on an opened path (Lean `HNN/LandmarkTree.path_telescope_exact`), executed
+/// **The telescope** on an opened path (Lean `Compression/Landmark/Context/Tree.path_telescope_exact`), executed
 /// and ideal: `q_0 = q_f · Π_(d<f) q_d/q_(d+1)`, and the edge ratios carry `q_0` to `q_f`.
 #[test]
 fn landmark_opened_path_telescopes() {
@@ -796,8 +802,8 @@ fn bundle_declaration(alphabet: usize, depth: usize) -> LandmarkDeclaration {
     }
 }
 
-/// **The enlarged tree's faces are normalized and certified** (Lean `HNN/LandmarkTree.{
-/// lattice_path_laws, cell_faces_partition, executed_face_bound}`, `HNN/LandmarkAddress`): with a
+/// **The enlarged tree's faces are normalized and certified** (Lean `Compression/Landmark/Context/Tree.{
+/// lattice_path_laws, cell_faces_partition, executed_face_bound}`, `Compression/Landmark/Context/Address`): with a
 /// declared family each dyadic cell joins the cell tree and the bundle tree, and at every step the
 /// all-class face sums to 1 exactly, each class's face is the one-class read and a dyadic of at
 /// most `B · M_p` bits, each grain exponent is `grain_exponent`'s, the splits rebuild the face, the
@@ -858,7 +864,7 @@ fn landmark_bundle_tree_is_normalized_and_certified() {
 }
 
 /// **The enlarged tree keeps the cell-only branch** (Lean
-/// `HNN/LandmarkAddress.cell_only_dominance_with_feature_charge`, on the ideal oracles with `β`
+/// `Compression/Landmark/Context/Address.cell_only_dominance_with_feature_charge`, on the ideal oracles with `β`
 /// exact): over any stream the join at each dyadic cell is the sequential mixture of the two
 /// branches (`sequential_mixture`), so the enlarged code is at most the cell tree's plus one bit per
 /// dyadic cell opened, `∏ q_enlarged · 2^H ≥ ∏ q_cells`. And where the features carry what the
@@ -866,7 +872,7 @@ fn landmark_bundle_tree_is_normalized_and_certified() {
 /// the enlarged executed tree codes strictly shorter, by disjoint exact enclosures.
 #[test]
 fn landmark_enlarged_tree_keeps_the_cell_only_branch() {
-    let mut draw = super::support::Draw::new(5);
+    let mut draw = crate::hnn::tests::support::Draw::new(5);
     let stream: Vec<usize> = (0..240)
         .map(|i| 2 * (draw.next() % 2) as usize + usize::from(i % 3 == 0))
         .collect();
@@ -990,8 +996,8 @@ fn landmark_letters_are_refused_outside_their_family() {
     tree.receive(&[Letter::Boundary], 1).unwrap();
 }
 
-/// **The carrier rebases with its enclosure** (Lean `HNN/LandmarkCarrier.{rebase_decode,
-/// rebase_ratio_enclosed}`, `HNN/LandmarkTree.rebase_log_residual`): at the carrier `W = 32` with
+/// **The carrier rebases with its enclosure** (Lean `Compression/Landmark/Context/Carrier.{rebase_decode,
+/// rebase_ratio_enclosed}`, `Compression/Landmark/Context/Tree.rebase_log_residual`): at the carrier `W = 32` with
 /// the rebase `R = 94` a β step whose carrier `(N, D)` has a 99-bit odd denominator
 /// passes the mantissa's division, so `D` rebases to its top `R` bits and releases its remainder;
 /// the carried `β'` lies in `[v(1 − 1/m'), v(1 + 1/D̂))` of the exact step `v`, and a carrier within
@@ -1023,7 +1029,7 @@ fn landmark_carrier_rebases_with_its_enclosure() {
 }
 
 /// **The tree declares past the old refusal and stays within its grain** (Sol's review §4; Lean
-/// `HNN/LandmarkCarrier.width_or_rebase_total`): campaign 1's `|A| = 256`, `D = 4`, `L_R = 16` was
+/// `Compression/Landmark/Context/Carrier.width_or_rebase_total`): campaign 1's `|A| = 256`, `D = 4`, `L_R = 16` was
 /// refused from 87,382 cells, where the β step's product `2W + κ + M_p + 1` passed 128 bits. At
 /// 131,072 cells the widths stay the rule's (`M_p = 48`, `W = 33`, never reduced), the carrier
 /// rebases at `R = 93` bits, and over the whole passage every cell's certified residual lies within
@@ -1057,7 +1063,7 @@ fn landmark_tree_declares_past_the_old_refusal_and_stays_within_the_grain() {
         .is_ok()
     );
     // A text-like passage: words drawn from a small vocabulary, separated by spaces.
-    let mut draw = super::support::Draw::new(1_024);
+    let mut draw = crate::hnn::tests::support::Draw::new(1_024);
     let words: Vec<Vec<usize>> = (0..96)
         .map(|_| {
             let length = 2 + (draw.next() % 7) as usize;
@@ -1105,7 +1111,7 @@ fn landmark_tree_declares_past_the_old_refusal_and_stays_within_the_grain() {
 /// kernel's) admit to `605,394`.
 #[test]
 fn landmark_split_operands_are_the_single_division() {
-    let mut draw = super::support::Draw::new(35);
+    let mut draw = crate::hnn::tests::support::Draw::new(35);
     for (population, depth) in [
         (6_148u64, 4usize),
         (1 << 20, 1),
@@ -1195,7 +1201,7 @@ fn landmark_split_operands_are_the_single_division() {
 /// integers.
 #[test]
 fn landmark_passage_code_is_the_faces_product() {
-    let mut draw = super::support::Draw::new(20);
+    let mut draw = crate::hnn::tests::support::Draw::new(20);
     let mut code = PassageCode::new();
     let (mut left, mut right) = (PassageCode::new(), PassageCode::new());
     // The exact product, unreduced: the faces' numerators and denominators multiplied apart.
@@ -1242,7 +1248,7 @@ fn landmark_passage_code_is_the_faces_product() {
         }
     }
     let (numerator, denominator, exponent) = code.bounds();
-    let integer = |bound: &crate::hnn::landmark::ProductBound| {
+    let integer = |bound: &crate::compression::landmark::context::ProductBound| {
         BigUint::from(bound.mantissa) << bound.exponent as usize
     };
     // `∏ q = N/(D 2^E)`: `N` between its bounds, `D 2^E` between its bounds times `2^E`.
@@ -1274,7 +1280,7 @@ fn rat_power(exponent: i64) -> Rat {
 // -------------------------------------------------------------------------------------------
 // The declared stop prior
 
-/// **The stop prior is the dyadic ladder** (Lean `HNN/LandmarkTree.ladder_founding`): rung `j`
+/// **The stop prior is the dyadic ladder** (Lean `Compression/Landmark/Context/Tree.ladder_founding`): rung `j`
 /// stops with `1 − 2^(−j)` and founds at `2^j − 1`; `[1]` is the `½` stop prior; a repeated last
 /// rung is dropped, so one law compares equal however it is declared; rungs outside `1..=63` and
 /// an empty law are refused. The ladder's top at the standing cut's scope is
@@ -1325,7 +1331,7 @@ fn landmark_stop_prior_is_the_dyadic_ladder() {
 }
 
 /// **Each node is founded at its depth's ratio, each chain at its summed rung** (Lean
-/// `HNN/LandmarkTree.stop_founding_step`, `HNN/LandmarkCompaction.{leaf_chain_is_one_node,
+/// `Compression/Landmark/Context/Tree.stop_founding_step`, `Compression/Landmark/Context/Compaction.{leaf_chain_is_one_node,
 /// chain_split}`): the founding chart is `β₀ = 2^(j_d) − 1` exactly with the stop weight
 /// `λ̂ = 1 − 2^(−j_d)` on the lattice; one arrival stores one leaf chain at the root with `D`'s
 /// chart; an arrival parting from it at depth 2 reads the upper part at the summed rung,
@@ -1386,7 +1392,7 @@ fn landmark_stop_prior_founds_each_node_at_its_ratio() {
 }
 
 /// **Campaign 2's constant-slot controls are the per-depth prior `(1, r + 1)`** (the declared stop prior; Lean
-/// `HNN/LandmarkTree.stop_mixture_over_trees`): in the bundle branch over `r` slots of one letter, a
+/// `Compression/Landmark/Context/Tree.stop_mixture_over_trees`): in the bundle branch over `r` slots of one letter, a
 /// cell node's split passes through a chain of `r` constant nodes at `½` (each routes the same
 /// counts), so every cell depth past the root stops with `1 − 2^(−(r+1))`, the root with `½`, and
 /// the bottom chain reads its leaf's face. On the ideal oracles with `β` exact, every opened digit's
@@ -1520,7 +1526,7 @@ fn external_split(face_bits: u64, t: usize, h: usize) -> u64 {
     eighths << (face_bits - 3)
 }
 
-/// **A join tree's prior sums to one** (Lean `HNN/LocalWeighing.static_mixture`): the balanced
+/// **A join tree's prior sums to one** (Lean `Compression/Landmark/Context/LocalWeighing.static_mixture`): the balanced
 /// tree over `2^m` faces is uniform, over five faces its weights are `2^(−depth)`; the incumbent's
 /// tree gives face 0 the prior `1 − 2^(−j)` and shares `2^(−j)` among the rest.
 #[test]
@@ -1550,7 +1556,7 @@ fn landmark_join_tree_prior_sums_to_one() {
 }
 
 /// **The joins are the Bayesian mixture of their faces, digit by digit** (Lean
-/// `HNN/LocalWeighing.{static_mixture, forward_executed}`): three declared lattice faces in two
+/// `Compression/Landmark/Context/LocalWeighing.{static_mixture, forward_executed}`): three declared lattice faces in two
 /// dyadic cells, joined by the incumbent's tree; each digit's mixed face lies within its
 /// certificate of the exact posterior mixture `Σ_k π_k A_k q_k/Σ_k π_k A_k` (each dyadic cell its
 /// own evidence `A_k`), and the mixed faces' product within the certificates' sum of the
@@ -1614,7 +1620,7 @@ fn landmark_joins_are_the_bayes_mixture_per_dyadic_cell() {
     );
 }
 
-/// **The stop-weight mixture per digit tree** (Lean `HNN/LocalWeighing.stop_mixture_per_tree`):
+/// **The stop-weight mixture per digit tree** (Lean `Compression/Landmark/Context/LocalWeighing.stop_mixture_per_tree`):
 /// one law alone is its tree exactly; a law joined with itself is its tree exactly (a join of two
 /// equal faces is that face); and two laws' mixture multiplies, in each dyadic cell, to within its
 /// certificates of `Σ_k π_k Π q̂_k` over the trees' own executed faces there.
@@ -1714,7 +1720,7 @@ fn arrivals(declared: &LandmarkDeclaration, stream: &[usize]) -> Vec<usize> {
     routed
 }
 
-/// **Each tree stores at most `2n − 1` nodes** (Lean `HNN/LandmarkCompaction.compacted_node_bound`)
+/// **Each tree stores at most `2n − 1` nodes** (Lean `Compression/Landmark/Context/Compaction.compacted_node_bound`)
 /// over `n` arrivals, and none without one.
 fn within_node_bound(tree: &Landmarks, routed: &[usize]) -> bool {
     let sizes = tree.tree_sizes();
@@ -1725,15 +1731,15 @@ fn within_node_bound(tree: &Landmarks, routed: &[usize]) -> bool {
             .all(|(&size, &n)| size <= (2 * n).saturating_sub(1))
 }
 
-/// **The oracle is the full tree's, exactly in ℚ** (Lean `HNN/LandmarkCompaction.{chain_ratio,
-/// chain_ratio_dyadic, leaf_chain_is_one_node, chain_split, compacted_is_decision_28}`): over streams
+/// **The oracle is the full tree's, exactly in ℚ** (Lean `Compression/Landmark/Context/Compaction.{chain_ratio,
+/// chain_ratio_dyadic, leaf_chain_is_one_node, chain_split, compacted_is_the_full_tree}`): over streams
 /// of two and five classes, at depths from 1 to past the stream's recurrence (at the deepest every
 /// context is new, so each leaf's label runs to the boundary letters), under the `½` stop prior, two
 /// global rungs and two per-depth priors, with forced depths 0 and 1, every class's face before
 /// each deposit and every prequential face of the oracle stored where paths part equal the
 /// full tree of one node a depth (`landmark_full`); it stores no more nodes.
 #[test]
-fn landmark_compacted_oracle_is_decision_28() {
+fn landmark_compacted_oracle_is_the_full_tree() {
     let binary: Vec<usize> = (0..40u64)
         .map(|t| usize::from((t * t + 3 * t) % 7 < 3))
         .collect();
@@ -1840,7 +1846,7 @@ fn landmark_compacted_tree_is_within_its_certificate() {
 /// part; the oracle's faces are the full tree's exactly, the executed faces sum to 1 and hold
 /// their certificates, and a window's faces in cell order are the deposited clone's.
 #[test]
-fn landmark_enlarged_tree_where_paths_part_is_decision_28() {
+fn landmark_enlarged_tree_where_paths_part_is_the_full_tree() {
     let alphabet = 5;
     let stream: Vec<usize> = (0..48u64)
         .map(|t| ((t * 7 + t / 3 + t * t / 11) % 5) as usize)
@@ -1949,19 +1955,21 @@ fn landmark_stored_parts_where_paths_part() {
 }
 
 /// **The split's ratios are their exact forms carried once** (`Beta::split`; Lean
-/// `HNN/LandmarkCompaction.chain_split`): over carried ratios `β` whose exponents run to `±3000`
+/// `Compression/Landmark/Context/Compaction.chain_split`): over carried ratios `β` whose exponents run to `±3000`
 /// and rungs to 40 on each side, the upper part lies at `β_u = (2^(S_up) − 1) 2^(S_low) β/(β (2^(S_low)
 /// − 1) + 2^S − 1)` and the lower at `β_ℓ = β (2^(S_low) − 1)/(2^S − 1)`, each exactly when its odd
 /// parts fit `W` bits and otherwise its `W`-bit floor, below the exact ratio by a relative
 /// `[0, 1/m')` with `m'` the kept mantissa in `[2^(W−1), 2^W)`.
 #[test]
 fn landmark_split_ratios_are_the_exact_forms() {
-    let mut draw = super::support::Draw::new(37);
+    let mut draw = crate::hnn::tests::support::Draw::new(37);
     let ladder = |rung: u64| Rat::from_integer((BigInt::one() << rung as usize) - 1);
     let (mut exact, mut rebased) = (0, 0);
     for width in [6u64, 28, 42] {
         for trial in 0..300 {
-            let wide = |draw: &mut super::support::Draw| u128::from(draw.next() >> (64 - width)) | 1;
+            let wide = |draw: &mut crate::hnn::tests::support::Draw| {
+                u128::from(draw.next() >> (64 - width)) | 1
+            };
             let exponent = match trial % 3 {
                 0 => (draw.next() % 21) as i64 - 10,
                 1 => (draw.next() % 6001) as i64 - 3000,
@@ -1975,7 +1983,8 @@ fn landmark_split_ratios_are_the_exact_forms() {
                     / (&value * ladder(lower) + ladder(upper + lower)),
                 &value * ladder(lower) / ladder(upper + lower),
             ];
-            for ((carried, mantissa), target) in beta.split(upper, lower, width).iter().zip(&targets)
+            for ((carried, mantissa), target) in
+                beta.split(upper, lower, width).iter().zip(&targets)
             {
                 let (n, d, _) = carried.parts();
                 assert!(n % 2 == 1 && d % 2 == 1 && n < 1 << width && d < 1 << width);
@@ -2014,7 +2023,7 @@ fn flipped(length: u64) -> Vec<usize> {
         .collect()
 }
 
-/// **The register's carry** (`Capacity::carry`, Lean `HNN/LandmarkCapacity.capCarry`): at the
+/// **The register's carry** (`Capacity::carry`, Lean `Compression/Landmark/Context/Capacity.capCarry`): at the
 /// ceiling each half-unit mass `2n + 1` becomes `2⌈n/2⌉ + 1`, and below it nothing moves; the
 /// unbounded register and a ceiling past every `u32` total never carry.
 #[test]
@@ -2049,12 +2058,12 @@ fn landmark_capacity_carries_its_register() {
 }
 
 /// **`c = ∞` and every ceiling no node reaches are the uncapped tree exactly** (Lean
-/// `HNN/LandmarkCapacity.{cap_unbounded_is_kt, cap_below_ceiling_is_kt}`): over a stream of 60
+/// `Compression/Landmark/Context/Capacity.{cap_unbounded_is_kt, cap_below_ceiling_is_kt}`): over a stream of 60
 /// cells, the unbounded tree, the tree at `c = 6` (`L = 64` passes every node's arrivals) and at
 /// `c = 40` read the same executed faces and certificates, store the same arena, and their oracles
 /// the same ideal faces, equal to the full tree of one node a depth.
 #[test]
-fn landmark_unbounded_capacity_is_decision_37() {
+fn landmark_unbounded_capacity_is_the_uncapped_tree() {
     let alphabet = 5;
     let stream: Vec<usize> = (0..60u64)
         .map(|t| ((t * 7 + t / 3 + t * t / 11) % 5) as usize)
@@ -2114,7 +2123,7 @@ fn landmark_unbounded_capacity_is_decision_37() {
 }
 
 /// **The capped oracle is the naive tree of one register a depth, exactly in ℚ** (Lean
-/// `HNN/LandmarkCompaction.compacted_node_law`, `HNN/LandmarkCapacity.capped_tree_laws`): at
+/// `Compression/Landmark/Context/Compaction.compacted_node_law`, `Compression/Landmark/Context/Capacity.capped_tree_laws`): at
 /// `L = 2, 4, 8, 32`, over the flipped binary stream and a five-class stream, at depths from 1 to
 /// past the stream's recurrence, under three priors and forced depths 0 and 1, every class's ideal
 /// face before each deposit equals the naive tree's (`landmark_full`, each depth its own register

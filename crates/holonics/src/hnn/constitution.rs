@@ -21,7 +21,7 @@
 //! `W_s,g = −f_g f_gᵀ`, the contrast port `W_c,g`, the skew slices `A_ρ = u_ρ v_ρᵀ − v_ρ u_ρᵀ`), its
 //! standing `q_g`, on a source ring its source ports (`E_g` and the factored pair port `E_g^(δ)`),
 //! on a receiving ring its receiving map `R` and the receiving parametron's landmark tree
-//! (the landmark tree, `hnn::landmark::Landmarks`), both at the receiving locus. Per contact `a`: its channel's
+//! (the landmark tree, `compression::landmark::context::Landmarks`), both at the receiving locus. Per contact `a`: its channel's
 //! square factors (`C_a = c_a c_aᵀ`, `K_a = b_a b_aᵀ`, `D_a = F_a F_aᵀ`). The junction admittance `Y_g` and the
 //! contact conductance `G_a` (`Y_a`, `β_a`, the screws) are declared on the field in campaign 1; the
 //! collapse names them as loci, but they carry no learned value.
@@ -38,17 +38,17 @@
 //! [definition; agent-inferred] **The landmark tree at the receiving locus.** The receiving map `R` keeps
 //! the prox step on its reached covectors (the lattice deposit and the lattice word), the covector of the ratio read on
 //! the combined face (`hnn::receiving::ReceivingRead::combined`). Beside it the receiving
-//! parametron stores its landmark tree (`hnn::landmark::Landmarks`, declared from the receiver by
+//! parametron stores its landmark tree (`compression::landmark::context::Landmarks`, declared from the receiver by
 //! `hnn::receiving::landmark_declaration`), which each reached comparison deposits on the path its
 //! causal address opens ([`LandmarkStep`], in cell order); its counts are integers of half-units
 //! and its mixture ratios are carried by the owner's β chart, so no lattice carry and no clock is
 //! read for it. It shares the locus's diamond row (retained always) and its collapse rule (never
-//! released): Lean `HNN/LandmarkTree.release_rule` proves that nodes deeper than `D` are releasable
+//! released): Lean `Compression/Landmark/Context/Tree.release_rule` proves that nodes deeper than `D` are releasable
 //! (the tree founds none) and that a retention is lawful exactly when it refines the causal
 //! signature; it does not prove that no shallower merge is lawful, and the collapse attempts none.
 //! The region table is retired from Rust, its laws staying in Lean `HNN/RegionCounts`; it
 //! is the depth-one forced case of the whole-cell emission (`|A|`-ary masses at a node; Lean
-//! `HNN/LandmarkTree.depth_one_is_decision_27`), not of this tree, which emits the cell's odometer
+//! `Compression/Landmark/Context/Tree.depth_one_is_the_whole_cell_table`), not of this tree, which emits the cell's odometer
 //! digits (its depth-one forced case is a product of binary KT faces). The first repair's exogenous law
 //! and standing read are retired: the tree's face contains the marginal (Lean `HNN/TargetFace`'s
 //! finite-chart obstruction stays a theorem).
@@ -170,12 +170,12 @@ use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
 use rayon::prelude::*;
 
+use crate::compression::landmark::context::{Landmarks, Letter};
 use crate::hnn::HnnError;
 use crate::hnn::contact::{
     certify_boost, contact_conductances, signed_form_certifies, signed_stiffness,
 };
 use crate::hnn::field::{ConstitutionRead, Field, lattice_exponent};
-use crate::hnn::landmark::{Landmarks, Letter};
 use crate::hnn::moment::PairPort;
 use crate::hnn::port::Deposit;
 use crate::hnn::propagation::gram;
@@ -1748,7 +1748,7 @@ struct RingMaterial {
     pairs: Vec<(usize, PairPort)>,
     pair_scale: Rat,
     receiving: Option<NormalLaw>,
-    /// The receiving parametron's landmark tree (`hnn::landmark`), on a receiving ring.
+    /// The receiving parametron's landmark tree (`compression::landmark::context`), on a receiving ring.
     tree: Option<Landmarks>,
     /// The receiver's mixture of the tree's face and the combined face (ruling A), on a receiving
     /// ring: its carried likelihood ratio `β`.
@@ -1947,7 +1947,7 @@ pub struct LinearStep {
 /// (the landmark tree): its receiving ring, the causal address its phase read the tree at
 /// (`hnn::receiving::ActiveAddress::phase`) and its target class. The deposit applies a window's
 /// steps in cell order, each on the paths its address opens (Lean
-/// `HNN/LandmarkTree.landmark_step`), at the receiving locus.
+/// `Compression/Landmark/Context/Tree.landmark_step`), at the receiving locus.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LandmarkStep {
     pub ring: usize,
@@ -2201,7 +2201,7 @@ impl Constitution {
                 .find(|receiver| receiver.ring == g)
                 .and_then(|receiver| landmark_declaration(field, receiver).ok())
                 .map_or(2, |declared| {
-                    crate::hnn::landmark::Widths::derived(&declared).carrier
+                    crate::compression::landmark::context::Widths::derived(&declared).carrier
                 })
         };
         let tree = |g: usize| -> Result<Option<Landmarks>, HnnError> {

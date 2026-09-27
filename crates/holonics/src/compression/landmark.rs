@@ -3,7 +3,8 @@
 //! [definition] Rebuild step 3 (#145). A **landmark** of a navigator family is a face where its
 //! paths converge: a site's kind and its Doppler ratio, a Möbius navigator's attracting fixed point,
 //! an identity (two constructions with one face), a constraint identity read through its partial
-//! navigator, and the primitive cycles (primes) of a return map. Landmark discovery locates them
+//! navigator, the primitive cycles (primes) of a return map, and the contexts of the shift navigator
+//! where a source's paths converge (the receiving tree, [`context`]). Landmark discovery locates them
 //! exactly over ℚ: an irrational landmark is carried as its constraint ([`QuadraticSurd`]), and a
 //! float never enters. Each module cites the Lean declarations of `Compression/Landmark` it
 //! realizes, and says where it is sharper than the Lean or departs from it, naming the #62 item.
@@ -16,6 +17,7 @@
 //! | [`identity`] | an identity is two constructions with one face; charts certify exactly the identities of `V` exactly when their images are Zariski dense (`I(⋃ images) = I(V)`), checked per component; the search over a finite family | `Identity` |
 //! | [`constraint`] | π (Machin) and `e` through their partial navigators; a window only with equal endpoint floors of Lean's enclosure | `ConstraintIdentity`, `Mathematics/RadixWindowReceiver` |
 //! | [`primitive`] | `tr(Mⁿ) = Σ_(d\|n) d·p_d`, Möbius inversion, the Euler product, for `0/1` return maps only | `PrimitiveCycle` |
+//! | [`context`] | the shift navigator's landmarks, the receiving tree: a node is a context where the source's paths converge; context-tree weighting over typed address letters, a mixture over the pruned trees' candidate standings with the stop prior, each node's arrivals the epochs of its section and its register capped by a carry; executed on a declared dyadic lattice with certified residuals, stored where paths part; the HNN reads it as the receiving parametron's storage (`hnn::receiving`) | `Context/{Tree, Standing, Epoch, Compaction, Capacity, Carrier, Address, LocalWeighing, ConvergenceFounding}` |
 //!
 //! [open] Owed in #62 (Lean `Compression/Landmark`): Gröbner completion and the face-kernel
 //! equality, Richardson's undecidability, the necklace integrality and infinite Euler product of a
@@ -23,6 +25,7 @@
 //! Lefschetz count of torus periodic points. Irreducible decomposition is out of scope.
 
 pub mod constraint;
+pub mod context;
 pub mod identity;
 pub mod mobius;
 pub mod primitive;

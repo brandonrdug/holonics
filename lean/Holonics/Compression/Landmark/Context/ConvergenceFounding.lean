@@ -1,7 +1,7 @@
-import Holonics.HNN.LocalWeighing
+import Holonics.Compression.Landmark.Context.LocalWeighing
 
 /-!
-# HNN.ConvergenceFounding: a landmark is founded where paths converge, at its second arrival
+# Compression.Landmark.Context.ConvergenceFounding: a landmark is founded where paths converge, at its second arrival
 
 [definition; agent-inferred] Decision 36 of the step 4 design (`docs/plans/THE_REBUILD.md`, "A
 landmark is founded where paths converge"), rebuild step 4 (#73). The elementary objects define a
@@ -55,10 +55,10 @@ second       the arrival that finds a child absent gives it its first count; the
    `β' = β e/q'` above the stop and is unchanged at the stop.
 4. **Decision 28 is the case "found at the first arrival"** (`stopDepth`, `stopDepth_spec`,
    `stopDepth_all`, `convWeight_first_arrival`, `convLik_first_arrival`,
-   `first_arrival_is_decision_28`): when every node is present (an unfounded one reading as the
-   prior, `LandmarkTree.unfounded_reads_prior`) the path never stops above `D` and no pre-factor
+   `first_arrival_is_the_full_tree`): when every node is present (an unfounded one reading as the
+   prior, `Tree.unfounded_reads_prior`) the path never stops above `D` and no pre-factor
    moves, and the weight, the pruned trees' likelihood and the stop weights are the declared stop
-   law's (`LandmarkTree.stopWeight`, `treeLik`, `stopLam`).
+   law's (`Tree.stopWeight`, `treeLik`, `stopLam`).
 5. **The second arrival** (`Convergence`, `Convergence.present`, `Convergence.own`,
    `Convergence.receive`, `Convergence.Inv`, `convergence_step`, `convergenceOf`,
    `convergence_is_probability`, `second_arrival_opens_with_the_first_count`): the standing holds
@@ -83,22 +83,22 @@ present, so a context must recur `d + 1` times before depth `d` reads it, where 
 tree reads it from its second occurrence. Which founding codes shorter is a measurement (the Rust
 owner's header records it).
 
-The Rust consumer is retired; realization at `d137e8a6` (`hnn::landmark`, the founding at the
+The Rust consumer is retired; realization at `d137e8a6` (`compression::landmark::context`, the founding at the
 second arrival): its arena opened a node at the second arrival with the first arrival's count and
 never stored `R` (the stopped node's `β` does not move, `conv_ratio_step`). The development cells
 chose the founding at the first arrival (Decision 36, measured), and Decision 37 stores that tree
-where paths part (`HNN/LandmarkCompaction`).
+where paths part (`Compression/Landmark/Context/Compaction`).
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
 
 noncomputable section
 
-namespace Holonics.HNN.ConvergenceFounding
+namespace Holonics.Compression.Landmark.Context.ConvergenceFounding
 
 open Finset
-open Holonics.HNN.LandmarkTree
-open Holonics.HNN.LocalWeighing
+open Holonics.Compression.Landmark.Context.Tree
+open Holonics.Compression.Landmark.Context.LocalWeighing
 
 universe u
 
@@ -624,14 +624,14 @@ theorem stopDepth_all (present : List Ltr → Bool) (a : List Ltr) (h : ∀ s, p
 variable [Fintype Ltr] [DecidableEq Ltr] {A : Type*} [Fintype A] [DecidableEq A]
 
 omit [DecidableEq A] [DecidableEq Ltr] in
-/-- [proved-derived; formal-checked] **`first_arrival_is_decision_28`: Decision 28's tree is the case
+/-- [proved-derived; formal-checked] **`first_arrival_is_the_full_tree`: Decision 28's tree is the case
 "found at the first arrival".** When every node is present at every arrival (an unfounded node
-reading as the prior with no counts, `LandmarkTree.unfounded_reads_prior`), the path never stops
+reading as the prior with no counts, `Tree.unfounded_reads_prior`), the path never stops
 above `D`; no arrival finds a child absent, so every pre-factor stays `1`; and with the KT own
 weights the tree with absent children is the declared stop law's tree, its pruned trees'
 likelihood is `treeLik`, and its stop weights are `stopLam` (so the stopped face at `D` is
 `stopFace`, whose step is `stop_weight_step`). -/
-theorem first_arrival_is_decision_28 (w : ℕ → ℚ) (N : TreeStanding Ltr A) (D : ℕ)
+theorem first_arrival_is_the_full_tree (w : ℕ → ℚ) (N : TreeStanding Ltr A) (D : ℕ)
     (a : List Ltr) :
     stopDepth (fun _ => true) a D = D ∧
       (∀ m s, convWeight w (fun s => ktMass (N s)) (fun _ => 1) m s = stopWeight w N m s) ∧
@@ -930,7 +930,7 @@ section Audit
 #print axioms conv_ratio_step
 #print axioms stopDepth_spec
 #print axioms stopDepth_all
-#print axioms first_arrival_is_decision_28
+#print axioms first_arrival_is_the_full_tree
 #print axioms Convergence.unreached_inv
 #print axioms Convergence.own_pos
 #print axioms absent_count_zero
@@ -942,4 +942,4 @@ section Audit
 
 end Audit
 
-end Holonics.HNN.ConvergenceFounding
+end Holonics.Compression.Landmark.Context.ConvergenceFounding

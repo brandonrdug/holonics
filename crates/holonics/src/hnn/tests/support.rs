@@ -4,27 +4,27 @@
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
 
+use crate::compression::landmark::context::Landmarks;
 use crate::geometry::RatVec3;
 use crate::geometry::screw::ScrewGenerator;
 use crate::hnn::field::{
     ConstitutionRead, ContactDeclaration, CribDeclaration, Field, FieldDeclaration,
     ReceiverDeclaration, RingDeclaration,
 };
-use crate::hnn::landmark::Landmarks;
 use crate::hnn::moment::PairPort;
 use crate::hnn::receiving::{Mixture, landmark_declaration};
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::{Rat, integer, rat};
 
 /// SplitMix64: exact, deterministic, no float.
-pub(super) struct Draw(u64);
+pub(crate) struct Draw(u64);
 
 impl Draw {
-    pub(super) fn new(seed: u64) -> Self {
+    pub(crate) fn new(seed: u64) -> Self {
         Self(seed)
     }
 
-    pub(super) fn next(&mut self) -> u64 {
+    pub(crate) fn next(&mut self) -> u64 {
         self.0 = self.0.wrapping_add(0x9E37_79B9_7F4A_7C15);
         let mut z = self.0;
         z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
@@ -169,7 +169,7 @@ pub(super) fn small_field(
                 aperture: 1,
                 tolerance: rat(1, 16),
                 depth: 2,
-                prior: crate::hnn::StopPrior::half(),
+                prior: crate::compression::landmark::context::StopPrior::half(),
             }],
             crib: CribDeclaration {
                 window: 16,
@@ -233,7 +233,7 @@ pub(super) struct Medium {
     pub(super) stiffness: Vec<ExactRatMatrix>,
     pub(super) dissipation: Vec<ExactRatMatrix>,
     pub(super) receiving: Vec<Option<ExactRatMatrix>>,
-    /// The receiving parametron's landmark tree, empty (`hnn::landmark`).
+    /// The receiving parametron's landmark tree, empty (`compression::landmark::context`).
     pub(super) trees: Vec<Option<Landmarks>>,
     /// The receiver's mixture at its opening `β = 1` (ruling A).
     pub(super) mixtures: Vec<Option<Mixture>>,
@@ -346,7 +346,10 @@ impl Medium {
                 .map(|g| {
                     field.receivers().iter().find(|r| r.ring == g).map(|r| {
                         let declared = landmark_declaration(field, r).unwrap();
-                        Mixture::new(crate::hnn::landmark::Widths::derived(&declared).carrier)
+                        Mixture::new(
+                            crate::compression::landmark::context::Widths::derived(&declared)
+                                .carrier,
+                        )
                     })
                 })
                 .collect(),

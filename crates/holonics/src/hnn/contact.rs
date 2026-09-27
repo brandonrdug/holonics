@@ -69,9 +69,9 @@
 //! by its own lock as well as by carries) reads **Unlocked**, a lawful letter.
 //!
 //! [definition; agent-inferred] **The lock letters** (the receiving join's contact letter,
-//! `hnn::landmark::Feature::Contact`). The addresses a contact can read form the finite family
+//! `compression::landmark::context::Feature::Contact`). The addresses a contact can read form the finite family
 //! `{Unlocked} ∪ {(p, q) reduced : 1 ≤ p ≤ P, 1 ≤ q ≤ Q}` (Lean
-//! `HNN/LandmarkAddress.lock_partition_finite`, whose horizon clause is the address's period,
+//! `Compression/Landmark/Context/Address.lock_partition_finite`, whose horizon clause is the address's period,
 //! `lockAddress_closes`): a box, not the Farey family `F_Q` of `[0, 1]`, since the
 //! contact `g → h` reads its rate in its declared orientation, which lies above one where ring `g`
 //! winds faster (campaign 1's `0 → 1` and `1 → 2`). Its letter is `0` unlocked and `1 +` the rank
@@ -95,8 +95,8 @@
 //! | `HNN/Contact.contact_boost_solve_or_singular_direction` | [`certify_boost`], [`signed_form_certifies`] |
 //! | `HNN/Contact.contact_signed_storage_balance`, `boost_grows_at_conserved_signed_storage` | tests (the transit's balance at an indefinite `K`) |
 //! | `HNN/Contact.{IsLockAddress, lockAddress_exists, lockAddress_unique, exists_smaller_den_between, least_denominator_unique, lockAddress_closes, contact_lock_address}` | [`lock_address`] (through [`simplest_between`]), [`ContactLock`] |
-//! | `HNN/LandmarkAddress.lock_partition_finite` (`Q = H`, the horizon) | [`LockDeclaration::derived`] |
-//! | `HNN/LandmarkAddress.lock_partition_finite` (the finite family the address lands in) | [`LockDeclaration::letters`], [`ContactLock::code`], [`ContactReading::letter`] |
+//! | `Compression/Landmark/Context/Address.lock_partition_finite` (`Q = H`, the horizon) | [`LockDeclaration::derived`] |
+//! | `Compression/Landmark/Context/Address.lock_partition_finite` (the finite family the address lands in) | [`LockDeclaration::letters`], [`ContactLock::code`], [`ContactReading::letter`] |
 //! | `HNN/ContactBreak.{break_release_balance, break_iff_release_covers_gluing, griffith_closed_port_case}` | [`BreakReceipt`] |
 //! | `HNN/ContactBreak.parting_returns_gluing_defect` | [`crate::hnn::Field::parted_holon`] |
 
@@ -511,7 +511,7 @@ impl LockDeclaration {
 
     /// **The lock family's letters** (module header, "The lock letters"): `1 + #{(p, q) : 1 ≤ p ≤ P,
     /// 1 ≤ q ≤ Q, gcd(p, q) = 1}`, `Unlocked` with the reduced addresses in the box (Lean
-    /// `HNN/LandmarkAddress.lock_partition_finite`).
+    /// `Compression/Landmark/Context/Address.lock_partition_finite`).
     pub fn letters(&self) -> Result<u64, HnnError> {
         let (p_bound, q_bound) = self.words()?;
         Ok(1 + (1..=q_bound)
@@ -633,7 +633,7 @@ impl ContactLock {
 
 /// [definition] **One contact's reading at a cell's tick**: its lock address and its site kind,
 /// both read from retained state before the cell (the lift point and the constitution). It is the
-/// receiving join's contact letter (`hnn::landmark::Feature::Contact`): its value in the slot is
+/// receiving join's contact letter (`compression::landmark::context::Feature::Contact`): its value in the slot is
 /// [`ContactReading::letter`].
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ContactReading {

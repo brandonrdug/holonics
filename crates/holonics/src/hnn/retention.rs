@@ -22,7 +22,7 @@
 //!
 //! [definition; agent-inferred] **The collapse keeps the whole tree and the active address**
 //! (the landmark tree). The tree sits at the receiving locus beside `R`, which is never released. Lean
-//! `HNN/LandmarkTree.release_rule` proves that nodes deeper than the address depth `D` are
+//! `Compression/Landmark/Context/Tree.release_rule` proves that nodes deeper than the address depth `D` are
 //! releasable, of which the tree founds none, and that a retention is lawful exactly when it
 //! refines the causal signature; it does not prove that no shallower merge is lawful, and the
 //! collapse attempts none. The receiving parametron's active suffix address

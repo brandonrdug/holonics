@@ -3,13 +3,15 @@ import Holonics.Compression.Landmark.FixedPoint
 import Holonics.Compression.Landmark.Identity
 import Holonics.Compression.Landmark.ConstraintIdentity
 import Holonics.Compression.Landmark.PrimitiveCycle
+import Holonics.Compression.Landmark.Context
 
 /-!
 # Landmark discovery: the faces where navigator paths converge
 
 [definition] Rebuild step 3 (#145). **Landmarks** are faces where navigator paths converge: lock
-addresses and fixed points, constraint identities, and the primitive cycles (primes) of a return
-map. **Landmark discovery** locates them. This root gathers the general laws, stated over the
+addresses and fixed points, constraint identities, the primitive cycles (primes) of a return map,
+and the contexts of the shift navigator where a source's paths converge (the receiving tree).
+**Landmark discovery** locates them. This root gathers the general laws, stated over the
 existing owners (`Transport/NavigatorTraceFaces`, `Geometry/{LocalFactor,TraceSequence}`,
 `Geometry/{CrossRatio,TwoSidedIdentityAtlas}`, `Mathematics/{RatioSeriesTransport,
 RadixWindowReceiver}`, `Physics/CompositeMassEnergy`, `Aeon/Production/Zeta`).
@@ -21,6 +23,7 @@ RadixWindowReceiver}`, `Physics/CompositeMassEnergy`, `Aeon/Production/Zeta`).
 | `Landmark/Identity` | an identity is two constructions with one face (the kernel of the face); a chart family certifies exactly the identities of `V` exactly when `I(⋃ images) = I(V)` (Zariski density); missing a component invents `C − 1`, missing a point does not |
 | `Landmark/ConstraintIdentity` | π (Machin's arms) and `e` are limits of their partial navigators' convergents; blocks compose associatively; a window is certified by the floors of both enclosure ends, and every window of π and `e` has a finite certificate; `e` is irrational from its own enclosure |
 | `Landmark/PrimitiveCycle` | `tr(M_fⁿ) = Σ_(d∣n) d·p_d`, Möbius inversion, and `det(1 − T·M_f) = ∏_d (1 − T^d)^(p_d)`: the dynamical zeta is the Euler product over primitive cycles |
+| `Landmark/Context` | the shift navigator's landmarks, the receiving tree: context-tree weighting over typed addresses, each pruned tree a candidate standing and the weight their mixture under the stop prior, each node's arrivals the epochs of its section and its register capped by a carry, stored where paths part, on declared carriers (its own table) |
 
 [open] Owed in #62: Gröbner completion and the face-kernel equality, Richardson undecidability,
 the necklace integrality and infinite Euler product of a general nonnegative integer return map,

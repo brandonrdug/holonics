@@ -14,7 +14,7 @@
 //! mass       T_c = Tr(A_c ρ A_c†) = ‖A_c ψ‖²/‖ψ‖²
 //! split      p(b | ρ) = T_b/(T_0 + T_1)                           zero denominator refused  (born_face_normalized)
 //! executed   q̂_0 = ⟦T̃_0/(T̃_0 + T̃_1)⟧ on 2^(−M), clamped to [2^(−M), 1 − 2^(−M)],  q̂_1 = 1 − q̂_0
-//! cell       q̂(c) = ∏_i q̂_i(c_i): a dyadic partition of the unit cell   (LandmarkTree.cell_faces_partition)
+//! cell       q̂(c) = ∏_i q̂_i(c_i): a dyadic partition of the unit cell   (Context/Tree.cell_faces_partition)
 //! reception  ψ ← A_b ψ  (ρ ← A_b ρ A_b†/Tr(A_b ρ A_b†))           the collapse is the receipt (born_update_trace_one)
 //! tick       ρ ← U ρ U†  with U = I between cells                  (born_unitary_invariant, born_tick_absorbed)
 //! covector   ∂ log p(b)/∂A_c = G_c = (2/Z)(q_c/p_c − 1) A_c ρ,  Z = T_0 + T_1        (born_covector_eq)
@@ -77,7 +77,7 @@
 //! declaration, [`BornWidths::derived`]):
 //! - **the face** on `2^(−M)`, `M` the least with `2^M ≥ 3 B L_R (2n* + 2)`: a face of at least
 //!   `1/(2n* + 2)` (the least a learner of `n*` arrivals assigns) is rounded within a quarter grain a
-//!   cell (`LandmarkTree.digit_log_residual`), and a digit costs at most `M` bits;
+//!   cell (`Context/Tree.digit_log_residual`), and a digit costs at most `M` bits;
 //! - **the state's mantissa** `S = M + 3 + ⌈j/2⌉`: the pair's amplitudes are rebased jointly to `S`
 //!   bits for the face (the largest real part in `[2^(S−1), 2^S)`), which moves the split by at
 //!   most `√χ 2^(1−S) ≤ 2^(−M−2)`; the next state is the observed amplitude rebased alone, its ray
@@ -105,7 +105,7 @@
 //!
 //! | Law | Lean `HNN/BornFace` | Rust |
 //! |---|---|---|
-//! | the digit split is nonnegative and normalized; the cell faces partition the unit cell | `born_face_normalized`; `HNN/LandmarkTree.{executed_split_laws, cell_faces_partition}` | [`born_split`], [`Born::face`] |
+//! | the digit split is nonnegative and normalized; the cell faces partition the unit cell | `born_face_normalized`; `Compression/Landmark/Context/Tree.{executed_split_laws, cell_faces_partition}` | [`born_split`], [`Born::face`] |
 //! | reception keeps a density, trace one | `born_update_trace_one` | [`Born::read`] |
 //! | the pure state stays pure | `born_pure_stays_pure` | the carried ray `ψ` |
 //! | the future faces factor through `ρ` (the retention quotient) | `born_state_future_sufficient` over `Foundation/Standing.StandingLaw` | [`Born`] holds `ψ` and the constitution only |
@@ -125,7 +125,7 @@
 //! retired `local` mode, commit `d2a2e0db`): the Born face's digit split
 //! ([`DigitOperand::numerator`], read causally at each digit) was the external face of the landmark
 //! tree's node-local law (retired, its realization at commit `89460425`, its law in Lean
-//! `HNN/LocalWeighing`) and is one face of the switching mixture
+//! `Compression/Landmark/Context/LocalWeighing`) and is one face of the switching mixture
 //! (`hnn::receiving::Mixture::switching`). Its oracle against
 //! the tree on the development cells is large at the digit and cell grains (`−3499 + 10/16 + ε` and
 //! `−1531 + 9/16 + ε` bits at `Dyadic` `χ = 128`) and small at the dyadic-cell grain
@@ -142,9 +142,9 @@ use num_bigint::BigUint;
 use num_traits::{One, ToPrimitive, Zero};
 use rayon::prelude::*;
 
+use crate::compression::landmark::context::odometer_digits;
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{declared_sign, gamma_length};
-use crate::hnn::landmark::odometer_digits;
 use crate::ratio::Rat;
 
 /// A Gaussian integer on a carrier word, `(re, im)`.

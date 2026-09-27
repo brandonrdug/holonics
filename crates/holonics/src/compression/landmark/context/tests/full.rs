@@ -1,9 +1,9 @@
 //! **The full tree of one node a depth, the tests' independent reference** (Lean
-//! `HNN/LandmarkTree.{stopWeight, landmark_step}`): the ideal tree weighting in ℚ with every node of
+//! `Compression/Landmark/Context/Tree.{stopWeight, landmark_step}`): the ideal tree weighting in ℚ with every node of
 //! an opened path founded at its first arrival, one node a depth, at its depth's
 //! `β₀ = 2^(j_d) − 1`. The library stores the tree at the faces where paths part
-//! (`hnn::landmark`), whose code is this tree's exactly in ℚ
-//! (`HNN/LandmarkCompaction.compacted_is_decision_28`); the retired realization of this arena
+//! (`compression::landmark::context`), whose code is this tree's exactly in ℚ
+//! (`Compression/Landmark/Context/Compaction.compacted_is_the_full_tree`); the retired realization of this arena
 //! (`Storage::Full`) is at commit `89460425`. Its nodes are keyed by their tree and the address
 //! prefix that reaches them, so it shares no topology with the owner it checks.
 //!
@@ -17,7 +17,7 @@
 //! - under a declared capacity (the register's capacity) each node's counts carry, `n ← ⌈n/2⌉`, when its count
 //!   brings `n_0 + n_1` to `2^c`, node by node: every depth keeps its own register, so this tree
 //!   checks that a stored chain of the owner is one register (Lean
-//!   `HNN/LandmarkCompaction.compacted_node_law`). Each node also counts its arrivals and its
+//!   `Compression/Landmark/Context/Compaction.compacted_node_law`). Each node also counts its arrivals and its
 //!   carries, which the tests read.
 
 use std::collections::HashMap;
@@ -25,7 +25,9 @@ use std::collections::HashMap;
 use num_bigint::BigInt;
 use num_traits::One;
 
-use crate::hnn::landmark::{Capacity, LandmarkDeclaration, Letter, odometer_digits};
+use crate::compression::landmark::context::{
+    Capacity, LandmarkDeclaration, Letter, odometer_digits,
+};
 use crate::ratio::{Rat, rat};
 
 /// One founded node: its two counts, its `β`, its arrivals and its carries.
@@ -180,8 +182,7 @@ impl FullTree {
         let face = digits.iter().map(|(.., face)| face.clone()).product();
         for (dyadic, symbol, reads, _) in digits {
             if reads.len() > 1 {
-                self.joins[dyadic] =
-                    &self.joins[dyadic] * &reads[0].faces[0] / &reads[1].faces[0];
+                self.joins[dyadic] = &self.joins[dyadic] * &reads[0].faces[0] / &reads[1].faces[0];
             }
             for (branch, read) in reads.into_iter().enumerate() {
                 let forced = self.forced(branch);

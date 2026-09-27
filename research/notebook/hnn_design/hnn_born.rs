@@ -21,7 +21,7 @@
 //!   declared population is refused (`BornWidths::derived`), and the family stops before it (at the
 //!   wide cut's `n* = 2^20` the solve's residual needs 128 bits at `χ = 32`, above the 126 admitted);
 //! - **the code lengths**: each population's faces multiplied and enclosed once
-//!   (`landmark::PassageCode`);
+//!   (`context::PassageCode`);
 //! - **the cost bound `J`**: a digit costs `2χ²` complex products to read (the pair's images) and
 //!   about `12χ²` to deposit (the Gram, the preconditioner, the solve and its refinements, the two
 //!   rank-one steps), so a development passage of `B·n_dev` digits costs `14χ² B n_dev` products;
@@ -42,7 +42,7 @@
 //!   result, and no held-out cell is read.
 //!
 //! [derived] The ideal mixture telescopes, `∏ q = ½ W_T + ½ W_B` (Lean
-//! `HNN/LandmarkTree.sequential_mixture`), so it codes below the tree exactly when the Born face
+//! `Compression/Landmark/Context/Tree.sequential_mixture`), so it codes below the tree exactly when the Born face
 //! alone does, `L_B < L_T`, up to the chart's drift; the harness reports both orderings.
 //!
 //! [established-bounded; measured] **The readout**: per member, bits a cell at the receiver's grain
@@ -59,8 +59,10 @@ mod exterior;
 
 use std::time::Instant;
 
+use holonics::compression::landmark::context::{
+    LandmarkDeclaration, Landmarks, LetterFamily, PassageCode, address,
+};
 use holonics::hnn::born::{Born, BornDeclaration, BornReport, Emission};
-use holonics::hnn::landmark::{LandmarkDeclaration, Landmarks, LetterFamily, PassageCode, address};
 use holonics::hnn::ratio::interval_sum;
 use holonics::hnn::receiving::{Mixture, MixtureStep, landmark_declaration_with};
 use holonics::hnn::{Field, FieldDeclaration};

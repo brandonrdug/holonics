@@ -70,13 +70,13 @@ use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::aeon::ClockLift;
 use crate::compression::ReflectorMachine;
+use crate::compression::landmark::context::{Landmarks, StopPrior};
 use crate::geometry::RatVec3;
 use crate::geometry::complex::{CellComplex, ConnectionIncidence};
 use crate::geometry::screw::{ScrewAxis, ScrewGenerator, ScrewPair, SituatedScrew};
 use crate::hnn::HnnError;
 use crate::hnn::chart::WordLattice;
 use crate::hnn::constitution::{Lattice, Locus, Steps};
-use crate::hnn::landmark::{Landmarks, StopPrior};
 use crate::hnn::moment::{Capacity, PairPort, capacity};
 use crate::hnn::receiving::Mixture;
 use crate::holarchy::{Gluing, GluingDefect, Holarchy};
@@ -124,7 +124,7 @@ pub trait ConstitutionRead: Sync {
     fn contact_dissipation(&self, contact: usize) -> &ExactRatMatrix;
     /// The receiving map `R` (`2|A| × 2d_R`) of a receiving ring; `None` elsewhere.
     fn receiving_map(&self, ring: usize) -> Option<&ExactRatMatrix>;
-    /// **The receiving parametron's landmark tree** (`hnn::landmark`) of a receiving
+    /// **The receiving parametron's landmark tree** (`compression::landmark::context`) of a receiving
     /// ring, whose face at each phase's causal address the receiving read adds to the wave at the
     /// grain (`hnn::receiving`); `None` elsewhere.
     fn landmarks(&self, ring: usize) -> Option<&Landmarks>;
@@ -199,7 +199,7 @@ pub struct ContactDeclaration {
 /// depth `D` of its landmark tree's address (the landmark tree; `hnn::receiving::landmark_declaration`):
 /// the receiving parametron's storage is the tree over the last `D` cells, and `D = 1` with the
 /// root's split forced is the region table; and the tree's declared stop-weight law
-/// (the declared stop prior; `hnn::landmark::StopPrior`, the `½` stop prior at `StopPrior::half`).
+/// (the declared stop prior; `compression::landmark::context::StopPrior`, the `½` stop prior at `StopPrior::half`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReceiverDeclaration {
     pub ring: usize,
@@ -1746,7 +1746,7 @@ impl Field {
 /// lattice) plus the wave `R P_R^(τ_R) v_R`, `R` opening at zero and moving by the prox step on its
 /// reached covectors; the scored face is the mixture of the tree's face and the combined face
 /// weighted by their likelihood ratio `β`, opening at 1 (the primary's ruling A); every comparison
-/// is scored and then deposited" (`hnn::receiving`, `hnn::landmark`).
+/// is scored and then deposited" (`hnn::receiving`, `compression::landmark::context`).
 /// Code 2 was the region table's class masses with `R` opening at the sign generator times ½;
 /// code 1 the first repair's exogenous normal law on the target code face with the standing read; and
 /// campaign 1's first law (the face on the change alone) carried none. A feature-law change takes

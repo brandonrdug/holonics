@@ -16,7 +16,7 @@
 //!
 //! The host keeps what only the host reads (the element `K_g`, `W_s,g`, the dissipation `D_a`, the
 //! exact operators `I − ½K_g` and `m_a` from which the chart store's operator words are read) and
-//! a copy of the published words. The receiving parametron's landmark tree (`hnn::landmark`) is not
+//! a copy of the published words. The receiving parametron's landmark tree (`compression::landmark::context`) is not
 //! among the published loci: no kernel reads it, its grain read compares integers past the card's
 //! 128-bit carrier, and the host reads it from the constitution it publishes, at compare. [definition] **Only
 //! the moved words cross the bus.** A successor's words are laid out as its predecessor's (the same

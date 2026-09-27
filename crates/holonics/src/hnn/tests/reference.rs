@@ -405,7 +405,7 @@ fn one_worker_and_many_return_the_same_values() {
 /// chart is refused.
 #[test]
 fn the_baselines_faces_are_the_faces_their_codes_read() {
-    use crate::hnn::landmark::code_length;
+    use crate::compression::landmark::context::code_length;
     use crate::hnn::reference::Baselines;
     let cells = source(96, 5);
     let (mut faces, mut codes) = (Baselines::new(4).unwrap(), Baselines::new(4).unwrap());
@@ -424,12 +424,12 @@ fn the_baselines_faces_are_the_faces_their_codes_read() {
 }
 
 /// The baselines read their code lengths by the certified integer binary logarithm
-/// (`landmark::code_length`): every enclosure contains the exact value the series enclosure
+/// (`context::code_length`): every enclosure contains the exact value the series enclosure
 /// (`ratio::log2_enclosure`) contains, so the two meet, and both read the same grain cell wherever
 /// their widths lie inside one; uniform over 2^k classes reads exactly `k`.
 #[test]
 fn the_baselines_read_their_exact_code_lengths_by_the_binary_logarithm() {
-    use crate::hnn::landmark::code_length;
+    use crate::compression::landmark::context::code_length;
     use crate::hnn::ratio::log2_enclosure;
     use crate::hnn::reference::{Baselines, Ppm, kt_probability};
     let cells = source(64, 3);

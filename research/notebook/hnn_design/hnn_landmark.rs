@@ -1,6 +1,6 @@
 //! **The landmark tree on the standing real cut, executed on its declared dyadic lattice**
 //! (Decision 28, count-only; Decisions 32, 34, 35 and 37; rebuild step 4, #73): the notebook's
-//! receipt of `holonics::hnn::landmark::{choose_depth, prequential, oracle_cost}` and of the tree
+//! receipt of `holonics::compression::landmark::context::{choose_depth, prequential, oracle_cost}` and of the tree
 //! stored where paths part, a committed command run once in release, never a test.
 //!
 //! ```sh
@@ -15,7 +15,7 @@
 //!
 //! [definition; agent-inferred] **A landmark's storage has a capacity** (`capacity`; Decision 39):
 //! Decision 37's tree at its chosen `D = 48` (the `½` prior, the cell-only family), each node's count
-//! register carried at the ceiling `L = 2^c` (`landmark::Capacity`: after the deposit that brings
+//! register carried at the ceiling `L = 2^c` (`context::Capacity`: after the deposit that brings
 //! `n_0 + n_1` to `L`, `n ← ⌈n/2⌉`, so the face read before the next arrival is KT's on the carried
 //! counts, a function of the arrivals so far), on the wide cut.
 //! - **0. The family and its charge**, stated before any passage: `c ∈ {∞, 5, 7, 9, 11}`, charged
@@ -35,7 +35,7 @@
 //!   `395598 + 8/16 + ε` (each a grain cell `[n + k/16, n + (k + 1)/16]`), in all and a cell.
 //!
 //! [definition; agent-inferred] **Stored where paths part** (`compact`; Decision 37): Decision 28's
-//! `½` tree over the cell-only family, stored at the faces where paths part (`landmark::Landmarks`,
+//! `½` tree over the cell-only family, stored at the faces where paths part (`context::Landmarks`,
 //! the one storage: a chain with its bottom is one node at the summed rung), on the wide cut. The prior is Decision 28's, so no family is swept again; only the depth is re-chosen,
 //! because memory no longer caps it. Decision 36's `converge` mode, which measured founding at the
 //! second arrival, is retired with its Rust realization (commit `d137e8a6`; its receipt is in
@@ -67,7 +67,7 @@
 //! count-only receiver's tree and Decision 34's adopted law read in one prequential passage over a
 //! larger cut. The standing cut must be the wide cut's tail (checked), so its cells lie in the wide
 //! held-out range. Every code is a population's faces' product enclosed once
-//! (`landmark::PassageCode`). The laws are the standing cut's choices; no family is swept again.
+//! (`context::PassageCode`). The laws are the standing cut's choices; no family is swept again.
 //! - **0. The memory**: the `½` tree's allocated bytes a node and the baselines' a cell, measured on the
 //!   standing cut by the harness's counted allocator (each built alone); the resident bound
 //!   `3 (n B D + 2^B − 1)` bytes a node `+ n` bytes a cell (the tree and the two-law stop mixture's
@@ -98,11 +98,11 @@
 //! [definition; agent-inferred] **The stop-prior decision** (`prior`; Decision 32): on the
 //! **development cells only** (the manifest's held-out range is cut away before the sweep reads
 //! anything), the cell-only tree under every law of the declared family
-//! (`hnn::landmark::prior_family`: the global dyadic ladder `w = 1 − 2^(−j)`, `j = 1, …, J`, then the
+//! (`compression::landmark::context::prior_family`: the global dyadic ladder `w = 1 − 2^(−j)`, `j = 1, …, J`, then the
 //! per-depth pairs `(j_root, j_below)`, `j_root ≠ j_below`; `J = ⌈log₂(n* B)⌉`,
-//! `hnn::landmark::ladder_top`), each law with its own depth sweep (`choose_depth`) and charged
+//! `compression::landmark::context::ladder_top`), each law with its own depth sweep (`choose_depth`) and charged
 //! `⌈log₂⌉` of its depths tried, the choice charged `⌈log₂⌉` of the laws tried
-//! (`hnn::landmark::choose_prior`):
+//! (`compression::landmark::context::choose_prior`):
 //! - each law's development code length and its difference from the `½` tree (Decision 28's law),
 //!   uncharged and charged, with its sign when decided by disjoint enclosures;
 //! - the choice: the least charged law when it lies strictly below the `½` tree, the `½` tree
@@ -148,13 +148,13 @@
 //!   least charged one with both `Δ_tree < 0` and `Δ_letters < 0` decided, the cell-only tree
 //!   otherwise;
 //! - the passage bound of every enlarged tree, family or control (Lean
-//!   `HNN/LandmarkAddress.cell_only_dominance_with_feature_charge`, `passage_join_bound`): at its
+//!   `Compression/Landmark/Context/Address.cell_only_dominance_with_feature_charge`, `passage_join_bound`): at its
 //!   chosen depth `D` its executed code is at most the cell-only tree's at `D` plus one bit a dyadic
 //!   cell the development cells opened, plus both trees' certified drift (each tree's a-priori rule
 //!   a cell, `Landmarks::face_rule`, times the cells), checked by exact enclosures;
 //! - the widths each family derives (its path depth `P = D + D(1 + r) + 2`) and its wall time.
 //!
-//! [definition] **What it runs** (the owner's header, `hnn::landmark`):
+//! [definition] **What it runs** (the owner's header, `compression::landmark::context`):
 //! - the cut file and its manifest (`exterior::read_cut`): the cells and the held-out range;
 //! - the receiver's grain `L_R` and the exterior chart's `|A|` from campaign 1's field declared at
 //!   the cut's population (`FieldDeclaration::campaign_one`), so no grain is a literal here;
@@ -188,7 +188,7 @@ use std::time::Instant;
 use rayon::prelude::*;
 
 use holonics::compression::cost::ceil_log2;
-use holonics::hnn::landmark::{
+use holonics::compression::landmark::context::{
     Capacity, ChartReport, Coded, DepthSweep, Feature, IdealLandmarks, JoinTree,
     LandmarkDeclaration, Landmarks, Letter, LetterFamily, OracleCost, PassageCode, PriorSweep,
     StopMixture, StopPrior, TreeRun, Widths, address, cell_letters, choose_depth,
@@ -687,7 +687,7 @@ fn letters_harness(path: &str, contacts: bool) {
         population: count as u64,
         grain,
         family: LetterFamily::cells(),
-        prior: holonics::hnn::StopPrior::half(),
+        prior: holonics::compression::landmark::context::StopPrior::half(),
         capacity: Capacity::Unbounded,
     };
     println!(
@@ -2004,7 +2004,7 @@ const DOUBLING: [usize; 4] = [6, 12, 24, 48];
 /// the sweep there, and the depth is chosen among what was measured.
 const PASSAGE_STOP_MS: u128 = 240_000;
 
-/// [definition; agent-inferred] **The bytes a stored node occupies on the host** (`hnn::landmark`,
+/// [definition; agent-inferred] **The bytes a stored node occupies on the host** (`compression::landmark::context`,
 /// "The arena"): its chart 80, its masses 8, its depth word 4 and its label end 4 in the flat
 /// vectors; a child-table entry `(key, child)` 16; a label letter 4.
 const NODE_BYTES: u128 = 96;
@@ -2056,7 +2056,12 @@ fn pass(cells: &[usize], development: usize, declaration: &LandmarkDeclaration) 
     let bytes = grown(before);
     counting(false);
     // Every stored node but a root is one child-table entry.
-    let roots = tree.arena().roots().iter().filter(|&&root| root != u32::MAX).count();
+    let roots = tree
+        .arena()
+        .roots()
+        .iter()
+        .filter(|&&root| root != u32::MAX)
+        .count();
     Pass {
         depth: declaration.depth,
         codes,
@@ -2230,7 +2235,7 @@ fn compact_harness(path: &str) {
 
     // 1. D = 6: Decision 28's depth, the development cells only.
     println!(
-        "1. D = 6 on the development cells, one passage: Decision 28's tree at its chosen depth, stored where paths part (the same prior and code in ℚ, Lean compacted_is_decision_28; the retired arena of one node a depth read it equal within their certificates at commit 2fb0c1c0)"
+        "1. D = 6 on the development cells, one passage: Decision 28's tree at its chosen depth, stored where paths part (the same prior and code in ℚ, Lean compacted_is_the_full_tree; the retired arena of one node a depth read it equal within their certificates at commit 2fb0c1c0)"
     );
     let first_bytes = DECISION_35_NODE_BYTES;
     if !admitted(
@@ -2771,7 +2776,7 @@ fn main() {
         population: count as u64,
         grain,
         family: LetterFamily::cells(),
-        prior: holonics::hnn::StopPrior::half(),
+        prior: holonics::compression::landmark::context::StopPrior::half(),
         capacity: Capacity::Unbounded,
     };
     let setup = setup.elapsed().as_millis();

@@ -1,4 +1,4 @@
-import Holonics.HNN.LandmarkTree
+import Holonics.Compression.Landmark.Context.Tree
 import Holonics.Foundation.Standing
 import Mathlib.LinearAlgebra.Matrix.PosDef
 import Mathlib.LinearAlgebra.UnitaryGroup
@@ -38,7 +38,7 @@ covector   ∂_E log p(b) at operator c = re Tr(Gᴴ E) ,  G = 2 (δ_(bc)/T_b �
    nonnegative and sum to one whenever every denominator a positive-mass prefix reaches is positive
    (`BornAdmits`). A digit of zero mass contributes zero and its subtree is never read. The
    executed face (the Rust owner's) is the landmark tree's executed split `executedSplit M` of the
-   exact Born ratio at each prefix, so `HNN/LandmarkTree.cell_faces_partition` applies verbatim:
+   exact Born ratio at each prefix, so `Compression/Landmark/Context/Tree.cell_faces_partition` applies verbatim:
    every executed cell face is positive and they sum to one (`born_executed_partition`).
 2. **The reception keeps a density** (`born_update_trace_one`): `A ρ Aᴴ / T` is positive
    semidefinite with trace one when `T > 0`. A pure state stays pure (`born_pure_stays_pure`:
@@ -238,9 +238,9 @@ theorem born_face_normalized :
       have hc' := Finset.mem_range.mp hc
       cases b
       · simp only [Bool.false_eq_true, if_false]
-        rw [LandmarkTree.toBits_succ_low hc', bornEmit]
+        rw [Compression.Landmark.Context.Tree.toBits_succ_low hc', bornEmit]
       · simp only [if_true]
-        rw [LandmarkTree.toBits_succ_high hc', bornEmit]
+        rw [Compression.Landmark.Context.Tree.toBits_succ_high hc', bornEmit]
     have h0 := hside false
     have h1 := hside true
     simp only [Bool.false_eq_true, if_false, if_true] at h0 h1
@@ -250,16 +250,16 @@ theorem born_face_normalized :
 /-- [proved-derived; formal-checked] **`born_executed_partition`.** The executed Born face rounds
 each digit's exact ratio `q0 π` (the Born split of side `0` at the prefix `π`, rational in the
 Rust carrier) by the landmark tree's executed split at `M ≥ 1`
-(`HNN/LandmarkTree.executed_split_laws`): every executed cell face is positive and the faces sum to
-one over the cells, a dyadic partition of the unit cell (`HNN/LandmarkTree.cell_faces_partition`,
+(`Compression/Landmark/Context/Tree.executed_split_laws`): every executed cell face is positive and the faces sum to
+one over the cells, a dyadic partition of the unit cell (`Compression/Landmark/Context/Tree.cell_faces_partition`,
 verbatim). -/
 theorem born_executed_partition {M : ℕ} (hM : 1 ≤ M) (q0 : List Bool → ℚ) (w : ℕ) :
-    (∀ c, 0 < LandmarkTree.emit (fun π b => LandmarkTree.executedSplit M (q0 π) b) []
+    (∀ c, 0 < Compression.Landmark.Context.Tree.emit (fun π b => Compression.Landmark.Context.Tree.executedSplit M (q0 π) b) []
         (toBits w c)) ∧
       ∑ c ∈ Finset.range (2 ^ w),
-        LandmarkTree.emit (fun π b => LandmarkTree.executedSplit M (q0 π) b) [] (toBits w c) = 1 :=
-  (LandmarkTree.cell_faces_partition (fun π b => LandmarkTree.executedSplit M (q0 π) b)
-    (fun π => (LandmarkTree.executed_split_laws hM (q0 π)).2.2.1) w).2.2 hM q0
+        Compression.Landmark.Context.Tree.emit (fun π b => Compression.Landmark.Context.Tree.executedSplit M (q0 π) b) [] (toBits w c) = 1 :=
+  (Compression.Landmark.Context.Tree.cell_faces_partition (fun π b => Compression.Landmark.Context.Tree.executedSplit M (q0 π) b)
+    (fun π => (Compression.Landmark.Context.Tree.executed_split_laws hM (q0 π)).2.2.1) w).2.2 hM q0
 
 /-! ## 3. Pure states, the tick and its absorption -/
 

@@ -47,10 +47,10 @@
 
 use num_bigint::BigInt;
 
+use crate::compression::landmark::context::{LandmarkFace, Letter};
 use crate::hnn::HnnError;
 use crate::hnn::chart::Charts;
 use crate::hnn::field::{ConstitutionRead, Current, Field};
-use crate::hnn::landmark::{LandmarkFace, Letter};
 use crate::hnn::moment::SourceMoment;
 use crate::hnn::ratio::Faces;
 use crate::hnn::realization::indexed;

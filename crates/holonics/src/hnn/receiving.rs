@@ -18,10 +18,10 @@
 //! ```
 //!
 //! [definition; agent-inferred] **The receiving parametron's storage is the landmark tree**
-//! (the landmark tree, `hnn::landmark::Landmarks`, held in `Θ` at the receiving locus beside `R`). It
+//! (the landmark tree, `compression::landmark::context::Landmarks`, held in `Θ` at the receiving locus beside `R`). It
 //! replaces the region table, whose laws stay in Lean (`HNN/RegionCounts`). The region
 //! table is the depth-one forced case of the whole-cell emission (`|A|`-ary masses at a node; Lean
-//! `HNN/LandmarkTree.depth_one_is_decision_27`), which lives in Lean only; this tree emits the
+//! `Compression/Landmark/Context/Tree.depth_one_is_the_whole_cell_table`), which lives in Lean only; this tree emits the
 //! cell's odometer digits, and its depth-one forced case is a product of binary KT faces at the
 //! preceding cell, not the region table's `|A|`-ary face.
 //! The tree is declared from the receiver ([`landmark_declaration`]): the cell emitted as its
@@ -36,7 +36,7 @@
 //! cell. It is not the source moment's state: the word never reads it, so the moment's window
 //! stays `max Δ` and the capacity `n*` (which counts the source state the word reads) is unchanged
 //! by construction. Its bits count in the resident's state bits, and the aeon collapse keeps it
-//! with the tree whole (Lean `HNN/LandmarkTree.release_rule` proves that nodes deeper than `D` are
+//! with the tree whole (Lean `Compression/Landmark/Context/Tree.release_rule` proves that nodes deeper than `D` are
 //! releasable, of which the tree founds none, and that a retention is lawful exactly when it
 //! refines the causal signature; it does not prove that no shallower merge is lawful, and the
 //! collapse attempts none). A pending ratio copies it at its cut, an operand like the moment's
@@ -44,19 +44,19 @@
 //! **The address is per cell and causal**: phase `j` of the window opening at `p` reads the tree at
 //! `a_j = [x_(p+j−1), …, x_p]` (the window's own earlier targets, known at compare) followed by the
 //! copied suffix `[x_(p−1), …]`, truncated to `D` ([`ActiveAddress::phase`]). It equals
-//! `hnn::landmark::address(cells, p + j, D)` exactly (the test
+//! `compression::landmark::context::address(cells, p + j, D)` exactly (the test
 //! `the_phase_address_is_the_trees_causal_address`), so an aperture-two window reads its two
 //! phases at their own addresses (the located failure pooled lags one and two at one region).
 //! **The window is read in cell order** (prequential scoring within a window): phase `j`'s tree face is read
 //! at the standing after the window's earlier phases' tree deposits (their targets are known at
 //! compare), on a working overlay of the nodes those deposits write
-//! (`hnn::landmark::Landmarks::window_faces`); the deposit then applies exactly those steps to the
+//! (`compression::landmark::context::Landmarks::window_faces`); the deposit then applies exactly those steps to the
 //! published tree, in cell order, so the tree it publishes is the overlay's last standing plus the
 //! last phase's step. The wave's part of a window is the one refine's, read at the window's opening
 //! standing: the wave's maps are deposited once a window, by the normal law.
 //!
 //! [definition; agent-inferred] **The receiving letters** (campaign 2; Lean
-//! `HNN/LandmarkAddress`). The address register holds typed bundles, not bare cells: each earlier
+//! `Compression/Landmark/Context/Address`). The address register holds typed bundles, not bare cells: each earlier
 //! cell's tick contributes its cell and the declared features' letters ([`LetterFamily`]), newest
 //! bundle first, and the register restricts by dropping its oldest whole bundle. A letter is read
 //! from the retained sufficient state before the cell it predicts: the register's reader
@@ -110,10 +110,10 @@
 //! | `HNN/RegionCounts.{grainExponent_spec, grain_log_iff_pow_bounds, grain_face_residual, grain_code_residual}` | [`grain_exponent`], [`grain_logits`] |
 //! | `receiver::reception::ReceiverFace::read` with `C_S = R P_R^(τ_R) Π_R` | [`ReceivingPhases::read`] |
 //! | `HNN/RegionCounts.{combinedLogits, combined_face_pullback, combined_code_pullback}` | [`ReceivingRead::combined`], [`ReceivingPhases::combine`] |
-//! | `HNN/LandmarkTree.{unfounded_reads_prior, founded_tree_same_law, release_rule}` (the typed suffix address, kept whole by the collapse) | [`ActiveAddress`], [`ReceivingPhases::tree_faces`] |
-//! | `HNN/LandmarkTree.{sequential_mixture, sequential_mixture_bounds, sequential_mixture_executed}` (the two-face mixture stepped cell by cell, within one bit of the better face plus the chart's drift) | [`Mixture`] |
-//! | `HNN/LocalWeighing.{fixed_share, share_ratio_step, share_log_lipschitz, forward_executed}` (local weighing: the switching mixture across epochs, within `1 + k(−log₂ α) + (n − k)(−log₂(1 − α))` of every switching sequence, its drift carried through the contracting share) | [`Mixture::switching`] |
-//! | `HNN/LandmarkAddress.{bundle_causal, bundle_restrict, feature_scale_square, address_descends_retention, phase_partition_finite}` (the typed bundles read from the retained clock before the cell they predict) | [`LetterReader`], [`ActiveAddress`], [`clock_letters`] |
+//! | `Compression/Landmark/Context/Tree.{unfounded_reads_prior, founded_tree_same_law, release_rule}` (the typed suffix address, kept whole by the collapse) | [`ActiveAddress`], [`ReceivingPhases::tree_faces`] |
+//! | `Compression/Landmark/Context/Tree.{sequential_mixture, sequential_mixture_bounds, sequential_mixture_executed}` (the two-face mixture stepped cell by cell, within one bit of the better face plus the chart's drift) | [`Mixture`] |
+//! | `Compression/Landmark/Context/LocalWeighing.{fixed_share, share_ratio_step, share_log_lipschitz, forward_executed}` (local weighing: the switching mixture across epochs, within `1 + k(−log₂ α) + (n − k)(−log₂(1 − α))` of every switching sequence, its drift carried through the contracting share) | [`Mixture::switching`] |
+//! | `Compression/Landmark/Context/Address.{bundle_causal, bundle_restrict, feature_scale_square, address_descends_retention, phase_partition_finite}` (the typed bundles read from the retained clock before the cell they predict) | [`LetterReader`], [`ActiveAddress`], [`clock_letters`] |
 
 use std::ops::Range;
 
@@ -121,13 +121,13 @@ use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::compression::cost::ceil_log2;
+use crate::compression::landmark::context::{
+    Beta, Bundle, Feature, LandmarkDeclaration, LandmarkFace, Letter, LetterFamily, code_length,
+};
 use crate::hnn::HnnError;
 use crate::hnn::contact::{ContactReading, LockDeclaration, lock_address, site_kinds};
 use crate::hnn::field::{ConstitutionRead, Current, Field, ReceiverDeclaration};
 use crate::hnn::keys;
-use crate::hnn::landmark::{
-    Beta, Bundle, Feature, LandmarkDeclaration, LandmarkFace, Letter, LetterFamily, code_length,
-};
 use crate::hnn::propagation::Operands;
 use crate::hnn::ratio::{Face, Faces};
 use crate::hnn::realization::{apply_rows, indexed};
@@ -320,7 +320,7 @@ struct ClockRing {
 /// carry-out, which opens the next aeon, is the reader's own), their phases `λ_g mod d_g` and whole
 /// windings since the aeon's opening at the register's cut, and each contact's site kind as the
 /// constitution read at the reader's last refresh. It is the retained sufficient state the letters
-/// are read from (Lean `HNN/LandmarkAddress.address_descends_retention`): a tick's letter is read
+/// are read from (Lean `Compression/Landmark/Context/Address.address_descends_retention`): a tick's letter is read
 /// after the tick, before the cell it predicts, and nothing of the past is kept.
 ///
 /// [definition; agent-inferred] **A contact's letter** is its owner's reading
@@ -691,11 +691,11 @@ impl ActiveAddress {
         })
     }
 
-    /// **Phase `j`'s address** (module header; Lean `HNN/LandmarkAddress.bundle_causal`): the
+    /// **Phase `j`'s address** (module header; Lean `Compression/Landmark/Context/Address.bundle_causal`): the
     /// letters of the window's cells before phase `j` that are known, newest first (read by a copy
     /// of the register's reader, its clock and held site kinds, stepped over `known[0], …,
     /// known[j−1]`, at most the `known.len()` of them), then this suffix, truncated to its depth. At
-    /// a compare every earlier target is known, so this is `hnn::landmark::letter_address` of the
+    /// a compare every earlier target is known, so this is `compression::landmark::context::letter_address` of the
     /// passage's letters at `p + j`, contact letters included (the register reads the same kinds at
     /// the window's ingest: [`LetterReader`]); at a release no cell of the window is known and every
     /// phase reads the window's opening address (`hnn::port`'s release). The target of phase `j`
@@ -810,7 +810,7 @@ pub fn landmark_declaration_with(
         grain: grain_of(&receiver.tolerance)?,
         family,
         prior: receiver.prior.clone(),
-        capacity: crate::hnn::landmark::Capacity::Unbounded,
+        capacity: crate::compression::landmark::context::Capacity::Unbounded,
     })
 }
 
@@ -848,8 +848,8 @@ fn grain_of(tolerance: &Rat) -> Result<u64, HnnError> {
 /// ```
 ///
 /// Any `λ ∈ [0, 1]` keeps `q` a positive normalized face (Lean
-/// `HNN/LandmarkTree.path_face_normalized`), so the executed mixture is exactly scored. The
-/// telescope and the bounds are Lean `HNN/LandmarkTree.{sequential_mixture,
+/// `Compression/Landmark/Context/Tree.path_face_normalized`), so the executed mixture is exactly scored. The
+/// telescope and the bounds are Lean `Compression/Landmark/Context/Tree.{sequential_mixture,
 /// sequential_mixture_bounds}` (the two-child case of `kraft_and_dominance`), which hold only when
 /// each cell's weight is the ratio after every earlier cell; with the ratio carried by a chart they
 /// are `sequential_mixture_executed`, the drift `Σ_t |log₂ ρ_t|` added once. `q_C(x)` lives in
@@ -857,7 +857,7 @@ fn grain_of(tolerance: &Rat) -> Result<u64, HnnError> {
 /// enclosure at the carried power's reading bits, whose certified residual `|log₂ q_C − log₂ q̃_C|`
 /// is at most `(hi − lo)/lo · 3/2` (`|ln x| ≤ |x − 1|/min(x, 1)`, `log₂ e < 3/2`), carried rounded
 /// up on the dyadic grid `2^(−128)` so the drift's sum keeps one denominator. `β` is carried
-/// on the landmark β chart (`hnn::landmark::Beta`: odd over odd times `2^e`) at the tree's carrier
+/// on the landmark β chart (`compression::landmark::context::Beta`: odd over odd times `2^e`) at the tree's carrier
 /// width `W`, rebased to its `W`-bit mantissa when its odd parts outgrow it, with the certified
 /// residual `|log₂(1 − r)| < 3 · 2^(−W)` a rebase. A step's factor is `ρ = q̃_C/(q_C (1 − r))`, so
 /// its drift (the sum of both residuals over its steps) bounds `Σ |log₂ ρ|`, and it is reported,
@@ -866,7 +866,7 @@ fn grain_of(tolerance: &Rat) -> Result<u64, HnnError> {
 /// compare, beside the tree read, on every realization.
 ///
 /// [definition; agent-inferred] **Switching across epochs** (local weighing, "across epochs";
-/// [`Mixture::switching`]; Lean `HNN/LocalWeighing.{fixed_share, share_ratio_step,
+/// [`Mixture::switching`]; Lean `Compression/Landmark/Context/LocalWeighing.{fixed_share, share_ratio_step,
 /// forward_executed}`): the fixed-share mixture lets the weights move between epochs of the passage
 /// at a declared price a switch, the rate `α = 2^(−j)` on the dyadic ladder. After the likelihood
 /// step `β₊ = β q_T(x)/q̃_C(x)` the weights share, `λ' = (1 − α) λ₊ + α (1 − λ₊)`:
@@ -904,7 +904,7 @@ pub struct MixtureStep {
 
 /// [definition] **A window scored by the mixture**: each phase's code length under the mixture
 /// `q` (the model's) and under the tree's executed face `q_T` alone (the face the mixture weighs,
-/// `hnn::landmark::code_length` of `q_T(t_j)`), and the steps its deposit applies to `β` in cell
+/// `compression::landmark::context::code_length` of `q_T(t_j)`), and the steps its deposit applies to `β` in cell
 /// order.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Scored {
@@ -973,7 +973,7 @@ impl Mixture {
         &self.drift
     }
 
-    /// **`log₂ β`, enclosed** by the certified binary logarithm (`hnn::landmark::code_length` of
+    /// **`log₂ β`, enclosed** by the certified binary logarithm (`compression::landmark::context::code_length` of
     /// `1/β`).
     pub fn log2_beta(&self) -> Result<ExactInterval, HnnError> {
         code_length(&self.beta().recip())
@@ -1013,7 +1013,7 @@ impl Mixture {
     }
 
     /// **Score a window in cell order** (module header of this section; Lean
-    /// `HNN/LandmarkTree.sequential_mixture`): phase `j` reads `β_j`, the carried ratio after the
+    /// `Compression/Landmark/Context/Tree.sequential_mixture`): phase `j` reads `β_j`, the carried ratio after the
     /// window's earlier phases' steps (their targets are known at compare), the tree's face
     /// `q_T,j(t_j)` and the combined face's exact enclosure `q_C,j(t_j) ∈ [lo, hi]`, so the mixture
     /// `q_j(t_j) ∈ [λ_j q_T + (1 − λ_j) lo, λ_j q_T + (1 − λ_j) hi]` and its code length is enclosed
@@ -1378,7 +1378,7 @@ impl ReceivingPhases {
     /// **The tree faces of one window, in cell order** (module header): the receiving parametron's
     /// tree read at each phase's address, every class's executed face with its grain exponent,
     /// phase `j` at the standing after the deposits of the known earlier phases' targets
-    /// (`hnn::landmark::Landmarks::window_faces`: a working overlay, the published tree unchanged;
+    /// (`compression::landmark::context::Landmarks::window_faces`: a working overlay, the published tree unchanged;
     /// at a release nothing is known and every phase reads the published standing). The phases then
     /// read together (`hnn::realization`). Refused when the constitution carries no tree on the
     /// receiving ring.

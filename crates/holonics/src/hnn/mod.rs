@@ -19,10 +19,13 @@
 //!   integer products under the carrier's ℓ1 certificate, and the declared precisions by rule;
 //! - [`receiving`]: [`ReceivingPhases`], the receiving parametron's active suffix address
 //!   ([`ActiveAddress`]) and the read at the receiver's grain `L_R`: the combined face of the
-//!   landmark tree's face at each phase's causal address and the wave (the region table and the landmark tree);
-//! - [`landmark`]: the receiving parametron's storage as a tree of landmarks ([`Landmarks`]): typed
-//!   address letters, KT masses at nodes founded at first arrival, the path face mixed along the
-//!   opened path, its deposit and its prequential measurement (the landmark tree);
+//!   context tree's face at each phase's causal address and the wave (the region table and the
+//!   context tree);
+//! - the receiving parametron's storage is the context tree, the shift navigator's landmarks
+//!   ([`crate::compression::landmark::context`]): a mixture over the candidate standings of the
+//!   pruned context trees, each node's arrivals the epochs of its section; typed address letters,
+//!   KT masses at nodes founded at first arrival, the path face mixed along the opened path, its
+//!   deposit and its prequential measurement;
 //! - [`keys`]: the data → menu map, key location per ring in carry order, and gauge fixing;
 //! - [`ring`] (campaign 2): the ring's parametron resonator at its storage port (its mode storage
 //!   `Q = diag(K, C)`, its pump and sheets), its rotor clock's epoch ticks, and the junction's
@@ -59,8 +62,8 @@
 //! | the causal cone | `HNN/Word.word_tick_cone` (the concrete tick) | [`Word::support`] |
 //! | the word on declared lattices: certified inverse charts, error feedback, the executed adjoint, the balance up to the residual | `HNN/LatticeWord.{nsStep, rounded_refinement_certificate, roundedIter_certificate, warm_start_certificate, inverse_chart_deviation, feedback_tick, carried_word_accounting, executed_adjoint_unique, executed_adjoint_deviation, cayley_chart_energy}` | [`chart`], [`Word`], [`Word::pull_back`], [`propagation::TickBalance`] |
 //! | the moment | `HNN/Moment.{encoderMoment_contract, encoder_covector_tape_free, closingRing_moment_is_phaseBinned, exteriorOffset_independent_of_E, selective_position, moment_capacity}` | [`SourceMoment`], [`moment::capacity`] |
-//! | the receiving face: the landmark tree's face at each phase's causal address, read at the grain, plus the wave (the region table and the landmark tree; the region table is the depth-one forced case of the whole-cell emission, kept in Lean, not of the digit tree) | `HNN/RegionCounts.{grain_log_iff_pow_bounds, grain_code_residual, combined_face_pullback}`, `HNN/LandmarkTree.{depth_one_is_decision_27, release_rule}` | [`receiving`], [`ReceivingRead::combined`], [`ActiveAddress`] |
-//! | the receiving face compresses landmarks: the tree's path face, its opened-path deposit and telescope, the executed dyadic face (the landmark tree) | `HNN/LandmarkTree.{path_face_normalized, weight_step, landmark_step, path_telescope_exact, depth_one_is_decision_27, executed_split_laws, cell_faces_partition, digit_log_residual}` ([`landmark`]'s header has the rest) | [`landmark`] |
+//! | the receiving face: the landmark tree's face at each phase's causal address, read at the grain, plus the wave (the region table and the landmark tree; the region table is the depth-one forced case of the whole-cell emission, kept in Lean, not of the digit tree) | `HNN/RegionCounts.{grain_log_iff_pow_bounds, grain_code_residual, combined_face_pullback}`, `Compression/Landmark/Context/Tree.{depth_one_is_the_whole_cell_table, release_rule}` | [`receiving`], [`ReceivingRead::combined`], [`ActiveAddress`] |
+//! | the receiving face compresses landmarks: the tree's path face, its opened-path deposit and telescope, the executed dyadic face (the landmark tree) | `Compression/Landmark/Context/Tree.{path_face_normalized, weight_step, landmark_step, path_telescope_exact, depth_one_is_the_whole_cell_table, executed_split_laws, cell_faces_partition, digit_log_residual}` (the owner's header has the rest) | [`crate::compression::landmark::context`] |
 //! | the word opens at zero | structural: [`Current`] has no wave field (`HNN/Retention.word_opens_at_zero` is the abstract trajectory's linearity) | [`Word::open`] |
 //! | keys | `HNN/Keys.{field_loop_fibre, selective_step_dormant, propagation_eq_edge_fibre, gauge_fix_unique}` | [`keys`], [`crate::compression::Menu::propagate`] |
 //! | the ring's mode tick, its pump and sheets, its clock, the junction's reference change (campaign 2) | `HNN/Ring.{ring_tick_conserves_mode_energy, ring_descriptor_tick_conserves, ring_cayley_denominator_nonsingular, ring_tick_executed_energy_balance, two_port_reference_balance, ring_crossings_are_epoch_ticks, pump_half_turn_invariant, pump_blind_to_sheets, locked_sheet_receiver_face}` | [`ring`] |
@@ -91,7 +94,6 @@ pub mod constitution;
 pub mod contact;
 pub mod field;
 pub mod keys;
-pub mod landmark;
 pub mod modes;
 pub mod moment;
 pub mod pending;
@@ -117,9 +119,6 @@ pub use field::{
     RingDeclaration,
 };
 pub use keys::{KeyLocation, RingKeys, locate_keys};
-pub use landmark::{
-    Bundle, Feature, LandmarkDeclaration, Landmarks, Letter, LetterFamily, StopPrior,
-};
 pub use moment::{Capacity, PairPort, SourceMoment};
 pub use pending::PendingRatio;
 pub use port::{
@@ -133,7 +132,7 @@ pub use ring::{PumpDeclaration, ResonatorMaterial, RingClock};
 pub use word::{Released, ResonatorBalance, Word};
 
 #[cfg(test)]
-mod tests;
+pub(crate) mod tests;
 
 use thiserror::Error;
 

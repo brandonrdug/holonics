@@ -1,7 +1,7 @@
-import Holonics.HNN.LandmarkCompaction
+import Holonics.Compression.Landmark.Context.Compaction
 
 /-!
-# HNN.LandmarkCapacity: a landmark's storage has a capacity, and at its ceiling it carries
+# Compression.Landmark.Context.Capacity: a landmark's storage has a capacity, and at its ceiling it carries
 
 [definition; agent-inferred] Decision 39 of the step 4 design (`docs/plans/THE_REBUILD.md`, "A
 landmark's storage has a capacity: at its ceiling it carries"), rebuild step 4 (#73). Decisions
@@ -26,7 +26,7 @@ half units h = 2n + 1:  ⌈n/2⌉ ↦ 2⌊(h + 1)/4⌋ + 1 ;  binary: Σ n ≥ L
 [definition; agent-inferred] **When the carry acts.** The deposit counts its arrival, and the
 deposit that brings the node's total to the ceiling carries it at once: the register a node keeps
 between arrivals, and the face read before the next arrival, is a function of the arrivals so far
-(`capLaw`, a `LandmarkTree.NodeLaw`). The register is not a function of the counts alone: the capped
+(`capLaw`, a `Tree.NodeLaw`). The register is not a function of the counts alone: the capped
 register is not exchangeable.
 
 [proved-derived; formal-checked] What is proved.
@@ -39,23 +39,23 @@ register is not exchangeable.
    On half-unit masses `h = 2n + 1` it is `h ↦ 2⌊(h + 1)/4⌋ + 1`, and on a binary digit the ceiling
    reads `h_0 + h_1 ≥ 2L + 2`.
 3. **`c = ∞` and every ceiling a node does not reach are KT's register** (`cap_unbounded_is_kt`,
-   `cap_below_ceiling_is_kt`): the unbounded law is `LandmarkTree.ktLaw`; at the ceiling `L` a node
+   `cap_below_ceiling_is_kt`): the unbounded law is `Tree.ktLaw`; at the ceiling `L` a node
    reached fewer than `L` times holds its counts, and its own weight over at most `L` arrivals is
    KT's.
 4. **The capped tree** (`capped_tree_laws`): stored where paths part it is the capped tree of one
-   node a depth, code for code, exactly in `ℚ` (`LandmarkCompaction.compacted_node_law`); its face is
+   node a depth, code for code, exactly in `ℚ` (`Compaction.compacted_node_law`); its face is
    positive and normalized, its root weight is the prequential code of its faces, and the code is
    complete. Over a passage shorter than the ceiling (every passage when `c = ∞`) it is Decision 28's
-   tree exactly: weight `LandmarkTree.stopWeight` and face `LandmarkTree.stopFace`.
+   tree exactly: weight `Tree.stopWeight` and face `Tree.stopFace`.
 
 The tree weighting's Kraft form and dominance hold at the capped register's own weights as at any
-node law's (`LandmarkTree.own_mixture_over_trees`, `own_kraft_and_dominance`).
+node law's (`Tree.own_mixture_over_trees`, `own_kraft_and_dominance`).
 
 [conditional] The capped register's code against a source that drifts (a piecewise-stationary
 source, the reason a capacity can pay) is not bounded here: whether a ceiling earns bits on a cut is
 a measurement (Decision 39's receipt), not a theorem.
 
-The Rust consumer is `crates/holonics/src/hnn/landmark.rs` (`hnn::landmark::Capacity`, declared in
+The Rust consumer is `crates/holonics/src/compression/landmark/context.rs` (`compression::landmark::context::Capacity`, declared in
 `LandmarkDeclaration::capacity`, consumed by the one `Law`'s deposit and by `IdealLandmarks`): the
 node's half-unit masses carry at the ceiling after each deposit, and a stored chain is one register.
 
@@ -64,12 +64,12 @@ No `sorry`, no `axiom`, no `native_decide`.
 
 noncomputable section
 
-namespace Holonics.HNN.LandmarkCapacity
+namespace Holonics.Compression.Landmark.Context.Capacity
 
 open Finset
-open Holonics.HNN.LandmarkTree
-open Holonics.HNN.LandmarkCompaction
-open Holonics.HNN.ConvergenceFounding (prequentialCode)
+open Holonics.Compression.Landmark.Context.Tree
+open Holonics.Compression.Landmark.Context.Compaction
+open Holonics.Compression.Landmark.Context.ConvergenceFounding (prequentialCode)
 
 universe v
 
@@ -159,7 +159,7 @@ theorem cap_run_snoc [DecidableEq A] [Nonempty A] (cap : Option ℕ) (w : List A
 omit [DecidableEq A] in
 /-- [proved-derived; formal-checked] **`cap_run_total_le`: a node's total never passes its
 arrivals.** The capped register's total after a word is at most the word's length, so a node's KT
-face is at least `1/(2n + 2)` over `n` arrivals (`LandmarkTree.kt_binary_ge`), as without a
+face is at least `1/(2n + 2)` over `n` arrivals (`Tree.kt_binary_ge`), as without a
 capacity. -/
 theorem cap_run_total_le [DecidableEq A] [Nonempty A] (cap : Option ℕ) (w : List A) :
     ∑ c, (capLaw A cap).run w c ≤ w.length := by
@@ -241,7 +241,7 @@ theorem cap_standing_below (cap : Option ℕ) (ctx : List A → List Ltr) (h : L
     exact ⟨rfl, rfl⟩
 
 /-- [definition] **The capped tree's root face** after a past, at the address it opens: the node
-law's tree face at the capped register (`LandmarkTree.lawFace`). -/
+law's tree face at the capped register (`Tree.lawFace`). -/
 def capFace (cap : Option ℕ) (j : ℕ → ℕ) (D : ℕ) (ctx : List A → List Ltr) (h : List A) :
     A → ℚ :=
   lawFace (capLaw A cap) (fun d => ladder (j d)) (lawStandingOf (capLaw A cap) ctx h) D (ctx h) 0
@@ -318,4 +318,4 @@ section Audit
 
 end Audit
 
-end Holonics.HNN.LandmarkCapacity
+end Holonics.Compression.Landmark.Context.Capacity

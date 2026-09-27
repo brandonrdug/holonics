@@ -1,7 +1,7 @@
-import Holonics.HNN.LandmarkTree
+import Holonics.Compression.Landmark.Context.Tree
 
 /-!
-# HNN.LocalWeighing: every face weighed at each landmark, in each digit tree and across epochs
+# Compression.Landmark.Context.LocalWeighing: every face weighed at each landmark, in each digit tree and across epochs
 
 [definition; agent-inferred] Decision 34 of the step 4 design (`docs/plans/THE_REBUILD.md`,
 "Weighing is local"), rebuild step 4 (#73). Decisions 30, 32 and 33 located one limit: a mixture
@@ -47,7 +47,7 @@ digit tree  W_h = Σ_k π_k W_h^(w_k) = Σ_(k, S) π_k prior_(w_k)(S) ∏_(leave
 2. **The executed forward mixture** (`fwdExec`, `forward_executed`): weights propagated with charted
    faces `f ρ` (a rational chart, a rebase) and scored with the true faces lose at most
    `Σ_t log₂(R_t/r_t)` against the ideal bound: the chart's drift adds once over the passage. At two
-   faces with the chart on one side it is `LandmarkTree.sequential_mixture_executed`'s `Σ|log₂ ρ|`.
+   faces with the chart on one side it is `Tree.sequential_mixture_executed`'s `Σ|log₂ ρ|`.
 3. **The static mixture** (`idKernel`, `static_mixture`, `two_face_prior`): under the identity
    kernel each face's forward weight is its prior times its prequential likelihood, the product
    telescopes to `Σ_x π_x A_x(n)` and codes within `−log₂ π_x` of every face. Over two faces with the
@@ -59,21 +59,21 @@ digit tree  W_h = Σ_k π_k W_h^(w_k) = Σ_(k, S) π_k prior_(w_k)(S) ∏_(leave
    sequence with `k` switches over `n` cells (Herbster–Warmuth); the executed ratio steps by the
    likelihood ratio, then the share map, which on the ladder `α = 2^(−j)` is
    `((2^j − 1)β + 1)/((2^j − 1) + β)`; and the share map never amplifies a drift in `log β`.
-5. **The tree over own weights** (`LandmarkTree.{ownWeight, ownSplit, ownLik,
+5. **The tree over own weights** (`Tree.{ownWeight, ownSplit, ownLik,
    own_mixture_over_trees, ownWeight_kt, ownLik_kt, ownWeight_one, own_kraft_and_dominance}`,
-   stated once in `LandmarkTree` since Decision 39, every node law's weighting): for any positive
+   stated once in `Tree` since Decision 39, every node law's weighting): for any positive
    own weights the tree is the mixture over pruned trees with the stop law's prior, its prior is
    complete, and it codes within the prior's code of every pruned tree. The declared stop law
-   (`LandmarkTree.stopWeight`, `treeLik`) is its case at the KT own weight.
+   (`Tree.stopWeight`, `treeLik`) is its case at the KT own weight.
 6. **Node-local mixing** (`ownLik_mul`, `ownLik_mono`, `node_local_dominance`,
    `own_face_normalized`, `node_local_founding`): with each landmark's own weight the static
    mixture of its KT mass and an admitted external face over its routed digits, the tree stays
    normalized (each own face is a normalized face, so the opened path is, under any stop weights)
    and Kraft-complete, and each landmark pays at most `−log₂` of its prior weight. An unfounded
    landmark reads `π/|A| + (1 − π) x`.
-7. **The opened-path step over own weights** (`LandmarkTree.{ownLam, ownRatio, ownLam_mem,
+7. **The opened-path step over own weights** (`Tree.{ownLam, ownRatio, ownLam_mem,
    ownWeight_off, ownSplit_arrive, own_weight_step₀, own_weight_step, own_ratio_step}`, stated once
-   in `LandmarkTree` since Decision 39): an arrival that moves
+   in `Tree` since Decision 39): an arrival that moves
    each opened landmark's own weight by its own face multiplies each opened node's weight by the path
    face over own faces, and the ratio steps by `β' = β e_d/q_(d+1)`: the stop law's step with the own
    face in place of the KT face.
@@ -92,21 +92,21 @@ parts, and the Rust tests check the executed faces against the ideal weighting.
 
 | Lean | Rust |
 |---|---|
-| `forward_telescope`, `forward_dominance`, `forward_weight_step`, `forward_executed` | `hnn::landmark::{JoinTree, FaceJoins}`, `hnn::receiving::Mixture::switching` |
-| `static_mixture`, `two_face_prior` | `hnn::landmark::JoinTree` (a two-face join from `β₀ = 2^j − 1`) |
+| `forward_telescope`, `forward_dominance`, `forward_weight_step`, `forward_executed` | `compression::landmark::context::{JoinTree, FaceJoins}`, `hnn::receiving::Mixture::switching` |
+| `static_mixture`, `two_face_prior` | `compression::landmark::context::JoinTree` (a two-face join from `β₀ = 2^j − 1`) |
 | `fixed_share`, `share_ratio_step`, `share_log_lipschitz` | `hnn::receiving::Mixture::switching` |
-| `LandmarkTree.{own_mixture_over_trees, own_kraft_and_dominance, own_weight_step, own_ratio_step}`, `node_local_dominance`, `own_face_normalized`, `node_local_founding` | `hnn::landmark::{Landmarks::local, LocalLaw}` (retired at `89460425`); the own-weight tree is every node law's (`hnn::landmark::Capacity`, Decision 39) |
-| `stop_mixture_per_tree` | `hnn::landmark::{StopMixture, FaceJoins}` |
+| `Tree.{own_mixture_over_trees, own_kraft_and_dominance, own_weight_step, own_ratio_step}`, `node_local_dominance`, `own_face_normalized`, `node_local_founding` | `compression::landmark::context::{Landmarks::local, LocalLaw}` (retired at `89460425`); the own-weight tree is every node law's (`compression::landmark::context::Capacity`, Decision 39) |
+| `stop_mixture_per_tree` | `compression::landmark::context::{StopMixture, FaceJoins}` |
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
 
 noncomputable section
 
-namespace Holonics.HNN.LocalWeighing
+namespace Holonics.Compression.Landmark.Context.LocalWeighing
 
 open Finset
-open Holonics.HNN.LandmarkTree
+open Holonics.Compression.Landmark.Context.Tree
 
 /-- A positive quantity below another reads fewer bits: `−log₂ b ≤ −log₂ a` for `0 < a ≤ b`. -/
 theorem neg_logb_le_of_le {a b : ℝ} (ha : 0 < a) (hab : a ≤ b) :
@@ -275,7 +275,7 @@ passage.** With the weights carried by charted faces `f̃ = f ρ`, `r_t ≤ ρ_x
 sequence `σ`: `F₀(σ_0) ∏_t f_(σ_t)(t) T(σ_t, σ_(t+1)) ∏_t (r_t/R_t) ≤ ∏_t q̂_t`, so
 `−log₂ ∏ q̂ ≤ −log₂ F₀(σ_0) − Σ log₂ T(σ_t, σ_(t+1)) − Σ log₂ f_(σ_t)(t) + Σ_t log₂(R_t/r_t)`.
 At two faces with the chart on one side (`ρ_a = 1`, `ρ_b = ρ`) the last sum is `Σ|log₂ ρ_t|`,
-`LandmarkTree.sequential_mixture_executed`'s. -/
+`Tree.sequential_mixture_executed`'s. -/
 theorem forward_executed {F0 : ι → ℚ} {f ρ : ι → ℕ → ℚ} {T : ι → ι → ℚ} {R r : ℕ → ℚ}
     (hF : IsPrior F0) (hf : ∀ x t, 0 < f x t) (hT : Stochastic T) (hρ : ∀ x t, 0 < ρ x t)
     (hR : ∀ x t, ρ x t ≤ R t) (hr : ∀ x t, r t ≤ ρ x t) (hr0 : ∀ t, 0 < r t)
@@ -440,8 +440,8 @@ from a declared prior.** For `π ∈ (0, 1)` and positive faces `a`, `b`:
 * the ratio opens at `β_0 = π/(1 − π)` and steps `β_(t+1) = β_t a_t/b_t`, the weight `β/(1 + β)`;
 * the product telescopes, `∏_(t<n) q_t = π A_n + (1 − π) B_n`, so the mixture codes within
   `−log₂ π` of the first face and `−log₂(1 − π)` of the second;
-* at `π = ½` it is Decision 30's mixture (`LandmarkTree.seqMix`); on the dyadic ladder
-  `π = 1 − 2^(−j)` the founding ratio is the integer `2^j − 1` (`LandmarkTree.ladder_founding`). -/
+* at `π = ½` it is Decision 30's mixture (`Tree.seqMix`); on the dyadic ladder
+  `π = 1 − 2^(−j)` the founding ratio is the integer `2^j − 1` (`Tree.ladder_founding`). -/
 theorem two_face_prior {π : ℚ} (hπ0 : 0 < π) (hπ1 : π < 1) {a b : ℕ → ℚ} (ha : ∀ t, 0 < a t)
     (hb : ∀ t, 0 < b t) :
     (∀ t, priorMix π a b t = fwdMix (boolPrior π) (boolFace a b) idKernel t) ∧
@@ -695,9 +695,9 @@ universe u
 
 variable {Ltr : Type u} [Fintype Ltr] [DecidableEq Ltr]
 
-/-! The tree over own weights (`LandmarkTree.ownWeight`, `ownSplit`, `ownLik`, `ownWeight_pos`,
+/-! The tree over own weights (`Tree.ownWeight`, `ownSplit`, `ownLik`, `ownWeight_pos`,
 `ownLik_pos`, `own_mixture_over_trees`, `own_kraft_and_dominance`, `ownWeight_kt`, `ownLik_kt`,
-`ownWeight_one`) is stated once in `LandmarkTree`, sections 4 and 5: it is every node law's weighting
+`ownWeight_one`) is stated once in `Tree`, sections 4 and 5: it is every node law's weighting
 (Decision 39), and the stop law's is its case at KT. Node-local mixing reads it here. -/
 
 omit [DecidableEq Ltr] in
@@ -802,7 +802,7 @@ theorem own_face_normalized {A : Type*} [Fintype A] :
 mixture.** At the founding the KT mass and the external face's likelihood are both `1` (nothing
 routed), so the own mixture's weight on KT is its prior `π`, and the landmark's own face is
 `π/|A| + (1 − π) x` (KT's empty face is uniform, `ktFace_zero`). On the dyadic ladder
-`π = 1 − 2^(−j)` the founding ratio `π/(1 − π)` is `2^j − 1` (`LandmarkTree.ladder_founding`). -/
+`π = 1 − 2^(−j)` the founding ratio `π/(1 − π)` is `2^j − 1` (`Tree.ladder_founding`). -/
 theorem node_local_founding {A : Type*} [Fintype A] [Nonempty A] (π : ℚ) (x : A → ℚ) (c : A) :
     π * ktMass (fun _ : A => 0) / (π * ktMass (fun _ : A => 0) + (1 - π) * 1) = π ∧
       π * ktFace (fun _ : A => 0) c + (1 - π) * x c = π / Fintype.card A + (1 - π) * x c := by
@@ -810,9 +810,9 @@ theorem node_local_founding {A : Type*} [Fintype A] [Nonempty A] (π : ℚ) (x :
   rw [ktFace_zero]
   ring
 
-/-! The opened-path step over own weights (`LandmarkTree.ownLam`, `ownRatio`, `ownLam_mem`,
+/-! The opened-path step over own weights (`Tree.ownLam`, `ownRatio`, `ownLam_mem`,
 `ownWeight_off`, `ownSplit_arrive`, `own_weight_step₀`, `own_weight_step`, `own_ratio_step`) is
-stated once in `LandmarkTree`, section 4. -/
+stated once in `Tree`, section 4. -/
 
 /-! ## 3. The stop-weight mixture per digit tree -/
 
@@ -901,4 +901,4 @@ section Audit
 
 end Audit
 
-end Holonics.HNN.LocalWeighing
+end Holonics.Compression.Landmark.Context.LocalWeighing

@@ -35,7 +35,6 @@ import Holonics.Foundation.FractalString
 import Holonics.Holarchy
 import Holonics.Aeon
 import Holonics.Compression
-import Holonics.HNN.LandmarkTree
 
 /-!
 # The elementary Holonic objects
@@ -58,7 +57,7 @@ with its consumer. The operator contract in the guide lists every owner; the ent
 | Ratio | `Objects/{Ratio,RatioPhase,RatioBlock}` |
 | Receiver and receipt | `Holarchy/{Reception,Receipt,Hearing}`, `Foundation/Standing` |
 | Holarchy | `Holarchy/{Join,View}` |
-| Holonic Compression | `Compression/{Core,Landmark}`, `HNN/LandmarkTree` (the receiving face's landmark tree: KT masses at typed address nodes, weighted along the opened path) |
+| Holonic Compression | `Compression/{Core,Landmark}`, with `Compression/Landmark/Context` (the receiving tree: the shift navigator's landmarks, KT masses at typed address nodes weighted along the opened path, a mixture over the pruned trees' candidate standings, each node's arrivals the epochs of its section) |
 | Aeon, epoch and cycle | `Aeon/Clock/{Groupoid,Reading,Winding,Lock,Epoch,CarryWord}`, `Aeon/Production` |
 
 Namespaces keep their historical names (`Holonics.HolonCore` for the Holon law, for example);

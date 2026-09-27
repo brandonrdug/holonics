@@ -51,7 +51,7 @@ T = (1/m) [[m − h²k, 2hc], [−2hk, 4c − m]] ,   tr T = (4c − h²k)/m ,  
    the box `1 ≤ p ≤ m_g`, `1 ≤ q ≤ m_h`, and it closes at its period `q`: its cycles are exactly the
    multiples of `q` (`lockAddress_closes`, composing `Aeon/Clock/Lock.{lock_at_address,
    cycle_iff_period_dvd}`). The finite family these addresses land in, `Unlocked` and the reduced
-   `(p, q)` within the derived bounds `(P, Q)`, is `HNN/LandmarkAddress.lock_partition_finite`, whose
+   `(p, q)` within the derived bounds `(P, Q)`, is `Compression/Landmark/Context/Address.lock_partition_finite`, whose
    horizon clause (`Q = H`, the windings counted up to the closing tick) is this theorem's box read
    at the horizon: one object, its reading here and its partition there.
 
@@ -469,7 +469,7 @@ whole windings `m_g, m_h ≥ 1`; their phases are the unresolved part, so the pa
   the least rate).
 * It lands in the box `1 ≤ p ≤ m_g`, `1 ≤ q ≤ m_h`: its denominator is at most the measured ratio's,
   and `p/q < (m_g + 1)/m_h` bounds its numerator. So whenever the windings are within the lock
-  letters' bounds `(P, Q)` the address is one of them (`HNN/LandmarkAddress.lock_partition_finite`).
+  letters' bounds `(P, Q)` the address is one of them (`Compression/Landmark/Context/Address.lock_partition_finite`).
 * It closes at its period `q`: the cycles at `p/q` are exactly the passages of a multiple of `q`
   turns of ring `h` (`lockAddress_closes`). -/
 theorem contact_lock_address (mg mh : ℕ) (hg : 0 < mg) (hh : 0 < mh) :

@@ -2,7 +2,7 @@
 
 **Status: active, September 26.** Tracked in #63. Steps 0–3 are built. Campaign 1
 meets its standing-cut criterion; campaign 2's laws and host/card parity pass, while its predictive
-criterion fails. The compacted landmark tree (`hnn::landmark`) and the loaded
+criterion fails. The compacted landmark tree (`compression::landmark::context`) and the loaded
 resonator/adjoint (`hnn::ring`) run on host and card. The fixed loaded source-ring family does not improve the
 standing-cut prediction. Campaign 3's future-mode quotient is the immediate work; campaigns 3–5
 remain consumer work. Step 6's finite physics and
@@ -29,7 +29,11 @@ short current position; dated records hold the evidence.
 sets the order:
 1. dissolve the Decisions log into its owners and records (done September 27; [index](#i-the-decisions-index));
 2. put the Holarchy and its aeons at the top of `hnn`, with the receiving tree expressed through
-   `receiver::standing`, `aeon::Epochs` and the source navigator's words;
+   `receiver::standing`, `aeon::Epochs` and the source navigator's words. The tree's part is built
+   (September 27): the tree is the shift navigator's landmarks, `compression::landmark::context`
+   (Lean `Compression/Landmark/Context`), and its Lean joins to `Foundation/Standing` (each pruned
+   tree a candidate standing, the weight their mixture) and `Aeon/Clock/Epoch` (a node's arrivals
+   are the epochs of its section) are proved;
 3. prototype learning on terrain a declared Holarchy made, with its exact truth;
 4. then continue campaign 3.
 
@@ -435,7 +439,7 @@ K   the complex: rings g (0-cells); contacts a = (g→h) (1-cells); declared loo
     - the receiving map R, a prox normal law on its reached covectors opening at zero, and the receiving
       parametron's landmark tree (KT masses at nodes, the prior 1/2, context-tree weighting over each
       cell's causal address of depth D), weighed against the combined face (tree plus wave) by their
-      likelihood ratio (`hnn::landmark`, `hnn::receiving::Mixture`; the retired region table is the
+      likelihood ratio (`compression::landmark::context`, `hnn::receiving::Mixture`; the retired region table is the
       depth-one case of the tree's whole-cell emission, kept in Lean).
     Every learned map carries its normal statistics, per locus and factored (`Holon/MomentStorage`).
 x   the current: the lift point λ ∈ ℤ^G of the rings' joint clock torus (`aeon::ClockLift`), the one owner of
@@ -578,7 +582,7 @@ receive  at the receiving ring's epochs e_j = e_0 + j, j < A, each read by tick 
          e_last = e_0 + A − 1, so the word evaluates e_max = e_0 + A junction steps (R3 R1):
            f_j = grain(log₂ q(· | a_j)) + R P_R^(τ_R) v_R(e_j) ,  read at the receiver's grain L_R as the face p̂_j
                  with its fibre ε_R; the landmark tree's face at phase j's causal address a_j (the window's
-                 earlier targets, then the receiver's active suffix address; `hnn::landmark`), read at compare,
+                 earlier targets, then the receiver's active suffix address; `compression::landmark::context`), read at compare,
                  plus the wave's correction
 release  at the word's end every wave and contact state is released: the unread change leaves as the
          word's emitted exchange, with its power in the receipt; nothing is carried to the next word
@@ -594,7 +598,7 @@ deposit  only at loci inside the causal diamond of the source rings and the rece
            ΔH_R = Σ_j w z_j z_j* ,  ΔR = γ_R Σ_j w g_j (X̂_R z_j)*            the receiving map's prox step at
                  z_j = P_R^(τ_R) v_R(e_j), X̂_R the certified chart of H_R' (`hnn::chart`)
            t_j deposited on the paths a_j opens, in cell order              the receiving parametron's landmark
-                 tree (`hnn::landmark`): the KT half-unit counts and the carried mixture ratio β on the opened path
+                 tree (`compression::landmark::context`): the KT half-unit counts and the carried mixture ratio β on the opened path
            Δh_x = Σ_t w|f_t|² (h_x from 1) ,  Δx = η_x G_x / h_x'                 per factor family x: c_a, b_a, F_a, the
                  slices' u, v, W_s's factor, E_g^(δ)'s factors, q_r; G_x its covector; no clamp: C_a, K_a, D_a, −W_s stay PSD as squares
            every entry of locus ℓ on its declared lattice 2^(−L_ℓ)ℤ, at the locus's m-th deposit (`HNN/LatticeDeposit`):
@@ -623,7 +627,7 @@ close    at an aeon boundary: the collapse onto what the admitted future disting
   (first review C10):
   - `w = 1` per compare return: each observed target counts once;
   - `γ_U` is linear locus `U`'s proxy step (the receiving map's included) and `η_x` factor family `x`'s
-    step; the landmark tree takes each compared cell once (`hnn::landmark`). Each is a declared
+    step; the landmark tree takes each compared cell once (`compression::landmark::context`). Each is a declared
     rational, part of `Field::describe`, not learned in campaign 1 and reported with its value.
   - Campaign 1 declares `γ_U = 1`: the normal law's pure solve. Under the exact law its bits stay
     slow only for a map that is not an operand of its own covector (`R`: 155 → 196 bits over 8 →
@@ -651,7 +655,7 @@ close    at an aeon boundary: the collapse onto what the admitted future disting
   covector about 34 against magnitude entries of at most 1). In the cut's frame `φ^T_j ∈ [0, 1 +
   2(j+1)/d_R)`. Only the target's class carries phase weight (`q_c = 0` elsewhere), so the phase part
   is `−q_(t_j) Δ_(t_j)` with the windowed gap `Δ = φ^T − φ^H` (`alignCost`, Lean
-  `HNN/Ratio.alignCost_turns`). The landmark tree (`hnn::landmark`) takes the target cell directly on its
+  `HNN/Ratio.alignCost_turns`). The landmark tree (`compression::landmark::context`) takes the target cell directly on its
   opened paths; no finite logit chart of the one-hot target is needed (Lean
   `HNN/TargetFace.finite_chart_obstruction` shows none exists).
 - **Notation.** `o` is a wave leaving a junction, `a` a wave arriving at one, and `z_a = (u_a, w_a)`
@@ -1263,14 +1267,14 @@ port. No other noun enters.
 | `Ring` | `hnn/field.rs` | A closing rotor ring: its `Parametron`, its navigator (`Transport::Map`, key, clock, lift), its screw generator with `d_g` node placements, its lock `N_g` and reflector `F_g` on the port chart `ℤ/d_g`, its storage admittance `Y_g`, its standing `q_g`, and its reaction material; on a source ring, its source ports `E_g`, `E_g^(δ)` and injection `I_g`. Campaign 1 has no non-closing form. | `holon::parametron::Parametron`, `navigator::Navigator`, `geometry::screw::{ScrewGenerator, SituatedScrew}`, `holon::restriction::PortMap` |
 | `Contact` | `hnn/field.rs` | A pair contact `a = (g→h)`: its channel width `k_a` and partial matchings `ι_(a,g)`, `ι_(a,h)` (so `U_a` and `U_aᵀ`), its block of `d_A`, its constitution `(c_a, b_a, F_a)`, its reference admittance `Y_a`, its participation exponent `β_a` and its pair geometry read from the two rings' screws. It has no scalar conductance. | `holon::contact::{PairContact, ContactMaterial}`, `geometry::screw::ScrewPair`, `holon::parametron::Parametron::lc` |
 | `Field` | `hnn/field.rs` | The HNN law: the complex, the rings and contacts, the `Constitution`, the admitted receivers, the founding and pending capacities. `Field::holon()` returns a read-only `Holarchy` chart built from the `Constitution`, `Field::parametric()` the `ClockLift`, and `Field::describe()` the field's exact self-delimiting code. | `geometry::complex::CellComplex`, `holarchy::{Holarchy, Gluing}`, `aeon::ClockLift` |
-| `Constitution` | `hnn/constitution.rs` | Θ, the standings `q` and each receiving ring's landmark tree (`hnn::landmark`) included, with a commit counter, the declared steps `γ_U` and `η_x`, and its bit budget `B_Θ`. Its fields are private, and only `deposit` and the collapse change it. | `holon::element::{ActiveRelation, ResistiveRelation, Pump}`, `holon::deposition::{project_passive, CommittedEnergyBound}` |
+| `Constitution` | `hnn/constitution.rs` | Θ, the standings `q` and each receiving ring's landmark tree (`compression::landmark::context`) included, with a commit counter, the declared steps `γ_U` and `η_x`, and its bit budget `B_Θ`. Its fields are private, and only `deposit` and the collapse change it. | `holon::element::{ActiveRelation, ResistiveRelation, Pump}`, `holon::deposition::{project_passive, CommittedEnergyBound}` |
 | `NormalLaw` | `hnn/constitution.rs` | One locus's deposition owner, `W H = B`, with factored statistics of the locus's own width. There is no global Gram (review A6). `W` and `H` are carried on the locus's lattice with their remainders. `B = W H` is not carried (the lattice deposit) and `W` moves by the prox step (`NormalLaw::deposited`), the receiving map included (the exogenous target law is retired, (h)). | `ratio::linear`; Lean `Holon/MomentStorage` |
 | `Current` | `hnn/field.rs` | The lift point `λ`: the rings' continuing motion, the only current that persists between words. It has no wave field (R2 C3). | `aeon::ClockLift` |
 | `SourceMoment` | `hnn/moment.rs` | On closing source rings only: the phase-binned counts `M_g`, the offset counts `C_g(δ)` on the exterior chart, the window `win_g` and its opening lift point; its capacity crossover `n*`. `m̃` is computed, never stored, on the indexed normalized open (the primary's ruling B, Lean `HNN/IndexedOpen`): the counts over their population and the pair port at the window's address over its column's, each `1/n` on the `PopulationChart`'s lattice. | `navigator::Navigator`, `ratio::linear` |
 | `Word<'c>` | `hnn/word.rs` | One evaluation of the ticks at one cut's fixed operands, opening at zero change. It borrows `&'c Field` and owns the change: the waves, the contact states and their per-tick values or checkpoints, which its return reads in reverse. Its end releases the change. | `hnn::propagation` |
 | (functions) | `hnn/propagation.rs` | The junction Swing, the ring element step and the contact transit. | `geometry::swing`; the midpoint scheme of `holon::law::ReferenceHolon`, realized directly and equated with it in two tests (reception item 1) |
-| `ReceivingPhases` | `hnn/receiving.rs` | The receiving ring, its epochs `e_j`, aperture `A`, grain `L_R`, its tree's address depth `D` and the shared map `R`; it reads the wave `R P_R^(τ_R) v_R` at refine and, at compare, the combined face `grain(log₂ q(· \| a_j)) + R P_R^(τ_R) v_R` with the landmark tree's face at each phase's causal address `a_j` (`tree_faces`, `combine`, `ReceivingRead::combined`; `hnn::landmark`); the scored face is `Mixture`'s, the tree's face against the combined face weighted by their likelihood ratio `β` in Θ (the primary's ruling A). It refuses `A` beyond the rank of the receiving ring's observability over the word, which it reports (review C7). Beside it, `ActiveAddress`: the receiving parametron's active suffix address, the last `D` cells received, which the resident shifts at every ingested cell, a pending ratio copies at its cut, the state bits count and the collapse keeps; not the moment's state, so `n*` is unchanged. `grain_exponent` (the grain's integer comparison) lives here. | `receiver::reception::ReceiverFace` |
-| `Landmarks` | `hnn/landmark.rs` | The receiving parametron's storage as a tree of landmarks: typed address letters (`Boundary`, `Cell`) read per cell, nodes founded at first arrival holding Krichevsky–Trofimov masses in half-units and the carried mixture ratio `β` (rebased on its derived carrier width `W` with a certified residual), the face along the one opened path (context-tree weighting) on the fixed-width lattice `2^(−M_p)`, the cell's odometer digits emitted as a dyadic partition of the unit cell, `M_p` and `W` derived from `n*`, `L_R`, `B` and `D`, and the prequential measurement against the baselines ((f)). It is the receiving parametron's storage in Θ (`ReceivingPhases` reads it; the region table, the depth-one case of the whole-cell emission kept in Lean, is retired from Rust). | `hnn::receiving::grain_exponent`; `hnn::reference::Baselines`; Lean `HNN/LandmarkTree` |
+| `ReceivingPhases` | `hnn/receiving.rs` | The receiving ring, its epochs `e_j`, aperture `A`, grain `L_R`, its tree's address depth `D` and the shared map `R`; it reads the wave `R P_R^(τ_R) v_R` at refine and, at compare, the combined face `grain(log₂ q(· \| a_j)) + R P_R^(τ_R) v_R` with the landmark tree's face at each phase's causal address `a_j` (`tree_faces`, `combine`, `ReceivingRead::combined`; `compression::landmark::context`); the scored face is `Mixture`'s, the tree's face against the combined face weighted by their likelihood ratio `β` in Θ (the primary's ruling A). It refuses `A` beyond the rank of the receiving ring's observability over the word, which it reports (review C7). Beside it, `ActiveAddress`: the receiving parametron's active suffix address, the last `D` cells received, which the resident shifts at every ingested cell, a pending ratio copies at its cut, the state bits count and the collapse keeps; not the moment's state, so `n*` is unchanged. `grain_exponent` (the grain's integer comparison) lives here. | `receiver::reception::ReceiverFace` |
+| `Landmarks` | `compression/landmark/context.rs` | The receiving parametron's storage as a tree of landmarks: typed address letters (`Boundary`, `Cell`) read per cell, nodes founded at first arrival holding Krichevsky–Trofimov masses in half-units and the carried mixture ratio `β` (rebased on its derived carrier width `W` with a certified residual), the face along the one opened path (context-tree weighting) on the fixed-width lattice `2^(−M_p)`, the cell's odometer digits emitted as a dyadic partition of the unit cell, `M_p` and `W` derived from `n*`, `L_R`, `B` and `D`, and the prequential measurement against the baselines ((f)). It is the receiving parametron's storage in Θ (`ReceivingPhases` reads it; the region table, the depth-one case of the whole-cell emission kept in Lean, is retired from Rust). | `hnn::receiving::grain_exponent`; `hnn::reference::Baselines`; Lean `Compression/Landmark/Context/Tree` |
 | `HolonRatio` | `hnn/ratio.rs` | `R_j = Ĝ_(T←H)` at each receiving phase, as undivided pairs, with `ℓ`, its branch and the receiver's fibre. | `ratio::Presentation`, `ratio::surprisal::SymbolicSurprisal`, `ratio::exponentiated::{RatioFamily, CarriedPower}` |
 | `RatioCovector` | `hnn/ratio.rs` | `R⁻¹dR` at the face: the magnitude part `p̂ − q` and the phase part `−q_c Δ_c`, in units of `ln 2` carried as a declared factor. Only a `HolonRatio` constructs it. | — |
 | `PendingRatio` | `hnn/pending.rs` | The producing anchor `λ`, the encoder moment `M`, the `ReceivingPhases` and the commit it was produced at. It is owned by the resident and addressed by `PendingId`. | the types above |
@@ -1358,7 +1362,7 @@ The additions outside `hnn`, each in its owner and with its Lean:
 
 [definition] The reference executes exact integer and rational chart operations. The lattice
 deposit (`HNN/LatticeDeposit`), the lattice word (`hnn::chart`) and the landmark storage
-(`hnn::landmark`) declare its deposition, transient, inverse and landmark rebases with their
+(`compression::landmark::context`) declare its deposition, transient, inverse and landmark rebases with their
 decoders and residuals. Deposition carries a remainder whose precision refines with the locus's deposit count;
 the released tail is reported and its coefficient sum stays below half a unit since founding.
 The complete word's sensitivity and the landmark passage drift remain separate obligations in
@@ -1458,8 +1462,8 @@ The complete word's sensitivity and the landmark passage drift remain separate o
 | 10 | The motor chart | `Transport/SerialScrewChain` | the chain Jacobian in `Transport/SerialScrewChain`; `HNN/Motor.lean`: `motor_pullback` (`⟨w, Jθ̇⟩ = ⟨Jᵀw, θ̇⟩`) | `hnn::motor` | 4; 2 |
 | 11 | Joint prediction as a boundary section | `Computation/JointReceiverWitness`; `Foundation/Holon.{ofEvolution, ofEvolution_receive_eq_encoded}`; `HolonicsResearch/Transport/ArtifactRelease.{step, stepMulti, restriction_never_widens}`, moved into `Holonics/Transport` | `HNN/Prediction.lean`: `jointSection`; `station_faces`; `joint_not_marginals`; `release_width_zero` | `hnn::prediction` | 5; 4 |
 | 12 | Holonic Encoding: `E_next T = U E`, `D E = ρ` | `Physics/ReflectedBoundaryMemory.{boundary_reduction_iff, boundary_reduction_with_forcing}`; `Foundation/JointReceiverDescent.joint_generator_descends_iff`; `Holon/Restriction.{descent_total, scale_square_pow}` | `HNN/Encoding.lean`: `injection_square`; `encoding_reduced_recurrence`; `encoding_separator` | `hnn::encoding` | 5; 4 |
-| 13 | The receiving letters: typed bundles of cells, ring phase classes, lock addresses and site kinds | `HNN/LandmarkTree.{address_scale_square, kraft_and_dominance, mixture_is_probability, landmark_step}`; `HNN/Retention.fieldStanding`; `HNN/Contact.contact_lock_address` | `HNN/LandmarkAddress.lean`: `bundle_causal`, `bundle_restrict`, `feature_scale_square` (with its commutation hypothesis), `address_descends_retention`, `phase_partition_finite`, `lock_partition_finite` (the contact's lock letters, a box `0 < p ≤ P`, `0 < q ≤ Q` in the contact's orientation, its horizon clause `contact_lock_address`'s cycles), `bundle_code_injective`, `cell_only_dominance_with_feature_charge`; `HNN/LandmarkTree`: the executed face's bound with address and lattice residuals | `hnn::{landmark, receiving, contact}` | 2 |
-| 14 | The tree's carriers rebase past their width | `HNN/LandmarkTree.{rebase_log_residual, lattice_path_deviation, lattice_node_telescope}` | `HNN/LandmarkCarrier.lean`: `rebase_decode`, `rebase_ratio_enclosed`, `rebase_step_enclosed`, `rebase_log_residual_sum`, `width_or_rebase_total` | `hnn::landmark` | 2; the landmark lattice's drift over the passage |
+| 13 | The receiving letters: typed bundles of cells, ring phase classes, lock addresses and site kinds | `Compression/Landmark/Context/Tree.{address_scale_square, kraft_and_dominance, mixture_is_probability, landmark_step}`; `HNN/Retention.fieldStanding`; `HNN/Contact.contact_lock_address` | `Compression/Landmark/Context/Address.lean`: `bundle_causal`, `bundle_restrict`, `feature_scale_square` (with its commutation hypothesis), `address_descends_retention`, `phase_partition_finite`, `lock_partition_finite` (the contact's lock letters, a box `0 < p ≤ P`, `0 < q ≤ Q` in the contact's orientation, its horizon clause `contact_lock_address`'s cycles), `bundle_code_injective`, `cell_only_dominance_with_feature_charge`; `Compression/Landmark/Context/Tree`: the executed face's bound with address and lattice residuals | `compression::landmark::context`, `hnn::{receiving, contact}` | 2 |
+| 14 | The tree's carriers rebase past their width | `Compression/Landmark/Context/Tree.{rebase_log_residual, lattice_path_deviation, lattice_node_telescope}` | `Compression/Landmark/Context/Carrier.lean`: `rebase_decode`, `rebase_ratio_enclosed`, `rebase_step_enclosed`, `rebase_log_residual_sum`, `width_or_rebase_total` | `compression::landmark::context` | 2; the landmark lattice's drift over the passage |
 
 [project-postulate; agent-inferred] **Retired with campaign 1, in this order.**
 1. The directed-contrast law of `Transport/GeneratorSourceEpisode.lean` moves into `HNN/Moment.lean`
@@ -2344,7 +2348,7 @@ exact chain word the descended ring returns the resonator's waves exactly. The w
     code-length pair, with segmentation lattices ([record](../../research/records/2026-09-25_THE_COMPRESSION_IS_OF_LANDMARKS_A_TREE_COCYCLE_AND_MERGES_PRICED_BY_THEIR_CODE_LENGTH_PAIR.md) §5); Lean first:
     `expand_merge`, `merge_cost_iff`, `segmentation_mass`, `encoding_square_or_separator` and
     `release_merge_iff_future_equivalent`. They follow campaign 2's letters, which own
-    `hnn::landmark`.
+    `compression::landmark::context`.
 - **Tests:**
   - each square holds or returns its separator;
   - changing the exterior alphabet leaves the ring count and widths unchanged;
@@ -2659,13 +2663,13 @@ retired unless noted.
   receiver outside the receiving path ([record](../../research/records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) §2).
 - **Landmark-local (node-local) weighing, and switching across epochs** (`d2a2e0db`): each gained on
   the development cells and lost held out. The node-local Rust is retired (its realization is at
-  `89460425`) and its Lean `HNN/LocalWeighing` stays; the switching mixture stays as
+  `89460425`) and its Lean `Compression/Landmark/Context/LocalWeighing` stays; the switching mixture stays as
   `hnn::receiving::Mixture::switching` ([record](../../research/records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) §3).
 - **Mixing all 256 stop laws per digit tree:** its naming would cost 1,232 bits against a gain of
   `244 + 9/16` ([record](../../research/records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) §3).
 - **Second-arrival founding** (`d137e8a6`; measured at `d8e23d63`): the development cells coded it
   `5186 + 12/16 + ε` bits above first-arrival founding. Its Rust is retired, and Lean
-  `HNN/ConvergenceFounding` stays as the law of absent children and stopping rules
+  `Compression/Landmark/Context/ConvergenceFounding` stays as the law of absent children and stopping rules
   ([record](../../research/records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) §5).
 - **The full arena of one node a depth** (its realization is at `89460425`): the same prior and
   face as the storage where paths part, at a memory that capped the depth. The tests keep an ideal
@@ -2682,9 +2686,11 @@ retired unless noted.
 September 27: the numbered Decisions were a habit of the agents, not his instruction. The
 [unity audit](../../research/records/2026-09-27_THE_HOLARCHY_AND_ITS_AEONS_ARE_THE_TOP_THE_DECISIONS_DISSOLVE_INTO_THEIR_OWNERS_AND_LEARNING_IS_PROTOTYPED_WHERE_A_HOLARCHY_MADE_THE_TERRAIN.md) dissolved the log: each law now lives in its guide or owner with its source,
 each measurement in its dated record, and each retired choice in (h). Dated records, the notebook
-and some Lean names (`depth_one_is_decision_27`, `first_arrival_is_decision_28`,
-`compacted_is_decision_28`) keep the numbers, and this table resolves them. A Rust owner's module
-doc is `crates/holonics/src/hnn/<name>.rs`.
+and some Lean module docs keep the numbers, and this table resolves them; the Lean names that cited
+them now state their law (`depth_one_is_the_whole_cell_table`, `first_arrival_is_the_full_tree`,
+`compacted_is_the_full_tree`, September 27). A Rust owner's module doc is
+`crates/holonics/src/hnn/<name>.rs`, except the receiving tree's, which is
+`crates/holonics/src/compression/landmark/context.rs`.
 
 | # | Subject | Where it lives now |
 |---|---|---|
@@ -2715,15 +2721,15 @@ doc is `crates/holonics/src/hnn/<name>.rs`.
 | 25 | The hardware surfaces advance with the laws (Brandon, September 25) | Rules of the rebuild |
 | 26 | Campaign 1's first repair | (h); its open stands in `hnn::moment`; [record](../../research/records/2026-09-25_CAMPAIGN_ONE_LOCATED_FAILURE.md), addendum |
 | 27 | The region table | (h); Lean `HNN/RegionCounts`; [record](../../research/records/2026-09-25_CAMPAIGN_ONE_LOCATED_FAILURE.md), addendum |
-| 28 | The landmark tree (Brandon, September 25) | `hnn::landmark` module doc; merges in (d), campaign 5; [derivation](../../research/records/2026-09-25_THE_COMPRESSION_IS_OF_LANDMARKS_A_TREE_COCYCLE_AND_MERGES_PRICED_BY_THEIR_CODE_LENGTH_PAIR.md), [measurement](../../research/records/2026-09-26_THE_LANDMARK_TREE_COMPRESSES_THE_STANDING_CUT_BELOW_PPM_TWO.md) |
-| 29 | Prequential scoring | (f), "The cuts and their protocol"; `hnn::landmark`, "The measurement is prequential" |
+| 28 | The landmark tree (Brandon, September 25) | `compression::landmark::context` module doc; merges in (d), campaign 5; [derivation](../../research/records/2026-09-25_THE_COMPRESSION_IS_OF_LANDMARKS_A_TREE_COCYCLE_AND_MERGES_PRICED_BY_THEIR_CODE_LENGTH_PAIR.md), [measurement](../../research/records/2026-09-26_THE_LANDMARK_TREE_COMPRESSES_THE_STANDING_CUT_BELOW_PPM_TWO.md) |
+| 29 | Prequential scoring | (f), "The cuts and their protocol"; `compression::landmark::context`, "The measurement is prequential" |
 | 30 | The likelihood mixture; the source's normalized open | `hnn::receiving::Mixture`, `hnn::moment::PopulationChart`; [record](../../research/records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md) |
 | 31 | Step 4's pace (Brandon, September 26) | Rules of the rebuild, "A development harness decides"; Order, step 7; [record](../../research/records/2026-09-26_STEP_FOURS_PACE_AND_THE_LIBRARY_CONSOLIDATING_WHILE_IT_GROWS.md) |
-| 32 | The declared stop prior | `hnn::landmark`, "The declared stop prior"; [record](../../research/records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) §1 |
+| 32 | The declared stop prior | `compression::landmark::context`, "The declared stop prior"; [record](../../research/records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) §1 |
 | 33 | The Born face | (h); [record](../../research/records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) §2 |
-| 34 | Weighing is local | `hnn::landmark`, "Weighing is local"; (h); [record](../../research/records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) §3 |
+| 34 | Weighing is local | `compression::landmark::context`, "Weighing is local"; (h); [record](../../research/records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) §3 |
 | 35 | The wide cut | (f), "The cuts and their protocol"; [record](../../research/records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) §4 |
 | 36 | Second-arrival founding | (h); [record](../../research/records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) §5 |
-| 37 | Stored at the faces where paths part | `hnn::landmark`, "Stored at the faces where paths part"; [record](../../research/records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) §6 |
+| 37 | Stored at the faces where paths part | `compression::landmark::context`, "Stored at the faces where paths part"; [record](../../research/records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) §6 |
 | 38 | The loaded resonator | `hnn::ring` module doc; [THE_MACHINE](../THE_MACHINE.md), the egg paragraph; [record](../../research/records/2026-09-26_THE_RESONATOR_RETURNS_ITS_WAVE_AND_THE_COMPARISON_REACHES_ITS_MATERIAL.md) |
-| 39 | A landmark's storage has a capacity | `hnn::landmark`, "A landmark's storage has a capacity"; [record](../../research/records/2026-09-27_A_LANDMARKS_STORAGE_HAS_A_CAPACITY_AT_ITS_CEILING_IT_CARRIES.md) |
+| 39 | A landmark's storage has a capacity | `compression::landmark::context`, "A landmark's storage has a capacity"; [record](../../research/records/2026-09-27_A_LANDMARKS_STORAGE_HAS_A_CAPACITY_AT_ITS_CEILING_IT_CARRIES.md) |

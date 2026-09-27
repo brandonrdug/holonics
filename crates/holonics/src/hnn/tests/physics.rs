@@ -7,6 +7,7 @@ use num_traits::{One, Signed, Zero};
 use super::learning::{OPEN_BUDGET, chain};
 use super::support::{Draw, Medium};
 use crate::aeon::TwoClocks;
+use crate::compression::landmark::context::Landmarks;
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{Constitution, Steps};
 use crate::hnn::contact::{
@@ -14,7 +15,6 @@ use crate::hnn::contact::{
     signed_form_certifies, signed_stiffness, site_reading, site_reading_of_factors, transfer,
 };
 use crate::hnn::field::{ConstitutionRead, Current, Field, FieldDeclaration};
-use crate::hnn::landmark::Landmarks;
 use crate::hnn::moment::{PairPort, SourceMoment};
 use crate::hnn::propagation::{
     ContactOperands, ExponentReading, gram, junction_swing, transit, transit_solve,

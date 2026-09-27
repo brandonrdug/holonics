@@ -40,7 +40,7 @@
 //!
 //! ```text
 //! R        sample (P_R^(τ_R) v_R(e_j), −g_j) per receiving phase                   normal law
-//! tree     each target t_j on the paths its address a_j opens, in cell order        landmark tree (`hnn::landmark`)
+//! tree     each target t_j on the paths its address a_j opens, in cell order        landmark tree (`compression::landmark::context`)
 //! W_c,g    sample (c_t, −u_t) at each tick of the element's window                  normal law
 //! E_g      sample (M_g[c] ν̂(n_g), −P^(c−τ_g) s̄_g(0)) per phase with counts           normal law (ruling B's normalized marginal)
 //! f_g      G = (K̄ + K̄ᵀ) f,  K̄ = Σ_t u_t x̄_tᵀ;   slices ∂/∂u_ρ = σ_ρ[(x̄·v)u − (u·v)x̄], ∂/∂v_ρ likewise
@@ -114,7 +114,7 @@
 //! | a word's open (`refine`, `compare`'s read, the deposit's re-read) | the rings' operands, then the contacts', each refining its own chart from its own kept chart; within them, a Gram's rows | each reads its own material (the standings, its own screws) and its own kept chart, and writes its own operands; the refined charts are kept afterwards, by key |
 //! | a tick of the word | the junctions, then the elements, then the transits; the rings' and contacts' power terms | a junction reads its own storage, arrivals and anchor remainder, an element its own junction and storage remainder, a transit its two ends' outgoing waves, its own state and its own remainders; the balance terms and the power are summed afterwards in ring, then contact, order |
 //! | the receiving read | the receiving epochs; within each, the map's `2\|A\|` rows, then the classes' grain cells | each row and class reads the shared anchor and writes its own logit or cell |
-//! | the tree read at compare | the receiving phases, each reading the published tree at its own address through its own working overlay (the window's earlier phases' deposits, built first in cell order, `hnn::landmark::Landmarks::window_faces`) | the published tree and every overlay are read, never written, until the deposit |
+//! | the tree read at compare | the receiving phases, each reading the published tree at its own address through its own working overlay (the window's earlier phases' deposits, built first in cell order, `compression::landmark::context::Landmarks::window_faces`) | the published tree and every overlay are read, never written, until the deposit |
 //! | the faces and the Holon ratio | the receiving phases' faces, then their ratios and code lengths | each reads its own read and target |
 //! | the compare phase ([`compare_phase`], campaign 2) | the tree face at the grain's code lengths (its phases together), beside the mixture score, the target phases, the Holon ratio and its covector (the mixture's steps in cell order inside) | both read the shared immutable faces and targets and write their own readings |
 //! | `pull_back` | per step in reverse, the junctions at their recorded anchors, then the elements (each through its executed chart's transpose), then the transits (each through its executed chart's transpose, and each channel coordinate), then the junctions' reverse Swings at their executed weights (and each coordinate) | each reads its step's record, its own covectors and its own adjoint remainders, and writes its own; the conductance terms are added afterwards, in contact, then ring and incidence, order |
@@ -149,6 +149,7 @@ use num_traits::{One, Signed, Zero};
 
 use crate::aeon::{ClockLift, EnclosedLedger};
 use crate::compression::cost::ceil_log2;
+use crate::compression::landmark::context::{Letter, code_length};
 use crate::geometry::RatVec3;
 use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartReading, ChartStart, Charts, Remainders};
@@ -159,7 +160,6 @@ use crate::hnn::constitution::{
 use crate::hnn::contact::{SiteReading, site_readings};
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::keys::{self, KeyLocation};
-use crate::hnn::landmark::{Letter, code_length};
 use crate::hnn::moment::{Ingested, PopulationChart, SourceMoment};
 use crate::hnn::pending::{Against, PendingRatio};
 use crate::hnn::port::{
@@ -1712,7 +1712,7 @@ pub fn compose(
         locus: LinearLocus::Receiving(receiving),
         samples,
     });
-    // The receiving parametron's landmark tree (`hnn::landmark`): each compared target deposits on
+    // The receiving parametron's landmark tree (`compression::landmark::context`): each compared target deposits on
     // the paths its phase's causal address opens, in cell order, when the comparison reached the
     // receiving locus.
     if targets.len() != back.reads.len() {
@@ -2391,7 +2391,7 @@ impl Cut {
 /// `tree_grain − tree`, which the combined face inherits), and `model − tree` (`L_model − L_T`) is
 /// what the mixture keeps of it: over the whole passage (both populations) `L_model` lies between
 /// `min(L_T, L_C)` and one bit above it, each within the chart's drift (Lean
-/// `HNN/LandmarkTree.{sequential_mixture_bounds, sequential_mixture_executed}`); and the online
+/// `Compression/Landmark/Context/Tree.{sequential_mixture_bounds, sequential_mixture_executed}`); and the online
 /// baselines' (uniform;
 /// order-0 and order-1 with the Krichevsky–Trofimov prior; PPM of order [`PPM_ORDER`] with escape
 /// rule C), each an enclosure, over `cells` targets. xz and zstd, with their description cost, are
@@ -2686,7 +2686,7 @@ pub fn kt_probability(count: u64, total: u64, alphabet: usize) -> Rat {
 }
 
 /// The online Krichevsky–Trofimov code length of one cell, `−log₂((count + ½)/(total + |A|/2))`,
-/// enclosed by the certified integer binary logarithm (`hnn::landmark::code_length`): the same exact
+/// enclosed by the certified integer binary logarithm (`compression::landmark::context::code_length`): the same exact
 /// value as `log2_enclosure` encloses, read in microseconds against milliseconds.
 fn kt_bits(count: u64, total: u64, alphabet: usize) -> Result<ExactInterval, HnnError> {
     code_length(&kt_probability(count, total, alphabet))
@@ -2770,7 +2770,7 @@ impl Ppm {
     }
 
     /// **The cell's code length** `−log₂ P`, enclosed by the certified integer binary logarithm
-    /// (`hnn::landmark::code_length`), then its count.
+    /// (`compression::landmark::context::code_length`), then its count.
     pub fn code(&mut self, symbol: usize) -> Result<ExactInterval, HnnError> {
         let bits = code_length(&self.mass(symbol))?;
         self.update(symbol);
@@ -2791,7 +2791,7 @@ pub struct BaselineCodes {
 
 /// [definition] **One cell's exact faces under the online baselines**, read at the standing before
 /// the cell's own count ([`Baselines::face_cell`]): the faces [`BaselineCodes`] encloses the code
-/// lengths of, for a reader that multiplies a passage's faces (`hnn::landmark::PassageCode`).
+/// lengths of, for a reader that multiplies a passage's faces (`compression::landmark::context::PassageCode`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct BaselineFaces {
     pub uniform: Rat,
@@ -2803,13 +2803,13 @@ pub struct BaselineFaces {
 /// [definition] **The online baselines, fitted on the same stream in the same order** as the model
 /// they are read beside: every cell is coded at the current counts, then counted (prequential).
 /// [agent-inferred] The order-1 baseline's contexts are the preceding cell's address letter
-/// (`hnn::landmark::Letter`: `1 + code`, and the boundary `0` before the stream's first cell): the
+/// (`compression::landmark::context::Letter`: `1 + code`, and the boundary `0` before the stream's first cell): the
 /// preceding cell's region. Order-1 is the depth-one forced case of the whole-cell emission
 /// (`|A|`-ary KT masses at a node, the region table; Lean
-/// `HNN/LandmarkTree.depth_one_is_decision_27`), which lives in Lean only; the executed tree
-/// (`hnn::landmark::Landmarks`) emits the cell's odometer digits, and its depth-one forced case is
+/// `Compression/Landmark/Context/Tree.depth_one_is_the_whole_cell_table`), which lives in Lean only; the executed tree
+/// (`compression::landmark::context::Landmarks`) emits the cell's odometer digits, and its depth-one forced case is
 /// a product of binary KT faces at the preceding cell, a different law. The exposure ([`expose`])
-/// and the landmark tree's prequential measurement (`hnn::landmark::prequential`) read them.
+/// and the landmark tree's prequential measurement (`compression::landmark::context::prequential`) read them.
 #[derive(Clone, Debug)]
 pub struct Baselines {
     alphabet: usize,

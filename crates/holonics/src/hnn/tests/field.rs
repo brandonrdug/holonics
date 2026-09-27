@@ -415,7 +415,8 @@ fn describe_is_the_fields_exact_code() {
     assert_ne!(describe(&Field::declare(declared).unwrap()), code);
     // The tree's stop-weight law (the declared stop prior) is part of the code.
     let mut declared = chain_declaration(1 << 20);
-    declared.receivers[0].prior = crate::hnn::StopPrior::per_depth(vec![1, 3]).unwrap();
+    declared.receivers[0].prior =
+        crate::compression::landmark::context::StopPrior::per_depth(vec![1, 3]).unwrap();
     assert_ne!(describe(&Field::declare(declared).unwrap()), code);
     let mut declared = chain_declaration(1 << 20);
     declared.contacts[1].admittance = integer(3);

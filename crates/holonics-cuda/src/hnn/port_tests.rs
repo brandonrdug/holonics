@@ -18,9 +18,9 @@
 
 use std::ops::Range;
 
+use holonics::compression::landmark::context::Letter;
 use holonics::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Steps};
 use holonics::hnn::field::{ContactDeclaration, CribDeclaration, ReceiverDeclaration};
-use holonics::hnn::landmark::Letter;
 use holonics::hnn::port::{ExecutionPort, Handle, ReceiptDetail};
 use holonics::hnn::reference::ExposedResident;
 use holonics::hnn::reference::{Cut, Reference, one_hot};
@@ -91,7 +91,7 @@ fn chain_declaration(population: u64) -> FieldDeclaration {
             aperture: 2,
             tolerance: rat(1, 16),
             depth: 2,
-            prior: holonics::hnn::StopPrior::half(),
+            prior: holonics::compression::landmark::context::StopPrior::half(),
         }],
         crib: CribDeclaration {
             window: 16,

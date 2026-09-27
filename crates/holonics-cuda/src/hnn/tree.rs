@@ -2,7 +2,7 @@
 //! paths part, with the register's capacity; #73 with #76; `kernels/tree.cu`).
 //!
 //! [definition] The receiving parametron's storage, the tree of landmarks
-//! (`holonics::hnn::landmark::Landmarks`), mirrored on the card with the host's exact integer law.
+//! (`holonics::compression::landmark::context::Landmarks`), mirrored on the card with the host's exact integer law.
 //! The computational object is the helical pair interaction; of the winding guide's objects this
 //! realization touches the receiving face (faces and placement: the dyadic digit faces it returns
 //! as splits) and the tower thread (the context depth as a restriction chain: a stored chain is a
@@ -18,7 +18,7 @@
 //! | the opened-path update of each deposit (`hnn_tree_deposit`): the label runs, the β steps with the carrier's rebase, a parting chain's split (both ratios formed exactly and carried at `W` bits), the upper parts and leaves founded at the host's numbers, the relinks, the masses and each register's carry at the declared ceiling (`tree_carry`) | the certificates (the host's tree, `Constitution::deposited`); the ceiling in half-units (`Capacity::ceiling_halves`) |
 //! | a window's phases in cell order: the earlier phases' deposits applied with an undo log, the later phase read, the log undone (`hnn_tree_undo`) | the addresses' letters (`LandmarkDeclaration::letters`), the digits each target opens, each branch's summed rungs (`LandmarkDeclaration::rung_sums`) and founding charts (`ArenaView::founding`) |
 //!
-//! [definition; agent-inferred] **The layout** (the compacted arena, `hnn::landmark`'s "The arena"):
+//! [definition; agent-inferred] **The layout** (the compacted arena, `compression::landmark::context`'s "The arena"):
 //! per node its depth word (the bottom depth, the branch in the top bit), its label end, its two
 //! half-unit masses and its chart `(β_n, β_d, β_e, λ̂)`, 48 bytes a node; the child table at twice
 //! the nodes' capacity, a power of two, 12 bytes a slot (`(parent << 32) | letter` and the child);
@@ -26,8 +26,8 @@
 //! is the a-priori bound (`compacted_node_bound`): a passage of `n` cells founds at most `2 n B`
 //! nodes a branch and holds at most `n D_b` letters, at the declared population plus a window.
 //!
-//! [definition; agent-inferred] **The register's capacity** (`landmark::Capacity`;
-//! Lean `HNN/LandmarkCapacity.{capCarry, cap_carry_half_units, capped_tree_laws}`). The law's words
+//! [definition; agent-inferred] **The register's capacity** (`context::Capacity`;
+//! Lean `Compression/Landmark/Context/Capacity.{capCarry, cap_carry_half_units, capped_tree_laws}`). The law's words
 //! carry the ceiling in half-units, `2L + 2 = 2^(c+1) + 2` (`u64::MAX` when no total reaches it:
 //! `c = ∞` is the KT node), read from the host's declaration; the layout is unchanged. The
 //! carry acts where the host's `Law::apply_branch` places it: in the deposit, at every node of the
@@ -59,7 +59,7 @@
 //! at depths past the stream's recurrence and under declared stop priors, unbounded and at ceilings
 //! `c ∈ {1, 2, 3}` where the registers carry and chains holding carried registers split, and after
 //! every deposit the card's arena (roots, children, depth words, label ends, masses, charts, joins,
-//! labels) equals the host's ([`CardTree::agrees`]); the card's split equals `landmark::Beta::split`
+//! labels) equals the host's ([`CardTree::agrees`]); the card's split equals `context::Beta::split`
 //! ([`split_ratios`]). In the port's lockstep every deposit is checked at the nodes it wrote and
 //! founded and at its joins ([`CardTree::agrees_at`]: their masses, `β`, stop weights, depth words
 //! and label ends, gathered by `hnn_tree_gather`), and at the labels it held.
@@ -67,10 +67,10 @@
 use core::ffi::c_void;
 use std::time::{Duration, Instant};
 
-use holonics::hnn::HnnError;
-use holonics::hnn::landmark::{
+use holonics::compression::landmark::context::{
     ArenaView, ChartWords, LandmarkDeclaration, Landmarks, Letter, Splits, Widths,
 };
+use holonics::hnn::HnnError;
 
 use crate::cuda::{Dim3, Module, Stream};
 use crate::ffi::CUdeviceptr;
@@ -379,8 +379,8 @@ impl<'c> CardTree<'c> {
         let mut sum_words = vec![0u32; depths.len() * sums_stride];
         for (branch, branch_sums) in sums.iter().enumerate() {
             for (depth, &sum) in branch_sums.iter().enumerate() {
-                sum_words[branch * sums_stride + depth] = u32::try_from(sum)
-                    .map_err(|_| launch_error("summed rungs within 32 bits"))?;
+                sum_words[branch * sums_stride + depth] =
+                    u32::try_from(sum).map_err(|_| launch_error("summed rungs within 32 bits"))?;
             }
         }
         let arena = tree.arena();
@@ -808,9 +808,8 @@ impl<'c> CardTree<'c> {
         let nodes = arena.halves().len();
         let held = arena.labels().len();
         let counted = self.card.fetch_range(&self.counts, 0, 2)?;
-        let mut same = counted == [nodes as u32, held as u32]
-            && self.nodes == nodes
-            && self.held == held;
+        let mut same =
+            counted == [nodes as u32, held as u32] && self.nodes == nodes && self.held == held;
         if same {
             same &= self.card.fetch(&self.roots)? == arena.roots();
             same &= self.card.fetch_range(&self.words, 0, nodes)? == arena.words();
@@ -952,7 +951,8 @@ impl CardTree<'_> {
                     let host = arena.halves()[at];
                     same &= halves[2 * i] == host[0] && halves[2 * i + 1] == host[1];
                     same &= arena.chart(node).map(TreeChart::from) == Some(charts[i]);
-                    same &= words[2 * i] == arena.words()[at] && words[2 * i + 1] == arena.ends()[at];
+                    same &=
+                        words[2 * i] == arena.words()[at] && words[2 * i + 1] == arena.ends()[at];
                 }
             }
             if !dyadic_chunk.is_empty() {
@@ -971,7 +971,7 @@ impl CardTree<'_> {
 
 /// **The card's β steps** on operand pairs `(N, D, e)` at width `W`, rebase `R` and lattice `M`
 /// (`hnn_tree_beta_steps`, the kernels' `tree_beta_step`): each step's carried `(β_n, β_d, β_e)`
-/// and stop weight, for the parity against `landmark::Beta::step`.
+/// and stop weight, for the parity against `context::Beta::step`.
 pub fn beta_steps(
     card: &Card,
     operands: &[(u128, u128, i64)],
@@ -1045,7 +1045,7 @@ pub type SplitWords = [(u64, u64, i64, u64); 2];
 
 /// **The card's split** on charts `(β_n, β_d, β_e)` with rungs `(S_up, S_low)` at width `W` and
 /// lattice `M` (`hnn_tree_split_ratios`, the kernels' `tree_split`): each part's carried ratio and
-/// stop weight, for the parity against `landmark::Beta::split`. Refused past the split's 512-bit
+/// stop weight, for the parity against `context::Beta::split`. Refused past the split's 512-bit
 /// integers.
 pub fn split_ratios(
     card: &Card,

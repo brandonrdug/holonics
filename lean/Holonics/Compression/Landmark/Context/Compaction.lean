@@ -1,7 +1,7 @@
-import Holonics.HNN.ConvergenceFounding
+import Holonics.Compression.Landmark.Context.ConvergenceFounding
 
 /-!
-# HNN.LandmarkCompaction: the tree is stored at the faces where paths part
+# Compression.Landmark.Context.Compaction: the tree is stored at the faces where paths part
 
 [definition; agent-inferred] Decision 37 of the step 4 design (`docs/plans/THE_REBUILD.md`, "The
 tree is stored at the faces where paths part"), rebuild step 4 (#73). Decision 28's prior needs no
@@ -53,7 +53,7 @@ bound      #parting ≤ L − 1 ,  #kept ≤ 2L − 1 (L ≥ 1) ,  L ≤ n ,  #k
    unary chain holds its bottom's counts (one KT mass `E`), and for any stop weights
    `E − W(s_0) = ∏_(i ≤ k) (1 − w_i) (E − X)`, also in the ratio `ρ = W/E`. On the dyadic ladder the
    product is `2^(−S)` with `S` the summed rung, so the chain with its bottom is Decision 28's node at
-   rung `S`: `W = ladder S · E + (1 − ladder S) X`, founded at `2^S − 1` (`LandmarkTree.ladder_ratio`)
+   rung `S`: `W = ladder S · E + (1 − ladder S) X`, founded at `2^S − 1` (`Tree.ladder_ratio`)
    with the ratio `β = (2^S − 1) E/X`, Decision 32's `β = w E/((1 − w) P)`, at every rung `j_d ≥ 0`
    (a forced depth has rung `0`). A chain that ends at the declared depth weighs `E` at every node
    under any stop weights.
@@ -67,16 +67,16 @@ bound      #parting ≤ L − 1 ,  #kept ≤ 2L − 1 (L ≥ 1) ,  L ≤ n ,  #k
 4. **The compacted tree is Decision 28's tree, code for code** (`compactFrom`, `compactWeight`,
    `keptLam`, `compactFaceFrom`, `compactFace`, `compactFrom_eq`, `compact_weight_eq`,
    `follow_step_algebra`, `kept_step_algebra`, `compactFaceFrom_eq`, `compact_face_eq`,
-   `stop_weight_prequential`, `compacted_is_decision_28`; each item 4′'s law at KT's own weights):
+   `stop_weight_prequential`, `compacted_is_the_full_tree`; each item 4′'s law at KT's own weights):
    the compacted weight reads a KT mass only
    at the kept nodes, each one node at the rung summed over its implicit chain, and it equals the stop
-   law's weight (`LandmarkTree.stopWeight`, every node founded at its first arrival) at every routed
+   law's weight (`Tree.stopWeight`, every node founded at its first arrival) at every routed
    standing. Its face is the path mixture over the kept nodes (with the split's `β_u` where the
    address parts from a chain, and the uniform prior at an absent child), and it equals the stop
-   law's face (`LandmarkTree.stopFace`) at every arrival: over a passage from the empty standing the
+   law's face (`Tree.stopFace`) at every arrival: over a passage from the empty standing the
    two prequential codes are equal exactly in `ℚ`, and each is the root weight. A root with one
    reached child is implicit like every other unary node: its rung joins its chain's sum. The rungs
-   are any `j_d ≥ 0` (`LandmarkTree.ladder_stopLaw₀`): a forced depth has rung `0` and always splits.
+   are any `j_d ≥ 0` (`Tree.ladder_stopLaw₀`): a forced depth has rung `0` and always splits.
 4′. **Under any node law** (Decision 39; `kidsOf`, `MassRouted`, `MassRouted.zero`,
    `MassRouted.absent_one`, `MassRouted.split`, `MassRouted.split_unary`, `massCompactFrom`,
    `massCompactFaceFrom`, `massCompactFrom_eq`, `massCompact_weight_eq`, `massCompactFaceFrom_eq`,
@@ -91,7 +91,7 @@ bound      #parting ≤ L − 1 ,  #kept ≤ 2L − 1 (L ≥ 1) ,  L ≤ n ,  #k
    routed (`lawRouted_standingOf`), so under any node law the compacted tree (one register a stored
    chain) is the tree of one node a depth, weight, face and prequential code exactly in `ℚ`, its
    face positive and normalized and its code complete (`compacted_node_law`). The capped register is
-   `HNN/LandmarkCapacity.capped_tree_laws`.
+   `Compression/Landmark/Context/Capacity.capped_tree_laws`.
 5. **The kept nodes** (`partingNodes`, `leafNodes`, `keptNodes`, `mem_leafNodes`,
    `mem_partingNodes`, `nodes_of_zero`, `parting_card_le`, `leaf_card_le_total`,
    `compacted_node_bound`): the reached leaves are the reached nodes at depth `D`, the parting nodes
@@ -107,11 +107,11 @@ children has fewer internal nodes than leaves (the bound of Morrison's PATRICIA 
 proofs here are this owner's.
 
 [conditional] The weight, face and code identities and the founding ratio hold for any rungs
-`j_d ≥ 0`, the forced rung `0` included. The executed chart steps `β` on its lattice (`LandmarkTree`,
+`j_d ≥ 0`, the forced rung `0` included. The executed chart steps `β` on its lattice (`Tree`,
 section 6′); its drift at a split, where `β_u` and `β_ℓ` are evaluated from the stored `β`, is the
 lattice chart's passage-level drift owed in #62 ("the landmark lattice's drift"), not restated here.
 
-The Rust consumer is `crates/holonics/src/hnn/landmark.rs` (`hnn::landmark::Landmarks`, the one
+The Rust consumer is `crates/holonics/src/compression/landmark/context.rs` (`compression::landmark::context::Landmarks`, the one
 storage; under a declared `Capacity` each stored chain carries one register, item 4′):
 the arena keeps the parting nodes and the leaves with their labels, each kept node with its counts,
 its summed rung (`rung_sums`, a forced depth's rung `0`) and its `β`; the first arrival founds one
@@ -119,7 +119,7 @@ node, its leaf, whose chain runs from the root (a unary root folds into its chai
 parts from a label at a chain's depth founds a node there with the label's counts and the
 closed-form `β_u`, `β_ℓ` (`chain_split`, `Law::part`), and an upper part with no rung passes its
 face through (`chain_split_pass`). Its test of exact equality with `IdealLandmarks` at the same `D`
-(forced depths `0` and `1`) is the executed receipt of `compacted_is_decision_28`, and its node
+(forced depths `0` and `1`) is the executed receipt of `compacted_is_the_full_tree`, and its node
 counts (one node after one arrival, at most `2n − 1`) the receipt of `compacted_node_bound`.
 
 No `sorry`, no `axiom`, no `native_decide`.
@@ -127,11 +127,11 @@ No `sorry`, no `axiom`, no `native_decide`.
 
 noncomputable section
 
-namespace Holonics.HNN.LandmarkCompaction
+namespace Holonics.Compression.Landmark.Context.Compaction
 
 open Finset
-open Holonics.HNN.LandmarkTree
-open Holonics.HNN.ConvergenceFounding (prequentialCode prequential_code_complete)
+open Holonics.Compression.Landmark.Context.Tree
+open Holonics.Compression.Landmark.Context.ConvergenceFounding (prequentialCode prequential_code_complete)
 
 /-! ## 1. Routed standings: every arrival runs to the declared depth -/
 
@@ -169,7 +169,7 @@ theorem opens_child_iff {a s : List Ltr} (hs : a.take s.length = s) (hlt : s.len
     (b : Ltr) : a.take (s ++ [b]).length = s ++ [b] ↔ b = a[s.length] := by
   have e : a.take (s.length + 1) = s ++ [a[s.length]] := by
     have := restrict_succ hlt
-    unfold LandmarkTree.restrict at this
+    unfold Tree.restrict at this
     rw [this, hs]
   simp only [List.length_append, List.length_singleton, e]
   constructor
@@ -537,7 +537,7 @@ end Chain
 /-! ## 3. The compacted tree: stored where paths part and at the leaves, under any node law
 
 The compaction reads a node only through whether an arrival reached it, its own weight and its face
-(`LandmarkTree.ownWeight`, the node law's). Its law is stated once, over any **routed** own weights
+(`Tree.ownWeight`, the node law's). Its law is stated once, over any **routed** own weights
 and faces (`MassRouted`): the count standing of Decision 28 (`Routed.mass`, KT's own weights) and
 every node law's standing (`LawRouted.mass`, Decision 39) are its instances. -/
 
@@ -793,7 +793,7 @@ theorem massCompactFaceFrom_eq (j : ℕ → ℕ) (hR : MassRouted D R E k k₀) 
     have hlen : (a.take d).length = d := by simp; omega
     have htake : a.take (d + 1) = a.take d ++ [a[d]] := by
       have := restrict_succ hda
-      unfold LandmarkTree.restrict at this
+      unfold Tree.restrict at this
       exact this
     have hW : ownWeight (fun d => ladder (j d)) E (m + 1) (a.take d) =
         ladder (j d) * E (a.take d) +
@@ -1023,7 +1023,7 @@ theorem stop_weight_prequential [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw₀ 
   rw [ownLam_kt]
   rfl
 
-/-- [proved-derived; formal-checked] **`compacted_is_decision_28`: the compacted tree is Decision
+/-- [proved-derived; formal-checked] **`compacted_is_the_full_tree`: the compacted tree is Decision
 28's tree at the declared depth, code for code, exactly in `ℚ`.** On the dyadic ladder
 `w_d = 1 − 2^(−j_d)` at any rungs `j_d ≥ 0` (a forced depth has rung `0`, `w = 0`, and always
 splits), for every passage built by arrivals from the empty standing over addresses reaching the
@@ -1036,7 +1036,7 @@ declared depth `D` (a causal context, `standingOf`):
   positive and normalized;
 * **the code**: the compacted root weight is the prequential code of its faces, and that code is the
   stop law's prequential code, so the two prequential code lengths `−log₂` are equal exactly. -/
-theorem compacted_is_decision_28 [Nonempty A] (j : ℕ → ℕ) (D : ℕ)
+theorem compacted_is_the_full_tree [Nonempty A] (j : ℕ → ℕ) (D : ℕ)
     (ctx : List A → List Ltr) (hctx : ∀ h, D ≤ (ctx h).length) :
     (∀ h, compactWeight j (standingOf ctx h) D =
         stopWeight (fun d => ladder (j d)) (standingOf ctx h) D []) ∧
@@ -1160,8 +1160,8 @@ by arrivals from the empty standing over addresses reaching the declared depth `
   tree face (`lawFace`), positive and normalized;
 * **the code**: the compacted root weight is the prequential code of its faces, which is the law's
   prequential code, and the code is complete: it sums to one over the words of every length.
-Decision 28's KT law is the case `ktLaw` (`ktLaw_standing`, `compacted_is_decision_28`); the
-capped register is another (`HNN/LandmarkCapacity.capped_tree_laws`). -/
+Decision 28's KT law is the case `ktLaw` (`ktLaw_standing`, `compacted_is_the_full_tree`); the
+capped register is another (`Compression/Landmark/Context/Capacity.capped_tree_laws`). -/
 theorem compacted_node_law (L : NodeLaw A) (j : ℕ → ℕ) (D : ℕ) (ctx : List A → List Ltr)
     (hctx : ∀ h, D ≤ (ctx h).length) :
     (∀ h, massCompactWeight j (lawReached L (lawStandingOf L ctx h))
@@ -1231,7 +1231,7 @@ omit [Fintype Ltr] [DecidableEq Ltr] in
 theorem prefix_step {s t : List Ltr} (hp : s <+: t) (hlt : s.length < t.length) :
     s ++ [t[s.length]] = t.take (s.length + 1) := by
   have e := restrict_succ hlt
-  unfold LandmarkTree.restrict at e
+  unfold Tree.restrict at e
   rw [e, ← List.prefix_iff_eq_take.mp hp]
 
 omit [DecidableEq A] in
@@ -1520,7 +1520,7 @@ section Audit
 #print axioms compactFaceFrom_eq
 #print axioms compact_face_eq
 #print axioms stop_weight_prequential
-#print axioms compacted_is_decision_28
+#print axioms compacted_is_the_full_tree
 #print axioms lawRouted_arrive
 #print axioms lawRouted_standingOf
 #print axioms LawRouted.mass
@@ -1533,4 +1533,4 @@ section Audit
 
 end Audit
 
-end Holonics.HNN.LandmarkCompaction
+end Holonics.Compression.Landmark.Context.Compaction

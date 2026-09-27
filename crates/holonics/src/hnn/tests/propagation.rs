@@ -700,7 +700,7 @@ fn quarter_turn_path(periods: &[u64], exponents: &[i64], grain: u64) -> FieldDec
             aperture: 1,
             tolerance: rat(1, 16),
             depth: 2,
-            prior: crate::hnn::StopPrior::half(),
+            prior: crate::compression::landmark::context::StopPrior::half(),
         }],
         crib: crate::hnn::field::CribDeclaration {
             window: 16,

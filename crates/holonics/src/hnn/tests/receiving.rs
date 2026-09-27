@@ -13,13 +13,13 @@ use num_traits::{One, Zero};
 
 use super::learning::{OPEN_BUDGET, chain, chain_declaration, moment, phases};
 use super::support::{Draw, Medium, Parts, lift, small_field};
+use crate::compression::landmark::context::{
+    Feature, Landmarks, Letter, LetterFamily, Widths, address, letter_address,
+};
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Constitution, Locus, Steps};
 use crate::hnn::field::{ConstitutionRead, Current, Field, FieldDeclaration, ReceiverDeclaration};
 use crate::hnn::keys;
-use crate::hnn::landmark::{
-    Feature, Landmarks, Letter, LetterFamily, Widths, address, letter_address,
-};
 use crate::hnn::pending::PendingRatio;
 use crate::hnn::port::{ExecutionPort, Handle, ReceiptDetail};
 use crate::hnn::ratio::{HolonRatio, log2_enclosure, target_phases};
@@ -50,7 +50,7 @@ fn the_grain_is_derived_from_the_receivers_code_tolerance() {
         aperture: 2,
         tolerance: rat(3, 40),
         depth: 2,
-        prior: crate::hnn::StopPrior::half(),
+        prior: crate::compression::landmark::context::StopPrior::half(),
     };
     assert_eq!(
         ReceivingPhases::declare(field, &medium, &current, &coarse)
@@ -80,7 +80,7 @@ fn an_aperture_beyond_the_observability_rank_is_refused() {
         aperture: 5,
         tolerance: rat(1, 16),
         depth: 2,
-        prior: crate::hnn::StopPrior::half(),
+        prior: crate::compression::landmark::context::StopPrior::half(),
     };
     match ReceivingPhases::declare(&field, &medium, &current, &wide) {
         Err(HnnError::Observability { aperture, rank }) => {
@@ -187,7 +187,7 @@ fn the_grain_exponent_is_the_integer_comparison() {
 /// **The active suffix address and each phase's causal address** (module header of
 /// `hnn::receiving`): the register shifted at every cell holds the last `D` cells newest first,
 /// `Boundary` before the first; at a window opening at `p` with its targets known, phase `j`'s
-/// address is `hnn::landmark::address(cells, p + j, D)` exactly, so no two phases of a window pool
+/// address is `compression::landmark::context::address(cells, p + j, D)` exactly, so no two phases of a window pool
 /// their lags; with no target known (a release) every phase reads the opening address.
 #[test]
 fn the_phase_address_is_the_trees_causal_address() {
@@ -557,8 +557,11 @@ fn r_opens_at_zero_and_learns_from_the_first_deposit() {
 }
 
 /// A tree face of given dyadic probabilities at the grain.
-fn tree_face(probabilities: &[Rat], grain: u64) -> crate::hnn::landmark::LandmarkFace {
-    crate::hnn::landmark::LandmarkFace {
+fn tree_face(
+    probabilities: &[Rat],
+    grain: u64,
+) -> crate::compression::landmark::context::LandmarkFace {
+    crate::compression::landmark::context::LandmarkFace {
         grain,
         probabilities: probabilities.to_vec(),
         exponents: probabilities
@@ -576,7 +579,7 @@ fn tree_face(probabilities: &[Rat], grain: u64) -> crate::hnn::landmark::Landmar
 }
 
 /// **The mixture weighs the tree against the combined face, cell by cell** (ruling A; Lean
-/// `HNN/LandmarkTree.{path_face_normalized, sequential_mixture, sequential_mixture_executed}`): it
+/// `Compression/Landmark/Context/Tree.{path_face_normalized, sequential_mixture, sequential_mixture_executed}`): it
 /// opens at `β = 1`, `λ = 1/2`; phase `j` of a window reads the ratio after the earlier phases'
 /// steps, so the window's product is `½ A + ½ B` (the tree's and the combined face's likelihoods),
 /// within the steps' residuals, and a weight read before phase 0's step (`β = 1` at phase 1) is
@@ -608,7 +611,7 @@ fn the_mixture_weighs_the_tree_against_the_combined_face() {
     assert_eq!((mixture.beta(), mixture.weight()), (integer(1), rat(1, 2)));
     let targets = [1usize, 3];
     let scored = mixture.score(2, &combined, &trees, &targets).unwrap();
-    let code = |p: Rat| crate::hnn::landmark::code_length(&p).unwrap();
+    let code = |p: Rat| crate::compression::landmark::context::code_length(&p).unwrap();
     // Phase 0 at β = 1: q_T = 1/4, q_C = 1/8, q = 3/16.
     assert!(scored.model[0].lower <= code(rat(3, 16)).upper);
     assert!(code(rat(3, 16)).lower <= scored.model[0].upper);
@@ -641,7 +644,7 @@ fn the_mixture_weighs_the_tree_against_the_combined_face() {
     // The charts' lower endpoints are rationals of many bits: β is rebased, within its drift.
     let drift = mixture.drift().clone();
     let log = mixture.log2_beta().unwrap();
-    let exact_log = crate::hnn::landmark::code_length(&exact.recip()).unwrap();
+    let exact_log = crate::compression::landmark::context::code_length(&exact.recip()).unwrap();
     assert!(log.lower <= &exact_log.upper + &drift && exact_log.lower <= &log.upper + &drift);
     assert!(mixture.rebases() <= 2);
     // An exact step keeps β exact: q_T = 3/4 against q̃_C = 1/2 multiplies it by 3/2.
@@ -677,12 +680,12 @@ fn the_mixture_weighs_the_tree_against_the_combined_face() {
 }
 
 /// **The mixture codes within one bit of the better face, and the tree is read in cell order**
-/// (Lean `HNN/LandmarkTree.{sequential_mixture_bounds, sequential_mixture_executed}`): on the
+/// (Lean `Compression/Landmark/Context/Tree.{sequential_mixture_bounds, sequential_mixture_executed}`): on the
 /// exposure's chain, over the whole cut, against the tree's executed face `L_T` (the face the
 /// mixture weighs) and the combined face `L_C`, `min(L_T, L_C) − drift ≤ L_model ≤ min(L_T, L_C) +
 /// 1 + drift`, each half read on the enclosure endpoints that can refute it (a half fails only when
 /// the law is violated); `log₂ β` is `L_C − L_T` within the drift; and the tree's code length is
-/// the count-only prequential tree's over the same cut (`hnn::landmark::prequential`, which encloses
+/// the count-only prequential tree's over the same cut (`compression::landmark::context::prequential`, which encloses
 /// the faces' product once, `PassageCode`, where the exposure sums its windows' enclosures): the two
 /// enclosures meet and each is narrower than `2^(−60)` bits, far below the least move one cell's
 /// face read at a different standing would make, so every phase of every window read the tree after
@@ -734,8 +737,9 @@ fn the_mixture_codes_within_one_bit_of_the_better_face() {
     // The tree read in cell order is the count-only prequential tree, exactly.
     let receiver = &field.receivers()[0];
     let declared = landmark_declaration(&field, receiver).unwrap();
-    let letters = crate::hnn::landmark::cell_letters(&cut.cells);
-    let alone = crate::hnn::landmark::prequential(&cut, &letters, &declared).unwrap();
+    let letters = crate::compression::landmark::context::cell_letters(&cut.cells);
+    let alone =
+        crate::compression::landmark::context::prequential(&cut, &letters, &declared).unwrap();
     let narrow = Rat::new(1.into(), num_bigint::BigInt::from(1u8) << 60usize);
     for (exposed, measured) in [
         (&exposure.training.tree, &alone.development.tree),
@@ -769,7 +773,7 @@ fn clock_family() -> LetterFamily {
 }
 
 /// **The bundle letters are read from the clock before the cell they predict** (Lean
-/// `HNN/LandmarkAddress.{bundle_causal, address_descends_retention}`): over a passage long enough
+/// `Compression/Landmark/Context/Address.{bundle_causal, address_descends_retention}`): over a passage long enough
 /// for the joint clock's carry-outs and their re-keyings, a register that receives each cell (its
 /// clock stepping as the lift point does, synchronized after each re-keying) holds
 /// `letter_address` of the replayed clock letters at every window, and each phase's address, read
@@ -841,7 +845,7 @@ fn the_bundle_letters_are_read_from_the_clock_before_the_cell_they_predict() {
 }
 
 /// **The address restricts by whole bundles, and the sheet grain is a scale square** (Lean
-/// `HNN/LandmarkAddress.{bundle_restrict, feature_scale_square}`): restricting the address at `D`
+/// `Compression/Landmark/Context/Address.{bundle_restrict, feature_scale_square}`): restricting the address at `D`
 /// to `d` bundles is the address at `d`, and the bundle tree's letters of the restricted address
 /// are the first `d(1 + r)` letters of the full one's; the half-turn sheet letters (grain 2) are the
 /// coarsening `k ↦ ⌊2k/d_g⌋` of the period-grain letters, tick by tick, so coarsening commutes
@@ -859,21 +863,22 @@ fn the_address_restricts_by_whole_bundles_and_the_sheets_are_a_scale_square() {
     let cells: Vec<usize> = (0..1_500).map(|_| (draw.next() % 256) as usize).collect();
     let letters = clock_letters(&field, &family, &cells, &[]).unwrap();
     let coarse = clock_letters(&field, &sheets, &cells, &[]).unwrap();
-    let declared = |family: LetterFamily| crate::hnn::landmark::LandmarkDeclaration {
-        alphabet: 256,
-        depth: 4,
-        forced: 0,
-        population: 6_148,
-        grain: 16,
-        family,
-        prior: crate::hnn::StopPrior::half(),
-        capacity: crate::hnn::landmark::Capacity::Unbounded,
-    };
+    let declared =
+        |family: LetterFamily| crate::compression::landmark::context::LandmarkDeclaration {
+            alphabet: 256,
+            depth: 4,
+            forced: 0,
+            population: 6_148,
+            grain: 16,
+            family,
+            prior: crate::compression::landmark::context::StopPrior::half(),
+            capacity: crate::compression::landmark::context::Capacity::Unbounded,
+        };
     let tree = Landmarks::new(declared(family.clone())).unwrap();
     let coarsen = |letter: Letter| match letter {
         Letter::Bundle(bundle) => {
             let values = family.decode(bundle.features);
-            Letter::Bundle(crate::hnn::landmark::Bundle {
+            Letter::Bundle(crate::compression::landmark::context::Bundle {
                 cell: bundle.cell,
                 features: sheets
                     .encode(&[(2 * values[0]) / 5, (2 * values[1]) / 7])
@@ -903,7 +908,7 @@ fn the_address_restricts_by_whole_bundles_and_the_sheets_are_a_scale_square() {
 }
 
 /// **The letters' partitions are finite and their codes injective** (Lean
-/// `HNN/LandmarkAddress.{phase_partition_finite, lock_partition_finite, bundle_code_injective}`):
+/// `Compression/Landmark/Context/Address.{phase_partition_finite, lock_partition_finite, bundle_code_injective}`):
 /// a ring's phases `k/d` read at grain `g ≤ d` fall in `[0, g)`, cover it, and each fibre is below
 /// `1/g`; the lock letters at `(P, Q)` are `Unlocked` and the reduced `(p, q)`, `1 ≤ p ≤ P`,
 /// `1 ≤ q ≤ Q` (the contact owner's family, `hnn::contact::ContactLock::code`), coded onto
@@ -912,8 +917,8 @@ fn the_address_restricts_by_whole_bundles_and_the_sheets_are_a_scale_square() {
 /// one to one; and the bundle code `1 + x + |A| f` is one to one with the boundary at 0.
 #[test]
 fn the_letter_partitions_are_finite_and_their_codes_injective() {
+    use crate::compression::landmark::context::Bundle;
     use crate::hnn::contact::{ContactLock, ContactReading, LockDeclaration};
-    use crate::hnn::landmark::Bundle;
     use crate::navigator::trace::SiteKind;
     use num_bigint::BigUint;
     use std::collections::BTreeSet;
@@ -1048,7 +1053,7 @@ fn the_letter_partitions_are_finite_and_their_codes_injective() {
 }
 
 /// **The contact letters are the contact owner's readings, read from the register's retained state
-/// before the cell they predict** (campaign 2; Lean `HNN/LandmarkAddress.bundle_causal`,
+/// before the cell they predict** (campaign 2; Lean `Compression/Landmark/Context/Address.bundle_causal`,
 /// `HNN/Contact.contact_lock_address`). Over a passage through carry-outs and re-keyings, with the
 /// register refreshed from a constitution after each window's ingest (the site kinds changing where
 /// a boost is declared on contact 0 for a stretch of windows):
@@ -1184,7 +1189,7 @@ fn the_contact_letters_are_read_from_the_register_before_the_cell_they_predict()
 }
 
 /// **The switching mixture shares its weights at the declared rate, and codes within the price of
-/// every switching sequence** (local weighing, "across epochs"; Lean `HNN/LocalWeighing.{fixed_share,
+/// every switching sequence** (local weighing, "across epochs"; Lean `Compression/Landmark/Context/LocalWeighing.{fixed_share,
 /// share_ratio_step}`): one step at `α = 2^(−2)` moves `β = 1` by the likelihood to `β₊ = 2`, then
 /// shares it to `(3·2 + 1)/(3 + 2) = 7/5`; over a passage whose better face changes twice, the
 /// mixture's executed product is at least `½ α^k (1 − α)^(n−k) Π f_σ` for every sequence `σ` tried,

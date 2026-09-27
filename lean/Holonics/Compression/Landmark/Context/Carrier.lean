@@ -1,12 +1,12 @@
-import Holonics.HNN.LandmarkTree
+import Holonics.Compression.Landmark.Context.Tree
 
 /-!
-# HNN.LandmarkCarrier: the tree's carriers rebase past their width
+# Compression.Landmark.Context.Carrier: the tree's carriers rebase past their width
 
 [definition; agent-inferred] Campaign 2 of rebuild step 4 (`docs/plans/THE_REBUILD.md`, Lean item
 14 of table (b); #73), from Sol's review of the campaign (§4). The computational object is the
 helical pair interaction; this owner is the fixed-width carrier of the landmark tree's mixture
-ratio `β` (`HNN/LandmarkTree`, section 6′). Of the winding guide's six general objects it touches
+ratio `β` (`Compression/Landmark/Context/Tree`, section 6′). Of the winding guide's six general objects it touches
 the **helix** (a carrier's common power of two is a carry, its kept part the phase within the
 octave) and **faces and placement** (the released ratio's interval, carried to the faces it
 reaches). No holonomy is claimed.
@@ -35,17 +35,17 @@ width      a < 2^(w_a), b < 2^(w_b):  w_a + w_b ≤ W ⇒ a b < 2^W ;  otherwise
 3. **`rebase_step_enclosed`.** A released enclosure of `β` propagates through every later step: the
    likelihood-ratio step `β k/x` scales it, and the path mixture `(β k + q)/(1 + β)` (a node's face,
    the join's, the receiver's mixture) moves by at most the enclosure's factor
-   (`LandmarkTree.mix_ratio_bound` at `ρ_q = 1`), lying between the mixtures of its endpoints.
+   (`Tree.mix_ratio_bound` at `ρ_q = 1`), lying between the mixtures of its endpoints.
 4. **`rebase_log_residual_sum`.** Over a passage whose steps release carrier widths
    `δ_t ≤ 2^(1−R)` and keep mantissas with residuals `r_t < 2^(1−W)`
-   (`LandmarkTree.rebase_log_residual`), the total `|log₂ ∏_t (1 + δ_t)(1 − r_t)|` is at most
+   (`Tree.rebase_log_residual`), the total `|log₂ ∏_t (1 + δ_t)(1 − r_t)|` is at most
    `n (2^(3−W) + 2^(2−R))`: the rebases add, never compound.
 5. **`width_or_rebase_total`.** A product of operands of `w_a` and `w_b` bits either fits the
    carrier's `W` bits exactly, or fits after the second operand rebases by `e = w_a + w_b − W`, its
    released relative width below `1/⌊b/2^e⌋ ≤ 2^(1 + e − w_b)` for a `w_b`-bit `b`; over `n` such
    steps with kept parts of at least `R` bits the released widths sum to at most `n 2^(1−R)`.
 
-The Rust consumer is `crates/holonics/src/hnn/landmark.rs`: `Beta::step` (the carrier's rebase at
+The Rust consumer is `crates/holonics/src/compression/landmark/context.rs`: `Beta::step` (the carrier's rebase at
 `R = 126 − W` bits and its release), the node's and the join's certificates (the release's
 `⌈2^C/D̂⌉` added to their drift and excess), `Widths::rebase` and `Landmarks::face_rule`.
 
@@ -54,9 +54,9 @@ No `sorry`, no `axiom`, no `native_decide`.
 
 noncomputable section
 
-namespace Holonics.HNN.LandmarkCarrier
+namespace Holonics.Compression.Landmark.Context.Carrier
 
-open Holonics.HNN.LandmarkTree (rebase_log_residual mix_ratio_bound)
+open Holonics.Compression.Landmark.Context.Tree (rebase_log_residual mix_ratio_bound)
 
 /-- [definition] **The kept part** of a carrier coordinate rebased by `2^e`. -/
 def kept (e N : ℕ) : ℕ := N / 2 ^ e
@@ -133,7 +133,7 @@ If `β` lies in `[β̌, β̌ (1 + δ)]` (`β̌ > 0`, `δ ≥ 0`), then for a KT 
 `x > 0` and a face `q > 0`:
 * the likelihood-ratio step keeps the enclosure: `β k/x ∈ [β̌ k/x, β̌ k/x (1 + δ)]`;
 * the path mixture `(β k + q)/(1 + β)` lies within the factor `1 + δ` of `(β̌ k + q)/(1 + β̌)`
-  (`LandmarkTree.mix_ratio_bound` at `ρ_q = 1`);
+  (`Tree.mix_ratio_bound` at `ρ_q = 1`);
 * and it lies between the mixtures at the enclosure's endpoints (the mixture is monotone in `β`). -/
 theorem rebase_step_enclosed {β βl δ k x q : ℚ} (hβl : 0 < βl) (hδ : 0 ≤ δ) (hk : 0 ≤ k)
     (hx : 0 < x) (hq : 0 < q) (h1 : βl ≤ β) (h2 : β ≤ βl * (1 + δ)) :
@@ -178,7 +178,7 @@ theorem rebase_step_enclosed {β βl δ k x q : ℚ} (hβl : 0 < βl) (hδ : 0 �
 
 /-- [proved-derived; formal-checked] **`rebase_log_residual_sum`: the rebases add over a passage.**
 Each step `t < n` keeps a mantissa with residual `r_t ∈ [0, 2^(1−W))` (`W ≥ 2`,
-`LandmarkTree.rebase_log_residual`) and releases a carrier width `δ_t ∈ [0, 2^(1−R)]`; then
+`Tree.rebase_log_residual`) and releases a carrier width `δ_t ∈ [0, 2^(1−R)]`; then
 `|log₂ ∏_(t<n) (1 + δ_t)(1 − r_t)| ≤ n (2^(3−W) + 2^(2−R))`. -/
 theorem rebase_log_residual_sum {W R n : ℕ} (hW : 2 ≤ W) (r δ : ℕ → ℝ)
     (hr : ∀ t, 0 ≤ r t ∧ r t < 2 ^ (1 - (W : ℤ))) (hδ : ∀ t, 0 ≤ δ t ∧ δ t ≤ 2 ^ (1 - (R : ℤ))) :
@@ -303,4 +303,4 @@ section Audit
 
 end Audit
 
-end Holonics.HNN.LandmarkCarrier
+end Holonics.Compression.Landmark.Context.Carrier

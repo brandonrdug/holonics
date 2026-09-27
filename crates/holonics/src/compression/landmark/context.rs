@@ -1,6 +1,37 @@
-//! **The receiving parametron's storage as a tree of landmarks, executed on a declared dyadic
-//! lattice, addressed by typed bundles, weighing every face locally, stored at the faces where
-//! paths part** (campaign 1's repair; campaign 2's receiving letters; #73).
+//! **The receiving tree: the shift navigator's landmarks, executed on a declared dyadic lattice,
+//! addressed by typed bundles, weighing every face locally, stored at the faces where paths part**
+//! (Lean `Compression/Landmark/Context`; campaign 1's repair; campaign 2's receiving letters; #73).
+//! The HNN reads it as the receiving parametron's storage (`hnn::receiving`).
+//!
+//! [definition; agent-inferred, the unity audit of September 27, §2] **The receiving tree is the
+//! shift navigator's landmarks.** A source read cell by cell is a passage of the shift navigator:
+//! each tick pushes its letter onto the address. A node is a context, the face where every path
+//! ending in that context converges, which is the elementary objects' definition of a landmark and
+//! the same object this module's siblings locate for other navigators (site kinds, fixed points,
+//! identities, constraint identities, primitive cycles). Its joins to the framework:
+//! - [proved-derived; formal-checked] **Each pruned tree is a candidate standing, and the tree is
+//!   their mixture** (Lean `Compression/Landmark/Context/Standing`). For a tree source over a pruned
+//!   tree `S`, whose next-symbol face reads only the leaf context `S` reaches, the address at the
+//!   declared depth is a `Foundation/Standing.StandingLaw` on the shift navigator's words
+//!   (`address_standing`, through `standingLaw_exists_iff_future_factors`), and so is the
+//!   leaf-context map itself when `S`'s leaves are closed under the shift (`leaf_standing`). The
+//!   tree's weight is the stop prior's weighted sum over `S` of the tree sources' likelihoods
+//!   (`mixture_over_leaf_standings`, `Tree.own_mixture_over_trees` read through
+//!   `tree_source_likelihood`), and its dominance bound (`Tree.own_kraft_and_dominance`) is the code
+//!   cost of choosing among the candidate standings.
+//! - [counterexample; formal-checked] A leaf map that is not closed under the shift is not a
+//!   standing (`unclosed_leaf_is_not_a_standing`): the address at the declared depth is then the
+//!   standing, and the leaf map only its present face.
+//! - [proved-derived; formal-checked] **A node's arrivals are the epochs of its section** (Lean
+//!   `Compression/Landmark/Context/Epoch`): the node's ticks form a certified section of the
+//!   passage's aeon, its arrival count after `k` cells is `Aeon/Clock/Epoch.epochOf` of those ticks
+//!   at micro-state `k` (`arrivals_are_epochs`), and its register ([`Capacity`]'s carry included)
+//!   is the node law's run of its epoch history, whose total never passes the epoch index
+//!   (`node_register_on_epochs`, `capped_register_on_epochs`).
+//!
+//! [definition; agent-inferred] The tree reads its refusals ([`HnnError`]), the contact letters
+//! (`hnn::contact`), the grain exponent (`hnn::receiving::grain_exponent`) and the cut and its
+//! baselines (`hnn::reference`) from the HNN it serves; its law depends on none of them.
 //!
 //! [definition; Brandon, September 25; the tree's form agent-inferred] **The receiving face
 //! compresses landmarks.** Brandon: the compression "is of landmarks connecting generators … when
@@ -33,7 +64,7 @@
 //!
 //! ```text
 //! bundle     b_i = (x_i, f_i)   the tick of cell i: its cell and its declared features' letters, read
-//!                              from the retained state after the tick (Lean HNN/LandmarkAddress)
+//!                              from the retained state after the tick (Lean Compression/Landmark/Context/Address)
 //! address    a_j = [b_(j−1), …, b_(j−D)]  newest bundle first,  b_i = Boundary for i < 0      per cell
 //! branches   cells:   [x_(j−1), …, x_(j−D)]                                     D letters
 //!            bundles: [x_(j−1), f¹_(j−1), …, f^r_(j−1), x_(j−2), …]               D(1 + r) letters
@@ -54,7 +85,7 @@
 //! first, read per cell: causal, with no window pooling ([`address`], [`letter_address`]). A
 //! bundle's code is `0` for the boundary and `1 + x + |A| · f` for a cell `x` with the features'
 //! mixed-radix code `f` ([`LetterFamily::bundle_code`], injective: Lean
-//! `HNN/LandmarkAddress.bundle_code_injective`); in a tree each typed letter is a child's key under
+//! `Compression/Landmark/Context/Address.bundle_code_injective`); in a tree each typed letter is a child's key under
 //! its parent, `0` for the boundary and `1 + value` otherwise.
 //!
 //! [definition; agent-inferred] **The declared family and its finite partitions** ([`LetterFamily`],
@@ -85,10 +116,10 @@
 //! With no features declared the tree is campaign 1's cell tree, unchanged. With `r ≥ 1` features
 //! each dyadic cell `h` carries two branches, the cell tree over `[x_(j−1), …]` and the bundle tree
 //! over the flattened bundle word, joined at `h` by a two-face mixture weighed by its own
-//! likelihood ratio (Lean `HNN/LandmarkTree.sequential_mixture`): the join's weight is
+//! likelihood ratio (Lean `Compression/Landmark/Context/Tree.sequential_mixture`): the join's weight is
 //! `½ W_cells + ½ W_bundles`, so the enlarged code length is at most the cell tree's plus one bit a
 //! dyadic cell, and for every cell-only pruned tree `S` at most `Γ(S) + 1` plus its leaves' code
-//! (Lean `HNN/LandmarkAddress.cell_only_dominance_with_feature_charge`), before the features'
+//! (Lean `Compression/Landmark/Context/Address.cell_only_dominance_with_feature_charge`), before the features'
 //! description and the certified drift. The bundle tree restricts by whole bundles
 //! (`bundle_restrict`): its node at `d(1 + r)` letters is the address restricted to `d` bundles.
 //!
@@ -99,7 +130,7 @@
 //! face 1 and stores nothing, so every `|A| ≥ 2` is normalized. The whole-cell emission
 //! (`|A|`-ary masses at each node) is retired: on the standing cut it never earned a split (the
 //! record of September 26). Its depth-one forced case is the region table (order-1's
-//! `|A|`-ary KT face), whose law is kept in Lean only (`HNN/LandmarkTree.depth_one_is_decision_27`).
+//! `|A|`-ary KT face), whose law is kept in Lean only (`Compression/Landmark/Context/Tree.depth_one_is_the_whole_cell_table`).
 //!
 //! [definition; agent-inferred, the primary's law] **Every quantity on the hot path is a
 //! fixed-width integer on a declared dyadic lattice, with certified residuals, and the executed
@@ -161,7 +192,7 @@
 //! Before it can overflow (`2W + κ + M_p + 1 > 128`, `κ` the bits of `K`), the carrier rebases by a
 //! common power of two, `N 2^s = 2^e N̂` exactly and `D = 2^e D̂ + r_D` with `D̂` of `R` bits, and the
 //! remainder `r_D` is released: the ratio lies in `(N̂/(D̂ + 1), N̂/D̂]`, whose logarithmic width is
-//! below `1/D̂` (Lean `HNN/LandmarkCarrier.{rebase_decode, rebase_ratio_enclosed}`). That width is
+//! below `1/D̂` (Lean `Compression/Landmark/Context/Carrier.{rebase_decode, rebase_ratio_enclosed}`). That width is
 //! added to the node's drift and excess certificates, the same terms that carry a mantissa rebase
 //! through every later KT, path and mixture step (`rebase_step_enclosed`, `rebase_log_residual_sum`,
 //! `width_or_rebase_total`). The widths are never reduced to fit the carrier: `M_p` and `W` stay the
@@ -193,13 +224,13 @@
 //! ([`CellReading::residual`]) is the digits' sum in `log₂` (times `3/2`), never above the rule.
 //!
 //! [definition; agent-inferred] **Stored at the faces where paths part** (Lean
-//! `HNN/LandmarkCompaction`; the one storage). Every address runs to the declared
+//! `Compression/Landmark/Context/Compaction`; the one storage). Every address runs to the declared
 //! depth (padded with `Boundary`), so a chain of nodes each with one reached child routes the same
 //! arrivals and holds the same counts: with `ρ = P_w/P_e`, `1 − ρ_j = (1 − w_j)(1 − ρ_(j+1))`, and on
 //! the dyadic rungs `1 − ρ_top = 2^(−S)(1 − ρ_bottom)`, `S = Σ j_i` (`chain_ratio`,
 //! `chain_ratio_dyadic`). So a chain with the node below it is one KT node at the summed
 //! rung, `P_w(top) = W E + (1 − W) X`, `1 − W = 2^(−S)`, founded at `β₀ = 2^S − 1` and stepped by the
-//! unchanged law (`compacted_is_decision_28`); a chain ending at `D` is one KT node
+//! unchanged law (`compacted_is_the_full_tree`); a chain ending at `D` is one KT node
 //! (`leaf_chain_is_one_node`); a forced depth has rung `0`. A stored node is a chain: its bottom
 //! depth, its counts, its chart at the chain's summed rung (read from
 //! the branch's summed rungs, never stored), and its **label**, the letters from its parent's face to
@@ -234,7 +265,7 @@
 //! and a passage of `n` cells at most `2 n B` nodes and `n D` label letters a branch.
 //!
 //! [definition; agent-inferred] **A landmark's storage has a capacity** (Lean
-//! `HNN/LandmarkCapacity`; [`Capacity`], declared in [`LandmarkDeclaration::capacity`]). A node's
+//! `Compression/Landmark/Context/Capacity`; [`Capacity`], declared in [`LandmarkDeclaration::capacity`]). A node's
 //! counts are a register on the node's own clock, its arrivals: the deposit counts the digit, and
 //! when that brings `n_0 + n_1` to the ceiling `L = 2^c` both counts carry, `n_b ← ⌈n_b/2⌉`, so the
 //! face read before the next arrival is KT's on the carried counts. The register is then a function
@@ -242,8 +273,8 @@
 //! exchangeable), and its face is positive and normalized (Lean `cap_face_pos`, `cap_face_sum`).
 //! The tree weighting, its Kraft form and dominance, the step `β' = β k/q̂'` and the compaction hold
 //! for any node law whose state is a function of what reached the node (Lean
-//! `LandmarkTree.{NodeLaw, own_mixture_over_trees, own_kraft_and_dominance, own_weight_step₀,
-//! law_standing_is_routed}`, `LandmarkCompaction.compacted_node_law`): a chain's nodes route the
+//! `Context/Tree.{NodeLaw, own_mixture_over_trees, own_kraft_and_dominance, own_weight_step₀,
+//! law_standing_is_routed}`, `Context/Compaction.compacted_node_law`): a chain's nodes route the
 //! same arrivals, so a stored
 //! chain is one register, and a split's upper part takes the chain's register (`Law::part`
 //! unchanged). `Unbounded` (`c = ∞`) is the KT node, as is every ceiling no node reaches
@@ -257,10 +288,10 @@
 //! ℚ at every arrival, and on the wide cut's development cells at `D = 6` the two codes were equal
 //! within their certificates while the full arena held 4,620,707 nodes against 2,784,875 (commit
 //! `2fb0c1c0`). The tests keep an ideal full tree in ℚ as the independent reference
-//! (`hnn/tests/landmark_full.rs`).
+//! (`compression/landmark/context/tests/full.rs`).
 //!
 //! [historical; measured] **Founding where paths converge (second-arrival founding) is measured and retired**
-//! (commit `d137e8a6`; Lean `HNN/ConvergenceFounding` stays as the law of absent children and
+//! (commit `d137e8a6`; Lean `Compression/Landmark/Context/ConvergenceFounding` stays as the law of absent children and
 //! stopping rules). A node founded at its second arrival, its first arrival held as a pending record
 //! in the child table, declared a different prior; on the wide cut's development cells it coded
 //! above the first-arrival tree at `D = 6` (`1827190 + 13/16 + ε` bits at its chosen
@@ -323,7 +354,7 @@
 //! octaves), whose rebases keep its code length within `2^(−O)` of the ideal over the passage.
 //!
 //! [definition; agent-inferred] **The declared stop prior** ([`StopPrior`]; Lean
-//! `HNN/LandmarkTree` item 12; agent-inferred: campaign 2's controls showed that `½` at every node
+//! `Compression/Landmark/Context/Tree` item 12; agent-inferred: campaign 2's controls showed that `½` at every node
 //! is not the code-length optimum, since constant slots, which carry nothing but raise the stop
 //! weight, coded the development cells up to 133 bits below the cell-only tree). A node at context
 //! depth `d` (in its branch's letters) stops with
@@ -340,7 +371,7 @@
 //! controls are the per-depth law `(j_0, j_(≥1)) = (1, r + 1)` exactly in the ideal weighting (the
 //! test `landmark_constant_slots_are_the_per_depth_prior`).
 //!
-//! [definition; agent-inferred] **Weighing is local** (Lean `HNN/LocalWeighing`). A
+//! [definition; agent-inferred] **Weighing is local** (Lean `Compression/Landmark/Context/LocalWeighing`). A
 //! mixture of whole passages telescopes to `½W_T + ½W_X` and uses a face only where it beats the
 //! tree over the whole passage; the tree's own law weighs every landmark by its own evidence. Of
 //! local weighing's three local laws, the one adopted lives here (the switching mixture across epochs
@@ -354,8 +385,8 @@
 //!
 //! [historical; measured] **The node-local law is retired** (its realization, `LocalLaw` and
 //! `Landmarks::local`, measured at commit `d2a2e0db`, is at commit `89460425`; its law stays in
-//! Lean `HNN/LocalWeighing.{node_local_dominance, node_local_founding}` over the own-weight tree
-//! `HNN/LandmarkTree.{own_mixture_over_trees, own_weight_step}`): each landmark's own face mixed its KT face with an external face read
+//! Lean `Compression/Landmark/Context/LocalWeighing.{node_local_dominance, node_local_founding}` over the own-weight tree
+//! `Compression/Landmark/Context/Tree.{own_mixture_over_trees, own_weight_step}`): each landmark's own face mixed its KT face with an external face read
 //! causally at the same digit, and held out it read above the tree (below).
 //!
 //! [established-bounded; measured] **On the standing cut** (notebook `hnn_landmark -- … local`,
@@ -453,28 +484,28 @@
 //!
 //! | Law | Lean | Rust |
 //! |---|---|---|
-//! | the typed suffix address; an unfounded node reads the prior, and founding at first arrival keeps the law | `HNN/LandmarkTree.{unfounded_reads_prior, founded_tree_same_law}` | [`Letter`], [`address`], [`Landmarks::deposit`] |
-//! | the bundle: causal, restricted by whole bundles, its code injective, its partitions finite | `HNN/LandmarkAddress.{bundle_causal, bundle_restrict, feature_scale_square, bundle_code_injective, phase_partition_finite, lock_partition_finite}` | [`Bundle`], [`LetterFamily`], [`Feature`] (the contact slot's letter is `hnn::contact::ContactReading::letter`), [`letter_address`] |
-//! | the enlarged tree keeps the cell-only branch | `HNN/LandmarkAddress.cell_only_dominance_with_feature_charge` | the join (`Law::digit`), [`Landmarks::face_rule`] |
-//! | the path face is positive and normalized for any `λ ∈ [0, 1]`; on the lattice too | `HNN/LandmarkTree.{path_face_normalized, lattice_path_laws}` | [`Landmarks::face`], [`Landmarks::probability`] |
-//! | the lattice path's floor, its deviation adding down the path, and the executed face's bound with the address residual | `HNN/LandmarkTree.{lattice_path_floor, lattice_path_deviation, executed_face_bound}` | [`face_bits`], [`CellReading::residual`] |
-//! | the mixture moves by at most the factors of `β` and of the child's face | `HNN/LandmarkTree.mix_ratio_bound` | [`CellReading::residual`] |
-//! | the likelihood-ratio step of β, the opened-path update, and its executed telescope with a rebase | `HNN/LandmarkTree.{weight_step, landmark_step, lattice_step_telescope, lattice_node_telescope, weight_log_lipschitz}` | [`Landmarks::deposit`], [`ChartReport`] |
-//! | a mantissa rebase's residual; the carrier's rebase, its enclosure and its total | `HNN/LandmarkTree.rebase_log_residual`; `HNN/LandmarkCarrier.{rebase_decode, rebase_ratio_enclosed, rebase_step_enclosed, rebase_log_residual_sum, width_or_rebase_total}` | [`Beta::carry`], [`Beta::step`], [`carrier_width`] |
-//! | the telescope on an opened path | `HNN/LandmarkTree.path_telescope_exact` | [`OpenedPath::edge_ratios`] |
-//! | the executed dyadic split and the cells' partition; the forced digits when `\|A\| < 2^B` | `HNN/LandmarkTree.{executed_split_laws, cell_faces_partition, forced_digits_normalized}` | [`Landmarks::probability`], [`Landmarks::face`] |
-//! | a digit face's floor and the rounding's residual (the first-order bound fails downward) | `HNN/LandmarkTree.{digit_face_ge, digit_log_residual, host_digit_bound_fails_downward}` | [`Landmarks::face_rule`] |
-//! | the ideal tree weighting (the oracle) | `HNN/LandmarkTree.{landmark_step, mixture_is_probability, kraft_and_dominance, sequential_mixture}` | [`IdealLandmarks`] |
-//! | the declared stop prior: the mixture over pruned trees with its prior, the weights summing to one, the dominance, the founding at `β₀ = 2^(j_d) − 1` and the step unchanged; `½` the corollary | `HNN/LandmarkTree.{stop_mixture_over_trees, PrunedTree.prior_const, PrunedTree.prior_sum, stop_kraft_and_dominance, stop_weight_step, stop_ratio_step, stop_founding_step, ladder_founding, stopWeight_half}` | [`StopPrior`], [`LandmarkDeclaration::prior`], the founding charts (`Law::founding`, [`ArenaView::founding`]), [`IdealLandmarks`] |
+//! | the typed suffix address; an unfounded node reads the prior, and founding at first arrival keeps the law | `Compression/Landmark/Context/Tree.{unfounded_reads_prior, founded_tree_same_law}` | [`Letter`], [`address`], [`Landmarks::deposit`] |
+//! | the bundle: causal, restricted by whole bundles, its code injective, its partitions finite | `Compression/Landmark/Context/Address.{bundle_causal, bundle_restrict, feature_scale_square, bundle_code_injective, phase_partition_finite, lock_partition_finite}` | [`Bundle`], [`LetterFamily`], [`Feature`] (the contact slot's letter is `hnn::contact::ContactReading::letter`), [`letter_address`] |
+//! | the enlarged tree keeps the cell-only branch | `Compression/Landmark/Context/Address.cell_only_dominance_with_feature_charge` | the join (`Law::digit`), [`Landmarks::face_rule`] |
+//! | the path face is positive and normalized for any `λ ∈ [0, 1]`; on the lattice too | `Compression/Landmark/Context/Tree.{path_face_normalized, lattice_path_laws}` | [`Landmarks::face`], [`Landmarks::probability`] |
+//! | the lattice path's floor, its deviation adding down the path, and the executed face's bound with the address residual | `Compression/Landmark/Context/Tree.{lattice_path_floor, lattice_path_deviation, executed_face_bound}` | [`face_bits`], [`CellReading::residual`] |
+//! | the mixture moves by at most the factors of `β` and of the child's face | `Compression/Landmark/Context/Tree.mix_ratio_bound` | [`CellReading::residual`] |
+//! | the likelihood-ratio step of β, the opened-path update, and its executed telescope with a rebase | `Compression/Landmark/Context/Tree.{weight_step, landmark_step, lattice_step_telescope, lattice_node_telescope, weight_log_lipschitz}` | [`Landmarks::deposit`], [`ChartReport`] |
+//! | a mantissa rebase's residual; the carrier's rebase, its enclosure and its total | `Compression/Landmark/Context/Tree.rebase_log_residual`; `Compression/Landmark/Context/Carrier.{rebase_decode, rebase_ratio_enclosed, rebase_step_enclosed, rebase_log_residual_sum, width_or_rebase_total}` | [`Beta::carry`], [`Beta::step`], [`carrier_width`] |
+//! | the telescope on an opened path | `Compression/Landmark/Context/Tree.path_telescope_exact` | [`OpenedPath::edge_ratios`] |
+//! | the executed dyadic split and the cells' partition; the forced digits when `\|A\| < 2^B` | `Compression/Landmark/Context/Tree.{executed_split_laws, cell_faces_partition, forced_digits_normalized}` | [`Landmarks::probability`], [`Landmarks::face`] |
+//! | a digit face's floor and the rounding's residual (the first-order bound fails downward) | `Compression/Landmark/Context/Tree.{digit_face_ge, digit_log_residual, host_digit_bound_fails_downward}` | [`Landmarks::face_rule`] |
+//! | the ideal tree weighting (the oracle) | `Compression/Landmark/Context/Tree.{landmark_step, mixture_is_probability, kraft_and_dominance, sequential_mixture}` | [`IdealLandmarks`] |
+//! | the declared stop prior: the mixture over pruned trees with its prior, the weights summing to one, the dominance, the founding at `β₀ = 2^(j_d) − 1` and the step unchanged; `½` the corollary | `Compression/Landmark/Context/Tree.{stop_mixture_over_trees, PrunedTree.prior_const, PrunedTree.prior_sum, stop_kraft_and_dominance, stop_weight_step, stop_ratio_step, stop_founding_step, ladder_founding, stopWeight_half}` | [`StopPrior`], [`LandmarkDeclaration::prior`], the founding charts (`Law::founding`, [`ArenaView::founding`]), [`IdealLandmarks`] |
 //! | the prior chosen on the development cells, charged `⌈log₂⌉` of the laws and of each law's depths | (a measurement, not a theorem) | [`ladder_top`], [`prior_family`], [`choose_prior`], [`choose_depth_within`], [`PriorSweep`] |
 //! | a population's code is its faces' product, enclosed once | (a certified reading: integer bounds and the certified logarithm) | [`PassageCode`], [`ProductBound`] |
-//! | the stop-weight mixture per digit tree: the mixture over (law, pruned tree), its prior complete, within `−log₂ π_k − log₂ prior_(w_k)(S)`; the joins telescope to the Bayesian mixture, the executed chart's drift once | `HNN/LocalWeighing.{stop_mixture_per_tree, static_mixture, forward_executed}` | [`StopMixture`], [`JoinTree`], [`FaceJoins`] |
-//! | a window's phases in cell order: each reads the standing after the earlier phases' deposits | `HNN/LandmarkTree.{landmark_step, treeWeight_arrive_off}` | [`Landmarks::window_faces`] |
-//! | founding where paths converge (second-arrival founding, measured and retired): the stopped path normalized under any stopping rule decided before the digit (a complete code); the tree with absent children, its Kraft form and dominance; the stopped step (`β` still at the stop); the second arrival opening with the first count; the first-arrival tree its case | `HNN/ConvergenceFounding.{stopping_rule_normalized, prequential_code_complete, conv_mixture_over_trees, conv_kraft_and_dominance, conv_weight_step, conv_ratio_step, second_arrival_opens_with_the_first_count, convergence_step, convergence_is_probability, first_arrival_is_decision_28}` | retired (its realization is at commit `d137e8a6`; the development cells kept the first arrival) |
-//! | a landmark's storage has a capacity: the tree weighting over any node law whose state is a function of the arrivals reaching the node (its Kraft form, dominance, step and prequential code), the compacted tree for that law, and the capped register as an instance (positive, normalized, the carry lowering the register and keeping each reached symbol, KT below its ceiling, `c = ∞` KT) | `HNN/LandmarkTree.{NodeLaw, own_mixture_over_trees, own_kraft_and_dominance, own_weight_step₀, law_standing_is_routed, ktLaw_standing}`; `HNN/LandmarkCompaction.{MassRouted, own_weight_prequential, compacted_node_law}`; `HNN/LandmarkCapacity.{capLaw, cap_face_pos, cap_face_sum, cap_carry_laws, cap_carry_half_units, cap_run_total_le, cap_unbounded_is_kt, cap_below_ceiling_is_kt, capped_tree_laws}` | [`Capacity`], [`Capacity::carry`], [`LandmarkDeclaration::capacity`], `Law::apply_branch`, [`IdealLandmarks`] |
-//! | stored where paths part: a chain with its bottom is one node at the summed rung (`1 − ρ_top = 2^(−S)(1 − ρ_bottom)`, founded at `2^S − 1`), a chain to `D` one KT node, the split's two ratios, the landmark tree's face exactly, at most `2n − 1` nodes a tree | `HNN/LandmarkCompaction.{chain_ratio, chain_ratio_dyadic, leaf_chain_is_one_node, chain_split, compacted_is_decision_28, compacted_node_bound}` | [`Landmarks`], [`LandmarkDeclaration::rung_sums`], the split ([`Beta::split`], `Law::part`, `Law::chain`), [`Landmarks::face_rule`], [`Landmarks::tree_sizes`], [`IdealLandmarks`] |
+//! | the stop-weight mixture per digit tree: the mixture over (law, pruned tree), its prior complete, within `−log₂ π_k − log₂ prior_(w_k)(S)`; the joins telescope to the Bayesian mixture, the executed chart's drift once | `Compression/Landmark/Context/LocalWeighing.{stop_mixture_per_tree, static_mixture, forward_executed}` | [`StopMixture`], [`JoinTree`], [`FaceJoins`] |
+//! | a window's phases in cell order: each reads the standing after the earlier phases' deposits | `Compression/Landmark/Context/Tree.{landmark_step, treeWeight_arrive_off}` | [`Landmarks::window_faces`] |
+//! | founding where paths converge (second-arrival founding, measured and retired): the stopped path normalized under any stopping rule decided before the digit (a complete code); the tree with absent children, its Kraft form and dominance; the stopped step (`β` still at the stop); the second arrival opening with the first count; the first-arrival tree its case | `Compression/Landmark/Context/ConvergenceFounding.{stopping_rule_normalized, prequential_code_complete, conv_mixture_over_trees, conv_kraft_and_dominance, conv_weight_step, conv_ratio_step, second_arrival_opens_with_the_first_count, convergence_step, convergence_is_probability, first_arrival_is_the_full_tree}` | retired (its realization is at commit `d137e8a6`; the development cells kept the first arrival) |
+//! | a landmark's storage has a capacity: the tree weighting over any node law whose state is a function of the arrivals reaching the node (its Kraft form, dominance, step and prequential code), the compacted tree for that law, and the capped register as an instance (positive, normalized, the carry lowering the register and keeping each reached symbol, KT below its ceiling, `c = ∞` KT) | `Compression/Landmark/Context/Tree.{NodeLaw, own_mixture_over_trees, own_kraft_and_dominance, own_weight_step₀, law_standing_is_routed, ktLaw_standing}`; `Compression/Landmark/Context/Compaction.{MassRouted, own_weight_prequential, compacted_node_law}`; `Compression/Landmark/Context/Capacity.{capLaw, cap_face_pos, cap_face_sum, cap_carry_laws, cap_carry_half_units, cap_run_total_le, cap_unbounded_is_kt, cap_below_ceiling_is_kt, capped_tree_laws}` | [`Capacity`], [`Capacity::carry`], [`LandmarkDeclaration::capacity`], `Law::apply_branch`, [`IdealLandmarks`] |
+//! | stored where paths part: a chain with its bottom is one node at the summed rung (`1 − ρ_top = 2^(−S)(1 − ρ_bottom)`, founded at `2^S − 1`), a chain to `D` one KT node, the split's two ratios, the landmark tree's face exactly, at most `2n − 1` nodes a tree | `Compression/Landmark/Context/Compaction.{chain_ratio, chain_ratio_dyadic, leaf_chain_is_one_node, chain_split, compacted_is_the_full_tree, compacted_node_bound}` | [`Landmarks`], [`LandmarkDeclaration::rung_sums`], the split ([`Beta::split`], `Law::part`, `Law::chain`), [`Landmarks::face_rule`], [`Landmarks::tree_sizes`], [`IdealLandmarks`] |
 //!
-//! [open] Owed in #62 (Lean `HNN/LandmarkTree`'s `[open]`): the passage-level composition of the
+//! [open] Owed in #62 (Lean `Compression/Landmark/Context/Tree`'s `[open]`): the passage-level composition of the
 //! drift bound (the subtree sum over the tree and the passage, from `lattice_node_telescope`,
 //! `weight_log_lipschitz` and `mix_ratio_bound`) into the per-cell rule, and the certified binary
 //! logarithm's squaring invariant; both are checked by the tests, the first cell by cell against
@@ -551,7 +582,7 @@ impl Feature {
     /// **A contact's letter**, its bound derived from the field (`LockDeclaration::derived`: `Q`
     /// the greatest denominator whose first return, `q` turns of the contact's second ring, Lean
     /// `Aeon/Clock/Lock.cycle_iff_period_dvd`, is observable within the aeon, and `P` the first
-    /// ring's alike; Lean `HNN/LandmarkAddress.lock_partition_finite`), never a literal.
+    /// ring's alike; Lean `Compression/Landmark/Context/Address.lock_partition_finite`), never a literal.
     pub fn contact(field: &Field, contact: usize) -> Self {
         Feature::Contact {
             contact,
@@ -699,7 +730,7 @@ impl LetterFamily {
             .collect()
     }
 
-    /// **The bundle's code** (Lean `HNN/LandmarkAddress.bundle_code_injective`): `0` for the
+    /// **The bundle's code** (Lean `Compression/Landmark/Context/Address.bundle_code_injective`): `0` for the
     /// boundary and `1 + x + |A| · f` for a cell `x` with the features' code `f`.
     pub fn bundle_code(&self, letter: Letter, alphabet: usize) -> u64 {
         match letter {
@@ -766,7 +797,7 @@ pub fn cell_letters(cells: &[usize]) -> Vec<Letter> {
 const MAX_RUNG: u32 = u64::BITS - 1;
 
 /// [definition; agent-inferred] **The tree's declared stop-weight law** (the declared stop prior; Lean
-/// `HNN/LandmarkTree` item 12): a node at context depth `d` stops with `w_d = 1 − 2^(−j_d)`, the rung
+/// `Compression/Landmark/Context/Tree` item 12): a node at context depth `d` stops with `w_d = 1 − 2^(−j_d)`, the rung
 /// `j_d ≥ 1` of the dyadic ladder, and is founded at `β₀ = w_d/(1 − w_d) = 2^(j_d) − 1`, an odd
 /// integer carried exactly (Lean `stop_founding_step`, `ladder_founding`); every later step is
 /// the landmark tree's, `β' = β k/q̂'` (`stop_ratio_step`). The rungs are listed from the root, and a depth
@@ -898,7 +929,7 @@ pub fn prior_family(top: u32) -> Vec<StopPrior> {
 // the declared node law: the register's capacity
 
 /// [definition; agent-inferred] **A landmark's storage capacity** (Lean
-/// `HNN/LandmarkCapacity`): the node's two counts `n_0, n_1` are a register of ceiling `L = 2^c`.
+/// `Compression/Landmark/Context/Capacity`): the node's two counts `n_0, n_1` are a register of ceiling `L = 2^c`.
 /// The deposit counts its arrival, and when that brings `n_0 + n_1` to `L` both counts carry,
 /// `n_b ← ⌈n_b/2⌉`, before the next arrival is read ([`Capacity::carry`]): the node's register is a
 /// function of the arrivals that reached it, and its face is KT's on the carried counts, positive
@@ -1044,7 +1075,7 @@ impl LandmarkDeclaration {
     /// for `d = 0, …, D_b`, `f_b` the branch's forced depths (the cell branch's `forced`, none in
     /// the bundle branch; a forced depth's rung is `0`). A stored chain from `top` to `bottom`
     /// below `D_b` is one node at the summed rung `sums[b][bottom + 1] − sums[b][top]`
-    /// (`HNN/LandmarkCompaction.chain_ratio_dyadic`).
+    /// (`Compression/Landmark/Context/Compaction.chain_ratio_dyadic`).
     pub fn rung_sums(&self) -> Vec<Vec<u64>> {
         self.branch_depths()
             .into_iter()
@@ -1372,7 +1403,7 @@ impl Beta {
     /// moved into the exponent and its odd parts reduced; exact when both fit `W` bits, otherwise
     /// rebased to its mantissa `m' = ⌊v 2^s⌋ ∈ [2^(W−1), 2^W)`, which is returned: the relative
     /// residual `r = 1 − m'/(v 2^s)` has `|ln(1 − r)| < 1/m' ≤ 2^(1−W)` (Lean
-    /// `HNN/LandmarkTree.rebase_log_residual`). The operands must be positive, with
+    /// `Compression/Landmark/Context/Tree.rebase_log_residual`). The operands must be positive, with
     /// `W + bits(denominator) ≤ 128`.
     pub fn carry(
         numerator: u128,
@@ -1386,7 +1417,7 @@ impl Beta {
     }
 
     /// **One step of the carried ratio with the carrier's rebase** (module header, "The carrier
-    /// rebases past `u128`"; Lean `HNN/LandmarkCarrier`): the ratio `(N/D) · 2^exponent` carried
+    /// rebases past `u128`"; Lean `Compression/Landmark/Context/Carrier`): the ratio `(N/D) · 2^exponent` carried
     /// at width `W` as [`Beta::carry`] carries it, except that when the mantissa's division
     /// `N 2^s / D` would pass `u128` (`W + bits(D) > 128`), `D`'s odd part first rebases to its
     /// top `R` bits (`rebase`, `R ≥ W`): `D = 2^e D̂ + r_D`, the exponent takes `−e`, and a
@@ -1460,7 +1491,7 @@ impl Beta {
     }
 
     /// [definition; agent-inferred] **A chain's split ratios** (stored where paths part; Lean
-    /// `HNN/LandmarkCompaction.chain_split`): a stored chain carrying `β` at the summed rung
+    /// `Compression/Landmark/Context/Compaction.chain_split`): a stored chain carrying `β` at the summed rung
     /// `S = S_up + S_low` (`S_up, S_low ≥ 1`) parts between its two rungs; its lower part keeps its
     /// counts at `β_ℓ = β (2^(S_low) − 1)/(2^S − 1)` and its upper part holds the same counts at
     /// `β_u = (2^(S_up) − 1) 2^(S_low) β/(β (2^(S_low) − 1) + 2^S − 1)`, each formed exactly and
@@ -2411,7 +2442,7 @@ struct Chart {
     excess: u128,
 }
 
-/// [definition; agent-inferred] **A parting chain's two parts** (stored where paths part; Lean `HNN/LandmarkCompaction.chain_split`): the read's last stored chain parts from the address at
+/// [definition; agent-inferred] **A parting chain's two parts** (stored where paths part; Lean `Compression/Landmark/Context/Compaction.chain_split`): the read's last stored chain parts from the address at
 /// `depth`; its upper part, down to `depth`, is read (and founded at the deposit) with `upper`, and
 /// its lower part keeps its counts with `lower` (none when it keeps its chart: a leaf, or an upper
 /// part above the forced depths). `units` is the split's rounding on `2^(−C)` (each ratio carried at
@@ -2650,7 +2681,7 @@ impl Law {
     }
 
     /// **The chart a chain of summed rung `S ≥ 1` is founded with** (stored where paths part; Lean
-    /// `HNN/LandmarkCompaction.leaf_chain_is_one_node`): `β₀ = 2^S − 1`, carried exactly within `W`
+    /// `Compression/Landmark/Context/Compaction.leaf_chain_is_one_node`): `β₀ = 2^S − 1`, carried exactly within `W`
     /// bits, otherwise as its mantissa `2^W − 1` (`⌊(2^S − 1) 2^(W−S)⌋`) times `2^(S − W)` with the
     /// rebase's unit `⌈2^C/(2^W − 1)⌉` in its drift.
     fn chain(&self, rung: u64) -> Chart {
@@ -2689,7 +2720,7 @@ impl Law {
         }
     }
 
-    /// **A chain's split at `depth`** (stored where paths part; Lean `HNN/LandmarkCompaction.chain_split`): the
+    /// **A chain's split at `depth`** (stored where paths part; Lean `Compression/Landmark/Context/Compaction.chain_split`): the
     /// stored chain `node` from `top` to its bottom parts at `depth`, `S = S_up + S_low`. Above a
     /// leaf the upper part is founded at `2^(S_up) − 1` ([`Law::chain`]) and the leaf keeps its
     /// chart. Above an internal bottom, `β_ℓ = β (2^(S_low) − 1)/(2^S − 1)` and
@@ -3424,11 +3455,7 @@ impl Landmarks {
 
     /// **The β chart's report** (module header).
     pub fn chart(&self) -> ChartReport {
-        let charts = self
-            .nodes
-            .charts
-            .iter()
-            .chain(&self.nodes.joins);
+        let charts = self.nodes.charts.iter().chain(&self.nodes.joins);
         let (mut drift, mut node_rebases) = (0u128, 0u64);
         for chart in charts {
             drift = drift.max(chart.drift);
@@ -3972,7 +3999,7 @@ fn dyadic_grain_exponent(
 /// split exactly in ℚ (`β_ℓ = β (2^(S_low) − 1)/(2^S − 1)`,
 /// `β_u = (2^(S_up) − 1) 2^(S_low) β/(β (2^(S_low) − 1) + 2^S − 1)`, `2^(S_up) − 1` above a leaf):
 /// its faces are the full tree's (one node a depth, each founded at `β₀ = 2^(j_d) − 1`),
-/// exactly (`compacted_is_decision_28`; the tests hold it against a full reference kept in
+/// exactly (`compacted_is_the_full_tree`; the tests hold it against a full reference kept in
 /// `hnn/tests`). Each node's register carries at the declared capacity as the executed tree's does
 /// (the register's capacity; `compacted_node_law`). With no width `β` is exact (the tests); at a width it is
 /// rebased past it with the residual `1/m'`.
@@ -4413,7 +4440,7 @@ struct Joint {
 }
 
 /// [definition; agent-inferred] **A join tree over `K` faces** (local weighing; Lean
-/// `HNN/LocalWeighing.{static_mixture, two_face_prior}`): every join is a two-face sequential
+/// `Compression/Landmark/Context/LocalWeighing.{static_mixture, two_face_prior}`): every join is a two-face sequential
 /// mixture of its sides' faces, founded at `β₀ = π_left/π_right` and stepped by
 /// `β' = β q_left(b)/q_right(b)`, so the joins telescope to the Bayesian mixture of the `K` faces
 /// with the tree's prior: each face's prior weight is the product of the join weights
@@ -4547,7 +4574,7 @@ pub struct JoinReceipt {
 /// `β' = β q̂_left(b)/q̂_right(b)`, the drift growing by both sides' excess increments and the
 /// rebases, the excess by its rounding `2^(−M)/min(q̂, q̂_left, q̂_right)`, twice the rebases and
 /// both sides' increments (the enlarged tree's join accounting; Lean
-/// `HNN/LocalWeighing.forward_executed`). A read's certificate is the faces' plus each join's drift
+/// `Compression/Landmark/Context/LocalWeighing.forward_executed`). A read's certificate is the faces' plus each join's drift
 /// and rounding. Each dyadic cell is its own digit tree, weighed by its own evidence.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FaceJoins {
@@ -4734,7 +4761,7 @@ fn side_value(values: &[u64], faces: &[u64], side: Side) -> u64 {
 }
 
 /// [definition; agent-inferred] **The stop-weight mixture per digit tree** (local weighing, "in each
-/// digit tree"; Lean `HNN/LocalWeighing.stop_mixture_per_tree`): `K` trees over one declaration,
+/// digit tree"; Lean `Compression/Landmark/Context/LocalWeighing.stop_mixture_per_tree`): `K` trees over one declaration,
 /// one per declared stop prior (their widths agree: the prior enters only at the founding), and in
 /// each dyadic cell a [`JoinTree`]'s joins ([`FaceJoins`]) mixing the trees' digit faces by that
 /// digit tree's own evidence. Each digit tree's weight is `Σ_k π_k W_(h,k)`, the mixture over
@@ -5589,3 +5616,6 @@ pub fn oracle_cost(
         certified,
     })
 }
+
+#[cfg(test)]
+mod tests;

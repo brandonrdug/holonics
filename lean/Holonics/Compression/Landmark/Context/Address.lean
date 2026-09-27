@@ -1,14 +1,14 @@
-import Holonics.HNN.LandmarkTree
+import Holonics.Compression.Landmark.Context.Tree
 import Holonics.HNN.Contact
 import Holonics.Aeon.Clock.Lock
 
 /-!
-# HNN.LandmarkAddress: the receiving letters, typed bundles of the earlier ticks
+# Compression.Landmark.Context.Address: the receiving letters, typed bundles of the earlier ticks
 
 [definition; agent-inferred] Campaign 2 of rebuild step 4 (`docs/plans/THE_REBUILD.md`, Lean item
 13 of table (b); #73), from Sol's review of the campaign (§2). The computational object is the
 helical pair interaction; this owner is the address of the receiving parametron's storage, the
-tree of landmarks (`HNN/LandmarkTree`). Each earlier cell's tick contributes one **typed bundle**:
+tree of landmarks (`Compression/Landmark/Context/Tree`). Each earlier cell's tick contributes one **typed bundle**:
 its cell and the declared features read at that tick (a ring's phase class, a contact's lock
 address and site kind). Of the winding guide's six general objects it touches the **tower thread**
 (the address restricts by dropping its oldest whole bundle; a coarser grain is a restriction of the
@@ -69,10 +69,10 @@ dominance   W_enlarged = ½ W_cells + ½ W_bundles  (the join's sequential mixtu
    injective on values within their slots and lies below the slots' product.
 8. **`cell_only_dominance_with_feature_charge`.** At a dyadic cell the enlarged tree joins the cell
    branch's faces `a_t` and the bundle branch's `b_t` by the sequential mixture
-   (`LandmarkTree.sequential_mixture`); when the cell branch's product is its tree weight under the
-   declared stop-weight law `w` (Decision 32; `LandmarkTree.stop_weight_step`), the join codes within
+   (`Tree.sequential_mixture`); when the cell branch's product is its tree weight under the
+   declared stop-weight law `w` (Decision 32; `Tree.stop_weight_step`), the join codes within
    one bit of the cell tree, and for every cell-only pruned tree `S` within `−log₂ prior_w(S) + 1` of
-   its leaves' code (`LandmarkTree.stop_kraft_and_dominance`; `Γ(S) + 1` at `w = ½`). Over the passage (`passage_join_bound`) the enlarged tree
+   its leaves' code (`Tree.stop_kraft_and_dominance`; `Γ(S) + 1` at `w = ½`). Over the passage (`passage_join_bound`) the enlarged tree
    pays at most one bit a dyadic cell opened: `−log₂ ∏_h ∏_t q_(h,t) ≤ Σ_h −log₂ W_h + |H|`
    (`|H| ≤ 2^B − 1`, the splitting dyadic cells, `255` at `|A| = 256`); an executed enlarged code
    within its certified drift `ρ` of the ideal join, against an executed cell-only code within `ρ_c`
@@ -86,7 +86,7 @@ from it) is the contact owner's (`HNN/Contact.contact_lock_address`), consumed h
 partition it lands in. The executed rank of a reduced pair in Rust
 (`hnn::contact::ContactLock::code`, ordered by `(q, p)`) is checked by the tests, not stated here.
 
-The Rust consumers are `crates/holonics/src/hnn/landmark.rs` (`Letter`, `Bundle`, `LetterFamily`,
+The Rust consumers are `crates/holonics/src/compression/landmark/context.rs` (`Letter`, `Bundle`, `LetterFamily`,
 `Feature`, `letter_address`, the join of the enlarged tree), `crates/holonics/src/hnn/contact.rs`
 (`LockDeclaration::letters`, `ContactLock::code`, `ContactReading::letter`: the contact letter's
 partition and rank) and `crates/holonics/src/hnn/receiving.rs` (`LetterReader`, `ActiveAddress`,
@@ -97,9 +97,9 @@ No `sorry`, no `axiom`, no `native_decide`.
 
 noncomputable section
 
-namespace Holonics.HNN.LandmarkAddress
+namespace Holonics.Compression.Landmark.Context.Address
 
-open Holonics.HNN.LandmarkTree (restrict PrunedTree StopLaw stopWeight treeLik TreeStanding
+open Holonics.Compression.Landmark.Context.Tree (restrict PrunedTree StopLaw stopWeight treeLik TreeStanding
   stop_kraft_and_dominance seqLik seqMix sequential_mixture_bounds)
 
 /-! ## 1. Bundles and the address -/
@@ -250,7 +250,7 @@ theorem bundle_causal (step : S → A → S) (read : S → F) (σ₀ : S) (D : �
   rw [address_append, address_append, hs, ha]
 
 /-- [proved-derived; formal-checked] **`bundle_restrict`: the address restricts by whole bundles.**
-* Restricting the address at `D` to `d ≤ D` (`LandmarkTree.restrict`, a `take`) is the address at
+* Restricting the address at `D` to `d ≤ D` (`Tree.restrict`, a `take`) is the address at
   `d`: restriction drops the oldest whole bundles.
 * The address at `D + 1` is the address at `D` with one older bundle appended.
 * When every bundle flattens to `k` letters (its cell, then its `k − 1` feature letters), the
@@ -573,7 +573,7 @@ theorem passage_join_bound {ι : Type*} (H : Finset ι) {a b : ι → ℕ → �
   have hpos : ∀ h, (0 : ℝ) < ((∏ t ∈ Finset.range (n h), seqMix (a h) (b h) t : ℚ) : ℝ) := by
     intro h
     have lo := (sequential_mixture_bounds (ha h) (hb h) (n h)).1
-    have hA := Holonics.HNN.LandmarkTree.seqLik_pos (ha h) (n h)
+    have hA := Holonics.Compression.Landmark.Context.Tree.seqLik_pos (ha h) (n h)
     have hmax : (0 : ℚ) < max (seqLik (a h) (n h)) (seqLik (b h) (n h)) / 2 :=
       half_pos (lt_of_lt_of_le hA (le_max_left _ _))
     exact_mod_cast lt_of_lt_of_le hmax lo
@@ -589,12 +589,12 @@ theorem passage_join_bound {ι : Type*} (H : Finset ι) {a b : ι → ℕ → �
 omit [DecidableEq A] in
 /-- [proved-derived; formal-checked] **`cell_only_dominance_with_feature_charge`.** At one dyadic
 cell, let `a_t` be the cell branch's faces of its routed digits and `b_t` the bundle branch's, joined
-by the sequential mixture `q_t` (`LandmarkTree.seqMix`, the ratio stepped after every digit). When
+by the sequential mixture `q_t` (`Tree.seqMix`, the ratio stepped after every digit). When
 the cell branch's faces multiply to its tree weight under the declared stop-weight law `w`,
-`∏_(t<n) a_t = W_cells` (`LandmarkTree.stop_weight_step`'s telescope):
+`∏_(t<n) a_t = W_cells` (`Tree.stop_weight_step`'s telescope):
 * the join codes within one bit of the cell tree: `−log₂ ∏ q ≤ −log₂ W_cells + 1`;
 * for every cell-only pruned tree `S`, `−log₂ ∏ q ≤ (−log₂ prior_w(S) + 1) − log₂ ∏_(leaves of S) E`
-  (`LandmarkTree.stop_kraft_and_dominance`): the embedded cell tree costs its own prior's code and
+  (`Tree.stop_kraft_and_dominance`): the embedded cell tree costs its own prior's code and
   the join's one bit; at `w = ½` the prior's code is `Γ(S)` (`PrunedTree.prior_half_bits`);
 * **over the passage, at most one bit a dyadic cell opened** (`passage_join_bound`): for the
   dyadic cells `H` a passage opens, an executed enlarged code `L` within its certified drift `ρ`
@@ -646,4 +646,4 @@ section Audit
 
 end Audit
 
-end Holonics.HNN.LandmarkAddress
+end Holonics.Compression.Landmark.Context.Address

@@ -15,7 +15,7 @@ pub(super) const OPEN_BUDGET: u64 = 1 << 40;
 
 /// The test fields declare `2^16` cells, well within the receiving tree's declaration: at `|A| = 4`,
 /// `D = 2` it is refused only from 1,712,317 = 233·7349 cells, where a lattice product itself passes 128 bits
-/// (the carrier past `u128` rebases, campaign 2: `hnn::landmark`'s header).
+/// (the carrier past `u128` rebases, campaign 2: `compression::landmark::context`'s header).
 ///
 /// **The six-ring path of `release.py`**: rings of period 2 (realified width 4) joined `(g, g+1)` on
 /// node 0 (channel width 2), exponents 0 (so `G_a = Y_a`), source ring 0, receiving ring 2 with
@@ -47,7 +47,7 @@ pub(super) fn path_with(aperture: usize, junctions: &[Rat], contacts: &[Rat]) ->
                 aperture,
                 tolerance: rat(1, 16),
                 depth: 2,
-                prior: crate::hnn::StopPrior::half(),
+                prior: crate::compression::landmark::context::StopPrior::half(),
             }],
             crib: CribDeclaration {
                 window: 16,
@@ -107,7 +107,7 @@ pub(super) fn chain_declaration(population: u64) -> FieldDeclaration {
             aperture: 2,
             tolerance: rat(1, 16),
             depth: 2,
-            prior: crate::hnn::StopPrior::half(),
+            prior: crate::compression::landmark::context::StopPrior::half(),
         }],
         crib: CribDeclaration {
             window: 16,

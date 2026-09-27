@@ -60,12 +60,12 @@
 use std::collections::BTreeMap;
 use std::time::Instant;
 
+use holonics::compression::landmark::context::Letter;
 use holonics::geometry::RatVec3;
 use holonics::geometry::screw::ScrewGenerator;
 use holonics::hnn::constitution::LandmarkStep;
 use holonics::hnn::constitution::{FactorGradient, LinearLocus};
 use holonics::hnn::field::{ConstitutionRead, CribDeclaration, ReceiverDeclaration};
-use holonics::hnn::landmark::Letter;
 use holonics::hnn::pending::PendingRatio;
 use holonics::hnn::propagation::path_attenuation;
 use holonics::hnn::receiving::GrainCell;
@@ -200,7 +200,7 @@ fn chain() -> Field {
                 aperture: 2,
                 tolerance: rat(1, 16),
                 depth: 2,
-                prior: holonics::hnn::StopPrior::half(),
+                prior: holonics::compression::landmark::context::StopPrior::half(),
             }],
             crib: CribDeclaration {
                 window: 16,
@@ -925,7 +925,7 @@ fn termwise(
 }
 
 /// **The landmark deposit's exact accounting at one deposit** (Decision 28; Lean
-/// `HNN/LandmarkTree.landmark_step`): the staged landmark steps are one per target of the window,
+/// `Compression/Landmark/Context/Tree.landmark_step`): the staged landmark steps are one per target of the window,
 /// in cell order, each at its phase's causal address; the published tree has passed exactly those
 /// cells more than its predecessor, and the reading reports them. Returns the steps checked.
 fn landmark_accounting(step: &Deposited<'_>) -> usize {

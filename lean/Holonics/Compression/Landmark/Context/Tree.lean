@@ -5,7 +5,7 @@ import Holonics.Compression.Core.Cost
 import Holonics.Foundation.Standing
 
 /-!
-# HNN.LandmarkTree: the receiving parametron's storage as a tree of landmarks
+# Compression.Landmark.Context.Tree: the receiving parametron's storage as a tree of landmarks
 
 [definition; agent-inferred] Decision 28 of the step 4 design (`docs/plans/THE_REBUILD.md`), from
 Brandon's direction and Sol's derivation (`research/records/2026-09-25_THE_COMPRESSION_IS_OF_
@@ -42,6 +42,13 @@ The standing is the count table at every node (`TreeStanding`): no occurrence li
 The routed subsequences appear only in the proof that each node's KT mass is the sequential KT
 likelihood of what reached it (`standing_is_routed_counts`).
 
+[proved-derived; formal-checked] **The tree is the shift navigator's landmarks** (the unity audit of
+September 27): a node is a context where the source's paths converge. Each pruned tree is a
+candidate standing on the shift navigator's words and the weight is the stop prior's mixture over
+them (`Context/Standing.{address_standing, leaf_standing, mixture_over_leaf_standings}`), and a
+node's arrivals are the epochs of its section, on which its register is read
+(`Context/Epoch.{arrivals_are_epochs, capped_register_on_epochs}`).
+
 [proved-derived; formal-checked] What is proved.
 
 1. **Address and scale square** (`address_scale_square`, `digit_context_square`,
@@ -68,7 +75,7 @@ likelihood of what reached it (`standing_is_routed_counts`).
    `kraft_and_dominance`): the weight is the mixture over pruned trees with weights `2^(−Γ(S))`,
    these weights sum to one, and `−log₂ W ≤ Γ(S) − log₂ ∏ E` for every pruned tree. Each is the
    declared stop-weight law's at `w = ½` (item 12).
-5. **Depth one is Decision 27** (`depth_one_is_decision_27`): at depth one with the forced split
+5. **Depth one is Decision 27** (`depth_one_is_the_whole_cell_table`): at depth one with the forced split
    `λ_0 = 0`, the face is `RegionCounts.countFace` of the KT masses the region word deposits at the
    preceding cell (`regionRun_local`, `count_face_eq_kt`); ordinary CTW at depth one mixes in the
    root face with `0 < λ_0 < 1`. This is the whole-cell emission (`|A|`-ary masses at a node),
@@ -119,8 +126,8 @@ likelihood of what reached it (`standing_is_routed_counts`).
     `r < 2^(1−W)`. **The executed face's bound** (`executed_face_bound`, campaign 2): the executed
     face at the executed address lies within `ε/(μ − ε) + ρ_A` in `ln` of the ideal face at the
     ideal address, `ε` the lattice deviation, `μ` the ideal face's floor and `ρ_A` the address
-    residual, zero when host and card read the same bundle codes (`HNN/LandmarkAddress`); the
-    carriers' rebase past `u128` is `HNN/LandmarkCarrier`.
+    residual, zero when host and card read the same bundle codes (`Compression/Landmark/Context/Address`); the
+    carriers' rebase past `u128` is `Compression/Landmark/Context/Carrier`.
 
 11. **The receiver's mixture of two faces** (`sequential_mixture`, `sequential_mixture_bounds`,
     `sequential_mixture_executed`; section 10): for positive faces `a_t`, `b_t` of the targets with
@@ -169,8 +176,8 @@ likelihood of what reached it (`standing_is_routed_counts`).
     each node holds its register and own weight, which are the law's of its routed subsequence (a
     function of the sequence, not of its counts); the node law's tree steps by its face, its face is
     positive and normalized, and KT's node law (`ktLaw`: counts, `bump`, `ktFace`) is Decision 28's
-    standing. The capped register (Decision 39) is `HNN/LandmarkCapacity.capLaw`, and the compacted
-    tree under any node law is `HNN/LandmarkCompaction.compacted_node_law`.
+    standing. The capped register (Decision 39) is `Compression/Landmark/Context/Capacity.capLaw`, and the compacted
+    tree under any node law is `Compression/Landmark/Context/Compaction.compacted_node_law`.
 
 [counterexample; formal-checked]
 * `budget_eviction_changes_face`: evicting an occupied child by budget alone changes a later face
@@ -202,7 +209,7 @@ invariant** (Rust `landmark::binary_log`); both are checked by the Rust tests. T
 on the standing real cut) are measurement receipts, not theorems. The campaign 5 merge laws are not
 stated here: they have no consumer yet.
 
-The Rust consumer is `crates/holonics/src/hnn/landmark.rs` (`hnn::landmark`, written beside this
+The Rust consumer is `crates/holonics/src/compression/landmark/context.rs` (`compression::landmark::context`, written beside this
 owner): `StopPrior` (item 12's declared law on the dyadic ladder, founding each node at
 `β₀ = 2^(j_d) − 1`; `choose_prior` chooses it on the development cells), `Capacity` (item 13's node
 law at the capped register, Decision 39), `Landmarks` (the tree
@@ -219,7 +226,7 @@ No `sorry`, no `axiom`, no `native_decide`.
 
 noncomputable section
 
-namespace Holonics.HNN.LandmarkTree
+namespace Holonics.Compression.Landmark.Context.Tree
 
 open Holonics.HNN.RegionCounts (ktProb ktPrior countFace countRun targetWord regionRun)
 open Holonics.Foundation.FractalPacking (Hand Cell descend root child)
@@ -1458,7 +1465,7 @@ def regionWord (obs : List (List Ltr × A)) : List (List Ltr × ℚ × A) :=
 
 open Holonics.HNN.RegionCounts (target regionRun_local count_face_eq_kt) in
 omit [Fintype Ltr] in
-/-- [proved-derived; formal-checked] **`depth_one_is_decision_27`.** At depth one with the forced
+/-- [proved-derived; formal-checked] **`depth_one_is_the_whole_cell_table`.** At depth one with the forced
 split `λ_0 = 0`, the tree's face at an address `a` is the face of the depth-one node, and it equals
 Decision 27's region face: `RegionCounts.countFace` of the KT masses the region word deposited at
 the region `a.take 1` (`regionRun_local`, `count_face_eq_kt`), which is KT's
@@ -1466,7 +1473,7 @@ the region `a.take 1` (`regionRun_local`, `count_face_eq_kt`), which is KT's
 weighs in the root's context-free face with `0 < λ_0 < 1` (`lamAt_mem`). The node faces here are
 the whole-cell emission's `|A|`-ary KT faces; the digit emission's depth-one forced case multiplies
 binary KT faces over the cell's opened digits and is not this face. -/
-theorem depth_one_is_decision_27 [Nonempty A] (obs : List (List Ltr × A)) {a : List Ltr}
+theorem depth_one_is_the_whole_cell_table [Nonempty A] (obs : List (List Ltr × A)) {a : List Ltr}
     (ha : 1 ≤ a.length) (lam : ℕ → ℚ) (h0 : lam 0 = 0) (c : A) :
     pathFace (kAt (nodeCounts obs) a) lam 1 0 c =
         countFace (regionRun (fun _ => ktPrior) (regionWord obs) (a.take 1)) c ∧
@@ -1492,7 +1499,7 @@ end Tree
 /-! ## 4′. Node laws: the register a landmark keeps of what reached it (Decision 39)
 
 A landmark's storage is a register on its own clock, its arrivals. Decisions 28–37 kept KT's counts,
-an exchangeable register; Decision 39 gives the register a capacity (`HNN/LandmarkCapacity`). The
+an exchangeable register; Decision 39 gives the register a capacity (`Compression/Landmark/Context/Capacity`). The
 tree weighting reads a node only through its **own weight** (the sequential likelihood of what
 reached it) and its **face** (read from its register before the next arrival), so every law of the
 own-weight tree (section 4, `ownWeight`, `own_weight_step₀`; section 5, `own_mixture_over_trees`,
@@ -1847,7 +1854,7 @@ theorem PrunedTree.prior_sum (w : ℕ → ℚ) :
     ring
 
 omit [DecidableEq Ltr] in
-theorem PrunedTree.prior_pos {w : ℕ → ℚ} (hw : Holonics.HNN.LandmarkTree.StopLaw w) :
+theorem PrunedTree.prior_pos {w : ℕ → ℚ} (hw : Holonics.Compression.Landmark.Context.Tree.StopLaw w) :
     ∀ m d (S : PrunedTree Ltr m), 0 < PrunedTree.prior w m d S
   | 0, _, _ => by simp [PrunedTree.prior]
   | m + 1, d, S => by
@@ -2445,7 +2452,7 @@ end Digits
 section Lattice
 
 /-- [definition] **The lattice path from depth `d` with `m` levels below** (the digit `0`, Rust
-`hnn::landmark::Landmarks`): the leaf reads its KT face rounded to the lattice `2^(−M)ℤ`,
+`compression::landmark::context::Landmarks`): the leaf reads its KT face rounded to the lattice `2^(−M)ℤ`,
 `⟦k_d⟧`, and a node its rounded mixture `⟦λ̂_d k_d + (1 − λ̂_d) q̂_(d+1)⟧`, each by `executedSplit`
 (nearest, ties up, clamped into `[2^(−M), 1 − 2^(−M)]`). The first unfounded depth reads the prior
 (`k = 1/2`, which rounds to itself), a forced depth has `λ̂ = 0`. -/
@@ -3601,7 +3608,7 @@ section Audit
 #print axioms wordSum_eq_sum
 #print axioms mixture_is_probability
 #print axioms standing_is_routed_counts
-#print axioms depth_one_is_decision_27
+#print axioms depth_one_is_the_whole_cell_table
 #print axioms PrunedTree.cost_eq
 #print axioms PrunedTree.prior_const
 #print axioms PrunedTree.prior_half_bits
@@ -3662,4 +3669,4 @@ section Audit
 
 end Audit
 
-end Holonics.HNN.LandmarkTree
+end Holonics.Compression.Landmark.Context.Tree

@@ -1,19 +1,19 @@
 // **The landmark tree on the card, stored at the faces where paths part** (campaign 2, the storage where paths part;
 // #73 with #76; owner `src/hnn/tree.rs`).
 //
-// The receiving parametron's storage as a tree of landmarks (`holonics::hnn::landmark`), mirrored
+// The receiving parametron's storage as a tree of landmarks (`holonics::compression::landmark::context`), mirrored
 // on the card: the all-class face read of a phase (the digit-0 split at every splitting dyadic
 // cell, each branch's opened path and the join) and the opened-path update of a deposit (each
 // mixing chain's β step, a parting chain's split, the founding of the upper part and the leaf, the
 // label run, the masses and their register's carry at the declared ceiling, the register's capacity), with the
 // host's exact integer law: every path face a numerator of `2^(−M_p)`, every β an odd/odd ratio of
-// `W` bits with its binary exponent, every product and quotient in 128-bit words, the carrier's rebase past `u128` at `R` bits (Lean `HNN/LandmarkTree`
-// §6′, `HNN/LandmarkCarrier`), and each split's two ratios formed exactly on 512-bit integers and
-// carried once at `W` bits (Lean `HNN/LandmarkCompaction.chain_split`). No float. The mirror carries
+// `W` bits with its binary exponent, every product and quotient in 128-bit words, the carrier's rebase past `u128` at `R` bits (Lean `Compression/Landmark/Context/Tree`
+// §6′, `Compression/Landmark/Context/Carrier`), and each split's two ratios formed exactly on 512-bit integers and
+// carried once at `W` bits (Lean `Compression/Landmark/Context/Compaction.chain_split`). No float. The mirror carries
 // what the reads need (the masses, the charts' β and stop weights, the topology, the labels); the
 // certificates stay with the host's constitution, whose tree is the owner.
 //
-// [definition] **The arena** (the host's layout, `hnn::landmark`'s "The arena"; the storage where paths part): nodes
+// [definition] **The arena** (the host's layout, `compression::landmark::context`'s "The arena"; the storage where paths part): nodes
 // numbered in founding order, each a stored chain; `roots[t]` the root of tree `t = branch · 2^B +
 // h` (`TREE_NONE` unfounded); the child table an open-addressing hash from `(parent << 32) | letter`
 // to the child (linear probing, `TABLE_EMPTY` free); each node's depth word (its bottom depth, its
@@ -117,7 +117,7 @@ __device__ __forceinline__ uint64_t tree_round(u128 numerator, u128 denominator,
     return r;
 }
 
-// **The stop weight** `λ̂ = ⟦β/(1 + β)⟧` on `2^(−M)` (`landmark::Beta::stop_weight`), decided
+// **The stop weight** `λ̂ = ⟦β/(1 + β)⟧` on `2^(−M)` (`context::Beta::stop_weight`), decided
 // before any division once `|e| > M + W` (the single division's realization, whose operands the
 // mirror admits: `2W + M + 3 ≤ 128`).
 __device__ uint64_t tree_stop_weight(uint64_t numerator, uint64_t denominator, int64_t exponent,
@@ -140,7 +140,7 @@ __device__ uint64_t tree_stop_weight(uint64_t numerator, uint64_t denominator, i
     }
 }
 
-// **One step of the carried ratio with the carrier's rebase** (`landmark::Beta::step`).
+// **One step of the carried ratio with the carrier's rebase** (`context::Beta::step`).
 __device__ TreeChart tree_beta_step(u128 numerator, u128 denominator, int64_t exponent,
                                     uint32_t width, uint32_t rebase, uint32_t face) {
     uint32_t twos_n = tree_ctz(numerator), twos_d = tree_ctz(denominator);
@@ -307,7 +307,7 @@ __device__ u128 big_quotient(const Big& num, const Big& den) {
     return q;
 }
 
-// **A positive ratio `(N/D) 2^e` carried at width `W`** (`landmark::carry_ratio`): its twos moved
+// **A positive ratio `(N/D) 2^e` carried at width `W`** (`context::carry_ratio`): its twos moved
 // into the exponent and its odd parts reduced, exact when both fit `W` bits, otherwise its `W`-bit
 // floor mantissa `m' ∈ [2^(W−1), 2^W)` (unique for the ratio, so read from the unreduced parts).
 __device__ void big_carry(Big n, Big d, int64_t exponent, uint32_t width, uint64_t& numerator,
@@ -348,7 +348,7 @@ __device__ void big_carry(Big n, Big d, int64_t exponent, uint32_t width, uint64
     carried = exponent - shift + (int64_t)twos;
 }
 
-// **A chain's split ratios** (`landmark::Beta::split`; Lean `HNN/LandmarkCompaction.chain_split`):
+// **A chain's split ratios** (`context::Beta::split`; Lean `Compression/Landmark/Context/Compaction.chain_split`):
 // `β_ℓ = β (2^(S_low) − 1)/(2^S − 1)` and `β_u = (2^(S_up) − 1) 2^(S_low) β/(β (2^(S_low) − 1) +
 // 2^S − 1)`, `β = (n/d) 2^e`, each formed exactly and carried once at `W` bits. [proved-derived;
 // agent-inferred] Past `e ≥ E* = 2W + 2S + 4` the carried `β_u` no longer moves with `e` (its
@@ -398,8 +398,8 @@ __device__ void tree_split(uint64_t n, uint64_t d, int64_t e, uint32_t upper_run
 // the register's capacity
 // -------------------------------------------------------------------------------------------------
 
-// **The register's carry after a deposit** (`landmark::Capacity::carry`; Lean
-// `HNN/LandmarkCapacity.{capCarry, cap_carry_half_units}`): on the half-unit masses `h_b = 2n_b + 1`,
+// **The register's carry after a deposit** (`context::Capacity::carry`; Lean
+// `Compression/Landmark/Context/Capacity.{capCarry, cap_carry_half_units}`): on the half-unit masses `h_b = 2n_b + 1`,
 // when `n_0 + n_1 ≥ L = 2^c`, that is `h_0 + h_1 ≥ 2L + 2 = ceiling`, each `n_b ← ⌈n_b/2⌉`, that is
 // `h_b ← 2⌊(h_b + 1)/4⌋ + 1`. The sum is read in 64 bits, so the unbounded ceiling `u64::MAX` is
 // never reached.
@@ -461,7 +461,7 @@ __device__ __forceinline__ uint32_t tree_bottom(const uint32_t* words, uint32_t 
     return words[node] & ~TREE_BRANCH_BIT;
 }
 
-// **The chart a chain of summed rung `S ≥ 1` is founded with** (`landmark::Law::chain`):
+// **The chart a chain of summed rung `S ≥ 1` is founded with** (`context::Law::chain`):
 // `2^S − 1`, carried as `(2^W − 1) 2^(S − W)` past `W` bits.
 __device__ TreeChart tree_chain(uint32_t rung, uint32_t face, uint32_t width) {
     TreeChart chart;
@@ -492,7 +492,7 @@ struct TreeRead {
     TreeChart lower;
 };
 
-// **A chain's split at `depth`** (`landmark::Law::part`): the stored chain `node` from `top` parts
+// **A chain's split at `depth`** (`context::Law::part`): the stored chain `node` from `top` parts
 // at `depth`; above the forced depths its upper part passes its face (the founding chart), above a
 // leaf it is founded at `2^(S_up) − 1`, above an internal bottom both parts' ratios are formed.
 __device__ void tree_part(const TreeLaw& law, const TreeArena& a, uint32_t branch, uint32_t top,
@@ -521,7 +521,7 @@ __device__ void tree_part(const TreeLaw& law, const TreeArena& a, uint32_t branc
     read.has_lower = 1;
 }
 
-// **One branch's read** (`landmark::Law::read`): the walk from the root, each stored node's label
+// **One branch's read** (`context::Law::read`): the walk from the root, each stored node's label
 // compared letter by letter below its top to its bottom; the first letter that differs parts the
 // path at the depth above it (the chain splits there, `tree_part`); a leaf at `D` stops the walk at
 // its own face; a missing child stops it at the prior `½`. Then the faces bottom-up: a level above
@@ -599,7 +599,7 @@ __device__ __forceinline__ uint64_t tree_side(uint64_t zero, uint32_t symbol, ui
 //
 // [definition] **`hnn_tree_splits`**: for phase `blockIdx.x` and each splitting dyadic cell
 // `h = splitting[i]`, the digit-0 face `q̂_h`: each branch's opened path read bottom-up
-// (`landmark::Law::read`) and, in an enlarged tree, their join `⟦λ̂_h q̂_cells + (1 − λ̂_h)
+// (`context::Law::read`) and, in an enlarged tree, their join `⟦λ̂_h q̂_cells + (1 − λ̂_h)
 // q̂_bundles⟧`. Realization: one block per phase; thread `t` takes the cells `i ≡ t mod
 // blockDim.x`, each cell's paths serial in its thread (at most `D_b + 1` stored chains and `D_b`
 // letters compared a branch, and at most one split's ratios). Every thread reads the shared
@@ -630,7 +630,7 @@ extern "C" __global__ void hnn_tree_splits(TreeLaw law, TreeArena arena, const u
 // the opened-path update
 // -------------------------------------------------------------------------------------------------
 //
-// [definition] **`hnn_tree_deposit`**: one cell's deposit (`landmark::Law::apply` without the
+// [definition] **`hnn_tree_deposit`**: one cell's deposit (`context::Law::apply` without the
 // certificates, which the host's tree keeps). Thread `i` takes the `i`-th opened digit
 // `(h, b) = digits[i]` and reads each branch's path at the standing. The block then holds each
 // branch's label run (the address's letters below the shallowest leaf this cell founds in that
@@ -931,7 +931,7 @@ extern "C" __global__ void hnn_tree_gather(TreeArena a, const uint32_t* nodes, u
 
 // [definition] **`hnn_tree_beta_steps`**: the card's β step (`tree_beta_step`, the carrier's rebase
 // included) on `count` operand pairs, one thread each, for its parity against the host's
-// `landmark::Beta::step`. Operands as 64-bit halves: `N = n_hi 2^64 + n_lo`, likewise `D`.
+// `context::Beta::step`. Operands as 64-bit halves: `N = n_hi 2^64 + n_lo`, likewise `D`.
 extern "C" __global__ void hnn_tree_beta_steps(const uint64_t* operands, const int64_t* exponents,
                                                uint32_t count, uint32_t width, uint32_t rebase,
                                                uint32_t face, TreeChart* out) {
@@ -944,7 +944,7 @@ extern "C" __global__ void hnn_tree_beta_steps(const uint64_t* operands, const i
 
 // [definition] **`hnn_tree_split_ratios`**: the card's split (`tree_split`, each ratio's stop
 // weight) on `count` charts `(β_n, β_d, β_e)` with rungs `(S_up, S_low)`, one thread each, for its
-// parity against the host's `landmark::Beta::split`: row `i` of `out` holds the upper part's chart,
+// parity against the host's `context::Beta::split`: row `i` of `out` holds the upper part's chart,
 // then the lower part's.
 extern "C" __global__ void hnn_tree_split_ratios(const uint64_t* charts, const int64_t* exponents,
                                                  const uint32_t* rungs, uint32_t count,

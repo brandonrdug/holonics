@@ -9,9 +9,9 @@
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
+use crate::compression::landmark::context::code_length;
 use crate::hnn::HnnError;
 use crate::hnn::born::{Born, BornDeclaration, BornWidths, Emission, Word, born_split};
-use crate::hnn::landmark::code_length;
 use crate::ratio::Rat;
 use crate::ratio::gaussian::GaussianRat;
 
