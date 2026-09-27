@@ -3323,7 +3323,13 @@ material covectors must enter the current deposition consumer and change a later
 lattice: `C = g_C² C₀`, `K = g_K² K₀`, `D = g_D² D₀`, and pump strength `p = g_P² p₀`.
 The bases, pump axis and pump step are immutable declaration operands. The gain covectors contract
 the material variation above with `2g` times its base. This preserves positive-semidefinite `C,D`
-and retains the signed stiffness base; zero amplitude may collapse its rank. Deposition re-certifies all pump phases before atomic
+and retains the signed stiffness base. A gain never reaches zero by deposition. Releasing a
+material family belongs to campaign 3's collapse law, with its receipt. A step whose carried gain
+would be `≤ 0` carries the gain to the lattice point `⌊(q + 1)/2⌋ 2^(−L)` for `g = q 2^(−L)`
+instead. That is `g/2` when `q` is even, rounded toward `g` when `q` is odd, and the gain holds at
+`q = 1` (Lean `HNN/Ring.gain_backtrack_midpoint`). The deposit receipt names each substitution
+(`DepositReading::backtracks`). The gain lattice follows the lattice rule with the ring's realified
+width as its fan-in (`field::lattice_exponent`). Deposition re-certifies all pump phases before atomic
 publication and refuses a candidate that fails. This is the admitted learning family, not a claim
 of arbitrary matrix or clock learning. The retained gains, their lattice remainders and statistics
 are counted in the constitution, and the next word reads them.
@@ -3357,6 +3363,25 @@ give the exact enclosures, cost, balance and hardware scope. Campaign 3 begins w
 future-kernel owner and the concrete source/phase/receiver squares above. The phase-dependent
 loaded-material growth bound remains in #62 beside the complete counterfactual sensitivity and
 diamond/deposition joins; the deposit receipt now names its contact-only growth certificate.
+
+**Reviewed and repaired (September 27).** A review of the implementation found no defect in the
+law: the forward, the adjoint and all four gain covectors match the exact tangent, including on
+signed and non-diagonal stiffness with a pump. It found that the receipts proved less than they
+claimed, and the repair closes each gap:
+- **The solve is bounded.** The resonator's solve and split terms now carry a certified bound,
+  `‖ω‖₁(δ_t‖r‖∞ + ‖M_t‖∞u) + (u/2)(‖C(ŵ′ + w′)‖₁ + ‖K_t(û′ + u′)‖₁)`, summed into the tick and
+  word bounds. A perturbed solve now fails the balance (Lean `HNN/Ring.{loaded_solve_chart_bound,
+  loaded_state_split_bound}`).
+- **The zero interconnection defect** is recorded as structural: it holds by construction.
+- **A gain never releases by deposition** (the rule above).
+- **The kernels.** A status race in the card's word kernels is removed. The card deposit's
+  fallible steps run inside its restoring trial. The standalone resonator kernel, a second
+  realization with no runtime consumer, is retired. The resonator operands are cached per
+  publication.
+
+The host re-run reproduces the recorded codes exactly. It reads the carried remainders of the `C`
+and `K` gains, each below half a lattice unit, which is why those amplitudes did not move. Commit
+`0fca6416`.
 
 #### Decision 39. A landmark's storage has a capacity: at its ceiling it carries
 
