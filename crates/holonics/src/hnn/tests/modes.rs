@@ -1,20 +1,28 @@
-//! Campaign 3's first construction (Lean `HNN/ModeQuotient`): a loaded ring's modes descend to
-//! their future quotient. The two-receiver, later-phase witness with its exact ranks and separators,
-//! the period lift read against the owner's tick, the squares at the consumer, the storage-null
-//! release, the pumped dormant pair one chart cannot release, and the loaded word comparison.
+//! Campaign 3's first construction and its material descent (Lean `HNN/ModeQuotient`): a loaded
+//! ring's modes descend to their future quotient. The two-receiver, later-phase witness with its
+//! exact ranks and separators, the period lift read against the owner's tick, the squares at the
+//! consumer, the storage-null release, the pumped dormant pair one chart cannot release, and the
+//! loaded word comparison; then the learning covector through the chart against the word's return
+//! and the deposit's features, the standing pump at threshold whose release a learning aeon
+//! retains, and the descended block's tick against the owner's balance.
 
 use num_traits::{One, Zero};
 
 use super::learning::{chain, generic, moment, phases};
+use super::port::cut_at;
 use super::support::Draw;
-use crate::hnn::modes::{LoadedRing, ModeQuotient, Separator, Silence, StateReceiver};
+use crate::hnn::modes::{
+    DescendedTick, GAIN_FAMILIES, GainDescent, LoadedRing, ModeQuotient, ReadingCovector,
+    Separator, Silence, StateReceiver,
+};
 use crate::hnn::ring::{
     PumpDeclaration, PumpStep, ResonatorMaterial, ResonatorOperands, ResonatorRemainders,
+    ResonatorStep,
 };
-use crate::hnn::word::Word;
+use crate::hnn::word::{ResonatorBalance, Word};
 use crate::holon::parametron::Carrier;
 use crate::ratio::linear::ExactRatMatrix;
-use crate::ratio::linear::vector::{add, is_zero, matrix, zeros};
+use crate::ratio::linear::vector::{add, dot, is_zero, matrix, scale, sub, zeros};
 use crate::ratio::{Rat, integer, rat};
 
 // -------------------------------------------------------------------------------------------
@@ -95,6 +103,39 @@ fn pumped_dormant() -> ResonatorMaterial {
         ExactRatMatrix::zero(2, 2).unwrap(),
         ExactRatMatrix::zero(2, 2).unwrap(),
         Some(half_pump(rat(1, 4))),
+    )
+    .unwrap()
+}
+
+/// **The standing pump at threshold**: one node, `C = 1`, `K = 1`, no dissipation, a standing pump
+/// (`P = 1`) of strength `½` on the axis `1`: `K_0 = 1 + diag(−1, 1) = diag(0, 2)`. The pump
+/// cancels the stiffness on the displacement `u_x`, a static mode that moves no rate.
+fn standing_threshold() -> ResonatorMaterial {
+    ResonatorMaterial::new(
+        ExactRatMatrix::identity(2).unwrap(),
+        ExactRatMatrix::identity(2).unwrap(),
+        ExactRatMatrix::zero(2, 2).unwrap(),
+        Some(
+            PumpDeclaration::new(
+                rat(1, 2),
+                Carrier::new(Rat::one(), Rat::zero()).unwrap(),
+                PumpStep::Stand,
+            )
+            .unwrap(),
+        ),
+    )
+    .unwrap()
+}
+
+/// **The pumped cycle**: the two-node cycle's forms `C = 2L̃`, `K = 4L̃`, `D = ⅛` and a half-turn
+/// pump of strength `1/16` on the axis at `½` (the loaded word's material).
+fn pumped_cycle() -> ResonatorMaterial {
+    let pump = PumpDeclaration::new(rat(1, 16), Carrier::at(&rat(1, 2)), PumpStep::Half).unwrap();
+    ResonatorMaterial::new(
+        cycle_form(2, &Rat::one()),
+        cycle_form(2, &integer(2)),
+        ExactRatMatrix::identity(4).unwrap().scaled(&rat(1, 8)),
+        Some(pump),
     )
     .unwrap()
 }
@@ -589,16 +630,8 @@ fn the_descended_ring_reproduces_the_loaded_word() {
     let field = chain().with_exact_word();
     let width = field.ring(0).width();
     assert_eq!(width, 4);
-    let pump = PumpDeclaration::new(rat(1, 16), Carrier::at(&rat(1, 2)), PumpStep::Half).unwrap();
-    let material = ResonatorMaterial::new(
-        cycle_form(2, &Rat::one()),
-        cycle_form(2, &integer(2)),
-        ExactRatMatrix::identity(width).unwrap().scaled(&rat(1, 8)),
-        Some(pump),
-    )
-    .unwrap();
     let theta = generic(&field, 311)
-        .with_ring_resonator(&field, 0, material)
+        .with_ring_resonator(&field, 0, pumped_cycle())
         .unwrap();
     let (current, open) = moment(&field, 312, 12);
     let admitted = phases(&field, &theta, &current);
@@ -649,4 +682,479 @@ fn the_descended_ring_reproduces_the_loaded_word() {
     for (step, wave) in steps.iter().zip(&descended) {
         assert_eq!(&step.output, wave);
     }
+    // The descended block's balance is the word's resonator balance, term for term.
+    let balance = ResonatorBalance::of(0, word.resonances()[0].as_ref().unwrap());
+    assert!(balance.closes());
+    assert!(balance.chart.is_zero() && balance.split.is_zero());
+    let ticks = quotient
+        .ticks(&quotient.retained(&zeros(2 * width)).unwrap(), &drive)
+        .unwrap();
+    assert!(ticks.iter().all(DescendedTick::closes));
+    let sum = |term: fn(&DescendedTick) -> &Rat| ticks.iter().map(term).sum::<Rat>();
+    assert_eq!(ticks.last().unwrap().after, balance.end);
+    assert_eq!(sum(|tick| &tick.pump), balance.pump);
+    assert_eq!(sum(|tick| &tick.port), balance.port);
+    assert_eq!(sum(|tick| &tick.dissipation), balance.dissipation);
+    assert!(!balance.port.is_zero() && !balance.dissipation.is_zero());
+}
+
+// -------------------------------------------------------------------------------------------
+// the material and deposition descent
+
+/// The owner's executed ticks over a drive sequence from a state.
+fn owner_steps(
+    operands: &ResonatorOperands,
+    state: &[Rat],
+    drives: &[Vec<Rat>],
+) -> Vec<ResonatorStep> {
+    let n = operands.width();
+    let mut current = state.to_vec();
+    drives
+        .iter()
+        .enumerate()
+        .map(|(tick, drive)| {
+            let stepped = operands
+                .step(
+                    tick,
+                    drive,
+                    [&current[..n], &current[n..]],
+                    &ResonatorRemainders::default(),
+                    None,
+                )
+                .unwrap();
+            current = [stepped.state[0].clone(), stepped.state[1].clone()].concat();
+            stepped
+        })
+        .collect()
+}
+
+/// **The full ring's return** on the owner's operands, in the word's return formulas
+/// (`hnn::port`): backward from the word's end, `z̄ = hū′ + 2w̄′ − (2/Y)s̄`, `r̄ = X_tᵀ z̄`,
+/// `ē = s̄ + h r̄`, `ū = ū′ − hK_tᵀ r̄`, `w̄ = −w̄′ + 2Cᵀ r̄`, with each declared receiver's `Rᵀ ȳ`
+/// added at its tick. The state covectors, drive covectors and solved covectors, by tick.
+#[allow(clippy::type_complexity)]
+fn owner_return(
+    operands: &ResonatorOperands,
+    receivers: &[StateReceiver],
+    ticks: usize,
+    covectors: &[ReadingCovector],
+) -> (Vec<Vec<Rat>>, Vec<Vec<Rat>>, Vec<Vec<Rat>>) {
+    let n = operands.width();
+    let h = operands.hop().clone();
+    let port = integer(2) / operands.admittance();
+    let capacity = operands.material().forms().0.transpose().unwrap();
+    let mut state_bar = zeros(2 * n);
+    let (mut costates, mut drive_bars, mut solved) = (
+        vec![Vec::new(); ticks],
+        vec![Vec::new(); ticks],
+        vec![Vec::new(); ticks],
+    );
+    for t in (0..ticks).rev() {
+        let phase = operands.phase_at(t);
+        let mut port_bar = zeros(n);
+        let mut received = zeros(2 * n);
+        for covector in covectors.iter().filter(|c| c.tick == t) {
+            if covector.receiver == 0 {
+                port_bar = add(&port_bar, &covector.covector);
+            } else {
+                let reading = receivers[covector.receiver - 1]
+                    .reading()
+                    .transpose()
+                    .unwrap();
+                received = add(&received, &reading.apply(&covector.covector).unwrap());
+            }
+        }
+        let (u_bar, w_bar) = state_bar.split_at(n);
+        let z = sub(
+            &add(&scale(&h, u_bar), &scale(&integer(2), w_bar)),
+            &scale(&port, &port_bar),
+        );
+        let r = operands.solve_transpose(phase, &z).unwrap();
+        let stiffness = operands.stiffness(phase).transpose().unwrap();
+        let u = sub(u_bar, &scale(&h, &stiffness.apply(&r).unwrap()));
+        let w = add(
+            &scale(&integer(-1), w_bar),
+            &scale(&integer(2), &capacity.apply(&r).unwrap()),
+        );
+        drive_bars[t] = add(&port_bar, &scale(&h, &r));
+        state_bar = add(&[u, w].concat(), &received);
+        costates[t] = state_bar.clone();
+        solved[t] = r;
+    }
+    (costates, drive_bars, solved)
+}
+
+/// The pump's unit-strength base form at a phase, its node block on every node.
+fn pump_base_form(pump: &PumpDeclaration, phase: usize, width: usize) -> ExactRatMatrix {
+    let block = pump.with_strength(Rat::one()).unwrap().block(phase);
+    matrix(width, width, |r, c| {
+        if r / 2 == c / 2 {
+            block[r % 2][c % 2].clone()
+        } else {
+            Rat::zero()
+        }
+    })
+    .unwrap()
+}
+
+/// **The deposit's four gain covectors** from the full ticks and the solved covectors, in the
+/// compare's formulas (`hnn::reference::compose`): `4g_C C₀(w − ω)`, `2hg_K K₀(u + hω/2)`,
+/// `2hg_D D₀ω`, `2hg_P p₀Π_t(u + hω/2)`, the last three subtracted.
+fn owner_gains(
+    operands: &ResonatorOperands,
+    steps: &[ResonatorStep],
+    solved: &[Vec<Rat>],
+) -> [Rat; GAIN_FAMILIES] {
+    let material = operands.material();
+    let h = operands.hop();
+    let (capacity, stiffness, dissipation, strength) = material.gain_bases();
+    let gains = material.gains();
+    let mut out: [Rat; GAIN_FAMILIES] = std::array::from_fn(|_| Rat::zero());
+    for (step, r) in steps.iter().zip(solved) {
+        let (u, w) = (&step.input[0], &step.input[1]);
+        let midpoint = add(u, &scale(&(h / integer(2)), &step.rate));
+        let c = scale(
+            &(integer(4) * &gains[0]),
+            &capacity.apply(&sub(w, &step.rate)).unwrap(),
+        );
+        let k = scale(
+            &(integer(2) * h * &gains[1]),
+            &stiffness.apply(&midpoint).unwrap(),
+        );
+        let d = scale(
+            &(integer(2) * h * &gains[2]),
+            &dissipation.apply(&step.rate).unwrap(),
+        );
+        let p = match (material.base_pump(), strength) {
+            (Some(pump), Some(strength)) => scale(
+                &(integer(2) * h * &gains[3] * strength),
+                &pump_base_form(pump, step.phase, material.width())
+                    .apply(&midpoint)
+                    .unwrap(),
+            ),
+            _ => zeros(material.width()),
+        };
+        out[0] += dot(r, &c);
+        out[1] -= dot(r, &k);
+        out[2] -= dot(r, &d);
+        out[3] -= dot(r, &p);
+    }
+    out
+}
+
+/// A drawn comparison: a covector on the port's wave at every tick and on every declared receiver
+/// at the ticks it reads.
+fn comparison(
+    receivers: &[StateReceiver],
+    period: usize,
+    width: usize,
+    ticks: usize,
+    seed: u64,
+) -> Vec<ReadingCovector> {
+    let mut draw = Draw::new(seed);
+    let mut covectors = Vec::new();
+    for tick in 0..ticks {
+        covectors.push(ReadingCovector {
+            receiver: 0,
+            tick,
+            covector: draw.half_vector(width),
+        });
+        for (index, receiver) in receivers.iter().enumerate() {
+            if receiver.phases().contains(&(tick % period)) {
+                covectors.push(ReadingCovector {
+                    receiver: index + 1,
+                    tick,
+                    covector: draw.half_vector(receiver.reading().rows()),
+                });
+            }
+        }
+    }
+    covectors
+}
+
+/// **The learning covector factors through the chart** (Lean `descended_costate`,
+/// `descended_drive_covector`, `gain_fibre_invariant`, `squared_gain_variation_null`,
+/// `half_turn_separates`). On every fixture, and the pumped cycle with its dissipation: every gain
+/// family descends, so a learning aeon releases exactly what the frozen one does; for a drawn
+/// comparison on the port at every tick and on the declared receivers, the descended return from
+/// `V x` gives the full ring's costates read through the chart (`λ_t = λ̄_t V`, so `λ_t k = 0` on
+/// the release), its drive and solved covectors, and the four gain covectors of the compare's
+/// formulas, which are the same at `x + k` for every released `k`.
+#[test]
+fn the_learning_covector_factors_through_the_chart() {
+    let mut all = fixtures();
+    all.push((pumped_cycle(), Vec::new()));
+    let mut released_total = 0;
+    for (seed, (material, receivers)) in all.into_iter().enumerate() {
+        let loaded = operands(&material);
+        let ring = LoadedRing::at_cut(&loaded).unwrap();
+        let frozen = ModeQuotient::of(&ring, &receivers).unwrap();
+        let learning = ModeQuotient::learning(&ring, &receivers).unwrap();
+        let (n, extent) = (ring.width(), ring.extent());
+        for family in 0..GAIN_FAMILIES {
+            assert_eq!(frozen.gain_descent(family), Some(&GainDescent::Descends));
+            assert_eq!(learning.gain_descent(family), Some(&GainDescent::Descends));
+        }
+        assert_eq!(learning.released_rank(), frozen.released_rank());
+        assert!(same_span(
+            &learning.released().unwrap(),
+            &frozen.released().unwrap(),
+            extent
+        ));
+        let ticks = 2 * extent;
+        let state = Draw::new(901 + seed as u64).half_vector(extent);
+        let drive = drives(911 + seed as u64, n, ticks);
+        let covectors = comparison(&receivers, ring.phases().len(), n, ticks, 921 + seed as u64);
+        let (costates, drive_bars, solved) = owner_return(&loaded, &receivers, ticks, &covectors);
+        let gains = owner_gains(&loaded, &owner_steps(&loaded, &state, &drive), &solved);
+        assert!(gains.iter().any(|gain| !gain.is_zero()));
+        for quotient in [&frozen, &learning] {
+            let back = quotient
+                .pull_back(&quotient.retained(&state).unwrap(), &drive, &covectors)
+                .unwrap();
+            let chart = quotient.retain().transpose().unwrap();
+            for t in 0..ticks {
+                assert_eq!(chart.apply(&back.costates[t]).unwrap(), costates[t]);
+                assert_eq!(back.drives[t], drive_bars[t]);
+                assert_eq!(back.solved[t], solved[t]);
+            }
+            assert_eq!(back.gains, gains.clone().map(Some));
+        }
+        for direction in frozen.released().unwrap() {
+            released_total += 1;
+            for costate in &costates {
+                assert!(dot(costate, &direction).is_zero());
+            }
+            let moved = owner_steps(&loaded, &add(&state, &direction), &drive);
+            assert_eq!(owner_gains(&loaded, &moved, &solved), gains);
+        }
+    }
+    // The pumped pair (2, then 1 with its cycle receiver), the cycle base (4), the dormant pair
+    // (none) and the pumped cycle (2).
+    assert_eq!(released_total, 9);
+}
+
+/// **A standing pump at threshold reads its release; a learning aeon retains it** (Lean
+/// `standing_pump_threshold_reads_release`, `learning_chart_le_kernel`, `solved_pairing_null_iff`).
+/// The static displacement `u_x` moves no rate and is released by the frozen quotient (retained
+/// `3`, released `1`). The capacity and dissipation families descend; the stiffness and pump
+/// families read it at phase `0`, since `K₀ u_x = u_x` while `K_0 u_x = 0`. At `x + u_x` their
+/// covectors move by `∓2h Σ_t r̄_t(u_x)` (the joint scaling `g_K ∂_K + g_P ∂_P` factors), so the
+/// frozen return names no covector for them. A learning aeon retains the direction with the
+/// stiffness family's reading (retained `4 = 2²`, released `0`) and returns all four covectors. A
+/// deposit along the stiffness family makes the direction heard.
+#[test]
+fn a_standing_pump_at_threshold_reads_its_release_and_learning_retains_it() {
+    let material = standing_threshold();
+    let loaded = operands(&material);
+    let ring = LoadedRing::at_cut(&loaded).unwrap();
+    assert_eq!(ring.phases().len(), 1);
+    assert_eq!(loaded.stiffness(0), &diagonal(&[Rat::zero(), integer(2)]));
+    let static_mode = unit(4, 0);
+    let frozen = ModeQuotient::of(&ring, &[]).unwrap();
+    assert_eq!((frozen.retained_rank(), frozen.released_rank()), (3, 1));
+    assert!(same_span(
+        &frozen.released().unwrap(),
+        std::slice::from_ref(&static_mode),
+        4
+    ));
+    for family in [0, 2] {
+        assert_eq!(frozen.gain_descent(family), Some(&GainDescent::Descends));
+    }
+    for family in [1, 3] {
+        let Some(GainDescent::Reads { direction, phase }) = frozen.gain_descent(family) else {
+            panic!("family {family} reads the static displacement");
+        };
+        assert_eq!(*phase, 0);
+        assert!(same_span(
+            std::slice::from_ref(direction),
+            std::slice::from_ref(&static_mode),
+            4
+        ));
+    }
+
+    let ticks = 6;
+    let state = Draw::new(951).half_vector(4);
+    let drive = drives(952, 2, ticks);
+    let covectors = comparison(&[], 1, 2, ticks, 953);
+    let (_, _, solved) = owner_return(&loaded, &[], ticks, &covectors);
+    let at = |x: &[Rat]| owner_gains(&loaded, &owner_steps(&loaded, x, &drive), &solved);
+    let (here, moved) = (at(&state), at(&add(&state, &static_mode)));
+    assert_eq!((&here[0], &here[2]), (&moved[0], &moved[2]));
+    let (stiffness, pump) = (&moved[1] - &here[1], &moved[3] - &here[3]);
+    let reached: Rat = solved.iter().map(|r| r[0].clone()).sum();
+    assert!(!reached.is_zero());
+    assert_eq!(stiffness, integer(-2) * &reached);
+    assert_eq!(pump, integer(2) * &reached);
+    let back = frozen
+        .pull_back(&frozen.retained(&state).unwrap(), &drive, &covectors)
+        .unwrap();
+    assert_eq!(
+        back.gains,
+        [Some(here[0].clone()), None, Some(here[2].clone()), None]
+    );
+
+    let learning = ModeQuotient::learning(&ring, &[]).unwrap();
+    assert_eq!((learning.retained_rank(), learning.released_rank()), (4, 0));
+    assert_eq!(learning.exterior_requests(), &[(0, 0)]);
+    assert_eq!(learning.requests().len(), 1 + GAIN_FAMILIES);
+    assert_eq!(learning.silent().len(), 2);
+    let deposited: Vec<_> = learning
+        .silent()
+        .iter()
+        .filter_map(|coordinate| match &coordinate.silence {
+            Silence::Deposited(separator) => Some((coordinate.direction.clone(), separator)),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(deposited.len(), 1);
+    assert!(same_span(
+        std::slice::from_ref(&deposited[0].0),
+        std::slice::from_ref(&static_mode),
+        4
+    ));
+    assert_eq!(
+        deposited[0].1,
+        &Separator {
+            receiver: learning.deposit_receiver(1).unwrap(),
+            phase: 0,
+            word: Vec::new(),
+        }
+    );
+    let back = learning
+        .pull_back(&learning.retained(&state).unwrap(), &drive, &covectors)
+        .unwrap();
+    assert_eq!(back.gains, here.clone().map(Some));
+
+    // A deposit along the stiffness family: `K_0 = diag(5/4, 13/4)`, and the port hears `u_x`.
+    let after = material
+        .with_gains([Rat::one(), rat(3, 2), Rat::one(), Rat::one()])
+        .unwrap();
+    let after = LoadedRing::at_cut(&operands(&after)).unwrap();
+    assert!(!is_zero(
+        &after.phases()[0].reading.apply(&static_mode).unwrap()
+    ));
+    assert_eq!(ModeQuotient::of(&after, &[]).unwrap().released_rank(), 0);
+}
+
+/// **The descended block ticks with the full ring's balance** (Lean `descended_form`,
+/// `descended_balance_terms`, `descended_balance`, `modeForm_radical`). On every fixture, the pumped
+/// cycle and the standing pump, in both aeons: `Q_t = Vᵀ Q̄_t V` at every phase, and from `V x` the
+/// descended ticks return the owner's rate and wave and its storage before and after, pump work,
+/// port work and dissipation exactly, tick for tick, each closing; the owner's chart and split terms
+/// are zero under the exact law. From `x + k` the owner's terms are the same.
+#[test]
+fn the_descended_block_ticks_with_the_full_rings_balance() {
+    let mut all = fixtures();
+    all.push((pumped_cycle(), Vec::new()));
+    all.push((standing_threshold(), Vec::new()));
+    for (seed, (material, receivers)) in all.into_iter().enumerate() {
+        let loaded = operands(&material);
+        let ring = LoadedRing::at_cut(&loaded).unwrap();
+        let state = Draw::new(1001 + seed as u64).half_vector(ring.extent());
+        let drive = drives(1011 + seed as u64, ring.width(), 2 * ring.extent());
+        let steps = owner_steps(&loaded, &state, &drive);
+        for quotient in [
+            ModeQuotient::of(&ring, &receivers).unwrap(),
+            ModeQuotient::learning(&ring, &receivers).unwrap(),
+        ] {
+            let chart = quotient.retain();
+            for (phase, loaded_phase) in ring.phases().iter().enumerate() {
+                let lifted = chart
+                    .transpose()
+                    .unwrap()
+                    .multiply(quotient.storage(phase).unwrap())
+                    .unwrap()
+                    .multiply(chart)
+                    .unwrap();
+                assert_eq!(lifted, loaded_phase.storage);
+            }
+            let ticks = quotient
+                .ticks(&quotient.retained(&state).unwrap(), &drive)
+                .unwrap();
+            let terms = |step: &ResonatorStep| {
+                [
+                    step.before.clone(),
+                    step.after.clone(),
+                    step.pump.clone(),
+                    step.port.clone(),
+                    step.dissipation.clone(),
+                ]
+            };
+            for (step, tick) in steps.iter().zip(&ticks) {
+                assert!(step.closes() && tick.closes());
+                assert!(step.chart.is_zero() && step.split.is_zero());
+                assert_eq!(tick.phase, step.phase);
+                assert_eq!(tick.rate, step.rate);
+                assert_eq!(tick.output, step.output);
+                assert_eq!(
+                    [
+                        tick.before.clone(),
+                        tick.after.clone(),
+                        tick.pump.clone(),
+                        tick.port.clone(),
+                        tick.dissipation.clone()
+                    ],
+                    terms(step)
+                );
+            }
+            for direction in quotient.released().unwrap() {
+                let moved = owner_steps(&loaded, &add(&state, &direction), &drive);
+                for (step, full) in moved.iter().zip(&steps) {
+                    assert_eq!(terms(step), terms(full));
+                }
+            }
+        }
+    }
+}
+
+/// **The deposit reads the loaded word through the chart.** The chain on the exact law with ring 0
+/// loaded by the pumped cycle, compared at one cut: at every resonator tick of the word's return,
+/// each family's variation read on `V x_t` equals the ring's variation on `x_t`, and the solved
+/// covectors paired with the descended variations sum to the compare's four gain covectors.
+#[test]
+fn the_deposit_reads_the_loaded_word_through_the_chart() {
+    let field = chain().with_exact_word();
+    let theta = generic(&field, 311)
+        .with_ring_resonator(&field, 0, pumped_cycle())
+        .unwrap();
+    let cut = cut_at(field.clone(), theta.clone());
+    let loaded = ResonatorOperands::at_cut(
+        0,
+        theta.resonator(0).unwrap(),
+        field.ring(0).admittance(),
+        field.step(),
+        None,
+    )
+    .unwrap();
+    let ring = LoadedRing::at_cut(&loaded).unwrap();
+    let learning = ModeQuotient::learning(&ring, &[]).unwrap();
+    assert_eq!(learning.released_rank(), 2);
+    let ticks = &cut.back.resonators[0];
+    assert!(!ticks.is_empty());
+    let mut gains: [Rat; GAIN_FAMILIES] = std::array::from_fn(|_| Rat::zero());
+    for tick in ticks {
+        let state = [tick.displacement.clone(), tick.velocity.clone()].concat();
+        let retained = learning.retained(&state).unwrap();
+        for (family, gain) in gains.iter_mut().enumerate() {
+            let full = ring.phases()[tick.phase].variations[family]
+                .apply(&state, &tick.drive)
+                .unwrap();
+            let descended = learning
+                .variation(tick.phase, family)
+                .unwrap()
+                .apply(&retained, &tick.drive)
+                .unwrap();
+            assert_eq!(descended, full);
+            *gain += dot(&tick.solved, &descended);
+        }
+    }
+    let reached = cut
+        .pullback
+        .resonators
+        .iter()
+        .find(|pullback| pullback.ring == 0)
+        .unwrap();
+    assert!(reached.gains.iter().all(|gain| !gain.is_zero()));
+    assert_eq!(gains, reached.gains);
 }

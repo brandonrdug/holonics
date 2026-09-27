@@ -192,6 +192,7 @@ impl FaceMap {
         }
         Ok(Retention {
             retain,
+            section,
             navigators,
             readings,
         })
@@ -388,6 +389,7 @@ impl Cokernel {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Retention {
     retain: ExactRatMatrix,
+    section: ExactRatMatrix,
     navigators: Vec<ExactRatMatrix>,
     readings: Vec<ExactRatMatrix>,
 }
@@ -396,6 +398,12 @@ impl Retention {
     /// The retention map `V : X → X ⧸ ker F`, of full row rank.
     pub fn retain(&self) -> &ExactRatMatrix {
         &self.retain
+    }
+
+    /// **The section** `σ` picking the chart's pivot columns, a right inverse `V σ = 1`. A reading
+    /// that vanishes on `ker V` factors as `(F σ) V`, whatever lift the section picks.
+    pub fn section(&self) -> &ExactRatMatrix {
+        &self.section
     }
 
     /// `dim (X ⧸ ker F) = rank F`.

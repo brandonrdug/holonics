@@ -167,14 +167,14 @@ fn the_word_return_pulls_back_through_the_executed_charts() {
 }
 
 /// The compare at one cut: its pending ratio, fixed covector and complete pullback.
-struct Cut {
+pub(super) struct Cut {
     field: Field,
     theta: Constitution,
     pending: PendingRatio,
     covector: RatioCovector,
-    pullback: Pullback,
+    pub(super) pullback: Pullback,
     deposit: Deposit,
-    back: WordReturn,
+    pub(super) back: WordReturn,
     /// `J(θ)` at the cut's own constitution.
     base: Rat,
     /// The word's operands at the cut's own constitution, charted once.
@@ -183,7 +183,7 @@ struct Cut {
 
 /// The compare at one cut of the chain at a constitution: the pending ratio of a drawn stream, its
 /// covector against fixed targets, the word's return and the complete pullback.
-fn cut_at(field: Field, theta: Constitution) -> Cut {
+pub(super) fn cut_at(field: Field, theta: Constitution) -> Cut {
     let (current, open) = moment(&field, 66, 13);
     let phases = phases(&field, &theta, &current);
     let pending = PendingRatio::produce(

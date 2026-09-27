@@ -37,6 +37,29 @@ returns `s′ = ρ_t x + D_t e`, the phase `t mod P`. The Rust owner is `holonic
    `Q_t = diag(K_t, C)` annihilates it, the split is `Q_t`-orthogonal for every complement, and the
    storage descends.
 
+5. **The learning covector factors through the chart** (`descended_costate`,
+   `costate_null_on_release`, `descended_drive_covector`, `descended_gain`, `gain_fibre_invariant`).
+   A declared comparison's costate `λ_t = λ_{t+1} T_t + c_t` (`c_t` the covectors on the admitted
+   readings) is `λ̄_t V` when every tick descends and every reading factors, so it vanishes on the
+   release; the drive covector is `λ̄_{t+1} (V B_t)`. A gain family's covector, the solved covector
+   paired with the family's variation `φ_t x_t + H_t e_t`, descends when `φ_t = φ̄_t V`, and is then
+   the same at `x₀ + k` for released `k`.
+6. **The exact condition** (`released_variation_shift`, `solved_pairing_null_iff`,
+   `squared_gain_variation_null`, `half_turn_separates`, `standing_pump_threshold_reads_release`,
+   `learning_chart_le_kernel`). On a released pair the rate does not move, so the variation moves by
+   `2δC k_w − hδK k_u` alone; every solved covector is reached by a port comparison, so a family
+   factors for every admitted comparison iff its variation vanishes on the release. Capacity and
+   dissipation always factor; stiffness and pump factor whenever the pump's cycle holds a
+   half-turn, and fail for a standing pump at threshold, `(K₀ + ½Π)(1, 0) = 0` with `K₀ (1, 0) ≠ 0`.
+   A chart through which every variation factors releases no more than the phase family's kernel
+   with the variations admitted as receivers: in a learning aeon the deposit is a receiver.
+7. **The descended block ticks** (`modeForm_radical`, `descended_form`, `descended_balance_terms`,
+   `descended_balance`). The released pair lies in the radical of the mode form, so a form whose
+   radical holds the release is `S x x = S̄(Vx, Vx)` with `S̄ = S(σ ·, σ ·)` for a section `σ`; the
+   descended tick's storage before and after, pump re-basing and returned wave are the full ring's
+   on every state, and the full balance on every state gives the descended balance on every
+   retained state.
+
 The present receiver is admitted, so `ker F_future ⊆ ker F_now` (`Holarchy/Hearing`,
 `HearingLaw.futureNull_le_ker_present`); the navigator runs on retention by
 `FaceMap.kernelClass_after_word`, and every future face factors by `FaceMap.kernelReceiverQuotient`.
@@ -265,6 +288,269 @@ theorem released_pair_storage_null (M C K : E →ₗ[𝕜] E) {h Y : 𝕜} (hh :
 
 end StorageNull
 
+/-! ## 5. The learning covector factors through the chart -/
+
+section Covector
+
+variable {K : Type*} [Field K] {X Q E F : Type*} [AddCommGroup X] [Module K X]
+  [AddCommGroup Q] [Module K Q] [AddCommGroup E] [Module K E] [AddCommGroup F] [Module K F]
+
+/-- [definition] **The costate of a tick-indexed linear system**, `m` ticks remaining from tick
+`t`: the declared comparison's covector read at tick `t` through the admitted readings, `c t`
+(`Σ_r ȳ_(r,t) ∘ ρ_(r,t)`), carried backward through the ticks,
+`λ_(m+1, t) = λ_(m, t+1) ∘ T_t + c_t`, and `λ_(0, t) = 0`: the word-local state is dropped at the
+word's end. -/
+def costate (T : ℕ → X →ₗ[K] X) (c : ℕ → X →ₗ[K] K) : ℕ → ℕ → X →ₗ[K] K
+  | 0, _ => 0
+  | m + 1, t => costate T c m (t + 1) ∘ₗ T t + c t
+
+/-- [proved-derived; formal-checked] **The costate lies in the chart's row space.** If every tick
+descends (`V T_t = T̄_t V`) and every admitted reading factors (`c_t = c̄_t V`), the costate is the
+descended costate read through the chart, `λ_t = λ̄_t V`: it vanishes on the released kernel and
+runs on the quotient. -/
+theorem descended_costate (V : X →ₗ[K] Q) (T : ℕ → X →ₗ[K] X) (T' : ℕ → Q →ₗ[K] Q)
+    (c : ℕ → X →ₗ[K] K) (c' : ℕ → Q →ₗ[K] K) (hsq : ∀ t, V ∘ₗ T t = T' t ∘ₗ V)
+    (hc : ∀ t, c t = c' t ∘ₗ V) (m t : ℕ) :
+    costate T c m t = costate T' c' m t ∘ₗ V := by
+  induction m generalizing t with
+  | zero => ext x; simp [costate]
+  | succ m ih =>
+    ext x
+    simp only [costate, LinearMap.add_apply, LinearMap.comp_apply]
+    rw [ih, hc]
+    simp only [LinearMap.comp_apply]
+    rw [← LinearMap.comp_apply V (T t), hsq, LinearMap.comp_apply]
+
+/-- [proved-derived; formal-checked] The costate vanishes on the released kernel. -/
+theorem costate_null_on_release (V : X →ₗ[K] Q) (T : ℕ → X →ₗ[K] X) (T' : ℕ → Q →ₗ[K] Q)
+    (c : ℕ → X →ₗ[K] K) (c' : ℕ → Q →ₗ[K] K) (hsq : ∀ t, V ∘ₗ T t = T' t ∘ₗ V)
+    (hc : ∀ t, c t = c' t ∘ₗ V) {k : X} (hk : V k = 0) (m t : ℕ) : costate T c m t k = 0 := by
+  rw [descended_costate V T T' c c' hsq hc, LinearMap.comp_apply, hk, map_zero]
+
+/-- [proved-derived; formal-checked] **The drive covector descends**: `λ_(t+1) B_t = λ̄_(t+1) B̄_t`
+with `B̄_t = V B_t`. -/
+theorem descended_drive_covector (V : X →ₗ[K] Q) (T : ℕ → X →ₗ[K] X) (T' : ℕ → Q →ₗ[K] Q)
+    (c : ℕ → X →ₗ[K] K) (c' : ℕ → Q →ₗ[K] K) (hsq : ∀ t, V ∘ₗ T t = T' t ∘ₗ V)
+    (hc : ∀ t, c t = c' t ∘ₗ V) (B : E →ₗ[K] X) (m t : ℕ) :
+    costate T c m t ∘ₗ B = costate T' c' m t ∘ₗ (V ∘ₗ B) := by
+  rw [descended_costate V T T' c c' hsq hc, LinearMap.comp_assoc]
+
+/-- [definition] **A gain family's covector** over `N` ticks of a declared comparison: at each tick
+the solved covector `a_t = r̄_t` pairs the family's material variation, a linear reading of the
+tick's state and drive, `φ_t x_t + H_t e_t` (Decision 38:
+`2δC(w − ω) − hδD ω − hδK_t(u + hω/2)` along `δ = 2g·base`, with `ω` read from the port). -/
+def gainCovector (a : ℕ → F →ₗ[K] K) (φ : ℕ → X →ₗ[K] F) (H : ℕ → E →ₗ[K] F)
+    (T : ℕ → X →ₗ[K] X) (B : ℕ → E →ₗ[K] X) (e : ℕ → E) (x₀ : X) (N : ℕ) : K :=
+  ∑ t ∈ Finset.range N, a t (φ t (run T B e x₀ t) + H t (e t))
+
+/-- [proved-derived; formal-checked] **The gain covector descends** when the family's variation
+reads the state through the chart, `φ_t = φ̄_t V`: it is the same pairing on the descended run. -/
+theorem descended_gain (V : X →ₗ[K] Q) (T : ℕ → X →ₗ[K] X) (T' : ℕ → Q →ₗ[K] Q)
+    (B : ℕ → E →ₗ[K] X) (hsq : ∀ t, V ∘ₗ T t = T' t ∘ₗ V) (φ : ℕ → X →ₗ[K] F)
+    (φ' : ℕ → Q →ₗ[K] F) (hφ : ∀ t, φ t = φ' t ∘ₗ V) (a : ℕ → F →ₗ[K] K)
+    (H : ℕ → E →ₗ[K] F) (e : ℕ → E) (x₀ : X) (N : ℕ) :
+    gainCovector a φ H T B e x₀ N =
+      gainCovector a φ' H T' (fun t => V ∘ₗ B t) e (V x₀) N := by
+  unfold gainCovector
+  refine Finset.sum_congr rfl fun t _ => ?_
+  rw [hφ, LinearMap.comp_apply, descended_run V T T' B hsq]
+
+/-- [proved-derived; formal-checked] **The gain covector is constant on the fibre**: at `x₀ + k`,
+`k` released, it equals its value at `x₀`. -/
+theorem gain_fibre_invariant (V : X →ₗ[K] Q) (T : ℕ → X →ₗ[K] X) (T' : ℕ → Q →ₗ[K] Q)
+    (B : ℕ → E →ₗ[K] X) (hsq : ∀ t, V ∘ₗ T t = T' t ∘ₗ V) (φ : ℕ → X →ₗ[K] F)
+    (φ' : ℕ → Q →ₗ[K] F) (hφ : ∀ t, φ t = φ' t ∘ₗ V) (a : ℕ → F →ₗ[K] K)
+    (H : ℕ → E →ₗ[K] F) (e : ℕ → E) (x₀ : X) {k : X} (hk : V k = 0) (N : ℕ) :
+    gainCovector a φ H T B e (x₀ + k) N = gainCovector a φ H T B e x₀ N := by
+  rw [descended_gain V T T' B hsq φ φ' hφ, descended_gain V T T' B hsq φ φ' hφ, map_add, hk,
+    add_zero]
+
+/-- [proved-derived; formal-checked] **On a released pair the variation moves by its storage
+part.** The rate is unchanged on a released pair (it moves no rate at any phase), so the material
+variation at `(u + k_u, w + k_w)` differs from that at `(u, w)` by `2δC k_w − hδK k_u` alone; the
+dissipation's `δD ω` does not move. -/
+theorem released_variation_shift (dC dD dK : F →ₗ[K] F) (h : K) (u w ω ku kw : F) :
+    ((2 : K) • dC ((w + kw) - ω) - h • dD ω - h • dK ((u + ku) + (h / 2) • ω)) -
+        ((2 : K) • dC (w - ω) - h • dD ω - h • dK (u + (h / 2) • ω)) =
+      (2 : K) • dC kw - h • dK ku := by
+  simp only [map_add, map_sub, smul_add, smul_sub]
+  abel
+
+/-- [proved-derived; formal-checked] **Every solved covector is reached by a port comparison**, so
+the condition below is exact. The solved covector obeys `r̄ M = λ′J − (2/Y)s̄` (`J ω = (hω, 2ω)`,
+the port's `s′ = e − (2/Y)ω`): with `M` invertible, a family's pairing `r̄(φ k)` vanishes for every
+port covector `s̄` exactly when `φ k = 0`. -/
+theorem solved_pairing_null_iff [CharZero K] (M : F ≃ₗ[K] F) (J : F →ₗ[K] X) (lam : X →ₗ[K] K)
+    {Y : K} (hY : Y ≠ 0) (v : F) :
+    (∀ s : F →ₗ[K] K, ((lam ∘ₗ J - (2 / Y) • s) ∘ₗ (M.symm : F →ₗ[K] F)) v = 0) ↔ v = 0 := by
+  constructor
+  · intro hs
+    refine (Module.forall_dual_apply_eq_zero_iff K v).mp fun a => ?_
+    have hreach := hs ((Y / 2) • (lam ∘ₗ J - a ∘ₗ (M : F →ₗ[K] F)))
+    have hc : (2 / Y) * (Y / 2) = (1 : K) := by field_simp
+    rw [smul_smul, hc, one_smul, sub_sub_cancel, LinearMap.comp_assoc] at hreach
+    simpa using hreach
+  · rintro rfl s
+    exact map_zero _
+
+/-- [proved-derived; formal-checked] **A squared gain's variation reads nothing its form does not**:
+with `g ≠ 0`, `(g² A₀) v = 0` gives `(2g A₀) v = 0`. The capacity family factors on every released
+pair (`C k_w = 0`); the dissipation family factors because the released rate is zero. -/
+theorem squared_gain_variation_null {g : K} (hg : g ≠ 0) (A₀ : F →ₗ[K] F) {v : F}
+    (hv : (g ^ 2 • A₀) v = 0) : ((2 * g) • A₀) v = 0 := by
+  rw [LinearMap.smul_apply] at hv ⊢
+  rw [(smul_eq_zero.mp hv).resolve_left (pow_ne_zero 2 hg), smul_zero]
+
+/-- [proved-derived; formal-checked] **A half-turn in the pump's cycle separates stiffness from
+pump.** A released displacement lies in `ker K_t` at every phase; if the cycle holds the phases
+`ψ` and `ψ + π` (every quarter-turn pump of order `2` or `4`), `K_t = aK₀ ± bΠ`, and with `a, b ≠ 0`
+it lies in `ker K₀ ∩ ker Π`: the stiffness and pump families factor. -/
+theorem half_turn_separates [CharZero K] {a b : K} (ha : a ≠ 0) (hb : b ≠ 0) (K₀ P₀ : F →ₗ[K] F)
+    {u : F} (h₀ : a • K₀ u + b • P₀ u = 0) (h₁ : a • K₀ u - b • P₀ u = 0) :
+    K₀ u = 0 ∧ P₀ u = 0 := by
+  have hsum : ((2 : K) * a) • K₀ u = 0 := by
+    have h := congrArg₂ (· + ·) h₀ h₁
+    simp only [add_zero] at h
+    rw [← h, mul_smul, two_smul]
+    abel
+  have hK : K₀ u = 0 :=
+    (smul_eq_zero.mp hsum).resolve_left (mul_ne_zero two_ne_zero ha)
+  refine ⟨hK, ?_⟩
+  rw [hK, smul_zero, zero_add] at h₀
+  exact (smul_eq_zero.mp h₀).resolve_left hb
+
+end Covector
+
+/-- [counterexample; formal-checked] **A standing pump at threshold reads a released direction.**
+One node, `K₀ = 1`, a standing pump (`P = 1`) of base block `Π = diag(−2, 2)` and strength `½`:
+`K_0 = K₀ + ½Π = diag(0, 2)`, so the displacement `(1, 0)` moves no rate and is released, but
+`K₀ (1, 0) ≠ 0` and `Π (1, 0) ≠ 0`: the stiffness and pump families read it, and a learning aeon
+retains it. The joint scaling `g_K ∂_(g_K) + g_P ∂_(g_P)` pairs `2K_0 u = 0` and factors. -/
+theorem standing_pump_threshold_reads_release :
+    let u : Fin 2 → ℚ := ![1, 0]
+    let P₀ : Matrix (Fin 2) (Fin 2) ℚ := Matrix.diagonal ![-2, 2]
+    Matrix.mulVec ((1 : Matrix (Fin 2) (Fin 2) ℚ) + (1 / 2 : ℚ) • P₀) u = 0 ∧
+      Matrix.mulVec (1 : Matrix (Fin 2) (Fin 2) ℚ) u ≠ 0 ∧ Matrix.mulVec P₀ u ≠ 0 := by
+  intro u P₀
+  refine ⟨?_, ?_, ?_⟩
+  · ext i
+    fin_cases i <;> simp [u, P₀, Matrix.mulVec, dotProduct, Fin.sum_univ_two, Matrix.add_apply,
+      Matrix.one_apply, Matrix.diagonal_apply]
+  · intro h
+    have := congrFun h 0
+    simp [u] at this
+  · intro h
+    have := congrFun h 0
+    simp [u, P₀, Matrix.mulVec, dotProduct, Matrix.diagonal_apply] at this
+
+section Learning
+
+variable {K : Type*} [Field K] {X V R G : Type} [AddCommGroup X] [Module K X]
+  [AddCommGroup V] [Module K V]
+
+/-- [proved-derived; formal-checked] **In a learning aeon the deposit is a receiver.** A chart
+through which every tick descends, every admitted reading factors and every gain family's variation
+factors releases no more than the phase family's kernel with the variations `φ_(f,t)` admitted
+beside the readings (`shared_chart_le_phase_kernel` on the receivers `R ⊕ G`). A released direction
+that a variation reads is retained, with the reading that separates it. -/
+theorem learning_chart_le_kernel (T : ℕ → X →ₗ[K] X) (ρ : R → ℕ → X →ₗ[K] V)
+    (φ : G → ℕ → X →ₗ[K] V) (P : ℕ) {Q : Type} [AddCommGroup Q] [Module K Q]
+    (retain : X →ₗ[K] Q) (T' : Fin P → Q →ₗ[K] Q) (ρ' : R × Fin P → Q →ₗ[K] V)
+    (φ' : G × Fin P → Q →ₗ[K] V)
+    (hsq : ∀ i, retain ∘ₗ phaseTransport T P i = T' i ∘ₗ retain)
+    (hread : ∀ ri, phaseRead ρ P ri = ρ' ri ∘ₗ retain)
+    (hvar : ∀ gi, phaseRead φ P gi = φ' gi ∘ₗ retain) :
+    LinearMap.ker retain ≤
+      LinearMap.ker (faceMap (phaseRead (fun s : R ⊕ G => Sum.elim ρ φ s) P)
+        (phaseTransport T P)) :=
+  shared_chart_le_phase_kernel T (fun s : R ⊕ G => Sum.elim ρ φ s) P retain T'
+    (fun si => Sum.elim (fun r => ρ' (r, si.2)) (fun g => φ' (g, si.2)) si.1) hsq
+    (fun ⟨s, i⟩ => by cases s with
+      | inl r => exact hread (r, i)
+      | inr g => exact hvar (g, i))
+
+end Learning
+
+/-! ## 6. The descended block ticks, with its storage and its balance -/
+
+section DescendedBalance
+
+variable {K : Type*} [Field K] {X Q E W : Type*} [AddCommGroup X] [Module K X]
+  [AddCommGroup Q] [Module K Q] [AddCommGroup E] [Module K E] [AddCommGroup W] [Module K W]
+
+/-- [proved-derived; formal-checked] **The released pair lies in the storage form's radical.** For
+`β`-symmetric `K_t`, `C`, the mode form `β(x_u, K_t y_u) + β(x_w, C y_w)` vanishes against every
+pair with `K_t k_u = 0`, `C k_w = 0` (`released_pair_storage_null`), on either side. -/
+theorem modeForm_radical (β : E →ₗ[K] E →ₗ[K] K) (Kt C : E →ₗ[K] E)
+    (hK : ∀ a b, β (Kt a) b = β a (Kt b)) (hC : ∀ a b, β (C a) b = β a (C b)) {ku kw : E}
+    (hku : Kt ku = 0) (hkw : C kw = 0) (yu yw : E) :
+    β ku (Kt yu) + β kw (C yw) = 0 ∧ β yu (Kt ku) + β yw (C kw) = 0 := by
+  refine ⟨?_, ?_⟩
+  · rw [← hK, ← hC, hku, hkw]
+    simp
+  · rw [hku, hkw]
+    simp
+
+/-- [proved-derived; formal-checked] **A form whose radical holds the release descends**: with a
+section `σ` of the chart (`V σ = 1`), `S x x = S̄(Vx, Vx)` for `S̄ = S(σ ·, σ ·)`, whatever the
+lift. -/
+theorem descended_form (V : X →ₗ[K] Q) (σ : Q →ₗ[K] X) (hσ : V ∘ₗ σ = LinearMap.id)
+    (S : X →ₗ[K] X →ₗ[K] K) (hl : ∀ k, V k = 0 → ∀ y, S k y = 0)
+    (hr : ∀ k, V k = 0 → ∀ y, S y k = 0) (x : X) :
+    S.compl₁₂ σ σ (V x) (V x) = S x x := by
+  have hk : V (x - σ (V x)) = 0 := by
+    rw [map_sub, ← LinearMap.comp_apply V σ, hσ, LinearMap.id_apply, sub_self]
+  have hx : σ (V x) + (x - σ (V x)) = x := by abel
+  have key : S x x = S (σ (V x)) (σ (V x)) := by
+    calc S x x = S (σ (V x) + (x - σ (V x))) (σ (V x) + (x - σ (V x))) := by rw [hx]
+    _ = S (σ (V x)) (σ (V x)) := by
+      simp only [map_add, LinearMap.add_apply, hl _ hk, hr _ hk, add_zero]
+  rw [LinearMap.compl₁₂_apply, key]
+
+/-- [proved-derived; formal-checked] **The descended tick's terms are the full ring's**, on every
+state `x` and drive `e`: the storage before (the previous phase's form `S₀`) and after (this
+phase's `S₁`), the pump's re-basing `S₁ − S₀` at the state, and the returned wave (so the rate
+`ω = (Y/2)(e − s′)`, the port work and the dissipation). -/
+theorem descended_balance_terms (V : X →ₗ[K] Q) (σ : Q →ₗ[K] X) (hσ : V ∘ₗ σ = LinearMap.id)
+    (T : X →ₗ[K] X) (T' : Q →ₗ[K] Q) (B : E →ₗ[K] X) (ρ : X →ₗ[K] W) (ρ' : Q →ₗ[K] W)
+    (D : E →ₗ[K] W) (hsq : V ∘ₗ T = T' ∘ₗ V) (hρ : ρ = ρ' ∘ₗ V) (S₀ S₁ : X →ₗ[K] X →ₗ[K] K)
+    (h₀l : ∀ k, V k = 0 → ∀ y, S₀ k y = 0) (h₀r : ∀ k, V k = 0 → ∀ y, S₀ y k = 0)
+    (h₁l : ∀ k, V k = 0 → ∀ y, S₁ k y = 0) (h₁r : ∀ k, V k = 0 → ∀ y, S₁ y k = 0)
+    (x : X) (e : E) :
+    V (T x + B e) = T' (V x) + V (B e) ∧
+      S₁.compl₁₂ σ σ (T' (V x) + V (B e)) (T' (V x) + V (B e)) = S₁ (T x + B e) (T x + B e) ∧
+      S₀.compl₁₂ σ σ (V x) (V x) = S₀ x x ∧ S₁.compl₁₂ σ σ (V x) (V x) = S₁ x x ∧
+      ρ' (V x) + D e = ρ x + D e := by
+  have hstep : V (T x + B e) = T' (V x) + V (B e) := by
+    rw [map_add, ← LinearMap.comp_apply V T, hsq, LinearMap.comp_apply]
+  refine ⟨hstep, ?_, descended_form V σ hσ S₀ h₀l h₀r x, descended_form V σ hσ S₁ h₁l h₁r x, ?_⟩
+  · rw [← hstep, descended_form V σ hσ S₁ h₁l h₁r]
+  · rw [hρ, LinearMap.comp_apply]
+
+/-- [proved-derived; formal-checked] **The descended block's balance.** If the full ring's tick
+balances on every state, `S₁(x′) − S₀(x) = (S₁ − S₀)(x) + work(e, s′)` (storage after, before, the
+pump's work at the state, and the port work less dissipation, a function of the drive and the
+returned wave), then the descended tick `q′ = T̄q + V B e`, `s′ = ρ̄q + D e` balances on every
+retained state with the descended forms `S̄ = S(σ ·, σ ·)`, term for term. -/
+theorem descended_balance (V : X →ₗ[K] Q) (σ : Q →ₗ[K] X) (hσ : V ∘ₗ σ = LinearMap.id)
+    (T : X →ₗ[K] X) (T' : Q →ₗ[K] Q) (B : E →ₗ[K] X) (ρ : X →ₗ[K] W) (ρ' : Q →ₗ[K] W)
+    (D : E →ₗ[K] W) (hsq : V ∘ₗ T = T' ∘ₗ V) (hρ : ρ = ρ' ∘ₗ V) (S₀ S₁ : X →ₗ[K] X →ₗ[K] K)
+    (h₀l : ∀ k, V k = 0 → ∀ y, S₀ k y = 0) (h₀r : ∀ k, V k = 0 → ∀ y, S₀ y k = 0)
+    (h₁l : ∀ k, V k = 0 → ∀ y, S₁ k y = 0) (h₁r : ∀ k, V k = 0 → ∀ y, S₁ y k = 0)
+    (work : E → W → K)
+    (hfull : ∀ x e, S₁ (T x + B e) (T x + B e) - S₀ x x = (S₁ x x - S₀ x x) + work e (ρ x + D e))
+    (q : Q) (e : E) :
+    S₁.compl₁₂ σ σ (T' q + V (B e)) (T' q + V (B e)) - S₀.compl₁₂ σ σ q q =
+      (S₁.compl₁₂ σ σ q q - S₀.compl₁₂ σ σ q q) + work e (ρ' q + D e) := by
+  have hq : V (σ q) = q := by rw [← LinearMap.comp_apply V σ, hσ, LinearMap.id_apply]
+  obtain ⟨_, hafter, hbefore, hnow, hwave⟩ :=
+    descended_balance_terms V σ hσ T T' B ρ ρ' D hsq hρ S₀ S₁ h₀l h₀r h₁l h₁r (σ q) e
+  rw [hq] at hafter hbefore hnow hwave
+  rw [hafter, hbefore, hnow, hwave]
+  exact hfull (σ q) e
+
+end DescendedBalance
+
 section Audit
 
 #print axioms periodic_lift_exact
@@ -272,6 +558,18 @@ section Audit
 #print axioms shared_chart_le_phase_kernel
 #print axioms descended_run_reads
 #print axioms released_pair_storage_null
+#print axioms descended_costate
+#print axioms descended_drive_covector
+#print axioms gain_fibre_invariant
+#print axioms released_variation_shift
+#print axioms solved_pairing_null_iff
+#print axioms squared_gain_variation_null
+#print axioms half_turn_separates
+#print axioms standing_pump_threshold_reads_release
+#print axioms learning_chart_le_kernel
+#print axioms modeForm_radical
+#print axioms descended_balance_terms
+#print axioms descended_balance
 
 end Audit
 
