@@ -11,6 +11,7 @@ mod landmark;
 mod landmark_full;
 mod learning;
 mod loaded_scalar;
+mod modes;
 mod moment;
 mod pending;
 mod physics;
