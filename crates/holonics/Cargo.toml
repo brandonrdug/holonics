@@ -63,3 +63,11 @@ path = "../../research/notebook/hnn_design/hnn_terrain.rs"
 [[example]]
 name = "hnn_curated"
 path = "../../research/notebook/hnn_design/hnn_curated.rs"
+
+# The notebook's egg population on terrain a declared Holarchy made (`receiver::population` over
+# `holarchy::terrain`: the tree at a ladder of depths, a moiré's gratings, a rotor crib's keys,
+# selecting the family that made the terrain; research/notebook/hnn_design/README.md): count-only
+# development receipts run once in release, never a test.
+[[example]]
+name = "hnn_population"
+path = "../../research/notebook/hnn_design/hnn_population.rs"

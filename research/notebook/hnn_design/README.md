@@ -696,3 +696,88 @@ declared base. The population needs a declared prior carrying each egg's descrip
 mass declared), the tree kept as one egg, and a per-class reading of the prequential code, so that
 selection is gauged class by class against these truths; one run partitioned by class in
 `hnn::reference` would replace the one run a class used here.
+
+## The egg population on terrain (rebuild step 4 item 4, September 27)
+
+`hnn_population.rs` runs the egg population (`holonics::receiver::population`: a receiver's
+Bayesian mixture over declared navigator families, the discrete replicator, each family dying
+exactly at zero likelihood) on the terrains above, and asks whether it selects the family that made
+each. These are **development receipts, not milestones**; the conversation cut stays the milestone.
+Every run takes under half a second.
+
+```sh
+cargo run --release -p holonics --example hnn_population -- tree 2
+cargo run --release -p holonics --example hnn_population -- tree 4
+cargo run --release -p holonics --example hnn_population -- moire parity
+cargo run --release -p holonics --example hnn_population -- moire sheets
+cargo run --release -p holonics --example hnn_population -- crib
+cargo run --release -p holonics --example hnn_population -- switching
+```
+
+The declared population on each terrain: the receiving tree (cell-only, `½` stop prior) at every
+depth of the ladder `D ∈ {1, 2, 4, 8, 16, 32}`, and one key family of the terrain's kind. Seven
+families, each named by `⌈log₂ 7⌉ = 3` bits: the Kraft mass is `7/8`, its unused `1/8` declared, and
+the prior is `1/7` a family. Survivor filtering enumerates at most `2^24` keys. Each reading is
+`n + k/16 + ε`, the exact endpoints in the output. `−log₂ w` is a family's posterior in bits.
+
+- **Tree source `d = 2`** (the terrain section's source): the population codes `56463 + 14/16 + ε`,
+  `−80 + 0/16 + ε` against `n·h` and `26 + 14/16 + ε` above the source's own code of the realized
+  cells. It selects the tree at `D = 2`, the source's depth: its code alone is `56462 + 0/16 + ε` and
+  its posterior `−log₂ w = 0 + 15/16 + ε`, decided above one half. The trees at `D ≥ 4` read
+  `3 + 0/16 + ε` each, and `D = 1` reads `5931 + 4/16 + ε`. The grating keys (`k = 3`, `q ≤ 2^3`,
+  parity) die at cell 15. The selected tree recovers the drawn tree `[00] [01] [1]` exactly.
+- **Tree source `d = 4`**: the population codes `47134 + 9/16 + ε`, `−123 + 1/16 + ε` against `n·h`
+  and `51 + 2/16 + ε` above `code_θ(x)`. It selects the tree at `D = 4`, whose posterior is
+  `0 + 11/16 + ε`; `D = 8, 16, 32` read `2 + 15/16 + ε` each. The grating keys die at cell 13, and
+  the selected tree recovers the minimal tree exactly (16 of 16 addresses).
+- **Moiré, parity color, `k = 3`, `q ≤ 2^3`**, drawn by the seed from `N_8 = 122 = 2·61` gratings a
+  ring, so `122³ = 1815848 = 2³·61³` keys:
+  - The drawn gratings are `5/7 @ 0/7`, `3/8 @ 6/8` and `7/8 @ 6/8`; the joint period is
+    `56 = 2³·7`, the least period `14 = 2·7`, and `D* = 7`.
+  - The grating family keeps **720 = 2⁴·3²·5** survivors, the drawn key among them. The two
+    period-8 rings differ in rate by a half-turn, so their sheets differ exactly on the odd ticks:
+    the emission is the `5/7` ring's sheet read against the alternation, and every key of that
+    species survives. The survivors are one species, the face map's quotient over generators.
+  - Its code is `log₂ 122³ − log₂ 720 = 11 + 4/16 + ε`, against the key description
+    `log₂ 122³ = 20 + 12/16 + ε` (`⌈⌉ = 21`).
+  - The population codes `14 + 1/16 + ε`, the family's code plus its naming `log₂ 7`, and selects the
+    gratings: their posterior is `0 + 0/16 + ε`, the tree kind's `66 + 0/16 + ε`. The best tree
+    (`D = 8`) codes `78 + 13/16 + ε` alone.
+  - At `q ≤ 2^4` the parity class's `862³ = 640503928 = 2³·431³` keys are refused, and the refusal
+    names the owed Bombe, parity-constraint propagation on the joint clock torus.
+- **Moiré, sheet tuple, `k = 3`, `q ≤ 2^4`**, the terrain section's moiré, factorized per ring
+  (`862 = 2·431` keys a ring):
+  - Each ring keeps **2** survivors: its grating and its mirror `(q − p)/q`, the phase Swung about the
+    centre of the ring's upper sheet arc (`c ↦ ⌈q/2⌉ + q − 1 − c mod q`). A half-turn sheet cannot
+    tell a ring from its Swing. The pairs are `14/15 @ 5/15 ~ 1/15 @ 2/15`,
+    `4/15 @ 10/15 ~ 11/15 @ 12/15` and `11/16 @ 12/16 ~ 5/16 @ 11/16`.
+  - The family's code is `log₂ 862³ − 3 = 26 + 4/16 + ε`, against the key description
+    `29 + 4/16 + ε` (`⌈⌉ = 30`).
+  - The population codes `29 + 0/16 + ε` and selects the gratings (the tree kind's posterior
+    `1521 + 5/16 + ε`). The tree at `D = 8 = D*` codes `1549 + 0/16 + ε` alone, the recorded
+    control; the recorded parity control at `D* = 14` is `993 + 5/16 + ε`.
+- **Rotor crib**: campaign 1's period-7 ring, locked at every port so it steps each tick, behind a
+  drawn plugboard, `n = 2^10`. The family's keys are the start, the key and the plugboard,
+  `7·7·7! = 246960 = 2⁴·3²·5·7³` of them:
+  - It keeps **7** survivors: the rotor-gauge orbit at the drawn start, the drawn key and plugboard
+    among them.
+  - Its code is `log₂ 35280 = 15 + 1/16 + ε`: the start's `log₂ 7`, plus the key description
+    `log₂(7·7!)` (`⌈⌉ = 16`), less the gauge's `log₂ 7`.
+  - The population codes `17 + 14/16 + ε` and selects the rotor keys. The best tree
+    (`D = 16, 32`) codes `375 + 12/16 + ε`.
+  - Ring 2's `11²·11! = 4829932800 = 2⁸·3⁴·5²·7·11³` keys are refused, and the refusal names the
+    built Bombe, `hnn::keys::locate_ring`.
+- **Aeon switching, the dormant grating** (grating 0 of the parity moiré silent in the odd aeons,
+  which run `2^10` to `2^11` cells; 11 switches, the first at cell 1223). The static population
+  cannot follow a switch:
+  - **Parity:** the grating keys die at cell 1223, the first cell the silent layer changes. The
+    population then rests on the trees: `252 + 9/16 + ε`, against `14 + 1/16 + ε` on the unswitched
+    moiré, `238 + 7/16 + ε` more. No single tree is decided above one half: `D = 8, 16, 32` read
+    `1 + 4/16`, `1 + 11/16` and `1 + 11/16` (each `+ ε`).
+  - **Sheet tuple:** the family dies at cell 1223 with survivors `[0, 2, 2]` per ring. The dormant
+    ring's keys die; the other rings keep their gratings and mirrors. The population codes
+    `688 + 6/16 + ε` against `20 + 9/16 + ε` unswitched.
+  - Following the switch is campaign 3's dormancy. A key must be held through the aeon its layer is
+    silent in, not filtered out: each layer's activity is read per epoch, and a switch is priced as
+    the fixed share across epochs (Lean `LocalWeighing.fixed_share`, `hnn::receiving::Mixture::switching`),
+    applied per ring factor instead of between two faces.

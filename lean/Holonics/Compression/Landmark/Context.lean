@@ -3,6 +3,7 @@ import Holonics.Compression.Landmark.Context.Standing
 import Holonics.Compression.Landmark.Context.Address
 import Holonics.Compression.Landmark.Context.Carrier
 import Holonics.Compression.Landmark.Context.LocalWeighing
+import Holonics.Compression.Landmark.Context.Population
 import Holonics.Compression.Landmark.Context.ConvergenceFounding
 import Holonics.Compression.Landmark.Context.Compaction
 import Holonics.Compression.Landmark.Context.Capacity
@@ -44,6 +45,7 @@ The joins to the framework ([proved-derived; formal-checked]):
 | `Context/Address` | the receiving letters: typed bundles restricted by whole bundles, their finite partitions and injective codes, the enlarged tree keeping the cell-only branch | `compression::landmark::context::{Letter, Bundle, LetterFamily}`, `hnn::receiving::LetterReader` |
 | `Context/Carrier` | the tree's carriers rebase past their width with an enclosed released remainder | `compression::landmark::context::Beta` |
 | `Context/LocalWeighing` | weighing is local: the forward mixture over faces, the two-face prior and the fixed share, node-local mixing over own weights, the stop-weight mixture per digit tree | `compression::landmark::context::{StopMixture, JoinTree, FaceJoins}`, `hnn::receiving::Mixture::switching` |
+| `Context/Population` | the egg population: the static mixture with death (nonnegative faces; a family at zero likelihood keeps weight zero, the population codes within its prior of every living family), survivor filtering as uniform Bayes (`log₂ \|K\| − log₂ #S`), and a product key space's survivors | `receiver::population::{Population, Survivors, KeyFamily}` |
 | `Context/ConvergenceFounding` | founding at the second arrival (retired as a realization, measured at `d137e8a6`): the stopped path under any stopping rule, the tree with absent children, and the first-arrival tree as its case (`first_arrival_is_the_full_tree`) | none (the law of absent children and stopping rules) |
 | `Context/Compaction` | the tree stored where paths part: a unary chain is one node at its summed rung, the compacted tree is the full tree code for code (`compacted_is_the_full_tree`) under any node law, with at most `2n − 1` nodes | `compression::landmark::context::Landmarks` (its arena) |
 | `Context/Capacity` | a landmark's register has a capacity: the capped register is a node law, its carry only lowers the register, `c = ∞` and every unreached ceiling are KT's | `compression::landmark::context::Capacity` |

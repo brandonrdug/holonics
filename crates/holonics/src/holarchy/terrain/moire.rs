@@ -173,8 +173,10 @@ impl MoireFamily {
         ceil_log2(&self.key_space())
     }
 
-    /// The grating at `index < N_Q`, in the order `(q, p, c)` ascending.
-    fn grating(&self, mut index: u64) -> Result<Grating, TerrainError> {
+    /// **The grating at `index < N_Q`**, in the order `(q, p, c)` ascending: the family's key space
+    /// enumerated, as the draw reads it and as a receiver's grating family weighs it
+    /// (`receiver::population::GratingSheet`).
+    pub fn grating(&self, mut index: u64) -> Result<Grating, TerrainError> {
         for q in 2..=self.denominator {
             let units = Self::units(q);
             let block = q * units.len() as u64;
