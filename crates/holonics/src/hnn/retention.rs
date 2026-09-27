@@ -21,7 +21,7 @@
 //! | the receiving map `R` and the receiving parametron's landmark tree | always |
 //!
 //! [definition; agent-inferred] **The collapse keeps the whole tree and the active address**
-//! (Decision 28). The tree sits at the receiving locus beside `R`, which is never released. Lean
+//! (the landmark tree). The tree sits at the receiving locus beside `R`, which is never released. Lean
 //! `HNN/LandmarkTree.release_rule` proves that nodes deeper than the address depth `D` are
 //! releasable, of which the tree founds none, and that a retention is lawful exactly when it
 //! refines the causal signature; it does not prove that no shallower merge is lawful, and the
@@ -324,7 +324,7 @@ pub fn contained(
 
 /// [definition] **What the collapse did to the constitution**: the loci it retains and the ones it
 /// newly released (each whole: value, carried remainders and deposit clock), the carried remainders
-/// that left with them (exact, each with its locus, array and entry: Decision 22's "leaves whole,
+/// that left with them (exact, each with its locus, array and entry: the lattice deposit's "leaves whole,
 /// with its remainder, reported"), their operator entries (the design's count: an element's
 /// `n_g²`, a channel's `3k_a²`) against the field's total, and the constitution's exact bits before
 /// and after.

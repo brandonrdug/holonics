@@ -1,6 +1,6 @@
 //! **Keys lead learning: the data → menu map, key location per ring, and gauge fixing.**
 //!
-//! [definition] Learning is locating keys (Brandon, September 22; design Decision 10, (d) "Data →
+//! [definition] Learning is locating keys (Brandon, September 22; THE_REBUILD's design (d), "Data →
 //! menu"). A ring's key is its initial configuration, its clock at an aeon's opening. It is located
 //! per ring, in carry order `g = 0, …, G−1`, from a crib of cells (at the port, the crib that
 //! closed the previous aeon, carried to the boundary; below), with the existing [`Menu`],

@@ -3,7 +3,7 @@
 //! [definition] A word reads the constitution `Θ` only through `holonics::hnn::ConstitutionRead`
 //! (the forward face). The device port forms, once per publication (a deposit's successor, a
 //! collapse's descent), the dyadic words of every locus the word's kernels read
-//! ([`Loci::of`]), each at its locus's **declared lattice** (Decision 22; `Field::lattice`), so the
+//! ([`Loci::of`]), each at its locus's **declared lattice** (the lattice deposit; `Field::lattice`), so the
 //! words' scales stay fixed across publications:
 //!
 //! | Locus | Words | Scale |
@@ -16,7 +16,7 @@
 //!
 //! The host keeps what only the host reads (the element `K_g`, `W_s,g`, the dissipation `D_a`, the
 //! exact operators `I − ½K_g` and `m_a` from which the chart store's operator words are read) and
-//! a copy of the published words. The receiving parametron's landmark tree (Decision 28) is not
+//! a copy of the published words. The receiving parametron's landmark tree (`hnn::landmark`) is not
 //! among the published loci: no kernel reads it, its grain read compares integers past the card's
 //! 128-bit carrier, and the host reads it from the constitution it publishes, at compare. [definition] **Only
 //! the moved words cross the bus.** A successor's words are laid out as its predecessor's (the same

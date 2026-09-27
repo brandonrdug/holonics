@@ -44,7 +44,7 @@
 //! its fixed operands (the junctions' executed weights, the lattice charts of `(I − ½K_r)⁻¹` and
 //! `m_a⁻¹`: the executed adjoint, Lean `HNN/LatticeWord.executed_adjoint_unique`, never an exact
 //! inverse), composed in reverse order, its own transients carried on the word's lattice with error
-//! feedback and their remainders released at the open ([`WordReturn::released`]; Decision 24) (Lean
+//! feedback and their remainders released at the open ([`WordReturn::released`]; the lattice word) (Lean
 //! `HolonicAdjointNormalization.dualMap_comp_reverse_order`, `HNN/Word.reaction_stage_adjoint`,
 //! `HNN/Propagation.{trajectory_pairing, word_variation_exact, covector_causal_cone}`, proved on the
 //! abstract block operator; the concrete-tick bridge is owed in #62).
@@ -169,7 +169,7 @@ pub enum ReceiptDetail {
     },
     /// `refine`: the diamond's retained loci, the change's power released at the word's end, its
     /// peak bits inside the word, the source-to-receiver path attenuation at the cut (review C2), so
-    /// a shielded receiver is reported as a located cause; and (Decision 24) every executed chart's
+    /// a shielded receiver is reported as a located cause; and (the lattice word) every executed chart's
     /// reading (its certificate against the target, its refinement's steps and seed), the carried
     /// remainders the word released at its end, the last junction's residual, and each declared
     /// resonator's balance over the word and the word's whole balance (campaign 2).
@@ -190,12 +190,12 @@ pub enum ReceiptDetail {
     },
     /// `compare`: the window's code length (the KL part, enclosed), phase excess, each phase's
     /// winding, the residual of the wave's logits against the emitted ones, the loci reached, the
-    /// remainders the return's carried adjoint released at the open (Decision 24); each phase's
+    /// remainders the return's carried adjoint released at the open (the lattice word); each phase's
     /// code length under the landmark tree's executed face alone (`tree`: `−log₂ q_T(t_j)`, the
     /// face the mixture weighs; `hnn::receiving::Scored::tree`) and under the face of its grain
     /// logits alone (`tree_grain`: `hnn::receiving::tree_code_length`, the face the combined read
     /// opens at when the wave reads zero), each at the same standing and address as the combined
-    /// face (Decision 28, the window read in cell order); and each phase's code length under the
+    /// face (the landmark tree, the window read in cell order); and each phase's code length under the
     /// receiver's scored face, the mixture of the tree's and the combined face (ruling A;
     /// `hnn::receiving::Mixture`), whose sum is the window's code length. The Holon ratio (its
     /// phases' code lengths, excess and windings) is the combined face's, whose covector the wave
@@ -452,7 +452,7 @@ pub struct Pullback {
 /// [definition] **The staged material return** (design (c), `Deposit`): keyed by locus, inside the
 /// causal diamond of the source rings and the receiver, at the constitution commit it was computed
 /// at: the linear loci's windows, the factor families' steps and the receiving parametron's
-/// landmark steps (Decision 28), one per reached comparison in cell order. Only a compare builds
+/// landmark steps (the landmark tree), one per reached comparison in cell order. Only a compare builds
 /// one.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Deposit {
@@ -491,12 +491,12 @@ impl Deposit {
         &self.mixture
     }
 
-    /// The deposit with the receiving parametron's landmark steps (Decision 28).
+    /// The deposit with the receiving parametron's landmark steps (the landmark tree).
     pub(crate) fn with_landmarks(self, landmarks: Vec<LandmarkStep>) -> Self {
         Self { landmarks, ..self }
     }
 
-    /// The receiving parametron's landmark steps (Decision 28), in cell order.
+    /// The receiving parametron's landmark steps (the landmark tree), in cell order.
     pub fn landmarks(&self) -> &[LandmarkStep] {
         &self.landmarks
     }

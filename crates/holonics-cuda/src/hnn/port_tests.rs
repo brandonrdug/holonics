@@ -13,7 +13,7 @@
 //! flock .local/gpu.lock cargo test -p holonics-cuda -- --include-ignored --test-threads=1
 //! ```
 //!
-//! The standing real cut (Decision 23) is private: its lockstep reads it from `HOLONICS_CUT` (the
+//! The standing real cut (THE_REBUILD (f)) is private: its lockstep reads it from `HOLONICS_CUT` (the
 //! cut file; its manifest beside it), and reports itself skipped when the file is absent.
 
 use std::ops::Range;
@@ -141,7 +141,7 @@ fn half_matrix(draw: &mut Draw, rows: usize, columns: usize) -> ExactRatMatrix {
 
 /// **A generic constitution on half-integers**: every locus drawn (the passive factor, the
 /// contrast port, generic slices, a mixed standing, the ports, nonzero pair-port outputs, the
-/// channels' factors, and the receiving parametron's landmark tree, Decision 28: a drawn passage
+/// channels' factors, and the receiving parametron's landmark tree: a drawn passage
 /// deposited at drawn addresses, so the tree's face differs from address to address and from
 /// uniform), so every term of the word and its return is exercised from the first window.
 fn generic(field: &Field, seed: u64) -> Constitution {
@@ -273,7 +273,7 @@ struct Compared {
     boundaries: u64,
     keys: u64,
     reads: u64,
-    /// The cells the deposits added to the receiving parametron's tree (Decision 28).
+    /// The cells the deposits added to the receiving parametron's tree (the landmark tree).
     landmarks: u64,
     /// Declared resonator material families whose gains changed across a deposit.
     resonator_material_changes: u64,
@@ -353,7 +353,7 @@ fn lockstep(
             let Some((staged, _)) = compared_return else {
                 break;
             };
-            // Prequential (Decision 29): every compared window is deposited, the held-out tail
+            // Prequential scoring: every compared window is deposited, the held-out tail
             // included; only the budget stop discards.
             if h.stopped().is_some() {
                 same(
@@ -372,7 +372,7 @@ fn lockstep(
                     device.deposit(&mut d, staged),
                 );
                 compared.deposits += 1;
-                // The cells a deposit added to the tree (Decision 28), and the published
+                // The cells a deposit added to the tree (the landmark tree), and the published
                 // constitutions, the tree among them, equal on both ports.
                 if let Some(reading) =
                     deposited.and_then(|returned| returned.deposit.into_present())
@@ -486,7 +486,7 @@ fn the_dyadic_readings_are_exact() {
     );
 }
 
-/// Decision 28 on the card's publication (no card needed to form it): the receiving parametron's
+/// The landmark tree on the card's publication (no card needed to form it): the receiving parametron's
 /// tree is not a published locus of the word (its own mirror, `tree::CardTree`, carries it); the
 /// reference reads it from the constitution at compare, at each phase's causal address and in cell
 /// order (phase 1 after phase 0's target is deposited, on a working overlay), and the device's
@@ -530,7 +530,7 @@ fn the_tree_is_read_at_each_phases_address_in_cell_order() {
 // the lockstep on the card
 
 /// The chain at its capacity from its declared initial constitution: every window refined,
-/// released, compared and deposited, the held-out tail included (Decision 29), the aeons closed and
+/// released, compared and deposited, the held-out tail included (prequential scoring), the aeons closed and
 /// keys located; every return the reference's.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
@@ -542,7 +542,7 @@ fn the_card_port_returns_the_reference_on_the_chain() {
     let compared = lockstep(&field, &cut_of(cells, held..population), u64::MAX, None, 3);
     println!("chain, declared constitution: {compared:?}");
     assert!(compared.boundaries > 0 && compared.keys > 0 && compared.deposits > 0);
-    // Every deposited window added its two targets to the tree (Decision 28).
+    // Every deposited window added its two targets to the tree (the landmark tree).
     assert_eq!(compared.landmarks, 2 * compared.deposits);
 }
 
@@ -585,7 +585,7 @@ fn the_card_port_returns_the_reference_on_campaign_one() {
     assert_eq!(compared.landmarks, 16);
 }
 
-/// **Campaign 2's physics through the port** (Decision 25): campaign 1's field with a resonator on
+/// **Campaign 2's physics through the port** (the hardware-surfaces rule): campaign 1's field with a resonator on
 /// every ring (`physics_tests::resonant`) and a certified boost on contact 0 (one negative
 /// stiffness column), on a drawn byte cut: every return the reference's, the refine receipts'
 /// resonator balances (the loaded word's ticks decoded by `crate::hnn::readout`)
@@ -835,7 +835,7 @@ fn manifest(path: &str) -> Option<(usize, Range<usize>)> {
     Some((population, range[0]..range[1]))
 }
 
-/// **The standing real cut's first 24 windows** (Decision 23; the cut file from `HOLONICS_CUT`):
+/// **The standing real cut's first 24 windows** (THE_REBUILD (f); the cut file from `HOLONICS_CUT`):
 /// every return the reference's.
 #[test]
 #[ignore = "needs the CUDA card and the private standing cut (HOLONICS_CUT); run alone"]

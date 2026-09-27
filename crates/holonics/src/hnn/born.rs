@@ -1,5 +1,5 @@
 //! **The wave read by the Born rule: a finitely correlated (quantum hidden Markov) receiver on the
-//! receiving ring's register** (Decision 33; rebuild step 4, #73; Lean `HNN/BornFace`).
+//! receiving ring's register** (the Born face; rebuild step 4, #73; Lean `HNN/BornFace`).
 //!
 //! [definition] The computational object is the helical pair interaction; this owner is its
 //! receiving parametron read quantum-mechanically. Of the winding guide's six general objects it
@@ -73,7 +73,7 @@
 //! `p̂` (the chart of `p` at `2^(−M)`, whose residual is the face's rounding), so it is bounded by
 //! `2^(M−1)`: a digit the executed face floors moves by the step the code paid for.
 //!
-//! [definition; agent-inferred] **The lattices** (Decisions 22 and 24; every width derived from the
+//! [definition; agent-inferred] **The lattices** (the lattice deposit and the lattice word; every width derived from the
 //! declaration, [`BornWidths::derived`]):
 //! - **the face** on `2^(−M)`, `M` the least with `2^M ≥ 3 B L_R (2n* + 2)`: a face of at least
 //!   `1/(2n* + 2)` (the least a learner of `n*` arrivals assigns) is rounded within a quarter grain a
@@ -87,10 +87,10 @@
 //!   refining precision `2^(−L_A−k_m)`, `k_m = 2⌊log₂ m⌋ + 1` (Lean `HNN/LatticeDeposit`), so
 //!   applied + carried + released is the exact executed update and the releases since the locus's
 //!   founding stay below half a unit;
-//! - **the Gram** on `2^(−L_H)`, `L_H = ⌈log₂(2 L_R χ)⌉` (Decision 22's rule for a width-`χ` Gram:
+//! - **the Gram** on `2^(−L_H)`, `L_H = ⌈log₂(2 L_R χ)⌉` (the lattice deposit's rule for a width-`χ` Gram:
 //!   within `χ 2^(−L_H) ≤ 1/(2L_R)` of the exact statistic, so positive definite), its increment
 //!   `ψψ†/‖ψ‖²` split exactly at the refining lattice;
-//! - **the covector's charts** (Decision 24's chart-based covector): the amplitude `A_c ψ`, the
+//! - **the covector's charts** (the lattice word's chart-based covector): the amplitude `A_c ψ`, the
 //!   solve `H′⁻¹ψ` and the coefficient `½(q_c/p̂_c − 1)/‖ψ‖²` each read on `C = M + 4 + j`
 //!   significant bits (relative residual `2^(1−C)` each), their product an exact dyadic that the
 //!   carry splits;
@@ -118,10 +118,10 @@
 //! [established-bounded; measured] **On the standing cut** (notebook `hnn_born`, development cells
 //! only, prequential): the best Born face, `Dyadic` at `χ = 128`, reads `4 + 3/16 + ε` bits a cell
 //! against the landmark tree's `3 + 10/16 + ε`, and no member of the declared family (both
-//! emissions, `χ ≤ 256`) lowers Decision 30's mixture below the tree; the mixture telescopes to
+//! emissions, `χ ≤ 256`) lowers the likelihood mixture below the tree; the mixture telescopes to
 //! `½W_T + ½W_B`, so it codes below the tree only where the Born face alone does.
 //!
-//! [established-bounded; measured] **Weighed locally** (Decision 34; the notebook `hnn_landmark`'s
+//! [established-bounded; measured] **Weighed locally** (local weighing; the notebook `hnn_landmark`'s
 //! retired `local` mode, commit `d2a2e0db`): the Born face's digit split
 //! ([`DigitOperand::numerator`], read causally at each digit) was the external face of the landmark
 //! tree's node-local law (retired, its realization at commit `89460425`, its law in Lean
@@ -1074,7 +1074,7 @@ impl Born {
         }
     }
 
-    /// **Read a cell** at the current standing (Decision 29: before its own deposit): each digit's
+    /// **Read a cell** at the current standing (prequential scoring: before its own deposit): each digit's
     /// split at the state the earlier digits left, the state received digit by digit
     /// (`ψ ← A_b ψ`, rebased), and the cell's executed face, with the digits' operands.
     pub fn read(&mut self, class: usize) -> Result<Reception, HnnError> {

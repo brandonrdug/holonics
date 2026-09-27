@@ -1366,7 +1366,7 @@ fn a_stale_deposit_is_refused() {
     );
 }
 
-/// The declared initial constitution and priors (design (d), R3 D2, Decision 28), on the chain
+/// The declared initial constitution and priors (design (d), R3 D2, the landmark tree), on the chain
 /// control: `E` (`2d_0 × |A|`) the declared `±1` pattern times 1/2 (kind 0), the receiving map `R`
 /// (`2|A| × 2d_R`) zero, the receiving parametron's tree empty, the pair port's outputs 0 on ring
 /// 0's width, `W_s = −½I` (the passive factor `½I`), `W_c = 0`,

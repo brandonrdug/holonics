@@ -14,15 +14,15 @@
 //!   the contact's midpoint two-port, the global power and the causal cone;
 //! - [`word`]: a [`Word`], one evaluation at one cut's fixed operands, opening at zero change and
 //!   releasing it at its end;
-//! - [`chart`]: the word on its declared lattices (Decision 24): every inverse a certified lattice
+//! - [`chart`]: the word on its declared lattices (the lattice word): every inverse a certified lattice
 //!   chart refined by rounded Newton–Schulz steps, every transient carried with error feedback, the
 //!   integer products under the carrier's ℓ1 certificate, and the declared precisions by rule;
 //! - [`receiving`]: [`ReceivingPhases`], the receiving parametron's active suffix address
 //!   ([`ActiveAddress`]) and the read at the receiver's grain `L_R`: the combined face of the
-//!   landmark tree's face at each phase's causal address and the wave (Decisions 27 and 28);
+//!   landmark tree's face at each phase's causal address and the wave (the region table and the landmark tree);
 //! - [`landmark`]: the receiving parametron's storage as a tree of landmarks ([`Landmarks`]): typed
 //!   address letters, KT masses at nodes founded at first arrival, the path face mixed along the
-//!   opened path, its deposit and its prequential measurement (Decision 28);
+//!   opened path, its deposit and its prequential measurement (the landmark tree);
 //! - [`keys`]: the data → menu map, key location per ring in carry order, and gauge fixing;
 //! - [`ring`] (campaign 2): the ring's parametron resonator at its storage port (its mode storage
 //!   `Q = diag(K, C)`, its pump and sheets), its rotor clock's epoch ticks, and the junction's
@@ -33,7 +33,7 @@
 //! - [`modes`] (campaign 3, first construction): a loaded ring's exact per-phase operators and its
 //!   mode quotient: the admitted future kernel through the pump's period, the release by the one
 //!   chart that closes every phase's squares, and the descended ring that returns the same wave;
-//! - [`born`] (Decision 33): the receiving ring's register read by the Born rule, a finitely
+//! - [`born`] (the Born face): the receiving ring's register read by the Born rule, a finitely
 //!   correlated receiver whose density is the retained state, each digit split by its pair of
 //!   operators' traces, the collapse its receipt, and the operators learned by the normal law's
 //!   Fisher-scored prox step on declared lattices.
@@ -59,15 +59,15 @@
 //! | the causal cone | `HNN/Word.word_tick_cone` (the concrete tick) | [`Word::support`] |
 //! | the word on declared lattices: certified inverse charts, error feedback, the executed adjoint, the balance up to the residual | `HNN/LatticeWord.{nsStep, rounded_refinement_certificate, roundedIter_certificate, warm_start_certificate, inverse_chart_deviation, feedback_tick, carried_word_accounting, executed_adjoint_unique, executed_adjoint_deviation, cayley_chart_energy}` | [`chart`], [`Word`], [`Word::pull_back`], [`propagation::TickBalance`] |
 //! | the moment | `HNN/Moment.{encoderMoment_contract, encoder_covector_tape_free, closingRing_moment_is_phaseBinned, exteriorOffset_independent_of_E, selective_position, moment_capacity}` | [`SourceMoment`], [`moment::capacity`] |
-//! | the receiving face: the landmark tree's face at each phase's causal address, read at the grain, plus the wave (Decisions 27 and 28; Decision 27's region table is the depth-one forced case of the whole-cell emission, kept in Lean, not of the digit tree) | `HNN/RegionCounts.{grain_log_iff_pow_bounds, grain_code_residual, combined_face_pullback}`, `HNN/LandmarkTree.{depth_one_is_decision_27, release_rule}` | [`receiving`], [`ReceivingRead::combined`], [`ActiveAddress`] |
-//! | the receiving face compresses landmarks: the tree's path face, its opened-path deposit and telescope, the executed dyadic face (Decision 28) | `HNN/LandmarkTree.{path_face_normalized, weight_step, landmark_step, path_telescope_exact, depth_one_is_decision_27, executed_split_laws, cell_faces_partition, digit_log_residual}` ([`landmark`]'s header has the rest) | [`landmark`] |
+//! | the receiving face: the landmark tree's face at each phase's causal address, read at the grain, plus the wave (the region table and the landmark tree; the region table is the depth-one forced case of the whole-cell emission, kept in Lean, not of the digit tree) | `HNN/RegionCounts.{grain_log_iff_pow_bounds, grain_code_residual, combined_face_pullback}`, `HNN/LandmarkTree.{depth_one_is_decision_27, release_rule}` | [`receiving`], [`ReceivingRead::combined`], [`ActiveAddress`] |
+//! | the receiving face compresses landmarks: the tree's path face, its opened-path deposit and telescope, the executed dyadic face (the landmark tree) | `HNN/LandmarkTree.{path_face_normalized, weight_step, landmark_step, path_telescope_exact, depth_one_is_decision_27, executed_split_laws, cell_faces_partition, digit_log_residual}` ([`landmark`]'s header has the rest) | [`landmark`] |
 //! | the word opens at zero | structural: [`Current`] has no wave field (`HNN/Retention.word_opens_at_zero` is the abstract trajectory's linearity) | [`Word::open`] |
 //! | keys | `HNN/Keys.{field_loop_fibre, selective_step_dormant, propagation_eq_edge_fibre, gauge_fix_unique}` | [`keys`], [`crate::compression::Menu::propagate`] |
 //! | the ring's mode tick, its pump and sheets, its clock, the junction's reference change (campaign 2) | `HNN/Ring.{ring_tick_conserves_mode_energy, ring_descriptor_tick_conserves, ring_cayley_denominator_nonsingular, ring_tick_executed_energy_balance, two_port_reference_balance, ring_crossings_are_epoch_ticks, pump_half_turn_invariant, pump_blind_to_sheets, locked_sheet_receiver_face}` | [`ring`] |
 //! | the contact's transfer and site kind, its boost, its lock address, its break (campaign 2) | `HNN/Contact.{contact_transfer_kind_by_storage_sign, contact_mode_transfer, contact_boost_solve_or_singular_direction, contact_signed_storage_balance, contact_lock_address, lockAddress_unique, least_denominator_unique, lockAddress_closes}`, `HNN/ContactBreak.{break_release_balance, break_iff_release_covers_gluing, griffith_closed_port_case, parting_returns_gluing_defect}` | [`contact`], [`contact_readings`], [`Field::parted_holon`] |
-//! | the loaded tick's field/resonator balance, separate element and returned-wave splits, the word's balance across the gain commit (Decision 38) | `HNN/Ring.{loaded_word_stage_balance, loaded_tick_executed_interconnection_balance}`, `HNN/Word.{field_commit_deposition}` | [`word::FieldBalance`], [`word::WordBalance`], [`word::PowerForm`] |
+//! | the loaded tick's field/resonator balance, separate element and returned-wave splits, the word's balance across the gain commit (the loaded resonator) | `HNN/Ring.{loaded_word_stage_balance, loaded_tick_executed_interconnection_balance}`, `HNN/Word.{field_commit_deposition}` | [`word::FieldBalance`], [`word::WordBalance`], [`word::PowerForm`] |
 //! | a loaded ring's modes descend to their future quotient: the period lift, one chart for every phase, the descended run, the storage-null release (campaign 3, first construction) | `HNN/ModeQuotient.{periodic_lift_exact, phase_kernel_le_lift, descended_run_reads, released_pair_storage_null}` | [`modes`] |
-//! | the wave read by the Born rule: the digit split and the dyadic cell face, the reception keeping a density, the density as the retained quotient, the absorbed tick, the interference zero, the covector and the Fisher-scored step (Decision 33) | `HNN/BornFace.{born_face_normalized, born_executed_partition, born_update_trace_one, born_pure_stays_pure, born_state_future_sufficient, born_unitary_invariant, born_tick_absorbed, born_interference_zero, born_covector_eq, born_fisher_bound}` | [`born`] |
+//! | the wave read by the Born rule: the digit split and the dyadic cell face, the reception keeping a density, the density as the retained quotient, the absorbed tick, the interference zero, the covector and the Fisher-scored step (the Born face) | `HNN/BornFace.{born_face_normalized, born_executed_partition, born_update_trace_one, born_pure_stays_pure, born_state_future_sufficient, born_unitary_invariant, born_tick_absorbed, born_interference_zero, born_covector_eq, born_fisher_bound}` | [`born`] |
 //! | the ring's navigator | `Holon/Navigator.{mapRotor_order, map_pow_mod_order, map_turn_lossless}` | [`Ring::navigator`] over `navigator::Transport::Map` |
 //! | the block incidence, the contrast map read from its blocks, and the Holarchy chart | `Holon/Complex.{blockIncidence, block_flat_closed}`, `Holarchy/Join.interconnect` | [`Field::connection`], [`Field::contrast`], [`Field::holon`] |
 //! | the port's returns | `Holarchy/Reception.InteractionReturn` (the owner's, generic in its payloads) | [`ExecutionPort`] |

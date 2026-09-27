@@ -1,4 +1,4 @@
-//! An independent scalar-coordinate witness for the loaded storage port (Decision 38).
+//! An independent scalar-coordinate witness for the loaded storage port (the loaded resonator).
 
 use num_traits::Zero;
 

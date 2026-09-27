@@ -1,8 +1,8 @@
-//! **Decision 28's tree of one node a depth, the tests' independent reference** (Lean
+//! **The full tree of one node a depth, the tests' independent reference** (Lean
 //! `HNN/LandmarkTree.{stopWeight, landmark_step}`): the ideal tree weighting in ℚ with every node of
 //! an opened path founded at its first arrival, one node a depth, at its depth's
-//! `β₀ = 2^(j_d) − 1`. The library stores the tree at the faces where paths part (Decision 37,
-//! `hnn::landmark`), whose code is this tree's exactly in ℚ
+//! `β₀ = 2^(j_d) − 1`. The library stores the tree at the faces where paths part
+//! (`hnn::landmark`), whose code is this tree's exactly in ℚ
 //! (`HNN/LandmarkCompaction.compacted_is_decision_28`); the retired realization of this arena
 //! (`Storage::Full`) is at commit `89460425`. Its nodes are keyed by their tree and the address
 //! prefix that reaches them, so it shares no topology with the owner it checks.
@@ -14,7 +14,7 @@
 //! - a deposit steps each mixing depth `β' = β k(b)/q'(b)` and the join
 //!   `β'_h = β_h q_cells(b)/q_bundles(b)`, founds the path's missing depths, then counts the digit
 //!   at every depth past the forced ones;
-//! - under a declared capacity (Decision 39) each node's counts carry, `n ← ⌈n/2⌉`, when its count
+//! - under a declared capacity (the register's capacity) each node's counts carry, `n ← ⌈n/2⌉`, when its count
 //!   brings `n_0 + n_1` to `2^c`, node by node: every depth keeps its own register, so this tree
 //!   checks that a stored chain of the owner is one register (Lean
 //!   `HNN/LandmarkCompaction.compacted_node_law`). Each node also counts its arrivals and its
@@ -44,7 +44,7 @@ struct Read {
     faces: Vec<Rat>,
 }
 
-/// **Decision 28's full tree in ℚ** (module header).
+/// **The full tree in ℚ** (module header).
 pub(super) struct FullTree {
     declaration: LandmarkDeclaration,
     digits: u64,
@@ -53,7 +53,7 @@ pub(super) struct FullTree {
 }
 
 impl FullTree {
-    /// Decision 28's tree of a declaration, empty.
+    /// The full tree of a declaration, empty.
     pub(super) fn new(declaration: LandmarkDeclaration) -> Self {
         let digits = odometer_digits(declaration.alphabet);
         let joins = vec![Rat::one(); 1usize << digits];
@@ -70,7 +70,7 @@ impl FullTree {
         self.nodes.len()
     }
 
-    /// The carries over every node so far (Decision 39).
+    /// The carries over every node so far (the register's capacity).
     pub(super) fn carries(&self) -> u64 {
         self.nodes.values().map(|node| node.carries).sum()
     }

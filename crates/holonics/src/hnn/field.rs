@@ -19,12 +19,12 @@
 //!   ([`Contact::pair`]); it has no scalar conductance;
 //! - the [`Field`] is the declared complex with its source rings `𝒮`, offsets `Δ`, the exterior
 //!   chart's size `|A|` (read only by the capacity), the hop `h`, the exponent grain `L`, the
-//!   admitted receivers with their landmark trees' address depths (Decision 28), the crib, and the
+//!   admitted receivers with their landmark trees' address depths (the landmark tree), the crib, and the
 //!   carrier lattice `2^(−L_ℓ)ℤ` of
 //!   every learned locus
 //!   ([`FieldDeclaration::lattice_by_rule`]). [`Field::declare`] computes the capacity `n*` by
 //!   counting and refuses a declared population shorter than it (guard 1), and declares the word's
-//!   precisions by rule ([`Field::word_lattice`], [`crate::hnn::WordLattice::by_rule`], Decision 24):
+//!   precisions by rule ([`Field::word_lattice`], [`crate::hnn::WordLattice::by_rule`], the lattice word):
 //!   the certificate's target `2^(−D_c)`, the charts' lattice `L_c = 2D_c` and the transients'
 //!   lattice `L_w`, from the finest receiver grain, the receiving fan-in, the widest local solve
 //!   and the junction steps; [`Field::describe`] codes them. Its contacts are the
@@ -124,7 +124,7 @@ pub trait ConstitutionRead: Sync {
     fn contact_dissipation(&self, contact: usize) -> &ExactRatMatrix;
     /// The receiving map `R` (`2|A| × 2d_R`) of a receiving ring; `None` elsewhere.
     fn receiving_map(&self, ring: usize) -> Option<&ExactRatMatrix>;
-    /// **The receiving parametron's landmark tree** (Decision 28, `hnn::landmark`) of a receiving
+    /// **The receiving parametron's landmark tree** (`hnn::landmark`) of a receiving
     /// ring, whose face at each phase's causal address the receiving read adds to the wave at the
     /// grain (`hnn::receiving`); `None` elsewhere.
     fn landmarks(&self, ring: usize) -> Option<&Landmarks>;
@@ -196,10 +196,10 @@ pub struct ContactDeclaration {
 
 /// [definition] **An admitted receiver as declared**: its receiving ring, its aperture `A`, its
 /// code tolerance `ε_bits` per cell, from which its grain `L_R = ⌈1/ε_bits⌉` is derived, the
-/// depth `D` of its landmark tree's address (Decision 28; `hnn::receiving::landmark_declaration`):
+/// depth `D` of its landmark tree's address (the landmark tree; `hnn::receiving::landmark_declaration`):
 /// the receiving parametron's storage is the tree over the last `D` cells, and `D = 1` with the
-/// root's split forced is Decision 27's region table; and the tree's declared stop-weight law
-/// (Decision 32; `hnn::landmark::StopPrior`, Decision 28's `½` at `StopPrior::half`).
+/// root's split forced is the region table; and the tree's declared stop-weight law
+/// (the declared stop prior; `hnn::landmark::StopPrior`, the `½` stop prior at `StopPrior::half`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReceiverDeclaration {
     pub ring: usize,
@@ -255,14 +255,14 @@ impl FieldDeclaration {
     /// `∅` on ring 3; reflectors `p ↦ −p mod d_g`; every ring at phase 0; one axis `e_z` through the
     /// origin, pitch 0, node `k` of ring `g` at the quarter turn `⌊4k/d_g⌋` of the unit circle
     /// ([`FieldDeclaration::quarter_turn`]); `β_a = 2`, `L = 1`; `h = 1`, `Y_g = Y_a = 2`; `L_R = 16`
-    /// (tolerance 1/16 bit); the receiver's landmark tree at address depth `D = 4` (Decision 28, chosen
+    /// (tolerance 1/16 bit); the receiver's landmark tree at address depth `D = 4` (the landmark tree, chosen
     /// on the development cells in the landmark receipt);
     /// `Δ = {1}`; the crib `W_crib = 64` at offset 1. The population is the cut's length. The carrier
     /// lattices follow [`FieldDeclaration::lattice_by_rule`]: `L = 9, 9, 10, 10` for the four rings'
     /// elements and standings, `10` for ring 2's receiving map, `9, 9, 10, 9` for the four channels,
     /// and `⌈log₂(32 · population)⌉` for ring 0's source ports (`22` on a cut of 2^17 cells, `23`
     /// on the notebook's pinned 171,754-byte cut). The word's precisions follow by rule at
-    /// [`Field::declare`] (Decision 24): `L_R = 16`, `X_w = 22`, the widest solve `26` and
+    /// [`Field::declare`] (the lattice word): `L_R = 16`, `X_w = 22`, the widest solve `26` and
     /// `e_max = 4` give the target `2^(−19)`, `L_c = 38` and `L_w = 15`.
     pub fn campaign_one(population: u64) -> Self {
         let periods = [5u64, 7, 11, 13];
@@ -385,7 +385,7 @@ impl FieldDeclaration {
     /// factor entry the same way, not their product, and the bound on a read through them is the
     /// word-level certificate owed in #62 ("Step 4 (#73) owed: the word-level certificate"). The remainder
     /// is carried, never released by the aeon collapse, which releases only exact complements
-    /// (Decision 22); each deposit releases only its tail below the refining precision `k_m`, and
+    /// (the lattice deposit); each deposit releases only its tail below the refining precision `k_m`, and
     /// the tails of one entry sum below half a unit since the locus's founding
     /// (`release_bounded_since_founding`). Since `X_ℓ` is at least the locus's Gram width, a carried
     /// Gram stays positive definite, `H ⪰ (1 − 1/(2L_R)) I` (`carried_gram_posDef_rule`). The unit
@@ -1034,7 +1034,7 @@ impl Field {
         })
     }
 
-    /// **The word's declared precisions** (Decision 24; [`WordLattice::by_rule`]): the charts'
+    /// **The word's declared precisions** (the lattice word; [`WordLattice::by_rule`]): the charts'
     /// lattice `L_c`, the certificate's target `2^(−D_c)` and the transients' lattice `L_w`. `None`
     /// is the exact law, which only the law's own tests declare (`Field::with_exact_word`).
     pub fn word_lattice(&self) -> Option<&WordLattice> {
@@ -1611,7 +1611,7 @@ impl Field {
     }
 
     /// **The field's exact self-delimiting code**: every declared value, each receiver's tree depth
-    /// `D` (Decision 28) and its stop-weight law's rungs (Decision 32), the word's precisions
+    /// `D` (the landmark tree) and its stop-weight law's rungs (the declared stop prior), the word's precisions
     /// (`L_c`, `D_c`, `L_w`; none for the exact law), the recorded `n*`, the open's law with its
     /// population chart's lattice `L_ν` (ruling B), the gauge convention, the sign generator's rule,
     /// the receiving law's code ([`RECEIVING_LAW`]) with the tree's Krichevsky–Trofimov prior `α`,
@@ -1674,7 +1674,7 @@ impl Field {
             natural(&mut code, receiver.aperture as u64);
             rational(&mut code, &receiver.tolerance);
             natural(&mut code, receiver.depth as u64);
-            // The stop-weight law's rungs from the root (Decision 32; `[1]` is Decision 28's `½`).
+            // The stop-weight law's rungs from the root (the declared stop prior; `[1]` is the `½` stop prior).
             let rungs: Vec<u64> = receiver
                 .prior
                 .rungs()
@@ -1702,7 +1702,7 @@ impl Field {
             natural(&mut code, index as u64);
             natural(&mut code, u64::from(lattice.exponent()));
         }
-        // The word's precisions (Decision 24): `L_c`, `D_c`, `L_w`; none for the exact law.
+        // The word's precisions (the lattice word): `L_c`, `D_c`, `L_w`; none for the exact law.
         match &self.word {
             Some(word) => naturals(
                 &mut code,
@@ -1715,7 +1715,7 @@ impl Field {
             None => naturals(&mut code, &[]),
         }
         natural(&mut code, self.capacity.n_star());
-        // The source's open (the primary's ruling B, Decision 26's): 1 names "the indexed
+        // The source's open (the primary's ruling B, the first repair's): 1 names "the indexed
         // normalized open", with its population chart's lattice `L_ν` (`hnn::moment::PopulationChart`).
         natural(&mut code, 1);
         natural(
@@ -1727,7 +1727,7 @@ impl Field {
         // The sign generator's rule (design (d)): 0 names "the low bit of SplitMix64 over
         // (0, ℓ, i, j)" (`constitution::declared_sign`).
         natural(&mut code, 0);
-        // The receiving law (Decision 28) and the tree's Krichevsky–Trofimov prior `α = 1/2`.
+        // The receiving law (the landmark tree) and the tree's Krichevsky–Trofimov prior `α = 1/2`.
         natural(&mut code, RECEIVING_LAW);
         rational(&mut code, &rat(1, 2));
         // The constitution's declared values and the resident's pending capacity.
@@ -1739,7 +1739,7 @@ impl Field {
     }
 }
 
-/// [definition; agent-inferred] **The receiving law's code in the description** (Decision 28): 3,
+/// [definition; agent-inferred] **The receiving law's code in the description** (the landmark tree): 3,
 /// "the combined face is the grain of the receiving parametron's landmark tree (the cell as its
 /// odometer digits, Krichevsky–Trofimov masses with `α` coded beside it, context-tree weighting over
 /// the per-cell causal address of depth `D`, coded with each receiver, on the tree's declared
@@ -1747,8 +1747,8 @@ impl Field {
 /// reached covectors; the scored face is the mixture of the tree's face and the combined face
 /// weighted by their likelihood ratio `β`, opening at 1 (the primary's ruling A); every comparison
 /// is scored and then deposited" (`hnn::receiving`, `hnn::landmark`).
-/// Code 2 was Decision 27's region class masses with `R` opening at the sign generator times ½;
-/// code 1 Decision 26's exogenous normal law on the target code face with the standing read; and
+/// Code 2 was the region table's class masses with `R` opening at the sign generator times ½;
+/// code 1 the first repair's exogenous normal law on the target code face with the standing read; and
 /// campaign 1's first law (the face on the change alone) carried none. A feature-law change takes
 /// the next code and starts a fresh constitution: an old statistic cannot be re-read through new
 /// features without the samples retention forbids.

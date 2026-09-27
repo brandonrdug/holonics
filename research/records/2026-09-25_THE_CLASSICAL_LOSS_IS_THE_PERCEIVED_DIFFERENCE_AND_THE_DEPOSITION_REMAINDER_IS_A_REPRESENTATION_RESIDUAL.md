@@ -215,3 +215,51 @@ statement about change per permeability and permittivity of the partition I thin
     `Objects/CommitRebase`.
 - **The per-cell budget split** as a reading of the exposure: `Σ ℓ + Σ g = n log₂|A|`, per aeon, beside
   the first-law split.
+
+## Addendum (same day): the word on declared lattices (the former Decision 24)
+
+[historical] The same exact-representation law, applied the same evening to the word's transients
+and inverses (commits `c0415925`, `53db0a8a`, `0b046304`). Moved here verbatim on September 27 from
+THE_REBUILD's former Decision 24; the law stands in `hnn::chart`'s module doc (Lean
+`HNN/LatticeWord`), and "Decision N" resolves through THE_REBUILD's [Decisions index](../../docs/plans/THE_REBUILD.md#i-the-decisions-index).
+
+**Every transient and every inverse inside the HNN is carried on a declared lattice with a
+certified residual.** Measured September 25 on the standing real cut: `6 rem 7 over 10` s per receiving
+window on one CPU core, because each ring's Cayley element `2(I − E/2)⁻¹ − I` and each contact
+solve were exact rational inverses whose determinant denominators (about 1 kbit) compounded
+across ticks, carrying numerators and denominators of between 2^11 and 2^13 bits through the word and its adjoint,
+and because the normal laws carried exact solved charts `H⁻¹` growing by the Hadamard bound.
+Decision 22 bounded the constitution, not the word. The exact-representation law applies:
+- **Transients** (each ring's state and the adjoint inside a word) are carried on
+  `2^(−L_w)ℤ` with error feedback: each tick's exact image of the carried state plus the
+  carried remainder is split at the nearest lattice point, the remainder carried, and the word
+  releases and reports the remainder at its end (the word already releases its unread change).
+- **Inverses** (`(I − E/2)⁻¹`, the contact solve `m⁻¹`, and each normal law's `H⁻¹`) are carried
+  as lattice charts `X̂` with a certified residual `R = I − A X̂`, `‖R‖ ≤ δ`. They are refined by
+  Newton–Schulz, `X̂ ← X̂(2I − AX̂)`, whose exact residual is `R²`, and rounded onto the chart's
+  lattice with the rounding term added to the certificate; each window warm-starts from the
+  last chart, since `A` moves by one deposit.
+- **The adjoint** pulls the covector back through the transposes of the linear charts actually
+  executed (`LatticeWord.executed_adjoint_unique`): a chart-based covector. It is not the
+  derivative of the rounded word: rounded participation weights are returned through the
+  smooth normalization at the executed anchor, a difference that needs its own residual
+  (owed, #62).
+- **The balances.** The ring's power balance and the prox identity
+  `(W + ΔW)H' = WH' + γΣ w g fᵀ` hold up to the released residuals, reported per word and per
+  deposit (the chart's share and the map and Gram carries, to be stated in one balance,
+  owed); the precisions are declared by rule so that each local solve and split moves a read
+  by less than a quarter grain under unit-scale operands and non-expansive continuation. That
+  a whole read moves below the grain needs the uniform sensitivity bound through every later
+  tick, active port and charted junction, a research obligation in #62. The first law is
+  unaffected: its exact values telescope and the ledger's enclosures widen by their interior
+  widths. Guard 15 is unaffected: word transients are never retained.
+- **Consequence.** The word's transients and charts are fixed-width integer coordinates (64- or
+  128-bit words with the ℓ1 carrier refusal), and its work is integer matrix products and small
+  certified refinements, which the card executes. The faces in `ℚ(θ)`, the initial covector on
+  `(1/W)ℤ`, the non-dyadic participation work, the prox deposition and the rare exact-inverse
+  fallback stay exact on the host.
+
+Source: agent-inferred from CLAUDE.md's exact-representation law and the measurement, after
+Brandon's September 25 ruling (Decision 25). Lean `HNN/LatticeWord` states the residual
+squaring, the error-feedback accounting, the balances up to the residual and the executed
+adjoint. Brandon may override it.

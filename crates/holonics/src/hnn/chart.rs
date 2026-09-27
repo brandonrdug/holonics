@@ -1,4 +1,4 @@
-//! **The word on declared lattices: certified inverse charts and carried transients** (Decision 24;
+//! **The word on declared lattices: certified inverse charts and carried transients** (the lattice word;
 //! Lean `HNN/LatticeWord`).
 //!
 //! [definition] Every inverse the word executes is a **lattice chart** `X̂` on `2^(−L_c)ℤ`, carried

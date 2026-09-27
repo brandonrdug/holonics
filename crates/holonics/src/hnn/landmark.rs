@@ -1,6 +1,24 @@
 //! **The receiving parametron's storage as a tree of landmarks, executed on a declared dyadic
 //! lattice, addressed by typed bundles, weighing every face locally, stored at the faces where
-//! paths part** (Decision 28; campaign 2's receiving letters; Decisions 32, 34 and 37; #73).
+//! paths part** (campaign 1's repair; campaign 2's receiving letters; #73).
+//!
+//! [definition; Brandon, September 25; the tree's form agent-inferred] **The receiving face
+//! compresses landmarks.** Brandon: the compression "is of landmarks connecting generators … when
+//! relevant they expand and are open for a time"; a cache is "more like a cocycle in a natural
+//! autogradient"; tokenizers and BPE are "partials without complete mathematics". The law, derived
+//! with Sol (`research/records/2026-09-25_THE_COMPRESSION_IS_OF_LANDMARKS_A_TREE_COCYCLE_AND_MERGES_PRICED_BY_THEIR_CODE_LENGTH_PAIR.md`):
+//! landmarks are nodes of the tree of typed address words, founded at first arrival; each holds KT
+//! masses, and the face is the tree's weighting along the one path the current address opens
+//! (Willems–Shtarkov–Tjalkens), exact in ℚ and read at the grain; the path's edge log ratios are an
+//! additive cochain, a deposit is local to the path, and its covector is the log-derivative of the
+//! edge ratios, with no pullback through a network; release is the retention law's future
+//! quotient, never a budget alone; and the wave earns its computation by supplying address letters
+//! the tree weights in, any wave correction measured against the count-only face. The tree's form
+//! (context-tree weighting) and the build order are agent-inferred; merges (tokenizers) belong to
+//! campaign 5. The measurements are in the dated records of September 26 and 27
+//! (`2026-09-26_THE_LANDMARK_TREE_COMPRESSES_THE_STANDING_CUT_BELOW_PPM_TWO.md`,
+//! `2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md`,
+//! `2026-09-27_A_LANDMARKS_STORAGE_HAS_A_CAPACITY_AT_ITS_CEILING_IT_CARRIES.md`).
 //!
 //! [definition] The computational object is the helical pair interaction; this owner is the
 //! receiving parametron's storage, read as a tree of landmarks. Of the winding guide's six general
@@ -80,7 +98,7 @@
 //! half-units. A dyadic cell whose upper half holds no class of the chart forces its digit with
 //! face 1 and stores nothing, so every `|A| ≥ 2` is normalized. The whole-cell emission
 //! (`|A|`-ary masses at each node) is retired: on the standing cut it never earned a split (the
-//! record of September 26). Its depth-one forced case is Decision 27's region table (order-1's
+//! record of September 26). Its depth-one forced case is the region table (order-1's
 //! `|A|`-ary KT face), whose law is kept in Lean only (`HNN/LandmarkTree.depth_one_is_decision_27`).
 //!
 //! [definition; agent-inferred, the primary's law] **Every quantity on the hot path is a
@@ -112,7 +130,7 @@
 //!   the node's arrivals, `2^(1−W)` a mantissa rebase's `|ln(1 − r)|` (`rebase_log_residual`) and
 //!   `ρ_c` a carrier rebase's (below).
 //! - **A cell** has at most `B` opened digits and `Σ_(d<P) (2(P − d) − 1) = P²`, and each split of
-//!   a stored chain (Decision 37, below) rounds once more at `W` bits: an arrival splits at most one
+//!   a stored chain (stored where paths part, below) rounds once more at `W` bits: an arrival splits at most one
 //!   chain in each digit tree it opens and a lineage at most `D ≤ P` times, so the mantissa units
 //!   number at most `(2n* + 1) P²` a digit, and
 //!   `|log₂ q̂ − log₂ q| ≤ (3/2) B [(n* P² + 2P + 1) ε/μ̂ + (2n* + 1) P² 2^(1−W) + n* P² ρ_c]`
@@ -153,7 +171,7 @@
 //! 605,395 cells (`2^19` admitted), and now declares to 19,372,659 cells (`2^24`).
 //!
 //! [definition; agent-inferred] **The lattice mixture and the stop weight read split operands**
-//! (Decision 35: at the wide cut's `2^20` cells the single division's `2M_p + κ + 3` reached 133
+//! (the wide cut: at the wide cut's `2^20` cells the single division's `2M_p + κ + 3` reached 133
 //! bits). A mixing node's face `⟦λ̂ u/v + (1 − λ̂) x⟧` has the lattice numerator
 //! `λ̂u/v + (2^M − λ̂)x/2^M`; each part is divided with its remainder, `λ̂u = q_a v + r_a` and
 //! `(2^M − λ̂)x = q_b 2^M + r_b`, and the rounding reads
@@ -174,12 +192,12 @@
 //! `ρ ≤ Σ drift + Σ θ` per opened digit over both branches and the join, and a cell's
 //! ([`CellReading::residual`]) is the digits' sum in `log₂` (times `3/2`), never above the rule.
 //!
-//! [definition; agent-inferred] **Stored at the faces where paths part** (Decision 37; Lean
+//! [definition; agent-inferred] **Stored at the faces where paths part** (Lean
 //! `HNN/LandmarkCompaction`; the one storage). Every address runs to the declared
 //! depth (padded with `Boundary`), so a chain of nodes each with one reached child routes the same
 //! arrivals and holds the same counts: with `ρ = P_w/P_e`, `1 − ρ_j = (1 − w_j)(1 − ρ_(j+1))`, and on
 //! the dyadic rungs `1 − ρ_top = 2^(−S)(1 − ρ_bottom)`, `S = Σ j_i` (`chain_ratio`,
-//! `chain_ratio_dyadic`). So a chain with the node below it is one Decision 28 node at the summed
+//! `chain_ratio_dyadic`). So a chain with the node below it is one KT node at the summed
 //! rung, `P_w(top) = W E + (1 − W) X`, `1 − W = 2^(−S)`, founded at `β₀ = 2^S − 1` and stepped by the
 //! unchanged law (`compacted_is_decision_28`); a chain ending at `D` is one KT node
 //! (`leaf_chain_is_one_node`); a forced depth has rung `0`. A stored node is a chain: its bottom
@@ -215,7 +233,7 @@
 //! reached by `n` arrivals stores at most `2n − 1` nodes at every depth (`compacted_node_bound`),
 //! and a passage of `n` cells at most `2 n B` nodes and `n D` label letters a branch.
 //!
-//! [definition; agent-inferred] **A landmark's storage has a capacity** (Decision 39; Lean
+//! [definition; agent-inferred] **A landmark's storage has a capacity** (Lean
 //! `HNN/LandmarkCapacity`; [`Capacity`], declared in [`LandmarkDeclaration::capacity`]). A node's
 //! counts are a register on the node's own clock, its arrivals: the deposit counts the digit, and
 //! when that brings `n_0 + n_1` to the ceiling `L = 2^c` both counts carry, `n_b ← ⌈n_b/2⌉`, so the
@@ -228,24 +246,24 @@
 //! law_standing_is_routed}`, `LandmarkCompaction.compacted_node_law`): a chain's nodes route the
 //! same arrivals, so a stored
 //! chain is one register, and a split's upper part takes the chain's register (`Law::part`
-//! unchanged). `Unbounded` (`c = ∞`) is Decision 28's node, as is every ceiling no node reaches
+//! unchanged). `Unbounded` (`c = ∞`) is the KT node, as is every ceiling no node reaches
 //! (`cap_below_ceiling_is_kt`). The carry only lowers counts, so every node's total stays at most
 //! its arrivals: KT's floor `1/(2n* + 2)`, the widths, the certificates and the rule are
 //! unchanged. The card's mirror (`holonics-cuda`, `kernels/tree.cu`) carries the same register at
 //! the same ceiling in its deposit ([`Capacity::ceiling_halves`] uploaded with the law).
 //!
-//! [historical; measured] **Decision 28's arena of one node a depth is retired** (its realization,
+//! [historical; measured] **The full arena of one node a depth is retired** (its realization,
 //! `Storage::Full`, is at commit `89460425`): it declared the same prior and read the same face in
 //! ℚ at every arrival, and on the wide cut's development cells at `D = 6` the two codes were equal
 //! within their certificates while the full arena held 4,620,707 nodes against 2,784,875 (commit
 //! `2fb0c1c0`). The tests keep an ideal full tree in ℚ as the independent reference
 //! (`hnn/tests/landmark_full.rs`).
 //!
-//! [historical; measured] **Founding where paths converge (Decision 36) is measured and retired**
+//! [historical; measured] **Founding where paths converge (second-arrival founding) is measured and retired**
 //! (commit `d137e8a6`; Lean `HNN/ConvergenceFounding` stays as the law of absent children and
 //! stopping rules). A node founded at its second arrival, its first arrival held as a pending record
 //! in the child table, declared a different prior; on the wide cut's development cells it coded
-//! above Decision 28's first-arrival tree at `D = 6` (`1827190 + 13/16 + ε` bits at its chosen
+//! above the first-arrival tree at `D = 6` (`1827190 + 13/16 + ε` bits at its chosen
 //! `D = 19`, charged 6, against `1822006 + 1/16 + ε`, charged 4), so the development cells kept the
 //! first arrival (held out, disclosed and choosing nothing, it read `−490 + 11/16 + ε` below: its
 //! paths grew one depth a recurrence, so its early cells read shallow and its late cells deep); its
@@ -269,7 +287,7 @@
 //! certificates: 48 bytes a node (the depth word, the label end, the masses and the chart's `β` and
 //! `λ̂`), a 12-byte table slot at twice the nodes, and 4 bytes a label letter.
 //!
-//! [definition; agent-inferred] **A window in cell order** ([`Landmarks::window_faces`], Decision 29
+//! [definition; agent-inferred] **A window in cell order** ([`Landmarks::window_faces`], prequential scoring
 //! within a window; consumed by `hnn::receiving::ReceivingPhases::tree_faces`). A receiving window
 //! compares `A` cells at once, and phase `j` reads the tree at the standing after the window's
 //! earlier phases' deposits: their targets are known at compare, so those deposits are applied, in
@@ -304,25 +322,28 @@
 //! `W_o = O + ⌈log₂(3 B n*² P²)⌉` ([`IdealLandmarks::reference_width`], `O` the enclosure grid's
 //! octaves), whose rebases keep its code length within `2^(−O)` of the ideal over the passage.
 //!
-//! [definition; agent-inferred] **The declared stop prior** ([`StopPrior`]; Decision 32, Lean
-//! `HNN/LandmarkTree` item 12). A node at context depth `d` (in its branch's letters) stops with
+//! [definition; agent-inferred] **The declared stop prior** ([`StopPrior`]; Lean
+//! `HNN/LandmarkTree` item 12; agent-inferred: campaign 2's controls showed that `½` at every node
+//! is not the code-length optimum, since constant slots, which carry nothing but raise the stop
+//! weight, coded the development cells up to 133 bits below the cell-only tree). A node at context
+//! depth `d` (in its branch's letters) stops with
 //! `w_d = 1 − 2^(−j_d)`, a rung of the dyadic ladder, and splits with `2^(−j_d)`: the tree is the
 //! mixture over pruned trees with the prior `∏_stops w_d ∏_splits (1 − w_d)`, whose weights sum to
 //! one, and it codes within `−log₂` of its prior of every pruned tree
 //! (`stop_mixture_over_trees`, `stop_kraft_and_dominance`). The law enters the executed tree only
 //! at the founding: each node is founded at `β₀ = w_d/(1 − w_d) = 2^(j_d) − 1`, an odd integer
 //! carried exactly, with its stop weight `λ̂ = ⟦1 − 2^(−j_d)⟧` exact on the lattice
-//! (`stop_founding_step`), and every step after it is Decision 28's, `β' = β k/q̂'`
+//! (`stop_founding_step`), and every step after it is the landmark tree's, `β' = β k/q̂'`
 //! (`stop_ratio_step`), so the lattice law, the widths and the certificates are unchanged. `[1]` is
-//! Decision 28's `½`. A rung at a mixing depth must fit the carrier `W` (the declaration is refused
+//! the `½` stop prior. A rung at a mixing depth must fit the carrier `W` (the declaration is refused
 //! otherwise). The joins of an enlarged tree keep their own `β = 1`. Campaign 2's constant-slot
 //! controls are the per-depth law `(j_0, j_(≥1)) = (1, r + 1)` exactly in the ideal weighting (the
 //! test `landmark_constant_slots_are_the_per_depth_prior`).
 //!
-//! [definition; agent-inferred] **Weighing is local** (Decision 34; Lean `HNN/LocalWeighing`). A
+//! [definition; agent-inferred] **Weighing is local** (Lean `HNN/LocalWeighing`). A
 //! mixture of whole passages telescopes to `½W_T + ½W_X` and uses a face only where it beats the
 //! tree over the whole passage; the tree's own law weighs every landmark by its own evidence. Of
-//! Decision 34's three local laws, the one adopted lives here (the switching mixture across epochs
+//! local weighing's three local laws, the one adopted lives here (the switching mixture across epochs
 //! is `hnn::receiving::Mixture::switching`):
 //! - **in each digit tree** ([`StopMixture`], [`JoinTree`], [`FaceJoins`]): `K` trees under the
 //!   declared stop priors, and in each dyadic cell a join tree of two-face joins mixing their digit
@@ -345,16 +366,16 @@
 //! charged, and below online order-0, order-1 and PPM-2; the node-local law reads `+17 + 3/16 + ε`
 //! above the tree.
 //!
-//! [established-bounded; measured] **On the wide cut** (notebook `hnn_landmark -- … wide`, Decision
-//! 35; `2^20` cells, the final `2^17` held out; `D = 6`, the deepest the 20 GB cap admits, chosen on
-//! the development cells): `½` stays first of Decision 32's 529 laws. Held out, the `½` tree reads
+//! [established-bounded; measured] **On the wide cut** (notebook `hnn_landmark -- … wide`, the
+//! wide cut; `2^20` cells, the final `2^17` held out; `D = 6`, the deepest the 20 GB cap admits, chosen on
+//! the development cells): `½` stays first of the stop prior's 529 laws. Held out, the `½` tree reads
 //! `1 + 15/16 + ε` a cell, `−133980 + 11/16 + ε` bits below PPM-2 charged (a cell
 //! `−2 + 15/16 + ε`), and the stop-weight mixture charged 15 bits lies `−38 + 7/16 + ε` below it
 //! (uncharged `−50 + 7/16 + ε`); on the standing cut's own cells, read at the wide standing, it lies
 //! above the tree.
 //!
 //! [established-bounded; measured] **Stored where paths part, on the wide cut** (notebook
-//! `hnn_landmark -- … compact`, Decision 37, at commit `2fb0c1c0`'s widths, `W` from `n*` alone;
+//! `hnn_landmark -- … compact`, the storage where paths part, at commit `2fb0c1c0`'s widths, `W` from `n*` alone;
 //! development 917,504 cells, held out the final 131,072; `n* = 2^20`; bits at `L_R = 16`, each
 //! `+ ε`, exact enclosures; bytes are the counted allocator's growth, allocated capacity and not
 //! occupancy). At `D = 6` on the development cells the compacted tree codes `1822006 + 1/16` as the
@@ -368,10 +389,10 @@
 //! both certificates): the development cells choose **`D = 48`**, 10,985,626 nodes, 35,373,218
 //! label letters and 2,097,158,484 allocated bytes in 24,936 ms (each passage 14,291 to 25,133
 //! ms). Charged
-//! 3 bits it lies below Decision 28's tree at `D = 6` charged 3 by `−20066 + 10/16`. Held out, once:
-//! `258201 + 3/16` (`1 + 15/16` a cell) against Decision 28's `261616 + 4/16` (re-read exactly), PPM-2
+//! 3 bits it lies below the full tree at `D = 6` charged 3 by `−20066 + 10/16`. Held out, once:
+//! `258201 + 3/16` (`1 + 15/16` a cell) against the full tree's `261616 + 4/16` (re-read exactly), PPM-2
 //! `395598 + 8/16`, order-1 `496687 + 2/16` and order-0 `631713 + 1/16`; charged 3 bits it lies below
-//! Decision 28's tree by `−3416 + 15/16`, PPM-2 by `−137395 + 11/16` (a cell `−2 + 15/16`), order-1 by
+//! the full tree by `−3416 + 15/16`, PPM-2 by `−137395 + 11/16` (a cell `−2 + 15/16`), order-1 by
 //! `−238483 + 1/16` and order-0 by `−373509 + 2/16`, each decided. The whole passage at `D = 48`
 //! stores 12,542,969 nodes and 40,352,545 label letters in 2,097,158,516 allocated bytes (29,052
 //! ms), against the full arena's 5,110,443 nodes at `D = 6` in 914,361,092 (19,126 ms).
@@ -386,16 +407,16 @@
 //! all.
 //!
 //! [established-bounded; measured] **A landmark's storage has a capacity, on the wide cut**
-//! (notebook `hnn_landmark -- … capacity`, Decision 39; `D = 48`, the `½` prior, cells only;
+//! (notebook `hnn_landmark -- … capacity`, the register's capacity; `D = 48`, the `½` prior, cells only;
 //! development 917,504 cells, held out the final 131,072; bits at `L_R = 16`, each `+ ε`, exact
 //! enclosures; the family `c ∈ {∞, 5, 7, 9, 11}` charged `⌈log₂ 5⌉ = 3` bits, `c = ∞` carrying no
-//! capacity bit). `c = ∞` reproduces Decision 37's development code `1801940 + 12/16`. The
+//! capacity bit). `c = ∞` reproduces the compacted tree's development code `1801940 + 12/16`. The
 //! development codes by `c = 5, 7, 9, 11`: `1950535 + 3/16`, `1827589 + 1/16`, `1804070 + 6/16`,
 //! `1801600 + 13/16`, against `c = ∞` `+148594 + 7/16`, `+25648 + 5/16`, `+2129 + 9/16` and
 //! `−340 + 1/16`, each decided; every passage stores 10,985,626 nodes in 1,371,879,880 occupied
 //! bytes (the capacity moves no topology), 19,940 to 20,259 ms. The development cells choose
 //! **`c = 11`** (`L = 2048`), charged 3 bits `−337 + 1/16` below `c = ∞`, and below every other
-//! ceiling. Held out, once: `258018 + 5/16` (`1 + 15/16` a cell), against Decision 37's recorded
+//! ceiling. Held out, once: `258018 + 5/16` (`1 + 15/16` a cell), against the compacted tree's recorded
 //! `258201 + 3/16` charged 3 bits within `[−180 + 1/16, −180 + 3/16]` (uncharged
 //! `[−183 + 1/16, −183 + 3/16]`), and against PPM-2's recorded `395598 + 8/16` charged 6 bits within
 //! `[−137575 + 12/16, −137575 + 14/16]`, each decided below; 12,542,969 nodes, 23,762 ms. The code
@@ -409,12 +430,12 @@
 //! per-depth pairs `(j_root, j_below)`, `J = ⌈log₂(n* B)⌉`, [`ladder_top`]) runs its own depth sweep,
 //! and the choice is charged `⌈log₂⌉` of the laws tried. The held-out cells never choose anything.
 //! [agent-inferred] A declared deepest depth bounds the depth sweep ([`choose_depth_within`];
-//! Decision 35): the resident memory cap bounded the retired full arena's a-priori founded nodes
+//! the wide cut): the resident memory cap bounded the retired full arena's a-priori founded nodes
 //! `n* B D + 2^B − 1`, and so its depth at a population; stored where paths part, `2 n* B` nodes
-//! bound no depth (Decision 37), and the carriers' widths are its only limit.
+//! bound no depth (stored where paths part), and the carriers' widths are its only limit.
 //!
 //! [definition; agent-inferred, from the retention and deposition laws] **The measurement is
-//! prequential** ([`prequential`], Decision 29): every cell is scored at the current standing
+//! prequential** ([`prequential`], prequential scoring): every cell is scored at the current standing
 //! before its own deposit, then deposited, for the tree and the online baselines alike. The tree's
 //! faces and the oracle's are read by [`code_length`], `log₂ d − log₂ n` of `q = n/d` by the
 //! certified binary logarithm ([`binary_log`]) within the enclosure grid `2^(−O)`; the baselines
@@ -423,7 +444,7 @@
 //! faces' product, enclosed once ([`PassageCode`]: exact integer bounds of the product, kept at
 //! 127 significant bits and rounded outward, then one certified logarithm), not the sum of the
 //! cells' enclosures: on the wide cut's development cells (`917,504 = 2^17·7`) the `D = 1` tree's
-//! run with the per-cell sum took 29,902 ms, of which its passage 3,137 ms (Decision 35).
+//! run with the per-cell sum took 29,902 ms, of which its passage 3,137 ms (the wide cut).
 //!
 //! [definition; agent-inferred] **The host realization** (the hardware law). Within
 //! [`prequential`] the tree and the baselines run together: each reads the shared immutable cut
@@ -449,9 +470,9 @@
 //! | a population's code is its faces' product, enclosed once | (a certified reading: integer bounds and the certified logarithm) | [`PassageCode`], [`ProductBound`] |
 //! | the stop-weight mixture per digit tree: the mixture over (law, pruned tree), its prior complete, within `−log₂ π_k − log₂ prior_(w_k)(S)`; the joins telescope to the Bayesian mixture, the executed chart's drift once | `HNN/LocalWeighing.{stop_mixture_per_tree, static_mixture, forward_executed}` | [`StopMixture`], [`JoinTree`], [`FaceJoins`] |
 //! | a window's phases in cell order: each reads the standing after the earlier phases' deposits | `HNN/LandmarkTree.{landmark_step, treeWeight_arrive_off}` | [`Landmarks::window_faces`] |
-//! | founding where paths converge (Decision 36, measured and retired): the stopped path normalized under any stopping rule decided before the digit (a complete code); the tree with absent children, its Kraft form and dominance; the stopped step (`β` still at the stop); the second arrival opening with the first count; Decision 28 the first-arrival case | `HNN/ConvergenceFounding.{stopping_rule_normalized, prequential_code_complete, conv_mixture_over_trees, conv_kraft_and_dominance, conv_weight_step, conv_ratio_step, second_arrival_opens_with_the_first_count, convergence_step, convergence_is_probability, first_arrival_is_decision_28}` | retired (its realization is at commit `d137e8a6`; the development cells kept the first arrival) |
-//! | a landmark's storage has a capacity (Decision 39): the tree weighting over any node law whose state is a function of the arrivals reaching the node (its Kraft form, dominance, step and prequential code), the compacted tree for that law, and the capped register as an instance (positive, normalized, the carry lowering the register and keeping each reached symbol, KT below its ceiling, `c = ∞` KT) | `HNN/LandmarkTree.{NodeLaw, own_mixture_over_trees, own_kraft_and_dominance, own_weight_step₀, law_standing_is_routed, ktLaw_standing}`; `HNN/LandmarkCompaction.{MassRouted, own_weight_prequential, compacted_node_law}`; `HNN/LandmarkCapacity.{capLaw, cap_face_pos, cap_face_sum, cap_carry_laws, cap_carry_half_units, cap_run_total_le, cap_unbounded_is_kt, cap_below_ceiling_is_kt, capped_tree_laws}` | [`Capacity`], [`Capacity::carry`], [`LandmarkDeclaration::capacity`], `Law::apply_branch`, [`IdealLandmarks`] |
-//! | stored where paths part (Decision 37): a chain with its bottom is one node at the summed rung (`1 − ρ_top = 2^(−S)(1 − ρ_bottom)`, founded at `2^S − 1`), a chain to `D` one KT node, the split's two ratios, Decision 28's face exactly, at most `2n − 1` nodes a tree | `HNN/LandmarkCompaction.{chain_ratio, chain_ratio_dyadic, leaf_chain_is_one_node, chain_split, compacted_is_decision_28, compacted_node_bound}` | [`Landmarks`], [`LandmarkDeclaration::rung_sums`], the split ([`Beta::split`], `Law::part`, `Law::chain`), [`Landmarks::face_rule`], [`Landmarks::tree_sizes`], [`IdealLandmarks`] |
+//! | founding where paths converge (second-arrival founding, measured and retired): the stopped path normalized under any stopping rule decided before the digit (a complete code); the tree with absent children, its Kraft form and dominance; the stopped step (`β` still at the stop); the second arrival opening with the first count; the first-arrival tree its case | `HNN/ConvergenceFounding.{stopping_rule_normalized, prequential_code_complete, conv_mixture_over_trees, conv_kraft_and_dominance, conv_weight_step, conv_ratio_step, second_arrival_opens_with_the_first_count, convergence_step, convergence_is_probability, first_arrival_is_decision_28}` | retired (its realization is at commit `d137e8a6`; the development cells kept the first arrival) |
+//! | a landmark's storage has a capacity: the tree weighting over any node law whose state is a function of the arrivals reaching the node (its Kraft form, dominance, step and prequential code), the compacted tree for that law, and the capped register as an instance (positive, normalized, the carry lowering the register and keeping each reached symbol, KT below its ceiling, `c = ∞` KT) | `HNN/LandmarkTree.{NodeLaw, own_mixture_over_trees, own_kraft_and_dominance, own_weight_step₀, law_standing_is_routed, ktLaw_standing}`; `HNN/LandmarkCompaction.{MassRouted, own_weight_prequential, compacted_node_law}`; `HNN/LandmarkCapacity.{capLaw, cap_face_pos, cap_face_sum, cap_carry_laws, cap_carry_half_units, cap_run_total_le, cap_unbounded_is_kt, cap_below_ceiling_is_kt, capped_tree_laws}` | [`Capacity`], [`Capacity::carry`], [`LandmarkDeclaration::capacity`], `Law::apply_branch`, [`IdealLandmarks`] |
+//! | stored where paths part: a chain with its bottom is one node at the summed rung (`1 − ρ_top = 2^(−S)(1 − ρ_bottom)`, founded at `2^S − 1`), a chain to `D` one KT node, the split's two ratios, the landmark tree's face exactly, at most `2n − 1` nodes a tree | `HNN/LandmarkCompaction.{chain_ratio, chain_ratio_dyadic, leaf_chain_is_one_node, chain_split, compacted_is_decision_28, compacted_node_bound}` | [`Landmarks`], [`LandmarkDeclaration::rung_sums`], the split ([`Beta::split`], `Law::part`, `Law::chain`), [`Landmarks::face_rule`], [`Landmarks::tree_sizes`], [`IdealLandmarks`] |
 //!
 //! [open] Owed in #62 (Lean `HNN/LandmarkTree`'s `[open]`): the passage-level composition of the
 //! drift bound (the subtree sum over the tree and the passage, from `lattice_node_telescope`,
@@ -744,12 +765,12 @@ pub fn cell_letters(cells: &[usize]) -> Vec<Letter> {
 /// The ladder's greatest rung: `β₀ = 2^j − 1` fits a machine word.
 const MAX_RUNG: u32 = u64::BITS - 1;
 
-/// [definition; agent-inferred] **The tree's declared stop-weight law** (Decision 32; Lean
+/// [definition; agent-inferred] **The tree's declared stop-weight law** (the declared stop prior; Lean
 /// `HNN/LandmarkTree` item 12): a node at context depth `d` stops with `w_d = 1 − 2^(−j_d)`, the rung
 /// `j_d ≥ 1` of the dyadic ladder, and is founded at `β₀ = w_d/(1 − w_d) = 2^(j_d) − 1`, an odd
 /// integer carried exactly (Lean `stop_founding_step`, `ladder_founding`); every later step is
-/// Decision 28's, `β' = β k/q̂'` (`stop_ratio_step`). The rungs are listed from the root, and a depth
-/// past the list reads its last rung: one rung is the global law, and `[1]` is Decision 28's `½`
+/// the landmark tree's, `β' = β k/q̂'` (`stop_ratio_step`). The rungs are listed from the root, and a depth
+/// past the list reads its last rung: one rung is the global law, and `[1]` is the `½` stop prior
 /// ([`StopPrior::half`]). A repeated last rung is dropped, so two declarations of one law compare
 /// equal.
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
@@ -758,7 +779,7 @@ pub struct StopPrior {
 }
 
 impl StopPrior {
-    /// Decision 28's law: `w = ½` at every depth (rung 1, `β₀ = 1`).
+    /// The landmark tree's law: `w = ½` at every depth (rung 1, `β₀ = 1`).
     pub fn half() -> Self {
         Self { rungs: vec![1] }
     }
@@ -839,7 +860,7 @@ impl std::fmt::Display for StopPrior {
     }
 }
 
-/// [definition; agent-inferred] **The ladder's top rung** `J = ⌈log₂(n* B)⌉` (Decision 32), derived
+/// [definition; agent-inferred] **The ladder's top rung** `J = ⌈log₂(n* B)⌉` (the declared stop prior), derived
 /// from the passage: for a fixed pruned tree the best stop weight at a depth is
 /// `stops_d/(stops_d + splits_d)` (Lean `PrunedTree.prior_const`'s maximum), the rung
 /// `log₂((stops_d + splits_d)/splits_d)`, and a depth holds at most `n* B` founded nodes (each cell
@@ -854,8 +875,8 @@ pub fn ladder_top(declaration: &LandmarkDeclaration) -> u32 {
         .min(MAX_RUNG)
 }
 
-/// [definition; agent-inferred] **The declared family of Decision 32's development decision**: the
-/// global ladder `j = 1, …, J` (rung 1 first, Decision 28's `½`), then the per-depth laws
+/// [definition; agent-inferred] **The declared family of the stop prior's development choice**: the
+/// global ladder `j = 1, …, J` (rung 1 first, the `½` stop prior), then the per-depth laws
 /// `(j_root, j_below)`, the root at one rung and every deeper depth at another, `j_root ≠ j_below`,
 /// in lexicographic order: `J²` laws. The per-depth shape is the one campaign 2's constant-slot
 /// controls took (the root at `½`, every cell depth past it at `1 − 2^(−(r+1))`), without their
@@ -876,17 +897,17 @@ pub fn prior_family(top: u32) -> Vec<StopPrior> {
 // -------------------------------------------------------------------------------------------
 // the declared node law: the register's capacity
 
-/// [definition; agent-inferred] **A landmark's storage capacity** (Decision 39; Lean
+/// [definition; agent-inferred] **A landmark's storage capacity** (Lean
 /// `HNN/LandmarkCapacity`): the node's two counts `n_0, n_1` are a register of ceiling `L = 2^c`.
 /// The deposit counts its arrival, and when that brings `n_0 + n_1` to `L` both counts carry,
 /// `n_b ← ⌈n_b/2⌉`, before the next arrival is read ([`Capacity::carry`]): the node's register is a
 /// function of the arrivals that reached it, and its face is KT's on the carried counts, positive
 /// and normalized (Lean `capLaw`, `cap_face_pos`, `cap_face_sum`). A reached symbol keeps a count.
-/// `Unbounded` (`c = ∞`) is Decision 28's node, and so is any ceiling a node never reaches: a node
+/// `Unbounded` (`c = ∞`) is the KT node, and so is any ceiling a node never reaches: a node
 /// reached fewer than `L` times reads KT's face exactly (`cap_below_ceiling_is_kt`).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub enum Capacity {
-    /// `c = ∞`: the counts never carry (Decisions 28–37).
+    /// `c = ∞`: the counts never carry (the uncapped tree).
     #[default]
     Unbounded,
     /// The ceiling exponent `c`: the register carries when a deposit brings `n_0 + n_1` to `2^c`.
@@ -946,7 +967,7 @@ impl std::fmt::Display for Capacity {
 /// `λ_d = 0`), the declared population `n*` bounding the passage, the receiver's grain `L_R`, the
 /// declared letter family, the declared stop-weight law ([`StopPrior`], read at each node's
 /// depth in its branch's letters; the joins of an enlarged tree keep their own `β = 1`), and the
-/// declared node law's capacity ([`Capacity`], Decision 39; `Unbounded` is Decision 28's node).
+/// declared node law's capacity ([`Capacity`], the register's capacity; `Unbounded` is the KT node).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LandmarkDeclaration {
     pub alphabet: usize,
@@ -1019,7 +1040,7 @@ impl LandmarkDeclaration {
         }
     }
 
-    /// **Each branch's summed rungs from the root** (Decision 37): `sums[b][d] = Σ_(i<d, i ≥ f_b) j_i`
+    /// **Each branch's summed rungs from the root** (stored where paths part): `sums[b][d] = Σ_(i<d, i ≥ f_b) j_i`
     /// for `d = 0, …, D_b`, `f_b` the branch's forced depths (the cell branch's `forced`, none in
     /// the bundle branch; a forced depth's rung is `0`). A stored chain from `top` to `bottom`
     /// below `D_b` is one node at the summed rung `sums[b][bottom + 1] − sums[b][top]`
@@ -1071,8 +1092,8 @@ pub fn face_bits(population: u64, digits: u64, grain: u64, depth: u64) -> u64 {
 }
 
 /// [definition; agent-inferred] **The β carrier width** `W`: the least width (at least 2) with
-/// `2^W ≥ 12 B L_R (2n* + 1) P²`, which holds the rebases' drift, the splits' included (Decision
-/// 37: `(2n* + 1) P²` units of `2^(1−W)`), within a quarter grain a cell (module header, "The
+/// `2^W ≥ 12 B L_R (2n* + 1) P²`, which holds the rebases' drift, the splits' included (stored where
+/// paths part: `(2n* + 1) P²` units of `2^(1−W)`), within a quarter grain a cell (module header, "The
 /// widths").
 pub fn carrier_width(population: u64, digits: u64, grain: u64, depth: u64) -> u64 {
     let d = BigUint::from(depth);
@@ -1316,7 +1337,7 @@ pub struct Carried {
 }
 
 impl Beta {
-    /// `β = 1`: a join's ratio at first arrival, and a node's under Decision 28's `½`.
+    /// `β = 1`: a join's ratio at first arrival, and a node's under the `½` stop prior.
     pub const ONE: Beta = Beta {
         numerator: 1,
         denominator: 1,
@@ -1438,7 +1459,7 @@ impl Beta {
         }
     }
 
-    /// [definition; agent-inferred] **A chain's split ratios** (Decision 37; Lean
+    /// [definition; agent-inferred] **A chain's split ratios** (stored where paths part; Lean
     /// `HNN/LandmarkCompaction.chain_split`): a stored chain carrying `β` at the summed rung
     /// `S = S_up + S_low` (`S_up, S_low ≥ 1`) parts between its two rungs; its lower part keeps its
     /// counts at `β_ℓ = β (2^(S_low) − 1)/(2^S − 1)` and its upper part holds the same counts at
@@ -1562,7 +1583,7 @@ impl Odometer {
 /// The top bit of a node's depth word: its branch (the bundle tree).
 const BRANCH_BIT: u32 = 1 << 31;
 
-/// The arena's topology and masses, stored where paths part (Decision 37), shared by the executed
+/// The arena's topology and masses, stored where paths part, shared by the executed
 /// tree and the oracle: the roots per tree, the child table, each node's depth word (its bottom
 /// depth, its branch in the top bit), its two half-unit masses and its label end, and the label
 /// pool, whose runs are the tree's own paths.
@@ -1591,7 +1612,7 @@ enum Stop {
 }
 
 /// [definition; agent-inferred] **A branch's walk down its tree** along an address: the stored
-/// nodes it opens from the root, where the last one's chain parts from the address (Decision 37:
+/// nodes it opens from the root, where the last one's chain parts from the address (stored where paths part:
 /// its upper part, down to that depth, is read), and where it stops.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct Walk {
@@ -1790,7 +1811,7 @@ impl Arena {
     }
 
     /// One arrival of `symbol` counted at the path's nodes whose bottom is at least `forced`, each
-    /// register carried at the ceiling (Decision 39).
+    /// register carried at the ceiling (the register's capacity).
     fn count(&mut self, nodes: &[u32], forced: usize, symbol: usize, ceiling: Option<u64>) {
         for &node in nodes {
             if self.bottom(node) >= forced {
@@ -2249,7 +2270,7 @@ pub struct DigitsReading {
 
 /// [definition] **One opened path**: the dyadic cell `h` whose tree it descends and the branch (`0`
 /// the cells, `1` the bundles), the digit it emits there, how many stored nodes it opens (its
-/// levels: one a stored chain, Decision 37) with each level's bottom depth (a parting chain's the
+/// levels: one a stored chain, the storage where paths part) with each level's bottom depth (a parting chain's the
 /// depth where it parts), its faces `q_0, …, q_top` of that digit (the executed lattice faces from
 /// [`Landmarks::opened`], the ideal ones from [`IdealLandmarks::opened`]; `top` the last level at a
 /// leaf, otherwise one past it, where the prior `1/2` is read), and at each level the node's KT
@@ -2390,7 +2411,7 @@ struct Chart {
     excess: u128,
 }
 
-/// [definition; agent-inferred] **A parting chain's two parts** (Decision 37; Lean `HNN/LandmarkCompaction.chain_split`): the read's last stored chain parts from the address at
+/// [definition; agent-inferred] **A parting chain's two parts** (stored where paths part; Lean `HNN/LandmarkCompaction.chain_split`): the read's last stored chain parts from the address at
 /// `depth`; its upper part, down to `depth`, is read (and founded at the deposit) with `upper`, and
 /// its lower part keeps its counts with `lower` (none when it keeps its chart: a leaf, or an upper
 /// part above the forced depths). `units` is the split's rounding on `2^(−C)` (each ratio carried at
@@ -2455,8 +2476,8 @@ struct Branch {
 /// The tree's law, apart from its standing: the declaration, its derived widths, the odometer, the
 /// branches, the founding chart at each depth (the declared stop prior's `β₀ = 2^(j_d) − 1` with
 /// its stop weight `λ̂ = ⟦1 − 2^(−j_d)⟧`), each branch's summed rungs from the root
-/// (`Σ_(i<d, i ≥ forced) j_i`, a forced depth's rung `0`; Decision 37's chains read their rungs
-/// from them), and the node register's ceiling in half-units (Decision 39, [`Capacity`]). Its reads
+/// (`Σ_(i<d, i ≥ forced) j_i`, a forced depth's rung `0`; the stored chains read their rungs
+/// from them), and the node register's ceiling in half-units (the register's capacity, [`Capacity`]). Its reads
 /// and its deposit act on any [`Standing`], the tree's own or a working overlay.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct Law {
@@ -2470,7 +2491,7 @@ struct Law {
 }
 
 /// [definition] **The landmark tree, executed** (module header): the declaration, its derived
-/// widths, the arena stored at the faces where paths part (Decision 37) with each node's chart and
+/// widths, the arena stored at the faces where paths part with each node's chart and
 /// each join, and the chart's counts.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Landmarks {
@@ -2483,7 +2504,7 @@ fn ladder(rung: u64) -> BigUint {
     (BigUint::one() << rung as usize) - 1u32
 }
 
-/// **A positive ratio `(N/D) 2^e` carried at width `W`** (a split's ratio, Decision 37): its twos
+/// **A positive ratio `(N/D) 2^e` carried at width `W`** (a split's ratio, the storage where paths part): its twos
 /// moved into the exponent and its odd parts reduced; exact when both fit `W` bits, otherwise its
 /// mantissa `m' = ⌊v 2^s⌋ ∈ [2^(W−1), 2^W)`, returned (the relative residual lies in `[0, 1/m')`, as
 /// [`Beta::carry`]'s rebase).
@@ -2623,12 +2644,12 @@ impl Law {
     }
 
     /// **The summed rung of a chain** from `top` to `bottom` (below the branch's depth) in `branch`:
-    /// `Σ_(d = max(top, forced))^bottom j_d` (Decision 37).
+    /// `Σ_(d = max(top, forced))^bottom j_d` (stored where paths part).
     fn rung_sum(&self, branch: usize, top: usize, bottom: usize) -> u64 {
         self.sums[branch][bottom + 1] - self.sums[branch][top]
     }
 
-    /// **The chart a chain of summed rung `S ≥ 1` is founded with** (Decision 37; Lean
+    /// **The chart a chain of summed rung `S ≥ 1` is founded with** (stored where paths part; Lean
     /// `HNN/LandmarkCompaction.leaf_chain_is_one_node`): `β₀ = 2^S − 1`, carried exactly within `W`
     /// bits, otherwise as its mantissa `2^W − 1` (`⌊(2^S − 1) 2^(W−S)⌋`) times `2^(S − W)` with the
     /// rebase's unit `⌈2^C/(2^W − 1)⌉` in its drift.
@@ -2668,7 +2689,7 @@ impl Law {
         }
     }
 
-    /// **A chain's split at `depth`** (Decision 37; Lean `HNN/LandmarkCompaction.chain_split`): the
+    /// **A chain's split at `depth`** (stored where paths part; Lean `HNN/LandmarkCompaction.chain_split`): the
     /// stored chain `node` from `top` to its bottom parts at `depth`, `S = S_up + S_low`. Above a
     /// leaf the upper part is founded at `2^(S_up) − 1` ([`Law::chain`]) and the leaf keeps its
     /// chart. Above an internal bottom, `β_ℓ = β (2^(S_low) − 1)/(2^S − 1)` and
@@ -2763,7 +2784,7 @@ impl Law {
     }
 
     /// **One branch's executed read** at its letters in tree `t`: its walk, and a parting chain's
-    /// split (Decision 37).
+    /// split (stored where paths part).
     fn read(
         &self,
         nodes: &impl Standing,
@@ -2991,11 +3012,11 @@ impl Law {
     /// **Deposit one branch's read** on a standing: each mixing level's β steps by
     /// `k(b)/q̂_(ℓ+1)(b)` bottom-up and its certificates grow (a parting chain's upper part is
     /// stepped on its split's chart, and its split's rounding added once to the increment). Then
-    /// the storage acts (Decision 37): a parting chain is split (its upper part founded with its
+    /// the storage acts (stored where paths part): a parting chain is split (its upper part founded with its
     /// stepped chart and the chain's counts, its lower part keeping its counts at `β_ℓ`, the parent
     /// relinked to the upper part), and an arrival stopped at the prior founds its leaf at `D`'s
     /// `β₀`, its label ending in the cell's run `run`. Then each node's mass of the digit grows,
-    /// and its register carries at the declared ceiling (Decision 39, [`Capacity::carry`]; a stored
+    /// and its register carries at the declared ceiling (the register's capacity, [`Capacity::carry`]; a stored
     /// chain is one register, since its nodes route the same arrivals). Returns the root's excess
     /// increment.
     fn apply_branch(
@@ -3279,13 +3300,13 @@ impl Landmarks {
         })
     }
 
-    /// The label pool's letters (Decision 37).
+    /// The label pool's letters (stored where paths part).
     pub fn held(&self) -> usize {
         self.nodes.arena.letters.len()
     }
 
     /// [definition] **The stored nodes of each tree** `t = branch · 2^B + h`, counted from its root
-    /// through the child table (Decision 37's `2n − 1` a tree reached by `n` arrivals).
+    /// through the child table (the compacted tree's `2n − 1` a tree reached by `n` arrivals).
     pub fn tree_sizes(&self) -> Vec<usize> {
         let arena = &self.nodes.arena;
         let mut children: HashMap<u32, Vec<u32>> = HashMap::new();
@@ -3334,7 +3355,7 @@ impl Landmarks {
         self.law.odometer.splitting()
     }
 
-    /// The stored nodes (Decision 37: each a chain).
+    /// The stored nodes (stored where paths part: each a chain).
     pub fn nodes(&self) -> usize {
         self.nodes.len()
     }
@@ -3350,7 +3371,7 @@ impl Landmarks {
     /// `max(1, bits) + 1` each, and its exponent, `max(1, bits|e|) + 2` with its sign; each stored
     /// child's letter, `max(1, bits(letter)) + 1`; each node's bottom depth and its label end (an
     /// index into the pool), `max(1, bits) + 1` each (its label's length is the difference of its
-    /// bottom from its parent's; Decision 37), and each letter of the label pool,
+    /// bottom from its parent's; the storage where paths part), and each letter of the label pool,
     /// `max(1, bits) + 1`; and one bit a splitting dyadic cell and branch for its root's presence.
     /// A split keeps the lower part's key letter in the pool, where the chain held it, and stores
     /// it again as the lower part's child letter, so that letter is counted twice: one letter a
@@ -3425,7 +3446,7 @@ impl Landmarks {
     /// **The rule's a-priori bound per cell**, in bits (module header, "The widths"):
     /// `(1 + 2^(−min(M_p, W))) (3/2) B [(n* P² + 2P + 1) ε/μ̂ + (2n* + 1) P² 2^(1−W) + n* P² ρ_c]`
     /// with `ε/μ̂ = 1/(2⌊2^(M_p)/K⌋)`, `K = 2n* + 2`, and `ρ_c = 2^(1−R)` when the carrier rebases
-    /// (else `0`). [proved-derived; agent-inferred] Stored where paths part (Decision 37), each
+    /// (else `0`). [proved-derived; agent-inferred] Stored where paths part, each
     /// split rounds its two ratios once at `W` bits (`Law::part`: each `1/m' < 2^(1−W)`): an arrival
     /// splits at most one chain in each digit tree it opens, and adds the split's units once to its
     /// increment (a further rebase of that arrival at one level), and a stored node's lineage is
@@ -3526,7 +3547,7 @@ impl Landmarks {
     }
 
     /// [definition; agent-inferred] **A window's faces in cell order** (module header, "A window
-    /// in cell order"; Decision 29 within a window): phase `j`'s all-class face at `addresses[j]`,
+    /// in cell order"; prequential scoring within a window): phase `j`'s all-class face at `addresses[j]`,
     /// read at the standing after the deposits of the phases before it whose classes are known
     /// (`known[i]` at `addresses[i]`, `i < j`), each on a working overlay of the nodes those
     /// deposits wrote; the tree itself is unchanged. With nothing known every phase reads the
@@ -3591,7 +3612,7 @@ impl Landmarks {
 
     /// **Deposit one cell** on the paths it opens, read at the current standing (module header):
     /// each mixing chain's β steps by `k(b)/q̂_(ℓ+1)(b)` bottom-up and its certificates grow, a
-    /// chain the address parts from splits (Decision 37) and the arrival founds its leaf, then each
+    /// chain the address parts from splits (stored where paths part) and the arrival founds its leaf, then each
     /// node's mass of the digit grows, and each join's β steps. Refused before anything moves at a
     /// bad address or class, or past the declared population.
     pub fn deposit(&mut self, address: &[Letter], class: usize) -> Result<(), HnnError> {
@@ -3743,7 +3764,7 @@ impl ArenaView<'_> {
         &self.tree.nodes.arena.depths
     }
 
-    /// Each node's label end: one past its bottom's letter in the label pool (Decision 37).
+    /// Each node's label end: one past its bottom's letter in the label pool (stored where paths part).
     pub fn ends(&self) -> &[u32] {
         &self.tree.nodes.arena.ends
     }
@@ -3774,7 +3795,7 @@ impl ArenaView<'_> {
         self.tree.nodes.joins.get(dyadic).map(chart_words)
     }
 
-    /// **The chart a node is founded with at its depth** (Decision 32): the declared stop prior's
+    /// **The chart a node is founded with at its depth** (the declared stop prior): the declared stop prior's
     /// `β₀ = 2^(j_d) − 1` and its stop weight `λ̂ = ⟦1 − 2^(−j_d)⟧`; `None` past the deepest branch.
     pub fn founding(&self, depth: usize) -> Option<ChartWords> {
         self.tree.law.founding.get(depth).map(chart_words)
@@ -3943,17 +3964,17 @@ fn dyadic_grain_exponent(
 // the reference oracle
 
 /// [definition] **The ideal tree weighting, the reference oracle** (module header): the executed
-/// tree's arena, stored at the faces where paths part (Decision 37), with `β` in ℚ and every path
+/// tree's arena, stored at the faces where paths part, with `β` in ℚ and every path
 /// face exact: along an opened path `q_top = k` at a leaf (`½` past the last stored level),
 /// `q_ℓ = (β_ℓ k_ℓ + q_(ℓ+1))/(1 + β_ℓ)` at each stored chain, the deposit `β' = β k/q_(ℓ+1)` on the
 /// exact faces, and in an enlarged tree each join `q_h = (β_h q_cells + q_bundles)/(1 + β_h)` from
 /// `β_h = 1`, `β'_h = β_h q_cells/q_bundles`. Each stored chain is one node at its summed rung,
 /// split exactly in ℚ (`β_ℓ = β (2^(S_low) − 1)/(2^S − 1)`,
 /// `β_u = (2^(S_up) − 1) 2^(S_low) β/(β (2^(S_low) − 1) + 2^S − 1)`, `2^(S_up) − 1` above a leaf):
-/// its faces are Decision 28's tree's (one node a depth, each founded at `β₀ = 2^(j_d) − 1`),
+/// its faces are the full tree's (one node a depth, each founded at `β₀ = 2^(j_d) − 1`),
 /// exactly (`compacted_is_decision_28`; the tests hold it against a full reference kept in
 /// `hnn/tests`). Each node's register carries at the declared capacity as the executed tree's does
-/// (Decision 39; `compacted_node_law`). With no width `β` is exact (the tests); at a width it is
+/// (the register's capacity; `compacted_node_law`). With no width `β` is exact (the tests); at a width it is
 /// rebased past it with the residual `1/m'`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct IdealLandmarks {
@@ -4079,7 +4100,7 @@ impl IdealLandmarks {
         Rat::from_integer(BigInt::from(ladder(rung)))
     }
 
-    /// **A chain's split in ℚ** (Decision 37; the executed [`Law::part`], exact): the stored chain
+    /// **A chain's split in ℚ** (stored where paths part; the executed [`Law::part`], exact): the stored chain
     /// `node` from `top` parts at `depth`; returns the upper part's `β` and the lower part's (none
     /// when it keeps its `β`: a leaf, or an upper part above the forced depths, whose ratio is
     /// never read).
@@ -4234,7 +4255,7 @@ impl IdealLandmarks {
         self.arena.founded_within(digits.len() * founding, held)?;
         let face = digits.iter().map(|digit| digit.face.clone()).product();
         let cells = 1usize << self.odometer.digits;
-        // Decision 37: each branch's label run, held once and shared by the leaves it founds.
+        // The storage where paths part: each branch's label run, held once and shared by the leaves it founds.
         let runs: Vec<Option<u32>> = (0..self.branches.len())
             .map(|branch| {
                 let top = digits
@@ -4374,7 +4395,7 @@ fn mantissa(a: &BigUint, b: &BigUint, width: u64) -> (BigUint, i64) {
 }
 
 // -------------------------------------------------------------------------------------------
-// Decision 34: the stop-weight mixture per digit tree
+// The stop-weight mixture per digit tree
 
 /// One side of a join: a face, or an earlier join (post-order).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -4391,7 +4412,7 @@ struct Joint {
     founding: u64,
 }
 
-/// [definition; agent-inferred] **A join tree over `K` faces** (Decision 34; Lean
+/// [definition; agent-inferred] **A join tree over `K` faces** (local weighing; Lean
 /// `HNN/LocalWeighing.{static_mixture, two_face_prior}`): every join is a two-face sequential
 /// mixture of its sides' faces, founded at `β₀ = π_left/π_right` and stepped by
 /// `β' = β q_left(b)/q_right(b)`, so the joins telescope to the Bayesian mixture of the `K` faces
@@ -4518,7 +4539,7 @@ pub struct JoinReceipt {
     pub increment: u128,
 }
 
-/// [definition; agent-inferred] **A mixture's joins on the lattice** (Decision 34): per dyadic
+/// [definition; agent-inferred] **A mixture's joins on the lattice** (local weighing): per dyadic
 /// cell, each join of a [`JoinTree`] carries its chart as a node or an enlarged tree's join does
 /// (the carried `β` of `W` bits, the stop weight `λ̂ = ⟦β/(1 + β)⟧`, its rebases, its drift and
 /// excess certificates on `2^(−C)`). A join's face is `⟦λ̂ q̂_left + (1 − λ̂) q̂_right⟧` on the
@@ -4712,7 +4733,7 @@ fn side_value(values: &[u64], faces: &[u64], side: Side) -> u64 {
     }
 }
 
-/// [definition; agent-inferred] **The stop-weight mixture per digit tree** (Decision 34, "in each
+/// [definition; agent-inferred] **The stop-weight mixture per digit tree** (local weighing, "in each
 /// digit tree"; Lean `HNN/LocalWeighing.stop_mixture_per_tree`): `K` trees over one declaration,
 /// one per declared stop prior (their widths agree: the prior enters only at the founding), and in
 /// each dyadic cell a [`JoinTree`]'s joins ([`FaceJoins`]) mixing the trees' digit faces by that
@@ -4830,7 +4851,7 @@ pub struct Coded {
 }
 
 /// [definition] **One tree's run**: its declaration and widths, its chart's report, its stored nodes,
-/// its label pool's letters (Decision 37) and stored bits, the rule's a-priori residual a cell and
+/// its label pool's letters (stored where paths part) and stored bits, the rule's a-priori residual a cell and
 /// the largest per-cell certified residual over the run.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TreeRun {
@@ -5084,7 +5105,7 @@ impl Ord for ProductBound {
 }
 
 /// [definition; agent-inferred] **A passage's code length, carried as its faces' product**
-/// (Decision 35: the measurement at scale). The faces `q_t = n_t/(d_t 2^(k_t))` of a passage multiply
+/// (the wide cut: the measurement at scale). The faces `q_t = n_t/(d_t 2^(k_t))` of a passage multiply
 /// to `N/(D 2^E)`; `N` and `D` are held between exact integer bounds ([`ProductBound`], each kept at
 /// 127 significant bits and rounded outward after every factor) and `E` exactly, so the passage's
 /// code length `−log₂ ∏ q_t = log₂ D + E − log₂ N` is enclosed once, by the certified
@@ -5362,7 +5383,7 @@ pub fn choose_depth(
 }
 
 /// [definition; agent-inferred] **Choose the address depth within a declared deepest depth**
-/// (Decision 35: a memory cap bounds the tree's a-priori founded nodes, `n* B D`, and so its depth):
+/// (the wide cut: a memory cap bounds the tree's a-priori founded nodes, `n* B D`, and so its depth):
 /// [`choose_depth`]'s sweep, which also stops at `D = deepest`; the family tried is still charged
 /// `⌈log₂⌉` of its length.
 pub fn choose_depth_within(
@@ -5406,7 +5427,7 @@ pub fn tree_prequential(
 }
 
 /// [definition] **A stop-prior sweep on the development cells** ([`choose_prior`]): every law tried
-/// with its own depth sweep, the incumbent (Decision 28's `½`), the chosen law, whether the chosen
+/// with its own depth sweep, the incumbent (the `½` stop prior), the chosen law, whether the chosen
 /// law's charged code length is decided below every other law's by disjoint enclosures, and the
 /// description bits the choice is charged, `⌈log₂⌉` of the laws tried (each law's depths are
 /// charged beside it, [`PriorSweep::charged`]).
@@ -5448,13 +5469,13 @@ impl PriorSweep {
     }
 }
 
-/// [definition; agent-inferred] **Choose the stop prior on the development cells** (Decision 32):
+/// [definition; agent-inferred] **Choose the stop prior on the development cells** (the declared stop prior):
 /// each declared law of `family` chooses its own depth ([`choose_depth`], so the depth selection is
 /// campaign 1's) and reads its development code length there, the laws run together
 /// (`hnn::realization`: each reads the shared immutable development cells and writes its own sweep,
 /// so their effects commute). Each law is charged `⌈log₂⌉` of its depths tried, and the choice
 /// `⌈log₂ |family|⌉`. The chosen law is the least charged one (the first in the family's order at a
-/// tie) when its enclosure lies strictly below the incumbent's (Decision 28's `½`, which the family
+/// tie) when its enclosure lies strictly below the incumbent's (the `½` stop prior, which the family
 /// must hold), and the incumbent otherwise; `decided` records whether it lies strictly below every
 /// other law's. The held-out cells never choose anything: they are cut away before any reading.
 pub fn choose_prior(
@@ -5466,7 +5487,7 @@ pub fn choose_prior(
     aligned(&cut.cells, letters)?;
     let half = StopPrior::half();
     let incumbent = family.iter().position(|prior| *prior == half).ok_or(shape(
-        "a stop-prior family holding Decision 28's ½",
+        "a stop-prior family holding the ½ stop prior",
         1,
         0,
     ))?;

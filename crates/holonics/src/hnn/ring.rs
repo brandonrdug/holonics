@@ -57,7 +57,51 @@
 //! `P_r = (hY/4)(|e|² − |s′|²)` cancels the field's signed loaded-port term `−P_r`; the remaining
 //! split and solve-chart residuals stay explicit. The mode state is word-local and is dropped with
 //! the word; the constitution's gains alone may persist through deposition. A ring without a
-//! declared resonator retains the earlier element path exactly.
+//! declared resonator retains the earlier element path exactly. All material is read at the
+//! producing cut, and the pump selects its predeclared phase within the word:
+//!
+//! ```text
+//! b = 2v − s, c = v − s                 junction Swing
+//! e = element(b, c)                    the existing passive/skew/contrast element
+//! M_t = 2C + (h/Y)I + hD + (h²/2)K_t
+//! M_t ω = 2Cw + h e − hK_t u           the resonator's local solve
+//! u′ = u + hω, w′ = 2ω − w
+//! s′ = e − (2/Y)ω                      the returned wave reaches the next junction
+//!
+//! return, with covectors on (s′, u′, w′), the resonator reversed before the element:
+//! z̄ = h ū′ + 2w̄′ − (2/Y)s̄′, r̄ = X_tᵀ z̄
+//! ē = s̄′ + h r̄, ū = ū′ − hK_tᵀr̄, w̄ = −w̄′ + 2Cᵀr̄
+//! material variation = ⟨r̄, 2δC(w−ω) − hδDω − hδK_t(u+hω/2)⟩
+//! ```
+//!
+//! The field's wave-energy change across `e → s′` is the negative of the resonator's port work;
+//! their sum closes with pump, dissipation, chart and split terms. The executed element output is
+//! carried before it drives the resonator. A carried returned wave has a separate remainder and
+//! wave-energy split residual in the field identity; the resonator's own state-energy split keeps
+//! its meaning. The source-opening remainder stays with the element's error-feedback stream, and
+//! the inserted returned-wave stream starts at zero remainder: the declared composition of the two
+//! lattice charts, with every remaining and released term counted, not a uniqueness claim about
+//! chart choice. `X_t` is the solve actually executed: the exact inverse law and the declared chart
+//! pullback keep their separate scopes, and a rounding is not differentiated as a smooth map.
+//! Reached material covectors enter the current deposition consumer and change a later word.
+//!
+//! [definition; agent-inferred] **The declared material family.** Each loaded ring carries four
+//! real scalar amplitudes on its locus lattice: `C = g_C² C₀`, `K = g_K² K₀`, `D = g_D² D₀` and the
+//! pump strength `p = g_P² p₀`. The bases, pump axis and pump step are immutable declaration
+//! operands. The gain covectors contract the material variation with `2g` times its base, which
+//! keeps `C, D` positive semidefinite and the signed stiffness base. A gain never reaches zero by
+//! deposition: a step whose carried gain would be `≤ 0` carries it to `⌊(q + 1)/2⌋ 2^(−L)` for
+//! `g = q 2^(−L)` (`g/2` for even `q`, toward `g` for odd `q`, holding at `q = 1`; Lean
+//! `HNN/Ring.gain_backtrack_midpoint`), and the deposit receipt names each substitution
+//! (`DepositReading::backtracks`); releasing a family belongs to campaign 3's collapse law. The gain
+//! lattice follows the lattice rule with the ring's realified width as its fan-in
+//! (`field::lattice_exponent`). Deposition re-certifies every pump phase before atomic publication
+//! and refuses a failing candidate. This is the admitted learning family, not a claim of arbitrary
+//! matrix or clock learning; the retained gains, their remainders and statistics are counted in the
+//! constitution, and the next word reads them. [historical] The source: campaign 2's resonator
+//! received the junction wave but returned none, and no comparison covector reached its material
+//! (September 26; its receipt, the fixed source-ring family losing to the default field, is in
+//! `research/records/2026-09-26_THE_RESONATOR_RETURNS_ITS_WAVE_AND_THE_COMPARISON_REACHES_ITS_MATERIAL.md`).
 //!
 //! [definition; agent-inferred] **The pump's phases are finite.** The pump carrier advances by a
 //! declared rational rotation per tick; the only rational rotations of finite order in the plane are
@@ -492,7 +536,7 @@ impl ResonatorMaterial {
 // the operands at the cut and the tick
 
 /// The executed solve of one pump phase's operator: the exact inverse (the law) or a certified
-/// lattice chart (Decision 24) with its reading.
+/// lattice chart (the lattice word) with its reading.
 #[derive(Clone, Debug, PartialEq, Eq)]
 enum PhaseSolve {
     Exact(ExactRatMatrix),

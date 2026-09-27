@@ -326,7 +326,7 @@ fn the_collapse_keeps_the_retained_remainders_and_clocks() {
     // A released locus received no covector in this family's deposits, so it carried nothing.
     assert!(reading.released_remainders.is_empty());
     // A narrower family (aperture 1) releases loci the deposits reached: their remainders leave
-    // with them, each reported exactly (Decision 22: "leaves whole, with its remainder, reported").
+    // with them, each reported exactly (the lattice deposit: "leaves whole, with its remainder, reported").
     let narrow = ReceivingPhases::declare(
         &field,
         &carried,

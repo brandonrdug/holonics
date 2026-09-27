@@ -21,7 +21,7 @@
 //! `W_s,g = −f_g f_gᵀ`, the contrast port `W_c,g`, the skew slices `A_ρ = u_ρ v_ρᵀ − v_ρ u_ρᵀ`), its
 //! standing `q_g`, on a source ring its source ports (`E_g` and the factored pair port `E_g^(δ)`),
 //! on a receiving ring its receiving map `R` and the receiving parametron's landmark tree
-//! (Decision 28, `hnn::landmark::Landmarks`), both at the receiving locus. Per contact `a`: its channel's
+//! (the landmark tree, `hnn::landmark::Landmarks`), both at the receiving locus. Per contact `a`: its channel's
 //! square factors (`C_a = c_a c_aᵀ`, `K_a = b_a b_aᵀ`, `D_a = F_a F_aᵀ`). The junction admittance `Y_g` and the
 //! contact conductance `G_a` (`Y_a`, `β_a`, the screws) are declared on the field in campaign 1; the
 //! collapse names them as loci, but they carry no learned value.
@@ -35,8 +35,8 @@
 //! n_s(t) += 1, β_s ← β_s k_s(t)/q    per reached comparison, on the path its address a opens (target t)       the landmark tree
 //! ```
 //!
-//! [definition; agent-inferred] **Decision 28 at the receiving locus.** The receiving map `R` keeps
-//! the prox step on its reached covectors (Decisions 22 and 24), the covector of the ratio read on
+//! [definition; agent-inferred] **The landmark tree at the receiving locus.** The receiving map `R` keeps
+//! the prox step on its reached covectors (the lattice deposit and the lattice word), the covector of the ratio read on
 //! the combined face (`hnn::receiving::ReceivingRead::combined`). Beside it the receiving
 //! parametron stores its landmark tree (`hnn::landmark::Landmarks`, declared from the receiver by
 //! `hnn::receiving::landmark_declaration`), which each reached comparison deposits on the path its
@@ -46,10 +46,10 @@
 //! released): Lean `HNN/LandmarkTree.release_rule` proves that nodes deeper than `D` are releasable
 //! (the tree founds none) and that a retention is lawful exactly when it refines the causal
 //! signature; it does not prove that no shallower merge is lawful, and the collapse attempts none.
-//! Decision 27's region table is retired from Rust, its laws staying in Lean `HNN/RegionCounts`; it
+//! The region table is retired from Rust, its laws staying in Lean `HNN/RegionCounts`; it
 //! is the depth-one forced case of the whole-cell emission (`|A|`-ary masses at a node; Lean
 //! `HNN/LandmarkTree.depth_one_is_decision_27`), not of this tree, which emits the cell's odometer
-//! digits (its depth-one forced case is a product of binary KT faces). Decision 26's exogenous law
+//! digits (its depth-one forced case is a product of binary KT faces). The first repair's exogenous law
 //! and standing read are retired: the tree's face contains the marginal (Lean `HNN/TargetFace`'s
 //! finite-chart obstruction stays a theorem).
 //!
@@ -112,7 +112,7 @@
 //! `K` of the deposit map, which is owed. Brandon may override this choice.
 //!
 //! A [`NormalLaw`] keeps `W` and its Gram `H` of the locus's own width (no global Gram), each
-//! carried, and the **solved chart** `X̂ ≈ H⁻¹` of the carried Gram (Decision 24, Lean
+//! carried, and the **solved chart** `X̂ ≈ H⁻¹` of the carried Gram (the lattice word, Lean
 //! `HNN/LatticeWord`; [`SolvedChart`]): a lattice matrix on `2^(−L_s)ℤ` with its certified left
 //! residual `δ = ‖1 − X̂H‖∞`, computed exactly, warm-started from the previous chart at each deposit
 //! and refined by rounded Newton–Schulz steps until `δ ≤ δ_ℓ`, both declared by rule
@@ -293,7 +293,7 @@ pub struct BudgetedCarry {
     backtracks: Vec<GainBacktrack>,
 }
 
-/// [definition; agent-inferred] **A loaded resonator gain's backtrack** (Decision 38's repair; the
+/// [definition; agent-inferred] **A loaded resonator gain's backtrack** (the loaded resonator's repair; the
 /// rule of [`Constitution::deposited`]): a candidate step that would carry gain family `family` of
 /// ring `ring` from `from > 0` to `candidate ≤ 0` carries it to `to` instead, the midpoint `from/2`
 /// of the admissible side `(0, from]` split at the locus's lattice by the carry's own nearest point,
@@ -664,7 +664,7 @@ fn ceil_log2(x: u128) -> u32 {
 /// of headroom stays inside the `i128` carrier.
 const RESIDUAL_SHIFT: u32 = 125;
 
-/// [definition; agent-inferred] **The chart rule of a normal law's locus** (Decision 24; Lean
+/// [definition; agent-inferred] **The chart rule of a normal law's locus** (the lattice word; Lean
 /// `HNN/LatticeWord.{prox_chart_certificate, rounded_refinement_certificate_left,
 /// roundedIter_certificate}`), declared from the locus's carrier lattice `L_ℓ` and the finest
 /// admitted receiver grain `L_R`, as `L_ℓ` is from `L_R` and `X_ℓ`:
@@ -757,7 +757,7 @@ impl ChartRule {
 }
 
 /// [definition; agent-inferred] **The solved chart** `X̂ ≈ H⁻¹` of a normal law's carried Gram
-/// (Decision 24; Lean `HNN/LatticeWord`): a symmetric lattice matrix on `2^(−L_s)ℤ` with its certified
+/// (the lattice word; Lean `HNN/LatticeWord`): a symmetric lattice matrix on `2^(−L_s)ℤ` with its certified
 /// left residual `δ = ‖1 − X̂H‖∞`, computed exactly. The Gram is the identity off its **support**
 /// (the rows where a deposit moved it: `H = I + Σ w f fᵀ` moves only rows some feature reached), and
 /// so is the chart; the chart is carried on the support as integer coordinates (`i128`, with the
@@ -1373,7 +1373,7 @@ pub(crate) fn refined_once(
     Some((chart.dense(gram.len()), before, after))
 }
 
-/// [definition] **One normal law's solved chart at a deposit** (Decision 24; Lean
+/// [definition] **One normal law's solved chart at a deposit** (the lattice word; Lean
 /// `HNN/LatticeWord.prox_chart_certificate`): the chart's lattice `L_s`, the declared target `δ_ℓ`,
 /// the warm start's certificate (`None` when it left the `i128` carrier), the executed chart's
 /// certificate `δ = ‖1 − X̂H'‖∞` (exact), the refinements taken and whether the chart restarted from
@@ -1410,7 +1410,7 @@ pub struct Sample {
 /// [definition] **One locus's deposition owner** (design (c), `NormalLaw`): the map `W` (`m × n`)
 /// and its Gram `H` (`n × n`, the locus's own width), each on the locus's lattice with its carried
 /// remainders, and the solved chart `X̂ ≈ H⁻¹` of the carried Gram on its own lattice with its
-/// certified residual ([`SolvedChart`], Decision 24). `B = W H` is not carried (module header). Its
+/// certified residual ([`SolvedChart`], the lattice word). `B = W H` is not carried (module header). Its
 /// law is the prox step at the carried Gram through the executed chart (Lean
 /// `HNN/Normal.normal_prox_step`, `HNN/LatticeWord.prox_chart_residual`: `W' = W + γ G X̂`, the prox
 /// identity holding up to the released residual `γG(1 − X̂H')`) with the carried Gram within one unit
@@ -1748,7 +1748,7 @@ struct RingMaterial {
     pairs: Vec<(usize, PairPort)>,
     pair_scale: Rat,
     receiving: Option<NormalLaw>,
-    /// The receiving parametron's landmark tree (Decision 28), on a receiving ring.
+    /// The receiving parametron's landmark tree (`hnn::landmark`), on a receiving ring.
     tree: Option<Landmarks>,
     /// The receiver's mixture of the tree's face and the combined face (ruling A), on a receiving
     /// ring: its carried likelihood ratio `β`.
@@ -1944,7 +1944,7 @@ pub struct LinearStep {
 }
 
 /// [definition] **One reached comparison's deposit into the receiving parametron's landmark tree**
-/// (Decision 28): its receiving ring, the causal address its phase read the tree at
+/// (the landmark tree): its receiving ring, the causal address its phase read the tree at
 /// (`hnn::receiving::ActiveAddress::phase`) and its target class. The deposit applies a window's
 /// steps in cell order, each on the paths its address opens (Lean
 /// `HNN/LandmarkTree.landmark_step`), at the receiving locus.
@@ -2058,8 +2058,8 @@ pub struct FactorStep {
 /// carry's report: every residual the deposit released (exact and sparse, with its locus, carrier
 /// and entry; Lean `HNN/LatticeDeposit.release`), their bits, and the number of entries whose
 /// lattice coordinate moved (`q ≠ 0`, review R5); and each normal law's solved chart with the prox
-/// residual its chart released ([`ChartReading`], Decision 24); and the cells its reached
-/// comparisons deposited into the receiving parametrons' landmark trees (Decision 28). The release
+/// residual its chart released ([`ChartReading`], the lattice word); and the cells its reached
+/// comparisons deposited into the receiving parametrons' landmark trees (the landmark tree). The release
 /// is reported, never silent.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DepositReading {
@@ -2148,7 +2148,7 @@ impl Constitution {
     /// | `E_g` on a source ring | the sign generator times ½ | normal law, `H_0 = I`, `B_0 = E_0` |
     /// | `E_g^(δ)`, rank `2d_g` | `e_ρ = 0`; `a_ρ`, `b_ρ` from the sign generator | factor steps |
     /// | `R` on a receiving ring | 0 | normal law, `H_0 = I`, `B_0 = 0` |
-    /// | the landmark tree on a receiving ring, declared from its first receiver | empty: every node unfounded, every face uniform (`α = ½` at first arrival) | the landmark deposit (Decision 28) |
+    /// | the landmark tree on a receiving ring, declared from its first receiver | empty: every node unfounded, every face uniform (`α = ½` at first arrival) | the landmark deposit (the landmark tree) |
     /// | `W_c,g` | 0 | normal law, `H_0 = I`, `B_0 = 0` |
     /// | `W_s,g = −f fᵀ` | `f = ½I` | factor step |
     /// | slices | `u_ρ = e_ρ`, `v_ρ = e_(ρ+1)`: the skew cyclic shift | factor steps |
@@ -2157,7 +2157,7 @@ impl Constitution {
     ///
     /// The sign generator's locus codes: `E` of ring `g` is kind 0; the pair port's current and
     /// earlier reads of ring `g` at the `o`-th declared offset are kind 2 and 3 with part `o` (kind
-    /// 1 was `R`'s while it opened at the sign generator, Decision 27).
+    /// 1 was `R`'s while it opened at the sign generator, the region table).
     ///
     /// [definition; agent-inferred] **`R_0 = 0`, `E_0` the sign generator times ½.** The receiving
     /// map opens at zero, so the combined face opens exactly at the tree's and the wave earns every
@@ -2509,7 +2509,7 @@ impl Constitution {
     /// field's hop on the ring's realified width.
     ///
     /// [definition; agent-inferred] **Its gains' lattice is the lattice rule's**
-    /// ([`crate::hnn::field::lattice_exponent`], Decision 22): `L = ⌈log₂(2 L_R X)⌉` with the
+    /// ([`crate::hnn::field::lattice_exponent`], the lattice deposit): `L = ⌈log₂(2 L_R X)⌉` with the
     /// fan-in `X = n`, the resonator's realified width. Each gain scales a base form whose rows
     /// read `n` unit-scale coordinates of the ring's state (`C₀w`, `K₀u`, `D₀ω`, the pumped `K`'s
     /// rows), and the rule bounds a factor entry by the fan-in of the read it enters, as for the

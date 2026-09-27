@@ -1,7 +1,7 @@
 //! **Dyadic coordinates: the card's reading of an exact value** (the device port's host side).
 //!
 //! [definition] Every value the resident word carries is dyadic: an integer `X` on a declared
-//! scale, `x = X · 2^(−σ)` (Decision 24's lattices, and campaign 1's declared scalars, `h = 1`,
+//! scale, `x = X · 2^(−σ)` (the lattice word's lattices, and campaign 1's declared scalars, `h = 1`,
 //! `Y = 2`, on `2^0ℤ`). A [`DyadicMatrix`] is an exact matrix read at its least common dyadic
 //! exponent as signed 64-bit words; a value whose denominator is not a power of two, or whose
 //! coordinate passes the word, is refused, never rounded ([`HnnError::Realization`]). The inverse

@@ -116,7 +116,7 @@ fn the_forward_word_reads_its_epochs_and_releases_its_change() {
 
 /// A medium with `E = 0` opens an empty word: its first word carries no change and every wave
 /// logit is zero; the receiving parametron's tree is empty, so its face is uniform at every
-/// address (Decision 28): every real logit of the combined read is `log₂(1/|A|) = −2` on the
+/// address (the landmark tree): every real logit of the combined read is `log₂(1/|A|) = −2` on the
 /// chain's `|A| = 4`, carry `−2` and phase class `0`, every imaginary logit zero. The first faces
 /// are uniform (read with no target known, so no phase reads an earlier phase's deposit).
 #[test]

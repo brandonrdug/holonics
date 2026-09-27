@@ -105,8 +105,8 @@ fn a_compare_across_an_ingest_equals_one_taken_before_it() {
 }
 
 /// After a deposit the delayed compare reads the contemporary constitution: its faces are a fresh
-/// refine's wave at the successor with the successor's tree at the targets' addresses (Decision
-/// 28), and it returns the wave's residual against the face it emitted.
+/// refine's wave at the successor with the successor's tree at the targets' addresses (the
+/// landmark tree), and it returns the wave's residual against the face it emitted.
 #[test]
 fn after_a_deposit_the_compare_returns_the_residual_against_the_emitted_face() {
     let (reference, mut resident, moment) = cut(true);

@@ -1,7 +1,7 @@
 // **The resident HNN's kernels** (rebuild step 5, #76; owners `src/hnn/{lattice,moment,word}.rs`).
 //
 // Each entry realizes one law of `holonics::hnn` on the card with exact integers and no float; the
-// only rounding is the word's nearest-point split (Decision 24), whose remainder is carried or
+// only rounding is the word's nearest-point split (the lattice word), whose remainder is carried or
 // bounded, never dropped unreported. Each entry's parity test against an exact host oracle is in
 // `src/hnn/tests.rs`. The launch of each is derived from the card's census by its owner
 // (`src/hnn/card.rs`), which also reports the realization.
@@ -16,7 +16,7 @@ extern __shared__ __align__(16) unsigned char hnn_shared[];
 // -------------------------------------------------------------------------------------------------
 //
 // [definition] A locus of the constitution carried on its lattice (`holonics::hnn::Lattice`,
-// Decision 22) is `A = a · 2^(−L_A)` with integer coordinates `a`; a vector on its own lattice is
+// the lattice deposit) is `A = a · 2^(−L_A)` with integer coordinates `a`; a vector on its own lattice is
 // `x = ξ · 2^(−L_x)` (the moment's counts have `L_x = 0`). The read is
 //
 //   y_b = A x_b = (Σ_j a_ij ξ_b,γ_b(j)) · 2^(−(L_A + L_x))
@@ -221,7 +221,7 @@ extern "C" __global__ void hnn_moment_ingest(
 // the word: the carried tick and its adjoint
 // -------------------------------------------------------------------------------------------------
 //
-// [definition] Decision 24, Lean `HNN/LatticeWord.{feedback_tick, feedback_accounting,
+// [definition] The lattice word, Lean `HNN/LatticeWord.{feedback_tick, feedback_accounting,
 // executed_adjoint_pairing}`. A region `g` of a word (a ring or a contact) carries a chart
 // `Q_g = q · 2^(−L_c)` (`n × n` signed 64-bit words), a state `x_g = ξ · 2^(−L_w)` (`n` words) and a
 // remainder `r_g` (`n` words on the fine lattice `2^(−(L_c + L_w))ℤ`). One tick is
@@ -344,7 +344,7 @@ extern "C" __global__ void hnn_word_adjoint_tick(
 // the inverse charts: the Newton–Schulz refinement and the certificate
 // -------------------------------------------------------------------------------------------------
 //
-// [definition] Decision 24, Lean `HNN/LatticeWord.{nsStep, newton_schulz_right,
+// [definition] The lattice word, Lean `HNN/LatticeWord.{nsStep, newton_schulz_right,
 // rounded_refinement_certificate}`. A pair `g` carries an operator `A = a · 2^(−L_A)` and its
 // inverse chart `X̂ = ξ · 2^(−L_c)` (`n × n` signed 64-bit words each), with `S = L_A + L_c ≤ 126`
 // so that `2^S` is a carrier word. The residual `R = 1 − A X̂` on `2^(−S)ℤ` is

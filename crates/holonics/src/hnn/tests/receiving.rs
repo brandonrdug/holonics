@@ -2,7 +2,7 @@
 //! grain reading and its integer comparison; the receiving parametron's landmark tree declared from
 //! the receiver and coded in the description; the active suffix address and each phase's causal
 //! address; the combined read of the tree's face and the wave through `R P_R^(τ_R)`; the compare's
-//! landmark steps and their deposit; and the maps' openings (Decision 28: `R_0 = 0`, `E_0` the sign
+//! landmark steps and their deposit; and the maps' openings (the landmark tree: `R_0 = 0`, `E_0` the sign
 //! generator times ½), with the deadlock they avoid. Campaign 2: the receiving letters read from the
 //! clock before the cell they predict (through aeon boundaries and re-keying), restricted by whole
 //! bundles, the sheet grain a scale square of the period grain, and the letters' partitions finite
@@ -361,7 +361,7 @@ fn the_read_adds_the_trees_face_to_the_rotated_wave() {
     );
 }
 
-/// **The compare deposits its targets into the tree on their own addresses** (Decision 28): the
+/// **The compare deposits its targets into the tree on their own addresses** (the landmark tree): the
 /// compare's landmark steps are one per phase, in cell order, each at its phase's causal address;
 /// the constitution's deposit applies them (the tree passes `A` cells and every face at a
 /// deposited address moves toward its target), and no other locus's material carries them.
@@ -473,7 +473,7 @@ fn the_wave_is_inert_when_every_map_opens_at_zero() {
     assert_eq!(resident.constitution().landmarks(2).unwrap().passed(), 2);
 }
 
-/// **`R` opens at zero and learns from the first deposit** (Decision 28's declared openings): at
+/// **`R` opens at zero and learns from the first deposit** (the landmark tree's declared openings): at
 /// the declared initial constitution (`R_0 = 0`, `E_0` the sign generator times ½) the first
 /// compare's combined face is the tree's at the grain exactly (its code length equals the tree's
 /// grain face alone's), its
@@ -1184,7 +1184,7 @@ fn the_contact_letters_are_read_from_the_register_before_the_cell_they_predict()
 }
 
 /// **The switching mixture shares its weights at the declared rate, and codes within the price of
-/// every switching sequence** (Decision 34, "across epochs"; Lean `HNN/LocalWeighing.{fixed_share,
+/// every switching sequence** (local weighing, "across epochs"; Lean `HNN/LocalWeighing.{fixed_share,
 /// share_ratio_step}`): one step at `α = 2^(−2)` moves `β = 1` by the likelihood to `β₊ = 2`, then
 /// shares it to `(3·2 + 1)/(3 + 2) = 7/5`; over a passage whose better face changes twice, the
 /// mixture's executed product is at least `½ α^k (1 − α)^(n−k) Π f_σ` for every sequence `σ` tried,

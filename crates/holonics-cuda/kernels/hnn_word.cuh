@@ -1,5 +1,5 @@
 // **The executed word on the card: its open, its ticks, its receiving read and its return**
-// (rebuild step 5, #76; Decision 24; owner `src/hnn/execute.rs`, port `src/hnn/port.rs`).
+// (rebuild step 5, #76; the lattice word; owner `src/hnn/execute.rs`, port `src/hnn/port.rs`).
 //
 // [definition] The host law is `holonics::hnn::{word, propagation, receiving, port}`: a word opens
 // at zero change with `s_g(0) = P_g^(τ_g) Σ_c P_g^(−c)(E_g M_g[c] + Σ_δ E_g^(δ) C_g(δ)[c])` on the

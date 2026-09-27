@@ -10,7 +10,8 @@ port work was recorded as an interconnection defect, and no comparison covector 
 material. The corrected campaign-2 receipt stated this explicitly. Decision 38 joins that
 consumer rather than adding another isolated resonator.
 
-The law and its order live in [THE_REBUILD](../../docs/plans/THE_REBUILD.md#decision-38-the-resonator-loads-the-ring-and-receives-its-covector).
+The law lives in `hnn::ring`'s module doc ("The resonator is loaded at the ring storage port"); it was
+THE_REBUILD's Decision 38 ([index](../../docs/plans/THE_REBUILD.md#i-the-decisions-index)).
 The existing element produces a wave; the resonator receives it and returns a wave to the next
 junction. The adjoint reverses the same stages. The material family consists of four scalar
 amplitudes on immutable capacity, stiffness, dissipation and pump bases, with phase certification
@@ -62,6 +63,14 @@ first deposit; final scalar amplitudes are a receipt.
 A `2⁵`-window development pilot measures the cost. The full passage is admitted only when its
 projection fits ten minutes per realization. A refusal or timeout remains incomplete evidence.
 The standing cut is reused development material; the separate evaluation partition is untouched.
+
+**Acceptance, as declared.** The smallest fixtures must exhibit a changed later receiving face, the
+state and material directional pairings, a closing loaded power balance, and a reached deposit
+that affects the next word. Host/card returns must agree for loaded, pumped and signed fixtures,
+including carried residuals and deferred comparisons. The campaign receipt records one development
+comparison with the baseline fixed in advance; predictive failure is recorded as such. The
+existing full standing-cut exposure remains a regression receipt. No result here promotes the
+wide count-only measurement to a full-HNN result.
 
 ## Verification and result
 

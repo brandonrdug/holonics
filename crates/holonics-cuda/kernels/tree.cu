@@ -1,11 +1,11 @@
-// **The landmark tree on the card, stored at the faces where paths part** (campaign 2, Decision 37;
+// **The landmark tree on the card, stored at the faces where paths part** (campaign 2, the storage where paths part;
 // #73 with #76; owner `src/hnn/tree.rs`).
 //
 // The receiving parametron's storage as a tree of landmarks (`holonics::hnn::landmark`), mirrored
 // on the card: the all-class face read of a phase (the digit-0 split at every splitting dyadic
 // cell, each branch's opened path and the join) and the opened-path update of a deposit (each
 // mixing chain's β step, a parting chain's split, the founding of the upper part and the leaf, the
-// label run, the masses and their register's carry at the declared ceiling, Decision 39), with the
+// label run, the masses and their register's carry at the declared ceiling, the register's capacity), with the
 // host's exact integer law: every path face a numerator of `2^(−M_p)`, every β an odd/odd ratio of
 // `W` bits with its binary exponent, every product and quotient in 128-bit words, the carrier's rebase past `u128` at `R` bits (Lean `HNN/LandmarkTree`
 // §6′, `HNN/LandmarkCarrier`), and each split's two ratios formed exactly on 512-bit integers and
@@ -13,7 +13,7 @@
 // what the reads need (the masses, the charts' β and stop weights, the topology, the labels); the
 // certificates stay with the host's constitution, whose tree is the owner.
 //
-// [definition] **The arena** (the host's layout, `hnn::landmark`'s "The arena"; Decision 37): nodes
+// [definition] **The arena** (the host's layout, `hnn::landmark`'s "The arena"; the storage where paths part): nodes
 // numbered in founding order, each a stored chain; `roots[t]` the root of tree `t = branch · 2^B +
 // h` (`TREE_NONE` unfounded); the child table an open-addressing hash from `(parent << 32) | letter`
 // to the child (linear probing, `TABLE_EMPTY` free); each node's depth word (its bottom depth, its
@@ -395,7 +395,7 @@ __device__ void tree_split(uint64_t n, uint64_t d, int64_t e, uint32_t upper_run
 }
 
 // -------------------------------------------------------------------------------------------------
-// the register's capacity (Decision 39)
+// the register's capacity
 // -------------------------------------------------------------------------------------------------
 
 // **The register's carry after a deposit** (`landmark::Capacity::carry`; Lean
@@ -642,7 +642,7 @@ extern "C" __global__ void hnn_tree_splits(TreeLaw law, TreeArena arena, const u
 // is founded with the chain's counts and its stepped chart, the parent relinked to it, the lower
 // part linked below it by its letter at `k + 1`), founds its leaf labelled to `D`, counts the digit
 // at each node past the forced depths and carries that node's register at the declared ceiling
-// (`tree_carry`, Decision 39: a stored chain is one register, and a split's upper part took the
+// (`tree_carry`, the register's capacity: a stored chain is one register, and a split's upper part took the
 // chain's carried register before the count), and steps the join's β by `q̂_cells(b)/q̂_bundles(b)`.
 // The digits of one cell descend different dyadic cells, so their trees are disjoint: the threads
 // write disjoint nodes, slots and joins, their insertions take distinct keys by `atomicCAS`, and

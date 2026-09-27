@@ -98,7 +98,7 @@ fn split_values(split: &SplitRecord, lattice: u32, fine: u32) -> (Vec<Rat>, Vec<
     )
 }
 
-/// **The normal law's prox step on the card equals the host's** (campaign 2, Decision 25: the deposit
+/// **The normal law's prox step on the card equals the host's** (campaign 2, the hardware-surfaces rule: the deposit
 /// phase on the card where its arithmetic is dyadic). A window of dyadic samples `(w, f, g)` is
 /// deposited on a normal law by the host (`NormalLaw::deposited`: `ΔH = Σ w f fᵀ` carried onto `H`,
 /// the chart of `H'`, `ΔW = γ Σ w g (X̂f)ᵀ` carried onto `W`, each by the budgeted carry at the deposit

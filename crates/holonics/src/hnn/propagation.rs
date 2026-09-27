@@ -31,7 +31,7 @@
 //! contact's own `k_a × k_a` `m_a` (positive definite for PSD squared carriers and `G_a > 0`). No
 //! global solve over the contact graph exists; the cone test checks the support exactly.
 //!
-//! [definition; agent-inferred] **The executed tick on declared lattices** (Decision 24;
+//! [definition; agent-inferred] **The executed tick on declared lattices** (the lattice word;
 //! [`crate::hnn::chart`]). A field's word carries each inverse as a certified lattice chart and each
 //! transient on `2^(−L_w)ℤ` with error feedback:
 //! - the junction's inverse `(Y_r + Σ G_a)⁻¹` is its weights' chart ([`junction_weights`]):
@@ -226,7 +226,7 @@ pub fn path_attenuation(
 // the executed solve
 
 /// [definition] **An executed solve**: the exact inverse (the law), or a certified lattice chart
-/// (Decision 24). The word applies it forward and its return applies its transpose, so the paired
+/// (the lattice word). The word applies it forward and its return applies its transpose, so the paired
 /// adjoint keeps the operands the forward executed (Lean `HNN/LatticeWord.executed_adjoint_unique`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) enum Solve {

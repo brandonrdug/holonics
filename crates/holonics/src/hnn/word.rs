@@ -16,7 +16,7 @@
 //!   exchange, with its power, and every carried remainder is released and reported with it;
 //!   nothing is carried to the next word ([`Word::release`] consumes it).
 //!
-//! [definition] **The carried transients** (Decision 24; Lean `HNN/LatticeWord.{feedback_tick,
+//! [definition] **The carried transients** (the lattice word; Lean `HNN/LatticeWord.{feedback_tick,
 //! carried_word_accounting}`). On the field's declared lattices ([`crate::hnn::chart`]) the word
 //! carries every transient on `2^(−L_w)ℤ` with error feedback: the opening storage, and at each tick
 //! the junction's anchor `v_r`, the element output, a loaded ring's returned storage `s_r′`, the

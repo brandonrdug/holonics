@@ -784,7 +784,7 @@ fn campaign_one_reads_and_ingest_match_the_host() {
             clock.elapsed().as_micros()
         );
         // The card reads the wave; the host adds the tree's grain logits at compare
-        // (Decision 28), so the wave's read is the host's `ReceivingPhases::read`.
+        // (the landmark tree), so the wave's read is the host's `ReceivingPhases::read`.
         for (b, anchor) in anchors.iter().enumerate() {
             let logits = phases
                 .read(&field, &theta, &current, anchor)
@@ -832,8 +832,8 @@ fn tree_flipped(length: usize) -> Vec<usize> {
         .collect()
 }
 
-/// A cell-only declaration at the grain 16 under Decision 28's `½`, with its node register's
-/// declared capacity (Decision 39).
+/// A cell-only declaration at the grain 16 under the `½` stop prior, with its node register's
+/// declared capacity (the register's capacity).
 fn tree_declared(
     alphabet: usize,
     depth: usize,
@@ -883,7 +883,7 @@ fn tree_bundles(stream: &[usize]) -> Vec<holonics::hnn::Letter> {
 }
 
 /// What a capped tree's run carried, read on the host against its unbounded twin (the same
-/// declaration at `c = ∞`, Decision 28's node): the carry moves only masses and charts, so the two
+/// declaration at `c = ∞`, the KT node): the carry moves only masses and charts, so the two
 /// arenas share their topology, node for node. `registers` counts the nodes whose masses end below
 /// the twin's (their registers carried), `splits` the parting chains' upper parts founded holding a
 /// register below the twin's (a chain split after its register carried, or carried at the split).
@@ -915,7 +915,7 @@ fn carried_upper_parts(
 /// One tree's run on the card against the host: at every window of `aperture` cells, the card's
 /// splits of every phase in cell order equal the host's (`Landmarks::window_splits`), known
 /// targets and none; each window is then deposited on both, and every `check` windows the card's
-/// arena equals the host's. A capped tree (Decision 39) also runs its unbounded twin on the host,
+/// arena equals the host's. A capped tree (the register's capacity) also runs its unbounded twin on the host,
 /// whose topology it keeps, and returns what carried ([`Carried`]). Returns the card's times.
 fn tree_parity(
     card: &Card,
@@ -988,9 +988,9 @@ fn tree_parity(
 }
 
 /// **The landmark tree on the card, stored where paths part, reads and deposits as the host's**
-/// (campaign 2; Decisions 25 and 37; `kernels/tree.cu`), the unbounded register (`c = ∞`,
-/// Decisions 28–37): the cell-only tree at campaign 1's `|A| = 256`, `D = 4`, and past the stream's
-/// recurrence at `D = 24` under the global rung 2 and at `D = 48` under Decision 28's `½` (long
+/// (campaign 2; the hardware-surfaces rule and the storage where paths part; `kernels/tree.cu`), the unbounded register (`c = ∞`,
+/// the uncapped tree): the cell-only tree at campaign 1's `|A| = 256`, `D = 4`, and past the stream's
+/// recurrence at `D = 24` under the global rung 2 and at `D = 48` under the `½` stop prior (long
 /// chains, their labels to the boundary letters, splits of internal chains); at five classes with
 /// a forced split (the odometer's forced digits) and a narrow carrier forcing the β chart's rebases
 /// and the splits' mantissas, at `D = 2` and at `D = 9` under the per-depth prior `(2, 5)`; and the
@@ -1078,8 +1078,8 @@ fn the_card_tree_reads_and_deposits_as_the_host_tree() {
     );
 }
 
-/// **The card's register carries at its ceiling as the host's** (Decision 39, `Capacity::carry`;
-/// Lean `HNN/LandmarkCapacity.{capCarry, cap_carry_half_units, capped_tree_laws}`; Decision 25:
+/// **The card's register carries at its ceiling as the host's** (the register's capacity, `Capacity::carry`;
+/// Lean `HNN/LandmarkCapacity.{capCarry, cap_carry_half_units, capped_tree_laws}`; the hardware-surfaces rule:
 /// the resident realization advances with the law). At the ceilings `c ∈ {1, 2, 3}` (`L = 2, 4,
 /// 8`, small enough that the shallow registers carry at nearly every arrival): the binary stream
 /// with its flipped cell at `D = 12` and `D = 48` (chains holding carried registers split, their

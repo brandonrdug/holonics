@@ -1,4 +1,4 @@
-//! **The executed charts resident on the card, keyed, and their refinement** (Decision 24; kernels
+//! **The executed charts resident on the card, keyed, and their refinement** (the lattice word; kernels
 //! `hnn_inverse_residual`, `hnn_inverse_refine`, `hnn_inverse_certificate`, `hnn_copy_words`).
 //!
 //! [definition] The host owner is `holonics::hnn::chart::{refine, Charts}`: the resident keeps the

@@ -9,7 +9,7 @@
 //! - **the faces** (`holonics::hnn::receiving::ReceivingPhases::read`, `ratio::Faces::of_reads`):
 //!   the wave's logits are the card's (`R · P_R^(τ_R) v_R(e_j)`, exact); their grain cells and
 //!   faces in `ℚ(θ)` are the host's. The landmark tree's grain logits at each phase's causal address
-//!   (Decision 28) are read on the host from its constitution's tree at compare and added there
+//!   (the landmark tree) are read on the host from its constitution's tree at compare and added there
 //!   (`PendingRatio::against`, the host reference's own formula);
 //! - **each tick's balance** (`holonics::hnn::word::Word::tick`, `propagation::TickBalance`): the
 //!   power before and after, the dissipation, the passive and contrast terms, and the executed

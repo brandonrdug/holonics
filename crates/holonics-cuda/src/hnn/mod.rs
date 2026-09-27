@@ -12,22 +12,22 @@
 //!   [`DeviceCensus`], and the layouts derived from it with their [`Realization`];
 //! - `kernels/exact_integer.cuh`: the signed 128-bit word ring `ℤ/2^128`, read on
 //!   `(−2^127, 2^127)` under the l1 certificate (#12);
-//! - [`lattice`]: a constitution locus carried on its lattice (Decision 22) as its signed 64-bit
+//! - [`lattice`]: a constitution locus carried on its lattice (the lattice deposit) as its signed 64-bit
 //!   coordinates, and the exact read `A x` against a resident operand, with an optional gather for
 //!   a ring rotation;
 //! - [`moment`]: the phase-binned source moment resident on the card, and its ingest (the
 //!   selective steps' scan with carries, then the counts' histogram);
-//! - [`word`] (Decision 24, Lean `HNN/LatticeWord`): the word's carried tick and its adjoint on
+//! - [`word`] (the lattice word, Lean `HNN/LatticeWord`): the word's carried tick and its adjoint on
 //!   lattice charts, the error-feedback split with the remainder carried on the card and released
 //!   at the word's end, resident chaining (tick by tick, a captured graph of `k` ticks, or a whole
 //!   window's word as one graph with its load and release copies); and the inverse charts'
 //!   Newton–Schulz refinement with its exact certificate `‖1 − AX̂‖∞`, warm-started when a deposit
 //!   moves the operator;
-//! - [`tree`] (campaign 2; Decision 37): **the receiving parametron's landmark tree mirrored on the
+//! - [`tree`] (campaign 2; the storage where paths part): **the receiving parametron's landmark tree mirrored on the
 //!   card, stored at the faces where paths part**, its windows' splits in cell order and its
 //!   deposits' opened-path updates with their splits and label runs (`kernels/tree.cu`, its own
 //!   translation unit and stream);
-//! - [`port`] (Decision 25): **the execution port resident on the card**, [`Resident`] with its
+//! - [`port`] (the hardware-surfaces rule): **the execution port resident on the card**, [`Resident`] with its
 //!   resident [`Mounted`], every `InteractionReturn` the host reference's; the exposure protocol
 //!   runs over it (`holonics::hnn::reference::expose`), and [`Traffic`] reads what crossed the bus.
 //!   It composes `publication` (the published constitution's loci at their declared lattices, the
@@ -50,7 +50,7 @@
 //! | `hnn_pair_weights` | one weight `(phase c, rank ρ)`; grid `(d_g, m)` | one residue class `x ≡ t` of the current cells; `threads` as the read's over `|A|` | the earlier cells, `C_c[x, y] a_ρ[x] b_ρ[y]` | the shared tree |
 //! | `hnn_copy_words` | one copy (a chart gathered into a word's operands, or kept) | a residue class of the copy's words | `⌈words/threads⌉` words | none |
 //! | `hnn_scatter_words` | a grid striding a publication's moved words | one moved word | — | none |
-//! | `hnn_tree_splits` ([`tree`]) | one phase's all-class read; grid = the window's phases read together | one splitting dyadic cell (`i ≡ t`); `threads` = the least power of two covering them, at least a warp, within the entry's census | each cell's walks (at most `D_b + 1` stored chains, `D_b` label letters compared and one split's ratios a branch, Decision 37) and the join | none: each split is its own thread's word |
+//! | `hnn_tree_splits` ([`tree`]) | one phase's all-class read; grid = the window's phases read together | one splitting dyadic cell (`i ≡ t`); `threads` = the least power of two covering them, at least a warp, within the entry's census | each cell's walks (at most `D_b + 1` stored chains, `D_b` label letters compared and one split's ratios a branch, the storage where paths part) and the join | none: each split is its own thread's word |
 //! | `hnn_tree_deposit`, `hnn_tree_undo` ([`tree`]) | one cell's deposit (one block of one warp) | one opened digit (its dyadic cell's trees) | the digit's paths bottom-up: β steps, a parting chain's split, the upper part and the leaf founded, the relinks, masses | a block minimum of each branch's leaf tops (the label runs) and a block prefix sum of the founded counts (the host's numbering) |
 //! | `hnn_tree_gather` ([`tree`], the per-deposit lockstep) | a grid striding the touched nodes and joins (`threads` the least power of two covering them, from a warp to 256) | one touched node's masses, chart, depth word and label end and one touched join's chart | — | none: each thread writes its own rows |
 //! | `hnn_outer_update` (campaign 2) | one entry `(i, j)` of a normal law's update `Σ_t a_t l_t r_tᵀ`; grid `(rows, columns)` | one residue class `t ≡ τ` of the window's samples; `threads` as the read's over the samples | `⌈samples/threads⌉` samples | the shared tree |
@@ -66,7 +66,7 @@
 //!
 //! # The device execution port: what runs resident
 //!
-//! [definition; agent-inferred] **The port, built** ([`port`], Decisions 24–25). Every word the port
+//! [definition; agent-inferred] **The port, built** ([`port`], the lattice word and the hardware-surfaces rule). Every word the port
 //! executes (a refine's, a compare's read again, a deposit's and a collapse's re-read, a release's)
 //! runs on the card, from the charts' refinement through the receiving read, in one launch after
 //! the refinement's; its return runs on the card in one launch. The host keeps what the port plan
@@ -79,7 +79,7 @@
 //! | Method | On the card | On the host, and why | Crosses the bus |
 //! |---|---|---|---|
 //! | `mount` | the constitution's loci at their declared lattices (the publication), an empty chart store | the field, the Holarchy's certificate, the admitted receivers' observability ranks (exact words, once) | the loci once, whole |
-//! | `ingest` | [`ResidentMoment::ingest`] | the lift `λ`, the receiving parametron's active suffix address (Decision 28) and the host's mirror of the moment (a pending ratio's operand, which the deposit's samples and the state's bits read), checked equal to the card's at every ingest | the cells (4 octets each) and the receipt |
+//! | `ingest` | [`ResidentMoment::ingest`] | the lift `λ`, the receiving parametron's active suffix address (the landmark tree) and the host's mirror of the moment (a pending ratio's operand, which the deposit's samples and the state's bits read), checked equal to the card's at every ingest | the cells (4 octets each) and the receipt |
 //! | `locate_keys` | the moments' phases re-keyed | the key location (discrete, `keys::locate_closing`) | one word per ring |
 //! | `refine` | the counts frozen at the cut ([`MomentSnapshot`]); chart refinement (`store`: warm, cold and target phases, every Newton–Schulz step and certificate); the word (`execute`: open, pair contact, element tick, loaded resonator state/return, contact transit, receiving read) | the operators `I − ½K`, `m_a` and each step's chart decision (cold start transpose and exact fallback); wave/tree face assembly in `ℚ(θ)`; energy balances and exact release readings | the plan and weights, moved operators and charts, certificates, the word record and logits |
 //! | `compare` | `hnn_word_reverse`: loaded resonator, element, transit and junction reverse steps with their own carried remainders; the landmark tree's causal-address splits in `hnn_tree_splits` | the host turns the splits into class faces, combines and scores the ratio, and composes source/material covectors; non-dyadic covectors stay on the host | carried reads and the full return record |
@@ -108,10 +108,10 @@
 //! | none (new) | `kernels/hnn.cu::hnn_moment_ingest`, [`moment`] | `SourceMoment::ingest` with `Field::selective_step` | `tests::moment_ingest_matches_the_host_moment`, `tests::campaign_one_reads_and_ingest_match_the_host` (GPU) |
 //! | none (new) | `kernels/hnn.cu::{hnn_word_tick, hnn_word_adjoint_tick}`, `exact_integer.cuh::hnn_nearest`, [`word`] | Lean `HNN/LatticeWord.{feedback_tick, feedback_accounting, executed_adjoint_pairing}` | `word_tests::the_tick_accounts_exactly`; GPU: `word_tick_matches_the_oracle_on_small_fixtures`, `word_tick_accounting_holds_on_the_card`, `word_ticks_match_the_oracle_at_campaign_one_shapes`, `resident_word_equals_the_oracle_word_and_is_measured` |
 //! | none (new; history's float proposal is not ported, below) | `kernels/hnn.cu::{hnn_inverse_residual, hnn_inverse_refine, hnn_inverse_certificate}`, `exact_integer.cuh::hnn_bounded_product`, [`word`] | Lean `HNN/LatticeWord.{nsStep, newton_schulz_right, rounded_refinement_certificate, warm_start_certificate}` | GPU: `word_tests::newton_schulz_matches_the_oracle_on_small_fixtures`, `newton_schulz_matches_the_oracle_at_campaign_one_shapes` |
-//! | none (new; campaign 2; Decision 37) | `kernels/tree.cu::{hnn_tree_splits, hnn_tree_deposit, hnn_tree_undo, hnn_tree_gather, hnn_tree_split_ratios}`, [`tree`] | `holonics::hnn::landmark::{Landmarks::window_splits, Landmarks::deposit, Landmarks::touched, Beta::step, Beta::split}` | GPU: `tests::the_card_tree_reads_and_deposits_as_the_host_tree`, `tests::the_card_split_is_the_hosts`; the port's lockstep tests |
+//! | none (new; campaign 2; the storage where paths part) | `kernels/tree.cu::{hnn_tree_splits, hnn_tree_deposit, hnn_tree_undo, hnn_tree_gather, hnn_tree_split_ratios}`, [`tree`] | `holonics::hnn::landmark::{Landmarks::window_splits, Landmarks::deposit, Landmarks::touched, Beta::step, Beta::split}` | GPU: `tests::the_card_tree_reads_and_deposits_as_the_host_tree`, `tests::the_card_split_is_the_hosts`; the port's lockstep tests |
 //! | none (new) | `kernels/hnn_word.cuh::{hnn_word_forward, hnn_word_reverse, hnn_pair_weights, hnn_copy_words, hnn_scatter_words}`, [`port`] | `holonics::hnn::{word::Word, port::Word::pull_back, receiving::ReceivingPhases::read, moment::SourceMoment::open_storage, chart::refine}` and the reference's `ExecutionPort` | GPU: `port_tests::the_card_port_returns_the_reference_on_{the_chain, a_generic_constitution, campaign_one, the_standing_cut}`, `the_card_port_refuses_as_the_reference` |
 //!
-//! | none (new, campaign 2; Decision 38) | the loaded stages of `kernels/hnn_word.cuh::{hnn_word_forward, hnn_word_reverse}`, [`word::ResonatorPlan`], `execute::LoadedResonatorPlan`, `readout::resonator_balance` (the balance and its bound) | `holonics::hnn::ring::ResonatorOperands::step`, `holonics::hnn::word::ResonatorBalance`; Lean `HNN/Ring.{ring_descriptor_tick_conserves, ring_tick_executed_energy_balance, loaded_word_stage_balance, loaded_tick_adjoint_pairing}` | GPU: `port_tests::the_card_port_returns_the_reference_with_resonators_and_a_boost` and the loaded, pumped and signed fixtures of `port_tests` |
+//! | none (new, campaign 2; the loaded resonator) | the loaded stages of `kernels/hnn_word.cuh::{hnn_word_forward, hnn_word_reverse}`, [`word::ResonatorPlan`], `execute::LoadedResonatorPlan`, `readout::resonator_balance` (the balance and its bound) | `holonics::hnn::ring::ResonatorOperands::step`, `holonics::hnn::word::ResonatorBalance`; Lean `HNN/Ring.{ring_descriptor_tick_conserves, ring_tick_executed_energy_balance, loaded_word_stage_balance, loaded_tick_adjoint_pairing}` | GPU: `port_tests::the_card_port_returns_the_reference_with_resonators_and_a_boost` and the loaded, pumped and signed fixtures of `port_tests` |
 //! | none (new, campaign 2) | `kernels/hnn.cu::{hnn_outer_update, hnn_budgeted_split}`, [`lattice::OuterSamples`], [`Card::outer_update`], [`Card::budgeted_split`] | `holonics::hnn::constitution::NormalLaw::deposited` (the Gram's and the map's updates and their budgeted carries); Lean `HNN/Normal.normal_prox_step`, `HNN/LatticeDeposit.carry` | GPU: `physics_tests::the_prox_deposit_on_the_card_equals_the_host_and_is_measured`; the port's normal-law mirror in the lockstep tests (`lattice::normal_deposit_on_card`, `Resident::with_normal_mirror`, its tally of steps carried, declined and skipped): `port_tests::the_card_port_returns_the_reference_with_resonators_and_a_boost` |
 //!
 //! **Not ported**, with the reason:
@@ -125,7 +125,7 @@
 //! - #13's `IntegerAdd` enclosure radius: the device carries exact values, no radius.
 //! - #14's per-region operator registry: each locus is its own [`ResidentLattice`]; no consumer
 //!   needs a registry yet.
-//! - #50's modular elimination: its HNN consumer, the solved chart `H'⁻¹`, is now a certified lattice chart (Decision 24), so no modular elimination is needed.
+//! - #50's modular elimination: its HNN consumer, the solved chart `H'⁻¹`, is now a certified lattice chart (the lattice word), so no modular elimination is needed.
 //!
 //! [open] Owed in #62: the ring law's formal statement (for integers `p_j` with
 //! `Σ_j |p_j| < 2^(w−1)`, the `ℤ/2^w` residue of `Σ_j p_j` read on `(−2^(w−1), 2^(w−1))` equals the

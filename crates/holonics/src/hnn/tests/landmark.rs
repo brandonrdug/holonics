@@ -1,4 +1,4 @@
-//! The landmark tree (Decision 28, count-only) on its declared dyadic lattice: the reference
+//! The landmark tree (count-only) on its declared dyadic lattice: the reference
 //! oracle on the Willems–Shtarkov–Tjalkens fixture and the block recursion; the executed face's
 //! exact normalization (a chart of five classes, so the odometer digits prune), its lattice law
 //! against a recomputation in ℚ, and its certificate against the oracle cell by cell; the stop
@@ -9,19 +9,19 @@
 //! addressed by typed bundles (its faces normalized and certified against the oracle with its join,
 //! the cell-only branch kept within one bit a dyadic cell, a window in cell order, the letters
 //! refused outside their family), the carrier's rebase with its enclosure, and a declaration past
-//! the old `u128` refusal whose certified residual stays within the grain. Decision 32: the declared
-//! stop prior on the dyadic ladder (the block recursion at any stop weights, the founding ratio
+//! the old `u128` refusal whose certified residual stays within the grain. The declared stop prior on the
+//! dyadic ladder (the block recursion at any stop weights, the founding ratio
 //! `2^j − 1`, the lattice law, the faces and windows under a prior), campaign 2's constant-slot
 //! controls as the per-depth prior `(1, r + 1)`, and the prior sweep on the development cells.
-//! Decision 34: the join tree's prior; the joins as the Bayesian mixture per dyadic cell; and the
+//! Local weighing: the join tree's prior; the joins as the Bayesian mixture per dyadic cell; and the
 //! stop-weight mixture per digit tree telescoping per dyadic cell (the node-local law is retired,
-//! its realization and tests at commit `89460425`). Decision 37 (the one
-//! storage): the oracle stored where paths part against Decision 28's tree of one node a depth
+//! its realization and tests at commit `89460425`). The storage where paths part (the one
+//! storage): the oracle stored where paths part against the full tree of one node a depth
 //! (`landmark_full`, the tests' independent reference), exact in ℚ at depths past the stream's
 //! recurrence (under the stop priors, forced depths and on both branches of the enlarged tree), the executed tree within its carried certificate with at most `2n − 1`
 //! nodes a tree, its windows in cell order, the split's ratios against their exact forms, and its
-//! stored parts. Decision 39 (a landmark's storage has a capacity): the unbounded register and any
-//! ceiling no node reaches are the tree of Decisions 28–37 exactly; the capped oracle equals the
+//! stored parts. A landmark's storage has a capacity: the unbounded register and any
+//! ceiling no node reaches are the uncapped tree exactly; the capped oracle equals the
 //! naive tree of one register a depth (`landmark_full`) exactly in ℚ, register for register along
 //! every opened path, with chains split after their registers carried; the capped executed tree
 //! within its certificate; and its windows in cell order.
@@ -69,7 +69,7 @@ fn kt_block(run: &[usize]) -> Rat {
 
 /// **The block recursion**, independent of the path law: `W_s = E_s` at depth `D`, otherwise
 /// `W_s = w_d E_s + (1 − w_d) Π_b W_bs` at the node's depth `d` (Lean `HNN/LandmarkTree.stopWeight`;
-/// `½` is Decision 28's), over the symbols of `stream[past..]` whose context (newest first) extends
+/// `½` is the landmark tree's), over the symbols of `stream[past..]` whose context (newest first) extends
 /// `context`.
 fn block_weight(
     stream: &[usize],
@@ -102,7 +102,7 @@ fn block_weight(
     &stop * estimate + (Rat::one() - &stop) * split
 }
 
-/// The stop priors the laws are checked under: Decision 28's `½`, two global rungs and two
+/// The stop priors the laws are checked under: the `½` stop prior, two global rungs and two
 /// per-depth laws.
 fn priors() -> Vec<StopPrior> {
     vec![
@@ -242,7 +242,7 @@ fn landmark_faces_are_normalized_and_certified() {
 }
 
 /// **The lattice law, recomputed in ℚ** at every step on every opened path, level by level (each
-/// level a stored chain, Decision 37): a leaf reads `⟦k_D(0)⟧`, past the last stored level the
+/// level a stored chain, the storage where paths part): a leaf reads `⟦k_D(0)⟧`, past the last stored level the
 /// prior `1/2`, a chain above the forced depths its child, and a mixing chain
 /// `⟦λ̂ k(0) + (1 − λ̂) q̂'(0)⟧` with `λ̂ = ⟦β/(1 + β)⟧₀¹`, every face a numerator of `2^(−M_p)`
 /// inside `[1, 2^(M_p) − 1]` (Lean `HNN/LandmarkTree.lattice_path_laws`); after the deposit each
@@ -512,7 +512,7 @@ fn landmark_widths_follow_the_passage_and_the_grain() {
 }
 
 /// **The rule lies below half a grain** (module header, "The widths"; the splits counted in `W`,
-/// Decision 37): at `n* ∈ {64, 6148, 2^14, 2^17, 2^20}`, `L_R = 16`, `B = 8` and path depths
+/// the storage where paths part): at `n* ∈ {64, 6148, 2^14, 2^17, 2^20}`, `L_R = 16`, `B = 8` and path depths
 /// `P ∈ {1, …, 6, 8, 12, 24, 48, 73}`, the lattice's rounding term and the mantissa term
 /// `(3/2) B (2n* + 1) P² 2^(1−W)` each lie within a quarter grain, and the rule
 /// (`Landmarks::face_rule`) below half a grain, exactly, with the carrier's rebase or without it
@@ -556,7 +556,7 @@ fn landmark_rule_lies_below_half_a_grain() {
 }
 
 /// **The stored bits**: the empty tree stores one bit a splitting dyadic cell; one arrival at depth
-/// 1 over two classes stores one leaf at the root (Decision 37: masses `3/2`, `1/2`, no `β`, its
+/// 1 over two classes stores one leaf at the root (stored where paths part: masses `3/2`, `1/2`, no `β`, its
 /// bottom depth and its label, the one letter `Boundary`); a second arrival behind another letter
 /// splits it into the root at depth 0 (founded with the leaf's masses at `β = 2¹ − 1`, then stepped
 /// to `3/2` by `k(0)/½`) with two leaves behind their letters, and holds no label letter (its leaf
@@ -1096,7 +1096,7 @@ fn landmark_tree_declares_past_the_old_refusal_and_stays_within_the_grain() {
 }
 
 /// **The split operands are the single division** (module header, "The lattice mixture and the
-/// stop weight read split operands"; Decision 35): at widths where the single division
+/// stop weight read split operands"; the wide cut): at widths where the single division
 /// `(2^M λ̂ u + (2^M − λ̂) x v)/(2^M v)` passes `u128`, `lattice_mix` returns the nearest lattice
 /// numerator of `λ̂u/v + (1 − λ̂)x` (ties up, inside `[1, 2^M − 1]`), read exactly in `ℕ`; the stop
 /// weight decided before its division is the exact rounding of `2^M β/(1 + β)`; and the wide cut's
@@ -1188,7 +1188,7 @@ fn landmark_split_operands_are_the_single_division() {
     assert!(single(1 << 19) && single(605_394) && !single(605_395) && !single(1 << 20));
 }
 
-/// **A passage's code is its faces' product, enclosed once** (`PassageCode`, Decision 35): over
+/// **A passage's code is its faces' product, enclosed once** (`PassageCode`, the wide cut): over
 /// dyadic sides, dyadic faces and faces with odd denominators (a KT face), the product's bounds hold
 /// the exact product between them, and its code length meets the exact product's enclosure within
 /// `f 2^(−125) + 2^(−95)` bits; two passages joined are their faces together; bounds compare as
@@ -1272,10 +1272,10 @@ fn rat_power(exponent: i64) -> Rat {
 }
 
 // -------------------------------------------------------------------------------------------
-// Decision 32: the declared stop prior
+// The declared stop prior
 
 /// **The stop prior is the dyadic ladder** (Lean `HNN/LandmarkTree.ladder_founding`): rung `j`
-/// stops with `1 − 2^(−j)` and founds at `2^j − 1`; `[1]` is Decision 28's `½`; a repeated last
+/// stops with `1 − 2^(−j)` and founds at `2^j − 1`; `[1]` is the `½` stop prior; a repeated last
 /// rung is dropped, so one law compares equal however it is declared; rungs outside `1..=63` and
 /// an empty law are refused. The ladder's top at the standing cut's scope is
 /// `⌈log₂(6148 · 8)⌉ = 16`, and the declared family is the global ladder, then the per-depth pairs.
@@ -1385,7 +1385,7 @@ fn landmark_stop_prior_founds_each_node_at_its_ratio() {
     assert!(Landmarks::with_carrier(wide, 13).is_ok());
 }
 
-/// **Campaign 2's constant-slot controls are the per-depth prior `(1, r + 1)`** (Decision 32; Lean
+/// **Campaign 2's constant-slot controls are the per-depth prior `(1, r + 1)`** (the declared stop prior; Lean
 /// `HNN/LandmarkTree.stop_mixture_over_trees`): in the bundle branch over `r` slots of one letter, a
 /// cell node's split passes through a chain of `r` constant nodes at `½` (each routes the same
 /// counts), so every cell depth past the root stops with `1 − 2^(−(r+1))`, the root with `½`, and
@@ -1440,9 +1440,9 @@ fn landmark_constant_slots_are_the_per_depth_prior() {
     }
 }
 
-/// **The prior sweep reads the development cells only** (Decision 32's choice): every law of the
+/// **The prior sweep reads the development cells only** (the stop prior's choice): every law of the
 /// family runs its own depth sweep ([`choose_depth`]), changing the held-out cells changes nothing,
-/// the choice is charged `⌈log₂⌉` of the laws tried, the incumbent is Decision 28's `½`, the chosen
+/// the choice is charged `⌈log₂⌉` of the laws tried, the incumbent is the `½` stop prior, the chosen
 /// law is the incumbent or the least charged law strictly below it, and a family without `½` is
 /// refused. [`tree_prequential`] is [`prequential`]'s tree.
 #[test]
@@ -1511,7 +1511,7 @@ fn landmark_prior_sweep_reads_the_development_cells_only() {
 }
 
 // -------------------------------------------------------------------------------------------
-// Decision 34: weighing is local
+// Weighing is local
 
 /// An external digit-0 face on the tree's lattice `2^(−M)`: a declared odd numerator pattern,
 /// never a tuned value, inside the open unit interval.
@@ -1696,7 +1696,7 @@ fn landmark_stop_mixture_is_the_bayes_mixture_per_digit_tree() {
 }
 
 // -------------------------------------------------------------------------------------------
-// Decision 37: the tree is stored at the faces where paths part
+// The tree is stored at the faces where paths part
 
 /// The arrivals each tree `t = branch · 2^B + h` routes over a stream of classes: every opened
 /// digit's dyadic cell, in each branch.
@@ -1725,13 +1725,13 @@ fn within_node_bound(tree: &Landmarks, routed: &[usize]) -> bool {
             .all(|(&size, &n)| size <= (2 * n).saturating_sub(1))
 }
 
-/// **The oracle is Decision 28's, exactly in ℚ** (Lean `HNN/LandmarkCompaction.{chain_ratio,
+/// **The oracle is the full tree's, exactly in ℚ** (Lean `HNN/LandmarkCompaction.{chain_ratio,
 /// chain_ratio_dyadic, leaf_chain_is_one_node, chain_split, compacted_is_decision_28}`): over streams
 /// of two and five classes, at depths from 1 to past the stream's recurrence (at the deepest every
-/// context is new, so each leaf's label runs to the boundary letters), under Decision 28's `½`, two
+/// context is new, so each leaf's label runs to the boundary letters), under the `½` stop prior, two
 /// global rungs and two per-depth priors, with forced depths 0 and 1, every class's face before
-/// each deposit and every prequential face of the oracle stored where paths part equal Decision
-/// 28's tree of one node a depth (`landmark_full`); it stores no more nodes.
+/// each deposit and every prequential face of the oracle stored where paths part equal the
+/// full tree of one node a depth (`landmark_full`); it stores no more nodes.
 #[test]
 fn landmark_compacted_oracle_is_decision_28() {
     let binary: Vec<usize> = (0..40u64)
@@ -1774,13 +1774,13 @@ fn landmark_compacted_oracle_is_decision_28() {
     }
 }
 
-/// **The executed tree stored where paths part holds its carried certificate** (Decision 37): at
+/// **The executed tree stored where paths part holds its carried certificate**: at
 /// depths from 1 to past the stream's recurrence, under three priors, forced depths 0 and 1, at the
 /// rule's carrier and at a narrow one (so the founding ratios `2^S − 1` of long chains and the
 /// splits' ratios rebase), every all-class face sums to 1 and meets each one-class read, every
-/// cell's executed face lies within its certificate of the ideal face (Decision 28's tree of one
+/// cell's executed face lies within its certificate of the ideal face (the full tree of one
 /// node a depth, exact, `landmark_full`), the certificate within the rule, and each tree stores at
-/// most `2n − 1` nodes, no more than Decision 28's.
+/// most `2n − 1` nodes, no more than the full tree's.
 #[test]
 fn landmark_compacted_tree_is_within_its_certificate() {
     let alphabet = 5;
@@ -1835,9 +1835,9 @@ fn landmark_compacted_tree_is_within_its_certificate() {
     }
 }
 
-/// **The enlarged tree stored where paths part** (Decision 37 on both branches): with a declared
+/// **The enlarged tree stored where paths part** (on both branches): with a declared
 /// family each dyadic cell joins the cell tree and the bundle tree, each stored where its paths
-/// part; the oracle's faces are Decision 28's tree's exactly, the executed faces sum to 1 and hold
+/// part; the oracle's faces are the full tree's exactly, the executed faces sum to 1 and hold
 /// their certificates, and a window's faces in cell order are the deposited clone's.
 #[test]
 fn landmark_enlarged_tree_where_paths_part_is_decision_28() {
@@ -1919,7 +1919,7 @@ fn landmark_deep_window_faces_read_each_phase_after_the_earlier_deposits() {
 /// **The parts stored where paths part**: score then deposit is receive and a clone compares equal
 /// past the stream's recurrence; one arrival at `D = 3` over two classes stores one leaf at the root
 /// (its masses `3/2` and `1/2`, its bottom depth and its label's three boundary letters in the pool)
-/// where Decision 28's tree founds four nodes.
+/// where the full tree founds four nodes.
 #[test]
 fn landmark_stored_parts_where_paths_part() {
     let stream: Vec<usize> = (0..50u64)
@@ -1999,7 +1999,7 @@ fn landmark_split_ratios_are_the_exact_forms() {
 }
 
 // -------------------------------------------------------------------------------------------
-// Decision 39: a landmark's storage has a capacity
+// A landmark's storage has a capacity
 
 /// The capacities the capped laws are checked at: `L = 2, 4, 8, 32`.
 fn ceilings() -> Vec<Capacity> {
@@ -2048,11 +2048,11 @@ fn landmark_capacity_carries_its_register() {
     );
 }
 
-/// **`c = ∞` and every ceiling no node reaches are the tree of Decisions 28–37 exactly** (Lean
+/// **`c = ∞` and every ceiling no node reaches are the uncapped tree exactly** (Lean
 /// `HNN/LandmarkCapacity.{cap_unbounded_is_kt, cap_below_ceiling_is_kt}`): over a stream of 60
 /// cells, the unbounded tree, the tree at `c = 6` (`L = 64` passes every node's arrivals) and at
 /// `c = 40` read the same executed faces and certificates, store the same arena, and their oracles
-/// the same ideal faces, equal to Decision 28's tree of one node a depth.
+/// the same ideal faces, equal to the full tree of one node a depth.
 #[test]
 fn landmark_unbounded_capacity_is_decision_37() {
     let alphabet = 5;
@@ -2208,7 +2208,7 @@ fn landmark_capped_oracle_is_the_naive_tree() {
     );
 }
 
-/// **The capped executed tree holds its carried certificate** (Decision 39: the counts stay exact
+/// **The capped executed tree holds its carried certificate** (the register's capacity: the counts stay exact
 /// integers, every total at most its arrivals, so KT's floor and the widths' rule are unchanged): at
 /// `L = 2` and `L = 16`, depths from 1 to past the stream's recurrence, two priors, forced depths 0
 /// and 1 and a narrow carrier, every all-class face sums to 1 and meets each one-class read, every

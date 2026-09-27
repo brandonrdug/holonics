@@ -2,7 +2,7 @@
 //! against a resident operand (kernel `hnn_lattice_read`, `kernels/hnn.cu`).
 //!
 //! [definition] Every entry of a learned locus `ℓ` lives on its declared lattice `2^(−L_ℓ)ℤ`
-//! (`holonics::hnn::Lattice`, Decision 22), so the locus is its integer coordinates:
+//! (`holonics::hnn::Lattice`, the lattice deposit), so the locus is its integer coordinates:
 //! `A = a · 2^(−L_A)` ([`LatticeCoordinates::of_matrix`]). An operand on its own lattice is
 //! `x = ξ · 2^(−L_x)`: the moment's counts `M_g[c]` at `L_x = 0`
 //! ([`crate::hnn::ResidentMoment::phase_operand`]), or a lattice vector
@@ -28,7 +28,7 @@
 //! Its campaign-1 instances are `E_0` (`10 × 256` on `2^(−L)ℤ`, `L = ⌈log₂(32 n)⌉`, read against the
 //! five phase rows `M_0[c]` of the moment) and `R` (`512 × 22` on `2^(−10)ℤ`, read against the
 //! receiving anchors). The anchors are lattice vectors only once the word's transients are fixed
-//! width (Decision 24, being derived); until then the read's operand is a declared lattice vector.
+//! width (the lattice word, being derived); until then the read's operand is a declared lattice vector.
 
 use core::ffi::c_void;
 use core::marker::PhantomData;

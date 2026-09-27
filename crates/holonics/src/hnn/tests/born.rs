@@ -1,4 +1,4 @@
-//! The Born receiver (Decision 33; Lean `HNN/BornFace`): the derived widths and their refusals;
+//! The Born receiver (the Born face; Lean `HNN/BornFace`): the derived widths and their refusals;
 //! the opening split, exactly uniform at every state; the executed cell faces, an exact dyadic
 //! partition (a chart of five classes, so digits are forced); the floored interference zero beside
 //! the nonnegative receiver's positive mass; the tick absorbed by the first digit's operators; the

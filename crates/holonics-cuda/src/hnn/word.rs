@@ -1,4 +1,4 @@
-//! **The word on the card: the carried tick, its adjoint, and the inverse charts** (Decision 24;
+//! **The word on the card: the carried tick, its adjoint, and the inverse charts** (the lattice word;
 //! kernels `hnn_word_tick`, `hnn_word_adjoint_tick`, `hnn_inverse_residual`, `hnn_inverse_refine`
 //! and `hnn_inverse_certificate` in `kernels/hnn.cu`).
 //!
@@ -1393,7 +1393,7 @@ impl<'c> ResidentInverses<'c> {
 // -------------------------------------------------------------------------------------------
 // the ring's resonator (campaign 2)
 
-/// [definition] **The loaded resonators' plan** (campaign 2, `holonics::hnn::ring`; Decision 38):
+/// [definition] **The loaded resonators' plan** (campaign 2, `holonics::hnn::ring`; the loaded resonator):
 /// every declared resonator's storage, dissipation and pumped stiffnesses as dyadic words at one
 /// exponent `L_m`, each phase's operator at `L_operator`, its executed charts (the host's certified
 /// lattice charts, at `L_c`), and the hop `h = 2^(e_h)`. It refuses what the card's dyadic words

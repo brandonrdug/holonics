@@ -1,4 +1,4 @@
-//! The word on declared lattices (Decision 24; Lean `HNN/LatticeWord`): the declared precisions,
+//! The word on declared lattices (the lattice word; Lean `HNN/LatticeWord`): the declared precisions,
 //! the certified inverse charts and their refinement, the executed adjoint, the carrier's refusal,
 //! error feedback, and a resident's warm start.
 
@@ -241,7 +241,7 @@ fn the_carrier_refuses_a_sum_past_its_certificate() {
     ));
 }
 
-/// A resident's warm start (Decision 24): operands read at a cut refine every chart and keep it;
+/// A resident's warm start (the lattice word): operands read at a cut refine every chart and keep it;
 /// read again at the same constitution they start warm, take no step and execute the same charts,
 /// so a read at an unchanged operator returns the same word.
 #[test]

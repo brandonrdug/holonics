@@ -6,8 +6,8 @@ It states the object, the equations its implementation preserves, and their owne
 construction; [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md) records the position; the
 [research routes](../research/records/README.md) recover the derivations. Existing code is what is
 in `crates/` and `lean/` today. The host `holonics::hnn` and resident `holonics-cuda::hnn` implement campaigns 1–2.
-The landmark tree supplies most of the measured compression. Decision 38 connects the
-resonator's returned wave and adjoint to the field; campaigns 3–5 supply release
+The landmark tree supplies most of the measured compression. The loaded resonator (`hnn::ring`)
+connects the resonator's returned wave and adjoint to the field; campaigns 3–5 supply release
 through modes, the motor chart, Holonic Encoding, context and joint prediction.
 [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md) distinguishes measured results from these remaining consumers.
 
@@ -66,9 +66,18 @@ relation enters the machine through the loaded storage port: the ring receives a
 returned wave changes a later receiving face. The corresponding covector reaches its material.
 A receiver's current nullity is not future extinction; `Holarchy/Hearing` supplies the distinction
 that campaign 3's mode retention must consume. The [audited egg/shadow record](../research/records/2026-09-26_THE_SHADOW_IS_THE_RECEIVERS_KERNEL_AND_THE_EGG_IS_TWO_RINGS_IN_RELATIVE_MOTION.md)
-keeps the curve, the receiver maps still owed, and the invariant rate-form reading. Decision 38
-implements the port connection; broader mode/shape and participating-receiver consumers retain
-their campaign scopes.
+keeps the curve, the receiver maps still owed, and the invariant rate-form reading. The loaded
+resonator (`hnn::ring`) implements the port connection; broader mode/shape and
+participating-receiver consumers retain their campaign scopes. Its gains test one declared
+material family: they do not replace the egg's geometry or prove that four coordinates express
+every useful interior, and the finite classes come from the admitted future faces and their
+grain. Integrating and differentiating directions are read through the actual rate form
+`A*G + GA + Ġ` with its metric, clock and source; a rechart transports that form by congruence,
+and an egg displacement is assigned no Lorentz law without its receiver/transport map. In
+campaigns 3 and 5 controlled release is received action: the mode reaches another Holon's
+boundary through the declared tube, and the encoding/receiver square closes or returns its
+separating difference, with the Hodge, complex-fluid and spectral target laws attached at those
+operations.
 
 ## The computational unit and the one picture
 
@@ -171,7 +180,14 @@ Copson and Newman boundaries have source owners in the
   deviation from its equation. The returned ball `B(c,ε)` keeps that realization/source family.
 - **The HNN's solves** are local only: a junction's admittance sum, an element's `I − ½K` and a
   contact's `M_a`.
-- **No global solve.** The prototype's global `r=rhs−(I+DD*)v` is history at `13f8c734`.
+- **No global solve.** The prototype's global `r=rhs−(I+DD*)v` is history at `13f8c734`. A change
+  moves one contact per tick, inside a causal cone of one hop per tick; the connection heat
+  equation is only the continuum limit ([THE_REBUILD](plans/THE_REBUILD.md#the-law-of-one-passage-a-change-on-a-medium-81-82), "The causal cone"). Brandon's
+  rulings: September 1, "The way that 'weights' … are updated is a propagating local thing";
+  September 11, "their states are determined by particles around them and propagating waves, not
+  by spooky action at a distance"; September 22, "my brain's regions … are only affected by the
+  propagating action that would reach the independent region". The tick's form is agent-inferred
+  from the light record's §8.1.
 - **The loss.** A target loss compares the produced face with an observed or requested face. The
   [Compression tablet](canon/TABLET_THE_COMPRESSION.md#7-what-this-tablet-refuses) states that a
   scalar loss is one receiver's face of a residual, never the residual itself.
@@ -183,7 +199,7 @@ Copson and Newman boundaries have source owners in the
 | Rings, contacts, phase connection | `Holon/Complex`, `HNN/Word` | `geometry::complex`, `hnn::field`, `hnn::word` | Richer field declarations; prototype `analytic_field.rs`, `hnn/field_geometry/` |
 | Helical pair and contact variation | `Transport/{HelicalPairInteraction,SerialScrewChain}`, `HNN/Contact` | `geometry::screw`, `holon::contact`, `hnn::contact` | Motor consumer (#27); prototype pair and chain adapters |
 | Winding, carry, lock, trace faces, cell holonomy | `Geometry/{PhaseCarry,PairResonance}`, `Transport/{NavigatorTraceFaces,CellHolonomy}` | `geometry::winding::Odometer`, `navigator::{address,trace}`, `hnn::contact` | Carry tower and continuous-key joins (#62) |
-| Parametron storage, pump, sheets and lock | `Objects/Parametron`, `HNN/Ring` | `holon::parametron`, `hnn::ring`, CUDA resonator kernels | Loaded forward/adjoint connection (Decision 38); pump/Floquet theorem (#62) |
+| Parametron storage, pump, sheets and lock | `Objects/Parametron`, `HNN/Ring` | `holon::parametron`, `hnn::ring`, CUDA resonator kernels | Loaded forward/adjoint connection (`hnn::ring`, built); pump/Floquet theorem (#62) |
 | Receiving comparison and covectors | `Objects/Ratio`, `HNN/{Ratio,LandmarkTree,LandmarkCompaction}` | `hnn::{ratio,receiving,landmark}`, CUDA compacted tree | Composed lattice drift and the log squaring invariant (#62) |
 | Constitutive current, storage and scattering | `Holon/{Element,Dirac,Law}`, `HNN/{Word,Propagation}` | `holon::{element,dirac,law,reaction}`, `hnn::{propagation,word}` | Complete word sensitivity and concrete diamond bridge (#62) |
 | Source moments, retention and release | `Transport/SourceMoment`, `HNN/{Moment,Retention}` | `hnn::{moment,pending,retention}`, `receiver::{standing,release}` | Mode release, founding and moment quotient (campaign 3) |

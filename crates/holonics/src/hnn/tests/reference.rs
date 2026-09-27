@@ -1,5 +1,5 @@
 //! The exposure protocol on small synthetic cuts: a refine and compare per receiving window, each
-//! then deposited, held-out windows included (prequential, Decision 29), aeon boundaries at the
+//! then deposited, held-out windows included (prequential scoring), aeon boundaries at the
 //! joint clock's carry-out, keys located
 //! on the crib that closed each aeon (past cells only, never a held-out one), the budget stop, the
 //! cut checked against the declared population, and design (f)'s readout with `Kt` charging the
@@ -7,7 +7,7 @@
 //!
 //! [measured] Under the exact law the constitution's exact bits multiplied per deposit on the chain
 //! control (1,126 → 10,883 → 623,415 at the declared steps; 1,126 → 7,053 → 311,864 → 2,224,183
-//! with the factor steps off). On the carrier lattice with the refining remainder (Decision 22) the
+//! with the factor steps off). On the carrier lattice with the refining remainder (the lattice deposit) the
 //! entries and remainders grow logarithmically, while the solved charts `H⁻¹` still grow with the
 //! carried Grams (`research/notebook/hnn_design/hnn_lattice_growth.rs`). These cuts run on the
 //! exposure's chain (no pair offset, so its capacity and cut are 17 and 18 cells: one aeon, nine
@@ -94,7 +94,7 @@ fn read_out(exposure: &Exposure, cells: u64, held_out: u64) {
         assert!(ordered(&law.exchange) && ordered(&law.deposition));
         assert!(boundary.cells > 0);
         // The declared field lies inside one diamond: the collapse releases no locus and no
-        // carried remainder (Decision 22), so the constitution's bits are unchanged.
+        // carried remainder (the lattice deposit), so the constitution's bits are unchanged.
         assert!(boundary.collapse.released.is_empty());
         assert_eq!(boundary.collapse.bits[0], boundary.collapse.bits[1]);
         // The ledger telescopes to the aeon's change of code length, exactly on the enclosures'
@@ -172,7 +172,7 @@ fn stopped(exposure: &Exposure) {
         exposure.constitution_curve.len() as u64,
         exposure.deposits + 1
     );
-    // One point per commit: the collapse releases no carried remainder (Decision 22), so no
+    // One point per commit: the collapse releases no carried remainder (the lattice deposit), so no
     // boundary adds a point.
     assert!(
         exposure
@@ -213,7 +213,7 @@ fn two_deposits(field: &crate::hnn::Field, cut: &Cut) -> u64 {
     curve[2].bits.total()
 }
 
-/// Design (d), campaign 1's exposure protocol at the declared steps under Decision 29, with a
+/// Design (d), campaign 1's exposure protocol at the declared steps under prequential scoring, with a
 /// budget two deposits pass: every window before the stop deposits, the held-out window among them
 /// included; the stop is reported with its commit and cell, no deposit is admitted after it, and
 /// the whole cut (its held-out tail included) is still read, compared and measured on the last
@@ -280,7 +280,7 @@ fn the_exposure_stops_at_its_deadline_and_changes_nothing_it_read() {
         );
         assert_eq!(exposure.literal_bits, 4 * windows);
         assert_eq!(exposure.state.source_bits, 4 * windows);
-        // Every window deposits, the held-out window 2 included (Decision 29).
+        // Every window deposits, the held-out window 2 included (prequential scoring).
         assert_eq!(exposure.deposits, deposits);
         assert_eq!(
             exposure.constitution_curve.len() as u64,
@@ -400,7 +400,7 @@ fn one_worker_and_many_return_the_same_values() {
 }
 
 /// **The baselines' exact faces are the faces their codes read** (`Baselines::face_cell`, the
-/// reader that multiplies a passage's faces, Decision 35): stepped beside `code_cell` over the same
+/// reader that multiplies a passage's faces, the wide cut): stepped beside `code_cell` over the same
 /// cells, each face's code length is the enclosure `code_cell` returns, and a cell outside the
 /// chart is refused.
 #[test]

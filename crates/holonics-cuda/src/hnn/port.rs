@@ -1,5 +1,5 @@
 //! **The execution port resident on the card** (`holonics::hnn::ExecutionPort` for a device;
-//! design (c), "Realization on the card"; Decisions 24 and 25; #76).
+//! design (c), "Realization on the card"; the lattice word and the hardware-surfaces rule; #76).
 //!
 //! [definition] [`Resident`] implements the port with its resident ([`Mounted`]) on a [`Card`]. It
 //! returns, method by method, the **same** `InteractionReturn`s as the host reference
@@ -9,16 +9,16 @@
 //! | On the card | On the host |
 //! |---|---|
 //! | the moment and its ingest (`hnn_moment_ingest`, [`ResidentMoment`]); a pending ratio's counts frozen at its cut ([`MomentSnapshot`]) | the lift point `λ`, the receiving parametron's active suffix address (`hnn::receiving::ActiveAddress`, shifted at every ingested cell) and the host's mirror of the moment (the pending ratio's operand, which the deposit's samples and the state's bits read), checked equal at every ingest |
-//! | the published constitution's loci at their lattices, the moved words scattered at each publication (`hnn::publication`) | the constitution `Θ`, the normal laws' prox steps, the receiving parametron's landmark tree and its deposit with its certificates (Decision 28), the budgeted carry and its remainders, the budget (`Constitution::deposited`), and the operators `I − ½K`, `m_a` formed from it |
+//! | the published constitution's loci at their lattices, the moved words scattered at each publication (`hnn::publication`) | the constitution `Θ`, the normal laws' prox steps, the receiving parametron's landmark tree and its deposit with its certificates (the landmark tree), the budgeted carry and its remainders, the budget (`Constitution::deposited`), and the operators `I − ½K`, `m_a` formed from it |
 //! | the keyed charts, their rounded Newton–Schulz steps and exact certificates (`hnn::store`) | each refinement's decisions from the certificates (warm, cold, fallback, target), the cold start's transpose and the exact fallback |
 //! | the word's open (`E_g M_g[c]`, the pair port), its ticks, its receiving read (`hnn_pair_weights`, `hnn_word_forward`) | the faces in `ℚ(θ)`, each tick's balance, the release (`hnn::readout`) |
-//! | the receiving parametron's landmark tree mirrored, stored at the faces where paths part (`hnn::tree::CardTree`, campaign 2, Decision 37): each window's splits at every phase's causal address in cell order (the known targets' deposits applied and undone on the card), and each deposit's opened-path update with its splits, foundings and label runs | the class faces from the splits and their grain exponents (`landmark::faces_of_splits`), added to the card's wave at the grain (`ReceivingPhases::combine`); after every deposit the mirror's counts and the masses, `β`, stop weights, depth words and label ends of every node the deposit's walks opened or it founded, its joins and its held labels, checked against the host's tree (`CardTree::agrees_at`) |
-//! | each declared ring resonator's ticks inside `hnn_word_forward`, its returned wave reaching the next junction; its state/input adjoint inside `hnn_word_reverse` (Decision 38) | the resonators' local operands and certified charts (`ResonatorOperands::at_cut`), formed once per publication (`publication::Loci::resonator_operands`); their balances and bounds read from the live word's record; gain contractions and deposition at the same producing operands |
+//! | the receiving parametron's landmark tree mirrored, stored at the faces where paths part (`hnn::tree::CardTree`, campaign 2, the storage where paths part): each window's splits at every phase's causal address in cell order (the known targets' deposits applied and undone on the card), and each deposit's opened-path update with its splits, foundings and label runs | the class faces from the splits and their grain exponents (`landmark::faces_of_splits`), added to the card's wave at the grain (`ReceivingPhases::combine`); after every deposit the mirror's counts and the masses, `β`, stop weights, depth words and label ends of every node the deposit's walks opened or it founded, its joins and its held labels, checked against the host's tree (`CardTree::agrees_at`) |
+//! | each declared ring resonator's ticks inside `hnn_word_forward`, its returned wave reaching the next junction; its state/input adjoint inside `hnn_word_reverse` (the loaded resonator) | the resonators' local operands and certified charts (`ResonatorOperands::at_cut`), formed once per publication (`publication::Loci::resonator_operands`); their balances and bounds read from the live word's record; gain contractions and deposition at the same producing operands |
 //! | in the GPU suite's parity tests only ([`Resident::with_normal_mirror`]; off the exposure's path, where it replaced no host owner): each normal law's prox step a deposit takes once at its locus (`hnn_outer_update` for `ΔH` and `ΔW`, `hnn_budgeted_split` for their carries, the reaches `X̂f` by `hnn_lattice_read` through the host's successor chart; campaign 2), read against the host's successor (`crate::hnn::lattice::normal_deposit_on_card`), every step counted carried, declined by reason or skipped | the successor constitution (`Constitution::deposited`, the owner of `Θ`), the chart of `H′`, and the steps the card's words cannot carry (a sample off the dyadics, such as `R`'s covector on `(1/W)ℤ`) |
 //! | the word's return (`hnn_word_reverse`) | the compare phase under the hardware law (`reference::compare_phase`: the tree at the grain beside the mixture score, the Holon ratio and its covector), the return's source through `Rᵀ` (the covector lives on `(1/W)ℤ`), the composition onto the loci (`reference::compose`) |
 //! | | keys, the collapse, the first law's ledger, the handles, every refusal's reason |
 //!
-//! [definition; agent-inferred] **The tree read moved to the card** (campaign 2; Decision 25; the
+//! [definition; agent-inferred] **The tree read moved to the card** (campaign 2; the hardware-surfaces rule; the
 //! #76 debt of campaign 1, whose host read took 1,720 µs a window against the card's word at 2,110
 //! µs). The mirror is uploaded at the mount, moved by the same steps as the host's tree at every
 //! deposit, and read at every compare, release and re-read; the host completes the class faces
@@ -657,7 +657,7 @@ impl<'c> Resident<'c> {
     }
 }
 
-/// **The tree part of a window's faces** (Decision 28; `PendingRatio::against`): on the card's
+/// **The tree part of a window's faces** (the landmark tree; `PendingRatio::against`): on the card's
 /// mirror when it holds the receiving ring's tree, its splits in cell order (the known targets'
 /// deposits applied and undone on the card) completed into class faces on the host
 /// (`landmark::faces_of_splits`) and added to the wave's faces at the grain; otherwise the host's
@@ -739,7 +739,7 @@ impl<'c> Resident<'c> {
                 read
             }
         };
-        // The tree part of the combined face at each phase's causal address (Decision 28): the
+        // The tree part of the combined face at each phase's causal address (the landmark tree): the
         // splits read on the card's mirror of the published tree, the class faces completed on the
         // host.
         let (against, read, transfer) = tree_against(

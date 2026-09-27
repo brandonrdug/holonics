@@ -1408,7 +1408,7 @@ fn gain_family_covectors(material: &ResonatorMaterial, seed: u64) -> [(Rat, Rat)
     })
 }
 
-/// **Every gain family's adjoint covector is the exact tangent** (Decision 38; Lean
+/// **Every gain family's adjoint covector is the exact tangent** (the loaded resonator; Lean
 /// `HNN/Ring.{loaded_tick_material_variation, loaded_gain_family_increment}`), on a word-level
 /// fixture beyond the unit parametron: a non-diagonal positive semidefinite stiffness base and a
 /// signed one (both non-diagonal, the second indefinite), `C₀ = I`, `D₀ = I/4`, and a half-turn

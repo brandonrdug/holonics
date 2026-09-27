@@ -11,7 +11,7 @@
 //! word opens at zero change, so the anchor needs no waves. A read ([`PendingRatio::open`])
 //! recomputes `m̃ = ⟨M, E_now⟩` and runs the word at the contemporary constitution, `q` included;
 //! at compare, the contemporary landmark tree is read at each phase's causal address, the copied
-//! suffix after the window's earlier targets (Decision 28, [`PendingRatio::against`]):
+//! suffix after the window's earlier targets (the landmark tree, [`PendingRatio::against`]):
 //!
 //! - `refine` publishes only faces, with no commit flag, so no source is counted twice and `E` is
 //!   never mixed across two cuts;
@@ -142,7 +142,7 @@ impl PendingRatio {
         self.open_charted(field, constitution, &mut Charts::new())
     }
 
-    /// **Open the word, its solves warm-started from a resident's charts** (Decision 24).
+    /// **Open the word, its solves warm-started from a resident's charts** (the lattice word).
     pub fn open_charted<'c>(
         &self,
         field: &'c Field,
@@ -189,7 +189,7 @@ impl PendingRatio {
         Ok((word, Faces::of_reads(&reads, self.phases.grain())?))
     }
 
-    /// **The window's faces at compare** (module header; Decision 28): the contemporary tree read at
+    /// **The window's faces at compare** (module header; the landmark tree): the contemporary tree read at
     /// each phase's causal address given the window's known targets, added to the wave's faces.
     /// At a compare every target is known; at a release none is, and every phase reads the
     /// window's opening address (`hnn::receiving::ActiveAddress::phase`).

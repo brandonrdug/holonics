@@ -1,5 +1,5 @@
-//! **The landmark tree on the card, stored at the faces where paths part** (campaign 2, Decisions 37
-//! and 39; #73 with #76; `kernels/tree.cu`).
+//! **The landmark tree on the card, stored at the faces where paths part** (campaign 2, stored where
+//! paths part, with the register's capacity; #73 with #76; `kernels/tree.cu`).
 //!
 //! [definition] The receiving parametron's storage, the tree of landmarks
 //! (`holonics::hnn::landmark::Landmarks`), mirrored on the card with the host's exact integer law.
@@ -7,7 +7,7 @@
 //! realization touches the receiving face (faces and placement: the dyadic digit faces it returns
 //! as splits) and the tower thread (the context depth as a restriction chain: a stored chain is a
 //! unique gluing, a parting face a plural one), and the helix twice: the β chart's carry and each
-//! node's count register carrying at its declared capacity (Decision 39); the edge ratios of each
+//! node's count register carrying at its declared capacity (the register's capacity); the edge ratios of each
 //! opened path (the pair) are kept attached. The host's constitution owns the tree and its
 //! certificates; the card carries what the reads need, the masses, each node's and each join's
 //! `(β, λ̂)`, the topology and the labels, and moves it by the same deposits in the same order.
@@ -18,7 +18,7 @@
 //! | the opened-path update of each deposit (`hnn_tree_deposit`): the label runs, the β steps with the carrier's rebase, a parting chain's split (both ratios formed exactly and carried at `W` bits), the upper parts and leaves founded at the host's numbers, the relinks, the masses and each register's carry at the declared ceiling (`tree_carry`) | the certificates (the host's tree, `Constitution::deposited`); the ceiling in half-units (`Capacity::ceiling_halves`) |
 //! | a window's phases in cell order: the earlier phases' deposits applied with an undo log, the later phase read, the log undone (`hnn_tree_undo`) | the addresses' letters (`LandmarkDeclaration::letters`), the digits each target opens, each branch's summed rungs (`LandmarkDeclaration::rung_sums`) and founding charts (`ArenaView::founding`) |
 //!
-//! [definition; agent-inferred] **The layout** (Decision 37's arena, `hnn::landmark`'s "The arena"):
+//! [definition; agent-inferred] **The layout** (the compacted arena, `hnn::landmark`'s "The arena"):
 //! per node its depth word (the bottom depth, the branch in the top bit), its label end, its two
 //! half-unit masses and its chart `(β_n, β_d, β_e, λ̂)`, 48 bytes a node; the child table at twice
 //! the nodes' capacity, a power of two, 12 bytes a slot (`(parent << 32) | letter` and the child);
@@ -26,10 +26,10 @@
 //! is the a-priori bound (`compacted_node_bound`): a passage of `n` cells founds at most `2 n B`
 //! nodes a branch and holds at most `n D_b` letters, at the declared population plus a window.
 //!
-//! [definition; agent-inferred] **The register's capacity** (Decision 39, `landmark::Capacity`;
+//! [definition; agent-inferred] **The register's capacity** (`landmark::Capacity`;
 //! Lean `HNN/LandmarkCapacity.{capCarry, cap_carry_half_units, capped_tree_laws}`). The law's words
 //! carry the ceiling in half-units, `2L + 2 = 2^(c+1) + 2` (`u64::MAX` when no total reaches it:
-//! `c = ∞` is Decision 28's node), read from the host's declaration; the layout is unchanged. The
+//! `c = ∞` is the KT node), read from the host's declaration; the layout is unchanged. The
 //! carry acts where the host's `Law::apply_branch` places it: in the deposit, at every node of the
 //! opened path past the forced depths, right after the node's mass of the digit grows, `h_0 + h_1
 //! ≥ 2L + 2` carries each `h ← 2⌊(h + 1)/4⌋ + 1`, so the next read (the window's next phase, or
@@ -314,7 +314,7 @@ impl<'c> CardTree<'c> {
     /// **Mirror a host tree on the card**: its law's words, its branches' summed rungs and its
     /// founding charts, the arena at its current standing, and room for every node and label
     /// letter a passage of the declared population founds (`2B` nodes and `D_b` letters a branch a
-    /// cell, Decision 37's bound), plus `window` cells a window's overlay and a re-read found past
+    /// cell, the compacted tree's bound), plus `window` cells a window's overlay and a re-read found past
     /// it; the child table at twice the nodes, a power of two. Refused at a branch deeper than the
     /// kernels' paths, at widths past the kernel's single-division operands
     /// (`Widths::single_division_admitted`), or at a split whose integers pass 512 bits
@@ -323,7 +323,7 @@ impl<'c> CardTree<'c> {
         let declaration = tree.declaration().clone();
         let widths: Widths = tree.widths();
         // The kernel mixes and weighs by single divisions: widths past their `u128` operands
-        // (the host's split operands declare wider trees, Decision 35) are refused here.
+        // (the host's split operands declare wider trees, the wide cut) are refused here.
         if !widths.single_division_admitted(declaration.population) {
             return Err(launch_error(
                 "widths whose single-division operands fit u128 (2M + κ + 3 and 2W + M + 3 bits)",

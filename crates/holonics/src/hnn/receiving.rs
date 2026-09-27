@@ -6,7 +6,7 @@
 //! `e_0 = min_(g∈𝒮) dist(g, R)`, its aperture `A` (so `e_last = e_0 + A − 1` and the word evaluates
 //! `e_max = e_0 + A` junction steps), its grain `L_R = ⌈1/ε_bits⌉`, derived from the receiver's
 //! declared code tolerance `ε_bits` per cell (R2 M2), and the depth `D` of its landmark tree's
-//! address (Decision 28). It refuses `A` beyond the rank of the receiving ring's observability
+//! address (the landmark tree). It refuses `A` beyond the rank of the receiving ring's observability
 //! over the word, and reports that rank (review C7).
 //!
 //! ```text
@@ -18,8 +18,8 @@
 //! ```
 //!
 //! [definition; agent-inferred] **The receiving parametron's storage is the landmark tree**
-//! (Decision 28, `hnn::landmark::Landmarks`, held in `Θ` at the receiving locus beside `R`). It
-//! replaces Decision 27's region table, whose laws stay in Lean (`HNN/RegionCounts`). The region
+//! (the landmark tree, `hnn::landmark::Landmarks`, held in `Θ` at the receiving locus beside `R`). It
+//! replaces the region table, whose laws stay in Lean (`HNN/RegionCounts`). The region
 //! table is the depth-one forced case of the whole-cell emission (`|A|`-ary masses at a node; Lean
 //! `HNN/LandmarkTree.depth_one_is_decision_27`), which lives in Lean only; this tree emits the
 //! cell's odometer digits, and its depth-one forced case is a product of binary KT faces at the
@@ -47,7 +47,7 @@
 //! `hnn::landmark::address(cells, p + j, D)` exactly (the test
 //! `the_phase_address_is_the_trees_causal_address`), so an aperture-two window reads its two
 //! phases at their own addresses (the located failure pooled lags one and two at one region).
-//! **The window is read in cell order** (Decision 29 within a window): phase `j`'s tree face is read
+//! **The window is read in cell order** (prequential scoring within a window): phase `j`'s tree face is read
 //! at the standing after the window's earlier phases' tree deposits (their targets are known at
 //! compare), on a working overlay of the nodes those deposits write
 //! (`hnn::landmark::Landmarks::window_faces`); the deposit then applies exactly those steps to the
@@ -74,12 +74,12 @@
 //! between ingests, so the compare's copy and the ingest read one letter per tick).
 //! The letters of a passage are replayed without the wave ([`clock_letters`]: the resident's clock
 //! law with its key location and re-keying at each carry-out, the site kinds given per tick), the
-//! development harness's letters (Decision 31). The field's declared family ([`letter_family`]) is
+//! development harness's letters (the development harness). The field's declared family ([`letter_family`]) is
 //! the harness's choice: on the standing cut's development cells, at the contacts' horizon bounds,
 //! no clock-only and no contact family coded below the constant control of its slots by its
 //! description charge, so it is the cell-only family, and the register is campaign 1's.
 //!
-//! [definition; agent-inferred] **The combined face** (Decision 27's combined read, with the tree's
+//! [definition; agent-inferred] **The combined face** (the region table's combined read, with the tree's
 //! face in place of the region table's). The scored logits are the tree face's grain logits
 //! (`k_c/L_R` on the real rows, zero on the imaginary rows: [`grain_logits`]) plus the wave's
 //! `R P_R^(τ_R) v_R` ([`ReceivingRead::combined`]). The wave part is the refine's; the tree part
@@ -112,7 +112,7 @@
 //! | `HNN/RegionCounts.{combinedLogits, combined_face_pullback, combined_code_pullback}` | [`ReceivingRead::combined`], [`ReceivingPhases::combine`] |
 //! | `HNN/LandmarkTree.{unfounded_reads_prior, founded_tree_same_law, release_rule}` (the typed suffix address, kept whole by the collapse) | [`ActiveAddress`], [`ReceivingPhases::tree_faces`] |
 //! | `HNN/LandmarkTree.{sequential_mixture, sequential_mixture_bounds, sequential_mixture_executed}` (the two-face mixture stepped cell by cell, within one bit of the better face plus the chart's drift) | [`Mixture`] |
-//! | `HNN/LocalWeighing.{fixed_share, share_ratio_step, share_log_lipschitz, forward_executed}` (Decision 34: the switching mixture across epochs, within `1 + k(−log₂ α) + (n − k)(−log₂(1 − α))` of every switching sequence, its drift carried through the contracting share) | [`Mixture::switching`] |
+//! | `HNN/LocalWeighing.{fixed_share, share_ratio_step, share_log_lipschitz, forward_executed}` (local weighing: the switching mixture across epochs, within `1 + k(−log₂ α) + (n − k)(−log₂(1 − α))` of every switching sequence, its drift carried through the contracting share) | [`Mixture::switching`] |
 //! | `HNN/LandmarkAddress.{bundle_causal, bundle_restrict, feature_scale_square, address_descends_retention, phase_partition_finite}` (the typed bundles read from the retained clock before the cell they predict) | [`LetterReader`], [`ActiveAddress`], [`clock_letters`] |
 
 use std::ops::Range;
@@ -726,7 +726,7 @@ impl ActiveAddress {
 }
 
 /// [definition; agent-inferred] **The field's declared letter family** (campaign 2, decided on the
-/// development cells by `hnn_landmark`'s harness, Decision 31): the receiving letters every
+/// development cells by `hnn_landmark`'s harness, the development harness): the receiving letters every
 /// receiver's tree is addressed by. The harness's receipt (the notebook README's `hnn_landmark`
 /// row) chose the cell-only family: at the horizon bounds no clock-only family and no contact
 /// family coded below the constant-slot control of its slots by its description charge (every
@@ -736,7 +736,7 @@ pub fn letter_family(_field: &Field) -> LetterFamily {
 }
 
 /// [definition; agent-inferred] **The letters of a passage replayed without the wave** (the
-/// development harness's letters, Decision 31): the resident's clock law. Each cell steps the lift
+/// development harness's letters, the development harness): the resident's clock law. Each cell steps the lift
 /// point (`Current::step`) and its tick's letter is read after the step; at the joint clock's
 /// carry-out the keys are located on the closing crib (its last `W_crib` cells, the aeon's own,
 /// read at the declared offset: `keys::locate_closing`, as the exposure locates them) and re-key
@@ -786,7 +786,7 @@ pub fn clock_letters(
 /// field's exterior chart `|A|` (the cell emitted as its odometer digits), the receiver's depth `D`
 /// with no forced split, the field's declared population (the passage the tree's certificates hold
 /// within), the receiver's grain `L_R = ⌈1/ε_bits⌉`, the field's letter family
-/// ([`letter_family`]) and the receiver's declared stop-weight law (Decision 32), from which the
+/// ([`letter_family`]) and the receiver's declared stop-weight law (the declared stop prior), from which the
 /// owner derives its widths (the path lattice `M_p`, the β carrier `W` and, past `u128`, the
 /// carrier's rebase `R`).
 pub fn landmark_declaration(
@@ -835,7 +835,7 @@ fn grain_of(tolerance: &Rat) -> Result<u64, HnnError> {
 // the mixture of the tree and the combined face
 
 /// [definition; agent-inferred] **The receiver's scored face is weighed like a landmark** (the
-/// primary's ruling A, from Decision 28's own law, which weighs every landmark by its code-length
+/// primary's ruling A, from the landmark tree's own law, which weighs every landmark by its code-length
 /// evidence and not by a rule): the two-way mixture of the tree's face `q_T` and the combined face
 /// `q_C` (the tree's grain logits plus the wave), weighted by their prequential likelihood ratio,
 /// exactly as a tree node weighs its own KT face against its split:
@@ -865,7 +865,7 @@ fn grain_of(tolerance: &Rat) -> Result<u64, HnnError> {
 /// target, and the tree's face is stored, not pulled back; the mixture is scored on the host at
 /// compare, beside the tree read, on every realization.
 ///
-/// [definition; agent-inferred] **Switching across epochs** (Decision 34, "across epochs";
+/// [definition; agent-inferred] **Switching across epochs** (local weighing, "across epochs";
 /// [`Mixture::switching`]; Lean `HNN/LocalWeighing.{fixed_share, share_ratio_step,
 /// forward_executed}`): the fixed-share mixture lets the weights move between epochs of the passage
 /// at a declared price a switch, the rate `α = 2^(−j)` on the dyadic ladder. After the likelihood
@@ -925,7 +925,7 @@ impl Mixture {
         }
     }
 
-    /// **The opening switching mixture** (Decision 34, "across epochs"): `β = 1`, and after every
+    /// **The opening switching mixture** (local weighing, "across epochs"): `β = 1`, and after every
     /// step the weights share at the rate `α = 2^(−j)` (rung `j` of the dyadic ladder). Refused
     /// outside `1..=63` or past the carrier `W` (the share's `2^j − 1` is carried exactly).
     pub fn switching(width: u64, rung: u32) -> Result<Self, HnnError> {
@@ -1308,7 +1308,7 @@ impl ReceivingPhases {
         &self.tolerance
     }
 
-    /// `D`, the depth of the landmark tree's address (Decision 28).
+    /// `D`, the depth of the landmark tree's address (the landmark tree).
     pub fn depth(&self) -> usize {
         self.depth
     }

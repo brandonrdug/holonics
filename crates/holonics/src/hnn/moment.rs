@@ -15,7 +15,7 @@
 //! ```
 //!
 //! [definition; agent-inferred] **The open is indexed and normalized** (the primary's ruling B,
-//! Decision 26's open; Lean `HNN/IndexedOpen`): the marginal reads the phase counts over their
+//! the first repair's open; Lean `HNN/IndexedOpen`): the marginal reads the phase counts over their
 //! population, and the pair port reads only the column of its offset counts at the address the
 //! retained window supplies, over that column's population, so the open's amplitude no longer grows
 //! with the ingested cells (the located failure's third cause; `normalized_open_population_invariant`).
@@ -318,8 +318,8 @@ impl PairPort {
 // -------------------------------------------------------------------------------------------
 // the population chart and the indexed column
 
-/// [definition; agent-inferred] **The population chart** (the primary's ruling B: Decision 26's
-/// normalized open, carried by Decision 24's rule for an inverse): `1/n` read on the lattice
+/// [definition; agent-inferred] **The population chart** (the primary's ruling B: the first repair's
+/// normalized open, carried by the lattice word's rule for an inverse): `1/n` read on the lattice
 /// `2^(−L_ν)`, `ν̂(n) = ⌊2^(L_ν)/n + ½⌋ 2^(−L_ν)` (nearest, ties up) with `|ν̂ − 1/n| ≤ 2^(−L_ν−1)`,
 /// and `ν̂(0) = 0` (an unsupported fibre contributes nothing, Lean
 /// `HNN/IndexedOpen.normalized_zero_population`). `L_ν = ⌈log₂(2 L_R n*)⌉` over the finest
@@ -652,7 +652,7 @@ impl SourceMoment {
     }
 
     /// **The source moment `m̃_g`** of one source ring at the constitution's ports, computed from
-    /// the counts and never stored, on the indexed normalized open (ruling B, Decision 26's; Lean
+    /// the counts and never stored, on the indexed normalized open (ruling B, the first repair's; Lean
     /// `HNN/IndexedOpen`): `Σ_c P_g^(−c)(E_g M_g[c] ν̂(n_g) + Σ_δ E_g^(δ)(C_g(δ)[c, ·, a_δ] ν̂_a ⊗ e_(a_δ)))`.
     pub fn encode(
         &self,

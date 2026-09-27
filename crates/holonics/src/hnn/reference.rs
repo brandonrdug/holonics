@@ -7,7 +7,7 @@
 //! charts ([`Charts`]).
 //! Every value is in ℚ, in `ℚ(θ)` at a face, or an enclosure read at the exterior, and no float
 //! exists. A word carries its inverses as certified lattice charts and its transients on the
-//! field's declared lattice with error feedback (Decision 24; [`crate::hnn::chart`]): nothing is
+//! field's declared lattice with error feedback (the lattice word; [`crate::hnn::chart`]): nothing is
 //! rounded away unreported, since every chart's certificate and every released remainder is in the
 //! receipts, and every tick's balance closes up to its reported residual within its certified bound.
 //!
@@ -40,7 +40,7 @@
 //!
 //! ```text
 //! R        sample (P_R^(τ_R) v_R(e_j), −g_j) per receiving phase                   normal law
-//! tree     each target t_j on the paths its address a_j opens, in cell order        landmark tree (Decision 28)
+//! tree     each target t_j on the paths its address a_j opens, in cell order        landmark tree (`hnn::landmark`)
 //! W_c,g    sample (c_t, −u_t) at each tick of the element's window                  normal law
 //! E_g      sample (M_g[c] ν̂(n_g), −P^(c−τ_g) s̄_g(0)) per phase with counts           normal law (ruling B's normalized marginal)
 //! f_g      G = (K̄ + K̄ᵀ) f,  K̄ = Σ_t u_t x̄_tᵀ;   slices ∂/∂u_ρ = σ_ρ[(x̄·v)u − (u·v)x̄], ∂/∂v_ρ likewise
@@ -73,7 +73,7 @@
 //! the literal beside it.
 //!
 //! [definition] **The exposure** ([`Reference::expose`], design (d), campaign 1's protocol under
-//! Decision 29): the cut, exactly the field's declared population (so the `n*` guard holds), is
+//! prequential scoring): the cut, exactly the field's declared population (so the `n*` guard holds), is
 //! read in order, as one stream, into one moment; at each receiving window `refine` runs on the
 //! moment and `compare` against the next `A` cells, whose return is then deposited, held-out
 //! windows included (prequential: every comparison is scored at the standing before its own
@@ -97,7 +97,7 @@
 //! the compare returns the same either way (the test
 //! `a_compare_returns_the_same_with_and_without_the_refines_kept_read`). The tree part of the
 //! combined face is read at compare in either case, at the published constitution and each phase's
-//! causal address (Decision 28, `PendingRatio::against`). The pending ratio still holds operands
+//! causal address (the landmark tree, `PendingRatio::against`). The pending ratio still holds operands
 //! only (guard 3), the kept word is consumed by its own return (guard 2), and the
 //! kept read is not state: the state bits do not count it, and a clone of the resident drops it.
 //!
@@ -127,7 +127,7 @@
 //! one worker each; the exact inversion runs only where a chart's cold start fails (never on the
 //! standing real cut's first 24 windows) and in the observability rank at the mount. The receipts
 //! (24 windows of the standing real cut: the host realization's, serial against parallel with
-//! identical readouts; and Decision 24's, before and after the lattice word) are the notebook's
+//! identical readouts; and the lattice word's, before and after it landed) are the notebook's
 //! (`research/notebook/hnn_design/README.md`).
 //!
 //! [open] **`ExactWork`'s operation counts.** The exposure's work counts the entries written, their
@@ -330,7 +330,7 @@ pub struct Resident {
     wall: WallTimes,
 }
 
-/// [definition] **The executed charts' tally** over a resident's words (Decision 24): the chart
+/// [definition] **The executed charts' tally** over a resident's words (the lattice word): the chart
 /// refinements read, how many started cold (from the scaled transpose) and how many from one exact
 /// inverse, the rounded Newton–Schulz steps they took, and the largest certificate read against the
 /// declared target.
@@ -395,7 +395,7 @@ pub struct WallTimes {
     /// commit.
     pub compare_read: Duration,
     /// `compare`: the landmark tree read at each phase's causal address and added to the wave's
-    /// faces (Decision 28; `PendingRatio::against`); on a card, its launches and the host's
+    /// faces (the landmark tree; `PendingRatio::against`); on a card, its launches and the host's
     /// completion of the class faces, the transfers apart.
     pub tree_read: Duration,
     /// `compare`: a card's transfers of the tree read (the letters and digits up, the splits
@@ -564,7 +564,7 @@ impl Resident {
         &self.current
     }
 
-    /// The receiving parametron's active suffix address (Decision 28): the last cells ingested,
+    /// The receiving parametron's active suffix address (the landmark tree): the last cells ingested,
     /// newest first, at the deepest declared receiver's depth.
     pub fn address(&self) -> &ActiveAddress {
         &self.address
@@ -657,7 +657,7 @@ impl Resident {
             + self.charts.bits()
     }
 
-    /// **The executed charts** the resident keeps between windows (Decision 24).
+    /// **The executed charts** the resident keeps between windows (the lattice word).
     pub fn charts(&self) -> &Charts {
         &self.charts
     }
@@ -1183,7 +1183,7 @@ impl ExecutionPort for Reference {
                 read
             }
         };
-        // The tree part of the combined face at each phase's causal address (Decision 28).
+        // The tree part of the combined face at each phase's causal address (the landmark tree).
         let start = Instant::now();
         let against = ratio.against(&resident.constitution, &faces, &targets)?;
         wall.tree_read = start.elapsed();
@@ -1712,7 +1712,7 @@ pub fn compose(
         locus: LinearLocus::Receiving(receiving),
         samples,
     });
-    // The receiving parametron's landmark tree (Decision 28): each compared target deposits on
+    // The receiving parametron's landmark tree (`hnn::landmark`): each compared target deposits on
     // the paths its phase's causal address opens, in cell order, when the comparison reached the
     // receiving locus.
     if targets.len() != back.reads.len() {
@@ -2351,7 +2351,7 @@ fn sheet_classes(
 // the exposure
 
 /// [definition] **A cut**: the exterior stream's codes in order, and its pinned held-out positions.
-/// Every cell is compared and then deposited (Decision 29): "held out" means only that no design
+/// Every cell is compared and then deposited (prequential scoring): "held out" means only that no design
 /// choice (depth, precision, step, grain) was made on those cells, and that no crib reads them.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Cut {
@@ -2381,7 +2381,7 @@ impl Cut {
 
 /// [definition] **Bits on a population of targets**: the model's code length on its scored face,
 /// the receiver's mixture of the tree's face and the combined face (ruling A); the landmark tree's
-/// executed face alone (`tree`, Decision 28: the receiving parametron's tree at each cell's causal
+/// executed face alone (`tree`, the landmark tree: the receiving parametron's tree at each cell's causal
 /// address and at the standing after every earlier cell, with no wave: the face `q_T` the mixture
 /// weighs); the same tree's face at the grain (`tree_grain`: its grain logits alone, the face the
 /// combined read opens at when the wave reads zero); the combined face alone (the tree's grain
@@ -2512,7 +2512,7 @@ pub struct Exposure {
     pub state: StateReport,
     pub compares: u64,
     pub deposits: u64,
-    /// The executed word's readout (Decision 24).
+    /// The executed word's readout (the lattice word).
     pub word: WordReport,
     /// The receiver's mixture at the end of the run (ruling A).
     pub mixture: Option<MixtureReport>,
@@ -2606,7 +2606,7 @@ impl Leg {
     }
 }
 
-/// [definition] **The executed word's readout over an exposure** (Decision 24): the charts' tally
+/// [definition] **The executed word's readout over an exposure** (the lattice word): the charts' tally
 /// (reads, seeds, rounded Newton–Schulz steps, the largest certificate against the target), the
 /// carried remainders the refines' words released at their ends (`forward`) and the compares'
 /// returns released at their opens (`adjoint`), joined over the run; over every refine's full
@@ -2805,7 +2805,7 @@ pub struct BaselineFaces {
 /// [agent-inferred] The order-1 baseline's contexts are the preceding cell's address letter
 /// (`hnn::landmark::Letter`: `1 + code`, and the boundary `0` before the stream's first cell): the
 /// preceding cell's region. Order-1 is the depth-one forced case of the whole-cell emission
-/// (`|A|`-ary KT masses at a node, Decision 27's region table; Lean
+/// (`|A|`-ary KT masses at a node, the region table; Lean
 /// `HNN/LandmarkTree.depth_one_is_decision_27`), which lives in Lean only; the executed tree
 /// (`hnn::landmark::Landmarks`) emits the cell's odometer digits, and its depth-one forced case is
 /// a product of binary KT faces at the preceding cell, a different law. The exposure ([`expose`])
@@ -3169,7 +3169,7 @@ where
                 .into_present()
                 .expect("a compare returns its ratio");
             // The model's (the mixture's) and the tree face alone's code lengths, its executed face
-            // and its face at the grain (ruling A, Decision 28): the compare's readings, each
+            // and its face at the grain (ruling A, the landmark tree): the compare's readings, each
             // phase at the standing after the window's earlier phases, before the deposit and the
             // window's ingest; the combined face's are the Holon ratio's.
             let (tree, tree_grain, model) = match &compared.receipt.detail {
@@ -3208,7 +3208,7 @@ where
                 baselines.code(bits, code)?;
                 leg.add(model, tree, &phase.code_length)?;
             }
-            // Prequential (Decision 29): every compared window is deposited, held-out windows
+            // Prequential scoring: every compared window is deposited, held-out windows
             // included; only the budget stop discards.
             if resident.stopped().is_some() {
                 port.discard(&mut resident, Handle::Staged(staged))?;

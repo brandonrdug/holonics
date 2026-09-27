@@ -3,7 +3,7 @@
 [project-postulate] This guide states the HNN law. Rebuild step 4 implements it in
 `holonics::hnn`, over aeons ([THE_REBUILD](plans/THE_REBUILD.md#order), #73); step 5 realizes
 it on the card in `holonics-cuda::hnn`. Both modules implement campaigns 1–2.
-Decision 38 supplies the loaded resonator connection and its reached material covector; release through modes,
+The loaded resonator (`hnn::ring`) supplies its connection and its reached material covector; release through modes,
 Holonic Encoding and joint prediction are the remaining campaign consumers. [THE_MACHINE](THE_MACHINE.md)
 states the object, and the [elementary objects](ELEMENTARY_OBJECTS.md) own the vocabulary.
 The HNN is the compression machine at scale ([the line](plans/THE_REBUILD.md#the-line-the-rebuild-serves)):

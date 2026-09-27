@@ -1,7 +1,7 @@
 //! **A loaded ring's modes and their future quotient** (campaign 3, first construction; Lean
 //! `HNN/ModeQuotient`).
 //!
-//! [definition] A loaded ring at a fixed publication (Decision 38, [`crate::hnn::ring`]): its
+//! [definition] A loaded ring at a fixed publication (the loaded resonator, [`crate::hnn::ring`]): its
 //! material read at the producing cut, its pump at phase `t mod P` of the word's tick `t`. Under the
 //! exact law its word-local state `x = (u, w) ∈ ℚ^(2n)` ticks as one linear system per pump phase,
 //! driven by the element output `e` and returning the wave `s′` to the ring's next junction:
@@ -77,7 +77,7 @@
 //! `λ_t = λ̄_t V`, so it vanishes on the release. The drive covector
 //! `ē_t = λ̄_(t+1) B̄_t + s̄_t D_t` and the solved covector `r̄_t = X_tᵀ z̄_t = (ē_t − s̄_t)/h` are the
 //! full ring's. Gain family `f`'s covector `G_f = Σ_t ⟨r̄_t, φ_(f,t)⟩` pairs its variation
-//! `φ = 2δC(w − ω) − hδD ω − hδK_t(u + hω/2)` (`δ = 2g·base`, Decision 38; [`Variation`]), a linear
+//! `φ = 2δC(w − ω) − hδD ω − hδK_t(u + hω/2)` (`δ = 2g·base`, the loaded resonator; [`Variation`]), a linear
 //! reading `F x + H e` with the rate read from the port. It descends exactly when `F` vanishes on
 //! the release, and then `F = (F σ) V` for a section `σ` of the chart.
 //!
@@ -163,7 +163,7 @@ pub const GAIN_FAMILIES: usize = 4;
 // -------------------------------------------------------------------------------------------
 // the loaded ring's exact operators
 
-/// [definition] **A gain family's material variation at one pump phase** (Decision 38): the vector
+/// [definition] **A gain family's material variation at one pump phase** (the loaded resonator): the vector
 /// `2δC(w − ω) − hδD ω − hδK_t(u + hω/2)` along the family's direction `δ = 2g·base`, a linear
 /// reading `φ = F x + H e` of the state and the drive (the rate read from the port,
 /// `ω = (Y/2)(e − s′)`). The family's gain covector is `Σ_t ⟨r̄_t, φ_t⟩`.
@@ -458,7 +458,7 @@ pub struct SilentCoordinate {
 }
 
 /// [definition] **An aeon's admission of deposit**: a frozen aeon admits none; a learning aeon
-/// admits the declared material family's deposit (Decision 38), whose gain covectors read the
+/// admits the declared material family's deposit (the loaded resonator), whose gain covectors read the
 /// ring's state through the families' variations.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Deposition {

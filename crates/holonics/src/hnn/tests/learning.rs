@@ -78,7 +78,7 @@ pub(super) fn chain_with(first_admittance: Rat) -> Field {
 /// counts its capacity is `n* = 17` cells (`71` with `Δ = {1}`), the smallest cut on which the
 /// exposure's protocol runs its aeons, keys and budget stop. Its receiver's tree reads the active
 /// suffix address, which the resident keeps beside the tree whether or not the moment retains a
-/// window (Decision 28).
+/// window (the landmark tree).
 pub(super) fn chain_of(population: u64) -> Field {
     chain_declared(integer(2), population, Vec::new())
 }

@@ -1,4 +1,4 @@
-//! The word's tests (Decision 24). [`oracle`] states the contract of `word.rs`'s header directly
+//! The word's tests (the lattice word). [`oracle`] states the contract of `word.rs`'s header directly
 //! on unbounded integers, independent of the device code: the split is Lean's `round`
 //! (`⌊s/2^L + 1/2⌋`, ties upward) taken on exact rationals, the refinement is `X(2 − AX)` formed
 //! whole, and each refusal is decided from the exact terms. The fast tests prove the host-side laws

@@ -367,7 +367,7 @@ fn run(
 /// Lean `HNN/Word.word_tick_balance`, lossless: with lossless contacts, `W_s = 0` and `W_c = 0` the
 /// exact law keeps the global power constant exactly over every tick, on a chorded field with
 /// proper partial isometries and contacts that store and stiffen. The executed word on its
-/// lattices (Decision 24) moves it at each tick by exactly its residual (the executed anchors,
+/// lattices (the lattice word) moves it at each tick by exactly its residual (the executed anchors,
 /// charts and splits), within the bound its certificates and cells give (Lean
 /// `HNN/LatticeWord.{chart_energy_identity, cayley_chart_energy, feedback_tick}`), and by a nonzero
 /// residual: the chart is not the exact inverse.

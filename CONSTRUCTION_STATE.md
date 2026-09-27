@@ -1,7 +1,10 @@
 # Construction state
 
-**September 27, after Decisions 37–39 and campaign 3's first construction.**
-[THE_REBUILD](docs/plans/THE_REBUILD.md) owns the implementation order and current decisions.
+**September 27, after the compacted tree, the loaded resonator, the register's capacity and campaign 3's
+first construction.**
+[THE_REBUILD](docs/plans/THE_REBUILD.md) owns the implementation order; each law lives in its guide or
+owner, and THE_REBUILD's [Decisions index](docs/plans/THE_REBUILD.md#i-the-decisions-index) maps the
+former numbered Decisions to them.
 The repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
@@ -11,11 +14,11 @@ The repository was reset on September 24; the pre-reset tree is
 |---|---|
 | Steps 0–3 | Operator layout, Holarchy/Aeon, compression and landmark owners built; their broader formal obligations remain in #62 |
 | Steps 4–5 (#73, #76) | Host `holonics::hnn` and resident `holonics-cuda::hnn` implement campaigns 1–2, with per-law parity |
-| Campaign 1 | Meets its standing-cut predictive criterion after Decisions 28–30; source moments, local word, comparison, deposition and structural collapse have consumers |
+| Campaign 1 | Meets its standing-cut predictive criterion after its repair (the landmark tree, prequential scoring, the likelihood mixture); source moments, local word, comparison, deposition and structural collapse have consumers |
 | Campaign 2 | Ring/contact laws and parity pass; its additional predictive criterion fails. The measured field declares no resonators or boost signatures |
-| Decision 38 | Loaded resonator forward/adjoint and material deposition built on host/card; the fixed source-ring family does not improve the standing-cut prediction |
-| Decision 39 | A landmark's count register carries at its ceiling `2^c`; the development cells choose `c = 11` at scale; the resident tree takes the carry |
-| Immediate work | Unity before campaign 3 continues ([audit](research/records/2026-09-27_THE_HOLARCHY_AND_ITS_AEONS_ARE_THE_TOP_THE_DECISIONS_DISSOLVE_INTO_THEIR_OWNERS_AND_LEARNING_IS_PROTOTYPED_WHERE_A_HOLARCHY_MADE_THE_TERRAIN.md)): dissolve the Decisions log into owners and records; the Holarchy and its aeons at the top of `hnn`, the receiving tree through `receiver::standing`, `aeon::Epochs` and navigator words; learning prototyped on terrain a declared Holarchy made. Campaign 3's first construction and descent are built (`hnn::modes`) |
+| Loaded resonator (`hnn::ring`) | Loaded resonator forward/adjoint and material deposition built on host/card; the fixed source-ring family does not improve the standing-cut prediction |
+| Register capacity (`hnn::landmark`) | A landmark's count register carries at its ceiling `2^c`; the development cells choose `c = 11` at scale; the resident tree takes the carry |
+| Immediate work | Unity before campaign 3 continues ([audit](research/records/2026-09-27_THE_HOLARCHY_AND_ITS_AEONS_ARE_THE_TOP_THE_DECISIONS_DISSOLVE_INTO_THEIR_OWNERS_AND_LEARNING_IS_PROTOTYPED_WHERE_A_HOLARCHY_MADE_THE_TERRAIN.md)): the Decisions log dissolved into owners and records (done); the Holarchy and its aeons at the top of `hnn`, the receiving tree through `receiver::standing`, `aeon::Epochs` and navigator words; learning prototyped on terrain a declared Holarchy made. Campaign 3's first construction and descent are built (`hnn::modes`) |
 | Campaign 3 | Mode release, dormant constitution/clock, founding and moment quotient; consumes the loaded ring connection |
 | Campaign 4 (#27) | Existing serial-screw laws need the HNN motor consumer and a motion-recording receipt |
 | Campaign 5 | Holonic Encoding, context, joint prediction and merges priced by their code-length pair |
@@ -38,25 +41,26 @@ consumers.
   cells. The full HNN's held-out readings remain campaign 1's. The corrected receipt identifies
   the unloaded resonator port and the undeclared resonators/signatures.
   [Campaign 2 receipt](research/records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md).
-- **Decision 38.** The loaded source-ring family closes its power balances and learns a
+- **Loaded resonator.** The loaded source-ring family closes its power balances and learns a
   dissipation amplitude of `273/256`. It loses to the default HNN by `0 + 8/16 + ε` development
   bits and `0 + 4/16 + ε` scored-tail bits before the 887-bit extra material description.
   The default stays unchanged. [Loaded ring receipt](research/records/2026-09-26_THE_RESONATOR_RETURNS_ITS_WAVE_AND_THE_COMPARISON_REACHES_ITS_MATERIAL.md).
 - **Count-only receiver, wide cut.** The cut has `2²⁰` cells with final `2¹⁷` scored as held out.
-  Decision 37's compacted tree admits the development-selected depth `48 = 3·2⁴`, reading
+  The compacted tree (stored where paths part) admits the development-selected depth `48 = 3·2⁴`, reading
   `1 + 15/16 + ε` bits per cell, below the shallower tree and PPM-2. This is the count-only
   harness, not a full-HNN exposure. The standing cut lies in this held-out range and has been
   used in development; the separate evaluation partition stays unread.
-- **Decision 39.** At depth 48 each landmark's count register carries (both counts halve) at the
+- **Register capacity.** At depth 48 each landmark's count register carries (both counts halve) at the
   ceiling `2^c`. The development cells choose `c = 11`, at the family's edge, `−337 + 1/16 + ε`
   bits below no ceiling, charged. Held out the tree reads `258018 + 5/16 + ε`, `−180 + 1/16 + ε`
-  below Decision 37's tree, charged. Dissipation on a landmark's own clock earns few bits: the
+  below the uncapped compacted tree, charged. Dissipation on a landmark's own clock earns few bits: the
   terrain is close to stationary at these contexts. The standing-cut HNN keeps its own
-  declaration.
-- **Decision 37.** Unary chains are stored at their parting faces. Lean proves the ideal
+  declaration. [Capacity record](research/records/2026-09-27_A_LANDMARKS_STORAGE_HAS_A_CAPACITY_AT_ITS_CEILING_IT_CARRIES.md).
+- **Stored where paths part.** Unary chains are stored at their parting faces. Lean proves the ideal
   rational tree's face/code equivalence and the `2n − 1` node bound for nonempty passages.
   Labels still cost memory and traversal with depth. Compacted storage is the sole host/card
   storage; its standing-cut HNN exposure preserves the earlier readings.
+  [Record of the tree at scale](research/records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md).
 - **Rejected trials.** The Born receiver failed its development criterion. Second-arrival
   founding lost on development cells and its Rust realization was retired. The stop-weight
   mixture is a measured count-only law; the full HNN retains its declared half prior.

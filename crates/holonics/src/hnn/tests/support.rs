@@ -233,7 +233,7 @@ pub(super) struct Medium {
     pub(super) stiffness: Vec<ExactRatMatrix>,
     pub(super) dissipation: Vec<ExactRatMatrix>,
     pub(super) receiving: Vec<Option<ExactRatMatrix>>,
-    /// The receiving parametron's landmark tree, empty (Decision 28).
+    /// The receiving parametron's landmark tree, empty (`hnn::landmark`).
     pub(super) trees: Vec<Option<Landmarks>>,
     /// The receiver's mixture at its opening `β = 1` (ruling A).
     pub(super) mixtures: Vec<Option<Mixture>>,
@@ -251,7 +251,7 @@ fn unit(n: usize, i: usize) -> Vec<Rat> {
 
 impl Medium {
     /// **A medium of campaign 1's declared shapes** (design (d), "The initial constitution and its
-    /// priors", before Decision 28 moved the prior from `R` to `E`): `E = 0`; the pair port's
+    /// priors", before the landmark tree moved the prior from `R` to `E`): `E = 0`; the pair port's
     /// outputs 0 with `±1` reads; `R` a `±1` pattern times 1/2, so the wave reads a nonzero face;
     /// `W_c = 0`; `W_s = −¼I`; the slices the skew cyclic shift; `q = 0`; `C = I`, `K = D = ¼I`;
     /// the receiving parametron's tree empty. The `±1` patterns here come from the test generator,
