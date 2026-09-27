@@ -3176,6 +3176,14 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
       by `−238483 + 1/16 + ε` and below order-0 by `−373509 + 2/16 + ε`. Each ordering is decided
       by disjoint exact enclosures. The passage stores 12542969 nodes and 40352545 label letters. The
       harness's resident peak was 1594884096 bytes.
+    - **On the card** (Decision 25, #76). The receiving path and the card run the compacted tree,
+      the only storage left. Retired with it: the full arena, and Decision 34's node-local law's Rust
+      (measured at `d2a2e0db`; its Lean stays). `W` is derived from `2n* + 1`, which keeps the rule
+      below half a grain. The GPU suite ran alone on an idle card: 39 passed. Campaign 1's exposure on
+      the card reads every recorded reading unchanged, host and card identical. Held out the whole
+      HNN reads `3 + 1/16 + ε` a cell. It is below order-0 by `−1996 + 12/16 + ε` and below PPM-2
+      by `−252 + 5/16 + ε`. The constitution holds 4836937 bits. The card takes
+      `103 rem 2667 over 3074` ms a window.
     - **What it located.** The development cells wanted depth, and memory had been hiding it. Once
       the tree is stored at its parting faces, the depth costs at most two nodes an arrival, and the
       code still falls at `D = 48`. Decision 36's held-out gain is had here without its
