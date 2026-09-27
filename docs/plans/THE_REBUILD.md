@@ -3357,3 +3357,31 @@ give the exact enclosures, cost, balance and hardware scope. Campaign 3 begins w
 future-kernel owner and the concrete source/phase/receiver squares above. The phase-dependent
 loaded-material growth bound remains in #62 beside the complete counterfactual sensitivity and
 diamond/deposition joins; the deposit receipt now names its contact-only growth certificate.
+
+#### Decision 39. A landmark's storage has a capacity: at its ceiling it carries
+
+[agent-inferred; declared before measurement] Decisions 28–37 read a landmark's counts as
+exchangeable: its KT face weighs the node's first arrival as much as its latest. A landmark is a
+storage on its own clock: its arrivals are its epochs (the flux through its section), and a storage
+has a capacity. Decision 38's measurement located where the rings do not yet earn bits: they tick on
+the cell clock, while text varies along its contexts. This decision places the dissipation on the
+landmark's own clock instead. Refs #73.
+
+- **The law.** Each node keeps its two counts `n_0, n_1` as before, carried as half-unit masses
+  `2n_c + 1`. When a deposit brings `n_0 + n_1` to the ceiling `L = 2^c`, both counts carry:
+  `n_c ← ⌈n_c/2⌉`. The shift is the register's carry, the helix's winding at its capacity, and a
+  reached symbol keeps a count. The face is KT's on the carried counts. `c = ∞` is Decision 28's
+  node.
+- **Why it is lawful.** The tree weighting normalizes for any node law that emits a normalized face
+  from what reached the node (`path_face_normalized`). The mixture over pruned trees and its
+  dominance hold for any sequential node law. A chain's nodes route the same arrivals, so they
+  carry the same register, and Decision 37's compaction is unchanged.
+- **The family and its charge.** The development cells of the wide cut, at Decision 37's `D = 48`,
+  choose `c ∈ {∞, 5, 7, 9, 11}`, charged `⌈log₂ 5⌉ = 3` bits. That is five passages of about
+  25 s each, stated in advance. Then comes one held-out passage for the chosen law. If development
+  keeps `c = ∞`, the law is recorded as rejected.
+- **Consumers.** The owner is `hnn::landmark` (`Law`, its deposit and faces, both oracles). If the
+  law is adopted, the receiving path and the card take it in the same step (Decision 25).
+- **Lean.** The stop mixture, its Kraft form and dominance, and `compacted_is_decision_28` are
+  generalized to a node law whose state is a function of the arrivals reaching the node. The
+  capped register is an instance; KT is the case `c = ∞`.
