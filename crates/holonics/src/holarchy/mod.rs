@@ -38,6 +38,11 @@
 //! [definition] **A Holarchy's quantities belong to the receiver** ([`view`]): the view, the count
 //! and the refinement are read at a receiver's grain and clock, never as a fixed count.
 //!
+//! [definition; agent-inferred] **Terrain a declared Holarchy made** ([`terrain`]): moiré gratings,
+//! a tree source, rotor cribs and aeon switching, each emitted with drawn keys and returned with its
+//! exact truth, so learning is gauged by redundancy, recovery and attribution where the truth is
+//! known (the record of September 27, §3.3 and §5).
+//!
 //! | Lean `Holarchy/Join` | Rust |
 //! |---|---|
 //! | `interconnect`, `interconnect_ok_iff`, `GluingDefect`, `GluingDefect.not_glues` | [`Holon::interconnect`], [`GluingDefect`] |
@@ -58,6 +63,7 @@
 //! (`Holarchy/Globe.HolarchyGlobe`, `holarchyGlobe_iff_linear`) has no Rust consumer here.
 
 pub mod gluing;
+pub mod terrain;
 pub mod view;
 
 #[cfg(test)]

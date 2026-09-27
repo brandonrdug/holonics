@@ -23,7 +23,7 @@
 //!   causal chord, joint reception and the receipt ratio.
 //! - [`holarchy`]: what `Holon::interconnect` returns — the joined whole with its constituents,
 //!   typed gluing (or a gluing defect) and parametric orientation, and its receiver-relative
-//!   `view`/`count`/`refine`.
+//!   `view`/`count`/`refine`; and the terrain a declared Holarchy makes, with its exact truth.
 //! - [`aeon`]: aeon, epoch and cycle — clock readings with carry, epochs and their towers at a
 //!   receiver's section with the oriented flux, two-clock locks, the Hodge split of a clock,
 //!   production, the dynamical zeta and the first law of learning.

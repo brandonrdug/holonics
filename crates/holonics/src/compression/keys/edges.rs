@@ -298,36 +298,22 @@ fn path_to_seed(parent: &[Option<(usize, usize)>], mut port: usize) -> Vec<usize
 mod tests {
     use super::*;
 
-    /// SplitMix64, for deterministic menus.
-    struct Draw(u64);
+    /// The seeded exact draw, for deterministic menus (the terrain owner's).
+    use crate::holarchy::terrain::Draw;
 
-    impl Draw {
-        fn next(&mut self) -> u64 {
-            self.0 = self.0.wrapping_add(0x9E37_79B9_7F4A_7C15);
-            let mut z = self.0;
-            z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
-            z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
-            z ^ (z >> 31)
-        }
-
-        fn below(&mut self, bound: usize) -> usize {
-            (self.next() % bound as u64) as usize
-        }
-
-        /// A random involution of `ports` ports: a random partial matching.
-        fn involution(&mut self, ports: usize) -> PortPermutation {
-            let mut images: Vec<usize> = (0..ports).collect();
-            let mut free: Vec<usize> = (0..ports).collect();
-            while free.len() >= 2 {
-                let a = free.swap_remove(self.below(free.len()));
-                if self.next() & 1 == 0 {
-                    continue;
-                }
-                let b = free.swap_remove(self.below(free.len()));
-                images.swap(a, b);
+    /// A random involution of `ports` ports: a random partial matching.
+    fn involution(draw: &mut Draw, ports: usize) -> PortPermutation {
+        let mut images: Vec<usize> = (0..ports).collect();
+        let mut free: Vec<usize> = (0..ports).collect();
+        while free.len() >= 2 {
+            let a = free.swap_remove(draw.below(free.len()));
+            if draw.next() & 1 == 0 {
+                continue;
             }
-            PortPermutation::new(images).unwrap()
+            let b = free.swap_remove(draw.below(free.len()));
+            images.swap(a, b);
         }
+        PortPermutation::new(images).unwrap()
     }
 
     /// A menu of `edges` random edges on `ports` ports whose stage under key `k` is a fixed random
@@ -337,7 +323,7 @@ mod tests {
             .map(|_| {
                 let (from, to) = (draw.below(ports), draw.below(ports));
                 let stages: Vec<PortPermutation> =
-                    (0..keys).map(|_| draw.involution(ports)).collect();
+                    (0..keys).map(|_| involution(draw, ports)).collect();
                 Edge::new(from, to, move |key: &usize| Ok(stages[*key].clone()))
             })
             .collect();
@@ -377,7 +363,7 @@ mod tests {
     /// survivors are exactly the injective candidates satisfying every edge.
     #[test]
     fn propagation_equals_the_brute_force_edge_fibre() {
-        let mut draw = Draw(7);
+        let mut draw = Draw::new(7);
         for trial in 0..60 {
             let ports = 3 + trial % 4;
             let edges = 1 + draw.below(6);
@@ -395,7 +381,7 @@ mod tests {
     /// ports; a conflict is reported as a failing loop through its seed.
     #[test]
     fn adding_an_edge_only_shrinks_the_propagated_fibre() {
-        let mut draw = Draw(11);
+        let mut draw = Draw::new(11);
         let keys: Vec<usize> = (0..2).collect();
         for _ in 0..20 {
             let full = random_menu(&mut draw, 5, 5, keys.len());

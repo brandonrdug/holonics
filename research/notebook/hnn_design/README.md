@@ -489,3 +489,54 @@ power balance and reached covectors establish the consumer needed by campaign 3.
 also prints each final gain's carried remainder, what reached the family below its lattice's
 unit; the word balances' bound covers the resonator's solve and split, and the interconnection's
 defect is zero by construction for a loaded port (the September 27 repair in the same record).
+
+## Terrain a declared Holarchy made (the record of September 27, §3.3 and §5)
+
+`hnn_terrain.rs` runs the count-only landmark tree on terrain whose truth is exact
+(`holonics::holarchy::terrain`; its header states the declarations). These are **development
+receipts, not milestones**: the conversation cut stays the living substrate and the milestone
+(Brandon's ruling of August 26), and no claim here is joined to the cut's. Every terrain is drawn
+by the seeded draw `20260927`; each run takes under four seconds.
+
+```sh
+cargo run --release -p holonics --example hnn_terrain -- tree 2
+cargo run --release -p holonics --example hnn_terrain -- tree 4
+cargo run --release -p holonics --example hnn_terrain -- moire
+```
+
+**Tree sources** over bits (faces on `1/16`, `n = 2^16` cells, the `½` tree at `D = d + 2`,
+`L_R = 16`; each reading `n + k/16 + ε`, the exact endpoints in the output):
+- `d = 2`: `|S| = 3` leaves `[00] [01] [1]`, stationary `(3/16, 5/16, 1/2)`; the rate
+  `h = 7/2 − (63/256) log₂ 3 − (95/256) log₂ 5 − (33/256) log₂ 11 − (65/256) log₂ 13` bits a cell,
+  `n·h = 56543 + 13/16 + ε`. The tree codes `56464 + 2/16 + ε` (PPM-2 `56562 + 1/16 + ε`); the
+  redundancy `code − n·h = −80 + 4/16 + ε` (the passage's own code lies below `n·h`), and against
+  the source's own code of the realized cells `27 + 1/16 + ε`, below the ideal tree's weighting
+  bound `Γ(S′) + Σ(½ log₂ n_s + 1) + b = 7 + (24 + 7/16 + ε) + 2 = 33 + 7/16 + ε` (the headline
+  `½|S| log₂ n + Γ(S′) = 31`); with the chart's certified drift (`n` times the largest per-cell
+  residual) the bound is `222 + 11/16 + ε`. The recovered tree is the drawn one, all 16
+  addresses agreeing.
+- `d = 4`: `|S| = 8` leaves, rate `0 + 11/16 + ε` a cell, `n·h = 47257 + 8/16 + ε`; the tree codes
+  `47134 + 11/16 + ε` (PPM-2 `51349 + 4/16 + ε`); the redundancy `−123 + 3/16 + ε`, against the
+  source's own code `51 + 4/16 + ε`, below the ideal bound `22 + (55 + 5/16 + ε) + 2 = 79 + 5/16 + ε`
+  (headline `86`). The recovered tree has 7 leaves: it merges the drawn `[0000]` and `[0001]`,
+  whose drawn faces are both `(9/16, 7/16)`, so it is the source's minimal tree (the coarsest tree
+  reading the same faces) exactly, all 64 addresses agreeing with it and 56 with the drawn spelling.
+
+**The moiré** (3 gratings, denominators up to `2^4`, `n = 2^14` cells): rates and phases
+`14/15 @ 5/15`, `4/15 @ 10/15`, `11/16 @ 12/16`; joint and least period `240 = 2^4·3·5`; the locks
+`7/2`, `224/165`, `64/165` (the contact law over one joint period reads `7/2`, `19/14`, `7/18`);
+the rate zero; the key description `⌈log₂ 862³⌉ = 30` bits (`862 = 2·431`). The harness's depth
+rule (`choose_depth_within`: `D` rises while the code falls strictly) **stops below the terrain's
+determining depth `D*`**, at the first plateau of the code in `D`:
+- parity color (`D* = 14`): chosen `D = 10`, code `2016 + 6/16 + ε` (the key description plus
+  `1986 + 6/16 + ε`), each later period `17 + 13/16 + ε` by period 67; the code by depth reads
+  `D = 10, 11: 2016 + 6/16, 2018 + 6/16`, `D = 12, 13: 1501 + 12/16, 1501 + 13/16`, `D = 14: 993 + 5/16`
+  (each `+ ε`). At the control `D = D* = 14` (the truth's, never a choice) the code is
+  `993 + 5/16 + ε`, the periods `245 + 3/16`, `209 + 5/16`, `102 + 2/16`, `57 + 6/16`, then
+  `17 + 7/16` (period 7), `4 + 2/16` (31), `1 + 14/16` (67), `5 + 14/16 + ε` a period over periods
+  4 to 67: the zero-rate terrain's code is its first periods plus the tree's own learning,
+  `963 + 5/16 + ε` bits past the key's 30;
+- sheet tuple (`D* = 8`): chosen `D = 5`, code `5427 + 1/16 + ε`, `62 + 10/16 + ε` a period by period
+  67; at `D* = 8` the code is `1549 + 0/16 + ε`, `2 + 15/16 + ε` by period 67. Online order-0,
+  order-1 and PPM-2 read `16391 + 5/16`, `16394 + 6/16`, `16165 + 8/16` (parity) and
+  `48632 + 0/16`, `36798 + 10/16`, `17406 + 13/16` (tuple).

@@ -48,3 +48,10 @@ path = "../../research/notebook/hnn_design/hnn_landmark.rs"
 [[example]]
 name = "hnn_born"
 path = "../../research/notebook/hnn_design/hnn_born.rs"
+
+# The notebook's first receipts on terrain a declared Holarchy made (`holarchy::terrain`: a tree
+# source and a moiré, each with its exact truth; research/notebook/hnn_design/README.md): count-only
+# development receipts run once in release, never a test.
+[[example]]
+name = "hnn_terrain"
+path = "../../research/notebook/hnn_design/hnn_terrain.rs"

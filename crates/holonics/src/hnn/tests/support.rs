@@ -16,22 +16,11 @@ use crate::hnn::receiving::{Mixture, landmark_declaration};
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::{Rat, integer, rat};
 
-/// SplitMix64: exact, deterministic, no float.
-pub(crate) struct Draw(u64);
+/// The seeded exact draw is the terrain owner's (`holarchy::terrain::Draw`); the tests' small
+/// operands are read from it here.
+pub(crate) use crate::holarchy::terrain::Draw;
 
 impl Draw {
-    pub(crate) fn new(seed: u64) -> Self {
-        Self(seed)
-    }
-
-    pub(crate) fn next(&mut self) -> u64 {
-        self.0 = self.0.wrapping_add(0x9E37_79B9_7F4A_7C15);
-        let mut z = self.0;
-        z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
-        z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
-        z ^ (z >> 31)
-    }
-
     /// A small rational `p/q`, `p ∈ [−3, 3]`, `q ∈ [1, 3]`.
     pub(super) fn rational(&mut self) -> Rat {
         let p = (self.next() % 7) as i64 - 3;
@@ -75,10 +64,6 @@ impl Draw {
             (0..rows).map(|_| self.dyadic_vector(columns)).collect(),
         )
         .unwrap()
-    }
-
-    pub(super) fn below(&mut self, bound: usize) -> usize {
-        (self.next() % bound as u64) as usize
     }
 
     pub(super) fn vector(&mut self, width: usize) -> Vec<Rat> {

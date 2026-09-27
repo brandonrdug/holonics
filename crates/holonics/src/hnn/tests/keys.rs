@@ -1,9 +1,10 @@
-//! Keys lead learning: a declared rotor configuration is recovered from a synthetic crib as its full
-//! gauge orbit, propagation equals brute force, gauge fixing picks one member per orbit, adding an
-//! edge only shrinks the fibre, an empty fibre falls back, a ring is located under the earlier
-//! rings' configurations, and re-keying leaves the open moment untouched.
+//! Keys lead learning: a declared rotor configuration is recovered from a crib the terrain owner's
+//! true machine produces (`holarchy::terrain::rotor_crib`) as its full gauge orbit, a drawn key and
+//! plugboard lie in the located fibre, propagation equals brute force, gauge fixing picks one member
+//! per orbit, adding an edge only shrinks the fibre, an empty fibre falls back, a ring is located
+//! under the earlier rings' configurations, and re-keying leaves the open moment untouched.
 
-use num_bigint::{BigInt, BigUint};
+use num_bigint::BigUint;
 
 use super::support::{Draw, contact, ring};
 use crate::compression::{Candidate, Menu, PortImages};
@@ -14,6 +15,7 @@ use crate::hnn::keys::{
     ring_steps,
 };
 use crate::hnn::moment::SourceMoment;
+use crate::holarchy::terrain::{RotorCrib, rotor_crib};
 use crate::holon::contact::menu::PortPermutation;
 use crate::navigator::Clock;
 use crate::ratio::{integer, rat};
@@ -53,41 +55,6 @@ fn rotor_field(rings: &[(u64, Vec<u64>)]) -> Field {
     .unwrap()
 }
 
-/// The stage `ρ^(−m) F ρ^m` of a ring at rotor position `m`.
-fn stage(field: &Field, ring: usize, position: u64) -> PortPermutation {
-    field
-        .ring(ring)
-        .machine()
-        .unwrap()
-        .stage(&BigUint::from(position))
-        .unwrap()
-}
-
-/// A crib a true machine produces on ring `g`: `x_(k+1) = S⁻¹ W_(key + steps_g(k)) S x_k`, with
-/// `steps_g(k)` ring `g`'s ticks on the cells before `k` from the declared configurations, stepped on
-/// the cells as they are produced. Codes are ports (codes below `d_g`).
-fn synthetic_crib(
-    field: &Field,
-    ring: usize,
-    key: u64,
-    board: &PortPermutation,
-    configurations: &[u64],
-    length: usize,
-    start: usize,
-) -> Vec<usize> {
-    let mut lift: Vec<BigInt> = configurations.iter().map(|c| BigInt::from(*c)).collect();
-    let mut taken = 0u64;
-    let mut crib = vec![start];
-    for k in 0..length - 1 {
-        let image = stage(field, ring, key + taken)
-            .apply(board.apply(crib[k]).unwrap())
-            .unwrap();
-        crib.push(board.inverse().apply(image).unwrap());
-        taken += u64::from(field.selective_step(&mut lift, crib[k]).unwrap().ticks[ring]);
-    }
-    crib
-}
-
 fn key_class(candidate: &Candidate<Clock>, period: u64) -> u64 {
     u64::try_from(candidate.key.ticks() % BigUint::from(period)).unwrap()
 }
@@ -101,7 +68,7 @@ fn a_known_key_is_recovered_as_its_gauge_orbit_and_published_by_the_convention()
     let field = rotor_field(&[(7, (0..7).collect()), (2, vec![])]);
     let board = PortPermutation::new(vec![0, 4, 6, 2, 1, 5, 3]).unwrap();
     let key = 3;
-    let crib = synthetic_crib(&field, 0, key, &board, &[0, 0], 64, 0);
+    let crib = rotor_crib(&field, 0, key, &board, &[0, 0], 64, 0).unwrap();
     let located = locate_ring(&field, 0, &crib, 1, &[0, 0], 0).unwrap();
     assert_eq!(
         located.fibre.len(),
@@ -126,10 +93,34 @@ fn a_known_key_is_recovered_as_its_gauge_orbit_and_published_by_the_convention()
     assert!(!located.fell_back);
     // A plugboard that does not fix the least port publishes the gauge-fixed member instead.
     let turned = PortPermutation::new(vec![2, 4, 6, 0, 1, 5, 3]).unwrap();
-    let crib = synthetic_crib(&field, 0, key, &turned, &[0, 0], 64, 0);
+    let crib = rotor_crib(&field, 0, key, &turned, &[0, 0], 64, 0).unwrap();
     let located = locate_ring(&field, 0, &crib, 1, &[0, 0], 0).unwrap();
     // The gauge-fixed member is `(key + t, S − t)` with `S(0) − t = 0`, so `t = S(0) = 2`.
     assert_eq!(located.published, Some((key + 2) % 7));
+}
+
+/// A drawn crib (`holarchy::terrain::RotorCrib::draw`): its truth's key and plugboard lie in the
+/// located fibre, which is one rotor-gauge orbit of seven members, and a drawn key and plugboard of a
+/// period-7 ring are named by `⌈log₂(7 · 7!)⌉ = ⌈log₂ 35280⌉ = 16` bits.
+#[test]
+fn a_drawn_crib_keeps_its_key_and_plugboard_in_the_located_fibre() {
+    let field = rotor_field(&[(7, (0..7).collect()), (2, vec![])]);
+    let crib = RotorCrib::draw(&field, 0, &[0, 0], 64, &mut Draw::new(41)).unwrap();
+    assert_eq!(crib.truth.key_bits, 16);
+    assert_eq!(crib.cells[0], crib.truth.start);
+    let located = locate_ring(&field, 0, &crib.cells, 1, &[0, 0], 0).unwrap();
+    assert_eq!(located.fibre.len(), 7);
+    let truth = located
+        .fibre
+        .iter()
+        .find(|c| key_class(c, 7) == crib.truth.key)
+        .expect("the drawn key lies in the fibre");
+    for port in &located.menu_ports {
+        assert_eq!(
+            truth.images.image(*port),
+            Some(crib.truth.board.apply(*port).unwrap())
+        );
+    }
 }
 
 /// Brute force over a ring's menu: every key with every injective image of the menu ports, kept
@@ -180,7 +171,7 @@ fn propagation_equals_brute_force_on_ring_menus() {
     let board = PortPermutation::new(vec![4, 0, 6, 2, 1, 5, 3]).unwrap();
     let mut draw = Draw::new(51);
     for length in [4usize, 6, 9] {
-        let crib = synthetic_crib(&field, 0, 2, &board, &[0, 0], length, draw.below(7));
+        let crib = rotor_crib(&field, 0, 2, &board, &[0, 0], length, draw.below(7)).unwrap();
         let random: Vec<usize> = (0..length).map(|_| draw.below(7)).collect();
         for cells in [crib, random] {
             let menu = crib_menu(&field, 0, &cells, 1, &[0, 0]).unwrap();
@@ -201,7 +192,7 @@ fn propagation_equals_brute_force_on_ring_menus() {
 fn gauge_fixing_picks_one_member_per_orbit() {
     let field = rotor_field(&[(7, vec![1, 4]), (2, vec![])]);
     let board = PortPermutation::new(vec![4, 0, 6, 2, 1, 5, 3]).unwrap();
-    let crib = synthetic_crib(&field, 0, 5, &board, &[0, 0], 12, 1);
+    let crib = rotor_crib(&field, 0, 5, &board, &[0, 0], 12, 1).unwrap();
     let located = locate_ring(&field, 0, &crib, 1, &[0, 0], 0).unwrap();
     assert!(
         located.orbits > 1,
@@ -225,7 +216,7 @@ fn gauge_fixing_picks_one_member_per_orbit() {
 fn adding_an_edge_only_shrinks_the_fibre() {
     let field = rotor_field(&[(7, vec![1, 4]), (2, vec![])]);
     let board = PortPermutation::new(vec![4, 0, 6, 2, 1, 5, 3]).unwrap();
-    let crib = synthetic_crib(&field, 0, 1, &board, &[0, 0], 24, 2);
+    let crib = rotor_crib(&field, 0, 1, &board, &[0, 0], 24, 2).unwrap();
     let keys = candidate_keys(&field, 0).unwrap();
     let restrict = |class: &(u64, Vec<Option<usize>>), ports: &[usize]| {
         (
@@ -290,7 +281,7 @@ fn an_empty_fibre_falls_back_to_the_current_configuration() {
 fn a_ring_is_located_under_the_earlier_rings_configurations() {
     let field = rotor_field(&[(3, vec![0, 1, 2]), (5, vec![])]);
     let board = PortPermutation::new(vec![3, 0, 4, 1, 2]).unwrap();
-    let crib = synthetic_crib(&field, 1, 2, &board, &[1, 0], 40, 0);
+    let crib = rotor_crib(&field, 1, 2, &board, &[1, 0], 40, 0).unwrap();
     let under_truth = locate_ring(&field, 1, &crib, 1, &[1, 0], 0).unwrap();
     let truth = |fibre: &[Candidate<Clock>]| {
         fibre
@@ -332,7 +323,7 @@ fn rekeying_leaves_the_open_moment_untouched() {
     let windings: Vec<_> = (0..2)
         .map(|g| current.winding(&field, g).unwrap())
         .collect();
-    let crib = synthetic_crib(&field, 0, 3, &board, &[0, 0], 64, 0);
+    let crib = rotor_crib(&field, 0, 3, &board, &[0, 0], 64, 0).unwrap();
     let location = locate_keys(&field, &current, &crib, 1).unwrap();
     assert_eq!(location.rings[0].published, Some(3));
     let jumps = location.rekey(&field, &mut current).unwrap();
@@ -356,7 +347,7 @@ fn rekeying_leaves_the_open_moment_untouched() {
 fn a_closing_crib_is_stepped_back_and_its_key_carried_to_the_boundary() {
     let field = rotor_field(&[(7, (0..7).collect()), (2, vec![])]);
     let board = PortPermutation::new(vec![0, 4, 6, 2, 1, 5, 3]).unwrap();
-    let crib = synthetic_crib(&field, 0, 3, &board, &[0, 0], 64, 0);
+    let crib = rotor_crib(&field, 0, 3, &board, &[0, 0], 64, 0).unwrap();
     let opening = Current::at(&field, vec![5.into(), 1.into()]).unwrap();
     let mut current = opening.clone();
     for &code in &crib {
