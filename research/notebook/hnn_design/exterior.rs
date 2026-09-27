@@ -97,6 +97,18 @@ pub fn resident_set() -> Option<(u128, u128)> {
     Some((field("VmRSS:")?, field("VmHWM:")?))
 }
 
+/// **The memory the kernel reports available**, in bytes (exterior: `/proc/meminfo`'s
+/// `MemAvailable`, read in kB), when it reads; a passage whose projected memory passes it is refused.
+#[allow(clippy::disallowed_types, clippy::disallowed_methods)]
+pub fn available_memory() -> Option<u128> {
+    let info = std::fs::read_to_string("/proc/meminfo").ok()?;
+    let line = info
+        .lines()
+        .find(|line| line.starts_with("MemAvailable:"))?;
+    let kilobytes: u128 = line.split_whitespace().nth(1)?.parse().ok()?;
+    Some(kilobytes * 1024)
+}
+
 // -------------------------------------------------------------------------------------------
 // presentation (for a person; every reading exact, never a decimal)
 

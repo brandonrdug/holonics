@@ -1,7 +1,7 @@
 //! **The landmark tree on the standing real cut, executed on its declared dyadic lattice**
-//! (Decision 28, count-only; Decisions 32, 34, 35 and 36; rebuild step 4, #73): the notebook's
-//! receipt of `holonics::hnn::landmark::{choose_depth, prequential, oracle_cost}` and of the founding
-//! law (`Founding`), a committed command run once in release, never a test.
+//! (Decision 28, count-only; Decisions 32, 34, 35 and 37; rebuild step 4, #73): the notebook's
+//! receipt of `holonics::hnn::landmark::{choose_depth, prequential, oracle_cost}` and of the
+//! storage (`Storage`), a committed command run once in release, never a test.
 //!
 //! ```sh
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin
@@ -10,30 +10,36 @@
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin prior
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin local
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/wide-real-cut.bin wide .local/cuts/standing-real-cut-campaign-1.bin
-//! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/wide-real-cut.bin converge .local/cuts/standing-real-cut-campaign-1.bin [probe 6,12,24]
+//! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/wide-real-cut.bin compact
 //! ```
 //!
-//! [definition; agent-inferred] **Convergence founding** (`converge <standing cut>`; Decision 36): the
-//! landmark tree founded at the second arrival (`landmark::Founding::SecondArrival`) on the wide cut,
-//! against Decision 28's `½` tree at `D = 6` (the depth Decision 35's memory cap admitted). The laws
-//! are Decision 28's otherwise (the `½` stop prior, the cell-only family); Decisions 32 and 34's
-//! families are not swept again.
-//! - **0. The memory and the carriers**: the convergence tree's live bytes a founded node on the
-//!   standing cut (the pending records charged to the founded nodes), its a-priori resident bound
-//!   `2 (n B + 2^B − 1)` founded-node bytes, the same at every depth, and the deepest depth the
-//!   carriers admit at `n*`, which alone bounds the sweep.
-//! - **`probe D,…`**: those depths' development passages only, each with its founded nodes, pending
-//!   records, live bytes, wall time and code: the sweep's cost, stated before the sweep runs.
-//! - **1. The depth sweep** on the development cells, `D = 1, 2, …` while the code decreases strictly
-//!   (`DepthSweep::{decreasing, of}`, the owner's rule), every depth's nodes, pending records, live
-//!   bytes, wall time and code printed; charged `⌈log₂⌉` of the depths tried and `⌈log₂ 2⌉` for the
-//!   founding law (Decision 28's tree charged `⌈log₂ 6⌉`, its depths on this cut, and the same bit).
-//! - **2. One prequential passage** over the whole cut: the chosen convergence tree (its scale checks,
-//!   and its development code checked against the sweep's), Decision 28's tree at `D = 6`, and the
-//!   baselines (uniform, order-0 and order-1 KT, PPM-2).
-//! - **3. The readings** on the development and held-out cells and the standing cut's parts, in all
-//!   and a cell at the grain; **4. the orderings** by disjoint exact enclosures: the convergence tree
-//!   against Decision 28's (charged and uncharged), and against PPM-2, order-1 and order-0.
+//! [definition; agent-inferred] **Stored where paths part** (`compact`; Decision 37): Decision 28's
+//! `½` tree over the cell-only family, stored at the faces where paths part
+//! (`landmark::Storage::Compacted`: a chain with its bottom is one node at the summed rung), on the
+//! wide cut. The prior is Decision 28's, so no family is swept again; only the depth is re-chosen,
+//! because memory no longer caps it. Decision 36's `converge` mode, which measured founding at the
+//! second arrival, is retired with its Rust realization (commit `d137e8a6`; its receipt is in
+//! THE_REBUILD's Decision 36).
+//! - **0. The family and the budget**, stated before any passage: `D = 6, 12, 24, 48` and the
+//!   deepest depth the carriers admit at `n*`, charged `⌈log₂ 5⌉` bits; about two minutes a
+//!   passage, the sweep stopped by a passage past four minutes; the a-priori size, `2n − 1` nodes a
+//!   tree reached by `n` arrivals at every depth. Before every passage its projected memory (the
+//!   a-priori nodes at the bytes a node measured, with its label pool) is checked against Brandon's
+//!   20 GB cap and the memory the kernel reports available, and a passage past either is refused.
+//! - **1. `D = 6` on the development cells**: Decision 28's full arena and the compacted tree, one
+//!   passage each, each code exact with its certified residuals summed, its nodes, label letters,
+//!   live bytes and wall time; the two codes are equal within the sum of their certificates (both
+//!   lie within their certificates of the same ideal code).
+//! - **2. The depth sweep** of the compacted tree on the development cells, doubling from 6 while the
+//!   code falls strictly (`DepthSweep::{decreasing, of}`, the owner's rule), every depth's code,
+//!   nodes, label letters, live bytes and wall time.
+//! - **3. The choice**: the chosen depth's code charged `⌈log₂ 5⌉`, against Decision 28's tree at
+//!   `D = 6` charged `⌈log₂ 6⌉` (Decision 35's family on these cells; Decision 36 added one bit for
+//!   its founding law, which Decision 37 does not choose), by disjoint exact enclosures.
+//! - **4. One held-out passage** of the chosen tree over the whole cut, every cell scored at the
+//!   standing before its own deposit, beside Decision 28's tree at `D = 6` and the baselines
+//!   (order-0 and order-1 KT, PPM-2), re-read and choosing nothing: each in all and a cell at the
+//!   grain, and the orderings by disjoint exact enclosures.
 //!
 //! [definition; agent-inferred] **The wide cut** (`wide <standing cut>`; Decision 35): the
 //! count-only receiver's tree and Decision 34's adopted law read in one prequential passage over a
@@ -191,12 +197,12 @@ use rayon::prelude::*;
 use holonics::compression::cost::ceil_log2;
 use holonics::hnn::born::{Born, BornDeclaration, Emission};
 use holonics::hnn::landmark::{
-    ChartReport, Coded, DepthSweep, FaceJoins, Feature, Founding, IdealLandmarks, JoinTree,
+    ChartReport, Coded, DepthSweep, FaceJoins, Feature, IdealLandmarks, JoinTree,
     LandmarkDeclaration, Landmarks, Letter, LetterFamily, LocalLaw, OracleCost, PassageCode,
-    PriorSweep, StopMixture, StopPrior, TreeRun, Widths, address, cell_letters, choose_depth,
-    choose_depth_within, choose_prior, code_length, development, development_run, ladder_top,
-    odometer_digits, oracle_cost, prequential, prior_family, ratio_code_length, rescale_split,
-    tree_prequential,
+    PriorSweep, StopMixture, StopPrior, Storage, TreeRun, Widths, address, cell_letters,
+    choose_depth, choose_depth_within, choose_prior, code_length, development, development_run,
+    ladder_top, odometer_digits, oracle_cost, prequential, prior_family, ratio_code_length,
+    rescale_split, tree_prequential,
 };
 use holonics::hnn::ratio::interval_sum;
 use holonics::hnn::receiving::clock_letters;
@@ -2655,15 +2661,13 @@ const SLOTS: [&str; 4] = [
 ];
 
 /// **A whole passage's tree, read on the parts**: every cell scored at the standing before its own
-/// deposit; the faces' products per slot, the tree's chart, founded nodes, pending first arrivals
-/// (Decision 36), stored bits, rule and largest certified residual, its live bytes when counted
-/// alone, and its wall time.
+/// deposit; the faces' products per slot, the tree's chart, stored nodes, stored bits, rule and
+/// largest certified residual, its live bytes when counted alone, and its wall time.
 struct TreePass {
     codes: [PassageCode; 4],
     chart: ChartReport,
     widths: Widths,
     nodes: usize,
-    pending: usize,
     bits: u64,
     rule: Rat,
     largest: Rat,
@@ -2674,16 +2678,13 @@ struct TreePass {
 fn tree_pass(
     cells: &[usize],
     declaration: &LandmarkDeclaration,
-    founding: Founding,
     parts: &Parts,
     count: bool,
 ) -> TreePass {
     let clock = Instant::now();
     counting(count);
     let before = live();
-    let mut tree = Landmarks::new(declaration.clone())
-        .and_then(|tree| tree.founded_at(founding))
-        .expect("a declared tree");
+    let mut tree = Landmarks::new(declaration.clone()).expect("a declared tree");
     let mut codes = [PassageCode::new(); 4];
     let mut largest = Rat::zero();
     for (position, &class) in cells.iter().enumerate() {
@@ -2706,7 +2707,6 @@ fn tree_pass(
         chart: tree.chart(),
         widths: tree.widths(),
         nodes: tree.nodes(),
-        pending: tree.pending(),
         bits: tree.bits(),
         rule: tree.face_rule(),
         largest,
@@ -2963,7 +2963,7 @@ fn wide_harness(path: &str, standing_path: &str) {
     println!(
         "2. one prequential passage over the whole cut at D = {depth}, every cell scored at the standing before its own deposit, each coder read on the parts:"
     );
-    let tree = tree_pass(&cells, &at, Founding::FirstArrival, &parts, true);
+    let tree = tree_pass(&cells, &at, &parts, true);
     scale_readings(
         &format!("the ½ tree at D = {depth}"),
         &tree,
@@ -3049,66 +3049,123 @@ fn wide_harness(path: &str, standing_path: &str) {
 }
 
 // -------------------------------------------------------------------------------------------
-// Decision 36: a landmark is founded where paths converge (`converge`)
+// Decision 37: the tree is stored at the faces where paths part (`compact`)
 
 /// Decision 35's depth sweep of the `½` tree on the wide cut's development cells tried `D = 1..6`
 /// (its receipt): Decision 28's tree at `D = 6` is charged `⌈log₂ 6⌉` bits.
 const DECISION_35_DEPTHS: usize = 6;
 
-/// The founding laws declared (Decisions 28 and 36): the comparison chooses one of two, and each
-/// is charged `⌈log₂ 2⌉` bits beside its depth's.
-const FOUNDING_LAWS: usize = 2;
+/// Decision 35's receipt: the full arena held 178 bytes a node on the wide cut (its a-priori
+/// bound  nodes at those bytes projects the full arena's passage).
+const DECISION_35_NODE_BYTES: u128 = 178;
 
-/// **One development passage of a tree under a founding law**, counted alone: its code over the
-/// development cells (the population's faces' product, enclosed once), founded nodes, pending
-/// first arrivals, live bytes, widths and wall time.
-struct DepthPass {
+/// **The declared doubling family** (Decision 37, stated before any passage): `D = 6, 12, 24, 48`,
+/// then the deepest depth the carriers admit at the cut's population.
+const DOUBLING: [usize; 4] = [6, 12, 24, 48];
+
+/// **A passage's budget**, stated in advance: about two minutes; a passage past four minutes stops
+/// the sweep there, and the depth is chosen among what was measured.
+const PASSAGE_STOP_MS: u128 = 240_000;
+
+/// **One passage of a tree over a stream**, its tree counted alone on its thread: the faces'
+/// products on `[development, held out]` (cells before and from `development`), the certified
+/// per-cell residuals summed on each part (bits, exact), and the stored nodes, label letters, live
+/// bytes, widths, chart, rule, largest residual and wall time.
+struct Pass {
     depth: usize,
-    bits: ExactInterval,
+    storage: Storage,
+    codes: [PassageCode; 2],
+    residuals: [Rat; 2],
     nodes: usize,
-    pending: usize,
+    held: usize,
     bytes: usize,
     widths: Widths,
+    chart: ChartReport,
+    rule: Rat,
+    largest: Rat,
     wall: u128,
 }
 
-fn depth_pass(dev: &[usize], declaration: &LandmarkDeclaration, founding: Founding) -> DepthPass {
+fn pass(
+    cells: &[usize],
+    development: usize,
+    declaration: &LandmarkDeclaration,
+    storage: Storage,
+) -> Pass {
     let clock = Instant::now();
     counting(true);
     let before = live();
     let mut tree = Landmarks::new(declaration.clone())
-        .and_then(|tree| tree.founded_at(founding))
+        .and_then(|tree| tree.with_storage(storage))
         .expect("a declared tree");
-    let mut code = PassageCode::new();
-    for (position, &class) in dev.iter().enumerate() {
+    let mut codes = [PassageCode::new(); 2];
+    let mut residuals = [Rat::zero(), Rat::zero()];
+    let mut largest = Rat::zero();
+    for (position, &class) in cells.iter().enumerate() {
         let reading = tree
-            .receive(&address(dev, position, declaration.depth), class)
+            .receive(&address(cells, position, declaration.depth), class)
             .expect("a cell within the declaration");
-        code.face(&reading.executed).expect("a positive face");
+        let part = usize::from(position >= development);
+        codes[part]
+            .face(&reading.executed)
+            .expect("a positive face");
+        residuals[part] += &reading.residual;
+        if reading.residual > largest {
+            largest = reading.residual;
+        }
     }
     let bytes = grown(before);
     counting(false);
-    DepthPass {
+    Pass {
         depth: declaration.depth,
-        bits: bits_of(&code),
+        storage,
+        codes,
+        residuals,
         nodes: tree.nodes(),
-        pending: tree.pending(),
+        held: tree.held(),
         bytes,
         widths: tree.widths(),
+        chart: tree.chart(),
+        rule: tree.face_rule(),
+        largest,
         wall: clock.elapsed().as_millis(),
     }
 }
 
-fn depth_line(pass: &DepthPass, cells: u64, grain: u64) {
+/// A passage's line: its code on a part (exact, at the grain, and a cell), its certified residual,
+/// and its stored nodes, label letters, live bytes and wall time.
+fn pass_line(pass: &Pass, part: usize, cells: u64, grain: u64) {
+    let bits = bits_of(&pass.codes[part]);
     println!(
-        "  D = {} ({}): {}; a cell {}; {} founded, {} pending, {} live bytes; {} ms",
+        "  D = {} ({}, {}): {}; a cell {}",
         pass.depth,
+        pass.storage,
         widths(&pass.widths),
-        enclosure(&pass.bits, grain),
-        per(&pass.bits, cells, grain),
+        enclosure(&bits, grain),
+        per(&bits, cells, grain)
+    );
+    println!(
+        "    certified residuals summed: at most {} bits; the largest a cell {} bits, {} the rule ({} bits)",
+        exact(&dyadic_ceiling(&pass.residuals[part])),
+        exact(&dyadic_ceiling(&pass.largest)),
+        if pass.largest <= pass.rule {
+            "within"
+        } else {
+            "ABOVE"
+        },
+        exact(&dyadic_ceiling(&pass.rule))
+    );
+    println!(
+        "    {} nodes stored, {} label letters, {} live bytes ({} rem {} over {} a node); {} rebases ({} at the most-rebased node), the largest drift ≤ {} bits; {} ms",
         pass.nodes,
-        pass.pending,
+        pass.held,
         pass.bytes,
+        pass.bytes / pass.nodes.max(1),
+        pass.bytes % pass.nodes.max(1),
+        pass.nodes,
+        pass.chart.rebases,
+        pass.chart.node_rebases,
+        exact(&dyadic_ceiling(&pass.chart.drift)),
         pass.wall
     );
 }
@@ -3128,22 +3185,32 @@ fn deepest_admitted(declared: &LandmarkDeclaration) -> usize {
     depth
 }
 
-/// **Decision 36's pass on the wide cut** (`converge <standing cut> [probe D,…]`; module header,
-/// "Convergence founding"): the memory and the carriers' admission, then the convergence-founded
-/// tree's depth sweep on the development cells (every depth's nodes, pending records, live bytes,
-/// wall time and code), then one prequential passage over the whole cut of the chosen tree,
-/// Decision 28's `½` tree at `D = 6` and the baselines, read on the parts and ordered. With
-/// `probe`, only the listed depths' development passages, for the sweep's cost stated before it
-/// runs.
+/// **A passage's projected memory** (stated before it runs): the compacted tree's a-priori nodes
+/// `2 n B` (each arrival founds at most an upper part and a leaf in each of its at most `B` digit
+/// trees) at the bytes a node measured on an earlier compacted passage, and its label pool's
+/// `n D` letters of 4 bytes; doubled for the vectors' and the table's growth.
+fn projected(cells: u128, digits: u128, depth: u128, node_bytes: u128) -> u128 {
+    2 * (2 * cells * digits * node_bytes + 4 * cells * depth)
+}
+
+/// **Whether a passage may run**: its projection within the cap and within the memory the kernel
+/// reports available now (printed), else refused.
+fn admitted(label: &str, projection: u128) -> bool {
+    let available = exterior::available_memory();
+    let fits = projection <= CAP && available.is_none_or(|free| projection <= free);
+    println!(
+        "  memory before {label}: {} bytes available, the projection {projection} bytes, the cap {CAP}: {}",
+        available.map_or_else(|| "unread".to_string(), |free| free.to_string()),
+        if fits { "admitted" } else { "REFUSED" }
+    );
+    fits
+}
+
+/// **Decision 37's pass on the wide cut** (`compact`; module header, "Stored where paths part").
 #[allow(clippy::too_many_lines)]
-fn converge_harness(path: &str, standing_path: &str, probe: Option<Vec<usize>>) {
+fn compact_harness(path: &str) {
     let setup = Instant::now();
     let (bytes, count, held) = read_cut(path);
-    let (standing_bytes, standing_count, standing_held) = read_cut(standing_path);
-    assert!(
-        bytes.ends_with(&standing_bytes),
-        "the wide cut holds the standing cut as its tail"
-    );
     let field = Field::declare(FieldDeclaration::campaign_one(count as u64))
         .expect("campaign 1's declared field over the cut");
     let grain = receiver_grain(&field);
@@ -3155,238 +3222,272 @@ fn converge_harness(path: &str, standing_path: &str, probe: Option<Vec<usize>>) 
         held_out: vec![held.clone()],
     };
     let dev = development(&cut);
-    let offset = count - standing_count;
-    let parts = Parts {
-        held: held.clone(),
-        standing: offset..count,
-        standing_held: offset + standing_held.start..count,
-    };
-    let counts = parts.counts(count);
+    assert_eq!(
+        dev.as_slice(),
+        &cells[..held.start],
+        "the held-out range closes the cut"
+    );
+    let (n_dev, n_held) = (dev.len() as u64, held.len() as u64);
     let declared = LandmarkDeclaration {
         alphabet,
-        depth: 1,
+        depth: DECISION_35_DEPTHS,
         forced: 0,
         population: count as u64,
         grain,
         family: LetterFamily::cells(),
         prior: StopPrior::half(),
     };
+    let at = |depth: usize| LandmarkDeclaration {
+        depth,
+        ..declared.clone()
+    };
     println!(
-        "hnn_landmark converge: a landmark is founded where paths converge, at its second arrival (Decision 36), over the cut file {path}"
+        "hnn_landmark compact: the tree stored at the faces where paths part (Decision 37), over the cut file {path}"
     );
     println!(
-        "cut: {count} cells, |A| = {alphabet}, B = {digits}; held out: cells {}..{} ({} cells, from the manifest); development: {} cells; n* = {count}, L_R = {grain}; the standing cut ({standing_count} cells) is its tail, cells {offset}..{count}",
-        held.start,
-        held.end,
-        held.len(),
-        dev.len(),
+        "cut: {count} cells, |A| = {alphabet}, B = {digits}; held out: cells {}..{} ({n_held} cells, from the manifest); development: {n_dev} cells; n* = {count}, L_R = {grain}; the ½ stop prior, the cell-only family",
+        held.start, held.end,
     );
     println!();
 
-    // 0. The memory and the carriers' admission.
-    let standing_cells: Vec<usize> = standing_bytes.iter().map(|&b| usize::from(b)).collect();
-    let measured_depth = DECISION_35_DEPTHS;
-    counting(true);
-    let before = live();
-    let mut measured = Landmarks::new(LandmarkDeclaration {
-        depth: measured_depth,
-        population: standing_count as u64,
-        ..declared.clone()
-    })
-    .and_then(|tree| tree.founded_at(Founding::SecondArrival))
-    .expect("the standing cut's convergence tree");
-    for (position, &cell) in standing_cells.iter().enumerate() {
-        measured
-            .receive(&address(&standing_cells, position, measured_depth), cell)
-            .expect("a cell");
-    }
-    let measured_bytes = grown(before) as u128;
-    counting(false);
-    let founded = measured.nodes() as u128;
-    let per_node = measured_bytes.div_ceil(founded);
-    let n = count as u128;
-    let keys = n * u128::from(digits);
-    let nodes_bound = keys + (1u128 << digits) - 1;
-    let bound = 2 * nodes_bound * per_node;
-    println!(
-        "0. memory (the cap {CAP} bytes): on the standing cut the convergence-founded tree at D = {measured_depth} founds {founded} nodes and holds {} pending first arrivals in {measured_bytes} live bytes, {per_node} bytes a founded node with the pending records charged to them ({} rem {} over {founded})",
-        measured.pending(),
-        measured_bytes / founded,
-        measured_bytes % founded
-    );
-    println!(
-        "  a passage of n cells founds at most n B + 2^B − 1 = {nodes_bound} nodes and holds at most n B = {keys} pending records at every depth: the resident bound 2 (n B + 2^B − 1) · {per_node} = {bound} bytes, {} the cap, at every depth (Decision 28's tree founds up to n B D + 2^B − 1 nodes, which capped it at D ≤ {DECISION_35_DEPTHS})",
-        if bound <= CAP { "within" } else { "ABOVE" }
-    );
+    // 0. The family, its charge, and the memory.
     let deepest = deepest_admitted(&declared);
-    let top = Landmarks::new(LandmarkDeclaration {
-        depth: deepest,
-        ..declared.clone()
-    })
-    .expect("the deepest admitted depth");
+    let family: Vec<usize> = DOUBLING
+        .iter()
+        .copied()
+        .filter(|&depth| depth < deepest)
+        .chain([deepest])
+        .collect();
+    let charge = family_charge(family.len());
+    let union = family_charge(DECISION_35_DEPTHS + family.len() - 1);
+    let incumbent_charge = family_charge(DECISION_35_DEPTHS);
     println!(
-        "  the carriers admit D ≤ {deepest} at n* = {count} ({} at D = {deepest}; the largest u128 operand {} bits); the sweep stops there at the latest",
-        widths(&top.widths()),
-        top.widths().operand_bits(count as u64)
+        "0. the declared family, doubling from 6 to the carriers' limit (D ≤ {deepest} at n* = {count}): D = {family:?}, charged ⌈log₂ {}⌉ = {charge} bits; Decision 28's tree at D = 6 was chosen from D = 1..6 on these cells (Decision 35), charged ⌈log₂ 6⌉ = {incumbent_charge} (Decision 36 added its founding law's bit); the union of both families, {} depths, would charge each ⌈log₂ {}⌉ = {union}",
+        family.len(),
+        DECISION_35_DEPTHS + family.len() - 1,
+        DECISION_35_DEPTHS + family.len() - 1,
+    );
+    println!(
+        "  the budget, stated in advance: about two minutes a passage; a passage past {PASSAGE_STOP_MS} ms stops the sweep; at most {} development passages of the compacted tree",
+        family.len()
+    );
+    println!(
+        "  the a-priori size at every depth: a tree reached by n arrivals stores at most 2n − 1 nodes, so a passage of n cells at most 2 n B = {} nodes (development), and its label pool at most n D letters",
+        2 * u128::from(n_dev) * u128::from(digits)
     );
     println!();
 
-    if let Some(depths) = probe {
-        println!(
-            "probe (the sweep's cost, stated before it runs): development passages of the convergence-founded tree"
-        );
-        for depth in depths {
-            let pass = depth_pass(
-                &dev,
-                &LandmarkDeclaration {
-                    depth,
-                    ..declared.clone()
-                },
-                Founding::SecondArrival,
-            );
-            depth_line(&pass, dev.len() as u64, grain);
-        }
-        println!(
-            "wall time (exterior): the probe {} ms; the process's resident peak {}",
-            setup.elapsed().as_millis(),
-            resident()
-        );
+    // 1. D = 6: the compacted tree against the full arena, the development cells only.
+    println!(
+        "1. D = 6 on the development cells, one passage each: Decision 28's full arena and the compacted tree (the same prior: every executed face within its certificate of the same ideal face)"
+    );
+    let first_bytes = DECISION_35_NODE_BYTES;
+    if !admitted(
+        "the full arena at D = 6",
+        u128::from(n_dev) * u128::from(digits) * 6 * first_bytes,
+    ) {
         return;
     }
-
-    // 1. The depth sweep on the development cells, in concurrent chunks within the cap.
-    let clock = Instant::now();
-    let workers = std::thread::available_parallelism().map_or(1, usize::from);
-    let concurrent = usize::try_from(CAP / bound).unwrap_or(1).clamp(1, workers);
-    println!(
-        "1. the depth sweep of the convergence-founded tree on the development cells ({} cells), D = 1.. while the code decreases strictly (DepthSweep's rule), D ≤ {deepest}; {concurrent} depths at once (⌊{CAP}/{bound}⌋ trees at the a-priori bound, within {workers} workers), each tree built, read and counted alone on its worker; the choice reads only the depths up to the stop:",
-        dev.len()
-    );
-    let mut tried: Vec<(usize, ExactInterval)> = Vec::new();
-    let (mut next, mut beyond) = (1usize, 0usize);
-    'sweep: while next <= deepest {
-        let chunk: Vec<usize> = (next..=(next + concurrent - 1).min(deepest)).collect();
-        next += chunk.len();
-        let passes: Vec<DepthPass> = chunk
-            .par_iter()
-            .map(|&depth| {
-                depth_pass(
-                    &dev,
-                    &LandmarkDeclaration {
-                        depth,
-                        ..declared.clone()
-                    },
-                    Founding::SecondArrival,
-                )
-            })
-            .collect();
-        for (index, pass) in passes.iter().enumerate() {
-            depth_line(pass, dev.len() as u64, grain);
-            tried.push((pass.depth, pass.bits.clone()));
-            if !DepthSweep::decreasing(&tried) {
-                beyond = passes.len() - index - 1;
-                break 'sweep;
-            }
-        }
+    let full = pass(&dev, dev.len(), &at(6), Storage::Full);
+    pass_line(&full, 0, n_dev, grain);
+    if !admitted(
+        "the compacted tree at D = 6",
+        projected(u128::from(n_dev), u128::from(digits), 6, first_bytes),
+    ) {
+        return;
     }
-    if beyond > 0 {
-        println!(
-            "  ({beyond} deeper depths of the last chunk were computed beside the stop and are not tried)"
+    let compact = pass(&dev, dev.len(), &at(6), Storage::Compacted);
+    pass_line(&compact, 0, n_dev, grain);
+    let (full_bits, compact_bits) = (bits_of(&full.codes[0]), bits_of(&compact.codes[0]));
+    let delta = difference_interval(&compact_bits, &full_bits);
+    let certificates = &full.residuals[0] + &compact.residuals[0];
+    let within = delta.lower <= certificates && -&certificates <= delta.upper;
+    println!(
+        "  compacted − full: {}; the certificates' sum {} bits: {}",
+        difference(&compact_bits, &full_bits, grain),
+        exact(&dyadic_ceiling(&certificates)),
+        if within {
+            "equal within their certificates"
+        } else {
+            "NOT within their certificates"
+        }
+    );
+    println!(
+        "  the compacted tree stores {} of the full arena's {} nodes in {} of its {} live bytes",
+        compact.nodes, full.nodes, compact.bytes, full.bytes
+    );
+    println!("  peak resident so far: {}", resident());
+    println!();
+
+    // 2. The depth sweep of the compacted tree, doubling, until the code rises.
+    println!(
+        "2. the depth sweep of the compacted tree on the development cells, D = {family:?} until the code rises (DepthSweep's rule), within the budget:"
+    );
+    let node_bytes = |pass: &Pass| {
+        let letters = 4 * pass.held as u128;
+        (pass.bytes as u128)
+            .saturating_sub(letters)
+            .div_ceil(pass.nodes.max(1) as u128)
+    };
+    let mut tried: Vec<(usize, ExactInterval)> = vec![(6, compact_bits.clone())];
+    let mut passes = vec![compact];
+    let mut stopped = None;
+    for &depth in &family[1..] {
+        let last = passes.last().expect("a passage");
+        if !DepthSweep::decreasing(&tried) {
+            break;
+        }
+        if last.wall > PASSAGE_STOP_MS {
+            stopped = Some(format!(
+                "the passage at D = {} took {} ms, past {PASSAGE_STOP_MS}",
+                last.depth, last.wall
+            ));
+            break;
+        }
+        let projection = projected(
+            u128::from(n_dev),
+            u128::from(digits),
+            depth as u128,
+            node_bytes(last),
         );
+        if !admitted(&format!("D = {depth}"), projection) {
+            stopped = Some(format!("the projection at D = {depth} was refused"));
+            break;
+        }
+        let run = pass(&dev, dev.len(), &at(depth), Storage::Compacted);
+        pass_line(&run, 0, n_dev, grain);
+        tried.push((depth, bits_of(&run.codes[0])));
+        passes.push(run);
+    }
+    if let Some(reason) = &stopped {
+        println!("  the sweep stopped: {reason}");
     }
     let sweep = DepthSweep::of(tried).expect("at least one depth");
+    let chosen = sweep.chosen;
     let chosen_bits = sweep
         .tried
         .iter()
-        .find(|(depth, _)| *depth == sweep.chosen)
+        .find(|(depth, _)| *depth == chosen)
         .map(|(_, bits)| bits.clone())
         .expect("the chosen depth was tried");
-    let founding_bits = family_charge(FOUNDING_LAWS);
-    let converged_bits = sweep.description_bits + founding_bits;
-    let first_bits = family_charge(DECISION_35_DEPTHS) + founding_bits;
     println!(
-        "  chosen D = {} of {} tried ({} ms); charged ⌈log₂ {}⌉ = {} depth bits and ⌈log₂ {FOUNDING_LAWS}⌉ = {founding_bits} for the founding law, {converged_bits} bits; Decision 28's ½ tree at D = {DECISION_35_DEPTHS} charged ⌈log₂ {DECISION_35_DEPTHS}⌉ + {founding_bits} = {first_bits} bits",
-        sweep.chosen,
+        "  chosen D = {chosen} of {} tried ({}); peak resident so far: {}",
         sweep.tried.len(),
-        clock.elapsed().as_millis(),
-        sweep.tried.len(),
-        sweep.description_bits
+        if DepthSweep::decreasing(&sweep.tried) {
+            "the code fell at every depth tried"
+        } else {
+            "the last depth's code did not fall below the one before"
+        },
+        resident()
     );
     println!();
 
-    // 2. One prequential passage over the whole cut.
-    let at = LandmarkDeclaration {
-        depth: sweep.chosen,
-        ..declared.clone()
-    };
-    let at_first = LandmarkDeclaration {
-        depth: DECISION_35_DEPTHS,
-        ..declared.clone()
-    };
+    // 3. The choice against Decision 28's tree at D = 6.
     println!(
-        "2. one prequential passage over the whole cut, every cell scored at the standing before its own deposit, each coder read on the parts:"
+        "3. the development cells' choice: the compacted tree at D = {chosen} charged {charge} bits against Decision 28's tree at D = 6 charged {incumbent_charge} (the union charge, {union} each, moves neither):"
     );
-    let converged = tree_pass(&cells, &at, Founding::SecondArrival, &parts, true);
-    scale_readings(
-        &format!("the convergence-founded tree at D = {}", sweep.chosen),
-        &converged,
-        count as u64,
-        grain,
+    let charged_chosen = charged(&chosen_bits, charge);
+    let charged_full = charged(&full_bits, incumbent_charge);
+    println!(
+        "  the compacted tree at D = {chosen}: {}",
+        enclosure(&charged_chosen, grain)
     );
     println!(
-        "    {} pending first arrivals; check: its development code is the sweep's at D = {}: {}",
-        converged.pending,
-        sweep.chosen,
-        bits_of(&converged.codes[0]) == chosen_bits
+        "  Decision 28's tree at D = 6: {}",
+        enclosure(&charged_full, grain)
     );
-    let first = tree_pass(&cells, &at_first, Founding::FirstArrival, &parts, true);
-    scale_readings(
-        &format!("Decision 28's ½ tree at D = {DECISION_35_DEPTHS}"),
-        &first,
-        count as u64,
+    ordering(
+        "the compacted tree against Decision 28's, charged",
+        &charged_chosen,
+        &charged_full,
+        n_dev,
         grain,
     );
+    println!();
+
+    // 4. One held-out passage at the chosen depth.
+    println!(
+        "4. one prequential passage over the whole cut at D = {chosen}, every cell scored at the standing before its own deposit; beside it Decision 28's tree at D = 6 and the baselines re-read (choosing nothing):"
+    );
+    let projection = passes
+        .iter()
+        .find(|pass| pass.depth == chosen)
+        .map_or(0, |pass| {
+            projected(
+                count as u128,
+                u128::from(digits),
+                chosen as u128,
+                node_bytes(pass),
+            )
+        });
+    if !admitted(&format!("the held-out passage at D = {chosen}"), projection) {
+        return;
+    }
+    let whole = pass(&cells, held.start, &at(chosen), Storage::Compacted);
+    pass_line(&whole, 1, n_held, grain);
+    println!(
+        "    check: its development code is the sweep's at D = {chosen}: {}",
+        bits_of(&whole.codes[0]) == chosen_bits
+    );
+    let incumbent = pass(&cells, held.start, &at(6), Storage::Full);
+    pass_line(&incumbent, 1, n_held, grain);
+    println!(
+        "    check: its development code is step 1's: {}",
+        bits_of(&incumbent.codes[0]) == full_bits
+    );
+    let parts = Parts {
+        held: held.clone(),
+        standing: count..count,
+        standing_held: count..count,
+    };
     let (baselines, baselines_ms) = baselines_pass(&cells, alphabet, &parts);
     println!(
         "  the baselines ({}): {baselines_ms} ms",
         BASELINES.join(", ")
     );
-    println!("  peak resident so far: {}", resident());
     println!();
-
-    println!("3. the readings (bits at L_R = {grain}, uncharged):");
-    let converged_label = format!("the convergence-founded tree at D = {}", sweep.chosen);
-    let first_label = format!("Decision 28's ½ tree at D = {DECISION_35_DEPTHS}");
-    part_readings(&converged_label, &converged.codes, &counts, grain);
-    part_readings(&first_label, &first.codes, &counts, grain);
-    for (codes, name) in baselines.iter().zip(BASELINES) {
-        part_readings(name, codes, &counts, grain);
+    println!("  held out ({n_held} cells), bits at L_R = {grain}, uncharged:");
+    let rows: Vec<(String, ExactInterval)> = [
+        (
+            format!("the compacted tree at D = {chosen}"),
+            bits_of(&whole.codes[1]),
+        ),
+        (
+            "Decision 28's tree at D = 6".to_string(),
+            bits_of(&incumbent.codes[1]),
+        ),
+    ]
+    .into_iter()
+    .chain(
+        BASELINES
+            .iter()
+            .enumerate()
+            .skip(1)
+            .map(|(index, name)| (name.to_string(), bits_of(&baselines[index][1]))),
+    )
+    .collect();
+    for (name, bits) in &rows {
+        println!("    {name}: {}", enclosure(bits, grain));
+        println!("      a cell {}", per(bits, n_held, grain));
     }
     println!();
-
-    println!("4. the orderings, each by disjoint exact enclosures:");
-    part_orderings(
+    println!("  held out, the orderings, each by disjoint exact enclosures:");
+    let chosen_held = charged(&rows[0].1, charge);
+    ordering(
         &format!(
-            "the convergence-founded tree charged {converged_bits} bits against Decision 28's ½ tree at D = {DECISION_35_DEPTHS} charged {first_bits}"
+            "the compacted tree charged {charge} bits against Decision 28's tree at D = 6 charged {incumbent_charge}"
         ),
-        (&converged.codes, converged_bits),
-        (&first.codes, first_bits),
-        &counts,
+        &chosen_held,
+        &charged(&rows[1].1, incumbent_charge),
+        n_held,
         grain,
     );
-    part_orderings(
-        "the convergence-founded tree against Decision 28's, both uncharged",
-        (&converged.codes, 0),
-        (&first.codes, 0),
-        &counts,
-        grain,
-    );
-    for (index, name) in BASELINES.iter().enumerate().skip(1).rev() {
-        part_orderings(
-            &format!("the convergence-founded tree charged {converged_bits} bits against {name}"),
-            (&converged.codes, converged_bits),
-            (&baselines[index], 0),
-            &counts,
+    for (name, bits) in rows.iter().skip(2) {
+        ordering(
+            &format!("the compacted tree charged {charge} bits against {name}"),
+            &chosen_held,
+            bits,
+            n_held,
             grain,
         );
     }
@@ -3418,18 +3519,8 @@ fn main() {
             wide_harness(value, standing);
             return;
         }
-        [key, value, mode, standing] if key == "cut-file" && mode == "converge" => {
-            converge_harness(value, standing, None);
-            return;
-        }
-        [key, value, mode, standing, probe, depths]
-            if key == "cut-file" && mode == "converge" && probe == "probe" =>
-        {
-            let depths = depths
-                .split(',')
-                .map(|depth| depth.parse().expect("a depth"))
-                .collect();
-            converge_harness(value, standing, Some(depths));
+        [key, value, mode] if key == "cut-file" && mode == "compact" => {
+            compact_harness(value);
             return;
         }
         [key, value, mode, with]
@@ -3440,7 +3531,7 @@ fn main() {
         }
         _ => {
             println!(
-                "usage: hnn_landmark cut-file <path> [letters [contacts] | prior | local | wide <standing cut> | converge <standing cut> [probe D,…]]"
+                "usage: hnn_landmark cut-file <path> [letters [contacts] | prior | local | wide <standing cut> | compact]"
             );
             return;
         }
