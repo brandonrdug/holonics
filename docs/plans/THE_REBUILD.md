@@ -3110,9 +3110,16 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
       depth. So each node holds the same counts and the same KT face `P_e`.
       - With `ρ = P_w/P_e`, the weighting reads `1 − ρ_j = (1 − w_j)(1 − ρ_(j+1))`. For the dyadic
         rungs `w_i = 1 − 2^(−j_i)` this gives `1 − ρ_top = 2^(−Σ j_i)(1 − ρ_bottom)`, an exact shift.
-      - The chain's stop weights compose to `∏ 1/(1 + β_i) = 2^(−Σ j_i) ρ_bottom/ρ_top`.
-      - A chain that ends at the declared depth (a leaf) has `ρ = 1` at every node, so it reads as
-        one KT node.
+      - So a chain with the node below it is one Decision 28 node whose rung is the chain's summed
+        rung. With `X` the product of the bottom's children, `P_w(top) = W E + (1 − W) X` with
+        `1 − W = 2^(−Σ j_i)`. It is founded at `β₀ = 2^(Σ j_i) − 1`, and its `β` steps by the
+        unchanged law.
+      - A chain that ends at the declared depth (a leaf, `w = 1` there) has `ρ = 1` at every node,
+        so it reads as one KT node.
+      - A split at a chain's depth `k` cuts its rung into `S = S_up + S_low`. The lower part keeps
+        its counts at `β_ℓ = β (2^(S_low) − 1)/(2^S − 1)`. The upper part holds the same counts at
+        `β_u = (2^(S_up) − 1) 2^(S_low) β_ℓ / ((2^(S_low) − 1)(β_ℓ + 1))`, which is
+        `2^(S_up) − 1` above a leaf.
     - **What is stored.** The compacted tree stores:
       - the root;
       - each node with at least two reached children, where paths part;
