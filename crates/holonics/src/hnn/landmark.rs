@@ -255,6 +255,14 @@
 //! charged, and below online order-0, order-1 and PPM-2; the node-local law reads `+17 + 3/16 + ε`
 //! above the tree.
 //!
+//! [established-bounded; measured] **On the wide cut** (notebook `hnn_landmark -- … wide`, Decision
+//! 35; `2^20` cells, the final `2^17` held out; `D = 6`, the deepest the 20 GB cap admits, chosen on
+//! the development cells): `½` stays first of Decision 32's 529 laws. Held out, the `½` tree reads
+//! `1 + 15/16 + ε` a cell, `−133980 + 11/16 + ε` bits below PPM-2 charged (a cell
+//! `−2 + 15/16 + ε`), and the stop-weight mixture charged 15 bits lies `−38 + 7/16 + ε` below it
+//! (uncharged `−50 + 7/16 + ε`); on the standing cut's own cells, read at the wide standing, it lies
+//! above the tree.
+//!
 //! [definition; agent-inferred] **The depth, the family and the prior** are chosen on the development
 //! cells only ([`choose_depth`], [`choose_prior`]): `D` increases from `max(1, forced)` while the
 //! development prequential code length decreases strictly (disjoint exact enclosures), every `D`
@@ -262,9 +270,9 @@
 //! prior of the declared family ([`prior_family`]: the global ladder `j = 1, …, J`, then the
 //! per-depth pairs `(j_root, j_below)`, `J = ⌈log₂(n* B)⌉`, [`ladder_top`]) runs its own depth sweep,
 //! and the choice is charged `⌈log₂⌉` of the laws tried. The held-out cells never choose anything.
-//! [agent-inferred] A declared deepest depth bounds both sweeps ([`choose_depth_within`],
-//! [`choose_prior_within`]; Decision 35): the resident memory cap bounds a tree's a-priori founded
-//! nodes `n* B D + 2^B − 1`, and so its depth at a population.
+//! [agent-inferred] A declared deepest depth bounds the depth sweep ([`choose_depth_within`];
+//! Decision 35): the resident memory cap bounds a tree's a-priori founded nodes `n* B D + 2^B − 1`,
+//! and so its depth at a population.
 //!
 //! [definition; agent-inferred, from the retention and deposition laws] **The measurement is
 //! prequential** ([`prequential`], Decision 29): every cell is scored at the current standing
@@ -298,7 +306,7 @@
 //! | a digit face's floor and the rounding's residual (the first-order bound fails downward) | `HNN/LandmarkTree.{digit_face_ge, digit_log_residual, host_digit_bound_fails_downward}` | [`Landmarks::face_rule`] |
 //! | the ideal tree weighting (the oracle) | `HNN/LandmarkTree.{landmark_step, mixture_is_probability, kraft_and_dominance, sequential_mixture}` | [`IdealLandmarks`] |
 //! | the declared stop prior: the mixture over pruned trees with its prior, the weights summing to one, the dominance, the founding at `β₀ = 2^(j_d) − 1` and the step unchanged; `½` the corollary | `HNN/LandmarkTree.{stop_mixture_over_trees, PrunedTree.prior_const, PrunedTree.prior_sum, stop_kraft_and_dominance, stop_weight_step, stop_ratio_step, stop_founding_step, ladder_founding, stopWeight_half}` | [`StopPrior`], [`LandmarkDeclaration::prior`], the founding charts (`Law::founding`, [`ArenaView::founding`]), [`IdealLandmarks`] |
-//! | the prior chosen on the development cells, charged `⌈log₂⌉` of the laws and of each law's depths | (a measurement, not a theorem) | [`ladder_top`], [`prior_family`], [`choose_prior`], [`choose_prior_within`], [`choose_depth_within`], [`PriorSweep`] |
+//! | the prior chosen on the development cells, charged `⌈log₂⌉` of the laws and of each law's depths | (a measurement, not a theorem) | [`ladder_top`], [`prior_family`], [`choose_prior`], [`choose_depth_within`], [`PriorSweep`] |
 //! | a population's code is its faces' product, enclosed once | (a certified reading: integer bounds and the certified logarithm) | [`PassageCode`], [`ProductBound`] |
 //! | the node-local law: the tree over own weights (the stop law its KT case), Kraft-complete, each landmark paying at most `−log₂` of its prior weight; its step with the own face in the KT face's place; an own face normalized; an unfounded landmark's prior own face; the two-face prior founding at `2^j − 1` | `HNN/LocalWeighing.{own_mixture_over_trees, ownWeight_kt, ownWeight_one, own_kraft_and_dominance, node_local_dominance, own_weight_step, own_ratio_step, own_face_normalized, node_local_founding, two_face_prior}` | [`LocalLaw`], [`Landmarks::local`], [`Landmarks::receive_with`], [`Widths::local`], [`IdealLandmarks::local`] |
 //! | the stop-weight mixture per digit tree: the mixture over (law, pruned tree), its prior complete, within `−log₂ π_k − log₂ prior_(w_k)(S)`; the joins telescope to the Bayesian mixture, the executed chart's drift once | `HNN/LocalWeighing.{stop_mixture_per_tree, static_mixture, forward_executed}` | [`StopMixture`], [`JoinTree`], [`FaceJoins`] |
@@ -5103,18 +5111,6 @@ pub fn choose_prior(
     declaration: &LandmarkDeclaration,
     family: &[StopPrior],
 ) -> Result<PriorSweep, HnnError> {
-    choose_prior_within(cut, letters, declaration, family, usize::MAX)
-}
-
-/// **Choose the stop prior with every law's depth within a declared deepest depth** (Decision 35):
-/// [`choose_prior`] with each law's sweep [`choose_depth_within`] `deepest`.
-pub fn choose_prior_within(
-    cut: &Cut,
-    letters: &[Letter],
-    declaration: &LandmarkDeclaration,
-    family: &[StopPrior],
-    deepest: usize,
-) -> Result<PriorSweep, HnnError> {
     aligned(&cut.cells, letters)?;
     let half = StopPrior::half();
     let incumbent = family.iter().position(|prior| *prior == half).ok_or(shape(
@@ -5127,7 +5123,7 @@ pub fn choose_prior_within(
             prior: family[index].clone(),
             ..declaration.clone()
         };
-        choose_depth_within(cut, letters, &declared, deepest)
+        choose_depth(cut, letters, &declared)
     })?;
     let mut sweep = PriorSweep {
         tried: family.iter().cloned().zip(sweeps).collect(),
