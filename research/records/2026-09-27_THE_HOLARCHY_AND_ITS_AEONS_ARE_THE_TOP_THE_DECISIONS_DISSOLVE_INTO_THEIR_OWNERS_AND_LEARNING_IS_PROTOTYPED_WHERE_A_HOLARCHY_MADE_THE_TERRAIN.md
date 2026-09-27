@@ -168,3 +168,56 @@ This also separates the two problems Brandon names:
    modules to the framework.
 3. Build the terrain owner and the first family above, with each terrain's exact truth receipt.
 4. Continue campaign 3 on the aeon-switching terrain, then on the real cut.
+
+## 5. The moiré terrain
+
+Brandon, September 27: "Moire patterns and overlap/intersections -> color theorems. The gaps from
+the patterns, it's exactly like polarity in charges and photons, lenses. Layers are like these as
+lenses … emanating axes of foundings … The classes are like slit diffraction patterns, imagine
+fraying threads through pathways of these as layers. Enigma and Bombe style."
+
+**What the laboratory already had** (commit `3450a0bc`):
+- `src/holobrochos/holo/src/found.rs::comb_upto` is "the sieve as moiré". Each founding lays its
+  grating (its multiples). The residue no grating covers founds a new grating. The covered part is
+  the span (the composites); the complement is the basis (the primes). It "never divides — it only
+  lays gratings and reads the residue".
+- Its `chance_floor` reads a founding as recurrence that outruns the moiré null `μ`, the coincidence
+  rate that independent gratings give.
+- `src/pureholonics/05_THE_WEAVE.md` holds the pair reading. Most lineage pairs are
+  "moiré-null, phase-orthogonal" and conduct without relating. Only aligned ("bright-moiré") pairs
+  weave.
+- `03_THE_RELATING.md`: "the threshold is the three-body moiré null, never a stored constant".
+
+**The joins to the objects** (`agent-inferred`; each piece is classical):
+- **Layers are rings.** Each ring is a grating, a clock with its period. Their overlap is the joint
+  clock torus, the Holarchy's parametric orientation (`Holarchy::parametric`). A fringe is a joint
+  phase class, and the beat is the difference of the rates.
+  - Bright moiré is a lock: the least-denominator rate in the fibre (the contact's lock address,
+    Farey).
+  - Moiré-null pairs are the dark, unlocked ones.
+- **The coloring is the polarity.** The boundaries of the layers' cells form an arrangement.
+  Coloring each face by the parity of the sides it lies on (the sum of the sheet readings, mod 2)
+  properly two-colors it. That parity is the polarized side reading of a half-turn, the rings'
+  sheets and their Ising lock. General maps need more colors; layered gratings need two.
+- **The gaps found.** The uncovered residue of the existing gratings is the cokernel: faces no
+  current ring reaches. It founds a new ring at its period. This is campaign 3's "founding by
+  interconnect from the cokernel residual". The old sieve is its arithmetic instance, and the
+  moiré null is its chance threshold.
+- **The classes are diffraction orders.** A path through successive layers composes each layer's
+  phase, like threads through lenses. Its class is the winding `m` of the composed phase read at
+  the last section, as a grating's order is.
+- **The Bombe reads a moiré.** Rotors are gratings stepping with carry. The key is the layers'
+  relative phases, and the Bombe locates them by loop closure over the menu.
+
+**The terrain.** The rings' first terrain (§3.3) is a moiré:
+- A declared Holarchy of `k` rings with drawn periods and phases.
+- Each tick emits the layers' joint class: the parity color, or the tuple of sheets, at a grain.
+- The truth is exact: the periods, the phases (the keys) and the lock addresses. The entropy rate
+  of the unmixed moiré is zero, so every bit the machine spends above it is the cost of locating
+  the keys.
+- Its founding variant is the sieve, where gratings are founded at the gaps. That is the
+  laboratory's prime-stream microscope, whose truth was known.
+- The gauges:
+  - the keys located against the drawn ones;
+  - the gratings founded at the true gaps;
+  - the code length against the exact rate.
