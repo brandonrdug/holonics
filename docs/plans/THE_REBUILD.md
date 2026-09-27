@@ -3066,7 +3066,7 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
       Its gain at scale is made on other cells.
     - **What it located.** The tree learns with the passage: `3 + 1/16` a cell on the standing cut
       alone, `2 + 0/16` on the same cells inside the wide passage. Depth is limited by memory, at
-      `178` bytes a node and 5,110,443 nodes at `D = 6` (Decision 36).
+      `178` bytes a node and 5,110,443 nodes at `D = 6` (Decisions 36–37).
 
     Source: agent-inferred, from Decision 34's measurement.
 
@@ -3086,4 +3086,55 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
       against Decision 28's at equal memory. The depth it admits under the cap. Then one held-out
       passage. Nodes, memory and time are reported beside the code.
 
+    **Measured (September 26).** One development sweep and one held-out passage on the wide cut
+    (notebook `hnn_landmark converge`; Lean `HNN/ConvergenceFounding`, 31 theorems).
+    - **Memory.** The pending records bound the memory at every depth: the carriers admit `D ≤ 73`.
+      The development cells chose `D = 19` of 20, at 671,092,356 live bytes, against 914,360,948
+      for Decision 28's tree at `D = 6`.
+    - **Development.** The convergence tree codes `1827190 + 13/16 + ε` bits (charged 6 for its
+      choice). That is above Decision 28's tree at `D = 6`, `1822006 + 1/16 + ε` (charged 4), by
+      `5186 + 12/16 + ε`. The development cells choose the first arrival, so Decision 28's founding
+      stays.
+    - **Held out** (disclosed, not a choice). The convergence tree is below Decision 28's by
+      `−490 + 11/16 + ε` bits, and below PPM-2 by `−134468 + 7/16 + ε`.
+    - **What it located.** A node at depth `d` opens only after its context has recurred `d + 1`
+      times, one level a recurrence. Deep contexts open late: the early cells pay and the late cells
+      gain. The memory it saved is had without changing the prior (Decision 37).
+
     Source: agent-inferred, from the landmark definition and Decision 35's depth limit.
+
+37. **The tree is stored at the faces where paths part.** Decision 28's prior needs no late founding
+    to save memory, because its unary chains are determined by their ends.
+    - **The law.** Consider a chain of nodes, each with one reached child. Every node on it routes
+      the same arrivals: the address is padded with `Boundary`, so every arrival runs to the declared
+      depth. So each node holds the same counts and the same KT face `P_e`.
+      - With `ρ = P_w/P_e`, the weighting reads `1 − ρ_j = (1 − w_j)(1 − ρ_(j+1))`. For the dyadic
+        rungs `w_i = 1 − 2^(−j_i)` this gives `1 − ρ_top = 2^(−Σ j_i)(1 − ρ_bottom)`, an exact shift.
+      - The chain's stop weights compose to `∏ 1/(1 + β_i) = 2^(−Σ j_i) ρ_bottom/ρ_top`.
+      - A chain that ends at the declared depth (a leaf) has `ρ = 1` at every node, so it reads as
+        one KT node.
+    - **What is stored.** The compacted tree stores:
+      - the root;
+      - each node with at least two reached children, where paths part;
+      - each leaf, with its label: the letters from its parent's face to the declared depth.
+
+      An arrival that parts from a label at depth `k` founds a node there with the label's counts and
+      its chart from the closed form.
+    - **What does not change.** The prior. This is Decision 28's tree at the declared `D`, code for
+      code, exactly in ℚ. No family is re-swept; only the depth is re-chosen, because memory no
+      longer caps it.
+    - **Memory.** A passage of `n` cells founds at most two nodes per arrival in each digit tree it
+      enters, at any depth, and each leaf holds its label.
+    - **Retired.** Decision 36's Rust realization: `Founding::SecondArrival` and the pending
+      records. Its Lean stays as the law of absent children and stopping rules.
+    - **What is measured.**
+      - Exact equality with `IdealLandmarks` at the same `D` on small passages.
+      - On the wide cut's development cells, a depth sweep that doubles from 6 until the code rises:
+        at most five passages, stated in advance at about two minutes each, with memory and time
+        beside the code.
+      - Then one held-out passage.
+    - **The card.** If the development cells adopt the depth, the card ports the compacted arena in
+      the same step (Decision 25).
+
+    Source: agent-inferred, from Decision 36's measurement and the unary-chain identity (the
+    compacted context tree of Willems's unbounded-depth weighting).
