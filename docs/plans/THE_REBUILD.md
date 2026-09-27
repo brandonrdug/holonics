@@ -33,7 +33,13 @@ sets the order:
    (September 27): the tree is the shift navigator's landmarks, `compression::landmark::context`
    (Lean `Compression/Landmark/Context`), and its Lean joins to `Foundation/Standing` (each pruned
    tree a candidate standing, the weight their mixture) and `Aeon/Clock/Epoch` (a node's arrivals
-   are the epochs of its section) are proved;
+   are the epochs of its section) are proved. The tree no longer reads the machine, and
+   `Field::holarchy` names the top. A cut passes through the resident's aeons: the joint clock
+   carries out every 5005 cells on campaign 1, so its 6148 cells close two. Still open in code:
+   - the receiving tree is storage read by the receiving face, not a Holon joined at ports;
+   - a receiving window is a step of the exposure's loop, not an `aeon::Epochs` reading at the
+     receiver's section;
+   - a pump period is the mode quotient's lift period, not an `aeon::Cycle`;
 3. prototype learning on terrain a declared Holarchy made, with its exact truth;
 4. then continue campaign 3.
 
@@ -416,8 +422,9 @@ The design is read from:
 
 #### The one object
 
-[definition] The HNN is one Holon. It is the Holarchy that `Holon::interconnect` returns when ring
-Holons are joined through contact Holons. In the model form `M = (K, Θ, x)` of HNN_FORMULA §1:
+[definition] The HNN is a Holarchy: the Holon that `Holon::interconnect` returns when ring Holons
+are joined through contact Holons (`Field::holarchy`). A cut passes through the resident's aeons on
+that Holarchy's parametric orientation. In the model form `M = (K, Θ, x)` of HNN_FORMULA §1:
 
 ```text
 K   the complex: rings g (0-cells); contacts a = (g→h) (1-cells); declared loops (2-cells). A contact's
