@@ -3038,5 +3038,10 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
       baselines.
     - **What stays.** The HNN's full exposure stays on the standing cut until its cost per window
       falls.
+    - [correction] **What a larger cut re-measures.** It re-measures the laws already chosen, one
+      prequential passage each, in minutes. A family is re-swept only when the scale could change
+      its choice, and only at a cost stated in advance. The first run re-swept 529 stop laws with
+      their depth sweeps and took 43 minutes to reconfirm `½`, so it was stopped. The development
+      cells chose `D = 6` at this scale.
 
     Source: agent-inferred, from Decision 34's measurement.
