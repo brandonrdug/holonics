@@ -55,6 +55,11 @@ sets the order:
      - a lock is a modular-group word located by Stern–Brocot descent;
      - phases come from parity relations;
      - generation packs the response into the keys;
+     - the measurement is an egg population: a mixture over generator families (trees, moiré
+       gratings, rotor keys) weighted by prequential likelihood, the replicator, gauged by
+       selecting the family that made the terrain
+       ([record §9](../../research/records/2026-09-27_THE_EGG_IS_A_GENERATORS_GENOME_SELECTION_IS_BAYES_AND_THE_FACES_OF_INTEGERS_ARE_MOIRES_OF_GRATINGS.md#9-what-it-asks-of-the-construction));
+       an arithmetic terrain (products and primes in bases 2, 6, 10 and 16) follows;
 4. then continue campaign 3.
 
 The standing cut has been reused for development and lies within the wide cut's held-out range.
