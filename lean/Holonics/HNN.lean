@@ -19,6 +19,7 @@ import Holonics.HNN.Contact
 import Holonics.HNN.ContactBreak
 import Holonics.HNN.BornFace
 import Holonics.HNN.LocalWeighing
+import Holonics.HNN.ConvergenceFounding
 
 /-!
 # The HNN law
@@ -49,4 +50,5 @@ design: the HNN law", table (b) rows 1–8, stated before their Rust owners in `
 | `HNN/ContactBreak` | campaign 2, item 8: the released storage `R = E_a + W_a − D_a − E_a′`, the advance `R ≥ J`, Griffith's closed-port case, the parted face's typed gluing defect | `hnn::contact`, `hnn::field` |
 | `HNN/BornFace` | Decision 33: the wave read by the Born rule, a finitely correlated receiver on the receiving ring's register: the normalized digit split and dyadic cell face, the reception keeping a density, the density as the retained quotient, the absorbed unitary tick, the interference zero no nonnegative receiver makes, the exact covector and the Fisher-scored step | `hnn::born` |
 | `HNN/LocalWeighing` | Decision 34: weighing is local: the forward mixture over faces (its telescope, dominance, Bayes-then-kernel step and executed chart), the static two-face prior and the fixed share with its switch price, the tree over own weights (node-local mixing: normalized, Kraft-complete, each landmark paying at most `−log₂` of its prior weight) and the stop-weight mixture per digit tree | `hnn::landmark::{Landmarks::local, LocalLaw, StopMixture, JoinTree}`, `hnn::receiving::Mixture::switching` |
+| `HNN/ConvergenceFounding` | Decision 36: a landmark is founded where paths converge, at its second arrival: the stopped path normalized under any stopping rule decided before the symbol (a complete prequential code), the tree with absent children (the Kraft form of its prior over pruned trees and its dominance), the stopped step (`β` still at the stop), Decision 28's tree as the case found at the first arrival, and the convergence standing whose root weight is the product of the stopped faces | `hnn::landmark::{Founding, Landmarks::founded_at, IdealLandmarks::founded_at}` |
 -/

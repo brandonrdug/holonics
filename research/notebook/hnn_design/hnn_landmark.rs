@@ -1,7 +1,7 @@
 //! **The landmark tree on the standing real cut, executed on its declared dyadic lattice**
-//! (Decision 28, count-only; rebuild step 4, #73): the notebook's receipt of
-//! `holonics::hnn::landmark::{choose_depth, prequential, oracle_cost}`, a committed command run once
-//! in release, never a test.
+//! (Decision 28, count-only; Decisions 32, 34, 35 and 36; rebuild step 4, #73): the notebook's
+//! receipt of `holonics::hnn::landmark::{choose_depth, prequential, oracle_cost}` and of the founding
+//! law (`Founding`), a committed command run once in release, never a test.
 //!
 //! ```sh
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin
@@ -10,7 +10,30 @@
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin prior
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin local
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/wide-real-cut.bin wide .local/cuts/standing-real-cut-campaign-1.bin
+//! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/wide-real-cut.bin converge .local/cuts/standing-real-cut-campaign-1.bin [probe 6,12,24]
 //! ```
+//!
+//! [definition; agent-inferred] **Convergence founding** (`converge <standing cut>`; Decision 36): the
+//! landmark tree founded at the second arrival (`landmark::Founding::SecondArrival`) on the wide cut,
+//! against Decision 28's `½` tree at `D = 6` (the depth Decision 35's memory cap admitted). The laws
+//! are Decision 28's otherwise (the `½` stop prior, the cell-only family); Decisions 32 and 34's
+//! families are not swept again.
+//! - **0. The memory and the carriers**: the convergence tree's live bytes a founded node on the
+//!   standing cut (the pending records charged to the founded nodes), its a-priori resident bound
+//!   `2 (n B + 2^B − 1)` founded-node bytes, the same at every depth, and the deepest depth the
+//!   carriers admit at `n*`, which alone bounds the sweep.
+//! - **`probe D,…`**: those depths' development passages only, each with its founded nodes, pending
+//!   records, live bytes, wall time and code: the sweep's cost, stated before the sweep runs.
+//! - **1. The depth sweep** on the development cells, `D = 1, 2, …` while the code decreases strictly
+//!   (`DepthSweep::{decreasing, of}`, the owner's rule), every depth's nodes, pending records, live
+//!   bytes, wall time and code printed; charged `⌈log₂⌉` of the depths tried and `⌈log₂ 2⌉` for the
+//!   founding law (Decision 28's tree charged `⌈log₂ 6⌉`, its depths on this cut, and the same bit).
+//! - **2. One prequential passage** over the whole cut: the chosen convergence tree (its scale checks,
+//!   and its development code checked against the sweep's), Decision 28's tree at `D = 6`, and the
+//!   baselines (uniform, order-0 and order-1 KT, PPM-2).
+//! - **3. The readings** on the development and held-out cells and the standing cut's parts, in all
+//!   and a cell at the grain; **4. the orderings** by disjoint exact enclosures: the convergence tree
+//!   against Decision 28's (charged and uncharged), and against PPM-2, order-1 and order-0.
 //!
 //! [definition; agent-inferred] **The wide cut** (`wide <standing cut>`; Decision 35): the
 //! count-only receiver's tree and Decision 34's adopted law read in one prequential passage over a
@@ -168,7 +191,7 @@ use rayon::prelude::*;
 use holonics::compression::cost::ceil_log2;
 use holonics::hnn::born::{Born, BornDeclaration, Emission};
 use holonics::hnn::landmark::{
-    ChartReport, Coded, DepthSweep, FaceJoins, Feature, IdealLandmarks, JoinTree,
+    ChartReport, Coded, DepthSweep, FaceJoins, Feature, Founding, IdealLandmarks, JoinTree,
     LandmarkDeclaration, Landmarks, Letter, LetterFamily, LocalLaw, OracleCost, PassageCode,
     PriorSweep, StopMixture, StopPrior, TreeRun, Widths, address, cell_letters, choose_depth,
     choose_depth_within, choose_prior, code_length, development, development_run, ladder_top,
@@ -193,39 +216,47 @@ use exterior::{
     receiver_grain,
 };
 
-/// [definition; agent-inferred] **The harness's allocator, counted when asked** (exterior; Decision
-/// 35's memory derivation): the system allocator; while counting is on, the bytes allocated less the
-/// bytes freed are kept in one counter, so a tree built alone on its thread holds the counter's
-/// difference across its building. Counting is off by default (the counter's cache line would be
-/// shared by every worker).
+/// [definition; agent-inferred] **The harness's allocator, counted when asked** (exterior; Decisions
+/// 35 and 36's memory readings): the system allocator; while a thread has counting on, the bytes it
+/// allocates less the bytes it frees are kept in that thread's counter, so a tree built and dropped
+/// on one thread holds the counter's difference across its building, and trees built together on
+/// several workers are each counted alone (Decision 36's concurrent sweep). The counters are
+/// thread-local and constant-initialized, so the allocator never allocates for them. Counting is
+/// off by default.
 struct Counted;
 
-static COUNTING: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
-static LIVE: std::sync::atomic::AtomicIsize = std::sync::atomic::AtomicIsize::new(0);
+thread_local! {
+    static COUNTING: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+    static LIVE: std::cell::Cell<isize> = const { std::cell::Cell::new(0) };
+}
+
+/// Add `bytes` to this thread's counter when its counting is on.
+fn count_bytes(bytes: isize) {
+    let _ = COUNTING.try_with(|on| {
+        if on.get() {
+            let _ = LIVE.try_with(|live| live.set(live.get() + bytes));
+        }
+    });
+}
 
 unsafe impl std::alloc::GlobalAlloc for Counted {
     unsafe fn alloc(&self, layout: std::alloc::Layout) -> *mut u8 {
         let pointer = unsafe { std::alloc::System.alloc(layout) };
-        if !pointer.is_null() && COUNTING.load(std::sync::atomic::Ordering::Relaxed) {
-            LIVE.fetch_add(layout.size() as isize, std::sync::atomic::Ordering::Relaxed);
+        if !pointer.is_null() {
+            count_bytes(layout.size() as isize);
         }
         pointer
     }
 
     unsafe fn dealloc(&self, pointer: *mut u8, layout: std::alloc::Layout) {
         unsafe { std::alloc::System.dealloc(pointer, layout) };
-        if COUNTING.load(std::sync::atomic::Ordering::Relaxed) {
-            LIVE.fetch_sub(layout.size() as isize, std::sync::atomic::Ordering::Relaxed);
-        }
+        count_bytes(-(layout.size() as isize));
     }
 
     unsafe fn realloc(&self, pointer: *mut u8, layout: std::alloc::Layout, size: usize) -> *mut u8 {
         let moved = unsafe { std::alloc::System.realloc(pointer, layout, size) };
-        if !moved.is_null() && COUNTING.load(std::sync::atomic::Ordering::Relaxed) {
-            LIVE.fetch_add(
-                size as isize - layout.size() as isize,
-                std::sync::atomic::Ordering::Relaxed,
-            );
+        if !moved.is_null() {
+            count_bytes(size as isize - layout.size() as isize);
         }
         moved
     }
@@ -234,14 +265,14 @@ unsafe impl std::alloc::GlobalAlloc for Counted {
 #[global_allocator]
 static COUNTED: Counted = Counted;
 
-/// Counting on or off.
+/// Counting on or off, on this thread.
 fn counting(on: bool) {
-    COUNTING.store(on, std::sync::atomic::Ordering::Relaxed);
+    COUNTING.with(|counting| counting.set(on));
 }
 
-/// The counter: the bytes allocated less the bytes freed while counting.
+/// This thread's counter: the bytes it allocated less the bytes it freed while counting.
 fn live() -> isize {
-    LIVE.load(std::sync::atomic::Ordering::Relaxed)
+    LIVE.with(std::cell::Cell::get)
 }
 
 /// The counter's growth since `before`, in bytes.
@@ -2624,13 +2655,15 @@ const SLOTS: [&str; 4] = [
 ];
 
 /// **A whole passage's tree, read on the parts**: every cell scored at the standing before its own
-/// deposit; the faces' products per slot, the tree's chart, founded nodes, stored bits, rule and
-/// largest certified residual, its live bytes when counted alone, and its wall time.
+/// deposit; the faces' products per slot, the tree's chart, founded nodes, pending first arrivals
+/// (Decision 36), stored bits, rule and largest certified residual, its live bytes when counted
+/// alone, and its wall time.
 struct TreePass {
     codes: [PassageCode; 4],
     chart: ChartReport,
     widths: Widths,
     nodes: usize,
+    pending: usize,
     bits: u64,
     rule: Rat,
     largest: Rat,
@@ -2641,13 +2674,16 @@ struct TreePass {
 fn tree_pass(
     cells: &[usize],
     declaration: &LandmarkDeclaration,
+    founding: Founding,
     parts: &Parts,
     count: bool,
 ) -> TreePass {
     let clock = Instant::now();
     counting(count);
     let before = live();
-    let mut tree = Landmarks::new(declaration.clone()).expect("a declared tree");
+    let mut tree = Landmarks::new(declaration.clone())
+        .and_then(|tree| tree.founded_at(founding))
+        .expect("a declared tree");
     let mut codes = [PassageCode::new(); 4];
     let mut largest = Rat::zero();
     for (position, &class) in cells.iter().enumerate() {
@@ -2670,6 +2706,7 @@ fn tree_pass(
         chart: tree.chart(),
         widths: tree.widths(),
         nodes: tree.nodes(),
+        pending: tree.pending(),
         bits: tree.bits(),
         rule: tree.face_rule(),
         largest,
@@ -2926,7 +2963,7 @@ fn wide_harness(path: &str, standing_path: &str) {
     println!(
         "2. one prequential passage over the whole cut at D = {depth}, every cell scored at the standing before its own deposit, each coder read on the parts:"
     );
-    let tree = tree_pass(&cells, &at, &parts, true);
+    let tree = tree_pass(&cells, &at, Founding::FirstArrival, &parts, true);
     scale_readings(
         &format!("the ½ tree at D = {depth}"),
         &tree,
@@ -3011,6 +3048,356 @@ fn wide_harness(path: &str, standing_path: &str) {
     );
 }
 
+// -------------------------------------------------------------------------------------------
+// Decision 36: a landmark is founded where paths converge (`converge`)
+
+/// Decision 35's depth sweep of the `½` tree on the wide cut's development cells tried `D = 1..6`
+/// (its receipt): Decision 28's tree at `D = 6` is charged `⌈log₂ 6⌉` bits.
+const DECISION_35_DEPTHS: usize = 6;
+
+/// The founding laws declared (Decisions 28 and 36): the comparison chooses one of two, and each
+/// is charged `⌈log₂ 2⌉` bits beside its depth's.
+const FOUNDING_LAWS: usize = 2;
+
+/// **One development passage of a tree under a founding law**, counted alone: its code over the
+/// development cells (the population's faces' product, enclosed once), founded nodes, pending
+/// first arrivals, live bytes, widths and wall time.
+struct DepthPass {
+    depth: usize,
+    bits: ExactInterval,
+    nodes: usize,
+    pending: usize,
+    bytes: usize,
+    widths: Widths,
+    wall: u128,
+}
+
+fn depth_pass(dev: &[usize], declaration: &LandmarkDeclaration, founding: Founding) -> DepthPass {
+    let clock = Instant::now();
+    counting(true);
+    let before = live();
+    let mut tree = Landmarks::new(declaration.clone())
+        .and_then(|tree| tree.founded_at(founding))
+        .expect("a declared tree");
+    let mut code = PassageCode::new();
+    for (position, &class) in dev.iter().enumerate() {
+        let reading = tree
+            .receive(&address(dev, position, declaration.depth), class)
+            .expect("a cell within the declaration");
+        code.face(&reading.executed).expect("a positive face");
+    }
+    let bytes = grown(before);
+    counting(false);
+    DepthPass {
+        depth: declaration.depth,
+        bits: bits_of(&code),
+        nodes: tree.nodes(),
+        pending: tree.pending(),
+        bytes,
+        widths: tree.widths(),
+        wall: clock.elapsed().as_millis(),
+    }
+}
+
+fn depth_line(pass: &DepthPass, cells: u64, grain: u64) {
+    println!(
+        "  D = {} ({}): {}; a cell {}; {} founded, {} pending, {} live bytes; {} ms",
+        pass.depth,
+        widths(&pass.widths),
+        enclosure(&pass.bits, grain),
+        per(&pass.bits, cells, grain),
+        pass.nodes,
+        pass.pending,
+        pass.bytes,
+        pass.wall
+    );
+}
+
+/// **The deepest depth the carriers admit** at a declaration's population: the widths' products
+/// fit `u128` (`Landmarks::new` refuses past it).
+fn deepest_admitted(declared: &LandmarkDeclaration) -> usize {
+    let mut depth = 1;
+    while Landmarks::new(LandmarkDeclaration {
+        depth: depth + 1,
+        ..declared.clone()
+    })
+    .is_ok()
+    {
+        depth += 1;
+    }
+    depth
+}
+
+/// **Decision 36's pass on the wide cut** (`converge <standing cut> [probe D,…]`; module header,
+/// "Convergence founding"): the memory and the carriers' admission, then the convergence-founded
+/// tree's depth sweep on the development cells (every depth's nodes, pending records, live bytes,
+/// wall time and code), then one prequential passage over the whole cut of the chosen tree,
+/// Decision 28's `½` tree at `D = 6` and the baselines, read on the parts and ordered. With
+/// `probe`, only the listed depths' development passages, for the sweep's cost stated before it
+/// runs.
+#[allow(clippy::too_many_lines)]
+fn converge_harness(path: &str, standing_path: &str, probe: Option<Vec<usize>>) {
+    let setup = Instant::now();
+    let (bytes, count, held) = read_cut(path);
+    let (standing_bytes, standing_count, standing_held) = read_cut(standing_path);
+    assert!(
+        bytes.ends_with(&standing_bytes),
+        "the wide cut holds the standing cut as its tail"
+    );
+    let field = Field::declare(FieldDeclaration::campaign_one(count as u64))
+        .expect("campaign 1's declared field over the cut");
+    let grain = receiver_grain(&field);
+    let alphabet = field.alphabet();
+    let digits = odometer_digits(alphabet);
+    let cells: Vec<usize> = bytes.iter().map(|&byte| usize::from(byte)).collect();
+    let cut = Cut {
+        cells: cells.clone(),
+        held_out: vec![held.clone()],
+    };
+    let dev = development(&cut);
+    let offset = count - standing_count;
+    let parts = Parts {
+        held: held.clone(),
+        standing: offset..count,
+        standing_held: offset + standing_held.start..count,
+    };
+    let counts = parts.counts(count);
+    let declared = LandmarkDeclaration {
+        alphabet,
+        depth: 1,
+        forced: 0,
+        population: count as u64,
+        grain,
+        family: LetterFamily::cells(),
+        prior: StopPrior::half(),
+    };
+    println!(
+        "hnn_landmark converge: a landmark is founded where paths converge, at its second arrival (Decision 36), over the cut file {path}"
+    );
+    println!(
+        "cut: {count} cells, |A| = {alphabet}, B = {digits}; held out: cells {}..{} ({} cells, from the manifest); development: {} cells; n* = {count}, L_R = {grain}; the standing cut ({standing_count} cells) is its tail, cells {offset}..{count}",
+        held.start,
+        held.end,
+        held.len(),
+        dev.len(),
+    );
+    println!();
+
+    // 0. The memory and the carriers' admission.
+    let standing_cells: Vec<usize> = standing_bytes.iter().map(|&b| usize::from(b)).collect();
+    let measured_depth = DECISION_35_DEPTHS;
+    counting(true);
+    let before = live();
+    let mut measured = Landmarks::new(LandmarkDeclaration {
+        depth: measured_depth,
+        population: standing_count as u64,
+        ..declared.clone()
+    })
+    .and_then(|tree| tree.founded_at(Founding::SecondArrival))
+    .expect("the standing cut's convergence tree");
+    for (position, &cell) in standing_cells.iter().enumerate() {
+        measured
+            .receive(&address(&standing_cells, position, measured_depth), cell)
+            .expect("a cell");
+    }
+    let measured_bytes = grown(before) as u128;
+    counting(false);
+    let founded = measured.nodes() as u128;
+    let per_node = measured_bytes.div_ceil(founded);
+    let n = count as u128;
+    let keys = n * u128::from(digits);
+    let nodes_bound = keys + (1u128 << digits) - 1;
+    let bound = 2 * nodes_bound * per_node;
+    println!(
+        "0. memory (the cap {CAP} bytes): on the standing cut the convergence-founded tree at D = {measured_depth} founds {founded} nodes and holds {} pending first arrivals in {measured_bytes} live bytes, {per_node} bytes a founded node with the pending records charged to them ({} rem {} over {founded})",
+        measured.pending(),
+        measured_bytes / founded,
+        measured_bytes % founded
+    );
+    println!(
+        "  a passage of n cells founds at most n B + 2^B − 1 = {nodes_bound} nodes and holds at most n B = {keys} pending records at every depth: the resident bound 2 (n B + 2^B − 1) · {per_node} = {bound} bytes, {} the cap, at every depth (Decision 28's tree founds up to n B D + 2^B − 1 nodes, which capped it at D ≤ {DECISION_35_DEPTHS})",
+        if bound <= CAP { "within" } else { "ABOVE" }
+    );
+    let deepest = deepest_admitted(&declared);
+    let top = Landmarks::new(LandmarkDeclaration {
+        depth: deepest,
+        ..declared.clone()
+    })
+    .expect("the deepest admitted depth");
+    println!(
+        "  the carriers admit D ≤ {deepest} at n* = {count} ({} at D = {deepest}; the largest u128 operand {} bits); the sweep stops there at the latest",
+        widths(&top.widths()),
+        top.widths().operand_bits(count as u64)
+    );
+    println!();
+
+    if let Some(depths) = probe {
+        println!(
+            "probe (the sweep's cost, stated before it runs): development passages of the convergence-founded tree"
+        );
+        for depth in depths {
+            let pass = depth_pass(
+                &dev,
+                &LandmarkDeclaration {
+                    depth,
+                    ..declared.clone()
+                },
+                Founding::SecondArrival,
+            );
+            depth_line(&pass, dev.len() as u64, grain);
+        }
+        println!(
+            "wall time (exterior): the probe {} ms; the process's resident peak {}",
+            setup.elapsed().as_millis(),
+            resident()
+        );
+        return;
+    }
+
+    // 1. The depth sweep on the development cells, in concurrent chunks within the cap.
+    let clock = Instant::now();
+    let workers = std::thread::available_parallelism().map_or(1, usize::from);
+    let concurrent = usize::try_from(CAP / bound).unwrap_or(1).clamp(1, workers);
+    println!(
+        "1. the depth sweep of the convergence-founded tree on the development cells ({} cells), D = 1.. while the code decreases strictly (DepthSweep's rule), D ≤ {deepest}; {concurrent} depths at once (⌊{CAP}/{bound}⌋ trees at the a-priori bound, within {workers} workers), each tree built, read and counted alone on its worker; the choice reads only the depths up to the stop:",
+        dev.len()
+    );
+    let mut tried: Vec<(usize, ExactInterval)> = Vec::new();
+    let (mut next, mut beyond) = (1usize, 0usize);
+    'sweep: while next <= deepest {
+        let chunk: Vec<usize> = (next..=(next + concurrent - 1).min(deepest)).collect();
+        next += chunk.len();
+        let passes: Vec<DepthPass> = chunk
+            .par_iter()
+            .map(|&depth| {
+                depth_pass(
+                    &dev,
+                    &LandmarkDeclaration {
+                        depth,
+                        ..declared.clone()
+                    },
+                    Founding::SecondArrival,
+                )
+            })
+            .collect();
+        for (index, pass) in passes.iter().enumerate() {
+            depth_line(pass, dev.len() as u64, grain);
+            tried.push((pass.depth, pass.bits.clone()));
+            if !DepthSweep::decreasing(&tried) {
+                beyond = passes.len() - index - 1;
+                break 'sweep;
+            }
+        }
+    }
+    if beyond > 0 {
+        println!(
+            "  ({beyond} deeper depths of the last chunk were computed beside the stop and are not tried)"
+        );
+    }
+    let sweep = DepthSweep::of(tried).expect("at least one depth");
+    let chosen_bits = sweep
+        .tried
+        .iter()
+        .find(|(depth, _)| *depth == sweep.chosen)
+        .map(|(_, bits)| bits.clone())
+        .expect("the chosen depth was tried");
+    let founding_bits = family_charge(FOUNDING_LAWS);
+    let converged_bits = sweep.description_bits + founding_bits;
+    let first_bits = family_charge(DECISION_35_DEPTHS) + founding_bits;
+    println!(
+        "  chosen D = {} of {} tried ({} ms); charged ⌈log₂ {}⌉ = {} depth bits and ⌈log₂ {FOUNDING_LAWS}⌉ = {founding_bits} for the founding law, {converged_bits} bits; Decision 28's ½ tree at D = {DECISION_35_DEPTHS} charged ⌈log₂ {DECISION_35_DEPTHS}⌉ + {founding_bits} = {first_bits} bits",
+        sweep.chosen,
+        sweep.tried.len(),
+        clock.elapsed().as_millis(),
+        sweep.tried.len(),
+        sweep.description_bits
+    );
+    println!();
+
+    // 2. One prequential passage over the whole cut.
+    let at = LandmarkDeclaration {
+        depth: sweep.chosen,
+        ..declared.clone()
+    };
+    let at_first = LandmarkDeclaration {
+        depth: DECISION_35_DEPTHS,
+        ..declared.clone()
+    };
+    println!(
+        "2. one prequential passage over the whole cut, every cell scored at the standing before its own deposit, each coder read on the parts:"
+    );
+    let converged = tree_pass(&cells, &at, Founding::SecondArrival, &parts, true);
+    scale_readings(
+        &format!("the convergence-founded tree at D = {}", sweep.chosen),
+        &converged,
+        count as u64,
+        grain,
+    );
+    println!(
+        "    {} pending first arrivals; check: its development code is the sweep's at D = {}: {}",
+        converged.pending,
+        sweep.chosen,
+        bits_of(&converged.codes[0]) == chosen_bits
+    );
+    let first = tree_pass(&cells, &at_first, Founding::FirstArrival, &parts, true);
+    scale_readings(
+        &format!("Decision 28's ½ tree at D = {DECISION_35_DEPTHS}"),
+        &first,
+        count as u64,
+        grain,
+    );
+    let (baselines, baselines_ms) = baselines_pass(&cells, alphabet, &parts);
+    println!(
+        "  the baselines ({}): {baselines_ms} ms",
+        BASELINES.join(", ")
+    );
+    println!("  peak resident so far: {}", resident());
+    println!();
+
+    println!("3. the readings (bits at L_R = {grain}, uncharged):");
+    let converged_label = format!("the convergence-founded tree at D = {}", sweep.chosen);
+    let first_label = format!("Decision 28's ½ tree at D = {DECISION_35_DEPTHS}");
+    part_readings(&converged_label, &converged.codes, &counts, grain);
+    part_readings(&first_label, &first.codes, &counts, grain);
+    for (codes, name) in baselines.iter().zip(BASELINES) {
+        part_readings(name, codes, &counts, grain);
+    }
+    println!();
+
+    println!("4. the orderings, each by disjoint exact enclosures:");
+    part_orderings(
+        &format!(
+            "the convergence-founded tree charged {converged_bits} bits against Decision 28's ½ tree at D = {DECISION_35_DEPTHS} charged {first_bits}"
+        ),
+        (&converged.codes, converged_bits),
+        (&first.codes, first_bits),
+        &counts,
+        grain,
+    );
+    part_orderings(
+        "the convergence-founded tree against Decision 28's, both uncharged",
+        (&converged.codes, 0),
+        (&first.codes, 0),
+        &counts,
+        grain,
+    );
+    for (index, name) in BASELINES.iter().enumerate().skip(1).rev() {
+        part_orderings(
+            &format!("the convergence-founded tree charged {converged_bits} bits against {name}"),
+            (&converged.codes, converged_bits),
+            (&baselines[index], 0),
+            &counts,
+            grain,
+        );
+    }
+    println!();
+    println!(
+        "wall time (exterior): the harness {} ms; the process's resident peak {}",
+        setup.elapsed().as_millis(),
+        resident()
+    );
+}
+
 fn main() {
     let arguments: Vec<String> = std::env::args().skip(1).collect();
     let path = match arguments.as_slice() {
@@ -3031,6 +3418,20 @@ fn main() {
             wide_harness(value, standing);
             return;
         }
+        [key, value, mode, standing] if key == "cut-file" && mode == "converge" => {
+            converge_harness(value, standing, None);
+            return;
+        }
+        [key, value, mode, standing, probe, depths]
+            if key == "cut-file" && mode == "converge" && probe == "probe" =>
+        {
+            let depths = depths
+                .split(',')
+                .map(|depth| depth.parse().expect("a depth"))
+                .collect();
+            converge_harness(value, standing, Some(depths));
+            return;
+        }
         [key, value, mode, with]
             if key == "cut-file" && mode == "letters" && with == "contacts" =>
         {
@@ -3039,7 +3440,7 @@ fn main() {
         }
         _ => {
             println!(
-                "usage: hnn_landmark cut-file <path> [letters [contacts] | prior | local | wide <standing cut>]"
+                "usage: hnn_landmark cut-file <path> [letters [contacts] | prior | local | wide <standing cut> | converge <standing cut> [probe D,…]]"
             );
             return;
         }

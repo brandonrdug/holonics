@@ -1,6 +1,6 @@
 //! **The receiving parametron's storage as a tree of landmarks, executed on a declared dyadic
-//! lattice, addressed by typed bundles, weighing every face locally** (Decision 28; campaign 2's
-//! receiving letters; Decisions 32 and 34; #73).
+//! lattice, addressed by typed bundles, weighing every face locally, founded where paths converge**
+//! (Decision 28; campaign 2's receiving letters; Decisions 32, 34 and 36; #73).
 //!
 //! [definition] The computational object is the helical pair interaction; this owner is the
 //! receiving parametron's storage, read as a tree of landmarks. Of the winding guide's six general
@@ -164,8 +164,27 @@
 //! `ρ ≤ Σ drift + Σ θ` per opened digit over both branches and the join, and a cell's
 //! ([`CellReading::residual`]) is the digits' sum in `log₂` (times `3/2`), never above the rule.
 //!
+//! [definition; agent-inferred] **Founding where paths converge** (Decision 36; [`Founding`],
+//! [`Landmarks::founded_at`], Lean `HNN/ConvergenceFounding`). A landmark is a face where navigator
+//! paths converge. Under [`Founding::SecondArrival`] a node is founded at its second arrival: the
+//! read stops at the path's deepest founded node when its child along the address has not met a
+//! second arrival, and that node reads its own KT face alone (the absent child is not a KT node
+//! with no counts: a different prior, `conv_mixture_over_trees`); its `β` does not move
+//! (`conv_ratio_step`), so no pre-factor is stored. The arrival that finds the child absent records
+//! it as a pending first arrival, the child table's word `PENDING | b`; the next arrival opens it
+//! with that count (KT's `3/4` or `1/4`, read as the stop, `second_arrival_opens_with_the_first_count`)
+//! and its deposit founds it at its depth's `β₀` with both counts and records its own child. The
+//! founded node learns its first arrival from the record's digit (agent-inferred, [`Founding`]):
+//! the record is needed anyway to recognize the second arrival, and the digit rides in its word.
+//! The stopped path is a path of at most `P` levels, so the lattice law, the widths and the rule's
+//! bound hold unchanged, and any stopping depth decided before the digit gives a normalized face
+//! (`stopping_rule_normalized`). A passage of `n` cells founds at most `n B + 2^B − 1` nodes and
+//! holds at most `n B` pending records at every depth, so the memory bounds no depth. Decision 28's
+//! tree is the case "found at the first arrival" (`first_arrival_is_decision_28`).
+//!
 //! [definition; agent-inferred] **The arena** (the layout the card ports). Nodes are founded at
-//! first arrival and numbered in founding order, `u32`; every per-node value is a flat vector
+//! their first arrival (Decision 28) or their second (Decision 36, a pending first arrival held as
+//! a child table word until then) and numbered in founding order, `u32`; every per-node value is a flat vector
 //! indexed by the node: its depth with its branch in the top bit and its two half-unit masses
 //! `2C_0, 2C_1` (their sum is the total; the arena the oracle shares), and its chart: `β`, the cached
 //! stop weight `λ̂`, its rebases and its two certificates. `roots[t]` is the root of tree
@@ -263,6 +282,21 @@
 //! (uncharged `−50 + 7/16 + ε`); on the standing cut's own cells, read at the wide standing, it lies
 //! above the tree.
 //!
+//! [established-bounded; measured] **Founding where paths converge, on the wide cut** (notebook
+//! `hnn_landmark -- … converge`, Decision 36; bits at `L_R = 16`, each `+ ε`, exact enclosures). The
+//! convergence tree's a-priori resident bound is 3,389,100,652 bytes at every depth, and the carriers
+//! admit `D ≤ 73`. The development cells choose `D = 19` of 20 depths tried (`D = 20` codes above
+//! it): `1827190 + 13/16`, with 3,580,220 founded nodes, 3,702,226 pending records and 528,485,988
+//! live bytes. Charged 6 bits (5 depth bits and one for the founding law), it lies **above**
+//! Decision 28's `½` tree at `D = 6` (`1822006 + 1/16`, charged 4) by `5186 + 12/16`, so the
+//! development cells choose the first arrival. Held out, it reads `261125 + 0/16` (`1 + 15/16` a
+//! cell). That is **below** Decision 28's tree by `−490 + 11/16` charged, below PPM-2 by
+//! `−134468 + 7/16`, order-1 by `−235557 + 14/16` and order-0 by `−370583 + 15/16`, each decided.
+//! Its whole passage holds 671,092,356 live bytes against Decision 28's 914,360,948 and takes
+//! 21,267 ms against 17,445. The cause: the path grows one depth a recurrence, so the passage's early
+//! cells read shallower than a tree founded to `D` at the first arrival, and its deeper landmarks
+//! gain only once contexts recur.
+//!
 //! [definition; agent-inferred] **The depth, the family and the prior** are chosen on the development
 //! cells only ([`choose_depth`], [`choose_prior`]): `D` increases from `max(1, forced)` while the
 //! development prequential code length decreases strictly (disjoint exact enclosures), every `D`
@@ -311,6 +345,7 @@
 //! | the node-local law: the tree over own weights (the stop law its KT case), Kraft-complete, each landmark paying at most `−log₂` of its prior weight; its step with the own face in the KT face's place; an own face normalized; an unfounded landmark's prior own face; the two-face prior founding at `2^j − 1` | `HNN/LocalWeighing.{own_mixture_over_trees, ownWeight_kt, ownWeight_one, own_kraft_and_dominance, node_local_dominance, own_weight_step, own_ratio_step, own_face_normalized, node_local_founding, two_face_prior}` | [`LocalLaw`], [`Landmarks::local`], [`Landmarks::receive_with`], [`Widths::local`], [`IdealLandmarks::local`] |
 //! | the stop-weight mixture per digit tree: the mixture over (law, pruned tree), its prior complete, within `−log₂ π_k − log₂ prior_(w_k)(S)`; the joins telescope to the Bayesian mixture, the executed chart's drift once | `HNN/LocalWeighing.{stop_mixture_per_tree, static_mixture, forward_executed}` | [`StopMixture`], [`JoinTree`], [`FaceJoins`] |
 //! | a window's phases in cell order: each reads the standing after the earlier phases' deposits | `HNN/LandmarkTree.{landmark_step, treeWeight_arrive_off}` | [`Landmarks::window_faces`] |
+//! | founding where paths converge: the stopped path normalized under any stopping rule decided before the digit (a complete code); the tree with absent children, its Kraft form and dominance; the stopped step (`β` still at the stop); the second arrival opening with the first count; Decision 28 the first-arrival case | `HNN/ConvergenceFounding.{stopping_rule_normalized, prequential_code_complete, conv_mixture_over_trees, conv_kraft_and_dominance, conv_weight_step, conv_ratio_step, second_arrival_opens_with_the_first_count, convergence_step, convergence_is_probability, first_arrival_is_decision_28}` | [`Founding`], [`Landmarks::founded_at`], [`Landmarks::pending`], [`IdealLandmarks::founded_at`], [`choose_depth_founded`], [`tree_prequential_founded`] |
 //!
 //! [open] Owed in #62 (Lean `HNN/LandmarkTree`'s `[open]`): the passage-level composition of the
 //! drift bound (the subtree sum over the tree and the passage, from `lattice_node_telescope`,
@@ -783,6 +818,57 @@ impl LocalLaw {
 impl std::fmt::Display for LocalLaw {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "local j = {}", self.rung)
+    }
+}
+
+// -------------------------------------------------------------------------------------------
+// Decisions 28 and 36: when a landmark is founded
+
+/// [definition; agent-inferred] **When a landmark is founded** (Decisions 28 and 36; Lean
+/// `HNN/ConvergenceFounding`). A landmark is a face where navigator paths converge.
+/// - [`Founding::FirstArrival`] (Decision 28): every node is founded at its first arrival, and an
+///   unfounded node reads as present with no counts, the prior `½` (`unfounded_reads_prior`); the
+///   path is opened to the declared depth at every read (`first_arrival_is_decision_28`).
+/// - [`Founding::SecondArrival`] (Decision 36): a node is founded at its second arrival, where two
+///   paths meet. Until then the opened path stops at its deepest founded node, whose child along the
+///   address reads as **absent**: the stopped node reads its own KT face alone and its `β` does not
+///   move (`conv_ratio_step`). The arrival that finds a child absent records it as a **pending first
+///   arrival** (the child table's word: a tag and that arrival's digit); the next arrival there opens
+///   it with that one count (KT's `3/4` or `1/4`), and its deposit founds it and records its own
+///   child's pending arrival. The nodes within the first-arrival reach (depth at most the forced
+///   depths, the root at `forced = 0`) are founded at their first arrival: a path can stop only at a
+///   node that holds counts.
+///
+/// [agent-inferred, the founding choice] **The founded node learns its first arrival from the
+/// pending record, which carries that arrival's digit.** Founding at the second arrival requires
+/// recognizing the second arrival, so the first must leave its key in the child table; the key's
+/// value word carries the digit at no further storage (one tag bit and one digit bit of the `u32`).
+/// So the node opens with exactly the counts of its one earlier arrival, as the law states
+/// (`second_arrival_opens_with_the_first_count`), its KT is the KT of everything routed to it while
+/// its parent was present, and nothing is forgotten. The record is the node's own count, its
+/// sufficient statistic (a quotient: no position, time or pointer into the history), not a tape.
+/// Founding it with the second digit only and a declared prior would discard one count per landmark
+/// at the same memory.
+///
+/// [proved-derived] **The a-priori size.** Each arrival opens at most one pending node and records
+/// at most one pending arrival in each digit tree it opens, so a passage of `n` cells founds at most
+/// `n B + 2^B − 1` nodes and holds at most `n B` child keys **at every depth**: the memory no longer
+/// bounds the depth, which the development cells choose alone.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub enum Founding {
+    /// Decision 28: founded at the first arrival.
+    #[default]
+    FirstArrival,
+    /// Decision 36: founded at the second arrival, where paths converge.
+    SecondArrival,
+}
+
+impl std::fmt::Display for Founding {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Founding::FirstArrival => write!(f, "founded at the first arrival"),
+            Founding::SecondArrival => write!(f, "founded at the second arrival"),
+        }
     }
 }
 
@@ -1373,29 +1459,57 @@ impl Odometer {
 /// The top bit of a node's depth word: its branch (the bundle tree).
 const BRANCH_BIT: u32 = 1 << 31;
 
+/// The top bit of a child table's word: a pending first arrival (Decision 36), its digit in the
+/// low bit; a founded child's number otherwise (below `2^31`, `Topology::founded_within`).
+const PENDING: u32 = 1 << 31;
+
+/// The half-unit masses a node opens with at its second arrival: the prior `[1, 1]` and its first
+/// arrival's digit, `2C_b + 1`.
+fn opening_halves(digit: usize) -> [u32; 2] {
+    let mut halves = [1, 1];
+    halves[digit] += 2;
+    halves
+}
+
 /// The arena's topology and masses, shared by the executed tree and the oracle: the roots per
-/// tree, the child table, each node's depth (its branch in the top bit) and its two half-unit
-/// masses.
+/// tree, the child table (each word a founded child or, under Decision 36, a pending first
+/// arrival), each node's depth (its branch in the top bit), its two half-unit masses, and the
+/// pending records held.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct Arena {
     roots: Vec<Option<u32>>,
     children: HashMap<u64, u32>,
     depths: Vec<u32>,
     halves: Vec<[u32; 2]>,
+    pending: usize,
 }
 
 fn key(parent: u32, letter: u32) -> u64 {
     (u64::from(parent) << 32) | u64::from(letter)
 }
 
-/// **The founded nodes as a read opens them**: the root of each tree, the child behind a letter,
-/// each node's two half-unit masses and the count of founded nodes. The arena answers them (for
-/// the oracle and the executed tree), and so does a window's working overlay ([`Working`]).
+/// **The founded nodes as a read opens them**: the root of each tree, the child table's word behind
+/// a letter (a founded child, or a pending first arrival), each node's two half-unit masses and the
+/// count of founded nodes. The arena answers them (for the oracle and the executed tree), and so
+/// does a window's working overlay ([`Working`]).
 trait Topology {
     fn root(&self, tree: usize) -> Option<u32>;
-    fn child(&self, parent: u32, letter: u32) -> Option<u32>;
+    fn entry(&self, parent: u32, letter: u32) -> Option<u32>;
     fn halves(&self, node: u32) -> [u32; 2];
     fn len(&self) -> usize;
+
+    /// The founded child behind a letter.
+    fn child(&self, parent: u32, letter: u32) -> Option<u32> {
+        self.entry(parent, letter)
+            .filter(|word| word & PENDING == 0)
+    }
+
+    /// The pending first arrival's digit behind a letter (Decision 36).
+    fn pending(&self, parent: u32, letter: u32) -> Option<usize> {
+        self.entry(parent, letter)
+            .filter(|word| word & PENDING != 0)
+            .map(|word| (word & 1) as usize)
+    }
 
     /// The founded nodes along an address in tree `t`, from its root, at most `limit` of them.
     fn open(&self, tree: usize, address: &[u32], limit: usize) -> Vec<u32> {
@@ -1446,7 +1560,7 @@ impl Topology for Arena {
         self.roots[tree]
     }
 
-    fn child(&self, parent: u32, letter: u32) -> Option<u32> {
+    fn entry(&self, parent: u32, letter: u32) -> Option<u32> {
         self.children.get(&key(parent, letter)).copied()
     }
 
@@ -1466,6 +1580,29 @@ impl Arena {
             children: HashMap::new(),
             depths: Vec::new(),
             halves: Vec::new(),
+            pending: 0,
+        }
+    }
+
+    /// **Record a pending first arrival** of `digit` behind `(parent, letter)` (Decision 36).
+    fn mark(&mut self, parent: u32, letter: u32, digit: usize) {
+        let previous = self
+            .children
+            .insert(key(parent, letter), PENDING | digit as u32);
+        debug_assert!(
+            previous.is_none(),
+            "a pending record marks an unreached child"
+        );
+        self.pending += 1;
+    }
+
+    /// **Place a founded child** behind `(parent, letter)`, retiring the pending record it opened
+    /// from, if any.
+    fn place(&mut self, parent: u32, letter: u32, child: u32) {
+        if let Some(word) = self.children.insert(key(parent, letter), child)
+            && word & PENDING != 0
+        {
+            self.pending -= 1;
         }
     }
 
@@ -1496,8 +1633,7 @@ impl Arena {
         while nodes.len() < address.len() + 1 {
             let parent = *nodes.last().expect("a root");
             let child = self.found(branch, nodes.len());
-            self.children
-                .insert(key(parent, address[nodes.len() - 1]), child);
+            self.place(parent, address[nodes.len() - 1], child);
             nodes.push(child);
         }
         self.len() - before
@@ -1524,8 +1660,8 @@ trait Standing: Topology {
     fn own(&self, node: u32) -> &Chart;
     fn own_mut(&mut self, node: u32) -> &mut Chart;
     /// Found a node at `depth` of `branch` in tree `t`, its root (`parent` absent) or the child
-    /// behind `(parent, letter)`, with the prior masses `[1, 1]`, `chart`, and under the node-local
-    /// law its own chart.
+    /// behind `(parent, letter)` (retiring its pending record, if any), with the prior masses
+    /// `[1, 1]`, `chart`, and under the node-local law its own chart.
     fn found(
         &mut self,
         tree: usize,
@@ -1535,6 +1671,8 @@ trait Standing: Topology {
         chart: Chart,
         own: Option<Chart>,
     ) -> u32;
+    /// Record a pending first arrival of `digit` behind `(parent, letter)` (Decision 36).
+    fn mark(&mut self, parent: u32, letter: u32, digit: usize);
     fn passed(&self) -> u64;
     fn pass(&mut self);
     fn rebased(&mut self);
@@ -1560,8 +1698,8 @@ impl Topology for Nodes {
         self.arena.root(tree)
     }
 
-    fn child(&self, parent: u32, letter: u32) -> Option<u32> {
-        self.arena.child(parent, letter)
+    fn entry(&self, parent: u32, letter: u32) -> Option<u32> {
+        self.arena.entry(parent, letter)
     }
 
     fn halves(&self, node: u32) -> [u32; 2] {
@@ -1618,11 +1756,13 @@ impl Standing for Nodes {
         }
         match parent {
             None => self.arena.roots[tree] = Some(node),
-            Some((parent, letter)) => {
-                self.arena.children.insert(key(parent, letter), node);
-            }
+            Some((parent, letter)) => self.arena.place(parent, letter, node),
         }
         node
+    }
+
+    fn mark(&mut self, parent: u32, letter: u32, digit: usize) {
+        self.arena.mark(parent, letter, digit);
     }
 
     fn passed(&self) -> u64 {
@@ -1688,11 +1828,11 @@ impl Topology for Working<'_> {
             .or_else(|| self.base.root(tree))
     }
 
-    fn child(&self, parent: u32, letter: u32) -> Option<u32> {
+    fn entry(&self, parent: u32, letter: u32) -> Option<u32> {
         self.children
             .get(&key(parent, letter))
             .copied()
-            .or_else(|| self.base.child(parent, letter))
+            .or_else(|| self.base.entry(parent, letter))
     }
 
     fn halves(&self, node: u32) -> [u32; 2] {
@@ -1798,6 +1938,11 @@ impl Standing for Working<'_> {
             }
         }
         node
+    }
+
+    fn mark(&mut self, parent: u32, letter: u32, digit: usize) {
+        self.children
+            .insert(key(parent, letter), PENDING | digit as u32);
     }
 
     fn passed(&self) -> u64 {
@@ -2086,10 +2231,58 @@ struct LatticeRead {
     tree: usize,
     branch: usize,
     symbol: usize,
+    stop: Stop,
     nodes: Vec<u32>,
     faces: Vec<u64>,
     own: Vec<u64>,
     external: Option<u64>,
+}
+
+/// [definition] **Where a branch's read stops** (Decisions 28 and 36; Lean
+/// `HNN/ConvergenceFounding.stopDepth`), decided from the standing before the digit is read.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Stop {
+    /// The path's last founded node reads its own KT face alone: at the branch's depth, or under
+    /// Decision 36 above its absent child.
+    Node,
+    /// The first unfounded depth reads the prior `½` (Decision 28; under Decision 36 within the
+    /// first-arrival reach, depth at most `forced`).
+    Prior,
+    /// Decision 36: the pending child opens at its second arrival with its first arrival's digit
+    /// and reads KT's face of that one count alone.
+    Opened(usize),
+}
+
+/// **Where a branch's read stops** under a founding law, from its founded path and letters.
+fn stop_of(
+    founded_at: Founding,
+    branch: &Branch,
+    nodes: &impl Topology,
+    path: &[u32],
+    letters: &[u32],
+) -> Stop {
+    if path.len() == branch.depth + 1 {
+        return Stop::Node;
+    }
+    match founded_at {
+        Founding::FirstArrival => Stop::Prior,
+        Founding::SecondArrival if path.len() <= branch.forced => Stop::Prior,
+        Founding::SecondArrival => {
+            let last = *path
+                .last()
+                .expect("the first-arrival reach founds the root");
+            match nodes.pending(last, letters[path.len() - 1]) {
+                Some(digit) => Stop::Opened(digit),
+                None => Stop::Node,
+            }
+        }
+    }
+}
+
+/// `(2C_b, 2N)` of a node opened at its second arrival with its first arrival's `digit`.
+fn opened_kt(digit: usize, symbol: usize) -> (u64, u64) {
+    let halves = opening_halves(digit);
+    (u64::from(halves[symbol]), u64::from(halves[0] + halves[1]))
 }
 
 /// One digit's executed read: its dyadic cell, its digit, each branch's read and the digit-0 face
@@ -2122,6 +2315,7 @@ struct Law {
     branches: Vec<Branch>,
     founding: Vec<Chart>,
     local: Option<(LocalLaw, Chart)>,
+    founded_at: Founding,
 }
 
 /// [definition] **The landmark tree, executed** (module header): the declaration, its derived
@@ -2175,6 +2369,7 @@ impl Law {
             branches,
             founding,
             local,
+            founded_at: Founding::FirstArrival,
         }
     }
 
@@ -2283,10 +2478,20 @@ impl Law {
         limit: usize,
         external: Option<u64>,
     ) -> LatticeRead {
-        let Branch { depth, forced } = self.branches[branch];
+        let forced = self.branches[branch].forced;
         let tree = self.tree(branch, dyadic);
         let path = nodes.open(tree, letters, limit);
-        let top = path.len().min(depth);
+        let stop = stop_of(
+            self.founded_at,
+            &self.branches[branch],
+            nodes,
+            &path,
+            letters,
+        );
+        let top = match stop {
+            Stop::Node => path.len() - 1,
+            Stop::Prior | Stop::Opened(_) => path.len(),
+        };
         let own: Vec<u64> = match external {
             Some(x) => (0..path.len())
                 .map(|d| {
@@ -2300,11 +2505,15 @@ impl Law {
             None => Vec::new(),
         };
         let mut faces = vec![0u64; top + 1];
-        faces[top] = match (path.len() == depth + 1, external) {
-            (true, Some(_)) => own[depth],
-            (true, None) => self.leaf(nodes, path[depth]),
-            (false, Some(x)) => self.unfounded_face(x),
-            (false, None) => self.full() / 2,
+        faces[top] = match (stop, external) {
+            (Stop::Node, Some(_)) => own[top],
+            (Stop::Node, None) => self.leaf(nodes, path[top]),
+            (Stop::Opened(digit), _) => {
+                let (u, v) = opened_kt(digit, 0);
+                self.round(u128::from(u) << self.widths.face, u128::from(v))
+            }
+            (Stop::Prior, Some(x)) => self.unfounded_face(x),
+            (Stop::Prior, None) => self.full() / 2,
         };
         for d in (0..top).rev() {
             faces[d] = if d < forced {
@@ -2324,6 +2533,7 @@ impl Law {
             tree,
             branch,
             symbol,
+            stop,
             nodes: path,
             faces,
             own,
@@ -2427,12 +2637,18 @@ impl Law {
         let Widths {
             face, certificate, ..
         } = self.widths;
-        let Branch { depth, forced } = self.branches[read.branch];
-        if d >= read.nodes.len() || d < forced {
+        let forced = self.branches[read.branch].forced;
+        let top = read.faces.len() - 1;
+        if d > top || d < forced {
             return 0;
         }
+        let (u, v) = match (d == top, read.stop) {
+            (true, Stop::Prior) => return 0,
+            (true, Stop::Opened(digit)) => opened_kt(digit, read.symbol),
+            _ => nodes.kt(read.nodes[d], read.symbol),
+        };
         if read.external.is_some() {
-            if d == depth {
+            if d == top {
                 return 0;
             }
             let own = u128::from(self.side(read.own[d], read.symbol));
@@ -2440,11 +2656,10 @@ impl Law {
             let below = u128::from(self.side(read.faces[d + 1], read.symbol));
             return ceil_div(1u128 << certificate, here.min(below).min(own));
         }
-        let (u, v) = nodes.kt(read.nodes[d], read.symbol);
         let here = u128::from(self.side(read.faces[d], read.symbol));
         let kt =
             |shift: u64| ceil_div(u128::from(v) << (certificate - face - shift), u128::from(u));
-        if d == depth {
+        if d == top {
             let lattice = ceil_div(1u128 << (certificate - 1), here);
             lattice.max(kt(1))
         } else {
@@ -2497,8 +2712,8 @@ impl Law {
     /// `ρ ≤ Σ drift + Σ θ` of one branch's read on `2^(−C)`; under the node-local law each founded
     /// node's own drift and own rounding, and the unfounded depth's own rounding, add.
     fn certificate(&self, nodes: &impl Standing, read: &LatticeRead) -> u128 {
-        let Branch { depth, forced } = self.branches[read.branch];
-        let mixing = read.nodes.len().min(depth);
+        let forced = self.branches[read.branch].forced;
+        let mixing = read.nodes.len().min(read.faces.len() - 1);
         let drift = (forced..mixing)
             .map(|d| nodes.chart(read.nodes[d]).drift)
             .fold(0u128, u128::saturating_add);
@@ -2649,13 +2864,18 @@ impl Law {
 
     /// **Deposit one branch's read** on a standing: each mixing node's β steps by `k(b)/q̂_(d+1)(b)`
     /// (under the node-local law by `ê(b)/q̂_(d+1)(b)`, each founded node's own ratio by
-    /// `k(b)/x̂(b)`) bottom-up and its certificates grow, the path's missing nodes are founded at
-    /// their depth's `β₀` (the declared stop prior; under the node-local law with `γ₀` stepped by the
-    /// empty KT face against `x̂`, `γ₀ ½/x̂(b)`), then each node's mass of the digit grows. Returns the
-    /// root's excess increment.
+    /// `k(b)/x̂(b)`) bottom-up and its certificates grow; a node where the read stopped keeps its β
+    /// (Lean `HNN/ConvergenceFounding.conv_ratio_step`). Then the founding law acts: at the first
+    /// arrival the path's missing nodes are founded at their depth's `β₀` (the declared stop prior;
+    /// under the node-local law with `γ₀` stepped by the empty KT face against `x̂`, `γ₀ ½/x̂(b)`);
+    /// at the second arrival (Decision 36) the first-arrival reach is founded, an opened pending
+    /// child is founded at its `β₀` with its first arrival's count, and the absent child below the
+    /// stop records this arrival's digit as its pending first arrival. Then each node's mass of the
+    /// digit grows. Returns the root's excess increment.
     fn apply_branch(&self, nodes: &mut impl Standing, letters: &[u32], read: LatticeRead) -> u128 {
         let face = self.widths.face;
-        let Branch { depth, forced } = self.branches[read.branch];
+        let forced = self.branches[read.branch].forced;
+        let top = read.faces.len() - 1;
         let local = read.external.is_some();
         // The first unfounded depth's own face is rounded once under the node-local law.
         let unfounded = if local {
@@ -2663,9 +2883,14 @@ impl Law {
         } else {
             0
         };
+        // An opened pending node's rounding is its own increment (Decision 36).
+        let opened = match read.stop {
+            Stop::Opened(_) => self.rounding(nodes, &read, top),
+            Stop::Node | Stop::Prior => 0,
+        };
         // Bottom-up over the founded nodes: θ and the rebases add to the excess, the child's
         // excess increment and the rebases to the drift (and the own face's increment, node-local).
-        let mut carried = unfounded;
+        let mut carried = unfounded.saturating_add(opened);
         for d in (forced..read.nodes.len()).rev() {
             let theta = self.rounding(nodes, &read, d);
             let node = read.nodes[d];
@@ -2675,7 +2900,7 @@ impl Law {
                 0
             };
             let mut rebase = 0u128;
-            if d < depth {
+            if d < top {
                 let below = self.side(read.faces[d + 1], read.symbol);
                 let beta = nodes.chart(node).beta;
                 let (step, units) = if local {
@@ -2732,6 +2957,7 @@ impl Law {
             tree,
             branch,
             symbol,
+            stop,
             nodes: mut path,
             ..
         } = read;
@@ -2741,13 +2967,20 @@ impl Law {
             chart
         };
         let own_at = own_founding.map(|(own, _)| own);
-        if path.is_empty() {
+        // The nodes founded at their first arrival: the whole path (Decision 28), or the
+        // first-arrival reach, depth at most `forced` (Decision 36).
+        let reach = match self.founded_at {
+            Founding::FirstArrival => letters.len(),
+            Founding::SecondArrival if stop == Stop::Prior => forced,
+            Founding::SecondArrival => 0,
+        };
+        if path.is_empty() && (stop == Stop::Prior || self.founded_at == Founding::FirstArrival) {
             if let Some((_, step)) = &own_founding {
                 Self::record(nodes, step);
             }
             path.push(nodes.found(tree, branch, None, 0, chart_at(0), own_at));
         }
-        while path.len() < letters.len() + 1 {
+        while path.len() < reach + 1 {
             let parent = *path.last().expect("a root");
             let letter = letters[path.len() - 1];
             let depth = path.len();
@@ -2762,6 +2995,32 @@ impl Law {
                 chart_at(depth),
                 own_at,
             ));
+        }
+        if self.founded_at == Founding::SecondArrival {
+            // Decision 36: the opened pending child is founded with its first arrival's count.
+            if let Stop::Opened(digit) = stop {
+                let parent = *path.last().expect("an opened node's founded parent");
+                let depth = path.len();
+                let mut chart = self.founding[depth];
+                chart.excess = opened;
+                let node = nodes.found(
+                    tree,
+                    branch,
+                    Some((parent, letters[depth - 1])),
+                    depth,
+                    chart,
+                    None,
+                );
+                *nodes.halves_mut(node) = opening_halves(digit);
+                path.push(node);
+            }
+            // The absent child below the stop records this arrival as its pending first arrival.
+            if path.len() < letters.len() + 1 {
+                let parent = *path
+                    .last()
+                    .expect("the first-arrival reach founds the root");
+                nodes.mark(parent, letters[path.len() - 1], symbol);
+            }
         }
         for &node in path.iter().skip(forced) {
             nodes.halves_mut(node)[symbol] += 2;
@@ -2930,6 +3189,41 @@ impl Landmarks {
         })
     }
 
+    /// [definition; agent-inferred] **Declare when the tree's landmarks are founded** ([`Founding`];
+    /// Decisions 28 and 36), on a tree nothing has reached yet: `Landmarks::new(d)?
+    /// .founded_at(Founding::SecondArrival)` is Decision 36's convergence-founded tree, with the
+    /// widths, the lattice law and the certificates of the declaration (the stopped path's read is a
+    /// path of at most `P` levels, so the rule's bound holds unchanged). Refused once a cell has
+    /// passed, and under the node-local law (Decision 34), which stays founded at the first arrival.
+    pub fn founded_at(mut self, founding: Founding) -> Result<Self, HnnError> {
+        if self.nodes.passed > 0 || self.nodes.len() > 0 {
+            return Err(shape(
+                "a founding law declared before any arrival",
+                0,
+                usize::try_from(self.nodes.passed).unwrap_or(usize::MAX),
+            ));
+        }
+        if founding == Founding::SecondArrival && self.law.is_local() {
+            return Err(shape(
+                "a convergence-founded tree without the node-local law",
+                0,
+                1,
+            ));
+        }
+        self.law.founded_at = founding;
+        Ok(self)
+    }
+
+    /// When the tree's landmarks are founded.
+    pub fn founding(&self) -> Founding {
+        self.law.founded_at
+    }
+
+    /// The pending first arrivals held (Decision 36): children reached once, not yet founded.
+    pub fn pending(&self) -> usize {
+        self.nodes.arena.pending
+    }
+
     /// The declaration.
     pub fn declaration(&self) -> &LandmarkDeclaration {
         &self.law.declaration
@@ -2969,9 +3263,11 @@ impl Landmarks {
     /// `bits(2C) + 2`, at the nodes of depth at least their branch's `forced`; at each mixing node
     /// (depth below its branch's) and each join, β's odd numerator and odd denominator,
     /// `max(1, bits) + 1` each, and its exponent, `max(1, bits|e|) + 2` with its sign; each founded
-    /// child's letter, `max(1, bits(letter)) + 1`; one bit a splitting dyadic cell and branch for
-    /// its root's presence; and under the node-local law each node's own ratio `γ`, as β. The totals (the masses' sum), the cached stop weight (read from β)
-    /// and the certificates are readings kept beside them and are not counted.
+    /// child's letter, `max(1, bits(letter)) + 1`, and each pending first arrival's letter likewise
+    /// and its digit, one bit (Decision 36); one bit a splitting dyadic cell and branch for its
+    /// root's presence; and under the node-local law each node's own ratio `γ`, as β. The totals
+    /// (the masses' sum), the cached stop weight (read from β) and the certificates are readings kept
+    /// beside them and are not counted.
     pub fn bits(&self) -> u64 {
         let slot = |value: u64| u64::from((u64::BITS - value.leading_zeros()).max(1)) + 1;
         let beta_bits = |beta: &Beta| {
@@ -3017,7 +3313,11 @@ impl Landmarks {
         } else {
             0
         };
-        nodes + letters + joins + (splitting.len() * self.law.branches.len()) as u64
+        nodes
+            + letters
+            + arena.pending as u64
+            + joins
+            + (splitting.len() * self.law.branches.len()) as u64
     }
 
     /// **The β chart's report** (module header).
@@ -3345,7 +3645,8 @@ impl Landmarks {
     /// **The nodes and joins a deposit touches** (the mirror's per-deposit lockstep): the founded
     /// nodes of every branch's path of every digit `class` opens at `address`, and the opened
     /// dyadic cells (whose joins an enlarged tree steps), read at the current standing: after the
-    /// deposit every node of its paths is founded. Each sorted, without repeats.
+    /// deposit of a tree founded at the first arrival every node of its paths is founded. Each
+    /// sorted, without repeats.
     pub fn touched(
         &self,
         address: &[Letter],
@@ -3418,13 +3719,15 @@ impl ArenaView<'_> {
             .collect()
     }
 
-    /// The child table as `(parent << 32 | letter, child)` pairs, in no order.
+    /// The child table as `(parent << 32 | letter, child)` pairs of founded children, in no order
+    /// (a pending first arrival, Decision 36, is not a child).
     pub fn children(&self) -> Vec<(u64, u32)> {
         self.tree
             .nodes
             .arena
             .children
             .iter()
+            .filter(|&(_, &child)| child & PENDING == 0)
             .map(|(&key, &child)| (key, child))
             .collect()
     }
@@ -3645,10 +3948,12 @@ pub struct IdealLandmarks {
     local: Option<LocalLaw>,
     width: Option<u64>,
     rebases: u64,
+    founded_at: Founding,
 }
 
 struct IdealRead {
     branch: usize,
+    stop: Stop,
     nodes: Vec<u32>,
     faces: Vec<Rat>,
     own: Vec<Rat>,
@@ -3713,7 +4018,26 @@ impl IdealLandmarks {
             local,
             width,
             rebases: 0,
+            founded_at: Founding::FirstArrival,
         })
+    }
+
+    /// **Declare when the oracle's landmarks are founded** ([`Founding`]; the executed tree's
+    /// [`Landmarks::founded_at`]), on an oracle nothing has reached yet. Refused once a cell has
+    /// passed, and under the node-local law.
+    pub fn founded_at(mut self, founding: Founding) -> Result<Self, HnnError> {
+        if self.arena.len() > 0 {
+            return Err(shape("a founding law declared before any arrival", 0, 1));
+        }
+        if founding == Founding::SecondArrival && self.local.is_some() {
+            return Err(shape(
+                "a convergence-founded oracle without the node-local law",
+                0,
+                1,
+            ));
+        }
+        self.founded_at = founding;
+        Ok(self)
     }
 
     /// [definition; agent-inferred] **The reference width** `W_o = O + ⌈log₂(3 B n*² P²)⌉`: the
@@ -3775,7 +4099,17 @@ impl IdealLandmarks {
         let Branch { depth, forced } = self.branches[branch];
         let tree = branch * (1usize << self.odometer.digits) + dyadic;
         let nodes = self.arena.open(tree, letters, depth + 1);
-        let top = nodes.len().min(depth);
+        let stop = stop_of(
+            self.founded_at,
+            &self.branches[branch],
+            &self.arena,
+            &nodes,
+            letters,
+        );
+        let top = match stop {
+            Stop::Node => nodes.len() - 1,
+            Stop::Prior | Stop::Opened(_) => nodes.len(),
+        };
         let own: Vec<Rat> = match external {
             Some(x) => (0..nodes.len())
                 .map(|d| {
@@ -3794,11 +4128,18 @@ impl IdealLandmarks {
             None => Rat::new(BigInt::one(), BigInt::from(2)),
         };
         let mut faces = vec![prior; top + 1];
-        if nodes.len() == depth + 1 {
-            faces[depth] = match external {
-                Some(_) => own[depth].clone(),
-                None => self.kt(nodes[depth], symbol),
-            };
+        match stop {
+            Stop::Node => {
+                faces[top] = match external {
+                    Some(_) => own[top].clone(),
+                    None => self.kt(nodes[top], symbol),
+                };
+            }
+            Stop::Opened(digit) => {
+                let (u, v) = opened_kt(digit, symbol);
+                faces[top] = Rat::new(BigInt::from(u), BigInt::from(v));
+            }
+            Stop::Prior => {}
         }
         for d in (0..top).rev() {
             faces[d] = if d < forced {
@@ -3814,6 +4155,7 @@ impl IdealLandmarks {
         }
         IdealRead {
             branch,
+            stop,
             nodes,
             faces,
             own,
@@ -3956,8 +4298,9 @@ impl IdealLandmarks {
                 self.rebases += u64::from(rebased);
             }
             for read in digit.reads {
-                let Branch { depth, forced } = self.branches[read.branch];
-                for d in (forced..read.nodes.len().min(depth)).rev() {
+                let forced = self.branches[read.branch].forced;
+                let top = read.faces.len() - 1;
+                for d in (forced..read.nodes.len().min(top)).rev() {
                     let node = read.nodes[d] as usize;
                     let own = match digit.external {
                         Some(_) => read.own[d].clone(),
@@ -3978,9 +4321,16 @@ impl IdealLandmarks {
                     }
                 }
                 let IdealRead {
-                    branch, mut nodes, ..
+                    branch,
+                    stop,
+                    mut nodes,
+                    ..
                 } = read;
                 let tree = branch * cells + digit.dyadic;
+                if self.founded_at == Founding::SecondArrival {
+                    self.converge(tree, branch, &letters[branch], stop, nodes, digit.symbol);
+                    continue;
+                }
                 let founded = self
                     .arena
                     .extend(tree, branch, &letters[branch], &mut nodes);
@@ -4003,6 +4353,58 @@ impl IdealLandmarks {
             }
         }
         Ok(face)
+    }
+}
+
+impl IdealLandmarks {
+    /// **Decision 36's founding on one branch's path** (the executed tree's `Law::apply_branch`, in
+    /// ℚ): the first-arrival reach founded at its depths' `β₀`, an opened pending child founded at
+    /// its `β₀` with its first arrival's count, the absent child below the stop recording this
+    /// arrival's digit, then each node's mass of the digit.
+    fn converge(
+        &mut self,
+        tree: usize,
+        branch: usize,
+        letters: &[u32],
+        stop: Stop,
+        mut nodes: Vec<u32>,
+        symbol: usize,
+    ) {
+        let forced = self.branches[branch].forced;
+        let founding =
+            |depth: usize| Rat::from_integer(BigInt::from(self.declaration.prior.founding(depth)));
+        let mut founded = Vec::new();
+        if stop == Stop::Prior {
+            if nodes.is_empty() {
+                let root = self.arena.found(branch, 0);
+                self.arena.roots[tree] = Some(root);
+                nodes.push(root);
+                founded.push(founding(0));
+            }
+            while nodes.len() < forced + 1 {
+                let parent = *nodes.last().expect("a root");
+                let child = self.arena.found(branch, nodes.len());
+                self.arena.place(parent, letters[nodes.len() - 1], child);
+                founded.push(founding(nodes.len()));
+                nodes.push(child);
+            }
+        }
+        if let Stop::Opened(digit) = stop {
+            let parent = *nodes.last().expect("an opened node's founded parent");
+            let child = self.arena.found(branch, nodes.len());
+            self.arena.place(parent, letters[nodes.len() - 1], child);
+            self.arena.halves[child as usize] = opening_halves(digit);
+            founded.push(founding(nodes.len()));
+            nodes.push(child);
+        }
+        self.beta.extend(founded);
+        if nodes.len() < letters.len() + 1 {
+            let parent = *nodes
+                .last()
+                .expect("the first-arrival reach founds the root");
+            self.arena.mark(parent, letters[nodes.len() - 1], symbol);
+        }
+        self.arena.count(&nodes, forced, symbol);
     }
 }
 
@@ -4497,15 +4899,17 @@ pub struct Coded {
     pub cells: u64,
 }
 
-/// [definition] **One tree's run**: its declaration and widths, its chart's report, its founded
-/// nodes and stored bits, the rule's a-priori residual a cell and the largest per-cell certified
-/// residual over the run.
+/// [definition] **One tree's run**: its declaration, its founding law and widths, its chart's
+/// report, its founded nodes, its pending first arrivals (Decision 36) and stored bits, the rule's
+/// a-priori residual a cell and the largest per-cell certified residual over the run.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TreeRun {
     pub declaration: LandmarkDeclaration,
+    pub founding: Founding,
     pub widths: Widths,
     pub chart: ChartReport,
     pub nodes: usize,
+    pub pending: usize,
     pub bits: u64,
     pub face_rule: Rat,
     pub largest_residual: Rat,
@@ -4527,6 +4931,38 @@ pub struct DepthSweep {
     pub tried: Vec<(usize, ExactInterval)>,
     pub chosen: usize,
     pub description_bits: u64,
+}
+
+impl DepthSweep {
+    /// **Whether a sweep continues past its last depth** ([`choose_depth`]'s rule): the last
+    /// depth's development code lies strictly below the one before it, by disjoint exact
+    /// enclosures (the first depth always continues).
+    pub fn decreasing(tried: &[(usize, ExactInterval)]) -> bool {
+        match tried {
+            [.., (_, previous), (_, last)] => last.upper < previous.lower,
+            _ => true,
+        }
+    }
+
+    /// **The sweep's choice from the depths tried** ([`choose_depth`]'s rule): the last depth, or
+    /// the one before it when the last did not decrease strictly; charged `⌈log₂⌉` of the depths
+    /// tried. Refused when nothing was tried.
+    pub fn of(tried: Vec<(usize, ExactInterval)>) -> Result<Self, HnnError> {
+        let Some((last, _)) = tried.last() else {
+            return Err(shape("a depth sweep of at least one depth", 1, 0));
+        };
+        let chosen = if Self::decreasing(&tried) {
+            *last
+        } else {
+            tried[tried.len() - 2].0
+        };
+        let description_bits = ceil_log2(&BigUint::from(tried.len()));
+        Ok(Self {
+            tried,
+            chosen,
+            description_bits,
+        })
+    }
 }
 
 fn zero() -> ExactInterval {
@@ -4859,9 +5295,10 @@ fn run_tree(
     letters: &[Letter],
     held_out: &(dyn Fn(usize) -> bool + Sync),
     declaration: &LandmarkDeclaration,
+    founding: Founding,
 ) -> Result<([ExactInterval; 2], TreeRun), HnnError> {
     aligned(cells, letters)?;
-    let mut tree = Landmarks::new(declaration.clone())?;
+    let mut tree = Landmarks::new(declaration.clone())?.founded_at(founding)?;
     let mut codes = [PassageCode::new(), PassageCode::new()];
     let mut largest_residual = Rat::zero();
     for (position, &class) in cells.iter().enumerate() {
@@ -4875,9 +5312,11 @@ fn run_tree(
         [codes[0].bits()?, codes[1].bits()?],
         TreeRun {
             declaration: declaration.clone(),
+            founding,
             widths: tree.widths(),
             chart: tree.chart(),
             nodes: tree.nodes(),
+            pending: tree.pending(),
             bits: tree.bits(),
             face_rule: tree.face_rule(),
             largest_residual,
@@ -4929,7 +5368,15 @@ pub fn prequential(
 ) -> Result<Prequential, HnnError> {
     let held_out = |position: usize| cut.held_out(position);
     let (tree, baselines) = rayon::join(
-        || run_tree(&cut.cells, letters, &held_out, declaration),
+        || {
+            run_tree(
+                &cut.cells,
+                letters,
+                &held_out,
+                declaration,
+                Founding::FirstArrival,
+            )
+        },
         || run_baselines(&cut.cells, &held_out, declaration.alphabet),
     );
     let ([development_tree, held_tree], run) = tree?;
@@ -4980,7 +5427,13 @@ pub fn development_run(
     let cells = development(cut);
     let letters = development_letters(cut, letters);
     let never = |_: usize| false;
-    let ([bits, _], run) = run_tree(&cells, &letters, &never, declaration)?;
+    let ([bits, _], run) = run_tree(
+        &cells,
+        &letters,
+        &never,
+        declaration,
+        Founding::FirstArrival,
+    )?;
     Ok((bits, run))
 }
 
@@ -5005,6 +5458,21 @@ pub fn choose_depth_within(
     declaration: &LandmarkDeclaration,
     deepest: usize,
 ) -> Result<DepthSweep, HnnError> {
+    choose_depth_founded(cut, letters, declaration, deepest, Founding::FirstArrival)
+}
+
+/// [definition; agent-inferred] **Choose the address depth of a tree under a founding law**
+/// ([`Founding`]; Decision 36): [`choose_depth_within`]'s sweep on the development cells, each
+/// depth's tree founded by the declared law. Under [`Founding::SecondArrival`] the memory bounds no
+/// depth (at most `n B + 2^B − 1` founded nodes at every depth), so `deepest` is the deepest depth
+/// whose widths the carriers admit.
+pub fn choose_depth_founded(
+    cut: &Cut,
+    letters: &[Letter],
+    declaration: &LandmarkDeclaration,
+    deepest: usize,
+    founding: Founding,
+) -> Result<DepthSweep, HnnError> {
     aligned(&cut.cells, letters)?;
     let cells = development(cut);
     let letters = development_letters(cut, letters);
@@ -5016,28 +5484,14 @@ pub fn choose_depth_within(
             depth,
             ..declaration.clone()
         };
-        let ([bits, _], _) = run_tree(&cells, &letters, &never, &declared)?;
-        let decreased = tried
-            .last()
-            .is_none_or(|(_, previous)| bits.upper < previous.lower);
+        let ([bits, _], _) = run_tree(&cells, &letters, &never, &declared, founding)?;
         tried.push((depth, bits));
-        if !decreased || depth >= cells.len() || depth >= deepest {
+        if !DepthSweep::decreasing(&tried) || depth >= cells.len() || depth >= deepest {
             break;
         }
         depth += 1;
     }
-    let chosen =
-        if tried.len() >= 2 && tried[tried.len() - 1].1.upper >= tried[tried.len() - 2].1.lower {
-            tried[tried.len() - 2].0
-        } else {
-            tried[tried.len() - 1].0
-        };
-    let description_bits = ceil_log2(&BigUint::from(tried.len()));
-    Ok(DepthSweep {
-        tried,
-        chosen,
-        description_bits,
-    })
+    DepthSweep::of(tried)
 }
 
 /// **One tree's prequential run on a cut, the tree alone** (the held-out pass of a law measured
@@ -5048,9 +5502,20 @@ pub fn tree_prequential(
     letters: &[Letter],
     declaration: &LandmarkDeclaration,
 ) -> Result<([ExactInterval; 2], TreeRun), HnnError> {
+    tree_prequential_founded(cut, letters, declaration, Founding::FirstArrival)
+}
+
+/// **One tree's prequential run on a cut under a founding law** ([`tree_prequential`]'s pass, the
+/// tree founded by the declared law, [`Founding`]).
+pub fn tree_prequential_founded(
+    cut: &Cut,
+    letters: &[Letter],
+    declaration: &LandmarkDeclaration,
+    founding: Founding,
+) -> Result<([ExactInterval; 2], TreeRun), HnnError> {
     aligned(&cut.cells, letters)?;
     let held_out = |position: usize| cut.held_out(position);
-    run_tree(&cut.cells, letters, &held_out, declaration)
+    run_tree(&cut.cells, letters, &held_out, declaration, founding)
 }
 
 /// [definition] **A stop-prior sweep on the development cells** ([`choose_prior`]): every law tried

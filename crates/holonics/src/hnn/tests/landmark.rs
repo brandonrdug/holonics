@@ -15,18 +15,25 @@
 //! controls as the per-depth prior `(1, r + 1)`, and the prior sweep on the development cells.
 //! Decision 34: the node-local law against the own-weight block recursion, its faces normalized and
 //! certified, its refusals; the join tree's prior; the joins as the Bayesian mixture per dyadic
-//! cell; and the stop-weight mixture per digit tree telescoping per dyadic cell.
+//! cell; and the stop-weight mixture per digit tree telescoping per dyadic cell. Decision 36: the
+//! convergence-founded oracle against the tree with absent children simulated apart (exact in ℚ),
+//! the founding at the second arrival with the first arrival's count, Decision 28 as the first
+//! arrival, the executed faces normalized and certified, the stopped path's lattice law, the memory
+//! bounded at every depth, a window in cell order, and the founded prequential pass and sweep.
+
+use std::collections::HashMap;
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
 
 use crate::hnn::HnnError;
 use crate::hnn::landmark::{
-    Beta, Bundle, DigitsReading, FaceJoins, Feature, IdealLandmarks, JoinTree, LandmarkDeclaration,
-    LandmarkFace, Landmarks, Letter, LetterFamily, LocalLaw, PassageCode, StopMixture, StopPrior,
-    Widths, address, binary_log, carrier_width, cell_letters, choose_depth, choose_prior,
-    code_length, face_bits, ladder_top, lattice_mix, letter_address, prequential, prior_family,
-    ratio_code_length, tree_prequential,
+    Beta, Bundle, DigitsReading, FaceJoins, Feature, Founding, IdealLandmarks, JoinTree,
+    LandmarkDeclaration, LandmarkFace, Landmarks, Letter, LetterFamily, LocalLaw, PassageCode,
+    StopMixture, StopPrior, Widths, address, binary_log, carrier_width, cell_letters, choose_depth,
+    choose_depth_founded, choose_prior, code_length, face_bits, ladder_top, lattice_mix,
+    letter_address, prequential, prior_family, ratio_code_length, tree_prequential,
+    tree_prequential_founded,
 };
 use crate::hnn::ratio::log2_enclosure;
 use crate::hnn::receiving::grain_exponent;
@@ -1796,4 +1803,514 @@ fn landmark_stop_mixture_is_the_bayes_mixture_per_digit_tree() {
         .product();
     assert!(within(&executed, &telescoped, &residual));
     assert!(residual > Rat::zero());
+}
+
+// -------------------------------------------------------------------------------------------
+// Decision 36: a landmark is founded where paths converge, at its second arrival
+
+/// A tree of `declared` founded at the second arrival.
+fn converging(declared: LandmarkDeclaration) -> Landmarks {
+    Landmarks::new(declared)
+        .unwrap()
+        .founded_at(Founding::SecondArrival)
+        .unwrap()
+}
+
+/// The oracle of `declared` founded at the second arrival, `β` exact.
+fn converging_oracle(declared: LandmarkDeclaration) -> IdealLandmarks {
+    IdealLandmarks::new(declared, None)
+        .unwrap()
+        .founded_at(Founding::SecondArrival)
+        .unwrap()
+}
+
+/// The KT mass of binary counts, `Π (j + ½)/Π (j + 1)`.
+fn kt_mass(counts: [i64; 2]) -> Rat {
+    let mut seen = [0i64; 2];
+    let mut mass = Rat::one();
+    for x in 0..2 {
+        for _ in 0..counts[x] {
+            mass *= rat(2 * seen[x] + 1, 2 * (seen[0] + seen[1]) + 2);
+            seen[x] += 1;
+        }
+    }
+    mass
+}
+
+/// One reached node of the convergence standing: its counts, its opening count and its
+/// pre-factor.
+#[derive(Clone)]
+struct Reached {
+    count: [i64; 2],
+    opening: [i64; 2],
+    pre: Rat,
+}
+
+/// **The convergence standing, simulated apart from the tree** (Lean
+/// `HNN/ConvergenceFounding.Convergence.receive`) over the binary symbols of `stream[past..]`, the
+/// nodes keyed by their letter codes newest first: each arrival stops at `τ`, the deepest present
+/// node (the root, or a node an earlier arrival reached); the stopped path counts the symbol; below
+/// the stop the absent child is reached, opens with this count, and its pre-factor takes the
+/// stopped node's KT face.
+fn converge_standing(stream: &[usize], past: usize, depth: usize) -> HashMap<Vec<u64>, Reached> {
+    let mut standing: HashMap<Vec<u64>, Reached> = HashMap::new();
+    for t in past..stream.len() {
+        let codes: Vec<u64> = address(stream, t, depth)
+            .into_iter()
+            .map(Letter::code)
+            .collect();
+        let x = stream[t];
+        let present = |s: &[u64], standing: &HashMap<Vec<u64>, Reached>| {
+            s.is_empty() || standing.get(s).is_some_and(|n| n.count[0] + n.count[1] > 0)
+        };
+        let mut stop = 0;
+        while stop < depth && present(&codes[..stop + 1], &standing) {
+            stop += 1;
+        }
+        if stop < depth {
+            let parent = standing.get(&codes[..stop]).map_or([0, 0], |n| n.count);
+            let face = rat(2 * parent[x] + 1, 2 * (parent[0] + parent[1]) + 2);
+            let child = standing
+                .entry(codes[..stop + 1].to_vec())
+                .or_insert(Reached {
+                    count: [0, 0],
+                    opening: [0, 0],
+                    pre: Rat::one(),
+                });
+            child.pre *= face;
+            child.opening[x] += 1;
+        }
+        for d in 0..=(stop + 1).min(depth) {
+            let node = standing.entry(codes[..d].to_vec()).or_insert(Reached {
+                count: [0, 0],
+                opening: [0, 0],
+                pre: Rat::one(),
+            });
+            node.count[x] += 1;
+        }
+    }
+    standing
+}
+
+/// **The weight of the convergence standing** (Lean `HNN/ConvergenceFounding.convWeight`):
+/// `W_s = E_s` at depth `D`, else `w_d E_s + (1 − w_d) Π_b R_(s b) W_(s b)` over the reached children
+/// (an unreached child weighs one), with `E_s = KT(counts)/KT(opening)`.
+fn converge_weight(
+    standing: &HashMap<Vec<u64>, Reached>,
+    s: &[u64],
+    depth: usize,
+    prior: &StopPrior,
+) -> Rat {
+    let own = standing
+        .get(s)
+        .map_or(Rat::one(), |n| kt_mass(n.count) / kt_mass(n.opening));
+    if s.len() == depth {
+        return own;
+    }
+    let split: Rat = standing
+        .iter()
+        .filter(|(k, _)| k.len() == s.len() + 1 && k.starts_with(s))
+        .map(|(k, n)| &n.pre * converge_weight(standing, k, depth, prior))
+        .product();
+    let stop = prior.weight(s.len());
+    &stop * own + (Rat::one() - &stop) * split
+}
+
+/// **The convergence-founded oracle is the tree with absent children** (Lean
+/// `HNN/ConvergenceFounding.{convergence_is_probability, convergence_step, conv_weight_step}`): on a
+/// binary stream at every depth up to 5 and under several stop priors, the product of the oracle's
+/// faces (`β` exact) equals, exactly in ℚ, the root weight of the convergence standing simulated
+/// apart from the tree (each node's KT given its opening count, each absent child's pre-factor);
+/// the executed tree founded at the second arrival stays within its certificate of the oracle
+/// cell by cell, and its faces are normalized.
+#[test]
+fn landmark_convergence_oracle_is_the_absent_child_weight() {
+    let stream: Vec<usize> = (0..60u64)
+        .map(|t| usize::from((t * t + 3 * t + t / 5) % 7 < 3))
+        .collect();
+    for prior in priors() {
+        for depth in 0..=5 {
+            let declared = LandmarkDeclaration {
+                prior: prior.clone(),
+                ..declaration(2, depth)
+            };
+            let mut oracle = converging_oracle(declared.clone());
+            let mut tree = converging(declared);
+            let mut ideal = Rat::one();
+            for t in depth..stream.len() {
+                let here = address(&stream, t, depth);
+                let sum =
+                    oracle.probability(&here, 0).unwrap() + oracle.probability(&here, 1).unwrap();
+                assert_eq!(sum, Rat::one());
+                let face = oracle.receive(&here, stream[t]).unwrap();
+                let reading = tree.receive(&here, stream[t]).unwrap();
+                assert!(within(&reading.executed, &face, &reading.residual));
+                assert!(reading.residual <= tree.face_rule());
+                ideal *= face;
+            }
+            let standing = converge_standing(&stream, depth, depth);
+            assert_eq!(
+                ideal,
+                converge_weight(&standing, &[], depth, &prior),
+                "{prior}, D = {depth}"
+            );
+            // The executed tree founds a node for each reached node that met a second arrival.
+            let founded = standing
+                .iter()
+                .filter(|(k, n)| k.is_empty() || n.count[0] + n.count[1] >= 2)
+                .count();
+            assert_eq!(tree.nodes(), founded, "{prior}, D = {depth}");
+            assert_eq!(tree.pending(), standing.len() - founded);
+        }
+    }
+}
+
+/// **A node is founded at its second arrival, opening with its first arrival's count** (Lean
+/// `HNN/ConvergenceFounding.second_arrival_opens_with_the_first_count`): the first arrival reads
+/// the root alone (the prior `½`), founds only the root and records the child's pending arrival;
+/// the second arrival at the same address opens that child with its one count (KT's `3/4` for the
+/// same digit), the root mixing over it, and its deposit founds it with both counts and records
+/// the grandchild; an arrival at a new context stops at the root. The oracle reads the same faces.
+#[test]
+fn landmark_convergence_founds_at_the_second_arrival() {
+    let declared = declaration(2, 3);
+    let mut tree = converging(declared.clone());
+    let mut oracle = converging_oracle(declared);
+    let here = [Letter::Cell(1), Letter::Cell(0), Letter::Cell(1)];
+    let first = tree.opened(&here, 0).unwrap();
+    assert_eq!(first[0].founded, 0);
+    assert_eq!(first[0].faces, vec![rat(1, 2)]);
+    assert_eq!(tree.receive(&here, 0).unwrap().executed, rat(1, 2));
+    assert_eq!(oracle.receive(&here, 0).unwrap(), rat(1, 2));
+    assert_eq!((tree.nodes(), tree.pending()), (1, 1));
+    // The second arrival opens the pending child with its first arrival's count.
+    let second = tree.opened(&here, 0).unwrap();
+    assert_eq!(second[0].founded, 1);
+    assert_eq!(second[0].faces.len(), 2);
+    assert_eq!(second[0].faces[1], rat(3, 4));
+    let ideal = oracle.opened(&here, 0).unwrap();
+    assert_eq!(ideal[0].faces[1], rat(3, 4));
+    let executed = tree.receive(&here, 1).unwrap().executed;
+    let face = oracle.receive(&here, 1).unwrap();
+    assert!(within(&executed, &face, &rat(1, 1 << 20)));
+    assert_eq!((tree.nodes(), tree.pending()), (2, 1));
+    // The founded child holds its opening count and this arrival's: half-units [3, 3].
+    assert_eq!(tree.arena().halves()[1], [3, 3]);
+    assert_eq!(tree.arena().children().len(), 1);
+    // A new context stops at the root, which reads its KT face alone.
+    let other = [Letter::Cell(0), Letter::Cell(0), Letter::Cell(0)];
+    let path = tree.opened(&other, 0).unwrap();
+    assert_eq!((path[0].founded, path[0].faces.len()), (1, 1));
+    tree.receive(&other, 0).unwrap();
+    assert_eq!((tree.nodes(), tree.pending()), (2, 2));
+    // The root's β stepped at the second arrival only (the first stopped at the root).
+    assert_eq!(tree.opened(&here, 0).unwrap()[0].betas[0], Rat::one());
+}
+
+/// **Decision 28's tree is the case "found at the first arrival"** (Lean
+/// `HNN/ConvergenceFounding.first_arrival_is_decision_28`): declaring the first arrival is the tree
+/// `Landmarks::new` declares, exactly; the second arrival reads a different face once a context
+/// meets its first arrival; the law is declared before any arrival and never under the node-local
+/// law.
+#[test]
+fn landmark_first_arrival_founding_is_decision_28() {
+    let declared = declaration(4, 3);
+    let stream: Vec<usize> = (0..40u64).map(|t| ((t * 5 + t / 3) % 4) as usize).collect();
+    let mut first = Landmarks::new(declared.clone())
+        .unwrap()
+        .founded_at(Founding::FirstArrival)
+        .unwrap();
+    let mut plain = Landmarks::new(declared.clone()).unwrap();
+    let mut second = converging(declared.clone());
+    assert_eq!(plain.founding(), Founding::FirstArrival);
+    assert_eq!(second.founding(), Founding::SecondArrival);
+    let mut differs = false;
+    for (position, &cell) in stream.iter().enumerate() {
+        let here = address(&stream, position, 3);
+        let reading = first.receive(&here, cell).unwrap();
+        assert_eq!(reading, plain.receive(&here, cell).unwrap());
+        differs |= reading.executed != second.receive(&here, cell).unwrap().executed;
+    }
+    assert_eq!(first, plain);
+    assert_eq!(first.pending(), 0);
+    assert!(differs);
+    assert!(second.nodes() < first.nodes());
+    assert!(matches!(
+        plain.clone().founded_at(Founding::SecondArrival),
+        Err(HnnError::Shape { .. })
+    ));
+    let local = Landmarks::local(declared.clone(), LocalLaw::new(2).unwrap()).unwrap();
+    assert!(local.clone().founded_at(Founding::FirstArrival).is_ok());
+    assert!(matches!(
+        local.founded_at(Founding::SecondArrival),
+        Err(HnnError::Shape { .. })
+    ));
+    let oracle = IdealLandmarks::local(declared, None, LocalLaw::new(2).unwrap()).unwrap();
+    assert!(oracle.founded_at(Founding::SecondArrival).is_err());
+}
+
+/// **The executed convergence-founded faces are normalized exactly and certified** over five
+/// classes (so a digit is forced) with and without a forced depth (the first-arrival reach), under
+/// two stop priors: each face sums to 1, each class is positive and equals the one-class read, each
+/// cell's certificate lies within the rule and holds against the oracle.
+#[test]
+fn landmark_convergence_faces_are_normalized_and_certified() {
+    let alphabet = 5;
+    let stream: Vec<usize> = (0..70u64).map(|t| ((t * 7 + t / 3) % 5) as usize).collect();
+    let laws = [StopPrior::half(), StopPrior::per_depth(vec![1, 3]).unwrap()];
+    for (forced, prior) in [0, 1]
+        .into_iter()
+        .flat_map(|f| laws.clone().map(|p| (f, p)))
+    {
+        let declared = LandmarkDeclaration {
+            forced,
+            prior,
+            population: 70,
+            ..declaration(alphabet, 3)
+        };
+        let mut tree = converging(declared.clone());
+        let mut oracle = converging_oracle(declared);
+        for (position, &cell) in stream.iter().enumerate() {
+            let here = address(&stream, position, 3);
+            let face = tree.face(&here, 16).unwrap();
+            let sum: Rat = face.probabilities.iter().cloned().sum();
+            assert_eq!(sum, Rat::one());
+            let ideal: Rat = (0..alphabet)
+                .map(|class| oracle.probability(&here, class).unwrap())
+                .sum();
+            assert_eq!(ideal, Rat::one());
+            for class in 0..alphabet {
+                let p = &face.probabilities[class];
+                assert!(p > &Rat::zero());
+                assert_eq!(p, &tree.probability(&here, class).unwrap());
+            }
+            let reading = tree.receive(&here, cell).unwrap();
+            let ideal = oracle.receive(&here, cell).unwrap();
+            assert!(reading.residual <= tree.face_rule());
+            assert!(within(&reading.executed, &ideal, &reading.residual));
+        }
+        assert!(tree.pending() > 0);
+    }
+}
+
+/// **The stopped path's lattice law, recomputed in ℚ** (Lean
+/// `HNN/ConvergenceFounding.{stopped_face_normalized, conv_ratio_step}`): on every opened path the
+/// stop reads its own face alone (a founded node's `⟦k⟧`, an opened pending node's KT face of its
+/// one count, or the prior `½` within the first-arrival reach), each depth above it mixes by
+/// `⟦λ̂ k + (1 − λ̂) q̂'⟧`; after the deposit each mixing node's `β` steps by `k/q̂'` (or its rebase)
+/// and a founded node where the read stopped keeps its `β`.
+#[test]
+fn landmark_convergence_lattice_faces_follow_the_law() {
+    let stream: Vec<usize> = (0..80u64).map(|t| ((t * t + t / 4) % 4) as usize).collect();
+    for (forced, prior) in [
+        (0, StopPrior::half()),
+        (1, StopPrior::per_depth(vec![1, 4]).unwrap()),
+    ] {
+        let mut tree = Landmarks::with_carrier(
+            LandmarkDeclaration {
+                forced,
+                prior: prior.clone(),
+                population: 80,
+                ..declaration(4, 3)
+            },
+            12,
+        )
+        .unwrap()
+        .founded_at(Founding::SecondArrival)
+        .unwrap();
+        let scale = Rat::from_integer(BigInt::one() << tree.face_bits() as usize);
+        let lattice = |x: &Rat| {
+            let rounded = (x * &scale + rat(1, 2)).floor();
+            rounded.max(Rat::one()).min(&scale - Rat::one()) / &scale
+        };
+        let rebase = rat(1, 1 << 11);
+        let (mut stops, mut opens) = (0, 0);
+        for (position, &cell) in stream.iter().enumerate() {
+            let here = address(&stream, position, 3);
+            for class in 0..4 {
+                for path in tree.opened(&here, class).unwrap() {
+                    let zero = |x: &Rat| {
+                        if path.symbol == 0 {
+                            x.clone()
+                        } else {
+                            Rat::one() - x
+                        }
+                    };
+                    let top = path.faces.len() - 1;
+                    for q in &path.faces {
+                        let numerator = q * &scale;
+                        assert!(numerator.is_integer());
+                    }
+                    if top + 1 == path.founded {
+                        // The path stops at a founded node: its KT face alone.
+                        assert_eq!(zero(&path.faces[top]), lattice(&zero(&path.masses[top])));
+                        stops += usize::from(top < 3);
+                    } else if top > forced.max(0) || (top == 0 && path.founded == 0 && forced == 0)
+                    {
+                        // An opened pending node (3/4 or 1/4 of its digit), or the root's prior.
+                        let q = &path.faces[top];
+                        assert!(q == &rat(1, 2) || q == &rat(3, 4) || q == &rat(1, 4));
+                        opens += usize::from(q != &rat(1, 2));
+                    } else {
+                        assert_eq!(path.faces[top], rat(1, 2));
+                    }
+                    for d in 0..top {
+                        let expected = if d < forced {
+                            path.faces[d + 1].clone()
+                        } else {
+                            let beta = &path.betas[d];
+                            let stop =
+                                (beta / (Rat::one() + beta) * &scale + rat(1, 2)).floor() / &scale;
+                            zero(&lattice(
+                                &(&stop * zero(&path.masses[d])
+                                    + (Rat::one() - &stop) * zero(&path.faces[d + 1])),
+                            ))
+                        };
+                        assert_eq!(path.faces[d], expected);
+                    }
+                }
+            }
+            let before = tree.opened(&here, cell).unwrap();
+            tree.receive(&here, cell).unwrap();
+            let after = tree.opened(&here, cell).unwrap();
+            for (old, new) in before.iter().zip(&after) {
+                let top = old.faces.len() - 1;
+                for d in forced..old.founded.min(top) {
+                    let stepped = &old.betas[d] * &old.masses[d] / &old.faces[d + 1];
+                    let ratio = &new.betas[d] / &stepped;
+                    assert!(ratio <= Rat::one() && ratio > Rat::one() - &rebase);
+                }
+                if top + 1 == old.founded && top < 3 {
+                    assert_eq!(new.betas[top], old.betas[top], "the stop keeps its β");
+                }
+                for d in old.founded..new.founded {
+                    assert_eq!(
+                        new.betas[d],
+                        Rat::from_integer(BigInt::from(prior.founding(d)))
+                    );
+                }
+            }
+        }
+        assert!(stops > 0 && opens > 0, "the passage stopped and opened");
+    }
+}
+
+/// **The memory bounds no depth** (Decision 36, `Founding`'s a-priori size): over a passage of `n`
+/// cells the convergence-founded tree founds at most `n B + 2^B − 1` nodes and holds at most `n B`
+/// pending first arrivals at every depth, while the first-arrival tree's founded nodes grow with the
+/// depth past that bound.
+#[test]
+fn landmark_convergence_memory_is_bounded_at_every_depth() {
+    let stream: Vec<usize> = (0..400u64)
+        .map(|t| ((t * 13 + t / 7 + t * t / 29) % 4) as usize)
+        .collect();
+    let (n, digits) = (stream.len(), 2usize);
+    let bound = n * digits + (1 << digits) - 1;
+    for depth in [2, 8, 24] {
+        let declared = LandmarkDeclaration {
+            population: 400,
+            ..declaration(4, depth)
+        };
+        let mut tree = converging(declared.clone());
+        let mut first = Landmarks::new(declared).unwrap();
+        for (position, &cell) in stream.iter().enumerate() {
+            let here = address(&stream, position, depth);
+            tree.receive(&here, cell).unwrap();
+            first.receive(&here, cell).unwrap();
+        }
+        assert!(tree.nodes() <= bound, "D = {depth}");
+        assert!(tree.pending() <= n * digits, "D = {depth}");
+        if depth == 24 {
+            assert!(first.nodes() > bound);
+        }
+    }
+}
+
+/// **A window's faces in cell order under the convergence founding** (the working overlay records
+/// and opens pending arrivals as the tree does): each phase reads the face of a clone into which
+/// the earlier phases were deposited, exactly.
+#[test]
+fn landmark_convergence_window_faces_read_each_phase_after_the_earlier_deposits() {
+    let stream: Vec<usize> = (0..90u64)
+        .map(|t| ((t * 7 + t / 3 + t * t / 11) % 5) as usize)
+        .collect();
+    let declared = LandmarkDeclaration {
+        population: 90,
+        ..declaration(5, 3)
+    };
+    let mut tree = Landmarks::with_carrier(declared, 6)
+        .unwrap()
+        .founded_at(Founding::SecondArrival)
+        .unwrap();
+    let aperture = 3;
+    for start in (0..stream.len()).step_by(aperture) {
+        let window = start..(start + aperture).min(stream.len());
+        let addresses: Vec<Vec<Letter>> = window
+            .clone()
+            .map(|position| address(&stream, position, 3))
+            .collect();
+        let known = &stream[window.clone()];
+        let before = tree.clone();
+        let faces = tree.window_faces(&addresses, known, 16).unwrap();
+        assert_eq!(tree, before, "the tree is unchanged");
+        let mut deposited = tree.clone();
+        for (j, (here, &cell)) in addresses.iter().zip(known).enumerate() {
+            assert_eq!(faces[j], deposited.face(here, 16).unwrap(), "phase {j}");
+            deposited.deposit(here, cell).unwrap();
+        }
+        tree = deposited;
+    }
+    assert!(tree.pending() > 0);
+}
+
+/// **The prequential measurement and the depth sweep under a founding law**: the founded pass's
+/// sums enclose the replay's faces and report the founding, its nodes and pending records; the
+/// founded sweep reads the development cells only and charges `⌈log₂⌉` of the depths tried.
+#[test]
+fn landmark_convergence_prequential_partitions_the_cut() {
+    let cells: Vec<usize> = (0..60u64).map(|t| ((t * 3 + t / 5) % 4) as usize).collect();
+    let tail = 45..60;
+    let cut = Cut {
+        cells: cells.clone(),
+        held_out: vec![tail],
+    };
+    let declared = declaration(4, 3);
+    let letters = cell_letters(&cut.cells);
+    let ([development, held], run) =
+        tree_prequential_founded(&cut, &letters, &declared, Founding::SecondArrival).unwrap();
+    let mut tree = converging(declared.clone());
+    let mut products = [Rat::one(), Rat::one()];
+    for (position, &cell) in cells.iter().enumerate() {
+        let reading = tree.receive(&address(&cells, position, 3), cell).unwrap();
+        products[usize::from(position >= 45)] *= &reading.executed;
+    }
+    for (coded, product) in [(&development, &products[0]), (&held, &products[1])] {
+        let whole = code_length(product).unwrap();
+        assert!(coded.lower <= whole.upper && whole.lower <= coded.upper);
+    }
+    assert_eq!(run.founding, Founding::SecondArrival);
+    assert_eq!((run.nodes, run.pending), (tree.nodes(), tree.pending()));
+    assert_eq!(run.bits, tree.bits());
+    let sweep =
+        choose_depth_founded(&cut, &letters, &declared, 6, Founding::SecondArrival).unwrap();
+    let mut other = cut.clone();
+    for cell in &mut other.cells[45..] {
+        *cell = 3 - *cell;
+    }
+    assert_eq!(
+        choose_depth_founded(
+            &other,
+            &cell_letters(&other.cells),
+            &declared,
+            6,
+            Founding::SecondArrival
+        )
+        .unwrap(),
+        sweep
+    );
+    assert!(sweep.tried.len() <= 6);
+    assert_eq!(
+        choose_depth_founded(&cut, &letters, &declared, 6, Founding::FirstArrival).unwrap(),
+        crate::hnn::landmark::choose_depth_within(&cut, &letters, &declared, 6).unwrap()
+    );
 }
