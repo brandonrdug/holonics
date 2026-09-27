@@ -20,18 +20,22 @@
 //! (`landmark_full`, the tests' independent reference), exact in ℚ at depths past the stream's
 //! recurrence (under the stop priors, forced depths and on both branches of the enlarged tree), the executed tree within its carried certificate with at most `2n − 1`
 //! nodes a tree, its windows in cell order, the split's ratios against their exact forms, and its
-//! stored parts.
+//! stored parts. Decision 39 (a landmark's storage has a capacity): the unbounded register and any
+//! ceiling no node reaches are the tree of Decisions 28–37 exactly; the capped oracle equals the
+//! naive tree of one register a depth (`landmark_full`) exactly in ℚ, register for register along
+//! every opened path, with chains split after their registers carried; the capped executed tree
+//! within its certificate; and its windows in cell order.
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
 
 use crate::hnn::HnnError;
 use crate::hnn::landmark::{
-    Beta, Bundle, DigitsReading, FaceJoins, Feature, IdealLandmarks, JoinTree, LandmarkDeclaration,
-    LandmarkFace, Landmarks, Letter, LetterFamily, PassageCode, StopMixture, StopPrior,
-    Widths, address, binary_log, carrier_width, cell_letters, choose_depth, choose_prior,
-    code_length, face_bits, ladder_top, lattice_mix, letter_address, odometer_digits, prequential,
-    prior_family, ratio_code_length, tree_prequential,
+    Beta, Bundle, Capacity, DigitsReading, FaceJoins, Feature, IdealLandmarks, JoinTree,
+    LandmarkDeclaration, LandmarkFace, Landmarks, Letter, LetterFamily, PassageCode, StopMixture,
+    StopPrior, Widths, address, binary_log, carrier_width, cell_letters, choose_depth,
+    choose_prior, code_length, face_bits, ladder_top, lattice_mix, letter_address, odometer_digits,
+    prequential, prior_family, ratio_code_length, tree_prequential,
 };
 use super::landmark_full::FullTree;
 use crate::hnn::ratio::log2_enclosure;
@@ -48,6 +52,7 @@ fn declaration(alphabet: usize, depth: usize) -> LandmarkDeclaration {
         grain: 16,
         family: LetterFamily::cells(),
         prior: StopPrior::half(),
+        capacity: Capacity::Unbounded,
     }
 }
 
@@ -606,16 +611,17 @@ fn landmark_window_faces_read_each_phase_after_the_earlier_deposits() {
         .map(|t| ((t * 7 + t / 3 + t * t / 11) % 5) as usize)
         .collect();
     for prior in [StopPrior::half(), StopPrior::per_depth(vec![2, 5]).unwrap()] {
-        window_in_cell_order(&stream, prior, 2);
+        window_in_cell_order(&stream, prior, 2, Capacity::Unbounded);
     }
 }
 
 /// One stop prior's run of `landmark_window_faces_read_each_phase_after_the_earlier_deposits` at a
-/// depth.
-fn window_in_cell_order(stream: &[usize], prior: StopPrior, depth: usize) {
+/// depth and a capacity.
+fn window_in_cell_order(stream: &[usize], prior: StopPrior, depth: usize, capacity: Capacity) {
     let declared = LandmarkDeclaration {
         population: 90,
         prior,
+        capacity,
         ..declaration(5, depth)
     };
     let mut tree = Landmarks::with_carrier(declared.clone(), 6).unwrap();
@@ -1906,7 +1912,7 @@ fn landmark_deep_window_faces_read_each_phase_after_the_earlier_deposits() {
         (StopPrior::half(), 9),
         (StopPrior::per_depth(vec![2, 5]).unwrap(), 5),
     ] {
-        window_in_cell_order(&stream, prior, depth);
+        window_in_cell_order(&stream, prior, depth, Capacity::Unbounded);
     }
 }
 
@@ -1990,4 +1996,277 @@ fn landmark_split_ratios_are_the_exact_forms() {
         }
     }
     assert!(exact > 0 && rebased > 0);
+}
+
+// -------------------------------------------------------------------------------------------
+// Decision 39: a landmark's storage has a capacity
+
+/// The capacities the capped laws are checked at: `L = 2, 4, 8, 32`.
+fn ceilings() -> Vec<Capacity> {
+    [1, 2, 3, 5].into_iter().map(Capacity::Ceiling).collect()
+}
+
+/// A binary stream of period five with one flipped cell: after the flip, each address holds it at
+/// one more depth, so it parts from the periodic contexts' chains, which have carried by then.
+fn flipped(length: u64) -> Vec<usize> {
+    (0..length)
+        .map(|t| usize::from([0, 1, 1, 0, 1][(t % 5) as usize] == 1) ^ usize::from(t == 60))
+        .collect()
+}
+
+/// **The register's carry** (`Capacity::carry`, Lean `HNN/LandmarkCapacity.capCarry`): at the
+/// ceiling each half-unit mass `2n + 1` becomes `2⌈n/2⌉ + 1`, and below it nothing moves; the
+/// unbounded register and a ceiling past every `u32` total never carry.
+#[test]
+fn landmark_capacity_carries_its_register() {
+    for exponent in 0..8u32 {
+        let top = 1u32 << exponent;
+        for zero in 0..=top + 1 {
+            for one in 0..=top + 1 {
+                let mut halves = [2 * zero + 1, 2 * one + 1];
+                let carried = Capacity::Ceiling(exponent).carry(&mut halves);
+                assert_eq!(carried, zero + one >= top);
+                let expected = if carried {
+                    [2 * zero.div_ceil(2) + 1, 2 * one.div_ceil(2) + 1]
+                } else {
+                    [2 * zero + 1, 2 * one + 1]
+                };
+                assert_eq!(halves, expected);
+                // A reached symbol keeps a count.
+                assert!(zero == 0 || halves[0] >= 3);
+                let mut unbounded = [2 * zero + 1, 2 * one + 1];
+                assert!(!Capacity::Unbounded.carry(&mut unbounded));
+            }
+        }
+    }
+    let mut widest = [u32::MAX, u32::MAX];
+    assert!(!Capacity::Ceiling(32).carry(&mut widest));
+    assert_eq!(Capacity::default(), Capacity::Unbounded);
+    assert_eq!(
+        format!("{} {}", Capacity::Unbounded, Capacity::Ceiling(7)),
+        "c = ∞ c = 7"
+    );
+}
+
+/// **`c = ∞` and every ceiling no node reaches are the tree of Decisions 28–37 exactly** (Lean
+/// `HNN/LandmarkCapacity.{cap_unbounded_is_kt, cap_below_ceiling_is_kt}`): over a stream of 60
+/// cells, the unbounded tree, the tree at `c = 6` (`L = 64` passes every node's arrivals) and at
+/// `c = 40` read the same executed faces and certificates, store the same arena, and their oracles
+/// the same ideal faces, equal to Decision 28's tree of one node a depth.
+#[test]
+fn landmark_unbounded_capacity_is_decision_37() {
+    let alphabet = 5;
+    let stream: Vec<usize> = (0..60u64)
+        .map(|t| ((t * 7 + t / 3 + t * t / 11) % 5) as usize)
+        .collect();
+    for depth in [1, 4, 31] {
+        for prior in [StopPrior::half(), StopPrior::per_depth(vec![1, 4]).unwrap()] {
+            let declared = |capacity| LandmarkDeclaration {
+                prior: prior.clone(),
+                capacity,
+                ..declaration(alphabet, depth)
+            };
+            let capacities = [
+                Capacity::Unbounded,
+                Capacity::Ceiling(6),
+                Capacity::Ceiling(40),
+            ];
+            let mut trees: Vec<Landmarks> = capacities
+                .iter()
+                .map(|&capacity| Landmarks::new(declared(capacity)).unwrap())
+                .collect();
+            let mut oracles: Vec<IdealLandmarks> = capacities
+                .iter()
+                .map(|&capacity| IdealLandmarks::new(declared(capacity), None).unwrap())
+                .collect();
+            let mut full = FullTree::new(declared(Capacity::Unbounded));
+            for (position, &cell) in stream.iter().enumerate() {
+                let here = address(&stream, position, depth);
+                let readings: Vec<_> = trees
+                    .iter_mut()
+                    .map(|tree| tree.receive(&here, cell).unwrap())
+                    .collect();
+                let ideal: Vec<Rat> = oracles
+                    .iter_mut()
+                    .map(|oracle| oracle.receive(&here, cell).unwrap())
+                    .collect();
+                let reference = full.receive(&here, cell);
+                for (reading, face) in readings.iter().zip(&ideal) {
+                    assert_eq!(
+                        reading, &readings[0],
+                        "{prior}, D = {depth}, cell {position}"
+                    );
+                    assert_eq!(face, &reference, "{prior}, D = {depth}, cell {position}");
+                }
+            }
+            let arena = trees[0].arena();
+            for tree in &trees[1..] {
+                let other = tree.arena();
+                assert_eq!(other.halves(), arena.halves());
+                assert_eq!(other.words(), arena.words());
+                assert_eq!(other.labels(), arena.labels());
+                assert_eq!(other.charts(), arena.charts());
+                assert_eq!(tree.nodes(), trees[0].nodes());
+            }
+            assert_eq!(full.carries(), 0);
+        }
+    }
+}
+
+/// **The capped oracle is the naive tree of one register a depth, exactly in ℚ** (Lean
+/// `HNN/LandmarkCompaction.compacted_node_law`, `HNN/LandmarkCapacity.capped_tree_laws`): at
+/// `L = 2, 4, 8, 32`, over the flipped binary stream and a five-class stream, at depths from 1 to
+/// past the stream's recurrence, under three priors and forced depths 0 and 1, every class's ideal
+/// face before each deposit equals the naive tree's (`landmark_full`, each depth its own register
+/// carrying on its own), the faces sum to 1, and along every opened path each stored level's
+/// register (its KT face of the digit) is the naive tree's at the level's bottom depth. The registers
+/// carry, and chains whose registers have carried are split: a stored chain is one register, and its
+/// split's upper part takes it.
+#[test]
+fn landmark_capped_oracle_is_the_naive_tree() {
+    let binary = flipped(110);
+    let five: Vec<usize> = (0..40u64).map(|t| ((t * 7 + t / 3) % 5) as usize).collect();
+    let mut split_after_carries = 0;
+    for (stream, alphabet, depths) in [(&binary, 2, [1, 3, 12, 111]), (&five, 5, [1, 2, 5, 41])] {
+        for capacity in ceilings() {
+            let mut carries = 0;
+            for prior in [
+                StopPrior::half(),
+                StopPrior::global(3).unwrap(),
+                StopPrior::per_depth(vec![1, 3]).unwrap(),
+            ] {
+                for depth in depths {
+                    for forced in [0, 1] {
+                        let declared = LandmarkDeclaration {
+                            forced,
+                            prior: prior.clone(),
+                            capacity,
+                            ..declaration(alphabet, depth)
+                        };
+                        let mut full = FullTree::new(declared.clone());
+                        let mut compact = IdealLandmarks::new(declared, None).unwrap();
+                        for (position, &cell) in stream.iter().enumerate() {
+                            let here = address(stream, position, depth);
+                            let label = format!(
+                                "{capacity}, {prior}, D = {depth}, forced {forced}, cell {position}"
+                            );
+                            let mut sum = Rat::zero();
+                            for class in 0..alphabet {
+                                let face = compact.probability(&here, class).unwrap();
+                                assert_eq!(face, full.probability(&here, class), "{label}");
+                                sum += face;
+                                let registers = full.registers(&here, class);
+                                let paths = compact.opened(&here, class).unwrap();
+                                for (path, path_registers) in
+                                    paths.iter().zip(registers.iter().flatten())
+                                {
+                                    // A forced level's register is never read (`λ = 0`).
+                                    for (level, &bottom) in path
+                                        .bottoms
+                                        .iter()
+                                        .enumerate()
+                                        .filter(|&(_, &bottom)| bottom >= forced)
+                                    {
+                                        assert_eq!(
+                                            path.masses[level], path_registers[bottom].0,
+                                            "{label}, class {class}, level {level}"
+                                        );
+                                    }
+                                }
+                            }
+                            assert_eq!(sum, Rat::one(), "{label}");
+                            let before = compact.nodes();
+                            let opened = compact.opened(&here, cell).unwrap();
+                            let registers = full.registers(&here, cell);
+                            assert_eq!(
+                                compact.receive(&here, cell).unwrap(),
+                                full.receive(&here, cell),
+                                "{label}"
+                            );
+                            // One digit tree over two classes: two nodes founded is a split and
+                            // its arrival's leaf; the upper part's register is the chain's, which
+                            // the naive tree carried at the parting depth.
+                            if alphabet == 2 && compact.nodes() == before + 2 {
+                                let path = &opened[0];
+                                let parting = *path.bottoms.last().expect("a parting level");
+                                if registers[0][0][parting].2 > 0 {
+                                    split_after_carries += 1;
+                                }
+                            }
+                        }
+                        assert!(compact.nodes() <= full.nodes());
+                        carries += full.carries();
+                    }
+                }
+            }
+            assert!(carries > 0, "{capacity}: the registers carried");
+        }
+    }
+    assert!(
+        split_after_carries > 0,
+        "chains split after their registers carried"
+    );
+}
+
+/// **The capped executed tree holds its carried certificate** (Decision 39: the counts stay exact
+/// integers, every total at most its arrivals, so KT's floor and the widths' rule are unchanged): at
+/// `L = 2` and `L = 16`, depths from 1 to past the stream's recurrence, two priors, forced depths 0
+/// and 1 and a narrow carrier, every all-class face sums to 1 and meets each one-class read, every
+/// cell's executed face lies within its certificate of the naive capped tree's ideal face, the
+/// certificate within the rule, and each tree stores at most `2n − 1` nodes; its windows in cell
+/// order read the deposited clone's faces.
+#[test]
+fn landmark_capped_tree_is_within_its_certificate() {
+    let alphabet = 5;
+    let stream: Vec<usize> = (0..60u64)
+        .map(|t| ((t * 7 + t / 3 + t * t / 11) % 5) as usize)
+        .collect();
+    for capacity in [Capacity::Ceiling(1), Capacity::Ceiling(4)] {
+        let mut carries = 0;
+        for depth in [1, 3, 8, 61] {
+            for prior in [StopPrior::half(), StopPrior::per_depth(vec![1, 4]).unwrap()] {
+                for (forced, carrier) in [(0, None), (1, None), (0, Some(6))] {
+                    let declared = LandmarkDeclaration {
+                        forced,
+                        prior: prior.clone(),
+                        capacity,
+                        ..declaration(alphabet, depth)
+                    };
+                    let mut tree = match carrier {
+                        Some(width) => Landmarks::with_carrier(declared.clone(), width).unwrap(),
+                        None => Landmarks::new(declared.clone()).unwrap(),
+                    };
+                    let mut oracle = FullTree::new(declared.clone());
+                    for (position, &cell) in stream.iter().enumerate() {
+                        let here = address(&stream, position, depth);
+                        let face = tree.face(&here, 16).unwrap();
+                        let sum: Rat = face.probabilities.iter().cloned().sum();
+                        assert_eq!(sum, Rat::one());
+                        for class in 0..alphabet {
+                            assert_eq!(
+                                face.probabilities[class],
+                                tree.probability(&here, class).unwrap()
+                            );
+                        }
+                        let reading = tree.receive(&here, cell).unwrap();
+                        let ideal = oracle.receive(&here, cell);
+                        assert!(
+                            within(&reading.executed, &ideal, &reading.residual),
+                            "{capacity}, {prior}, D = {depth}, forced {forced}, cell {position}"
+                        );
+                        assert!(reading.residual <= tree.face_rule());
+                    }
+                    assert!(within_node_bound(&tree, &arrivals(&declared, &stream)));
+                    carries += oracle.carries();
+                }
+            }
+        }
+        assert!(carries > 0, "{capacity}: the registers carried");
+    }
+    let windows: Vec<usize> = (0..90u64)
+        .map(|t| ((t * 7 + t / 3 + t * t / 11) % 5) as usize)
+        .collect();
+    for (depth, capacity) in [(2, Capacity::Ceiling(1)), (9, Capacity::Ceiling(2))] {
+        window_in_cell_order(&windows, StopPrior::half(), depth, capacity);
+    }
 }

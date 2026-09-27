@@ -10,7 +10,29 @@
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin prior
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/wide-real-cut.bin wide .local/cuts/standing-real-cut-campaign-1.bin
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/wide-real-cut.bin compact
+//! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/wide-real-cut.bin capacity
 //! ```
+//!
+//! [definition; agent-inferred] **A landmark's storage has a capacity** (`capacity`; Decision 39):
+//! Decision 37's tree at its chosen `D = 48` (the `½` prior, the cell-only family), each node's count
+//! register carried at the ceiling `L = 2^c` (`landmark::Capacity`: after the deposit that brings
+//! `n_0 + n_1` to `L`, `n ← ⌈n/2⌉`, so the face read before the next arrival is KT's on the carried
+//! counts, a function of the arrivals so far), on the wide cut.
+//! - **0. The family and its charge**, stated before any passage: `c ∈ {∞, 5, 7, 9, 11}`, charged
+//!   `⌈log₂ 5⌉` bits; `c = ∞` is Decision 37's tree and carries no capacity bit, so a ceiling is
+//!   adopted only when its development code charged lies below `c = ∞`'s by disjoint exact
+//!   enclosures; five development passages of about 25 s, each admitted against the 20 GB cap and
+//!   the memory the kernel reports available.
+//! - **1. The check**: `c = ∞` on the development cells must read Decision 37's recorded development
+//!   code `1801940 + 12/16 + ε`; nothing further is read otherwise.
+//! - **2. The ceilings** on the development cells, one passage each: the code (exact, at the grain
+//!   and a cell), its difference from `c = ∞`, nodes, label letters, allocated and occupied bytes and
+//!   wall time.
+//! - **3. The choice**: the least ceiling charged against `c = ∞`, and whether it lies below every
+//!   other ceiling.
+//! - **4. One held-out passage** of the chosen ceiling over the whole cut (none when `c = ∞` stays),
+//!   read against Decision 37's recorded held-out tree `258201 + 3/16 + ε` and PPM-2's
+//!   `395598 + 8/16 + ε` (each a grain cell `[n + k/16, n + (k + 1)/16]`), in all and a cell.
 //!
 //! [definition; agent-inferred] **Stored where paths part** (`compact`; Decision 37): Decision 28's
 //! `½` tree over the cell-only family, stored at the faces where paths part (`landmark::Landmarks`,
@@ -167,11 +189,11 @@ use rayon::prelude::*;
 
 use holonics::compression::cost::ceil_log2;
 use holonics::hnn::landmark::{
-    ChartReport, Coded, DepthSweep, Feature, IdealLandmarks, JoinTree, LandmarkDeclaration,
-    Landmarks, Letter, LetterFamily, OracleCost, PassageCode, PriorSweep, StopMixture, StopPrior,
-    TreeRun, Widths, address, cell_letters, choose_depth, choose_depth_within, choose_prior,
-    code_length, development, ladder_top, odometer_digits, oracle_cost, prequential, prior_family,
-    tree_prequential,
+    Capacity, ChartReport, Coded, DepthSweep, Feature, IdealLandmarks, JoinTree,
+    LandmarkDeclaration, Landmarks, Letter, LetterFamily, OracleCost, PassageCode, PriorSweep,
+    StopMixture, StopPrior, TreeRun, Widths, address, cell_letters, choose_depth,
+    choose_depth_within, choose_prior, code_length, development, ladder_top, odometer_digits,
+    oracle_cost, prequential, prior_family, tree_prequential,
 };
 use holonics::hnn::ratio::interval_sum;
 use holonics::hnn::receiving::clock_letters;
@@ -666,6 +688,7 @@ fn letters_harness(path: &str, contacts: bool) {
         grain,
         family: LetterFamily::cells(),
         prior: holonics::hnn::StopPrior::half(),
+        capacity: Capacity::Unbounded,
     };
     println!(
         "development: {cells} cells (the manifest's held-out range {}..{} is cut away before any reading); |A| = {alphabet}, n* = {count}, L_R = {grain}",
@@ -1229,6 +1252,7 @@ fn prior_harness(path: &str) {
         grain,
         family: LetterFamily::cells(),
         prior: StopPrior::half(),
+        capacity: Capacity::Unbounded,
     };
     let top = ladder_top(&declared);
     let family = prior_family(top);
@@ -1856,6 +1880,7 @@ fn wide_harness(path: &str, standing_path: &str) {
         grain,
         family: LetterFamily::cells(),
         prior: StopPrior::half(),
+        capacity: Capacity::Unbounded,
     };
     let clock = Instant::now();
     let depth_sweep = choose_depth_within(&dev_cut(&dev), &cell_letters(&dev), &declared, deepest)
@@ -2161,6 +2186,7 @@ fn compact_harness(path: &str) {
         grain,
         family: LetterFamily::cells(),
         prior: StopPrior::half(),
+        capacity: Capacity::Unbounded,
     };
     let at = |depth: usize| LandmarkDeclaration {
         depth,
@@ -2399,6 +2425,298 @@ fn compact_harness(path: &str) {
     );
 }
 
+// -------------------------------------------------------------------------------------------
+// Decision 39: a landmark's storage has a capacity (`capacity`)
+
+/// Decision 37's chosen depth on the wide cut's development cells (its receipt), at which the
+/// capacity family is read.
+const DECISION_37_DEPTH: usize = 48;
+
+/// **The declared capacity family** (Decision 39, stated before any passage): `c = ∞` (Decision
+/// 37's tree) and the ceilings `L = 2^c`, `c = 5, 7, 9, 11`, charged `⌈log₂ 5⌉` bits.
+const CEILINGS: [u32; 4] = [5, 7, 9, 11];
+
+/// [established-bounded; measured] **Decision 37's recorded readings on the wide cut** at
+/// `L_R = 16` (THE_REBUILD, Decision 37's receipt), each `carry + phase/16 + ε`, `0 ≤ ε < 1/16`: the
+/// development code at `D = 48`, which `c = ∞` must reproduce; the held-out tree at `D = 48` and
+/// PPM-2 held out, against which the chosen ceiling's one held-out passage is read.
+const DECISION_37_DEVELOPMENT: (u64, u64) = (1_801_940, 12);
+const DECISION_37_HELD_OUT: (u64, u64) = (258_201, 3);
+const PPM_TWO_HELD_OUT: (u64, u64) = (395_598, 8);
+
+/// **A recorded grain reading as an exact enclosure**: `n + k/L + ε`, `0 ≤ ε < 1/L`, lies in
+/// `[n + k/L, n + (k + 1)/L]`.
+fn recorded(reading: (u64, u64), grain: u64) -> ExactInterval {
+    let at = |phase: u64| {
+        Rat::from_integer(BigInt::from(reading.0))
+            + Rat::new(BigInt::from(phase), BigInt::from(grain))
+    };
+    ExactInterval {
+        lower: at(reading.1),
+        upper: at(reading.1 + 1),
+    }
+}
+
+/// **Whether an enclosure reads a recorded grain cell exactly**: both endpoints in the cell
+/// `n + k/L + ε`.
+fn reads(interval: &ExactInterval, reading: (u64, u64), grain: u64) -> bool {
+    [&interval.lower, &interval.upper].into_iter().all(|value| {
+        let cell = holonics::hnn::receiving::GrainCell::of(value, grain);
+        cell.carry == BigInt::from(reading.0) && cell.phase == reading.1
+    })
+}
+
+/// **Decision 39's pass on the wide cut** (`capacity`; module header, "A landmark's storage has a
+/// capacity").
+#[allow(clippy::too_many_lines)]
+fn capacity_harness(path: &str) {
+    let setup = Instant::now();
+    let (bytes, count, held) = read_cut(path);
+    let field = Field::declare(FieldDeclaration::campaign_one(count as u64))
+        .expect("campaign 1's declared field over the cut");
+    let grain = receiver_grain(&field);
+    let alphabet = field.alphabet();
+    let digits = odometer_digits(alphabet);
+    let cells: Vec<usize> = bytes.iter().map(|&byte| usize::from(byte)).collect();
+    let cut = Cut {
+        cells: cells.clone(),
+        held_out: vec![held.clone()],
+    };
+    let dev = development(&cut);
+    assert_eq!(
+        dev.as_slice(),
+        &cells[..held.start],
+        "the held-out range closes the cut"
+    );
+    let (n_dev, n_held) = (dev.len() as u64, held.len() as u64);
+    let depth = DECISION_37_DEPTH;
+    let at = |capacity: Capacity| LandmarkDeclaration {
+        alphabet,
+        depth,
+        forced: 0,
+        population: count as u64,
+        grain,
+        family: LetterFamily::cells(),
+        prior: StopPrior::half(),
+        capacity,
+    };
+    let family: Vec<Capacity> = std::iter::once(Capacity::Unbounded)
+        .chain(CEILINGS.iter().map(|&c| Capacity::Ceiling(c)))
+        .collect();
+    let charge = family_charge(family.len());
+    let depth_charge = family_charge(5);
+    println!(
+        "hnn_landmark capacity: a landmark's storage has a capacity (Decision 39), over the cut file {path}"
+    );
+    println!(
+        "cut: {count} cells, |A| = {alphabet}, B = {digits}; held out: cells {}..{} ({n_held} cells, from the manifest); development: {n_dev} cells; n* = {count}, L_R = {grain}; D = {depth} (Decision 37's choice, charged ⌈log₂ 5⌉ = {depth_charge} bits), the ½ stop prior, the cell-only family",
+        held.start, held.end,
+    );
+    println!();
+
+    // 0. The family, its charge and the budget, stated before any passage.
+    let names: Vec<String> = family.iter().map(ToString::to_string).collect();
+    println!(
+        "0. the declared family: {}, charged ⌈log₂ {}⌉ = {charge} bits (c = ∞ is Decision 37's tree and carries no capacity bit: a ceiling is adopted only when its development code charged {charge} bits lies below c = ∞'s by disjoint exact enclosures); the budget, stated in advance: {} development passages of about 25 s, then one held-out passage for the chosen ceiling, none when c = ∞ stays",
+        names.join(", "),
+        family.len(),
+        family.len()
+    );
+    println!(
+        "  the law: each node's counts carry, n ← ⌈n/2⌉, after the deposit that brings n_0 + n_1 to L = 2^c; the face read before the next arrival is KT's on the carried counts (a function of the arrivals so far)"
+    );
+    println!();
+
+    // 1. The check: c = ∞ reproduces Decision 37's development code.
+    let projection = |pass: Option<&Pass>| {
+        let node_bytes = pass.map_or(DECISION_35_NODE_BYTES, |pass| {
+            (pass.bytes as u128)
+                .saturating_sub(4 * pass.held as u128)
+                .div_ceil(pass.nodes.max(1) as u128)
+        });
+        projected(
+            u128::from(n_dev),
+            u128::from(digits),
+            depth as u128,
+            node_bytes,
+        )
+    };
+    println!(
+        "1. the check: c = ∞ on the development cells, one passage, against Decision 37's recorded {} + {}/{grain} + ε",
+        DECISION_37_DEVELOPMENT.0, DECISION_37_DEVELOPMENT.1
+    );
+    if !admitted("c = ∞", projection(None)) {
+        return;
+    }
+    let unbounded = pass(&dev, dev.len(), &at(Capacity::Unbounded));
+    capacity_line(Capacity::Unbounded, &unbounded, 0, n_dev, grain);
+    let unbounded_bits = bits_of(&unbounded.codes[0]);
+    let reproduced = reads(&unbounded_bits, DECISION_37_DEVELOPMENT, grain);
+    println!(
+        "  check: c = ∞ reads Decision 37's development code {} + {}/{grain} + ε: {reproduced}",
+        DECISION_37_DEVELOPMENT.0, DECISION_37_DEVELOPMENT.1
+    );
+    if !reproduced {
+        println!("  the reproduction failed: nothing further is read");
+        return;
+    }
+    println!();
+
+    // 2. The ceilings on the development cells.
+    println!("2. the ceilings on the development cells, one passage each:");
+    let mut passes: Vec<(Capacity, Pass)> = Vec::new();
+    for &capacity in &family[1..] {
+        if !admitted(&capacity.to_string(), projection(Some(&unbounded))) {
+            println!("  the family stopped: the projection at {capacity} was refused");
+            break;
+        }
+        let run = pass(&dev, dev.len(), &at(capacity));
+        capacity_line(capacity, &run, 0, n_dev, grain);
+        let bits = bits_of(&run.codes[0]);
+        println!(
+            "    against c = ∞, uncharged: {} ({})",
+            difference(&bits, &unbounded_bits, grain),
+            against(&bits, &unbounded_bits)
+        );
+        passes.push((capacity, run));
+    }
+    println!("  peak resident so far: {}", resident());
+    println!();
+
+    // 3. The choice.
+    let least = passes
+        .iter()
+        .min_by(|a, b| {
+            let (x, y) = (bits_of(&a.1.codes[0]), bits_of(&b.1.codes[0]));
+            x.lower.cmp(&y.lower)
+        })
+        .expect("a ceiling was read");
+    let least_bits = bits_of(&least.1.codes[0]);
+    let least_charged = charged(&least_bits, charge);
+    println!(
+        "3. the development cells' choice: the least ceiling's code, {}, charged {charge} bits, against c = ∞ uncharged:",
+        least.0
+    );
+    println!(
+        "  {} charged: {}",
+        least.0,
+        enclosure(&least_charged, grain)
+    );
+    println!("  c = ∞: {}", enclosure(&unbounded_bits, grain));
+    ordering(
+        &format!("{} charged {charge} bits against c = ∞", least.0),
+        &least_charged,
+        &unbounded_bits,
+        n_dev,
+        grain,
+    );
+    let adopted = least_charged.upper < unbounded_bits.lower;
+    let others_below = passes
+        .iter()
+        .filter(|(capacity, _)| *capacity != least.0)
+        .all(|(_, run)| least_bits.upper < bits_of(&run.codes[0]).lower);
+    println!(
+        "  the choice: {}; the least ceiling lies below every other ceiling by disjoint enclosures: {others_below}",
+        if adopted {
+            format!("{} (below c = ∞ charged)", least.0)
+        } else {
+            "c = ∞ stays: the ceiling is rejected".to_string()
+        }
+    );
+    println!();
+    if !adopted {
+        println!("4. no held-out passage: the development cells keep c = ∞ (the declared rule)");
+        println!();
+        println!(
+            "wall time (exterior): the harness {} ms; the process's resident peak {}",
+            setup.elapsed().as_millis(),
+            resident()
+        );
+        return;
+    }
+
+    // 4. One held-out passage at the chosen ceiling.
+    let chosen = least.0;
+    println!(
+        "4. one prequential passage over the whole cut at {chosen}, every cell scored at the standing before its own deposit, read against Decision 37's recorded held-out tree ({} + {}/{grain} + ε) and PPM-2 ({} + {}/{grain} + ε):",
+        DECISION_37_HELD_OUT.0, DECISION_37_HELD_OUT.1, PPM_TWO_HELD_OUT.0, PPM_TWO_HELD_OUT.1
+    );
+    let whole_projection = projected(
+        count as u128,
+        u128::from(digits),
+        depth as u128,
+        (least.1.bytes as u128)
+            .saturating_sub(4 * least.1.held as u128)
+            .div_ceil(least.1.nodes.max(1) as u128),
+    );
+    if !admitted(
+        &format!("the held-out passage at {chosen}"),
+        whole_projection,
+    ) {
+        return;
+    }
+    let whole = pass(&cells, held.start, &at(chosen));
+    capacity_line(chosen, &whole, 1, n_held, grain);
+    println!(
+        "    check: its development code is step 2's at {chosen}: {}",
+        bits_of(&whole.codes[0]) == least_bits
+    );
+    let held_bits = bits_of(&whole.codes[1]);
+    let tree = recorded(DECISION_37_HELD_OUT, grain);
+    let ppm = recorded(PPM_TWO_HELD_OUT, grain);
+    println!("  held out ({n_held} cells), bits at L_R = {grain}:");
+    println!("    {chosen}, uncharged: {}", enclosure(&held_bits, grain));
+    println!("      a cell {}", per(&held_bits, n_held, grain));
+    println!(
+        "    Decision 37's tree (recorded): {}; a cell {}",
+        enclosure(&tree, grain),
+        per(&tree, n_held, grain)
+    );
+    println!(
+        "    PPM-2 (recorded): {}; a cell {}",
+        enclosure(&ppm, grain),
+        per(&ppm, n_held, grain)
+    );
+    println!("  held out, the orderings, each by disjoint exact enclosures:");
+    ordering(
+        &format!(
+            "{chosen} charged {charge} bits against Decision 37's tree (both charged the depth's {depth_charge})"
+        ),
+        &charged(&held_bits, charge),
+        &tree,
+        n_held,
+        grain,
+    );
+    ordering(
+        &format!("{chosen} uncharged against Decision 37's tree"),
+        &held_bits,
+        &tree,
+        n_held,
+        grain,
+    );
+    ordering(
+        &format!(
+            "{chosen} charged {} bits (the depth's and the capacity's) against PPM-2",
+            depth_charge + charge
+        ),
+        &charged(&held_bits, depth_charge + charge),
+        &ppm,
+        n_held,
+        grain,
+    );
+    println!();
+    println!(
+        "wall time (exterior): the harness {} ms; the process's resident peak {}",
+        setup.elapsed().as_millis(),
+        resident()
+    );
+}
+
+/// A capacity's passage line: its capacity, then the passage's readings ([`pass_line`]).
+fn capacity_line(capacity: Capacity, pass: &Pass, part: usize, cells: u64, grain: u64) {
+    println!("  {capacity}:");
+    pass_line(pass, part, cells, grain);
+}
 fn main() {
     let arguments: Vec<String> = std::env::args().skip(1).collect();
     let path = match arguments.as_slice() {
@@ -2419,6 +2737,10 @@ fn main() {
             compact_harness(value);
             return;
         }
+        [key, value, mode] if key == "cut-file" && mode == "capacity" => {
+            capacity_harness(value);
+            return;
+        }
         [key, value, mode, with]
             if key == "cut-file" && mode == "letters" && with == "contacts" =>
         {
@@ -2427,7 +2749,7 @@ fn main() {
         }
         _ => {
             println!(
-                "usage: hnn_landmark cut-file <path> [letters [contacts] | prior | wide <standing cut> | compact]"
+                "usage: hnn_landmark cut-file <path> [letters [contacts] | prior | wide <standing cut> | compact | capacity]"
             );
             return;
         }
@@ -2450,6 +2772,7 @@ fn main() {
         grain,
         family: LetterFamily::cells(),
         prior: holonics::hnn::StopPrior::half(),
+        capacity: Capacity::Unbounded,
     };
     let setup = setup.elapsed().as_millis();
     let development = (count - held.len()) as u64;

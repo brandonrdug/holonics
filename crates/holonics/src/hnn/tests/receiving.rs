@@ -867,6 +867,7 @@ fn the_address_restricts_by_whole_bundles_and_the_sheets_are_a_scale_square() {
         grain: 16,
         family,
         prior: crate::hnn::StopPrior::half(),
+        capacity: crate::hnn::landmark::Capacity::Unbounded,
     };
     let tree = Landmarks::new(declared(family.clone())).unwrap();
     let coarsen = |letter: Letter| match letter {

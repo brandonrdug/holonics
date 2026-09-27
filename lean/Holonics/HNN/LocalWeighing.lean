@@ -59,9 +59,10 @@ digit tree  W_h = Σ_k π_k W_h^(w_k) = Σ_(k, S) π_k prior_(w_k)(S) ∏_(leave
    sequence with `k` switches over `n` cells (Herbster–Warmuth); the executed ratio steps by the
    likelihood ratio, then the share map, which on the ladder `α = 2^(−j)` is
    `((2^j − 1)β + 1)/((2^j − 1) + β)`; and the share map never amplifies a drift in `log β`.
-5. **The tree over own weights** (`ownWeight`, `ownSplit`, `ownLik`, `own_mixture_over_trees`,
-   `ownWeight_kt`, `ownLik_kt`, `ownWeight_one`, `own_kraft_and_dominance`): for any positive own
-   weights the tree is the mixture over pruned trees with the stop law's prior, its prior is
+5. **The tree over own weights** (`LandmarkTree.{ownWeight, ownSplit, ownLik,
+   own_mixture_over_trees, ownWeight_kt, ownLik_kt, ownWeight_one, own_kraft_and_dominance}`,
+   stated once in `LandmarkTree` since Decision 39, every node law's weighting): for any positive
+   own weights the tree is the mixture over pruned trees with the stop law's prior, its prior is
    complete, and it codes within the prior's code of every pruned tree. The declared stop law
    (`LandmarkTree.stopWeight`, `treeLik`) is its case at the KT own weight.
 6. **Node-local mixing** (`ownLik_mul`, `ownLik_mono`, `node_local_dominance`,
@@ -70,8 +71,9 @@ digit tree  W_h = Σ_k π_k W_h^(w_k) = Σ_(k, S) π_k prior_(w_k)(S) ∏_(leave
    normalized (each own face is a normalized face, so the opened path is, under any stop weights)
    and Kraft-complete, and each landmark pays at most `−log₂` of its prior weight. An unfounded
    landmark reads `π/|A| + (1 − π) x`.
-7. **The opened-path step over own weights** (`ownLam`, `ownRatio`, `ownLam_mem`,
-   `ownWeight_off`, `ownSplit_arrive`, `own_weight_step`, `own_ratio_step`): an arrival that moves
+7. **The opened-path step over own weights** (`LandmarkTree.{ownLam, ownRatio, ownLam_mem,
+   ownWeight_off, ownSplit_arrive, own_weight_step₀, own_weight_step, own_ratio_step}`, stated once
+   in `LandmarkTree` since Decision 39): an arrival that moves
    each opened landmark's own weight by its own face multiplies each opened node's weight by the path
    face over own faces, and the ratio steps by `β' = β e_d/q_(d+1)`: the stop law's step with the own
    face in place of the KT face.
@@ -93,7 +95,7 @@ parts, and the Rust tests check the executed faces against the ideal weighting.
 | `forward_telescope`, `forward_dominance`, `forward_weight_step`, `forward_executed` | `hnn::landmark::{JoinTree, FaceJoins}`, `hnn::receiving::Mixture::switching` |
 | `static_mixture`, `two_face_prior` | `hnn::landmark::JoinTree` (a two-face join from `β₀ = 2^j − 1`) |
 | `fixed_share`, `share_ratio_step`, `share_log_lipschitz` | `hnn::receiving::Mixture::switching` |
-| `own_mixture_over_trees`, `own_kraft_and_dominance`, `node_local_dominance`, `own_face_normalized`, `node_local_founding`, `own_weight_step`, `own_ratio_step` | `hnn::landmark::{Landmarks::local, LocalLaw}` |
+| `LandmarkTree.{own_mixture_over_trees, own_kraft_and_dominance, own_weight_step, own_ratio_step}`, `node_local_dominance`, `own_face_normalized`, `node_local_founding` | `hnn::landmark::{Landmarks::local, LocalLaw}` (retired at `89460425`); the own-weight tree is every node law's (`hnn::landmark::Capacity`, Decision 39) |
 | `stop_mixture_per_tree` | `hnn::landmark::{StopMixture, FaceJoins}` |
 
 No `sorry`, no `axiom`, no `native_decide`.
@@ -693,147 +695,10 @@ universe u
 
 variable {Ltr : Type u} [Fintype Ltr] [DecidableEq Ltr]
 
-/-- [definition] **The tree over own weights** at node `s` with `m` levels below it: a landmark's own
-weight `E_s` (its KT mass, or the mixture of its KT mass with an admitted external face over its
-routed digits) at the maximum depth, and `W_s = w_|s| E_s + (1 − w_|s|) ∏_b W_(s b)` above it. -/
-def ownWeight (w : ℕ → ℚ) (E : List Ltr → ℚ) : ℕ → List Ltr → ℚ
-  | 0, s => E s
-  | m + 1, s => w s.length * E s + (1 - w s.length) * ∏ b, ownWeight w E m (s ++ [b])
-
-/-- [definition] **The split weight** `P_s = ∏_b W_(s b)` over own weights. -/
-def ownSplit (w : ℕ → ℚ) (E : List Ltr → ℚ) (m : ℕ) (s : List Ltr) : ℚ :=
-  ∏ b, ownWeight w E m (s ++ [b])
-
-omit [DecidableEq Ltr] in
-theorem ownWeight_succ (w : ℕ → ℚ) (E : List Ltr → ℚ) (m : ℕ) (s : List Ltr) :
-    ownWeight w E (m + 1) s = w s.length * E s + (1 - w s.length) * ownSplit w E m s := rfl
-
-/-- [definition] **The likelihood of a pruned tree over own weights**: the product of its leaves'
-own weights. -/
-def ownLik (E : List Ltr → ℚ) : (m : ℕ) → List Ltr → PrunedTree Ltr m → ℚ
-  | 0, s, _ => E s
-  | m + 1, s, S => Option.elim (S : Option (Ltr → PrunedTree Ltr m)) (E s)
-      fun f => ∏ b, ownLik E m (s ++ [b]) (f b)
-
-omit [DecidableEq Ltr] in
-theorem ownWeight_pos {w : ℕ → ℚ} (hw : StopLaw w) {E : List Ltr → ℚ} (hE : ∀ s, 0 < E s) :
-    ∀ m s, 0 < ownWeight w E m s
-  | 0, s => hE s
-  | m + 1, s => by
-    have hP : 0 < ∏ b, ownWeight w E m (s ++ [b]) :=
-      Finset.prod_pos fun _ _ => ownWeight_pos hw hE m _
-    obtain ⟨h0, h1⟩ := hw s.length
-    have e1 := mul_pos h0 (hE s)
-    have e2 := mul_pos (sub_pos.mpr h1) hP
-    simp only [ownWeight]
-    linarith
-
-omit [DecidableEq Ltr] in
-theorem ownSplit_pos {w : ℕ → ℚ} (hw : StopLaw w) {E : List Ltr → ℚ} (hE : ∀ s, 0 < E s)
-    (m : ℕ) (s : List Ltr) : 0 < ownSplit w E m s :=
-  Finset.prod_pos fun _ _ => ownWeight_pos hw hE m _
-
-omit [DecidableEq Ltr] in
-theorem ownLik_pos {E : List Ltr → ℚ} (hE : ∀ s, 0 < E s) :
-    ∀ m s (S : PrunedTree Ltr m), 0 < ownLik E m s S
-  | 0, s, _ => hE s
-  | m + 1, s, S => by
-    cases hS : (S : Option (Ltr → PrunedTree Ltr m)) with
-    | none => simp only [ownLik, Option.elim]; exact hE s
-    | some f =>
-      simp only [ownLik, Option.elim]
-      exact Finset.prod_pos fun b _ => ownLik_pos hE m _ _
-
-/-- [proved-derived; formal-checked] **`own_mixture_over_trees`: over any own weights the tree is
-the mixture over pruned trees with the stop law's prior**,
-`W_s = Σ_S prior_w(S) ∏_(leaves ℓ of S) E_(s ℓ)`. At `E = KT` it is
-`LandmarkTree.stop_mixture_over_trees` (`ownWeight_kt`, `ownLik_kt`). -/
-theorem own_mixture_over_trees (w : ℕ → ℚ) (E : List Ltr → ℚ) :
-    ∀ m s, ownWeight w E m s =
-      ∑ S : PrunedTree Ltr m, PrunedTree.prior w m s.length S * ownLik E m s S
-  | 0, s => by
-    have hc : Fintype.card (PrunedTree Ltr 0) = 1 := rfl
-    simp [ownWeight, ownLik, PrunedTree.prior, hc]
-  | m + 1, s => by
-    rw [ownWeight_succ, ownSplit]
-    simp only [own_mixture_over_trees w E m, List.length_append, List.length_singleton]
-    rw [Fintype.prod_sum]
-    have e : ∑ S : PrunedTree Ltr (m + 1),
-        PrunedTree.prior w (m + 1) s.length S * ownLik E (m + 1) s S =
-        w s.length * E s + ∑ f : Ltr → PrunedTree Ltr m,
-          ((1 - w s.length) * ∏ b, PrunedTree.prior w m (s.length + 1) (f b)) *
-            ∏ b, ownLik E m (s ++ [b]) (f b) :=
-      Fintype.sum_option (fun S : Option (Ltr → PrunedTree Ltr m) =>
-        PrunedTree.prior w (m + 1) s.length S * ownLik E (m + 1) s S)
-    rw [e, Finset.mul_sum]
-    congr 1
-    refine Finset.sum_congr rfl fun f _ => ?_
-    rw [Finset.prod_mul_distrib]
-    ring
-
-section KTCase
-
-variable {A : Type*} [Fintype A] [DecidableEq A]
-
-omit [DecidableEq A] [DecidableEq Ltr] in
-/-- [proved-derived; formal-checked] **The declared stop law is the tree over KT own weights**:
-`ownWeight w (KT ∘ N) = stopWeight w N`. -/
-theorem ownWeight_kt (w : ℕ → ℚ) (N : TreeStanding Ltr A) :
-    ∀ m s, ownWeight w (fun s => ktMass (N s)) m s = stopWeight w N m s
-  | 0, _ => rfl
-  | m + 1, s => by
-    simp only [ownWeight, stopWeight, ownWeight_kt w N m]
-
-omit [DecidableEq A] [DecidableEq Ltr] in
-/-- The likelihood of a pruned tree over KT own weights is `treeLik`. -/
-theorem ownLik_kt (N : TreeStanding Ltr A) :
-    ∀ m s (S : PrunedTree Ltr m), ownLik (fun s => ktMass (N s)) m s S = treeLik N m s S
-  | 0, _, _ => rfl
-  | m + 1, s, S => by
-    cases hS : (S : Option (Ltr → PrunedTree Ltr m)) with
-    | none => simp only [ownLik, treeLik, Option.elim]
-    | some f => simp only [ownLik, treeLik, Option.elim, ownLik_kt N m]
-
-end KTCase
-
-omit [DecidableEq Ltr] in
-/-- [proved-derived; formal-checked] **`ownWeight_one`: the prior is complete.** At unit own
-weights the tree's weight is one: the prior over pruned trees (and, under node-local mixing, over
-the leaves' face choices) sums to one. -/
-theorem ownWeight_one (w : ℕ → ℚ) : ∀ m s, ownWeight w (fun _ : List Ltr => 1) m s = 1
-  | 0, _ => rfl
-  | m + 1, s => by
-    simp only [ownWeight, ownWeight_one w m, Finset.prod_const_one]
-    ring
-
-/-- [proved-derived; formal-checked] **`own_kraft_and_dominance`.** Under any stop-weight law and
-positive own weights: the pruned trees' prior weights sum to one, and for every pruned tree `S`,
-`prior_w(S) ∏_(leaves) E ≤ W`, so `−log₂ W ≤ −log₂ prior_w(S) − log₂ ∏_(leaves) E`. -/
-theorem own_kraft_and_dominance {w : ℕ → ℚ} (hw : StopLaw w) {E : List Ltr → ℚ}
-    (hE : ∀ s, 0 < E s) (m : ℕ) (s : List Ltr) :
-    ∑ S : PrunedTree Ltr m, PrunedTree.prior w m s.length S = 1 ∧
-      ∀ S : PrunedTree Ltr m,
-        PrunedTree.prior w m s.length S * ownLik E m s S ≤ ownWeight w E m s ∧
-        -Real.logb 2 (ownWeight w E m s : ℝ) ≤
-          -Real.logb 2 (PrunedTree.prior w m s.length S : ℝ) -
-            Real.logb 2 (ownLik E m s S : ℝ) := by
-  have hdom : ∀ S : PrunedTree Ltr m,
-      PrunedTree.prior w m s.length S * ownLik E m s S ≤ ownWeight w E m s := by
-    intro S
-    rw [own_mixture_over_trees w E m s]
-    exact Finset.single_le_sum
-      (f := fun S => PrunedTree.prior w m s.length S * ownLik E m s S)
-      (fun S _ => (mul_pos (PrunedTree.prior_pos hw m _ S) (ownLik_pos hE m s S)).le)
-      (Finset.mem_univ S)
-  refine ⟨PrunedTree.prior_sum w m s.length, fun S => ⟨hdom S, ?_⟩⟩
-  have hpR : (0 : ℝ) < (PrunedTree.prior w m s.length S : ℝ) := by
-    exact_mod_cast PrunedTree.prior_pos hw m s.length S
-  have hLR : (0 : ℝ) < (ownLik E m s S : ℝ) := by exact_mod_cast ownLik_pos hE m s S
-  have hdR : ((PrunedTree.prior w m s.length S : ℚ) : ℝ) * (ownLik E m s S : ℝ) ≤
-      (ownWeight w E m s : ℝ) := by exact_mod_cast hdom S
-  have hlog := Real.logb_le_logb_of_le (b := 2) (by norm_num) (by positivity) hdR
-  rw [Real.logb_mul hpR.ne' hLR.ne'] at hlog
-  linarith
+/-! The tree over own weights (`LandmarkTree.ownWeight`, `ownSplit`, `ownLik`, `ownWeight_pos`,
+`ownLik_pos`, `own_mixture_over_trees`, `own_kraft_and_dominance`, `ownWeight_kt`, `ownLik_kt`,
+`ownWeight_one`) is stated once in `LandmarkTree`, sections 4 and 5: it is every node law's weighting
+(Decision 39), and the stop law's is its case at KT. Node-local mixing reads it here. -/
 
 omit [DecidableEq Ltr] in
 /-- The likelihood of a product of own weights is the product of their likelihoods. -/
@@ -945,146 +810,9 @@ theorem node_local_founding {A : Type*} [Fintype A] [Nonempty A] (π : ℚ) (x :
   rw [ktFace_zero]
   ring
 
-/-! ### The opened-path step over own weights -/
-
-section Step
-
-variable {A : Type*} [Fintype A]
-
-/-- [definition] **The stop weight at depth `d` over own weights**:
-`λ_d = w_d E_d/(w_d E_d + (1 − w_d) P_d)`. -/
-def ownLam (w : ℕ → ℚ) (E : List Ltr → ℚ) (D : ℕ) (a : List Ltr) (d : ℕ) : ℚ :=
-  w d * E (a.take d) / (w d * E (a.take d) + (1 - w d) * ownSplit w E (D - d - 1) (a.take d))
-
-/-- [definition] **The stop-to-split ratio over own weights**: `β_d = w_d E_d/((1 − w_d) P_d)`. -/
-def ownRatio (w : ℕ → ℚ) (E : List Ltr → ℚ) (D : ℕ) (a : List Ltr) (d : ℕ) : ℚ :=
-  w d * E (a.take d) / ((1 - w d) * ownSplit w E (D - d - 1) (a.take d))
-
-omit [DecidableEq Ltr] in
-theorem ownLam_mem {w : ℕ → ℚ} (hw : StopLaw w) {E : List Ltr → ℚ} (hE : ∀ s, 0 < E s)
-    (D : ℕ) (a : List Ltr) (d : ℕ) : 0 < ownLam w E D a d ∧ ownLam w E D a d < 1 := by
-  have hEd := hE (a.take d)
-  have hP := ownSplit_pos hw hE (D - d - 1) (a.take d)
-  obtain ⟨h0, h1⟩ := hw d
-  have e1 := mul_pos h0 hEd
-  have e2 := mul_pos (sub_pos.mpr h1) hP
-  unfold ownLam
-  exact ⟨div_pos e1 (by linarith), (div_lt_one (by linarith)).mpr (by linarith)⟩
-
-omit [DecidableEq Ltr] in
-/-- An arrival that moves no own weight off the opened path moves no tree weight off it. -/
-theorem ownWeight_off (w : ℕ → ℚ) {E E' : List Ltr → ℚ} {a : List Ltr}
-    (hoff : ∀ s, ¬ a.take s.length = s → E' s = E s) {s : List Ltr}
-    (h : ¬ a.take s.length = s) (m : ℕ) : ownWeight w E' m s = ownWeight w E m s := by
-  induction m generalizing s with
-  | zero => simp [ownWeight, hoff s h]
-  | succ m ih =>
-    rw [ownWeight_succ, ownWeight_succ, hoff s h, ownSplit, ownSplit,
-      Finset.prod_congr rfl fun b _ => ih (off_path_descendant h [b])]
-
-/-- The split weight of an opened node moves by its opened child's factor. -/
-theorem ownSplit_arrive (w : ℕ → ℚ) {E E' : List Ltr → ℚ} {a : List Ltr}
-    (hoff : ∀ s, ¬ a.take s.length = s → E' s = E s) {d : ℕ} (hd : d < a.length) (m : ℕ) (r : ℚ)
-    (hchild : ownWeight w E' m (a.take (d + 1)) = ownWeight w E m (a.take (d + 1)) * r) :
-    ownSplit w E' m (a.take d) = ownSplit w E m (a.take d) * r := by
-  unfold ownSplit
-  refine prod_update_one _ _ a[d] r ?_ fun b hb => ownWeight_off w hoff (off_path_child hd hb) m
-  have e : a.take d ++ [a[d]] = a.take (d + 1) := (restrict_succ hd).symm
-  rw [e]
-  exact hchild
-
-omit [Fintype A] in
-/-- [proved-derived; formal-checked] **`own_weight_step`: over own weights the conditional
-prediction is the successive likelihood ratio.** For an address `a` of length at least `D`, own
-weights `E` and `E'` that agree off the opened path and move by the landmark's own face on it,
-`E'_d = E_d e_d(c)`: at every depth `d ≤ D`, `W'_d = W_d q_d(c)` with `q_D = e_D` and
-`q_d = λ_d e_d + (1 − λ_d) q_(d+1)`, `λ_d = w_d E_d/(w_d E_d + (1 − w_d) P_d)`: the stop law's step
-(`LandmarkTree.stop_weight_step`) with the own face in place of the KT face. -/
-theorem own_weight_step {w : ℕ → ℚ} (hw : StopLaw w) {E E' : List Ltr → ℚ} (hE : ∀ s, 0 < E s)
-    {D : ℕ} {a : List Ltr} (hD : D ≤ a.length) (e : ℕ → A → ℚ) (c : A)
-    (hoff : ∀ s, ¬ a.take s.length = s → E' s = E s)
-    (hon : ∀ d ≤ D, E' (a.take d) = E (a.take d) * e d c) :
-    ∀ d ≤ D, ownWeight w E' (D - d) (a.take d) =
-      ownWeight w E (D - d) (a.take d) * pathFace e (ownLam w E D a) D d c := by
-  suffices h : ∀ m d, d + m = D → ownWeight w E' m (a.take d) =
-      ownWeight w E m (a.take d) * pathFace e (ownLam w E D a) D d c by
-    intro d hd
-    exact h (D - d) d (by omega)
-  intro m
-  induction m with
-  | zero =>
-    intro d hd
-    have hdD : d = D := by omega
-    subst hdD
-    rw [pathFace_deepest]
-    exact hon _ le_rfl
-  | succ m ih =>
-    intro d hd
-    have hda : d < a.length := by omega
-    have hlen : (a.take d).length = d := by simp; omega
-    have hsplit := ownSplit_arrive w hoff hda m (pathFace e (ownLam w E D a) D (d + 1) c)
-      (ih (d + 1) (by omega))
-    rw [ownWeight_succ, ownWeight_succ, hsplit, hlen, hon d (by omega),
-      pathFace_step _ _ (show d < D by omega)]
-    have hlam : ownLam w E D a d = w d * E (a.take d) /
-        (w d * E (a.take d) + (1 - w d) * ownSplit w E m (a.take d)) := by
-      unfold ownLam
-      rw [show D - d - 1 = m by omega]
-    rw [hlam]
-    have hEd := hE (a.take d)
-    have hP := ownSplit_pos hw hE m (a.take d)
-    obtain ⟨h0, h1⟩ := hw d
-    have hden : w d * E (a.take d) + (1 - w d) * ownSplit w E m (a.take d) ≠ 0 :=
-      (add_pos (mul_pos h0 hEd) (mul_pos (sub_pos.mpr h1) hP)).ne'
-    field_simp
-    ring
-
-/-- [proved-derived; formal-checked] **`own_ratio_step`: the executed step over own weights.** The
-stop weight is `λ = β/(1 + β)` with `β_d = w_d E_d/((1 − w_d) P_d)`, and an arrival moves
-`β' = β e_d(c)/q_(d+1)(c)`: the landmark's own face `e` stands where the stop law's KT face stood
-(`LandmarkTree.stop_ratio_step`), and the law's factor `w_d/(1 − w_d)` is carried from the
-founding. -/
-theorem own_ratio_step {w : ℕ → ℚ} (hw : StopLaw w) {E E' : List Ltr → ℚ} (hE : ∀ s, 0 < E s)
-    {D : ℕ} {a : List Ltr} (hD : D ≤ a.length) (e : ℕ → A → ℚ) (c : A)
-    (he : ∀ d ≤ D, ∀ c, 0 < e d c) (hes : ∀ d ≤ D, ∑ c, e d c = 1)
-    (hoff : ∀ s, ¬ a.take s.length = s → E' s = E s)
-    (hon : ∀ d ≤ D, E' (a.take d) = E (a.take d) * e d c) {d : ℕ} (hd : d < D) :
-    ownLam w E D a d = ownRatio w E D a d / (1 + ownRatio w E D a d) ∧
-      ownRatio w E' D a d =
-        ownRatio w E D a d * e d c / pathFace e (ownLam w E D a) D (d + 1) c := by
-  have hEd := hE (a.take d)
-  have hP := ownSplit_pos hw hE (D - d - 1) (a.take d)
-  obtain ⟨h0, h1⟩ := hw d
-  have hw1 : (0 : ℚ) < 1 - w d := sub_pos.mpr h1
-  refine ⟨?_, ?_⟩
-  · have e1 := mul_pos h0 hEd
-    have e2 := mul_pos hw1 hP
-    have hden : 0 < w d * E (a.take d) + (1 - w d) * ownSplit w E (D - d - 1) (a.take d) :=
-      add_pos e1 e2
-    have hw1' : (1 : ℚ) - w d ≠ 0 := hw1.ne'
-    unfold ownLam ownRatio
-    field_simp
-    ring
-  · have hda : d < a.length := by omega
-    have hchild := own_weight_step hw hE hD e c hoff hon (d + 1) (by omega)
-    rw [show D - (d + 1) = D - d - 1 by omega] at hchild
-    have hsplit := ownSplit_arrive w hoff hda (D - d - 1)
-      (pathFace e (ownLam w E D a) D (d + 1) c) hchild
-    have hq := ((own_face_normalized (A := A)).2 e e (fun _ => 1) (ownLam w E D a) D he hes he hes
-      (fun _ _ => ⟨zero_le_one, le_rfl⟩)
-      (fun d _ => ⟨(ownLam_mem hw hE D a d).1.le, (ownLam_mem hw hE D a d).2.le⟩) (d + 1)
-      (by omega)).1 c
-    have hq' : 0 < pathFace e (ownLam w E D a) D (d + 1) c := by
-      have e3 : (fun d c => (fun _ : ℕ => (1 : ℚ)) d * e d c + (1 - (fun _ : ℕ => (1 : ℚ)) d) *
-          e d c) = e := by funext d c; ring
-      rw [e3] at hq
-      exact hq
-    have hw1' : (1 : ℚ) - w d ≠ 0 := hw1.ne'
-    unfold ownRatio
-    rw [hon d hd.le, hsplit]
-    field_simp
-
-end Step
+/-! The opened-path step over own weights (`LandmarkTree.ownLam`, `ownRatio`, `ownLam_mem`,
+`ownWeight_off`, `ownSplit_arrive`, `own_weight_step₀`, `own_weight_step`, `own_ratio_step`) is
+stated once in `LandmarkTree`, section 4. -/
 
 /-! ## 3. The stop-weight mixture per digit tree -/
 
@@ -1164,25 +892,11 @@ section Audit
 #print axioms shareMap_den_pos
 #print axioms share_ratio_step
 #print axioms share_log_lipschitz
-#print axioms ownWeight_succ
-#print axioms ownWeight_pos
-#print axioms ownSplit_pos
-#print axioms ownLik_pos
-#print axioms own_mixture_over_trees
-#print axioms ownWeight_kt
-#print axioms ownLik_kt
-#print axioms ownWeight_one
-#print axioms own_kraft_and_dominance
 #print axioms ownLik_mul
 #print axioms ownLik_mono
 #print axioms node_local_dominance
 #print axioms own_face_normalized
 #print axioms node_local_founding
-#print axioms ownLam_mem
-#print axioms ownWeight_off
-#print axioms ownSplit_arrive
-#print axioms own_weight_step
-#print axioms own_ratio_step
 #print axioms stop_mixture_per_tree
 
 end Audit

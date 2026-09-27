@@ -13,21 +13,28 @@
 //! - an enlarged tree joins its two branches at each dyadic cell, `(β_h q_cells + q_bundles)/(1 + β_h)`;
 //! - a deposit steps each mixing depth `β' = β k(b)/q'(b)` and the join
 //!   `β'_h = β_h q_cells(b)/q_bundles(b)`, founds the path's missing depths, then counts the digit
-//!   at every depth past the forced ones.
+//!   at every depth past the forced ones;
+//! - under a declared capacity (Decision 39) each node's counts carry, `n ← ⌈n/2⌉`, when its count
+//!   brings `n_0 + n_1` to `2^c`, node by node: every depth keeps its own register, so this tree
+//!   checks that a stored chain of the owner is one register (Lean
+//!   `HNN/LandmarkCompaction.compacted_node_law`). Each node also counts its arrivals and its
+//!   carries, which the tests read.
 
 use std::collections::HashMap;
 
 use num_bigint::BigInt;
 use num_traits::One;
 
-use crate::hnn::landmark::{LandmarkDeclaration, Letter, odometer_digits};
+use crate::hnn::landmark::{Capacity, LandmarkDeclaration, Letter, odometer_digits};
 use crate::ratio::{Rat, rat};
 
-/// One founded node: its two counts and its `β`.
+/// One founded node: its two counts, its `β`, its arrivals and its carries.
 #[derive(Clone, Debug)]
 struct Node {
     counts: [i64; 2],
     beta: Rat,
+    arrivals: u64,
+    carries: u64,
 }
 
 /// One branch's read of one digit: its founded nodes' keys and its faces of the digit's symbol,
@@ -61,6 +68,39 @@ impl FullTree {
     /// The founded nodes, one a depth of every opened path.
     pub(super) fn nodes(&self) -> usize {
         self.nodes.len()
+    }
+
+    /// The carries over every node so far (Decision 39).
+    pub(super) fn carries(&self) -> u64 {
+        self.nodes.values().map(|node| node.carries).sum()
+    }
+
+    /// **Each opened digit's registers along its path** at an address, per branch: at every
+    /// founded depth `d` (a forced depth included), the node's KT face of the digit, its arrivals
+    /// and its carries.
+    pub(super) fn registers(
+        &self,
+        address: &[Letter],
+        class: usize,
+    ) -> Vec<Vec<Vec<(Rat, u64, u64)>>> {
+        let letters = self.declaration.letters(address);
+        self.declaration
+            .emitted(class)
+            .into_iter()
+            .map(|(dyadic, symbol)| {
+                letters
+                    .iter()
+                    .enumerate()
+                    .map(|(branch, flat)| {
+                        let tree = branch * (1usize << self.digits) + dyadic;
+                        (0..=flat.len())
+                            .map_while(|d| self.nodes.get(&(tree, flat[..d].to_vec())))
+                            .map(|node| (Self::kt(node, symbol), node.arrivals, node.carries))
+                            .collect()
+                    })
+                    .collect()
+            })
+            .collect()
     }
 
     fn forced(&self, branch: usize) -> usize {
@@ -158,12 +198,24 @@ impl FullTree {
                         Node {
                             counts: [0, 0],
                             beta: Rat::from_integer(BigInt::from(founding)),
+                            arrivals: 0,
+                            carries: 0,
                         },
                     );
                 }
+                let ceiling = match self.declaration.capacity {
+                    Capacity::Unbounded => None,
+                    Capacity::Ceiling(exponent) => Some(1i64 << exponent),
+                };
                 for d in forced..=depths[branch] {
                     let key = (tree, letters[branch][..d].to_vec());
-                    self.nodes.get_mut(&key).expect("a path node").counts[symbol] += 1;
+                    let node = self.nodes.get_mut(&key).expect("a path node");
+                    node.counts[symbol] += 1;
+                    node.arrivals += 1;
+                    if ceiling.is_some_and(|top| node.counts[0] + node.counts[1] >= top) {
+                        node.counts = node.counts.map(|n| (n + 1) / 2);
+                        node.carries += 1;
+                    }
                 }
             }
         }

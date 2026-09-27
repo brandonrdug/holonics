@@ -151,6 +151,27 @@ likelihood of what reached it (`standing_is_routed_counts`).
     `stopFace_normalized₀`, `stop_weight_step₀`): a forced node always splits, `λ_d = 0`, and passes
     its path face through; its founding ratio is `2^0 − 1 = 0` (`ladder_ratio`).
 
+13. **The tree over any node's own weight, and node laws** (Decisions 34 and 39; `ownWeight`,
+    `ownSplit`, `ownLik`, `ownWeight_pos₀`, `ownWeight_one`, `ownLam`, `ownRatio`, `ownLam_mem₀`,
+    `own_face_positive_normalized`, `ownWeight_off`, `ownSplit_arrive`, `own_weight_step₀`,
+    `own_weight_step`, `own_ratio_step`, `own_mixture_over_trees`, `own_kraft_and_dominance`,
+    `ownWeight_kt`, `ownSplit_kt`, `ownLam_kt`, `ownLik_kt`; `NodeLaw`, `NodeLaw.mass_laws`,
+    `ktLaw`, `ktLaw_read`, `lawStandingOf`, `law_standing_is_routed`, `law_state_own_routed`,
+    `lawOwn_pos`, `law_weight_step₀`, `law_face_normalized`, `ktLaw_standing`). The weighting reads a
+    node only through its own weight `E_s` and its face, so its positivity, its step
+    `W'_d = W_d q_d(c)` (`β' = β e_d/q_(d+1)`), its normalized face and its Kraft form and dominance
+    hold for **any** positive own weights, stated once here; the stop law's (`stop_weight_step₀`,
+    `stopWeight_arrive_off`, `stopSplit_arrive`, `stop_mixture_over_trees`,
+    `stop_kraft_and_dominance`) are their case at KT's own weights (`ownWeight_kt`), and
+    `LocalWeighing`'s node-local mixing reads them. A **node law** is a register of what reached the
+    node (`State`, `init`, `step`) with a positive normalized face per register; its own weight is
+    the sequential likelihood `∏_t face(σ_(t−1))(x_t)`, a probability law on words. Over a passage
+    each node holds its register and own weight, which are the law's of its routed subsequence (a
+    function of the sequence, not of its counts); the node law's tree steps by its face, its face is
+    positive and normalized, and KT's node law (`ktLaw`: counts, `bump`, `ktFace`) is Decision 28's
+    standing. The capped register (Decision 39) is `HNN/LandmarkCapacity.capLaw`, and the compacted
+    tree under any node law is `HNN/LandmarkCompaction.compacted_node_law`.
+
 [counterexample; formal-checked]
 * `budget_eviction_changes_face`: evicting an occupied child by budget alone changes a later face
   (`3/4` against `7/12`), so no lawful retention identifies the two standings: a storage budget
@@ -183,7 +204,8 @@ stated here: they have no consumer yet.
 
 The Rust consumer is `crates/holonics/src/hnn/landmark.rs` (`hnn::landmark`, written beside this
 owner): `StopPrior` (item 12's declared law on the dyadic ladder, founding each node at
-`β₀ = 2^(j_d) − 1`; `choose_prior` chooses it on the development cells), `Landmarks` (the tree
+`β₀ = 2^(j_d) − 1`; `choose_prior` chooses it on the development cells), `Capacity` (item 13's node
+law at the capped register, Decision 39), `Landmarks` (the tree
 executed on the lattice: its all-class face `Landmarks::face`, a
 window's faces in cell order `Landmarks::window_faces`, `probability`, `score`, its deposit
 `Landmarks::deposit` and `receive`, the certificates),
@@ -785,6 +807,231 @@ theorem ladder_ratio (j : ℕ) : ladder j / (1 - ladder j) = 2 ^ j - 1 := by
   unfold ladder
   rw [sub_sub_cancel, sub_div, div_self hp.ne', one_div_pow, one_div_one_div]
 
+/-! ### The tree over any node's own weight (Decisions 34 and 39)
+
+A node's **own weight** `E_s` is the sequential likelihood of what reached it under its node law:
+KT's mass `ktMass (N s)` (Decision 28), the capped register's (Decision 39, `NodeLaw`), or a
+landmark's node-local mixture (Decision 34). The weighting, its positivity, its opened-path step and
+(section 5) its Kraft form hold for **any** positive own weights; the stop law's (`stopWeight`,
+`stopFace`, `stop_weight_step₀`, `stop_mixture_over_trees`, `stop_kraft_and_dominance`) is the case
+`E = KT` (`ownWeight_kt`), stated once here and read there. -/
+
+/-- [definition] **The tree over own weights** at node `s` with `m` levels below it: the node's own
+weight `E_s` at the maximum depth, and `W_s = w_|s| E_s + (1 − w_|s|) ∏_b W_(s b)` above it. -/
+def ownWeight (w : ℕ → ℚ) (E : List Ltr → ℚ) : ℕ → List Ltr → ℚ
+  | 0, s => E s
+  | m + 1, s => w s.length * E s + (1 - w s.length) * ∏ b, ownWeight w E m (s ++ [b])
+
+/-- [definition] **The split weight** `P_s = ∏_b W_(s b)` over own weights. -/
+def ownSplit (w : ℕ → ℚ) (E : List Ltr → ℚ) (m : ℕ) (s : List Ltr) : ℚ :=
+  ∏ b, ownWeight w E m (s ++ [b])
+
+omit [DecidableEq Ltr] in
+theorem ownWeight_succ (w : ℕ → ℚ) (E : List Ltr → ℚ) (m : ℕ) (s : List Ltr) :
+    ownWeight w E (m + 1) s = w s.length * E s + (1 - w s.length) * ownSplit w E m s := rfl
+
+omit [DecidableEq Ltr] in
+/-- The weight over positive own weights is positive under a law with forced depths. -/
+theorem ownWeight_pos₀ {w : ℕ → ℚ} (hw : StopLaw₀ w) {E : List Ltr → ℚ} (hE : ∀ s, 0 < E s) :
+    ∀ m s, 0 < ownWeight w E m s
+  | 0, s => hE s
+  | m + 1, s => by
+    have hP : 0 < ∏ b, ownWeight w E m (s ++ [b]) :=
+      Finset.prod_pos fun _ _ => ownWeight_pos₀ hw hE m _
+    obtain ⟨h0, h1⟩ := hw s.length
+    have e1 := mul_nonneg h0 (hE s).le
+    have e2 := mul_pos (sub_pos.mpr h1) hP
+    simp only [ownWeight]
+    linarith
+
+omit [DecidableEq Ltr] in
+theorem ownWeight_pos {w : ℕ → ℚ} (hw : StopLaw w) {E : List Ltr → ℚ} (hE : ∀ s, 0 < E s) :
+    ∀ m s, 0 < ownWeight w E m s :=
+  ownWeight_pos₀ hw.toStopLaw₀ hE
+
+omit [DecidableEq Ltr] in
+theorem ownSplit_pos₀ {w : ℕ → ℚ} (hw : StopLaw₀ w) {E : List Ltr → ℚ} (hE : ∀ s, 0 < E s)
+    (m : ℕ) (s : List Ltr) : 0 < ownSplit w E m s :=
+  Finset.prod_pos fun _ _ => ownWeight_pos₀ hw hE m _
+
+omit [DecidableEq Ltr] in
+theorem ownSplit_pos {w : ℕ → ℚ} (hw : StopLaw w) {E : List Ltr → ℚ} (hE : ∀ s, 0 < E s)
+    (m : ℕ) (s : List Ltr) : 0 < ownSplit w E m s :=
+  ownSplit_pos₀ hw.toStopLaw₀ hE m s
+
+omit [DecidableEq Ltr] in
+/-- [proved-derived; formal-checked] **`ownWeight_one`: the prior is complete.** At unit own
+weights the tree's weight is one: the prior over pruned trees (and, under node-local mixing, over
+the leaves' face choices) sums to one. -/
+theorem ownWeight_one (w : ℕ → ℚ) : ∀ m s, ownWeight w (fun _ : List Ltr => 1) m s = 1
+  | 0, _ => rfl
+  | m + 1, s => by
+    simp only [ownWeight, ownWeight_one w m, Finset.prod_const_one]
+    ring
+
+/-- [definition] **The stop weight at depth `d` over own weights**:
+`λ_d = w_d E_d/(w_d E_d + (1 − w_d) P_d)`. -/
+def ownLam (w : ℕ → ℚ) (E : List Ltr → ℚ) (D : ℕ) (a : List Ltr) (d : ℕ) : ℚ :=
+  w d * E (a.take d) / (w d * E (a.take d) + (1 - w d) * ownSplit w E (D - d - 1) (a.take d))
+
+/-- [definition] **The stop-to-split ratio over own weights**: `β_d = w_d E_d/((1 − w_d) P_d)`. -/
+def ownRatio (w : ℕ → ℚ) (E : List Ltr → ℚ) (D : ℕ) (a : List Ltr) (d : ℕ) : ℚ :=
+  w d * E (a.take d) / ((1 - w d) * ownSplit w E (D - d - 1) (a.take d))
+
+omit [DecidableEq Ltr] in
+theorem ownLam_mem {w : ℕ → ℚ} (hw : StopLaw w) {E : List Ltr → ℚ} (hE : ∀ s, 0 < E s)
+    (D : ℕ) (a : List Ltr) (d : ℕ) : 0 < ownLam w E D a d ∧ ownLam w E D a d < 1 := by
+  have hEd := hE (a.take d)
+  have hP := ownSplit_pos hw hE (D - d - 1) (a.take d)
+  obtain ⟨h0, h1⟩ := hw d
+  have e1 := mul_pos h0 hEd
+  have e2 := mul_pos (sub_pos.mpr h1) hP
+  unfold ownLam
+  exact ⟨div_pos e1 (by linarith), (div_lt_one (by linarith)).mpr (by linarith)⟩
+
+omit [DecidableEq Ltr] in
+/-- Under a law with forced depths the posterior stop weight over own weights lies in `[0, 1)`. -/
+theorem ownLam_mem₀ {w : ℕ → ℚ} (hw : StopLaw₀ w) {E : List Ltr → ℚ} (hE : ∀ s, 0 < E s)
+    (D : ℕ) (a : List Ltr) (d : ℕ) : 0 ≤ ownLam w E D a d ∧ ownLam w E D a d < 1 := by
+  have hEd := hE (a.take d)
+  have hP := ownSplit_pos₀ hw hE (D - d - 1) (a.take d)
+  obtain ⟨h0, h1⟩ := hw d
+  have e1 := mul_nonneg h0 hEd.le
+  have e2 := mul_pos (sub_pos.mpr h1) hP
+  unfold ownLam
+  exact ⟨div_nonneg e1 (by linarith), (div_lt_one (by linarith)).mpr (by linarith)⟩
+
+omit [DecidableEq Ltr] [DecidableEq A] in
+/-- [proved-derived; formal-checked] **`own_face_positive_normalized`: over positive normalized own
+faces the opened path's face is positive and normalized** at every depth `d ≤ D`, under any law with
+forced depths (`path_face_normalized` with `λ = ownLam ∈ [0, 1)`). -/
+theorem own_face_positive_normalized {w : ℕ → ℚ} (hw : StopLaw₀ w) {E : List Ltr → ℚ}
+    (hE : ∀ s, 0 < E s) (e : ℕ → A → ℚ) (D : ℕ) (a : List Ltr)
+    (he : ∀ d ≤ D, ∀ c, 0 < e d c) (hes : ∀ d ≤ D, ∑ c, e d c = 1) :
+    ∀ d ≤ D, (∀ c, 0 < pathFace e (ownLam w E D a) D d c) ∧
+      ∑ c, pathFace e (ownLam w E D a) D d c = 1 :=
+  path_face_normalized e _ D he hes fun d _ =>
+    ⟨(ownLam_mem₀ hw hE D a d).1, (ownLam_mem₀ hw hE D a d).2.le⟩
+
+omit [Fintype Ltr] [DecidableEq Ltr] in
+/-- An arrival that moves no own weight off the opened path moves no tree weight off it. -/
+theorem ownWeight_off [Fintype Ltr] (w : ℕ → ℚ) {E E' : List Ltr → ℚ} {a : List Ltr}
+    (hoff : ∀ s, ¬ a.take s.length = s → E' s = E s) {s : List Ltr}
+    (h : ¬ a.take s.length = s) (m : ℕ) : ownWeight w E' m s = ownWeight w E m s := by
+  induction m generalizing s with
+  | zero => simp [ownWeight, hoff s h]
+  | succ m ih =>
+    rw [ownWeight_succ, ownWeight_succ, hoff s h, ownSplit, ownSplit,
+      Finset.prod_congr rfl fun b _ => ih (off_path_descendant h [b])]
+
+/-- The split weight of an opened node moves by its opened child's factor. -/
+theorem ownSplit_arrive (w : ℕ → ℚ) {E E' : List Ltr → ℚ} {a : List Ltr}
+    (hoff : ∀ s, ¬ a.take s.length = s → E' s = E s) {d : ℕ} (hd : d < a.length) (m : ℕ) (r : ℚ)
+    (hchild : ownWeight w E' m (a.take (d + 1)) = ownWeight w E m (a.take (d + 1)) * r) :
+    ownSplit w E' m (a.take d) = ownSplit w E m (a.take d) * r := by
+  unfold ownSplit
+  refine prod_update_one _ _ a[d] r ?_ fun b hb => ownWeight_off w hoff (off_path_child hd hb) m
+  have e : a.take d ++ [a[d]] = a.take (d + 1) := (restrict_succ hd).symm
+  rw [e]
+  exact hchild
+
+omit [Fintype A] [DecidableEq A] in
+/-- [proved-derived; formal-checked] **`own_weight_step₀`: over own weights the conditional
+prediction is the successive likelihood ratio**, under any stop-weight law with forced depths. For
+an address `a` of length at least `D`, own weights `E` and `E'` that agree off the opened path and
+move by the node's own face on it, `E'_d = E_d e_d(c)` (the node law's sequential step): at every
+depth `d ≤ D`, `W'_d = W_d q_d(c)` with `q_D = e_D` and `q_d = λ_d e_d + (1 − λ_d) q_(d+1)`,
+`λ_d = w_d E_d/(w_d E_d + (1 − w_d) P_d)` (`λ_d = 0` at a forced depth). The stop law's step
+(`stop_weight_step₀`) is its case at KT. -/
+theorem own_weight_step₀ {w : ℕ → ℚ} (hw : StopLaw₀ w) {E E' : List Ltr → ℚ}
+    (hE : ∀ s, 0 < E s) {D : ℕ} {a : List Ltr} (hD : D ≤ a.length) (e : ℕ → A → ℚ) (c : A)
+    (hoff : ∀ s, ¬ a.take s.length = s → E' s = E s)
+    (hon : ∀ d ≤ D, E' (a.take d) = E (a.take d) * e d c) :
+    ∀ d ≤ D, ownWeight w E' (D - d) (a.take d) =
+      ownWeight w E (D - d) (a.take d) * pathFace e (ownLam w E D a) D d c := by
+  suffices h : ∀ m d, d + m = D → ownWeight w E' m (a.take d) =
+      ownWeight w E m (a.take d) * pathFace e (ownLam w E D a) D d c by
+    intro d hd
+    exact h (D - d) d (by omega)
+  intro m
+  induction m with
+  | zero =>
+    intro d hd
+    have hdD : d = D := by omega
+    subst hdD
+    rw [pathFace_deepest]
+    exact hon _ le_rfl
+  | succ m ih =>
+    intro d hd
+    have hda : d < a.length := by omega
+    have hlen : (a.take d).length = d := by simp; omega
+    have hsplit := ownSplit_arrive w hoff hda m (pathFace e (ownLam w E D a) D (d + 1) c)
+      (ih (d + 1) (by omega))
+    rw [ownWeight_succ, ownWeight_succ, hsplit, hlen, hon d (by omega),
+      pathFace_step _ _ (show d < D by omega)]
+    have hlam : ownLam w E D a d = w d * E (a.take d) /
+        (w d * E (a.take d) + (1 - w d) * ownSplit w E m (a.take d)) := by
+      unfold ownLam
+      rw [show D - d - 1 = m by omega]
+    rw [hlam]
+    have hEd := hE (a.take d)
+    have hP := ownSplit_pos₀ hw hE m (a.take d)
+    obtain ⟨h0, h1⟩ := hw d
+    have hden : w d * E (a.take d) + (1 - w d) * ownSplit w E m (a.take d) ≠ 0 :=
+      (add_pos_of_nonneg_of_pos (mul_nonneg h0 hEd.le) (mul_pos (sub_pos.mpr h1) hP)).ne'
+    field_simp
+    ring
+
+omit [Fintype A] [DecidableEq A] in
+/-- [proved-derived; formal-checked] **`own_weight_step`: over own weights the conditional
+prediction is the successive likelihood ratio** (`own_weight_step₀`, no depth forced): the stop
+law's step (`stop_weight_step`) with the own face in place of the KT face. -/
+theorem own_weight_step {w : ℕ → ℚ} (hw : StopLaw w) {E E' : List Ltr → ℚ} (hE : ∀ s, 0 < E s)
+    {D : ℕ} {a : List Ltr} (hD : D ≤ a.length) (e : ℕ → A → ℚ) (c : A)
+    (hoff : ∀ s, ¬ a.take s.length = s → E' s = E s)
+    (hon : ∀ d ≤ D, E' (a.take d) = E (a.take d) * e d c) :
+    ∀ d ≤ D, ownWeight w E' (D - d) (a.take d) =
+      ownWeight w E (D - d) (a.take d) * pathFace e (ownLam w E D a) D d c :=
+  own_weight_step₀ hw.toStopLaw₀ hE hD e c hoff hon
+
+omit [DecidableEq A] in
+/-- [proved-derived; formal-checked] **`own_ratio_step`: the executed step over own weights.** The
+stop weight is `λ = β/(1 + β)` with `β_d = w_d E_d/((1 − w_d) P_d)`, and an arrival moves
+`β' = β e_d(c)/q_(d+1)(c)`: the node's own face `e` stands where the stop law's KT face stood
+(`stop_ratio_step`), and the law's factor `w_d/(1 − w_d)` is carried from the founding. -/
+theorem own_ratio_step {w : ℕ → ℚ} (hw : StopLaw w) {E E' : List Ltr → ℚ} (hE : ∀ s, 0 < E s)
+    {D : ℕ} {a : List Ltr} (hD : D ≤ a.length) (e : ℕ → A → ℚ) (c : A)
+    (he : ∀ d ≤ D, ∀ c, 0 < e d c) (hes : ∀ d ≤ D, ∑ c, e d c = 1)
+    (hoff : ∀ s, ¬ a.take s.length = s → E' s = E s)
+    (hon : ∀ d ≤ D, E' (a.take d) = E (a.take d) * e d c) {d : ℕ} (hd : d < D) :
+    ownLam w E D a d = ownRatio w E D a d / (1 + ownRatio w E D a d) ∧
+      ownRatio w E' D a d =
+        ownRatio w E D a d * e d c / pathFace e (ownLam w E D a) D (d + 1) c := by
+  have hEd := hE (a.take d)
+  have hP := ownSplit_pos hw hE (D - d - 1) (a.take d)
+  obtain ⟨h0, h1⟩ := hw d
+  have hw1 : (0 : ℚ) < 1 - w d := sub_pos.mpr h1
+  refine ⟨?_, ?_⟩
+  · have e1 := mul_pos h0 hEd
+    have e2 := mul_pos hw1 hP
+    have hden : 0 < w d * E (a.take d) + (1 - w d) * ownSplit w E (D - d - 1) (a.take d) :=
+      add_pos e1 e2
+    have hw1' : (1 : ℚ) - w d ≠ 0 := hw1.ne'
+    unfold ownLam ownRatio
+    field_simp
+    ring
+  · have hda : d < a.length := by omega
+    have hchild := own_weight_step hw hE hD e c hoff hon (d + 1) (by omega)
+    rw [show D - (d + 1) = D - d - 1 by omega] at hchild
+    have hsplit := ownSplit_arrive w hoff hda (D - d - 1)
+      (pathFace e (ownLam w E D a) D (d + 1) c) hchild
+    have hq' : 0 < pathFace e (ownLam w E D a) D (d + 1) c :=
+      (own_face_positive_normalized hw.toStopLaw₀ hE e D a he hes (d + 1) (by omega)).1 c
+    have hw1' : (1 : ℚ) - w d ≠ 0 := hw1.ne'
+    unfold ownRatio
+    rw [hon d hd.le, hsplit]
+    field_simp
+
 /-- [definition] **The tree's mixture under a stop-weight law** at node `s` with `m` levels below it:
 `W_s = E_s` at the maximum depth and `W_s = w_|s| E_s + (1 − w_|s|) ∏_b W_(s b)` above it, the stop
 weight read at the node's depth `|s|`. -/
@@ -845,6 +1092,20 @@ omit [DecidableEq A] [DecidableEq Ltr] in
 theorem stopSplit_half (N : TreeStanding Ltr A) (m : ℕ) (s : List Ltr) :
     stopSplit (fun _ => (1 / 2 : ℚ)) N m s = splitMass N m s := by
   simp only [stopSplit, splitMass, stopWeight_half]
+
+omit [DecidableEq A] [DecidableEq Ltr] in
+/-- [proved-derived; formal-checked] **The declared stop law is the tree over KT own weights**:
+`ownWeight w (KT ∘ N) = stopWeight w N`; each node's own weight is its KT mass. -/
+theorem ownWeight_kt (w : ℕ → ℚ) (N : TreeStanding Ltr A) :
+    ∀ m s, ownWeight w (fun s => ktMass (N s)) m s = stopWeight w N m s
+  | 0, _ => rfl
+  | m + 1, s => by
+    simp only [ownWeight, stopWeight, ownWeight_kt w N m]
+
+omit [DecidableEq A] [DecidableEq Ltr] in
+theorem ownSplit_kt (w : ℕ → ℚ) (N : TreeStanding Ltr A) (m : ℕ) (s : List Ltr) :
+    ownSplit w (fun s => ktMass (N s)) m s = stopSplit w N m s := by
+  simp only [ownSplit, stopSplit, ownWeight_kt]
 
 /-- [definition] **The stop weight at depth `d` of the opened path** under the law:
 `λ_d = w_d E_d/(w_d E_d + (1 − w_d) P_d)`, the posterior weight of stopping at the node. -/
@@ -932,17 +1193,20 @@ theorem stopFace_half [Nonempty A] (N : TreeStanding Ltr A) (D : ℕ) (a : List 
   funext d
   simp only [stopFace, face, hlam]
 
+omit [DecidableEq A] [DecidableEq Ltr] in
+/-- The stop law's posterior stop weights are the own-weight tree's at KT's own weights. -/
+theorem ownLam_kt (w : ℕ → ℚ) (N : TreeStanding Ltr A) (D : ℕ) (a : List Ltr) :
+    ownLam w (fun s => ktMass (N s)) D a = stopLam w N D a := by
+  funext d
+  simp only [ownLam, stopLam, ownSplit_kt]
+
 /-- [proved-derived; formal-checked] **A deposit is local to the opened path under any law**: at a
 node off the path the arrival changes no weight at any depth below it. -/
 theorem stopWeight_arrive_off (w : ℕ → ℚ) (N : TreeStanding Ltr A) {a s : List Ltr}
     (h : ¬ a.take s.length = s) (c : A) (m : ℕ) :
     stopWeight w (arrive N a c) m s = stopWeight w N m s := by
-  induction m generalizing s with
-  | zero => simp [stopWeight, arrive, h]
-  | succ m ih =>
-    have hs : arrive N a c s = N s := by simp [arrive, h]
-    rw [stopWeight_succ, stopWeight_succ, hs, stopSplit, stopSplit,
-      Finset.prod_congr rfl fun b _ => ih (off_path_descendant h [b])]
+  rw [← ownWeight_kt, ← ownWeight_kt]
+  exact ownWeight_off w (fun t ht => by simp [arrive, ht]) h m
 
 /-- The split mass of an opened node moves by its opened child's factor, under any law. -/
 theorem stopSplit_arrive (w : ℕ → ℚ) (N : TreeStanding Ltr A) {a : List Ltr} {d : ℕ}
@@ -950,58 +1214,27 @@ theorem stopSplit_arrive (w : ℕ → ℚ) (N : TreeStanding Ltr A) {a : List Lt
     (hchild : stopWeight w (arrive N a c) m (a.take (d + 1)) =
       stopWeight w N m (a.take (d + 1)) * r) :
     stopSplit w (arrive N a c) m (a.take d) = stopSplit w N m (a.take d) * r := by
-  unfold stopSplit
-  refine prod_update_one _ _ a[d] r ?_ fun b hb =>
-    stopWeight_arrive_off w N (off_path_child hd hb) c m
-  have e : a.take d ++ [a[d]] = a.take (d + 1) := (restrict_succ hd).symm
-  rw [e]
+  rw [← ownSplit_kt, ← ownSplit_kt]
+  refine ownSplit_arrive w (fun t ht => by simp [arrive, ht]) hd m r ?_
+  rw [ownWeight_kt, ownWeight_kt]
   exact hchild
 
 /-- [proved-derived; formal-checked] **`stop_weight_step₀`: under any stop-weight law with forced
 depths the conditional prediction is the successive likelihood ratio.** For an address `a` of length
 at least `D` and a class `c`, at every depth `d ≤ D` of the opened path, `W'_d = W_d · q_d(c)` with
 `q_D = k_D` and `q_d = λ_d k_d + (1 − λ_d) q_(d+1)`, `λ_d = w_d E_d/(w_d E_d + (1 − w_d) P_d)`
-(`λ_d = 0` at a forced depth). -/
+(`λ_d = 0` at a forced depth). It is `own_weight_step₀` at KT's own weights (`ownWeight_kt`). -/
 theorem stop_weight_step₀ [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw₀ w) (N : TreeStanding Ltr A)
     {D : ℕ} {a : List Ltr} (hD : D ≤ a.length) (c : A) :
     ∀ d ≤ D, stopWeight w (arrive N a c) (D - d) (a.take d) =
       stopWeight w N (D - d) (a.take d) * stopFace w N D a d c := by
-  suffices h : ∀ m d, d + m = D → stopWeight w (arrive N a c) m (a.take d) =
-      stopWeight w N m (a.take d) * stopFace w N D a d c by
-    intro d hd
-    exact h (D - d) d (by omega)
-  intro m
-  induction m with
-  | zero =>
-    intro d hd
-    have hdD : d = D := by omega
-    subst hdD
-    simp only [stopWeight, arrive, if_pos (opens_take a d), ktMass_bump]
-    rw [stopFace, pathFace_deepest]
-    rfl
-  | succ m ih =>
-    intro d hd
-    have hda : d < a.length := by omega
-    have hlen : (a.take d).length = d := by simp; omega
-    have hsplit := stopSplit_arrive w N hda c m (stopFace w N D a (d + 1) c)
-      (ih (d + 1) (by omega))
-    rw [stopWeight_succ, stopWeight_succ, hsplit, hlen]
-    simp only [arrive, if_pos (opens_take a d), ktMass_bump]
-    simp only [stopFace]
-    rw [pathFace_step _ _ (show d < D by omega)]
-    have hlam : stopLam w N D a d = w d * ktMass (N (a.take d)) /
-        (w d * ktMass (N (a.take d)) + (1 - w d) * stopSplit w N m (a.take d)) := by
-      unfold stopLam
-      rw [show D - d - 1 = m by omega]
-    rw [hlam]
-    have hE := ktMass_pos (N (a.take d))
-    have hP := stopSplit_pos₀ hw N m (a.take d)
-    obtain ⟨h0, h1⟩ := hw d
-    have hden : w d * ktMass (N (a.take d)) + (1 - w d) * stopSplit w N m (a.take d) ≠ 0 :=
-      (add_pos_of_nonneg_of_pos (mul_nonneg h0 hE.le) (mul_pos (sub_pos.mpr h1) hP)).ne'
-    unfold kAt
-    field_simp
-    ring
+  intro d hd
+  have h := own_weight_step₀ hw (E := fun s => ktMass (N s))
+    (E' := fun s => ktMass (arrive N a c s)) (fun s => ktMass_pos _) hD (kAt N a) c
+    (fun t ht => by simp [arrive, ht])
+    (fun d _ => by simp only [arrive, if_pos (opens_take a d), ktMass_bump, kAt]) d hd
+  rw [ownWeight_kt, ownWeight_kt, ownLam_kt] at h
+  exact h
 
 /-- [proved-derived; formal-checked] **`stop_weight_step`: under any stop-weight law the conditional
 prediction is the successive likelihood ratio** (`stop_weight_step₀`, no depth forced). -/
@@ -1256,6 +1489,232 @@ theorem depth_one_is_decision_27 [Nonempty A] (obs : List (List Ltr × A)) {a : 
 
 end Tree
 
+/-! ## 4′. Node laws: the register a landmark keeps of what reached it (Decision 39)
+
+A landmark's storage is a register on its own clock, its arrivals. Decisions 28–37 kept KT's counts,
+an exchangeable register; Decision 39 gives the register a capacity (`HNN/LandmarkCapacity`). The
+tree weighting reads a node only through its **own weight** (the sequential likelihood of what
+reached it) and its **face** (read from its register before the next arrival), so every law of the
+own-weight tree (section 4, `ownWeight`, `own_weight_step₀`; section 5, `own_mixture_over_trees`,
+`own_kraft_and_dominance`) holds for any node law. The routed subsequences appear only in the
+specification (`law_standing_is_routed`): the standing keeps each node's register and own weight. -/
+
+section NodeLaw
+
+universe v
+
+/-- [definition] **A node law** (Decision 39): the register a landmark keeps of the arrivals that
+reached it (`State`), opened at `init` and stepped by each arrival (`step`), with a positive
+normalized face per register (`face`). The register after a word is a function of the word, not
+necessarily of its counts: the capped register is not exchangeable. -/
+structure NodeLaw (A : Type v) [Fintype A] where
+  State : Type v
+  init : State
+  step : State → A → State
+  face : State → A → ℚ
+  face_pos : ∀ σ c, 0 < face σ c
+  face_sum : ∀ σ, ∑ c, face σ c = 1
+
+namespace NodeLaw
+
+variable {A : Type v} [Fintype A] (L : NodeLaw A)
+
+/-- [definition] **A node's reading of a word** (oldest first): its register and its own weight,
+each arrival read at the face of the register before it. -/
+def read (w : List A) : L.State × ℚ :=
+  w.foldl (fun p c => (L.step p.1 c, p.2 * L.face p.1 c)) (L.init, 1)
+
+/-- [definition] **The register after a word.** -/
+def run (w : List A) : L.State := (L.read w).1
+
+/-- [definition] **The own weight of a word**: `∏_t face(σ_t)(x_t)`, the node law's sequential
+likelihood, `σ_t` the register before arrival `t`. -/
+def mass (w : List A) : ℚ := (L.read w).2
+
+theorem read_snoc (w : List A) (c : A) :
+    L.read (w ++ [c]) = (L.step (L.run w) c, L.mass w * L.face (L.run w) c) := by
+  rw [read, List.foldl_append]
+  rfl
+
+theorem run_nil : L.run [] = L.init := rfl
+
+theorem mass_nil : L.mass [] = 1 := rfl
+
+theorem run_snoc (w : List A) (c : A) : L.run (w ++ [c]) = L.step (L.run w) c := by
+  rw [run, read_snoc]
+
+theorem mass_snoc (w : List A) (c : A) : L.mass (w ++ [c]) = L.mass w * L.face (L.run w) c := by
+  rw [mass, read_snoc]
+
+theorem mass_pos (w : List A) : 0 < L.mass w := by
+  induction w using List.reverseRecOn with
+  | nil => rw [mass_nil]; exact one_pos
+  | append_singleton w c ih => rw [mass_snoc]; exact mul_pos ih (L.face_pos _ c)
+
+/-- [proved-derived; formal-checked] **`NodeLaw.mass_laws`: a node law's own weight is a probability
+law on words**: positive, one on the empty word, consistent (`Σ_c M(w ++ [c]) = M(w)`), and its
+conditional is the face of the register, `M(w ++ [c])/M(w) = face(run w)(c)`. -/
+theorem mass_laws :
+    (∀ w, 0 < L.mass w) ∧ L.mass [] = 1 ∧ (∀ w, ∑ c, L.mass (w ++ [c]) = L.mass w) ∧
+      ∀ w c, L.mass (w ++ [c]) / L.mass w = L.face (L.run w) c := by
+  refine ⟨L.mass_pos, rfl, fun w => ?_, fun w c => ?_⟩
+  · simp only [mass_snoc, ← Finset.mul_sum, L.face_sum, mul_one]
+  · rw [mass_snoc, mul_div_cancel_left₀ _ (L.mass_pos w).ne']
+
+end NodeLaw
+
+variable {A : Type v} [Fintype A]
+
+/-- [definition] **KT's node law** (Decision 28): the register is the counts, stepped by `bump` and
+read at `ktFace`. -/
+def ktLaw (A : Type v) [Fintype A] [DecidableEq A] [Nonempty A] : NodeLaw A where
+  State := A → ℕ
+  init := fun _ => 0
+  step := bump
+  face := ktFace
+  face_pos := ktFace_pos
+  face_sum := ktFace_sum
+
+/-- [proved-derived; formal-checked] **`ktLaw_read`: KT's node law keeps the counts and weighs KT's
+mass**: its register after a word is the word's counts, and its own weight is `ktSeq`. -/
+theorem ktLaw_read [DecidableEq A] [Nonempty A] (w : List A) :
+    (ktLaw A).run w = counts w ∧ (ktLaw A).mass w = ktSeq w := by
+  induction w using List.reverseRecOn with
+  | nil => exact ⟨counts_nil.symm, ktSeq_nil.symm⟩
+  | append_singleton w c ih =>
+    refine ⟨?_, ?_⟩
+    · rw [NodeLaw.run_snoc, ih.1, counts_snoc]
+      rfl
+    · rw [NodeLaw.mass_snoc, ih.1, ih.2]
+      show ktSeq w * ktFace (counts w) c = ktSeq (w ++ [c])
+      simp only [ktSeq, counts_snoc, ktMass_bump]
+
+variable {Ltr : Type*} [Fintype Ltr] [DecidableEq Ltr]
+
+/-- [definition] **A node law's tree standing**: at each node its register and its own weight, or
+nothing where no arrival has reached it (an unfounded node, read at `init` with own weight `1`). -/
+abbrev LawStanding (L : NodeLaw A) (Ltr : Type*) := List Ltr → Option (L.State × ℚ)
+
+/-- [definition] A node's register in a law standing (`init` where unfounded). -/
+def lawState (L : NodeLaw A) (N : LawStanding L Ltr) (s : List Ltr) : L.State :=
+  ((N s).map Prod.fst).getD L.init
+
+/-- [definition] A node's own weight in a law standing (`1` where unfounded). -/
+def lawOwn (L : NodeLaw A) (N : LawStanding L Ltr) (s : List Ltr) : ℚ :=
+  ((N s).map Prod.snd).getD 1
+
+/-- [definition] Whether an arrival has reached a node. -/
+def lawReached (L : NodeLaw A) (N : LawStanding L Ltr) (s : List Ltr) : Bool := (N s).isSome
+
+/-- [definition] **An arrival** of class `c` at address `a`: every node on the opened path steps
+its register and multiplies its own weight by its face before the arrival; every node off the path
+is unchanged. -/
+def lawArrive (L : NodeLaw A) (N : LawStanding L Ltr) (a : List Ltr) (c : A) :
+    LawStanding L Ltr := fun s =>
+  if a.take s.length = s then
+    some (L.step (lawState L N s) c, lawOwn L N s * L.face (lawState L N s) c)
+  else N s
+
+/-- [definition] **The law standing after a past**, for a causal context: the empty standing, and
+each class arriving at the address its past opens. -/
+def lawStandingOf (L : NodeLaw A) (ctx : List A → List Ltr) : List A → LawStanding L Ltr
+  | [] => fun _ => none
+  | c :: h => lawArrive L (lawStandingOf L ctx h) (ctx h) c
+
+/-- [definition] **The node law's tree face** along the opened path `a`, at depth `d`: the path
+mixture of the nodes' faces under the own weights' stop weights. -/
+def lawFace (L : NodeLaw A) (w : ℕ → ℚ) (N : LawStanding L Ltr) (D : ℕ) (a : List Ltr)
+    (d : ℕ) : A → ℚ :=
+  pathFace (fun d => L.face (lawState L N (a.take d))) (ownLam w (lawOwn L N) D a) D d
+
+omit [Fintype A] [Fintype Ltr] in
+/-- [proved-derived; formal-checked] **`law_standing_is_routed`: each node's register is a function
+of the sequence that reached it.** Under a causal context, the law standing after a past holds at
+each node nothing when no arrival reached it, and otherwise the node law's register and own weight
+of its routed subsequence (the classes of the arrivals whose address opens the node, in order). -/
+theorem law_standing_is_routed [Fintype A] (L : NodeLaw A) (ctx : List A → List Ltr) :
+    ∀ h s, lawStandingOf L ctx h s =
+      if routed (observations ctx h) s = [] then none
+      else some (L.run (routed (observations ctx h) s), L.mass (routed (observations ctx h) s))
+  | [], s => by simp [lawStandingOf, observations, routed]
+  | c :: h, s => by
+    have ih := law_standing_is_routed L ctx h s
+    have hstate : lawState L (lawStandingOf L ctx h) s = L.run (routed (observations ctx h) s) := by
+      rw [lawState, ih]
+      split_ifs with hr
+      · rw [hr]; rfl
+      · rfl
+    have hown : lawOwn L (lawStandingOf L ctx h) s = L.mass (routed (observations ctx h) s) := by
+      rw [lawOwn, ih]
+      split_ifs with hr
+      · rw [hr]; rfl
+      · rfl
+    simp only [lawStandingOf, observations, routed_snoc]
+    by_cases hs : (ctx h).take s.length = s
+    · simp only [lawArrive, if_pos hs, hstate, hown, List.append_eq_nil_iff, List.cons_ne_nil,
+        and_false, if_false, NodeLaw.run_snoc, NodeLaw.mass_snoc]
+    · simp only [lawArrive, if_neg hs, List.append_nil, ih]
+
+omit [Fintype Ltr] in
+/-- The register and own weight of a node after a passage are the node law's of its routed
+subsequence. -/
+theorem law_state_own_routed (L : NodeLaw A) (ctx : List A → List Ltr) (h : List A)
+    (s : List Ltr) :
+    lawState L (lawStandingOf L ctx h) s = L.run (routed (observations ctx h) s) ∧
+      lawOwn L (lawStandingOf L ctx h) s = L.mass (routed (observations ctx h) s) := by
+  rw [lawState, lawOwn, law_standing_is_routed L ctx h s]
+  split_ifs with hr
+  · rw [hr]; exact ⟨rfl, rfl⟩
+  · exact ⟨rfl, rfl⟩
+
+omit [Fintype Ltr] in
+theorem lawOwn_pos (L : NodeLaw A) (ctx : List A → List Ltr) (h : List A) (s : List Ltr) :
+    0 < lawOwn L (lawStandingOf L ctx h) s := by
+  rw [(law_state_own_routed L ctx h s).2]
+  exact L.mass_pos _
+
+omit [Fintype A] [Fintype Ltr] in
+/-- An arrival off a node leaves its own weight. -/
+theorem lawOwn_arrive_off [Fintype A] (L : NodeLaw A) (N : LawStanding L Ltr) {a s : List Ltr}
+    (c : A) (hs : ¬ a.take s.length = s) : lawOwn L (lawArrive L N a c) s = lawOwn L N s := by
+  simp [lawOwn, lawArrive, hs]
+
+/-- [proved-derived; formal-checked] **`law_weight_step₀`: the node law's tree steps by its face.**
+For an address `a` of length at least `D`, under any stop-weight law with forced depths and positive
+own weights, an arrival multiplies each opened node's weight by the node law's tree face there,
+`W'_d = W_d q_d(c)` (`own_weight_step₀` with the node law's step `E' = E face(σ)(c)`). -/
+theorem law_weight_step₀ (L : NodeLaw A) {w : ℕ → ℚ} (hw : StopLaw₀ w) (N : LawStanding L Ltr)
+    (hE : ∀ s, 0 < lawOwn L N s) {D : ℕ} {a : List Ltr} (hD : D ≤ a.length) (c : A) :
+    ∀ d ≤ D, ownWeight w (lawOwn L (lawArrive L N a c)) (D - d) (a.take d) =
+      ownWeight w (lawOwn L N) (D - d) (a.take d) * lawFace L w N D a d c :=
+  own_weight_step₀ hw hE hD _ c (fun s hs => lawOwn_arrive_off L N c hs)
+    (fun d _ => by simp [lawOwn, lawArrive])
+
+omit [DecidableEq Ltr] in
+/-- [proved-derived; formal-checked] **`law_face_normalized`: the node law's tree face is positive
+and normalized** at every depth of the opened path, under any stop-weight law with forced depths and
+positive own weights (`own_face_positive_normalized`, each node's face the law's). -/
+theorem law_face_normalized (L : NodeLaw A) {w : ℕ → ℚ} (hw : StopLaw₀ w) (N : LawStanding L Ltr)
+    (hE : ∀ s, 0 < lawOwn L N s) (D : ℕ) (a : List Ltr) :
+    ∀ d ≤ D, (∀ c, 0 < lawFace L w N D a d c) ∧ ∑ c, lawFace L w N D a d c = 1 :=
+  own_face_positive_normalized hw hE _ D a (fun _ _ c => L.face_pos _ c) (fun _ _ => L.face_sum _)
+
+omit [Fintype Ltr] in
+/-- [proved-derived; formal-checked] **`ktLaw_standing`: KT's node law is Decision 28's standing.**
+After every passage, each node's register is its count table and its own weight its KT mass, so the
+node law's tree weight and face are the stop law's (`ownWeight_kt`). -/
+theorem ktLaw_standing [DecidableEq A] [Nonempty A] (ctx : List A → List Ltr) (h : List A)
+    (s : List Ltr) :
+    lawState (ktLaw A) (lawStandingOf (ktLaw A) ctx h) s = standingOf ctx h s ∧
+      lawOwn (ktLaw A) (lawStandingOf (ktLaw A) ctx h) s = ktMass (standingOf ctx h s) := by
+  obtain ⟨hs, ho⟩ := law_state_own_routed (ktLaw A) ctx h s
+  obtain ⟨hN, -⟩ := standing_is_routed_counts ctx h s
+  rw [hs, ho, (ktLaw_read _).1, (ktLaw_read _).2, hN]
+  exact ⟨rfl, rfl⟩
+
+end NodeLaw
+
+
 /-! ## 5. The mixture over pruned trees (the Kraft form) -/
 
 section Kraft
@@ -1399,33 +1858,106 @@ theorem PrunedTree.prior_pos {w : ℕ → ℚ} (hw : Holonics.HNN.LandmarkTree.S
       exact mul_pos (sub_pos.mpr (hw d).2)
         (Finset.prod_pos fun b _ => PrunedTree.prior_pos hw m (d + 1) (f b))
 
-omit [DecidableEq A] in
-/-- [proved-derived; formal-checked] **`stop_mixture_over_trees`: under any stop-weight law the tree
-is the mixture over pruned trees with the law's prior** (Decision 32):
-`W_s = Σ_S prior_w(S) ∏_(leaves ℓ of S) E_(s ℓ)`, the prior `∏_stops w_d ∏_splits (1 − w_d)`; at a
-constant `w` it is `w^(stops S) (1 − w)^(splits S)` (`PrunedTree.prior_const`). -/
-theorem stop_mixture_over_trees (w : ℕ → ℚ) (N : TreeStanding Ltr A) :
-    ∀ m s, stopWeight w N m s =
-      ∑ S : PrunedTree Ltr m, PrunedTree.prior w m s.length S * treeLik N m s S
+/-- [definition] **The likelihood of a pruned tree over own weights**: the product of its leaves'
+own weights. -/
+def ownLik (E : List Ltr → ℚ) : (m : ℕ) → List Ltr → PrunedTree Ltr m → ℚ
+  | 0, s, _ => E s
+  | m + 1, s, S => Option.elim (S : Option (Ltr → PrunedTree Ltr m)) (E s)
+      fun f => ∏ b, ownLik E m (s ++ [b]) (f b)
+
+omit [DecidableEq Ltr] in
+theorem ownLik_pos {E : List Ltr → ℚ} (hE : ∀ s, 0 < E s) :
+    ∀ m s (S : PrunedTree Ltr m), 0 < ownLik E m s S
+  | 0, s, _ => hE s
+  | m + 1, s, S => by
+    cases hS : (S : Option (Ltr → PrunedTree Ltr m)) with
+    | none => simp only [ownLik, Option.elim]; exact hE s
+    | some f =>
+      simp only [ownLik, Option.elim]
+      exact Finset.prod_pos fun b _ => ownLik_pos hE m _ _
+
+/-- [proved-derived; formal-checked] **`own_mixture_over_trees`: over any own weights the tree is
+the mixture over pruned trees with the stop law's prior**,
+`W_s = Σ_S prior_w(S) ∏_(leaves ℓ of S) E_(s ℓ)`, the prior `∏_stops w_d ∏_splits (1 − w_d)`. The
+own weight is any node law's sequential likelihood of what reached the node (KT's, Decision 28;
+the capped register's, Decision 39; a node-local mixture, Decision 34);
+`stop_mixture_over_trees` is its case at KT (`ownWeight_kt`, `ownLik_kt`). -/
+theorem own_mixture_over_trees (w : ℕ → ℚ) (E : List Ltr → ℚ) :
+    ∀ m s, ownWeight w E m s =
+      ∑ S : PrunedTree Ltr m, PrunedTree.prior w m s.length S * ownLik E m s S
   | 0, s => by
     have hc : Fintype.card (PrunedTree Ltr 0) = 1 := rfl
-    simp [stopWeight, treeLik, PrunedTree.prior, hc]
+    simp [ownWeight, ownLik, PrunedTree.prior, hc]
   | m + 1, s => by
-    rw [stopWeight_succ, stopSplit]
-    simp only [stop_mixture_over_trees w N m, List.length_append, List.length_singleton]
+    rw [ownWeight_succ, ownSplit]
+    simp only [own_mixture_over_trees w E m, List.length_append, List.length_singleton]
     rw [Fintype.prod_sum]
     have e : ∑ S : PrunedTree Ltr (m + 1),
-        PrunedTree.prior w (m + 1) s.length S * treeLik N (m + 1) s S =
-        w s.length * ktMass (N s) + ∑ f : Ltr → PrunedTree Ltr m,
+        PrunedTree.prior w (m + 1) s.length S * ownLik E (m + 1) s S =
+        w s.length * E s + ∑ f : Ltr → PrunedTree Ltr m,
           ((1 - w s.length) * ∏ b, PrunedTree.prior w m (s.length + 1) (f b)) *
-            ∏ b, treeLik N m (s ++ [b]) (f b) :=
+            ∏ b, ownLik E m (s ++ [b]) (f b) :=
       Fintype.sum_option (fun S : Option (Ltr → PrunedTree Ltr m) =>
-        PrunedTree.prior w (m + 1) s.length S * treeLik N (m + 1) s S)
+        PrunedTree.prior w (m + 1) s.length S * ownLik E (m + 1) s S)
     rw [e, Finset.mul_sum]
     congr 1
     refine Finset.sum_congr rfl fun f _ => ?_
     rw [Finset.prod_mul_distrib]
     ring
+
+/-- [proved-derived; formal-checked] **`own_kraft_and_dominance`.** Under any stop-weight law and
+positive own weights: the pruned trees' prior weights sum to one (the stop/split code is complete),
+and for every pruned tree `S`, `prior_w(S) ∏_(leaves) E ≤ W`, so
+`−log₂ W ≤ −log₂ prior_w(S) − log₂ ∏_(leaves) E`: the tree codes within its prior's code of every
+pruned tree, whatever the node law. `stop_kraft_and_dominance` is its case at KT. -/
+theorem own_kraft_and_dominance {w : ℕ → ℚ} (hw : StopLaw w) {E : List Ltr → ℚ}
+    (hE : ∀ s, 0 < E s) (m : ℕ) (s : List Ltr) :
+    ∑ S : PrunedTree Ltr m, PrunedTree.prior w m s.length S = 1 ∧
+      ∀ S : PrunedTree Ltr m,
+        PrunedTree.prior w m s.length S * ownLik E m s S ≤ ownWeight w E m s ∧
+        -Real.logb 2 (ownWeight w E m s : ℝ) ≤
+          -Real.logb 2 (PrunedTree.prior w m s.length S : ℝ) -
+            Real.logb 2 (ownLik E m s S : ℝ) := by
+  have hdom : ∀ S : PrunedTree Ltr m,
+      PrunedTree.prior w m s.length S * ownLik E m s S ≤ ownWeight w E m s := by
+    intro S
+    rw [own_mixture_over_trees w E m s]
+    exact Finset.single_le_sum
+      (f := fun S => PrunedTree.prior w m s.length S * ownLik E m s S)
+      (fun S _ => (mul_pos (PrunedTree.prior_pos hw m _ S) (ownLik_pos hE m s S)).le)
+      (Finset.mem_univ S)
+  refine ⟨PrunedTree.prior_sum w m s.length, fun S => ⟨hdom S, ?_⟩⟩
+  have hpR : (0 : ℝ) < (PrunedTree.prior w m s.length S : ℝ) := by
+    exact_mod_cast PrunedTree.prior_pos hw m s.length S
+  have hLR : (0 : ℝ) < (ownLik E m s S : ℝ) := by exact_mod_cast ownLik_pos hE m s S
+  have hdR : ((PrunedTree.prior w m s.length S : ℚ) : ℝ) * (ownLik E m s S : ℝ) ≤
+      (ownWeight w E m s : ℝ) := by exact_mod_cast hdom S
+  have hlog := Real.logb_le_logb_of_le (b := 2) (by norm_num) (by positivity) hdR
+  rw [Real.logb_mul hpR.ne' hLR.ne'] at hlog
+  linarith
+
+omit [DecidableEq A] [DecidableEq Ltr] in
+/-- The likelihood of a pruned tree over KT own weights is `treeLik`. -/
+theorem ownLik_kt (N : TreeStanding Ltr A) :
+    ∀ m s (S : PrunedTree Ltr m), ownLik (fun s => ktMass (N s)) m s S = treeLik N m s S
+  | 0, _, _ => rfl
+  | m + 1, s, S => by
+    cases hS : (S : Option (Ltr → PrunedTree Ltr m)) with
+    | none => simp only [ownLik, treeLik, Option.elim]
+    | some f => simp only [ownLik, treeLik, Option.elim, ownLik_kt N m]
+
+omit [DecidableEq A] in
+/-- [proved-derived; formal-checked] **`stop_mixture_over_trees`: under any stop-weight law the tree
+is the mixture over pruned trees with the law's prior** (Decision 32):
+`W_s = Σ_S prior_w(S) ∏_(leaves ℓ of S) E_(s ℓ)`, the prior `∏_stops w_d ∏_splits (1 − w_d)`; at a
+constant `w` it is `w^(stops S) (1 − w)^(splits S)` (`PrunedTree.prior_const`). It is
+`own_mixture_over_trees` at KT's own weights. -/
+theorem stop_mixture_over_trees (w : ℕ → ℚ) (N : TreeStanding Ltr A) :
+    ∀ m s, stopWeight w N m s =
+      ∑ S : PrunedTree Ltr m, PrunedTree.prior w m s.length S * treeLik N m s S := by
+  intro m s
+  rw [← ownWeight_kt, own_mixture_over_trees]
+  simp only [ownLik_kt]
 
 omit [DecidableEq A] in
 /-- [proved-derived; formal-checked] **`mixture_over_trees`: the recursive mixture is the mixture
@@ -1458,7 +1990,8 @@ stop-weight law `w_d ∈ (0, 1)`:
   within its prior's code of every pruned tree:
   `−log₂ W ≤ −log₂ prior_w(S) − log₂ ∏ E`.
 
-At `w = ½` it is `kraft_and_dominance`, the prior's code `Γ(S)`. -/
+It is `own_kraft_and_dominance` at KT's own weights; at `w = ½` it is `kraft_and_dominance`, the
+prior's code `Γ(S)`. -/
 theorem stop_kraft_and_dominance [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w)
     (N : TreeStanding Ltr A) (m : ℕ) (s : List Ltr) :
     ∑ S : PrunedTree Ltr m, PrunedTree.prior w m s.length S = 1 ∧
@@ -1467,23 +2000,9 @@ theorem stop_kraft_and_dominance [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w)
         -Real.logb 2 (stopWeight w N m s : ℝ) ≤
           -Real.logb 2 (PrunedTree.prior w m s.length S : ℝ) -
             Real.logb 2 (treeLik N m s S : ℝ) := by
-  have hdom : ∀ S : PrunedTree Ltr m,
-      PrunedTree.prior w m s.length S * treeLik N m s S ≤ stopWeight w N m s := by
-    intro S
-    rw [stop_mixture_over_trees w N m s]
-    exact Finset.single_le_sum
-      (f := fun S => PrunedTree.prior w m s.length S * treeLik N m s S)
-      (fun S _ => (mul_pos (PrunedTree.prior_pos hw m _ S) (treeLik_pos N m s S)).le)
-      (Finset.mem_univ S)
-  refine ⟨PrunedTree.prior_sum w m s.length, fun S => ⟨hdom S, ?_⟩⟩
-  have hpR : (0 : ℝ) < (PrunedTree.prior w m s.length S : ℝ) := by
-    exact_mod_cast PrunedTree.prior_pos hw m s.length S
-  have hLR : (0 : ℝ) < (treeLik N m s S : ℝ) := by exact_mod_cast treeLik_pos N m s S
-  have hdR : ((PrunedTree.prior w m s.length S : ℚ) : ℝ) * (treeLik N m s S : ℝ) ≤
-      (stopWeight w N m s : ℝ) := by exact_mod_cast hdom S
-  have hlog := Real.logb_le_logb_of_le (b := 2) (by norm_num) (by positivity) hdR
-  rw [Real.logb_mul hpR.ne' hLR.ne'] at hlog
-  linarith
+  have h := own_kraft_and_dominance hw (E := fun s => ktMass (N s)) (fun s => ktMass_pos _) m s
+  simp only [ownWeight_kt, ownLik_kt] at h
+  exact h
 
 omit [DecidableEq A] in
 /-- [proved-derived; formal-checked] **`kraft_and_dominance`.**
@@ -3056,6 +3575,18 @@ section Audit
 #print axioms ladder_stopLaw₀
 #print axioms ladder_ratio
 #print axioms stopFace_normalized₀
+#print axioms ownWeight_pos₀
+#print axioms ownWeight_one
+#print axioms ownLam_mem₀
+#print axioms own_face_positive_normalized
+#print axioms ownWeight_off
+#print axioms ownSplit_arrive
+#print axioms own_weight_step₀
+#print axioms own_weight_step
+#print axioms own_ratio_step
+#print axioms ownWeight_kt
+#print axioms ownSplit_kt
+#print axioms ownLam_kt
 #print axioms stop_weight_step₀
 #print axioms stopWeight_half
 #print axioms stopLam_eq_ratio
@@ -3075,6 +3606,10 @@ section Audit
 #print axioms PrunedTree.prior_const
 #print axioms PrunedTree.prior_half_bits
 #print axioms PrunedTree.prior_sum
+#print axioms ownLik_pos
+#print axioms own_mixture_over_trees
+#print axioms own_kraft_and_dominance
+#print axioms ownLik_kt
 #print axioms stop_mixture_over_trees
 #print axioms mixture_over_trees
 #print axioms stop_kraft_and_dominance
@@ -3115,6 +3650,15 @@ section Audit
 #print axioms sequential_mixture
 #print axioms sequential_mixture_bounds
 #print axioms sequential_mixture_executed
+
+#print axioms NodeLaw.mass_laws
+#print axioms ktLaw_read
+#print axioms law_standing_is_routed
+#print axioms law_state_own_routed
+#print axioms lawOwn_pos
+#print axioms law_weight_step₀
+#print axioms law_face_normalized
+#print axioms ktLaw_standing
 
 end Audit
 

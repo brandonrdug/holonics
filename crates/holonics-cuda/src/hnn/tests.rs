@@ -890,6 +890,7 @@ fn the_card_tree_reads_and_deposits_as_the_host_tree() {
             grain: 16,
             family: LetterFamily::cells(),
             prior: StopPrior::half(),
+            capacity: holonics::hnn::landmark::Capacity::Unbounded,
         };
     let campaign = Landmarks::new(declared(256, 4, 0, 1_200)).unwrap();
     let times = tree_parity(&card, campaign, &cell_letters(&bytes), &bytes, 2, 50);

@@ -810,6 +810,7 @@ pub fn landmark_declaration_with(
         grain: grain_of(&receiver.tolerance)?,
         family,
         prior: receiver.prior.clone(),
+        capacity: crate::hnn::landmark::Capacity::Unbounded,
     })
 }
 

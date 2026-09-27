@@ -27,7 +27,7 @@
 //! join       q̂_h = ⟦λ̂_h q̂_cells + (1 − λ̂_h) q̂_bundles⟧ ,  λ̂_h = ⟦β_h/(1 + β_h)⟧,  β_h = W_cells/W_bundles
 //! split      (q̂, 1 − q̂) at each opened digit;  cell face = ∏ of its digits' splits
 //! deposit    β'_d = β_d k_d(b)/q̂_(d+1)(b) bottom-up on each branch, β'_h = β_h q̂_cells(b)/q̂_bundles(b),
-//!            then n_d(b) += 1
+//!            then n_d(b) += 1, and at the ceiling (n_d(0) + n_d(1) = 2^c) n_d(·) ← ⌈n_d(·)/2⌉
 //! ```
 //!
 //! [definition] **Typed address letters** ([`Letter`]): `Boundary` (before the cut's first cell),
@@ -215,6 +215,24 @@
 //! reached by `n` arrivals stores at most `2n − 1` nodes at every depth (`compacted_node_bound`),
 //! and a passage of `n` cells at most `2 n B` nodes and `n D` label letters a branch.
 //!
+//! [definition; agent-inferred] **A landmark's storage has a capacity** (Decision 39; Lean
+//! `HNN/LandmarkCapacity`; [`Capacity`], declared in [`LandmarkDeclaration::capacity`]). A node's
+//! counts are a register on the node's own clock, its arrivals: the deposit counts the digit, and
+//! when that brings `n_0 + n_1` to the ceiling `L = 2^c` both counts carry, `n_b ← ⌈n_b/2⌉`, so the
+//! face read before the next arrival is KT's on the carried counts. The register is then a function
+//! of the sequence of digits that reached the node, never of the counts alone (it is not
+//! exchangeable), and its face is positive and normalized (Lean `cap_face_pos`, `cap_face_sum`).
+//! The tree weighting, its Kraft form and dominance, the step `β' = β k/q̂'` and the compaction hold
+//! for any node law whose state is a function of what reached the node (Lean
+//! `LandmarkTree.{NodeLaw, own_mixture_over_trees, own_kraft_and_dominance, own_weight_step₀,
+//! law_standing_is_routed}`, `LandmarkCompaction.compacted_node_law`): a chain's nodes route the
+//! same arrivals, so a stored
+//! chain is one register, and a split's upper part takes the chain's register (`Law::part`
+//! unchanged). `Unbounded` (`c = ∞`) is Decision 28's node, as is every ceiling no node reaches
+//! (`cap_below_ceiling_is_kt`). The carry only lowers counts, so every node's total stays at most
+//! its arrivals: KT's floor `1/(2n* + 2)`, the widths, the certificates and the rule are
+//! unchanged. The card's mirror (`holonics-cuda`) does not carry yet.
+//!
 //! [historical; measured] **Decision 28's arena of one node a depth is retired** (its realization,
 //! `Storage::Full`, is at commit `89460425`): it declared the same prior and read the same face in
 //! ℚ at every arrival, and on the wide cut's development cells at `D = 6` the two codes were equal
@@ -314,8 +332,8 @@
 //!
 //! [historical; measured] **The node-local law is retired** (its realization, `LocalLaw` and
 //! `Landmarks::local`, measured at commit `d2a2e0db`, is at commit `89460425`; its law stays in
-//! Lean `HNN/LocalWeighing.{own_mixture_over_trees, node_local_dominance, own_weight_step,
-//! node_local_founding}`): each landmark's own face mixed its KT face with an external face read
+//! Lean `HNN/LocalWeighing.{node_local_dominance, node_local_founding}` over the own-weight tree
+//! `HNN/LandmarkTree.{own_mixture_over_trees, own_weight_step}`): each landmark's own face mixed its KT face with an external face read
 //! causally at the same digit, and held out it read above the tree (below).
 //!
 //! [established-bounded; measured] **On the standing cut** (notebook `hnn_landmark -- … local`,
@@ -366,6 +384,22 @@
 //! 1,566,219,572 over the whole passage at `D = 48` (its 2,097,158,516 allocated); 168,704 ms in
 //! all.
 //!
+//! [established-bounded; measured] **A landmark's storage has a capacity, on the wide cut**
+//! (notebook `hnn_landmark -- … capacity`, Decision 39; `D = 48`, the `½` prior, cells only;
+//! development 917,504 cells, held out the final 131,072; bits at `L_R = 16`, each `+ ε`, exact
+//! enclosures; the family `c ∈ {∞, 5, 7, 9, 11}` charged `⌈log₂ 5⌉ = 3` bits, `c = ∞` carrying no
+//! capacity bit). `c = ∞` reproduces Decision 37's development code `1801940 + 12/16`. The
+//! development codes by `c = 5, 7, 9, 11`: `1950535 + 3/16`, `1827589 + 1/16`, `1804070 + 6/16`,
+//! `1801600 + 13/16`, against `c = ∞` `+148594 + 7/16`, `+25648 + 5/16`, `+2129 + 9/16` and
+//! `−340 + 1/16`, each decided; every passage stores 10,985,626 nodes in 1,371,879,880 occupied
+//! bytes (the capacity moves no topology), 19,940 to 20,259 ms. The development cells choose
+//! **`c = 11`** (`L = 2048`), charged 3 bits `−337 + 1/16` below `c = ∞`, and below every other
+//! ceiling. Held out, once: `258018 + 5/16` (`1 + 15/16` a cell), against Decision 37's recorded
+//! `258201 + 3/16` charged 3 bits within `[−180 + 1/16, −180 + 3/16]` (uncharged
+//! `[−183 + 1/16, −183 + 3/16]`), and against PPM-2's recorded `395598 + 8/16` charged 6 bits within
+//! `[−137575 + 12/16, −137575 + 14/16]`, each decided below; 12,542,969 nodes, 23,762 ms. The code
+//! falls with `c` through the declared family's edge.
+//!
 //! [definition; agent-inferred] **The depth, the family and the prior** are chosen on the development
 //! cells only ([`choose_depth`], [`choose_prior`]): `D` increases from `max(1, forced)` while the
 //! development prequential code length decreases strictly (disjoint exact enclosures), every `D`
@@ -415,6 +449,7 @@
 //! | the stop-weight mixture per digit tree: the mixture over (law, pruned tree), its prior complete, within `−log₂ π_k − log₂ prior_(w_k)(S)`; the joins telescope to the Bayesian mixture, the executed chart's drift once | `HNN/LocalWeighing.{stop_mixture_per_tree, static_mixture, forward_executed}` | [`StopMixture`], [`JoinTree`], [`FaceJoins`] |
 //! | a window's phases in cell order: each reads the standing after the earlier phases' deposits | `HNN/LandmarkTree.{landmark_step, treeWeight_arrive_off}` | [`Landmarks::window_faces`] |
 //! | founding where paths converge (Decision 36, measured and retired): the stopped path normalized under any stopping rule decided before the digit (a complete code); the tree with absent children, its Kraft form and dominance; the stopped step (`β` still at the stop); the second arrival opening with the first count; Decision 28 the first-arrival case | `HNN/ConvergenceFounding.{stopping_rule_normalized, prequential_code_complete, conv_mixture_over_trees, conv_kraft_and_dominance, conv_weight_step, conv_ratio_step, second_arrival_opens_with_the_first_count, convergence_step, convergence_is_probability, first_arrival_is_decision_28}` | retired (its realization is at commit `d137e8a6`; the development cells kept the first arrival) |
+//! | a landmark's storage has a capacity (Decision 39): the tree weighting over any node law whose state is a function of the arrivals reaching the node (its Kraft form, dominance, step and prequential code), the compacted tree for that law, and the capped register as an instance (positive, normalized, the carry lowering the register and keeping each reached symbol, KT below its ceiling, `c = ∞` KT) | `HNN/LandmarkTree.{NodeLaw, own_mixture_over_trees, own_kraft_and_dominance, own_weight_step₀, law_standing_is_routed, ktLaw_standing}`; `HNN/LandmarkCompaction.{MassRouted, own_weight_prequential, compacted_node_law}`; `HNN/LandmarkCapacity.{capLaw, cap_face_pos, cap_face_sum, cap_carry_laws, cap_carry_half_units, cap_run_total_le, cap_unbounded_is_kt, cap_below_ceiling_is_kt, capped_tree_laws}` | [`Capacity`], [`Capacity::carry`], [`LandmarkDeclaration::capacity`], `Law::apply_branch`, [`IdealLandmarks`] |
 //! | stored where paths part (Decision 37): a chain with its bottom is one node at the summed rung (`1 − ρ_top = 2^(−S)(1 − ρ_bottom)`, founded at `2^S − 1`), a chain to `D` one KT node, the split's two ratios, Decision 28's face exactly, at most `2n − 1` nodes a tree | `HNN/LandmarkCompaction.{chain_ratio, chain_ratio_dyadic, leaf_chain_is_one_node, chain_split, compacted_is_decision_28, compacted_node_bound}` | [`Landmarks`], [`LandmarkDeclaration::rung_sums`], the split ([`Beta::split`], `Law::part`, `Law::chain`), [`Landmarks::face_rule`], [`Landmarks::tree_sizes`], [`IdealLandmarks`] |
 //!
 //! [open] Owed in #62 (Lean `HNN/LandmarkTree`'s `[open]`): the passage-level composition of the
@@ -838,13 +873,78 @@ pub fn prior_family(top: u32) -> Vec<StopPrior> {
 }
 
 // -------------------------------------------------------------------------------------------
+// the declared node law: the register's capacity
+
+/// [definition; agent-inferred] **A landmark's storage capacity** (Decision 39; Lean
+/// `HNN/LandmarkCapacity`): the node's two counts `n_0, n_1` are a register of ceiling `L = 2^c`.
+/// The deposit counts its arrival, and when that brings `n_0 + n_1` to `L` both counts carry,
+/// `n_b ← ⌈n_b/2⌉`, before the next arrival is read ([`Capacity::carry`]): the node's register is a
+/// function of the arrivals that reached it, and its face is KT's on the carried counts, positive
+/// and normalized (Lean `capLaw`, `cap_face_pos`, `cap_face_sum`). A reached symbol keeps a count.
+/// `Unbounded` (`c = ∞`) is Decision 28's node, and so is any ceiling a node never reaches: a node
+/// reached fewer than `L` times reads KT's face exactly (`cap_below_ceiling_is_kt`).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub enum Capacity {
+    /// `c = ∞`: the counts never carry (Decisions 28–37).
+    #[default]
+    Unbounded,
+    /// The ceiling exponent `c`: the register carries when a deposit brings `n_0 + n_1` to `2^c`.
+    Ceiling(u32),
+}
+
+impl Capacity {
+    /// **The ceiling in half-units**: a node's half-unit masses `2n_b + 1` total `2(n_0 + n_1) + 2`,
+    /// so the register carries at the total `2L + 2 = 2^(c+1) + 2`; `None` when unbounded or when
+    /// the ceiling passes every total a `u32` mass can hold (it is never reached).
+    fn ceiling_halves(self) -> Option<u64> {
+        match self {
+            Capacity::Unbounded => None,
+            Capacity::Ceiling(exponent) if exponent < u32::BITS => Some((2u64 << exponent) + 2),
+            Capacity::Ceiling(_) => None,
+        }
+    }
+
+    /// **The register's carry after a deposit** on its half-unit masses `h_b = 2n_b + 1`: when
+    /// `n_0 + n_1 ≥ L`, each `n_b ← ⌈n_b/2⌉`, that is `h_b ← 2⌊(h_b + 1)/4⌋ + 1`. Returns whether it
+    /// carried. The total carried is at most `L/2 + 1`, so a node's total never passes the arrivals
+    /// that reached it, and KT's floor `1/(2n* + 2)` and the widths' rule hold unchanged.
+    pub fn carry(self, halves: &mut [u32; 2]) -> bool {
+        carry_at(self.ceiling_halves(), halves)
+    }
+}
+
+/// The register's carry at a ceiling in half-units ([`Capacity::carry`]).
+fn carry_at(ceiling: Option<u64>, halves: &mut [u32; 2]) -> bool {
+    match ceiling {
+        Some(top) if u64::from(halves[0]) + u64::from(halves[1]) >= top => {
+            for half in halves.iter_mut() {
+                *half = 2 * ((*half + 1) / 4) + 1;
+            }
+            true
+        }
+        _ => false,
+    }
+}
+
+impl std::fmt::Display for Capacity {
+    /// `c = ∞`, or `c = 5`.
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Capacity::Unbounded => write!(f, "c = ∞"),
+            Capacity::Ceiling(exponent) => write!(f, "c = {exponent}"),
+        }
+    }
+}
+
+// -------------------------------------------------------------------------------------------
 // the declaration and its derived widths
 
 /// [definition] **A landmark tree's declaration**: the exterior chart's `|A|`, the address depth
 /// `D` in bundles, the forced splits of the cell tree (context depths `d < forced` mix nothing,
 /// `λ_d = 0`), the declared population `n*` bounding the passage, the receiver's grain `L_R`, the
-/// declared letter family, and the declared stop-weight law ([`StopPrior`], read at each node's
-/// depth in its branch's letters; the joins of an enlarged tree keep their own `β = 1`).
+/// declared letter family, the declared stop-weight law ([`StopPrior`], read at each node's
+/// depth in its branch's letters; the joins of an enlarged tree keep their own `β = 1`), and the
+/// declared node law's capacity ([`Capacity`], Decision 39; `Unbounded` is Decision 28's node).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LandmarkDeclaration {
     pub alphabet: usize,
@@ -854,6 +954,7 @@ pub struct LandmarkDeclaration {
     pub grain: u64,
     pub family: LetterFamily,
     pub prior: StopPrior,
+    pub capacity: Capacity,
 }
 
 impl LandmarkDeclaration {
@@ -1686,11 +1787,14 @@ impl Arena {
         u32::try_from(self.letters.len()).expect("the pool is checked within 32 bits")
     }
 
-    /// One arrival of `symbol` counted at the path's nodes whose bottom is at least `forced`.
-    fn count(&mut self, nodes: &[u32], forced: usize, symbol: usize) {
+    /// One arrival of `symbol` counted at the path's nodes whose bottom is at least `forced`, each
+    /// register carried at the ceiling (Decision 39).
+    fn count(&mut self, nodes: &[u32], forced: usize, symbol: usize, ceiling: Option<u64>) {
         for &node in nodes {
             if self.bottom(node) >= forced {
-                self.halves[node as usize][symbol] += 2;
+                let halves = &mut self.halves[node as usize];
+                halves[symbol] += 2;
+                carry_at(ceiling, halves);
             }
         }
     }
@@ -2350,8 +2454,8 @@ struct Branch {
 /// branches, the founding chart at each depth (the declared stop prior's `β₀ = 2^(j_d) − 1` with
 /// its stop weight `λ̂ = ⟦1 − 2^(−j_d)⟧`), each branch's summed rungs from the root
 /// (`Σ_(i<d, i ≥ forced) j_i`, a forced depth's rung `0`; Decision 37's chains read their rungs
-/// from them). Its reads and its deposit act on any [`Standing`], the tree's own or a working
-/// overlay.
+/// from them), and the node register's ceiling in half-units (Decision 39, [`Capacity`]). Its reads
+/// and its deposit act on any [`Standing`], the tree's own or a working overlay.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct Law {
     declaration: LandmarkDeclaration,
@@ -2360,6 +2464,7 @@ struct Law {
     branches: Vec<Branch>,
     founding: Vec<Chart>,
     sums: Vec<Vec<u64>>,
+    ceiling: Option<u64>,
 }
 
 /// [definition] **The landmark tree, executed** (module header): the declaration, its derived
@@ -2455,6 +2560,7 @@ impl Law {
             .map(|depth| chart_of(declaration.prior.founding(depth)))
             .collect();
         let sums = declaration.rung_sums();
+        let ceiling = declaration.capacity.ceiling_halves();
         Self {
             declaration,
             widths,
@@ -2462,6 +2568,7 @@ impl Law {
             branches,
             founding,
             sums,
+            ceiling,
         }
     }
 
@@ -2885,8 +2992,10 @@ impl Law {
     /// the storage acts (Decision 37): a parting chain is split (its upper part founded with its
     /// stepped chart and the chain's counts, its lower part keeping its counts at `β_ℓ`, the parent
     /// relinked to the upper part), and an arrival stopped at the prior founds its leaf at `D`'s
-    /// `β₀`, its label ending in the cell's run `run`. Then each node's mass of the digit grows.
-    /// Returns the root's excess increment.
+    /// `β₀`, its label ending in the cell's run `run`. Then each node's mass of the digit grows,
+    /// and its register carries at the declared ceiling (Decision 39, [`Capacity::carry`]; a stored
+    /// chain is one register, since its nodes route the same arrivals). Returns the root's excess
+    /// increment.
     fn apply_branch(
         &self,
         nodes: &mut impl Standing,
@@ -3008,7 +3117,9 @@ impl Law {
         }
         for &node in &path {
             if nodes.bottom(node) >= forced {
-                nodes.halves_mut(node)[symbol] += 2;
+                let halves = nodes.halves_mut(node);
+                halves[symbol] += 2;
+                carry_at(self.ceiling, halves);
             }
         }
         carried
@@ -3839,8 +3950,9 @@ fn dyadic_grain_exponent(
 /// `β_u = (2^(S_up) − 1) 2^(S_low) β/(β (2^(S_low) − 1) + 2^S − 1)`, `2^(S_up) − 1` above a leaf):
 /// its faces are Decision 28's tree's (one node a depth, each founded at `β₀ = 2^(j_d) − 1`),
 /// exactly (`compacted_is_decision_28`; the tests hold it against a full reference kept in
-/// `hnn/tests`). With no width `β` is exact (the tests); at a width it is rebased past it with
-/// the residual `1/m'`.
+/// `hnn/tests`). Each node's register carries at the declared capacity as the executed tree's does
+/// (Decision 39; `compacted_node_law`). With no width `β` is exact (the tests); at a width it is
+/// rebased past it with the residual `1/m'`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct IdealLandmarks {
     declaration: LandmarkDeclaration,
@@ -4219,7 +4331,8 @@ impl IdealLandmarks {
             self.arena.link(tree, parent, leaf);
             nodes.push(leaf);
         }
-        self.arena.count(&nodes, forced, symbol);
+        let ceiling = self.declaration.capacity.ceiling_halves();
+        self.arena.count(&nodes, forced, symbol, ceiling);
     }
 }
 
