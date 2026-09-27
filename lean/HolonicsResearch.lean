@@ -557,6 +557,7 @@ import HolonicsResearch.Mathematics.Towers
 import Holonics.Geometry.PartitionFunction
 import HolonicsResearch.Zeta.OneInvolution
 import HolonicsResearch.Geometry.Farey
+import HolonicsResearch.Geometry.EggModular
 import HolonicsResearch.Geometry.Rigidity
 import HolonicsResearch.EllipticCurve.Descent
 import Holonics.Geometry.Ricci

@@ -24,6 +24,11 @@ phase). The **coherent** reading joins them first and reads the intensity of the
    is not: turning one path by a half-turn moves `4` to `0` (`relative_phase_moves_intensity`).
    The unit modulus is load-bearing: a joint factor `2` scales the intensity by `4`
    (`nonunit_factor_scales`).
+4. **Resolved modes.** When each path carries a mode tag and the receiver reads each mode's
+   coherent intensity, the cross terms survive only between paths of one mode
+   (`resolved_intensity_eq`); distinct modes, such as orthogonal path tags or an instrument that
+   separates the paths, give the incoherent reading (`distinct_modes_no_cross_terms`), and one
+   shared mode gives the coherent reading (`single_mode_is_coherent`).
 
 The atlas row `holon.interference-before-intensity` stated the two-term identity as
 `proved-standard`; this is its checked, finite-family form. It is distinct from
@@ -135,9 +140,81 @@ theorem relative_phase_moves_intensity :
   · simp [coherent, pair, sum_range_succ]
   · simp [incoherent, pair, sum_range_succ]
 
+/-! ## Resolved modes: cross terms only between paths that reach one mode -/
+
+variable {M : Type*} [Fintype M] [DecidableEq M]
+
+/-- [definition] **The resolved reading.** Each path carries a mode tag `t j` (an orthogonal path
+tag, or the detector cell it reaches); the receiver joins the amplitudes of each mode coherently,
+reads that mode's intensity, and sums over modes. -/
+def resolved (t : ℕ → M) (u : ℕ → ℂ) (n : ℕ) : ℝ :=
+  ∑ m, Complex.normSq (∑ j ∈ (range n).filter (fun j => t j = m), u j)
+
+/-- [definition] The cross terms `2 Re Σ_(j<k, t j = t k) ū_j u_k` between paths of one mode. -/
+def sameModeCross (t : ℕ → M) (u : ℕ → ℂ) (n : ℕ) : ℝ :=
+  2 * ∑ k ∈ range n, ∑ j ∈ (range k).filter (fun j => t j = t k), (conj (u j) * u k).re
+
+/-- [proved-derived; formal-checked] **The resolved interference identity**: the resolved reading
+is the incoherent reading plus the cross terms of the pairs that reach one mode. -/
+theorem resolved_intensity_eq (t : ℕ → M) (u : ℕ → ℂ) (n : ℕ) :
+    resolved t u n = incoherent u n + sameModeCross t u n := by
+  induction n with
+  | zero => simp [resolved, incoherent, sameModeCross]
+  | succ n ih =>
+    have hsplit : ∀ m, ∑ j ∈ (range (n + 1)).filter (fun j => t j = m), u j =
+        (∑ j ∈ (range n).filter (fun j => t j = m), u j) + if t n = m then u n else 0 := by
+      intro m
+      rw [sum_filter, sum_filter, sum_range_succ]
+    have hterm : ∀ m, Complex.normSq (∑ j ∈ (range (n + 1)).filter (fun j => t j = m), u j) =
+        Complex.normSq (∑ j ∈ (range n).filter (fun j => t j = m), u j) +
+          if t n = m then Complex.normSq (u n) +
+            2 * ((∑ j ∈ (range n).filter (fun j => t j = m), u j) * conj (u n)).re else 0 := by
+      intro m
+      rw [hsplit m]
+      by_cases h : t n = m
+      · simp only [h, if_true, Complex.normSq_add]
+        ring
+      · simp [h]
+    have hc : ((∑ j ∈ (range n).filter (fun j => t j = t n), u j) * conj (u n)).re =
+        ∑ j ∈ (range n).filter (fun j => t j = t n), (conj (u j) * u n).re := by
+      rw [sum_mul, Complex.re_sum]
+      refine sum_congr rfl fun j _ => ?_
+      rw [← Complex.conj_re (u j * conj (u n)), map_mul, Complex.conj_conj]
+    have hres : resolved t u (n + 1) = resolved t u n + (Complex.normSq (u n) +
+        2 * ∑ j ∈ (range n).filter (fun j => t j = t n), (conj (u j) * u n).re) := by
+      simp only [resolved]
+      rw [sum_congr rfl fun m _ => hterm m, sum_add_distrib, sum_ite_eq]
+      simp only [mem_univ, if_true, hc]
+    rw [hres, ih]
+    simp only [incoherent, sameModeCross, sum_range_succ]
+    ring
+
+/-- [proved-derived; formal-checked] **Distinct resolved modes give no cross terms.** When no two
+paths reach one mode, the resolved reading is the incoherent reading. -/
+theorem distinct_modes_no_cross_terms (t : ℕ → M) (u : ℕ → ℂ) (n : ℕ)
+    (ht : ∀ j k, j < n → k < n → t j = t k → j = k) :
+    resolved t u n = incoherent u n := by
+  rw [resolved_intensity_eq]
+  have hzero : sameModeCross t u n = 0 := by
+    unfold sameModeCross
+    rw [sum_eq_zero, mul_zero]
+    intro k hk
+    refine sum_eq_zero fun j hj => ?_
+    simp only [mem_filter, mem_range] at hj hk
+    exact absurd (ht j k (hj.1.trans hk) hk hj.2) hj.1.ne
+  rw [hzero, add_zero]
+
+/-- [proved-derived; formal-checked] **One shared mode is the coherent reading.** -/
+theorem single_mode_is_coherent (u : ℕ → ℂ) (n : ℕ) :
+    resolved (fun _ => ()) u n = Complex.normSq (coherent u n) := by
+  simp [resolved, coherent]
+
 section Audit
 
 #print axioms intensity_eq
+#print axioms resolved_intensity_eq
+#print axioms distinct_modes_no_cross_terms
+#print axioms single_mode_is_coherent
 #print axioms coherent_not_a_function_of_incoherent
 #print axioms common_phase_invariant
 #print axioms relative_phase_moves_intensity

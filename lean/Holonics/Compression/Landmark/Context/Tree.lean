@@ -61,7 +61,10 @@ node's arrivals are the epochs of its section, on which its register is read
 2. **Krichevsky–Trofimov** (`kt_likelihood_laws`, `ktMass_bump`): the sequential KT likelihood is
    positive, consistent (`Σ_c KT(w ++ [c]) = KT(w)`), its conditional is the likelihood ratio
    `RegionCounts.ktProb` (Decision 27's region face), it is exchangeable (the counts are the whole
-   standing), and it is the unique law with that sequential step.
+   standing), and it is the unique law with that sequential step. It is the Dirichlet-½ law: the
+   node face is the Pólya urn's prediction at initial weight `1/2` per class
+   (`dirichletPredictive`), and the urn's sequential product is the KT mass of the counts
+   (`urnSeq`, `kt_eq_dirichlet_half`).
 3. **The opened-path face** (`path_face_normalized`, `path_face_ge_min`, `pathFace_const`): for
    positive normalized node faces and **any** `λ_d ∈ [0,1]` (the exact weights or a lattice
    chart's), the path face is positive and normalized, and at least the minimum of the path's faces.
@@ -515,6 +518,48 @@ theorem kt_likelihood_laws [Nonempty A] :
   · induction w using List.reverseRecOn with
     | nil => rw [h0, ktSeq_nil]
     | append_singleton w c ih => rw [hs, ih, ktSeq_snoc]
+
+/-- [definition] **The Dirichlet(α) predictive face** of a count table: the Pólya urn that starts
+with weight `α` on every class and adds one to the class drawn, `(n_c + α)/(Σn + |A| α)`. -/
+def dirichletPredictive (α : ℚ) (n : A → ℕ) (c : A) : ℚ :=
+  ((n c : ℚ) + α) / (((∑ c, n c : ℕ) : ℚ) + Fintype.card A * α)
+
+/-- The Pólya urn's sequential product over a word read newest first. -/
+def urnRev (α : ℚ) : List A → ℚ
+  | [] => 1
+  | c :: r => urnRev α r * dirichletPredictive α (counts r) c
+
+/-- [definition] **The Pólya urn likelihood of a word**: the product of its successive
+Dirichlet(α) predictions, each read from the counts of the word before it. -/
+def urnSeq (α : ℚ) (w : List A) : ℚ := urnRev α w.reverse
+
+omit [Fintype A] in
+theorem counts_reverse (w : List A) : counts w.reverse = counts w := by
+  funext c
+  simp [counts, List.count_reverse]
+
+/-- One draw multiplies the urn likelihood by the Dirichlet(α) prediction of that draw. -/
+theorem urnSeq_snoc (α : ℚ) (w : List A) (c : A) :
+    urnSeq α (w ++ [c]) = urnSeq α w * dirichletPredictive α (counts w) c := by
+  simp only [urnSeq, List.reverse_append, List.reverse_singleton, List.singleton_append, urnRev,
+    counts_reverse]
+
+/-- [proved-derived; formal-checked] **`kt_eq_dirichlet_half`: KT is the Dirichlet-½ predictive
+law.** The KT node face `(n_c + 1/2)/(n + |A|/2)` is the Pólya urn's prediction at initial weight
+`1/2` per class, and the urn's sequential product of predictions is the KT mass of the word's
+counts (through the uniqueness clause of `kt_likelihood_laws`). -/
+theorem kt_eq_dirichlet_half [Nonempty A] :
+    (∀ (n : A → ℕ) (c : A), ktFace n c = dirichletPredictive (1 / 2) n c) ∧
+      ∀ w : List A, urnSeq (1 / 2) w = ktMass (counts w) := by
+  have hface : ∀ (n : A → ℕ) (c : A), ktFace n c = dirichletPredictive (1 / 2) n c := by
+    intro n c
+    simp only [ktFace, ktProb, dirichletPredictive]
+    ring
+  refine ⟨hface, fun w => ?_⟩
+  have := (kt_likelihood_laws (A := A)).2.2.2.2.2 (urnSeq (1 / 2)) rfl (fun w c => by
+    rw [urnSeq_snoc, ← hface, ktFace, sum_counts]
+    rfl) w
+  exact this
 
 end KT
 
@@ -3574,6 +3619,7 @@ section Audit
 #print axioms digit_emission_descends
 #print axioms ktMass_bump
 #print axioms kt_likelihood_laws
+#print axioms kt_eq_dirichlet_half
 #print axioms path_face_normalized
 #print axioms path_face_ge_min
 #print axioms pathFace_const

@@ -1,4 +1,5 @@
 import Holonics.Computation.HolonicInformationTheory
+import Holonics.Geometry.AffineSwing
 import Mathlib.Analysis.InnerProductSpace.Adjoint
 import Mathlib.Analysis.Calculus.Deriv.Mul
 import Mathlib.Analysis.Calculus.Deriv.Inv
@@ -13,7 +14,9 @@ This file keeps four objects separate:
 * a returned difference in its situated fibre;
 * the covector obtained by differentiating a scalar receiver;
 * the gradient obtained only after a declared tangent--cotangent chart;
-* normalized exponential, RMS, and centered variance faces read from a complete finite section.
+* normalized exponential, RMS, and centered variance faces read from a complete finite section,
+  including Bayes' posterior, which is the normalized exponential face of `log p + log L`, whose
+  pair ratio moves by two Swings, and which is the discrete replicator on unnormalized weights.
 
 This file formalizes normalization and its differential on an admitted finite contact population.
 Incidence is supplied by the contact law; native normalized/contact owners realize particular
@@ -270,6 +273,131 @@ theorem face_add_eq_iff_anchor_constant (anchor increment : Index → ℝ) :
     rw [constant i j]
     ring
 
+/-! ### Bayes is this face, its pair ratio is two Swings, and it is the replicator
+
+[proved-derived; formal-checked] A received condition with positive likelihoods `L` reweighs a
+positive prior `p` by the quotient rule, `p'_i = p_i L_i / Σ_j p_j L_j` (`bayes`). The posterior is
+this owner's face of the potential `log p + log L` (`bayes_eq_face`), so it forgets exactly the
+common origin of that potential (`bayes_eq_iff_logOdds`, through `face_eq_iff_pairwise_differences`
+and `face_add_common`); in particular the prior's own normalization is invisible
+(`bayes_smul_prior`). In the additive chart of the pair ratio the update is the translation
+`log(p'_i/p'_j) = log(p_i/p_j) + log(L_i/L_j)`, which is the Swing about `0` followed by the Swing
+about `½ log(L_i/L_j)` (`bayes_logOdds_twoSwings`, `AffineSwing.twoSwingsAreADoubledTranslation`).
+The same quotient on unnormalized weights is the discrete replicator `w' = w ⊙ L / ⟨w, L⟩`
+(`bayes_eq_discrete_replicator`). A positive likelihood never zeroes a weight
+(`replicator_pos`); a weight reaches zero only where its likelihood or its weight is already zero
+(`replicator_eq_zero_iff`), so a candidate is removed only by zero likelihood or an external
+release. This is a chart identity for the ratio and the Swing, not a claim that conditioning
+performs two reflections. -/
+
+/-- [definition] **Bayes' quotient rule** on finite weights: `p'_i = p_i L_i / Σ_j p_j L_j`. -/
+def bayes (p L : Index → ℝ) (index : Index) : ℝ :=
+  p index * L index / ∑ j, p j * L j
+
+/-- [definition] **The discrete replicator** with fitness `L`: `w' = w ⊙ L / ⟨w, L⟩`. -/
+def replicator (w L : Index → ℝ) (index : Index) : ℝ :=
+  w index * L index / ∑ j, w j * L j
+
+theorem sum_mul_pos {p L : Index → ℝ} (hp : ∀ i, 0 < p i) (hL : ∀ i, 0 < L i) :
+    0 < ∑ j, p j * L j := by
+  classical
+  let index : Index := Classical.choice inferInstance
+  exact Finset.sum_pos (fun j _ => mul_pos (hp j) (hL j)) ⟨index, Finset.mem_univ index⟩
+
+/-- [proved-derived; formal-checked] **The posterior is the normalized exponential face of
+`log p + log L`.** -/
+theorem bayes_eq_face {p L : Index → ℝ} (hp : ∀ i, 0 < p i) (hL : ∀ i, 0 < L i) :
+    bayes p L = (face (fun i => Real.log (p i) + Real.log (L i))).mass := by
+  have hexp : ∀ i, Real.exp (Real.log (p i) + Real.log (L i)) = p i * L i := fun i => by
+    rw [Real.exp_add, Real.exp_log (hp i), Real.exp_log (hL i)]
+  funext index
+  simp only [bayes, face, partition, hexp]
+
+/-- [proved-derived; formal-checked] **The posterior forgets exactly the common origin.** Two
+Bayes updates agree exactly when their log potentials `log p + log L` have the same pairwise
+differences. -/
+theorem bayes_eq_iff_logOdds {p L q M : Index → ℝ} (hp : ∀ i, 0 < p i) (hL : ∀ i, 0 < L i)
+    (hq : ∀ i, 0 < q i) (hM : ∀ i, 0 < M i) :
+    bayes p L = bayes q M ↔
+      ∀ i j, (Real.log (p i) + Real.log (L i)) - (Real.log (p j) + Real.log (L j)) =
+        (Real.log (q i) + Real.log (M i)) - (Real.log (q j) + Real.log (M j)) := by
+  rw [bayes_eq_face hp hL, bayes_eq_face hq hM, face_eq_iff_pairwise_differences]
+
+/-- [proved-derived; formal-checked] **The prior's normalization is a common origin.** Scaling
+the prior by `c > 0` adds `log c` to every potential, which `face_add_common` forgets. -/
+theorem bayes_smul_prior {p L : Index → ℝ} (hp : ∀ i, 0 < p i) (hL : ∀ i, 0 < L i)
+    {c : ℝ} (hc : 0 < c) :
+    bayes (fun i => c * p i) L = bayes p L := by
+  rw [bayes_eq_face (fun i => mul_pos hc (hp i)) hL, bayes_eq_face hp hL]
+  have hshift : (fun i => Real.log (c * p i) + Real.log (L i)) =
+      fun i => (Real.log (p i) + Real.log (L i)) + Real.log c := by
+    funext i
+    rw [Real.log_mul hc.ne' (hp i).ne']
+    ring
+  rw [hshift, face_add_common]
+
+/-- [proved-derived; formal-checked] **`bayes_logOdds_twoSwings`.** In the additive chart of the
+pair ratio, Bayes adds the likelihood's log ratio to the prior's, and that translation is the
+Swing about `0` followed by the Swing about `½ log(L_i/L_j)`. -/
+theorem bayes_logOdds_twoSwings {p L : Index → ℝ} (hp : ∀ i, 0 < p i) (hL : ∀ i, 0 < L i)
+    (i j : Index) :
+    Real.log (bayes p L i / bayes p L j) = Real.log (p i / p j) + Real.log (L i / L j) ∧
+      Real.log (bayes p L i / bayes p L j) =
+        Holonics.Geometry.AffineSwing.swing ((1 / 2 : ℝ) * Real.log (L i / L j))
+          (Holonics.Geometry.AffineSwing.swing 0 (Real.log (p i / p j))) := by
+  have hpos : ∀ k, 0 < bayes p L k := fun k => by
+    rw [bayes_eq_face hp hL]
+    exact (face _).positive k
+  have hlog : ∀ k, Real.log (bayes p L k) =
+      Real.log (p k) + Real.log (L k) -
+        Real.log (partition (fun i => Real.log (p i) + Real.log (L i))) := fun k => by
+    rw [bayes_eq_face hp hL, log_face_mass]
+  have hodds : Real.log (bayes p L i / bayes p L j) =
+      Real.log (p i / p j) + Real.log (L i / L j) := by
+    rw [Real.log_div (hpos i).ne' (hpos j).ne', hlog, hlog, Real.log_div (hp i).ne' (hp j).ne',
+      Real.log_div (hL i).ne' (hL j).ne']
+    ring
+  refine ⟨hodds, ?_⟩
+  rw [hodds, Holonics.Geometry.AffineSwing.twoSwingsAreADoubledTranslation]
+  ring
+
+/-- [proved-derived; formal-checked] **`bayes_eq_discrete_replicator`.** Bayes on the normalized
+prior `w / Σw` is the discrete replicator on the unnormalized weights `w`, and both are the face of
+`log w + log L`. -/
+theorem bayes_eq_discrete_replicator {w L : Index → ℝ} (hw : ∀ i, 0 < w i)
+    (hL : ∀ i, 0 < L i) :
+    bayes (fun i => w i / ∑ j, w j) L = replicator w L ∧
+      replicator w L = (face (fun i => Real.log (w i) + Real.log (L i))).mass := by
+  classical
+  have hS : 0 < ∑ j, w j := by
+    let index : Index := Classical.choice inferInstance
+    exact Finset.sum_pos (fun j _ => hw j) ⟨index, Finset.mem_univ index⟩
+  have hrep : replicator w L = bayes w L := rfl
+  have hnorm : bayes (fun i => w i / ∑ j, w j) L = bayes w L := by
+    have := bayes_smul_prior hw hL (inv_pos.mpr hS)
+    simpa [div_eq_inv_mul] using this
+  exact ⟨hnorm.trans hrep.symm, hrep.trans (bayes_eq_face hw hL)⟩
+
+/-- [proved-derived; formal-checked] **A positive likelihood never zeroes a weight.** -/
+theorem replicator_pos {w L : Index → ℝ} (hw : ∀ i, 0 < w i) (hL : ∀ i, 0 < L i)
+    (index : Index) : 0 < replicator w L index :=
+  div_pos (mul_pos (hw index) (hL index)) (sum_mul_pos hw hL)
+
+omit [Nonempty Index] in
+/-- [proved-derived; formal-checked] **A weight reaches zero only at zero likelihood or zero
+weight.** With nonnegative weights and likelihoods and a positive total, the reweighed candidate
+is zero exactly when its weight (an earlier release) or its likelihood is zero. -/
+theorem replicator_eq_zero_iff {w L : Index → ℝ} (hZ : 0 < ∑ j, w j * L j) (index : Index) :
+    replicator w L index = 0 ↔ w index = 0 ∨ L index = 0 := by
+  rw [replicator, div_eq_zero_iff, mul_eq_zero, or_iff_left hZ.ne']
+
+omit [Nonempty Index] in
+/-- The replicator returns a normalized population. -/
+theorem sum_replicator {w L : Index → ℝ} (hZ : 0 < ∑ j, w j * L j) :
+    ∑ i, replicator w L i = 1 := by
+  simp only [replicator, ← Finset.sum_div]
+  exact div_self hZ.ne'
+
 /-- The expected receiver reading of one finite section. -/
 def expectation (probability : PositiveProbabilitySection Index) (values : Index → ℝ) : ℝ :=
   ∑ index, probability.mass index * values index
@@ -521,6 +649,12 @@ section Audit
 #print axioms sourceDerived_jointHeldRelaxation_scatter_invariant
 #print axioms dualMap_comp_reverse_order
 #print axioms NormalizedExponential.face_add_common
+#print axioms NormalizedExponential.bayes_eq_face
+#print axioms NormalizedExponential.bayes_eq_iff_logOdds
+#print axioms NormalizedExponential.bayes_logOdds_twoSwings
+#print axioms NormalizedExponential.bayes_eq_discrete_replicator
+#print axioms NormalizedExponential.replicator_pos
+#print axioms NormalizedExponential.replicator_eq_zero_iff
 #print axioms NormalizedExponential.sum_laplacianReturn_zero
 #print axioms NormalizedExponential.quadratic_laplacianReturn
 #print axioms sigmoid_is_binary_normalized_exponential

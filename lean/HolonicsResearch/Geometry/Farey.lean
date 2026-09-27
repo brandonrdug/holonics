@@ -21,7 +21,10 @@ That group is the modular one.  `L = !![1,0;1,1]` and `R = !![1,1;0,1]` are unim
 the Stern–Brocot tree; the step matrix `!![t,1;1,0]` is `R^t` composed with the exchange
 `!![0,1;1,0]`, whose determinant is `−1` — **the exchange is the swing**, and it is what makes the
 word alternate.  And two fractions are Farey neighbours exactly when `hk' − h'k = ±1`, i.e. exactly
-when their matrix is unimodular.
+when their matrix is unimodular.  Their Ford circles (radius `1/(2k²)` standing at `h/k`) stand apart by
+`dx² − 4r₁r₂ = ((hK − Hk)² − 1)/(kK)²` (`ford_separation`), so two Ford circles touch exactly at a
+unit determinant (`ford_tangent_iff_unimodular`): the Farey lock and the tangent packing are one
+condition.
 
 `GL₂(ℤ)` acts on the upper half plane by Möbius transformations, which **preserve the cross ratio**.
 So the chain closes: the sign word's modulus, the convergents, the Farey tree, the modular group, and
@@ -136,6 +139,61 @@ action on the upper half plane is by Möbius transformations, which preserve the
 theorem theMediantConditionIsUnimodularity (h k h' k' : ℤ) :
     h * k' - h' * k = 1 ↔ (!![h, h'; k, k']).det = 1 := by
   simp [Matrix.det_fin_two]
+
+/-! ## Ford circles: the separation is the determinant, and tangency is unimodularity -/
+
+/-- [definition] The Ford radius over the denominator `k`, `1/(2k²)`; the circle stands on the
+real axis at `h/k` with its centre at that height. -/
+def fordRadius (k : ℤ) : ℚ := 1 / (2 * (k : ℚ) ^ 2)
+
+/-- [proved-derived; formal-checked] **`ford_separation`.** For Ford circles at `h/k` and `H/K`,
+`(h/k − H/K)² − 4 r₁ r₂ = ((hK − Hk)² − 1)/(kK)²`. -/
+theorem ford_separation (h k H K : ℤ) (hk : k ≠ 0) (hK : K ≠ 0) :
+    ((h : ℚ) / k - (H : ℚ) / K) ^ 2 - 4 * fordRadius k * fordRadius K =
+      ((((h * K - H * k) ^ 2 : ℤ) : ℚ) - 1) / ((k : ℚ) * K) ^ 2 := by
+  have hk' : (k : ℚ) ≠ 0 := by exact_mod_cast hk
+  have hK' : (K : ℚ) ≠ 0 := by exact_mod_cast hK
+  unfold fordRadius
+  push_cast
+  field_simp
+  ring
+
+/-- [proved-derived; formal-checked] **Ford circles are tangent exactly at a unit determinant.**
+The circles of centres `(h/k, r₁)`, `(H/K, r₂)` and radii `r₁`, `r₂` touch
+(`dx² + (r₁ − r₂)² = (r₁ + r₂)²`) exactly when `|hK − Hk| = 1`; that is, exactly when the pair is
+unimodular in one of its two orders (`theMediantConditionIsUnimodularity`). -/
+theorem ford_tangent_iff_unimodular (h k H K : ℤ) (hk : k ≠ 0) (hK : K ≠ 0) :
+    (((h : ℚ) / k - (H : ℚ) / K) ^ 2 + (fordRadius k - fordRadius K) ^ 2 =
+        (fordRadius k + fordRadius K) ^ 2 ↔ |h * K - H * k| = 1) ∧
+      (|h * K - H * k| = 1 ↔ (!![h, H; k, K]).det = 1 ∨ (!![H, h; K, k]).det = 1) := by
+  have hk' : (k : ℚ) ≠ 0 := by exact_mod_cast hk
+  have hK' : (K : ℚ) ≠ 0 := by exact_mod_cast hK
+  have hkK : ((k : ℚ) * K) ^ 2 ≠ 0 := pow_ne_zero 2 (mul_ne_zero hk' hK')
+  have hsep := ford_separation h k H K hk hK
+  have habs : |h * K - H * k| = 1 ↔ (h * K - H * k) ^ 2 = 1 := by
+    rw [← sq_abs, pow_eq_one_iff_of_nonneg (abs_nonneg _) two_ne_zero]
+  refine ⟨?_, ?_⟩
+  · rw [habs]
+    constructor
+    · intro htan
+      have hzero : ((h : ℚ) / k - (H : ℚ) / K) ^ 2 - 4 * fordRadius k * fordRadius K = 0 := by
+        linear_combination htan
+      rw [hsep, div_eq_zero_iff, or_iff_left hkK, sub_eq_zero] at hzero
+      exact_mod_cast hzero
+    · intro hdet
+      have hzero : ((h : ℚ) / k - (H : ℚ) / K) ^ 2 - 4 * fordRadius k * fordRadius K = 0 := by
+        rw [hsep, hdet]
+        norm_num
+      linear_combination hzero
+  · rw [← theMediantConditionIsUnimodularity, ← theMediantConditionIsUnimodularity, abs_eq
+      zero_le_one]
+    constructor
+    · rintro (h1 | h1)
+      · exact Or.inl h1
+      · exact Or.inr (by linarith)
+    · rintro (h1 | h1)
+      · exact Or.inl h1
+      · exact Or.inr (by linarith)
 
 
 end Holonics.Geometry.Farey
