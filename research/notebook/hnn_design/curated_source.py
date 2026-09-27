@@ -4,8 +4,9 @@ release contract"; #73, #148).
 An exterior codec step, stdlib only, run once. It reads the private conversation exposure
 (`.local/datasets/athena-alpha-exposure-2026-09-06.jsonl`, schema
 `holonics.conversation-exposure.v1`) and writes a structured source, its incidence, a pinned cut and
-the same bytes as a flat stream into `.local/cuts/`, each file mode 0600. Nothing it writes is
-published, and it prints counts and hashes only, never any text.
+the same bytes as a flat stream into `.local/cuts/` (mode 0700), each file created mode 0600
+(`standing_cut.private_write`: private from creation, never widened and narrowed after). Nothing it
+writes is published, and it prints counts and hashes only, never any text.
 
 The contract's items, as this source meets them:
 
@@ -28,12 +29,19 @@ The contract's items, as this source meets them:
    A part whose text is absent (`human-material`) stays a reference on its author's port. The flag
    `container-has-copied-session-meta` marks the container, not the view's text (the exposure
    already keeps the first container origin), so a flagged view stays on its author's port.
-3. **Sections.** Before each visible part with cells, one letter: `open` when its turn is the
-   first of its conversation (`session_id`) in the stream, an aeon opening; `switch` when its turn
-   belongs to another conversation than the turn before it (sessions interleave in the declared
-   order); `turn` for the next turn of the same conversation; `part` for a further part of the same
-   turn. A turn is one declared occurrence (a family's first view), so turns are epochs and
-   conversations are aeons.
+3. **Sections follow the declared turn.** Before each visible part with cells, one letter, read
+   against the previous emitted occurrence: `open` when the occurrence is the first of its
+   conversation (`session_id`) in the stream, an aeon opening; `switch` when its conversation is
+   another than the previous emitted occurrence's (sessions interleave in the declared order);
+   `part` when it lies in the previous emitted occurrence's declared turn (the provider's
+   `turn_id`, in the same conversation), or is a further part of the same record; `turn`
+   otherwise: a new declared turn or, where the provider declares no `turn_id`, the record boundary
+   (the fallback: one declared occurrence is one turn). So turns are epochs and conversations are
+   aeons. The manifest counts the letters by path (`turn_id` declared, the record boundary, a
+   further part within a record). [agent-inferred] A return into a conversation whose declared
+   turn continues is a `switch`: the letter must mark the aeon change, and the four kinds carry one
+   section, not two; the manifest counts those returns, and a declared turn re-entered after
+   another turn of its conversation.
 4. **Incidence** (the incidence file, one record per development occurrence, ordinals and capture
    coordinates only): the occurrence's port and its parts' cell ranges; its declared parent (the
    provider's `parent_id`, its `provider-parent` link) and its relations (`comparison-request`,
@@ -42,7 +50,11 @@ The contract's items, as this source meets them:
    `previous_record` is the capture predecessor (it is `event - 1` in every development view): it is
    carried as a coordinate and never as a parent, since adjacency never manufactures an edge.
 5. **Separation**: the harness above. Equal text never merges occurrences: every occurrence is
-   emitted in the dataset's declared order, whatever its text.
+   emitted in the dataset's declared order, whatever its text. A mirror is harness only when it
+   is one: every mirror view's visible parts (kinds and text) are compared by hash with its
+   family's first view's, and every development family's `conflicts` must be empty. A family
+   failing either is **refused** (deferred): never emitted and never resolved, its events a
+   relation's `refused` state, the refusals counted in the manifest's `checks`.
 6. **Counts under a certified partition**: the manifest's counts; the pinned cut below declares
    its population `n*`.
 8. **A pinned partition.** Only the `development` partition is read into the source. The
@@ -72,12 +84,7 @@ import os
 import sys
 from array import array
 
-ROOT = os.environ.get(
-    "HOLONICS_ROOT",
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
-)
-SOURCE = os.path.join(ROOT, ".local", "datasets", "athena-alpha-exposure-2026-09-06.jsonl")
-OUT_DIR = os.path.join(ROOT, ".local", "cuts")
+from standing_cut import ROOT, SOURCE, private_directory, private_write
 
 CHANNELS = ("human", "agent", "tool")
 KINDS = ("open", "switch", "turn", "part")
@@ -100,15 +107,16 @@ def letter(kind, channel):
     return BYTES + len(CHANNELS) * KINDS.index(kind) + CHANNELS.index(channel)
 
 
-def private_write(name, data, mode="wb"):
-    path = os.path.join(OUT_DIR, name)
-    with open(path, mode) as handle:
-        handle.write(data)
-    os.chmod(path, 0o600)
-
-
 def sha(data):
     return hashlib.sha256(data).hexdigest()
+
+
+def visible(view):
+    """A view's visible parts, kinds and text, as one hash (compared, never printed)."""
+    digest = hashlib.sha256()
+    for part in view["visible_parts"]:
+        digest.update(json.dumps([part["kind"], part.get("text")]).encode("utf-8"))
+    return digest.digest()
 
 
 def u16(codes):
@@ -140,14 +148,22 @@ def main():
                "mirror_parts": 0, "mirror_bytes": 0, "harness_text_references": 0,
                "other_nonvisible_references": 0}
     letters = {kind: {channel: 0 for channel in CHANNELS} for kind in KINDS}
+    paths = {path: {kind: {channel: 0 for channel in CHANNELS} for kind in KINDS}
+             for path in ("turn_id", "record_boundary", "within_record")}
+    returns = {"switch_into_its_conversations_continuing_turn": 0, "declared_turn_reentered": 0}
+    checks = {"families_conflicts_empty": 0, "families_conflicts_declared": 0,
+              "mirror_views_equal_first_view": 0, "mirror_views_differing": 0, "families_refused": 0}
+    refused_events = set()
     flags = {}
     sequence_order = {"increasing": 0, "not_increasing": 0}
     capture = {"previous_record_is_event_minus_one": 0, "otherwise": 0}
     sessions = {}
     aeons = set()  # the conversations whose aeon the stream has opened
+    turns = {}  # each conversation's declared turns: the one its last emitted occurrence lies in, and all
     source_hash = hashlib.sha256()
     last_sequence = None
     last_session = None
+    last_turn = None  # the previous emitted occurrence's declared turn (None: none declared)
 
     with open(SOURCE, "rb") as handle:
         for line in handle:
@@ -163,6 +179,15 @@ def main():
                   else "not_increasing")
             last_sequence = sequence
             view, mirrors = record["views"][0], record["views"][1:]
+            first = visible(view)
+            differing = sum(1 for mirror in mirrors if visible(mirror) != first)
+            checks["mirror_views_differing"] += differing
+            checks["mirror_views_equal_first_view"] += len(mirrors) - differing
+            checks["families_conflicts_declared" if record["conflicts"] else "families_conflicts_empty"] += 1
+            if record["conflicts"] or differing:
+                checks["families_refused"] += 1
+                refused_events.update(captured["event"] for captured in record["views"])
+                continue
             index = len(occurrences)
             for captured in record["views"]:
                 event_to_occurrence[captured["event"]] = index
@@ -197,6 +222,8 @@ def main():
                     harness["control_bytes"] += len((part.get("text") or "").encode("utf-8"))
                 continue
             opened = False
+            declared = view["turn_id"]
+            known = turns.setdefault(conversation, {"last": None, "all": set()})
             for part in view["visible_parts"]:
                 channel = PART_CHANNEL[part["kind"]]
                 assert channel == author or channel == "tool", "a part's kind agrees with its author"
@@ -211,18 +238,30 @@ def main():
                     entry["parts"].append({"channel": channel, "cells": [len(stream), len(stream)]})
                     continue
                 if opened:
-                    kind = "part"
-                elif conversation not in aeons:
-                    kind = "open"
-                    aeons.add(conversation)
-                elif view["session_id"] != last_session:
-                    kind = "switch"
+                    kind, path = "part", "within_record"
                 else:
-                    kind = "turn"
+                    path = "record_boundary" if declared is None else "turn_id"
+                    if conversation not in aeons:
+                        kind = "open"
+                        aeons.add(conversation)
+                    elif view["session_id"] != last_session:
+                        kind = "switch"
+                    elif declared is not None and declared == last_turn:
+                        kind = "part"
+                    else:
+                        kind = "turn"
+                    if declared is not None:
+                        if kind == "switch" and declared == known["last"]:
+                            returns["switch_into_its_conversations_continuing_turn"] += 1
+                        elif declared != known["last"] and declared in known["all"]:
+                            returns["declared_turn_reentered"] += 1
+                        known["all"].add(declared)
+                    known["last"] = declared
+                    last_session, last_turn = view["session_id"], declared
                 opened = True
-                last_session = view["session_id"]
                 stream.append(letter(kind, channel))
                 letters[kind][channel] += 1
+                paths[path][kind][channel] += 1
                 start = len(stream)
                 stream.extend(cells)
                 channel_counts[channel]["parts"] += 1
@@ -236,7 +275,7 @@ def main():
         for kind, target in entry.pop("links"):
             at = event_to_occurrence.get(target)
             if at is None:
-                state = "outside"
+                state = "refused" if target in refused_events else "outside"
             elif at < entry["occurrence"]:
                 state = "earlier"
             else:
@@ -265,10 +304,11 @@ def main():
             k, c = divmod(code - BYTES, len(CHANNELS))
             cut_letters[KINDS[k]][CHANNELS[c]] += 1
 
-    os.makedirs(OUT_DIR, exist_ok=True)
+    incidence_bytes = "".join(json.dumps(entry, separators=(",", ":")) + "\n"
+                              for entry in occurrences).encode("utf-8")
+    private_directory()
     private_write("curated-source.bin", curated)
-    private_write("curated-source.incidence.jsonl",
-                  "".join(json.dumps(entry, separators=(",", ":")) + "\n" for entry in occurrences), "w")
+    private_write("curated-source.incidence.jsonl", incidence_bytes)
     private_write("curated-cut.bin", u16(cut))
     private_write("curated-flat-cut.bin", flat_cut)
     manifest = {
@@ -281,7 +321,15 @@ def main():
                   "letters": {f"{kind}:{channel}": letter(kind, channel)
                               for kind in KINDS for channel in CHANNELS}},
         "ports": {"channels": channel_counts, "harness": harness, "flags": flags},
-        "sections": {"letters": letters, "conversations": len(sessions),
+        "checks": checks,
+        "sections": {"rule": "open: the conversation's first occurrence in the stream; switch: another "
+                             "conversation than the previous emitted occurrence's; part: the previous "
+                             "emitted occurrence's declared turn (turn_id) in the same conversation, or a "
+                             "further part of the same record; turn: otherwise (a new declared turn, or "
+                             "the record boundary where turn_id is absent)",
+                     "letters": letters, "paths": paths, **returns,
+                     "declared_turns": sum(len(known["all"]) for known in turns.values()),
+                     "conversations": len(sessions),
                      "occurrences": len(occurrences),
                      "occurrences_with_cells": sum(1 for o in occurrences
                                                    if any("letter" in p for p in o["parts"]))},
@@ -290,7 +338,7 @@ def main():
         "development_stream_sha256": sha(curated),
         "flat_stream_cells": len(flat),
         "flat_stream_sha256": sha(flat),
-        "incidence_sha256": sha(open(os.path.join(OUT_DIR, "curated-source.incidence.jsonl"), "rb").read()),
+        "incidence_sha256": sha(incidence_bytes),
         "cut": {"from": "development stream tail, beginning at its first section letter at or after len - population",
                 "stream_start": start, "cells": cells, "population": population,
                 "held_out_start": held_start, "held_out_rule": "the cut's final eighth, cells // 8 (as the wide cut)",
@@ -301,19 +349,19 @@ def main():
                 "flat_cut_sha256": sha(flat_cut), "flat_development_sha256": sha(flat_cut[:flat_held_start]),
                 "flat_held_out_sha256": sha(flat_cut[flat_held_start:])},
     }
-    private_write("curated-source.json", json.dumps(manifest, indent=2), "w")
+    private_write("curated-source.json", json.dumps(manifest, indent=2).encode("utf-8"))
     private_write("curated-cut.json", json.dumps({
         "schema": "holonics.curated-cut.v1", "encoding": "u16 little-endian, one code a cell",
         "alphabet": ALPHABET, "population": population, "cells": cells,
-        "held_out_start": held_start, "cut_sha256": manifest["cut"]["cut_sha256"]}, indent=2), "w")
+        "held_out_start": held_start, "cut_sha256": manifest["cut"]["cut_sha256"]}, indent=2).encode("utf-8"))
     private_write("curated-flat-cut.json", json.dumps({
         "schema": "holonics.standing-cut.v2",
         "from": "the curated cut's bytes, its section letters removed; held out: the curated held-out cells' bytes",
         "population": len(flat_cut), "declared_population": population,
         "held_out_range": [flat_held_start, len(flat_cut)],
-        "cut_sha256": manifest["cut"]["flat_cut_sha256"]}, indent=2), "w")
+        "cut_sha256": manifest["cut"]["flat_cut_sha256"]}, indent=2).encode("utf-8"))
     print(json.dumps({key: manifest[key] for key in (
-        "families", "declared_order", "ports", "sections", "incidence", "development_stream_cells",
+        "families", "declared_order", "checks", "ports", "sections", "incidence", "development_stream_cells",
         "development_stream_sha256", "flat_stream_cells", "flat_stream_sha256", "cut")}, indent=1))
 
 

@@ -10,12 +10,15 @@
 //! [definition; agent-inferred] **The source** (`curated_source.py`, an exterior codec step): the
 //! exposure's development partition, each visible part's UTF-8 bytes on its channel's port (human,
 //! agent, tool; the harness holds references only), and before each part one **section letter**, a
-//! coded cell of the declared chart `|A| = 256 + 12`: `open` (the turn opens its conversation's
-//! aeon), `switch` (the turn lies in another conversation than the turn before it), `turn` (the next
-//! epoch of the same aeon) or `part` (a further part of the turn), each typed by the channel the
-//! part opens on. So the channel is never supplied: it is read from the coded past, and every
-//! section costs the bits of its letter. The flat cut is the same bytes with every letter removed,
-//! its held-out cells the curated held-out cells' bytes: the two are measured on identical cells.
+//! coded cell of the declared chart `|A| = 256 + 12`: `open` (the occurrence opens its
+//! conversation's aeon), `switch` (it lies in another conversation than the previous emitted
+//! occurrence), `part` (it lies in the previous emitted occurrence's declared turn, the provider's
+//! `turn_id`, or is a further part of the same record) or `turn` (a new declared turn, or the
+//! record boundary where no `turn_id` is declared: the next epoch of the same aeon), each typed by
+//! the channel the part opens on. So the channel is never supplied: it is read from the coded
+//! past, and every section costs the bits of its letter. The flat cut is the same bytes with every
+//! letter removed, its held-out cells the curated held-out cells' bytes: the two are measured on
+//! identical cells.
 //!
 //! [definition; agent-inferred] **The reader** (`curated`): each tick's bundle is its cell with two
 //! declared slots, its **channel** (3 letters) and its **section** letter (the kind of the letter

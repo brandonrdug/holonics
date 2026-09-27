@@ -4,6 +4,9 @@ An exterior codec step, run once. It reads the private conversation exposure dat
 (`.local/datasets/athena-alpha-exposure-2026-09-06.jsonl`, schema
 `holonics.conversation-exposure.v1`) and writes a pinned byte cut and its manifest into `.local/cuts/`.
 Nothing it writes is published; the notebook README reports the cut by scope and counts only.
+**Privacy from creation**: `.local/cuts/` is made (or set) mode 0700 and every file is created mode
+0600 (an existing one set to 0600 before a byte is written), never widened and narrowed after
+(`private_directory`, `private_write`; `curated_source.py` writes through them too).
 
 The dataset declares its own partition at its temporal cut (2026-09-04): `development` families
 before it, `evaluation` families at or after it, `deferred` families with conflicting views. The
@@ -47,6 +50,21 @@ NAME = "standing-real-cut-campaign-1"
 WIDE = "wide-real-cut"
 
 
+def private_directory():
+    """`.local/cuts/`, mode 0700: made so, or an existing one set so."""
+    os.makedirs(OUT_DIR, mode=0o700, exist_ok=True)
+    os.chmod(OUT_DIR, 0o700)
+
+
+def private_write(name, data):
+    """Write `data` (bytes) to `.local/cuts/<name>`, private from creation: created mode 0600, or an
+    existing file set to 0600 before a byte is written."""
+    descriptor = os.open(os.path.join(OUT_DIR, name), os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(descriptor, "wb") as handle:
+        os.fchmod(handle.fileno(), 0o600)
+        handle.write(data)
+
+
 def mean_aeon_cells():
     numerator = 5 * 7 * 11 * 13 * 2**8
     denominator = 52 + 5 * 37 + 5 * 7 * 24
@@ -86,10 +104,8 @@ def main():
                 development += family_bytes(record)
     assert held_out < population <= len(development), "the development stream cannot hold the cut"
     cut = bytes(development[len(development) - population:])
-    os.makedirs(OUT_DIR, exist_ok=True)
-    with open(os.path.join(OUT_DIR, name + ".bin"), "wb") as handle:
-        handle.write(cut)
-    os.chmod(os.path.join(OUT_DIR, name + ".bin"), 0o600)
+    private_directory()
+    private_write(name + ".bin", cut)
     manifest = {
         "schema": "holonics.standing-cut.v2",
         "source": os.path.relpath(SOURCE, ROOT),
@@ -104,10 +120,7 @@ def main():
         "development_sha256": hashlib.sha256(cut[: population - held_out]).hexdigest(),
         "held_out_sha256": hashlib.sha256(cut[population - held_out:]).hexdigest(),
     }
-    path = os.path.join(OUT_DIR, name + ".json")
-    with open(path, "w") as handle:
-        json.dump(manifest, handle, indent=2)
-    os.chmod(path, 0o600)
+    private_write(name + ".json", json.dumps(manifest, indent=2).encode("utf-8"))
     print(json.dumps({key: manifest[key] for key in ("families", "development_stream_bytes",
                                                       "population", "held_out_range", "cut_sha256",
                                                       "development_sha256", "held_out_sha256")}))
