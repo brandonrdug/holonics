@@ -19,20 +19,25 @@ two-cells) and the tube (the passage) stay attached, unchanged.
 routed     N_s(c) = Σ_b N_(s b)(c)  (|s| < D): every arrival runs to D (Boundary padding)
 chain      s_0 … s_k, each s_i (i < k) with the one reached child s_(i+1):  N_(s_i) = N_(s_k), one E
            E − W(s_0) = ∏_(i ≤ k) (1 − w_i) · (E − X) ,  X = ∏_b W(s_k b) ;  1 − ρ_i = (1 − w_i)(1 − ρ_(i+1))
-dyadic     w_i = 1 − 2^(−j_i):  ∏_(i ≤ k) (1 − w_i) = 2^(−S) ,  S = Σ_(i ≤ k) j_i
+dyadic     w_i = 1 − 2^(−j_i) , j_i ≥ 0:  ∏_(i ≤ k) (1 − w_i) = 2^(−S) ,  S = Σ_(i ≤ k) j_i
            W(s_0) = ladder S · E + (1 − ladder S) X   (one node at the summed rung)
            β = ladder S · E/((1 − ladder S) X) = (2^S − 1) E/X ;  founding β₀ = 2^S − 1
+forced     j_d = 0 , w_d = 0:  the node always splits (λ = 0) and passes its path face through
 leaf       a chain ending at D:  W = E at every node (ρ = 1), one KT node
 split      S = S_up + S_low:  β_ℓ = β (2^(S_low) − 1)/(2^S − 1) ,
            β_u = (2^(S_up) − 1) 2^(S_low) β_ℓ/((2^(S_low) − 1)(β_ℓ + 1)) ;  above a leaf β_u = 2^(S_up) − 1
-kept       the root, the parting nodes (at least two reached children), the reached leaves at D
+           S_up = 0 (the upper part above the forced depths):  β_u = 0 , the face passes through,
+           and the lower part keeps β
+implicit   every node with exactly one reached child, the root included (a unary root is its chain's top)
+kept       the parting nodes (at least two reached children) and the reached leaves at D;
+           the root only while nothing has arrived
 compacted  C(S, s) = E_s at D ;  C(S + j_d, s b) at an implicit node (one reached child b) ;
            ladder S′ E_s + (1 − ladder S′) ∏_(reached b) C(0, s b) at a kept node, S′ = S + j_d
            C(S, s) = (1 − 2^(−S)) E_s + 2^(−S) W(s) ,  so C(0, root) = W(root)
 face       q = Λ k + (1 − Λ) q_below ,  Λ = ladder S′ E/(ladder S′ E + (1 − ladder S′) X) = β/(1 + β)
            at a kept node or where the address parts from a chain; the rung is carried at an implicit
            node the address follows; q_below = 1/|A| at an absent child
-bound      #parting ≤ L − 1 ,  #(parting ∪ leaves) ≤ 2L − 1 ,  #kept ≤ max(1, 2L) ,  L ≤ n
+bound      #parting ≤ L − 1 ,  #kept ≤ 2L − 1 (L ≥ 1) ,  L ≤ n ,  #kept ≤ 2n − 1 (n ≥ 1) , 1 (n = 0)
 ```
 
 [proved-derived; formal-checked] What is proved.
@@ -48,13 +53,17 @@ bound      #parting ≤ L − 1 ,  #(parting ∪ leaves) ≤ 2L − 1 ,  #kept �
    unary chain holds its bottom's counts (one KT mass `E`), and for any stop weights
    `E − W(s_0) = ∏_(i ≤ k) (1 − w_i) (E − X)`, also in the ratio `ρ = W/E`. On the dyadic ladder the
    product is `2^(−S)` with `S` the summed rung, so the chain with its bottom is Decision 28's node at
-   rung `S`: `W = ladder S · E + (1 − ladder S) X`, founded at `2^S − 1` (`LandmarkTree.ladder_founding`)
-   with the ratio `β = (2^S − 1) E/X`, Decision 32's `β = w E/((1 − w) P)`. A chain that ends at the
-   declared depth weighs `E` at every node under any stop weights.
-3. **The split** (`chain_split`): cutting a summed rung `S = S_up + S_low` changes no weight; the lower
-   part keeps `β_ℓ = β (2^(S_low) − 1)/(2^S − 1)`, the upper part holds the same counts at
-   `β_u = (2^(S_up) − 1) 2^(S_low) β_ℓ/((2^(S_low) − 1)(β_ℓ + 1))`, and `β_u = 2^(S_up) − 1` above a
-   leaf. This is the chart an arrival that parts from a label at a chain's depth founds its node with.
+   rung `S`: `W = ladder S · E + (1 − ladder S) X`, founded at `2^S − 1` (`LandmarkTree.ladder_ratio`)
+   with the ratio `β = (2^S − 1) E/X`, Decision 32's `β = w E/((1 − w) P)`, at every rung `j_d ≥ 0`
+   (a forced depth has rung `0`). A chain that ends at the declared depth weighs `E` at every node
+   under any stop weights.
+3. **The split** (`chain_split`, `chain_split_pass`): cutting a summed rung `S = S_up + S_low` changes
+   no weight; the lower part keeps `β_ℓ = β (2^(S_low) − 1)/(2^S − 1)`, the upper part holds the same
+   counts at `β_u = (2^(S_up) − 1) 2^(S_low) β_ℓ/((2^(S_low) − 1)(β_ℓ + 1))`, and
+   `β_u = 2^(S_up) − 1` above a leaf. An upper part with no rung (`S_up = 0`, above the forced depths)
+   is a pass-through: it weighs its lower part, `β_u = 0` and `Λ = 0`, so its face is its lower
+   part's, and the lower part keeps the chain's `β`. This is the chart an arrival that parts from a
+   label at a chain's depth founds its node with.
 4. **The compacted tree is Decision 28's tree, code for code** (`compactFrom`, `compactWeight`,
    `keptLam`, `compactFaceFrom`, `compactFace`, `compactFrom_eq`, `compact_weight_eq`,
    `follow_step_algebra`, `kept_step_algebra`, `compactFaceFrom_eq`, `compact_face_eq`,
@@ -64,30 +73,37 @@ bound      #parting ≤ L − 1 ,  #(parting ∪ leaves) ≤ 2L − 1 ,  #kept �
    standing. Its face is the path mixture over the kept nodes (with the split's `β_u` where the
    address parts from a chain, and the uniform prior at an absent child), and it equals the stop
    law's face (`LandmarkTree.stopFace`) at every arrival: over a passage from the empty standing the
-   two prequential codes are equal exactly in `ℚ`, and each is the root weight.
+   two prequential codes are equal exactly in `ℚ`, and each is the root weight. A root with one
+   reached child is implicit like every other unary node: its rung joins its chain's sum. The rungs
+   are any `j_d ≥ 0` (`LandmarkTree.ladder_stopLaw₀`): a forced depth has rung `0` and always splits.
 5. **The kept nodes** (`partingNodes`, `leafNodes`, `keptNodes`, `mem_leafNodes`,
    `mem_partingNodes`, `nodes_of_zero`, `parting_card_le`, `leaf_card_le_total`,
    `compacted_node_bound`): the reached leaves are the reached nodes at depth `D`, the parting nodes
    are the nodes above `D` with at least two reached children, there is at most one parting node
-   fewer than leaves, and the leaves are at most the arrivals. So a passage of `n ≥ 1` arrivals keeps
-   at most `2n` nodes a tree, whatever the declared depth (the root alone when nothing has arrived).
+   fewer than leaves, and the leaves are at most the arrivals. The kept nodes are the parting nodes
+   and the leaves (the root is kept only while nothing has arrived, reading the prior), so `L ≥ 1`
+   reached leaves keep at most `2L − 1` nodes, and a passage of `n ≥ 1` arrivals at most `2n − 1`
+   nodes a tree, whatever the declared depth (one node, the root, when nothing has arrived).
 
 [proved-standard] The compacted context tree is the storage of Willems's unbounded-depth
 context-tree weighting (Willems, 1998); a rooted tree whose internal nodes have at least two
 children has fewer internal nodes than leaves (the bound of Morrison's PATRICIA tree, 1968). The
 proofs here are this owner's.
 
-[conditional] The weight identity holds for any rungs; the face identity and the founding ratio use
-the declared family `j_d ≥ 1`. The executed chart steps `β` on its lattice (`LandmarkTree`,
+[conditional] The weight, face and code identities and the founding ratio hold for any rungs
+`j_d ≥ 0`, the forced rung `0` included. The executed chart steps `β` on its lattice (`LandmarkTree`,
 section 6′); its drift at a split, where `β_u` and `β_ℓ` are evaluated from the stored `β`, is the
 lattice chart's passage-level drift owed in #62 ("the landmark lattice's drift"), not restated here.
 
-The Rust consumer is `crates/holonics/src/hnn/landmark.rs` (`hnn::landmark`, the compacted
-storage): the arena keeps the root, the parting nodes and the leaves with their labels, each kept
-node with its counts, its summed rung and its `β`; an arrival that parts from a label at a chain's
-depth founds a node there with the label's counts and the closed-form `β_u`, `β_ℓ` (`chain_split`);
-its test of exact equality with `IdealLandmarks` at the same `D` is the executed receipt of
-`compacted_is_decision_28`.
+The Rust consumer is `crates/holonics/src/hnn/landmark.rs` (`hnn::landmark::Storage::Compacted`):
+the arena keeps the parting nodes and the leaves with their labels, each kept node with its counts,
+its summed rung (`rung_sums`, a forced depth's rung `0`) and its `β`; the first arrival founds one
+node, its leaf, whose chain runs from the root (a unary root folds into its chain); an arrival that
+parts from a label at a chain's depth founds a node there with the label's counts and the
+closed-form `β_u`, `β_ℓ` (`chain_split`, `Law::part`), and an upper part with no rung passes its
+face through (`chain_split_pass`). Its test of exact equality with `IdealLandmarks` at the same `D`
+(forced depths `0` and `1`) is the executed receipt of `compacted_is_decision_28`, and its node
+counts (one node after one arrival, at most `2n − 1`) the receipt of `compacted_node_bound`.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
@@ -364,14 +380,16 @@ theorem chain_ratio [Nonempty A] (w : ℕ → ℚ) {D : ℕ} {N : TreeStanding L
 
 omit [DecidableEq Ltr] [DecidableEq A] in
 /-- [proved-derived; formal-checked] **`chain_ratio_dyadic`: a chain with its bottom is ONE node at
-the summed rung.** On the dyadic ladder `w_d = 1 − 2^(−j_d)`, for a unary chain `s … s ++ t` (as in
-`chain_ratio`) with the summed rung `S = Σ_(i ≤ |t|) j_(d+i)`:
+the summed rung.** On the dyadic ladder `w_d = 1 − 2^(−j_d)` at any rungs `j_d ≥ 0` (a forced depth
+has rung `0`), for a unary chain `s … s ++ t` (as in `chain_ratio`) with the summed rung
+`S = Σ_(i ≤ |t|) j_(d+i)`:
 * `∏_(i ≤ |t|) (1 − w_(d+i)) = 2^(−S)`;
 * `W(s) = ladder S · E + (1 − ladder S) · X`, `X` the split of the bottom: Decision 28's node at
   rung `S` (`stopWeight_succ` with `w = ladder S`);
-* its founding ratio is `ladder S/(1 − ladder S) = 2^S − 1` (`ladder_founding`), and its ratio is
+* its founding ratio is `ladder S/(1 − ladder S) = 2^S − 1` (`ladder_ratio`; `0` for a chain within
+  the forced depths, which passes its face through), and its ratio is
   `β = ladder S · E/((1 − ladder S) X) = (2^S − 1) E/X`, Decision 32's `β = w E/((1 − w) P)`. -/
-theorem chain_ratio_dyadic [Nonempty A] (j : ℕ → ℕ) (hj : ∀ d, 1 ≤ j d) {D : ℕ}
+theorem chain_ratio_dyadic [Nonempty A] (j : ℕ → ℕ) {D : ℕ}
     {N : TreeStanding Ltr A} (hN : Routed D N) (t s : List Ltr) (m : ℕ) (hsm : s.length + m = D)
     (ht : t.length < m)
     (hU : ∀ i (hi : i < t.length) b, (N (s ++ t.take i ++ [b]) ≠ fun _ => 0) → b = t[i])
@@ -380,18 +398,14 @@ theorem chain_ratio_dyadic [Nonempty A] (j : ℕ → ℕ) (hj : ∀ d, 1 ≤ j d
       stopWeight (fun d => ladder (j d)) N m s =
         ladder S * ktMass (N s) +
           (1 - ladder S) * stopSplit (fun d => ladder (j d)) N (m - t.length - 1) (s ++ t) ∧
-      1 ≤ S ∧ ladder S / (1 - ladder S) = 2 ^ S - 1 ∧
+      ladder S / (1 - ladder S) = 2 ^ S - 1 ∧
       ladder S * ktMass (N s) /
           ((1 - ladder S) * stopSplit (fun d => ladder (j d)) N (m - t.length - 1) (s ++ t)) =
         (2 ^ S - 1) * ktMass (N s) /
           stopSplit (fun d => ladder (j d)) N (m - t.length - 1) (s ++ t) := by
   have hprod : ∏ i ∈ range (t.length + 1), (1 - ladder (j (s.length + i))) = (1 / 2 : ℚ) ^ S := by
     simp only [one_sub_ladder, Finset.prod_pow_eq_pow_sum, hS]
-  have hS1 : 1 ≤ S := by
-    rw [← hS, Finset.sum_range_succ']
-    have := hj (s.length + 0)
-    omega
-  obtain ⟨-, -, hfound, -⟩ := ladder_founding hS1
+  have hfound := ladder_ratio S
   obtain ⟨-, hchain, -⟩ := chain_ratio (fun d => ladder (j d)) hN t s m hsm ht hU
   have hW : stopWeight (fun d => ladder (j d)) N m s =
       ladder S * ktMass (N s) +
@@ -399,7 +413,7 @@ theorem chain_ratio_dyadic [Nonempty A] (j : ℕ → ℕ) (hj : ∀ d, 1 ≤ j d
     rw [hprod] at hchain
     rw [one_sub_ladder, show ladder S = 1 - (1 / 2 : ℚ) ^ S from rfl]
     linarith
-  refine ⟨hprod, hW, hS1, hfound, ?_⟩
+  refine ⟨hprod, hW, hfound, ?_⟩
   rw [mul_div_mul_comm, hfound, mul_div_assoc]
 
 omit [DecidableEq Ltr] [DecidableEq A] in
@@ -483,9 +497,27 @@ theorem chain_split {E X : ℚ} (hE : 0 < E) (hX : 0 < X) {Su Sl : ℕ} (hu : 1 
   · field_simp
   · field_simp
 
+/-- [proved-derived; formal-checked] **`chain_split_pass`: a split whose upper part has no rung is a
+pass-through.** Where the address parts from a chain within the forced depths, the upper part's
+summed rung is `S_up = 0` (every depth it spans forced, `w = 0`):
+* the cut changes no weight: the upper part weighs its lower part,
+  `ladder 0 · E + (1 − ladder 0) W_low = W_low`, the whole chain at `S = 0 + S_low`;
+* its ratio is `β_u = ladder 0 · E/((1 − ladder 0) W_low) = 0` and its posterior stop weight
+  `Λ = 0`: its face is its lower part's, passed through;
+* the lower part keeps the chain's summed rung, so it keeps the chain's `β`. -/
+theorem chain_split_pass (E X : ℚ) (Sl : ℕ) :
+    ladder 0 * E + (1 - ladder 0) * (ladder Sl * E + (1 - ladder Sl) * X) =
+        ladder (0 + Sl) * E + (1 - ladder (0 + Sl)) * X ∧
+      ladder 0 * E / ((1 - ladder 0) * (ladder Sl * E + (1 - ladder Sl) * X)) = 0 ∧
+      ladder 0 * E / (ladder 0 * E + (1 - ladder 0) * (ladder Sl * E + (1 - ladder Sl) * X)) = 0 ∧
+      ladder (0 + Sl) * E / ((1 - ladder (0 + Sl)) * X) = ladder Sl * E / ((1 - ladder Sl) * X) := by
+  have h0 : ladder 0 = 0 := by simp [ladder]
+  rw [zero_add, h0]
+  exact ⟨by ring, by simp, by simp, rfl⟩
+
 end Chain
 
-/-! ## 3. The compacted tree: stored at the root, where paths part, and at the leaves -/
+/-! ## 3. The compacted tree: stored where paths part and at the leaves -/
 
 section Compact
 
@@ -495,16 +527,17 @@ variable {Ltr : Type*} [Fintype Ltr] [DecidableEq Ltr] {A : Type*} [Fintype A] [
 below it, carrying the rung `S` summed over the implicit nodes of the chain above `s`:
 * at the declared depth (`m = 0`), the leaf's KT mass (a chain that ends at `D` is one KT node,
   `leaf_chain_is_one_node`);
-* at an **implicit** node (not the root, exactly one reached child: a unary chain's node, a gluing
-  that is unique), its rung joins the chain's sum and the chain continues into its child; no mass
-  is read there;
-* at a **kept** node (the root, or a node where paths part: a plural gluing), one Decision 28 node at
-  the summed rung `S' = S + j_d`: `ladder S' · E + (1 − ladder S') ∏_(reached b) W_b`, each reached
-  child's chain entered afresh (`S = 0`); an absent child contributes `1`. -/
+* at an **implicit** node (exactly one reached child: a unary chain's node, a gluing that is unique;
+  the root included, so a unary root is its chain's top), its rung joins the chain's sum and the
+  chain continues into its child; no mass is read there;
+* at a **kept** node (a node where paths part, a plural gluing; or the root while nothing has
+  arrived, which reads the prior), one Decision 28 node at the summed rung `S' = S + j_d`:
+  `ladder S' · E + (1 − ladder S') ∏_(reached b) W_b`, each reached child's chain entered afresh
+  (`S = 0`); an absent child contributes `1`. A forced depth has rung `j_d = 0`. -/
 def compactFrom (j : ℕ → ℕ) (N : TreeStanding Ltr A) : ℕ → ℕ → List Ltr → ℚ
   | 0, _, s => ktMass (N s)
   | m + 1, S, s =>
-    if s ≠ [] ∧ (reachedKids N s).card = 1 then
+    if (reachedKids N s).card = 1 then
       ∑ b ∈ reachedKids N s, compactFrom j N m (S + j s.length) (s ++ [b])
     else
       ladder (S + j s.length) * ktMass (N s) +
@@ -530,7 +563,7 @@ def compactFaceFrom (j : ℕ → ℕ) (N : TreeStanding Ltr A) (a : List Ltr) :
     ℕ → ℕ → ℕ → A → ℚ
   | 0, _, d => ktFace (N (a.take d))
   | m + 1, S, d =>
-    if a.take d ≠ [] ∧ (reachedKids N (a.take d)).card = 1 ∧ (N (a.take (d + 1)) ≠ fun _ => 0) then
+    if (reachedKids N (a.take d)).card = 1 ∧ (N (a.take (d + 1)) ≠ fun _ => 0) then
       compactFaceFrom j N a m (S + j d) (d + 1)
     else fun c =>
       keptLam (S + j d) (ktMass (N (a.take d)))
@@ -565,7 +598,7 @@ theorem compactFrom_eq (j : ℕ → ℕ) {D : ℕ} {N : TreeStanding Ltr A} (hN 
         simp
     rw [compactFrom, stopWeight_succ]
     split_ifs with himp
-    · obtain ⟨b0, hb0⟩ := Finset.card_eq_one.mp himp.2
+    · obtain ⟨b0, hb0⟩ := Finset.card_eq_one.mp himp
       have hU : ∀ b, (N (s ++ [b]) ≠ fun _ => 0) → b = b0 := fun b hb => by
         have hmem : b ∈ reachedKids N s := mem_reachedKids.mpr hb
         rw [hb0] at hmem
@@ -627,11 +660,11 @@ theorem kept_step_algebra {E k P q F h : ℚ} (hE : 0 < E) (hP : 0 < P) (hF0 : 0
 
 omit [DecidableEq Ltr] [DecidableEq A] in
 /-- [proved-derived; formal-checked] **The compacted face is Decision 28's face, node for node.**
-Under routing, for an address reaching the declared depth, the compacted path mixture entered at
-depth `d` with the rung `S` summed above is the chain's one-node mixture over the tree's own
-quantities: `((1 − 2^(−S)) E k + 2^(−S) W q)/((1 − 2^(−S)) E + 2^(−S) W)`, `k`, `W`, `q` the KT
-face, the weight and the path face of the stop law at that node. -/
-theorem compactFaceFrom_eq [Nonempty A] (j : ℕ → ℕ) (hj : ∀ d, 1 ≤ j d) {D : ℕ}
+Under routing, for an address reaching the declared depth and any rungs `j_d ≥ 0`, the compacted
+path mixture entered at depth `d` with the rung `S` summed above is the chain's one-node mixture over
+the tree's own quantities: `((1 − 2^(−S)) E k + 2^(−S) W q)/((1 − 2^(−S)) E + 2^(−S) W)`, `k`, `W`,
+`q` the KT face, the weight and the path face of the stop law at that node. -/
+theorem compactFaceFrom_eq [Nonempty A] (j : ℕ → ℕ) {D : ℕ}
     {N : TreeStanding Ltr A} (hN : Routed D N) {a : List Ltr} (ha : D ≤ a.length) (c : A) :
     ∀ m S d, d + m = D →
       compactFaceFrom j N a m S d c =
@@ -640,8 +673,7 @@ theorem compactFaceFrom_eq [Nonempty A] (j : ℕ → ℕ) (hj : ∀ d, 1 ≤ j d
               stopFace (fun d => ladder (j d)) N D a d c) /
           ((1 - (1 / 2 : ℚ) ^ S) * ktMass (N (a.take d)) +
             (1 / 2 : ℚ) ^ S * stopWeight (fun d => ladder (j d)) N m (a.take d)) := by
-  have hw : StopLaw fun d => ladder (j d) := fun d =>
-    ⟨(ladder_founding (hj d)).1, (ladder_founding (hj d)).2.1⟩
+  have hw := ladder_stopLaw₀ j
   intro m
   induction m with
   | zero =>
@@ -688,13 +720,12 @@ theorem compactFaceFrom_eq [Nonempty A] (j : ℕ → ℕ) (hj : ∀ d, 1 ≤ j d
     have hh1 : (1 / 2 : ℚ) ^ (j d) ≤ 1 := pow_le_one₀ (by norm_num) (by norm_num)
     have hE := ktMass_pos (N (a.take d))
     rw [hW, hq, hlam]
-    by_cases hcond : a.take d ≠ [] ∧ (reachedKids N (a.take d)).card = 1 ∧
-        (N (a.take (d + 1)) ≠ fun _ => 0)
+    by_cases hcond : (reachedKids N (a.take d)).card = 1 ∧ (N (a.take (d + 1)) ≠ fun _ => 0)
     · -- the address follows an implicit node: the rung is carried down the chain
       rw [compactFaceFrom, if_pos hcond, ih (S + j d) (d + 1) (by omega)]
-      obtain ⟨b0, hb0⟩ := Finset.card_eq_one.mp hcond.2.1
+      obtain ⟨b0, hb0⟩ := Finset.card_eq_one.mp hcond.1
       have hmem : a[d] ∈ reachedKids N (a.take d) := mem_reachedKids.mpr (by
-        rw [← htake]; exact hcond.2.2)
+        rw [← htake]; exact hcond.2)
       have hU : ∀ b, (N (a.take d ++ [b]) ≠ fun _ => 0) → b = a[d] := fun b hb => by
         have hb' : b ∈ reachedKids N (a.take d) := mem_reachedKids.mpr hb
         rw [hb0] at hb' hmem
@@ -709,7 +740,7 @@ theorem compactFaceFrom_eq [Nonempty A] (j : ℕ → ℕ) (hj : ∀ d, 1 ≤ j d
       have hk : kAt N a (d + 1) c = kAt N a d c := by
         unfold kAt
         rw [hE']
-      have hWt := stopWeight_pos hw N m (a.take (d + 1))
+      have hWt := stopWeight_pos₀ hw N m (a.take (d + 1))
       rw [hE', hk, hP]
       generalize stopWeight (fun d => ladder (j d)) N m (a.take (d + 1)) = W at hWt ⊢
       generalize stopFace (fun d => ladder (j d)) N D a (d + 1) c = q
@@ -739,10 +770,10 @@ theorem compactFaceFrom_eq [Nonempty A] (j : ℕ → ℕ) (hj : ∀ d, 1 ≤ j d
             exact routed_zero hN _ _ (by simp; omega) hk
           simp only [kAt, hz, ktFace_zero]
         · rw [if_pos hk, ih 0 (d + 1) (by omega)]
-          have hWt := stopWeight_pos hw N m (a.take (d + 1))
+          have hWt := stopWeight_pos₀ hw N m (a.take (d + 1))
           simp only [pow_zero, sub_self, zero_mul, one_mul, zero_add]
           field_simp
-      have hPpos := stopSplit_pos hw N m (a.take d)
+      have hPpos := stopSplit_pos₀ hw N m (a.take d)
       rw [hX, hbelow]
       unfold keptLam
       generalize stopSplit (fun d => ladder (j d)) N m (a.take d) = P at hPpos ⊢
@@ -756,20 +787,19 @@ theorem compactFaceFrom_eq [Nonempty A] (j : ℕ → ℕ) (hj : ∀ d, 1 ≤ j d
 
 omit [DecidableEq Ltr] [DecidableEq A] in
 /-- [proved-derived; formal-checked] **The compacted root face is Decision 28's root face**, for
-every routed standing and every address reaching the declared depth. -/
-theorem compact_face_eq [Nonempty A] (j : ℕ → ℕ) (hj : ∀ d, 1 ≤ j d) {D : ℕ}
+every routed standing, every address reaching the declared depth and any rungs `j_d ≥ 0`. -/
+theorem compact_face_eq [Nonempty A] (j : ℕ → ℕ) {D : ℕ}
     {N : TreeStanding Ltr A} (hN : Routed D N) {a : List Ltr} (ha : D ≤ a.length) (c : A) :
     compactFace j N D a c = stopFace (fun d => ladder (j d)) N D a 0 c := by
-  have hw : StopLaw fun d => ladder (j d) := fun d =>
-    ⟨(ladder_founding (hj d)).1, (ladder_founding (hj d)).2.1⟩
-  have hW := stopWeight_pos hw N D (a.take 0)
-  rw [compactFace, compactFaceFrom_eq j hj hN ha c D 0 0 (by simp)]
+  have hW := stopWeight_pos₀ (ladder_stopLaw₀ j) N D (a.take 0)
+  rw [compactFace, compactFaceFrom_eq j hN ha c D 0 0 (by simp)]
   simp only [pow_zero, sub_self, zero_mul, one_mul, zero_add]
   field_simp
 
 /-- [proved-derived; formal-checked] The stop law's root weight after a past is the prequential
-code of its root faces (`stop_weight_step` at the root, from the empty standing's weight one). -/
-theorem stop_weight_prequential [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w) (D : ℕ)
+code of its root faces (`stop_weight_step₀` at the root, from the empty standing's weight one), under
+any law with forced depths. -/
+theorem stop_weight_prequential [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw₀ w) (D : ℕ)
     (ctx : List A → List Ltr) (hctx : ∀ h, D ≤ (ctx h).length) :
     ∀ h, stopWeight w (standingOf ctx h) D [] =
       prequentialCode (fun h => stopFace w (standingOf ctx h) D (ctx h) 0) h
@@ -778,23 +808,24 @@ theorem stop_weight_prequential [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w) 
     exact stop_unfounded w _ D [] fun _ => rfl
   | c :: h => by
     simp only [standingOf, prequentialCode]
-    have hstep := stop_weight_step hw (standingOf ctx h) (hctx h) c 0 (Nat.zero_le _)
+    have hstep := stop_weight_step₀ hw (standingOf ctx h) (hctx h) c 0 (Nat.zero_le _)
     simp only [Nat.sub_zero, List.take_zero] at hstep
     rw [hstep, stop_weight_prequential hw D ctx hctx h]
 
 /-- [proved-derived; formal-checked] **`compacted_is_decision_28`: the compacted tree is Decision
 28's tree at the declared depth, code for code, exactly in `ℚ`.** On the dyadic ladder
-`w_d = 1 − 2^(−j_d)` (`j_d ≥ 1`), for every passage built by arrivals from the empty standing over
-addresses reaching the declared depth `D` (a causal context, `standingOf`):
-* **the weight**: the compacted root weight (the root, the nodes where paths part and the leaves,
-  each kept node one node at the rung summed over its implicit chain) is the stop law's root weight
-  `stopWeight` (every node founded at its first arrival);
+`w_d = 1 − 2^(−j_d)` at any rungs `j_d ≥ 0` (a forced depth has rung `0`, `w = 0`, and always
+splits), for every passage built by arrivals from the empty standing over addresses reaching the
+declared depth `D` (a causal context, `standingOf`):
+* **the weight**: the compacted root weight (the nodes where paths part and the leaves, each kept
+  node one node at the rung summed over its implicit chain, a unary root folded into its chain) is
+  the stop law's root weight `stopWeight` (every node founded at its first arrival);
 * **the face**: the compacted path mixture over the kept nodes, read at each arrival before its
   deposit, is the stop law's root face `stopFace`, the prequential face of that arrival; it is
   positive and normalized;
 * **the code**: the compacted root weight is the prequential code of its faces, and that code is the
   stop law's prequential code, so the two prequential code lengths `−log₂` are equal exactly. -/
-theorem compacted_is_decision_28 [Nonempty A] (j : ℕ → ℕ) (hj : ∀ d, 1 ≤ j d) (D : ℕ)
+theorem compacted_is_decision_28 [Nonempty A] (j : ℕ → ℕ) (D : ℕ)
     (ctx : List A → List Ltr) (hctx : ∀ h, D ≤ (ctx h).length) :
     (∀ h, compactWeight j (standingOf ctx h) D =
         stopWeight (fun d => ladder (j d)) (standingOf ctx h) D []) ∧
@@ -807,20 +838,19 @@ theorem compacted_is_decision_28 [Nonempty A] (j : ℕ → ℕ) (hj : ∀ d, 1 �
         prequentialCode (fun h => compactFace j (standingOf ctx h) D (ctx h)) h =
           prequentialCode
             (fun h => stopFace (fun d => ladder (j d)) (standingOf ctx h) D (ctx h) 0) h := by
-  have hw : StopLaw fun d => ladder (j d) := fun d =>
-    ⟨(ladder_founding (hj d)).1, (ladder_founding (hj d)).2.1⟩
+  have hw := ladder_stopLaw₀ j
   have hR := routed_standingOf hctx
   have hweight : ∀ h, compactWeight j (standingOf ctx h) D =
       stopWeight (fun d => ladder (j d)) (standingOf ctx h) D [] := fun h =>
     compact_weight_eq j (hR h)
   have hface : ∀ h c, compactFace j (standingOf ctx h) D (ctx h) c =
       stopFace (fun d => ladder (j d)) (standingOf ctx h) D (ctx h) 0 c := fun h c =>
-    compact_face_eq j hj (hR h) (hctx h) c
+    compact_face_eq j (hR h) (hctx h) c
   have hfun : (fun h => compactFace j (standingOf ctx h) D (ctx h)) =
       fun h => stopFace (fun d => ladder (j d)) (standingOf ctx h) D (ctx h) 0 :=
     funext fun h => funext fun c => hface h c
   refine ⟨hweight, hface, fun h => ?_, fun h => ?_⟩
-  · have hn := stopFace_normalized hw (standingOf ctx h) D (ctx h) 0 (Nat.zero_le _)
+  · have hn := stopFace_normalized₀ hw (standingOf ctx h) D (ctx h) 0 (Nat.zero_le _)
     simp only [hface]
     exact hn
   · rw [hfun, hweight, stop_weight_prequential hw D ctx hctx h]
@@ -828,7 +858,7 @@ theorem compacted_is_decision_28 [Nonempty A] (j : ℕ → ℕ) (hj : ∀ d, 1 �
 
 end Compact
 
-/-! ## 4. The kept nodes: at most two a passage's arrival -/
+/-! ## 4. The kept nodes: at most `2n − 1` over `n ≥ 1` arrivals -/
 
 section Nodes
 
@@ -847,11 +877,12 @@ def leafNodes (N : TreeStanding Ltr A) : ℕ → List Ltr → Finset (List Ltr)
   | 0, s => if N s ≠ (fun _ => 0) then {s} else ∅
   | m + 1, s => (reachedKids N s).biUnion fun b => leafNodes N m (s ++ [b])
 
-/-- [definition] **The kept nodes** of the compacted tree at the declared depth `D`: the root, the
-parting nodes and the reached leaves. Every other reached node is implicit: one reached child, its
-counts its child's (`routed_unary`), its rung carried in its chain's sum. -/
+/-- [definition] **The kept nodes** of the compacted tree at the declared depth `D`: the parting
+nodes and the reached leaves, and the root only while nothing has arrived (it reads the prior).
+Every other reached node is implicit, the root included: one reached child, its counts its child's
+(`routed_unary`), its rung carried in its chain's sum. -/
 def keptNodes (N : TreeStanding Ltr A) (D : ℕ) : Finset (List Ltr) :=
-  insert [] (partingNodes N D [] ∪ leafNodes N D [])
+  if N [] = (fun _ => 0) then {[]} else partingNodes N D [] ∪ leafNodes N D []
 
 omit [Fintype Ltr] [DecidableEq Ltr] in
 /-- A node's one-letter extension along a longer word it prefixes is that word's restriction. -/
@@ -1039,15 +1070,17 @@ theorem leaf_card_le_total {D : ℕ} {N : TreeStanding Ltr A} (hN : Routed D N) 
           rw [Finset.sum_comm]
           exact Finset.sum_congr rfl fun c _ => (hN s hs c).symm
 
-/-- [proved-derived; formal-checked] **`compacted_node_bound`: the compacted tree keeps at most two
-nodes an arrival, at any depth.** For every passage built by arrivals from the empty standing over
-addresses reaching the declared depth `D`, with `L` its distinct reached leaves (the reached nodes
-at depth `D`) and `n` its arrivals:
+/-- [proved-derived; formal-checked] **`compacted_node_bound`: the compacted tree keeps at most
+`2n − 1` nodes over `n ≥ 1` arrivals, at any depth.** For every passage built by arrivals from the
+empty standing over addresses reaching the declared depth `D`, with `L` its distinct reached leaves
+(the reached nodes at depth `D`) and `n` its arrivals:
 * the parting nodes are the nodes above `D` with at least two reached children, and there are at
-  most `L − 1` of them;
-* so the kept nodes besides the root (parting nodes and leaves) are at most `2L − 1`, and with the
-  root at most `2L` (one node, the root, when nothing has arrived);
-* `L ≤ n`, so the compacted tree keeps at most `2n` nodes for `n ≥ 1`, whatever `D`. -/
+  most `L − 1` of them, so the parting nodes and the leaves are at most `2L − 1`;
+* nothing has arrived exactly when no leaf is reached, and then the root alone is kept (it reads the
+  prior); once something has arrived the kept nodes are the parting nodes and the leaves (a unary
+  root folds into its chain), at most `2L − 1` for `L ≥ 1`;
+* `L ≤ n`, so the compacted tree keeps at most `2n − 1` nodes for `n ≥ 1` and one for `n = 0`,
+  whatever `D`. -/
 theorem compacted_node_bound (D : ℕ) (ctx : List A → List Ltr)
     (hctx : ∀ h, D ≤ (ctx h).length) (h : List A) :
     (∀ t, t ∈ leafNodes (standingOf ctx h) D [] ↔
@@ -1058,43 +1091,66 @@ theorem compacted_node_bound (D : ℕ) (ctx : List A → List Ltr)
         (leafNodes (standingOf ctx h) D []).card - 1 ∧
       (partingNodes (standingOf ctx h) D [] ∪ leafNodes (standingOf ctx h) D []).card ≤
         2 * (leafNodes (standingOf ctx h) D []).card - 1 ∧
-      (keptNodes (standingOf ctx h) D).card ≤
-        max 1 (2 * (leafNodes (standingOf ctx h) D []).card) ∧
+      (1 ≤ (leafNodes (standingOf ctx h) D []).card ↔ h ≠ []) ∧
+      (h = [] → keptNodes (standingOf ctx h) D = {[]}) ∧
+      (h ≠ [] → keptNodes (standingOf ctx h) D =
+        partingNodes (standingOf ctx h) D [] ∪ leafNodes (standingOf ctx h) D []) ∧
+      (1 ≤ (leafNodes (standingOf ctx h) D []).card →
+        (keptNodes (standingOf ctx h) D).card ≤ 2 * (leafNodes (standingOf ctx h) D []).card - 1) ∧
       (leafNodes (standingOf ctx h) D []).card ≤ h.length ∧
-      (keptNodes (standingOf ctx h) D).card ≤ max 1 (2 * h.length) := by
+      (keptNodes (standingOf ctx h) D).card ≤ max 1 (2 * h.length - 1) := by
   have hN := routed_standingOf hctx h
   set N := standingOf ctx h with hNdef
   have hLn : (leafNodes N D []).card ≤ h.length := by
     have := leaf_card_le_total hN D [] (by simp)
     rwa [hNdef, standingOf_root_total] at this
-  have hPL : (partingNodes N D []).card + 1 ≤ (leafNodes N D []).card ∨
-      (partingNodes N D [] = ∅ ∧ leafNodes N D [] = ∅) := by
+  have hroot : N [] = (fun _ => 0) ↔ h = [] := by
+    have htot : ∑ c, N [] c = h.length := by rw [hNdef, standingOf_root_total]
+    constructor
+    · intro h0
+      rw [h0] at htot
+      simpa [eq_comm] using htot
+    · rintro rfl
+      funext c
+      exact (Finset.sum_eq_zero_iff.mp (by simpa using htot)) c (mem_univ c)
+  have hPL : (h ≠ [] ∧ (partingNodes N D []).card + 1 ≤ (leafNodes N D []).card) ∨
+      (h = [] ∧ partingNodes N D [] = ∅ ∧ leafNodes N D [] = ∅) := by
     by_cases h0 : N [] = fun _ => 0
-    · exact Or.inr (nodes_of_zero hN (by simp) h0)
-    · exact Or.inl (parting_card_le hN D [] (by simp) h0)
+    · exact Or.inr ⟨hroot.mp h0, nodes_of_zero hN (by simp) h0⟩
+    · exact Or.inl ⟨fun he => h0 (hroot.mpr he), parting_card_le hN D [] (by simp) h0⟩
   have hU := Finset.card_union_le (partingNodes N D []) (leafNodes N D [])
-  have hK : (keptNodes N D).card ≤ (partingNodes N D [] ∪ leafNodes N D []).card + 1 :=
-    Finset.card_insert_le _ _
-  have hK' : (keptNodes N D).card ≤ max 1 (2 * (leafNodes N D []).card) := by
-    rcases hPL with hPL | ⟨hP0, hL0⟩
-    · have := le_max_right 1 (2 * (leafNodes N D []).card)
-      omega
-    · rw [keptNodes, hP0, hL0]
-      simp
-  refine ⟨fun t => ?_, fun t => ?_, ?_, ?_, hK', hLn, ?_⟩
+  have hKe : h = [] → keptNodes N D = {[]} := fun he => by
+    rw [keptNodes, if_pos (hroot.mpr he)]
+  have hKn : h ≠ [] → keptNodes N D = partingNodes N D [] ∪ leafNodes N D [] := fun he => by
+    rw [keptNodes, if_neg fun h0 => he (hroot.mp h0)]
+  refine ⟨fun t => ?_, fun t => ?_, ?_, ?_, ?_, hKe, hKn, fun hL => ?_, hLn, ?_⟩
   · rw [mem_leafNodes hN D [] (by simp) t]
     simp
   · rw [mem_partingNodes hN D [] (by simp) t]
     simp
-  · rcases hPL with hPL | ⟨hP0, hL0⟩
+  · rcases hPL with ⟨-, hPL⟩ | ⟨-, hP0, -⟩
     · omega
     · rw [hP0]
       simp
-  · rcases hPL with hPL | ⟨hP0, hL0⟩
+  · rcases hPL with ⟨-, hPL⟩ | ⟨-, hP0, hL0⟩
     · omega
     · rw [hP0, hL0]
       simp
-  · exact hK'.trans (max_le_max le_rfl (by omega))
+  · rcases hPL with ⟨he, hPL⟩ | ⟨he, -, hL0⟩
+    · exact ⟨fun _ => he, fun _ => by omega⟩
+    · rw [hL0]
+      simp [he]
+  · rcases hPL with ⟨he, hPL⟩ | ⟨-, -, hL0⟩
+    · rw [hKn he]
+      omega
+    · rw [hL0] at hL
+      simp at hL
+  · rcases hPL with ⟨he, hPL⟩ | ⟨he, -, -⟩
+    · rw [hKn he]
+      have := le_max_right 1 (2 * h.length - 1)
+      omega
+    · rw [hKe he]
+      simp
 
 end Nodes
 
@@ -1106,6 +1162,7 @@ section Audit
 #print axioms chain_ratio_dyadic
 #print axioms leaf_chain_is_one_node
 #print axioms chain_split
+#print axioms chain_split_pass
 #print axioms compactFrom_eq
 #print axioms compact_weight_eq
 #print axioms compactFaceFrom_eq

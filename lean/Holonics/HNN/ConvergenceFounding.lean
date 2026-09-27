@@ -83,10 +83,11 @@ present, so a context must recur `d + 1` times before depth `d` reads it, where 
 tree reads it from its second occurrence. Which founding codes shorter is a measurement (the Rust
 owner's header records it).
 
-The Rust consumer is `crates/holonics/src/hnn/landmark.rs` (`hnn::landmark::Founding::SecondArrival`,
-`Landmarks::founded_at`, `IdealLandmarks::founded_at`): the arena records a pending first arrival as
-the child table's word (a tag and the arrival's digit), opens it at the second arrival with that
-count, and never stores `R` (the stopped node's `β` does not move, `conv_ratio_step`).
+The Rust consumer is retired; realization at `d137e8a6` (`hnn::landmark`, the founding at the
+second arrival): its arena opened a node at the second arrival with the first arrival's count and
+never stored `R` (the stopped node's `β` does not move, `conv_ratio_step`). The development cells
+chose the founding at the first arrival (Decision 36, measured), and Decision 37 stores that tree
+where paths part (`HNN/LandmarkCompaction`).
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/

@@ -146,6 +146,10 @@ likelihood of what reached it (`standing_is_routed_counts`).
     split, Kraft form and founding (`weight_step`, `treeWeight_arrive_off`, `splitMass_arrive`,
     `mixture_over_trees`, `kraft_and_dominance`, `founding_step`) are the corollaries at `w = ½`
     (`stopWeight_half`, `stopFace_half`, `PrunedTree.prior_half`, `PrunedTree.prior_half_bits`).
+    With forced depths (`StopLaw₀`: `w_d ∈ [0, 1)`; `ladder_stopLaw₀`, rung `0` is `w = 0`) the
+    weight stays positive, the face normalized and the step the same (`stopWeight_pos₀`,
+    `stopFace_normalized₀`, `stop_weight_step₀`): a forced node always splits, `λ_d = 0`, and passes
+    its path face through; its founding ratio is `2^0 − 1 = 0` (`ladder_ratio`).
 
 [counterexample; formal-checked]
 * `budget_eviction_changes_face`: evicting an occupied child by budget alone changes a later face
@@ -756,6 +760,31 @@ theorem ladder_founding {j : ℕ} (hj : 1 ≤ j) :
   unfold ladder
   rw [sub_sub_cancel, sub_div, div_self hp.ne', one_div_pow, one_div_one_div]
 
+/-- [definition] **A stop-weight law with forced depths**: every stop weight `w_d` lies in `[0, 1)`.
+A depth with `w_d = 0` is forced: its node always splits and passes its path face through (rung `0`
+on the dyadic ladder). -/
+def StopLaw₀ (w : ℕ → ℚ) : Prop := ∀ d, 0 ≤ w d ∧ w d < 1
+
+/-- A stop-weight law is a law with forced depths, none of them forced. -/
+theorem StopLaw.toStopLaw₀ {w : ℕ → ℚ} (hw : StopLaw w) : StopLaw₀ w := fun d =>
+  ⟨(hw d).1.le, (hw d).2⟩
+
+/-- [proved-derived; formal-checked] **`ladder_stopLaw₀`: every rung `j_d ≥ 0` of the dyadic ladder
+is a law with forced depths**: `ladder j = 1 − 2^(−j) ∈ [0, 1)`, rung `0` the forced `w = 0`. -/
+theorem ladder_stopLaw₀ (j : ℕ → ℕ) : StopLaw₀ fun d => ladder (j d) := fun d => by
+  have hp : (0 : ℚ) < (1 / 2) ^ j d := by positivity
+  have hq : (1 / 2 : ℚ) ^ j d ≤ 1 := pow_le_one₀ (by norm_num) (by norm_num)
+  unfold ladder
+  constructor <;> linarith
+
+/-- [proved-derived; formal-checked] **`ladder_ratio`: the founding ratio at every rung**, the forced
+one included: `w/(1 − w) = 2^j − 1` on the dyadic ladder, `0` at rung `0` (the node passes its face
+through). -/
+theorem ladder_ratio (j : ℕ) : ladder j / (1 - ladder j) = 2 ^ j - 1 := by
+  have hp : (0 : ℚ) < (1 / 2) ^ j := by positivity
+  unfold ladder
+  rw [sub_sub_cancel, sub_div, div_self hp.ne', one_div_pow, one_div_one_div]
+
 /-- [definition] **The tree's mixture under a stop-weight law** at node `s` with `m` levels below it:
 `W_s = E_s` at the maximum depth and `W_s = w_|s| E_s + (1 − w_|s|) ∏_b W_(s b)` above it, the stop
 weight read at the node's depth `|s|`. -/
@@ -773,23 +802,35 @@ theorem stopWeight_succ (w : ℕ → ℚ) (N : TreeStanding Ltr A) (m : ℕ) (s 
       w s.length * ktMass (N s) + (1 - w s.length) * stopSplit w N m s := rfl
 
 omit [DecidableEq A] [DecidableEq Ltr] in
-theorem stopWeight_pos [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w) (N : TreeStanding Ltr A) :
+/-- The weight is positive under a law with forced depths: a forced node weighs its split, a
+product of positive weights. -/
+theorem stopWeight_pos₀ [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw₀ w) (N : TreeStanding Ltr A) :
     ∀ m s, 0 < stopWeight w N m s
   | 0, s => ktMass_pos _
   | m + 1, s => by
     have hE := ktMass_pos (N s)
     have hP : 0 < ∏ b, stopWeight w N m (s ++ [b]) :=
-      Finset.prod_pos fun _ _ => stopWeight_pos hw N m _
+      Finset.prod_pos fun _ _ => stopWeight_pos₀ hw N m _
     obtain ⟨h0, h1⟩ := hw s.length
-    have e1 := mul_pos h0 hE
+    have e1 := mul_nonneg h0 hE.le
     have e2 := mul_pos (sub_pos.mpr h1) hP
     simp only [stopWeight]
     linarith
 
 omit [DecidableEq A] [DecidableEq Ltr] in
+theorem stopWeight_pos [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w) (N : TreeStanding Ltr A) :
+    ∀ m s, 0 < stopWeight w N m s :=
+  stopWeight_pos₀ hw.toStopLaw₀ N
+
+omit [DecidableEq A] [DecidableEq Ltr] in
+theorem stopSplit_pos₀ [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw₀ w) (N : TreeStanding Ltr A) (m : ℕ)
+    (s : List Ltr) : 0 < stopSplit w N m s :=
+  Finset.prod_pos fun _ _ => stopWeight_pos₀ hw N m _
+
+omit [DecidableEq A] [DecidableEq Ltr] in
 theorem stopSplit_pos [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w) (N : TreeStanding Ltr A) (m : ℕ)
     (s : List Ltr) : 0 < stopSplit w N m s :=
-  Finset.prod_pos fun _ _ => stopWeight_pos hw N m _
+  stopSplit_pos₀ hw.toStopLaw₀ N m s
 
 omit [DecidableEq A] [DecidableEq Ltr] in
 /-- [proved-derived; formal-checked] **Decision 28's tree is the law at `½`**: `W_s = ½E_s + ½P_s`. -/
@@ -831,6 +872,19 @@ theorem stopLam_mem [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w) (N : TreeSta
   exact ⟨div_pos e1 (by linarith), (div_lt_one (by linarith)).mpr (by linarith)⟩
 
 omit [DecidableEq A] [DecidableEq Ltr] in
+/-- Under a law with forced depths the posterior stop weight lies in `[0, 1)`: `λ_d = 0` at a forced
+depth, whose node passes its path face through. -/
+theorem stopLam_mem₀ [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw₀ w) (N : TreeStanding Ltr A) (D : ℕ)
+    (a : List Ltr) (d : ℕ) : 0 ≤ stopLam w N D a d ∧ stopLam w N D a d < 1 := by
+  have hE := ktMass_pos (N (a.take d))
+  have hP := stopSplit_pos₀ hw N (D - d - 1) (a.take d)
+  obtain ⟨h0, h1⟩ := hw d
+  have e1 := mul_nonneg h0 hE.le
+  have e2 := mul_pos (sub_pos.mpr h1) hP
+  unfold stopLam
+  exact ⟨div_nonneg e1 (by linarith), (div_lt_one (by linarith)).mpr (by linarith)⟩
+
+omit [DecidableEq A] [DecidableEq Ltr] in
 /-- The stop weight is `λ = β/(1 + β)` with the stop-to-split ratio `β = w E/((1 − w) P)`. -/
 theorem stopLam_eq_ratio [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w) (N : TreeStanding Ltr A)
     (D : ℕ) (a : List Ltr) (d : ℕ) :
@@ -849,11 +903,17 @@ theorem stopLam_eq_ratio [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w) (N : Tr
   ring
 
 omit [DecidableEq A] [DecidableEq Ltr] in
-theorem stopFace_normalized [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w) (N : TreeStanding Ltr A)
+theorem stopFace_normalized₀ [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw₀ w) (N : TreeStanding Ltr A)
     (D : ℕ) (a : List Ltr) :
     ∀ d ≤ D, (∀ c, 0 < stopFace w N D a d c) ∧ ∑ c, stopFace w N D a d c = 1 :=
   path_face_normalized _ _ D (fun _ _ c => ktFace_pos _ c) (fun _ _ => ktFace_sum _)
-    fun d _ => ⟨(stopLam_mem hw N D a d).1.le, (stopLam_mem hw N D a d).2.le⟩
+    fun d _ => ⟨(stopLam_mem₀ hw N D a d).1, (stopLam_mem₀ hw N D a d).2.le⟩
+
+omit [DecidableEq A] [DecidableEq Ltr] in
+theorem stopFace_normalized [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w) (N : TreeStanding Ltr A)
+    (D : ℕ) (a : List Ltr) :
+    ∀ d ≤ D, (∀ c, 0 < stopFace w N D a d c) ∧ ∑ c, stopFace w N D a d c = 1 :=
+  stopFace_normalized₀ hw.toStopLaw₀ N D a
 
 omit [DecidableEq A] [DecidableEq Ltr] in
 /-- At `w = ½` the law's stop weight and face are Decision 28's. -/
@@ -897,11 +957,12 @@ theorem stopSplit_arrive (w : ℕ → ℚ) (N : TreeStanding Ltr A) {a : List Lt
   rw [e]
   exact hchild
 
-/-- [proved-derived; formal-checked] **`stop_weight_step`: under any stop-weight law the conditional
-prediction is the successive likelihood ratio.** For an address `a` of length at least `D` and a
-class `c`, at every depth `d ≤ D` of the opened path, `W'_d = W_d · q_d(c)` with `q_D = k_D` and
-`q_d = λ_d k_d + (1 − λ_d) q_(d+1)`, `λ_d = w_d E_d/(w_d E_d + (1 − w_d) P_d)`. -/
-theorem stop_weight_step [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w) (N : TreeStanding Ltr A)
+/-- [proved-derived; formal-checked] **`stop_weight_step₀`: under any stop-weight law with forced
+depths the conditional prediction is the successive likelihood ratio.** For an address `a` of length
+at least `D` and a class `c`, at every depth `d ≤ D` of the opened path, `W'_d = W_d · q_d(c)` with
+`q_D = k_D` and `q_d = λ_d k_d + (1 − λ_d) q_(d+1)`, `λ_d = w_d E_d/(w_d E_d + (1 − w_d) P_d)`
+(`λ_d = 0` at a forced depth). -/
+theorem stop_weight_step₀ [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw₀ w) (N : TreeStanding Ltr A)
     {D : ℕ} {a : List Ltr} (hD : D ≤ a.length) (c : A) :
     ∀ d ≤ D, stopWeight w (arrive N a c) (D - d) (a.take d) =
       stopWeight w N (D - d) (a.take d) * stopFace w N D a d c := by
@@ -934,13 +995,21 @@ theorem stop_weight_step [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w) (N : Tr
       rw [show D - d - 1 = m by omega]
     rw [hlam]
     have hE := ktMass_pos (N (a.take d))
-    have hP := stopSplit_pos hw N m (a.take d)
+    have hP := stopSplit_pos₀ hw N m (a.take d)
     obtain ⟨h0, h1⟩ := hw d
     have hden : w d * ktMass (N (a.take d)) + (1 - w d) * stopSplit w N m (a.take d) ≠ 0 :=
-      (add_pos (mul_pos h0 hE) (mul_pos (sub_pos.mpr h1) hP)).ne'
+      (add_pos_of_nonneg_of_pos (mul_nonneg h0 hE.le) (mul_pos (sub_pos.mpr h1) hP)).ne'
     unfold kAt
     field_simp
     ring
+
+/-- [proved-derived; formal-checked] **`stop_weight_step`: under any stop-weight law the conditional
+prediction is the successive likelihood ratio** (`stop_weight_step₀`, no depth forced). -/
+theorem stop_weight_step [Nonempty A] {w : ℕ → ℚ} (hw : StopLaw w) (N : TreeStanding Ltr A)
+    {D : ℕ} {a : List Ltr} (hD : D ≤ a.length) (c : A) :
+    ∀ d ≤ D, stopWeight w (arrive N a c) (D - d) (a.take d) =
+      stopWeight w N (D - d) (a.take d) * stopFace w N D a d c :=
+  stop_weight_step₀ hw.toStopLaw₀ N hD c
 
 /-- [proved-derived; formal-checked] **`stop_ratio_step`: the executed step is the same at every
 law.** Under a stop-weight law the stop weight is `λ = β/(1 + β)` with `β_d = w_d E_d/((1 − w_d)
@@ -2984,6 +3053,10 @@ section Audit
 #print axioms pathFace_const
 #print axioms lamAt_eq_beta
 #print axioms ladder_founding
+#print axioms ladder_stopLaw₀
+#print axioms ladder_ratio
+#print axioms stopFace_normalized₀
+#print axioms stop_weight_step₀
 #print axioms stopWeight_half
 #print axioms stopLam_eq_ratio
 #print axioms stopFace_half
