@@ -12,7 +12,7 @@
 //! | the published constitution's loci at their lattices, the moved words scattered at each publication (`hnn::publication`) | the constitution `Θ`, the normal laws' prox steps, the receiving parametron's landmark tree and its deposit with its certificates (the landmark tree), the budgeted carry and its remainders, the budget (`Constitution::deposited`), and the operators `I − ½K`, `m_a` formed from it |
 //! | the keyed charts, their rounded Newton–Schulz steps and exact certificates (`hnn::store`) | each refinement's decisions from the certificates (warm, cold, fallback, target), the cold start's transpose and the exact fallback |
 //! | the word's open (`E_g M_g[c]`, the pair port), its ticks, its receiving read (`hnn_pair_weights`, `hnn_word_forward`) | the faces in `ℚ(θ)`, each tick's balance, the release (`hnn::readout`) |
-//! | the receiving parametron's landmark tree mirrored, stored at the faces where paths part (`hnn::tree::CardTree`, campaign 2, the storage where paths part): each window's splits at every phase's causal address in cell order (the known targets' deposits applied and undone on the card), and each deposit's opened-path update with its splits, foundings and label runs | the class faces from the splits and their grain exponents (`context::faces_of_splits`), added to the card's wave at the grain (`ReceivingPhases::combine`); after every deposit the mirror's counts and the masses, `β`, stop weights, depth words and label ends of every node the deposit's walks opened or it founded, its joins and its held labels, checked against the host's tree (`CardTree::agrees_at`) |
+//! | the receiving parametron's landmark tree mirrored, stored at the faces where paths part (`hnn::tree::CardTree`, campaign 2, the storage where paths part): each window's splits at every phase's causal address in cell order (the known targets' deposits applied and undone on the card), and each deposit's opened-path update with its splits, foundings and label runs | the class faces from the splits and their grain exponents (`hnn::receiving::faces_of_splits`), added to the card's wave at the grain (`ReceivingPhases::combine`); after every deposit the mirror's counts and the masses, `β`, stop weights, depth words and label ends of every node the deposit's walks opened or it founded, its joins and its held labels, checked against the host's tree (`CardTree::agrees_at`) |
 //! | each declared ring resonator's ticks inside `hnn_word_forward`, its returned wave reaching the next junction; its state/input adjoint inside `hnn_word_reverse` (the loaded resonator) | the resonators' local operands and certified charts (`ResonatorOperands::at_cut`), formed once per publication (`publication::Loci::resonator_operands`); their balances and bounds read from the live word's record; gain contractions and deposition at the same producing operands |
 //! | in the GPU suite's parity tests only ([`Resident::with_normal_mirror`]; off the exposure's path, where it replaced no host owner): each normal law's prox step a deposit takes once at its locus (`hnn_outer_update` for `ΔH` and `ΔW`, `hnn_budgeted_split` for their carries, the reaches `X̂f` by `hnn_lattice_read` through the host's successor chart; campaign 2), read against the host's successor (`crate::hnn::lattice::normal_deposit_on_card`), every step counted carried, declined by reason or skipped | the successor constitution (`Constitution::deposited`, the owner of `Θ`), the chart of `H′`, and the steps the card's words cannot carry (a sample off the dyadics, such as `R`'s covector on `(1/W)ℤ`) |
 //! | the word's return (`hnn_word_reverse`) | the compare phase under the hardware law (`reference::compare_phase`: the tree at the grain beside the mixture score, the Holon ratio and its covector), the return's source through `Rᵀ` (the covector lives on `(1/W)ℤ`), the composition onto the loci (`reference::compose`) |
@@ -47,7 +47,7 @@ use std::time::Instant;
 use holonics::aeon::{ClockLift, EnclosedLedger};
 use holonics::compression::cost::ceil_log2;
 use holonics::compression::landmark::context::{
-    LandmarkDeclaration, Landmarks, Letter, code_length, faces_of_splits,
+    LandmarkDeclaration, Landmarks, Letter, code_length,
 };
 use holonics::hnn::constitution::{
     CAMPAIGN_ONE_BUDGET, Carrier, DepositReading, LandmarkStep, LinearLocus, gamma_length,
@@ -62,6 +62,7 @@ use holonics::hnn::port::{
 };
 use holonics::hnn::propagation::path_attenuation;
 use holonics::hnn::ratio::{HolonRatio, PhaseRatio};
+use holonics::hnn::receiving::faces_of_splits;
 use holonics::hnn::reference::{
     BudgetStop, ChartTally, ComparePhase, Cut, Declared, ExposedResident, Exposure, WallTimes,
     compare_phase, compose, expose, expose_from, window_code_length,
@@ -587,7 +588,7 @@ impl<'c> Resident<'c> {
         current: &Current,
         constitution: Constitution,
     ) -> Result<Mounted<'c>, HnnError> {
-        let parametric = field.holon(&constitution)?.parametric();
+        let parametric = field.holarchy(&constitution)?.parametric();
         if parametric != field.parametric() {
             return Err(HnnError::Shape {
                 what: "the Holarchy's parametric orientation against the field's joint clock lift",
@@ -660,7 +661,7 @@ impl<'c> Resident<'c> {
 /// **The tree part of a window's faces** (the landmark tree; `PendingRatio::against`): on the card's
 /// mirror when it holds the receiving ring's tree, its splits in cell order (the known targets'
 /// deposits applied and undone on the card) completed into class faces on the host
-/// (`context::faces_of_splits`) and added to the wave's faces at the grain; otherwise the host's
+/// (`hnn::receiving::faces_of_splits`) and added to the wave's faces at the grain; otherwise the host's
 /// read. Returns the faces, the read's wall time and the transfers' apart.
 fn tree_against(
     tree: Option<&mut (usize, CardTree<'_>)>,

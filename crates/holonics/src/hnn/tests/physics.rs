@@ -1259,12 +1259,12 @@ fn the_break_receipt_and_the_parted_face() {
     assert_eq!(image.len(), 4);
     // The parted face.
     let theta = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET).unwrap();
-    assert!(field.holon(&theta).is_ok());
-    match field.parted_holon(&theta, 1).unwrap() {
+    assert!(field.holarchy(&theta).is_ok());
+    match field.parted_holarchy(&theta, 1).unwrap() {
         GluingDefect::UncancelledPower { power, .. } => assert!(!power.is_zero()),
         other => panic!("expected an uncancelled power, found {other:?}"),
     }
-    assert!(field.parted_holon(&theta, 7).is_err());
+    assert!(field.parted_holarchy(&theta, 7).is_err());
 }
 
 /// Every refusal of campaign 2's physics, each a typed return.

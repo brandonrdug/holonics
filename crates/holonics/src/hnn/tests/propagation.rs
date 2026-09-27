@@ -947,9 +947,9 @@ fn termwise_inertia(
 #[test]
 fn the_integral_chart_equals_the_termwise_arithmetic() {
     use crate::hnn::moment::SourceMoment;
-    use crate::hnn::receiving::GrainCell;
     use crate::ratio::linear::inertia::{PivotOrder, SymmetricForm, inertia_with_schedule};
     use crate::ratio::linear::vector::{IntegralMatrix, combination, integral};
+    use crate::receiver::face::GrainCell;
     let mut draw = Draw::new(97);
     for n in [1usize, 3, 6] {
         let (a, b, v) = (

@@ -15,8 +15,8 @@ use super::support::Draw;
 use crate::hnn::HnnError;
 use crate::hnn::field::{Current, Field};
 use crate::hnn::moment::{SourceMoment, capacity};
-use crate::hnn::receiving::GrainCell;
 use crate::ratio::{Rat, rat};
+use crate::receiver::face::GrainCell;
 
 /// Guard 1: the moment is sized once from the field, and ingest never grows it (on the chain
 /// control: ring 0's two phases, each `|A|` phase counts and `|A|²` offset counts, and the offset

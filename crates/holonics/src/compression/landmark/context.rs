@@ -29,9 +29,15 @@
 //!   is the node law's run of its epoch history, whose total never passes the epoch index
 //!   (`node_register_on_epochs`, `capped_register_on_epochs`).
 //!
-//! [definition; agent-inferred] The tree reads its refusals ([`HnnError`]), the contact letters
-//! (`hnn::contact`), the grain exponent (`hnn::receiving::grain_exponent`) and the cut and its
-//! baselines (`hnn::reference`) from the HNN it serves; its law depends on none of them.
+//! [definition; agent-inferred] **The tree depends on library owners only.** Its refusals are its
+//! own ([`ContextError`]); its enclosures and their grid are `ratio::algebraic`'s
+//! ([`LOG_OCTAVES`], `interval_sum`); a face's grain exponent is the receiver's face read at the
+//! grain (`receiver::face::grain_exponent`); its letters are addresses over a declared family of
+//! slot alphabets ([`LetterFamily`]), whose readers are the HNN's (`hnn::receiving::Feature`: a
+//! ring's phase class, a contact's reading); its online baselines are codes of fixed context order
+//! ([`baseline`]). The HNN reads the tree: it builds the addresses it passes in, runs a window's
+//! phases together on its cores (`hnn::receiving::window_faces`), and measures the tree
+//! prequentially on the exposure's cut (`hnn::reference::prequential`).
 //!
 //! [definition; Brandon, September 25; the tree's form agent-inferred] **The receiving face
 //! compresses landmarks.** Brandon: the compression "is of landmarks connecting generators … when
@@ -89,7 +95,8 @@
 //! its parent, `0` for the boundary and `1 + value` otherwise.
 //!
 //! [definition; agent-inferred] **The declared family and its finite partitions** ([`LetterFamily`],
-//! [`Feature`]), each derived from a declaration, never a literal:
+//! the slots' alphabets; the HNN's readers of them, `hnn::receiving::{Feature, FeatureFamily}`),
+//! each derived from a declaration, never a literal:
 //! - a ring's **phase class** `⌊g·phase⌋ mod g` at the ring's declared grain `g` (its period `d_g`,
 //!   the ring's own port chart, where the fibre is empty; or `g = 2`, the half of the rotor's cycle
 //!   its clock phase `λ_g/d_g` is in), `g ≥ 2` letters (Lean `phase_partition_finite`). The grain-2
@@ -318,8 +325,9 @@
 //! certificates: 48 bytes a node (the depth word, the label end, the masses and the chart's `β` and
 //! `λ̂`), a 12-byte table slot at twice the nodes, and 4 bytes a label letter.
 //!
-//! [definition; agent-inferred] **A window in cell order** ([`Landmarks::window_faces`], prequential scoring
-//! within a window; consumed by `hnn::receiving::ReceivingPhases::tree_faces`). A receiving window
+//! [definition; agent-inferred] **A window in cell order** ([`Landmarks::window`], [`Window`],
+//! prequential scoring within a window; run on the host's cores by `hnn::receiving::window_faces`
+//! and consumed by `hnn::receiving::ReceivingPhases::tree_faces`). A receiving window
 //! compares `A` cells at once, and phase `j` reads the tree at the standing after the window's
 //! earlier phases' deposits: their targets are known at compare, so those deposits are applied, in
 //! cell order, to a working overlay (`Working`). The nodes and joins a deposit writes are copied
@@ -454,38 +462,40 @@
 //! falls with `c` through the declared family's edge.
 //!
 //! [definition; agent-inferred] **The depth, the family and the prior** are chosen on the development
-//! cells only ([`choose_depth`], [`choose_prior`]): `D` increases from `max(1, forced)` while the
+//! cells only (the exposure's measurement, `hnn::reference::{choose_depth, choose_prior}`): `D` increases from `max(1, forced)` while the
 //! development prequential code length decreases strictly (disjoint exact enclosures), every `D`
 //! tried is reported, and `⌈log₂⌉` of the family tried is charged as description bits; each stop
 //! prior of the declared family ([`prior_family`]: the global ladder `j = 1, …, J`, then the
 //! per-depth pairs `(j_root, j_below)`, `J = ⌈log₂(n* B)⌉`, [`ladder_top`]) runs its own depth sweep,
 //! and the choice is charged `⌈log₂⌉` of the laws tried. The held-out cells never choose anything.
-//! [agent-inferred] A declared deepest depth bounds the depth sweep ([`choose_depth_within`];
+//! [agent-inferred] A declared deepest depth bounds the depth sweep (`choose_depth_within`;
 //! the wide cut): the resident memory cap bounded the retired full arena's a-priori founded nodes
 //! `n* B D + 2^B − 1`, and so its depth at a population; stored where paths part, `2 n* B` nodes
 //! bound no depth (stored where paths part), and the carriers' widths are its only limit.
 //!
 //! [definition; agent-inferred, from the retention and deposition laws] **The measurement is
-//! prequential** ([`prequential`], prequential scoring): every cell is scored at the current standing
+//! prequential** (`hnn::reference::prequential` on the exposure's cut): every cell is scored at the current standing
 //! before its own deposit, then deposited, for the tree and the online baselines alike. The tree's
 //! faces and the oracle's are read by [`code_length`], `log₂ d − log₂ n` of `q = n/d` by the
 //! certified binary logarithm ([`binary_log`]) within the enclosure grid `2^(−O)`; the baselines
-//! read their own faces through `hnn::reference`. Both are certified enclosures of `−log₂ q`, and
+//! read their own faces ([`baseline`]). Both are certified enclosures of `−log₂ q`, and
 //! every ordering is decided by disjoint enclosures. [agent-inferred] A population's code is its
 //! faces' product, enclosed once ([`PassageCode`]: exact integer bounds of the product, kept at
 //! 127 significant bits and rounded outward, then one certified logarithm), not the sum of the
 //! cells' enclosures: on the wide cut's development cells (`917,504 = 2^17·7`) the `D = 1` tree's
 //! run with the per-cell sum took 29,902 ms, of which its passage 3,137 ms (the wide cut).
 //!
-//! [definition; agent-inferred] **The host realization** (the hardware law). Within
-//! [`prequential`] the tree and the baselines run together: each reads the shared immutable cut
-//! and writes only its own state and sums, so their effects commute and every value is the serial
-//! one. Within one tree the cells stay serial: they share mutable counts along their paths.
+//! [definition; agent-inferred] **The host realization** (the hardware law) is the reader's: which
+//! regions run together is recorded where they are run (`hnn::reference`'s header). Within the
+//! prequential measurement the tree and the baselines run together, each reading the shared
+//! immutable cut and writing only its own state and sums; a window's phases read their own
+//! overlays together. Within one tree the cells stay serial: they share mutable counts along their
+//! paths.
 //!
 //! | Law | Lean | Rust |
 //! |---|---|---|
 //! | the typed suffix address; an unfounded node reads the prior, and founding at first arrival keeps the law | `Compression/Landmark/Context/Tree.{unfounded_reads_prior, founded_tree_same_law}` | [`Letter`], [`address`], [`Landmarks::deposit`] |
-//! | the bundle: causal, restricted by whole bundles, its code injective, its partitions finite | `Compression/Landmark/Context/Address.{bundle_causal, bundle_restrict, feature_scale_square, bundle_code_injective, phase_partition_finite, lock_partition_finite}` | [`Bundle`], [`LetterFamily`], [`Feature`] (the contact slot's letter is `hnn::contact::ContactReading::letter`), [`letter_address`] |
+//! | the bundle: causal, restricted by whole bundles, its code injective, its partitions finite | `Compression/Landmark/Context/Address.{bundle_causal, bundle_restrict, feature_scale_square, bundle_code_injective, phase_partition_finite, lock_partition_finite}` | [`Bundle`], [`LetterFamily`] (the slots' readers are `hnn::receiving::Feature`; the contact slot's letter is `hnn::contact::ContactReading::letter`), [`letter_address`] |
 //! | the enlarged tree keeps the cell-only branch | `Compression/Landmark/Context/Address.cell_only_dominance_with_feature_charge` | the join (`Law::digit`), [`Landmarks::face_rule`] |
 //! | the path face is positive and normalized for any `λ ∈ [0, 1]`; on the lattice too | `Compression/Landmark/Context/Tree.{path_face_normalized, lattice_path_laws}` | [`Landmarks::face`], [`Landmarks::probability`] |
 //! | the lattice path's floor, its deviation adding down the path, and the executed face's bound with the address residual | `Compression/Landmark/Context/Tree.{lattice_path_floor, lattice_path_deviation, executed_face_bound}` | [`face_bits`], [`CellReading::residual`] |
@@ -497,10 +507,10 @@
 //! | a digit face's floor and the rounding's residual (the first-order bound fails downward) | `Compression/Landmark/Context/Tree.{digit_face_ge, digit_log_residual, host_digit_bound_fails_downward}` | [`Landmarks::face_rule`] |
 //! | the ideal tree weighting (the oracle) | `Compression/Landmark/Context/Tree.{landmark_step, mixture_is_probability, kraft_and_dominance, sequential_mixture}` | [`IdealLandmarks`] |
 //! | the declared stop prior: the mixture over pruned trees with its prior, the weights summing to one, the dominance, the founding at `β₀ = 2^(j_d) − 1` and the step unchanged; `½` the corollary | `Compression/Landmark/Context/Tree.{stop_mixture_over_trees, PrunedTree.prior_const, PrunedTree.prior_sum, stop_kraft_and_dominance, stop_weight_step, stop_ratio_step, stop_founding_step, ladder_founding, stopWeight_half}` | [`StopPrior`], [`LandmarkDeclaration::prior`], the founding charts (`Law::founding`, [`ArenaView::founding`]), [`IdealLandmarks`] |
-//! | the prior chosen on the development cells, charged `⌈log₂⌉` of the laws and of each law's depths | (a measurement, not a theorem) | [`ladder_top`], [`prior_family`], [`choose_prior`], [`choose_depth_within`], [`PriorSweep`] |
+//! | the prior chosen on the development cells, charged `⌈log₂⌉` of the laws and of each law's depths | (a measurement, not a theorem) | [`ladder_top`], [`prior_family`]; the sweeps are the exposure's (`hnn::reference::{choose_prior, choose_depth_within, PriorSweep}`) |
 //! | a population's code is its faces' product, enclosed once | (a certified reading: integer bounds and the certified logarithm) | [`PassageCode`], [`ProductBound`] |
 //! | the stop-weight mixture per digit tree: the mixture over (law, pruned tree), its prior complete, within `−log₂ π_k − log₂ prior_(w_k)(S)`; the joins telescope to the Bayesian mixture, the executed chart's drift once | `Compression/Landmark/Context/LocalWeighing.{stop_mixture_per_tree, static_mixture, forward_executed}` | [`StopMixture`], [`JoinTree`], [`FaceJoins`] |
-//! | a window's phases in cell order: each reads the standing after the earlier phases' deposits | `Compression/Landmark/Context/Tree.{landmark_step, treeWeight_arrive_off}` | [`Landmarks::window_faces`] |
+//! | a window's phases in cell order: each reads the standing after the earlier phases' deposits | `Compression/Landmark/Context/Tree.{landmark_step, treeWeight_arrive_off}` | [`Landmarks::window`], [`Window`] |
 //! | founding where paths converge (second-arrival founding, measured and retired): the stopped path normalized under any stopping rule decided before the digit (a complete code); the tree with absent children, its Kraft form and dominance; the stopped step (`β` still at the stop); the second arrival opening with the first count; the first-arrival tree its case | `Compression/Landmark/Context/ConvergenceFounding.{stopping_rule_normalized, prequential_code_complete, conv_mixture_over_trees, conv_kraft_and_dominance, conv_weight_step, conv_ratio_step, second_arrival_opens_with_the_first_count, convergence_step, convergence_is_probability, first_arrival_is_the_full_tree}` | retired (its realization is at commit `d137e8a6`; the development cells kept the first arrival) |
 //! | a landmark's storage has a capacity: the tree weighting over any node law whose state is a function of the arrivals reaching the node (its Kraft form, dominance, step and prequential code), the compacted tree for that law, and the capped register as an instance (positive, normalized, the carry lowering the register and keeping each reached symbol, KT below its ceiling, `c = ∞` KT) | `Compression/Landmark/Context/Tree.{NodeLaw, own_mixture_over_trees, own_kraft_and_dominance, own_weight_step₀, law_standing_is_routed, ktLaw_standing}`; `Compression/Landmark/Context/Compaction.{MassRouted, own_weight_prequential, compacted_node_law}`; `Compression/Landmark/Context/Capacity.{capLaw, cap_face_pos, cap_face_sum, cap_carry_laws, cap_carry_half_units, cap_run_total_le, cap_unbounded_is_kt, cap_below_ceiling_is_kt, capped_tree_laws}` | [`Capacity`], [`Capacity::carry`], [`LandmarkDeclaration::capacity`], `Law::apply_branch`, [`IdealLandmarks`] |
 //! | stored where paths part: a chain with its bottom is one node at the summed rung (`1 − ρ_top = 2^(−S)(1 − ρ_bottom)`, founded at `2^S − 1`), a chain to `D` one KT node, the split's two ratios, the landmark tree's face exactly, at most `2n − 1` nodes a tree | `Compression/Landmark/Context/Compaction.{chain_ratio, chain_ratio_dyadic, leaf_chain_is_one_node, chain_split, compacted_is_the_full_tree, compacted_node_bound}` | [`Landmarks`], [`LandmarkDeclaration::rung_sums`], the split ([`Beta::split`], `Law::part`, `Law::chain`), [`Landmarks::face_rule`], [`Landmarks::tree_sizes`], [`IdealLandmarks`] |
@@ -516,16 +526,43 @@ use std::collections::HashMap;
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
 
+use thiserror::Error;
+
 use crate::compression::cost::ceil_log2;
-use crate::hnn::HnnError;
-use crate::hnn::contact::{ContactReading, LockDeclaration};
-use crate::hnn::field::Field;
-use crate::hnn::ratio::{LOG_OCTAVES, interval_sum};
-use crate::hnn::realization::indexed;
-use crate::hnn::receiving::grain_exponent;
-use crate::hnn::reference::{BaselineCodes, Baselines, Cut};
 use crate::ratio::Rat;
-use crate::ratio::algebraic::ExactInterval;
+use crate::ratio::algebraic::{ExactInterval, ExactValueError, LOG_OCTAVES, interval_sum};
+use crate::receiver::face::{GrainRefusal, grain_exponent};
+
+pub mod baseline;
+
+// -------------------------------------------------------------------------------------------
+// the refusals
+
+/// [definition] **Every refusal of the context tree**: an extent that does not match its
+/// declaration, a cell outside the exterior chart, a declaration that is not positive, a passage
+/// past the declared population, an enclosure's, and the grain read's. Bad input is a typed
+/// return, never a panic; a reader (the HNN, `hnn::HnnError::Context`) converts at its boundary.
+#[derive(Clone, Debug, Error, PartialEq, Eq)]
+pub enum ContextError {
+    #[error("{what}: expected {expected}, found {found}")]
+    Extent {
+        what: &'static str,
+        expected: usize,
+        found: usize,
+    },
+    #[error("cell code {code} lies outside the exterior chart of {alphabet}")]
+    CellOutside { code: usize, alphabet: usize },
+    #[error("the tree's declared population and grain must be positive")]
+    NonpositiveDeclaration,
+    #[error(
+        "the landmark tree's declared population n* = {population} is passed; its chart's certificates hold only within it"
+    )]
+    PopulationReached { population: u64 },
+    #[error(transparent)]
+    Exact(#[from] ExactValueError),
+    #[error(transparent)]
+    Grain(#[from] GrainRefusal),
+}
 
 // -------------------------------------------------------------------------------------------
 // letters, bundles and the declared family
@@ -565,55 +602,13 @@ impl Letter {
     }
 }
 
-/// [definition] **One declared feature slot of a bundle**.
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
-pub enum Feature {
-    /// Ring `ring`'s phase class `⌊g·phase⌋ mod g` at its declared grain `g`.
-    Phase { ring: usize, grain: u64 },
-    /// Contact `contact`'s reading (`hnn::contact::ContactReading`): its lock address in the lock
-    /// family at its derived bound `(P, Q)`, and its site kind.
-    Contact {
-        contact: usize,
-        bound: LockDeclaration,
-    },
-}
-
-impl Feature {
-    /// **A contact's letter**, its bound derived from the field (`LockDeclaration::derived`: `Q`
-    /// the greatest denominator whose first return, `q` turns of the contact's second ring, Lean
-    /// `Aeon/Clock/Lock.cycle_iff_period_dvd`, is observable within the aeon, and `P` the first
-    /// ring's alike; Lean `Compression/Landmark/Context/Address.lock_partition_finite`), never a literal.
-    pub fn contact(field: &Field, contact: usize) -> Self {
-        Feature::Contact {
-            contact,
-            bound: LockDeclaration::derived(field, contact),
-        }
-    }
-
-    /// **The slot's finite alphabet**: `g` phase classes, or the contact's letters (its lock
-    /// family's letters times the five site kinds, `hnn::contact::ContactReading::letters`).
-    pub fn size(&self) -> Result<u64, HnnError> {
-        match self {
-            Feature::Phase { grain, .. } => Ok(*grain),
-            Feature::Contact { bound, .. } => ContactReading::letters(bound),
-        }
-    }
-
-    /// A contact reading's value in this slot (`hnn::contact::ContactReading::letter`).
-    pub fn contact_value(&self, reading: &ContactReading) -> Result<u64, HnnError> {
-        match self {
-            Feature::Contact { bound, .. } => reading.letter(bound),
-            Feature::Phase { .. } => Err(shape("a contact slot for a contact reading", 1, 0)),
-        }
-    }
-}
-
-/// [definition] **The declared letter family**: the feature slots each bundle carries after its
-/// cell, in order. The empty family is the cell-only tree (campaign 1).
+/// [definition] **The declared letter family**: each bundle slot's finite alphabet `s_i`, in order,
+/// the slots each bundle carries after its cell. The empty family is the cell-only tree
+/// (campaign 1). The tree reads only the alphabets; what a slot's letter reads is its reader's (in
+/// the HNN, a ring's phase class or a contact's reading, `hnn::receiving::Feature`, whose
+/// `FeatureFamily` builds this family from its features' alphabets).
 #[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct LetterFamily {
-    features: Vec<Feature>,
-    /// Each slot's alphabet `s_i`, read once at the declaration.
     sizes: Vec<u64>,
 }
 
@@ -623,13 +618,11 @@ impl LetterFamily {
         Self::default()
     }
 
-    /// **Declare a family**, refused at a slot of fewer than two letters (one letter carries
-    /// nothing, module header) or when the slots' product passes 32 bits.
-    pub fn new(features: Vec<Feature>) -> Result<Self, HnnError> {
+    /// **Declare a family of slot alphabets**, refused at a slot of fewer than two letters (one
+    /// letter carries nothing, module header) or when the slots' product passes 32 bits.
+    pub fn new(sizes: Vec<u64>) -> Result<Self, ContextError> {
         let mut product = 1u64;
-        let mut sizes = Vec::with_capacity(features.len());
-        for feature in &features {
-            let size = feature.size()?;
+        for &size in &sizes {
             if size < 2 {
                 return Err(shape(
                     "a feature slot of at least two letters (one letter carries nothing)",
@@ -645,25 +638,18 @@ impl LetterFamily {
                     usize::try_from(product).unwrap_or(usize::MAX),
                 ));
             }
-            sizes.push(size);
         }
-        Ok(Self { features, sizes })
+        Ok(Self { sizes })
     }
 
     /// [definition; agent-inferred] **The constant-slot control of `slots` slots** (module header):
-    /// each slot reads one letter at every tick (ring 0's phase class at grain 1), so the family
-    /// carries no information and its code length against the cell-only tree is the enlarged tree's
-    /// own reweighting. A development harness's control, never a declared family ([`Self::new`]
-    /// refuses a slot of one letter), and never charged.
+    /// each slot holds one letter, so the family carries no information and its code length against
+    /// the cell-only tree is the enlarged tree's own reweighting. A development harness's control,
+    /// never a declared family ([`Self::new`] refuses a slot of one letter), and never charged.
     pub fn constant_control(slots: usize) -> Self {
         Self {
-            features: vec![Feature::Phase { ring: 0, grain: 1 }; slots],
             sizes: vec![1; slots],
         }
-    }
-
-    pub fn features(&self) -> &[Feature] {
-        &self.features
     }
 
     /// Each slot's alphabet `s_i`.
@@ -673,18 +659,11 @@ impl LetterFamily {
 
     /// `r`, the feature slots.
     pub fn slots(&self) -> usize {
-        self.features.len()
+        self.sizes.len()
     }
 
     pub fn is_empty(&self) -> bool {
-        self.features.is_empty()
-    }
-
-    /// Whether a slot reads a contact (its readings need the constitution's site kinds).
-    pub fn reads_contacts(&self) -> bool {
-        self.features
-            .iter()
-            .any(|feature| matches!(feature, Feature::Contact { .. }))
+        self.sizes.is_empty()
     }
 
     /// `Π_i s_i`, the features' codes.
@@ -693,11 +672,11 @@ impl LetterFamily {
     }
 
     /// **The features' mixed-radix code** `Σ_i v_i Π_(k<i) s_k`, refused at a value outside its slot.
-    pub fn encode(&self, values: &[u64]) -> Result<u32, HnnError> {
-        if values.len() != self.features.len() {
+    pub fn encode(&self, values: &[u64]) -> Result<u32, ContextError> {
+        if values.len() != self.sizes.len() {
             return Err(shape(
                 "one value per feature slot",
-                self.features.len(),
+                self.sizes.len(),
                 values.len(),
             ));
         }
@@ -816,13 +795,13 @@ impl StopPrior {
     }
 
     /// **The global law at rung `j`**, refused outside `1..=63`.
-    pub fn global(rung: u32) -> Result<Self, HnnError> {
+    pub fn global(rung: u32) -> Result<Self, ContextError> {
         Self::per_depth(vec![rung])
     }
 
     /// **A per-depth law**: rung `j_d` at depth `d`, the last rung at every depth past the list;
     /// refused when empty or at a rung outside `1..=63` (`β₀ = 2^j − 1` fits a word).
-    pub fn per_depth(mut rungs: Vec<u32>) -> Result<Self, HnnError> {
+    pub fn per_depth(mut rungs: Vec<u32>) -> Result<Self, ContextError> {
         if rungs.is_empty() {
             return Err(shape("a stop prior of at least one rung", 1, 0));
         }
@@ -1232,7 +1211,7 @@ impl Widths {
 }
 
 /// `log₂ e < 3/2`, the constant of the certified residual (`ln 2 > 2/3`).
-fn log2_e_bound() -> Rat {
+pub(crate) fn log2_e_bound() -> Rat {
     Rat::new(BigInt::from(3), BigInt::from(2))
 }
 
@@ -1333,8 +1312,8 @@ fn odd_gcd(mut a: u128, mut b: u128) -> u128 {
     a
 }
 
-fn shape(what: &'static str, expected: usize, found: usize) -> HnnError {
-    HnnError::Shape {
+fn shape(what: &'static str, expected: usize, found: usize) -> ContextError {
+    ContextError::Extent {
         what,
         expected,
         found,
@@ -1747,7 +1726,7 @@ trait Topology {
 
     /// Refused when founding `nodes` more would pass 31-bit node numbers, or holding `letters` more
     /// would pass a 32-bit label pool.
-    fn founded_within(&self, nodes: usize, letters: usize) -> Result<(), HnnError> {
+    fn founded_within(&self, nodes: usize, letters: usize) -> Result<(), ContextError> {
         if self.len() + nodes >= BRANCH_BIT as usize {
             return Err(shape(
                 "a landmark arena within 31-bit node numbers",
@@ -2181,7 +2160,7 @@ fn check(
     declaration: &LandmarkDeclaration,
     address: &[Letter],
     class: usize,
-) -> Result<(), HnnError> {
+) -> Result<(), ContextError> {
     if address.len() != declaration.depth {
         return Err(shape(
             "an address of the declared depth",
@@ -2191,7 +2170,7 @@ fn check(
     }
     let alphabet = declaration.alphabet;
     if class >= alphabet {
-        return Err(HnnError::CellOutside {
+        return Err(ContextError::CellOutside {
             code: class,
             alphabet,
         });
@@ -2201,7 +2180,7 @@ fn check(
         match *letter {
             Letter::Boundary => {}
             Letter::Cell(code) | Letter::Bundle(Bundle { cell: code, .. }) if code >= alphabet => {
-                return Err(HnnError::CellOutside { code, alphabet });
+                return Err(ContextError::CellOutside { code, alphabet });
             }
             Letter::Cell(_) if !family.is_empty() => {
                 return Err(shape(
@@ -2225,7 +2204,7 @@ fn check(
     Ok(())
 }
 
-fn check_declaration(declaration: &LandmarkDeclaration) -> Result<(), HnnError> {
+fn check_declaration(declaration: &LandmarkDeclaration) -> Result<(), ContextError> {
     if declaration.alphabet < 2 || declaration.alphabet >= u32::MAX as usize / 2 {
         return Err(shape(
             "a landmark tree over at least two classes, within 31 bits",
@@ -2234,7 +2213,7 @@ fn check_declaration(declaration: &LandmarkDeclaration) -> Result<(), HnnError> 
         ));
     }
     if declaration.population == 0 || declaration.grain == 0 {
-        return Err(HnnError::NonpositiveDeclaration);
+        return Err(ContextError::NonpositiveDeclaration);
     }
     if declaration.population >= u64::from(u32::MAX / 2) || declaration.grain > u64::from(u32::MAX)
     {
@@ -2357,7 +2336,7 @@ impl LandmarkFace {
         declaration: &LandmarkDeclaration,
         splits: &Splits,
         grain: u64,
-    ) -> Result<Self, HnnError> {
+    ) -> Result<Self, ContextError> {
         let odometer = Odometer {
             alphabet: declaration.alphabet,
             digits: odometer_digits(declaration.alphabet),
@@ -2416,19 +2395,6 @@ impl LandmarkFace {
             exponents,
         })
     }
-}
-
-/// **The class faces of a window's splits** ([`LandmarkFace::of_splits`] per phase): the phases
-/// read alone and run together (`hnn::realization`: each reads its own splits and writes its own
-/// face).
-pub fn faces_of_splits(
-    declaration: &LandmarkDeclaration,
-    splits: &[Splits],
-    grain: u64,
-) -> Result<Vec<LandmarkFace>, HnnError> {
-    indexed(splits.len(), |j| {
-        LandmarkFace::of_splits(declaration, &splits[j], grain)
-    })
 }
 
 /// The executed chart of one node or join: its carried β, the cached stop weight `λ̂` (a numerator
@@ -3019,7 +2985,7 @@ impl Law {
         nodes: &impl Standing,
         address: &[Letter],
         grain: u64,
-    ) -> Result<LandmarkFace, HnnError> {
+    ) -> Result<LandmarkFace, ContextError> {
         LandmarkFace::of_splits(&self.declaration, &self.splits(nodes, address), grain)
     }
 
@@ -3191,9 +3157,9 @@ impl Law {
         address: &[Letter],
         digits: Vec<DigitRead>,
         admitted: u64,
-    ) -> Result<Vec<u128>, HnnError> {
+    ) -> Result<Vec<u128>, ContextError> {
         if nodes.passed() >= admitted {
-            return Err(HnnError::PopulationReached {
+            return Err(ContextError::PopulationReached {
                 population: self.declaration.population,
             });
         }
@@ -3270,7 +3236,7 @@ impl Landmarks {
     /// grain past 32 bits, a forced depth past the address depth, derived widths whose products
     /// exceed `u128` (module header, "The carrier rebases past `u128`"), or a stop prior's rung at a
     /// mixing depth past the carrier `W` (its founding ratio `2^j − 1` would not be carried exactly).
-    pub fn new(declaration: LandmarkDeclaration) -> Result<Self, HnnError> {
+    pub fn new(declaration: LandmarkDeclaration) -> Result<Self, ContextError> {
         check_declaration(&declaration)?;
         let widths = Widths::derived(&declaration);
         Self::with_widths(declaration, widths)
@@ -3279,13 +3245,16 @@ impl Landmarks {
     /// **Declare a tree at a declared carrier width `W`** in place of the rule's. A width below the
     /// rule's gives up the rule's place below the grain ([`Landmarks::face_rule`] reports it); the
     /// executed face stays exactly normalized and every certificate stays valid.
-    pub fn with_carrier(declaration: LandmarkDeclaration, carrier: u64) -> Result<Self, HnnError> {
+    pub fn with_carrier(
+        declaration: LandmarkDeclaration,
+        carrier: u64,
+    ) -> Result<Self, ContextError> {
         check_declaration(&declaration)?;
         let widths = Widths::with_carrier(&declaration, carrier);
         Self::with_widths(declaration, widths)
     }
 
-    fn with_widths(declaration: LandmarkDeclaration, widths: Widths) -> Result<Self, HnnError> {
+    fn with_widths(declaration: LandmarkDeclaration, widths: Widths) -> Result<Self, ContextError> {
         let operands = widths.operand_bits(declaration.population);
         if !(2..=63).contains(&widths.carrier)
             || widths.face > 62
@@ -3508,13 +3477,13 @@ impl Landmarks {
     }
 
     /// **The executed face of one class** at an address, exact.
-    pub fn probability(&self, address: &[Letter], class: usize) -> Result<Rat, HnnError> {
+    pub fn probability(&self, address: &[Letter], class: usize) -> Result<Rat, ContextError> {
         Ok(self.score(address, class)?.executed)
     }
 
     /// **Score one class** at an address at the current standing: its executed face and its
     /// certified residual, with nothing deposited.
-    pub fn score(&self, address: &[Letter], class: usize) -> Result<CellReading, HnnError> {
+    pub fn score(&self, address: &[Letter], class: usize) -> Result<CellReading, ContextError> {
         check(&self.law.declaration, address, class)?;
         let reads = self.law.reads(&self.nodes, address, class);
         Ok(self.law.reading(&self.nodes, &reads))
@@ -3522,7 +3491,11 @@ impl Landmarks {
 
     /// **The opened paths of one class** at an address, with their executed lattice faces: per
     /// opened digit, each branch's path.
-    pub fn opened(&self, address: &[Letter], class: usize) -> Result<Vec<OpenedPath>, HnnError> {
+    pub fn opened(
+        &self,
+        address: &[Letter],
+        class: usize,
+    ) -> Result<Vec<OpenedPath>, ContextError> {
         check(&self.law.declaration, address, class)?;
         let law = &self.law;
         let scale = BigInt::one() << law.widths.face as usize;
@@ -3561,43 +3534,32 @@ impl Landmarks {
 
     /// **The splits at an address** (module header, "Faces"): each splitting dyadic cell's
     /// executed digit-0 numerator, heap-ordered.
-    pub fn splits(&self, address: &[Letter]) -> Result<Splits, HnnError> {
+    pub fn splits(&self, address: &[Letter]) -> Result<Splits, ContextError> {
         check(&self.law.declaration, address, 0)?;
         Ok(self.law.splits(&self.nodes, address))
     }
 
     /// **All classes' executed faces at an address**, with their grain exponents at `grain`
     /// (module header, "Faces").
-    pub fn face(&self, address: &[Letter], grain: u64) -> Result<LandmarkFace, HnnError> {
+    pub fn face(&self, address: &[Letter], grain: u64) -> Result<LandmarkFace, ContextError> {
         check(&self.law.declaration, address, 0)?;
         self.law.face(&self.nodes, address, grain)
     }
 
-    /// [definition; agent-inferred] **A window's faces in cell order** (module header, "A window
-    /// in cell order"; prequential scoring within a window): phase `j`'s all-class face at `addresses[j]`,
-    /// read at the standing after the deposits of the phases before it whose classes are known
-    /// (`known[i]` at `addresses[i]`, `i < j`), each on a working overlay of the nodes those
-    /// deposits wrote; the tree itself is unchanged. With nothing known every phase reads the
-    /// current standing. The overlays are built in cell order, then the phases read together
-    /// (`hnn::realization`: each reads its own overlay, and nothing is written). Refused at an
+    /// [definition; agent-inferred] **A window's standings in cell order** (module header, "A
+    /// window in cell order"; prequential scoring within a window): phase `j` reads the tree at
+    /// `addresses[j]` at the standing after the deposits of the phases before it whose classes are
+    /// known (`known[i]` at `addresses[i]`, `i < j`), each on a working overlay of the nodes those
+    /// deposits wrote, built here in cell order; the tree itself is unchanged. With nothing known
+    /// every phase reads the current standing. Each phase's read ([`Window::splits`],
+    /// [`Window::face`]) reads its own overlay and writes nothing, so a reader may run the phases
+    /// together (the HNN's host realization does, `hnn::receiving::window_faces`). Refused at an
     /// address or class outside the declaration.
-    pub fn window_faces(
-        &self,
-        addresses: &[Vec<Letter>],
+    pub fn window<'a>(
+        &'a self,
+        addresses: &'a [Vec<Letter>],
         known: &[usize],
-        grain: u64,
-    ) -> Result<Vec<LandmarkFace>, HnnError> {
-        let splits = self.window_splits(addresses, known)?;
-        faces_of_splits(&self.law.declaration, &splits, grain)
-    }
-
-    /// **A window's splits in cell order**: [`Landmarks::window_faces`]'s reads, each phase's
-    /// splits alone (the quantity the card's read returns).
-    pub fn window_splits(
-        &self,
-        addresses: &[Vec<Letter>],
-        known: &[usize],
-    ) -> Result<Vec<Splits>, HnnError> {
+    ) -> Result<Window<'a>, ContextError> {
         let law = &self.law;
         for address in addresses {
             check(&law.declaration, address, 0)?;
@@ -3614,11 +3576,11 @@ impl Landmarks {
             law.apply(&mut working, address, reads, admitted)?;
             standings.push(working.clone());
         }
-        indexed(addresses.len(), |j| {
-            Ok::<_, HnnError>(match j.min(deposits).checked_sub(1) {
-                Some(index) => law.splits(&standings[index], &addresses[j]),
-                None => law.splits(&self.nodes, &addresses[j]),
-            })
+        Ok(Window {
+            law,
+            nodes: &self.nodes,
+            addresses,
+            standings,
         })
     }
 
@@ -3642,7 +3604,7 @@ impl Landmarks {
     /// chain the address parts from splits (stored where paths part) and the arrival founds its leaf, then each
     /// node's mass of the digit grows, and each join's β steps. Refused before anything moves at a
     /// bad address or class, or past the declared population.
-    pub fn deposit(&mut self, address: &[Letter], class: usize) -> Result<(), HnnError> {
+    pub fn deposit(&mut self, address: &[Letter], class: usize) -> Result<(), ContextError> {
         check(&self.law.declaration, address, class)?;
         let reads = self.law.reads(&self.nodes, address, class);
         let population = self.law.declaration.population;
@@ -3652,7 +3614,11 @@ impl Landmarks {
     }
 
     /// **Receive one cell**: score it at the current standing, then deposit it.
-    pub fn receive(&mut self, address: &[Letter], class: usize) -> Result<CellReading, HnnError> {
+    pub fn receive(
+        &mut self,
+        address: &[Letter],
+        class: usize,
+    ) -> Result<CellReading, ContextError> {
         Ok(self.receive_digits(address, class)?.reading)
     }
 
@@ -3663,7 +3629,7 @@ impl Landmarks {
         &mut self,
         address: &[Letter],
         class: usize,
-    ) -> Result<DigitsReading, HnnError> {
+    ) -> Result<DigitsReading, ContextError> {
         check(&self.law.declaration, address, class)?;
         let reads = self.law.reads(&self.nodes, address, class);
         let reading = self.law.reading(&self.nodes, &reads);
@@ -3701,7 +3667,7 @@ impl Landmarks {
         &self,
         address: &[Letter],
         class: usize,
-    ) -> Result<(Vec<u32>, Vec<usize>), HnnError> {
+    ) -> Result<(Vec<u32>, Vec<usize>), ContextError> {
         check(&self.law.declaration, address, class)?;
         let (mut nodes, mut dyadic) = (Vec::new(), Vec::new());
         for digit in self.law.reads(&self.nodes, address, class) {
@@ -3723,6 +3689,39 @@ impl Landmarks {
     /// and each join's.
     pub fn arena(&self) -> ArenaView<'_> {
         ArenaView { tree: self }
+    }
+}
+
+/// [definition; agent-inferred] **A window's standings in cell order** ([`Landmarks::window`]):
+/// the window's addresses, and for each phase after the first whose predecessors' classes are
+/// known, the working overlay of their deposits over the published tree, which is never written.
+pub struct Window<'a> {
+    law: &'a Law,
+    nodes: &'a Nodes,
+    addresses: &'a [Vec<Letter>],
+    standings: Vec<Working<'a>>,
+}
+
+impl Window<'_> {
+    /// The window's phases.
+    pub fn phases(&self) -> usize {
+        self.addresses.len()
+    }
+
+    /// **Phase `j`'s splits** (the quantity a card's read returns), at the standing after the
+    /// window's earlier known phases' deposits.
+    pub fn splits(&self, phase: usize) -> Splits {
+        match phase.min(self.standings.len()).checked_sub(1) {
+            Some(index) => self
+                .law
+                .splits(&self.standings[index], &self.addresses[phase]),
+            None => self.law.splits(self.nodes, &self.addresses[phase]),
+        }
+    }
+
+    /// **Phase `j`'s all-class face** at `grain`, from its splits ([`LandmarkFace::of_splits`]).
+    pub fn face(&self, phase: usize, grain: u64) -> Result<LandmarkFace, ContextError> {
+        LandmarkFace::of_splits(&self.law.declaration, &self.splits(phase), grain)
     }
 }
 
@@ -3980,10 +3979,14 @@ fn dyadic_grain_exponent(
     numerator: &BigUint,
     exponent: u64,
     grain: u64,
-) -> Result<BigInt, HnnError> {
+) -> Result<BigInt, ContextError> {
     match grain_floor(numerator, grain) {
         Some(floor) => Ok(floor - BigInt::from(grain) * BigInt::from(exponent)),
-        None => grain_exponent(numerator, &(BigUint::one() << exponent as usize), grain),
+        None => Ok(grain_exponent(
+            numerator,
+            &(BigUint::one() << exponent as usize),
+            grain,
+        )?),
     }
 }
 
@@ -4043,7 +4046,7 @@ struct IdealDigit {
 
 impl IdealLandmarks {
     /// **Declare the oracle**, empty, with `β` exact (`width = None`) or carried at a width.
-    pub fn new(declaration: LandmarkDeclaration, width: Option<u64>) -> Result<Self, HnnError> {
+    pub fn new(declaration: LandmarkDeclaration, width: Option<u64>) -> Result<Self, ContextError> {
         check_declaration(&declaration)?;
         let digits = odometer_digits(declaration.alphabet);
         let branches: Vec<Branch> = declaration
@@ -4224,7 +4227,7 @@ impl IdealLandmarks {
     }
 
     /// **The ideal face of one class** at an address, exact.
-    pub fn probability(&self, address: &[Letter], class: usize) -> Result<Rat, HnnError> {
+    pub fn probability(&self, address: &[Letter], class: usize) -> Result<Rat, ContextError> {
         check(&self.declaration, address, class)?;
         Ok(self
             .reads(address, class)
@@ -4235,7 +4238,11 @@ impl IdealLandmarks {
 
     /// **The opened paths of one class** at an address, with their ideal faces (a level a stored
     /// node; a parting chain's upper part carries its split `β`).
-    pub fn opened(&self, address: &[Letter], class: usize) -> Result<Vec<OpenedPath>, HnnError> {
+    pub fn opened(
+        &self,
+        address: &[Letter],
+        class: usize,
+    ) -> Result<Vec<OpenedPath>, ContextError> {
         check(&self.declaration, address, class)?;
         let mut paths = Vec::new();
         for digit in self.reads(address, class) {
@@ -4273,7 +4280,7 @@ impl IdealLandmarks {
     }
 
     /// **Receive one cell**: its ideal face at the current standing, then its deposit.
-    pub fn receive(&mut self, address: &[Letter], class: usize) -> Result<Rat, HnnError> {
+    pub fn receive(&mut self, address: &[Letter], class: usize) -> Result<Rat, ContextError> {
         check(&self.declaration, address, class)?;
         let digits = self.reads(address, class);
         let letters = self.flatten(address);
@@ -4471,7 +4478,7 @@ impl JoinTree {
 
     /// **The balanced join tree** over `K ≥ 1` faces, every join founded at `β₀ = 1`: each face's
     /// prior is `2^(−depth)`, uniform when `K` is a power of two.
-    pub fn balanced(faces: usize) -> Result<Self, HnnError> {
+    pub fn balanced(faces: usize) -> Result<Self, ContextError> {
         if faces == 0 {
             return Err(shape("a join tree over at least one face", 1, 0));
         }
@@ -4487,7 +4494,7 @@ impl JoinTree {
     /// **The incumbent's join tree** over `K ≥ 2` faces: face 0 (the incumbent) against the
     /// balanced join of faces `1..K`, the root founded at `β₀ = 2^j − 1` (the incumbent's prior
     /// `1 − 2^(−j)`, the dyadic ladder), every inner join at `1`. Refused outside `1..=63`.
-    pub fn incumbent(faces: usize, rung: u32) -> Result<Self, HnnError> {
+    pub fn incumbent(faces: usize, rung: u32) -> Result<Self, ContextError> {
         if faces < 2 {
             return Err(shape(
                 "an incumbent's join tree over at least two faces",
@@ -4588,7 +4595,7 @@ pub struct FaceJoins {
 impl FaceJoins {
     /// **The joins of a mixture on a tree's lattice**, every dyadic cell's at its founding. Refused
     /// at a founding ratio past the carrier `W`.
-    pub fn new(tree: JoinTree, widths: Widths) -> Result<Self, HnnError> {
+    pub fn new(tree: JoinTree, widths: Widths) -> Result<Self, ContextError> {
         if tree.widest() > widths.carrier {
             return Err(shape(
                 "a join tree whose founding ratios fit the carrier's W bits",
@@ -4646,7 +4653,7 @@ impl FaceJoins {
         certified(&self.widths, largest)
     }
 
-    fn check(&self, dyadic: usize, faces: &[u64]) -> Result<(), HnnError> {
+    fn check(&self, dyadic: usize, faces: &[u64]) -> Result<(), ContextError> {
         let full = 1u64 << self.widths.face;
         if faces.len() != self.tree.faces || dyadic >= self.charts.len() {
             return Err(shape(
@@ -4678,7 +4685,7 @@ impl FaceJoins {
     }
 
     /// **The mixed digit-0 face** at a dyadic cell from the faces' digit-0 numerators.
-    pub fn split(&self, dyadic: usize, faces: &[u64]) -> Result<u64, HnnError> {
+    pub fn split(&self, dyadic: usize, faces: &[u64]) -> Result<u64, ContextError> {
         self.check(dyadic, faces)?;
         let values = self.values(dyadic, faces);
         Ok(side_value(&values, faces, self.tree.root))
@@ -4695,7 +4702,7 @@ impl FaceJoins {
         symbol: usize,
         certificates: &[u128],
         increments: &[u128],
-    ) -> Result<JoinReceipt, HnnError> {
+    ) -> Result<JoinReceipt, ContextError> {
         self.check(dyadic, faces)?;
         if certificates.len() != faces.len() || increments.len() != faces.len() || symbol > 1 {
             return Err(shape(
@@ -4782,7 +4789,7 @@ impl StopMixture {
         declaration: LandmarkDeclaration,
         priors: Vec<StopPrior>,
         tree: JoinTree,
-    ) -> Result<Self, HnnError> {
+    ) -> Result<Self, ContextError> {
         if priors.len() != tree.faces() {
             return Err(shape(
                 "one stop prior per face of the join tree",
@@ -4798,7 +4805,7 @@ impl StopMixture {
                     ..declaration.clone()
                 })
             })
-            .collect::<Result<Vec<Landmarks>, HnnError>>()?;
+            .collect::<Result<Vec<Landmarks>, ContextError>>()?;
         let widths = trees[0].widths();
         let joins = FaceJoins::new(tree, widths)?;
         Ok(Self { trees, joins })
@@ -4826,7 +4833,11 @@ impl StopMixture {
     /// in each opened dyadic cell the joins read the trees' pre-deposit splits and step by the
     /// digit. The cell's executed face is the product of the mixed digits' sides; its residual the
     /// digits' certificates in bits.
-    pub fn receive(&mut self, address: &[Letter], class: usize) -> Result<CellReading, HnnError> {
+    pub fn receive(
+        &mut self,
+        address: &[Letter],
+        class: usize,
+    ) -> Result<CellReading, ContextError> {
         for tree in &self.trees {
             check(tree.declaration(), address, class)?;
         }
@@ -4834,7 +4845,7 @@ impl StopMixture {
             .trees
             .iter_mut()
             .map(|tree| tree.receive_digits(address, class))
-            .collect::<Result<Vec<DigitsReading>, HnnError>>()?;
+            .collect::<Result<Vec<DigitsReading>, ContextError>>()?;
         let widths = self.trees[0].widths();
         let full = 1u64 << widths.face;
         let digits = readings[0].digits.len();
@@ -4863,84 +4874,8 @@ impl StopMixture {
 }
 
 // -------------------------------------------------------------------------------------------
-// the measurement
-
-/// [definition] **Code lengths on one population**, each an enclosure of the population's faces'
-/// product ([`PassageCode`]) over `cells` cells: the tree's executed face and the online baselines.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Coded {
-    pub tree: ExactInterval,
-    pub uniform: ExactInterval,
-    pub order_zero: ExactInterval,
-    pub order_one: ExactInterval,
-    pub ppm: ExactInterval,
-    pub cells: u64,
-}
-
-/// [definition] **One tree's run**: its declaration and widths, its chart's report, its stored nodes,
-/// its label pool's letters (stored where paths part) and stored bits, the rule's a-priori residual a cell and
-/// the largest per-cell certified residual over the run.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct TreeRun {
-    pub declaration: LandmarkDeclaration,
-    pub widths: Widths,
-    pub chart: ChartReport,
-    pub nodes: usize,
-    pub held: usize,
-    pub bits: u64,
-    pub face_rule: Rat,
-    pub largest_residual: Rat,
-}
-
-/// [definition] **The prequential measurement** ([`prequential`]): the development and held-out
-/// populations' code lengths and the tree's run.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Prequential {
-    pub development: Coded,
-    pub held_out: Coded,
-    pub run: TreeRun,
-}
-
-/// [definition] **A depth sweep on the development cells** ([`choose_depth`]): every depth tried with
-/// its development code length, the chosen depth and the description bits the choice is charged.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct DepthSweep {
-    pub tried: Vec<(usize, ExactInterval)>,
-    pub chosen: usize,
-    pub description_bits: u64,
-}
-
-impl DepthSweep {
-    /// **Whether a sweep continues past its last depth** ([`choose_depth`]'s rule): the last
-    /// depth's development code lies strictly below the one before it, by disjoint exact
-    /// enclosures (the first depth always continues).
-    pub fn decreasing(tried: &[(usize, ExactInterval)]) -> bool {
-        match tried {
-            [.., (_, previous), (_, last)] => last.upper < previous.lower,
-            _ => true,
-        }
-    }
-
-    /// **The sweep's choice from the depths tried** ([`choose_depth`]'s rule): the last depth, or
-    /// the one before it when the last did not decrease strictly; charged `⌈log₂⌉` of the depths
-    /// tried. Refused when nothing was tried.
-    pub fn of(tried: Vec<(usize, ExactInterval)>) -> Result<Self, HnnError> {
-        let Some((last, _)) = tried.last() else {
-            return Err(shape("a depth sweep of at least one depth", 1, 0));
-        };
-        let chosen = if Self::decreasing(&tried) {
-            *last
-        } else {
-            tried[tried.len() - 2].0
-        };
-        let description_bits = ceil_log2(&BigUint::from(tried.len()));
-        Ok(Self {
-            tried,
-            chosen,
-            description_bits,
-        })
-    }
-}
+// the code length of faces and passages (the tree's prequential measurement on a cut, and its
+// development choices, are the exposure's: `hnn::reference`)
 
 fn zero() -> ExactInterval {
     ExactInterval::point(Rat::zero())
@@ -4948,10 +4883,10 @@ fn zero() -> ExactInterval {
 
 /// [definition; agent-inferred] **A face's code length** `−log₂ q`, enclosed (module header, "The
 /// measurement"): for `q = n/d`, `log₂ d − log₂ n`, each by the certified [`binary_log`] at
-/// `O + 1` fraction bits (`O` the enclosure grid's octaves, `hnn::ratio`'s `LOG_OCTAVES`), so the
+/// `O + 1` fraction bits (`O` the declared enclosure grid's octaves, `ratio::algebraic::LOG_OCTAVES`), so the
 /// enclosure is at most `2^(−O)` wide on the grid `interval_sum` rounds every sum out to; exact when
 /// both are powers of two (a dyadic face with a power-of-two numerator).
-pub fn code_length(probability: &Rat) -> Result<ExactInterval, HnnError> {
+pub fn code_length(probability: &Rat) -> Result<ExactInterval, ContextError> {
     if !probability.is_positive() {
         return Err(shape("a positive face's code length", 1, 0));
     }
@@ -4968,7 +4903,7 @@ pub fn code_length(probability: &Rat) -> Result<ExactInterval, HnnError> {
 pub fn ratio_code_length(
     numerator: &BigUint,
     denominator: &BigUint,
-) -> Result<ExactInterval, HnnError> {
+) -> Result<ExactInterval, ContextError> {
     if numerator.is_zero() || denominator.is_zero() {
         return Err(shape("a positive ratio's code length", 1, 0));
     }
@@ -5137,7 +5072,7 @@ impl Ord for ProductBound {
 /// 127 significant bits and rounded outward after every factor) and `E` exactly, so the passage's
 /// code length `−log₂ ∏ q_t = log₂ D + E − log₂ N` is enclosed once, by the certified
 /// [`binary_log`] at `O + 1` fraction bits, and rounded out on the enclosure grid `2^(−O)` as
-/// `interval_sum` rounds (`O` the grid's octaves, `hnn::ratio`'s `LOG_OCTAVES`). A factor moves a
+/// `interval_sum` rounds (`O` the grid's octaves, `ratio::algebraic::LOG_OCTAVES`). A factor moves a
 /// bound by a relative `2^(−126)` at most, so over `f` factors the enclosure stays within
 /// `f 2^(−125) + 2^(1−O)` bits of the exact code length; a dyadic face (every tree's) moves only
 /// `N`'s bounds and `E`. It is the per-cell sum of [`code_length`]s without their per-cell
@@ -5181,7 +5116,7 @@ impl PassageCode {
 
     /// **One positive face**, exact: its numerator's bounds move, its denominator's twos go to
     /// `E` and its odd part moves the denominator's bounds. Refused at a face that is not positive.
-    pub fn face(&mut self, face: &Rat) -> Result<(), HnnError> {
+    pub fn face(&mut self, face: &Rat) -> Result<(), ContextError> {
         if !face.is_positive() {
             return Err(shape("a positive face in a passage's code", 1, 0));
         }
@@ -5238,7 +5173,7 @@ impl PassageCode {
     }
 
     /// **The code length** `−log₂ ∏ q`, enclosed and rounded out on `2^(−O)`.
-    pub fn bits(&self) -> Result<ExactInterval, HnnError> {
+    pub fn bits(&self) -> Result<ExactInterval, ContextError> {
         let octaves = LOG_OCTAVES + 1;
         let (numerator_low, _) = self.numerator[0].log2(octaves);
         let (_, numerator_high) = self.numerator[1].log2(octaves);
@@ -5250,371 +5185,8 @@ impl PassageCode {
             denominator_high + exponent - numerator_low,
         )
         .map_err(|_| shape("an ordered enclosure of a passage's code", 0, 1))?;
-        interval_sum(&zero(), &enclosure)
+        Ok(interval_sum(&zero(), &enclosure)?)
     }
-}
-
-/// Refused unless there is one letter per cell.
-fn aligned(cells: &[usize], letters: &[Letter]) -> Result<(), HnnError> {
-    if cells.len() != letters.len() {
-        return Err(shape(
-            "one tick's letter per cell",
-            cells.len(),
-            letters.len(),
-        ));
-    }
-    Ok(())
-}
-
-/// A tree's prequential sums over one stream, `[development, held-out]`, and the run.
-fn run_tree(
-    cells: &[usize],
-    letters: &[Letter],
-    held_out: &(dyn Fn(usize) -> bool + Sync),
-    declaration: &LandmarkDeclaration,
-) -> Result<([ExactInterval; 2], TreeRun), HnnError> {
-    aligned(cells, letters)?;
-    let mut tree = Landmarks::new(declaration.clone())?;
-    let mut codes = [PassageCode::new(), PassageCode::new()];
-    let mut largest_residual = Rat::zero();
-    for (position, &class) in cells.iter().enumerate() {
-        let reading = tree.receive(&letter_address(letters, position, declaration.depth), class)?;
-        codes[usize::from(held_out(position))].face(&reading.executed)?;
-        if reading.residual > largest_residual {
-            largest_residual = reading.residual;
-        }
-    }
-    Ok((
-        [codes[0].bits()?, codes[1].bits()?],
-        TreeRun {
-            declaration: declaration.clone(),
-            widths: tree.widths(),
-            chart: tree.chart(),
-            nodes: tree.nodes(),
-            held: tree.held(),
-            bits: tree.bits(),
-            face_rule: tree.face_rule(),
-            largest_residual,
-        },
-    ))
-}
-
-/// The baselines' prequential sums over one stream, `[development, held-out]`, and the counts.
-fn run_baselines(
-    cells: &[usize],
-    held_out: &(dyn Fn(usize) -> bool + Sync),
-    alphabet: usize,
-) -> Result<([BaselineCodes; 2], [u64; 2]), HnnError> {
-    let mut baselines = Baselines::new(alphabet)?;
-    let mut codes = [[PassageCode::new(); 4]; 2];
-    let mut counts = [0u64; 2];
-    for (position, &class) in cells.iter().enumerate() {
-        let faces = baselines.face_cell(class)?;
-        let part = usize::from(held_out(position));
-        for (code, face) in codes[part].iter_mut().zip([
-            &faces.uniform,
-            &faces.order_zero,
-            &faces.order_one,
-            &faces.ppm,
-        ]) {
-            code.face(face)?;
-        }
-        counts[part] += 1;
-    }
-    let sums = |[uniform, order_zero, order_one, ppm]: [PassageCode; 4]| {
-        Ok::<_, HnnError>(BaselineCodes {
-            uniform: uniform.bits()?,
-            order_zero: order_zero.bits()?,
-            order_one: order_one.bits()?,
-            ppm: ppm.bits()?,
-        })
-    };
-    let [development, held] = codes;
-    Ok(([sums(development)?, sums(held)?], counts))
-}
-
-/// **The prequential measurement on a cut** (module header): the tree over the ticks' letters and
-/// the online baselines over the same cells in the same order, each cell scored at the current
-/// standing and then deposited, with enclosures on the development and held-out populations.
-pub fn prequential(
-    cut: &Cut,
-    letters: &[Letter],
-    declaration: &LandmarkDeclaration,
-) -> Result<Prequential, HnnError> {
-    let held_out = |position: usize| cut.held_out(position);
-    let (tree, baselines) = rayon::join(
-        || run_tree(&cut.cells, letters, &held_out, declaration),
-        || run_baselines(&cut.cells, &held_out, declaration.alphabet),
-    );
-    let ([development_tree, held_tree], run) = tree?;
-    let ([development, held], counts) = baselines?;
-    let coded = |tree: ExactInterval, baselines: BaselineCodes, cells: u64| Coded {
-        tree,
-        uniform: baselines.uniform,
-        order_zero: baselines.order_zero,
-        order_one: baselines.order_one,
-        ppm: baselines.ppm,
-        cells,
-    };
-    Ok(Prequential {
-        development: coded(development_tree, development, counts[0]),
-        held_out: coded(held_tree, held, counts[1]),
-        run,
-    })
-}
-
-/// **The development stream**: the cut with its held-out cells removed.
-pub fn development(cut: &Cut) -> Vec<usize> {
-    cut.cells
-        .iter()
-        .enumerate()
-        .filter(|(position, _)| !cut.held_out(*position))
-        .map(|(_, &cell)| cell)
-        .collect()
-}
-
-/// **The development letters**: the ticks' letters at the development positions.
-pub fn development_letters(cut: &Cut, letters: &[Letter]) -> Vec<Letter> {
-    letters
-        .iter()
-        .enumerate()
-        .filter(|(position, _)| !cut.held_out(*position))
-        .map(|(_, &letter)| letter)
-        .collect()
-}
-
-/// **The development code length of one declaration** (the harness's unit): the tree's
-/// prequential code length over the development cells and their letters, and its run.
-pub fn development_run(
-    cut: &Cut,
-    letters: &[Letter],
-    declaration: &LandmarkDeclaration,
-) -> Result<(ExactInterval, TreeRun), HnnError> {
-    aligned(&cut.cells, letters)?;
-    let cells = development(cut);
-    let letters = development_letters(cut, letters);
-    let never = |_: usize| false;
-    let ([bits, _], run) = run_tree(&cells, &letters, &never, declaration)?;
-    Ok((bits, run))
-}
-
-/// **Choose the address depth on the development cells** (module header): `D = max(1, forced), …`
-/// while the development prequential code length decreases strictly; the declaration's own depth
-/// is ignored, and each depth derives its own widths.
-pub fn choose_depth(
-    cut: &Cut,
-    letters: &[Letter],
-    declaration: &LandmarkDeclaration,
-) -> Result<DepthSweep, HnnError> {
-    choose_depth_within(cut, letters, declaration, usize::MAX)
-}
-
-/// [definition; agent-inferred] **Choose the address depth within a declared deepest depth**
-/// (the wide cut: a memory cap bounds the tree's a-priori founded nodes, `n* B D`, and so its depth):
-/// [`choose_depth`]'s sweep, which also stops at `D = deepest`; the family tried is still charged
-/// `⌈log₂⌉` of its length.
-pub fn choose_depth_within(
-    cut: &Cut,
-    letters: &[Letter],
-    declaration: &LandmarkDeclaration,
-    deepest: usize,
-) -> Result<DepthSweep, HnnError> {
-    aligned(&cut.cells, letters)?;
-    let cells = development(cut);
-    let letters = development_letters(cut, letters);
-    let never = |_: usize| false;
-    let mut tried: Vec<(usize, ExactInterval)> = Vec::new();
-    let mut depth = declaration.forced.max(1);
-    loop {
-        let declared = LandmarkDeclaration {
-            depth,
-            ..declaration.clone()
-        };
-        let ([bits, _], _) = run_tree(&cells, &letters, &never, &declared)?;
-        tried.push((depth, bits));
-        if !DepthSweep::decreasing(&tried) || depth >= cells.len() || depth >= deepest {
-            break;
-        }
-        depth += 1;
-    }
-    DepthSweep::of(tried)
-}
-
-/// **One tree's prequential run on a cut, the tree alone** (the held-out pass of a law measured
-/// beside another's run of the baselines): every cell scored at the current standing before its
-/// own deposit, the code lengths enclosed on `[development, held-out]`, and the tree's run.
-pub fn tree_prequential(
-    cut: &Cut,
-    letters: &[Letter],
-    declaration: &LandmarkDeclaration,
-) -> Result<([ExactInterval; 2], TreeRun), HnnError> {
-    aligned(&cut.cells, letters)?;
-    let held_out = |position: usize| cut.held_out(position);
-    run_tree(&cut.cells, letters, &held_out, declaration)
-}
-
-/// [definition] **A stop-prior sweep on the development cells** ([`choose_prior`]): every law tried
-/// with its own depth sweep, the incumbent (the `½` stop prior), the chosen law, whether the chosen
-/// law's charged code length is decided below every other law's by disjoint enclosures, and the
-/// description bits the choice is charged, `⌈log₂⌉` of the laws tried (each law's depths are
-/// charged beside it, [`PriorSweep::charged`]).
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct PriorSweep {
-    pub tried: Vec<(StopPrior, DepthSweep)>,
-    pub incumbent: usize,
-    pub chosen: usize,
-    pub decided: bool,
-    pub description_bits: u64,
-}
-
-impl PriorSweep {
-    /// A law's development code length at its chosen depth.
-    pub fn bits(&self, index: usize) -> ExactInterval {
-        let sweep = &self.tried[index].1;
-        sweep
-            .tried
-            .iter()
-            .find(|(depth, _)| *depth == sweep.chosen)
-            .map(|(_, bits)| bits.clone())
-            .expect("the chosen depth was tried")
-    }
-
-    /// A law's development code length charged its depths' description bits `⌈log₂⌉` of the
-    /// depths it tried (the laws' own charge is common to every law, [`PriorSweep::description_bits`]).
-    pub fn charged(&self, index: usize) -> ExactInterval {
-        let bits = self.bits(index);
-        let depth = Rat::from_integer(BigInt::from(self.tried[index].1.description_bits));
-        ExactInterval {
-            lower: &bits.lower + &depth,
-            upper: &bits.upper + &depth,
-        }
-    }
-
-    /// The chosen law's whole description: the laws' `⌈log₂⌉` and its depths'.
-    pub fn chosen_description(&self) -> u64 {
-        self.description_bits + self.tried[self.chosen].1.description_bits
-    }
-}
-
-/// [definition; agent-inferred] **Choose the stop prior on the development cells** (the declared stop prior):
-/// each declared law of `family` chooses its own depth ([`choose_depth`], so the depth selection is
-/// campaign 1's) and reads its development code length there, the laws run together
-/// (`hnn::realization`: each reads the shared immutable development cells and writes its own sweep,
-/// so their effects commute). Each law is charged `⌈log₂⌉` of its depths tried, and the choice
-/// `⌈log₂ |family|⌉`. The chosen law is the least charged one (the first in the family's order at a
-/// tie) when its enclosure lies strictly below the incumbent's (the `½` stop prior, which the family
-/// must hold), and the incumbent otherwise; `decided` records whether it lies strictly below every
-/// other law's. The held-out cells never choose anything: they are cut away before any reading.
-pub fn choose_prior(
-    cut: &Cut,
-    letters: &[Letter],
-    declaration: &LandmarkDeclaration,
-    family: &[StopPrior],
-) -> Result<PriorSweep, HnnError> {
-    aligned(&cut.cells, letters)?;
-    let half = StopPrior::half();
-    let incumbent = family.iter().position(|prior| *prior == half).ok_or(shape(
-        "a stop-prior family holding the ½ stop prior",
-        1,
-        0,
-    ))?;
-    let sweeps = indexed(family.len(), |index| {
-        let declared = LandmarkDeclaration {
-            prior: family[index].clone(),
-            ..declaration.clone()
-        };
-        choose_depth(cut, letters, &declared)
-    })?;
-    let mut sweep = PriorSweep {
-        tried: family.iter().cloned().zip(sweeps).collect(),
-        incumbent,
-        chosen: incumbent,
-        decided: false,
-        description_bits: ceil_log2(&BigUint::from(family.len())),
-    };
-    let charged: Vec<ExactInterval> = (0..family.len()).map(|i| sweep.charged(i)).collect();
-    let mut least = 0;
-    for (index, bits) in charged.iter().enumerate() {
-        if bits.upper < charged[least].upper {
-            least = index;
-        }
-    }
-    if charged[least].upper < charged[incumbent].lower {
-        sweep.chosen = least;
-    }
-    let chosen = &charged[sweep.chosen];
-    sweep.decided = charged
-        .iter()
-        .enumerate()
-        .all(|(index, bits)| index == sweep.chosen || chosen.upper < bits.lower);
-    Ok(sweep)
-}
-
-/// [definition] **The executed face's cost against the oracle** ([`oracle_cost`]), per population
-/// `[development, held-out]`: the oracle's reference width and rebases, both code lengths, the
-/// largest observed per-cell deviation (the upper bound `|q̂ − q|/min(q̂, q) · 3/2` bits of
-/// `|log₂(q̂/q)|`), the largest certificate, the oracle's own rule a cell, and whether every cell's
-/// observed deviation lay within its certificate plus the oracle's rule (the certificate bounds the
-/// distance to the ideal, the oracle's rule the oracle's).
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct OracleCost {
-    pub reference_width: u64,
-    pub rebases: u64,
-    pub executed: [ExactInterval; 2],
-    pub ideal: [ExactInterval; 2],
-    pub largest_deviation: Rat,
-    pub largest_certificate: Rat,
-    pub drift_rule: Rat,
-    pub certified: bool,
-}
-
-/// **The executed face against the reference oracle on a cut** (module header): both trees receive
-/// every cell in order at the reference width `W_o`; each cell's executed and ideal faces are
-/// read by [`code_length`] and compared exactly. Not on the hot path.
-pub fn oracle_cost(
-    cut: &Cut,
-    letters: &[Letter],
-    declaration: &LandmarkDeclaration,
-) -> Result<OracleCost, HnnError> {
-    aligned(&cut.cells, letters)?;
-    let reference_width = IdealLandmarks::reference_width(declaration);
-    let mut tree = Landmarks::new(declaration.clone())?;
-    let mut oracle = IdealLandmarks::new(declaration.clone(), Some(reference_width))?;
-    let drift_rule = oracle.drift_rule();
-    let (mut executed, mut ideal) = ([zero(), zero()], [zero(), zero()]);
-    let (mut largest_deviation, mut largest_certificate) = (Rat::zero(), Rat::zero());
-    let mut certified = true;
-    for (position, &class) in cut.cells.iter().enumerate() {
-        let here = letter_address(letters, position, declaration.depth);
-        let reading = tree.receive(&here, class)?;
-        let face = oracle.receive(&here, class)?;
-        let part = usize::from(cut.held_out(position));
-        executed[part] = interval_sum(&executed[part], &code_length(&reading.executed)?)?;
-        ideal[part] = interval_sum(&ideal[part], &code_length(&face)?)?;
-        let least = if reading.executed < face {
-            &reading.executed
-        } else {
-            &face
-        };
-        let deviation = (&reading.executed - &face).abs() / least * log2_e_bound();
-        certified &= deviation <= &reading.residual + &drift_rule;
-        if deviation > largest_deviation {
-            largest_deviation = deviation;
-        }
-        if reading.residual > largest_certificate {
-            largest_certificate = reading.residual;
-        }
-    }
-    Ok(OracleCost {
-        reference_width,
-        rebases: oracle.rebases(),
-        executed,
-        ideal,
-        largest_deviation,
-        largest_certificate,
-        drift_rule,
-        certified,
-    })
 }
 
 #[cfg(test)]

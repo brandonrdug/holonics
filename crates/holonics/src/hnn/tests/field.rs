@@ -516,7 +516,7 @@ fn the_field_connection_is_the_block_incidence_of_its_channels() {
     assert!(connection.kirchhoff().is_ok());
 }
 
-/// Design (c) `Field::holon()` (review F2), block by block (guard 14): every ring and every contact
+/// Design (c) `Field::holarchy()` (review F2), block by block (guard 14): every ring and every contact
 /// is its own Holon, certified on its own; the Holarchy keeps them and its gluing, and its whole,
 /// assembled only when read, is Dirac (Tellegen), its navigators the rings' closing maps, and its
 /// element relations the blocks read from the one constitution: ring 0's resistance is
@@ -526,7 +526,7 @@ fn the_field_connection_is_the_block_incidence_of_its_channels() {
 fn the_field_holon_is_a_read_only_holarchy_of_rings_and_contacts() {
     let field = small_field(&[2, 2], vec![contact(0, 1, 1, 0)], 1);
     let theta = generic(&field, 7);
-    let holarchy = field.holon(&theta).unwrap();
+    let holarchy = field.holarchy(&theta).unwrap();
     let sigma: usize = field.rings().iter().map(|ring| ring.width()).sum();
     let states: usize = field.contacts().iter().map(|c| 2 * c.width()).sum();
     let whole = holarchy.whole();
@@ -571,7 +571,7 @@ fn the_field_holon_is_a_read_only_holarchy_of_rings_and_contacts() {
         }
     }
     let initial = Constitution::initial(&field, Steps::campaign_one(), OPEN_BUDGET).unwrap();
-    let other = field.holon(&initial).unwrap();
+    let other = field.holarchy(&initial).unwrap();
     assert_ne!(other.whole().active(), whole.active());
     // A singular contact storage has no momentum chart and is refused, not pseudo-inverted.
     let singular = initial
@@ -582,5 +582,8 @@ fn the_field_holon_is_a_read_only_holarchy_of_rings_and_contacts() {
             crate::ratio::linear::ExactRatMatrix::identity(k).unwrap(),
         )
         .unwrap();
-    assert!(matches!(field.holon(&singular), Err(HnnError::Linear(_))));
+    assert!(matches!(
+        field.holarchy(&singular),
+        Err(HnnError::Linear(_))
+    ));
 }

@@ -15,9 +15,9 @@
 use std::ops::Range;
 
 use holonics::hnn::Field;
-use holonics::hnn::receiving::GrainCell;
 use holonics::ratio::Rat;
 use holonics::ratio::algebraic::ExactInterval;
+use holonics::receiver::face::GrainCell;
 use num_bigint::BigInt;
 use num_traits::One;
 

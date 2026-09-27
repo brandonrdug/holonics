@@ -1,5 +1,5 @@
-//! The receiving phases: the grain derived from the receiver, the observability refusal, the exact
-//! grain reading and its integer comparison; the receiving parametron's landmark tree declared from
+//! The receiving phases: the grain derived from the receiver, the observability refusal (the exact
+//! grain reading and its integer comparison are `receiver::face`'s, tested there); the receiving parametron's landmark tree declared from
 //! the receiver and coded in the description; the active suffix address and each phase's causal
 //! address; the combined read of the tree's face and the wave through `R P_R^(τ_R)`; the compare's
 //! landmark steps and their deposit; and the maps' openings (the landmark tree: `R_0 = 0`, `E_0` the sign
@@ -8,13 +8,13 @@
 //! bundles, the sheet grain a scale square of the period grain, and the letters' partitions finite
 //! with injective codes.
 
-use num_bigint::{BigInt, BigUint};
+use num_bigint::BigInt;
 use num_traits::{One, Zero};
 
 use super::learning::{OPEN_BUDGET, chain, chain_declaration, moment, phases};
 use super::support::{Draw, Medium, Parts, lift, small_field};
 use crate::compression::landmark::context::{
-    Feature, Landmarks, Letter, LetterFamily, Widths, address, letter_address,
+    Landmarks, Letter, LetterFamily, Widths, address, letter_address,
 };
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Constitution, Locus, Steps};
@@ -22,14 +22,16 @@ use crate::hnn::field::{ConstitutionRead, Current, Field, FieldDeclaration, Rece
 use crate::hnn::keys;
 use crate::hnn::pending::PendingRatio;
 use crate::hnn::port::{ExecutionPort, Handle, ReceiptDetail};
-use crate::hnn::ratio::{HolonRatio, log2_enclosure, target_phases};
+use crate::hnn::ratio::{HolonRatio, target_phases};
 use crate::hnn::receiving::{
-    ActiveAddress, GrainCell, LetterReader, ReceivingPhases, ReceivingRead, clock_letters,
-    grain_exponent, grain_logits, landmark_declaration, tree_code_length,
+    ActiveAddress, Feature, FeatureFamily, LetterReader, ReceivingPhases, ReceivingRead,
+    clock_letters, grain_logits, landmark_declaration, tree_code_length,
 };
 use crate::hnn::reference::{Reference, compose, one_hot};
+use crate::ratio::algebraic::log2_enclosure;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::{Rat, integer, rat};
+use crate::receiver::face::{GrainCell, grain_exponent};
 
 /// `L_R = ⌈1/ε_bits⌉` (R2 M2): the chain control's tolerance of 1/16 bit (campaign 1's) gives 16,
 /// and 3/40 gives 14; the first epoch is the front's hop distance, and the observability rank is
@@ -89,99 +91,6 @@ fn an_aperture_beyond_the_observability_rank_is_refused() {
         }
         other => panic!("expected an observability refusal, found {other:?}"),
     }
-}
-
-/// Guard 15, and Lean `HNN/Ratio.face_constant_on_fibre`: an exponent read at a grain is its carry,
-/// its phase class and its fibre, exactly, with `0 ≤ ε < 1/L`; reading it down to its cell's
-/// representative moves it by less than `1/L`, and every value of a cell has one representative.
-#[test]
-fn the_grain_reading_is_a_carry_a_phase_class_and_a_fibre() {
-    let values = [
-        rat(-37, 7),
-        rat(5, 3),
-        integer(-2),
-        rat(1, 16),
-        rat(-1, 1000),
-        Rat::zero(),
-    ];
-    for value in &values {
-        for grain in [1u64, 2, 16, 7] {
-            let cell = GrainCell::of(value, grain);
-            let grain_rat = Rat::from_integer(BigInt::from(grain));
-            assert!(cell.phase < grain);
-            assert!(cell.fibre >= Rat::zero() && cell.fibre < grain_rat.recip());
-            assert_eq!(cell.representative(grain) + &cell.fibre, *value);
-            assert!(value - cell.representative(grain) < grain_rat.recip());
-            let inside = cell.representative(grain) + &cell.fibre / integer(2);
-            assert_eq!(
-                GrainCell::of(&inside, grain).representative(grain),
-                cell.representative(grain)
-            );
-        }
-    }
-    let cell = GrainCell::of(&rat(-37, 7), 16);
-    assert_eq!(cell.carry, BigInt::from(-6));
-    assert_eq!(cell.phase, 11);
-}
-
-/// `2^k ≤ p^L < 2^(k+1)`, checked over ℚ.
-fn brackets(p: &Rat, grain: u64, k: &BigInt) -> bool {
-    let mut read = Rat::one();
-    for _ in 0..grain {
-        read *= p;
-    }
-    let two = |k: &BigInt| {
-        let magnitude = usize::try_from(k.magnitude().clone()).unwrap();
-        let value = Rat::from_integer(BigInt::one() << magnitude);
-        if k.sign() == num_bigint::Sign::Minus {
-            value.recip()
-        } else {
-            value
-        }
-    };
-    two(k) <= read && read < two(&(k + 1))
-}
-
-fn grain_of(p: &Rat, grain: u64) -> BigInt {
-    grain_exponent(
-        &p.numer().to_biguint().unwrap(),
-        &p.denom().to_biguint().unwrap(),
-        grain,
-    )
-    .unwrap()
-}
-
-/// Lean `HNN/RegionCounts.{grainExponent_spec, grain_log_iff_pow_bounds, grain_face_residual,
-/// grain_fixture}`: the grain exponent is the unique `k` with `2^k ≤ (a/b)^L < 2^(k+1)`, from integer
-/// comparisons, and `k/L ≤ log₂(a/b) < (k+1)/L`; at `L = 1` it is `⌊log₂(a/b)⌋`; an exact power of
-/// two reads its own exponent; `5/8 → −11`, `3/8 → −23` at `L = 16`; a zero is refused.
-#[test]
-fn the_grain_exponent_is_the_integer_comparison() {
-    for p in [
-        rat(5, 8),
-        rat(3, 8),
-        rat(1, 1),
-        rat(1, 256),
-        rat(3, 7),
-        rat(255, 256),
-        rat(1, 3),
-        rat(9, 2),
-        rat(1023, 1025),
-    ] {
-        for grain in [1u64, 2, 7, 16] {
-            let k = grain_of(&p, grain);
-            assert!(brackets(&p, grain, &k), "{p} at {grain}");
-            let log = log2_enclosure(&p).unwrap();
-            let grain_rat = Rat::from_integer(BigInt::from(grain));
-            assert!(Rat::from_integer(k.clone()) / &grain_rat <= log.upper);
-            assert!(log.lower < Rat::from_integer(&k + 1) / &grain_rat);
-        }
-    }
-    assert_eq!(grain_of(&rat(1, 256), 16), BigInt::from(-128));
-    assert_eq!(grain_of(&rat(9, 2), 1), BigInt::from(2));
-    assert_eq!(grain_of(&rat(5, 8), 16), BigInt::from(-11));
-    assert_eq!(grain_of(&rat(3, 8), 16), BigInt::from(-23));
-    assert!(grain_exponent(&BigUint::zero(), &BigUint::one(), 16).is_err());
 }
 
 /// **The active suffix address and each phase's causal address** (module header of
@@ -685,7 +594,7 @@ fn the_mixture_weighs_the_tree_against_the_combined_face() {
 /// mixture weighs) and the combined face `L_C`, `min(L_T, L_C) − drift ≤ L_model ≤ min(L_T, L_C) +
 /// 1 + drift`, each half read on the enclosure endpoints that can refute it (a half fails only when
 /// the law is violated); `log₂ β` is `L_C − L_T` within the drift; and the tree's code length is
-/// the count-only prequential tree's over the same cut (`compression::landmark::context::prequential`, which encloses
+/// the count-only prequential tree's over the same cut (`hnn::reference::prequential`, which encloses
 /// the faces' product once, `PassageCode`, where the exposure sums its windows' enclosures): the two
 /// enclosures meet and each is narrower than `2^(−60)` bits, far below the least move one cell's
 /// face read at a different standing would make, so every phase of every window read the tree after
@@ -738,8 +647,7 @@ fn the_mixture_codes_within_one_bit_of_the_better_face() {
     let receiver = &field.receivers()[0];
     let declared = landmark_declaration(&field, receiver).unwrap();
     let letters = crate::compression::landmark::context::cell_letters(&cut.cells);
-    let alone =
-        crate::compression::landmark::context::prequential(&cut, &letters, &declared).unwrap();
+    let alone = crate::hnn::reference::prequential(&cut, &letters, &declared).unwrap();
     let narrow = Rat::new(1.into(), num_bigint::BigInt::from(1u8) << 60usize);
     for (exposed, measured) in [
         (&exposure.training.tree, &alone.development.tree),
@@ -764,8 +672,8 @@ fn campaign_field() -> Field {
 }
 
 /// Rings 0 and 1's phase classes at their declared periods.
-fn clock_family() -> LetterFamily {
-    LetterFamily::new(vec![
+fn clock_family() -> FeatureFamily {
+    FeatureFamily::new(vec![
         Feature::Phase { ring: 0, grain: 5 },
         Feature::Phase { ring: 1, grain: 7 },
     ])
@@ -854,7 +762,7 @@ fn the_bundle_letters_are_read_from_the_clock_before_the_cell_they_predict() {
 fn the_address_restricts_by_whole_bundles_and_the_sheets_are_a_scale_square() {
     let field = campaign_field();
     let family = clock_family();
-    let sheets = LetterFamily::new(vec![
+    let sheets = FeatureFamily::new(vec![
         Feature::Phase { ring: 0, grain: 2 },
         Feature::Phase { ring: 1, grain: 2 },
     ])
@@ -874,13 +782,14 @@ fn the_address_restricts_by_whole_bundles_and_the_sheets_are_a_scale_square() {
             prior: crate::compression::landmark::context::StopPrior::half(),
             capacity: crate::compression::landmark::context::Capacity::Unbounded,
         };
-    let tree = Landmarks::new(declared(family.clone())).unwrap();
+    let tree = Landmarks::new(declared(family.letters().clone())).unwrap();
     let coarsen = |letter: Letter| match letter {
         Letter::Bundle(bundle) => {
-            let values = family.decode(bundle.features);
+            let values = family.letters().decode(bundle.features);
             Letter::Bundle(crate::compression::landmark::context::Bundle {
                 cell: bundle.cell,
                 features: sheets
+                    .letters()
                     .encode(&[(2 * values[0]) / 5, (2 * values[1]) / 7])
                     .unwrap(),
             })
@@ -1009,12 +918,13 @@ fn the_letter_partitions_are_finite_and_their_codes_injective() {
         }
     }
     assert_eq!(values, (0..slot.size().unwrap()).collect());
-    let family = LetterFamily::new(vec![
+    let declared = FeatureFamily::new(vec![
         Feature::Phase { ring: 0, grain: 3 },
         slot.clone(),
         Feature::Phase { ring: 1, grain: 2 },
     ])
     .unwrap();
+    let family = declared.letters();
     assert_eq!(family.codes(), 3 * at.letters().unwrap() * 5 * 2);
     let mut codes = BTreeSet::new();
     let mut bundles = BTreeSet::from([family.bundle_code(Letter::Boundary, 4)]);
@@ -1038,7 +948,7 @@ fn the_letter_partitions_are_finite_and_their_codes_injective() {
     assert_eq!(bundles.len() as u64, family.bundle_codes(4));
     assert!(family.encode(&[3, 0, 0]).is_err());
     assert!(
-        LetterFamily::new(vec![Feature::Phase {
+        FeatureFamily::new(vec![Feature::Phase {
             ring: 0,
             grain: 1 << 33
         }])
@@ -1046,7 +956,7 @@ fn the_letter_partitions_are_finite_and_their_codes_injective() {
     );
     // A slot of one letter carries nothing: no family declares one, and the constant-slot control
     // is its own constructor, never a declared family.
-    assert!(LetterFamily::new(vec![Feature::Phase { ring: 0, grain: 1 }]).is_err());
+    assert!(FeatureFamily::new(vec![Feature::Phase { ring: 0, grain: 1 }]).is_err());
     let control = LetterFamily::constant_control(2);
     assert_eq!(control.sizes(), &[1, 1]);
     assert_eq!(control.codes(), 1);
@@ -1077,7 +987,7 @@ fn the_contact_letters_are_read_from_the_register_before_the_cell_they_predict()
         .with_contact_signature(&field, 0, (0..width).map(|j| j != 0).collect())
         .unwrap();
     assert_eq!(site_kinds(&field, &boosted).unwrap()[0], SiteKind::Boost);
-    let family = LetterFamily::new(vec![
+    let family = FeatureFamily::new(vec![
         Feature::contact(&field, 1),
         Feature::contact(&field, 0),
     ])
@@ -1134,7 +1044,7 @@ fn the_contact_letters_are_read_from_the_register_before_the_cell_they_predict()
             let Letter::Bundle(bundle) = letter else {
                 panic!("a bundle letter")
             };
-            let values = family.decode(bundle.features);
+            let values = family.letters().decode(bundle.features);
             for ((contact, bound), value) in bounds.iter().zip(&values) {
                 assert_eq!(*value, readings[*contact].letter(bound).unwrap());
                 if readings[*contact].lock != crate::hnn::contact::ContactLock::Unlocked {

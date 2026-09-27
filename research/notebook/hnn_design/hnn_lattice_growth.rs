@@ -68,13 +68,13 @@ use holonics::hnn::constitution::{FactorGradient, LinearLocus};
 use holonics::hnn::field::{ConstitutionRead, CribDeclaration, ReceiverDeclaration};
 use holonics::hnn::pending::PendingRatio;
 use holonics::hnn::propagation::path_attenuation;
-use holonics::hnn::receiving::GrainCell;
 use holonics::hnn::reference::one_hot;
 use holonics::hnn::{
     Carrier, Constitution, ContactDeclaration, Current, Deposit, ExecutionPort, Field,
     FieldDeclaration, Locus, NormalLaw, Reference, RingDeclaration, Steps,
 };
 use holonics::ratio::{Rat, integer, rat};
+use holonics::receiver::face::GrainCell;
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 

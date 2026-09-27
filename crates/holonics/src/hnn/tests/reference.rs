@@ -3,7 +3,8 @@
 //! joint clock's carry-out, keys located
 //! on the crib that closed each aeon (past cells only, never a held-out one), the budget stop, the
 //! cut checked against the declared population, and design (f)'s readout with `Kt` charging the
-//! located keys.
+//! located keys; and the landmark tree's prequential measurement on a cut and its development
+//! choices (the depth sweep and the stop-prior sweep read the development cells only).
 //!
 //! [measured] Under the exact law the constitution's exact bits multiplied per deposit on the chain
 //! control (1,126 → 10,883 → 623,415 at the declared steps; 1,126 → 7,053 → 311,864 → 2,224,183
@@ -15,13 +16,23 @@
 //! its second commit, [`two_deposits`]), which is the stop rule's own case and keeps the exact
 //! deposits few, and the rest of the cut runs on the last published constitution.
 
+use num_bigint::{BigInt, BigUint};
+use num_traits::{One, Zero};
+
 use super::learning::{OPEN_BUDGET, chain, chain_of};
 use super::support::Draw;
+use crate::compression::landmark::context::{
+    Capacity, LandmarkDeclaration, Landmarks, LetterFamily, StopPrior, address, cell_letters,
+    code_length, prior_family,
+};
 use crate::hnn::HnnError;
 use crate::hnn::constitution::Steps;
 use crate::hnn::field::Current;
 use crate::hnn::port::{ExecutionPort, ReceiptDetail};
-use crate::hnn::reference::{Cut, Exposure, ReadoutWall, Reference, WallTimes, one_hot};
+use crate::hnn::reference::{
+    Cut, Exposure, ReadoutWall, Reference, WallTimes, choose_depth, choose_prior, one_hot,
+    prequential, tree_prequential,
+};
 use crate::ratio::Rat;
 use crate::ratio::algebraic::ExactInterval;
 use crate::receiver::reception::Component;
@@ -399,61 +410,146 @@ fn one_worker_and_many_return_the_same_values() {
     assert_eq!(serial, parallel);
 }
 
-/// **The baselines' exact faces are the faces their codes read** (`Baselines::face_cell`, the
-/// reader that multiplies a passage's faces, the wide cut): stepped beside `code_cell` over the same
-/// cells, each face's code length is the enclosure `code_cell` returns, and a cell outside the
-/// chart is refused.
-#[test]
-fn the_baselines_faces_are_the_faces_their_codes_read() {
-    use crate::compression::landmark::context::code_length;
-    use crate::hnn::reference::Baselines;
-    let cells = source(96, 5);
-    let (mut faces, mut codes) = (Baselines::new(4).unwrap(), Baselines::new(4).unwrap());
-    for &cell in &cells {
-        let face = faces.face_cell(cell).unwrap();
-        let code = codes.code_cell(cell).unwrap();
-        assert_eq!(code_length(&face.uniform).unwrap(), code.uniform);
-        assert_eq!(code_length(&face.order_zero).unwrap(), code.order_zero);
-        assert_eq!(code_length(&face.order_one).unwrap(), code.order_one);
-        assert_eq!(code_length(&face.ppm).unwrap(), code.ppm);
+// -------------------------------------------------------------------------------------------
+// the landmark tree's prequential measurement on a cut, and its development choices
+
+/// A cell-only tree declaration at the grain 16 under the `½` stop prior.
+fn tree_declaration(alphabet: usize, depth: usize) -> LandmarkDeclaration {
+    LandmarkDeclaration {
+        alphabet,
+        depth,
+        forced: 0,
+        population: 64,
+        grain: 16,
+        family: LetterFamily::cells(),
+        prior: StopPrior::half(),
+        capacity: Capacity::Unbounded,
     }
-    assert!(matches!(
-        faces.face_cell(4),
-        Err(crate::hnn::HnnError::CellOutside { .. })
-    ));
 }
 
-/// The baselines read their code lengths by the certified integer binary logarithm
-/// (`context::code_length`): every enclosure contains the exact value the series enclosure
-/// (`ratio::log2_enclosure`) contains, so the two meet, and both read the same grain cell wherever
-/// their widths lie inside one; uniform over 2^k classes reads exactly `k`.
+/// **The prequential measurement**: the development and held-out sums are the replay's per-cell
+/// code lengths of the executed faces; the depth sweep reads the development cells only (changing
+/// the held-out cells changes no reading) and charges `⌈log₂⌉` of the family tried.
 #[test]
-fn the_baselines_read_their_exact_code_lengths_by_the_binary_logarithm() {
-    use crate::compression::landmark::context::code_length;
-    use crate::hnn::ratio::log2_enclosure;
-    use crate::hnn::reference::{Baselines, Ppm, kt_probability};
-    let cells = source(64, 3);
-    let mut baselines = Baselines::new(4).unwrap();
-    let mut ppm = Ppm::new(2, 4);
-    let mut counts = [0u64; 4];
-    for (seen, &cell) in cells.iter().enumerate() {
-        let kt = kt_probability(counts[cell], seen as u64, 4);
-        let series = log2_enclosure(&kt.recip()).unwrap();
-        let binary = code_length(&kt).unwrap();
-        assert!(binary.lower <= series.upper && series.lower <= binary.upper);
-        let mass = ppm.mass(cell);
-        let (series, binary) = (
-            log2_enclosure(&mass.recip()).unwrap(),
-            code_length(&mass).unwrap(),
-        );
-        assert!(binary.lower <= series.upper && series.lower <= binary.upper);
-        let codes = baselines.code_cell(cell).unwrap();
-        assert_eq!(codes.order_zero, code_length(&kt).unwrap());
-        assert_eq!(
-            codes.uniform,
-            ExactInterval::point(Rat::from_integer(2.into()))
-        );
-        ppm.update(cell);
-        counts[cell] += 1;
+fn landmark_prequential_partitions_the_cut() {
+    let cells: Vec<usize> = (0..48u64).map(|t| ((t * 3 + t / 5) % 4) as usize).collect();
+    let tail = 36..48;
+    let cut = Cut {
+        cells: cells.clone(),
+        held_out: vec![tail],
+    };
+    let declared = tree_declaration(4, 2);
+    let run = prequential(&cut, &cell_letters(&cut.cells), &declared).unwrap();
+    assert_eq!(run.development.cells, 36);
+    assert_eq!(run.held_out.cells, 12);
+    let mut tree = Landmarks::new(declared.clone()).unwrap();
+    let mut sums = [Rat::zero(), Rat::zero(), Rat::zero(), Rat::zero()];
+    let mut products = [Rat::one(), Rat::one()];
+    for (position, &cell) in cells.iter().enumerate() {
+        let reading = tree.receive(&address(&cells, position, 2), cell).unwrap();
+        let length = code_length(&reading.executed).unwrap();
+        let part = 2 * usize::from(position >= 36);
+        sums[part] += length.lower;
+        sums[part + 1] += length.upper;
+        products[part / 2] *= &reading.executed;
     }
+    // The run encloses the faces' product (`PassageCode`): it meets the per-cell sum and the
+    // product's own code length, within `2^(−80)` bits.
+    for (part, coded) in [&run.development.tree, &run.held_out.tree]
+        .into_iter()
+        .enumerate()
+    {
+        let whole = code_length(&products[part]).unwrap();
+        assert!(coded.lower <= sums[2 * part + 1] && sums[2 * part] <= coded.upper);
+        assert!(coded.lower <= whole.upper && whole.lower <= coded.upper);
+        assert!(&coded.upper - &coded.lower <= Rat::new(BigInt::one(), BigInt::one() << 80usize));
+    }
+    assert_eq!(run.run.nodes, tree.nodes());
+    assert_eq!(run.run.bits, tree.bits());
+    assert!(run.run.largest_residual <= run.run.face_rule);
+
+    let sweep = choose_depth(&cut, &cell_letters(&cut.cells), &declared).unwrap();
+    let mut other = cut.clone();
+    for cell in &mut other.cells[36..] {
+        *cell = 3 - *cell;
+    }
+    assert_eq!(
+        choose_depth(&other, &cell_letters(&other.cells), &declared).unwrap(),
+        sweep
+    );
+    assert!(!sweep.tried.is_empty());
+    assert_eq!(
+        sweep.description_bits,
+        crate::compression::cost::ceil_log2(&BigUint::from(sweep.tried.len()))
+    );
+}
+
+/// **The prior sweep reads the development cells only** (the stop prior's choice): every law of the
+/// family runs its own depth sweep ([`crate::hnn::reference::choose_depth`]), changing the held-out cells changes nothing,
+/// the choice is charged `⌈log₂⌉` of the laws tried, the incumbent is the `½` stop prior, the chosen
+/// law is the incumbent or the least charged law strictly below it, and a family without `½` is
+/// refused. `tree_prequential` is `prequential`'s tree.
+#[test]
+fn landmark_prior_sweep_reads_the_development_cells_only() {
+    let cells: Vec<usize> = (0..96u64)
+        .map(|t| ((t * 3 + t / 5 + t * t / 7) % 4) as usize)
+        .collect();
+    let tail = 72..96;
+    let cut = Cut {
+        cells: cells.clone(),
+        held_out: vec![tail],
+    };
+    let letters = cell_letters(&cut.cells);
+    let declared = LandmarkDeclaration {
+        population: 96,
+        ..tree_declaration(4, 1)
+    };
+    let family = prior_family(3);
+    let sweep = choose_prior(&cut, &letters, &declared, &family).unwrap();
+    let mut other = cut.clone();
+    for cell in &mut other.cells[72..] {
+        *cell = 3 - *cell;
+    }
+    assert_eq!(
+        choose_prior(&other, &cell_letters(&other.cells), &declared, &family).unwrap(),
+        sweep
+    );
+    assert_eq!(sweep.incumbent, 0);
+    assert_eq!(sweep.description_bits, 4);
+    assert_eq!(sweep.tried.len(), 9);
+    for (prior, depths) in &sweep.tried {
+        let at = LandmarkDeclaration {
+            prior: prior.clone(),
+            ..declared.clone()
+        };
+        assert_eq!(&choose_depth(&cut, &letters, &at).unwrap(), depths);
+    }
+    let chosen = sweep.charged(sweep.chosen);
+    if sweep.chosen != sweep.incumbent {
+        assert!(chosen.upper < sweep.charged(sweep.incumbent).lower);
+        assert!((0..9).all(|index| chosen.upper <= sweep.charged(index).upper));
+    }
+    assert_eq!(
+        sweep.decided,
+        (0..9).all(|index| index == sweep.chosen || chosen.upper < sweep.charged(index).lower)
+    );
+    assert_eq!(
+        sweep.chosen_description(),
+        4 + sweep.tried[sweep.chosen].1.description_bits
+    );
+    assert!(choose_prior(&cut, &letters, &declared, &family[1..]).is_err());
+
+    let at = LandmarkDeclaration {
+        prior: StopPrior::per_depth(vec![1, 3]).unwrap(),
+        depth: 2,
+        ..declared
+    };
+    let ([development, held], run) = tree_prequential(&cut, &letters, &at).unwrap();
+    let both = prequential(&cut, &letters, &at).unwrap();
+    assert_eq!(
+        (development, held),
+        (both.development.tree, both.held_out.tree)
+    );
+    assert_eq!(run, both.run);
+    assert!(run.largest_residual <= run.face_rule);
 }

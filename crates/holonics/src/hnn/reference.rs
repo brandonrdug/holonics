@@ -54,9 +54,9 @@
 //! receiver, and each statistic only over the locus's time-indexed window
 //! ([`crate::hnn::retention::Diamond`]).
 //!
-//! [definition] **The Holon, the Holarchy and the aeon at the mount.** A mount is the resident's
+//! [definition] **The Holarchy and its aeon at the mount.** A mount is the resident's
 //! declaration: it certifies that the field at the mounted constitution is a Holarchy that glues
-//! (`Field::holon`, `Holon::interconnect`'s typed gluing, refused with its defect), and it keeps
+//! (`Field::holarchy`, `Holon::interconnect`'s typed gluing, refused with its defect), and it keeps
 //! that Holarchy's parametric orientation ([`crate::holarchy::Holarchy::parametric`], the lift of
 //! the rings' joint clock torus) as the complex of every aeon it reads. The resident's aeon is an
 //! [`crate::aeon::Aeon`] on it, carried by its opening lift point and read at the boundary through
@@ -114,7 +114,7 @@
 //! | a word's open (`refine`, `compare`'s read, the deposit's re-read) | the rings' operands, then the contacts', each refining its own chart from its own kept chart; within them, a Gram's rows | each reads its own material (the standings, its own screws) and its own kept chart, and writes its own operands; the refined charts are kept afterwards, by key |
 //! | a tick of the word | the junctions, then the elements, then the transits; the rings' and contacts' power terms | a junction reads its own storage, arrivals and anchor remainder, an element its own junction and storage remainder, a transit its two ends' outgoing waves, its own state and its own remainders; the balance terms and the power are summed afterwards in ring, then contact, order |
 //! | the receiving read | the receiving epochs; within each, the map's `2\|A\|` rows, then the classes' grain cells | each row and class reads the shared anchor and writes its own logit or cell |
-//! | the tree read at compare | the receiving phases, each reading the published tree at its own address through its own working overlay (the window's earlier phases' deposits, built first in cell order, `compression::landmark::context::Landmarks::window_faces`) | the published tree and every overlay are read, never written, until the deposit |
+//! | the tree read at compare | the receiving phases, each reading the published tree at its own address through its own working overlay (the window's earlier phases' deposits, built first in cell order by `compression::landmark::context::Landmarks::window`; run together by `hnn::receiving::window_faces`) | the published tree and every overlay are read, never written, until the deposit |
 //! | the faces and the Holon ratio | the receiving phases' faces, then their ratios and code lengths | each reads its own read and target |
 //! | the compare phase ([`compare_phase`], campaign 2) | the tree face at the grain's code lengths (its phases together), beside the mixture score, the target phases, the Holon ratio and its covector (the mixture's steps in cell order inside) | both read the shared immutable faces and targets and write their own readings |
 //! | `pull_back` | per step in reverse, the junctions at their recorded anchors, then the elements (each through its executed chart's transpose), then the transits (each through its executed chart's transpose, and each channel coordinate), then the junctions' reverse Swings at their executed weights (and each coordinate) | each reads its step's record, its own covectors and its own adjoint remainders, and writes its own; the conductance terms are added afterwards, in contact, then ring and incidence, order |
@@ -149,7 +149,11 @@ use num_traits::{One, Signed, Zero};
 
 use crate::aeon::{ClockLift, EnclosedLedger};
 use crate::compression::cost::ceil_log2;
-use crate::compression::landmark::context::{Letter, code_length};
+use crate::compression::landmark::context::baseline::{BaselineCodes, Baselines};
+use crate::compression::landmark::context::{
+    ChartReport, IdealLandmarks, LandmarkDeclaration, Landmarks, Letter, PassageCode, StopPrior,
+    Widths, code_length, letter_address, log2_e_bound,
+};
 use crate::geometry::RatVec3;
 use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartReading, ChartStart, Charts, Remainders};
@@ -168,9 +172,7 @@ use crate::hnn::port::{
     port_receipt, release_width, resonance_reading, source_order, wrote_all,
 };
 use crate::hnn::propagation::{contact_exponent, path_attenuation};
-use crate::hnn::ratio::{
-    Faces, HolonRatio, PhaseRatio, RatioCovector, interval_sum, target_phases,
-};
+use crate::hnn::ratio::{Faces, HolonRatio, PhaseRatio, RatioCovector, target_phases};
 use crate::hnn::realization::{apply_rows, indexed, outer_rows};
 use crate::hnn::receiving::{
     ActiveAddress, MixtureStep, ReceivingPhases, Scored, tree_code_length,
@@ -179,7 +181,7 @@ use crate::hnn::retention::{AeonBoundary, Diamond, aeon_readings, collapse, cont
 use crate::hnn::word::{KeptWord, PowerForm, WordBalance};
 use crate::holon::contact::FeatureCovector;
 use crate::navigator::Clock;
-use crate::ratio::algebraic::ExactInterval;
+use crate::ratio::algebraic::{ExactInterval, interval_sum};
 use crate::ratio::exponentiated::power_of_two;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{add, dot, scale, sub};
@@ -288,7 +290,7 @@ pub fn window_code_length(model: &[ExactInterval]) -> Result<ExactInterval, HnnE
     model
         .iter()
         .try_fold(ExactInterval::point(Rat::zero()), |sum, phase| {
-            interval_sum(&sum, phase)
+            Ok(interval_sum(&sum, phase)?)
         })
 }
 
@@ -722,7 +724,7 @@ impl Reference {
     }
 
     /// **Mount on a declared constitution** (a transfer, and the resident's declaration): the field
-    /// at the constitution is certified a Holarchy that glues (`Field::holon`, refused with its
+    /// at the constitution is certified a Holarchy that glues (`Field::holarchy`, refused with its
     /// gluing defect), whose parametric orientation is the field's joint clock lift and carries the
     /// resident's aeons; the admitted family is the field's declared receivers at that
     /// constitution.
@@ -732,7 +734,7 @@ impl Reference {
         current: &Current,
         constitution: Constitution,
     ) -> Result<Resident, HnnError> {
-        let parametric = field.holon(&constitution)?.parametric();
+        let parametric = field.holarchy(&constitution)?.parametric();
         if parametric != field.parametric() {
             return Err(HnnError::Shape {
                 what: "the Holarchy's parametric orientation against the field's joint clock lift",
@@ -2393,7 +2395,8 @@ impl Cut {
 /// `min(L_T, L_C)` and one bit above it, each within the chart's drift (Lean
 /// `Compression/Landmark/Context/Tree.{sequential_mixture_bounds, sequential_mixture_executed}`); and the online
 /// baselines' (uniform;
-/// order-0 and order-1 with the Krichevsky–Trofimov prior; PPM of order [`PPM_ORDER`] with escape
+/// order-0 and order-1 with the Krichevsky–Trofimov prior; PPM of order
+/// [`PPM_ORDER`](crate::compression::landmark::context::baseline::PPM_ORDER) with escape
 /// rule C), each an enclosure, over `cells` targets. xz and zstd, with their description cost, are
 /// exterior codecs: the crate runs no process, so they are owed to the application, computed there
 /// on the same cut and joined to this report.
@@ -2676,239 +2679,15 @@ pub struct ReadoutWall {
     pub census: Duration,
 }
 
-/// [definition] **The online Krichevsky–Trofimov probability** of a class seen `count` times in
-/// `total`: `(count + ½)/(total + |A|/2)`, exact (Lean `HNN/RegionCounts.ktProb`).
-pub fn kt_probability(count: u64, total: u64, alphabet: usize) -> Rat {
-    Rat::new(
-        BigInt::from(2 * count + 1),
-        BigInt::from(2 * total) + BigInt::from(alphabet),
-    )
-}
-
-/// The online Krichevsky–Trofimov code length of one cell, `−log₂((count + ½)/(total + |A|/2))`,
-/// enclosed by the certified integer binary logarithm (`compression::landmark::context::code_length`): the same exact
-/// value as `log2_enclosure` encloses, read in microseconds against milliseconds.
-fn kt_bits(count: u64, total: u64, alphabet: usize) -> Result<ExactInterval, HnnError> {
-    code_length(&kt_probability(count, total, alphabet))
-}
-
-/// [definition; agent-inferred] **The PPM baseline's declared order**: two context cells, the
-/// least order above the order-1 baseline beside it.
-pub const PPM_ORDER: usize = 2;
-
-/// [definition] **Prediction by partial matching, exact and online** (Cleary and Witten; escape
-/// rule C of Moffat): the counts of each symbol after each context of up to `order` cells, all
-/// orders updated after each cell. A cell is coded from the longest context down: at a context
-/// with counts `n_s` over the symbols not yet excluded, total `n` and `d` distinct, a seen symbol
-/// has mass `n_s/(n + d)` and the escape `d/(n + d)`, which excludes those symbols below; a context
-/// never seen escapes with mass one; below order 0 the declared prior is uniform over the symbols
-/// not excluded. The cell's mass is the exact rational product, and its code length is enclosed.
-#[derive(Clone, Debug)]
-pub struct Ppm {
-    order: usize,
-    alphabet: usize,
-    tables: Vec<BTreeMap<Vec<usize>, BTreeMap<usize, u64>>>,
-    history: Vec<usize>,
-}
-
-impl Ppm {
-    pub fn new(order: usize, alphabet: usize) -> Self {
-        Self {
-            order,
-            alphabet,
-            tables: vec![BTreeMap::new(); order + 1],
-            history: Vec::new(),
-        }
-    }
-
-    /// **The exact mass of the next cell** under the counts so far.
-    pub fn mass(&self, symbol: usize) -> Rat {
-        let mut mass = Rat::one();
-        let mut excluded: std::collections::BTreeSet<usize> = std::collections::BTreeSet::new();
-        for k in (0..=self.order.min(self.history.len())).rev() {
-            let context = &self.history[self.history.len() - k..];
-            let Some(counts) = self.tables[k].get(context) else {
-                continue;
-            };
-            let (mut total, mut distinct) = (0u64, 0u64);
-            for (seen, count) in counts {
-                if !excluded.contains(seen) {
-                    total += count;
-                    distinct += 1;
-                }
-            }
-            if total == 0 {
-                continue;
-            }
-            let denominator = BigInt::from(total + distinct);
-            if let Some(count) = counts.get(&symbol).filter(|_| !excluded.contains(&symbol)) {
-                return mass * Rat::new(BigInt::from(*count), denominator);
-            }
-            mass *= Rat::new(BigInt::from(distinct), denominator);
-            excluded.extend(counts.keys().copied());
-        }
-        mass * Rat::new(
-            BigInt::one(),
-            BigInt::from(self.alphabet.saturating_sub(excluded.len()).max(1)),
-        )
-    }
-
-    /// Count one cell at every order and extend the history.
-    pub fn update(&mut self, symbol: usize) {
-        for k in 0..=self.order.min(self.history.len()) {
-            let context = self.history[self.history.len() - k..].to_vec();
-            *self.tables[k]
-                .entry(context)
-                .or_default()
-                .entry(symbol)
-                .or_insert(0) += 1;
-        }
-        self.history.push(symbol);
-        if self.history.len() > self.order {
-            self.history.remove(0);
-        }
-    }
-
-    /// **The cell's code length** `−log₂ P`, enclosed by the certified integer binary logarithm
-    /// (`compression::landmark::context::code_length`), then its count.
-    pub fn code(&mut self, symbol: usize) -> Result<ExactInterval, HnnError> {
-        let bits = code_length(&self.mass(symbol))?;
-        self.update(symbol);
-        Ok(bits)
-    }
-}
-
-/// [definition] **One cell's code lengths under the online baselines**, each read at the standing
-/// before the cell's own count: uniform, order-0 and order-1 Krichevsky–Trofimov, and PPM of order
-/// [`PPM_ORDER`] with escape rule C, each enclosed.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct BaselineCodes {
-    pub uniform: ExactInterval,
-    pub order_zero: ExactInterval,
-    pub order_one: ExactInterval,
-    pub ppm: ExactInterval,
-}
-
-/// [definition] **One cell's exact faces under the online baselines**, read at the standing before
-/// the cell's own count ([`Baselines::face_cell`]): the faces [`BaselineCodes`] encloses the code
-/// lengths of, for a reader that multiplies a passage's faces (`compression::landmark::context::PassageCode`).
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct BaselineFaces {
-    pub uniform: Rat,
-    pub order_zero: Rat,
-    pub order_one: Rat,
-    pub ppm: Rat,
-}
-
-/// [definition] **The online baselines, fitted on the same stream in the same order** as the model
-/// they are read beside: every cell is coded at the current counts, then counted (prequential).
-/// [agent-inferred] The order-1 baseline's contexts are the preceding cell's address letter
-/// (`compression::landmark::context::Letter`: `1 + code`, and the boundary `0` before the stream's first cell): the
-/// preceding cell's region. Order-1 is the depth-one forced case of the whole-cell emission
-/// (`|A|`-ary KT masses at a node, the region table; Lean
-/// `Compression/Landmark/Context/Tree.depth_one_is_the_whole_cell_table`), which lives in Lean only; the executed tree
-/// (`compression::landmark::context::Landmarks`) emits the cell's odometer digits, and its depth-one forced case is
-/// a product of binary KT faces at the preceding cell, a different law. The exposure ([`expose`])
-/// and the landmark tree's prequential measurement (`compression::landmark::context::prequential`) read them.
-#[derive(Clone, Debug)]
-pub struct Baselines {
-    alphabet: usize,
-    uniform: ExactInterval,
-    order_zero: Vec<u64>,
-    order_one: BTreeMap<(usize, usize), u64>,
-    order_one_totals: Vec<u64>,
-    previous: Option<usize>,
-    seen: u64,
-    ppm: Ppm,
-}
-
-impl Baselines {
-    /// The baselines at their priors over `|A|` classes.
-    pub fn new(alphabet: usize) -> Result<Self, HnnError> {
-        Ok(Self {
-            alphabet,
-            uniform: code_length(&Rat::new(BigInt::one(), BigInt::from(alphabet)))?,
-            order_zero: vec![0; alphabet],
-            order_one: BTreeMap::new(),
-            order_one_totals: vec![0; alphabet + 1],
-            previous: None,
-            seen: 0,
-            ppm: Ppm::new(PPM_ORDER, alphabet),
-        })
-    }
-
-    /// The order-1 context: the preceding cell's address letter's code.
-    fn context(&self) -> usize {
-        self.previous.map_or(Letter::Boundary, Letter::Cell).code() as usize
-    }
-
-    /// Count one cell in the Krichevsky–Trofimov baselines.
-    fn count(&mut self, code: usize) {
-        let context = self.context();
-        self.order_zero[code] += 1;
-        *self.order_one.entry((context, code)).or_insert(0) += 1;
-        self.order_one_totals[context] += 1;
-        self.previous = Some(code);
-        self.seen += 1;
-    }
-
-    /// Count one cell in every baseline, uncoded.
-    pub fn update(&mut self, code: usize) {
-        self.count(code);
-        self.ppm.update(code);
-    }
-
-    /// **Code one cell in every baseline at the current counts, then count it** (prequential).
-    pub fn code_cell(&mut self, code: usize) -> Result<BaselineCodes, HnnError> {
-        let context = self.context();
-        let codes = BaselineCodes {
-            uniform: self.uniform.clone(),
-            order_zero: kt_bits(self.order_zero[code], self.seen, self.alphabet)?,
-            order_one: kt_bits(
-                self.order_one.get(&(context, code)).copied().unwrap_or(0),
-                self.order_one_totals[context],
-                self.alphabet,
-            )?,
-            ppm: self.ppm.code(code)?,
-        };
-        self.count(code);
-        Ok(codes)
-    }
-
-    /// **Read one cell's exact faces in every baseline at the current counts, then count it**
-    /// (prequential; [`Baselines::code_cell`]'s faces).
-    pub fn face_cell(&mut self, code: usize) -> Result<BaselineFaces, HnnError> {
-        if code >= self.alphabet {
-            return Err(HnnError::CellOutside {
-                code,
-                alphabet: self.alphabet,
-            });
-        }
-        let context = self.context();
-        let faces = BaselineFaces {
-            uniform: Rat::new(BigInt::one(), BigInt::from(self.alphabet)),
-            order_zero: kt_probability(self.order_zero[code], self.seen, self.alphabet),
-            order_one: kt_probability(
-                self.order_one.get(&(context, code)).copied().unwrap_or(0),
-                self.order_one_totals[context],
-                self.alphabet,
-            ),
-            ppm: self.ppm.mass(code),
-        };
-        self.update(code);
-        Ok(faces)
-    }
-
-    /// Code one cell in every baseline into `bits`, then count it.
-    fn code(&mut self, bits: &mut Bits, code: usize) -> Result<(), HnnError> {
-        let codes = self.code_cell(code)?;
-        bits.uniform = interval_sum(&bits.uniform, &codes.uniform)?;
-        bits.order_zero = interval_sum(&bits.order_zero, &codes.order_zero)?;
-        bits.order_one = interval_sum(&bits.order_one, &codes.order_one)?;
-        bits.ppm = interval_sum(&bits.ppm, &codes.ppm)?;
-        bits.cells += 1;
-        Ok(())
-    }
+/// **Code one cell in every baseline into `bits`, then count it** (the exposure's population sums).
+fn code_baselines(baselines: &mut Baselines, bits: &mut Bits, code: usize) -> Result<(), HnnError> {
+    let codes = baselines.code_cell(code)?;
+    bits.uniform = interval_sum(&bits.uniform, &codes.uniform)?;
+    bits.order_zero = interval_sum(&bits.order_zero, &codes.order_zero)?;
+    bits.order_one = interval_sum(&bits.order_one, &codes.order_one)?;
+    bits.ppm = interval_sum(&bits.ppm, &codes.ppm)?;
+    bits.cells += 1;
+    Ok(())
 }
 
 impl Reference {
@@ -3205,7 +2984,7 @@ where
                 bits.tree = interval_sum(&bits.tree, tree)?;
                 bits.tree_grain = interval_sum(&bits.tree_grain, grained)?;
                 bits.combined = interval_sum(&bits.combined, &phase.code_length)?;
-                baselines.code(bits, code)?;
+                code_baselines(&mut baselines, bits, code)?;
                 leg.add(model, tree, &phase.code_length)?;
             }
             // Prequential scoring: every compared window is deposited, held-out windows
@@ -3358,5 +3137,478 @@ where
                 })
             })
             .transpose()?,
+    })
+}
+
+// -------------------------------------------------------------------------------------------
+// the landmark tree's prequential measurement on a cut
+
+/// [definition; agent-inferred] **The landmark tree's prequential measurement on a cut, and its
+/// development choices** (the tree is `compression::landmark::context`'s; the cut is the
+/// exposure's, [`Cut`]): the tree over the ticks' letters and the online baselines
+/// (`compression::landmark::context::baseline`) over the same cells in the same order, each cell
+/// scored at the current standing and then deposited, with exact enclosures on the development and
+/// held-out populations ([`prequential`]); the address depth and the stop prior chosen on the
+/// development cells alone ([`choose_depth`], [`choose_prior`]; the held-out cells are cut away
+/// before any reading); and the executed face against the reference oracle ([`oracle_cost`]). The
+/// laws of a stop-prior sweep run together on the host (the host realization; each reads the
+/// shared immutable development cells and writes its own sweep).
+
+fn measurement_shape(what: &'static str, expected: usize, found: usize) -> HnnError {
+    HnnError::Shape {
+        what,
+        expected,
+        found,
+    }
+}
+
+fn zero_bits() -> ExactInterval {
+    ExactInterval::point(Rat::zero())
+}
+
+/// [definition] **Code lengths on one population**, each an enclosure of the population's faces'
+/// product ([`PassageCode`]) over `cells` cells: the tree's executed face and the online baselines.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Coded {
+    pub tree: ExactInterval,
+    pub uniform: ExactInterval,
+    pub order_zero: ExactInterval,
+    pub order_one: ExactInterval,
+    pub ppm: ExactInterval,
+    pub cells: u64,
+}
+
+/// [definition] **One tree's run**: its declaration and widths, its chart's report, its stored nodes,
+/// its label pool's letters (stored where paths part) and stored bits, the rule's a-priori residual a cell and
+/// the largest per-cell certified residual over the run.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TreeRun {
+    pub declaration: LandmarkDeclaration,
+    pub widths: Widths,
+    pub chart: ChartReport,
+    pub nodes: usize,
+    pub held: usize,
+    pub bits: u64,
+    pub face_rule: Rat,
+    pub largest_residual: Rat,
+}
+
+/// [definition] **The prequential measurement** ([`prequential`]): the development and held-out
+/// populations' code lengths and the tree's run.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Prequential {
+    pub development: Coded,
+    pub held_out: Coded,
+    pub run: TreeRun,
+}
+
+/// [definition] **A depth sweep on the development cells** ([`choose_depth`]): every depth tried with
+/// its development code length, the chosen depth and the description bits the choice is charged.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DepthSweep {
+    pub tried: Vec<(usize, ExactInterval)>,
+    pub chosen: usize,
+    pub description_bits: u64,
+}
+
+impl DepthSweep {
+    /// **Whether a sweep continues past its last depth** ([`choose_depth`]'s rule): the last
+    /// depth's development code lies strictly below the one before it, by disjoint exact
+    /// enclosures (the first depth always continues).
+    pub fn decreasing(tried: &[(usize, ExactInterval)]) -> bool {
+        match tried {
+            [.., (_, previous), (_, last)] => last.upper < previous.lower,
+            _ => true,
+        }
+    }
+
+    /// **The sweep's choice from the depths tried** ([`choose_depth`]'s rule): the last depth, or
+    /// the one before it when the last did not decrease strictly; charged `⌈log₂⌉` of the depths
+    /// tried. Refused when nothing was tried.
+    pub fn of(tried: Vec<(usize, ExactInterval)>) -> Result<Self, HnnError> {
+        let Some((last, _)) = tried.last() else {
+            return Err(measurement_shape(
+                "a depth sweep of at least one depth",
+                1,
+                0,
+            ));
+        };
+        let chosen = if Self::decreasing(&tried) {
+            *last
+        } else {
+            tried[tried.len() - 2].0
+        };
+        let description_bits = ceil_log2(&BigUint::from(tried.len()));
+        Ok(Self {
+            tried,
+            chosen,
+            description_bits,
+        })
+    }
+}
+
+/// Refused unless there is one letter per cell.
+fn aligned(cells: &[usize], letters: &[Letter]) -> Result<(), HnnError> {
+    if cells.len() != letters.len() {
+        return Err(measurement_shape(
+            "one tick's letter per cell",
+            cells.len(),
+            letters.len(),
+        ));
+    }
+    Ok(())
+}
+
+/// A tree's prequential sums over one stream, `[development, held-out]`, and the run.
+fn run_tree(
+    cells: &[usize],
+    letters: &[Letter],
+    held_out: &(dyn Fn(usize) -> bool + Sync),
+    declaration: &LandmarkDeclaration,
+) -> Result<([ExactInterval; 2], TreeRun), HnnError> {
+    aligned(cells, letters)?;
+    let mut tree = Landmarks::new(declaration.clone())?;
+    let mut codes = [PassageCode::new(), PassageCode::new()];
+    let mut largest_residual = Rat::zero();
+    for (position, &class) in cells.iter().enumerate() {
+        let reading = tree.receive(&letter_address(letters, position, declaration.depth), class)?;
+        codes[usize::from(held_out(position))].face(&reading.executed)?;
+        if reading.residual > largest_residual {
+            largest_residual = reading.residual;
+        }
+    }
+    Ok((
+        [codes[0].bits()?, codes[1].bits()?],
+        TreeRun {
+            declaration: declaration.clone(),
+            widths: tree.widths(),
+            chart: tree.chart(),
+            nodes: tree.nodes(),
+            held: tree.held(),
+            bits: tree.bits(),
+            face_rule: tree.face_rule(),
+            largest_residual,
+        },
+    ))
+}
+
+/// The baselines' prequential sums over one stream, `[development, held-out]`, and the counts.
+fn run_baselines(
+    cells: &[usize],
+    held_out: &(dyn Fn(usize) -> bool + Sync),
+    alphabet: usize,
+) -> Result<([BaselineCodes; 2], [u64; 2]), HnnError> {
+    let mut baselines = Baselines::new(alphabet)?;
+    let mut codes = [[PassageCode::new(); 4]; 2];
+    let mut counts = [0u64; 2];
+    for (position, &class) in cells.iter().enumerate() {
+        let faces = baselines.face_cell(class)?;
+        let part = usize::from(held_out(position));
+        for (code, face) in codes[part].iter_mut().zip([
+            &faces.uniform,
+            &faces.order_zero,
+            &faces.order_one,
+            &faces.ppm,
+        ]) {
+            code.face(face)?;
+        }
+        counts[part] += 1;
+    }
+    let sums = |[uniform, order_zero, order_one, ppm]: [PassageCode; 4]| {
+        Ok::<_, HnnError>(BaselineCodes {
+            uniform: uniform.bits()?,
+            order_zero: order_zero.bits()?,
+            order_one: order_one.bits()?,
+            ppm: ppm.bits()?,
+        })
+    };
+    let [development, held] = codes;
+    Ok(([sums(development)?, sums(held)?], counts))
+}
+
+/// **The prequential measurement on a cut** (the section header): the tree over the ticks' letters and
+/// the online baselines over the same cells in the same order, each cell scored at the current
+/// standing and then deposited, with enclosures on the development and held-out populations.
+pub fn prequential(
+    cut: &Cut,
+    letters: &[Letter],
+    declaration: &LandmarkDeclaration,
+) -> Result<Prequential, HnnError> {
+    let held_out = |position: usize| cut.held_out(position);
+    let (tree, baselines) = rayon::join(
+        || run_tree(&cut.cells, letters, &held_out, declaration),
+        || run_baselines(&cut.cells, &held_out, declaration.alphabet),
+    );
+    let ([development_tree, held_tree], run) = tree?;
+    let ([development, held], counts) = baselines?;
+    let coded = |tree: ExactInterval, baselines: BaselineCodes, cells: u64| Coded {
+        tree,
+        uniform: baselines.uniform,
+        order_zero: baselines.order_zero,
+        order_one: baselines.order_one,
+        ppm: baselines.ppm,
+        cells,
+    };
+    Ok(Prequential {
+        development: coded(development_tree, development, counts[0]),
+        held_out: coded(held_tree, held, counts[1]),
+        run,
+    })
+}
+
+/// **The development stream**: the cut with its held-out cells removed.
+pub fn development(cut: &Cut) -> Vec<usize> {
+    cut.cells
+        .iter()
+        .enumerate()
+        .filter(|(position, _)| !cut.held_out(*position))
+        .map(|(_, &cell)| cell)
+        .collect()
+}
+
+/// **The development letters**: the ticks' letters at the development positions.
+pub fn development_letters(cut: &Cut, letters: &[Letter]) -> Vec<Letter> {
+    letters
+        .iter()
+        .enumerate()
+        .filter(|(position, _)| !cut.held_out(*position))
+        .map(|(_, &letter)| letter)
+        .collect()
+}
+
+/// **The development code length of one declaration** (the harness's unit): the tree's
+/// prequential code length over the development cells and their letters, and its run.
+pub fn development_run(
+    cut: &Cut,
+    letters: &[Letter],
+    declaration: &LandmarkDeclaration,
+) -> Result<(ExactInterval, TreeRun), HnnError> {
+    aligned(&cut.cells, letters)?;
+    let cells = development(cut);
+    let letters = development_letters(cut, letters);
+    let never = |_: usize| false;
+    let ([bits, _], run) = run_tree(&cells, &letters, &never, declaration)?;
+    Ok((bits, run))
+}
+
+/// **Choose the address depth on the development cells** (the section header): `D = max(1, forced), …`
+/// while the development prequential code length decreases strictly; the declaration's own depth
+/// is ignored, and each depth derives its own widths.
+pub fn choose_depth(
+    cut: &Cut,
+    letters: &[Letter],
+    declaration: &LandmarkDeclaration,
+) -> Result<DepthSweep, HnnError> {
+    choose_depth_within(cut, letters, declaration, usize::MAX)
+}
+
+/// [definition; agent-inferred] **Choose the address depth within a declared deepest depth**
+/// (the wide cut: a memory cap bounds the tree's a-priori founded nodes, `n* B D`, and so its depth):
+/// [`choose_depth`]'s sweep, which also stops at `D = deepest`; the family tried is still charged
+/// `⌈log₂⌉` of its length.
+pub fn choose_depth_within(
+    cut: &Cut,
+    letters: &[Letter],
+    declaration: &LandmarkDeclaration,
+    deepest: usize,
+) -> Result<DepthSweep, HnnError> {
+    aligned(&cut.cells, letters)?;
+    let cells = development(cut);
+    let letters = development_letters(cut, letters);
+    let never = |_: usize| false;
+    let mut tried: Vec<(usize, ExactInterval)> = Vec::new();
+    let mut depth = declaration.forced.max(1);
+    loop {
+        let declared = LandmarkDeclaration {
+            depth,
+            ..declaration.clone()
+        };
+        let ([bits, _], _) = run_tree(&cells, &letters, &never, &declared)?;
+        tried.push((depth, bits));
+        if !DepthSweep::decreasing(&tried) || depth >= cells.len() || depth >= deepest {
+            break;
+        }
+        depth += 1;
+    }
+    DepthSweep::of(tried)
+}
+
+/// **One tree's prequential run on a cut, the tree alone** (the held-out pass of a law measured
+/// beside another's run of the baselines): every cell scored at the current standing before its
+/// own deposit, the code lengths enclosed on `[development, held-out]`, and the tree's run.
+pub fn tree_prequential(
+    cut: &Cut,
+    letters: &[Letter],
+    declaration: &LandmarkDeclaration,
+) -> Result<([ExactInterval; 2], TreeRun), HnnError> {
+    aligned(&cut.cells, letters)?;
+    let held_out = |position: usize| cut.held_out(position);
+    run_tree(&cut.cells, letters, &held_out, declaration)
+}
+
+/// [definition] **A stop-prior sweep on the development cells** ([`choose_prior`]): every law tried
+/// with its own depth sweep, the incumbent (the `½` stop prior), the chosen law, whether the chosen
+/// law's charged code length is decided below every other law's by disjoint enclosures, and the
+/// description bits the choice is charged, `⌈log₂⌉` of the laws tried (each law's depths are
+/// charged beside it, [`PriorSweep::charged`]).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PriorSweep {
+    pub tried: Vec<(StopPrior, DepthSweep)>,
+    pub incumbent: usize,
+    pub chosen: usize,
+    pub decided: bool,
+    pub description_bits: u64,
+}
+
+impl PriorSweep {
+    /// A law's development code length at its chosen depth.
+    pub fn bits(&self, index: usize) -> ExactInterval {
+        let sweep = &self.tried[index].1;
+        sweep
+            .tried
+            .iter()
+            .find(|(depth, _)| *depth == sweep.chosen)
+            .map(|(_, bits)| bits.clone())
+            .expect("the chosen depth was tried")
+    }
+
+    /// A law's development code length charged its depths' description bits `⌈log₂⌉` of the
+    /// depths it tried (the laws' own charge is common to every law, [`PriorSweep::description_bits`]).
+    pub fn charged(&self, index: usize) -> ExactInterval {
+        let bits = self.bits(index);
+        let depth = Rat::from_integer(BigInt::from(self.tried[index].1.description_bits));
+        ExactInterval {
+            lower: &bits.lower + &depth,
+            upper: &bits.upper + &depth,
+        }
+    }
+
+    /// The chosen law's whole description: the laws' `⌈log₂⌉` and its depths'.
+    pub fn chosen_description(&self) -> u64 {
+        self.description_bits + self.tried[self.chosen].1.description_bits
+    }
+}
+
+/// [definition; agent-inferred] **Choose the stop prior on the development cells** (the declared stop prior):
+/// each declared law of `family` chooses its own depth ([`choose_depth`], so the depth selection is
+/// campaign 1's) and reads its development code length there, the laws run together
+/// (the host realization: each reads the shared immutable development cells and writes its own sweep,
+/// so their effects commute). Each law is charged `⌈log₂⌉` of its depths tried, and the choice
+/// `⌈log₂ |family|⌉`. The chosen law is the least charged one (the first in the family's order at a
+/// tie) when its enclosure lies strictly below the incumbent's (the `½` stop prior, which the family
+/// must hold), and the incumbent otherwise; `decided` records whether it lies strictly below every
+/// other law's. The held-out cells never choose anything: they are cut away before any reading.
+pub fn choose_prior(
+    cut: &Cut,
+    letters: &[Letter],
+    declaration: &LandmarkDeclaration,
+    family: &[StopPrior],
+) -> Result<PriorSweep, HnnError> {
+    aligned(&cut.cells, letters)?;
+    let half = StopPrior::half();
+    let incumbent = family
+        .iter()
+        .position(|prior| *prior == half)
+        .ok_or(measurement_shape(
+            "a stop-prior family holding the ½ stop prior",
+            1,
+            0,
+        ))?;
+    let sweeps = indexed(family.len(), |index| {
+        let declared = LandmarkDeclaration {
+            prior: family[index].clone(),
+            ..declaration.clone()
+        };
+        choose_depth(cut, letters, &declared)
+    })?;
+    let mut sweep = PriorSweep {
+        tried: family.iter().cloned().zip(sweeps).collect(),
+        incumbent,
+        chosen: incumbent,
+        decided: false,
+        description_bits: ceil_log2(&BigUint::from(family.len())),
+    };
+    let charged: Vec<ExactInterval> = (0..family.len()).map(|i| sweep.charged(i)).collect();
+    let mut least = 0;
+    for (index, bits) in charged.iter().enumerate() {
+        if bits.upper < charged[least].upper {
+            least = index;
+        }
+    }
+    if charged[least].upper < charged[incumbent].lower {
+        sweep.chosen = least;
+    }
+    let chosen = &charged[sweep.chosen];
+    sweep.decided = charged
+        .iter()
+        .enumerate()
+        .all(|(index, bits)| index == sweep.chosen || chosen.upper < bits.lower);
+    Ok(sweep)
+}
+
+/// [definition] **The executed face's cost against the oracle** ([`oracle_cost`]), per population
+/// `[development, held-out]`: the oracle's reference width and rebases, both code lengths, the
+/// largest observed per-cell deviation (the upper bound `|q̂ − q|/min(q̂, q) · 3/2` bits of
+/// `|log₂(q̂/q)|`), the largest certificate, the oracle's own rule a cell, and whether every cell's
+/// observed deviation lay within its certificate plus the oracle's rule (the certificate bounds the
+/// distance to the ideal, the oracle's rule the oracle's).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct OracleCost {
+    pub reference_width: u64,
+    pub rebases: u64,
+    pub executed: [ExactInterval; 2],
+    pub ideal: [ExactInterval; 2],
+    pub largest_deviation: Rat,
+    pub largest_certificate: Rat,
+    pub drift_rule: Rat,
+    pub certified: bool,
+}
+
+/// **The executed face against the reference oracle on a cut** (the section header): both trees receive
+/// every cell in order at the reference width `W_o`; each cell's executed and ideal faces are
+/// read by [`code_length`] and compared exactly. Not on the hot path.
+pub fn oracle_cost(
+    cut: &Cut,
+    letters: &[Letter],
+    declaration: &LandmarkDeclaration,
+) -> Result<OracleCost, HnnError> {
+    aligned(&cut.cells, letters)?;
+    let reference_width = IdealLandmarks::reference_width(declaration);
+    let mut tree = Landmarks::new(declaration.clone())?;
+    let mut oracle = IdealLandmarks::new(declaration.clone(), Some(reference_width))?;
+    let drift_rule = oracle.drift_rule();
+    let (mut executed, mut ideal) = ([zero_bits(), zero_bits()], [zero_bits(), zero_bits()]);
+    let (mut largest_deviation, mut largest_certificate) = (Rat::zero(), Rat::zero());
+    let mut certified = true;
+    for (position, &class) in cut.cells.iter().enumerate() {
+        let here = letter_address(letters, position, declaration.depth);
+        let reading = tree.receive(&here, class)?;
+        let face = oracle.receive(&here, class)?;
+        let part = usize::from(cut.held_out(position));
+        executed[part] = interval_sum(&executed[part], &code_length(&reading.executed)?)?;
+        ideal[part] = interval_sum(&ideal[part], &code_length(&face)?)?;
+        let least = if reading.executed < face {
+            &reading.executed
+        } else {
+            &face
+        };
+        let deviation = (&reading.executed - &face).abs() / least * log2_e_bound();
+        certified &= deviation <= &reading.residual + &drift_rule;
+        if deviation > largest_deviation {
+            largest_deviation = deviation;
+        }
+        if reading.residual > largest_certificate {
+            largest_certificate = reading.residual;
+        }
+    }
+    Ok(OracleCost {
+        reference_width,
+        rebases: oracle.rebases(),
+        executed,
+        ideal,
+        largest_deviation,
+        largest_certificate,
+        drift_rule,
+        certified,
     })
 }

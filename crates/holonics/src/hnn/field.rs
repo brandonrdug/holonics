@@ -29,7 +29,7 @@
 //!   lattice `L_w`, from the finest receiver grain, the receiving fan-in, the widest local solve
 //!   and the junction steps; [`Field::describe`] codes them. Its contacts are the
 //!   blocks of its connection incidence `d_A` ([`Field::connection`]), and the rings and contacts
-//!   joined through it are the read-only Holarchy chart [`Field::holon`], built from the one
+//!   joined through it are the read-only Holarchy chart [`Field::holarchy`], built from the one
 //!   constitution;
 //! - the [`Current`] is the lift point `λ ∈ ℤ^G` of the rings' joint clock torus: the only thing
 //!   that persists between words besides the constitution and the open moments. It has no wave
@@ -56,11 +56,11 @@
 //! | `Holon/Complex` (`∂∘∂ = 0`) | [`Field::complex`] |
 //! | `Holon/Navigator.{mapRotor_order, map_pow_mod_order}` | [`Ring::navigator`], [`Ring::rotate`] |
 //! | `Holon/Complex.{blockIncidence, block_cell_curvature, block_flat_closed}` | [`Field::connection`], consumed by [`Field::contrast`] |
-//! | `Holarchy/Join.interconnect`, `Holon/Dirac.kirchhoff_isDirac`, `Holarchy/Join.Holarchy.parametric` | [`Field::holon`] (certified at the mount) |
+//! | `Holarchy/Join.interconnect`, `Holon/Dirac.kirchhoff_isDirac`, `Holarchy/Join.Holarchy.parametric` | [`Field::holarchy`] (certified at the mount) |
 //! | `HNN/Propagation.partialIsometry_transit` | [`Field::connection`]'s blocks `U_aᵀ`, read by [`Field::contrast`] and by the transit's channel selections ([`Contact::selection`]) |
 //! | `Transport/HelicalPairInteraction.pairFeatureAt_gradient` | [`Contact::pair`] through [`PairContact`] |
-//! | `HNN/ContactBreak.parting_returns_gluing_defect` | [`Field::parted_holon`] |
-//! | `HNN/Contact.contact_signed_storage_balance` (a boost's signed stiffness in the chart) | [`Field::holon`] through `hnn::contact::signed_stiffness` |
+//! | `HNN/ContactBreak.parting_returns_gluing_defect` | [`Field::parted_holarchy`] |
+//! | `HNN/Contact.contact_signed_storage_balance` (a boost's signed stiffness in the chart) | [`Field::holarchy`] through `hnn::contact::signed_stiffness` |
 //! | `HNN/Moment.moment_capacity` | [`Field::declare`] through [`crate::hnn::moment::capacity`] |
 
 use std::collections::BTreeMap;
@@ -1310,7 +1310,7 @@ impl Field {
     }
 
     /// [definition] **The HNN as a Holarchy: a read-only chart built from the field and the one
-    /// constitution** (design (c), `Field::holon()`; review F2), block by block (guard 14):
+    /// constitution** (design (c), `Field::holarchy()`; review F2), block by block (guard 14):
     ///
     /// ```text
     /// ring g     x_g ∈ ℚ^(2d_g),  storage ½|x_g|²,  ẋ_g = (Ω_g − R_g + W_c,g) x_g + B_g f_g,  e_g = B_gᵀ x_g
@@ -1344,7 +1344,7 @@ impl Field {
     /// resident reads. The mount costs what the blocks cost: no dense whole is assembled. The chart
     /// glues at ports, with no glued cell complex, so a receiver's `view` and `count` of its regions
     /// are a declared absence at the aeon boundary.
-    pub fn holon(&self, constitution: &impl ConstitutionRead) -> Result<Holarchy, HnnError> {
+    pub fn holarchy(&self, constitution: &impl ConstitutionRead) -> Result<Holarchy, HnnError> {
         // Each ring's contact ends, in contact order.
         let ends: Vec<Vec<(usize, End)>> = (0..self.rings.len())
             .map(|g| {
@@ -1394,13 +1394,13 @@ impl Field {
 
     /// **A parted contact's shared face returns its typed gluing defect** (Lean
     /// `HNN/ContactBreak.parting_returns_gluing_defect`, over `Holarchy/Join.{interconnect_ok_iff,
-    /// GluingDefect.not_glues}`). The field's Holarchy chart ([`Field::holon`]) is declared again with
+    /// GluingDefect.not_glues}`). The field's Holarchy chart ([`Field::holarchy`]) is declared again with
     /// no flow transmitted through the parted contact's shared ports (its flow gain's columns zero,
     /// `partedAt`), and `interconnect` returns the failed check with its witness: the join no longer
     /// cancels the interface power ([`GluingDefect::UncancelledPower`]). An unparted contact (index
     /// outside the field) is refused; a parted declaration that glued would contradict the law and
     /// is refused as a realization defect.
-    pub fn parted_holon(
+    pub fn parted_holarchy(
         &self,
         constitution: &impl ConstitutionRead,
         parted: usize,

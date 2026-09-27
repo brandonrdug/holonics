@@ -55,7 +55,7 @@
 //! the launches ([`TreeTimes`]).
 //!
 //! [definition] **Parity** (`src/hnn/tests.rs`, `port_tests.rs`): the card's splits equal the host's
-//! (`Landmarks::window_splits`) exactly, window by window, on the cell-only and the enlarged tree,
+//! (`hnn::receiving::window_splits` over `Landmarks::window`) exactly, window by window, on the cell-only and the enlarged tree,
 //! at depths past the stream's recurrence and under declared stop priors, unbounded and at ceilings
 //! `c ∈ {1, 2, 3}` where the registers carry and chains holding carried registers split, and after
 //! every deposit the card's arena (roots, children, depth words, label ends, masses, charts, joins,
@@ -688,7 +688,7 @@ impl<'c> CardTree<'c> {
         Ok(self.stream.synchronize()?)
     }
 
-    /// **A window's splits in cell order** (`Landmarks::window_splits` on the card): phase `j`'s
+    /// **A window's splits in cell order** (`hnn::receiving::window_splits` over `Landmarks::window` on the card): phase `j`'s
     /// splits at `addresses[j]`, read after the deposits of the known earlier phases, each applied
     /// with its undo log; the logs are undone in reverse after the last read, so the mirror is
     /// unchanged. Refused at more phases than the mirror's window, or past its capacity.

@@ -15,7 +15,7 @@
 //! read at the join, while its port Holon (the composed Dirac structure with block storage and
 //! resistance) is assembled from the retained join only when it is read, and kept
 //! ([`Holon::port_holon`]). A constituent may be the unassembled whole of an earlier join, so a
-//! Holarchy of many small Holons (the HNN field's rings and contacts, `hnn::Field::holon`) is
+//! Holarchy of many small Holons (the HNN field's rings and contacts, `hnn::Field::holarchy`) is
 //! certified block by block and costs what its blocks cost (guard 14). The whole joins
 //! (`Holarchy/Join.Holarchy.wholeConstituent`):
 //!

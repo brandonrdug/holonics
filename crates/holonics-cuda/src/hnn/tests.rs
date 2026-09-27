@@ -856,12 +856,8 @@ fn tree_declared(
 
 /// The enlarged tree's letter family: two phase slots, of grains 3 and 2.
 fn tree_family() -> holonics::compression::landmark::context::LetterFamily {
-    use holonics::compression::landmark::context::{Feature, LetterFamily};
-    LetterFamily::new(vec![
-        Feature::Phase { ring: 0, grain: 3 },
-        Feature::Phase { ring: 1, grain: 2 },
-    ])
-    .unwrap()
+    use holonics::compression::landmark::context::LetterFamily;
+    LetterFamily::new(vec![3, 2]).unwrap()
 }
 
 /// A stream's bundles under [`tree_family`]: cell `i` with the phases `(i mod 3, ⌊i/3⌋ mod 2)`.
@@ -913,7 +909,7 @@ fn carried_upper_parts(
 }
 
 /// One tree's run on the card against the host: at every window of `aperture` cells, the card's
-/// splits of every phase in cell order equal the host's (`Landmarks::window_splits`), known
+/// splits of every phase in cell order equal the host's (`hnn::receiving::window_splits`), known
 /// targets and none; each window is then deposited on both, and every `check` windows the card's
 /// arena equals the host's. A capped tree (the register's capacity) also runs its unbounded twin on the host,
 /// whose topology it keeps, and returns what carried ([`Carried`]). Returns the card's times.
@@ -947,10 +943,10 @@ fn tree_parity(
             .map(|at| letter_address(letters, at, depth))
             .collect();
         let known = &cells[position..position + aperture];
-        let host = tree.window_splits(&addresses, known).unwrap();
+        let host = holonics::hnn::receiving::window_splits(&tree, &addresses, known).unwrap();
         let carded = mirror.window_splits(&addresses, known).unwrap();
         assert_eq!(carded, host, "the window at {position}");
-        let host = tree.window_splits(&addresses, &[]).unwrap();
+        let host = holonics::hnn::receiving::window_splits(&tree, &addresses, &[]).unwrap();
         let carded = mirror.window_splits(&addresses, &[]).unwrap();
         assert_eq!(carded, host, "the window at {position}, nothing known");
         let steps: Vec<(Vec<holonics::compression::landmark::context::Letter>, usize)> =

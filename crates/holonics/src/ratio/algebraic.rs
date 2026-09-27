@@ -183,6 +183,82 @@ impl ExactInterval {
     }
 }
 
+// -------------------------------------------------------------------------------------------
+// the declared enclosure grid of base-two logarithms and code lengths
+
+/// The series terms of a base-two logarithm's enclosure on the declared grid.
+const LOG_TERMS: u32 = 48;
+
+/// [definition; agent-inferred] **The declared enclosure grid's octaves** `O`: every base-two
+/// logarithm, every code length and every sum of them is held outward on `2^(−O)`, so a chain of
+/// sums keeps its denominators at `2^O` however long it runs. The receiving face's code lengths
+/// (`hnn::ratio`), the context tree's certified binary logarithm and passage code
+/// (`compression::landmark::context::{code_length, PassageCode}`) and the tree's reference oracle
+/// read this one grid.
+pub const LOG_OCTAVES: u32 = 96;
+
+/// **`log₂` of a positive rational, enclosed** without factoring: `ln x / ln 2`, each enclosed by
+/// `natural_log_enclosure` and divided outward, held on the declared grid. Exact (a point) on
+/// powers of two. Refused at a value that is not positive.
+pub fn log2_enclosure(value: &Rat) -> Result<ExactInterval, ExactValueError> {
+    if !value.is_positive() {
+        return Err(ExactValueError::NonPositiveLogarithm);
+    }
+    if let (Some(n), Some(d)) = (
+        value.numer().to_biguint().filter(|n| n.count_ones() == 1),
+        value.denom().to_biguint().filter(|d| d.count_ones() == 1),
+    ) {
+        let exponent = BigInt::from(n.bits()) - BigInt::from(d.bits());
+        return Ok(ExactInterval::point(Rat::from_integer(exponent)));
+    }
+    let natural = natural_log_enclosure(value, LOG_TERMS, LOG_OCTAVES)?;
+    let two = ln_two()?;
+    let candidates = [
+        &natural.lower / &two.lower,
+        &natural.lower / &two.upper,
+        &natural.upper / &two.lower,
+        &natural.upper / &two.upper,
+    ];
+    let lower = candidates.iter().min().expect("four candidates").clone();
+    let upper = candidates.iter().max().expect("four candidates").clone();
+    ExactInterval::new(lower, upper)?.round_out(LOG_OCTAVES)
+}
+
+/// `ln 2`'s enclosure at the declared series terms and octaves: a constant of the grid, formed once.
+fn ln_two() -> Result<&'static ExactInterval, ExactValueError> {
+    static LN_TWO: std::sync::OnceLock<Result<ExactInterval, ExactValueError>> =
+        std::sync::OnceLock::new();
+    LN_TWO
+        .get_or_init(|| {
+            natural_log_enclosure(&Rat::from_integer(BigInt::from(2)), LOG_TERMS, LOG_OCTAVES)
+        })
+        .as_ref()
+        .map_err(Clone::clone)
+}
+
+/// `log₂` of an enclosed positive value: monotone, so the bounds' logarithms bound it.
+pub fn log2_of_enclosure(value: &ExactInterval) -> Result<ExactInterval, ExactValueError> {
+    let lower = log2_enclosure(&value.lower)?;
+    let upper = log2_enclosure(&value.upper)?;
+    ExactInterval::new(lower.lower, upper.upper)
+}
+
+/// The sum of two enclosures, held outward on the declared grid.
+pub fn interval_sum(
+    a: &ExactInterval,
+    b: &ExactInterval,
+) -> Result<ExactInterval, ExactValueError> {
+    ExactInterval::new(&a.lower + &b.lower, &a.upper + &b.upper)?.round_out(LOG_OCTAVES)
+}
+
+/// `a − b` of two enclosures, held outward on the declared grid.
+pub fn interval_difference(
+    a: &ExactInterval,
+    b: &ExactInterval,
+) -> Result<ExactInterval, ExactValueError> {
+    ExactInterval::new(&a.lower - &b.upper, &a.upper - &b.lower)?.round_out(LOG_OCTAVES)
+}
+
 /// Integer polynomial with coefficients in ascending power order.
 ///
 /// **The normal form is part of the type.** [`IntegerPolynomial::new`] trims trailing zeros and

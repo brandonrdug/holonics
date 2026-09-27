@@ -5,14 +5,16 @@
 //! weight's rounding; the β chart's rebase and its certified residual; the opened path's telescope;
 //! the certified binary logarithm and the grain exponents; the derived widths; the stored bits;
 //! score and deposit against receive; a window's faces in cell order on a working overlay against
-//! the deposited tree; the refusals; and the prequential measurement. Campaign 2: the enlarged tree
+//! the deposited tree; the refusals; the code length of faces and passages; and the online context
+//! baselines (the prequential measurement on a cut and the development choices are the exposure's,
+//! tested in `hnn::tests::reference`). Campaign 2: the enlarged tree
 //! addressed by typed bundles (its faces normalized and certified against the oracle with its join,
 //! the cell-only branch kept within one bit a dyadic cell, a window in cell order, the letters
 //! refused outside their family), the carrier's rebase with its enclosure, and a declaration past
 //! the old `u128` refusal whose certified residual stays within the grain. The declared stop prior on the
 //! dyadic ladder (the block recursion at any stop weights, the founding ratio
 //! `2^j − 1`, the lattice law, the faces and windows under a prior), campaign 2's constant-slot
-//! controls as the per-depth prior `(1, r + 1)`, and the prior sweep on the development cells.
+//! controls as the per-depth prior `(1, r + 1)`.
 //! Local weighing: the join tree's prior; the joins as the Bayesian mixture per dyadic cell; and the
 //! stop-weight mixture per digit tree telescoping per dyadic cell (the node-local law is retired,
 //! its realization and tests at commit `89460425`). The storage where paths part (the one
@@ -31,19 +33,47 @@ mod full;
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
 
+use crate::compression::landmark::context::baseline::{Baselines, Ppm, kt_probability};
 use crate::compression::landmark::context::{
-    Beta, Bundle, Capacity, DigitsReading, FaceJoins, Feature, IdealLandmarks, JoinTree,
+    Beta, Bundle, Capacity, ContextError, DigitsReading, FaceJoins, IdealLandmarks, JoinTree,
     LandmarkDeclaration, LandmarkFace, Landmarks, Letter, LetterFamily, PassageCode, StopMixture,
-    StopPrior, Widths, address, binary_log, carrier_width, cell_letters, choose_depth,
-    choose_prior, code_length, face_bits, ladder_top, lattice_mix, letter_address, odometer_digits,
-    prequential, prior_family, ratio_code_length, tree_prequential,
+    StopPrior, Widths, address, binary_log, carrier_width, cell_letters, code_length, face_bits,
+    ladder_top, lattice_mix, letter_address, odometer_digits, prior_family, ratio_code_length,
 };
-use crate::hnn::HnnError;
-use crate::hnn::ratio::log2_enclosure;
-use crate::hnn::receiving::grain_exponent;
-use crate::hnn::reference::Cut;
+use crate::ratio::algebraic::{ExactInterval, interval_sum, log2_enclosure};
 use crate::ratio::{Rat, rat};
+use crate::receiver::face::grain_exponent;
 use full::FullTree;
+
+/// SplitMix64, for deterministic streams and operands.
+pub(super) struct Draw(u64);
+
+impl Draw {
+    pub(super) fn new(seed: u64) -> Self {
+        Self(seed)
+    }
+
+    pub(super) fn next(&mut self) -> u64 {
+        self.0 = self.0.wrapping_add(0x9E37_79B9_7F4A_7C15);
+        let mut z = self.0;
+        z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+        z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+        z ^ (z >> 31)
+    }
+}
+
+/// **A window's faces in cell order**, read phase by phase through [`Landmarks::window`].
+fn window_faces(
+    tree: &Landmarks,
+    addresses: &[Vec<Letter>],
+    known: &[usize],
+    grain: u64,
+) -> Result<Vec<LandmarkFace>, ContextError> {
+    let window = tree.window(addresses, known)?;
+    (0..window.phases())
+        .map(|phase| window.face(phase, grain))
+        .collect()
+}
 
 fn declaration(alphabet: usize, depth: usize) -> LandmarkDeclaration {
     LandmarkDeclaration {
@@ -606,7 +636,7 @@ fn landmark_score_and_deposit_is_receive() {
     assert_eq!(once.passed(), stream.len() as u64);
 }
 
-/// **A window's faces in cell order** (`Landmarks::window_faces`): phase `j` reads the face of a
+/// **A window's faces in cell order** (`Landmarks::window`): phase `j` reads the face of a
 /// clone into which the earlier phases' targets were deposited, exactly, founded nodes and rebased
 /// charts included (a narrow carrier forces rebases); the tree is unchanged; with nothing known
 /// every phase reads the current standing; the window past the declared population is still read
@@ -640,14 +670,14 @@ fn window_in_cell_order(stream: &[usize], prior: StopPrior, depth: usize, capaci
             .collect();
         let known = &stream[window.clone()];
         let before = tree.clone();
-        let faces = tree.window_faces(&addresses, known, 16).unwrap();
+        let faces = window_faces(&tree, &addresses, known, 16).unwrap();
         assert_eq!(tree, before, "the tree is unchanged");
         let mut deposited = tree.clone();
         for (j, (here, &cell)) in addresses.iter().zip(known).enumerate() {
             assert_eq!(faces[j], deposited.face(here, 16).unwrap(), "phase {j}");
             deposited.deposit(here, cell).unwrap();
         }
-        let unknown = tree.window_faces(&addresses, &[], 16).unwrap();
+        let unknown = window_faces(&tree, &addresses, &[], 16).unwrap();
         for (face, here) in unknown.iter().zip(&addresses) {
             assert_eq!(face, &tree.face(here, 16).unwrap());
         }
@@ -657,11 +687,11 @@ fn window_in_cell_order(stream: &[usize], prior: StopPrior, depth: usize, capaci
     assert_eq!(tree.passed(), 90);
     // Past the population: the window's earlier cells are read again, as a re-read does.
     let last = [address(stream, 88, depth), address(stream, 89, depth)];
-    let again = tree.window_faces(&last, &stream[88..90], 16).unwrap();
+    let again = window_faces(&tree, &last, &stream[88..90], 16).unwrap();
     assert_eq!(again.len(), 2);
     assert!(matches!(
-        tree.window_faces(&last, &[5, 0], 16),
-        Err(HnnError::CellOutside { .. })
+        window_faces(&tree, &last, &[5, 0], 16),
+        Err(ContextError::CellOutside { .. })
     ));
 }
 
@@ -675,14 +705,17 @@ fn landmark_refusals() {
         ..declaration(3, 1)
     })
     .unwrap();
-    assert!(matches!(tree.receive(&[], 0), Err(HnnError::Shape { .. })));
+    assert!(matches!(
+        tree.receive(&[], 0),
+        Err(ContextError::Extent { .. })
+    ));
     assert!(matches!(
         tree.receive(&[Letter::Boundary], 3),
-        Err(HnnError::CellOutside { .. })
+        Err(ContextError::CellOutside { .. })
     ));
     assert!(matches!(
         tree.receive(&[Letter::Cell(5)], 0),
-        Err(HnnError::CellOutside { .. })
+        Err(ContextError::CellOutside { .. })
     ));
     assert_eq!(tree.nodes(), 0);
     tree.receive(&[Letter::Boundary], 0).unwrap();
@@ -690,7 +723,7 @@ fn landmark_refusals() {
     let before = tree.clone();
     assert_eq!(
         tree.receive(&[Letter::Cell(1)], 2),
-        Err(HnnError::PopulationReached { population: 2 })
+        Err(ContextError::PopulationReached { population: 2 })
     );
     assert_eq!(tree, before);
     assert!(
@@ -710,73 +743,12 @@ fn landmark_refusals() {
     );
 }
 
-/// **The prequential measurement**: the development and held-out sums are the replay's per-cell
-/// code lengths of the executed faces; the depth sweep reads the development cells only (changing
-/// the held-out cells changes no reading) and charges `⌈log₂⌉` of the family tried.
-#[test]
-fn landmark_prequential_partitions_the_cut() {
-    let cells: Vec<usize> = (0..48u64).map(|t| ((t * 3 + t / 5) % 4) as usize).collect();
-    let tail = 36..48;
-    let cut = Cut {
-        cells: cells.clone(),
-        held_out: vec![tail],
-    };
-    let declared = declaration(4, 2);
-    let run = prequential(&cut, &cell_letters(&cut.cells), &declared).unwrap();
-    assert_eq!(run.development.cells, 36);
-    assert_eq!(run.held_out.cells, 12);
-    let mut tree = Landmarks::new(declared.clone()).unwrap();
-    let mut sums = [Rat::zero(), Rat::zero(), Rat::zero(), Rat::zero()];
-    let mut products = [Rat::one(), Rat::one()];
-    for (position, &cell) in cells.iter().enumerate() {
-        let reading = tree.receive(&address(&cells, position, 2), cell).unwrap();
-        let length = code_length(&reading.executed).unwrap();
-        let part = 2 * usize::from(position >= 36);
-        sums[part] += length.lower;
-        sums[part + 1] += length.upper;
-        products[part / 2] *= &reading.executed;
-    }
-    // The run encloses the faces' product (`PassageCode`): it meets the per-cell sum and the
-    // product's own code length, within `2^(−80)` bits.
-    for (part, coded) in [&run.development.tree, &run.held_out.tree]
-        .into_iter()
-        .enumerate()
-    {
-        let whole = code_length(&products[part]).unwrap();
-        assert!(coded.lower <= sums[2 * part + 1] && sums[2 * part] <= coded.upper);
-        assert!(coded.lower <= whole.upper && whole.lower <= coded.upper);
-        assert!(&coded.upper - &coded.lower <= rat_power(-80));
-    }
-    assert_eq!(run.run.nodes, tree.nodes());
-    assert_eq!(run.run.bits, tree.bits());
-    assert!(run.run.largest_residual <= run.run.face_rule);
-
-    let sweep = choose_depth(&cut, &cell_letters(&cut.cells), &declared).unwrap();
-    let mut other = cut.clone();
-    for cell in &mut other.cells[36..] {
-        *cell = 3 - *cell;
-    }
-    assert_eq!(
-        choose_depth(&other, &cell_letters(&other.cells), &declared).unwrap(),
-        sweep
-    );
-    assert!(!sweep.tried.is_empty());
-    assert_eq!(
-        sweep.description_bits,
-        crate::compression::cost::ceil_log2(&BigUint::from(sweep.tried.len()))
-    );
-}
-
 // -------------------------------------------------------------------------------------------
 // campaign 2: typed bundles, the enlarged tree that keeps the cell-only branch, and the carrier
 
 /// A family of two phase slots (grains 3 and 2).
 fn phase_family() -> LetterFamily {
-    LetterFamily::new(vec![
-        Feature::Phase { ring: 0, grain: 3 },
-        Feature::Phase { ring: 1, grain: 2 },
-    ])
-    .unwrap()
+    LetterFamily::new(vec![3, 2]).unwrap()
 }
 
 /// Each tick's bundle: its cell with the features `(i mod 3, ⌊i/3⌋ mod 2)`.
@@ -872,7 +844,7 @@ fn landmark_bundle_tree_is_normalized_and_certified() {
 /// the enlarged executed tree codes strictly shorter, by disjoint exact enclosures.
 #[test]
 fn landmark_enlarged_tree_keeps_the_cell_only_branch() {
-    let mut draw = crate::hnn::tests::support::Draw::new(5);
+    let mut draw = Draw::new(5);
     let stream: Vec<usize> = (0..240)
         .map(|i| 2 * (draw.next() % 2) as usize + usize::from(i % 3 == 0))
         .collect();
@@ -913,8 +885,7 @@ fn landmark_enlarged_tree_keeps_the_cell_only_branch() {
             let reading = tree
                 .receive(&letter_address(letters, position, 1), cell)
                 .unwrap();
-            sum = crate::hnn::ratio::interval_sum(&sum, &code_length(&reading.executed).unwrap())
-                .unwrap();
+            sum = interval_sum(&sum, &code_length(&reading.executed).unwrap()).unwrap();
         }
         sum
     };
@@ -932,7 +903,7 @@ fn landmark_enlarged_tree_keeps_the_cell_only_branch() {
     );
 }
 
-/// **A window's faces in cell order on the enlarged tree** (`Landmarks::window_faces`): phase `j`
+/// **A window's faces in cell order on the enlarged tree** (`Landmarks::window`): phase `j`
 /// reads exactly the face of a clone into which the earlier phases' targets were deposited, the
 /// joins included; the tree is unchanged.
 #[test]
@@ -954,7 +925,7 @@ fn landmark_bundle_window_faces_read_each_phase_after_the_earlier_deposits() {
             .collect();
         let known = &stream[window];
         let before = tree.clone();
-        let faces = tree.window_faces(&addresses, known, 16).unwrap();
+        let faces = window_faces(&tree, &addresses, known, 16).unwrap();
         assert_eq!(tree, before);
         let mut deposited = tree.clone();
         for (j, (here, &cell)) in addresses.iter().zip(known).enumerate() {
@@ -977,12 +948,12 @@ fn landmark_letters_are_refused_outside_their_family() {
     });
     assert!(matches!(
         cells.receive(&[bundle], 0),
-        Err(HnnError::Shape { .. })
+        Err(ContextError::Extent { .. })
     ));
     let mut tree = Landmarks::new(bundle_declaration(3, 1)).unwrap();
     assert!(matches!(
         tree.receive(&[Letter::Cell(0)], 0),
-        Err(HnnError::Shape { .. })
+        Err(ContextError::Extent { .. })
     ));
     let past = Letter::Bundle(Bundle {
         cell: 0,
@@ -990,7 +961,7 @@ fn landmark_letters_are_refused_outside_their_family() {
     });
     assert!(matches!(
         tree.receive(&[past], 0),
-        Err(HnnError::Shape { .. })
+        Err(ContextError::Extent { .. })
     ));
     tree.receive(&[bundle], 0).unwrap();
     tree.receive(&[Letter::Boundary], 1).unwrap();
@@ -1063,7 +1034,7 @@ fn landmark_tree_declares_past_the_old_refusal_and_stays_within_the_grain() {
         .is_ok()
     );
     // A text-like passage: words drawn from a small vocabulary, separated by spaces.
-    let mut draw = crate::hnn::tests::support::Draw::new(1_024);
+    let mut draw = Draw::new(1_024);
     let words: Vec<Vec<usize>> = (0..96)
         .map(|_| {
             let length = 2 + (draw.next() % 7) as usize;
@@ -1097,7 +1068,7 @@ fn landmark_tree_declares_past_the_old_refusal_and_stays_within_the_grain() {
     );
     assert!(matches!(
         tree.receive(&address(&stream, 0, 4), 0),
-        Err(HnnError::PopulationReached { .. })
+        Err(ContextError::PopulationReached { .. })
     ));
 }
 
@@ -1111,7 +1082,7 @@ fn landmark_tree_declares_past_the_old_refusal_and_stays_within_the_grain() {
 /// kernel's) admit to `605,394`.
 #[test]
 fn landmark_split_operands_are_the_single_division() {
-    let mut draw = crate::hnn::tests::support::Draw::new(35);
+    let mut draw = Draw::new(35);
     for (population, depth) in [
         (6_148u64, 4usize),
         (1 << 20, 1),
@@ -1201,7 +1172,7 @@ fn landmark_split_operands_are_the_single_division() {
 /// integers.
 #[test]
 fn landmark_passage_code_is_the_faces_product() {
-    let mut draw = crate::hnn::tests::support::Draw::new(20);
+    let mut draw = Draw::new(20);
     let mut code = PassageCode::new();
     let (mut left, mut right) = (PassageCode::new(), PassageCode::new());
     // The exact product, unreduced: the faces' numerators and denominators multiplied apart.
@@ -1444,76 +1415,6 @@ fn landmark_constant_slots_are_the_per_depth_prior() {
             tree.receive(&here, cell).unwrap();
         }
     }
-}
-
-/// **The prior sweep reads the development cells only** (the stop prior's choice): every law of the
-/// family runs its own depth sweep ([`choose_depth`]), changing the held-out cells changes nothing,
-/// the choice is charged `⌈log₂⌉` of the laws tried, the incumbent is the `½` stop prior, the chosen
-/// law is the incumbent or the least charged law strictly below it, and a family without `½` is
-/// refused. [`tree_prequential`] is [`prequential`]'s tree.
-#[test]
-fn landmark_prior_sweep_reads_the_development_cells_only() {
-    let cells: Vec<usize> = (0..96u64)
-        .map(|t| ((t * 3 + t / 5 + t * t / 7) % 4) as usize)
-        .collect();
-    let tail = 72..96;
-    let cut = Cut {
-        cells: cells.clone(),
-        held_out: vec![tail],
-    };
-    let letters = cell_letters(&cut.cells);
-    let declared = LandmarkDeclaration {
-        population: 96,
-        ..declaration(4, 1)
-    };
-    let family = prior_family(3);
-    let sweep = choose_prior(&cut, &letters, &declared, &family).unwrap();
-    let mut other = cut.clone();
-    for cell in &mut other.cells[72..] {
-        *cell = 3 - *cell;
-    }
-    assert_eq!(
-        choose_prior(&other, &cell_letters(&other.cells), &declared, &family).unwrap(),
-        sweep
-    );
-    assert_eq!(sweep.incumbent, 0);
-    assert_eq!(sweep.description_bits, 4);
-    assert_eq!(sweep.tried.len(), 9);
-    for (prior, depths) in &sweep.tried {
-        let at = LandmarkDeclaration {
-            prior: prior.clone(),
-            ..declared.clone()
-        };
-        assert_eq!(&choose_depth(&cut, &letters, &at).unwrap(), depths);
-    }
-    let chosen = sweep.charged(sweep.chosen);
-    if sweep.chosen != sweep.incumbent {
-        assert!(chosen.upper < sweep.charged(sweep.incumbent).lower);
-        assert!((0..9).all(|index| chosen.upper <= sweep.charged(index).upper));
-    }
-    assert_eq!(
-        sweep.decided,
-        (0..9).all(|index| index == sweep.chosen || chosen.upper < sweep.charged(index).lower)
-    );
-    assert_eq!(
-        sweep.chosen_description(),
-        4 + sweep.tried[sweep.chosen].1.description_bits
-    );
-    assert!(choose_prior(&cut, &letters, &declared, &family[1..]).is_err());
-
-    let at = LandmarkDeclaration {
-        prior: StopPrior::per_depth(vec![1, 3]).unwrap(),
-        depth: 2,
-        ..declared
-    };
-    let ([development, held], run) = tree_prequential(&cut, &letters, &at).unwrap();
-    let both = prequential(&cut, &letters, &at).unwrap();
-    assert_eq!(
-        (development, held),
-        (both.development.tree, both.held_out.tree)
-    );
-    assert_eq!(run, both.run);
-    assert!(run.largest_residual <= run.face_rule);
 }
 
 // -------------------------------------------------------------------------------------------
@@ -1894,7 +1795,7 @@ fn landmark_enlarged_tree_where_paths_part_is_the_full_tree() {
             .collect();
         let known = &stream[window];
         let before = tree.clone();
-        let faces = tree.window_faces(&addresses, known, 16).unwrap();
+        let faces = window_faces(&tree, &addresses, known, 16).unwrap();
         assert_eq!(tree, before);
         let mut deposited = tree.clone();
         for (j, (here, &cell)) in addresses.iter().zip(known).enumerate() {
@@ -1905,7 +1806,7 @@ fn landmark_enlarged_tree_where_paths_part_is_the_full_tree() {
     }
 }
 
-/// **A window's faces in cell order past the stream's recurrence** (`Landmarks::window_faces`): the
+/// **A window's faces in cell order past the stream's recurrence** (`Landmarks::window`): the
 /// overlay founds, splits and relinks as the deposit does, so phase `j` reads exactly the face of a
 /// clone into which the earlier phases' targets were deposited.
 #[test]
@@ -1962,14 +1863,12 @@ fn landmark_stored_parts_where_paths_part() {
 /// `[0, 1/m')` with `m'` the kept mantissa in `[2^(W−1), 2^W)`.
 #[test]
 fn landmark_split_ratios_are_the_exact_forms() {
-    let mut draw = crate::hnn::tests::support::Draw::new(37);
+    let mut draw = Draw::new(37);
     let ladder = |rung: u64| Rat::from_integer((BigInt::one() << rung as usize) - 1);
     let (mut exact, mut rebased) = (0, 0);
     for width in [6u64, 28, 42] {
         for trial in 0..300 {
-            let wide = |draw: &mut crate::hnn::tests::support::Draw| {
-                u128::from(draw.next() >> (64 - width)) | 1
-            };
+            let wide = |draw: &mut Draw| u128::from(draw.next() >> (64 - width)) | 1;
             let exponent = match trial % 3 {
                 0 => (draw.next() % 21) as i64 - 10,
                 1 => (draw.next() % 6001) as i64 - 3000,
@@ -2277,5 +2176,76 @@ fn landmark_capped_tree_is_within_its_certificate() {
         .collect();
     for (depth, capacity) in [(2, Capacity::Ceiling(1)), (9, Capacity::Ceiling(2))] {
         window_in_cell_order(&windows, StopPrior::half(), depth, capacity);
+    }
+}
+
+// -------------------------------------------------------------------------------------------
+// the online context baselines
+
+/// A stream over four classes: a period-four pattern with one cell in eight drawn at random.
+fn baseline_source(length: usize, seed: u64) -> Vec<usize> {
+    let mut draw = Draw::new(seed);
+    (0..length)
+        .map(|k| {
+            if draw.next() % 8 == 0 {
+                (draw.next() % 4) as usize
+            } else {
+                [0, 1, 2, 1][k % 4]
+            }
+        })
+        .collect()
+}
+
+/// **The baselines' exact faces are the faces their codes read** (`Baselines::face_cell`, the
+/// reader that multiplies a passage's faces, the wide cut): stepped beside `code_cell` over the same
+/// cells, each face's code length is the enclosure `code_cell` returns, and a cell outside the
+/// chart is refused.
+#[test]
+fn the_baselines_faces_are_the_faces_their_codes_read() {
+    let cells = baseline_source(96, 5);
+    let (mut faces, mut codes) = (Baselines::new(4).unwrap(), Baselines::new(4).unwrap());
+    for &cell in &cells {
+        let face = faces.face_cell(cell).unwrap();
+        let code = codes.code_cell(cell).unwrap();
+        assert_eq!(code_length(&face.uniform).unwrap(), code.uniform);
+        assert_eq!(code_length(&face.order_zero).unwrap(), code.order_zero);
+        assert_eq!(code_length(&face.order_one).unwrap(), code.order_one);
+        assert_eq!(code_length(&face.ppm).unwrap(), code.ppm);
+    }
+    assert!(matches!(
+        faces.face_cell(4),
+        Err(ContextError::CellOutside { .. })
+    ));
+}
+
+/// The baselines read their code lengths by the certified integer binary logarithm
+/// ([`code_length`]): every enclosure contains the exact value the series enclosure
+/// (`ratio::algebraic::log2_enclosure`) contains, so the two meet, and both read the same grain cell wherever
+/// their widths lie inside one; uniform over 2^k classes reads exactly `k`.
+#[test]
+fn the_baselines_read_their_exact_code_lengths_by_the_binary_logarithm() {
+    let cells = baseline_source(64, 3);
+    let mut baselines = Baselines::new(4).unwrap();
+    let mut ppm = Ppm::new(2, 4);
+    let mut counts = [0u64; 4];
+    for (seen, &cell) in cells.iter().enumerate() {
+        let kt = kt_probability(counts[cell], seen as u64, 4);
+        let series = log2_enclosure(&kt.recip()).unwrap();
+        let binary = code_length(&kt).unwrap();
+        assert!(binary.lower <= series.upper && series.lower <= binary.upper);
+        let mass = ppm.mass(cell);
+        let (series, binary) = (
+            log2_enclosure(&mass.recip()).unwrap(),
+            code_length(&mass).unwrap(),
+        );
+        assert!(binary.lower <= series.upper && series.lower <= binary.upper);
+        let codes = baselines.code_cell(cell).unwrap();
+        assert_eq!(codes.order_zero, code_length(&kt).unwrap());
+        assert_eq!(
+            codes.uniform,
+            ExactInterval::point(Rat::from_integer(2.into()))
+        );
+        ppm.update(cell);
+        counts[cell] += 1;
     }
 }

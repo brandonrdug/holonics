@@ -54,24 +54,24 @@
 //! | `Objects/Ratio.logFibre` (the undivided pair with its winding) | [`HolonRatio::log_ratio`] |
 
 use num_bigint::{BigInt, BigUint};
-use num_traits::{One, Signed, ToPrimitive, Zero};
+use num_traits::{One, ToPrimitive, Zero};
 
 use crate::aeon::Reading;
 use crate::hnn::HnnError;
 use crate::hnn::field::{Field, phase_winding};
 use crate::hnn::realization::indexed;
-use crate::hnn::receiving::{GrainCell, ReceivingRead};
-use crate::ratio::algebraic::{ExactInterval, natural_log_enclosure};
+use crate::hnn::receiving::ReceivingRead;
+use crate::ratio::algebraic::{
+    ExactInterval, interval_difference, interval_sum, log2_enclosure, log2_of_enclosure,
+};
 use crate::ratio::exponentiated::{CarriedPower, PhaseField, READING_BITS, power_of_two};
 use crate::ratio::gaussian::GaussianRat;
 use crate::ratio::{LogRatio, Rat, integer};
-
-/// The series terms and dyadic octaves of a logarithm's enclosure.
-const LOG_TERMS: u32 = 48;
-pub(crate) const LOG_OCTAVES: u32 = 96;
+use crate::receiver::face::GrainCell;
 
 // -------------------------------------------------------------------------------------------
-// enclosures of the real chart
+// enclosures of the real chart (the base-two logarithms and their sums are
+// `crate::ratio::algebraic`'s, on its declared grid)
 
 /// **`2^x` of a rational, enclosed**: `2^⌊x⌋ · 2^(a/b)` with `a/b` the fractional part, its root
 /// bounded by an exact integer `b`-th root at [`READING_BITS`]. A reading, never a law's value.
@@ -107,92 +107,7 @@ pub fn power_of_two_enclosure(x: &Rat) -> Result<ExactInterval, HnnError> {
     } else {
         Rat::from_integer(BigInt::from(root + 1u32)) * &unit
     };
-    interval(&scale * lower, &scale * upper)
-}
-
-fn interval(lower: Rat, upper: Rat) -> Result<ExactInterval, HnnError> {
-    ExactInterval::new(lower, upper).map_err(|_| HnnError::Shape {
-        what: "an ordered enclosure",
-        expected: 0,
-        found: 1,
-    })
-}
-
-/// **`log₂` of a positive rational, enclosed** without factoring: `ln x / ln 2`, each enclosed by
-/// the crate's series and divided outward. Exact (a point) on powers of two.
-pub fn log2_enclosure(value: &Rat) -> Result<ExactInterval, HnnError> {
-    if !value.is_positive() {
-        return Err(HnnError::Shape {
-            what: "a positive argument of log2",
-            expected: 1,
-            found: 0,
-        });
-    }
-    if let (Some(n), Some(d)) = (
-        value.numer().to_biguint().filter(|n| n.count_ones() == 1),
-        value.denom().to_biguint().filter(|d| d.count_ones() == 1),
-    ) {
-        let exponent = BigInt::from(n.bits()) - BigInt::from(d.bits());
-        return Ok(ExactInterval::point(Rat::from_integer(exponent)));
-    }
-    let natural =
-        natural_log_enclosure(value, LOG_TERMS, LOG_OCTAVES).map_err(|_| HnnError::Shape {
-            what: "a logarithm's enclosure",
-            expected: 1,
-            found: 0,
-        })?;
-    let two = ln_two()?;
-    let candidates = [
-        &natural.lower / &two.lower,
-        &natural.lower / &two.upper,
-        &natural.upper / &two.lower,
-        &natural.upper / &two.upper,
-    ];
-    let lower = candidates.iter().min().expect("four candidates").clone();
-    let upper = candidates.iter().max().expect("four candidates").clone();
-    round_out(interval(lower, upper)?)
-}
-
-/// `ln 2`'s enclosure at the declared series terms and octaves: a constant of the reading, formed
-/// once.
-fn ln_two() -> Result<&'static ExactInterval, HnnError> {
-    static LN_TWO: std::sync::OnceLock<Option<ExactInterval>> = std::sync::OnceLock::new();
-    LN_TWO
-        .get_or_init(|| natural_log_enclosure(&integer(2), LOG_TERMS, LOG_OCTAVES).ok())
-        .as_ref()
-        .ok_or(HnnError::Shape {
-            what: "ln 2's enclosure",
-            expected: 1,
-            found: 0,
-        })
-}
-
-/// `log₂` of an enclosed positive value: monotone, so the bounds' logarithms bound it.
-pub fn log2_of_enclosure(value: &ExactInterval) -> Result<ExactInterval, HnnError> {
-    let lower = log2_enclosure(&value.lower)?;
-    let upper = log2_enclosure(&value.upper)?;
-    interval(lower.lower, upper.upper)
-}
-
-/// The sum of two enclosures, held outward on the dyadic grid of the log octaves.
-pub fn interval_sum(a: &ExactInterval, b: &ExactInterval) -> Result<ExactInterval, HnnError> {
-    round_out(interval(&a.lower + &b.lower, &a.upper + &b.upper)?)
-}
-
-/// `a − b` of two enclosures.
-pub fn interval_difference(
-    a: &ExactInterval,
-    b: &ExactInterval,
-) -> Result<ExactInterval, HnnError> {
-    round_out(interval(&a.lower - &b.upper, &a.upper - &b.lower)?)
-}
-
-fn round_out(value: ExactInterval) -> Result<ExactInterval, HnnError> {
-    value.round_out(LOG_OCTAVES).map_err(|_| HnnError::Shape {
-        what: "an ordered enclosure",
-        expected: 0,
-        found: 1,
-    })
+    Ok(ExactInterval::new(&scale * lower, &scale * upper)?)
 }
 
 // -------------------------------------------------------------------------------------------
@@ -296,7 +211,10 @@ impl Face {
             Some(value) => log2_enclosure(value)?,
             None => log2_of_enclosure(&self.normalizer.enclosure()?)?,
         };
-        interval_difference(&log_normalizer, &ExactInterval::point(offset))
+        Ok(interval_difference(
+            &log_normalizer,
+            &ExactInterval::point(offset),
+        )?)
     }
 
     /// **The odometer masses** `p̃_c = 2^(n_c)(L + k_c) / Σ_d 2^(n_d)(L + k_d)`: the covector's

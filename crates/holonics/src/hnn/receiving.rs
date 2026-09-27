@@ -50,14 +50,15 @@
 //! **The window is read in cell order** (prequential scoring within a window): phase `j`'s tree face is read
 //! at the standing after the window's earlier phases' tree deposits (their targets are known at
 //! compare), on a working overlay of the nodes those deposits write
-//! (`compression::landmark::context::Landmarks::window_faces`); the deposit then applies exactly those steps to the
+//! ([`window_faces`], over `compression::landmark::context::Landmarks::window`); the deposit then applies exactly those steps to the
 //! published tree, in cell order, so the tree it publishes is the overlay's last standing plus the
 //! last phase's step. The wave's part of a window is the one refine's, read at the window's opening
 //! standing: the wave's maps are deposited once a window, by the normal law.
 //!
 //! [definition; agent-inferred] **The receiving letters** (campaign 2; Lean
 //! `Compression/Landmark/Context/Address`). The address register holds typed bundles, not bare cells: each earlier
-//! cell's tick contributes its cell and the declared features' letters ([`LetterFamily`]), newest
+//! cell's tick contributes its cell and the declared features' letters ([`Feature`], declared as a
+//! [`FeatureFamily`] whose alphabets the tree reads as its `LetterFamily`), newest
 //! bundle first, and the register restricts by dropping its oldest whole bundle. A letter is read
 //! from the retained sufficient state before the cell it predicts: the register's reader
 //! ([`LetterReader`]) keeps the clock of the rings its phase letters read (their phases
@@ -105,9 +106,9 @@
 //!
 //! | Lean | Rust |
 //! |---|---|
-//! | `HNN/Ratio.face_constant_on_fibre` (the face reads only `(n, k)`) | [`GrainCell`] |
+//! | `HNN/Ratio.face_constant_on_fibre` (the face reads only `(n, k)`; the owner's, `receiver::face`) | [`GrainCell`] |
 //! | `HNN/Ratio.grain_of_tolerance` (`L_R = ⌈1/ε_bits⌉`) | [`ReceivingPhases::declare`] |
-//! | `HNN/RegionCounts.{grainExponent_spec, grain_log_iff_pow_bounds, grain_face_residual, grain_code_residual}` | [`grain_exponent`], [`grain_logits`] |
+//! | `HNN/RegionCounts.{grain_face_residual, grain_code_residual}` (the grain exponent is `receiver::face::grain_exponent`'s, `grainExponent_spec`, `grain_log_iff_pow_bounds`) | [`grain_logits`] |
 //! | `receiver::reception::ReceiverFace::read` with `C_S = R P_R^(τ_R) Π_R` | [`ReceivingPhases::read`] |
 //! | `HNN/RegionCounts.{combinedLogits, combined_face_pullback, combined_code_pullback}` | [`ReceivingRead::combined`], [`ReceivingPhases::combine`] |
 //! | `Compression/Landmark/Context/Tree.{unfounded_reads_prior, founded_tree_same_law, release_rule}` (the typed suffix address, kept whole by the collapse) | [`ActiveAddress`], [`ReceivingPhases::tree_faces`] |
@@ -122,7 +123,8 @@ use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::compression::cost::ceil_log2;
 use crate::compression::landmark::context::{
-    Beta, Bundle, Feature, LandmarkDeclaration, LandmarkFace, Letter, LetterFamily, code_length,
+    Beta, Bundle, LandmarkDeclaration, LandmarkFace, Landmarks, Letter, LetterFamily, Splits,
+    code_length,
 };
 use crate::hnn::HnnError;
 use crate::hnn::contact::{ContactReading, LockDeclaration, lock_address, site_kinds};
@@ -137,53 +139,10 @@ use crate::ratio::algebraic::ExactInterval;
 use crate::ratio::exponentiated::CarriedPower;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::{Rat, integer};
+use crate::receiver::face::GrainCell;
 
 // -------------------------------------------------------------------------------------------
 // the grain
-
-/// [definition] **The grain exponent of a positive ratio `a/b` at grain `L`** (Lean
-/// `HNN/RegionCounts.{grainExponent_spec, grain_log_iff_pow_bounds}`): the unique integer `k` with
-/// `2^k ≤ (a/b)^L < 2^(k+1)`, decided by the natural-number comparisons
-/// `2^(k⁺) b^L ≤ 2^(k⁻) a^L` and `2^((k+1)⁻) a^L < 2^((k+1)⁺) b^L` (`k⁺ = max(k, 0)`,
-/// `k⁻ = max(−k, 0)`). The bit lengths of `a^L` and `b^L` place `k` within one of its value, and one
-/// comparison decides it. Refused at a zero numerator or denominator (no finite exponent).
-pub fn grain_exponent(
-    numerator: &BigUint,
-    denominator: &BigUint,
-    grain: u64,
-) -> Result<BigInt, HnnError> {
-    if numerator.is_zero() || denominator.is_zero() {
-        return Err(HnnError::Shape {
-            what: "a positive ratio read at the grain",
-            expected: 1,
-            found: 0,
-        });
-    }
-    let power = u32::try_from(grain).map_err(|_| HnnError::Shape {
-        what: "a receiver's grain within 32 bits",
-        expected: u32::MAX as usize,
-        found: usize::MAX,
-    })?;
-    let (a, b) = (numerator.pow(power), denominator.pow(power));
-    // `2^(bits(a) − 1) ≤ a < 2^bits(a)`, likewise `b`: `a/b ∈ (2^(d−1), 2^(d+1))`, `d = bits(a) − bits(b)`.
-    let d = BigInt::from(a.bits()) - BigInt::from(b.bits());
-    let k = if at_least(&a, &b, &d) { d } else { d - 1 };
-    debug_assert!(at_least(&a, &b, &k) && !at_least(&a, &b, &(&k + 1)));
-    Ok(k)
-}
-
-/// `2^k ≤ a/b`, as `2^(k⁺) b ≤ 2^(k⁻) a`.
-fn at_least(a: &BigUint, b: &BigUint, k: &BigInt) -> bool {
-    let shift = k
-        .magnitude()
-        .to_usize()
-        .expect("a grain exponent within the machine word");
-    if k.is_negative() {
-        b <= &(a << shift)
-    } else {
-        &(b << shift) <= a
-    }
-}
 
 /// [definition] **The tree face's grain logits**, realified `[k_0/L_R, 0, k_1/L_R, 0, …]` (Lean
 /// `HNN/RegionCounts.grainLogits`): each class's grain exponent over the grain on its real row,
@@ -204,48 +163,6 @@ pub fn grain_logits(face: &LandmarkFace) -> Vec<Rat> {
 pub fn tree_code_length(face: &LandmarkFace, class: usize) -> Result<ExactInterval, HnnError> {
     let read = ReceivingRead::of_logits(grain_logits(face), face.grain);
     Face::of_read(&read, face.grain)?.code_length(class)
-}
-
-/// [definition] **One exponent read at a grain**: `value = carry + phase/grain + fibre`, with
-/// `phase ∈ ℤ/grain` and `fibre ∈ [0, 1/grain)`.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct GrainCell {
-    pub carry: BigInt,
-    pub phase: u64,
-    pub fibre: Rat,
-}
-
-impl GrainCell {
-    /// Read `value` at `grain ≥ 1`, exactly: nothing is rounded, the remainder is the fibre.
-    ///
-    /// [definition; agent-inferred] Two integer divisions with remainder of `value = p/q`
-    /// (`q > 0`): `p = n q + r` with `0 ≤ r < q`, then `L r = k q + s` with `0 ≤ s < q`, so the
-    /// carry is `n`, the phase class `k` and the fibre `s/(L q)`, normalized once. These are the
-    /// floor readings `n = ⌊value⌋`, `k = ⌊L(value − n)⌋`, `ε = (L(value − n) − k)/L` exactly.
-    pub fn of(value: &Rat, grain: u64) -> Self {
-        let (numerator, denominator) = (value.numer(), value.denom());
-        // A reduced ratio carries a positive denominator, so the truncated remainder is
-        // corrected once for a negative numerator.
-        let (mut carry, mut remainder) = (numerator / denominator, numerator % denominator);
-        if remainder.is_negative() {
-            carry -= 1;
-            remainder += denominator;
-        }
-        let scaled = remainder * BigInt::from(grain);
-        let (phase, residue) = (&scaled / denominator, &scaled % denominator);
-        let fibre = Rat::new(residue, denominator * BigInt::from(grain));
-        Self {
-            carry,
-            phase: phase.to_u64().expect("a phase class lies in ℤ/grain"),
-            fibre,
-        }
-    }
-
-    /// The cell's representative `carry + phase/grain`: the point every value of the cell reads as.
-    pub fn representative(&self, grain: u64) -> Rat {
-        Rat::from_integer(self.carry.clone())
-            + Rat::new(BigInt::from(self.phase), BigInt::from(grain))
-    }
 }
 
 /// [definition] **One receiving read**: the exact realified logits `f`, each class's grain cell of
@@ -303,7 +220,169 @@ impl ReceivingRead {
 }
 
 // -------------------------------------------------------------------------------------------
-// the receiving letters: the clock register and the active suffix address
+// the tree's window read on the host: the phases run together
+
+/// **The class faces of a window's splits** (`LandmarkFace::of_splits` per phase): the phases read
+/// alone and run together (`hnn::realization`: each reads its own splits and writes its own face).
+/// The host's window read and every device realization's form their faces here.
+pub fn faces_of_splits(
+    declaration: &LandmarkDeclaration,
+    splits: &[Splits],
+    grain: u64,
+) -> Result<Vec<LandmarkFace>, HnnError> {
+    indexed(splits.len(), |j| {
+        Ok(LandmarkFace::of_splits(declaration, &splits[j], grain)?)
+    })
+}
+
+/// [definition; agent-inferred] **A window's splits in cell order, the phases run together** (the
+/// host realization of `compression::landmark::context::Landmarks::window`): the tree builds the
+/// window's working overlays in cell order, and each phase then reads its own overlay alone
+/// (`hnn::realization`: nothing is written, so the reads commute). The quantity a card's read
+/// returns.
+pub fn window_splits(
+    tree: &Landmarks,
+    addresses: &[Vec<Letter>],
+    known: &[usize],
+) -> Result<Vec<Splits>, HnnError> {
+    let window = tree.window(addresses, known)?;
+    indexed(window.phases(), |j| Ok(window.splits(j)))
+}
+
+/// **A window's all-class faces in cell order** at `grain` ([`window_splits`], then
+/// [`faces_of_splits`]): phase `j` at the standing after the deposits of the known earlier phases.
+pub fn window_faces(
+    tree: &Landmarks,
+    addresses: &[Vec<Letter>],
+    known: &[usize],
+    grain: u64,
+) -> Result<Vec<LandmarkFace>, HnnError> {
+    faces_of_splits(
+        tree.declaration(),
+        &window_splits(tree, addresses, known)?,
+        grain,
+    )
+}
+
+// -------------------------------------------------------------------------------------------
+// the receiving letters: the features, the HNN's letter family, the clock register and the
+// active suffix address
+
+/// [definition] **One declared feature slot of a bundle**: what a slot's letter reads from the
+/// retained clock and constitution. The tree reads only the slot's alphabet
+/// (`compression::landmark::context::LetterFamily`).
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub enum Feature {
+    /// Ring `ring`'s phase class `⌊g·phase⌋ mod g` at its declared grain `g`.
+    Phase { ring: usize, grain: u64 },
+    /// Contact `contact`'s reading (`hnn::contact::ContactReading`): its lock address in the lock
+    /// family at its derived bound `(P, Q)`, and its site kind.
+    Contact {
+        contact: usize,
+        bound: LockDeclaration,
+    },
+}
+
+impl Feature {
+    /// **A contact's letter**, its bound derived from the field (`LockDeclaration::derived`: `Q`
+    /// the greatest denominator whose first return, `q` turns of the contact's second ring, Lean
+    /// `Aeon/Clock/Lock.cycle_iff_period_dvd`, is observable within the aeon, and `P` the first
+    /// ring's alike; Lean `Compression/Landmark/Context/Address.lock_partition_finite`), never a
+    /// literal.
+    pub fn contact(field: &Field, contact: usize) -> Self {
+        Feature::Contact {
+            contact,
+            bound: LockDeclaration::derived(field, contact),
+        }
+    }
+
+    /// **The slot's finite alphabet**: `g` phase classes, or the contact's letters (its lock
+    /// family's letters times the five site kinds, `hnn::contact::ContactReading::letters`).
+    pub fn size(&self) -> Result<u64, HnnError> {
+        match self {
+            Feature::Phase { grain, .. } => Ok(*grain),
+            Feature::Contact { bound, .. } => ContactReading::letters(bound),
+        }
+    }
+
+    /// A contact reading's value in this slot (`hnn::contact::ContactReading::letter`).
+    pub fn contact_value(&self, reading: &ContactReading) -> Result<u64, HnnError> {
+        match self {
+            Feature::Contact { bound, .. } => reading.letter(bound),
+            Feature::Phase { .. } => Err(HnnError::Shape {
+                what: "a contact slot for a contact reading",
+                expected: 1,
+                found: 0,
+            }),
+        }
+    }
+}
+
+/// [definition] **The HNN's declared letter family**: the feature slots each bundle carries after
+/// its cell, in order, and the tree's family of their alphabets
+/// (`compression::landmark::context::LetterFamily`, which the receiver's tree is declared with).
+/// The empty family is the cell-only tree (campaign 1).
+#[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
+pub struct FeatureFamily {
+    features: Vec<Feature>,
+    letters: LetterFamily,
+}
+
+impl FeatureFamily {
+    /// The cell-only family.
+    pub fn cells() -> Self {
+        Self::default()
+    }
+
+    /// **Declare a family**: its slots' alphabets are the features' ([`Feature::size`]), refused
+    /// as the tree refuses them (`LetterFamily::new`: a slot of one letter carries nothing, and the
+    /// slots' product fits 32 bits).
+    pub fn new(features: Vec<Feature>) -> Result<Self, HnnError> {
+        let sizes = features
+            .iter()
+            .map(Feature::size)
+            .collect::<Result<Vec<u64>, HnnError>>()?;
+        Ok(Self {
+            letters: LetterFamily::new(sizes)?,
+            features,
+        })
+    }
+
+    /// [definition; agent-inferred] **The constant-slot control of `slots` slots**: each slot reads
+    /// ring 0's phase class at grain 1, one letter at every tick, over the tree's constant control
+    /// (`LetterFamily::constant_control`). A development harness's control, never a declared family.
+    pub fn constant_control(slots: usize) -> Self {
+        Self {
+            features: vec![Feature::Phase { ring: 0, grain: 1 }; slots],
+            letters: LetterFamily::constant_control(slots),
+        }
+    }
+
+    pub fn features(&self) -> &[Feature] {
+        &self.features
+    }
+
+    /// The tree's family of the slots' alphabets.
+    pub fn letters(&self) -> &LetterFamily {
+        &self.letters
+    }
+
+    /// `r`, the feature slots.
+    pub fn slots(&self) -> usize {
+        self.features.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.features.is_empty()
+    }
+
+    /// Whether a slot reads a contact (its readings need the constitution's site kinds).
+    pub fn reads_contacts(&self) -> bool {
+        self.features
+            .iter()
+            .any(|feature| matches!(feature, Feature::Contact { .. }))
+    }
+}
 
 /// One ring's clock law as the register reads it: its period and its lock on the port chart
 /// `port(x) = x mod d` (`hnn::field::Ring::{port, fits}`).
@@ -335,7 +414,7 @@ struct ClockRing {
 /// as a re-keying does (Lean `bundle_causal`: the letters already read keep their ticks' values).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LetterReader {
-    family: LetterFamily,
+    family: FeatureFamily,
     rings: Vec<ClockRing>,
     phases: Vec<u64>,
     /// Each kept ring's whole windings since the aeon's opening (read only by contact letters).
@@ -350,7 +429,7 @@ impl LetterReader {
     /// The cell-only family's reader: no clock is read.
     pub fn cells() -> Self {
         Self {
-            family: LetterFamily::cells(),
+            family: FeatureFamily::cells(),
             rings: Vec::new(),
             phases: Vec::new(),
             windings: Vec::new(),
@@ -364,7 +443,7 @@ impl LetterReader {
     /// Refused at a phase letter of a ring outside the field, at a grain that is zero, or at a
     /// contact slot of a contact outside it. A family with contact letters reads its site kinds
     /// from the first [`LetterReader::refresh`].
-    pub fn of(field: &Field, family: LetterFamily, current: &Current) -> Result<Self, HnnError> {
+    pub fn of(field: &Field, family: FeatureFamily, current: &Current) -> Result<Self, HnnError> {
         let mut reach = 0usize;
         for feature in family.features() {
             match *feature {
@@ -417,7 +496,7 @@ impl LetterReader {
         Ok(reader)
     }
 
-    pub fn family(&self) -> &LetterFamily {
+    pub fn family(&self) -> &FeatureFamily {
         &self.family
     }
 
@@ -554,7 +633,7 @@ impl LetterReader {
         }
         Ok(Letter::Bundle(Bundle {
             cell,
-            features: self.family.encode(&values)?,
+            features: self.family.letters().encode(&values)?,
         }))
     }
 
@@ -720,7 +799,9 @@ impl ActiveAddress {
     /// the reader's state.
     pub fn bits(&self, alphabet: usize) -> u64 {
         self.letters.len() as u64
-            * ceil_log2(&BigUint::from(self.reader.family.bundle_codes(alphabet)))
+            * ceil_log2(&BigUint::from(
+                self.reader.family.letters().bundle_codes(alphabet),
+            ))
             + self.reader.bits()
     }
 }
@@ -731,8 +812,8 @@ impl ActiveAddress {
 /// row) chose the cell-only family: at the horizon bounds no clock-only family and no contact
 /// family coded below the constant-slot control of its slots by its description charge (every
 /// `Δ_letters` decided positive), so no letter carried information the preceding cells do not.
-pub fn letter_family(_field: &Field) -> LetterFamily {
-    LetterFamily::cells()
+pub fn letter_family(_field: &Field) -> FeatureFamily {
+    FeatureFamily::cells()
 }
 
 /// [definition; agent-inferred] **The letters of a passage replayed without the wave** (the
@@ -745,7 +826,7 @@ pub fn letter_family(_field: &Field) -> LetterFamily {
 /// refreshes of a development pass: the exposure's constitution curve); it is refused without them.
 pub fn clock_letters(
     field: &Field,
-    family: &LetterFamily,
+    family: &FeatureFamily,
     cells: &[usize],
     kinds: &[Vec<SiteKind>],
 ) -> Result<Vec<Letter>, HnnError> {
@@ -786,14 +867,14 @@ pub fn clock_letters(
 /// field's exterior chart `|A|` (the cell emitted as its odometer digits), the receiver's depth `D`
 /// with no forced split, the field's declared population (the passage the tree's certificates hold
 /// within), the receiver's grain `L_R = ⌈1/ε_bits⌉`, the field's letter family
-/// ([`letter_family`]) and the receiver's declared stop-weight law (the declared stop prior), from which the
+/// ([`letter_family`], its slots' alphabets) and the receiver's declared stop-weight law (the declared stop prior), from which the
 /// owner derives its widths (the path lattice `M_p`, the β carrier `W` and, past `u128`, the
 /// carrier's rebase `R`).
 pub fn landmark_declaration(
     field: &Field,
     receiver: &ReceiverDeclaration,
 ) -> Result<LandmarkDeclaration, HnnError> {
-    landmark_declaration_with(field, receiver, letter_family(field))
+    landmark_declaration_with(field, receiver, letter_family(field).letters().clone())
 }
 
 /// **The landmark tree a receiver declares with a given family** (the harness's and the tests').
@@ -976,7 +1057,7 @@ impl Mixture {
     /// **`log₂ β`, enclosed** by the certified binary logarithm (`compression::landmark::context::code_length` of
     /// `1/β`).
     pub fn log2_beta(&self) -> Result<ExactInterval, HnnError> {
-        code_length(&self.beta().recip())
+        Ok(code_length(&self.beta().recip())?)
     }
 
     /// **Its exact bits**: `β`'s numerator and denominator, each by its bits.
@@ -1378,10 +1459,10 @@ impl ReceivingPhases {
     /// **The tree faces of one window, in cell order** (module header): the receiving parametron's
     /// tree read at each phase's address, every class's executed face with its grain exponent,
     /// phase `j` at the standing after the deposits of the known earlier phases' targets
-    /// (`compression::landmark::context::Landmarks::window_faces`: a working overlay, the published tree unchanged;
-    /// at a release nothing is known and every phase reads the published standing). The phases then
-    /// read together (`hnn::realization`). Refused when the constitution carries no tree on the
-    /// receiving ring.
+    /// ([`window_faces`] over `compression::landmark::context::Landmarks::window`: a working
+    /// overlay, the published tree unchanged; at a release nothing is known and every phase reads
+    /// the published standing). The phases then read together (`hnn::realization`). Refused when
+    /// the constitution carries no tree on the receiving ring.
     pub fn tree_faces(
         &self,
         constitution: &impl ConstitutionRead,
@@ -1392,7 +1473,7 @@ impl ReceivingPhases {
             .landmarks(self.ring)
             .ok_or(HnnError::MissingReceivingMap { ring: self.ring })?;
         let addresses = self.addresses(address, known)?;
-        tree.window_faces(&addresses, known, self.grain)
+        window_faces(tree, &addresses, known, self.grain)
     }
 
     /// **The combined faces of one window** (module header): each phase's wave logits plus its tree

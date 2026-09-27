@@ -63,11 +63,11 @@ use holonics::compression::landmark::context::{
     LandmarkDeclaration, Landmarks, LetterFamily, PassageCode, address,
 };
 use holonics::hnn::born::{Born, BornDeclaration, BornReport, Emission};
-use holonics::hnn::ratio::interval_sum;
 use holonics::hnn::receiving::{Mixture, MixtureStep, landmark_declaration_with};
 use holonics::hnn::{Field, FieldDeclaration};
 use holonics::ratio::Rat;
 use holonics::ratio::algebraic::ExactInterval;
+use holonics::ratio::algebraic::interval_sum;
 use num_bigint::BigInt;
 use num_traits::One;
 

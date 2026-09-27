@@ -21,7 +21,11 @@
 //! * **A receiver face** (a codec projection): the exact value a reading returns ([`ExactFace`]),
 //!   the declared norm ([`DiameterNorm`]), the diameter over a fibre ([`ReceiverWidth`],
 //!   [`width_over_readings`]), the two-axis [`Horizon`] and the relation ladder's [`Rung`]. A face
-//!   is what a coholon's value is charted as; it is not itself a port object.
+//!   is what a coholon's value is charted as; it is not itself a port object. **A face read at a
+//!   grain** keeps its carry, phase class and unresolved fibre ([`GrainCell`]), and the base-two
+//!   logarithm of a ratio read at a grain is decided by integer comparison ([`grain_exponent`]);
+//!   the HNN's receiving read (`hnn::receiving`) and the context tree's faces
+//!   (`compression::landmark::context`) consume both.
 //!
 //! Compatible-family dynamics and release decisions are [`crate::receiver::release`].
 //!
@@ -37,12 +41,14 @@
 //! | `Foundation/ReceiverRelease.width`, `width_nonneg`, `abs_sub_le_width` | [`width_over_readings`], [`ReceiverWidth`] |
 //! | `Foundation/ReceiverRelease.Horizon`, `Horizon.Within`, `horizonWithin_is_not_total` | [`Horizon`], [`Horizon::contains`], [`Horizon::comparable`] |
 //! | `Foundation/RelationLadder.Rung`, `Rung.entailed`, `Rung.entails`, `rungMeet` | [`Rung`], [`rung_meet`] |
+//! | `HNN/Ratio.{grainRead, grainFibre, face_constant_on_fibre}` (the face reads only the grain cell) | [`GrainCell`] |
+//! | `HNN/RegionCounts.{grainExponent_spec, grain_log_iff_pow_bounds}` (`log₂` of a ratio read at the grain by integer comparison) | [`grain_exponent`] |
 
 use std::fmt::Debug;
 
 use crate::ratio::Rat;
-use num_bigint::BigInt;
-use num_traits::{Signed, Zero};
+use num_bigint::{BigInt, BigUint};
+use num_traits::{Signed, ToPrimitive, Zero};
 use thiserror::Error;
 
 use crate::holon::HolonError;
@@ -1239,13 +1245,110 @@ pub fn rung_meet(left: Rung, right: Rung) -> Rung {
     }
 }
 
+// =============================================================================================
+// The face read at a grain
+// =============================================================================================
+
+/// [definition] **One exponent read at a grain**: `value = carry + phase/grain + fibre`, with
+/// `phase ∈ ℤ/grain` and `fibre ∈ [0, 1/grain)` (Lean `HNN/Ratio.{grainRead, grainFibre,
+/// face_constant_on_fibre}`): the reading at a declared grain, the carry, the phase class and the
+/// unresolved fibre, which is returned and never rounded. A receiver's face depends only on the
+/// cells of its exponents.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct GrainCell {
+    pub carry: BigInt,
+    pub phase: u64,
+    pub fibre: Rat,
+}
+
+impl GrainCell {
+    /// Read `value` at `grain ≥ 1`, exactly: nothing is rounded, the remainder is the fibre.
+    ///
+    /// [definition; agent-inferred] Two integer divisions with remainder of `value = p/q`
+    /// (`q > 0`): `p = n q + r` with `0 ≤ r < q`, then `L r = k q + s` with `0 ≤ s < q`, so the
+    /// carry is `n`, the phase class `k` and the fibre `s/(L q)`, normalized once. These are the
+    /// floor readings `n = ⌊value⌋`, `k = ⌊L(value − n)⌋`, `ε = (L(value − n) − k)/L` exactly.
+    pub fn of(value: &Rat, grain: u64) -> Self {
+        let (numerator, denominator) = (value.numer(), value.denom());
+        // A reduced ratio carries a positive denominator, so the truncated remainder is
+        // corrected once for a negative numerator.
+        let (mut carry, mut remainder) = (numerator / denominator, numerator % denominator);
+        if remainder.is_negative() {
+            carry -= 1;
+            remainder += denominator;
+        }
+        let scaled = remainder * BigInt::from(grain);
+        let (phase, residue) = (&scaled / denominator, &scaled % denominator);
+        let fibre = Rat::new(residue, denominator * BigInt::from(grain));
+        Self {
+            carry,
+            phase: phase.to_u64().expect("a phase class lies in ℤ/grain"),
+            fibre,
+        }
+    }
+
+    /// The cell's representative `carry + phase/grain`: the point every value of the cell reads as.
+    pub fn representative(&self, grain: u64) -> Rat {
+        Rat::from_integer(self.carry.clone())
+            + Rat::new(BigInt::from(self.phase), BigInt::from(grain))
+    }
+}
+
+/// A ratio the grain read refuses.
+#[derive(Clone, Debug, Error, PartialEq, Eq)]
+pub enum GrainRefusal {
+    #[error("a ratio read at the grain must be positive: a zero part has no finite exponent")]
+    NotPositive,
+    #[error("the grain {grain} passes 32 bits")]
+    WideGrain { grain: u64 },
+}
+
+/// [definition] **The grain exponent of a positive ratio `a/b` at grain `L`** (Lean
+/// `HNN/RegionCounts.{grainExponent_spec, grain_log_iff_pow_bounds}`): the unique integer `k` with
+/// `2^k ≤ (a/b)^L < 2^(k+1)`, decided by the natural-number comparisons
+/// `2^(k⁺) b^L ≤ 2^(k⁻) a^L` and `2^((k+1)⁻) a^L < 2^((k+1)⁺) b^L` (`k⁺ = max(k, 0)`,
+/// `k⁻ = max(−k, 0)`). The bit lengths of `a^L` and `b^L` place `k` within one of its value, and one
+/// comparison decides it. It is the face `log₂(a/b)` read at the grain: `k/L ≤ log₂(a/b) < (k+1)/L`.
+/// Refused at a zero numerator or denominator (no finite exponent).
+pub fn grain_exponent(
+    numerator: &BigUint,
+    denominator: &BigUint,
+    grain: u64,
+) -> Result<BigInt, GrainRefusal> {
+    if numerator.is_zero() || denominator.is_zero() {
+        return Err(GrainRefusal::NotPositive);
+    }
+    let power = u32::try_from(grain).map_err(|_| GrainRefusal::WideGrain { grain })?;
+    let (a, b) = (numerator.pow(power), denominator.pow(power));
+    // `2^(bits(a) − 1) ≤ a < 2^bits(a)`, likewise `b`: `a/b ∈ (2^(d−1), 2^(d+1))`, `d = bits(a) − bits(b)`.
+    let d = BigInt::from(a.bits()) - BigInt::from(b.bits());
+    let k = if at_least(&a, &b, &d) { d } else { d - 1 };
+    debug_assert!(at_least(&a, &b, &k) && !at_least(&a, &b, &(&k + 1)));
+    Ok(k)
+}
+
+/// `2^k ≤ a/b`, as `2^(k⁺) b ≤ 2^(k⁻) a`.
+fn at_least(a: &BigUint, b: &BigUint, k: &BigInt) -> bool {
+    let shift = k
+        .magnitude()
+        .to_usize()
+        .expect("a grain exponent within the machine word");
+    if k.is_negative() {
+        b <= &(a << shift)
+    } else {
+        &(b << shift) <= a
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::holon::law::EnergyBalance;
+    use crate::ratio::algebraic::log2_enclosure;
     use crate::ratio::integer;
     use crate::ratio::linear::vector::{form_matrix, integer_matrix, ints};
     use crate::ratio::rat;
+    use num_traits::One;
 
     /// `Holon/Law.passive_reading`: the linear reading and the coholon read the same value,
     /// and the coholon draws zero power.
@@ -1355,5 +1458,98 @@ mod tests {
             .pullback_balance(&p, &ints(&[2, -1]), &ints(&[1, 1, 1]))
             .unwrap();
         assert_eq!(returned, forward);
+    }
+
+    /// Guard 15, and Lean `HNN/Ratio.face_constant_on_fibre`: an exponent read at a grain is its carry,
+    /// its phase class and its fibre, exactly, with `0 ≤ ε < 1/L`; reading it down to its cell's
+    /// representative moves it by less than `1/L`, and every value of a cell has one representative.
+    #[test]
+    fn the_grain_reading_is_a_carry_a_phase_class_and_a_fibre() {
+        let values = [
+            rat(-37, 7),
+            rat(5, 3),
+            integer(-2),
+            rat(1, 16),
+            rat(-1, 1000),
+            Rat::zero(),
+        ];
+        for value in &values {
+            for grain in [1u64, 2, 16, 7] {
+                let cell = GrainCell::of(value, grain);
+                let grain_rat = Rat::from_integer(BigInt::from(grain));
+                assert!(cell.phase < grain);
+                assert!(cell.fibre >= Rat::zero() && cell.fibre < grain_rat.recip());
+                assert_eq!(cell.representative(grain) + &cell.fibre, *value);
+                assert!(value - cell.representative(grain) < grain_rat.recip());
+                let inside = cell.representative(grain) + &cell.fibre / integer(2);
+                assert_eq!(
+                    GrainCell::of(&inside, grain).representative(grain),
+                    cell.representative(grain)
+                );
+            }
+        }
+        let cell = GrainCell::of(&rat(-37, 7), 16);
+        assert_eq!(cell.carry, BigInt::from(-6));
+        assert_eq!(cell.phase, 11);
+    }
+
+    /// `2^k ≤ p^L < 2^(k+1)`, checked over ℚ.
+    fn brackets(p: &Rat, grain: u64, k: &BigInt) -> bool {
+        let mut read = Rat::one();
+        for _ in 0..grain {
+            read *= p;
+        }
+        let two = |k: &BigInt| {
+            let magnitude = usize::try_from(k.magnitude().clone()).unwrap();
+            let value = Rat::from_integer(BigInt::one() << magnitude);
+            if k.sign() == num_bigint::Sign::Minus {
+                value.recip()
+            } else {
+                value
+            }
+        };
+        two(k) <= read && read < two(&(k + 1))
+    }
+
+    fn grain_of(p: &Rat, grain: u64) -> BigInt {
+        grain_exponent(
+            &p.numer().to_biguint().unwrap(),
+            &p.denom().to_biguint().unwrap(),
+            grain,
+        )
+        .unwrap()
+    }
+
+    /// Lean `HNN/RegionCounts.{grainExponent_spec, grain_log_iff_pow_bounds, grain_face_residual,
+    /// grain_fixture}`: the grain exponent is the unique `k` with `2^k ≤ (a/b)^L < 2^(k+1)`, from integer
+    /// comparisons, and `k/L ≤ log₂(a/b) < (k+1)/L`; at `L = 1` it is `⌊log₂(a/b)⌋`; an exact power of
+    /// two reads its own exponent; `5/8 → −11`, `3/8 → −23` at `L = 16`; a zero is refused.
+    #[test]
+    fn the_grain_exponent_is_the_integer_comparison() {
+        for p in [
+            rat(5, 8),
+            rat(3, 8),
+            rat(1, 1),
+            rat(1, 256),
+            rat(3, 7),
+            rat(255, 256),
+            rat(1, 3),
+            rat(9, 2),
+            rat(1023, 1025),
+        ] {
+            for grain in [1u64, 2, 7, 16] {
+                let k = grain_of(&p, grain);
+                assert!(brackets(&p, grain, &k), "{p} at {grain}");
+                let log = log2_enclosure(&p).unwrap();
+                let grain_rat = Rat::from_integer(BigInt::from(grain));
+                assert!(Rat::from_integer(k.clone()) / &grain_rat <= log.upper);
+                assert!(log.lower < Rat::from_integer(&k + 1) / &grain_rat);
+            }
+        }
+        assert_eq!(grain_of(&rat(1, 256), 16), BigInt::from(-128));
+        assert_eq!(grain_of(&rat(9, 2), 1), BigInt::from(2));
+        assert_eq!(grain_of(&rat(5, 8), 16), BigInt::from(-11));
+        assert_eq!(grain_of(&rat(3, 8), 16), BigInt::from(-23));
+        assert!(grain_exponent(&BigUint::zero(), &BigUint::one(), 16).is_err());
     }
 }

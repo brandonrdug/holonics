@@ -11,6 +11,33 @@ connects the resonator's returned wave and adjoint to the field; campaigns 3–5
 through modes, the motor chart, Holonic Encoding, context and joint prediction.
 [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md) distinguishes measured results from these remaining consumers.
 
+## The top: a Holarchy and its aeons
+
+[definition; Brandon, September 27: "Aeons and Holarchies are at the top"; the construction
+`agent-inferred`, [the unity audit](../research/records/2026-09-27_THE_HOLARCHY_AND_ITS_AEONS_ARE_THE_TOP_THE_DECISIONS_DISSOLVE_INTO_THEIR_OWNERS_AND_LEARNING_IS_PROTOTYPED_WHERE_A_HOLARCHY_MADE_THE_TERRAIN.md#2-the-unification)]
+**The HNN is a Holarchy, and its passage is an aeon.**
+- **The Holarchy.** Its closing rotor rings and its helical pair contacts are Holons, each
+  certified on its own, joined at ports by `interconnect`: `hnn::Field::holarchy` returns the
+  `holarchy::Holarchy`, and the mount certifies that it glues or refuses with its typed gluing
+  defect. The receiving parametron's storage is the context tree (`compression::landmark::context`,
+  the shift navigator's landmarks), held in `Θ` at the receiving locus. `hnn::Field` is the
+  Holarchy's declaration, a chart of it.
+- **The aeon.** Its passage is an aeon on the Holarchy's parametric orientation (the lift of the
+  rings' joint clock torus): a receiving window is an epoch at the receiver's section; a pump
+  period or a clock closure is a cycle; the aeon boundary is the collapse; and the first law over
+  the aeon is `aeon::EnclosedLedger`. `hnn::Reference::expose` is a cut's passage through the
+  resident's aeons, one closed at each joint-clock carry-out.
+- **What the code joins** (read from source at this commit): the resident's aeon is an
+  `aeon::Aeon` on the parametric orientation from its opening lift point to the joint clock's
+  carry-out; each ring's epochs are the flux through its own ring section; the carry-out is an
+  `aeon::Cycle` of the last ring's clock when that ring opened on its section; the boundary runs
+  the collapse; and the resident carries the `EnclosedLedger`.
+- [open] Three joins are not yet in the code: the receiving tree is storage read by the receiving
+  face, not a Holon joined at ports in `Field::holarchy`; a receiving window is a step of the
+  exposure's loop, not an `aeon::Epochs` reading at the receiver's section; and a pump's period is
+  the mode quotient's lift period (`hnn::modes`), not an `aeon::Cycle`. The unity audit's order,
+  item 2, owns them (#63).
+
 ## One continuing geometric object
 
 [project-postulate] HNN is one continuing field of interacting Holons: circulating modes,

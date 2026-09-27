@@ -2,9 +2,37 @@
 //! [THE_REBUILD](../../../../docs/plans/THE_REBUILD.md), "Step 4 design: the HNN law").
 //! Campaign 1: keys, the change on a medium, and the collapse.
 //!
-//! [definition] The HNN is one Holon: closing rotor rings joined by pair contacts, the medium
-//! `(Θ, λ)` fixing every operand of a word, and a change that opens at zero, propagates one contact
-//! per tick and is released at the word's end. The forward machine is here:
+//! [definition; Brandon, September 27: "Aeons and Holarchies are at the top"; the construction
+//! agent-inferred, the unity audit of September 27, §2] **The HNN is a Holarchy, and its passage
+//! is an aeon.**
+//! - **The Holarchy.** Its closing rotor rings and its pair contacts are Holons, each certified on
+//!   its own, joined at ports: the rings side by side, the contacts side by side, the two
+//!   interconnected at every contact end ([`Field::holarchy`] returns the
+//!   [`crate::holarchy::Holarchy`], and the mount certifies that it glues or refuses with its typed
+//!   gluing defect). The receiving parametron's storage is the context tree, the shift navigator's
+//!   landmarks ([`crate::compression::landmark::context`], held in `Θ` at the receiving locus).
+//!   [`Field`] is the Holarchy's declaration, a chart of it; the constitution `Θ` holds its element
+//!   relations.
+//! - **The aeon.** Its passage is an aeon on the Holarchy's parametric orientation
+//!   ([`crate::holarchy::Holarchy::parametric`], the lift of the rings' joint clock torus): a
+//!   receiving window is an epoch at the receiver's section; a pump period or a clock closure is a
+//!   cycle; the aeon boundary is the collapse; and the first law over the aeon is
+//!   [`crate::aeon::EnclosedLedger`]. [`Reference::expose`] is a cut's passage through the
+//!   resident's aeons, one closed at each joint-clock carry-out (`close_aeon`).
+//! - **What the code joins** (read from source): the resident's aeon is an [`crate::aeon::Aeon`] on
+//!   the parametric orientation, from its opening lift point to the joint clock's carry-out; each
+//!   ring's epochs are the flux through its own ring section, read at the boundary; the carry-out
+//!   is an [`crate::aeon::Cycle`] of the last ring's clock when that ring opened on its section;
+//!   the boundary runs the collapse; and the resident carries the ledger
+//!   ([`retention::aeon_readings`], [`AeonBoundary`], [`Reference`]'s header).
+//! - [open] Three joins the sentence names are not yet in the code. The receiving tree is storage
+//!   read by the receiving face, not a Holon joined at ports in [`Field::holarchy`]. A receiving
+//!   window is a step of the exposure's loop, not an [`crate::aeon::Epochs`] reading at the
+//!   receiver's section. A pump's period is the mode quotient's lift period ([`modes`]), not an
+//!   [`crate::aeon::Cycle`]. The unity audit's order, item 2, owns them (#63).
+//!
+//! Within an aeon the medium `(Θ, λ)` fixes every operand of a word, and a change opens at zero,
+//! propagates one contact per tick and is released at the word's end. The forward machine is here:
 //!
 //! - [`field`]: the declaration ([`Ring`], [`Contact`], [`Field`]), the lift point [`Current`] and
 //!   the read face of the constitution ([`ConstitutionRead`]); selective stepping on the port chart;
@@ -18,9 +46,10 @@
 //!   chart refined by rounded Newton–Schulz steps, every transient carried with error feedback, the
 //!   integer products under the carrier's ℓ1 certificate, and the declared precisions by rule;
 //! - [`receiving`]: [`ReceivingPhases`], the receiving parametron's active suffix address
-//!   ([`ActiveAddress`]) and the read at the receiver's grain `L_R`: the combined face of the
+//!   ([`ActiveAddress`]), its letters' readers (`receiving::{Feature, FeatureFamily}`, whose
+//!   alphabets the tree reads) and the read at the receiver's grain `L_R`: the combined face of the
 //!   context tree's face at each phase's causal address and the wave (the region table and the
-//!   context tree);
+//!   context tree), the tree's window read with its phases run together;
 //! - the receiving parametron's storage is the context tree, the shift navigator's landmarks
 //!   ([`crate::compression::landmark::context`]): a mixture over the candidate standings of the
 //!   pruned context trees, each node's arrivals the epochs of its section; typed address letters,
@@ -62,17 +91,17 @@
 //! | the causal cone | `HNN/Word.word_tick_cone` (the concrete tick) | [`Word::support`] |
 //! | the word on declared lattices: certified inverse charts, error feedback, the executed adjoint, the balance up to the residual | `HNN/LatticeWord.{nsStep, rounded_refinement_certificate, roundedIter_certificate, warm_start_certificate, inverse_chart_deviation, feedback_tick, carried_word_accounting, executed_adjoint_unique, executed_adjoint_deviation, cayley_chart_energy}` | [`chart`], [`Word`], [`Word::pull_back`], [`propagation::TickBalance`] |
 //! | the moment | `HNN/Moment.{encoderMoment_contract, encoder_covector_tape_free, closingRing_moment_is_phaseBinned, exteriorOffset_independent_of_E, selective_position, moment_capacity}` | [`SourceMoment`], [`moment::capacity`] |
-//! | the receiving face: the landmark tree's face at each phase's causal address, read at the grain, plus the wave (the region table and the landmark tree; the region table is the depth-one forced case of the whole-cell emission, kept in Lean, not of the digit tree) | `HNN/RegionCounts.{grain_log_iff_pow_bounds, grain_code_residual, combined_face_pullback}`, `Compression/Landmark/Context/Tree.{depth_one_is_the_whole_cell_table, release_rule}` | [`receiving`], [`ReceivingRead::combined`], [`ActiveAddress`] |
+//! | the receiving face: the landmark tree's face at each phase's causal address, read at the grain, plus the wave (the region table and the landmark tree; the region table is the depth-one forced case of the whole-cell emission, kept in Lean, not of the digit tree) | `HNN/RegionCounts.{grain_log_iff_pow_bounds, grain_code_residual, combined_face_pullback}`, `Compression/Landmark/Context/Tree.{depth_one_is_the_whole_cell_table, release_rule}` | [`receiving`], [`ReceivingRead::combined`], [`ActiveAddress`]; the grain read is [`crate::receiver::face::grain_exponent`]'s |
 //! | the receiving face compresses landmarks: the tree's path face, its opened-path deposit and telescope, the executed dyadic face (the landmark tree) | `Compression/Landmark/Context/Tree.{path_face_normalized, weight_step, landmark_step, path_telescope_exact, depth_one_is_the_whole_cell_table, executed_split_laws, cell_faces_partition, digit_log_residual}` (the owner's header has the rest) | [`crate::compression::landmark::context`] |
 //! | the word opens at zero | structural: [`Current`] has no wave field (`HNN/Retention.word_opens_at_zero` is the abstract trajectory's linearity) | [`Word::open`] |
 //! | keys | `HNN/Keys.{field_loop_fibre, selective_step_dormant, propagation_eq_edge_fibre, gauge_fix_unique}` | [`keys`], [`crate::compression::Menu::propagate`] |
 //! | the ring's mode tick, its pump and sheets, its clock, the junction's reference change (campaign 2) | `HNN/Ring.{ring_tick_conserves_mode_energy, ring_descriptor_tick_conserves, ring_cayley_denominator_nonsingular, ring_tick_executed_energy_balance, two_port_reference_balance, ring_crossings_are_epoch_ticks, pump_half_turn_invariant, pump_blind_to_sheets, locked_sheet_receiver_face}` | [`ring`] |
-//! | the contact's transfer and site kind, its boost, its lock address, its break (campaign 2) | `HNN/Contact.{contact_transfer_kind_by_storage_sign, contact_mode_transfer, contact_boost_solve_or_singular_direction, contact_signed_storage_balance, contact_lock_address, lockAddress_unique, least_denominator_unique, lockAddress_closes}`, `HNN/ContactBreak.{break_release_balance, break_iff_release_covers_gluing, griffith_closed_port_case, parting_returns_gluing_defect}` | [`contact`], [`contact_readings`], [`Field::parted_holon`] |
+//! | the contact's transfer and site kind, its boost, its lock address, its break (campaign 2) | `HNN/Contact.{contact_transfer_kind_by_storage_sign, contact_mode_transfer, contact_boost_solve_or_singular_direction, contact_signed_storage_balance, contact_lock_address, lockAddress_unique, least_denominator_unique, lockAddress_closes}`, `HNN/ContactBreak.{break_release_balance, break_iff_release_covers_gluing, griffith_closed_port_case, parting_returns_gluing_defect}` | [`contact`], [`contact_readings`], [`Field::parted_holarchy`] |
 //! | the loaded tick's field/resonator balance, separate element and returned-wave splits, the word's balance across the gain commit (the loaded resonator) | `HNN/Ring.{loaded_word_stage_balance, loaded_tick_executed_interconnection_balance}`, `HNN/Word.{field_commit_deposition}` | [`word::FieldBalance`], [`word::WordBalance`], [`word::PowerForm`] |
 //! | a loaded ring's modes descend to their future quotient: the period lift, one chart for every phase, the descended run, the storage-null release (campaign 3, first construction) | `HNN/ModeQuotient.{periodic_lift_exact, phase_kernel_le_lift, descended_run_reads, released_pair_storage_null}` | [`modes`] |
 //! | the wave read by the Born rule: the digit split and the dyadic cell face, the reception keeping a density, the density as the retained quotient, the absorbed tick, the interference zero, the covector and the Fisher-scored step (the Born face) | `HNN/BornFace.{born_face_normalized, born_executed_partition, born_update_trace_one, born_pure_stays_pure, born_state_future_sufficient, born_unitary_invariant, born_tick_absorbed, born_interference_zero, born_covector_eq, born_fisher_bound}` | [`born`] |
 //! | the ring's navigator | `Holon/Navigator.{mapRotor_order, map_pow_mod_order, map_turn_lossless}` | [`Ring::navigator`] over `navigator::Transport::Map` |
-//! | the block incidence, the contrast map read from its blocks, and the Holarchy chart | `Holon/Complex.{blockIncidence, block_flat_closed}`, `Holarchy/Join.interconnect` | [`Field::connection`], [`Field::contrast`], [`Field::holon`] |
+//! | the block incidence, the contrast map read from its blocks, and the Holarchy chart | `Holon/Complex.{blockIncidence, block_flat_closed}`, `Holarchy/Join.interconnect` | [`Field::connection`], [`Field::contrast`], [`Field::holarchy`] |
 //! | the port's returns | `Holarchy/Reception.InteractionReturn` (the owner's, generic in its payloads) | [`ExecutionPort`] |
 //! | the mount certifies the Holarchy; its parametric orientation carries the aeons | `Holarchy/Join.interconnect`, `Holarchy/Join.Holarchy.parametric` | [`Reference`] (`mount_with`), [`reference::Resident::parametric`] |
 //! | the aeon at its boundary: readings, epochs as section flux, the carry-out's cycle | `Aeon/Clock/Winding.{reading_navigatorClock, torus_cycle_reads_whole_windings}`, `Aeon/Clock/Epoch.signed_count_is_flux`, `HNN/Retention.lift_reading` | [`retention::aeon_readings`], [`AeonBoundary`] |
@@ -125,7 +154,7 @@ pub use port::{
     Deposit, ExecutionPort, Handle, MomentId, PendingId, Pullback, StagedId, Transpose,
 };
 pub use ratio::{Faces, HolonRatio, RatioCovector};
-pub use receiving::{ActiveAddress, GrainCell, LetterReader, ReceivingPhases, ReceivingRead};
+pub use receiving::{ActiveAddress, LetterReader, ReceivingPhases, ReceivingRead};
 pub use reference::{Cut, Exposure, Reference, Resident};
 pub use retention::AeonBoundary;
 pub use ring::{PumpDeclaration, ResonatorMaterial, RingClock};
@@ -138,11 +167,13 @@ use thiserror::Error;
 
 use crate::aeon::AeonError;
 use crate::compression::CompressionError;
+use crate::compression::landmark::context::ContextError;
 use crate::holon::HolonError;
 use crate::holon::contact::ContactError;
 use crate::holon::contact::menu::MenuError;
 use crate::holon::parametron::ParametronError;
 use crate::ratio::Rat;
+use crate::ratio::algebraic::ExactValueError;
 use crate::ratio::exponentiated::RatioError;
 use crate::ratio::linear::ExactLinearError;
 use crate::receiver::face::WidthRefusal;
@@ -170,6 +201,10 @@ pub enum HnnError {
     Aeon(Box<AeonError>),
     #[error(transparent)]
     Ratio(#[from] RatioError),
+    #[error(transparent)]
+    Exact(#[from] ExactValueError),
+    #[error(transparent)]
+    Context(#[from] ContextError),
     #[error("{what}: expected {expected}, found {found}")]
     Shape {
         what: &'static str,

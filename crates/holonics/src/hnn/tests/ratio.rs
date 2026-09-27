@@ -11,14 +11,14 @@ use crate::hnn::field::Current;
 use crate::hnn::moment::SourceMoment;
 use crate::hnn::port::ExecutionPort;
 use crate::hnn::ratio::{
-    Face, Faces, HolonRatio, TargetPhases, interval_difference, log2_of_enclosure,
-    power_of_two_enclosure, target_phases,
+    Face, Faces, HolonRatio, TargetPhases, power_of_two_enclosure, target_phases,
 };
-use crate::hnn::receiving::{GrainCell, ReceivingRead};
+use crate::hnn::receiving::ReceivingRead;
 use crate::hnn::reference::{Reference, one_hot};
-use crate::ratio::algebraic::ExactInterval;
+use crate::ratio::algebraic::{ExactInterval, interval_difference, log2_of_enclosure};
 use crate::ratio::exponentiated::{CarriedPower, PhaseField, power_of_two};
 use crate::ratio::{Rat, integer, rat};
+use crate::receiver::face::GrainCell;
 
 /// A receiving read of realified logits `[Re, Im, …]` at a grain.
 fn read(logits: Vec<Rat>, grain: u64) -> ReceivingRead {

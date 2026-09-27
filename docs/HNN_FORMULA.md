@@ -12,6 +12,19 @@ The HNN is the compression machine at scale ([the line](plans/THE_REBUILD.md#the
 - its learning is locating keys: navigator configuration inferred by loop closure;
 - its release is the split between resonating (RIDE) and emanating (FOUND).
 
+[definition; Brandon, September 27; the construction `agent-inferred`] **The top is a Holarchy
+and its aeons** ([THE_MACHINE](THE_MACHINE.md#the-top-a-holarchy-and-its-aeons)). The HNN is a
+Holarchy: its ring and contact Holons are joined at ports (`Field::holarchy` returns it, certified
+to glue), and the receiving parametron's storage is the context tree
+(`compression::landmark::context`). Its passage is an aeon on the Holarchy's parametric
+orientation: a receiving window is an epoch at the receiver's section, a pump period or a clock
+closure is a cycle, the aeon boundary is the collapse, and the first law over the aeon is
+`aeon::EnclosedLedger`. `Field` is the Holarchy's declaration, a chart of it, and
+`Reference::expose` is a cut's passage through the resident's aeons. The equations below are that
+Holarchy's element relations and that passage. What the code does not yet join (the tree as a
+Holon at ports, the receiving window as an epoch reading, the pump period as a cycle) is `[open]`
+in THE_MACHINE.
+
 Its field is chains of complex parametron rings joined by helical pair contacts. Athena is its
 first intended product; Eros names the collective formative organization and the composition
 within each of its Holons. Perception, internal generation and outward expression use the same

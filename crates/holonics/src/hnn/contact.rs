@@ -69,7 +69,7 @@
 //! by its own lock as well as by carries) reads **Unlocked**, a lawful letter.
 //!
 //! [definition; agent-inferred] **The lock letters** (the receiving join's contact letter,
-//! `compression::landmark::context::Feature::Contact`). The addresses a contact can read form the finite family
+//! `hnn::receiving::Feature::Contact`). The addresses a contact can read form the finite family
 //! `{Unlocked} ∪ {(p, q) reduced : 1 ≤ p ≤ P, 1 ≤ q ≤ Q}` (Lean
 //! `Compression/Landmark/Context/Address.lock_partition_finite`, whose horizon clause is the address's period,
 //! `lockAddress_closes`): a box, not the Farey family `F_Q` of `[0, 1]`, since the
@@ -85,7 +85,7 @@
 //! `R = E_a + W_a − D_a − E_a′` with `E_a′` the post-transit storage the parted constitution still
 //! holds, and the receipt is `R − J`. Under the exact law `R` is the storage the parting removes
 //! (`break_release_balance`); on the lattices it carries the transit's defects. A parted contact's
-//! shared face returns its typed gluing defect ([`crate::hnn::Field::parted_holon`],
+//! shared face returns its typed gluing defect ([`crate::hnn::Field::parted_holarchy`],
 //! `parting_returns_gluing_defect`).
 //!
 //! | Lean | Rust |
@@ -98,7 +98,7 @@
 //! | `Compression/Landmark/Context/Address.lock_partition_finite` (`Q = H`, the horizon) | [`LockDeclaration::derived`] |
 //! | `Compression/Landmark/Context/Address.lock_partition_finite` (the finite family the address lands in) | [`LockDeclaration::letters`], [`ContactLock::code`], [`ContactReading::letter`] |
 //! | `HNN/ContactBreak.{break_release_balance, break_iff_release_covers_gluing, griffith_closed_port_case}` | [`BreakReceipt`] |
-//! | `HNN/ContactBreak.parting_returns_gluing_defect` | [`crate::hnn::Field::parted_holon`] |
+//! | `HNN/ContactBreak.parting_returns_gluing_defect` | [`crate::hnn::Field::parted_holarchy`] |
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
@@ -633,7 +633,7 @@ impl ContactLock {
 
 /// [definition] **One contact's reading at a cell's tick**: its lock address and its site kind,
 /// both read from retained state before the cell (the lift point and the constitution). It is the
-/// receiving join's contact letter (`compression::landmark::context::Feature::Contact`): its value in the slot is
+/// receiving join's contact letter (`hnn::receiving::Feature::Contact`): its value in the slot is
 /// [`ContactReading::letter`].
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ContactReading {

@@ -2209,7 +2209,7 @@ impl Constitution {
                 .receivers()
                 .iter()
                 .find(|receiver| receiver.ring == g)
-                .map(|receiver| Landmarks::new(landmark_declaration(field, receiver)?))
+                .map(|receiver| Ok(Landmarks::new(landmark_declaration(field, receiver)?)?))
                 .transpose()
         };
         let rings = field
@@ -3440,7 +3440,8 @@ impl Constitution {
                         .and_then(LocusMaterial::tree)
                         .ok_or(HnnError::MissingReceivingMap { ring: step.ring })
                         .map_err(refused)?;
-                    tree.deposit(&step.address, step.class).map_err(refused)?;
+                    tree.deposit(&step.address, step.class)
+                        .map_err(|refusal| refused(refusal.into()))?;
                 }
                 LocusStep::Mixture(step) => {
                     // The mixture's β carries its own chart, so it moves no lattice clock.

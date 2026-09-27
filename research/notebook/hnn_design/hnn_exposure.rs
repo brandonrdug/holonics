@@ -120,9 +120,10 @@ use std::time::Instant;
 
 use holonics::aeon::{EnclosedBalance, LiteralComparison};
 use holonics::compression::cost::ceil_log2;
+use holonics::compression::landmark::context::baseline::PPM_ORDER;
 use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
 use holonics::hnn::port::{ExecutionPort, ReceiptDetail};
-use holonics::hnn::reference::{Bits, KeyReport, PPM_ORDER};
+use holonics::hnn::reference::{Bits, KeyReport};
 use holonics::hnn::{
     AeonBoundary, Constitution, Cut, Exposure, Field, FieldDeclaration, Reference,
     ResonatorMaterial, Steps,

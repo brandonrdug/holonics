@@ -102,7 +102,7 @@
 //! per-depth pairs `(j_root, j_below)`, `j_root ≠ j_below`; `J = ⌈log₂(n* B)⌉`,
 //! `compression::landmark::context::ladder_top`), each law with its own depth sweep (`choose_depth`) and charged
 //! `⌈log₂⌉` of its depths tried, the choice charged `⌈log₂⌉` of the laws tried
-//! (`compression::landmark::context::choose_prior`):
+//! (`hnn::reference::choose_prior`):
 //! - each law's development code length and its difference from the `½` tree (Decision 28's law),
 //!   uncharged and charged, with its sign when decided by disjoint enclosures;
 //! - the choice: the least charged law when it lies strictly below the `½` tree, the `½` tree
@@ -130,18 +130,19 @@
 //! - the families tried: every nonempty set of campaign 1's four rings at one declared grain, the
 //!   ring's period `d_g` (its own port chart, an empty fibre) or `2` (the half of the rotor's cycle
 //!   its clock phase is in; not the parametron's half-turn sheets, which no letter reads), so
-//!   `2 (2^4 − 1) = 30` families; each is declared (`LetterFamily`) and read with its own depth
+//!   `2 (2^4 − 1) = 30` families; each is declared (`hnn::receiving::FeatureFamily`, whose alphabets the tree reads as its
+//!   `LetterFamily`) and read with its own depth
 //!   sweep (`choose_depth`), prequentially, every cell scored before its own deposit;
 //! - each family's description charge: `⌈log₂(N + 1)⌉` bits for the family chosen among the `N`
 //!   declared and the cell-only one, plus `⌈log₂⌉` of its depths tried; a slot of one letter is never
-//!   declared (`LetterFamily::new` refuses it: it carries nothing), so nothing is charged for one;
+//!   declared (`FeatureFamily::new`, through `LetterFamily::new`, refuses it: it carries nothing), so nothing is charged for one;
 //! - `Δ_tree = L_(tree+letters) − L_(tree, cells) + description`, an exact enclosure, and its
 //!   sign when decided;
 //! - with `contacts`, the contact families (every set of the field's contacts whose code fits 32
 //!   bits, each contact's letter its owner's reading, `hnn::contact::ContactReading`), their site
 //!   kinds read from the exposure's development part on the host (its deadline the development's
 //!   last window: only its constitution curve's contact site readings are read);
-//! - the constant-slot controls (`LetterFamily::constant_control`: `r` slots of one letter each,
+//! - the constant-slot controls (`FeatureFamily::constant_control`: `r` slots of one letter each,
 //!   never declared and never charged), whose difference from the cell-only tree is the enlarged
 //!   tree's own reweighting, and each family's
 //!   `Δ_letters = L_(tree+letters) − L_(control, r slots) + description`; the family chosen is the
@@ -188,21 +189,23 @@ use std::time::Instant;
 use rayon::prelude::*;
 
 use holonics::compression::cost::ceil_log2;
+use holonics::compression::landmark::context::baseline::{Baselines, PPM_ORDER};
 use holonics::compression::landmark::context::{
-    Capacity, ChartReport, Coded, DepthSweep, Feature, IdealLandmarks, JoinTree,
-    LandmarkDeclaration, Landmarks, Letter, LetterFamily, OracleCost, PassageCode, PriorSweep,
-    StopMixture, StopPrior, TreeRun, Widths, address, cell_letters, choose_depth,
-    choose_depth_within, choose_prior, code_length, development, ladder_top, odometer_digits,
-    oracle_cost, prequential, prior_family, tree_prequential,
+    Capacity, ChartReport, IdealLandmarks, JoinTree, LandmarkDeclaration, Landmarks, Letter,
+    LetterFamily, PassageCode, StopMixture, StopPrior, Widths, address, cell_letters, code_length,
+    ladder_top, odometer_digits, prior_family,
 };
-use holonics::hnn::ratio::interval_sum;
-use holonics::hnn::receiving::clock_letters;
 use holonics::hnn::receiving::landmark_declaration_with;
-use holonics::hnn::reference::{Baselines, PPM_ORDER};
+use holonics::hnn::receiving::{Feature, FeatureFamily, clock_letters};
+use holonics::hnn::reference::{
+    Coded, DepthSweep, OracleCost, PriorSweep, TreeRun, choose_depth, choose_depth_within,
+    choose_prior, development, oracle_cost, prequential, tree_prequential,
+};
 use holonics::hnn::{Cut, Field, FieldDeclaration, Reference};
 use holonics::navigator::trace::SiteKind;
 use holonics::ratio::Rat;
 use holonics::ratio::algebraic::ExactInterval;
+use holonics::ratio::algebraic::interval_sum;
 use num_bigint::BigInt;
 use num_bigint::BigUint;
 use num_traits::Zero;
@@ -560,7 +563,7 @@ fn hot_path(cut: &Cut, declared: &LandmarkDeclaration, held: &std::ops::Range<us
 /// length, its description bits, and its wall time.
 struct FamilyRun {
     name: String,
-    family: LetterFamily,
+    family: FeatureFamily,
     sweep: DepthSweep,
     bits: ExactInterval,
     description: u64,
@@ -707,7 +710,7 @@ fn letters_harness(path: &str, contacts: bool) {
     println!();
 
     let rings = field.rings();
-    let mut families: Vec<(String, LetterFamily)> = Vec::new();
+    let mut families: Vec<(String, FeatureFamily)> = Vec::new();
     for sheet in [false, true] {
         for subset in 1u32..(1 << rings.len()) {
             let chosen: Vec<usize> = (0..rings.len()).filter(|g| subset >> g & 1 == 1).collect();
@@ -731,7 +734,7 @@ fn letters_harness(path: &str, contacts: bool) {
                 .join(", ");
             families.push((
                 name,
-                LetterFamily::new(features).expect("a declared family"),
+                FeatureFamily::new(features).expect("a declared family"),
             ));
         }
     }
@@ -759,7 +762,7 @@ fn letters_harness(path: &str, contacts: bool) {
                 })
                 .collect::<Vec<_>>()
                 .join(", ");
-            match LetterFamily::new(features) {
+            match FeatureFamily::new(features) {
                 Ok(family) => families.push((name, family)),
                 Err(refusal) => println!("not declared: {name}: {refusal}"),
             }
@@ -772,7 +775,7 @@ fn letters_harness(path: &str, contacts: bool) {
         families.len(),
         families.len()
     );
-    let run_family = |name: String, family: LetterFamily, charge: u64| -> FamilyRun {
+    let run_family = |name: String, family: FeatureFamily, charge: u64| -> FamilyRun {
         let clock = Instant::now();
         let letters =
             clock_letters(&field, &family, &cut.cells, &kinds).expect("the passage's letters");
@@ -785,7 +788,7 @@ fn letters_harness(path: &str, contacts: bool) {
             .collect::<std::collections::BTreeSet<u32>>()
             .len();
         let at = LandmarkDeclaration {
-            family: family.clone(),
+            family: family.letters().clone(),
             ..declared.clone()
         };
         let family_sweep = choose_depth(&cut, &letters, &at).expect("a family's sweep");
@@ -818,7 +821,7 @@ fn letters_harness(path: &str, contacts: bool) {
         .map(|slots| {
             run_family(
                 format!("the constant control of {slots} slots"),
-                LetterFamily::constant_control(slots),
+                FeatureFamily::constant_control(slots),
                 0,
             )
         })
@@ -885,7 +888,7 @@ fn letters_harness(path: &str, contacts: bool) {
         let cells_at = cell_bits_at(depth);
         let drift = rule(LandmarkDeclaration {
             depth,
-            family: run.family.clone(),
+            family: run.family.letters().clone(),
             ..declared.clone()
         }) + rule(LandmarkDeclaration {
             depth,
@@ -931,7 +934,7 @@ fn letters_harness(path: &str, contacts: bool) {
         };
         let tree = Landmarks::new(LandmarkDeclaration {
             depth: run.sweep.chosen,
-            family: run.family.clone(),
+            family: run.family.letters().clone(),
             ..declared.clone()
         })
         .expect("the chosen declaration");
@@ -939,7 +942,7 @@ fn letters_harness(path: &str, contacts: bool) {
             "  {} ({} slots, {} bundle codes):",
             run.name,
             run.family.slots(),
-            run.family.bundle_codes(alphabet)
+            run.family.letters().bundle_codes(alphabet)
         );
         println!("    sweep {}", tried.join("; "));
         println!(
@@ -2466,7 +2469,7 @@ fn recorded(reading: (u64, u64), grain: u64) -> ExactInterval {
 /// `n + k/L + ε`.
 fn reads(interval: &ExactInterval, reading: (u64, u64), grain: u64) -> bool {
     [&interval.lower, &interval.upper].into_iter().all(|value| {
-        let cell = holonics::hnn::receiving::GrainCell::of(value, grain);
+        let cell = holonics::receiver::face::GrainCell::of(value, grain);
         cell.carry == BigInt::from(reading.0) && cell.phase == reading.1
     })
 }
