@@ -1,0 +1,634 @@
+{
+  "scope": "Decision 38, source-ring loaded resonator; standing development cut reused for design; separate evaluation partition unspent",
+  "population": {
+    "cells": "6148 = 2^2 * 29 * 53",
+    "windows": "3074 = 2 * 29 * 53",
+    "development_cells": "4958 = 2 * 37 * 67",
+    "scored_tail_cells": "1190 = 2 * 5 * 7 * 17"
+  },
+  "grain": "L_R = 16 = 2^4; each epsilon is its own unresolved fibre 0 <= epsilon < 1/16",
+  "description_bits": {
+    "field": 1437,
+    "loaded_initial_material": 889,
+    "empty_material_counts": 2,
+    "increment": 887,
+    "charge_applied": "once per entire passage"
+  },
+  "loaded_declaration": "source ring 0; unit parametron C0/K0, D0=I/4, no pump, all initial gains 1; forms scale by squared gains",
+  "protocol_agreement": "loaded host/card protocol receipts agree exactly over 3301 lines, excluding exterior time and device traffic",
+  "baseline_regression": "new default scores, balances, constitution, resident size and counted work equal the f4bae3de complete card receipt; description now includes two empty material counts",
+  "work_scope": "ExactWork counters report instrumented work, not a complete operation or energy census",
+  "loaded_host": {
+    "training": {
+      "targets": 4958,
+      "model q": {
+        "lower": "1430104830328153130301887406190401/2^96",
+        "upper": "1430104830328153130338393294472641/2^96",
+        "grain_reading": "18050 + 7/16 + ε"
+      },
+      "tree": {
+        "lower": "178928456235901797215227641847683/2^93",
+        "upper": "357856912471803594430455283696605/2^94",
+        "grain_reading": "18067 + 2/16 + ε"
+      },
+      "tree at the grain": {
+        "lower": "715699717689016710192048994026373/2^95",
+        "upper": "1431399435378033420404783970012033/2^96",
+        "grain_reading": "18066 + 12/16 + ε"
+      },
+      "combined": {
+        "lower": "1430025602793538651292124230508841/2^96",
+        "upper": "715012801396769325656464029329133/2^95",
+        "grain_reading": "18049 + 7/16 + ε"
+      },
+      "uniform": {
+        "lower": "39664",
+        "upper": "39664",
+        "grain_reading": "39664 + 0/16 + ε"
+      },
+      "order-0 KT": {
+        "lower": "1944104112973089168687607614711213/2^96",
+        "upper": "1944104112973089168687607614718653/2^96",
+        "grain_reading": "24538 + 0/16 + ε"
+      },
+      "order-1 KT": {
+        "lower": "501640171760031208621383259477147/2^94",
+        "upper": "2006560687040124834485533037915787/2^96",
+        "grain_reading": "25326 + 5/16 + ε"
+      },
+      "PPM order 2": {
+        "lower": "371094929619691866648866709851551/2^94",
+        "upper": "1484379718478767466595466839412157/2^96",
+        "grain_reading": "18735 + 8/16 + ε"
+      }
+    },
+    "held out": {
+      "targets": 1190,
+      "model q": {
+        "lower": "290916488246071604324955752986925/2^96",
+        "upper": "145458244123035802167475795178271/2^95",
+        "grain_reading": "3671 + 14/16 + ε"
+      },
+      "tree": {
+        "lower": "291382252931002896142409091803023/2^96",
+        "upper": "291382252931002896142409091804213/2^96",
+        "grain_reading": "3677 + 12/16 + ε"
+      },
+      "tree at the grain": {
+        "lower": "291414371114214197522204076634983/2^96",
+        "upper": "291414371114214197527153542905863/2^96",
+        "grain_reading": "3678 + 2/16 + ε"
+      },
+      "combined": {
+        "lower": "145458243858519673505150259469033/2^95",
+        "upper": "290916487717039347015286926088879/2^96",
+        "grain_reading": "3671 + 14/16 + ε"
+      },
+      "uniform": {
+        "lower": "9520",
+        "upper": "9520",
+        "grain_reading": "9520 + 0/16 + ε"
+      },
+      "order-0 KT": {
+        "lower": "28060593105289687746093345272409/2^92",
+        "upper": "448969489684635003937493524360335/2^96",
+        "grain_reading": "5666 + 12/16 + ε"
+      },
+      "order-1 KT": {
+        "lower": "409202479264728077694206161517081/2^96",
+        "upper": "409202479264728077694206161518847/2^96",
+        "grain_reading": "5164 + 13/16 + ε"
+      },
+      "PPM order 2": {
+        "lower": "310832789082359294855546670806339/2^96",
+        "upper": "310832789082359294855546670807875/2^96",
+        "grain_reading": "3923 + 4/16 + ε"
+      }
+    },
+    "windows": "receiving windows read: 3074 (compares 3074, deposits 3074); the source-to-receiver path open at the cut of 2711 of the 3074 windows; peak bits of the change inside a word: 31",
+    "complete": true,
+    "word_balance": "word balances (campaign 2, WordBalance::closes: the field and its resonators in one identity with the deposition work at the commit and the interconnection's defect, and the executed residual within its certified bound): 3074 formed, 3074 carried across a commit, every one closed: true; the largest executed residual (defects plus the last junction's) 10818602302617422270798110180703649327395/2^147 against its bound 261253459166925346351609190584190422857847/2^147: at or below it (bound − value = 62608714216076981020202770100871693382613/2^145); the deposition work summed over the commits -11581862336831/2^50 (the largest in magnitude 153871450597/2^49); the interconnection's defect summed 0",
+    "tick_balance": "tick balances: 9222 read, every one closed up to its residual within its certified bound: true; the largest residual 8637610766496162385103093243/2^106 against its bound 34201463312896031778940253217/2^105: at or below it (bound − value = 59765315859295901172777413191/2^106)",
+    "constitution": "constitution: 4833768 bits, per source bit 604221/6148 (98 rem 1717 over 6148)",
+    "resident": "resident: 6289868 bits with the collapse, per source bit 54223/424 (127 rem 375 over 424); 6289868 bits without it, per source bit 54223/424 (127 rem 375 over 424)",
+    "work": "additions 0; multiplications 0; divisions 0; entries written 6516880; cumulative bits 107395451; peak bits 61; resident entries 4833768; dependency span 15370",
+    "cost": "Kt = |field + initial material description| 2326 + located keys 0 + L_target|model + ceil(log2 ExactWork) 23 = exact [953564136160115831817038949258295/2^95, 1907128272320231663680579624168447/2^96] bits; at L_R = 16: 24071 + 5/16 + ε, ε ∈ [1206819294542907191743747127/2^95, 2413638589085860885213146111/2^96] ⊂ [0, 1/16)",
+    "gains": [
+      "ring 0: C 1, K 1, D 273/256, pump 1"
+    ],
+    "time": "wall time (exterior): setup 36 ms; exposure 384041 ms over 3074 windows (per window 124 rem 2865 over 3074, in ms)",
+    "phases": {
+      "refine read": {
+        "total_ms": 45961,
+        "per_window_ms": {
+          "quotient": 14,
+          "remainder": 2925
+        }
+      },
+      "release": {
+        "total_ms": 1598,
+        "per_window_ms": {
+          "quotient": 0,
+          "remainder": 1598
+        }
+      },
+      "resonators": {
+        "total_ms": 0,
+        "per_window_ms": {
+          "quotient": 0,
+          "remainder": 0
+        }
+      },
+      "compare read": {
+        "total_ms": 0,
+        "per_window_ms": {
+          "quotient": 0,
+          "remainder": 0
+        }
+      },
+      "tree transfer": {
+        "total_ms": 0,
+        "per_window_ms": {
+          "quotient": 0,
+          "remainder": 0
+        }
+      },
+      "tree read": {
+        "total_ms": 4929,
+        "per_window_ms": {
+          "quotient": 1,
+          "remainder": 1855
+        }
+      },
+      "holon and covector": {
+        "total_ms": 33441,
+        "per_window_ms": {
+          "quotient": 10,
+          "remainder": 2701
+        }
+      },
+      "pull_back": {
+        "total_ms": 15370,
+        "per_window_ms": {
+          "quotient": 5,
+          "remainder": 0
+        }
+      },
+      "compose": {
+        "total_ms": 15928,
+        "per_window_ms": {
+          "quotient": 5,
+          "remainder": 558
+        }
+      },
+      "deposited": {
+        "total_ms": 171192,
+        "per_window_ms": {
+          "quotient": 55,
+          "remainder": 2122
+        }
+      },
+      "tree deposit": {
+        "total_ms": 0,
+        "per_window_ms": {
+          "quotient": 0,
+          "remainder": 0
+        }
+      },
+      "normal deposit": {
+        "total_ms": 0,
+        "per_window_ms": {
+          "quotient": 0,
+          "remainder": 0
+        }
+      },
+      "ingest": {
+        "total_ms": 7,
+        "per_window_ms": {
+          "quotient": 0,
+          "remainder": 7
+        }
+      }
+    }
+  },
+  "loaded_card": {
+    "training": {
+      "targets": 4958,
+      "model q": {
+        "lower": "1430104830328153130301887406190401/2^96",
+        "upper": "1430104830328153130338393294472641/2^96",
+        "grain_reading": "18050 + 7/16 + ε"
+      },
+      "tree": {
+        "lower": "178928456235901797215227641847683/2^93",
+        "upper": "357856912471803594430455283696605/2^94",
+        "grain_reading": "18067 + 2/16 + ε"
+      },
+      "tree at the grain": {
+        "lower": "715699717689016710192048994026373/2^95",
+        "upper": "1431399435378033420404783970012033/2^96",
+        "grain_reading": "18066 + 12/16 + ε"
+      },
+      "combined": {
+        "lower": "1430025602793538651292124230508841/2^96",
+        "upper": "715012801396769325656464029329133/2^95",
+        "grain_reading": "18049 + 7/16 + ε"
+      },
+      "uniform": {
+        "lower": "39664",
+        "upper": "39664",
+        "grain_reading": "39664 + 0/16 + ε"
+      },
+      "order-0 KT": {
+        "lower": "1944104112973089168687607614711213/2^96",
+        "upper": "1944104112973089168687607614718653/2^96",
+        "grain_reading": "24538 + 0/16 + ε"
+      },
+      "order-1 KT": {
+        "lower": "501640171760031208621383259477147/2^94",
+        "upper": "2006560687040124834485533037915787/2^96",
+        "grain_reading": "25326 + 5/16 + ε"
+      },
+      "PPM order 2": {
+        "lower": "371094929619691866648866709851551/2^94",
+        "upper": "1484379718478767466595466839412157/2^96",
+        "grain_reading": "18735 + 8/16 + ε"
+      }
+    },
+    "held out": {
+      "targets": 1190,
+      "model q": {
+        "lower": "290916488246071604324955752986925/2^96",
+        "upper": "145458244123035802167475795178271/2^95",
+        "grain_reading": "3671 + 14/16 + ε"
+      },
+      "tree": {
+        "lower": "291382252931002896142409091803023/2^96",
+        "upper": "291382252931002896142409091804213/2^96",
+        "grain_reading": "3677 + 12/16 + ε"
+      },
+      "tree at the grain": {
+        "lower": "291414371114214197522204076634983/2^96",
+        "upper": "291414371114214197527153542905863/2^96",
+        "grain_reading": "3678 + 2/16 + ε"
+      },
+      "combined": {
+        "lower": "145458243858519673505150259469033/2^95",
+        "upper": "290916487717039347015286926088879/2^96",
+        "grain_reading": "3671 + 14/16 + ε"
+      },
+      "uniform": {
+        "lower": "9520",
+        "upper": "9520",
+        "grain_reading": "9520 + 0/16 + ε"
+      },
+      "order-0 KT": {
+        "lower": "28060593105289687746093345272409/2^92",
+        "upper": "448969489684635003937493524360335/2^96",
+        "grain_reading": "5666 + 12/16 + ε"
+      },
+      "order-1 KT": {
+        "lower": "409202479264728077694206161517081/2^96",
+        "upper": "409202479264728077694206161518847/2^96",
+        "grain_reading": "5164 + 13/16 + ε"
+      },
+      "PPM order 2": {
+        "lower": "310832789082359294855546670806339/2^96",
+        "upper": "310832789082359294855546670807875/2^96",
+        "grain_reading": "3923 + 4/16 + ε"
+      }
+    },
+    "windows": "receiving windows read: 3074 (compares 3074, deposits 3074); the source-to-receiver path open at the cut of 2711 of the 3074 windows; peak bits of the change inside a word: 31",
+    "complete": true,
+    "word_balance": "word balances (campaign 2, WordBalance::closes: the field and its resonators in one identity with the deposition work at the commit and the interconnection's defect, and the executed residual within its certified bound): 3074 formed, 3074 carried across a commit, every one closed: true; the largest executed residual (defects plus the last junction's) 10818602302617422270798110180703649327395/2^147 against its bound 261253459166925346351609190584190422857847/2^147: at or below it (bound − value = 62608714216076981020202770100871693382613/2^145); the deposition work summed over the commits -11581862336831/2^50 (the largest in magnitude 153871450597/2^49); the interconnection's defect summed 0",
+    "tick_balance": "tick balances: 9222 read, every one closed up to its residual within its certified bound: true; the largest residual 8637610766496162385103093243/2^106 against its bound 34201463312896031778940253217/2^105: at or below it (bound − value = 59765315859295901172777413191/2^106)",
+    "constitution": "constitution: 4833768 bits, per source bit 604221/6148 (98 rem 1717 over 6148)",
+    "resident": "resident: 6289868 bits with the collapse, per source bit 54223/424 (127 rem 375 over 424); 6289868 bits without it, per source bit 54223/424 (127 rem 375 over 424)",
+    "work": "additions 0; multiplications 0; divisions 0; entries written 6516880; cumulative bits 107395451; peak bits 61; resident entries 4833768; dependency span 15370",
+    "cost": "Kt = |field + initial material description| 2326 + located keys 0 + L_target|model + ceil(log2 ExactWork) 23 = exact [953564136160115831817038949258295/2^95, 1907128272320231663680579624168447/2^96] bits; at L_R = 16: 24071 + 5/16 + ε, ε ∈ [1206819294542907191743747127/2^95, 2413638589085860885213146111/2^96] ⊂ [0, 1/16)",
+    "gains": [
+      "ring 0: C 1, K 1, D 273/256, pump 1"
+    ],
+    "time": "wall time (exterior): setup 38 ms; exposure 333854 ms over 3074 windows (per window 108 rem 1862 over 3074, in ms)",
+    "phases": {
+      "refine read": {
+        "total_ms": 8201,
+        "per_window_ms": {
+          "quotient": 2,
+          "remainder": 2053
+        }
+      },
+      "release": {
+        "total_ms": 8240,
+        "per_window_ms": {
+          "quotient": 2,
+          "remainder": 2092
+        }
+      },
+      "resonators": {
+        "total_ms": 0,
+        "per_window_ms": {
+          "quotient": 0,
+          "remainder": 0
+        }
+      },
+      "compare read": {
+        "total_ms": 0,
+        "per_window_ms": {
+          "quotient": 0,
+          "remainder": 0
+        }
+      },
+      "tree transfer": {
+        "total_ms": 549,
+        "per_window_ms": {
+          "quotient": 0,
+          "remainder": 549
+        }
+      },
+      "tree read": {
+        "total_ms": 5622,
+        "per_window_ms": {
+          "quotient": 1,
+          "remainder": 2548
+        }
+      },
+      "holon and covector": {
+        "total_ms": 33075,
+        "per_window_ms": {
+          "quotient": 10,
+          "remainder": 2335
+        }
+      },
+      "pull_back": {
+        "total_ms": 6796,
+        "per_window_ms": {
+          "quotient": 2,
+          "remainder": 648
+        }
+      },
+      "compose": {
+        "total_ms": 16258,
+        "per_window_ms": {
+          "quotient": 5,
+          "remainder": 888
+        }
+      },
+      "deposited": {
+        "total_ms": 166629,
+        "per_window_ms": {
+          "quotient": 54,
+          "remainder": 633
+        }
+      },
+      "tree deposit": {
+        "total_ms": 1552,
+        "per_window_ms": {
+          "quotient": 0,
+          "remainder": 1552
+        }
+      },
+      "normal deposit": {
+        "total_ms": 0,
+        "per_window_ms": {
+          "quotient": 0,
+          "remainder": 0
+        }
+      },
+      "ingest": {
+        "total_ms": 713,
+        "per_window_ms": {
+          "quotient": 0,
+          "remainder": 713
+        }
+      }
+    }
+  },
+  "default_card": {
+    "training": {
+      "targets": 4958,
+      "model q": {
+        "lower": "357515989859502811635948641026529/2^94",
+        "upper": "715031979719005623290036094741039/2^95",
+        "grain_reading": "18049 + 15/16 + ε"
+      },
+      "tree": {
+        "lower": "178928456235901797215227641847683/2^93",
+        "upper": "357856912471803594430455283696605/2^94",
+        "grain_reading": "18067 + 2/16 + ε"
+      },
+      "tree at the grain": {
+        "lower": "715699717689016710192048994026373/2^95",
+        "upper": "1431399435378033420404783970012033/2^96",
+        "grain_reading": "18066 + 12/16 + ε"
+      },
+      "combined": {
+        "lower": "1429984731750904397343267580720173/2^96",
+        "upper": "178748091468863049670509624558337/2^93",
+        "grain_reading": "18048 + 15/16 + ε"
+      },
+      "uniform": {
+        "lower": "39664",
+        "upper": "39664",
+        "grain_reading": "39664 + 0/16 + ε"
+      },
+      "order-0 KT": {
+        "lower": "1944104112973089168687607614711213/2^96",
+        "upper": "1944104112973089168687607614718653/2^96",
+        "grain_reading": "24538 + 0/16 + ε"
+      },
+      "order-1 KT": {
+        "lower": "501640171760031208621383259477147/2^94",
+        "upper": "2006560687040124834485533037915787/2^96",
+        "grain_reading": "25326 + 5/16 + ε"
+      },
+      "PPM order 2": {
+        "lower": "371094929619691866648866709851551/2^94",
+        "upper": "1484379718478767466595466839412157/2^96",
+        "grain_reading": "18735 + 8/16 + ε"
+      }
+    },
+    "held out": {
+      "targets": 1190,
+      "model q": {
+        "lower": "290892088787486485511122996453689/2^96",
+        "upper": "145446044393743242760584931474317/2^95",
+        "grain_reading": "3671 + 9/16 + ε"
+      },
+      "tree": {
+        "lower": "291382252931002896142409091803023/2^96",
+        "upper": "291382252931002896142409091804213/2^96",
+        "grain_reading": "3677 + 12/16 + ε"
+      },
+      "tree at the grain": {
+        "lower": "291414371114214197522204076634983/2^96",
+        "upper": "291414371114214197527153542905863/2^96",
+        "grain_reading": "3678 + 2/16 + ε"
+      },
+      "combined": {
+        "lower": "290892088416265557267103438883821/2^96",
+        "upper": "290892088416265557272109206617319/2^96",
+        "grain_reading": "3671 + 9/16 + ε"
+      },
+      "uniform": {
+        "lower": "9520",
+        "upper": "9520",
+        "grain_reading": "9520 + 0/16 + ε"
+      },
+      "order-0 KT": {
+        "lower": "28060593105289687746093345272409/2^92",
+        "upper": "448969489684635003937493524360335/2^96",
+        "grain_reading": "5666 + 12/16 + ε"
+      },
+      "order-1 KT": {
+        "lower": "409202479264728077694206161517081/2^96",
+        "upper": "409202479264728077694206161518847/2^96",
+        "grain_reading": "5164 + 13/16 + ε"
+      },
+      "PPM order 2": {
+        "lower": "310832789082359294855546670806339/2^96",
+        "upper": "310832789082359294855546670807875/2^96",
+        "grain_reading": "3923 + 4/16 + ε"
+      }
+    },
+    "windows": "receiving windows read: 3074 (compares 3074, deposits 3074); the source-to-receiver path open at the cut of 2711 of the 3074 windows; peak bits of the change inside a word: 31",
+    "complete": true,
+    "word_balance": "word balances (campaign 2, WordBalance::closes: the field and its resonators in one identity with the deposition work at the commit and the interconnection's defect, and the executed residual within its certified bound): 3074 formed, 3074 carried across a commit, every one closed: true; the largest executed residual (defects plus the last junction's) 21834822548327147019868729407/2^108 against its bound 375968495188234367672328561447/2^107: at or below it (bound − value = 730102167828141588324788393487/2^108); the deposition work summed over the commits -12254903892777/2^50 (the largest in magnitude 265288775589/2^49); the interconnection's defect summed 0",
+    "tick_balance": "tick balances: 9222 read, every one closed up to its residual within its certified bound: true; the largest residual 12962646199680886556278302925/2^106 against its bound 31735230312020318015181592311/2^105: at or below it (bound − value = 50507814424359749474084881697/2^106)",
+    "constitution": "constitution: 4836937 bits, per source bit 4836937/49184 (98 rem 16905 over 49184)",
+    "resident": "resident: 6293386 bits with the collapse, per source bit 3146693/24592 (127 rem 23509 over 24592); 6293386 bits without it, per source bit 3146693/24592 (127 rem 23509 over 24592)",
+    "work": "additions 0; multiplications 0; divisions 0; entries written 6516880; cumulative bits 107612857; peak bits 61; resident entries 4837790; dependency span 15370",
+    "cost": "Kt = |field + initial material description| 1439 + located keys 0 + L_target|model + ceil(log2 ExactWork) 23 = exact [1836787621821352193616678815951037/2^96, 229598452727669024207875413477743/2^93] bits; at L_R = 16: 23183 + 8/16 + ε, ε ∈ [1516171904923016752643336381/2^96, 189521488115382884641900911/2^93] ⊂ [0, 1/16)",
+    "gains": [],
+    "time": "wall time (exterior): setup 34 ms; exposure 327803 ms over 3074 windows (per window 106 rem 1959 over 3074, in ms)",
+    "phases": {
+      "refine read": {
+        "total_ms": 7013,
+        "per_window_ms": {
+          "quotient": 2,
+          "remainder": 865
+        }
+      },
+      "release": {
+        "total_ms": 7470,
+        "per_window_ms": {
+          "quotient": 2,
+          "remainder": 1322
+        }
+      },
+      "resonators": {
+        "total_ms": 0,
+        "per_window_ms": {
+          "quotient": 0,
+          "remainder": 0
+        }
+      },
+      "compare read": {
+        "total_ms": 0,
+        "per_window_ms": {
+          "quotient": 0,
+          "remainder": 0
+        }
+      },
+      "tree transfer": {
+        "total_ms": 546,
+        "per_window_ms": {
+          "quotient": 0,
+          "remainder": 546
+        }
+      },
+      "tree read": {
+        "total_ms": 5597,
+        "per_window_ms": {
+          "quotient": 1,
+          "remainder": 2523
+        }
+      },
+      "holon and covector": {
+        "total_ms": 34087,
+        "per_window_ms": {
+          "quotient": 11,
+          "remainder": 273
+        }
+      },
+      "pull_back": {
+        "total_ms": 6570,
+        "per_window_ms": {
+          "quotient": 2,
+          "remainder": 422
+        }
+      },
+      "compose": {
+        "total_ms": 15614,
+        "per_window_ms": {
+          "quotient": 5,
+          "remainder": 244
+        }
+      },
+      "deposited": {
+        "total_ms": 164090,
+        "per_window_ms": {
+          "quotient": 53,
+          "remainder": 1168
+        }
+      },
+      "tree deposit": {
+        "total_ms": 1543,
+        "per_window_ms": {
+          "quotient": 0,
+          "remainder": 1543
+        }
+      },
+      "normal deposit": {
+        "total_ms": 0,
+        "per_window_ms": {
+          "quotient": 0,
+          "remainder": 0
+        }
+      },
+      "ingest": {
+        "total_ms": 711,
+        "per_window_ms": {
+          "quotient": 0,
+          "remainder": 711
+        }
+      }
+    }
+  },
+  "comparisons": {
+    "training": {
+      "loaded_model_minus_default": {
+        "lower": "40870890141883721815216708323/2^96",
+        "upper": "40870890141883794598730366525/2^96",
+        "ordering": "above",
+        "grain_lower": "0 + 8/16 + epsilon"
+      },
+      "loaded_model_minus_tree": {
+        "lower": "-1322819559061247419933728596019/2^96",
+        "upper": "-1322819559061247383427840308823/2^96",
+        "ordering": "below",
+        "grain_lower": "-17 + 4/16 + epsilon"
+      }
+    },
+    "held out": {
+      "loaded_model_minus_default": {
+        "lower": "24399458585118803785890038291/2^96",
+        "upper": "24399458585118823828593902853/2^96",
+        "ordering": "above",
+        "grain_lower": "0 + 4/16 + epsilon"
+      },
+      "loaded_model_minus_tree": {
+        "lower": "-58220585616411477181667352161/2^93",
+        "upper": "-465764684931291807457501446481/2^96",
+        "ordering": "below",
+        "grain_lower": "-6 + 1/16 + epsilon"
+      }
+    },
+    "entire_passage_charged_once": {
+      "lower": "35170325249439734985537295347323/2^95",
+      "upper": "35170325249439735031950404108705/2^95",
+      "ordering": "above",
+      "grain_lower": "887 + 13/16 + epsilon"
+    }
+  }
+}

@@ -783,9 +783,9 @@ pub struct Operands {
     step: Rat,
     rings: Vec<RingOperands>,
     contacts: Vec<ContactOperands>,
-    /// Each ring's resonator (campaign 2, `hnn::ring`), where the constitution declares one. Its
-    /// charts are kept apart from [`Operands::charts`]: the resonator receives the storage wave
-    /// and moves none of the word's waves or readings.
+    /// Each ring's loaded resonator (campaign 2, `hnn::ring`), where the constitution declares one.
+    /// Its charts stay apart from [`Operands::charts`]; the word composes its returned storage wave
+    /// after the ring element and carries the resonator's own word-local state.
     resonators: Vec<Option<ResonatorOperands>>,
     /// Each contact's declared surface-storage density `γ` (#31), where the constitution declares
     /// its break law (`hnn::contact::BreakReceipt`).
@@ -1488,18 +1488,27 @@ pub struct TickBalance {
     pub dissipation: Rat,
     pub resist: Rat,
     pub contrast: Rat,
+    /// The signed power the loaded resonator returns to the ring storage port (negative when it
+    /// receives positive port work).
+    pub loaded_port: Rat,
+    /// The loaded return's lattice split contribution to the field power balance.
+    pub loaded_split: Rat,
     pub residual: Rat,
     pub bound: Rat,
 }
 
 impl TickBalance {
-    /// `P(t+1) = P(t) − dissipation + resist + Π_c + residual`, exactly, with the residual within
-    /// its certified bound (Lean `HNN/LatticeWord.{chart_energy_identity, cayley_chart_energy,
-    /// feedback_tick}`).
+    /// `P(t+1) = P(t) − dissipation + resist + Π_c + residual + loaded_port + loaded_split`,
+    /// exactly. The certified bound covers the execution defects plus the loaded split.
     pub fn closes(&self) -> bool {
         self.after
-            == &self.before - &self.dissipation + &self.resist + &self.contrast + &self.residual
-            && self.residual.abs() <= self.bound
+            == &self.before - &self.dissipation
+                + &self.resist
+                + &self.contrast
+                + &self.residual
+                + &self.loaded_port
+                + &self.loaded_split
+            && (&self.residual + &self.loaded_split).abs() <= self.bound
     }
 }
 

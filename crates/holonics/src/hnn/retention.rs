@@ -12,7 +12,7 @@
 //!
 //! | Locus | Retained exactly when |
 //! |---|---|
-//! | ring `g`'s element (edge `g → g`) | `r_g + 1 + o_g ≤ e_last` |
+//! | ring `g`'s element and declared resonator (edge `g → g`) | `r_g + 1 + o_g ≤ e_last` |
 //! | ring `g`'s junction (`Y_g`) | `r_g + o_g ≤ e_last` (always at `R`) |
 //! | contact `a = (g, h)`'s channel | `min(r_g, r_h) + 1 + min(o_g, o_h) ≤ e_last` |
 //! | contact `a`'s conductance `G_a` | its channel or either end's junction is retained |
@@ -224,6 +224,9 @@ impl Diamond {
             Locus::Conductance(a) => self.conductance(field, a),
             Locus::SourcePort(g) => self.source_port(field, g),
             Locus::Standing(g) => self.standing(field, g),
+            // The resonator is local to the ring's element port and its learned gains only affect
+            // that ring's word-local state transition.
+            Locus::Resonator(g) => self.element(g),
             Locus::ReceivingMap(g) => g == self.receiver,
         }
     }
@@ -259,7 +262,12 @@ impl Diamond {
 pub fn loci(field: &Field) -> Vec<Locus> {
     let mut all = Vec::new();
     for g in 0..field.rings().len() {
-        all.extend([Locus::Element(g), Locus::Junction(g), Locus::Standing(g)]);
+        all.extend([
+            Locus::Element(g),
+            Locus::Junction(g),
+            Locus::Standing(g),
+            Locus::Resonator(g),
+        ]);
         if field.is_source(g) {
             all.push(Locus::SourcePort(g));
         }
@@ -342,9 +350,21 @@ pub fn collapse(
 ) -> Result<Collapse, HnnError> {
     let kept = retained(field, admitted);
     let before = constitution.exact_bits();
+    let materialized_resonators: BTreeSet<usize> = (0..field.rings().len())
+        .filter(|&ring| {
+            constitution.resonator(ring).is_some()
+                || constitution.released().contains(&Locus::Resonator(ring))
+        })
+        .collect();
+    let materialized = |locus: &Locus| match locus {
+        Locus::Resonator(ring) => materialized_resonators.contains(ring),
+        _ => true,
+    };
     let released: BTreeSet<Locus> = loci(field)
         .into_iter()
-        .filter(|locus| !kept.contains(locus) && !constitution.released().contains(locus))
+        .filter(|locus| {
+            materialized(locus) && !kept.contains(locus) && !constitution.released().contains(locus)
+        })
         .collect();
     // The receiving map is never released, so its remainders stay (`Constitution::release`).
     let released_remainders = constitution
@@ -353,7 +373,11 @@ pub fn collapse(
         .filter(|(locus, ..)| released.contains(locus) && !matches!(locus, Locus::ReceivingMap(_)))
         .collect();
     constitution.release(&released)?;
-    let total_entries = loci(field).iter().map(|locus| locus.entries(field)).sum();
+    let total_entries = loci(field)
+        .iter()
+        .filter(|locus| materialized(locus))
+        .map(|locus| locus.entries(field))
+        .sum();
     let released_entries = constitution
         .released()
         .iter()

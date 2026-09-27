@@ -482,12 +482,11 @@ fn every_junction_port_balances_its_reference_change() {
     assert!(port_scattering(&integer(1), &[], 1).is_err());
 }
 
-/// The resonator inside the word (`hnn::ring`, `hnn::word::FieldBalance`): a declared resonator
-/// moves none of the word's waves, readings or tick balances (it receives the storage wave), every
-/// tick's field balance closes with every term stated and lumps exactly the tick balance's
-/// residual, and the whole word closes; on the word's lattices and under the exact law.
+/// The loaded resonator inside the word (`hnn::ring`, `hnn::word::FieldBalance`): its return changes
+/// the later receiving face, its signed port work cancels the field's loaded-port work, each tick's
+/// balance closes, and the whole word closes on both exact and carried lattices.
 #[test]
-fn the_field_balance_closes_at_every_tick_and_the_resonator_moves_no_wave() {
+fn the_loaded_resonator_returns_to_storage_and_closes_at_every_tick() {
     for field in [chain(), chain().with_exact_word()] {
         let field = &field;
         let medium = Medium::encoding(field, 41);
@@ -510,13 +509,22 @@ fn the_field_balance_closes_at_every_tick_and_the_resonator_moves_no_wave() {
             );
         }
         let mut word = Word::open(field, &declared, &current, &moment).unwrap();
+        if field.word_lattice().is_some() {
+            let (element_carry, returned_carry) = word.loaded_wave_remainders(0).unwrap();
+            assert!(element_carry.iter().any(|remainder| !remainder.is_zero()));
+            assert!(returned_carry.iter().all(Rat::is_zero));
+        }
         let reads = word.forward(&phases).unwrap();
-        assert_eq!(reads, plain_reads);
-        assert_eq!(word.balances(), plain.balances());
+        assert_ne!(reads, plain_reads);
         assert_eq!(word.field_balances().len(), word.balances().len());
         for (field_balance, tick) in word.field_balances().iter().zip(word.balances()) {
             assert!(field_balance.closes(), "{field_balance:?}");
-            assert_eq!(field_balance.residual(), tick.residual);
+            assert_eq!(
+                field_balance.residual(),
+                &tick.residual + &tick.loaded_split
+            );
+            assert_eq!(field_balance.loaded_port, -field_balance.port.clone());
+            assert!(field_balance.interconnection.is_zero());
             assert!(tick.closes());
         }
         assert!(word.resonances().iter().all(Option::is_some));
@@ -530,22 +538,7 @@ fn the_field_balance_closes_at_every_tick_and_the_resonator_moves_no_wave() {
         let balance = word.word_balance().unwrap();
         assert!(balance.closes(), "{balance:?}");
         assert!(plain.word_balance().unwrap().closes());
-        // The unloaded port is named (Lean `combined_balance_unloaded_port`): the field delivers
-        // none of the resonators' port work, so the interconnection's defect is that work, and the
-        // one combined identity fails without it, per tick and over the word.
-        assert_eq!(balance.interconnection, balance.port);
-        assert!(!balance.interconnection.is_zero());
-        let mut unnamed = balance.clone();
-        unnamed.interconnection = Rat::zero();
-        assert!(!unnamed.closes());
-        for field_balance in word.field_balances() {
-            assert_eq!(field_balance.interconnection, field_balance.port);
-            if !field_balance.port.is_zero() {
-                let mut unnamed = field_balance.clone();
-                unnamed.interconnection = Rat::zero();
-                assert!(!unnamed.closes());
-            }
-        }
+        assert!(balance.interconnection.is_zero());
         assert!(plain.word_balance().unwrap().interconnection.is_zero());
         // The release returns each resonator's balance (`ResonatorBalance`), which closes, and
         // whose ends and terms sum to the word balance's; a word without resonators returns none.
@@ -562,10 +555,8 @@ fn the_field_balance_closes_at_every_tick_and_the_resonator_moves_no_wave() {
         assert_eq!(total(|r| &r.pump), balance.pump);
         assert_eq!(total(|r| &r.port), balance.port);
         assert!(plain.released().unwrap().resonators.is_empty());
-        // Beside its resonators' balance, the word's release is the plain word's.
-        let mut resonant = word.release().unwrap();
-        resonant.resonators.clear();
-        assert_eq!(resonant, plain.release().unwrap());
+        let resonant = word.release().unwrap();
+        assert_ne!(resonant.power, plain.release().unwrap().power);
     }
 }
 

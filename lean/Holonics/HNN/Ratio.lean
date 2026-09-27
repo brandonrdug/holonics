@@ -53,11 +53,13 @@ exactly in `ℚ(θ_R)`, `θ_R^(L_R) = 2`, and returns `ε` as its fibre. Nothing
 
 6. **The covector's odometer chart** (`odometer_covector_descends`,
    `odometer_eq_face_at_integer_cells`, `face_weight_le_odometer`): the declared masses
-   `p̃_c ∝ 2^(n_c)(1 + k_c/L)` pair positively with the scored face's gradient,
-   `⟨p̂ − q, p̃ − q⟩ = Σ_(c≠t) p̂_c p̃_c + (1 − p̂_t)(1 − p̃_t) > 0`, so `−(p̃ − q)` is a strict
-   descent direction of the scored code length; at integer cells (`k = 0`) the chart is the
-   face; inside a carry the chart's weight lies above the face's, `2^(n + k/L) ≤ 2^n(1 + k/L)`
-   (Bernoulli). A single class leaves nothing to descend (`odometer_descent_needs_two_classes`).
+   `p̃_c ∝ 2^(n_c)(1 + k_c/L)` pair positively with the smooth code-length gradient `p̂ − q`,
+   `⟨p̂ − q, p̃ − q⟩ = Σ_(c≠t) p̂_c p̃_c + (1 − p̂_t)(1 − p̃_t) > 0`. Thus
+   `−(p̃ − q)` is a first-order descent direction for the smooth softmax score evaluated at `p̂`.
+   This pairing does not prove strict descent of the grain-quantized score: that score is constant
+   while logits remain in the same grain cells (`quantized_score_has_grain_plateau`). At integer
+   cells (`k = 0`) the chart is the face; inside a carry its weight lies above the face's,
+   `2^(n + k/L) ≤ 2^n(1 + k/L)` (Bernoulli). A single class leaves nothing to descend.
 
 [definition] **The real-part covector is `R⁻¹dR` read in the declared odometer chart**
 `2^(n + k/L) ↦ 2^n (1 + k/L)` (design, "Exact charts"; R2 M2): rational, exact at every carry,
@@ -368,6 +370,17 @@ theorem face_constant_on_fibre {L : ℕ} (hL : 0 < L) (f : K) :
         rw [lt_div_iff₀ hLpos] at this
         linarith
 
+/-- [counterexample; formal-checked] **A quantized score has a grain-cell plateau.** At `L=2`, the
+distinct logits `1/8` and `3/16` both read as `(n,k)=(0,0)`. Every score depending only on this grain
+read is therefore unchanged between them; a nonzero logit step can leave the quantized score
+constant while it stays inside the cell. -/
+theorem quantized_score_has_grain_plateau :
+    grainRead (K := ℚ) 2 (1 / 8) = (0, 0) ∧
+      grainRead (K := ℚ) 2 (3 / 16) = (0, 0) ∧
+      ∀ (score : ℤ × ℤ → ℚ), score (grainRead (K := ℚ) 2 (1 / 8)) =
+        score (grainRead (K := ℚ) 2 (3 / 16)) := by
+  norm_num [grainRead, Int.fract]
+
 /-- [counterexample; formal-checked] **A positive grain is load-bearing for the fibre.** At
 `L = 0` the fibre of `1/2` is `1/2`, not below `1/0 = 0`. -/
 theorem grain_needs_positive_L : ¬ grainFibre (K := ℚ) 0 (1 / 2) < 1 / (0 : ℕ) := by
@@ -467,13 +480,13 @@ rational, exact at every carry (`k = 0`), continuous across one (`2^n · 2 = 2^(
 monotone in the cell. The covector's magnitude part is read on the masses it normalizes. -/
 def odometerWeight (n : ℤ) (k L : ℕ) : ℝ := (2 : ℝ) ^ n * (1 + (k : ℝ) / L)
 
-/-- [proved-derived; formal-checked] **The odometer chart is a strict descent direction of the
-scored face.** Let `p` be the exact face `p̂` and `r` the odometer masses `p̃` (both positive,
-each summing to one) and `q` the one-hot target at `t`, with at least one other class. The code
-length's logit gradient is `p̂ − q` (`receivingPhase_magnitude_pullback`); the declared covector
-is `p̃ − q`; their pairing is `Σ_(c≠t) p̂_c p̃_c + (1 − p̂_t)(1 − p̃_t) > 0`. So a step along
-`−(p̃ − q)` strictly lowers the scored code length to first order, although `p̃ − q` is not the
-face's derivative. -/
+/-- [proved-derived; formal-checked] **The odometer covector pairs positively with the smooth
+score's gradient.** Let `p` be a positive normalized softmax face, `r` positive normalized
+odometer masses, and `q` the one-hot target at `t`, with at least one other class. Their pairing
+`⟨p − q, r − q⟩ = Σ_(c≠t) p_c r_c + (1 − p_t)(1 − r_t)` is positive. Therefore the negative
+odometer covector is a strict first-order descent direction for the smooth softmax score evaluated
+at `p`. This theorem does not assert descent of the grain-quantized scored map, which is locally
+constant inside a grain cell. -/
 theorem odometer_covector_descends (p r : Index → ℝ) (hp : ∀ c, 0 < p c) (hr : ∀ c, 0 < r c)
     (hp1 : ∑ c, p c = 1) (hr1 : ∑ c, r c = 1) (t : Index) (hc : ∃ c, c ≠ t) :
     0 < ∑ c, (p c - (Pi.single t (1 : ℝ) : Index → ℝ) c) *
@@ -539,6 +552,7 @@ section Audit
 #print axioms alignCost_turns
 #print axioms turns_need_a_period
 #print axioms face_constant_on_fibre
+#print axioms quantized_score_has_grain_plateau
 #print axioms grain_needs_positive_L
 #print axioms codeLength_eq_face
 #print axioms face_code_length_within_grain

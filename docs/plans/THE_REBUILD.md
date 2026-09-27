@@ -1,11 +1,31 @@
 # The rebuild
 
-**Status:** active, September 24. This plan replaces the restructure plan, which is in git history
-at [`13f8c734`](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_REPOSITORY_RESTRUCTURE.md).
-Tracked in #63. Steps 0–3 are done (September 24), and so are step 6's physics (K3 #74, K4 #75)
-and step 7's renames by subject (September 25). Step 4 (the HNN law, #73) is under way: campaign 1
-is built, and its exposure on the standing real cut (pinned September 25, Decision 23) is the
-next receipt.
+**Status: active, September 26.** Tracked in #63. Steps 0–3 are built. Campaign 1
+meets its standing-cut criterion; campaign 2's laws and host/card parity pass, while its predictive
+criterion fails. Decision 37's compacted tree and
+[Decision 38](#decision-38-the-resonator-loads-the-ring-and-receives-its-covector)'s loaded
+resonator/adjoint run on host and card. The fixed loaded source-ring family does not improve the
+standing-cut prediction. Campaign 3's future-mode quotient is the immediate work; campaigns 3–5
+remain consumer work. Step 6's finite physics and
+step 7's first curation pass are built; equation extraction (#146), remaining curation (#147) and
+applications (#148) remain open.
+
+This plan replaces the [pre-reset restructure plan](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_REPOSITORY_RESTRUCTURE.md).
+The specification below records the campaign-1 construction and its subsequent decisions; a later
+numbered decision supersedes an earlier choice at the named consumer. Historical measurements
+retain their original law and population. [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md) is the
+short current position; dated records hold the evidence.
+
+| Current boundary | What runs | Evidence / remaining term |
+|---|---|---|
+| Host and card | Campaigns 1–2, compacted landmark receiver | Per-law parity; deposition and exact face completion still have host owners (#76) |
+| Standing-cut HNN | Depth 4, half stop prior, tree/wave mixture | Recorded `3 + 1/16 + ε` bits per cell; this is the full HNN exposure |
+| Wide-cut count receiver | Compacted tree, depth `48 = 3·2⁴` | `2²⁰` cells, final `2¹⁷` scored as held out, `1 + 15/16 + ε` bits per cell; no full-HNN claim |
+| Ring storage | Loaded forward, adjoint and reached material deposition (Decision 38) | Balance and parity pass; the fixed source-ring family loses to the default HNN on the standing cut |
+| Mode release and generation | Shared primitive laws exist | Campaigns 3–5 must build their consumers; application acceptance is step 8 |
+
+The standing cut has been reused for development and lies within the wide cut's held-out range.
+These are development receipts. The dataset's separate evaluation partition remains unspent.
 
 ## The line the rebuild serves
 
@@ -135,8 +155,8 @@ archive root. Brandon's Metal port stays on its own branch, `codex/apple-silicon
 
 ## Order
 
-0. **Repair the guides.** The kept guides still describe the retired engine as current, and about
-   157 links are broken. Agents read the guides, so this comes first.
+0. **Repair the guides — reset pass complete.** At the reset, the kept guides described the
+   retired engine as current and about 157 links were broken. The completed scope was:
    - Remove retired code stated as current fact from THE_MACHINE, HNN_FORMULA, HOLON,
      HELICAL_GEOMETRY and the operator contract. The laws stay; their retired Rust addresses become
      permalinks at `13f8c734`.
@@ -165,7 +185,7 @@ archive root. Brandon's Metal port stays on its own branch, `codex/apple-silicon
      the elementary objects.
    - Port the checked files of history's `formal/rh-source-transport` into `lean/`; the paper
      `divisor-source-transport-boundary` cites them.
-1. **The operator layout and the Lean package.**
+1. **The operator layout and the Lean package — complete.**
    - **Rust.** Reorganize `holonics` into five operator modules:
      - `ratio/`: one per two, with remainder, residue, inversion, lift, jet and rings;
      - `geometry/`: complex, frame, clock, carry, screw, pair and tube charts, winding, the Swing;
@@ -190,11 +210,11 @@ archive root. Brandon's Metal port stays on its own branch, `codex/apple-silicon
 
      Subject renames and duplicate curation wait for step 7.
 2. **K1: Holarchy, Aeon/Epoch/Cycle, relative completeness, complete interconnection and joint
-   reception** (#72).
+   reception — complete** (#72).
    - Lean first (the obligations in #62), then `holonics::{holarchy, aeon}`.
    - Relative completeness (the globe) is stated here, relative to a receiver family
      (`Objects/RelativeCompleteness`). Its full theorem is owed in #62.
-3. **Holonic Compression and landmark discovery** (#145).
+3. **Holonic Compression and landmark discovery — construction complete** (#145).
    - **Lean first.** State a navigator's face map against terrain and a receiver family by its
      kernel and cokernel. Join `CausalRelevance`, `ReceiverHistoryCompression`,
      `NavigatorModeQuotient`, `ReceiverCodeCost`, `NavigatorInference` and `CokernelCalculus`, and
@@ -258,10 +278,12 @@ archive root. Brandon's Metal port stays on its own branch, `codex/apple-silicon
      - §3.6, heat, spacetime and plural clocks.
    - Equation extraction (#146) compresses a foreign realization into navigators and element
      relations (the six steps in HOLON).
-7. **Lean curation** (#147).
-   - Remove the duplicate theorems the audit found.
-   - Rename the directories named after the prize ("Millennium", "RH") by subject (done, `8f85f4b9`).
-   - Rename generator names to navigator names where they mean the object.
+7. **Lean curation** (#147), first pass complete (Decision 31).
+   - Subject and navigator module renames are done, along with the major duplicate consolidation
+     and the framework/research split.
+   - Remaining: short duplicate statement groups, `HodgeProductMixedFilling`'s repeated sphere
+     constructions, and the `BivariateSeries`/`LaurentBody` abbreviations, checked at their owners.
+   - Fix stale owner citations when their consumer changes, with the atlas in the same commit.
 8. **Applications** (#148: a workbench, an Athena application, a simulator), rebuilt on the library
    under the lessons record's requirements.
    - An outcome is one of:
@@ -315,7 +337,8 @@ Below, "(§8.n)" cites that record's §8.n and marks each place one of its infer
 design; "(review X)" names a first-review finding, "(R2 X)" a second-review finding and "(R3 X)" a
 third-check finding. The five campaigns implement this specification. Campaign 1 built `field`,
 `moment`, `propagation`, `word`, `receiving`, `ratio`, `pending`, `constitution`, `retention`,
-`keys`, `port` and `reference`; the modules of campaigns 2–5 do not exist yet.
+`keys`, `port` and `reference`. Campaign 2 added `ring`, `contact`, typed receiving
+letters and their resident realizations. Campaigns 3–5 still owe their named HNN consumers.
 
 The design fixes the objects, laws, types, order, port map, measurement and guards before any code
 is written, because the machine's earlier designs drifted into forms Brandon rejected:
@@ -601,7 +624,7 @@ close    at an aeon boundary: the collapse onto what the admitted future disting
   `HNN/TargetFace.finite_chart_obstruction` shows none exists).
 - **Notation.** `o` is a wave leaving a junction, `a` a wave arriving at one, and `z_a = (u_a, w_a)`
   a contact's state. `k_a` is a contact's channel width. `c_a`, `b_a` and `F_a` are the square
-  factors of `C_a`, `K_a` and `D_a`. `φ_a ∈ ℤ/L` is the phase class of a contact's exponent. `ε_R` is a receiver's fibre, and `ε_k` a deposit's energy-growth bound
+  factors of `C_a`, `K_a` and `D_a`. `φ_a ∈ ℤ/L` is the phase class of a contact's exponent. `ε_R` is a receiver's fibre, and `ε_k` a deposit's contact-form growth bound
   (`CommittedEnergyBound`). Rings are `g, h, r`, and contacts are `a`.
 - **The window and the pair port.** `win_g` is a shift register of the last `max Δ` exterior cells,
   overwritten cyclically: a bounded window of raw cells, counted in the moment's bits, with an
@@ -1262,10 +1285,12 @@ The additions outside `hnn`, each in its owner and with its Lean:
 
 #### Exact charts (§8.4, §8.5)
 
-[definition] The reference is exact. Nothing in it rounds or commits (review A2, C1). The one
-rebase is the deposit's (Decision 22): each update is carried onto its locus's lattice with its
-remainder, whose precision refines with the locus's deposit count. The part below that precision is
-released and reported at each deposit, and its total stays below half a unit over every aeon since the locus's founding.
+[definition] The reference executes exact integer and rational chart operations. Decisions 22,
+24 and 37 declare its deposition, transient, inverse and landmark rebases with their decoders and
+residuals. Deposition carries a remainder whose precision refines with the locus's deposit count;
+the released tail is reported and its coefficient sum stays below half a unit since founding.
+The complete word's sensitivity and the landmark passage drift remain separate obligations in
+#62. Local residual accounting alone does not prove the final face is below its grain.
 - **Complex currents** are realified as `[re₀, im₀, re₁, im₁, …]` over ℚ with the complex structure
   `J`, as `holon::reaction::realify` does.
 - **Phase: rings close by default.** A closing ring's transport is a port permutation. Its entries
@@ -1307,11 +1332,13 @@ released and reported at each deposit, and its total stays below half a unit ove
       `2^(n + k/L_R) ↦ 2^n(1 + k/L_R)`: rational, exact at every carry, continuous across it
       (`2^n · 2 = 2^(n+1) · 1`) and monotone. The covector is `R⁻¹dR` in that chart: the magnitude
       part `p̃ − q` with `p̃_c ∝ 2^(n_c)(L_R + k_c)`, and the phase part.
-    - [agent-inferred] It is a declared chart, not the face's derivative, and it is a **strict
-      descent direction for the scored face**: the scored code length `−log₂ p̂(t)` has logit
-      gradient `p̂ − q`, and `⟨p̂ − q, p̃ − q⟩ = Σ_(c≠t) p̂_c p̃_c + (1 − p̂_t)(1 − p̃_t) > 0` for at
-      least two classes (Lean `HNN/Ratio.odometer_covector_descends`). At an integer cell it is the
-      face (`odometer_eq_face_at_integer_cells`), and its weight dominates the face's,
+    - [agent-inferred] Its **negative** is a descent direction for the smooth softmax score
+      evaluated at the grain representative: `⟨p̂ − q, p̃ − q⟩ = Σ_(c≠t) p̂_c p̃_c +
+      (1 − p̂_t)(1 − p̃_t) > 0` for at least two classes
+      (Lean `HNN/Ratio.odometer_covector_descends`). The theorem proves this pairing. The
+      quantized score is constant inside a grain cell; no strict decrease through that read or
+      after a finite deposited step is asserted. At an integer cell the chart is the face
+      (`odometer_eq_face_at_integer_cells`), and its weight dominates the face's,
       `2^(n + k/L) ≤ 2^n(1 + k/L)` (`face_weight_le_odometer`), by at most the factor
       `max_x (1 + x)/2^x = 2/(e ln 2)`, attained at `1 + x = 1/ln 2`. At `L_R = 1` the two agree.
     - The face `p̂` that is read, scored and reported stays exact in `ℚ(θ_R)`.
@@ -1347,7 +1374,7 @@ released and reported at each deposit, and its total stays below half a unit ove
 | 3 | Moment accumulation on closing rings with selective stepping, and its tape-free adjoint | `Transport/SourceMoment.{moment_closed_form, position_adjoint_is_tape_free, offset_moment_separates_pair, streamDescent}`; `Objects/SourceHolon.{moment_closed_form, jointMoment_append_one, momentStanding, native_futureAgreement_iff}`; `Objects/SourcePorts.{moment_eq_symbol_sum, port_eq_symbol_sum, moment_transpose, anchor_covector}` | `HNN/Moment.lean`: `encoderMoment_contract` (`m̃_g = ⟨M_g, E_g⟩` for every linear `E_g`); `encoder_covector_tape_free`; `selectiveClock_stream_descent` (with input-dependent clocks, the fixed-size state is a `ReceiverHistoryCompression` for the append action); `closingRing_moment_is_phaseBinned` (`M_g = Σ_c P^(−c) ⊗ h_c`, `h_c ∈ ℕ^\|A\|`); `exteriorOffset_independent_of_E`; `selective_position` (`steps_g(k)`, counted from the aeon's opening, depends only on the aeon's cells, the declared locks and the earlier rings' configurations, so the rotor position is `key_g + steps_g(k)`; R3 K1); `moment_capacity` (the persisting source state takes at most `N(n)` values, the stated product of binomials; where `N(n) < \|A\|^n` the source → state map is not injective on `A^n`, and that holds for every `n ≥ n*` by convexity; R2 H1, R3 H1); the moved `DirectedContact`, `pooledContrast`, `pooledContrastPullback`, `pooledContrast_zero_of_absent_kind` and `pooledContrast_pairing_adjoint` (kinds and multiplicity kept; review B5, F6) | `hnn::moment` | 1; 4 |
 | 4 | The normal constitution and deposition, per locus | `Physics/AccumulatedNormalResponse.{normalProxyTarget_residual_eq_scaled_covector, rankOne_update_residual_identity, unitPrior_data_separation}`; `Objects/Deposition.{normal_law_local, normal_law_keeps_posSemidef, constitutionStanding}`; `Holon/Deposition.{commit_balance, projectPassiveCongruence_passive, certified_committed_energy_bound}`; `Holon/MomentStorage` | `HNN/Normal.lean`: `normalStatistic_standing` (the objective factors through `(H, B, C_data)`: a `StandingLaw` that keeps the statistic, never the sample list); `normal_prox_step` (`W_next = W + γ_U g f* H_next⁻¹`); `deposit_local`; `reaction_deposit_storage_unchanged`; `factorCarrier_psd` (`C = cc*`, `K = bb*` and `D = FF*` stay PSD under every factor update, with no clamp); `standing_deposit` (`q` changes only by deposit, through the declared lock chart; a sheet class changes only where a deposit carries `Δ_ρ` across zero; R2 C3) | `hnn::constitution` | 1; 5 |
 | 4b | Deposition on a declared carrier lattice, with the remainder carried at a precision that refines with the locus's count and the tail released and reported (Decision 22) | `Geometry/PhaseCarry.carry_cocycle`; `HNN/Retention.deposit_descends`; the Ratio's `div_rem`; `Objects/CommitRebase` (the counterfactual bound, owed with `K`) | `HNN/LatticeDeposit.lean`: `div_rem_spec`, `rem_bounds`, `quot_eq_zero_of_bounds` (nearest point, ties upward); `carry_accounting`, `lattice_deposit_accounting` (applied + carried + released = the exact sum); `gamma_kraft_lt_one` (`Σ_(m≤M) 2^(−(2⌊log₂ m⌋+1)) < 1`); `release_bounded`, `release_bounded_since_founding`, `within_one_unit_since_founding`; `remainder_numerator_bounded`, `remainder_rat_bits_bounded` (`O(L + 2 log₂ m)` bits); `carried_gram_posDef`, `carried_gram_posDef_rule`; `carry_zero`, `carry_entry_zero`, `carry_entry_below_grain` (heard and counted, not deposited), `listening_grain_refines`, `lattice_deposit_descends`; `lattice_bits_bounded`, `lattice_entry_bits`, `lattice_rat_bits_bounded`, `remainder_below_grain` | `hnn::constitution`: `Lattice::{div_rem, div_rem_coordinate}` (the carry's fine split at `2^(−L−k_m)ℤ` and its coarse split at `2^(−L)ℤ`), `BudgetedCarry` (the carried deposit of every entry), `gamma_length` | 1; "Step 4 (#73) owed": the word-level certificate, and the counterfactual bound through `Objects/CommitRebase` |
-| 5 | The Holon-ratio loss at the receiver's face, and the carried power (§8.4) | `Objects/Ratio.{logRatio_mem_logFibre, liftedCrossEntropy_excess_eq_logRatio, lossCovector_eq_expected_logDerivative, winding_separates_liftedCrossEntropy}`; `Objects/RatioPhase.{excessCovector_re, excessCovector_im, alignCost_gradient_sign, phaseGap_winding}`; `Physics/InformationDifference.liftedCrossEntropy_commonPhase` | `HNN/Ratio.lean`: `receivingPhase_ratio` (a common rechart leaves `ℓ_j` unchanged); `receivingPhase_pullback`; `alignCost_turns` (the windowed gap: with `τ = d_R w + ρ`, the absolute gap is the cut's winding `w`, the branch, plus the windowed gap, on which the cost and its gradient `−½ q_c Δ_c` are exact; review C1); `odometer_covector_descends` (`⟨p̂ − q, p̃ − q⟩ > 0`: the odometer chart's covector is a strict descent direction for the scored face; review C3), `odometer_eq_face_at_integer_cells`, `face_weight_le_odometer`; `carriedPower_exact` (`2^(n + k/L) = 2^n θ^k`, `θ^L = 2`; the phase carry is multiplication by 2; `ℚ(θ)` is a field); `face_constant_on_fibre` (the face depends only on `(n, k)`; `ε` is the receiver's fibre). `Objects/CommitRebase` is not used | `hnn::ratio` | 1; 5 |
+| 5 | The Holon-ratio loss at the receiver's face, and the carried power (§8.4) | `Objects/Ratio.{logRatio_mem_logFibre, liftedCrossEntropy_excess_eq_logRatio, lossCovector_eq_expected_logDerivative, winding_separates_liftedCrossEntropy}`; `Objects/RatioPhase.{excessCovector_re, excessCovector_im, alignCost_gradient_sign, phaseGap_winding}`; `Physics/InformationDifference.liftedCrossEntropy_commonPhase` | `HNN/Ratio.lean`: `receivingPhase_ratio` (a common rechart leaves `ℓ_j` unchanged); `receivingPhase_pullback`; `alignCost_turns` (the windowed gap: with `τ = d_R w + ρ`, the absolute gap is the cut's winding `w`, the branch, plus the windowed gap, on which the cost and its gradient `−½ q_c Δ_c` are exact; review C1); `odometer_covector_descends` (`⟨p̂ − q, p̃ − q⟩ > 0`: the negative odometer covector descends the smooth score at its grain representative; the quantized score may stay constant; review C3), `odometer_eq_face_at_integer_cells`, `face_weight_le_odometer`; `carriedPower_exact` (`2^(n + k/L) = 2^n θ^k`, `θ^L = 2`; the phase carry is multiplication by 2; `ℚ(θ)` is a field); `face_constant_on_fibre` (the face depends only on `(n, k)`; `ε` is the receiver's fibre). `Objects/CommitRebase` is not used | `hnn::ratio` | 1; 5 |
 | 6 | Retention as the collapse onto what the admitted future distinguishes (§8.3) | `Foundation/Standing.standingLaw_exists_iff_future_factors`; `Compression/Core/FaceMap.{kernelQuotient_is_coarsest_retention, ker_faceMap_invariant, kernelHistoryCompression}`; `Objects/Retention.minimalRetain_factors_through_every_standing`; `Aeon/Clock/Winding.reading_navigatorClock` | `HNN/Retention.lean`: `word_opens_at_zero` (between words only `(Θ, λ, M)` and the pending ratios persist); `fieldStanding` (a `StandingLaw` with carrier `(Θ, λ, M, pending)`, generators `ingest`, `locate_keys` at an aeon boundary and `refine` then `compare` then `deposit`, observations the admitted faces after every admitted word over the class family `{T_c}`, and `retain` the collapse; R3 R3); `diamond_recursion` (the reach and observe recursions compute `r_g = dist(𝒮, g)` and `o_g = dist(g, R)` in `e_last` rounds, and a block reached at `r_x` lies outside `horizonBlind(e_last − r_x)` exactly when `r_x + o_x ≤ e_last`; R3 R2); `release_indistinguishable` (every locus the diamond rule releases changes no admitted reading); `release_structural` (the release computed on the loci's sparsity is invariant under every admitted deposit); **`deposit_descends`** (a deposit gives the same result with or without the collapse: `collapse ∘ deposit = deposit ∘ collapse` on the admitted family, because the features and covectors a retained locus reads in its diamond window depend on no released locus, and a released locus receives no covector; composes `tick_causal_cone` and `reached_loci_diamond`; R3 R3); `admitted_nonincreasing` (the collapse is sufficient for every later aeon exactly when each later admitted family is contained in this one); `local_retention_blocks` (the block-diagonal 0/1 projection is lawful and keeps the contact graph); `constitution_descends` (deleting released loci keeps every retained operator's law and values, and every receiver factors); `contemporary_read` (with the producing anchor held, a delayed read equals the immediate one when no deposit intervened, and otherwise returns the residual); `lift_reading`. **Scope (review L1):** `release_indistinguishable`, `deposit_descends`, `release_structural`, `admitted_nonincreasing`, `contemporary_read`, `fieldStanding` and `word_opens_at_zero` are proved on the abstract `BlockOp` of item 2 (`word_opens_at_zero` is its linearity; the Rust guarantee is structural, `Current` has no wave field); `diamond_recursion` and `lift_reading` hold as stated; the concrete-tick bridge is owed | `hnn::{retention, pending}` | 1; 6, and "Step 4 (#73) owed": bounded bit growth of the deposited constitution (open), and the diamond on the concrete tick |
 | 7 | Keys by loop closure, and selective stepping (Brandon, September 22) | `Compression/Core/Keys.{fibre_eq_bombe, fibre_cons, fibre_gauge_invariant, fibre_eq_orbit}`, `Keys.Machine.{stage_succ, rotorGauge}`; `Transport/HelicalPairInteraction.menu_loop_closure` | `HNN/Keys.lean`: `contact_menu_closes` (a cycle of observed deterministic contacts closes under the true key); `field_loop_fibre` (the consistent ring keys are the Bombe fibre of the field's menu, up to the rotor gauge); `selective_step_dormant` (a ring whose lock no input fits keeps its configuration, so its mode is invariant until a fitting input arrives); `propagation_eq_edge_fibre` (the propagated survivors are exactly the candidates satisfying every menu edge: the fibre of the component's fundamental-cycle menu with injective images); `gauge_fix_unique` (each rotor-gauge orbit has exactly one member with `S_g(p_0) = 0`) | `hnn::keys` | 1; 3, 8 (continuous keys: item 3 of the step-3 list) |
 | 8 | Ring and contact storage, lock and flow, and the contact's break | `Objects/Parametron.{lc_energy_conserved, modeEnergy_conserved, ringCrossings_eq, perceptron_is_a_face}`; `Physics/{PhaseCarrier.{pumpStorage_halfTurnSheet, phaseCarrier_binaryPhase}, CoupledIncidence}`; `Holon/Conformance.{pairContact_resistive, lc_pump_work}`; `Geometry/PairResonance.{mediant_neighbours_both, mediant_lies_between, between_neighbours_costs_at_least_the_mediant}`; `Aeon/Clock/Lock.{lock_at_address, cycle_iff_period_dvd, convergent_near_return, convergent_never_closes}`; `Aeon/Clock/Epoch.{epochOf_coarse, coarsen_tower}`; `Aeon/Production/Kac.kac_grain_ratio`; `Compression/Landmark/SiteKind`; `HNN/Propagation.{transit_balance, tick_well_defined}`; `HNN/Word.{word_tick_balance, fieldTick_balance}`; `Holon/Deposition.commit_balance`; `Holarchy/Join.{interconnect_ok_iff, GluingDefect.not_glues}` | `HNN/Ring.lean`: `ring_cayley_denominator_nonsingular`; `ring_tick_conserves_mode_energy` (`UᵀQU = Q`); `ring_tick_executed_energy_balance` (pump and port work plus the enclosed chart and split defects); `two_port_reference_balance` (`Γ² + T = 1`, `T` the power fraction); `ring_crossings_are_epoch_ticks`; `pump_half_turn_invariant`, `locked_sheet_receiver_face` (composing, not restating). `HNN/Contact.lean`: `contact_transfer_kind_by_storage_sign` (lossless, `C_a > 0`, nonsingular Cayley chart); `contact_boost_solve_or_singular_direction`; `contact_signed_storage_balance`; `contact_lock_address` (from the measured winding pair). `HNN/ContactBreak.lean`: `break_release_balance`, `break_iff_release_covers_gluing` (`R ≥ J`), `griffith_closed_port_case`, `parting_returns_gluing_defect`. `HNN/Word.field_executed_balance_with_defects` lands with its executed consumer | `hnn::{field, propagation, word}` | 2; pump/Floquet locking open |
@@ -1414,14 +1441,14 @@ staged deposits and the first law's arrived operand, `Arrived`.
   method reads it. [agent-inferred: it is kept in the resident rather than in the staged deposit,
   because the collapse's re-read needs it after the staged deposit is consumed or discarded.]
 - Every value is in ℚ, in `ℚ(θ)` at a face of grain `L > 1`, or is a `SymbolicSurprisal` form.
-- No value is committed or rounded, and no float exists anywhere in `holonics`.
+- Lattice splits keep their declared remainders and released residuals; no float enters the law.
 - A person reads an enclosure (`ExactInterval`) that the application renders.
 
 Each method returns the same typed relation as the resident `holonics-cuda::hnn`. Parity in step 5
 is per law and per kernel family:
-- the reference's exact value lies in the dyadic ball the device returns;
-- at a grain face both return the same cell `(n, k)`, and the device's ball for the fibre contains
-  the reference's `ε` (review D3).
+- the card executes the same declared integer charts as the reference;
+- every port return, face, residue and refusal is checked equal to the reference. Bounds against
+  the ideal unrebased law are the separately named mathematical obligations.
 
 ```rust
 pub trait ExecutionPort {
@@ -1566,7 +1593,7 @@ releases (Decision 22; `hnn::retention`):
 | `locate_keys` | per ring in carry order, on the crib that closed the aeon: the fibre of consistent key candidates with their rotor-gauge orbits. A ring's key is published, gauge-fixed, only when its fibre is one orbit; otherwise its current configuration stays | absent: key location is discrete, and the key covector is a reading | the published ring clocks: the phase classes of `λ` at the aeon's opening, windings kept | the crib's edges with their positions from the aeon's opening | absent | per ring: the fibre's size, its orbits, the minimal failing loop, the candidates checked and the propagation work |
 | `refine` | the faces `p̂_j` with fibres; nothing else is published (R2 C3) | absent (forward only): the `Word` is kept for its compare on the same commit, then dropped | absent | the moment's lift | the binding read | per-ring tick counts; the tick power balances; the diamond's loci reached; the change released at the word's end, its power and its peak bits inside the word; the source-to-receiver path attenuation at the cut; the fibres; work |
 | `compare` | the contemporary faces and the `HolonRatio` per phase, from the anchor `λ` and `⟨M, E_now⟩` at the contemporary constitution | complete: `M` through to `E`, `E^(δ)`; per contact `(λ_Δ, λ_Q, λ_DQ)` and its constitution; per ring the reaction material and `q` (the declared lock chart); `R`; the key covector as a reading | a `Deposit` staged inside the causal diamond | the pending ratio's and the target's | the pending binding | the ratio's faces (KL part, phase excess, winding); the residual against the emitted face; the loci reached |
-| `deposit` | the successor constitution, in one atomic publication, or a `ConstitutionBudget` refusal that leaves the predecessor published | absent: a deposit consumes covectors | the applied `DepositReading`: the energy-growth bound `ε_k` and its running product, the commit, the successor's bits against the budget, the loci reached, the released residuals with their bits, and the entries stepped | unchanged | absent | the deposition work; the energy-bound product; the commit counter; the constitution's exact bits against its budget |
+| `deposit` | the successor constitution, in one atomic publication, or a `ConstitutionBudget` refusal that leaves the predecessor published | absent: a deposit consumes covectors | the applied `DepositReading`: `contact_growth` and `contact_product` for contact C/K forms, the commit, the successor's bits against the budget, the loci reached, the released residuals with their bits, and the entries stepped | unchanged | absent | the deposition work; the contact-form bound product; the commit counter; the constitution's exact bits against its budget |
 | `release` | the released face at width zero, or a refusal with its width | absent | the founded ring's material, when FOUND | the pending ratio's | the pending binding | the RIDE/FOUND split, its work form, and the width against the grain |
 | `close_aeon` | the `AeonBoundary`: its `Collapse` (`V = ⊕V_g` as the retained and released loci, the `released_remainders`, the entries and bits), the descended constitution published in the resident, the pending ratios carried or refused (`carried`, `refused`) and the staged deposits refused (`refused_staged`) | `Vec<(PendingId, Transpose)>`: per pending ratio the transpose of `V` on it, or its separator | absent: the released loci are the boundary's collapse, read in the forward | each ring's aeon reading (windings, open phase) and the aeon's cells; the epochs, as section flux, are the boundary's `epochs` | the admitted family | `ReceiptDetail::Boundary`: the boundary is the forward, carrying the first-law split (`first_law`, `literal`), the released entries (structural, with the value kernel as a declared absence), and the constitution's and state's bits before and after |
 | `discard` | the handle removed | absent | absent | unchanged | absent | the bits freed |
@@ -1667,8 +1694,8 @@ regression controls are controls, never milestones:
   | `E_0` (`10 × 256`) | linear | sign generator, times 1/2 (Decision 28's openings) | normal law, `H_0 = I`, `B_0 = E_0` |
   | `E_0^(δ)` | `Σ_(ρ<m) e_ρ (a_ρ·x)(b_ρ·y)` on the pair `x ⊗ y`, rank `m = 2d_0 = 10` | `e_ρ = 0`; `a_ρ`, `b_ρ` from the sign generator | factor steps on `e`, `a`, `b` (`E_0^(δ)` is carried in this factored form, R3 §5) |
   | `R` (`512 × 22`) | linear | 0 (Decision 28's openings) | normal law, `H_0 = I`, `B_0 = 0` |
-  | the landmark tree on ring 2 | the receiving parametron's storage, depth `D = 4`, the path lattice `M_p = 39` and the β carrier `W = 28` (derived) | empty: every node unfounded, every face uniform | the landmark deposit, each compared cell on its opened paths |
-  | the mixture on ring 2 (ruling A) | `β = W_T/W_C` on the landmark β chart at `W = 28` | 1: the prior ½/½ | `β' = β q_T(x)/q̃_C(x)`, each compared cell in order |
+  | the landmark tree on ring 2 | the receiving parametron's storage, depth `D = 4`, the path lattice `M_p = 39` and the β carrier `W = 29` (Decision 37's derived rule) | empty: every node unfounded, every face uniform | the landmark deposit, each compared cell on its opened paths |
+  | the mixture on ring 2 (ruling A) | `β = W_T/W_C` on the landmark β chart at the derived width | 1: the prior ½/½ | `β' = β q_T(x)/q̃_C(x)`, each compared cell in order |
   | `W_c,g` (`2d_g × 2d_g`) | linear | 0 | normal law: feature the contrast `c_t`, covector the element adjoint's `u_t`; `H_0 = I`, `B_0 = 0` |
   | `W_s,g = −f_g f_g*` | square | `f_g = ½I`, so `W_s,g = −¼I` | factor step |
   | Slices `A_ρ,g = u_ρ v_ρ* − v_ρ u_ρ*`, `ρ < 2d_g`, rank 1 | skew | `u_ρ = e_ρ`, `v_ρ = e_(ρ+1 mod 2d_g)`; with every class `+1`, `Σ_ρ A_ρ,g` is the skew cyclic shift of the realified ring | factor steps on `u`, `v` |
@@ -1952,9 +1979,10 @@ order-0, so the repair precedes campaign 2. Its course:
     `log₂ β` at the boundaries `−2 + 9/16`, `−8 + 10/16`, `−12 + 2/16`, `−17 + 2/16`, `−21 + 0/16` and
     `−25 + 9/16` at the end (each `+ ε`): the wave earns its weight, a few bits over the cut.
 
-  Owed in #76: the tree read's card port (1,720 µs a window on the host against the card's word at
-  2,110 µs) and the tree's carrier past `u128` (its widths refuse 87,382 cells at `|A| = 256`,
-  `D = 4`).
+  **Historical device debt:** campaign 2 ported the tree read and widened its admitted
+  carrier population; Decision 37 now supplies the compacted host/card storage. #76 owns the
+  remaining host deposition and exact-face crossings. The earlier cost and carrier refusals
+  belong to the Decision 28 receipt.
 
 Each lands Lean first with its consumer, and the exposure is re-run on the standing real cut,
 resident on the card.
@@ -2096,16 +2124,35 @@ receiving law. It is judged by what they add that the tree does not already say 
 
 #### Campaign 3. Release through modes, dormancy and far fields
 
+**Prerequisite:** Decision 38 must join the ring's mode storage to the scored word and carry the
+comparison covector through that same port. Its small-fixture balance and directional tests,
+loaded host/card parity, and a measured receiving effect precede this campaign. Dormancy retains
+constitution and clock; transient resonator waves remain inside their word.
+
+**First construction [agent-inferred].** Join the existing `compression::FaceMap::{new,quotient}`
+and `Foundation/NavigatorModeQuotient` to the loaded local stage in `hnn::{ring,word,retention}`.
+Begin with one declared fixed-material ring and its pump phases, carrying the source and receiver
+maps with the state. A presently silent coordinate must either return a later-phase separator or
+lie in the stable future kernel. Check `V T_t = T̄_t V`, `V B_t = B̄_t` and `ρ = ρ̄ V` at the
+consumer. Then supply the material/deposition descent before admitting the quotient in a learning
+aeon. A square that fails retains the coordinate and its separator. This uses the existing exact
+kernel owner. The first receipt is a two-receiver, later-phase witness with exact retained and
+released ranks, followed by the same loaded host/card word comparison. The campaign's broader
+acceptance below remains in force.
+
 - **Laws:** Lean item 9, and:
   - **Dormant rings.** Two receiver families are declared: the exterior receiving family and the
     admitted future family that contains it.
-    - A dormant ring's mode is retained standing, not a persisting wave (Decision 1):
+    - A dormant ring's mode is retained through its constitution and clock (Decision 1):
       - its constitution and lock, which the collapse keeps when an admitted cycle receiver reads
         them through some admitted word;
       - its clock in `λ`, which keeps winding. That winding is the persistent interior motion in
         the fibre that `Objects/RelativeCompleteness` asks for.
     - A fitting antecedent excites the mode within a word.
-  - **Release through modes** over the rings' rational components.
+  - **Release through modes** over the rings' rational components. The restriction must act on
+    the current loaded operators and pump phases: `V T_t = T̄_t V` and `ρ = ρ̄ V`, with deposition
+    descending on the admitted future. A rotor's cyclotomic projector alone does not establish
+    those squares for arbitrary resonator base forms; a failed square keeps its separator.
   - **Founding** by interconnect from the cokernel residual, within capacity.
   - **Release** at width zero at the receiver's grain.
   - **Far-field moments:** the moment's quotient against the receivers, and `Δ` derived from it.
@@ -2238,25 +2285,30 @@ law → test.
 [definition] **How a run is read.** Every number comes from an `InteractionReturn` and is reported
 with its units, population and clock. The host reference's exposure (`Reference::expose`) gathers
 them into one readout, `hnn::reference::Exposure`, whose fields are named below.
-1. **Bits, on the face the adjoint consumes.**
-   - `L_target|model = Σ_j −log₂ p̂_j(t_j)` is exact on the face `p̂` at the receiver's grain, with
-     its fibre `ε` reported. It is split into its KL part and phase excess, with the winding.
+1. **The scored face and the declared comparison covector.**
+   - Since Decision 30, `L_target|model = Σ_j −log₂ q_j(t_j)` scores the likelihood mixture of
+     the tree face and the combined tree/wave face. Both component codes are reported beside it.
+   - The wave's covector comes from its own combined face `q_C`, in the declared odometer chart,
+     with its phase excess and winding. It is not the derivative of the quantized mixture score.
+     Exact enclosures and grain fibres accompany the scored readings.
    - The baselines are fitted online on the same exposure with a declared prior (review E2):
      - order-0 and order-1 with the Krichevsky–Trofimov prior;
      - PPM (order 2, exact, in `hnn::reference`);
      - xz and zstd bits per character, with their description cost: computed outside the crate
        (no processes in `holonics`), owed to the application that runs the exposure.
    - Failing to beat online order-0 is reported as a failure.
-   - One face serves learning, selection and report (D4).
+   - Selection reads the declared scored face. The component comparison that supplies each
+     covector is named explicitly (Decision 30).
 2. **The first law of learning over an aeon.** `ΔC = exchange + deposition` (aeon A7), with the
    released part counted as exchange, through `aeon::EnclosedLedger` (the enclosed first law; Lean
    `Aeon/Production/FirstLaw.{ledger_telescopes, ledger_is_first_law, enclosed_contains,
    enclosed_telescopes}`). Beside it, the face's comparison
    with the literal per aeon: `Σ_k ℓ_k + Σ_k g_k = n·log₂|A|`, exact algebra whose `g_k` is negative
    wherever the face predicts worse than uniform, so it is a reading, not a budget ([the perceived-difference record](../../research/records/2026-09-25_THE_CLASSICAL_LOSS_IS_THE_PERCEIVED_DIFFERENCE_AND_THE_DEPOSITION_REMAINDER_IS_A_REPRESENTATION_RESIDUAL.md)).
-3. **Cost against the literal (review E3).** `Kt = |Field::describe()| + K_keys + L_target|model + ⌈log₂ ExactWork⌉`.
-   - The first term is the model, the second the located keys (`⌈log₂ d_g⌉` per published key: what
-     learning located is paid for; review D1), and the third item 1's bits.
+3. **Cost against the literal (review E3).** `Kt = |Field::describe()| + |Θ_initial.describe_physics()| + K_keys + L_target|model + ⌈log₂ ExactWork⌉`.
+   - The first two terms describe the field and its initial material; the located keys cost
+     `⌈log₂ d_g⌉` per published key (what learning located is paid for; review D1), and
+     `L_target|model` is item 1's reading.
    - The literal is `⌈log₂|A|⌉ · n`, and the pivot pays off exactly when `Kt` is smaller.
    - Over a declared population the description is paid once.
 4. **State against source, in bits.**
@@ -2268,11 +2320,15 @@ them into one readout, `hnn::reference::Exposure`, whose fields are named below.
      Decision 22's bound, and the released tails' bits: the exposure's `constitution_curve`, one
      `CurvePoint` per published commit (the mount's first): its `commit`, its `CarrierBits`, and the
      reaching deposit's `released_bits` and `stepped` entries (zero at the mount).
-   - The peak bits inside a word, which bound the change: `peak_word_bits`, the largest
-     `ReceiptDetail::Refine::peak_bits` over the exposure's refines.
+   - `peak_word_bits` is the largest numerator-plus-denominator bit length of a wave, contact
+     or resonator state coordinate, maximized over the word and the exposure's refines.
+     Carried residuals have their separate complete bit receipts; this state-coordinate reading
+     does not claim to count every arithmetic intermediate.
    - The released bits and dimension per aeon.
-   - Coordinate counts stay flat in `N`, and the bits are the test. The baseline is the prototype's
-     2,936 bytes at `N = 2`–128.
+   - The source moment's coordinate layout is fixed by its declaration. The receiving landmark
+     tree grows with arrivals: Decision 37 bounds its nodes while its labels still depend on
+     depth. Count both in retained bits and allocated bytes. The prototype's historical moment
+     reading was 2,936 bytes at `N = 2`–128; it is not a bound on today's complete constitution.
 5. **Work, time and rates (review E4).**
    - The `ExactWork` of each method.
    - `N_face/dt` and `N_update/dt` per receiver clock (objects §10).
@@ -2296,7 +2352,7 @@ A timeout is an unfinished run at its deadline.
 | Campaign | Declared receiver | Success |
 |---|---|---|
 | 1 | The receiving faces on the standing real cut; the menu's loop-closure faces; the law tests | Every law identity holds exactly. The key fibre is reported with its orbits and failing loops. The held-out bits beat online order-0, or the failure is recorded with its located cause. State bits are reported with and without the collapse, the moment's total bits against `n*`, and the constitution's bits per deposit. |
-| 2 | The same cut; the ring mode-energy face, the whole-field balance, and the landmark tree with typed bundles | Choices fixed on the development cells and charged. On the held-out cells, `Δ_tree < 0`, or the charged wave gain exceeds campaign 1's `5 − 13/16 − ε` on a common tree reference, by disjoint exact enclosures. The balances close with their certified defects, host and card are in parity, and the site-kind census and cost receipts are reported. |
+| 2 | The same cut; the ring mode-energy face, the whole-field balance, and the landmark tree with typed bundles | Choices fixed on the development cells and charged. On the held-out cells, `Δ_letters < 0` against the constant-slot control, or the charged wave gain exceeds campaign 1's `5 − 13/16 − ε` on a common tree reference, by disjoint exact enclosures. The balances close with their certified defects, host and card are in parity, and the site-kind census and cost receipts are reported. |
 | 3 | The same cut; a cycle receiver | Dormant rings are kept and read later, with their bits reported. Release is at width zero or refused. The held-out bits against campaign 2 are reported. |
 | 4 | A pinned real motion recording; the same cut | A requested face returns its complete joint fibre and residual. The held-out endpoint faces are reported against constant velocity. The text cut shows no regression. |
 | 5 | The same cut through Holonic Encoding; the two squares | Each square holds or returns its separator. The held-out bits are reported against every baseline. State bits per source bit are below 1, and the outputs are read. |
@@ -2373,13 +2429,13 @@ ignores the codes), and says whether its guarantee is structural. No guard is a 
     `Legacy` law arm.
 14. **No global solve (§8.1).** `propagation.rs` exposes only junction-local solves. A cone test
     checks that an impulse at any ring is supported within `t` hops after `t` ticks, exactly.
-15. **No rounding (§8.4).** No API returns a committed centre. The only grain reading is
+15. **Declared charts and residuals (§8.4).** Every lattice split has its decoder and residual. The receiver's grain reading is
     `CarriedPower` at a face, which returns the carry, the phase class and the fibre. No port method
     takes a free tolerance: `release` reads its receiving phases' grain, and the collapse releases
     only exact complements (R2 §2), never a carried remainder. A deposit's released tail is fixed by
     the locus's deposit count, reported in its receipt, and bounded over every aeon since the locus's founding
     (Decision 22). A constitution over its bit budget is refused
-    (`ConstitutionBudget`), never rounded (R3 §5).
+    (`ConstitutionBudget`); its declaration is not silently coarsened (R3 §5).
 16. **No change outlives its word (R2 C2c, C3).** `Current` has no wave or contact-state field.
     Waves and contact states are fields of `Word` only, created at zero by its open and dropped at
     its return (`compile_fail` on building a `Current` from a `Word`'s waves).
@@ -3149,7 +3205,7 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
     **Measured (September 26).** Lean `HNN/LandmarkCompaction` proves `compacted_is_decision_28`
     for every passage: the compacted root weight is `stopWeight`, every face is `stopFace`, positive
     and normalized, and both prequential codes are equal in ℚ. `compacted_node_bound` keeps at most
-    `2n − 1` nodes a tree. Rust `Storage::Compacted` in `hnn::landmark` runs the same `Law`, and
+    `2n − 1` nodes a tree. Rust `Landmarks` in `hnn::landmark` runs the same `Law`, and
     its oracle equals the full oracle exactly in ℚ at every face in the tests. Each split ratio is
     carried once at `W` bits, and its unit enters the drift. On the wide cut (notebook
     `hnn_landmark compact`, 177535 ms in all):
@@ -3191,3 +3247,113 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
 
     Source: agent-inferred, from Decision 36's measurement and the unary-chain identity (the
     compacted context tree of Willems's unbounded-depth weighting).
+
+
+<a id="decision-38-the-resonator-loads-the-ring-and-receives-its-covector"></a>
+#### Decision 38. The resonator loads the ring and receives its covector
+
+[agent-inferred; implemented and measured] The review found that campaign 2's resonator received
+the junction wave but returned no wave to the field, and no comparison covector reached its material.
+The missing term is its storage-port return. This work is part of #73 and #76, with formal
+obligations in #62; it precedes campaign 3.
+
+**Objects and consumer.** The helical pair interaction joins the rings through the existing
+contact transit. This change loads the parametron at each declared ring's storage port. It touches
+the helix and its clock, pair contact, receiver faces and placement, and the longitudinal tube.
+Cell holonomy and the transverse tower retain their existing declarations. The consumers are
+`hnn::{ring,word,port,constitution,reference}` and the resident word in `holonics-cuda`.
+
+**The egg and receiver reading behind the change.** Brandon's September 24–26 messages,
+re-read directly during this implementation, ask for an interior whose motion holds and changes
+its boundary, with microscopic and macroscopic descriptions joined through the receiver. The
+[light/change record](../../research/records/2026-09-24_THE_LIGHT_IS_THE_CHANGE_AND_EXPRESSION_COLLAPSES_ONTO_FINITELY_MANY_CRITICAL_CLASSES.md)
+and the audited [egg/shadow record](../../research/records/2026-09-26_THE_SHADOW_IS_THE_RECEIVERS_KERNEL_AND_THE_EGG_IS_TWO_RINGS_IN_RELATIVE_MOTION.md)
+state the existing derivations and their grades. Their concrete implications here are:
+
+- The storage port carries actual exchange in both directions. Its returned wave changes the
+  later boundary face, and that face's covector reaches the material that produced it.
+- A neck is an exchange interface. A null receiver reading does not assert an empty interior.
+  Campaign 3 uses `ker F_future`, with `ker F_future ⊆ ker F_now` when the present receiver is
+  admitted (`Holarchy/Hearing`); present silence alone cannot release a mode.
+- The finite classes come from the admitted future faces and their grain. The gains below test
+  one declared material family; they do not replace the egg's geometry or prove that these four
+  coordinates express every useful interior.
+- Integrating and differentiating directions are read through the actual rate form
+  `A*G + GA + Ġ` with its metric, clock and source. A rechart transports that form by congruence;
+  an egg displacement is not assigned a Lorentz law without its receiver/transport map.
+- In campaigns 3 and 5, controlled release is received action: the mode reaches another Holon's
+  boundary through the declared tube, and the encoding/receiver square either closes or returns
+  its separating difference. The Hodge, complex-fluid and spectral target laws stay attached at
+  those same operations.
+
+**Forward, in this order.** All material is read at the producing cut. The pump selects its
+predeclared phase within the word.
+
+```text
+b = 2v − s, c = v − s                  junction Swing
+ e = element(b, c)                    the existing passive/skew/contrast element
+M_t = 2C + (h/Y)I + hD + (h²/2)K_t
+M_t ω = 2Cw + h e − hK_tu             the resonator's local solve
+u′ = u + hω, w′ = 2ω − w
+s′ = e − (2/Y)ω                      the returned wave reaches the next junction
+```
+
+The field's wave-energy change across `e → s′` is the negative of the resonator's port work
+`(hY/4)(|e|² − |s′|²)`. Their sum closes with pump, dissipation, chart and split terms. The executed element output is carried before it drives the resonator. A carried
+returned wave has a separate remainder and wave-energy split residual in the field identity;
+the resonator's own state-energy split retains its original meaning. The source-opening
+remainder stays with the existing element's error-feedback stream; the inserted returned-wave
+stream starts at zero remainder. This is the declared composition of the two lattice charts,
+with all remaining and released terms counted, rather than a uniqueness claim about chart choice. Without a declared resonator the
+existing element returns directly. Every transient state remains inside its word.
+
+**Return.** With covectors on `(s′,u′,w′)`, reverse the resonator before the element:
+
+```text
+z̄ = h ū′ + 2w̄′ − (2/Y)s̄′, r̄ = X_tᵀ z̄
+ē = s̄′ + h r̄, ū = ū′ − hK_tᵀr̄, w̄ = −w̄′ + 2Cᵀr̄
+material variation = ⟨r̄, 2δC(w−ω) − hδDω − hδK_t(u+hω/2)⟩
+```
+
+`X_t` is the solve actually executed. The exact inverse law and the declared chart pullback keep
+their separate scopes; a rounding operation is not differentiated as a smooth map. Reached
+material covectors must enter the current deposition consumer and change a later word.
+
+**Declared material family.** Each loaded ring carries four real scalar amplitudes on its locus
+lattice: `C = g_C² C₀`, `K = g_K² K₀`, `D = g_D² D₀`, and pump strength `p = g_P² p₀`.
+The bases, pump axis and pump step are immutable declaration operands. The gain covectors contract
+the material variation above with `2g` times its base. This preserves positive-semidefinite `C,D`
+and retains the signed stiffness base; zero amplitude may collapse its rank. Deposition re-certifies all pump phases before atomic
+publication and refuses a candidate that fails. This is the admitted learning family, not a claim
+of arbitrary matrix or clock learning. The retained gains, their lattice remainders and statistics
+are counted in the constitution, and the next word reads them.
+
+**Predeclared measurement.** The existing notebook accepts `resonator source` or `resonator none`.
+The loaded comparison uses source ring 0, the smallest source ring whose returned wave can reach
+the second receiving epoch; its unit parametron supplies `C₀,K₀`, its dissipation is `I/4` (the
+campaign's initial passive rate), and no pump is declared. All amplitudes start at 1. The initial
+material description is charged before any deposit. This is one declaration, not a family sweep.
+A first `2⁵`-window development pilot measures work; a full passage is admitted only if its
+projection fits a ten-minute bound per realization. A timeout/refusal is an incomplete receipt,
+not evidence of a predictive gain. Public controls check the joined consumer; the existing cut
+keeps its development status and the separate evaluation partition is unused.
+
+**Acceptance.** The smallest fixtures must exhibit a changed later receiving face, the state and
+material directional pairings, a closing loaded power balance, and a reached deposit that affects
+the next word. Host/card returns must agree for loaded, pumped and signed fixtures, including
+carried residuals and deferred comparisons. The campaign receipt records one development
+comparison with the baseline fixed in advance; predictive failure is recorded as such. The
+existing full standing-cut exposure remains a regression receipt. No result here promotes the
+wide count-only measurement to a full-HNN result.
+
+**Receipt and decision (September 26).** The joined operator, its input/state adjoint and four-gain
+material consumer are built on host and card. Lean contains the local balances, directional
+pairings and finite material-work laws. All small-fixture and parity gates pass. The fixed loaded
+source-ring family loses to the default HNN by `0 + 8/16 + ε` development bits and
+`0 + 4/16 + ε` scored-tail bits, before its 887-bit extra material declaration. It remains a
+notebook option; the default field is unchanged. The final dissipation amplitude is `273/256`.
+The [full record and verification](../../research/records/2026-09-26_THE_RESONATOR_RETURNS_ITS_WAVE_AND_THE_COMPARISON_REACHES_ITS_MATERIAL.md)
+give the exact enclosures, cost, balance and hardware scope. Campaign 3 begins with the existing
+future-kernel owner and the concrete source/phase/receiver squares above. The phase-dependent
+loaded-material growth bound remains in #62 beside the complete counterfactual sensitivity and
+diamond/deposition joins; the deposit receipt now names its contact-only growth certificate.

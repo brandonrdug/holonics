@@ -1,7 +1,76 @@
 # Construction state
 
-| Item | State |
+**September 26, after Decisions 37–38.**
+[THE_REBUILD](docs/plans/THE_REBUILD.md) owns the implementation order and current decisions.
+The repository was reset on September 24; the pre-reset tree is
+[`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
+
+## Current construction
+
+| Area | State |
 |---|---|
-| Position (September 24) | The repository is reset to what functions: the `holonics` library, the `holonics-cuda` driver, the Lean mathematics in `lean/`, the object and mathematics guides, and the research records. The pre-reset tree is [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734). |
-| Next action | [The rebuild](docs/plans/THE_REBUILD.md), step 4 (#73): the HNN law in `holonics::hnn` over aeons, in five campaigns, keys leading. **Campaign 1** (keys, the change on a medium, and the collapse) is built: the field, the moment with its capacity `n*`, the local tick, the word, the Holon ratio in the odometer chart, the pending read, key location from the crib that closed each aeon, the execution port with its exact `Reference`, and the exposure against online order-0 and order-1 KT and PPM-2 (xz and zstd owed to the application). Deposition carries each locus on a declared lattice with its remainder (Decision 22, Lean `HNN/LatticeDeposit`); every transient and inverse of the word is a certified lattice chart (Decision 24, Lean `HNN/LatticeWord`); and the resident realization advances with the laws (Decision 25, #76): `holonics_cuda::hnn::Resident` runs the exposure on the card with every return equal to the host's. Campaign 1's exposure on the standing real cut (Decision 23) first failed design (f), its cause located ([record](research/records/2026-09-25_CAMPAIGN_ONE_LOCATED_FAILURE.md)); **its repair meets the criterion** ([record](research/records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md)): the receiving parametron's storage is Decision 28's landmark tree (context-tree weighting over per-cell causal addresses, the cell emitted as its odometer digits, on a fixed-width lattice; Lean `HNN/LandmarkTree`, Rust `hnn::landmark`), every comparison is scored before its own deposit (Decision 29), and the scored face weighs the tree's face against the combined face (tree plus wave) by their likelihood ratio, with the source opening on its normalized counts (Decision 30). Held out the whole HNN reads `3 + 1/16 + ε` bits a cell, below online order-0 (`4 + 12/16 + ε`), order-1 (`4 + 5/16 + ε`) and PPM-2 (`3 + 4/16 + ε`) by disjoint exact enclosures, host and card identical; the wave lowers the code length in every aeon, by `5 − 13/16 − ε` bits over the held-out cells after charging the 2 bits of the law's selection, far less than its computation costs. Campaign 2 (rings and contacts store, lock and flow) is built and lawful, host and card in parity (card `101 rem 398 over 3074` ms a window), and its predictive criterion fails ([record](research/records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md)). Decisions 32–34 followed: the tree's stop weight is a declared prior (the development cells keep `½`); the Born-rule wave (`hnn::born`, Lean `HNN/BornFace`) codes above the tree; and local weighing (Lean `HNN/LocalWeighing`) adopts the stop mixture per digit tree, `7 − 12/16 − ε` held-out bits below the tree, charged. Decision 35 measured the count-only receiver on a pinned development cut of `2^20` cells: held out, the tree reads `1 + 15/16 + ε` bits a cell against PPM-2's `3 + 0/16 + ε`, the adopted stop mixture transfers with a small gain, and the depth is capped by memory. Decision 36's founding at the second arrival saves memory, but it opens depth `d` only after `d + 1` recurrences, so the development cells keep the first arrival; held out it gained `−490 + 11/16 + ε` bits (disclosed). Decision 37 stores Decision 28's tree at the faces where paths part: the same prior, exactly (Lean `HNN/LandmarkCompaction.compacted_is_decision_28`), with at most `2n − 1` nodes a tree at any depth. The development cells then choose `D = 48`, and held out the tree reads `1 + 15/16 + ε` bits a cell, `−3416 + 15/16 + ε` below Decision 28's tree charged and `−137395 + 11/16 + ε` below PPM-2. The receiving path and the card run it as the only storage. The GPU suite passes, and campaign 1's exposure on the card is unchanged, host and card identical. The RH source-to-neck campaign (step 6) returned `HolonicsResearch/Zeta/{ZeroTube, CarryTick, Hearing, PaletteLaw}` and a falsifier whose surviving candidate is the global prime-part sign law ([record](research/records/2026-09-26_THE_ZERO_GAS_IS_A_COMPLEX_BURGERS_FLOW_AND_RH_NEEDS_A_SOURCE_LAW_AT_TIME_ZERO.md)). Owed in #62: the word-level sensitivity certificate of the lattice rule, the diamond on the concrete tick, the binary KT parameter bound, the landmark lattice's drift composed over the passage, and the binary logarithm's squaring invariant. Campaigns 2–5 follow; campaign 5 prices merges (tokenizers) by their code-length pair. Steps 0–3 are done; so are step 6's physics (K3 #74, K4 #75) and step 7's renames; equation extraction is #146, curation #147, applications #148. Laws found alongside the steps land in their objects and are listed in [THE_REBUILD](docs/plans/THE_REBUILD.md#laws-found-alongside-the-steps); `Holonics.Framework.Objects` is the object→owner map. The finite hearing identities, the carry word (in the Aeon clock), the scale zeta (through the Aeon transfer determinant) and the hearing law (on the Receiver) are formal ([record](research/records/2026-09-25_THE_MUSIC_IS_IN_THE_HOLES_HEARING_MULTIPLIES_BY_ZETA_AND_A_QUASICRYSTAL_IS_A_HELIX_THAT_NEVER_LOCKS.md)): Lean `Foundation/FractalString`, `Aeon/Clock/CarryWord`, `Holarchy/Hearing`, `HNN/LatticeDeposit.below_grain_heard_counted_not_deposited`, `Foundation/FractalPacking.reflect_eq_swing` and `Zeta/Seam.completedRiemannZeta_swing_half`. The [expression atlas](docs/atlas/README.md) holds 2,579 expressions; owed laws are listed in #62. |
-| Machine position | On the standing real cut the rebuilt HNN reads held out `3 + 1/16 + ε` bits a cell (the landmark tree weighed with the wave), below PPM-2's `3 + 4/16 + ε`; its wave earns `5 − 13/16 − ε` bits over the held-out cells after charging the 2 bits of the law's selection. The prototype HNN's last measured position (the model above uniform on its exposure sample; a tape of gigabytes against moments of kilobytes) is in the [lessons record](research/records/2026-09-24_LESSONS_FROM_THE_WORKBENCH_AND_ATHENA_PROTOTYPES.md). |
+| Steps 0–3 | Operator layout, Holarchy/Aeon, compression and landmark owners built; their broader formal obligations remain in #62 |
+| Steps 4–5 (#73, #76) | Host `holonics::hnn` and resident `holonics-cuda::hnn` implement campaigns 1–2, with per-law parity |
+| Campaign 1 | Meets its standing-cut predictive criterion after Decisions 28–30; source moments, local word, comparison, deposition and structural collapse have consumers |
+| Campaign 2 | Ring/contact laws and parity pass; its additional predictive criterion fails. The measured field declares no resonators or boost signatures |
+| Decision 38 | Loaded resonator forward/adjoint and material deposition built on host/card; the fixed source-ring family does not improve the standing-cut prediction |
+| Immediate work | Campaign 3: join the existing exact future-kernel quotient to a loaded ring, with source, pump-phase and receiver squares before release |
+| Campaign 3 | Mode release, dormant constitution/clock, founding and moment quotient; consumes the loaded ring connection |
+| Campaign 4 (#27) | Existing serial-screw laws need the HNN motor consumer and a motion-recording receipt |
+| Campaign 5 | Holonic Encoding, context, joint prediction and merges priced by their code-length pair |
+| Step 6 | Finite physics K3–K4 complete; target research continues alongside construction; equation extraction #146 remains |
+| Step 7 (#147) | First Lean curation pass and navigator/subject renames complete; short duplicates and named repeated constructions remain |
+| Step 8 (#148) | Workbench, Athena and simulator applications remain; their frozen acceptance cases are unspent |
+
+## Measured receiving faces
+
+All code lengths below are grain readings with their unresolved `ε`. The complete receipts and
+exact enclosures are in the linked records and THE_REBUILD. These are distinct populations and
+consumers.
+
+- **Full HNN, standing cut.** The landmark tree at depth 4, half stop prior, weighed with the wave,
+  reads `3 + 1/16 + ε` bits per cell. The online order-0, order-1 and PPM-2 comparisons are strict
+  orderings. The wave earns `5 − 13/16 − ε` held-out bits after the two-bit law-selection charge,
+  which has not paid for its computation. Host and card agree.
+  [Campaign 1 receipt](research/records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md).
+- **Campaign 2.** No clock/contact letter family beats its constant-slot control on development
+  cells. The full HNN's held-out readings remain campaign 1's. The corrected receipt identifies
+  the unloaded resonator port and the undeclared resonators/signatures.
+  [Campaign 2 receipt](research/records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md).
+- **Decision 38.** The loaded source-ring family closes its power balances and learns a
+  dissipation amplitude of `273/256`. It loses to the default HNN by `0 + 8/16 + ε` development
+  bits and `0 + 4/16 + ε` scored-tail bits before the 887-bit extra material description.
+  The default stays unchanged. [Loaded ring receipt](research/records/2026-09-26_THE_RESONATOR_RETURNS_ITS_WAVE_AND_THE_COMPARISON_REACHES_ITS_MATERIAL.md).
+- **Count-only receiver, wide cut.** The cut has `2²⁰` cells with final `2¹⁷` scored as held out.
+  Decision 37's compacted tree admits the development-selected depth `48 = 3·2⁴`, reading
+  `1 + 15/16 + ε` bits per cell, below the shallower tree and PPM-2. This is the count-only
+  harness, not a full-HNN exposure. The standing cut lies in this held-out range and has been
+  used in development; the separate evaluation partition stays unread.
+- **Decision 37.** Unary chains are stored at their parting faces. Lean proves the ideal
+  rational tree's face/code equivalence and the `2n − 1` node bound for nonempty passages.
+  Labels still cost memory and traversal with depth. Compacted storage is the sole host/card
+  storage; its standing-cut HNN exposure preserves the earlier readings.
+- **Rejected trials.** The Born receiver failed its development criterion. Second-arrival
+  founding lost on development cells and its Rust realization was retired. The stop-weight
+  mixture is a measured count-only law; the full HNN retains its declared half prior.
+
+## Formal scope and targets
+
+The local lattice identities do not discharge the word's complete sensitivity certificate or its
+counterfactual trajectory bound. The relative growth certificate currently covers contact C/K
+forms; a loaded signed/pumped material bound is owed. The concrete diamond bridge, binary KT parameter bound,
+landmark drift composed over the passage, and binary logarithm's squaring invariant remain owed
+in #62. The odometer theorem proves positive pairing with the smooth score's gradient at the grain
+representative; it asserts no strict decrease of the quantized score inside a grain cell.
+
+The RH source-to-neck work returned `HolonicsResearch/Zeta/{ZeroTube,CarryTick,Hearing,PaletteLaw}`
+and the falsifier. A surviving global prime-part sign candidate still lacks the implication to
+absence of off-seam pairs. `Hearing` proves symbol and bounded-truncation laws; the unbounded
+operator/Mellin–Plancherel construction is owed.
+[Target record](research/records/2026-09-26_THE_ZERO_GAS_IS_A_COMPLEX_BURGERS_FLOW_AND_RH_NEEDS_A_SOURCE_LAW_AT_TIME_ZERO.md).
+The higher-codimension Hodge source and complex-time Navier–Stokes continuation remain open.
+
+The reusable hearing, carry-word and scale-zeta laws live in `Foundation/FractalString`,
+`Aeon/Clock/CarryWord`, `Aeon/Production/Zeta`, `Holarchy/Hearing` and the Swing owners.
+[Record](research/records/2026-09-25_THE_MUSIC_IS_IN_THE_HOLES_HEARING_MULTIPLIES_BY_ZETA_AND_A_QUASICRYSTAL_IS_A_HELIX_THAT_NEVER_LOCKS.md).
+`Holonics.Framework.Objects` and the [expression atlas](docs/atlas/README.md) locate their owners.

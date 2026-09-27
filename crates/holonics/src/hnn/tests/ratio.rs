@@ -53,7 +53,8 @@ fn below(a: &ExactInterval, bound: &Rat) -> bool {
 
 /// Lean `HNN/Ratio.odometer_covector_descends`, `odometer_eq_face_at_integer_cells`: the real
 /// covector is `p̃ − q` in the declared odometer chart, `p̃_c ∝ 2^(n_c)(L + k_c)`; it sums to zero, it
-/// is a strict descent direction of the scored code length (`⟨p̂ − q, p̃ − q⟩ > 0`, read here on
+/// pairs positively with the smooth score's gradient at the grain representative
+/// (`⟨p̂ − q, p̃ − q⟩ > 0`, read here on
 /// the real chart's enclosure of `p̂`), and at `L = 1` the odometer chart and the exact face agree.
 #[test]
 fn the_real_covector_is_the_face_minus_the_target_at_the_cell_representative() {

@@ -863,6 +863,18 @@ fn termwise(
                     after.ring_scales(*ring)[0].clone(),
                     vec![(Carrier::Standing, gradient.clone())],
                 ),
+                FactorGradient::Resonator {
+                    ring,
+                    family,
+                    gradient,
+                } => (
+                    Carrier::ResonatorScale(*family),
+                    after
+                        .resonator_scales(*ring)
+                        .expect("a deposited resonator's feature statistics")[*family]
+                        .clone(),
+                    vec![(Carrier::Resonator(*family), vec![gradient.clone()])],
+                ),
                 FactorGradient::PairPort {
                     ring,
                     offset,

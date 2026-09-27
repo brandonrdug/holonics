@@ -1691,6 +1691,7 @@ impl Field {
                 Locus::SourcePort(g) => (4, g),
                 Locus::Standing(g) => (5, g),
                 Locus::ReceivingMap(g) => (6, g),
+                Locus::Resonator(g) => (7, g),
             };
             natural(&mut code, kind);
             natural(&mut code, index as u64);
@@ -1945,7 +1946,7 @@ fn hop_distances(rings: usize, contacts: &[Contact]) -> Vec<Vec<Option<usize>>> 
 // the code
 
 /// Elias gamma of `n + 1`: self-delimiting.
-fn natural(code: &mut Vec<bool>, n: u64) {
+pub(crate) fn natural(code: &mut Vec<bool>, n: u64) {
     natural_big(code, &BigUint::from(n));
 }
 
@@ -1966,7 +1967,7 @@ fn naturals(code: &mut Vec<bool>, values: &[u64]) {
 }
 
 /// Zig-zag: `z ≥ 0 ↦ 2z`, `z < 0 ↦ −2z − 1`.
-fn integer_code(code: &mut Vec<bool>, z: &BigInt) {
+pub(crate) fn integer_code(code: &mut Vec<bool>, z: &BigInt) {
     let two = BigInt::from(2);
     let folded = if z.is_negative() {
         (-z * &two - BigInt::one()).to_biguint()
@@ -1976,7 +1977,7 @@ fn integer_code(code: &mut Vec<bool>, z: &BigInt) {
     natural_big(code, &folded.expect("a folded integer is nonnegative"));
 }
 
-fn rational(code: &mut Vec<bool>, value: &Rat) {
+pub(crate) fn rational(code: &mut Vec<bool>, value: &Rat) {
     integer_code(code, value.numer());
     natural_big(
         code,

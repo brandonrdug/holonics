@@ -51,7 +51,7 @@ fn device(error: DeviceError) -> HnnError {
 // -------------------------------------------------------------------------------------------
 // the plan's layout (the kernels' `WP_*` … words)
 
-const WP_HEADER: usize = 29;
+const WP_HEADER: usize = 30;
 const WP_RINGS: usize = 0;
 const WP_CONTACTS: usize = 1;
 const WP_STEPS: usize = 2;
@@ -81,6 +81,7 @@ const WP_ALPHABET: usize = 25;
 const WP_PAIR_TABLE: usize = 26;
 const WP_INCIDENCES: usize = 27;
 const WP_MAP: usize = 28;
+const WP_RESONATORS: usize = 29;
 
 const WR_STRIDE: usize = 12;
 const WR_WIDTH: usize = 0;
@@ -93,6 +94,24 @@ const WR_DEGREE: usize = 6;
 const WR_INCIDENCE: usize = 7;
 const WR_WEIGHTS: usize = 8;
 const WR_ANCHOR_EXP: usize = 9;
+const WR_RESONATOR: usize = 10;
+
+const RZ_STRIDE: usize = 15;
+const RZ_RING: usize = 0;
+const RZ_WIDTH: usize = 1;
+const RZ_ROWS: usize = 2;
+const RZ_CAPACITY: usize = 3;
+const RZ_STIFFNESS: usize = 4;
+const RZ_CHARTS: usize = 5;
+const RZ_PHASES: usize = 6;
+const RZ_LM: usize = 7;
+const RZ_LC: usize = 8;
+const RZ_EH: usize = 9;
+const RZ_RETURN_GAIN: usize = 10;
+const RZ_RETURN_EXP: usize = 11;
+const RZ_DISSIPATION: usize = 12;
+const RZ_OPERATOR: usize = 13;
+const RZ_OPERATOR_EXP: usize = 14;
 
 const WC_STRIDE: usize = 20;
 const WC_WIDTH: usize = 0;
@@ -120,7 +139,7 @@ const WS_STRIDE: usize = 10;
 const WQ_STRIDE: usize = 8;
 
 /// The word buffer's arrays, in the kernels' `WL_*` order.
-const WL_ENTRIES: usize = 51;
+const WL_ENTRIES: usize = 67;
 
 // -------------------------------------------------------------------------------------------
 // the scales the host decodes with
@@ -162,6 +181,25 @@ pub(crate) struct ContactPlan {
     pub(crate) stiffness_exp: Option<u32>,
 }
 
+/// The host reading scales of one loaded resonator's on-card record.
+#[derive(Clone, Debug)]
+pub(crate) struct LoadedResonatorPlan {
+    pub(crate) ring: usize,
+    pub(crate) width: usize,
+    pub(crate) rows: usize,
+    pub(crate) phases: usize,
+    pub(crate) return_gain: i64,
+    pub(crate) return_exp: u32,
+    pub(crate) hop_exp: u32,
+    pub(crate) material_exp: u32,
+    pub(crate) chart_exp: u32,
+    pub(crate) operator_exp: u32,
+    pub(crate) capacity_offset: usize,
+    pub(crate) stiffness_offset: usize,
+    pub(crate) dissipation_offset: usize,
+    pub(crate) operator_offset: usize,
+}
+
 /// [definition] **A word's plan**: the plan's words, the operands' weights (every ring's, first;
 /// only they cross the bus), the charts' offsets after them (gathered in on the card), and what the
 /// host reads the record with.
@@ -193,6 +231,8 @@ pub(crate) struct WordPlan {
     /// unsupported fibre.
     pub(crate) pairs: Vec<(usize, usize, usize, usize, usize, u32, u64)>,
     pub(crate) pair_weights: usize,
+    /// Host decoding scales in the embedded resonator table's order.
+    pub(crate) resonators: Vec<LoadedResonatorPlan>,
 }
 
 /// The executed junction weights, their certificate and the admittance sum of one ring at the
@@ -239,6 +279,7 @@ impl WordPlan {
         phases: &ReceivingPhases,
         moment: &MomentSnapshot<'_>,
         opens: &[SourceOpen],
+        resonators: &[Option<holonics::hnn::ring::ResonatorOperands>],
     ) -> Result<Self, HnnError> {
         let population = PopulationChart::of(field).exponent();
         let lattice = *field
@@ -358,6 +399,7 @@ impl WordPlan {
             record[WR_INCIDENCE] = incidences as i64;
             record[WR_WEIGHTS] = weights_at as i64;
             record[WR_ANCHOR_EXP] = i64::from(anchor_exp);
+            record[WR_RESONATOR] = -1;
             for &(a, slot, base) in &incident {
                 incidence.extend([a as i64, slot as i64, base as i64]);
             }
@@ -561,6 +603,114 @@ impl WordPlan {
         for entry in &pair_entries {
             plan.extend_from_slice(entry);
         }
+        if resonators.len() != widths.len() {
+            return Err(refused("one optional resonator declaration per ring"));
+        }
+        let resonator_refs: Vec<_> = resonators.iter().flatten().collect();
+        let mut loaded_resonators = Vec::new();
+        let resonator_count = if resonator_refs.is_empty() {
+            0
+        } else {
+            let resonator_plan = crate::hnn::word::ResonatorPlan::form(&resonator_refs, lw)?;
+            let (
+                capacity,
+                capacity_base,
+                dissipation,
+                dissipation_base,
+                stiffness,
+                phase_base,
+                operators,
+                operator_base,
+                solve_charts,
+                _,
+            ) = resonator_plan.execution_operands();
+            let (res_rings, res_widths, _, (e_h, l_m, l_operator, l_c, _)) =
+                resonator_plan.execution_shape();
+            if resonator_plan.rings().len() != resonator_refs.len() {
+                return Err(refused("the resonator plan's declared rings"));
+            }
+            // Keep every value on its exact dyadic carrier. C/D/K/M are the declared material
+            // forms and phase operator; X is the exact executed chart used in both directions.
+            operands.resize(chart_cursor, 0);
+            let capacity_at = chart_cursor;
+            chart_cursor += capacity.len();
+            operands.extend_from_slice(capacity);
+            let dissipation_at = chart_cursor;
+            chart_cursor += dissipation.len();
+            operands.extend_from_slice(dissipation);
+            let stiffness_at = chart_cursor;
+            chart_cursor += stiffness.len();
+            operands.extend_from_slice(stiffness);
+            let operator_at = chart_cursor;
+            chart_cursor += operators.len();
+            operands.extend_from_slice(operators);
+            let charts_at = chart_cursor;
+            chart_cursor += solve_charts.len();
+            operands.extend_from_slice(solve_charts);
+
+            let mut records = vec![0i64; RZ_STRIDE * resonator_refs.len()];
+            let mut chart_offset = 0usize;
+            let mut out_bases = Vec::with_capacity(resonator_refs.len());
+            for (index, (resonator, (&ring, &width))) in resonator_refs
+                .iter()
+                .zip(res_rings.iter().zip(res_widths))
+                .enumerate()
+            {
+                if ring >= widths.len() || width != widths[ring] {
+                    return Err(refused("a resonator matched to its field ring and width"));
+                }
+                let phase_count = resonator.phases();
+                let (return_gain, return_exp) = reduced_word(
+                    &(Rat::from_integer(BigInt::from(2)) / resonator.admittance()),
+                    "a loaded resonator's return coefficient off the dyadics",
+                )?;
+                let row = &mut records[index * RZ_STRIDE..(index + 1) * RZ_STRIDE];
+                row[RZ_RING] = ring as i64;
+                row[RZ_WIDTH] = width as i64;
+                row[RZ_ROWS] = ring_rows[ring] as i64;
+                row[RZ_CAPACITY] = (capacity_at + capacity_base[index] as usize) as i64;
+                row[RZ_STIFFNESS] = (stiffness_at + phase_base[index] as usize) as i64;
+                row[RZ_CHARTS] = (charts_at + chart_offset) as i64;
+                row[RZ_PHASES] = phase_count as i64;
+                row[RZ_LM] = i64::from(l_m);
+                row[RZ_LC] = i64::from(l_c);
+                row[RZ_EH] = i64::from(e_h);
+                row[RZ_RETURN_GAIN] = return_gain;
+                row[RZ_RETURN_EXP] = i64::from(return_exp);
+                row[RZ_DISSIPATION] = (dissipation_at + dissipation_base[index] as usize) as i64;
+                row[RZ_OPERATOR] = (operator_at + operator_base[index] as usize) as i64;
+                row[RZ_OPERATOR_EXP] = i64::from(l_operator);
+                chart_offset += width * width * phase_count;
+                out_bases.push((ring, index));
+                loaded_resonators.push(LoadedResonatorPlan {
+                    ring,
+                    width,
+                    rows: ring_rows[ring],
+                    phases: phase_count,
+                    return_gain,
+                    return_exp,
+                    hop_exp: e_h,
+                    material_exp: l_m,
+                    chart_exp: l_c,
+                    operator_exp: l_operator,
+                    capacity_offset: capacity_at + capacity_base[index] as usize,
+                    stiffness_offset: stiffness_at + phase_base[index] as usize,
+                    dissipation_offset: dissipation_at + dissipation_base[index] as usize,
+                    operator_offset: operator_at + operator_base[index] as usize,
+                });
+            }
+            plan.extend(records);
+            for (ring, index) in out_bases {
+                plan[ring_table + ring * WR_STRIDE + WR_RESONATOR] = index as i64;
+            }
+            resonator_refs.len()
+        };
+        let resonator_table = if resonator_count == 0 {
+            0
+        } else {
+            // RZ records were just appended; store their offset in the header below.
+            plan.len() - resonator_count * RZ_STRIDE
+        };
         let steps = phases.junction_steps();
         let header = [
             (WP_RINGS, widths.len() as i64),
@@ -592,6 +742,7 @@ impl WordPlan {
             (WP_PAIR_TABLE, pair_at as i64),
             (WP_INCIDENCES, incidences as i64),
             (WP_MAP, map.offset as i64),
+            (WP_RESONATORS, resonator_table as i64),
         ];
         for (at, value) in header {
             plan[at] = value;
@@ -622,6 +773,7 @@ impl WordPlan {
             grain: phases.grain(),
             pairs,
             pair_weights,
+            resonators: loaded_resonators,
         })
     }
 
@@ -700,6 +852,8 @@ impl SourceOpen {
 pub(crate) struct WordLayout {
     pub(crate) offsets: [u64; WL_ENTRIES],
     pub(crate) forward: usize,
+    pub(crate) resonator_forward: usize,
+    pub(crate) resonator_forward_bytes: usize,
     pub(crate) total: usize,
 }
 
@@ -762,6 +916,24 @@ impl WordLayout {
             16 * s * plan.incidences,
             8 * reads,
             16,
+            // The loaded ring states/remainders and their per-tick resident record.
+            8 * n,
+            8 * n,
+            16 * n,
+            16 * n,
+            16 * n,
+            16 * n,
+            8 * s * n,
+            8 * s * n,
+            8 * s * n,
+            8 * s * n,
+            8 * s * n,
+            // The reverse state covectors, z-bar, and X-hat^T z-bar at Lw + Lc.
+            16 * n,
+            16 * n,
+            16 * n,
+            16 * s * n,
+            4 * n,
         ];
         let mut offsets = [0u64; WL_ENTRIES];
         let mut at = 0usize;
@@ -776,6 +948,8 @@ impl WordLayout {
         Self {
             offsets,
             forward,
+            resonator_forward: offsets[WL_RES_U] as usize,
+            resonator_forward_bytes: offsets[WL_RES_U_BAR] as usize - offsets[WL_RES_U] as usize,
             total: at,
         }
     }
@@ -821,6 +995,19 @@ const WL_DOTS2: usize = 47;
 const WL_DOTS3: usize = 48;
 const WL_READS: usize = 49;
 const WL_REV_STATUS: usize = 50;
+const WL_RES_U: usize = 51;
+const WL_RES_W: usize = 52;
+const WL_RES_REM_RATE: usize = 53;
+const WL_RES_REM_U: usize = 54;
+const WL_RES_REM_W: usize = 55;
+const WL_RES_REM_OUTPUT: usize = 56;
+const WL_REC_RES_DRIVE: usize = 57;
+const WL_REC_RES_OUTPUT: usize = 58;
+const WL_REC_RES_U: usize = 59;
+const WL_REC_RES_W: usize = 60;
+const WL_REC_RES_RATE: usize = 61;
+const WL_RES_U_BAR: usize = 62;
+const WL_REC_RES_SOLVED: usize = 65;
 
 fn i64s(octets: &[u8], at: usize, count: usize) -> Vec<i64> {
     octets[at..at + 8 * count]
@@ -870,6 +1057,15 @@ pub(crate) struct ForwardRecord {
     pub(crate) rem_disp: Vec<i128>,
     pub(crate) rem_rate: Vec<i128>,
     pub(crate) logits: Vec<i128>,
+    /// One loaded tick's operands and return, laid out by field ring row at `t * N + row`.
+    pub(crate) resonator_drive: Vec<i64>,
+    pub(crate) resonator_output: Vec<i64>,
+    pub(crate) resonator_u: Vec<i64>,
+    pub(crate) resonator_w: Vec<i64>,
+    pub(crate) resonator_rate: Vec<i64>,
+    pub(crate) resonator_final_u: Vec<i64>,
+    pub(crate) resonator_final_w: Vec<i64>,
+    pub(crate) resonator_remainders: [Vec<i128>; 4],
 }
 
 /// [definition] **The return's record as the host reads it**: the opening covector, per step the
@@ -890,6 +1086,10 @@ pub(crate) struct ReverseRecord {
     pub(crate) rem_disp: Vec<i128>,
     pub(crate) rem_storage: Vec<i128>,
     pub(crate) rem_arrival: Vec<i128>,
+    /// The post-split `X̂ᵀ z̄` and `z̄` at `Lw`, stored per field-ring row and reverse tick.
+    pub(crate) resonator_solved: Vec<i128>,
+    /// Remainders after the z̄, solved, displacement-bar and velocity-bar splits.
+    pub(crate) resonator_remainders: [Vec<i128>; 4],
 }
 
 /// The stages the kernels report a refusal at.
@@ -1078,7 +1278,20 @@ impl<'c> ResidentWord<'c> {
         if let Some(refusal) = refusal(&status, true) {
             return Err(refusal);
         }
-        let record = decode_forward(&plan, &layout, &octets_read);
+        let resonator_octets = if plan.resonators.is_empty() {
+            None
+        } else {
+            let read = card
+                .fetch_range(
+                    &buffer,
+                    layout.resonator_forward,
+                    layout.resonator_forward_bytes,
+                )
+                .map_err(device)?;
+            octets += read.len();
+            Some(read)
+        };
+        let record = decode_forward(&plan, &layout, &octets_read, resonator_octets.as_deref());
         Ok((
             Self {
                 card,
@@ -1147,13 +1360,41 @@ impl<'c> ResidentWord<'c> {
             rem_disp: i128s(&read, at(WL_REV_DISP), k),
             rem_storage: i128s(&read, at(WL_REV_STORAGE), n),
             rem_arrival: i128s(&read, at(WL_REV_ARRIVAL), na),
+            resonator_solved: i128s(&read, at(WL_REC_RES_SOLVED), s * n),
+            resonator_remainders: [
+                i128s(&read, at(WL_RES_REM_RATE), n),
+                i128s(&read, at(WL_RES_REM_OUTPUT), n),
+                i128s(&read, at(WL_RES_REM_U), n),
+                i128s(&read, at(WL_RES_REM_W), n),
+            ],
         })
     }
 }
 
-fn decode_forward(plan: &WordPlan, layout: &WordLayout, octets: &[u8]) -> ForwardRecord {
+fn decode_forward(
+    plan: &WordPlan,
+    layout: &WordLayout,
+    octets: &[u8],
+    resonator_octets: Option<&[u8]>,
+) -> ForwardRecord {
     let (n, na, k, s) = (plan.n, plan.na, plan.k, plan.steps);
     let at = |entry: usize| layout.at(entry);
+    let at_resonator = |entry: usize| layout.at(entry) - layout.resonator_forward;
+    let (resonator_final_u, resonator_final_w, resonator_remainders) =
+        if let Some(resonator_octets) = resonator_octets {
+            (
+                i64s(resonator_octets, at_resonator(WL_RES_U), n),
+                i64s(resonator_octets, at_resonator(WL_RES_W), n),
+                [
+                    i128s(resonator_octets, at_resonator(WL_RES_REM_RATE), n),
+                    i128s(resonator_octets, at_resonator(WL_RES_REM_U), n),
+                    i128s(resonator_octets, at_resonator(WL_RES_REM_W), n),
+                    i128s(resonator_octets, at_resonator(WL_RES_REM_OUTPUT), n),
+                ],
+            )
+        } else {
+            (vec![0; n], vec![0; n], std::array::from_fn(|_| vec![0; n]))
+        };
     ForwardRecord {
         storage: i64s(octets, at(WL_REC_STORAGE), s * n),
         arrivals: i64s(octets, at(WL_REC_ARRIVALS), s * na),
@@ -1175,6 +1416,29 @@ fn decode_forward(plan: &WordPlan, layout: &WordLayout, octets: &[u8]) -> Forwar
         rem_disp: i128s(octets, at(WL_REM_DISP), k),
         rem_rate: i128s(octets, at(WL_REM_RATE), k),
         logits: i128s(octets, at(WL_LOGITS), plan.aperture * plan.map_rows),
+        resonator_drive: resonator_octets.map_or_else(
+            || vec![0; s * n],
+            |bytes| i64s(bytes, at_resonator(WL_REC_RES_DRIVE), s * n),
+        ),
+        resonator_output: resonator_octets.map_or_else(
+            || vec![0; s * n],
+            |bytes| i64s(bytes, at_resonator(WL_REC_RES_OUTPUT), s * n),
+        ),
+        resonator_u: resonator_octets.map_or_else(
+            || vec![0; s * n],
+            |bytes| i64s(bytes, at_resonator(WL_REC_RES_U), s * n),
+        ),
+        resonator_w: resonator_octets.map_or_else(
+            || vec![0; s * n],
+            |bytes| i64s(bytes, at_resonator(WL_REC_RES_W), s * n),
+        ),
+        resonator_rate: resonator_octets.map_or_else(
+            || vec![0; s * n],
+            |bytes| i64s(bytes, at_resonator(WL_REC_RES_RATE), s * n),
+        ),
+        resonator_final_u,
+        resonator_final_w,
+        resonator_remainders,
     }
 }
 

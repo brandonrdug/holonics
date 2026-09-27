@@ -6,6 +6,12 @@ the toroidal/helical geometry, as "convergence into something prime, and diverge
 ResearchGate figures refuse automated access (HTTP 403); this record works from the standard
 construction.
 
+**September 26 scope correction:** the [audited receiver/egg record](2026-09-26_THE_SHADOW_IS_THE_RECEIVERS_KERNEL_AND_THE_EGG_IS_TWO_RINGS_IN_RELATIVE_MOTION.md#4-the-egg-is-the-face-of-two-rings-in-relative-motion)
+keeps the modulus identity but grades the velocity, Doppler, rest-frame and lightlike readings as
+images until a receiver and transport map are supplied. The title and the original derivation
+below are historical wording; those physical identifications are not established by the shared
+algebraic parameter alone.
+
 **Truth discipline:**
 - Classical results are `[proved-standard]`.
 - The algebra first checked here (exact computer algebra) is `[proved-derived]`, pending Lean.

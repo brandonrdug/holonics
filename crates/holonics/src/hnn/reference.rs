@@ -164,8 +164,8 @@ use crate::hnn::moment::{Ingested, PopulationChart, SourceMoment};
 use crate::hnn::pending::{Against, PendingRatio};
 use crate::hnn::port::{
     Census, ContactPullback, Deposit, ExecutionPort, Handle, MomentId, PendingId, PortReceipt,
-    Pullback, ReceiptDetail, RingPullback, StagedId, Transpose, WordReturn, port_receipt,
-    release_width, resonance_reading, source_order, wrote_all,
+    Pullback, ReceiptDetail, ResonatorPullback, RingPullback, StagedId, Transpose, WordReturn,
+    port_receipt, release_width, resonance_reading, source_order, wrote_all,
 };
 use crate::hnn::propagation::{contact_exponent, path_attenuation};
 use crate::hnn::ratio::{
@@ -182,7 +182,7 @@ use crate::navigator::Clock;
 use crate::ratio::algebraic::ExactInterval;
 use crate::ratio::exponentiated::power_of_two;
 use crate::ratio::linear::ExactRatMatrix;
-use crate::ratio::linear::vector::{add, dot, scale};
+use crate::ratio::linear::vector::{add, dot, scale, sub};
 use crate::ratio::work::ExactWork;
 use crate::ratio::{Rat, integer};
 use crate::receiver::reception::{Component, InteractionReturn, SourceOrder};
@@ -1317,8 +1317,13 @@ impl ExecutionPort for Reference {
         // leaves the predecessor, the ledger and the staged deposit as they were (review S12).
         let deposited = start.elapsed();
         let start = Instant::now();
-        let (reread, readings) = arrived.code_length(&field, &next, &mut resident.charts)?;
-        resident.tally.read(&readings);
+        // The successor re-read can refuse late (for example, a newly certified loaded resonator
+        // chart). Keep its chart and tally writes private until the receipt and first-law ledger
+        // also accept the same reread.
+        let mut next_charts = resident.charts.clone();
+        let (reread, readings) = arrived.code_length(&field, &next, &mut next_charts)?;
+        let mut next_tally = resident.tally.clone();
+        next_tally.read(&readings);
         let reread_time = start.elapsed();
         let mut work = ExactWork::nothing();
         work.stepped();
@@ -1335,9 +1340,13 @@ impl ExecutionPort for Reference {
             },
         )?;
         // The ledger's step refuses before it moves (`EnclosedLedger::deposit`).
-        resident.ledger.deposit(reread)?;
+        let mut next_ledger = resident.ledger.clone();
+        next_ledger.deposit(reread)?;
         resident.staged.remove(&staged);
         resident.constitution = next;
+        resident.charts = next_charts;
+        resident.tally = next_tally;
+        resident.ledger = next_ledger;
         resident.forget_kept_reads();
         resident.wall.deposited += deposited;
         resident.wall.reread += reread_time;
@@ -1388,12 +1397,23 @@ impl ExecutionPort for Reference {
         let options = LawfulOptions::assemble(&width, tolerance.clone(), None, None, false)?;
         let decided = release(decision, &options)?;
         let released = matches!(decided, ReleaseReturn::Released { .. });
-        let split = match anchors.last() {
-            Some(anchor) => resonance_reading(field.ring(phases.ring()), anchor)?,
-            None => [
-                Component::Absent("the window read no anchor"),
-                Component::Absent("the window read no anchor"),
-            ],
+        let split = if resident
+            .constitution
+            .ring_resonator(phases.ring())
+            .is_some()
+        {
+            [
+                Component::Absent("the loaded resonator has no campaign-3 RIDE/FOUND read"),
+                Component::Absent("the loaded resonator has no campaign-3 RIDE/FOUND read"),
+            ]
+        } else {
+            match anchors.last() {
+                Some(anchor) => resonance_reading(field.ring(phases.ring()), anchor)?,
+                None => [
+                    Component::Absent("the window read no anchor"),
+                    Component::Absent("the window read no anchor"),
+                ],
+            }
         };
         let order = source_order(field, slot.ratio.anchor(), slot.ratio.moment().cells());
         let ticks = vec![phases.junction_steps() as u64; field.rings().len()];
@@ -1600,6 +1620,26 @@ fn negated(values: &[Rat]) -> Vec<Rat> {
 
 fn matrix_of(rows: Vec<Vec<Rat>>, columns: usize) -> Result<ExactRatMatrix, HnnError> {
     Ok(ExactRatMatrix::shaped(rows.len(), columns, rows)?)
+}
+
+/// **The base pump form at one phase**, before the learned squared amplitude `g_P²` scales its
+/// strength. Its node blocks are assembled on the ring's declared realified coordinates.
+fn resonator_pump_base_form(
+    pump: &crate::hnn::ring::PumpDeclaration,
+    phase: usize,
+    width: usize,
+) -> Result<ExactRatMatrix, HnnError> {
+    let unit = pump.with_strength(Rat::one())?;
+    let block = unit.block(phase);
+    let mut rows = vec![vec![Rat::zero(); width]; width];
+    for node in 0..(width / 2) {
+        for i in 0..2 {
+            for j in 0..2 {
+                rows[2 * node + i][2 * node + j] = block[i][j].clone();
+            }
+        }
+    }
+    matrix_of(rows, width)
 }
 
 /// **The compare's composition** (module header): the complete pullback and the deposit staged
@@ -1865,6 +1905,94 @@ pub fn compose(
         ring_pullbacks[g].moment = Some(moment_covector);
     }
 
+    // The loaded resonators: reverse their transient local state in reverse tick order (the word
+    // returns each tick's transposed solve and operands), then pull the four scalar amplitudes onto
+    // their immutable base forms. The exact inverse/material derivative and the executed chart's
+    // adjoint residual remain separate readings in `WordReturn`.
+    if back.resonators.len() != field.rings().len() {
+        return Err(HnnError::Shape {
+            what: "the loaded resonator pullbacks by ring",
+            expected: field.rings().len(),
+            found: back.resonators.len(),
+        });
+    }
+    let mut resonator_pullbacks = Vec::new();
+    for (g, ticks) in back.resonators.iter().enumerate() {
+        let Some(material) = constitution.ring_resonator(g) else {
+            if !ticks.is_empty() {
+                return Err(HnnError::Resonator {
+                    ring: g,
+                    what: "the return has a resonator tick without a declared material",
+                });
+            }
+            continue;
+        };
+        let (capacity, stiffness, dissipation, pump_strength) = material.gain_bases();
+        let gains = material.gains();
+        let mut loss_gradients = std::array::from_fn(|_| Rat::zero());
+        let mut energies = std::array::from_fn(|_| Rat::zero());
+        let mut reached = false;
+        for tick in ticks {
+            if !diamond.element_window(g, tick.tick) {
+                continue;
+            }
+            reached = true;
+            let hω = scale(&(&h / integer(2)), &tick.rate);
+            let midpoint = add(&tick.displacement, &hω);
+            let w_minus_ω = sub(&tick.velocity, &tick.rate);
+            let feature_c = scale(
+                &(integer(4) * &gains[0]),
+                &apply_rows(capacity, &w_minus_ω)?,
+            );
+            let feature_k = scale(
+                &(integer(2) * &h * &gains[1]),
+                &apply_rows(stiffness, &midpoint)?,
+            );
+            let feature_d = scale(
+                &(integer(2) * &h * &gains[2]),
+                &apply_rows(dissipation, &tick.rate)?,
+            );
+            let feature_p = match (material.base_pump(), pump_strength) {
+                (Some(pump), Some(strength)) => scale(
+                    &(integer(2) * &h * &gains[3] * strength),
+                    &apply_rows(
+                        &resonator_pump_base_form(pump, tick.phase, material.width())?,
+                        &midpoint,
+                    )?,
+                ),
+                _ => vec![Rat::zero(); material.width()],
+            };
+            loss_gradients[0] += dot(&tick.solved, &feature_c);
+            loss_gradients[1] -= dot(&tick.solved, &feature_k);
+            loss_gradients[2] -= dot(&tick.solved, &feature_d);
+            loss_gradients[3] -= dot(&tick.solved, &feature_p);
+            for (energy, feature) in energies
+                .iter_mut()
+                .zip([&feature_c, &feature_k, &feature_d, &feature_p])
+            {
+                *energy += dot(feature, feature);
+            }
+        }
+        let pullback = ResonatorPullback {
+            ring: g,
+            gains: loss_gradients.clone(),
+            energy: energies.clone(),
+        };
+        if retained(Locus::Resonator(g)) && reached {
+            for family in 0..4 {
+                factors.push(FactorStep {
+                    gradient: FactorGradient::Resonator {
+                        ring: g,
+                        family,
+                        gradient: -loss_gradients[family].clone(),
+                    },
+                    energy: energies[family].clone(),
+                });
+            }
+        }
+        resonator_pullbacks.push(pullback);
+    }
+
     // The contacts: their channel factors, conductance and pair geometry, the contacts together.
     let parts = indexed(field.contacts().len(), |a| {
         compose_contact(
@@ -1891,6 +2019,7 @@ pub fn compose(
     let pullback = Pullback {
         rings: ring_pullbacks,
         contacts: contact_pullbacks,
+        resonators: resonator_pullbacks,
         receiving: (receiving, matrix_of(map_gradient, width_r)?),
     };
     Ok((
@@ -2344,8 +2473,9 @@ pub struct CurvePoint {
 /// each deposit's released and stepped entries, the receiving windows whose source-to-receiver path
 /// was open at their cut against all windows read (the refine receipt's located cause, review C2),
 /// the peak bits of the change inside any word, the budget stop, the deadline, the description bits
-/// (`Field::describe`, the constitution's declared steps, budget and the pending capacity
-/// included), the located keys' bits (`⌈log₂ d_g⌉` per published key: the model pays for what
+/// (`Field::describe` plus the constitution's self-delimiting campaign-2 material declaration; the
+/// field code includes its declared steps, budget and pending capacity), the final resonator gains,
+/// the located keys' bits (`⌈log₂ d_g⌉` per published key: the model pays for what
 /// learning located) and `Kt = |describe| + key bits + L_target|model + ⌈log₂ work⌉` against the
 /// literal over the cells read, the work counted and the state against the source. The run is
 /// complete when it read the whole cut with no budget stop. Beside the readout, exterior, the host's
@@ -2369,6 +2499,9 @@ pub struct Exposure {
     pub deadline: Option<u64>,
     pub complete: bool,
     pub description_bits: u64,
+    /// Final scalar gains of declared resonators, in ring order (a constitutive reading, not an
+    /// event archive).
+    pub resonator_gains: Vec<(usize, [Rat; 4])>,
     pub key_bits: u64,
     pub kt: ExactInterval,
     pub literal_bits: u64,
@@ -2495,7 +2628,8 @@ pub struct WordReport {
 /// (the combined identity with the deposition work and the interconnection's defect, and the
 /// executed residual within its bound), the largest executed residual in magnitude with its bound,
 /// the deposition work summed over the commits with the largest in magnitude, and the
-/// interconnection's defect summed (the unloaded resonators' port work; zero without resonators).
+/// interconnection's defect summed (the resonator's port work plus the field's signed port term:
+/// zero when loaded, and the resonator's port work when unloaded).
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct WordBalances {
     pub formed: u64,
@@ -2791,6 +2925,29 @@ impl Reference {
             cut,
         )
     }
+
+    /// Run the same prequential protocol from a caller-declared initial constitution.
+    pub fn expose_with(
+        &self,
+        field: &Field,
+        cut: &Cut,
+        constitution: Constitution,
+    ) -> Result<Exposure, HnnError> {
+        let current = Current::at_rest(field);
+        let resident = self.mount_with(field, &current, constitution)?;
+        expose_from(
+            self,
+            &Declared {
+                steps: &self.steps,
+                budget: self.budget,
+                pending_capacity: self.pending_capacity,
+                deadline: self.deadline,
+            },
+            field,
+            cut,
+            resident,
+        )
+    }
 }
 
 /// [definition] **What an exposure reads of a port's resident** beside the port's own methods: the
@@ -2871,7 +3028,31 @@ where
             found: cut.cells.len(),
         });
     }
-    let mut resident = port.mount(field, &Current::at_rest(field))?;
+    let resident = port.mount(field, &Current::at_rest(field))?;
+    expose_from(port, declared, field, cut, resident)
+}
+
+/// Continue the standard exposure protocol from an already mounted resident.
+pub fn expose_from<P>(
+    port: &P,
+    declared: &Declared<'_>,
+    field: &Field,
+    cut: &Cut,
+    mut resident: P::Resident,
+) -> Result<Exposure, HnnError>
+where
+    P: ExecutionPort,
+    P::Resident: ExposedResident,
+{
+    if cut.cells.len() as u64 != field.population() {
+        return Err(HnnError::Shape {
+            what: "the cut's cells against the declared population",
+            expected: usize::try_from(field.population()).unwrap_or(usize::MAX),
+            found: cut.cells.len(),
+        });
+    }
+    let declared_physics = resident.constitution().describe_physics();
+    let declared_physics_bits = declared_physics.len() as u64;
     let phases = resident
         .admitted()
         .first()
@@ -3086,7 +3267,8 @@ where
     }
     let description_bits = field
         .describe(declared.steps, declared.budget, declared.pending_capacity)
-        .len() as u64;
+        .len() as u64
+        + declared_physics_bits;
     let key_bits: u64 = keys
         .iter()
         .map(|report| match &report.detail {
@@ -3138,6 +3320,7 @@ where
         stop,
         deadline,
         description_bits,
+        resonator_gains: resident.constitution().resonator_gains(),
         key_bits,
         kt,
         literal_bits: symbol * position as u64,

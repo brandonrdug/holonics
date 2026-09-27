@@ -75,6 +75,7 @@ namespace Holonics.HNN.Ring
 
 open Matrix
 open Holonics.HNN.Propagation
+open Holonics.HNN.Word
 open scoped BigOperators
 
 /-! ## 1. The Cayley tick keeps its declared storage form -/
@@ -250,6 +251,218 @@ theorem ring_tick_executed_energy_balance (C D K K' : E →L[ℝ] E)
     ring
   linear_combination hport + hpump
 
+/-! ## 2′. A loaded resonator in the ring's word-local port -/
+
+/-- [proved-derived; formal-checked] **The loaded resonator closes its port power exactly.** Its
+descriptor equation is the existing `ringOperator` solve with `e` as the already-computed element
+output. At the exact solve, the mode storage changes by the wave power it receives, less
+dissipation. -/
+theorem loaded_tick_port_balance (C D K : E →L[ℝ] E)
+    (hC : ∀ x y, inner ℝ (C x) y = inner ℝ x (C y))
+    (hK : ∀ x y, inner ℝ (K x) y = inner ℝ x (K y))
+    {Y h : ℝ} (hY : Y ≠ 0) (u w e ω : E)
+    (hsolve : ringOperator C D K Y h ω = ringRight C K h u w e) :
+    contactEnergy C K (u + h • ω) ((2 : ℝ) • ω - w) - contactEnergy C K u w +
+        h * inner ℝ ω (D ω) =
+      h * Y / 4 * (‖e‖ ^ 2 - ‖ringOut Y e ω‖ ^ 2) := by
+  have hp := ring_tick_port_balance C D K hC hK (h := h) hY u w e ω
+  rw [hsolve] at hp
+  simpa [ringOut, ringRight] using hp
+
+/-- [proved-derived; formal-checked] A change to capacity and stiffness at fixed state is exactly
+their deposition work. The stiffness here may include the pump block. -/
+theorem ring_material_commit_work (C K C' K' : E →L[ℝ] E)
+    (u w : E) :
+    contactEnergy C' K' u w - contactEnergy C K u w =
+      (1 / 2 : ℝ) * inner ℝ w ((C' - C) w) +
+        (1 / 2 : ℝ) * inner ℝ u ((K' - K) u) := by
+  simp only [contactEnergy, _root_.sub_apply, inner_sub_right]
+  ring
+
+/-- [proved-derived; formal-checked] **The loaded element–resonator stage is the existing element
+followed by the transient resonator.** If `e` is the existing element's output, the returned wave
+`s'` changes the field wave store by `hY/4 (‖s'‖²−‖b‖²)`. Adding the resonator's mode change and
+dissipation cancels its port transfer exactly, leaving the existing element's passive and contrast
+work. -/
+theorem loaded_word_stage_balance
+    {ρ : Type*} [Fintype ρ]
+    (Ws : E →L[ℝ] E) (A : ρ → E →L[ℝ] E) (σ : ρ → ℝ) (Wc : E →L[ℝ] E)
+    (hA : ∀ r v, inner ℝ v (A r v) = 0)
+    (C D K : E →L[ℝ] E)
+    (hC : ∀ x y, inner ℝ (C x) y = inner ℝ x (C y))
+    (hK : ∀ x y, inner ℝ (K x) y = inner ℝ x (K y))
+    {Y h : ℝ} (hY : Y ≠ 0) (b c u w e ω : E)
+    (hElement : ElementStep Ws A σ Wc b c e)
+    (hSolve : ringOperator C D K Y h ω = ringRight C K h u w e) :
+    h * Y / 4 * (‖ringOut Y e ω‖ ^ 2 - ‖b‖ ^ 2) +
+        contactEnergy C K (u + h • ω) ((2 : ℝ) • ω - w) - contactEnergy C K u w +
+        h * inner ℝ ω (D ω) =
+      h * Y / 2 * (inner ℝ (midpoint b e) (Ws (midpoint b e)) +
+        inner ℝ (midpoint b e) (Wc c)) := by
+  have he := reaction_stage_balance hA σ Wc hElement
+  have hr := loaded_tick_port_balance C D K hC hK hY u w e ω hSolve
+  linear_combination hr + (h * Y / 2) * he
+
+/-- [proved-derived; formal-checked] **The loaded tick's executed balance includes both carried
+state and returned-wave splits.** The exact wave returned by the resonator is `ringOut`; the
+consumer may carry a nearby state and wave. Their two energy differences and the descriptor-solve
+residual are reported explicitly, so the field/resonator interconnection still closes. -/
+theorem loaded_tick_executed_interconnection_balance (C D K K' : E →L[ℝ] E)
+    (hC : ∀ x y, inner ℝ (C x) y = inner ℝ x (C y))
+    (hK' : ∀ x y, inner ℝ (K' x) y = inner ℝ x (K' y))
+    {Y h : ℝ} (hY : Y ≠ 0) (u w e ω u' w' sOut : E) :
+    contactEnergy C K' u' w' - contactEnergy C K u w + h * inner ℝ ω (D ω) +
+        h * Y / 4 * (‖sOut‖ ^ 2 - ‖e‖ ^ 2) =
+      (1 / 2 : ℝ) * inner ℝ u ((K' - K) u) +
+        inner ℝ ω (ringOperator C D K' Y h ω - ringRight C K' h u w e) +
+        (contactEnergy C K' u' w' -
+          contactEnergy C K' (u + h • ω) ((2 : ℝ) • ω - w)) +
+        h * Y / 4 * (‖sOut‖ ^ 2 - ‖ringOut Y e ω‖ ^ 2) := by
+  have he := ring_tick_executed_energy_balance C D K K' hC hK' hY u w e ω u' w'
+    (h := h)
+  linear_combination he
+
+/-- [proved-derived; formal-checked] **The reverse loaded tick pairs with the exact local tangent.**
+For a state/input tangent obeying the differentiated descriptor solve, first solve the transposed
+descriptor system for `r̄`; the returned input and state covectors are exactly the listed pullback.
+The solve here is the exact adjoint. A carried adjoint chart has the separate residual owned by
+`HNN/LatticeWord`. -/
+theorem loaded_tick_adjoint_pairing
+    [CompleteSpace E] (C K M : E →L[ℝ] E) {h Y : ℝ}
+    (uBar' wBar' sBar' rBar : E)
+    (hAdj : ContinuousLinearMap.adjoint M rBar =
+      h • uBar' + (2 : ℝ) • wBar' - (2 / Y) • sBar')
+    {δu δw δe δω : E}
+    (hTangent : M δω = (2 : ℝ) • C δw + h • δe - h • K δu) :
+    inner ℝ uBar' (δu + h • δω) +
+        inner ℝ wBar' ((2 : ℝ) • δω - δw) +
+        inner ℝ sBar' (δe - (2 / Y) • δω) =
+      inner ℝ (uBar' - h • ContinuousLinearMap.adjoint K rBar) δu +
+        inner ℝ (-wBar' + (2 : ℝ) • ContinuousLinearMap.adjoint C rBar) δw +
+        inner ℝ (sBar' + h • rBar) δe := by
+  have hp := ContinuousLinearMap.adjoint_inner_left M δω rBar
+  rw [hAdj] at hp
+  rw [hTangent] at hp
+  simp only [inner_add_left, inner_add_right, inner_sub_left, inner_sub_right,
+    inner_smul_left, inner_smul_right, ContinuousLinearMap.adjoint_inner_left,
+    real_inner_comm, conj_trivial] at hp ⊢
+  simp only [real_inner_comm, inner_neg_right] at hp ⊢
+  linear_combination hp
+
+/-- [proved-derived; formal-checked] **Differentiate the descriptor equation in its materials.**
+Holding `(u,w,e)` fixed, differentiating `Mω = 2Cw + he − hKu` yields the displayed equation;
+collecting the rate terms gives the material-direction tangent used by the exact adjoint. -/
+theorem loaded_material_rate_tangent (M dC dD dK : E →L[ℝ] E) {h : ℝ}
+    (u w ω : E) {δω : E}
+    (hImplicit : M δω + (2 : ℝ) • dC ω + h • dD ω +
+      (h ^ 2 / 2) • dK ω = (2 : ℝ) • dC w - h • dK u) :
+    M δω = (2 : ℝ) • dC (w - ω) - h • dD ω -
+      h • dK (u + (h / 2) • ω) := by
+  let A := (2 : ℝ) • dC w - h • dK u
+  let B := (2 : ℝ) • dC ω + h • dD ω + (h ^ 2 / 2) • dK ω
+  have hplus : M δω + B = A := by simpa [A, B, add_assoc] using hImplicit
+  have hexpand : (2 : ℝ) • dC (w - ω) - h • dD ω -
+      h • dK (u + (h / 2) • ω) = A - B := by
+    simp only [map_sub, map_add, map_smul, A, B]
+    module
+  calc
+    M δω = (M δω + B) - B := by abel
+    _ = A - B := by rw [hplus]
+    _ = (2 : ℝ) • dC (w - ω) - h • dD ω -
+        h • dK (u + (h / 2) • ω) := hexpand.symm
+
+/-- [proved-derived; formal-checked] **The material directional derivative of a loaded tick.**
+Differentiating the actual descriptor equation, then applying its exact adjoint, pairs the output
+variation with `2 dC (w−ω) − h dD ω − h dK (u+hω/2)`. -/
+theorem loaded_tick_material_variation
+    [CompleteSpace E] (M dC dD dK : E →L[ℝ] E) {h Y : ℝ}
+    (u w ω uBar' wBar' sBar' rBar : E)
+    (hAdj : ContinuousLinearMap.adjoint M rBar =
+      h • uBar' + (2 : ℝ) • wBar' - (2 / Y) • sBar')
+    {δω : E}
+    (hImplicit : M δω + (2 : ℝ) • dC ω + h • dD ω +
+      (h ^ 2 / 2) • dK ω = (2 : ℝ) • dC w - h • dK u) :
+    inner ℝ uBar' (h • δω) + inner ℝ wBar' ((2 : ℝ) • δω) +
+        inner ℝ sBar' (-(2 / Y) • δω) =
+      inner ℝ rBar ((2 : ℝ) • dC (w - ω) - h • dD ω -
+        h • dK (u + (h / 2) • ω)) := by
+  have hp := ContinuousLinearMap.adjoint_inner_left M δω rBar
+  rw [hAdj, loaded_material_rate_tangent M dC dD dK u w ω hImplicit] at hp
+  simp only [inner_add_left, inner_add_right, inner_sub_left, inner_sub_right,
+    inner_smul_left, inner_smul_right, ContinuousLinearMap.adjoint_inner_left,
+    real_inner_comm, conj_trivial] at hp ⊢
+  linear_combination hp
+
+/-- [proved-derived; formal-checked] **Squared gain directions preserve the material chart.** For
+`A(g)=g² A₀`, the directional material change is `dA=2g·dg·A₀`; this is the exact chain factor
+used with `loaded_tick_material_variation` for each admitted scalar gain. -/
+theorem squared_gain_direction (g dg : ℝ) (A₀ : E →L[ℝ] E) :
+    (g + dg) ^ 2 • A₀ - g ^ 2 • A₀ = (2 * g * dg + dg ^ 2) • A₀ := by
+  rw [add_sq]
+  module
+
+/-- [proved-derived; formal-checked] The squared-gain variation has the stated derivative term and
+an exact quadratic remainder. This form keeps the first variation distinct from a finite update. -/
+theorem squared_gain_first_variation (g dg : ℝ) (A₀ : E →L[ℝ] E) :
+    ((g + dg) ^ 2 • A₀ - g ^ 2 • A₀) - (2 * g * dg) • A₀ = dg ^ 2 • A₀ := by
+  rw [add_sq]
+  module
+
+/-- [proved-derived; formal-checked] A squared scalar gain preserves positive semidefiniteness of
+its declared base form. -/
+theorem squared_gain_preserves_nonneg (g : ℝ) (A₀ : E →L[ℝ] E)
+    (hA : ∀ x, 0 ≤ inner ℝ x (A₀ x)) :
+    ∀ x, 0 ≤ inner ℝ x ((g ^ 2) • A₀ x) := by
+  intro x
+  have hg : 0 ≤ g ^ 2 := sq_nonneg g
+  simpa only [inner_smul_right, conj_trivial] using mul_nonneg hg (hA x)
+
+/-- [definition; agent-inferred] The capacity relation under its scalar amplitude gain. -/
+def gainedCapacity (gC : ℝ) (C₀ : E →L[ℝ] E) : E →L[ℝ] E := gC ^ 2 • C₀
+
+/-- [definition; agent-inferred] The dissipation relation under its scalar amplitude gain. -/
+def gainedDissipation (gD : ℝ) (D₀ : E →L[ℝ] E) : E →L[ℝ] E := gD ^ 2 • D₀
+
+/-- [definition; agent-inferred] Stiffness and pump are separate admitted amplitudes over immutable
+base relations; their powered contributions join as the tick's stiffness. -/
+def gainedStiffness (gK gP : ℝ) (K₀ P₀ : E →L[ℝ] E) : E →L[ℝ] E :=
+  gK ^ 2 • K₀ + gP ^ 2 • P₀
+
+/-- [proved-derived; formal-checked] Squared gains preserve positive semidefiniteness of the
+capacity and dissipation base forms. The stiffness/pump family remains its exact signed sum and is
+certified at every pump phase by `ResonatorMaterial::certify`; pump work is reported by the tick
+balance rather than treated as passive storage. -/
+theorem loaded_gains_preserve_storage_dissipation (gC gD : ℝ)
+    (C₀ D₀ : E →L[ℝ] E)
+    (hC : ∀ x, 0 ≤ inner ℝ x (C₀ x)) (hD : ∀ x, 0 ≤ inner ℝ x (D₀ x)) :
+    (∀ x, 0 ≤ inner ℝ x (gainedCapacity gC C₀ x)) ∧
+      ∀ x, 0 ≤ inner ℝ x (gainedDissipation gD D₀ x) := by
+  exact ⟨squared_gain_preserves_nonneg gC C₀ hC,
+    squared_gain_preserves_nonneg gD D₀ hD⟩
+
+/-- [proved-derived; formal-checked] **The gain family has the host's exact finite directional
+increment.** Each first-order term is `2g·δg` times its immutable base form, with the quadratic
+remainder kept explicitly. -/
+theorem loaded_gain_family_increment (gC gK gD gP dC dK dD dP : ℝ)
+    (C₀ K₀ D₀ P₀ : E →L[ℝ] E) :
+    (gainedCapacity (gC + dC) C₀ - gainedCapacity gC C₀ =
+      (2 * gC * dC + dC ^ 2) • C₀) ∧
+    (gainedDissipation (gD + dD) D₀ - gainedDissipation gD D₀ =
+      (2 * gD * dD + dD ^ 2) • D₀) ∧
+    (gainedStiffness (gK + dK) (gP + dP) K₀ P₀ - gainedStiffness gK gP K₀ P₀ =
+      (2 * gK * dK + dK ^ 2) • K₀ + (2 * gP * dP + dP ^ 2) • P₀) := by
+  refine ⟨?_, ?_, ?_⟩
+  · exact squared_gain_direction gC dC C₀
+  · exact squared_gain_direction gD dD D₀
+  · calc
+      gainedStiffness (gK + dK) (gP + dP) K₀ P₀ - gainedStiffness gK gP K₀ P₀ =
+          ((gK + dK) ^ 2 • K₀ - gK ^ 2 • K₀) +
+            ((gP + dP) ^ 2 • P₀ - gP ^ 2 • P₀) := by
+        simp only [gainedStiffness]
+        abel
+      _ = (2 * gK * dK + dK ^ 2) • K₀ + (2 * gP * dP + dP ^ 2) • P₀ := by
+        rw [squared_gain_direction gK dK K₀, squared_gain_direction gP dP P₀]
+
 omit [InnerProductSpace ℝ E] in
 theorem existsUnique_of_injective [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
     (M : E →L[ℝ] E) (hinj : ∀ v, M v = 0 → v = 0) : ∀ r, ∃! ω, M ω = r := by
@@ -300,6 +513,16 @@ theorem ring_cayley_denominator_nonsingular [FiniteDimensional ℝ E] (C D K : E
     have hc0 : inner ℝ v (C v) = 0 := by nlinarith
     have hk0 : inner ℝ v (K v) = 0 := by nlinarith
     linarith
+
+/-- [proved-derived; formal-checked] Under the ring owner's positive-semidefinite material and
+positive port/tick hypotheses, every loaded rate solve exists and is unique. -/
+theorem loaded_tick_solve_unique [FiniteDimensional ℝ E]
+    (C D K : E →L[ℝ] E)
+    (hC : ∀ v, 0 ≤ inner ℝ v (C v)) (hD : ∀ v, 0 ≤ inner ℝ v (D v))
+    (hK : ∀ v, 0 ≤ inner ℝ v (K v)) {Y h : ℝ} (hY : 0 < Y) (hh : 0 < h)
+    (u w e : E) : ∃! ω, ringOperator C D K Y h ω = ringRight C K h u w e := by
+  obtain ⟨_, hsolve⟩ := (ring_cayley_denominator_nonsingular C D K hC hD hK).1 hY hh
+  exact hsolve (ringRight C K h u w e)
 
 end Tick
 
@@ -450,6 +673,18 @@ section Audit
 #print axioms ring_descriptor_tick_conserves
 #print axioms ring_tick_port_balance
 #print axioms ring_tick_executed_energy_balance
+#print axioms loaded_tick_port_balance
+#print axioms loaded_tick_solve_unique
+#print axioms loaded_word_stage_balance
+#print axioms loaded_tick_executed_interconnection_balance
+#print axioms loaded_tick_adjoint_pairing
+#print axioms loaded_material_rate_tangent
+#print axioms loaded_tick_material_variation
+#print axioms squared_gain_direction
+#print axioms squared_gain_first_variation
+#print axioms squared_gain_preserves_nonneg
+#print axioms loaded_gains_preserve_storage_dissipation
+#print axioms loaded_gain_family_increment
 #print axioms ring_cayley_denominator_nonsingular
 #print axioms ring_harmonic_mode_singular
 #print axioms two_port_reference_balance

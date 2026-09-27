@@ -1396,12 +1396,14 @@ impl<'c> ResidentInverses<'c> {
 /// The resonators' entry in the image.
 pub const RESONATOR_ENTRY: &str = "hnn_resonator_word";
 
-/// [definition] **The resonators' plan** (campaign 2, `holonics::hnn::ring`, kernel
-/// `hnn_resonator_word`): every declared resonator's storage and pumped stiffnesses as dyadic
+/// [definition] **The standalone resonators' chart-check plan** (campaign 2,
+/// `holonics::hnn::ring`, kernel `hnn_resonator_word`): every declared resonator's storage and pumped stiffnesses as dyadic
 /// words at one exponent `L_m`, its executed charts (the host's certified lattice charts, at `L_c`),
 /// its row offset among the word's resonators, and the hop `h = 2^(e_h)`. It refuses what the card's
 /// dyadic words cannot carry: a hop that is not a nonnegative power of two, material off the
-/// dyadics, a word under the exact law (no chart), or charts of different exponents.
+/// dyadics, a word under the exact law (no chart), or charts of different exponents. The live
+/// resident word embeds these same C/K/X operands in `execute::WordPlan` and runs them inside its
+/// forward and reverse kernels.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ResonatorPlan {
     rings: Vec<usize>,
@@ -1409,13 +1411,18 @@ pub struct ResonatorPlan {
     phases: Vec<usize>,
     capacity: Vec<i64>,
     capacity_base: Vec<u64>,
+    dissipation: Vec<i64>,
+    dissipation_base: Vec<u64>,
     stiffness: Vec<i64>,
+    operators: Vec<i64>,
+    operator_base: Vec<u64>,
     charts: Vec<i64>,
     phase_base: Vec<u64>,
     row_base: Vec<u64>,
     rows: usize,
     e_h: u32,
     l_m: u32,
+    l_operator: u32,
     l_c: u32,
     l_w: u32,
 }
@@ -1455,13 +1462,16 @@ impl ResonatorPlan {
         let e_h = hop_exponent(hop).ok_or(refused("a resonator's hop that is 2^e, e ≥ 0"))?;
         let mut forms: Vec<&holonics::ratio::linear::ExactRatMatrix> = Vec::new();
         let mut stiffnesses = Vec::new();
+        let mut operators = Vec::new();
         for resonator in resonators {
             if resonator.hop() != hop {
                 return Err(refused("one hop for every resonator of a word"));
             }
             forms.push(resonator.material().forms().0);
+            forms.push(resonator.material().forms().2);
             for phase in 0..resonator.phases() {
                 stiffnesses.push(resonator.stiffness(phase).clone());
+                operators.push(resonator.operator(phase).clone());
             }
         }
         let l_m = common_exponent(
@@ -1471,19 +1481,28 @@ impl ResonatorPlan {
                 .chain(stiffnesses.iter().flat_map(|form| form.entries())),
             "a resonator's storage and stiffness on the dyadics",
         )?;
+        let l_operator = common_exponent(
+            operators.iter().flat_map(|form| form.entries()),
+            "a loaded resonator's operator on the dyadics",
+        )?;
         let mut plan = Self {
             rings: Vec::new(),
             widths: Vec::new(),
             phases: Vec::new(),
             capacity: Vec::new(),
             capacity_base: Vec::new(),
+            dissipation: Vec::new(),
+            dissipation_base: Vec::new(),
             stiffness: Vec::new(),
+            operators: Vec::new(),
+            operator_base: Vec::new(),
             charts: Vec::new(),
             phase_base: Vec::new(),
             row_base: Vec::new(),
             rows: 0,
             e_h,
             l_m,
+            l_operator,
             l_c: 0,
             l_w: transient,
         };
@@ -1498,11 +1517,29 @@ impl ResonatorPlan {
                 DyadicMatrix::at(resonator.material().forms().0, l_m, "a resonator's storage")?
                     .words,
             );
+            plan.dissipation_base.push(plan.dissipation.len() as u64);
+            plan.dissipation.extend(
+                DyadicMatrix::at(
+                    resonator.material().forms().2,
+                    l_m,
+                    "a resonator's dissipation",
+                )?
+                .words,
+            );
             plan.phase_base.push(plan.stiffness.len() as u64);
+            plan.operator_base.push(plan.operators.len() as u64);
             for phase in 0..resonator.phases() {
                 plan.stiffness.extend(
                     DyadicMatrix::at(resonator.stiffness(phase), l_m, "a resonator's stiffness")?
                         .words,
+                );
+                plan.operators.extend(
+                    DyadicMatrix::at(
+                        resonator.operator(phase),
+                        l_operator,
+                        "a loaded resonator's operator",
+                    )?
+                    .words,
                 );
                 let chart = resonator.chart_words(phase).ok_or(refused(
                     "a resonator's chart: the word runs on its lattices",
@@ -1533,15 +1570,56 @@ impl ResonatorPlan {
         &self.widths
     }
 
-    /// `(e_h, L_m, L_c, L_w)`.
-    pub fn exponents(&self) -> (u32, u32, u32, u32) {
-        (self.e_h, self.l_m, self.l_c, self.l_w)
+    /// `(e_h, L_m, L_operator, L_c, L_w)`.
+    pub fn exponents(&self) -> (u32, u32, u32, u32, u32) {
+        (self.e_h, self.l_m, self.l_operator, self.l_c, self.l_w)
     }
 
     /// Resonator `k`'s rows among the plan's.
     pub fn rows_of(&self, resonator: usize) -> core::ops::Range<usize> {
         let start = self.row_base[resonator] as usize;
         start..start + self.widths[resonator]
+    }
+
+    /// CUDA word-plan operands, in each resonator's declaration order. The loaded word embeds
+    /// these beside its junction/contact charts so the coupled tick can stay in one resident
+    /// forward/reverse launch.
+    pub(crate) fn execution_operands(
+        &self,
+    ) -> (
+        &[i64],
+        &[u64],
+        &[i64],
+        &[u64],
+        &[i64],
+        &[u64],
+        &[i64],
+        &[u64],
+        &[i64],
+        &[u64],
+    ) {
+        (
+            &self.capacity,
+            &self.capacity_base,
+            &self.dissipation,
+            &self.dissipation_base,
+            &self.stiffness,
+            &self.phase_base,
+            &self.operators,
+            &self.operator_base,
+            &self.charts,
+            &self.row_base,
+        )
+    }
+
+    /// Per-resonator declaration tables for the coupled word kernel.
+    pub(crate) fn execution_shape(&self) -> (&[usize], &[usize], usize, (u32, u32, u32, u32, u32)) {
+        (
+            &self.rings,
+            &self.widths,
+            self.rows,
+            (self.e_h, self.l_m, self.l_operator, self.l_c, self.l_w),
+        )
     }
 }
 
@@ -1703,105 +1781,4 @@ impl Card {
             remainders: self.fetch(&remainder)?,
         })
     }
-}
-
-/// [definition; agent-inferred] **A word's resonators on the card, read against the host's**
-/// (campaign 2; the port's refine, `crate::hnn::port`). The declared resonators of `rings` (in ring
-/// order) take their operands at the cut exactly as the host word does
-/// (`holonics::hnn::ring::ResonatorOperands::at_cut`, each pump phase's chart refined on the word's
-/// lattices), and their drives are the storage waves the card's word sent at each full tick
-/// (`crate::hnn::readout::storage_waves`). They tick resident (`hnn_resonator_word`, one launch for
-/// the word), and the host reads their balance from the same ticks, as it reads each tick's
-/// balance from the word's record (`crate::hnn::readout`: the terms pass the card's carrier): the
-/// host's steps over the same drives are the card's reading, and every tick's `(u, w, ω)` and each
-/// row's carried solve remainder at the end are checked equal to the card's record, a difference
-/// refused as a realization defect. Returns each resonator's balance
-/// (`holonics::hnn::ResonatorBalance`), the one the host reference's word releases.
-pub(crate) fn resonate(
-    card: &Card,
-    field: &holonics::hnn::Field,
-    constitution: &impl holonics::hnn::ConstitutionRead,
-    rings: &[usize],
-    drives: &[Vec<Vec<Rat>>],
-) -> Result<Vec<holonics::hnn::ResonatorBalance>, holonics::hnn::HnnError> {
-    use holonics::hnn::HnnError;
-    use holonics::hnn::ResonatorBalance;
-    use holonics::hnn::ring::{ResonatorOperands, ResonatorRemainders};
-    use holonics::hnn::word::Resonance;
-    use num_traits::Zero;
-    if rings.is_empty() {
-        return Ok(Vec::new());
-    }
-    let lattice = field.word_lattice().ok_or(crate::hnn::dyadic::refused(
-        "a resonator word on the card runs on the word's lattices",
-    ))?;
-    let transient = lattice.transient();
-    let operands = rings
-        .iter()
-        .map(|&g| {
-            let material = constitution
-                .ring_resonator(g)
-                .ok_or(HnnError::Realization {
-                    what: "a resonator declared on each ring the port resonates",
-                })?;
-            ResonatorOperands::at_cut(
-                g,
-                material,
-                field.ring(g).admittance(),
-                field.step(),
-                Some(lattice),
-            )
-        })
-        .collect::<Result<Vec<_>, HnnError>>()?;
-    // The host's reading: the same steps over the same drives.
-    let mut resonances: Vec<Resonance> = operands
-        .iter()
-        .map(|resonator| Resonance {
-            state: [
-                vec![Rat::zero(); resonator.width()],
-                vec![Rat::zero(); resonator.width()],
-            ],
-            remainders: ResonatorRemainders::default(),
-            steps: Vec::new(),
-        })
-        .collect();
-    for (tick, drive) in drives.iter().enumerate() {
-        for (k, (resonator, resonance)) in operands.iter().zip(resonances.iter_mut()).enumerate() {
-            let step = resonator.step(
-                tick,
-                &drive[k],
-                [&resonance.state[0], &resonance.state[1]],
-                &resonance.remainders,
-                Some(&transient),
-            )?;
-            resonance.state = step.state.clone();
-            resonance.remainders = step.remainders().clone();
-            resonance.steps.push(step);
-        }
-    }
-    // The card's resident ticks, checked against the reading.
-    let references: Vec<&ResonatorOperands> = operands.iter().collect();
-    let plan = ResonatorPlan::form(&references, lattice.transient_exponent())?;
-    let record = card
-        .resonator_word(&plan, drives)
-        .map_err(DeviceError::into_hnn)?;
-    let defect = || HnnError::Realization {
-        what: "the card's resonator ticks against the host's reading of them",
-    };
-    for (k, resonance) in resonances.iter().enumerate() {
-        for (tick, step) in resonance.steps.iter().enumerate() {
-            let (state, rate) = record.state(&plan, k, tick).map_err(|_| defect())?;
-            if state != step.state || rate != step.rate {
-                return Err(defect());
-            }
-        }
-        if !drives.is_empty() && record.remainders(&plan, k) != resonance.remainders.rate {
-            return Err(defect());
-        }
-    }
-    Ok(rings
-        .iter()
-        .zip(&resonances)
-        .map(|(&g, resonance)| ResonatorBalance::of(g, resonance))
-        .collect())
 }

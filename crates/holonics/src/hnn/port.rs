@@ -21,7 +21,7 @@
 //! | `locate_keys` | the fibres per ring, from the crib that closed the aeon | absent (discrete; the key covector is a reading) | the published ring clocks ([`Clock`] at the boundary, winding kept; none where a ring fell back) | the crib's edges | absent | fibres, orbits, failing loops, work |
 //! | `refine` | the wave's faces (the tree part needs each phase's address, read at compare) | absent (forward only) | absent | the moment's lift | the binding read | ticks, balances (each with its residual and certified bound), diamond, the released change, the charts' certificates, the released remainders |
 //! | `compare` | the [`HolonRatio`] on the combined faces (the tree's at each phase's causal address plus the wave's) | the complete [`Pullback`] | a [`Deposit`] (its landmark steps included) | the anchor's | the pending binding | KL, excess, winding, residual, loci, the return's released remainders, the tree face alone's code lengths |
-//! | `deposit` | the successor constitution | absent | the applied [`DepositReading`] | unchanged | absent | work, `ε_k` product, commit, bits against `B_Θ` |
+//! | `deposit` | the successor constitution | absent | the applied [`DepositReading`] | unchanged | absent | contact-storage `ε_k` product, commit, bits against `B_Θ` |
 //! | `release` | the released face, or a declared absence when the rule holds | absent | absent (FOUND is campaign 3's) | the anchor's | the pending binding | the width read from the receiving phases' fibres against the grain, the rule's decision, the RIDE/FOUND split |
 //! | `close_aeon` | the [`AeonBoundary`] (its collapse names the released loci and their remainders; the staged deposits it refuses) | the transpose of `V` per pending ratio, or its separator ([`Transpose`]) | absent (the released loci are the boundary's collapse) | the aeon readings | the admitted family | the boundary |
 //! | `discard` | the handle removed | absent | absent | unchanged | absent | bits freed |
@@ -87,7 +87,7 @@ use crate::holon::HolonError;
 use crate::holon::contact::FeatureCovector;
 use crate::navigator::Clock;
 use crate::ratio::linear::ExactRatMatrix;
-use crate::ratio::linear::vector::{dot, scale, sub};
+use crate::ratio::linear::vector::{add, dot, scale, sub};
 use crate::ratio::work::ExactWork;
 use crate::ratio::{Rat, integer};
 use crate::receiver::face::{DiameterNorm, ReceiverWidth, WidthWitness};
@@ -445,6 +445,7 @@ pub struct ContactPullback {
 pub struct Pullback {
     pub rings: Vec<RingPullback>,
     pub contacts: Vec<ContactPullback>,
+    pub resonators: Vec<ResonatorPullback>,
     pub receiving: (usize, ExactRatMatrix),
 }
 
@@ -728,9 +729,36 @@ pub struct WordReturn {
     pub opening: Vec<Vec<Rat>>,
     pub elements: Vec<Vec<ElementTick>>,
     pub transits: Vec<Vec<TransitTick>>,
+    /// Loaded resonator ticks, indexed by ring and ordered chronologically.
+    pub resonators: Vec<Vec<ResonatorTick>>,
     pub conductance: Vec<Rat>,
     pub reads: Vec<(Vec<Rat>, Vec<Rat>)>,
     pub released: Remainders,
+}
+
+/// One loaded resonator tick's material-free adjoint operands.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ResonatorTick {
+    pub ring: usize,
+    pub tick: usize,
+    pub phase: usize,
+    pub drive: Vec<Rat>,
+    pub displacement: Vec<Rat>,
+    pub velocity: Vec<Rat>,
+    pub rate: Vec<Rat>,
+    /// The transpose solve's RHS covector `r̄ = X̂ᵀ z̄`, carried on the word lattice.
+    pub solved: Vec<Rat>,
+    pub output: Vec<Rat>,
+}
+
+/// One resonator's four gain covectors, accumulated in its declared basis family.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ResonatorPullback {
+    pub ring: usize,
+    /// Loss gradients with respect to `(g_C,g_K,g_D,g_pump)`.
+    pub gains: [Rat; 4],
+    /// Exact feature energies used by the factor law.
+    pub energy: [Rat; 4],
 }
 
 impl<'c> Word<'c> {
@@ -771,6 +799,10 @@ struct Adjoint {
     displacement: Vec<Vec<Rat>>,
     rate: Vec<Vec<Rat>>,
     elements: Vec<Vec<Rat>>,
+    resonator_drive: Vec<Vec<Rat>>,
+    resonator_rate: Vec<Vec<Rat>>,
+    resonator_solve: Vec<Vec<Rat>>,
+    resonator_state: Vec<Option<[Vec<Rat>; 2]>>,
     zetas: Vec<Vec<Rat>>,
     solved: Vec<Vec<Rat>>,
     /// The receiving anchor's covector `P^(−τ)Rᵀg_j`, the return's source, carried from epoch to
@@ -786,6 +818,15 @@ impl Adjoint {
                 .chain(&self.displacement)
                 .chain(&self.rate)
                 .chain(&self.elements)
+                .chain(&self.resonator_drive)
+                .chain(&self.resonator_rate)
+                .chain(&self.resonator_solve)
+                .chain(
+                    self.resonator_state
+                        .iter()
+                        .filter_map(Option::as_ref)
+                        .flatten(),
+                )
                 .chain(&self.zetas)
                 .chain(&self.solved)
                 .chain(std::iter::once(&self.reads))
@@ -798,6 +839,9 @@ impl Adjoint {
 /// One element's reverse step: its wave and contrast covectors, its tick, and its adjoint's next
 /// remainder.
 type ElementReverse = (Vec<Rat>, Vec<Rat>, ElementTick, Vec<Rat>);
+
+/// A loaded resonator's return to its element drive and preceding mode state.
+type ResonatorReverse = (Vec<Rat>, [Vec<Rat>; 2], ResonatorTick, [Vec<Rat>; 5]);
 
 /// One transit's reverse step: its two ends' outgoing covectors, its previous state covectors, its
 /// conductance term, its tick and its three next remainders (`ζ̄`, `r̄`, and the state's pair).
@@ -882,13 +926,35 @@ fn reverse(
         displacement: displacement_bar.clone(),
         rate: rate_bar.clone(),
         elements: storage_bar.clone(),
+        resonator_drive: storage_bar.clone(),
+        resonator_rate: storage_bar.clone(),
+        resonator_solve: storage_bar.clone(),
+        resonator_state: operands
+            .resonators()
+            .iter()
+            .map(|resonator| {
+                resonator
+                    .as_ref()
+                    .map(|r| [zeros(r.width()), zeros(r.width())])
+            })
+            .collect(),
         zetas: displacement_bar.clone(),
         solved: displacement_bar.clone(),
         reads: zeros(widths[receiving]),
     };
     let mut conductance = vec![Rat::zero(); contacts.len()];
     let mut elements: Vec<Vec<ElementTick>> = vec![Vec::new(); rings.len()];
+    let mut resonator_ticks: Vec<Vec<ResonatorTick>> = vec![Vec::new(); rings.len()];
     let mut transits: Vec<Vec<TransitTick>> = vec![Vec::new(); contacts.len()];
+    let mut resonator_state_bar: Vec<Option<[Vec<Rat>; 2]>> = operands
+        .resonators()
+        .iter()
+        .map(|resonator| {
+            resonator
+                .as_ref()
+                .map(|r| [zeros(r.width()), zeros(r.width())])
+        })
+        .collect();
     for t in (0..steps).rev() {
         let record = &records[t];
         // The step's junctions, read from its own record at the anchors the word carried: the
@@ -917,14 +983,97 @@ fn reverse(
             })
             .collect();
         let (mut displacement_prev, mut rate_prev) = (displacement_bar.clone(), rate_bar.clone());
+        let mut resonator_state_prev = resonator_state_bar.clone();
         if t + 1 < steps {
-            // Each element's reverse step reads only its own storage covector and remainder
-            // through its executed solve's transpose, and writes only its own slot: the rings run
-            // together.
+            // Reverse the loaded storage-port stage first. Its drive covector then enters the
+            // element transpose, so the junction and contact receive the complete loaded path.
+            let loaded = indexed(rings.len(), |r| {
+                let Some(resonator) = operands.resonators()[r].as_ref() else {
+                    return Ok::<Option<ResonatorReverse>, HnnError>(None);
+                };
+                let trajectory = word.resonances()[r].as_ref().ok_or(HnnError::Realization {
+                    what: "a declared resonator trajectory in the word",
+                })?;
+                let step = trajectory
+                    .steps
+                    .get(t)
+                    .ok_or(HnnError::WordEnded { ticks: steps })?;
+                let state_bar = resonator_state_prev[r].as_ref().ok_or(HnnError::Shape {
+                    what: "loaded resonator state covectors",
+                    expected: 1,
+                    found: 0,
+                })?;
+                let z_image = entries(widths[r], |i| {
+                    &h * &state_bar[0][i] + integer(2) * &state_bar[1][i]
+                        - integer(2) / resonator.admittance() * &storage_bar[r][i]
+                });
+                let (zbar, zbar_remainder) =
+                    split(lattice.as_ref(), z_image, &carried.resonator_rate[r]);
+                let image = resonator.solve_transpose(step.phase, &zbar)?;
+                let (solved, solved_remainder) =
+                    split(lattice.as_ref(), image, &carried.resonator_solve[r]);
+                let drive_image = entries(widths[r], |i| &storage_bar[r][i] + &h * &solved[i]);
+                let (drive, drive_remainder) =
+                    split(lattice.as_ref(), drive_image, &carried.resonator_drive[r]);
+                let capacity = resonator.material().forms().0;
+                let stiffness = resonator.stiffness(step.phase);
+                let u_image = sub(&state_bar[0], &scale(&h, &apply_rows(stiffness, &solved)?));
+                let w_image = add(
+                    &scale(&integer(-1), &state_bar[1]),
+                    &scale(&integer(2), &apply_rows(capacity, &solved)?),
+                );
+                let (u_bar, u_remainder) = split(
+                    lattice.as_ref(),
+                    u_image,
+                    &carried.resonator_state[r].as_ref().expect("declared state")[0],
+                );
+                let (w_bar, w_remainder) = split(
+                    lattice.as_ref(),
+                    w_image,
+                    &carried.resonator_state[r].as_ref().expect("declared state")[1],
+                );
+                Ok(Some((
+                    drive,
+                    [u_bar, w_bar],
+                    ResonatorTick {
+                        ring: r,
+                        tick: t,
+                        phase: step.phase,
+                        drive: step.drive.clone(),
+                        displacement: step.input[0].clone(),
+                        velocity: step.input[1].clone(),
+                        rate: step.rate.clone(),
+                        solved: solved.clone(),
+                        output: step.output.clone(),
+                    },
+                    [
+                        zbar_remainder,
+                        solved_remainder,
+                        drive_remainder,
+                        u_remainder,
+                        w_remainder,
+                    ],
+                )))
+            })?;
+            let mut element_output_bar = storage_bar.clone();
+            for (r, item) in loaded.into_iter().enumerate() {
+                if let Some((drive, state, tick, [z, solved, drive_rem, u, w])) = item {
+                    element_output_bar[r] = drive;
+                    resonator_state_prev[r] = Some(state);
+                    resonator_ticks[r].push(tick);
+                    carried.resonator_rate[r] = z;
+                    carried.resonator_solve[r] = solved;
+                    carried.resonator_drive[r] = drive_rem;
+                    carried.resonator_state[r] = Some([u, w]);
+                }
+            }
+            resonator_state_bar = resonator_state_prev.clone();
+            // Each element's reverse step reads the covector on its executed output and remainder
+            // through its chart transpose, then writes only its own junction slot.
             let reversed = indexed(rings.len(), |r| {
-                let image = rings[r].solve_transpose(&storage_bar[r])?;
+                let image = rings[r].solve_transpose(&element_output_bar[r])?;
                 let (adjoint, remainder) = split(lattice.as_ref(), image, &carried.elements[r]);
-                let wave = sub(&scale(&integer(2), &adjoint), &storage_bar[r]);
+                let wave = sub(&scale(&integer(2), &adjoint), &element_output_bar[r]);
                 let contrast = rings[r].contrast_transpose(&adjoint);
                 Ok::<ElementReverse, HnnError>((
                     wave,
@@ -1161,10 +1310,14 @@ fn reverse(
     for ticks in &mut transits {
         ticks.reverse();
     }
+    for ticks in &mut resonator_ticks {
+        ticks.reverse();
+    }
     Ok(WordReturn {
         opening: storage_bar,
         elements,
         transits,
+        resonators: resonator_ticks,
         conductance,
         reads,
         released: carried.released(),

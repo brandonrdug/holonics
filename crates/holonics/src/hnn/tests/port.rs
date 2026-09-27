@@ -6,20 +6,23 @@
 //! stored per-tick waves, the sanctioned realization; no checkpoint scheme is built.
 
 use num_bigint::BigInt;
-use num_traits::{One, Zero};
+use num_traits::{One, Signed, Zero};
 
 use super::learning::{chain, chain_with, generic, moment, pairing, phases};
 use super::support::Draw;
 use crate::hnn::HnnError;
-use crate::hnn::constitution::{Constitution, Steps};
+use crate::hnn::constitution::{Constitution, FactorGradient, Locus, Steps};
 use crate::hnn::field::{ConstitutionRead, Current, End, Field};
 use crate::hnn::moment::PairPort;
 use crate::hnn::pending::PendingRatio;
-use crate::hnn::port::{ExecutionPort, Handle, Pullback, ReceiptDetail, Transpose, WordReturn};
+use crate::hnn::port::{
+    Deposit, ExecutionPort, Handle, Pullback, ReceiptDetail, Transpose, WordReturn,
+};
 use crate::hnn::propagation::{Operands, contact_exponent, element_step, junction_swing, transit};
 use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector, TargetPhases, target_phases};
 use crate::hnn::receiving::ActiveAddress;
 use crate::hnn::reference::{Reference, compose, one_hot};
+use crate::hnn::ring::ResonatorMaterial;
 use crate::hnn::word::Word;
 use crate::ratio::exponentiated::power_of_two;
 use crate::ratio::linear::ExactRatMatrix;
@@ -170,6 +173,7 @@ struct Cut {
     pending: PendingRatio,
     covector: RatioCovector,
     pullback: Pullback,
+    deposit: Deposit,
     back: WordReturn,
     /// `J(θ)` at the cut's own constitution.
     base: Rat,
@@ -210,7 +214,7 @@ fn cut_at(field: Field, theta: Constitution) -> Cut {
             &phases,
         )
         .unwrap();
-    let (pullback, _) = compose(&field, &theta, &pending, &back, &targets, &[]).unwrap();
+    let (pullback, deposit) = compose(&field, &theta, &pending, &back, &targets, &[]).unwrap();
     let base = pairing(covector.logits(), &faces_logits);
     Cut {
         field,
@@ -218,10 +222,92 @@ fn cut_at(field: Field, theta: Constitution) -> Cut {
         pending,
         covector,
         pullback,
+        deposit,
         back,
         base,
         operands,
     }
+}
+
+/// A real comparison composes loaded resonator gain steps, and applying only that reached material
+/// return changes the same pending ratio's next receiving logits.
+#[test]
+fn loaded_comparison_composes_a_gain_deposit_that_changes_next_logits() {
+    let field = chain().with_exact_word();
+    let width_receiver = field.ring(2).width();
+    let mut draw = Draw::new(67);
+    let receiving = draw.half_matrix(2 * field.alphabet(), width_receiver);
+    let width = field.ring(0).width();
+    let material = ResonatorMaterial::new(
+        ExactRatMatrix::identity(width)
+            .unwrap()
+            .scaled(&integer(16)),
+        ExactRatMatrix::zero(width, width).unwrap(),
+        ExactRatMatrix::zero(width, width).unwrap(),
+        None,
+    )
+    .unwrap();
+    let declare = |factor: Rat| {
+        Constitution::initial(
+            &field,
+            Steps {
+                proxy: Rat::one(),
+                factor,
+            },
+            1 << 40,
+        )
+        .unwrap()
+        .with_ports(2, None, None, Some(receiving.clone()))
+        .unwrap()
+        .with_ring_resonator(&field, 0, material.clone())
+        .unwrap()
+    };
+    let coarse = cut_at(field.clone(), declare(Rat::one()));
+    let seed_step = coarse
+        .deposit
+        .factors()
+        .iter()
+        .find(|step| matches!(&step.gradient, FactorGradient::Resonator { family: 0, .. }))
+        .unwrap();
+    let FactorGradient::Resonator { gradient, .. } = &seed_step.gradient else {
+        unreachable!()
+    };
+    let unit = coarse.theta.lattice(Locus::Resonator(0)).unwrap().unit();
+    // Choose a declared factor rate whose actual composed gradient moves several lattice units.
+    let factor_rate = integer(4) * unit * (Rat::one() + &seed_step.energy) / gradient.abs();
+    let cut = cut_at(field.clone(), declare(factor_rate));
+    let pulled = cut
+        .pullback
+        .resonators
+        .iter()
+        .find(|pullback| pullback.ring == 0)
+        .expect("the comparison reached ring 0's resonator");
+    assert!(pulled.gains[0] != Rat::zero());
+    let factors: Vec<_> = cut
+        .deposit
+        .factors()
+        .iter()
+        .filter(|step| matches!(&step.gradient, FactorGradient::Resonator { ring: 0, .. }))
+        .cloned()
+        .collect();
+    assert!(!factors.is_empty());
+    assert!(
+        factors
+            .iter()
+            .any(|step| { matches!(&step.gradient, FactorGradient::Resonator { family: 0, .. }) })
+    );
+    let isolated = Deposit::new(
+        cut.theta.commit(),
+        Vec::new(),
+        factors,
+        vec![Locus::Resonator(0)],
+    );
+    let (successor, deposit_reading) = cut.theta.deposited(&isolated).unwrap();
+    assert!(deposit_reading.stepped > 0);
+    assert_ne!(successor.resonator_gains(), cut.theta.resonator_gains());
+    let (_, before) = cut.pending.read(&cut.field, &cut.theta).unwrap();
+    let (_, after) = cut.pending.read(&cut.field, &successor).unwrap();
+    assert_ne!(before.logits, after.logits);
 }
 
 /// The chain's cut at a generic constitution, built once and shared by the pullback's laws.
@@ -232,6 +318,67 @@ fn cut() -> &'static Cut {
         let theta = generic(&field, 65);
         cut_at(field, theta)
     })
+}
+
+/// The loaded reverse carries the two-state mode adjoint across several ticks and contracts its
+/// C gain covector against the exact input-output derivative. The finite difference holds the
+/// loss covector fixed, as the constitutive pullback does.
+#[test]
+fn loaded_resonator_reverse_carries_state_and_matches_the_c_gain_direction() {
+    let field = chain().with_exact_word();
+    let mut theta = generic(&field, 65);
+    let width = field.ring(0).width();
+    let material = ResonatorMaterial::new(
+        ExactRatMatrix::identity(width).unwrap(),
+        ExactRatMatrix::zero(width, width).unwrap(),
+        ExactRatMatrix::zero(width, width).unwrap(),
+        None,
+    )
+    .unwrap();
+    theta = theta
+        .with_ring_resonator(&field, 0, material.clone())
+        .unwrap();
+    let cut = cut_at(field.clone(), theta.clone());
+    let ticks = &cut.back.resonators[0];
+    assert!(
+        ticks.len() >= 2,
+        "the receiver's adjoint traverses multiple loaded ticks"
+    );
+    assert!(
+        ticks
+            .iter()
+            .any(|tick| tick.displacement.iter().any(|x| !x.is_zero()))
+    );
+    let gains = cut
+        .pullback
+        .resonators
+        .iter()
+        .find(|pullback| pullback.ring == 0)
+        .expect("ring 0's loaded material was reached");
+    assert!(!gains.gains[0].is_zero());
+
+    let epsilon = rat(1, 4096);
+    let perturbed = |offset: Rat| {
+        let mut values = material.gains().clone();
+        values[0] += offset;
+        let candidate = material.with_gains(values).unwrap();
+        theta
+            .clone()
+            .with_ring_resonator(&field, 0, candidate)
+            .unwrap()
+    };
+    let plus_theta = perturbed(epsilon.clone());
+    let minus_theta = perturbed(-epsilon.clone());
+    let plus = cut.functional_of(&cut.pending, &plus_theta);
+    let minus = cut.functional_of(&cut.pending, &minus_theta);
+    let directional = (plus - minus) / (integer(2) * epsilon.clone());
+    assert!(
+        (&directional - &gains.gains[0]).abs() < epsilon,
+        "centered exact-rational difference quotient: {directional:?}; adjoint: {:?}",
+        gains.gains[0]
+    );
+    let tangent = tangent(&cut, (&cut.field, &plus_theta), (&cut.field, &minus_theta)) / epsilon;
+    assert_eq!(tangent, gains.gains[0]);
 }
 
 impl Cut {
@@ -324,6 +471,16 @@ fn tangent(cut: &Cut, plus: (&Field, &Constitution), minus: (&Field, &Constituti
         .map(|contact| [zeros(contact.width()), zeros(contact.width())])
         .collect();
     let mut d_states = states.clone();
+    let mut mode_states: Vec<Option<[Vec<Rat>; 2]>> = ops
+        .resonators()
+        .iter()
+        .map(|resonator| {
+            resonator
+                .as_ref()
+                .map(|r| [zeros(r.width()), zeros(r.width())])
+        })
+        .collect();
+    let mut d_mode_states = mode_states.clone();
     let d_element: Vec<ExactRatMatrix> = (0..rings.len())
         .map(|r| central(up.rings()[r].element(), down.rings()[r].element()))
         .collect();
@@ -336,6 +493,18 @@ fn tangent(cut: &Cut, plus: (&Field, &Constitution), minus: (&Field, &Constituti
                 (up.contacts()[a].forms(), down.contacts()[a].forms());
             [central(cp, cm), central(kp, km), central(dp, dm)]
         })
+        .collect();
+    let d_resonator_forms: Vec<Option<[ExactRatMatrix; 2]>> = (0..rings.len())
+        .map(
+            |r| match (up.resonators()[r].as_ref(), down.resonators()[r].as_ref()) {
+                (Some(up), Some(down)) => {
+                    let (up_c, _, up_d) = up.material().forms();
+                    let (down_c, _, down_d) = down.material().forms();
+                    Some([central(up_c, down_c), central(up_d, down_d)])
+                }
+                _ => None,
+            },
+        )
         .collect();
     let d_conductance: Vec<Rat> = (0..contacts.len())
         .map(|a| (up.contacts()[a].conductance() - down.contacts()[a].conductance()) * &half)
@@ -423,8 +592,73 @@ fn tangent(cut: &Cut, plus: (&Field, &Constitution), minus: (&Field, &Constituti
                     &apply(&d_contrast[r], &junction.contrast),
                 ),
             );
-            d_storage[r] = apply(&left[r], &rhs);
-            storage[r] = step.next;
+            let element_output_tangent = apply(&left[r], &rhs);
+            if let (
+                Some(resonator),
+                Some(up_resonator),
+                Some(down_resonator),
+                Some(state),
+                Some(d_state),
+            ) = (
+                ops.resonators()[r].as_ref(),
+                up.resonators()[r].as_ref(),
+                down.resonators()[r].as_ref(),
+                mode_states[r].as_ref(),
+                d_mode_states[r].as_ref(),
+            ) {
+                let phase = resonator.phase_at(t);
+                let driven = resonator
+                    .step(
+                        t,
+                        &step.next,
+                        [&state[0], &state[1]],
+                        &crate::hnn::ring::ResonatorRemainders::default(),
+                        None,
+                    )
+                    .unwrap();
+                let [d_c, d_d] = d_resonator_forms[r].as_ref().unwrap();
+                let d_k = central(
+                    up_resonator.stiffness(phase),
+                    down_resonator.stiffness(phase),
+                );
+                let (capacity, _, _) = resonator.material().forms();
+                let stiffness = resonator.stiffness(phase);
+                let d_operator = d_c
+                    .scaled(&two)
+                    .add(&d_d.scaled(&h))
+                    .unwrap()
+                    .add(&d_k.scaled(&(&h * &h / &two)))
+                    .unwrap();
+                let d_right = add(
+                    &add(
+                        &add(
+                            &scale(&two, &apply(capacity, &d_state[1])),
+                            &scale(&h, &element_output_tangent),
+                        ),
+                        &scale(&-h.clone(), &apply(stiffness, &d_state[0])),
+                    ),
+                    &add(
+                        &scale(&two, &apply(d_c, &state[1])),
+                        &scale(&-h.clone(), &apply(&d_k, &state[0])),
+                    ),
+                );
+                let d_rate = resonator
+                    .solve(phase, &sub(&d_right, &apply(&d_operator, &driven.rate)))
+                    .unwrap();
+                d_storage[r] = sub(
+                    &element_output_tangent,
+                    &scale(&(integer(2) / rings[r].admittance()), &d_rate),
+                );
+                storage[r] = driven.output;
+                d_mode_states[r] = Some([
+                    add(&d_state[0], &scale(&h, &d_rate)),
+                    sub(&scale(&two, &d_rate), &d_state[1]),
+                ]);
+                mode_states[r] = Some(driven.state);
+            } else {
+                d_storage[r] = element_output_tangent;
+                storage[r] = step.next;
+            }
         }
         for (a, contact) in contacts.iter().enumerate() {
             let (from, to) = contact.ends();

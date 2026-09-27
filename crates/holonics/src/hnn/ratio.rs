@@ -35,12 +35,13 @@
 //! continuous across it (`2^n · 2 = 2^(n+1) · 1`), monotone in the logit, and rational. Its
 //! magnitude part is `p̃ − q` with `p̃_c ∝ 2^(n_c)(L + k_c)`; its phase part is `−½ q_c Δ_c` on
 //! `Im f_c` (`−q_c Δ_c` on `φ^H_c = Im f_c / 2`). It is not the face's derivative (the face is
-//! constant on each grain cell, so its own derivative vanishes almost everywhere). It is a strict
-//! descent direction of the scored code length, whose logit gradient is `p̂ − q`:
+//! constant on each grain cell, so its own derivative vanishes almost everywhere). The pairing
 //! `⟨p̂ − q, p̃ − q⟩ = Σ_(c≠t) p̂_c p̃_c + (1 − p̂_t)(1 − p̃_t) > 0` (Lean
-//! `HNN/Ratio.odometer_covector_descends`). At an integer cell (`k = 0`) the chart is the face
-//! (`odometer_eq_face_at_integer_cells`), and at `L = 1` the two agree everywhere; elsewhere its
-//! weights lie within the factor `max_x (1 + x)/2^x ≈ 1.0615` of the face's, a reading. The face
+//! `HNN/Ratio.odometer_covector_descends`) makes `−(p̃ − q)` a descent direction for the smooth
+//! softmax score evaluated at the grain representative. It proves no strict decrease of the
+//! quantized score: a step inside the same grain cells leaves that score unchanged. At an integer
+//! cell (`k = 0`) the chart is the face (`odometer_eq_face_at_integer_cells`), and at `L = 1` the
+//! two agree everywhere; elsewhere the weight ratio is at most `2/(e ln 2)`.
 //! `p̂` that is read, reported and scored stays exact in `ℚ(θ)`.
 //!
 //! | Lean `HNN/Ratio` | Rust |

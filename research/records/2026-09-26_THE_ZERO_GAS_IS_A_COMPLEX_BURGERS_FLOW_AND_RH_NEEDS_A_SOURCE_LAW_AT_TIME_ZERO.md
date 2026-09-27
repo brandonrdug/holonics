@@ -22,9 +22,10 @@ bound is half the square of the greatest off-seam height.
 
 ## 2. Four exact readings in the objects
 
-1. **The ear and its blur** [derived: a functional-calculus corollary of `seamTimes_eq_Ici`;
+1. **The ear and its blur** [derived at the symbol and bounded-truncation levels;
+   the unbounded-operator construction and its Bochner identity are open, as §5 states;
    direction corrected the same day].
-   - The seam times use `heatE(−τ) ξ = ∫ e^(τu²) e^((s−½)u) Φ(u) du` (`DeBruijnSeal`). So the operator
+   - The seam times use `heatE(−τ) ξ = ∫ e^(τu²) e^((s−½)u) Φ(u) du` (`DeBruijnSeal`). The proposed unbounded-operator reading
      at seam time `τ` is `G_τ(∂_c) = ∫ e^(τu²) Φ(u) e^((∂_c − ½)u) du`: the palette of scale
      shifts `Φ`, reweighted by a Gaussian.
    - Along the seam (`s = ½ + iz`), weighting the palette by `e^(τu²)` is the Gaussian

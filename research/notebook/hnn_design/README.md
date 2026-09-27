@@ -445,3 +445,27 @@ command first, then the card's, back to back.
   full cut ran before a word's operands crossed as its weights only (its chart slots are gathered on
   the card), which moves less a word (the saving in octets: exact reading owed; rerun): 220 → 183
   kB a window at `windows 24`.
+
+## Loaded resonator comparison (Decision 38)
+
+The exposure now accepts `resonator source` (default `resonator none`). It declares one loaded
+resonator on source ring 0: the ring's unit parametron supplies C/K, D is the campaign's initial
+passive rate I/4, no pump is declared, and the scalar material amplitudes start at 1. The same
+exposure protocol scores the faces before their deposits and charges the initial material.
+No value is selected by this passage. The standing cut remains development material.
+
+Run a `2⁵`-window development pilot first. Admit the full passage only if its exact wall-time
+projection fits ten minutes per realization; a deadline or refusal is an incomplete receipt.
+Run the GPU work alone under the repository lock after the law suites.
+
+```sh
+cargo run --release -p holonics --example hnn_exposure -- cut-file .local/cuts/standing-real-cut-campaign-1.bin cells all windows 32 resonator source
+flock .local/gpu.lock cargo run --release -p holonics-cuda --example hnn_exposure -- cut-file .local/cuts/standing-real-cut-campaign-1.bin cells all windows 32 realization card resonator source
+# after each realization passes its cost projection, omit `windows 32` for its full passage
+```
+
+[Decision 38's receipt](../../records/2026-09-26_THE_RESONATOR_RETURNS_ITS_WAVE_AND_THE_COMPARISON_REACHES_ITS_MATERIAL.md)
+records exact host/card agreement over the full passage. The loaded family loses to the default
+HNN on development and scored-tail cells, before its extra material description, so
+`resonator none` remains the default. The final dissipation amplitude is `273/256`. Its loaded
+power balance and reached covectors establish the consumer needed by campaign 3.

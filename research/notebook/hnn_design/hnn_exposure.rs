@@ -34,7 +34,8 @@
 //! bits; `held-out H` declares a tail of `H` cells instead. A cut file's is its manifest's range
 //! (above). Prequential (Decision 29): its targets are compared at the standing before their
 //! own deposit and then deposited, as every baseline counts them after scoring; "held out" means
-//! that no design choice was made on them, and no crib reads them (review D1).
+//! their score precedes their own deposit. This development cut has been reused for design;
+//! the separate evaluation partition remains unspent. A crib reads only cells already scored.
 //!
 //! [definition] **The deadline** `windows K` ends the reading after `K` receiving windows
 //! (`Reference::with_deadline`). The cut is still the whole declared population, so the `n*` guard
@@ -51,6 +52,11 @@
 //! ```sh
 //! cargo run --release -p holonics-cuda --example hnn_exposure -- cut-file .local/cuts/standing-real-cut-campaign-1.bin cells all realization card
 //! ```
+//!
+//! Decision 38 adds `resonator source`: one predeclared loaded resonator on source ring 0,
+//! with its unit parametron's C/K, the campaign's passive rate D=I/4, no pump and all scalar
+//! amplitudes initially 1. `resonator none` is the default. Both paths use the same exposure
+//! protocol and charge the initial material declaration.
 //!
 //! The card's readout is the host's line for line but for the realization's line, the wall times
 //! and, beside them, what crossed the bus (`holonics_cuda::hnn::Traffic`).
@@ -115,9 +121,12 @@ use holonics::compression::cost::ceil_log2;
 use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
 use holonics::hnn::port::{ExecutionPort, ReceiptDetail};
 use holonics::hnn::reference::{Bits, KeyReport, PPM_ORDER};
-use holonics::hnn::{AeonBoundary, Cut, Exposure, Field, FieldDeclaration, Reference, Steps};
-use holonics::ratio::Rat;
+use holonics::hnn::{
+    AeonBoundary, Constitution, Cut, Exposure, Field, FieldDeclaration, Reference,
+    ResonatorMaterial, Steps,
+};
 use holonics::ratio::algebraic::ExactInterval;
+use holonics::ratio::{Rat, rat};
 use holonics::receiver::reception::Component;
 use num_bigint::{BigInt, BigUint};
 use num_traits::One;
@@ -187,6 +196,7 @@ fn main() {
         (None, None, None);
     let mut cut_file: Option<String> = None;
     let mut realization = String::from("host");
+    let mut loaded = false;
     for pair in arguments.chunks(2) {
         match pair {
             [key, value] if key == "cells" => cells = Some(value.clone()),
@@ -194,6 +204,9 @@ fn main() {
                 held_out = Some(value.parse().expect("a held-out tail in cells"));
             }
             [key, value] if key == "cut-file" => cut_file = Some(value.clone()),
+            [key, value] if key == "resonator" && (value == "source" || value == "none") => {
+                loaded = value == "source";
+            }
             [key, value] if key == "windows" => {
                 deadline = Some(value.parse().expect("a deadline in windows"));
             }
@@ -202,7 +215,7 @@ fn main() {
             }
             _ => {
                 println!(
-                    "usage: hnn_exposure [cut-file <path>] [cells <N|all>] [held-out <cells>] [windows <deadline>] [realization <host|card>]"
+                    "usage: hnn_exposure [cut-file <path>] [cells <N|all>] [held-out <cells>] [windows <deadline>] [realization <host|card>] [resonator <none|source>]"
                 );
                 return;
             }
@@ -264,11 +277,25 @@ fn main() {
         Some(windows) => Reference::campaign_one().with_deadline(windows),
         None => Reference::campaign_one(),
     };
+    let constitution = loaded.then(|| loaded_constitution(&field));
     let setup = setup.elapsed().as_millis();
-
     let aperture = field.receivers()[0].aperture;
     let steps = Steps::campaign_one();
     println!("hnn_exposure: campaign 1's declared field over {source}");
+    println!(
+        "resonator: {}",
+        if loaded {
+            "Decision 38: source ring 0; C/K from its unit parametron, D = I/4 as the initial passive rate; no pump; learned scalar amplitudes initially 1"
+        } else {
+            "none (campaign 1)"
+        }
+    );
+    if let Some(initial) = &constitution {
+        println!(
+            "additional declared material: {} bits (charged by the exposure)",
+            initial.describe_physics().len()
+        );
+    }
     println!(
         "cut: the first {length} of the pinned cut's {} bytes (the declared population; n* = {n_star}); {} receiving windows of A = {aperture} cells",
         text.len(),
@@ -307,12 +334,30 @@ fn main() {
     }
     let clock = Instant::now();
     let (exposure, traffic) = if realization == "card" {
-        card_exposure(deadline, &field, &cut)
+        card_exposure(deadline, &field, &cut, constitution)
     } else {
-        (reference.expose(&field, &cut).expect("the exposure"), None)
+        let exposure = match constitution {
+            Some(initial) => reference.expose_with(&field, &cut, initial),
+            None => reference.expose(&field, &cut),
+        }
+        .expect("the exposure");
+        (exposure, None)
     };
     let wall = clock.elapsed().as_millis();
     report(&field, &exposure);
+    if !exposure.resonator_gains.is_empty() {
+        println!();
+        println!("== final resonator scalar amplitudes (forms use their squares) ==");
+        for (ring, gains) in &exposure.resonator_gains {
+            println!(
+                "ring {ring}: C {}, K {}, D {}, pump {}",
+                exact(&gains[0]),
+                exact(&gains[1]),
+                exact(&gains[2]),
+                exact(&gains[3])
+            );
+        }
+    }
     println!();
     phases(&exposure, wall);
     if let Some(traffic) = traffic {
@@ -324,6 +369,20 @@ fn main() {
         exposure.compares,
         mean(wall, u128::from(exposure.compares))
     );
+}
+
+/// Decision 38's one predeclared loaded comparison. The source ring is the smallest ring in the
+/// existing causal diamond whose returned wave can reach the second receiving epoch. Its C/K
+/// forms are the ring's unit parametron's, and D is the campaign's initial passive rate. No pump,
+/// width, gain or material is selected on the cut. The owner retains the initial forms and learns
+/// their scalar amplitudes through the reached comparison covector.
+fn loaded_constitution(field: &Field) -> Constitution {
+    let material = ResonatorMaterial::of_parametron(field.ring(0).parametron(), &rat(1, 4), None)
+        .expect("the declared source parametron");
+    Constitution::initial(field, Steps::campaign_one(), CAMPAIGN_ONE_BUDGET)
+        .expect("the initial constitution")
+        .with_ring_resonator(field, 0, material)
+        .expect("the source resonator's certified phases")
 }
 
 /// The card the device port runs on: its name and capability, read off its census.
@@ -351,7 +410,12 @@ fn card_realization() -> String {
 /// **Campaign 1's exposure on the card** (`holonics_cuda::hnn::Resident::expose`, the reference's
 /// protocol over the device port), with what crossed the bus beside it (exterior).
 #[cfg(holonics_card)]
-fn card_exposure(deadline: Option<u64>, field: &Field, cut: &Cut) -> (Exposure, Option<String>) {
+fn card_exposure(
+    deadline: Option<u64>,
+    field: &Field,
+    cut: &Cut,
+    constitution: Option<Constitution>,
+) -> (Exposure, Option<String>) {
     let card =
         holonics_cuda::hnn::Card::open(0).expect("a CUDA card at ordinal 0 with its kernels");
     let port = holonics_cuda::hnn::Resident::campaign_one(&card);
@@ -359,7 +423,11 @@ fn card_exposure(deadline: Option<u64>, field: &Field, cut: &Cut) -> (Exposure, 
         Some(windows) => port.with_deadline(windows),
         None => port,
     };
-    let exposure = port.expose(field, cut).expect("the exposure on the card");
+    let exposure = match constitution {
+        Some(initial) => port.expose_with(field, cut, initial),
+        None => port.expose(field, cut),
+    }
+    .expect("the exposure on the card");
     let traffic = port.traffic();
     let tree = port.tree_times();
     let windows = u128::from(exposure.compares);
@@ -412,7 +480,12 @@ fn card_exposure(deadline: Option<u64>, field: &Field, cut: &Cut) -> (Exposure, 
 }
 
 #[cfg(not(holonics_card))]
-fn card_exposure(_: Option<u64>, _: &Field, _: &Cut) -> (Exposure, Option<String>) {
+fn card_exposure(
+    _: Option<u64>,
+    _: &Field,
+    _: &Cut,
+    _: Option<Constitution>,
+) -> (Exposure, Option<String>) {
     unreachable!("card_realization refused first")
 }
 
@@ -613,7 +686,7 @@ fn report(field: &Field, exposure: &Exposure) {
     println!("== cost against the literal ==");
     let work_bits = ceil_log2(&exposure.work.entries_written.clone().max(BigUint::one()));
     println!(
-        "Kt = |Field::describe| {} + located keys {} + L_target|model + ceil(log2 ExactWork) {} = {}",
+        "Kt = |field + initial material description| {} + located keys {} + L_target|model + ceil(log2 ExactWork) {} = {}",
         exposure.description_bits,
         exposure.key_bits,
         work_bits,

@@ -133,6 +133,14 @@ pub(crate) struct ChartStore<'c> {
     pub(crate) launches: u64,
 }
 
+/// The pre-publication chart state of one fallible deposit. It lives only until that call
+/// publishes or refuses; no history of completed updates is retained.
+pub(crate) struct ChartState {
+    slots: BTreeMap<ChartKey, Slot>,
+    used: usize,
+    mirror: BTreeMap<ChartKey, ChartWords>,
+}
+
 fn device(error: DeviceError) -> HnnError {
     error.into_hnn()
 }
@@ -165,6 +173,38 @@ impl<'c> ChartStore<'c> {
     /// The kept charts' bits, a reading (`holonics::hnn::Charts::bits`).
     pub(crate) fn bits(&self) -> u64 {
         self.mirror.values().map(ChartWords::bits).sum()
+    }
+
+    pub(crate) fn before_trial(&self) -> ChartState {
+        ChartState {
+            slots: self.slots.clone(),
+            used: self.used,
+            mirror: self.mirror.clone(),
+        }
+    }
+
+    /// Restore the charts and their producing operators after an unpublished candidate refuses.
+    /// Scratch buffers may keep their capacity; the next refinement overwrites their contents.
+    pub(crate) fn restore(&mut self, state: ChartState) -> Result<(), HnnError> {
+        for (key, slot) in &state.slots {
+            if let Some(operator) = &slot.operator {
+                self.card
+                    .write(&self.operators, slot.offset, &operator.words)
+                    .map_err(device)?;
+                self.octets += operator.words.len() * 8;
+            }
+            if let Some(chart) = state.mirror.get(key) {
+                self.card
+                    .write(&self.kept, slot.offset, chart.words())
+                    .map_err(device)?;
+                self.octets += chart.words().len() * 8;
+            }
+        }
+        self.slots = state.slots;
+        self.used = state.used;
+        self.mirror = state.mirror;
+        self.tables = None;
+        Ok(())
     }
 
     /// The workspace's words (the word's operands copy their charts from it).

@@ -18,7 +18,8 @@
 **Truth discipline:**
 - Classical results are `[proved-standard]`, and measured facts are `[established-bounded; measured]`.
 - Joins into the objects are `[interpretation]`.
-- The consequences for the HNN are `[project-postulate]` rulings for step 4.
+- The consequences for the HNN in §8 are `[definition; agent-inferred]` implementation choices
+  derived from the discussion, not direct rulings Brandon stated for step 4.
 
 ## 1. The light is the change
 

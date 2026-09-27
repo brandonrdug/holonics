@@ -22,16 +22,20 @@ use holonics::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Steps};
 use holonics::hnn::field::{ContactDeclaration, CribDeclaration, ReceiverDeclaration};
 use holonics::hnn::landmark::Letter;
 use holonics::hnn::port::{ExecutionPort, Handle, ReceiptDetail};
+use holonics::hnn::reference::ExposedResident;
 use holonics::hnn::reference::{Cut, Reference, one_hot};
+use holonics::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial};
 use holonics::hnn::{
     Constitution, ConstitutionRead, Current, Field, FieldDeclaration, HnnError, PairPort,
-    RingDeclaration,
+    ReceivingPhases, RingDeclaration, SourceMoment, Word,
 };
+use holonics::holon::parametron::Carrier;
 use holonics::ratio::Rat;
 use holonics::ratio::linear::ExactRatMatrix;
 use holonics::ratio::{integer, rat};
 use holonics::receiver::release::{BeyondTolerance, DecisionRule, WithinTolerance};
 use num_bigint::BigInt;
+use num_traits::{One, Zero};
 
 use super::dyadic::{exponent_of, integral, power_of_two};
 use super::lattice::NormalMirror;
@@ -103,6 +107,18 @@ fn chain_declaration(population: u64) -> FieldDeclaration {
 fn chain() -> Field {
     let probe = Field::declare(chain_declaration(1 << 20)).unwrap();
     Field::declare(chain_declaration(probe.capacity().n_star())).unwrap()
+}
+
+/// The small chain control with a loaded source ring whose returned wave has a non-unit dyadic
+/// coefficient, and a non-unit hop. It forces the integrated path to carry both splits.
+fn loaded_y4_h2_field() -> Field {
+    let mut declaration = chain_declaration(1 << 20);
+    declaration.rings[0].admittance = integer(4);
+    declaration.step = integer(2);
+    declaration = declaration.by_lattice_rule();
+    let probe = Field::declare(declaration.clone()).unwrap();
+    declaration.population = probe.capacity().n_star() as u64;
+    Field::declare(declaration.by_lattice_rule()).unwrap()
 }
 
 /// A half-integer (`½ℤ`, on every lattice `L ≥ 1`).
@@ -259,6 +275,8 @@ struct Compared {
     reads: u64,
     /// The cells the deposits added to the receiving parametron's tree (Decision 28).
     landmarks: u64,
+    /// Declared resonator material families whose gains changed across a deposit.
+    resonator_material_changes: u64,
     traffic: Traffic,
     /// The normal-law mirror's tally: every prox step carried, declined by reason or skipped.
     mirror: NormalMirror,
@@ -345,6 +363,9 @@ fn lockstep(
                 );
                 compared.discards += 1;
             } else {
+                let resonators_before: Vec<_> = (0..field.rings().len())
+                    .map(|ring| h.constitution().ring_resonator(ring).cloned())
+                    .collect();
                 let deposited = same(
                     "deposit",
                     host.deposit(&mut h, staged),
@@ -358,6 +379,11 @@ fn lockstep(
                 {
                     compared.landmarks += reading.landmarks;
                 }
+                compared.resonator_material_changes += (0..field.rings().len())
+                    .filter(|&ring| {
+                        resonators_before[ring] != h.constitution().ring_resonator(ring).cloned()
+                    })
+                    .count() as u64;
                 assert_eq!(
                     h.constitution(),
                     holonics::hnn::reference::ExposedResident::constitution(&d),
@@ -562,7 +588,7 @@ fn the_card_port_returns_the_reference_on_campaign_one() {
 /// **Campaign 2's physics through the port** (Decision 25): campaign 1's field with a resonator on
 /// every ring (`physics_tests::resonant`) and a certified boost on contact 0 (one negative
 /// stiffness column), on a drawn byte cut: every return the reference's, the refine receipts'
-/// resonator balances (the card's resident ticks read by the host, `crate::hnn::word::resonate`)
+/// resonator balances (the loaded word's ticks decoded by `crate::hnn::readout`)
 /// and the published constitutions after every deposit included (the card's stiffness is the signed
 /// one, `publication`), and the normal laws' prox steps the card carried in the deposits
 /// (`crate::hnn::lattice::normal_deposit_on_card`, the mirror the GPU suite runs, its `X̂f` read
@@ -590,6 +616,197 @@ fn the_card_port_returns_the_reference_with_resonators_and_a_boost() {
     println!("campaign 1 with resonators and a boost, drawn bytes: {compared:?}");
     assert_eq!(compared.compares, 8);
     assert!(compared.mirror.carried > 0);
+    // Coarse gains may stay in their lattice cells on these first windows. The returned
+    // covectors, carried statistics/remainders, and successor constitution are checked above;
+    // the count of visible gain changes is reported rather than assumed positive.
+}
+
+/// A non-unit return and hop exercise the loaded wave's independent storage split and the
+/// reverse solve/state recurrence through a pumped, non-diagonal parametron. The host fixture first
+/// proves that the loaded source changes the receiving face and produces a nonzero split receipt;
+/// then every card return, including a deferred compare/deposit, is checked against it.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_loaded_source_matches_with_y4_and_hop_two() {
+    let field = loaded_y4_h2_field();
+    let width = field.contact(0).width();
+    let receiver = field.receivers()[0].ring;
+    let receiver_width = field.ring(receiver).width();
+    let receiving = ExactRatMatrix::shaped(
+        2 * field.alphabet(),
+        receiver_width,
+        (0..2 * field.alphabet())
+            .map(|row| {
+                (0..receiver_width)
+                    .map(|column| {
+                        if row == column {
+                            Rat::one()
+                        } else {
+                            Rat::zero()
+                        }
+                    })
+                    .collect()
+            })
+            .collect(),
+    )
+    .unwrap();
+    let baseline = Constitution::initial(&field, Steps::campaign_one(), CAMPAIGN_ONE_BUDGET)
+        .unwrap()
+        .with_ports(receiver, None, None, Some(receiving))
+        .unwrap()
+        .with_contact_signature(&field, 0, (0..width).map(|j| j != 0).collect())
+        .unwrap();
+    let pump = PumpDeclaration::new(
+        rat(1, 8),
+        Carrier::new(Rat::one(), Rat::zero()).unwrap(),
+        PumpStep::Half,
+    )
+    .unwrap();
+    let material =
+        ResonatorMaterial::of_parametron(field.ring(0).parametron(), &rat(1, 4), Some(pump))
+            .unwrap();
+    let theta = baseline
+        .clone()
+        .with_ring_resonator(&field, 0, material)
+        .unwrap();
+    let mut draw = Draw(29);
+    let cells: Vec<usize> = (0..field.capacity().n_star() as usize)
+        .map(|_| draw.below(field.alphabet()))
+        .collect();
+    let mut current = Current::at_rest(&field);
+    let mut moment = SourceMoment::open(&field, &current);
+    moment.ingest(&field, &mut current, &cells).unwrap();
+    let phases = ReceivingPhases::declare(&field, &theta, &current, &field.receivers()[0]).unwrap();
+    let read = |constitution: &Constitution| {
+        let mut word = Word::open(&field, constitution, &current, &moment).unwrap();
+        let anchors = word.forward(&phases).unwrap();
+        let faces = anchors
+            .iter()
+            .map(|anchor| phases.read(&field, constitution, &current, anchor).unwrap())
+            .collect::<Vec<_>>();
+        (faces, word.release().unwrap())
+    };
+    let (baseline_faces, _) = read(&baseline);
+    let (loaded_faces, loaded) = read(&theta);
+    assert_ne!(loaded_faces, baseline_faces);
+    assert!(
+        loaded
+            .balances
+            .iter()
+            .any(|balance| !balance.loaded_split.is_zero())
+    );
+
+    let n_star = field.capacity().n_star() as usize;
+    let compared = lockstep(
+        &field,
+        &cut_of(cells, n_star.saturating_sub(16)..n_star),
+        8,
+        Some(theta),
+        2,
+    );
+    assert_eq!(compared.compares, 8);
+    assert!(compared.mirror.carried > 0);
+}
+
+/// A finite, valid staged deposit may still fail when its successor is read. The host fails while
+/// carrying the resulting exponent; the card may refuse earlier while forming its bounded
+/// publication. In either case the old constitution, staged handle and every card mirror remain at
+/// their predecessor, and a fresh read at the same moment/targets agrees with the old host tree.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn late_successor_read_refusal_restores_host_and_card_predecessors() {
+    let field = chain();
+    let steps = Steps {
+        proxy: Rat::from_integer(BigInt::from(1u8) << 128usize),
+        factor: Rat::zero(),
+    };
+    let theta = Constitution::initial(&field, steps.clone(), u64::MAX).unwrap();
+    let host = Reference::new(64, steps.clone(), u64::MAX);
+    let card = card();
+    let device = Resident::new(&card, 64, steps, u64::MAX);
+    let current = Current::at_rest(&field);
+    let mut h = host.mount_with(&field, &current, theta.clone()).unwrap();
+    let mut d = device.mount_with(&field, &current, theta).unwrap();
+
+    let (moment, _) = same(
+        "open and ingest a tiny source moment",
+        host.ingest(&mut h, None, &one_hot(&[0])),
+        device.ingest(&mut d, None, &one_hot(&[0])),
+    )
+    .unwrap();
+    let phases = h.admitted()[0].clone();
+    let (pending, _) = same(
+        "refine before staging the large finite update",
+        host.refine(&mut h, &moment, &phases),
+        device.refine(&mut d, &moment, &phases),
+    )
+    .unwrap();
+    let (staged, compared) = same(
+        "stage a valid comparison",
+        host.compare(&mut h, pending, &one_hot(&[0, 1])),
+        device.compare(&mut d, pending, &one_hot(&[0, 1])),
+    )
+    .unwrap();
+    let deposit = compared
+        .deposit
+        .into_present()
+        .expect("compare staged a deposit");
+    assert!(!deposit.linear().is_empty());
+    assert!(!deposit.landmarks().is_empty());
+
+    let host_theta = h.constitution().clone();
+    let device_theta = d.constitution().clone();
+    let host_current = h.current().clone();
+    let device_current = d.current().clone();
+    let host_charts = h.charts().clone();
+    let host_ledger = h.ledger().clone();
+    let host_bits = h.state_bits();
+    let device_bits = d.state_bits();
+    let host_handles = host.read(&h).unwrap().2;
+    let device_handles = device.read(&d).unwrap().2;
+    assert_eq!(host_handles, device_handles);
+    assert!(
+        host_handles
+            .iter()
+            .any(|(handle, _)| *handle == Handle::Staged(staged))
+    );
+
+    let host_refusal = host.deposit(&mut h, staged);
+    let device_refusal = device.deposit(&mut d, staged);
+    assert!(host_refusal.is_err() && device_refusal.is_err());
+    assert!(!matches!(
+        host_refusal,
+        Err(HnnError::ConstitutionBudget { .. })
+    ));
+    assert!(!matches!(
+        device_refusal,
+        Err(HnnError::ConstitutionBudget { .. })
+    ));
+    assert!(h.stopped().is_none() && d.stopped().is_none());
+    assert_eq!(h.constitution(), &host_theta);
+    assert_eq!(d.constitution(), &device_theta);
+    assert_eq!(h.current(), &host_current);
+    assert_eq!(d.current(), &device_current);
+    assert_eq!(h.charts(), &host_charts);
+    assert_eq!(h.ledger(), &host_ledger);
+    assert_eq!(h.state_bits(), host_bits);
+    assert_eq!(d.state_bits(), device_bits);
+    let host_handles_after = host.read(&h).unwrap().2;
+    let device_handles_after = device.read(&d).unwrap().2;
+    assert_eq!(host_handles_after, host_handles);
+    assert_eq!(device_handles_after, device_handles);
+
+    // The card's tree and chart mirrors must now answer the same fresh read as the unchanged host
+    // constitution. This exercises the rollback, not just the public handles and state counts.
+    let (host_pending, _) = host.refine(&mut h, &moment, &phases).unwrap();
+    let (device_pending, _) = device.refine(&mut d, &moment, &phases).unwrap();
+    assert_eq!(host_pending, device_pending);
+    let retried = same(
+        "compare again after the late refusal",
+        host.compare(&mut h, host_pending, &one_hot(&[0, 1])),
+        device.compare(&mut d, device_pending, &one_hot(&[0, 1])),
+    );
+    assert!(retried.is_some());
 }
 
 /// The standing real cut's manifest numbers (its population and held-out range).

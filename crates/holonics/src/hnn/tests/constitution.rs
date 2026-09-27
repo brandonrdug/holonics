@@ -708,6 +708,15 @@ fn updates(deposit: &Deposit, next: &Constitution) -> Vec<((Locus, Carrier), Vec
                 next.ring_scales(*ring)[0].clone(),
                 vec![(Carrier::Standing, gradient.clone())],
             ),
+            FactorGradient::Resonator {
+                ring,
+                family,
+                gradient,
+            } => (
+                Carrier::ResonatorScale(*family),
+                next.resonator_scales(*ring).unwrap()[*family].clone(),
+                vec![(Carrier::Resonator(*family), vec![gradient.clone()])],
+            ),
             FactorGradient::PairPort {
                 ring,
                 offset,
@@ -1096,10 +1105,10 @@ fn the_factor_carriers_stay_positive_semidefinite_with_no_clamp() {
 }
 
 /// Lean `HNN/Normal.reaction_deposit_storage_unchanged`: a deposit of reaction material and ports
-/// leaves the storage forms, so its energy growth is `ε_k = 0`; a storage deposit (the counterexample,
-/// `storage_deposit_does_work`) grows it.
+/// leaves contact C/K forms, so its contact growth is `ε_k = 0`; a contact storage deposit (the
+/// counterexample, `storage_deposit_does_work`) grows that contact-only bound.
 #[test]
-fn reaction_deposits_have_zero_energy_growth() {
+fn reaction_deposits_have_zero_contact_growth() {
     let field = chain();
     let theta = generic(&field, 9);
     let mut draw = Draw::new(10);
@@ -1120,7 +1129,7 @@ fn reaction_deposits_have_zero_energy_growth() {
         Vec::new(),
     );
     let (_, reading) = theta.deposited(&reaction).unwrap();
-    assert_eq!(reading.growth, Some(Rat::zero()));
+    assert_eq!(reading.contact_growth, Some(Rat::zero()));
     let k = field.contact(0).width();
     let storage = Deposit::new(
         0,
@@ -1135,7 +1144,11 @@ fn reaction_deposits_have_zero_energy_growth() {
         Vec::new(),
     );
     let (_, grown) = theta.deposited(&storage).unwrap();
-    assert!(grown.growth.is_none_or(|epsilon| epsilon > Rat::zero()));
+    assert!(
+        grown
+            .contact_growth
+            .is_none_or(|epsilon| epsilon > Rat::zero())
+    );
 }
 
 /// Design (d), the budget and stop rule: a deposit whose successor exceeds `B_Θ` is refused with

@@ -5,8 +5,11 @@ It states the object, the equations its implementation preserves, and their owne
 [model formula](HNN_FORMULA.md) gives the full law; [THE_REBUILD](plans/THE_REBUILD.md) orders the
 construction; [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md) records the position; the
 [research routes](../research/records/README.md) recover the derivations. Existing code is what is
-in `crates/` and `lean/` today. The HNN law is not yet code: rebuild step 4 builds it in
-`holonics::hnn` and step 5 in `holonics-cuda::hnn`.
+in `crates/` and `lean/` today. The host `holonics::hnn` and resident `holonics-cuda::hnn` implement campaigns 1–2.
+The landmark tree supplies most of the measured compression. Decision 38 connects the
+resonator's returned wave and adjoint to the field; campaigns 3–5 supply release
+through modes, the motor chart, Holonic Encoding, context and joint prediction.
+[CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md) distinguishes measured results from these remaining consumers.
 
 ## One continuing geometric object
 
@@ -58,6 +61,15 @@ map is also the material through which later conduct proceeds
 ([circulating cartographer](canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md),
 [solver inference](../research/records/2026-09-12_SOLVER_INFERENCE_AND_GENERATOR_COMPRESSION_ARE_INTELLIGENCE.md)).
 
+[project-postulate; agent-inferred at the consumer] The egg discussion's interior↔exterior
+relation enters the machine through the loaded storage port: the ring receives a wave and its
+returned wave changes a later receiving face. The corresponding covector reaches its material.
+A receiver's current nullity is not future extinction; `Holarchy/Hearing` supplies the distinction
+that campaign 3's mode retention must consume. The [audited egg/shadow record](../research/records/2026-09-26_THE_SHADOW_IS_THE_RECEIVERS_KERNEL_AND_THE_EGG_IS_TWO_RINGS_IN_RELATIVE_MOTION.md)
+keeps the curve, the receiver maps still owed, and the invariant rate-form reading. Decision 38
+implements the port connection; broader mode/shape and participating-receiver consumers retain
+their campaign scopes.
+
 ## The computational unit and the one picture
 
 [definition] The computational object is the
@@ -71,7 +83,7 @@ acoustic or motor chart is a boundary of it. Owners: Lean `Transport/HelicalPair
 `PairQuadranceJet`, `RationalPhase`). The prototype's pair and chain adapters
 ([`holonic_interaction/helical.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/holonic_interaction/helical.rs),
 [`holonic_chain/serial.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/holonic_chain/serial.rs))
-are ported in rebuild step 1 to the contact owner `holon::contact`.
+were port sources for the current contact owner `holon::contact`.
 
 [project-postulate] **One picture, six general objects** ([winding guide](WINDING_CARRY_AND_PLACEMENT.md)).
 The pair unit continues into six objects. A design or worker brief states which it touches and
@@ -166,17 +178,17 @@ Copson and Newman boundaries have source owners in the
 
 ## How the geometry reaches the implementation
 
-| Source relation | Lean owner | `holonics` today | Rebuild target; history at `13f8c734` |
+| Source relation | Lean owner | Current consumer | Remaining construction / history source |
 |---|---|---|---|
-| Toroidal domains, shared cells, phase connection | `Holon/Complex`, connection owners, `Geometry/HolonicTorusKnots` | `holonics::geometry::complex` | step 4; prototype `analytic_field.rs`, `hnn/field_geometry/` |
-| Helical pair and contact variation | `Geometry/ScrewGeometry`, `Transport/{HelicalPairInteraction,SerialScrewChain}` | `holonics::geometry::screw`, `holonics::holon::contact` | `holon::contact` (step 1); prototype `holonic_interaction/helical.rs`, `holonic_chain/serial.rs`, `exact_contact.rs` |
-| Winding, carry, lock address, trace faces, cell holonomy | `Geometry/{PhaseCarry,PairResonance}`, `Transport/{NavigatorTraceFaces,CellHolonomy}`, joined to `Farey`, `LocalFactor`, `HodgeReceiver`, `IwasawaTower` | `holonics::geometry::winding` (`Odometer`, `LockAddress`, `SiteFactor`, `Machine`, `triangle_holonomy`) | `navigator/` (step 1); dynamic carry tower, lock-address inference and dormant-class consumer are #17/#62 |
-| Parametron ring: `C`, `L`, pump, half-turn sheets, Ising lock | `Objects/Parametron`, `Physics/{PhaseCarrier,CoupledIncidence}` | none | `holon::parametron` (step 1); prototype `cuda_refine/complex_parametron.rs` |
-| Normalized receiver and both input covectors | `HolonicAdjointNormalization` | `holonics::ratio::exponentiated` | `holonics::hnn` (step 4); prototype `receiver/normalized/phase.rs` |
-| Constitutive current, storage and scattering | `HolonicConstitutiveCirculation`, `Holon/{Element,Dirac,Law}` | `holonics::holon::{element,dirac,law,reaction}` | `holonics::hnn` (step 4); prototype `native_ecology/constitutive_fibre/field/junction/operative/` |
-| Source moments, standing and release | `Transport/SourceMoment`, `Foundation/{Standing,ReceiverRelease}` | `holonics::receiver::{standing,release}` | `holonics::hnn` (step 4); moment accumulation replaces the prototype's per-occurrence tape |
-| Reuse at future receivers | `ReceiverHistoryCompression`, `NavigatorModeQuotient`, `CausalRelevance`, `ReceiverCodeCost` | history [`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs) | `holonics::compression` (step 3); prototype `receiver_history_compression.rs`, `identity_atlas.rs` |
-| Physical placement | — | history [`hardware_cover`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/hardware_cover.rs); `holonics_cuda::Device::launch_census` | step 5; prototype `section_partition.rs`, `section_layout.rs`, `launch_law.rs` |
+| Rings, contacts, phase connection | `Holon/Complex`, `HNN/Word` | `geometry::complex`, `hnn::field`, `hnn::word` | Richer field declarations; prototype `analytic_field.rs`, `hnn/field_geometry/` |
+| Helical pair and contact variation | `Transport/{HelicalPairInteraction,SerialScrewChain}`, `HNN/Contact` | `geometry::screw`, `holon::contact`, `hnn::contact` | Motor consumer (#27); prototype pair and chain adapters |
+| Winding, carry, lock, trace faces, cell holonomy | `Geometry/{PhaseCarry,PairResonance}`, `Transport/{NavigatorTraceFaces,CellHolonomy}` | `geometry::winding::Odometer`, `navigator::{address,trace}`, `hnn::contact` | Carry tower and continuous-key joins (#62) |
+| Parametron storage, pump, sheets and lock | `Objects/Parametron`, `HNN/Ring` | `holon::parametron`, `hnn::ring`, CUDA resonator kernels | Loaded forward/adjoint connection (Decision 38); pump/Floquet theorem (#62) |
+| Receiving comparison and covectors | `Objects/Ratio`, `HNN/{Ratio,LandmarkTree,LandmarkCompaction}` | `hnn::{ratio,receiving,landmark}`, CUDA compacted tree | Composed lattice drift and the log squaring invariant (#62) |
+| Constitutive current, storage and scattering | `Holon/{Element,Dirac,Law}`, `HNN/{Word,Propagation}` | `holon::{element,dirac,law,reaction}`, `hnn::{propagation,word}` | Complete word sensitivity and concrete diamond bridge (#62) |
+| Source moments, retention and release | `Transport/SourceMoment`, `HNN/{Moment,Retention}` | `hnn::{moment,pending,retention}`, `receiver::{standing,release}` | Mode release, founding and moment quotient (campaign 3) |
+| Reuse at future receivers | `Compression`, `Foundation/{ReceiverHistoryCompression,NavigatorModeQuotient,CausalRelevance}` | `compression`, structural `hnn::retention` | Value-kernel/mode consumer (campaign 3), encoding squares (campaign 5) |
+| Physical placement | `HNN/LatticeWord` and local law owners | `hnn::realization`, `holonics_cuda::hnn::{card,port,word,tree}` | Host deposition remains authoritative; device debts #76 |
 
 History paths are under `crates/holonics-cuda/src/` at
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734/crates/holonics-cuda/src). Each

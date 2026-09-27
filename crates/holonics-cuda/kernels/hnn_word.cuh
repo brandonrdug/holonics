@@ -77,6 +77,7 @@
 #define WP_PAIR_TABLE 26
 #define WP_INCIDENCES 27
 #define WP_MAP 28
+#define WP_RESONATORS 29
 
 #define WR_STRIDE 12
 #define WR_WIDTH 0
@@ -89,6 +90,25 @@
 #define WR_INCIDENCE 7
 #define WR_WEIGHTS 8
 #define WR_ANCHOR_EXP 9
+#define WR_RESONATOR 10
+
+// A loaded ring resonator's plan row (`execute.rs`, RZ_*).
+#define RZ_STRIDE 15
+#define RZ_RING 0
+#define RZ_WIDTH 1
+#define RZ_ROWS 2
+#define RZ_CAPACITY 3
+#define RZ_STIFFNESS 4
+#define RZ_CHARTS 5
+#define RZ_PHASES 6
+#define RZ_LM 7
+#define RZ_LC 8
+#define RZ_EH 9
+#define RZ_RETURN_GAIN 10
+#define RZ_RETURN_EXP 11
+#define RZ_DISSIPATION 12
+#define RZ_OPERATOR 13
+#define RZ_OPERATOR_EXP 14
 
 #define WI_STRIDE 3
 #define WI_CONTACT 0
@@ -198,6 +218,22 @@
 #define WL_DOTS3 48
 #define WL_READS 49
 #define WL_REV_STATUS 50
+#define WL_RES_U 51
+#define WL_RES_W 52
+#define WL_RES_REM_RATE 53
+#define WL_RES_REM_U 54
+#define WL_RES_REM_W 55
+#define WL_RES_REM_OUTPUT 56
+#define WL_REC_RES_DRIVE 57
+#define WL_REC_RES_OUTPUT 58
+#define WL_REC_RES_U 59
+#define WL_REC_RES_W 60
+#define WL_REC_RES_RATE 61
+#define WL_RES_U_BAR 62
+#define WL_RES_W_BAR 63
+#define WL_RES_Z_BAR 64
+#define WL_REC_RES_SOLVED 65
+#define WL_RES_STATUS 66
 
 // The status block: the refusal bits, the first refused stage, and the row it refused.
 #define WSTATUS_BITS 0
@@ -405,6 +441,7 @@ extern "C" __global__ void hnn_pair_weights(
 #define STAGE_ARRIVAL 7
 #define STAGE_LAST 8
 #define STAGE_READ 9
+#define STAGE_RESONATOR 10
 
 extern "C" __global__ void hnn_word_forward(
     const long long *plan, const int64_t *operands, const int64_t *published,
@@ -446,6 +483,13 @@ extern "C" __global__ void hnn_word_forward(
     wide *operand = HNN_AT(wide, WL_OPERAND);
     wide *right = HNN_AT(wide, WL_RIGHT);
     int64_t *zeta = HNN_AT(int64_t, WL_ZETA);
+    int64_t *res_u = HNN_AT(int64_t, WL_RES_U);
+    int64_t *res_w = HNN_AT(int64_t, WL_RES_W);
+    wide *res_rem_rate = HNN_AT(wide, WL_RES_REM_RATE);
+    wide *res_rem_u = HNN_AT(wide, WL_RES_REM_U);
+    wide *res_rem_w = HNN_AT(wide, WL_RES_REM_W);
+    wide *res_rem_output = HNN_AT(wide, WL_RES_REM_OUTPUT);
+    uint32_t *res_status = HNN_AT(uint32_t, WL_RES_STATUS);
     int64_t *rec_storage = HNN_AT(int64_t, WL_REC_STORAGE);
     int64_t *rec_arrivals = HNN_AT(int64_t, WL_REC_ARRIVALS);
     int64_t *rec_u = HNN_AT(int64_t, WL_REC_U);
@@ -457,12 +501,25 @@ extern "C" __global__ void hnn_word_forward(
     wide *rec_omega = HNN_AT(wide, WL_REC_OMEGA);
     wide *logits = HNN_AT(wide, WL_LOGITS);
     uint32_t *status_block = HNN_AT(uint32_t, WL_STATUS);
+    int64_t *rec_res_drive = HNN_AT(int64_t, WL_REC_RES_DRIVE);
+    int64_t *rec_res_output = HNN_AT(int64_t, WL_REC_RES_OUTPUT);
+    int64_t *rec_res_u = HNN_AT(int64_t, WL_REC_RES_U);
+    int64_t *rec_res_w = HNN_AT(int64_t, WL_REC_RES_W);
+    int64_t *rec_res_rate = HNN_AT(int64_t, WL_REC_RES_RATE);
+    wide *res_rho = HNN_AT(wide, WL_RES_Z_BAR);
 
     // ---- the open: zero change everywhere, then the source rings' storage.
     for (long long e = t; e < N; e += T) {
         storage[e] = 0;
         rem_anchor[e] = 0;
         rem_storage[e] = 0;
+        res_u[e] = 0;
+        res_w[e] = 0;
+        res_rem_rate[e] = 0;
+        res_rem_u[e] = 0;
+        res_rem_w[e] = 0;
+        res_rem_output[e] = 0;
+        res_status[e] = HNN_EXACT;
     }
     for (long long p = t; p < NA; p += T) {
         arrivals[p] = 0;
@@ -535,6 +592,11 @@ extern "C" __global__ void hnn_word_forward(
         // The change at the step's start, recorded for the balance and the return.
         for (long long e = t; e < N; e += T) {
             rec_storage[step * N + e] = storage[e];
+            rec_res_drive[step * N + e] = 0;
+            rec_res_output[step * N + e] = 0;
+            rec_res_u[step * N + e] = 0;
+            rec_res_w[step * N + e] = 0;
+            rec_res_rate[step * N + e] = 0;
         }
         for (long long p = t; p < NA; p += T) {
             rec_arrivals[step * NA + p] = arrivals[p];
@@ -725,6 +787,122 @@ extern "C" __global__ void hnn_word_forward(
                 hnn_note(st, STAGE_ARRIVAL, (uint32_t)p, &bits, &first);
             }
             __syncthreads();
+            // A declared resonator loads the ring's element output and returns its wave into the
+            // storage that the next junction reads. This stage follows the contact solve/arrival:
+            // those stages read the frozen anchor/arrival and write only contact/arrival rows, so
+            // they commute with this ring-local storage/state write. The next junction starts only
+            // after this barrier. Each ring owns its state and material rows.
+            const long long *resonators = plan + plan[WP_RESONATORS];
+            for (long long e = t; e < N; e += T) {
+                const long long ring_index = row_ring[e];
+                const long long *ring = rings + ring_index * WR_STRIDE;
+                const long long rix = ring[WR_RESONATOR];
+                if (rix < 0) {
+                    res_rho[e] = 0;
+                    res_status[e] = HNN_EXACT;
+                    continue;
+                }
+                uint32_t st = HNN_EXACT;
+                const long long *res = resonators + rix * RZ_STRIDE;
+                const long long n = res[RZ_WIDTH], base = res[RZ_ROWS];
+                const long long phase = step % res[RZ_PHASES];
+                const long long lm = res[RZ_LM], eh = res[RZ_EH];
+                const int64_t *capacity = operands + res[RZ_CAPACITY];
+                const int64_t *stiffness =
+                    operands + res[RZ_STIFFNESS] + phase * n * n;
+                const long long row = e - base;
+                HnnSum image = hnn_sum();
+                for (long long j = 0; j < n; ++j) {
+                    hnn_add_scaled(image, capacity[row * n + j], 2 * (wide)res_w[base + j]);
+                    hnn_add_scaled(
+                        image, stiffness[row * n + j],
+                        -hnn_shifted((wide)res_u[base + j], eh, &st)
+                    );
+                }
+                const wide source = hnn_shifted(
+                    (wide)storage[e], lm + eh, &st
+                );
+                hnn_add(image, source);
+                res_rho[e] = hnn_read(image, &st);
+                res_status[e] = st;
+                hnn_note(st, STAGE_RESONATOR, (uint32_t)e, &bits, &first);
+            }
+            __syncthreads();
+            // X̂ maps the integer right side on Lm+Lw through the executed solve chart.
+            int64_t *rate_record = HNN_AT(int64_t, WL_REC_RES_RATE);
+            for (long long e = t; e < N; e += T) {
+                const long long ring_index = row_ring[e];
+                const long long *ring = rings + ring_index * WR_STRIDE;
+                const long long rix = ring[WR_RESONATOR];
+                rate_record[step * N + e] = 0;
+                if (rix < 0) continue;
+                uint32_t st = res_status[e];
+                const long long *res = resonators + rix * RZ_STRIDE;
+                const long long n = res[RZ_WIDTH], base = res[RZ_ROWS];
+                const long long phase = step % res[RZ_PHASES];
+                const long long shift = res[RZ_LC] + res[RZ_LM];
+                const int64_t *chart = operands + res[RZ_CHARTS] + phase * n * n;
+                for (long long j = 0; j < n; ++j) {
+                    if (res_status[base + j] != HNN_EXACT) st |= HNN_REFUSED_OPERAND;
+                }
+                HnnSum image = hnn_sum();
+                if (st == HNN_EXACT) {
+                    for (long long j = 0; j < n; ++j) {
+                        hnn_add_scaled(image, chart[(e - base) * n + j], res_rho[base + j]);
+                    }
+                    hnn_add(image, res_rem_rate[e]);
+                }
+                wide remainder = 0;
+                const int64_t rate = hnn_split(hnn_read(image, &st), shift, &remainder, &st);
+                res_rem_rate[e] = remainder;
+                rate_record[step * N + e] = rate;
+                res_status[e] = st;
+                hnn_note(st, STAGE_RESONATOR, (uint32_t)e, &bits, &first);
+            }
+            __syncthreads();
+            // Carry the ring state and the separately split returned wave on Lw.
+            for (long long e = t; e < N; e += T) {
+                const long long ring_index = row_ring[e];
+                const long long *ring = rings + ring_index * WR_STRIDE;
+                const long long rix = ring[WR_RESONATOR];
+                if (rix < 0) continue;
+                uint32_t st = res_status[e];
+                const long long *res = resonators + rix * RZ_STRIDE;
+                const long long eh = res[RZ_EH], return_exp = res[RZ_RETURN_EXP];
+                const int64_t drive = storage[e];
+                const int64_t old_u = res_u[e], old_w = res_w[e];
+                const int64_t rate = rate_record[step * N + e];
+                const wide next_u = (wide)old_u + hnn_shifted((wide)rate, eh, &st);
+                const wide next_w = 2 * (wide)rate - (wide)old_w;
+                if (st == HNN_EXACT && (!hnn_is_word(next_u) || !hnn_is_word(next_w))) {
+                    st |= HNN_REFUSED_WORD;
+                }
+                const int64_t next_state_u = st == HNN_EXACT ? (int64_t)next_u : 0;
+                const int64_t next_state_w = st == HNN_EXACT ? (int64_t)next_w : 0;
+                const int64_t gain = res[RZ_RETURN_GAIN];
+                HnnSum returned = hnn_sum();
+                hnn_add(returned, hnn_shifted((wide)drive, return_exp, &st));
+                hnn_add_scaled(returned, -gain, (wide)rate);
+                hnn_add(returned, res_rem_output[e]);
+                wide return_remainder = 0;
+                const int64_t output = hnn_split(
+                    hnn_read(returned, &st), return_exp, &return_remainder, &st
+                );
+                rec_res_drive[step * N + e] = drive;
+                rec_res_output[step * N + e] = output;
+                rec_res_u[step * N + e] = old_u;
+                rec_res_w[step * N + e] = old_w;
+                rec_res_rate[step * N + e] = rate;
+                res_u[e] = st == HNN_EXACT ? next_state_u : 0;
+                res_w[e] = st == HNN_EXACT ? next_state_w : 0;
+                res_rem_u[e] = 0;
+                res_rem_w[e] = 0;
+                res_rem_output[e] = return_remainder;
+                storage[e] = output;
+                res_status[e] = st;
+                hnn_note(st, STAGE_RESONATOR, (uint32_t)e, &bits, &first);
+            }
+            __syncthreads();
         } else {
             // The last junction: the storage and outgoing waves become the change, unsplit.
             for (long long e = t; e < N; e += T) {
@@ -868,11 +1046,28 @@ extern "C" __global__ void hnn_word_reverse(
     wide *dots3 = HNN_AT(wide, WL_DOTS3);
     const int64_t *reads = HNN_AT(int64_t, WL_READS);
     uint32_t *status_block = HNN_AT(uint32_t, WL_REV_STATUS);
+    const long long *resonators = plan + plan[WP_RESONATORS];
+    wide *res_u_bar = HNN_AT(wide, WL_RES_U_BAR);
+    wide *res_w_bar = HNN_AT(wide, WL_RES_W_BAR);
+    wide *res_z_bar = HNN_AT(wide, WL_RES_Z_BAR);
+    wide *res_rem_z = HNN_AT(wide, WL_RES_REM_RATE);
+    wide *res_rem_solved = HNN_AT(wide, WL_RES_REM_OUTPUT);
+    wide *res_rem_u = HNN_AT(wide, WL_RES_REM_U);
+    wide *res_rem_w = HNN_AT(wide, WL_RES_REM_W);
+    wide *rec_res_solved = HNN_AT(wide, WL_REC_RES_SOLVED);
+    uint32_t *res_status = HNN_AT(uint32_t, WL_RES_STATUS);
 
     for (long long e = t; e < N; e += T) {
         storage_bar[e] = 0;
         rem_el[e] = 0;
         rem_storage[e] = 0;
+        res_u_bar[e] = 0;
+        res_w_bar[e] = 0;
+        res_rem_z[e] = 0;
+        res_rem_solved[e] = 0;
+        res_rem_u[e] = 0;
+        res_rem_w[e] = 0;
+        res_status[e] = HNN_EXACT;
     }
     for (long long p = t; p < NA; p += T) {
         arrival_bar[p] = 0;
@@ -898,6 +1093,118 @@ extern "C" __global__ void hnn_word_reverse(
         }
         __syncthreads();
         if (step + 1 < steps) {
+            // Reverse the loaded port first: output -> z̄ -> X̂ᵀz̄ -> drive, then state bars.
+            for (long long e = t; e < N; e += T) {
+                const long long ring_index = row_ring[e];
+                const long long *ring = rings + ring_index * WR_STRIDE;
+                const long long rix = ring[WR_RESONATOR];
+                if (rix < 0) {
+                    res_z_bar[e] = 0;
+                    rec_res_solved[step * N + e] = 0;
+                    res_status[e] = HNN_EXACT;
+                    continue;
+                }
+                uint32_t st = HNN_EXACT;
+                const long long *res = resonators + rix * RZ_STRIDE;
+                const long long qexp = res[RZ_RETURN_EXP], eh = res[RZ_EH];
+                const long long gain = res[RZ_RETURN_GAIN];
+                HnnSum image = hnn_sum();
+                hnn_add(image, hnn_shifted(res_u_bar[e], eh + qexp, &st));
+                hnn_add(image, hnn_shifted(res_w_bar[e], 1 + qexp, &st));
+                hnn_add(image, -hnn_word_product((int64_t)gain, storage_bar[e]));
+                hnn_add(image, res_rem_z[e]);
+                wide remainder = 0;
+                const int64_t zbar = hnn_split(hnn_read(image, &st), qexp, &remainder, &st);
+                res_rem_z[e] = remainder;
+                res_z_bar[e] = zbar;
+                res_status[e] = st;
+                hnn_note(st, RSTAGE_SOLVED, (uint32_t)e, &bits, &first);
+            }
+            __syncthreads();
+            // Pull z̄ through the exact chart the forward tick executed; split to Lw and carry its
+            // remainder before the state and material cotangents read it.
+            for (long long e = t; e < N; e += T) {
+                const long long ring_index = row_ring[e];
+                const long long *ring = rings + ring_index * WR_STRIDE;
+                const long long rix = ring[WR_RESONATOR];
+                if (rix < 0) continue;
+                uint32_t st = res_status[e];
+                const long long *res = resonators + rix * RZ_STRIDE;
+                const long long n = res[RZ_WIDTH], base = res[RZ_ROWS];
+                const long long phase = step % res[RZ_PHASES];
+                const int64_t *chart = operands + res[RZ_CHARTS] + phase * n * n;
+                for (long long j = 0; j < n; ++j) {
+                    if (res_status[base + j] != HNN_EXACT) st |= HNN_REFUSED_OPERAND;
+                }
+                HnnSum image = hnn_sum();
+                if (st == HNN_EXACT) {
+                    for (long long j = 0; j < n; ++j) {
+                        hnn_add_scaled(image, chart[j * n + (e - base)], res_z_bar[base + j]);
+                    }
+                    hnn_add(image, res_rem_solved[e]);
+                }
+                wide remainder = 0;
+                const int64_t rbar = hnn_split(
+                    hnn_read(image, &st), res[RZ_LC], &remainder, &st
+                );
+                res_rem_solved[e] = remainder;
+                rec_res_solved[step * N + e] = rbar;
+                res_status[e] = st;
+                hnn_note(st, RSTAGE_SOLVED, (uint32_t)e, &bits, &first);
+            }
+            __syncthreads();
+            // The loaded drive bar enters the existing element transpose. State covectors use the
+            // producing phase's stiffness and capacity, with separate Lw remainders.
+            for (long long e = t; e < N; e += T) {
+                const long long ring_index = row_ring[e];
+                const long long *ring = rings + ring_index * WR_STRIDE;
+                const long long rix = ring[WR_RESONATOR];
+                if (rix < 0) continue;
+                uint32_t st = res_status[e];
+                const long long *res = resonators + rix * RZ_STRIDE;
+                const long long n = res[RZ_WIDTH], base = res[RZ_ROWS];
+                const long long phase = step % res[RZ_PHASES];
+                const long long lm = res[RZ_LM], eh = res[RZ_EH];
+                const int64_t *capacity = operands + res[RZ_CAPACITY];
+                const int64_t *stiffness = operands + res[RZ_STIFFNESS] + phase * n * n;
+                const long long row = e - base;
+                const int64_t rbar = (int64_t)rec_res_solved[step * N + e];
+                HnnSum drive_bar = hnn_sum();
+                hnn_add(drive_bar, (wide)storage_bar[e]);
+                hnn_add(drive_bar, hnn_shifted((wide)rbar, eh, &st));
+                storage_bar[e] = hnn_word_of(hnn_read(drive_bar, &st), &st);
+
+                HnnSum ub = hnn_sum();
+                hnn_add(ub, hnn_shifted(res_u_bar[e], lm, &st));
+                for (long long j = 0; j < n; ++j) {
+                    hnn_add_scaled(
+                        ub, stiffness[j * n + row],
+                        -hnn_shifted(rec_res_solved[step * N + base + j], eh, &st)
+                    );
+                }
+                hnn_add(ub, res_rem_u[e]);
+                wide urem = 0;
+                const int64_t uprev = hnn_split(hnn_read(ub, &st), lm, &urem, &st);
+
+                HnnSum wb = hnn_sum();
+                hnn_add(wb, -hnn_shifted(res_w_bar[e], lm, &st));
+                for (long long j = 0; j < n; ++j) {
+                    hnn_add_scaled(
+                        wb, capacity[j * n + row],
+                        2 * (wide)rec_res_solved[step * N + base + j]
+                    );
+                }
+                hnn_add(wb, res_rem_w[e]);
+                wide wrem = 0;
+                const int64_t wprev = hnn_split(hnn_read(wb, &st), lm, &wrem, &st);
+                res_u_bar[e] = uprev;
+                res_w_bar[e] = wprev;
+                res_rem_u[e] = urem;
+                res_rem_w[e] = wrem;
+                res_status[e] = st;
+                hnn_note(st, RSTAGE_STATE, (uint32_t)e, &bits, &first);
+            }
+            __syncthreads();
             // The elements: u = split(X̂ᵀ s̄ + r); wave = 2u − s̄.
             for (long long e = t; e < N; e += T) {
                 uint32_t st = 0;

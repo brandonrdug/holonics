@@ -13,7 +13,7 @@
 //! | the keyed charts, their rounded Newton–Schulz steps and exact certificates (`hnn::store`) | each refinement's decisions from the certificates (warm, cold, fallback, target), the cold start's transpose and the exact fallback |
 //! | the word's open (`E_g M_g[c]`, the pair port), its ticks, its receiving read (`hnn_pair_weights`, `hnn_word_forward`) | the faces in `ℚ(θ)`, each tick's balance, the release (`hnn::readout`) |
 //! | the receiving parametron's landmark tree mirrored, stored at the faces where paths part (`hnn::tree::CardTree`, campaign 2, Decision 37): each window's splits at every phase's causal address in cell order (the known targets' deposits applied and undone on the card), and each deposit's opened-path update with its splits, foundings and label runs | the class faces from the splits and their grain exponents (`landmark::faces_of_splits`), added to the card's wave at the grain (`ReceivingPhases::combine`); after every deposit the mirror's counts and the masses, `β`, stop weights, depth words and label ends of every node the deposit's walks opened or it founded, its joins and its held labels, checked against the host's tree (`CardTree::agrees_at`) |
-//! | each declared ring resonator's ticks (`hnn_resonator_word`, campaign 2), driven by the storage waves the card's word sent (`readout::storage_waves`) | the resonators' operands at the cut (`ResonatorOperands::at_cut`, their charts) and their balance, read from the same ticks and checked against the card's record (`crate::hnn::word::resonate`) |
+//! | each declared ring resonator's ticks inside `hnn_word_forward`, its returned wave reaching the next junction; its state/input adjoint inside `hnn_word_reverse` (Decision 38) | the resonators' local operands and certified charts at the cut (`ResonatorOperands::at_cut`); their balances read from the live word's record; gain contractions and deposition at the same producing operands |
 //! | in the GPU suite's parity tests only ([`Resident::with_normal_mirror`]; off the exposure's path, where it replaced no host owner): each normal law's prox step a deposit takes once at its locus (`hnn_outer_update` for `ΔH` and `ΔW`, `hnn_budgeted_split` for their carries, the reaches `X̂f` by `hnn_lattice_read` through the host's successor chart; campaign 2), read against the host's successor (`crate::hnn::lattice::normal_deposit_on_card`), every step counted carried, declined by reason or skipped | the successor constitution (`Constitution::deposited`, the owner of `Θ`), the chart of `H′`, and the steps the card's words cannot carry (a sample off the dyadics, such as `R`'s covector on `(1/W)ℤ`) |
 //! | the word's return (`hnn_word_reverse`) | the compare phase under the hardware law (`reference::compare_phase`: the tree at the grain beside the mixture score, the Holon ratio and its covector), the return's source through `Rᵀ` (the covector lives on `(1/W)ℤ`), the composition onto the loci (`reference::compose`) |
 //! | | keys, the collapse, the first law's ledger, the handles, every refusal's reason |
@@ -64,9 +64,10 @@ use holonics::hnn::propagation::path_attenuation;
 use holonics::hnn::ratio::{HolonRatio, PhaseRatio};
 use holonics::hnn::reference::{
     BudgetStop, ChartTally, ComparePhase, Cut, Declared, ExposedResident, Exposure, WallTimes,
-    compare_phase, compose, expose, window_code_length,
+    compare_phase, compose, expose, expose_from, window_code_length,
 };
 use holonics::hnn::retention::{Diamond, aeon_readings, collapse, contained, separator};
+use holonics::hnn::ring::ResonatorOperands;
 use holonics::hnn::{
     ActiveAddress, AeonBoundary, ChartKey, ChartReading, Constitution, ConstitutionRead, Current,
     Faces, Field, HnnError, Locus, PendingRatio, ReceivingPhases, SourceMoment, Steps,
@@ -298,7 +299,33 @@ impl<'c> Mounted<'c> {
         let current = ratio.current(field)?;
         // The indexed normalized open (ruling B), read from the pending ratio's copy of the moment.
         let opens = SourceOpen::of(field, ratio.moment())?;
-        let plan = WordPlan::form(field, &current, publication, ratio.phases(), moment, &opens)?;
+        // Match the host's declared resonator charts at this producing cut. Only these local
+        // operators are formed here; ring/contact chart refinement remains resident below.
+        let resonators = (0..field.rings().len())
+            .map(|ring| {
+                publication.loci.resonators[ring]
+                    .as_ref()
+                    .map(|material| {
+                        ResonatorOperands::at_cut(
+                            ring,
+                            material,
+                            field.ring(ring).admittance(),
+                            field.step(),
+                            field.word_lattice(),
+                        )
+                    })
+                    .transpose()
+            })
+            .collect::<Result<Vec<_>, HnnError>>()?;
+        let plan = WordPlan::form(
+            field,
+            &current,
+            publication,
+            ratio.phases(),
+            moment,
+            &opens,
+            &resonators,
+        )?;
         let loci = &publication.loci;
         let mut operators = Vec::with_capacity(plan.contacts.len());
         for (a, contact) in plan.contacts.iter().enumerate() {
@@ -538,6 +565,31 @@ impl<'c> Resident<'c> {
             },
             field,
             cut,
+        )
+    }
+
+    /// Run the shared exposure from a caller-declared constitution. This is the resident-card
+    /// counterpart to `Reference::expose_with`, used to compare a loaded resonator source against
+    /// the same cut and prequential protocol.
+    pub fn expose_with(
+        &self,
+        field: &Field,
+        cut: &Cut,
+        constitution: Constitution,
+    ) -> Result<Exposure, HnnError> {
+        let current = Current::at_rest(field);
+        let resident = self.mount_with(field, &current, constitution)?;
+        expose_from(
+            self,
+            &Declared {
+                steps: &self.steps,
+                budget: self.budget,
+                pending_capacity: self.pending_capacity,
+                deadline: self.deadline,
+            },
+            field,
+            cut,
+            resident,
         )
     }
 
@@ -1116,30 +1168,15 @@ impl<'c> ExecutionPort for Resident<'c> {
                 .collect(),
             readings: &word.readings,
         };
-        let mut released = readout::released(
+        let released = readout::released(
             &word.word.plan,
             &publication.loci,
             &word.word.record,
             &executed,
         );
         resident.tally.read(&released.charts);
-        // The declared resonators tick resident on the card, driven by the storage waves the
-        // card's word sent, and the host reads their balance (campaign 2).
-        let resonating: Vec<usize> = (0..field.rings().len())
-            .filter(|&g| resident.constitution.ring_resonator(g).is_some())
-            .collect();
-        if !resonating.is_empty() {
-            let started = Instant::now();
-            let drives = readout::storage_waves(&word.word.plan, &word.word.record, &resonating);
-            released.resonators = crate::hnn::word::resonate(
-                self.card,
-                field,
-                &resident.constitution,
-                &resonating,
-                &drives,
-            )?;
-            resident.wall.resonators += started.elapsed();
-        }
+        // Loaded resonators ran inside this word. The release reads their actual state and
+        // balance from that same record; no separate forward evaluation follows it.
         let path = path_attenuation(
             field,
             ratio.anchor(),
@@ -1369,66 +1406,97 @@ impl<'c> ExecutionPort for Resident<'c> {
             mirror.set(tally);
         }
         let normal_deposit = start.elapsed();
-        // The card's mirror of the tree moved by the deposit's steps, as the host's moved.
-        let start = Instant::now();
-        if let Some((ring, tree)) = resident.tree.as_mut() {
-            let steps: Vec<(Vec<Letter>, usize)> = slot
-                .landmarks()
-                .iter()
-                .filter(|step: &&LandmarkStep| step.ring == *ring)
-                .map(|step| (step.address.clone(), step.class))
-                .collect();
-            tree.deposit(&steps).map_err(device)?;
-            // The lockstep: the counts, and the masses, β, stop weights, depth words and label
-            // ends of every stored node the deposit's walks opened (read on the predecessor: a
-            // later cell's walk only refines an earlier one's chains) and of every node it founded,
-            // the joins it stepped, and the labels it held, against the host's successor tree.
-            let before = resident
-                .constitution
-                .landmarks(*ring)
-                .ok_or(HnnError::Realization {
-                    what: "the host's landmark tree at the predecessor",
+        let tree_steps: Vec<(Vec<Letter>, usize)> =
+            resident.tree.as_ref().map_or_else(Vec::new, |(ring, _)| {
+                slot.landmarks()
+                    .iter()
+                    .filter(|step: &&LandmarkStep| step.ring == *ring)
+                    .map(|step| (step.address.clone(), step.class))
+                    .collect()
+            });
+        // The tree and warm charts are physical mirrors. Keep only this call's predecessor until
+        // every successor read succeeds; a late carrier refusal must not advance either mirror.
+        let chart_before = resident.store.before_trial();
+        let trial = (|| {
+            // The card's mirror of the tree moved by the deposit's steps, as the host's moved.
+            let start = Instant::now();
+            if let Some((ring, tree)) = resident.tree.as_mut() {
+                let steps = &tree_steps;
+                tree.deposit(steps).map_err(device)?;
+                // The lockstep: the counts, and the masses, β, stop weights, depth words and label
+                // ends of every stored node the deposit's walks opened (read on the predecessor: a
+                // later cell's walk only refines an earlier one's chains) and of every node it founded,
+                // the joins it stepped, and the labels it held, against the host's successor tree.
+                let before =
+                    resident
+                        .constitution
+                        .landmarks(*ring)
+                        .ok_or(HnnError::Realization {
+                            what: "the host's landmark tree at the predecessor",
+                        })?;
+                let host = next.landmarks(*ring).ok_or(HnnError::Realization {
+                    what: "the host's landmark tree at the successor",
                 })?;
-            let host = next.landmarks(*ring).ok_or(HnnError::Realization {
-                what: "the host's landmark tree at the successor",
-            })?;
-            let (mut nodes, mut dyadic) = (Vec::new(), Vec::new());
-            for (address, class) in &steps {
-                let (touched, cells) = before.touched(address, *class)?;
-                nodes.extend(touched);
-                dyadic.extend(cells);
+                let (mut nodes, mut dyadic) = (Vec::new(), Vec::new());
+                for (address, class) in steps {
+                    let (touched, cells) = before.touched(address, *class)?;
+                    nodes.extend(touched);
+                    dyadic.extend(cells);
+                }
+                let founded = u32::try_from(before.nodes()).unwrap_or(u32::MAX)
+                    ..u32::try_from(host.nodes()).unwrap_or(u32::MAX);
+                nodes.extend(founded);
+                nodes.sort_unstable();
+                nodes.dedup();
+                dyadic.sort_unstable();
+                dyadic.dedup();
+                if host.nodes() != tree.nodes()
+                    || !tree
+                        .agrees_at(host, &nodes, &dyadic, before.held())
+                        .map_err(device)?
+                {
+                    return Err(HnnError::Realization {
+                        what: "the card's landmark tree against the host's after a deposit (its counts, a written or founded node's masses, β, stop weight, depth word or label end, a join, or a held label)",
+                    });
+                }
             }
-            let founded = u32::try_from(before.nodes()).unwrap_or(u32::MAX)
-                ..u32::try_from(host.nodes()).unwrap_or(u32::MAX);
-            nodes.extend(founded);
-            nodes.sort_unstable();
-            nodes.dedup();
-            dyadic.sort_unstable();
-            dyadic.dedup();
-            if host.nodes() != tree.nodes()
-                || !tree
-                    .agrees_at(host, &nodes, &dyadic, before.held())
-                    .map_err(device)?
-            {
-                return Err(HnnError::Realization {
-                    what: "the card's landmark tree against the host's after a deposit (its counts, a written or founded node's masses, β, stop weight, depth word or label end, a join, or a held label)",
-                });
+            let tree_deposit = start.elapsed();
+            let start = Instant::now();
+            // The successor's loci on the card (the moved words), then the arrived re-read on them.
+            let successor = Rc::new(Publication::publish(
+                self.card,
+                Loci::of(&field, &next)?,
+                Some(&resident.publication),
+            )?);
+            let octets = successor.octets as u64;
+            resident.count(|traffic| traffic.publications += octets);
+            let (reread, readings) =
+                resident.arrived_code_length(&successor, Some(&next), self.card)?;
+            let reread_time = start.elapsed();
+            Ok::<_, HnnError>((successor, reread, readings, tree_deposit, reread_time))
+        })();
+        let (successor, reread, readings, tree_deposit, reread_time) = match trial {
+            Ok(success) => success,
+            Err(refusal) => {
+                let tree_restore = if let Some((ring, tree)) = resident.tree.as_mut() {
+                    match resident.constitution.landmarks(*ring) {
+                        Some(before) => tree.upload(&before.arena()).map_err(device),
+                        None => Err(HnnError::MissingReceivingMap { ring: *ring }),
+                    }
+                } else {
+                    Ok(())
+                };
+                let charts_restore = resident.store.restore(chart_before);
+                let octets = resident.store.octets as u64;
+                resident.count(|traffic| traffic.words += octets);
+                resident.store.octets = 0;
+                resident.publish_tree_times();
+                charts_restore?;
+                tree_restore?;
+                return Err(refusal);
             }
-        }
-        let tree_deposit = start.elapsed();
-        let start = Instant::now();
-        // The successor's loci on the card (the moved words), then the arrived re-read on them.
-        let successor = Rc::new(Publication::publish(
-            self.card,
-            Loci::of(&field, &next)?,
-            Some(&resident.publication),
-        )?);
-        let octets = successor.octets as u64;
-        resident.count(|traffic| traffic.publications += octets);
-        let (reread, readings) =
-            resident.arrived_code_length(&successor, Some(&next), self.card)?;
+        };
         resident.tally.read(&readings);
-        let reread_time = start.elapsed();
         let mut work = ExactWork::nothing();
         stepped(&mut work, 1);
         holonics::hnn::port::resident(&mut work, reading.bits);
@@ -1498,12 +1566,23 @@ impl<'c> ExecutionPort for Resident<'c> {
         let options = LawfulOptions::assemble(&width, tolerance.clone(), None, None, false)?;
         let decided = release(decision, &options)?;
         let released = matches!(decided, ReleaseReturn::Released { .. });
-        let split = match anchors.last() {
-            Some(anchor) => resonance_reading(field.ring(phases.ring()), anchor)?,
-            None => [
-                Component::Absent("the window read no anchor"),
-                Component::Absent("the window read no anchor"),
-            ],
+        let split = if resident
+            .constitution
+            .ring_resonator(phases.ring())
+            .is_some()
+        {
+            [
+                Component::Absent("the loaded resonator has no campaign-3 RIDE/FOUND read"),
+                Component::Absent("the loaded resonator has no campaign-3 RIDE/FOUND read"),
+            ]
+        } else {
+            match anchors.last() {
+                Some(anchor) => resonance_reading(field.ring(phases.ring()), anchor)?,
+                None => [
+                    Component::Absent("the window read no anchor"),
+                    Component::Absent("the window read no anchor"),
+                ],
+            }
         };
         let order = source_order(field, ratio.anchor(), ratio.moment().cells());
         let ticks = vec![phases.junction_steps() as u64; field.rings().len()];

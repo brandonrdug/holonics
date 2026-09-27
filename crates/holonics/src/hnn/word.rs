@@ -19,27 +19,22 @@
 //! [definition] **The carried transients** (Decision 24; Lean `HNN/LatticeWord.{feedback_tick,
 //! carried_word_accounting}`). On the field's declared lattices ([`crate::hnn::chart`]) the word
 //! carries every transient on `2^(−L_w)ℤ` with error feedback: the opening storage, and at each tick
-//! the junction's anchor `v_r`, the element's next storage `s_r′`, the contact's solved `ζ_a`, its
-//! state `(u_a, w_a)` and the arriving waves. Each is the exact image of the carried values under the
+//! the junction's anchor `v_r`, the element output, a loaded ring's returned storage `s_r′`, the
+//! resonator's solve rate and state, the contact's solved `ζ_a`, its state `(u_a, w_a)` and the
+//! arriving waves. The element drive and returned storage have separate carries. Each is the exact image of the carried values under the
 //! executed tick plus its carried remainder, split at the nearest lattice point, ties upward
 //! ([`crate::hnn::chart::carry`]); `Σ_t x_t + r_T = Σ_t y_t` entry by entry, and the word releases
 //! the remainders `r_T` at its end ([`Released::remainders`]). Every product with a chart runs on
 //! the carried values' integer coordinates. Under the exact law nothing is split and every
 //! remainder stays zero.
 //!
-//! [definition] **The field balance and the resonators** (campaign 2; Lean
-//! `HNN/Word.{field_executed_balance_with_defects, field_commit_deposition,
-//! combined_balance_unloaded_port}`, `HNN/Ring.ring_tick_executed_energy_balance`). Every full tick
-//! also records its [`FieldBalance`]: the tick balance's residual taken apart into the junctions'
-//! executed-anchor defect, the elements' and transits' chart defects and the splits of the carried
-//! outputs, with each declared ring resonator's terms (`hnn::ring`: pump work, port work,
-//! dissipation, chart defect, split). A resonator receives the storage wave its ring's junction
-//! sends and moves none of the word's waves, so the word's reads, tick balances and release are
-//! campaign 1's; the port work it draws is delivered by no field term, and the one combined balance
-//! names it as the interconnection's defect ([`FieldBalance::interconnection`]). Its state opens at
-//! zero with the word and is released with it. No deposit happens inside a word (its operands are
-//! fixed at the cut), so the deposition work is read at the commit that follows it
-//! ([`WordBalance::commit`], `½⟨x, ΔΘ x⟩` on the word's end change, [`PowerForm`]).
+//! [definition] **The loaded field balance** (Lean `HNN/Word`, `HNN/Ring`). A junction sends `(b,c)`
+//! to the ring element; its output `e` is split at the word lattice and drives a declared resonator.
+//! The resonator returns `s′ = e − (2/Y)ω`, which is split independently and becomes the next ring
+//! storage. Its port work cancels the field's signed loaded-port term; element, returned-wave and
+//! resonator-state splits remain explicit in [`FieldBalance`]. The resonator's two-state motion and
+//! its adjoint live only in this word. Its four learned gain coordinates update only through the
+//! post-word [`PowerForm`] deposit, whose work includes the resonator's end-state form change.
 //! [`WordBalance::of`] closes the whole word from its release, on every realization of the port,
 //! and [`Word::partings`] reads each declared contact's break receipt at every transit
 //! (`hnn::contact::BreakReceipt`).
@@ -111,7 +106,10 @@ pub(crate) struct Passage {
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct Carried {
     anchors: Vec<Vec<Rat>>,
+    /// The returned ring-storage stream's split remainder; zero at open for a loaded port.
     storage: Vec<Vec<Rat>>,
+    /// The element-output stream's split remainder; a loaded ring inherits the source-open split.
+    element_drive: Vec<Vec<Rat>>,
     solves: Vec<Vec<Rat>>,
     arrivals: Vec<[Vec<Rat>; 2]>,
     states: Vec<[Vec<Rat>; 2]>,
@@ -123,6 +121,7 @@ impl Carried {
             self.anchors
                 .iter()
                 .chain(&self.storage)
+                .chain(&self.element_drive)
                 .chain(&self.solves)
                 .flatten()
                 .chain(self.arrivals.iter().flatten().flatten())
@@ -219,18 +218,14 @@ impl ResonatorBalance {
     }
 }
 
-/// [definition] **One executed tick's field balance, every term stated** (Lean
-/// `HNN/Word.field_executed_balance_with_defects`, campaign 2's committed balance). The field's
-/// power `P` moves by the contacts' dissipation, the rings' passive work, the contrast ports'
-/// power `Π_c`, the junctions' executed-anchor defect, the elements' and transits' chart defects and
-/// the splits of the carried outputs; the resonators' storage (`hnn::ring`) moves by its pump work,
-/// its port work (drawn from the storage wave it receives), its dissipation, its chart defect and
-/// its split. The resonator's port is unloaded: the field returns no wave through it and delivers
-/// none of the port work, so the combined storage `P + E` gains that work, the interconnection's
-/// defect (Lean `HNN/Word.combined_balance_unloaded_port` at `δ = 0`), named here. No deposit
-/// happens within a tick (the operands are fixed at the cut); the deposition work is the commit's
-/// ([`WordBalance::commit`]). No term is set to zero: each is the exact difference it names, and
-/// [`FieldBalance::closes`] checks the one combined identity with them.
+/// [definition] **One executed tick's loaded balance, every term stated** (Lean
+/// `HNN/Ring.{loaded_word_stage_balance, loaded_tick_executed_interconnection_balance}`). The
+/// junction's anchor sends `(b,c)` to the ring element, which returns `e`; a
+/// declared resonator is driven by carried `e` and returns `s′ = e−(2/Y)ω` as the ring's next
+/// storage. Its received port work equals the field's signed loaded-port term with opposite sign.
+/// The balance separately reports the element split, returned-wave split, resonator's internal
+/// state split, and each chart residual. The port pair cancels exactly. No deposit happens within
+/// a tick; the gain deposition work is read at the commit that follows it.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FieldBalance {
     pub before: Rat,
@@ -250,10 +245,13 @@ pub struct FieldBalance {
     pub resonator_dissipation: Rat,
     pub resonator_chart: Rat,
     pub resonator_split: Rat,
-    /// **The interconnection's defect**: the resonators' port work less the power the field
-    /// delivers through their ports. The field returns no wave through an unloaded port, so it
-    /// delivers none, and the defect is the port work the resonators draw (loading the port is owed
-    /// in #62).
+    /// The field's signed port term, equal to minus the loaded resonator's received port work.
+    pub loaded_port: Rat,
+    /// The loaded return's lattice split, an explicit field residual.
+    pub loaded_split: Rat,
+    /// **The interconnection's defect**: resonator port work plus the field's signed loaded-port
+    /// work. It is zero for a loaded port and equals the resonator port work when the port is
+    /// unloaded.
     pub interconnection: Rat,
 }
 
@@ -265,10 +263,12 @@ impl FieldBalance {
             + &self.element_split
             + &self.transit_chart
             + &self.transit_split
+            + &self.loaded_split
     }
 
     /// **The combined balance closes exactly with its stated terms** (Lean
-    /// `combined_balance_unloaded_port`): `(P′ + E′) − (P + E) = − dissipation + resist + Π_c +
+    /// `HNN/Ring.loaded_tick_executed_interconnection_balance`):
+    /// `(P′ + E′) − (P + E) = − dissipation + resist + Π_c +
     /// defects + pump − resonator dissipation + resonator chart + resonator split +
     /// interconnection`.
     pub fn closes(&self) -> bool {
@@ -289,6 +289,9 @@ pub struct EndChange {
     pub storage: Vec<Vec<Rat>>,
     pub arrivals: Vec<[Vec<Rat>; 2]>,
     pub states: Vec<[Vec<Rat>; 2]>,
+    /// Word-local resonator states at the end and the phase whose form measures them.
+    pub resonators: Vec<Option<[Vec<Rat>; 2]>>,
+    pub resonator_phases: Vec<Option<usize>>,
 }
 
 /// [definition] **The field's power form at a cut**, `P(x) = (h/4)[Σ_r Y_r|s_r|² + Σ_a G_a(|a_g|² +
@@ -370,15 +373,30 @@ impl PowerForm {
         Ok(&self.step / integer(4) * waves + stored)
     }
 
+    /// The declared resonator energy at the end state, measured with this constitution.
+    fn resonator_power(&self, change: &EndChange) -> Result<Rat, HnnError> {
+        let mut total = Rat::zero();
+        for (ring, state) in change.resonators.iter().enumerate() {
+            let (Some(material), Some(state), Some(phase)) = (
+                self.resonators.get(ring).and_then(Option::as_ref),
+                state,
+                change.resonator_phases.get(ring).copied().flatten(),
+            ) else {
+                continue;
+            };
+            total += material.energy(phase, &state[0], &state[1])?;
+        }
+        Ok(total)
+    }
+
     /// **The deposition work of the commit from this form to `after`** on the change `x` (Lean
     /// `HNN/Word.field_commit_deposition`, `Holon/Deposition.deposition_work`): `½⟨x, ΔΘ x⟩`,
     /// formed from the forms' differences, `(h/4)[Σ ΔY|s|² + Σ ΔG|a|²] + ½Σ_a(⟨w, ΔC_a w⟩ +
-    /// ⟨u, ΔK_a u⟩)`. Refused at a changed hop or resonator material: no law deposits either (no
-    /// covector reaches a resonator, whose port the return does not pass).
+    /// ⟨u, ΔK_a u⟩)`, including each loaded resonator's end-state form change.
     pub fn deposition_work(&self, after: &PowerForm, change: &EndChange) -> Result<Rat, HnnError> {
-        if self.step != after.step || self.resonators != after.resonators {
+        if self.step != after.step {
             return Err(HnnError::Shape {
-                what: "a commit that changes neither the hop nor a resonator's material",
+                what: "a commit that keeps the hop fixed",
                 expected: 0,
                 found: 1,
             });
@@ -406,6 +424,35 @@ impl PowerForm {
                 + dot(&state[0], &stiffness.apply(&state[0])?))
                 / integer(2);
         }
+        for ring in 0..self.resonators.len().max(after.resonators.len()) {
+            match (
+                self.resonators.get(ring).and_then(Option::as_ref),
+                after.resonators.get(ring).and_then(Option::as_ref),
+                change.resonators.get(ring).and_then(Option::as_ref),
+                change.resonator_phases.get(ring).copied().flatten(),
+            ) {
+                (Some(old), Some(new), Some(state), Some(phase)) if old != new => {
+                    let (old_c, _, _) = old.forms();
+                    let (new_c, _, _) = new.forms();
+                    let old_k = old.pumped_stiffness(phase)?;
+                    let new_k = new.pumped_stiffness(phase)?;
+                    let dc = new_c.subtract(old_c)?;
+                    let dk = new_k.subtract(&old_k)?;
+                    stored += (dot(&state[1], &dc.apply(&state[1])?)
+                        + dot(&state[0], &dk.apply(&state[0])?))
+                        / integer(2);
+                }
+                (None, None, None, _) | (Some(_), Some(_), None, _) => {}
+                (a, b, _, _) if a == b => {}
+                _ => {
+                    return Err(HnnError::Shape {
+                        what: "a deposit that preserves the declared resonator family",
+                        expected: self.resonators.len(),
+                        found: after.resonators.len(),
+                    });
+                }
+            }
+        }
         Ok(&self.step / integer(4) * waves + stored)
     }
 }
@@ -424,8 +471,8 @@ pub struct CommitWork {
 /// from its release on every realization of the port, [`WordBalance::of`]): the field's power at the
 /// open (after the opening split) and at the end, every tick's stated terms summed, the defects
 /// (the ticks' residuals) and the last junction's residual with their certified bound, the
-/// resonators' storage at the end with their terms (they open at zero), the interconnection's
-/// defect (the unloaded port's work), the end change the commit reads, the commit when one follows
+/// resonators' storage at the end with their terms (they open at zero), the signed port pairing,
+/// the end change the commit reads, the commit when one follows
 /// ([`WordBalance::commit`]), and the remainders the end releases, the word's and the resonators'.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct WordBalance {
@@ -444,6 +491,8 @@ pub struct WordBalance {
     pub resonator_chart: Rat,
     pub resonator_split: Rat,
     pub interconnection: Rat,
+    /// The field's loaded-return split work over the word.
+    pub loaded_split: Rat,
     pub change: EndChange,
     pub commit: Option<CommitWork>,
     pub released: Remainders,
@@ -466,6 +515,8 @@ impl WordBalance {
             released.resonators.iter().map(term).sum()
         };
         let port = resonators(|r| &r.port);
+        let loaded_port: Rat = released.balances.iter().map(|tick| &tick.loaded_port).sum();
+        let loaded_split = sum(|tick| &tick.loaded_split);
         Self {
             open,
             end,
@@ -477,7 +528,8 @@ impl WordBalance {
             bound: sum(|t| &t.bound) + &released.last_bound,
             resonator_end: resonators(|r| &r.end),
             pump: resonators(|r| &r.pump),
-            interconnection: port.clone(),
+            interconnection: &port + loaded_port,
+            loaded_split,
             port,
             resonator_dissipation: resonators(|r| &r.dissipation),
             resonator_chart: resonators(|r| &r.chart),
@@ -498,6 +550,7 @@ impl WordBalance {
     /// word's cut, before and after the deposit): the deposition work `½⟨x, ΔΘ x⟩` from the forms'
     /// differences and the end change's power under the committed form alone.
     pub fn commit(&mut self, before: &PowerForm, after: &PowerForm) -> Result<(), HnnError> {
+        self.resonator_end = after.resonator_power(&self.change)?;
         self.commit = Some(CommitWork {
             deposition: before.deposition_work(after, &self.change)?,
             committed: after.power(&self.change)?,
@@ -505,14 +558,14 @@ impl WordBalance {
         Ok(())
     }
 
-    /// The executed residual: the ticks' defects and the last junction's.
+    /// The executed residual: the ticks' defects and loaded splits, plus the last junction's.
     pub fn residual(&self) -> Rat {
-        &self.defects + &self.last
+        &self.defects + &self.last + &self.loaded_split
     }
 
     /// **The word closes with its stated defects, the combined system in one identity** (Lean
-    /// `HNN/Word.{field_executed_balance_with_defects, field_commit_deposition,
-    /// combined_balance_unloaded_port}`): `P_end + E_end = P_open − dissipation + resist + Π_c +
+    /// `HNN/Word.{field_executed_balance_with_defects, field_commit_deposition}`):
+    /// `P_end + E_end = P_open − dissipation + resist + Π_c +
     /// defects + last + pump − resonator dissipation + resonator chart + resonator split +
     /// interconnection`, with `P_end` the committed power and `deposition` added when a commit
     /// follows; and the executed residual lies within its certified bound.
@@ -572,12 +625,16 @@ struct Swung {
 struct Stepped {
     next: Vec<Rat>,
     remainder: Vec<Rat>,
+    drive_remainder: Vec<Rat>,
     midpoint: Vec<Rat>,
     resist: Rat,
     drive: Rat,
     chart: Rat,
     split: Rat,
     bound: Rat,
+    resonance: Option<ResonatorStep>,
+    loaded_port: Rat,
+    loaded_split: Rat,
 }
 
 /// One contact's transit at a tick: the carried arrivals, state and solve with their remainders,
@@ -715,6 +772,7 @@ impl<'c> Word<'c> {
         let mut carried = Carried {
             anchors: widths.iter().map(|n| zeros(*n)).collect(),
             storage: Vec::with_capacity(widths.len()),
+            element_drive: widths.iter().map(|n| zeros(*n)).collect(),
             solves: field
                 .contacts()
                 .iter()
@@ -723,11 +781,22 @@ impl<'c> Word<'c> {
             arrivals: arrivals.clone(),
             states: states.clone(),
         };
+        // The source-open split belongs to the ordinary ring element's incoming storage chart.
+        // Once a resonator is inserted after that element, the returned wave starts a distinct
+        // output chart with no prior returned-wave remainder.
         let storage: Vec<Vec<Rat>> = storage
             .into_iter()
-            .map(|wave| {
+            .enumerate()
+            .map(|(ring, wave)| {
                 let (opened, remainder) = split(lattice.as_ref(), wave.clone(), &zeros(wave.len()));
-                carried.storage.push(remainder);
+                if operands.resonators()[ring].is_some() {
+                    // The opening storage remainder belongs to the element-output stream. A
+                    // loaded returned wave starts its own carry chain at zero.
+                    carried.storage.push(zeros(wave.len()));
+                    carried.element_drive[ring] = remainder;
+                } else {
+                    carried.storage.push(remainder);
+                }
                 opened
             })
             .collect();
@@ -854,16 +923,27 @@ impl<'c> Word<'c> {
             .collect()
     }
 
+    /// Largest rational coordinate of the current wave/contact/mode state. Carried residuals
+    /// have their own complete bit receipt in Released and ResonatorBalance.
     fn state_bits(&self) -> u64 {
         let bits = |x: &Rat| x.numer().bits() + x.denom().bits();
-        self.storage
+        let field = self
+            .storage
             .iter()
             .flatten()
             .chain(self.arrivals.iter().flatten().flatten())
             .chain(self.states.iter().flatten().flatten())
             .map(bits)
             .max()
+            .unwrap_or(0);
+        self.resonators
+            .iter()
+            .filter_map(Option::as_ref)
+            .flat_map(|resonance| resonance.state.iter().flatten())
+            .map(bits)
+            .max()
             .unwrap_or(0)
+            .max(field)
     }
 
     /// The transients' lattice, or `None` under the exact law.
@@ -964,37 +1044,128 @@ impl<'c> Word<'c> {
         let (mut resist, mut contrast, mut dissipation) = (Rat::zero(), Rat::zero(), Rat::zero());
         // Every element reads only its own junction and storage remainder: the rings run together,
         // and their balance terms are summed afterwards in ring order.
-        let (operands, remainders) = (&self.operands, &self.carried.storage);
+        let (operands, remainders, drive_remainders, resonances) = (
+            &self.operands,
+            &self.carried.storage,
+            &self.carried.element_drive,
+            &self.resonators,
+        );
+        let tick = self.passage.len() - 1;
         let steps = indexed(junctions.len(), |ring| {
-            let step = element_step(
+            let element = element_step(
                 &operands.rings()[ring],
                 &junctions[ring].storage_wave,
                 &junctions[ring].contrast,
             )?;
-            let (next, remainder) = split(lattice.as_ref(), step.next.clone(), &remainders[ring]);
+            let (
+                next,
+                remainder,
+                drive_remainder,
+                resonance,
+                loaded_port,
+                element_split,
+                loaded_split,
+                element_bound,
+            ) = match (&operands.resonators()[ring], &resonances[ring]) {
+                (Some(resonator), Some(resonance)) => {
+                    let (drive, drive_remainder) = split(
+                        lattice.as_ref(),
+                        element.next.clone(),
+                        &drive_remainders[ring],
+                    );
+                    let driven = resonator.step(
+                        tick,
+                        &drive,
+                        [&resonance.state[0], &resonance.state[1]],
+                        &resonance.remainders,
+                        lattice.as_ref(),
+                    )?;
+                    let (next, remainder) =
+                        split(lattice.as_ref(), driven.output.clone(), &remainders[ring]);
+                    let (element_power, element_bound) = split_energy(&drive, &element.next, &unit);
+                    let (loaded_power, loaded_bound) = split_energy(&next, &driven.output, &unit);
+                    let admittance = operands.rings()[ring].admittance();
+                    let element_split = &quarter * admittance * element_power;
+                    let loaded_split = &quarter * admittance * loaded_power;
+                    let element_bound = &quarter * admittance * element_bound
+                        + &quarter * admittance * loaded_bound;
+                    let loaded_port = -driven.port.clone();
+                    (
+                        next,
+                        remainder,
+                        drive_remainder,
+                        Some(driven),
+                        loaded_port,
+                        element_split,
+                        loaded_split,
+                        element_bound,
+                    )
+                }
+                _ => {
+                    let (next, remainder) =
+                        split(lattice.as_ref(), element.next.clone(), &remainders[ring]);
+                    let (split_power, split_bound) = split_energy(&next, &element.next, &unit);
+                    (
+                        next,
+                        remainder,
+                        drive_remainders[ring].clone(),
+                        None,
+                        Rat::zero(),
+                        &quarter * operands.rings()[ring].admittance() * split_power,
+                        Rat::zero(),
+                        &quarter * operands.rings()[ring].admittance() * split_bound,
+                    )
+                }
+            };
             let admittance = operands.rings()[ring].admittance();
-            let (split_power, split_bound) = split_energy(&next, &step.next, &unit);
             Ok::<_, HnnError>(Stepped {
                 remainder,
-                midpoint: step.midpoint,
-                resist: &half * admittance * &step.resist,
-                drive: &half * admittance * &step.drive,
-                chart: &half * admittance * &step.defect,
-                split: &quarter * admittance * &split_power,
-                bound: &half * admittance * &step.bound + &quarter * admittance * &split_bound,
+                drive_remainder,
+                midpoint: element.midpoint,
+                resist: &half * admittance * &element.resist,
+                drive: &half * admittance * &element.drive,
+                chart: &half * admittance * &element.defect,
+                split: element_split,
+                bound: &half * admittance * &element.bound + element_bound,
                 next,
+                resonance,
+                loaded_port,
+                loaded_split,
             })
         })?;
         let mut midpoints = Vec::with_capacity(steps.len());
+        let mut loaded_port = Rat::zero();
+        let mut loaded_split = Rat::zero();
+        let mut resonance_terms: [Rat; 7] = std::array::from_fn(|_| Rat::zero());
         for (ring, step) in steps.into_iter().enumerate() {
             resist += step.resist;
             contrast += step.drive;
             element_chart += step.chart;
             element_split += step.split;
             bound += step.bound;
+            loaded_port += &step.loaded_port;
+            loaded_split += &step.loaded_split;
             self.storage[ring] = step.next;
             self.carried.storage[ring] = step.remainder;
+            self.carried.element_drive[ring] = step.drive_remainder;
             midpoints.push(step.midpoint);
+            if let (Some(step), Some(resonance)) = (step.resonance, self.resonators[ring].as_mut())
+            {
+                for (total, term) in resonance_terms.iter_mut().zip([
+                    &step.before,
+                    &step.after,
+                    &step.pump,
+                    &step.port,
+                    &step.dissipation,
+                    &step.chart,
+                    &step.split,
+                ]) {
+                    *total += term;
+                }
+                resonance.state = step.state.clone();
+                resonance.remainders = step.remainders().clone();
+                resonance.steps.push(step);
+            }
         }
         // Every contact reads the outgoing waves of its two ends, its own state and its own
         // remainders, and writes only its own arrivals, state and remainders: the contacts run
@@ -1121,52 +1292,6 @@ impl<'c> Word<'c> {
             record.midpoints = midpoints;
             record.rates = rates;
         }
-        // Every resonator reads only its own ring's storage wave, state and remainders, and writes
-        // only its own: the rings run together (`hnn::ring`). It receives the wave; it moves none.
-        let tick = self.passage.len() - 1;
-        let (operands, resonances) = (&self.operands, &self.resonators);
-        let resonated = indexed(resonances.len(), |ring| {
-            match (&operands.resonators()[ring], &resonances[ring]) {
-                (Some(resonator), Some(resonance)) => resonator
-                    .step(
-                        tick,
-                        &junctions[ring].storage_wave,
-                        [&resonance.state[0], &resonance.state[1]],
-                        &resonance.remainders,
-                        lattice.as_ref(),
-                    )
-                    .map(Some),
-                _ => Ok(None),
-            }
-        })?;
-        let mut resonator = [
-            Rat::zero(),
-            Rat::zero(),
-            Rat::zero(),
-            Rat::zero(),
-            Rat::zero(),
-            Rat::zero(),
-            Rat::zero(),
-        ];
-        for (ring, step) in resonated.into_iter().enumerate() {
-            let (Some(step), Some(resonance)) = (step, self.resonators[ring].as_mut()) else {
-                continue;
-            };
-            for (total, term) in resonator.iter_mut().zip([
-                &step.before,
-                &step.after,
-                &step.pump,
-                &step.port,
-                &step.dissipation,
-                &step.chart,
-                &step.split,
-            ]) {
-                *total += term;
-            }
-            resonance.state = step.state.clone();
-            resonance.remainders = step.remainders().clone();
-            resonance.steps.push(step);
-        }
         let residual =
             &junction_defect + &element_chart + &element_split + &transit_chart + &transit_split;
         let balance = TickBalance {
@@ -1175,6 +1300,8 @@ impl<'c> Word<'c> {
             dissipation,
             resist,
             contrast,
+            loaded_port: loaded_port.clone(),
+            loaded_split: loaded_split.clone(),
             residual,
             bound,
         };
@@ -1186,7 +1313,7 @@ impl<'c> Word<'c> {
             resonator_dissipation,
             resonator_chart,
             resonator_split,
-        ] = resonator;
+        ] = resonance_terms;
         self.fields.push(FieldBalance {
             before: balance.before.clone(),
             after: balance.after.clone(),
@@ -1201,9 +1328,9 @@ impl<'c> Word<'c> {
             resonator_before,
             resonator_after,
             pump,
-            // The field returns no wave through the resonators' ports and delivers none of their
-            // work (its tick balance has no port term): the whole port work is the defect.
-            interconnection: port.clone(),
+            loaded_port: loaded_port.clone(),
+            loaded_split: loaded_split.clone(),
+            interconnection: &port + &loaded_port,
             port,
             resonator_dissipation,
             resonator_chart,
@@ -1234,9 +1361,18 @@ impl<'c> Word<'c> {
         &self.resonators
     }
 
-    /// **The storage waves `b_r = 2v_r − s_r` the junctions sent at junction step `step`** (the
-    /// resonators' drives), read from the word's own record: the carried anchor and the storage at
-    /// the step's start. `None` past the steps taken.
+    /// The loaded port's two nested wave-chart remainders, used by its smallest law fixture.
+    #[cfg(test)]
+    pub(crate) fn loaded_wave_remainders(&self, ring: usize) -> Option<(&[Rat], &[Rat])> {
+        self.resonators.get(ring)?.as_ref()?;
+        Some((
+            &self.carried.element_drive[ring],
+            &self.carried.storage[ring],
+        ))
+    }
+
+    /// The driven wave at junction step `step`: the element output `e` when a loaded resonator is
+    /// declared, otherwise the junction's storage wave `b = 2v−s`. `None` past the steps taken.
     pub fn storage_waves(&self, step: usize) -> Option<Vec<Vec<Rat>>> {
         let record = self.passage.get(step)?;
         Some(
@@ -1244,7 +1380,16 @@ impl<'c> Word<'c> {
                 .anchors
                 .iter()
                 .zip(&record.storage)
-                .map(|(anchor, storage)| crate::geometry::swing::swing(anchor, storage))
+                .enumerate()
+                .map(|(ring, (anchor, storage))| {
+                    self.resonators[ring]
+                        .as_ref()
+                        .and_then(|resonance| resonance.steps.get(step))
+                        .map_or_else(
+                            || crate::geometry::swing::swing(anchor, storage),
+                            |resonance| resonance.drive.clone(),
+                        )
+                })
                 .collect(),
         )
     }
@@ -1322,6 +1467,20 @@ impl<'c> Word<'c> {
                 storage: self.storage.clone(),
                 arrivals: self.arrivals.clone(),
                 states: self.states.clone(),
+                resonators: self
+                    .resonators
+                    .iter()
+                    .map(|resonance| resonance.as_ref().map(|r| r.state.clone()))
+                    .collect(),
+                resonator_phases: self
+                    .resonators
+                    .iter()
+                    .map(|resonance| {
+                        resonance
+                            .as_ref()
+                            .map(|r| r.steps.last().map_or(0, |step| step.phase))
+                    })
+                    .collect(),
             },
             remainders: self.carried.released(),
             charts: self.operands.charts(),

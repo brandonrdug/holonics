@@ -34,18 +34,14 @@
 //! locked sheets whose threshold is the perceptron (`locked_sheet_receiver_face`,
 //! [`sheets`]).
 //!
-//! [definition; agent-inferred] **The resonator receives the storage wave; it does not load it.** The
-//! word's return (`hnn::port`'s pull-back, the exact adjoint of the executed forward) does not pass
-//! through the resonator in campaign 2, so the resonator stands at the ring's storage port as a
-//! driven receiver: the port work it draws is stated in its own balance, and the field, which
-//! receives no returned wave through that port, delivers none of it. The combined balance names
-//! that work as the interconnection's defect (Lean `HNN/Word.combined_balance_unloaded_port`,
-//! `hnn::word::FieldBalance::interconnection`), and the waves, the return and every campaign-1
-//! reading are unchanged. No covector reaches the resonator, so no deposit changes its material.
-//! Loading the port (the resonator's returned wave `β − (2/Y) ω` fed back into the ring's storage,
-//! which makes the defect zero) needs the return through the resonator; it is owed in #62. A ring
-//! without a declared resonator (every campaign-1 constitution) has none, and its word is
-//! campaign 1's.
+//! [definition; agent-inferred] **The resonator is loaded at the ring storage port.** The junction
+//! sends `(b,c)` to the ring element, which returns `e`; the resonator is driven by that carried
+//! element output and returns `s′ = e − (2/Y)ω` to the ring's next storage. The return composes the
+//! resonator's two-state recurrence before the element and junction transposes. Its port work
+//! `P_r = (hY/4)(|e|² − |s′|²)` cancels the field's signed loaded-port term `−P_r`; the remaining
+//! split and solve-chart residuals stay explicit. The mode state is word-local and is dropped with
+//! the word; the constitution's gains alone may persist through deposition. A ring without a
+//! declared resonator retains the earlier element path exactly.
 //!
 //! [definition; agent-inferred] **The pump's phases are finite.** The pump carrier advances by a
 //! declared rational rotation per tick; the only rational rotations of finite order in the plane are
@@ -182,6 +178,11 @@ impl PumpDeclaration {
         self.step
     }
 
+    /// The same pump family at a new nonnegative strength.
+    pub fn with_strength(&self, strength: Rat) -> Result<Self, HnnError> {
+        Self::new(strength, self.axis.clone(), self.step)
+    }
+
     /// The pump phases a word visits.
     pub fn phases(&self) -> usize {
         self.step.order()
@@ -225,13 +226,19 @@ pub fn sheets(displacement: &[Rat], axis: &Carrier) -> Vec<bool> {
 
 /// [definition] **A ring's resonator material** in `Θ`: its storage `C` on the rate, its stiffness `K`
 /// on the displacement, its dissipation `D` on the rate (each symmetric on the ring's realified
-/// width; `C, D ⪰ 0`), and its pump. It is declared, not learned, in campaign 2.
+/// width; `C, D ⪰ 0`), and its pump. The immutable base forms are declared; four squared scalar
+/// amplitudes are learned at the ring's loaded port.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ResonatorMaterial {
     capacity: ExactRatMatrix,
     stiffness: ExactRatMatrix,
     dissipation: ExactRatMatrix,
     pump: Option<PumpDeclaration>,
+    base_capacity: ExactRatMatrix,
+    base_stiffness: ExactRatMatrix,
+    base_dissipation: ExactRatMatrix,
+    base_pump: Option<PumpDeclaration>,
+    gains: [Rat; 4],
 }
 
 impl ResonatorMaterial {
@@ -269,11 +276,66 @@ impl ResonatorMaterial {
         }
         symmetric(&stiffness)?;
         Ok(Self {
+            base_capacity: capacity.clone(),
+            base_stiffness: stiffness.clone(),
+            base_dissipation: dissipation.clone(),
+            base_pump: pump.clone(),
             capacity,
             stiffness,
             dissipation,
             pump,
+            gains: std::array::from_fn(|_| Rat::one()),
         })
+    }
+
+    /// The trainable amplitudes of the declared storage, stiffness, dissipation and pump forms.
+    /// Their squares scale immutable declared bases, so positive semidefiniteness is structural.
+    pub fn gains(&self) -> &[Rat; 4] {
+        &self.gains
+    }
+
+    /// Rebuild the material from its declared forms and squared scalar amplitudes. The caller
+    /// certifies the candidate at its ring's hop before publication.
+    pub fn with_gains(&self, gains: [Rat; 4]) -> Result<Self, HnnError> {
+        let scale = |form: &ExactRatMatrix, gain: &Rat| form.scaled(&(gain * gain));
+        let pump = self
+            .base_pump
+            .as_ref()
+            .map(|pump| pump.with_strength(pump.strength() * &gains[3] * &gains[3]))
+            .transpose()?;
+        Ok(Self {
+            capacity: scale(&self.base_capacity, &gains[0]),
+            stiffness: scale(&self.base_stiffness, &gains[1]),
+            dissipation: scale(&self.base_dissipation, &gains[2]),
+            pump,
+            base_capacity: self.base_capacity.clone(),
+            base_stiffness: self.base_stiffness.clone(),
+            base_dissipation: self.base_dissipation.clone(),
+            base_pump: self.base_pump.clone(),
+            gains,
+        })
+    }
+
+    /// Immutable declared bases for the four gain coordinates.
+    pub fn gain_bases(
+        &self,
+    ) -> (
+        &ExactRatMatrix,
+        &ExactRatMatrix,
+        &ExactRatMatrix,
+        Option<&Rat>,
+    ) {
+        (
+            &self.base_capacity,
+            &self.base_stiffness,
+            &self.base_dissipation,
+            self.base_pump.as_ref().map(PumpDeclaration::strength),
+        )
+    }
+
+    /// The immutable declared pump chart, before its learned amplitude is applied.
+    pub fn base_pump(&self) -> Option<&PumpDeclaration> {
+        self.base_pump.as_ref()
     }
 
     /// **The parametron's resonator** (module header): `C = BᵀW_C B` and `K = BᵀW_K B` on the real and
@@ -410,6 +472,13 @@ impl PhaseSolve {
             Self::Chart(chart) => chart.apply(vector),
         }
     }
+
+    fn apply_transpose(&self, vector: &[Rat]) -> Result<Vec<Rat>, HnnError> {
+        match self {
+            Self::Exact(inverse) => Ok(inverse.transpose()?.apply(vector)?),
+            Self::Chart(chart) => chart.apply_transpose(vector),
+        }
+    }
 }
 
 /// One pump phase's operands: its stiffness `K_j`, its operator `M_j` and its executed solve.
@@ -448,6 +517,14 @@ pub struct ResonatorOperands {
 /// executed balance (module header), with the carried state and the remainders it leaves.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ResonatorStep {
+    /// The element output that drives this loaded port.
+    pub drive: Vec<Rat>,
+    /// Resonator state before the tick.
+    pub input: [Vec<Rat>; 2],
+    /// The exact right side of the phase solve before its executed chart.
+    pub right: Vec<Rat>,
+    /// The returned storage wave `drive − (2/Y) rate` before the word's carried split.
+    pub output: Vec<Rat>,
     pub phase: usize,
     pub before: Rat,
     pub after: Rat,
@@ -606,6 +683,16 @@ impl ResonatorOperands {
         &self.phases[phase].stiffness
     }
 
+    /// Apply the transpose of the executed phase solve to a covector.
+    pub fn solve_transpose(&self, phase: usize, covector: &[Rat]) -> Result<Vec<Rat>, HnnError> {
+        self.phases[phase].solve.apply_transpose(covector)
+    }
+
+    /// Apply the executed phase solve to a right-side variation.
+    pub fn solve(&self, phase: usize, right: &[Rat]) -> Result<Vec<Rat>, HnnError> {
+        self.phases[phase].solve.apply(right)
+    }
+
     /// Every chart's reading (none under the exact law).
     pub fn charts(&self) -> Vec<ResonatorChart> {
         self.phases
@@ -701,6 +788,10 @@ impl ResonatorOperands {
         let after = self.energy_at(phase, &displacement, &velocity)?;
         let split_term = &after - self.energy_at(phase, &displacement_image, &velocity_image)?;
         Ok(ResonatorStep {
+            drive: drive.to_vec(),
+            input: [u.to_vec(), w.to_vec()],
+            right,
+            output: out,
             phase,
             before,
             after,

@@ -33,6 +33,7 @@ use core::ffi::c_void;
 
 use holonics::hnn::contact::signed_stiffness;
 use holonics::hnn::propagation::{contact_operator, element_material, gram, ring_operator};
+use holonics::hnn::ring::ResonatorMaterial;
 use holonics::hnn::{ConstitutionRead, Field, HnnError, Locus};
 use holonics::ratio::Rat;
 use holonics::ratio::linear::ExactRatMatrix;
@@ -109,6 +110,9 @@ pub(crate) struct Loci {
     pub(crate) rings: Vec<RingLoci>,
     pub(crate) contacts: Vec<ContactLoci>,
     pub(crate) sources: Vec<SourceLoci>,
+    /// Loaded mode material of this producing publication. Candidate re-reads must use these
+    /// forms before the successor replaces the resident's published constitution.
+    pub(crate) resonators: Vec<Option<ResonatorMaterial>>,
     /// The receiving map per ring (`None` off the receiving rings).
     pub(crate) maps: Vec<Option<Placed>>,
     pub(crate) words: Vec<i64>,
@@ -295,6 +299,9 @@ impl Loci {
             rings,
             contacts,
             sources,
+            resonators: (0..field.rings().len())
+                .map(|ring| constitution.ring_resonator(ring).cloned())
+                .collect(),
             maps,
             words: words.words,
             layout: words.layout,

@@ -151,7 +151,7 @@
 //! | `HNN/LatticeWord.{roundedIter_certificate, newton_schulz_iter_left, inverse_chart_deviation}` | [`ChartRule`] (the lattice `L_s`, the target `δ_ℓ`, the refinement count) |
 //! | `HNN/Normal.normalStatistic_standing`, `objective_eq_statisticObjective`, for its statistic `H` only (carried on the lattice) | [`NormalLaw::gram`] (keeps `H`, never the samples) |
 //! | `HNN/Normal.deposit_local`, `windowGram_apply_eq_zero` | [`Constitution::deposited`] (per locus, only its window) |
-//! | `HNN/Normal.reaction_deposit_storage_unchanged`, `reaction_deposits_keep_committed_energy` | [`DepositReading::growth`] |
+//! | `HNN/Normal.reaction_deposit_storage_unchanged`, `reaction_deposits_keep_committed_energy` | [`DepositReading::contact_growth`] |
 //! | `HNN/Normal.factorCarrier_psd` | the factor families ([`FactorGradient`]) |
 //! | `HNN/Normal.standing_deposit`, `sheetClass_locally_constant` | [`FactorGradient::Standing`] |
 //! | `HNN/LatticeDeposit.{quot, rem, div_rem_spec, rem_bounds, quot_eq_zero_of_bounds, fine}` | [`Lattice::div_rem`] (the carry's fine split), [`Lattice::div_rem_coordinate`] (its coarse split) |
@@ -579,17 +579,20 @@ pub enum Locus {
     SourcePort(usize),
     /// Ring `g`'s standing `q_g`.
     Standing(usize),
+    /// Ring `g`'s loaded resonator's four squared gain coordinates `(C,K,D,pump)`.
+    Resonator(usize),
     /// Ring `g`'s receiving map `R`.
     ReceivingMap(usize),
 }
 
 impl Locus {
     /// **The design's operator-entry count** of a locus: an element's `n_g²`, a channel's `3k_a²`
-    /// (its `C`, `K`, `D`), and zero for every other locus (design (a), retention item 3, the
-    /// count `release.py` reports).
+    /// (its `C`, `K`, `D`), four scalar resonator gains, and zero for the other loci (design (a),
+    /// retention item 3, the count `release.py` reports).
     pub fn entries(&self, field: &Field) -> usize {
         match *self {
             Locus::Element(ring) => field.ring(ring).width().pow(2),
+            Locus::Resonator(_) => 4,
             Locus::Channel(contact) => 3 * field.contact(contact).width().pow(2),
             _ => 0,
         }
@@ -1722,8 +1725,12 @@ struct RingMaterial {
     /// The receiver's mixture of the tree's face and the combined face (ruling A), on a receiving
     /// ring: its carried likelihood ratio `β`.
     mixture: Option<Mixture>,
-    /// The ring's resonator (campaign 2, `hnn::ring`), declared, not learned.
+    /// The ring's loaded resonator: immutable base forms with learned scalar amplitudes.
     resonator: Option<ResonatorMaterial>,
+    /// The four factor-family statistics for its squared gain coordinates.
+    resonator_scales: [Rat; 4],
+    /// The hop at which every candidate resonator material is certified.
+    resonator_step: Option<Rat>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -1818,6 +1825,8 @@ pub enum Carrier {
     SliceScale,
     Standing,
     StandingScale,
+    Resonator(usize),
+    ResonatorScale(usize),
     /// Family 0, 1, 2: the outputs `e`, the current reads `a`, the earlier reads `b`.
     Pair {
         offset: usize,
@@ -1935,6 +1944,12 @@ pub enum FactorGradient {
     /// The standing `q_g`, through the declared lock chart (the class covector carried by the
     /// transpose of the contrast map `q ↦ Δ`).
     Standing { ring: usize, gradient: Vec<Rat> },
+    /// One squared scalar amplitude of a declared resonator base form: `C`, `K`, `D`, or pump.
+    Resonator {
+        ring: usize,
+        family: usize,
+        gradient: Rat,
+    },
     /// The pair port's outputs `e_ρ`, current reads `a_ρ` and earlier reads `b_ρ`.
     PairPort {
         ring: usize,
@@ -1972,6 +1987,7 @@ impl FactorGradient {
                 Box::new(gradient.iter().flat_map(|(u, v)| u.iter().chain(v)))
             }
             FactorGradient::Standing { gradient, .. } => Box::new(gradient.iter()),
+            FactorGradient::Resonator { gradient, .. } => Box::new(std::iter::once(gradient)),
             FactorGradient::PairPort {
                 outputs,
                 current,
@@ -1987,6 +2003,7 @@ impl FactorGradient {
                 Locus::Element(ring)
             }
             FactorGradient::Standing { ring, .. } => Locus::Standing(ring),
+            FactorGradient::Resonator { ring, .. } => Locus::Resonator(ring),
             FactorGradient::PairPort { ring, .. } => Locus::SourcePort(ring),
             FactorGradient::Storage { contact, .. }
             | FactorGradient::Stiffness { contact, .. }
@@ -2003,9 +2020,12 @@ pub struct FactorStep {
     pub energy: Rat,
 }
 
-/// [definition] **What a deposit's publication reads**: the energy-growth bound `ε_k` certified
-/// for the storage forms (`Q_(k+1) ⪯ (1 + ε_k) Q_k`, zero when only reaction material moved, `None`
-/// when no dyadic bound up to `2^40` certifies it), the running product `∏(1 + ε_k)`, the commit
+/// [definition] **What a deposit's publication reads**: the contact-storage growth bound `ε_k`
+/// certified for the contact forms only (`Q_(k+1) ⪯ (1 + ε_k) Q_k`, zero when contact C/K did not
+/// move, `None` when no dyadic bound up to `2^40` certifies it), and its contact-only product
+/// `∏(1 + ε_k)`. This is not a certificate for the loaded resonator's C, signed/pumped K or D;
+/// `PowerForm::deposition_work` reports C/K end-state work, while a phase-dependent growth bound
+/// through later words remains owed in #62. The reading also returns the commit
 /// reached, the successor's exact bits against the budget, the loci reached, and the budgeted
 /// carry's report: every residual the deposit released (exact and sparse, with its locus, carrier
 /// and entry; Lean `HNN/LatticeDeposit.release`), their bits, and the number of entries whose
@@ -2015,8 +2035,8 @@ pub struct FactorStep {
 /// is reported, never silent.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DepositReading {
-    pub growth: Option<Rat>,
-    pub product: Rat,
+    pub contact_growth: Option<Rat>,
+    pub contact_product: Rat,
     pub commit: u64,
     pub bits: u64,
     pub budget: u64,
@@ -2040,7 +2060,8 @@ pub struct Constitution {
     budget: u64,
     commit: u64,
     released: BTreeSet<Locus>,
-    bound: CommittedEnergyBound,
+    /// Contact C/K growth only. Loaded ring-mode growth has no committed global bound yet.
+    contact_bound: CommittedEnergyBound,
     /// The declared lattice of every learned locus (the field's).
     lattices: BTreeMap<Locus, Lattice>,
     /// The factor families' carried remainders (the normal laws carry their own).
@@ -2237,6 +2258,8 @@ impl Constitution {
                     mixture: receivers.contains(&g).then(|| Mixture::new(carrier(g))),
                     tree: tree(g)?,
                     resonator: None,
+                    resonator_scales: std::array::from_fn(|_| Rat::one()),
+                    resonator_step: None,
                 })
             })
             .collect::<Result<Vec<_>, HnnError>>()?;
@@ -2262,7 +2285,7 @@ impl Constitution {
             budget,
             commit: 0,
             released: BTreeSet::new(),
-            bound: CommittedEnergyBound::new(Rat::zero()),
+            contact_bound: CommittedEnergyBound::new(Rat::zero()),
             lattices,
             carries: Carries::new(),
             clocks: BTreeMap::new(),
@@ -2298,11 +2321,6 @@ impl Constitution {
     /// because deposits only advance (module header); the ticks are not retained.
     pub fn clock(&self, locus: Locus) -> u64 {
         self.clocks.get(&locus).copied().unwrap_or(0)
-    }
-
-    /// The running energy-bound product `∏(1 + ε_k)`.
-    pub fn energy_product(&self) -> &Rat {
-        self.bound.product()
     }
 
     /// Ring `g`'s source-port normal law `E_g`.
@@ -2464,6 +2482,11 @@ impl Constitution {
         ring: usize,
         material: ResonatorMaterial,
     ) -> Result<Self, HnnError> {
+        if self.released.contains(&Locus::Resonator(ring)) {
+            return Err(HnnError::ReleasedLocus {
+                locus: Locus::Resonator(ring),
+            });
+        }
         if material.width() != field.ring(ring).width() {
             return Err(HnnError::Shape {
                 what: "a resonator (the ring's realified width)",
@@ -2473,43 +2496,140 @@ impl Constitution {
         }
         material.certify(ring, field.step())?;
         self.rings[ring].resonator = Some(material);
+        self.rings[ring].resonator_step = Some(field.step().clone());
+        let lattice =
+            self.lattices
+                .get(&Locus::Element(ring))
+                .copied()
+                .ok_or(HnnError::Lattice {
+                    locus: Locus::Element(ring),
+                })?;
+        self.lattices.insert(Locus::Resonator(ring), lattice);
         Ok(self)
     }
 
-    /// **The campaign-2 declarations' exact bits** (a reading the code length charges): each boost's
-    /// signature, each surface density, and each resonator's forms and pump, as numerator and
-    /// denominator bits.
-    pub fn declared_bits(&self) -> u64 {
-        let matrix_bits = |m: &ExactRatMatrix| m.entries().iter().map(bits).sum::<u64>();
-        let rings: u64 = self
+    /// **The campaign-2 material declaration code** in the field's exact self-delimiting chart:
+    /// ring indices, immutable resonator base forms, the base pump, its initial gain coordinates,
+    /// and contact boosts/surface densities. This code is charged with `Field::describe` and
+    /// includes the immutable operands omitted from the learned-lattice carrier census.
+    pub fn describe_physics(&self) -> Vec<bool> {
+        use crate::hnn::field::{natural, rational};
+
+        fn matrix(code: &mut Vec<bool>, matrix: &ExactRatMatrix) {
+            natural(code, matrix.rows() as u64);
+            natural(code, matrix.columns() as u64);
+            for value in matrix.entries() {
+                rational(code, value);
+            }
+        }
+
+        let mut code = Vec::new();
+        let resonators: Vec<_> = self
             .rings
             .iter()
-            .filter_map(|ring| ring.resonator.as_ref())
-            .map(|resonator| {
-                let (c, k, d) = resonator.forms();
-                matrix_bits(c)
-                    + matrix_bits(k)
-                    + matrix_bits(d)
-                    + resonator.pump().map_or(0, |pump| {
-                        bits(pump.strength())
-                            + bits(pump.axis().cos())
-                            + bits(pump.axis().sin())
-                            + 2
-                    })
-            })
-            .sum();
-        let contacts: u64 = self
+            .enumerate()
+            .filter_map(|(ring, material)| material.resonator.as_ref().map(|m| (ring, m)))
+            .collect();
+        natural(&mut code, resonators.len() as u64);
+        for (ring, material) in resonators {
+            natural(&mut code, ring as u64);
+            let (capacity, stiffness, dissipation, _) = material.gain_bases();
+            for form in [capacity, stiffness, dissipation] {
+                matrix(&mut code, form);
+            }
+            match material.base_pump() {
+                None => natural(&mut code, 0),
+                Some(pump) => {
+                    natural(&mut code, 1);
+                    rational(&mut code, pump.strength());
+                    rational(&mut code, pump.axis().cos());
+                    rational(&mut code, pump.axis().sin());
+                    natural(
+                        &mut code,
+                        match pump.step() {
+                            crate::hnn::ring::PumpStep::Stand => 0,
+                            crate::hnn::ring::PumpStep::Quarter => 1,
+                            crate::hnn::ring::PumpStep::Half => 2,
+                            crate::hnn::ring::PumpStep::ThreeQuarters => 3,
+                        },
+                    );
+                }
+            }
+            natural(&mut code, 4);
+            for gain in material.gains() {
+                rational(&mut code, gain);
+            }
+        }
+
+        let contacts: Vec<_> = self
             .contacts
             .iter()
-            .map(|contact| {
-                contact
-                    .boost
+            .enumerate()
+            .filter(|(_, material)| material.boost.is_some() || material.surface.is_some())
+            .collect();
+        natural(&mut code, contacts.len() as u64);
+        for (contact, material) in contacts {
+            natural(&mut code, contact as u64);
+            match &material.boost {
+                None => natural(&mut code, 0),
+                Some(boost) => {
+                    natural(&mut code, 1);
+                    natural(&mut code, boost.signature.len() as u64);
+                    code.extend(boost.signature.iter().copied());
+                    match &boost.conductances {
+                        None => natural(&mut code, 0),
+                        Some(values) => {
+                            natural(&mut code, 1);
+                            natural(&mut code, values.len() as u64);
+                            for value in values {
+                                rational(&mut code, value);
+                            }
+                        }
+                    }
+                    rational(&mut code, &boost.step);
+                }
+            }
+            match &material.surface {
+                None => natural(&mut code, 0),
+                Some(density) => {
+                    natural(&mut code, 1);
+                    rational(&mut code, density);
+                }
+            }
+        }
+        code
+    }
+
+    /// The current scalar gain amplitudes for every declared resonator, in ring order. Their
+    /// material forms scale by these amplitudes squared. This is a compact constitutive reading,
+    /// not an event log.
+    pub fn resonator_gains(&self) -> Vec<(usize, [Rat; 4])> {
+        self.rings
+            .iter()
+            .enumerate()
+            .filter_map(|(ring, material)| {
+                material
+                    .resonator
                     .as_ref()
-                    .map_or(0, |boost| boost.signature.len() as u64)
-                    + contact.surface.as_ref().map_or(0, bits)
+                    .map(|resonator| (ring, resonator.gains().clone()))
             })
-            .sum();
-        rings + contacts
+            .collect()
+    }
+
+    /// The carried feature-energy scales for a ring's four scalar gain families, if it declares a
+    /// loaded resonator.
+    pub fn resonator_scales(&self, ring: usize) -> Option<&[Rat; 4]> {
+        self.rings.get(ring).and_then(|material| {
+            material
+                .resonator
+                .as_ref()
+                .map(|_| &material.resonator_scales)
+        })
+    }
+
+    /// The loaded resonator on ring `g`, if that ring declares one.
+    pub fn resonator(&self, ring: usize) -> Option<&ResonatorMaterial> {
+        self.rings[ring].resonator.as_ref()
     }
 
     /// **Replace one ring's standing, source port or receiving map** (a test and control chart).
@@ -2594,7 +2714,9 @@ impl Constitution {
 
     /// **The constitution's exact bits by carrier** per retained locus: every numerator and
     /// denominator of its lattice entries (values and statistics), of their carried remainders and
-    /// of its solved charts at their lattices.
+    /// of its solved charts at their lattices. Immutable material bases are charged by
+    /// `describe_physics`; derived resonator forms are regenerated from those bases and gains.
+    /// This is a logical carrier census, not an allocation or total resident-memory measurement.
     pub fn carrier_bits_by_locus(&self) -> Vec<(Locus, CarrierBits)> {
         let values = |values: &mut dyn Iterator<Item = &Rat>| -> u64 { values.map(bits).sum() };
         let mut loci: Vec<(Locus, CarrierBits)> = Vec::new();
@@ -2644,6 +2766,17 @@ impl Constitution {
                 parts.entries += material.tree.as_ref().map_or(0, Landmarks::bits);
                 parts.entries += material.mixture.as_ref().map_or(0, Mixture::bits);
                 loci.push((Locus::ReceivingMap(g), parts));
+            }
+            if let Some(resonator) = &material.resonator {
+                loci.push((
+                    Locus::Resonator(g),
+                    CarrierBits {
+                        entries: values(
+                            &mut resonator.gains().iter().chain(&material.resonator_scales),
+                        ),
+                        ..CarrierBits::default()
+                    },
+                ));
             }
         }
         for (a, material) in self.contacts.iter().enumerate() {
@@ -2743,6 +2876,7 @@ impl Constitution {
                 | Locus::Standing(g)
                 | Locus::SourcePort(g)
                 | Locus::ReceivingMap(g)
+                | Locus::Resonator(g)
                 | Locus::Junction(g) => g,
                 Locus::Channel(a) | Locus::Conductance(a) => a,
             };
@@ -2830,6 +2964,32 @@ impl Constitution {
                         law.gram[entry / n][entry % n] += &r;
                     }
                 }
+                (Locus::Resonator(_), Carrier::Resonator(family)) => {
+                    let material = exact.rings[ring]
+                        .resonator
+                        .as_ref()
+                        .ok_or(HnnError::Lattice { locus })?;
+                    let mut gains = material.gains().clone();
+                    let gain = gains.get_mut(family).ok_or(HnnError::Resonator {
+                        ring,
+                        what: "a resonator gain family is one of C, K, D, or pump",
+                    })?;
+                    *gain += &r;
+                    let candidate = material.with_gains(gains)?;
+                    exact.rings[ring].resonator = Some(candidate);
+                }
+                (Locus::Resonator(_), Carrier::ResonatorScale(family)) => {
+                    let scale = exact.rings[ring].resonator_scales.get_mut(family).ok_or(
+                        HnnError::Resonator {
+                            ring,
+                            what: "a resonator gain family is one of C, K, D, or pump",
+                        },
+                    )?;
+                    *scale += &r;
+                }
+                (_, Carrier::Resonator(_) | Carrier::ResonatorScale(_)) => {
+                    return Err(HnnError::Lattice { locus });
+                }
                 (_, Carrier::Factor(_) | Carrier::FactorScale(_)) => {}
             }
         }
@@ -2889,6 +3049,7 @@ impl Constitution {
             let standing = self.lattices.get(&Locus::Standing(g));
             let source = self.lattices.get(&Locus::SourcePort(g));
             let receiving = self.lattices.get(&Locus::ReceivingMap(g));
+            let resonator = self.lattices.get(&Locus::Resonator(g));
             (!retained(Locus::Element(g))
                 || (all(
                     element,
@@ -2927,6 +3088,14 @@ impl Constitution {
                     .receiving
                     .as_ref()
                     .is_none_or(|law| receiving.is_some_and(|l| law.on_lattice(l)))
+                && material.resonator.as_ref().is_none_or(|law| {
+                    resonator.is_some_and(|l| {
+                        law.gains()
+                            .iter()
+                            .chain(&material.resonator_scales)
+                            .all(|x| l.contains(x))
+                    })
+                })
         });
         let contacts = self.contacts.iter().enumerate().all(|(a, material)| {
             !retained(Locus::Channel(a))
@@ -2945,7 +3114,7 @@ impl Constitution {
     }
 
     /// The contact storage forms `(C_a, K_a)` per contact, as symmetric forms.
-    fn storage_forms(&self) -> Result<Vec<[ExactRatMatrix; 2]>, HnnError> {
+    fn contact_storage_forms(&self) -> Result<Vec<[ExactRatMatrix; 2]>, HnnError> {
         self.contacts
             .iter()
             .map(|material| Ok([gram(&material.storage)?, gram(&material.stiffness)?]))
@@ -2997,6 +3166,13 @@ impl Constitution {
                 .or_default()
                 .push((landmarks + index, LocusStep::Mixture(step)));
         }
+        let resonators_to_certify: Vec<usize> = groups
+            .keys()
+            .filter_map(|locus| match locus {
+                Locus::Resonator(ring) => Some(*ring),
+                _ => None,
+            })
+            .collect();
         // Each locus's material and carried remainders, taken apart: a locus's steps read and
         // write only its own, so the loci run together (`hnn::realization`), each in its
         // steps' order with its own budgeted carry, at the clock it would advance it to.
@@ -3056,6 +3232,18 @@ impl Constitution {
                 boost.certify(contact, material)?;
             }
         }
+        // The resonator's four gain families may share one comparison. Certify their complete
+        // successor once, at every pump phase, before this cloned constitution can be published.
+        for ring in resonators_to_certify {
+            let material = &next.rings[ring];
+            let resonator = material.resonator.as_ref().ok_or(HnnError::Lattice {
+                locus: Locus::Resonator(ring),
+            })?;
+            let hop = material.resonator_step.as_ref().ok_or(HnnError::Lattice {
+                locus: Locus::Resonator(ring),
+            })?;
+            resonator.certify(ring, hop)?;
+        }
         next.commit += 1;
         // The clocks of the loci whose update was nonzero advance; the released residuals and the
         // stepped entries are read off the budgeted carries.
@@ -3072,13 +3260,15 @@ impl Constitution {
             );
         }
         let released_bits = released.iter().map(|(.., residual)| bits(residual)).sum();
-        // The storage forms are the contacts' C_a and K_a; the reaction material, the ports and the
-        // standing store nothing, so a deposit that moves only them has ε_k = 0.
-        let (before, after) = (self.storage_forms()?, next.storage_forms()?);
-        let growth = certify_growth(&before, &after)?;
-        if let Some(epsilon) = &growth {
-            let (initial, reached) = (joint_form(&before)?, joint_form(&after)?);
-            next.bound
+        // `contact_growth` is certified on contact C/K blocks only. It deliberately makes no
+        // claim about loaded resonator C, D or the signed, phase-varying pump contribution to K;
+        // their end-state work is read by `Word::PowerForm`, and a future-word growth bound is owed
+        // in #62.
+        let (before, after) = (self.contact_storage_forms()?, next.contact_storage_forms()?);
+        let contact_growth = certify_contact_growth(&before, &after)?;
+        if let Some(epsilon) = &contact_growth {
+            let (initial, reached) = (contact_joint_form(&before)?, contact_joint_form(&after)?);
+            next.contact_bound
                 .commit(&initial, &reached, epsilon, Rat::zero())?;
         }
         let bits = next.exact_bits();
@@ -3104,8 +3294,8 @@ impl Constitution {
             });
         }
         let reading = DepositReading {
-            growth,
-            product: next.bound.product().clone(),
+            contact_growth,
+            contact_product: next.contact_bound.product().clone(),
             commit: next.commit,
             bits,
             budget: self.budget,
@@ -3225,6 +3415,12 @@ impl Constitution {
                     let material = &mut self.rings[g];
                     material.standing = vec![Rat::zero(); material.standing.len()];
                 }
+                Locus::Resonator(g) => {
+                    let material = &mut self.rings[g];
+                    material.resonator = None;
+                    material.resonator_scales = std::array::from_fn(|_| Rat::zero());
+                    material.resonator_step = None;
+                }
                 Locus::SourcePort(g) => {
                     let material = &mut self.rings[g];
                     if let Some(source) = &material.source {
@@ -3305,6 +3501,12 @@ enum LocusMaterial<'a> {
         tree: &'a mut Option<Landmarks>,
         mixture: &'a mut Option<Mixture>,
     },
+    Resonator {
+        ring: usize,
+        material: &'a mut Option<ResonatorMaterial>,
+        scales: &'a mut [Rat; 4],
+        step: &'a mut Option<Rat>,
+    },
     Channel(&'a mut ContactMaterial),
 }
 
@@ -3331,7 +3533,9 @@ impl<'a> LocusMaterial<'a> {
                 receiving,
                 tree,
                 mixture,
-                resonator: _,
+                resonator,
+                resonator_scales,
+                resonator_step,
             } = material;
             let width = standing.len();
             if named.contains_key(&Locus::Element(g)) {
@@ -3375,6 +3579,19 @@ impl<'a> LocusMaterial<'a> {
                         mixture,
                     },
                 );
+            }
+            if named.contains_key(&Locus::Resonator(g)) {
+                if resonator.is_some() {
+                    materials.insert(
+                        Locus::Resonator(g),
+                        LocusMaterial::Resonator {
+                            ring: g,
+                            material: resonator,
+                            scales: resonator_scales,
+                            step: resonator_step,
+                        },
+                    );
+                }
             }
         }
         for (a, material) in contacts.iter_mut().enumerate() {
@@ -3505,6 +3722,46 @@ fn factor_step(
             }
         }
         (
+            FactorGradient::Resonator {
+                ring,
+                family,
+                gradient,
+            },
+            LocusMaterial::Resonator {
+                ring: material_ring,
+                material,
+                scales,
+                step: hop,
+            },
+        ) if ring == material_ring => {
+            if *family >= 4 {
+                return Err(HnnError::Resonator {
+                    ring: *ring,
+                    what: "a resonator gain family is one of C, K, D, or pump",
+                });
+            }
+            let current = material.as_ref().ok_or(HnnError::Lattice { locus })?;
+            let rate = advance(
+                carries,
+                at,
+                (locus, Carrier::ResonatorScale(*family)),
+                &mut scales[*family],
+                energy,
+                eta,
+            )?;
+            let mut gain = current.gains()[*family].clone();
+            let delta = rate_times(&rate, gradient);
+            carries
+                .entry((locus, Carrier::Resonator(*family)))
+                .or_default()
+                .deposit(at, Carrier::Resonator(*family), 0, &mut gain, &delta);
+            let mut gains = current.gains().clone();
+            gains[*family] = gain;
+            let candidate = current.with_gains(gains)?;
+            let _hop = hop.as_ref().ok_or(HnnError::Lattice { locus })?;
+            **material = Some(candidate);
+        }
+        (
             FactorGradient::PairPort {
                 offset,
                 outputs,
@@ -3583,7 +3840,7 @@ fn factor_step(
     Ok(())
 }
 
-fn joint_form(
+fn contact_joint_form(
     forms: &[[ExactRatMatrix; 2]],
 ) -> Result<crate::ratio::linear::inertia::SymmetricForm, HnnError> {
     let blocks: Vec<&ExactRatMatrix> = forms.iter().flat_map(|pair| pair.iter()).collect();
@@ -3602,8 +3859,9 @@ fn joint_form(
     Ok(matrix_form(&joint).map_err(crate::holon::HolonError::from)?)
 }
 
-/// The least `ε ∈ {0} ∪ {2^k : −20 ≤ k ≤ 40}` certifying `Q_(k+1) ⪯ (1 + ε) Q_k` on every contact's
-/// storage and stiffness form, or `None` when none does (a reading of the deposit's energy growth).
+/// The least contact-only `ε ∈ {0} ∪ {2^k : −20 ≤ k ≤ 40}` certifying
+/// `Q_(k+1) ⪯ (1 + ε) Q_k` on every contact's storage and stiffness form, or `None` when no
+/// candidate certifies those contact blocks. It does not cover the loaded resonator's mode storage.
 ///
 /// [definition; agent-inferred] Read block by block: the joint form is block-diagonal, so it is
 /// certified at `ε` exactly when every block is (its negative inertia is the blocks' sum), and the
@@ -3611,7 +3869,7 @@ fn joint_form(
 /// `K = b bᵀ`), so `(1 + ε) Q_k − Q_(k+1)` only gains the PSD term `(ε′ − ε) Q_k` as `ε` grows to
 /// `ε′`: a block's certified candidates are upward closed, and its least is found by bisection over
 /// the ordered candidates. An unchanged block certifies at `0`.
-fn certify_growth(
+fn certify_contact_growth(
     before: &[[ExactRatMatrix; 2]],
     after: &[[ExactRatMatrix; 2]],
 ) -> Result<Option<Rat>, HnnError> {

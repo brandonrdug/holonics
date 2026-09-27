@@ -27,8 +27,8 @@ restore wholesale. [THE_REBUILD](docs/plans/THE_REBUILD.md) gives the order.
 
 | Path | Role |
 |---|---|
-| `crates/holonics/` | The main library: the Holon law and its facets, ratio/ring arithmetic, geometry (frames, screws, winding), navigators, receivers, standing and release. Rebuild step 1 reorganizes it into the operator layout. |
-| `crates/holonics-cuda/` | The CUDA driver. The HNN's resident realization is rebuilt here after its law exists in `holonics`. |
+| `crates/holonics/` | The main library: the Holon law and its facets, ratio/ring arithmetic, geometry (frames, screws, winding), navigators, receivers, standing and release. The operator layout and HNN campaigns 1–2 are built; the active work is in THE_REBUILD. |
+| `crates/holonics-cuda/` | The CUDA driver and resident HNN realization, advancing with the host laws and checked against their reference. |
 | `lean/` | The Lean package `holonics`: library `Holonics` (the `Framework` closure, the default target) and `HolonicsResearch` (the rest), namespace `Holonics`. |
 | `docs/` | The object and mathematics guides and the canon. The canon is historical doctrine; the elementary objects govern its wording. |
 | `research/` | Dated records (derivations, measurements, lessons), papers, design, notebook. |
@@ -152,9 +152,10 @@ adjoint uses the operands that produced the forward carriers.
 - **The classical loss is the perceived difference.** Cross-entropy read at the receiver's face,
   `−log₂ p̂(t)` at its grain, is the surprise that crosses the receiver's section: the news, the
   only difference learning lives on (the laboratory's foil `κ = S ⊖ E`; what the receiver already
-  predicts cancels). Its gradient `p−q` is the real, grain-level part of `R⁻¹dR`, and the adjoint
-  pulls it back in a declared chart (at a grain `L_R > 1` the HNN's odometer chart `p̃ − q`, a strict
-  descent direction for the scored face); the phase part completes it. Minimizing expected cross-entropy is minimizing
+  predicts cancels). In a smooth receiving chart its logit gradient `p−q` is the real part of
+  `R⁻¹dR`. The HNN adjoint uses the declared odometer covector `p̃ − q`: its negative descends
+  the smooth score at the grain representative. Strict decrease of the quantized score is not
+  asserted; the phase part completes the comparison. Minimizing expected cross-entropy is minimizing
   expected description length exactly (Kraft–McMillan and Shannon: the excess is `D(p‖q)`), which
   is why it trains language models.
 - Scalars (lifted cross-entropy, `log det R`, a twist in rad/m, bits per observation) are limit
