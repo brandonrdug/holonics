@@ -1,6 +1,6 @@
 # Holonics canon glossary (read-only extraction, 2026-08-30)
 
-Repository `/home/b/Workspaces/holonics`. Quotations verbatim, trimmed to defining sentences; `path:line` = first line quoted. Where canon is silent, blueprint/AGENTS are cited and marked. No interpretation.
+Repository `.`. Quotations verbatim, trimmed to defining sentences; `path:line` = first line quoted. Where canon is silent, blueprint/AGENTS are cited and marked. No interpretation.
 
 ## Part 1 — Term glossary
 

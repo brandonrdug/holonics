@@ -20,7 +20,7 @@ cd soma/formal/elementary-holonics
 lake build                                   # 3,293 jobs; mathlib is prebuilt
 lake env lean <file>                         # check one file
 # audit any theorem:  #print axioms <name>   in a scratch file importing ElementaryHolonics
-cd /home/b/Workspaces/holonics
+cd .
 bash tools/gates.sh named-paths line-citations claim-index document-law
 ```
 

@@ -38,11 +38,11 @@ The existing production owners composed for this result are:
 One Luna audit read the actual long-running message archives rather than inferring Brandon's
 position from the newest repository records alone. Its sampled scope was:
 
-- 182 Claude.ai conversations in `/home/b/style/claude_ai_export/conversations.json`, spanning at
+- 182 Claude.ai conversations in `~/style/claude_ai_export/conversations.json`, spanning at
   least January through May 2026;
 - 46 top-level human-message Claude Code laboratory sessions beneath
-  `/home/b/.claude/projects/-home-b-Workspaces-laboratory`, spanning June 10 through July 14; and
-- 15 root Codex laboratory sessions beneath `/home/b/.codex/sessions`, spanning July 8 through
+  `~/.claude/projects/-home-b-Workspaces-laboratory`, spanning June 10 through July 14; and
+- 15 root Codex laboratory sessions beneath `~/.codex/sessions`, spanning July 8 through
   August 1 and selected by user thread source plus laboratory working directory.
 
 The archive available to the audit has an approximate May 2 through June 9 gap. Imported/forked

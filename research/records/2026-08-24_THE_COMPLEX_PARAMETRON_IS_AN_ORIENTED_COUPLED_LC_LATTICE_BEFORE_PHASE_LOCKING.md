@@ -38,7 +38,7 @@ self-resonance, and approximately `23` quality factor at `1 GHz`; it measured a 
 capacitance-density increase.  The same source reports that direction randomization reduces
 effective series inductance and that most measured inductance and resistance came from pads,
 vias, and stubs.  Geometry therefore changes a coupled `C,L,R,Q` return, not an isolated scalar
-capacitance.  Source: `/home/b/Downloads/SAMieeejssc98.pdf`, especially Sections IV--VI.
+capacitance.  Source: `~/Downloads/SAMieeejssc98.pdf`, especially Sections IV--VI.
 
 [proved-standard] Lee et al.'s circuit-lattice construction writes Kirchhoff balance as a
 generalized eigenproblem and varies capacitive and inductive couplings to create nodal-line and

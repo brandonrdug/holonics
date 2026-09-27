@@ -9,7 +9,7 @@ base `8ac667fa`; it adds no construction phase or runtime mechanism.
 [historical; source-inspected] Fifteen direct human messages were recovered for September 11,
 00:00–24:00 America/Los_Angeles, using message timestamps and the existing conversation provider
 codec. They occur in Codex session `01a08d68-06a4-7ab1-a494-46b8f58e3832`, whose local source is
-`/home/b/.codex/sessions/2026/09/10/rollout-2026-09-10T15-20-00-01a08d68-06a4-7ab1-a494-46b8f58e3832.jsonl`.
+`~/.codex/sessions/2026/09/10/rollout-2026-09-10T15-20-00-01a08d68-06a4-7ab1-a494-46b8f58e3832.jsonl`.
 The private full-text retrieval remains ignored under `.local/scratch/september-11-messages.md`.
 The following is a paraphrase with source coordinates, not a copy of the private raw logs:
 

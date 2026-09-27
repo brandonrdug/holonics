@@ -20,9 +20,9 @@ test whether the center-constrained star supplies the missing Hodge geometry.
 
 The first two objects do not automatically supply the third.
 
-[historical] The authorized evidence audit used `/home/b/.codex/history.jsonl` (notably entries
+[historical] The authorized evidence audit used `~/.codex/history.jsonl` (notably entries
 279, 298, 322, 369, 626, 662, 674, 717, 764, 1032, 1209, and 1241) and
-`/home/b/.claude/history.jsonl` (notably entries 11210--11232, 12081, 12149, 14135, 14145,
+`~/.claude/history.jsonl` (notably entries 11210--11232, 12081, 12149, 14135, 14145,
 14321, 14353--14354, 14460--14465, and 14543--14606).  Those messages consistently pose current,
 lineage, crossing, heat/diffusion, knot, pin/standing-wave, and local-to-global hypotheses.  They
 are reasoning provenance; only the constructions below receive theorem grades.

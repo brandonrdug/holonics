@@ -9,7 +9,7 @@ test retirement until each candidate has an ownership and consequence audit.
 the Phoenix/Gemma blueprints.  
 **Primary logs:** Claude sessions `80057f5f-c4fd-4ef5-95cd-b6630a86f537`,
 `8433552c-db93-488a-aa68-16b4ea64b0bf`, and `013aea94-513b-462b-9c56-96068441a9d3` under
-`/home/b/.claude/projects/-home-b-Workspaces-holonics/`.
+`~/.claude/projects/-home-b-Workspaces-holonics/`.
 
 ---
 

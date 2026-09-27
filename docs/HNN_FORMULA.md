@@ -226,7 +226,9 @@ newlines as the only sections. It is a byte codec, which Holonic Encoding exclud
 regression control. The curated conversation source is built under this contract: human, agent,
 tool and harness as ports; turns as epochs; conversations as aeons; parents as incidence; and the
 request→response and response→later-human relations as the admitted receivers. It is campaign 5's
-input and step 8's curation.
+input and step 8's curation. [open] Its first build (`curated_source.py`) meets items 1–6 and 8. It
+carries the request→response and response→later-human relations in its incidence file, but no
+receiver consumes them yet, so item 7 is unmet. Campaign 5 declares those receivers.
 
 ### A tensor is an operation chart
 

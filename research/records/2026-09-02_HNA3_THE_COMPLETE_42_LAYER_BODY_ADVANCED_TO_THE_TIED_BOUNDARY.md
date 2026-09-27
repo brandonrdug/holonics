@@ -46,6 +46,6 @@ projection, or source executor cannot substitute for that boundary.
 [process-audit] The bounded return was produced by:
 
 ```text
-cargo run -q -p holonic-engine --example advance_full_native_operator_prefix_hna3 -- /home/b/models/gemma-4-E4B-it
+cargo run -q -p holonic-engine --example advance_full_native_operator_prefix_hna3 -- ~/models/gemma-4-E4B-it
 ```
 

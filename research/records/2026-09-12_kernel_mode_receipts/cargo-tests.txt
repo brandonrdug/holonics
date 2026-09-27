@@ -1,5 +1,5 @@
 warning: holonic-engine@0.1.0: exact CUDA laws built for compute_89
-   Compiling holonic-engine v0.1.0 (/home/b/Workspaces/holonics/crates/holonic-engine)
+   Compiling holonic-engine v0.1.0 (crates/holonic-engine)
     Finished `test` profile [unoptimized + debuginfo] target(s) in 47.36s
      Running unittests src/lib.rs (target/debug/deps/holonic_engine-5318ec7c60cd39ca)
 

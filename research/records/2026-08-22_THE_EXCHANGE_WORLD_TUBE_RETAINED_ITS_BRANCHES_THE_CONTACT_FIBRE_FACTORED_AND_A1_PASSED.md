@@ -196,9 +196,9 @@ Output telemetry and deterministic semantic receipts remain separate.
 ```text
 cargo run -p life --release --example the_exchange_world_tube_retains_its_branches -- \
   --output output/the_exchange_world_tube_retains_its_branches/product \
-  --codex /home/b/.codex/sessions/2026/08/18/rollout-2026-08-18T07-52-09-01a0155b-c0f1-7b11-84ae-003379f5eb69.jsonl \
-  --claude-main /home/b/.claude/projects/-home-b-Workspaces-holonics/32fb276f-7b88-4788-b19b-1ffb2fe39b70.jsonl \
-  --claude-branches /home/b/.claude/projects/-home-b-Workspaces-holonics/32fb276f-7b88-4788-b19b-1ffb2fe39b70
+  --codex ~/.codex/sessions/2026/08/18/rollout-2026-08-18T07-52-09-01a0155b-c0f1-7b11-84ae-003379f5eb69.jsonl \
+  --claude-main ~/.claude/projects/-home-b-Workspaces-holonics/32fb276f-7b88-4788-b19b-1ffb2fe39b70.jsonl \
+  --claude-branches ~/.claude/projects/-home-b-Workspaces-holonics/32fb276f-7b88-4788-b19b-1ffb2fe39b70
 ```
 
 [established-bounded; measured] That invocation returned exit status zero in 35.64 seconds against

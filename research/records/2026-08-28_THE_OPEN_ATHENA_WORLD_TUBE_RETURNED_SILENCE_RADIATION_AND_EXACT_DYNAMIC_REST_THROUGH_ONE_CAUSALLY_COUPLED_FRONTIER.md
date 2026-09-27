@@ -48,7 +48,7 @@ future projective receiver already factors.
 ## Returned mixed world-tube
 
 [established-bounded; implemented-exact; measured] One real GRID source at
-`/home/b/Workspaces/laboratory/runs/information-flow-datasets/source/GRID/s1/bbaf2n.mpg`, SHA-256
+`laboratory/runs/information-flow-datasets/source/GRID/s1/bbaf2n.mpg`, SHA-256
 `e468120039e208b5ff9b9e269f8dc96bbddc45701f8dddcf2c0ae21abc0df546`, was reconstructed both as
 one memory span and as 223 irregular fragments. The two covers returned the same complete source,
 incidence, native current, and world-tube consequence. Five 20 ms acoustic cells and four optical

@@ -57,7 +57,7 @@ the attempted natural-language result; it did not establish an open framework ph
 ## Goal replay amplified the error
 
 [established-bounded; process-audit] At `2026-08-31T21:39:36Z`, the agent called `create_goal` in
-`/home/b/.codex/sessions/2026/08/30/rollout-2026-08-30T14-00-03-01a05478-e32c-7532-9c92-cec80cc1c77f.jsonl`
+`~/.codex/sessions/2026/08/30/rollout-2026-08-30T14-00-03-01a05478-e32c-7532-9c92-cec80cc1c77f.jsonl`
 with an objective that the agent itself expanded to include “R0Q6 unchanged qualitative receiver”
 and “complete UAR4 qualitative release.” The tool's own contract said to create goals only when
 explicitly requested and not to infer them from ordinary tasks.

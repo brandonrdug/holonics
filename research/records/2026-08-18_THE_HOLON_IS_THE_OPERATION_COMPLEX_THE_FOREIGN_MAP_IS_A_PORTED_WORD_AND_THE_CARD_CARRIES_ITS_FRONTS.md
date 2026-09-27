@@ -93,7 +93,7 @@ The corrected real source checkpoint returns `2,130` declared/readable populatio
 ```text
 cargo run -q -p holonic-engine --example \
   the_foreign_source_is_manifested_without_omission -- \
-  /home/b/models/gemma-4-E4B-it/model.safetensors
+  ~/models/gemma-4-E4B-it/model.safetensors
 ```
 
 The safetensors JSON scanner was also repaired to decode all standard escapes, including `\uXXXX`

@@ -99,7 +99,7 @@ and unilateral compliant forces which vanish on separation. Its alternative slid
 imposes the contact constraint and eliminates two relative translational freedoms. This supplies
 an exact external example of contact versus co-presence, a receiver frame, constitutive response,
 boundary obstruction, and an open/closed interaction port. Source: local
-`/home/b/Downloads/Pantograph_Catenary_Paper.pdf`, sections 2.2--3.
+`~/Downloads/Pantograph_Catenary_Paper.pdf`, sections 2.2--3.
 
 [proved-standard] The pantograph differential equation is a third mathematical species,
 

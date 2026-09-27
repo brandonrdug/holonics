@@ -1,4 +1,4 @@
-   Compiling holonic-engine v0.1.0 (/home/b/Workspaces/holonics/crates/holonic-engine)
+   Compiling holonic-engine v0.1.0 (crates/holonic-engine)
 warning: holonic-engine@0.1.0: exact CUDA laws built for compute_89
 warning: method `record_joined_operative_return_bounds` is never used
  --> crates/holonic-engine/src/resident_section/surface_operative_map_source.rs:4:19
@@ -23,6 +23,6 @@ warning: function `enact_section_contact` is never used
     |               ^^^^^^^^^^^^^^^^^^^^^
 
 warning: `holonic-engine` (lib) generated 3 warnings
-    Checking life v0.0.0 (/home/b/Workspaces/holonics/crates/holonic-life)
-    Checking holonics-hna v0.1.0 (/home/b/Workspaces/holonics/crates/holonics-hna)
+    Checking life v0.0.0 (crates/holonic-life)
+    Checking holonics-hna v0.1.0 (crates/holonics-hna)
     Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 58s

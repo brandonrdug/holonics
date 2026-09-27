@@ -61,6 +61,6 @@ actual application faces without interpreting the morphology change as quality.
 
 ```text
 cargo check -p holonic-engine --example developmental_morphology_hna4
-cargo run -q -p holonic-engine --example developmental_morphology_hna4 -- /home/b/models/gemma-4-E4B-it
+cargo run -q -p holonic-engine --example developmental_morphology_hna4 -- ~/models/gemma-4-E4B-it
 ```
 

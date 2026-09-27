@@ -41,7 +41,7 @@ it does not prohibit learned, contextual constituents with plural continuations.
 §4 treats sparse autoencoders and natural-language autoencoders as receiver-dependent decomposition
 and reconstruction charts. Its later-return distinction is retained: observer reconstruction and
 native development are different operations. Current ownership and later direct rulings govern.
-All laboratory paths here are relative to `/home/b/Workspaces/laboratory`; no frozen source changed.
+All laboratory paths here are relative to `~/Workspaces/laboratory`; no frozen source changed.
 
 ## What the current text path actually does
 

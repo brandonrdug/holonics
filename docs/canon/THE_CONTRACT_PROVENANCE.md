@@ -145,7 +145,7 @@ It read: *"The figures the first four bullets correct no longer exist… the sam
 figures… not available to re-examine, and no claim may cite it as evidence."* **The atlas is on disk,
 viewable, and reproducible from a driver in this tree.**
 
-- **The files exist.** `/home/b/Workspaces/laboratory/output/arithmetic-dimensional-receiver/morphology-atlas/`
+- **The files exist.** `laboratory/output/arithmetic-dimensional-receiver/morphology-atlas/`
   — 111 files, 66 MB. Brandon displayed two of the contact sheets on 2026-08-14.
 - **What is true is narrower and is a fact about git, not about availability.** `/output/` is
   `.gitignore` line 3 in the laboratory, so `git ls-files` returns zero at all 1,726 commits. **No

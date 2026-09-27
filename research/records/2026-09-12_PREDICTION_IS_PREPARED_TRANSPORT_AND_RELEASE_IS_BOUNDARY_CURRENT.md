@@ -10,7 +10,7 @@ or a new engine. The returned mathematical operators below serve that programme 
 ## 1. Recover the Leap, without restoring the retired mechanism
 
 [historical; source-inspected] The laboratory source is
-`/home/b/Workspaces/laboratory/src/holobrochos/INTUITIONS/lineages/the-swing-leap-friction.md`
+`laboratory/src/holobrochos/INTUITIONS/lineages/the-swing-leap-friction.md`
 (64 lines), especially the June 28–30 source coordinates `da61487c` and `47c0dddb`. It joins
 the preparatory swing, an outward leap across unresolved propagated turns, and rebasing at
 the next contact. It explicitly rejects carrying reach as a counter. The same thread already

@@ -1,4 +1,4 @@
-   Compiling holonic-engine v0.1.0 (/home/b/Workspaces/holonics/crates/holonic-engine)
+   Compiling holonic-engine v0.1.0 (crates/holonic-engine)
 warning: holonic-engine@0.1.0: exact CUDA laws built for compute_89
     Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 16s
      Running unittests src/lib.rs (target/debug/deps/holonic_engine-6ae3d245ea632305)

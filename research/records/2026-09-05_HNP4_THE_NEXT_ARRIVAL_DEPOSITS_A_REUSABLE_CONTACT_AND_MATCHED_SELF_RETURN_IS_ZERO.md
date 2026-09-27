@@ -105,7 +105,7 @@ single-scan improvement, so its duration does not measure that improvement.
 ```sh
 cargo build -p holonics-hna --example boundary_contact_hnp4 --example text_hnp4
 target/debug/examples/boundary_contact_hnp4 target/ske4/rest.bin \
-  /home/b/models/gemma-4-E4B-it .local/artifacts/hnp4/received-cube.txt \
+  ~/models/gemma-4-E4B-it .local/artifacts/hnp4/received-cube.txt \
   'What color is the cube?' .local/artifacts/hnp4/boundary-contact-01 24
 ```
 

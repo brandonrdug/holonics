@@ -36,7 +36,7 @@ x_{ij}'=x_{ij}+\log\frac{L_i}{L_j}.
 \]
 For \(S_a(x)=2a-x\), choose \(a=0\) and \(b=\tfrac12\log(L_i/L_j)\). Then \(x_{ij}'=S_bS_a(x_{ij})\) exactly. This is a chart identity for the [ratio](../../docs/ELEMENTARY_OBJECTS.md) and [Affine Swing](../../lean/Holonics/Geometry/AffineSwing.lean), not a claim that conditioning physically performs two point reflections.
 
-**Smallest Lean return, owed in #62:** `Receiver.bayes_logOdds_twoSwings`, stating the two displayed equalities for a finite positive measure and positive likelihoods. The Swing composition exists; this probability join does not.
+**Smallest Lean return (proved, `Computation/HolonicAdjointNormalization.bayes_logOdds_twoSwings`; see Lean below):** `Receiver.bayes_logOdds_twoSwings`, stating the two displayed equalities for a finite positive measure and positive likelihoods. The Swing composition exists; this probability join does not.
 
 ## 2. Amplitude and information distance
 
@@ -107,11 +107,11 @@ K(\sqrt\lambda)=\frac{\pi}{2}\,{}_2F_1(1/2,1/2;1;\lambda).
 \]
 The \(\lambda\) period and the \(j\) Schwarz map are connected by this modular quotient; they are **different hypergeometric charts**. The [Farey owner](../../lean/HolonicsResearch/Geometry/Farey.lean) already proves unimodular Stern–Brocot steps; [HolonicTorusKnots](../../lean/Holonics/Geometry/HolonicTorusKnots.lean) proves coprime torus slopes and odd-half-twist boundary embeddings. Farey adjacency \(|hk'-h'k|=1\), Ford tangency, and a coprime \((p,q)\) torus-knot slope give distinct faces of the modular action. The Smith disk additionally needs its declared impedance-to-reflection Cayley chart. The affine Swing’s half-turn and the modular inversion \(z\mapsto-1/z\) share an abstract order-two role; identifying their actions requires an explicit conjugating chart.
 
-**Smallest Lean returns, owed in #62:** `Geometry.egg_j_of_legendre_lambda`, the rational identity above, and `Geometry.modular_exponent_differences`, the three exponent differences. The full Schwarz inverse and group identification remain named analytic obligations; the existing Farey and torus-knot lemmas do not prove them.
+**Smallest Lean returns:** `Geometry.egg_j_of_legendre_lambda`, the rational identity above (proved, see Lean below), and, owed in #62, `Geometry.modular_exponent_differences`, the three exponent differences. The full Schwarz inverse and group identification remain named analytic obligations; the existing Farey and torus-knot lemmas do not prove them.
 
 ## 5′. The real eggs meet the half-turn point once
 
-`proved-derived` (exact over ℚ; Lean owed in #62 as `egg_j_of_legendre_lambda`).
+`proved-derived` (exact over ℚ; proved in Lean as `HolonicsResearch/Geometry/EggModular.egg_j_of_legendre_lambda`).
 - **The six images.** `j(λ) = 256(1 − λ + λ²)³/(λ²(1 − λ)²)` takes one value on the six anharmonic
   images `λ, 1 − λ, 1/λ, 1/(1 − λ), (λ − 1)/λ, λ/(λ − 1)`. This was checked at `λ = 1/2, 1/3, 2/7`.
   The group of the six is `S₃`, which is the two-three structure again.
@@ -150,7 +150,7 @@ w_g'=\frac{w_gL_g}{\sum_h w_hL_h}
 \]
 is exactly the **discrete replicator equation** with positive fitness \(L_g\). Biology is an analogy; Bayesian selection is the algebra. Positive but poor likelihood reduces relative weight without killing a candidate. Exact extinction needs zero likelihood or a separately lawful release. A newly founded candidate needs a declared prior and its description cost; conditioning a fixed zero-prior family cannot birth it. [Harper](https://arxiv.org/abs/0911.1763); [Shalizi](https://www.stat.cmu.edu/tr/tr874/tr874.pdf); [CTW original](https://research.tue.nl/en/publications/the-context-tree-weighting-method-basic-properties/).
 
-**Smallest Lean returns, owed in #62:** `Context.kt_eq_dirichlet_half` for the node predictive ratio; `Context.betaBinomial_pgf` for the terminating polynomial; `Context.bayes_eq_discrete_replicator` for finite positive candidate weights. The CTW mixture, dominance, and standing joins already exist. A separate full finite de Finetti formalization can begin with the finite count-class decomposition rather than an infinite theorem.
+**Smallest Lean returns:** `Context.kt_eq_dirichlet_half` for the node predictive ratio (proved); `Context.betaBinomial_pgf` for the terminating polynomial; `Context.bayes_eq_discrete_replicator` for finite positive candidate weights. The CTW mixture, dominance, and standing joins already exist. A separate full finite de Finetti formalization can begin with the finite count-class decomposition rather than an infinite theorem.
 
 ## 7. Optics and Holonic Interactions
 
@@ -163,7 +163,7 @@ The classes interfere when their amplitudes reach the **same receiving mode with
 
 **[Conditional frame join]** The egg’s converging and diverging descriptions can be two readings of one receiving surface: with declared clock, metric, and dynamics, the rate form \(\Sigma_G=A^*G+GA+\dot G\) has negative, positive, and null directions. Their inertia survives a lawful rechart; assigning a direction to integration or differentiation needs this form and the surface’s oriented flux pairing. A drawn convex or concave outline supplies neither an optical transfer law nor a Lorentz law. The [shadow and egg audit](2026-09-26_THE_SHADOW_IS_THE_RECEIVERS_KERNEL_AND_THE_EGG_IS_TWO_RINGS_IN_RELATIVE_MOTION.md) already sets that boundary.
 
-**Smallest Lean return, owed:** `Receiver.coherent_intensity_split`, the displayed amplitude identity, with an orthogonal-tag corollary. The existing wave, Born, receiver, and pair owners consume it; the egg-to-optics map remains an `interpretation` obligation with an explicit aperture and receipt.
+**Smallest Lean return (proved as `Physics/Wave/Interference.{intensity_eq, resolved_intensity_eq, distinct_modes_no_cross_terms}`):** `Receiver.coherent_intensity_split`, the displayed amplitude identity, with an orthogonal-tag corollary. The existing wave, Born, receiver, and pair owners consume it; the egg-to-optics map remains an `interpretation` obligation with an explicit aperture and receipt.
 
 ## 7′. The softmax ratio family is already this geometry
 
@@ -206,7 +206,7 @@ The [unity audit’s receipts](2026-09-27_THE_HOLARCHY_AND_ITS_AEONS_ARE_THE_TOP
 
 **Exposed wording to repair.** In the [egg population record](2026-09-27_THE_EGG_IS_A_GENERATORS_GENOME_SELECTION_IS_BAYES_AND_THE_FACES_OF_INTEGERS_ARE_MOIRES_OF_GRATINGS.md), “failing configurations die” needs the zero-likelihood or release condition, and a sample’s recovered minimal tree does not prove unique future truth beyond its admitted family. In [egg packing](2026-09-27_EGG_PACKING_THE_MOIRE_OF_TWO_HELICES_IS_A_TORUS_KNOT_AND_THE_TREFOIL_IS_THE_HALF_TURN_WITH_THE_THIRD_TURN.md), \(|ad-bc|\) counts transverse intersections of **primitive, distinct, nonparallel** torus paths, not automatically complement cells; the affine Swing is not the modular inversion without a chart; and the Smith identification needs calibrated port variables. The present [Order](../../docs/plans/THE_REBUILD.md) already mentions the egg population inside its moiré bullet. Consolidating that bullet with campaign 3’s release and campaign 5’s encoding avoids a second programme. The real conversation cut remains each campaign’s milestone; terrain with known truth diagnoses learning, while exterior conversation curation belongs to step 8.
 
-## Lean (September 27, commit `ebc1f30d`)
+## Lean (September 27, commit `56bc667d`)
 
 Proved in their owners, with the standard axioms only:
 - **Bayes** (`Computation/HolonicAdjointNormalization`): `bayes_logOdds_twoSwings` (the log-odds

@@ -453,20 +453,20 @@ So the chain is: assistant chooses per-coordinate interval enclosures → the co
 
 ## Files of record
 
-- `/home/b/Workspaces/holonics/research/records/2026-08-18_THE_SECTION_MUST_STAY_ON_THE_CARD_THE_CONTRACT_BEFORE_THE_RESIDENT_LAYER.md`
-- `/home/b/Workspaces/holonics/research/records/2026-08-18_THE_SECTION_STAYED_BUT_THE_HOST_STILL_OWNED_THE_PASSAGE_AND_NO_PHOENIX_STATION_PASSED.md`
-- `/home/b/Workspaces/holonics/research/records/2026-08-19_THE_LAYER_IS_ONE_GRAPH_LAUNCHED_ONCE_AND_THE_IMMEDIATE_GATE_RETURNS_ITS_FALSIFIERS_WITH_THE_RATCHET_OPEN.md`
-- `/home/b/Workspaces/holonics/research/records/2026-08-19_THE_TOWER_CONDUCTS_LAYER_BY_LAYER_AND_THE_CERTIFIED_ENCLOSURE_DIVERGES_AT_TWO_TO_THE_THIRTY_FIVE_PER_LAYER.md`
-- `/home/b/Workspaces/holonics/research/records/2026-09-02_HNA3_THE_COMPLETE_42_LAYER_BODY_ADVANCED_TO_THE_TIED_BOUNDARY.md`
-- `/home/b/Workspaces/holonics/research/records/2026-09-03_SKE2_receipts/occ0.json`
-- `/home/b/Workspaces/holonics/blueprint/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`
-- `/home/b/Workspaces/holonics/blueprint/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md`
-- `/home/b/Workspaces/holonics/AGENTS.md` (§Purity boundary 306–348, §Apparatus 757–776, retraction record 170–175, 426–429)
-- `/home/b/Workspaces/holonics/crates/holonic-engine/src/resident_section.rs`
-- `/home/b/Workspaces/holonics/crates/holonic-engine/src/resident_section/{surface_passage.rs,surface_mount.rs,surface_tiled.rs,surface_shapes.rs,tests_core.rs}`
-- `/home/b/Workspaces/holonics/crates/holonic-engine/src/{resident_law.rs,front_passage.rs,embedding_fiber.rs}`
-- `/home/b/Workspaces/holonics/crates/holonic-engine/kernels/exact_resident_section.cu`
-- `/home/b/Workspaces/holonics/crates/holonic-engine/src/holonic_intelligence/{full_operation.rs,operative_terminal.rs,operative_backward.rs,operative_intervention.rs,operative_adjoint.rs,operative_return.rs,operative_scalars.rs,operative_residence.rs,operative_atlas.rs}`
-- `/home/b/Workspaces/holonics/soma/mount/src/cuda.rs`
+- `research/records/2026-08-18_THE_SECTION_MUST_STAY_ON_THE_CARD_THE_CONTRACT_BEFORE_THE_RESIDENT_LAYER.md`
+- `research/records/2026-08-18_THE_SECTION_STAYED_BUT_THE_HOST_STILL_OWNED_THE_PASSAGE_AND_NO_PHOENIX_STATION_PASSED.md`
+- `research/records/2026-08-19_THE_LAYER_IS_ONE_GRAPH_LAUNCHED_ONCE_AND_THE_IMMEDIATE_GATE_RETURNS_ITS_FALSIFIERS_WITH_THE_RATCHET_OPEN.md`
+- `research/records/2026-08-19_THE_TOWER_CONDUCTS_LAYER_BY_LAYER_AND_THE_CERTIFIED_ENCLOSURE_DIVERGES_AT_TWO_TO_THE_THIRTY_FIVE_PER_LAYER.md`
+- `research/records/2026-09-02_HNA3_THE_COMPLETE_42_LAYER_BODY_ADVANCED_TO_THE_TIED_BOUNDARY.md`
+- `research/records/2026-09-03_SKE2_receipts/occ0.json`
+- `blueprint/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`
+- `blueprint/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md`
+- `AGENTS.md` (§Purity boundary 306–348, §Apparatus 757–776, retraction record 170–175, 426–429)
+- `crates/holonic-engine/src/resident_section.rs`
+- `crates/holonic-engine/src/resident_section/{surface_passage.rs,surface_mount.rs,surface_tiled.rs,surface_shapes.rs,tests_core.rs}`
+- `crates/holonic-engine/src/{resident_law.rs,front_passage.rs,embedding_fiber.rs}`
+- `crates/holonic-engine/kernels/exact_resident_section.cu`
+- `crates/holonic-engine/src/holonic_intelligence/{full_operation.rs,operative_terminal.rs,operative_backward.rs,operative_intervention.rs,operative_adjoint.rs,operative_return.rs,operative_scalars.rs,operative_residence.rs,operative_atlas.rs}`
+- `soma/mount/src/cuda.rs`
 
 

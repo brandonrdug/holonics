@@ -289,7 +289,7 @@ monomers); no `.npz` reader at all (no zip/deflate dependency in either crate �
 directory of hand-extracted `.npy` files, `m5/fold.rs:110`, `:115`); no FASTA reader anywhere in the
 repository; no PDB-format reader; **no CPU fallback for contact classification** — `m5/fold.rs:181`
 hard-requires a CUDA device. No release data is committed: all paths are absolute pointers into
-`/home/b/Downloads` with env-var overrides (`m5/input.rs:102-123`).
+`~/Downloads` with env-var overrides (`m5/input.rs:102-123`).
 
 **Answer to the posed question: M5 exists only as an example driver. There is no reusable library
 path for any protein adapter.**
@@ -811,7 +811,7 @@ design measured in two systems can differ by more than 10× in fitted `K_D` (rel
 ## 6. Evaluation discipline
 
 [established-bounded; source-inspected; measured] The mounted documentation/tables tier
-(`/home/b/Downloads/holonics-m5-protein-binder-docs-tables/protein_binder_design_data_release`,
+(`~/Downloads/holonics-m5-protein-binder-docs-tables/protein_binder_design_data_release`,
 49 MB, SHA-256-pinned at `m5/input.rs:127`) is what the splits must respect. Measured structure:
 
 - 1,440 designs, 1,440 distinct UUIDs, **16 targets** (TNFa 150, Mature GDF-8 120, then 90 each for
@@ -905,7 +905,7 @@ downloaded or scanned merely because it exists."
 [historical] The operator reports that Anthropic has released optimization kits for open
 protein/genomics tools exposing **off / exact / fast / big** modes with explicit activation. **This
 is external testimony and is not verified in this repository** — no such kit, mode flag or
-activation path exists anywhere under `/home/b/Workspaces/holonics` (searched for `optimization kit`,
+activation path exists anywhere under `.` (searched for `optimization kit`,
 mode-name combinations and `*_MODE` environment variables; zero hits).
 
 [project-postulate] Whatever the kit's provenance, the receipt discipline is already

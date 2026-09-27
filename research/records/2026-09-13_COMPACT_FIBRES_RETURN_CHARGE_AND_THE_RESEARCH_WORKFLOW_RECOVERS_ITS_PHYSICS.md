@@ -220,7 +220,7 @@ every future omission or measure a causal improvement against an unskilled basel
 ```sh
 bash tools/lean_check.sh ElementaryHolonics.Physics.CompactifiedModeTransport \
   ElementaryHolonics.Computation.HolonicFermiHubbard ElementaryHolonics.Framework.Physics
-python3 /home/b/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
+python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
   .agents/skills/holonics-research
 git diff --check
 ```

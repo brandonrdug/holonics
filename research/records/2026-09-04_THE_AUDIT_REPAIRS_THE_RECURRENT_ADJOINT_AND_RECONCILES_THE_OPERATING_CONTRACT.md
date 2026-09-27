@@ -122,7 +122,7 @@ passed after the endpoint-storage repair. The first return retained overlay rank
 second return used those exact prior ranks, crossed 1,271 operations, deposited on 344
 cross-sections and returned rank 5,504 at generation 3,825. Its full third cycle took 6,464 ms.
 The actual receipt is `2026-09-04_recurrent_adjoint_receipts/repeated_cultivation.json`.
-Commands: `target/debug/examples/adjoint_return_ske1 /home/b/models/gemma-4-E4B-it repeat`,
+Commands: `target/debug/examples/adjoint_return_ske1 ~/models/gemma-4-E4B-it repeat`,
 exit 0; the retained-overlay, partial-release and quadratic-moment CUDA test filters each
 returned one passed test on the final code (0.18, 0.14 and 0.15 s).
 

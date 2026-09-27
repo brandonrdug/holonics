@@ -4,7 +4,7 @@
 polarization, Pauli exclusion, moving fluid boundaries, frame-dependent invariants and physical
 emulation with the generator/information programme. Direct source:
 `msg_01a0964a-d841-76d3-80ec-cde52f9339c3`, `2026-09-12T15:44:42.561Z`, line 644 of
-`/home/b/.codex/sessions/2026/09/12/rollout-2026-09-12T07-07-56-01a095f2-3f4f-7012-a914-f4fb5c419fa5.jsonl`.
+`~/.codex/sessions/2026/09/12/rollout-2026-09-12T07-07-56-01a095f2-3f4f-7012-a914-f4fb5c419fa5.jsonl`.
 The clarification is that a contemporary invariant or held boundary can itself vary along the
 physical development, and a changed frame can transfer where that variation is represented.
 

@@ -258,10 +258,10 @@ Doppler readings are no longer untaken — `crates/holonic-engine/src/approach_f
 one level out.
 
 **And Brandon's Landauer hypothesis has a formal owner in the frozen laboratory.**
-`git -C /home/b/Workspaces/laboratory show a07ff376:src/eros/um/THEORY_AND_EQUATIONS.md` §18 carries
+`git -C ~/Workspaces/laboratory show a07ff376:src/eros/um/THEORY_AND_EQUATIONS.md` §18 carries
 `Φ = P/(kT ln 2)` bits/s graded `FORMAL`, with `Φ ≤ 2E/πℏ` (Margolus–Levitin) bounding it above and
 `∇·Φ ~ G_μν/8π` as the Einstein join; and
-`git -C /home/b/Workspaces/laboratory show a07ff376:src/docs/UNIVERSALITY_LIMIT.md` §2 states the
+`git -C ~/Workspaces/laboratory show a07ff376:src/docs/UNIVERSALITY_LIMIT.md` §2 states the
 hypothesis as a **Landauer efficiency** — the fraction of the thermodynamic budget converted into kept
 structure — with the guidance that *the value matters less than the trajectory*.
 

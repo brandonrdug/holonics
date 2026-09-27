@@ -11,7 +11,7 @@ The return crossed three distinct nominal incidences, founded one parented durab
 held-out conduct, retained directional organ defects and restored its predecessor exactly.
 
 [measured] The sole complete E3 release receiver began at 2026-08-23T14:35:06-07:00 with
-`env CARGO_TARGET_DIR=/home/b/Workspaces/holonics/target bash tools/gates.sh` in the isolated E3
+`env CARGO_TARGET_DIR=target bash tools/gates.sh` in the isolated E3
 worktree. It returned 2,860 passes, zero failures, 34 ignores, every example target type-checked and
 twelve green scopes. Its sole red scope was the architecture ratchet, which correctly reported the
 new `boundary_cultivation.rs` owner's local `.clone()`, `.collect()`, `.flat_map()`, `.into_iter()`,

@@ -332,36 +332,43 @@ laboratory settled this ontology: "probability appears only where a declared obs
 unavailable interior". The faces carry this geometry
 ([record](../research/records/2026-09-27_PROBABILITY_IS_A_RECEIVER_GEOMETRY_BAYES_IS_THE_RATIOS_TRANSLATION_AND_THE_EGGS_PERIOD_IS_HYPERGEOMETRIC.md); the identities are graded there, and their Lean is owned or owed
 in #62):
-- **Bayes is the quotient rule under refinement.** In the ratio's additive chart it is a translation:
+- [proved-derived; formal-checked: `HolonicAdjointNormalization.{bayes_logOdds_twoSwings, bayes_eq_face,
+  bayes_eq_discrete_replicator}`] **Bayes is the quotient rule under refinement.** In the ratio's additive chart it is a translation:
   `log(p′_i/p′_j) = log(p_i/p_j) + log(L_i/L_j)`, which is two Swings `S_b S_0` with
   `b = ½ log(L_i/L_j)`, a chart identity. It is the softmax of `log p + log L`. The softmax ratio
   family `r_ij` keeps every pair's ratio and forgets only the common origin, the evidence, which is a
-  gauge (`Computation/HolonicAdjointNormalization.face_add_common`). The same normalization is the
-  attend row of the Holonic Interactions, and the discrete replicator over candidates.
-- **The amplitude sphere.** `p ↦ √p` puts the faces on the positive orthant of a sphere. The Fisher
+  gauge (`Computation/HolonicAdjointNormalization.face_add_common`), and the discrete replicator
+  over candidates. [agent-inferred] The same normalization is the attend row of the Holonic
+  Interactions.
+- [established-classical] **The amplitude sphere.** `p ↦ √p` puts the faces on the positive orthant of a sphere. The Fisher
   metric is four times its pullback, and Fisher–Rao distance is `2 arccos Σ√(p_i q_i)`. The complex
   Born chart adds the phase that the loss's winding keeps.
-- **The Laplacian return is the Fisher information** of the categorical family in its natural chart:
+- [proved-derived] **The Laplacian return is the Fisher information** of the categorical family in its natural chart:
   `β(diag(p) − ppᵀ)`, with `vᵀJv = (β/2)Σ p_i p_j (v_i − v_j)²`
   (`HolonicAdjointNormalization.quadratic_laplacianReturn`).
-- **Chentsov.** On finite sample spaces the Fisher metric is, up to scale, the one metric invariant
+- [established-classical; the join agent-inferred and conditional] **Chentsov.** On finite sample spaces the Fisher metric is, up to scale, the one metric invariant
   under congruent Markov embeddings, the sufficient maps. A general Markov map contracts it. A
   sufficient statistic is a retention only when every admitted future face factors through it and
   the admitted transports descend (`Foundation/Standing.standingLaw_exists_iff_future_factors`).
-- **The hyperbolic face.** A location–scale family's Fisher geometry is the hyperbolic half-plane. An
-  equal-information circle about `(x₀, y₀)` of hyperbolic radius `r` is the Euclidean circle of
-  centre `(x₀, y₀ cosh r)` and radius `y₀ sinh r`: lopsided toward the diffusive side.
-- **Hypergeometry.**
+- [established-classical; the egg reading an interpretation] **The hyperbolic face.** A
+  location–scale family's Fisher geometry is a constant multiple of the hyperbolic half-plane (for
+  the Gaussian, a Fisher radius `R` is the hyperbolic radius `r = R/√2`). An equal-distance circle
+  about `(x₀, y₀)` of hyperbolic radius `r` is the Euclidean circle of centre `(x₀, y₀ cosh r)` and
+  radius `y₀ sinh r`, lopsided toward larger `y`. It is lopsided toward diffusion only when the
+  receiver declares `y` a diffusion width; its likeness to an egg is an interpretation.
+- [established-classical; the joins graded in the record] **Hypergeometry.**
   - The Gauss equation's Schwarz map with exponent differences `(0, 1/2, 1/3)` has monodromy
     `(2,3,∞) = PSL(2,ℤ)`, the half-turn with the third-turn.
-  - The egg's period is `K(√λ) = (π/2)₂F₁(½,½;1;λ)`, and its modular `j(λ)` meets the half-turn
-    point `j = 1728` once on the real eggs.
+  - The Hügelschäffer curve's period is `K(√λ) = (π/2)₂F₁(½,½;1;λ)` (owed in #62). Its modular
+    `j(λ)` meets the half-turn point `j = 1728` once on the real curves
+    (`HolonicsResearch/Geometry/EggModular.egg_j_of_legendre_lambda`, formal-checked).
   - The node law's beta-binomial generating function is the terminating `₂F₁(−n, α; α+β; 1 − t)`.
-- **Counting faces.** A type class is a count face of a passage, with
+- [established-classical; `kt_eq_dirichlet_half` formal-checked] **Counting faces.** A type class is a count face of a passage, with
   `(n+1)^(−m) 2^(nH) ≤ |T(P)| ≤ 2^(nH)`. The receiving tree's KT node law is the Dirichlet-½
   (Pólya-urn) predictive. A finite exchangeable law is a mixture of the uniform laws on its count
   classes (Diaconis–Freedman).
-- **Coherent reception.** Classes interfere exactly when their amplitudes reach one receiving mode
+- [proved-derived; formal-checked: `Physics/Wave/Interference.{intensity_eq,
+  resolved_intensity_eq}`] **Coherent reception.** Classes interfere exactly when their amplitudes reach one receiving mode
   with a retained relative phase: `|Σa_j|² = Σ|a_j|² + 2Σ_(j<k) Re(a_j ā_k)`. Resolved modes or
   distinguishing tags give the incoherent sum. An aperture transmitting `L_i` gives Bayes's
   conditional face, and its rejected flux belongs in the receipt.

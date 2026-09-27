@@ -240,7 +240,7 @@ disjoint slices of one corpus return different partitions, so the receivers read
 ## 5. Station six — the census fired its own falsifier
 
 `crates/holonic-engine/examples/the_head_reads_the_aim_and_the_census_is_four_classes.rs`, on
-`/home/b/models/gemma-4-E4B-it/model.safetensors`, layer 0, head 0 over key group 0, `d_head = 256`,
+`~/models/gemma-4-E4B-it/model.safetensors`, layer 0, head 0 over key group 0, `d_head = 256`,
 `d_model = 2560`.
 
 **The card carried the projections**: 2,048 token directions through two 256-row maps,

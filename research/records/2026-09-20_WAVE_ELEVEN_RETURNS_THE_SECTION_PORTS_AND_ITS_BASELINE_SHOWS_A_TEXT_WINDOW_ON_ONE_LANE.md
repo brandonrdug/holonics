@@ -83,7 +83,7 @@ session.
 
 1. **No Claude agent received the contract.** `CLAUDE.md` was removed on September 19 in the belief
    that the harness falls back to `AGENTS.md`; this build does not. Every subagent transcript of
-   this wave contains `/home/b/CLAUDE.md` (a desktop-environment file) and no line of `AGENTS.md`.
+   this wave contains `~/CLAUDE.md` (a desktop-environment file) and no line of `AGENTS.md`.
    A primary received it only when it was attached by hand.
 2. **The pickup path never states the object.** `AGENTS.md` is 548 lines with no equation block and
    118 lines of negation; the state, roadmap and issue bodies describe work in operator nouns

@@ -13,7 +13,7 @@ synthesis corrections; `interpretation` for the lens, marked in place with its f
 `SKE4` remains the frontier, and the roadmap's clause that the de Bruijn--Newman/RH line is
 independent of the engine campaign is unchanged.  
 **Apparatus:** Lean `v4.33.0` through `lake` (the root umbrella `ElementaryHolonics` built 9,786 jobs
-after the two owner changes); sympy 1.14 in `/home/b/scratch/huggingface/.venv` as an observer
+after the two owner changes); sympy 1.14 in `~/scratch/huggingface/.venv` as an observer
 outside the engine.  
 **Receipts:** [`2026-09-03_flow_witnesses/`](2026-09-03_flow_witnesses): the observer script and
 its receipt.
@@ -493,5 +493,5 @@ lifted these from
 cd soma/formal/elementary-holonics
 timeout 180s lake build ElementaryHolonics.RH.HeatFlowBinding ElementaryHolonics.RH.PhaseFlowLedger
 timeout 180s lake build ElementaryHolonics
-/home/b/scratch/huggingface/.venv/bin/python -u research/records/2026-09-03_flow_witnesses/flow_witnesses.py
+~/scratch/huggingface/.venv/bin/python -u research/records/2026-09-03_flow_witnesses/flow_witnesses.py
 ```

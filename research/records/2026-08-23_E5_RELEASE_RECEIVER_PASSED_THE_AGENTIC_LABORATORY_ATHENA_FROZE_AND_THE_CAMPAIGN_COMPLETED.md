@@ -13,7 +13,7 @@ returned membrane standing under product identity
 `bececf079d04a8289059456637d294ab5e86beb01d066d30cde6a08b86e6f6af`.
 
 [measured] The sole complete E5 release receiver began at 2026-08-23T16:10:20-07:00 under
-`env CARGO_TARGET_DIR=/home/b/Workspaces/holonics/target bash tools/gates.sh` in the isolated E5
+`env CARGO_TARGET_DIR=target bash tools/gates.sh` in the isolated E5
 release worktree. It returned 2,862 passing tests, zero failures, 34 explicit ignores, every example
 target type-checked, and twelve immediately green scopes.
 

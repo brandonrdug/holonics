@@ -12,7 +12,7 @@ focused checks; **counterexample** where a promoted deed contradicts its own con
 **Truth status: established-bounded.**
 
 The audited Claude session is
-/home/b/.claude/projects/-home-b-Workspaces-holonics/ef596553-e95f-4009-94a2-2aed521e011b.jsonl,
+~/.claude/projects/-home-b-Workspaces-holonics/ef596553-e95f-4009-94a2-2aed521e011b.jsonl,
 from 2026-08-19T15:19:35Z through the usage-limit failure at 2026-08-20T06:57:51Z.
 Transcript classification returned 585 shell calls, 61 gate-related command blocks, 59
 engine-test blocks, four workspace-test blocks and 16 commit commands.

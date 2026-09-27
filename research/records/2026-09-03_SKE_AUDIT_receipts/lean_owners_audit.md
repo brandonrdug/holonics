@@ -13,7 +13,7 @@ I'll start by reading the blueprint and locating the Lean files.
 
 ### 1.1 `Site`, `Carrier`, the state, the ecology
 
-`/home/b/Workspaces/holonics/soma/formal/elementary-holonics/ElementaryHolonics/Computation/HolonicNeuralEcology.lean:29-37`
+`soma/formal/elementary-holonics/ElementaryHolonics/Computation/HolonicNeuralEcology.lean:29-37`
 
 ```lean
 /-- A finite chart of local holonic current and constitutive response.  `localCurrent` may depend
@@ -64,7 +64,7 @@ The state is literally the function type `Site → Carrier`; the only algebra as
 
 ### 1.2 `signature`, `withdraw`, `IsCone`, `LoadBearing`
 
-`/home/b/…/Computation/HolonicExcitationFoundedQuotient.lean:45-48`
+`~/…/Computation/HolonicExcitationFoundedQuotient.lean:45-48`
 
 ```lean
 /-- The complete receiver face of one presented state after one ordered history at one rest. -/
@@ -251,7 +251,7 @@ from which the backward closure of the receiver's read-set over `|history|` step
 
 ### 2.c′ `LocalCausalConeCultivation` — hypothesis-carrying, not sound-by-construction, and not the same proposition
 
-`/home/b/…/Computation/NativeMorphologyVariant.lean:105-126`
+`~/…/Computation/NativeMorphologyVariant.lean:105-126`
 
 ```lean
 /-- One returned local morphology change with source-detached remount, ablation, and restoration.
@@ -292,7 +292,7 @@ structure LocalCausalConeCultivation
 
 ### 3.1 `Soma.Holonics.Compression`
 
-`/home/b/…/Foundation/Receiver.lean:86-94` (namespace `Soma.Holonics`, `:11`)
+`~/…/Foundation/Receiver.lean:86-94` (namespace `Soma.Holonics`, `:11`)
 
 ```lean
 /--

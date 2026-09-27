@@ -74,7 +74,7 @@ pre/post snapshot equality. Headless 80x28, 120x36 and 180x48 surfaces passed.
 [established-bounded; process-audit; measured] Real 80x24 and 180x48 pseudo-terminals returned the
 session-first surface and restored on exit. The wide diffusion Summary and Structure views displayed
 the exact values above; the narrow view exposed visible scroll controls rather than truncating the
-receipt irretrievably. `/home/b/.cargo/bin/holonics` reports version 0.3.0. Human demo output is typed;
+receipt irretrievably. `~/.cargo/bin/holonics` reports version 0.3.0. Human demo output is typed;
 noninteractive no-command invocation exits 2 with clean stderr.
 
 [established-bounded; formal-checked; process-audit; measured] The first cold workspace test section

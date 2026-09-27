@@ -148,7 +148,7 @@ exist*. And the audit is taken **after** the deed, not declared before it:
 ```text
 descriptors the child actually held        39
 any resolving to the source             false
-the source it did not open              /home/b/models/gemma-4-E4B-it/model.safetensors
+the source it did not open              ~/models/gemma-4-E4B-it/model.safetensors
 ```
 
 `CLAUDE.md` §0i names why this shape matters: *a preflight declaration is not evidence.* Reading

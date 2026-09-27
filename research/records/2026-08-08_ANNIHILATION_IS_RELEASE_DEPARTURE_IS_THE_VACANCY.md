@@ -5,7 +5,7 @@
 owners were read directly; Brandon's governing ruling is verbatim from a surviving transcript.
 **Evidence:** direct source inspection of `soma/membrane/src/sparse_surface.rs:266`,
 `soma/body/src/chart.rs:56-67`, and `archive/laboratory-physics/P20-the-dark-sector.md:71-77`;
-`FORMULA §CV` read via `git -C /home/b/Workspaces/laboratory show a07ff376:src/soma/FORMULA.md`.
+`FORMULA §CV` read via `git -C ~/Workspaces/laboratory show a07ff376:src/soma/FORMULA.md`.
 **Provenance.** A permitted sub-agent's collection surfaced an apparent contradiction between the
 live body and an archived laboratory law and reported, correctly, that **no reconciling document
 exists**. It does now. The reconciling section already existed and nobody had connected it. The

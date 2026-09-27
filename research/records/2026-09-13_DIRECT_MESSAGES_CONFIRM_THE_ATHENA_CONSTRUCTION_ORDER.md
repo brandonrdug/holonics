@@ -29,9 +29,9 @@ order. Raw extraction and source pointers remain private under
 
 [definition] The following abbreviations identify exact local provenance, not another authority:
 
-- **A:** `/home/b/.codex/sessions/2026/09/10/rollout-2026-09-10T15-20-00-01a08d68-06a4-7ab1-a494-46b8f58e3832.jsonl`
-- **B:** `/home/b/.codex/sessions/2026/09/12/rollout-2026-09-12T07-07-56-01a095f2-3f4f-7012-a914-f4fb5c419fa5.jsonl`
-- **C:** `/home/b/.codex/sessions/2026/09/12/rollout-2026-09-12T21-20-40-01a098fe-f3e1-7e33-80a3-2f1bfd64d4f5.jsonl`
+- **A:** `~/.codex/sessions/2026/09/10/rollout-2026-09-10T15-20-00-01a08d68-06a4-7ab1-a494-46b8f58e3832.jsonl`
+- **B:** `~/.codex/sessions/2026/09/12/rollout-2026-09-12T07-07-56-01a095f2-3f4f-7012-a914-f4fb5c419fa5.jsonl`
+- **C:** `~/.codex/sessions/2026/09/12/rollout-2026-09-12T21-20-40-01a098fe-f3e1-7e33-80a3-2f1bfd64d4f5.jsonl`
 
 | Pacific time and source | Direct ruling relevant to the plan |
 |---|---|

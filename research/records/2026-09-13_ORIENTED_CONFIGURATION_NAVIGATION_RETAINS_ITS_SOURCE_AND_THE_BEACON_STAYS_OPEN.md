@@ -238,7 +238,7 @@ bash tools/lean_check.sh ElementaryHolonics.Millennium.Navigation \
   ElementaryHolonics.Geometry.CrossRatio ElementaryHolonics.Millennium.MassGap \
   ElementaryHolonics.Framework
 python3 research/experiments/oriented_split_transport/run.py
-python3 /home/b/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
+python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
   .agents/skills/holonics-research
 git diff --check
 ```

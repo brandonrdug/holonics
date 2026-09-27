@@ -45,7 +45,7 @@ inverse/restoration to approximately 40 seconds without weakening the exterior w
 ## Returned consequence
 
 [established-bounded; implemented-exact; measured] The real GRID source
-`/home/b/Workspaces/laboratory/runs/information-flow-datasets/source/GRID/s1/bbaf2n.mpg` supplied
+`laboratory/runs/information-flow-datasets/source/GRID/s1/bbaf2n.mpg` supplied
 452,608 encoded octets. The bounded occurrence carried 640 decoded 8 kHz audio samples and four
 90-by-72 optical frames as separate receiver sections. Four exact elementary overlap intervals
 returned four synchronized contacts under incidence identity

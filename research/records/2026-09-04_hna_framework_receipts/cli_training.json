@@ -4,7 +4,7 @@
     "domain": "hna",
     "command": {
       "action": "train",
-      "model": "/home/b/models/gemma-4-E4B-it",
+      "model": "~/models/gemma-4-E4B-it",
       "sequence": ".local/scratch/hna_training_sequence.json",
       "learning_shift": 16,
       "series_terms": 14

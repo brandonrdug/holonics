@@ -116,10 +116,10 @@ this enforces dataflow and enacts nothing simultaneously.
 exterior realization testimony under the Gemma instance §6:
 
 ```text
-locator   /home/b/scratch/huggingface/.venv/lib/python3.13/site-packages/transformers/models/gemma4/modeling_gemma4.py
+locator   ~/scratch/huggingface/.venv/lib/python3.13/site-packages/transformers/models/gemma4/modeling_gemma4.py
 version   transformers 5.8.1  (its __init__.py, __version__ = "5.8.1")
 sha256    64ecac478c7d11b9a6993ea194bdf98ce867d0e6d361295d976140e0ded53933
-config    /home/b/models/gemma-4-E4B-it/config.json  (text_config), and the safetensors header
+config    ~/models/gemma-4-E4B-it/config.json  (text_config), and the safetensors header
 ```
 
 Read directly, and every line below is a `SourceTestimony::Implementation` with that locator:

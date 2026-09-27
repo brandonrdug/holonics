@@ -63,9 +63,9 @@ equation families to a CAS-shaped plan.
 
 | file | extent | SHA-256 |
 |---|---:|---|
-| `/home/b/Downloads/dataset.json` | approximately 38 MB | `6f993176418d57be89c89e27af4ccdef6dae0177b9ed887368e8d66a1c235c78` |
-| `/home/b/Downloads/problems.json` | approximately 37 MB | `8ae5b01b910bb6123e6de5813204026a01be16dd9bc1883cd51c9c0e1a4b62da` |
-| `/home/b/Downloads/research_results.json` | approximately 77 MB | `8da848d31c20eb4eecaa07702eced4724aa4a89f877c2a0774d9f3138389aa6b` |
+| `~/Downloads/dataset.json` | approximately 38 MB | `6f993176418d57be89c89e27af4ccdef6dae0177b9ed887368e8d66a1c235c78` |
+| `~/Downloads/problems.json` | approximately 37 MB | `8ae5b01b910bb6123e6de5813204026a01be16dd9bc1883cd51c9c0e1a4b62da` |
+| `~/Downloads/research_results.json` | approximately 77 MB | `8da848d31c20eb4eecaa07702eced4724aa4a89f877c2a0774d9f3138389aa6b` |
 
 [established-bounded] Version 1.5.0 contains 8,785 problems in 17 exterior categories and 14 source
 collections: 4,462 labelled open, 3,627 partially solved and 696 solved. The research-result map

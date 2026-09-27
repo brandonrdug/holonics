@@ -14,7 +14,7 @@ or endorsement of those external claims. None is a cultivation input or executab
   "content_sha256": "71dda066fd17b95e6323d6a528224f861d6a512fd3ff1ceb4c9bbbbb743ddf52",
   "byte_count": 928734,
   "media_type": "application/json",
-  "original_locator": "/home/b/Downloads/elliptic-rank-database.json",
+  "original_locator": "~/Downloads/elliptic-rank-database.json",
   "original_uri": "https://elliptic-rank.icarm.cloud/api/curves",
   "license_text": "Database payload license not located during 2026-08-27 source audit; preserve attribution and do not infer the Apache-2.0 code license applies to submitted data.",
   "schema_name": "icarm-elliptic-rank-database-json",

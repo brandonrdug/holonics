@@ -67,8 +67,8 @@ unrepresentable in the hot owner. HNA2 is now the sole current deed.
 [process-audit] The returns were produced by:
 
 ```text
-cargo run -q -p holonic-engine --example dismantle_full_native_operator_hna1 -- /home/b/models/gemma-4-E4B-it
-cargo run -q -p holonic-engine --example mount_full_native_operator_residence_hna1 -- /home/b/models/gemma-4-E4B-it
+cargo run -q -p holonic-engine --example dismantle_full_native_operator_hna1 -- ~/models/gemma-4-E4B-it
+cargo run -q -p holonic-engine --example mount_full_native_operator_residence_hna1 -- ~/models/gemma-4-E4B-it
 cargo check -p holonic-engine --example mount_full_native_operator_residence_hna1
 ```
 

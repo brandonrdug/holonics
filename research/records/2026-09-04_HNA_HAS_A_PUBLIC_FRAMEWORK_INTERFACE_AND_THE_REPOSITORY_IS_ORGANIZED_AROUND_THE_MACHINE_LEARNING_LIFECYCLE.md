@@ -40,7 +40,7 @@ census, with the full morphology trace optionally requested. It is explicitly a 
 not a saved trained checkpoint.
 
 [established-bounded; implemented-exact; measured] The actual CLI command
-`target/debug/holonics --format json hna train /home/b/models/gemma-4-E4B-it .local/scratch/hna_training_sequence.json`
+`target/debug/holonics --format json hna train ~/models/gemma-4-E4B-it .local/scratch/hna_training_sequence.json`
 returned exit 0 on the consumer GPU. Three cumulative text occurrences completed three cycles
 at generation 3,825 and overlay rank 5,504. The selected text faces were ` Explain`, ` the`,
 and ` Hol`; they are inspected single-face results, not a qualitative answer claim. The actual

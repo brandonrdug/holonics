@@ -15,7 +15,7 @@ warning: function `enact_section_contact` is never used
     |               ^^^^^^^^^^^^^^^^^^^^^
 
 warning: `holonic-engine` (lib) generated 2 warnings
-   Compiling holonics-hna v0.1.0 (/home/b/Workspaces/holonics/crates/holonics-hna)
+   Compiling holonics-hna v0.1.0 (crates/holonics-hna)
     Finished `test` profile [unoptimized + debuginfo] target(s) in 3.09s
      Running unittests examples/alpha_text.rs (target/debug/examples/alpha_text-6896952e413bc78c)
 

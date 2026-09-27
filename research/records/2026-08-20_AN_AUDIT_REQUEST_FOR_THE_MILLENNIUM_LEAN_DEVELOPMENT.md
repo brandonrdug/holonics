@@ -40,7 +40,7 @@ cd soma/formal/elementary-holonics
 lake build                                    # 3,313 jobs; mathlib v4.27.0 is prebuilt
 lake env lean ElementaryHolonics/Millennium/<file>.lean       # check one file, ~10-30s
 # audit: a scratch file importing the module, then `#print axioms <name>` per theorem
-cd /home/b/Workspaces/holonics
+cd .
 bash tools/gates.sh named-paths line-citations claim-index document-law     # 4 passed, 0 failed
 ```
 

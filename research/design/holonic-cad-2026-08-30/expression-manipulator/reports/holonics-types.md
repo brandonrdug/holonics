@@ -1,9 +1,9 @@
 # Holonics typed glossary (read-only survey, 2026-08-30)
 
 Path prefixes used below (all paths absolute once expanded):
-- `L/` = `/home/b/Workspaces/holonics/formal/elementary-holonics/ElementaryHolonics/`
-- `LR/` = `/home/b/Workspaces/holonics/formal/elementary-holonics/`
-- `R/` = `/home/b/Workspaces/holonics/crates/`
+- `L/` = `formal/elementary-holonics/ElementaryHolonics/`
+- `LR/` = `formal/elementary-holonics/`
+- `R/` = `crates/`
 
 Format of every row: `Name — fields — meaning — path:line`. Meanings are the source's own doc-comment, condensed to one line. Nothing was built or modified.
 
@@ -345,7 +345,7 @@ Owns: "Exact reflective runtime beneath learnable surface codecs … defines no 
 
 - `R/holonic-engine/src/lean_development.rs` (2400): parses Lean **source text** (not kernel output). `read_development(text, grain: DeclarationGrain{OneArtifactOneDeclaration | EveryTopLevelDeclaration}) -> DevelopmentReading` (1867); emits `DevelopmentReading {grain, declarations: Vec<DeclaredForm>, unopened: Vec<UnopenedDeclaration>, commentary, preamble, scoping: BTreeMap<String,u32>, ambiguous_short_names}` (366); `DeclaredForm {former, name, anonymous, namespace_path, statement, recruited: BTreeMap<String,u32>, tactics, local_bindings, steps: Vec<ProofStep>, line}` (220); `ProofStep {former, cohort, focus, binder, statement, recruited, column, line}` (193); projections `derivations(ConductGrain)`, `declared_recruitment`, `open_recruitment`, `qualified_index`, `resolve` (386-610). Doc (`:1-40`) records why: the earlier reader named each file by its last `theorem` and charged comments/preamble as recruitment.
 - `R/holonic-engine/src/derivation_atlas.rs` (2746): `Derivation {name, statement, recruited}` (236); `read_derivation(text) -> Option<Derivation>` (505); `DECLARATION_FORMERS` = abbrev, axiom, class, def, example, inductive, instance, lemma, opaque, structure, theorem, variable (188); `CircuitAperture {identity: {ByDeclaration|ByRoute}, coefficient: {Incidence|Multiplicity}, statements: {Withheld|Founded}, reach: {IntoDerivation|OutOfDerivation}}` (646); `found_circuit(...) -> DerivationCircuit {aperture, complex: GradedCausalComplex, vertices, recruitments, reaches, routes}` (1012, 800) — 0-cells = declarations/symbols/statements, 1-cells = recruitment or reach, no 2-cells (doc `:11-26`); `invariant_movement`, `route_movement` (1311, 1409) return what changed between two readings.
-- `/home/b/Workspaces/holonics/applications/derivation-atlas/src/main.rs`: `extract` runs `lake build derivation_atlas` then `.lake/build/bin/derivation_atlas --input … --output …` (1274-1290); `validate`, `inspect`, `corpus` consume the `holonics.derivation-atlas.v2` JSON (`SCHEMA`, mirrored `camelCase` structs).
+- `applications/derivation-atlas/src/main.rs`: `extract` runs `lake build derivation_atlas` then `.lake/build/bin/derivation_atlas --input … --output …` (1274-1290); `validate`, `inspect`, `corpus` consume the `holonics.derivation-atlas.v2` JSON (`SCHEMA`, mirrored `camelCase` structs).
 
 ### B.6 CUDA kernels `R/holonic-engine/kernels/` (all registered in `build.rs:52-58`)
 
@@ -361,7 +361,7 @@ Owns: "Exact reflective runtime beneath learnable surface codecs … defines no 
 
 ---
 
-## C. Cargo workspace (`/home/b/Workspaces/holonics/Cargo.toml`)
+## C. Cargo workspace (`Cargo.toml`)
 
 Header (`:1-13`): "`body` is pure law: no_std, zero dependencies. `crates/holonic-structure` is the substrate … `relational-geometry` and `holonic-engine` are the exact receiver-relative geometry, float-free over BigRational with Sturm-certified algebraic roots. `holonic-language` is the reflective runtime. `crates/holonic-life` is the membrane where the ecologies live." Resolver 2, edition 2024. Historical exclusion at report time (own nightlies, committed artifacts): `accelerators/rust-gpu`, `accelerators/rust-gpu/builder`; the Vulkan surface was retired in R2. Current device-only targets: `accelerators/cuda-smoke`, `accelerators/cuda-kernel`.
 

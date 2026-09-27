@@ -109,7 +109,7 @@ That is the operational form of `SeriesTailCertificate` and it predates the carr
 file adds the clause that keeps the ban from becoming a ban on mathematics: *"every algorithm that
 would normally output a floating point number is actually a relativistic series"* — `exp`, `ln`,
 `sqrt`, `sin`, the cross-ratio are all kept; what stops is the **collapse**. Reachable only through
-`git -C /home/b/Workspaces/laboratory show a07ff376:src/eros/um/THEORY_AND_EQUATIONS.md`.
+`git -C ~/Workspaces/laboratory show a07ff376:src/eros/um/THEORY_AND_EQUATIONS.md`.
 
 **And today's coefficient repair is the third instance**, which is why it belongs in this table and
 not only in a defect record. `ComparativeMultiplicity` held two arms and destroyed them at

@@ -1,6 +1,6 @@
 """Exact witnesses for research/records/2026-09-03_THE_SEAMS_ARE_LOCAL_OPTIMA_OF_THE_THREAD_ENERGY_THE_PRIMES_ARE_THE_MISSING_HALF_AND_THE_FLOW_BINDS_THE_INTEGER_EVENTS.md
 Observer computation (sympy over Q and exact algebraics); it is apparatus outside the engine.
-Run: /home/b/scratch/huggingface/.venv/bin/python -u research/records/2026-09-03_flow_witnesses/flow_witnesses.py
+Run: ~/scratch/huggingface/.venv/bin/python -u research/records/2026-09-03_flow_witnesses/flow_witnesses.py
 No float determines any reported result: bisection probes are exact rationals, counts are Sturm counts."""
 import sys, time
 import sympy as sp

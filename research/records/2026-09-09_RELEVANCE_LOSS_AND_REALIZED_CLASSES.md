@@ -13,8 +13,8 @@ selected by `response_item/message/user`; harness messages, tool returns and com
 were excluded. Full text is retained locally at `.local/scratch/relevance-user-messages.json`.
 The table contains paraphrases, not quoted replacements for the original messages.
 
-- **F:** `/home/b/.codex/sessions/2026/09/08/rollout-2026-09-08T16-00-58-01a08340-d28a-7350-836c-37918f573f77.jsonl`.
-- **A:** `/home/b/.codex/sessions/2026/09/06/rollout-2026-09-06T13-59-42-01a07885-13f1-7351-b539-996e18049602.jsonl`.
+- **F:** `~/.codex/sessions/2026/09/08/rollout-2026-09-08T16-00-58-01a08340-d28a-7350-836c-37918f573f77.jsonl`.
+- **A:** `~/.codex/sessions/2026/09/06/rollout-2026-09-06T13-59-42-01a07885-13f1-7351-b539-996e18049602.jsonl`.
 
 | Thread / line | UTC timestamp | Recovered direction |
 |---|---|---|

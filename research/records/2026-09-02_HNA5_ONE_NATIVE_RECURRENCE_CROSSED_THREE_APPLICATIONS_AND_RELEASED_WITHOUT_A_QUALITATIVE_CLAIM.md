@@ -51,7 +51,7 @@ The application release receiver and focused build passed with:
 
 ```text
 cargo check -p athena-alpha --example full_application_matrix_hna5
-cargo run -q -p athena-alpha --example full_application_matrix_hna5 -- /home/b/models/gemma-4-E4B-it
+cargo run -q -p athena-alpha --example full_application_matrix_hna5 -- ~/models/gemma-4-E4B-it
 ```
 
 ## Grade

@@ -30,7 +30,7 @@ prepared private exposure and compares the resumed state with its uninterrupted 
 ```text
 cargo test -p holonics-hna --example alpha_text leading_nontext_material_preserves_the_available_native_parent -- --ignored --test-threads=1
 /tmp/athena-leading-material-parent-test.log
-HOLONICS_ALPHA_TEST_EXPOSURE=/home/b/Workspaces/holonics/.local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl cargo test -p holonics-hna --example alpha_text -- --ignored --test-threads=1
+HOLONICS_ALPHA_TEST_EXPOSURE=.local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl cargo test -p holonics-hna --example alpha_text -- --ignored --test-threads=1
 /tmp/athena-text-framing-resume-tests.log
 ```
 

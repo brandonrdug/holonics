@@ -104,7 +104,7 @@ breadth three and a dependency span of two**, where a serial reading would have 
 ```
 cargo run --release -q -p holonic-engine \
   --example the_source_diagram_is_bound_or_its_candidates_are_retained -- \
-  /home/b/models/gemma-4-E4B-it
+  ~/models/gemma-4-E4B-it
 ```
 
 ```text
@@ -175,7 +175,7 @@ composition. `diagram closed false`, `open questions 4`, `operations with no dec
 
 ```
 cargo run --release -q -p holonic-engine \
-  --example the_ported_transport_is_posed_or_the_work_refuses -- /home/b/models/gemma-4-E4B-it
+  --example the_ported_transport_is_posed_or_the_work_refuses -- ~/models/gemma-4-E4B-it
 ```
 
 on an RTX 4080 SUPER with an active display, which is stated because a measurement without its frame

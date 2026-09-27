@@ -6,9 +6,9 @@
 `established-bounded [measured]` for the architecture facts and the two measurements in §5;
 `open` for every capability in §9.
 **Evidence:** the model's `config.json`, its 274 KB safetensors header (2,130 tensors), and two
-direct reads of its weights, all at `/home/b/models/gemma-4-E4B-it`, sha256 of the artifact
+direct reads of its weights, all at `~/models/gemma-4-E4B-it`, sha256 of the artifact
 `cfbd3d2f1cd71bd471c37fe2…`, 15,992,595,884 octets; `THE_HOLONIC_DERIVATIONS.md` §0 verified by
-`git -C /home/b/Workspaces/laboratory show a07ff376:src/holobrochos/RESEARCH/THE_HOLONIC_DERIVATIONS.md`.
+`git -C ~/Workspaces/laboratory show a07ff376:src/holobrochos/RESEARCH/THE_HOLONIC_DERIVATIONS.md`.
 **Provenance:** Brandon, direct conversation 2026-08-13, setting the object, the prohibition on
 running the model, the receiver family, and the finite-set/infinite-complexity thesis.
 **Band:** THE MAP IS MATERIAL, NOT A PORT / ONLY RATIO AND WINDING CROSS A HORIZON / THE TIE

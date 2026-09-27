@@ -1,7 +1,7 @@
 # The recovered law
 
 **Deposited 2026-08-07.** Six parallel readings of the frozen laboratory at
-`/home/b/Workspaces/laboratory` (1,658 commits, 2026-05-10 → 2026-08-03), on Brandon's direct
+`~/Workspaces/laboratory` (1,658 commits, 2026-05-10 → 2026-08-03), on Brandon's direct
 instruction after a major misinterpretation.
 
 **Why this file exists.** The laboratory's answer to drift was `FORMULA.md`: one canon, read on

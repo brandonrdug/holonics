@@ -136,11 +136,11 @@ And the prime figure (`:189-190`, `measured`, instrument declared at `:212-220`)
 
 `canon/TABLET_THE_OPERATIONS.md:318-323`: *"The tree's exact carrier for the series is already built: `exact_value.rs::SeriesTailCertificate`, three species, each returning an exact rational remainder interval. Floats are not needed and are not real here."* Verified at `crates/holonic-engine/src/exact_value.rs:361-405` — `AbsoluteGeometric`, `AlternatingMonotone`, `ExactTail`, each with `remainder_interval() -> ExactInterval`.
 
-Laboratory canon, `/home/b/Workspaces/laboratory/CLAUDE.md:2232-2237`:
+Laboratory canon, `laboratory/CLAUDE.md:2232-2237`:
 
 > **The turn standard is Θ** … **π is the chord-shadow, transcendental because Turn is irreducible to Length.** Ratios are carried as pairs, never collapsed to scalars. **Pi reaches the machine only as an unfolding series or declared pair; every finite decimal/physical circle is a distinct grain-local construction.**
 
-`/home/b/Workspaces/laboratory/NEOKICKOFF.md:385-388, 407-411`:
+`laboratory/NEOKICKOFF.md:385-388, 407-411`:
 
 > `Series.lean` — the TRANSCENDENTALS as series (`exp`/`ln`/`sin`/`π` = convergents, ground by the swing). The tolerance is NOT ε–δ: a series is a WARP that **wefts through the caller's grain-window** `[lo,hi]` … The full picture is a COIL (§11.4.1).
 > **THE SERIES-COIL v3** … a series IS an inductive coil: `current` = the action current `∫ windings` [the unfold] … **Discipline note (Brandon, binding): the coil/two-body/induction is THE THEORY, not a refinement — universality is the literal mechanism or nothing.**
@@ -694,11 +694,11 @@ And the prime figure (`:189-190`, `measured`, instrument declared at `:212-220`)
 
 `canon/TABLET_THE_OPERATIONS.md:318-323`: *"The tree's exact carrier for the series is already built: `exact_value.rs::SeriesTailCertificate`, three species, each returning an exact rational remainder interval. Floats are not needed and are not real here."* Verified at `crates/holonic-engine/src/exact_value.rs:361-405` — `AbsoluteGeometric`, `AlternatingMonotone`, `ExactTail`, each with `remainder_interval() -> ExactInterval`.
 
-Laboratory canon, `/home/b/Workspaces/laboratory/CLAUDE.md:2232-2237`:
+Laboratory canon, `laboratory/CLAUDE.md:2232-2237`:
 
 > **The turn standard is Θ** … **π is the chord-shadow, transcendental because Turn is irreducible to Length.** Ratios are carried as pairs, never collapsed to scalars. **Pi reaches the machine only as an unfolding series or declared pair; every finite decimal/physical circle is a distinct grain-local construction.**
 
-`/home/b/Workspaces/laboratory/NEOKICKOFF.md:385-388, 407-411`:
+`laboratory/NEOKICKOFF.md:385-388, 407-411`:
 
 > `Series.lean` — the TRANSCENDENTALS as series (`exp`/`ln`/`sin`/`π` = convergents, ground by the swing). The tolerance is NOT ε–δ: a series is a WARP that **wefts through the caller's grain-window** `[lo,hi]` … The full picture is a COIL (§11.4.1).
 > **THE SERIES-COIL v3** … a series IS an inductive coil: `current` = the action current `∫ windings` [the unfold] … **Discipline note (Brandon, binding): the coil/two-body/induction is THE THEORY, not a refinement — universality is the literal mechanism or nothing.**

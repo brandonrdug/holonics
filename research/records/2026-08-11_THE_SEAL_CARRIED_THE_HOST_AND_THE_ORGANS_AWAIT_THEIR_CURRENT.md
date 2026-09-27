@@ -30,7 +30,7 @@ RE-MEASURED BEFORE DEPOSIT
 >    the repair agent, named in no audit — `standing()` folded `path.display()` into every
 >    `PassageOrigin::Standing`, which `conditioned_rest.rs` writes into the sealed body, so the
 >    **plan-2 conditioned-body address was host-dependent too.** Measured: old body **103**
->    standing host paths and 495,934 total `/home/b`; repaired body **0** and **0**.
+>    standing host paths and 495,934 total the home prefix; repaired body **0** and **0**.
 > 3. **This record's author verified a claim with an instrument that could not see it.** The first
 >    check of correction 2 ran `grep -o` against the body rest and returned `0`, appearing to refute
 >    the agent. The body rest is **binary CDER**; `grep` reports nothing for a binary file unless
@@ -74,7 +74,7 @@ finding carries the site, the measured count, and the repair.
 1. **The sealed corpus embeds the absolute host path in 46,745 occurrence identities.**
    `soma/life/src/text_material/import.rs` `founded_record_identity` formats
    `container={path.display()}`; measured by direct count in the sealed rest
-   (`founded:container=/home/b` × 46,745). The corpus address `633f9ab6…` — the anchor of the whole
+   (`founded:container=$HOME` × 46,745). The corpus address `633f9ab6…` — the anchor of the whole
    plan-2 chain — is a function of this machine's home directory. This is `CLAUDE.md` §0 lesson 2
    verbatim, and it arose by building a second identity law beside the owner the plan named:
    `dialogue_lineage` already founds identities from the **record address**, reproducible from the

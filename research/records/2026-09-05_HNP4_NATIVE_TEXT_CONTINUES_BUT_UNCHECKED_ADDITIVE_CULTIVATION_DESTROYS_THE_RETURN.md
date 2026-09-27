@@ -46,7 +46,7 @@ that save after delivery failure; it claims no peer acknowledgment or arbitrary-
 ## Actual matched text experiment
 
 [established-bounded; measured] Both runs used `target/ske4/rest.bin`, the same prompt
-“Describe a red cube.”, the same exterior codec/source root `/home/b/models/gemma-4-E4B-it`, and
+“Describe a red cube.”, the same exterior codec/source root `~/models/gemma-4-E4B-it`, and
 one continuing native owner. Missing input sections were acquired while that owner remained
 mounted. No foreign executor generated the text. The separate first-cycle control returned `A`
 from a fresh native body, contrasting with the earlier cultivated checkpoint's ` mik`.
@@ -104,14 +104,14 @@ it is not an additional full-native-state equality comparison against an uninter
 reference. The earlier full-state persistence and input-extension comparisons keep their own scopes.
 
 ```sh
-target/debug/examples/text_hnp4 fresh target/ske4/rest.bin /home/b/models/gemma-4-E4B-it \
+target/debug/examples/text_hnp4 fresh target/ske4/rest.bin ~/models/gemma-4-E4B-it \
   'Describe a red cube.' .local/artifacts/hnp4/text-develop-01 12 develop 16
 
-target/debug/examples/text_hnp4 fresh target/ske4/rest.bin /home/b/models/gemma-4-E4B-it \
+target/debug/examples/text_hnp4 fresh target/ske4/rest.bin ~/models/gemma-4-E4B-it \
   'Describe a red cube.' .local/artifacts/hnp4/text-observe-01 64 observe 16
 
 target/debug/examples/text_hnp4 resume .local/artifacts/hnp4/text-observe-01/text.json \
-  /home/b/models/gemma-4-E4B-it .local/artifacts/hnp4/text-observe-resume-01 1
+  ~/models/gemma-4-E4B-it .local/artifacts/hnp4/text-observe-resume-01 1
 ```
 
 [definition] Reproduction requires new destinations; no existing model or material was overwritten.

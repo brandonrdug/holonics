@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-13
 **Truth status:** `established-bounded [measured]` for every figure taken off
-`/home/b/models/gemma-4-E4B-it/model.safetensors`; `proved-standard` for `H.0471`, `H.0472` and
+`~/models/gemma-4-E4B-it/model.safetensors`; `proved-standard` for `H.0471`, `H.0472` and
 `H.0469`, each cited to its registry entry; `interpretation` for the design that composes them.
 **Evidence:** direct reads of the safetensors header and payload, this machine, 2026-08-13; four
 verification passes over the cited owners; one driver re-run on an RTX 4080 SUPER with an active

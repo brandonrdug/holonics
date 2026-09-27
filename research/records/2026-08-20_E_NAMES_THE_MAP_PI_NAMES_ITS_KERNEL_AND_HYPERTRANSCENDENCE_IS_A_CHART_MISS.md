@@ -480,7 +480,7 @@ t=4.2   0.000049096267059            4.47e-19
 **`established-bounded`, and it corrects an absence claimed in conversation on 2026-08-20.** The
 claim was that no continued-fraction owner exists — measured over `crates/` and `soma/` and true
 there. Brandon said the work existed in the laboratory, and it does. Measured by
-`git -C /home/b/Workspaces/laboratory grep -n -i "continued.fraction\|convergents" a07ff376`:
+`git -C ~/Workspaces/laboratory grep -n -i "continued.fraction\|convergents" a07ff376`:
 
 - `src/eros/um/NEOTHEORY.md:131` — **`simplest_in(lo,hi)`**, the Stern–Brocot mediant descent, whose
   consecutive mediants are *unimodular Farey neighbours, `det ±1`, the conserved projective

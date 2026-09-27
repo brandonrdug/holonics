@@ -68,19 +68,19 @@ raw utterance is preserved and the interpretation is kept visibly separate and d
 
 | Tag | Path | Span |
 |---|---|---|
-| `CC` | `/home/b/.claude/projects/-home-b-Workspaces-holonics/414ff629-2667-4de3-afb4-9a46dfb6c8d2.jsonl` | 2026-08-06 → 2026-08-07, 54 Brandon messages, timestamps UTC |
-| `CX 2026/07/08` | `/home/b/.codex/sessions/2026/07/08/rollout-2026-07-08T19-38-21-019f44bd-9059-73f1-b5dd-4431217f8b7a.jsonl` | timestamps America/Los_Angeles |
-| `CX 2026/07/10` | `/home/b/.codex/sessions/2026/07/10/rollout-2026-07-10T11-44-55-019f4d58-d711-71d1-8658-466dfd11dcbe.jsonl` | |
-| `CX 2026/07/14` | `/home/b/.codex/sessions/2026/07/14/rollout-2026-07-14T18-11-25-019f6354-1ecd-77e0-8553-0fd9715c3867.jsonl` | |
-| `CX 2026/07/19` | `/home/b/.codex/sessions/2026/07/19/rollout-2026-07-19T06-39-59-019f7a9a-e631-7351-ba4e-d84ba8f474aa.jsonl` | |
-| `CX 2026/07/27` | `/home/b/.codex/sessions/2026/07/27/rollout-2026-07-27T11-47-17-019fa4e7-1b3b-7f63-82e6-6675bc310dd3.jsonl` | |
-| `CX 2026/07/29` | `/home/b/.codex/sessions/2026/07/29/rollout-2026-07-29T21-02-26-019fb130-1469-7fe0-b55b-5b5f41f818de.jsonl` | |
-| `CX 2026/07/30` | `/home/b/.codex/sessions/2026/07/30/rollout-2026-07-30T14-41-23-019fb4f9-957a-7551-95c7-876b672bb419.jsonl` | |
-| `CX 2026/07/31` | `/home/b/.codex/sessions/2026/07/31/rollout-2026-07-31T10-40-07-019fb943-1067-7f60-9a6b-6a1adce665bf.jsonl` | |
-| `CX 2026/08/02` | `/home/b/.codex/sessions/2026/08/02/rollout-2026-08-02T10-59-45-019fc3a1-bed3-76c1-bac6-0e01bc264384.jsonl` | |
-| `CX 2026/08/03` | `/home/b/.codex/sessions/2026/08/03/rollout-2026-08-03T15-55-13-019fc9d6-9e05-7080-bb1e-f5f577f59e1d.jsonl` | |
-| `CX 2026/08/04` | `/home/b/.codex/sessions/2026/08/04/rollout-2026-08-04T11-36-27-019fce10-135d-7e20-a28f-9e77d253452b.jsonl` | |
-| `CX 2026/08/05` | `/home/b/.codex/sessions/2026/08/05/rollout-2026-08-05T08-20-27-019fd282-fabb-70e2-8a70-4a5a620d3260.jsonl` | |
+| `CC` | `~/.claude/projects/-home-b-Workspaces-holonics/414ff629-2667-4de3-afb4-9a46dfb6c8d2.jsonl` | 2026-08-06 → 2026-08-07, 54 Brandon messages, timestamps UTC |
+| `CX 2026/07/08` | `~/.codex/sessions/2026/07/08/rollout-2026-07-08T19-38-21-019f44bd-9059-73f1-b5dd-4431217f8b7a.jsonl` | timestamps America/Los_Angeles |
+| `CX 2026/07/10` | `~/.codex/sessions/2026/07/10/rollout-2026-07-10T11-44-55-019f4d58-d711-71d1-8658-466dfd11dcbe.jsonl` | |
+| `CX 2026/07/14` | `~/.codex/sessions/2026/07/14/rollout-2026-07-14T18-11-25-019f6354-1ecd-77e0-8553-0fd9715c3867.jsonl` | |
+| `CX 2026/07/19` | `~/.codex/sessions/2026/07/19/rollout-2026-07-19T06-39-59-019f7a9a-e631-7351-ba4e-d84ba8f474aa.jsonl` | |
+| `CX 2026/07/27` | `~/.codex/sessions/2026/07/27/rollout-2026-07-27T11-47-17-019fa4e7-1b3b-7f63-82e6-6675bc310dd3.jsonl` | |
+| `CX 2026/07/29` | `~/.codex/sessions/2026/07/29/rollout-2026-07-29T21-02-26-019fb130-1469-7fe0-b55b-5b5f41f818de.jsonl` | |
+| `CX 2026/07/30` | `~/.codex/sessions/2026/07/30/rollout-2026-07-30T14-41-23-019fb4f9-957a-7551-95c7-876b672bb419.jsonl` | |
+| `CX 2026/07/31` | `~/.codex/sessions/2026/07/31/rollout-2026-07-31T10-40-07-019fb943-1067-7f60-9a6b-6a1adce665bf.jsonl` | |
+| `CX 2026/08/02` | `~/.codex/sessions/2026/08/02/rollout-2026-08-02T10-59-45-019fc3a1-bed3-76c1-bac6-0e01bc264384.jsonl` | |
+| `CX 2026/08/03` | `~/.codex/sessions/2026/08/03/rollout-2026-08-03T15-55-13-019fc9d6-9e05-7080-bb1e-f5f577f59e1d.jsonl` | |
+| `CX 2026/08/04` | `~/.codex/sessions/2026/08/04/rollout-2026-08-04T11-36-27-019fce10-135d-7e20-a28f-9e77d253452b.jsonl` | |
+| `CX 2026/08/05` | `~/.codex/sessions/2026/08/05/rollout-2026-08-05T08-20-27-019fd282-fabb-70e2-8a70-4a5a620d3260.jsonl` | |
 
 ### The standing hazard this file must not hide
 
@@ -883,7 +883,7 @@ Reading structure directly off the residue-stratum renders:
 > — 2026-07-31 11:07, `CX 2026/07/31`
 
 > "Related to primes and RH, one of the more important sets of recorded outputs was in
-> /home/b/Workspaces/laboratory/output/arithmetic-dimensional-receiver/"
+> laboratory/output/arithmetic-dimensional-receiver/"
 >
 > — 2026-08-06T00:31:15Z, `CC` msg 3
 

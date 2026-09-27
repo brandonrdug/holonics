@@ -24,8 +24,9 @@
 //! - **The density read through a face** ([`FaceCode`]): partition the window by `n mod d` for a
 //!   declared modulus `d`; the indicator coded at each class's own density costs
 //!   `Σ_r |W_r| H(π_r/|W_r|)` bits, exactly, as its form in `log₂ p` (`ratio::surprisal::entropy`).
-//!   At `d = 1` it is **the density's code**, what a receiver knowing only how many primes the
-//!   window holds pays; at `d = b` the trailing face's (the last digit). Neither is the stream's
+//!   At `d = 1` it is **the density's code**, the code at a known density `π/n`; a receiver
+//!   knowing only how many primes the window holds pays `log₂ C(n, π)`, which is smaller. At
+//!   `d = b` it is the trailing face's (the last digit). Neither is the stream's
 //!   rate, which is zero; they place a receiver's code between the density and the determined.
 
 use std::collections::BTreeMap;

@@ -88,16 +88,16 @@ reference; transport buffers were empty and the native state was awaiting the ne
 
 ```sh
 target/debug/examples/input_material_hnp4 prepare \
-  .local/artifacts/hnp3/checkpoint-01.hna /home/b/models/gemma-4-E4B-it \
+  .local/artifacts/hnp3/checkpoint-01.hna ~/models/gemma-4-E4B-it \
   .local/artifacts/hnp4/input-01/material.safetensors
 
 target/debug/examples/input_material_hnp4 exercise \
   .local/artifacts/hnp3/checkpoint-01.hna .local/artifacts/hnp4/input-01/material.safetensors \
-  /home/b/models/gemma-4-E4B-it .local/artifacts/hnp4/input-01 \
+  ~/models/gemma-4-E4B-it .local/artifacts/hnp4/input-01 \
   .local/artifacts/hnp3/expected-after-01.hna
 
 target/debug/examples/input_material_hnp4 resume \
-  .local/artifacts/hnp4/input-01/developed.hna /home/b/models/gemma-4-E4B-it \
+  .local/artifacts/hnp4/input-01/developed.hna ~/models/gemma-4-E4B-it \
   .local/artifacts/hnp4/input-01/expected-after.hna
 ```
 

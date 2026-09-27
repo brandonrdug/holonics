@@ -34467,7 +34467,7 @@
       "label": "sol-lean-millennium-2026-08-27",
       "description": "",
       "created_by_occurrence_id": "OCC-e5432278-7bfc-4050-ba49-7f10b35eb3b8",
-      "metadata_json": "{\"apparatus\":\"Codex terminal; Lean 4 workspace /home/b/Workspaces/holonics\"}"
+      "metadata_json": "{\"apparatus\":\"Codex terminal; Lean 4 workspace .\"}"
     },
     {
       "id": "OBJ-85efeeaf-b659-480d-b2d1-aef0c435edd9",
@@ -36025,7 +36025,7 @@
       "id": "OBJ-2452d130-d54c-4265-a7f9-b95e62257801",
       "object_kind": "message",
       "label": "[established-bounded] Owner audit for compression/cycles: exact reusable owners ",
-      "description": "[established-bounded] Owner audit for compression/cycles: exact reusable owners are Foundation/Holon.lean (Holon, ReconstructionFibre, interaction/comp, BoundaryHolon and boundary_totalCurrent); Foundation/ReceiverQuotient.lean (ReceiverQuotient, reconstructionFibre, quotient_eq_places_both_in_one_fibre); Millennium/LineageCompression.lean (ReceiverHistoryCompression, generatorExact, allSuccessorHistories, quotientEqForcesEverySuccessorFace, separatingSuccessorReopensTheProposedQuotient, static counterexample); HolonicGranularBoundaryRadiation.lean (GranularBoundaryBody, boundary_boundary/outerReturn_eq_zero, reflectedBoundaryPotential, boundaryRadiation_pairing_eq_reflected_action_pairing, jointPortKernel, reconstructionFiber, BoundaryScalePassage and composition, CausalGrain/Pasage, radiation_natural); DiagonalChainTransport.lean (separate/rejoin, boundary²=0 and low-degree reconstruction homotopy); HolonicDifferenceCalculus.lean (iteratedDifference, exact telescoping/window integration, modular zero fibre); HolonicDiscreteInduction.lean (face curl/Stokes, Faraday telescope, node divergence, continuity balance, four-axis flux linkage and inducedAxisEmf); HolonicTorusParametronRealization.lean (cellular cycles, exact-drop/flux-linkage fibres, cut insufficiency). SpherePacking.lean is actually exact Soddy–Gossett five-bend reflection orbit (involutions, defect preservation, noncommuting chronology), not general fractal packing. HolonicFourForceSectorCarrier.lean carries six coordinate planes + four dependent sector fibres, but no force identification theorem. HolonicTorusEntropyParametronEquivalence.lean gives four-axis winding current/injectivity and entropy-axis cross-current alignment. There is no Lean owner/file named Schlaefli, Platonic, diffraction, fractal, or lightning; these remain gaps. The 2026-08-27 LATTICE_DAMAGE_DIFFRACTION_PASSAGE record is strongest exact source synthesis: finite phase sum S(k)=Σ a_j exp(i<k,x_j>), cyclic character cancellation, and four-map RH gap. Suggested next owner should extend existing HolonicGranularBoundaryRadiation/LineageCompression rather than duplicate a generic compression cabinet, with a chain-map compression law preserving ∂, boundary cycle, reflection pairing, and complete reconstruction fibre. Claude export is discoverable at /home/b/.claude/jobs/2f87fe75/tmp/export/conversations.json; filtered relevant named chats found only older 'Redundancy, feedback, and information architecture' and 'Reservoir computing and manifold geometry'; no recent Claude log was available under obvious paths. Recent exact Holonic user intuitions are already deposited in records 2026-08-21_LINEAGE_IS_PULLBACK... (dynamic compression, ordered reflection orbit), 2026-08-27_LATTICE_DAMAGE_DIFFRACTION_PASSAGE.md (damage/phase/diffraction), and canon/TABLET_THE_MANIFOLD.md §§21–21.2 (integration/differentiation by reflection, Bragg lattice, null boundary). Duplication warnings: ReceiverQuotient vs LineageCompression vs GranularBoundaryRadiation each define distinct receiver/reconstruction layers; do not fork another same-shaped compression owner; SpherePacking and HolonicFourForceSectorCarrier are specialized, not general replacements.",
+      "description": "[established-bounded] Owner audit for compression/cycles: exact reusable owners are Foundation/Holon.lean (Holon, ReconstructionFibre, interaction/comp, BoundaryHolon and boundary_totalCurrent); Foundation/ReceiverQuotient.lean (ReceiverQuotient, reconstructionFibre, quotient_eq_places_both_in_one_fibre); Millennium/LineageCompression.lean (ReceiverHistoryCompression, generatorExact, allSuccessorHistories, quotientEqForcesEverySuccessorFace, separatingSuccessorReopensTheProposedQuotient, static counterexample); HolonicGranularBoundaryRadiation.lean (GranularBoundaryBody, boundary_boundary/outerReturn_eq_zero, reflectedBoundaryPotential, boundaryRadiation_pairing_eq_reflected_action_pairing, jointPortKernel, reconstructionFiber, BoundaryScalePassage and composition, CausalGrain/Pasage, radiation_natural); DiagonalChainTransport.lean (separate/rejoin, boundary²=0 and low-degree reconstruction homotopy); HolonicDifferenceCalculus.lean (iteratedDifference, exact telescoping/window integration, modular zero fibre); HolonicDiscreteInduction.lean (face curl/Stokes, Faraday telescope, node divergence, continuity balance, four-axis flux linkage and inducedAxisEmf); HolonicTorusParametronRealization.lean (cellular cycles, exact-drop/flux-linkage fibres, cut insufficiency). SpherePacking.lean is actually exact Soddy–Gossett five-bend reflection orbit (involutions, defect preservation, noncommuting chronology), not general fractal packing. HolonicFourForceSectorCarrier.lean carries six coordinate planes + four dependent sector fibres, but no force identification theorem. HolonicTorusEntropyParametronEquivalence.lean gives four-axis winding current/injectivity and entropy-axis cross-current alignment. There is no Lean owner/file named Schlaefli, Platonic, diffraction, fractal, or lightning; these remain gaps. The 2026-08-27 LATTICE_DAMAGE_DIFFRACTION_PASSAGE record is strongest exact source synthesis: finite phase sum S(k)=Σ a_j exp(i<k,x_j>), cyclic character cancellation, and four-map RH gap. Suggested next owner should extend existing HolonicGranularBoundaryRadiation/LineageCompression rather than duplicate a generic compression cabinet, with a chain-map compression law preserving ∂, boundary cycle, reflection pairing, and complete reconstruction fibre. Claude export is discoverable at ~/.claude/jobs/2f87fe75/tmp/export/conversations.json; filtered relevant named chats found only older 'Redundancy, feedback, and information architecture' and 'Reservoir computing and manifold geometry'; no recent Claude log was available under obvious paths. Recent exact Holonic user intuitions are already deposited in records 2026-08-21_LINEAGE_IS_PULLBACK... (dynamic compression, ordered reflection orbit), 2026-08-27_LATTICE_DAMAGE_DIFFRACTION_PASSAGE.md (damage/phase/diffraction), and canon/TABLET_THE_MANIFOLD.md §§21–21.2 (integration/differentiation by reflection, Bragg lattice, null boundary). Duplication warnings: ReceiverQuotient vs LineageCompression vs GranularBoundaryRadiation each define distinct receiver/reconstruction layers; do not fork another same-shaped compression owner; SpherePacking and HolonicFourForceSectorCarrier are specialized, not general replacements.",
       "created_by_occurrence_id": "OCC-923c5415-9668-418c-979b-65c29ca6f6a7",
       "metadata_json": "{\"media_type\":\"text/plain\"}"
     },
@@ -37617,7 +37617,7 @@
       "id": "OBJ-771b36ca-bac0-4a5c-b812-0dae7c7ccabd",
       "object_kind": "message",
       "label": "[definition] Read-only intent: relate the four-bar drawing pantograph, pantograp",
-      "description": "[definition] Read-only intent: relate the four-bar drawing pantograph, pantograph–catenary dynamics, and the pantograph functional/delay equation to the existing holonic swing, addressed passage, receiver-exact compression/scaling, Complex-Parametron carrier, and scale tower. Sources: arXiv:2101.08173, ScienceDirect Topics / pantograph, local /home/b/Downloads/Pantograph_Catenary_Paper.pdf, and O'Rourke's geometric construction. Requested return: an explicitly typed mathematical lift with preserved diagrams, limits, first theorem targets, and firing falsifiers. This schedules no UAR or Hodge construction and will not advance CONSTRUCTION_STATE.md.",
+      "description": "[definition] Read-only intent: relate the four-bar drawing pantograph, pantograph–catenary dynamics, and the pantograph functional/delay equation to the existing holonic swing, addressed passage, receiver-exact compression/scaling, Complex-Parametron carrier, and scale tower. Sources: arXiv:2101.08173, ScienceDirect Topics / pantograph, local ~/Downloads/Pantograph_Catenary_Paper.pdf, and O'Rourke's geometric construction. Requested return: an explicitly typed mathematical lift with preserved diagrams, limits, first theorem targets, and firing falsifiers. This schedules no UAR or Hodge construction and will not advance CONSTRUCTION_STATE.md.",
       "created_by_occurrence_id": "OCC-cddb8ac6-3e06-402a-beff-5aa094e1e24b",
       "metadata_json": "{\"media_type\":\"text/plain\"}"
     },
@@ -40347,7 +40347,7 @@
       "label": "Receiver-Indexed Addressed Causal Length Tower with Encoding-Anchored TM2 Receiver",
       "description": "",
       "created_by_occurrence_id": "OCC-267ee283-aaee-475f-9b4d-c2e5933ca6d2",
-      "metadata_json": "{\"build\":{\"command\":\"lake build ElementaryHolonics.Millennium.ReceiverIndexedCausalLengthTower ElementaryHolonics.Millennium.PVersusNPCausalLengthBridge\",\"exit_code\":0,\"jobs\":3241},\"evidence_tags\":[\"formal-checked\"],\"holonic_codec\":\"holonic-json-v1\",\"holonic_node_kind\":\"container\",\"repository\":\"/home/b/Workspaces/holonics\",\"source_files\":[{\"path\":\"soma/formal/elementary-holonics/ElementaryHolonics/Millennium/ReceiverIndexedCausalLengthTower.lean\",\"sha256\":\"da5ae77ef49bad9a894f2000c06d9747b5e953857458505035c6224919ae0477\"},{\"path\":\"soma/formal/elementary-holonics/ElementaryHolonics/Millennium/PVersusNPCausalLengthBridge.lean\",\"sha256\":\"0a5c975c969bd61f10f0cf477ebed0db3381a62cb81f8eecd79d6af2567cccc6\"}],\"source_scan\":{\"forbidden_terms\":[\"sorry\",\"admit\",\"proof_wanted\",\"axiom declaration\"],\"matches\":0},\"truth_status\":\"proved-derived\",\"uar_modified\":false}"
+      "metadata_json": "{\"build\":{\"command\":\"lake build ElementaryHolonics.Millennium.ReceiverIndexedCausalLengthTower ElementaryHolonics.Millennium.PVersusNPCausalLengthBridge\",\"exit_code\":0,\"jobs\":3241},\"evidence_tags\":[\"formal-checked\"],\"holonic_codec\":\"holonic-json-v1\",\"holonic_node_kind\":\"container\",\"repository\":\".\",\"source_files\":[{\"path\":\"soma/formal/elementary-holonics/ElementaryHolonics/Millennium/ReceiverIndexedCausalLengthTower.lean\",\"sha256\":\"da5ae77ef49bad9a894f2000c06d9747b5e953857458505035c6224919ae0477\"},{\"path\":\"soma/formal/elementary-holonics/ElementaryHolonics/Millennium/PVersusNPCausalLengthBridge.lean\",\"sha256\":\"0a5c975c969bd61f10f0cf477ebed0db3381a62cb81f8eecd79d6af2567cccc6\"}],\"source_scan\":{\"forbidden_terms\":[\"sorry\",\"admit\",\"proof_wanted\",\"axiom declaration\"],\"matches\":0},\"truth_status\":\"proved-derived\",\"uar_modified\":false}"
     },
     {
       "id": "OBJ-736ff42c-e6ae-402b-b3b3-59d156e82aee",
@@ -42641,7 +42641,7 @@
       "id": "OBJ-3245459b-6cb0-4b22-905a-0593a68ddeea",
       "object_kind": "message",
       "label": "[implemented-exact; measured] UAR2-C2 now returns one query-independent resident",
-      "description": "[implemented-exact; measured] UAR2-C2 now returns one query-independent resident receiver-history compression mounted before exterior current. The exact source/native populations, q assignment, descended generator targets, receiver factors, fibres and separators remain on the RTX 4080 SUPER and CUDA verifies qT=Uq plus fibre membership. Measured smallest receiver: source 2221, native 2221, two generators, 2221 fibres, zero first separators, 692984 resident quotient octets; production reference comparison false and invariant reupload false. Egress is now typed honestly: 192 joining-address bytes, 24 apparatus-shape bytes, zero intermediate semantic bytes, 22922800 terminal semantic bytes after resident successor commits. [counterexample; measured] The unchanged C3 receiver then returns Opening, one exact octet, four plural potential fronts, Closure; boundary totality remains false. The lawful next deed is therefore to turn that returned plural obstruction into the situated causal difference cultivated by the same source-neutral body, then remount/ablate and rerun the unchanged receiver—never to search candidates, traverse retained source material, or let a cold codec invent a surface. Governing paths: /home/b/Workspaces/holonics/blueprint/THE_UNIFIED_ATHENA_BODY_RETURNS_TECHNICAL_CONDUCT_AND_BRANDON_THROUGH_COMPLETE_CULTIVATED_HISTORY.md; /home/b/Workspaces/holonics/CONSTRUCTION_STATE.md; /home/b/Workspaces/holonics/crates/holonic-engine/src/cuda_refine.rs; /home/b/Workspaces/holonics/soma/life/src/athena_native/source_neutral_rest.rs.",
+      "description": "[implemented-exact; measured] UAR2-C2 now returns one query-independent resident receiver-history compression mounted before exterior current. The exact source/native populations, q assignment, descended generator targets, receiver factors, fibres and separators remain on the RTX 4080 SUPER and CUDA verifies qT=Uq plus fibre membership. Measured smallest receiver: source 2221, native 2221, two generators, 2221 fibres, zero first separators, 692984 resident quotient octets; production reference comparison false and invariant reupload false. Egress is now typed honestly: 192 joining-address bytes, 24 apparatus-shape bytes, zero intermediate semantic bytes, 22922800 terminal semantic bytes after resident successor commits. [counterexample; measured] The unchanged C3 receiver then returns Opening, one exact octet, four plural potential fronts, Closure; boundary totality remains false. The lawful next deed is therefore to turn that returned plural obstruction into the situated causal difference cultivated by the same source-neutral body, then remount/ablate and rerun the unchanged receiver—never to search candidates, traverse retained source material, or let a cold codec invent a surface. Governing paths: blueprint/THE_UNIFIED_ATHENA_BODY_RETURNS_TECHNICAL_CONDUCT_AND_BRANDON_THROUGH_COMPLETE_CULTIVATED_HISTORY.md; CONSTRUCTION_STATE.md; crates/holonic-engine/src/cuda_refine.rs; soma/life/src/athena_native/source_neutral_rest.rs.",
       "created_by_occurrence_id": "OCC-c94efc60-ee1b-4e24-803c-01639c0d8233",
       "metadata_json": "{\"media_type\":\"text/plain\"}"
     },
@@ -44697,7 +44697,7 @@
       "id": "OBJ-f8d8beb2-8e1a-4474-822a-2e8e67deb4de",
       "object_kind": "message",
       "label": "{\"schema\":\"holonic-json-v1\",\"truth_status\":\"definition\",\"objective\":\"Construct t",
-      "description": "{\"schema\":\"holonic-json-v1\",\"truth_status\":\"definition\",\"objective\":\"Construct the shortest exact Lean owner for joint unbounded-weight absolute summability of complete transport and stretching occurrence populations at each admitted smooth interior periodic Navier–Stokes slice; use existing smooth/H3/Hodge sources, or return the first absent theorem without assumptions.\",\"boundaries\":{\"repository\":\"/home/b/Workspaces/holonics\",\"package\":\"soma/formal/elementary-holonics\",\"forbidden\":[\"ElementaryHolonics.lean\",\"roadmap/state\",\"toolchain\",\"CSLib\",\"sorry/admit/axiom/opaque\",\"raw Real.pi/Real.exp\"]}}",
+      "description": "{\"schema\":\"holonic-json-v1\",\"truth_status\":\"definition\",\"objective\":\"Construct the shortest exact Lean owner for joint unbounded-weight absolute summability of complete transport and stretching occurrence populations at each admitted smooth interior periodic Navier–Stokes slice; use existing smooth/H3/Hodge sources, or return the first absent theorem without assumptions.\",\"boundaries\":{\"repository\":\".\",\"package\":\"soma/formal/elementary-holonics\",\"forbidden\":[\"ElementaryHolonics.lean\",\"roadmap/state\",\"toolchain\",\"CSLib\",\"sorry/admit/axiom/opaque\",\"raw Real.pi/Real.exp\"]}}",
       "created_by_occurrence_id": "OCC-938d7b6e-3534-4ab1-bf60-cd39bd1cf75d",
       "metadata_json": "{\"media_type\":\"holonic-json-v1\"}"
     },
@@ -48059,7 +48059,7 @@
       "label": "Read-only Lean formal consolidation audit 2026-08-30",
       "description": "Quantitative and qualitative audit of soma/formal/elementary-holonics for module/owner coherence, duplication, theorem API sprawl, scratch leakage, axiom/options hygiene, conformance boundaries, and build ergonomics.",
       "created_by_occurrence_id": "OCC-be4eca9d-11b2-453d-8da8-ff9b788c541a",
-      "metadata_json": "{\"mutates_repository\":false,\"repository\":\"/home/b/Workspaces/holonics\",\"scope\":\"soma/formal/elementary-holonics\"}"
+      "metadata_json": "{\"mutates_repository\":false,\"repository\":\".\",\"scope\":\"soma/formal/elementary-holonics\"}"
     },
     {
       "id": "OBJ-71dc8a25-5fd5-487c-870e-3b35a916430c",
@@ -48409,7 +48409,7 @@
       "id": "OBJ-89f68b32-ab58-4c65-ab4d-b2a61275dbe0",
       "object_kind": "workspace",
       "label": "Ergasteria prototype workspace",
-      "description": "Adjacent frontend and Lean-apparatus prototype rooted at /home/b/Workspaces/holonics-ergasteria; external to the Holonics construction schedule.",
+      "description": "Adjacent frontend and Lean-apparatus prototype rooted at .-ergasteria; external to the Holonics construction schedule.",
       "created_by_occurrence_id": "OCC-148cac38-d7c8-4cc4-9b3f-0f7a7446d84b",
       "metadata_json": "{\"truth_status\":\"definition\"}"
     },
@@ -48473,7 +48473,7 @@
       "id": "OBJ-1e8b55a2-afee-4d2e-bf6e-73df18de6210",
       "object_kind": "message",
       "label": "[established-bounded; implemented-exact; measured] Ergasteria foundation returne",
-      "description": "[established-bounded; implemented-exact; measured] Ergasteria foundation returned in /home/b/Workspaces/holonics-ergasteria without changing Holonics source, roadmap, or construction state. The workbench contains a single `ergasteria.receiver-document.v1` TypeScript owner and validator, exact Z/Q/Q(i)/Q(sqrt) plus declared display-f64 carriers, objects/ports/charts/occurrences/addressed passages/receiver projections/fibres/presentations/claims/obstructions, a strict `holonics.derivation-atlas.v2` adapter, one SolidJS four-face workbench, and a Tauri 2 shell with no privileged commands. Six tests, TypeScript, Vite production build, and Cargo check pass. [established-bounded; formal-checked; process-audit] A fresh live Lean 4.33 DerivationAtlas export of `ElementaryHolonics/Foundation/Receiver.lean` returned 8,782 expression nodes, 17,033 weighted uses, 89 declarations, 1,269 term occurrences, and 193 proof events; the adapter returned a validated 21 MB receiver document with 8,872 objects, 10,052 occurrences, 17,033 multiplicity-bearing passages, 17,603 fibres, one formal-checked claim, and zero obstructions. [open] Browser pixel inspection is not graded because the in-app browser runtime was unavailable; DOM interaction tests cover receiver switching and fibre withdrawal. MCP implementation, parametric Lean annotations, GPU/mesh renderers, exact field producers, cache sectioning, and a real non-fixture holonic semantic annotation remain separate future continuations.",
+      "description": "[established-bounded; implemented-exact; measured] Ergasteria foundation returned in .-ergasteria without changing Holonics source, roadmap, or construction state. The workbench contains a single `ergasteria.receiver-document.v1` TypeScript owner and validator, exact Z/Q/Q(i)/Q(sqrt) plus declared display-f64 carriers, objects/ports/charts/occurrences/addressed passages/receiver projections/fibres/presentations/claims/obstructions, a strict `holonics.derivation-atlas.v2` adapter, one SolidJS four-face workbench, and a Tauri 2 shell with no privileged commands. Six tests, TypeScript, Vite production build, and Cargo check pass. [established-bounded; formal-checked; process-audit] A fresh live Lean 4.33 DerivationAtlas export of `ElementaryHolonics/Foundation/Receiver.lean` returned 8,782 expression nodes, 17,033 weighted uses, 89 declarations, 1,269 term occurrences, and 193 proof events; the adapter returned a validated 21 MB receiver document with 8,872 objects, 10,052 occurrences, 17,033 multiplicity-bearing passages, 17,603 fibres, one formal-checked claim, and zero obstructions. [open] Browser pixel inspection is not graded because the in-app browser runtime was unavailable; DOM interaction tests cover receiver switching and fibre withdrawal. MCP implementation, parametric Lean annotations, GPU/mesh renderers, exact field producers, cache sectioning, and a real non-fixture holonic semantic annotation remain separate future continuations.",
       "created_by_occurrence_id": "OCC-97bda20b-1177-44a2-b3aa-2feb2a19f907",
       "metadata_json": "{\"media_type\":\"text/plain\"}"
     },
@@ -48513,7 +48513,7 @@
       "id": "OBJ-a45a03d8-9a24-4064-bb9a-6f72638577e1",
       "object_kind": "message",
       "label": "[established-bounded; implemented-exact; measured] Ergasteria infinite receiver ",
-      "description": "[established-bounded; implemented-exact; measured] Ergasteria infinite receiver redesign returned in /home/b/Workspaces/holonics-ergasteria. One renderer-owned SpatialAtlas mounts five simultaneous receiver charts: exact-Q Minkowski, chronology×continuation trace, bounded periodic fluid+temperature, four polynomial Bord cells, and an orbitable finite Z4 lattice folded into Q3. Five explicit chart-transition passages retain source/target receiver boundaries, law, hand, and reconstruction-fibre testimony. Three.js/WebGL2 owns terminal depth, orbit, particles, current ticks, meshes and Float32 buffers; source identity remains in receiver documents/polynomial/field owners. [established-bounded; computational-witness; measured] The 64² periodic fluid uses spectral Poisson reconstruction, centered streamfunction velocity, conservative upwind face flux, explicit viscosity/thermal diffusion, positive-temperature thermal and viscous entropy receivers, and dimensional-wave emergent color. Thirty ticks returned heat relative error 1.813e-16, mean vorticity -2.279e-17, max centered divergence 2.220e-16, decreasing enstrophy, positive minimum T, and positive entropy faces in 20.75 ms. [counterexample; source-inspected] Recovered Bord hatch midpoints generally are not exact surface points, so the redesign carries exact polynomial/boundary equations and sign-bracket provenance beside declared approximate Marching-Cubes/slice interiors; no exact principal-direction claim is copied. The cap slab extends above its apex. [established-bounded; process-audit] TypeScript, 16 tests across five files, Vite production build with lazy WebGL chunks, production preview asset fetches, Three renderer module imports, and Tauri cargo check pass. Browser pixel inspection remains open because the in-app browser runtime is unavailable. Holonics source, roadmap, and construction state were not changed.",
+      "description": "[established-bounded; implemented-exact; measured] Ergasteria infinite receiver redesign returned in .-ergasteria. One renderer-owned SpatialAtlas mounts five simultaneous receiver charts: exact-Q Minkowski, chronology×continuation trace, bounded periodic fluid+temperature, four polynomial Bord cells, and an orbitable finite Z4 lattice folded into Q3. Five explicit chart-transition passages retain source/target receiver boundaries, law, hand, and reconstruction-fibre testimony. Three.js/WebGL2 owns terminal depth, orbit, particles, current ticks, meshes and Float32 buffers; source identity remains in receiver documents/polynomial/field owners. [established-bounded; computational-witness; measured] The 64² periodic fluid uses spectral Poisson reconstruction, centered streamfunction velocity, conservative upwind face flux, explicit viscosity/thermal diffusion, positive-temperature thermal and viscous entropy receivers, and dimensional-wave emergent color. Thirty ticks returned heat relative error 1.813e-16, mean vorticity -2.279e-17, max centered divergence 2.220e-16, decreasing enstrophy, positive minimum T, and positive entropy faces in 20.75 ms. [counterexample; source-inspected] Recovered Bord hatch midpoints generally are not exact surface points, so the redesign carries exact polynomial/boundary equations and sign-bracket provenance beside declared approximate Marching-Cubes/slice interiors; no exact principal-direction claim is copied. The cap slab extends above its apex. [established-bounded; process-audit] TypeScript, 16 tests across five files, Vite production build with lazy WebGL chunks, production preview asset fetches, Three renderer module imports, and Tauri cargo check pass. Browser pixel inspection remains open because the in-app browser runtime is unavailable. Holonics source, roadmap, and construction state were not changed.",
       "created_by_occurrence_id": "OCC-cc169e5e-c0f6-44e6-8c60-10e76f688a87",
       "metadata_json": "{\"media_type\":\"text/plain\"}"
     },
@@ -48664,8 +48664,8 @@
     {
       "id": "OBJ-90e15964-b8ad-4f02-9994-83d2a0512fff",
       "object_kind": "message",
-      "label": "[definition] Read-only scoping intent after HIF7 closure: inspect /home/b/models",
-      "description": "[definition] Read-only scoping intent after HIF7 closure: inspect /home/b/models/gemma-4-E4B-it/config.json, processor_config.json, and the 2,130-entry Safetensors header; trace crates/holonic-engine/src/{foreign_map,soulkiller,soulkiller_witness,native_spool,holonic_intelligence}/ and soma/life/src/native_intelligence/{types,rest,conduct}.rs. Separate raw multimodal foreign chart, active receiver/history section, productive source-neutral lift scaffold, cold reconstruction witness, insufficiency, Athena rest, and repeated inference/cultivation cycle. Determine whether spool is the right whole-object name, whether Soulkiller condensation is scaffolding rather than Athena compression, and whether a current end-to-end all-modality Gemma-to-Athena composition actually exists. No model execution, construction, or new scheduler.",
+      "label": "[definition] Read-only scoping intent after HIF7 closure: inspect ~/models",
+      "description": "[definition] Read-only scoping intent after HIF7 closure: inspect ~/models/gemma-4-E4B-it/config.json, processor_config.json, and the 2,130-entry Safetensors header; trace crates/holonic-engine/src/{foreign_map,soulkiller,soulkiller_witness,native_spool,holonic_intelligence}/ and soma/life/src/native_intelligence/{types,rest,conduct}.rs. Separate raw multimodal foreign chart, active receiver/history section, productive source-neutral lift scaffold, cold reconstruction witness, insufficiency, Athena rest, and repeated inference/cultivation cycle. Determine whether spool is the right whole-object name, whether Soulkiller condensation is scaffolding rather than Athena compression, and whether a current end-to-end all-modality Gemma-to-Athena composition actually exists. No model execution, construction, or new scheduler.",
       "created_by_occurrence_id": "OCC-51d206da-afc3-4184-aead-c8efb5978983",
       "metadata_json": "{\"media_type\":\"text/plain\"}"
     },
@@ -48913,7 +48913,7 @@
       "id": "OBJ-bc0a7266-fba8-4a3d-83a8-8ec6b028ab26",
       "object_kind": "message",
       "label": "[established-bounded; process-audit; measured] The reported Workbench install fa",
-      "description": "[established-bounded; process-audit; measured] The reported Workbench install failure did not reproduce. The displayed shell occurrence was canceled by the user before Cargo began (`Exit code -1`, duration 0.0000). A cold isolated `cargo install --path applications/holonics-workbench --locked --root /tmp/holonics-install-repro` completed in 40.45 seconds, including exact CUDA compute_89 compilation. The exact requested default command then completed exit 0 and installed `/home/b/.cargo/bin/holonics` version 0.1.0. `holonics --help` returned all Workbench families; `holonics status` returned 24 CPU threads and RTX 4080 SUPER/384 block threads. No source repair was warranted. cargo clean removed the 1.1 GiB reproduction target.",
+      "description": "[established-bounded; process-audit; measured] The reported Workbench install failure did not reproduce. The displayed shell occurrence was canceled by the user before Cargo began (`Exit code -1`, duration 0.0000). A cold isolated `cargo install --path applications/holonics-workbench --locked --root /tmp/holonics-install-repro` completed in 40.45 seconds, including exact CUDA compute_89 compilation. The exact requested default command then completed exit 0 and installed `~/.cargo/bin/holonics` version 0.1.0. `holonics --help` returned all Workbench families; `holonics status` returned 24 CPU threads and RTX 4080 SUPER/384 block threads. No source repair was warranted. cargo clean removed the 1.1 GiB reproduction target.",
       "created_by_occurrence_id": "OCC-86c0a389-eb43-43aa-bbb8-ee6b515ca1ad",
       "metadata_json": "{\"media_type\":\"text/plain\"}"
     },
@@ -53819,7 +53819,7 @@
       "id": "LOC-11818e54-34f7-4e61-a141-534b9a74d152",
       "object_id": "OBJ-cad2cd30-b75d-4fe0-90a8-79a152d32f7a",
       "namespace": "path",
-      "address": "/home/b/Workspaces/holonics/soma/formal/elementary-holonics/ElementaryHolonics/Millennium/NavierStokesH2AdvectingLowGradePopulation.lean",
+      "address": "soma/formal/elementary-holonics/ElementaryHolonics/Millennium/NavierStokesH2AdvectingLowGradePopulation.lean",
       "observed_by_occurrence_id": "OCC-df307f71-8791-409e-9a73-1030e111c102",
       "source_snapshot_id": null
     },
@@ -53827,7 +53827,7 @@
       "id": "LOC-14f9c438-b472-47f8-9a1c-cefe933ed482",
       "object_id": "OBJ-6fa80a66-b9e8-414c-8341-592f9f0a9abe",
       "namespace": "path",
-      "address": "/home/b/Workspaces/holonics/soma/formal/elementary-holonics/ElementaryHolonics/Millennium/NavierStokesH2AdvectingLowGradePopulation.lean",
+      "address": "soma/formal/elementary-holonics/ElementaryHolonics/Millennium/NavierStokesH2AdvectingLowGradePopulation.lean",
       "observed_by_occurrence_id": "OCC-4556da33-9a8d-4d74-9d0c-66b2ffded827",
       "source_snapshot_id": null
     },
@@ -53835,7 +53835,7 @@
       "id": "LOC-043fde90-f0e2-4e94-b41d-052d46038fa4",
       "object_id": "OBJ-85c3914b-612f-4e13-aae0-392cec6865ed",
       "namespace": "path",
-      "address": "/home/b/Workspaces/holonics/soma/formal/elementary-holonics/ElementaryHolonics/Millennium/NavierStokesPhysicalH2VelocityCurrentJoin.lean",
+      "address": "soma/formal/elementary-holonics/ElementaryHolonics/Millennium/NavierStokesPhysicalH2VelocityCurrentJoin.lean",
       "observed_by_occurrence_id": "OCC-1bf3f465-3528-45e7-a1e1-26a575700c93",
       "source_snapshot_id": null
     },
@@ -53851,7 +53851,7 @@
       "id": "LOC-13adef66-bf7b-4d0a-9472-60549d0b4c7d",
       "object_id": "OBJ-ab66219f-709a-4d04-b38b-58c7bbf09aaa",
       "namespace": "filesystem-path",
-      "address": "/home/b/Workspaces/holonics/soma/formal/elementary-holonics/ElementaryHolonics/Millennium/NavierStokesPhysicalH2CyclicSectorSwing.lean",
+      "address": "soma/formal/elementary-holonics/ElementaryHolonics/Millennium/NavierStokesPhysicalH2CyclicSectorSwing.lean",
       "observed_by_occurrence_id": "OCC-1528ed7e-52bc-44aa-a538-891fd27a794d",
       "source_snapshot_id": null
     },
@@ -54027,7 +54027,7 @@
       "id": "LOC-4bcf7f8f-3812-4da2-9095-71f13fe8b32e",
       "object_id": "OBJ-e1521585-4038-4d6f-be13-48128403d26a",
       "namespace": "workspace-path",
-      "address": "/home/b/Workspaces/holonics/soma/formal/elementary-holonics/ElementaryHolonics/Millennium/NavierStokesPhysicalH2ClockedQuarticPrincipalSymbol.lean",
+      "address": "soma/formal/elementary-holonics/ElementaryHolonics/Millennium/NavierStokesPhysicalH2ClockedQuarticPrincipalSymbol.lean",
       "observed_by_occurrence_id": "OCC-86c7dd49-bf77-470b-bec4-d6ddac79afd1",
       "source_snapshot_id": null
     },
@@ -54251,7 +54251,7 @@
       "id": "LOC-7eb0817a-a0a7-45db-8019-918f48a725d3",
       "object_id": "OBJ-89f68b32-ab58-4c65-ab4d-b2a61275dbe0",
       "namespace": "filesystem-path",
-      "address": "/home/b/Workspaces/holonics-ergasteria",
+      "address": ".-ergasteria",
       "observed_by_occurrence_id": "OCC-148cac38-d7c8-4cc4-9b3f-0f7a7446d84b",
       "source_snapshot_id": null
     },
@@ -54547,7 +54547,7 @@
       "id": "LOC-901eacd6-5886-4a98-8993-591ef1090d2c",
       "object_id": "OBJ-4691a971-f703-49cb-91cf-ab2af87ab069",
       "namespace": "source-intake",
-      "address": "/home/b/Downloads/elliptic-rank-database.json",
+      "address": "~/Downloads/elliptic-rank-database.json",
       "observed_by_occurrence_id": "OCC-6d152413-5270-4aaa-b44c-817d86cb6eb0",
       "source_snapshot_id": null
     },
@@ -71724,7 +71724,7 @@
       "content_sha256": "71dda066fd17b95e6323d6a528224f861d6a512fd3ff1ceb4c9bbbbb743ddf52",
       "byte_count": 928734,
       "media_type": "application/json",
-      "original_locator": "/home/b/Downloads/elliptic-rank-database.json",
+      "original_locator": "~/Downloads/elliptic-rank-database.json",
       "original_uri": "https://elliptic-rank.icarm.cloud/api/curves",
       "license_text": "Database payload license not located during 2026-08-27 source audit; preserve attribution and do not infer the Apache-2.0 code license applies to submitted data.",
       "schema_name": "icarm-elliptic-rank-database-json",

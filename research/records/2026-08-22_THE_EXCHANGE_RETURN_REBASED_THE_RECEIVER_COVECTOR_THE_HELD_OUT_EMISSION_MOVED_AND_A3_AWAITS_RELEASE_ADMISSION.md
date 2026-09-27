@@ -298,7 +298,7 @@ compression.
 
 [open] A4 is unscheduled while the Athena-Gemma capability closure remains open. Its parked second
 source occurrence is
-`/home/b/Downloads/Qwen3.8-27B-IQ3_M.gguf`, 12,789,303,424 octets, SHA-256
+`~/Downloads/Qwen3.8-27B-IQ3_M.gguf`, 12,789,303,424 octets, SHA-256
 `3cc4a8a9e1903c12e1b5c25df8921e7989a425a4998d2bc7ab9a9f303cebb2fa`, GGUF v3 with 866 tensor
 entries, 54 metadata entries, exterior architecture face `qwen35` and embedding length 5,120. The
 filename is lineage rather than identity; it names the same byte occurrence previously observed

@@ -10,7 +10,7 @@ their mathematical content. Causal origin does not prescribe exact historical re
 
 [historical; source-inspected] The current correction is message
 `msg_01a09607-ca3c-7d53-bbfc-b3ccc823653c`, September 12 at `14:31:28.060Z`, line 234 of
-`/home/b/.codex/sessions/2026/09/12/rollout-2026-09-12T07-07-56-01a095f2-3f4f-7012-a914-f4fb5c419fa5.jsonl`.
+`~/.codex/sessions/2026/09/12/rollout-2026-09-12T07-07-56-01a095f2-3f4f-7012-a914-f4fb5c419fa5.jsonl`.
 Brandon identifies two recurrent errors: reducing learning to ubiquitous causal computation,
 and interpreting origin preservation as a reason to retain exact historical traces. The
 preceding messages reject the failed character output as a solver standard and correct the
@@ -93,8 +93,8 @@ No native source, checkpoint or evidence was deleted or rewritten by this clarif
 
 [established-bounded; source-inspected] The OpenAI Docs skill was used for the narrow instruction
 discovery check. [Official AGENTS.md documentation](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
-describes global and project instruction discovery. No `/home/b/.codex/AGENTS.md`,
-`/home/b/.codex/AGENTS.override.md` or repository `AGENTS.override.md` was present. The inspected
+describes global and project instruction discovery. No `~/.codex/AGENTS.md`,
+`~/.codex/AGENTS.override.md` or repository `AGENTS.override.md` was present. The inspected
 config exposed no instruction-file override in the queried fields. This check supplies no
 OpenAI-imposed distinction between solver inference and intelligence; the substantive repair is
 to this repository's wording and the assistant's interpretation. Global configuration was untouched.

@@ -70,7 +70,7 @@ filtering, request/response round trip, direct/structured equality, structured m
 zero-parameter demo, filesystem navigation, context-valid actions, every actual successor, exact
 return form, asynchronous runtime return, 80x24 and 120x36 rendering, adapters, and refusals.
 
-[established-bounded; process-audit; measured] The installed `/home/b/.cargo/bin/holonics` reports
+[established-bounded; process-audit; measured] The installed `~/.cargo/bin/holonics` reports
 version 0.2.0. A real 80-column pseudo-terminal showed Guided start, resource/action/detail/event
 regions, ran `d` to the five-event generation-1 boundary, exited 0, and restored the terminal.
 

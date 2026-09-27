@@ -11,7 +11,7 @@ replace it with a leaderboard, another learning definition or another elementary
 [established-bounded; source-audit; process-audit] The review starts at `d0588238`, with 1,160
 commits reachable from HEAD. It traces methodology families through the August 3–September 15
 Holonics history, retained research/experiment sources, the retraction history, and selected
-July predecessor origins in `/home/b/Workspaces/laboratory`. Two bounded Luna reviews covered
+July predecessor origins in `~/Workspaces/laboratory`. Two bounded Luna reviews covered
 August and September 1–13; root inspected current contracts, original messages, representative
 original drivers, retained result files and the newer source owners. The table groups related
 variants rather than claiming to rerun every old driver or inspect every unit test. Frozen

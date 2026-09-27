@@ -247,7 +247,7 @@ licensed it.
 different claims about it.** `CLAUDE.md` §12 and `CONSTRUCTION_STATE.md:686-689` say it *"resolves at
 no commit in either repository"* and *"no claim may cite it as evidence."*
 
-Measured: the files exist — `/home/b/Workspaces/laboratory/output/arithmetic-dimensional-receiver/morphology-atlas/`,
+Measured: the files exist — `laboratory/output/arithmetic-dimensional-receiver/morphology-atlas/`,
 **111 files, 66 MB**. `/output/` is `.gitignore` line 3, so `git ls-files` returns zero at all 1,726
 laboratory commits — *that is a fact about git, not about availability.* **The producing driver is
 tracked and byte-identical between the laboratory at `a07ff376` and this tree right now**

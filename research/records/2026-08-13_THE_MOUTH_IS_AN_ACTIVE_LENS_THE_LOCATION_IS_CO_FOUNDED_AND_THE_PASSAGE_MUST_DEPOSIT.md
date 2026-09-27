@@ -140,7 +140,7 @@ by every compression and already consumed by `decomposing_codec`.
 
 `blueprint/THE_ROADMAP.md` plan 1 is the material mouth, committed and convicted twice.
 
-1. **An absolute frame.** 46,745 occurrence identities carry `founded:container=/home/b`, so the
+1. **An absolute frame.** 46,745 occurrence identities carry `founded:container=$HOME`, so the
    sealed corpus's content address is a function of one filesystem.
 2. **Chronology deleted.** The rollout `session_id` fell back to the message id, making each message
    its own conversation — 11,266 of 11,282 Codex witnesses, with sampled occurrences carrying

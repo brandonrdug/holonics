@@ -54,7 +54,7 @@ expected-answer receiver.
 [process-audit] The returns were produced by:
 
 ```text
-cargo run -q -p holonic-engine --example complete_full_native_recurrence_hna3 -- /home/b/models/gemma-4-E4B-it
-cargo run -q -p athena-alpha --example full_autoregressive_recurrence_hna3 -- /home/b/models/gemma-4-E4B-it 'The receiver'
+cargo run -q -p holonic-engine --example complete_full_native_recurrence_hna3 -- ~/models/gemma-4-E4B-it
+cargo run -q -p athena-alpha --example full_autoregressive_recurrence_hna3 -- ~/models/gemma-4-E4B-it 'The receiver'
 ```
 

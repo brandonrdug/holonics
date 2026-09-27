@@ -12,7 +12,7 @@ incidence; the provisional returned-codec candidate remained non-durable; and de
 repeated the exact joint and every directional withdrawal.
 
 [measured] The sole complete release receiver began at 2026-08-23T14:05:46-07:00 with command
-`env CARGO_TARGET_DIR=/home/b/Workspaces/holonics/target bash tools/gates.sh` in an isolated worktree
+`env CARGO_TARGET_DIR=target bash tools/gates.sh` in an isolated worktree
 containing the E2 closure and the addressed shared output store. Twelve scopes passed. The tests
 scope returned 2,641 passes, two failures and 32 ignores because two existing production-aperture
 tests attempted to deserialize the superseded I5 heterogeneous schema after E2 had lawfully removed

@@ -30,7 +30,7 @@ cannot found native state by itself.
 ## Local Gemma experiment
 
 [established-bounded; source-inspected; measured] The read-only command
-`timeout -k 2s 180s cargo run -q -p holonic-engine --example inspect_gemma4_e4b_multimodal_transport_chart_scf2 -- /home/b/models/gemma-4-E4B-it`
+`timeout -k 2s 180s cargo run -q -p holonic-engine --example inspect_gemma4_e4b_multimodal_transport_chart_scf2 -- ~/models/gemma-4-E4B-it`
 read the two JSON charts and the Safetensors header. It did not read tensor payloads into a model,
 allocate model weights on a device, or execute inference.
 

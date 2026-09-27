@@ -10,7 +10,7 @@ The repository-language agent is now directly operable as one continuing
 terminal session:
 
 ```bash
-cd /home/b/Workspaces/laboratory/src/soma/life
+cd laboratory/src/soma/life
 cargo run --quiet --example eros_repository_language_agent -- --interactive
 ```
 

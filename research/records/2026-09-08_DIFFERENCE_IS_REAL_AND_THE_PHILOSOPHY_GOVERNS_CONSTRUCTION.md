@@ -65,7 +65,7 @@ corroborate the through-line but do not provide independent measurements. Its Ja
 annotations do not override the timestamp carried by the inspected January export.
 
 [historical; source-inspected] The foundational laboratory documents retain the following
-philosophical relations. Source locations are relative to `/home/b/Workspaces/laboratory/` at the
+philosophical relations. Source locations are relative to `laboratory/` at the
 revision above; the inspected files have no local modifications.
 
 | Source and reading aperture | Recovered relation |

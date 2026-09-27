@@ -47,6 +47,6 @@ executed.
 
 ```text
 cargo check -p holonic-engine --example advance_full_native_operator_hna2
-cargo run -q -p holonic-engine --example advance_full_native_operator_hna2 -- /home/b/models/gemma-4-E4B-it
+cargo run -q -p holonic-engine --example advance_full_native_operator_hna2 -- ~/models/gemma-4-E4B-it
 ```
 

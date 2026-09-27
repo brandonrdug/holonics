@@ -234,5 +234,5 @@ direct authorization; this record and its owner follow in a second commit.
 cd soma/formal/elementary-holonics
 timeout 180s lake build ElementaryHolonics.RH.HeatFlowStackedSeam
 timeout 180s lake build ElementaryHolonics
-/home/b/scratch/huggingface/.venv/bin/python -u research/records/2026-09-03_flow_witnesses/flow_witnesses.py
+~/scratch/huggingface/.venv/bin/python -u research/records/2026-09-03_flow_witnesses/flow_witnesses.py
 ```

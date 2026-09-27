@@ -1,6 +1,6 @@
 # Holonic rendering — extraction for a JavaScript library
 
-READ-ONLY extraction from `/home/b/Workspaces/holonics`. Nothing modified, built, or run. Quotes verbatim; `path:line` as of 2026-08-30.
+READ-ONLY extraction from `.`. Nothing modified, built, or run. Quotes verbatim; `path:line` as of 2026-08-30.
 
 ---
 

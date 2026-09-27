@@ -4,7 +4,7 @@
 **Truth status:** `established-bounded [measured]` for every figure; `implemented-exact` for the
 sieve and the sweep.
 **Evidence:** `measured` on this machine, RTX 4080 SUPER with an active display, against
-`/home/b/models/gemma-4-E4B-it/model.safetensors`. Both figures are the driver's own prints.
+`~/models/gemma-4-E4B-it/model.safetensors`. Both figures are the driver's own prints.
 **Occasion:** Brandon, twice in one evening, on the same run: *"Dropped to 16MB in RAM, 100% on one
 core, and no activity on the GPU… I was alerting you of this same exact behavior earlier and it is
 still the same set of issues"*, and then *"Why are you not rebasing? This isn't a real limit, it's

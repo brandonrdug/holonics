@@ -36,19 +36,19 @@ advertised as an unrestricted theorem before its statement, domain and derivatio
 [historical; source-inspected] Primary human messages were read, not inferred from assistant prose:
 
 - Current correction: Codex
-  `/home/b/.codex/sessions/2026/09/04/rollout-2026-09-04T12-03-02-01a06dcd-8bff-7f80-91fb-b3c5f840250b.jsonl:10003`,
+  `~/.codex/sessions/2026/09/04/rollout-2026-09-04T12-03-02-01a06dcd-8bff-7f80-91fb-b3c5f840250b.jsonl:10003`,
   2026-09-06T02:09:15.908Z.
 - Relevance: Claude
-  `/home/b/.claude/projects/-home-b-Workspaces-holonics/304efc06-9bde-42a7-b61a-28766524cdbe.jsonl:2187`,
+  `~/.claude/projects/-home-b-Workspaces-holonics/304efc06-9bde-42a7-b61a-28766524cdbe.jsonl:2187`,
   2026-09-01T22:45:29.217Z. Brandon rejects assumed any-to-any/many-to-many coupling and names
   constrained faces, characteristic flux, phase/chart transitions and rebasing.
 - Environments and inherited potential: Claude
-  `/home/b/.claude/projects/-home-b-Workspaces-holonics/e6ec0363-0473-4f0f-ab29-3397fd89f073.jsonl:466`,
+  `~/.claude/projects/-home-b-Workspaces-holonics/e6ec0363-0473-4f0f-ab29-3397fd89f073.jsonl:466`,
   2026-09-03T06:03:55.282Z. Excitation alone does not explain which configurations conduct in
   which environments. His September 4 SKE ruling remains; this priority change does not revive
   the retired foreign-tower prohibition.
 - Native/runtime and world separation: predecessor
-  `/home/b/Workspaces/laboratory/src/holobrochos/diet/conv_chord/028_f02747f1.txt`, human turns
+  `laboratory/src/holobrochos/diet/conv_chord/028_f02747f1.txt`, human turns
   at lines 9601, 9628, 27580 and 29201. These distinguish the world's own mechanics/curriculum,
   relations between entities, input/output dynamics and a ground-up instance-agnostic base.
   Individual timestamps are absent from this export. Interleaved assistant replies are not
