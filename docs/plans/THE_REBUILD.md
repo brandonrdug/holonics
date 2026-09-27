@@ -72,7 +72,29 @@ sets the order:
    and its key description. The arithmetic terrain (digit convolution and carry, cheap residue
    faces, prime gratings) follows through the same owner. The real cut stays each campaign's
    acceptance;
-5. then continue campaign 3 as the population's birth, death and dormancy.
+   **Built and measured (September 27).** `receiver::population` (Lean
+   `Context/Population.{population_mixture, survivor_code, survivors_product}`): a receiver's Bayesian
+   mixture over declared families (trees at a ladder of depths, moiré gratings, rotor keys), each
+   named by its description bits. On every terrain one declared family made, it selects that family:
+   - the moiré sheet tuple codes `29 + 0/16 + ε` bits against its `29 + 4/16` key description and
+     the tree's `1549`;
+   - the moiré parity codes `14 + 1/16 + ε`, below its `20 + 12/16` key description, because the
+     720 surviving keys are one species;
+   - the rotor crib codes `17 + 14/16 + ε` against its 16-bit key and the tree's `375 + 12/16`;
+   - the tree sources select the right depth and recover the minimal tree.
+
+   The static population fails on aeon switching: a dormant grating's keys die at the first silent
+   cell (`252 + 9/16` against `14 + 1/16` unswitched). That is campaign 3's work. The arithmetic
+   terrain (`holarchy::terrain::arithmetic`) shows the tree cannot read the trailing face or a
+   record's position in bases 10 and 16: determined cells cost `3 + 3/16` to `4 + 7/16` bits each.
+   The arithmetic eggs (a record clock, a convolution-and-carry egg, a counter, a sieve) are
+   families of the same population. The curated conversation source (channels as ports, turns as
+   epochs, conversations as aeons) codes every byte below the flat stream (`−777 + 7/16` held out).
+   Its section letters cost more than they save on development, so each port needs its own tree
+   and the sections their own navigator (campaign 5);
+5. then continue campaign 3 as the population's birth, death and dormancy: hold a silent ring's
+   keys through its aeon, price a switch by fixed share per ring factor, found from reserved prior
+   mass, and release only by zero likelihood or a certified null direction.
 
 The standing cut has been reused for development and lies within the wide cut's held-out range.
 These are development receipts. The dataset's separate evaluation partition remains unspent.
