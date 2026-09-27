@@ -1,6 +1,6 @@
 # Construction state
 
-**September 27, after Decisions 37–39.**
+**September 27, after Decisions 37–39 and campaign 3's first construction.**
 [THE_REBUILD](docs/plans/THE_REBUILD.md) owns the implementation order and current decisions.
 The repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
@@ -15,7 +15,7 @@ The repository was reset on September 24; the pre-reset tree is
 | Campaign 2 | Ring/contact laws and parity pass; its additional predictive criterion fails. The measured field declares no resonators or boost signatures |
 | Decision 38 | Loaded resonator forward/adjoint and material deposition built on host/card; the fixed source-ring family does not improve the standing-cut prediction |
 | Decision 39 | A landmark's count register carries at its ceiling `2^c`; the development cells choose `c = 11` at scale; the resident tree takes the carry |
-| Immediate work | Campaign 3: join the existing exact future-kernel quotient to a loaded ring, with source, pump-phase and receiver squares before release |
+| Immediate work | Campaign 3: the first construction (`hnn::modes`, Lean `HNN/ModeQuotient`) releases a loaded ring's storage-null future kernel with exact squares at every pump phase, and keeps energy-storing silent modes dormant; next is the material/deposition descent and the descended block's tick |
 | Campaign 3 | Mode release, dormant constitution/clock, founding and moment quotient; consumes the loaded ring connection |
 | Campaign 4 (#27) | Existing serial-screw laws need the HNN motor consumer and a motion-recording receipt |
 | Campaign 5 | Holonic Encoding, context, joint prediction and merges priced by their code-length pair |

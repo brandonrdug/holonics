@@ -2140,6 +2140,41 @@ kernel owner. The first receipt is a two-receiver, later-phase witness with exac
 released ranks, followed by the same loaded host/card word comparison. The campaign's broader
 acceptance below remains in force.
 
+**First construction built (September 27; `hnn::modes`, Lean `HNN/ModeQuotient`).**
+`LoadedRing::at_cut` reads each phase's `(T_t, B_t, ρ_t, D_t)` from the owner's exact step. The
+pump's cycle is lifted to the period navigator `T_P` with phase-offset receivers `ρ_(r,k)Φ(k)`.
+Since `Φ(mP + k) = Φ(k)T_P^m`, the lifted `FaceMap` kernel is exactly the admitted future kernel
+(`periodic_lift_exact`). `ModeQuotient::of` returns:
+- the chart `V` and the retained and released ranks;
+- the descended operators;
+- for every present-silent direction, either its release or its separator.
+
+The squares `V T_t = T̄_t V`, `V B_t = B̄_t` and `ρ = ρ̄ V` close exactly at every phase. On the
+exact chain word the descended ring returns the resonator's waves exactly. The witness fixtures:
+- **The pumped phase pair.** Of four present-silent directions, two are released and two are
+  heard at phase 1. With a declared cycle receiver reading `w_0y`, one is released: a later
+  receiver keeps what the present one cannot hear.
+- **The non-diagonal cycle base.** Four are released and four retained. A winding receiver keeps
+  the harmonic displacement.
+
+- [agent-inferred] **A released mode stores nothing; a silent mode that stores energy is
+  dormant.** One chart for every phase releases exactly the phase family's kernel over every word
+  (`shared_chart_le_phase_kernel`). With the port admitted, that kernel stores nothing at any phase
+  (`released_pair_storage_null`), so the release changes no reading and no energy. The admitted
+  kernel can be larger. In the pumped dormant fixture two directions are never heard over the
+  cycle, yet they store energy (`E_0 = −7/32` on one of them), and a phase-dependent chart would
+  release them. They are retained. A mode that stores energy is a dormant mode (Decision 1; the
+  objects' "dormant modes wait for a fitting antecedent"): an admitted family can grow, and a
+  release that drops stored energy would have to be emanated with its receipt, which this
+  construction does not own.
+- **Next in this campaign.**
+  - The material and deposition descent: the gain covectors over admitted comparisons factor
+    through `V`, and the descended block gets a stated tick, since `T̄_t` no longer has the Cayley
+    form.
+  - The lattice chart's solve and remainders.
+  - The card.
+  - The bridge from the linear statements to `HNN/Ring`'s concrete tick is owed in #62.
+
 - **Laws:** Lean item 9, and:
   - **Dormant rings.** Two receiver families are declared: the exterior receiving family and the
     admitted future family that contains it.
