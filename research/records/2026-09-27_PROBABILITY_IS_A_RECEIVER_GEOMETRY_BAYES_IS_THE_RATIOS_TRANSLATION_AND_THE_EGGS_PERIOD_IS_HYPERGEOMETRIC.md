@@ -205,3 +205,32 @@ With §1, `agent-inferred` and exact in its chart:
 The [unity audit’s receipts](2026-09-27_THE_HOLARCHY_AND_ITS_AEONS_ARE_THE_TOP_THE_DECISIONS_DISSOLVE_INTO_THEIR_OWNERS_AND_LEARNING_IS_PROTOTYPED_WHERE_A_HOLARCHY_MADE_THE_TERRAIN.md) fix the first measurements: recover the source’s **minimal future-equivalent** tree; on the moiré, compare each family’s charged prequential code with the exact source code and its key description, locate drawn phases and locks, and report the family’s posterior ratio and residual. The existing moiré control reads \(993+5/16+\varepsilon\) bits at determining depth against a \(30\)-bit key description; that gap is the rings’ target, not evidence already earned by them. Add arithmetic terrain through the same owner: exact digit convolution and carry, cheap residue faces, and prime gratings, with the true operands and factorization as truth gauges. Campaign 3 owns mode dormancy, founded cokernel directions, lawful release, and their aeon receipts; campaign 5 owns Holonic Encoding and charged merges of future-equivalent source words. Generation packs requested receiver consequences into keys and checks `decode(T_native(encode x)) = T(x)` at its consumer. Calling learning and generation *adjoints* additionally owes an actual pairing and adjoint square.
 
 **Exposed wording to repair.** In the [egg population record](2026-09-27_THE_EGG_IS_A_GENERATORS_GENOME_SELECTION_IS_BAYES_AND_THE_FACES_OF_INTEGERS_ARE_MOIRES_OF_GRATINGS.md), “failing configurations die” needs the zero-likelihood or release condition, and a sample’s recovered minimal tree does not prove unique future truth beyond its admitted family. In [egg packing](2026-09-27_EGG_PACKING_THE_MOIRE_OF_TWO_HELICES_IS_A_TORUS_KNOT_AND_THE_TREFOIL_IS_THE_HALF_TURN_WITH_THE_THIRD_TURN.md), \(|ad-bc|\) counts transverse intersections of **primitive, distinct, nonparallel** torus paths, not automatically complement cells; the affine Swing is not the modular inversion without a chart; and the Smith identification needs calibrated port variables. The present [Order](../../docs/plans/THE_REBUILD.md) already mentions the egg population inside its moiré bullet. Consolidating that bullet with campaign 3’s release and campaign 5’s encoding avoids a second programme. The real conversation cut remains each campaign’s milestone; terrain with known truth diagnoses learning, while exterior conversation curation belongs to step 8.
+
+## Lean (September 27, commit `ebc1f30d`)
+
+Proved in their owners, with the standard axioms only:
+- **Bayes** (`Computation/HolonicAdjointNormalization`): `bayes_logOdds_twoSwings` (the log-odds
+  translation as `S_b S_0`), `bayes_eq_face`, `bayes_eq_iff_logOdds`, `bayes_eq_discrete_replicator`,
+  `replicator_pos` and `replicator_eq_zero_iff` (a weight dies exactly at zero weight or likelihood).
+- **The node law** (`Compression/Landmark/Context/Tree`): `kt_eq_dirichlet_half`, with the Pólya urn
+  `urnSeq`.
+- **Reception** (`Physics/Wave/Interference`): `resolved_intensity_eq` and
+  `distinct_modes_no_cross_terms`, beside the existing coherent `intensity_eq`.
+- **The egg's modular invariant** (`HolonicsResearch/Geometry/EggModular`): `legendreJ_anharmonic`,
+  `legendreJ_sub_1728`, and `egg_j_of_legendre_lambda` (`λ = 1/2 ⇔ β = 3 − 2√2`, where
+  `j = 1728`).
+- **The torus crossings** (`Geometry/HolonicTorusKnots`): `torus_geodesic_crossings` (`|ad − bc|`
+  crossings at every offset, through `slopeLattice_index`).
+- **Ford circles** (`HolonicsResearch/Geometry/Farey`): `ford_separation` and
+  `ford_tangent_iff_unimodular`.
+- **Digits** (`Mathematics/RadixWindowReceiver`): `digit_product_is_carry_of_convolution`,
+  `carried_word_is_product_digits`, `grating_on_digit_index` and `cheap_faces`.
+
+Still owed in #62:
+- the egg's hypergeometric charts: `K(√λ) = (π/2)₂F₁(½,½;1;λ)`, and the Schwarz map with inverse
+  `1728/j` and exponent differences `(0, ½, ⅓)`;
+- the identification of their monodromy with `PSL(2,ℤ)`;
+- `fisher_sqrt_pullback`;
+- `statistical_sufficiency_gives_standing`;
+- the hyperbolic circle equation;
+- `betaBinomial_pgf`.
