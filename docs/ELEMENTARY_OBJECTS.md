@@ -703,6 +703,28 @@ a name is a key to a person; a coordinate is a key to a cell. The inference is g
 repository's applications are language, mathematics, code, perception and motor control, and no
 cryptanalytic application is pursued.
 
+[project-postulate] **Inference targets the generator, not the key** (Brandon, September 27: "we're
+talking about intelligence"). Every product was made by a generator of finite description drawn
+from finitely many families with characteristic groups. That holds for a cipher's machine and its
+operator's habits, a language's grammar and its speakers, a password and the person who chose it.
+Intelligence does not enumerate keys:
+- **It searches generator families by constraint.** Each face the product shows is a receiver: a
+  guessed fragment (the Bombe's crib, drawn from the operators' habits), a structural property (the
+  reflector: no letter enciphers to itself), a side channel, the author's patterns. Loop closure
+  over a menu of such faces kills whole families at once.
+- **It grows its receivers.** Every new face shrinks the kernel: the differences no admitted receiver
+  distinguishes. An interior is recovered up to its species relative to the receivers admitted. No
+  interior is sealed in principle; one whose faces have not been received is only not yet read.
+  An event horizon is read the same way, through the interior's exterior faces.
+- **It forgets no failure.** Every contradiction is a death with a receipt, and the seeds of the
+  eliminated families stay in the declaration. Across aeons the population's prior over families
+  learns from its own deaths and selections. This is the evolved ability: a family that keeps
+  winning is founded sooner, and one that keeps dying later. It is a retention of selection counts
+  over families, never a tape of attempts.
+- **It encodes by the same law.** Communication between intelligences is a shared generator whose
+  faces only a receiver of the right standing decodes: keys that move with their holders, not
+  static ones.
+
 ## Emanation and resonance
 
 [proved-derived; formal-checked] A drive splits uniquely and `C`-orthogonally into its component in

@@ -95,7 +95,9 @@ sets the order:
 5. then continue campaign 3 as the population's birth, death and dormancy: hold a silent ring's
    keys through its aeon, price a switch by fixed share per ring factor, found from reserved prior
    mass, and release only by zero likelihood or a certified null direction. Families compose at ports (a
-   Holarchy of eggs). A keystone's value is the joint code with it against without it, and a mode held
+   Holarchy of eggs). The birth prior over families is learned across aeons from the
+   population's deaths and selections (the evolved ability; [ELEMENTARY_OBJECTS, keys](../ELEMENTARY_OBJECTS.md#keys-locks-and-navigation)):
+   a retention of selection counts, never a tape. A keystone's value is the joint code with it against without it, and a mode held
    against dissipation charges its maintenance work
    ([ELEMENTARY_OBJECTS, the egg](../ELEMENTARY_OBJECTS.md#the-egg-a-generator-read-as-a-whole)).
 
