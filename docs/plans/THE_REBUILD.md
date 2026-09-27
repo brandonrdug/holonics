@@ -112,10 +112,7 @@ sets the order:
      aeons. The Lean for the rounding bound, the newborn's telescope and the chord equality is owed
      in #62.
 
-   Earlier text of this item, for its law: hold a silent ring's
-   keys through its aeon, price a switch by fixed share per ring factor, found from reserved prior
-   mass, and release only by zero likelihood or a certified null direction. Families compose at ports (a
-   Holarchy of eggs). The birth prior over families is learned across aeons from the
+6. **Next: composition and the evolved prior.** Families compose at ports (a Holarchy of eggs). The birth prior over families is learned across aeons from the
    population's deaths and selections (the evolved ability; [ELEMENTARY_OBJECTS, keys](../ELEMENTARY_OBJECTS.md#keys-locks-and-navigation)):
    a retention of selection counts, never a tape. A keystone's value is the joint code with it against without it, and a mode held
    against dissipation charges its maintenance work
