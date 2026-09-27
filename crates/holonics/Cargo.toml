@@ -55,3 +55,11 @@ path = "../../research/notebook/hnn_design/hnn_born.rs"
 [[example]]
 name = "hnn_terrain"
 path = "../../research/notebook/hnn_design/hnn_terrain.rs"
+
+# The notebook's reader of the curated conversation source (channels as ports, turns as epochs,
+# conversations as aeons) as typed letters, against the flat stream of the same bytes
+# (research/notebook/hnn_design/README.md): count-only development receipts run once in release,
+# never a test.
+[[example]]
+name = "hnn_curated"
+path = "../../research/notebook/hnn_design/hnn_curated.rs"
