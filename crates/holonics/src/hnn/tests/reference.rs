@@ -399,6 +399,30 @@ fn one_worker_and_many_return_the_same_values() {
     assert_eq!(serial, parallel);
 }
 
+/// **The baselines' exact faces are the faces their codes read** (`Baselines::face_cell`, the
+/// reader that multiplies a passage's faces, Decision 35): stepped beside `code_cell` over the same
+/// cells, each face's code length is the enclosure `code_cell` returns, and a cell outside the
+/// chart is refused.
+#[test]
+fn the_baselines_faces_are_the_faces_their_codes_read() {
+    use crate::hnn::landmark::code_length;
+    use crate::hnn::reference::Baselines;
+    let cells = source(96, 5);
+    let (mut faces, mut codes) = (Baselines::new(4).unwrap(), Baselines::new(4).unwrap());
+    for &cell in &cells {
+        let face = faces.face_cell(cell).unwrap();
+        let code = codes.code_cell(cell).unwrap();
+        assert_eq!(code_length(&face.uniform).unwrap(), code.uniform);
+        assert_eq!(code_length(&face.order_zero).unwrap(), code.order_zero);
+        assert_eq!(code_length(&face.order_one).unwrap(), code.order_one);
+        assert_eq!(code_length(&face.ppm).unwrap(), code.ppm);
+    }
+    assert!(matches!(
+        faces.face_cell(4),
+        Err(crate::hnn::HnnError::CellOutside { .. })
+    ));
+}
+
 /// The baselines read their code lengths by the certified integer binary logarithm
 /// (`landmark::code_length`): every enclosure contains the exact value the series enclosure
 /// (`ratio::log2_enclosure`) contains, so the two meet, and both read the same grain cell wherever

@@ -138,8 +138,21 @@
 //! through every later KT, path and mixture step (`rebase_step_enclosed`, `rebase_log_residual_sum`,
 //! `width_or_rebase_total`). The widths are never reduced to fit the carrier: `M_p` and `W` stay the
 //! rule's. The declaration is refused only when a lattice product itself passes `u128`
-//! (`2M_p + κ + 3`, `2W + M_p + 3` or `W + κ + M_p` above 128 bits, or `R < W`). Campaign 1's
-//! `|A| = 256`, `D = 4` tree was refused from 87,382 cells; it now declares to `2^19` cells.
+//! (`max(2M_p + 2, M_p + κ + 3)`, `M_p + W + 3` or `W + κ + M_p` above 128 bits, `M_p > 62`, or
+//! `R < W`). Campaign 1's `|A| = 256`, `D = 4` tree was refused from 87,382 cells, then from
+//! 605,395 cells (`2^19` admitted), and now declares to 19,372,659 cells (`2^24`).
+//!
+//! [definition; agent-inferred] **The lattice mixture and the stop weight read split operands**
+//! (Decision 35: at the wide cut's `2^20` cells the single division's `2M_p + κ + 3` reached 133
+//! bits). A mixing node's face `⟦λ̂ u/v + (1 − λ̂) x⟧` has the lattice numerator
+//! `λ̂u/v + (2^M − λ̂)x/2^M`; each part is divided with its remainder, `λ̂u = q_a v + r_a` and
+//! `(2^M − λ̂)x = q_b 2^M + r_b`, and the rounding reads
+//! `q_a + q_b + ⌊(2r_a 2^M + 2r_b v + v 2^M)/(2v 2^M)⌋`, the same integer as the single division of
+//! the sum (`⌊N/D + ½⌋` with its integer part taken out), in `max(2M_p, M_p + κ + 3)` bits. The stop
+//! weight `⟦β/(1 + β)⟧` is decided before its division whenever one side of `1 + β` passes the other
+//! by `2^(M+1)` (the other side's share is then below half a lattice step), which bounds its operands
+//! by `M_p + W + 3` bits. Both return exactly the integers the single divisions return (the test
+//! `landmark_split_operands_are_the_single_division`).
 //!
 //! [definition] **The certificate is carried, not recomputed** (the per-cell residual without the
 //! ideal). Each node and each join carries two bounds on the grid `2^(−C)`: `drift` ≥ `Δ` and
@@ -249,6 +262,9 @@
 //! prior of the declared family ([`prior_family`]: the global ladder `j = 1, …, J`, then the
 //! per-depth pairs `(j_root, j_below)`, `J = ⌈log₂(n* B)⌉`, [`ladder_top`]) runs its own depth sweep,
 //! and the choice is charged `⌈log₂⌉` of the laws tried. The held-out cells never choose anything.
+//! [agent-inferred] A declared deepest depth bounds both sweeps ([`choose_depth_within`],
+//! [`choose_prior_within`]; Decision 35): the resident memory cap bounds a tree's a-priori founded
+//! nodes `n* B D + 2^B − 1`, and so its depth at a population.
 //!
 //! [definition; agent-inferred, from the retention and deposition laws] **The measurement is
 //! prequential** ([`prequential`], Decision 29): every cell is scored at the current standing
@@ -256,7 +272,11 @@
 //! faces and the oracle's are read by [`code_length`], `log₂ d − log₂ n` of `q = n/d` by the
 //! certified binary logarithm ([`binary_log`]) within the enclosure grid `2^(−O)`; the baselines
 //! read their own faces through `hnn::reference`. Both are certified enclosures of `−log₂ q`, and
-//! every ordering is decided by disjoint enclosures.
+//! every ordering is decided by disjoint enclosures. [agent-inferred] A population's code is its
+//! faces' product, enclosed once ([`PassageCode`]: exact integer bounds of the product, kept at
+//! 127 significant bits and rounded outward, then one certified logarithm), not the sum of the
+//! cells' enclosures: on the wide cut's development cells (`917,504 = 2^17·7`) the `D = 1` tree's
+//! run with the per-cell sum took 29,902 ms, of which its passage 3,137 ms (Decision 35).
 //!
 //! [definition; agent-inferred] **The host realization** (the hardware law). Within
 //! [`prequential`] the tree and the baselines run together: each reads the shared immutable cut
@@ -278,7 +298,8 @@
 //! | a digit face's floor and the rounding's residual (the first-order bound fails downward) | `HNN/LandmarkTree.{digit_face_ge, digit_log_residual, host_digit_bound_fails_downward}` | [`Landmarks::face_rule`] |
 //! | the ideal tree weighting (the oracle) | `HNN/LandmarkTree.{landmark_step, mixture_is_probability, kraft_and_dominance, sequential_mixture}` | [`IdealLandmarks`] |
 //! | the declared stop prior: the mixture over pruned trees with its prior, the weights summing to one, the dominance, the founding at `β₀ = 2^(j_d) − 1` and the step unchanged; `½` the corollary | `HNN/LandmarkTree.{stop_mixture_over_trees, PrunedTree.prior_const, PrunedTree.prior_sum, stop_kraft_and_dominance, stop_weight_step, stop_ratio_step, stop_founding_step, ladder_founding, stopWeight_half}` | [`StopPrior`], [`LandmarkDeclaration::prior`], the founding charts (`Law::founding`, [`ArenaView::founding`]), [`IdealLandmarks`] |
-//! | the prior chosen on the development cells, charged `⌈log₂⌉` of the laws and of each law's depths | (a measurement, not a theorem) | [`ladder_top`], [`prior_family`], [`choose_prior`], [`PriorSweep`] |
+//! | the prior chosen on the development cells, charged `⌈log₂⌉` of the laws and of each law's depths | (a measurement, not a theorem) | [`ladder_top`], [`prior_family`], [`choose_prior`], [`choose_prior_within`], [`choose_depth_within`], [`PriorSweep`] |
+//! | a population's code is its faces' product, enclosed once | (a certified reading: integer bounds and the certified logarithm) | [`PassageCode`], [`ProductBound`] |
 //! | the node-local law: the tree over own weights (the stop law its KT case), Kraft-complete, each landmark paying at most `−log₂` of its prior weight; its step with the own face in the KT face's place; an own face normalized; an unfounded landmark's prior own face; the two-face prior founding at `2^j − 1` | `HNN/LocalWeighing.{own_mixture_over_trees, ownWeight_kt, ownWeight_one, own_kraft_and_dominance, node_local_dominance, own_weight_step, own_ratio_step, own_face_normalized, node_local_founding, two_face_prior}` | [`LocalLaw`], [`Landmarks::local`], [`Landmarks::receive_with`], [`Widths::local`], [`IdealLandmarks::local`] |
 //! | the stop-weight mixture per digit tree: the mixture over (law, pruned tree), its prior complete, within `−log₂ π_k − log₂ prior_(w_k)(S)`; the joins telescope to the Bayesian mixture, the executed chart's drift once | `HNN/LocalWeighing.{stop_mixture_per_tree, static_mixture, forward_executed}` | [`StopMixture`], [`JoinTree`], [`FaceJoins`] |
 //! | a window's phases in cell order: each reads the standing after the earlier phases' deposits | `HNN/LandmarkTree.{landmark_step, treeWeight_arrive_off}` | [`Landmarks::window_faces`] |
@@ -932,10 +953,12 @@ impl Widths {
         }
     }
 
-    /// The largest `u128` operand the widths ask for, in bits: the lattice mixture `2M + κ + 3`,
-    /// the stop weight `2W + M + 3`, the β step's carrier `W + κ + M` and, unless the carrier
-    /// rebases, its mantissa division `2W + κ + M + 1`, with `κ` the bits of `2n* + 2`.
-    fn operand_bits(&self, population: u64) -> u64 {
+    /// The largest `u128` operand the widths ask for, in bits: the lattice mixture
+    /// `max(2M + 2, M + κ + 3)` (its parts divided apart, [`lattice_mix`]; the two faces' blend
+    /// `2M + 2`), the stop weight `M + W + 3` (decided before its division past `2^(M+1)`,
+    /// [`Beta::stop_weight`]), the β step's carrier `W + κ + M` and, unless the carrier rebases,
+    /// its mantissa division `2W + κ + M + 1`, with `κ` the bits of `2n* + 2`.
+    pub fn operand_bits(&self, population: u64) -> u64 {
         let kappa = floor_reciprocal(population).bits();
         let (m, w) = (self.face, self.carrier);
         let division = if self.rebase > 0 {
@@ -943,10 +966,27 @@ impl Widths {
         } else {
             2 * w + kappa + m + 1
         };
-        (2 * m + kappa + 3)
-            .max(2 * w + m + 3)
+        self.lattice_operands(kappa).max(division)
+    }
+
+    /// The lattice mixture's, the stop weight's and the β carrier's operands, in bits.
+    fn lattice_operands(&self, kappa: u64) -> u64 {
+        let (m, w) = (self.face, self.carrier);
+        (2 * m + 2)
+            .max(m + kappa + 3)
+            .max(m + w + 3)
             .max(w + kappa + m)
-            .max(division)
+    }
+
+    /// [agent-inferred] **Whether the single divisions fit `u128`** at a population: the lattice
+    /// mixture read as one division `(2^M λ̂ u + (2^M − λ̂) x v)/(2^M v)` (`2M + κ + 3` bits) and the
+    /// stop weight decided only past `|exponent| > M + W` (`2W + M + 3` bits). The card's kernel
+    /// (`holonics-cuda`, `kernels/tree.cu`) executes that realization, so its mirror refuses wider
+    /// widths; the host's split operands ([`lattice_mix`], [`Beta::stop_weight`]) return the same
+    /// integers wherever both admit.
+    pub fn single_division_admitted(&self, population: u64) -> bool {
+        let kappa = floor_reciprocal(population).bits();
+        (2 * self.face + kappa + 3).max(2 * self.carrier + self.face + 3) <= u64::from(u128::BITS)
     }
 
     /// Whether the widths at a population admit every product in `u128`, the carrier rebase
@@ -955,11 +995,7 @@ impl Widths {
         let kappa = floor_reciprocal(population).bits();
         let rebase_needed = 2 * self.carrier + kappa + self.face + 1 > u64::from(u128::BITS);
         let rebase_kept = !rebase_needed || 126u64.saturating_sub(self.carrier) >= self.carrier;
-        rebase_kept
-            && (2 * self.face + kappa + 3)
-                .max(2 * self.carrier + self.face + 3)
-                .max(self.carrier + kappa + self.face)
-                <= u64::from(u128::BITS)
+        rebase_kept && self.lattice_operands(kappa) <= u64::from(u128::BITS)
     }
 }
 
@@ -986,6 +1022,21 @@ fn ceil_div(a: u128, b: u128) -> u128 {
 fn lattice_round(widths: &Widths, numerator: u128, denominator: u128) -> u64 {
     let rounded = (2 * numerator + denominator) / (2 * denominator);
     (rounded as u64).clamp(1, (1u64 << widths.face) - 1)
+}
+
+/// **`⟦λ̂ u/v + (1 − λ̂) x⟧` on `2^(−M)`** (module header, "The lattice mixture and the stop weight
+/// read split operands"): the nearest lattice numerator (ties up) of `λ̂u/v + (2^M − λ̂)x/2^M`, inside
+/// `[1, 2^M − 1]`, each part divided with its remainder so that no operand passes
+/// `max(2M, M + κ + 3)` bits (`u ≤ v < 2^κ`, `λ̂ ≤ 2^M`, `x < 2^M`).
+pub(crate) fn lattice_mix(widths: &Widths, stop: u64, u: u64, v: u64, below: u64) -> u64 {
+    let face = widths.face;
+    let full = 1u128 << face;
+    let (stop, u, v) = (u128::from(stop), u128::from(u), u128::from(v));
+    let (a, b) = (stop * u, (full - stop) * u128::from(below));
+    let whole = a / v + (b >> face);
+    let (left, right) = (a % v, b & (full - 1));
+    let half = ((left << (face + 1)) + 2 * right * v + (v << face)) / (v << (face + 1));
+    ((whole + half) as u64).clamp(1, (1u64 << face) - 1)
 }
 
 /// `⟦λ̂ a + (1 − λ̂) b⟧` of two lattice faces with the stop weight `λ̂` (numerators of `2^(−M)`).
@@ -1222,17 +1273,21 @@ impl Beta {
     }
 
     /// **The stop weight** `λ̂ = ⟦β/(1 + β)⟧` on the lattice `2^(−M)`, as its numerator in
-    /// `[0, 2^M]` (round to nearest, ties up). At `|exponent| > M + W` the rounding is decided
-    /// (`λ̂ = 1` or `0`: the other side is below half a lattice step), so every operand stays within
-    /// `2W + M + 3` bits.
-    pub fn stop_weight(&self, face_bits: u64, width: u64) -> u64 {
+    /// `[0, 2^M]` (round to nearest, ties up). When one side of `1 + β` passes the other by at least
+    /// `2^(M+1)` the rounding is decided (`λ̂ = 1` or `0`: the other side's share is below half a
+    /// lattice step); it is read from the sides' bits before any division, so every operand stays
+    /// within `M + b + 3` bits for odd parts of `b` bits (`b ≤ W` on the carrier; a leaf's founding
+    /// chart, never stepped, may hold a rung up to 63). The width is the carrier's, unused.
+    pub fn stop_weight(&self, face_bits: u64, _width: u64) -> u64 {
         let full = 1u64 << face_bits;
-        let reach = face_bits + width + 1;
         let (a, b) = (u128::from(self.numerator), u128::from(self.denominator));
+        let (bits_a, bits_b) = (bits128(a) as i64, bits128(b) as i64);
+        let decided = face_bits as i64 + 2;
         let twice = 1u128 << (face_bits + 1);
         if self.exponent >= 0 {
-            // 2^M λ = 2^M − z, z = 2^M b/g, g = a 2^e + b; ⌊2^M − z + ½⌋ = 2^M − ⌈z − ½⌉.
-            if self.exponent as u64 >= reach {
+            // 2^M λ = 2^M − z, z = 2^M b/g, g = a 2^e + b; ⌊2^M − z + ½⌋ = 2^M − ⌈z − ½⌉. When
+            // bits a − 1 + e ≥ M + 1 + bits b, a 2^e > 2^(M+1) b, so z < ½.
+            if self.exponent + bits_a >= decided + bits_b {
                 return full;
             }
             let g = (a << self.exponent) + b;
@@ -1240,9 +1295,9 @@ impl Beta {
             let up = if t <= g { 0 } else { (t - g).div_ceil(2 * g) };
             full - up as u64
         } else {
-            // 2^M λ = 2^M a/h, h = a + b 2^|e|.
+            // 2^M λ = 2^M a/h, h = a + b 2^|e|: below ½ when b 2^|e| > 2^(M+1) a.
             let shift = self.exponent.unsigned_abs();
-            if shift >= reach {
+            if shift as i64 + bits_b >= decided + bits_a {
                 return 0;
             }
             let h = a + (b << shift);
@@ -2179,15 +2234,9 @@ impl Law {
         self.round(u128::from(u) << self.widths.face, u128::from(v))
     }
 
-    /// `⟦λ̂ u/v + (1 − λ̂) x⟧` with the stop weight `λ̂` and a lattice face `x`, on `2^M v` as the
-    /// common denominator.
+    /// `⟦λ̂ u/v + (1 − λ̂) x⟧` with the stop weight `λ̂` and a lattice face `x` ([`lattice_mix`]).
     fn mix_stop(&self, stop: u64, u: u64, v: u64, below: u64) -> u64 {
-        let face = self.widths.face;
-        let stop = u128::from(stop);
-        let full = u128::from(self.full());
-        let numerator =
-            ((stop * u128::from(u)) << face) + (full - stop) * u128::from(below) * u128::from(v);
-        self.round(numerator, u128::from(v) << face)
+        lattice_mix(&self.widths, stop, u, v, below)
     }
 
     /// The mixing node's lattice face `⟦λ̂ k(0) + (1 − λ̂) q̂'⟧`.
@@ -4428,8 +4477,8 @@ impl StopMixture {
 // -------------------------------------------------------------------------------------------
 // the measurement
 
-/// [definition] **Code lengths on one population**, each an enclosure summed by `interval_sum`
-/// over `cells` cells: the tree's executed face and the online baselines.
+/// [definition] **Code lengths on one population**, each an enclosure of the population's faces'
+/// product ([`PassageCode`]) over `cells` cells: the tree's executed face and the online baselines.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Coded {
     pub tree: ExactInterval,
@@ -4516,6 +4565,274 @@ pub fn ratio_code_length(
         .map_err(|_| shape("an ordered enclosure of a code length", 0, 1))
 }
 
+/// The significant bits a product bound keeps: `2^(K−1) ≤ m < 2^K` once a factor has rounded it.
+const KEPT: u64 = 127;
+
+/// [definition; agent-inferred] **One side of a product's enclosure**: the integer `m · 2^e`, its
+/// mantissa `m < 2^127` and its binary exponent `e`, rounded down (a lower bound) or up (an upper
+/// bound) after each factor ([`PassageCode`]).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct ProductBound {
+    pub mantissa: u128,
+    pub exponent: u64,
+}
+
+impl ProductBound {
+    /// The empty product, `1`.
+    pub const ONE: ProductBound = ProductBound {
+        mantissa: 1,
+        exponent: 0,
+    };
+
+    /// Keep `KEPT` significant bits of `top 2^64 + bottom` (`top < 2^127`, `bottom < 2^64`),
+    /// rounding down, or up when `up`.
+    fn kept(top: u128, bottom: u128, exponent: u64, up: bool) -> Self {
+        let total = if top == 0 {
+            bits128(bottom)
+        } else {
+            bits128(top) + 64
+        };
+        if total <= KEPT {
+            return Self {
+                mantissa: (top << 64) | bottom,
+                exponent,
+            };
+        }
+        let shift = total - KEPT;
+        let (mantissa, dropped) = if shift <= 64 {
+            (
+                (top << (64 - shift)) | (bottom >> shift),
+                bottom & ((1u128 << shift) - 1) != 0,
+            )
+        } else {
+            let over = shift - 64;
+            (top >> over, bottom != 0 || top & ((1u128 << over) - 1) != 0)
+        };
+        Self::rounded(mantissa, exponent + shift, up && dropped)
+    }
+
+    /// A kept mantissa, raised by one unit when `raise` (and renormalized at `2^127`).
+    fn rounded(mantissa: u128, exponent: u64, raise: bool) -> Self {
+        if !raise {
+            return Self { mantissa, exponent };
+        }
+        let mantissa = mantissa + 1;
+        if bits128(mantissa) > KEPT {
+            Self {
+                mantissa: mantissa >> 1,
+                exponent: exponent + 1,
+            }
+        } else {
+            Self { mantissa, exponent }
+        }
+    }
+
+    /// **Times a word**, `m 2^e · x`, kept at `KEPT` bits (down, or up when `up`).
+    pub fn times(self, factor: u64, up: bool) -> Self {
+        let mask = u128::from(u64::MAX);
+        let (low, high) = (
+            (self.mantissa & mask) * u128::from(factor),
+            (self.mantissa >> 64) * u128::from(factor),
+        );
+        Self::kept(high + (low >> 64), low & mask, self.exponent, up)
+    }
+
+    /// **Times an integer**, kept at `KEPT` bits (down, or up when `up`).
+    pub fn times_integer(self, factor: &BigUint, up: bool) -> Self {
+        if let Some(word) = factor.to_u64() {
+            return self.times(word, up);
+        }
+        let product = BigUint::from(self.mantissa) * factor;
+        let bits = product.bits();
+        if bits <= KEPT {
+            return Self {
+                mantissa: product.to_u128().expect("within the kept bits"),
+                exponent: self.exponent,
+            };
+        }
+        let shift = bits - KEPT;
+        let mantissa = (&product >> shift as usize)
+            .to_u128()
+            .expect("the kept bits");
+        let dropped = product.trailing_zeros().is_some_and(|zeros| zeros < shift);
+        Self::rounded(mantissa, self.exponent + shift, up && dropped)
+    }
+
+    /// **Times another bound**, kept at `KEPT` bits (down, or up when `up`).
+    pub fn times_bound(self, other: ProductBound, up: bool) -> Self {
+        let product = BigUint::from(self.mantissa) * BigUint::from(other.mantissa);
+        let bound = Self {
+            mantissa: 1,
+            exponent: self.exponent + other.exponent,
+        };
+        bound.times_integer(&product, up)
+    }
+
+    /// `log₂` of the bound, enclosed by the certified [`binary_log`] at `bits` fraction bits:
+    /// `(lower, upper)` on `2^(−bits)`.
+    pub fn log2(self, bits: u32) -> (Rat, Rat) {
+        let log = binary_log(&BigUint::from(self.mantissa), bits, |_| false);
+        let scale = BigInt::one() << log.bits as usize;
+        let whole = (BigInt::from(log.whole) + BigInt::from(self.exponent)) << log.bits as usize;
+        let lower = &whole + BigInt::from(log.fraction);
+        let upper = if log.exact { lower.clone() } else { &lower + 1 };
+        (Rat::new(lower, scale.clone()), Rat::new(upper, scale))
+    }
+}
+
+impl PartialOrd for ProductBound {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for ProductBound {
+    /// The integers `m 2^e` compared exactly.
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        let size = |b: &ProductBound| {
+            if b.mantissa == 0 {
+                0
+            } else {
+                bits128(b.mantissa) + b.exponent
+            }
+        };
+        match size(self).cmp(&size(other)) {
+            std::cmp::Ordering::Equal if self.mantissa != 0 => {
+                if self.exponent >= other.exponent {
+                    (self.mantissa << (self.exponent - other.exponent)).cmp(&other.mantissa)
+                } else {
+                    self.mantissa
+                        .cmp(&(other.mantissa << (other.exponent - self.exponent)))
+                }
+            }
+            order => order,
+        }
+    }
+}
+
+/// [definition; agent-inferred] **A passage's code length, carried as its faces' product**
+/// (Decision 35: the measurement at scale). The faces `q_t = n_t/(d_t 2^(k_t))` of a passage multiply
+/// to `N/(D 2^E)`; `N` and `D` are held between exact integer bounds ([`ProductBound`], each kept at
+/// 127 significant bits and rounded outward after every factor) and `E` exactly, so the passage's
+/// code length `−log₂ ∏ q_t = log₂ D + E − log₂ N` is enclosed once, by the certified
+/// [`binary_log`] at `O + 1` fraction bits, and rounded out on the enclosure grid `2^(−O)` as
+/// `interval_sum` rounds (`O` the grid's octaves, `hnn::ratio`'s `LOG_OCTAVES`). A factor moves a
+/// bound by a relative `2^(−126)` at most, so over `f` factors the enclosure stays within
+/// `f 2^(−125) + 2^(1−O)` bits of the exact code length; a dyadic face (every tree's) moves only
+/// `N`'s bounds and `E`. It is the per-cell sum of [`code_length`]s without their per-cell
+/// enclosures: on the wide cut's development cells the `D = 1` tree's run with the per-cell sum took
+/// 29,902 ms, of which its passage 3,137 ms.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct PassageCode {
+    numerator: [ProductBound; 2],
+    denominator: [ProductBound; 2],
+    exponent: u64,
+    factors: u64,
+}
+
+impl Default for PassageCode {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl PassageCode {
+    /// The empty passage: code length zero.
+    pub fn new() -> Self {
+        Self {
+            numerator: [ProductBound::ONE; 2],
+            denominator: [ProductBound::ONE; 2],
+            exponent: 0,
+            factors: 0,
+        }
+    }
+
+    /// **One lattice side** `x/2^bits` (a digit's executed side, `0 < x`).
+    pub fn side(&mut self, numerator: u64, bits: u64) {
+        debug_assert!(numerator > 0);
+        self.numerator = [
+            self.numerator[0].times(numerator, false),
+            self.numerator[1].times(numerator, true),
+        ];
+        self.exponent += bits;
+        self.factors += 1;
+    }
+
+    /// **One positive face**, exact: its numerator's bounds move, its denominator's twos go to
+    /// `E` and its odd part moves the denominator's bounds. Refused at a face that is not positive.
+    pub fn face(&mut self, face: &Rat) -> Result<(), HnnError> {
+        if !face.is_positive() {
+            return Err(shape("a positive face in a passage's code", 1, 0));
+        }
+        let numerator = face.numer().magnitude();
+        let denominator = face.denom().magnitude();
+        let twos = denominator.trailing_zeros().unwrap_or(0);
+        let odd = denominator >> twos as usize;
+        self.numerator = [
+            self.numerator[0].times_integer(numerator, false),
+            self.numerator[1].times_integer(numerator, true),
+        ];
+        if !odd.is_one() {
+            self.denominator = [
+                self.denominator[0].times_integer(&odd, false),
+                self.denominator[1].times_integer(&odd, true),
+            ];
+        }
+        self.exponent += twos;
+        self.factors += 1;
+        Ok(())
+    }
+
+    /// **One dyadic face from its numerator**, `n/2^k` (`n > 0`): a cell's product of lattice sides.
+    pub fn dyadic(&mut self, numerator: &BigUint, exponent: u64) {
+        debug_assert!(!numerator.is_zero());
+        self.numerator = [
+            self.numerator[0].times_integer(numerator, false),
+            self.numerator[1].times_integer(numerator, true),
+        ];
+        self.exponent += exponent;
+        self.factors += 1;
+    }
+
+    /// **Two passages joined**: the product of their faces.
+    pub fn join(&mut self, other: &PassageCode) {
+        for side in 0..2 {
+            let up = side == 1;
+            self.numerator[side] = self.numerator[side].times_bound(other.numerator[side], up);
+            self.denominator[side] =
+                self.denominator[side].times_bound(other.denominator[side], up);
+        }
+        self.exponent += other.exponent;
+        self.factors += other.factors;
+    }
+
+    /// The faces multiplied in.
+    pub fn factors(&self) -> u64 {
+        self.factors
+    }
+
+    /// The bounds of the faces' product `N/(D 2^E)`: `(N_lower, N_upper, D_lower, D_upper, E)`.
+    pub fn bounds(&self) -> ([ProductBound; 2], [ProductBound; 2], u64) {
+        (self.numerator, self.denominator, self.exponent)
+    }
+
+    /// **The code length** `−log₂ ∏ q`, enclosed and rounded out on `2^(−O)`.
+    pub fn bits(&self) -> Result<ExactInterval, HnnError> {
+        let octaves = LOG_OCTAVES + 1;
+        let (numerator_low, _) = self.numerator[0].log2(octaves);
+        let (_, numerator_high) = self.numerator[1].log2(octaves);
+        let (denominator_low, _) = self.denominator[0].log2(octaves);
+        let (_, denominator_high) = self.denominator[1].log2(octaves);
+        let exponent = Rat::from_integer(BigInt::from(self.exponent));
+        let enclosure = ExactInterval::new(
+            &denominator_low + &exponent - numerator_high,
+            denominator_high + exponent - numerator_low,
+        )
+        .map_err(|_| shape("an ordered enclosure of a passage's code", 0, 1))?;
+        interval_sum(&zero(), &enclosure)
+    }
+}
+
 /// Refused unless there is one letter per cell.
 fn aligned(cells: &[usize], letters: &[Letter]) -> Result<(), HnnError> {
     if cells.len() != letters.len() {
@@ -4537,18 +4854,17 @@ fn run_tree(
 ) -> Result<([ExactInterval; 2], TreeRun), HnnError> {
     aligned(cells, letters)?;
     let mut tree = Landmarks::new(declaration.clone())?;
-    let mut sums = [zero(), zero()];
+    let mut codes = [PassageCode::new(), PassageCode::new()];
     let mut largest_residual = Rat::zero();
     for (position, &class) in cells.iter().enumerate() {
         let reading = tree.receive(&letter_address(letters, position, declaration.depth), class)?;
-        let part = usize::from(held_out(position));
-        sums[part] = interval_sum(&sums[part], &code_length(&reading.executed)?)?;
+        codes[usize::from(held_out(position))].face(&reading.executed)?;
         if reading.residual > largest_residual {
             largest_residual = reading.residual;
         }
     }
     Ok((
-        sums,
+        [codes[0].bits()?, codes[1].bits()?],
         TreeRun {
             declaration: declaration.clone(),
             widths: tree.widths(),
@@ -4568,24 +4884,31 @@ fn run_baselines(
     alphabet: usize,
 ) -> Result<([BaselineCodes; 2], [u64; 2]), HnnError> {
     let mut baselines = Baselines::new(alphabet)?;
-    let empty = || BaselineCodes {
-        uniform: zero(),
-        order_zero: zero(),
-        order_one: zero(),
-        ppm: zero(),
-    };
-    let (mut sums, mut counts) = ([empty(), empty()], [0u64; 2]);
+    let mut codes = [[PassageCode::new(); 4]; 2];
+    let mut counts = [0u64; 2];
     for (position, &class) in cells.iter().enumerate() {
-        let codes = baselines.code_cell(class)?;
+        let faces = baselines.face_cell(class)?;
         let part = usize::from(held_out(position));
-        let sum = &mut sums[part];
-        sum.uniform = interval_sum(&sum.uniform, &codes.uniform)?;
-        sum.order_zero = interval_sum(&sum.order_zero, &codes.order_zero)?;
-        sum.order_one = interval_sum(&sum.order_one, &codes.order_one)?;
-        sum.ppm = interval_sum(&sum.ppm, &codes.ppm)?;
+        for (code, face) in codes[part].iter_mut().zip([
+            &faces.uniform,
+            &faces.order_zero,
+            &faces.order_one,
+            &faces.ppm,
+        ]) {
+            code.face(face)?;
+        }
         counts[part] += 1;
     }
-    Ok((sums, counts))
+    let sums = |[uniform, order_zero, order_one, ppm]: [PassageCode; 4]| {
+        Ok::<_, HnnError>(BaselineCodes {
+            uniform: uniform.bits()?,
+            order_zero: order_zero.bits()?,
+            order_one: order_one.bits()?,
+            ppm: ppm.bits()?,
+        })
+    };
+    let [development, held] = codes;
+    Ok(([sums(development)?, sums(held)?], counts))
 }
 
 /// **The prequential measurement on a cut** (module header): the tree over the ticks' letters and
@@ -4661,6 +4984,19 @@ pub fn choose_depth(
     letters: &[Letter],
     declaration: &LandmarkDeclaration,
 ) -> Result<DepthSweep, HnnError> {
+    choose_depth_within(cut, letters, declaration, usize::MAX)
+}
+
+/// [definition; agent-inferred] **Choose the address depth within a declared deepest depth**
+/// (Decision 35: a memory cap bounds the tree's a-priori founded nodes, `n* B D`, and so its depth):
+/// [`choose_depth`]'s sweep, which also stops at `D = deepest`; the family tried is still charged
+/// `⌈log₂⌉` of its length.
+pub fn choose_depth_within(
+    cut: &Cut,
+    letters: &[Letter],
+    declaration: &LandmarkDeclaration,
+    deepest: usize,
+) -> Result<DepthSweep, HnnError> {
     aligned(&cut.cells, letters)?;
     let cells = development(cut);
     let letters = development_letters(cut, letters);
@@ -4677,7 +5013,7 @@ pub fn choose_depth(
             .last()
             .is_none_or(|(_, previous)| bits.upper < previous.lower);
         tried.push((depth, bits));
-        if !decreased || depth >= cells.len() {
+        if !decreased || depth >= cells.len() || depth >= deepest {
             break;
         }
         depth += 1;
@@ -4767,6 +5103,18 @@ pub fn choose_prior(
     declaration: &LandmarkDeclaration,
     family: &[StopPrior],
 ) -> Result<PriorSweep, HnnError> {
+    choose_prior_within(cut, letters, declaration, family, usize::MAX)
+}
+
+/// **Choose the stop prior with every law's depth within a declared deepest depth** (Decision 35):
+/// [`choose_prior`] with each law's sweep [`choose_depth_within`] `deepest`.
+pub fn choose_prior_within(
+    cut: &Cut,
+    letters: &[Letter],
+    declaration: &LandmarkDeclaration,
+    family: &[StopPrior],
+    deepest: usize,
+) -> Result<PriorSweep, HnnError> {
     aligned(&cut.cells, letters)?;
     let half = StopPrior::half();
     let incumbent = family.iter().position(|prior| *prior == half).ok_or(shape(
@@ -4779,7 +5127,7 @@ pub fn choose_prior(
             prior: family[index].clone(),
             ..declaration.clone()
         };
-        choose_depth(cut, letters, &declared)
+        choose_depth_within(cut, letters, &declared, deepest)
     })?;
     let mut sweep = PriorSweep {
         tried: family.iter().cloned().zip(sweeps).collect(),

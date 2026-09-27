@@ -63,6 +63,52 @@ pub fn read_cut(path: &str) -> (Vec<u8>, usize, Range<usize>) {
     (bytes, population, range[0]..range[1])
 }
 
+/// **A count from a cut's manifest** (exterior JSON, read by the number after its key), e.g. the
+/// development stream's length `"development_stream_bytes":`.
+#[allow(clippy::disallowed_types, clippy::disallowed_methods)]
+pub fn manifest_number(path: &str, key: &str) -> usize {
+    let manifest_path = path
+        .strip_suffix(".bin")
+        .map_or_else(|| format!("{path}.json"), |stem| format!("{stem}.json"));
+    let manifest = std::fs::read_to_string(&manifest_path)
+        .unwrap_or_else(|error| panic!("read the cut manifest {manifest_path}: {error}"));
+    let start = manifest
+        .find(key)
+        .unwrap_or_else(|| panic!("the manifest names {key}"))
+        + key.len();
+    manifest[start..]
+        .trim_start()
+        .split(|c: char| !c.is_ascii_digit())
+        .find(|piece| !piece.is_empty())
+        .and_then(|piece| piece.parse().ok())
+        .expect("a count")
+}
+
+/// **The process's resident set, now and at its peak**, in bytes (exterior: the kernel's
+/// `/proc/self/status`, `VmRSS` and `VmHWM`, read in kB), when the status reads.
+#[allow(clippy::disallowed_types, clippy::disallowed_methods)]
+pub fn resident_set() -> Option<(u128, u128)> {
+    let status = std::fs::read_to_string("/proc/self/status").ok()?;
+    let field = |key: &str| -> Option<u128> {
+        let line = status.lines().find(|line| line.starts_with(key))?;
+        let kilobytes: u128 = line.split_whitespace().nth(1)?.parse().ok()?;
+        Some(kilobytes * 1024)
+    };
+    Some((field("VmRSS:")?, field("VmHWM:")?))
+}
+
+/// **The memory the host has available**, in bytes (exterior: the kernel's `/proc/meminfo`,
+/// `MemAvailable`, read in kB), when it reads.
+#[allow(clippy::disallowed_types, clippy::disallowed_methods)]
+pub fn memory_available() -> Option<u128> {
+    let info = std::fs::read_to_string("/proc/meminfo").ok()?;
+    let line = info
+        .lines()
+        .find(|line| line.starts_with("MemAvailable:"))?;
+    let kilobytes: u128 = line.split_whitespace().nth(1)?.parse().ok()?;
+    Some(kilobytes * 1024)
+}
+
 // -------------------------------------------------------------------------------------------
 // presentation (for a person; every reading exact, never a decimal)
 

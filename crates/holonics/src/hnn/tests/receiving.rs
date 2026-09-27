@@ -682,8 +682,11 @@ fn the_mixture_weighs_the_tree_against_the_combined_face() {
 /// mixture weighs) and the combined face `L_C`, `min(L_T, L_C) − drift ≤ L_model ≤ min(L_T, L_C) +
 /// 1 + drift`, each half read on the enclosure endpoints that can refute it (a half fails only when
 /// the law is violated); `log₂ β` is `L_C − L_T` within the drift; and the tree's code length is
-/// exactly the count-only prequential tree's over the same cut (`hnn::landmark::prequential`), so
-/// every phase of every window read the tree after every earlier cell.
+/// the count-only prequential tree's over the same cut (`hnn::landmark::prequential`, which encloses
+/// the faces' product once, `PassageCode`, where the exposure sums its windows' enclosures): the two
+/// enclosures meet and each is narrower than `2^(−60)` bits, far below the least move one cell's
+/// face read at a different standing would make, so every phase of every window read the tree after
+/// every earlier cell.
 #[test]
 fn the_mixture_codes_within_one_bit_of_the_better_face() {
     use super::learning::chain_of;
@@ -733,8 +736,15 @@ fn the_mixture_codes_within_one_bit_of_the_better_face() {
     let declared = landmark_declaration(&field, receiver).unwrap();
     let letters = crate::hnn::landmark::cell_letters(&cut.cells);
     let alone = crate::hnn::landmark::prequential(&cut, &letters, &declared).unwrap();
-    assert_eq!(exposure.training.tree, alone.development.tree);
-    assert_eq!(exposure.held_out.tree, alone.held_out.tree);
+    let narrow = Rat::new(1.into(), num_bigint::BigInt::from(1u8) << 60usize);
+    for (exposed, measured) in [
+        (&exposure.training.tree, &alone.development.tree),
+        (&exposure.held_out.tree, &alone.held_out.tree),
+    ] {
+        assert!(exposed.lower <= measured.upper && measured.lower <= exposed.upper);
+        assert!(&exposed.upper - &exposed.lower < narrow);
+        assert!(&measured.upper - &measured.lower < narrow);
+    }
     assert_eq!(
         (exposure.training.cells, exposure.held_out.cells),
         (alone.development.cells, alone.held_out.cells)

@@ -237,7 +237,8 @@ impl<'c> CardTree<'c> {
     /// **Mirror a host tree on the card**: its law's words, the arena at its current standing, and
     /// room for every node a passage of the declared population founds, plus `window` cells a
     /// window's overlay and a re-read found past it (`B Σ_b (D_b + 1)` nodes a cell), the child
-    /// table at twice that, a power of two. Refused at a branch deeper than the kernels' paths.
+    /// table at twice that, a power of two. Refused at a branch deeper than the kernels' paths, or
+    /// at widths past the kernel's single-division operands (`Widths::single_division_admitted`).
     pub fn mirror(card: &'c Card, tree: &Landmarks, window: usize) -> Result<Self, DeviceError> {
         let declaration = tree.declaration().clone();
         // The kernel founds every node at `β = 1` (`TreeChart{1, 1, 0, full/2}`): Decision 28's
@@ -248,6 +249,13 @@ impl<'c> CardTree<'c> {
             ));
         }
         let widths: Widths = tree.widths();
+        // The kernel mixes and weighs by single divisions: widths past their `u128` operands
+        // (the host's split operands declare wider trees, Decision 35) are refused here.
+        if !widths.single_division_admitted(declaration.population) {
+            return Err(launch_error(
+                "widths whose single-division operands fit u128 (2M + κ + 3 and 2W + M + 3 bits)",
+            ));
+        }
         let depths = declaration.branch_depths();
         if depths.iter().any(|&depth| depth + 1 > MAX_DEPTH) || depths.len() > 2 {
             return Err(launch_error(

@@ -2650,6 +2650,17 @@ pub struct BaselineCodes {
     pub ppm: ExactInterval,
 }
 
+/// [definition] **One cell's exact faces under the online baselines**, read at the standing before
+/// the cell's own count ([`Baselines::face_cell`]): the faces [`BaselineCodes`] encloses the code
+/// lengths of, for a reader that multiplies a passage's faces (`hnn::landmark::PassageCode`).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct BaselineFaces {
+    pub uniform: Rat,
+    pub order_zero: Rat,
+    pub order_one: Rat,
+    pub ppm: Rat,
+}
+
 /// [definition] **The online baselines, fitted on the same stream in the same order** as the model
 /// they are read beside: every cell is coded at the current counts, then counted (prequential).
 /// [agent-inferred] The order-1 baseline's contexts are the preceding cell's address letter
@@ -2723,6 +2734,30 @@ impl Baselines {
         };
         self.count(code);
         Ok(codes)
+    }
+
+    /// **Read one cell's exact faces in every baseline at the current counts, then count it**
+    /// (prequential; [`Baselines::code_cell`]'s faces).
+    pub fn face_cell(&mut self, code: usize) -> Result<BaselineFaces, HnnError> {
+        if code >= self.alphabet {
+            return Err(HnnError::CellOutside {
+                code,
+                alphabet: self.alphabet,
+            });
+        }
+        let context = self.context();
+        let faces = BaselineFaces {
+            uniform: Rat::new(BigInt::one(), BigInt::from(self.alphabet)),
+            order_zero: kt_probability(self.order_zero[code], self.seen, self.alphabet),
+            order_one: kt_probability(
+                self.order_one.get(&(context, code)).copied().unwrap_or(0),
+                self.order_one_totals[context],
+                self.alphabet,
+            ),
+            ppm: self.ppm.mass(code),
+        };
+        self.update(code);
+        Ok(faces)
     }
 
     /// Code one cell in every baseline into `bits`, then count it.

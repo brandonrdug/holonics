@@ -23,9 +23,10 @@ use num_traits::{One, Zero};
 use crate::hnn::HnnError;
 use crate::hnn::landmark::{
     Beta, Bundle, DigitsReading, FaceJoins, Feature, IdealLandmarks, JoinTree, LandmarkDeclaration,
-    LandmarkFace, Landmarks, Letter, LetterFamily, LocalLaw, StopMixture, StopPrior, address,
-    binary_log, carrier_width, cell_letters, choose_depth, choose_prior, code_length, face_bits,
-    ladder_top, letter_address, prequential, prior_family, tree_prequential,
+    LandmarkFace, Landmarks, Letter, LetterFamily, LocalLaw, PassageCode, StopMixture, StopPrior,
+    Widths, address, binary_log, carrier_width, cell_letters, choose_depth, choose_prior,
+    code_length, face_bits, ladder_top, lattice_mix, letter_address, prequential, prior_family,
+    ratio_code_length, tree_prequential,
 };
 use crate::hnn::ratio::log2_enclosure;
 use crate::hnn::receiving::grain_exponent;
@@ -648,15 +649,26 @@ fn landmark_prequential_partitions_the_cut() {
     assert_eq!(run.held_out.cells, 12);
     let mut tree = Landmarks::new(declared.clone()).unwrap();
     let mut sums = [Rat::zero(), Rat::zero(), Rat::zero(), Rat::zero()];
+    let mut products = [Rat::one(), Rat::one()];
     for (position, &cell) in cells.iter().enumerate() {
         let reading = tree.receive(&address(&cells, position, 2), cell).unwrap();
         let length = code_length(&reading.executed).unwrap();
         let part = 2 * usize::from(position >= 36);
         sums[part] += length.lower;
         sums[part + 1] += length.upper;
+        products[part / 2] *= &reading.executed;
     }
-    assert!(run.development.tree.lower <= sums[0] && sums[1] <= run.development.tree.upper);
-    assert!(run.held_out.tree.lower <= sums[2] && sums[3] <= run.held_out.tree.upper);
+    // The run encloses the faces' product (`PassageCode`): it meets the per-cell sum and the
+    // product's own code length, within `2^(−80)` bits.
+    for (part, coded) in [&run.development.tree, &run.held_out.tree]
+        .into_iter()
+        .enumerate()
+    {
+        let whole = code_length(&products[part]).unwrap();
+        assert!(coded.lower <= sums[2 * part + 1] && sums[2 * part] <= coded.upper);
+        assert!(coded.lower <= whole.upper && whole.lower <= coded.upper);
+        assert!(&coded.upper - &coded.lower <= rat_power(-80));
+    }
     assert_eq!(run.run.nodes, tree.nodes());
     assert_eq!(run.run.bits, tree.bits());
     assert!(run.run.largest_residual <= run.run.face_rule);
@@ -943,7 +955,8 @@ fn landmark_carrier_rebases_with_its_enclosure() {
 /// refused from 87,382 cells, where the β step's product `2W + κ + M_p + 1` passed 128 bits. At
 /// 131,072 cells the widths stay the rule's (`M_p = 48`, `W = 32`, never reduced), the carrier
 /// rebases at `R = 94` bits, and over the whole passage every cell's certified residual lies within
-/// the rule, which lies below half the declared grain; the declaration reaches `2^19` cells.
+/// the rule, which lies below half the declared grain; the declaration reaches `2^19` cells (and,
+/// with the split operands, `2^24`: `landmark_split_operands_are_the_single_division`).
 #[test]
 fn landmark_tree_declares_past_the_old_refusal_and_stays_within_the_grain() {
     let population = 131_072u64;
@@ -963,7 +976,7 @@ fn landmark_tree_declares_past_the_old_refusal_and_stays_within_the_grain() {
     );
     let rule = tree.face_rule();
     assert!(rule < rat(1, 32));
-    // The declaration reaches 2^19 cells before a lattice product itself passes 128 bits.
+    // The declaration reaches 2^19 cells.
     assert!(
         Landmarks::new(LandmarkDeclaration {
             population: 1 << 19,
@@ -1008,6 +1021,182 @@ fn landmark_tree_declares_past_the_old_refusal_and_stays_within_the_grain() {
         tree.receive(&address(&stream, 0, 4), 0),
         Err(HnnError::PopulationReached { .. })
     ));
+}
+
+/// **The split operands are the single division** (module header, "The lattice mixture and the
+/// stop weight read split operands"; Decision 35): at widths where the single division
+/// `(2^M λ̂ u + (2^M − λ̂) x v)/(2^M v)` passes `u128`, `lattice_mix` returns the nearest lattice
+/// numerator of `λ̂u/v + (1 − λ̂)x` (ties up, inside `[1, 2^M − 1]`), read exactly in `ℕ`; the stop
+/// weight decided before its division is the exact rounding of `2^M β/(1 + β)`; and the wide cut's
+/// `2^20` cells declare at `D = 1, …, 8`, where the single division's `2M_p + κ + 3` passed 128
+/// bits (133 at `D = 4`), up to `19,372,659` cells at `D = 4`, while the single divisions (the card
+/// kernel's) admit to `605,394`.
+#[test]
+fn landmark_split_operands_are_the_single_division() {
+    let mut draw = super::support::Draw::new(35);
+    for (population, depth) in [
+        (6_148u64, 4usize),
+        (1 << 20, 1),
+        (1 << 20, 4),
+        (19_372_659, 4),
+    ] {
+        let declared = LandmarkDeclaration {
+            population,
+            ..declaration(256, depth)
+        };
+        let widths = Widths::derived(&declared);
+        let full = 1u64 << widths.face;
+        for _ in 0..4_000 {
+            let stop = draw.next() % (full + 1);
+            let v = 2 + 2 * (draw.next() % (population + 1));
+            let u = 1 + 2 * (draw.next() % (v / 2));
+            let below = 1 + draw.next() % (full - 1);
+            let big = |x: u64| BigUint::from(x);
+            let numerator = ((big(stop) * big(u)) << widths.face as usize)
+                + big(full - stop) * big(below) * big(v);
+            let denominator = big(v) << widths.face as usize;
+            let rounded: BigUint = (numerator * 2u32 + &denominator) / (denominator * 2u32);
+            let expected = u64::try_from(rounded).unwrap().clamp(1, full - 1);
+            assert_eq!(lattice_mix(&widths, stop, u, v, below), expected);
+        }
+        for _ in 0..4_000 {
+            let bits = 1 + draw.next() % widths.carrier;
+            let odd = |x: u64| (x % (1u64 << bits)) | 1;
+            let reach = (widths.face + widths.carrier + 2) as i64;
+            let exponent = (draw.next() % (2 * reach as u64 + 1)) as i64 - reach;
+            let (beta, mantissa) = Beta::carry(
+                u128::from(odd(draw.next())),
+                u128::from(odd(draw.next())),
+                exponent,
+                widths.carrier,
+            );
+            assert!(mantissa.is_none());
+            let value = beta.value();
+            let lambda = &value / (Rat::one() + &value);
+            let scaled =
+                lambda * Rat::from_integer(BigInt::one() << widths.face as usize) + rat(1, 2);
+            let expected = u64::try_from(scaled.floor().to_integer()).unwrap();
+            assert_eq!(beta.stop_weight(widths.face, widths.carrier), expected);
+        }
+    }
+    let wide = |depth: usize| LandmarkDeclaration {
+        population: 1 << 20,
+        ..declaration(256, depth)
+    };
+    let widths = Widths::derived(&wide(4));
+    assert_eq!(
+        (widths.face, widths.carrier, widths.certificate),
+        (54, 35, 89)
+    );
+    assert_eq!(
+        2 * widths.face + 22 + 3,
+        133,
+        "the single division's operand"
+    );
+    assert!(widths.operand_bits(1 << 20) <= 128);
+    for depth in 1..=8 {
+        assert!(Landmarks::new(wide(depth)).is_ok(), "D = {depth}");
+    }
+    let at = |population: u64| {
+        Landmarks::new(LandmarkDeclaration {
+            population,
+            ..declaration(256, 4)
+        })
+    };
+    assert!(at(19_372_659).is_ok());
+    assert!(at(19_372_660).is_err());
+    // The single divisions (the card kernel's realization) admit to 605,394 cells and no further.
+    let single = |population: u64| {
+        Widths::derived(&LandmarkDeclaration {
+            population,
+            ..declaration(256, 4)
+        })
+        .single_division_admitted(population)
+    };
+    assert!(single(1 << 19) && single(605_394) && !single(605_395) && !single(1 << 20));
+}
+
+/// **A passage's code is its faces' product, enclosed once** (`PassageCode`, Decision 35): over
+/// dyadic sides, dyadic faces and faces with odd denominators (a KT face), the product's bounds hold
+/// the exact product between them, and its code length meets the exact product's enclosure within
+/// `f 2^(−125) + 2^(−95)` bits; two passages joined are their faces together; bounds compare as
+/// integers.
+#[test]
+fn landmark_passage_code_is_the_faces_product() {
+    let mut draw = super::support::Draw::new(20);
+    let mut code = PassageCode::new();
+    let (mut left, mut right) = (PassageCode::new(), PassageCode::new());
+    // The exact product, unreduced: the faces' numerators and denominators multiplied apart.
+    let (mut numerators, mut denominators) = (BigUint::one(), BigUint::one());
+    for index in 0..3_000u64 {
+        let face = match index % 3 {
+            0 => {
+                let bits = 1 + draw.next() % 62;
+                let side = 1 + draw.next() % ((1u64 << bits) - 1);
+                code.side(side, bits);
+                numerators *= side;
+                denominators <<= bits as usize;
+                Rat::new(BigInt::from(side), BigInt::one() << bits as usize)
+            }
+            1 => {
+                let digits = 1 + draw.next() % 7;
+                let mut numerator = BigUint::one();
+                for _ in 0..digits {
+                    numerator *= 1 + draw.next() % ((1u64 << 54) - 1);
+                }
+                let face = Rat::new(
+                    BigInt::from(numerator),
+                    BigInt::one() << (54 * digits) as usize,
+                );
+                code.face(&face).unwrap();
+                numerators *= face.numer().magnitude();
+                denominators *= face.denom().magnitude();
+                face
+            }
+            _ => {
+                let total = 1 + draw.next() % 5_000;
+                let count = draw.next() % (total + 1);
+                let face = rat(2 * count as i64 + 1, 2 * total as i64 + 256);
+                code.face(&face).unwrap();
+                numerators *= face.numer().magnitude();
+                denominators *= face.denom().magnitude();
+                face
+            }
+        };
+        if index % 2 == 0 {
+            left.face(&face).unwrap();
+        } else {
+            right.face(&face).unwrap();
+        }
+    }
+    let (numerator, denominator, exponent) = code.bounds();
+    let integer = |bound: &crate::hnn::landmark::ProductBound| {
+        BigUint::from(bound.mantissa) << bound.exponent as usize
+    };
+    // `∏ q = N/(D 2^E)`: `N` between its bounds, `D 2^E` between its bounds times `2^E`.
+    assert!(integer(&numerator[0]) <= numerators && numerators <= integer(&numerator[1]));
+    let scale = BigUint::one() << exponent as usize;
+    assert!(integer(&denominator[0]) * &scale <= denominators);
+    assert!(denominators <= integer(&denominator[1]) * &scale);
+    let bits = code.bits().unwrap();
+    let whole = ratio_code_length(&numerators, &denominators).unwrap();
+    assert!(bits.lower <= whole.upper && whole.lower <= bits.upper);
+    assert!(&bits.upper - &bits.lower <= rat_power(-90));
+    left.join(&right);
+    let joined = left.bits().unwrap();
+    assert!(joined.lower <= whole.upper && whole.lower <= joined.upper);
+    assert_eq!(left.factors(), 3_000);
+    assert!(numerator[0] <= numerator[1] && denominator[0] <= denominator[1]);
+}
+
+/// `2^e` as an exact rational.
+fn rat_power(exponent: i64) -> Rat {
+    let shift = exponent.unsigned_abs() as usize;
+    if exponent >= 0 {
+        Rat::from_integer(BigInt::one() << shift)
+    } else {
+        Rat::new(BigInt::one(), BigInt::one() << shift)
+    }
 }
 
 // -------------------------------------------------------------------------------------------

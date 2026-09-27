@@ -22,6 +22,14 @@ and provenance are exterior codec information and are not encoded.
 `hnn_exposure`). The held-out length is one mean aeon of the joint clock on uniform bytes,
 `⌈5·7·11·13·2^8 / (52 + 5·37 + 5·7·24)⌉` cells (the design's "Locks" row), set from the field,
 never from the data.
+
+    python3 research/notebook/hnn_design/standing_cut.py wide <population>
+
+writes the **wide cut** (THE_REBUILD Decision 35): the development stream's last `population`
+cells (a power of two, `2^20` by the notebook's memory derivation, `hnn_landmark -- … wide`), of
+which the final `population/8` are held out, into `.local/cuts/wide-real-cut.{bin,json}`. It holds
+the standing cut (both are the stream's tail), and the evaluation partition stays unread. Run from
+the main checkout, or set `HOLONICS_ROOT` to it.
 """
 
 import hashlib
@@ -36,6 +44,7 @@ ROOT = os.environ.get(
 SOURCE = os.path.join(ROOT, ".local", "datasets", "athena-alpha-exposure-2026-09-06.jsonl")
 OUT_DIR = os.path.join(ROOT, ".local", "cuts")
 NAME = "standing-real-cut-campaign-1"
+WIDE = "wide-real-cut"
 
 
 def mean_aeon_cells():
@@ -51,10 +60,18 @@ def family_bytes(record):
 
 
 def main():
-    if len(sys.argv) != 2:
+    arguments = sys.argv[1:]
+    if len(arguments) == 1:
+        name, population = NAME, int(arguments[0])
+        held_out = mean_aeon_cells()
+        rule = "one mean aeon of the joint clock on uniform bytes"
+    elif len(arguments) == 2 and arguments[0] == "wide":
+        name, population = WIDE, int(arguments[1])
+        assert population > 0 and population & (population - 1) == 0, "a power of two"
+        held_out = population // 8
+        rule = "one eighth of the population (Decision 35)"
+    else:
         sys.exit(__doc__)
-    population = int(sys.argv[1])
-    held_out = mean_aeon_cells()
     development = bytearray()
     counts = {"development": 0, "evaluation": 0, "deferred": 0}
     source_hash = hashlib.sha256()
@@ -70,9 +87,9 @@ def main():
     assert held_out < population <= len(development), "the development stream cannot hold the cut"
     cut = bytes(development[len(development) - population:])
     os.makedirs(OUT_DIR, exist_ok=True)
-    with open(os.path.join(OUT_DIR, NAME + ".bin"), "wb") as handle:
+    with open(os.path.join(OUT_DIR, name + ".bin"), "wb") as handle:
         handle.write(cut)
-    os.chmod(os.path.join(OUT_DIR, NAME + ".bin"), 0o600)
+    os.chmod(os.path.join(OUT_DIR, name + ".bin"), 0o600)
     manifest = {
         "schema": "holonics.standing-cut.v2",
         "source": os.path.relpath(SOURCE, ROOT),
@@ -81,15 +98,19 @@ def main():
         "development_stream_bytes": len(development),
         "population": population,
         "held_out_range": [population - held_out, population],
+        "held_out_rule": rule,
         "from": "development stream tail; the final held_out_range cells held out",
         "cut_sha256": hashlib.sha256(cut).hexdigest(),
+        "development_sha256": hashlib.sha256(cut[: population - held_out]).hexdigest(),
+        "held_out_sha256": hashlib.sha256(cut[population - held_out:]).hexdigest(),
     }
-    path = os.path.join(OUT_DIR, NAME + ".json")
+    path = os.path.join(OUT_DIR, name + ".json")
     with open(path, "w") as handle:
         json.dump(manifest, handle, indent=2)
     os.chmod(path, 0o600)
     print(json.dumps({key: manifest[key] for key in ("families", "development_stream_bytes",
-                                                      "population", "held_out_range", "cut_sha256")}))
+                                                      "population", "held_out_range", "cut_sha256",
+                                                      "development_sha256", "held_out_sha256")}))
 
 
 if __name__ == "__main__":

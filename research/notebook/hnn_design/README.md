@@ -107,6 +107,13 @@ held out, and the evaluation partition is not read (it stays unspent for step 8'
 `cut-file <path>` runs campaign 1's exposure on it, reading the held-out range from the manifest;
 the pinned public text is the notebook's development control. The cut's hashes are recorded in #73.
 
+**The wide cut** (THE_REBUILD Decision 35). `standing_cut.py wide 1048576` writes the development
+stream's last `2^20` cells, the final `2^17` held out (one eighth), to `.local/cuts/wide-real-cut.*`
+(mode 0600), with the whole cut's, the development part's and the held-out part's hashes in its
+manifest. It holds the standing cut as its tail, so the standing cut's cells (development and
+held out alike) lie in the wide cut's held-out range, and the evaluation partition stays unread.
+`2^20` is the largest power of two within the memory cap (`hnn_landmark -- … wide`, stage 0).
+
 `hnn_diagnose.rs` locates campaign 1's failure on the standing cut (review E1: the located cause
 before campaign 2). It runs the exposure protocol step for step through the host reference's
 `ExecutionPort` and reads between the port's methods, so it changes no law and adds no accessor; it
@@ -218,6 +225,50 @@ once only for a law whose charged development code lies below the tree:
 cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin local
 ```
 
+Its `wide` mode is Decision 35's measurement on the wide cut (above, beside the standing cut),
+given the standing cut, which must be its tail. Every code is a population's faces' product enclosed once
+(`landmark::PassageCode`), and the laws are streamed, so nothing per digit is kept but the `½`
+tree's splits, the global ladder's and the Born members'. In order:
+- **0. the memory**: the `½` tree's live bytes a node and the baselines' a cell, measured on the
+  standing cut by the harness's counted allocator; the resident bound
+  `3 (n B D + 2^B − 1)` bytes a node `+ n` bytes a cell (the tree and the two-law stop mixture's
+  two trees at the a-priori node bound, and the baselines) at the standing cut's `D = 4`, for
+  every power of two the development stream holds; the largest within Brandon's 20 GB cap, which
+  the pinned cut must be; and at that population the deepest depth within the cap, which bounds
+  every depth sweep (`choose_depth_within`, `choose_prior_within`). Each parallel stage runs on the
+  workers the memory admits;
+- **1. the depth** and **2. Decision 32's family** (every law with its own sweep) on the
+  development cells;
+- **3. the faces at the chosen depth**: the `½` tree, every other law streamed (its code in all
+  and per dyadic cell, its oracles at the digit and cell grains, its incumbent joins at every rung,
+  executed), and the Born family within the cost bound and the receiver's carrier, each member on
+  its own thread; the oracles and the least stop law in every unit;
+- **4. the development decisions**: the Born face alone, and Decision 34's three local laws, each
+  charged, each refused when its oracle's gain does not exceed its price (the `local` mode's
+  rule); the whole family mixed per digit tree is read ideally, not as a member (its
+  `StopMixture` would hold one tree a law);
+- **5. the held-out pass, once**: the `½` tree (its whole passage's widths, operand bits,
+  rebases, drift, rule, largest certified residual, nodes and live bytes: the scale checks), the
+  baselines, Decision 32's choice when it is not `½`, each local law whose charged development
+  code lies below the tree, and Decision 34's adopted law (`½` with `(1, 3)` at `π_½ = ½`,
+  declared before the wide cut: a family of one) unless it is the stop choice, each read on the
+  development and held-out cells and on the standing cut's two parts within them;
+- **6. the standing cut alone**, beside the same cells read at the wide cut's standing.
+
+`wide-adopted` runs stage 0's derivation, the depth and then only the whole passage of the `½`
+tree, the baselines and the adopted law.
+
+```sh
+cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/wide-real-cut.bin wide .local/cuts/standing-real-cut-campaign-1.bin
+cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/wide-real-cut.bin wide-adopted .local/cuts/standing-real-cut-campaign-1.bin
+```
+
+Run on the standing cut as both cuts, the `wide` mode reproduces the `prior` and `local` modes'
+receipts: `½` chosen of 256 laws (11 bits), the node-local `j = 2` with `Dyadic` `χ = 1` at
+`−61 + 11/16`, the stop mixture `½` with `(1, 3)` at `π_½ = ½` at `−133 + 7/16`, switching at
+`α = 2^(−7)` with `Dyadic` `χ = 256` at `−106 + 9/16`, and held out the tree `3677 + 12/16`, the
+stop mixture `3659 + 8/16`, node-local `3685 + 15/16` and switching `3681 + 0/16`.
+
 
 `hnn_born.rs` measures the Born receiver (THE_REBUILD Decision 33, `holonics::hnn::born`, Lean
 `HNN/BornFace`) on the standing cut's development cells, beside the landmark tree's current law
@@ -227,8 +278,11 @@ cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/s
 landmark β chart). The declared family is both emissions (`Position`: a pair of operators per digit
 position; `Dyadic`: a pair per dyadic cell, the tree's forced split) at every register width
 `χ = 2^j`, `j ≤ J`, the cost bound (`14·4^J·B·n_dev ≤ 2^37` complex products a passage: `J = 8`),
-charged `⌈log₂⌉` of the members tried. The choice is the least charged development mixture; a held-out
-pass runs only if it codes below the tree by disjoint enclosures. It prints each member's widths,
+stopping before a width the receiver's carrier refuses at the declared population (at `n* = 2^20`
+the solve's residual needs 128 bits at `χ = 32`), charged `⌈log₂⌉` of the members tried; each
+population's faces are multiplied and enclosed once (`landmark::PassageCode`). The choice is the
+least charged development mixture; a held-out pass runs only if it codes below the tree by
+disjoint enclosures. It prints each member's widths,
 code lengths at the grain, the orderings mixture − tree and Born − tree, `log₂ β`, the receiver's
 chart receipts (the solve's refinements and certificate, the preconditioner's refreshes, the
 state's rebases) and the wall time a digit:
@@ -255,8 +309,9 @@ a build with overflow checks reproduced every reading. A digit costs, `Dyadic`: 
 at `χ = 256` (`Position` `1175 rem 6800 over 39664`); the harness took 168,717 ms.
 
 `exterior.rs` is the notebook's shared exterior boundary: the cut file and its manifest
-(`read_cut`) and the exact presentation of readings. `hnn_exposure`, `hnn_diagnose`,
-`hnn_landmark` and `hnn_born` include it by `#[path]`.
+(`read_cut`, `manifest_number`), the host's memory (`resident_set`, `memory_available`, read from
+the kernel's status for the `wide` mode's workers and receipts) and the exact presentation of
+readings. `hnn_exposure`, `hnn_diagnose`, `hnn_landmark` and `hnn_born` include it by `#[path]`.
 
 `field.py` is the exact reference of the revised tick: the junction Swing (a parallel adaptor), the
 Cayley ring element with its passive part `W_s` and its contrast port `W_c` driving inside the

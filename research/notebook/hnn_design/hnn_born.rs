@@ -17,6 +17,11 @@
 //!   stopped the `Dyadic` emission at `χ = 2`, whose code sat above `χ = 1`'s, while the `Position`
 //!   emission kept falling to `χ = 256`; nothing establishes that the code is unimodal in `χ`, so
 //!   no early stop is declared);
+//! - **the carrier**: a width whose derived lattices pass the receiver's `i128` carrier at the
+//!   declared population is refused (`BornWidths::derived`), and the family stops before it (at the
+//!   wide cut's `n* = 2^20` the solve's residual needs 128 bits at `χ = 32`, above the 126 admitted);
+//! - **the code lengths**: each population's faces multiplied and enclosed once
+//!   (`landmark::PassageCode`);
 //! - **the cost bound `J`**: a digit costs `2χ²` complex products to read (the pair's images) and
 //!   about `12χ²` to deposit (the Gram, the preconditioner, the solve and its refinements, the two
 //!   rank-one steps), so a development passage of `B·n_dev` digits costs `14χ² B n_dev` products;
@@ -55,7 +60,7 @@ mod exterior;
 use std::time::Instant;
 
 use holonics::hnn::born::{Born, BornDeclaration, BornReport, Emission};
-use holonics::hnn::landmark::{LandmarkDeclaration, Landmarks, LetterFamily, address, code_length};
+use holonics::hnn::landmark::{LandmarkDeclaration, Landmarks, LetterFamily, PassageCode, address};
 use holonics::hnn::ratio::interval_sum;
 use holonics::hnn::receiving::{Mixture, MixtureStep, landmark_declaration_with};
 use holonics::hnn::{Field, FieldDeclaration};
@@ -68,10 +73,6 @@ use exterior::{against, difference, enclosure, exact, per, read_cut, receiver_gr
 
 /// The cost bound's declared work: `2^37` complex products a development passage.
 const WORK: u128 = 1 << 37;
-
-fn zero() -> ExactInterval {
-    ExactInterval::point(Rat::from_integer(BigInt::from(0)))
-}
 
 fn charged(bits: &ExactInterval, description: u64) -> ExactInterval {
     interval_sum(
@@ -131,8 +132,11 @@ fn pass(
     let wall = Instant::now();
     let mut born = Born::new(declaration.clone()).expect("a Born declaration");
     let mut mixture = Mixture::new(carrier);
-    let (mut born_sum, mut tree_sum, mut mixture_sum) =
-        ([zero(), zero()], [zero(), zero()], [zero(), zero()]);
+    let (mut born_sum, mut tree_sum, mut mixture_sum) = (
+        [PassageCode::new(); 2],
+        [PassageCode::new(); 2],
+        [PassageCode::new(); 2],
+    );
     let mut counts = [0u64; 2];
     let mut born_ms = 0u128;
     for (position, &cell) in cells.iter().enumerate() {
@@ -143,12 +147,9 @@ fn pass(
         let tree = &trees[position];
         let weight = mixture.weight();
         let mixed = &weight * tree + (Rat::one() - &weight) * &face;
-        born_sum[part] = interval_sum(&born_sum[part], &code_length(&face).expect("bits"))
-            .expect("an enclosure");
-        tree_sum[part] =
-            interval_sum(&tree_sum[part], &code_length(tree).expect("bits")).expect("an enclosure");
-        mixture_sum[part] = interval_sum(&mixture_sum[part], &code_length(&mixed).expect("bits"))
-            .expect("an enclosure");
+        born_sum[part].face(&face).expect("a positive face");
+        tree_sum[part].face(tree).expect("a positive face");
+        mixture_sum[part].face(&mixed).expect("a positive face");
         mixture
             .step(&MixtureStep {
                 ring,
@@ -159,10 +160,11 @@ fn pass(
             .expect("a positive step");
         counts[part] += 1;
     }
+    let bits = |codes: [PassageCode; 2]| codes.map(|code| code.bits().expect("an enclosure"));
     Pass {
-        born: born_sum,
-        tree: tree_sum,
-        mixture: mixture_sum,
+        born: bits(born_sum),
+        tree: bits(tree_sum),
+        mixture: bits(mixture_sum),
         cells: counts,
         born_ms: born_ms / 1000,
         wall_ms: wall.elapsed().as_millis(),
@@ -324,7 +326,7 @@ fn main() {
     println!("the tree's development passage: {tree_ms} ms; its β carrier W = {carrier}");
     println!();
 
-    // The family: both emissions at every declared width within the cost bound.
+    // The family: both emissions at every declared width within the cost bound and the carrier.
     let mut runs: Vec<(BornDeclaration, Pass)> = Vec::new();
     for emission in [Emission::Position, Emission::Dyadic] {
         for order in 0..=bound {
@@ -335,6 +337,14 @@ fn main() {
                 population: count as u64,
                 grain,
             };
+            if let Err(refusal) = Born::new(declaration.clone()) {
+                println!(
+                    "{} χ = {} is refused by its carrier at n* = {count}: {refusal}; the family stops there",
+                    name(emission),
+                    declaration.width
+                );
+                break;
+            }
             let run = pass(
                 &development,
                 &never,
