@@ -1,0 +1,207 @@
+# Egg packing: the moiré of two helices is a torus knot, and the trefoil is the half-turn with the third-turn
+
+**Date:** 2026-09-27. **Occasion:** Brandon, after a walk:
+- the Hügelschäffer egg as the abstract potential object;
+- "fractal packing" into complete objects "like Smith Charts";
+- eggs, tubes and tori as one object seen in different frames;
+- entropic lenses (integrator and differentiator; orientability, Möbius);
+- trees, spinal laminae and carcinization as lenses that distribute energy;
+- eyes (ommatidia, spider and human eyes), hair and skin as sensors, spider mechanosense and webs;
+- moiré and Turing patterns;
+- *egg packing*: "a prompt can be like the genetics of an egg … its life ending after the
+  production of decodable information that is a response";
+- fractal navigators, and currents in free fall;
+- the question: "what do the Moire patterns look like when you make them about gyroparallelograms
+  and intersecting eggs like pairs of toroids/helices? … projections of trefoil knots like twisted
+  Mobius strips … that image actually also works for solving the faces of Rubik's cubes".
+
+Refs #73, #62. **Grades:**
+- **`proved-derived`:** statements checked exactly in this session. The script and its outputs are
+  receipts, not formal checks.
+- **`established-classical`:** statements with their sources, not formalized here.
+- **`agent-inferred`:** the joins to the objects.
+
+## Already in the library
+
+- **Torus knots and bands.** `Geometry/HolonicTorusKnots`: a coprime slope `(p, q)` is an embedded
+  circle in the geometric two-torus (`torusSlopeMap_isEmbedding_of_coprime`). The boundary of a band
+  with an odd number `m` of half-twists has slope `(2, m)`
+  (`oddHalfTwist_boundary_isTorusKnotEmbedding`), so three half-twists give the `(2, 3)` knot, the
+  trefoil.
+- **Farey neighbours.** `Farey.lean`: the Stern–Brocot generators are unimodular, and the mediant
+  condition is unimodularity (`theMediantConditionIsUnimodularity`).
+- **The gyroparallelogram.** `Geometry/Gyrogroup.additive_gyroparallelogram`.
+- **The hexagon** ([record](2026-07-25_THE_HEXAGON_CARRIES_TWO_AND_THREE_THE_MESH_BENDS_THE_RECEIVERS.md)):
+  six is the first polygonal carrier of both two and three, and a cube seen along its body diagonal
+  has a hexagonal silhouette. The same record holds the embodied optical receiver atlas and the
+  ommatidial axes in triangulated curvature.
+- **The egg.** It is a torus whose shape is a boost, with its neck the null cone
+  ([record](2026-09-24_THE_EGG_IS_A_TORUS_WHOSE_SHAPE_IS_A_BOOST_AND_ITS_NECK_IS_THE_NULL_CONE.md)).
+  It is two rings in relative motion, and the shadow is the receiver's kernel
+  ([record](2026-09-26_THE_SHADOW_IS_THE_RECEIVERS_KERNEL_AND_THE_EGG_IS_TWO_RINGS_IN_RELATIVE_MOTION.md)).
+- **The rings.** The HNN's ring tick is a Cayley step (`Holon/Cayley`). A contact's lock address is
+  the least-denominator rate in its fibre. The moiré terrain is `holarchy::terrain`, with the
+  record [§5–6](2026-09-27_THE_HOLARCHY_AND_ITS_AEONS_ARE_THE_TOP_THE_DECISIONS_DISSOLVE_INTO_THEIR_OWNERS_AND_LEARNING_IS_PROTOTYPED_WHERE_A_HOLARCHY_MADE_THE_TERRAIN.md).
+
+## 1. The moiré of two helices on the joint clock
+
+Two rings are two helices: circles with carry. Their joint clock is a torus, the Holarchy's
+parametric orientation. A ring's path on it with windings `(a, b)` is a closed geodesic, and its
+Moiré against another path `(c, d)` is their crossing pattern.
+
+- **The cells are the parallelogram** (`proved-derived`, counted exactly on seven pairs): two
+  closed geodesics of slopes `(a, b)` and `(c, d)` cross in exactly `|ad − bc|` points. That is the
+  area of the parallelogram their windings span, the flat gyroparallelogram. The moiré's cells
+  are these crossings, and the determinant counts them.
+- **One cell is a lock** (`proved-derived`, exact on eight pairs): `|ad − bc| = 1` exactly when
+  `a/b` and `c/d` are Farey neighbours.
+  - Their Ford circles (centre `h/k + i/(2k²)`, radius `1/(2k²)`) are tangent exactly then.
+  - In general they stand apart by `dx² − 4r₁r₂ = (det² − 1)/(kK)²`. For example, `1/3` and `3/4`,
+    with `det = −5`, stand apart by `1/6`.
+  - So the bright moiré (the lock, the least-denominator address), the one-cell parallelogram and
+    the tangent packing are one condition.
+- **The knot** (`established-classical`; Rolfsen, *Knots and Links*, §3.C): a pair with rates
+  `p : q` coprime traces the `(p, q)` torus knot. Its crossing number is
+  `min((p − 1)q, (q − 1)p)`, which is 3 for the trefoil `(2, 3)`.
+  - Its projection is the picture Brandon describes.
+  - It is also the boundary of a band with three half-twists, a twisted Möbius strip, which is
+    formal here (`oddHalfTwist_boundary_isTorusKnotEmbedding`).
+
+## 2. The trefoil is the half-turn with the third-turn
+
+`established-classical`:
+- **The modular group.** `PSL(2, ℤ) ≅ ℤ/2 ∗ ℤ/3` (Serre, *A Course in Arithmetic*, VII.1). It is
+  freely generated by `S : z ↦ −1/z`, of order 2, and `ST : z ↦ −1/(z + 1)`, of order 3. It acts
+  transitively on the rationals with ∞, and it preserves the Farey tessellation, whose edges join
+  neighbours. Its words are the Stern–Brocot descents (`Farey.lean`).
+- **The trefoil's group.** The trefoil complement has group `⟨x, y | x² = y³⟩`, the braid group
+  `B₃`. Its quotient by the centre `⟨x²⟩` is `PSL(2, ℤ)`.
+- **Rubik's cube.** Its orientation classes are an edge flip (`ℤ/2`) and a corner twist (`ℤ/3`,
+  about the body diagonal). They satisfy `Σ flips ≡ 0 mod 2` and `Σ twists ≡ 0 mod 3`, which gives
+  the factors `2¹¹` and `3⁷` of `|G| = 2²⁷·3¹⁴·5³·7²·11` (Joyner, *Adventures in Group Theory*).
+  Along the body diagonal the cube's silhouette is the hexagon, the first two-three carrier (July
+  25 record).
+
+The join (`agent-inferred`):
+- The half-turn is the Swing: `S_a x = 2a − x`, `e^{iπ}`, of order 2. The third-turn is the corner
+  twist.
+- The group they generate freely is the modular group, whose tessellation holds the rings' lock
+  addresses. Its central extension is the trefoil's group.
+- So the trefoil drawn by two rings at `2 : 3` on the joint clock is the figure where the half-turn
+  and the third-turn meet. Solving a cube's faces returns its `ℤ/2` and `ℤ/3` classes to zero.
+  Locating a ring pair's lock is a descent in the same tessellation.
+
+That is why the image serves both.
+
+## 3. The Smith chart is the Cayley packing
+
+- **The chart is the ring's Cayley step** (`established-classical`; the Smith chart is the Cayley
+  transform `Γ = (Z − 1)/(Z + 1)` of normalized impedance). The half-plane of passive impedances
+  maps to the unit disk, and every line and circle maps to a circle.
+  - The HNN's ring tick is the same Cayley map on the port.
+  - The junction's returned wave is the reflection, `s′ = e − (2/Y)ω` (Decision 38's law, now in
+    `hnn::ring`).
+  - So the Smith chart is the scattering chart of every ring port.
+- **The Farey horocycles pack the chart completely** (`proved-derived` and classical; Ford, *Amer.
+  Math. Monthly* 45, 1938).
+  - The Cayley map `w = (z − i)/(z + i)` sends the real axis onto `|w| = 1` exactly, and each Ford
+    circle to a horocycle tangent to the boundary at its rational's image.
+  - Every rational has one horocycle, and two are tangent exactly when their rationals are
+    neighbours.
+  - This is Brandon's "fractal packing into complete objects like Smith Charts": the Farey
+    packing, carried by the ring's own Cayley map, fills the disk of passive reflections.
+
+## 4. Egg, tube and torus are one object in different frames
+
+- **Inversion** (`established-classical`; Dupin cyclides, the conformal images of tori, cylinders
+  and cones). A Möbius inversion is the circle's version of the Swing. It maps:
+  - a torus to a ring cyclide;
+  - a cylinder, inverted about a point of its axis, to a horn torus pinched at one point, which is a
+    neck.
+
+  It exchanges interior and exterior.
+- **Frames** (`agent-inferred`, joined to the September 24 record's boost). Under these frames the
+  open tube, the pinched neck and the closed egg are one object.
+  - The tube is open to its exterior only in the frame that sends its end to infinity, as Brandon
+    says of the tube "ultimately apart of the interior of another egg".
+  - Convex becomes concave under the exchange.
+  - So the integrator (flux converging inward: the enclosed sources, by divergence) and the
+    differentiator (flux diverging outward) are the two frames of one surface. Which one is read
+    is the orientation of the flux relative to the surface.
+- **Orientation lives only in the pairing** (CLAUDE.md's Holon table). On a Möbius band there is no
+  global outward normal, so the flux's sign is read only through a declared pairing. The band with
+  three half-twists bounds the trefoil (§1).
+
+## 5. Lenses: eyes, hair, webs and patterns
+
+Each organ below is a receiver with its own kernel, its shadow. "The structures are specific kinds
+of lenses": each is a declared receiver, not a ring eyeballed at a scale. `established-classical`
+with sources; the joins are `agent-inferred`.
+- **Ommatidia.** A compound eye's facets are hexagonal, the two-three carrier (July 25 record). Each
+  facet's aperture `D` blurs by diffraction at about `λ/D`, against the angle between facets. The
+  eye's design balances the two (Snyder, 1977; Land and Nilsson, *Animal Eyes*, 2012).
+  - A closed hexagonal mesh needs twelve pentagons by Euler's formula. The eye's curvature is
+    carried by its defects.
+- **Jumping spiders.** The principal eyes have a layered retina and judge depth by image defocus
+  between layers (Nagata et al., *Science* 335, 2012). Past research on salticids is in the July
+  13, July 22 and August 5 records and the laboratory's `src/holo-bits/SPIDER.md`.
+  - The defocus is a lens read at two sections, a difference of faces.
+- **Hair and skin.** A hair is a cantilever, and its nerve reads the base moment `M = ∫ x f(x) dx`.
+  That is one linear face of the distributed load: the collapsed signal. Its kernel is every load
+  with zero first moment.
+  - A partition of skin carrying many hairs reads a family of moments, and the stimulus is recovered
+    up to that family's kernel: the moment problem.
+  - This is the HNN's source entering as moments (`SourceMoment`).
+  - Spider trichobothria and slit sensilla are the arthropod instances (Barth, *A Spider's World*,
+    2002). A web extends the receiver: its joints and threads transport vibration to the legs.
+- **Laminae, trees and carcinization.** Each is a declared way of distributing force or flux
+  across joints: a lens in the same sense. Carcinization is a repeated convergence of form (crab
+  bodies evolved several times). Brandon's reading, that such bodies "enable joints for energy to
+  diffuse in more complex patterns", is a hypothesis to be stated as a receiver and tested.
+- **Turing patterns.** A reaction–diffusion system selects a band of unstable modes of its
+  linearized operator (Turing, 1952). The pattern is the fastest-growing mode. In the objects it is
+  a pumped parametron selecting its mode (the Ising lock) over a diffusive contact field.
+
+## 6. Egg packing: generation is the adjoint of key location
+
+Brandon: "a firework or a bomb that goes off in perfectly orchestrated patterns … a prompt can be
+like the genetics of an egg". `agent-inferred`:
+- **A burst is a packed pattern.** Ballistic free fall is affine: every star of a firework's shell
+  moves by the same law. So the burst is the shell's arrangement, dilated and falling. The pattern
+  must be packed into the initial arrangement, because the transport cannot invent it.
+- **In the objects:**
+  - the prompt is encoded into the navigators' initial configuration: the key, the egg's genome;
+  - the hatching is the native transport, the currents in free fall that continue until a contact
+    or a dissipation opposes them (the Holon as a continuing current);
+  - the response is the release at tolerance, decodable by the receiver;
+  - the law is `decode(T_native(encode x)) = T(x)`.
+- **Learning and generation are adjoint.** Learning locates keys from what was received (the
+  Bombe's loop closure). Generation packs keys so that the transport emits the requested pattern.
+  They are one relation read in opposite directions.
+- **Why the curves end** (`agent-inferred`): "fractal if not curved". The fractal navigator's
+  family (words, restrictions, the scale square) is unbounded. Physical curvature bounds it:
+  dissipation, finite capacity (the receiving tree's register carries at its ceiling), and the
+  release at tolerance. So what emanates is a truncated fractal whose truncation is its curvature.
+- **Intelligence as intersecting currents.** Reception changes both participants and returns a
+  receipt, `I_C(|H_S⟩, |H_R⟩) = (|H'_S⟩, |H'_R⟩, f_R)`. What leaves an intersection is a new
+  current, not the one that entered. Brandon: "what emanates is also in free-fall but it is not
+  the same thing from prior to an intersection".
+
+## 7. What this asks of the construction
+
+The rings' next construction (THE_REBUILD, Order item 3) becomes the moiré on the joint clock:
+- **A tick's class is its cell** among the `|ad − bc|` crossing cells of the rings' paths. The
+  terrain's parity color is the two-coloring of those cells.
+- **A pair's lock is a modular-group word.** Locating it is a Stern–Brocot descent in the Farey
+  tessellation. Each step is a half-turn or a translation, and the unimodular steps are proved in
+  `Farey.lean`.
+- **Phases come from the parity relations** on the torus, the Bombe for a moiré.
+- **Generation is egg packing.** Encode the requested response into the rings' keys, so that the
+  transport emits it.
+- **The gauge is the terrain's truth.** The moiré's code should fall toward its key description
+  (30 bits on the first terrain, against the tree's `993 + 5/16 + ε`).
+
+Owed in #62 (Lean):
+- the crossing count of two torus geodesics, `|ad − bc|`;
+- the Ford separation `(det² − 1)/(kK)²` and its tangency;
+- `PSL(2, ℤ) ≅ ℤ/2 ∗ ℤ/3` joined to `Farey.lean`'s generators and to the Swing.

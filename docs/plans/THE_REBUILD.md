@@ -49,7 +49,12 @@ sets the order:
      first rise (`agent-inferred`: a zero-rate terrain's code can plateau before it falls);
    - the tree memorizes a moiré at about 30 times its key description. The rings are measured
      there next. That needs parallel gratings, a declared plugboard for the rate, and a parity
-     menu for the Bombe;
+     menu for the Bombe. The construction is stated on the joint clock in
+     [egg packing](../../research/records/2026-09-27_EGG_PACKING_THE_MOIRE_OF_TWO_HELICES_IS_A_TORUS_KNOT_AND_THE_TREFOIL_IS_THE_HALF_TURN_WITH_THE_THIRD_TURN.md#7-what-this-asks-of-the-construction) §7:
+     - a tick's class is its crossing cell (`|ad − bc|` of them);
+     - a lock is a modular-group word located by Stern–Brocot descent;
+     - phases come from parity relations;
+     - generation packs the response into the keys;
 4. then continue campaign 3.
 
 The standing cut has been reused for development and lies within the wide cut's held-out range.
