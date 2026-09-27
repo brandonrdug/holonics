@@ -792,7 +792,10 @@ softmax(a,b)_1 = σ(a − b).
 ```
 
 Normalization keeps the complete ratio family `r_ij`, one per two for every pair, and forgets
-only the common additive origin, which is a gauge. Its local return is a weighted graph
+only the common additive origin, which is a gauge. Bayes is this normalization of `log p + log L`: it translates every
+`log r_ij` by `log(L_i/L_j)`, which is two Swings, and the Laplacian return is the categorical
+family's Fisher information. The receiving storage's mixture over candidates is the same update, the
+discrete replicator ([probability as a receiver geometry](RECEIVER_HOLARCHY.md#probability-is-a-receiver-geometry)). Its local return is a weighted graph
 Laplacian, and sigmoid is its two-member restriction. Neither needs sampling or a privileged
 winner. In the loss, `p−q` is the real codec-chart part of the Holon ratio's covector `R⁻¹dR`
 ([ratio](ELEMENTARY_OBJECTS.md#9-ratio)). Owners:

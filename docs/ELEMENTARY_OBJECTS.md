@@ -729,6 +729,32 @@ optimal plan is a Pareto frontier over (description bits, work, time, peak space
 under a random-access deadline; no single optimum is proved, AGM is `O(M(N) log N)`, the only proven
 lower bound is Ω(N), and base-10 log-space extraction is open.
 
+### The egg: a generator read as a whole
+
+[definition; agent-inferred] Brandon's **egg** is a composition of the objects, not a new object. It
+is a navigator with its initial configuration, the constitution it runs in, and the receiver
+family that reads its faces, read together as one generator of faces.
+- **Its genome** is the navigator's initial configuration and its self-delimiting description.
+- **Its phenotype** is the faces it emits.
+- **A species** is the class of eggs that every admitted future receiver reads alike. It is the
+  face map's quotient over generators (`compression::FaceMap`), the retention quotient taken over
+  generators instead of states.
+- **A population** is a receiver's mixture over candidate eggs. It is updated by Bayes, which is the
+  discrete replicator with the likelihood as fitness, and a translation in the ratio's additive
+  chart. The receiving tree's mixture over candidate standings is its first instance
+  (`Compression/Landmark/Context/Standing.mixture_over_leaf_standings`).
+- **Birth** is founding (FOUND, from a cokernel residual), with a declared prior and its description
+  cost.
+- **Death** is zero likelihood or a lawful release. A poor positive likelihood only loses weight.
+- **Generation is egg packing.** The requested consequence is packed into the keys, and the native
+  transport emits it: `decode(T_native(encode x)) = T(x)`.
+
+The geometry of the population's faces is the receiver's
+([RECEIVER_HOLARCHY, "Probability is a receiver geometry"](RECEIVER_HOLARCHY.md#probability-is-a-receiver-geometry)).
+Records: [egg packing](../research/records/2026-09-27_EGG_PACKING_THE_MOIRE_OF_TWO_HELICES_IS_A_TORUS_KNOT_AND_THE_TREFOIL_IS_THE_HALF_TURN_WITH_THE_THIRD_TURN.md),
+[the genome](../research/records/2026-09-27_THE_EGG_IS_A_GENERATORS_GENOME_SELECTION_IS_BAYES_AND_THE_FACES_OF_INTEGERS_ARE_MOIRES_OF_GRATINGS.md),
+[the geometry](../research/records/2026-09-27_PROBABILITY_IS_A_RECEIVER_GEOMETRY_BAYES_IS_THE_RATIOS_TRANSLATION_AND_THE_EGGS_PERIOD_IS_HYPERGEOMETRIC.md).
+
 ## The targets
 
 [project-postulate] RH, Hodge, complex Euler/Navier–Stokes and BSD are targets of compression and

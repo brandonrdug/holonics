@@ -1,11 +1,13 @@
 # The rebuild
 
-**Status: active, September 26.** Tracked in #63. Steps 0–3 are built. Campaign 1
+**Status: active, September 27.** Tracked in #63. Steps 0–3 are built. Campaign 1
 meets its standing-cut criterion; campaign 2's laws and host/card parity pass, while its predictive
 criterion fails. The compacted landmark tree (`compression::landmark::context`) and the loaded
 resonator/adjoint (`hnn::ring`) run on host and card. The fixed loaded source-ring family does not improve the
-standing-cut prediction. Campaign 3's future-mode quotient is the immediate work; campaigns 3–5
-remain consumer work. Step 6's finite physics and
+standing-cut prediction. The HNN's receiving storage is a population of candidate standings under
+Bayesian selection. Its extension to a population of eggs (candidate generator families) on
+terrain whose truth is known is the immediate work. Campaigns 3–5 are that population's birth,
+death and dormancy (3), its motor chart (4), and its species and generation (5). Step 6's finite physics and
 step 7's first curation pass are built; equation extraction (#146), remaining curation (#147) and
 applications (#148) remain open.
 
@@ -60,7 +62,17 @@ sets the order:
        selecting the family that made the terrain
        ([record §9](../../research/records/2026-09-27_THE_EGG_IS_A_GENERATORS_GENOME_SELECTION_IS_BAYES_AND_THE_FACES_OF_INTEGERS_ARE_MOIRES_OF_GRATINGS.md#9-what-it-asks-of-the-construction));
        an arithmetic terrain (products and primes in bases 2, 6, 10 and 16) follows;
-4. then continue campaign 3.
+4. **the egg population** (September 27; [ELEMENTARY_OBJECTS, the egg](../ELEMENTARY_OBJECTS.md#the-egg-a-generator-read-as-a-whole),
+   [RECEIVER_HOLARCHY, probability](../RECEIVER_HOLARCHY.md#probability-is-a-receiver-geometry),
+   [record](../../research/records/2026-09-27_PROBABILITY_IS_A_RECEIVER_GEOMETRY_BAYES_IS_THE_RATIOS_TRANSLATION_AND_THE_EGGS_PERIOD_IS_HYPERGEOMETRIC.md)). The receiving storage's mixture over candidate
+   standings extends to a mixture over candidate navigator families (tree sources, moiré gratings,
+   rotor keys). Each family has its description, decoder, gauge fibre and prequential likelihood,
+   and Bayes (the replicator) weighs them. On `holarchy::terrain` it is gauged by selecting the
+   family that made the terrain, with each family's charged code against the source's exact code
+   and its key description. The arithmetic terrain (digit convolution and carry, cheap residue
+   faces, prime gratings) follows through the same owner. The real cut stays each campaign's
+   acceptance;
+5. then continue campaign 3 as the population's birth, death and dormancy.
 
 The standing cut has been reused for development and lies within the wide cut's held-out range.
 These are development receipts. The dataset's separate evaluation partition remains unspent.
@@ -292,7 +304,11 @@ archive root. Brandon's Metal port stays on its own branch, `codex/apple-silicon
    scale:
    - its retention is step 3's kernel quotient, taken at aeon boundaries;
    - its learning is locating keys and depositing covectors;
-   - its release is the split between resonating and emanating.
+   - its release is the split between resonating and emanating;
+   - its receiving storage is a population of candidate standings, and later of candidate eggs,
+     under Bayesian selection. Bayes is the ratio's translation and the discrete replicator, and
+     the population's faces carry the receiver's probability geometry
+     ([RECEIVER_HOLARCHY](../RECEIVER_HOLARCHY.md#probability-is-a-receiver-geometry)).
 
    Its field is closing rings of parametrons joined by pair contacts. It has:
    - source moments `m_g = Σ_k Ĝ_g(τ_g(k))⁻¹E_g(u_k)` on closing source rings under selective
@@ -326,7 +342,11 @@ archive root. Brandon's Metal port stays on its own branch, `codex/apple-silicon
    each with its parity check against the host reference. The device debts of #76 (#12–#15, #50)
    are paid here.
 6. **Targets, physics and extraction.**
-   - The targets continue as landmark discovery on the rebuilt library and their Lean.
+   - The targets continue as landmark discovery on the rebuilt library and their Lean. The egg's
+     Legendre period and modular `j`, the Farey and Ford faces, the torus knots, the Fisher
+     receiver geometry and the arithmetic gratings are instances of the existing geometry,
+     receiver, ratio and navigator laws. They carry each target's kernel, cokernel and landmark
+     obligations, beside their consumers.
    - Physics instances K3–K4 (#74, #75) supply objects the framework needs. They are not
      applications. Their contracts are in the [restructure plan](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_REPOSITORY_RESTRUCTURE.md):
      - §3.5, the battle tests: square/cube join, `1+(−1)=0` interference, control-volume
@@ -2232,6 +2252,17 @@ the likelihood mixture).
 
 #### Campaign 3. Release through modes, dormancy and far fields
 
+[definition] In the egg population's terms this campaign is birth, death and dormancy:
+- the receiver's future faces and deposition covectors are admitted before a loaded mode is
+  quotiented;
+- an energy-storing silent mode is kept through aeon boundaries (dormancy);
+- founding comes from a measured cokernel residual, with a declared prior and capacity (birth);
+- release covers only a certified future-null direction (death: zero likelihood or a lawful
+  release).
+
+Its receipts are the retained and released ranks, the later-phase separators, the family's code
+against the terrain's truth, and the standing-cut comparison.
+
 **Prerequisite:** the loaded resonator (`hnn::ring`) must join the ring's mode storage to the scored word and carry the
 comparison covector through that same port. Its small-fixture balance and directional tests,
 loaded host/card parity, and a measured receiving effect precede this campaign. Dormancy retains
@@ -2342,6 +2373,10 @@ exact chain word the descended ring returns the resonator's waves exactly. The w
 
 #### Campaign 4. The motor chart: serial screw words
 
+[definition] The motor chart is the same situated navigator, pair-contact and receiving law. An
+action is generated by egg packing: the requested endpoint is packed into the joint keys, and the
+screw word's transport emits it. The joint fibre stays plural where it is.
+
 [definition] Its issue is #27 (multi-neck chains and the ordered chain of situated screws), label
 `campaign-4`.
 
@@ -2362,6 +2397,13 @@ exact chain word the descended ring returns the resonator's waves exactly. The w
   - the standing text cut is re-measured and shows no regression.
 
 #### Campaign 5. Holonic Encoding, context and joint prediction
+
+[definition] In the egg population's terms this campaign is species and generation:
+- a merge is accepted only when the admitted future faces agree and its charged code-length pair
+  wins (two eggs one species);
+- `D E = ρ` and `E_next T = U E` hold, or the separator is returned;
+- a requested joint consequence is packed into the navigators' keys and released at the declared
+  receiver, with the decoder's equality or its residual reported.
 
 - **Laws:** Lean items 11–12, and:
   - `E` is a learned boundary element relation, with `D E = ρ` and `E_next T_a = U_a E` for each

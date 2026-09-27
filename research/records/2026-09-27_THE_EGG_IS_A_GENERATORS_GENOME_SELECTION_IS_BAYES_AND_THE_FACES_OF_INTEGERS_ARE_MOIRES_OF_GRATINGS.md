@@ -279,3 +279,15 @@ is a computational optimization, as Brandon suspects, not a change of the law.
   - the grating law on digit positions, `p | b^m k + r ⇔ k ≡ −r b^{−m} mod p`;
   - the cheap faces of `b` and `b ± 1`;
   - Bayes' rule as the discrete replicator, joined to `Tree.own_kraft_and_dominance`.
+
+## Corrections (September 27, from the [probability-geometry derivation](2026-09-27_PROBABILITY_IS_A_RECEIVER_GEOMETRY_BAYES_IS_THE_RATIOS_TRANSLATION_AND_THE_EGGS_PERIOD_IS_HYPERGEOMETRIC.md) §8)
+
+- **§2: "failing configurations die".** A positive but poor likelihood reduces a candidate's relative
+  weight without extinguishing it. Death needs zero likelihood or a separately lawful release
+  (campaign 3). A newly founded candidate needs a declared prior and its description cost:
+  conditioning a fixed family with a zero prior cannot give birth to one.
+- **§1: the Kraft prior.** Kraft weights `2^{−ℓ}` form a prior only after their total mass and any
+  unused mass are declared.
+- **§2: one sample.** A recovered minimal tree on one sample shows the population found a
+  future-equivalent species within its admitted family. It does not prove unique truth beyond that
+  family.

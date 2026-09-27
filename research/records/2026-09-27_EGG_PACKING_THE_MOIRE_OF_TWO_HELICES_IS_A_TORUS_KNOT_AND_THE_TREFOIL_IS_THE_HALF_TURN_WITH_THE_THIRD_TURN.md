@@ -205,3 +205,16 @@ Owed in #62 (Lean):
 - the crossing count of two torus geodesics, `|ad − bc|`;
 - the Ford separation `(det² − 1)/(kK)²` and its tangency;
 - `PSL(2, ℤ) ≅ ℤ/2 ∗ ℤ/3` joined to `Farey.lean`'s generators and to the Swing.
+
+## Corrections (September 27, from the [probability-geometry derivation](2026-09-27_PROBABILITY_IS_A_RECEIVER_GEOMETRY_BAYES_IS_THE_RATIOS_TRANSLATION_AND_THE_EGGS_PERIOD_IS_HYPERGEOMETRIC.md) §8)
+
+- **§1: crossings, not cells.** `|ad − bc|` counts the transverse crossings of two primitive,
+  distinct, nonparallel torus paths. It does not count the complement's cells automatically.
+- **§2: the Swing and the modular inversion share a role, not an action.** The Swing's half-turn
+  and the modular inversion `z ↦ −1/z` share the abstract order-two role. Identifying their
+  actions needs an explicit conjugating chart.
+- **§3: the Smith identification needs calibrated ports.** It needs the declared
+  impedance-to-reflection Cayley chart with calibrated port variables before the ring's port is read
+  as a Smith chart.
+- **§6: the adjoint is owed.** Calling learning and generation adjoint also owes an actual pairing
+  and its adjoint square. Until then it is an `interpretation`.
