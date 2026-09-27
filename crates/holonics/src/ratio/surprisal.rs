@@ -637,10 +637,11 @@ pub fn entropy(population: &BTreeMap<u64, BigUint>) -> Result<Support, Surprisal
     cross_entropy(population, population)
 }
 
-/// **Exact primality by trial division.** No probabilistic test, no table, no bound below which a
-/// number is assumed prime: the argument this module's exactness rests on is about primes, so the
-/// carrier admits a prime or refuses.
-fn factor_biguint(value: &BigUint) -> Result<Vec<(u64, u32)>, SurprisalError> {
+/// **Exact factorization by trial division**, ascending primes with their exponents. No
+/// probabilistic test, no table, no bound below which a number is assumed prime: the argument this
+/// module's exactness rests on is about primes, so the carrier admits a prime or refuses. The
+/// crate's one factorization owner (the arithmetic terrain's truths read it too).
+pub(crate) fn factor_biguint(value: &BigUint) -> Result<Vec<(u64, u32)>, SurprisalError> {
     if value.is_zero() {
         return Err(SurprisalError::NonPositiveProbability);
     }

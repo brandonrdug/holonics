@@ -616,3 +616,83 @@ determining depth `D*`**, at the first plateau of the code in `D`:
   67; at `D* = 8` the code is `1549 + 0/16 + ε`, `2 + 15/16 + ε` by period 67. Online order-0,
   order-1 and PPM-2 read `16391 + 5/16`, `16394 + 6/16`, `16165 + 8/16` (parity) and
   `48632 + 0/16`, `36798 + 10/16`, `17406 + 13/16` (tuple).
+
+## The arithmetic terrain (the record of September 27 on the faces of integers, §7 and §9)
+
+`hnn_terrain.rs`'s `arithmetic` mode (`hnn_terrain_arithmetic.rs`, its header states the
+declarations) runs the same count-only tree on `holonics::holarchy::terrain::arithmetic`, through
+the prequential harness, and reads **the code on each cell class separately** (`tree_prequential`
+with the class's cells as the scored-apart range, one tree run a class, every cell scored before
+its own deposit) against its truth: the operand cells at `2L log₂ b` bits a record, exactly, and
+every determined cell at zero. These are development receipts, not milestones. Each run states its
+cost first; the mode takes about 40 seconds in all (products 14, 8 and 9 seconds, primes 3, 5 and
+under 1), its peak resident set `158064` to `158504` kB over two runs, whose readings agree exactly.
+
+```sh
+cargo run --release -p holonics --example hnn_terrain -- arithmetic
+```
+
+**Products** (`L = 4` digits least significant first, `k = 2`, `2^12` records `a ⊗ c = P ;` of 19
+cells drawn by the seed `20260927`, `n = 77824 = 2^12·19`; per class the operand cells
+`32768 = 2^15`, the marks `12288 = 2^12·3`, the product's trailing `8192 = 2^13`, middle
+`16384 = 2^14` and leading `8192` cells; each reading `+ ε`):
+
+| base | chosen `D` | passage (PPM-2) | operands (truth) | marks | trailing | middle | leading |
+|---|---|---|---|---|---|---|---|
+| 2 | 13 | `41557 + 8/16` (`122726 + 13/16`) | `33179 + 11/16` (`32768`) | `1524 + 0/16` | `1422 + 4/16` | `3966 + 1/16` | `1465 + 6/16` |
+| 10 | 5 | `273520 + 7/16` (`286584 + 13/16`) | `114394 + 15/16` (`32768 + 32768 log₂ 5 = 108852 + 15/16`) | `41600 + 2/16` | `26466 + 6/16` | `60508 + 10/16` | `30550 + 4/16` |
+| 16 | 4 | `320308 + 10/16` (`342827 + 13/16`) | `137510 + 1/16` (`2^17`) | `41831 + 7/16` | `32396 + 10/16` | `72206 + 12/16` | `36363 + 10/16` |
+
+A cell, in the same order: base 2 `1 + 0/16`, `0 + 1/16`, `0 + 2/16`, `0 + 3/16`, `0 + 2/16`; base 10
+`3 + 7/16`, `3 + 6/16`, `3 + 3/16`, `3 + 11/16`, `3 + 11/16`; base 16 `4 + 3/16`, `3 + 6/16`,
+`3 + 15/16`, `4 + 6/16`, `4 + 7/16`. The operands exceed their entropy by `411 + 11/16`,
+`5542 + 0/16` and `6438 + 1/16` bits. At the control `D = 18` (the record span `4L + 2`, declared,
+never chosen) the passages read `41624 + 12/16`, `273781 + 11/16` and `320400 + 12/16`, and every
+class within a few hundred bits of the chosen depth's. The leading fibre is one reading wide in
+`2285`, `790` and `711` records, two in `1811`, `2737` and `2734`, three in none, `569` and `651`.
+
+In base 2 the `2^8` operand pairs recur sixteen times on average, and the tree at `D = 13` nearly
+memorizes the table: every determined cell costs at most `0 + 3/16` a cell. In bases 10 and 16 the
+pairs never repeat (`10^8` and `2^32` pairs against `2^12` records), the tree stops at `D = 5` and
+`4`, and every determined cell, the marks included, costs between `3 + 3/16` and `4 + 7/16` bits a
+cell, near a digit's own code: the tree reads neither the trailing face nor the record's position.
+A suffix context cannot reach past the drawn digits between a cell and what determines it (the
+mark `⊗` follows the previous `;` by `L + 1` cells, with `L` drawn digits between), so every face
+here, being placed by digit position, is out of its reach.
+
+**Primes** over `[0, 10^4)` (`1229` primes, itself prime; the density `1229/10000`): the density's
+code `10^4 H(1229/10^4) = 40000 log₂ 10 − 17542 log₂ 7 − 8771 log₂ 179 − 1229 log₂ 1229`
+(`8771 = 7²·179`) reads `5376 + 6/16 + ε` bits; through the faces `n mod 2`, `6`, `10` and `30`,
+`4034 + 14/16`, `3188 + 0/16`, `3580 + 4/16` and `2682 + 14/16`. The truth of every cell is zero.
+- Base 10, four digits most significant first and the primality cell (`n = 50000 = 2^4·5^5`):
+  chosen `D = 4`, the passage `161780 + 4/16` (PPM-2 `171808 + 13/16`); the digit cells
+  (`40000`) `146345 + 2/16`, `3 + 10/16` a cell; the primality cells (`10000`) `15435 + 1/16`,
+  `10058 + 11/16` above the density's code and `11854 + 13/16` above the face `n mod 10`'s. At the
+  control `D = 5`: `146596 + 9/16` and `15369 + 7/16`.
+- Base 6, six digits (`n = 70000 = 2^4·5^4·7`): chosen `D = 6`, the passage `164718 + 10/16`; the
+  digit cells (`60000`) `145167 + 12/16`, `2 + 6/16` a cell; the primality cells `19550 + 13/16`,
+  `14174 + 7/16` above the density's code and `16362 + 12/16` above the face `n mod 6`'s. At the
+  control `D = 7`: `145595 + 8/16` and `19343 + 2/16`.
+- The bare indicator (`n = 10^4`): chosen `D = 1`, `5150 + 6/16` (order-1 KT `5149 + 6/16`, order-0
+  `5383 + 5/16`); against the density's code the difference reads `−227 + 15/16 + ε`, the tree below
+  it (its count follows the density's fall along the window, and its one cell of context reads that
+  no two primes past 3 are adjacent); it lies `1115 + 8/16` above the face `n mod 2`'s code and
+  `1962 + 5/16` above `n mod 6`'s.
+
+The primality cell pays for its position as the products' marks do, so on the digit emission it
+codes above the density's code, and the counter's digits (an odometer, determined by the record
+before) cost `2 + 6/16` to `3 + 10/16` a cell.
+
+**What the arithmetic families need from the population owner** (`receiver::population`; the next
+construction, not this step): the population's eggs must be able to address a cell by its place in
+a declared record, which the suffix tree cannot. A **record clock** (a navigator on the record's
+period, `4L + 3` or `L + 1`, keyed at its offset) makes the marks and positions cost zero once
+located. A **convolution-and-carry egg** reads the operands' digits by place relative to that
+clock, carries the winding as its state, and emits the product's digits (its genome: `b`, `L`, the
+order and the layout, with a declared description cost). A **counter egg** is the odometer's
+increment with carry. A **sieve egg** lays the gratings `p ∤ b` on the leading index with their
+classes, founded at the gaps (the terrain's open founding law), beside the cheap faces of the
+declared base. The population needs a declared prior carrying each egg's description cost (Kraft
+mass declared), the tree kept as one egg, and a per-class reading of the prequential code, so that
+selection is gauged class by class against these truths; one run partitioned by class in
+`hnn::reference` would replace the one run a class used here.

@@ -8,6 +8,7 @@
 //! cargo run --release -p holonics --example hnn_terrain -- tree 2
 //! cargo run --release -p holonics --example hnn_terrain -- tree 4
 //! cargo run --release -p holonics --example hnn_terrain -- moire
+//! cargo run --release -p holonics --example hnn_terrain -- arithmetic
 //! ```
 //!
 //! [definition; agent-inferred] **`tree d`: a tree source** (`terrain::TreeSource`), drawn from its
@@ -46,6 +47,9 @@
 
 #[path = "exterior.rs"]
 mod exterior;
+
+#[path = "hnn_terrain_arithmetic.rs"]
+mod arithmetic;
 
 use std::time::Instant;
 
@@ -504,6 +508,7 @@ fn main() {
     match arguments.iter().map(String::as_str).collect::<Vec<_>>().as_slice() {
         ["tree", depth] => tree_harness(depth.parse().expect("a depth")),
         ["moire"] => moire_harness(),
+        ["arithmetic"] => arithmetic::harness(),
         _ => println!("usage: hnn_terrain -- tree <d> | moire"),
     }
 }

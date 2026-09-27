@@ -18,6 +18,7 @@
 //! | [`TreeSource`] | a shift-closed pruned context tree whose leaves hold drawn faces: the shift navigator with its standing, the leaf map (Lean `Compression/Landmark/Context/Standing.leaf_standing`) | [`TreeSourceTruth`]: the tree and faces, the leaf chain's stationary law solved over ℚ, the entropy rate as its exact form in `log₂ p` and its enclosure; per passage the source's own code ([`TreeSource::passage`]), the weighting bound ([`TreeSource::weighting_bound`]) and the recovered tree ([`TreeSource::recovery`]) | the receiving tree: does it recover the tree and reach the rate? |
 //! | [`RotorCrib`] | a declared HNN field's ring as a reflector machine behind a plugboard | [`CribTruth`]: the key and the plugboard, and their description | key location |
 //! | [`Switching`] | two sources alternating by drawn aeons; for [`Switching::dormant`] one moiré whose grating is silent in the odd aeons while its ring keeps turning | [`SwitchTruth`]: the switch epochs as `aeon::Epochs` of the cell clock's forward aeon at the switch section, and the dormant grating | dormancy across aeon boundaries (campaign 3) |
+//! | [`arithmetic::Products`], [`arithmetic::PrimeWindow`] | integers as digit vectors on a helix (odometers, the carry their winding): two drawn operands joined by the convolution of their digits, whose carry is the product's odometer; a window's integers met by the gratings `p ∤ b` on the leading index (the record `2026-09-27_THE_EGG_IS_A_GENERATORS_GENOME_…`, §7) | [`arithmetic::ProductTruth`]: the operands and their factorizations, the convolution, the carry word, the trailing face and the leading face with its carry fibre; [`arithmetic::IntegerTruth`]: each integer's factorization, gratings and cheap readings, and the density read through a face | the trailing and leading faces, the cheap faces, the gratings |
 //!
 //! [definition; agent-inferred] **The draw is a navigator** ([`Draw`]): a Weyl rotation of
 //! `ℤ/2^64` by the odd step `γ = ⌊2^64/φ⌋ = 0x9E37_79B9_7F4A_7C15`, whose orbit is the whole circle
@@ -45,6 +46,7 @@
 //! **cell holonomy** (none is claimed: the gratings exchange no power) and the **tower thread**
 //! (the context tree restricts an address to its leaf) stay attached.
 
+pub mod arithmetic;
 pub mod crib;
 pub mod moire;
 pub mod source;
