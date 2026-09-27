@@ -92,7 +92,27 @@ sets the order:
    epochs, conversations as aeons) codes every byte below the flat stream (`−777 + 7/16` held out).
    Its section letters cost more than they save on development, so each port needs its own tree
    and the sections their own navigator (campaign 5);
-5. then continue campaign 3 as the population's birth, death and dormancy: hold a silent ring's
+5. **Campaign 3 at the population, built (September 27;** `receiver::population::dormancy`, Lean
+   `Context/Dormancy`, `Population.death_is_an_exchange`**).**
+   - **Dormancy.** A ring is a layer, active or dormant. A dormant layer reads nothing while its
+     ring's clock winds on, so its keys are filtered only where it sounds, and its activity switches
+     under a fixed share (`dormant_survivor_code`, `share_path_code_le`). On the aeon-switching
+     terrain (eleven switches over `2^14` cells):
+     - the sheet tuple codes `169 + 9/16 + ε` against the static population's `688 + 6/16`, below
+       the unswitched code plus 14 bits a switch (`174 + 9/16`);
+     - the parity class codes `163 + 4/16` against `252 + 9/16`;
+     - the dormant ring's grating survives every silent aeon.
+   - **Death is an exchange.** A family dies only at zero likelihood. Its mass passes to the
+     survivors, summing exactly to what died, with a receipt: the killing cell, the dead family's
+     last face, each survivor's share, and the seed it held.
+   - **Birth.** Founding draws from the reserved prior mass without moving the population's code. A
+     dead seed can be re-founded. The descended ring's causal chord equals the full ring's
+     (`the_chord_survives_the_release`).
+   - **Remaining.** Species collapse is not built, and the birth prior is not yet learned across
+     aeons. The Lean for the rounding bound, the newborn's telescope and the chord equality is owed
+     in #62.
+
+   Earlier text of this item, for its law: hold a silent ring's
    keys through its aeon, price a switch by fixed share per ring factor, found from reserved prior
    mass, and release only by zero likelihood or a certified null direction. Families compose at ports (a
    Holarchy of eggs). The birth prior over families is learned across aeons from the
