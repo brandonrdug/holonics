@@ -735,7 +735,8 @@ selection is gauged class by class against these truths; one run partitioned by 
 Bayesian mixture over declared navigator families, the discrete replicator, each family dying
 exactly at zero likelihood) on the terrains above, and asks whether it selects the family that made
 each. These are **development receipts, not milestones**; the conversation cut stays the milestone.
-Every run takes under half a second.
+Every run takes under half a second except `switching`: the sheet tuple's in seconds, the parity
+color's in about two minutes, its dormant family carrying tens of thousands of joint keys.
 
 ```sh
 cargo run --release -p holonics --example hnn_population -- tree 2
@@ -743,7 +744,8 @@ cargo run --release -p holonics --example hnn_population -- tree 4
 cargo run --release -p holonics --example hnn_population -- moire parity
 cargo run --release -p holonics --example hnn_population -- moire sheets
 cargo run --release -p holonics --example hnn_population -- crib
-cargo run --release -p holonics --example hnn_population -- switching
+cargo run --release -p holonics --example hnn_population -- switching [parity | sheets]
+cargo run --release -p holonics --example hnn_population -- standing .local/cuts/standing-real-cut-campaign-1.bin
 ```
 
 The declared population on each terrain: the receiving tree (cell-only, `½` stop prior) at every
@@ -766,10 +768,15 @@ the prior is `1/7` a family. Survivor filtering enumerates at most `2^24` keys. 
   ring, so `122³ = 1815848 = 2³·61³` keys:
   - The drawn gratings are `5/7 @ 0/7`, `3/8 @ 6/8` and `7/8 @ 6/8`; the joint period is
     `56 = 2³·7`, the least period `14 = 2·7`, and `D* = 7`.
-  - The grating family keeps **720 = 2⁴·3²·5** survivors, the drawn key among them. The two
-    period-8 rings differ in rate by a half-turn, so their sheets differ exactly on the odd ticks:
-    the emission is the `5/7` ring's sheet read against the alternation, and every key of that
-    species survives. The survivors are one species, the face map's quotient over generators.
+  - The grating family keeps **720 = 2⁴·3²·5** survivors, the drawn key among them: every key that
+    emits the same parity word, one species of the face map's quotient over generators. The species
+    is wider than a gauge orbit. By denominators it is `(7, 8, 8)` 384, `(3, 6, 7)` 144,
+    `(2, 7, 7)` 96 and `(4, 4, 7)` 96: 336 survivors hold no period-8 pair and 384 no `5/7` ring
+    (for example `1/2 @ 1/2`, `1/7 @ 3/7`, `1/7 @ 5/7`). Besides the rings' permutations it holds
+    each ring's mirror, the half-turn of a rate `p ↦ p + q/2` on an even `q` (two such rings cancel
+    their flips on the odd ticks) and coincidences across denominators. **The parity class locates
+    the word, neither the rates nor the rings** (a brute force over the `122³` keys:
+    `the_parity_fibre_is_one_word_not_one_rate`).
   - Its code is `log₂ 122³ − log₂ 720 = 11 + 4/16 + ε`, against the key description
     `log₂ 122³ = 20 + 12/16 + ε` (`⌈⌉ = 21`).
   - The population codes `14 + 1/16 + ε`, the family's code plus its naming `log₂ 7`, and selects the
@@ -799,17 +806,64 @@ the prior is `1/7` a family. Survivor filtering enumerates at most `2^24` keys. 
     (`D = 16, 32`) codes `375 + 12/16 + ε`.
   - Ring 2's `11²·11! = 4829932800 = 2⁸·3⁴·5²·7·11³` keys are refused, and the refusal names the
     built Bombe, `hnn::keys::locate_ring`.
-- **Aeon switching, the dormant grating** (grating 0 of the parity moiré silent in the odd aeons,
-  which run `2^10` to `2^11` cells; 11 switches, the first at cell 1223). The static population
-  cannot follow a switch:
-  - **Parity:** the grating keys die at cell 1223, the first cell the silent layer changes. The
-    population then rests on the trees: `252 + 9/16 + ε`, against `14 + 1/16 + ε` on the unswitched
-    moiré, `238 + 7/16 + ε` more. No single tree is decided above one half: `D = 8, 16, 32` read
-    `1 + 4/16`, `1 + 11/16` and `1 + 11/16` (each `+ ε`).
-  - **Sheet tuple:** the family dies at cell 1223 with survivors `[0, 2, 2]` per ring. The dormant
-    ring's keys die; the other rings keep their gratings and mirrors. The population codes
-    `688 + 6/16 + ε` against `20 + 9/16 + ε` unswitched.
-  - Following the switch is campaign 3's dormancy. A key must be held through the aeon its layer is
-    silent in, not filtered out: each layer's activity is read per epoch, and a switch is priced as
-    the fixed share across epochs (Lean `LocalWeighing.fixed_share`, `hnn::receiving::Mixture::switching`),
-    applied per ring factor instead of between two faces.
+- **Aeon switching, the dormant grating: campaign 3 at the population** (#73; grating 0 of the
+  parity moiré silent in the odd aeons, which run `2^10` to `2^11` cells). The truth: 11 switches,
+  at cells 1223, 3018, 4511, 5730, 6761, 8104, 9672, 11548, 12879, 14341 and 15518. A switch pays
+  `j = ⌈log₂ n⌉ = 14` bits at `α = 2^(−14)` (the `log₂` of its positions), and the positions' own
+  count reads `log₂ C(n − 1, 11) = 128 + 11/16 + ε`. Four populations read the same cells: the
+  static one (trees and the static gratings, `M = 7/8`), the one with dormancy (and the dormant
+  gratings, eight families of 3 bits, `M = 1`), the born one (the static one founding the dormant
+  gratings from its reserved `1/8` at a section, every `2^8` cells, whose residual passes the 3-bit
+  charge) and the reseeding one (the static one re-founding its dead gratings' seed).
+  - **Sheet tuple:**
+    - Static: the gratings die at cell 1223, where class 4 arrived against their certain 5, ring 0's
+      factor exhausted. Their mass (`−log₂ w = 0 + 0/16 + ε`) passes to the trees, `1 + 9/16 + ε`
+      bits of it to each of `D = 8, 16, 32`. The population codes `688 + 6/16 + ε` (the recorded
+      receipt), `667 + 12/16 + ε` above the unswitched `20 + 9/16 + ε`.
+    - With dormancy: ring 0's grating and mirror are held through every silent aeon (survivors
+      `[2, 2, 2]` at every checkpoint, the fibre's mass `−log₂ = 0 + 0/16 + ε`). At the silent
+      aeon's end the layer is believed dormant (`−log₂ P(active) = 12 + 6/16 + ε`); 64 cells after
+      its return it is active again (`−log₂ P(dormant) = 13 + 15/16 + ε`). The static gratings'
+      death passes their mass (`0 + 13/16 + ε`) to the dormant family. The population codes
+      `169 + 9/16 + ε`: `149 + 0/16 + ε` above the unswitched, `−5 + 0/16 + ε` against the unswitched
+      plus 14 bits a switch, `20 + 4/16 + ε` above the unswitched plus `log₂ C(n − 1, 11)`; the
+      dormant family is selected (`−log₂ w = 0 + 0/16 + ε`). Alone it codes `166 + 9/16 + ε` against
+      its bound `176 + 1/16 + ε` (`log₂ 122³ − log₂ 2³` and the truth path's fixed-share code), with
+      a certified drift of `1406097/2^62` bits. On the unswitched moiré the dormancy costs
+      `0 + 1/16 + ε`.
+    - Born: the dormant gratings are founded at cell 1280 (the section's residual `384 + 3/16 + ε`),
+      charged 3 bits; the population codes `572 + 7/16 + ε`, having paid the trees' `404 + 12/16 + ε`
+      before the birth.
+    - Reseeding: the dead gratings' seed (8 keys, each ring's grating and mirror) is re-founded 11
+      times at charges of 4 to 14 bits; five newborns live through an active aeon (born at 3072,
+      5888, 8192, 11776 and 14592, each dying at the next silent cell), but by their birth the trees
+      have re-read the returning pattern: `688 + 9/16 + ε`. Re-founding at a section pays only where
+      the other families cannot re-read a returning face within the section.
+  - **Parity color:**
+    - Static: the gratings die at cell 1223, where class 1 arrived against their certain 0 (the
+      joint factor exhausted). Their mass passes to the trees, `1 + 8/16 + ε` bits of it to `D = 8`
+      and `1 + 9/16 + ε` to each of `D = 16, 32`. The population codes `252 + 9/16 + ε` (the recorded
+      receipt), `238 + 7/16 + ε` above the unswitched `14 + 1/16 + ε`.
+    - With dormancy: the drawn key is held through every silent aeon among 64032 joint survivors
+      (`−log₂ mass = 9 + 4/16 + ε`: with a layer per ring the word's whole fibre survives). At a
+      silent aeon's end each ring's dormancy reads `−log₂ P = 1 + 9/16 + ε`: the parity class cannot
+      tell which ring sleeps, as it cannot tell the rates. 64 cells after the return every ring is
+      active again (`−log₂ P(dormant) = 12 + 5/16 + ε`). The static gratings' death passes their
+      mass (`0 + 13/16 + ε`) to the dormant family. The population codes `163 + 4/16 + ε`:
+      `149 + 3/16 + ε` above the unswitched, `−5 + 3/16 + ε` against the unswitched plus 14 bits a
+      switch, `20 + 7/16 + ε` above the unswitched plus `log₂ C(n − 1, 11)`; the dormant family is
+      selected. Alone it codes `160 + 4/16 + ε` against its bound `171 + 6/16 + ε`
+      (`#S_σ = 208 = 2⁴·13` joint keys along the truth's path), with a certified drift of
+      `25654856001/2^60` bits. On the unswitched moiré the dormancy costs `0 + 1/16 + ε`. The
+      population with dormancy reads the passage in 35 s on the host.
+    - Born: founded at cell 1280 (the section's residual `72 + 9/16 + ε`), charged 3 bits; the
+      population codes `231 + 5/16 + ε`.
+    - Reseeding: the 720-key seed is re-founded 9 times (charges of 4 to 12 bits); five newborns live
+      through active aeons, born at the sheets' cells; `252 + 12/16 + ε`.
+- **The standing-cut regression** (`standing`; the trees alone, `D ∈ {1, …, 32}`, each named by 3
+  bits, `M = 3/4`): the population selects `D = 4` (`−log₂ w = 0 + 0/16 + ε`) and codes
+  `21747 + 8/16 + ε` over the 6,148 cells. On development (4,958 cells) it reads
+  `18069 + 11/16 + ε` against the recorded `½` tree at `D = 4` (`tree_prequential`)
+  `18067 + 2/16 + ε`, `2 + 9/16 + ε` above; held out (1,190 cells) it reads `3677 + 12/16 + ε`
+  (`3 + 1/16 + ε` a cell) against the tree's `3677 + 12/16 + ε`, the campaign 1 receipt's exact
+  face, `0 + 0/16 + ε` apart.

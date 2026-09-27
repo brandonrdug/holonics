@@ -18,8 +18,16 @@
 //!   ring's survivors keep that pair (the grating itself when `q = 2`).
 //! - [`GratingParity`]: the joint key space of `k` rings, `N_Q^k` keys, ring `i` the `i`-th digit
 //!   of the key in base `N_Q` (least significant first); it emits the parity color `Σ_i s_i mod 2`;
-//!   coordinates `(p_0, q_0, c_0, p_1, …)`. Its survivors keep the class's gauge: the rings'
-//!   permutations, and two even gratings turned by a half-turn together (a half-turn flips a sheet).
+//!   coordinates `(p_0, q_0, c_0, p_1, …)`. [proved-derived; measured] **The parity class locates
+//!   its word, neither the rates nor the rings.** Its survivors are every key emitting the same
+//!   parity word, one species of the face map's quotient over generators, and that species is wider
+//!   than a gauge orbit: the rings' permutations, each ring's mirror (below), the half-turn of a
+//!   rate `p ↦ p + q/2` on an even `q` (it flips the sheet on the odd ticks, so two such rings
+//!   cancel their flips), and coincidences across denominators. On the notebook's drawn moiré
+//!   (`5/7 @ 0/7`, `3/8 @ 6/8`, `7/8 @ 6/8`) the `720 = 2⁴·3²·5` survivors split by denominators as
+//!   `(7, 8, 8)` 384, `(3, 6, 7)` 144, `(2, 7, 7)` 96 and `(4, 4, 7)` 96: 336 of them hold no
+//!   period-8 pair and 384 no `5/7` ring (for example `1/2 @ 1/2`, `1/7 @ 3/7`, `1/7 @ 5/7`); the test
+//!   `the_parity_fibre_is_one_word_not_one_rate` counts them against a brute force.
 //! - The sheet tuple's key space factorizes per ring (`KeyFamily::gratings`): one [`GratingSheet`]
 //!   factor a ring, the cell's bit `i` read by factor `i`.
 //! - [`RotorKeys`]: the start port, the key and the plugboard of ring `g`'s machine, `d · d · d!`
@@ -39,6 +47,7 @@ use std::collections::VecDeque;
 use num_bigint::{BigInt, BigUint};
 use num_traits::ToPrimitive;
 
+use super::dormancy::{Dormancy, DormantFamily, Layered};
 use super::{Emitters, Family, KeyFamily, Likelihood, PopulationError, Readout, Survivors, refuse};
 use crate::compression::landmark::context::{
     LandmarkDeclaration, Landmarks, Letter, PassageCode, StopPrior,
@@ -70,6 +79,7 @@ pub struct TreeFamily {
     tree: Landmarks,
     past: VecDeque<usize>,
     passage: PassageCode,
+    received: u64,
 }
 
 impl TreeFamily {
@@ -96,6 +106,7 @@ impl TreeFamily {
             tree: Landmarks::new(declaration)?,
             past: VecDeque::new(),
             passage: PassageCode::new(),
+            received: 0,
         })
     }
 
@@ -143,7 +154,24 @@ impl Family for TreeFamily {
         if self.past.len() > self.tree.declaration().depth {
             self.past.pop_front();
         }
+        self.received += 1;
         Ok(reading.executed)
+    }
+
+    /// A tree admits a passage of its alphabet's cells that stays within its declared population
+    /// `n*` (its certificates hold within it).
+    fn admits(&self, cells: &[usize]) -> Result<(), PopulationError> {
+        let alphabet = self.alphabet();
+        if let Some(&cell) = cells.iter().find(|&&cell| cell >= alphabet) {
+            return Err(PopulationError::CellOutside { cell, alphabet });
+        }
+        if self.received + cells.len() as u64 > self.tree.declaration().population {
+            return Err(refuse(
+                "a tree family's passage",
+                "it stays within the tree's declared population",
+            ));
+        }
+        Ok(())
     }
 
     fn likelihood(&self) -> Likelihood {
@@ -160,6 +188,7 @@ impl Family for TreeFamily {
 
 /// [definition] **One ring's key space** (module header): the declared family's gratings, each
 /// emitting its half-turn sheet.
+#[derive(Clone)]
 pub struct GratingSheet {
     gratings: Vec<Grating>,
     words: Vec<Vec<bool>>,
@@ -233,10 +262,36 @@ impl Emitters for GratingSheet {
     fn coordinates(&self, key: u64) -> Vec<u64> {
         self.coordinates_of(key as usize).to_vec()
     }
+
+    fn fork_at(&self, tick: u64) -> Option<Box<dyn Emitters>> {
+        let mut fork = self.clone();
+        fork.tick = tick;
+        Some(Box::new(fork))
+    }
+}
+
+/// One ring is one layer: its sheet sounds when active and reads `0` when dormant.
+impl Layered for GratingSheet {
+    fn layers(&self) -> usize {
+        1
+    }
+
+    fn sounding(&self, key: u64) -> usize {
+        usize::from(self.sheet(key as usize))
+    }
+
+    fn class(&self, sounding: usize, active: usize) -> usize {
+        sounding & active & 1
+    }
+
+    fn wind(&mut self, ticks: u64) {
+        self.tick += ticks;
+    }
 }
 
 /// [definition] **The parity color's joint key space** (module header): `k` rings over the family's
 /// gratings.
+#[derive(Clone)]
 pub struct GratingParity {
     ring: GratingSheet,
     rings: u32,
@@ -290,6 +345,34 @@ impl Emitters for GratingParity {
         self.digits(key)
             .flat_map(|index| self.ring.coordinates_of(index))
             .collect()
+    }
+
+    fn fork_at(&self, tick: u64) -> Option<Box<dyn Emitters>> {
+        let mut fork = self.clone();
+        fork.ring.tick = tick;
+        Some(Box::new(fork))
+    }
+}
+
+/// Each ring is a layer: the parity of the active rings' sheets.
+impl Layered for GratingParity {
+    fn layers(&self) -> usize {
+        self.rings as usize
+    }
+
+    fn sounding(&self, key: u64) -> usize {
+        self.digits(key)
+            .enumerate()
+            .map(|(ring, index)| usize::from(self.ring.sheet(index)) << ring)
+            .sum()
+    }
+
+    fn class(&self, sounding: usize, active: usize) -> usize {
+        ((sounding & active).count_ones() % 2) as usize
+    }
+
+    fn wind(&mut self, ticks: u64) {
+        self.ring.wind(ticks);
     }
 }
 
@@ -529,5 +612,76 @@ impl KeyFamily {
         );
         let factor = Survivors::new(Box::new(keys), admitted, ROTOR_BOMBE)?;
         Self::new(label, description, vec![factor])
+    }
+}
+
+impl DormantFamily {
+    /// **The dormant grating family of a declared moiré family and class** (module header of
+    /// `dormancy`): the parity color over the joint key space, each ring a layer, refused past
+    /// `admitted` key states with the Bombe it is owed to; the sheet tuple factorized, one ring a
+    /// factor of one layer. Every layer shares the fixed share at `α = 2^(−rung)`.
+    pub fn gratings(
+        family: &MoireFamily,
+        class: MoireClass,
+        admitted: u64,
+        rung: u32,
+        description: u64,
+    ) -> Result<Self, PopulationError> {
+        if family.rings == 0 || family.denominator < 2 {
+            return Err(refuse(
+                "a dormant grating family",
+                "it declares at least one ring and a denominator of at least 2",
+            ));
+        }
+        match class {
+            MoireClass::Parity => {
+                let rings = u32::try_from(family.rings).map_err(|_| {
+                    refuse("a dormant grating family", "its rings fit a machine word")
+                })?;
+                let space = BigUint::from(family.gratings()).pow(rings)
+                    * (BigUint::from(1u32) << family.rings);
+                if space > BigUint::from(admitted) {
+                    return Err(PopulationError::Bombe {
+                        key_space: space,
+                        admitted: BigUint::from(admitted),
+                        bombe: MOIRE_BOMBE,
+                    });
+                }
+                let factor = Dormancy::new(
+                    Box::new(GratingParity::new(family)?),
+                    rung,
+                    admitted,
+                    MOIRE_BOMBE,
+                )?;
+                Self::new(
+                    format!(
+                        "dormant gratings k = {}, q ≤ {}, parity color (joint), α = 2^(−{rung})",
+                        family.rings, family.denominator
+                    ),
+                    description,
+                    vec![factor],
+                )
+            }
+            MoireClass::Sheets => {
+                let factors = (0..family.rings)
+                    .map(|_| {
+                        Dormancy::new(
+                            Box::new(GratingSheet::new(family)?),
+                            rung,
+                            admitted,
+                            MOIRE_BOMBE,
+                        )
+                    })
+                    .collect::<Result<Vec<Dormancy>, _>>()?;
+                Self::new(
+                    format!(
+                        "dormant gratings k = {}, q ≤ {}, sheet tuple (per ring), α = 2^(−{rung})",
+                        family.rings, family.denominator
+                    ),
+                    description,
+                    factors,
+                )
+            }
+        }
     }
 }

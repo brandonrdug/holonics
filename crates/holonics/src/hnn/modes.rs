@@ -64,6 +64,16 @@
 //! every complement, `E_t(x + k) = E_t(x)` for `k ∈ K_rel`, and the storage descends to the retained
 //! ring. This holds for every loaded ring whose port is admitted, not only for the fixtures.
 //!
+//! [proved-derived; implemented-exact] **The chord survives the release** (Brandon, September 27:
+//! "the ring might die, but the chord exchanges"; the test `the_chord_survives_the_release`). A
+//! released direction is unobservable to every admitted receiver, so at every phase the descended
+//! ring's causal chord `ρ̄_(r,t) (sI − T̄_t)⁻¹ B̄_t` ([`crate::receiver::causal_chord`]'s
+//! `H(s) = C(sI − A)⁻¹B`) equals the full ring's `ρ_(r,t) (sI − T_t)⁻¹ B_t` exactly, entry by entry in
+//! lowest terms: `V T_t = T̄_t V` gives `(sI − T̄_t)⁻¹ V = V (sI − T_t)⁻¹`, so the release removes only
+//! factors of `det(sI − T_t)` that every admitted entry cancels. A mode that stores energy is never
+//! released (below: it is dormant), so nothing that stores is snuffed out. The Lean statement of the
+//! descended chord's equality is owed (#62).
+//!
 //! [proved-derived; implemented-exact] **The descended ring runs** (Lean `descended_run`,
 //! `descended_run_reads`; [`ModeQuotient::run`]): `q′ = T̄_t q + B̄_t e`, `s′ = ρ̄_(0,t) q + D_t e`
 //! from `q = V x` returns the full ring's wave at every tick for every drive sequence, the equation
@@ -127,6 +137,7 @@
 //! | `cycle_mul_add`, `periodic_lift_exact` | [`LoadedRing::cycle`], [`LoadedRing::period`], [`ModeQuotient::admitted`] |
 //! | `phase_kernel_le_cycle`, `phase_kernel_le_lift`, `wordMap_cycleWord`, `shared_chart_le_phase_kernel` | [`ModeQuotient::release`], [`ModeQuotient::of`] (the nesting checked) |
 //! | `descended_run`, `descended_run_reads` | [`ModeQuotient::run`] |
+//! | owed (#62): the descended chord equals the full chord | [`ModeQuotient::transport`], [`ModeQuotient::source`], [`ModeQuotient::reading`] against `receiver::causal_chord` (`tests/modes.rs`, `the_chord_survives_the_release`) |
 //! | `released_pair_storage_null` | [`ModeQuotient::released`] (checked at the consumer, `tests/modes.rs`) |
 //! | `descended_costate`, `costate_null_on_release`, `descended_drive_covector`, `descended_gain`, `gain_fibre_invariant` | [`ModeQuotient::pull_back`], [`DescendedReturn`] |
 //! | `released_variation_shift`, `solved_pairing_null_iff`, `squared_gain_variation_null`, `half_turn_separates`, `standing_pump_threshold_reads_release` | [`Variation`], [`ModeQuotient::gain_descent`], [`GainDescent`] |

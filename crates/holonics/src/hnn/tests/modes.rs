@@ -605,6 +605,77 @@ fn the_descended_ring_returns_the_full_rings_wave() {
     }
 }
 
+/// **The chord survives the release** (Brandon, September 27: "the ring might die, but the chord
+/// exchanges"). A released direction is unobservable to every admitted receiver, so at every phase
+/// the descended ring's causal chord `ρ̄_(r,t) (sI − T̄_t)⁻¹ B̄_t` (`receiver::causal_chord`'s
+/// `H(s) = C(sI − A)⁻¹B`) equals the full ring's `ρ_(r,t) (sI − T_t)⁻¹ B_t` exactly, entry by entry
+/// in lowest terms, for the port and every declared receiver at the phases it reads: `V T_t = T̄_t V`
+/// gives `(sI − T̄_t)⁻¹ V = V (sI − T_t)⁻¹`, and the release removes only factors of `det(sI − T_t)`
+/// that every entry cancels. The pumped dormant pair's energy-storing modes are retained, so nothing
+/// that stores is released.
+#[test]
+fn the_chord_survives_the_release() {
+    use crate::receiver::causal_chord::{Linearization, transfer_function};
+    let mut compared = 0;
+    for (material, receivers) in fixtures() {
+        let loaded = operands(&material);
+        let ring = LoadedRing::at_cut(&loaded).unwrap();
+        let quotient = ModeQuotient::of(&ring, &receivers).unwrap();
+        for (phase, operators) in ring.phases().iter().enumerate() {
+            for &(receiver, at) in quotient.requests() {
+                if at != phase {
+                    continue;
+                }
+                let full_reading = if receiver == 0 {
+                    operators.reading.clone()
+                } else {
+                    receivers[receiver - 1].reading().clone()
+                };
+                let names = |count: usize, what: &str| -> Vec<String> {
+                    (0..count).map(|i| format!("{what} {i}")).collect()
+                };
+                let sources = names(operators.source.columns(), "drive");
+                let readers = names(full_reading.rows(), "reading");
+                let full = transfer_function(
+                    &Linearization::declared(
+                        "the full ring",
+                        operators.transport.clone(),
+                        operators.source.clone(),
+                        full_reading,
+                        sources.clone(),
+                        readers.clone(),
+                    )
+                    .unwrap(),
+                )
+                .unwrap();
+                if quotient.retained_rank() == 0 {
+                    assert!(full.entries.iter().all(|e| e.reduced_numerator.is_zero()));
+                    continue;
+                }
+                let descended = transfer_function(
+                    &Linearization::declared(
+                        "the descended ring",
+                        quotient.transport(phase).unwrap().clone(),
+                        quotient.source(phase).unwrap().clone(),
+                        quotient.reading(receiver, phase).unwrap().clone(),
+                        sources,
+                        readers,
+                    )
+                    .unwrap(),
+                )
+                .unwrap();
+                assert_eq!(full.entries.len(), descended.entries.len());
+                for (whole, kept) in full.entries.iter().zip(&descended.entries) {
+                    assert_eq!(whole.reduced_numerator, kept.reduced_numerator);
+                    assert_eq!(whole.reduced_denominator, kept.reduced_denominator);
+                    compared += 1;
+                }
+            }
+        }
+    }
+    assert!(compared > 0);
+}
+
 /// A lattice chart's executed solve is not the law: the mode quotient refuses it.
 #[test]
 fn a_charted_solve_is_refused() {

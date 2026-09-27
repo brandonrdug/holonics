@@ -1,4 +1,5 @@
 import Holonics.Compression.Landmark.Context.LocalWeighing
+import Holonics.Computation.HolonicAdjointNormalization
 
 /-!
 # The egg population: the static mixture with death, and survivor filtering
@@ -23,6 +24,14 @@ emit another class), so this module states the same mixture with **nonnegative**
   pair of its factors' classes, keeps the product of the factors' survivors, so its count is the
   product and its code the sum of the factors' codes (the sheet tuple read per ring; the Rust cell is
   the pair's injective mixed-radix code).
+* `death_is_an_exchange` [proved-derived; formal-checked] (a corollary of
+  `HolonicAdjointNormalization.sum_replicator`): death is an exchange, never a deletion. At a cell
+  whose likelihood is zero for the dying families and positive in total, each dying family's weight
+  goes to zero, the survivors' new weights sum to one, the survivors' total gain is exactly the dead
+  mass, each dead family's mass `w_f` is received by the survivors as `w_f w′_g`, which sum to
+  `w_f`, and each survivor's new weight is its share of the living mass plus its shares of the dead
+  (Rust `receiver::population::DeathReceipt`: the population's total mass is conserved across a
+  death).
 
 The computational object is the helical pair interaction read as a receiver's population of
 candidate eggs; of the winding guide's six general objects this module touches **faces and
@@ -266,6 +275,49 @@ theorem survivors_product {κ₁ κ₂ C₁ C₂ : Type*} [Fintype κ₁] [Finty
 
 end Survivors
 
+section Exchange
+
+open Holonics.Computation.HolonicAdjointNormalization.NormalizedExponential
+
+/-- [proved-derived; formal-checked] **`death_is_an_exchange`: the dead mass is the survivors'
+gain.** With normalized nonnegative weights `w`, nonnegative likelihoods `L` of the received cell and
+a positive total, the dying families (`L_f = 0`) keep weight zero after the replicator, and, with
+`w′ = replicator w L` over the survivors (`L_g ≠ 0`):
+* `Σ_g w′_g = 1`: the population's mass is conserved;
+* `Σ_g (w′_g − w_g) = Σ_f w_f`: the survivors' total gain is exactly the dead mass;
+* `Σ_g w_f w′_g = w_f`: each dead family's mass is received whole, `w_f w′_g` by survivor `g`
+  (`w_f · w_g L_g / Σ_(h alive) w_h L_h`, Bayes' normalization stated as the transfer);
+* `w′_g = (Σ_(h alive) w_h) w′_g + Σ_f w_f w′_g`: a survivor's new weight is its share of the living
+  mass and its shares of the dead. -/
+theorem death_is_an_exchange {ι : Type*} [Fintype ι] {w L : ι → ℝ} (hsum : ∑ i, w i = 1)
+    (hZ : 0 < ∑ j, w j * L j) :
+    (∀ f, L f = 0 → replicator w L f = 0) ∧
+      ∑ g ∈ univ.filter (fun i => ¬ L i = 0), replicator w L g = 1 ∧
+      ∑ g ∈ univ.filter (fun i => ¬ L i = 0), (replicator w L g - w g) =
+        ∑ f ∈ univ.filter (fun i => L i = 0), w f ∧
+      (∀ f, ∑ g ∈ univ.filter (fun i => ¬ L i = 0), w f * replicator w L g = w f) ∧
+      ∀ g, replicator w L g =
+        (∑ h ∈ univ.filter (fun i => ¬ L i = 0), w h) * replicator w L g +
+          ∑ f ∈ univ.filter (fun i => L i = 0), w f * replicator w L g := by
+  classical
+  have hdead : ∀ f, L f = 0 → replicator w L f = 0 := fun f hf => by
+    simp [replicator, hf]
+  have hdead_sum : ∑ f ∈ univ.filter (fun i => L i = 0), replicator w L f = 0 :=
+    sum_eq_zero fun f hf => hdead f (mem_filter.mp hf).2
+  have hsplit := sum_filter_add_sum_filter_not univ (fun i => L i = 0) (replicator w L)
+  have halive : ∑ g ∈ univ.filter (fun i => ¬ L i = 0), replicator w L g = 1 := by
+    rw [hdead_sum, zero_add, sum_replicator hZ] at hsplit
+    exact hsplit
+  have hw_split := sum_filter_add_sum_filter_not univ (fun i => L i = 0) w
+  rw [hsum] at hw_split
+  refine ⟨hdead, halive, ?_, fun f => ?_, fun g => ?_⟩
+  · rw [sum_sub_distrib, halive]
+    linarith
+  · rw [← mul_sum, halive, mul_one]
+  · rw [← sum_mul, ← add_mul, add_comm, hw_split, one_mul]
+
+end Exchange
+
 section Audit
 
 #print axioms seqLik_eq_zero_of_le
@@ -280,6 +332,7 @@ section Audit
 #print axioms sum_indicator
 #print axioms survivor_code
 #print axioms survivors_product
+#print axioms death_is_an_exchange
 
 end Audit
 
