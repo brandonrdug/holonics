@@ -6,7 +6,9 @@ use num_bigint::BigInt;
 use num_traits::{One, Zero};
 
 use crate::hnn::HnnError;
-use crate::hnn::constitution::{Carrier, Constitution, FactorGradient, FactorStep, Locus, Steps};
+use crate::hnn::constitution::{
+    Carrier, Constitution, FactorGradient, FactorStep, GainBacktrack, Locus, Steps,
+};
 use crate::hnn::field::{Current, Field};
 use crate::hnn::port::{Deposit, ExecutionPort, Handle};
 use crate::hnn::reference::{Reference, one_hot};
@@ -156,8 +158,10 @@ fn all_gain_families_are_certified_as_one_atomic_candidate() {
     let theta = generic(&field, 302)
         .with_ring_resonator(&field, 0, base)
         .unwrap();
-    // The capacity-only intermediate has certificate 0.1−0.5 < 0. Raising the dissipation
-    // amplitude in the same comparison makes the complete successor 0.9−0.5 > 0.
+    // At `h = 1` the certificate is `2g_C² + g_D²/10 − 1/2`. The capacity step alone carries
+    // `g_C` from 1 to 1/4, whose intermediate reads `1/8 + 1/10 − 1/2 = −11/40 < 0`. Raising the
+    // dissipation amplitude to 3 in the same comparison makes the complete successor
+    // `1/8 + 9/10 − 1/2 = 21/40 > 0`, and the candidate is certified once, whole.
     let deposit = Deposit::new(
         0,
         Vec::new(),
@@ -166,7 +170,7 @@ fn all_gain_families_are_certified_as_one_atomic_candidate() {
                 gradient: FactorGradient::Resonator {
                     ring: 0,
                     family: 0,
-                    gradient: integer(-2),
+                    gradient: rat(-3, 2),
                 },
                 energy: Rat::zero(),
             },
@@ -181,11 +185,91 @@ fn all_gain_families_are_certified_as_one_atomic_candidate() {
         ],
         vec![Locus::Resonator(0)],
     );
-    let (next, _) = theta.deposited(&deposit).unwrap();
+    let (next, reading) = theta.deposited(&deposit).unwrap();
     assert_eq!(
         next.resonator(0).unwrap().gains(),
-        &[Rat::zero(), Rat::one(), integer(3), Rat::one()]
+        &[rat(1, 4), Rat::one(), integer(3), Rat::one()]
     );
+    assert!(reading.backtracks.is_empty());
+}
+
+/// **A gain never releases by deposition** (`hnn::constitution::GainBacktrack`): a step that would
+/// carry an amplitude to `g ≤ 0` backtracks to the midpoint of the admissible side, `g/2`, on the
+/// locus's lattice, and the deposit's reading names the substitution. At the lattice's first point
+/// the midpoint rounds back to the gain itself (ties upward), so the amplitude stays positive.
+#[test]
+fn a_step_past_zero_backtracks_to_the_midpoint_and_is_named() {
+    let field = chain();
+    let theta = declared(&field, 308);
+    // The capacity step −1 (gradient −2 at rate 1/2) reaches exactly zero; −2 goes past it.
+    for (gradient, candidate) in [(integer(-2), Rat::zero()), (integer(-4), integer(-1))] {
+        let (next, reading) = theta
+            .deposited(&one_gain_step(0, 0, gradient, Rat::zero()))
+            .unwrap();
+        assert_eq!(next.resonator(0).unwrap().gains()[0], rat(1, 2));
+        assert!(next.on_lattice());
+        assert_eq!(
+            reading.backtracks,
+            vec![GainBacktrack {
+                ring: 0,
+                family: 0,
+                from: Rat::one(),
+                candidate,
+                to: rat(1, 2),
+            }]
+        );
+    }
+    // Repeated backtracks halve the amplitude down to the lattice's first point and hold there.
+    let unit = theta.lattice(Locus::Resonator(0)).unwrap().unit();
+    let mut current = theta;
+    let mut gain = Rat::one();
+    while gain > unit {
+        let (next, reading) = current
+            .deposited(&Deposit::new(
+                current.commit(),
+                Vec::new(),
+                vec![FactorStep {
+                    gradient: FactorGradient::Resonator {
+                        ring: 0,
+                        family: 0,
+                        gradient: integer(-4),
+                    },
+                    energy: Rat::zero(),
+                }],
+                vec![Locus::Resonator(0)],
+            ))
+            .unwrap();
+        assert_eq!(reading.backtracks.len(), 1);
+        let halved = next.resonator(0).unwrap().gains()[0].clone();
+        assert_eq!(halved, &gain * rat(1, 2));
+        gain = halved;
+        current = next;
+    }
+    let (held, reading) = current
+        .deposited(&Deposit::new(
+            current.commit(),
+            Vec::new(),
+            vec![FactorStep {
+                gradient: FactorGradient::Resonator {
+                    ring: 0,
+                    family: 0,
+                    gradient: integer(-4),
+                },
+                energy: Rat::zero(),
+            }],
+            vec![Locus::Resonator(0)],
+        ))
+        .unwrap();
+    assert_eq!(held.resonator(0).unwrap().gains()[0], unit);
+    assert_eq!(reading.backtracks[0].to, unit);
+    // The material owner refuses a nonpositive amplitude outright.
+    let material = held.resonator(0).unwrap();
+    let mut zeroed = material.gains().clone();
+    zeroed[0] = Rat::zero();
+    assert!(matches!(
+        material.with_gains(zeroed),
+        Err(HnnError::Resonator { .. })
+    ));
 }
 
 #[test]

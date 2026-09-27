@@ -175,9 +175,10 @@ pub struct Resonance {
 /// [definition] **A resonator's balance over one word** (campaign 2, `hnn::ring`; Lean
 /// `HNN/Ring.ring_tick_executed_energy_balance` summed over the word's ticks): its ring, its ticks,
 /// its storage at the word's end (it opens at zero with the word), its pump, port and dissipation
-/// work, its chart defect and its split summed over the ticks, and the remainders its end
-/// releases. It is what the word's release returns of a resonator, so every realization of the
-/// port reads it alike ([`Released::resonators`]).
+/// work, its chart defect and its split summed over the ticks with their certified bound
+/// ([`crate::hnn::ring::ResonatorStep::bound`] summed), and the remainders its end releases. It is
+/// what the word's release returns of a resonator, so every realization of the port reads it alike
+/// ([`Released::resonators`]).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ResonatorBalance {
     pub ring: usize,
@@ -188,6 +189,8 @@ pub struct ResonatorBalance {
     pub dissipation: Rat,
     pub chart: Rat,
     pub split: Rat,
+    /// The certified bound on `|chart + split|`, the ticks' bounds summed.
+    pub bound: Rat,
     pub released: Remainders,
 }
 
@@ -208,13 +211,16 @@ impl ResonatorBalance {
             dissipation: sum(|step| &step.dissipation),
             chart: sum(|step| &step.chart),
             split: sum(|step| &step.split),
+            bound: sum(|step| &step.bound),
             released: Remainders::of(resonance.remainders.all()),
         }
     }
 
-    /// **It closes**: `E_end = pump + port − dissipation + chart + split`, from zero at the open.
+    /// **It closes**: `E_end = pump + port − dissipation + chart + split`, from zero at the open,
+    /// with `|chart + split| ≤ bound`.
     pub fn closes(&self) -> bool {
         self.end == &self.pump + &self.port - &self.dissipation + &self.chart + &self.split
+            && (&self.chart + &self.split).abs() <= self.bound
     }
 }
 
@@ -224,8 +230,10 @@ impl ResonatorBalance {
 /// declared resonator is driven by carried `e` and returns `s′ = e−(2/Y)ω` as the ring's next
 /// storage. Its received port work equals the field's signed loaded-port term with opposite sign.
 /// The balance separately reports the element split, returned-wave split, resonator's internal
-/// state split, and each chart residual. The port pair cancels exactly. No deposit happens within
-/// a tick; the gain deposition work is read at the commit that follows it.
+/// state split, and each chart residual, and bounds them together: the field's executed residual
+/// plus the resonator's chart and split lie within the tick's field bound plus the resonator's
+/// ([`crate::hnn::ring::ResonatorStep::bound`]). No deposit happens within a tick; the gain
+/// deposition work is read at the commit that follows it.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FieldBalance {
     pub before: Rat,
@@ -250,9 +258,17 @@ pub struct FieldBalance {
     /// The loaded return's lattice split, an explicit field residual.
     pub loaded_split: Rat,
     /// **The interconnection's defect**: resonator port work plus the field's signed loaded-port
-    /// work. It is zero for a loaded port and equals the resonator port work when the port is
-    /// unloaded.
+    /// work. [definition] It is zero **by construction** for a loaded port: the field's term is
+    /// formed as the negative of the resonator's received work (`loaded_port = −port`), the
+    /// power-neutral interconnection stated structurally, not measured. It equals the resonator's
+    /// port work when the port is unloaded. The loaded balance's evidence is its bounded
+    /// residuals: the field's executed residual and the resonator's chart and split within
+    /// [`FieldBalance::bound`] plus [`FieldBalance::resonator_bound`].
     pub interconnection: Rat,
+    /// The tick's certified bound on the field's executed residual ([`TickBalance::bound`]).
+    pub bound: Rat,
+    /// The resonators' certified bound on their chart and split terms at this tick.
+    pub resonator_bound: Rat,
 }
 
 impl FieldBalance {
@@ -270,14 +286,17 @@ impl FieldBalance {
     /// `HNN/Ring.loaded_tick_executed_interconnection_balance`):
     /// `(P′ + E′) − (P + E) = − dissipation + resist + Π_c +
     /// defects + pump − resonator dissipation + resonator chart + resonator split +
-    /// interconnection`.
+    /// interconnection`, and the executed residuals lie within their certified bounds:
+    /// `|defects + resonator chart + resonator split| ≤ bound + resonator bound`.
     pub fn closes(&self) -> bool {
+        let executed = self.residual() + &self.resonator_chart + &self.resonator_split;
         &self.after + &self.resonator_after - &self.before - &self.resonator_before
             == -&self.dissipation + &self.resist + &self.contrast + self.residual() + &self.pump
                 - &self.resonator_dissipation
                 + &self.resonator_chart
                 + &self.resonator_split
                 + &self.interconnection
+            && executed.abs() <= &self.bound + &self.resonator_bound
     }
 }
 
@@ -291,6 +310,10 @@ pub struct EndChange {
     pub states: Vec<[Vec<Rat>; 2]>,
     /// Word-local resonator states at the end and the phase whose form measures them.
     pub resonators: Vec<Option<[Vec<Rat>; 2]>>,
+    /// [definition] The pump phase whose form measures a loaded ring's end state: its last executed
+    /// tick's, and with no full tick the phase `0` at which the open state is read
+    /// ([`crate::hnn::ring::ResonatorOperands::step`] reads `before` at tick `0` on phase `0`).
+    /// `None` where no resonator is declared.
     pub resonator_phases: Vec<Option<usize>>,
 }
 
@@ -474,6 +497,8 @@ pub struct CommitWork {
 /// resonators' storage at the end with their terms (they open at zero), the signed port pairing,
 /// the end change the commit reads, the commit when one follows
 /// ([`WordBalance::commit`]), and the remainders the end releases, the word's and the resonators'.
+/// Its certified bound covers the executed residual of the field and of the resonators alike: the
+/// ticks' bounds, the last junction's and the resonators' ([`ResonatorBalance::bound`]).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct WordBalance {
     pub open: Rat,
@@ -490,6 +515,10 @@ pub struct WordBalance {
     pub resonator_dissipation: Rat,
     pub resonator_chart: Rat,
     pub resonator_split: Rat,
+    /// The resonators' certified bound on their chart and split terms, summed into `bound`.
+    pub resonator_bound: Rat,
+    /// The interconnection's defect, zero by construction for a loaded port
+    /// ([`FieldBalance::interconnection`]).
     pub interconnection: Rat,
     /// The field's loaded-return split work over the word.
     pub loaded_split: Rat,
@@ -501,8 +530,8 @@ pub struct WordBalance {
 
 impl WordBalance {
     /// **The word's balance from its release**: the ticks' balances summed, the last junction's
-    /// residual and bound, and the resonators' balances (whose port work, delivered by no field term,
-    /// is the interconnection's defect).
+    /// residual and bound, and the resonators' balances with their bounds (their port work against
+    /// the field's signed loaded-port term is the interconnection's defect).
     pub fn of(released: &Released) -> Self {
         let end = released.power.clone();
         let open = released
@@ -517,6 +546,7 @@ impl WordBalance {
         let port = resonators(|r| &r.port);
         let loaded_port: Rat = released.balances.iter().map(|tick| &tick.loaded_port).sum();
         let loaded_split = sum(|tick| &tick.loaded_split);
+        let resonator_bound = resonators(|r| &r.bound);
         Self {
             open,
             end,
@@ -525,7 +555,8 @@ impl WordBalance {
             contrast: sum(|t| &t.contrast),
             defects: sum(|t| &t.residual),
             last: released.last.clone(),
-            bound: sum(|t| &t.bound) + &released.last_bound,
+            bound: sum(|t| &t.bound) + &released.last_bound + &resonator_bound,
+            resonator_bound,
             resonator_end: resonators(|r| &r.end),
             pump: resonators(|r| &r.pump),
             interconnection: &port + loaded_port,
@@ -550,17 +581,26 @@ impl WordBalance {
     /// word's cut, before and after the deposit): the deposition work `½⟨x, ΔΘ x⟩` from the forms'
     /// differences and the end change's power under the committed form alone.
     pub fn commit(&mut self, before: &PowerForm, after: &PowerForm) -> Result<(), HnnError> {
-        self.resonator_end = after.resonator_power(&self.change)?;
+        // Every fallible reading first: a refusal leaves the balance as it was.
+        let deposition = before.deposition_work(after, &self.change)?;
+        let committed = after.power(&self.change)?;
+        let resonator_end = after.resonator_power(&self.change)?;
+        self.resonator_end = resonator_end;
         self.commit = Some(CommitWork {
-            deposition: before.deposition_work(after, &self.change)?,
-            committed: after.power(&self.change)?,
+            deposition,
+            committed,
         });
         Ok(())
     }
 
-    /// The executed residual: the ticks' defects and loaded splits, plus the last junction's.
+    /// The executed residual: the ticks' defects and loaded splits, the last junction's, and the
+    /// resonators' chart and split terms.
     pub fn residual(&self) -> Rat {
-        &self.defects + &self.last + &self.loaded_split
+        &self.defects
+            + &self.last
+            + &self.loaded_split
+            + &self.resonator_chart
+            + &self.resonator_split
     }
 
     /// **The word closes with its stated defects, the combined system in one identity** (Lean
@@ -568,7 +608,8 @@ impl WordBalance {
     /// `P_end + E_end = P_open − dissipation + resist + Π_c +
     /// defects + last + pump − resonator dissipation + resonator chart + resonator split +
     /// interconnection`, with `P_end` the committed power and `deposition` added when a commit
-    /// follows; and the executed residual lies within its certified bound.
+    /// follows; and the executed residual, the resonators' chart and split included, lies within
+    /// its certified bound.
     pub fn closes(&self) -> bool {
         let terms = &self.open - &self.dissipation
             + &self.resist
@@ -576,8 +617,6 @@ impl WordBalance {
             + self.residual()
             + &self.pump
             - &self.resonator_dissipation
-            + &self.resonator_chart
-            + &self.resonator_split
             + &self.interconnection;
         let identity = match &self.commit {
             Some(commit) => &commit.committed + &self.resonator_end == terms + &commit.deposition,
@@ -1136,7 +1175,7 @@ impl<'c> Word<'c> {
         let mut midpoints = Vec::with_capacity(steps.len());
         let mut loaded_port = Rat::zero();
         let mut loaded_split = Rat::zero();
-        let mut resonance_terms: [Rat; 7] = std::array::from_fn(|_| Rat::zero());
+        let mut resonance_terms: [Rat; 8] = std::array::from_fn(|_| Rat::zero());
         for (ring, step) in steps.into_iter().enumerate() {
             resist += step.resist;
             contrast += step.drive;
@@ -1159,6 +1198,7 @@ impl<'c> Word<'c> {
                     &step.dissipation,
                     &step.chart,
                     &step.split,
+                    &step.bound,
                 ]) {
                     *total += term;
                 }
@@ -1313,6 +1353,7 @@ impl<'c> Word<'c> {
             resonator_dissipation,
             resonator_chart,
             resonator_split,
+            resonator_bound,
         ] = resonance_terms;
         self.fields.push(FieldBalance {
             before: balance.before.clone(),
@@ -1335,6 +1376,8 @@ impl<'c> Word<'c> {
             resonator_dissipation,
             resonator_chart,
             resonator_split,
+            bound: balance.bound.clone(),
+            resonator_bound,
         });
         self.partings.push(partings);
         self.peak_bits = self.peak_bits.max(self.state_bits());
@@ -1472,6 +1515,8 @@ impl<'c> Word<'c> {
                     .iter()
                     .map(|resonance| resonance.as_ref().map(|r| r.state.clone()))
                     .collect(),
+                // The last executed tick's phase; with no full tick, phase 0, where the open
+                // state is read (`EndChange::resonator_phases`).
                 resonator_phases: self
                     .resonators
                     .iter()

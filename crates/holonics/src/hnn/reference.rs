@@ -2502,6 +2502,9 @@ pub struct Exposure {
     /// Final scalar gains of declared resonators, in ring order (a constitutive reading, not an
     /// event archive).
     pub resonator_gains: Vec<(usize, [Rat; 4])>,
+    /// The carried remainders of those gains, in ring order: what reached each family below its
+    /// lattice's unit.
+    pub resonator_remainders: Vec<(usize, [Rat; 4])>,
     pub key_bits: u64,
     pub kt: ExactInterval,
     pub literal_bits: u64,
@@ -2626,10 +2629,12 @@ pub struct WordReport {
 /// formed from each refine's release on every realization of the port and carried across the commit
 /// that follows it): the balances formed and carried across a commit, whether every one closed
 /// (the combined identity with the deposition work and the interconnection's defect, and the
-/// executed residual within its bound), the largest executed residual in magnitude with its bound,
-/// the deposition work summed over the commits with the largest in magnitude, and the
-/// interconnection's defect summed (the resonator's port work plus the field's signed port term:
-/// zero when loaded, and the resonator's port work when unloaded).
+/// executed residual, the resonators' chart and split included, within its bound), the largest
+/// executed residual in magnitude with its bound, the deposition work summed over the commits with
+/// the largest in magnitude, and the interconnection's defect summed (the resonator's port work
+/// plus the field's signed port term: zero by construction when loaded, since the field's term is
+/// formed as the negative of the resonator's work, and the resonator's port work when unloaded;
+/// the loaded evidence is the bounded executed residual).
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct WordBalances {
     pub formed: u64,
@@ -3321,6 +3326,7 @@ where
         deadline,
         description_bits,
         resonator_gains: resident.constitution().resonator_gains(),
+        resonator_remainders: resident.constitution().resonator_gain_remainders(),
         key_bits,
         kt,
         literal_bits: symbol * position as u64,

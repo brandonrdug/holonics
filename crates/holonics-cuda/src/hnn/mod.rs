@@ -53,7 +53,6 @@
 //! | `hnn_tree_splits` ([`tree`]) | one phase's all-class read; grid = the window's phases read together | one splitting dyadic cell (`i ≡ t`); `threads` = the least power of two covering them, at least a warp, within the entry's census | each cell's walks (at most `D_b + 1` stored chains, `D_b` label letters compared and one split's ratios a branch, Decision 37) and the join | none: each split is its own thread's word |
 //! | `hnn_tree_deposit`, `hnn_tree_undo` ([`tree`]) | one cell's deposit (one block of one warp) | one opened digit (its dyadic cell's trees) | the digit's paths bottom-up: β steps, a parting chain's split, the upper part and the leaf founded, the relinks, masses | a block minimum of each branch's leaf tops (the label runs) and a block prefix sum of the founded counts (the host's numbering) |
 //! | `hnn_tree_gather` ([`tree`], the per-deposit lockstep) | a grid striding the touched nodes and joins (`threads` the least power of two covering them, from a warp to 256) | one touched node's masses, chart, depth word and label end and one touched join's chart | — | none: each thread writes its own rows |
-//! | `hnn_resonator_word` (standalone chart check) | one ring's resonator; grid = the word's declared resonators | one resonator row | its row's `n` columns in each stage; ticks serial within the block | none across rows; the live word uses the coupled `hnn_word_forward`/`hnn_word_reverse` stages above |
 //! | `hnn_outer_update` (campaign 2) | one entry `(i, j)` of a normal law's update `Σ_t a_t l_t r_tᵀ`; grid `(rows, columns)` | one residue class `t ≡ τ` of the window's samples; `threads` as the read's over the samples | `⌈samples/threads⌉` samples | the shared tree |
 //! | `hnn_budgeted_split` (campaign 2) | a grid striding the entries | one entry's fine and coarse split | — | none |
 //!
@@ -112,7 +111,7 @@
 //! | none (new; campaign 2; Decision 37) | `kernels/tree.cu::{hnn_tree_splits, hnn_tree_deposit, hnn_tree_undo, hnn_tree_gather, hnn_tree_split_ratios}`, [`tree`] | `holonics::hnn::landmark::{Landmarks::window_splits, Landmarks::deposit, Landmarks::touched, Beta::step, Beta::split}` | GPU: `tests::the_card_tree_reads_and_deposits_as_the_host_tree`, `tests::the_card_split_is_the_hosts`; the port's lockstep tests |
 //! | none (new) | `kernels/hnn_word.cuh::{hnn_word_forward, hnn_word_reverse, hnn_pair_weights, hnn_copy_words, hnn_scatter_words}`, [`port`] | `holonics::hnn::{word::Word, port::Word::pull_back, receiving::ReceivingPhases::read, moment::SourceMoment::open_storage, chart::refine}` and the reference's `ExecutionPort` | GPU: `port_tests::the_card_port_returns_the_reference_on_{the_chain, a_generic_constitution, campaign_one, the_standing_cut}`, `the_card_port_refuses_as_the_reference` |
 //!
-//! | none (new, campaign 2) | `kernels/hnn.cu::hnn_resonator_word`, [`word::ResonatorPlan`], [`Card::resonator_word`] | `holonics::hnn::ring::ResonatorOperands::step`; Lean `HNN/Ring.{ring_descriptor_tick_conserves, ring_tick_executed_energy_balance}` | GPU: `physics_tests::resident_resonators_equal_the_host_word_and_are_measured`; the live loaded stages (`execute`, `readout`): `port_tests::the_card_port_returns_the_reference_with_resonators_and_a_boost` |
+//! | none (new, campaign 2; Decision 38) | the loaded stages of `kernels/hnn_word.cuh::{hnn_word_forward, hnn_word_reverse}`, [`word::ResonatorPlan`], `execute::LoadedResonatorPlan`, `readout::resonator_balance` (the balance and its bound) | `holonics::hnn::ring::ResonatorOperands::step`, `holonics::hnn::word::ResonatorBalance`; Lean `HNN/Ring.{ring_descriptor_tick_conserves, ring_tick_executed_energy_balance, loaded_word_stage_balance, loaded_tick_adjoint_pairing}` | GPU: `port_tests::the_card_port_returns_the_reference_with_resonators_and_a_boost` and the loaded, pumped and signed fixtures of `port_tests` |
 //! | none (new, campaign 2) | `kernels/hnn.cu::{hnn_outer_update, hnn_budgeted_split}`, [`lattice::OuterSamples`], [`Card::outer_update`], [`Card::budgeted_split`] | `holonics::hnn::constitution::NormalLaw::deposited` (the Gram's and the map's updates and their budgeted carries); Lean `HNN/Normal.normal_prox_step`, `HNN/LatticeDeposit.carry` | GPU: `physics_tests::the_prox_deposit_on_the_card_equals_the_host_and_is_measured`; the port's normal-law mirror in the lockstep tests (`lattice::normal_deposit_on_card`, `Resident::with_normal_mirror`, its tally of steps carried, declined and skipped): `port_tests::the_card_port_returns_the_reference_with_resonators_and_a_boost` |
 //!
 //! **Not ported**, with the reason:
@@ -157,7 +156,7 @@ mod word_tests;
 
 pub use card::{
     Card, CardBuffer, DeviceCensus, EntryCensus, KERNELS, Layout, Operand, Realization,
-    certificate_layout, copy_layout, ingest_layout, read_layout, resonator_layout, word_layout,
+    certificate_layout, copy_layout, ingest_layout, read_layout, word_layout,
 };
 pub use lattice::{Gather, LatticeCoordinates, LatticeRead, ResidentLattice, ResidentRead};
 pub use moment::{MomentCounts, MomentSnapshot, ResidentMoment};
@@ -165,7 +164,7 @@ pub use port::{Mounted, Resident, Traffic};
 pub use tree::{CardTree, TreeTimes};
 pub use word::{
     CarryRelease, Certificate, ChartRelease, InversePair, Orientation, Refusal, ResidentCarry,
-    ResidentCharts, ResidentInverses, ResonatorPlan, ResonatorRecord, WordChart, WordGraph,
+    ResidentCharts, ResidentInverses, ResonatorPlan, WordChart, WordGraph,
 };
 
 use holonics::hnn::HnnError;

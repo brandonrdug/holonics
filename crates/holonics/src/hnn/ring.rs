@@ -17,7 +17,23 @@
 //! balance    E_(K_t)(û′, ŵ′) − E_(K_(t−1))(u, w) = pump + port − dissipation + chart + split
 //!            pump = ½⟨u, (K_t − K_(t−1)) u⟩ ,   port = (hY/4)(|β|² − |β − (2/Y)ω|²)
 //!            dissipation = h⟨ω, D ω⟩ ,   chart = ⟨ω, M_t ω − r⟩ ,   split = E(û′, ŵ′) − E(u′, w′)
+//! bound      |chart + split| ≤ ‖ω‖₁ (δ_t ‖r‖∞ + ‖M_t‖∞ u) + (u/2)(‖C(ŵ′ + w′)‖₁ + ‖K_t(û′ + u′)‖₁)
 //! ```
+//!
+//! [proved-derived; implemented-exact] **The executed solve's bound** ([`ResonatorStep::bound`]).
+//! The phase's chart `X̂` carries the certificate every chart of the word carries (the element's
+//! and the contact's, `hnn::chart`): `δ_t = ‖1 − M_t X̂‖∞`, zero for the exact inverse. The element
+//! reads its chart's image unsplit, so its bound is `‖x̄‖₁ δ ‖operand‖∞`; the resonator carries its
+//! solved rate on `2^(−L_w)ℤ` before the state reads it, as the contact carries its `ζ`, so the
+//! bound gains the split's term: `M_t ω − r = M_t(ω − X̂ r) − (1 − M_t X̂) r`, and error feedback
+//! keeps `|ω − X̂ r|∞ < u = 2^(−L_w)` (the two remainders lie in one half-open cell), hence
+//! `|⟨ω, M_t ω − r⟩| ≤ ‖ω‖₁ (δ_t ‖r‖∞ + ‖M_t‖∞ u)` with `‖·‖∞` the largest absolute row sum. The
+//! state's split is `E(û′, ŵ′) − E(u′, w′) = ½⟨ŵ′ − w′, C(ŵ′ + w′)⟩ + ½⟨û′ − u′, K_t(û′ + u′)⟩` with
+//! each coordinate within `u`, the contact's split bound. Under the exact law both terms and the
+//! bound are zero (Lean `HNN/Ring.{loaded_solve_chart_bound, loaded_state_split_bound}`). The
+//! chart term no longer absorbs a wrong solve: an executed rate off the certified chart leaves its
+//! chart term above the bound, and [`ResonatorStep::closes`],
+//! `hnn::word::{FieldBalance, WordBalance}::closes` refuse it.
 //!
 //! [proved-derived; implemented-exact] **Its laws** (Lean `HNN/Ring`). Closed, lossless and unpumped,
 //! the tick keeps its storage form, sign included: `UᵀQU = Q` (`ring_tick_conserves_mode_energy`),
@@ -66,9 +82,14 @@
 //! | `cayley_preserves_form`, `ring_generator_qSkew`, `ring_tick_conserves_mode_energy`, `ring_descriptor_tick_conserves` | [`ResonatorOperands::step`] (closed and lossless in the tests) |
 //! | `ring_cayley_denominator_nonsingular`, `ring_harmonic_mode_singular` | [`ResonatorMaterial::certify`] |
 //! | `ring_tick_port_balance`, `ring_tick_executed_energy_balance` | [`ResonatorStep`], [`ResonatorStep::closes`] |
+//! | `loaded_word_stage_balance`, `loaded_tick_executed_interconnection_balance` | [`ResonatorOperands::step`], `hnn::word::{FieldBalance, WordBalance}` |
+//! | `loaded_tick_adjoint_pairing`, `loaded_material_rate_tangent`, `loaded_tick_material_variation` | [`ResonatorOperands::solve_transpose`], `hnn::port::Word::pull_back`, `hnn::reference::compose` |
+//! | `loaded_gain_family_increment`, `loaded_gains_preserve_storage_dissipation`, `ring_material_commit_work` | [`ResonatorMaterial::with_gains`], `hnn::constitution::Constitution::deposited`, `hnn::word::PowerForm::deposition_work` |
 //! | `two_port_reference_balance` | [`port_scattering`], [`PortScattering`] |
 //! | `ring_crossings_are_epoch_ticks` | [`RingClock::over`] |
 //! | `pump_half_turn_invariant`, `pump_blind_to_sheets`, `locked_sheet_receiver_face` | [`PumpDeclaration`], [`sheets`] |
+//! | `loaded_solve_chart_bound`, `loaded_state_split_bound` (with `abs_mulVec_le_rowNorm`, `abs_dot_le_l1`) | [`ResonatorStep::bound`], [`ResonatorStep::closes`] |
+//! | `gain_backtrack_midpoint` | `hnn::constitution::GainBacktrack`, [`ResonatorMaterial::with_gains`] |
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
@@ -296,7 +317,20 @@ impl ResonatorMaterial {
 
     /// Rebuild the material from its declared forms and squared scalar amplitudes. The caller
     /// certifies the candidate at its ring's hop before publication.
+    ///
+    /// [definition; agent-inferred] **Every amplitude is positive.** `g` and `−g` give one form
+    /// (`g²`), so the positive sheet is the chart; a zero amplitude would zero its family's covector
+    /// `2g·feature` for every later word, a release that deposition never makes. A family's release
+    /// belongs to campaign 3's collapse law, with its receipt; a deposit step that would carry an
+    /// amplitude to `g ≤ 0` backtracks instead (`hnn::constitution::GainBacktrack`). A
+    /// nonpositive amplitude is refused here.
     pub fn with_gains(&self, gains: [Rat; 4]) -> Result<Self, HnnError> {
+        if gains.iter().any(|gain| !gain.is_positive()) {
+            return Err(HnnError::Resonator {
+                ring: usize::MAX,
+                what: "a resonator gain amplitude is positive (release belongs to the collapse)",
+            });
+        }
         let scale = |form: &ExactRatMatrix, gain: &Rat| form.scaled(&(gain * gain));
         let pump = self
             .base_pump
@@ -481,11 +515,13 @@ impl PhaseSolve {
     }
 }
 
-/// One pump phase's operands: its stiffness `K_j`, its operator `M_j` and its executed solve.
+/// One pump phase's operands: its stiffness `K_j`, its operator `M_j` with its largest absolute
+/// row sum `‖M_j‖∞`, and its executed solve.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct Phase {
     stiffness: ExactRatMatrix,
     operator: ExactRatMatrix,
+    operator_norm: Rat,
     solve: PhaseSolve,
     reading: Option<ResonatorChart>,
 }
@@ -535,6 +571,10 @@ pub struct ResonatorStep {
     pub split: Rat,
     pub state: [Vec<Rat>; 2],
     pub rate: Vec<Rat>,
+    /// **The certified bound on `|chart + split|`** (module header): `‖ω‖₁(δ‖r‖∞ + ‖M‖∞u)` for the
+    /// executed solve and `(u/2)(‖C(ŵ′ + w′)‖₁ + ‖K(û′ + u′)‖₁)` for the state's split; zero under
+    /// the exact law.
+    pub bound: Rat,
     remainders: ResonatorRemainders,
 }
 
@@ -561,10 +601,12 @@ impl ResonatorRemainders {
 
 impl ResonatorStep {
     /// **The executed balance closes exactly** (Lean `HNN/Ring.ring_tick_executed_energy_balance`):
-    /// `after − before = pump + port − dissipation + chart + split`.
+    /// `after − before = pump + port − dissipation + chart + split`, and the executed solve's and
+    /// split's residual lies within its certified bound, `|chart + split| ≤ bound`.
     pub fn closes(&self) -> bool {
         &self.after - &self.before
             == &self.pump + &self.port - &self.dissipation + &self.chart + &self.split
+            && (&self.chart + &self.split).abs() <= self.bound
     }
 
     /// The carried remainders this tick leaves.
@@ -598,6 +640,17 @@ impl ResonatorOperands {
                     .add(&ExactRatMatrix::identity(n)?.scaled(&(step / admittance)))?
                     .add(&dissipation.scaled(step))?
                     .add(&stiffness.scaled(&(step * step / integer(2))))?;
+                let operator_norm = (0..n)
+                    .map(|i| {
+                        operator
+                            .row(i)
+                            .expect("in range")
+                            .iter()
+                            .map(|x| x.abs())
+                            .sum::<Rat>()
+                    })
+                    .max()
+                    .unwrap_or_else(Rat::zero);
                 let (solve, reading) = match lattice {
                     None => (PhaseSolve::Exact(operator.inverse()?), None),
                     Some(lattice) => {
@@ -618,6 +671,7 @@ impl ResonatorOperands {
                 Ok(Phase {
                     stiffness,
                     operator,
+                    operator_norm,
                     solve,
                     reading,
                 })
@@ -681,6 +735,27 @@ impl ResonatorOperands {
     /// The pumped stiffness `K_j`.
     pub fn stiffness(&self, phase: usize) -> &ExactRatMatrix {
         &self.phases[phase].stiffness
+    }
+
+    /// `‖M_j‖∞`, the operator's largest absolute row sum.
+    pub fn operator_norm(&self, phase: usize) -> &Rat {
+        &self.phases[phase].operator_norm
+    }
+
+    /// `δ_j = ‖1 − M_j X̂_j‖∞`, the executed chart's certificate; zero for the exact inverse.
+    pub fn certificate(&self, phase: usize) -> Rat {
+        self.phases[phase]
+            .reading
+            .as_ref()
+            .map_or_else(Rat::zero, |reading| reading.certificate.clone())
+    }
+
+    /// Replace pump phase `j`'s executed solve by `solve`, its certificate kept: the wrong solve of
+    /// the bound's own test.
+    #[cfg(test)]
+    pub(crate) fn with_executed_solve(mut self, phase: usize, solve: ExactRatMatrix) -> Self {
+        self.phases[phase].solve = PhaseSolve::Exact(solve);
+        self
     }
 
     /// Apply the transpose of the executed phase solve to a covector.
@@ -787,6 +862,19 @@ impl ResonatorOperands {
         );
         let after = self.energy_at(phase, &displacement, &velocity)?;
         let split_term = &after - self.energy_at(phase, &displacement_image, &velocity_image)?;
+        // |⟨ω, M ω − r⟩| ≤ ‖ω‖₁(δ‖r‖∞ + ‖M‖∞u) and |E(x̂) − E(x)| ≤ (u/2)(‖C(ŵ + w)‖₁ + ‖K(û + u)‖₁).
+        let bound = match lattice {
+            Some(lattice) => {
+                let unit = lattice.unit();
+                let solve = l1(&rate)
+                    * (self.certificate(phase) * sup(&right)
+                        + &self.phases[phase].operator_norm * &unit);
+                let stored = capacity.apply(&add(&velocity, &velocity_image))?;
+                let stiffened = stiffness.apply(&add(&displacement, &displacement_image))?;
+                solve + unit * (l1(&stored) + l1(&stiffened)) / integer(2)
+            }
+            None => l1(&rate) * self.certificate(phase) * sup(&right),
+        };
         Ok(ResonatorStep {
             drive: drive.to_vec(),
             input: [u.to_vec(), w.to_vec()],
@@ -802,12 +890,27 @@ impl ResonatorOperands {
             split: split_term,
             state: [displacement, velocity],
             rate,
+            bound,
             remainders: ResonatorRemainders {
                 rate: rate_remainder,
                 state: [displacement_remainder, velocity_remainder],
             },
         })
     }
+}
+
+/// `‖x‖₁`.
+fn l1(vector: &[Rat]) -> Rat {
+    vector.iter().map(|x| x.abs()).sum()
+}
+
+/// `‖x‖∞`.
+fn sup(vector: &[Rat]) -> Rat {
+    vector
+        .iter()
+        .map(|x| x.abs())
+        .max()
+        .unwrap_or_else(Rat::zero)
 }
 
 // -------------------------------------------------------------------------------------------

@@ -1041,6 +1041,12 @@ impl Operands {
         &self.resonators
     }
 
+    /// Each ring's resonator operands, mutable: the wrong solve of the resonator bound's own test.
+    #[cfg(test)]
+    pub(crate) fn resonators_mut(&mut self) -> &mut [Option<ResonatorOperands>] {
+        &mut self.resonators
+    }
+
     /// Each contact's declared surface-storage density, where its break law is declared.
     pub fn surfaces(&self) -> &[Option<Rat>] {
         &self.surfaces

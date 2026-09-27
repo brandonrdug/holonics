@@ -1,7 +1,9 @@
-//! **Campaign 2's resident ring physics** (`holonics::hnn::ring`, kernel `hnn_resonator_word`): the
-//! word's resonators on the card equal the host's executed resonator ticks coordinate for
-//! coordinate, and each phase is timed on the host and the card. The parity tests are `#[ignore]`
-//! and need the card; run them alone:
+//! **Campaign 2's resident physics fixtures and the normal law's deposit on the card**: the
+//! resonant constitution the loaded port tests declare (`port_tests`), and the prox deposit's
+//! parity with the host. The loaded resonator itself runs only inside the word kernels
+//! (`hnn_word_forward`, `hnn_word_reverse`), whose parity tests cover its law; the standalone
+//! resonator kernel was retired with its last consumer. The parity tests are `#[ignore]` and need
+//! the card; run them alone:
 //!
 //! ```text
 //! flock .local/gpu.lock cargo test --release -p holonics-cuda -- --include-ignored --test-threads=1
@@ -10,16 +12,13 @@
 use std::time::Instant;
 
 use holonics::hnn::constitution::{Constitution, Steps};
-use holonics::hnn::field::{Current, Field, FieldDeclaration};
-use holonics::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial, ResonatorOperands};
-use holonics::hnn::{ReceivingPhases, SourceMoment, Word};
+use holonics::hnn::field::Field;
+use holonics::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial};
 use holonics::holon::parametron::Carrier;
 use holonics::ratio::{Rat, rat};
 use num_traits::Zero;
 
-use super::card::{Realization, resonator_layout};
-use super::tests::{Draw, card, census, entry};
-use super::word::{RESONATOR_ENTRY, ResonatorPlan};
+use super::tests::{Draw, card};
 
 /// Campaign 1's field at the standing cut's population, each ring carrying its parametron's
 /// resonator (unit weights, `d = 1/4`) with a half-turn pump of strength `1/8` on the axis `1`: dyadic
@@ -39,131 +38,6 @@ pub(super) fn resonant(field: &Field) -> Constitution {
         theta = theta.with_ring_resonator(field, ring, material).unwrap();
     }
     theta
-}
-
-/// The resonators' layout: one block per resonator, one thread per row, the ticks serial.
-#[test]
-fn the_resonator_layout_is_one_block_per_ring_and_one_thread_per_row() {
-    let census = census();
-    let layout = resonator_layout(&census, &entry(RESONATOR_ENTRY, 1024, 0), 4, 26).unwrap();
-    assert_eq!(layout.grid.x, 4);
-    assert_eq!(layout.block.x, 32);
-    assert_eq!(
-        layout.realization,
-        Realization::RingPerBlock {
-            rings: 4,
-            threads: 32,
-            columns: 26
-        }
-    );
-    assert!(resonator_layout(&census, &entry(RESONATOR_ENTRY, 16, 0), 4, 26).is_err());
-}
-
-/// **The resident resonators equal the host's word, tick for tick** (campaign 2, Decision 25): on
-/// campaign 1's field with a resonator on every ring, the card's `(u, w, ω)` at every tick and the
-/// carried solve remainders at the word's end equal the host word's executed resonator ticks
-/// (`holonics::hnn::ring::ResonatorOperands::step` inside `Word::tick`), driven by the storage waves
-/// the host word's junctions sent. The host's and the card's times are reported.
-#[test]
-#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
-fn resident_resonators_equal_the_host_word_and_are_measured() {
-    let card = card();
-    let field = Field::declare(FieldDeclaration::campaign_one(6148)).unwrap();
-    let theta = resonant(&field);
-    let mut draw = Draw(1_077);
-    let cells: Vec<usize> = (0..2_048).map(|_| draw.below(256)).collect();
-    let mut current = Current::at_rest(&field);
-    let mut moment = SourceMoment::open(&field, &current);
-    moment.ingest(&field, &mut current, &cells).unwrap();
-    let phases = ReceivingPhases::declare(&field, &theta, &current, &field.receivers()[0]).unwrap();
-
-    let clock = Instant::now();
-    let mut word = Word::open(&field, &theta, &current, &moment).unwrap();
-    word.forward(&phases).unwrap();
-    let host_word_us = clock.elapsed().as_micros();
-    let ticks = word.balances().len();
-    assert!(word.field_balances().iter().all(|balance| balance.closes()));
-
-    let resonators: Vec<&ResonatorOperands> =
-        word.operands().resonators().iter().flatten().collect();
-    let rings: Vec<usize> = resonators.iter().map(|r| r.ring()).collect();
-    let drives: Vec<Vec<Vec<Rat>>> = (0..ticks)
-        .map(|t| {
-            let waves = word.storage_waves(t).unwrap();
-            rings.iter().map(|&ring| waves[ring].clone()).collect()
-        })
-        .collect();
-    let transient = field.word_lattice().unwrap().transient().exponent();
-    let plan = ResonatorPlan::form(&resonators, transient).unwrap();
-
-    // The host's resonator ticks alone, from the same drives.
-    let lattice = field.word_lattice().unwrap().transient();
-    let clock = Instant::now();
-    for (k, resonator) in resonators.iter().enumerate() {
-        let n = resonator.width();
-        let mut state = [vec![Rat::zero(); n], vec![Rat::zero(); n]];
-        let mut remainders = Default::default();
-        for (t, tick) in drives.iter().enumerate() {
-            let step = resonator
-                .step(
-                    t,
-                    &tick[k],
-                    [&state[0], &state[1]],
-                    &remainders,
-                    Some(&lattice),
-                )
-                .unwrap();
-            state = step.state.clone();
-            remainders = step.remainders().clone();
-        }
-    }
-    let host_resonator_us = clock.elapsed().as_micros();
-
-    // The card: a first word (its buffers allocated), then repeated words.
-    let clock = Instant::now();
-    let record = card.resonator_word(&plan, &drives).unwrap();
-    let first_us = clock.elapsed().as_micros();
-    const REPEATS: u32 = 16;
-    let clock = Instant::now();
-    for _ in 0..REPEATS {
-        card.resonator_word(&plan, &drives).unwrap();
-    }
-    let card_us = clock.elapsed().as_micros() / u128::from(REPEATS);
-
-    for (k, &ring) in rings.iter().enumerate() {
-        let resonance = word.resonances()[ring].as_ref().unwrap();
-        assert_eq!(resonance.steps.len(), ticks);
-        for (t, step) in resonance.steps.iter().enumerate() {
-            let (state, omega) = record.state(&plan, k, t).unwrap();
-            assert_eq!(state, step.state, "ring {ring}, tick {t}");
-            assert_eq!(omega, step.rate, "ring {ring}, tick {t}");
-        }
-        assert_eq!(
-            record.remainders(&plan, k),
-            resonance.remainders.rate,
-            "ring {ring}'s carried solve remainders"
-        );
-    }
-    let layout = resonator_layout(
-        card.census(),
-        &card.entry(RESONATOR_ENTRY).unwrap(),
-        plan.widths().len(),
-        plan.widths().iter().copied().max().unwrap(),
-    )
-    .unwrap();
-    eprintln!("resonator layout: {:?}", layout.realization);
-    eprintln!(
-        "resonators {:?} widths {:?}, {} ticks, exponents (e_h, L_m, L_c, L_w) {:?}",
-        plan.rings(),
-        plan.widths(),
-        ticks,
-        plan.exponents()
-    );
-    eprintln!(
-        "times (µs): host word with resonators {host_word_us}; host resonator ticks \
-         {host_resonator_us}; card resonator word first {first_us}, then {card_us} a word \
-         (upload, one launch, one read)"
-    );
 }
 
 // -------------------------------------------------------------------------------------------

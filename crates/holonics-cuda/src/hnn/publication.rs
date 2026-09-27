@@ -25,7 +25,7 @@
 //! (`hnn_scatter_words`): the port plan's "stepped entries", `(index, word)` per moved entry. A
 //! first publication, or one whose layout differs, crosses whole.
 
-use std::cell::RefCell;
+use std::cell::{OnceCell, RefCell};
 use std::collections::BTreeMap;
 use std::rc::Rc;
 
@@ -33,7 +33,7 @@ use core::ffi::c_void;
 
 use holonics::hnn::contact::signed_stiffness;
 use holonics::hnn::propagation::{contact_operator, element_material, gram, ring_operator};
-use holonics::hnn::ring::ResonatorMaterial;
+use holonics::hnn::ring::{ResonatorMaterial, ResonatorOperands};
 use holonics::hnn::{ConstitutionRead, Field, HnnError, Locus};
 use holonics::ratio::Rat;
 use holonics::ratio::linear::ExactRatMatrix;
@@ -120,6 +120,8 @@ pub(crate) struct Loci {
     /// layouts differ only in their words.
     layout: Vec<(usize, usize, u32)>,
     operators: RefCell<BTreeMap<(usize, BigInt), Rc<ContactOperator>>>,
+    /// The loaded rings' operands at this publication, formed once ([`Loci::resonator_operands`]).
+    resonator_operands: OnceCell<Rc<Vec<Option<ResonatorOperands>>>>,
 }
 
 fn lattice(field: &Field, locus: Locus) -> Result<u32, HnnError> {
@@ -306,6 +308,7 @@ impl Loci {
             words: words.words,
             layout: words.layout,
             operators: RefCell::new(BTreeMap::new()),
+            resonator_operands: OnceCell::new(),
         })
     }
 
@@ -336,6 +339,41 @@ impl Loci {
         });
         self.operators.borrow_mut().insert(key, Rc::clone(&formed));
         Ok(formed)
+    }
+
+    /// **The loaded rings' operands at this publication** (`ResonatorOperands::at_cut`: every pump
+    /// phase certified, its operator formed and charted on the word's lattices), formed once per
+    /// publication. [definition] They read only the published material, the ring's admittance, the
+    /// hop and the word's lattices, none of which a word's cut moves, so every word of the
+    /// publication executes the same operands and charts.
+    pub(crate) fn resonator_operands(
+        &self,
+        field: &Field,
+    ) -> Result<Rc<Vec<Option<ResonatorOperands>>>, HnnError> {
+        if let Some(formed) = self.resonator_operands.get() {
+            return Ok(Rc::clone(formed));
+        }
+        let formed = Rc::new(
+            self.resonators
+                .iter()
+                .enumerate()
+                .map(|(ring, material)| {
+                    material
+                        .as_ref()
+                        .map(|material| {
+                            ResonatorOperands::at_cut(
+                                ring,
+                                material,
+                                field.ring(ring).admittance(),
+                                field.step(),
+                                field.word_lattice(),
+                            )
+                        })
+                        .transpose()
+                })
+                .collect::<Result<Vec<_>, HnnError>>()?,
+        );
+        Ok(Rc::clone(self.resonator_operands.get_or_init(|| formed)))
     }
 }
 

@@ -86,23 +86,7 @@ impl<'a> Change<'a> {
                 &record.resonator_w[step * plan.n..(step + 1) * plan.n],
             )
         };
-        let resonator_phases = plan
-            .rings
-            .iter()
-            .enumerate()
-            .map(|(ring, _)| {
-                plan.resonators
-                    .iter()
-                    .find(|resonator| resonator.ring == ring)
-                    .and_then(|resonator| {
-                        if step == 0 || full == 0 {
-                            None
-                        } else {
-                            Some((step - 1).min(full - 1) % resonator.phases)
-                        }
-                    })
-            })
-            .collect();
+        let resonator_phases = measured_phases(plan, step.min(full));
         Self {
             storage: slice(&record.storage, step * plan.n, plan.n),
             arrivals: slice(&record.arrivals, step * plan.na, plan.na),
@@ -122,16 +106,7 @@ impl<'a> Change<'a> {
             w: &record.final_w,
             resonator_u: &record.resonator_final_u,
             resonator_w: &record.resonator_final_w,
-            resonator_phases: plan
-                .rings
-                .iter()
-                .enumerate()
-                .map(|(ring, _)| {
-                    let res = plan.resonators.iter().find(|res| res.ring == ring)?;
-                    let full = plan.steps.saturating_sub(1);
-                    (full > 0).then_some((full - 1) % res.phases)
-                })
-                .collect(),
+            resonator_phases: measured_phases(plan, plan.steps.saturating_sub(1)),
         }
     }
 
@@ -201,6 +176,22 @@ impl<'a> Change<'a> {
             resonator_phases,
         }
     }
+}
+
+/// The pump phase whose form measures each loaded ring's state after `ticks` full ticks
+/// (`holonics::hnn::word::EndChange::resonator_phases`): the last executed tick's, and phase `0`,
+/// where the open state is read, before any; `None` off the loaded rings.
+fn measured_phases(plan: &WordPlan, ticks: usize) -> Vec<Option<usize>> {
+    (0..plan.rings.len())
+        .map(|ring| {
+            let resonator = plan.resonators.iter().find(|res| res.ring == ring)?;
+            Some(
+                ticks
+                    .checked_sub(1)
+                    .map_or(0, |last| last % resonator.phases),
+            )
+        })
+        .collect()
 }
 
 /// `⟨x, F x⟩` for a form at its scale and a coordinate vector at `σ_x`: the value, or zero for a
@@ -275,7 +266,12 @@ fn loaded_output(
 }
 
 /// The host's `ResonatorBalance` read from the loaded tick record. The returned wave's split
-/// remains in the field balance; it is separate from the resonator's state split.
+/// remains in the field balance; it is separate from the resonator's state split. Its bound is the
+/// host's (`holonics::hnn::ring::ResonatorStep::bound`) on the record's coordinates:
+/// `‖ω‖₁(δ_j‖r‖∞ + ‖M_j‖∞u)` for the executed solve, with the host's chart certificate and the
+/// operator words' row norm, and `(u/2)(‖C(ŵ′ + w′)‖₁ + ‖K_j(û′ + u′)‖₁)` for the state's split. The
+/// card carries the state exactly (`u + hω`, `2ω − w` lie on `2^(−L_w)ℤ` for `h = 2^(e_h)`), so the
+/// carried state is its image and the split term is zero, while its bound is not.
 fn resonator_balance(
     plan: &WordPlan,
     record: &ForwardRecord,
@@ -297,6 +293,8 @@ fn resonator_balance(
     let mut dissipation_work = Rat::zero();
     let mut chart_work = Rat::zero();
     let split_work = Rat::zero();
+    let mut bound = Rat::zero();
+    let unit = rat(BigInt::from(1), plan.lw);
     let ring = &plan.rings[resonator.ring];
     for tick in 0..full {
         let at = tick * plan.n + ring.rows;
@@ -379,12 +377,27 @@ fn resonator_balance(
         let common = resonator.operator_exp.max(resonator.material_exp) + plan.lw;
         let op_shift = common - (resonator.operator_exp + plan.lw);
         let rhs_shift = common - (resonator.material_exp + plan.lw);
+        let rhs_at_scale = rhs.clone();
         let residual: Vec<BigInt> = image
             .iter()
             .zip(rhs)
             .map(|(left, right)| (left << op_shift as usize) - (right << rhs_shift as usize))
             .collect();
         chart_work += rat(dot(&rate, &residual), plan.lw + common);
+        // |⟨ω, M ω − r⟩| ≤ ‖ω‖₁(δ‖r‖∞ + ‖M‖∞u); the split's cells on the carried state, which is
+        // its image here (the sums are twice the images).
+        bound += rat(l1(&rate), plan.lw)
+            * (&resonator.certificates[phase]
+                * rat(sup(&rhs_at_scale), resonator.material_exp + plan.lw)
+                + operator.row_norm() * &unit);
+        let doubled =
+            |values: &[BigInt]| -> Vec<BigInt> { values.iter().map(|x| x << 1usize).collect() };
+        let stored = capacity.apply(&doubled(&velocity_after));
+        let stiffened = stiffness.apply(&doubled(&displacement_after));
+        bound += &unit
+            * (rat(l1(&stored), capacity.exponent + plan.lw)
+                + rat(l1(&stiffened), stiffness.exponent + plan.lw))
+            / integer(2);
     }
     let mut released = Vec::new();
     for i in 0..n {
@@ -411,6 +424,7 @@ fn resonator_balance(
         dissipation: dissipation_work,
         chart: chart_work,
         split: split_work,
+        bound,
         released: Remainders::of(&released),
     }
 }

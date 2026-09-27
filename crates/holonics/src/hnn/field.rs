@@ -406,15 +406,7 @@ impl FieldDeclaration {
             .unwrap_or(1);
         self.learned_loci()
             .into_iter()
-            .map(|(locus, fan_in)| {
-                let reach = 2u128.saturating_mul(grain).saturating_mul(fan_in.max(1));
-                let exponent = if reach <= 1 {
-                    0
-                } else {
-                    128 - (reach - 1).leading_zeros()
-                };
-                (locus, exponent)
-            })
+            .map(|(locus, fan_in)| (locus, lattice_exponent(grain, fan_in)))
             .collect()
     }
 
@@ -422,6 +414,19 @@ impl FieldDeclaration {
     pub fn by_lattice_rule(mut self) -> Self {
         self.lattice = self.lattice_by_rule();
         self
+    }
+}
+
+/// **The lattice rule's exponent** ([`FieldDeclaration::lattice_by_rule`]): `L = ⌈log₂(2 L_R X)⌉`
+/// for the finest receiver grain `L_R` and a locus's fan-in `X` (at least one). It is the one owner
+/// of the rule, read by the field's declared loci and by a constitution's declared resonator
+/// (`hnn::constitution::Constitution::with_ring_resonator`).
+pub fn lattice_exponent(grain: u128, fan_in: u128) -> u32 {
+    let reach = 2u128.saturating_mul(grain).saturating_mul(fan_in.max(1));
+    if reach <= 1 {
+        0
+    } else {
+        128 - (reach - 1).leading_zeros()
     }
 }
 

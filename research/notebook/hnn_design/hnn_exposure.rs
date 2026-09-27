@@ -67,8 +67,10 @@
 //!   the rounded Newton–Schulz steps, the largest certificate against the target), the remainders
 //!   the words and their returns released, the tick balances' residuals against their bounds, and
 //!   every word's whole balance carried across its commit (campaign 2: the count, whether every
-//!   one closed, the largest residual against its bound, the deposition work and the
-//!   interconnection's defect);
+//!   one closed, the largest residual, the resonators' chart and split included, against its
+//!   bound, the deposition work and the interconnection's defect, which is zero by construction
+//!   for a loaded port); with `resonator source`, the final gain amplitudes and their carried
+//!   remainders;
 //! - the bits on the training and the held-out targets against each online baseline (uniform,
 //!   order-0 and order-1 Krichevsky–Trofimov, PPM of order 2), and the verdict against order-0;
 //!   the model's face is the mixture of the tree's face and the combined face (the primary's ruling
@@ -357,6 +359,18 @@ fn main() {
                 exact(&gains[3])
             );
         }
+        println!(
+            "== their carried remainders (what reached each family below its lattice's unit) =="
+        );
+        for (ring, remainders) in &exposure.resonator_remainders {
+            println!(
+                "ring {ring}: C {}, K {}, D {}, pump {}",
+                exact(&remainders[0]),
+                exact(&remainders[1]),
+                exact(&remainders[2]),
+                exact(&remainders[3])
+            );
+        }
     }
     println!();
     phases(&exposure, wall);
@@ -630,7 +644,7 @@ fn report(field: &Field, exposure: &Exposure) {
     );
     let words = &word.words;
     println!(
-        "word balances (campaign 2, WordBalance::closes: the field and its resonators in one identity with the deposition work at the commit and the interconnection's defect, and the executed residual within its certified bound): {} formed, {} carried across a commit, every one closed: {}; the largest executed residual (defects plus the last junction's) {} against its bound {}: {}; the deposition work summed over the commits {} (the largest in magnitude {}); the interconnection's defect summed {}",
+        "word balances (campaign 2, WordBalance::closes: the field and its resonators in one identity with the deposition work at the commit, and the executed residual within its certified bound): {} formed, {} carried across a commit, every one closed: {}; the largest executed residual (defects, the last junction's, and the resonators' chart and split) {} against its bound {}: {}; the deposition work summed over the commits {} (the largest in magnitude {}); the interconnection's defect summed {} (zero by construction for a loaded port: the field's term is the negative of the resonator's port work)",
         words.formed,
         words.committed,
         words.closed,

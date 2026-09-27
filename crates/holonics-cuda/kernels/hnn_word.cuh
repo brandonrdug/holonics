@@ -234,6 +234,7 @@
 #define WL_RES_Z_BAR 64
 #define WL_REC_RES_SOLVED 65
 #define WL_RES_STATUS 66
+#define WL_RES_OPERAND_STATUS 67
 
 // The status block: the refusal bits, the first refused stage, and the row it refused.
 #define WSTATUS_BITS 0
@@ -490,6 +491,9 @@ extern "C" __global__ void hnn_word_forward(
     wide *res_rem_w = HNN_AT(wide, WL_RES_REM_W);
     wide *res_rem_output = HNN_AT(wide, WL_RES_REM_OUTPUT);
     uint32_t *res_status = HNN_AT(uint32_t, WL_RES_STATUS);
+    // The right side's statuses as its stage left them: the solve reads its ring's other rows only
+    // here, while each row rewrites its own `res_status` in the same barrier interval.
+    uint32_t *res_operand_status = HNN_AT(uint32_t, WL_RES_OPERAND_STATUS);
     int64_t *rec_storage = HNN_AT(int64_t, WL_REC_STORAGE);
     int64_t *rec_arrivals = HNN_AT(int64_t, WL_REC_ARRIVALS);
     int64_t *rec_u = HNN_AT(int64_t, WL_REC_U);
@@ -520,6 +524,7 @@ extern "C" __global__ void hnn_word_forward(
         res_rem_w[e] = 0;
         res_rem_output[e] = 0;
         res_status[e] = HNN_EXACT;
+        res_operand_status[e] = HNN_EXACT;
     }
     for (long long p = t; p < NA; p += T) {
         arrivals[p] = 0;
@@ -800,6 +805,7 @@ extern "C" __global__ void hnn_word_forward(
                 if (rix < 0) {
                     res_rho[e] = 0;
                     res_status[e] = HNN_EXACT;
+                    res_operand_status[e] = HNN_EXACT;
                     continue;
                 }
                 uint32_t st = HNN_EXACT;
@@ -825,6 +831,7 @@ extern "C" __global__ void hnn_word_forward(
                 hnn_add(image, source);
                 res_rho[e] = hnn_read(image, &st);
                 res_status[e] = st;
+                res_operand_status[e] = st;
                 hnn_note(st, STAGE_RESONATOR, (uint32_t)e, &bits, &first);
             }
             __syncthreads();
@@ -843,7 +850,7 @@ extern "C" __global__ void hnn_word_forward(
                 const long long shift = res[RZ_LC] + res[RZ_LM];
                 const int64_t *chart = operands + res[RZ_CHARTS] + phase * n * n;
                 for (long long j = 0; j < n; ++j) {
-                    if (res_status[base + j] != HNN_EXACT) st |= HNN_REFUSED_OPERAND;
+                    if (res_operand_status[base + j] != HNN_EXACT) st |= HNN_REFUSED_OPERAND;
                 }
                 HnnSum image = hnn_sum();
                 if (st == HNN_EXACT) {
@@ -1056,6 +1063,9 @@ extern "C" __global__ void hnn_word_reverse(
     wide *res_rem_w = HNN_AT(wide, WL_RES_REM_W);
     wide *rec_res_solved = HNN_AT(wide, WL_REC_RES_SOLVED);
     uint32_t *res_status = HNN_AT(uint32_t, WL_RES_STATUS);
+    // z̄'s statuses as its stage left them (the forward word's snapshot, reused): the transposed
+    // solve reads its ring's other rows only here.
+    uint32_t *res_operand_status = HNN_AT(uint32_t, WL_RES_OPERAND_STATUS);
 
     for (long long e = t; e < N; e += T) {
         storage_bar[e] = 0;
@@ -1068,6 +1078,7 @@ extern "C" __global__ void hnn_word_reverse(
         res_rem_u[e] = 0;
         res_rem_w[e] = 0;
         res_status[e] = HNN_EXACT;
+        res_operand_status[e] = HNN_EXACT;
     }
     for (long long p = t; p < NA; p += T) {
         arrival_bar[p] = 0;
@@ -1102,6 +1113,7 @@ extern "C" __global__ void hnn_word_reverse(
                     res_z_bar[e] = 0;
                     rec_res_solved[step * N + e] = 0;
                     res_status[e] = HNN_EXACT;
+                    res_operand_status[e] = HNN_EXACT;
                     continue;
                 }
                 uint32_t st = HNN_EXACT;
@@ -1118,6 +1130,7 @@ extern "C" __global__ void hnn_word_reverse(
                 res_rem_z[e] = remainder;
                 res_z_bar[e] = zbar;
                 res_status[e] = st;
+                res_operand_status[e] = st;
                 hnn_note(st, RSTAGE_SOLVED, (uint32_t)e, &bits, &first);
             }
             __syncthreads();
@@ -1134,7 +1147,7 @@ extern "C" __global__ void hnn_word_reverse(
                 const long long phase = step % res[RZ_PHASES];
                 const int64_t *chart = operands + res[RZ_CHARTS] + phase * n * n;
                 for (long long j = 0; j < n; ++j) {
-                    if (res_status[base + j] != HNN_EXACT) st |= HNN_REFUSED_OPERAND;
+                    if (res_operand_status[base + j] != HNN_EXACT) st |= HNN_REFUSED_OPERAND;
                 }
                 HnnSum image = hnn_sum();
                 if (st == HNN_EXACT) {

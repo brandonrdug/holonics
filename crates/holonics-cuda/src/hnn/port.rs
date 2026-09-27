@@ -13,7 +13,7 @@
 //! | the keyed charts, their rounded Newton–Schulz steps and exact certificates (`hnn::store`) | each refinement's decisions from the certificates (warm, cold, fallback, target), the cold start's transpose and the exact fallback |
 //! | the word's open (`E_g M_g[c]`, the pair port), its ticks, its receiving read (`hnn_pair_weights`, `hnn_word_forward`) | the faces in `ℚ(θ)`, each tick's balance, the release (`hnn::readout`) |
 //! | the receiving parametron's landmark tree mirrored, stored at the faces where paths part (`hnn::tree::CardTree`, campaign 2, Decision 37): each window's splits at every phase's causal address in cell order (the known targets' deposits applied and undone on the card), and each deposit's opened-path update with its splits, foundings and label runs | the class faces from the splits and their grain exponents (`landmark::faces_of_splits`), added to the card's wave at the grain (`ReceivingPhases::combine`); after every deposit the mirror's counts and the masses, `β`, stop weights, depth words and label ends of every node the deposit's walks opened or it founded, its joins and its held labels, checked against the host's tree (`CardTree::agrees_at`) |
-//! | each declared ring resonator's ticks inside `hnn_word_forward`, its returned wave reaching the next junction; its state/input adjoint inside `hnn_word_reverse` (Decision 38) | the resonators' local operands and certified charts at the cut (`ResonatorOperands::at_cut`); their balances read from the live word's record; gain contractions and deposition at the same producing operands |
+//! | each declared ring resonator's ticks inside `hnn_word_forward`, its returned wave reaching the next junction; its state/input adjoint inside `hnn_word_reverse` (Decision 38) | the resonators' local operands and certified charts (`ResonatorOperands::at_cut`), formed once per publication (`publication::Loci::resonator_operands`); their balances and bounds read from the live word's record; gain contractions and deposition at the same producing operands |
 //! | in the GPU suite's parity tests only ([`Resident::with_normal_mirror`]; off the exposure's path, where it replaced no host owner): each normal law's prox step a deposit takes once at its locus (`hnn_outer_update` for `ΔH` and `ΔW`, `hnn_budgeted_split` for their carries, the reaches `X̂f` by `hnn_lattice_read` through the host's successor chart; campaign 2), read against the host's successor (`crate::hnn::lattice::normal_deposit_on_card`), every step counted carried, declined by reason or skipped | the successor constitution (`Constitution::deposited`, the owner of `Θ`), the chart of `H′`, and the steps the card's words cannot carry (a sample off the dyadics, such as `R`'s covector on `(1/W)ℤ`) |
 //! | the word's return (`hnn_word_reverse`) | the compare phase under the hardware law (`reference::compare_phase`: the tree at the grain beside the mixture score, the Holon ratio and its covector), the return's source through `Rᵀ` (the covector lives on `(1/W)ℤ`), the composition onto the loci (`reference::compose`) |
 //! | | keys, the collapse, the first law's ledger, the handles, every refusal's reason |
@@ -67,7 +67,6 @@ use holonics::hnn::reference::{
     compare_phase, compose, expose, expose_from, window_code_length,
 };
 use holonics::hnn::retention::{Diamond, aeon_readings, collapse, contained, separator};
-use holonics::hnn::ring::ResonatorOperands;
 use holonics::hnn::{
     ActiveAddress, AeonBoundary, ChartKey, ChartReading, Constitution, ConstitutionRead, Current,
     Faces, Field, HnnError, Locus, PendingRatio, ReceivingPhases, SourceMoment, Steps,
@@ -299,24 +298,10 @@ impl<'c> Mounted<'c> {
         let current = ratio.current(field)?;
         // The indexed normalized open (ruling B), read from the pending ratio's copy of the moment.
         let opens = SourceOpen::of(field, ratio.moment())?;
-        // Match the host's declared resonator charts at this producing cut. Only these local
-        // operators are formed here; ring/contact chart refinement remains resident below.
-        let resonators = (0..field.rings().len())
-            .map(|ring| {
-                publication.loci.resonators[ring]
-                    .as_ref()
-                    .map(|material| {
-                        ResonatorOperands::at_cut(
-                            ring,
-                            material,
-                            field.ring(ring).admittance(),
-                            field.step(),
-                            field.word_lattice(),
-                        )
-                    })
-                    .transpose()
-            })
-            .collect::<Result<Vec<_>, HnnError>>()?;
+        // The host's declared resonator operands and charts at this publication, formed once per
+        // publication (`Loci::resonator_operands`); ring/contact chart refinement remains resident
+        // below.
+        let resonators = publication.loci.resonator_operands(field)?;
         let plan = WordPlan::form(
             field,
             &current,
@@ -1473,9 +1458,34 @@ impl<'c> ExecutionPort for Resident<'c> {
             let (reread, readings) =
                 resident.arrived_code_length(&successor, Some(&next), self.card)?;
             let reread_time = start.elapsed();
-            Ok::<_, HnnError>((successor, reread, readings, tree_deposit, reread_time))
+            // Every fallible step stays inside the trial, as the host's does
+            // (`holonics::hnn::reference`): the receipt, then the first law's ledger step on a
+            // copy (`EnclosedLedger::deposit` refuses before it moves); the tally is read only after
+            // the trial succeeds.
+            let mut work = ExactWork::nothing();
+            stepped(&mut work, 1);
+            holonics::hnn::port::resident(&mut work, reading.bits);
+            let receipt = port_receipt(
+                &zero_ticks(&field),
+                &Rat::one(),
+                work,
+                ReceiptDetail::Deposit {
+                    reading: reading.clone(),
+                    reread: reread.clone(),
+                },
+            )?;
+            let mut ledger = resident.ledger.clone();
+            ledger.deposit(reread)?;
+            Ok::<_, HnnError>((
+                successor,
+                readings,
+                receipt,
+                ledger,
+                tree_deposit,
+                reread_time,
+            ))
         })();
-        let (successor, reread, readings, tree_deposit, reread_time) = match trial {
+        let (successor, readings, receipt, ledger, tree_deposit, reread_time) = match trial {
             Ok(success) => success,
             Err(refusal) => {
                 let tree_restore = if let Some((ring, tree)) = resident.tree.as_mut() {
@@ -1497,19 +1507,7 @@ impl<'c> ExecutionPort for Resident<'c> {
             }
         };
         resident.tally.read(&readings);
-        let mut work = ExactWork::nothing();
-        stepped(&mut work, 1);
-        holonics::hnn::port::resident(&mut work, reading.bits);
-        let receipt = port_receipt(
-            &zero_ticks(&field),
-            &Rat::one(),
-            work,
-            ReceiptDetail::Deposit {
-                reading: reading.clone(),
-                reread: reread.clone(),
-            },
-        )?;
-        resident.ledger.deposit(reread)?;
+        resident.ledger = ledger;
         resident.staged.remove(&staged);
         resident.constitution = next;
         resident.publication = successor;

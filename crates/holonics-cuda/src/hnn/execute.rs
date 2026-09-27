@@ -139,7 +139,7 @@ const WS_STRIDE: usize = 10;
 const WQ_STRIDE: usize = 8;
 
 /// The word buffer's arrays, in the kernels' `WL_*` order.
-const WL_ENTRIES: usize = 67;
+const WL_ENTRIES: usize = 68;
 
 // -------------------------------------------------------------------------------------------
 // the scales the host decodes with
@@ -198,6 +198,9 @@ pub(crate) struct LoadedResonatorPlan {
     pub(crate) stiffness_offset: usize,
     pub(crate) dissipation_offset: usize,
     pub(crate) operator_offset: usize,
+    /// Each pump phase's chart certificate `δ_j = ‖1 − M_j X̂_j‖∞`, the host's
+    /// (`holonics::hnn::ring::ResonatorOperands::certificate`), which the balance's bound reads.
+    pub(crate) certificates: Vec<Rat>,
 }
 
 /// [definition] **A word's plan**: the plan's words, the operands' weights (every ring's, first;
@@ -622,9 +625,8 @@ impl WordPlan {
                 operators,
                 operator_base,
                 solve_charts,
-                _,
             ) = resonator_plan.execution_operands();
-            let (res_rings, res_widths, _, (e_h, l_m, l_operator, l_c, _)) =
+            let (res_rings, res_widths, (e_h, l_m, l_operator, l_c)) =
                 resonator_plan.execution_shape();
             if resonator_plan.rings().len() != resonator_refs.len() {
                 return Err(refused("the resonator plan's declared rings"));
@@ -697,6 +699,9 @@ impl WordPlan {
                     stiffness_offset: stiffness_at + phase_base[index] as usize,
                     dissipation_offset: dissipation_at + dissipation_base[index] as usize,
                     operator_offset: operator_at + operator_base[index] as usize,
+                    certificates: (0..phase_count)
+                        .map(|phase| resonator.certificate(phase))
+                        .collect(),
                 });
             }
             plan.extend(records);
@@ -933,6 +938,9 @@ impl WordLayout {
             16 * n,
             16 * n,
             16 * s * n,
+            4 * n,
+            // The loaded solve's operand statuses, the first stage's snapshot: the chart stage reads
+            // its ring's other rows only there, never the status each row rewrites in that stage.
             4 * n,
         ];
         let mut offsets = [0u64; WL_ENTRIES];

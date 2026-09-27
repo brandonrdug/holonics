@@ -162,6 +162,7 @@
 //! | `HNN/LatticeDeposit.{carried_gram_posDef, carried_gram_posDef_rule}` | [`NormalLaw::gram`] (the carried Gram) |
 //! | `HNN/LatticeDeposit.{lattice_bits_bounded, lattice_rat_bits_bounded}` | [`Constitution::carrier_bits`] |
 //! | `HNN/LatticeDeposit.lattice_deposit_descends` | [`Constitution::deposited`] with `hnn::retention::collapse` |
+//! | `HNN/Ring.gain_backtrack_midpoint` | [`GainBacktrack`], [`DepositReading::backtracks`] |
 
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -173,7 +174,7 @@ use crate::hnn::HnnError;
 use crate::hnn::contact::{
     certify_boost, contact_conductances, signed_form_certifies, signed_stiffness,
 };
-use crate::hnn::field::{ConstitutionRead, Field};
+use crate::hnn::field::{ConstitutionRead, Field, lattice_exponent};
 use crate::hnn::landmark::{Landmarks, Letter};
 use crate::hnn::moment::PairPort;
 use crate::hnn::port::Deposit;
@@ -289,6 +290,27 @@ pub struct BudgetedCarry {
     clock: u64,
     staged: BTreeMap<(Carrier, usize), (Rat, BigInt)>,
     moved: bool,
+    backtracks: Vec<GainBacktrack>,
+}
+
+/// [definition; agent-inferred] **A loaded resonator gain's backtrack** (Decision 38's repair; the
+/// rule of [`Constitution::deposited`]): a candidate step that would carry gain family `family` of
+/// ring `ring` from `from > 0` to `candidate ≤ 0` carries it to `to` instead, the midpoint `from/2`
+/// of the admissible side `(0, from]` split at the locus's lattice by the carry's own nearest point,
+/// ties upward (toward `from`): `to = ⌈q/2⌉·2^(−L)` for `from = q·2^(−L)`, exactly `from/2` when `q`
+/// is even, and `from` itself at the lattice's first point `q = 1`. The substitute step `to − from`
+/// lies on the lattice, so the carry moves the gain by exactly that step and its remainder stays in
+/// its cell (Lean `HNN/Ring.gain_backtrack_midpoint`: the coordinate `⌊(q + 1)/2⌋ ∈ [1, q]`).
+/// Deposition never releases a family: a zero amplitude would zero its covector for every later
+/// word, and release belongs to campaign 3's collapse law with its receipt. Every substitution is
+/// named in the deposit's reading ([`DepositReading::backtracks`]).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct GainBacktrack {
+    pub ring: usize,
+    pub family: usize,
+    pub from: Rat,
+    pub candidate: Rat,
+    pub to: Rat,
 }
 
 impl BudgetedCarry {
@@ -299,7 +321,13 @@ impl BudgetedCarry {
             clock,
             staged: BTreeMap::new(),
             moved: false,
+            backtracks: Vec::new(),
         }
+    }
+
+    /// The gain backtracks this deposit took at the locus ([`GainBacktrack`]).
+    pub fn backtracks(&self) -> &[GainBacktrack] {
+        &self.backtracks
     }
 
     /// `m`, the clock the deposit advances the locus to.
@@ -2046,6 +2074,9 @@ pub struct DepositReading {
     pub stepped: u64,
     pub charts: Vec<(Locus, ChartReading)>,
     pub landmarks: u64,
+    /// Every loaded resonator gain step the deposit backtracked instead of carrying a gain to
+    /// `g ≤ 0` ([`GainBacktrack`]); deposition never releases a family.
+    pub backtracks: Vec<GainBacktrack>,
 }
 
 // -------------------------------------------------------------------------------------------
@@ -2476,6 +2507,17 @@ impl Constitution {
 
     /// **Declare a ring's resonator** (campaign 2, `hnn::ring`), certified at every pump phase at the
     /// field's hop on the ring's realified width.
+    ///
+    /// [definition; agent-inferred] **Its gains' lattice is the lattice rule's**
+    /// ([`crate::hnn::field::lattice_exponent`], Decision 22): `L = ⌈log₂(2 L_R X)⌉` with the
+    /// fan-in `X = n`, the resonator's realified width. Each gain scales a base form whose rows
+    /// read `n` unit-scale coordinates of the ring's state (`C₀w`, `K₀u`, `D₀ω`, the pumped `K`'s
+    /// rows), and the rule bounds a factor entry by the fan-in of the read it enters, as for the
+    /// element's factors (`W_s = −ffᵀ`, the slices), whose fan-in is the same ring width. The gain
+    /// enters its forms squared, so its read's bound through `g²` and the base form's coefficients
+    /// is the factor loci's word-level certificate owed in #62. For a field whose element lattice
+    /// is the rule's, the two lattices agree (campaign 1's ring 0: `n = 10`,
+    /// `L = ⌈log₂ 320⌉ = 9`).
     pub fn with_ring_resonator(
         mut self,
         field: &Field,
@@ -2495,15 +2537,9 @@ impl Constitution {
             });
         }
         material.certify(ring, field.step())?;
+        let lattice = Lattice::new(lattice_exponent(self.grain, material.width() as u128));
         self.rings[ring].resonator = Some(material);
         self.rings[ring].resonator_step = Some(field.step().clone());
-        let lattice =
-            self.lattices
-                .get(&Locus::Element(ring))
-                .copied()
-                .ok_or(HnnError::Lattice {
-                    locus: Locus::Element(ring),
-                })?;
         self.lattices.insert(Locus::Resonator(ring), lattice);
         Ok(self)
     }
@@ -2612,6 +2648,25 @@ impl Constitution {
                     .resonator
                     .as_ref()
                     .map(|resonator| (ring, resonator.gains().clone()))
+            })
+            .collect()
+    }
+
+    /// The carried remainders of every declared resonator's four gain amplitudes, in ring order:
+    /// what reached a family below its lattice's unit and has not moved its amplitude (zero where
+    /// nothing is carried).
+    pub fn resonator_gain_remainders(&self) -> Vec<(usize, [Rat; 4])> {
+        self.rings
+            .iter()
+            .enumerate()
+            .filter(|(_, material)| material.resonator.is_some())
+            .map(|(ring, _)| {
+                let remainders = std::array::from_fn(|family| {
+                    self.carries
+                        .get(&(Locus::Resonator(ring), Carrier::Resonator(family)))
+                        .map_or_else(Rat::zero, |carry| carry.at(0))
+                });
+                (ring, remainders)
             })
             .collect()
     }
@@ -3126,7 +3181,9 @@ impl Constitution {
     /// advanced, the energy-growth bound certified, and the budget checked on the successor's
     /// exact bits before anything is published. Refused with [`HnnError::ConstitutionBudget`]
     /// past `B_Θ`, with [`HnnError::StaleDeposit`] when the deposit was computed at another commit,
-    /// and with [`HnnError::ReleasedLocus`] when it names a released locus.
+    /// and with [`HnnError::ReleasedLocus`] when it names a released locus. A loaded resonator's
+    /// gain step whose carried gain would be `≤ 0` backtracks to the midpoint of the admissible
+    /// side and is named in the reading ([`GainBacktrack`]): deposition never releases a family.
     pub fn deposited(&self, deposit: &Deposit) -> Result<(Self, DepositReading), HnnError> {
         if deposit.commit() != self.commit {
             return Err(HnnError::StaleDeposit {
@@ -3260,6 +3317,10 @@ impl Constitution {
             );
         }
         let released_bits = released.iter().map(|(.., residual)| bits(residual)).sum();
+        let backtracks: Vec<GainBacktrack> = strokes
+            .values()
+            .flat_map(|at| at.backtracks().iter().cloned())
+            .collect();
         // `contact_growth` is certified on contact C/K blocks only. It deliberately makes no
         // claim about loaded resonator C, D or the signed, phase-varying pump contribution to K;
         // their end-state work is read by `Word::PowerForm`, and a future-word growth bound is owed
@@ -3305,6 +3366,7 @@ impl Constitution {
             stepped,
             charts,
             landmarks: deposit.landmarks().len() as u64,
+            backtracks,
         };
         Ok((next, reading))
     }
@@ -3749,12 +3811,37 @@ fn factor_step(
                 energy,
                 eta,
             )?;
-            let mut gain = current.gains()[*family].clone();
+            // The candidate step, carried on copies of the entry's carry; kept when the carried
+            // gain stays positive, backtracked otherwise ([`GainBacktrack`]).
+            let carrier = Carrier::Resonator(*family);
+            let from = current.gains()[*family].clone();
             let delta = rate_times(&rate, gradient);
-            carries
-                .entry((locus, Carrier::Resonator(*family)))
-                .or_default()
-                .deposit(at, Carrier::Resonator(*family), 0, &mut gain, &delta);
+            let carry = carries.entry((locus, carrier)).or_default();
+            let (mut trial, mut stroke, mut gain) = (carry.clone(), at.clone(), from.clone());
+            trial.deposit(&mut stroke, carrier, 0, &mut gain, &delta);
+            if gain.is_positive() {
+                *carry = trial;
+                *at = stroke;
+            } else {
+                let candidate = gain;
+                let (quotient, _) = at.lattice.div_rem(&(&from * rat(1, 2)));
+                let midpoint = Rat::from_integer(quotient) * at.lattice.unit();
+                gain = from.clone();
+                carry.deposit(at, carrier, 0, &mut gain, &(&midpoint - &from));
+                if !gain.is_positive() {
+                    return Err(HnnError::Resonator {
+                        ring: *ring,
+                        what: "a backtracked gain stays positive on its lattice",
+                    });
+                }
+                at.backtracks.push(GainBacktrack {
+                    ring: *ring,
+                    family: *family,
+                    from,
+                    candidate,
+                    to: gain.clone(),
+                });
+            }
             let mut gains = current.gains().clone();
             gains[*family] = gain;
             let candidate = current.with_gains(gains)?;

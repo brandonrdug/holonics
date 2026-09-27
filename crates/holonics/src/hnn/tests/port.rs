@@ -1372,3 +1372,98 @@ fn a_refused_compare_or_deposit_leaves_its_handle_and_the_resident() {
         .discard(&mut resident, Handle::Staged(second))
         .unwrap();
 }
+
+/// Ring 0's four gain covectors at a declared loaded material, against the separately implemented
+/// tangent word along each family (exact ℚ; the exact word).
+fn gain_family_covectors(material: &ResonatorMaterial, seed: u64) -> [(Rat, Rat); 4] {
+    let field = chain().with_exact_word();
+    let theta = generic(&field, seed)
+        .with_ring_resonator(&field, 0, material.clone())
+        .unwrap();
+    let cut = cut_at(field.clone(), theta.clone());
+    let gains = cut
+        .pullback
+        .resonators
+        .iter()
+        .find(|pullback| pullback.ring == 0)
+        .expect("ring 0's loaded material was reached")
+        .gains
+        .clone();
+    // Each family enters its form as `g²` (the pump's strength as `g_P² p₀`), so the tangent word's
+    // central operand difference at `g ± ε` is the exact first variation `2gε·base`, and the tangent
+    // divided by `ε` is the exact directional derivative along the family.
+    let epsilon = rat(1, 4096);
+    std::array::from_fn(|family| {
+        let at = |offset: Rat| {
+            let mut values = material.gains().clone();
+            values[family] += offset;
+            theta
+                .clone()
+                .with_ring_resonator(&field, 0, material.with_gains(values).unwrap())
+                .unwrap()
+        };
+        let (plus, minus) = (at(epsilon.clone()), at(-epsilon.clone()));
+        let tangent = tangent(&cut, (&cut.field, &plus), (&cut.field, &minus)) / &epsilon;
+        (gains[family].clone(), tangent)
+    })
+}
+
+/// **Every gain family's adjoint covector is the exact tangent** (Decision 38; Lean
+/// `HNN/Ring.{loaded_tick_material_variation, loaded_gain_family_increment}`), on a word-level
+/// fixture beyond the unit parametron: a non-diagonal positive semidefinite stiffness base and a
+/// signed one (both non-diagonal, the second indefinite), `C₀ = I`, `D₀ = I/4`, and a half-turn
+/// pump of strength `1/8`, certified at both phases. For each of the four families the covector the
+/// reverse word composes equals the tangent word's exact directional derivative.
+#[test]
+fn every_gain_family_covector_is_the_exact_tangent_on_signed_and_pumped_bases() {
+    use crate::hnn::ring::{PumpDeclaration, PumpStep};
+    use crate::holon::parametron::Carrier as PumpAxis;
+    let width = chain().ring(0).width();
+    let identity = || ExactRatMatrix::identity(width).unwrap();
+    // The coordinate-parity path Laplacian: 2 on the diagonal, −1 between nodes `i` and `i ± 1` on
+    // each coordinate, symmetric and positive semidefinite, eigenvalues in [0, 4].
+    let laplacian = ExactRatMatrix::shaped(
+        width,
+        width,
+        (0..width)
+            .map(|i| {
+                (0..width)
+                    .map(|j| {
+                        if i == j {
+                            integer(2)
+                        } else if i + 2 == j || j + 2 == i {
+                            -Rat::one()
+                        } else {
+                            Rat::zero()
+                        }
+                    })
+                    .collect()
+            })
+            .collect(),
+    )
+    .unwrap();
+    // `I − Λ/2`: eigenvalues in [−1, 1], signed and non-diagonal. The certificate
+    // `2C + hD + (h²/2)K_j ⪰ (2 + 1/4 − 1/2 − 1/8) I` holds at both pump phases.
+    let signed = identity().add(&laplacian.scaled(&rat(-1, 2))).unwrap();
+    for (seed, stiffness) in [(65, laplacian), (66, signed)] {
+        let pump =
+            PumpDeclaration::new(rat(1, 8), PumpAxis::at(&Rat::zero()), PumpStep::Half).unwrap();
+        let material = ResonatorMaterial::new(
+            identity(),
+            stiffness,
+            identity().scaled(&rat(1, 4)),
+            Some(pump),
+        )
+        .unwrap();
+        for (family, (adjoint, tangent)) in gain_family_covectors(&material, seed)
+            .into_iter()
+            .enumerate()
+        {
+            assert!(!adjoint.is_zero(), "family {family}: a reached covector");
+            assert_eq!(
+                adjoint, tangent,
+                "family {family}: the adjoint against the tangent"
+            );
+        }
+    }
+}

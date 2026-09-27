@@ -630,5 +630,20 @@
       "ordering": "above",
       "grain_lower": "887 + 13/16 + epsilon"
     }
+  },
+  "repair_rerun_host": {
+    "date": "2026-09-27",
+    "scope": "Decision 38 repair: one host re-run of the same source-ring declaration after the resonator bound, gain backtrack and rule-lattice repairs; the rule lattice for ring 0 equals the one measured (L = 9); the code enclosures and final gains equal the pre-repair run's, so no gain step reached the backtrack",
+    "codes": "development 18050 + 7/16 + ε and scored tail 3671 + 14/16 + ε, the enclosures equal to loaded_host above; default 18049 + 15/16 + ε and 3671 + 9/16 + ε",
+    "gains": [
+      "ring 0: C 1, K 1, D 273/256, pump 1"
+    ],
+    "gain_remainders": [
+      "ring 0: C -454129/2^32 = -(13·181·193)/2^32, K -253799/2^32 = -(7·13·2789)/2^32, D -1141561/2^32 = -(37·30853)/2^32, pump 0"
+    ],
+    "word_balance": "word balances (campaign 2, WordBalance::closes: the field and its resonators in one identity with the deposition work at the commit, and the executed residual within its certified bound): 3074 formed, 3074 carried across a commit, every one closed: true; the largest executed residual (defects, the last junction's, and the resonators' chart and split) 11316054684149825820510285954130858404131/2^147 against its bound 343481291111163870507538042672150446979191/2^147: at or below it (bound − value = 83041309106753511171756939179504897143765/2^145); the deposition work summed over the commits -11581862336831/2^50 (the largest in magnitude 153871450597/2^49); the interconnection's defect summed 0 (zero by construction for a loaded port: the field's term is the negative of the resonator's port work)",
+    "tick_balance": "tick balances: 9222 read, every one closed up to its residual within its certified bound: true; the largest residual 8637610766496162385103093243/2^106 against its bound 34201463312896031778940253217/2^105: at or below it (bound − value = 59765315859295901172777413191/2^106)",
+    "pilot": "32 windows in 1970 = 2·5·197 ms; linear projection to 3074 windows 189243 rem 4 over 32 ms",
+    "time": "wall time (exterior): setup 37 ms; exposure 370269 ms over 3074 windows (per window 120 rem 1389 over 3074, in ms)"
   }
 }

@@ -1,4 +1,5 @@
 import Holonics.HNN.Word
+import Holonics.HNN.LatticeWord
 import Holonics.Aeon.Clock.Epoch
 
 /-!
@@ -62,6 +63,15 @@ generator form:    ż = A z ,  A = [[0, 1], [−C⁻¹K, 0]] ,  U = (1 − A_h)�
    on locked sheets the ring population's driven phase energy is the Ising energy and the threshold
    sheet minimizes it (`Objects/Parametron.{drivenPhaseEnergy_binaryPhase, thresholdSheet_minimizes,
    sheetReading_binaryPhase}`): the perceptron is that receiver face, not the ring.
+
+7. **The executed solve's bound and a gain's backtrack** (`abs_mulVec_le_rowNorm`,
+   `abs_dot_le_l1`, `loaded_solve_chart_bound`, `loaded_state_split_bound`,
+   `gain_backtrack_midpoint`; Decision 38's repair). For a chart `X̂` with certificate
+   `‖1 − M X̂‖∞ ≤ δ`, a right side with `|r_i| ≤ ρ` and an executed rate within `u` of `X̂ r`,
+   `|⟨ω, M ω − r⟩| ≤ ‖ω‖₁ (δ ρ + ‖M‖∞ u)`; for a symmetric form and a carried state within `u` of its
+   image, the split `½⟨ŷ, Q ŷ⟩ − ½⟨y, Q y⟩` is within `(u/2)‖Q(ŷ + y)‖₁`. The chart term no longer
+   absorbs a wrong solve. A gain at the positive lattice coordinate `q` backtracks to
+   `quot L (q·2^(−L)/2) = ⌊(q + 1)/2⌋ ∈ [1, q]`: positive, never past the admissible side.
 
 [open] Pump/Floquet locking (that the pumped tick selects the two sheets as attracting basins) is
 not proved; the sheets are read, not asserted to attract (#62).
@@ -664,6 +674,102 @@ theorem locked_sheet_receiver_face {ι : Type*} [DecidableEq ι] [Fintype ι]
 
 end Pump
 
+/-! ## 6. The executed solve's bound and a gain's backtrack -/
+
+section ExecutedBound
+
+open Holonics.HNN.LatticeWord (rowNorm l1 row_sum_le_rowNorm)
+open Holonics.HNN.LatticeDeposit (quot unit unit_pos)
+
+variable {n : Type*} [Fintype n] [DecidableEq n]
+
+omit [DecidableEq n] in
+/-- [proved-derived; formal-checked] A row of `A v` is within `‖A‖∞ c` when every coordinate of `v`
+is within `c`. -/
+theorem abs_mulVec_le_rowNorm (A : Matrix n n ℚ) (v : n → ℚ) {c : ℚ} (hc : 0 ≤ c)
+    (hv : ∀ j, |v j| ≤ c) (i : n) : |(A *ᵥ v) i| ≤ rowNorm A * c := by
+  calc |(A *ᵥ v) i| = |∑ j, A i j * v j| := rfl
+    _ ≤ ∑ j, |A i j * v j| := Finset.abs_sum_le_sum_abs _ _
+    _ ≤ ∑ j, |A i j| * c := by
+      refine Finset.sum_le_sum fun j _ => ?_
+      rw [abs_mul]
+      exact mul_le_mul_of_nonneg_left (hv j) (abs_nonneg _)
+    _ = (∑ j, |A i j|) * c := (Finset.sum_mul _ _ _).symm
+    _ ≤ rowNorm A * c := mul_le_mul_of_nonneg_right (row_sum_le_rowNorm A i) hc
+
+omit [DecidableEq n] in
+/-- [proved-derived; formal-checked] A pairing is within `‖ω‖₁ c` when every coordinate of the
+vector is within `c`. -/
+theorem abs_dot_le_l1 (ω e : n → ℚ) {c : ℚ} (he : ∀ i, |e i| ≤ c) : |ω ⬝ᵥ e| ≤ l1 ω * c := by
+  unfold l1
+  calc |ω ⬝ᵥ e| = |∑ i, ω i * e i| := rfl
+    _ ≤ ∑ i, |ω i * e i| := Finset.abs_sum_le_sum_abs _ _
+    _ ≤ ∑ i, |ω i| * c := by
+      refine Finset.sum_le_sum fun i _ => ?_
+      rw [abs_mul]
+      exact mul_le_mul_of_nonneg_left (he i) (abs_nonneg _)
+    _ = (∑ i, |ω i|) * c := (Finset.sum_mul _ _ _).symm
+
+/-- [proved-derived; formal-checked] **The executed solve's chart term is bounded by its
+certificate** (`hnn::ring::ResonatorStep::bound`, the contact's `transit_defect` alike). With
+`‖1 − M X̂‖∞ ≤ δ`, `|r_i| ≤ ρ` and the executed (carried) rate within `u` of the chart's image,
+`M ω − r = M(ω − X̂ r) − (1 − M X̂) r`, so `|⟨ω, M ω − r⟩| ≤ ‖ω‖₁ (δ ρ + ‖M‖∞ u)`. The balance's
+chart term absorbs any executed rate; this bound is what refuses a wrong one. -/
+theorem loaded_solve_chart_bound (M X : Matrix n n ℚ) (r ω : n → ℚ) {δ ρ u : ℚ}
+    (hρ : 0 ≤ ρ) (hu : 0 ≤ u) (hR : rowNorm (1 - M * X) ≤ δ) (hr : ∀ i, |r i| ≤ ρ)
+    (hω : ∀ i, |ω i - (X *ᵥ r) i| ≤ u) :
+    |ω ⬝ᵥ (M *ᵥ ω - r)| ≤ l1 ω * (δ * ρ + rowNorm M * u) := by
+  have hsplit : M *ᵥ ω - r = M *ᵥ (ω - X *ᵥ r) - (1 - M * X) *ᵥ r := by
+    rw [Matrix.mulVec_sub, Matrix.sub_mulVec, Matrix.one_mulVec, Matrix.mulVec_mulVec]
+    abel
+  apply abs_dot_le_l1
+  intro i
+  rw [hsplit, Pi.sub_apply]
+  have h1 := abs_mulVec_le_rowNorm M (ω - X *ᵥ r) hu (fun j => by simpa using hω j) i
+  have h2 := abs_mulVec_le_rowNorm (1 - M * X) r hρ hr i
+  have h3 := abs_add_le ((M *ᵥ (ω - X *ᵥ r)) i) (-(((1 - M * X) *ᵥ r) i))
+  rw [abs_neg, ← sub_eq_add_neg] at h3
+  have h4 : rowNorm (1 - M * X) * ρ ≤ δ * ρ := mul_le_mul_of_nonneg_right hR hρ
+  linarith
+
+omit [DecidableEq n] in
+/-- [proved-derived; formal-checked] **A carried state's split is within its cells.** For a
+symmetric form `Q` and a carried state `ŷ` within `u` of its image `y`,
+`½⟨ŷ, Q ŷ⟩ − ½⟨y, Q y⟩ = ½⟨ŷ − y, Q(ŷ + y)⟩`, within `(u/2)‖Q(ŷ + y)‖₁`: the resonator's state
+split on its `C` and on its phase's `K`. -/
+theorem loaded_state_split_bound (Q : Matrix n n ℚ) (hQ : Qᵀ = Q) (y ŷ : n → ℚ) {u : ℚ}
+    (hy : ∀ i, |ŷ i - y i| ≤ u) :
+    |ŷ ⬝ᵥ Q *ᵥ ŷ / 2 - y ⬝ᵥ Q *ᵥ y / 2| ≤ u / 2 * l1 (Q *ᵥ (ŷ + y)) := by
+  have hsym : y ⬝ᵥ Q *ᵥ ŷ = ŷ ⬝ᵥ Q *ᵥ y := by
+    rw [Matrix.dotProduct_mulVec, ← Matrix.mulVec_transpose, hQ, dotProduct_comm]
+  have hid : ŷ ⬝ᵥ Q *ᵥ ŷ / 2 - y ⬝ᵥ Q *ᵥ y / 2 = (Q *ᵥ (ŷ + y)) ⬝ᵥ (ŷ - y) / 2 := by
+    rw [Matrix.mulVec_add, add_dotProduct, dotProduct_sub, dotProduct_sub,
+      dotProduct_comm (Q *ᵥ ŷ) ŷ, dotProduct_comm (Q *ᵥ ŷ) y, dotProduct_comm (Q *ᵥ y) ŷ,
+      dotProduct_comm (Q *ᵥ y) y, hsym]
+    ring
+  have hb := abs_dot_le_l1 (Q *ᵥ (ŷ + y)) (ŷ - y) (c := u) (fun i => by simpa using hy i)
+  rw [hid, abs_div, abs_two]
+  linarith
+
+/-- [proved-derived; formal-checked] **A gain's backtrack is positive and on the admissible side**
+(`hnn::constitution::GainBacktrack`). A gain at the positive lattice coordinate `q`,
+`g = q·2^(−L)`, whose candidate step would reach `g ≤ 0`, carries to the midpoint `g/2` split at the
+lattice by its nearest point, ties upward: the coordinate `⌊(q + 1)/2⌋`, between `1` and `q`. It is
+exactly `q/2` for even `q`, and the gain holds at `q = 1`; deposition never releases a family. -/
+theorem gain_backtrack_midpoint (L : ℕ) (q : ℤ) (hq : 1 ≤ q) :
+    quot L (q * unit L / 2) = (q + 1) / 2 ∧ 1 ≤ (q + 1) / 2 ∧ (q + 1) / 2 ≤ q := by
+  have hu : unit L ≠ 0 := (unit_pos L).ne'
+  have hmid : (q : ℚ) * unit L / 2 / unit L = ((q + 1 : ℤ) : ℚ) / ((2 : ℕ) : ℚ) - 1 / 2 := by
+    push_cast
+    field_simp
+    ring
+  refine ⟨?_, by omega, by omega⟩
+  unfold quot
+  rw [hmid, round_eq, sub_add_cancel, Rat.floor_intCast_div_natCast]
+  norm_num
+
+end ExecutedBound
+
 section Audit
 
 #print axioms cayley_forms_agree
@@ -692,6 +798,11 @@ section Audit
 #print axioms pump_half_turn_invariant
 #print axioms pump_blind_to_sheets
 #print axioms locked_sheet_receiver_face
+#print axioms abs_mulVec_le_rowNorm
+#print axioms abs_dot_le_l1
+#print axioms loaded_solve_chart_bound
+#print axioms loaded_state_split_bound
+#print axioms gain_backtrack_midpoint
 
 end Audit
 

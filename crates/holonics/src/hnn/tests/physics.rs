@@ -560,6 +560,66 @@ fn the_loaded_resonator_returns_to_storage_and_closes_at_every_tick() {
     }
 }
 
+/// **A wrong resonator solve fails the word's balance** (`hnn::ring::ResonatorStep::bound`, summed
+/// into `FieldBalance` and `WordBalance`). The loaded word executed with one phase's solve replaced
+/// by `(9/8)M⁻¹` still satisfies every energy identity, since the chart term `⟨ω, Mω − r⟩` absorbs
+/// any solve, but its chart term leaves the certified bound (the chart's certificate kept), so the
+/// resonator's steps, the ticks' combined balances and the word's balance no longer close; the
+/// same word with the executed solve closes, on the exact law and on the lattices alike.
+#[test]
+fn a_perturbed_resonator_solve_fails_the_word_balance() {
+    use crate::hnn::propagation::Operands;
+    for field in [chain(), chain().with_exact_word()] {
+        let field = &field;
+        let medium = Medium::encoding(field, 43);
+        let (current, moment) = cut(field);
+        let phases =
+            ReceivingPhases::declare(field, &medium, &current, &field.receivers()[0]).unwrap();
+        let mut declared = Declared::of(field, medium.clone());
+        let parametron = cycle(
+            field.ring(0).period() as usize,
+            vec![Rat::one(); field.ring(0).period() as usize],
+            vec![integer(2); field.ring(0).period() as usize],
+        );
+        let pump =
+            PumpDeclaration::new(rat(1, 16), Carrier::at(&rat(1, 2)), PumpStep::Half).unwrap();
+        declared.resonators[0] =
+            Some(ResonatorMaterial::of_parametron(&parametron, &rat(1, 8), Some(pump)).unwrap());
+        let storage = moment.open_storage(field, &declared, &current).unwrap();
+        let run = |operands: Operands| {
+            let mut word = Word::on_operands(field, operands, storage.clone()).unwrap();
+            word.forward(&phases).unwrap();
+            word
+        };
+        let operands = Operands::at_cut(field, &declared, &current).unwrap();
+        let executed = run(operands.clone());
+        assert!(executed.word_balance().unwrap().closes());
+        let mut perturbed = operands;
+        let resonator = perturbed.resonators_mut()[0].take().unwrap();
+        let wrong = resonator.operator(0).inverse().unwrap().scaled(&rat(9, 8));
+        perturbed.resonators_mut()[0] = Some(resonator.with_executed_solve(0, wrong));
+        let word = run(perturbed);
+        let steps = &word.resonances()[0].as_ref().unwrap().steps;
+        assert!(
+            steps
+                .iter()
+                .any(|step| step.phase == 0 && !step.chart.is_zero())
+        );
+        for step in steps {
+            // Every identity still closes; only the bound refuses the wrong phase's ticks.
+            assert_eq!(
+                &step.after - &step.before,
+                &step.pump + &step.port - &step.dissipation + &step.chart + &step.split
+            );
+        }
+        assert!(steps.iter().any(|step| !step.closes()));
+        assert!(word.field_balances().iter().any(|tick| !tick.closes()));
+        let balance = word.word_balance().unwrap();
+        assert!(balance.residual().abs() > balance.bound, "{balance:?}");
+        assert!(!balance.closes());
+    }
+}
+
 /// **The port returns the resonators' balance** (campaign 2): the host reference's refine carries
 /// each declared resonator's balance over its word in its receipt (`ReceiptDetail::Refine`), the
 /// release's, each closing, and none where no resonator is declared.

@@ -485,4 +485,7 @@ flock .local/gpu.lock cargo run --release -p holonics-cuda --example hnn_exposur
 records exact host/card agreement over the full passage. The loaded family loses to the default
 HNN on development and scored-tail cells, before its extra material description, so
 `resonator none` remains the default. The final dissipation amplitude is `273/256`. Its loaded
-power balance and reached covectors establish the consumer needed by campaign 3.
+power balance and reached covectors establish the consumer needed by campaign 3. The exposure
+also prints each final gain's carried remainder, what reached the family below its lattice's
+unit; the word balances' bound covers the resonator's solve and split, and the interconnection's
+defect is zero by construction for a loaded port (the September 27 repair in the same record).
