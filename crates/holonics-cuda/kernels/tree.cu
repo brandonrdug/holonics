@@ -5,9 +5,9 @@
 // on the card: the all-class face read of a phase (the digit-0 split at every splitting dyadic
 // cell, each branch's opened path and the join) and the opened-path update of a deposit (each
 // mixing chain's β step, a parting chain's split, the founding of the upper part and the leaf, the
-// label run, the masses), with the host's exact integer law: every path face a numerator of
-// `2^(−M_p)`, every β an odd/odd ratio of `W` bits with its binary exponent, every product and
-// quotient in 128-bit words, the carrier's rebase past `u128` at `R` bits (Lean `HNN/LandmarkTree`
+// label run, the masses and their register's carry at the declared ceiling, Decision 39), with the
+// host's exact integer law: every path face a numerator of `2^(−M_p)`, every β an odd/odd ratio of
+// `W` bits with its binary exponent, every product and quotient in 128-bit words, the carrier's rebase past `u128` at `R` bits (Lean `HNN/LandmarkTree`
 // §6′, `HNN/LandmarkCarrier`), and each split's two ratios formed exactly on 512-bit integers and
 // carried once at `W` bits (Lean `HNN/LandmarkCompaction.chain_split`). No float. The mirror carries
 // what the reads need (the masses, the charts' β and stop weights, the topology, the labels); the
@@ -20,7 +20,9 @@
 // branch in the top bit), its label end (one past its bottom's letter in the label pool), its two
 // half-unit masses and its chart `(β_n, β_d, β_e, λ̂)`; each join's chart; the label pool; the
 // counts `(nodes, letters)`; each branch's summed rungs from the root (a forced depth's rung `0`);
-// and the founding chart at each depth (the declared stop prior's `β₀ = 2^(j_d) − 1`).
+// and the founding chart at each depth (the declared stop prior's `β₀ = 2^(j_d) − 1`). The law's
+// words carry the register's ceiling in half-units, `2^(c+1) + 2` (all ones, `u64::MAX`, when no
+// total reaches it: `c = ∞`, or a ceiling past every `u32` mass).
 
 #include <stdint.h>
 
@@ -44,6 +46,7 @@ struct TreeChart {
 
 struct TreeLaw {
     uint64_t table_mask;
+    uint64_t ceiling;
     uint32_t face;
     uint32_t carrier;
     uint32_t rebase;
@@ -392,6 +395,22 @@ __device__ void tree_split(uint64_t n, uint64_t d, int64_t e, uint32_t upper_run
 }
 
 // -------------------------------------------------------------------------------------------------
+// the register's capacity (Decision 39)
+// -------------------------------------------------------------------------------------------------
+
+// **The register's carry after a deposit** (`landmark::Capacity::carry`; Lean
+// `HNN/LandmarkCapacity.{capCarry, cap_carry_half_units}`): on the half-unit masses `h_b = 2n_b + 1`,
+// when `n_0 + n_1 ≥ L = 2^c`, that is `h_0 + h_1 ≥ 2L + 2 = ceiling`, each `n_b ← ⌈n_b/2⌉`, that is
+// `h_b ← 2⌊(h_b + 1)/4⌋ + 1`. The sum is read in 64 bits, so the unbounded ceiling `u64::MAX` is
+// never reached.
+__device__ __forceinline__ void tree_carry(uint32_t* halves, uint64_t ceiling) {
+    if ((uint64_t)halves[0] + halves[1] >= ceiling) {
+        halves[0] = 2u * ((halves[0] + 1u) / 4u) + 1u;
+        halves[1] = 2u * ((halves[1] + 1u) / 4u) + 1u;
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
 // the arena
 // -------------------------------------------------------------------------------------------------
 
@@ -621,16 +640,20 @@ extern "C" __global__ void hnn_tree_splits(TreeLaw law, TreeArena arena, const u
 // its paths' mixing chains' β by `k(b)/q̂_(ℓ+1)(b)` bottom-up (a parting chain's upper part on its
 // split chart), splits the parting chain (the lower part keeps its counts at `β_ℓ`, the upper part
 // is founded with the chain's counts and its stepped chart, the parent relinked to it, the lower
-// part linked below it by its letter at `k + 1`), founds its leaf labelled to `D`, counts the digit,
-// and steps the join's β by `q̂_cells(b)/q̂_bundles(b)`. The digits of one cell descend different
-// dyadic cells, so their trees are disjoint: the threads write disjoint nodes, slots and joins,
-// their insertions take distinct keys by `atomicCAS`, and their founded numbers are disjoint. With
-// `logging`, each thread writes what it overwrote into its own stride of the undo log.
+// part linked below it by its letter at `k + 1`), founds its leaf labelled to `D`, counts the digit
+// at each node past the forced depths and carries that node's register at the declared ceiling
+// (`tree_carry`, Decision 39: a stored chain is one register, and a split's upper part took the
+// chain's carried register before the count), and steps the join's β by `q̂_cells(b)/q̂_bundles(b)`.
+// The digits of one cell descend different dyadic cells, so their trees are disjoint: the threads
+// write disjoint nodes, slots and joins, their insertions take distinct keys by `atomicCAS`, and
+// their founded numbers are disjoint. With `logging`, each thread writes what it overwrote into its
+// own stride of the undo log.
 //
-// The undo log, per digit: the walks' nodes with their old masses and charts (stride
-// `law.log_stride`), the slots inserted (4), the slots relinked with their old children (2), the
-// roots set with their old roots (2), and the join's old chart; its counts
-// `(logged, inserted, relinked, rooted)` per digit and, after them, the arena's counts before.
+// The undo log, per digit: the walks' nodes with their old masses (before the count and the carry,
+// so the undo restores the pre-carry register) and charts (stride `law.log_stride`), the slots
+// inserted (4), the slots relinked with their old children (2), the roots set with their old roots
+// (2), and the join's old chart; its counts `(logged, inserted, relinked, rooted)` per digit and,
+// after them, the arena's counts before.
 struct TreeLog {
     uint32_t* nodes;
     uint32_t* halves;
@@ -826,8 +849,12 @@ extern "C" __global__ void hnn_tree_deposit(TreeLaw law, TreeArena a, const uint
             read.bottoms[read.count] = (uint8_t)depth;
             read.count++;
         }
+        // Each node's mass of the digit grows, and its register carries at the ceiling.
         for (uint32_t k = 0; k < read.count; ++k) {
-            if (read.bottoms[k] >= forced) a.halves[2 * read.nodes[k] + symbol] += 2;
+            if (read.bottoms[k] < forced) continue;
+            uint32_t* halves = a.halves + 2 * (uint64_t)read.nodes[k];
+            halves[symbol] += 2;
+            tree_carry(halves, law.ceiling);
         }
     }
     if (law.branches > 1) {

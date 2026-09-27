@@ -1,20 +1,21 @@
-//! **The landmark tree on the card, stored at the faces where paths part** (campaign 2, Decision 37;
-//! #73 with #76; `kernels/tree.cu`).
+//! **The landmark tree on the card, stored at the faces where paths part** (campaign 2, Decisions 37
+//! and 39; #73 with #76; `kernels/tree.cu`).
 //!
 //! [definition] The receiving parametron's storage, the tree of landmarks
 //! (`holonics::hnn::landmark::Landmarks`), mirrored on the card with the host's exact integer law.
 //! The computational object is the helical pair interaction; of the winding guide's objects this
 //! realization touches the receiving face (faces and placement: the dyadic digit faces it returns
 //! as splits) and the tower thread (the context depth as a restriction chain: a stored chain is a
-//! unique gluing, a parting face a plural one), with the edge ratios of each opened path (the pair)
-//! and the β chart's carry (the helix) kept attached. The host's constitution owns the tree and its
+//! unique gluing, a parting face a plural one), and the helix twice: the β chart's carry and each
+//! node's count register carrying at its declared capacity (Decision 39); the edge ratios of each
+//! opened path (the pair) are kept attached. The host's constitution owns the tree and its
 //! certificates; the card carries what the reads need, the masses, each node's and each join's
 //! `(β, λ̂)`, the topology and the labels, and moves it by the same deposits in the same order.
 //!
 //! | On the card | On the host |
 //! |---|---|
 //! | the all-class read: at each splitting dyadic cell, each branch's walk (each stored chain's label compared to the address letter by letter), a parting chain's upper part at its split ratio, the opened path's faces and the join (`hnn_tree_splits`) | the class faces from the splits (`LandmarkFace::of_splits`: the products down the dyadic heap and the grain exponents, whose certified logarithm reads integers past the card's words) |
-//! | the opened-path update of each deposit (`hnn_tree_deposit`): the label runs, the β steps with the carrier's rebase, a parting chain's split (both ratios formed exactly and carried at `W` bits), the upper parts and leaves founded at the host's numbers, the relinks, the masses | the certificates (the host's tree, `Constitution::deposited`) |
+//! | the opened-path update of each deposit (`hnn_tree_deposit`): the label runs, the β steps with the carrier's rebase, a parting chain's split (both ratios formed exactly and carried at `W` bits), the upper parts and leaves founded at the host's numbers, the relinks, the masses and each register's carry at the declared ceiling (`tree_carry`) | the certificates (the host's tree, `Constitution::deposited`); the ceiling in half-units (`Capacity::ceiling_halves`) |
 //! | a window's phases in cell order: the earlier phases' deposits applied with an undo log, the later phase read, the log undone (`hnn_tree_undo`) | the addresses' letters (`LandmarkDeclaration::letters`), the digits each target opens, each branch's summed rungs (`LandmarkDeclaration::rung_sums`) and founding charts (`ArenaView::founding`) |
 //!
 //! [definition; agent-inferred] **The layout** (Decision 37's arena, `hnn::landmark`'s "The arena"):
@@ -24,6 +25,18 @@
 //! the label pool, 4 bytes a letter; each join's chart; the counts `(nodes, letters)`. The capacity
 //! is the a-priori bound (`compacted_node_bound`): a passage of `n` cells founds at most `2 n B`
 //! nodes a branch and holds at most `n D_b` letters, at the declared population plus a window.
+//!
+//! [definition; agent-inferred] **The register's capacity** (Decision 39, `landmark::Capacity`;
+//! Lean `HNN/LandmarkCapacity.{capCarry, cap_carry_half_units, capped_tree_laws}`). The law's words
+//! carry the ceiling in half-units, `2L + 2 = 2^(c+1) + 2` (`u64::MAX` when no total reaches it:
+//! `c = ∞` is Decision 28's node), read from the host's declaration; the layout is unchanged. The
+//! carry acts where the host's `Law::apply_branch` places it: in the deposit, at every node of the
+//! opened path past the forced depths, right after the node's mass of the digit grows, `h_0 + h_1
+//! ≥ 2L + 2` carries each `h ← 2⌊(h + 1)/4⌋ + 1`, so the next read (the window's next phase, or
+//! the next cell) meets the carried counts. A stored chain is one register; a parting chain's upper
+//! part is founded with the chain's register as carried so far, then counts and carries as any
+//! node; the lower part is not reached and keeps its register. The undo log holds the masses from
+//! before the count, so a window's undo restores the pre-carry register.
 //!
 //! [definition; agent-inferred] **The realization** (the hardware law, CLAUDE.md). The read is one
 //! block per phase with one thread per splitting dyadic cell (`threads` the least power of two
@@ -43,9 +56,10 @@
 //!
 //! [definition] **Parity** (`src/hnn/tests.rs`, `port_tests.rs`): the card's splits equal the host's
 //! (`Landmarks::window_splits`) exactly, window by window, on the cell-only and the enlarged tree,
-//! at depths past the stream's recurrence and under declared stop priors, and after every deposit
-//! the card's arena (roots, children, depth words, label ends, masses, charts, joins, labels)
-//! equals the host's ([`CardTree::agrees`]); the card's split equals `landmark::Beta::split`
+//! at depths past the stream's recurrence and under declared stop priors, unbounded and at ceilings
+//! `c ∈ {1, 2, 3}` where the registers carry and chains holding carried registers split, and after
+//! every deposit the card's arena (roots, children, depth words, label ends, masses, charts, joins,
+//! labels) equals the host's ([`CardTree::agrees`]); the card's split equals `landmark::Beta::split`
 //! ([`split_ratios`]). In the port's lockstep every deposit is checked at the nodes it wrote and
 //! founded and at its joins ([`CardTree::agrees_at`]: their masses, `β`, stop weights, depth words
 //! and label ends, gathered by `hnn_tree_gather`), and at the labels it held.
@@ -113,6 +127,7 @@ impl From<ChartWords> for TreeChart {
 #[derive(Clone, Copy, Debug)]
 struct TreeLaw {
     table_mask: u64,
+    ceiling: u64,
     face: u32,
     carrier: u32,
     rebase: u32,
@@ -347,6 +362,7 @@ impl<'c> CardTree<'c> {
         let cells = 1usize << digits;
         let law = TreeLaw {
             table_mask: slots as u64 - 1,
+            ceiling: declaration.capacity.ceiling_halves().unwrap_or(u64::MAX),
             face: widths.face as u32,
             carrier: widths.carrier as u32,
             rebase: widths.rebase as u32,

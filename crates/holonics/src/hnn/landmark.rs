@@ -231,7 +231,8 @@
 //! unchanged). `Unbounded` (`c = ∞`) is Decision 28's node, as is every ceiling no node reaches
 //! (`cap_below_ceiling_is_kt`). The carry only lowers counts, so every node's total stays at most
 //! its arrivals: KT's floor `1/(2n* + 2)`, the widths, the certificates and the rule are
-//! unchanged. The card's mirror (`holonics-cuda`) does not carry yet.
+//! unchanged. The card's mirror (`holonics-cuda`, `kernels/tree.cu`) carries the same register at
+//! the same ceiling in its deposit ([`Capacity::ceiling_halves`] uploaded with the law).
 //!
 //! [historical; measured] **Decision 28's arena of one node a depth is retired** (its realization,
 //! `Storage::Full`, is at commit `89460425`): it declared the same prior and read the same face in
@@ -895,8 +896,9 @@ pub enum Capacity {
 impl Capacity {
     /// **The ceiling in half-units**: a node's half-unit masses `2n_b + 1` total `2(n_0 + n_1) + 2`,
     /// so the register carries at the total `2L + 2 = 2^(c+1) + 2`; `None` when unbounded or when
-    /// the ceiling passes every total a `u32` mass can hold (it is never reached).
-    fn ceiling_halves(self) -> Option<u64> {
+    /// the ceiling passes every total a `u32` mass can hold (it is never reached). The card's
+    /// mirror uploads it with its law (`holonics-cuda`, `hnn::tree`).
+    pub fn ceiling_halves(self) -> Option<u64> {
         match self {
             Capacity::Unbounded => None,
             Capacity::Ceiling(exponent) if exponent < u32::BITS => Some((2u64 << exponent) + 2),

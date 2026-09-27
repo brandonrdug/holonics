@@ -799,10 +799,124 @@ fn campaign_one_reads_and_ingest_match_the_host() {
 // -------------------------------------------------------------------------------------------
 // the landmark tree on the card (campaign 2)
 
+/// The tree tests' text-like stream: 1,200 bytes, 24 drawn words over `a..z`, each followed by a
+/// space.
+fn tree_bytes() -> Vec<usize> {
+    let mut draw = Draw(97);
+    let words: Vec<Vec<usize>> = (0..24)
+        .map(|_| {
+            (0..2 + draw.below(6))
+                .map(|_| 97 + draw.below(26))
+                .collect()
+        })
+        .collect();
+    let mut bytes = Vec::new();
+    while bytes.len() < 1_200 {
+        bytes.extend(words[draw.below(24)].iter().copied().chain([32]));
+    }
+    bytes.truncate(1_200);
+    bytes
+}
+
+/// The tree tests' five-class stream of 400 cells.
+fn tree_small() -> Vec<usize> {
+    (0..400).map(|t| (t * 7 + t / 3 + t * t / 11) % 5).collect()
+}
+
+/// A binary stream of period five with one flipped cell at 60: past the flip each address holds
+/// it one depth deeper, so it parts from the periodic contexts' chains, whose registers have
+/// carried by then (the host's `landmark_capped_oracle_is_the_naive_tree`).
+fn tree_flipped(length: usize) -> Vec<usize> {
+    (0..length)
+        .map(|t| usize::from([0, 1, 1, 0, 1][t % 5] == 1) ^ usize::from(t == 60))
+        .collect()
+}
+
+/// A cell-only declaration at the grain 16 under Decision 28's `½`, with its node register's
+/// declared capacity (Decision 39).
+fn tree_declared(
+    alphabet: usize,
+    depth: usize,
+    forced: usize,
+    population: u64,
+    capacity: holonics::hnn::landmark::Capacity,
+) -> holonics::hnn::landmark::LandmarkDeclaration {
+    use holonics::hnn::landmark::{LandmarkDeclaration, LetterFamily, StopPrior};
+    LandmarkDeclaration {
+        alphabet,
+        depth,
+        forced,
+        population,
+        grain: 16,
+        family: LetterFamily::cells(),
+        prior: StopPrior::half(),
+        capacity,
+    }
+}
+
+/// The enlarged tree's letter family: two phase slots, of grains 3 and 2.
+fn tree_family() -> holonics::hnn::landmark::LetterFamily {
+    use holonics::hnn::landmark::{Feature, LetterFamily};
+    LetterFamily::new(vec![
+        Feature::Phase { ring: 0, grain: 3 },
+        Feature::Phase { ring: 1, grain: 2 },
+    ])
+    .unwrap()
+}
+
+/// A stream's bundles under [`tree_family`]: cell `i` with the phases `(i mod 3, ⌊i/3⌋ mod 2)`.
+fn tree_bundles(stream: &[usize]) -> Vec<holonics::hnn::Letter> {
+    use holonics::hnn::landmark::{Bundle, Letter};
+    let family = tree_family();
+    stream
+        .iter()
+        .enumerate()
+        .map(|(i, &cell)| {
+            Letter::Bundle(Bundle {
+                cell,
+                features: family
+                    .encode(&[(i % 3) as u64, ((i / 3) % 2) as u64])
+                    .unwrap(),
+            })
+        })
+        .collect()
+}
+
+/// What a capped tree's run carried, read on the host against its unbounded twin (the same
+/// declaration at `c = ∞`, Decision 28's node): the carry moves only masses and charts, so the two
+/// arenas share their topology, node for node. `registers` counts the nodes whose masses end below
+/// the twin's (their registers carried), `splits` the parting chains' upper parts founded holding a
+/// register below the twin's (a chain split after its register carried, or carried at the split).
+#[derive(Clone, Copy, Debug, Default)]
+struct Carried {
+    registers: usize,
+    splits: usize,
+}
+
+/// The upper parts a deposit founded (nodes numbered from `before` whose bottom lies above their
+/// branch's depth: a leaf's bottom is the depth) holding a register below the twin's.
+fn carried_upper_parts(
+    tree: &holonics::hnn::Landmarks,
+    twin: &holonics::hnn::Landmarks,
+    before: usize,
+) -> usize {
+    let (arena, reference) = (tree.arena(), twin.arena());
+    let depths = arena.branch_depths();
+    (before..arena.halves().len())
+        .filter(|&node| {
+            // The depth word: the bottom depth, the branch in the top bit (`ArenaView::words`).
+            let word = arena.words()[node];
+            let (bottom, branch) = ((word & (u32::MAX >> 1)) as usize, (word >> 31) as usize);
+            bottom < depths[branch] && arena.halves()[node] != reference.halves()[node]
+        })
+        .count()
+}
+
 /// One tree's run on the card against the host: at every window of `aperture` cells, the card's
 /// splits of every phase in cell order equal the host's (`Landmarks::window_splits`), known
 /// targets and none; each window is then deposited on both, and every `check` windows the card's
-/// arena equals the host's. Returns the card's times.
+/// arena equals the host's. A capped tree (Decision 39) also runs its unbounded twin on the host,
+/// whose topology it keeps, and returns what carried ([`Carried`]). Returns the card's times.
 fn tree_parity(
     card: &Card,
     mut tree: holonics::hnn::Landmarks,
@@ -810,9 +924,17 @@ fn tree_parity(
     cells: &[usize],
     aperture: usize,
     check: usize,
-) -> TreeTimes {
-    use holonics::hnn::landmark::letter_address;
+) -> (TreeTimes, Carried) {
+    use holonics::hnn::landmark::{Capacity, LandmarkDeclaration, Landmarks, letter_address};
     let depth = tree.declaration().depth;
+    let mut twin = (tree.declaration().capacity != Capacity::Unbounded).then(|| {
+        Landmarks::new(LandmarkDeclaration {
+            capacity: Capacity::Unbounded,
+            ..tree.declaration().clone()
+        })
+        .unwrap()
+    });
+    let mut carried = Carried::default();
     let mut mirror = CardTree::mirror(card, &tree, aperture - 1).expect("the mirror");
     assert!(mirror.agrees(&tree).unwrap(), "the mirror at its upload");
     let mut position = 0;
@@ -831,7 +953,12 @@ fn tree_parity(
         let steps: Vec<(Vec<holonics::hnn::Letter>, usize)> =
             addresses.into_iter().zip(known.iter().copied()).collect();
         for (address, class) in &steps {
+            let before = tree.nodes();
             tree.deposit(address, *class).unwrap();
+            if let Some(twin) = twin.as_mut() {
+                twin.deposit(address, *class).unwrap();
+                carried.splits += carried_upper_parts(&tree, twin, before);
+            }
         }
         mirror.deposit(&steps).unwrap();
         windows += 1;
@@ -844,56 +971,48 @@ fn tree_parity(
         position += aperture;
     }
     assert!(mirror.agrees(&tree).unwrap(), "the arena at the end");
-    mirror.times()
+    if let Some(twin) = &twin {
+        let (arena, reference) = (tree.arena(), twin.arena());
+        assert_eq!(arena.words(), reference.words(), "the twin's depth words");
+        assert_eq!(arena.ends(), reference.ends(), "the twin's label ends");
+        assert_eq!(arena.labels(), reference.labels(), "the twin's labels");
+        assert_eq!(arena.roots(), reference.roots(), "the twin's roots");
+        carried.registers = arena
+            .halves()
+            .iter()
+            .zip(reference.halves())
+            .filter(|(capped, unbounded)| capped != unbounded)
+            .count();
+    }
+    (mirror.times(), carried)
 }
 
 /// **The landmark tree on the card, stored where paths part, reads and deposits as the host's**
-/// (campaign 2; Decisions 25 and 37; `kernels/tree.cu`): the cell-only tree at campaign 1's
-/// `|A| = 256`, `D = 4`, and past the stream's recurrence at `D = 24` under the global rung 2 and at
-/// `D = 48` under Decision 28's `½` (long chains, their labels to the boundary letters, splits of
-/// internal chains); at five classes with a forced split (the odometer's forced digits) and a
-/// narrow carrier forcing the β chart's rebases and the splits' mantissas, at `D = 2` and at `D = 9`
-/// under the per-depth prior `(2, 5)`; and the enlarged tree (the cell branch and the bundle branch
-/// joined at every dyadic cell) with two phase slots, at `D = 2` and at `D = 9` under the global
-/// rung 2 (a bundle branch of 27 letters), and at `|A| = 256`. Every window's splits in cell order,
-/// at apertures 2 and 3, known targets and none, are the host's word for word, and after the
-/// deposits the card's arena (roots, children, depth words, label ends, masses, charts, joins,
-/// labels) is the host's.
+/// (campaign 2; Decisions 25 and 37; `kernels/tree.cu`), the unbounded register (`c = ∞`,
+/// Decisions 28–37): the cell-only tree at campaign 1's `|A| = 256`, `D = 4`, and past the stream's
+/// recurrence at `D = 24` under the global rung 2 and at `D = 48` under Decision 28's `½` (long
+/// chains, their labels to the boundary letters, splits of internal chains); at five classes with
+/// a forced split (the odometer's forced digits) and a narrow carrier forcing the β chart's rebases
+/// and the splits' mantissas, at `D = 2` and at `D = 9` under the per-depth prior `(2, 5)`; and the
+/// enlarged tree (the cell branch and the bundle branch joined at every dyadic cell) with two phase
+/// slots, at `D = 2` and at `D = 9` under the global rung 2 (a bundle branch of 27 letters), and at
+/// `|A| = 256`. Every window's splits in cell order, at apertures 2 and 3, known targets and none,
+/// are the host's word for word, and after the deposits the card's arena (roots, children, depth
+/// words, label ends, masses, charts, joins, labels) is the host's.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_card_tree_reads_and_deposits_as_the_host_tree() {
     use holonics::hnn::landmark::{
-        Bundle, Feature, LandmarkDeclaration, Landmarks, Letter, LetterFamily, StopPrior,
-        cell_letters,
+        Capacity, LandmarkDeclaration, Landmarks, StopPrior, cell_letters,
     };
     let card = card();
-    let mut draw = Draw(97);
-    // A text-like stream over bytes.
-    let words: Vec<Vec<usize>> = (0..24)
-        .map(|_| {
-            (0..2 + draw.below(6))
-                .map(|_| 97 + draw.below(26))
-                .collect()
-        })
-        .collect();
-    let mut bytes = Vec::new();
-    while bytes.len() < 1_200 {
-        bytes.extend(words[draw.below(24)].iter().copied().chain([32]));
-    }
-    bytes.truncate(1_200);
-    let declared =
-        |alphabet: usize, depth: usize, forced: usize, population: u64| LandmarkDeclaration {
-            alphabet,
-            depth,
-            forced,
-            population,
-            grain: 16,
-            family: LetterFamily::cells(),
-            prior: StopPrior::half(),
-            capacity: holonics::hnn::landmark::Capacity::Unbounded,
-        };
-    let campaign = Landmarks::new(declared(256, 4, 0, 1_200)).unwrap();
-    let times = tree_parity(&card, campaign, &cell_letters(&bytes), &bytes, 2, 50);
+    let bytes = tree_bytes();
+    let small = tree_small();
+    let unbounded = |alphabet, depth, forced, population| {
+        tree_declared(alphabet, depth, forced, population, Capacity::Unbounded)
+    };
+    let campaign = Landmarks::new(unbounded(256, 4, 0, 1_200)).unwrap();
+    let (times, _) = tree_parity(&card, campaign, &cell_letters(&bytes), &bytes, 2, 50);
     println!(
         "cell-only |A| = 256, D = 4: {} reads {} µs, {} deposits {} µs, transfers {} µs",
         times.reads,
@@ -904,12 +1023,12 @@ fn the_card_tree_reads_and_deposits_as_the_host_tree() {
     );
     let ruled = Landmarks::new(LandmarkDeclaration {
         prior: StopPrior::global(2).unwrap(),
-        ..declared(256, 24, 0, 1_200)
+        ..unbounded(256, 24, 0, 1_200)
     })
     .unwrap();
     tree_parity(&card, ruled, &cell_letters(&bytes), &bytes, 3, 50);
-    let deep = Landmarks::new(declared(256, 48, 0, 1_200)).unwrap();
-    let times = tree_parity(&card, deep, &cell_letters(&bytes), &bytes, 2, 50);
+    let deep = Landmarks::new(unbounded(256, 48, 0, 1_200)).unwrap();
+    let (times, _) = tree_parity(&card, deep, &cell_letters(&bytes), &bytes, 2, 50);
     println!(
         "cell-only |A| = 256, D = 48: {} reads {} µs, {} deposits {} µs",
         times.reads,
@@ -917,59 +1036,39 @@ fn the_card_tree_reads_and_deposits_as_the_host_tree() {
         times.deposits,
         times.deposit.as_micros()
     );
-    let small: Vec<usize> = (0..400).map(|t| (t * 7 + t / 3 + t * t / 11) % 5).collect();
-    let narrow = Landmarks::with_carrier(declared(5, 2, 1, 400), 6).unwrap();
+    let narrow = Landmarks::with_carrier(unbounded(5, 2, 1, 400), 6).unwrap();
     tree_parity(&card, narrow, &cell_letters(&small), &small, 2, 10);
     let staged = Landmarks::with_carrier(
         LandmarkDeclaration {
             prior: StopPrior::per_depth(vec![2, 5]).unwrap(),
-            ..declared(5, 9, 1, 400)
+            ..unbounded(5, 9, 1, 400)
         },
         6,
     )
     .unwrap();
     tree_parity(&card, staged, &cell_letters(&small), &small, 3, 10);
-    let family = LetterFamily::new(vec![
-        Feature::Phase { ring: 0, grain: 3 },
-        Feature::Phase { ring: 1, grain: 2 },
-    ])
-    .unwrap();
-    let bundle = |stream: &[usize]| -> Vec<Letter> {
-        stream
-            .iter()
-            .enumerate()
-            .map(|(i, &cell)| {
-                Letter::Bundle(Bundle {
-                    cell,
-                    features: family
-                        .encode(&[(i % 3) as u64, ((i / 3) % 2) as u64])
-                        .unwrap(),
-                })
-            })
-            .collect()
-    };
     let enlarged = Landmarks::with_carrier(
         LandmarkDeclaration {
-            family: family.clone(),
-            ..declared(5, 2, 0, 400)
+            family: tree_family(),
+            ..unbounded(5, 2, 0, 400)
         },
         6,
     )
     .unwrap();
-    tree_parity(&card, enlarged, &bundle(&small), &small, 2, 10);
+    tree_parity(&card, enlarged, &tree_bundles(&small), &small, 2, 10);
     let deep_enlarged = Landmarks::new(LandmarkDeclaration {
-        family: family.clone(),
+        family: tree_family(),
         prior: StopPrior::global(2).unwrap(),
-        ..declared(5, 9, 0, 400)
+        ..unbounded(5, 9, 0, 400)
     })
     .unwrap();
-    tree_parity(&card, deep_enlarged, &bundle(&small), &small, 3, 10);
+    tree_parity(&card, deep_enlarged, &tree_bundles(&small), &small, 3, 10);
     let wide = Landmarks::new(LandmarkDeclaration {
-        family: family.clone(),
-        ..declared(256, 2, 0, 1_200)
+        family: tree_family(),
+        ..unbounded(256, 2, 0, 1_200)
     })
     .unwrap();
-    let times = tree_parity(&card, wide, &bundle(&bytes), &bytes, 3, 50);
+    let (times, _) = tree_parity(&card, wide, &tree_bundles(&bytes), &bytes, 3, 50);
     println!(
         "enlarged |A| = 256, D = 2, r = 2 (aperture 3): {} reads {} µs, {} deposits {} µs",
         times.reads,
@@ -977,6 +1076,97 @@ fn the_card_tree_reads_and_deposits_as_the_host_tree() {
         times.deposits,
         times.deposit.as_micros()
     );
+}
+
+/// **The card's register carries at its ceiling as the host's** (Decision 39, `Capacity::carry`;
+/// Lean `HNN/LandmarkCapacity.{capCarry, cap_carry_half_units, capped_tree_laws}`; Decision 25:
+/// the resident realization advances with the law). At the ceilings `c ∈ {1, 2, 3}` (`L = 2, 4,
+/// 8`, small enough that the shallow registers carry at nearly every arrival): the binary stream
+/// with its flipped cell at `D = 12` and `D = 48` (chains holding carried registers split, their
+/// upper parts founded with the carried register); five classes with a forced split and the narrow
+/// carrier at `D = 2`, and at `D = 9` under the per-depth prior `(2, 5)`; the enlarged tree at
+/// `D = 2` and at `D = 9` under the global rung 2 (both branches carrying); and the text-like bytes
+/// at `|A| = 256`, `D = 4` and `D = 48`. At apertures 2 and 3, every window's splits in cell order
+/// (known targets, read through the logged deposits and their undo, and none) are the host's word
+/// for word, and after the deposits the card's arena (masses and charts included) is the host's.
+/// Each run's registers carry (its arena's masses fall below its unbounded twin's), and the binary
+/// runs split chains after their registers carried.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_card_register_carries_at_its_ceiling_as_the_host() {
+    use holonics::hnn::landmark::{
+        Capacity, LandmarkDeclaration, Landmarks, StopPrior, cell_letters,
+    };
+    let card = card();
+    let bytes = tree_bytes();
+    let small = tree_small();
+    let flipped = tree_flipped(200);
+    let mut runs = 0;
+    for exponent in 1..=3u32 {
+        let capacity = Capacity::Ceiling(exponent);
+        let declared = |alphabet, depth, forced, population| {
+            tree_declared(alphabet, depth, forced, population, capacity)
+        };
+        let mut witnessed = |label: &str, (_, carried): (TreeTimes, Carried), splits: bool| {
+            println!(
+                "{capacity}, {label}: {} registers carried, {} upper parts founded carried",
+                carried.registers, carried.splits
+            );
+            assert!(
+                carried.registers > 0,
+                "{capacity}, {label}: the registers carried"
+            );
+            assert!(
+                !splits || carried.splits > 0,
+                "{capacity}, {label}: chains split after their registers carried"
+            );
+            runs += 1;
+        };
+        for (depth, aperture) in [(12, 2), (48, 3)] {
+            let binary = Landmarks::new(declared(2, depth, 0, 200)).unwrap();
+            let letters = cell_letters(&flipped);
+            let run = tree_parity(&card, binary, &letters, &flipped, aperture, 1);
+            witnessed(&format!("binary flipped, D = {depth}"), run, true);
+        }
+        let narrow = Landmarks::with_carrier(declared(5, 2, 1, 400), 6).unwrap();
+        let run = tree_parity(&card, narrow, &cell_letters(&small), &small, 2, 1);
+        witnessed("five classes, forced 1, W = 6, D = 2", run, false);
+        let staged = Landmarks::with_carrier(
+            LandmarkDeclaration {
+                prior: StopPrior::per_depth(vec![2, 5]).unwrap(),
+                ..declared(5, 9, 1, 400)
+            },
+            6,
+        )
+        .unwrap();
+        let run = tree_parity(&card, staged, &cell_letters(&small), &small, 3, 1);
+        witnessed("five classes, forced 1, W = 6, D = 9, (2, 5)", run, false);
+        let enlarged = Landmarks::with_carrier(
+            LandmarkDeclaration {
+                family: tree_family(),
+                ..declared(5, 2, 0, 400)
+            },
+            6,
+        )
+        .unwrap();
+        let run = tree_parity(&card, enlarged, &tree_bundles(&small), &small, 2, 1);
+        witnessed("enlarged, W = 6, D = 2", run, false);
+        let deep_enlarged = Landmarks::new(LandmarkDeclaration {
+            family: tree_family(),
+            prior: StopPrior::global(2).unwrap(),
+            ..declared(5, 9, 0, 400)
+        })
+        .unwrap();
+        let run = tree_parity(&card, deep_enlarged, &tree_bundles(&small), &small, 3, 1);
+        witnessed("enlarged, D = 9, rung 2", run, false);
+        let campaign = Landmarks::new(declared(256, 4, 0, 1_200)).unwrap();
+        let run = tree_parity(&card, campaign, &cell_letters(&bytes), &bytes, 2, 10);
+        witnessed("bytes, |A| = 256, D = 4", run, false);
+        let deep = Landmarks::new(declared(256, 48, 0, 1_200)).unwrap();
+        let run = tree_parity(&card, deep, &cell_letters(&bytes), &bytes, 3, 10);
+        witnessed("bytes, |A| = 256, D = 48", run, false);
+    }
+    assert_eq!(runs, 3 * 8);
 }
 
 /// **The card's β step is the host's** (`hnn_tree_beta_steps` against `landmark::Beta::step`,
