@@ -1,6 +1,6 @@
 # Construction state
 
-**September 26, after Decisions 37–38.**
+**September 27, after Decisions 37–39.**
 [THE_REBUILD](docs/plans/THE_REBUILD.md) owns the implementation order and current decisions.
 The repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
@@ -14,6 +14,7 @@ The repository was reset on September 24; the pre-reset tree is
 | Campaign 1 | Meets its standing-cut predictive criterion after Decisions 28–30; source moments, local word, comparison, deposition and structural collapse have consumers |
 | Campaign 2 | Ring/contact laws and parity pass; its additional predictive criterion fails. The measured field declares no resonators or boost signatures |
 | Decision 38 | Loaded resonator forward/adjoint and material deposition built on host/card; the fixed source-ring family does not improve the standing-cut prediction |
+| Decision 39 | A landmark's count register carries at its ceiling `2^c`; the development cells choose `c = 11` at scale; the resident tree takes the carry |
 | Immediate work | Campaign 3: join the existing exact future-kernel quotient to a loaded ring, with source, pump-phase and receiver squares before release |
 | Campaign 3 | Mode release, dormant constitution/clock, founding and moment quotient; consumes the loaded ring connection |
 | Campaign 4 (#27) | Existing serial-screw laws need the HNN motor consumer and a motion-recording receipt |
@@ -46,6 +47,12 @@ consumers.
   `1 + 15/16 + ε` bits per cell, below the shallower tree and PPM-2. This is the count-only
   harness, not a full-HNN exposure. The standing cut lies in this held-out range and has been
   used in development; the separate evaluation partition stays unread.
+- **Decision 39.** At depth 48 each landmark's count register carries (both counts halve) at the
+  ceiling `2^c`. The development cells choose `c = 11`, at the family's edge, `−337 + 1/16 + ε`
+  bits below no ceiling, charged. Held out the tree reads `258018 + 5/16 + ε`, `−180 + 1/16 + ε`
+  below Decision 37's tree, charged. Dissipation on a landmark's own clock earns few bits: the
+  terrain is close to stationary at these contexts. The standing-cut HNN keeps its own
+  declaration.
 - **Decision 37.** Unary chains are stored at their parting faces. Lean proves the ideal
   rational tree's face/code equivalence and the `2n − 1` node bound for nonempty passages.
   Labels still cost memory and traversal with depth. Compacted storage is the sole host/card
