@@ -748,13 +748,14 @@ family that reads its faces, read together as one generator of faces.
 - **Death** is zero likelihood or a lawful release. A poor positive likelihood only loses weight.
 - **Generation is egg packing.** The requested consequence is packed into the keys, and the native
   transport emits it: `decode(T_native(encode x)) = T(x)`.
-- **Hubs and their maintenance** (Brandon, September 27: some functions may need energy spent "to
-  maintain the resonance", like "certain stars and black holes … for orbits to stabilize").
-  [agent-inferred] Eggs compose at ports, a Holarchy of eggs. A **hub** is a constituent whose
-  presence conditions the others' faces.
-  - Its value is read as the joint code with it against without it, not as its own bits. An example
-    is the record clock of the arithmetic terrain, which makes a product's determined digits cheap
-    for the carry egg.
+- **Keystones and their maintenance** (Brandon, September 27: some functions may need energy spent
+  "to maintain the resonance", like "certain stars and black holes … for orbits to stabilize";
+  nothing in a configuration is unrelated to the rest). [agent-inferred] Eggs compose at ports, a
+  Holarchy of eggs. A **keystone** is a constituent whose presence conditions the others' faces. The
+  name is borrowed from the keystone species of an ecosystem and from the stone that holds an arch.
+  - A keystone's value is read as the joint code with it against without it, not as its own bits.
+    An example is the record clock of the arithmetic terrain, which makes a product's determined
+    digits cheap for the carry egg.
   - A dense basin is a landmark with heavy traffic: a region where many families' paths converge,
     found where it is causally attributable.
   - Holding a dormant key is free only when its ring is lossless. A mode held against dissipation
