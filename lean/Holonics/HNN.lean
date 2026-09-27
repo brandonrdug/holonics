@@ -20,6 +20,7 @@ import Holonics.HNN.ContactBreak
 import Holonics.HNN.BornFace
 import Holonics.HNN.LocalWeighing
 import Holonics.HNN.ConvergenceFounding
+import Holonics.HNN.LandmarkCompaction
 
 /-!
 # The HNN law
@@ -51,4 +52,5 @@ design: the HNN law", table (b) rows 1–8, stated before their Rust owners in `
 | `HNN/BornFace` | Decision 33: the wave read by the Born rule, a finitely correlated receiver on the receiving ring's register: the normalized digit split and dyadic cell face, the reception keeping a density, the density as the retained quotient, the absorbed unitary tick, the interference zero no nonnegative receiver makes, the exact covector and the Fisher-scored step | `hnn::born` |
 | `HNN/LocalWeighing` | Decision 34: weighing is local: the forward mixture over faces (its telescope, dominance, Bayes-then-kernel step and executed chart), the static two-face prior and the fixed share with its switch price, the tree over own weights (node-local mixing: normalized, Kraft-complete, each landmark paying at most `−log₂` of its prior weight) and the stop-weight mixture per digit tree | `hnn::landmark::{Landmarks::local, LocalLaw, StopMixture, JoinTree}`, `hnn::receiving::Mixture::switching` |
 | `HNN/ConvergenceFounding` | Decision 36: a landmark is founded where paths converge, at its second arrival: the stopped path normalized under any stopping rule decided before the symbol (a complete prequential code), the tree with absent children (the Kraft form of its prior over pruned trees and its dominance), the stopped step (`β` still at the stop), Decision 28's tree as the case found at the first arrival, and the convergence standing whose root weight is the product of the stopped faces | `hnn::landmark::{Founding, Landmarks::founded_at, IdealLandmarks::founded_at}` |
+| `HNN/LandmarkCompaction` | Decision 37: the tree is stored at the faces where paths part: a unary chain with its bottom is one node at the summed rung (`chain_ratio`, `chain_ratio_dyadic`: `E − W = ∏ (1 − w_i)(E − X)`, `∏ (1 − w_i) = 2^(−S)`, founded at `2^S − 1`), a chain ending at the declared depth is one KT node (`leaf_chain_is_one_node`), a split's closed-form ratios (`chain_split`), the compacted tree (root, parting nodes, leaves) is Decision 28's tree code for code, weight, face and prequential code exactly in `ℚ` (`compacted_is_decision_28`), and it keeps at most `2n` nodes over `n` arrivals at any depth (`compacted_node_bound`) | `hnn::landmark` compacted storage |
 -/
