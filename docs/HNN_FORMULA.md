@@ -177,6 +177,57 @@ address (`Transport/SourceMoment`). The complex parametron keeps quadratures and
 incidence before any phase/sign/intensity receiver, so encoding keeps real timing and receiver
 orientation; it assigns no pump frequency to a character and imposes no torus on every datum.
 
+### The source and release contract
+
+[definition; agent-inferred] (Brandon, September 27: data must be "structured fluid input that's
+ready to channel as flux".) A parameter, a weight or a word is a pin: a coordinate where current
+folds or pivots. That is the Swing's anchor `a` in `S_a x = 2a − x`, a navigator's key, or a
+constitution's lattice locus. Learning moves the pins; the current falls through them. So the
+input must arrive as flux the pins can act on, and the output must return as faces an operator can
+decode.
+
+**The source contract.** What an input must carry to be channelled:
+1. **A terrain chart.** A declared alphabet or exact lattice with its units and grain. Floats are
+   converted only at the exterior boundary, at a declared precision.
+2. **Channels as ports.** Each stream (a speaker, a tool, a sensor axis, a colour plane) is its own
+   port with its own clock. Parallel streams declare their joint clock. Roles and provenance are
+   exterior codec information: they place cells on ports, not native semantic identities.
+3. **Sections.** The clock's sections are declared (turns, lines, rows, frames), so the passage is
+   divided into epochs, and aeons are closed at declared boundaries (a conversation, a document, a
+   recording).
+4. **Incidence.** Actual causal references (a reply's parent, a tool result's call) are the joining
+   incidence. Adjacency never manufactures an edge, and equal text never merges occurrences
+   ([the data rules at history](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/CONVERSATION_DATA.md)).
+5. **Separation.** The source is separated from its harness: control blocks, presentation mirrors
+   and copied metadata are not source currents.
+6. **Counts under a certified partition.** The source enters as phase-carried moments, never as an
+   archive, with its capacity `n*` declared.
+7. **The admitted receivers.** The declared receivers name what is to be predicted or decoded, and
+   the admitted future family names what retention must keep.
+8. **A pinned partition and a calibration terrain.** Development, evaluation and deferred families
+   are pinned by hash before any learning. Each curated source is paired with a terrain whose truth
+   is known (`holarchy::terrain`), so a failure can be attributed.
+
+**The release contract.** What an output must carry to be decodable:
+1. **A receipt of faces** over the declared partition, each at its receiver's grain, frame and
+   clock, with its fibre as an exact enclosure and its code length against the baselines.
+2. **The decoder carried.** `decode(T_native(encode x)) = T(x)`, `D E = ρ` and `E_next T = U E` hold,
+   or the separator is returned. A text face reconstructs valid Unicode through its receiving
+   relation.
+3. **Provenance.** Each emitted face names the navigators and keys that produced it (its egg's
+   genome) and the causal diamond of the inputs that reached it. A plural fibre is reported, never
+   silently collapsed, and a refusal is typed.
+4. **Health and cost.** Each response carries its numerical health and its costs by kind
+   ([lessons record §4](../research/records/2026-09-24_LESSONS_FROM_THE_WORKBENCH_AND_ATHENA_PROTOTYPES.md)).
+
+[established-bounded; source-inspected] The standing real cut meets items 1, 6 and 8 and not 2–5.
+It is the UTF-8 bytes of each family's visible parts, with roles and provenance removed and
+newlines as the only sections. It is a byte codec, which Holonic Encoding excludes, and it stays the
+regression control. The curated conversation source is built under this contract: human, agent,
+tool and harness as ports; turns as epochs; conversations as aeons; parents as incidence; and the
+request→response and response→later-human relations as the admitted receivers. It is campaign 5's
+input and step 8's curation.
+
 ### A tensor is an operation chart
 
 [definition] For a finite admitted family a linear transport has a matrix chart, a multilinear

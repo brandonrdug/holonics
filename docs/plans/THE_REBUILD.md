@@ -2398,7 +2398,10 @@ screw word's transport emits it. The joint fibre stays plural where it is.
 
 #### Campaign 5. Holonic Encoding, context and joint prediction
 
-[definition] In the egg population's terms this campaign is species and generation:
+[definition] Its input is a source curated under [the source and release contract](../HNN_FORMULA.md#the-source-and-release-contract):
+channels as ports, turns as epochs, conversations as aeons, and parents as incidence. It replaces the
+flat byte cut, which stays the regression control. In the egg population's terms this campaign is
+species and generation:
 - a merge is accepted only when the admitted future faces agree and its charged code-length pair
   wins (two eggs one species);
 - `D E = ρ` and `E_next T = U E` hold, or the separator is returned;
