@@ -232,8 +232,9 @@ mark an inferred choice with its reason (`agent-inferred`), and proceed. Never h
 decision that the framework settles, and never hedge finished work with a queue of "next" items.
 Brandon supplies the framework and the ontology as a lens (September 26: "I'm more of a lens that
 aims to focus you on this research and work … the Decisions are yours, resonate with my
-messages"). Technical and mathematical decisions, the Decisions in THE_REBUILD among them, belong
-to the agents: make them, record them with their reason, and revise what fails. Implement a
+messages"). Technical and mathematical decisions belong to the agents: make them, and record each
+with its reason where its law lives (its owner, its guide or its dated record; never in a separate
+log of choices), and revise what fails. Implement a
 relation together with its consumer, stated as an equation at the consumer: for
 example `decode(T_native(encode x))=T(x)`, `E_next T=U E`, `D E=ρ`, or the complete residual.
 
