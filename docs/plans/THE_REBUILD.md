@@ -94,7 +94,10 @@ sets the order:
    and the sections their own navigator (campaign 5);
 5. then continue campaign 3 as the population's birth, death and dormancy: hold a silent ring's
    keys through its aeon, price a switch by fixed share per ring factor, found from reserved prior
-   mass, and release only by zero likelihood or a certified null direction.
+   mass, and release only by zero likelihood or a certified null direction. Families compose at ports (a
+   Holarchy of eggs). A hub's value is the joint code with it against without it, and a mode held
+   against dissipation charges its maintenance work
+   ([ELEMENTARY_OBJECTS, the egg](../ELEMENTARY_OBJECTS.md#the-egg-a-generator-read-as-a-whole)).
 
 The standing cut has been reused for development and lies within the wide cut's held-out range.
 These are development receipts. The dataset's separate evaluation partition remains unspent.
