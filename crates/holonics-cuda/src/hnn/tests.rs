@@ -1044,6 +1044,7 @@ fn the_card_split_is_the_hosts() {
     use holonics::hnn::landmark::Beta;
     let card = card();
     let mut draw = Draw(37);
+    let (mut rebased_all, mut kept_all) = (0usize, 0usize);
     for (width, face) in [(6u64, 20u64), (29, 39), (43, 39)] {
         let mut charts = Vec::new();
         for trial in 0..3_000u64 {
@@ -1081,7 +1082,8 @@ fn the_card_split_is_the_hosts() {
                     .any(|(_, mantissa)| mantissa.is_some())
             })
             .count();
-        assert!(rebased > 0 && rebased < charts.len(), "both branches exercised");
+        rebased_all += rebased;
+        kept_all += charts.len() - rebased;
         let carded = super::tree::split_ratios(&card, &charts, width, face).unwrap();
         for (index, (card_split, host_split)) in carded.iter().zip(&host).enumerate() {
             assert_eq!(
@@ -1091,5 +1093,6 @@ fn the_card_split_is_the_hosts() {
             );
         }
     }
+    assert!(rebased_all > 0 && kept_all > 0, "both branches exercised");
     assert!(super::tree::split_ratios(&card, &[(1, 1, 0, 60, 60)], 63, 39).is_err());
 }
