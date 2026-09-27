@@ -2167,12 +2167,34 @@ exact chain word the descended ring returns the resonator's waves exactly. The w
   objects' "dormant modes wait for a fitting antecedent"): an admitted family can grow, and a
   release that drops stored energy would have to be emanated with its receipt, which this
   construction does not own.
+
+**The material and deposition descent (September 27; Lean `HNN/ModeQuotient` §5–6).**
+- **The costate descends.** A declared comparison's costate is `λ_t = λ̄_t V`: it vanishes on the
+  release. The drive and solved covectors are the full ring's.
+- **The gain covectors.** A gain family's covector is the same at `x` and at `x + k` for every
+  admitted comparison exactly when its variation vanishes on the release
+  (`gain_fibre_invariant`, `solved_pairing_null_iff`):
+  - capacity and dissipation always factor;
+  - stiffness and pump factor when `K₀k_u = 0`, which holds unpumped and for every pump of order 2
+    or 4 (`half_turn_separates`);
+  - they fail at a standing pump's threshold, where a deposit along either family makes the mode
+    heard (`standing_pump_threshold_reads_release`).
+- **Learning admits the deposit as a receiver.** `ModeQuotient::learning` admits the four
+  variations at every phase as receivers, so its chart is the largest one-chart release through
+  which every gain covector descends (`learning_chart_le_kernel`). On the standing-threshold
+  witness it keeps every direction, and the mode that deposition would reach is retained with its
+  separator. On every other fixture the learning release equals the frozen one.
+- **The descended block ticks.** `q′ = T̄_t q + B̄_t e`, `s′ = ρ̄_(0,t)q + D_t e`, with the storage
+  form `Q̄_t = σᵀQ_tσ` (the release lies in the radical of `diag(K_t, C)`). Its balance of storage,
+  pump work, port work and dissipation equals the full ring's at every lift, term for term
+  (`descended_balance`). The descended variations paired with a real word's covector sum to the
+  reference owner's gain covectors.
 - **Next in this campaign.**
-  - The material and deposition descent: the gain covectors over admitted comparisons factor
-    through `V`, and the descended block gets a stated tick, since `T̄_t` no longer has the Cayley
-    form.
-  - The lattice chart's solve and remainders.
-  - The card.
+  - The descended block under the lattice chart, with its chart defect and split remainders on `q`.
+  - The card's parity for `tick` and `pull_back`.
+  - The deposit consumer reading the descended return, which needs the ring's state retained
+    across words: dormancy across an aeon boundary.
+  - The release's stability under every finite deposit in the four-gain family.
   - The bridge from the linear statements to `HNN/Ring`'s concrete tick is owed in #62.
 
 - **Laws:** Lean item 9, and:
