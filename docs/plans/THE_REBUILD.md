@@ -24,6 +24,15 @@ short current position; dated records hold the evidence.
 | Ring storage | Loaded forward, adjoint and reached material deposition (Decision 38) | Balance and parity pass; the fixed source-ring family loses to the default HNN on the standing cut |
 | Mode release and generation | Shared primitive laws exist | Campaigns 3–5 must build their consumers; application acceptance is step 8 |
 
+**Immediate work (September 27): unity before campaign 3 continues.** The
+[unity audit](../../research/records/2026-09-27_THE_HOLARCHY_AND_ITS_AEONS_ARE_THE_TOP_THE_DECISIONS_DISSOLVE_INTO_THEIR_OWNERS_AND_LEARNING_IS_PROTOTYPED_WHERE_A_HOLARCHY_MADE_THE_TERRAIN.md)
+sets the order:
+1. dissolve the Decisions log below into its owners and records;
+2. put the Holarchy and its aeons at the top of `hnn`, with the receiving tree expressed through
+   `receiver::standing`, `aeon::Epochs` and the source navigator's words;
+3. prototype learning on terrain a declared Holarchy made, with its exact truth;
+4. then continue campaign 3.
+
 The standing cut has been reused for development and lies within the wide cut's held-out range.
 These are development receipts. The dataset's separate evaluation partition remains unspent.
 

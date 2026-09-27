@@ -20,6 +20,7 @@ git grep -n '<term>' 13f8c734 -- crates docs
 
 ## HNN, the continuing object and its consumer
 
+- [The Holarchy and its aeons are the top; the Decisions dissolve into their owners; learning is prototyped where a Holarchy made the terrain](2026-09-27_THE_HOLARCHY_AND_ITS_AEONS_ARE_THE_TOP_THE_DECISIONS_DISSOLVE_INTO_THEIR_OWNERS_AND_LEARNING_IS_PROTOTYPED_WHERE_A_HOLARCHY_MADE_THE_TERRAIN.md) (#63, #73, #147): the unity audit (the Decisions log mixes definitions, measurements and order; the receiving tree and ten HNN Lean modules stand outside the object library; the machine's top is a field and a harness), the unification (the HNN a Holarchy over aeons; the receiving tree a mixture over retention quotients), and learning prototyped on terrain a declared Holarchy made, with its exact truth, the conversation cut kept as the milestone.
 - [The resonator returns its wave and the comparison reaches its material](2026-09-26_THE_RESONATOR_RETURNS_ITS_WAVE_AND_THE_COMPARISON_REACHES_ITS_MATERIAL.md) (Decision 38, #73/#76): the loaded ring port, its state/material adjoint and scalar-amplitude deposition, with the consuming calls and scoped verification.
 
 Read [HOLON](../../docs/HOLON.md), [HNN_FORMULA](../../docs/HNN_FORMULA.md) and the prototype's

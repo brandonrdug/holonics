@@ -1,0 +1,170 @@
+# The Holarchy and its aeons are the top; the Decisions dissolve into their owners; learning is prototyped where a Holarchy made the terrain
+
+**Date:** 2026-09-27. **Scope:** a unity audit of the library, and the basis for prototyping
+learning. Refs #63, #73, #147. **Grades:** the audit findings are `established-bounded` (read from
+source at `289e63af`); the unification and the terrain basis are `agent-inferred`.
+
+## The question
+
+Brandon, September 27:
+- The numbered "Decisions" were a habit of the agents, not his instruction.
+- He asks for an audit of the unity of Holonics: is everything synthesized and consolidated in the
+  library objects?
+- On learning: the conversation logs are being used as the material. They may not be packaged for
+  the learning the machine needs, and curating data is a separate problem from learning itself. Is
+  there a better basis for prototyping learning? How is behavior being gauged on those logs?
+- "Don't reinvent the wheel": past experiments, including the laboratory, bear on this.
+- "Aeons and Holarchies are at the top."
+
+## 1. The audit
+
+### 1.1 The Decisions log mixes three kinds of text
+
+`THE_REBUILD` has 3504 lines. Its `### Decisions` section, from line 2500 to the end, holds 39
+numbered entries. They mix three kinds of text that the operating guide routes to different places
+("documentation is the fix"):
+- **definitions**, which belong in their object's guide or beside their owner;
+- **measurements**, which belong in dated records (most already have one);
+- **order**, which alone belongs in `THE_REBUILD`.
+
+Rejected and superseded entries sit beside adopted ones: 33 (the Born face), 34's node-local law,
+and 36 (second-arrival founding). The log grew by accretion. It keeps each choice's reason, which
+is worth keeping, but it scatters each object's law across entries. For example, the receiving
+tree's law is spread over Decisions 28–30, 32 and 34–37 and the module doc of `hnn::landmark`.
+
+### 1.2 The working predictor is outside the object library
+
+`hnn::landmark` is 5570 lines. It is the component that earns the HNN's bits: on the wide cut,
+`1 + 15/16 + ε` bits a cell against PPM-2's `3 + 0/16 + ε`. It imports only `Rat`,
+`ExactInterval` and `ceil_log` from the library. None of the objects its nouns name are used:
+- **its retention** is not a `receiver::standing::StandingLaw`;
+- **its node arrivals** are not `aeon::Epochs`, and its capacity carry (Decision 39) is not an
+  aeon cycle;
+- **its addresses** are not navigator words;
+- **its "landmark"** is not `compression::landmark`. That is a different owner, rebuild step 3's
+  landmark discovery (sites, fixed points, identities, primitive cycles), so two unrelated owners
+  carry the name.
+
+`hnn::receiving` likewise bypasses `receiver::{face, reception, standing}` for its tree faces.
+
+### 1.3 Ten Lean modules stand apart from the framework
+
+Ten of the 25 `lean/Holonics/HNN` modules import no framework object:
+- `LandmarkCompaction`, `LandmarkCapacity`, `ConvergenceFounding`, `LocalWeighing`,
+  `LandmarkCarrier`;
+- `RegionCounts`, `StandingRead`, `TargetFace`, `Word`, `IndexedOpen`.
+
+Their theorems are correct and checked, but they are not joined to `Foundation/Standing`,
+`Aeon/Clock/Epoch`, `Holarchy` or `Compression`.
+
+### 1.4 The machine's top is a field and a harness
+
+The HNN's top is `hnn::field::Field` and the exposure harness `hnn::reference::Reference::expose`.
+The Holarchy enters only as `Holarchy::parametric` inside `reference.rs`, and the aeon through
+`EnclosedLedger` and the retention collapse.
+
+### 1.5 What is already joined
+
+- `hnn::modes` descends through `compression::FaceMap` and `receiver::standing`.
+- `hnn::retention` reads `aeon::{Cycle, Epochs, EnclosedLedger}` and `holarchy::Count`.
+- `hnn::field` builds on `holon::{parametron, contact, dirac, element}` and `aeon::ClockLift`.
+- `hnn::port` reads `receiver::{face, receipt, reception, release}`.
+- `hnn::ratio` reads `aeon::Reading` and the carried power.
+
+## 2. The unification
+
+- **The Holarchy and its aeons are the top** (Brandon; `agent-inferred` as a construction). The HNN
+  is a Holarchy: its rings, contacts and receiving tree are Holons joined at ports by
+  `interconnect`. Its passage is an aeon:
+  - a receiving window is an epoch at the receiver's section;
+  - a pump period or a clock closure is a cycle;
+  - the aeon boundary is the collapse.
+
+  `Field` and `Reference::expose` become charts of that pair, not the top.
+- **The receiving tree is a mixture over retention quotients** (`agent-inferred`; the
+  identification is exact). The chain of identities:
+  - Each pruned context tree partitions the source's histories into classes that predict alike: a
+    candidate standing, a `StandingLaw` on the source navigator's words.
+  - Context-tree weighting weighs those candidates by the stop prior, and its dominance bound is
+    the code cost of choosing among them (`LandmarkTree.own_kraft_and_dominance`).
+  - A node's arrivals are the epochs of its section; the capacity carry acts at the register's
+    cycle.
+  - A node is a face where source paths converge. It is a landmark of the shift navigator, the
+    same object `compression::landmark` finds for other navigators.
+
+  The consolidation expresses the tree through these owners and names it once. Its own name
+  becomes the receiver's standing mixture, so the two "landmark" owners no longer collide.
+
+## 3. The basis for prototyping learning
+
+### 3.1 How behavior is gauged now
+
+On the conversation cut behavior is gauged only against baselines: online order-0, order-1 and
+PPM-2. There is no ground truth. The cut has no known generator, keys or entropy rate. So a
+failure cannot be told apart from absent structure. Campaign 2's letter families "add no bits on
+text", and the keys "are located correctly where a machine made the data and are absent from text"
+(campaign 1). The data's packaging and the learning law are measured together.
+
+### 3.2 What the past established
+
+The following comes from the laboratory at commits `c91914d5`, `32007c95` and `703b0dab`, and
+from history at `13f8c734`:
+- **The laboratory's rule.** Its May kickoff wrote: "Stop using whim-selected substrates.
+  Construct them." Constructed microscopes are for structure and living substrates for the thesis,
+  "never mix them".
+- **Sources with a known generator** gauged learning against the truth: the prime stream against
+  the coprime rate, Dyck depth against the known depth, clocked reach, the copy floor `log 26`,
+  and exact arithmetic answers. Infinite generated arithmetic reached held-out exact-match on
+  between 83 and 91 of every 100 queries, where a fixed corpus of 45k reached 14 of every 100.
+- **Here, on machine-made cribs,** the HNN located the true key 128 times in 128.
+- **What failed on real corpora:**
+  - TinyStories and walks confounded depth, entropy and repetition;
+  - code worlds enacted nothing;
+  - pre-reset conversation exposure produced nothing useful, with replay 18/388;
+  - campaign 2's rings found no letter family on text.
+- **The golden-mean source's rate** `log₂ φ` is proved in `Foundation/ReceiverCodeCost`, and no
+  testbed has used it yet.
+- **Brandon's ruling of August 26 still governs the milestone.** The HNN must return "an
+  inferred response and not a manually posed outcome", so every campaign's criterion stays on the
+  real cut.
+
+### 3.3 The basis
+
+`agent-inferred`. Learning is prototyped on terrain that a Holarchy made:
+- A declared Holarchy, run over declared aeons with drawn keys and constitution, generates the
+  terrain.
+- Its truth is exact: the entropy rate as an exact enclosure, the keys, and the constitution.
+- Learning is gauged three ways:
+  - **redundancy:** the HNN's code minus the true rate, never only against baselines;
+  - **recovery:** the located keys and constitution against the drawn ones;
+  - **attribution:** each mechanism's share, by a terrain that holds one kind of structure.
+- The keys are drawn, not posed, and the terrain is the same objects the machine is made of. So it
+  honours Brandon's August 26 ruling as a prototype.
+- The conversation cut stays the living substrate and the milestone. The two are never mixed in one
+  claim.
+
+The first family, one terrain per mechanism:
+
+| Terrain | Its truth | The mechanism it isolates |
+|---|---|---|
+| A tree source with a drawn context tree and drawn leaf faces | the tree and the rate | the receiving tree: does it recover the tree and reach the rate? |
+| Rotation words: a rational rotation read at a grain, and the golden-mean shift | the period or the rate `log₂ φ` | the rings: lock, resonance, the helix that never locks |
+| Rotor cribs (`hnn/tests/keys.rs::synthetic_crib`) | the key and the plugboard | key location (128/128 already) |
+| An aeon-switching source: a mode silent for an aeon, then returning | the switch epochs and the dormant mode | dormancy across aeon boundaries (campaign 3) |
+
+This also separates the two problems Brandon names:
+- **Curating the conversation data** is exterior codec work (step 8, #148).
+- **The learning law** is tested where the truth is known.
+
+## 4. Order
+
+1. Dissolve the Decisions log:
+   - each surviving law goes to its object's guide or owner doc, with its reason;
+   - each measurement goes to its dated record;
+   - rejected and superseded entries become one-line pointers to their commits;
+   - `THE_REBUILD` returns to order.
+2. Put the Holarchy and its aeons at the top of `hnn`. Express the receiving tree through
+   `receiver::standing`, `aeon::Epochs` and the source navigator's words. Join the ten free Lean
+   modules to the framework.
+3. Build the terrain owner and the first family above, with each terrain's exact truth receipt.
+4. Continue campaign 3 on the aeon-switching terrain, then on the real cut.
