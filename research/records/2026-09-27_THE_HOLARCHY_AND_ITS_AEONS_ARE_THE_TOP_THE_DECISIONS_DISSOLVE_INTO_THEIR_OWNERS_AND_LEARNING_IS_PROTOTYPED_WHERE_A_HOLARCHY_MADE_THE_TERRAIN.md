@@ -221,3 +221,54 @@ fraying threads through pathways of these as layers. Enigma and Bombe style."
   - the keys located against the drawn ones;
   - the gratings founded at the true gaps;
   - the code length against the exact rate.
+
+## 6. The first receipts on terrain (September 27, commit `ab416919`)
+
+The owner is `holarchy::terrain`. It holds moiré, tree source, rotor cribs and aeon switching, each
+drawn by the library's exact `Draw` and returned with its truth. The notebook is `hnn_terrain`.
+These are development receipts, and the conversation cut stays the milestone. Each reading is
+`+ ε` with `0 ≤ ε < 1/16`.
+
+### 6.1 The receiving tree against a tree source's truth, at `n = 2^16` cells
+
+The receiving tree learns what the source is:
+
+| Source | `n·h` (the exact rate) | Tree code | Code against the source's own code | The ideal weighting bound | Recovered tree |
+|---|---|---|---|---|---|
+| depth 2, three leaves | `56543 + 13/16` | `56464 + 2/16` | `+27 + 1/16` | `33 + 7/16` | the drawn tree, 16 of 16 addresses |
+| depth 4, eight leaves | `47257 + 8/16` | `47134 + 11/16` | `+51 + 4/16` | `79 + 5/16` | the minimal tree, 64 of 64 |
+
+- Both codes lie below `n·h`. That is a sample's own fluctuation: the source's own code is lower
+  still.
+- At depth 4, two drawn leaves share one face, and the tree merges them. It recovers the coarsest
+  tree with the same faces, which is the retention quotient: two histories that predict alike are
+  one standing.
+
+### 6.2 The moiré locates two failures
+
+Three gratings, with keys `14/15 @ 5/15`, `4/15 @ 10/15` and `11/16 @ 12/16`, joint period
+`240 = 2^4·3·5`, and a key description of 30 bits:
+- **The depth rule stops at a plateau.** The harness's depth sweep stops at the first code that
+  does not fall, below the determining depth `D*`: `D = 10` against `D* = 14` for the parity
+  class, `D = 5` against `D* = 8` for the sheet tuple.
+  - At the chosen depths the codes are `2016 + 6/16` (parity) and `5427 + 1/16` (sheets), with
+    `17 + 13/16` and `62 + 10/16` bits a period still spent at period 67.
+  - At `D*`, read as a control and not a choice, they are `993 + 5/16` and `1549 + 0/16`.
+- **The tree memorizes a moiré it could name.** Even at `D*` the zero-rate terrain costs about 30
+  times its key description. The tree learns the pattern's contexts, not its gratings. The rings
+  exist for exactly this terrain; the gap between those 993 bits and the key's 30 is theirs to
+  earn.
+
+### 6.3 What the rings need to be measured on it
+
+- **Parallel gratings.** The field's selective law carries a ring's overflow to the next ring, an
+  odometer. Moiré gratings are independent: they need rings with no carry between them.
+- **A rate is a plugboard.** Stepping one port a cell carries grating `i` exactly under the key
+  `p_i⁻¹c_i`, since `(c + tp) mod q = p((p⁻¹c + t) mod q)`. The sheet letter must read the ports
+  with that relabelling declared.
+- **The Bombe for a moiré.** `hnn::keys` builds its menu from port-to-port edges, and a moiré cell
+  (a parity or a tuple) gives none. Locating the phases needs a menu of parity constraints on the
+  joint clock torus: with the rates known, one relation a tick over at most `Π q_i` phase
+  configurations.
+- **Locks at the winding grain.** Over one joint period the contact letters read the pairs' locks
+  coarsely (`19/14` for the true `224/165`). The pair lock is not resolved within a period.

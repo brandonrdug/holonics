@@ -40,7 +40,16 @@ sets the order:
    - a receiving window is a step of the exposure's loop, not an `aeon::Epochs` reading at the
      receiver's section;
    - a pump period is the mode quotient's lift period, not an `aeon::Cycle`;
-3. prototype learning on terrain a declared Holarchy made, with its exact truth;
+3. prototype learning on terrain a declared Holarchy made, with its exact truth. Built:
+   `holarchy::terrain` (moiré, tree source, rotor cribs, aeon switching), with the first receipts
+   in the [audit record §6](../../research/records/2026-09-27_THE_HOLARCHY_AND_ITS_AEONS_ARE_THE_TOP_THE_DECISIONS_DISSOLVE_INTO_THEIR_OWNERS_AND_LEARNING_IS_PROTOTYPED_WHERE_A_HOLARCHY_MADE_THE_TERRAIN.md#6-the-first-receipts-on-terrain-september-27-commit-ab416919):
+   - the receiving tree recovers a tree source's minimal tree exactly, within the weighting bound;
+   - on a moiré the harness's depth rule stops at a plateau below the determining depth. The
+     depth choice takes the least code over the declared family, each passage paid, not the
+     first rise (`agent-inferred`: a zero-rate terrain's code can plateau before it falls);
+   - the tree memorizes a moiré at about 30 times its key description. The rings are measured
+     there next. That needs parallel gratings, a declared plugboard for the rate, and a parity
+     menu for the Bombe;
 4. then continue campaign 3.
 
 The standing cut has been reused for development and lies within the wide cut's held-out range.
