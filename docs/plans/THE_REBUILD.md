@@ -3029,8 +3029,8 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
       15,462,581 cells, and the standing cut uses its last 6,148. Campaign 2's rebase lifted the
       tree's carrier limit.
     - **The cut.** A second pinned development cut holds the stream's last `2^20` cells, which
-      include the standing cut. Its final `2^17` cells are held out, the same one-eighth ratio as
-      the standing cut. `2^20` is the largest power of two whose tree fits the workstation's memory
+      include the standing cut. Its final `2^17` cells, one eighth, are held out. The standing cut
+      holds out `1,190` of its `6,148`. `2^20` is the largest power of two whose tree fits the workstation's memory
       budget at the measured bytes a node; the worker derives it and refuses a larger cut. The
       evaluation partition stays unspent.
     - **What runs on it.** The count-only receivers' laws are chosen on its development cells, then
@@ -3044,4 +3044,46 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
       their depth sweeps and took 43 minutes to reconfirm `½`, so it was stopped. The development
       cells chose `D = 6` at this scale.
 
+    **Measured (September 26).** The wide cut is `.local/cuts/wide-real-cut.{bin,json}`: `2^20`
+    cells, the final `2^17` held out, with the standing cut as its tail, byte for byte. One
+    prequential passage was run, taking `109,950` ms with a resident peak under 2 GB.
+    - **The depth.** The development cells chose `D = 6`. The code fell strictly with depth, and the
+      memory cap stopped the sweep at 6. An uncapped probe kept improving down to `D = 16`. `½`
+      stayed first among Decision 32's laws.
+    - **Held out, bits a cell** (each `+ ε`):
+      - the tree `1 + 15/16`;
+      - the adopted stop mixture `1 + 15/16`;
+      - PPM-2 `3 + 0/16`;
+      - order-1 `3 + 12/16`;
+      - order-0 `4 + 13/16`.
+    - **Orderings.** The tree is below PPM-2 by `−133980 + 11/16 + ε` bits in all, more than a bit
+      a cell. The adopted mixture, charged 15 bits, is below the tree by `−38 + 7/16 + ε`: it
+      transfers, and the gain is small.
+    - **The carriers.** At `2^20` the carriers hold within the rule: `M_p = 55`, `W = 36`, the
+      largest operand 127 bits, and the largest residual within its bound.
+    - **Disclosed.** The standing cut lies inside the wide cut's held-out range, and the adopted law
+      was designed on those cells. On them the adopted law now reads `+2 + 12/16` above the tree.
+      Its gain at scale is made on other cells.
+    - **What it located.** The tree learns with the passage: `3 + 1/16` a cell on the standing cut
+      alone, `2 + 0/16` on the same cells inside the wide passage. Depth is limited by memory, at
+      `178` bytes a node and 5,110,443 nodes at `D = 6` (Decision 36).
+
     Source: agent-inferred, from Decision 34's measurement.
+
+36. **A landmark is founded where paths converge: at its second arrival, not its first.** The
+    objects define a landmark as a face where navigator paths converge (CLAUDE.md, "Holonic
+    Compression"). Decision 28 founded every node at its first arrival.
+    - **The problem.** At scale the deepest nodes are mostly visited once. They hold no convergence,
+      and they cost memory that caps the depth the development cells want: `D = 6` at the memory
+      cap, with improvement continuing to `D = 16`.
+    - **The law.** A node is founded at its second arrival. Until then, the path read stops at its
+      founded parent. The first arrival is recorded only as the parent's counts, which the tree
+      already holds.
+    - **What changes.** This declares a different prior: an unfounded child reads as absent, not as
+      a KT node with one count. So it is a new law with its own Lean (normalization, Kraft form,
+      dominance), not an approximation of Decision 28's.
+    - **What is measured.** On the wide cut's development cells, the convergence-founded tree
+      against Decision 28's at equal memory. The depth it admits under the cap. Then one held-out
+      passage. Nodes, memory and time are reported beside the code.
+
+    Source: agent-inferred, from the landmark definition and Decision 35's depth limit.
