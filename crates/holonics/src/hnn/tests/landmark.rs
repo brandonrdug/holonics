@@ -13,13 +13,14 @@
 //! stop prior on the dyadic ladder (the block recursion at any stop weights, the founding ratio
 //! `2^j − 1`, the lattice law, the faces and windows under a prior), campaign 2's constant-slot
 //! controls as the per-depth prior `(1, r + 1)`, and the prior sweep on the development cells.
-//! Decision 34: the node-local law against the own-weight block recursion, its faces normalized and
-//! certified, its refusals; the join tree's prior; the joins as the Bayesian mixture per dyadic
-//! cell; and the stop-weight mixture per digit tree telescoping per dyadic cell. Decision 37: the
-//! oracle stored where paths part against the full arena, exact in ℚ at depths past the stream's
-//! recurrence (under the stop priors, forced depths, the node-local law and on both branches of
-//! the enlarged tree), the executed compacted tree within its carried certificate with at most
-//! `2n − 1` nodes a tree, its windows in cell order, and its stored parts.
+//! Decision 34: the join tree's prior; the joins as the Bayesian mixture per dyadic cell; and the
+//! stop-weight mixture per digit tree telescoping per dyadic cell (the node-local law is retired,
+//! its realization and tests at commit `89460425`). Decision 37 (the one
+//! storage): the oracle stored where paths part against Decision 28's tree of one node a depth
+//! (`landmark_full`, the tests' independent reference), exact in ℚ at depths past the stream's
+//! recurrence (under the stop priors, forced depths and on both branches of the enlarged tree), the executed tree within its carried certificate with at most `2n − 1`
+//! nodes a tree, its windows in cell order, the split's ratios against their exact forms, and its
+//! stored parts.
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
@@ -27,11 +28,12 @@ use num_traits::{One, Zero};
 use crate::hnn::HnnError;
 use crate::hnn::landmark::{
     Beta, Bundle, DigitsReading, FaceJoins, Feature, IdealLandmarks, JoinTree, LandmarkDeclaration,
-    LandmarkFace, Landmarks, Letter, LetterFamily, LocalLaw, PassageCode, StopMixture, StopPrior,
-    Storage, Widths, address, binary_log, carrier_width, cell_letters, choose_depth, choose_prior,
+    LandmarkFace, Landmarks, Letter, LetterFamily, PassageCode, StopMixture, StopPrior,
+    Widths, address, binary_log, carrier_width, cell_letters, choose_depth, choose_prior,
     code_length, face_bits, ladder_top, lattice_mix, letter_address, odometer_digits, prequential,
     prior_family, ratio_code_length, tree_prequential,
 };
+use super::landmark_full::FullTree;
 use crate::hnn::ratio::log2_enclosure;
 use crate::hnn::receiving::grain_exponent;
 use crate::hnn::reference::Cut;
@@ -234,11 +236,13 @@ fn landmark_faces_are_normalized_and_certified() {
     }
 }
 
-/// **The lattice law, recomputed in ℚ** at every step on every opened path: a founded leaf reads
-/// `⟦k_D(0)⟧`, the first unfounded depth the prior `1/2`, a forced depth its child, and a mixing
-/// depth `⟦λ̂ k(0) + (1 − λ̂) q̂'(0)⟧` with `λ̂ = ⟦β/(1 + β)⟧₀¹`, every face a numerator of
-/// `2^(−M_p)` inside `[1, 2^(M_p) − 1]` (Lean `HNN/LandmarkTree.lattice_path_laws`); after the
-/// deposit each mixing node's `β` is `β k(b)/q̂'(b)`, or its rebase within `2^(1−W)` below it.
+/// **The lattice law, recomputed in ℚ** at every step on every opened path, level by level (each
+/// level a stored chain, Decision 37): a leaf reads `⟦k_D(0)⟧`, past the last stored level the
+/// prior `1/2`, a chain above the forced depths its child, and a mixing chain
+/// `⟦λ̂ k(0) + (1 − λ̂) q̂'(0)⟧` with `λ̂ = ⟦β/(1 + β)⟧₀¹`, every face a numerator of `2^(−M_p)`
+/// inside `[1, 2^(M_p) − 1]` (Lean `HNN/LandmarkTree.lattice_path_laws`); after the deposit each
+/// mixing chain's `β` (a parting chain's upper part's split `β`) is `β k(b)/q̂'(b)`, or its rebase
+/// within `2^(1−W)` below it, and the leaf it founds keeps `D`'s `β₀ = 2^(j_D) − 1`.
 #[test]
 fn landmark_lattice_faces_follow_the_law() {
     let stream: Vec<usize> = (0..60u64).map(|t| ((t * t + t / 4) % 4) as usize).collect();
@@ -283,13 +287,14 @@ fn landmark_lattice_faces_follow_the_law() {
                         assert!(numerator.is_integer());
                         assert!(numerator >= Rat::one() && numerator <= &scale - Rat::one());
                     }
-                    if path.founded == 4 {
-                        assert_eq!(zero(&path.faces[3]), lattice(&zero(&path.masses[3])));
+                    if path.founded == path.faces.len() {
+                        assert_eq!(path.bottoms[top], 3);
+                        assert_eq!(zero(&path.faces[top]), lattice(&zero(&path.masses[top])));
                     } else {
                         assert_eq!(path.faces[top], rat(1, 2));
                     }
                     for d in 0..top {
-                        let expected = if d < forced {
+                        let expected = if path.bottoms[d] < forced {
                             path.faces[d + 1].clone()
                         } else {
                             let beta = &path.betas[d];
@@ -308,19 +313,18 @@ fn landmark_lattice_faces_follow_the_law() {
             tree.receive(&here, cell).unwrap();
             let after = tree.opened(&here, cell).unwrap();
             for (old, new) in before.iter().zip(&after) {
-                for d in forced..old.founded.min(3) {
+                let mixing = old.founded.min(old.faces.len() - 1);
+                for d in (0..mixing).filter(|&d| old.bottoms[d] >= forced) {
                     let stepped = &old.betas[d] * &old.masses[d] / &old.faces[d + 1];
                     let ratio = &new.betas[d] / &stepped;
                     assert!(ratio <= Rat::one() && ratio > Rat::one() - &rebase);
                 }
-                // A node this arrival founded keeps its depth's β₀ = 2^(j_d) − 1.
-                for d in old.founded..new.founded {
-                    let founding = BigInt::from(prior.founding(d));
-                    assert_eq!(
-                        new.betas[d],
-                        Rat::from_integer(founding),
-                        "{prior}, d = {d}"
-                    );
+                // The leaf this arrival founded keeps D's β₀ = 2^(j_D) − 1.
+                assert_eq!(new.founded, new.faces.len(), "the arrival ends at a leaf");
+                if old.founded < old.faces.len() {
+                    assert_eq!(new.founded, old.founded + 1);
+                    let founding = BigInt::from(prior.founding(3));
+                    assert_eq!(new.betas[old.founded], Rat::from_integer(founding), "{prior}");
                 }
             }
         }
@@ -418,7 +422,7 @@ fn landmark_opened_path_telescopes() {
     let founded = tree
         .opened(&address(&stream, stream.len(), 3), stream[0])
         .unwrap();
-    assert!(founded.iter().any(|path| path.founded == 4));
+    assert!(founded.iter().any(|path| path.founded == path.faces.len()));
 }
 
 /// **The certified binary logarithm**: its enclosure meets `log2_enclosure`'s on integers of a few
@@ -474,15 +478,15 @@ fn landmark_code_length_meets_the_series() {
 }
 
 /// **The derived widths** at the standing real cut's scope (`n* = 6,148`, `L_R = 16`, `B = 8`):
-/// at `D = 4`, `M_p = 39` (`2^38 < 3·8·16·12298·98377 ≤ 2^39`), `W = 28`
-/// (`2^27 < 12·8·16·6148·16 ≤ 2^28`) and `C = 67`; the rule's residual per cell lies below half a
-/// grain; the reference oracle's width is `96 + 34`.
+/// at `D = 4`, `M_p = 39` (`2^38 < 3·8·16·12298·98377 ≤ 2^39`), `W = 29`
+/// (`2^28 < 12·8·16·12297·16 ≤ 2^29`, the splits counted: `2n* + 1 = 12297`) and `C = 68`; the rule's
+/// residual per cell lies below half a grain; the reference oracle's width is `96 + 34`.
 #[test]
 fn landmark_widths_follow_the_passage_and_the_grain() {
     assert_eq!(face_bits(6_148, 8, 16, 4), 39);
-    assert_eq!(carrier_width(6_148, 8, 16, 4), 28);
+    assert_eq!(carrier_width(6_148, 8, 16, 4), 29);
     assert_eq!(face_bits(6_148, 8, 16, 1), 35);
-    assert_eq!(carrier_width(6_148, 8, 16, 1), 24);
+    assert_eq!(carrier_width(6_148, 8, 16, 1), 25);
     let declared = LandmarkDeclaration {
         population: 6_148,
         ..declaration(256, 4)
@@ -496,23 +500,80 @@ fn landmark_widths_follow_the_passage_and_the_grain() {
             widths.carrier,
             widths.certificate
         ),
-        (8, 39, 28, 67)
+        (8, 39, 29, 68)
     );
     assert!(tree.face_rule() < rat(1, 32));
     assert_eq!(IdealLandmarks::reference_width(&declared), 130);
 }
 
+/// **The rule lies below half a grain** (module header, "The widths"; the splits counted in `W`,
+/// Decision 37): at `n* ∈ {64, 6148, 2^14, 2^17, 2^20}`, `L_R = 16`, `B = 8` and path depths
+/// `P ∈ {1, …, 6, 8, 12, 24, 48, 73}`, the lattice's rounding term and the mantissa term
+/// `(3/2) B (2n* + 1) P² 2^(1−W)` each lie within a quarter grain, and the rule
+/// (`Landmarks::face_rule`) below half a grain, exactly, with the carrier's rebase or without it
+/// (both occur on the scan). With `W` from `n*` alone (commit `89460425`) the rule passed half a
+/// grain at `n* = 6148`, `D = 5`, where that rule's `W = 28`.
+#[test]
+fn landmark_rule_lies_below_half_a_grain() {
+    let (digits, grain) = (8u64, 16i64);
+    let mut rebased = [false; 2];
+    for population in [64u64, 6_148, 1 << 14, 1 << 17, 1 << 20] {
+        for depth in [1usize, 2, 3, 4, 5, 6, 8, 12, 24, 48, 73] {
+            let declared = LandmarkDeclaration {
+                population,
+                ..declaration(256, depth)
+            };
+            let tree = Landmarks::new(declared).unwrap();
+            let widths = tree.widths();
+            let (n, p) = (BigInt::from(population), BigInt::from(depth as u64));
+            let floor = (BigInt::one() << widths.face as usize) / (&n * 2 + 2);
+            let rounding = Rat::new(&n * &p * &p + &p * 2 + 1, floor * 2);
+            let mantissa =
+                Rat::from_integer((&n * 2 + 1) * &p * &p) * rat_power(1 - widths.carrier as i64);
+            let quarter = rat(1, 4 * grain);
+            let bits = |term: Rat| term * rat(3, 2) * Rat::from_integer(BigInt::from(digits));
+            assert!(bits(rounding) <= quarter, "n* = {population}, D = {depth}");
+            assert!(bits(mantissa) <= quarter, "n* = {population}, D = {depth}");
+            assert!(
+                tree.face_rule() < rat(1, 2 * grain),
+                "n* = {population}, D = {depth}"
+            );
+            rebased[usize::from(widths.rebase > 0)] = true;
+        }
+    }
+    assert_eq!(rebased, [true, true]);
+    let before = LandmarkDeclaration {
+        population: 6_148,
+        ..declaration(256, 5)
+    };
+    let narrow = Landmarks::with_carrier(before, 28).unwrap();
+    assert!(narrow.face_rule() > rat(1, 2 * grain));
+}
+
 /// **The stored bits**: the empty tree stores one bit a splitting dyadic cell; one arrival at depth
-/// 1 over two classes founds a root (masses `3/2`, `1/2` and `β = 1`) and a leaf (masses only)
-/// behind the letter `Boundary`.
+/// 1 over two classes stores one leaf at the root (Decision 37: masses `3/2`, `1/2`, no `β`, its
+/// bottom depth and its label, the one letter `Boundary`); a second arrival behind another letter
+/// splits it into the root at depth 0 (founded with the leaf's masses at `β = 2¹ − 1`, then stepped
+/// to `3/2` by `k(0)/½`) with two leaves behind their letters, and holds no label letter (its leaf
+/// is reached by its letter alone).
 #[test]
 fn landmark_bits_count_the_stored_parts() {
     let mut tree = Landmarks::new(declaration(2, 1)).unwrap();
     assert_eq!(tree.bits(), 1);
     tree.receive(&[Letter::Boundary], 0).unwrap();
-    // masses 2C = 3 and 1: (2 + 2) + (1 + 2) each node; β = 1/1·2^0: 2 + 2 + 2 + 1; letter 0: 2.
+    // masses 2C = 3 and 1: (2 + 2) + (1 + 2); the bottom depth 1 and the label end 1: 2 each; the
+    // label's letter 0: 2.
     let masses = (2 + 2) + (1 + 2);
-    assert_eq!(tree.bits(), 2 * masses + 7 + 2 + 1);
+    assert_eq!(tree.bits(), masses + 2 + 2 + 2 + 1);
+    assert_eq!((tree.nodes(), tree.held()), (1, 1));
+    tree.receive(&[Letter::Cell(1)], 0).unwrap();
+    // The root: masses 2C = 5 and 1, (3 + 2) + (1 + 2); β = 3/1·2^(−1): 3 + 2 + 2 + 1; the bottom
+    // depth 0 and the label end 0: 2 each. The two leaves: masses 3 and 1, the bottom depth 1 and
+    // the label end 1 each; their child letters 0 and 2: 2 and 3; the pool's one letter 0: 2.
+    let root = (3 + 2) + (1 + 2) + (3 + 2 + 2 + 1) + 2 + 2;
+    let leaves = 2 * (masses + 2 + 2);
+    assert_eq!(tree.bits(), root + leaves + (2 + 3) + 2 + 1);
+    assert_eq!((tree.nodes(), tree.held()), (3, 1));
 }
 
 /// **Score then deposit is receive**, and a clone compares equal (the arena's table as a map).
@@ -545,22 +606,19 @@ fn landmark_window_faces_read_each_phase_after_the_earlier_deposits() {
         .map(|t| ((t * 7 + t / 3 + t * t / 11) % 5) as usize)
         .collect();
     for prior in [StopPrior::half(), StopPrior::per_depth(vec![2, 5]).unwrap()] {
-        window_in_cell_order(&stream, prior, Storage::Full, 2);
+        window_in_cell_order(&stream, prior, 2);
     }
 }
 
-/// One stop prior's run of `landmark_window_faces_read_each_phase_after_the_earlier_deposits` under
-/// a storage at a depth.
-fn window_in_cell_order(stream: &[usize], prior: StopPrior, storage: Storage, depth: usize) {
+/// One stop prior's run of `landmark_window_faces_read_each_phase_after_the_earlier_deposits` at a
+/// depth.
+fn window_in_cell_order(stream: &[usize], prior: StopPrior, depth: usize) {
     let declared = LandmarkDeclaration {
         population: 90,
         prior,
         ..declaration(5, depth)
     };
-    let mut tree = Landmarks::with_carrier(declared.clone(), 6)
-        .unwrap()
-        .with_storage(storage)
-        .unwrap();
+    let mut tree = Landmarks::with_carrier(declared.clone(), 6).unwrap();
     let aperture = 3;
     for start in (0..stream.len()).step_by(aperture) {
         let window = start..(start + aperture).min(stream.len());
@@ -927,8 +985,8 @@ fn landmark_letters_are_refused_outside_their_family() {
 }
 
 /// **The carrier rebases with its enclosure** (Lean `HNN/LandmarkCarrier.{rebase_decode,
-/// rebase_ratio_enclosed}`, `HNN/LandmarkTree.rebase_log_residual`): at the widths of a 131,072-cell
-/// declaration (`W = 32`, `R = 94`) a β step whose carrier `(N, D)` has a 99-bit odd denominator
+/// rebase_ratio_enclosed}`, `HNN/LandmarkTree.rebase_log_residual`): at the carrier `W = 32` with
+/// the rebase `R = 94` a β step whose carrier `(N, D)` has a 99-bit odd denominator
 /// passes the mantissa's division, so `D` rebases to its top `R` bits and releases its remainder;
 /// the carried `β'` lies in `[v(1 − 1/m'), v(1 + 1/D̂))` of the exact step `v`, and a carrier within
 /// the division is carried as before.
@@ -961,8 +1019,8 @@ fn landmark_carrier_rebases_with_its_enclosure() {
 /// **The tree declares past the old refusal and stays within its grain** (Sol's review §4; Lean
 /// `HNN/LandmarkCarrier.width_or_rebase_total`): campaign 1's `|A| = 256`, `D = 4`, `L_R = 16` was
 /// refused from 87,382 cells, where the β step's product `2W + κ + M_p + 1` passed 128 bits. At
-/// 131,072 cells the widths stay the rule's (`M_p = 48`, `W = 32`, never reduced), the carrier
-/// rebases at `R = 94` bits, and over the whole passage every cell's certified residual lies within
+/// 131,072 cells the widths stay the rule's (`M_p = 48`, `W = 33`, never reduced), the carrier
+/// rebases at `R = 93` bits, and over the whole passage every cell's certified residual lies within
 /// the rule, which lies below half the declared grain; the declaration reaches `2^19` cells (and,
 /// with the split operands, `2^24`: `landmark_split_operands_are_the_single_division`).
 #[test]
@@ -976,7 +1034,7 @@ fn landmark_tree_declares_past_the_old_refusal_and_stays_within_the_grain() {
     let widths = tree.widths();
     assert_eq!(widths.face, face_bits(population, 8, 16, 4));
     assert_eq!(widths.carrier, carrier_width(population, 8, 16, 4));
-    assert_eq!((widths.face, widths.carrier, widths.rebase), (48, 32, 94));
+    assert_eq!((widths.face, widths.carrier, widths.rebase), (48, 33, 93));
     let kappa = 64 - (2 * population + 2).leading_zeros() as u64;
     assert!(
         2 * widths.carrier + kappa + widths.face + 1 > 128,
@@ -1094,7 +1152,7 @@ fn landmark_split_operands_are_the_single_division() {
     let widths = Widths::derived(&wide(4));
     assert_eq!(
         (widths.face, widths.carrier, widths.certificate),
-        (54, 35, 89)
+        (54, 36, 90)
     );
     assert_eq!(
         2 * widths.face + 22 + 3,
@@ -1260,9 +1318,14 @@ fn landmark_stop_prior_is_the_dyadic_ladder() {
     assert_eq!(distinct.len(), family.len());
 }
 
-/// **Each node is founded at its depth's ratio** (Lean `HNN/LandmarkTree.stop_founding_step`): the
-/// founding chart is `β₀ = 2^(j_d) − 1` exactly with the stop weight `λ̂ = 1 − 2^(−j_d)` on the
-/// lattice, the nodes one arrival founds carry it, and a rung past the carrier `W` is refused (its
+/// **Each node is founded at its depth's ratio, each chain at its summed rung** (Lean
+/// `HNN/LandmarkTree.stop_founding_step`, `HNN/LandmarkCompaction.{leaf_chain_is_one_node,
+/// chain_split}`): the founding chart is `β₀ = 2^(j_d) − 1` exactly with the stop weight
+/// `λ̂ = 1 − 2^(−j_d)` on the lattice; one arrival stores one leaf chain at the root with `D`'s
+/// chart; an arrival parting from it at depth 2 reads the upper part at the summed rung,
+/// `2^(j_0 + j_1 + j_2) − 1`; one parting from that internal chain at depth 0 reads
+/// `β_u = (2^(S_up) − 1) 2^(S_low) β/(β (2^(S_low) − 1) + 2^S − 1)` and leaves the lower part at
+/// `β_ℓ = β (2^(S_low) − 1)/(2^S − 1)`, exactly; and a rung past the carrier `W` is refused (its
 /// founding ratio would not be carried exactly).
 #[test]
 fn landmark_stop_prior_founds_each_node_at_its_ratio() {
@@ -1283,16 +1346,31 @@ fn landmark_stop_prior_founds_each_node_at_its_ratio() {
         assert_eq!(words.stop, (1u64 << face) - (1u64 << (face - u64::from(j))));
     }
     assert!(tree.arena().founding(4).is_none());
-    let here = [Letter::Boundary; 3];
-    tree.receive(&here, 1).unwrap();
-    let path = &tree.opened(&here, 1).unwrap()[0];
-    assert_eq!(path.founded, 4);
-    for (depth, beta) in path.betas.iter().enumerate() {
-        assert_eq!(
-            beta,
-            &Rat::from_integer(BigInt::from(prior.founding(depth)))
-        );
-    }
+    let ladder = |rung: u32| Rat::from_integer((BigInt::one() << rung as usize) - 1);
+    let (b, c) = (Letter::Boundary, Letter::Cell(0));
+    let first = [b, b, b];
+    tree.receive(&first, 1).unwrap();
+    let path = &tree.opened(&first, 1).unwrap()[0];
+    assert_eq!((path.founded, &path.bottoms[..]), (1, &[3][..]));
+    assert_eq!(path.betas[0], ladder(prior.rung(3)));
+    // Parting at depth 2 from the leaf chain: the upper part at the summed rung 2 + 3 + 5.
+    let second = [b, b, c];
+    let path = &tree.opened(&second, 1).unwrap()[0];
+    assert_eq!((path.founded, &path.bottoms[..]), (1, &[2][..]));
+    assert_eq!(path.betas[0], ladder(10));
+    tree.receive(&second, 1).unwrap();
+    let beta = tree.opened(&second, 1).unwrap()[0].betas[0].clone();
+    // Parting at depth 0 from the internal chain 0..2: S_up = 2, S_low = 3 + 5.
+    let third = [c, b, b];
+    let path = &tree.opened(&third, 1).unwrap()[0];
+    assert_eq!((path.founded, &path.bottoms[..]), (1, &[0][..]));
+    let (up, low, whole) = (ladder(2), ladder(8), ladder(10));
+    let upper = &up * rat(256, 1) * &beta / (&beta * &low + &whole);
+    assert_eq!(path.betas[0], upper);
+    tree.receive(&third, 1).unwrap();
+    let path = &tree.opened(&second, 1).unwrap()[0];
+    assert_eq!(&path.bottoms[..], &[0, 2, 3]);
+    assert_eq!(path.betas[1], &beta * &low / &whole);
     let wide = LandmarkDeclaration {
         prior: StopPrior::global(13).unwrap(),
         ..declaration(4, 2)
@@ -1434,201 +1512,6 @@ fn landmark_prior_sweep_reads_the_development_cells_only() {
 fn external_split(face_bits: u64, t: usize, h: usize) -> u64 {
     let eighths = 1 + ((t * 5 + h * 3) % 7) as u64;
     eighths << (face_bits - 3)
-}
-
-/// **The own-weight block recursion** (Lean `HNN/LocalWeighing.{ownWeight,
-/// own_mixture_over_trees}`), independent of the path law: `W_s = E_s` at depth `D`, otherwise
-/// `W_s = w_d E_s + (1 − w_d) Π_b W_bs`, with the node-local own weight
-/// `E_s = π KT_s + (1 − π) X_s` over the digits routed to `s` (`X_s` the external faces' product).
-fn own_block_weight(
-    stream: &[usize],
-    external: &[Rat],
-    past: usize,
-    context: &[usize],
-    depth: usize,
-    prior: &StopPrior,
-    law: &LocalLaw,
-) -> Rat {
-    let routed: Vec<usize> = (past..stream.len())
-        .filter(|&t| {
-            context
-                .iter()
-                .enumerate()
-                .all(|(back, &x)| stream[t - 1 - back] == x)
-        })
-        .collect();
-    let symbols: Vec<usize> = routed.iter().map(|&t| stream[t]).collect();
-    let foreign: Rat = routed
-        .iter()
-        .map(|&t| {
-            if stream[t] == 0 {
-                external[t].clone()
-            } else {
-                Rat::one() - &external[t]
-            }
-        })
-        .product();
-    let pi = law.weight();
-    let estimate = &pi * kt_block(&symbols) + (Rat::one() - &pi) * foreign;
-    if context.len() == depth {
-        return estimate;
-    }
-    let split: Rat = (0..2)
-        .map(|b| {
-            let mut child = context.to_vec();
-            child.push(b);
-            own_block_weight(stream, external, past, &child, depth, prior, law)
-        })
-        .product();
-    let stop = prior.weight(context.len());
-    &stop * estimate + (Rat::one() - &stop) * split
-}
-
-/// **The node-local law is the own-weight recursion** (Lean `HNN/LocalWeighing.{own_weight_step,
-/// own_ratio_step, node_local_founding, two_face_prior}`): on a binary stream with a declared
-/// external face, the oracle (`β` and `γ` exact, each node's own ratio founded at `γ₀ ½/x(b)`)
-/// multiplies to the block recursion with `E_s = π KT_s + (1 − π) X_s` at every depth up to 3,
-/// under Decision 28's `½` and a per-depth prior, at two rungs; and the executed tree stays within
-/// its certificate of the oracle at every cell.
-#[test]
-fn landmark_local_law_is_the_own_weight_recursion() {
-    let stream: Vec<usize> = (0..22u64)
-        .map(|t| usize::from((t * t + 5 * t) % 7 < 3))
-        .collect();
-    for law in [LocalLaw::new(1).unwrap(), LocalLaw::new(3).unwrap()] {
-        for prior in [StopPrior::half(), StopPrior::per_depth(vec![1, 3]).unwrap()] {
-            for depth in 0..=3 {
-                let declared = LandmarkDeclaration {
-                    prior: prior.clone(),
-                    ..declaration(2, depth)
-                };
-                let mut oracle = IdealLandmarks::local(declared.clone(), None, law).unwrap();
-                let mut tree = Landmarks::local(declared, law).unwrap();
-                let bits = tree.face_bits();
-                let scale = Rat::from_integer(BigInt::one() << bits as usize);
-                let splits: Vec<u64> = (0..stream.len())
-                    .map(|t| external_split(bits, t, 1))
-                    .collect();
-                let external: Vec<Rat> = splits
-                    .iter()
-                    .map(|&x| Rat::from_integer(BigInt::from(x)) / &scale)
-                    .collect();
-                let mut ideal = Rat::one();
-                for t in depth..stream.len() {
-                    let here = address(&stream, t, depth);
-                    let face = oracle
-                        .receive_with(&here, stream[t], &external[t..=t])
-                        .unwrap();
-                    let reading = tree.receive_with(&here, stream[t], &splits[t..=t]).unwrap();
-                    assert!(
-                        within(&reading.executed, &face, &reading.residual),
-                        "{law}, {prior}, D = {depth}, cell {t}"
-                    );
-                    ideal *= face;
-                }
-                assert_eq!(
-                    ideal,
-                    own_block_weight(&stream, &external, depth, &[], depth, &prior, &law),
-                    "{law}, {prior}, D = {depth}"
-                );
-            }
-        }
-    }
-}
-
-/// **The node-local tree's faces are normalized exactly and certified** over five classes (the
-/// third digit forced where the upper half is empty): the all-class face under the external
-/// faces sums to 1, each class's face is the one-class read with that class's opened digits'
-/// external faces, and each cell's certificate holds against the oracle.
-#[test]
-fn landmark_local_faces_are_normalized_and_certified() {
-    let alphabet = 5;
-    let stream: Vec<usize> = (0..36u64).map(|t| ((t * 7 + t / 3) % 5) as usize).collect();
-    let law = LocalLaw::new(2).unwrap();
-    let declared = declaration(alphabet, 2);
-    let mut tree = Landmarks::local(declared.clone(), law).unwrap();
-    let mut oracle = IdealLandmarks::local(declared.clone(), None, law).unwrap();
-    let bits = tree.face_bits();
-    let scale = Rat::from_integer(BigInt::one() << bits as usize);
-    for (position, &cell) in stream.iter().enumerate() {
-        let here = address(&stream, position, 2);
-        let by_dyadic: Vec<u64> = tree
-            .splitting()
-            .iter()
-            .map(|&h| external_split(bits, position, h))
-            .collect();
-        let face = tree.face_with(&here, 16, &by_dyadic).unwrap();
-        let sum: Rat = face.probabilities.iter().cloned().sum();
-        assert_eq!(sum, Rat::one());
-        let opened = |class: usize| -> Vec<u64> {
-            declared
-                .emitted(class)
-                .iter()
-                .map(|&(h, _)| external_split(bits, position, h))
-                .collect()
-        };
-        let ideal: Rat = (0..alphabet)
-            .map(|class| {
-                let external: Vec<Rat> = opened(class)
-                    .iter()
-                    .map(|&x| Rat::from_integer(BigInt::from(x)) / &scale)
-                    .collect();
-                oracle.probability_with(&here, class, &external).unwrap()
-            })
-            .sum();
-        assert_eq!(ideal, Rat::one());
-        for class in 0..alphabet {
-            let p = &face.probabilities[class];
-            assert!(p > &Rat::zero());
-            assert_eq!(
-                p,
-                &tree
-                    .score_with(&here, class, &opened(class))
-                    .unwrap()
-                    .executed
-            );
-        }
-        let external: Vec<Rat> = opened(cell)
-            .iter()
-            .map(|&x| Rat::from_integer(BigInt::from(x)) / &scale)
-            .collect();
-        let reading = tree.receive_with(&here, cell, &opened(cell)).unwrap();
-        let ideal = oracle.receive_with(&here, cell, &external).unwrap();
-        assert!(within(&reading.executed, &ideal, &reading.residual));
-    }
-    assert!(tree.bits() > 0);
-}
-
-/// **The node-local law's refusals**: a tree under the law refuses a read without its external
-/// faces, a window read, and external faces outside the lattice's open unit interval; a tree
-/// without the law refuses external faces; a rung outside the ladder or past the carrier is
-/// refused.
-#[test]
-fn landmark_local_refusals() {
-    let declared = declaration(4, 1);
-    let law = LocalLaw::new(2).unwrap();
-    let mut local = Landmarks::local(declared.clone(), law).unwrap();
-    let mut plain = Landmarks::new(declared.clone()).unwrap();
-    let here = address(&[1, 2], 1, 1);
-    let full = 1u64 << local.face_bits();
-    assert!(local.receive(&here, 2).is_err());
-    assert!(
-        local
-            .window_splits(std::slice::from_ref(&here), &[])
-            .is_err()
-    );
-    assert!(local.receive_with(&here, 2, &[0, 5]).is_err());
-    assert!(local.receive_with(&here, 2, &[full, 5]).is_err());
-    assert!(local.receive_with(&here, 2, &[5]).is_err());
-    assert!(plain.receive_with(&here, 2, &[5, 5]).is_err());
-    assert!(local.receive_with(&here, 2, &[5, full - 5]).is_ok());
-    assert!(plain.receive(&here, 2).is_ok());
-    assert_eq!(local.local_law(), Some(law));
-    assert_eq!(plain.local_law(), None);
-    assert!(LocalLaw::new(0).is_err());
-    assert!(LocalLaw::new(64).is_err());
-    let wide = LocalLaw::new(u32::try_from(local.widths().carrier).unwrap() + 1).unwrap();
-    assert!(Landmarks::local(declared, wide).is_err());
 }
 
 /// **A join tree's prior sums to one** (Lean `HNN/LocalWeighing.static_mixture`): the balanced
@@ -1782,7 +1665,7 @@ fn landmark_stop_mixture_is_the_bayes_mixture_per_digit_tree() {
         residual += &reading.residual;
         let digits: Vec<DigitsReading> = trees
             .iter_mut()
-            .map(|tree| tree.receive_digits(&here, cell, &[]).unwrap())
+            .map(|tree| tree.receive_digits(&here, cell).unwrap())
             .collect();
         for i in 0..digits[0].digits.len() {
             let h = digits[0].digits[i].dyadic;
@@ -1808,14 +1691,6 @@ fn landmark_stop_mixture_is_the_bayes_mixture_per_digit_tree() {
 
 // -------------------------------------------------------------------------------------------
 // Decision 37: the tree is stored at the faces where paths part
-
-/// The oracle of `declared`, `β` exact, stored where paths part.
-fn compacted_oracle(declared: LandmarkDeclaration) -> IdealLandmarks {
-    IdealLandmarks::new(declared, None)
-        .unwrap()
-        .with_storage(Storage::Compacted)
-        .unwrap()
-}
 
 /// The arrivals each tree `t = branch · 2^B + h` routes over a stream of classes: every opened
 /// digit's dyadic cell, in each branch.
@@ -1844,13 +1719,13 @@ fn within_node_bound(tree: &Landmarks, routed: &[usize]) -> bool {
             .all(|(&size, &n)| size <= (2 * n).saturating_sub(1))
 }
 
-/// **The compacted oracle is Decision 28's, exactly in ℚ** (Lean `HNN/LandmarkCompaction.{
-/// chain_ratio, chain_ratio_dyadic, leaf_chain_is_one_node, chain_split, compacted_is_decision_28}`):
-/// over streams of two and five classes, at depths from 1 to past the stream's recurrence (at the
-/// deepest every context is new, so each leaf's label runs to the boundary letters), under Decision
-/// 28's `½`, two global rungs and two per-depth priors, with forced depths 0 and 1, every class's
-/// face before each deposit and every prequential face of the oracle stored where paths part equal
-/// the full arena's; it stores no more nodes.
+/// **The oracle is Decision 28's, exactly in ℚ** (Lean `HNN/LandmarkCompaction.{chain_ratio,
+/// chain_ratio_dyadic, leaf_chain_is_one_node, chain_split, compacted_is_decision_28}`): over streams
+/// of two and five classes, at depths from 1 to past the stream's recurrence (at the deepest every
+/// context is new, so each leaf's label runs to the boundary letters), under Decision 28's `½`, two
+/// global rungs and two per-depth priors, with forced depths 0 and 1, every class's face before
+/// each deposit and every prequential face of the oracle stored where paths part equal Decision
+/// 28's tree of one node a depth (`landmark_full`); it stores no more nodes.
 #[test]
 fn landmark_compacted_oracle_is_decision_28() {
     let binary: Vec<usize> = (0..40u64)
@@ -1869,25 +1744,24 @@ fn landmark_compacted_oracle_is_decision_28() {
                         prior: prior.clone(),
                         ..declaration(alphabet, depth)
                     };
-                    let mut full = IdealLandmarks::new(declared.clone(), None).unwrap();
-                    let mut compact = compacted_oracle(declared);
+                    let mut full = FullTree::new(declared.clone());
+                    let mut compact = IdealLandmarks::new(declared, None).unwrap();
                     for (position, &cell) in stream.iter().enumerate() {
                         let here = address(stream, position, depth);
                         for class in 0..alphabet {
                             assert_eq!(
                                 compact.probability(&here, class).unwrap(),
-                                full.probability(&here, class).unwrap(),
+                                full.probability(&here, class),
                                 "{prior}, D = {depth}, forced {forced}, cell {position}, class {class}"
                             );
                         }
                         assert_eq!(
                             compact.receive(&here, cell).unwrap(),
-                            full.receive(&here, cell).unwrap(),
+                            full.receive(&here, cell),
                             "{prior}, D = {depth}, forced {forced}, cell {position}"
                         );
                     }
                     assert!(compact.nodes() <= full.nodes());
-                    assert_eq!(compact.storage(), Storage::Compacted);
                 }
             }
         }
@@ -1898,9 +1772,9 @@ fn landmark_compacted_oracle_is_decision_28() {
 /// depths from 1 to past the stream's recurrence, under three priors, forced depths 0 and 1, at the
 /// rule's carrier and at a narrow one (so the founding ratios `2^S − 1` of long chains and the
 /// splits' ratios rebase), every all-class face sums to 1 and meets each one-class read, every
-/// cell's executed face lies within its certificate of the ideal face (Decision 28's, exact), the
-/// certificate within the rule, and each tree stores at most `2n − 1` nodes, no more than the full
-/// arena.
+/// cell's executed face lies within its certificate of the ideal face (Decision 28's tree of one
+/// node a depth, exact, `landmark_full`), the certificate within the rule, and each tree stores at
+/// most `2n − 1` nodes, no more than Decision 28's.
 #[test]
 fn landmark_compacted_tree_is_within_its_certificate() {
     let alphabet = 5;
@@ -1924,9 +1798,8 @@ fn landmark_compacted_tree_is_within_its_certificate() {
                     Some(width) => Landmarks::with_carrier(declared.clone(), width).unwrap(),
                     None => Landmarks::new(declared.clone()).unwrap(),
                 };
-                let mut tree = declare().with_storage(Storage::Compacted).unwrap();
-                let mut full = declare();
-                let mut oracle = IdealLandmarks::new(declared.clone(), None).unwrap();
+                let mut tree = declare();
+                let mut oracle = FullTree::new(declared.clone());
                 for (position, &cell) in stream.iter().enumerate() {
                     let here = address(&stream, position, depth);
                     let face = tree.face(&here, 16).unwrap();
@@ -1939,17 +1812,15 @@ fn landmark_compacted_tree_is_within_its_certificate() {
                         );
                     }
                     let reading = tree.receive(&here, cell).unwrap();
-                    let ideal = oracle.receive(&here, cell).unwrap();
-                    let executed = full.receive(&here, cell).unwrap();
+                    let ideal = oracle.receive(&here, cell);
                     assert!(
                         within(&reading.executed, &ideal, &reading.residual),
                         "{prior}, D = {depth}, forced {forced}, cell {position}"
                     );
-                    assert!(within(&executed.executed, &ideal, &executed.residual));
                     assert!(reading.residual <= tree.face_rule());
                 }
                 assert!(within_node_bound(&tree, &arrivals(&declared, &stream)));
-                assert!(tree.nodes() <= full.nodes());
+                assert!(tree.nodes() <= oracle.nodes());
                 if carrier.is_some() && depth > 3 {
                     assert!(tree.chart().rebases > 0, "the narrow carrier rebased");
                 }
@@ -1958,57 +1829,12 @@ fn landmark_compacted_tree_is_within_its_certificate() {
     }
 }
 
-/// **The node-local law stored where paths part** (Decision 34 under Decision 37): a chain's nodes
-/// hold one own ratio (the same counts and the same external faces), so the compacted oracle's
-/// faces are the full arena's exactly in ℚ, and the executed compacted tree holds its certificate.
-#[test]
-fn landmark_compacted_local_law_is_the_full_arena() {
-    let alphabet = 5;
-    let stream: Vec<usize> = (0..36u64).map(|t| ((t * 7 + t / 3) % 5) as usize).collect();
-    let law = LocalLaw::new(2).unwrap();
-    for depth in [2, 7, 37] {
-        let declared = declaration(alphabet, depth);
-        let mut tree = Landmarks::local(declared.clone(), law)
-            .unwrap()
-            .with_storage(Storage::Compacted)
-            .unwrap();
-        let mut full = IdealLandmarks::local(declared.clone(), None, law).unwrap();
-        let mut compact = IdealLandmarks::local(declared.clone(), None, law)
-            .unwrap()
-            .with_storage(Storage::Compacted)
-            .unwrap();
-        let bits = tree.face_bits();
-        let scale = Rat::from_integer(BigInt::one() << bits as usize);
-        for (position, &cell) in stream.iter().enumerate() {
-            let here = address(&stream, position, depth);
-            let opened: Vec<u64> = declared
-                .emitted(cell)
-                .iter()
-                .map(|&(h, _)| external_split(bits, position, h))
-                .collect();
-            let external: Vec<Rat> = opened
-                .iter()
-                .map(|&x| Rat::from_integer(BigInt::from(x)) / &scale)
-                .collect();
-            let ideal = full.receive_with(&here, cell, &external).unwrap();
-            assert_eq!(
-                compact.receive_with(&here, cell, &external).unwrap(),
-                ideal,
-                "D = {depth}, cell {position}"
-            );
-            let reading = tree.receive_with(&here, cell, &opened).unwrap();
-            assert!(within(&reading.executed, &ideal, &reading.residual));
-        }
-        assert!(within_node_bound(&tree, &arrivals(&declared, &stream)));
-    }
-}
-
 /// **The enlarged tree stored where paths part** (Decision 37 on both branches): with a declared
 /// family each dyadic cell joins the cell tree and the bundle tree, each stored where its paths
-/// part; the compacted oracle's faces are the full arena's exactly, the executed faces sum to 1 and
-/// hold their certificates, and a window's faces in cell order are the deposited clone's.
+/// part; the oracle's faces are Decision 28's tree's exactly, the executed faces sum to 1 and hold
+/// their certificates, and a window's faces in cell order are the deposited clone's.
 #[test]
-fn landmark_compacted_enlarged_tree_is_the_full_arena() {
+fn landmark_enlarged_tree_where_paths_part_is_decision_28() {
     let alphabet = 5;
     let stream: Vec<usize> = (0..48u64)
         .map(|t| ((t * 7 + t / 3 + t * t / 11) % 5) as usize)
@@ -2023,18 +1849,15 @@ fn landmark_compacted_enlarged_tree_is_the_full_arena() {
             ..bundle_declaration(alphabet, depth)
         };
         let letters = bundles(&stream, &declared.family);
-        let mut tree = Landmarks::new(declared.clone())
-            .unwrap()
-            .with_storage(Storage::Compacted)
-            .unwrap();
-        let mut full = IdealLandmarks::new(declared.clone(), None).unwrap();
-        let mut compact = compacted_oracle(declared.clone());
+        let mut tree = Landmarks::new(declared.clone()).unwrap();
+        let mut full = FullTree::new(declared.clone());
+        let mut compact = IdealLandmarks::new(declared.clone(), None).unwrap();
         for (position, &cell) in stream.iter().enumerate() {
             let here = letter_address(&letters, position, depth);
             let face = tree.face(&here, 16).unwrap();
             let sum: Rat = face.probabilities.iter().cloned().sum();
             assert_eq!(sum, Rat::one());
-            let ideal = full.receive(&here, cell).unwrap();
+            let ideal = full.receive(&here, cell);
             assert_eq!(compact.receive(&here, cell).unwrap(), ideal, "D = {depth}");
             let reading = tree.receive(&here, cell).unwrap();
             assert!(within(&reading.executed, &ideal, &reading.residual));
@@ -2050,10 +1873,7 @@ fn landmark_compacted_enlarged_tree_is_the_full_arena() {
         ..bundle_declaration(alphabet, 4)
     };
     let letters = bundles(&stream, &declared.family);
-    let mut tree = Landmarks::with_carrier(declared, 6)
-        .unwrap()
-        .with_storage(Storage::Compacted)
-        .unwrap();
+    let mut tree = Landmarks::with_carrier(declared, 6).unwrap();
     for start in (0..stream.len()).step_by(3) {
         let window = start..(start + 3).min(stream.len());
         let addresses: Vec<Vec<Letter>> = window
@@ -2073,11 +1893,11 @@ fn landmark_compacted_enlarged_tree_is_the_full_arena() {
     }
 }
 
-/// **A window's faces in cell order on the compacted tree** (`Landmarks::window_faces`): the
+/// **A window's faces in cell order past the stream's recurrence** (`Landmarks::window_faces`): the
 /// overlay founds, splits and relinks as the deposit does, so phase `j` reads exactly the face of a
 /// clone into which the earlier phases' targets were deposited.
 #[test]
-fn landmark_compacted_window_faces_read_each_phase_after_the_earlier_deposits() {
+fn landmark_deep_window_faces_read_each_phase_after_the_earlier_deposits() {
     let stream: Vec<usize> = (0..90u64)
         .map(|t| ((t * 7 + t / 3 + t * t / 11) % 5) as usize)
         .collect();
@@ -2086,23 +1906,20 @@ fn landmark_compacted_window_faces_read_each_phase_after_the_earlier_deposits() 
         (StopPrior::half(), 9),
         (StopPrior::per_depth(vec![2, 5]).unwrap(), 5),
     ] {
-        window_in_cell_order(&stream, prior, Storage::Compacted, depth);
+        window_in_cell_order(&stream, prior, depth);
     }
 }
 
-/// **The compacted storage's parts**: score then deposit is receive and a clone compares equal;
-/// the storage is refused once a cell has passed; one arrival at `D = 3` over two classes stores
-/// one leaf at the root (its masses `3/2` and `1/2`, its bottom depth and its label's three
-/// boundary letters in the pool) where the full arena founds four nodes.
+/// **The parts stored where paths part**: score then deposit is receive and a clone compares equal
+/// past the stream's recurrence; one arrival at `D = 3` over two classes stores one leaf at the root
+/// (its masses `3/2` and `1/2`, its bottom depth and its label's three boundary letters in the pool)
+/// where Decision 28's tree founds four nodes.
 #[test]
-fn landmark_compacted_storage_parts() {
+fn landmark_stored_parts_where_paths_part() {
     let stream: Vec<usize> = (0..50u64)
         .map(|t| ((t * 11 + t / 7) % 6) as usize)
         .collect();
-    let mut once = Landmarks::new(declaration(6, 7))
-        .unwrap()
-        .with_storage(Storage::Compacted)
-        .unwrap();
+    let mut once = Landmarks::new(declaration(6, 7)).unwrap();
     let mut twice = once.clone();
     for (position, &cell) in stream.iter().enumerate() {
         let here = address(&stream, position, 7);
@@ -2111,21 +1928,66 @@ fn landmark_compacted_storage_parts() {
         twice.deposit(&here, cell).unwrap();
         assert_eq!(once, twice);
     }
-    assert_eq!(once.storage(), Storage::Compacted);
     assert!(once.held() > 0);
-    assert!(once.clone().with_storage(Storage::Full).is_err());
 
-    let mut tree = Landmarks::new(declaration(2, 3))
-        .unwrap()
-        .with_storage(Storage::Compacted)
-        .unwrap();
-    let mut full = Landmarks::new(declaration(2, 3)).unwrap();
+    let mut tree = Landmarks::new(declaration(2, 3)).unwrap();
+    let mut full = FullTree::new(declaration(2, 3));
     let boundary = [Letter::Boundary; 3];
     tree.receive(&boundary, 0).unwrap();
-    full.receive(&boundary, 0).unwrap();
+    full.receive(&boundary, 0);
     assert_eq!((tree.nodes(), full.nodes()), (1, 4));
     assert_eq!(tree.held(), 3);
-    // masses 2C = 3 and 1: (2 + 2) + (1 + 2); the bottom depth 3: 2 + 1; three letters 0: 2 each;
-    // the root's presence: 1.
-    assert_eq!(tree.bits(), (2 + 2) + (1 + 2) + 3 + 3 * 2 + 1);
+    // masses 2C = 3 and 1: (2 + 2) + (1 + 2); the bottom depth 3 and the label end 3: 2 + 1 each;
+    // three letters 0: 2 each; the root's presence: 1.
+    assert_eq!(tree.bits(), (2 + 2) + (1 + 2) + 3 + 3 + 3 * 2 + 1);
+}
+
+/// **The split's ratios are their exact forms carried once** (`Beta::split`; Lean
+/// `HNN/LandmarkCompaction.chain_split`): over carried ratios `β` whose exponents run to `±3000`
+/// and rungs to 40 on each side, the upper part lies at `β_u = (2^(S_up) − 1) 2^(S_low) β/(β (2^(S_low)
+/// − 1) + 2^S − 1)` and the lower at `β_ℓ = β (2^(S_low) − 1)/(2^S − 1)`, each exactly when its odd
+/// parts fit `W` bits and otherwise its `W`-bit floor, below the exact ratio by a relative
+/// `[0, 1/m')` with `m'` the kept mantissa in `[2^(W−1), 2^W)`.
+#[test]
+fn landmark_split_ratios_are_the_exact_forms() {
+    let mut draw = super::support::Draw::new(37);
+    let ladder = |rung: u64| Rat::from_integer((BigInt::one() << rung as usize) - 1);
+    let (mut exact, mut rebased) = (0, 0);
+    for width in [6u64, 28, 42] {
+        for trial in 0..300 {
+            let wide = |draw: &mut super::support::Draw| u128::from(draw.next() >> (64 - width)) | 1;
+            let exponent = match trial % 3 {
+                0 => (draw.next() % 21) as i64 - 10,
+                1 => (draw.next() % 6001) as i64 - 3000,
+                _ => (draw.next() % 401) as i64 - 200,
+            };
+            let (beta, _) = Beta::carry(wide(&mut draw), wide(&mut draw), exponent, width);
+            let (upper, lower) = (1 + draw.next() % 40, 1 + draw.next() % 40);
+            let value = beta.value();
+            let targets = [
+                ladder(upper) * rat_power(lower as i64) * &value
+                    / (&value * ladder(lower) + ladder(upper + lower)),
+                &value * ladder(lower) / ladder(upper + lower),
+            ];
+            for ((carried, mantissa), target) in beta.split(upper, lower, width).iter().zip(&targets)
+            {
+                let (n, d, _) = carried.parts();
+                assert!(n % 2 == 1 && d % 2 == 1 && n < 1 << width && d < 1 << width);
+                match mantissa {
+                    None => {
+                        assert_eq!(&carried.value(), target);
+                        exact += 1;
+                    }
+                    Some(m) => {
+                        assert!(*m >= 1 << (width - 1) && *m < 1 << width);
+                        let relative = (target - carried.value()) / target;
+                        assert!(relative >= Rat::zero());
+                        assert!(relative < Rat::new(BigInt::one(), BigInt::from(*m)));
+                        rebased += 1;
+                    }
+                }
+            }
+        }
+    }
+    assert!(exact > 0 && rebased > 0);
 }

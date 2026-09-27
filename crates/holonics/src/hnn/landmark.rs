@@ -111,11 +111,14 @@
 //!   subtree**, never compounded, `Δ_d ≤ n_s (2(P − d) − 1)(ε/μ̂ + 2^(1−W) + ρ_c)` with `n_s ≤ n*`
 //!   the node's arrivals, `2^(1−W)` a mantissa rebase's `|ln(1 − r)|` (`rebase_log_residual`) and
 //!   `ρ_c` a carrier rebase's (below).
-//! - **A cell** has at most `B` opened digits and `Σ_(d<P) (2(P − d) − 1) = P²`, so
-//!   `|log₂ q̂ − log₂ q| ≤ (3/2) B [(n* P² + 2P + 1) ε/μ̂ + n* P² (2^(1−W) + ρ_c)]` (`log₂ e < 3/2`).
-//!   Each source is held within a quarter grain:
+//! - **A cell** has at most `B` opened digits and `Σ_(d<P) (2(P − d) − 1) = P²`, and each split of
+//!   a stored chain (Decision 37, below) rounds once more at `W` bits: an arrival splits at most one
+//!   chain in each digit tree it opens and a lineage at most `D ≤ P` times, so the mantissa units
+//!   number at most `(2n* + 1) P²` a digit, and
+//!   `|log₂ q̂ − log₂ q| ≤ (3/2) B [(n* P² + 2P + 1) ε/μ̂ + (2n* + 1) P² 2^(1−W) + n* P² ρ_c]`
+//!   (`log₂ e < 3/2`). Each source is held within a quarter grain:
 //!   - `M_p` is the least `M` with `2^M ≥ 3 B L_R K (n* P² + 2P + 1)` ([`face_bits`]);
-//!   - `W` is the least width with `2^W ≥ 12 B L_R n* P²` ([`carrier_width`]);
+//!   - `W` is the least width with `2^W ≥ 12 B L_R (2n* + 1) P²` ([`carrier_width`]);
 //!   - the carrier rebase keeps a denominator of `R = 126 − W ≥ W` bits, so `ρ_c < 2^(1−R)` and its
 //!     share is below a quarter grain too (the rebase is taken only when its product can overflow;
 //!     otherwise `ρ_c = 0` and the rule is campaign 1's);
@@ -123,9 +126,16 @@
 //!     least `2^(−M_p)` and every rebase term at least `2^(−W)`, so rounding each up on the grid
 //!     inflates it by at most `1 + 2^(−min(M_p, W))`.
 //!
+//!   So the rule ([`Landmarks::face_rule`]) is at most `(1 + 2^(−min(M_p, W))) · 3/4` of a grain,
+//!   and `(1 + 2^(−min(M_p, W))) · 1/2` without the carrier's rebase. [established-bounded;
+//!   checked] It lies below half a grain, exactly, with or without the carrier's rebase, at
+//!   `n* ∈ {64, 6148, 2^14, 2^17, 2^20}`, `L_R = 16`, `B = 8` and `P ∈ {1, …, 6, 8, 12, 24, 48, 73}`
+//!   (the test `landmark_rule_lies_below_half_a_grain`). [historical] Before the splits were
+//!   counted in `W` (`2^W ≥ 12 B L_R n* P²`, at commit `89460425`), the rule passed half a grain,
+//!   first at `n* = 6148`, `D = 5` (`M_p = 40`, `W = 28`).
+//!
 //!   At the standing cut (`n* = 6,148 = 2²·29·53`, `L_R = 16`, `B = 8`, `D = 4`, cells only):
-//!   `M_p = 39`, `W = 28`, `C = 67`; the rule's bound per cell ([`Landmarks::face_rule`]) is below
-//!   half a grain.
+//!   `M_p = 39`, `W = 29`, `C = 68`.
 //!
 //! [definition; agent-inferred, Sol's review §4] **The carrier rebases past `u128`.** The β step's
 //! carrier `(N, D) = (β_n k_n, β_d k_d x)` (odd parts of `β`, the KT face `k = k_n/k_d` in half-units,
@@ -164,16 +174,16 @@
 //! `ρ ≤ Σ drift + Σ θ` per opened digit over both branches and the join, and a cell's
 //! ([`CellReading::residual`]) is the digits' sum in `log₂` (times `3/2`), never above the rule.
 //!
-//! [definition; agent-inferred] **Stored at the faces where paths part** (Decision 37; [`Storage`],
-//! [`Landmarks::with_storage`], Lean `HNN/LandmarkCompaction`). Every address runs to the declared
+//! [definition; agent-inferred] **Stored at the faces where paths part** (Decision 37; Lean
+//! `HNN/LandmarkCompaction`; the one storage). Every address runs to the declared
 //! depth (padded with `Boundary`), so a chain of nodes each with one reached child routes the same
 //! arrivals and holds the same counts: with `ρ = P_w/P_e`, `1 − ρ_j = (1 − w_j)(1 − ρ_(j+1))`, and on
 //! the dyadic rungs `1 − ρ_top = 2^(−S)(1 − ρ_bottom)`, `S = Σ j_i` (`chain_ratio`,
 //! `chain_ratio_dyadic`). So a chain with the node below it is one Decision 28 node at the summed
 //! rung, `P_w(top) = W E + (1 − W) X`, `1 − W = 2^(−S)`, founded at `β₀ = 2^S − 1` and stepped by the
 //! unchanged law (`compacted_is_decision_28`); a chain ending at `D` is one KT node
-//! (`leaf_chain_is_one_node`); a forced depth has rung `0`. Under [`Storage::Compacted`] a stored
-//! node is a chain: its bottom depth, its counts, its chart at the chain's summed rung (read from
+//! (`leaf_chain_is_one_node`); a forced depth has rung `0`. A stored node is a chain: its bottom
+//! depth, its counts, its chart at the chain's summed rung (read from
 //! the branch's summed rungs, never stored), and its **label**, the letters from its parent's face to
 //! its bottom (a leaf's to `D`). A read walks each label letter by letter (exact comparison, no
 //! hash); where the address parts from a label at depth `k` the chain splits (`chain_split`,
@@ -182,7 +192,8 @@
 //! and the path stops at the prior below `k`. The deposit founds the upper part with the chain's
 //! counts and its stepped chart, keeps the lower part's counts at `β_ℓ`, relinks the parent, and
 //! founds the arrival's leaf. [proved-derived; agent-inferred] **The split's rounding**: each
-//! ratio is formed exactly (`BigUint`) and carried once at `W` bits, one mantissa rebase at most,
+//! ratio is formed exactly (`BigUint`, [`Beta::split`]) and carried once at `W` bits, one mantissa
+//! rebase at most,
 //! the ratio's carry `m' ∈ [2^(W−1), 2^W)` below the exact one by a relative `[0, 1/m')`; the map
 //! `β ↦ β_u` is 1-Lipschitz in `ln β` and `β ↦ β_ℓ` an exact shift, so
 //! `|ln β̂_u − ln β_u|, |ln β̂_ℓ − ln β_ℓ| ≤ Δ + 1/m' < Δ + 2^(1−W)` with `Δ` the chain's drift: each part
@@ -190,14 +201,26 @@
 //! once, by the rule the rebases use; a founding ratio `2^S − 1` past `W` bits is carried as
 //! `(2^W − 1) 2^(S − W)` with its unit alike. An arrival splits at most one chain in each digit tree
 //! it opens, and a lineage at most `D ≤ P` times, so the rule's rebase term reads
-//! `(2n* + 1) P² 2^(1−W)` ([`Landmarks::face_rule`]), still below one grain. **The labels are the
-//! tree's own paths**: a cell that founds leaves holds, in each branch, one run of its address's
-//! letters below the shallowest leaf it founds (the label pool, `u32` letters), and each of its
-//! leaves ends in that run; every letter of a run lies on a stored node's edge, so the pool is the
-//! union of the tree's labels, interned per founding cell, never a record of arrivals or a pointer
-//! into the source. [proved-derived] A tree of `ℓ` leaves stores at most `2ℓ − 1` chains, so a tree
+//! `(2n* + 1) P² 2^(1−W)` ([`Landmarks::face_rule`]), which the derived `W` holds within a quarter
+//! grain ([`carrier_width`]). **The labels are the tree's own paths**: a cell that founds leaves
+//! holds, in each branch, one run of its address's letters below the shallowest leaf it founds (the
+//! label pool, `u32` letters), and each of its leaves ends in that run; every letter of a run lies
+//! on a stored node's edge, interned per founding cell, never a record of arrivals or a pointer into
+//! the source. The pool holds the tree's labels and, after each split, one letter more: the letter
+//! at the parting depth `k + 1` becomes the lower part's child letter in the table and stays in the
+//! pool where the chain held it (still on a stored edge; [`Landmarks::bits`] counts it twice). The
+//! root folds into its chain: a tree nothing has reached stores nothing and reads the prior, and
+//! its first arrival stores one leaf chain from the root to `D`. [proved-derived] A tree of `ℓ`
+//! leaves stores at most `2ℓ − 1` chains, so a tree
 //! reached by `n` arrivals stores at most `2n − 1` nodes at every depth (`compacted_node_bound`),
 //! and a passage of `n` cells at most `2 n B` nodes and `n D` label letters a branch.
+//!
+//! [historical; measured] **Decision 28's arena of one node a depth is retired** (its realization,
+//! `Storage::Full`, is at commit `89460425`): it declared the same prior and read the same face in
+//! ℚ at every arrival, and on the wide cut's development cells at `D = 6` the two codes were equal
+//! within their certificates while the full arena held 4,620,707 nodes against 2,784,875 (commit
+//! `2fb0c1c0`). The tests keep an ideal full tree in ℚ as the independent reference
+//! (`hnn/tests/landmark_full.rs`).
 //!
 //! [historical; measured] **Founding where paths converge (Decision 36) is measured and retired**
 //! (commit `d137e8a6`; Lean `HNN/ConvergenceFounding` stays as the law of absent children and
@@ -207,24 +230,25 @@
 //! `D = 19`, charged 6, against `1822006 + 1/16 + ε`, charged 4), so the development cells kept the
 //! first arrival (held out, disclosed and choosing nothing, it read `−490 + 11/16 + ε` below: its
 //! paths grew one depth a recurrence, so its early cells read shallow and its late cells deep); its
-//! memory saving is had without changing the prior by the compacted storage.
+//! memory saving is had without changing the prior by the storage where paths part.
 //!
-//! [definition; agent-inferred] **The arena** (the layout the card ports). Nodes are numbered in
-//! founding order, `u32`; every per-node value is a flat vector indexed by the node: its depth word
-//! (its bottom depth, which in the full arena is its depth, with its branch in the top bit) and its
-//! two half-unit masses `2C_0, 2C_1` (their sum is the total; the arena the oracle shares), and its
-//! chart: `β`, the cached stop weight `λ̂`, its rebases and its two certificates; under the compacted
-//! storage also its label end (one past its bottom's letter in the label pool). `roots[t]` is the
-//! root of tree `t = branch · 2^B + h` (the heap index `h = 2^i + prefix` of the dyadic cell),
-//! `children` a hash table from `(parent << 32) | letter` to the child, and `joins[h]` each dyadic
-//! cell's join chart (enlarged trees only). An unfounded node reads as the prior: a path read stops
-//! at its first unfounded depth, whose face is exactly `1/2`. `Clone` copies the arena, linear in
-//! the stored nodes: 92 bytes a node in the flat vectors on x86-64 (the chart 80, the masses 8, the
-//! depth 4; compacted, 96 with the label end), a 16-byte table entry with its control byte, and
-//! compacted 4 bytes a label letter; `PartialEq` compares the table as a map (std's `HashMap`). The
-//! reads and the deposit are one law (`Law`) acting on any standing (`Standing`): the tree's own,
-//! or a window's working overlay (below). The card uploads the full arena ([`ArenaView`]); the
-//! compacted storage is the host's until the card ports it.
+//! [definition; agent-inferred] **The arena** (the layout the card ports, [`ArenaView`]). Nodes are
+//! numbered in founding order, `u32`; every per-node value is a flat vector indexed by the node:
+//! its depth word (its bottom depth, with its branch in the top bit), its two half-unit masses
+//! `2C_0, 2C_1` (their sum is the total; the arena the oracle shares), its label end (one past its
+//! bottom's letter in the label pool, `u32` letters), and its chart: `β`, the cached stop weight
+//! `λ̂`, its rebases and its two certificates. `roots[t]` is the root of tree `t = branch · 2^B + h`
+//! (the heap index `h = 2^i + prefix` of the dyadic cell), `children` a hash table from
+//! `(parent << 32) | letter` to the child, and `joins[h]` each dyadic cell's join chart (enlarged
+//! trees only). A read past the stored nodes reads the prior: a path read stops where the address
+//! leaves the stored labels, whose face is exactly `1/2`. `Clone` copies the arena, linear in the
+//! stored nodes: 96 bytes a node in the flat vectors on x86-64 (the chart 80, the masses 8, the depth
+//! word 4, the label end 4), a 16-byte table entry with its control byte, and 4 bytes a label
+//! letter; `PartialEq` compares the table as a map (std's `HashMap`). The reads and the deposit are
+//! one law (`Law`) acting on any standing (`Standing`): the tree's own, or a window's working
+//! overlay (below). The card (`holonics-cuda`, `hnn::tree`) mirrors the same arena without the
+//! certificates: 48 bytes a node (the depth word, the label end, the masses and the chart's `β` and
+//! `λ̂`), a 12-byte table slot at twice the nodes, and 4 bytes a label letter.
 //!
 //! [definition; agent-inferred] **A window in cell order** ([`Landmarks::window_faces`], Decision 29
 //! within a window; consumed by `hnn::receiving::ReceivingPhases::tree_faces`). A receiving window
@@ -278,23 +302,21 @@
 //!
 //! [definition; agent-inferred] **Weighing is local** (Decision 34; Lean `HNN/LocalWeighing`). A
 //! mixture of whole passages telescopes to `½W_T + ½W_X` and uses a face only where it beats the
-//! tree over the whole passage; the tree's own law weighs every landmark by its own evidence, and
-//! two of Decision 34's three local laws live here (the third, the switching mixture across epochs,
+//! tree over the whole passage; the tree's own law weighs every landmark by its own evidence. Of
+//! Decision 34's three local laws, the one adopted lives here (the switching mixture across epochs
 //! is `hnn::receiving::Mixture::switching`):
-//! - **at each landmark** ([`LocalLaw`], [`Landmarks::local`]): each founded node carries a second
-//!   chart, its own ratio `γ` (founded at `γ₀ ½/x̂(b)` from `γ₀ = 2^j − 1`, stepped `γ' = γ k(b)/x̂(b)`),
-//!   and its own face `ê = ⟦μ̂ k(0) + (1 − μ̂) x̂(0)⟧` takes the KT face's place in the path
-//!   (`q̂_d = ⟦λ̂ ê + (1 − λ̂) q̂'⟧`, `β' = β ê(b)/q̂'(b)`; an unfounded node reads
-//!   `⟦μ̂₀ ½ + (1 − μ̂₀) x̂⟧`). The external face `x̂` is given per opened digit, read causally at that
-//!   digit ([`Landmarks::receive_with`]); its chart on the tree's lattice is [`rescale_split`]. The
-//!   certificates add each node's own drift and own rounding `2^(−M)/min(ê, k, x̂)`, and the widths
-//!   are the rule's at `2P + 1` levels ([`Widths::local`]);
 //! - **in each digit tree** ([`StopMixture`], [`JoinTree`], [`FaceJoins`]): `K` trees under the
 //!   declared stop priors, and in each dyadic cell a join tree of two-face joins mixing their digit
 //!   faces by that digit tree's evidence, each join's chart and certificates the enlarged tree's
 //!   join's. The joins run on any faces' digit-0 numerators ([`FaceJoins::receive`]), so the
 //!   development harness measures every member on the trees' executed faces, which the mixture does
 //!   not change.
+//!
+//! [historical; measured] **The node-local law is retired** (its realization, `LocalLaw` and
+//! `Landmarks::local`, measured at commit `d2a2e0db`, is at commit `89460425`; its law stays in
+//! Lean `HNN/LocalWeighing.{own_mixture_over_trees, node_local_dominance, own_weight_step,
+//! node_local_founding}`): each landmark's own face mixed its KT face with an external face read
+//! causally at the same digit, and held out it read above the tree (below).
 //!
 //! [established-bounded; measured] **On the standing cut** (notebook `hnn_landmark -- … local`,
 //! development cells, prequential, each law charged `⌈log₂⌉` of its family): the node-local law
@@ -313,24 +335,36 @@
 //! above the tree.
 //!
 //! [established-bounded; measured] **Stored where paths part, on the wide cut** (notebook
-//! `hnn_landmark -- … compact`, Decision 37; development 917,504 cells, held out the final 131,072;
-//! `n* = 2^20`; bits at `L_R = 16`, each `+ ε`, exact enclosures). At `D = 6` on the development
-//! cells the compacted tree codes `1822006 + 1/16` as the full arena does, their difference
+//! `hnn_landmark -- … compact`, Decision 37, at commit `2fb0c1c0`'s widths, `W` from `n*` alone;
+//! development 917,504 cells, held out the final 131,072; `n* = 2^20`; bits at `L_R = 16`, each
+//! `+ ε`, exact enclosures; bytes are the counted allocator's growth, allocated capacity and not
+//! occupancy). At `D = 6` on the development cells the compacted tree codes `1822006 + 1/16` as the
+//! full arena does, their difference
 //! `[−505516772782985345855/2^96, −505516772782985345853/2^96]` bits against certificates summing to
-//! `1005 + 4/16` (484 + 1/16 compacted, 521 + 3/16 full), with 2,784,875 nodes and 477,104,868 live
-//! bytes against 4,620,707 and 914,361,060 (14,291 ms against 16,436). The depth sweep, doubling
+//! `1005 + 4/16` (484 + 1/16 compacted, 521 + 3/16 full), with 2,784,875 nodes and 477,104,868
+//! allocated bytes against 4,620,707 and 914,361,060 (14,291 ms against 16,436). The depth sweep, doubling
 //! (`D = 6, 12, 24, 48, 73`, 73 the carriers' limit, charged 3 bits): `1802252 + 14/16`,
 //! `1801962 + 7/16`, `1801940 + 12/16`, and at `D = 73` a code above `D = 48` by
 //! `[51135399609700288000155/2^93, 204541598438801152000621/2^95]` (a grain `0 + 0/16`, far inside
 //! both certificates): the development cells choose **`D = 48`**, 10,985,626 nodes, 35,373,218
-//! label letters and 2,097,158,484 live bytes in 24,936 ms (each passage 14,291 to 25,133 ms). Charged
+//! label letters and 2,097,158,484 allocated bytes in 24,936 ms (each passage 14,291 to 25,133
+//! ms). Charged
 //! 3 bits it lies below Decision 28's tree at `D = 6` charged 3 by `−20066 + 10/16`. Held out, once:
 //! `258201 + 3/16` (`1 + 15/16` a cell) against Decision 28's `261616 + 4/16` (re-read exactly), PPM-2
 //! `395598 + 8/16`, order-1 `496687 + 2/16` and order-0 `631713 + 1/16`; charged 3 bits it lies below
 //! Decision 28's tree by `−3416 + 15/16`, PPM-2 by `−137395 + 11/16` (a cell `−2 + 15/16`), order-1 by
 //! `−238483 + 1/16` and order-0 by `−373509 + 2/16`, each decided. The whole passage at `D = 48`
-//! stores 12,542,969 nodes and 40,352,545 label letters in 2,097,158,516 live bytes (29,052 ms),
-//! against the full arena's 5,110,443 nodes at `D = 6` in 914,361,092 (19,126 ms).
+//! stores 12,542,969 nodes and 40,352,545 label letters in 2,097,158,516 allocated bytes (29,052
+//! ms), against the full arena's 5,110,443 nodes at `D = 6` in 914,361,092 (19,126 ms).
+//! [established-bounded; measured] **Re-measured once with the splits counted in `W`** (`W = 37,
+//! 39, 41, 43, 44` at `D = 6, 12, 24, 48, 73`; the full arena retired): every reading above at the
+//! grain is reproduced (the codes, the choice `D = 48`, the held-out passage and each ordering),
+//! the rise at `D = 73` above `D = 48` is now
+//! `[402375638051304080257559/2^96, 402375638051304080257561/2^96]`, and the bytes occupied (96 a
+//! node, 16 a child-table entry, 4 a label letter) are 313,643,028 at `D = 6`, 969,583,660,
+//! 1,249,468,440, 1,371,879,880 at `D = 48` and 1,472,140,904 on the development cells, and
+//! 1,566,219,572 over the whole passage at `D = 48` (its 2,097,158,516 allocated); 168,704 ms in
+//! all.
 //!
 //! [definition; agent-inferred] **The depth, the family and the prior** are chosen on the development
 //! cells only ([`choose_depth`], [`choose_prior`]): `D` increases from `max(1, forced)` while the
@@ -340,9 +374,9 @@
 //! per-depth pairs `(j_root, j_below)`, `J = ⌈log₂(n* B)⌉`, [`ladder_top`]) runs its own depth sweep,
 //! and the choice is charged `⌈log₂⌉` of the laws tried. The held-out cells never choose anything.
 //! [agent-inferred] A declared deepest depth bounds the depth sweep ([`choose_depth_within`];
-//! Decision 35): the resident memory cap bounds the full arena's a-priori founded nodes
-//! `n* B D + 2^B − 1`, and so its depth at a population; the compacted storage's `2 n* B` nodes bound
-//! no depth (Decision 37), and the carriers' widths are its only limit.
+//! Decision 35): the resident memory cap bounded the retired full arena's a-priori founded nodes
+//! `n* B D + 2^B − 1`, and so its depth at a population; stored where paths part, `2 n* B` nodes
+//! bound no depth (Decision 37), and the carriers' widths are its only limit.
 //!
 //! [definition; agent-inferred, from the retention and deposition laws] **The measurement is
 //! prequential** ([`prequential`], Decision 29): every cell is scored at the current standing
@@ -378,11 +412,10 @@
 //! | the declared stop prior: the mixture over pruned trees with its prior, the weights summing to one, the dominance, the founding at `β₀ = 2^(j_d) − 1` and the step unchanged; `½` the corollary | `HNN/LandmarkTree.{stop_mixture_over_trees, PrunedTree.prior_const, PrunedTree.prior_sum, stop_kraft_and_dominance, stop_weight_step, stop_ratio_step, stop_founding_step, ladder_founding, stopWeight_half}` | [`StopPrior`], [`LandmarkDeclaration::prior`], the founding charts (`Law::founding`, [`ArenaView::founding`]), [`IdealLandmarks`] |
 //! | the prior chosen on the development cells, charged `⌈log₂⌉` of the laws and of each law's depths | (a measurement, not a theorem) | [`ladder_top`], [`prior_family`], [`choose_prior`], [`choose_depth_within`], [`PriorSweep`] |
 //! | a population's code is its faces' product, enclosed once | (a certified reading: integer bounds and the certified logarithm) | [`PassageCode`], [`ProductBound`] |
-//! | the node-local law: the tree over own weights (the stop law its KT case), Kraft-complete, each landmark paying at most `−log₂` of its prior weight; its step with the own face in the KT face's place; an own face normalized; an unfounded landmark's prior own face; the two-face prior founding at `2^j − 1` | `HNN/LocalWeighing.{own_mixture_over_trees, ownWeight_kt, ownWeight_one, own_kraft_and_dominance, node_local_dominance, own_weight_step, own_ratio_step, own_face_normalized, node_local_founding, two_face_prior}` | [`LocalLaw`], [`Landmarks::local`], [`Landmarks::receive_with`], [`Widths::local`], [`IdealLandmarks::local`] |
 //! | the stop-weight mixture per digit tree: the mixture over (law, pruned tree), its prior complete, within `−log₂ π_k − log₂ prior_(w_k)(S)`; the joins telescope to the Bayesian mixture, the executed chart's drift once | `HNN/LocalWeighing.{stop_mixture_per_tree, static_mixture, forward_executed}` | [`StopMixture`], [`JoinTree`], [`FaceJoins`] |
 //! | a window's phases in cell order: each reads the standing after the earlier phases' deposits | `HNN/LandmarkTree.{landmark_step, treeWeight_arrive_off}` | [`Landmarks::window_faces`] |
 //! | founding where paths converge (Decision 36, measured and retired): the stopped path normalized under any stopping rule decided before the digit (a complete code); the tree with absent children, its Kraft form and dominance; the stopped step (`β` still at the stop); the second arrival opening with the first count; Decision 28 the first-arrival case | `HNN/ConvergenceFounding.{stopping_rule_normalized, prequential_code_complete, conv_mixture_over_trees, conv_kraft_and_dominance, conv_weight_step, conv_ratio_step, second_arrival_opens_with_the_first_count, convergence_step, convergence_is_probability, first_arrival_is_decision_28}` | retired (its realization is at commit `d137e8a6`; the development cells kept the first arrival) |
-//! | stored where paths part (Decision 37): a chain with its bottom is one node at the summed rung (`1 − ρ_top = 2^(−S)(1 − ρ_bottom)`, founded at `2^S − 1`), a chain to `D` one KT node, the split's two ratios, Decision 28's face exactly, at most `2n − 1` nodes a tree | `HNN/LandmarkCompaction.{chain_ratio, chain_ratio_dyadic, leaf_chain_is_one_node, chain_split, compacted_is_decision_28, compacted_node_bound}` | [`Storage`], [`Landmarks::with_storage`], the split (`Law::part`, `Law::chain`), [`Landmarks::face_rule`], [`Landmarks::tree_sizes`], [`IdealLandmarks::with_storage`] |
+//! | stored where paths part (Decision 37): a chain with its bottom is one node at the summed rung (`1 − ρ_top = 2^(−S)(1 − ρ_bottom)`, founded at `2^S − 1`), a chain to `D` one KT node, the split's two ratios, Decision 28's face exactly, at most `2n − 1` nodes a tree | `HNN/LandmarkCompaction.{chain_ratio, chain_ratio_dyadic, leaf_chain_is_one_node, chain_split, compacted_is_decision_28, compacted_node_bound}` | [`Landmarks`], [`LandmarkDeclaration::rung_sums`], the split ([`Beta::split`], `Law::part`, `Law::chain`), [`Landmarks::face_rule`], [`Landmarks::tree_sizes`], [`IdealLandmarks`] |
 //!
 //! [open] Owed in #62 (Lean `HNN/LandmarkTree`'s `[open]`): the passage-level composition of the
 //! drift bound (the subtree sum over the tree and the passage, from `lattice_node_telescope`,
@@ -805,104 +838,6 @@ pub fn prior_family(top: u32) -> Vec<StopPrior> {
 }
 
 // -------------------------------------------------------------------------------------------
-// Decision 34: the node-local law
-
-/// [definition; agent-inferred] **The node-local law** (Decision 34, "at each landmark"; Lean
-/// `HNN/LocalWeighing.{own_mixture_over_trees, node_local_dominance, own_weight_step,
-/// two_face_prior}`): each landmark's own face is the sequential mixture, over the digits routed to
-/// it, of its KT face and an admitted external face read causally at the same digit. The KT face
-/// holds the prior weight `1 − 2^(−j)` and the external face `2^(−j)`, so the node's own ratio
-/// `γ = (1 − 2^(−j)) KT_s/(2^(−j) X_s)` is founded at `γ₀ = 2^j − 1`, an odd integer carried exactly,
-/// and steps `γ' = γ k(b)/x̂(b)`; its own face is `ê = ⟦μ̂ k(0) + (1 − μ̂) x̂(0)⟧`, `μ̂ = ⟦γ/(1 + γ)⟧`. The
-/// tree's stop weights and steps are the declared stop prior's with the own face in place of the
-/// KT face (`β' = β ê(b)/q̂'(b)`), so the tree stays normalized and Kraft-complete and each landmark
-/// pays at most `−log₂` of its own face's prior weight. An unfounded node reads the prior own face
-/// `⟦μ̂₀ ½ + (1 − μ̂₀) x̂⟧` (`node_local_founding`).
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub struct LocalLaw {
-    rung: u32,
-}
-
-impl LocalLaw {
-    /// **The law at rung `j`**, refused outside `1..=63` (`γ₀ = 2^j − 1` fits a word).
-    pub fn new(rung: u32) -> Result<Self, HnnError> {
-        if rung == 0 || rung > MAX_RUNG {
-            return Err(shape(
-                "a node-local rung of the dyadic ladder within 1..=63",
-                MAX_RUNG as usize,
-                rung as usize,
-            ));
-        }
-        Ok(Self { rung })
-    }
-
-    /// The rung `j`.
-    pub fn rung(&self) -> u32 {
-        self.rung
-    }
-
-    /// The KT face's prior weight `1 − 2^(−j)`, exact.
-    pub fn weight(&self) -> Rat {
-        Rat::one() - two_power(-i64::from(self.rung))
-    }
-
-    /// The founding ratio `γ₀ = 2^j − 1`.
-    pub fn founding(&self) -> u64 {
-        (1u64 << self.rung) - 1
-    }
-}
-
-impl std::fmt::Display for LocalLaw {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "local j = {}", self.rung)
-    }
-}
-
-// -------------------------------------------------------------------------------------------
-// Decisions 28 and 37: how the landmarks are stored
-
-/// [definition; agent-inferred] **How a tree's landmarks are stored** (Decisions 28 and 37; Lean
-/// `HNN/LandmarkCompaction`). Both store Decision 28's tree at the declared `D`: the same prior, and
-/// the same face in ℚ at every arrival (`compacted_is_decision_28`).
-/// - [`Storage::Full`] (Decision 28's arena): every node of an opened path is founded at its first
-///   arrival, one node a depth. It is the realization the card uploads ([`ArenaView`]).
-/// - [`Storage::Compacted`] (Decision 37): the tree is stored at the faces where paths part. A
-///   chain of nodes each with one reached child routes the same arrivals (every address runs to
-///   `D`, padded with `Boundary`), so each holds the same counts, and with the node below it the
-///   chain is one Decision 28 node at the chain's **summed rung** `S = Σ j_d`: `1 − ρ_top =
-///   2^(−S)(1 − ρ_bottom)`, `ρ = P_w/P_e` (`chain_ratio`, `chain_ratio_dyadic`), founded at
-///   `β₀ = 2^S − 1` and stepped by the unchanged law; a chain ending at `D` is one KT node
-///   (`leaf_chain_is_one_node`). A stored node is such a chain: its bottom depth, its counts, its
-///   chart, and its **label**, the letters from its parent's face to its bottom (a leaf's to `D`).
-///   An arrival that parts from a label at depth `k` splits the chain there (`chain_split`): the
-///   lower part keeps its counts at `β_ℓ = β (2^(S_low) − 1)/(2^S − 1)`, the upper part holds the same
-///   counts at `β_u = (2^(S_up) − 1) 2^(S_low) β/(β (2^(S_low) − 1) + 2^S − 1)` (`2^(S_up) − 1` above a
-///   leaf), and the arrival founds its own leaf under the upper part. A forced depth has rung `0`
-///   (`w = 0`), so a chain above the forced depths passes its face through.
-///
-/// [proved-derived] **The a-priori size** (`compacted_node_bound`): each arrival founds at most two
-/// nodes in each digit tree it opens (one upper part and one leaf), and a tree of `ℓ` leaves stores at
-/// most `2ℓ − 1` chains, so a tree reached by `n` arrivals stores at most `2n − 1` nodes **at every
-/// depth**: the memory no longer bounds the depth.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
-pub enum Storage {
-    /// Decision 28's arena: one node a depth, founded at the first arrival.
-    #[default]
-    Full,
-    /// Decision 37: stored at the faces where paths part, each chain one node at its summed rung.
-    Compacted,
-}
-
-impl std::fmt::Display for Storage {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Storage::Full => write!(f, "one node a depth"),
-            Storage::Compacted => write!(f, "stored where paths part"),
-        }
-    }
-}
-
-// -------------------------------------------------------------------------------------------
 // the declaration and its derived widths
 
 /// [definition] **A landmark tree's declaration**: the exterior chart's `|A|`, the address depth
@@ -980,6 +915,31 @@ impl LandmarkDeclaration {
             depths.iter().map(|&d| d as u64).sum::<u64>() + 2
         }
     }
+
+    /// **Each branch's summed rungs from the root** (Decision 37): `sums[b][d] = Σ_(i<d, i ≥ f_b) j_i`
+    /// for `d = 0, …, D_b`, `f_b` the branch's forced depths (the cell branch's `forced`, none in
+    /// the bundle branch; a forced depth's rung is `0`). A stored chain from `top` to `bottom`
+    /// below `D_b` is one node at the summed rung `sums[b][bottom + 1] − sums[b][top]`
+    /// (`HNN/LandmarkCompaction.chain_ratio_dyadic`).
+    pub fn rung_sums(&self) -> Vec<Vec<u64>> {
+        self.branch_depths()
+            .into_iter()
+            .enumerate()
+            .map(|(branch, depth)| {
+                let forced = if branch == 0 { self.forced } else { 0 };
+                let mut sums = vec![0u64; depth + 1];
+                for at in 0..depth {
+                    let rung = if at >= forced {
+                        u64::from(self.prior.rung(at))
+                    } else {
+                        0
+                    };
+                    sums[at + 1] = sums[at] + rung;
+                }
+                sums
+            })
+            .collect()
+    }
 }
 
 /// `B = ⌈log₂|A|⌉`, the odometer digits of a cell.
@@ -1008,15 +968,16 @@ pub fn face_bits(population: u64, digits: u64, grain: u64, depth: u64) -> u64 {
 }
 
 /// [definition; agent-inferred] **The β carrier width** `W`: the least width (at least 2) with
-/// `2^W ≥ 12 B L_R n* P²`, which holds the rebases' drift within a quarter grain a cell (module
-/// header, "The widths").
+/// `2^W ≥ 12 B L_R (2n* + 1) P²`, which holds the rebases' drift, the splits' included (Decision
+/// 37: `(2n* + 1) P²` units of `2^(1−W)`), within a quarter grain a cell (module header, "The
+/// widths").
 pub fn carrier_width(population: u64, digits: u64, grain: u64, depth: u64) -> u64 {
     let d = BigUint::from(depth);
     ceil_log2(
         &(BigUint::from(12u32)
             * BigUint::from(digits)
             * BigUint::from(grain)
-            * BigUint::from(population)
+            * (BigUint::from(population) * 2u32 + 1u32)
             * &d
             * &d),
     )
@@ -1040,14 +1001,6 @@ impl Widths {
     /// The widths the rule derives from a declaration.
     pub fn derived(declaration: &LandmarkDeclaration) -> Self {
         Self::at_depth(declaration, declaration.path_depth(), None)
-    }
-
-    /// [definition; agent-inferred] **The widths under the node-local law** (Decision 34): each
-    /// node's own face is one more lattice mixture on the read (its KT face against the external
-    /// face, with its own ratio's drift), so a path of `P` mixing levels and `P + 1` own mixtures
-    /// reads as a path of `P_local = 2P + 1` levels, and the rule derives `M_p` and `W` at it.
-    pub fn local(declaration: &LandmarkDeclaration) -> Self {
-        Self::at_depth(declaration, 2 * declaration.path_depth() + 1, None)
     }
 
     /// The derived widths with a declared carrier `W` in place of the rule's.
@@ -1209,20 +1162,6 @@ fn certified(widths: &Widths, units: u128) -> Rat {
         BigInt::from(units) * 3,
         BigInt::from(2u32) << widths.certificate as usize,
     )
-}
-
-/// **A lattice split's numerator on another lattice**: `x/2^from` on `2^(−to)`, exact when
-/// `to ≥ from`, otherwise the nearest (ties up), inside `[1, 2^to − 1]` (the external face's chart on
-/// the tree's lattice).
-pub fn rescale_split(numerator: u64, from: u64, to: u64) -> u64 {
-    let top = (1u64 << to) - 1;
-    let value = if to >= from {
-        u128::from(numerator) << (to - from)
-    } else {
-        let shift = from - to;
-        (u128::from(numerator) + (1u128 << (shift - 1))) >> shift
-    };
-    (value as u64).clamp(1, top)
 }
 
 /// The greatest common divisor of two odd integers (binary: subtract, then shed twos).
@@ -1396,6 +1335,37 @@ impl Beta {
         }
     }
 
+    /// [definition; agent-inferred] **A chain's split ratios** (Decision 37; Lean
+    /// `HNN/LandmarkCompaction.chain_split`): a stored chain carrying `β` at the summed rung
+    /// `S = S_up + S_low` (`S_up, S_low ≥ 1`) parts between its two rungs; its lower part keeps its
+    /// counts at `β_ℓ = β (2^(S_low) − 1)/(2^S − 1)` and its upper part holds the same counts at
+    /// `β_u = (2^(S_up) − 1) 2^(S_low) β/(β (2^(S_low) − 1) + 2^S − 1)`, each formed exactly and
+    /// carried once at width `W` (exact when both odd parts fit, otherwise the `W`-bit floor
+    /// mantissa, returned). Returns `[upper, lower]`: the executed split's two charts (`Law::part`)
+    /// and the card's split (`holonics-cuda`, `kernels/tree.cu`), checked against it.
+    pub fn split(self, upper: u64, lower: u64, width: u64) -> [(Self, Option<u128>); 2] {
+        let (e, n, d) = (
+            self.exponent,
+            BigUint::from(self.numerator),
+            BigUint::from(self.denominator),
+        );
+        let (up, low, whole) = (ladder(upper), ladder(lower), ladder(upper + lower));
+        let below = carry_ratio(&n * &low, &d * &whole, e, width);
+        let shift = e.unsigned_abs() as usize;
+        let (numerator, denominator) = if e >= 0 {
+            (
+                (&up * &n) << (lower as usize + shift),
+                ((&n * &low) << shift) + &d * &whole,
+            )
+        } else {
+            (
+                (&up * &n) << lower as usize,
+                &n * &low + ((&d * &whole) << shift),
+            )
+        };
+        [carry_ratio(numerator, denominator, 0, width), below]
+    }
+
     /// **The stop weight** `λ̂ = ⟦β/(1 + β)⟧` on the lattice `2^(−M)`, as its numerator in
     /// `[0, 2^M]` (round to nearest, ties up). When one side of `1 + β` passes the other by at least
     /// `2^(M+1)` the rounding is decided (`λ̂ = 1` or `0`: the other side's share is below half a
@@ -1489,10 +1459,10 @@ impl Odometer {
 /// The top bit of a node's depth word: its branch (the bundle tree).
 const BRANCH_BIT: u32 = 1 << 31;
 
-/// The arena's topology and masses, shared by the executed tree and the oracle: the roots per
-/// tree, the child table, each node's depth word (its bottom depth, its branch in the top bit) and
-/// its two half-unit masses; under the compacted storage (Decision 37) each node's label end and the
-/// label pool, whose runs are the tree's own paths.
+/// The arena's topology and masses, stored where paths part (Decision 37), shared by the executed
+/// tree and the oracle: the roots per tree, the child table, each node's depth word (its bottom
+/// depth, its branch in the top bit), its two half-unit masses and its label end, and the label
+/// pool, whose runs are the tree's own paths.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct Arena {
     roots: Vec<Option<u32>>,
@@ -1518,8 +1488,8 @@ enum Stop {
 }
 
 /// [definition; agent-inferred] **A branch's walk down its tree** along an address: the stored
-/// nodes it opens from the root, where the last one's chain parts from the address (compacted
-/// storage, Decision 37: its upper part, down to that depth, is read), and where it stops.
+/// nodes it opens from the root, where the last one's chain parts from the address (Decision 37:
+/// its upper part, down to that depth, is read), and where it stops.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct Walk {
     nodes: Vec<u32>,
@@ -1528,8 +1498,8 @@ struct Walk {
 }
 
 /// **The stored nodes as a read opens them**: the root of each tree, the child behind a letter,
-/// each node's two half-unit masses, its depth word and (compacted storage) its label end, the label
-/// pool's letters and the count of stored nodes. The arena answers them (for the oracle and the
+/// each node's two half-unit masses, its depth word and its label end, the label pool's letters and
+/// the count of stored nodes. The arena answers them (for the oracle and the
 /// executed tree), and so does a window's working overlay ([`Working`]).
 trait Topology {
     fn root(&self, tree: usize) -> Option<u32>;
@@ -1537,7 +1507,7 @@ trait Topology {
     fn halves(&self, node: u32) -> [u32; 2];
     /// The node's depth word: its bottom depth, its branch in the top bit.
     fn word(&self, node: u32) -> u32;
-    /// A compacted node's label end: one past its bottom's letter in the label pool.
+    /// A node's label end: one past its bottom's letter in the label pool.
     fn end(&self, node: u32) -> u32;
     /// The label pool's letter at an index.
     fn letter(&self, index: u32) -> u32;
@@ -1545,12 +1515,12 @@ trait Topology {
     /// The label pool's letters.
     fn held(&self) -> usize;
 
-    /// The node's bottom depth (in the full arena, its depth).
+    /// The node's bottom depth: the depth of the chain's last node.
     fn bottom(&self, node: u32) -> usize {
         (self.word(node) & !BRANCH_BIT) as usize
     }
 
-    /// A compacted node's label letter at depth `d`, below its top and at most its bottom.
+    /// A node's label letter at depth `d`, below its top and at most its bottom.
     fn label(&self, node: u32, depth: usize) -> u32 {
         let bottom = self.bottom(node);
         let end = self.end(node) as usize;
@@ -1558,10 +1528,10 @@ trait Topology {
     }
 
     /// **The walk along an address in tree `t`** (letters `a_1, …, a_D`, `letters[d − 1] = a_d`):
-    /// from the root, each stored node's label is compared letter by letter from its top to its
-    /// bottom (in the full arena every node's top is its bottom, so nothing is compared); the first
-    /// letter that differs parts the path at the depth above it; a leaf at `D` stops the walk at its
-    /// own face; a missing child stops it at the prior.
+    /// from the root, each stored node's label is compared letter by letter below its top to its
+    /// bottom (a one-depth chain compares nothing); the first letter that differs parts the path
+    /// at the depth above it; a leaf at `D` stops the walk at its own face; a missing child stops
+    /// it at the prior.
     fn walk(&self, tree: usize, letters: &[u32]) -> Walk {
         let mut nodes = Vec::new();
         let Some(mut node) = self.root(tree) else {
@@ -1687,17 +1657,15 @@ impl Arena {
         }
     }
 
-    /// **Found a node** of `branch` at bottom depth `bottom` with its masses and, compacted, its
-    /// label end; it is linked apart ([`Arena::link`]).
-    fn push(&mut self, branch: usize, bottom: usize, halves: [u32; 2], end: Option<u32>) -> u32 {
+    /// **Found a node** of `branch` at bottom depth `bottom` with its masses and its label end; it
+    /// is linked apart ([`Arena::link`]).
+    fn push(&mut self, branch: usize, bottom: usize, halves: [u32; 2], end: u32) -> u32 {
         let node = u32::try_from(self.len()).expect("the arena is checked within 31 bits");
         let depth = u32::try_from(bottom).expect("a depth within 31 bits");
         self.depths
             .push(depth | if branch == 1 { BRANCH_BIT } else { 0 });
         self.halves.push(halves);
-        if let Some(end) = end {
-            self.ends.push(end);
-        }
+        self.ends.push(end);
         node
     }
 
@@ -1718,26 +1686,6 @@ impl Arena {
         u32::try_from(self.letters.len()).expect("the pool is checked within 32 bits")
     }
 
-    /// Found the path's missing nodes in tree `t` of `branch` (full storage: the root, then each
-    /// child along the address), returning how many were founded.
-    fn extend(
-        &mut self,
-        tree: usize,
-        branch: usize,
-        address: &[u32],
-        nodes: &mut Vec<u32>,
-    ) -> usize {
-        let before = self.len();
-        while nodes.len() < address.len() + 1 {
-            let depth = nodes.len();
-            let parent = nodes.last().map(|&parent| (parent, address[depth - 1]));
-            let node = self.push(branch, depth, [1, 1], None);
-            self.link(tree, parent, node);
-            nodes.push(node);
-        }
-        self.len() - before
-    }
-
     /// One arrival of `symbol` counted at the path's nodes whose bottom is at least `forced`.
     fn count(&mut self, nodes: &[u32], forced: usize, symbol: usize) {
         for &node in nodes {
@@ -1748,16 +1696,15 @@ impl Arena {
     }
 }
 
-/// A node to found on a standing: its branch and bottom depth, its masses, its label end
-/// (compacted storage), its chart and, under the node-local law, its own chart.
+/// A node to found on a standing: its branch and bottom depth, its masses, its label end and its
+/// chart.
 #[derive(Clone, Copy, Debug)]
 struct Founded {
     branch: usize,
     bottom: usize,
     halves: [u32; 2],
-    end: Option<u32>,
+    end: u32,
     chart: Chart,
-    own: Option<Chart>,
 }
 
 /// **The executed tree's standing as a deposit moves it** (module header, "The arena"): the
@@ -1769,9 +1716,6 @@ trait Standing: Topology {
     fn join(&self, dyadic: usize) -> &Chart;
     fn join_mut(&mut self, dyadic: usize) -> &mut Chart;
     fn halves_mut(&mut self, node: u32) -> &mut [u32; 2];
-    /// A node's own chart (the node-local law, Decision 34): its own ratio `γ` and certificates.
-    fn own(&self, node: u32) -> &Chart;
-    fn own_mut(&mut self, node: u32) -> &mut Chart;
     /// Found a node, unlinked.
     fn found(&mut self, node: Founded) -> u32;
     /// Link a node as tree `t`'s root (`parent` absent) or the child behind `(parent, letter)`.
@@ -1784,14 +1728,13 @@ trait Standing: Topology {
     fn released(&mut self);
 }
 
-/// The executed tree's own standing: the arena, each node's chart, each node's own chart (the
-/// node-local law only; empty otherwise), each dyadic cell's join chart (enlarged trees), the
+/// The executed tree's own standing: the arena, each node's chart, each dyadic cell's join chart
+/// (enlarged trees), the
 /// rebases, the carrier's releases and the cells passed.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct Nodes {
     arena: Arena,
     charts: Vec<Chart>,
-    own: Vec<Chart>,
     joins: Vec<Chart>,
     rebases: u64,
     releases: u64,
@@ -1853,22 +1796,11 @@ impl Standing for Nodes {
         &mut self.arena.halves[node as usize]
     }
 
-    fn own(&self, node: u32) -> &Chart {
-        &self.own[node as usize]
-    }
-
-    fn own_mut(&mut self, node: u32) -> &mut Chart {
-        &mut self.own[node as usize]
-    }
-
     fn found(&mut self, node: Founded) -> u32 {
         let founded = self
             .arena
             .push(node.branch, node.bottom, node.halves, node.end);
         self.charts.push(node.chart);
-        if let Some(own) = node.own {
-            self.own.push(own);
-        }
         founded
     }
 
@@ -1897,14 +1829,13 @@ impl Standing for Nodes {
     }
 }
 
-/// A node a working overlay founded: its depth word, masses, label end, chart and own chart.
+/// A node a working overlay founded: its depth word, masses, label end and chart.
 #[derive(Clone, Debug)]
 struct Fresh {
     word: u32,
     halves: [u32; 2],
     end: u32,
     chart: Chart,
-    own: Option<Chart>,
 }
 
 /// [definition; agent-inferred] **A working overlay on the tree** (module header, "A window in
@@ -1917,7 +1848,6 @@ struct Fresh {
 struct Working<'a> {
     base: &'a Nodes,
     charts: HashMap<u32, Chart>,
-    own: HashMap<u32, Chart>,
     joins: HashMap<usize, Chart>,
     halves: HashMap<u32, [u32; 2]>,
     founded: Vec<Fresh>,
@@ -1932,7 +1862,6 @@ impl<'a> Working<'a> {
         Self {
             base,
             charts: HashMap::new(),
-            own: HashMap::new(),
             joins: HashMap::new(),
             halves: HashMap::new(),
             founded: Vec::new(),
@@ -2026,29 +1955,6 @@ impl Standing for Working<'_> {
         }
     }
 
-    fn own(&self, node: u32) -> &Chart {
-        match self.fresh(node) {
-            Some(index) => self.founded[index]
-                .own
-                .as_ref()
-                .expect("a node-local tree founds each node with its own chart"),
-            None => self.own.get(&node).unwrap_or_else(|| self.base.own(node)),
-        }
-    }
-
-    fn own_mut(&mut self, node: u32) -> &mut Chart {
-        match self.fresh(node) {
-            Some(index) => self.founded[index]
-                .own
-                .as_mut()
-                .expect("a node-local tree founds each node with its own chart"),
-            None => {
-                let base = self.base;
-                self.own.entry(node).or_insert_with(|| *base.own(node))
-            }
-        }
-    }
-
     fn join(&self, dyadic: usize) -> &Chart {
         self.joins
             .get(&dyadic)
@@ -2078,9 +1984,8 @@ impl Standing for Working<'_> {
         self.founded.push(Fresh {
             word: depth | if node.branch == 1 { BRANCH_BIT } else { 0 },
             halves: node.halves,
-            end: node.end.unwrap_or(0),
+            end: node.end,
             chart: node.chart,
-            own: node.own,
         });
         founded
     }
@@ -2238,17 +2143,18 @@ pub struct DigitsReading {
 
 /// [definition] **One opened path**: the dyadic cell `h` whose tree it descends and the branch (`0`
 /// the cells, `1` the bundles), the digit it emits there, how many stored nodes it opens (its
-/// levels: in the full arena one a depth, compacted one a chain, Decision 37), its faces
-/// `q_0, …, q_top` of that digit (the executed lattice faces from [`Landmarks::opened`], the ideal
-/// ones from [`IdealLandmarks::opened`]; the first unfounded depth reads the prior `1/2`), and at
-/// each level the node's KT face `k_ℓ` of the digit and its carried `β_ℓ` (a parting chain's upper
-/// part's split `β`).
+/// levels: one a stored chain, Decision 37) with each level's bottom depth (a parting chain's the
+/// depth where it parts), its faces `q_0, …, q_top` of that digit (the executed lattice faces from
+/// [`Landmarks::opened`], the ideal ones from [`IdealLandmarks::opened`]; `top` the last level at a
+/// leaf, otherwise one past it, where the prior `1/2` is read), and at each level the node's KT
+/// face `k_ℓ` of the digit and its carried `β_ℓ` (a parting chain's upper part's split `β`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct OpenedPath {
     pub dyadic: usize,
     pub branch: usize,
     pub symbol: usize,
     pub founded: usize,
+    pub bottoms: Vec<usize>,
     pub faces: Vec<Rat>,
     pub masses: Vec<Rat>,
     pub betas: Vec<Rat>,
@@ -2378,8 +2284,7 @@ struct Chart {
     excess: u128,
 }
 
-/// [definition; agent-inferred] **A parting chain's two parts** (Decision 37, the compacted storage;
-/// Lean `HNN/LandmarkCompaction.chain_split`): the read's last stored chain parts from the address at
+/// [definition; agent-inferred] **A parting chain's two parts** (Decision 37; Lean `HNN/LandmarkCompaction.chain_split`): the read's last stored chain parts from the address at
 /// `depth`; its upper part, down to `depth`, is read (and founded at the deposit) with `upper`, and
 /// its lower part keeps its counts with `lower` (none when it keeps its chart: a leaf, or an upper
 /// part above the forced depths). `units` is the split's rounding on `2^(−C)` (each ratio carried at
@@ -2398,10 +2303,7 @@ struct Parting {
 /// nodes its walk opened from the root with each level's bottom depth (the parting chain's the
 /// depth where it parts), the parting chain's parts, and the lattice faces of the digit `0`,
 /// `q̂_ℓ(0)` as numerators of `2^(−M_p)`, at the levels `ℓ = 0, …, top` (`top` the last node at a
-/// leaf, or one past it where the prior `2^(M_p − 1)` is read, or under the node-local law the prior
-/// own face). Under the node-local law it also holds the external face's digit-0 numerator `x̂` and
-/// each level's own face `ê_ℓ(0)` (zero above the forced depths). In the full arena a level is a
-/// depth.
+/// leaf, or one past it where the prior `2^(M_p − 1)` is read). A level is a stored chain.
 #[derive(Clone, Debug)]
 struct LatticeRead {
     tree: usize,
@@ -2412,8 +2314,6 @@ struct LatticeRead {
     bottoms: Vec<usize>,
     parting: Option<Parting>,
     faces: Vec<u64>,
-    own: Vec<u64>,
-    external: Option<u64>,
 }
 
 impl LatticeRead {
@@ -2422,8 +2322,8 @@ impl LatticeRead {
         self.parting.is_some() && level + 1 == self.nodes.len()
     }
 
-    /// The top depth of the leaf the arrival founds when the read stops at the prior (compacted
-    /// storage): `0` with no root, otherwise one past the last level's bottom.
+    /// The top depth of the leaf the arrival founds when the read stops at the prior: `0` with no
+    /// root, otherwise one past the last level's bottom.
     fn leaf_top(&self) -> usize {
         self.bottoms.last().map_or(0, |bottom| bottom + 1)
     }
@@ -2449,10 +2349,9 @@ struct Branch {
 /// The tree's law, apart from its standing: the declaration, its derived widths, the odometer, the
 /// branches, the founding chart at each depth (the declared stop prior's `β₀ = 2^(j_d) − 1` with
 /// its stop weight `λ̂ = ⟦1 − 2^(−j_d)⟧`), each branch's summed rungs from the root
-/// (`Σ_(i<d, i ≥ forced) j_i`, a forced depth's rung `0`), under the node-local law (Decision 34)
-/// its rung with the own chart every node is founded from (`γ₀ = 2^j − 1`, `μ̂₀ = ⟦1 − 2^(−j)⟧`), and
-/// the storage (Decision 37). Its reads and its deposit act on any [`Standing`], the tree's own or
-/// a working overlay.
+/// (`Σ_(i<d, i ≥ forced) j_i`, a forced depth's rung `0`; Decision 37's chains read their rungs
+/// from them). Its reads and its deposit act on any [`Standing`], the tree's own or a working
+/// overlay.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct Law {
     declaration: LandmarkDeclaration,
@@ -2461,37 +2360,15 @@ struct Law {
     branches: Vec<Branch>,
     founding: Vec<Chart>,
     sums: Vec<Vec<u64>>,
-    local: Option<(LocalLaw, Chart)>,
-    storage: Storage,
 }
 
 /// [definition] **The landmark tree, executed** (module header): the declaration, its derived
-/// widths, the arena with each node's chart and each join, and the chart's counts.
+/// widths, the arena stored at the faces where paths part (Decision 37) with each node's chart and
+/// each join, and the chart's counts.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Landmarks {
     law: Law,
     nodes: Nodes,
-}
-
-/// **Each branch's summed rungs from the root**: `sums[d] = Σ_(i<d, i ≥ forced) j_i` for
-/// `d = 0, …, D_b`; a chain from `top` to `bottom` (below `D_b`) has the summed rung
-/// `sums[bottom + 1] − sums[top]` (Decision 37).
-fn rung_sums(declaration: &LandmarkDeclaration, branches: &[Branch]) -> Vec<Vec<u64>> {
-    branches
-        .iter()
-        .map(|branch| {
-            let mut sums = vec![0u64; branch.depth + 1];
-            for depth in 0..branch.depth {
-                let rung = if depth >= branch.forced {
-                    u64::from(declaration.prior.rung(depth))
-                } else {
-                    0
-                };
-                sums[depth + 1] = sums[depth] + rung;
-            }
-            sums
-        })
-        .collect()
 }
 
 /// `2^k − 1`, exact.
@@ -2543,12 +2420,7 @@ fn carry_ratio(
 }
 
 impl Law {
-    fn new(
-        declaration: LandmarkDeclaration,
-        widths: Widths,
-        local: Option<LocalLaw>,
-        storage: Storage,
-    ) -> Self {
+    fn new(declaration: LandmarkDeclaration, widths: Widths) -> Self {
         let odometer = Odometer {
             alphabet: declaration.alphabet,
             digits: widths.digits,
@@ -2582,8 +2454,7 @@ impl Law {
         let founding = (0..=deepest)
             .map(|depth| chart_of(declaration.prior.founding(depth)))
             .collect();
-        let local = local.map(|law| (law, chart_of(law.founding())));
-        let sums = rung_sums(&declaration, &branches);
+        let sums = declaration.rung_sums();
         Self {
             declaration,
             widths,
@@ -2591,8 +2462,6 @@ impl Law {
             branches,
             founding,
             sums,
-            local,
-            storage,
         }
     }
 
@@ -2608,19 +2477,9 @@ impl Law {
         self.branches.len() > 1
     }
 
-    fn is_local(&self) -> bool {
-        self.local.is_some()
-    }
-
-    /// The path depth the widths' rule reads: the declaration's `P`, or `2P + 1` under the
-    /// node-local law ([`Widths::local`]).
+    /// The path depth the widths' rule reads: the declaration's `P`.
     fn path_depth(&self) -> u64 {
-        let depth = self.declaration.path_depth();
-        if self.is_local() {
-            2 * depth + 1
-        } else {
-            depth
-        }
+        self.declaration.path_depth()
     }
 
     /// Tree `t = branch · 2^B + h`.
@@ -2705,10 +2564,10 @@ impl Law {
     /// leaf the upper part is founded at `2^(S_up) − 1` ([`Law::chain`]) and the leaf keeps its
     /// chart. Above an internal bottom, `β_ℓ = β (2^(S_low) − 1)/(2^S − 1)` and
     /// `β_u = (2^(S_up) − 1) 2^(S_low) β/(β (2^(S_low) − 1) + 2^S − 1)`, each formed exactly and
-    /// carried once at `W` bits ([`carry_ratio`]): `|ln β̂_ℓ − ln β_ℓ| ≤ Δ + 1/m'_ℓ` and, the map
+    /// carried once at `W` bits: `|ln β̂_ℓ − ln β_ℓ| ≤ Δ + 1/m'_ℓ` and, the map
     /// `β ↦ β_u` being 1-Lipschitz in `ln β`, `|ln β̂_u − ln β_u| ≤ Δ + 1/m'_u`, each `1/m' < 2^(1−W)`
-    /// with `Δ` the chain's drift. An upper part above the forced depths (`S_up = 0`) passes its face
-    /// through, and the lower part then keeps `β`.
+    /// with `Δ` the chain's drift ([`Beta::split`]). An upper part above the forced depths
+    /// (`S_up = 0`) passes its face through, and the lower part then keeps `β`.
     fn part(
         &self,
         nodes: &impl Standing,
@@ -2746,27 +2605,7 @@ impl Law {
         }
         let lower_rung = self.rung_sum(branch, depth + 1, bottom);
         let chart = *nodes.chart(node);
-        let (n, d, e) = chart.beta.parts();
-        let (n, d) = (BigUint::from(n), BigUint::from(d));
-        let (up, low, whole) = (
-            ladder(upper_rung),
-            ladder(lower_rung),
-            ladder(upper_rung + lower_rung),
-        );
-        let lower = carry_ratio(&n * &low, &d * &whole, e, carrier);
-        let shift = e.unsigned_abs() as usize;
-        let (numerator, denominator) = if e >= 0 {
-            (
-                (&up * &n) << (lower_rung as usize + shift),
-                ((&n * &low) << shift) + &d * &whole,
-            )
-        } else {
-            (
-                (&up * &n) << lower_rung as usize,
-                &n * &low + ((&d * &whole) << shift),
-            )
-        };
-        let upper = carry_ratio(numerator, denominator, 0, carrier);
+        let [upper, lower] = chart.beta.split(upper_rung, lower_rung, carrier);
         let unit = |kept: Option<u128>| kept.map_or(0, |m| ceil_div(1u128 << certificate, m));
         let (lower_units, upper_units) = (unit(lower.1), unit(upper.1));
         let chart_of = |beta: Beta, units: u128, kept: Option<u128>| Chart {
@@ -2809,26 +2648,13 @@ impl Law {
         lattice_mix(&self.widths, stop, u, v, below)
     }
 
-    /// **A stored node's own face** under the node-local law: `⟦μ̂ k(0) + (1 − μ̂) x̂(0)⟧`.
-    fn own_face(&self, nodes: &impl Standing, node: u32, external: u64) -> u64 {
-        let (u, v) = nodes.kt(node, 0);
-        self.mix_stop(nodes.own(node).stop, u, v, external)
-    }
-
-    /// **An unfounded node's own face**: `⟦μ̂₀ ½ + (1 − μ̂₀) x̂(0)⟧` (Lean `node_local_founding`).
-    fn unfounded_face(&self, external: u64) -> u64 {
-        let (_, founding) = self.local.as_ref().expect("the node-local law");
-        self.mix_stop(founding.stop, 1, 2, external)
-    }
-
     /// The join's lattice face `⟦λ̂_h q̂_cells + (1 − λ̂_h) q̂_bundles⟧`.
     fn join_face(&self, nodes: &impl Standing, dyadic: usize, cells: u64, bundles: u64) -> u64 {
         lattice_blend(&self.widths, nodes.join(dyadic).stop, cells, bundles)
     }
 
-    /// **One branch's executed read** at its letters in tree `t` (its walk, and a parting chain's
-    /// split); under the node-local law each stored node's own face mixes its KT face with
-    /// `external` (a chain's nodes hold one own chart: the same counts and the same external faces).
+    /// **One branch's executed read** at its letters in tree `t`: its walk, and a parting chain's
+    /// split (Decision 37).
     fn read(
         &self,
         nodes: &impl Standing,
@@ -2836,7 +2662,6 @@ impl Law {
         dyadic: usize,
         symbol: usize,
         letters: &[u32],
-        external: Option<u64>,
     ) -> LatticeRead {
         let forced = self.branches[branch].forced;
         let tree = self.tree(branch, dyadic);
@@ -2856,24 +2681,10 @@ impl Law {
             Stop::Node => path.len() - 1,
             Stop::Prior => path.len(),
         };
-        let own: Vec<u64> = match external {
-            Some(x) => (0..path.len())
-                .map(|level| {
-                    if bottoms[level] < forced {
-                        0
-                    } else {
-                        self.own_face(nodes, path[level], x)
-                    }
-                })
-                .collect(),
-            None => Vec::new(),
-        };
         let mut faces = vec![0u64; top + 1];
-        faces[top] = match (stop, external) {
-            (Stop::Node, Some(_)) => own[top],
-            (Stop::Node, None) => self.leaf(nodes, path[top]),
-            (Stop::Prior, Some(x)) => self.unfounded_face(x),
-            (Stop::Prior, None) => self.full() / 2,
+        faces[top] = match stop {
+            Stop::Node => self.leaf(nodes, path[top]),
+            Stop::Prior => self.full() / 2,
         };
         for level in (0..top).rev() {
             let weight = match &parting {
@@ -2882,8 +2693,6 @@ impl Law {
             };
             faces[level] = if bottoms[level] < forced {
                 faces[level + 1]
-            } else if external.is_some() {
-                lattice_blend(&self.widths, weight, own[level], faces[level + 1])
             } else {
                 let (u, v) = nodes.kt(path[level], 0);
                 self.mix_stop(weight, u, v, faces[level + 1])
@@ -2898,8 +2707,6 @@ impl Law {
             bottoms,
             parting,
             faces,
-            own,
-            external,
         }
     }
 
@@ -2910,10 +2717,9 @@ impl Law {
         dyadic: usize,
         symbol: usize,
         letters: &[Vec<u32>],
-        external: Option<u64>,
     ) -> DigitRead {
         let reads: Vec<LatticeRead> = (0..self.branches.len())
-            .map(|branch| self.read(nodes, branch, dyadic, symbol, &letters[branch], external))
+            .map(|branch| self.read(nodes, branch, dyadic, symbol, &letters[branch]))
             .collect();
         let face = if self.joined() {
             self.join_face(nodes, dyadic, reads[0].faces[0], reads[1].faces[0])
@@ -2928,44 +2734,13 @@ impl Law {
         }
     }
 
-    /// Refused unless the external faces fit the law: none for a tree without the node-local law,
-    /// one numerator inside `[1, 2^(M_p) − 1]` per opened digit (or splitting dyadic cell) with it.
-    fn check_external(&self, external: &[u64], expected: usize) -> Result<(), HnnError> {
-        let wanted = if self.is_local() { expected } else { 0 };
-        if external.len() != wanted {
-            return Err(shape(
-                "one external digit-0 face per opened digit under the node-local law, none otherwise",
-                wanted,
-                external.len(),
-            ));
-        }
-        if let Some(&x) = external.iter().find(|&&x| x == 0 || x >= self.full()) {
-            return Err(shape(
-                "an external digit-0 face inside the lattice's open unit interval",
-                self.full() as usize,
-                x as usize,
-            ));
-        }
-        Ok(())
-    }
-
-    /// Every digit a class opens, read at the standing (with its external face, node-local law).
-    fn reads(
-        &self,
-        nodes: &impl Standing,
-        address: &[Letter],
-        class: usize,
-        external: &[u64],
-    ) -> Vec<DigitRead> {
+    /// Every digit a class opens, read at the standing.
+    fn reads(&self, nodes: &impl Standing, address: &[Letter], class: usize) -> Vec<DigitRead> {
         let letters = self.flatten(address);
         self.odometer
             .emitted(class)
             .into_iter()
-            .enumerate()
-            .map(|(index, (dyadic, symbol))| {
-                let x = external.get(index).copied();
-                self.digit(nodes, dyadic, symbol, &letters, x)
-            })
+            .map(|(dyadic, symbol)| self.digit(nodes, dyadic, symbol, &letters))
             .collect()
     }
 
@@ -2980,9 +2755,7 @@ impl Law {
 
     /// **A level's rounding bound** `θ_ℓ` of `symbol` on `2^(−C)`: `2^(−M)/min(q̂_ℓ, k_ℓ, q̂_(ℓ+1))`
     /// at a mixing level, `2^(−M−1)/min(q̂_D, k_D)` at a stored leaf, zero at a forced or unfounded
-    /// level (their faces pass exactly). Under the node-local law the node's own face `ê_ℓ` takes
-    /// the KT face's place: `2^(−M)/min(q̂_ℓ, ê_ℓ, q̂_(ℓ+1))` at a mixing level and zero at the leaf,
-    /// whose face is its own face (`own_rounding`).
+    /// level (their faces pass exactly).
     fn rounding(&self, nodes: &impl Standing, read: &LatticeRead, level: usize) -> u128 {
         let Widths {
             face, certificate, ..
@@ -2996,15 +2769,6 @@ impl Law {
             return 0;
         }
         let (u, v) = nodes.kt(read.nodes[level], read.symbol);
-        if read.external.is_some() {
-            if level == top {
-                return 0;
-            }
-            let own = u128::from(self.side(read.own[level], read.symbol));
-            let here = u128::from(self.side(read.faces[level], read.symbol));
-            let below = u128::from(self.side(read.faces[level + 1], read.symbol));
-            return ceil_div(1u128 << certificate, here.min(below).min(own));
-        }
         let here = u128::from(self.side(read.faces[level], read.symbol));
         let kt =
             |shift: u64| ceil_div(u128::from(v) << (certificate - face - shift), u128::from(u));
@@ -3018,37 +2782,6 @@ impl Law {
         }
     }
 
-    /// **The own face's rounding bound** under the node-local law, on `2^(−C)`:
-    /// `2^(−M)/min(ê_ℓ, k_ℓ, x̂)` at a stored level, and at the unfounded level
-    /// `2^(−M)/min(ê₀, ½, x̂)` (the prior own face is rounded once; `μ̂₀ = 1 − 2^(−j)` is exact on the
-    /// lattice); zero without the law.
-    fn own_rounding(&self, nodes: &impl Standing, read: &LatticeRead, level: usize) -> u128 {
-        let Widths {
-            face, certificate, ..
-        } = self.widths;
-        let Some(x) = read.external else {
-            return 0;
-        };
-        let forced = self.branches[read.branch].forced;
-        let external = u128::from(self.side(x, read.symbol));
-        if level < read.nodes.len() {
-            if read.bottoms[level] < forced {
-                return 0;
-            }
-            let (u, v) = nodes.kt(read.nodes[level], read.symbol);
-            let own = u128::from(self.side(read.own[level], read.symbol));
-            let kt = ceil_div(u128::from(v) << (certificate - face), u128::from(u));
-            ceil_div(1u128 << certificate, own.min(external)).max(kt)
-        } else if level == read.nodes.len() && read.stop == Stop::Prior {
-            let top = read.faces.len() - 1;
-            let own = u128::from(self.side(read.faces[top], read.symbol));
-            let half = u128::from(self.full() / 2);
-            ceil_div(1u128 << certificate, own.min(external).min(half))
-        } else {
-            0
-        }
-    }
-
     /// **The join's rounding bound** `θ_h = 2^(−M)/min(q̂_h, q̂_cells, q̂_bundles)` on `2^(−C)`.
     fn join_rounding(&self, digit: &DigitRead) -> u128 {
         let side = |zero: u64| u128::from(self.side(zero, digit.symbol));
@@ -3059,8 +2792,7 @@ impl Law {
     }
 
     /// `ρ ≤ Σ drift + Σ θ` of one branch's read on `2^(−C)` (a parting chain's upper part carries
-    /// its split's drift); under the node-local law each stored level's own drift and own rounding,
-    /// and the unfounded level's own rounding, add.
+    /// its split's drift).
     fn certificate(&self, nodes: &impl Standing, read: &LatticeRead) -> u128 {
         let forced = self.branches[read.branch].forced;
         let mixing = read.nodes.len().min(read.faces.len() - 1);
@@ -3068,21 +2800,9 @@ impl Law {
             .filter(|&level| read.bottoms[level] >= forced)
             .map(|level| self.level(nodes, read, level).drift)
             .fold(0u128, u128::saturating_add);
-        let mut total = (0..read.faces.len())
+        (0..read.faces.len())
             .map(|level| self.rounding(nodes, read, level))
-            .fold(drift, u128::saturating_add);
-        if read.external.is_some() {
-            for level in 0..read.nodes.len() {
-                if read.bottoms[level] < forced {
-                    continue;
-                }
-                total = total
-                    .saturating_add(nodes.own(read.nodes[level]).drift)
-                    .saturating_add(self.own_rounding(nodes, read, level));
-            }
-            total = total.saturating_add(self.own_rounding(nodes, read, read.nodes.len()));
-        }
-        total
+            .fold(drift, u128::saturating_add)
     }
 
     /// One digit's certificate: its branches' and, in an enlarged tree, the join's drift and
@@ -3117,19 +2837,14 @@ impl Law {
     }
 
     /// **The splits at an address** (module header, "Faces"): each splitting dyadic cell's digit-0
-    /// face, heap-ordered; under the node-local law `external` holds each splitting dyadic cell's
-    /// external digit-0 face in the same order.
-    fn splits(&self, nodes: &impl Standing, address: &[Letter], external: &[u64]) -> Splits {
+    /// face, heap-ordered.
+    fn splits(&self, nodes: &impl Standing, address: &[Letter]) -> Splits {
         let letters = self.flatten(address);
         let numerators = self
             .odometer
             .splitting()
             .into_iter()
-            .enumerate()
-            .map(|(index, dyadic)| {
-                let x = external.get(index).copied();
-                self.digit(nodes, dyadic, 0, &letters, x).face
-            })
+            .map(|dyadic| self.digit(nodes, dyadic, 0, &letters).face)
             .collect();
         Splits {
             face_bits: self.widths.face,
@@ -3143,13 +2858,8 @@ impl Law {
         nodes: &impl Standing,
         address: &[Letter],
         grain: u64,
-        external: &[u64],
     ) -> Result<LandmarkFace, HnnError> {
-        LandmarkFace::of_splits(
-            &self.declaration,
-            &self.splits(nodes, address, external),
-            grain,
-        )
+        LandmarkFace::of_splits(&self.declaration, &self.splits(nodes, address), grain)
     }
 
     /// **One carried β step** on `2^(−C)`: the step `β' = β u/(v x) 2^s`, its rebase units
@@ -3169,56 +2879,14 @@ impl Law {
         u32::from(carried.mantissa.is_some())
     }
 
-    /// **The node-local own step** at one stored level: `γ' = γ k(b)/x̂(b)` with its rebase units,
-    /// on the level's own chart (`own`, or the node's when `None`), its drift and excess growing;
-    /// returns the own face's excess increment on the grid (its rounding plus twice its rebase
-    /// units).
-    fn own_step(
-        &self,
-        nodes: &mut impl Standing,
-        read: &LatticeRead,
-        level: usize,
-        own: Option<&mut Chart>,
-    ) -> u128 {
-        let node = read.nodes[level];
-        let theta = self.own_rounding(nodes, read, level);
-        let (u, v) = nodes.kt(node, read.symbol);
-        let x = self.side(read.external.expect("the node-local law"), read.symbol);
-        let gamma = own
-            .as_ref()
-            .map_or_else(|| nodes.own(node).beta, |own| own.beta);
-        let (step, units) = self.beta_step(
-            gamma,
-            u128::from(u),
-            u128::from(v),
-            u128::from(x),
-            self.widths.face as i64,
-        );
-        let rebased = Self::record(nodes, &step);
-        let increment = theta.saturating_add(units.saturating_mul(2));
-        let own = match own {
-            Some(own) => own,
-            None => nodes.own_mut(node),
-        };
-        own.beta = step.beta;
-        own.stop = step.beta.stop_weight(self.widths.face, self.widths.carrier);
-        own.rebases += rebased;
-        own.drift = own.drift.saturating_add(units);
-        own.excess = own.excess.saturating_add(increment);
-        increment
-    }
-
     /// **Deposit one branch's read** on a standing: each mixing level's β steps by
-    /// `k(b)/q̂_(ℓ+1)(b)` (under the node-local law by `ê(b)/q̂_(ℓ+1)(b)`, each stored level's own
-    /// ratio by `k(b)/x̂(b)`) bottom-up and its certificates grow (a parting chain's upper part is
+    /// `k(b)/q̂_(ℓ+1)(b)` bottom-up and its certificates grow (a parting chain's upper part is
     /// stepped on its split's chart, and its split's rounding added once to the increment). Then
-    /// the storage acts: in the full arena the path's missing nodes are founded at their depth's
-    /// `β₀` (the declared stop prior; under the node-local law with `γ₀` stepped by the empty KT face
-    /// against `x̂`, `γ₀ ½/x̂(b)`); compacted, a parting chain is split (its upper part founded with
-    /// its stepped chart and the chain's counts, its lower part keeping its counts at `β_ℓ`, the
-    /// parent relinked to the upper part), and an arrival stopped at the prior founds its leaf, its
-    /// label ending in the cell's run `run`. Then each node's mass of the digit grows. Returns the
-    /// root's excess increment.
+    /// the storage acts (Decision 37): a parting chain is split (its upper part founded with its
+    /// stepped chart and the chain's counts, its lower part keeping its counts at `β_ℓ`, the parent
+    /// relinked to the upper part), and an arrival stopped at the prior founds its leaf at `D`'s
+    /// `β₀`, its label ending in the cell's run `run`. Then each node's mass of the digit grows.
+    /// Returns the root's excess increment.
     fn apply_branch(
         &self,
         nodes: &mut impl Standing,
@@ -3230,23 +2898,11 @@ impl Law {
         let forced = self.branches[read.branch].forced;
         let top = read.faces.len() - 1;
         let levels = read.nodes.len();
-        let local = read.external.is_some();
-        // The first unfounded level's own face is rounded once under the node-local law.
-        let unfounded = if local {
-            self.own_rounding(nodes, &read, levels)
-        } else {
-            0
-        };
-        // The parting chain's upper part (compacted), stepped here and founded below, with the
-        // chain's own chart under the node-local law.
+        // The parting chain's upper part, stepped here and founded below.
         let mut upper = read.parting.map(|parting| parting.upper);
-        let mut upper_own = match (read.parting, read.nodes.last()) {
-            (Some(_), Some(&chain)) if local => Some(*nodes.own(chain)),
-            _ => None,
-        };
         // Bottom-up over the stored levels: θ and the rebases add to the excess, the child's
-        // excess increment and the rebases to the drift (and the own face's increment, node-local).
-        let mut carried = unfounded;
+        // excess increment and the rebases to the drift.
+        let mut carried = 0u128;
         for level in (0..levels).rev() {
             if read.bottoms[level] < forced {
                 break;
@@ -3254,16 +2910,6 @@ impl Law {
             let theta = self.rounding(nodes, &read, level);
             let node = read.nodes[level];
             let parts = read.parts(level);
-            let own = if local {
-                self.own_step(
-                    nodes,
-                    &read,
-                    level,
-                    if parts { upper_own.as_mut() } else { None },
-                )
-            } else {
-                0
-            };
             let split = match read.parting {
                 Some(parting) if parts => parting.units,
                 _ => 0,
@@ -3275,19 +2921,14 @@ impl Law {
                     Some(chart) if parts => chart.beta,
                     _ => nodes.chart(node).beta,
                 };
-                let (step, units) = if local {
-                    let own_side = self.side(read.own[level], read.symbol);
-                    self.beta_step(beta, u128::from(own_side), 1, u128::from(below), 0)
-                } else {
-                    let (u, v) = nodes.kt(node, read.symbol);
-                    self.beta_step(
-                        beta,
-                        u128::from(u),
-                        u128::from(v),
-                        u128::from(below),
-                        face as i64,
-                    )
-                };
+                let (u, v) = nodes.kt(node, read.symbol);
+                let (step, units) = self.beta_step(
+                    beta,
+                    u128::from(u),
+                    u128::from(v),
+                    u128::from(below),
+                    face as i64,
+                );
                 rebase = units;
                 let rebased = Self::record(nodes, &step);
                 let chart = match upper.as_mut() {
@@ -3297,16 +2938,11 @@ impl Law {
                 chart.beta = step.beta;
                 chart.stop = step.beta.stop_weight(face, self.widths.carrier);
                 chart.rebases += rebased;
-                chart.drift = chart
-                    .drift
-                    .saturating_add(carried)
-                    .saturating_add(rebase)
-                    .saturating_add(own);
+                chart.drift = chart.drift.saturating_add(carried).saturating_add(rebase);
             }
             let increment = theta
                 .saturating_add(rebase.saturating_mul(2))
                 .saturating_add(carried)
-                .saturating_add(own)
                 .saturating_add(split);
             let chart = match upper.as_mut() {
                 Some(chart) if parts => chart,
@@ -3315,23 +2951,6 @@ impl Law {
             chart.excess = chart.excess.saturating_add(increment);
             carried = increment;
         }
-        // The founded nodes' own chart: `γ₀` stepped by `½/x̂(b)` (the empty KT face).
-        let own_founding = self
-            .local
-            .as_ref()
-            .zip(read.external)
-            .map(|((_, chart), x)| {
-                let side = self.side(x, read.symbol);
-                let (step, units) = self.beta_step(chart.beta, 1, 2, u128::from(side), face as i64);
-                let own = Chart {
-                    beta: step.beta,
-                    stop: step.beta.stop_weight(face, self.widths.carrier),
-                    rebases: u32::from(step.mantissa.is_some()),
-                    drift: units,
-                    excess: unfounded.saturating_add(units.saturating_mul(2)),
-                };
-                (own, step)
-            });
         let LatticeRead {
             tree,
             branch,
@@ -3341,86 +2960,51 @@ impl Law {
             parting,
             ..
         } = read;
-        let chart_at = |depth: usize| {
-            let mut chart = self.founding[depth];
-            chart.excess = unfounded;
-            chart
-        };
-        let own_at = own_founding.map(|(own, _)| own);
         let depth = letters.len();
-        match self.storage {
-            Storage::Full => {
-                // The path's missing nodes, founded at their first arrival (Decision 28).
-                while path.len() < depth + 1 {
-                    let at = path.len();
-                    let parent = path.last().map(|&parent| (parent, letters[at - 1]));
-                    if let Some((_, step)) = &own_founding {
-                        Self::record(nodes, step);
-                    }
-                    let node = nodes.found(Founded {
-                        branch,
-                        bottom: at,
-                        halves: [1, 1],
-                        end: None,
-                        chart: chart_at(at),
-                        own: own_at,
-                    });
-                    nodes.link(tree, parent, node);
-                    path.push(node);
-                }
+        if let Some(parting) = parting {
+            // The parting chain splits: its upper part is founded above its lower part.
+            let chain = path.pop().expect("a parting chain");
+            let at = parting.depth;
+            let chain_top = path.last().map_or(0, |&parent| nodes.bottom(parent) + 1);
+            let bottom = nodes.bottom(chain);
+            let end = nodes.end(chain) - u32::try_from(bottom - at).expect("a depth");
+            let halves = if at >= forced {
+                nodes.halves(chain)
+            } else {
+                [1, 1]
+            };
+            let key = nodes.label(chain, at + 1);
+            for _ in 0..parting.rebases {
+                nodes.rebased();
             }
-            Storage::Compacted => {
-                if let Some(parting) = parting {
-                    // The parting chain splits: its upper part is founded above its lower part.
-                    let chain = path.pop().expect("a parting chain");
-                    let at = parting.depth;
-                    let chain_top = path.last().map_or(0, |&parent| nodes.bottom(parent) + 1);
-                    let bottom = nodes.bottom(chain);
-                    let end = nodes.end(chain) - u32::try_from(bottom - at).expect("a depth");
-                    let halves = if at >= forced {
-                        nodes.halves(chain)
-                    } else {
-                        [1, 1]
-                    };
-                    let key = nodes.label(chain, at + 1);
-                    for _ in 0..parting.rebases {
-                        nodes.rebased();
-                    }
-                    if let Some(lower) = parting.lower {
-                        *nodes.chart_mut(chain) = lower;
-                    }
-                    let upper = nodes.found(Founded {
-                        branch,
-                        bottom: at,
-                        halves,
-                        end: Some(end),
-                        chart: upper.expect("the parting chain's upper part"),
-                        own: upper_own,
-                    });
-                    let parent = path.last().map(|&parent| (parent, letters[chain_top - 1]));
-                    nodes.link(tree, parent, upper);
-                    nodes.link(tree, Some((upper, key)), chain);
-                    path.push(upper);
-                }
-                if stop == Stop::Prior {
-                    // The arrival founds its leaf, labelled to the declared depth.
-                    let leaf_top = path.last().map_or(0, |&parent| nodes.bottom(parent) + 1);
-                    if let Some((_, step)) = &own_founding {
-                        Self::record(nodes, step);
-                    }
-                    let leaf = nodes.found(Founded {
-                        branch,
-                        bottom: depth,
-                        halves: [1, 1],
-                        end: Some(run.expect("a compacted arrival's label run")),
-                        chart: chart_at(depth),
-                        own: own_at,
-                    });
-                    let parent = path.last().map(|&parent| (parent, letters[leaf_top - 1]));
-                    nodes.link(tree, parent, leaf);
-                    path.push(leaf);
-                }
+            if let Some(lower) = parting.lower {
+                *nodes.chart_mut(chain) = lower;
             }
+            let upper = nodes.found(Founded {
+                branch,
+                bottom: at,
+                halves,
+                end,
+                chart: upper.expect("the parting chain's upper part"),
+            });
+            let parent = path.last().map(|&parent| (parent, letters[chain_top - 1]));
+            nodes.link(tree, parent, upper);
+            nodes.link(tree, Some((upper, key)), chain);
+            path.push(upper);
+        }
+        if stop == Stop::Prior {
+            // The arrival founds its leaf, labelled to the declared depth.
+            let leaf_top = path.last().map_or(0, |&parent| nodes.bottom(parent) + 1);
+            let leaf = nodes.found(Founded {
+                branch,
+                bottom: depth,
+                halves: [1, 1],
+                end: run.expect("an arrival's label run"),
+                chart: self.founding[depth],
+            });
+            let parent = path.last().map(|&parent| (parent, letters[leaf_top - 1]));
+            nodes.link(tree, parent, leaf);
+            path.push(leaf);
         }
         for &node in &path {
             if nodes.bottom(node) >= forced {
@@ -3430,8 +3014,7 @@ impl Law {
         carried
     }
 
-    /// **Deposit one cell's reads** on a standing (module header): under the compacted storage each
-    /// branch's label run (the address's letters below the shallowest leaf this cell founds in that
+    /// **Deposit one cell's reads** on a standing (module header): each branch's label run (the address's letters below the shallowest leaf this cell founds in that
     /// branch, held once and shared by its leaves), then each branch's opened path, then each join's
     /// β by `q̂_cells(b)/q̂_bundles(b)` with its certificates. Returns each opened digit's top excess
     /// increment on `2^(−C)` (the join's in an enlarged tree, the cell branch root's otherwise).
@@ -3455,9 +3038,6 @@ impl Law {
         nodes.founded_within(digits.len() * founding, held)?;
         let runs: Vec<Option<u32>> = (0..self.branches.len())
             .map(|branch| {
-                if self.storage != Storage::Compacted {
-                    return None;
-                }
                 let top = digits
                     .iter()
                     .map(|digit| &digit.reads[branch])
@@ -3528,19 +3108,7 @@ impl Landmarks {
     pub fn new(declaration: LandmarkDeclaration) -> Result<Self, HnnError> {
         check_declaration(&declaration)?;
         let widths = Widths::derived(&declaration);
-        Self::with_widths(declaration, widths, None)
-    }
-
-    /// **Declare a tree under the node-local law** (Decision 34, [`LocalLaw`]), empty: every node's
-    /// own face mixes its KT face with the external face its reads are given
-    /// ([`Landmarks::receive_with`]), the KT face at the prior weight `1 − 2^(−j)`. Refused as
-    /// [`Landmarks::new`] refuses, and at a rung past the carrier `W` or the lattice `M_p` (`γ₀` and
-    /// `μ̂₀ = 1 − 2^(−j)` are then carried exactly). Its widths are the rule's at the node-local path
-    /// depth `2P + 1` ([`Widths::local`]).
-    pub fn local(declaration: LandmarkDeclaration, law: LocalLaw) -> Result<Self, HnnError> {
-        check_declaration(&declaration)?;
-        let widths = Widths::local(&declaration);
-        Self::with_widths(declaration, widths, Some(law))
+        Self::with_widths(declaration, widths)
     }
 
     /// **Declare a tree at a declared carrier width `W`** in place of the rule's. A width below the
@@ -3549,14 +3117,10 @@ impl Landmarks {
     pub fn with_carrier(declaration: LandmarkDeclaration, carrier: u64) -> Result<Self, HnnError> {
         check_declaration(&declaration)?;
         let widths = Widths::with_carrier(&declaration, carrier);
-        Self::with_widths(declaration, widths, None)
+        Self::with_widths(declaration, widths)
     }
 
-    fn with_widths(
-        declaration: LandmarkDeclaration,
-        widths: Widths,
-        local: Option<LocalLaw>,
-    ) -> Result<Self, HnnError> {
+    fn with_widths(declaration: LandmarkDeclaration, widths: Widths) -> Result<Self, HnnError> {
         let operands = widths.operand_bits(declaration.population);
         if !(2..=63).contains(&widths.carrier)
             || widths.face > 62
@@ -3582,16 +3146,7 @@ impl Landmarks {
                 widest as usize,
             ));
         }
-        if let Some(law) = local
-            && u64::from(law.rung()) > widths.carrier.min(widths.face)
-        {
-            return Err(shape(
-                "a node-local rung whose founding ratio 2^j − 1 fits the carrier's W bits and the lattice",
-                widths.carrier.min(widths.face) as usize,
-                law.rung() as usize,
-            ));
-        }
-        let law = Law::new(declaration, widths, local, Storage::Full);
+        let law = Law::new(declaration, widths);
         let trees = law.branches.len() * law.cells();
         let joins = if law.joined() {
             vec![law.unit(); law.cells()]
@@ -3602,7 +3157,6 @@ impl Landmarks {
             nodes: Nodes {
                 arena: Arena::new(trees),
                 charts: Vec::new(),
-                own: Vec::new(),
                 joins,
                 rebases: 0,
                 releases: 0,
@@ -3612,30 +3166,7 @@ impl Landmarks {
         })
     }
 
-    /// [definition; agent-inferred] **Declare how the tree stores its landmarks** ([`Storage`];
-    /// Decisions 28 and 37), on a tree nothing has reached yet: `Landmarks::new(d)?
-    /// .with_storage(Storage::Compacted)` is Decision 37's tree stored at the faces where paths
-    /// part, with the declaration's law, widths and lattice (a read opens at most `P + 1` levels, so
-    /// the rule's bound holds, with each split counted as a further rebase, [`Landmarks::face_rule`]).
-    /// Refused once a cell has passed.
-    pub fn with_storage(mut self, storage: Storage) -> Result<Self, HnnError> {
-        if self.nodes.passed > 0 || self.nodes.len() > 0 {
-            return Err(shape(
-                "a storage declared before any arrival",
-                0,
-                usize::try_from(self.nodes.passed).unwrap_or(usize::MAX),
-            ));
-        }
-        self.law.storage = storage;
-        Ok(self)
-    }
-
-    /// How the tree stores its landmarks.
-    pub fn storage(&self) -> Storage {
-        self.law.storage
-    }
-
-    /// The label pool's letters (compacted storage; zero in the full arena).
+    /// The label pool's letters (Decision 37).
     pub fn held(&self) -> usize {
         self.nodes.arena.letters.len()
     }
@@ -3690,7 +3221,7 @@ impl Landmarks {
         self.law.odometer.splitting()
     }
 
-    /// The stored nodes (in the full arena the founded nodes).
+    /// The stored nodes (Decision 37: each a chain).
     pub fn nodes(&self) -> usize {
         self.nodes.len()
     }
@@ -3704,26 +3235,26 @@ impl Landmarks {
     /// `bits(2C) + 2`, at the nodes whose bottom is at least their branch's `forced`; at each mixing
     /// node (bottom below its branch's depth) and each join, β's odd numerator and odd denominator,
     /// `max(1, bits) + 1` each, and its exponent, `max(1, bits|e|) + 2` with its sign; each stored
-    /// child's letter, `max(1, bits(letter)) + 1`; under the compacted storage (Decision 37) each
-    /// node's bottom depth, `max(1, bits) + 1` (its label's length is the difference from its
-    /// parent's), and each letter of the label pool, `max(1, bits) + 1`; one bit a splitting dyadic
-    /// cell and branch for its root's presence; and under the node-local law each node's own ratio
-    /// `γ`, as β. The totals (the masses' sum), the cached stop weight (read from β), the label ends
-    /// (indices into the pool) and the certificates are readings kept beside them and are not
-    /// counted.
+    /// child's letter, `max(1, bits(letter)) + 1`; each node's bottom depth and its label end (an
+    /// index into the pool), `max(1, bits) + 1` each (its label's length is the difference of its
+    /// bottom from its parent's; Decision 37), and each letter of the label pool,
+    /// `max(1, bits) + 1`; and one bit a splitting dyadic cell and branch for its root's presence.
+    /// A split keeps the lower part's key letter in the pool, where the chain held it, and stores
+    /// it again as the lower part's child letter, so that letter is counted twice: one letter a
+    /// split. The totals (the masses' sum), the cached stop weight (read from β) and the
+    /// certificates are readings kept beside them and are not counted.
     pub fn bits(&self) -> u64 {
         let slot = |value: u64| u64::from((u64::BITS - value.leading_zeros()).max(1)) + 1;
         let beta_bits = |beta: &Beta| {
             slot(beta.numerator) + slot(beta.denominator) + slot(beta.exponent.unsigned_abs()) + 1
         };
-        let compacted = self.law.storage == Storage::Compacted;
         let arena = &self.nodes.arena;
         let nodes: u64 = (0..arena.len())
             .map(|node| {
                 let word = arena.depths[node];
                 let branch = &self.law.branches[usize::from(word & BRANCH_BIT != 0)];
                 let at = (word & !BRANCH_BIT) as usize;
-                let depth = if compacted { slot(at as u64) } else { 0 };
+                let depth = slot(at as u64) + slot(u64::from(arena.ends[node]));
                 if at < branch.forced {
                     return depth;
                 }
@@ -3736,12 +3267,7 @@ impl Landmarks {
                 } else {
                     0
                 };
-                let own = self
-                    .nodes
-                    .own
-                    .get(node)
-                    .map_or(0, |own| beta_bits(&own.beta));
-                masses + beta + own + depth
+                masses + beta + depth
             })
             .sum();
         let letters: u64 = arena
@@ -3768,7 +3294,6 @@ impl Landmarks {
             .nodes
             .charts
             .iter()
-            .chain(&self.nodes.own)
             .chain(&self.nodes.joins);
         let (mut drift, mut node_rebases) = (0u128, 0u64);
         for chart in charts {
@@ -3785,15 +3310,16 @@ impl Landmarks {
     }
 
     /// **The rule's a-priori bound per cell**, in bits (module header, "The widths"):
-    /// `(1 + 2^(−min(M_p, W))) (3/2) B [(n* P² + 2P + 1) ε/μ̂ + n* P² (2^(1−W) + ρ_c)]` with
-    /// `ε/μ̂ = 1/(2⌊2^(M_p)/K⌋)`, `K = 2n* + 2`, and `ρ_c = 2^(1−R)` when the carrier rebases (else
-    /// `0`); below one grain at the derived widths, below half a grain without the carrier's rebase.
-    /// [proved-derived; agent-inferred] Under the compacted storage (Decision 37) each split rounds
-    /// its two ratios once at `W` bits (`Law::part`: each `1/m' < 2^(1−W)`): an arrival splits at most
-    /// one chain in each digit tree it opens, and adds the split's units once to its increment (a
-    /// further rebase of that arrival at one level), and a stored node's lineage is split at most
-    /// `D ≤ P` times, each time adding one unit to its drift; so the rebase term reads
-    /// `(2n* + 1) P² 2^(1−W) + n* P² ρ_c`, still below one grain.
+    /// `(1 + 2^(−min(M_p, W))) (3/2) B [(n* P² + 2P + 1) ε/μ̂ + (2n* + 1) P² 2^(1−W) + n* P² ρ_c]`
+    /// with `ε/μ̂ = 1/(2⌊2^(M_p)/K⌋)`, `K = 2n* + 2`, and `ρ_c = 2^(1−R)` when the carrier rebases
+    /// (else `0`). [proved-derived; agent-inferred] Stored where paths part (Decision 37), each
+    /// split rounds its two ratios once at `W` bits (`Law::part`: each `1/m' < 2^(1−W)`): an arrival
+    /// splits at most one chain in each digit tree it opens, and adds the split's units once to its
+    /// increment (a further rebase of that arrival at one level), and a stored node's lineage is
+    /// split at most `D ≤ P` times, each time adding one unit to its drift; so the mantissa term
+    /// reads `(2n* + 1) P² 2^(1−W)`, which the derived `W` holds within a quarter grain
+    /// ([`carrier_width`]). At the derived widths the rule is at most `(1 + 2^(−min(M_p, W))) · 3/4`
+    /// of a grain, and `· 1/2` without the carrier's rebase.
     pub fn face_rule(&self) -> Rat {
         let Widths {
             digits,
@@ -3811,11 +3337,7 @@ impl Landmarks {
         let floor = (BigInt::one() << face as usize)
             / BigInt::from(floor_reciprocal(declaration.population));
         let rounding = Rat::new(&paths + &d * 2 + 1, floor * 2);
-        let splits = if self.law.storage == Storage::Compacted {
-            &paths + &d * &d
-        } else {
-            BigInt::zero()
-        };
+        let splits = &paths + &d * &d;
         let mut rebases = Rat::from_integer(&paths + splits) * two_power(1 - carrier as i64);
         if rebase > 0 {
             rebases += Rat::from_integer(paths) * two_power(1 - rebase as i64);
@@ -3829,54 +3351,22 @@ impl Landmarks {
         Ok(self.score(address, class)?.executed)
     }
 
-    /// The node-local law the tree was declared under, if any (Decision 34).
-    pub fn local_law(&self) -> Option<LocalLaw> {
-        self.law.local.as_ref().map(|(law, _)| *law)
-    }
-
-    /// Checks an address, a class and its external faces: one per digit the class opens under the
-    /// node-local law, none otherwise.
-    fn check_with(
-        &self,
-        address: &[Letter],
-        class: usize,
-        external: &[u64],
-    ) -> Result<(), HnnError> {
-        check(&self.law.declaration, address, class)?;
-        self.law
-            .check_external(external, self.law.odometer.emitted(class).len())
-    }
-
     /// **Score one class** at an address at the current standing: its executed face and its
     /// certified residual, with nothing deposited.
     pub fn score(&self, address: &[Letter], class: usize) -> Result<CellReading, HnnError> {
-        self.score_with(address, class, &[])
-    }
-
-    /// **Score one class under the node-local law** (Decision 34): `external[i]` is the external
-    /// face's digit-0 numerator on `2^(−M_p)` at the `i`-th digit the class opens
-    /// ([`LandmarkDeclaration::emitted`] order), read causally at that digit (an external receiver
-    /// that walks the class's earlier digits, as the Born face does, supplies each at the state
-    /// they left). Empty for a tree without the law.
-    pub fn score_with(
-        &self,
-        address: &[Letter],
-        class: usize,
-        external: &[u64],
-    ) -> Result<CellReading, HnnError> {
-        self.check_with(address, class, external)?;
-        let reads = self.law.reads(&self.nodes, address, class, external);
+        check(&self.law.declaration, address, class)?;
+        let reads = self.law.reads(&self.nodes, address, class);
         Ok(self.law.reading(&self.nodes, &reads))
     }
 
     /// **The opened paths of one class** at an address, with their executed lattice faces: per
     /// opened digit, each branch's path.
     pub fn opened(&self, address: &[Letter], class: usize) -> Result<Vec<OpenedPath>, HnnError> {
-        self.check_with(address, class, &[])?;
+        check(&self.law.declaration, address, class)?;
         let law = &self.law;
         let scale = BigInt::one() << law.widths.face as usize;
         Ok(law
-            .reads(&self.nodes, address, class, &[])
+            .reads(&self.nodes, address, class)
             .into_iter()
             .flat_map(|digit| {
                 let dyadic = digit.dyadic;
@@ -3887,6 +3377,7 @@ impl Landmarks {
                 branch: read.branch,
                 symbol: read.symbol,
                 founded: read.nodes.len(),
+                bottoms: read.bottoms.clone(),
                 faces: read
                     .faces
                     .iter()
@@ -3910,37 +3401,15 @@ impl Landmarks {
     /// **The splits at an address** (module header, "Faces"): each splitting dyadic cell's
     /// executed digit-0 numerator, heap-ordered.
     pub fn splits(&self, address: &[Letter]) -> Result<Splits, HnnError> {
-        self.splits_with(address, &[])
-    }
-
-    /// **The splits under the node-local law**: `external` holds each splitting dyadic cell's
-    /// external digit-0 numerator on `2^(−M_p)`, heap-ordered ([`Landmarks::splitting`]); empty for
-    /// a tree without the law.
-    pub fn splits_with(&self, address: &[Letter], external: &[u64]) -> Result<Splits, HnnError> {
         check(&self.law.declaration, address, 0)?;
-        self.law
-            .check_external(external, self.law.odometer.splitting().len())?;
-        Ok(self.law.splits(&self.nodes, address, external))
+        Ok(self.law.splits(&self.nodes, address))
     }
 
     /// **All classes' executed faces at an address**, with their grain exponents at `grain`
     /// (module header, "Faces").
     pub fn face(&self, address: &[Letter], grain: u64) -> Result<LandmarkFace, HnnError> {
-        self.face_with(address, grain, &[])
-    }
-
-    /// **All classes' executed faces under the node-local law** (`external` as
-    /// [`Landmarks::splits_with`]).
-    pub fn face_with(
-        &self,
-        address: &[Letter],
-        grain: u64,
-        external: &[u64],
-    ) -> Result<LandmarkFace, HnnError> {
         check(&self.law.declaration, address, 0)?;
-        self.law
-            .check_external(external, self.law.odometer.splitting().len())?;
-        self.law.face(&self.nodes, address, grain, external)
+        self.law.face(&self.nodes, address, grain)
     }
 
     /// [definition; agent-inferred] **A window's faces in cell order** (module header, "A window
@@ -3950,8 +3419,7 @@ impl Landmarks {
     /// deposits wrote; the tree itself is unchanged. With nothing known every phase reads the
     /// current standing. The overlays are built in cell order, then the phases read together
     /// (`hnn::realization`: each reads its own overlay, and nothing is written). Refused at an
-    /// address or class outside the declaration, and for a tree under the node-local law (its
-    /// phases would need their external faces).
+    /// address or class outside the declaration.
     pub fn window_faces(
         &self,
         addresses: &[Vec<Letter>],
@@ -3970,13 +3438,6 @@ impl Landmarks {
         known: &[usize],
     ) -> Result<Vec<Splits>, HnnError> {
         let law = &self.law;
-        if law.is_local() {
-            return Err(shape(
-                "a window read of a tree without the node-local law",
-                0,
-                1,
-            ));
-        }
         for address in addresses {
             check(&law.declaration, address, 0)?;
         }
@@ -3988,14 +3449,14 @@ impl Landmarks {
         let mut working = Working::on(&self.nodes);
         let mut standings = Vec::with_capacity(deposits);
         for (address, &class) in addresses.iter().zip(known).take(deposits) {
-            let reads = law.reads(&working, address, class, &[]);
+            let reads = law.reads(&working, address, class);
             law.apply(&mut working, address, reads, admitted)?;
             standings.push(working.clone());
         }
         indexed(addresses.len(), |j| {
             Ok::<_, HnnError>(match j.min(deposits).checked_sub(1) {
-                Some(index) => law.splits(&standings[index], &addresses[j], &[]),
-                None => law.splits(&self.nodes, &addresses[j], &[]),
+                Some(index) => law.splits(&standings[index], &addresses[j]),
+                None => law.splits(&self.nodes, &addresses[j]),
             })
         })
     }
@@ -4016,25 +3477,13 @@ impl Landmarks {
     }
 
     /// **Deposit one cell** on the paths it opens, read at the current standing (module header):
-    /// each mixing node's β steps by `k(b)/q̂_(d+1)(b)` bottom-up and its certificates grow, the
-    /// path's missing nodes are founded at their depth's `β₀ = 2^(j_d) − 1` (the declared stop prior),
-    /// then each node's mass of the digit grows, and
-    /// each join's β steps. Refused before anything moves at a bad address or class, or past the
-    /// declared population.
+    /// each mixing chain's β steps by `k(b)/q̂_(ℓ+1)(b)` bottom-up and its certificates grow, a
+    /// chain the address parts from splits (Decision 37) and the arrival founds its leaf, then each
+    /// node's mass of the digit grows, and each join's β steps. Refused before anything moves at a
+    /// bad address or class, or past the declared population.
     pub fn deposit(&mut self, address: &[Letter], class: usize) -> Result<(), HnnError> {
-        self.deposit_with(address, class, &[])
-    }
-
-    /// **Deposit one cell under the node-local law** (`external` as [`Landmarks::score_with`]): each
-    /// founded node's own ratio steps by `k(b)/x̂(b)` and each mixing node's β by `ê(b)/q̂_(d+1)(b)`.
-    pub fn deposit_with(
-        &mut self,
-        address: &[Letter],
-        class: usize,
-        external: &[u64],
-    ) -> Result<(), HnnError> {
-        self.check_with(address, class, external)?;
-        let reads = self.law.reads(&self.nodes, address, class, external);
+        check(&self.law.declaration, address, class)?;
+        let reads = self.law.reads(&self.nodes, address, class);
         let population = self.law.declaration.population;
         self.law
             .apply(&mut self.nodes, address, reads, population)
@@ -4043,17 +3492,7 @@ impl Landmarks {
 
     /// **Receive one cell**: score it at the current standing, then deposit it.
     pub fn receive(&mut self, address: &[Letter], class: usize) -> Result<CellReading, HnnError> {
-        self.receive_with(address, class, &[])
-    }
-
-    /// **Receive one cell under the node-local law** (`external` as [`Landmarks::score_with`]).
-    pub fn receive_with(
-        &mut self,
-        address: &[Letter],
-        class: usize,
-        external: &[u64],
-    ) -> Result<CellReading, HnnError> {
-        Ok(self.receive_digits(address, class, external)?.reading)
+        Ok(self.receive_digits(address, class)?.reading)
     }
 
     /// **Receive one cell, digit by digit** (the development harness's and a join's reading): the
@@ -4063,10 +3502,9 @@ impl Landmarks {
         &mut self,
         address: &[Letter],
         class: usize,
-        external: &[u64],
     ) -> Result<DigitsReading, HnnError> {
-        self.check_with(address, class, external)?;
-        let reads = self.law.reads(&self.nodes, address, class, external);
+        check(&self.law.declaration, address, class)?;
+        let reads = self.law.reads(&self.nodes, address, class);
         let reading = self.law.reading(&self.nodes, &reads);
         let digits: Vec<DigitReading> = reads
             .iter()
@@ -4092,19 +3530,20 @@ impl Landmarks {
         })
     }
 
-    /// **The nodes and joins a deposit touches** (the mirror's per-deposit lockstep): the founded
-    /// nodes of every branch's path of every digit `class` opens at `address`, and the opened
-    /// dyadic cells (whose joins an enlarged tree steps), read at the current standing: after the
-    /// deposit of the full arena every node of its paths is founded (a compacted split's new upper
-    /// part is not among them). Each sorted, without repeats.
+    /// **The stored nodes and joins a deposit writes** (the mirror's per-deposit lockstep), read at
+    /// the current standing before it: every stored node of every branch's walk of every digit
+    /// `class` opens at `address` (their masses and charts step, and a parting chain's lower part
+    /// takes `β_ℓ`), and the opened dyadic cells (whose joins an enlarged tree steps). The nodes the
+    /// deposit founds (the parting chains' upper parts and the leaves) are numbered after the stored
+    /// ones. Each sorted, without repeats.
     pub fn touched(
         &self,
         address: &[Letter],
         class: usize,
     ) -> Result<(Vec<u32>, Vec<usize>), HnnError> {
-        self.check_with(address, class, &[])?;
+        check(&self.law.declaration, address, class)?;
         let (mut nodes, mut dyadic) = (Vec::new(), Vec::new());
-        for digit in self.law.reads(&self.nodes, address, class, &[]) {
+        for digit in self.law.reads(&self.nodes, address, class) {
             dyadic.push(digit.dyadic);
             for read in digit.reads {
                 nodes.extend(read.nodes);
@@ -4119,7 +3558,8 @@ impl Landmarks {
 
     /// **The arena as flat words** (module header, "The arena"; the layout the card ports): the
     /// roots per tree (`u32::MAX` unfounded), the children as `(key, child)` pairs, each node's
-    /// depth word and masses, each node's chart `(β_n, β_d, β_e, λ̂)`, and each join's.
+    /// depth word, label end and masses, the label pool, each node's chart `(β_n, β_d, β_e, λ̂)`,
+    /// and each join's.
     pub fn arena(&self) -> ArenaView<'_> {
         ArenaView { tree: self }
     }
@@ -4183,6 +3623,22 @@ impl ArenaView<'_> {
     /// Each node's two half-unit masses.
     pub fn halves(&self) -> &[[u32; 2]] {
         &self.tree.nodes.arena.halves
+    }
+
+    /// Each node's depth word: its bottom depth, its branch (the bundle tree) in the top bit.
+    pub fn words(&self) -> &[u32] {
+        &self.tree.nodes.arena.depths
+    }
+
+    /// Each node's label end: one past its bottom's letter in the label pool (Decision 37).
+    pub fn ends(&self) -> &[u32] {
+        &self.tree.nodes.arena.ends
+    }
+
+    /// The label pool's letters: each node's label, the letters below its top to its bottom, ends
+    /// at its label end.
+    pub fn labels(&self) -> &[u32] {
+        &self.tree.nodes.arena.letters
     }
 
     /// Each node's chart.
@@ -4374,20 +3830,17 @@ fn dyadic_grain_exponent(
 // the reference oracle
 
 /// [definition] **The ideal tree weighting, the reference oracle** (module header): the executed
-/// tree's arena with `β` in ℚ and every path face exact, `q_D = k_D`,
-/// `q_d = (β k_d + q_(d+1))/(1 + β)`, each node founded at its depth's `β₀ = 2^(j_d) − 1` (the
-/// declared stop prior), the deposit `β' = β k/q_(d+1)` on the exact faces, and in an enlarged tree
-/// each join `q_h = (β_h q_cells + q_bundles)/(1 + β_h)` from `β_h = 1`,
-/// `β'_h = β_h q_cells/q_bundles`. Under the node-local law (Decision 34) each node's own face
-/// `e = (γ k + x)/(1 + γ)` takes the KT face's place, its own ratio founded at `γ₀ ½/x(b)` and stepped
-/// `γ' = γ k(b)/x(b)`, and an unfounded node reads `e₀ = (γ₀ ½ + x)/(1 + γ₀)`; the external face `x`
-/// is the one the executed tree reads, exact. Under the compacted storage (Decision 37,
-/// [`Storage::Compacted`]) each stored chain is one node at its summed rung, split exactly in ℚ
-/// (`β_ℓ = β (2^(S_low) − 1)/(2^S − 1)`, `β_u = (2^(S_up) − 1) 2^(S_low) β/(β (2^(S_low) − 1) + 2^S − 1)`,
-/// `2^(S_up) − 1` above a leaf): its faces are the full arena's, exactly
-/// (`compacted_is_decision_28`).
-/// With no width `β` is exact (the tests); at a width it is rebased past it with the residual
-/// `1/m'`.
+/// tree's arena, stored at the faces where paths part (Decision 37), with `β` in ℚ and every path
+/// face exact: along an opened path `q_top = k` at a leaf (`½` past the last stored level),
+/// `q_ℓ = (β_ℓ k_ℓ + q_(ℓ+1))/(1 + β_ℓ)` at each stored chain, the deposit `β' = β k/q_(ℓ+1)` on the
+/// exact faces, and in an enlarged tree each join `q_h = (β_h q_cells + q_bundles)/(1 + β_h)` from
+/// `β_h = 1`, `β'_h = β_h q_cells/q_bundles`. Each stored chain is one node at its summed rung,
+/// split exactly in ℚ (`β_ℓ = β (2^(S_low) − 1)/(2^S − 1)`,
+/// `β_u = (2^(S_up) − 1) 2^(S_low) β/(β (2^(S_low) − 1) + 2^S − 1)`, `2^(S_up) − 1` above a leaf):
+/// its faces are Decision 28's tree's (one node a depth, each founded at `β₀ = 2^(j_d) − 1`),
+/// exactly (`compacted_is_decision_28`; the tests hold it against a full reference kept in
+/// `hnn/tests`). With no width `β` is exact (the tests); at a width it is rebased past it with
+/// the residual `1/m'`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct IdealLandmarks {
     declaration: LandmarkDeclaration,
@@ -4396,17 +3849,14 @@ pub struct IdealLandmarks {
     sums: Vec<Vec<u64>>,
     arena: Arena,
     beta: Vec<Rat>,
-    own: Vec<Rat>,
     joins: Vec<Rat>,
-    local: Option<LocalLaw>,
     width: Option<u64>,
     rebases: u64,
-    storage: Storage,
 }
 
 /// One branch's ideal read: where it stops, the stored nodes with each level's bottom (the parting
 /// chain's the depth where it parts), the parting chain's upper and lower ratios (none kept below
-/// when the lower part keeps its `β`), the faces and the own faces.
+/// when the lower part keeps its `β`), and the faces.
 struct IdealRead {
     branch: usize,
     stop: Stop,
@@ -4414,7 +3864,6 @@ struct IdealRead {
     bottoms: Vec<usize>,
     parting: Option<(usize, Rat, Option<Rat>)>,
     faces: Vec<Rat>,
-    own: Vec<Rat>,
 }
 
 impl IdealRead {
@@ -4428,29 +3877,11 @@ struct IdealDigit {
     symbol: usize,
     reads: Vec<IdealRead>,
     face: Rat,
-    external: Option<Rat>,
 }
 
 impl IdealLandmarks {
     /// **Declare the oracle**, empty, with `β` exact (`width = None`) or carried at a width.
     pub fn new(declaration: LandmarkDeclaration, width: Option<u64>) -> Result<Self, HnnError> {
-        Self::declare(declaration, width, None)
-    }
-
-    /// **Declare the oracle under the node-local law** (Decision 34).
-    pub fn local(
-        declaration: LandmarkDeclaration,
-        width: Option<u64>,
-        law: LocalLaw,
-    ) -> Result<Self, HnnError> {
-        Self::declare(declaration, width, Some(law))
-    }
-
-    fn declare(
-        declaration: LandmarkDeclaration,
-        width: Option<u64>,
-        local: Option<LocalLaw>,
-    ) -> Result<Self, HnnError> {
         check_declaration(&declaration)?;
         let digits = odometer_digits(declaration.alphabet);
         let branches: Vec<Branch> = declaration
@@ -4474,32 +3905,14 @@ impl IdealLandmarks {
                 digits,
             },
             arena: Arena::new(branches.len() * cells),
-            sums: rung_sums(&declaration, &branches),
+            sums: declaration.rung_sums(),
             branches,
             declaration,
             beta: Vec::new(),
-            own: Vec::new(),
             joins,
-            local,
             width,
             rebases: 0,
-            storage: Storage::Full,
         })
-    }
-
-    /// [definition; agent-inferred] **Declare how the oracle stores its landmarks** ([`Storage`];
-    /// the executed tree's [`Landmarks::with_storage`]), on an oracle nothing has reached yet.
-    pub fn with_storage(mut self, storage: Storage) -> Result<Self, HnnError> {
-        if self.arena.len() > 0 {
-            return Err(shape("a storage declared before any arrival", 0, 1));
-        }
-        self.storage = storage;
-        Ok(self)
-    }
-
-    /// How the oracle stores its landmarks.
-    pub fn storage(&self) -> Storage {
-        self.storage
     }
 
     /// The stored nodes.
@@ -4547,14 +3960,6 @@ impl IdealLandmarks {
         self.declaration.letters(address)
     }
 
-    /// The unfounded own face `e₀(b) = (γ₀ ½ + x(b))/(1 + γ₀)` under the node-local law.
-    fn unfounded(&self, external: &Rat) -> Rat {
-        let founding = Rat::from_integer(BigInt::from(
-            self.local.expect("the node-local law").founding(),
-        ));
-        (&founding * Rat::new(BigInt::one(), BigInt::from(2)) + external) / (Rat::one() + founding)
-    }
-
     /// The ratio `2^k − 1`.
     fn ladder_ratio(rung: u64) -> Rat {
         Rat::from_integer(BigInt::from(ladder(rung)))
@@ -4586,14 +3991,7 @@ impl IdealLandmarks {
         (upper, Some(lower))
     }
 
-    fn read(
-        &self,
-        branch: usize,
-        dyadic: usize,
-        symbol: usize,
-        letters: &[u32],
-        external: Option<&Rat>,
-    ) -> IdealRead {
+    fn read(&self, branch: usize, dyadic: usize, symbol: usize, letters: &[u32]) -> IdealRead {
         let Branch { forced, .. } = self.branches[branch];
         let tree = branch * (1usize << self.odometer.digits) + dyadic;
         let Walk {
@@ -4613,29 +4011,9 @@ impl IdealLandmarks {
             Stop::Node => nodes.len() - 1,
             Stop::Prior => nodes.len(),
         };
-        let own: Vec<Rat> = match external {
-            Some(x) => (0..nodes.len())
-                .map(|level| {
-                    if bottoms[level] < forced {
-                        Rat::zero()
-                    } else {
-                        let gamma = &self.own[nodes[level] as usize];
-                        (gamma * self.kt(nodes[level], symbol) + x) / (Rat::one() + gamma)
-                    }
-                })
-                .collect(),
-            None => Vec::new(),
-        };
-        let prior = match external {
-            Some(x) => self.unfounded(x),
-            None => Rat::new(BigInt::one(), BigInt::from(2)),
-        };
-        let mut faces = vec![prior; top + 1];
+        let mut faces = vec![Rat::new(BigInt::one(), BigInt::from(2)); top + 1];
         if stop == Stop::Node {
-            faces[top] = match external {
-                Some(_) => own[top].clone(),
-                None => self.kt(nodes[top], symbol),
-            };
+            faces[top] = self.kt(nodes[top], symbol);
         }
         for level in (0..top).rev() {
             faces[level] = if bottoms[level] < forced {
@@ -4645,11 +4023,7 @@ impl IdealLandmarks {
                     Some((_, upper, _)) if level + 1 == nodes.len() => upper,
                     _ => &self.beta[nodes[level] as usize],
                 };
-                let face = match external {
-                    Some(_) => own[level].clone(),
-                    None => self.kt(nodes[level], symbol),
-                };
-                (beta * face + &faces[level + 1]) / (Rat::one() + beta)
+                (beta * self.kt(nodes[level], symbol) + &faces[level + 1]) / (Rat::one() + beta)
             };
         }
         IdealRead {
@@ -4659,27 +4033,17 @@ impl IdealLandmarks {
             bottoms,
             parting,
             faces,
-            own,
         }
     }
 
-    fn reads(&self, address: &[Letter], class: usize, external: &[Rat]) -> Vec<IdealDigit> {
+    fn reads(&self, address: &[Letter], class: usize) -> Vec<IdealDigit> {
         let letters = self.flatten(address);
         self.odometer
             .emitted(class)
             .into_iter()
-            .enumerate()
-            .map(|(index, (dyadic, symbol))| {
-                // The external face of the observed side.
-                let x = external.get(index).map(|zero| {
-                    if symbol == 0 {
-                        zero.clone()
-                    } else {
-                        Rat::one() - zero
-                    }
-                });
+            .map(|(dyadic, symbol)| {
                 let reads: Vec<IdealRead> = (0..self.branches.len())
-                    .map(|branch| self.read(branch, dyadic, symbol, &letters[branch], x.as_ref()))
+                    .map(|branch| self.read(branch, dyadic, symbol, &letters[branch]))
                     .collect();
                 let face = if reads.len() > 1 {
                     let beta = &self.joins[dyadic];
@@ -4692,49 +4056,16 @@ impl IdealLandmarks {
                     symbol,
                     reads,
                     face,
-                    external: x,
                 }
             })
             .collect()
     }
 
-    fn check_external(&self, class: usize, external: &[Rat]) -> Result<(), HnnError> {
-        let wanted = if self.local.is_some() {
-            self.odometer.emitted(class).len()
-        } else {
-            0
-        };
-        if external.len() != wanted
-            || external
-                .iter()
-                .any(|x| !x.is_positive() || x >= &Rat::one())
-        {
-            return Err(shape(
-                "one external digit-0 face in (0, 1) per opened digit under the node-local law",
-                wanted,
-                external.len(),
-            ));
-        }
-        Ok(())
-    }
-
     /// **The ideal face of one class** at an address, exact.
     pub fn probability(&self, address: &[Letter], class: usize) -> Result<Rat, HnnError> {
-        self.probability_with(address, class, &[])
-    }
-
-    /// **The ideal face of one class under the node-local law**: `external[i]` the external face's
-    /// digit-0 face at the `i`-th opened digit, exact (the executed tree's numerator over `2^(M_p)`).
-    pub fn probability_with(
-        &self,
-        address: &[Letter],
-        class: usize,
-        external: &[Rat],
-    ) -> Result<Rat, HnnError> {
         check(&self.declaration, address, class)?;
-        self.check_external(class, external)?;
         Ok(self
-            .reads(address, class, external)
+            .reads(address, class)
             .iter()
             .map(|digit| digit.face.clone())
             .product())
@@ -4744,9 +4075,8 @@ impl IdealLandmarks {
     /// node; a parting chain's upper part carries its split `β`).
     pub fn opened(&self, address: &[Letter], class: usize) -> Result<Vec<OpenedPath>, HnnError> {
         check(&self.declaration, address, class)?;
-        self.check_external(class, &[])?;
         let mut paths = Vec::new();
-        for digit in self.reads(address, class, &[]) {
+        for digit in self.reads(address, class) {
             for read in digit.reads {
                 let betas = (0..read.nodes.len())
                     .map(|level| match &read.parting {
@@ -4759,6 +4089,7 @@ impl IdealLandmarks {
                     branch: read.branch,
                     symbol: digit.symbol,
                     founded: read.nodes.len(),
+                    bottoms: read.bottoms.clone(),
                     masses: read
                         .nodes
                         .iter()
@@ -4772,11 +4103,6 @@ impl IdealLandmarks {
         Ok(paths)
     }
 
-    /// **Receive one cell**: its ideal face at the current standing, then its deposit.
-    pub fn receive(&mut self, address: &[Letter], class: usize) -> Result<Rat, HnnError> {
-        self.receive_with(address, class, &[])
-    }
-
     /// A ratio carried at the oracle's width, its rebase counted.
     fn carry(&mut self, value: &Rat) -> Rat {
         let (carried, rebased) = carried_ratio(value, self.width);
@@ -4784,17 +4110,10 @@ impl IdealLandmarks {
         carried
     }
 
-    /// **Receive one cell under the node-local law** (`external` as
-    /// [`IdealLandmarks::probability_with`]).
-    pub fn receive_with(
-        &mut self,
-        address: &[Letter],
-        class: usize,
-        external: &[Rat],
-    ) -> Result<Rat, HnnError> {
+    /// **Receive one cell**: its ideal face at the current standing, then its deposit.
+    pub fn receive(&mut self, address: &[Letter], class: usize) -> Result<Rat, HnnError> {
         check(&self.declaration, address, class)?;
-        self.check_external(class, external)?;
-        let digits = self.reads(address, class, external);
+        let digits = self.reads(address, class);
         let letters = self.flatten(address);
         let founding: usize = letters.iter().map(|l| l.len() + 1).sum();
         let held: usize = letters.iter().map(Vec::len).sum();
@@ -4804,9 +4123,6 @@ impl IdealLandmarks {
         // Decision 37: each branch's label run, held once and shared by the leaves it founds.
         let runs: Vec<Option<u32>> = (0..self.branches.len())
             .map(|branch| {
-                if self.storage != Storage::Compacted {
-                    return None;
-                }
                 let top = digits
                     .iter()
                     .map(|digit| &digit.reads[branch])
@@ -4823,25 +4139,15 @@ impl IdealLandmarks {
                 self.joins[digit.dyadic] = self.carry(&stepped);
             }
             for read in digit.reads {
-                self.deposit_read(
-                    read,
-                    &letters,
-                    &runs,
-                    digit.dyadic,
-                    digit.symbol,
-                    digit.external.as_ref(),
-                    cells,
-                );
+                self.deposit_read(read, &letters, &runs, digit.dyadic, digit.symbol, cells);
             }
         }
         Ok(face)
     }
 
-    /// **Deposit one branch's ideal read**: each mixing level's `β` (the parting chain's upper part
-    /// on its split `β`) and each stored level's own ratio step, then the storage acts (the full
-    /// arena founds the path's missing nodes; compacted, the parting chain splits and the arrival
-    /// founds its leaf), then each node's mass of the digit grows.
-    #[allow(clippy::too_many_arguments)]
+    /// **Deposit one branch's ideal read**: each mixing level's `β` steps (the parting chain's
+    /// upper part on its split `β`), then the parting chain splits and an arrival stopped at the
+    /// prior founds its leaf, then each node's mass of the digit grows.
     fn deposit_read(
         &mut self,
         read: IdealRead,
@@ -4849,51 +4155,26 @@ impl IdealLandmarks {
         runs: &[Option<u32>],
         dyadic: usize,
         symbol: usize,
-        external: Option<&Rat>,
         cells: usize,
     ) {
         let forced = self.branches[read.branch].forced;
         let top = read.faces.len() - 1;
         let levels = read.nodes.len();
         let mut upper = read.parting.as_ref().map(|(_, upper, _)| upper.clone());
-        let mut upper_own = match (&read.parting, external, read.nodes.last()) {
-            (Some(_), Some(_), Some(&chain)) => Some(self.own[chain as usize].clone()),
-            _ => None,
-        };
         for level in (0..levels.min(top)).rev() {
             if read.bottoms[level] < forced {
                 break;
             }
             let node = read.nodes[level] as usize;
-            let own = match external {
-                Some(_) => read.own[level].clone(),
-                None => self.kt(read.nodes[level], symbol),
-            };
+            let kt = self.kt(read.nodes[level], symbol);
             let beta = match &upper {
                 Some(upper) if read.parts(level) => upper.clone(),
                 _ => self.beta[node].clone(),
             };
-            let stepped = self.carry(&(beta * own / &read.faces[level + 1]));
+            let stepped = self.carry(&(beta * kt / &read.faces[level + 1]));
             match upper.as_mut() {
                 Some(upper) if read.parts(level) => *upper = stepped,
                 _ => self.beta[node] = stepped,
-            }
-        }
-        if let Some(x) = external {
-            for level in 0..levels {
-                if read.bottoms[level] < forced {
-                    continue;
-                }
-                let node = read.nodes[level] as usize;
-                let gamma = match &upper_own {
-                    Some(own) if read.parts(level) => own.clone(),
-                    _ => self.own[node].clone(),
-                };
-                let stepped = self.carry(&(gamma * self.kt(read.nodes[level], symbol) / x));
-                match upper_own.as_mut() {
-                    Some(own) if read.parts(level) => *own = stepped,
-                    _ => self.own[node] = stepped,
-                }
             }
         }
         let IdealRead {
@@ -4906,71 +4187,37 @@ impl IdealLandmarks {
         let letters = &letters[branch];
         let depth = letters.len();
         let tree = branch * cells + dyadic;
-        // Under the node-local law a founded node's own ratio is `γ₀ ½/x(b)` (its first arrival).
-        let first = match (self.local, external) {
-            (Some(law), Some(x)) => Some(carried_ratio(
-                &(Rat::from_integer(BigInt::from(law.founding()))
-                    * Rat::new(BigInt::one(), BigInt::from(2))
-                    / x),
-                self.width,
-            )),
-            _ => None,
-        };
-        match self.storage {
-            Storage::Full => {
-                let founded = self.arena.extend(tree, branch, letters, &mut nodes);
-                // Each founded node at its depth's β₀ = 2^(j_d) − 1 (the declared stop prior).
-                let prior = &self.declaration.prior;
-                self.beta.extend(
-                    (nodes.len() - founded..nodes.len())
-                        .map(|depth| Rat::from_integer(BigInt::from(prior.founding(depth)))),
-                );
-                if let Some((gamma, rebased)) = first {
-                    self.rebases += u64::from(rebased) * founded as u64;
-                    self.own.extend(std::iter::repeat_n(gamma, founded));
-                }
+        if let Some((at, _, lower)) = parting {
+            let chain = nodes.pop().expect("a parting chain");
+            let chain_top = nodes.last().map_or(0, |&p| self.arena.bottom(p) + 1);
+            let bottom = self.arena.bottom(chain);
+            let end = self.arena.end(chain) - u32::try_from(bottom - at).expect("a depth");
+            let halves = if at >= forced {
+                self.arena.halves(chain)
+            } else {
+                [1, 1]
+            };
+            let key = self.arena.label(chain, at + 1);
+            if let Some(lower) = lower {
+                self.beta[chain as usize] = self.carry(&lower);
             }
-            Storage::Compacted => {
-                if let Some((at, _, lower)) = parting {
-                    let chain = nodes.pop().expect("a parting chain");
-                    let chain_top = nodes.last().map_or(0, |&p| self.arena.bottom(p) + 1);
-                    let bottom = self.arena.bottom(chain);
-                    let end = self.arena.end(chain) - u32::try_from(bottom - at).expect("a depth");
-                    let halves = if at >= forced {
-                        self.arena.halves(chain)
-                    } else {
-                        [1, 1]
-                    };
-                    let key = self.arena.label(chain, at + 1);
-                    if let Some(lower) = lower {
-                        self.beta[chain as usize] = self.carry(&lower);
-                    }
-                    let node = self.arena.push(branch, at, halves, Some(end));
-                    self.beta
-                        .push(upper.expect("the parting chain's upper part"));
-                    if let Some(own) = upper_own {
-                        self.own.push(own);
-                    }
-                    let parent = nodes.last().map(|&p| (p, letters[chain_top - 1]));
-                    self.arena.link(tree, parent, node);
-                    self.arena.link(tree, Some((node, key)), chain);
-                    nodes.push(node);
-                }
-                if stop == Stop::Prior {
-                    let leaf_top = nodes.last().map_or(0, |&p| self.arena.bottom(p) + 1);
-                    let run = runs[branch].expect("a compacted arrival's label run");
-                    let leaf = self.arena.push(branch, depth, [1, 1], Some(run));
-                    let founding = self.declaration.prior.founding(depth);
-                    self.beta.push(Rat::from_integer(BigInt::from(founding)));
-                    if let Some((gamma, rebased)) = first {
-                        self.rebases += u64::from(rebased);
-                        self.own.push(gamma);
-                    }
-                    let parent = nodes.last().map(|&p| (p, letters[leaf_top - 1]));
-                    self.arena.link(tree, parent, leaf);
-                    nodes.push(leaf);
-                }
-            }
+            let node = self.arena.push(branch, at, halves, end);
+            self.beta
+                .push(upper.expect("the parting chain's upper part"));
+            let parent = nodes.last().map(|&p| (p, letters[chain_top - 1]));
+            self.arena.link(tree, parent, node);
+            self.arena.link(tree, Some((node, key)), chain);
+            nodes.push(node);
+        }
+        if stop == Stop::Prior {
+            let leaf_top = nodes.last().map_or(0, |&p| self.arena.bottom(p) + 1);
+            let run = runs[branch].expect("an arrival's label run");
+            let leaf = self.arena.push(branch, depth, [1, 1], run);
+            let founding = self.declaration.prior.founding(depth);
+            self.beta.push(Rat::from_integer(BigInt::from(founding)));
+            let parent = nodes.last().map(|&p| (p, letters[leaf_top - 1]));
+            self.arena.link(tree, parent, leaf);
+            nodes.push(leaf);
         }
         self.arena.count(&nodes, forced, symbol);
     }
@@ -5418,12 +4665,12 @@ impl StopMixture {
     /// digits' certificates in bits.
     pub fn receive(&mut self, address: &[Letter], class: usize) -> Result<CellReading, HnnError> {
         for tree in &self.trees {
-            tree.check_with(address, class, &[])?;
+            check(tree.declaration(), address, class)?;
         }
         let readings = self
             .trees
             .iter_mut()
-            .map(|tree| tree.receive_digits(address, class, &[]))
+            .map(|tree| tree.receive_digits(address, class))
             .collect::<Result<Vec<DigitsReading>, HnnError>>()?;
         let widths = self.trees[0].widths();
         let full = 1u64 << widths.face;
@@ -5467,13 +4714,12 @@ pub struct Coded {
     pub cells: u64,
 }
 
-/// [definition] **One tree's run**: its declaration, its storage and widths, its chart's report, its
-/// stored nodes, its label pool's letters (Decision 37) and stored bits, the rule's a-priori
-/// residual a cell and the largest per-cell certified residual over the run.
+/// [definition] **One tree's run**: its declaration and widths, its chart's report, its stored nodes,
+/// its label pool's letters (Decision 37) and stored bits, the rule's a-priori residual a cell and
+/// the largest per-cell certified residual over the run.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TreeRun {
     pub declaration: LandmarkDeclaration,
-    pub storage: Storage,
     pub widths: Widths,
     pub chart: ChartReport,
     pub nodes: usize,
@@ -5863,10 +5109,9 @@ fn run_tree(
     letters: &[Letter],
     held_out: &(dyn Fn(usize) -> bool + Sync),
     declaration: &LandmarkDeclaration,
-    storage: Storage,
 ) -> Result<([ExactInterval; 2], TreeRun), HnnError> {
     aligned(cells, letters)?;
-    let mut tree = Landmarks::new(declaration.clone())?.with_storage(storage)?;
+    let mut tree = Landmarks::new(declaration.clone())?;
     let mut codes = [PassageCode::new(), PassageCode::new()];
     let mut largest_residual = Rat::zero();
     for (position, &class) in cells.iter().enumerate() {
@@ -5880,7 +5125,6 @@ fn run_tree(
         [codes[0].bits()?, codes[1].bits()?],
         TreeRun {
             declaration: declaration.clone(),
-            storage,
             widths: tree.widths(),
             chart: tree.chart(),
             nodes: tree.nodes(),
@@ -5936,7 +5180,7 @@ pub fn prequential(
 ) -> Result<Prequential, HnnError> {
     let held_out = |position: usize| cut.held_out(position);
     let (tree, baselines) = rayon::join(
-        || run_tree(&cut.cells, letters, &held_out, declaration, Storage::Full),
+        || run_tree(&cut.cells, letters, &held_out, declaration),
         || run_baselines(&cut.cells, &held_out, declaration.alphabet),
     );
     let ([development_tree, held_tree], run) = tree?;
@@ -5987,7 +5231,7 @@ pub fn development_run(
     let cells = development(cut);
     let letters = development_letters(cut, letters);
     let never = |_: usize| false;
-    let ([bits, _], run) = run_tree(&cells, &letters, &never, declaration, Storage::Full)?;
+    let ([bits, _], run) = run_tree(&cells, &letters, &never, declaration)?;
     Ok((bits, run))
 }
 
@@ -6023,7 +5267,7 @@ pub fn choose_depth_within(
             depth,
             ..declaration.clone()
         };
-        let ([bits, _], _) = run_tree(&cells, &letters, &never, &declared, Storage::Full)?;
+        let ([bits, _], _) = run_tree(&cells, &letters, &never, &declared)?;
         tried.push((depth, bits));
         if !DepthSweep::decreasing(&tried) || depth >= cells.len() || depth >= deepest {
             break;
@@ -6043,7 +5287,7 @@ pub fn tree_prequential(
 ) -> Result<([ExactInterval; 2], TreeRun), HnnError> {
     aligned(&cut.cells, letters)?;
     let held_out = |position: usize| cut.held_out(position);
-    run_tree(&cut.cells, letters, &held_out, declaration, Storage::Full)
+    run_tree(&cut.cells, letters, &held_out, declaration)
 }
 
 /// [definition] **A stop-prior sweep on the development cells** ([`choose_prior`]): every law tried

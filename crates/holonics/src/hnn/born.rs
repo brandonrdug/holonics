@@ -121,10 +121,12 @@
 //! emissions, `χ ≤ 256`) lowers Decision 30's mixture below the tree; the mixture telescopes to
 //! `½W_T + ½W_B`, so it codes below the tree only where the Born face alone does.
 //!
-//! [established-bounded; measured] **Weighed locally** (Decision 34; notebook `hnn_landmark -- …
-//! local`): the Born face's digit split ([`DigitOperand::numerator`], read causally at each digit)
-//! is the external face of the landmark tree's node-local law (`hnn::landmark::Landmarks::local`)
-//! and one face of the switching mixture (`hnn::receiving::Mixture::switching`). Its oracle against
+//! [established-bounded; measured] **Weighed locally** (Decision 34; the notebook `hnn_landmark`'s
+//! retired `local` mode, commit `d2a2e0db`): the Born face's digit split
+//! ([`DigitOperand::numerator`], read causally at each digit) was the external face of the landmark
+//! tree's node-local law (retired, its realization at commit `89460425`, its law in Lean
+//! `HNN/LocalWeighing`) and is one face of the switching mixture
+//! (`hnn::receiving::Mixture::switching`). Its oracle against
 //! the tree on the development cells is large at the digit and cell grains (`−3499 + 10/16 + ε` and
 //! `−1531 + 9/16 + ε` bits at `Dyadic` `χ = 128`) and small at the dyadic-cell grain
 //! (`−46 + 3/16 + ε`). Both local laws code below the tree on the development cells, charged

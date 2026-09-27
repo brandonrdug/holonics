@@ -231,7 +231,7 @@ fn the_phase_address_is_the_trees_causal_address() {
 /// **The receiver declares its tree, and the field codes it** (guard 13): the tree's declaration
 /// is the field's `|A|` and population, the receiver's depth and grain, the cell emitted as its odometer digits, with
 /// no forced split; campaign 1 declares `D = 4`, and at `n* = 6,148 = 2²·29·53`, `L_R = 16`, `B = 8`
-/// the owner derives the path lattice `M_p = 39` and the β carrier `W = 28`. A change of depth changes the field's code; the initial
+/// the owner derives the path lattice `M_p = 39` and the β carrier `W = 29`. A change of depth changes the field's code; the initial
 /// constitution carries a tree on the receiving ring only, empty, and its receiving map `R_0 = 0`
 /// and source port `E_0` the declared sign generator times ½ (entries `±½`).
 #[test]
@@ -255,7 +255,7 @@ fn the_field_declares_the_tree_and_codes_it() {
     );
     assert_eq!((declared.population, declared.grain), (6_148, 16));
     let widths = Widths::derived(&declared);
-    assert_eq!((widths.digits, widths.face, widths.carrier), (8, 39, 28));
+    assert_eq!((widths.digits, widths.face, widths.carrier), (8, 39, 29));
     let theta = Constitution::initial(&campaign, steps, CAMPAIGN_ONE_BUDGET).unwrap();
     let tree = theta.landmarks(2).unwrap();
     assert_eq!(tree.declaration(), &declared);

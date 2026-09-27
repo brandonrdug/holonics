@@ -847,17 +847,24 @@ fn tree_parity(
     mirror.times()
 }
 
-/// **The landmark tree on the card reads and deposits as the host's** (campaign 2; Decision 25;
-/// `kernels/tree.cu`): the cell-only tree at campaign 1's `|A| = 256`, `D = 4` and at five classes
-/// with a forced split (the odometer's forced digits), a narrow carrier forcing the β chart's
-/// rebases; and the enlarged tree (the cell branch and the bundle branch joined at every dyadic
-/// cell) with two phase slots. Every window's splits in cell order are the host's, word for word,
-/// and after the deposits the card's arena (roots, children, masses, charts, joins) is the host's.
+/// **The landmark tree on the card, stored where paths part, reads and deposits as the host's**
+/// (campaign 2; Decisions 25 and 37; `kernels/tree.cu`): the cell-only tree at campaign 1's
+/// `|A| = 256`, `D = 4`, and past the stream's recurrence at `D = 24` under the global rung 2 and at
+/// `D = 48` under Decision 28's `½` (long chains, their labels to the boundary letters, splits of
+/// internal chains); at five classes with a forced split (the odometer's forced digits) and a
+/// narrow carrier forcing the β chart's rebases and the splits' mantissas, at `D = 2` and at `D = 9`
+/// under the per-depth prior `(2, 5)`; and the enlarged tree (the cell branch and the bundle branch
+/// joined at every dyadic cell) with two phase slots, at `D = 2` and at `D = 9` under the global
+/// rung 2 (a bundle branch of 27 letters), and at `|A| = 256`. Every window's splits in cell order,
+/// at apertures 2 and 3, known targets and none, are the host's word for word, and after the
+/// deposits the card's arena (roots, children, depth words, label ends, masses, charts, joins,
+/// labels) is the host's.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_card_tree_reads_and_deposits_as_the_host_tree() {
     use holonics::hnn::landmark::{
-        Bundle, Feature, LandmarkDeclaration, Landmarks, Letter, LetterFamily, cell_letters,
+        Bundle, Feature, LandmarkDeclaration, Landmarks, Letter, LetterFamily, StopPrior,
+        cell_letters,
     };
     let card = card();
     let mut draw = Draw(97);
@@ -882,7 +889,7 @@ fn the_card_tree_reads_and_deposits_as_the_host_tree() {
             population,
             grain: 16,
             family: LetterFamily::cells(),
-            prior: holonics::hnn::StopPrior::half(),
+            prior: StopPrior::half(),
         };
     let campaign = Landmarks::new(declared(256, 4, 0, 1_200)).unwrap();
     let times = tree_parity(&card, campaign, &cell_letters(&bytes), &bytes, 2, 50);
@@ -894,9 +901,33 @@ fn the_card_tree_reads_and_deposits_as_the_host_tree() {
         times.deposit.as_micros(),
         times.transfer.as_micros()
     );
+    let ruled = Landmarks::new(LandmarkDeclaration {
+        prior: StopPrior::global(2).unwrap(),
+        ..declared(256, 24, 0, 1_200)
+    })
+    .unwrap();
+    tree_parity(&card, ruled, &cell_letters(&bytes), &bytes, 3, 50);
+    let deep = Landmarks::new(declared(256, 48, 0, 1_200)).unwrap();
+    let times = tree_parity(&card, deep, &cell_letters(&bytes), &bytes, 2, 50);
+    println!(
+        "cell-only |A| = 256, D = 48: {} reads {} µs, {} deposits {} µs",
+        times.reads,
+        times.read.as_micros(),
+        times.deposits,
+        times.deposit.as_micros()
+    );
     let small: Vec<usize> = (0..400).map(|t| (t * 7 + t / 3 + t * t / 11) % 5).collect();
     let narrow = Landmarks::with_carrier(declared(5, 2, 1, 400), 6).unwrap();
     tree_parity(&card, narrow, &cell_letters(&small), &small, 2, 10);
+    let staged = Landmarks::with_carrier(
+        LandmarkDeclaration {
+            prior: StopPrior::per_depth(vec![2, 5]).unwrap(),
+            ..declared(5, 9, 1, 400)
+        },
+        6,
+    )
+    .unwrap();
+    tree_parity(&card, staged, &cell_letters(&small), &small, 3, 10);
     let family = LetterFamily::new(vec![
         Feature::Phase { ring: 0, grain: 3 },
         Feature::Phase { ring: 1, grain: 2 },
@@ -925,6 +956,13 @@ fn the_card_tree_reads_and_deposits_as_the_host_tree() {
     )
     .unwrap();
     tree_parity(&card, enlarged, &bundle(&small), &small, 2, 10);
+    let deep_enlarged = Landmarks::new(LandmarkDeclaration {
+        family: family.clone(),
+        prior: StopPrior::global(2).unwrap(),
+        ..declared(5, 9, 0, 400)
+    })
+    .unwrap();
+    tree_parity(&card, deep_enlarged, &bundle(&small), &small, 3, 10);
     let wide = Landmarks::new(LandmarkDeclaration {
         family: family.clone(),
         ..declared(256, 2, 0, 1_200)
@@ -991,4 +1029,67 @@ fn the_card_beta_step_is_the_hosts() {
         let carded = super::tree::beta_steps(&card, &operands, width, rebase, face).unwrap();
         assert_eq!(carded, host, "W = {width}, M = {face}");
     }
+}
+
+/// **The card's split is the host's** (`hnn_tree_split_ratios` against `landmark::Beta::split`
+/// with each part's stop weight; Lean `HNN/LandmarkCompaction.chain_split`): over carried ratios
+/// `β` at the carriers `W = 6, 29, 43` (a narrow carrier, campaign 1's `D = 4` and the wide cut's
+/// `D = 48`) with rungs on both sides to 40, the exponents running to `±5000` and across the card's
+/// caps (`e = E* ± 2`, `E* = 2W + 2S + 4`, and `−e = F* ± 2`, `F* = 3W + 2S + 4`), each part's
+/// carried ratio, exact or its `W`-bit mantissa, and its stop weight are the host's, word for
+/// word; and a split past the 512-bit integers is refused.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_card_split_is_the_hosts() {
+    use holonics::hnn::landmark::Beta;
+    let card = card();
+    let mut draw = Draw(37);
+    for (width, face) in [(6u64, 20u64), (29, 39), (43, 39)] {
+        let mut charts = Vec::new();
+        for trial in 0..3_000u64 {
+            let odd = |draw: &mut Draw| u128::from(draw.next() >> (64 - width)) | 1;
+            let (upper, lower) = (1 + draw.next() % 40, 1 + draw.next() % 40);
+            let whole = (upper + lower) as i64;
+            let exponent = match trial % 6 {
+                0 => draw.signed(4),
+                1 => draw.signed(13) % 5_001,
+                2 => 2 * width as i64 + 2 * whole + 4 + draw.signed(2) % 3,
+                3 => -(3 * width as i64 + 2 * whole + 4 + draw.signed(2) % 3),
+                4 => draw.signed(8),
+                _ => draw.signed(7) - (width as i64),
+            };
+            let (beta, _) = Beta::carry(odd(&mut draw), odd(&mut draw), exponent, width);
+            let (n, d, e) = beta.parts();
+            charts.push((n, d, e, upper, lower));
+        }
+        let host: Vec<[(u64, u64, i64, u64); 2]> = charts
+            .iter()
+            .map(|&(n, d, e, upper, lower)| {
+                let (beta, _) = Beta::carry(u128::from(n), u128::from(d), e, width);
+                beta.split(upper, lower, width).map(|(part, _)| {
+                    let (a, b, c) = part.parts();
+                    (a, b, c, part.stop_weight(face, width))
+                })
+            })
+            .collect();
+        let rebased = charts
+            .iter()
+            .filter(|&&(n, d, e, upper, lower)| {
+                let (beta, _) = Beta::carry(u128::from(n), u128::from(d), e, width);
+                beta.split(upper, lower, width)
+                    .iter()
+                    .any(|(_, mantissa)| mantissa.is_some())
+            })
+            .count();
+        assert!(rebased > 0 && rebased < charts.len(), "both branches exercised");
+        let carded = super::tree::split_ratios(&card, &charts, width, face).unwrap();
+        for (index, (card_split, host_split)) in carded.iter().zip(&host).enumerate() {
+            assert_eq!(
+                card_split, host_split,
+                "W = {width}, chart {:?}",
+                charts[index]
+            );
+        }
+    }
+    assert!(super::tree::split_ratios(&card, &[(1, 1, 0, 60, 60)], 63, 39).is_err());
 }

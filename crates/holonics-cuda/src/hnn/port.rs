@@ -12,7 +12,7 @@
 //! | the published constitution's loci at their lattices, the moved words scattered at each publication (`hnn::publication`) | the constitution `Θ`, the normal laws' prox steps, the receiving parametron's landmark tree and its deposit with its certificates (Decision 28), the budgeted carry and its remainders, the budget (`Constitution::deposited`), and the operators `I − ½K`, `m_a` formed from it |
 //! | the keyed charts, their rounded Newton–Schulz steps and exact certificates (`hnn::store`) | each refinement's decisions from the certificates (warm, cold, fallback, target), the cold start's transpose and the exact fallback |
 //! | the word's open (`E_g M_g[c]`, the pair port), its ticks, its receiving read (`hnn_pair_weights`, `hnn_word_forward`) | the faces in `ℚ(θ)`, each tick's balance, the release (`hnn::readout`) |
-//! | the receiving parametron's landmark tree mirrored (`hnn::tree::CardTree`, campaign 2): each window's splits at every phase's causal address in cell order (the known targets' deposits applied and undone on the card), and each deposit's opened-path update | the class faces from the splits and their grain exponents (`landmark::faces_of_splits`), added to the card's wave at the grain (`ReceivingPhases::combine`); after every deposit the mirror's founded count and the masses, `β` and stop weights of every node and join the deposit touched, checked against the host's tree (`CardTree::agrees_at`) |
+//! | the receiving parametron's landmark tree mirrored, stored at the faces where paths part (`hnn::tree::CardTree`, campaign 2, Decision 37): each window's splits at every phase's causal address in cell order (the known targets' deposits applied and undone on the card), and each deposit's opened-path update with its splits, foundings and label runs | the class faces from the splits and their grain exponents (`landmark::faces_of_splits`), added to the card's wave at the grain (`ReceivingPhases::combine`); after every deposit the mirror's counts and the masses, `β`, stop weights, depth words and label ends of every node the deposit's walks opened or it founded, its joins and its held labels, checked against the host's tree (`CardTree::agrees_at`) |
 //! | each declared ring resonator's ticks (`hnn_resonator_word`, campaign 2), driven by the storage waves the card's word sent (`readout::storage_waves`) | the resonators' operands at the cut (`ResonatorOperands::at_cut`, their charts) and their balance, read from the same ticks and checked against the card's record (`crate::hnn::word::resonate`) |
 //! | in the GPU suite's parity tests only ([`Resident::with_normal_mirror`]; off the exposure's path, where it replaced no host owner): each normal law's prox step a deposit takes once at its locus (`hnn_outer_update` for `ΔH` and `ΔW`, `hnn_budgeted_split` for their carries, the reaches `X̂f` by `hnn_lattice_read` through the host's successor chart; campaign 2), read against the host's successor (`crate::hnn::lattice::normal_deposit_on_card`), every step counted carried, declined by reason or skipped | the successor constitution (`Constitution::deposited`, the owner of `Θ`), the chart of `H′`, and the steps the card's words cannot carry (a sample off the dyadics, such as `R`'s covector on `(1/W)ℤ`) |
 //! | the word's return (`hnn_word_reverse`) | the compare phase under the hardware law (`reference::compare_phase`: the tree at the grain beside the mixture score, the Holon ratio and its covector), the return's source through `Rᵀ` (the covector lives on `(1/W)ℤ`), the composition onto the loci (`reference::compose`) |
@@ -1379,26 +1379,39 @@ impl<'c> ExecutionPort for Resident<'c> {
                 .map(|step| (step.address.clone(), step.class))
                 .collect();
             tree.deposit(&steps).map_err(device)?;
-            // The lockstep: the founded count, and the masses, β and stop weights of every node
-            // and join the deposit touched, against the host's successor tree.
+            // The lockstep: the counts, and the masses, β, stop weights, depth words and label
+            // ends of every stored node the deposit's walks opened (read on the predecessor: a
+            // later cell's walk only refines an earlier one's chains) and of every node it founded,
+            // the joins it stepped, and the labels it held, against the host's successor tree.
+            let before = resident
+                .constitution
+                .landmarks(*ring)
+                .ok_or(HnnError::Realization {
+                    what: "the host's landmark tree at the predecessor",
+                })?;
             let host = next.landmarks(*ring).ok_or(HnnError::Realization {
                 what: "the host's landmark tree at the successor",
             })?;
             let (mut nodes, mut dyadic) = (Vec::new(), Vec::new());
             for (address, class) in &steps {
-                let (touched, cells) = host.touched(address, *class)?;
+                let (touched, cells) = before.touched(address, *class)?;
                 nodes.extend(touched);
                 dyadic.extend(cells);
             }
+            let founded = u32::try_from(before.nodes()).unwrap_or(u32::MAX)
+                ..u32::try_from(host.nodes()).unwrap_or(u32::MAX);
+            nodes.extend(founded);
             nodes.sort_unstable();
             nodes.dedup();
             dyadic.sort_unstable();
             dyadic.dedup();
             if host.nodes() != tree.nodes()
-                || !tree.agrees_at(host, &nodes, &dyadic).map_err(device)?
+                || !tree
+                    .agrees_at(host, &nodes, &dyadic, before.held())
+                    .map_err(device)?
             {
                 return Err(HnnError::Realization {
-                    what: "the card's landmark tree against the host's after a deposit (its founded count, or a touched node's masses, β or stop weight)",
+                    what: "the card's landmark tree against the host's after a deposit (its counts, a written or founded node's masses, β, stop weight, depth word or label end, a join, or a held label)",
                 });
             }
         }

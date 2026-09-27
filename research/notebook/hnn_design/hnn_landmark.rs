@@ -1,22 +1,20 @@
 //! **The landmark tree on the standing real cut, executed on its declared dyadic lattice**
 //! (Decision 28, count-only; Decisions 32, 34, 35 and 37; rebuild step 4, #73): the notebook's
-//! receipt of `holonics::hnn::landmark::{choose_depth, prequential, oracle_cost}` and of the
-//! storage (`Storage`), a committed command run once in release, never a test.
+//! receipt of `holonics::hnn::landmark::{choose_depth, prequential, oracle_cost}` and of the tree
+//! stored where paths part, a committed command run once in release, never a test.
 //!
 //! ```sh
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin letters
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin letters contacts
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin prior
-//! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin local
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/wide-real-cut.bin wide .local/cuts/standing-real-cut-campaign-1.bin
 //! cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/wide-real-cut.bin compact
 //! ```
 //!
 //! [definition; agent-inferred] **Stored where paths part** (`compact`; Decision 37): Decision 28's
-//! `½` tree over the cell-only family, stored at the faces where paths part
-//! (`landmark::Storage::Compacted`: a chain with its bottom is one node at the summed rung), on the
-//! wide cut. The prior is Decision 28's, so no family is swept again; only the depth is re-chosen,
+//! `½` tree over the cell-only family, stored at the faces where paths part (`landmark::Landmarks`,
+//! the one storage: a chain with its bottom is one node at the summed rung), on the wide cut. The prior is Decision 28's, so no family is swept again; only the depth is re-chosen,
 //! because memory no longer caps it. Decision 36's `converge` mode, which measured founding at the
 //! second arrival, is retired with its Rust realization (commit `d137e8a6`; its receipt is in
 //! THE_REBUILD's Decision 36).
@@ -26,13 +24,15 @@
 //!   tree reached by `n` arrivals at every depth. Before every passage its projected memory (the
 //!   a-priori nodes at the bytes a node measured, with its label pool) is checked against Brandon's
 //!   20 GB cap and the memory the kernel reports available, and a passage past either is refused.
-//! - **1. `D = 6` on the development cells**: Decision 28's full arena and the compacted tree, one
-//!   passage each, each code exact with its certified residuals summed, its nodes, label letters,
-//!   live bytes and wall time; the two codes are equal within the sum of their certificates (both
-//!   lie within their certificates of the same ideal code).
-//! - **2. The depth sweep** of the compacted tree on the development cells, doubling from 6 while the
-//!   code falls strictly (`DepthSweep::{decreasing, of}`, the owner's rule), every depth's code,
-//!   nodes, label letters, live bytes and wall time.
+//! - **1. `D = 6` on the development cells**: Decision 28's tree at its chosen depth, one passage,
+//!   its code exact with its certified residuals summed, its nodes, table entries, label letters,
+//!   allocated bytes (the counted allocator's growth, the vectors' and the table's capacity) and
+//!   occupied bytes (the stored parts at the bytes each occupies), and wall time. [historical] Its
+//!   comparison with Decision 28's arena of one node a depth (equal within the sum of their
+//!   certificates) was measured at commit `2fb0c1c0` and left with that arena's retirement.
+//! - **2. The depth sweep** of the tree on the development cells, doubling from 6 while the code
+//!   falls strictly (`DepthSweep::{decreasing, of}`, the owner's rule), every depth's code, nodes,
+//!   label letters, allocated and occupied bytes and wall time.
 //! - **3. The choice**: the chosen depth's code charged `⌈log₂ 5⌉`, against Decision 28's tree at
 //!   `D = 6` charged `⌈log₂ 6⌉` (Decision 35's family on these cells; Decision 36 added one bit for
 //!   its founding law, which Decision 37 does not choose), by disjoint exact enclosures.
@@ -46,7 +46,7 @@
 //! larger cut. The standing cut must be the wide cut's tail (checked), so its cells lie in the wide
 //! held-out range. Every code is a population's faces' product enclosed once
 //! (`landmark::PassageCode`). The laws are the standing cut's choices; no family is swept again.
-//! - **0. The memory**: the `½` tree's live bytes a node and the baselines' a cell, measured on the
+//! - **0. The memory**: the `½` tree's allocated bytes a node and the baselines' a cell, measured on the
 //!   standing cut by the harness's counted allocator (each built alone); the resident bound
 //!   `3 (n B D + 2^B − 1)` bytes a node `+ n` bytes a cell (the tree and the two-law stop mixture's
 //!   two trees at the a-priori node bound, each cell founding at most `D` nodes in each of its `B`
@@ -67,40 +67,11 @@
 //!   development and held-out cells: the adopted law against the `½` tree (charged and uncharged),
 //!   and each against order-0, order-1 and PPM-2.
 //!
-//! [definition; agent-inferred] **Weighing is local** (`local`; Decision 34): on the **development
-//! cells only** (the manifest's held-out range is cut away before anything is read), the receiver's
-//! tree (`hnn::receiving::landmark_declaration_with`: the cell-only family at `D = 4`, Decision 28's
-//! `½`), every law of Decision 32's declared family (`prior_family(ladder_top)`) and every member of
-//! Decision 33's Born family (both emissions at `χ = 2^j`, `j ≤ J` by the cost bound
-//! `14·4^J·B·n_dev ≤ 2^37`) are read prequentially, each digit's split before its cell's deposit
-//! (`Landmarks::receive_digits`, `Born::read`). These per-digit splits are an exterior measurement
-//! of this harness; no owner retains them (no tape).
-//! - **1. The oracles** `Σ_u min(ℓ_T(u), ℓ_X(u)) − L_T` at three grains (`u` a digit, a cell, a
-//!   dyadic cell), each exactly enclosed: the units' products of observed sides on the tree's
-//!   lattice compare exactly, and the chosen products' ratio to the tree's is read by one certified
-//!   binary logarithm; for every Born member, every stop law (the eight least and the constant-slot
-//!   controls printed), and the least stop law in every unit.
-//! - **2. The three local laws**, each measured prequentially on the development cells and charged
-//!   `⌈log₂⌉` of its family (the tree's depth bits are common and cancel), each ordering decided by
-//!   disjoint exact enclosures, each law refused when its oracle's gain does not exceed its price:
-//!   - **at each landmark**: the tree under `LocalLaw` at every rung `j = 1..J` of the ladder
-//!     (`J = ladder_top`), the external face each Born member's digit split (`rescale_split` onto
-//!     the tree's lattice); the oracle the best member's digit grain, the price its family charge
-//!     (a landmark's naming is per landmark and cannot be read from a per-digit oracle);
-//!   - **in each digit tree**: the owner's joins (`FaceJoins`) on the laws' executed digit faces,
-//!     the members the `½` tree against every other law at the incumbent's rungs `j = 1..J`
-//!     (`JoinTree::incumbent`) and the balanced joins of the global ladder and of the whole family;
-//!     the oracle the best pair's dyadic-cell grain, the price one bit a dyadic cell opened plus the
-//!     charge; and the least law in every dyadic cell against its naming (`⌈log₂⌉` of the laws a
-//!     dyadic cell);
-//!   - **across epochs**: `Mixture::switching` of the tree's and each Born member's cell faces at
-//!     `α = 2^(−j)`, `j = 1..⌈log₂ n*⌉`, beside Decision 30's plain mixture; the oracle the best
-//!     member's cell grain, the price the best switching sequence's naming (its dominance bound,
-//!     Lean `fixed_share`, by exact Viterbi on integers, less the oracle) plus the charge.
-//! - **3. The held-out pass**, once, only for a law whose charged development code lies below the
-//!   tree: the tree, online order-0, order-1, PPM-2 (`prequential`) and the chosen law over the
-//!   whole cut, every cell scored before its own deposit, in all and a cell at the grain; the stop
-//!   mixture's pass through the owner's `StopMixture`, checked against the joins' development code.
+//! [historical; measured] **Weighing is local** (`local`; Decision 34) **is retired** with the
+//! node-local law: on the development cells it measured Decision 34's three local laws (the
+//! node-local law, the stop-weight mixture per digit tree and the switching mixture across epochs)
+//! and held out the adopted one (commit `d2a2e0db`, its receipt in THE_REBUILD's Decision 34). The
+//! harness is at commit `89460425`; the adopted stop-weight mixture is read by `wide`.
 //!
 //! [definition; agent-inferred] **The stop-prior decision** (`prior`; Decision 32): on the
 //! **development cells only** (the manifest's held-out range is cut away before the sweep reads
@@ -195,18 +166,16 @@ use std::time::Instant;
 use rayon::prelude::*;
 
 use holonics::compression::cost::ceil_log2;
-use holonics::hnn::born::{Born, BornDeclaration, Emission};
 use holonics::hnn::landmark::{
-    ChartReport, Coded, DepthSweep, FaceJoins, Feature, IdealLandmarks, JoinTree,
-    LandmarkDeclaration, Landmarks, Letter, LetterFamily, LocalLaw, OracleCost, PassageCode,
-    PriorSweep, StopMixture, StopPrior, Storage, TreeRun, Widths, address, cell_letters,
-    choose_depth, choose_depth_within, choose_prior, code_length, development, development_run,
-    ladder_top, odometer_digits, oracle_cost, prequential, prior_family, ratio_code_length,
-    rescale_split, tree_prequential,
+    ChartReport, Coded, DepthSweep, Feature, IdealLandmarks, JoinTree, LandmarkDeclaration,
+    Landmarks, Letter, LetterFamily, OracleCost, PassageCode, PriorSweep, StopMixture, StopPrior,
+    TreeRun, Widths, address, cell_letters, choose_depth, choose_depth_within, choose_prior,
+    code_length, development, ladder_top, odometer_digits, oracle_cost, prequential, prior_family,
+    tree_prequential,
 };
 use holonics::hnn::ratio::interval_sum;
 use holonics::hnn::receiving::clock_letters;
-use holonics::hnn::receiving::{Mixture, MixtureStep, landmark_declaration_with};
+use holonics::hnn::receiving::landmark_declaration_with;
 use holonics::hnn::reference::{Baselines, PPM_ORDER};
 use holonics::hnn::{Cut, Field, FieldDeclaration, Reference};
 use holonics::navigator::trace::SiteKind;
@@ -214,7 +183,7 @@ use holonics::ratio::Rat;
 use holonics::ratio::algebraic::ExactInterval;
 use num_bigint::BigInt;
 use num_bigint::BigUint;
-use num_traits::{One, Zero};
+use num_traits::Zero;
 use std::collections::BTreeSet;
 
 use exterior::{
@@ -1424,1068 +1393,11 @@ fn prior_harness(path: &str) {
 }
 
 // -------------------------------------------------------------------------------------------
-// Decision 34: weighing is local (`local`)
-
-/// The development digits in cell order: per opened digit its cell, its dyadic cell and its digit,
-/// and each cell's first digit.
-struct Digits {
-    cell: Vec<usize>,
-    dyadic: Vec<usize>,
-    symbol: Vec<usize>,
-    starts: Vec<usize>,
-}
-
-impl Digits {
-    fn len(&self) -> usize {
-        self.cell.len()
-    }
-
-    fn of_cell(&self, cell: usize) -> std::ops::Range<usize> {
-        self.starts[cell]..self.starts.get(cell + 1).copied().unwrap_or(self.len())
-    }
-}
-
-/// **A face source's development splits**: each digit's digit-0 numerator on `2^(−bits)`, read
-/// before its cell's deposit.
-struct Source {
-    label: String,
-    splits: Vec<u64>,
-    bits: u64,
-}
-
-impl Source {
-    /// The observed side on the common lattice `2^(−lattice)` (`lattice ≥ bits`, exact).
-    fn side(&self, digits: &Digits, i: usize, lattice: u64) -> u64 {
-        let zero = self.splits[i];
-        let side = if digits.symbol[i] == 0 {
-            zero
-        } else {
-            (1u64 << self.bits) - zero
-        };
-        side << (lattice - self.bits)
-    }
-}
-
-/// A balanced product of integers.
-fn product(mut values: Vec<BigUint>) -> BigUint {
-    if values.is_empty() {
-        return BigUint::from(1u32);
-    }
-    while values.len() > 1 {
-        values = values
-            .par_chunks(2)
-            .map(|pair| {
-                if pair.len() == 2 {
-                    &pair[0] * &pair[1]
-                } else {
-                    pair[0].clone()
-                }
-            })
-            .collect();
-    }
-    values.pop().expect("a product")
-}
-
-/// `−log₂(numerator/denominator)`, enclosed (`landmark::ratio_code_length`, unreduced).
-fn log_ratio(numerator: &BigUint, denominator: &BigUint) -> ExactInterval {
-    ratio_code_length(numerator, denominator).expect("a positive ratio")
-}
-
-/// The grains of the oracle: each digit alone, each cell's digits, each dyadic cell's digits.
-#[derive(Clone, Copy)]
-enum Grain {
-    Digit,
-    Cell,
-    Dyadic,
-}
-
-impl Grain {
-    fn name(self) -> &'static str {
-        match self {
-            Grain::Digit => "digit",
-            Grain::Cell => "cell",
-            Grain::Dyadic => "dyadic cell",
-        }
-    }
-
-    fn unit(self, digits: &Digits, i: usize) -> usize {
-        match self {
-            Grain::Digit => i,
-            Grain::Cell => digits.cell[i],
-            Grain::Dyadic => digits.dyadic[i],
-        }
-    }
-
-    fn units(self, digits: &Digits, cells: usize, dyadic: usize) -> usize {
-        match self {
-            Grain::Digit => digits.len(),
-            Grain::Cell => cells,
-            Grain::Dyadic => dyadic,
-        }
-    }
-}
-
-/// **Each unit's product of observed sides** on the common lattice (each unit's code length is
-/// `−log₂` of it over its lattice power; units share the lattice, so products compare exactly).
-fn unit_products(
-    source: &Source,
-    digits: &Digits,
-    grain: Grain,
-    units: usize,
-    lattice: u64,
-) -> Vec<BigUint> {
-    let mut sides: Vec<Vec<BigUint>> = vec![Vec::new(); units];
-    for i in 0..digits.len() {
-        sides[grain.unit(digits, i)].push(BigUint::from(source.side(digits, i, lattice)));
-    }
-    sides.into_par_iter().map(product).collect()
-}
-
-/// **The oracle** `Σ_u min_X ℓ_X(u) − L_T ≤ 0` at a grain, exactly enclosed: every unit takes the
-/// largest product among the sources, against the tree's (`−log₂` of the chosen products' ratio to
-/// the tree's); with how many units a source other than the tree wins.
-fn unit_oracle(
-    tree: &[BigUint],
-    tree_total: &BigUint,
-    others: &[&Vec<BigUint>],
-) -> (ExactInterval, usize) {
-    let mut wins = 0;
-    let chosen: Vec<BigUint> = (0..tree.len())
-        .map(|u| {
-            let mut best = &tree[u];
-            for other in others {
-                if other[u] > *best {
-                    best = &other[u];
-                }
-            }
-            if best != &tree[u] {
-                wins += 1;
-            }
-            best.clone()
-        })
-        .collect();
-    let oracle = log_ratio(&product(chosen), tree_total);
-    (oracle, wins)
-}
-
-/// A code length accumulated exactly: the faces' product held between exact integer bounds and
-/// enclosed once (`landmark::PassageCode`).
-#[derive(Default)]
-struct Coder(PassageCode);
-
-impl Coder {
-    fn add(&mut self, face: &Rat) {
-        self.0.face(face).expect("a positive face");
-    }
-
-    fn add_side(&mut self, side: u64, bits: u64) {
-        self.0.side(side, bits);
-    }
-
-    fn bits(self) -> ExactInterval {
-        self.0.bits().expect("an enclosure")
-    }
-}
-
-/// The Born receiver's development splits: each digit's digit-0 numerator on `2^(−M)`, read before
-/// its cell's deposit, and the wall time.
-fn born_source(cells: &[usize], declaration: &BornDeclaration) -> (Source, u128) {
-    let clock = Instant::now();
-    let mut born = Born::new(declaration.clone()).expect("a Born declaration");
-    let bits = u64::from(born.widths().face);
-    let mut splits = Vec::with_capacity(cells.len() * 8);
-    for &cell in cells {
-        let reception = born.read(cell).expect("a Born reception");
-        splits.extend(reception.digits.iter().map(|digit| digit.numerator));
-        born.deposit(reception).expect("a Born deposit");
-    }
-    let label = format!(
-        "Born {} χ = {}",
-        match declaration.emission {
-            Emission::Position => "Position",
-            Emission::Dyadic => "Dyadic",
-        },
-        declaration.width
-    );
-    (
-        Source {
-            label,
-            splits,
-            bits,
-        },
-        clock.elapsed().as_millis(),
-    )
-}
-
-/// A tree's development splits (any stop prior), with the digits it opens.
-fn tree_source(cells: &[usize], declaration: &LandmarkDeclaration) -> (Source, Digits) {
-    let mut tree = Landmarks::new(declaration.clone()).expect("a declared tree");
-    let bits = tree.face_bits();
-    let mut digits = Digits {
-        cell: Vec::new(),
-        dyadic: Vec::new(),
-        symbol: Vec::new(),
-        starts: Vec::new(),
-    };
-    let mut splits = Vec::new();
-    for (position, &class) in cells.iter().enumerate() {
-        digits.starts.push(digits.len());
-        let reading = tree
-            .receive_digits(&address(cells, position, declaration.depth), class, &[])
-            .expect("a cell within the declaration");
-        for digit in reading.digits {
-            digits.cell.push(position);
-            digits.dyadic.push(digit.dyadic);
-            digits.symbol.push(digit.symbol);
-            splits.push(digit.split);
-        }
-    }
-    (
-        Source {
-            label: declaration.prior.to_string(),
-            splits,
-            bits,
-        },
-        digits,
-    )
-}
-
-/// One member's development code length and its label.
-struct Member {
-    label: String,
-    bits: ExactInterval,
-    note: String,
-}
-
-/// The least member (by upper endpoint) and whether it lies strictly below every other member.
-fn least(members: &[Member]) -> (usize, bool) {
-    let mut best = 0;
-    for (index, member) in members.iter().enumerate() {
-        if member.bits.upper < members[best].bits.upper {
-            best = index;
-        }
-    }
-    let decided = members
-        .iter()
-        .enumerate()
-        .all(|(index, member)| index == best || members[best].bits.upper < member.bits.lower);
-    (best, decided)
-}
+// the charges
 
 /// A family's charge `⌈log₂ |family|⌉`.
 fn family_charge(members: usize) -> u64 {
     ceil_log2(&BigUint::from(members))
-}
-
-/// **The node-local law's run** over a stream: the tree under [`LocalLaw`] reading the external
-/// source's splits at each opened digit; the code length on the parts `held` selects (development
-/// `false`, held out `true`), the largest certified residual and the founded nodes.
-fn local_run(
-    cells: &[usize],
-    held: &dyn Fn(usize) -> bool,
-    declaration: &LandmarkDeclaration,
-    law: LocalLaw,
-    external: &Source,
-) -> ([ExactInterval; 2], Rat, usize) {
-    let mut tree = Landmarks::local(declaration.clone(), law).expect("a node-local tree");
-    let lattice = tree.face_bits();
-    let (mut coders, mut residual) = ([Coder::default(), Coder::default()], Rat::zero());
-    let mut index = 0;
-    for (position, &class) in cells.iter().enumerate() {
-        let opened = declaration.emitted(class).len();
-        let splits: Vec<u64> = external.splits[index..index + opened]
-            .iter()
-            .map(|&x| rescale_split(x, external.bits, lattice))
-            .collect();
-        index += opened;
-        let reading = tree
-            .receive_with(&address(cells, position, declaration.depth), class, &splits)
-            .expect("a node-local reception");
-        coders[usize::from(held(position))].add(&reading.executed);
-        if reading.residual > residual {
-            residual = reading.residual;
-        }
-    }
-    let [development, held_out] = coders;
-    (
-        [development.bits(), held_out.bits()],
-        residual,
-        tree.nodes(),
-    )
-}
-
-/// **The stop-weight mixture's run on the laws' development splits** (the owner's joins,
-/// [`FaceJoins`], on the trees' executed digit faces, which the mixture does not change): the
-/// code length of the mixed faces.
-fn joins_run(
-    digits: &Digits,
-    sources: &[&Source],
-    tree: JoinTree,
-    widths: holonics::hnn::landmark::Widths,
-) -> ExactInterval {
-    let mut joins = FaceJoins::new(tree, widths).expect("the joins");
-    let full = 1u64 << widths.face;
-    let zeros = vec![0u128; sources.len()];
-    let mut coder = Coder::default();
-    for i in 0..digits.len() {
-        let faces: Vec<u64> = sources.iter().map(|source| source.splits[i]).collect();
-        let symbol = digits.symbol[i];
-        let receipt = joins
-            .receive(digits.dyadic[i], &faces, symbol, &zeros, &zeros)
-            .expect("a join step");
-        let side = if symbol == 0 {
-            receipt.split
-        } else {
-            full - receipt.split
-        };
-        coder.add_side(side, widths.face);
-    }
-    coder.bits()
-}
-
-/// **The switching mixture's run** over the development cells: the tree's cell face and the
-/// external source's, mixed by [`Mixture::switching`] (or the plain mixture at `None`), each cell
-/// scored before its step; the code length enclosed cell by cell, and the chart's drift.
-fn switching_run(
-    tree: &[Rat],
-    other: &[Rat],
-    rung: Option<u32>,
-    carrier: u64,
-) -> (ExactInterval, Rat) {
-    let mut mixture = match rung {
-        Some(rung) => Mixture::switching(carrier, rung).expect("a switch rate"),
-        None => Mixture::new(carrier),
-    };
-    let mut bits = ExactInterval::point(Rat::zero());
-    for (q_tree, q_other) in tree.iter().zip(other) {
-        let weight = mixture.weight();
-        let face = &weight * q_tree + (Rat::one() - &weight) * q_other;
-        bits = interval_sum(&bits, &code_length(&face).expect("a face")).expect("an enclosure");
-        mixture
-            .step(&MixtureStep {
-                ring: 0,
-                tree: q_tree.clone(),
-                combined: q_other.clone(),
-                residual: Rat::zero(),
-            })
-            .expect("a positive step");
-    }
-    (bits, mixture.drift().clone())
-}
-
-/// Each cell's face from a source's splits on the common lattice: `Π side/2^(lattice · digits)`.
-fn cell_faces(source: &Source, digits: &Digits, cells: usize, lattice: u64) -> Vec<Rat> {
-    (0..cells)
-        .map(|cell| {
-            let range = digits.of_cell(cell);
-            let numerator: BigUint = range
-                .clone()
-                .map(|i| BigUint::from(source.side(digits, i, lattice)))
-                .product();
-            Rat::new(
-                BigInt::from(numerator),
-                BigInt::from(1u32) << (lattice as usize * range.len()),
-            )
-        })
-        .collect()
-}
-
-/// **The switching law's dominance bound** (Lean `HNN/LocalWeighing.fixed_share`), exact: the
-/// best switching sequence's prior times its faces, `max_σ ½ Π T(σ_t, σ_(t+1)) Π f_σ(t)`, by
-/// Viterbi on integers over the common lattice; returned as the bound minus `L_T` (`−log₂` of its
-/// ratio to the tree's product).
-fn switching_bound(
-    tree: &[BigUint],
-    tree_total: &BigUint,
-    other: &[BigUint],
-    rung: u32,
-) -> ExactInterval {
-    let keep = (BigUint::from(1u32) << rung as usize) - 1u32;
-    let mut values = [tree[0].clone(), other[0].clone()];
-    for t in 1..tree.len() {
-        let faces = [&tree[t], &other[t]];
-        let next = [0, 1].map(|x| {
-            let stay = &values[x] * &keep;
-            let switch = &values[1 - x];
-            let best = if &stay >= switch {
-                stay
-            } else {
-                switch.clone()
-            };
-            best * faces[x]
-        });
-        values = next;
-    }
-    let best = if values[0] >= values[1] {
-        &values[0]
-    } else {
-        &values[1]
-    };
-    // The prior's denominator: ½ at the opening and 2^j a transition.
-    let transitions = (tree.len() - 1) as u64 * u64::from(rung) + 1;
-    log_ratio(best, &(tree_total << transitions as usize))
-}
-
-/// **Decision 34's development decision** (module header, "Weighing is local").
-fn local_harness(path: &str) {
-    let setup = Instant::now();
-    let (bytes, count, held) = read_cut(path);
-    let field = Field::declare(FieldDeclaration::campaign_one(count as u64))
-        .expect("campaign 1's declared field over the cut");
-    let grain = receiver_grain(&field);
-    let alphabet = field.alphabet();
-    let receiver = field.receivers()[0].clone();
-    let declared = landmark_declaration_with(&field, &receiver, LetterFamily::cells())
-        .expect("the receiver's tree");
-    let full = Cut {
-        cells: bytes.iter().map(|&byte| usize::from(byte)).collect(),
-        held_out: vec![held.clone()],
-    };
-    let dev = development(&full);
-    let cells = dev.len();
-    let population = count as u64;
-    println!("hnn_landmark local: weighing is local (Decision 34) over the cut file {path}");
-    println!(
-        "development: {cells} cells (the manifest's held-out range {}..{} is cut away before anything is read); |A| = {alphabet}, n* = {count}, L_R = {grain}; the tree at D = {} under {}",
-        held.start, held.end, declared.depth, declared.prior
-    );
-
-    // The tree, the declared stop laws and the Born members, each prequential on the development
-    // cells; their splits read before each cell's deposit (an exterior measurement, never retained
-    // by the machine).
-    let clock = Instant::now();
-    let (tree, digits) = tree_source(&dev, &declared);
-    let lattice = tree.bits;
-    let tree_widths = Landmarks::new(declared.clone()).expect("a tree").widths();
-    let top = ladder_top(&declared);
-    let laws = prior_family(top);
-    let law_sources: Vec<Source> = laws
-        .par_iter()
-        .map(|prior| {
-            tree_source(
-                &dev,
-                &LandmarkDeclaration {
-                    prior: prior.clone(),
-                    ..declared.clone()
-                },
-            )
-            .0
-        })
-        .collect();
-    let laws_ms = clock.elapsed().as_millis();
-    let bits_b = u128::from(odometer_digits(alphabet));
-    let mut bound = 0u32;
-    while 14 * (1u128 << (2 * (bound + 1))) * bits_b * cells as u128 <= 1u128 << 37 {
-        bound += 1;
-    }
-    let born_declarations: Vec<BornDeclaration> = [Emission::Position, Emission::Dyadic]
-        .into_iter()
-        .flat_map(|emission| {
-            (0..=bound).map(move |order| BornDeclaration {
-                alphabet,
-                width: 1 << order,
-                emission,
-                population,
-                grain,
-            })
-        })
-        .collect();
-    let clock = Instant::now();
-    let born: Vec<(Source, u128)> = born_declarations
-        .par_iter()
-        .map(|declaration| born_source(&dev, declaration))
-        .collect();
-    let born_ms = clock.elapsed().as_millis();
-    let dyadic_cells = 1usize << odometer_digits(alphabet);
-    println!(
-        "read: the ½ tree and the {} declared stop laws (J = {top}) in {laws_ms} ms; the {} Born members (both emissions, χ = 1..2^{bound}) in {born_ms} ms wall ({} digits)",
-        laws.len(),
-        born.len(),
-        digits.len()
-    );
-    for (source, ms) in &born {
-        println!("  {}: M = {}, {ms} ms", source.label, source.bits);
-    }
-    let setup_ms = setup.elapsed().as_millis();
-    println!();
-
-    // ---- 1. The oracles, on the development cells only.
-    let tree_code = {
-        let mut coder = Coder::default();
-        for i in 0..digits.len() {
-            coder.add_side(tree.side(&digits, i, lattice), lattice);
-        }
-        coder.bits()
-    };
-    let (sweep_bits, _) = development_run(&dev_cut(&dev), &cell_letters(&dev), &declared)
-        .expect("the tree's development run");
-    // The tree's depth, chosen on the development cells (Decision 28), and its description bits.
-    let depth_sweep =
-        choose_depth(&dev_cut(&dev), &cell_letters(&dev), &declared).expect("the depth sweep");
-    assert_eq!(
-        depth_sweep.chosen, declared.depth,
-        "the receiver's depth is the sweep's"
-    );
-    let depth_bits = depth_sweep.description_bits;
-    println!(
-        "the ½ tree: L_T {} ({} a cell); the sweep's enclosure agrees: {}; its depth D = {} of {} tried, {depth_bits} description bits, common to every law here",
-        enclosure(&tree_code, grain),
-        per(&tree_code, cells as u64, grain),
-        sweep_bits.lower <= tree_code.upper && tree_code.lower <= sweep_bits.upper,
-        depth_sweep.chosen,
-        depth_sweep.tried.len()
-    );
-    println!(
-        "1. the oracles Σ_u min(ℓ_T(u), ℓ_X(u)) − L_T (development; u a digit, a cell or a dyadic cell; exact enclosures, bits at L_R = {grain}; before any price):"
-    );
-    let grains = [Grain::Digit, Grain::Cell, Grain::Dyadic];
-    let tree_units: Vec<Vec<BigUint>> = grains
-        .iter()
-        .map(|&g| {
-            unit_products(
-                &tree,
-                &digits,
-                g,
-                g.units(&digits, cells, dyadic_cells),
-                lattice,
-            )
-        })
-        .collect();
-    let tree_totals: Vec<BigUint> = tree_units
-        .iter()
-        .map(|units| product(units.clone()))
-        .collect();
-    let units_of = |source: &Source| -> Vec<Vec<BigUint>> {
-        grains
-            .iter()
-            .map(|&g| {
-                unit_products(
-                    source,
-                    &digits,
-                    g,
-                    g.units(&digits, cells, dyadic_cells),
-                    lattice,
-                )
-            })
-            .collect()
-    };
-    let oracle_line = |label: &str, units: &[Vec<BigUint>]| -> Vec<ExactInterval> {
-        let mut gains = Vec::new();
-        let mut line = format!("  {label}:");
-        for (g, grain_units) in units.iter().enumerate() {
-            let (oracle, wins) = unit_oracle(&tree_units[g], &tree_totals[g], &[grain_units]);
-            line += &format!(
-                " {} {} (wins {wins});",
-                grains[g].name(),
-                reading_of(&oracle, grain)
-            );
-            gains.push(oracle);
-        }
-        println!("{line}");
-        gains
-    };
-    let born_units: Vec<Vec<Vec<BigUint>>> = born.iter().map(|(s, _)| units_of(s)).collect();
-    let mut born_oracles = Vec::new();
-    for ((source, _), units) in born.iter().zip(&born_units) {
-        let code = {
-            let mut coder = Coder::default();
-            for i in 0..digits.len() {
-                coder.add_side(source.side(&digits, i, lattice), lattice);
-            }
-            coder.bits()
-        };
-        println!(
-            "  {} alone: {} a cell",
-            source.label,
-            per(&code, cells as u64, grain)
-        );
-        born_oracles.push(oracle_line(&source.label, units));
-    }
-    let law_units: Vec<Vec<Vec<BigUint>>> = law_sources.par_iter().map(units_of).collect();
-    let mut law_rows: Vec<(usize, Vec<ExactInterval>)> = (1..laws.len())
-        .into_par_iter()
-        .map(|k| {
-            let gains = (0..grains.len())
-                .map(|g| unit_oracle(&tree_units[g], &tree_totals[g], &[&law_units[k][g]]).0)
-                .collect();
-            (k, gains)
-        })
-        .collect();
-    law_rows.sort_by(|a, b| a.1[2].upper.cmp(&b.1[2].upper));
-    println!(
-        "  the stop laws, by their dyadic-cell oracle (the eight least, then the constant-slot controls):"
-    );
-    let law_line = |k: usize, gains: &[ExactInterval]| {
-        println!(
-            "    {}: digit {}; cell {}; dyadic cell {}",
-            laws[k],
-            reading_of(&gains[0], grain),
-            reading_of(&gains[1], grain),
-            reading_of(&gains[2], grain)
-        );
-    };
-    for (k, gains) in law_rows.iter().take(8) {
-        law_line(*k, gains);
-    }
-    for slots in 1..=4u32 {
-        let control = StopPrior::per_depth(vec![1, slots + 1]).expect("a ladder law");
-        if let Some((k, gains)) = law_rows.iter().find(|(k, _)| laws[*k] == control) {
-            law_line(*k, gains);
-        }
-    }
-    let least_law: Vec<(ExactInterval, usize)> = (0..grains.len())
-        .map(|g| {
-            let all: Vec<&Vec<BigUint>> = (1..laws.len()).map(|k| &law_units[k][g]).collect();
-            unit_oracle(&tree_units[g], &tree_totals[g], &all)
-        })
-        .collect();
-    println!(
-        "  the least stop law in every unit: digit {} (the least law wins {}); cell {} ({}); dyadic cell {} ({} of {} dyadic cells opened)",
-        reading_of(&least_law[0].0, grain),
-        least_law[0].1,
-        reading_of(&least_law[1].0, grain),
-        least_law[1].1,
-        reading_of(&least_law[2].0, grain),
-        least_law[2].1,
-        tree_units[2]
-            .iter()
-            .filter(|p| **p != BigUint::from(1u32))
-            .count()
-    );
-    println!();
-
-    // ---- 2. The laws, measured prequentially on the development cells, charged.
-    let opened = tree_units[2]
-        .iter()
-        .filter(|p| **p != BigUint::from(1u32))
-        .count() as u64;
-    println!(
-        "2. the local laws on the development cells, prequential, each charged ⌈log₂⌉ of its family (the tree's depth bits are common and cancel):"
-    );
-
-    // (a) Node-local mixing, Born's digit split as the admitted external face.
-    let clock = Instant::now();
-    let local_members: Vec<(usize, u32)> = (0..born.len())
-        .flat_map(|m| (1..=top).map(move |j| (m, j)))
-        .collect();
-    let never = |_: usize| false;
-    let local_runs: Vec<Member> = local_members
-        .par_iter()
-        .map(|&(m, j)| {
-            let law = LocalLaw::new(j).expect("a rung");
-            let ([bits, _], residual, nodes) = local_run(&dev, &never, &declared, law, &born[m].0);
-            Member {
-                label: format!("{} with {}", law, born[m].0.label),
-                bits,
-                note: format!(
-                    "{nodes} nodes, largest residual ≤ {} bits",
-                    exact(&residual)
-                ),
-            }
-        })
-        .collect();
-    let local_ms = clock.elapsed().as_millis();
-    let local_charge = family_charge(local_runs.len());
-    let decide = |label: &str,
-                  runs: &[Member],
-                  charge: u64,
-                  oracle: &ExactInterval,
-                  price: &Rat|
-     -> Option<usize> {
-        let (best, decided) = least(runs);
-        let charged_bits = charged(&runs[best].bits, charge);
-        let gain = ExactInterval {
-            lower: -&oracle.upper,
-            upper: -&oracle.lower,
-        };
-        let exceeds = gain.lower > *price;
-        println!(
-            "  {label}: {} members, charged {charge} bits; the oracle's gain {} against the price {}: {}",
-            runs.len(),
-            reading_of(&gain, grain),
-            reading_of(&ExactInterval::point(price.clone()), grain),
-            if exceeds {
-                "exceeds it"
-            } else {
-                "does not exceed it: refused"
-            }
-        );
-        println!(
-            "    the least member: {} ({}); {} a cell uncharged; strictly below every other member: {decided}",
-            runs[best].label,
-            runs[best].note,
-            per(&runs[best].bits, cells as u64, grain)
-        );
-        ordering(
-            "    the least member, charged, against the ½ tree",
-            &charged_bits,
-            &tree_code,
-            cells as u64,
-            grain,
-        );
-        let below = charged_bits.upper < tree_code.lower;
-        (exceeds && below).then_some(best)
-    };
-    println!("  (a) at each landmark (node-local mixing; {local_ms} ms wall):");
-    for (m, (source, _)) in born.iter().enumerate() {
-        let (row, _) = least(&local_runs[m * top as usize..(m + 1) * top as usize]);
-        let run = &local_runs[m * top as usize + row];
-        println!(
-            "    {}: best {} {} a cell ({} against the tree uncharged)",
-            source.label,
-            run.label,
-            per(&run.bits, cells as u64, grain),
-            reading_of(&difference_interval(&run.bits, &tree_code), grain)
-        );
-    }
-    let local_oracle = born_oracles
-        .iter()
-        .map(|gains| gains[0].clone())
-        .min_by(|a, b| a.upper.cmp(&b.upper))
-        .expect("a member");
-    let local_choice = decide(
-        "node-local (the digit-grain oracle of the best Born member; the price its family charge)",
-        &local_runs,
-        local_charge,
-        &local_oracle,
-        &Rat::from_integer(BigInt::from(local_charge)),
-    );
-
-    // (b) The stop-weight mixture per digit tree.
-    let clock = Instant::now();
-    let mut stop_members: Vec<(Vec<usize>, JoinTree, String)> = Vec::new();
-    for (k, law) in laws.iter().enumerate().skip(1) {
-        for j in 1..=top {
-            stop_members.push((
-                vec![0, k],
-                JoinTree::incumbent(2, j).expect("a rung"),
-                format!("½ with {law} at π_½ = 1 − 2^(−{j})"),
-            ));
-        }
-    }
-    let ladder: Vec<usize> = (0..laws.len()).filter(|&k| laws[k].is_global()).collect();
-    stop_members.push((
-        ladder.clone(),
-        JoinTree::balanced(ladder.len()).expect("a family"),
-        format!("the global ladder j = 1..{top}, balanced"),
-    ));
-    stop_members.push((
-        (0..laws.len()).collect(),
-        JoinTree::balanced(laws.len()).expect("a family"),
-        format!("all {} laws, balanced", laws.len()),
-    ));
-    let stop_runs: Vec<Member> = stop_members
-        .par_iter()
-        .map(|(faces, join, label)| {
-            let sources: Vec<&Source> = faces.iter().map(|&k| &law_sources[k]).collect();
-            Member {
-                label: label.clone(),
-                bits: joins_run(&digits, &sources, join.clone(), tree_widths),
-                note: format!("{} faces", faces.len()),
-            }
-        })
-        .collect();
-    let stop_ms = clock.elapsed().as_millis();
-    let stop_charge = family_charge(stop_runs.len());
-    // The price at the dyadic-cell grain: naming the least law in every dyadic cell opened among the
-    // pair (one bit a dyadic cell at π = ½) and the family's charge.
-    let stop_oracle = law_rows
-        .iter()
-        .map(|(_, gains)| gains[2].clone())
-        .min_by(|a, b| a.upper.cmp(&b.upper))
-        .expect("a law");
-    println!(
-        "  (b) in each digit tree (the stop-weight mixture; {} members: the ½ tree against each other law at the incumbent's rungs j = 1..{top}, and two balanced families; {stop_ms} ms wall):",
-        stop_runs.len()
-    );
-    for index in [stop_runs.len() - 2, stop_runs.len() - 1] {
-        println!(
-            "    {}: {} a cell ({} against the tree uncharged)",
-            stop_runs[index].label,
-            per(&stop_runs[index].bits, cells as u64, grain),
-            reading_of(
-                &difference_interval(&stop_runs[index].bits, &tree_code),
-                grain
-            )
-        );
-    }
-    let least_all = least_law[2].0.clone();
-    println!(
-        "    the least law in every dyadic cell: oracle {} against its naming ⌈log₂ {}⌉ = {} bits a dyadic cell over {opened} opened, {} bits: {}",
-        reading_of(&least_all, grain),
-        laws.len() - 1,
-        family_charge(laws.len() - 1),
-        family_charge(laws.len() - 1) * opened,
-        if -&least_all.upper
-            > Rat::from_integer(BigInt::from(family_charge(laws.len() - 1) * opened))
-        {
-            "exceeds it"
-        } else {
-            "does not exceed it: refused"
-        }
-    );
-    let stop_price = Rat::from_integer(BigInt::from(opened + stop_charge));
-    let stop_choice = decide(
-        "stop mixture (the best pair's dyadic-cell oracle; the price one bit a dyadic cell opened plus the family charge)",
-        &stop_runs,
-        stop_charge,
-        &stop_oracle,
-        &stop_price,
-    );
-
-    // (c) Fixed-share across epochs: the tree's cell face against each Born member's.
-    let clock = Instant::now();
-    let shares = u32::try_from(ceil_log2(&BigUint::from(population))).expect("a rung");
-    let tree_cells = cell_faces(&tree, &digits, cells, lattice);
-    let born_cells: Vec<Vec<Rat>> = born
-        .iter()
-        .map(|(s, _)| cell_faces(s, &digits, cells, lattice))
-        .collect();
-    let switch_members: Vec<(usize, u32)> = (0..born.len())
-        .flat_map(|m| (1..=shares).map(move |j| (m, j)))
-        .collect();
-    let switch_runs: Vec<Member> = switch_members
-        .par_iter()
-        .map(|&(m, j)| {
-            let (bits, drift) =
-                switching_run(&tree_cells, &born_cells[m], Some(j), tree_widths.carrier);
-            Member {
-                label: format!("α = 2^(−{j}) with {}", born[m].0.label),
-                bits,
-                note: format!("drift ≤ {} bits", exact(&drift)),
-            }
-        })
-        .collect();
-    let bounds: Vec<ExactInterval> = switch_members
-        .par_iter()
-        .map(|&(m, j)| switching_bound(&tree_units[1], &tree_totals[1], &born_units[m][1], j))
-        .collect();
-    let switch_ms = clock.elapsed().as_millis();
-    let switch_charge = family_charge(switch_runs.len());
-    println!(
-        "  (c) across epochs (the switching mixture of the tree's and a Born member's cell faces at α = 2^(−j), j = 1..{shares}; {} members; {switch_ms} ms wall):",
-        switch_runs.len()
-    );
-    for (m, (source, _)) in born.iter().enumerate() {
-        let span = m * shares as usize..(m + 1) * shares as usize;
-        let (row, _) = least(&switch_runs[span.clone()]);
-        let best_bound = bounds[span.clone()]
-            .iter()
-            .min_by(|a, b| a.upper.cmp(&b.upper))
-            .expect("a rate");
-        let (plain, _) = switching_run(&tree_cells, &born_cells[m], None, tree_widths.carrier);
-        println!(
-            "    {}: best {} {} against the tree; Decision 30's plain mixture {}; the dominance bound (best switching sequence with its price) {}; the cell-grain oracle {}",
-            source.label,
-            switch_runs[span.start + row].label,
-            reading_of(
-                &difference_interval(&switch_runs[span.start + row].bits, &tree_code),
-                grain
-            ),
-            reading_of(&difference_interval(&plain, &tree_code), grain),
-            reading_of(best_bound, grain),
-            reading_of(&born_oracles[m][1], grain),
-        );
-    }
-    let switch_oracle = born_oracles
-        .iter()
-        .map(|gains| gains[1].clone())
-        .min_by(|a, b| a.upper.cmp(&b.upper))
-        .expect("a member");
-    let best_bound = bounds
-        .iter()
-        .min_by(|a, b| a.upper.cmp(&b.upper))
-        .expect("a bound");
-    // The price at the cell grain: the best switching sequence's naming, read off its dominance
-    // bound minus its oracle, with the family's charge.
-    let switch_price =
-        &best_bound.upper - &switch_oracle.lower + Rat::from_integer(BigInt::from(switch_charge));
-    let switch_choice = decide(
-        "switching (the best Born member's cell-grain oracle; the price the best switching sequence's naming plus the family charge)",
-        &switch_runs,
-        switch_charge,
-        &switch_oracle,
-        &switch_price.max(Rat::from_integer(BigInt::from(switch_charge))),
-    );
-    println!();
-
-    // ---- 3. The held-out pass, once, for each law that codes below the tree.
-    let chosen = [
-        local_choice.map(|i| ("node-local", i)),
-        stop_choice.map(|i| ("stop mixture", i)),
-        switch_choice.map(|i| ("switching", i)),
-    ];
-    if chosen.iter().all(Option::is_none) {
-        println!(
-            "3. no local law codes below the ½ tree on the development cells, charged: that is the result, and no held-out cell is read"
-        );
-    } else {
-        println!("3. the held-out pass, once, for each law that codes below the tree:");
-        let letters = cell_letters(&full.cells);
-        let clock = Instant::now();
-        let run = prequential(&full, &letters, &declared).expect("the tree and the baselines");
-        let held_cells = run.held_out.cells;
-        let is_held = |position: usize| held.contains(&position);
-        println!("  held out ({held_cells} cells), bits a cell at L_R = {grain}:");
-        for (name, bits) in [
-            ("the ½ tree", &run.held_out.tree),
-            ("online order-0 KT", &run.held_out.order_zero),
-            ("online order-1 KT", &run.held_out.order_one),
-            ("PPM order 2, escape C", &run.held_out.ppm),
-        ] {
-            println!(
-                "    {name}: {} (total {})",
-                per(bits, held_cells, grain),
-                enclosure(bits, grain)
-            );
-        }
-        let clock_half = Instant::now();
-        let mut half_tree = Landmarks::new(declared.clone()).expect("the ½ tree");
-        for (position, &class) in full.cells.iter().enumerate() {
-            half_tree
-                .receive(&address(&full.cells, position, declared.depth), class)
-                .expect("a cell");
-        }
-        println!(
-            "    the ½ tree's whole passage: {} ms, {} nodes, {} stored bits",
-            clock_half.elapsed().as_millis(),
-            half_tree.nodes(),
-            half_tree.bits()
-        );
-        for (name, index) in chosen.into_iter().flatten() {
-            let clock_law = Instant::now();
-            let (bits, charge) = match name {
-                "node-local" => {
-                    let (m, j) = local_members[index];
-                    let (whole, _) = born_source(&full.cells, &born_declarations[m]);
-                    let ([_, held_bits], _, _) = local_run(
-                        &full.cells,
-                        &is_held,
-                        &declared,
-                        LocalLaw::new(j).expect("a rung"),
-                        &whole,
-                    );
-                    (held_bits, local_charge)
-                }
-                "stop mixture" => {
-                    let (faces, join, _) = &stop_members[index];
-                    let mut mixture = StopMixture::new(
-                        declared.clone(),
-                        faces.iter().map(|&k| laws[k].clone()).collect(),
-                        join.clone(),
-                    )
-                    .expect("the chosen mixture");
-                    let mut coders = [Coder::default(), Coder::default()];
-                    for (position, &class) in full.cells.iter().enumerate() {
-                        let reading = mixture
-                            .receive(&address(&full.cells, position, declared.depth), class)
-                            .expect("a cell");
-                        coders[usize::from(is_held(position))].add(&reading.executed);
-                    }
-                    let [development_bits, held_bits] = coders.map(Coder::bits);
-                    println!(
-                        "    check: the owner's StopMixture reproduces the development code: {}",
-                        development_bits == stop_runs[index].bits
-                    );
-                    let nodes: usize = mixture.trees().iter().map(Landmarks::nodes).sum();
-                    let stored: u64 = mixture.trees().iter().map(Landmarks::bits).sum();
-                    let (rebases, _) = mixture.joins().rebases();
-                    println!(
-                        "    the mixture's whole passage: {} ms, {nodes} nodes and {stored} stored bits in its {} trees, {} join rebases, the joins' largest drift ≤ {} bits",
-                        clock_law.elapsed().as_millis(),
-                        mixture.trees().len(),
-                        rebases,
-                        exact(&mixture.joins().drift())
-                    );
-                    (held_bits, stop_charge)
-                }
-                _ => {
-                    let (m, j) = switch_members[index];
-                    let (whole, _) = born_source(&full.cells, &born_declarations[m]);
-                    let (whole_tree, whole_digits) = tree_source(&full.cells, &declared);
-                    let n = full.cells.len();
-                    let tree_faces = cell_faces(&whole_tree, &whole_digits, n, lattice);
-                    let born_faces = cell_faces(&whole, &whole_digits, n, lattice);
-                    let mut mixture = Mixture::switching(tree_widths.carrier, j).expect("a rate");
-                    let mut bits = ExactInterval::point(Rat::zero());
-                    for position in 0..n {
-                        let weight = mixture.weight();
-                        let face = &weight * &tree_faces[position]
-                            + (Rat::one() - &weight) * &born_faces[position];
-                        if is_held(position) {
-                            bits = interval_sum(&bits, &code_length(&face).expect("a face"))
-                                .expect("an enclosure");
-                        }
-                        mixture
-                            .step(&MixtureStep {
-                                ring: 0,
-                                tree: tree_faces[position].clone(),
-                                combined: born_faces[position].clone(),
-                                residual: Rat::zero(),
-                            })
-                            .expect("a step");
-                    }
-                    (bits, switch_charge)
-                }
-            };
-            println!(
-                "  {name} ({}): {} a cell (total {})",
-                match name {
-                    "node-local" => &local_runs[index].label,
-                    "stop mixture" => &stop_runs[index].label,
-                    _ => &switch_runs[index].label,
-                },
-                per(&bits, held_cells, grain),
-                enclosure(&bits, grain)
-            );
-            println!(
-                "    {name}'s held-out pass: {} ms",
-                clock_law.elapsed().as_millis()
-            );
-            ordering(
-                &format!(
-                    "  {name}, charged its family's {charge} bits, against the ½ tree (both charged the depth's {depth_bits})"
-                ),
-                &charged(&bits, charge),
-                &run.held_out.tree,
-                held_cells,
-                grain,
-            );
-            let total = charge + depth_bits;
-            for (label, against) in [
-                ("online order-0 KT", &run.held_out.order_zero),
-                ("online order-1 KT", &run.held_out.order_one),
-                ("PPM order 2", &run.held_out.ppm),
-            ] {
-                ordering(
-                    &format!(
-                        "  {name}, charged {total} bits (its family's and the depth's), against {label}"
-                    ),
-                    &charged(&bits, total),
-                    against,
-                    held_cells,
-                    grain,
-                );
-            }
-        }
-        println!(
-            "  the held-out pass: {} ms wall",
-            clock.elapsed().as_millis()
-        );
-    }
-    println!();
-    println!(
-        "wall time (exterior): setup and reads {setup_ms} ms; the harness {} ms",
-        setup.elapsed().as_millis()
-    );
-}
-
-/// `a − b` of two enclosures.
-fn difference_interval(a: &ExactInterval, b: &ExactInterval) -> ExactInterval {
-    ExactInterval {
-        lower: &a.lower - &b.upper,
-        upper: &a.upper - &b.lower,
-    }
 }
 
 /// A cut of the development cells alone.
@@ -2503,8 +1415,8 @@ fn dev_cut(cells: &[usize]) -> Cut {
 const CAP: u128 = 20_000_000_000;
 
 /// **The bytes a node and a baseline cell, measured on the standing cut** (Decision 35): the `½`
-/// tree at `depth` over the standing cut's cells, its live bytes (the counted allocator's, the tree
-/// alone on its thread) over its founded nodes; the online baselines' live bytes over the cells
+/// tree at `depth` over the standing cut's cells, its allocated bytes (the counted allocator's, the tree
+/// alone on its thread) over its founded nodes; the online baselines' allocated bytes over the cells
 /// they read.
 struct Measured {
     tree_bytes: u128,
@@ -2562,7 +1474,7 @@ fn memory_derivation(
     let digits = u128::from(odometer_digits(declaration.alphabet));
     let depth = declaration.depth as u128;
     println!(
-        "0. memory (the cap {CAP} bytes): on the standing cut ({} cells) the ½ tree at D = {depth} holds {} nodes in {} live bytes, {} bytes a node ({} rem {} over {}); the baselines {} live bytes, {} bytes a cell ({} rem {} over {})",
+        "0. memory (the cap {CAP} bytes): on the standing cut ({} cells) the ½ tree at D = {depth} holds {} nodes in {} allocated bytes, {} bytes a node ({} rem {} over {}); the baselines {} allocated bytes, {} bytes a cell ({} rem {} over {})",
         measured.cells,
         measured.nodes,
         measured.tree_bytes,
@@ -2662,7 +1574,7 @@ const SLOTS: [&str; 4] = [
 
 /// **A whole passage's tree, read on the parts**: every cell scored at the standing before its own
 /// deposit; the faces' products per slot, the tree's chart, stored nodes, stored bits, rule and
-/// largest certified residual, its live bytes when counted alone, and its wall time.
+/// largest certified residual, its allocated bytes when counted alone, and its wall time.
 struct TreePass {
     codes: [PassageCode; 4],
     chart: ChartReport,
@@ -2761,7 +1673,7 @@ fn scale_readings(label: &str, pass: &TreePass, population: u64, grain: u64) {
         pass.nodes,
         pass.bits,
         pass.bytes.map_or(String::new(), |bytes| format!(
-            ", {bytes} live bytes ({} rem {} over {} a node)",
+            ", {bytes} allocated bytes ({} rem {} over {} a node)",
             bytes / pass.nodes.max(1),
             bytes % pass.nodes.max(1),
             pass.nodes
@@ -3067,16 +1979,25 @@ const DOUBLING: [usize; 4] = [6, 12, 24, 48];
 /// the sweep there, and the depth is chosen among what was measured.
 const PASSAGE_STOP_MS: u128 = 240_000;
 
+/// [definition; agent-inferred] **The bytes a stored node occupies on the host** (`hnn::landmark`,
+/// "The arena"): its chart 80, its masses 8, its depth word 4 and its label end 4 in the flat
+/// vectors; a child-table entry `(key, child)` 16; a label letter 4.
+const NODE_BYTES: u128 = 96;
+const ENTRY_BYTES: u128 = 16;
+const LETTER_BYTES: u128 = 4;
+
 /// **One passage of a tree over a stream**, its tree counted alone on its thread: the faces'
 /// products on `[development, held out]` (cells before and from `development`), the certified
-/// per-cell residuals summed on each part (bits, exact), and the stored nodes, label letters, live
-/// bytes, widths, chart, rule, largest residual and wall time.
+/// per-cell residuals summed on each part (bits, exact), the stored nodes, child-table entries and
+/// label letters, the allocated bytes (the counted allocator's growth: capacity, which the vectors
+/// and the table reserve by doubling, not occupancy), the widths, chart, rule, largest residual and
+/// wall time.
 struct Pass {
     depth: usize,
-    storage: Storage,
     codes: [PassageCode; 2],
     residuals: [Rat; 2],
     nodes: usize,
+    entries: usize,
     held: usize,
     bytes: usize,
     widths: Widths,
@@ -3086,18 +2007,11 @@ struct Pass {
     wall: u128,
 }
 
-fn pass(
-    cells: &[usize],
-    development: usize,
-    declaration: &LandmarkDeclaration,
-    storage: Storage,
-) -> Pass {
+fn pass(cells: &[usize], development: usize, declaration: &LandmarkDeclaration) -> Pass {
     let clock = Instant::now();
     counting(true);
     let before = live();
-    let mut tree = Landmarks::new(declaration.clone())
-        .and_then(|tree| tree.with_storage(storage))
-        .expect("a declared tree");
+    let mut tree = Landmarks::new(declaration.clone()).expect("a declared tree");
     let mut codes = [PassageCode::new(); 2];
     let mut residuals = [Rat::zero(), Rat::zero()];
     let mut largest = Rat::zero();
@@ -3116,12 +2030,14 @@ fn pass(
     }
     let bytes = grown(before);
     counting(false);
+    // Every stored node but a root is one child-table entry.
+    let roots = tree.arena().roots().iter().filter(|&&root| root != u32::MAX).count();
     Pass {
         depth: declaration.depth,
-        storage,
         codes,
         residuals,
         nodes: tree.nodes(),
+        entries: tree.nodes() - roots,
         held: tree.held(),
         bytes,
         widths: tree.widths(),
@@ -3132,14 +2048,21 @@ fn pass(
     }
 }
 
+/// **A passage's occupied bytes**: its stored nodes, child-table entries and label letters at the
+/// bytes each occupies ([`NODE_BYTES`], [`ENTRY_BYTES`], [`LETTER_BYTES`]).
+fn occupied(pass: &Pass) -> u128 {
+    NODE_BYTES * pass.nodes as u128
+        + ENTRY_BYTES * pass.entries as u128
+        + LETTER_BYTES * pass.held as u128
+}
+
 /// A passage's line: its code on a part (exact, at the grain, and a cell), its certified residual,
-/// and its stored nodes, label letters, live bytes and wall time.
+/// and its stored nodes, label letters, allocated and occupied bytes and wall time.
 fn pass_line(pass: &Pass, part: usize, cells: u64, grain: u64) {
     let bits = bits_of(&pass.codes[part]);
     println!(
-        "  D = {} ({}, {}): {}; a cell {}",
+        "  D = {} ({}): {}; a cell {}",
         pass.depth,
-        pass.storage,
         widths(&pass.widths),
         enclosure(&bits, grain),
         per(&bits, cells, grain)
@@ -3156,13 +2079,15 @@ fn pass_line(pass: &Pass, part: usize, cells: u64, grain: u64) {
         exact(&dyadic_ceiling(&pass.rule))
     );
     println!(
-        "    {} nodes stored, {} label letters, {} live bytes ({} rem {} over {} a node); {} rebases ({} at the most-rebased node), the largest drift ≤ {} bits; {} ms",
+        "    {} nodes stored, {} table entries, {} label letters; {} allocated bytes ({} rem {} over {} a node), {} occupied ({NODE_BYTES} a node, {ENTRY_BYTES} an entry, {LETTER_BYTES} a letter); {} rebases ({} at the most-rebased node), the largest drift ≤ {} bits; {} ms",
         pass.nodes,
+        pass.entries,
         pass.held,
         pass.bytes,
         pass.bytes / pass.nodes.max(1),
         pass.bytes % pass.nodes.max(1),
         pass.nodes,
+        occupied(pass),
         pass.chart.rebases,
         pass.chart.node_rebases,
         exact(&dyadic_ceiling(&pass.chart.drift)),
@@ -3277,45 +2202,20 @@ fn compact_harness(path: &str) {
     );
     println!();
 
-    // 1. D = 6: the compacted tree against the full arena, the development cells only.
+    // 1. D = 6: Decision 28's depth, the development cells only.
     println!(
-        "1. D = 6 on the development cells, one passage each: Decision 28's full arena and the compacted tree (the same prior: every executed face within its certificate of the same ideal face)"
+        "1. D = 6 on the development cells, one passage: Decision 28's tree at its chosen depth, stored where paths part (the same prior and code in ℚ, Lean compacted_is_decision_28; the retired arena of one node a depth read it equal within their certificates at commit 2fb0c1c0)"
     );
     let first_bytes = DECISION_35_NODE_BYTES;
     if !admitted(
-        "the full arena at D = 6",
-        u128::from(n_dev) * u128::from(digits) * 6 * first_bytes,
-    ) {
-        return;
-    }
-    let full = pass(&dev, dev.len(), &at(6), Storage::Full);
-    pass_line(&full, 0, n_dev, grain);
-    if !admitted(
-        "the compacted tree at D = 6",
+        "the tree at D = 6",
         projected(u128::from(n_dev), u128::from(digits), 6, first_bytes),
     ) {
         return;
     }
-    let compact = pass(&dev, dev.len(), &at(6), Storage::Compacted);
-    pass_line(&compact, 0, n_dev, grain);
-    let (full_bits, compact_bits) = (bits_of(&full.codes[0]), bits_of(&compact.codes[0]));
-    let delta = difference_interval(&compact_bits, &full_bits);
-    let certificates = &full.residuals[0] + &compact.residuals[0];
-    let within = delta.lower <= certificates && -&certificates <= delta.upper;
-    println!(
-        "  compacted − full: {}; the certificates' sum {} bits: {}",
-        difference(&compact_bits, &full_bits, grain),
-        exact(&dyadic_ceiling(&certificates)),
-        if within {
-            "equal within their certificates"
-        } else {
-            "NOT within their certificates"
-        }
-    );
-    println!(
-        "  the compacted tree stores {} of the full arena's {} nodes in {} of its {} live bytes",
-        compact.nodes, full.nodes, compact.bytes, full.bytes
-    );
+    let first = pass(&dev, dev.len(), &at(6));
+    pass_line(&first, 0, n_dev, grain);
+    let first_bits = bits_of(&first.codes[0]);
     println!("  peak resident so far: {}", resident());
     println!();
 
@@ -3329,8 +2229,8 @@ fn compact_harness(path: &str) {
             .saturating_sub(letters)
             .div_ceil(pass.nodes.max(1) as u128)
     };
-    let mut tried: Vec<(usize, ExactInterval)> = vec![(6, compact_bits.clone())];
-    let mut passes = vec![compact];
+    let mut tried: Vec<(usize, ExactInterval)> = vec![(6, first_bits.clone())];
+    let mut passes = vec![first];
     let mut stopped = None;
     for &depth in &family[1..] {
         let last = passes.last().expect("a passage");
@@ -3354,7 +2254,7 @@ fn compact_harness(path: &str) {
             stopped = Some(format!("the projection at D = {depth} was refused"));
             break;
         }
-        let run = pass(&dev, dev.len(), &at(depth), Storage::Compacted);
+        let run = pass(&dev, dev.len(), &at(depth));
         pass_line(&run, 0, n_dev, grain);
         tried.push((depth, bits_of(&run.codes[0])));
         passes.push(run);
@@ -3387,7 +2287,7 @@ fn compact_harness(path: &str) {
         "3. the development cells' choice: the compacted tree at D = {chosen} charged {charge} bits against Decision 28's tree at D = 6 charged {incumbent_charge} (the union charge, {union} each, moves neither):"
     );
     let charged_chosen = charged(&chosen_bits, charge);
-    let charged_full = charged(&full_bits, incumbent_charge);
+    let charged_full = charged(&first_bits, incumbent_charge);
     println!(
         "  the compacted tree at D = {chosen}: {}",
         enclosure(&charged_chosen, grain)
@@ -3423,17 +2323,17 @@ fn compact_harness(path: &str) {
     if !admitted(&format!("the held-out passage at D = {chosen}"), projection) {
         return;
     }
-    let whole = pass(&cells, held.start, &at(chosen), Storage::Compacted);
+    let whole = pass(&cells, held.start, &at(chosen));
     pass_line(&whole, 1, n_held, grain);
     println!(
         "    check: its development code is the sweep's at D = {chosen}: {}",
         bits_of(&whole.codes[0]) == chosen_bits
     );
-    let incumbent = pass(&cells, held.start, &at(6), Storage::Full);
+    let incumbent = pass(&cells, held.start, &at(6));
     pass_line(&incumbent, 1, n_held, grain);
     println!(
         "    check: its development code is step 1's: {}",
-        bits_of(&incumbent.codes[0]) == full_bits
+        bits_of(&incumbent.codes[0]) == first_bits
     );
     let parts = Parts {
         held: held.clone(),
@@ -3511,10 +2411,6 @@ fn main() {
             prior_harness(value);
             return;
         }
-        [key, value, mode] if key == "cut-file" && mode == "local" => {
-            local_harness(value);
-            return;
-        }
         [key, value, mode, standing] if key == "cut-file" && mode == "wide" => {
             wide_harness(value, standing);
             return;
@@ -3531,7 +2427,7 @@ fn main() {
         }
         _ => {
             println!(
-                "usage: hnn_landmark cut-file <path> [letters [contacts] | prior | local | wide <standing cut> | compact]"
+                "usage: hnn_landmark cut-file <path> [letters [contacts] | prior | wide <standing cut> | compact]"
             );
             return;
         }

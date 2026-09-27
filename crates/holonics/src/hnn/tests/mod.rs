@@ -8,6 +8,7 @@ mod field;
 mod guards;
 mod keys;
 mod landmark;
+mod landmark_full;
 mod learning;
 mod moment;
 mod pending;
