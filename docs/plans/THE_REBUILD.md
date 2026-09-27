@@ -3130,8 +3130,8 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
     - **What does not change.** The prior. This is Decision 28's tree at the declared `D`, code for
       code, exactly in ℚ. No family is re-swept; only the depth is re-chosen, because memory no
       longer caps it.
-    - **Memory.** A passage of `n` cells founds at most two nodes per arrival in each digit tree it
-      enters, at any depth, and each leaf holds its label.
+    - **Memory.** A passage of `n` cells keeps at most `2n − 1` nodes in each digit tree it enters
+      (`max 1 (2n)` counting an empty passage's root), at any depth, and each leaf holds its label.
     - **Retired.** Decision 36's Rust realization: `Founding::SecondArrival` and the pending
       records. Its Lean stays as the law of absent children and stopping rules.
     - **What is measured.**
@@ -3142,6 +3142,40 @@ Each settled decision and its source (R3 H5). Two kinds of source are distinguis
       - Then one held-out passage.
     - **The card.** If the development cells adopt the depth, the card ports the compacted arena in
       the same step (Decision 25).
+
+    **Measured (September 26).** Lean `HNN/LandmarkCompaction` proves `compacted_is_decision_28`
+    for every passage: the compacted root weight is `stopWeight`, every face is `stopFace`, positive
+    and normalized, and both prequential codes are equal in ℚ. `compacted_node_bound` keeps at most
+    `max 1 (2n)` nodes a tree. Rust `Storage::Compacted` in `hnn::landmark` runs the same `Law`, and
+    its oracle equals the full oracle exactly in ℚ at every face in the tests. Each split ratio is
+    carried once at `W` bits, and its unit enters the drift. On the wide cut (notebook
+    `hnn_landmark compact`, 177535 ms in all):
+    - **The check at `D = 6`.** On the development cells the compacted and full trees both read
+      `1822006 + 1/16 + ε`. They are equal within their certificates. The compacted tree holds
+      2784875 nodes in 477104868 live bytes; the full tree holds 4620707 nodes in 914361060 bytes.
+    - **The depth sweep** (development, charged `⌈log₂ 5⌉ = 3` bits, the same as Decision 35's
+      charge for its depth):
+
+      | D | code | nodes | live bytes | ms |
+      |---|---|---|---|---|
+      | 6 | `1822006 + 1/16 + ε` | 2784875 | 477104868 | 14291 |
+      | 12 | `1802252 + 14/16 + ε` | 8527193 | 1920994548 | 22078 |
+      | 24 | `1801962 + 7/16 + ε` | 10664559 | 1996493076 | 23988 |
+      | 48 | `1801940 + 12/16 + ε` | 10985626 | 2097158484 | 24936 |
+      | 73 | `D = 48` plus `0 + 0/16 + ε` | 11066401 | 2202018284 | 25133 |
+
+      The rise at 73 lies within the certificates. **The development cells choose `D = 48`**, which
+      is `−20066 + 10/16 + ε` below Decision 28's `D = 6`. Decision 37 is adopted.
+    - **Held out** (one passage, 131072 cells). The tree at `D = 48` reads `258201 + 3/16 + ε`,
+      which is `1 + 15/16 + ε` a cell. Charged, it is below Decision 28's tree by
+      `−3416 + 15/16 + ε`, below PPM-2 by `−137395 + 11/16 + ε` (a cell `−2 + 15/16`), below order-1
+      by `−238483 + 1/16 + ε` and below order-0 by `−373509 + 2/16 + ε`. Each ordering is decided
+      by disjoint exact enclosures. The passage stores 12542969 nodes and 40352545 label letters in
+      2097158516 live bytes.
+    - **What it located.** The development cells wanted depth, and memory had been hiding it. Once
+      the tree is stored at its parting faces, the depth costs at most two nodes an arrival, and the
+      code still falls at `D = 48`. Decision 36's held-out gain is had here without its
+      development loss.
 
     Source: agent-inferred, from Decision 36's measurement and the unary-chain identity (the
     compacted context tree of Willems's unbounded-depth weighting).
