@@ -152,13 +152,23 @@ sets the order:
    design choices). Every byte gains (`−5426 + 3/16` development), and the letters fall to
    `4467 + 6/16` from `5774 + 15/16`. The part clock is worth `2764 + 8/16` on development.
    Bayes selects the boundary egg outright.
-9. **Next in campaign 5.**
-   - merges: learn the part clock's byte classes and share the human port's thin counts, by
-     collapsing classes whose faces agree over the admitted future, priced by their code pair.
-     The merge Lean comes first (`expand_merge`, `merge_cost_iff`, `segmentation_mass`,
-     `encoding_square_or_separator`, `release_merge_iff_future_equivalent`);
-   - the admitted receivers (request→response, response→later-human) consumed;
-   - merges priced by their code pair as species collapse (Holonic Encoding);
+9. **Campaign 5's merges and admitted receivers, built (September 27;** `receiver::population::{merge,
+   admitted}`, `compression::landmark::context::spans`, Lean `Context/Merge`**).**
+   - **The admitted receivers** (the source contract's item 7) are consumed. A response is read
+     against its request's span (where it quotes it), with the pointer to the request coded and
+     paid; it is worth `−754 + 6/16` on development and `−173 + 6/16` held out. A later human
+     return is read against the response it answers as a receipt only (`−470 + 12/16`), never a
+     target.
+   - **Merges are species of partition cells.** The merge Lean (`expand_merge`, `merge_cost_iff`,
+     `segmentation_mass`, `encoding_square_or_separator`, `release_merge_iff_future_equivalent`)
+     is proved. The part clock's six declared byte classes are learned into four on development
+     cells, and the human port's shared counts are refused, by `7/16`.
+   - **Combined, the curated stream codes `−1820 + 9/16 + ε` below the flat stream on
+     development.** Held out it reads `−535 + 8/16 + ε`, disclosed and choosing nothing: `47 + 14/16`
+     above the declared classes, which is mostly the learned partition's description.
+10. **Next in campaign 5.**
+   - merges of the byte tree's contexts (tokenizers as landmark words), priced by their code pair
+     as species collapse (Holonic Encoding), which need a key signature for tree contexts;
    - then the full HNN at scale on the population.
 
 The standing cut has been reused for development and lies within the wide cut's held-out range.
