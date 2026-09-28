@@ -1,6 +1,9 @@
 use super::tests::Fixed;
-use super::{Population, PopulationRelease, Relation, RelationKind, ReleaseRefusal};
-use crate::ratio::rat;
+use super::{Family, Population, PopulationRelease, Relation, RelationKind, ReleaseRefusal};
+use crate::ratio::algebraic::ExactInterval;
+use crate::ratio::{Rat, rat};
+use crate::receiver::release::ReleaseReturn;
+use num_traits::{One, Zero};
 
 #[test]
 fn release_is_the_scored_face_and_includes_the_designated_class() {
@@ -45,6 +48,59 @@ fn a_relation_without_a_living_receiver_owner_is_refused() {
 }
 
 // -------------------------------------------------------------------------------------------
+// the family draw (the receipts `population::family_release` carried, through the one law)
+
+/// A family whose posterior is a point mass is drawn at every key.
+#[test]
+fn point_mass_family_choice_is_certified() {
+    let mut population = Population::new(vec![
+        Box::new(Fixed::new(vec![Rat::one(), Rat::zero()], 0)) as Box<dyn Family>,
+    ])
+    .unwrap();
+    population.receive(0).unwrap();
+    let face = population.family_posterior_face().unwrap();
+    assert_eq!(face, vec![ExactInterval::point(Rat::one())]);
+    let drawn = population.select_family(&rat(1, 2)).unwrap();
+    assert_eq!(drawn.drawn_class(), Some(0));
+}
+
+/// The posterior enclosure is the two families' charged mixture: `2/3` and `1/3` at descriptions
+/// one and two bits.
+#[test]
+fn posterior_bounds_use_the_two_families_charged_mixture() {
+    let population = Population::new(vec![
+        Box::new(Fixed::new(vec![rat(1, 1), rat(0, 1)], 1)) as Box<dyn Family>,
+        Box::new(Fixed::new(vec![rat(0, 1), rat(1, 1)], 2)),
+    ])
+    .unwrap();
+    let posterior = population.family_posterior_face().unwrap();
+    assert_eq!(posterior.len(), 2);
+    assert!(posterior[0].lower <= rat(2, 3) && posterior[0].upper >= rat(2, 3));
+    assert!(posterior[1].lower <= rat(1, 3) && posterior[1].upper >= rat(1, 3));
+}
+
+/// A key the posterior enclosure leaves plural is held: the family draw is `Unresolved`, with the
+/// crossing families, and nothing is drawn.
+#[test]
+fn interval_posterior_holds_an_unresolved_family_crossing() {
+    let population = Population::new(vec![
+        Box::new(Fixed::new(vec![Rat::one(), Rat::zero()], 1)) as Box<dyn Family>,
+        Box::new(Fixed::new(vec![Rat::zero(), Rat::one()], 2)),
+    ])
+    .unwrap();
+    match population.select_family(&rat(2, 3)).unwrap() {
+        ReleaseReturn::Unresolved(held) => {
+            assert_eq!(held.key, rat(2, 3));
+            assert_eq!(
+                held.crossings.iter().map(|c| c.class).collect::<Vec<_>>(),
+                vec![0, 1]
+            );
+        }
+        other => panic!("expected an unresolved family draw, got {other:?}"),
+    }
+}
+
+// -------------------------------------------------------------------------------------------
 // release checks on known-truth terrain (the notebook's retired `hnn_release_terrain`, whose
 // receipt these fixtures reproduce exactly)
 
@@ -59,12 +115,15 @@ mod terrain {
         Draw, Moire, MoireClass, MoireFamily, MoireTruth, TreeSource, TreeSourceFamily,
     };
     use crate::ratio::{Rat, rat};
-    use crate::receiver::population::{Composed, Family, KeyFamily, Population, TreeFamily};
+    use crate::receiver::population::{
+        Composed, Family, KeyFamily, Population, PopulationRelease, TreeFamily,
+    };
+    use crate::receiver::release::{ReleaseReturn, draw_exact};
 
     const SEED: u64 = 20_260_927;
 
-    /// The one-member population's exact conditional face, read inside the population's public
-    /// enclosure (the enclosure must contain it, class by class).
+    /// The one-member population's exact conditional face, read inside the release view's face
+    /// (`P_release = P_scored`: the enclosure must contain it, class by class).
     fn enclosed_member_face(population: &Population) -> Vec<Rat> {
         let exact = population
             .families()
@@ -72,21 +131,28 @@ mod terrain {
             .expect("the declared one-family population")
             .face()
             .expect("the member's exact conditional face");
-        let enclosure = population.face().expect("the population's enclosure");
+        let view = PopulationRelease::from_scored_face(population, 0).expect("the release view");
+        let enclosure = view.face();
         assert_eq!(exact.len(), enclosure.len());
         assert!(
             exact
                 .iter()
-                .zip(&enclosure)
+                .zip(enclosure)
                 .all(|(p, bounds)| bounds.lower <= *p && *p <= bounds.upper)
         );
         exact
     }
 
+    /// **The face determines `class` at every key**: the certified draw of the key zero lands in
+    /// `class` with the whole key interval `[0, 1)` as its cell. For a normalized exact face this
+    /// is exactly the face being one-hot on `class`, read through the one law.
     fn one_hot(face: &[Rat], class: usize) -> bool {
-        face.iter()
-            .enumerate()
-            .all(|(c, p)| if c == class { p.is_one() } else { p.is_zero() })
+        match draw_exact(face, &Rat::zero()).expect("a normalized exact face") {
+            ReleaseReturn::Drawn(cell) => {
+                cell.class == class && cell.prior_upper.is_zero() && cell.through_lower.is_one()
+            }
+            _ => false,
+        }
     }
 
     /// The moiré's cell at `tick`, read from the terrain's returned rate/phase keys alone.

@@ -1,12 +1,13 @@
-//! Tests for **R6 — receiver width and release**.
+//! Tests for **the one decision law**: the width laws it decides on, the threshold commit and its
+//! refusals, the certified draw and its join to the law at tolerance zero.
 //!
-//! Every theorem of `Foundation/ReceiverRelease` appears here as a test under the name the
-//! module's correspondence table gives it, and every declared-size entry point has a hostile-input
-//! test beside it. Nothing here needs a fixture.
+//! Every theorem of `Foundation/ReceiverRelease` the module's table names appears here under that
+//! name, and the draw's receipts are the ones `population::sampling` carried before U3 moved the law
+//! here (September 28), reproduced exactly.
 
 use super::*;
-use crate::receiver::face::Horizon;
-use num_traits::One;
+use crate::receiver::face::{ExactFace, FAMILY_CEILING, Horizon, Reading, width_over_readings};
+use num_bigint::BigInt;
 
 fn ratio(numerator: i64, denominator: i64) -> Rat {
     Rat::new(BigInt::from(numerator), BigInt::from(denominator))
@@ -14,15 +15,6 @@ fn ratio(numerator: i64, denominator: i64) -> Rat {
 
 fn integer(value: i64) -> Rat {
     Rat::from_integer(BigInt::from(value))
-}
-
-fn matrix(rows: &[&[i64]]) -> ExactRatMatrix {
-    ExactRatMatrix::new(
-        rows.iter()
-            .map(|row| row.iter().copied().map(integer).collect())
-            .collect(),
-    )
-    .expect("a rectangular matrix")
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -52,189 +44,118 @@ impl Reading for Coordinate {
     }
 }
 
-/// `min(value, cap)`: a declared non-expansive factor map.
-#[derive(Clone, Debug)]
-struct Clamp {
-    cap: Rat,
-}
-
-impl FactorMap for Clamp {
-    fn name(&self) -> &str {
-        "clamp"
-    }
-
-    fn apply(&self, value: &Rat) -> Rat {
-        if value > &self.cap {
-            self.cap.clone()
-        } else {
-            value.clone()
-        }
+fn x() -> Coordinate {
+    Coordinate {
+        receiver: "x".to_owned(),
+        at: 0,
     }
 }
 
-/// An **owned** coarser reading: one coordinate clamped at a declared cap. `FactoredReading`
-/// borrows its finer reading, which a `CoarseningStep`'s `Box<dyn Reading>` cannot hold, so the
-/// tower tests use this owned equivalent. It is `Clamp ∘ Coordinate` by construction, so it
-/// factors through `Coordinate` exactly as `coarser_receiver_factors` requires.
-#[derive(Clone, Debug)]
-struct OwnedClamped {
-    receiver: String,
-    at: usize,
-    cap: Rat,
+/// The finite width of a reading over an enumerated compatible family: each member read, then the
+/// diameter of the read faces (Lean `width`).
+fn width_of(reading: &dyn Reading, members: &[Vec<Rat>], norm: DiameterNorm) -> ReceiverWidth {
+    let faces = members
+        .iter()
+        .map(|member| reading.read(member).expect("a face"))
+        .collect::<Vec<_>>();
+    width_over_readings(reading.name(), "the enumerated fibre", &faces, norm).expect("a width")
 }
 
-impl Reading for OwnedClamped {
-    fn name(&self) -> &str {
-        &self.receiver
-    }
-
-    fn read(&self, state: &[Rat]) -> Result<ExactFace, WidthRefusal> {
-        let value = state.get(self.at).ok_or(WidthRefusal::DimensionMismatch {
-            declared: self.at,
-            found: state.len(),
-        })?;
-        let clamped = if value > &self.cap {
-            self.cap.clone()
-        } else {
-            value.clone()
-        };
-        Ok(ExactFace::Vector(vec![clamped]))
-    }
+fn states(values: &[Rat]) -> Vec<Vec<Rat>> {
+    values.iter().map(|value| vec![value.clone()]).collect()
 }
 
-/// `2 · value`: a declared **expansive** factor map. It is still a lawful coarsening — the
-/// composite reading is a function of the finer face and of nothing else — and it still widens.
-#[derive(Clone, Debug)]
-struct Scale {
-    by: Rat,
+/// A factor map `g` composed with the coordinate reading: the coarser receiver `g ∘ R`.
+fn factored(members: &[Vec<Rat>], g: impl Fn(&Rat) -> Rat) -> ReceiverWidth {
+    let faces = members
+        .iter()
+        .map(|member| ExactFace::Vector(vec![g(&member[0])]))
+        .collect::<Vec<_>>();
+    width_over_readings("g ∘ x", "the enumerated fibre", &faces, DiameterNorm::Supremum)
+        .expect("a width")
 }
 
-impl FactorMap for Scale {
-    fn name(&self) -> &str {
-        "scale"
-    }
-
-    fn apply(&self, value: &Rat) -> Rat {
-        &self.by * value
-    }
-}
-
-/// **The exact system whose event is future-stable while its timing is not.**
-///
-/// `x_{t+1} = 2 x_t` over `Q` — `Linearization` with `state = [[2]]` and a zero admitted input —
-/// with the event "the trajectory reaches `1`". Both receivers below read the same fibre of
-/// initial states through the same exact `h`-step map; they are `R ∘ Φ_h`, exactly as the Lean
-/// owner says.
-fn doubling() -> Linearization {
-    Linearization::declared(
-        "doubling",
-        matrix(&[&[2]]),
-        matrix(&[&[0]]),
-        matrix(&[&[1]]),
-        vec!["none".to_owned()],
-        vec!["x".to_owned()],
-    )
-    .expect("a one-dimensional linearization")
-}
-
-/// The first step at or before the horizon at which the trajectory reaches the threshold, or
-/// `horizon + 1` when it does not. The crossing is computed, not declared.
-fn crossing_time(system: &Linearization, state: &[Rat], threshold: &Rat, horizon: usize) -> usize {
-    let mut current = state.to_vec();
+/// **The exact system whose event is future-stable while its timing is not**: the doubling
+/// recurrence `x ↦ 2x` over `Q` (Lean `doubling`), with the event "the trajectory reaches `1`".
+fn crossing_time(state: &Rat, threshold: &Rat, horizon: usize) -> usize {
+    let mut current = state.clone();
     for step in 0..=horizon {
-        if &current[0] >= threshold {
+        if &current >= threshold {
             return step;
         }
-        current = advance(system, &current, &[vec![Rat::zero()]]).expect("the step advances");
+        current = &current * integer(2);
     }
     horizon + 1
 }
 
 /// The receiver **"the event occurs by the declared horizon"**.
-#[derive(Clone, Debug)]
 struct EventByHorizon {
-    receiver: String,
     horizon: usize,
-    threshold: Rat,
 }
 
 impl Reading for EventByHorizon {
     fn name(&self) -> &str {
-        &self.receiver
+        "event-by-horizon"
     }
 
     fn read(&self, state: &[Rat]) -> Result<ExactFace, WidthRefusal> {
-        let at = crossing_time(&doubling(), state, &self.threshold, self.horizon);
+        let at = crossing_time(&state[0], &Rat::one(), self.horizon);
         Ok(ExactFace::Flag(at <= self.horizon))
     }
 }
 
 /// The receiver **"the time of the event"**.
-#[derive(Clone, Debug)]
 struct TimeOfEvent {
-    receiver: String,
     horizon: usize,
-    threshold: Rat,
 }
 
 impl Reading for TimeOfEvent {
     fn name(&self) -> &str {
-        &self.receiver
+        "time-of-event"
     }
 
     fn read(&self, state: &[Rat]) -> Result<ExactFace, WidthRefusal> {
-        let at = crossing_time(&doubling(), state, &self.threshold, self.horizon);
+        let at = crossing_time(&state[0], &Rat::one(), self.horizon);
         Ok(ExactFace::Count(BigInt::from(at)))
     }
 }
 
 // ---------------------------------------------------------------------------------------------
-// the three laws of the width
+// the laws of the width
 // ---------------------------------------------------------------------------------------------
 
 /// Lean: `width_mono`. **A narrower fibre has no larger width.**
 #[test]
 fn the_width_is_monotone_under_fibre_inclusion() {
-    let wide = CompatibleFamily::enumerated(
-        "wide",
-        vec![vec![integer(0)], vec![integer(3)], vec![integer(7)]],
-    )
-    .expect("a family");
-    let narrow = CompatibleFamily::enumerated("narrow", vec![vec![integer(0)], vec![integer(3)]])
-        .expect("a family");
-    assert_eq!(narrow.is_subfamily_of(&wide), Some(true));
-    let reading = Coordinate {
-        receiver: "x".to_owned(),
-        at: 0,
-    };
-    let wide_width = width_enumerated(&reading, &wide, DiameterNorm::Supremum).expect("a width");
-    let narrow_width =
-        width_enumerated(&reading, &narrow, DiameterNorm::Supremum).expect("a width");
-    assert_eq!(wide_width.diameter(), &integer(7));
-    assert_eq!(narrow_width.diameter(), &integer(3));
-    assert!(narrow_width.diameter() <= wide_width.diameter());
-    assert_eq!(
-        wide_width.attaining(),
-        &WidthWitness::Pair { left: 0, right: 2 }
+    let wide = width_of(
+        &x(),
+        &states(&[integer(0), integer(3), integer(7)]),
+        DiameterNorm::Supremum,
     );
+    let narrow = width_of(
+        &x(),
+        &states(&[integer(0), integer(3)]),
+        DiameterNorm::Supremum,
+    );
+    assert_eq!(wide.diameter(), &integer(7));
+    assert_eq!(narrow.diameter(), &integer(3));
+    assert!(narrow.diameter() <= wide.diameter());
+    assert_eq!(wide.attaining(), &WidthWitness::Pair { left: 0, right: 2 });
 }
 
 /// Lean: `width_eq_zero_iff`. **Width zero is exactly constancy on the fibre.**
 #[test]
 fn width_zero_is_constancy_on_the_fibre() {
-    let reading = Coordinate {
-        receiver: "x".to_owned(),
-        at: 0,
-    };
-    let constant = CompatibleFamily::enumerated(
-        "constant",
-        vec![vec![integer(5)], vec![integer(5)], vec![integer(5)]],
-    )
-    .expect("a family");
-    let plural = CompatibleFamily::enumerated("plural", vec![vec![integer(5)], vec![integer(6)]])
-        .expect("a family");
-    let flat = width_enumerated(&reading, &constant, DiameterNorm::Supremum).expect("a width");
-    let spread = width_enumerated(&reading, &plural, DiameterNorm::Supremum).expect("a width");
+    let flat = width_of(
+        &x(),
+        &states(&[integer(5), integer(5), integer(5)]),
+        DiameterNorm::Supremum,
+    );
+    let spread = width_of(
+        &x(),
+        &states(&[integer(5), integer(6)]),
+        DiameterNorm::Supremum,
+    );
     assert!(flat.is_zero());
     assert_eq!(flat.attaining(), &WidthWitness::Point);
     assert!(!spread.is_zero());
@@ -243,554 +164,102 @@ fn width_zero_is_constancy_on_the_fibre() {
 /// Lean: `releasable_at_every_tolerance_iff_width_zero`.
 #[test]
 fn width_zero_releases_at_every_tolerance() {
-    let reading = Coordinate {
-        receiver: "x".to_owned(),
-        at: 0,
-    };
-    let constant =
-        CompatibleFamily::enumerated("constant", vec![vec![integer(5)], vec![integer(5)]])
-            .expect("a family");
-    let flat = width_enumerated(&reading, &constant, DiameterNorm::Supremum).expect("a width");
+    let flat = width_of(
+        &x(),
+        &states(&[integer(5), integer(5)]),
+        DiameterNorm::Supremum,
+    );
     for tolerance in [Rat::zero(), ratio(1, 1000), integer(1), integer(1000)] {
         assert!(flat.releasable_at(&tolerance));
     }
-    let plural = CompatibleFamily::enumerated("plural", vec![vec![integer(0)], vec![integer(4)]])
-        .expect("a family");
-    let spread = width_enumerated(&reading, &plural, DiameterNorm::Supremum).expect("a width");
+    let spread = width_of(
+        &x(),
+        &states(&[integer(0), integer(4)]),
+        DiameterNorm::Supremum,
+    );
     assert!(!spread.releasable_at(&integer(3)));
     assert!(spread.releasable_at(&integer(4)));
 }
 
-/// Lean: `width_nonExpansive_factor`. **A coarser receiver with a non-expansive factor map has no
-/// larger width**, and the non-expansiveness is *checked* on the fibre actually read.
+/// Lean: `width_nonExpansive_factor`. **A coarser receiver `g ∘ R` with `g` non-expansive has no
+/// larger width**: clamping at `4` never increases a separation.
 #[test]
-fn a_non_expansive_coarser_receiver_has_no_larger_width() {
-    let family = CompatibleFamily::enumerated(
-        "fibre",
-        vec![vec![integer(0)], vec![integer(3)], vec![integer(9)]],
-    )
-    .expect("a family");
-    let fine = Coordinate {
-        receiver: "x".to_owned(),
-        at: 0,
-    };
-    let clamp = Clamp { cap: integer(4) };
-    let coarse = FactoredReading {
-        receiver: "clamped-x".to_owned(),
-        fine: &fine,
-        factor: &clamp,
-    };
-    coarse
-        .verify_non_expansive(&family)
-        .expect("clamping never increases a separation");
-    let fine_width = width_enumerated(&fine, &family, DiameterNorm::Supremum).expect("a width");
-    let coarse_width = width_enumerated(&coarse, &family, DiameterNorm::Supremum).expect("a width");
-    assert_eq!(fine_width.diameter(), &integer(9));
-    assert_eq!(coarse_width.diameter(), &integer(4));
-    assert!(coarse_width.diameter() <= fine_width.diameter());
+fn a_non_expansive_coarser_reading_has_no_larger_width() {
+    let members = states(&[integer(0), integer(3), integer(9)]);
+    let fine = width_of(&x(), &members, DiameterNorm::Supremum);
+    let cap = integer(4);
+    let clamped = factored(&members, |value| value.min(&cap).clone());
+    assert_eq!(fine.diameter(), &integer(9));
+    assert_eq!(clamped.diameter(), &integer(4));
+    assert!(clamped.diameter() <= fine.diameter());
 }
 
 /// Lean: `expansive_factor_increases_width` and `doubling_factor_not_nonExpansive`. **The
-/// hypothesis is needed**: `q ↦ 2q` is a lawful coarsening that strictly widens, and the library
-/// says so by name rather than accepting it.
+/// hypothesis is needed**: `q ↦ 2q` is a lawful coarsening (a function of the finer face) that
+/// strictly widens.
 #[test]
-fn an_expansive_factor_map_widens_the_reading() {
-    let family = CompatibleFamily::enumerated("fibre", vec![vec![integer(0)], vec![integer(3)]])
-        .expect("a family");
-    let fine = Coordinate {
-        receiver: "x".to_owned(),
-        at: 0,
-    };
-    let scale = Scale { by: integer(2) };
-    let coarse = FactoredReading {
-        receiver: "doubled-x".to_owned(),
-        fine: &fine,
-        factor: &scale,
-    };
-    let fine_width = width_enumerated(&fine, &family, DiameterNorm::Supremum).expect("a width");
-    let coarse_width = width_enumerated(&coarse, &family, DiameterNorm::Supremum).expect("a width");
-    assert_eq!(fine_width.diameter(), &integer(3));
-    assert_eq!(coarse_width.diameter(), &integer(6));
-    assert!(coarse_width.diameter() > fine_width.diameter());
-    let refusal = coarse
-        .verify_non_expansive(&family)
-        .expect_err("an expansive factor map is refused by name");
-    assert!(matches!(
-        refusal,
-        WidthRefusal::FactorIsExpansive { ref factor, .. } if factor == "scale"
-    ));
+fn an_expansive_factor_widens_the_reading() {
+    let members = states(&[integer(0), integer(3)]);
+    let fine = width_of(&x(), &members, DiameterNorm::Supremum);
+    let doubled = factored(&members, |value| value * integer(2));
+    assert_eq!(fine.diameter(), &integer(3));
+    assert_eq!(doubled.diameter(), &integer(6));
+    assert!(doubled.diameter() > fine.diameter());
+}
+
+/// The squared-Euclidean norm is exact over read faces.
+#[test]
+fn the_squared_euclidean_norm_is_exact_over_read_faces() {
+    let squared = width_of(
+        &x(),
+        &states(&[integer(0), integer(3)]),
+        DiameterNorm::SquaredEuclidean,
+    );
+    assert_eq!(squared.diameter(), &integer(9));
 }
 
 // ---------------------------------------------------------------------------------------------
 // the event is future-stable while its timing is not
 // ---------------------------------------------------------------------------------------------
 
-/// Lean: `future_stable_event_with_unstable_timing`.
-///
-/// **One fibre, two receivers, two opposite verdicts.** On the exact doubling system with the
-/// compatible fibre `{1/8, 1/4}` and horizon `3`, the receiver "the event occurs by horizon 3" has
-/// width exactly `0` and is released at every tolerance; the receiver "the time of the event" has
-/// width exactly `1` and is released at no tolerance below `1`. There is no scalar attached to the
-/// fibre that could have produced both answers.
+/// Lean: `future_stable_event_with_unstable_timing`. **One fibre, two receivers, two opposite
+/// verdicts.** On the doubling system with the compatible fibre `{1/8, 1/4} = {2⁻³, 2⁻²}` and
+/// horizon `3`, "the event occurs by horizon 3" has width `0` and releases at every tolerance;
+/// "the time of the event" has width `1` and releases at no tolerance below `1`.
 #[test]
 fn an_event_is_future_stable_while_its_timing_is_not() {
-    let fibre =
-        CompatibleFamily::enumerated("doubling|fibre", vec![vec![ratio(1, 8)], vec![ratio(1, 4)]])
-            .expect("a family");
-    let event = EventByHorizon {
-        receiver: "event-by-3".to_owned(),
-        horizon: 3,
-        threshold: Rat::one(),
-    };
-    let timing = TimeOfEvent {
-        receiver: "time-of-event".to_owned(),
-        horizon: 3,
-        threshold: Rat::one(),
-    };
-
-    // The crossings are computed from the exact trajectory, so the receivers earn their names.
-    let system = doubling();
-    assert_eq!(
-        crossing_time(&system, &[ratio(1, 8)], &Rat::one(), 3),
-        3,
-        "1/8 doubles to 1 in exactly three steps"
+    let fibre = states(&[ratio(1, 8), ratio(1, 4)]);
+    assert_eq!(crossing_time(&ratio(1, 8), &Rat::one(), 3), 3);
+    assert_eq!(crossing_time(&ratio(1, 4), &Rat::one(), 3), 2);
+    let event = width_of(
+        &EventByHorizon { horizon: 3 },
+        &fibre,
+        DiameterNorm::Supremum,
     );
-    assert_eq!(crossing_time(&system, &[ratio(1, 4)], &Rat::one(), 3), 2);
-
-    let event_width = width_enumerated(&event, &fibre, DiameterNorm::Supremum).expect("a width");
-    let timing_width = width_enumerated(&timing, &fibre, DiameterNorm::Supremum).expect("a width");
-    assert!(event_width.is_zero(), "the event is future-stable");
-    assert_eq!(timing_width.diameter(), &integer(1), "the timing is not");
+    let timing = width_of(&TimeOfEvent { horizon: 3 }, &fibre, DiameterNorm::Supremum);
+    assert!(event.is_zero(), "the event is future-stable");
+    assert_eq!(timing.diameter(), &integer(1), "the timing is not");
     for tolerance in [Rat::zero(), ratio(1, 2), integer(1)] {
-        assert!(event_width.releasable_at(&tolerance));
+        assert!(event.releasable_at(&tolerance));
     }
-    assert!(!timing_width.releasable_at(&ratio(1, 2)));
-    assert!(timing_width.releasable_at(&integer(1)));
+    assert!(!timing.releasable_at(&ratio(1, 2)));
+    assert!(timing.releasable_at(&integer(1)));
 }
 
 /// Lean: `timingInsufficiency` and `no_transformer_from_the_released_coarse_face`. The released
-/// coarse face does **not** determine the unreleased fine one: the two members of the fibre carry
-/// the same event reading and different timings.
+/// coarse face does **not** determine the fine one.
 #[test]
 fn the_coarse_event_reading_does_not_determine_the_timing() {
-    let event = EventByHorizon {
-        receiver: "event-by-3".to_owned(),
-        horizon: 3,
-        threshold: Rat::one(),
-    };
-    let timing = TimeOfEvent {
-        receiver: "time-of-event".to_owned(),
-        horizon: 3,
-        threshold: Rat::one(),
-    };
+    let event = EventByHorizon { horizon: 3 };
+    let timing = TimeOfEvent { horizon: 3 };
     let eighth = vec![ratio(1, 8)];
     let quarter = vec![ratio(1, 4)];
-    assert_eq!(
-        event.read(&eighth).expect("a face"),
-        event.read(&quarter).expect("a face"),
-        "the coarse reading identifies them"
-    );
-    assert_ne!(
-        timing.read(&eighth).expect("a face"),
-        timing.read(&quarter).expect("a face"),
-        "the fine reading separates them: an exact insufficiency witness"
-    );
-}
-
-/// `ReleaseCoarser` finds the coarser invariant through the declared refinement order, and the
-/// factoring is checked at every step rather than assumed.
-#[test]
-fn release_coarser_walks_the_declared_refinement_order() {
-    let fibre =
-        CompatibleFamily::enumerated("doubling|fibre", vec![vec![ratio(1, 8)], vec![ratio(1, 4)]])
-            .expect("a family");
-    let timing = TimeOfEvent {
-        receiver: "time-of-event".to_owned(),
-        horizon: 3,
-        threshold: Rat::one(),
-    };
-    let tower = CoarseningTower {
-        lineage: "doubling|timing-tower".to_owned(),
-        steps: vec![CoarseningStep {
-            reading: Box::new(EventByHorizon {
-                receiver: "event-by-3".to_owned(),
-                horizon: 3,
-                threshold: Rat::one(),
-            }),
-        }],
-    };
-    let found = release_coarser(
-        &timing,
-        &tower,
-        &fibre,
-        &ratio(1, 2),
-        DiameterNorm::Supremum,
-    )
-    .expect("the search returns")
-    .expect("the event reading is inside tolerance");
-    assert_eq!(found.receiver, "event-by-3");
-    assert!(found.width.is_zero());
-    assert_eq!(found.step, 0);
-}
-
-/// And a declared tower whose step does **not** factor through the finer reading is refused by
-/// name, with the two members that refute it. A tower that is not a coarsening is not a tower.
-#[test]
-fn release_coarser_refuses_a_tower_that_does_not_factor() {
-    // The finer reading is the event flag — constant on this fibre — and the declared "coarser"
-    // step is the timing, which separates what the finer reading identified.
-    let fibre =
-        CompatibleFamily::enumerated("doubling|fibre", vec![vec![ratio(1, 8)], vec![ratio(1, 4)]])
-            .expect("a family");
-    let event = EventByHorizon {
-        receiver: "event-by-3".to_owned(),
-        horizon: 3,
-        threshold: Rat::one(),
-    };
-    let tower = CoarseningTower {
-        lineage: "doubling|not-a-tower".to_owned(),
-        steps: vec![CoarseningStep {
-            reading: Box::new(TimeOfEvent {
-                receiver: "time-of-event".to_owned(),
-                horizon: 3,
-                threshold: Rat::one(),
-            }),
-        }],
-    };
-    let refusal = release_coarser(&event, &tower, &fibre, &integer(10), DiameterNorm::Supremum)
-        .expect_err("a step that separates what the finer reading identified is refused");
-    assert!(matches!(
-        refusal,
-        WidthRefusal::CoarserDoesNotFactor { ref coarse, ref fine, left: 0, right: 1 }
-            if coarse == "time-of-event" && fine == "event-by-3"
-    ));
-}
-
-/// Phase 6: a coarsening tower is the core restriction's factor descent. The step that refuses in
-/// `release_coarser` is the first descent that breaks, at the same two members; a step that
-/// factors is a witness.
-#[test]
-fn the_coarsening_tower_is_the_core_factor_descent() {
-    let fibre =
-        CompatibleFamily::enumerated("doubling|fibre", vec![vec![ratio(1, 8)], vec![ratio(1, 4)]])
-            .expect("a family");
-    let timing = TimeOfEvent {
-        receiver: "time-of-event".to_owned(),
-        horizon: 3,
-        threshold: Rat::one(),
-    };
-    let event = EventByHorizon {
-        receiver: "event-by-3".to_owned(),
-        horizon: 3,
-        threshold: Rat::one(),
-    };
-    let lawful = CoarseningTower {
-        lineage: "doubling|timing-tower".to_owned(),
-        steps: vec![CoarseningStep {
-            reading: Box::new(EventByHorizon {
-                receiver: "event-by-3".to_owned(),
-                horizon: 3,
-                threshold: Rat::one(),
-            }),
-        }],
-    };
-    let descents = lawful
-        .descent(&timing, &fibre)
-        .expect("the descent is taken");
-    assert_eq!(descents.len(), 1);
-    assert!(descents[0].descends());
-    assert!(
-        release_coarser(
-            &timing,
-            &lawful,
-            &fibre,
-            &ratio(1, 2),
-            DiameterNorm::Supremum
-        )
-        .expect("the search returns")
-        .is_some()
-    );
-
-    let not_a_tower = CoarseningTower {
-        lineage: "doubling|not-a-tower".to_owned(),
-        steps: vec![CoarseningStep {
-            reading: Box::new(TimeOfEvent {
-                receiver: "time-of-event".to_owned(),
-                horizon: 3,
-                threshold: Rat::one(),
-            }),
-        }],
-    };
-    let descents = not_a_tower
-        .descent(&event, &fibre)
-        .expect("the descent is taken");
-    let breaks = descents
-        .last()
-        .and_then(|descent| descent.defect())
-        .expect("the timing step does not factor through the event flag");
-    let refusal = release_coarser(
-        &event,
-        &not_a_tower,
-        &fibre,
-        &integer(10),
-        DiameterNorm::Supremum,
-    )
-    .expect_err("the same step is refused");
-    let WidthRefusal::CoarserDoesNotFactor { left, right, .. } = refusal else {
-        panic!("the refusal is the factoring refusal");
-    };
-    assert_eq!(
-        breaks.first().expect("a defect has a separator").pair(),
-        (left, right)
-    );
-    assert_eq!(descents.len(), 1);
-}
-
-/// Phase 6: a factor map is the induced coarse reading of a descent. A `FactoredReading` descends
-/// through its finer reading (`Foundation/ReceiverRelease.coarser_receiver_factors`), and the
-/// witness's induced map `ρ̄` on the finer faces is the declared `FactorMap` applied entrywise.
-#[test]
-fn a_factor_map_is_the_induced_reading_of_a_descent() {
-    let family = CompatibleFamily::enumerated(
-        "fibre",
-        vec![
-            vec![integer(0)],
-            vec![integer(3)],
-            vec![integer(9)],
-            vec![integer(3)],
-        ],
-    )
-    .expect("a family");
-    let members = family.members().expect("enumerated");
-    let fine = Coordinate {
-        receiver: "x".to_owned(),
-        at: 0,
-    };
-    let clamp = Clamp { cap: integer(4) };
-    let coarse = FactoredReading {
-        receiver: "clamped-x".to_owned(),
-        fine: &fine,
-        factor: &clamp,
-    };
-    let quotient = super::FaceQuotient {
-        faces: members
-            .iter()
-            .map(|m| fine.read(m).expect("a face"))
-            .collect(),
-    };
-    let indices: Vec<usize> = (0..members.len()).collect();
-    let descent = crate::holon::restriction::factor_descent(
-        &quotient,
-        |k: &usize| coarse.read(&members[*k]).expect("a face"),
-        &indices,
-    )
-    .expect("a small family");
-    let witness = descent
-        .witness()
-        .expect("a factored reading descends by construction");
-    assert_eq!(witness.merged_pairs(), 1);
-    assert_eq!(witness.factored().len(), 3);
-    for (face, induced) in witness.factored() {
-        let Some(ExactFace::Vector(values)) = face else {
-            panic!("the coordinate reading is a vector face");
-        };
-        let mapped: Vec<Rat> = values.iter().map(|v| clamp.apply(v)).collect();
-        assert_eq!(induced, &ExactFace::Vector(mapped));
-    }
+    assert_eq!(event.read(&eighth).unwrap(), event.read(&quarter).unwrap());
+    assert_ne!(timing.read(&eighth).unwrap(), timing.read(&quarter).unwrap());
 }
 
 // ---------------------------------------------------------------------------------------------
-// the exact enclosure and the exact h-step map
-// ---------------------------------------------------------------------------------------------
-
-/// The image of a box under an exact linear map is an exact zonotope, and its sup-norm diameter is
-/// `2·max_i Σ_j |G_ij|`. Checked against the enumerated corner images.
-#[test]
-fn the_image_of_a_box_under_an_exact_linear_map_is_an_exact_zonotope() {
-    let hull = ExactZonotope::box_hull(vec![integer(0), integer(0)], &[integer(1), integer(2)])
-        .expect("a box");
-    let map = matrix(&[&[1, 1], &[1, -1]]);
-    let image = hull.mapped(&map).expect("the image");
-    assert_eq!(image.generators().len(), 2);
-    // Row 0 of the image: |1| + |2| = 3, so the extent is 6. Row 1: |1| + |−2| = 3, also 6.
-    let (diameter, coordinate) = image.supremum_diameter().expect("a diameter");
-    assert_eq!(diameter, integer(6));
-    assert_eq!(coordinate, 0);
-    // The same number, read off the four corners of the box.
-    let corners = [
-        vec![integer(1), integer(2)],
-        vec![integer(1), integer(-2)],
-        vec![integer(-1), integer(2)],
-        vec![integer(-1), integer(-2)],
-    ];
-    let images = corners
-        .iter()
-        .map(|corner| map.apply(corner).expect("the corner image"))
-        .collect::<Vec<_>>();
-    let mut widest = Rat::zero();
-    for left in 0..images.len() {
-        for right in (left + 1)..images.len() {
-            let separation = ExactFace::Vector(images[left].clone())
-                .separation(
-                    &ExactFace::Vector(images[right].clone()),
-                    DiameterNorm::Supremum,
-                )
-                .expect("a separation");
-            if separation > widest {
-                widest = separation;
-            }
-        }
-    }
-    assert_eq!(widest, diameter, "the enclosure is tight on this box");
-}
-
-/// The `h`-step image of a compatible box and an admitted-input box is exact, and it agrees with
-/// the enumerated trajectories of the corners.
-#[test]
-fn the_horizon_image_is_exact() {
-    // x' = 2x + u, compatible states in [−1, 1], admitted inputs in [−1, 1], horizon 2.
-    // Φ₂(x, u₀, u₁) = 4x + 2u₀ + u₁, so the exact extent is 4 + 2 + 1 = 7 either side.
-    let system = Linearization::declared(
-        "doubling-with-input",
-        matrix(&[&[2]]),
-        matrix(&[&[1]]),
-        matrix(&[&[1]]),
-        vec!["u".to_owned()],
-        vec!["x".to_owned()],
-    )
-    .expect("declared");
-    let states = ExactZonotope::box_hull(vec![Rat::zero()], &[integer(1)]).expect("a box");
-    let inputs = ExactZonotope::box_hull(vec![Rat::zero()], &[integer(1)]).expect("a box");
-    let image = horizon_image(&system, &states, &inputs, 2).expect("the image");
-    assert_eq!(image.generators().len(), 3);
-    let (diameter, _) = image.supremum_diameter().expect("a diameter");
-    assert_eq!(diameter, integer(14));
-
-    // The extremal trajectory, advanced exactly.
-    let top = advance(
-        &system,
-        &[integer(1)],
-        &[vec![integer(1)], vec![integer(1)]],
-    )
-    .expect("the trajectory");
-    assert_eq!(top, vec![integer(7)]);
-    let bottom = advance(
-        &system,
-        &[integer(-1)],
-        &[vec![integer(-1)], vec![integer(-1)]],
-    )
-    .expect("the trajectory");
-    assert_eq!(bottom, vec![integer(-7)]);
-
-    // Every generator names the source it came from: one compatible state coordinate and one
-    // admitted input per step of the horizon.
-    let sources = image
-        .generators()
-        .iter()
-        .map(|generator| generator.source)
-        .collect::<Vec<_>>();
-    assert!(sources.contains(&GeneratorSource::CompatibleState { coordinate: 0 }));
-    assert!(sources.contains(&GeneratorSource::AdmittedInput { step: 0, port: 0 }));
-    assert!(sources.contains(&GeneratorSource::AdmittedInput { step: 1, port: 0 }));
-}
-
-/// The width of an exact linear reading over an enclosure, and the release verdict it supports.
-#[test]
-fn the_width_over_an_enclosure_is_exact() {
-    let hull = ExactZonotope::box_hull(vec![integer(0), integer(0)], &[integer(1), ratio(1, 10)])
-        .expect("a box");
-    let family = CompatibleFamily::enclosed("hull", hull);
-    // Read only the second coordinate: the width is 1/5, inside a tolerance of 1/4.
-    let reading = LinearReading {
-        receiver: "second-coordinate".to_owned(),
-        matrix: matrix(&[&[0, 1]]),
-    };
-    let reading_width = width_enclosed(&reading, &family, DiameterNorm::Supremum).expect("a width");
-    assert_eq!(reading_width.diameter(), &ratio(1, 5));
-    assert!(reading_width.releasable_at(&ratio(1, 4)));
-    // Read the first: the width is 2, outside it.
-    let wide = LinearReading {
-        receiver: "first-coordinate".to_owned(),
-        matrix: matrix(&[&[1, 0]]),
-    };
-    let wide_width = width_enclosed(&wide, &family, DiameterNorm::Supremum).expect("a width");
-    assert_eq!(wide_width.diameter(), &integer(2));
-    assert!(!wide_width.releasable_at(&ratio(1, 4)));
-}
-
-// ---------------------------------------------------------------------------------------------
-// `Ask`: the probe is computed
-// ---------------------------------------------------------------------------------------------
-
-/// **The probe direction maximally reducing the width, computed.** The reading sees the first
-/// coordinate three times as strongly as the second, so the generator to ask for is the first
-/// state coordinate — and the answer is returned with the exact width observing it would leave.
-#[test]
-fn the_narrowing_probe_names_the_generator_that_reduces_the_width_most() {
-    let hull = ExactZonotope::box_hull(vec![integer(0), integer(0)], &[integer(3), integer(1)])
-        .expect("a box");
-    let reading = LinearReading {
-        receiver: "sum".to_owned(),
-        matrix: matrix(&[&[1, 1]]),
-    };
-    let probe = narrowing_probe(&reading, &hull)
-        .expect("the search returns")
-        .expect("there is something to ask for");
-    assert_eq!(
-        probe.source,
-        GeneratorSource::CompatibleState { coordinate: 0 }
-    );
-    // Before: 2·(3 + 1) = 8. After observing the first coordinate exactly: 2·1 = 2.
-    assert_eq!(probe.width_after, integer(2));
-    assert_eq!(probe.reduction, integer(6));
-    // And an enclosure with nothing unresolved has nothing to ask for.
-    let point = ExactZonotope::box_hull(vec![integer(0), integer(0)], &[Rat::zero(), Rat::zero()])
-        .expect("a point");
-    assert_eq!(
-        narrowing_probe(&reading, &point).expect("the search returns"),
-        None
-    );
-}
-
-/// **The declared observation maximally reducing the width, computed.** Over the enumerated fibre
-/// the candidate whose level sets leave the smallest surviving width is returned by name.
-#[test]
-fn the_narrowing_observation_is_computed_over_the_declared_candidates() {
-    // Four compatible states in the plane. The target reading is the first coordinate; observing
-    // the first coordinate collapses it to zero, observing the second leaves it whole.
-    let family = CompatibleFamily::enumerated(
-        "plane",
-        vec![
-            vec![integer(0), integer(0)],
-            vec![integer(0), integer(1)],
-            vec![integer(5), integer(0)],
-            vec![integer(5), integer(1)],
-        ],
-    )
-    .expect("a family");
-    let target = Coordinate {
-        receiver: "first".to_owned(),
-        at: 0,
-    };
-    let first = Coordinate {
-        receiver: "observe-first".to_owned(),
-        at: 0,
-    };
-    let second = Coordinate {
-        receiver: "observe-second".to_owned(),
-        at: 1,
-    };
-    let candidates: Vec<&dyn Reading> = vec![&second, &first];
-    let probe = narrowing_observation(&target, &family, &candidates, DiameterNorm::Supremum)
-        .expect("the search returns")
-        .expect("a candidate narrows it");
-    assert_eq!(probe.observation, "observe-first");
-    assert!(probe.width_after.is_zero());
-    assert_eq!(probe.reduction, integer(5));
-}
-
-// ---------------------------------------------------------------------------------------------
-// the release law is the caller's
+// the threshold commit: the law is the caller's
 // ---------------------------------------------------------------------------------------------
 
 struct HoldingLaw;
@@ -826,18 +295,14 @@ impl DecisionLaw for AskingLaw {
                 tolerance: options.tolerance().clone(),
             };
         }
-        match (options.ask(), options.coarser(), options.bridges()) {
-            (Some(probe), _, _) => ReleaseReturn::Ask {
+        match (options.ask(), options.bridges()) {
+            (Some(probe), _) => ReleaseReturn::Ask {
                 probe: probe.clone(),
             },
-            (None, Some(coarser), _) => ReleaseReturn::ReleaseCoarser {
-                receiver: coarser.receiver().to_owned(),
-                width: coarser.width().clone(),
-            },
-            (None, None, false) => ReleaseReturn::NoContinuationBridges {
+            (None, false) => ReleaseReturn::NoContinuationBridges {
                 reason: "no admitted continuation reaches this receiver".to_owned(),
             },
-            (None, None, true) => ReleaseReturn::Widen {
+            (None, true) => ReleaseReturn::Widen {
                 tolerance: options.width().clone(),
             },
         }
@@ -859,33 +324,49 @@ impl DecisionLaw for LyingLaw {
     }
 }
 
-fn plural_options() -> LawfulOptions {
-    let family = CompatibleFamily::enumerated("fibre", vec![vec![integer(0)], vec![integer(4)]])
-        .expect("a family");
-    let reading = Coordinate {
-        receiver: "x".to_owned(),
-        at: 0,
-    };
-    let measured = width_enumerated(&reading, &family, DiameterNorm::Supremum).expect("a width");
-    LawfulOptions::assemble(&measured, integer(1), None, None, true).expect("coherent options")
+fn plural_options(ask: Option<ObservationProbe>, bridges: bool) -> LawfulOptions {
+    let measured = width_of(
+        &x(),
+        &states(&[integer(0), integer(4)]),
+        DiameterNorm::Supremum,
+    );
+    LawfulOptions::assemble(&measured, integer(1), ask, bridges).expect("coherent options")
+}
+
+fn probe() -> ObservationProbe {
+    ObservationProbe {
+        observation: "observe-x".to_owned(),
+        width_after: Rat::zero(),
+        reduction: integer(4),
+    }
 }
 
 /// Lean: `no_default_among_the_lawful_returns`. **Two lawful laws, one width, different arms.**
-/// The library supplies no default; the decision is declared by the caller.
 #[test]
 fn two_lawful_laws_return_different_arms() {
-    let options = plural_options();
+    let options = plural_options(None, true);
     assert!(!options.inside_tolerance());
     let held = release(&HoldingLaw, &options).expect("a lawful return");
-    let asked = release(&AskingLaw, &options).expect("a lawful return");
+    let widened = release(&AskingLaw, &options).expect("a lawful return");
     assert_eq!(held, ReleaseReturn::Hold);
     assert_eq!(
-        asked,
+        widened,
         ReleaseReturn::Widen {
             tolerance: integer(4)
         }
     );
-    assert_ne!(held, asked);
+    assert_ne!(held, widened);
+    // An offered probe is asked for; an unbridged gap is reported.
+    assert_eq!(
+        release(&AskingLaw, &plural_options(Some(probe()), true)).expect("lawful"),
+        ReleaseReturn::Ask { probe: probe() }
+    );
+    assert_eq!(
+        release(&AskingLaw, &plural_options(None, false)).expect("lawful"),
+        ReleaseReturn::NoContinuationBridges {
+            reason: "no admitted continuation reaches this receiver".to_owned()
+        }
+    );
 }
 
 /// Rebuild step 4 addition 8 (Lean `ReleaseLaw.sound`): **the decision as data.** A declared
@@ -894,17 +375,14 @@ fn two_lawful_laws_return_different_arms() {
 /// options do not carry falls back to holding, and two rules on one width return different arms.
 #[test]
 fn a_decision_rule_is_a_declared_law_as_data() {
-    let options = plural_options();
-    let family = CompatibleFamily::enumerated("fibre", vec![vec![integer(0)], vec![ratio(1, 2)]])
-        .expect("a family");
-    let reading = Coordinate {
-        receiver: "x".to_owned(),
-        at: 0,
-    };
+    let options = plural_options(None, true);
     let narrow = LawfulOptions::assemble(
-        &width_enumerated(&reading, &family, DiameterNorm::Supremum).expect("a width"),
+        &width_of(
+            &x(),
+            &states(&[integer(0), ratio(1, 2)]),
+            DiameterNorm::Supremum,
+        ),
         integer(1),
-        None,
         None,
         true,
     )
@@ -943,7 +421,6 @@ fn a_decision_rule_is_a_declared_law_as_data() {
     );
     for beyond in [
         BeyondTolerance::Ask,
-        BeyondTolerance::ReleaseCoarser,
         BeyondTolerance::NoContinuation("bridged".to_owned()),
         BeyondTolerance::Hold,
     ] {
@@ -953,39 +430,28 @@ fn a_decision_rule_is_a_declared_law_as_data() {
             ReleaseReturn::Hold
         );
     }
-    let unbridged = LawfulOptions::assemble(
-        &width_enumerated(
-            &reading,
-            &CompatibleFamily::enumerated("fibre", vec![vec![integer(0)], vec![integer(4)]])
-                .expect("a family"),
-            DiameterNorm::Supremum,
-        )
-        .expect("a width"),
-        integer(1),
-        None,
-        None,
-        false,
-    )
-    .expect("coherent options");
+    let asking = DecisionRule::new("ask", WithinTolerance::Release, BeyondTolerance::Ask);
+    assert_eq!(
+        release(&asking, &plural_options(Some(probe()), true)).expect("lawful"),
+        ReleaseReturn::Ask { probe: probe() }
+    );
     let reporting = DecisionRule::new(
         "report",
         WithinTolerance::Release,
         BeyondTolerance::NoContinuation("no admitted continuation".to_owned()),
     );
     assert_eq!(
-        release(&reporting, &unbridged).expect("lawful"),
+        release(&reporting, &plural_options(None, false)).expect("lawful"),
         ReleaseReturn::NoContinuationBridges {
             reason: "no admitted continuation".to_owned()
         }
     );
 }
 
-/// Lean: `ReleaseLaw.sound`. **The one thing the library owns.** A law claiming release outside its
-/// own declared tolerance is refused by name.
+/// Lean: `ReleaseLaw.sound`. A law claiming release outside its own declared tolerance is refused.
 #[test]
 fn a_law_releasing_outside_its_declared_tolerance_is_refused() {
-    let options = plural_options();
-    let refusal = release(&LyingLaw, &options).expect_err("the claim is refused");
+    let refusal = release(&LyingLaw, &plural_options(None, true)).expect_err("refused");
     assert!(matches!(
         refusal,
         WidthRefusal::ReleasedOutsideTolerance(ref claim) if claim.law == "lying"
@@ -1008,8 +474,7 @@ fn a_widening_proposal_below_the_measured_width_is_refused() {
         }
     }
 
-    let options = plural_options(); // measured width is 4
-    let refusal = release(&TooNarrow, &options).expect_err("width 4 is not inside tolerance 3");
+    let refusal = release(&TooNarrow, &plural_options(None, true)).expect_err("4 is not inside 3");
     assert!(matches!(
         refusal,
         WidthRefusal::WidenTooNarrow(ref claim)
@@ -1019,10 +484,10 @@ fn a_widening_proposal_below_the_measured_width_is_refused() {
     ));
 }
 
-/// And a law naming a probe or a coarser receiver the library did not compute is refused: `Ask`
-/// asks for something that exists.
+/// A law naming a probe the owner did not offer is refused, and so is a width law that returns a
+/// draw: the separating term between a width decision and a draw is the key.
 #[test]
-fn a_law_naming_an_uncomputed_probe_or_coarser_receiver_is_refused() {
+fn a_law_naming_an_unoffered_probe_or_a_draw_is_refused() {
     struct Inventing;
     impl DecisionLaw for Inventing {
         fn name(&self) -> &str {
@@ -1030,88 +495,231 @@ fn a_law_naming_an_uncomputed_probe_or_coarser_receiver_is_refused() {
         }
         fn decide(&self, _options: &LawfulOptions) -> ReleaseReturn {
             ReleaseReturn::Ask {
-                probe: AskProbe::Observation(ObservationProbe {
+                probe: ObservationProbe {
                     observation: "an-observation-nobody-computed".to_owned(),
                     width_after: Rat::zero(),
                     reduction: Rat::zero(),
-                }),
+                },
             }
         }
     }
-    struct Inventing2;
-    impl DecisionLaw for Inventing2 {
+    struct Drawing;
+    impl DecisionLaw for Drawing {
         fn name(&self) -> &str {
-            "inventing-coarser"
+            "drawing"
         }
         fn decide(&self, _options: &LawfulOptions) -> ReleaseReturn {
-            ReleaseReturn::ReleaseCoarser {
-                receiver: "a-receiver-nobody-declared".to_owned(),
-                width: Rat::zero(),
-            }
+            ReleaseReturn::Drawn(CertifiedDraw {
+                key: Rat::zero(),
+                class: 0,
+                prior_upper: Rat::zero(),
+                through_lower: Rat::one(),
+            })
         }
     }
-    let options = plural_options();
+    let options = plural_options(Some(probe()), true);
     assert!(matches!(
         release(&Inventing, &options).expect_err("refused"),
         WidthRefusal::ProbeNotOffered { .. }
     ));
     assert!(matches!(
-        release(&Inventing2, &options).expect_err("refused"),
-        WidthRefusal::CoarserNotOffered { .. }
+        release(&Drawing, &options).expect_err("refused"),
+        WidthRefusal::DrawNotOffered { ref law } if law == "drawing"
     ));
 }
 
-/// The whole mechanism end to end: an unreleased fine receiver, a computed probe, a coarser
-/// receiver inside tolerance, and a caller's law picking among them — with no default anywhere.
+// ---------------------------------------------------------------------------------------------
+// the certified draw (the receipts `population::sampling` and `population::family_release`
+// carried, reproduced through the one law)
+// ---------------------------------------------------------------------------------------------
+
+fn drawn(returned: ReleaseReturn) -> CertifiedDraw {
+    match returned {
+        ReleaseReturn::Drawn(certified) => certified,
+        other => panic!("expected a certified draw, got {other:?}"),
+    }
+}
+
+fn unresolved(returned: ReleaseReturn) -> UnresolvedDraw {
+    match returned {
+        ReleaseReturn::Unresolved(unresolved) => unresolved,
+        other => panic!("expected an unresolved draw, got {other:?}"),
+    }
+}
+
+/// A point face draws the inverse-CDF class with its exact cell.
 #[test]
-fn the_release_mechanism_runs_end_to_end_on_the_doubling_system() {
-    let fibre =
-        CompatibleFamily::enumerated("doubling|fibre", vec![vec![ratio(1, 8)], vec![ratio(1, 4)]])
-            .expect("a family");
-    let timing = TimeOfEvent {
-        receiver: "time-of-event".to_owned(),
-        horizon: 3,
-        threshold: Rat::one(),
-    };
-    let measured = width_enumerated(&timing, &fibre, DiameterNorm::Supremum).expect("a width");
-    let tower = CoarseningTower {
-        lineage: "doubling|timing-tower".to_owned(),
-        steps: vec![CoarseningStep {
-            reading: Box::new(EventByHorizon {
-                receiver: "event-by-3".to_owned(),
-                horizon: 3,
-                threshold: Rat::one(),
-            }),
-        }],
-    };
-    let coarser = release_coarser(
-        &timing,
-        &tower,
-        &fibre,
-        &ratio(1, 2),
-        DiameterNorm::Supremum,
-    )
-    .expect("the search returns");
-    let options = LawfulOptions::assemble(&measured, ratio(1, 2), None, coarser, true)
-        .expect("the coarser release was searched at this very tolerance");
-    assert!(!options.inside_tolerance());
+fn point_face_selects_the_inverse_cdf_class_with_exact_bounds() {
+    let face = vec![
+        ExactInterval::point(ratio(1, 4)),
+        ExactInterval::point(ratio(1, 2)),
+        ExactInterval::point(ratio(1, 4)),
+    ];
+    let selected = drawn(draw(&face, &ratio(1, 4)).unwrap());
+    assert_eq!(selected.class, 1);
+    assert_eq!(selected.key, ratio(1, 4));
+    assert_eq!(selected.prior_upper, ratio(1, 4));
+    assert_eq!(selected.through_lower, ratio(3, 4));
+}
+
+/// An overlapping face leaves the key plural: it is held, with every crossing's exact bounds, and
+/// its draw mass stays unresolved.
+#[test]
+fn overlapping_face_is_held_with_exact_crossing_bounds() {
+    let face = vec![
+        ExactInterval::new(ratio(0, 1), ratio(3, 4)).unwrap(),
+        ExactInterval::new(ratio(1, 4), ratio(1, 1)).unwrap(),
+    ];
+    let held = unresolved(draw(&face, &ratio(1, 2)).unwrap());
+    assert_eq!(held.key, ratio(1, 2));
+    assert_eq!(held.crossings.len(), 2);
+    assert_eq!(held.crossings[0].class, 0);
+    assert_eq!(held.crossings[0].prior_upper, ratio(0, 1));
+    assert_eq!(held.crossings[0].through_lower, ratio(0, 1));
+    assert_eq!(held.crossings[1].class, 1);
+    assert_eq!(held.crossings[1].prior_upper, ratio(3, 4));
+    assert_eq!(held.crossings[1].through_lower, ratio(1, 4));
+}
+
+/// Bounds that enclose no normalized face are refused as content, not decided.
+#[test]
+fn invalid_normalization_is_refused() {
+    let face = vec![
+        ExactInterval::point(ratio(1, 4)),
+        ExactInterval::point(ratio(1, 4)),
+    ];
     assert_eq!(
-        release(&AskingLaw, &options).expect("a lawful return"),
-        ReleaseReturn::ReleaseCoarser {
-            receiver: "event-by-3".to_owned(),
-            width: Rat::zero(),
-        }
+        draw(&face, &ratio(1, 8)),
+        Err(DrawRefusal::InvalidNormalization {
+            lower_total: ratio(1, 2),
+            upper_total: ratio(1, 2),
+        })
     );
-    // The same options under a different declared law return a different arm. Release is
-    // receiver-relative and caller-declared; there is no global gate.
+    assert_eq!(draw(&[], &ratio(1, 8)), Err(DrawRefusal::EmptyFace));
     assert_eq!(
-        release(&HoldingLaw, &options).expect("a lawful return"),
-        ReleaseReturn::Hold
+        draw(&face, &Rat::one()),
+        Err(DrawRefusal::KeyOutOfRange { key: Rat::one() })
     );
 }
 
+/// The stop class of the curated section chart (268 classes) is drawable.
+#[test]
+fn stop_class_is_selectable_in_a_268_class_chart() {
+    let mut face = vec![ExactInterval::point(ratio(0, 1)); 268];
+    face[267] = ExactInterval::point(ratio(1, 1));
+    let selected = drawn(draw(&face, &ratio(999, 1000)).unwrap());
+    assert_eq!(selected.class, 267);
+    assert_eq!(selected.prior_upper, ratio(0, 1));
+    assert_eq!(selected.through_lower, ratio(1, 1));
+}
+
+/// An exact family face is checked nonnegative and normalized, then drawn through its point
+/// enclosure.
+#[test]
+fn exact_family_class_selection_validates_and_returns_the_cell() {
+    let selected = drawn(draw_exact(&[ratio(1, 4), ratio(3, 4)], &ratio(1, 4)).unwrap());
+    assert_eq!(selected.class, 1);
+    assert_eq!(selected.prior_upper, ratio(1, 4));
+    assert_eq!(selected.through_lower, Rat::one());
+    assert!(matches!(
+        draw_exact(&[ratio(-1, 4), ratio(5, 4)], &ratio(0, 1)),
+        Err(DrawRefusal::NegativeMass { class: 0, .. })
+    ));
+    assert_eq!(
+        draw_exact(&[ratio(1, 4), ratio(1, 4)], &ratio(0, 1)),
+        Err(DrawRefusal::NotNormalized { total: ratio(1, 2) })
+    );
+}
+
+/// **The join** (Lean `certified_draw_is_released_at_zero_tolerance`, `plural_draw_is_held`):
+/// the draw's arm is the holding law's at tolerance zero on the key's class reading. On a face
+/// whose certified cells and crossings are both present, every key in a certified cell is `Drawn`
+/// exactly when the tolerance-zero holding rule releases a zero width, every other key is
+/// `Unresolved` exactly when it holds a width of one, and a point face leaves no key unresolved.
+#[test]
+fn a_draw_is_the_holding_law_at_tolerance_zero() {
+    let rule = DecisionRule::new(
+        CERTIFIED_DRAW_RULE,
+        WithinTolerance::Release,
+        BeyondTolerance::Hold,
+    );
+    let decided = |diameter: Rat| {
+        let attaining = if diameter.is_zero() {
+            WidthWitness::Point
+        } else {
+            WidthWitness::Coordinate { coordinate: 0 }
+        };
+        let width = ReceiverWidth::declared(
+            "the key's class",
+            "the enclosure",
+            DiameterNorm::Supremum,
+            diameter,
+            attaining,
+            3,
+        )
+        .unwrap();
+        release(
+            &rule,
+            &LawfulOptions::assemble(&width, Rat::zero(), None, false).unwrap(),
+        )
+        .unwrap()
+    };
+    let interval = vec![
+        ExactInterval::new(ratio(1, 8), ratio(1, 4)).unwrap(),
+        ExactInterval::point(ratio(1, 2)),
+        ExactInterval::new(ratio(1, 4), ratio(3, 8)).unwrap(),
+    ];
+    let point = vec![
+        ExactInterval::point(ratio(1, 4)),
+        ExactInterval::point(ratio(1, 2)),
+        ExactInterval::point(ratio(1, 4)),
+    ];
+    let (mut certified, mut plural) = (0usize, 0usize);
+    for numerator in 0..64 {
+        let key = ratio(numerator, 64);
+        match draw(&interval, &key).unwrap() {
+            ReleaseReturn::Drawn(cell) => {
+                certified += 1;
+                assert!(cell.prior_upper <= key && key < cell.through_lower);
+                assert!(matches!(
+                    decided(Rat::zero()),
+                    ReleaseReturn::Released { .. }
+                ));
+            }
+            ReleaseReturn::Unresolved(held) => {
+                plural += 1;
+                assert!(!held.crossings.is_empty());
+                assert_eq!(decided(Rat::one()), ReleaseReturn::Hold);
+            }
+            other => panic!("a draw returns only its two arms, got {other:?}"),
+        }
+        assert!(matches!(
+            draw(&point, &key).unwrap(),
+            ReleaseReturn::Drawn(_)
+        ));
+    }
+    // The certified cells are [0, 1/8), [1/4, 5/8) and [3/4, 7/8): 8 + 24 + 8 of 64 keys. The 24
+    // keys of [1/8, 1/4) ∪ [5/8, 3/4) ∪ [7/8, 1) are unresolved draw mass `3/8 = 3/2³`; on
+    // [7/8, 1) normalization already fixes class 2, so that part is the certificate's
+    // sufficiency, not a plural fibre.
+    assert_eq!(certified, 40);
+    assert_eq!(plural, 24);
+}
+
+/// A face that covers the whole simplex never certifies a class: every key is held.
+#[test]
+fn a_simplex_covering_face_holds_every_key() {
+    let face = vec![ExactInterval::new(Rat::zero(), Rat::one()).unwrap(); 2];
+    for numerator in 0..8 {
+        assert!(matches!(
+            draw(&face, &ratio(numerator, 8)).unwrap(),
+            ReleaseReturn::Unresolved(_)
+        ));
+    }
+}
+
 // ---------------------------------------------------------------------------------------------
-// hostile input
+// the faces the width is taken over
 // ---------------------------------------------------------------------------------------------
 
 /// Two faces of different arms are incomparable and no separation is invented.
@@ -1133,208 +741,6 @@ fn faces_of_different_arms_are_incomparable() {
         WidthRefusal::VectorFacesDiffer { left: 1, right: 2 }
     ));
 }
-
-/// The squared-Euclidean diameter of a zonotope is not computed by enumerating `2^k` vertices: the
-/// norm is refused on an enclosure by name, and it is exact on an enumerated family.
-#[test]
-fn the_squared_euclidean_norm_is_refused_on_an_enclosure_and_exact_on_a_family() {
-    let hull = ExactZonotope::box_hull(vec![Rat::zero()], &[integer(1)]).expect("a box");
-    let family = CompatibleFamily::enclosed("hull", hull);
-    let reading = LinearReading {
-        receiver: "x".to_owned(),
-        matrix: matrix(&[&[1]]),
-    };
-    assert!(matches!(
-        width_enclosed(&reading, &family, DiameterNorm::SquaredEuclidean).expect_err("refused"),
-        WidthRefusal::NormNotExactOnEnclosure {
-            norm: "squared-euclidean"
-        }
-    ));
-    let enumerated = CompatibleFamily::enumerated("pair", vec![vec![integer(0)], vec![integer(3)]])
-        .expect("a family");
-    let squared = width_enumerated(&reading, &enumerated, DiameterNorm::SquaredEuclidean)
-        .expect("exact on an enumerated family");
-    assert_eq!(squared.diameter(), &integer(9));
-}
-
-/// A declared non-linear reading over an enclosure is refused rather than sampled.
-#[test]
-fn a_declared_reading_over_an_enclosure_is_refused_rather_than_sampled() {
-    let hull = ExactZonotope::box_hull(vec![Rat::zero()], &[integer(1)]).expect("a box");
-    let family = CompatibleFamily::enclosed("hull", hull);
-    let timing = TimeOfEvent {
-        receiver: "time-of-event".to_owned(),
-        horizon: 3,
-        threshold: Rat::one(),
-    };
-    assert!(matches!(
-        width(&timing, &family, DiameterNorm::Supremum).expect_err("refused"),
-        WidthRefusal::DeclaredReadingNeedsEnumeratedFamily { .. }
-    ));
-}
-
-// ---------------------------------------------------------------------------------------------
-// R6 (e/f) — a coarser release cannot leave the tolerance it was searched under
-// ---------------------------------------------------------------------------------------------
-
-/// **The two-call escape, refused.** A coarser release searched under a wide tolerance cannot be
-/// assembled against a narrow one. Before the fix both calls were ordinary public calls and the
-/// resulting `ReleaseCoarser` was released, because `release` compared only `(receiver, width)`
-/// against the offer and never compared the width to the tolerance.
-///
-/// Here the coarser reading is a *width-5* reading searched inside tolerance `10`, re-presented
-/// against tolerance `1/2`.
-#[test]
-fn a_coarser_release_searched_under_a_wider_tolerance_is_refused() {
-    let family = CompatibleFamily::enumerated(
-        "fibre",
-        vec![vec![integer(0)], vec![integer(5)], vec![integer(20)]],
-    )
-    .expect("a family");
-    let fine = Coordinate {
-        receiver: "x".to_owned(),
-        at: 0,
-    };
-    let clamp = Clamp { cap: integer(5) };
-    let tower = CoarseningTower {
-        lineage: "clamping-tower".to_owned(),
-        steps: vec![CoarseningStep {
-            reading: Box::new(OwnedClamped {
-                receiver: "clamped-x".to_owned(),
-                at: 0,
-                cap: clamp.cap.clone(),
-            }),
-        }],
-    };
-    // Searched under tolerance 10: the clamped reading has width exactly 5 and is admitted.
-    let coarser = release_coarser(&fine, &tower, &family, &integer(10), DiameterNorm::Supremum)
-        .expect("the search returns")
-        .expect("the clamped reading is inside tolerance 10");
-    assert_eq!(coarser.width(), &integer(5));
-    assert_eq!(coarser.searched_tolerance(), &integer(10));
-
-    let measured = width_enumerated(&fine, &family, DiameterNorm::Supremum).expect("a width");
-    // Assembling that answer against tolerance 1/2 is refused at the assembly.
-    let refusal =
-        LawfulOptions::assemble(&measured, ratio(1, 2), None, Some(coarser.clone()), true)
-            .expect_err("a release searched at 10 is not an answer about 1/2");
-    assert!(matches!(
-        refusal,
-        WidthRefusal::CoarserSearchedAtAnotherTolerance(ref claim)
-            if claim.receiver == "clamped-x" && claim.searched == integer(10)
-                && claim.declared == ratio(1, 2)
-    ));
-
-    // Assembled against the tolerance it really was searched under, it is admitted and released.
-    let options = LawfulOptions::assemble(&measured, integer(10), None, Some(coarser), true)
-        .expect("the tolerances agree");
-    assert_eq!(
-        release(&AskingLaw, &options).expect("a lawful return"),
-        ReleaseReturn::ReleaseCoarser {
-            receiver: "clamped-x".to_owned(),
-            width: integer(5),
-        }
-    );
-}
-
-/// **The `ReleaseCoarser` arm recomputes the inequality.** `assemble` already refuses a tolerance
-/// mismatch, so outside this module the inconsistent options below are unconstructible; the
-/// forgery is written inside the defining module, where the private fields are still reachable,
-/// to exercise the arm's own guard. Before the fix the arm checked only `(receiver, width)`
-/// against the offer and returned this release.
-#[test]
-fn the_coarser_arm_refuses_a_width_outside_the_options_tolerance() {
-    let family = CompatibleFamily::enumerated(
-        "fibre",
-        vec![vec![integer(0)], vec![integer(5)], vec![integer(20)]],
-    )
-    .expect("a family");
-    let fine = Coordinate {
-        receiver: "x".to_owned(),
-        at: 0,
-    };
-    let tower = CoarseningTower {
-        lineage: "clamping-tower".to_owned(),
-        steps: vec![CoarseningStep {
-            reading: Box::new(OwnedClamped {
-                receiver: "clamped-x".to_owned(),
-                at: 0,
-                cap: integer(5),
-            }),
-        }],
-    };
-    let coarser = release_coarser(&fine, &tower, &family, &integer(10), DiameterNorm::Supremum)
-        .expect("the search returns")
-        .expect("inside tolerance 10");
-    let measured = width_enumerated(&fine, &family, DiameterNorm::Supremum).expect("a width");
-    let mut options = LawfulOptions::assemble(&measured, integer(10), None, Some(coarser), true)
-        .expect("the tolerances agree");
-    // The forgery a private field still permits inside this module: narrow the tolerance after
-    // the assembly checked it.
-    options.tolerance = ratio(1, 2);
-    let refusal = release(&AskingLaw, &options).expect_err("the arm recomputes the inequality");
-    assert!(matches!(
-        refusal,
-        WidthRefusal::CoarserReleasedOutsideTolerance(ref claim)
-            if claim.receiver == "clamped-x" && claim.width == integer(5)
-    ));
-}
-
-/// `release_coarser` walks **past the first step**: the first coarsening is still outside
-/// tolerance and the second one is inside it, and the returned step index says which. Every step
-/// is checked to factor through the step before it, not merely through the finest reading.
-#[test]
-fn the_coarser_search_walks_past_the_first_tower_step() {
-    let family = CompatibleFamily::enumerated(
-        "fibre",
-        vec![vec![integer(0)], vec![integer(4)], vec![integer(9)]],
-    )
-    .expect("a family");
-    let fine = Coordinate {
-        receiver: "x".to_owned(),
-        at: 0,
-    };
-    let tower = CoarseningTower {
-        lineage: "two-step-tower".to_owned(),
-        steps: vec![
-            CoarseningStep {
-                reading: Box::new(OwnedClamped {
-                    receiver: "clamped-at-6".to_owned(),
-                    at: 0,
-                    cap: integer(6),
-                }),
-            },
-            CoarseningStep {
-                reading: Box::new(OwnedClamped {
-                    receiver: "clamped-at-2".to_owned(),
-                    at: 0,
-                    cap: integer(2),
-                }),
-            },
-        ],
-    };
-    let coarser = release_coarser(&fine, &tower, &family, &integer(3), DiameterNorm::Supremum)
-        .expect("the search returns")
-        .expect("the second step is inside tolerance 3");
-    assert_eq!(coarser.receiver(), "clamped-at-2");
-    assert_eq!(coarser.step(), 1, "the first step, width 6, was outside 3");
-    assert_eq!(coarser.width(), &integer(2));
-    assert_eq!(coarser.searched_tolerance(), &integer(3));
-    // No step of the tower is inside a tolerance below the coarsest width.
-    assert!(
-        release_coarser(&fine, &tower, &family, &integer(1), DiameterNorm::Supremum)
-            .expect("the search returns")
-            .is_none()
-    );
-}
-
-// ---------------------------------------------------------------------------------------------
-// declared-size ceilings
-// ---------------------------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------------------------
-// T5 (a) — the horizon has two coordinates, and the width over already-read faces
-// ---------------------------------------------------------------------------------------------
 
 fn declared_horizon(longitudinal: usize, index: usize) -> Horizon {
     Horizon::declare(longitudinal, index).expect("a horizon inside both ceilings")
@@ -1359,41 +765,22 @@ fn the_horizon_has_two_coordinates_that_are_not_one_scale() {
     );
 }
 
-/// `width_over_readings` is `width_enumerated`'s diameter on faces that were read elsewhere — the
-/// two-axis horizon of a tube is the first consumer — and the two agree exactly, witness included.
+/// The finite width over read faces refuses an empty family and one past the ceiling.
 #[test]
-fn the_width_over_readings_is_the_enumerated_width() {
-    let family = CompatibleFamily::enumerated(
-        "three compatible states",
-        vec![
-            vec![integer(1), integer(0)],
-            vec![integer(4), integer(0)],
-            vec![integer(2), integer(0)],
-        ],
-    )
-    .expect("a family inside the ceiling");
-    let reading = LinearReading {
-        receiver: "the first coordinate".to_owned(),
-        matrix: matrix(&[&[1, 0]]),
-    };
-    let enumerated =
-        width_enumerated(&reading, &family, DiameterNorm::Supremum).expect("an exact width");
+fn the_width_over_readings_refuses_empty_and_oversized_families() {
     let faces = vec![
         ExactFace::Vector(vec![integer(1)]),
         ExactFace::Vector(vec![integer(4)]),
         ExactFace::Vector(vec![integer(2)]),
     ];
-    let over_readings = width_over_readings(
-        "the first coordinate",
-        "three compatible states",
-        &faces,
-        DiameterNorm::Supremum,
-    )
-    .expect("an exact width");
-    assert_eq!(enumerated.diameter(), over_readings.diameter());
-    assert_eq!(enumerated.diameter(), &integer(3));
-    assert_eq!(enumerated.attaining(), over_readings.attaining());
-    assert_eq!(enumerated.read(), over_readings.read());
+    let over_readings =
+        width_over_readings("the first coordinate", "three", &faces, DiameterNorm::Supremum)
+            .expect("an exact width");
+    assert_eq!(over_readings.diameter(), &integer(3));
+    assert_eq!(
+        over_readings.attaining(),
+        &WidthWitness::Pair { left: 0, right: 1 }
+    );
     assert!(matches!(
         width_over_readings("r", "l", &[], DiameterNorm::Supremum),
         Err(WidthRefusal::EmptyFamily)

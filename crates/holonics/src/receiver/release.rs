@@ -1,1249 +1,346 @@
-//! **Receiver width and release: uncertainty as a structure, not a scalar.**
+//! **Release: one decision law with arms** (THE_REBUILD U3; #73, #148).
 //!
-//! [definition] A navigator runs until its receiver face is within tolerance; then it is released.
-//! Uncertainty is the width of a reading over a compatible family, and release is a declared law
-//! over lawful returns. The Lean counterpart is `Foundation/ReceiverRelease`:
+//! [definition] **The contract.** Every emission of the machine is a [`ReleaseReturn`] of one
+//! decision law, and this module is its one owner. A release decides what a receiver emits from a
+//! reading over a compatible fibre; the arms are what it may return:
+//!
+//! | Arm | The act | What checks it |
+//! |---|---|---|
+//! | **threshold commit**: `Released`, with `Widen` its named proposal | a width over a compatible fibre, decided at a declared tolerance by the caller's declared law ([`DecisionLaw`]; its data form [`DecisionRule`]) | [`release`]: `Released` inside the law's own tolerance (`ReleaseLaw.sound`), `Widen` wide enough for the width (`ReleaseLaw.widenSound`) |
+//! | **certified draw**: `Drawn` | a declared key `u ∈ [0, 1)` read by the inverse CDF of an exact interval face ([`draw`], [`draw_exact`]) | the certificate `Σ_(j<i) upper_j ≤ u < Σ_(j≤i) lower_j` (`certified_inverseCDF_class`), decided through [`release`] at tolerance zero |
+//! | **probe**: `Ask` | the named observation the owner computed and offered ([`ObservationProbe`]) | [`release`]: only an offered probe |
+//! | **typed refusal**: `Hold`, `Unresolved`, `NoContinuationBridges` | nothing is emitted: the plural fibre is kept (`Hold`); a key the enclosure leaves plural keeps its unresolved draw mass with its exact crossing bounds (`Unresolved`); no admitted continuation reaches the receiver's section (`NoContinuationBridges`, the stop law's refusal when no stop fits the aperture) | unconstrained, as in Lean: which one is the caller's declared law |
+//!
+//! Malformed operands (an empty or unnormalizable face, a key outside `[0, 1)`, a forged width) are
+//! not decisions: they are returned as [`DrawRefusal`] or [`WidthRefusal`] content, never as an arm.
+//!
+//! [proved-derived; formal-checked] **The join: a certified draw is a release at tolerance zero.**
+//! A declared draw is a different act from deciding at a tolerance. Its key is an exterior declared
+//! input (the release's key, a navigator's initial configuration read at the receiver), and what it
+//! emits is one class of the face, not the face. Its decision is nevertheless the same law. The
+//! reading is the key's class, `R_u(q) = inverseCDF_q(u)`, over the compatible fibre of the interval
+//! face (every normalized exact face inside the bounds). A class has no grain coarser than itself, so
+//! the tolerance is zero (the discrete metric on the alphabet), and releasing at zero is constancy
+//! on the fibre (`width_eq_zero_iff`). The certificate is the enclosure route to width zero
+//! (`width_le_of_bounds`). Lean `Compression/Landmark/Context/Population.certified_draw_is_released_at_zero_tolerance`
+//! proves that the holding law at tolerance zero releases the class reading over every finite family
+//! of compatible faces, and `plural_draw_is_held` that it holds once two compatible faces part.
+//! [`draw`] runs exactly that: it declares the class reading's width (zero when certified; otherwise
+//! one, the discrete diameter's band), assembles [`LawfulOptions`] at tolerance zero, and takes the
+//! holding rule's decision through [`release`]. `Released` returns as `Drawn` with the key and its
+//! certified cell `[prior_upper, through_lower)`; `Hold` returns as `Unresolved` with the crossing
+//! bounds. **The separating term between the two acts is the key**: a width decision has no key, so
+//! [`release`] refuses a declared law that returns `Drawn` or `Unresolved`
+//! ([`WidthRefusal::DrawNotOffered`]).
+//!
+//! [established-bounded] **What the draw does not claim.** The certificate is sufficient, not
+//! necessary: normalization can make every compatible face agree where the prefix bounds still
+//! straddle the key, and that key is `Unresolved`. The inverse-CDF theorem certifies each emitted
+//! class. It does not turn the certified submeasure into the full mixture: over a point face the
+//! certified cells partition `[0, 1)` and the drawn class follows the face, while over an interval
+//! face the unresolved keys are mass the release does not emit. No claim of distributional
+//! equality rests on the draw. `P_release = P_scored` is the face identity of the population's
+//! release view (`receiver::population::PopulationRelease`), which the draw reads.
+//!
+//! [definition] **The consumers.** The HNN's release (`hnn::reference`, the CUDA port) is a
+//! threshold commit at its receiving phases' grain. The population's release pipeline
+//! (`receiver::population::{releasing, text_release}`) returns this law's arms: the family draw
+//! (`Population::select_family`), one certified draw per response cell, the stop law and the
+//! typed refusals (`receiver::population::Population::release_response`). The chaser's rule
+//! (`receiver::population::chaser`) is a separate arm, declared as such: a capture-basin commit with
+//! an information probe, not yet a `ReleaseReturn` (THE_REBUILD U3 names its loop).
 //!
 //! | Lean | Rust |
 //! |---|---|
-//! | `width` | [`width`] and [`crate::receiver::face::ReceiverWidth`] |
-//! | `width_nonneg` | [`crate::receiver::face::ReceiverWidth::diameter`] is a maximum of absolute separations |
-//! | `abs_sub_le_width` | [`crate::receiver::face::ReceiverWidth::attaining`], the pair that attains it |
-//! | `width_le_of_bounds` | [`ExactZonotope::supremum_diameter`], the enclosure route |
-//! | `width_mono` | `the_width_is_monotone_under_fibre_inclusion` |
-//! | `width_eq_zero_iff` | [`crate::receiver::face::ReceiverWidth::is_zero`] |
-//! | `releasable_at_every_tolerance_iff_width_zero` | `width_zero_releases_at_every_tolerance` |
-//! | `NonExpansive`, `width_nonExpansive_factor` | [`FactorMap`], [`FactoredReading::verify_non_expansive`] and `a_non_expansive_coarser_receiver_has_no_larger_width` |
-//! | `expansive_factor_increases_width` | `an_expansive_factor_map_widens_the_reading` |
-//! | `ReleaseReturn` | [`ReleaseReturn`] |
-//! | `ReleaseLaw`, `ReleaseLaw.sound`, `ReleaseLaw.widenSound` | [`DecisionLaw`] and [`release`], which refuses a release outside tolerance by name; its data form [`DecisionRule`] |
-//! | `every_lawful_return_other_than_hold_ask_or_no_continuation_is_inside_its_tolerance` | [`release`]'s `Released`, `Widen` and `ReleaseCoarser` arms, and [`LawfulOptions::assemble`]'s tolerance check |
-//! | `coarser_receiver_factors`, `releaseCoarser` | [`CoarseningTower`], [`release_coarser`] and [`CoarserRelease`], which carries the tolerance it was searched under |
-//! | `Releasable` | [`crate::receiver::face::ReceiverWidth::releasable_at`] |
+//! | `width`, `width_nonneg`, `abs_sub_le_width`, `width_mono`, `width_eq_zero_iff` | [`crate::receiver::face::width_over_readings`], [`crate::receiver::face::ReceiverWidth`] (`the_width_is_monotone_under_fibre_inclusion`, `width_zero_is_constancy_on_the_fibre`) |
+//! | `width_le_of_bounds` | [`crate::receiver::face::ReceiverWidth::declared`], a width an owner bounded (the HNN's receiving fibres; [`draw`]'s certificate) |
+//! | `releasable_at_every_tolerance_iff_width_zero`, `Releasable` | [`crate::receiver::face::ReceiverWidth::releasable_at`] (`width_zero_releases_at_every_tolerance`) |
+//! | `NonExpansive`, `width_nonExpansive_factor`, `expansive_factor_increases_width` | `a_non_expansive_coarser_reading_has_no_larger_width`, `an_expansive_factor_widens_the_reading` |
+//! | `ReleaseReturn` | [`ReleaseReturn`] (its `releaseCoarser` has no Rust realization: no owner builds a coarser receiver) |
+//! | `ReleaseLaw`, `ReleaseLaw.sound`, `ReleaseLaw.widenSound` | [`DecisionLaw`] and [`release`]; its data form [`DecisionRule`] |
+//! | `holdingLaw` | the rule [`draw`] decides with, `DecisionRule(Release, Hold)` at tolerance zero |
 //! | `no_default_among_the_lawful_returns` | `two_lawful_laws_return_different_arms` |
-//! | `future_stable_event_with_unstable_timing` | `an_event_is_future_stable_while_its_timing_is_not` |
-//! | `timingInsufficiency` | `the_coarse_event_reading_does_not_determine_the_timing` |
+//! | `future_stable_event_with_unstable_timing`, `timingInsufficiency` | `an_event_is_future_stable_while_its_timing_is_not`, `the_coarse_event_reading_does_not_determine_the_timing` |
+//! | `Horizon`, `Horizon.Within`, `horizonWithin_is_not_total` | [`crate::receiver::face::Horizon`] (`the_horizon_has_two_coordinates_that_are_not_one_scale`) |
+//! | `Population.certified_inverseCDF_class` | [`draw`]'s certificate, [`CertifiedDraw`] |
+//! | `Population.{certified_draw_is_released_at_zero_tolerance, plural_draw_is_held}` | [`draw`]: `Drawn` through `Released`, `Unresolved` through `Hold` |
 //!
-//! The horizon's second coordinate (the tower index) is carried by the same Lean owner:
+//! [definition] **Retired September 28** (U3; history at `1bdacc8f`). The exact zonotope enclosure
+//! and its `h`-step image under a linearization, the enumerated and enclosed compatible families,
+//! the two probe searches, the coarsening tower search and the factored readings had no consumer:
+//! the contract's fibres are receiving faces, interval face enclosures and enumerated candidates,
+//! never an affine image of a box. Their laws are kept in Lean (`width`, `width_le_of_bounds`,
+//! `width_mono`, `coarser_receiver_factors`, `NonExpansive`, `width_nonExpansive_factor`,
+//! `expansive_factor_increases_width`) and in
+//! [RECEIVER_HOLARCHY](../../../../docs/RECEIVER_HOLARCHY.md#width-and-release) (the zonotope's
+//! image and its sup-norm diameter, the probe searches and the tower search).
 //!
-//! | Lean | Rust |
-//! |---|---|
-//! | `Horizon`, `Horizon.longitudinalOnly`, `Horizon.Within` | [`crate::receiver::face::Horizon`], [`crate::receiver::face::Horizon::longitudinal_only`], [`crate::receiver::face::Horizon::contains`] |
-//! | `horizonWithin_is_not_total` | `the_horizon_has_two_coordinates_that_are_not_one_scale`; [`crate::receiver::face::Horizon`] derives no `Ord` |
-//! | `width` over already-read faces | [`width_over_readings`], which [`width_enumerated`] now is |
-//!
-//! # The object
-//!
-//! [definition] For a **compatible family** — the preimage/observation fibre of
-//! the receiver-atlas preimage fibre, carried here either enumerated
-//! ([`CompatibleFamily::enumerated`]) or enclosed ([`CompatibleFamily::enclosed`]) — an exact `h`-step
-//! map `Φ_h` and a receiver reading `R`, the **width** is
-//!
-//! ```text
-//! w_R(h) = diam { R(Φ_h(x, u)) : x compatible, u admitted }
-//! ```
-//!
-//! and a face is **released** when that width falls inside the receiver's *declared* tolerance.
-//!
-//! # Why an enclosure is exact here
-//!
-//! [implemented-exact] The first real dynamics is [`crate::receiver::causal_chord::Linearization`]'s
-//! `x_{t+1} = A x_t + B u_t` over `Q`. The image of a box under an exact linear map is **not** a
-//! box, but it *is* an exact zonotope: `A·(c + G e) = A c + (A G) e`. [`ExactZonotope`] carries
-//! that centre and those generators exactly, [`horizon_image`] pushes a box of compatible states
-//! and a box of admitted inputs through `h` steps, and
-//! [`ExactZonotope::supremum_diameter`] is the sup-norm diameter `2·max_i Σ_j |G_ij|` — exact,
-//! and linear in the generator count.
-//!
-//! [established-bounded] **A finding, stated as a refusal rather than hidden.** The *squared
-//! Euclidean* diameter of a zonotope is attained at a vertex of the generator cube, so computing
-//! it exactly would enumerate `2^k` sign patterns. This module therefore declares
-//! [`DiameterNorm::Supremum`] as the exact norm on an enclosure and refuses
-//! [`DiameterNorm::SquaredEuclidean`] on one by name
-//! ([`WidthRefusal::NormNotExactOnEnclosure`]) rather than enumerating a declared-size family.
-//! On an enumerated family both norms are exact and both are computed.
-//!
-//! # Formal boundary and executable representation
-//!
-//! [formal-checked] Lean's `width` and `ReleaseLaw` range over any nonempty finite `Finset X`
-//! and any `R : X → ℚ`; Lean proves the generic extrema, inclusion, tolerance and decision-law
-//! statements. It does not formalize this Rust module's zonotope carrier, matrix recurrence, work
-//! ceilings, or a refinement from a nonlinear system to such a carrier. Rust implements the
-//! finite case by enumerating a bounded family, or the affine rational case by exactly mapping an
-//! `ExactZonotope`; its enclosure width is exact for that declared hull and is an upper bound on
-//! any smaller compatible set it encloses. This is the `width_le_of_bounds` direction, not a
-//! Lean proof that Rust's matrix map constructs the same zonotope. Nonlinear readings over an
-//! enclosure and squared-Euclidean enclosure diameters are refused.
-//!
-//! # Release is receiver-relative, and this module builds no global gate
-//!
-//! [project-postulate] AGENTS.md: *"A plural fibre does not impose a universal certainty gate on
-//! generation."* The Lean theorem `release_is_receiver_relative_not_a_global_gate` is that clause
-//! proved, and this module is built to match it: [`release`] takes the caller's [`DecisionLaw`]
-//! and enforces the tolerance obligations of the named arms: `Released` and `ReleaseCoarser`
-//! must fit their declared tolerance, and a `Widen` proposal must be at least the measured width
-//! (`ReleaseLaw.widenSound`). This widening check corrects the prior Rust behavior, which accepted
-//! any proposed tolerance. It does not choose a return or force the caller to widen. No default
-//! is supplied among `Hold`, `Widen`, `Ask`,
-//! `ReleaseCoarser` and `NoContinuationBridges`, and it exposes no predicate on a fibre that any
-//! generator is obliged to consult.
-//!
-//! # No floats
-//!
-//! [implemented-exact] Every centre, generator, half-width, separation, diameter and tolerance is
-//! an exact `Rat` or `BigInt`. No `f32`/`f64` appears anywhere in this module.
+//! [implemented-exact] **No floats.** Every width, tolerance, key, bound and mass is an exact `Rat`.
 
-use std::collections::BTreeMap;
-use std::fmt::{self, Debug};
+use num_traits::{One, Zero};
+use thiserror::Error;
 
 use crate::ratio::Rat;
-use num_bigint::BigInt;
-use num_traits::{Signed, Zero};
-
-use crate::ratio::linear::ExactRatMatrix;
-use crate::receiver::causal_chord::Linearization;
-
-// The faces, norm, passive linear reading, width, witness and two-axis horizon are
-// `crate::receiver::face`; this module owns the dynamics, compatible families, coarsening and the
-// declared release law that consume them.
+use crate::ratio::algebraic::ExactInterval;
 use crate::receiver::face::{
-    CoarserClaim, CoarserToleranceClaim, DiameterNorm, ExactFace, FAMILY_CEILING, HORIZON_CEILING,
-    LinearReading, Reading, ReceiverWidth, ReleasedClaim, WidenClaim, WidthRefusal, WidthWitness,
-    width_over_readings,
+    DiameterNorm, ReceiverWidth, ReleasedClaim, WidenClaim, WidthRefusal, WidthWitness,
 };
 
-/// The ceiling on the number of uncertainty generators an enclosure may carry.
-///
-/// [definition] Every generator is one column of exact rationals of the declared dimension, and
-/// [`horizon_image`] multiplies the admitted-input generator count by the declared horizon. The
-/// ceiling is checked with checked arithmetic **before** any allocation, so a hostile horizon
-/// declaration is a typed refusal and never a memory request.
-pub(crate) const GENERATOR_CEILING: usize = 4096;
-
-/// The ceiling on the carrier extent a declared linearization may present to [`horizon_image`].
-///
-/// [definition] [`HORIZON_CEILING`] bounds the *number* of exact matrix multiplications, but each
-/// one is `extent³` exact rational products, and the extent comes from a caller-declared matrix.
-/// A horizon inside its ceiling therefore still admits unbounded work unless the extent is bounded
-/// too. This ceiling is checked first, before any matrix is formed.
-pub const EXTENT_CEILING: usize = 256;
-
-/// The ceiling on the **product** `horizon · extent³` — the exact rational multiplications
-/// [`horizon_image`] will actually perform.
-///
-/// [definition] The two axis ceilings above bound each declaration separately; this bounds the
-/// work, which is what a hostile declaration actually buys. The product is formed with checked
-/// arithmetic, so a declaration whose product overflows `usize` is refused rather than wrapping.
-pub(crate) const MULTIPLY_WORK_CEILING: usize = 1 << 24;
-
-/// The ceiling on the number of steps a declared coarsening tower may carry to one search.
-///
-/// [definition] [`release_coarser`] checks the factoring of every step over every unordered pair
-/// of the fibre, so the work is `steps · n(n−1)/2` with `n` bounded by [`FAMILY_CEILING`]. This
-/// ceiling bounds the step count before the first step runs.
-pub(crate) const TOWER_STEP_CEILING: usize = 256;
-
-/// The ceiling on the number of candidate observations one [`narrowing_observation`] call may
-/// declare: every candidate partitions the fibre and re-reads the target width inside each level
-/// set, so the work is linear in the candidate count and quadratic in the fibre.
-pub const CANDIDATE_CEILING: usize = 1024;
-
 // -------------------------------------------------------------------------------------------
-// R6 (a) — the exact enclosure
+// the probe
 // -------------------------------------------------------------------------------------------
 
-/// Where one uncertainty generator came from. A [`ProbeDirection`] names this, so `Ask` asks for a
-/// *named* observation and not for "more data".
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum GeneratorSource {
-    /// A coordinate of the compatible-state fibre.
-    CompatibleState {
-        /// Which state coordinate is unresolved.
-        coordinate: usize,
-    },
-    /// A port of the admitted input at one step of the horizon.
-    AdmittedInput {
-        /// Which step of the horizon.
-        step: usize,
-        /// Which input port.
-        port: usize,
-    },
-}
-
-impl fmt::Display for GeneratorSource {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::CompatibleState { coordinate } => write!(f, "compatible-state@{coordinate}"),
-            Self::AdmittedInput { step, port } => write!(f, "admitted-input@step{step}/port{port}"),
-        }
-    }
-}
-
-/// One generator of an exact zonotope: a column of exact rationals with the source it came from.
-///
-/// A zonotope generator is a direction of an exact set (the algebraic sense of the word), not a
-/// clocked transport like [`crate::navigator::Navigator`].
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct ZonotopeGenerator {
-    /// Where the unresolved direction came from.
-    pub source: GeneratorSource,
-    /// The column itself, of the zonotope's dimension.
-    pub column: Vec<Rat>,
-}
-
-/// **An exact zonotope** `{ c + G e : e ∈ [−1, 1]^k }` over `Q`.
-///
-/// This is the exact enclosure of a compatible family. A box is the special case where `G` is
-/// diagonal, and the image of a zonotope under an exact linear map is again a zonotope — which is
-/// why an `h`-step exact linear map keeps the enclosure exact rather than widening it.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct ExactZonotope {
-    dimension: usize,
-    center: Vec<Rat>,
-    generators: Vec<ZonotopeGenerator>,
-}
-
-impl ExactZonotope {
-    /// The box hull of a declared centre and declared nonnegative half-widths, one generator per
-    /// coordinate whose half-width is nonzero.
-    ///
-    /// A negative half-width is refused by name: an enclosure with a negative extent is not an
-    /// enclosure.
-    pub fn box_hull(center: Vec<Rat>, half_widths: &[Rat]) -> Result<Self, WidthRefusal> {
-        if center.len() != half_widths.len() {
-            return Err(WidthRefusal::DimensionMismatch {
-                declared: center.len(),
-                found: half_widths.len(),
-            });
-        }
-        let dimension = center.len();
-        if dimension == 0 {
-            return Err(WidthRefusal::EmptyDimension);
-        }
-        let live = half_widths.iter().filter(|w| !w.is_zero()).count();
-        if live > GENERATOR_CEILING {
-            return Err(WidthRefusal::GeneratorCeiling {
-                requested: live,
-                ceiling: GENERATOR_CEILING,
-            });
-        }
-        let mut generators = Vec::with_capacity(live);
-        for (coordinate, half_width) in half_widths.iter().enumerate() {
-            if half_width.is_negative() {
-                return Err(WidthRefusal::NegativeHalfWidth { coordinate });
-            }
-            if half_width.is_zero() {
-                continue;
-            }
-            let mut column = vec![Rat::zero(); dimension];
-            column[coordinate] = half_width.clone();
-            generators.push(ZonotopeGenerator {
-                source: GeneratorSource::CompatibleState { coordinate },
-                column,
-            });
-        }
-        Ok(Self {
-            dimension,
-            center,
-            generators,
-        })
-    }
-
-    /// A zonotope from a declared centre and declared generators, each checked against the
-    /// dimension and the ceiling.
-    pub fn declared(
-        center: Vec<Rat>,
-        generators: Vec<ZonotopeGenerator>,
-    ) -> Result<Self, WidthRefusal> {
-        let dimension = center.len();
-        if dimension == 0 {
-            return Err(WidthRefusal::EmptyDimension);
-        }
-        if generators.len() > GENERATOR_CEILING {
-            return Err(WidthRefusal::GeneratorCeiling {
-                requested: generators.len(),
-                ceiling: GENERATOR_CEILING,
-            });
-        }
-        for generator in &generators {
-            if generator.column.len() != dimension {
-                return Err(WidthRefusal::DimensionMismatch {
-                    declared: dimension,
-                    found: generator.column.len(),
-                });
-            }
-        }
-        Ok(Self {
-            dimension,
-            center,
-            generators,
-        })
-    }
-
-    /// The exact dimension of the space this enclosure lives in.
-    pub fn dimension(&self) -> usize {
-        self.dimension
-    }
-
-    /// The exact centre.
-    pub fn center(&self) -> &[Rat] {
-        &self.center
-    }
-
-    /// The exact generators, in declaration order.
-    pub fn generators(&self) -> &[ZonotopeGenerator] {
-        &self.generators
-    }
-
-    /// The image under an exact linear map. Exact: `M·(c + G e) = M c + (M G) e`.
-    pub(crate) fn mapped(&self, map: &ExactRatMatrix) -> Result<Self, WidthRefusal> {
-        if map.columns() != self.dimension {
-            return Err(WidthRefusal::DimensionMismatch {
-                declared: self.dimension,
-                found: map.columns(),
-            });
-        }
-        let center = map.apply(&self.center)?;
-        let mut generators = Vec::with_capacity(self.generators.len());
-        for generator in &self.generators {
-            generators.push(ZonotopeGenerator {
-                source: generator.source,
-                column: map.apply(&generator.column)?,
-            });
-        }
-        Ok(Self {
-            dimension: map.rows(),
-            center,
-            generators,
-        })
-    }
-
-    /// The Minkowski sum of two enclosures of the same dimension: centres add, generators join.
-    pub fn summed(&self, other: &Self) -> Result<Self, WidthRefusal> {
-        if self.dimension != other.dimension {
-            return Err(WidthRefusal::DimensionMismatch {
-                declared: self.dimension,
-                found: other.dimension,
-            });
-        }
-        let total = self
-            .generators
-            .len()
-            .checked_add(other.generators.len())
-            .ok_or(WidthRefusal::GeneratorCountOverflows {
-                states: self.generators.len(),
-                inputs: other.generators.len(),
-                horizon: 1,
-            })?;
-        if total > GENERATOR_CEILING {
-            return Err(WidthRefusal::GeneratorCeiling {
-                requested: total,
-                ceiling: GENERATOR_CEILING,
-            });
-        }
-        let center = self
-            .center
-            .iter()
-            .zip(&other.center)
-            .map(|(a, b)| a + b)
-            .collect();
-        let mut generators = Vec::with_capacity(total);
-        generators.extend(self.generators.iter().cloned());
-        generators.extend(other.generators.iter().cloned());
-        Ok(Self {
-            dimension: self.dimension,
-            center,
-            generators,
-        })
-    }
-
-    /// The exact half-extent of the enclosure along one coordinate: `Σ_j |G_ij|`.
-    pub(crate) fn coordinate_half_extent(&self, coordinate: usize) -> Result<Rat, WidthRefusal> {
-        if coordinate >= self.dimension {
-            return Err(WidthRefusal::DimensionMismatch {
-                declared: self.dimension,
-                found: coordinate,
-            });
-        }
-        Ok(self.generators.iter().fold(Rat::zero(), |sum, generator| {
-            sum + generator.column[coordinate].abs()
-        }))
-    }
-
-    /// **The exact sup-norm diameter** `2·max_i Σ_j |G_ij|`, with the coordinate attaining it.
-    ///
-    /// Lean counterpart: `width_le_of_bounds` — the enclosure route to a width, which pins the
-    /// diameter without enumerating the family.
-    pub fn supremum_diameter(&self) -> Result<(Rat, usize), WidthRefusal> {
-        let mut best = Rat::zero();
-        let mut at = 0usize;
-        for coordinate in 0..self.dimension {
-            let extent = self.coordinate_half_extent(coordinate)?;
-            if extent > best {
-                best = extent;
-                at = coordinate;
-            }
-        }
-        Ok((best * Rat::from_integer(BigInt::from(2)), at))
-    }
-
-    /// The same enclosure with one generator dropped: what observing that direction exactly would
-    /// leave. Used by [`narrowing_probe`].
-    pub fn without_generator(&self, index: usize) -> Result<Self, WidthRefusal> {
-        if index >= self.generators.len() {
-            return Err(WidthRefusal::GeneratorAbsent {
-                index,
-                carried: self.generators.len(),
-            });
-        }
-        let mut generators = self.generators.clone();
-        generators.remove(index);
-        Ok(Self {
-            dimension: self.dimension,
-            center: self.center.clone(),
-            generators,
-        })
-    }
-}
-
-// -------------------------------------------------------------------------------------------
-// R6 (b) — the exact h-step map
-// -------------------------------------------------------------------------------------------
-
-/// **The exact `h`-step image of a compatible enclosure under a declared linearization.**
-///
-/// `Φ_h(x, u_0 … u_{h−1}) = A^h x + Σ_{k<h} A^{h−1−k} B u_k`, with a *fresh* admitted input drawn
-/// at every step. The returned enclosure is exact: every centre and every generator is an exact
-/// rational matrix–vector product, and nothing is widened.
-///
-/// # Declared-size guard
-///
-/// [implemented-exact] The generator count of the return is
-/// `states.generators + horizon · inputs.generators`. That product and that sum are formed with
-/// checked arithmetic and compared against [`GENERATOR_CEILING`] **before** the first allocation,
-/// so a hostile `horizon` is refused by name and never sizes a `Vec`.
-pub fn horizon_image(
-    linearization: &Linearization,
-    states: &ExactZonotope,
-    inputs: &ExactZonotope,
-    horizon: usize,
-) -> Result<ExactZonotope, WidthRefusal> {
-    let extent = linearization.extent();
-    if extent > EXTENT_CEILING {
-        return Err(WidthRefusal::ExtentCeiling {
-            requested: extent,
-            ceiling: EXTENT_CEILING,
-        });
-    }
-    if states.dimension() != extent {
-        return Err(WidthRefusal::DimensionMismatch {
-            declared: extent,
-            found: states.dimension(),
-        });
-    }
-    if inputs.dimension() != linearization.source_count() {
-        return Err(WidthRefusal::DimensionMismatch {
-            declared: linearization.source_count(),
-            found: inputs.dimension(),
-        });
-    }
-    if horizon > HORIZON_CEILING {
-        return Err(WidthRefusal::HorizonCeiling {
-            requested: horizon,
-            ceiling: HORIZON_CEILING,
-        });
-    }
-    let input_total = horizon.checked_mul(inputs.generators().len()).ok_or(
-        WidthRefusal::GeneratorCountOverflows {
-            states: states.generators().len(),
-            inputs: inputs.generators().len(),
-            horizon,
-        },
-    )?;
-    let total = states.generators().len().checked_add(input_total).ok_or(
-        WidthRefusal::GeneratorCountOverflows {
-            states: states.generators().len(),
-            inputs: inputs.generators().len(),
-            horizon,
-        },
-    )?;
-    if total > GENERATOR_CEILING {
-        return Err(WidthRefusal::GeneratorCeiling {
-            requested: total,
-            ceiling: GENERATOR_CEILING,
-        });
-    }
-    // The work itself: one `extent × extent` exact multiplication per step, each `extent³`
-    // rational products. Formed with checked arithmetic and compared before the loop runs.
-    let multiply_work = extent
-        .checked_mul(extent)
-        .and_then(|square| square.checked_mul(extent))
-        .and_then(|cube| cube.checked_mul(horizon.max(1)))
-        .ok_or(WidthRefusal::MultiplyWorkCeiling {
-            extent,
-            horizon,
-            ceiling: MULTIPLY_WORK_CEILING,
-        })?;
-    if multiply_work > MULTIPLY_WORK_CEILING {
-        return Err(WidthRefusal::MultiplyWorkCeiling {
-            extent,
-            horizon,
-            ceiling: MULTIPLY_WORK_CEILING,
-        });
-    }
-
-    // `A^h` and the `h` transported excitation maps, built by repeated exact multiplication.
-    let mut power = ExactRatMatrix::identity(extent)?;
-    let mut transported: Vec<ExactRatMatrix> = Vec::with_capacity(horizon);
-    for _ in 0..horizon {
-        transported.push(power.multiply(&linearization.excitation)?);
-        power = linearization.state.multiply(&power)?;
-    }
-
-    let mut image = states.mapped(&power)?;
-    // Step `k` of the horizon contributes `A^{h−1−k} B u_k`; `transported[j]` is `A^j B`, so the
-    // step whose transport exponent is `j` is `k = h − 1 − j`.
-    for (exponent, map) in transported.iter().enumerate() {
-        let step = horizon - 1 - exponent;
-        let block = inputs.mapped(map)?;
-        let relabelled = ExactZonotope {
-            dimension: block.dimension,
-            center: block.center,
-            generators: block
-                .generators
-                .into_iter()
-                .enumerate()
-                .map(|(port, generator)| ZonotopeGenerator {
-                    source: GeneratorSource::AdmittedInput { step, port },
-                    column: generator.column,
-                })
-                .collect(),
-        };
-        image = image.summed(&relabelled)?;
-    }
-    Ok(image)
-}
-
-/// **One exact trajectory**: the `h`-step advance of a single compatible state under a declared
-/// input word. The word's length is the horizon; a shorter word is refused by name.
-pub fn advance(
-    linearization: &Linearization,
-    state: &[Rat],
-    inputs: &[Vec<Rat>],
-) -> Result<Vec<Rat>, WidthRefusal> {
-    if state.len() != linearization.extent() {
-        return Err(WidthRefusal::DimensionMismatch {
-            declared: linearization.extent(),
-            found: state.len(),
-        });
-    }
-    let mut current = state.to_vec();
-    for step in inputs {
-        if step.len() != linearization.source_count() {
-            return Err(WidthRefusal::DimensionMismatch {
-                declared: linearization.source_count(),
-                found: step.len(),
-            });
-        }
-        let free = linearization.state.apply(&current)?;
-        let driven = linearization.excitation.apply(step)?;
-        current = free.iter().zip(&driven).map(|(a, b)| a + b).collect();
-    }
-    Ok(current)
-}
-
-// -------------------------------------------------------------------------------------------
-// R6 (c) — the reading and its exact faces
-// -------------------------------------------------------------------------------------------
-
-/// How a compatible family is carried. Private: the only way to build a [`CompatibleFamily`] is
-/// through [`CompatibleFamily::enumerated`] or [`CompatibleFamily::enclosed`], so the declared-size
-/// ceiling and the common-dimension check cannot be bypassed by a struct literal.
-#[derive(Clone, Debug, PartialEq, Eq)]
-enum FamilyCarrier {
-    /// The fibre enumerated: finitely many compatible states, each already advanced to the
-    /// horizon or read by a reading that advances them.
-    Finite(Vec<Vec<Rat>>),
-    /// The fibre enclosed: an exact zonotope hull of the compatible states at the horizon.
-    Enclosed(ExactZonotope),
-}
-
-/// The compatible family a width is taken over: the preimage/observation fibre, enumerated or
-/// enclosed.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct CompatibleFamily {
-    lineage: String,
-    carrier: FamilyCarrier,
-}
-
-impl CompatibleFamily {
-    /// What this fibre is the fibre of.
-    pub fn lineage(&self) -> &str {
-        &self.lineage
-    }
-
-    /// The enclosing hull, when the family is enclosed.
-    pub fn hull(&self) -> Option<&ExactZonotope> {
-        match &self.carrier {
-            FamilyCarrier::Enclosed(hull) => Some(hull),
-            FamilyCarrier::Finite(_) => None,
-        }
-    }
-
-    /// An enumerated family, with its declared size checked against [`FAMILY_CEILING`] and its
-    /// members checked against one another for a common dimension.
-    pub fn enumerated(
-        lineage: impl Into<String>,
-        members: Vec<Vec<Rat>>,
-    ) -> Result<Self, WidthRefusal> {
-        if members.is_empty() {
-            return Err(WidthRefusal::EmptyFamily);
-        }
-        if members.len() > FAMILY_CEILING {
-            return Err(WidthRefusal::FamilyCeiling {
-                declared: members.len(),
-                ceiling: FAMILY_CEILING,
-            });
-        }
-        // The pair count is the work this family asks for; form it with checked arithmetic.
-        let count = members.len();
-        count
-            .checked_mul(count.saturating_sub(1))
-            .ok_or(WidthRefusal::PairCountOverflows { members: count })?;
-        let dimension = members[0].len();
-        if dimension == 0 {
-            return Err(WidthRefusal::EmptyDimension);
-        }
-        for member in &members {
-            if member.len() != dimension {
-                return Err(WidthRefusal::DimensionMismatch {
-                    declared: dimension,
-                    found: member.len(),
-                });
-            }
-        }
-        Ok(Self {
-            lineage: lineage.into(),
-            carrier: FamilyCarrier::Finite(members),
-        })
-    }
-
-    /// An enclosed family.
-    pub fn enclosed(lineage: impl Into<String>, hull: ExactZonotope) -> Self {
-        Self {
-            lineage: lineage.into(),
-            carrier: FamilyCarrier::Enclosed(hull),
-        }
-    }
-
-    /// The enumerated members, when the family is enumerated.
-    pub fn members(&self) -> Option<&[Vec<Rat>]> {
-        match &self.carrier {
-            FamilyCarrier::Finite(members) => Some(members),
-            FamilyCarrier::Enclosed(_) => None,
-        }
-    }
-
-    /// Whether every member of this family is a member of the other. Used by the monotonicity
-    /// law; only defined between two enumerated families.
-    pub fn is_subfamily_of(&self, other: &Self) -> Option<bool> {
-        match (self.members(), other.members()) {
-            (Some(mine), Some(theirs)) => Some(mine.iter().all(|member| theirs.contains(member))),
-            _ => None,
-        }
-    }
-}
-
-/// **The width of a declared reading over an enumerated compatible family.**
-///
-/// Every unordered pair is read; the work is `n(n−1)/2` with `n` bounded by [`FAMILY_CEILING`] at
-/// the family's construction.
-pub fn width_enumerated(
-    reading: &dyn Reading,
-    family: &CompatibleFamily,
-    norm: DiameterNorm,
-) -> Result<ReceiverWidth, WidthRefusal> {
-    let Some(members) = family.members() else {
-        return Err(WidthRefusal::DeclaredReadingNeedsEnumeratedFamily {
-            receiver: reading.name().to_owned(),
-        });
-    };
-    let faces = members
-        .iter()
-        .map(|member| reading.read(member))
-        .collect::<Result<Vec<_>, _>>()?;
-    width_over_readings(reading.name(), family.lineage(), &faces, norm)
-}
-
-/// **The width of an exact linear reading over an enclosed compatible family.**
-///
-/// Exact and linear in the generator count: the image of the hull is an exact zonotope and its
-/// sup-norm diameter is `2·max_i Σ_j |G_ij|`. The squared-Euclidean norm is refused on an
-/// enclosure by name.
-pub fn width_enclosed(
-    reading: &LinearReading,
-    family: &CompatibleFamily,
-    norm: DiameterNorm,
-) -> Result<ReceiverWidth, WidthRefusal> {
-    let Some(hull) = family.hull() else {
-        return Err(WidthRefusal::EnclosedReadingNeedsEnclosure {
-            receiver: reading.receiver.clone(),
-        });
-    };
-    if norm != DiameterNorm::Supremum {
-        return Err(WidthRefusal::NormNotExactOnEnclosure { norm: norm.name() });
-    }
-    let image = hull.mapped(&reading.matrix)?;
-    let (diameter, coordinate) = image.supremum_diameter()?;
-    let attaining = if image.generators().is_empty() {
-        WidthWitness::Point
-    } else {
-        WidthWitness::Coordinate { coordinate }
-    };
-    ReceiverWidth::declared(
-        reading.receiver.clone(),
-        family.lineage(),
-        norm,
-        diameter,
-        attaining,
-        image.generators().len(),
-    )
-}
-
-/// The width, dispatched on how the family is carried. A declared non-linear reading over an
-/// enclosure is refused by name rather than sampled.
-pub fn width(
-    reading: &dyn Reading,
-    family: &CompatibleFamily,
-    norm: DiameterNorm,
-) -> Result<ReceiverWidth, WidthRefusal> {
-    if family.members().is_some() {
-        width_enumerated(reading, family, norm)
-    } else {
-        Err(WidthRefusal::DeclaredReadingNeedsEnumeratedFamily {
-            receiver: reading.name().to_owned(),
-        })
-    }
-}
-
-// -------------------------------------------------------------------------------------------
-// T5 (a) — the horizon has two coordinates
-// -------------------------------------------------------------------------------------------
-
-// -------------------------------------------------------------------------------------------
-// R6 (d) — `Ask`: the probe that narrows the fibre most, computed
-// -------------------------------------------------------------------------------------------
-
-/// The named direction whose exact observation would narrow the width most.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct ProbeDirection {
-    /// Where the unresolved direction came from.
-    pub source: GeneratorSource,
-    /// Which generator of the image enclosure it is.
-    pub generator: usize,
-    /// The exact width that observing it would leave.
-    pub width_after: Rat,
-    /// The exact reduction it buys.
-    pub reduction: Rat,
-}
-
-/// The named declared observation whose reading would narrow the width most.
+/// **The probe an owner offers**: the named observation whose reading would narrow the fibre, and
+/// what it would leave. The owner that computed it offers it through [`LawfulOptions::assemble`];
+/// a law may ask only for the probe offered.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ObservationProbe {
     /// The observation's declared name.
     pub observation: String,
-    /// The exact width the worst remaining level set would still carry.
+    /// The exact width the observation would leave.
     pub width_after: Rat,
     /// The exact reduction it buys.
     pub reduction: Rat,
 }
 
-/// Either kind of answer to `Ask`.
+// -------------------------------------------------------------------------------------------
+// the certified draw
+// -------------------------------------------------------------------------------------------
+
+/// Exact bounds at a class the key may cross: the enclosure places the class's inverse-CDF cell on
+/// both sides of the key.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub enum AskProbe {
-    /// An unresolved direction of the enclosure.
-    Direction(ProbeDirection),
-    /// A declared observation over the enumerated fibre.
-    Observation(ObservationProbe),
+pub struct CrossingBounds {
+    /// Zero-based class whose cell may contain the key.
+    pub class: usize,
+    /// Upper bound on the cumulative mass strictly before `class`.
+    pub prior_upper: Rat,
+    /// Lower bound on the cumulative mass through `class`.
+    pub through_lower: Rat,
 }
 
-impl AskProbe {
-    /// The exact width the probe would leave.
-    pub fn width_after(&self) -> &Rat {
-        match self {
-            Self::Direction(probe) => &probe.width_after,
-            Self::Observation(probe) => &probe.width_after,
-        }
-    }
-
-    /// The probe's name, for the law's refusal.
-    pub fn name(&self) -> String {
-        match self {
-            Self::Direction(probe) => probe.source.to_string(),
-            Self::Observation(probe) => probe.observation.clone(),
-        }
-    }
-}
-
-/// **The probe direction maximally reducing the width, computed rather than guessed.**
-///
-/// Observing one generator of the image enclosure exactly removes that generator; the sup-norm
-/// diameter of what remains is exact, so the generator to ask for is the one whose removal leaves
-/// the smallest diameter. The work is the generator count squared times the dimension, and the
-/// generator count is bounded by [`GENERATOR_CEILING`] at the enclosure's construction.
-///
-/// Returns `None` when the enclosure carries no generator: there is nothing left to ask.
-pub fn narrowing_probe(
-    reading: &LinearReading,
-    hull: &ExactZonotope,
-) -> Result<Option<ProbeDirection>, WidthRefusal> {
-    let image = hull.mapped(&reading.matrix)?;
-    if image.generators().is_empty() {
-        return Ok(None);
-    }
-    let (before, _) = image.supremum_diameter()?;
-    let mut best: Option<ProbeDirection> = None;
-    for index in 0..image.generators().len() {
-        let narrowed = image.without_generator(index)?;
-        let (after, _) = narrowed.supremum_diameter()?;
-        let candidate = ProbeDirection {
-            source: image.generators()[index].source,
-            generator: index,
-            width_after: after.clone(),
-            reduction: &before - &after,
-        };
-        let better = match &best {
-            None => true,
-            Some(current) => candidate.width_after < current.width_after,
-        };
-        if better {
-            best = Some(candidate);
-        }
-    }
-    Ok(best)
-}
-
-/// **The declared observation maximally reducing the width over an enumerated fibre.**
-///
-/// Each candidate observation partitions the fibre into the level sets of its own reading; the
-/// width that survives is the largest width the target reading still carries inside one level set.
-/// The observation to ask for is the candidate minimizing that survivor. Nothing is sampled and no
-/// candidate is invented: the candidate family is the caller's declaration.
-pub fn narrowing_observation(
-    reading: &dyn Reading,
-    family: &CompatibleFamily,
-    candidates: &[&dyn Reading],
-    norm: DiameterNorm,
-) -> Result<Option<ObservationProbe>, WidthRefusal> {
-    let Some(members) = family.members() else {
-        return Err(WidthRefusal::DeclaredReadingNeedsEnumeratedFamily {
-            receiver: reading.name().to_owned(),
-        });
-    };
-    if candidates.len() > CANDIDATE_CEILING {
-        return Err(WidthRefusal::CandidateCeiling {
-            requested: candidates.len(),
-            ceiling: CANDIDATE_CEILING,
-        });
-    }
-    let before = width_enumerated(reading, family, norm)?.diameter().clone();
-    let mut best: Option<ObservationProbe> = None;
-    for candidate in candidates {
-        // The level sets of the candidate's own reading, keyed by its exact face's printed form so
-        // that no ordering on the face type is assumed.
-        let mut levels: BTreeMap<String, Vec<Vec<Rat>>> = BTreeMap::new();
-        for member in members {
-            let face = candidate.read(member)?;
-            levels
-                .entry(format!("{face:?}"))
-                .or_default()
-                .push(member.clone());
-        }
-        let mut survivor = Rat::zero();
-        for level in levels.values() {
-            let sub = CompatibleFamily::enumerated(
-                format!("{}|{}", family.lineage(), candidate.name()),
-                level.clone(),
-            )?;
-            let inner = width_enumerated(reading, &sub, norm)?.diameter().clone();
-            if inner > survivor {
-                survivor = inner;
-            }
-        }
-        let probe = ObservationProbe {
-            observation: candidate.name().to_owned(),
-            width_after: survivor.clone(),
-            reduction: &before - &survivor,
-        };
-        let better = match &best {
-            None => true,
-            Some(current) => probe.width_after < current.width_after,
-        };
-        if better {
-            best = Some(probe);
-        }
-    }
-    Ok(best)
-}
-
-// -------------------------------------------------------------------------------------------
-// R6 (e) — `ReleaseCoarser`: the refinement order, and the factoring it checks
-// -------------------------------------------------------------------------------------------
-
-/// One step of a declared coarsening tower: a receiver, and the claim that it factors through the
-/// step before it. The claim is **checked** over the fibre, never assumed.
-pub struct CoarseningStep {
-    /// The coarser receiver.
-    pub reading: Box<dyn Reading>,
-}
-
-impl Debug for CoarseningStep {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("CoarseningStep")
-            .field("reading", &self.reading.name())
-            .finish()
-    }
-}
-
-/// **A declared coarsening tower**, finest first. This is the atlas refinement order of
-/// the receiver-atlas refinement order presented as a chain of readings, which is what
-/// `ReleaseCoarser` needs: the coarser invariant to release is the first one up the tower whose
-/// width falls inside tolerance.
-#[derive(Debug)]
-pub struct CoarseningTower {
-    /// What this tower coarsens.
-    pub lineage: String,
-    /// The steps, finest first. Step `0` is the finest *coarsening* of the target reading.
-    pub steps: Vec<CoarseningStep>,
-}
-
-/// What the coarser search returned.
-///
-/// [implemented-exact] **The tolerance is part of the object.** A `CoarserRelease` is the claim
-/// *"this coarser receiver's width is inside `tolerance`"*, and the tolerance it was searched
-/// under is carried with it so that the claim cannot be re-used against a different, narrower
-/// tolerance. Every field is private and the only constructor is [`release_coarser`]: there is no
-/// literal and no `Default` that mints one.
+/// **A certified draw**: every compatible face lands the declared key in `class`, and every key in
+/// the certified cell `[prior_upper, through_lower)` does too.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct CoarserRelease {
-    receiver: String,
-    width: Rat,
-    step: usize,
-    tolerance: Rat,
+pub struct CertifiedDraw {
+    /// The declared key.
+    pub key: Rat,
+    /// The drawn class.
+    pub class: usize,
+    /// Upper bound on the cumulative mass strictly before `class`: the cell's left end.
+    pub prior_upper: Rat,
+    /// Lower bound on the cumulative mass through `class`: the cell's right end.
+    pub through_lower: Rat,
 }
 
-impl CoarserRelease {
-    /// The coarser receiver's name.
-    pub fn receiver(&self) -> &str {
-        &self.receiver
-    }
-
-    /// Its exact width.
-    pub fn width(&self) -> &Rat {
-        &self.width
-    }
-
-    /// How many steps up the tower it sits.
-    pub fn step(&self) -> usize {
-        self.step
-    }
-
-    /// **The tolerance this release was searched under.** [`LawfulOptions::assemble`] refuses a
-    /// release whose searched tolerance is not the tolerance being assembled.
-    pub fn searched_tolerance(&self) -> &Rat {
-        &self.tolerance
-    }
+/// **A key the enclosure leaves plural**: the classes whose cells cross it, with their exact
+/// bounds. Nothing is emitted; the draw mass stays unresolved.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct UnresolvedDraw {
+    /// The declared key.
+    pub key: Rat,
+    /// Every class the key may land in.
+    pub crossings: Vec<CrossingBounds>,
 }
 
-/// **The coarser invariant whose width is inside tolerance, found through the refinement order.**
+/// Malformed draw operands, returned as content. None of these is a decision.
+#[derive(Clone, Debug, Error, PartialEq, Eq)]
+pub enum DrawRefusal {
+    /// A face with no class.
+    #[error("a face must contain at least one class")]
+    EmptyFace,
+    /// A class whose lower bound (or exact mass) is negative.
+    #[error("class {class} has negative mass bound {bound}")]
+    NegativeMass { class: usize, bound: Rat },
+    /// A class whose upper bound exceeds one.
+    #[error("class {class} has mass bound {bound} above one")]
+    MassAboveOne { class: usize, bound: Rat },
+    /// Interval bounds that enclose no normalized face.
+    #[error("the lower bounds total {lower_total} and the upper bounds {upper_total}; no normalized face lies between")]
+    InvalidNormalization { lower_total: Rat, upper_total: Rat },
+    /// An exact face that does not sum to one.
+    #[error("the exact face sums to {total}, not exactly one")]
+    NotNormalized { total: Rat },
+    /// A key outside `[0, 1)`.
+    #[error("the key {key} lies outside [0, 1)")]
+    KeyOutOfRange { key: Rat },
+    /// The decision law refused the draw's own width (unreachable through [`draw`]'s declarations).
+    #[error("the release law refused the draw: {0}")]
+    Law(String),
+}
+
+/// The declared name of the rule a draw is decided by (Lean `holdingLaw` at tolerance zero).
+pub const CERTIFIED_DRAW_RULE: &str = "certified draw: release at tolerance zero, else hold";
+
+/// **The certified draw of a declared key from an exact interval face** (module header).
 ///
-/// At every step the factoring is *checked* over the fibre: two members the finer reading
-/// identifies must be identified by the coarser one, or the step is refused by name with the two
-/// members that refute it. A tower whose steps do not actually coarsen is not a tower, and saying
-/// so is the point.
-///
-/// Returns `None` when no step of the declared tower is inside tolerance — which is exactly when
-/// `ReleaseCoarser` is not among the lawful returns.
-pub fn release_coarser(
-    fine: &dyn Reading,
-    tower: &CoarseningTower,
-    family: &CompatibleFamily,
-    tolerance: &Rat,
-    norm: DiameterNorm,
-) -> Result<Option<CoarserRelease>, WidthRefusal> {
-    let Some(members) = family.members() else {
-        return Err(WidthRefusal::DeclaredReadingNeedsEnumeratedFamily {
-            receiver: fine.name().to_owned(),
+/// For class `i` the certificate is `Σ_(j<i) upper_j ≤ key < Σ_(j≤i) lower_j`
+/// (`Population.certified_inverseCDF_class`). A key the bounds leave plural returns
+/// [`ReleaseReturn::Unresolved`] with every crossing class's exact bounds; it is never forced into
+/// a class. The decision is taken through [`release`] at tolerance zero.
+pub fn draw(face: &[ExactInterval], key: &Rat) -> Result<ReleaseReturn, DrawRefusal> {
+    if face.is_empty() {
+        return Err(DrawRefusal::EmptyFace);
+    }
+    if key < &Rat::zero() || key >= &Rat::one() {
+        return Err(DrawRefusal::KeyOutOfRange { key: key.clone() });
+    }
+    let mut lower_total = Rat::zero();
+    let mut upper_total = Rat::zero();
+    for (class, mass) in face.iter().enumerate() {
+        if mass.lower < Rat::zero() {
+            return Err(DrawRefusal::NegativeMass {
+                class,
+                bound: mass.lower.clone(),
+            });
+        }
+        if mass.upper > Rat::one() {
+            return Err(DrawRefusal::MassAboveOne {
+                class,
+                bound: mass.upper.clone(),
+            });
+        }
+        lower_total += &mass.lower;
+        upper_total += &mass.upper;
+    }
+    if lower_total > Rat::one() || upper_total < Rat::one() {
+        return Err(DrawRefusal::InvalidNormalization {
+            lower_total,
+            upper_total,
         });
+    }
+    decide(face.len(), inverse_cdf(face, key))
+}
+
+/// **The certified draw from an exact face** (a family's own normalized face): the point enclosure
+/// of each mass, after the exact face is checked nonnegative and normalized.
+pub fn draw_exact(face: &[Rat], key: &Rat) -> Result<ReleaseReturn, DrawRefusal> {
+    if face.is_empty() {
+        return Err(DrawRefusal::EmptyFace);
+    }
+    let mut total = Rat::zero();
+    let mut points = Vec::with_capacity(face.len());
+    for (class, mass) in face.iter().enumerate() {
+        if mass < &Rat::zero() {
+            return Err(DrawRefusal::NegativeMass {
+                class,
+                bound: mass.clone(),
+            });
+        }
+        total += mass;
+        points.push(ExactInterval::point(mass.clone()));
+    }
+    if total != Rat::one() {
+        return Err(DrawRefusal::NotNormalized { total });
+    }
+    draw(&points, key)
+}
+
+/// The inverse-CDF reading of a validated face: the certified class, or every crossing class.
+fn inverse_cdf(face: &[ExactInterval], key: &Rat) -> Result<CertifiedDraw, UnresolvedDraw> {
+    let mut lower_prefix = Rat::zero();
+    let mut upper_prefix = Rat::zero();
+    let mut crossings = Vec::new();
+    for (class, mass) in face.iter().enumerate() {
+        let prior_upper = upper_prefix.clone();
+        let through_lower = &lower_prefix + &mass.lower;
+        if &prior_upper <= key && key < &through_lower {
+            return Ok(CertifiedDraw {
+                key: key.clone(),
+                class,
+                prior_upper,
+                through_lower,
+            });
+        }
+        if &lower_prefix <= key && key < &(&upper_prefix + &mass.upper) {
+            crossings.push(CrossingBounds {
+                class,
+                prior_upper,
+                through_lower: through_lower.clone(),
+            });
+        }
+        lower_prefix = through_lower;
+        upper_prefix += &mass.upper;
+    }
+    Err(UnresolvedDraw {
+        key: key.clone(),
+        crossings,
+    })
+}
+
+/// The class reading's width, decided by the holding rule at tolerance zero through [`release`].
+fn decide(
+    classes: usize,
+    reading: Result<CertifiedDraw, UnresolvedDraw>,
+) -> Result<ReleaseReturn, DrawRefusal> {
+    let law = |refusal: WidthRefusal| DrawRefusal::Law(refusal.to_string());
+    let (diameter, attaining) = match &reading {
+        Ok(_) => (Rat::zero(), WidthWitness::Point),
+        Err(unresolved) => (
+            Rat::one(),
+            WidthWitness::Coordinate {
+                coordinate: unresolved.crossings.first().map_or(0, |c| c.class),
+            },
+        ),
     };
-    if tower.steps.len() > TOWER_STEP_CEILING {
-        return Err(WidthRefusal::TowerStepCeiling {
-            requested: tower.steps.len(),
-            ceiling: TOWER_STEP_CEILING,
-        });
-    }
-    let mut previous: &dyn Reading = fine;
-    for (step, entry) in tower.steps.iter().enumerate() {
-        let coarse = entry.reading.as_ref();
-        for left in 0..members.len() {
-            for right in (left + 1)..members.len() {
-                if previous.read(&members[left])? != previous.read(&members[right])? {
-                    continue;
-                }
-                if coarse.read(&members[left])? != coarse.read(&members[right])? {
-                    return Err(WidthRefusal::CoarserDoesNotFactor {
-                        coarse: coarse.name().to_owned(),
-                        fine: previous.name().to_owned(),
-                        left,
-                        right,
-                    });
-                }
-            }
-        }
-        let reading = width_enumerated(coarse, family, norm)?;
-        if reading.releasable_at(tolerance) {
-            return Ok(Some(CoarserRelease {
-                receiver: coarse.name().to_owned(),
-                width: reading.diameter().clone(),
-                step,
-                tolerance: tolerance.clone(),
-            }));
-        }
-        previous = coarse;
-    }
-    Ok(None)
-}
-
-/// The quotient a finer reading makes of an enumerated family: member `k` transports its face and
-/// retains itself. It is the core restriction's [`Transition`](crate::holon::restriction::tower::Transition)
-/// over which [`CoarseningTower::descent`] asks each step to factor; the residual is the member,
-/// which is exactly what a later finer receiver reopens.
-struct FaceQuotient {
-    faces: Vec<ExactFace>,
-}
-
-impl crate::holon::restriction::tower::Transition for FaceQuotient {
-    type Source = usize;
-    type Target = Option<ExactFace>;
-    type Residual = usize;
-
-    fn apply(&self, member: &usize) -> Option<ExactFace> {
-        self.faces.get(*member).cloned()
-    }
-
-    fn residual(&self, member: &usize) -> usize {
-        *member
-    }
-
-    fn reopen(&self, _face: &Option<ExactFace>, member: &usize) -> usize {
-        *member
-    }
-}
-
-/// One step of a coarsening tower read as the core restriction's factor descent: the step's
-/// reading factors through the reading below it (the witness carries the induced map on its
-/// faces), or the pairs it separates that the finer reading identified.
-pub(crate) type CoarseningDescent =
-    crate::holon::restriction::FactorDescent<Option<ExactFace>, usize, ExactFace>;
-
-impl CoarseningTower {
-    /// **The tower read as core descents**, one per step up to and including the first step that
-    /// does not factor — the step at which [`release_coarser`] refuses with
-    /// [`WidthRefusal::CoarserDoesNotFactor`], whose `(left, right)` is that descent's first
-    /// break (`Foundation/ReceiverRelease.coarser_receiver_factors`,
-    /// `Foundation/Standing.standingLaw_exists_iff_future_factors`).
-    pub fn descent(
-        &self,
-        fine: &dyn Reading,
-        family: &CompatibleFamily,
-    ) -> Result<Vec<CoarseningDescent>, WidthRefusal> {
-        let Some(members) = family.members() else {
-            return Err(WidthRefusal::DeclaredReadingNeedsEnumeratedFamily {
-                receiver: fine.name().to_owned(),
-            });
-        };
-        if self.steps.len() > TOWER_STEP_CEILING {
-            return Err(WidthRefusal::TowerStepCeiling {
-                requested: self.steps.len(),
-                ceiling: TOWER_STEP_CEILING,
-            });
-        }
-        let indices: Vec<usize> = (0..members.len()).collect();
-        let mut previous = members
-            .iter()
-            .map(|member| fine.read(member))
-            .collect::<Result<Vec<_>, _>>()?;
-        let mut descents = Vec::with_capacity(self.steps.len());
-        for step in &self.steps {
-            let coarse = members
-                .iter()
-                .map(|member| step.reading.read(member))
-                .collect::<Result<Vec<_>, _>>()?;
-            let quotient = FaceQuotient { faces: previous };
-            let descent = crate::holon::restriction::factor_descent(
-                &quotient,
-                |member: &usize| coarse[*member].clone(),
-                &indices,
-            )
-            // The family ceiling equals the descent ceiling; this refusal is unreachable through
-            // an enumerated family and is reported in the family's own vocabulary.
-            .map_err(|_| WidthRefusal::FamilyCeiling {
-                declared: members.len(),
-                ceiling: FAMILY_CEILING,
-            })?;
-            let broke = !descent.descends();
-            descents.push(descent);
-            if broke {
-                break;
-            }
-            previous = coarse;
-        }
-        Ok(descents)
-    }
-}
-
-/// A declared factor map on an exact rational reading. A *coarser* receiver is this map composed
-/// with a finer one; whether it is also *narrower* depends on whether the map is non-expansive,
-/// which [`FactoredReading::verify_non_expansive`] checks rather than assumes.
-///
-/// Lean counterpart: `NonExpansive`, `width_nonExpansive_factor` and
-/// `expansive_factor_increases_width`.
-pub trait FactorMap {
-    /// The factor map's declared name.
-    fn name(&self) -> &str;
-    /// The map itself.
-    fn apply(&self, value: &Rat) -> Rat;
-}
-
-/// **A coarser receiver**: a declared factor map composed with a finer reading. It factors through
-/// the finer reading by construction — `coarser_receiver_factors` in the Lean owner — so it is a
-/// lawful `ReleaseCoarser` target.
-pub struct FactoredReading<'a> {
-    /// The coarser receiver's declared name.
-    pub receiver: String,
-    /// The finer reading it factors through.
-    pub fine: &'a dyn Reading,
-    /// The declared factor map.
-    pub factor: &'a dyn FactorMap,
-}
-
-impl Debug for FactoredReading<'_> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("FactoredReading")
-            .field("receiver", &self.receiver)
-            .field("fine", &self.fine.name())
-            .field("factor", &self.factor.name())
-            .finish()
-    }
-}
-
-impl Reading for FactoredReading<'_> {
-    fn name(&self) -> &str {
-        &self.receiver
-    }
-
-    fn read(&self, state: &[Rat]) -> Result<ExactFace, WidthRefusal> {
-        match self.fine.read(state)? {
-            ExactFace::Vector(values) => Ok(ExactFace::Vector(
-                values
-                    .iter()
-                    .map(|value| self.factor.apply(value))
-                    .collect(),
-            )),
-            other => Err(WidthRefusal::FactorNeedsVectorFace {
-                factor: self.factor.name().to_owned(),
-                arm: other.arm(),
-            }),
-        }
-    }
-}
-
-impl FactoredReading<'_> {
-    /// **Check non-expansiveness on the fibre actually read**, rather than asserting it.
-    ///
-    /// For every pair of members and every coordinate of the finer reading, the factored
-    /// separation must not exceed the finer one. A factor map that fails is returned by name with
-    /// the pair and the coordinate that refute it — which is exactly the counterexample the Lean
-    /// owner's `expansive_factor_increases_width` exhibits.
-    pub fn verify_non_expansive(&self, family: &CompatibleFamily) -> Result<(), WidthRefusal> {
-        let Some(members) = family.members() else {
-            return Err(WidthRefusal::DeclaredReadingNeedsEnumeratedFamily {
-                receiver: self.receiver.clone(),
-            });
-        };
-        let fine = members
-            .iter()
-            .map(|member| self.fine.read(member))
-            .collect::<Result<Vec<_>, _>>()?;
-        for left in 0..fine.len() {
-            for right in (left + 1)..fine.len() {
-                let (ExactFace::Vector(a), ExactFace::Vector(b)) = (&fine[left], &fine[right])
-                else {
-                    return Err(WidthRefusal::FactorNeedsVectorFace {
-                        factor: self.factor.name().to_owned(),
-                        arm: fine[left].arm(),
-                    });
-                };
-                if a.len() != b.len() {
-                    return Err(WidthRefusal::VectorFacesDiffer {
-                        left: a.len(),
-                        right: b.len(),
-                    });
-                }
-                for (coordinate, (x, y)) in a.iter().zip(b).enumerate() {
-                    let before = (x - y).abs();
-                    let after = (self.factor.apply(x) - self.factor.apply(y)).abs();
-                    if after > before {
-                        return Err(WidthRefusal::FactorIsExpansive {
-                            factor: self.factor.name().to_owned(),
-                            left,
-                            right,
-                            coordinate,
-                        });
-                    }
-                }
-            }
-        }
-        Ok(())
+    let width = ReceiverWidth::declared(
+        "the key's inverse-CDF class",
+        "the normalized faces inside the interval enclosure",
+        DiameterNorm::Supremum,
+        diameter,
+        attaining,
+        classes,
+    )
+    .map_err(law)?;
+    let options = LawfulOptions::assemble(&width, Rat::zero(), None, false).map_err(law)?;
+    let rule = DecisionRule::new(
+        CERTIFIED_DRAW_RULE,
+        WithinTolerance::Release,
+        BeyondTolerance::Hold,
+    );
+    match (release(&rule, &options).map_err(law)?, reading) {
+        (ReleaseReturn::Released { .. }, Ok(certified)) => Ok(ReleaseReturn::Drawn(certified)),
+        (ReleaseReturn::Hold, Err(unresolved)) => Ok(ReleaseReturn::Unresolved(unresolved)),
+        (decided, _) => Err(DrawRefusal::Law(format!(
+            "the holding rule at tolerance zero returned {decided:?} against the draw's own width"
+        ))),
     }
 }
 
 // -------------------------------------------------------------------------------------------
-// R6 (f) — the release law, declared by the caller
+// the decision law
 // -------------------------------------------------------------------------------------------
 
-/// **The six caller-declared returns.** `Released`, `Widen` and `ReleaseCoarser` are checked
-/// against the tolerance each arm names; `Hold`, `Ask` and `NoContinuationBridges` remain the
-/// caller's decisions, subject only to their offered-input and offered-coarser checks.
+/// **The arms of the one decision law** (module header). `Released`, `Widen` and `Drawn` are
+/// checked against what they name; `Ask` must be the offered probe; `Hold`, `Unresolved` and
+/// `NoContinuationBridges` emit nothing and are the caller's.
 ///
-/// Lean counterpart: `Foundation/ReceiverRelease.ReleaseReturn`.
+/// Lean counterpart: `Foundation/ReceiverRelease.ReleaseReturn` (`Drawn` and `Unresolved` are its
+/// `released` and `hold` at tolerance zero on the key's class reading).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ReleaseReturn {
-    /// The width is inside the declared tolerance.
+    /// The threshold commit: the width is inside the declared tolerance.
     Released {
         /// The exact width.
         width: Rat,
         /// The tolerance it fell inside.
         tolerance: Rat,
     },
+    /// The certified draw: the key's class, with its certified cell.
+    Drawn(CertifiedDraw),
     /// Retain the plural fibre and emit nothing at this receiver.
     Hold,
+    /// A key the enclosure leaves plural: nothing emitted, the draw mass kept unresolved.
+    Unresolved(UnresolvedDraw),
     /// Declare a wider tolerance, named.
     Widen {
         /// The proposed tolerance.
         tolerance: Rat,
     },
-    /// Name the input or observation that would narrow the fibre most.
+    /// Name the observation that would narrow the fibre.
     Ask {
-        /// The computed probe.
-        probe: AskProbe,
-    },
-    /// Release only the coarser invariant whose width is inside tolerance.
-    ReleaseCoarser {
-        /// The coarser receiver.
-        receiver: String,
-        /// Its exact width.
-        width: Rat,
+        /// The offered probe.
+        probe: ObservationProbe,
     },
     /// No admitted continuation bridges the gap.
     NoContinuationBridges {
@@ -1252,60 +349,45 @@ pub enum ReleaseReturn {
     },
 }
 
-/// **What the library computed and what is therefore lawfully available** to the caller's decision.
+impl ReleaseReturn {
+    /// The class this return emits: the drawn class of a certified draw, and nothing otherwise.
+    pub fn drawn_class(&self) -> Option<usize> {
+        match self {
+            Self::Drawn(certified) => Some(certified.class),
+            _ => None,
+        }
+    }
+}
+
+/// **What the owner computed and what is therefore lawfully available** to the caller's decision.
 /// The library computes the options; it does not choose among them.
 ///
-/// [implemented-exact] Every field is private and the only constructor is [`Self::assemble`],
-/// which refuses an incoherent assembly rather than carrying it. In particular a
-/// [`CoarserRelease`] searched under one tolerance cannot be assembled against another — the
-/// two-call route *"search the coarser invariant at tolerance 10, assemble at tolerance 1/2,
-/// release"* is refused at the assembly, not merely at the release.
+/// [implemented-exact] Every field is private and the only constructor is [`Self::assemble`].
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LawfulOptions {
     width: Rat,
     tolerance: Rat,
     inside_tolerance: bool,
-    ask: Option<AskProbe>,
-    coarser: Option<CoarserRelease>,
+    ask: Option<ObservationProbe>,
     bridges: bool,
 }
 
 impl LawfulOptions {
     /// Assemble the options from a width and the declared apparatus. The caller declares the
-    /// tolerance; nothing here has a default.
-    ///
-    /// # What is refused
-    ///
-    /// A `coarser` release searched under a tolerance other than `tolerance` is refused by name
-    /// ([`WidthRefusal::CoarserSearchedAtAnotherTolerance`]). [`release_coarser`] answers the
-    /// question *"is any step of this tower inside **this** tolerance"*, and its answer is only
-    /// an answer to that question; re-presenting it under a narrower tolerance would release a
-    /// face outside the tolerance actually declared.
+    /// tolerance; nothing here has a default. The result is a `Result` so that an incoherent
+    /// assembly stays refusable as content.
     pub fn assemble(
         reading: &ReceiverWidth,
         tolerance: Rat,
-        ask: Option<AskProbe>,
-        coarser: Option<CoarserRelease>,
+        ask: Option<ObservationProbe>,
         bridges: bool,
     ) -> Result<Self, WidthRefusal> {
-        if let Some(offered) = &coarser
-            && offered.tolerance != tolerance
-        {
-            return Err(WidthRefusal::CoarserSearchedAtAnotherTolerance(Box::new(
-                CoarserToleranceClaim {
-                    receiver: offered.receiver.clone(),
-                    searched: offered.tolerance.clone(),
-                    declared: tolerance,
-                },
-            )));
-        }
         let inside_tolerance = reading.releasable_at(&tolerance);
         Ok(Self {
             width: reading.diameter().clone(),
             tolerance,
             inside_tolerance,
             ask,
-            coarser,
             bridges,
         })
     }
@@ -1325,14 +407,9 @@ impl LawfulOptions {
         self.inside_tolerance
     }
 
-    /// The computed probe, when there is one to ask for.
-    pub fn ask(&self) -> Option<&AskProbe> {
+    /// The offered probe, when there is one to ask for.
+    pub fn ask(&self) -> Option<&ObservationProbe> {
         self.ask.as_ref()
-    }
-
-    /// The coarser invariant inside tolerance, when the declared tower carries one.
-    pub fn coarser(&self) -> Option<&CoarserRelease> {
-        self.coarser.as_ref()
     }
 
     /// Whether any admitted continuation bridges the gap at all.
@@ -1342,8 +419,7 @@ impl LawfulOptions {
 }
 
 /// A caller's **declared** decision law. There is no default implementation and no blanket
-/// implementation: the decision is supplied, exactly as a metric is supplied to a chart in
-/// the receiver-atlas capability.
+/// implementation: the decision is supplied.
 pub trait DecisionLaw {
     /// The law's declared name, for the refusal.
     fn name(&self) -> &str;
@@ -1370,8 +446,6 @@ pub enum BeyondTolerance {
     Widen(Rat),
     /// Ask the probe the options offer, holding when none is offered.
     Ask,
-    /// Release the coarser invariant the options offer, holding when none is offered.
-    ReleaseCoarser,
     /// Report that no admitted continuation bridges the gap, with the declared reason; held when
     /// the options say one does.
     NoContinuation(String),
@@ -1438,13 +512,6 @@ impl DecisionLaw for DecisionRule {
                 },
                 None => ReleaseReturn::Hold,
             },
-            BeyondTolerance::ReleaseCoarser => match options.coarser() {
-                Some(offered) => ReleaseReturn::ReleaseCoarser {
-                    receiver: offered.receiver().to_owned(),
-                    width: offered.width().clone(),
-                },
-                None => ReleaseReturn::Hold,
-            },
             BeyondTolerance::NoContinuation(reason) if !options.bridges() => {
                 ReleaseReturn::NoContinuationBridges {
                     reason: reason.clone(),
@@ -1455,15 +522,15 @@ impl DecisionLaw for DecisionRule {
     }
 }
 
-/// **Take the declared law's decision, and check the one thing the library owns.**
+/// **Take the declared law's decision, and check what the library owns.**
 ///
 /// A law returning [`ReleaseReturn::Released`] with the width outside its own declared tolerance is
-/// refused by name; a law asking for a probe the options did not offer, or releasing a coarser
-/// receiver the tower did not return, is refused by name. Nothing else is constrained: `Hold`,
-/// `Widen`, `Ask`, `ReleaseCoarser` and `NoContinuationBridges` are the caller's to choose among,
-/// and this module supplies no default and no global gate.
+/// refused by name; a law proposing a widening that does not contain the width, or asking for a
+/// probe the options did not offer, is refused by name; and a law returning a draw is refused,
+/// because a width decision carries no key ([`draw`] is the draw's own entry). Nothing else is
+/// constrained: this module supplies no default and no global gate.
 ///
-/// Lean counterpart: `ReleaseLaw.sound`.
+/// Lean counterpart: `ReleaseLaw.sound`, `ReleaseLaw.widenSound`.
 pub fn release(
     law: &dyn DecisionLaw,
     options: &LawfulOptions,
@@ -1489,39 +556,7 @@ pub fn release(
             _ => {
                 return Err(WidthRefusal::ProbeNotOffered {
                     law: law.name().to_owned(),
-                    probe: probe.name(),
-                });
-            }
-        },
-        ReleaseReturn::ReleaseCoarser { receiver, width } => match &options.coarser {
-            Some(offered) if &offered.receiver == receiver && &offered.width == width => {
-                // The coarser arm releases a face, so it carries the same obligation the
-                // `Released` arm does: the released width is inside the tolerance these options
-                // were assembled against. Matching `(receiver, width)` against the offer is not
-                // that check — the offer was searched under its own tolerance, which
-                // `LawfulOptions::assemble` has already required to be this one, and the
-                // inequality is recomputed here rather than inherited.
-                //
-                // Lean counterpart: the `releaseCoarser` constructor of
-                // `Foundation/ReceiverRelease.ReleaseReturn` carries
-                // `coarserWidth ≤ tolerance` as an argument, and
-                // `every_lawful_return_other_than_hold_ask_or_no_continuation_is_inside_its_tolerance`
-                // collects the three arms that name a tolerance.
-                if width > &options.tolerance {
-                    return Err(WidthRefusal::CoarserReleasedOutsideTolerance(Box::new(
-                        CoarserClaim {
-                            law: law.name().to_owned(),
-                            receiver: receiver.clone(),
-                            width: width.clone(),
-                            tolerance: options.tolerance.clone(),
-                        },
-                    )));
-                }
-            }
-            _ => {
-                return Err(WidthRefusal::CoarserNotOffered {
-                    law: law.name().to_owned(),
-                    receiver: receiver.clone(),
+                    probe: probe.observation.clone(),
                 });
             }
         },
@@ -1534,14 +569,15 @@ pub fn release(
                 })));
             }
         }
+        ReleaseReturn::Drawn(_) | ReleaseReturn::Unresolved(_) => {
+            return Err(WidthRefusal::DrawNotOffered {
+                law: law.name().to_owned(),
+            });
+        }
         ReleaseReturn::Hold | ReleaseReturn::NoContinuationBridges { .. } => {}
     }
     Ok(decision)
 }
-
-// -------------------------------------------------------------------------------------------
-// R6 (g) — refusals
-// -------------------------------------------------------------------------------------------
 
 #[cfg(test)]
 mod tests;

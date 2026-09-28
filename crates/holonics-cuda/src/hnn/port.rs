@@ -1562,7 +1562,7 @@ impl<'c> ExecutionPort for Resident<'c> {
         let anchors = readout::anchors(&word.word.plan, &word.word.record);
         let width = release_width(&phases, &faces)?;
         let tolerance = Rat::new(BigInt::one(), BigInt::from(phases.grain()));
-        let options = LawfulOptions::assemble(&width, tolerance.clone(), None, None, false)?;
+        let options = LawfulOptions::assemble(&width, tolerance.clone(), None, false)?;
         let decided = release(decision, &options)?;
         let released = matches!(decided, ReleaseReturn::Released { .. });
         let split = if resident

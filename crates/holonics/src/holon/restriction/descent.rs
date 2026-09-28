@@ -32,9 +32,9 @@
 //! `Foundation/Standing.standingLaw_exists_iff_future_factors` (a quotient is a lawful
 //! standing exactly when the future factors through it). A square break's retained residual
 //! reopening the fine motion is `Transition.reopen_apply` at `A_f x`, not a new law. The tube square
-//! (`tube::SquareVerdict::descent`), the coarsening tower of release
-//! (`crate::receiver::release::CoarseningTower::descent`) and standing sufficiency read through
-//! this owner.
+//! (`tube::SquareVerdict::descent`) and standing sufficiency read through this owner; the coarsening
+//! tower of release read through it too until its retirement (September 28; its law is in
+//! `docs/RECEIVER_HOLARCHY.md`, "Width and release").
 //!
 //! Every declared population is bounded ([`DESCENT_SOURCE_CEILING`]) before any transition runs;
 //! a factoring is quadratic in it.

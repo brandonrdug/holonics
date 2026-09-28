@@ -39,7 +39,8 @@ Its corrections are folded in.
   be reopened; species collapse keeps seeds and shares and can split. Each keeps its recoverability
   condition.
 - **Release** is one decision law whose arms are the certified draw, the threshold commit, the probe
-  and the typed refusal. Today three rules realize it apart (§3, U3).
+  and the typed refusal. The HNN's commit and the population's draws return its arms through
+  `receiver::release` (U3's first loop); the chaser's rule is a separate arm until U3's next loop.
 - **Charts.** Text, arithmetic, motion and image are boundary charts of the one machine. Brandon,
   September 28: the physical computation is the ideal, and framing the machine as text prediction
   makes the problem harder. The construction proceeds from the motion. Text is one chart, and its
@@ -54,7 +55,7 @@ Its corrections are folded in.
 | Field (rings, contacts, word, deposition, wave) | lawful on host and card; `5 − 13/16 − ε` held-out bits on the standing cut through `q_C`; campaign 2 and the loaded resonator added none; its wave and resonator states live inside one word |
 | Chase (F6) | reception at truth on 16 arenas; action captures in 164 ticks against 3,704 and 366; the at-once acceptance failed; its decision rule is a capture-basin planner, not the specified log-odds commit |
 | Retention | one contract (objects §8): each collapse is the standing law through its own carrier, with its Lean standing and its recoverability (U2's first loop); the test-only linear chain is retired |
-| Release | three rules: `receiver::release` (the HNN), the population's draw pipeline, the chaser's decision |
+| Release | one law, `receiver::release`: the HNN's threshold commit and the population's certified draws, stop law and refusals (U3's first loop); the chaser's capture-basin commit is a separate arm |
 | Mixtures | five constructions, sharing the ideal telescope but differing in conditioning, transitions and carriers: digit-local joins (`JoinTree`, `FaceJoins`), the whole-cell `receiving::Mixture`, the population's telescope with death, dormancy's fixed share over switching paths, and the retired `LocalMixture` |
 | Motion primitives | proved in `Geometry/Motion`; no Rust consumer |
 
@@ -157,7 +158,7 @@ Owners: Lean `Foundation/Standing` (its Rust chart `receiver::standing` retired 
 
 #### U3. One release contract
 
-Owners: `receiver::release`, `population::{releasing, sampling, family_release, text_release}`,
+Owners: `receiver::release`, `population::{releasing, text_release, provenance}`,
 `population::chaser`.
 - **Contract.** Every emission is a `ReleaseReturn` of one decision law; its arms are the certified
   draw (the inverse CDF), the threshold commit, the probe and the typed refusal. `P_release = P_scored`
@@ -172,6 +173,33 @@ Owners: `receiver::release`, `population::{releasing, sampling, family_release, 
   library owner, or are deleted.
 - **Failure.** A receipt that the one law cannot reproduce names its separating term; that rule
   stays a separate arm, declared as such.
+- **First loop: the contract at exact parity** (September 28, done). `receiver::release` owns the
+  one decision law and states it; its arms are the threshold commit (`Released`, `Widen`), the
+  certified draw (`Drawn`), the probe (`Ask`) and the typed refusals (`Hold`, `Unresolved`,
+  `NoContinuationBridges`). The draw is the law at tolerance zero on the key's class reading (Lean
+  `Population.{certified_draw_is_released_at_zero_tolerance, plural_draw_is_held}`); the key is the
+  separating term, so a width law that returns a draw is refused. `population::sampling` and
+  `family_release` moved into it (`draw`, `draw_exact`, `Population::select_family`), and the
+  harness's two response loops became the library's `Population::release_response` (scored and
+  ancestral laws, the stop law, per-cell family provenance). Parity: the pre-U3 selectors and
+  harness loops, run beside the law, agreed on 20,000 interval faces, 20,000 exact faces and 1,600
+  responses (every status, bytes, family, face count, posterior width and scored trace). The kept
+  subtree: the zonotope, the compatible families, the probe searches and the coarsening tower had no
+  consumer and were retired, their laws in Lean or in
+  [RECEIVER_HOLARCHY](../RECEIVER_HOLARCHY.md#width-and-release); the Rust `ReleaseCoarser` arm
+  went with them. `population::health` was retired (its bound is in the same section; the draw holds
+  on a simplex-covering face); `population::provenance` is called by the scored response.
+  `causal_chord` is not a release owner (a decision reads widths, never a transfer object); its one
+  consumer is `hnn::modes`'s check of `hnn.mode-quotient-chord-survives`, which has no Lean
+  counterpart, so its disposition joins `hnn::modes`'s at U2.
+- **Next loop: the chaser's arm** (after U4's motion rebase). Map `MachineChaser`'s releases onto the
+  law and reproduce `MachineReceipt` on the 16 arenas exactly: `Certified` is `Released` at
+  tolerance zero on the capture-within-`m` reading over the selected fibre; `Probe` is `Ask`, whose
+  probe gains the partition it is chosen by (its class sizes and the exact `∏_c |c|^|c|`
+  comparison), since its criterion is information, not residual width; `Commit` (cornering when the
+  probe's concession exceeds `d·|Θ|`) is a cost comparison, the Bellman stop law of the F6 review,
+  and stays a declared separate arm with the price as its separating term. The specified sequential
+  test on accumulated log-odds is then built as its own arm or the F6 law is amended, by that parity.
 - **Then** F4's second stage, `Q_R` (its gate below).
 
 #### U1. One machine: the receiving composition at the field's port
