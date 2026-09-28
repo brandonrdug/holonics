@@ -105,8 +105,12 @@ on the admitted egg, and the trees beyond depth 24 add at most 20 bits.
      - The standing falls from 11,513,530,863 to 2,781,355,912 bytes (from 10,983 to 2,653 a cell).
      - Peak resident memory falls from 10.8 GB to 3.4 GB, and the passage from 272,849 to
        166,113 ms.
-  2. **Mix per cell.** Switching among families under the hazard ladder (Astra §14.6), so that
-     each family contributes where it predicts best, instead of a posterior that settles on one.
+  2. **A family wins where it is closest: dormancy in space and in time** ([record](../../research/records/2026-09-28_A_NUMBER_IS_A_HELIX_ITS_BASE_IS_A_FACE_AND_A_FAMILY_WINS_WHERE_IT_IS_CLOSEST.md#5-the-population-a-family-wins-where-it-is-closest)).
+     Keep a posterior over families at each context of a shared gating tree (node-local Bayes),
+     with the activity switching in time under the hazard ladder (Astra §14.6). Families dropped
+     for having no global share return where they win locally. Test on F4's development passage:
+     the eight declared families mixed node-locally, against the admitted egg alone, reading
+     validation bytes and standing.
   3. **Word contexts.** A cheap word-context family on the byte stream, and continuation transports
      promoted by `π_G P_G > π_C P_C`.
   4. **A learned lens** under source item 10.
