@@ -82,7 +82,7 @@
 //! |---|---|---|
 //! | the ring element | `HNN/Word.{reaction_stage_isometry, reaction_stage_balance, contrastPort_active}` | [`propagation::element_step`] |
 //! | the tick's global power | `HNN/Word.word_tick_balance` | [`propagation::global_power`], [`propagation::TickBalance`] |
-//! | the junction Swing | `HNN/Propagation.{anchor_is_participation, junctionSwing_involutive, junctionSwing_isometry}` | [`propagation::junction_swing`] |
+//! | the junction's scattering (a half-turn about the participation anchor) | `HNN/Propagation.{anchor_is_participation, junctionSwing_involutive, junctionSwing_isometry}` | [`propagation::junction_scattering`] |
 //! | the contact two-port | `HNN/Propagation.{partialIsometry_transit, transit_balance, tick_well_defined}` | [`propagation::transit`], [`Contact`] |
 //! | the causal cone | `HNN/Word.word_tick_cone` (the concrete tick) | [`Word::support`] |
 //! | the word on declared lattices: certified inverse charts, error feedback, the executed adjoint, the balance up to the residual | `HNN/LatticeWord.{nsStep, rounded_refinement_certificate, roundedIter_certificate, warm_start_certificate, inverse_chart_deviation, feedback_tick, carried_word_accounting, executed_adjoint_unique, executed_adjoint_deviation, cayley_chart_energy}` | [`chart`], [`Word`], [`Word::pull_back`], [`propagation::TickBalance`] |

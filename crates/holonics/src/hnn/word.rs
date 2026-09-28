@@ -76,7 +76,7 @@ use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::moment::SourceMoment;
 use crate::hnn::propagation::{
     Junction, Operands, TickBalance, contact_exponent, element_step, global_power, gram,
-    participation, swing_about, transit_defect, transit_solve, transit_update,
+    participation, scattering_about, transit_defect, transit_solve, transit_update,
 };
 use crate::hnn::realization::indexed;
 use crate::hnn::receiving::ReceivingPhases;
@@ -1037,7 +1037,7 @@ impl<'c> Word<'c> {
                 None => (Rat::zero(), Rat::zero()),
             };
             Ok::<_, HnnError>(Swung {
-                junction: swing_about(anchor, &storage[ring], &incoming),
+                junction: scattering_about(anchor, &storage[ring], &incoming),
                 remainder,
                 residual,
                 bound,
@@ -1429,7 +1429,7 @@ impl<'c> Word<'c> {
                         .as_ref()
                         .and_then(|resonance| resonance.steps.get(step))
                         .map_or_else(
-                            || crate::geometry::swing::swing(anchor, storage),
+                            || crate::geometry::swing::half_turn(anchor, storage),
                             |resonance| resonance.drive.clone(),
                         )
                 })

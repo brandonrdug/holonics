@@ -17,7 +17,7 @@ use crate::hnn::contact::{
 use crate::hnn::field::{ConstitutionRead, Current, Field, FieldDeclaration};
 use crate::hnn::moment::{PairPort, SourceMoment};
 use crate::hnn::propagation::{
-    ContactOperands, ExponentReading, gram, junction_swing, transit, transit_solve,
+    ContactOperands, ExponentReading, gram, junction_scattering, transit, transit_solve,
 };
 use crate::hnn::receiving::{Mixture, ReceivingPhases};
 use crate::hnn::ring::{
@@ -455,7 +455,7 @@ fn every_junction_port_balances_its_reference_change() {
             let arrivals: Vec<(Rat, Vec<Rat>)> = (1..weights.len())
                 .map(|q| (weights[q].clone(), wave(q)))
                 .collect();
-            let junction = junction_swing(
+            let junction = junction_scattering(
                 &admittance,
                 &wave(0),
                 &arrivals

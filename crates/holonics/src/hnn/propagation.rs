@@ -82,7 +82,7 @@
 //!
 //! | Lean | Rust |
 //! |---|---|
-//! | `HNN/Propagation.anchor_is_participation`, `junctionSwing_involutive`, `junctionSwing_isometry`; `Geometry/AffineSwing.swing` | [`junction_swing`], [`participation`], [`swing_about`] |
+//! | `HNN/Propagation.anchor_is_participation`, `junctionSwing_involutive`, `junctionSwing_isometry`; `Geometry/AffineSwing.swing` | [`junction_scattering`], [`participation`], [`scattering_about`] |
 //! | `HNN/Word.reaction_stage_isometry`, `reaction_stage_balance`, `contrastPort_active`; `Holon/Cayley.drive_balance`; `HNN/LatticeWord.cayley_chart_energy` | [`element_step`] |
 //! | `HNN/Propagation.partialIsometry_transit`, `transit_balance`, `tick_well_defined` | [`transit`], [`transit_solve`], [`transit_update`], [`ContactOperands`] |
 //! | `HNN/Word.word_tick_balance`; `HNN/LatticeWord.{chart_energy_identity, feedback_tick}` | [`global_power`], [`TickBalance`] |
@@ -98,7 +98,7 @@
 use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
 
-use crate::geometry::swing::swing;
+use crate::geometry::swing::half_turn;
 use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartKey, ChartReading, ChartWords, Charts, WordLattice, refine};
 use crate::hnn::constitution::Lattice;
@@ -1170,25 +1170,25 @@ pub fn participation(
     Ok(anchor)
 }
 
-/// **The junction Swing about an anchor**: each wave leaves as the owner's point Swing about it
-/// ([`crate::geometry::swing::swing`] on `ℚ^(2d_r)`, Lean `Geometry/AffineSwing.swing`).
-pub fn swing_about(anchor: Vec<Rat>, storage: &[Rat], arrivals: &[&[Rat]]) -> Junction {
+/// **The junction's scattering about an anchor**: each wave leaves as the owner's half-turn about it
+/// ([`crate::geometry::swing::half_turn`] on `ℚ^(2d_r)`, Lean `Geometry/AffineSwing.swing`).
+pub fn scattering_about(anchor: Vec<Rat>, storage: &[Rat], arrivals: &[&[Rat]]) -> Junction {
     Junction {
-        storage_wave: swing(&anchor, &storage.to_vec()),
+        storage_wave: half_turn(&anchor, &storage.to_vec()),
         contrast: sub(&anchor, storage),
         outgoing: arrivals
             .iter()
-            .map(|wave| swing(&anchor, &wave.to_vec()))
+            .map(|wave| half_turn(&anchor, &wave.to_vec()))
             .collect(),
         anchor,
     }
 }
 
-/// **The junction Swing** about the participation anchor (Lean
+/// **The junction's scattering** about the participation anchor (Lean
 /// `HNN/Propagation.{anchor_is_participation, junctionSwing_involutive, junctionSwing_isometry}`):
 /// the reflection `2P_D − I` onto the common-potential subspace, `W = diag(Y_r, G_a)`, under the
 /// exact law. It divides by its own positive admittance sum only.
-pub fn junction_swing(
+pub fn junction_scattering(
     admittance: &Rat,
     storage: &[Rat],
     arrivals: &[(&Rat, &[Rat])],
@@ -1197,7 +1197,7 @@ pub fn junction_swing(
     let (weights, _, _) = junction_weights(admittance, &conductances, None)?;
     let waves: Vec<&[Rat]> = arrivals.iter().map(|(_, wave)| *wave).collect();
     let anchor = participation(&weights, storage, &waves)?;
-    Ok(swing_about(anchor, storage, &waves))
+    Ok(scattering_about(anchor, storage, &waves))
 }
 
 // -------------------------------------------------------------------------------------------

@@ -13,7 +13,7 @@ use crate::hnn::chart::{ChartKey, WordLattice};
 use crate::hnn::field::{Current, Field, FieldDeclaration};
 use crate::hnn::propagation::{
     ContactOperands, ExponentReading, Operands, RingOperands, contact_exponent, element_step,
-    junction_swing, path_attenuation, transit,
+    junction_scattering, path_attenuation, transit,
 };
 use crate::hnn::word::Word;
 use crate::ratio::linear::ExactRatMatrix;
@@ -25,7 +25,7 @@ use crate::ratio::{Rat, integer, rat};
 /// with the storage port included), the Swing is an involution, and it keeps the `W`-weighted power
 /// `Y|s|² + Σ G|a|²`.
 #[test]
-fn the_junction_swing_is_a_weighted_involution_about_the_participation_anchor() {
+fn the_junction_scattering_is_a_weighted_involution_about_the_participation_anchor() {
     let mut draw = Draw::new(1);
     let admittance = rat(3, 2);
     let conductances = [rat(1, 4), integer(2), rat(5, 3)];
@@ -36,7 +36,7 @@ fn the_junction_swing_is_a_weighted_involution_about_the_participation_anchor() 
         .zip(&waves)
         .map(|(g, w)| (g, w.as_slice()))
         .collect();
-    let junction = junction_swing(&admittance, &storage, &arrivals).unwrap();
+    let junction = junction_scattering(&admittance, &storage, &arrivals).unwrap();
     let total = &admittance + conductances.iter().sum::<Rat>();
     let mut anchor = scale(&(&admittance / &total), &storage);
     for (g, w) in conductances.iter().zip(&waves) {
@@ -60,7 +60,7 @@ fn the_junction_swing_is_a_weighted_involution_about_the_participation_anchor() 
         .zip(&junction.outgoing)
         .map(|(g, w)| (g, w.as_slice()))
         .collect();
-    let twice = junction_swing(&admittance, &junction.storage_wave, &again).unwrap();
+    let twice = junction_scattering(&admittance, &junction.storage_wave, &again).unwrap();
     assert_eq!(twice.storage_wave, storage);
     assert_eq!(twice.outgoing, waves);
     assert_eq!(junction.contrast, sub(&junction.anchor, &storage));
