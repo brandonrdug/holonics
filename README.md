@@ -48,7 +48,7 @@ where navigators' paths converge. Learning is locating keys, the way the Bombe i
 key by closing loops over a menu of contacts: inference targets the process that made the data,
 not a blind search over keys.
 [Keys, locks and navigation](docs/ELEMENTARY_OBJECTS.md#keys-locks-and-navigation) ·
-[the line](docs/plans/THE_REBUILD.md#the-line-the-rebuild-serves)
+[the line](docs/THE_MACHINE.md#the-line-the-rebuild-serves)
 
 **The machine is geometry.** The HNN (Holonic neural network) is a continuing field of complex
 parametron rings, annular rings that store, oscillate and lock, joined by helical pair contacts,
@@ -153,7 +153,7 @@ private conversation data, which is never published: only its counts, bits and h
   [Record](research/records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md)
 
 **Not yet.** Athena answers nothing today. The next steps are fixed in advance in the
-[forward plan](docs/plans/THE_REBUILD.md#the-forward-plan-september-27):
+[forward plan](research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#the-forward-plan-september-27):
 1. release text from the population (F4);
 2. build Athena-0 (F5), whose responses Brandon judges blind against a retrieval control.
 
@@ -170,7 +170,7 @@ Failures are published with the same care as results.
   bits over the development cells, before its own `887`-bit material description is charged.
   [Record](research/records/2026-09-26_THE_RESONATOR_RETURNS_ITS_WAVE_AND_THE_COMPARISON_REACHES_ITS_MATERIAL.md)
 - **Rejected receivers.** Each is listed with its receipt among the
-  [retired choices](docs/plans/THE_REBUILD.md#h-retired-choices):
+  [retired choices](research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#h-retired-choices):
   - a Born-rule receiver failed its development criterion, and stays only as a measured receiver;
   - second-arrival founding lost, and was retired;
   - a per-port conversation reader lost to the flat stream, and was retired.

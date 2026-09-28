@@ -1,7 +1,7 @@
 //! **Holonic Compression: a navigator family against terrain, its kernel and its cokernel.**
 //!
 //! [definition] Rebuild step 3 (#145): **compression is intelligence is navigation**
-//! ([the line](../../../../docs/plans/THE_REBUILD.md#the-line-the-rebuild-serves)). Terrain is
+//! ([the line](../../../../docs/THE_MACHINE.md#the-line-the-rebuild-serves)). Terrain is
 //! whatever is present for a navigator to meet; Holonic Compression couples a navigator's
 //! resonating modes with it, and a compression is a codec pivot carrying its decoder. The law is
 //! stated in Lean `Compression/Core` and realized here in four parts:

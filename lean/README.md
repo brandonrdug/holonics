@@ -85,7 +85,7 @@ library declares the glob `HolonicsResearch.*`), including the modules the impor
 not import. `HolonicsResearch.lean` is the research import face: `Holonics.Framework` plus the
 subject owners the targets (RH, Hodge, complex Euler/Navier–Stokes, BSD) use. The targets are
 instances of Holonic Compression and landmark discovery
-([the line](../docs/plans/THE_REBUILD.md#the-line-the-rebuild-serves)), not a separate category,
+([the line](../docs/THE_MACHINE.md#the-line-the-rebuild-serves)), not a separate category,
 so their Lean is filed by subject:
 
 | Directory | Subject |
