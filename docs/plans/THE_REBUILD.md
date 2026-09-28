@@ -710,7 +710,7 @@ dormant for text.
   8. *The run, once*, on the card: `holonics-cuda`'s `hnn_exposure … realization card gate f2`,
      alone on the idle card under the GPU lock. Its readout equals the host's line for line (U1).
      - It is projected at 308,234 to 318,378 ms for the exposure, milliseconds for the tree alone,
-       under 1 GB of host memory and about 0.5 GiB on the card.
+       under 1 GB of host memory and about 512 MiB on the card.
      - It is stopped past ten minutes (`timeout`) or past 20 GB (a memory-limited scope), and its
        partial evidence is then reported as incomplete.
      - The harness's smoke is the public development control (`held-out 6132 windows 16 gate f2`,
