@@ -36,7 +36,9 @@ exponent, the carry), and `θ ∈ [0, 1)` is the phase (the mantissa). This is t
 already use, a reading as a carry and a phase class. Multiplication by `r` advances the helix by
 `log_b r`.
 
-A base `b` does not change the helix. It chooses two faces on it:
+A base `b` sets the helix's period: `log_b x = log x / log b`, so one logarithmic line is wound at
+the period `log b`, and a different base is a different circle (corrected September 28; GPT-6
+Astra's review). On its helix the base then chooses two faces:
 - **the leading face**, a partition of the phase circle into the arcs
   `[log_b d, log_b(d + 1))`;
 - **the trailing face**, the residue ring `ℤ/b`.
@@ -54,8 +56,9 @@ multiplication is a rotation:
   multiplying is adding indices mod `p − 1`: one ring of `p − 1` positions, and no zero divisors
   (for example `3` generates mod `7`).
 - **Base `2^m`, `m ≥ 3`.** Every odd residue is `±5^j`, and `(ℤ/2^m)^× ≅ ℤ/2 × ℤ/2^(m−2)`: a half-turn
-  sheet (the sign) times a ring (the powers of `5`). That is a parametron, with two sheets and a
-  ring.
+  sheet (the sign) times a ring (the powers of `5`). This has the shape of a parametron's two sheets
+  and ring, but a group decomposition carries no storage, pump or contact, so it does not make a
+  parametron (corrected September 28).
   - Brandon's example: `7 ≡ −1` and `3 ≡ −5 (mod 8)`, so `7 · 3 ≡ (−1)(−1)·5 = 5`.
   - Indeed `21 ≡ 5 (mod 8)`, and `10101₂` ends in `101`.
 - **Base `10 = 2 · 5`.** By the Chinese remainder theorem the trailing digit is a pair, parity and

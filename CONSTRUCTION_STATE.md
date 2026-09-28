@@ -101,6 +101,13 @@ consumers.
 
 ## Formal scope and targets
 
+The primitives of motion are re-derived and proved (`Geometry/Motion`,
+[record](research/records/2026-09-28_THE_SWING_IS_A_MOVE_ABOUT_A_GRIP_A_GRIP_TURNS_A_PUSH_BOOSTS_AND_A_FREE_BODY_FALLS.md)):
+the turn, the boost and free fall, the receiver's split of a rate with its energy law, a move's pivot
+and its multiplier as a cross ratio, and the path jets. The Swing is the move about a grip; the point
+reflection is its half-turn. No machine owner consumes the primitives yet; the chase's move pair
+`(v, v′)` is the first consumer named.
+
 The local lattice identities do not discharge the word's complete sensitivity certificate or its
 counterfactual trajectory bound. The relative growth certificate currently covers contact C/K
 forms; a loaded signed/pumped material bound is owed. The concrete diamond bridge, binary KT parameter bound,

@@ -59,8 +59,8 @@ through material motion, oriented stress faces, Hodge decomposition, interior me
 micro/macro restriction. The high-level interaction has a concrete energy form: advection of
 an internal field and its adjoint force exchange energy, while the material gradient and
 positive mobility produce diffusion and heat. Graph scattering is precisely the
-[Swing](ELEMENTARY_OBJECTS.md#the-swing) `2P_D−I` about its constituted projection; the object
-therefore connects to the primitive operation without replacing the field by its displayed
+junction scattering `2P_D−I` about its constituted projection, a half-turn about a subspace
+([motion](ELEMENTARY_OBJECTS.md#the-swing)); the object therefore connects to the primitive operation without replacing the field by its displayed
 coefficient vector.
 
 [definition] The [receiving Holon](RECEIVER_HOLARCHY.md) completes this distinction:

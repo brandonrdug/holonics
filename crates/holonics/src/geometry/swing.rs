@@ -1,27 +1,32 @@
-//! **The Swing: the primitive act of situated relating and transport.**
+//! **The half-turn and its charts: particular moves of the Swing.**
 //!
-//! [proved-derived; formal-checked] A body swings past an anchor on a board every motion leaves
-//! invariant ([objects §3](../../../../docs/ELEMENTARY_OBJECTS.md#the-swing-the-navigators-elementary-motion)).
-//! Projectively the Swing is harmonic conjugation, `(A, A′; B, D) = −1` with anchor `B` and board
-//! `D`; in the chart sending the anchor to `0` and the board to `∞` it is negation. Freezing the
-//! board at infinity leaves the affine chart, the point reflection `S_a x = 2a − x`, a half-turn
-//! `e^{iπ}` about the anchor:
+//! [definition] The Swing is the one move, a pivot held by a grip with momentum carried through it,
+//! and motion has three kinds: the turn, the boost and free fall
+//! ([objects §3](../../../../docs/ELEMENTARY_OBJECTS.md#the-swing); Lean `Geometry/Motion`). This
+//! owner holds the half-turn and its charts, which are particular moves: words of half-turns have
+//! linear part `±1`, so they compose only translations and half-turns, and in an odd real dimension
+//! the half-turn is parity, not a proper continuous motion.
+//!
+//! [proved-derived; formal-checked] Projectively the half-turn is harmonic conjugation,
+//! `(A, A′; B, D) = −1` with anchor `B` and board `D`; in the chart sending the anchor to `0` and the
+//! board to `∞` it is negation. Freezing the board at infinity leaves the affine chart, the point
+//! reflection `S_a x = 2a − x`, a half-turn `e^{iπ}` about the anchor:
 //!
 //! ```text
 //! S_a x − a = −(x − a),   S_a S_a = 1,   S_a a = a
-//! S_b S_a x = x + 2(b − a)                 two Swings compose to a translation
+//! S_b S_a x = x + 2(b − a)                 two half-turns compose to a translation
 //! S_b S_a − S_a S_b = 4(b − a)             and do not commute
-//! Q − O = s (P − O)                        the pantograph about O; its scale −1 is the Swing
+//! Q − O = s (P − O)                        the pantograph about O; its scale −1 is the half-turn
 //! ```
 //!
 //! The cross ratio is carried as its undivided [`Presentation`] (`swingPair`), so a vanishing
 //! denominator is a named fibre rather than an invented infinity.
 //!
 //! [definition] **The anchor lives in any exact affine space over ℚ** ([`RationalPoint`]): a frame
-//! point [`RatVec3`] or a vector of `ℚ^d`. Lean `Geometry/AffineSwing` states the Swing and its laws
-//! over every `AddCommGroup`, so one statement covers both; the HNN's junction Swing
-//! `o = 2v − a` about the participation anchor `v ∈ ℚ^(2d_r)` is this Swing
-//! (`crate::hnn::propagation::junction_swing`).
+//! point [`RatVec3`] or a vector of `ℚ^d`. Lean `Geometry/AffineSwing` states the half-turn and its
+//! laws over every `AddCommGroup`, so one statement covers both; the HNN's junction scattering
+//! `o = 2v − a` about the participation anchor `v ∈ ℚ^(2d_r)`, an anchor derived from
+//! admittance-weighted participation, is this half-turn (`crate::hnn::propagation::junction_swing`).
 //!
 //! | Lean | Rust |
 //! |---|---|

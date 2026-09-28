@@ -33,7 +33,9 @@ What stands:
 - The releases are not legible text. Reading 580 of their 758 word tokens as real words shows a
   pattern-recognizing predictor at a PPM-class rate: about `1 + 12/16` bits a byte on unseen agent
   text.
-- The standing is an index. The re-run measured 11,513,530,863 bytes after 1,048,243 cells for the
+- The standing is very large (the title's "index" is corrected: size shows a severe cost, not that the
+  standing replays or indexes the source; a future-sufficient representation can be large and
+  nonminimal). The re-run measured 11,513,530,863 bytes after 1,048,243 cells for the
   population (10,983 bytes a cell), and 1,358,603,467 bytes after 1,046,625 cells for the single
   flat tree (1,298 a cell).
 - The posterior sits wholly on the admitted egg, with every other family thousands of bits behind.
@@ -95,7 +97,8 @@ Sol's own records are on the branch:
 
    The retrieval control returned coherent recorded replies, most of them not answers either. No
    private text is published here.
-3. **The standing is an index, not a quotient.** `[established-bounded; measured]` After 522,206
+3. **The standing is very large.** `[established-bounded; measured]` (Corrected September 28: this
+   item first read "an index, not a quotient"; size alone proves neither.) After 522,206
    choosing cells, the population's standing is 6,256,005,986 bytes, or 11,979 bytes kept per cell
    read, in 44,387,932 tree nodes (85 per cell). This is within the compacted tree's proved node
    bound, which counts digit arrivals. It is simply what a depth-48 context mixture's sufficient

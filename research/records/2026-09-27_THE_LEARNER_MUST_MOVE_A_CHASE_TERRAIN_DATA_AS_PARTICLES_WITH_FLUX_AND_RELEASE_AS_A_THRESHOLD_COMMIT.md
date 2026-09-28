@@ -304,8 +304,10 @@ receiver. A source carries real flux when it records:
 3. the causes of each change;
 4. where the source is live, its response to the learner's own emissions.
 
-Bytes read at uniform ticks carry none of these. They are the recording of the boom, not the
-motion that made it. `[interpretation]`
+Bytes read at uniform ticks carry none of these: the source's own timing and incidence are lost.
+`[interpretation]` (Corrected September 28: the receiving machine still moves as it reads them; its
+address shifts, its nodes' arrivals are epochs and its splits move. The
+[motion record](2026-09-28_THE_SWING_IS_A_MOVE_ABOUT_A_GRIP_A_GRIP_TURNS_A_PUSH_BOOSTS_AND_A_FREE_BODY_FALLS.md) states the primitives.)
 
 **Sources that carry it** `[interpretation]`.
 - **Games.** Entities with identity, exact changes every tick, causes (inputs and collisions), a

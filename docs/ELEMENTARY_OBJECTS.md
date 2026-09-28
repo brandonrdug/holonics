@@ -59,7 +59,7 @@ built. Each rebuild step updates this table in the same commit.
 |---|---|---|---|
 | Ratio | `present`, `compare`, `compose`, `invert` (nonunit fibre), `div_rem`, `residue`, `lift`, `jet`, `log` with branch | Lean `Objects/{Ratio,RatioPhase,RatioBlock}`, `Foundation/TransportLift`, `Geometry/{PhaseCarry,CrossRatio}`, `Geometry/Farey`; Rust `holonics::ratio::{Rat,Presentation,ExactOrdering}` (the undivided pair, compared by cross-multiplication), `holonics::ratio::linear` (inversion with its fibre), `holonics::geometry::winding::Odometer`, `holonics::navigator::address::LockAddress`, `holonics::ratio::ring::{ExactRing,ModularWords}`, `holonics::ratio::exponentiated::{RatioFamily,NormalizedKernel}`, `holonics::ratio::surprisal`, `holonics::holon::contact::Alignment` (the undivided squared-cosine face); `holonics::ratio::exponentiated::CarriedPower` (`2^(n + k/L)` as a carry and a phase in `ℚ(θ)`, Lean `Objects/Ratio/CarriedPower`); `ratio::linear`'s integral chart (products summed over integers and reduced once per entry; a fraction-free inverse) | `holonics::ratio`; `Holonics.Ratio` |
 | Complex, frame, clock, carry | `boundary`, `transport`, `transport_rate`, `join_axes` (commuting square or defect), phase lift | Lean `Holon/Complex`, `Geometry/*`; Rust `holonics::geometry::complex`, `holonics::navigator::Clock`, the frame carriers `holonics::geometry::{RatVec3,RatMat3,AffineMap3,Axis}` over `holonics::ratio::Rat`; block transports in `geometry::complex::ConnectionIncidence` (Lean `Holon/Complex.{blockIncidence, blockWalkRead_incidence, block_cell_curvature, block_flat_closed}`) | `holonics::geometry`; `Holonics.Geometry` |
-| Swing | `swing` (half-turn about an anchor), `compose` (two Swings are a translation; odd words are Swings), `pantograph` (scale about an anchor), `tick` (oriented section crossing), inner fibre of a coarse Swing | Lean `Geometry/{AffineSwing,SwingPotential}`, `HolonicsResearch/Zeta/Seam` (ξ is Swing-invariant about ½), `Foundation/FractalPacking.reflect_eq_swing` (the packing's reflection is `S_½`), `Geometry/{Swing,SwingBridges,Navigation,HolonicPantographicSwingJets,HolonicClockedPantographicSwing,HolonicClockedPantographicSwingApparatus}`; Rust `holonics::geometry::swing` (`swing`, `composed_translation`, `pantograph`, `harmonic_conjugate`, `swing_pair`); `holonics::geometry::swing` over `ℚ^d` anchors (`RationalPoint`), which the HNN junction calls | `holonics::geometry`; `Holonics.Geometry` |
+| Swing (motion) | `move` (`x ↦ Mx + b`: its multiplier, pivot and kind), `split` (turn and boost against a receiver's metric, with the energy law), `compose`, `kind` (turn, boost, free fall, half-turn with a boost; `tr²/det`), `factor` (turn · boost · shear), `half_turn`, `pantograph` (a scalar move about an anchor), `tick` (oriented section crossing), inner fibre of a coarse move, `junction_scattering` (`2P_D − I`) | Lean `Geometry/Motion` (the split, the three kinds, the Iwasawa factors, pivots, the multiplier as a cross ratio, the path jets), `Geometry/{AffineSwing,SwingPotential}` (the half-turn), `HolonicsResearch/Zeta/Seam` (ξ is invariant under the half-turn about ½), `Foundation/FractalPacking.reflect_eq_swing`, `Geometry/{Swing,SwingBridges,Navigation,HolonicPantographicSwingJets,HolonicClockedPantographicSwing,HolonicClockedPantographicSwingApparatus}`, `Compression/Landmark/FixedPoint` (Möbius pivots and multipliers), `Physics/Spacetime/{Boost,Wigner}`; Rust `holonics::geometry::swing` (`swing` as the half-turn, `composed_translation`, `pantograph`, `harmonic_conjugate`, `swing_pair`) over `ℚ^d` anchors (`RationalPoint`), which the HNN junction calls; `holonics::navigator::trace::SiteKind` (the projective kinds) | `holonics::geometry`; `Holonics.Geometry` |
 | Pair and tube charts | `screw_pair` (two motions, relative jet), `tube` (longitudinal transfer), `restrict` (transverse, gluing unique/plural/obstructed), neck, fold, junction | Lean `Transport/{HelicalPairInteraction,ContinuingTube,WorldTube,Neck,Fold,JunctionLaw,JetStaircase}`, `Geometry/PairResonance`, `Foundation/{ContinuingTower,IwasawaTower}`; Rust `holonics::geometry::screw`, `holonics::holon::restriction::{tube,tower}` | `holonics::geometry`; `Holonics.Geometry` |
 | Pair contact | `slip` (`J=[v_a\|−v_b]`), `quadrance` (`Q`, `DQ=2J*Δ`, `D²Q`), `material` (`M_contact=ΣwJ*DJ`), `power` (resistive element on slip), `lock_address` (Farey), `chain` (serial screw words and contact rows) | Lean `Transport/{HelicalPairInteraction,HolonicInteraction,HolonicChain,SerialScrewChain}`, `Geometry/PairResonance`, `Holon/Conformance.pairContact_resistive`; Rust `holonics::geometry::screw::{ScrewPair,PairQuadranceJet,SituatedScrew}` (the pair geometry), `holonics::holon::contact` (`PairContact`, `ContactMaterial`, `Alignment`, `SerialChain`), `holonics::navigator::address::LockAddress` | `holonics::holon::contact`; `Holonics.Holon` |
 | Parametron | `store`/`exchange` (`C`, `L`, `ω=1/√(LC)`, mode energy), `pump`, `lock` (half-turn sheets, Ising pairing), `tick` (section crossing), `read` (the perceptron face) | Lean `Objects/Parametron`, `Physics/{PhaseCarrier,CoupledIncidence,HolonicMeasuredParametron,HolonicTorusParametronRealization}`; Rust `holonics::holon::parametron` (`Parametron`, `Carrier`, `Population`, `pump_storage`, `ring_crossings`) and the pumped-LC witness of `holonics::holon::conformance` | `holonics::holon::parametron`; `Holonics.Holon` |
@@ -190,61 +190,118 @@ states these transitions and success laws. The Rust chart is
 validation are outside this formal contract.
 
 <a id="the-swing"></a>
-#### The Swing: the navigator's elementary motion
+<a id="motion"></a>
+#### Motion: the turn, the boost and free fall (the Swing)
 
-[project-postulate] Brandon's most primitive concept is the **Swing**: the primitive act of
-situated relating and transport. A body swings past an anchor, under a contemporary constraint, on
-a board that every motion of the system leaves invariant. The Swing is harmonic conjugation,
-`(A,A';B,D)=−1` with anchor `B` and board `D`; in the chart sending the anchor to `0` and the board
-to `∞` it is negation (`Geometry/Swing`).
+[project-postulate] Brandon's most primitive concept is the **Swing**, the one move: a pivot held
+by a grip, momentum carried through it, and free fall between grips (July 14: "modulating their
+inertia and pivoting"; August 6: the pivot's "invariant 'grip'"; September 28: "the motions are the
+turn and the boost, it's about pivoting and free-falling"). The [motion record](../research/records/2026-09-28_THE_SWING_IS_A_MOVE_ABOUT_A_GRIP_A_GRIP_TURNS_A_PUSH_BOOSTS_AND_A_FREE_BODY_FALLS.md) derives what
+follows, with its checks and GPT-6 Astra's corrections.
 
-[proved-derived; formal-checked] Freezing the board puts it at infinity, and the Swing becomes the
-point reflection, a half-turn `e^{iπ}` about the anchor (`Geometry/AffineSwing`):
+[proved-standard; formal-checked] **Three kinds of motion.** A quadratic motion of one degree of
+freedom, `H = ½(αp² + 2βpq + γq²)` with `α = 1/m` the inverse inertia, has the generator
+`X = [[β, α], [−γ, −β]]` with `X² = −(det X)·I`:
+- `det X > 0`: a **turn**, an oscillator's exchange of storage and flow;
+- `det X = 0`: **free fall**, a shear; for `β = γ = 0` a step is `(q, p) ↦ (q + hp/m, p)`, inertia alone;
+- `det X < 0`: a **boost**, a squeeze.
+
+Every `M ∈ SL(2)` factors uniquely as a turn, a boost and a shear (Iwasawa, `KAN`), exact in the
+extension carrying `r² = a² + c²`; the Lorentz group factors into rotations, boosts and null rotations.
+
+[proved-standard] **Power decides turn or boost.** An effort that does no work turns and one that
+does work boosts: for a point mass, `Ė = m|v|² Re(v⁻¹v̇)` and `θ̇ = Im(v̄F)/(m|v|²)`. A stationary
+ideal grip turns. A moving grip (power `−λ∂_t f`), a push along the motion, a pump (through the
+storage's own motion) and friction boost. **Free fall** is motion under inertia alone, the geodesic
+`∇_u u = 0`, with gravity the connection; inertia is the kinetic constitutive relation, not all
+storage.
+
+[proved-derived; formal-checked] **A receiver's reading.** Against a receiver's energy metric `G`, a
+linear rate splits uniquely as `A = T + B`, with `T` `G`-skew (the turn) and `B` `G`-self-adjoint (the
+boost), and `Ė = xᵀGBx + ½xᵀĠx + xᵀGf` for `ẋ = Ax + f`. Recharting moves neither part; a different
+receiver's metric can. The spectrum, each mode's `λ = β + iθ`, is the conserved face, and the split
+agrees with it when `A` is `G`-normal. In the Holon's quadratic chart `ẋ = (J − R)Qx + Bu` the turn is
+`JQ` and the boost `−RQ`. With the interval as metric every Lorentz move is skew: the rotation/boost
+split needs an observer. A complex channel `ż = (β + iθ)z` carries its turn as its frequency and its
+boost as its growth.
+
+[proved-standard; formal-checked] **A move has the pivot it holds.** `x ↦ Mx + b` pivots about
+`O = (I − M)⁻¹b`; when `M` fixes directions semisimply it moves about the invariant set
+`O + ker(I − M)` with free fall `b_∥` along it (a screw: a helix is a turn about an axis with free
+fall along it); a shear has no such split. What a move holds invariant is its **grip**: a turn holds a
+distance, a positive scalar dilation a bearing, a Möbius move every cross ratio. For
+`m(z) = (az + b)/(cz + d)` with pivots `z₁, z₂` and `μ_i = cz_i + d`,
 
 ```text
-S_a x = 2a − x          S_a x − a = e^{iπ}(x − a),   S_a S_a = 1,   S_a a = a
-S_b S_a x = x + 2(b − a)                  two Swings compose to a translation
-S_b S_a − S_a S_b = 4(b − a)              and do not commute
+(m(z) − z₁)(z − z₂)·μ₁ = μ₂·(z − z₁)(m(z) − z₂)      K = μ₂/μ₁ = m′(z₁),     K + K⁻¹ + 2 = tr²/det
 ```
 
-An odd word of Swings is a Swing and an even word is a translation; that `ℤ/2` grading is the
-orientation class (`Geometry/Navigation`). The Swing's charts are:
-- **projective:** harmonic conjugation (`Geometry/{Swing,SwingBridges}`);
-- **affine:** the point reflection above;
-- **pantographic:** `Q−O=s(P−O)` about the anchor `O`, whose scale `−1` is the Swing and whose
-  serial passages multiply scales (`Geometry/HolonicPantographicSwingJets`);
-- **clocked pantographic** (`Geometry/HolonicClockedPantographicSwing`): a **tick** is an oriented
-  crossing of a declared oscillator section, a clock ratio is carried by integer quotient and
-  remainder (the remainder is within-cycle phase), and one coarse Swing keeps the complete fibre of
-  its inner Swings with their individual clock passages. Placement on apparatus is a separate
-  receiver (`HolonicClockedPantographicSwingApparatus`).
+so the multiplier is a cross ratio of the two pivots, the body and its image (Brandon's cross-ratio
+swing), and `tr²/det` classifies the move projectively as `navigator::trace::SiteKind` does: a turn
+(Rotation), a boost (Boost), free fall (Null), a half-turn with a boost (Reflection). A physical grip
+is a constraint with its reaction, supplied by the constitution; a fixed point alone is kinematic.
 
-[proved-derived; GPT-6 Astra, September 27, [record](../research/records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md#14-gpt-6-astras-review)] **The
-Swing is the square of an oriented quarter-turn.** With polarity `D = diag(−1, 1)` and exchange
-`S = [[0, 1], [1, 0]]` (Kauffman's iterants), `D² = S² = I`, `SD = −DS`, and `J = DS` has `J² = −I`,
-`J⁴ = I`. At an anchor, `Q_a x = a + J(x − a)` gives `Q_a² = S_a` and `Q_a⁴ = id`. A distinction
-with an oriented exchange admits a complex phase chart; it does not derive a parametron's storage
-law, and a period-two toggle creates no clock (Lean owed in #62).
+[proved-derived; formal-checked] **Along a path.** The velocity `v` is the carrier. Where it does not
+vanish, `ẇ = v⁻¹v̇` is the boost rate plus `i` times the turn rate, and
+`x^(n+1) = v·Y_n` with `Y_0 = 1`, `Y_(n+1) = Ẏ_n + ẇ·Y_n` (the complete Bell polynomials): every higher
+derivative of motion is `v` times a polynomial in the jets of `ẇ`. `v⁻¹v̇` is the ratio's `R⁻¹dR`
+(§9) evaluated on a clock.
 
-Rebasing the observation, receiver and navigators through a Swing preserves every possible future
-face, and in a normed chart the Swing carries a declared tolerance exactly (`Geometry/SwingPotential`).
-With a subspace for its anchor, the Swing is `R_D=2P_D−I`: it splits one current into two shares and
-recombines them, conserving the joint norm ([receiver atlas](RECEIVER_HOLARCHY.md#the-reflection-algebra-shared-by-seam-and-swing)).
-A fold is that reflection applied to one side of a crease (§6).
+[definition; agent-inferred] **The Swing and its older charts.** The Swing is the move about a grip,
+as a passage: grip, swing, release (the commit), free fall, and catch (reception at a new contact).
+Its earlier charts are particular moves, each kept with its owner:
+- **the half-turn** `S_a x = 2a − x` (`Geometry/AffineSwing`), multiplier `−1`: a proper continuous
+  motion in the plane and in any complex chart, and parity in an odd real dimension. Words of
+  half-turns have linear part `±I`, so they compose only translations and half-turns, and any map is
+  pointwise a half-turn about `(x + T(x))/2`: a half-turn explains a motion only with its anchor's law;
+- **harmonic conjugation** (`Geometry/{Swing,SwingBridges}`): a projective involution (trace zero),
+  Möbius-conjugate to a half-turn;
+- **the pantograph** `Q − O = s(P − O)` (`Geometry/HolonicPantographicSwingJets`): the move about `O`
+  with a scalar multiplier;
+- **the clocked pantograph** (`HolonicClockedPantographicSwing`): the turn's lift, each tick an
+  oriented section crossing, the windings its quotient and the phase its remainder, with the fibre
+  of inner moves; placement on apparatus is a separate receiver
+  (`HolonicClockedPantographicSwingApparatus`);
+- **junction scattering** `R_D = 2P_D − I`: a lossless junction splits one current into two shares
+  and recombines them, conserving the joint norm and doing no work, with determinant `(−1)^codim`
+  ([receiver atlas](RECEIVER_HOLARCHY.md#the-reflection-algebra-shared-by-seam-and-swing)). A fold is
+  that map applied to one side of a crease (§6).
 
-[project-postulate] **The Swing is the navigator's elementary motion.** A navigator's advance
-relates what moves to an anchor on a board; its word, clock and carry are how its Swings compose.
-Navigating is choosing that word, and landmarks are where the words' paths converge.
-[proved-standard] A translation is two point Swings, and every Euclidean isometry is a word of
-reflections about hyperplanes (Cartan–Dieudonné).
-[proved-standard; formal-checked] The completed zeta is invariant under the Swing about ½,
+Rebasing the observation, receiver and navigators through a half-turn preserves every possible future
+face, and in a normed chart it carries a declared tolerance exactly (`Geometry/SwingPotential`); a
+coordinate rebase is not a physical intervention.
+
+[project-postulate] **Motion is the navigator's elementary act.** A navigator advances in free fall
+along its clock, and turns and boosts at the grips it meets; its word, clock and carry are how its
+moves compose. Navigating is choosing the moves, and landmarks are where their paths converge.
+
+[proved-standard; formal-checked] The completed zeta is invariant under the half-turn about ½,
 `ξ(S_½ s)=ξ(s)` (`Zeta/Seam.completedRiemannZeta_swing_half`, through the derived join
-`combReflection_eq_swing`); the critical line is the fixed set of that Swing after the conjugation
-mirror, not of the Swing alone, which fixes only ½. Integration by reflection over the fractal
-packing uses the same Swing on `[0,1]`: the reflection conjugating the two Cantor maps is `S_½`
-(`Foundation/FractalPacking.reflect_eq_swing`). [proved-standard; interpretation] Mellin's ½ (a
+`combReflection_eq_swing`); the critical line is the fixed set of `s ↦ 1 − s̄`, the half-turn after
+the conjugation mirror, not of the half-turn alone, which fixes only ½. Integration by reflection over
+the fractal packing uses the same half-turn on `[0,1]`: the map conjugating the two Cantor maps is
+`S_½` (`Foundation/FractalPacking.reflect_eq_swing`). [proved-standard; interpretation] Mellin's ½ (a
 half-density weight) and spin's ½ (a half-angle) are different halves; an intertwiner, not a shared
 numeral, would join them ([record](../research/records/2026-09-25_THE_MUSIC_IS_IN_THE_HOLES_HEARING_MULTIPLIES_BY_ZETA_AND_A_QUASICRYSTAL_IS_A_HELIX_THAT_NEVER_LOCKS.md#4-the-half-and-the-pivot-three-different-halves)).
+
+[proved-standard; formal-checked where named] **The lifts** ([record §5](../research/records/2026-09-28_THE_SWING_IS_A_MOVE_ABOUT_A_GRIP_A_GRIP_TURNS_A_PUSH_BOOSTS_AND_A_FREE_BODY_FALLS.md#5-the-lifts)):
+- **Lattices and crystals.** A turn holding a lattice has integer trace, so its order is `1, 2, 3, 4`
+  or `6` (Niven); `SL(2, ℤ)` is the lattice's turns, shears (its free fall) and boosts; the golden
+  boost `[[2, 1], [1, 1]]` holds `x² − xy − y²`, and its expanding direction cuts the Fibonacci
+  quasicrystal. A crystal's turn closes; a quasicrystal's never does.
+- **Hypergeometry.** Monodromy is a group of moves: the `(2, 3, ∞)` triangle group is the half-turn,
+  the third-turn and the cusp's shear; the egg's Legendre period has the shears of `Γ(2)`.
+- **Induction and cross-entropy.** `E` boosts a charge and `B` turns it; vacuum Maxwell is
+  `i∂_t F = ∇ × F` for `F = E + iB`, a turn, and a current's `J·E` is the push. For a linear field the
+  turn and boost are Helmholtz–Hodge (coexact and exact), and vortex stretching is strain boosting
+  vorticity. Relaxation lowers the divergence to the stationary face (a boost), and the arrow that
+  survives at stationarity lives on cycles (`heat.chain-no-arrow`, `heat.ring-current-affinity`).
+- **Einstein.** Free fall is the geodesic; two boosts leave a turn (`Physics/Spacetime/Wigner`); tidal
+  curvature and frame dragging are the Weyl tensor's strain and rotation parts.
+- **The quantum.** Unitary evolution is a turn and imaginary time a boost
+  (`quantum.evolution-kinds`); the Wick rotation exchanges them; energy is a turn rate, `E = ħω`.
+- **Transcendentals are constraints.** A move is carried by its algebraic data; `e^(2πi) = 1` is the
+  condition that a turn closes, `e^(iπ) = −1` the half-turn, and `e` the boost that is its own rate.
 
 [proved-derived; formal-checked] **Conservation of faces.** Carrying material to another phase
 conjugates it, `M ↦ S⁻ᵈMSᵈ`, so every class function of the material is a face conserved along the
@@ -256,7 +313,8 @@ conservation is one conservation of faces:** storage and flow exchange along a m
 energy is conserved (`Objects/Parametron.modeEnergy_conserved`), and the Cayley step of a skew
 transport preserves its norm (`Holon/Cayley.cayley_isometry`; Rust chart `holonics::navigator`). Trace faces are invariants, not a complete
 action certificate: `I₂` and `[[1,1],[0,1]]` share them, and the receiver `(1,0)` after one step
-from `(0,1)` separates them.
+from `(0,1)` separates them. A move's multiplier is such a face: every frame agrees on it, though the
+identity (rest) and a shear (free fall) share it.
 
 ### 4. Pair contact
 

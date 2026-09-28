@@ -130,8 +130,9 @@ a dissipation law (`Physics/{PortEnergyHeat,TwoCellEntropyTransport}`).
 
 ### The reflection algebra shared by seam and Swing
 
-[proved-derived] The graph projection `P_D` and its [Swing](ELEMENTARY_OBJECTS.md#the-swing)
-`R_D = 2P_D − I` distribute a one-port current into two shares and recombine them, conserving the
+[proved-derived] The graph projection `P_D` and its junction scattering `R_D = 2P_D − I` (a
+[half-turn about a subspace](ELEMENTARY_OBJECTS.md#the-swing): lossless, doing no work, of determinant
+`(−1)^codim`) distribute a one-port current into two shares and recombine them, conserving the
 joint norm while individual receivers gain and lose. Self-adjointness is a declared realization
 condition (`D_t = Dᵀ`, `K = I + DDᵀ`), not a consequence of an arbitrary `D`
 (`Computation/HolonicConstitutiveCirculation`). Centering the conjugate reflection at one half gives

@@ -84,6 +84,13 @@ That is the discrete replicator equation with fitness `L_i`. `agent-inferred`:
   the only material the fall reads.
 - **Generation is the same board run forward.** The requested face is packed into the keys, and the
   fall emits it (egg packing, §6).
+- **Corrected September 28.** In reception the received cell forces its digit path; the pegs do not
+  choose it. The arrival moves each peg it passes: a node's Krichevsky–Trofimov split
+  `a = (n₀ + ½)/(N + 1)` moves by `a′ − a = (y − a)/(N + 2)` when side `y` arrives, the descent
+  covector `q − p` at the rate of the node's own epochs. "Nothing chooses" holds for release, where
+  the splits force the path (the inverse CDF); a release inverts the chart, not the learning. The
+  branch maps are pantographs about the interval's ends, not about the split
+  ([motion record](2026-09-28_THE_SWING_IS_A_MOVE_ABOUT_A_GRIP_A_GRIP_TURNS_A_PUSH_BOOSTS_AND_A_FREE_BODY_FALLS.md)).
 
 ## 4. Decipherment is loop closure up to gauge
 

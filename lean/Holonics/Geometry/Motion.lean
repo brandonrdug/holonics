@@ -12,17 +12,16 @@ import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 /-!
 # Motion: a move about its pivot, the turn and the boost, free fall, and the path jets
 
-[definition] The motion record of September 28 (`THE_SWING_IS_A_MOVE_ABOUT_A_GRIP_…`, §3 and §8)
+[definition] The motion record of September 28 (`THE_SWING_IS_A_MOVE_ABOUT_A_GRIP_…`, §3 and §9)
 re-derives the Swing as a move about a grip. This module proves its exact identities. A receiver
 reads a rate `A` against its energy metric `G` (storage `½⟨x, G x⟩`); a finite **move** is
-`x ↦ M x + b`; its **pivot** is derived from the move as a solution of `(1 − M) O = b`, never
-declared. The frozen-board Swing `AffineSwing.swing a x = 2a − x` is the move `M = −1`, the
+`x ↦ M x + b`; its **pivot** is derived from the move as a solution of `(1 − M) O = b`. The frozen-board Swing `AffineSwing.swing a x = 2a − x` is the move `M = −1`, the
 half-turn about `a`.
 
 [proved-standard; formal-checked] What is proved, over any commutative ring or field named in each
 statement (`½` is `⅟2`, so characteristic two is excluded by hypothesis, never by a float):
 
-1. **Turn and boost are the receiver's split of a rate** (§3.1). With `A♯ = G⁻¹AᵀG`
+1. **Turn and boost are the receiver's split of a rate** (§3.2). With `A♯ = G⁻¹AᵀG`
    (`adjointIn`), `turn G A = ½(A − A♯)` and `boost G A = ½(A + A♯)` add to `A`
    (`turn_add_boost`); for invertible symmetric `G` the turn is `G`-skew (`turn_isSkew`) and the
    boost `G`-symmetric (`boost_isSymm`); any split into a `G`-skew and a `G`-symmetric part is this
@@ -31,24 +30,24 @@ statement (`½` is `⅟2`, so characteristic two is excluded by hypothesis, neve
    nothing (`skew_rate_conserves`). One complex channel `ż = (β + iθ) z`, read as the real matrix
    `[[β, −θ], [θ, β]]` against `G = 1`, splits into the turn `[[0, −θ], [θ, 0]]` and the boost
    `β·1` (`complex_rate_split`).
-2. **The port-Hamiltonian reading** (§3.2). For `ẋ = (J − R) Q x` with `J` skew, `R` and `Q`
+2. **The port-Hamiltonian reading** (§3.3). For `ẋ = (J − R) Q x` with `J` skew, `R` and `Q`
    symmetric and `Q` invertible, the receiver of storage `Q` reads the turn `J Q` and the boost
-   `−R Q` (`turn_portHamiltonian`, `boost_portHamiltonian`): the interconnection is the grip, which
-   only turns, and the resistive relation is friction, a boost.
-3. **A move has the pivot it holds** (§3.3). `(1 − M) O = b` gives `M x + b − O = M (x − O)`
+   `−R Q` (`turn_portHamiltonian`, `boost_portHamiltonian`): in this quadratic chart the
+   interconnection turns and the resistive relation is friction, a boost.
+3. **A move has the pivot it holds** (§3.4). `(1 − M) O = b` gives `M x + b − O = M (x − O)`
    (`move_about_pivot`); the pivots are exactly the fixed points (`move_fixes_iff_pivot`) and are
    unique when `1 − M` is injective (`pivot_unique`); moves compose as
    `(M₁, b₁) ∘ (M₂, b₂) = (M₁M₂, M₁b₂ + b₁)` (`move_comp`); a pure translation has no pivot
    (`translation_has_no_pivot`, the pivot at infinity); and with `b = b_∥ + b_⊥`, `M b_∥ = b_∥`
    and `(1 − M) O = b_⊥`, the move is `M` about the axis through `O` followed by the free fall
    `b_∥`, with which it commutes (`move_about_axis_then_falls`).
-4. **The complex chart** (§3.3). For `k ≠ 1` the pivot `O = b/(1 − k)` gives
+4. **The complex chart** (§3.4). For `k ≠ 1` the pivot `O = b/(1 − k)` gives
    `k z + b − O = k (z − O)` (`complex_move_about_pivot`), which is the pantograph of
    `Geometry/HolonicPantographicSwingJets.pantographicPoint` about `O` with scale `k`
    (`complex_move_is_pantograph`); `k = 1, b ≠ 0` has no pivot (`complex_fall_has_no_pivot`);
    multipliers multiply under composition (`complex_move_comp`); the frozen-board Swing is the move
    `k = −1` whose pivot is its anchor (`swing_is_half_turn_move`, `swing_pivot_is_anchor`).
-5. **The multiplier is a cross ratio** (§3.4), on the Möbius navigator of
+5. **The multiplier is a cross ratio** (§3.5), on the Möbius navigator of
    `Compression/Landmark/FixedPoint` (atlas `landmark.mobius-fixed-points`). With distinct fixed
    points `z₁, z₂` and `μ_i = c z_i + d`, undivided,
    `(m z − z₁)(z − z₂) μ₁ = μ₂ (z − z₁)(m z − z₂)` (`multiplier_cross_ratio`): two pivots, the body
@@ -63,18 +62,18 @@ statement (`½` is `⅟2`, so characteristic two is excluded by hypothesis, neve
    length two, three and four of `HolonicsResearch/Geometry/Navigation`. `det(−1_d) = (−1)^d`
    (`det_half_turn`): `−1` in odd dimension (`det_half_turn_odd`), `1` in even
    (`det_half_turn_even`).
-7. **Point-mass work and the sling** (§3.2, §3.7). In the complex chart, with `v̇ = v ẇ`,
+7. **Point-mass work and the sling** (§3.3, §3.8). In the complex chart, with `v̇ = v ẇ`,
    `Re(v̄ · v ẇ) = |v|² Re ẇ` (`power_is_boost_rate`: the power is the boost rate) and
    `Im(v̄ · v ẇ) = |v|² Im ẇ` (`normal_effort_is_turn_rate`), so for `m ≠ 0`, `v ≠ 0` and
    `F = m v ẇ` the signed turn rate is `θ̇ = Im(v̄ F)/(m|v|²)` and the boost rate
    `β̇ = Re(v̄ F)/(m|v|²)` (`rates_from_effort`). If `v_out − V = k (v_in − V)` with
-   `|k|² = 1`, then `|v_out|² − |v_in|² = 2 Re(V̄ (v_out − v_in))` (`sling_speed_gain`): the turn
-   about the moving pivot `V` is a boost in any other frame.
-8. **The traction disk** (§6). For `v ≠ 0` and `k = v′/v`, `|v′ − v|² = |k − 1|² |v|²`
+   `|k|² = 1`, then `|v_out|² − |v_in|² = 2 Re(V̄ (v_out − v_in))` (`sling_speed_gain`): a turn
+   about a pivot `V` changes the speed a receiver centred at rest reads.
+8. **The traction disk** (§7). For `v ≠ 0` and `k = v′/v`, `|v′ − v|² = |k − 1|² |v|²`
    (`traction_move_ratio`, `traction_disk`); for `|k|² = 1`, `|k − 1|² = 2 − 2 Re k`
    (`turn_distance_from_one`); the chord of `k = cos θ + i sin θ` is
    `|k − 1|² = 2 − 2cos θ = 4 sin²(θ/2)` (`turn_by_angle_distance_from_one`).
-9. **The path jets** (§3.5). With `ẋ = e^w`, `ẍ = e^w ẇ` and `ẇ = (e^w)⁻¹ ẍ`, the Maurer–Cartan
+9. **The path jets** (§3.6). With `ẋ = e^w`, `ẍ = e^w ẇ` and `ẇ = (e^w)⁻¹ ẍ`, the Maurer–Cartan
    form (`velocity_rate_is_log_derivative`); the jerk is `e^w (ẇ² + ẅ)` (`acceleration_and_jerk`).
    In any differential ring, `D e = e w₁` gives `Dⁿ e = e Y_n` with `Y_0 = 1`,
    `Y_(n+1) = D Y_n + w₁ Y_n` (`derivation_iterate_of_log_rate`). On the integer jet polynomials
@@ -82,7 +81,7 @@ statement (`½` is `⅟2`, so characteristic two is excluded by hypothesis, neve
    `bellJet 1 = X₁`, `bellJet 2 = X₂ + X₁²` (`bellJet_one`, `bellJet_two`), evaluation at the jets
    of `w` differentiates as the derivation (`hasDerivAt_jet_eval`), and every higher derivative of
    the position is `x^(n+1) = e^w · Y_n(ẇ, ẅ, …)` (`position_jets`).
-10. **The three kinds of quadratic motion** (GPT-6 Astra's review). The flow of
+10. **The three kinds of quadratic motion** (§3.1). The flow of
    `H = ½(α p² + 2β p q + γ q²)` on `(q, p)` has generator `X = [[β, α], [−γ, −β]]`
    (`quadraticGenerator`), traceless with `det X = αγ − β²`, the determinant of the energy metric
    `G_H = [[γ, β], [β, α]]` (`quadraticGenerator_trace_det`); `X = J G_H` is `G_H`-skew, a turn of
@@ -92,19 +91,19 @@ statement (`½` is `⅟2`, so characteristic two is excluded by hypothesis, neve
    (`quadratic_boost`); and `det X = 0` free fall, a nilpotent shear whose exact steps compose
    additively (`quadratic_fall`), the free particle's `[[1, h/m], [0, 1]]`
    (`free_particle_step`).
-11. **Iwasawa for `SL(2)`**, with the root `r² = a² + c²` a hypothesis so that it holds in any
+11. **Iwasawa for `SL(2)`** (§3.1), with the root `r² = a² + c²` a hypothesis so that it holds in any
    field containing it: `M = K · diag(r, r⁻¹) · [[1, (ab + cd)/r²], [0, 1]]` with `K` orthogonal
    (`iwasawa`), and the factors are unique once the boost is positive (`iwasawa_unique`): every
    move of `SL(2)` is a turn, a boost and a free-fall shear (the `KAN` split).
-12. **The energy law with a moving metric and forcing.** Along `ẋ = Ax + f` with metric `G`
+12. **The energy law with a moving metric and forcing** (§3.2). Along `ẋ = Ax + f` with metric `G`
    (symmetric) and rate `Ġ`, undivided: `ẋᵀGx + xᵀĠx + xᵀGẋ = xᵀ(AᵀG + GA + Ġ)x + 2xᵀGf`
    (`energy_rate_moving_metric`) `= 2xᵀG B x + xᵀĠx + 2xᵀGf` with `B` the boost
-   (`energy_rate_moving_metric_boost`): the boost's work, the moving metric's (deposition's) work
+   (`energy_rate_moving_metric_boost`): the boost's work, the moving metric's work (a pump's or a deposition's)
    and the push's power.
 
 [interpretation] The words grip, push, free fall and sling are the record's readings of these
-identities; the receiver-relativity of the split (a change of metric moves it) is the record's
-§3.1 and is not a further theorem here. Owed and cited in the record, not proved here:
+identities; the the split's dependence on the receiver (a different metric for the same motion moves
+it; a rechart does not) is the record's §3.2 and is not a further theorem here. Owed and cited in the record, not proved here:
 `PSL(2, ℂ) ≅ SO⁺(1, 3)`, Chasles, Lancret, the polar decomposition over an exact field with square
 roots.
 -/

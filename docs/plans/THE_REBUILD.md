@@ -71,8 +71,8 @@ the wide cut and the curated cut.
   (September 28, [audit](../../research/records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md)). F4's known-truth terrain
   acceptance can proceed meanwhile.
 - F1 (words) and F2 (the field) are improvements the population may adopt; neither blocks F4.
-- F5 needs F0, F4 and the product surface. The product shell built in PR #149 waits on its branch
-  until F0 and F4 pass.
+- F5 needs F0, F4 and the product surface. The product shell from PR #149 is on main and waits for
+  F0 and F4 to pass.
 - F3 is an acceleration gate, required only if Athena-0's response deadline needs the card.
 - F6's chase terrain needs nothing from F4 for its reception phase; its action phase and the
   motor chart use F4's release law.

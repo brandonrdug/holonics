@@ -181,9 +181,12 @@ orientation; it assigns no pump frequency to a character and imposes no torus on
 
 [definition; agent-inferred] (Brandon, September 27: data must be "structured fluid input that's
 ready to channel as flux".) A parameter, a weight or a word is a pin: a coordinate where current
-folds or pivots. That is the Swing's anchor `a` in `S_a x = 2a − x`, a navigator's key, or a
-constitution's lattice locus. Learning moves the pins; the current falls through them. So the
-input must arrive as flux the pins can act on, and the output must return as faces an operator can
+folds or pivots. A pin has three roles, which correspond in particular constructions and are not
+interchangeable ([motion record §6](../research/records/2026-09-28_THE_SWING_IS_A_MOVE_ABOUT_A_GRIP_A_GRIP_TURNS_A_PUSH_BOOSTS_AND_A_FREE_BODY_FALLS.md#6-what-is-retired-and-what-stays)):
+a **pivot**, the fixed point a move holds ([motion](ELEMENTARY_OBJECTS.md#the-swing)); a **key**, a
+navigator's initial configuration; and a **locus**, a place in the constitution's lattice where
+deposition acts. Learning changes the loci; the current turns, boosts and falls through them. So the
+input must arrive as flux they can act on, and the output must return as faces an operator can
 decode.
 
 **The source contract.** What an input must carry to be channelled:
@@ -212,7 +215,9 @@ decode.
    The source records identities that persist across epochs, their changes with the real intervals
    between them, and the causes of each change (item 4's incidence). Where the source is live, it
    records its response to the learner's own emissions. Bytes read at uniform ticks with their
-   intervals and causes removed are the residue of the motion, not its flux.
+   intervals and causes removed have lost the source's own timing and incidence. The receiving
+   machine still moves as it reads them (its address shifts, its nodes' arrivals are epochs and its
+   splits move), but that motion is the machine's, not the source's.
 10. **The record is pinned; the encoding is not.** The physical record (items 1–9) is pinned once,
     by hash, for honest evaluation. No encoding is pinned: each re-encoding (learned classes, words,
     concepts across ports and aeons) is a lens in the population, a face map that pays its own

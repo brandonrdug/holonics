@@ -3,7 +3,7 @@
 //! Carrying material to another phase conjugates it, `M ↦ S⁻ᵈMSᵈ`, so every class function of
 //! the material is a face conserved along the winding: its determinant, its trace sequence
 //! `tr(Mᵏ)` and its transfer determinant `det(1 − T·M)`
-//! ([objects §3](../../../../docs/ELEMENTARY_OBJECTS.md#the-swing-the-navigators-elementary-motion)).
+//! ([objects §3](../../../../docs/ELEMENTARY_OBJECTS.md#the-swing)).
 //! For independent sites the transfer determinants multiply and the trace sequences add; the
 //! product `∏(1 − a_g T + q_g T²)` is the machine's dynamical zeta denominator.
 //!
@@ -27,15 +27,23 @@ use num_traits::{One, Signed, Zero};
 /// `reflection_iff_opposite_eigenvalues`, `degenerate_iff_zero_eigenvalue`,
 /// `rotation_iff_no_real_eigenvalue`, `null_iff_traceless_nilpotent` and
 /// `boost_iff_two_real_eigenvalues`. This is the one Rust owner of the site kinds.
+///
+/// [proved-standard; formal-checked in `Geometry/Motion`] **The kinds are the kinds of motion**
+/// ([objects §3](../../../../docs/ELEMENTARY_OBJECTS.md#the-swing)). Read projectively, on the ratio
+/// of the two components, the move's multiplier `K` satisfies `K + K⁻¹ + 2 = a²/q`: a turn, free
+/// fall (a shear), a boost, or a half-turn with a boost. The reading is projective: `I` and `2I`
+/// share a kind, and a linear quarter-turn reads as a projective half-turn.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum SiteKind {
-    /// `q > 0`, `a² < 4q`: the roots are off the real line and the counts circulate.
+    /// `q > 0`, `a² < 4q`: the roots are off the real line and the counts circulate: a turn.
     Rotation,
-    /// `q > 0`, `a² = 4q`: a double root; the traceless part is nilpotent (a shear, the lock).
+    /// `q > 0`, `a² = 4q`: a double root; the traceless part is nilpotent (a shear, the lock):
+    /// free fall, or rest.
     Null,
-    /// `q > 0`, `a² > 4q`: two real roots of one sign; the sequence goes hyperbolic.
+    /// `q > 0`, `a² > 4q`: two real roots of one sign; the sequence goes hyperbolic: a boost.
     Boost,
-    /// `q < 0`: two real roots of opposite sign; the site reverses orientation (the Swing).
+    /// `q < 0`: two real roots of opposite sign; the site reverses orientation: a half-turn with
+    /// a boost.
     Reflection,
     /// `q = 0`: a singular site.
     Degenerate,
