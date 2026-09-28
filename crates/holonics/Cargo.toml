@@ -72,6 +72,14 @@ path = "../../research/notebook/hnn_design/hnn_curated.rs"
 name = "hnn_population"
 path = "../../research/notebook/hnn_design/hnn_population.rs"
 
+# The notebook's chase terrain in its reception phase (`holarchy::terrain::chase`, the population of
+# candidate runners `receiver::population::ChaseFamily`; THE_REBUILD F6;
+# research/notebook/hnn_design/README.md): count-only development receipts run once in release,
+# never a test.
+[[example]]
+name = "hnn_chase"
+path = "../../research/notebook/hnn_design/hnn_chase.rs"
+
 [[example]]
 name = "hnn_release_terrain"
 path = "../../research/notebook/hnn_design/hnn_release_terrain.rs"

@@ -18,6 +18,7 @@
 //! | [`TreeSource`] | a shift-closed pruned context tree whose leaves hold drawn faces: the shift navigator with its standing, the leaf map (Lean `Compression/Landmark/Context/Standing.leaf_standing`) | [`TreeSourceTruth`]: the tree and faces, the leaf chain's stationary law solved over ℚ, the entropy rate as its exact form in `log₂ p` and its enclosure; per passage the source's own code ([`TreeSource::passage`]), the weighting bound ([`TreeSource::weighting_bound`]) and the recovered tree ([`TreeSource::recovery`]) | the receiving tree: does it recover the tree and reach the rate? |
 //! | [`RotorCrib`] | a declared HNN field's ring as a reflector machine behind a plugboard | [`CribTruth`]: the key and the plugboard, and their description | key location |
 //! | [`Switching`] | two sources alternating by drawn aeons; for [`Switching::dormant`] one moiré whose grating is silent in the odd aeons while its ring keeps turning | [`SwitchTruth`]: the switch epochs as `aeon::Epochs` of the cell clock's forward aeon at the switch section, and the dormant grating | dormancy across aeon boundaries (campaign 3) |
+//! | [`Chase`] | a fast runner and a scripted pursuer on a bounded exact arena whose cells carry friction classes: the runner's constitution at the ground contact (speed bound, traction coefficient; `⟨Δv, Δv⟩ ≤ (γ μ g h²/ℓ)²`), its slip hold and its evasion navigator (flee, circle, zig-zag) drawn from a declared [`RunnerFamily`]; the pursuer's pure pursuit, whose capture `Q ≤ ρ²` ends the passage; the cells are the runner's realized moves, slips and wall meetings | [`ChaseTruth`]: the drawn candidate and its index, the friction field, the openings, the realized motions, the slips, walls and capture tick, and the key description `⌈log₂ N · m^P · WH · (WH − 1)⌉`; beside it the surviving fibre ([`Chase::fibre`]) and its future classes under the admitted chaser words ([`Chase::futures`]) | motion against another's constitution: reception selects the fibre of runner constitutions the passage leaves (F6) |
 //! | [`arithmetic::Products`], [`arithmetic::PrimeWindow`] | integers as digit vectors on a helix (odometers, the carry their winding): two drawn operands joined by the convolution of their digits, whose carry is the product's odometer; a window's integers met by the gratings `p ∤ b` on the leading index (the record `2026-09-27_THE_EGG_IS_A_GENERATORS_GENOME_…`, §7) | [`arithmetic::ProductTruth`]: the operands and their factorizations, the convolution, the carry word, the trailing face and the leading face with its carry fibre; [`arithmetic::IntegerTruth`]: each integer's factorization, gratings and cheap readings, and the density read through a face | the trailing and leading faces, the cheap faces, the gratings |
 //!
 //! [definition; agent-inferred] **The draw is a navigator** ([`Draw`]): a Weyl rotation of
@@ -44,9 +45,13 @@
 //! the sheet, the parity color, a leaf's face on its grid) and the **tube** (the aeon's span, one
 //! cell a tick; the switch epochs divide it). The **pair** (each two gratings' lock address), the
 //! **cell holonomy** (none is claimed: the gratings exchange no power) and the **tower thread**
-//! (the context tree restricts an address to its leaf) stay attached.
+//! (the context tree restricts an address to its leaf) stay attached. The chase ([`chase`]) touches
+//! the **pair** too: the runner's navigator meets the arena's friction field at its ground contact
+//! (the traction law admits or slips), and the runner and the pursuer are a pair whose quadrance the
+//! flee navigator raises and the pursuer lowers until capture.
 
 pub mod arithmetic;
+pub mod chase;
 pub mod crib;
 pub mod moire;
 pub mod source;
@@ -54,11 +59,19 @@ pub mod switching;
 pub mod words;
 
 #[cfg(test)]
+mod chase_tests;
+
+#[cfg(test)]
 mod tests;
 
 #[cfg(test)]
 mod words_tests;
 
+pub use chase::{
+    ARENA_SIDE_LIMIT, Arena, ArenaDeclaration, Caps, Chase, ChasePorts, ChaseTruth, Constitution,
+    Futures, Letter, MOVE_CAP_LIMIT, Motion, Moves, Policy, Pursuer, Replay, Runner, RunnerFamily,
+    RunnerState,
+};
 pub use crib::{CribTruth, RotorCrib, rotor_crib};
 pub use moire::{Grating, Moire, MoireClass, MoireFamily, MoireTruth, PairLock};
 pub use source::{

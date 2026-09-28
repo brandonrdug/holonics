@@ -233,6 +233,7 @@
 //! | `Compression/Landmark/Context/Population.population_mixture` (the static mixture with death) | [`Population::code`], [`Population::receipt`] |
 //! | `Compression/Landmark/Context/Population.survivor_code` | [`Survivors`] |
 //! | `Compression/Landmark/Context/Population.survivors_product` | [`KeyFamily`]'s factors |
+//! | `Compression/Landmark/Context/Population.{seqLik_escaped_survivor, escaped_fibre_is_mode}` | [`ChaseFamily`] (the escaped face), [`selected_fibre`] |
 //! | `Compression/Landmark/Context/Population.death_is_an_exchange` | [`DeathReceipt`] (the exchange of [`Population::receive`]) |
 //! | `Compression/Landmark/Context/Dormancy.{forward_dominance_nonneg, dormant_survivor_code, layer_survivors, productKernel_stochastic, productKernel_path}` | [`Dormancy`], [`DormantFamily`] |
 //! | `Compression/Landmark/Context/Dormancy.{share_path_code, stay_code_le, share_path_code_le}` | the declared rate `α = 2^(−j)` of [`Dormancy::new`] |
@@ -258,6 +259,7 @@ pub use checkpoint::{
     AdmittedMemberManifest, PopulationCheckpointError, PopulationMemberManifest, TreeMemberManifest,
 };
 pub mod boundary;
+pub mod chase;
 pub mod checkpoint;
 pub mod composition;
 pub mod dormancy;
@@ -308,6 +310,7 @@ pub use boundary::{
     BYTE_VALUES, BoundaryEgg, BoundaryReadout, Hazard, HazardCell, HazardComparison,
     HazardPartition, HazardRest, LastByte, PartClock, PartPort, byte_index, dyadic_class,
 };
+pub use chase::{ChaseFamily, selected_fibre};
 pub use composition::{
     Composed, Conditioned, Keystone, Port, PortPath, PortReader, PortedEmitters, Unheld,
 };

@@ -1,0 +1,503 @@
+//! The chase terrain's laws checked exactly on small arenas: the traction law refusing an
+//! inadmissible change and the slip a demand beyond it causes, a slip held for its declared ticks,
+//! the wall law keeping every mover inside, capture ending the passage, the key description, and
+//! reception on hash-seeded arenas: the population's selected fibre is the surviving fibre, it holds
+//! the truth, its code lies within the naming margin of the truth's own code and strictly below the
+//! landmark tree's on the same cells; a plural fibre the ground cannot split is one future class
+//! under every admitted pursuer word.
+
+use num_bigint::BigUint;
+use num_traits::One;
+
+use super::chase::*;
+use super::{Draw, TerrainError};
+use crate::compression::landmark::context::{
+    Capacity, LandmarkDeclaration, LetterFamily, StopPrior,
+};
+use crate::ratio::algebraic::ExactInterval;
+use crate::ratio::{Rat, rat};
+use crate::receiver::population::{
+    ChaseFamily, Family, Population, Posterior, TreeFamily, selected_fibre,
+};
+
+/// The declared arena: `16 × 16` positions, patches of side 4, classes ice `1/2`, grass `1`, track
+/// `3/2`, `g = 8`, `h = 1/2`, `ℓ = 1`, so `k = g h²/ℓ = 2` and a unit traction coefficient admits
+/// changes of radius `1`, `2` and `3` on the three classes: every class resolves on the lattice.
+fn declaration() -> ArenaDeclaration {
+    ArenaDeclaration {
+        width: 16,
+        height: 16,
+        patch: 4,
+        classes: vec![rat(1, 2), rat(1, 1), rat(3, 2)],
+        gravity: rat(8, 1),
+        tick: rat(1, 2),
+        spacing: rat(1, 1),
+    }
+}
+
+/// The declared family: speeds `2, 3`, traction coefficients `1, 3/2`, holds `1, 2`, and five
+/// navigators: `2·2·2·5 = 40 = 2³·5` candidates, each named by `⌈log₂ 40⌉ = 6` bits.
+fn family() -> RunnerFamily {
+    RunnerFamily {
+        speeds: vec![rat(2, 1), rat(3, 1)],
+        tractions: vec![rat(1, 1), rat(3, 2)],
+        holds: vec![1, 2],
+        policies: vec![
+            Policy::Flee,
+            Policy::Circle { clockwise: false },
+            Policy::Circle { clockwise: true },
+            Policy::ZigZag { period: 2 },
+            Policy::ZigZag { period: 3 },
+        ],
+    }
+}
+
+/// The scripted pursuer: speed `3/2` below both runner speeds, traction `2` above both, capturing
+/// within one lattice step, diagonals included (`ρ² = 2`).
+fn pursuer() -> Pursuer {
+    Pursuer {
+        constitution: Constitution {
+            speed: rat(3, 2),
+            traction: rat(2, 1),
+        },
+        capture: rat(2, 1),
+    }
+}
+
+/// The escape exponent `j`: `η = 2^(−12)` (the family module's reason).
+const ESCAPE: u32 = 12;
+
+/// The arena with every patch of one class.
+fn uniform(class: usize) -> Arena {
+    let declaration = declaration();
+    let patches = vec![class; declaration.patches()];
+    Arena::new(declaration, patches).unwrap()
+}
+
+/// The arena of track on its left half (`x < 8`) and ice on its right.
+fn track_then_ice() -> Arena {
+    let declaration = declaration();
+    let patches = (0..declaration.patches())
+        .map(|p| if p % 4 < 2 { 2 } else { 0 })
+        .collect();
+    Arena::new(declaration, patches).unwrap()
+}
+
+/// A runner of speed 3, unit traction, the declared hold, fleeing.
+fn fleeing(hold: u64) -> Runner {
+    Runner {
+        constitution: Constitution {
+            speed: rat(3, 1),
+            traction: rat(1, 1),
+        },
+        hold,
+        policy: Policy::Flee,
+    }
+}
+
+/// The traction law is exact in ℚ: a unit coefficient admits `⟨Δv, Δv⟩ ≤ 1` on ice (the four axis
+/// steps, not a diagonal), `≤ 4` on grass, `≤ 9` on track; `γ = 3/2` admits `≤ 9/4` (the diagonal
+/// too), `≤ 9` and `≤ 81/4`. The caps are the bounds' floors and agree with the law on every move.
+/// A demand made as on the track behind the runner slips on the ice under it, keeping the velocity;
+/// the same demand is realized on track, and a runner that last pushed from ice demands within it.
+#[test]
+fn the_traction_bound_refuses_an_inadmissible_change() {
+    let declaration = declaration();
+    let unit = fleeing(1).constitution;
+    let firm = Constitution {
+        speed: rat(3, 1),
+        traction: rat(3, 2),
+    };
+    assert_eq!(declaration.scale(), rat(2, 1));
+    assert_eq!(
+        declaration.traction_bound(&unit.traction, 0),
+        Some(rat(1, 1))
+    );
+    assert_eq!(
+        declaration.traction_bound(&firm.traction, 2),
+        Some(rat(81, 4))
+    );
+    assert!(unit.admits(&declaration, 0, [1, 0]));
+    assert!(!unit.admits(&declaration, 0, [1, 1]));
+    assert!(unit.admits(&declaration, 1, [2, 0]));
+    assert!(!unit.admits(&declaration, 1, [2, 1]));
+    assert!(unit.admits(&declaration, 2, [3, 0]));
+    assert!(!unit.admits(&declaration, 2, [2, 3]));
+    assert!(firm.admits(&declaration, 0, [1, 1]));
+    assert!(!firm.admits(&declaration, 0, [2, 0]));
+    assert!(firm.admits(&declaration, 2, [4, 2]));
+    assert!(!firm.admits(&declaration, 2, [4, 3]));
+    let caps = unit.caps(&declaration).unwrap();
+    assert_eq!((caps.speed, caps.classes.clone()), (9, vec![1, 4, 9]));
+    assert_eq!(firm.caps(&declaration).unwrap().classes, vec![2, 9, 20]);
+    let moves = family().moves(&declaration).unwrap();
+    assert_eq!(
+        (moves.cap(), moves.vectors().len(), moves.alphabet()),
+        (20, 69, 71)
+    );
+    for constitution in [&unit, &firm] {
+        let caps = constitution.caps(&declaration).unwrap();
+        for &change in moves.vectors() {
+            for class in 0..3 {
+                assert_eq!(
+                    constitution.admits(&declaration, class, change),
+                    quadrance(change) <= caps.classes[class]
+                );
+            }
+            assert_eq!(
+                constitution.within_speed(change),
+                quadrance(change) <= caps.speed
+            );
+        }
+    }
+    assert!(matches!(
+        Moves::within(MOVE_CAP_LIMIT + 1),
+        Err(TerrainError::Declaration { .. })
+    ));
+    let runner = fleeing(1);
+    let motion = Motion {
+        position: [8, 8],
+        velocity: [1, 0],
+    };
+    // It last pushed from track (class 2), and stands on ice.
+    let state = RunnerState {
+        motion,
+        ground: 2,
+        held: 0,
+    };
+    let ice = uniform(0);
+    let demand = runner
+        .demand(&ice, &moves, &caps, &state, [0, 8], 0)
+        .unwrap();
+    assert_eq!(demand, [2, 0]);
+    assert!(!runner.constitution.admits(&declaration, 0, demand));
+    let cell = runner.cell(&ice, &moves, &caps, &state, [0, 8], 0).unwrap();
+    assert_eq!(cell, moves.slip());
+    let next = runner.receive(&ice, &moves, &state, cell).unwrap();
+    assert_eq!(
+        next.motion,
+        Motion {
+            position: [9, 8],
+            velocity: [1, 0]
+        }
+    );
+    assert_eq!(next.ground, 0);
+    let track = uniform(2);
+    let cell = runner
+        .cell(&track, &moves, &caps, &state, [0, 8], 0)
+        .unwrap();
+    assert_eq!(moves.read(cell), Some(Letter::Move(demand)));
+    let reading_ice = RunnerState { ground: 0, ..state };
+    let cell = runner
+        .cell(&ice, &moves, &caps, &reading_ice, [0, 8], 0)
+        .unwrap();
+    assert_eq!(moves.read(cell), Some(Letter::Move([1, 0])));
+}
+
+/// A slip holds for its declared ticks: a runner come off the track onto ice slips at its first
+/// demand; with hold 2 it keeps its velocity one more tick, with hold 1 its next demand, made as on
+/// the ice it now reads, is realized. Each held tick steps by the kept velocity.
+#[test]
+fn slip_holds_for_its_declared_ticks() {
+    let declaration = declaration();
+    let arena = track_then_ice();
+    let moves = family().moves(&declaration).unwrap();
+    let opening = RunnerState {
+        motion: Motion {
+            position: [8, 8],
+            velocity: [1, 0],
+        },
+        ground: 2,
+        held: 0,
+    };
+    let passage = |hold: u64| -> Vec<(usize, Motion)> {
+        let runner = fleeing(hold);
+        let caps = runner.constitution.caps(&declaration).unwrap();
+        let mut state = opening;
+        (0..3)
+            .map(|tick| {
+                let cell = runner
+                    .cell(&arena, &moves, &caps, &state, [0, 8], tick)
+                    .unwrap();
+                state = runner.receive(&arena, &moves, &state, cell).unwrap();
+                (cell, state.motion)
+            })
+            .collect()
+    };
+    let held = passage(2);
+    assert_eq!(held[0].0, moves.slip());
+    assert_eq!(held[1].0, moves.slip(), "the hold keeps the slip");
+    assert_eq!(held[0].1.position, [9, 8]);
+    assert_eq!(
+        held[1].1,
+        Motion {
+            position: [10, 8],
+            velocity: [1, 0]
+        }
+    );
+    assert!(
+        held[2].0 < moves.vectors().len(),
+        "the hold spent, the demand is realized"
+    );
+    let once = passage(1);
+    assert_eq!(once[0].0, moves.slip());
+    assert_eq!(moves.read(once[1].0), Some(Letter::Move([1, 0])));
+    assert_eq!(
+        once[1].1,
+        Motion {
+            position: [11, 8],
+            velocity: [2, 0]
+        }
+    );
+}
+
+/// The wall law keeps every mover inside: a runner at the wall faster than its traction on grass can
+/// brake meets the wall, its crossing velocity zeroed and its position clamped; over drawn arenas
+/// every candidate's own motions against the pursuer's port and the pursuer's motions stay in the
+/// arena within their speed bounds; and a passage ends at capture.
+#[test]
+fn walls_keep_the_runner_inside() {
+    let declaration = declaration();
+    let arena = uniform(1);
+    let moves = family().moves(&declaration).unwrap();
+    let runner = fleeing(1);
+    let caps = runner.constitution.caps(&declaration).unwrap();
+    let state = RunnerState {
+        motion: Motion {
+            position: [15, 8],
+            velocity: [3, 1],
+        },
+        ground: 1,
+        held: 0,
+    };
+    assert_eq!(
+        runner.demand(&arena, &moves, &caps, &state, [0, 8], 0),
+        None,
+        "no change of radius 2 brakes 3 steps before the wall"
+    );
+    let cell = runner
+        .cell(&arena, &moves, &caps, &state, [0, 8], 0)
+        .unwrap();
+    assert_eq!(cell, moves.wall());
+    let next = runner.receive(&arena, &moves, &state, cell).unwrap();
+    assert_eq!(
+        next.motion,
+        Motion {
+            position: [15, 9],
+            velocity: [0, 1]
+        }
+    );
+    assert_eq!(
+        arena.observe(&moves, &state.motion, moves.slip()).unwrap(),
+        next.motion,
+        "a kept step that leaves the arena meets the wall law too"
+    );
+    let family = family();
+    let pursuer = pursuer();
+    let pursuer_speed = pursuer.constitution.caps(&declaration).unwrap().speed;
+    for seed in [1u64, 2, 3] {
+        let chase = Chase::draw(&declaration, &family, &pursuer, 64, seed).unwrap();
+        let arena = &chase.ports.arena;
+        assert!(chase.truth.path.iter().all(|m| arena.inside(m.position)));
+        assert!(
+            chase
+                .ports
+                .chaser
+                .iter()
+                .all(|m| arena.inside(m.position) && quadrance(m.velocity) <= pursuer_speed)
+        );
+        match chase.truth.captured {
+            Some(tick) => {
+                assert_eq!(chase.cells.len(), tick);
+                let caught = chase.truth.path.last().map_or(chase.ports.opening, |m| *m);
+                assert!(pursuer.captures(caught.position, chase.ports.chaser[tick].position));
+            }
+            None => assert_eq!(chase.cells.len(), 64),
+        }
+        for index in 0..family.len() {
+            let runner = family.candidate(index).unwrap();
+            let caps = runner.constitution.caps(&declaration).unwrap();
+            let mut state = RunnerState::opening(arena, chase.ports.opening.position).unwrap();
+            for (tick, chaser) in chase.ports.chaser.iter().enumerate() {
+                let cell = runner
+                    .cell(
+                        arena,
+                        &chase.ports.moves,
+                        &caps,
+                        &state,
+                        chaser.position,
+                        tick as u64,
+                    )
+                    .unwrap();
+                state = runner
+                    .receive(arena, &chase.ports.moves, &state, cell)
+                    .unwrap();
+                assert!(arena.inside(state.motion.position));
+                assert!(quadrance(state.motion.velocity) <= caps.speed);
+            }
+        }
+    }
+}
+
+/// The truth receipt: the drawn candidate is the family's index, the key description is
+/// `⌈log₂(40 · 3^16 · 256 · 255)⌉ = 47` bits, the pursuer's port holds one motion a tick and the
+/// one after, and the refusals are typed.
+#[test]
+fn the_truth_names_its_key() {
+    let declaration = declaration();
+    let family = family();
+    let chase = Chase::draw(&declaration, &family, &pursuer(), 32, 7).unwrap();
+    let space = BigUint::from(40u32) * BigUint::from(3u32).pow(16) * BigUint::from(256u32 * 255);
+    assert_eq!(chase.truth.key_space, space);
+    assert_eq!(chase.truth.key_bits, 47);
+    assert!(BigUint::one() << 47 >= space && BigUint::one() << 46 < space);
+    assert_eq!(
+        chase.truth.runner,
+        family.candidate(chase.truth.index).unwrap()
+    );
+    assert_eq!(chase.ports.chaser.len(), chase.cells.len() + 1);
+    let mut draw = Draw::new(7);
+    assert_eq!(draw.below(40), chase.truth.index);
+    let slow = Pursuer {
+        constitution: Constitution {
+            speed: rat(3, 1),
+            traction: rat(2, 1),
+        },
+        capture: rat(2, 1),
+    };
+    assert!(matches!(
+        Chase::draw(&declaration, &family, &slow, 8, 7),
+        Err(TerrainError::Declaration { .. })
+    ));
+    assert!(matches!(
+        Chase::run(uniform(2), &family, 0, &pursuer(), [[4, 4], [5, 5]], 8),
+        Err(TerrainError::Declaration { .. })
+    ));
+    let bad = ArenaDeclaration {
+        patch: 3,
+        ..declaration
+    };
+    assert!(bad.check().is_err());
+}
+
+fn tree(alphabet: usize, depth: usize, population: usize) -> LandmarkDeclaration {
+    LandmarkDeclaration {
+        alphabet,
+        depth,
+        forced: 0,
+        population: population as u64,
+        grain: 16,
+        family: LetterFamily::cells(),
+        prior: StopPrior::half(),
+        capacity: Capacity::Unbounded,
+    }
+}
+
+/// The landmark tree's least code alone over a ladder of depths, reading the same cells.
+fn tree_code(cells: &[usize], alphabet: usize) -> ExactInterval {
+    [1usize, 2, 4]
+        .iter()
+        .map(|&depth| {
+            let mut family = TreeFamily::new(tree(alphabet, depth, cells.len()), 0).unwrap();
+            for &cell in cells {
+                family.receive(cell).unwrap();
+            }
+            family.likelihood().code().unwrap().unwrap()
+        })
+        .min_by(|a, b| a.lower.cmp(&b.lower))
+        .unwrap()
+}
+
+/// Reception on hash-seeded arenas (F6's reception acceptance): the surviving fibre holds the
+/// truth; the population's selected fibre (its greatest posterior, read exactly) is the surviving
+/// fibre, and the family it selects, when one is decided, lies in it; the fibre's joint posterior is
+/// decided above one half; the population's code lies within the naming margin `⌈log₂ N⌉` of the
+/// truth family's own code and strictly below the landmark tree's least code on the same cells. The
+/// seeds are the harness's: a circle runner that slips, a zig-zag runner and a flee runner.
+#[test]
+fn reception_selects_the_surviving_fibre() {
+    let declaration = declaration();
+    let family = family();
+    let margin = Rat::from_integer(family.description().into());
+    for seed in [20_260_928u64, 20_260_931, 20_260_937] {
+        let chase = Chase::draw(&declaration, &family, &pursuer(), 128, seed).unwrap();
+        let fibre = chase.fibre(&family).unwrap();
+        assert!(fibre.contains(&chase.truth.index), "seed {seed:#x}");
+        let mut population =
+            Population::new(ChaseFamily::declare(&chase, &family, ESCAPE).unwrap()).unwrap();
+        population.receive_passage(&chase.cells).unwrap();
+        let receipt = population.receipt().unwrap();
+        assert_eq!(selected_fibre(&population), fibre, "seed {seed:#x}");
+        if let Some(selected) = receipt.selected {
+            assert!(fibre.contains(&selected));
+        }
+        assert_eq!(receipt.selected.is_some(), fibre.len() == 1);
+        let Posterior::Bits(joint) = population.posterior_of(&fibre).unwrap() else {
+            panic!("the fibre lives");
+        };
+        assert!(joint.upper < Rat::one(), "seed {seed:#x}: {joint:?}");
+        let truth = receipt.families[chase.truth.index].code.clone().unwrap();
+        assert!(
+            &receipt.code.upper - &truth.lower <= margin,
+            "seed {seed:#x}: {:?} against {truth:?}",
+            receipt.code
+        );
+        let tree = tree_code(&chase.cells, chase.ports.moves.alphabet());
+        assert!(
+            receipt.code.upper < tree.lower,
+            "seed {seed:#x}: {:?} against the tree's {tree:?}",
+            receipt.code
+        );
+        let futures = chase.futures(&family, &fibre, &pursuer(), 3).unwrap();
+        assert!(futures.classes[0].contains(&chase.truth.index));
+        assert_eq!(
+            futures.classes.iter().map(Vec::len).sum::<usize>(),
+            fibre.len()
+        );
+    }
+}
+
+/// A plural fibre the ground cannot split: on an arena of track alone the runner never meets lower
+/// ground, so no slip is demanded and the two holds emit alike on the passage; the population
+/// selects both, neither alone above one half, and they are one future class under every admitted
+/// pursuer word, since no action can put the runner on ice.
+#[test]
+fn a_plural_fibre_is_one_future_class_where_no_action_separates_it() {
+    let family = family();
+    let chase = Chase::run(uniform(2), &family, 0, &pursuer(), [[4, 4], [12, 12]], 48).unwrap();
+    assert_eq!(chase.truth.slips, 0);
+    let fibre = chase.fibre(&family).unwrap();
+    // Hold 2 with the truth's speed, traction and navigator: the hold's digit weighs 2·2.
+    let other_hold = 4;
+    assert!(
+        fibre.contains(&0) && fibre.contains(&other_hold),
+        "{fibre:?}"
+    );
+    let mut population =
+        Population::new(ChaseFamily::declare(&chase, &family, ESCAPE).unwrap()).unwrap();
+    population.receive_passage(&chase.cells).unwrap();
+    assert_eq!(selected_fibre(&population), fibre);
+    assert_eq!(population.receipt().unwrap().selected, None);
+    let futures = chase.futures(&family, &fibre, &pursuer(), 3).unwrap();
+    assert!(futures.words > 1);
+    let truth_class = &futures.classes[0];
+    assert!(truth_class.contains(&0) && truth_class.contains(&other_hold));
+}
+
+/// Two speed bounds the passage leaves together, a probe separates (the record's §14.10): on the
+/// harness's seed `20260935` the pursuer captures a zig-zag runner at tick 9, before the passage
+/// shows its speed; the fibre keeps speeds 2 and 3 and both holds, and over the admitted pursuer
+/// words it parts by speed into two future classes with a separating word: the exact family is
+/// required only where such a probe is emitted.
+#[test]
+fn a_probe_separates_the_speed_bounds_the_passage_leaves_together() {
+    let family = family();
+    let chase = Chase::draw(&declaration(), &family, &pursuer(), 256, 20_260_935).unwrap();
+    assert_eq!(chase.truth.captured, Some(9));
+    assert_eq!(chase.truth.index, 37);
+    let fibre = chase.fibre(&family).unwrap();
+    assert_eq!(fibre, vec![32, 33, 36, 37]);
+    let futures = chase.futures(&family, &fibre, &pursuer(), 5).unwrap();
+    assert_eq!(futures.classes, vec![vec![33, 37], vec![32, 36]]);
+    assert!(futures.separating.is_some());
+}
