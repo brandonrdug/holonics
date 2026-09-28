@@ -905,6 +905,20 @@ pub enum Reach {
     F4,
 }
 
+/// Counts the bytes a standing encodes to, holding none of them (F0: standing bytes per cell).
+struct StandingBytes(u64);
+
+impl std::io::Write for StandingBytes {
+    fn write(&mut self, buffer: &[u8]) -> std::io::Result<usize> {
+        self.0 += u64::try_from(buffer.len()).expect("a write length fits u64");
+        Ok(buffer.len())
+    }
+
+    fn flush(&mut self) -> std::io::Result<()> {
+        Ok(())
+    }
+}
+
 pub fn harness(curated_path: &str, flat_path: &str, reach: Reach) {
     let clock = Instant::now();
     let f4 = reach == Reach::F4;
@@ -1043,7 +1057,7 @@ pub fn harness(curated_path: &str, flat_path: &str, reach: Reach) {
         ("declared".to_string(), HazardPartition::declared()),
         (other.0.to_string(), other.1),
     ];
-    let (mut population, egg_index, _manifest) = curated_population(
+    let (mut population, egg_index, manifest) = curated_population(
         chart,
         cut.population,
         grain,
@@ -1146,6 +1160,18 @@ pub fn harness(curated_path: &str, flat_path: &str, reach: Reach) {
         "3. one passage of the population over the whole cut: development {development_ms} ms, in all {} ms; resident set (now, peak) {resident:?} bytes",
         passage.elapsed().as_millis()
     );
+    // F0: the standing's size, streamed and counted, against the cells read.
+    let mut standing = StandingBytes(0);
+    population
+        .write_checkpoint(&manifest, &mut standing)
+        .expect("the constructor's manifest matches the population");
+    let read = cut.codes.len() as u64;
+    println!(
+        "  standing: {} bytes after {read} cells, {} bytes a cell (remainder {})",
+        standing.0,
+        standing.0 / read,
+        standing.0 % read
+    );
     drop(population);
 
     // The flat tree over the flat twin, once.
@@ -1178,6 +1204,13 @@ pub fn harness(curated_path: &str, flat_path: &str, reach: Reach) {
     println!(
         "  the flat tree at D = {FLAT_DEPTH}, one passage over the flat twin: {} ms",
         flat_clock.elapsed().as_millis()
+    );
+    let flat_standing = flat_tree.encode_checkpoint().len() as u64;
+    let flat_read = flat_bytes.len() as u64;
+    println!(
+        "  the flat tree's standing: {flat_standing} bytes after {flat_read} cells, {} bytes a cell (remainder {})",
+        flat_standing / flat_read,
+        flat_standing % flat_read
     );
     println!();
 

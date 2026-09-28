@@ -9,6 +9,40 @@ at `e171b175`: three commits, 72 files, `+13467 / −141`) and Sol's thread, whi
 ([the learner must move](2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md))
 and to GPT-6 Astra's review within it.
 
+## 0. Correction after the diagnosis (the same morning)
+
+`[established-bounded; measured]` The first F0 loop re-ran F4's passage with each component read
+separately. It shows that the title's first clause was **wrong**: on unseen families the population
+codes the bytes *below* the flat tree. The `+1346` is the cost of structure that the flat stream
+never codes.
+
+| Validation (523,236 bytes, 916 section letters) | Population against flat, bits at `L_R = 16` |
+|---|---|
+| human bytes (30,841) | `−415 + 1/16 + ε` |
+| agent bytes (492,395) | `−2015 + 7/16 + ε` |
+| every byte | `−2430 + 8/16 + ε` |
+| section letters, coded only by the curated stream | `+3333 + 10/16 + ε` |
+| the request's pointer | `+402 + 0/16 + ε` |
+| charges (`42 + 12/16` against the flat stream's `3`) | `+39 + 12/16` |
+| **whole stream** | **`+1346 + 1/16 + ε`** |
+
+On the choosing families the byte gain was `−4591 + 8/16 + ε`. It halves on unseen families but
+stays a gain.
+
+What stands:
+- The releases are not legible text. Reading 580 of their 758 word tokens as real words shows a
+  pattern-recognizing predictor at a PPM-class rate: about `1 + 12/16` bits a byte on unseen agent
+  text.
+- The standing is an index. The re-run measured 11,513,530,863 bytes after 1,048,243 cells for the
+  population (10,983 bytes a cell), and 1,358,603,467 bytes after 1,046,625 cells for the single
+  flat tree (1,298 a cell).
+- The posterior sits wholly on the admitted egg, with every other family thousands of bits behind.
+  The trees beyond depth 24 add at most 20 bits. So seven of the eight families are standing
+  without a predictive share.
+
+Section 3's first reading is corrected accordingly: the byte population does transfer, weakly. F0 is
+restated in THE_REBUILD as the predictor's rate on unseen families, within a standing budget.
+
 Sol's own records are on the branch:
 - [F4](https://github.com/brandonrdug/holonics/blob/e171b175/research/records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md)
 - [F1](https://github.com/brandonrdug/holonics/blob/e171b175/research/records/2026-09-27_F1_WORD_ALPHABET_GATE.md)
@@ -46,7 +80,8 @@ Sol's own records are on the branch:
 
 ## 2. What the receipts say
 
-1. **The predictor does not transfer across families.** `[established-bounded; measured]` (Sol's
+1. **The predictor does not transfer across families** (corrected in §0: it does, on bytes; the
+   whole-stream excess is the structure's cost). `[established-bounded; measured]` (Sol's
    F4 record.) On F4's validation families the curated population coded `+1346 + 1/16 + ε` bits
    above the flat stream of the same bytes, after coding `−1477 + 5/16 + ε` below it on the
    choosing families. The earlier held-out gain, `−535 + 8/16 + ε`, came from a later tail of the
@@ -76,7 +111,8 @@ Sol's own records are on the branch:
 
 `[interpretation]`
 
-- **Contexts memorize; navigators transfer.** A context tree's gain lives in the contexts it has
+- **Contexts memorize; navigators transfer** (§0 narrows this: the contexts' byte gain halves on
+  unseen families but stays a gain; what fails is the rate, not the transfer). A context tree's gain lives in the contexts it has
   seen. New families present new contexts, and the charges the curated structure pays (sections,
   part clocks, the boundary egg, the request copy) stop buying anything. This is the September 27
   derivation, now measured on text: the arithmetic egg keeps a clock and codes at the truth, while
@@ -102,7 +138,7 @@ Sol's own records are on the branch:
 
 `[definition; agent-inferred]`
 
-- **F0, transfer across families, now gates F4's curated release and F5** ([THE_REBUILD](../../docs/plans/THE_REBUILD.md#f0-transfer-across-families-the-predictors-gate-73-148)).
+- **F0, transfer across families, now gates F4's curated release and F5** ([THE_REBUILD](../../docs/plans/THE_REBUILD.md#f0-the-predictor-on-unseen-families-the-releases-gate-73-148)).
   - Its first loop is a diagnosis from the existing run: which families and which components lose
     on the validation passage.
   - Its acceptance is on a fresh development split never used for a diagnostic: charged code

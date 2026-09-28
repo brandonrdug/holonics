@@ -67,7 +67,7 @@ the wide cut and the curated cut.
   claim.
 
 **Order.**
-- F0 comes first: the predictor must transfer across families before F4's curated release or F5
+- F0 comes first: the predictor's rate on unseen families must improve before F4's curated release or F5
   (September 28, [audit](../../research/records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md)). F4's known-truth terrain
   acceptance can proceed meanwhile.
 - F1 (words) and F2 (the field) are improvements the population may adopt; neither blocks F4.
@@ -77,30 +77,47 @@ the wide cut and the curated cut.
 - F6's chase terrain needs nothing from F4 for its reception phase; its action phase and the
   motor chart use F4's release law.
 
-### F0. Transfer across families (the predictor's gate; #73, #148)
+### F0. The predictor on unseen families (the release's gate; #73, #148)
 
-[definition; agent-inferred; [audit](../../research/records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md)] F4's pinned validation found
-the curated population coding `+1346 + 1/16 + ε` bits above the flat stream on families it had not
-seen. Its 32 diagnostic releases were not legible text, and its standing after 522,206 cells was
-6,256,005,986 bytes. Neither release (F4) nor Athena-0 (F5) can pass on that predictor.
+[definition; agent-inferred; [audit and diagnosis](../../research/records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md)]
 
-- **Builds on.** `receiver::population`, `compression::landmark::context`,
-  `Context/Merge.merge_cost_mass_iff`, the transport-closure founding law and continuation
-  transports ([Astra's review](../../research/records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md#141-birth)), and PR #149's family-split
-  scripts.
-- **First loop: the diagnosis.** On the spent F4 passage (development, already read), report the
-  validation code against the flat stream by family and by component: the trees, sections and part
-  clock, the boundary egg, the request copy, and the charges. No law changes from it.
-- **Law.** A candidate is adopted by the choosing families alone and judged on validation families.
-  Candidates include a bounded or pruned context standing that pays for what it drops, a
-  continuation transport promoted by `π_G P_G > π_C P_C`, and a learned lens under source item 10.
-- **Standing.** Every receipt reports standing bytes per cell read (F4's population kept 11,979).
-  A standing budget is pinned before each run.
-- **Acceptance.** On a fresh development-family split never used for a diagnostic, the charged code
-  is strictly below the flat stream's on the validation families, within the pinned standing and
-  passage budgets.
-- **If it fails.** The byte population remains a compression result, F4's curated release and F5
-  stay closed, and the chase terrain (F6) carries the architecture's tests.
+**The diagnosis** (the first loop, done September 28, re-reading F4's development passage by
+component). On unseen families the population codes the bytes `−2430 + 8/16 + ε` bits below the flat
+tree, half its gain on the choosing families. F4's whole-stream `+1346 + 1/16 + ε` is the cost of the
+section letters and the request pointer, which the flat stream never codes. The rate on unseen agent
+text is about `1 + 12/16` bits a byte, a PPM-class rate: its releases carry real words (580 of 758
+word tokens) and are not yet legible. The standing is 10,983 bytes a cell. The posterior sits wholly
+on the admitted egg, and the trees beyond depth 24 add at most 20 bits.
+
+- **Builds on.** `receiver::population` with its dormancy and fixed share,
+  `compression::landmark::context`, the merges, `Context/Merge.merge_cost_mass_iff`, the hazard ladder
+  and continuation transports ([Astra's review](../../research/records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md#146-gain)),
+  and the family-split scripts.
+- **The comparison.** Like with like. The code of the bytes (and of each response's stop, which a
+  release must predict), given the observed sections, is read against the flat tree on the same
+  bytes. Section letters that a conversation supplies are observed, not predicted, so they are not
+  charged to either side. Whole-stream codes stay reported.
+- **Candidates**, each adopted by the choosing families alone:
+  1. **Drop what carries no share.** Remove the dominated families. The standing falls, at a code
+     cost read exactly.
+  2. **Mix per cell.** Switching among families under the hazard ladder (Astra §14.6), so that
+     each family contributes where it predicts best, instead of a posterior that settles on one.
+  3. **Word contexts.** A cheap word-context family on the byte stream, and continuation transports
+     promoted by `π_G P_G > π_C P_C`.
+  4. **A learned lens** under source item 10.
+- **Standing.** Every receipt reports standing bytes a cell. A standing budget is pinned before each
+  run.
+- **Readings of released text, monitored and never forced** (Brandon, September 28): paired
+  delimiters (quotes, brackets, backticks, bold), valid UTF-8, and the word-shape rate against the
+  choosing vocabulary (`release_legibility.py`). The first releases: 24 texts and 8 typed refusals;
+  580 of 758 word tokens real, against 3,139 of 3,306 in the controls; backticks even in 14 of 24,
+  against 32 of 32.
+- **Acceptance.** On a fresh development-family split never used for a diagnostic, the conditional
+  byte-and-stop code on the validation families is strictly below the flat tree's by a margin
+  pinned before the run, within the standing and passage budgets. The release readings are
+  reported beside it.
+- **If it fails.** The byte population stays a compression result, and F4's curated release and F5
+  wait. The chase terrain (F6) carries the architecture's tests.
 
 ### F1. The word alphabet (campaign 5; #73, #148)
 

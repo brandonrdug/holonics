@@ -1434,3 +1434,30 @@ streams standing and protocol metadata into one owner-only atomic file. At this 
 size its synthetic typed-refusal `Ask` committed in 7,706 ms, replayed without a second Engine
 call, and used 22,323,200 bytes peak RSS in Python. An independent cold restore, live atomic
 protocol transition and full product health/provenance/fibre receipts are still owed.
+
+## F0: the predictor on unseen families, the first diagnosis (September 28)
+
+The [audit and diagnosis](../../records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md)
+re-ran F4's development passage with the standing counted after the passage:
+
+```sh
+cargo run --release -p holonics --example hnn_population -- f4 .local/cuts/curated-f4-passage-cut.bin .local/cuts/curated-f4-passage-flat-cut.bin
+```
+
+It ran in 272,849 ms at a 10,843,217,920-byte peak resident set.
+- **Bytes.** On the validation families the population's bytes code `−2430 + 8/16 + ε` below the flat
+  tree (human `−415 + 1/16`, agent `−2015 + 7/16`). On the choosing families they coded
+  `−4591 + 8/16 + ε`.
+- **Structure.** The whole-stream `+1346 + 1/16 + ε` is the section letters (`3333 + 10/16 + ε`), the
+  request pointer (`402 + 0/16 + ε`) and the charges, none of which the flat stream codes.
+- **Standing.** 11,513,530,863 bytes for the population (10,983 a cell), against 1,358,603,467 for
+  the flat tree (1,298 a cell).
+- **Families.** The posterior sits on the admitted egg alone, and the cell trees beyond depth 24 add
+  at most 20 bits.
+
+`release_legibility.py` reads the diagnostic releases, their retrieval controls and the requests,
+and prints counts only: paired delimiters, the backtick, straight-quote and bold parities, and the
+word-shape rate against the choosing vocabulary. Of the native releases, 24 are texts and 8 are
+typed refusals. 580 of their 758 word tokens are in the choosing vocabulary, against 3,139 of 3,306
+in the controls and 1,817 of 1,932 in the requests. Backticks come out even in 14 of 24 releases,
+against 32 of 32 controls.
