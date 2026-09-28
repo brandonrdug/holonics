@@ -4,7 +4,7 @@
 campaign 1's exposure on the standing real cut does not beat the online order-0 held-out bits
 (#73's receipt: `7 + 9/16 + ε` bits a byte against order-0 KT's `4 + 12/16 + ε`, at the receiver's
 grain `L_R = 16`). The step 4 design's standing real
-cut (review E1, [THE_REBUILD](../../docs/plans/THE_REBUILD.md#d-the-five-campaigns-in-order-reordered-keys-lead))
+cut (review E1, [THE_REBUILD](2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#d-the-five-campaigns-in-order-reordered-keys-lead))
 admits the next campaign only after the failure is recorded with its located cause: source,
 relation, encoding or decoder. This record locates it. It changes no law and proposes no fix; it
 names the missing term in each owner.
@@ -346,8 +346,8 @@ moves, so a better-learned `R` also meets different features.
 (commits `dd67ace6`, `6c2a76ba`, `9322cdf5`, `7a0dbf5b`). Both were superseded by the landmark tree
 ([record](2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md)),
 except Decision 26's indexed, normalized open, which stands in `hnn::moment`; their one-line
-retirements are in THE_REBUILD's [(h) Retired choices](../../docs/plans/THE_REBUILD.md#h-retired-choices), and "Decision N" resolves through its
-[Decisions index](../../docs/plans/THE_REBUILD.md#i-the-decisions-index).
+retirements are in THE_REBUILD's [(h) Retired choices](2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#h-retired-choices), and "Decision N" resolves through its
+[Decisions index](../../docs/plans/THE_REBUILD.md#the-decisions-index).
 
 ### Decision 26
 

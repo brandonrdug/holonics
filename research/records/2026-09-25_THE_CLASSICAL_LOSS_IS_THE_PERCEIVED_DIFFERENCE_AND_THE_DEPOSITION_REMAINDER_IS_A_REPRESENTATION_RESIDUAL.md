@@ -221,7 +221,7 @@ statement about change per permeability and permittivity of the partition I thin
 [historical] The same exact-representation law, applied the same evening to the word's transients
 and inverses (commits `c0415925`, `53db0a8a`, `0b046304`). Moved here verbatim on September 27 from
 THE_REBUILD's former Decision 24; the law stands in `hnn::chart`'s module doc (Lean
-`HNN/LatticeWord`), and "Decision N" resolves through THE_REBUILD's [Decisions index](../../docs/plans/THE_REBUILD.md#i-the-decisions-index).
+`HNN/LatticeWord`), and "Decision N" resolves through THE_REBUILD's [Decisions index](../../docs/plans/THE_REBUILD.md#the-decisions-index).
 
 **Every transient and every inverse inside the HNN is carried on a declared lattice with a
 certified residual.** Measured September 25 on the standing real cut: `6 rem 7 over 10` s per receiving

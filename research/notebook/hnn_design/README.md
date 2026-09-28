@@ -1,7 +1,7 @@
 # HNN design measurements
 
 [established-bounded; measured] The exact-arithmetic scripts behind the measured numbers in the
-[step 4 design](../../../docs/plans/THE_REBUILD.md#step-4-design-the-hnn-law) and its #62 item on
+[step 4 design](../../records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#step-4-design-the-hnn-law) and its #62 item on
 bounded bit growth ("Step 4 (#73) owed"). Every measured value is a `fractions.Fraction` or an exact
 integer, so each number is exact and seeded; `capacity.py` bisects on the exact integer test and
 certifies each `n*` at `n* − 1` and `n*`, with no float anywhere. No script prints a float or a decimal

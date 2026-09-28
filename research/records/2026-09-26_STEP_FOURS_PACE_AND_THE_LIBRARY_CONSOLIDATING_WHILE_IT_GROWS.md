@@ -6,9 +6,9 @@ from THE_REBUILD's former Decision 31 when the Decisions log dissolved into its 
 ([unity audit](2026-09-27_THE_HOLARCHY_AND_ITS_AEONS_ARE_THE_TOP_THE_DECISIONS_DISSOLVE_INTO_THEIR_OWNERS_AND_LEARNING_IS_PROTOTYPED_WHERE_A_HOLARCHY_MADE_THE_TERRAIN.md), #63).
 
 The rules that stand are in THE_REBUILD: the development harness and the law gates in
-"Rules of the rebuild" and [(f) Measurement](../../docs/plans/THE_REBUILD.md#f-measurement); the curation's remaining scope in the Order,
+"Rules of the rebuild" and [(f) Measurement](../../docs/THE_MACHINE.md#measurement); the curation's remaining scope in the Order,
 step 7. The text keeps its original numbering: "Decision N" resolves through THE_REBUILD's
-[Decisions index](../../docs/plans/THE_REBUILD.md#i-the-decisions-index).
+[Decisions index](../../docs/plans/THE_REBUILD.md#the-decisions-index).
 
 ## The direction and its receipts (the former Decision 31)
 

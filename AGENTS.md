@@ -36,7 +36,7 @@ restore wholesale. [THE_REBUILD](docs/plans/THE_REBUILD.md) gives the order.
 ## The line: compression is intelligence is navigation
 
 [project-postulate] Brandon's slogan names the line the repository builds
-([THE_REBUILD](docs/plans/THE_REBUILD.md#the-line-the-rebuild-serves)):
+([THE_MACHINE](docs/THE_MACHINE.md#the-line-the-rebuild-serves)):
 - Holonic Compression couples a fractal navigator's resonating modes with terrain (stuff in
   general).
 - Landmark discovery locates the faces where navigator paths converge.

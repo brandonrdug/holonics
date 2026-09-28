@@ -8,13 +8,13 @@ Where each part now lives:
 - the laws that stand are in `hnn::landmark`'s module doc: the declared stop prior (§1), the
   stop-weight mixture per digit tree (§3), and the storage where paths part (§6);
 - the wide cut and the rule for re-measuring at scale (§4) are in THE_REBUILD's
-  [(f) Measurement](../../docs/plans/THE_REBUILD.md#f-measurement);
+  [(f) Measurement](../../docs/THE_MACHINE.md#measurement);
 - the choices that did not stand (§2, the Born face; §3's landmark-local and switching laws; §5,
   second-arrival founding; the full arena) are one line each in THE_REBUILD's
-  [(h) Retired choices](../../docs/plans/THE_REBUILD.md#h-retired-choices).
+  [(h) Retired choices](2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#h-retired-choices).
 
 The text keeps its original numbering: "Decision N" resolves through THE_REBUILD's
-[Decisions index](../../docs/plans/THE_REBUILD.md#i-the-decisions-index).
+[Decisions index](../../docs/plans/THE_REBUILD.md#the-decisions-index).
 
 ## 1. The stop weight is a declared prior (the former Decision 32)
 

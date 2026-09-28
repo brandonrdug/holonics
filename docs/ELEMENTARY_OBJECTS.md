@@ -164,7 +164,7 @@ collapse to a multiset). Recursive description and branch/address information ar
 compression operands. A navigator runs until its receiver face is within tolerance
 (`ReceiverRelease.Releasable`, `Standing.Extinct`); then it is released and a new one is founded.
 Holonic Compression couples a fractal navigator's resonating modes with terrain
-([the line](plans/THE_REBUILD.md#the-line-the-rebuild-serves)). [definition; agent-inferred] For a
+([the line](THE_MACHINE.md#the-line-the-rebuild-serves)). [definition; agent-inferred] For a
 self-similar navigator with ratios `r_i` its resonating modes in scale are its complex dimensions, the roots of `Σ_i r_i^ω=1`
 (`Foundation/FractalString.selfSimilarZeta_eq`): the real part is a dilation, the imaginary part a
 rotation in the log chart (Cantor: `log 2/log 3 + 2πik/log 3`; the golden string: `2^(−ω)+2^(−φω)=1`).
@@ -886,7 +886,7 @@ Records: [egg packing](../research/records/2026-09-27_EGG_PACKING_THE_MOIRE_OF_T
 ## The targets
 
 [project-postulate] RH, Hodge, complex Euler/Navier–Stokes and BSD are targets of compression and
-landmark discovery ([the line](plans/THE_REBUILD.md#the-line-the-rebuild-serves)), not a
+landmark discovery ([the line](THE_MACHINE.md#the-line-the-rebuild-serves)), not a
 separate category. Their joins to the objects:
 
 [definition] Navier–Stokes: velocity is a coholon, vorticity `du♭`, pressure the exact part,

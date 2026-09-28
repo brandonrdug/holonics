@@ -151,7 +151,7 @@ map is proved equal to the existing `coupledResponse` through identity incidence
 dimensionless rod chart is reusable mathematics; a DNA/material application supplies reference
 strain, stiffness, units, medium and boundary conditions.
 
-[definition] [THE_REBUILD](plans/THE_REBUILD.md#order) orders use of the returned mathematics:
+[definition] [THE_REBUILD](../research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#order) orders use of the returned mathematics:
 compression and landmark discovery (step 3), then the HNN law (step 4). The
 [Lorentzian bounded-ratio review](../research/records/2026-09-12_BOUNDED_LORENTZIAN_RATIOS_JOIN_COEFFICIENT_GAUGES_AND_HODGE_BOUNDS.md)
 connects coefficient log gauges, M-convex affine quotients and Hodge-type Hessian signatures
@@ -879,7 +879,7 @@ Its finite theorem is a local comparison, not a mandate to replace the machine w
 coupled-LC chart.
 
 [project-postulate] “Compression is intelligence is navigation” names the framework's adopted
-construction ([the line](plans/THE_REBUILD.md#the-line-the-rebuild-serves)): couple fractal
+construction ([the line](THE_MACHINE.md#the-line-the-rebuild-serves)): couple fractal
 navigators with terrain, quotient what no admitted receiver distinguishes, and learn reusable
 routes through changing, receiver-relative geometry. Exact
 factorization and generator descent are mathematical theorems at declared scope. A universal

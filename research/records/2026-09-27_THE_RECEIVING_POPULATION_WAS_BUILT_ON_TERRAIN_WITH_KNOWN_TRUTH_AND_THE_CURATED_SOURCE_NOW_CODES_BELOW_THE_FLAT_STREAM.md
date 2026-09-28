@@ -8,7 +8,7 @@ receipts of the commits named in each item.
 **Immediate work (September 27): unity before campaign 3 continues.** The
 [unity audit](2026-09-27_THE_HOLARCHY_AND_ITS_AEONS_ARE_THE_TOP_THE_DECISIONS_DISSOLVE_INTO_THEIR_OWNERS_AND_LEARNING_IS_PROTOTYPED_WHERE_A_HOLARCHY_MADE_THE_TERRAIN.md)
 sets the order:
-1. dissolve the Decisions log into its owners and records (done September 27; [index](../../docs/plans/THE_REBUILD.md#i-the-decisions-index));
+1. dissolve the Decisions log into its owners and records (done September 27; [index](../../docs/plans/THE_REBUILD.md#the-decisions-index));
 2. put the Holarchy and its aeons at the top of `hnn`, with the receiving tree expressed through
    `receiver::standing`, `aeon::Epochs` and the source navigator's words. The tree's part is built
    (September 27): the tree is the shift navigator's landmarks, `compression::landmark::context`

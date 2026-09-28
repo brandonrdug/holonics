@@ -11,7 +11,7 @@ material. The corrected campaign-2 receipt stated this explicitly. Decision 38 j
 consumer rather than adding another isolated resonator.
 
 The law lives in `hnn::ring`'s module doc ("The resonator is loaded at the ring storage port"); it was
-THE_REBUILD's Decision 38 ([index](../../docs/plans/THE_REBUILD.md#i-the-decisions-index)).
+THE_REBUILD's Decision 38 ([index](../../docs/plans/THE_REBUILD.md#the-decisions-index)).
 The existing element produces a wave; the resonator receives it and returns a wave to the next
 junction. The adjoint reverses the same stages. The material family consists of four scalar
 amplitudes on immutable capacity, stiffness, dissipation and pump bases, with phase certification

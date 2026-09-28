@@ -103,7 +103,7 @@ Lean obligations join #62.
 
 ## Compression and landmarks
 
-Read [the line](../../docs/plans/THE_REBUILD.md#the-line-the-rebuild-serves) and step 3 of the
+Read [the line](../../docs/THE_MACHINE.md#the-line-the-rebuild-serves) and step 3 of the
 rebuild, the elementary objects' "Emanation and resonance" and "Keys, locks and navigation", and
 [the compression doctrine](../../docs/canon/TABLET_THE_COMPRESSION.md) (canon, historical).
 

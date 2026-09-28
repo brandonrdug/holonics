@@ -1,12 +1,12 @@
 # HNN formula: the law `holonics::hnn` implements
 
 [project-postulate] This guide states the HNN law. Rebuild step 4 implements it in
-`holonics::hnn`, over aeons ([THE_REBUILD](plans/THE_REBUILD.md#order), #73); step 5 realizes
+`holonics::hnn`, over aeons ([THE_REBUILD](../research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#order), #73); step 5 realizes
 it on the card in `holonics-cuda::hnn`. Both modules implement campaigns 1–2.
 The loaded resonator (`hnn::ring`) supplies its connection and its reached material covector; release through modes,
 Holonic Encoding and joint prediction are the remaining campaign consumers. [THE_MACHINE](THE_MACHINE.md)
 states the object, and the [elementary objects](ELEMENTARY_OBJECTS.md) own the vocabulary.
-The HNN is the compression machine at scale ([the line](plans/THE_REBUILD.md#the-line-the-rebuild-serves)):
+The HNN is the compression machine at scale ([the line](THE_MACHINE.md#the-line-the-rebuild-serves)):
 - its retention is the kernel quotient of Holonic Compression, the future-sufficient quotient
   taken at aeon boundaries;
 - its learning is locating keys: navigator configuration inferred by loop closure;
@@ -687,7 +687,7 @@ flowchart LR
 
 ### The incident word
 
-[definition] **The step 4 word** ([the step 4 design](plans/THE_REBUILD.md#step-4-design-the-hnn-law)).
+[definition] **The step 4 word** ([the step 4 design](../research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#step-4-design-the-hnn-law)).
 - **The medium.** It is `(Θ, λ)`, fixed at the cut. `Θ` holds each ring's standing `q`.
 - **The open.** The word opens at zero change and receives the source moment on the source rings'
   storage ports.
@@ -1106,7 +1106,7 @@ enters the HNN.
 
 [project-postulate] Step 4 builds this law in five campaigns, keys leading. Each campaign has its
 host reference, its Lean laws first, and a test of each law it implements
-([the step 4 design](plans/THE_REBUILD.md#step-4-design-the-hnn-law), (d)):
+([the step 4 design](../research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#step-4-design-the-hnn-law), (d)):
 1. keys, the change on a medium, and the collapse:
    - ring keys located by loop closure;
    - the local tick;

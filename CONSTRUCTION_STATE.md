@@ -1,31 +1,27 @@
 # Construction state
 
-**September 27, during F5's development continuation after the F4/F1/F2 gates.**
-[THE_REBUILD](docs/plans/THE_REBUILD.md) owns the implementation order; each law lives in its guide or
-owner, and THE_REBUILD's [Decisions index](docs/plans/THE_REBUILD.md#i-the-decisions-index) maps the
-former numbered Decisions to them.
+**September 28, under the [unified plan](docs/plans/THE_REBUILD.md#the-unified-plan-september-28).**
+[THE_REBUILD](docs/plans/THE_REBUILD.md) owns the order (U0–U8); each law lives in its guide or owner;
+the [construction record](research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md)
+keeps the steps, campaigns and forward plan it replaced, and THE_REBUILD's
+[Decisions index](docs/plans/THE_REBUILD.md#the-decisions-index) maps the former numbered Decisions.
 The repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
 ## Current construction
 
-| Area | State |
-|---|---|
-| Steps 0–3 | Operator layout, Holarchy/Aeon, compression and landmark owners built; their broader formal obligations remain in #62 |
-| Steps 4–5 (#73, #76) | Host `holonics::hnn` and resident `holonics-cuda::hnn` implement campaigns 1–2, with per-law parity |
-| Campaign 1 | Meets its standing-cut predictive criterion after its repair (the landmark tree, prequential scoring, the likelihood mixture); source moments, local word, comparison, deposition and structural collapse have consumers |
-| Campaign 2 | Ring/contact laws and parity pass; its additional predictive criterion fails. The measured field declares no resonators or boost signatures |
-| Loaded resonator (`hnn::ring`) | Loaded resonator forward/adjoint and material deposition built on host/card; the fixed source-ring family does not improve the standing-cut prediction |
-| Register capacity (`compression::landmark::context`) | A landmark's count register carries at its ceiling `2^c`; the development cells choose `c = 11` at scale; the resident tree takes the carry |
-| F4–F5 run (September 27, PR #149) | F4's pinned validation codes `+1346 + 1/16 + ε` bits above flat on the whole stream; the September 28 diagnosis shows this is the cost of the section letters and request pointer, while on bytes the population is `−2430 + 8/16 + ε` below flat on unseen families. The population's native releases are checked face by face against its own score, emit UTF-8 without copying, and are not yet legible text. F1's exact word law passes a bounded part but exceeds the full work budget, so bytes stay. F2 has one field-only held-out passage; the population family lacks a per-cell field face. F5's product shell (protocol, atomic checkpoint, native standing codecs restoring a 6,256,005,986-byte standing, blind CLI) is built and waits on F0 and F4. Its diagnostic split is spent, and the evaluation partition is closed |
-| F6 reception and action (September 28) | The chase terrain (`holarchy::terrain::chase`) and its candidate runner families: on 16 seeded arenas the selected fibre equals the surviving fibre and holds the truth, within 6 bits of the truth's code and below the landmark tree. The action phase (`holarchy::terrain::pursuit`, `receiver::population::MachineChaser`): the machine reads the runner through that population, commits to captures its fibre's capture basin certifies, and otherwise corners by the runner's viable tube. On the 16 pinned seeds it captures in 164 ticks in sum, against 3,704 for pure pursuit and 366 for constant bearing, and is strictly faster on 10 and 11 seeds. It beats both at once on 7, so the acceptance is not passed under that reading: a control already captures at the truth-only least on 8 of the seeds, so no chaser could exceed 8. The switches are not built |
-| Immediate work | The [forward plan](docs/plans/THE_REBUILD.md#the-forward-plan-september-27), after the [September 28 audit](research/records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md): F0 first: the predictor's rate on unseen families (about `1 + 12/16` bits a byte, releases with real words but not yet legible). The egg alone is adopted (standing 2,653 bytes a cell, from 10,983). Node-local family mixing is measured and not adopted: the gating ladder in space loses on the choosing families, and its time gain (`−298 + 8/16 + ε` validation bits against the egg alone) rides on an undeclared floor at four times the standing. Learned tokens as the alphabet are not adopted; then F4's curated release and F5; F6's chase terrain in parallel; F1 and F2 as improvements; F3 only if the deadline needs the card |
-| Campaign 3 | Mode release, dormant constitution/clock, founding and moment quotient; consumes the loaded ring connection |
-| Campaign 4 (#27) | Existing serial-screw laws need the HNN motor consumer and a motion-recording receipt |
-| Campaign 5 | Holonic Encoding, context, joint prediction and merges priced by their code-length pair |
-| Step 6 | Finite physics K3–K4 complete; target research continues alongside construction; equation extraction #146 remains |
-| Step 7 (#147) | First Lean curation pass and navigator/subject renames complete; short duplicates and named repeated constructions remain |
-| Step 8 (#148) | The Athena-0 development protocol and private blind judging package are built on fixtures; one native diagnostic response path is scored/decoded, and 32 request-only diagnostics ran. Tagged Population/AdmittedEgg standing restores small futures exactly, while the large choosing state needs a memory-bounded atomic file join. Product health, producing-key/fibre receipts and untouched acceptance remain; evaluation is unspent. Workbench and simulator remain. |
+| Part | State | Plan |
+|---|---|---|
+| Foundations (former steps 0–3) | Operator layout, Holarchy/Aeon, compression and landmark owners built; their broader formal obligations in #62 | — |
+| The field (`hnn`, host and card; #73, #76) | Campaigns 1–2 built with per-law parity: source moments, the local word, comparison, deposition, the collapse, rings and contacts, the loaded resonator (`hnn::ring`). Campaign 1 meets its standing-cut criterion through the landmark tree; campaign 2's rings and contacts add no bits; the wave earns `5 − 13/16 − ε` held-out bits through the combined face | U1, U5, U8 |
+| The landmark tree (`compression::landmark::context`) | Earns the measured compression: standing cut `3 + 1/16 + ε` a cell held out, wide cut `1 + 15/16 + ε`; its register carries at `2^11`; host and card | U2 |
+| The population (`receiver::population`) | Codes known-truth terrain at its truth among declared families; the egg alone is F0's byte predictor (`−2430 + 8/16 + ε` against flat on unseen bytes, about `1 + 12/16` bits a byte, standing 2,653 bytes a cell); node-local mixing and learned tokens not adopted; no library owner calls it yet | U1, U2, U3 |
+| Release and product (F4, F5; #148) | F4's views are score-identical; the text-release carrier is incomplete; the releases carry real words and are not legible. F5's product shell is on main and waits on F0 and F4; its diagnostic split is spent; the evaluation partition is closed | U3, U6 |
+| Motion (F6; #27) | The chase: reception at truth on 16 arenas; action captures in 164 ticks in sum against 3,704 (pure pursuit) and 366 (constant bearing), and fails the at-once acceptance; the switches are not built. The motion primitives are proved (`Geometry/Motion`) with no Rust consumer | U4 |
+| Retention | Lean `Foundation/Standing`; Rust `receiver::standing` used only by tests; the two collapses do not use it | U2 |
+| Targets and physics (#146, #20, #22, #23, #32) | Finite physics K3–K4 complete; target research continues alongside construction | U7 |
+| Lean curation (#147) | First pass and renames complete; duplicate owners and retired vocabulary remain | U0, U8 |
+| **Immediate work** | **U0, consolidation, in three workers (Rust; Lean, atlas and #62; guides and indexes); then wave B: U2's contract with F0's memory experiment, U3's contract and U4's rebase** | U0 |
 
 ## Measured receiving faces
 

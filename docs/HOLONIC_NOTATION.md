@@ -140,7 +140,7 @@ faces; a progression retains ordered passages and actual joins. These examples d
 general computational quanta or prescribe their names.
 The [class/occurrence construction](../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md#class-composed-occurrence-and-progression)
 and [music/receiver synthesis](../research/records/2026-09-14_HEAR_THE_MUSIC_SITUATED_RELEASE_AND_SELF_MOTION.md#hear-the-chord-the-interval-and-the-progression)
-retain that example's content. [Compression is intelligence is navigation](plans/THE_REBUILD.md#the-line-the-rebuild-serves)
+retain that example's content. [Compression is intelligence is navigation](THE_MACHINE.md#the-line-the-rebuild-serves)
 concerns the reusable paths and navigators across these different presentations.
 
 ## The same form in every subject

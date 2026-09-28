@@ -6,7 +6,7 @@ Decision 39 when the Decisions log dissolved into its owners ([unity audit](2026
 
 The law stands in `hnn::landmark`'s module doc ("A landmark's storage has a capacity"; Lean
 `HNN/LandmarkCapacity`), and the resident tree takes the carry. The text keeps its original
-numbering: "Decision N" resolves through THE_REBUILD's [Decisions index](../../docs/plans/THE_REBUILD.md#i-the-decisions-index).
+numbering: "Decision N" resolves through THE_REBUILD's [Decisions index](../../docs/plans/THE_REBUILD.md#the-decisions-index).
 
 ## The declaration and the measurement (the former Decision 39)
 

@@ -1,6 +1,6 @@
 # F1: the word-alphabet gate before validation
 
-**Date:** 2026-09-27. **Scope:** [THE_REBUILD F1](../../docs/plans/THE_REBUILD.md#f1-the-word-alphabet-campaign-5-73-148), #73 and #148. This pin precedes word-law fitting or validation.
+**Date:** 2026-09-27. **Scope:** [THE_REBUILD F1](2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#f1-the-word-alphabet-campaign-5-73-148), #73 and #148. This pin precedes word-law fitting or validation.
 
 The exterior split uses the dataset's undivided development occurrence families `(provider, record_group)`, canonicalized as sorted-key compact UTF-8 JSON. `SHA-256(seed || NUL || canonical family)` read as a big-endian integer assigns residue zero modulo five to validation and the other residues to choosing. `seed = holonics-f1-development-families-2026-09-27-v1`. The source SHA-256 is `e1001a7ed0dd03c583ab4ef097f3e243b12680daad05911374b8765107f2f8b2`: 17,957 choosing families and 4,492 validation families. The SHA-256 of the canonical sorted private membership entries is `01830d4c78dfe4a07598501b71ce9c184ed41bfd7b2982186babd08e6eb53566`. The membership is owner-only in `.local/cuts/development-families-f1.json` (directory `0700`, file `0600`); no family key or source text is published. This split is independent of F4's. The evaluation partition remains closed.
 
