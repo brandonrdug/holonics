@@ -483,25 +483,19 @@ on the library; foreign forward graphs and Q/K/V caches are not ported whole.
 
 ## What exists now
 
-[established-bounded; source-inspected] After rebuild step 1 the computational Holon has these
-code owners:
-- `crates/holonics`, exact over `Rat` throughout, in five operator modules:
-  - `ratio`: the undivided pair, rings, the exponentiated/log chart, surprisal, algebraic numbers,
-    polynomials, exact work, primality, and exact linear algebra (`ratio::linear`: inversion with
-    its fibre, inertia, prime images);
-  - `geometry`: complex, frames, screws and pairs, winding, the Swing;
-  - `holon`: law, ports, Dirac, elements, restrictions (tube, tower), deposition, reaction,
-    conformance, the pair contact and serial chain (`holon::contact`), the parametron
-    (`holon::parametron`);
-  - `navigator`: navigators, clocks, phase lifts, transports, lock addresses, trace faces;
-  - `receiver`: faces, release, standing, the causal chord.
-- `crates/holonics-cuda`: the CUDA driver only. The resident HNN is rebuilt there after its law
-  exists in `holonics` (rebuild steps 4–5).
+[established-bounded; source-inspected] The computational Holon's code owners are listed once, in
+the [operator contract](ELEMENTARY_OBJECTS.md#operator-contract), each current owner beside its
+target. The map of the crates:
+- `crates/holonics`, exact over `Rat` throughout, in the ten modules its `lib.rs` names: `ratio`,
+  `geometry`, `holon`, `navigator`, `receiver`, `holarchy`, `aeon`, `compression`, `hnn` and
+  `physics`.
+- `crates/holonics-cuda`: the CUDA driver and the resident HNN (`holonics_cuda::hnn::Resident`),
+  checked in lockstep against the host reference (`hnn/port_tests.rs`).
 - The prototype's resident sections, operative field, coupled body and its wrappers are in
   history ([`hnn`](https://github.com/brandonrdug/holonics/tree/13f8c734/crates/holonics-cuda/src/hnn),
-  [`native_ecology`](https://github.com/brandonrdug/holonics/tree/13f8c734/crates/holonics-cuda/src/native_ecology)). Their laws are stated in
-  [HNN_FORMULA](HNN_FORMULA.md), and they are ported one law at a time under
-  [THE_REBUILD](plans/THE_REBUILD.md).
+  [`native_ecology`](https://github.com/brandonrdug/holonics/tree/13f8c734/crates/holonics-cuda/src/native_ecology)).
+  [HNN_FORMULA](HNN_FORMULA.md) states the laws; a law is ported from there only when
+  [THE_REBUILD](plans/THE_REBUILD.md) needs it.
 
 [definition] A face map need not be injective or reversible: a constant map refutes
 reversibility whenever the retained relation does not distinguish the prior values, and

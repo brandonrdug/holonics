@@ -11,8 +11,8 @@ The [helical guide](HELICAL_GEOMETRY.md) owns the pair geometry, the
 the source recovery behind this synthesis, and [THE_REBUILD](plans/THE_REBUILD.md) the order. A
 **navigator** is the object with an initial configuration, its own clock and carry, and address
 words ([elementary objects §3](ELEMENTARY_OBJECTS.md#3-navigator)); **generator** here keeps its
-algebraic senses (a group generator, the Lie generator of a helix). Lean module names such as
-`NavigatorTraceFaces` keep their spelling until the rebuild renames them.
+algebraic senses (a group generator, the Lie generator of a helix). The navigator's owners carry
+its name (`Transport/NavigatorTraceFaces`, `holonics::navigator`).
 
 [project-postulate] These objects are one picture. A design or a worker brief states which of
 them it touches and keeps the others attached: phase with its carry, a pair with its address,

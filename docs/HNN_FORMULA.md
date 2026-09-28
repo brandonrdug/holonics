@@ -1,11 +1,13 @@
 # HNN formula: the law `holonics::hnn` implements
 
-[project-postulate] This guide states the HNN law. Rebuild step 4 implements it in
-`holonics::hnn`, over aeons ([THE_REBUILD](plans/THE_REBUILD.md#order), #73); step 5 realizes
-it on the card in `holonics-cuda::hnn`. Both modules implement campaigns 1–2.
-The loaded resonator (`hnn::ring`) supplies its connection and its reached material covector; release through modes,
-Holonic Encoding and joint prediction are the remaining campaign consumers. [THE_MACHINE](THE_MACHINE.md)
-states the object, and the [elementary objects](ELEMENTARY_OBJECTS.md) own the vocabulary.
+[project-postulate] This guide states the HNN law. `holonics::hnn` implements it over aeons
+(#73), and `holonics-cuda::hnn` realizes it on the card (#76). The current owners are the
+[operator contract](ELEMENTARY_OBJECTS.md#operator-contract)'s HNN row: the word, deposition and
+the collapse of campaigns 1–2, the loaded resonator (`hnn::ring`), and a loaded ring's mode
+quotient (`hnn::modes`, campaign 3's first construction). Release through modes, Holonic Encoding
+and joint prediction have no owner yet. [THE_MACHINE](THE_MACHINE.md) states the object,
+[THE_REBUILD](plans/THE_REBUILD.md) the order and [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md) the
+position; the [elementary objects](ELEMENTARY_OBJECTS.md) own the vocabulary.
 The HNN is the compression machine at scale ([the line](plans/THE_REBUILD.md#the-line-the-rebuild-serves)):
 - its retention is the kernel quotient of Holonic Compression, the future-sufficient quotient
   taken at aeon boundaries;
@@ -258,7 +260,9 @@ charged. The response is observed conduct, predicted and never scored. The respo
 receiver reads the later human part against the response it follows as a receipt only: an
 observation, never a reward, and never in the family's face. On the agent bytes the population now
 codes `−5936 + 6/16` below the flat stream on development and `−751 + 12/16` held out, against
-`−4068 + 0/16` and `−418 + 3/16` before. The receiver's value with its pointer paid is
+`−4068 + 0/16` and `−418 + 3/16` before. The held-out cells are a later tail of the same
+development families, not unseen families; transfer to unseen families is read separately
+([the forward-plan audit, §2](../research/records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md#2-what-the-receipts-say)). The receiver's value with its pointer paid is
 `−754 + 6/16` and `−173 + 6/16`. The later human return conditioned on its response codes
 `−457 + 11/16` below the unconditioned over 12,391 held-out human bytes. A relation whose target
 lies outside the passage stays unheld: 711 of the 1,393 development agent parts reach a request no
@@ -853,9 +857,12 @@ corrected its outward-normal sign and constant-input normalization domain.
 `p_c=Σ μ_j V_j`; the same attention is `a_i=(Σ_c k_ic p_c)/(Σ_c k_ic m_c)`. The pair
 (mass, current) is associative; normalized means alone are not.
 [AttentionModeCompression](../lean/Holonics/Computation/AttentionModeCompression.lean)
-owns the law. [`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs) constructed an exact finite
-factorization, transports its signed current columns and tests action closure, or returns the
-source-null separator; step 4 binds it to the HNN's operator execution.
+owns the law. The prototype's
+[`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs)
+constructed an exact finite factorization, transported its signed current columns and tested action
+closure, or returned the source-null separator. It is retired: `compression::face_map` (Lean
+`Compression/Core/FaceMap`) owns the face map's kernel and its quotient, and no HNN execution
+consumes it; a loaded ring's future quotient is `hnn::modes` (campaign 3's first construction).
 
 [definition] Convolution shares the transport kernel by relative position; sparse graph transport
 uses actual edges. A fixed SSM `x_next=A x+B u` has output

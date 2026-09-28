@@ -437,9 +437,18 @@ readouts and reconstruction. Neither a filename nor one measured voltage is that
 object. Navigator/constraint representations can retain the required consequences without
 an event archive or perfect reconstruction of every earlier microscopic state.
 
-## The concrete implementation and diagram return
+## The moving receiver's owners and the retired optical control
 
-[established-bounded; implemented-exact] The retired [`geometry::projection`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/projection.rs) exposed
+[established-bounded; source-inspected] **Current owners.** The moving receiver's rate is
+`receiver::reception::FaceMotion` (Lean `Holarchy/Reception.moving_receiver_rate_of_law`): over a
+solved joint step the face's change splits exactly into the source's motion, the receiver's own
+motion and the chart's explicit motion, `Δy = C_S Δx_S + C_R Δx_R + h c`. Boosts on aeon clocks, the
+Lorentz map and the observer current are `physics::spacetime` (`LightCone`, `DopplerBoost`,
+`LorentzMap`; Lean `Physics/Spacetime`). No current owner projects a receiver point through a
+moving chart or assembles the optical diagram below; the moving electromagnetic surface, the
+receiver's material response and their encoding consumers remain owed.
+
+[established-bounded; implemented-exact; history] **The retired optical control.** The retired [`geometry::projection`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/projection.rs) exposed
 `project_receiver_point_rate` for its four projections and `project_point_with_motion` through the
 declared source→receiver route. The latter computes `p_R=Lp+b`, `ṗ_R=Lṗ+L̇p+ḃ`, then the actual
 projection derivative. The chart rates are supplied kinematic operands; two frame snapshots alone
@@ -466,8 +475,7 @@ these returns; it does not supply their I/O direction.
 [definition] The ray example is a local Minkowski specialization with supplied inertial
 motion and null-stress channels. The optical face and moving-aperture entropy are calculated.
 It does not claim a curved ray solution, calibrated photodetector response or a field
-assembly. The full receiver material response, moving EM surface coupling and the corresponding
-encoding consumers remain the integration work named by their equations above.
+assembly.
 
 ## Continuing-field correction
 
