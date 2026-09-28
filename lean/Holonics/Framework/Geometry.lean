@@ -14,6 +14,7 @@ import Holonics.Geometry.PairResonance
 import Holonics.Geometry.ConnectionCalculus
 import Holonics.Geometry.AffineSwing
 import Holonics.Geometry.SwingPotential
+import Holonics.Geometry.Motion
 
 /-!
 # Orientation, scale, constraints, and curved transport
