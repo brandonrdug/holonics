@@ -43,6 +43,7 @@ docstring says otherwise.
 | `hnn_landmark.rs` | The landmark tree (count-only): the depth sweep and prequential passage; `letters`, `prior`, `wide`, `compact`, `capacity` | `cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin` | [below PPM-2](../../records/2026-09-26_THE_LANDMARK_TREE_COMPRESSES_THE_STANDING_CUT_BELOW_PPM_TWO.md), [at scale](../../records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md), [capacity](../../records/2026-09-27_A_LANDMARKS_STORAGE_HAS_A_CAPACITY_AT_ITS_CEILING_IT_CARRIES.md), [campaign 2](../../records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md) |
 | `hnn_population.rs` (with `hnn_population_{composition,evolution,curated,census,u2,birth}.rs`) | The egg population: terrain (`tree`, `moire`, `crib`, `switching`, `standing`), `composition`, `evolution`, `species`, the curated source (`curated`, with `merges`), `f4`, F0's egg (`f0-egg`, `f0-census`), U2's acceptance run (`u2-acceptance`), residual-founded transport discovery (`birth-probe`, `birth`) | `cargo run --release -p holonics --example hnn_population -- <mode>` | [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md), [F4](../../records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md), [the forward plan](../../records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md), [U2's acceptance run](../../records/2026-09-28_U2_F0S_MEMORY_ACCEPTANCE_RUN_PINNED_BEFORE_ITS_SPLIT_IS_READ.md), [residual-founded transport discovery](../../records/2026-09-28_RESIDUAL_FOUNDED_TRANSPORT_DISCOVERY_PINNED_BEFORE_ITS_SEEDS_ARE_READ.md) |
 | `hnn_chase.rs` | F6's chase terrain: the reception phase, the action phase's choosing sweep (`choose`) and its acceptance (`action`, with U4's move reading and U3's release reading); U4's next loop: the failure's diagnosis (`diagnose`) and the fresh population (`fresh`); F6's switches and their attribution (`switches`) | `cargo run --release -p holonics --example hnn_chase` | [the learner must move](../../records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md) (no dedicated record; the receipts below) |
+| `hnn_ring_search.rs` | The ring-search experiment: the bank of HNN rings (`hnn::ring::PumpedRing`) as proposal dynamics for keys on the blind and parity moirés and the rotor crib, against enumeration, menu propagation (`hnn::keys`) and the nonlocking control, all work charged; the basins of the undriven bank against the Stern–Brocot mass law; `bank`, `preflight`, `diagnose <seed>`, `run` | `cargo run --release -p holonics --example hnn_ring_search -- run` | [the rings as a search for keys](../../records/2026-09-28_THE_RINGS_AS_A_SEARCH_FOR_KEYS_PINNED_BEFORE_THE_RUN.md) |
 | `exterior.rs` | The shared exterior boundary the examples include | | |
 | `standing_cut.py` | Pins the standing real cut (`6148`) and the wide cut (`wide 1048576`) | `python3 research/notebook/hnn_design/standing_cut.py 6148` | [campaign 1 meets its criterion](../../records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md), [at scale](../../records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) |
 | `curated_source.py`, `curated_incidence.py` | The curated source, its pinned cut and flat twin; the admitted relations on the cut | `HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/curated_source.py 1048576` | [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md) |
@@ -2608,3 +2609,37 @@ cargo run --release -p holonics --example hnn_population -- birth-dimensions
   has the Hankel rank on all eight.
 - Gates: `cargo check --workspace --all-targets`; `cargo test -p holonics --lib`; `bash
   tools/lean_check.sh Holonics HolonicsResearch`.
+
+### The ring-search experiment (September 28)
+
+Record: [the rings as a search for keys](../../records/2026-09-28_THE_RINGS_AS_A_SEARCH_FOR_KEYS_PINNED_BEFORE_THE_RUN.md)
+(its pin, the run and what it located). #28, #73, #63.
+
+```sh
+cargo run --release -p holonics --example hnn_ring_search -- bank        # the declaration
+cargo run --release -p holonics --example hnn_ring_search -- preflight   # development seeds only
+cargo run --release -p holonics --example hnn_ring_search -- run         # the pinned run, once
+```
+
+The computational object is the helical pair interaction: the rings as complex parametrons whose
+ports are joined by their contacts (neighbours and half-turn partners), carried by their rotors at
+their rates, locking onto sheets past the pump's bifurcation. This loop touches the **helix** (each
+ring's rotor winding with carry, the phase-carried moment), the **pair** (the contacts' coupling and,
+on the crib, the Bombe's wires joined by the menu's stages) and the **cell holonomy** (the Bombe's
+loop closure, and the crib's revisited joint state); faces and placement, the tube and the tower
+thread stay attached.
+
+Pinned at `c2f577f1`, run once (6,887 ms, peak resident 174,500 kB, 24 cores); every passage's
+balance closed (672 moiré, 78 crib, 91 prior), and every certified key was future-equivalent to the
+truth. The work to a certified key, summed over 8 fresh seeds a terrain (a moiré bank with its
+declaration, 3,795,456):
+
+| Terrain | Bank | Nonlocking control | Enumeration | Menu propagation |
+|---|---|---|---|---|
+| Blind moiré | 7 of 8 certified: none | 7 of 8: none | 25,566 | not declared |
+| Parity moiré | 6 of 8: none | 7 of 8: none | 53,017,545 | not declared |
+| Rotor crib | 1,512,813,925 | 1,512,813,925 | 460,880 | 268,218 |
+
+(1) fails on all three terrains. (2) fails: the undriven bank lands on a plural lock in all but
+`[596/2^24, 597/2^24)` of its `2^122` configurations, and its single-rate basins do not follow
+`2^(−ℓ)` (114 ordering violations). The rings are recorded as not a search.

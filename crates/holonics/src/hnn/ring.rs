@@ -109,6 +109,28 @@
 //! pump phases, each with its own operator and chart. A pump of infinite order would give each tick
 //! its own operator; it is not declared.
 //!
+//! [definition; agent-inferred] **The pumped passage** ([`PumpedRing`], [`PumpedPassage`]; the
+//! ring-search experiment's driver, `research/notebook/hnn_design/hnn_ring_search.rs`). A ring's
+//! resonator runs through a declared schedule of [`PumpStage`]s that moves only the pump's strength
+//! (storage, stiffness, dissipation and the pump's axis and step are refused unless shared). Each
+//! stage's operands are solved once at the cut ([`PumpedRing::new`]), every tick is the resonator's
+//! own [`ResonatorOperands::step`] driven through its storage port, and each stage's pump starts at
+//! its phase 0. The sheets of the displacement ([`sheets`]) are read after every tick from a declared
+//! first read: past the bifurcation (`K_t` negative on the axis) the in-phase coordinate grows on its
+//! side and the sheet holds, a lock; unpumped the ring turns and its sheet does not hold. A change of
+//! strength injects `½⟨u, (K_new − K_old) u⟩`, which no tick carries, so the passage closes when
+//! every tick closes and `E_end − E_start = Σ_ticks (pump + port − dissipation + chart + split) +
+//! Σ_switches ½⟨u, (K_new − K_old) u⟩` ([`PumpedPassage::closes`]). Its declared work counts the
+//! motion, not the receipt: a tick `6n² + 15n` on the lattices (`6n² + 6n` exact) at realified width
+//! `n` ([`tick_work`]: three dense products, nine vector operations and three carried splits a
+//! coordinate), a sheet read `2n` ([`read_work`]), and each stage's preparation `n³ + 6n²` plus its
+//! solve, `2n³` exact or `2n³(1 + 3·steps)` for the chart's Newton–Schulz refinement
+//! ([`PumpedRing::solve_work`]). The executed balance each tick forms is not counted. Its consumer's
+//! pinned run found the rings not a search: the bank costs more than enumeration and menu
+//! propagation, its lock proposes nothing its unpumped control does not, and undriven it lands on a
+//! plural lock, not the Stern–Brocot prior
+//! (`research/records/2026-09-28_THE_RINGS_AS_A_SEARCH_FOR_KEYS_PINNED_BEFORE_THE_RUN.md`).
+//!
 //! [proved-derived; implemented-exact] **The clock** ([`RingClock`]). The ring's rotor steps `1/d` of
 //! a turn per micro-step; over a passage of cells its arrivals on its section (the lift's multiples of
 //! `d`) are its epoch ticks, `(r + N)/d` of them from residue `r` after `N` micro-steps
@@ -134,6 +156,7 @@
 //! | `pump_half_turn_invariant`, `pump_blind_to_sheets`, `locked_sheet_receiver_face` | [`PumpDeclaration`], [`sheets`] |
 //! | `loaded_solve_chart_bound`, `loaded_state_split_bound` (with `abs_mulVec_le_rowNorm`, `abs_dot_le_l1`) | [`ResonatorStep::bound`], [`ResonatorStep::closes`] |
 //! | `gain_backtrack_midpoint` | `hnn::constitution::GainBacktrack`, [`ResonatorMaterial::with_gains`] |
+//! | `ring_tick_executed_energy_balance`, `ring_material_commit_work` (the switch's `½⟨u, ΔK u⟩`), `pump_blind_to_sheets` | [`PumpedRing::pass`], [`PumpedPassage::closes`] |
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
@@ -939,6 +962,242 @@ impl ResonatorOperands {
                 rate: rate_remainder,
                 state: [displacement_remainder, velocity_remainder],
             },
+        })
+    }
+}
+
+// -------------------------------------------------------------------------------------------
+// the pumped passage
+
+/// [definition; agent-inferred] **One stage of a pump schedule**: the ring's resonator at the
+/// stage's pump strength, and the ticks it runs. The stages of one passage declare the same storage,
+/// stiffness and dissipation and the same pump axis and step; only the strength moves (module
+/// header, "The pumped passage").
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PumpStage {
+    pub material: ResonatorMaterial,
+    pub ticks: usize,
+}
+
+/// [definition; agent-inferred] **A pumped passage's declared work** (module header): elementary
+/// exact operations, each rational or integer addition, subtraction, multiplication, division,
+/// comparison or carry counted as one, of the solves' construction (`solves`, charged once per
+/// [`PumpedRing`]) and of each passage's dynamics and sheet reads. The executed balance every tick
+/// also forms is the law's receipt, not the motion, and is not counted.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct PassageWork {
+    pub dynamics: u64,
+    pub reads: u64,
+}
+
+impl PassageWork {
+    pub fn total(&self) -> u64 {
+        self.dynamics + self.reads
+    }
+}
+
+/// [definition] **A pumped passage's receipt**: the carried state at its end; the sheets read after
+/// each tick from the declared first read on, in tick order (the lock readout); the ticks run and
+/// those whose executed balance closed ([`ResonatorStep::closes`]); the pump's work at each change of
+/// strength, `½⟨u, (K_new − K_old) u⟩`, which no tick carries; the storage at the start and the end;
+/// the sum of every tick's balance terms; and the declared work.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PumpedPassage {
+    pub state: [Vec<Rat>; 2],
+    pub sheets: Vec<Vec<bool>>,
+    pub ticks: usize,
+    pub closed: usize,
+    pub switch_work: Vec<Rat>,
+    pub start_energy: Rat,
+    pub end_energy: Rat,
+    pub terms: Rat,
+    pub work: PassageWork,
+}
+
+impl PumpedPassage {
+    /// **The passage closes**: every tick's executed balance closes, and the storage telescopes
+    /// across the stages, `E_end − E_start = Σ_ticks (pump + port − dissipation + chart + split) +
+    /// Σ_switches ½⟨u, (K_new − K_old) u⟩`.
+    pub fn closes(&self) -> bool {
+        self.closed == self.ticks
+            && &self.end_energy - &self.start_energy
+                == &self.terms + self.switch_work.iter().sum::<Rat>()
+    }
+}
+
+/// [definition; agent-inferred] **A ring's resonator prepared for pumped passages** (module header):
+/// each stage's operands at the cut, solved once (the exact inverse, or the word lattice's chart),
+/// the pump's axis whose sheets are read, and the declared work of that preparation.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PumpedRing {
+    ring: usize,
+    stages: Vec<(ResonatorOperands, usize)>,
+    axis: Carrier,
+    transient: Option<Lattice>,
+    solve_work: u64,
+}
+
+/// The declared work of one tick's dynamics at width `n` (module header): three dense
+/// matrix–vector products `6n² − 3n`, the vector operations `9n`, and on the lattice the three
+/// carried splits `9n`.
+pub fn tick_work(width: usize, lattice: bool) -> u64 {
+    let n = width as u64;
+    6 * n * n - 3 * n + if lattice { 18 * n } else { 9 * n }
+}
+
+/// The declared work of reading one tick's sheets at width `n`: two products, a sum and a
+/// comparison a node.
+pub fn read_work(width: usize) -> u64 {
+    2 * width as u64
+}
+
+impl PumpedRing {
+    /// **Prepare a ring's pumped passages** (module header): every stage certified and solved at the
+    /// cut. Refused without a stage, without a declared pump (its axis reads the sheets, at zero
+    /// strength or above), or when two stages differ in anything but the pump's strength.
+    pub fn new(
+        ring: usize,
+        admittance: &Rat,
+        hop: &Rat,
+        lattice: Option<&WordLattice>,
+        stages: &[PumpStage],
+    ) -> Result<Self, HnnError> {
+        let first = stages.first().ok_or(HnnError::Resonator {
+            ring,
+            what: "a pumped passage has at least one stage",
+        })?;
+        let undeclared = || HnnError::Resonator {
+            ring,
+            what: "a pumped passage declares its pump (its axis reads the sheets), at zero strength or above",
+        };
+        let declared = first.material.pump().ok_or_else(undeclared)?;
+        for stage in stages {
+            let pump = stage.material.pump().ok_or_else(undeclared)?;
+            if stage.material.forms() != first.material.forms()
+                || pump.axis() != declared.axis()
+                || pump.step() != declared.step()
+            {
+                return Err(HnnError::Resonator {
+                    ring,
+                    what: "a pumped passage's stages share the storage, stiffness, dissipation and the pump's axis and step; only the strength moves",
+                });
+            }
+        }
+        let n = first.material.width() as u64;
+        let mut solve_work = 0u64;
+        let mut prepared = Vec::with_capacity(stages.len());
+        for stage in stages {
+            let operands =
+                ResonatorOperands::at_cut(ring, &stage.material, admittance, hop, lattice)?;
+            // Per pump phase: the certificate's elimination n³, forming the operator 6n², and the
+            // solve: the exact inverse 2n³, or the chart's (1 + 3·steps) products of 2n³.
+            for phase in 0..operands.phases() {
+                let solve = match operands.charts().get(phase) {
+                    Some(reading) => 2 * n * n * n * (1 + 3 * u64::from(reading.steps)),
+                    None => 2 * n * n * n,
+                };
+                solve_work += n * n * n + 6 * n * n + solve;
+            }
+            prepared.push((operands, stage.ticks));
+        }
+        Ok(Self {
+            ring,
+            stages: prepared,
+            axis: declared.axis().clone(),
+            transient: lattice.map(WordLattice::transient),
+            solve_work,
+        })
+    }
+
+    pub fn ring(&self) -> usize {
+        self.ring
+    }
+
+    /// The realified width.
+    pub fn width(&self) -> usize {
+        self.stages[0].0.width()
+    }
+
+    /// The ticks of one passage: every stage's.
+    pub fn ticks(&self) -> usize {
+        self.stages.iter().map(|(_, ticks)| ticks).sum()
+    }
+
+    /// The declared work of the preparation (module header).
+    pub fn solve_work(&self) -> u64 {
+        self.solve_work
+    }
+
+    /// **One pumped passage** (module header) from `initial = [u, w]`: at every tick `t` the drive
+    /// `drive(t)` enters the ring's storage port and the stage's operands tick it (each stage's pump
+    /// from its phase 0), the sheets of `u` are read after every tick from `first_read` on, and each
+    /// change of stage books the pump's work on the carried state.
+    pub fn pass(
+        &self,
+        initial: [Vec<Rat>; 2],
+        first_read: usize,
+        mut drive: impl FnMut(usize) -> Vec<Rat>,
+    ) -> Result<PumpedPassage, HnnError> {
+        let n = self.width();
+        if initial[0].len() != n || initial[1].len() != n {
+            return Err(HnnError::Shape {
+                what: "a pumped passage's initial state (the ring's realified width)",
+                expected: n,
+                found: initial[0].len().min(initial[1].len()),
+            });
+        }
+        let lattice = self.transient.is_some();
+        let mut state = initial;
+        let mut remainders = ResonatorRemainders::zero(n);
+        let start_energy = self.stages[0].0.energy_at(0, &state[0], &state[1])?;
+        let mut work = PassageWork::default();
+        let (mut terms, mut switch_work) = (Rat::zero(), Vec::new());
+        let (mut sheets_read, mut closed, mut tick) = (Vec::new(), 0usize, 0usize);
+        let mut last: Option<(&ResonatorOperands, usize)> = None;
+        for (operands, ticks) in &self.stages {
+            if let Some((previous, phase)) = last {
+                let before = previous.energy_at(phase, &state[0], &state[1])?;
+                switch_work.push(operands.energy_at(0, &state[0], &state[1])? - before);
+            }
+            for local in 0..*ticks {
+                let beta = drive(tick);
+                let step = operands.step(
+                    local,
+                    &beta,
+                    [&state[0], &state[1]],
+                    &remainders,
+                    self.transient.as_ref(),
+                )?;
+                work.dynamics += tick_work(n, lattice);
+                closed += usize::from(step.closes());
+                terms += &step.pump + &step.port - &step.dissipation + &step.chart + &step.split;
+                remainders = step.remainders().clone();
+                state = step.state;
+                if tick >= first_read {
+                    sheets_read.push(sheets(&state[0], &self.axis));
+                    work.reads += read_work(n);
+                }
+                tick += 1;
+            }
+            let phase = if *ticks == 0 {
+                0
+            } else {
+                operands.phase_at(ticks - 1)
+            };
+            last = Some((operands, phase));
+        }
+        let (operands, phase) = last.expect("a prepared ring has a stage");
+        let end_energy = operands.energy_at(phase, &state[0], &state[1])?;
+        Ok(PumpedPassage {
+            state,
+            sheets: sheets_read,
+            ticks: tick,
+            closed,
+            switch_work,
+            start_energy,
+            end_energy,
+            terms,
+            work,
         })
     }
 }
