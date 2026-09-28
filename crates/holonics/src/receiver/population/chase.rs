@@ -119,11 +119,21 @@ impl ChaseFamily {
         family: &RunnerFamily,
         escape: u32,
     ) -> Result<Vec<Box<dyn Family>>, PopulationError> {
+        Self::declare_on(&chase.ports, family, escape)
+    }
+
+    /// **Every candidate of the family** over a chase's ports, read as the chaser writes its port
+    /// (the action phase: the machine's own population, `receiver::population::chaser`).
+    pub fn declare_on(
+        ports: &Arc<ChasePorts>,
+        family: &RunnerFamily,
+        escape: u32,
+    ) -> Result<Vec<Box<dyn Family>>, PopulationError> {
         let description = family.description();
         (0..family.len())
             .map(|index| {
                 Ok(Box::new(Self::new(
-                    Arc::clone(&chase.ports),
+                    Arc::clone(ports),
                     family.candidate(index)?,
                     index,
                     family.len() as u64,

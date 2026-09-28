@@ -1633,3 +1633,138 @@ not move to whole words.**
   letters, at `970145 + 1/16 + ε`. The token tree's bytes alone lie above that, at
   `1031705 + 10/16 + ε`.
 - F0's byte code stays the admitted egg's.
+
+## F6 chase terrain: the action phase (September 28)
+
+```sh
+cargo run --release -p holonics --example hnn_chase -- choose                         # stage 1
+cargo run --release -p holonics --example hnn_chase -- choose 2 12 0,1,4,16,64,256    # stage 2
+cargo run --release -p holonics --example hnn_chase -- action                         # acceptance
+cargo test -p holonics --lib holarchy::terrain::chase_tests
+```
+
+In this phase the machine chases (THE_REBUILD F6; campaign 4, #27, #148).
+`holarchy::terrain::pursuit` holds the terrain's laws for this phase: the chaser's capture reach,
+the runner's viable tube, the capture basin over a fibre of candidate runners, the `Chaser` port,
+the two controls and the passage. `receiver::population::chaser::MachineChaser` is the machine. It
+reads the runner through the reception's population (`ChaseFamily`, escape `2^(−12)`), which reads
+the chaser's live motion port (`ChaserPort`) as the chaser writes it. Every chaser has speed `3/2`
+and traction `2`. It can always stop (`⌊v_C²⌋ = 2` is at most every class cap: 4, 16 and 36), and
+`act` refuses any motion outside its traction-admitted set. The computational object is the helical
+pair interaction: the runner and the chaser form a pair whose contact quadrance the chaser closes,
+each meeting the friction field at its ground contact. The owners touch the pair, faces and
+placement, the tube and the tower thread; the helix and the cell holonomy stay attached.
+
+[definition; agent-inferred] **The laws** (the owners' headers state them in full).
+- **The viable tube**, the cornering reading. The chaser's capture reach `D_k` is every position
+  some chaser word of `k` ticks captures. The runner's forward viable reach is
+  `F_(k+1) = Post(F_k) ∖ D_(k+1)`, and its kernel is the Pre recursion backward,
+  `K_n = F_n, K_k = F_k ∩ Pre(K_(k+1))`. The reading is `|K₁| + … + |K_n|`, counted in runner motions
+  `(x, v)`.
+- **The capture basin over a fibre.** The fibre splits by each member's cell into observation classes.
+  A class's value is `0` at capture, and otherwise `1 + min_u max_(class′)` of the value one tick
+  deeper, up to the horizon `m`. A memo of belief nodes keeps it cheap: on the truth alone, depth 11
+  took 10,552 nodes and 9 ms.
+- **The machine.** Its fibre is the population's selected fibre.
+  - It commits to a capture the basin certifies in the fewest ticks. Otherwise it commits to the
+    move whose fibre-summed viable tube at `n` is least, breaking ties by nearness.
+  - It probes only while the fibre is plural, where a move carries strictly more
+    `I(Θ; Y_t, Y_(t+1) | do(u))` than the commit (compared exactly as `∏|c|^|c|`) and concedes at
+    most `d` tube states a member.
+  - Each tick records the release, the fibre's size, the certified bound and whether the leading
+    class's predicted cell unfolded.
+- **The controls.** Pure pursuit takes the admitted motion nearest the runner's present position.
+  Constant bearing holds a collision course: approaching motions first (`⟨r, ṙ⟩ < 0`), then the least
+  `|det(r, ṙ)|`, then the most closing, reading the runner as keeping its velocity.
+
+**Choosing** (the choosing seeds `20261001 + s`, `s < 16`). The rule is the least sum of capture
+ticks (an uncaptured passage counts its cap of 512), then the most seeds won against both controls,
+then the least work. On these seeds pure pursuit sums 4,668 and constant bearing 240.
+
+| Stage 1: the machine's sum (work) | `m = 4` | `m = 8` | `m = 12` | `m = 16` |
+|---|---|---|---|---|
+| `n = 2` | 1,157 (2,673 ms) | 159 (1,794 ms) | **150 (14,015 ms)** | 150 (55,211 ms) |
+| `n = 3` | 1,157 (2,940 ms) | 154 (1,816 ms) | 150 (13,779 ms) | 150 (54,492 ms) |
+| `n = 4` | 158 (969 ms) | 153 (2,123 ms) | 150 (14,053 ms) | 150 (56,726 ms) |
+
+- The rungs at `m ≥ 12` tie at 150 with the same passages, so least work chooses `n = 2, m = 12`. A
+  basin of 4 ticks certifies too late: the machine then follows pure pursuit's path and ties it.
+- Stage 2, `d ∈ {0, 1, 4, 16, 64, 256}` at `n = 2, m = 12`: every rung is the same 150, and no probe
+  fires. At every plural tick either every admitted move carries the same one-tick information or
+  the commit is already among the most informative. So `d = 0`.
+- On the choosing seeds the machine wins 9 against pure pursuit and 7 against constant bearing. The
+  choice used the machine's own sum, which the controls do not enter.
+
+**Acceptance** (seeds `20260927 + s`, `s < 16`, the reception's draw). Capture ticks are listed for
+the machine, pure pursuit and constant bearing, then the truth-only basin's least capture from the
+opening. That least is the least any chaser can reach knowing the runner's law, read to the machine's
+own capture. The next column is the viable tube at horizon 4 under the truth, summed over the ticks
+before the seed's first capture. The last column is the runner's slips, as onsets/slipping ticks.
+
+| Seed | Truth | Machine | Pursuit | Bearing | Least | Tube before first capture | Slips |
+|---|---|---|---|---|---|---|---|
+| 20260927 | `[14]` v 2, γ 3/2, hold 2, circle ccw | 5 | 5 | 5 | 5 | 2291 / 2291 / 2538 | 0/0, 0/0, 0/0 |
+| 20260928 | `[19]` v 3, γ 3/2, hold 1, circle cw | 16 | none | 35 | 14 | 9176 / 13138 / 11001 | 0/0, 40/40, 2/2 |
+| 20260929 | `[23]` v 3, γ 3/2, hold 2, circle cw | 11 | none | 11 | 10 | 8599 / 10694 / 9324 | 0/0, 0/0, 0/0 |
+| 20260930 | `[10]` v 2, γ 3/2, hold 1, circle ccw | 12 | none | 11 | 11 | 5455 / 5551 / 5564 | 0/0, 0/0, 0/0 |
+| 20260931 | `[36]` v 2, γ 1, hold 2, zig-zag 3 | 14 | none | 13 | 13 | 3827 / 4163 / 4258 | 1/2, 24/37, 1/2 |
+| 20260932 | `[26]` v 2, γ 3/2, hold 1, zig-zag 2 | 4 | 17 | 42 | 4 | 13 / 167 / 151 | 0/0, 0/0, 0/0 |
+| 20260933 | `[14]` v 2, γ 3/2, hold 2, circle ccw | 10 | none | 11 | 4 | 1011 / 2716 / 2211 | 0/0, 0/0, 0/0 |
+| 20260934 | `[39]` v 3, γ 3/2, hold 2, zig-zag 3 | 9 | none | 88 | 9 | 9707 / 15043 / 15731 | 0/0, 15/29, 5/7 |
+| 20260935 | `[37]` v 3, γ 1, hold 2, zig-zag 3 | 9 | 9 | 15 | 9 | 3530 / 3884 / 7270 | 0/0, 0/0, 0/0 |
+| 20260936 | `[29]` v 3, γ 1, hold 2, zig-zag 2 | 10 | 10 | 33 | 10 | 3299 / 3961 / 4206 | 2/3, 2/3, 3/5 |
+| 20260937 | `[7]` v 3, γ 3/2, hold 2, flee | 10 | none | 26 | 10 | 7873 / 11046 / 14248 | 0/0, 0/0, 0/0 |
+| 20260938 | `[1]` v 3, γ 1, hold 1, flee | 11 | 11 | 14 | 11 | 2390 / 2390 / 4212 | 0/0, 0/0, 0/0 |
+| 20260939 | `[35]` v 3, γ 3/2, hold 1, zig-zag 3 | 12 | 12 | 13 | 12 | 13837 / 13850 / 14456 | 0/0, 0/0, 1/1 |
+| 20260940 | `[39]` v 3, γ 3/2, hold 2, zig-zag 3 | 13 | 30 | 17 | 13 | 7380 / 7724 / 11472 | 0/0, 1/1, 0/0 |
+| 20260941 | `[15]` v 3, γ 3/2, hold 2, circle ccw | 5 | 5 | 5 | 5 | 9548 / 9548 / 9697 | 0/0, 0/0, 0/0 |
+| 20260942 | `[37]` v 3, γ 1, hold 2, zig-zag 3 | 13 | 21 | 27 | 13 | 13118 / 14702 / 17105 | 1/2, 1/2, 2/4 |
+
+- **Sums.** Capture ticks: the machine 164, pure pursuit 3,704, constant bearing 366 ("none" counts
+  512). The tube before each first capture sums to 101,054, 120,868 and 133,444. Over whole
+  passages it sums to 101,054, 2,750,616 and 227,295. The runner's slips are (4, 7), (83, 112) and
+  (14, 21), with 9, 151 and 19 wall meetings.
+- **Seeds won.** The machine is strictly faster on 10 seeds against pure pursuit, on 11 against
+  constant bearing and on 7 against both at once. It reaches the truth-only least on 11.
+- **The machine's releases.** 152 certified, 11 commits and 1 probe (on seed 20260942). The leading
+  class's predicted cell missed on 21 of its 164 ticks.
+- **Verdict: not passed** under the at-once reading (7 of 16). It passes in sum and against each
+  control separately (10 and 11 of 16).
+- [measured] **No chaser can pass the at-once reading on these seeds.** On 8 seeds (20260927,
+  20260930, 20260931, 20260935, 20260936, 20260938, 20260939 and 20260941) a control already
+  captures at the truth-only least, so no chaser beats both there. That leaves 8 seeds, which is not
+  more than half, and the machine takes 7 of them. It misses 20260929, at 11 ticks against the least
+  of 10 and bearing's 11.
+- **Where the machine misses the least** (5 seeds: 20260928, 20260929, 20260930, 20260931 and
+  20260933), it plans robustly over the opening's wide fibre. On 20260933 it certified capture within
+  10 ticks over all 40 candidates at tick 0, while the truth alone is caught in 4.
+- **The cornering receipt, tick by tick**, on 20260937 (the flee runner):
+
+  | Chaser | The tube at horizon 4, ticks 0 to 11 | Capture |
+  |---|---|---|
+  | The machine | 3203 1589 590 1067 727 423 168 106 0 0 | tick 10 |
+  | Pure pursuit | 3203 1589 590 1067 727 423 168 239 1199 1841 1990 80 … | none by 512 |
+  | Constant bearing | 3203 1667 725 1891 1708 1528 1307 1056 740 423 168 106 … | tick 26 |
+
+  Pure pursuit shares the machine's first seven ticks. It then lets the runner out while the machine
+  closes the tube to zero, cornering it two ticks before capture. `action trace` prints every
+  passage this way.
+- **The control was corrected before this verdict.** The first acceptance run's constant bearing
+  ordered `|det(r, ṙ)|` before approach. Against a runner at rest, resting nulls the rotation, so it
+  stood still: its tube held at 1985 for hundreds of ticks on 20260937, and it summed 4,934 capture
+  ticks. Against that control the machine won 12 of 16 and 6 at once, with the same verdict. The
+  correction follows §14.4 ("approach also needs `⟨r, ṙ⟩ < 0`") and strengthens the control.
+- **Resources.** The acceptance run took 18,055 ms at a 249,788 kB peak resident set. Each seed's
+  machine passage took 108 to 2,875 ms. Stage 1 took 220,727 ms at a
+  510,580 kB peak, and stage 2 took 83,171 ms at 256,012 kB.
+- **Tests** (`chase_tests.rs`, under a second together):
+  - the tube's `F_k` and `K_k` equal a brute-force enumeration of runner and chaser words on a
+    `6 × 6` arena at `n = 3`, over four cases: two constitutions, a held slip, and one cornered
+    runner;
+  - every motion the machine and both controls release satisfies the traction bound in ℚ on the cell
+    it left, within the speed bound and inside the arena;
+  - the machine's certified captures are kept;
+  - a chaser outside its bound is refused;
+  - the controls' laws.
+- **Not built.** The switches: the lag channel, and three observation channels with loop-closure
+  attribution. THE_REBUILD F6 records the owed Lean.

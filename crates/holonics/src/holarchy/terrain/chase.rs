@@ -1,7 +1,9 @@
 //! **The chase terrain: a fast runner on a bounded exact arena, its motion read as cells** (THE_REBUILD
 //! F6; the record `2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_…`, §13 and §14.4; campaign 4,
-//! #27, #148). The reception phase only: the machine reads the runner's passage and selects its
-//! constitution; the chaser here is a declared scripted pursuer, never the machine.
+//! #27, #148). The reception phase: the machine reads the runner's passage and selects its
+//! constitution, the chaser here a declared scripted pursuer. The action phase, where the machine
+//! chases, is `holarchy::terrain::pursuit` (and `receiver::population::chaser`); it reads this
+//! terrain's arena, runner and ports, and the same draw ([`Chase::drawn`]).
 //!
 //! [definition; agent-inferred] **The arena** ([`ArenaDeclaration`], [`Arena`]). A bounded lattice
 //! `[0, W) × [0, H)` of integer positions, spacing `ℓ` and tick `h`, under gravity `g`, all declared
@@ -60,7 +62,7 @@
 //! own constitution on its own cell (it never demands beyond its traction, so it never slips; with
 //! no admitted change it meets the wall law). It is slower and of larger traction than the runner
 //! (the record: `v_C < v_R`), refused otherwise. It moves the runner's context; it is not the
-//! machine, whose action phase is not built here. **Capture** (the record's §13) is the pair's
+//! machine, whose action phase is `holarchy::terrain::pursuit`. **Capture** (the record's §13) is the pair's
 //! quadrance at most the declared `ρ²`, `Q = ⟨x_R − x_C, x_R − x_C⟩ ≤ ρ²`; the chase, and so the
 //! passage, ends at the first tick it holds (after it the two would stand locked and every candidate
 //! would read alike).
@@ -103,7 +105,7 @@
 //! is declared, no gluing is read) stay attached.
 
 use std::collections::BTreeMap;
-use std::sync::Arc;
+use std::sync::{Arc, PoisonError, RwLock};
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{Signed, ToPrimitive};
@@ -120,11 +122,11 @@ pub fn quadrance(p: Point) -> i64 {
     p[0] * p[0] + p[1] * p[1]
 }
 
-fn add(a: Point, b: Point) -> Point {
+pub(super) fn add(a: Point, b: Point) -> Point {
     [a[0] + b[0], a[1] + b[1]]
 }
 
-fn sub(a: Point, b: Point) -> Point {
+pub(super) fn sub(a: Point, b: Point) -> Point {
     [a[0] - b[0], a[1] - b[1]]
 }
 
@@ -146,7 +148,7 @@ pub const MOVE_CAP_LIMIT: i64 = 1 << 12;
 
 /// `⌊b⌋` of a nonnegative rational bound: an integer quadrance `q` meets `q ≤ b` exactly when
 /// `q ≤ ⌊b⌋` (an identity on the integers, not a rounding).
-fn floor_cap(bound: &Rat) -> Result<i64, TerrainError> {
+pub(super) fn floor_cap(bound: &Rat) -> Result<i64, TerrainError> {
     if bound.is_negative() {
         return Err(refuse("a quadrance bound", "it is nonnegative"));
     }
@@ -752,10 +754,10 @@ impl Pursuer {
         Rat::from_integer(BigInt::from(quadrance(sub(runner, chaser)))) <= self.capture
     }
 
-    /// **Its admitted next motions** from a motion: every change its traction admits on its cell,
-    /// within its speed bound, keeping it inside, in canonical order of the change; the wall law's
-    /// motion alone when none does.
-    pub fn admitted(
+    /// **Its traction-admitted next motions** from a motion: every change its traction admits on
+    /// its cell, within its speed bound, keeping it inside, in canonical order of the change; none
+    /// when no change does.
+    pub fn motions(
         &self,
         arena: &Arena,
         disk: &Moves,
@@ -765,7 +767,7 @@ impl Pursuer {
         let class = arena
             .class(motion.position)
             .ok_or_else(|| refuse("a pursuer's position", "it lies in the arena"))?;
-        let next: Vec<Motion> = disk
+        Ok(disk
             .vectors()
             .iter()
             .filter(|&&change| quadrance(change) <= caps.classes[class])
@@ -776,12 +778,33 @@ impl Pursuer {
                 velocity,
             })
             .filter(|next| arena.inside(next.position))
-            .collect();
+            .collect())
+    }
+
+    /// **Its admitted next motions** from a motion: its traction-admitted motions
+    /// ([`Pursuer::motions`]); the wall law's motion alone when none does.
+    pub fn admitted(
+        &self,
+        arena: &Arena,
+        disk: &Moves,
+        caps: &Caps,
+        motion: &Motion,
+    ) -> Result<Vec<Motion>, TerrainError> {
+        let next = self.motions(arena, disk, caps, motion)?;
         Ok(if next.is_empty() {
             vec![arena.wall(motion)]
         } else {
             next
         })
+    }
+
+    /// [proved-derived] **Whether it can always stop**: its speed cap is at most its least class
+    /// cap. Then from every motion within its speed bound the change `−v` to rest is admitted on
+    /// every cell and keeps it where it stands, so its traction-admitted motions are never empty
+    /// and it never meets the wall law: every motion it emits satisfies its traction bound.
+    pub fn stops(&self, declaration: &ArenaDeclaration) -> Result<bool, TerrainError> {
+        let caps = self.constitution.caps(declaration)?;
+        Ok(caps.classes.iter().all(|&cap| caps.speed <= cap))
     }
 
     /// **Pure pursuit**: the admitted next motion whose position is nearest the target in
@@ -896,17 +919,78 @@ impl RunnerFamily {
 // -------------------------------------------------------------------------------------------
 // the chase
 
-/// [definition] **The receiver's ports on a chase**: the arena, the move alphabet, the pursuer's
-/// motions at every tick of the passage and the one after it (the admitted action port), and the
-/// runner's opening motion. The cells are the runner's; these are what the receiver reads beside
-/// them.
+/// [definition] **The receiver's ports on a chase**: the arena, the move alphabet, the chaser's
+/// motion port (the admitted action port) and the runner's opening motion. The cells are the
+/// runner's; these are what the receiver reads beside them.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ChasePorts {
     pub arena: Arena,
     pub moves: Moves,
-    pub chaser: Vec<Motion>,
+    pub chaser: ChaserPort,
     pub opening: Motion,
 }
+
+/// [definition; agent-inferred] **The chaser's motion port**: the chaser's motion at each tick,
+/// in tick order. In the reception phase the scripted pursuer's motions at every tick of the
+/// passage and the one after it are written whole before any reading. In the action phase
+/// (`holarchy::terrain::pursuit`) the chaser writes its motion at each tick as it stands there,
+/// and the receiver reads the tick it has reached: a port is written by its Holon and read by the
+/// receiver joined to it, so it is appended through a shared handle. A clone copies the motions
+/// (a value, never a second writer); equality compares them.
+#[derive(Debug, Default)]
+pub struct ChaserPort(RwLock<Vec<Motion>>);
+
+impl ChaserPort {
+    /// A port holding these motions.
+    pub fn new(motions: Vec<Motion>) -> Self {
+        Self(RwLock::new(motions))
+    }
+
+    fn read(&self) -> std::sync::RwLockReadGuard<'_, Vec<Motion>> {
+        self.0.read().unwrap_or_else(PoisonError::into_inner)
+    }
+
+    /// The chaser's motion at a tick, none past the ticks written.
+    pub fn get(&self, tick: usize) -> Option<Motion> {
+        self.read().get(tick).copied()
+    }
+
+    /// The ticks written.
+    pub fn len(&self) -> usize {
+        self.read().len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.read().is_empty()
+    }
+
+    /// **Write the chaser's motion at the next tick.**
+    pub fn push(&self, motion: Motion) {
+        self.0
+            .write()
+            .unwrap_or_else(PoisonError::into_inner)
+            .push(motion);
+    }
+
+    /// The motions written, in tick order.
+    pub fn motions(&self) -> Vec<Motion> {
+        self.read().clone()
+    }
+}
+
+impl Clone for ChaserPort {
+    fn clone(&self) -> Self {
+        Self::new(self.motions())
+    }
+}
+
+impl PartialEq for ChaserPort {
+    fn eq(&self, other: &Self) -> bool {
+        *self.read() == *other.read()
+    }
+}
+
+impl Eq for ChaserPort {}
 
 /// [definition] **The chase's exact truth receipt** (module header).
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -1028,7 +1112,7 @@ impl Chase {
             ports: Arc::new(ChasePorts {
                 arena,
                 moves,
-                chaser: chasers,
+                chaser: ChaserPort::new(chasers),
                 opening,
             }),
             cells,
@@ -1060,6 +1144,21 @@ impl Chase {
         ticks: usize,
         seed: u64,
     ) -> Result<Self, TerrainError> {
+        let (index, arena, openings) = Self::drawn(declaration, family, seed)?;
+        let mut chase = Self::run(arena, family, index, pursuer, openings, ticks)?;
+        chase.truth.seed = Some(seed);
+        Ok(chase)
+    }
+
+    /// **A seed's drawn key** (module header): the candidate's index uniform on the family, the
+    /// arena with each patch's class uniform, and the openings (the runner's position uniform, the
+    /// chaser's uniform on the others). The action phase (`holarchy::terrain::pursuit`) reads the
+    /// same draw, so a seed names the same runner, arena and openings in both phases.
+    pub fn drawn(
+        declaration: &ArenaDeclaration,
+        family: &RunnerFamily,
+        seed: u64,
+    ) -> Result<(usize, Arena, [Point; 2]), TerrainError> {
         if family.is_empty() {
             return Err(refuse(
                 "a runner family",
@@ -1075,10 +1174,11 @@ impl Chase {
         if chaser >= runner {
             chaser += 1;
         }
-        let openings = [declaration.position(runner), declaration.position(chaser)];
-        let mut chase = Self::run(arena, family, index, pursuer, openings, ticks)?;
-        chase.truth.seed = Some(seed);
-        Ok(chase)
+        Ok((
+            index,
+            arena,
+            [declaration.position(runner), declaration.position(chaser)],
+        ))
     }
 
     /// **A candidate's replay** (module header): at each tick its law's cell read from the observed
@@ -1088,6 +1188,13 @@ impl Chase {
         let ports = &self.ports;
         let caps = runner.constitution.caps(ports.arena.declaration())?;
         let mut state = RunnerState::opening(&ports.arena, ports.opening.position)?;
+        let chaser = ports.chaser.motions();
+        if chaser.len() < self.cells.len() {
+            return Err(refuse(
+                "a chase's ports",
+                "the chaser's port holds every tick of the passage",
+            ));
+        }
         let mut contradictions = Vec::new();
         for (tick, &cell) in self.cells.iter().enumerate() {
             let own = runner.cell(
@@ -1095,7 +1202,7 @@ impl Chase {
                 &ports.moves,
                 &caps,
                 &state,
-                ports.chaser[tick].position,
+                chaser[tick].position,
                 tick as u64,
             )?;
             if own != cell {
@@ -1131,7 +1238,7 @@ impl Chase {
         let ports = &self.ports;
         let caps = pursuer.constitution.caps(ports.arena.declaration())?;
         let disk = Moves::within(caps.top())?;
-        let start = *ports
+        let start = ports
             .chaser
             .get(self.cells.len())
             .ok_or_else(|| refuse("a chase's ports", "they hold the pursuer after the passage"))?;

@@ -260,6 +260,7 @@ pub use checkpoint::{
 };
 pub mod boundary;
 pub mod chase;
+pub mod chaser;
 pub mod checkpoint;
 pub mod composition;
 pub mod dormancy;
@@ -311,6 +312,7 @@ pub use boundary::{
     HazardPartition, HazardRest, LastByte, PartClock, PartPort, byte_index, dyadic_class,
 };
 pub use chase::{ChaseFamily, selected_fibre};
+pub use chaser::{MachineChaser, MachineDeclaration, MachineReceipt, Release};
 pub use composition::{
     Composed, Conditioned, Keystone, Port, PortPath, PortReader, PortedEmitters, Unheld,
 };

@@ -356,6 +356,60 @@ The machine has only read recordings; here it first moves, against another's con
   minutes and the host memory before it runs. No card is needed.
 - **If it fails.** A reception failure locates the birth problem on terrain whose truth is known. An
   action failure leaves a receiver without a controller, reported as a terrain result.
+- **The action phase, built September 28 (development receipt; the switches are not built).**
+  [definition; agent-inferred; [receipts](../../research/notebook/hnn_design/README.md#f6-chase-terrain-the-action-phase-september-28)]
+  - **Owners.** `holarchy::terrain::pursuit` holds the chaser's capture reach, the runner's viable
+    tube, the capture basin over a fibre of candidates, the `Chaser` port, the two controls and the
+    passage. `receiver::population::chaser::MachineChaser` is the machine. `ChaserPort` is the
+    chaser's live motion port, which the reception population reads as the chaser writes it.
+  - **The cornering reading** is the runner's viable tube: its robust viability kernel at a bounded
+    horizon, `K_k = F_k ∩ Pre(K_(k+1))` over the forward viable reach, with the chaser as a
+    set-valued disturbance through its capture reach. It equals a brute-force enumeration on a
+    `6 × 6` arena. The runner does not observe the chaser's later moves, so the tube is an inner
+    reading of the closed-loop kernel.
+  - **The decision rule.** The fibre is the population's selected fibre.
+    - The machine commits to a capture the capture basin certifies over the fibre within
+      `m = 12` ticks, in the fewest ticks. Otherwise it commits to the move that least sums the
+      fibre's viable tubes at `n = 2`, breaking ties by nearness.
+    - It probes only while the fibre is plural, where a move carries strictly more
+      `I(Θ; Y_t, Y_(t+1) | do(u))` than the commit (compared exactly as `∏|c|^|c|`) and concedes at
+      most `d = 0` tube states a member.
+    - `n`, `m` and `d` were chosen on 16 pinned choosing seeds disjoint from the acceptance seeds.
+      No probe fired there at any price: the commit was always among the most informative moves.
+  - **Acceptance, on the 16 pinned seeds.**
+    - Capture ticks in sum: the machine 164, pure pursuit 3,704, constant bearing 366 (an uncaptured
+      passage counts its cap of 512).
+    - Strictly fewer ticks on 10 seeds against pure pursuit and 11 against constant bearing, but on
+      7 against both at once. **Not passed** under the at-once reading; passed in sum and against
+      each control separately.
+    - [measured] The at-once gate cannot be met on these seeds by any chaser. The truth-only capture
+      basin gives the least capture of any chaser that knows the runner's law. On 8 of the 16
+      seeds a control already captures at that least, which leaves at most 8 seeds, not more than
+      half. The machine takes 7 of the 8.
+    - The machine reaches the truth-only least on 11 seeds. It misses it on 5, where it plans robustly
+      over the opening's wide fibre: on seed 20260933 it certified capture within 10 ticks over all
+      40 candidates at tick 0, while the truth alone is caught in 4.
+  - **The control was corrected before this verdict.** The first acceptance run's constant bearing
+    lacked §14.4's approach condition `⟨r, ṙ⟩ < 0`: against a runner at rest, resting nulls
+    `det(r, ṙ)`, and it stood still for hundreds of ticks (sum 4,934). The corrected control approaches
+    where it can. The correction strengthens the control and was not chosen by the machine's result.
+  - **Cornering receipt.** The tube summed over the ticks before each seed's first capture is
+    101,054 for the machine, 120,868 for pure pursuit and 133,444 for constant bearing. It is at most
+    pursuit's on every seed and below bearing's on every seed. The runner's slips (onsets, slipping
+    ticks) are (4, 7), (83, 112) and (14, 21).
+  - **Owed in #62.**
+    - The recursions' soundness at a bounded horizon: the tube's `K_k` is exactly the set of motions
+      on an `n`-tick path avoiding every `D_j`, and it lies inside the closed-loop kernel. The
+      basin's value is the least capture over adaptive strategies on the observation classes, and
+      its memo's reuse is sound. The truth-only value bounds every chaser's capture from below.
+    - The chaser's admissibility: `⌊v_C²⌋` at most every class cap puts rest among the admitted
+      motions from every speed-bounded motion, and every released motion satisfies the traction
+      and speed bounds.
+    - The information order: for a uniform fibre of deterministic laws, `I` is larger exactly where
+      `∏|c|^|c|` is smaller.
+  - **The next loop's subject**, by its measurement: the machine misses the truth-only least on 5 of
+    16 seeds while its opening fibre is wide. The switches (the lag channel and the three
+    observation channels with loop-closure attribution) follow.
 - **Then the motor chart.** Pinned before fitting: a public recording, its skeleton, its units, the
   horizon, the split and a constant-velocity control. The HNN's motor consumer preserves the ordered
   screw transport and `⟨w, Jθ̇⟩ = ⟨Jᵀw, θ̇⟩`, and releases a reachable endpoint at its declared grain

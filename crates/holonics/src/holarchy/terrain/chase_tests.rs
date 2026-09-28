@@ -4,12 +4,18 @@
 //! reception on hash-seeded arenas: the population's selected fibre is the surviving fibre, it holds
 //! the truth, its code lies within the naming margin of the truth's own code and strictly below the
 //! landmark tree's on the same cells; a plural fibre the ground cannot split is one future class
-//! under every admitted pursuer word.
+//! under every admitted pursuer word. The action phase (`pursuit`): the runner's viable tube, its
+//! Pre recursion matching a brute-force enumeration of runner and chaser words on a tiny arena; every
+//! motion a chaser releases (the machine and both controls) within its traction bound, a chaser
+//! outside it refused; the controls' laws; and the machine's certified captures kept.
+
+use std::collections::BTreeSet;
 
 use num_bigint::BigUint;
 use num_traits::One;
 
 use super::chase::*;
+use super::pursuit::*;
 use super::{Draw, TerrainError};
 use crate::compression::landmark::context::{
     Capacity, LandmarkDeclaration, LetterFamily, StopPrior,
@@ -17,7 +23,8 @@ use crate::compression::landmark::context::{
 use crate::ratio::algebraic::ExactInterval;
 use crate::ratio::{Rat, rat};
 use crate::receiver::population::{
-    ChaseFamily, Family, Population, Posterior, TreeFamily, selected_fibre,
+    ChaseFamily, Family, MachineChaser, MachineDeclaration, Population, Posterior, Release,
+    TreeFamily, selected_fibre,
 };
 
 /// The declared arena: `16 × 16` positions, patches of side 4, classes ice `1/2`, grass `1`, track
@@ -303,6 +310,7 @@ fn walls_keep_the_runner_inside() {
             chase
                 .ports
                 .chaser
+                .motions()
                 .iter()
                 .all(|m| arena.inside(m.position) && quadrance(m.velocity) <= pursuer_speed)
         );
@@ -310,7 +318,10 @@ fn walls_keep_the_runner_inside() {
             Some(tick) => {
                 assert_eq!(chase.cells.len(), tick);
                 let caught = chase.truth.path.last().map_or(chase.ports.opening, |m| *m);
-                assert!(pursuer.captures(caught.position, chase.ports.chaser[tick].position));
+                assert!(pursuer.captures(
+                    caught.position,
+                    chase.ports.chaser.get(tick).unwrap().position
+                ));
             }
             None => assert_eq!(chase.cells.len(), 64),
         }
@@ -318,7 +329,7 @@ fn walls_keep_the_runner_inside() {
             let runner = family.candidate(index).unwrap();
             let caps = runner.constitution.caps(&declaration).unwrap();
             let mut state = RunnerState::opening(arena, chase.ports.opening.position).unwrap();
-            for (tick, chaser) in chase.ports.chaser.iter().enumerate() {
+            for (tick, chaser) in chase.ports.chaser.motions().iter().enumerate() {
                 let cell = runner
                     .cell(
                         arena,
@@ -500,4 +511,370 @@ fn a_probe_separates_the_speed_bounds_the_passage_leaves_together() {
     let futures = chase.futures(&family, &fibre, &pursuer(), 5).unwrap();
     assert_eq!(futures.classes, vec![vec![33, 37], vec![32, 36]]);
     assert!(futures.separating.is_some());
+}
+
+// -------------------------------------------------------------------------------------------
+// the action phase
+
+/// A tiny arena: `6 × 6` positions in patches of side 2, the declared classes and chart.
+fn tiny() -> Arena {
+    let declaration = ArenaDeclaration {
+        width: 6,
+        height: 6,
+        patch: 2,
+        ..declaration()
+    };
+    Arena::new(declaration, vec![2, 1, 0, 1, 0, 2, 0, 2, 1]).unwrap()
+}
+
+/// **The runner's successors, re-derived from the traction law in ℚ** (independent of the tube's
+/// caps): the kept motion while forced; otherwise every change the constitution admits on the cell
+/// it stands on, within its speed bound, keeping it inside; the wall law's motion when none.
+fn successors(
+    arena: &Arena,
+    constitution: &Constitution,
+    motion: &Motion,
+    forced: bool,
+) -> Vec<Motion> {
+    let step = |velocity: Point| {
+        [
+            motion.position[0] + velocity[0],
+            motion.position[1] + velocity[1],
+        ]
+    };
+    if forced {
+        let kept = step(motion.velocity);
+        return vec![if arena.inside(kept) {
+            Motion {
+                position: kept,
+                velocity: motion.velocity,
+            }
+        } else {
+            arena.wall(motion)
+        }];
+    }
+    let class = arena.class(motion.position).unwrap();
+    let wide = Moves::within(64).unwrap();
+    let next: Vec<Motion> = wide
+        .vectors()
+        .iter()
+        .filter(|&&change| constitution.admits(arena.declaration(), class, change))
+        .map(|&change| {
+            [
+                motion.velocity[0] + change[0],
+                motion.velocity[1] + change[1],
+            ]
+        })
+        .filter(|&velocity| constitution.within_speed(velocity) && arena.inside(step(velocity)))
+        .map(|velocity| Motion {
+            position: step(velocity),
+            velocity,
+        })
+        .collect();
+    if next.is_empty() {
+        vec![arena.wall(motion)]
+    } else {
+        next
+    }
+}
+
+/// **The chaser's positions after every word of `k` ticks**, `k = 0, …, n`, by enumeration.
+fn chaser_positions(
+    arena: &Arena,
+    pursuer: &Pursuer,
+    chaser: Motion,
+    n: usize,
+) -> Vec<BTreeSet<Point>> {
+    let caps = pursuer.constitution.caps(arena.declaration()).unwrap();
+    let disk = Moves::within(caps.top()).unwrap();
+    let mut words = vec![chaser];
+    let mut positions = vec![BTreeSet::from([chaser.position])];
+    for _ in 0..n {
+        let mut next = Vec::new();
+        for motion in &words {
+            next.extend(pursuer.admitted(arena, &disk, &caps, motion).unwrap());
+        }
+        positions.push(next.iter().map(|m| m.position).collect());
+        words = next;
+    }
+    positions
+}
+
+/// A brute-force tube: the reach and the kernel at each tick.
+type BruteTube = (Vec<BTreeSet<Motion>>, Vec<BTreeSet<Motion>>);
+
+/// **The viable tube by brute force**: every runner word of `n` ticks from the present, kept while
+/// no chaser word of the same ticks captures it; the kernel at tick `k` is every motion at `k` on a
+/// kept word of the full `n` ticks, the reach every motion at `k` on a kept word of `k` ticks.
+fn brute_tube(
+    arena: &Arena,
+    constitution: &Constitution,
+    runner: Motion,
+    forced: u64,
+    pursuer: &Pursuer,
+    chaser: Motion,
+    n: usize,
+) -> BruteTube {
+    let positions = chaser_positions(arena, pursuer, chaser, n);
+    let covered = |k: usize, x: Point| positions[k].iter().any(|&p| pursuer.captures(x, p));
+    let mut reach = vec![BTreeSet::new(); n + 1];
+    let mut kernel = vec![BTreeSet::new(); n + 1];
+    let mut words: Vec<Vec<Motion>> = if covered(0, runner.position) {
+        Vec::new()
+    } else {
+        vec![vec![runner]]
+    };
+    for word in &words {
+        reach[0].insert(word[0]);
+    }
+    for k in 0..n {
+        let mut longer = Vec::new();
+        for word in &words {
+            for next in successors(arena, constitution, &word[k], (k as u64) < forced) {
+                if !covered(k + 1, next.position) {
+                    let mut extended = word.clone();
+                    extended.push(next);
+                    reach[k + 1].insert(next);
+                    longer.push(extended);
+                }
+            }
+        }
+        words = longer;
+    }
+    for word in &words {
+        for (k, motion) in word.iter().enumerate() {
+            kernel[k].insert(*motion);
+        }
+    }
+    (reach, kernel)
+}
+
+/// **The viable tube's Pre recursion matches a brute-force enumeration** on the tiny arena: for two
+/// constitutions, a slip still held and runners opening near corners, the forward viable reach and
+/// the kernel `K_k` at every tick of a three-tick horizon are the enumeration's sets, and the tube's
+/// sizes are theirs. A runner near the chaser is cornered (its kernel is empty while its reach is
+/// not); the runner in the far corner is not.
+#[test]
+fn the_tube_recursion_matches_brute_force_enumeration() {
+    let arena = tiny();
+    let pursuer = pursuer();
+    let caps = pursuer.constitution.caps(arena.declaration()).unwrap();
+    let disk = Moves::within(caps.top()).unwrap();
+    let slow = Constitution {
+        speed: rat(2, 1),
+        traction: rat(1, 1),
+    };
+    let firm = Constitution {
+        speed: rat(3, 1),
+        traction: rat(3, 2),
+    };
+    let moving = |position: Point, velocity: Point| Motion { position, velocity };
+    let cases = [
+        (&slow, moving([1, 1], [1, 0]), 0, Motion::rest([3, 3])),
+        (&firm, moving([4, 2], [-2, 1]), 1, moving([2, 4], [1, 0])),
+        (&firm, Motion::rest([0, 5]), 0, Motion::rest([5, 0])),
+        (&slow, Motion::rest([5, 5]), 0, Motion::rest([3, 3])),
+    ];
+    let mut sizes = Vec::new();
+    for (constitution, runner, forced, chaser) in cases {
+        let runner_caps = constitution.caps(arena.declaration()).unwrap();
+        let reach = CaptureReach::of(&arena, &pursuer, &caps, &disk, chaser, 3).unwrap();
+        let layers = viable_layers(&arena, &runner_caps, runner, forced, &reach).unwrap();
+        let (brute_reach, brute_kernel) =
+            brute_tube(&arena, constitution, runner, forced, &pursuer, chaser, 3);
+        for k in 0..=3 {
+            let reach_set: BTreeSet<Motion> = layers.reach[k].iter().copied().collect();
+            let kernel_set: BTreeSet<Motion> = layers.kernel[k].iter().copied().collect();
+            assert_eq!(reach_set.len(), layers.reach[k].len(), "no repeats at {k}");
+            assert_eq!(
+                reach_set, brute_reach[k],
+                "the reach at tick {k}: {runner:?}"
+            );
+            assert_eq!(
+                kernel_set, brute_kernel[k],
+                "the kernel at tick {k}: {runner:?}"
+            );
+        }
+        let tube = viable_tube(&arena, &runner_caps, runner, forced, &reach).unwrap();
+        assert_eq!(
+            tube.kernel,
+            (1..=3).map(|k| brute_kernel[k].len()).collect::<Vec<_>>()
+        );
+        assert_eq!(tube.inside, !brute_kernel[0].is_empty());
+        sizes.push((tube.size(), tube.reach.iter().sum::<usize>()));
+    }
+    // (|K₁| + |K₂| + |K₃|, |F₁| + |F₂| + |F₃|): the runner two steps from the chaser is cornered
+    // (its reach does not last the horizon), the slipping runner is caught by every word's first
+    // tick, the runner in the far corner keeps 89 motions on viable paths.
+    assert_eq!(sizes, vec![(0, 5), (0, 0), (89, 90), (0, 0)]);
+}
+
+/// **Every motion a chaser releases satisfies its traction bound**, read in ℚ against the
+/// constitution on the cell it stood on, within its speed bound and inside the arena, for the machine
+/// and both controls over hash-seeded passages; the declared chaser can always stop; the machine's
+/// certified captures are kept (capture comes within the ticks the basin certified).
+#[test]
+fn every_chaser_motion_satisfies_its_traction_bound() {
+    let declaration = declaration();
+    let family = family();
+    let pursuer = pursuer();
+    assert!(pursuer.stops(&declaration).unwrap());
+    let action = ActionDeclaration {
+        pursuer: pursuer.clone(),
+        ticks: 40,
+        horizon: 2,
+    };
+    let check = |passage: &ActionPassage| {
+        let arena = &passage.ports.arena;
+        let motions = passage.ports.chaser.motions();
+        assert_eq!(motions.len(), passage.cells.len() + 1);
+        for pair in motions.windows(2) {
+            let (from, to) = (pair[0], pair[1]);
+            let change = [
+                to.velocity[0] - from.velocity[0],
+                to.velocity[1] - from.velocity[1],
+            ];
+            let class = arena.class(from.position).unwrap();
+            assert!(
+                pursuer.constitution.admits(&declaration, class, change),
+                "{from:?} → {to:?}"
+            );
+            assert!(pursuer.constitution.within_speed(to.velocity));
+            assert_eq!(
+                to.position,
+                [
+                    from.position[0] + to.velocity[0],
+                    from.position[1] + to.velocity[1]
+                ]
+            );
+            assert!(arena.inside(to.position));
+        }
+        assert_eq!(passage.tubes.len(), passage.cells.len());
+    };
+    for seed in [20_261_001u64, 20_261_004, 20_261_013] {
+        let mut machine = MachineChaser::new(MachineDeclaration {
+            family: family.clone(),
+            escape: ESCAPE,
+            horizon: 2,
+            basin: 6,
+            price: 0,
+        })
+        .unwrap();
+        let passage = act_drawn(&declaration, &family, &action, seed, &mut machine).unwrap();
+        check(&passage);
+        let receipt = machine.receipt();
+        assert_eq!(receipt.releases.len(), passage.cells.len());
+        for (tick, bound) in receipt.certified.iter().enumerate() {
+            if let Some(ticks) = bound {
+                assert_eq!(receipt.releases[tick], Release::Certified);
+                assert!(
+                    passage.captured.is_some_and(|at| at <= tick + ticks),
+                    "seed {seed}"
+                );
+            }
+        }
+        check(&act_drawn(&declaration, &family, &action, seed, &mut PurePursuit).unwrap());
+        check(&act_drawn(&declaration, &family, &action, seed, &mut ConstantBearing).unwrap());
+    }
+    let weak = Pursuer {
+        constitution: Constitution {
+            speed: rat(3, 2),
+            traction: rat(1, 2),
+        },
+        capture: rat(2, 1),
+    };
+    assert!(
+        !weak.stops(&declaration).unwrap(),
+        "on ice it cannot brake from a diagonal"
+    );
+}
+
+/// A chaser outside its traction bound is refused by name.
+#[test]
+fn a_chaser_outside_its_traction_bound_is_refused() {
+    struct Leaper;
+    impl Chaser for Leaper {
+        type Error = TerrainError;
+        fn label(&self) -> String {
+            "leaper".to_string()
+        }
+        fn decide(&mut self, view: &ChaseView<'_>) -> Result<Motion, TerrainError> {
+            Ok(Motion {
+                position: [view.chaser.position[0] + 3, view.chaser.position[1]],
+                velocity: [3, 0],
+            })
+        }
+    }
+    let action = ActionDeclaration {
+        pursuer: pursuer(),
+        ticks: 8,
+        horizon: 2,
+    };
+    let refused = act(
+        uniform(2),
+        &family(),
+        0,
+        [[12, 12], [2, 2]],
+        &action,
+        &mut Leaper,
+    );
+    assert!(matches!(refused, Err(TerrainError::Declaration { .. })));
+}
+
+/// **The controls' laws**: against a runner at `(8, 8)` moving `(0, 2)` across the line of sight
+/// from a chaser at rest at `(4, 8)`, pure pursuit steps to `(5, 8)`, nearest the runner's present
+/// position; constant bearing takes velocity `(1, 1)`: approaching (`⟨r, ṙ⟩ = −4`), the least
+/// `|det(r, ṙ)| = 4`, the most closing, `⟨r + ṙ, r + ṙ⟩ = 10`. Against a runner at rest, resting
+/// nulls the rotation but does not approach, and constant bearing closes along the line of sight.
+#[test]
+fn the_controls_head_at_the_runner_and_null_the_bearing_rate() {
+    let ports = std::sync::Arc::new(ChasePorts {
+        arena: uniform(2),
+        moves: family().moves(&declaration()).unwrap(),
+        chaser: ChaserPort::default(),
+        opening: Motion::rest([8, 8]),
+    });
+    let pursuer = pursuer();
+    let view = ChaseView {
+        ports: &ports,
+        pursuer: &pursuer,
+        runner: Motion {
+            position: [8, 8],
+            velocity: [0, 2],
+        },
+        chaser: Motion::rest([4, 8]),
+        tick: 0,
+    };
+    let pure = PurePursuit.decide(&view).unwrap();
+    assert_eq!(
+        pure,
+        Motion {
+            position: [5, 8],
+            velocity: [1, 0]
+        }
+    );
+    let bearing = ConstantBearing.decide(&view).unwrap();
+    assert_eq!(
+        bearing,
+        Motion {
+            position: [5, 9],
+            velocity: [1, 1]
+        }
+    );
+    assert_eq!(
+        ConstantBearing::key(&view.runner, &view.chaser, &bearing),
+        (false, 4, 10)
+    );
+    assert_eq!(det([4, 0], [0, 1]), 4);
+    let resting = ChaseView {
+        runner: Motion::rest([8, 8]),
+        ..view
+    };
+    assert_eq!(
+        ConstantBearing.decide(&resting).unwrap(),
+        Motion {
+            position: [5, 8],
+            velocity: [1, 0]
+        }
+    );
 }
