@@ -1310,12 +1310,17 @@ fn main() {
         ["composition", which] => composition::harness(Some(which)),
         ["evolution"] => evolution::evolution(),
         ["species"] => evolution::species(),
-        ["curated", curated_cut, flat_cut] => curated::harness(curated_cut, flat_cut, false),
+        ["curated", curated_cut, flat_cut] => {
+            curated::harness(curated_cut, flat_cut, curated::Reach::Whole);
+        }
         ["curated", curated_cut, flat_cut, "development"] => {
-            curated::harness(curated_cut, flat_cut, true);
+            curated::harness(curated_cut, flat_cut, curated::Reach::Development);
+        }
+        ["curated", curated_cut, flat_cut, "merges"] => {
+            curated::harness(curated_cut, flat_cut, curated::Reach::Merges);
         }
         _ => println!(
-            "usage: hnn_population -- tree <d> | moire parity | moire sheets | crib | switching | standing <cut> | composition [products | primes] | evolution | species | curated <curated-cut> <flat-cut> [development]"
+            "usage: hnn_population -- tree <d> | moire parity | moire sheets | crib | switching | standing <cut> | composition [products | primes] | evolution | species | curated <curated-cut> <flat-cut> [development | merges]"
         ),
     }
 }

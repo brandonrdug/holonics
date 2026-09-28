@@ -1,33 +1,43 @@
 //! **The part clock and the boundary egg: where a part ends is predicted by more than its bytes**
 //! (campaign 5 on the population; #73, #148; Lean `Compression/Landmark/Context/Composition.
-//! {stagedFace_nonneg, stagedFace_sum_one, staged_chain_rule, staged_code}`).
+//! {stagedFace_nonneg, stagedFace_sum_one, staged_chain_rule, staged_code}` and, for its learned
+//! partition, `Compression/Landmark/Context/Merge`).
 //!
 //! [definition; agent-inferred] **The part clock** ([`PartClock`]) is a keystone of one key: the
 //! declared section chart's clock, read from the coded past, so it locates nothing and its chain-rule
 //! term `log₂ |K| − log₂ #S` is zero. Its port ([`PartPort`]) at the next cell is the open part's
 //! section (channel and kind, read once at its letter), its **phase** `p` (the bytes since its
 //! section letter), its **carry** `s` (the sentence closes among them: the clock winds by bytes and
-//! carries at a sentence close) and the **last byte's class** `ℓ` ([`LastByte`]: none at the part's
-//! opening, a line close `\n`, a sentence close `.`, `!` or `?`, a colon, a space, any other byte).
-//! A section letter resets it. [agent-inferred, development counts] The byte classes are declared on
-//! the exterior chart: on the curated development cells 1426 of the 1477 section letters follow a
-//! `.`, and 1439 a sentence close.
+//! carries at a sentence close) and the **last byte** itself (none at the part's opening), which each
+//! reader classes through its own partition. The **declared classes** `ℓ` ([`LastByte`]: none, a line
+//! close `\n`, a sentence close `.`, `!` or `?`, a colon, a space, any other byte) are the carry's
+//! (a sentence close) and the letter tree's. A section letter resets the port. [agent-inferred,
+//! development counts] The declared classes are declared on the exterior chart: on the curated
+//! development cells 1426 of the 1477 section letters follow a `.`, and 1439 a sentence close.
 //!
 //! [definition; agent-inferred] **The hazard law** ([`Hazard`]): the probability that a section
-//! letter comes next is a Krichevsky–Trofimov face over `{byte, letter}` per cell of a declared
-//! partition of the port (Lean `Tree.{ktFace, ktFace_pos, ktFace_sum}`; `context::baseline::
-//! kt_probability`):
+//! letter comes next is a Krichevsky–Trofimov face over `{byte, letter}` per cell of a partition
+//! of the port ([`HazardPartition`]; Lean `Tree.{ktFace, ktFace_pos, ktFace_sum}`; `context::
+//! baseline::kt_probability`):
 //!
 //! ```text
 //! ⌊n⌋₂ = 0 at n = 0,   1 + ⌊log₂ n⌋ otherwise                        the dyadic class of a count
-//! cell(port) = (c, k, ⌊p⌋₂, ⌊s⌋₂)   when ℓ is a sentence close          (channel, kind, phase, carry)
-//!            = (c, ℓ)               otherwise                          (channel, last byte's class)
+//! cell(port) = (c′, k, ⌊p⌋₂, ⌊s⌋₂)  when ℓ is a sentence close          (channel, kind, phase, carry)
+//!            = (c′, κ(b))           otherwise                          (channel, the last byte's class)
 //! h_t(letter) = (2 n₁ + 1)/(2 n + 2),   h_t(byte) = (2 n₀ + 1)/(2 n + 2)
 //! ```
 //!
-//! `n₁` letters and `n₀` bytes read in the cell before `t`, `n = n₀ + n₁`. Before any section is open
-//! the chart's pin makes the letter certain (`h = 1` on letters, `0` on bytes: a cut opens at a
-//! letter), and nothing is counted.
+//! `n₁` letters and `n₀` bytes read in the cell before `t`, `n = n₀ + n₁`; `κ` classes the 257
+//! last-byte values and `c′` is the channel the port's cell reads its counts on (its own, or the
+//! channel it shares counts with at that rest). The **declared partition** is `κ = ℓ` with every port
+//! apart; a **learned** one comes from the merges of [`super::merge`] (priced by their code-length
+//! pair, decided on the development cells). Every fine cell's counts (the port's own channel, the
+//! last byte's value) are kept beside the partition's: the seeds, from which any coarser or finer
+//! partition reads its counts exactly ([`Hazard::repartition`]). Before any section is open the
+//! chart's pin makes the letter certain (`h = 1` on letters, `0` on bytes: a cut opens at a letter),
+//! and nothing is counted. The egg can read further hazards on its cells as comparisons
+//! ([`BoundaryEgg::compared_with`], [`HazardComparison`]): deposited on the same cells, entering no
+//! face, so a partition's difference is exact on one passage.
 //!
 //! [definition; agent-inferred] **The boundary egg** ([`BoundaryEgg`]) composes the part clock with
 //! the byte tree (the typed tree, [`TreeFamily::sectioned`]) and the letter tree (the retired reader's
@@ -130,14 +140,22 @@ pub fn dyadic_class(count: u64) -> u32 {
 }
 
 /// [definition] **The part clock's port** (module header): the open part's section, its phase (bytes
-/// since its letter), its carry (sentence closes among them) and the last byte's class; no section
-/// before the cut's first letter.
+/// since its letter), its carry (sentence closes among them) and the last byte itself (none at the
+/// part's opening), whose class each reader reads through its own partition; no section before the
+/// cut's first letter.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct PartPort {
     pub section: Option<Section>,
     pub phase: u64,
     pub carry: u64,
-    pub last: LastByte,
+    pub byte: Option<u8>,
+}
+
+impl PartPort {
+    /// The last byte's declared class ([`LastByte`]).
+    pub fn last(&self) -> LastByte {
+        self.byte.map_or(LastByte::None, |byte| LastByte::of(usize::from(byte)))
+    }
 }
 
 /// [definition; agent-inferred] **The part clock** (module header): a keystone of one key over the
@@ -157,7 +175,7 @@ impl PartClock {
                 section: None,
                 phase: 0,
                 carry: 0,
-                last: LastByte::None,
+                byte: None,
             },
         }
     }
@@ -181,66 +199,207 @@ impl PartClock {
                     section: Some(section),
                     phase: 0,
                     carry: 0,
-                    last: LastByte::None,
+                    byte: None,
                 };
             }
             None => {
-                let last = LastByte::of(cell);
                 self.port.phase += 1;
-                if last == LastByte::SentenceClose {
+                if LastByte::of(cell) == LastByte::SentenceClose {
                     self.port.carry += 1;
                 }
-                self.port.last = last;
+                self.port.byte = u8::try_from(cell).ok();
             }
         }
     }
 }
 
-/// [definition; agent-inferred] **A cell of the hazard's declared partition** (module header).
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum HazardCell {
-    /// After a sentence close: the channel, the kind, the phase's and the carry's dyadic classes.
-    Sentence {
-        channel: usize,
-        kind: usize,
-        phase: u32,
-        carry: u32,
-    },
-    /// Otherwise: the channel and the last byte's class.
-    Other { channel: usize, last: LastByte },
+/// The last-byte values a partition classes: the part's opening (no byte) and the 256 bytes.
+pub const BYTE_VALUES: usize = 257;
+
+/// **A last byte's index** among [`BYTE_VALUES`]: `0` at the part's opening, `1 + b` for the byte `b`.
+pub fn byte_index(byte: Option<u8>) -> usize {
+    byte.map_or(0, |byte| 1 + usize::from(byte))
 }
 
-impl HazardCell {
-    /// **The partition's cell of an open part's port** (module header).
-    pub fn of(section: Section, port: &PartPort) -> Self {
-        if port.last == LastByte::SentenceClose {
-            HazardCell::Sentence {
-                channel: section.channel,
+/// [definition; agent-inferred] **A cell's reading without its channel** (module header): after a
+/// sentence close the kind and the phase's and the carry's dyadic classes, otherwise the last byte's
+/// class under the partition.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub enum HazardRest {
+    Sentence { kind: usize, phase: u32, carry: u32 },
+    Other { class: usize },
+}
+
+/// [definition; agent-inferred] **A cell of the hazard's partition** (module header): a channel (the
+/// port's own, or the port it shares counts with) and the rest of its reading.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub struct HazardCell {
+    pub channel: usize,
+    pub rest: HazardRest,
+}
+
+/// [definition; agent-inferred] **The hazard's partition of the port** (module header; learned by
+/// merges in [`super::merge`]): the class of each last-byte value ([`BYTE_VALUES`] of them), and,
+/// per rest, the channel each port's cell reads its counts on (a port's cells merged into another's
+/// share its counts; a rest not listed keeps every port apart). The **declared** partition is
+/// [`LastByte`]'s classes with no share; the **finest** classes every value alone.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct HazardPartition {
+    classes: Vec<usize>,
+    shares: BTreeMap<HazardRest, Vec<usize>>,
+}
+
+impl HazardPartition {
+    /// **The declared partition**: [`LastByte`]'s classes, every port apart.
+    pub fn declared() -> Self {
+        let classes = (0..BYTE_VALUES)
+            .map(|index| match index {
+                0 => LastByte::None.index(),
+                _ => LastByte::of(index - 1).index(),
+            })
+            .collect();
+        Self {
+            classes,
+            shares: BTreeMap::new(),
+        }
+    }
+
+    /// **The finest partition**: every last-byte value its own class, every port apart. Its cells
+    /// are the hazard's fine cells, whose counts are every coarser partition's seeds.
+    pub fn finest() -> Self {
+        Self {
+            classes: (0..BYTE_VALUES).collect(),
+            shares: BTreeMap::new(),
+        }
+    }
+
+    /// **A learned partition**: the classes of the [`BYTE_VALUES`] last-byte values and the shared
+    /// channels per rest (each a map of the chart's channels onto the channel each reads on).
+    /// Refused unless every value is classed and every share maps a channel onto a channel.
+    pub fn learned(
+        classes: Vec<usize>,
+        shares: BTreeMap<HazardRest, Vec<usize>>,
+    ) -> Result<Self, PopulationError> {
+        if classes.len() != BYTE_VALUES
+            || shares
+                .values()
+                .any(|map| map.iter().any(|&channel| channel >= map.len()))
+        {
+            return Err(refuse(
+                "a hazard partition",
+                "every last-byte value is classed and every share maps channels onto channels",
+            ));
+        }
+        Ok(Self { classes, shares })
+    }
+
+    /// The classes of the last-byte values.
+    pub fn classes(&self) -> &[usize] {
+        &self.classes
+    }
+
+    /// The shared channels per rest.
+    pub fn shares(&self) -> &BTreeMap<HazardRest, Vec<usize>> {
+        &self.shares
+    }
+
+    /// **The fine cell of an open part's port**: its channel, and after a sentence close the kind,
+    /// the phase's and the carry's dyadic classes, otherwise the last byte's value.
+    pub fn fine(section: Section, port: &PartPort) -> HazardCell {
+        let rest = if port.last() == LastByte::SentenceClose {
+            HazardRest::Sentence {
                 kind: section.kind,
                 phase: dyadic_class(port.phase),
                 carry: dyadic_class(port.carry),
             }
         } else {
-            HazardCell::Other {
-                channel: section.channel,
-                last: port.last,
+            HazardRest::Other {
+                class: byte_index(port.byte),
             }
+        };
+        HazardCell {
+            channel: section.channel,
+            rest,
         }
+    }
+
+    /// **The partition's cell of a fine cell**: its value's class, then the channel it shares.
+    pub fn coarse(&self, fine: &HazardCell) -> HazardCell {
+        let rest = match fine.rest {
+            HazardRest::Other { class } => HazardRest::Other {
+                class: self.classes[class],
+            },
+            sentence => sentence,
+        };
+        let channel = self
+            .shares
+            .get(&rest)
+            .and_then(|map| map.get(fine.channel).copied())
+            .unwrap_or(fine.channel);
+        HazardCell { channel, rest }
+    }
+
+    /// **The partition's cell of an open part's port** (module header).
+    pub fn cell(&self, section: Section, port: &PartPort) -> HazardCell {
+        self.coarse(&Self::fine(section, port))
+    }
+
+    /// The partition's declaration: every value's class, then each share's rest and map.
+    pub fn declaration(&self) -> Declaration {
+        let mut parameters: Vec<u64> = self.classes.iter().map(|&class| class as u64).collect();
+        for (rest, map) in &self.shares {
+            match *rest {
+                HazardRest::Sentence { kind, phase, carry } => parameters.extend([
+                    0,
+                    kind as u64,
+                    u64::from(phase),
+                    u64::from(carry),
+                ]),
+                HazardRest::Other { class } => parameters.extend([1, class as u64]),
+            }
+            parameters.extend(map.iter().map(|&channel| channel as u64));
+        }
+        Declaration::new("hazard partition", parameters)
     }
 }
 
 /// [definition; agent-inferred] **The hazard law** (module header): a Krichevsky–Trofimov face over
-/// `{byte, letter}` per cell of the declared partition, its counts the only state it keeps.
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+/// `{byte, letter}` per cell of its partition, read from the cell's pooled counts. Its fine cells'
+/// counts are kept beside them, the seeds of every coarser partition: a merged cell splits exactly
+/// ([`Hazard::repartition`]).
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Hazard {
+    partition: HazardPartition,
+    fine: BTreeMap<HazardCell, [u64; 2]>,
     counts: BTreeMap<HazardCell, [u64; 2]>,
     deposits: u64,
 }
 
+impl Default for Hazard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Hazard {
-    /// The empty law: every cell at `(½, ½)`.
+    /// The empty law on the declared partition: every cell at `(½, ½)`.
     pub fn new() -> Self {
-        Self::default()
+        Self::with_partition(HazardPartition::declared())
+    }
+
+    /// The empty law on a partition.
+    pub fn with_partition(partition: HazardPartition) -> Self {
+        Self {
+            partition,
+            fine: BTreeMap::new(),
+            counts: BTreeMap::new(),
+            deposits: 0,
+        }
+    }
+
+    /// The partition.
+    pub fn partition(&self) -> &HazardPartition {
+        &self.partition
     }
 
     /// **The face at a port**, `[h(byte), h(letter)]`, exact: the KT face of the port's cell, and
@@ -251,7 +410,7 @@ impl Hazard {
             Some(section) => {
                 let counts = self
                     .counts
-                    .get(&HazardCell::of(section, port))
+                    .get(&self.partition.cell(section, port))
                     .copied()
                     .unwrap_or([0, 0]);
                 let total = counts[0] + counts[1];
@@ -263,11 +422,14 @@ impl Hazard {
         }
     }
 
-    /// **Count the stage that arrived** in the port's cell (nothing before any section).
+    /// **Count the stage that arrived** in the port's cell and its fine cell (nothing before any
+    /// section).
     pub fn deposit(&mut self, port: &PartPort, letter: bool) {
         if let Some(section) = port.section {
+            let fine = HazardPartition::fine(section, port);
+            self.fine.entry(fine).or_insert([0, 0])[usize::from(letter)] += 1;
             self.counts
-                .entry(HazardCell::of(section, port))
+                .entry(self.partition.coarse(&fine))
                 .or_insert([0, 0])[usize::from(letter)] += 1;
             self.deposits += 1;
         }
@@ -276,6 +438,29 @@ impl Hazard {
     /// The partition's cells met so far.
     pub fn cells(&self) -> usize {
         self.counts.len()
+    }
+
+    /// The fine cells' counts (the seeds).
+    pub fn fine_counts(&self) -> &BTreeMap<HazardCell, [u64; 2]> {
+        &self.fine
+    }
+
+    /// The partition's cells' counts.
+    pub fn counts(&self) -> &BTreeMap<HazardCell, [u64; 2]> {
+        &self.counts
+    }
+
+    /// **Read the same seeds through another partition**: its cells' counts are the fine counts
+    /// pooled by it, exactly (a merge pools, a split restores).
+    pub fn repartition(&mut self, partition: HazardPartition) {
+        let mut counts: BTreeMap<HazardCell, [u64; 2]> = BTreeMap::new();
+        for (fine, pair) in &self.fine {
+            let cell = counts.entry(partition.coarse(fine)).or_insert([0, 0]);
+            cell[0] += pair[0];
+            cell[1] += pair[1];
+        }
+        self.counts = counts;
+        self.partition = partition;
     }
 }
 
@@ -305,6 +490,19 @@ pub struct BoundaryReadout {
     pub tree_letters: PassageCode,
     /// The partition's cells met by the hazard.
     pub hazard_cells: usize,
+    /// The comparison hazards read on the same cells (their faces enter no code).
+    pub comparisons: Vec<HazardComparison>,
+}
+
+/// [definition; agent-inferred] **A comparison hazard's reading** on the egg's cells: another
+/// partition's hazard, deposited on the same cells, its faces on each channel's bytes and at each
+/// channel's closes, and its cells met. It enters no face of the egg.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct HazardComparison {
+    pub label: String,
+    pub bytes: Vec<PassageCode>,
+    pub closes: Vec<PassageCode>,
+    pub cells: usize,
 }
 
 /// [definition; agent-inferred] **The letter tree** on the section epochs' clock (module header):
@@ -326,7 +524,7 @@ impl LetterTree {
             .min(self.lengths - 1);
         Ok(Letter::Bundle(Bundle {
             cell: letter,
-            features: self.family.encode(&[length, port.last.index() as u64])?,
+            features: self.family.encode(&[length, port.last().index() as u64])?,
         }))
     }
 
@@ -372,6 +570,7 @@ pub struct BoundaryEgg {
     bytes: TreeFamily,
     clock: PartClock,
     hazard: Hazard,
+    comparisons: Vec<Hazard>,
     letters: LetterTree,
     passage: PassageCode,
     readout: BoundaryReadout,
@@ -419,6 +618,7 @@ impl BoundaryEgg {
             bytes,
             clock: PartClock::new(chart),
             hazard: Hazard::new(),
+            comparisons: Vec::new(),
             letters: LetterTree {
                 tree: Landmarks::new(letters)?,
                 family,
@@ -439,8 +639,48 @@ impl BoundaryEgg {
                 root_closes: empty,
                 tree_letters: PassageCode::new(),
                 hazard_cells: 0,
+                comparisons: Vec::new(),
             },
         })
+    }
+
+    /// **The hazard read on a partition** (the declared one otherwise; a learned one from
+    /// [`super::merge::learn_hazard_partition`]). Refused once a cell has been received.
+    pub fn with_hazard(mut self, partition: HazardPartition) -> Result<Self, PopulationError> {
+        self.unread("a boundary egg's hazard partition")?;
+        self.hazard = Hazard::with_partition(partition);
+        Ok(self)
+    }
+
+    /// **A comparison hazard** on another partition, deposited on the same cells and read in the
+    /// readout, entering no face. Refused once a cell has been received.
+    pub fn compared_with(
+        mut self,
+        label: String,
+        partition: HazardPartition,
+    ) -> Result<Self, PopulationError> {
+        self.unread("a boundary egg's comparison hazard")?;
+        let channels = self.chart.channels();
+        self.comparisons.push(Hazard::with_partition(partition));
+        self.readout.comparisons.push(HazardComparison {
+            label,
+            bytes: vec![PassageCode::new(); channels],
+            closes: vec![PassageCode::new(); channels],
+            cells: 0,
+        });
+        Ok(self)
+    }
+
+    fn unread(&self, what: &'static str) -> Result<(), PopulationError> {
+        if self.passage.factors() > 0 || self.letters.received > 0 {
+            return Err(refuse(what, "it is declared before the egg receives a cell"));
+        }
+        Ok(())
+    }
+
+    /// The hazard.
+    pub fn hazard(&self) -> &Hazard {
+        &self.hazard
     }
 
     /// **The letter tree's declared family** at a population `n*` (module header): the closed
@@ -599,6 +839,20 @@ impl Family for BoundaryEgg {
         };
         let face = &stage * &within;
         self.passage.face(&face)?;
+        if let Some(open) = port.section {
+            for (hazard, reading) in self.comparisons.iter().zip(&mut self.readout.comparisons) {
+                let compared = &hazard.face(&port)[usize::from(letter)];
+                if letter {
+                    reading.closes[open.channel].face(compared)?;
+                } else {
+                    reading.bytes[open.channel].face(compared)?;
+                }
+            }
+        }
+        for (hazard, reading) in self.comparisons.iter_mut().zip(&mut self.readout.comparisons) {
+            hazard.deposit(&port, letter);
+            reading.cells = hazard.cells();
+        }
         self.hazard.deposit(&port, letter);
         self.readout.hazard_cells = self.hazard.cells();
         self.clock.advance(cell);
@@ -647,17 +901,21 @@ impl Family for BoundaryEgg {
                     LastByte::CLASSES as u64,
                 ],
             ),
+            self.hazard.partition().declaration(),
             self.bytes.declaration(),
             Declaration::new("letter tree", parameters),
         ])
     }
 
-    /// The byte tree's deposits and nodes, the letter tree's, and the hazard's counts.
+    /// The byte tree's deposits and nodes, the letter tree's, and the hazards' counts.
     fn work(&self) -> Work {
         let mut work = self.bytes.work();
         work.add(Act::Deposit, self.letters.received);
         work.add(Act::Node, self.letters.tree.nodes() as u64);
         work.add(Act::Count, self.hazard.deposits);
+        for hazard in &self.comparisons {
+            work.add(Act::Count, hazard.deposits);
+        }
         work
     }
 }

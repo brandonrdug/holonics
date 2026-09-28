@@ -189,6 +189,16 @@
 //! key's conditioned family and merges the keystone keys whose conditioned families are certain with
 //! one signature.
 //!
+//! [proved-derived; formal-checked] **Merges are species of cells** ([`merge`]; Lean
+//! `Compression/Landmark/Context/Merge`). A partition's cells merge by the same quotient as keys: a
+//! **release** when the merged cells' faces agree at every admitted reading (no code changes,
+//! `release_merge_iff_future_equivalent`), or a **priced merge** that pools counts and is accepted
+//! exactly when it lowers the complete code, the description's restaurant mass at `α = ½` times the
+//! likelihood (`merge_cost_mass_iff`, `restaurant_merge_ratio`), decided by integer bounds. Every
+//! member keeps its counts, so a merged block splits exactly. The boundary egg's hazard reads a
+//! partition learned this way on the development cells ([`learn_hazard_partition`]: the last-byte
+//! classes, then the ports' shared counts, each adopted where its complete code falls).
+//!
 //! [definition; agent-inferred] **Maintenance work** ([`Work`], [`Act`]). Beside a family's
 //! description and code its receipt reports the work it has spent, as exact counts of what it
 //! executed: a key family's emissions read against received cells, a dormant family's states read
@@ -236,6 +246,11 @@
 //! | `Compression/Landmark/Context/Tree.{ktFace, ktFace_pos, ktFace_sum}` (over `{byte, letter}`) | [`Hazard`] |
 //! | `Compression/Landmark/Context/Composition.{stagedFace_nonneg, stagedFace_sum_one}` at each tick's `σ_t`, `{staged_chain_rule, staged_code}` at `σ = id` | [`AdmittedEgg`] (the copy stage over the inner egg, [`StageReadout`]) |
 //! | `Compression/Landmark/Context/Tree.{ktFace, ktFace_pos, ktFace_sum}` (over `{miss, copy}`, the pointer's sides) | [`CopyStage`], [`PointerReadout`] |
+//! | `Compression/Landmark/Context/Merge.{merge_cost_iff, merge_cost_mass_iff, merge_cost_nat}` | [`Blocks::price`] (accepted exactly when `P·W < P′·W′`) |
+//! | `Compression/Landmark/Context/Merge.{restaurant_found, restaurant_join, restaurant_step_sum, restaurant_merge_ratio, restaurant_merge_ratio_ge_two}` | [`restaurant_ratio`], [`Blocks::description_bits`] |
+//! | `Compression/Landmark/Context/Merge.{expand_merge, expansion_sum, mergedFace_isPrior}` | [`Blocks`] (a block's pooled counts; every member's seed, [`Blocks::split`]) |
+//! | `Compression/Landmark/Context/Merge.{release_merge_iff_future_equivalent, release_merge_code}` | [`Blocks::species`] (the release reading) |
+//! | `Compression/Landmark/Context/Merge.{segmentation_mass, parse_given_sum, parse_code, segmentation_code_le}`, `{square_iff_no_separator, encoding_square_or_separator, merged_square_of_compatible}` | owed consumers: word merges over segmentation lattices and the merged encoding's square (campaign 5) |
 
 pub mod admitted;
 pub mod arithmetic;
@@ -244,6 +259,7 @@ pub mod composition;
 pub mod dormancy;
 pub mod evolution;
 pub mod families;
+pub mod merge;
 pub mod species;
 
 #[cfg(test)]
@@ -259,7 +275,8 @@ pub use admitted::{
 };
 pub use arithmetic::{CarryEgg, Counter, RecordClock, Sieve, SieveFace};
 pub use boundary::{
-    BoundaryEgg, BoundaryReadout, Hazard, HazardCell, LastByte, PartClock, PartPort, dyadic_class,
+    BYTE_VALUES, BoundaryEgg, BoundaryReadout, Hazard, HazardCell, HazardComparison,
+    HazardPartition, HazardRest, LastByte, PartClock, PartPort, byte_index, dyadic_class,
 };
 pub use composition::{
     Composed, Conditioned, Keystone, Port, PortPath, PortReader, PortedEmitters, Unheld,
@@ -267,6 +284,10 @@ pub use composition::{
 pub use dormancy::{Dormancy, DormantFamily, Layered, Weight};
 pub use evolution::{Declaration, Identity, Selections, Tally};
 pub use families::{GratingParity, GratingSheet, RotorKeys, TreeFamily};
+pub use merge::{
+    Blocks, Item, KtTables, MergeReceipt, PartitionReceipt, Price, learn_hazard_partition,
+    restaurant_ratio,
+};
 pub use species::{
     AdmittedFuture, Collapse, FactorSpecies, KeystoneMember, KeystoneSpecies, Seed, Species,
 };

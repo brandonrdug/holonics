@@ -169,20 +169,25 @@ fn the_part_clock_winds_by_bytes_and_carries_at_a_sentence_close() {
         })
     );
     assert_eq!(
-        (port.phase, port.carry, port.last),
-        (15, 2, LastByte::SentenceClose)
+        (port.phase, port.carry, port.last(), port.byte),
+        (15, 2, LastByte::SentenceClose, Some(b'.'))
     );
     assert_eq!(
-        HazardCell::of(port.section.expect("open"), &port),
-        HazardCell::Sentence {
+        HazardPartition::declared().cell(port.section.expect("open"), &port),
+        HazardCell {
             channel: 1,
-            kind: 2,
-            phase: 4,
-            carry: 2
+            rest: HazardRest::Sentence {
+                kind: 2,
+                phase: 4,
+                carry: 2
+            }
         }
     );
     clock.advance(letter(3, 1));
-    assert_eq!((clock.port().phase, clock.port().last), (0, LastByte::None));
+    assert_eq!(
+        (clock.port().phase, clock.port().last(), clock.port().byte),
+        (0, LastByte::None, None)
+    );
     assert_eq!(
         [0, 1, 2, 3, 4, 7, 8].map(dyadic_class),
         [0, 1, 2, 2, 3, 3, 4]
