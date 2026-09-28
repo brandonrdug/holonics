@@ -18,7 +18,7 @@
 //!   tower, fibre, descent), deposition, reaction — with the helical pair [`holon::contact`] and the
 //!   ring [`holon::parametron`].
 //! - [`navigator`]: transport with an initial configuration and its own clock, phase lift, address
-//!   words and lock addresses, trace faces and the dynamical zeta, the reflective continuation.
+//!   words and lock addresses, trace faces and the dynamical zeta.
 //! - [`receiver`]: roles and faces, width and release, standing as the retention quotient, the
 //!   causal chord, joint reception and the receipt ratio.
 //! - [`holarchy`]: what `Holon::interconnect` returns — the joined whole with its constituents,
