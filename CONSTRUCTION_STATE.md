@@ -1,7 +1,6 @@
 # Construction state
 
-**September 27, after the compacted tree, the loaded resonator, the register's capacity and campaign 3's
-first construction.**
+**September 27, after F4's split-family release gate and the F1/F2 pins.**
 [THE_REBUILD](docs/plans/THE_REBUILD.md) owns the implementation order; each law lives in its guide or
 owner, and THE_REBUILD's [Decisions index](docs/plans/THE_REBUILD.md#i-the-decisions-index) maps the
 former numbered Decisions to them.
@@ -18,7 +17,7 @@ The repository was reset on September 24; the pre-reset tree is
 | Campaign 2 | Ring/contact laws and parity pass; its additional predictive criterion fails. The measured field declares no resonators or boost signatures |
 | Loaded resonator (`hnn::ring`) | Loaded resonator forward/adjoint and material deposition built on host/card; the fixed source-ring family does not improve the standing-cut prediction |
 | Register capacity (`compression::landmark::context`) | A landmark's count register carries at its ceiling `2^c`; the development cells choose `c = 11` at scale; the resident tree takes the carry |
-| Immediate work | The [forward plan](docs/plans/THE_REBUILD.md#the-forward-plan-september-27), reviewed: F4 release on the byte population (the population's text-release consumer, exact on deterministic terrain, inspected against a request-aware retrieval control), then F5 Athena-0 (one protocol, atomic checkpoint and resume, health and privacy gates, a blind rubric against retrieval, the evaluation partition spent once); F1 words and F2 the field as optional improvements; F3 the card only if Athena's deadline needs it; F6 the motor chart |
+| Forward plan | F4's hash-seeded development-family split, request-incidence planning, score-identical next-face view and one held-out passage are built. F4 fails its release gate: the text decoder, producing keys/provenance, grain/fibre and release square are absent, the moiré's full-period continuation separates, and the charged validation code exceeds the flat control. F1's word terrain, exact segmentation family and sectioned adapter are built on a separate pinned split; one bounded held-out part closes exactly, but full work exceeds budget, so bytes stay. F2 is pinned and has one `n*`-sized field-only held-out passage; its field family still lacks a per-cell face owner. F5's product/evaluation gate remains closed; F3 is conditional on its response deadline and F6 follows the common release law. |
 | Campaign 3 | Mode release, dormant constitution/clock, founding and moment quotient; consumes the loaded ring connection |
 | Campaign 4 (#27) | Existing serial-screw laws need the HNN motor consumer and a motion-recording receipt |
 | Campaign 5 | Holonic Encoding, context, joint prediction and merges priced by their code-length pair |
@@ -64,6 +63,26 @@ consumers.
 - **Rejected trials.** The Born receiver failed its development criterion. Second-arrival
   founding lost on development cells and its Rust realization was retired. The stop-weight
   mixture is a measured count-only law; the full HNN retains its declared half prior.
+- **F4 release gate on disjoint development families.** A hash split pins 17,984 choosing and
+  4,465 validation families. On one private passage the charged curated code against the flat
+  stream is `−1477 + 5/16 + ε` choosing and `+1346 + 1/16 + ε` validation, at `L_R = 16`.
+  The 307,213-ms run peaked at 10,330,435,584 bytes, within its preflight budget. A one-hot
+  moiré next face separates at the following tick; arithmetic composition matches its determined
+  truth; the stochastic source and receiving faces differ. The byte population remains a
+  predictor. [F4 pin and receipt](research/records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md).
+- **F1 word alphabet.** A separate split pins 17,957 choosing and 4,492 validation families.
+  The known-truth fixed-width terrain recovers its observed words and the source mass including
+  stop. An ambiguous dictionary sums both singleton and pair parses exactly; a sectioned adapter
+  has a normalized 268-class face. The choosing work probe projects above ten minutes, so the
+  one held-out part is bounded at 113 bytes and END, where its prequential mass equals its exact
+  parse mass. No charged whole-stream win is claimed.
+  [F1 pin and receipt](research/records/2026-09-27_F1_WORD_ALPHABET_GATE.md).
+- **F2 field as a population family.** Its own development split is pinned. The host field read
+  one `n* = 6,148` byte-chart passage (4,096 choosing and 2,052 validation) in 363,330 ms;
+  its held-out model face read `6410 + 6/16 + ε` bits against PPM-2's `6896 + 12/16 + ε`.
+  This is aggregate field evidence only: `Reference::expose` does not return the per-cell
+  rational probability needed by `Population::Family`, so no F2 adoption is claimed.
+  [F2 pin and receipt](research/records/2026-09-27_F2_FIELD_FAMILY_GATE.md).
 
 ## Formal scope and targets
 

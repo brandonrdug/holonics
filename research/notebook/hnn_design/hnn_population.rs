@@ -1319,8 +1319,11 @@ fn main() {
         ["curated", curated_cut, flat_cut, "merges"] => {
             curated::harness(curated_cut, flat_cut, curated::Reach::Merges);
         }
+        ["f4", curated_cut, flat_cut] => {
+            curated::harness(curated_cut, flat_cut, curated::Reach::F4);
+        }
         _ => println!(
-            "usage: hnn_population -- tree <d> | moire parity | moire sheets | crib | switching | standing <cut> | composition [products | primes] | evolution | species | curated <curated-cut> <flat-cut> [development | merges]"
+            "usage: hnn_population -- tree <d> | moire parity | moire sheets | crib | switching | standing <cut> | composition [products | primes] | evolution | species | curated <curated-cut> <flat-cut> [development | merges] | f4 <joined-cut> <joined-flat-cut>"
         ),
     }
 }

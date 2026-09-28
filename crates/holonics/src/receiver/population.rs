@@ -260,14 +260,23 @@ pub mod dormancy;
 pub mod evolution;
 pub mod families;
 pub mod merge;
+pub mod releasing;
+pub mod sectioned_words;
 pub mod species;
+pub mod words;
 
 #[cfg(test)]
 mod composition_tests;
 #[cfg(test)]
 mod evolution_tests;
 #[cfg(test)]
+mod releasing_tests;
+#[cfg(test)]
+mod sectioned_words_tests;
+#[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod words_tests;
 
 pub use admitted::{
     AdmittedEgg, AdmittedReadout, CopyCell, CopyLaw, CopyStage, PointerReadout, Relation,
@@ -288,8 +297,16 @@ pub use merge::{
     Blocks, Item, KtTables, MergeReceipt, PartitionReceipt, Price, learn_hazard_partition,
     restaurant_ratio,
 };
+pub use releasing::{
+    MissingTextReleaseTerm, PopulationRelease, ReleaseRefusal, TextReleaseRefusal,
+};
+pub use sectioned_words::SectionedWordFamily;
 pub use species::{
     AdmittedFuture, Collapse, FactorSpecies, KeystoneMember, KeystoneSpecies, Seed, Species,
+};
+pub use words::{
+    EncodingSeparator, EncodingSquare, ParseError, SegmentationLattice, SeparatorCause, WORD_END,
+    WordDictionary, WordFamily, WordReadout,
 };
 
 use std::collections::BTreeMap;
@@ -448,6 +465,7 @@ pub enum Readout<'a> {
     Standing(&'a Landmarks),
     Boundary(Box<BoundaryReadout>),
     Admitted(Box<AdmittedReadout>),
+    Words(WordReadout),
 }
 
 /// [definition] **A declared navigator family** (module header): a candidate egg read by the
@@ -477,6 +495,19 @@ pub trait Family: Send {
             None => Ok(()),
         }
     }
+    /// Whether this family actually owns planned request/response incidence. An unrelated family
+    /// may share the population's alphabet but cannot make a requested relation effective.
+    fn owns_planned_relation(&self) -> bool {
+        false
+    }
+    /// Validate a receiver incidence planned before its target part arrives. Families that do
+    /// not own admitted request/response incidence ignore this operation.
+    fn validate_planned_relation(&self, _relation: Relation) -> Result<(), PopulationError> {
+        Ok(())
+    }
+    /// Commit a relation after every living family has validated it. This operation is infallible
+    /// so a later family cannot reject after an earlier one has already changed its standing.
+    fn commit_planned_relation(&mut self, _relation: Relation) {}
     /// The factor whose every key the killing cell contradicted, once the family has died there.
     fn exhausted(&self) -> Option<usize> {
         None
@@ -1634,6 +1665,32 @@ impl Population {
     /// The declared cell alphabet.
     pub fn alphabet(&self) -> usize {
         self.alphabet
+    }
+
+    /// Plan an admitted request/response incidence before receiving its target part. Validation
+    /// runs across all living families before any family is mutated; unrelated families ignore it.
+    pub fn plan_relation(&mut self, relation: Relation) -> Result<(), PopulationError> {
+        if !self
+            .members
+            .iter()
+            .any(|member| member.died.is_none() && member.family.owns_planned_relation())
+        {
+            return Err(refuse(
+                "a planned admitted relation",
+                "at least one living family owns the request/response incidence",
+            ));
+        }
+        for member in &self.members {
+            if member.died.is_none() {
+                member.family.validate_planned_relation(relation)?;
+            }
+        }
+        for member in &mut self.members {
+            if member.died.is_none() {
+                member.family.commit_planned_relation(relation);
+            }
+        }
+        Ok(())
     }
 
     /// **The declared total mass** `M = Σ_f 2^(−ℓ_f)` of the declared families.

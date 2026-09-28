@@ -5,6 +5,9 @@ Family keys and assignments stay in an owner-only file; stdout contains counts a
 
     HOLONICS_ROOT=<checkout with private data> python3 development_families.py
 
+Pass `F1` or `F2` for an independent item split before its validation; the default remains the
+pinned F4 split.
+
 The split belongs to the exterior codec. A family is the undivided pair
 ``(provider, record_group)`` from the dataset, not a byte span or an aeon. SHA-256 of the
 declared seed, a NUL separator and its canonical JSON gives a hash-seeded assignment: residue
@@ -31,16 +34,20 @@ def canonical_family(family):
     return json.dumps(family, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
 
 
-def assignment(family):
+def assignment(family, seed=SEED):
     key = canonical_family(family)
-    digest = hashlib.sha256(SEED.encode() + b"\0" + key).digest()
+    digest = hashlib.sha256(seed.encode() + b"\0" + key).digest()
     return ("validation" if int.from_bytes(digest, "big") % 5 == 0 else "choosing",
             hashlib.sha256(key).hexdigest())
 
 
 def main():
-    if sys.argv[1:]:
+    arguments = sys.argv[1:]
+    if arguments not in ([], ["F1"], ["F2"]):
         sys.exit(__doc__)
+    item = arguments[0] if arguments else "F4"
+    seed = SEED if item == "F4" else f"holonics-{item.lower()}-development-families-2026-09-27-v1"
+    name = NAME if item == "F4" else f"development-families-{item.lower()}.json"
     with open(os.path.join(OUT_DIR, "curated-source.json"), "rb") as handle:
         source_manifest = json.load(handle)
     counts = {"choosing": 0, "validation": 0}
@@ -61,7 +68,7 @@ def main():
                 continue
             record = json.loads(line)
             assert record["kind"] == "occurrence-family" and record["partition"] == partition
-            role, family_hash = assignment(record["family"])
+            role, family_hash = assignment(record["family"], seed)
             assert family_hash not in seen, "each development family occurs once"
             seen.add(family_hash)
             counts[role] += 1
@@ -71,9 +78,9 @@ def main():
     members.sort(key=lambda item: item["family_sha256"])
     membership_bytes = json.dumps(members, separators=(",", ":"), sort_keys=True).encode()
     receipt = {
-        "schema": "holonics.development-families-f4.v1",
+        "schema": f"holonics.development-families-{item.lower()}.v1",
         "source_sha256": source_manifest["source_sha256"],
-        "seed": SEED,
+        "seed": seed,
         "canonical": "UTF-8 JSON of family {provider,record_group}, sorted keys, compact separators",
         "hash": "SHA-256(seed UTF-8 || NUL || canonical); big-endian integer mod 5",
         "validation_residue": 0,
@@ -82,7 +89,7 @@ def main():
         "members": members,
     }
     private_directory()
-    private_write(NAME, json.dumps(receipt, indent=2).encode())
+    private_write(name, json.dumps(receipt, indent=2).encode())
     print(json.dumps({k: receipt[k] for k in ("schema", "source_sha256", "seed", "counts", "membership_sha256")}, indent=2))
 
 

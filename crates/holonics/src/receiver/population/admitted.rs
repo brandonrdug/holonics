@@ -533,6 +533,49 @@ impl AdmittedEgg {
         &self.inner
     }
 
+    /// Check a request/response incidence while both its target and reading part are still ahead
+    /// of the clock. This does not create a span early: `open_part` creates and retains that span
+    /// when the target letter is actually received.
+    fn validate_planned_relation(&self, relation: Relation) -> Result<(), PopulationError> {
+        if relation.target >= relation.letter || relation.target < self.tick {
+            return Err(refuse(
+                "a planned admitted relation",
+                "its target is at the current or a future part and precedes its reading part",
+            ));
+        }
+        if self
+            .relations
+            .iter()
+            .any(|old| old.letter == relation.letter)
+        {
+            return Err(refuse(
+                "a planned admitted relation",
+                "there is at most one relation on each reading part",
+            ));
+        }
+        let insertion = self
+            .relations
+            .partition_point(|old| old.letter < relation.letter);
+        if insertion < self.next {
+            return Err(refuse(
+                "a planned admitted relation",
+                "relations remain in increasing letter order without changing a passed part",
+            ));
+        }
+        Ok(())
+    }
+
+    fn insert_planned_relation(&mut self, relation: Relation) {
+        let insertion = self
+            .relations
+            .partition_point(|old| old.letter < relation.letter);
+        self.relations.insert(insertion, relation);
+        if insertion < self.next {
+            self.next += 1;
+        }
+        *self.targets.entry(relation.target).or_insert(0) += 1;
+    }
+
     /// The open part's located continuation and its relation's kind, when a relation is held.
     fn located(&self) -> Option<(RelationKind, Located)> {
         let open = self.open.as_ref()?;
@@ -654,6 +697,10 @@ impl AdmittedEgg {
 }
 
 impl Family for AdmittedEgg {
+    fn owns_planned_relation(&self) -> bool {
+        true
+    }
+
     fn label(&self) -> String {
         self.label.clone()
     }
@@ -741,6 +788,21 @@ impl Family for AdmittedEgg {
             }
         };
         for relation in &self.relations[self.next..] {
+            let (reader, target) = relation.kind.channels();
+            if (self.tick..end).contains(&relation.target) && !letter_on(relation.target, target) {
+                return Err(refuse(
+                    "a planned admitted relation's target",
+                    "it opens as a letter on the target port before any state changes",
+                ));
+            }
+            if (self.tick..end).contains(&relation.letter) && !letter_on(relation.letter, reader) {
+                return Err(refuse(
+                    "a planned admitted relation's reading part",
+                    "it opens as a letter on the reading port before any state changes",
+                ));
+            }
+        }
+        for relation in &self.relations[self.next..] {
             if relation.letter >= end {
                 break;
             }
@@ -756,6 +818,14 @@ impl Family for AdmittedEgg {
             }
         }
         Ok(())
+    }
+
+    fn validate_planned_relation(&self, relation: Relation) -> Result<(), PopulationError> {
+        self.validate_planned_relation(relation)
+    }
+
+    fn commit_planned_relation(&mut self, relation: Relation) {
+        self.insert_planned_relation(relation);
     }
 
     fn likelihood(&self) -> Likelihood {

@@ -12,6 +12,10 @@
 - **The curated conversation source** (channels as ports, turns as epochs, conversations as aeons)
   codes below the flat stream of the same bytes on a development-partition cut. There is no
   evidence yet of performance on the evaluation families, or of answer quality.
+- **F4 release gate:** the development-family split is pinned and its one held-out passage has run.
+  Request incidence can be planned before its target, and a next-cell release view equals the
+  scored face; complete text release is refused. The validation code is above its flat control,
+  and a moiré continuation separates within its full joint period ([F4 receipt](../../research/records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md)).
 - **What follows** is the [forward plan](#the-forward-plan-september-27). Step 6's finite physics
   and step 7's first curation pass are built; equation extraction (#146), the remaining curation
   (#147) and applications (#148) remain open.
@@ -30,7 +34,7 @@ short current position; dated records hold the evidence.
 | Wide-cut receiver | The compacted tree, `D = 48`, with capacity `2^11` | `1 + 15/16 + ε` bits a cell held out; count-only, not the full HNN |
 | Terrain with known truth | `holarchy::terrain` and the population's families | Selects among declared families: the sheet moiré at its key description, the arithmetic at exactly its truth, the parity moiré at a word fibre |
 | Curated conversation source | The population: a part clock, a boundary egg, a request→response receiver, learned byte classes | On the development partition's curated cut, `−1820 + 9/16 + ε` in its development cells and `−535 + 8/16 + ε` in its held-out tail against the flat stream; words are F1 |
-| Release (generation) and products | The release contract (`HNN_FORMULA`), the generic `receiver::release` law, egg packing | No population text-release consumer yet (F4); Athena-0 is F5 |
+| Release (generation) and products | The release contract (`HNN_FORMULA`), the generic `receiver::release` law, egg packing; `Population::plan_relation` and a score-identical next-face view | F4's text decoder, producing keys/provenance, grain/fibre and release square remain absent; its pinned validation fails. Athena-0 is F5 |
 
 **Built on September 27** ([record](../../research/records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md)):
 - the unity steps: the Decisions log dissolved, the Holarchy and aeons at the top, and the
@@ -71,6 +75,13 @@ the wide cut and the curated cut.
 
 ### F1. The word alphabet (campaign 5; #73, #148)
 
+[established-bounded; measured] The [F1 pin and receipt](../../research/records/2026-09-27_F1_WORD_ALPHABET_GATE.md)
+include the exact known-truth word terrain, segmentation mass and decoder/separator, a 268-class
+sectioned adapter and one bounded held-out part. The fixed choosing dictionary's exact word path
+took 8,981 ms for 128 bytes, projecting far beyond the ten-minute full passage. Its one 113-byte
+validation part satisfied the exact parse/score identity including END; no full charged
+whole-stream win is claimed. Bytes remain the text chart under F1's failure branch.
+
 - **Builds on.** `Context/Merge` (`expand_merge`, `merge_cost_iff`, `segmentation_mass`,
   `parse_code`, `segmentation_code_le`, `encoding_square_or_separator`,
   `release_merge_iff_future_equivalent`) and `receiver::population::merge`.
@@ -92,6 +103,13 @@ the wide cut and the curated cut.
 - **If either fails.** The bytes stay, and the word law's bounded terrain result is recorded.
 
 ### F2. The field as a family (step 4; #73)
+
+[established-bounded; source-inspected] The [F2 pin and preflight](../../research/records/2026-09-27_F2_FIELD_FAMILY_GATE.md)
+found that the proposed full passage exceeds the budget and the bounded probe is below the
+field's admitted `n*`. The resident exposure also lacks a per-cell rational field face for the
+population's `Family` contract. A corrected `n*`-sized host field exposure read one held-out
+development passage in 363,330 ms, but supplies no population field-family comparison or
+adoption. The field remains dormant for text until that consumer is built.
 
 - **Builds on.** `hnn::receiving`, `hnn::reference::expose`, `receiver::population` and its work
   receipts.
@@ -121,6 +139,11 @@ the wide cut and the curated cut.
 - **If no family completes resident.** F3 fails, and a host Athena may still proceed.
 
 ### F4. Release (campaign 5 into step 8)
+
+[established-bounded; measured] The [pinned split and receipt](../../research/records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md)
+record one held-out development-family passage. The F4 failure branch applies: the score-identical
+next-face view is built, but the text-release carrier is incomplete, and the charged validation
+stream is above the flat control. The evaluation partition remains closed.
 
 - **Builds on.** `receiver::release`, the generic release law.
 - **New.** The population's text-release consumer.

@@ -11,6 +11,7 @@ use crate::compression::landmark::context::{
 };
 use crate::ratio::algebraic::ExactInterval;
 use crate::receiver::population::TreeFamily;
+use crate::receiver::population::{Population, PopulationRelease};
 
 const POPULATION: u64 = 1 << 10;
 const GRAIN: u64 = 16;
@@ -380,4 +381,88 @@ fn the_incidence_is_refused_out_of_order_or_off_its_ports() {
         assert!(egg.admits(&cells).is_err());
         assert!(egg.likelihood() == Likelihood::Enclosed(PassageCode::new()));
     }
+}
+
+#[test]
+fn a_planned_request_conditions_the_response_face_before_the_request_span_is_read() {
+    let (cells, ticks) = passage();
+    let make = || {
+        AdmittedEgg::new(
+            "planned admitted receivers".to_string(),
+            1,
+            inner(),
+            chart(),
+            Vec::new(),
+            law(),
+        )
+        .expect("an admitted egg")
+    };
+    let relation = Relation {
+        letter: ticks[1],
+        kind: RelationKind::Request,
+        target: ticks[0],
+    };
+    let mut conditioned = Population::new(vec![Box::new(make())]).expect("population");
+    conditioned
+        .plan_relation(relation)
+        .expect("plan before the request arrives");
+    let mut unconditioned = Population::new(vec![Box::new(make())]).expect("population");
+
+    // Read the request and its bytes, then the response's opening section. Its following byte is
+    // now scored against the retained request span only in the planned receiver.
+    // Read through the first response while its request span is retained; its locator can then
+    // condition the next scored cell.
+    for &cell in &cells[..ticks[2] as usize] {
+        conditioned.receive(cell).expect("conditioned reception");
+        unconditioned
+            .receive(cell)
+            .expect("unconditioned reception");
+    }
+    let scored = conditioned.face().expect("conditioned score");
+    let bare = unconditioned.face().expect("unconditioned score");
+    assert_ne!(
+        scored, bare,
+        "the request relation changes the response face"
+    );
+
+    let released = PopulationRelease::from_scored_face(&conditioned, chart().alphabet() - 1)
+        .expect("release the current scored face");
+    assert_eq!(released.face(), scored.as_slice());
+    assert_eq!(released.stopping_class(), chart().alphabet() - 1);
+}
+
+#[test]
+fn planning_refuses_passed_targets_and_duplicate_reading_parts() {
+    let (cells, ticks) = passage();
+    let make = || {
+        AdmittedEgg::new(
+            "planned admitted receivers".to_string(),
+            1,
+            inner(),
+            chart(),
+            Vec::new(),
+            law(),
+        )
+        .expect("an admitted egg")
+    };
+    let relation = Relation {
+        letter: ticks[1],
+        kind: RelationKind::Request,
+        target: ticks[0],
+    };
+    let mut population = Population::new(vec![Box::new(make())]).expect("population");
+    population
+        .plan_relation(relation)
+        .expect("the request target is still ahead");
+    assert!(
+        population.plan_relation(relation).is_err(),
+        "one relation per part"
+    );
+
+    let mut late = Population::new(vec![Box::new(make())]).expect("population");
+    late.receive(cells[0]).expect("receive the target section");
+    assert!(
+        late.plan_relation(relation).is_err(),
+        "the target has passed"
+    );
 }

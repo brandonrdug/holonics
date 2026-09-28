@@ -71,3 +71,11 @@ path = "../../research/notebook/hnn_design/hnn_curated.rs"
 [[example]]
 name = "hnn_population"
 path = "../../research/notebook/hnn_design/hnn_population.rs"
+
+[[example]]
+name = "hnn_release_terrain"
+path = "../../research/notebook/hnn_design/hnn_release_terrain.rs"
+
+[[example]]
+name = "hnn_word_probe"
+path = "../../research/notebook/hnn_design/hnn_word_probe.rs"

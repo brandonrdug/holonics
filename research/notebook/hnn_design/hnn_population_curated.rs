@@ -678,7 +678,8 @@ fn receivers(now: &AdmittedReadout, before: Option<&AdmittedReadout>) -> ExactIn
 }
 
 /// The population's readings on one population against the flat tree's, beside the recorded
-/// readings; returns the whole curated stream against the flat stream.
+/// readings; returns the whole curated stream against the flat stream. F4 has a new, disjoint
+/// family population, so historical readings of the earlier mixed cut are not compared to it.
 #[allow(clippy::too_many_arguments)]
 fn readings(
     part: usize,
@@ -689,6 +690,7 @@ fn readings(
     flat_charge: u64,
     egg: usize,
     pointer: &ExactInterval,
+    historical: bool,
 ) -> ExactInterval {
     let grain = super::GRAIN;
     let at = |slot: usize| &readings[part * SLOTS.len() + slot];
@@ -720,7 +722,7 @@ fn readings(
             &tree,
             counts[part][slot],
         );
-        if slot == 1 {
+        if slot == 1 && historical {
             println!(
                 "      without the admitted receivers (the population of commit 40ab94cf): {}",
                 RECORDED_AGENT[part]
@@ -764,15 +766,17 @@ fn readings(
         lower: &whole.lower - &flat_whole.upper,
         upper: &whole.upper - &flat_whole.lower,
     };
-    println!(
-        "    beside, recorded on the same cells (the whole curated stream against the flat stream):"
-    );
-    for (label, cells) in &RECORDED_WHOLE {
-        let (carry, phase) = cells[part];
+    if historical {
         println!(
-            "      {label}: {carry} + {phase}/{grain} + ε; this passage lies {} it",
-            against(&delta, &grain_cell(cells[part]))
+            "    beside, recorded on the same cells (the whole curated stream against the flat stream):"
         );
+        for (label, cells) in &RECORDED_WHOLE {
+            let (carry, phase) = cells[part];
+            println!(
+                "      {label}: {carry} + {phase}/{grain} + ε; this passage lies {} it",
+                against(&delta, &grain_cell(cells[part]))
+            );
+        }
     }
     delta
 }
@@ -784,10 +788,13 @@ pub enum Reach {
     Merges,
     Development,
     Whole,
+    /// F4: a choosing-family cut followed by the one validation-family passage.
+    F4,
 }
 
 pub fn harness(curated_path: &str, flat_path: &str, reach: Reach) {
     let clock = Instant::now();
+    let f4 = reach == Reach::F4;
     let chart = SectionChart::curated();
     let cut = read_curated(curated_path, &chart);
     let (flat_bytes, flat_count, flat_held) = read_cut(flat_path);
@@ -838,7 +845,8 @@ pub fn harness(curated_path: &str, flat_path: &str, reach: Reach) {
         })
         .collect();
     println!(
-        "hnn_population curated: the curated source through the egg population against the flat stream of the same bytes (campaign 5; #73, #148)"
+        "hnn_population curated: {} through the egg population against the flat stream of the same bytes (campaign 5; #73, #148)",
+        if f4 { "F4 disjoint choosing and validation families" } else { "the curated source" }
     );
     println!(
         "0. the cut: {} curated cells (|A| = {}), {flat_count} flat cells, identical bytes: {identical}; n* = {}, L_R = {grain}",
@@ -1124,28 +1132,38 @@ pub fn harness(curated_path: &str, flat_path: &str, reach: Reach) {
             flat_charge,
             egg_index,
             &pointer,
+            !f4,
         );
-        let recorded = grain_cell(RECORDED_WHOLE[0].1[part]);
-        if part == 0 {
-            adopted = whole.upper < recorded.lower;
+        if f4 {
             println!(
-                "  development's choice (the learned partition in the admitted egg, its description charged, against the declared partition's recorded reading on the same cells): {}",
-                if adopted {
-                    "the learned partition adopted"
-                } else {
-                    "the declared partition kept (the learned one is not below it)"
-                }
+                "  F4 {} families: one {} passage; the partition was learned only from choosing cells; the charged whole-stream difference {}",
+                if part == 0 { "choosing" } else { "validation" },
+                if part == 0 { "choosing" } else { "held-out" },
+                enclosure(&whole, grain)
             );
         } else {
-            println!(
-                "  held out, read once after development's choice and choosing nothing: the {} partition's admitted egg {} the declared partition's recorded reading",
-                if adopted {
-                    "adopted learned"
-                } else {
-                    "disclosed (not adopted) learned"
-                },
-                against(&whole, &recorded)
-            );
+            let recorded = grain_cell(RECORDED_WHOLE[0].1[part]);
+            if part == 0 {
+                adopted = whole.upper < recorded.lower;
+                println!(
+                    "  development's choice (the learned partition in the admitted egg, its description charged, against the declared partition's recorded reading on the same cells): {}",
+                    if adopted {
+                        "the learned partition adopted"
+                    } else {
+                        "the declared partition kept (the learned one is not below it)"
+                    }
+                );
+            } else {
+                println!(
+                    "  held out, read once after development's choice and choosing nothing: the {} partition's admitted egg {} the declared partition's recorded reading",
+                    if adopted {
+                        "adopted learned"
+                    } else {
+                        "disclosed (not adopted) learned"
+                    },
+                    against(&whole, &recorded)
+                );
+            }
         }
         println!("  each family's code on this population:");
         let family_receipt = if part == 0 {
@@ -1173,7 +1191,7 @@ pub fn harness(curated_path: &str, flat_path: &str, reach: Reach) {
         };
         stages(&egg_stages, &channels, counts[part][LETTERS]);
         receivers(admitted, before);
-        if part == 0 {
+        if part == 0 && !f4 {
             println!(
                 "    the retired per-port reader's closes on the development cells: human {}, agent {}; its section navigator's letters {RETIRED_LETTERS}",
                 RETIRED_CLOSES[0], RETIRED_CLOSES[1]
