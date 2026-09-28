@@ -2393,8 +2393,7 @@ impl Constitution {
     ///
     /// **A complex-bilinear block is refused at declaration** (design (d), "Reaction"): a reaction
     /// slice is declared only through its factor pair `(u_ρ, v_ρ)`, so `A_ρ = u_ρ v_ρᵀ − v_ρ u_ρᵀ` is
-    /// skew and workless, the owner's real-bilinear reaction (`holon::reaction`,
-    /// `Holon/Reaction.skewReaction_workless`). A full block `c ⊗ s` has no declaration, since no
+    /// skew and workless, the real-bilinear reaction (`Holon/Reaction.skewReaction_workless`). A full block `c ⊗ s` has no declaration, since no
     /// such block is power-neutral for both `c` and `i c` unless it is zero
     /// (`Holon/Reaction.bilinear_reaction_workless_iff_zero`). The guarantee is structural, the
     /// parameter's type; the doctest fails with a type mismatch (`E0308`):

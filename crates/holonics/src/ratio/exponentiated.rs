@@ -106,9 +106,7 @@ use thiserror::Error;
 use super::surprisal::SymbolicSurprisal;
 
 mod carried;
-mod transport;
 pub use carried::{CarriedPower, PhaseField, READING_BITS, power_of_two};
-pub use transport::{NormalizedKernel, NormalizedKernelError};
 
 /// `2^form`, exactly, when the form's coefficients are integers.
 ///

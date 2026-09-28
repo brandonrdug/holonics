@@ -189,6 +189,35 @@ That is the next consumer of
 [#50](https://github.com/brandonrdug/holonics/issues/50)'s certificate-bearing rank/kernel/solve,
 and nothing in this instance waited on it.
 
+**Retired September 28.** The ported Rust atlas `compression::landmark::identity` had no consumer
+and is retired; it is at [`2d34b819`](https://github.com/brandonrdug/holonics/tree/2d34b819/crates/holonics/src/compression/landmark/identity.rs).
+Lean `Compression/Landmark/Identity` keeps the identity ideal and the coverage law
+(`certifies_exactly_iff`, `identityIdeal_eq_iff_dense`). Its dimension certificate and density step
+are not in Lean, and are kept here.
+- **Hypotheses.** The configuration `V ⊆ ℚˢ` is declared as its irreducible components (declared,
+  not computed), each a point or a curve with generators over ℚ, and a curve's eliminants are among
+  its generators (supplied, not computed by elimination). Charts have one parameter:
+  `t ↦ (N_i(t)/D_i(t))_i`.
+- `[proved-standard]` **The dimension certificate.** A component's dimension is the largest number
+  of its coordinates algebraically independent on it: a transcendence basis of its function field
+  can be chosen among the coordinates. A nonzero generator in each single coordinate therefore
+  bounds a point component's dimension by zero, and a nonzero generator in each pair of coordinates
+  bounds a curve's by one. A component without that certificate was refused, because a declaration
+  without it invents identities: the plane declared a curve and covered by the `x`-axis chart
+  certifies `y`.
+- `[proved-standard]` **Density.** A chart lands in a component when every generator pulls back to
+  zero. A nonconstant chart landing in an irreducible curve has an infinite image, which is Zariski
+  dense in it; a constant chart landing in a point is the point. One landing chart of the
+  component's dimension for each component gives `I(⋃ images) = ⋂ I(V_j) = I(V)`.
+- `[proved-derived]` **The search and its witness.** The identities in the span of a finite family
+  are the kernel of the exact matrix of pullback coefficients over every chart, each chart over one
+  common denominator. A candidate that is not an identity has a witness point among
+  `deg N + Σ deg D_i + 1` integer parameters, since only that many can be roots or poles.
+
+Owed (#62): the dimension certificate and the density step in Lean, with the identity atlas;
+irreducible decomposition, elimination, and charts of more than one parameter stay outside the
+declared scope.
+
 ## Prior art run before anything was founded
 
 ```text
