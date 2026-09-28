@@ -42,7 +42,7 @@ docstring says otherwise.
 | `hnn_exposure.rs` | Campaign 1's exposure on a cut: the model face (the landmark tree mixed with the combined face), the baselines, keys, aeons and the first law; on the host or the card (`realization card`); the loaded resonator (`resonator source`) | `cargo run --release -p holonics --example hnn_exposure -- cut-file .local/cuts/standing-real-cut-campaign-1.bin cells all` | [campaign 1 meets its criterion](../../records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md), [the resonator](../../records/2026-09-26_THE_RESONATOR_RETURNS_ITS_WAVE_AND_THE_COMPARISON_REACHES_ITS_MATERIAL.md), [campaign 2](../../records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md) |
 | `hnn_landmark.rs` | The landmark tree (count-only): the depth sweep and prequential passage; `letters`, `prior`, `wide`, `compact`, `capacity` | `cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin` | [below PPM-2](../../records/2026-09-26_THE_LANDMARK_TREE_COMPRESSES_THE_STANDING_CUT_BELOW_PPM_TWO.md), [at scale](../../records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md), [capacity](../../records/2026-09-27_A_LANDMARKS_STORAGE_HAS_A_CAPACITY_AT_ITS_CEILING_IT_CARRIES.md), [campaign 2](../../records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md) |
 | `hnn_population.rs` (with `hnn_population_{composition,evolution,curated}.rs`) | The egg population: terrain (`tree`, `moire`, `crib`, `switching`, `standing`), `composition`, `evolution`, `species`, the curated source (`curated`, with `merges`), `f4` | `cargo run --release -p holonics --example hnn_population -- <mode>` | [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md), [F4](../../records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md), [the forward plan](../../records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md) |
-| `hnn_chase.rs` | F6's chase terrain: the reception phase, the action phase's choosing sweep (`choose`) and its acceptance (`action`) | `cargo run --release -p holonics --example hnn_chase` | [the learner must move](../../records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md) (no dedicated record; the receipts below) |
+| `hnn_chase.rs` | F6's chase terrain: the reception phase, the action phase's choosing sweep (`choose`) and its acceptance (`action`, with U4's move reading) | `cargo run --release -p holonics --example hnn_chase` | [the learner must move](../../records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md) (no dedicated record; the receipts below) |
 | `exterior.rs` | The shared exterior boundary the examples include | | |
 | `standing_cut.py` | Pins the standing real cut (`6148`) and the wide cut (`wide 1048576`) | `python3 research/notebook/hnn_design/standing_cut.py 6148` | [campaign 1 meets its criterion](../../records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md), [at scale](../../records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) |
 | `curated_source.py`, `curated_incidence.py` | The curated source, its pinned cut and flat twin; the admitted relations on the cut | `HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/curated_source.py 1048576` | [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md) |
@@ -1917,3 +1917,59 @@ before the seed's first capture. The last column is the runner's slips, as onset
   - the controls' laws.
 - **Not built.** The switches: the lag channel, and three observation channels with loop-closure
   attribution. The construction record's F6 action-phase receipt and #62 ("The chase consumer") record the owed Lean.
+
+### F6: the chase reads the move pair, and the move reading (U4's rebase, September 28)
+
+Record: the motion's first consumer, [the motion record §7](../../records/2026-09-28_THE_SWING_IS_A_MOVE_ABOUT_A_GRIP_A_GRIP_TURNS_A_PUSH_BOOSTS_AND_A_FREE_BODY_FALLS.md#7-the-first-consumer-the-chase); THE_REBUILD U4.
+
+```sh
+cargo run --release -p holonics --example hnn_chase                    # the reception phase
+cargo run --release -p holonics --example hnn_chase -- action trace    # the action phase, with the move reading
+cargo test -p holonics --lib geometry::motion holarchy::terrain
+```
+
+[definition; agent-inferred] **The rebase.** `holonics::geometry::motion` owns the move pair
+`(v, v′)` over the Gaussian integers `ℤ[i]`, carried undivided (`Move`), with its change, its kind
+(`MoveKind`: rest, start, stop, free fall, turn, boost, turn and boost, decided on the integers
+without division where a velocity vanishes), its traction disk (`within_cap` on the lattice at
+`⌊r²⌋`, `within_bound` in ℚ), its power `Re(v̄·Δv)` and its signed turn `Im(v̄·Δv)`, each cited to
+Lean `Geometry/Motion`. The chase's traction law (`RunnerLaw::admits`), its demand and slip test
+(`Runner::demand`, `Runner::cell`), its letters (`Arena::observe`: a move letter realizes
+`(v, v + Δv)`, a slip the held move `(v, v)`), the chaser's admitted motions (`Pursuer::motions`) and
+the viable tube's successors (`pursuit`'s `post`) read their moves through it. The lattice
+arithmetic (`Point`, `add`, `sub`, `scale`, `quadrance`, `quarter_turn`, `dot`, `det`) moved into the
+owner, each checked equal to `ratio::GaussianRat`'s on `ℤ[i]`; it stays in machine words because the
+tube and the basin read it for every runner motion of every decision. `floor_cap` stays in the chase:
+it reads the chase's declared rational bounds (speed, capture) as well as the traction disk.
+
+**Parity: every chase receipt is unchanged.** The 11 chase and pursuit tests pass with their file
+untouched. Built before and after the rebase, the harness's output agrees line for line with only
+the wall times masked: the reception phase's 414 lines (the 16 arenas' codes, fibres and future
+classes), `action trace`'s 185 lines (capture ticks 164 / 3,704 / 366, the cornering sums
+101,054 / 120,868 / 133,444 and 101,054 / 2,750,616 / 227,295, every tube tick by tick, the slips
+(4, 7) / (83, 112) / (14, 21), the walls 9 / 151 / 19, the releases 152 / 11 / 1 and the 21 misses)
+and the choosing rung `choose 2 12 0` (150 / 4,668 / 240). The action run took 16,020 ms at a
+249,420 kB peak resident set (16,620 ms at 249,156 kB before).
+
+**The move reading** (a reading of the receipt, not a change of law): each tick's move of the
+runner and of the chaser by kind, over the 16 acceptance seeds.
+
+| Against | Mover | Rest | Start | Stop | Free fall | Turn | Boost | Turn and boost |
+|---|---|---|---|---|---|---|---|---|
+| the machine | runner | 22 | 33 | 24 | 38 | 3 | 22 | 22 |
+| | chaser | 0 | 16 | 1 | 104 | 16 | 0 | 27 |
+| pure pursuit | runner | 133 | 339 | 332 | 1,969 | 91 | 370 | 470 |
+| | chaser | 0 | 16 | 0 | 2,796 | 367 | 0 | 525 |
+| constant bearing | runner | 46 | 63 | 52 | 82 | 8 | 61 | 54 |
+| | chaser | 0 | 17 | 1 | 149 | 102 | 0 | 97 |
+
+- **Every slip reads as the demanded move outside the traction disk while the realized move is the
+  held one.** Every onset's demanded move (the runner's law re-read at the tick) lies outside the
+  disk of the cell it stands on: 4 of 4, 83 of 83 and 14 of 14. Every slipping tick realizes
+  `(v, v)`: 7 of 7, 112 of 112 and 21 of 21. The demanded moves are turns and boosts (4; 69; 6),
+  pure turns (0; 13; 1) and stops (0; 1; 7): a stop demanded as on the firmer ground behind slips
+  where the speed passes the disk of the ground underfoot.
+- **The chaser never boosts purely.** Its speed cap `⌊v_C²⌋ = 2` admits only the nonzero lattice
+  velocities of quadrance `1` (the axes) and `2` (the diagonals), one to each ray, so each of its
+  speed changes turns as well. Its starts are its openings, one a seed, and constant bearing's one restart after
+  its one stop; the machine's one stop is its last move before capture.

@@ -503,6 +503,16 @@ slips. During a slip the realized move can be the identity while the demanded on
 disk, and opening velocities are zero and stopping gives `k = 0`, so the consumer carries the
 undivided pair `(v, v′)`, not `k`. It does not consume this reading yet.
 
+[after-note, September 28; THE_REBUILD U4] It now does. `holonics::geometry::motion` owns the pair
+`(v, v′)` over `ℤ[i]` (`Move`) with its change, its kind decided on the integers without division
+(rest, start, stop, free fall, turn, boost, turn and boost), its traction disk, its power and its
+signed turn, each cited to this record's Lean. The chase's traction law, demand, slip test and
+letters, the chaser's admitted motions and the viable tube's successors read their moves through it,
+and every chase receipt is unchanged; the move reading of the 16 action seeds is in the
+[notebook](../notebook/hnn_design/README.md#f6-the-chase-reads-the-move-pair-and-the-move-reading-u4s-rebase-september-28).
+Still owed in #62: the Lean statement that the integer kind test is the ratio's kind where `v ≠ 0`,
+which the Rust tests check on every pair of `[−2, 2]²`.
+
 ## 8. What this does not claim
 
 - The text receivers (the tree and the population) are not yet Holons joined at ports

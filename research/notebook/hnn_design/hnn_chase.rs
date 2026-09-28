@@ -54,6 +54,13 @@
 //! the fibre's size at its last tick. Then the sums, the seeds won, and the verdict against F6's
 //! acceptance: capture in strictly fewer ticks than both controls in sum and in more than half of
 //! the seeds. `action trace` prints each passage's tube sizes tick by tick as well.
+//!
+//! [definition; agent-inferred] **The move reading** (THE_REBUILD U4; a reading of the receipt, not
+//! a change of law): for each passage and in sum, each tick's move `(v, v′)` of the runner and of
+//! the chaser counted by its kind (`geometry::motion`: rest, start, stop, free fall, turn, boost,
+//! turn and boost), and each slip read as the demanded move outside the traction disk of the cell
+//! the runner stands on (at the onset, the demanded move's kind) while the realized move is the held
+//! one `(v, v)` at every slipping tick.
 
 #[path = "exterior.rs"]
 mod exterior;
@@ -63,10 +70,11 @@ use std::time::Instant;
 use holonics::compression::landmark::context::{
     Capacity, LandmarkDeclaration, LetterFamily, StopPrior,
 };
+use holonics::geometry::motion::{Move, MoveKind};
 use holonics::holarchy::terrain::{
     ActionDeclaration, ActionPassage, ArenaDeclaration, Basin, BasinMemo, Candidate, Chase,
     ConstantBearing, Evasion, Motion, Moves, PurePursuit, Pursuer, RunnerFamily, RunnerLaw,
-    act_drawn,
+    RunnerState, act_drawn,
 };
 use holonics::ratio::algebraic::ExactInterval;
 use holonics::ratio::surprisal::SymbolicSurprisal;
@@ -342,6 +350,124 @@ fn least_capture(seed: u64, limit: usize) -> Option<usize> {
         .expect("the basin")
 }
 
+/// [definition; agent-inferred] **A passage's move reading** (module header; a reading of the
+/// receipt, not a law): per tick the runner's move `(v_t, v_(t+1))` from its opening at rest and the
+/// chaser's from its port, each counted by kind (`geometry::motion::MoveKind`, in its declared
+/// order); and each slip, at its onset the demanded move `(v, v + Δv)` (the runner's law re-read at
+/// the tick, `Runner::demand`) against the traction disk of the cell it stands on, and at every
+/// slipping tick the realized move against the held one `(v, v)`.
+#[derive(Clone, Copy, Debug, Default)]
+struct MoveReading {
+    runner: [usize; 7],
+    chaser: [usize; 7],
+    onsets: usize,
+    outside: usize,
+    demanded: [usize; 7],
+    slipping: usize,
+    held: usize,
+}
+
+impl MoveReading {
+    fn add(&mut self, other: &MoveReading) {
+        let pairs = [
+            (&mut self.runner, &other.runner),
+            (&mut self.chaser, &other.chaser),
+            (&mut self.demanded, &other.demanded),
+        ];
+        for (total, count) in pairs {
+            for (t, c) in total.iter_mut().zip(count) {
+                *t += c;
+            }
+        }
+        self.onsets += other.onsets;
+        self.outside += other.outside;
+        self.slipping += other.slipping;
+        self.held += other.held;
+    }
+}
+
+/// A kind's place in `MoveKind::ALL`.
+fn kind_index(kind: MoveKind) -> usize {
+    MoveKind::ALL
+        .iter()
+        .position(|&k| k == kind)
+        .expect("a declared kind")
+}
+
+/// Counts by kind, as `label n` in the declared order.
+fn kinds_line(counts: &[usize; 7]) -> String {
+    MoveKind::ALL
+        .iter()
+        .zip(counts)
+        .map(|(kind, n)| format!("{} {n}", kind.label()))
+        .collect::<Vec<_>>()
+        .join(", ")
+}
+
+/// **A passage's move reading** (on [`MoveReading`]): the runner replayed from its opening through
+/// its cells, which must return the passage's path at every tick.
+fn move_reading(passage: &ActionPassage) -> MoveReading {
+    let ports = &passage.ports;
+    let (arena, moves, runner) = (&ports.arena, &ports.moves, &passage.runner);
+    let caps = runner.law.caps(arena.declaration()).expect("the caps");
+    let chaser = ports.chaser.motions();
+    let mut state = RunnerState::opening(arena, ports.opening.position).expect("the opening");
+    let mut reading = MoveReading::default();
+    for (tick, &cell) in passage.cells.iter().enumerate() {
+        let v = state.motion.velocity;
+        let realized = Move::new(v, passage.path[tick].velocity);
+        reading.runner[kind_index(realized.kind())] += 1;
+        let chased = Move::new(chaser[tick].velocity, chaser[tick + 1].velocity);
+        reading.chaser[kind_index(chased.kind())] += 1;
+        if cell == moves.slip() {
+            reading.slipping += 1;
+            reading.held += usize::from(realized == Move::held(v));
+            if state.held == 0 {
+                reading.onsets += 1;
+                let change = runner
+                    .demand(
+                        arena,
+                        moves,
+                        &caps,
+                        &state,
+                        chaser[tick].position,
+                        tick as u64,
+                    )
+                    .expect("a slip onset has its demand");
+                let demanded = Move::by_change(v, change);
+                let class = arena.class(state.motion.position).expect("in the arena");
+                reading.outside += usize::from(!demanded.within_cap(caps.classes[class]));
+                reading.demanded[kind_index(demanded.kind())] += 1;
+            }
+        }
+        state = runner
+            .receive(arena, moves, &state, cell)
+            .expect("the runner's cell");
+        assert_eq!(state.motion, passage.path[tick], "the replay is the path");
+    }
+    reading
+}
+
+/// The move reading's lines.
+fn move_lines(reading: &MoveReading, indent: &str) {
+    println!(
+        "{indent}the runner's moves: {}",
+        kinds_line(&reading.runner)
+    );
+    println!(
+        "{indent}the chaser's moves: {}",
+        kinds_line(&reading.chaser)
+    );
+    println!(
+        "{indent}slip onsets {}, the demanded move outside the traction disk on {} ({}); slipping ticks {}, the realized move the held one on {}",
+        reading.onsets,
+        reading.outside,
+        kinds_line(&reading.demanded),
+        reading.slipping,
+        reading.held
+    );
+}
+
 /// A capture tick, or none within the cap.
 fn capture_line(passage: &ActionPassage) -> String {
     match passage.captured {
@@ -374,6 +500,7 @@ fn action(trace: bool) {
     let (mut slips, mut walls) = ([(0usize, 0usize); 3], [0usize; 3]);
     let (mut wins, mut both, mut optimal) = ([0usize; 2], 0usize, 0usize);
     let (mut releases, mut misses) = ([0usize; 3], 0usize);
+    let mut readings = [MoveReading::default(); 3];
     for s in 0..SEEDS {
         let seed = SEED + s;
         let (runs, receipt, fibre, ms) = passages(seed, TUBE_HORIZON, BASIN_HORIZON, PRICE);
@@ -428,6 +555,9 @@ fn action(trace: bool) {
                     .collect();
                 println!("    tube by tick: {}", sizes.join(" "));
             }
+            let reading = move_reading(passage);
+            move_lines(&reading, "    ");
+            readings[i].add(&reading);
         }
         wins[0] += usize::from(m.ticks() < p.ticks());
         wins[1] += usize::from(m.ticks() < b.ticks());
@@ -477,6 +607,11 @@ fn action(trace: bool) {
         "  read against each control separately: {}",
         verdict(fewer_in_sum && 2 * wins[0] > SEEDS as usize && 2 * wins[1] > SEEDS as usize)
     );
+    println!("  the move reading over {SEEDS} seeds (a reading, not a law):");
+    for (name, reading) in names.iter().zip(&readings) {
+        println!("  against {name}:");
+        move_lines(reading, "    ");
+    }
 }
 
 fn reception() {
