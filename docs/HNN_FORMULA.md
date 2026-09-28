@@ -15,8 +15,10 @@ The HNN is the compression machine at scale ([the line](plans/THE_REBUILD.md#the
 [definition; Brandon, September 27; the construction `agent-inferred`] **The top is a Holarchy
 and its aeons** ([THE_MACHINE](THE_MACHINE.md#the-top-a-holarchy-and-its-aeons)). The HNN is a
 Holarchy: its ring and contact Holons are joined at ports (`Field::holarchy` returns it, certified
-to glue), and the receiving parametron's storage is the context tree
-(`compression::landmark::context`). Its passage is an aeon on the Holarchy's parametric
+to glue), and the receiving parametron's storage is read from the context tree
+(`compression::landmark::context`), one family of the receiving storage the objects define
+([the receiving storage](ELEMENTARY_OBJECTS.md#the-receiving-storage), an interpretation whose
+port join is owed). Its passage is an aeon on the Holarchy's parametric
 orientation: a receiving window is an epoch at the receiver's section, a pump period or a clock
 closure is a cycle, the aeon boundary is the collapse, and the first law over the aeon is
 `aeon::EnclosedLedger`. `Field` is the Holarchy's declaration, a chart of it, and
@@ -391,7 +393,9 @@ M = (K, Θ, x),                 y_F = ρ_F(b_H(x)).
 ```
 
 `K` is the oriented contact complex, including its boundary ports and chart transitions; `Θ` is
-the constitution; `x` contains the active currents and internal modes. Their representations may
+the constitution; `x` contains the active currents and internal modes. `(K, Θ)` with its ports is
+the Holon's law `H`, and `x` is a point of a motion `|H⟩` that `H` admits
+([the Holon as one object](ELEMENTARY_OBJECTS.md#the-holon-as-one-object)). Their representations may
 be sparse sections, tensors, factors, recurrences or correlated parameter families. `K` is not a
 semantic classifier. The components need not share one shape, one spatial grain or a universal
 clock; at an interaction, the joined ports determine which restrictions participate.
@@ -759,7 +763,9 @@ The prototype's softmax-participation return is in history at `13f8c734`.
   dissipation `D_a` on its slip, carried as squares with no clamp. It is not a fixed template
   scaled by one amplitude. A completed update adds no history operand.
 - **The medium** changes only by deposition and, at an aeon boundary, by the collapse onto what the
-  admitted future distinguishes.
+  admitted future distinguishes. That collapse is structural: it releases learned material and
+  cannot be reopened, so an admitted family that grows past it is refused
+  ([objects §8](ELEMENTARY_OBJECTS.md#collapse-relative-to-the-admitted-future)).
 - **What this replaces.** The
   [retention audit](../research/records/2026-09-22_RETENTION_IS_A_QUOTIENT_NOT_A_TAPE_AND_THE_SOURCE_ENTERS_AS_PHASE_CARRIED_MOMENTS.md)
   names what this replaces.

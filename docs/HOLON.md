@@ -2,7 +2,9 @@
 
 ## The object and its notation
 
-[definition] Write a Holon in a declared tensor chart as **|H⟩_F**. H carries the Holonic
+[definition] Write a Holon in a declared tensor chart as **|H⟩_F**: a motion admitted by the
+Holon's law `H`, presented in the frame `F`
+([the Holon as one object](ELEMENTARY_OBJECTS.md#the-holon-as-one-object) owns the statement). H carries the Holonic
 entity mark (the recovered wavy underline); F specifies its frame, port/axis roles and
 pairing. The notation packages the object so it can be manipulated without expanding its
 construction record at every use. [Holonic notation](HOLONIC_NOTATION.md) is the consolidated

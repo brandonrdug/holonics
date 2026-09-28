@@ -42,8 +42,10 @@ through modes, the motor chart, Holonic Encoding, context and joint prediction.
 
 [project-postulate] HNN is one continuing field of interacting Holons: circulating modes,
 interlinked toroidal domains, helical passages, active contact faces and participating receivers.
-A Holon `|H⟩_F` is simultaneously a whole and a part, with incidence `K`, constitution `Θ`,
-currents `Ψ`, interior storage and a declared frame `F`. Athena is the first intended
+A Holon `|H⟩_F`, a motion admitted by its law
+([the Holon as one object](ELEMENTARY_OBJECTS.md#the-holon-as-one-object)), is simultaneously a
+whole and a part, with incidence `K`, constitution `Θ`, currents `Ψ`, interior storage and a
+declared frame `F`. Athena is the first intended
 application; Eros names its collective formation and composition at every grain. Holonics also
 develops the broader mathematical and physical framework these constructions instantiate.
 
