@@ -66,6 +66,9 @@ impl Keystone for Ring {
     fn coordinates(&self, key: u64) -> Vec<u64> {
         vec![key]
     }
+    fn declaration(&self) -> Declaration {
+        Declaration::new("ring", vec![self.0])
+    }
 }
 
 /// A family whose face is a declared table by the phase its port reads.
@@ -122,6 +125,9 @@ impl Family for ByPhase {
             dormant: Vec::new(),
         })
     }
+    fn declaration(&self) -> Declaration {
+        Declaration::new("by phase", vec![self.table.len() as u64])
+    }
 }
 
 /// Phase 0 emits class 0, phase 1 is uniform over classes 1 and 2, phase 2 emits class 3.
@@ -138,7 +144,7 @@ fn table() -> Vec<Vec<Rat>> {
 fn the_composed_face_is_a_face_and_telescopes_to_the_keystone_mixture() {
     let ring: Arc<dyn Keystone> = Arc::new(Ring(3));
     let conditioned: Conditioned =
-        Box::new(|path| Ok(Box::new(ByPhase::new(table(), path)) as Box<dyn Family>));
+        Arc::new(|path| Ok(Box::new(ByPhase::new(table(), path)) as Box<dyn Family>));
     let mut composed = Composed::new(
         "ring ⊳ by phase".to_string(),
         0,
@@ -216,6 +222,9 @@ impl PortReader for Phase {
     }
     fn emit(&self, port: Port) -> usize {
         port.phase as usize
+    }
+    fn declaration(&self) -> Declaration {
+        Declaration::new("phase", vec![self.0 as u64])
     }
 }
 

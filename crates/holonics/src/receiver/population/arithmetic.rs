@@ -54,7 +54,8 @@ use super::composition::{
     Composed, Conditioned, Keystone, Port, PortPath, PortReader, PortedEmitters, Unheld,
 };
 use super::{
-    Family, KeyFamily, KeyReadout, Likelihood, PopulationError, Readout, Survivors, refuse,
+    Act, Declaration, Family, KeyFamily, KeyReadout, Likelihood, PopulationError, Readout,
+    Survivors, Work, refuse,
 };
 use crate::compression::landmark::context::PassageCode;
 use crate::holarchy::terrain::arithmetic::{
@@ -123,6 +124,10 @@ impl Keystone for RecordClock {
     fn coordinates(&self, key: u64) -> Vec<u64> {
         vec![key]
     }
+
+    fn declaration(&self) -> Declaration {
+        Declaration::new("record clock", vec![self.period])
+    }
 }
 
 fn digit_window(window: &PrimeWindow) -> Result<(), PopulationError> {
@@ -163,6 +168,7 @@ pub struct CarryEgg {
     product: Option<Vec<u64>>,
     passage: PassageCode,
     description: u64,
+    products: u64,
 }
 
 impl CarryEgg {
@@ -184,6 +190,7 @@ impl CarryEgg {
             product: None,
             passage: PassageCode::new(),
             description,
+            products: 0,
         })
     }
 
@@ -236,6 +243,7 @@ impl CarryEgg {
                     let mut word = digit_product(self.family.base, &left, &right)?.digits;
                     word.resize(2 * self.family.digits, 0);
                     self.product = Some(word);
+                    self.products += 1;
                 }
             }
             Part::Record => {
@@ -303,6 +311,32 @@ impl Family for CarryEgg {
             dormant: Vec::new(),
         })
     }
+
+    fn declaration(&self) -> Declaration {
+        Declaration::new(
+            "carry egg",
+            vec![
+                self.family.base,
+                self.family.digits as u64,
+                self.family.face as u64,
+                order_code(self.family.order),
+            ],
+        )
+    }
+
+    /// The records' digit products formed by convolution and carry.
+    fn work(&self) -> Work {
+        let mut work = Work::default();
+        work.add(Act::Product, self.products);
+        work
+    }
+}
+
+fn order_code(order: DigitOrder) -> u64 {
+    match order {
+        DigitOrder::LeastFirst => 0,
+        DigitOrder::MostFirst => 1,
+    }
 }
 
 fn order_name(order: DigitOrder) -> &'static str {
@@ -367,6 +401,10 @@ impl Keystone for Counter {
     fn coordinates(&self, key: u64) -> Vec<u64> {
         vec![key]
     }
+
+    fn declaration(&self) -> Declaration {
+        Declaration::new("counter", vec![self.base, self.digits as u64])
+    }
 }
 
 // -------------------------------------------------------------------------------------------
@@ -394,6 +432,7 @@ pub struct Sieve {
     cheap: [Vec<u64>; 3],
     gratings: Vec<(u64, Vec<u64>)>,
     prime: Vec<bool>,
+    decided: Work,
 }
 
 impl Sieve {
@@ -434,9 +473,24 @@ impl Sieve {
             cheap,
             gratings,
             prime: Vec::new(),
+            decided: Work::default(),
         };
-        sieve.prime = (0..range).map(|n| sieve.verdict(n).0).collect();
+        let mut decided = Work::default();
+        sieve.prime = (0..range)
+            .map(|n| {
+                let (prime, face) = sieve.verdict(n);
+                decided.add(Act::Decide(face), 1);
+                prime
+            })
+            .collect();
+        sieve.decided = decided;
         Ok(sieve)
+    }
+
+    /// **The sieve's maintenance**: its window's integers, each decided once by its face (the
+    /// cheap faces first, then the gratings).
+    pub fn work(&self) -> Work {
+        self.decided.clone()
     }
 
     /// The gratings `p` (primes up to `√(b^L − 1)` no cheap face reads) with their classes by
@@ -518,6 +572,18 @@ impl PortReader for Sieve {
             .unwrap_or(false);
         self.base as usize + usize::from(prime)
     }
+
+    fn declaration(&self) -> Declaration {
+        Declaration::new(
+            "sieve",
+            vec![
+                self.base,
+                self.digits as u64,
+                order_code(self.order),
+                self.unit,
+            ],
+        )
+    }
 }
 
 // -------------------------------------------------------------------------------------------
@@ -528,7 +594,7 @@ impl Composed {
     pub fn products(family: &ProductFamily, description: u64) -> Result<Self, PopulationError> {
         let clock = Arc::new(RecordClock::products(family)?);
         let declared = family.clone();
-        let conditioned: Conditioned = Box::new(move |path| {
+        let conditioned: Conditioned = Arc::new(move |path| {
             Ok(Box::new(CarryEgg::new(&declared, path, 0)?) as Box<dyn Family>)
         });
         let label = format!(
@@ -557,13 +623,15 @@ impl Composed {
         description: u64,
     ) -> Result<Self, PopulationError> {
         let (clock, counter, sieve) = prime_eggs(window, admitted)?;
+        let maintenance = sieve.work();
+        let sieve: Arc<dyn PortReader> = sieve;
         let label = format!(
             "{} ⊳ ({} ⊳ {})",
             clock.label(),
             counter.label(),
             sieve.label()
         );
-        let conditioned: Conditioned = Box::new(move |path| {
+        let conditioned: Conditioned = Arc::new(move |path| {
             let emitters = PortedEmitters::new(counter.clone(), sieve.clone(), path)?;
             let factor = Survivors::new(Box::new(emitters), admitted, COUNTER_BOMBE)?;
             Ok(Box::new(KeyFamily::new(
@@ -573,14 +641,15 @@ impl Composed {
             )?) as Box<dyn Family>)
         });
         let keys = clock.keys();
-        Self::new(
+        Ok(Self::new(
             label,
             description,
             clock,
             &PortPath::tick(),
             &conditioned,
             keys,
-        )
+        )?
+        .with_maintenance(maintenance))
     }
 
     /// **`clock ⊳ (unheld counter ⊳ sieve)`** (module header): the sieve at the counter's unheld
@@ -591,13 +660,15 @@ impl Composed {
         description: u64,
     ) -> Result<Self, PopulationError> {
         let (clock, counter, sieve) = prime_eggs(window, admitted)?;
+        let maintenance = sieve.work();
+        let sieve: Arc<dyn PortReader> = sieve;
         let label = format!(
             "{} ⊳ (unheld {} ⊳ {})",
             clock.label(),
             counter.label(),
             sieve.label()
         );
-        let conditioned: Conditioned = Box::new(move |path| {
+        let conditioned: Conditioned = Arc::new(move |path| {
             let emitters = PortedEmitters::new(counter.clone(), sieve.clone(), path)?;
             Ok(Box::new(Unheld::new(
                 "unheld counter ⊳ sieve".to_string(),
@@ -606,22 +677,23 @@ impl Composed {
             )) as Box<dyn Family>)
         });
         let keys = clock.keys();
-        Self::new(
+        Ok(Self::new(
             label,
             description,
             clock,
             &PortPath::tick(),
             &conditioned,
             keys,
-        )
+        )?
+        .with_maintenance(maintenance))
     }
 }
 
-type PrimeEggs = (Arc<RecordClock>, Arc<dyn Keystone>, Arc<dyn PortReader>);
+type PrimeEggs = (Arc<RecordClock>, Arc<dyn Keystone>, Arc<Sieve>);
 
 fn prime_eggs(window: &PrimeWindow, admitted: u64) -> Result<PrimeEggs, PopulationError> {
     let clock = Arc::new(RecordClock::primes(window)?);
     let counter: Arc<dyn Keystone> = Arc::new(Counter::of(window)?);
-    let sieve: Arc<dyn PortReader> = Arc::new(Sieve::of(window, admitted)?);
+    let sieve = Arc::new(Sieve::of(window, admitted)?);
     Ok((clock, counter, sieve))
 }

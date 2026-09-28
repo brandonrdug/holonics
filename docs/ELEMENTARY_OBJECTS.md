@@ -720,7 +720,8 @@ Intelligence does not enumerate keys:
   eliminated families stay in the declaration. Across aeons the population's prior over families
   learns from its own deaths and selections. This is the evolved ability: a family that keeps
   winning is founded sooner, and one that keeps dying later. It is a retention of selection counts
-  over families, never a tape of attempts.
+  over families, never a tape of attempts (built: `receiver::population::Selections`, the Dirichlet
+  face of each identity's selections at a pseudo-count its deaths thin, Lean `Context/Evolution`).
 - **It encodes by the same law.** Communication between intelligences is a shared generator whose
   faces only a receiver of the right standing decodes: keys that move with their holders, not
   static ones.
@@ -760,7 +761,9 @@ family that reads its faces, read together as one generator of faces.
 - **Its phenotype** is the faces it emits.
 - **A species** is the class of eggs that every admitted future receiver reads alike. It is the
   face map's quotient over generators (`compression::FaceMap`), the retention quotient taken over
-  generators instead of states.
+  generators instead of states. Collapsing a population's species relative to the admitted future
+  changes no code over it, and the members' seeds let a species split when the future grows
+  (`receiver::population::Population::{collapse, split}`, Lean `Context/Evolution.species_collapse_code`).
 - **A population** is a receiver's mixture over candidate eggs. It is updated by Bayes, which is the
   discrete replicator with the likelihood as fitness, and a translation in the ratio's additive
   chart. The receiving tree's mixture over candidate standings is its first instance
@@ -794,7 +797,8 @@ family that reads its faces, read together as one generator of faces.
     found where it is causally attributable.
   - Holding a dormant key is free only when its ring is lossless. A mode held against dissipation
     costs its pump work every tick: the parametron's pump, charged in the word's balance.
-  - The population's cost receipt therefore reports maintenance work beside description and code.
+  - The population's cost receipt therefore reports maintenance work beside description and code
+    (`receiver::population::Work`: exact counts of what each family executes).
 
 The geometry of the population's faces is the receiver's
 ([RECEIVER_HOLARCHY, "Probability is a receiver geometry"](RECEIVER_HOLARCHY.md#probability-is-a-receiver-geometry)).

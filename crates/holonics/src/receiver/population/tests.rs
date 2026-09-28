@@ -70,6 +70,21 @@ impl Family for Fixed {
             dormant: Vec::new(),
         })
     }
+    /// The fixed face's numerators and denominators.
+    fn declaration(&self) -> Declaration {
+        Declaration::new(
+            "fixed face",
+            self.face
+                .iter()
+                .flat_map(|class| {
+                    [
+                        class.numer().try_into().unwrap_or(u64::MAX),
+                        class.denom().try_into().unwrap_or(u64::MAX),
+                    ]
+                })
+                .collect(),
+        )
+    }
 }
 
 /// The terrain's hand moiré: `1/4 @ 0` and `1/3 @ 1/3`, joint period 12.
@@ -845,6 +860,9 @@ impl Family for Refusing {
     }
     fn readout(&self) -> Readout<'_> {
         self.inner.readout()
+    }
+    fn declaration(&self) -> Declaration {
+        Declaration::new("refusing", vec![self.refused as u64]).with(vec![self.inner.declaration()])
     }
     fn admits(&self, cells: &[usize]) -> Result<(), PopulationError> {
         if cells.contains(&self.refused) {

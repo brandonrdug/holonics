@@ -48,9 +48,12 @@ use num_bigint::{BigInt, BigUint};
 use num_traits::ToPrimitive;
 
 use super::dormancy::{Dormancy, DormantFamily, Layered};
-use super::{Emitters, Family, KeyFamily, Likelihood, PopulationError, Readout, Survivors, refuse};
+use super::{
+    Act, AdmittedFuture, Declaration, Emitters, Family, KeyFamily, Likelihood, PopulationError,
+    Readout, Survivors, Work, refuse,
+};
 use crate::compression::landmark::context::{
-    LandmarkDeclaration, Landmarks, Letter, PassageCode, StopPrior,
+    Capacity, LandmarkDeclaration, Landmarks, Letter, PassageCode, StopPrior,
 };
 use crate::hnn::field::Field;
 use crate::holarchy::terrain::{Grating, MoireClass, MoireFamily};
@@ -181,6 +184,32 @@ impl Family for TreeFamily {
     fn readout(&self) -> Readout<'_> {
         Readout::Standing(&self.tree)
     }
+
+    /// The tree's generator family: its depth, forced depth, grain, capacity and stop prior's
+    /// rungs; not the aeon's cell alphabet, which the receiver declares and the tree reads.
+    fn declaration(&self) -> Declaration {
+        let declared = self.tree.declaration();
+        let capacity = match declared.capacity {
+            Capacity::Unbounded => 0,
+            Capacity::Ceiling(ceiling) => u64::from(ceiling) + 1,
+        };
+        let mut parameters = vec![
+            declared.depth as u64,
+            declared.forced as u64,
+            declared.grain,
+            capacity,
+        ];
+        parameters.extend(declared.prior.rungs().iter().map(|&rung| u64::from(rung)));
+        Declaration::new("receiving tree", parameters)
+    }
+
+    /// The cells deposited along their addresses, and the nodes the tree holds.
+    fn work(&self) -> Work {
+        let mut work = Work::default();
+        work.add(Act::Deposit, self.received);
+        work.add(Act::Node, self.tree.nodes() as u64);
+        work
+    }
 }
 
 // -------------------------------------------------------------------------------------------
@@ -193,6 +222,7 @@ pub struct GratingSheet {
     gratings: Vec<Grating>,
     words: Vec<Vec<bool>>,
     tick: u64,
+    denominator: u64,
 }
 
 impl GratingSheet {
@@ -213,6 +243,7 @@ impl GratingSheet {
             gratings,
             words,
             tick: 0,
+            denominator: family.denominator,
         })
     }
 
@@ -231,8 +262,13 @@ impl GratingSheet {
 
     /// Grating `index`'s sheet at the current tick.
     fn sheet(&self, index: usize) -> bool {
+        self.sheet_at(index, self.tick)
+    }
+
+    /// Grating `index`'s sheet at tick `tick`: its ring winds without the cells.
+    fn sheet_at(&self, index: usize, tick: u64) -> bool {
         let word = &self.words[index];
-        word[(self.tick % word.len() as u64) as usize]
+        word[(tick % word.len() as u64) as usize]
     }
 
     fn coordinates_of(&self, index: usize) -> [u64; 3] {
@@ -267,6 +303,19 @@ impl Emitters for GratingSheet {
         let mut fork = self.clone();
         fork.tick = tick;
         Some(Box::new(fork))
+    }
+
+    fn declaration(&self) -> Declaration {
+        Declaration::new("grating sheet", vec![self.denominator])
+    }
+
+    fn ahead(&self, key: u64, ticks: u64) -> Option<usize> {
+        Some(usize::from(self.sheet_at(key as usize, self.tick + ticks)))
+    }
+
+    /// A ring of denominator `q` returns to its port every `q` ticks.
+    fn period(&self, key: u64) -> Option<u64> {
+        Some(self.words[key as usize].len() as u64)
     }
 }
 
@@ -352,6 +401,39 @@ impl Emitters for GratingParity {
         fork.ring.tick = tick;
         Some(Box::new(fork))
     }
+
+    fn declaration(&self) -> Declaration {
+        Declaration::new(
+            "grating parity",
+            vec![u64::from(self.rings), self.ring.denominator],
+        )
+    }
+
+    fn ahead(&self, key: u64, ticks: u64) -> Option<usize> {
+        let tick = self.ring.tick + ticks;
+        Some(
+            self.digits(key)
+                .filter(|&index| self.ring.sheet_at(index, tick))
+                .count()
+                % 2,
+        )
+    }
+
+    /// The rings' joint period: the least common multiple of their denominators.
+    fn period(&self, key: u64) -> Option<u64> {
+        Some(self.digits(key).fold(1u64, |period, index| {
+            let q = self.ring.words[index].len() as u64;
+            period / gcd(period, q) * q
+        }))
+    }
+}
+
+/// `gcd(a, b)` of two machine words.
+fn gcd(mut a: u64, mut b: u64) -> u64 {
+    while b != 0 {
+        (a, b) = (b, a % b);
+    }
+    a
 }
 
 /// Each ring is a layer: the parity of the active rings' sheets.
@@ -515,6 +597,42 @@ impl Emitters for RotorKeys {
             .into_iter()
             .chain(self.boards[board].iter().map(|&image| image as u64))
             .collect()
+    }
+
+    /// The ring, its ports, its rotor's period, the declared configurations and the machine's
+    /// stages; the field's rings by their periods.
+    fn declaration(&self) -> Declaration {
+        let mut parameters = vec![self.ring as u64, self.ports as u64, self.rotor];
+        parameters.extend(self.lift.iter().map(|c| c.to_u64().unwrap_or(u64::MAX)));
+        parameters.extend(self.stages.iter().flatten().map(|&port| port as u64));
+        Declaration::new("rotor keys", parameters).with(vec![Declaration::new(
+            "field rings",
+            self.field
+                .rings()
+                .iter()
+                .map(|ring| ring.period())
+                .collect(),
+        )])
+    }
+
+    /// [definition; agent-inferred] **A rotor key's signature** (module header of `species`): its
+    /// next class depends on the cell before it, so its signature is its transition table over one
+    /// rotor period from the current stage, `S⁻¹ W_(key + T + j) S x` for every stage offset `j`
+    /// and every cell `x` it steps from (its start first, before the first cell): sufficient for
+    /// every future passage, whatever ticks the field takes.
+    fn signature(&self, key: u64, _future: AdmittedFuture) -> Option<Vec<usize>> {
+        let (start, rotor_key, board) = self.split(key);
+        let mut word = Vec::with_capacity(1 + self.rotor as usize * self.ports);
+        if self.last.is_none() {
+            word.push(start);
+        }
+        for offset in 0..self.rotor {
+            let stage = &self.stages[((rotor_key + self.taken + offset) % self.rotor) as usize];
+            word.extend(
+                (0..self.ports).map(|x| self.inverses[board][stage[self.boards[board][x]]]),
+            );
+        }
+        Some(word)
     }
 }
 

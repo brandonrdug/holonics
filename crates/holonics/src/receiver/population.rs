@@ -93,7 +93,10 @@
 //! stay in its declared key space ([`Survivors::seeded`]), and [`Population::refound`] re-founds
 //! them at a later cell, their clocks wound to it, charged half the reserved mass (the declared prior
 //! share of a re-founding, so births never exhaust the reserve), never the relearning of the key
-//! space. A newborn seed that dies returns the seed to its family, which can be re-founded again.
+//! space. A newborn seed that dies returns the seed to its family, which can be re-founded again. A
+//! composed egg's seed is its keystone's surviving keys: their ports wind without the cells, so it is
+//! re-founded with each conditioned family re-founded from its own seed or declared anew on the path
+//! read from the cell ([`Composed`]'s `reseed`).
 //!
 //! [definition; agent-inferred] **Birth from reserved mass.** The declared families take
 //! `M = Σ_f 2^(−ℓ_f)`; the unused `1 − M` is reserved. A family founded at cell `t_g`
@@ -127,6 +130,41 @@
 //! ([`Unheld`]). The arithmetic eggs ([`arithmetic`]: the record clock, the carry egg, the counter,
 //! the sieve) are the first composition.
 //!
+//! [definition; agent-inferred] **Identity** ([`evolution`]). A family's identity across aeons is
+//! its declaration ([`Family::declaration`]: the generator family's kind, declared integers and the
+//! declarations it is built on) and its description ([`Identity`]), never its label: a seed
+//! re-founded, or the same declaration in a new aeon, carries it.
+//!
+//! [proved-derived; formal-checked] **The evolved prior** ([`evolution`]; Lean
+//! `Compression/Landmark/Context/Evolution`). Across aeons the receiver retains, for each identity,
+//! the aeons it was declared, selected and died in ([`Selections`], [`Tally`]), and nothing else. At
+//! an aeon's opening ([`Population::evolved`]) the declared families' prior is
+//! `π(f) = λ D(f) + (1 − λ) 2^(−ℓ_f)/M`, `D(f) = (s_f + σ_f)/Σ_g (s_g + σ_g)` the Dirichlet face of
+//! the selections at the survival pseudo-count `σ_f = (2(a_f − d_f) + 1)/(2(2a_f + 1))` (KT's `½`
+//! until a death), at the static total mass `M` (the reserve unchanged), and the aeon's code is at
+//! most the selected family's code plus `−log₂ π(f)` (`evolved_aeon_code`). A family is founded at a
+//! declared rational mass with [`Population::found_with`].
+//!
+//! [proved-derived; formal-checked] **Species collapse** ([`species`]; Lean `Evolution.{species_face,
+//! species_collapse_code, species_split}`). Surviving keys whose conditioned faces agree for every
+//! admitted receiver over the declared admitted future ([`AdmittedFuture`]: the next `h` ticks or
+//! every tick; the exact check is the key space's own [`Emitters::signature`]) are one species: one
+//! member at the summed posterior ([`Population::collapse`]), which changes no code for the admitted
+//! future, the receipt ([`Collapse`]) keeping every member's seed; a collapsed family refuses a cell
+//! past its admitted future, and [`Population::split`] restores every member of a surviving species
+//! at its share, so a wider future can collapse again. A composed egg collapses within each keystone
+//! key's conditioned family and merges the keystone keys whose conditioned families are certain with
+//! one signature.
+//!
+//! [definition; agent-inferred] **Maintenance work** ([`Work`], [`Act`]). Beside a family's
+//! description and code its receipt reports the work it has spent, as exact counts of what it
+//! executed: a key family's emissions read against received cells, a dormant family's states read
+//! and kernel shares, a tree's deposits and held nodes, a composed egg's keystone keys weighed and its
+//! constituents' work, a carry egg's digit products, and a sieve's window decided once by face (its
+//! gratings' maintenance). No family here is pumped against dissipation (every ring is a lossless
+//! exact clock), so no pump work is claimed: the counts are the computation the families actually
+//! execute.
+//!
 //! [definition; agent-inferred] **A partition's reading** ([`Population::receive_partitioned`],
 //! [`PartReading`]). A receipt is a field of readings over a partition: the passage's cells declared
 //! into parts (a product record's operand, mark, trailing, middle and leading cells), and on each
@@ -158,14 +196,21 @@
 //! | owed (#62): the abstaining newborn's telescope | [`Population::found`], [`Population::refound`] |
 //! | `Compression/Landmark/Context/Composition.{composedFace_received, composedFace_nonneg, composedFace_sum_one, composedFace_pos, composed_telescope}` | [`Composed`] (its face and its likelihood) |
 //! | `Compression/Landmark/Context/Composition.{chain_rule, chain_rule_of_species}` | [`Composed`]'s code over a keystone's keys; [`PortedEmitters`] under `KeyFamily` (a deterministic reader: `log₂ \|K_A\| − log₂ #S`) |
+//! | `Compression/Landmark/Context/Evolution.{survivalPseudo_zero_deaths, survivalPseudo_death_lt, dirichletFace_isPrior, kt_face, dirichletFace_no_deaths, descriptionPrior_isPrior, evolved_isPrior, masses_total}` | [`Tally::pseudo`], [`Selections::face`], [`Selections::prior`], [`Population::evolved`] |
+//! | `Compression/Landmark/Context/Evolution.{evolved_code_le_face, evolved_code_le_description, evolved_aeon_code}` | the evolved population's code against its selected family's |
+//! | `Compression/Landmark/Context/Evolution.{speciesWeight_isPrior, species_mixture, species_face, species_collapse_code, species_split}` | [`Population::collapse`], [`Population::split`], [`Collapse`] |
 
 pub mod arithmetic;
 pub mod composition;
 pub mod dormancy;
+pub mod evolution;
 pub mod families;
+pub mod species;
 
 #[cfg(test)]
 mod composition_tests;
+#[cfg(test)]
+mod evolution_tests;
 #[cfg(test)]
 mod tests;
 
@@ -174,7 +219,13 @@ pub use composition::{
     Composed, Conditioned, Keystone, Port, PortPath, PortReader, PortedEmitters, Unheld,
 };
 pub use dormancy::{Dormancy, DormantFamily, Layered, Weight};
+pub use evolution::{Declaration, Identity, Selections, Tally};
 pub use families::{GratingParity, GratingSheet, RotorKeys, TreeFamily};
+pub use species::{
+    AdmittedFuture, Collapse, FactorSpecies, KeystoneMember, KeystoneSpecies, Seed, Species,
+};
+
+use std::collections::BTreeMap;
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
@@ -370,6 +421,53 @@ pub trait Family: Send {
     fn drift(&self) -> Rat {
         Rat::zero()
     }
+    /// **The family's declaration** (module header, "Identity"): its generator family's kind and
+    /// declared integers, never its label.
+    fn declaration(&self) -> Declaration;
+    /// **The family's identity across aeons**: its declaration and its description.
+    fn identity(&self) -> Identity {
+        Identity {
+            declaration: self.declaration(),
+            description: self.description(),
+        }
+    }
+    /// **The work the family has spent** (module header, "Maintenance work"): exact counts of what
+    /// it executed, by act.
+    fn work(&self) -> Work {
+        Work::default()
+    }
+    /// **Collapse the family's surviving keys into species** relative to the admitted future
+    /// (module header, "Species collapse"): none when the family declares no exact check.
+    fn collapse(&mut self, _future: AdmittedFuture) -> Result<Option<Collapse>, PopulationError> {
+        Ok(None)
+    }
+    /// **Split the species a collapse merged** from its receipt: every member of a surviving
+    /// species returns with its share.
+    fn split(&mut self, _collapse: &Collapse) -> Result<(), PopulationError> {
+        Err(refuse(
+            "a species split",
+            "the family collapsed its keys into the receipt's species",
+        ))
+    }
+    /// **The family's certain signature** over the admitted future: per factor, the signature
+    /// every held key shares, when each factor's keys share one (the family then gives face one on
+    /// one class at every admitted tick of every admitted passage it survives); none otherwise.
+    fn certain(&self, _future: AdmittedFuture) -> Option<Vec<Vec<usize>>> {
+        None
+    }
+    /// **The family's seed**: the keys it holds, per factor with each key's members, its clock's
+    /// reading and its admitted future's end (a key family's).
+    fn seed(&self) -> Option<Seed> {
+        None
+    }
+    /// **Hold exactly a seed's keys** (a species member restored at a split), the clock reading the
+    /// seed's tick.
+    fn restrict(&mut self, _seed: &Seed) -> Result<(), PopulationError> {
+        Err(refuse(
+            "a species member's restoration",
+            "the family holds keys of a declared key space",
+        ))
+    }
 }
 
 /// **A cell's mixed-radix digits** over the declared radices, the first least significant.
@@ -406,16 +504,57 @@ pub trait Emitters: Send {
     fn fork_at(&self, _tick: u64) -> Option<Box<dyn Emitters>> {
         None
     }
+    /// **The key space's declaration** (module header, "Identity").
+    fn declaration(&self) -> Declaration;
+    /// **The class key `k` emits `ticks` ticks after the current one**, read without the cells,
+    /// when its clock winds without them.
+    fn ahead(&self, _key: u64, _ticks: u64) -> Option<usize> {
+        None
+    }
+    /// **A declared period of key `k`'s emission**: `e_k(t + P) = e_k(t)` at every tick.
+    fn period(&self, _key: u64) -> Option<u64> {
+        None
+    }
+    /// **Key `k`'s signature over the admitted future** (module header, "Species collapse"): two
+    /// keys with equal signatures emit one class at every admitted tick of every admitted passage.
+    /// Over `h` ticks it is the word of the next `h` classes; over the whole future the word of one
+    /// least period from the current tick (two periodic words agree forever exactly when their least
+    /// periods and one period's words agree). None when the emitters declare no exact check.
+    fn signature(&self, key: u64, future: AdmittedFuture) -> Option<Vec<usize>> {
+        match future {
+            AdmittedFuture::Ticks(ticks) => (0..ticks).map(|t| self.ahead(key, t)).collect(),
+            AdmittedFuture::Whole => {
+                let period = self.period(key)?;
+                let word: Vec<usize> = (0..period)
+                    .map(|t| self.ahead(key, t))
+                    .collect::<Option<_>>()?;
+                let least = (1..=period).find(|&d| {
+                    period % d == 0
+                        && (d..period).all(|t| word[t as usize] == word[(t - d) as usize])
+                })?;
+                Some(word[..least as usize].to_vec())
+            }
+        }
+    }
 }
 
 /// [definition] **Survivor filtering** (module header): the uniform prior over a declared key
 /// space, conditioned on the received cells. The survivors are held as key indices; before the
-/// first cell every key survives and none is held.
+/// first cell every key survives and none is held. Once collapsed into species (module header,
+/// "Species collapse") each held key is its species' representative and carries its members.
 pub struct Survivors {
     emitters: Box<dyn Emitters>,
     held: Option<Vec<u64>>,
+    /// Each held key's members, once collapsed; none: one member each.
+    members: Option<Vec<u64>>,
     count: u64,
     space: u64,
+    /// The clock's reading: the ticks the emitters stand at.
+    tick: u64,
+    /// The tick the admitted future of a collapse ends at (none: every future tick).
+    until: Option<u64>,
+    /// The emissions read against received cells.
+    reads: u64,
 }
 
 impl Survivors {
@@ -444,8 +583,12 @@ impl Survivors {
         Ok(Self {
             emitters,
             held: None,
+            members: None,
             count: keys,
             space: keys,
+            tick: 0,
+            until: None,
+            reads: 0,
         })
     }
 
@@ -453,18 +596,44 @@ impl Survivors {
     /// prior over the declared keys `seed` of the emitters' key space; refused at an empty seed or a
     /// key outside the space.
     pub fn seeded(emitters: Box<dyn Emitters>, seed: Vec<u64>) -> Result<Self, PopulationError> {
-        if seed.is_empty() || seed.iter().any(|&key| key >= emitters.keys()) {
+        let seed: Vec<(u64, u64)> = seed.into_iter().map(|key| (key, 1)).collect();
+        Self::of_species(emitters, &seed, 0, None)
+    }
+
+    /// Survivor filtering over declared keys, each with its members, the clock reading `tick`
+    /// and the admitted future ending at `until`; the prior uniform over the members.
+    fn of_species(
+        emitters: Box<dyn Emitters>,
+        seed: &[(u64, u64)],
+        tick: u64,
+        until: Option<u64>,
+    ) -> Result<Self, PopulationError> {
+        let keys = emitters.keys();
+        if seed.is_empty()
+            || seed
+                .iter()
+                .any(|&(key, members)| key >= keys || members == 0)
+            || seed.windows(2).any(|pair| pair[0].0 >= pair[1].0)
+        {
             return Err(refuse(
                 "a seed's survivor filtering",
-                "its seed holds keys of the declared key space",
+                "its seed holds ascending keys of the declared key space, each with a member",
             ));
         }
-        let count = seed.len() as u64;
+        let count = seed.iter().map(|&(_, members)| members).sum();
+        let members = seed
+            .iter()
+            .any(|&(_, members)| members > 1)
+            .then(|| seed.iter().map(|&(_, members)| members).collect());
         Ok(Self {
             emitters,
-            held: Some(seed),
+            held: Some(seed.iter().map(|&(key, _)| key).collect()),
+            members,
             count,
             space: count,
+            tick,
+            until,
+            reads: 0,
         })
     }
 
@@ -473,7 +642,7 @@ impl Survivors {
         self.space
     }
 
-    /// `#S`, the survivors.
+    /// `#S`, the survivors (the members of every held species).
     pub fn count(&self) -> u64 {
         self.count
     }
@@ -488,7 +657,17 @@ impl Survivors {
         self.emitters.as_ref()
     }
 
-    /// The surviving keys' indices, ascending.
+    /// The clock's reading.
+    pub fn tick(&self) -> u64 {
+        self.tick
+    }
+
+    /// The tick the admitted future of a collapse ends at, if one is declared.
+    pub fn until(&self) -> Option<u64> {
+        self.until
+    }
+
+    /// The surviving keys' indices (each a species' representative once collapsed), ascending.
     pub fn survivors(&self) -> Vec<u64> {
         match &self.held {
             Some(held) => held.clone(),
@@ -496,23 +675,44 @@ impl Survivors {
         }
     }
 
-    /// **Each class's surviving emitters** at the current tick.
+    /// **Each held key's members**, in the order of [`Survivors::survivors`] (one each until a
+    /// collapse).
+    pub fn members(&self) -> Vec<u64> {
+        match &self.members {
+            Some(members) => members.clone(),
+            None => vec![1; self.held_len()],
+        }
+    }
+
+    /// The held keys.
+    fn held_len(&self) -> usize {
+        match &self.held {
+            Some(held) => held.len(),
+            None => self.emitters.keys() as usize,
+        }
+    }
+
+    /// **Each class's surviving members** at the current tick.
     pub fn counts(&self) -> Vec<u64> {
         let mut counts = vec![0u64; self.emitters.alphabet()];
-        let mut tally = |key: u64| {
+        let mut tally = |key: u64, members: u64| {
             let class = self.emitters.emit(key);
             if let Some(count) = counts.get_mut(class) {
-                *count += 1;
+                *count += members;
             }
         };
-        match &self.held {
-            Some(held) => held.iter().for_each(|&key| tally(key)),
-            None => (0..self.emitters.keys()).for_each(tally),
+        match (&self.held, &self.members) {
+            (Some(held), Some(members)) => held
+                .iter()
+                .zip(members)
+                .for_each(|(&key, &members)| tally(key, members)),
+            (Some(held), None) => held.iter().for_each(|&key| tally(key, 1)),
+            (None, _) => (0..self.emitters.keys()).for_each(|key| tally(key, 1)),
         }
         counts
     }
 
-    /// **The family's face**: each class's surviving emitters over the survivors, exact; all zero
+    /// **The family's face**: each class's surviving members over the survivors, exact; all zero
     /// once no key survives.
     pub fn face(&self) -> Vec<Rat> {
         let total = BigInt::from(self.count);
@@ -545,10 +745,23 @@ impl Survivors {
     }
 
     /// **Commit a filter** read by [`Survivors::filter`] at `cell`: the survivors become exactly
-    /// `kept`, and every emitter advances past the cell.
+    /// `kept` (an ascending part of the held keys, each keeping its members), and every emitter
+    /// advances past the cell.
     fn commit(&mut self, kept: Vec<u64>, cell: usize) -> Result<(), PopulationError> {
-        self.count = kept.len() as u64;
+        if let (Some(held), Some(members)) = (&self.held, &self.members) {
+            let mut next = kept.iter().peekable();
+            let kept_members: Vec<u64> = held
+                .iter()
+                .zip(members)
+                .filter_map(|(key, &members)| next.next_if_eq(&key).map(|_| members))
+                .collect();
+            self.count = kept_members.iter().sum();
+            self.members = Some(kept_members);
+        } else {
+            self.count = kept.len() as u64;
+        }
         self.held = Some(kept);
+        self.tick += 1;
         self.emitters.advance(cell)
     }
 
@@ -562,6 +775,7 @@ impl Survivors {
         if cell >= alphabet {
             return Err(PopulationError::CellOutside { cell, alphabet });
         }
+        self.reads += self.held_len() as u64;
         let kept = self.filter(cell);
         if kept.is_empty() {
             return Ok(Rat::zero());
@@ -574,6 +788,17 @@ impl Survivors {
     /// `#S/|K|` (a seed's `#S/#seed`), exact.
     pub fn likelihood(&self) -> Rat {
         Rat::new(BigInt::from(self.count), BigInt::from(self.space))
+    }
+
+    /// Whether the admitted future admits `cells` more cells.
+    fn admits(&self, cells: usize) -> Result<(), PopulationError> {
+        match self.until {
+            Some(end) if self.tick + cells as u64 > end => Err(refuse(
+                "a collapsed key family's passage",
+                "it stays within the admitted future its species were collapsed over (split them from their receipt first)",
+            )),
+            _ => Ok(()),
+        }
     }
 }
 
@@ -653,8 +878,12 @@ impl Family for KeyFamily {
         if cell >= alphabet {
             return Err(PopulationError::CellOutside { cell, alphabet });
         }
-        // Every factor's filter is read before any commits: a death moves no factor.
+        // Every factor's filter is read before any commits: a death moves no factor, though its
+        // reads were spent.
         let digits = self.digits(cell);
+        for factor in &mut self.factors {
+            factor.reads += factor.held_len() as u64;
+        }
         let kept: Vec<Vec<u64>> = self
             .factors
             .iter()
@@ -678,12 +907,23 @@ impl Family for KeyFamily {
         self.exhausted
     }
 
+    /// The seed re-founded at `at`: each factor's held keys with their members, the admitted
+    /// future of a collapse kept; none once that future has ended (split the species first).
     fn reseed(&self, at: usize) -> Option<Box<dyn Family>> {
+        let at = at as u64;
         let factors = self
             .factors
             .iter()
             .map(|factor| {
-                Survivors::seeded(factor.emitters.fork_at(at as u64)?, factor.survivors()).ok()
+                if factor.until.is_some_and(|end| at >= end) {
+                    return None;
+                }
+                let seed: Vec<(u64, u64)> = factor
+                    .survivors()
+                    .into_iter()
+                    .zip(factor.members())
+                    .collect();
+                Survivors::of_species(factor.emitters.fork_at(at)?, &seed, at, factor.until).ok()
             })
             .collect::<Option<Vec<Survivors>>>()?;
         Some(Box::new(KeyFamily {
@@ -692,6 +932,101 @@ impl Family for KeyFamily {
             factors,
             exhausted: None,
         }))
+    }
+
+    fn admits(&self, cells: &[usize]) -> Result<(), PopulationError> {
+        let alphabet = self.alphabet();
+        if let Some(&cell) = cells.iter().find(|&&cell| cell >= alphabet) {
+            return Err(PopulationError::CellOutside { cell, alphabet });
+        }
+        self.factors
+            .iter()
+            .try_for_each(|factor| factor.admits(cells.len()))
+    }
+
+    fn declaration(&self) -> Declaration {
+        Declaration::new("key family", Vec::new()).with(
+            self.factors
+                .iter()
+                .map(|factor| factor.emitters.declaration())
+                .collect(),
+        )
+    }
+
+    /// Each factor's emissions read against received cells.
+    fn work(&self) -> Work {
+        let mut work = Work::default();
+        for factor in &self.factors {
+            work.add(Act::Read, factor.reads);
+        }
+        work
+    }
+
+    fn collapse(&mut self, future: AdmittedFuture) -> Result<Option<Collapse>, PopulationError> {
+        species::collapse_keys(self, future).map(Some)
+    }
+
+    fn split(&mut self, collapse: &Collapse) -> Result<(), PopulationError> {
+        species::split_keys(self, collapse)
+    }
+
+    fn certain(&self, future: AdmittedFuture) -> Option<Vec<Vec<usize>>> {
+        self.factors
+            .iter()
+            .map(|factor| {
+                let mut keys = factor.survivors().into_iter();
+                let first = factor.emitters.signature(keys.next()?, future)?;
+                keys.all(|key| factor.emitters.signature(key, future).as_ref() == Some(&first))
+                    .then_some(first)
+            })
+            .collect()
+    }
+
+    fn seed(&self) -> Option<Seed> {
+        Some(Seed {
+            keys: self
+                .factors
+                .iter()
+                .map(|factor| {
+                    factor
+                        .survivors()
+                        .into_iter()
+                        .zip(factor.members())
+                        .collect()
+                })
+                .collect(),
+            tick: self.factors[0].tick,
+            until: self
+                .factors
+                .iter()
+                .fold(None, |end, factor| species::earliest(end, factor.until)),
+        })
+    }
+
+    fn restrict(&mut self, seed: &Seed) -> Result<(), PopulationError> {
+        if seed.keys.len() != self.factors.len()
+            || seed.keys.iter().zip(&self.factors).any(|(keys, factor)| {
+                keys.iter()
+                    .any(|&(key, members)| key >= factor.keys() || members == 0)
+            })
+        {
+            return Err(refuse(
+                "a species member's restoration",
+                "its seed names keys of every factor's key space",
+            ));
+        }
+        let factors = std::mem::take(&mut self.factors);
+        let mut restored = Vec::with_capacity(factors.len());
+        for (factor, keys) in factors.into_iter().zip(&seed.keys) {
+            restored.push(Survivors::of_species(
+                factor.emitters,
+                keys,
+                seed.tick,
+                seed.until,
+            )?);
+        }
+        self.factors = restored;
+        Ok(())
     }
 
     fn likelihood(&self) -> Likelihood {
@@ -712,9 +1047,76 @@ impl Family for KeyFamily {
                         .collect()
                 })
                 .collect(),
-            masses: Vec::new(),
+            masses: if self.factors.iter().any(|factor| factor.members.is_some()) {
+                self.factors
+                    .iter()
+                    .map(|factor| {
+                        factor
+                            .members()
+                            .into_iter()
+                            .map(|members| {
+                                Rat::new(BigInt::from(members), BigInt::from(factor.count))
+                            })
+                            .collect()
+                    })
+                    .collect()
+            } else {
+                Vec::new()
+            },
             dormant: Vec::new(),
         })
+    }
+}
+
+// -------------------------------------------------------------------------------------------
+// the work a family spends
+
+/// [definition; agent-inferred] **An act a family executes** (module header, "Maintenance work").
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub enum Act {
+    /// A key's emission read against a received cell (survivor filtering).
+    Read,
+    /// A dormancy state (a key and one activity of its layers) read against a received cell.
+    State,
+    /// One share of the dormancy kernel: a layer's stay or switch on one key's activity.
+    Share,
+    /// A cell deposited into a receiving tree along its address.
+    Deposit,
+    /// A node a receiving tree holds: the storage it maintains.
+    Node,
+    /// A keystone key weighed at a received cell: its conditioned family read, its weight moved.
+    Weigh,
+    /// A record's digit product formed by convolution and carry (the carry egg).
+    Product,
+    /// An integer of a sieve's window decided by a face: the gratings maintained over the window.
+    Decide(SieveFace),
+}
+
+/// [definition; agent-inferred] **A family's work** (module header, "Maintenance work"): exact
+/// counts of what it executed, by act; never a scalar price.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct Work {
+    pub acts: BTreeMap<Act, u64>,
+}
+
+impl Work {
+    /// Count `count` more of an act.
+    pub fn add(&mut self, act: Act, count: u64) {
+        if count > 0 {
+            *self.acts.entry(act).or_insert(0) += count;
+        }
+    }
+
+    /// Count another work's acts too.
+    pub fn absorb(&mut self, other: &Work) {
+        for (&act, &count) in &other.acts {
+            self.add(act, count);
+        }
+    }
+
+    /// The count of one act.
+    pub fn of(&self, act: Act) -> u64 {
+        self.acts.get(&act).copied().unwrap_or(0)
     }
 }
 
@@ -902,6 +1304,8 @@ pub enum Posterior {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FamilyReceipt {
     pub label: String,
+    /// The family's identity across aeons: its declaration and description.
+    pub identity: Identity,
     pub description: u64,
     pub prior: Rat,
     pub born: usize,
@@ -911,6 +1315,8 @@ pub struct FamilyReceipt {
     pub posterior: Posterior,
     pub keys: Option<KeyReadout>,
     pub drift: Rat,
+    /// The work the family has spent (module header, "Maintenance work").
+    pub work: Work,
 }
 
 /// [definition] **A death's exchange, exactly** (when every living family's likelihood is exact):
@@ -1062,6 +1468,26 @@ impl Population {
     /// `M = Σ_f 2^(−ℓ_f)` is at most one (a prefix code's lengths); the prior is `2^(−ℓ_f)/M`, and
     /// `1 − M` is reserved.
     pub fn new(families: Vec<Box<dyn Family>>) -> Result<Self, PopulationError> {
+        let masses = families
+            .iter()
+            .map(|family| kraft(family.description()))
+            .collect::<Result<Vec<Rat>, _>>()?;
+        if masses.iter().sum::<Rat>() > Rat::one() {
+            return Err(refuse(
+                "a population's descriptions",
+                "their Kraft sum passes one: they are no prefix code's lengths",
+            ));
+        }
+        Self::with_masses(families, masses)
+    }
+
+    /// **Declare the population at declared masses** `m_f` (the evolved prior's, module header of
+    /// [`evolution`]): positive rationals summing to at most one; the prior is `m_f/M`,
+    /// `M = Σ_f m_f`, and `1 − M` is reserved.
+    pub fn with_masses(
+        families: Vec<Box<dyn Family>>,
+        masses: Vec<Rat>,
+    ) -> Result<Self, PopulationError> {
         let Some(first) = families.first() else {
             return Err(refuse("a population", "it declares at least one family"));
         };
@@ -1072,16 +1498,15 @@ impl Population {
                 "its families read one declared cell alphabet",
             ));
         }
-        let masses = families
-            .iter()
-            .map(|family| kraft(family.description()))
-            .collect::<Result<Vec<Rat>, _>>()?;
+        if masses.len() != families.len() || masses.iter().any(|mass| !mass.is_positive()) {
+            return Err(refuse(
+                "a population's masses",
+                "one positive mass is declared for every family",
+            ));
+        }
         let mass: Rat = masses.iter().sum();
         if mass > Rat::one() {
-            return Err(refuse(
-                "a population's descriptions",
-                "their Kraft sum passes one: they are no prefix code's lengths",
-            ));
+            return Err(refuse("a population's masses", "they sum to at most one"));
         }
         let members = families
             .into_iter()
@@ -1507,7 +1932,19 @@ impl Population {
         residual: Option<ExactInterval>,
     ) -> Result<BirthReceipt, PopulationError> {
         let mass = kraft(family.description())?;
-        self.found_with(family, mass, residual, None)
+        self.found_from(family, mass, residual, None)
+    }
+
+    /// **Found a family at a declared rational mass** from the reserved mass (module header,
+    /// "Birth from reserved mass"; the evolved prior's birth mass, module header of [`evolution`]):
+    /// refused unless the mass is positive and fits in `1 − M_n`.
+    pub fn found_with(
+        &mut self,
+        family: Box<dyn Family>,
+        mass: Rat,
+        residual: Option<ExactInterval>,
+    ) -> Result<BirthReceipt, PopulationError> {
+        self.found_from(family, mass, residual, None)
     }
 
     /// **Re-found a dead family from its seed** (module header, "A death keeps the seed"): the keys
@@ -1537,12 +1974,12 @@ impl Population {
             ));
         };
         let mass = self.reserved() / Rat::from_integer(BigInt::from(2u32));
-        let receipt = self.found_with(newborn, mass, residual, Some(dead))?;
+        let receipt = self.found_from(newborn, mass, residual, Some(dead))?;
         self.members[dead].reseeded = true;
         Ok(receipt)
     }
 
-    fn found_with(
+    fn found_from(
         &mut self,
         family: Box<dyn Family>,
         mass: Rat,
@@ -1759,6 +2196,7 @@ impl Population {
             }
             families.push(FamilyReceipt {
                 label: member.family.label(),
+                identity: member.family.identity(),
                 description: member.family.description(),
                 prior: member.prior.clone(),
                 born: member.born,
@@ -1779,6 +2217,7 @@ impl Population {
                     Readout::Standing(_) => None,
                 },
                 drift: member.family.drift(),
+                work: member.family.work(),
             });
         }
         Ok(PopulationReceipt {
@@ -1789,6 +2228,46 @@ impl Population {
             families,
             selected,
         })
+    }
+
+    /// **Collapse a living family's surviving keys into species** relative to the admitted future
+    /// (module header, "Species collapse"): the population's code, its face over the admitted
+    /// future and every posterior are unchanged; the receipt keeps every member's seed. Refused at
+    /// a dead family and at a family that declares no exact check.
+    pub fn collapse(
+        &mut self,
+        family: usize,
+        future: AdmittedFuture,
+    ) -> Result<Collapse, PopulationError> {
+        let Some(member) = self.members.get_mut(family) else {
+            return Err(refuse("a species collapse", "it names a declared family"));
+        };
+        if member.died.is_some() {
+            return Err(refuse("a species collapse", "it names a living family"));
+        }
+        member.family.collapse(future)?.ok_or_else(|| {
+            refuse(
+                "a species collapse",
+                "the family declares an exact check over the admitted future",
+            )
+        })
+    }
+
+    /// **Split the species a collapse merged** (module header, "Species collapse"): every member
+    /// of a surviving species returns with its share, so a wider admitted future can collapse
+    /// again. The population's code does not move.
+    pub fn split(&mut self, family: usize, collapse: &Collapse) -> Result<(), PopulationError> {
+        let Some(member) = self.members.get_mut(family) else {
+            return Err(refuse("a species split", "it names a declared family"));
+        };
+        member.family.split(collapse)
+    }
+
+    /// Family `f`'s identity.
+    pub fn identity(&self, family: usize) -> Option<Identity> {
+        self.members
+            .get(family)
+            .map(|member| member.family.identity())
     }
 
     /// Family `f`'s readout.

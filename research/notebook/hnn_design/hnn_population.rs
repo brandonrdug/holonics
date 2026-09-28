@@ -15,6 +15,8 @@
 //! cargo run --release -p holonics --example hnn_population -- switching [parity | sheets]
 //! cargo run --release -p holonics --example hnn_population -- standing /home/b/Workspaces/holonics/.local/cuts/standing-real-cut-campaign-1.bin
 //! cargo run --release -p holonics --example hnn_population -- composition [products | primes]
+//! cargo run --release -p holonics --example hnn_population -- evolution
+//! cargo run --release -p holonics --example hnn_population -- species
 //! ```
 //!
 //! [definition; agent-inferred] **The declared population.** On each terrain the receiver declares
@@ -68,6 +70,9 @@ mod exterior;
 
 #[path = "hnn_population_composition.rs"]
 mod composition;
+
+#[path = "hnn_population_evolution.rs"]
+mod evolution;
 
 use std::time::Instant;
 
@@ -1299,8 +1304,10 @@ fn main() {
         ["standing", path] => standing_harness(path),
         ["composition"] => composition::harness(None),
         ["composition", which] => composition::harness(Some(which)),
+        ["evolution"] => evolution::evolution(),
+        ["species"] => evolution::species(),
         _ => println!(
-            "usage: hnn_population -- tree <d> | moire parity | moire sheets | crib | switching | standing <cut> | composition [products | primes]"
+            "usage: hnn_population -- tree <d> | moire parity | moire sheets | crib | switching | standing <cut> | composition [products | primes] | evolution | species"
         ),
     }
 }

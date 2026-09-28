@@ -63,7 +63,8 @@ use num_traits::{One, Zero};
 use rayon::prelude::*;
 
 use super::{
-    Emitters, Family, KeyReadout, Likelihood, PopulationError, Readout, mixed_radix, refuse,
+    Act, Declaration, Emitters, Family, KeyReadout, Likelihood, PopulationError, Readout, Work,
+    mixed_radix, refuse,
 };
 use crate::compression::landmark::context::PassageCode;
 use crate::ratio::Rat;
@@ -253,6 +254,10 @@ pub struct Dormancy {
     weights: Vec<Weight>,
     opening: Vec<Weight>,
     roundings: u128,
+    /// The states (a key and one activity) read against received cells.
+    states: u64,
+    /// The kernel's shares executed: a layer's stay or switch on one key's activity.
+    shares: u64,
 }
 
 impl Dormancy {
@@ -309,6 +314,8 @@ impl Dormancy {
             weights: Vec::new(),
             opening,
             roundings,
+            states: 0,
+            shares: 0,
         })
     }
 
@@ -547,6 +554,7 @@ impl Dormancy {
 
     /// Commit a read of `cell`: the survivors and weights move, and every clock winds one tick.
     fn commit(&mut self, pending: Pending, cell: usize) -> Result<(), PopulationError> {
+        self.shares += pending.kept.len() as u64 * (self.layers() * self.masks) as u64;
         self.held = Some(pending.kept);
         self.weights = pending.weights;
         self.roundings += pending.roundings;
@@ -653,8 +661,12 @@ impl Family for DormantFamily {
         if cell >= alphabet {
             return Err(PopulationError::CellOutside { cell, alphabet });
         }
-        // Every factor reads before any commits: a death moves no factor.
+        // Every factor reads before any commits: a death moves no factor, though its reads were
+        // spent.
         let digits = self.digits(cell);
+        for factor in &mut self.factors {
+            factor.states += factor.count() * factor.masks as u64;
+        }
         let pending: Vec<Pending> = self
             .factors
             .iter()
@@ -703,5 +715,32 @@ impl Family for DormantFamily {
 
     fn drift(&self) -> Rat {
         DormantFamily::drift(self)
+    }
+
+    fn declaration(&self) -> Declaration {
+        Declaration::new(
+            "dormant key family",
+            self.factors
+                .iter()
+                .map(|factor| u64::from(factor.rung))
+                .collect(),
+        )
+        .with(
+            self.factors
+                .iter()
+                .map(|factor| factor.emitters.declaration())
+                .collect(),
+        )
+    }
+
+    /// The states read and the kernel's shares executed: the work of holding every key through
+    /// its layers' silence.
+    fn work(&self) -> Work {
+        let mut work = Work::default();
+        for factor in &self.factors {
+            work.add(Act::State, factor.states);
+            work.add(Act::Share, factor.shares);
+        }
+        work
     }
 }

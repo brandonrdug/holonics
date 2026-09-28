@@ -51,6 +51,14 @@
 //! arch falls with the keystone, and the joint code without the keystone is the population's other
 //! families (the notebook reads the population without the record clock as the tree alone).
 //!
+//! [definition; agent-inferred] **Re-founding and species.** A port path is read from the passage's
+//! cell at its start ([`PortPath::starting`]), so a composed egg's seed (its keystone's surviving
+//! keys) is re-founded at a later cell, each conditioned family from its own seed or declared anew on
+//! the path from that cell (`Composed`'s `reseed`). Its species (`receiver::population::species`)
+//! are collapsed within each keystone key's conditioned family and across the keystone keys whose
+//! conditioned families are certain with one signature; a merged member returns at a split from its
+//! seed, declared anew on the path from the current cell and holding its seed's keys.
+//!
 //! [definition] The computational object is the helical pair interaction, read as eggs joined at
 //! ports. Of the winding guide's six general objects this owner touches three: the **helix** (a
 //! port's phase and its winding: the clock's record phase and its carry, the counter's odometer),
@@ -58,13 +66,18 @@
 //! **tower thread** (a record's phases restrict a cell to its place in the record). The pair, the
 //! cell holonomy and the tube stay attached through the constituents' owners.
 
+use std::collections::BTreeMap;
 use std::sync::Arc;
 
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
 use rayon::prelude::*;
 
-use super::{Emitters, Family, KeyReadout, Likelihood, PopulationError, Readout, refuse};
+use super::species::earliest;
+use super::{
+    Act, AdmittedFuture, Collapse, Declaration, Emitters, Family, KeyReadout, KeystoneMember,
+    KeystoneSpecies, Likelihood, PopulationError, Readout, Work, refuse,
+};
 use crate::compression::landmark::context::PassageCode;
 use crate::ratio::Rat;
 
@@ -97,12 +110,17 @@ pub trait Keystone: Send + Sync {
     fn port(&self, key: u64, upstream: Port) -> Port;
     /// Key `key`'s coordinates in the keystone's declared layout.
     fn coordinates(&self, key: u64) -> Vec<u64>;
+    /// **The keystone's declaration** (the population's identity, module header of `evolution`).
+    fn declaration(&self) -> Declaration;
 }
 
-/// [definition] **A port path** (module header): located keys of a chain of keystones, root first.
+/// [definition] **A port path** (module header): located keys of a chain of keystones, root first,
+/// read from the passage's clock at its start (a family founded at a later cell reads the passage's
+/// clock from that cell: its keys wind without the cells).
 #[derive(Clone, Default)]
 pub struct PortPath {
     links: Vec<(Arc<dyn Keystone>, u64)>,
+    start: u64,
 }
 
 impl PortPath {
@@ -115,14 +133,31 @@ impl PortPath {
     pub fn through(&self, keystone: Arc<dyn Keystone>, key: u64) -> Self {
         let mut links = self.links.clone();
         links.push((keystone, key));
-        Self { links }
+        Self {
+            links,
+            start: self.start,
+        }
     }
 
-    /// **The port read at tick `t`**: the passage's clock through every located keystone in turn.
+    /// **The same path read from the passage's cell `start`**: its tick zero is that cell.
+    pub fn starting(&self, start: u64) -> Self {
+        Self {
+            links: self.links.clone(),
+            start,
+        }
+    }
+
+    /// The passage's cell the path's tick zero reads.
+    pub fn start(&self) -> u64 {
+        self.start
+    }
+
+    /// **The port read at tick `t`**: the passage's clock at `start + t` through every located
+    /// keystone in turn.
     pub fn read(&self, tick: u64) -> Port {
         self.links
             .iter()
-            .fold(Port::tick(tick), |port, (keystone, key)| {
+            .fold(Port::tick(self.start + tick), |port, (keystone, key)| {
                 keystone.port(*key, port)
             })
     }
@@ -130,6 +165,14 @@ impl PortPath {
     /// The located keys, root first.
     pub fn keys(&self) -> Vec<u64> {
         self.links.iter().map(|(_, key)| *key).collect()
+    }
+
+    /// The keystones' declarations, root first (their keys are located, not declared).
+    pub fn declarations(&self) -> Vec<Declaration> {
+        self.links
+            .iter()
+            .map(|(keystone, _)| keystone.declaration())
+            .collect()
     }
 }
 
@@ -142,6 +185,8 @@ pub trait PortReader: Send + Sync {
     fn alphabet(&self) -> usize;
     /// The class emitted at a port reading.
     fn emit(&self, port: Port) -> usize;
+    /// **The reader's declaration**.
+    fn declaration(&self) -> Declaration;
 }
 
 // -------------------------------------------------------------------------------------------
@@ -220,11 +265,30 @@ impl Emitters for PortedEmitters {
         self.keystone.coordinates(key)
     }
 
+    /// The emitters at the passage's cell `tick` (their path read from its start).
     fn fork_at(&self, tick: u64) -> Option<Box<dyn Emitters>> {
         let mut fork = self.clone();
-        fork.tick = tick;
-        fork.port = fork.upstream.read(tick);
+        fork.tick = tick.checked_sub(self.upstream.start())?;
+        fork.port = fork.upstream.read(fork.tick);
         Some(Box::new(fork))
+    }
+
+    fn declaration(&self) -> Declaration {
+        let mut parts = self.upstream.declarations();
+        parts.push(self.keystone.declaration());
+        parts.push(self.reader.declaration());
+        Declaration::new("reader keyed through a keystone", Vec::new()).with(parts)
+    }
+
+    /// The port winds without the cells: key `k`'s class `ticks` ahead is its reader's at the port
+    /// read then.
+    fn ahead(&self, key: u64, ticks: u64) -> Option<usize> {
+        Some(
+            self.reader.emit(
+                self.keystone
+                    .port(key, self.upstream.read(self.tick + ticks)),
+            ),
+        )
     }
 }
 
@@ -240,6 +304,7 @@ pub struct Unheld {
     description: u64,
     emitters: PortedEmitters,
     passage: PassageCode,
+    reads: u64,
 }
 
 impl Unheld {
@@ -250,6 +315,7 @@ impl Unheld {
             description,
             emitters,
             passage: PassageCode::new(),
+            reads: 0,
         }
     }
 }
@@ -283,12 +349,24 @@ impl Family for Unheld {
             BigInt::from(self.emitters.count(cell)),
             BigInt::from(self.emitters.keys()),
         );
+        self.reads += self.emitters.keys();
         if face.is_zero() {
             return Ok(face);
         }
         self.emitters.advance(cell)?;
         self.passage.face(&face)?;
         Ok(face)
+    }
+
+    fn declaration(&self) -> Declaration {
+        Declaration::new("unheld port", Vec::new()).with(vec![self.emitters.declaration()])
+    }
+
+    /// Every key's emission read at every cell: the prior pushed through the port.
+    fn work(&self) -> Work {
+        let mut work = Work::default();
+        work.add(Act::Read, self.reads);
+        work
     }
 
     fn likelihood(&self) -> Likelihood {
@@ -312,19 +390,23 @@ impl Family for Unheld {
 /// [definition] **A conditioned family's declaration**: the family built on a port path (its
 /// keystone's key located on it).
 pub type Conditioned =
-    Box<dyn Fn(PortPath) -> Result<Box<dyn Family>, PopulationError> + Send + Sync>;
+    Arc<dyn Fn(PortPath) -> Result<Box<dyn Family>, PopulationError> + Send + Sync>;
 
-/// One surviving key of the keystone: the conditioned family built under it and its exact
-/// posterior.
+/// One surviving key of the keystone (a species' representative once collapsed): the conditioned
+/// family built under it, its exact posterior, and the keystone keys it stands for.
 struct Held {
     key: u64,
     family: Box<dyn Family>,
     weight: Rat,
+    members: u64,
 }
 
 /// [definition; agent-inferred] **The composed family `A ⊳ B`** (module header): the keystone's
 /// surviving keys, each with the conditioned family built on the path through it and the key's
-/// exact posterior; the likelihood is the product of the composed faces, enclosed.
+/// exact posterior; the likelihood is the product of the composed faces, enclosed. It keeps its
+/// declaration (the keystone's, the upstream path's and the conditioned family's), the path it
+/// reads from, the cells received, the admitted future's end of a keystone collapse, the work of
+/// the conditioned families that died, and its declared maintenance.
 pub struct Composed {
     label: String,
     description: u64,
@@ -332,6 +414,13 @@ pub struct Composed {
     keystone: Arc<dyn Keystone>,
     held: Vec<Held>,
     passage: PassageCode,
+    conditioned: Conditioned,
+    declared: Declaration,
+    upstream: PortPath,
+    ticks: u64,
+    until: Option<u64>,
+    spent: Work,
+    maintenance: Work,
 }
 
 impl Composed {
@@ -364,6 +453,7 @@ impl Composed {
                     key,
                     family: conditioned(upstream.through(Arc::clone(&keystone), key))?,
                     weight: weight.clone(),
+                    members: 1,
                 })
             })
             .collect::<Result<Vec<Held>, PopulationError>>()?;
@@ -378,6 +468,9 @@ impl Composed {
                 "its conditioned families read one declared alphabet",
             ));
         }
+        let mut parts = upstream.declarations();
+        parts.push(keystone.declaration());
+        parts.push(held[0].family.declaration());
         Ok(Self {
             label,
             description,
@@ -385,12 +478,35 @@ impl Composed {
             keystone,
             held,
             passage: PassageCode::new(),
+            conditioned: Arc::clone(conditioned),
+            declared: Declaration::new("composed at a port", Vec::new()).with(parts),
+            upstream: upstream.clone(),
+            ticks: 0,
+            until: None,
+            spent: Work::default(),
+            maintenance: Work::default(),
         })
+    }
+
+    /// **The composed family with its declared maintenance**: the work its constituents spent
+    /// once, at their declaration (a sieve's gratings laid over its window).
+    pub fn with_maintenance(mut self, maintenance: Work) -> Self {
+        self.maintenance = maintenance;
+        self
     }
 
     /// The keystone.
     pub fn keystone(&self) -> &dyn Keystone {
         self.keystone.as_ref()
+    }
+
+    /// **Each surviving keystone key's members** (the keys its species stands for), ascending by
+    /// key.
+    pub fn members(&self) -> Vec<(u64, u64)> {
+        self.held
+            .iter()
+            .map(|member| (member.key, member.members))
+            .collect()
     }
 
     /// **The keystone's posterior** over its surviving keys, exact, ascending by key.
@@ -465,16 +581,22 @@ impl Family for Composed {
         if face.is_zero() {
             return Ok(face);
         }
+        self.spent.add(Act::Weigh, self.held.len() as u64);
         let held = std::mem::take(&mut self.held);
-        self.held = held
-            .into_iter()
-            .zip(faces)
-            .filter(|(_, conditioned)| !conditioned.is_zero())
-            .map(|(member, conditioned)| Held {
+        let mut kept = Vec::with_capacity(held.len());
+        for (member, conditioned) in held.into_iter().zip(faces) {
+            if conditioned.is_zero() {
+                // A key that dies leaves the work its conditioned family spent.
+                self.spent.absorb(&member.family.work());
+                continue;
+            }
+            kept.push(Held {
                 weight: &member.weight * &conditioned / &face,
                 ..member
-            })
-            .collect();
+            });
+        }
+        self.held = kept;
+        self.ticks += 1;
         self.passage.face(&face)?;
         Ok(face)
     }
@@ -517,8 +639,231 @@ impl Family for Composed {
     }
 
     fn admits(&self, cells: &[usize]) -> Result<(), PopulationError> {
+        if self
+            .until
+            .is_some_and(|end| self.ticks + cells.len() as u64 > end)
+        {
+            return Err(refuse(
+                "a collapsed composed egg's passage",
+                "it stays within the admitted future its keystone's species were collapsed over (split them from their receipt first)",
+            ));
+        }
         self.held
             .iter()
             .try_for_each(|member| member.family.admits(cells))
+    }
+
+    fn declaration(&self) -> Declaration {
+        self.declared.clone()
+    }
+
+    /// The keystone keys weighed, every conditioned family's work (the living and the dead), and
+    /// the declared maintenance.
+    fn work(&self) -> Work {
+        let mut work = self.maintenance.clone();
+        work.absorb(&self.spent);
+        for member in &self.held {
+            work.absorb(&member.family.work());
+        }
+        work
+    }
+
+    /// [definition; agent-inferred] **The composed egg re-founded from its seed** at the passage's
+    /// cell `at` (item 3 of the population's remaining terms): the keystone's keys wind without the
+    /// cells, so each surviving key's port is read from `at`; each conditioned family is re-founded
+    /// from its own seed where it has one, else declared anew on the path from `at` (a carry egg
+    /// joining mid-record reads its product phases uniform until it has read a record's operands).
+    /// The prior is uniform over the keystone keys the seed stands for. None while a keystone
+    /// collapse's admitted future holds (split its species first).
+    fn reseed(&self, at: usize) -> Option<Box<dyn Family>> {
+        if self.until.is_some() {
+            return None;
+        }
+        let upstream = self.upstream.starting(at as u64);
+        let total: u64 = self.held.iter().map(|member| member.members).sum();
+        let held = self
+            .held
+            .iter()
+            .map(|member| {
+                let family = match member.family.reseed(at) {
+                    Some(family) => family,
+                    None => {
+                        (self.conditioned)(upstream.through(Arc::clone(&self.keystone), member.key))
+                            .ok()?
+                    }
+                };
+                Some(Held {
+                    key: member.key,
+                    family,
+                    weight: Rat::new(BigInt::from(member.members), BigInt::from(total)),
+                    members: member.members,
+                })
+            })
+            .collect::<Option<Vec<Held>>>()?;
+        Some(Box::new(Composed {
+            label: format!("{} (re-founded from its seed)", self.label),
+            description: self.description,
+            alphabet: self.alphabet,
+            keystone: Arc::clone(&self.keystone),
+            held,
+            passage: PassageCode::new(),
+            conditioned: Arc::clone(&self.conditioned),
+            declared: self.declared.clone(),
+            upstream,
+            ticks: 0,
+            until: None,
+            spent: Work::default(),
+            maintenance: self.maintenance.clone(),
+        }))
+    }
+
+    /// **Species within a composed egg** (module header of `species`): each surviving key's
+    /// conditioned family collapses its own keys; then the keystone keys whose conditioned
+    /// families are certain over the admitted future with one signature are one species, kept as
+    /// the least key's family at the summed weight, every member's seed in the receipt.
+    fn collapse(&mut self, future: AdmittedFuture) -> Result<Option<Collapse>, PopulationError> {
+        let mut conditioned = Vec::new();
+        for member in &mut self.held {
+            if let Ok(Some(collapse)) = member.family.collapse(future) {
+                conditioned.push((member.key, collapse));
+            }
+        }
+        let mut certain: BTreeMap<Vec<Vec<usize>>, Vec<usize>> = BTreeMap::new();
+        let mut groups: Vec<Vec<usize>> = Vec::new();
+        for (index, member) in self.held.iter().enumerate() {
+            match member.family.certain(future) {
+                Some(signature) => certain.entry(signature).or_default().push(index),
+                None => groups.push(vec![index]),
+            }
+        }
+        groups.extend(certain.into_values());
+        groups.sort_by_key(|group| group[0]);
+        let keystone: Vec<KeystoneSpecies> = groups
+            .iter()
+            .map(|group| {
+                let posterior: Rat = group.iter().map(|&i| &self.held[i].weight).sum();
+                KeystoneSpecies {
+                    representative: self.held[group[0]].key,
+                    members: group
+                        .iter()
+                        .map(|&i| {
+                            let member = &self.held[i];
+                            KeystoneMember {
+                                key: member.key,
+                                members: member.members,
+                                share: &member.weight / &posterior,
+                                seed: member.family.seed(),
+                            }
+                        })
+                        .collect(),
+                    posterior,
+                }
+            })
+            .collect();
+        let receipt = Collapse::Composed {
+            future,
+            keystone: keystone.clone(),
+            conditioned,
+            until: self.until,
+            ticks: self.ticks,
+        };
+        if groups.iter().any(|group| group.len() > 1) {
+            let mut held: Vec<Option<Held>> = std::mem::take(&mut self.held)
+                .into_iter()
+                .map(Some)
+                .collect();
+            let mut kept = Vec::with_capacity(groups.len());
+            for (group, species) in groups.iter().zip(&keystone) {
+                let mut representative = held[group[0]].take().expect("a held key");
+                representative.weight = species.posterior.clone();
+                representative.members = species.members.iter().map(|member| member.members).sum();
+                for &i in &group[1..] {
+                    let member = held[i].take().expect("a held key");
+                    self.spent.absorb(&member.family.work());
+                }
+                kept.push(representative);
+            }
+            self.held = kept;
+            self.until = earliest(self.until, future.end(self.ticks));
+        }
+        Ok(Some(receipt))
+    }
+
+    /// **Split a composed egg's species** from its receipt: every member of a surviving keystone
+    /// species is declared anew on the path from the current cell and holds its seed, its clock wound
+    /// by the cells received since the collapse, at its share of the species' weight; then each
+    /// conditioned family splits its own species. Every member is built before anything moves.
+    fn split(&mut self, collapse: &Collapse) -> Result<(), PopulationError> {
+        let Collapse::Composed {
+            keystone,
+            conditioned,
+            until,
+            ticks,
+            ..
+        } = collapse
+        else {
+            return Err(refuse(
+                "a composed egg's species split",
+                "its receipt is a composed egg's collapse",
+            ));
+        };
+        let Some(elapsed) = self.ticks.checked_sub(*ticks) else {
+            return Err(refuse(
+                "a composed egg's species split",
+                "its receipt was read at or before the current cell",
+            ));
+        };
+        let now = self.upstream.start() + self.ticks;
+        let mut restored: Vec<Held> = Vec::new();
+        let mut moved: Vec<(usize, Rat, u64)> = Vec::new();
+        for species in keystone.iter().filter(|species| species.members.len() > 1) {
+            let Some(position) = self
+                .held
+                .iter()
+                .position(|member| member.key == species.representative)
+            else {
+                continue;
+            };
+            let weight = self.held[position].weight.clone();
+            for member in &species.members {
+                if member.key == species.representative {
+                    moved.push((position, &weight * &member.share, member.members));
+                    continue;
+                }
+                let seed = member.seed.as_ref().ok_or_else(|| {
+                    refuse(
+                        "a composed egg's species split",
+                        "every merged member keeps its conditioned family's seed",
+                    )
+                })?;
+                let mut family = (self.conditioned)(
+                    self.upstream
+                        .starting(now)
+                        .through(Arc::clone(&self.keystone), member.key),
+                )?;
+                let mut wound = seed.clone();
+                wound.tick += elapsed;
+                family.restrict(&wound)?;
+                restored.push(Held {
+                    key: member.key,
+                    family,
+                    weight: &weight * &member.share,
+                    members: member.members,
+                });
+            }
+        }
+        for (position, weight, members) in moved {
+            self.held[position].weight = weight;
+            self.held[position].members = members;
+        }
+        self.held.extend(restored);
+        self.held.sort_by_key(|member| member.key);
+        for (key, nested) in conditioned {
+            if let Some(member) = self.held.iter_mut().find(|member| member.key == *key) {
+                member.family.split(nested)?;
+            }
+        }
+        self.until = *until;
+        Ok(())
     }
 }

@@ -975,10 +975,88 @@ by their own face); in base 6 the last digit `6666` (2: `4999`, 3: `1667`), the 
 `667 = 23·29`, the alternating sum (7) `381 = 3·127`, the 43 gratings `11..=211` `1102 = 2·19·29`,
 the gaps `1182 = 2·3·197`.
 
-**What the evolved prior and species collapse need from this owner.** The composed family's
-readout carries the keystone's surviving keys with their exact posteriors and, once one key
-survives, its conditioned family's located keys: a selection count over eggs can be read from the
-population's receipt at each aeon's end, and the keystone's value from the partition's reading. A
-composed egg built from a surviving seed has no reseed yet (its keystone's keys wind without the
-cells, so it can); a species of keystone keys (keys every admitted receiver reads alike) is carried
-as separate held keys with one posterior each, which is what species collapse would quotient.
+## The evolved prior and species collapse (rebuild step 4 item 7, September 27)
+
+`hnn_population.rs`'s `evolution` and `species` modes (`hnn_population_evolution.rs`, its header
+states the declarations) run `holonics::receiver::population::{evolution, species}` (Lean
+`Compression/Landmark/Context/Evolution`). These are **development receipts, not milestones**.
+`evolution` reads its twelve aeons in `3922` ms and `species` its three terrains in under two
+seconds (exterior wall).
+
+```sh
+cargo run --release -p holonics --example hnn_population -- evolution
+cargo run --release -p holonics --example hnn_population -- species
+```
+
+**The evolved prior across aeons.** Twelve declared aeons, three cycles of four terrains, each drawn
+by the seed plus the aeon's index: a moiré's parity color (`k = 3`, `q ≤ 2^3`, `2^12` cells), a tree
+source (depth 2 over bits, `2^12` cells), products in base 2 (`L = 4`, `k = 2`, `2^8` records of 19
+cells) and a prime stream in base 10 (`L = 3` over `[100c, 1000)` in cycle `c`). Each aeon declares
+the tree at every depth of the ladder and the catalogue's key family for its alphabet (the parity
+gratings on both binary terrains, `clock ⊳ carry`, `clock ⊳ (counter ⊳ sieve)`): seven families of
+3 bits, the static prior `1/7` at `M = 7/8`. The evolved population declares the same families at
+`M π(f)`, `π(f) = ½ D(f) + ½ · 1/7`, from the counts retained so far; the counts are the only
+history kept. After the twelfth aeon they read, as (declared, selected, died): the gratings
+`(6, 3, 3)`, the tree at `D = 2` `(12, 3, 0)`, `clock ⊳ carry` `(3, 3, 0)`,
+`clock ⊳ (counter ⊳ sieve)` `(3, 3, 0)`, the other five trees `(12, 0, 0)`.
+
+| aeon | terrain | selected (its evolved prior) | static | evolved | evolved − static |
+|---|---|---|---|---|---|
+| 0 | moiré `5/7 @ 0/7, 3/8 @ 6/8, 7/8 @ 6/8` | gratings (`1/7`) | `14 + 1/16` | `14 + 1/16` | within `2^(−96)` |
+| 1 | tree source | tree `D = 2` (`8/63`) | `2847 + 14/16` | `2848 + 1/16` | `0 + 2/16` |
+| 2 | products | `clock ⊳ carry` (`8/63`) | `2055 + 0/16` | `2055 + 3/16` | `0 + 2/16` |
+| 3 | primes `[0, 1000)` | `clock ⊳ (counter ⊳ sieve)` (`8/63`) | `14 + 12/16` | `14 + 15/16` | `0 + 2/16` |
+| 4 | moiré `5/6 @ 2/6, 4/5 @ 3/5, 1/3 @ 2/3` | gratings (`72/371`) | `15 + 8/16` | `15 + 1/16` | `−1 + 8/16` |
+| 5 | tree source | tree `D = 2` (`118/623`) | `3277 + 5/16` | `3277 + 0/16` | `−1 + 11/16` |
+| 6 | products | `clock ⊳ carry` (`17/91`) | `2055 + 0/16` | `2054 + 10/16` | `−1 + 9/16` |
+| 7 | primes `[100, 1000)` | the prime egg (`17/91`) | `14 + 12/16` | `14 + 6/16` | `−1 + 9/16` |
+| 8 | moiré `5/8 @ 3/8, 3/7 @ 5/7, 6/7 @ 6/7` | gratings (`209/917`) | `16 + 6/16` | `15 + 12/16` | `−1 + 5/16` |
+| 9 | tree source | tree `D = 2` (`284/1281`; the static population selects none) | `2916 + 9/16` | `2916 + 7/16` | `−1 + 13/16` |
+| 10 | products | `clock ⊳ carry` (`26/119`) | `2055 + 0/16` | `2054 + 7/16` | `−1 + 6/16` |
+| 11 | primes `[200, 1000)` | the prime egg (`26/119`) | `14 + 12/16` | `14 + 2/16` | `−1 + 6/16` |
+
+Each reading is `+ ε`. By cycle the evolved population codes `0 + 8/16`, `−2 + 8/16` and
+`−3 + 14/16` against the static one, and over the twelve aeons `15294 + 6/16` against
+`15297 + 6/16`, `−4 + 15/16` (exact `[−60206255015575805798155076523/2^94,
+−60206255015575805798155076517/2^94]`). In every aeon its code lies within the bound: the selected
+family's code plus `−log₂` of its evolved prior. What it located:
+- **The evolved prior moves only the naming.** At `λ = ½` a family's prior lies in
+  `[1/14, 4/7]` against the static `1/7`: it saves at most 2 bits an aeon and costs at most one.
+  The first cycle meets each kind before its count exists, at a Dirichlet face thinned by the
+  others' selections (`8/63 < 1/7`), and pays `0 + 2/16` an aeon; once a kind has been selected the
+  later aeons of that kind cost less, reading `−1 + 5/16` to `−1 + 13/16` against the static
+  population in the third cycle. The mixture's code moves by less than the selected family's prior
+  where other families keep mass (the tree source's deeper trees).
+- **A family that keeps winning is founded sooner; one that keeps dying later.** The key family's
+  founding charge `−log₂ m_f` falls from 3 bits as its selections accumulate: the arithmetic eggs'
+  to `2 + 6/16 + ε` by the third cycle (two selections each), the gratings' to `2 + 1/16 + ε` at
+  aeon 9 (three selections). The gratings die on every tree source, and their deaths thin their
+  pseudo-count to `σ = 7/22` at aeon 9's opening: their prior reads `347/1281`, where the KT
+  pseudo-count `½` would give `33/119`.
+
+**The work each family spent** (the cost receipt's counts, beside description and code): the
+parity gratings read `6574260` emissions on the first moiré (every one of the `1815848` keys at the
+first cell, the survivors after); the tree at `D = 2` deposited `4096` cells and holds `9` nodes;
+`clock ⊳ carry` weighed `4924` keystone keys and formed `256` digit products; the prime egg read
+`8317` counter emissions and weighed `4006` keystone keys on `[0, 1000)`, and its sieve's window
+was decided once, `1000 = 2^3·5^3` integers: `2` below two, the last digit `599` (2: `499`,
+5: `100`), the digit sum (3) `134`, the alternating sum (11) `24`, the gratings `7..=31` `84`
+(`35, 17, 11, 9, 7, 3, 2`), and `157` gaps, the primes past `31`. No family here is pumped against
+dissipation, so none reports pump work.
+
+**Species collapse relative to the admitted future.** Each terrain is read whole by its population
+(the `moire` and `crib` modes'), then its key family is collapsed over the whole future:
+- **The parity moiré** (`k = 3`, `q ≤ 2^3`, `2^14` cells): its `720 = 2^4·3^2·5` survivors are one
+  species at posterior 1 (the representative `1/7 @ 5/7, 1/7 @ 3/7, 1/2 @ 1/2`). The population
+  codes `14 + 1/16 + ε` before and after; its face, the family's posterior and its own code are
+  unchanged.
+- **Relative to a growing admitted future**, at cell 9 where `3816 = 2^3·3^2·53` parity keys
+  survive: over the next 1, 2, 4 and 8 ticks they form 2, 4, 14 and 27 species, and 27 from 8 ticks
+  on and over the whole future. A species of a short future splits when the future grows; the word
+  a surviving key emits is fixed 8 ticks ahead.
+- **The sheet tuple** (`k = 3`, `q ≤ 2^4`, `2^14` cells): each ring's grating and its mirror are one
+  species, `2·2·2` members to 1: `1/15 @ 2/15 ~ 14/15 @ 5/15`, `4/15 @ 10/15 ~ 11/15 @ 12/15` and
+  `5/16 @ 11/16 ~ 11/16 @ 12/16`. The population codes `29 + 0/16 + ε` before and after.
+- **The rotor crib** (`2^10` cells): its 7 survivors, the ring's rotor-gauge orbit, are one species:
+  their transition tables agree at every stage of the rotor's period. The population codes
+  `17 + 14/16 + ε` before and after.
