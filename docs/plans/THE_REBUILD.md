@@ -141,10 +141,23 @@ sets the order:
      cell 9 the parity survivors form 2, 4, 14 and 27 species over 1, 2, 4 and 8 ticks, and a
      growing future splits a species again.
    - **Work.** Each family's executed work is counted in its cost receipt.
-8. **Next: campaign 5 on the population.**
-   - the curated readers as families;
-   - a part clock with a boundary egg, so a message's end is predicted by more than its bytes;
-   - a joint address across ports;
+8. **Campaign 5 on the population, first step built (September 27;**
+   `receiver::population::boundary`, `compression::landmark::context::sections`, Lean
+   `Composition.{staged_chain_rule, staged_code}`**).** The curated readers are families. A part
+   clock (a keystone carrying the open part's channel and kind, its phase, its sentence carry and
+   the last byte's class) feeds a boundary egg. Its hazard is a KT face on a declared partition of
+   those classes, and the chain rule splits its code exactly into boundary and letters. With its
+   sections paid, **the curated stream now codes below the flat stream of the same bytes**:
+   `−950 + 9/16 + ε` on development and `−415 + 3/16 + ε` held out (charged 12 bits for the
+   design choices). Every byte gains (`−5426 + 3/16` development), and the letters fall to
+   `4467 + 6/16` from `5774 + 15/16`. The part clock is worth `2764 + 8/16` on development.
+   Bayes selects the boundary egg outright.
+9. **Next in campaign 5.**
+   - merges: learn the part clock's byte classes and share the human port's thin counts, by
+     collapsing classes whose faces agree over the admitted future, priced by their code pair.
+     The merge Lean comes first (`expand_merge`, `merge_cost_iff`, `segmentation_mass`,
+     `encoding_square_or_separator`, `release_merge_iff_future_equivalent`);
+   - the admitted receivers (request→response, response→later-human) consumed;
    - merges priced by their code pair as species collapse (Holonic Encoding);
    - then the full HNN at scale on the population.
 
