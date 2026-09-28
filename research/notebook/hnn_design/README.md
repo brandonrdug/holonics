@@ -2100,7 +2100,7 @@ acceptance stays as written"). Campaign 4, #27, #148.
 ```sh
 cargo run --release -p holonics --example hnn_chase -- diagnose 20260928 20260929 20260930 20260931 20260933
 cargo run --release -p holonics --example hnn_chase -- choose 2 12 0 robust,certified-expected,expected
-cargo run --release -p holonics --example hnn_chase -- fresh
+cargo run --release -p holonics --example hnn_chase -- fresh    # at commit 7f2c5d4f; `fresh` now reads the pledge loop's population
 cargo test -p holonics --lib holarchy::terrain::chase_tests
 ```
 
@@ -2268,6 +2268,7 @@ Record: no dedicated record; THE_REBUILD U4 ("The pledge"). Campaign 4, #27, #14
 
 ```sh
 cargo run --release -p holonics --example hnn_chase -- choose 2 12 0 robust,certified-expected,expected
+cargo run --release -p holonics --example hnn_chase -- fresh
 cargo test -p holonics --lib holarchy::terrain::chase_tests
 cargo test -p holonics --lib receiver::population::chaser
 ```
@@ -2345,3 +2346,30 @@ masked).
   exactly when the basin certifies and then `b ≤ W ≤` the depth, and the pledged plan keeps its
   bound (the frozen-horizon reading of the class the cell names attains `U = 0` at `W − 2`, so each
   later `W′ ≤ W − 1`).
+
+**Pinned before the run** (this commit; `hnn_chase.rs`'s `FRESH_SEED`, `FRESH_SEEDS`,
+`CANDIDATE_PLAN` and `fresh`):
+- **The fresh population**: seeds `20261201 + s`, `s < 64`, a declared contiguous range disjoint from
+  every range read so far (the acceptance seeds `20260927 + s` and the choosing seeds
+  `20261001 + s`, `s < 16`; the spent first fresh population `20261101 + s`, `s < 64`, which `moves
+  fresh` still reads), none read before this pin and none selected by any property. Projected from
+  the first fresh run (226,712 ms at 643,932 kB) and the pledged rung's lesser work at about four
+  minutes and under 1 GB, against ten minutes and the host's memory.
+- **The chasers**, each from the reception's draw under the same traction bound: the machine under
+  its robust plan (the current `MachineChaser::new`), the candidate (the pledged expected plan at
+  `n = 2, m = 12, d = 0`), pure pursuit and constant bearing; an uncaptured passage counts its cap
+  `2^9`. The truth-only least `L` is read to the least of the four captures, which bounds it. A draw
+  the terrain refuses (openings within capture) is printed, read by no chaser and enters no sum, and
+  "more than half of the seeds" counts the chased seeds.
+- **The criteria**, the first fresh run's: aggregate capture ticks `Σ T` for each chaser; the sum of
+  regrets `Σ (T − L)`; win/tie/loss (strictly fewer ticks, equal, more) of each machine against pure
+  pursuit, against constant bearing and against both at once (the lesser of the two on the seed),
+  and of the candidate against the robust machine; F6's action acceptance as written for each
+  machine.
+- **The adoption rule**, fixed now: the candidate becomes `MachineChaser::new` exactly when its
+  aggregate capture ticks are strictly fewer than the robust machine's and it wins more seeds against
+  it than it loses.
+- **Printed beside them, not criteria**: each machine's released bounds and those its passages kept,
+  and the pledges broken. **Reported separately, as a conditional reading, never as the
+  acceptance**: the seeds whose truth-only least lies strictly below both controls, with each
+  machine's win/tie/loss against both at once and its regret sum there.

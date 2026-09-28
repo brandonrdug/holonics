@@ -318,6 +318,12 @@ where one exists), `holarchy::terrain::{chase, pursuit}`, then the named operato
   - *Chosen on the choosing seeds only* (the pinned rule): robust 150 capture ticks (3 won against
     both controls), certified-then-expected 148 (4), pledged expected 147 (4), each keeping every
     bound it released (144, 142, 141) and breaking no pledge. The candidate is the pledged plan.
+  - *Pinned before the run*: the fresh population `20261201 + s`, `s < 64`, disjoint from every range
+    read so far; the first fresh run's criteria (aggregate capture ticks, regret to the truth-only
+    least, win/tie/loss against both controls at once, the candidate against the robust machine,
+    F6's capture bullet as written); refused draws printed and entering no sum. The adoption rule:
+    the candidate becomes `MachineChaser::new` exactly when its aggregate is strictly fewer than the
+    robust machine's and it wins more seeds against it than it loses.
 - **Known-truth game terrains** (Brandon, September 28;
   [record](../../research/records/2026-09-28_THE_OPTIMAL_POLICY_IS_THE_GEODESIC_NAVIGATOR_THE_CHASE_IS_RETROGRADE_ANALYSIS_AND_A_TEMPO_IS_A_MOBIUS_LOOP.md)),
   after the chase's next loop and before the fluid-cell terrain: the two-by-two cube's Cayley graph

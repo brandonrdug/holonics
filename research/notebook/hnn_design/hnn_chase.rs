@@ -11,8 +11,8 @@
 //! cargo run --release -p holonics --example hnn_chase -- choose   # the action phase's choosing sweep
 //! cargo run --release -p holonics --example hnn_chase -- action   # the action phase's acceptance
 //! cargo run --release -p holonics --example hnn_chase -- diagnose [seeds]   # U4: the failure located
-//! cargo run --release -p holonics --example hnn_chase -- fresh    # U4: the fresh population
-//! cargo run --release -p holonics --example hnn_chase -- moves [fresh]   # U4: the move sets
+//! cargo run --release -p holonics --example hnn_chase -- fresh    # U4: the pledge loop's fresh population
+//! cargo run --release -p holonics --example hnn_chase -- moves [fresh]   # U4: the move sets (fresh: the first fresh population)
 //! ```
 //!
 //! [definition; agent-inferred] **U4's next loop.** `diagnose` reads the machine's passage tick by
@@ -141,12 +141,19 @@ const RECEIPT_HORIZON: usize = 4;
 /// The truth-only basin's reading limit.
 const OPTIMUM_LIMIT: usize = 16;
 
-/// [definition; agent-inferred, pinned before the run] **The fresh population** (U4's next loop):
-/// the seeds `FRESH_SEED + s`, `s < FRESH_SEEDS`, a declared contiguous range disjoint from the
-/// acceptance seeds (`SEED + s`) and the choosing seeds (`CHOOSING_SEED + s`), none read before this
-/// pin and none selected by any property. `64 = 2⁶` seeds: the run was projected at about four
-/// minutes against the ten-minute budget from the choosing sweep's work.
-const FRESH_SEED: u64 = 20_261_101;
+/// [definition; agent-inferred, pinned before its run] **The first fresh population** (U4's next
+/// loop, spent): the seeds `FIRST_FRESH_SEED + s`, `s < FRESH_SEEDS`, on which the unpledged expected
+/// plan was run once (at commit `7f2c5d4f`); `moves fresh` reads the move sets on it.
+const FIRST_FRESH_SEED: u64 = 20_261_101;
+
+/// [definition; agent-inferred, pinned before the run] **The fresh population** (U4's pledge loop):
+/// the seeds `FRESH_SEED + s`, `s < FRESH_SEEDS`, a declared contiguous range disjoint from every
+/// range read so far (the acceptance seeds `SEED + s`, the choosing seeds `CHOOSING_SEED + s` and
+/// the spent first fresh population `FIRST_FRESH_SEED + s`), none read before this pin and none
+/// selected by any property. `64 = 2⁶` seeds: the first fresh run took 226,712 ms at a 643,932 kB
+/// peak, and the pledged plan's choosing rung took less work than the unpledged one's, so the run is
+/// projected at about four minutes and under 1 GB, against the ten-minute budget.
+const FRESH_SEED: u64 = 20_261_201;
 const FRESH_SEEDS: u64 = 64;
 
 /// [definition; agent-inferred, chosen on the choosing seeds] **The candidate**: the pledged expected
@@ -504,11 +511,12 @@ fn wtl(counts: &[usize; 3]) -> String {
     format!("{}/{}/{}", counts[0], counts[1], counts[2])
 }
 
-/// [definition; agent-inferred, pinned before the run] **The fresh population's run** (U4's next
-/// loop; THE_REBUILD U4, "F6's action acceptance stays as written"). On each seed of the fresh
-/// population ([`FRESH_SEED`]), four chasers from the reception's draw under the same traction
-/// bound: the machine under its robust plan (the current rule), the candidate ([`CANDIDATE_PLAN`]),
-/// pure pursuit and constant bearing; each capture tick counts the cap `2^9` when uncaptured. The
+/// [definition; agent-inferred, pinned before the run] **The fresh population's run** (U4's pledge
+/// loop; THE_REBUILD U4, "F6's action acceptance stays as written"; the criteria are the first fresh
+/// run's). On each seed of the fresh population ([`FRESH_SEED`]), four chasers from the reception's
+/// draw under the same traction bound: the machine under its robust plan (the current rule,
+/// `MachineChaser::new`), the candidate ([`CANDIDATE_PLAN`]), pure pursuit and constant bearing; each
+/// capture tick counts the cap `2^9` when uncaptured. The
 /// truth-only basin's least capture `L` is read to the least of the four captures, which bounds it
 /// (each chaser's realized word is a strategy that knows nothing the truth-only basin lacks). The
 /// criteria, declared before the run:
@@ -519,19 +527,21 @@ fn wtl(counts: &[usize; 3]) -> String {
 ///   seed), and of the candidate against the robust machine;
 /// - **F6's action acceptance as written**, for each machine: strictly fewer ticks than both
 ///   controls in sum, and strictly fewer than both on more than half of the seeds;
-/// - **the candidate against the current machine**: it improves on it exactly when its aggregate
-///   capture ticks are strictly fewer and it wins more seeds against it than it loses.
+/// - **the adoption rule**, fixed before the run: the candidate becomes `MachineChaser::new` exactly
+///   when its aggregate capture ticks are strictly fewer than the robust machine's and it wins more
+///   seeds against it than it loses.
 ///
-/// Reported separately, as a conditional reading and never as the acceptance: the seeds whose
-/// truth-only least lies strictly below both controls (a win beyond every control is admitted),
-/// with each machine's win/tie/loss against both at once and its regret sum on them.
+/// Printed beside them, not criteria: each machine's released bounds and those its passages kept
+/// (capture by `t + B_t`, the chaser's pledge), and the pledges broken. Reported separately, as a
+/// conditional reading and never as the acceptance: the seeds whose truth-only least lies strictly
+/// below both controls (a win beyond every control is admitted), with each machine's win/tie/loss
+/// against both at once and its regret sum on them.
 ///
-/// [measured; the pin amended before the rerun] **A refused draw.** The first run stopped at seed
-/// `20261135`, the 35th: its draw opens the runner and the chaser within capture, which the terrain
-/// refuses (`Chase::draw`, `pursuit::act`), and the pin had not declared the case. A draw the terrain
-/// refuses is a seed with no chase: it is printed, read by no chaser and enters no sum, and "more
-/// than half of the seeds" counts the chased seeds. The refusal reads the openings alone, the same
-/// for every chaser, so it selects by no chaser's outcome. Nothing else changed.
+/// [definition; declared in the first fresh run's amended pin] **A refused draw.** A draw that opens
+/// the runner and the chaser within capture is refused by the terrain (`Chase::draw`,
+/// `pursuit::act`): it is a seed with no chase, printed, read by no chaser and entering no sum, and
+/// "more than half of the seeds" counts the chased seeds. The refusal reads the openings alone, the
+/// same for every chaser, so it selects by no chaser's outcome.
 fn fresh() {
     let declaration = declaration();
     let family = family();
@@ -558,6 +568,7 @@ fn fresh() {
     let (mut admitting, mut conditional, mut conditional_regrets) =
         (0usize, [[0usize; 3]; 2], [0usize; 2]);
     let mut releases = [[0usize; 3]; 2];
+    let (mut kept, mut broken) = ([(0usize, 0usize); 2], [0usize; 2]);
     let mut refused = Vec::new();
     for s in 0..FRESH_SEEDS {
         let seed = FRESH_SEED + s;
@@ -589,6 +600,15 @@ fn fresh() {
             {
                 *count += receipt.count(release);
             }
+        }
+        for (m, (passage, receipt)) in [(&r, robust.receipt()), (&e, candidate.receipt())]
+            .into_iter()
+            .enumerate()
+        {
+            let (k, n) = bounds_kept(passage, receipt);
+            kept[m].0 += k;
+            kept[m].1 += n;
+            broken[m] += receipt.broken;
         }
         let ticks = [r.ticks(), e.ticks(), p.ticks(), b.ticks()];
         let limit = *ticks.iter().min().expect("four");
@@ -649,12 +669,15 @@ fn fresh() {
     );
     for m in 0..2 {
         println!(
-            "  {} win/tie/loss: against pure pursuit {}, against constant bearing {}, against both at once {}; releases certified/commit/probe {:?}",
+            "  {} win/tie/loss: against pure pursuit {}, against constant bearing {}, against both at once {}; releases certified/commit/probe {:?}; released bounds kept {} of {}, pledges broken {}",
             names[m],
             wtl(&against[m][0]),
             wtl(&against[m][1]),
             wtl(&against[m][2]),
-            releases[m]
+            releases[m],
+            kept[m].0,
+            kept[m].1,
+            broken[m]
         );
     }
     println!(
@@ -671,8 +694,13 @@ fn fresh() {
         );
     }
     println!(
-        "  the candidate improves on the current machine (fewer ticks in sum, more seeds won than lost against it): {}",
-        verdict(sums[1] < sums[0] && head[0] > head[2])
+        "  the adoption rule (fewer ticks in sum than the robust machine, more seeds won than lost against it): {}; the candidate becomes MachineChaser::new: {}",
+        verdict(sums[1] < sums[0] && head[0] > head[2]),
+        if sums[1] < sums[0] && head[0] > head[2] {
+            "yes"
+        } else {
+            "no"
+        }
     );
     println!(
         "  conditional reading (not the acceptance): {admitting} seeds admit a win beyond both controls; on them win/tie/loss against both at once {} {}, {} {}; regret sums {} / {}",
@@ -965,13 +993,13 @@ const MOVE_SETS: [MoveSet; 4] = [
 
 /// [definition; agent-inferred] **The truth-only least capture as a function of the move set**
 /// (U4's next loop, a reading, not a change of law): on each seed (the acceptance seeds by default,
-/// or `fresh` for the fresh population), the truth-only least capture from the opening under each
+/// or `fresh` for the spent first fresh population), the truth-only least capture from the opening under each
 /// declared move set (`pursuit::least_capture`), each finer set read to the lattice's least (a finer
 /// grain's least is at most it); the lattice's reading is checked equal to the capture basin's on the
 /// truth alone.
 fn move_sets(args: &[String]) {
     let (first, count) = match args.first().map(String::as_str) {
-        Some("fresh") => (FRESH_SEED, FRESH_SEEDS),
+        Some("fresh") => (FIRST_FRESH_SEED, FRESH_SEEDS),
         _ => (SEED, SEEDS),
     };
     let declaration = declaration();
@@ -1219,7 +1247,8 @@ fn capture_line(passage: &ActionPassage) -> String {
     }
 }
 
-/// **The action phase's acceptance** (module header) on the acceptance seeds.
+/// **The action phase's acceptance** (module header) on the acceptance seeds, the machine under
+/// `MachineChaser::new`'s plan ([`Plan::default`]).
 fn action(trace: bool) {
     let declaration = declaration();
     let pursuer = pursuer();
@@ -1247,7 +1276,7 @@ fn action(trace: bool) {
     for s in 0..SEEDS {
         let seed = SEED + s;
         let (runs, receipt, fibre, ms) =
-            passages(seed, TUBE_HORIZON, BASIN_HORIZON, PRICE, Plan::Robust);
+            passages(seed, TUBE_HORIZON, BASIN_HORIZON, PRICE, Plan::default());
         let [m, p, b] = &runs;
         println!();
         println!("seed {seed}: the truth [{}] {}", m.index, m.runner.label());
