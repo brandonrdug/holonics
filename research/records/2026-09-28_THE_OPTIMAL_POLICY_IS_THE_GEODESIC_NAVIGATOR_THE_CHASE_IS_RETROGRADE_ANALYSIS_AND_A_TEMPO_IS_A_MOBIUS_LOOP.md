@@ -1,35 +1,39 @@
-# God's algorithm is the geodesic navigator; the chase is retrograde analysis; a tempo is a Möbius loop
+# The optimal policy is the geodesic navigator; the chase is retrograde analysis; a tempo is a Möbius loop
 
 **September 28, 2026.** Brandon, on the chase, cornering and moves: compare the intelligence to chess
-and to "God's Algorithm" for Rubik's cubes (Cayley graphs), in line with Möbius strips and trefoil
+and to "God's Algorithm" for Rubik's cubes (Cayley graphs). Brandon, later that day: the label is
+quoted on purpose, a reference and not a claim that anything is privileged; this record uses the
+puzzle literature's labels "God's algorithm" and "God's number" only in quotes, and otherwise says
+the optimal policy and the diameter, in line with Möbius strips and trefoil
 knots as intersecting strings; "God's Algorithm is equivalent to our navigator I think, the aeons and
 lengths are related to what would traditionally be the diameter; we respect General Relativity,
 spatial and temporal and higher dimensions and derivatives." This record states what is exact, what
 is an image, and what it adds to the [unified plan](../../docs/plans/THE_REBUILD.md#the-unified-plan-september-28).
 Checked items were verified exactly before writing; the rest are cited.
 
-## 1. God's algorithm and the diameter
+## 1. The optimal policy and the diameter
 
-- [proved-standard] **God's algorithm** is the optimal policy on a puzzle's move graph: from every
-  state, a shortest word of moves to the goal. Its value is the word metric's distance, and **God's
-  number** is the move graph's diameter. For Rubik's cube it is 20 when a half-turn of a face counts as
+- [proved-standard] **The optimal policy** (the puzzle literature's "God's algorithm") gives, from
+  every state of a puzzle's move graph, a shortest word of moves to the goal. Its value is the word
+  metric's distance, and the move graph's **diameter** is the literature's "God's number". For Rubik's cube the diameter
+  is 20 when a half-turn of a face counts as
   one move and 26 when only quarter-turns do (Rokicki, Kociemba, Davidson and Dethridge, 2010;
   Rokicki and Davidson, 2014); for the two-by-two cube, 11 and 14.
 - [interpretation, on the exact statement] **The diameter depends on which moves are elementary.**
   Counting the half-turn as one move shortens every long word. This is the motion record's point in
   a finite group: what counts as one move is the metric
   ([motion record §3](2026-09-28_THE_SWING_IS_A_MOVE_ABOUT_A_GRIP_A_GRIP_TURNS_A_PUSH_BOOSTS_AND_A_FREE_BODY_FALLS.md#3-the-derivation)).
-- **The navigator reading** [definition; agent-inferred]. God's algorithm is the geodesic navigator: a
+- **The navigator reading** [definition; agent-inferred]. The optimal policy is the geodesic navigator: a
   navigator whose word from every state is a geodesic of the move metric. The diameter is the longest
   aeon such a navigator needs, counted in its own ticks. A navigator in the objects' sense carries a
-  key and a clock; God's algorithm is the special navigator that already knows the whole graph.
-- **Intelligence is not the table** [interpretation]. God's algorithm stored as a table is an index:
+  key and a clock; the optimal policy is the navigator that already knows the whole graph.
+- **Intelligence is not the table** [interpretation]. The optimal policy stored as a table is an index:
   a chess endgame tablebase keeps a value for every position (the seven-piece tables run to many
   terabytes). A player compresses it into a few navigators (the box that drives a lone king to the
   edge, the opposition, triangulation) that play near the table's optimum. That is the same
   distinction as F0's standing: a context model is an index, and the machine's task is to find the short
   navigators. The measurable question on a solved game is a navigator's description length against
-  its regret to God's algorithm.
+  its regret to the optimal policy.
 
 ## 2. The chase already computes it
 
@@ -81,7 +85,7 @@ Checked items were verified exactly before writing; the rest are cited.
   2) and its second the corners' twists (the third-turn class, of order 3): the half-turn and the
   third-turn that generate the modular group, the trefoil's quotient
   ([egg packing](2026-09-27_EGG_PACKING_THE_MOIRE_OF_TWO_HELICES_IS_A_TORUS_KNOT_AND_THE_TREFOIL_IS_THE_HALF_TURN_WITH_THE_THIRD_TURN.md)).
-- [proved-standard] **Where greedy descent is God's algorithm.** The modular group is the free product
+- [proved-standard] **Where greedy descent is the optimal policy.** The modular group is the free product
   of the half-turn and the third-turn, so every element has one reduced word, and reducing a matrix to
   it is Euclid's algorithm on its entries (the Stern–Brocot descent the ratio object already owns). In a
   group whose Cayley graph is tree-like or hyperbolic, local shortening finds near-geodesics (Dehn's
@@ -94,14 +98,14 @@ Checked items were verified exactly before writing; the rest are cited.
   constant speed with a least turning radius (the runner's `v²/(μg)`) travels shortest along at most
   three pieces: a maximal turn, a straight free fall, a maximal turn (Dubins, 1957). A body with bounded
   acceleration reaches rest at a point fastest by a full boost then a full brake, switching on the
-  parabola `x = −½ v|v|` of free-fall arcs. God's algorithm for such a body is words in turn, boost and
-  free fall.
+  parabola `x = −½ v|v|` of free-fall arcs. The optimal policy for such a body is words in turn, boost
+  and free fall.
 - [proved-standard] **In spacetime the extremum reverses.** Between two events, free fall maximizes
   proper time (the reverse triangle inequality, which follows from the reverse Cauchy–Schwarz
   inequality that `Coupling/LorentzianPerp` owns);
   every turn or boost shortens it, which is the twin paradox (`Physics/Spacetime/Boost.time_dilation`).
   The Lorentzian diameter of a causal diamond is its free fall's proper time. So "the longest aeon
-  between two occurrences" is the geodesic's, where a spatial God's algorithm seeks the shortest word.
+  between two occurrences" is the geodesic's, where a spatial optimal policy seeks the shortest word.
 
 ## 7. What it adds to the plan
 
@@ -113,7 +117,7 @@ Checked items were verified exactly before writing; the rest are cited.
   - king and queen, and king and rook, against king, by retrograde analysis (the chase's capture
     basin, already built), with the box as the navigator to price.
 
-  Each measures a navigator's description length against its regret to God's algorithm, charged, with
+  Each measures a navigator's description length against its regret to the optimal policy, charged, with
   the table itself as the index control.
 - **The chase's metric.** The chase's next loop records its capture distances as a function of the
   admitted move set (the chaser's missing boost), beside its measured failure.
