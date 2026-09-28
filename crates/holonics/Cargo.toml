@@ -43,3 +43,11 @@ path = "../../research/notebook/hnn_design/hnn_population.rs"
 [[example]]
 name = "hnn_chase"
 path = "../../research/notebook/hnn_design/hnn_chase.rs"
+
+# The notebook's ring-search experiment (THE_REBUILD §4, wave C; `hnn::ring::PumpedRing` over
+# `holarchy::terrain`'s moiré and rotor crib, against enumeration, menu propagation and the nonlocking
+# control; research/notebook/hnn_design/README.md): a measurement pinned before it runs, run once in
+# release, never a test.
+[[example]]
+name = "hnn_ring_search"
+path = "../../research/notebook/hnn_design/hnn_ring_search.rs"

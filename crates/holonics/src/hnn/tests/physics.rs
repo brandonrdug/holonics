@@ -21,8 +21,8 @@ use crate::hnn::propagation::{
 };
 use crate::hnn::receiving::ReceivingPhases;
 use crate::hnn::ring::{
-    PumpDeclaration, PumpStep, ResonatorMaterial, ResonatorOperands, ResonatorRemainders,
-    RingClock, port_scattering, sheets,
+    PumpDeclaration, PumpStage, PumpStep, PumpedRing, ResonatorMaterial, ResonatorOperands,
+    ResonatorRemainders, RingClock, port_scattering, sheets,
 };
 use crate::hnn::word::{PowerForm, Word, WordBalance};
 use crate::holarchy::GluingDefect;
@@ -402,6 +402,109 @@ fn the_pump_is_blind_to_the_sheets_and_the_locked_sheet_is_an_ising_face() {
         };
         assert!(energy(chosen) <= energy(!chosen));
     }
+}
+
+/// A one-node resonator (width 2) with storage `1`, stiffness `k` on both coordinates, no
+/// dissipation, and its pump on the real axis standing at `strength`.
+fn node(stiffness: Rat, strength: Rat) -> ResonatorMaterial {
+    let pump = PumpDeclaration::new(strength, Carrier::sheet(false), PumpStep::Stand).unwrap();
+    ResonatorMaterial::new(
+        ExactRatMatrix::identity(2).unwrap(),
+        ExactRatMatrix::identity(2).unwrap().scaled(&stiffness),
+        ExactRatMatrix::zero(2, 2).unwrap(),
+        Some(pump),
+    )
+    .unwrap()
+}
+
+/// **A pumped passage closes, and past the bifurcation its sheet locks** (`hnn::ring::PumpedRing`,
+/// Lean `HNN/Ring.{ring_tick_executed_energy_balance, pump_blind_to_sheets}`): through a schedule
+/// that moves only the pump's strength, every tick's executed balance closes and the storage
+/// telescopes with the pump's work at the switch, `½⟨u, (K_new − K_old)u⟩`, exactly and on the word's
+/// lattices. Past the bifurcation (`k − 2σ < 0` on the axis) the in-phase coordinate grows on its
+/// initial side, so the sheet read at every tick is the initial one: a lock. The same ring unpumped
+/// turns (`k > 0`): its sheet does not hold, the nonlocking control. The declared work is the ticks'
+/// and the reads' by their formulas.
+#[test]
+fn a_pumped_passage_closes_and_its_sheet_locks() {
+    let (one, h) = (integer(1), integer(1));
+    let lattice = chain().word_lattice().copied().unwrap();
+    for word_lattice in [None, Some(&lattice)] {
+        let on_lattice = word_lattice.is_some();
+        // A switch: unpumped for 3 ticks, then pumped past the bifurcation for 9.
+        let schedule = [
+            PumpStage {
+                material: node(one.clone(), Rat::zero()),
+                ticks: 3,
+            },
+            PumpStage {
+                material: node(one.clone(), integer(1)),
+                ticks: 9,
+            },
+        ];
+        let ring = PumpedRing::new(0, &integer(64), &h, word_lattice, &schedule).unwrap();
+        let initial = [vec![rat(-1, 2), rat(1, 4)], vec![Rat::zero(), rat(1, 8)]];
+        let mut draw = Draw::new(43);
+        let passage = ring.pass(initial, 0, |_| draw.dyadic_vector(2)).unwrap();
+        assert_eq!((passage.ticks, passage.switch_work.len()), (12, 1));
+        assert!(passage.closes(), "{passage:?}");
+        assert_eq!(
+            passage.work.dynamics,
+            12 * crate::hnn::ring::tick_work(2, on_lattice)
+        );
+        assert_eq!(passage.work.reads, 12 * crate::hnn::ring::read_work(2));
+        // The lock and its control, undriven from the same initial side.
+        let initial = || [vec![rat(-1, 2), rat(1, 4)], vec![Rat::zero(), Rat::zero()]];
+        let quiet = |_| vec![Rat::zero(); 2];
+        let pumped = PumpedRing::new(
+            0,
+            &integer(64),
+            &h,
+            word_lattice,
+            &[PumpStage {
+                material: node(one.clone(), integer(1)),
+                ticks: 16,
+            }],
+        )
+        .unwrap()
+        .pass(initial(), 0, quiet)
+        .unwrap();
+        assert!(pumped.closes());
+        assert!(pumped.sheets.iter().all(|read| read == &vec![true]));
+        let turning = PumpedRing::new(
+            0,
+            &integer(64),
+            &h,
+            word_lattice,
+            &[PumpStage {
+                material: node(one.clone(), Rat::zero()),
+                ticks: 16,
+            }],
+        )
+        .unwrap()
+        .pass(initial(), 0, quiet)
+        .unwrap();
+        assert!(turning.closes());
+        assert!(turning.sheets.iter().any(|read| read == &vec![false]));
+    }
+    // Stages that differ in more than the pump's strength are refused.
+    let refused = PumpedRing::new(
+        0,
+        &integer(64),
+        &h,
+        None,
+        &[
+            PumpStage {
+                material: node(one.clone(), Rat::zero()),
+                ticks: 1,
+            },
+            PumpStage {
+                material: node(integer(2), Rat::zero()),
+                ticks: 1,
+            },
+        ],
+    );
+    assert!(matches!(refused, Err(HnnError::Resonator { .. })));
 }
 
 /// Lean `HNN/Ring.ring_crossings_are_epoch_ticks`: over a passage of cells every ring's arrivals on
