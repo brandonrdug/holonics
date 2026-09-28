@@ -115,6 +115,26 @@
 //! [proved-derived; measured] **The parity class locates one word, not one rate** ([`families`]
 //! module header): its survivors are one species wider than a gauge orbit.
 //!
+//! [proved-derived; formal-checked] **Eggs compose at ports** ([`composition`]; Lean
+//! `Compression/Landmark/Context/Composition`). A keystone ([`Keystone`]) exposes its state at a
+//! port, and a family built on the port path through one of its keys reads it; the composed family
+//! ([`Composed`]) is the mixture over the keystone's keys, `P_(A⊳B)(x | past) = Σ_a P_A(a | past)
+//! P_B(x | past, a)`, its face a face wherever the constituents' are, its product the keystone's
+//! prior mixture of the conditioned likelihoods, and under the uniform prior its code the chain
+//! rule along the surviving keys, `code(A⊳B) = (log₂ |K_A| − log₂ #S_A) + code(B | A)`. A
+//! deterministic keystone is survivor filtered by the family that reads it. A keystone's value is
+//! the joint code without it against with it; without it a stateless reader meets its unheld port
+//! ([`Unheld`]). The arithmetic eggs ([`arithmetic`]: the record clock, the carry egg, the counter,
+//! the sieve) are the first composition.
+//!
+//! [definition; agent-inferred] **A partition's reading** ([`Population::receive_partitioned`],
+//! [`PartReading`]). A receipt is a field of readings over a partition: the passage's cells declared
+//! into parts (a product record's operand, mark, trailing, middle and leading cells), and on each
+//! part the population's code (`Σ_(t ∈ part) −log₂ q_t(x_t)`, read as the population's code after
+//! each cell less its code before) and each family's code (`−log₂` of its faces' product over the
+//! part). The population keeps only each part's sums while reading, never the cells: a receipt, not
+//! a record.
+//!
 //! [definition] The computational object is the helical pair interaction, read here as a
 //! receiver's population of candidate eggs through aeons. Of the winding guide's six general objects
 //! this owner touches four: the **helix** (a grating's key is its ring's rate and phase, a clock with
@@ -136,13 +156,23 @@
 //! | `Compression/Landmark/Context/Dormancy.{forward_dominance_nonneg, dormant_survivor_code, layer_survivors, productKernel_stochastic, productKernel_path}` | [`Dormancy`], [`DormantFamily`] |
 //! | `Compression/Landmark/Context/Dormancy.{share_path_code, stay_code_le, share_path_code_le}` | the declared rate `α = 2^(−j)` of [`Dormancy::new`] |
 //! | owed (#62): the abstaining newborn's telescope | [`Population::found`], [`Population::refound`] |
+//! | `Compression/Landmark/Context/Composition.{composedFace_received, composedFace_nonneg, composedFace_sum_one, composedFace_pos, composed_telescope}` | [`Composed`] (its face and its likelihood) |
+//! | `Compression/Landmark/Context/Composition.{chain_rule, chain_rule_of_species}` | [`Composed`]'s code over a keystone's keys; [`PortedEmitters`] under `KeyFamily` (a deterministic reader: `log₂ \|K_A\| − log₂ #S`) |
 
+pub mod arithmetic;
+pub mod composition;
 pub mod dormancy;
 pub mod families;
 
 #[cfg(test)]
+mod composition_tests;
+#[cfg(test)]
 mod tests;
 
+pub use arithmetic::{CarryEgg, Counter, RecordClock, Sieve, SieveFace};
+pub use composition::{
+    Composed, Conditioned, Keystone, Port, PortPath, PortReader, PortedEmitters, Unheld,
+};
 pub use dormancy::{Dormancy, DormantFamily, Layered, Weight};
 pub use families::{GratingParity, GratingSheet, RotorKeys, TreeFamily};
 
@@ -949,6 +979,17 @@ impl Reception {
     }
 }
 
+/// [definition; agent-inferred] **One part's reading** (module header, "A partition's reading"):
+/// the part's cells, the population's code on them (the sum of `−log₂ q_t(x_t)` over the part,
+/// each the population's code after the cell less its code before, enclosed), and each family's
+/// code on them (`−log₂` of its faces' product over the part, enclosed; none once the family died).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PartReading {
+    pub cells: usize,
+    pub population: ExactInterval,
+    pub families: Vec<Option<ExactInterval>>,
+}
+
 /// [definition] **The population's receipt**: the cells received, the declared total mass `M` and
 /// the founded mass `M_n` (`M` plus every newborn's), the population's code `−log₂ W` (exact
 /// enclosure), each family's receipt, and the family the population selects: the one whose
@@ -1210,6 +1251,15 @@ impl Population {
     /// One admitted cell: the families read it together on the host's cores, each writing only its
     /// own state (the hardware law), then the deaths are exchanged and the founding read.
     fn receive_admitted(&mut self, cell: usize) -> Result<Reception, PopulationError> {
+        Ok(self.receive_faces(cell)?.0)
+    }
+
+    /// One admitted cell ([`Population::receive_admitted`]), returning beside the reception each
+    /// member's face of the cell (none for a member already dead).
+    fn receive_faces(
+        &mut self,
+        cell: usize,
+    ) -> Result<(Reception, Vec<Option<Rat>>), PopulationError> {
         let position = self.cells;
         let read: Vec<Option<(Likelihood, Rat)>> = self
             .members
@@ -1237,6 +1287,10 @@ impl Population {
         if read.iter().flatten().all(|(_, face)| face.is_zero()) {
             return Err(PopulationError::Extinct { cell: position });
         }
+        let faces = read
+            .iter()
+            .map(|entry| entry.as_ref().map(|(_, face)| face.clone()))
+            .collect();
         let mut reception = Reception::default();
         if !dying.is_empty() {
             reception.deaths = self.exchange(position, cell, &read, &dying)?;
@@ -1252,7 +1306,7 @@ impl Population {
         if let Some(birth) = self.found_at_section()? {
             reception.births.push(birth);
         }
-        Ok(reception)
+        Ok((reception, faces))
     }
 
     /// **Death is an exchange** (module header): each dying family's mass `w_f` before the cell and
@@ -1374,6 +1428,73 @@ impl Population {
             reception.extend(self.receive_admitted(cell)?);
         }
         Ok(reception)
+    }
+
+    /// **Receive a passage read over a declared partition of its cells** (module header, "A
+    /// partition's reading"): cell `t` belongs to part `parts[t] < count`. Admitted whole before any
+    /// cell moves, then received cell by cell exactly as [`Population::receive_passage`] receives
+    /// it; returns the reception and each part's reading.
+    pub fn receive_partitioned(
+        &mut self,
+        cells: &[usize],
+        parts: &[usize],
+        count: usize,
+    ) -> Result<(Reception, Vec<PartReading>), PopulationError> {
+        if parts.len() != cells.len() || parts.iter().any(|&part| part >= count) {
+            return Err(refuse(
+                "a partition of a passage",
+                "it names one declared part for every cell",
+            ));
+        }
+        self.admit(cells)?;
+        let mut codes = vec![vec![PassageCode::new(); self.members.len()]; count];
+        let mut population = vec![ExactInterval::point(Rat::zero()); count];
+        let mut sizes = vec![0usize; count];
+        let mut reception = Reception::default();
+        let mut before = self.code()?;
+        for (&cell, &part) in cells.iter().zip(parts) {
+            if self.members.iter().any(|member| member.born > 0) {
+                self.admit(&[cell])?;
+            }
+            let (received, faces) = self.receive_faces(cell)?;
+            reception.extend(received);
+            for row in &mut codes {
+                row.resize(self.members.len(), PassageCode::new());
+            }
+            for (family, face) in faces.iter().enumerate() {
+                if let Some(face) = face
+                    && face.is_positive()
+                {
+                    codes[part][family].face(face)?;
+                }
+            }
+            let after = self.code()?;
+            population[part] =
+                interval_sum(&population[part], &interval_difference(&after, &before)?)?;
+            before = after;
+            sizes[part] += 1;
+        }
+        let readings = codes
+            .into_iter()
+            .zip(population)
+            .zip(sizes)
+            .map(|((row, population), cells)| {
+                let families = row
+                    .iter()
+                    .zip(&self.members)
+                    .map(|(code, member)| match member.died {
+                        Some(_) => Ok(None),
+                        None => Ok(Some(code.bits()?)),
+                    })
+                    .collect::<Result<Vec<_>, PopulationError>>()?;
+                Ok(PartReading {
+                    cells,
+                    population,
+                    families,
+                })
+            })
+            .collect::<Result<Vec<_>, PopulationError>>()?;
+        Ok((reception, readings))
     }
 
     /// **Found a family from the reserved mass** (module header, "Birth from reserved mass"): its

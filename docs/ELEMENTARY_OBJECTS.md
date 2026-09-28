@@ -782,9 +782,14 @@ family that reads its faces, read together as one generator of faces.
   nothing in a configuration is unrelated to the rest). [agent-inferred] Eggs compose at ports, a
   Holarchy of eggs. A **keystone** is a constituent whose presence conditions the others' faces. The
   name is borrowed from the keystone species of an ecosystem and from the stone that holds an arch.
+  - Composition is the population's own operation (`receiver::population::Composed`, Lean
+    `Context/Composition`): `P_(A⊳B)(x | past) = Σ_a P_A(a | past) P_B(x | past, a)`, a face
+    wherever the constituents' are, whose code is the chain rule along the keystone's surviving
+    keys, `code(A⊳B) = (log₂ |K_A| − log₂ #S_A) + code(B | A)` (`chain_rule`).
   - A keystone's value is read as the joint code with it against without it, not as its own bits.
     An example is the record clock of the arithmetic terrain, which makes a product's determined
-    digits cheap for the carry egg.
+    digits cheap for the carry egg: on `2^12` base-10 records the clock's value is
+    `164662 + 4/16 + ε` bits against its own `log₂ 19` (notebook README, "Eggs composed at ports").
   - A dense basin is a landmark with heavy traffic: a region where many families' paths converge,
     found where it is causally attributable.
   - Holding a dormant key is free only when its ring is lossless. A mode held against dissipation

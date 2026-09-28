@@ -893,3 +893,92 @@ What it located:
 
 The typed reader stays. Campaign 5 needs a joint address across ports (the shared landmarks) and a
 cheaper boundary: the part's end predicted by more than its bytes.
+
+## Eggs composed at ports: the arithmetic eggs (rebuild step 4 item 6, September 27)
+
+`hnn_population.rs`'s `composition` mode (`hnn_population_composition.rs`, its header states the
+declarations) runs the composed eggs of `holonics::receiver::population::{composition,
+arithmetic}` (Lean `Compression/Landmark/Context/Composition`) on the terrain notebook's arithmetic
+terrains, drawn by the same seed. These are **development receipts, not milestones**. The mode
+reads each terrain once, partitioned by cell class (`Population::receive_partitioned`), in about
+57 seconds in all (products 7, 7 and 6 seconds; primes 15 and 22, the sieve at the counter's
+unheld port counting every start a cell on the host's cores), its peak resident set under
+`58400` kB.
+
+```sh
+cargo run --release -p holonics --example hnn_population -- composition [products | primes]
+```
+
+The population on each terrain: the receiving tree at the depth the terrain notebook's sweep chose
+on the same cells (products `13`, `5`, `4`; primes `4`, `6`), and the composed egg, each named by
+one bit (`M = 1`). Every class code of the tree inside the population reproduces the arithmetic
+terrain's recorded class codes exactly (the table above), a cross-check of the partition's reading.
+
+**Products** (`record clock ⊳ carry egg`: the clock of period 19 keyed by its offset, the carry egg
+uniform on the operand phases, deterministic on the marks and, by the terrain's convolution and
+carry, on the product's phases). In every base the clock locates its offset `0` (posterior `1`) in
+the first record, and the composed egg codes **exactly** the truth: the operands' entropy plus the
+clock's key, `2^12 · 8 log₂ b + log₂ 19`, its difference from the truth enclosed in
+`[−1/2^95, 1/2^96]` bits. The population codes the truth plus one bit (its naming; the difference in
+`[1 − 1/2^96, 1 + 1/2^96]`). Per class (each `+ ε`; the operands' truth `32768`, `108852 + 15/16`,
+`131072`; every other class's truth zero):
+
+| base | class | tree | composed egg | population | the clock's value here |
+|---|---|---|---|---|---|
+| 2 | operands | `33179 + 11/16` | `32769 + 7/16` | `32770 + 5/16` | `409 + 5/16` |
+| 2 | marks | `1524 + 0/16` | `2 + 12/16` | `2 + 14/16` | `1521 + 2/16` |
+| 2 | trailing, middle, leading | `1422 + 4/16`, `3966 + 1/16`, `1465 + 6/16` | `0 + 0/16` each | `0 + 0/16` each | the tree's |
+| 10 | operands | `114394 + 15/16` | `108854 + 6/16` | `108855 + 3/16` | `5539 + 11/16` |
+| 10 | marks | `41600 + 2/16` | `2 + 12/16` | `2 + 15/16` | `41597 + 2/16` |
+| 10 | trailing, middle, leading | `26466 + 6/16`, `60508 + 10/16`, `30550 + 4/16` | `0 + 0/16` each | `0 + 0/16` each | the tree's |
+| 16 | operands | `137510 + 1/16` | `131073 + 7/16` | `131073 + 11/16` | `6436 + 5/16` |
+| 16 | marks | `41831 + 7/16` | `2 + 12/16` | `3 + 8/16` | `41827 + 15/16` |
+| 16 | trailing, middle, leading | `32396 + 10/16`, `72206 + 12/16`, `36363 + 10/16` | `0 + 0/16` each | `0 + 0/16` each | the tree's |
+
+The composed egg's location of the clock is paid in the first record, `1 + 7/16` on its operand
+cells and `2 + 12/16` on its marks (together `log₂ 19 = 4 + 3/16 + ε`); after it every determined
+cell's face is exactly one. The determined cells together (`45056 = 2^12·11`) cost the composed egg
+`2 + 12/16 + ε` against the tree's `8377 + 13/16`, `159125 + 8/16` and `182798 + 9/16` (a cell
+`0 + 2/16`, `3 + 8/16`, `4 + 0/16`). In all the tree reads `41557 + 8/16`, `273520 + 7/16` and
+`320308 + 10/16`, the population `32773 + 3/16`, `108858 + 3/16` and `131077 + 3/16`. **The record
+clock's value**, the joint code without it against with it (without the clock neither the carry
+egg nor anything else here has a port, so the population without it is the tree alone), is
+`8784 + 4/16`, `164662 + 4/16` and `189231 + 6/16` bits, beside its own description of
+`log₂ 19 = 4 + 3/16 + ε` bits and one naming bit.
+
+**Prime streams** over `[0, 10^4)` (`record clock ⊳ (counter ⊳ sieve)`: the clock of period
+`L + 1`, the counter's start survivor filtered under each clock key, the sieve reading the
+counter's port). The truth of every cell is zero and the keys' description is
+`log₂ (L + 1) + L log₂ b`: `log₂ 5 + 4 log₂ 10 = 15 + 9/16 + ε` in base 10,
+`log₂ 7 + 6 log₂ 6 = 18 + 5/16 + ε` in base 6. The composed egg locates the clock's offset `0` and
+the counter's start `0` among `10^4 = 2^4·5^4` and `46656 = 2^6·3^6` starts, and codes **exactly**
+the keys' description (the difference in `[−1/2^95, 1/2^96]`): `15 + 9/16 + ε` on the digit cells
+and `0 + 0/16 + ε` on the primality cells in base 10 (`18 + 5/16` and `0 + 0/16` in base 6),
+against the tree's `146345 + 2/16` and `15435 + 1/16` (`145167 + 12/16` and `19550 + 13/16`). The
+population codes `16 + 9/16 + ε` and `19 + 5/16 + ε` (its one naming bit above); the clock's value
+reads `161763 + 10/16` and `164699 + 5/16`.
+
+**The counter's value** (the sieve's keystone), against the sieve at the counter's unheld port
+under the located clock (`Composed::primes_unheld_counter`: each tick the sieve meets the counter's
+uniform prior pushed through the port, never filtered): the unheld reading codes the digit cells
+at `132879 + 7/16` (`log₂ 10` a digit, `3 + 5/16` a cell) and the primality cells at
+`5376 + 6/16`, the window's density code exactly (the counter's range is the window); in base 6,
+`155100 + 8/16` and `5404 + 11/16`, `28 + 4/16` above the window's density code because the
+counter's range `6^6` holds a sparser density than `[0, 10^4)`. The counter's value is
+`138240 + 3/16` and `160486 + 14/16` bits, beside its key's `log₂ 10^4` and `log₂ 6^6`.
+
+**The sieve's work** over the window, the face that decided each integer (the cheap faces first):
+in base 10 the last digit `5999` (2: `4999`, 5: `1000 = 2^3·5^3`), the digit sum (3) `1334`, the
+alternating sum (11) `242 = 2·11^2`, the 21 gratings `7..=97` `1219 = 23·53`, below two `2`, and
+the gaps of every grating `1204 = 2^2·7·43` (the primes past 97; the 25 primes up to 97 are decided
+by their own face); in base 6 the last digit `6666` (2: `4999`, 3: `1667`), the digit sum (5)
+`667 = 23·29`, the alternating sum (7) `381 = 3·127`, the 43 gratings `11..=211` `1102 = 2·19·29`,
+the gaps `1182 = 2·3·197`.
+
+**What the evolved prior and species collapse need from this owner.** The composed family's
+readout carries the keystone's surviving keys with their exact posteriors and, once one key
+survives, its conditioned family's located keys: a selection count over eggs can be read from the
+population's receipt at each aeon's end, and the keystone's value from the partition's reading. A
+composed egg built from a surviving seed has no reseed yet (its keystone's keys wind without the
+cells, so it can); a species of keystone keys (keys every admitted receiver reads alike) is carried
+as separate held keys with one posterior each, which is what species collapse would quotient.
