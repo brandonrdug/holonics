@@ -960,10 +960,13 @@ not:
   (`Population.executed_{face,mixture}_within_population`). Digit-local joins (`JoinTree`,
   `FaceJoins`) and whole-family Bayes are different admitted combinations of the same families: in
   general `∏_h Σ_f π_f L_(f,h) ≠ Σ_f π_f ∏_h L_(f,h)`.
-- **The field is a family at its own port, not yet in the text population.** Its combined face is
-  read per cell at the HNN's receiving port; `Reference::expose` still returns no per-cell face to a
-  `Population` outside the machine, so F2's field family is not built
-  ([F2 record](../research/records/2026-09-27_F2_FIELD_FAMILY_GATE.md)).
+- **The field is a family at its own port, dormant for text.** Its combined face is the receiver's
+  population's second family at the HNN's port (U1). F2's adoption gate
+  ([THE_REBUILD F2](plans/THE_REBUILD.md#f2-the-field-as-a-family-step-4-73), September 28) read
+  it on fresh validation families against the population over the tree alone. There it codes
+  strictly shorter, by `10` to `10 + 1/16` bits on 2,052 cells. Its work fails the budgets:
+  `107 rem 21` ms a window, where the tree's whole passage takes 432 ms. So it is not adopted for
+  text, and it is kept and not run there.
 - **The missing join, and its maps named** (U1; owed in #62). Neither the tree nor the population
   is yet a Holon joined at power ports. Their counts and posterior weights carry no declared
   flow/effort pair, storage or power balance, and the learned-energy balance

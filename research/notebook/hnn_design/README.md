@@ -39,7 +39,7 @@ docstring says otherwise.
 
 | Harness | What it measures | Command | Record |
 |---|---|---|---|
-| `hnn_exposure.rs` | Campaign 1's exposure on a cut: the model face (the receiver's population over the landmark tree and the combined face), the baselines, keys, aeons and the first law; on the host or the card (`realization card`); the loaded resonator (`resonator source`); F2's adoption gate (`gate f2`: the population with and without the field on the held-out cells, work, memory and budgets) | `cargo run --release -p holonics --example hnn_exposure -- cut-file .local/cuts/standing-real-cut-campaign-1.bin cells all` | [campaign 1 meets its criterion](../../records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md), [the resonator](../../records/2026-09-26_THE_RESONATOR_RETURNS_ITS_WAVE_AND_THE_COMPARISON_REACHES_ITS_MATERIAL.md), [campaign 2](../../records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md) |
+| `hnn_exposure.rs` | Campaign 1's exposure on a cut: the model face (the receiver's population over the landmark tree and the combined face), the baselines, keys, aeons and the first law; on the host or the card (`realization card`); the loaded resonator (`resonator source`); F2's adoption gate (`gate f2`: the population with and without the field on the held-out cells, work, memory and budgets) | `cargo run --release -p holonics --example hnn_exposure -- cut-file .local/cuts/standing-real-cut-campaign-1.bin cells all` | [campaign 1 meets its criterion](../../records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md), [the resonator](../../records/2026-09-26_THE_RESONATOR_RETURNS_ITS_WAVE_AND_THE_COMPARISON_REACHES_ITS_MATERIAL.md), [campaign 2](../../records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md), [F2's adoption gate](../../../docs/plans/THE_REBUILD.md#f2-the-field-as-a-family-step-4-73) |
 | `hnn_landmark.rs` | The landmark tree (count-only): the depth sweep and prequential passage; `letters`, `prior`, `wide`, `compact`, `capacity` | `cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin` | [below PPM-2](../../records/2026-09-26_THE_LANDMARK_TREE_COMPRESSES_THE_STANDING_CUT_BELOW_PPM_TWO.md), [at scale](../../records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md), [capacity](../../records/2026-09-27_A_LANDMARKS_STORAGE_HAS_A_CAPACITY_AT_ITS_CEILING_IT_CARRIES.md), [campaign 2](../../records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md) |
 | `hnn_population.rs` (with `hnn_population_{composition,evolution,curated,census,u2}.rs`) | The egg population: terrain (`tree`, `moire`, `crib`, `switching`, `standing`), `composition`, `evolution`, `species`, the curated source (`curated`, with `merges`), `f4`, F0's egg (`f0-egg`, `f0-census`), U2's acceptance run (`u2-acceptance`) | `cargo run --release -p holonics --example hnn_population -- <mode>` | [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md), [F4](../../records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md), [the forward plan](../../records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md), [U2's acceptance run](../../records/2026-09-28_U2_F0S_MEMORY_ACCEPTANCE_RUN_PINNED_BEFORE_ITS_SPLIT_IS_READ.md) |
 | `hnn_chase.rs` | F6's chase terrain: the reception phase, the action phase's choosing sweep (`choose`) and its acceptance (`action`, with U4's move reading and U3's release reading); U4's next loop: the failure's diagnosis (`diagnose`) and the fresh population (`fresh`) | `cargo run --release -p holonics --example hnn_chase` | [the learner must move](../../records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md) (no dedicated record; the receipts below) |
@@ -1397,6 +1397,27 @@ once in 363,330 ms on the host. `Reference::expose` provides aggregate code rath
 per-cell rational face required by a population family. The field cannot be inserted or
 validated by substituting its odometer covector for a probability. No F2 held-out
 **field-family** reading has run, and the evaluation partition remains closed.
+
+### F2 adoption gate on the receiving population (September 28)
+
+Record: [THE_REBUILD F2](../../../docs/plans/THE_REBUILD.md#f2-the-field-as-a-family-step-4-73)
+(the pins and the receipt).
+
+```sh
+cargo run --release -p holonics-cuda --example hnn_exposure -- cut-file .local/cuts/f2v2-gate-probe.bin cells all realization card gate f2
+```
+
+The run used a fresh split (`F2V2`, 18,068 choosing and 4,381 validation families) and the
+6,148-cell probe at `n*` (4,096 choosing and 2,052 validation byte cells). It ran once on the
+card, at the pins' commit `89bc9b8b`, and took 328,939 ms at a 502,538,240-byte peak.
+- **Code.** On the validation cells, the receiver's population with the field codes
+  `7450 + 1/16 + ε`. The population over the tree alone codes `7460 + 2/16 + ε`. The difference,
+  `−11 + 15/16 + ε`, is strictly below zero.
+- **Work.** The run takes `107 rem 21` ms a window; the tree alone takes 432 ms in all. The host's
+  deposit is `54 rem 712` ms of each window.
+- **Budgets.** The longest validation response projects to 1,009,824 ms, against a 60,000-ms
+  budget. The declared validation passage projects to 27,989,242 ms, against 600,000 ms.
+- **Verdict.** Not adopted. The field stays dormant for text.
 
 ### F5 development-only release and product protocol (September 27)
 

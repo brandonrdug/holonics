@@ -624,7 +624,10 @@ found that the proposed full passage exceeds the budget and the bounded probe is
 field's admitted `n*`. The resident exposure also lacks a per-cell rational field face for the
 population's `Family` contract. A corrected `n*`-sized host field exposure read one held-out
 development passage in 363,330 ms, but supplies no population field-family comparison or
-adoption. The field remains dormant for text until that consumer is built.
+adoption. The field remains dormant for text until that consumer is built. U1 built it (the
+receiver's population at the HNN's port), and the adoption gate of September 28 below read it on
+fresh families: the code is strictly shorter, the work fails the budgets, and the field stays
+dormant for text.
 
 - **Builds on.** `hnn::receiving`, `hnn::reference::expose`, `receiver::population` and its work
   receipts.
@@ -713,6 +716,75 @@ adoption. The field remains dormant for text until that consumer is built.
      - The harness's smoke is the public development control (`held-out 6132 windows 16 gate f2`,
        32 cells, the two readings of the tree agreeing). Nothing of the fresh split is read before
        the run.
+- **The adoption gate, September 28: the receipt. The field codes the validation cells strictly
+  shorter, but its work fails the response and passage budgets. Not adopted; the field stays
+  dormant for text, kept and not run** (the run at the pins' commit `89bc9b8b`; Refs #73 #63;
+  only counts, bits and hashes are reported, and the log stays owner-only).
+  - *The split* (`development_families.py F2V2`, `curated_source.py 524288 <role> F2V2`,
+    `f2_capacity_probe.py F2V2`). Source SHA-256 `e1001a7e…` as F4's. Of 22,449 development
+    families, 18,068 choose and 4,381 validate, none refused; the membership's SHA-256 is
+    `66687b12c3c1148b50cac14106c536c7687ae65c9bcd3482c8b4844cad3b087c`. The role streams hold
+    12,286,055 and 3,089,767 cells. The declared validation passage holds 523,995 cells
+    (`6ca679945a7e67189ece108a81f4ce2e8fd3c6e9f54b635626f1d8c1676e8a6c`), 523,130 of them byte
+    cells, with 820 agent responses. The probe's cut is
+    `0a111b33e743e462dcdbcd215f2ed72fd0c0cd5bb1e9c168f79258c619fd287e` (choosing tail `743b4e52…`,
+    validation tail `3b674bec…`).
+  - *The run.* It ran on the card, alone on the idle RTX 4080 SUPER under the GPU lock, complete:
+    3,074 windows, no budget stop, every tick balance and word balance closed. The two readings of
+    the tree intersect on both parts. Bits are read at `L_R = 16` as `n + k/16 + ε`; the exact
+    enclosures follow.
+
+    | The validation cells (2,052) | With the field | Without it |
+    |---|---|---|
+    | Charged code | `7450 + 1/16 + ε`, `[295128431019628188705712421452793/2^95, 590256862039256553129877989108675/2^96]` | `7460 + 2/16 + ε`, `[295526465875028402633931480694427/2^95, 295526465875028402633931480695453/2^95]` |
+    | Work | 328,939 ms for the run (setup and exposure), `107 rem 21` ms a window | 432 ms for the population over the tree alone |
+    | Memory | resident state 6,623,232 bits (the field's part 4,982,280, the tree's 1,640,101, the population's 851); peak resident set 502,538,240 bytes; at most 739 MiB on the card | 1,640,532 bits (the tree's 1,640,101 over 42,940 nodes, the population's 431) |
+
+  - *The code: strictly shorter.* With − without is `−11 + 15/16 + ε`,
+    `[−99508713850053482054764810665/2^93, −796069710800252137984972280179/2^96]`: the field's family
+    codes the validation cells between 10 and `10 + 1/16` bits shorter. Both read `3 + 10/16 + ε` a
+    cell. Beside it, deciding nothing:
+    - the field's own face `q_C` codes the validation cells at `7450 + 1/16 + ε`, with
+      `L_C − L_T = −11 + 15/16 + ε`;
+    - on the 4,096 choosing cells, with − without is `−15 + 3/16 + ε`, and `L_C − L_T` at the
+      join is `−16 + 3/16 + ε`, so the population enters the validation cells almost wholly on
+      `q_C`;
+    - over the whole passage, where the prior's one bit is paid explicitly, the telescopes read
+      `22988 + 11/16 + ε` with the field and `23013 + 8/16 + ε` without, a difference of
+      `−25 + 2/16 + ε`; the log-odds at the end are `−26 + 2/16 + ε`;
+    - PPM-2 codes the validation cells at `7858 + 0/16 + ε`; the population with the field less
+      PPM-2 reads `−408 + 0/16 + ε`;
+    - the field's declared description, the `Kt` term that the gate's prior does not charge, is
+      1,439 bits.
+  - *The work, by phase* (milliseconds over the run, per window as quotient and remainder over
+    3,074).
+    - The tree's own phases (its read, transfers and deposit updates) take 7,520 ms. The rest of
+      the phases' 286,948 ms is the field's, with both populations' scoring inside the compare.
+    - The card's word (the refine read) takes 6,858 ms, `2 rem 710` a window.
+    - The host's deposit of the successor constitution takes 166,708 ms, `54 rem 712` a window:
+      more than half of the run. The re-read takes 41,667 ms, the compare phase 33,896 ms and the
+      composition 15,851 ms.
+    - With the field, the run takes 328,939 ms against the tree alone's 432 ms: a ratio of 761,
+      remainder 187.
+  - *The budgets.*
+    - (a) The probe passage: within its budget. It took 328,939 ms, against 600,000 (margin
+      271,061). Its peak resident set was 502,538,240 bytes, against 20,000,000,000. The card's
+      total use, sampled every 250 ms, peaked at 2,060 MiB against 1,321 MiB before the run, so
+      the run held at most 739 MiB there.
+    - (b) The warm response: **past its budget.** The longest agent response has 18,873 cells:
+      9,437 windows, 1,009,824 ms at the run's mean, 949,824 ms past the minute. The minute admits
+      560 windows at that mean. 39 of the 820 responses are past it; the longest that fits has
+      1,113 cells.
+    - (c) The declared validation passage: **past its budget.** It has 523,130 byte cells: 261,565
+      windows, 27,989,242 ms at the run's mean. That is 46 times ten minutes and 389,242 ms more.
+      Ten minutes admit 5,607 windows at that mean.
+  - *Verdict.* **Not adopted.** The code is not the separating term: the field's family codes the
+    unseen validation families strictly shorter than the tree alone. The separating term is its
+    work: `107 rem 21` ms a window, against 432 ms for the tree's whole passage. More than half of
+    each window is the host's deposit of the successor constitution (`54 rem 712` ms), not the
+    card's word (`2 rem 710` ms). The declared validation passage needs 261,565 windows where ten
+    minutes admit 5,607 at this rate. The field stays dormant for text, kept and not run. The
+    receiver's population still weighs it at the HNN's own port.
 
 
 ### F3. The resident population (step 5; #76)
