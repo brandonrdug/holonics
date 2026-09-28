@@ -40,7 +40,9 @@ Its corrections are folded in.
   condition.
 - **Release** is one decision law whose arms are the certified draw, the threshold commit, the probe
   and the typed refusal. The HNN's commit and the population's draws return its arms through
-  `receiver::release` (U3's first loop); the chaser's rule is a separate arm until U3's next loop.
+  `receiver::release` (U3's first loop). So do the chaser's certified capture and its probe (U3's
+  second loop). Its cornering commit is a declared separate arm, whose separating term is the price
+  of a tick.
 - **Charts.** Text, arithmetic, motion and image are boundary charts of the one machine. Brandon,
   September 28: the physical computation is the ideal, and framing the machine as text prediction
   makes the problem harder. The construction proceeds from the motion. Text is one chart, and its
@@ -53,9 +55,9 @@ Its corrections are folded in.
 | Landmark tree | earns: standing cut `3 + 1/16 + ε` a cell held out; unseen agent text about `1 + 12/16` bits a byte |
 | Population | codes known-truth terrain at its truth among declared families; the egg alone is F0's byte predictor; no library owner calls it (the harnesses do) |
 | Field (rings, contacts, word, deposition, wave) | lawful on host and card; `5 − 13/16 − ε` held-out bits on the standing cut through `q_C`; campaign 2 and the loaded resonator added none; its wave and resonator states live inside one word |
-| Chase (F6) | reception at truth on 16 arenas; action captures in 164 ticks against 3,704 and 366; the at-once acceptance failed; its decision rule is a capture-basin planner, not the specified log-odds commit |
+| Chase (F6) | reception at truth on 16 arenas; action captures in 164 ticks against 3,704 and 366; the at-once acceptance failed; each tick is released through the one law (the certified capture, the probe) or the declared cornering arm, and F6's action law is amended to that rule (U3's second loop) |
 | Retention | one contract (objects §8): each collapse is the standing law through its own carrier, with its Lean standing and its recoverability (U2's first loop); the test-only linear chain is retired |
-| Release | one law, `receiver::release`: the HNN's threshold commit and the population's certified draws, stop law and refusals (U3's first loop); the chaser's capture-basin commit is a separate arm |
+| Release | one law, `receiver::release`: the HNN's threshold commit and the population's certified draws, stop law and refusals (U3's first loop); the chaser's certified capture and probe (U3's second loop), its cornering commit a declared separate arm priced by the tick |
 | Mixtures | five constructions, sharing the ideal telescope but differing in conditioning, transitions and carriers: digit-local joins (`JoinTree`, `FaceJoins`), the whole-cell `receiving::Mixture`, the population's telescope with death, dormancy's fixed share over switching paths, and the retired `LocalMixture` |
 | Motion primitives | proved in `Geometry/Motion`; no Rust consumer |
 
@@ -192,14 +194,29 @@ Owners: `receiver::release`, `population::{releasing, text_release, provenance}`
   `causal_chord` is not a release owner (a decision reads widths, never a transfer object); its one
   consumer is `hnn::modes`'s check of `hnn.mode-quotient-chord-survives`, which has no Lean
   counterpart, so its disposition joins `hnn::modes`'s at U2.
-- **Next loop: the chaser's arm** (after U4's motion rebase). Map `MachineChaser`'s releases onto the
-  law and reproduce `MachineReceipt` on the 16 arenas exactly: `Certified` is `Released` at
-  tolerance zero on the capture-within-`m` reading over the selected fibre; `Probe` is `Ask`, whose
-  probe gains the partition it is chosen by (its class sizes and the exact `∏_c |c|^|c|`
-  comparison), since its criterion is information, not residual width; `Commit` (cornering when the
-  probe's concession exceeds `d·|Θ|`) is a cost comparison, the Bellman stop law of the F6 review,
-  and stays a declared separate arm with the price as its separating term. The specified sequential
-  test on accumulated log-odds is then built as its own arm or the F6 law is amended, by that parity.
+- **Second loop: the chaser's arm at exact parity** (September 28, done).
+  - *The arms.* `MachineChaser` decides each tick through `release`, with `DecisionRule(Release,
+    Ask)` at tolerance zero on the capture-within-`m` reading over the selected fibre. The basin's
+    certificate over every member is width zero, and the law returns `Released`, the certified
+    capture. Beyond it the law returns `Ask` with the offered probe, or `Hold` where none is offered.
+  - *The probe's partition.* The probe carries its `ProbePartition`: its class sizes against the
+    commit's, constructed only where it separates the fibre strictly more (`∏|c|^|c|` strictly
+    smaller; Lean `Population.partitionInformation_lt_iff`). Its criterion is information; the
+    retired residual-width fields of `ObservationProbe` went.
+  - *The cornering arm.* The cornering commit (`MachineRelease::Commit`) takes the law's `Hold`, or
+    an `Ask` whose concession exceeds `d·|Θ|`. It is the Bellman stop law's one-step comparison,
+    declared separate, and the price is its separating term.
+  - *Parity.* The harness, built before and after, agrees line for line with the wall times
+    masked: the reception's 414 lines, `action trace`'s 342, and `choose 2 12 0`'s 150 / 4,668 /
+    240. `action trace` adds 12 lines, one for each uncertified release. A scratch printer agreed
+    tick by tick on 64 machine passages (the acceptance seeds at `d = 0, 1, 256`, the choosing seeds
+    at `d = 0`). The pre-U3 selector agrees on 8,320 fixtures in `chaser_tests.rs`. Of the 164
+    acceptance releases, 152 are `Released` and 1 is `Ask`, on seed 20260942 (`2^64·3^18` against
+    the commit's `2^60·3^24`). Eleven are cornering commits: 10 beside `Hold`, and 1 priced out on
+    20260932 (a concession of 242 above the price 0). The receipt is in the notebook README.
+  - *F6's law is amended* to the built rule, by that parity (F6 below: the superseded text, the date
+    and the reason). The specified test's statistic is identically zero inside the fibre, and 143 of
+    the 152 certified releases came over a plural fibre, where the test would still be sampling.
 - **Then** F4's second stage, `Q_R` (its gate below).
 
 #### U1. One machine: the receiving composition at the field's port
@@ -307,7 +324,7 @@ equation extraction (#146).
 | Gain by precision, and the hazard ladder | U2 (deposition step by reading precision) and U1 (the switch rate), each with its acceptance before adoption |
 | Regeneration from the quotient | kept as the identity that regenerated passages add no evidence in expectation; no training on them |
 | The ring-search experiment (rings as the search for keys, not as predictors) | restored: after U1, on the moiré and rotor terrains, it measures search work against enumeration and menu propagation, and basin mass against a declared prior, with a nonlocking control ([learner record §2](../../research/records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md#2-the-rings-as-the-search)); residual-founded transport discovery first ([§14.1](../../research/records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md#141-birth)) |
-| The F6 law's threshold commit against the built planner | U3 |
+| The F6 law's threshold commit against the built planner | U3's second loop: F6's action law amended to the built rule, the sequential test's statistic being identically zero inside the fibre (F6) |
 
 ### 5. The waves
 
@@ -337,7 +354,8 @@ equation extraction (#146).
 ## The gates (inherited verbatim)
 
 [definition] The product and terrain gates of the forward plan of September 27, kept word for word:
-the U-items above consume them and change none. Owners their receipts name that U0 retired
+the U-items above consume them and change none, except F6's action law, which U3's second loop
+amended explicitly (F6 quotes the superseded text). Owners their receipts name that U0 retired
 (`LocalMixture`, `hnn_tokens`, F1's word family, `hnn::born`, `Mixture::switching`) are at commit
 `2d34b819`. Their receipts are in the records they cite and in
 the [construction record](../../research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md).
@@ -579,10 +597,30 @@ The machine has only read recordings; here it first moves, against another's con
 - **Law.**
   - Reception: the population reads the runner's passage and selects its constitution (speed bound,
     traction per friction class, slip law, policy family).
-  - Action: each chaser motion is released as a threshold commit, a sequential test on accumulated
-    log-odds whose threshold is priced by the declared cost of a tick. Each emission carries its
-    predicted consequence, and the directed covector (predicted against unfolding) is read at the
-    action.
+  - Action (amended by U3's second loop, September 28): each chaser motion is released through the
+    one release law (`receiver::release`) on the capture-within-`m` reading over the selected fibre.
+    A capture the basin certifies over every member is `Released` at tolerance zero. Beyond it the
+    law asks the offered probe (`Ask`): the motion of greatest `I(Θ; Y | h, do(a))`, offered where it
+    separates the fibre strictly more than the commit, compared exactly as `∏|c|^|c|`. Where no
+    probe is offered the law holds. The probe is emitted only within the declared price of a tick,
+    `K(u_p) − K(u*) ≤ d·|Θ|` (the Bellman stop law of §14.3, read one step deep). Otherwise the
+    machine commits to the cornering move, the declared separate arm whose separating term is the
+    price. Each emission carries its predicted consequence, and the directed covector (predicted
+    against unfolding) is read at the action.
+  - [historical] Superseded September 28 by U3's second loop: "Action: each chaser motion is released
+    as a threshold commit, a sequential test on accumulated log-odds whose threshold is priced by the
+    declared cost of a tick." Why, from the mathematics:
+    - Under the declared deterministic candidate laws with their escape, every member of the
+      selected fibre has the likelihood `(1 − η)^n` (Lean `Population.survivors_share_one_likelihood`).
+      So the log-odds between members are identically zero, and a threshold of at most one
+      contradiction's `log₂((1 − η)(A − 1)/η)` bits is crossed exactly when the fibre is one member.
+    - The test reads the family's identity, which is finer than the action's consequence. The capture
+      reading certifies the consequence over a plural fibre (143 of the 152 certified releases on the
+      acceptance seeds, 138 of 144 on the choosing seeds), where the test would still be sampling.
+      Every single-member tick was already certified.
+    - Wald and Wolfowitz's optimality holds only for two hypotheses under stationary, independent,
+      passively sampled observations (§14.3). Here the chaser's move selects the observation. The
+      general law is the Bellman comparison, which the built rule reads one step deep.
   - Deposition only at the locus a covector reached: a loop-closure reading across the three
     observation channels attributes each error to the mover or to a channel. The channel menu meets
     the separation condition: a defect on at most `k` edges is located uniquely only when the

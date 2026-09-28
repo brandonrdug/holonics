@@ -30,6 +30,17 @@ emit another class), so this module states the same mixture with **nonnegative**
   likelihood `(1 − η)^n` (`seqLik_escaped_survivor`), and with `0 < δ < 1 − η` it strictly exceeds
   every contradicted key's, so under the uniform prior the families of greatest posterior are exactly
   the survivors (Rust `receiver::population::ChaseFamily`, the chase terrain's reception).
+* `survivors_share_one_likelihood` [proved-derived; formal-checked]: every survivor has the same
+  escaped likelihood, so under the uniform prior the log-odds between two members of the selected
+  fibre are identically zero. A sequential test on accumulated log-odds reads nothing inside the
+  fibre and crosses a threshold of at most one contradiction exactly when one member survives
+  (THE_REBUILD F6's action law, amended by U3's second loop; Rust `receiver::population::chaser`).
+* `partitionInformation`, `partitionInformation_lt_iff` [proved-derived; formal-checked]: **the
+  probe's criterion.** An observation partitions a uniform fibre of `N` members into classes of
+  sizes `c`, and its information is `log N − (1/N) Σ_c c log c`. Over one fibre a partition carries
+  strictly more information than another exactly when `∏_c c^c` is strictly smaller: a comparison
+  of natural numbers, with no logarithm formed (Rust `receiver::release::ProbePartition`, the
+  chaser's `Ask`).
 * `death_is_an_exchange` [proved-derived; formal-checked] (a corollary of
   `HolonicAdjointNormalization.sum_replicator`): death is an exchange, never a deletion. At a cell
   whose likelihood is zero for the dying families and positive in total, each dying family's weight
@@ -414,7 +425,62 @@ theorem escaped_fibre_is_mode (e : κ → ℕ → C) (x : ℕ → C) {η δ : �
   · simp only [escaped, hne, if_false]
     exact hlt
 
+omit [DecidableEq κ] in
+/-- [proved-derived; formal-checked] **`survivors_share_one_likelihood`: the log-odds inside the
+surviving fibre vanish.** Two keys that both survive to `n` have the same escaped likelihood
+`(1 − η)^n`, so under the uniform prior their posterior log-odds are exactly zero: a sequential test
+on accumulated log-odds separates no two members of the selected fibre, and crosses any threshold of
+at most one contradiction exactly when one member survives (Rust `receiver::population::chaser`,
+THE_REBUILD F6's amended action law). -/
+theorem survivors_share_one_likelihood (e : κ → ℕ → C) (x : ℕ → C) (η δ : ℚ) {k j : κ} {n : ℕ}
+    (hk : k ∈ survivors e x n) (hj : j ∈ survivors e x n) :
+    seqLik (escaped e x η δ k) n = seqLik (escaped e x η δ j) n := by
+  simp only [survivors, mem_filter, mem_univ, true_and] at hk hj
+  rw [seqLik_escaped_survivor e x η δ hk, seqLik_escaped_survivor e x η δ hj]
+
 end Survivors
+
+section ProbePartition
+
+/-! ## The probe's criterion: a partition compared by its product -/
+
+/-- [definition] **The information of a partition** of a uniform fibre of `c.sum` members into
+classes of sizes `c`: `log N − (1/N) Σ_c c log c`, the mutual information between the member and
+its class (natural logarithm; every base orders alike). -/
+def partitionInformation (c : List ℕ) : ℝ :=
+  Real.log (c.sum : ℝ) - (c.map (fun k : ℕ => (k : ℝ) * Real.log k)).sum / (c.sum : ℝ)
+
+/-- `exp (k log k) = k^k` on the naturals, `0^0 = 1` included. -/
+theorem exp_mul_log_self (k : ℕ) : Real.exp ((k : ℝ) * Real.log k) = ((k ^ k : ℕ) : ℝ) := by
+  rcases Nat.eq_zero_or_pos k with rfl | hk
+  · simp
+  · rw [Real.exp_nat_mul, Real.exp_log (by exact_mod_cast hk)]
+    push_cast
+    ring
+
+/-- `exp (Σ_c c log c) = ∏_c c^c`. -/
+theorem exp_sum_mul_log_self (c : List ℕ) :
+    Real.exp (c.map (fun k : ℕ => (k : ℝ) * Real.log k)).sum =
+      (((c.map (fun k : ℕ => k ^ k)).prod : ℕ) : ℝ) := by
+  induction c with
+  | nil => simp
+  | cons a t ih =>
+    simp only [List.map_cons, List.sum_cons, List.prod_cons, Real.exp_add, ih,
+      exp_mul_log_self, Nat.cast_mul]
+
+/-- [proved-derived; formal-checked] **`partitionInformation_lt_iff`: the probe's criterion is an
+integer comparison.** Over one nonempty fibre, the partition `c` carries strictly more information
+than `c'` exactly when `∏_c c^c < ∏_c' c'^c'` (Rust `receiver::release::ProbePartition`). -/
+theorem partitionInformation_lt_iff (c c' : List ℕ) (hsum : c.sum = c'.sum) (hpos : 0 < c.sum) :
+    partitionInformation c' < partitionInformation c ↔
+      (c.map (fun k : ℕ => k ^ k)).prod < (c'.map (fun k : ℕ => k ^ k)).prod := by
+  unfold partitionInformation
+  rw [← hsum]
+  have hN : (0 : ℝ) < (c.sum : ℝ) := by exact_mod_cast hpos
+  rw [sub_lt_sub_iff_left, div_lt_div_iff_of_pos_right hN, ← Real.exp_lt_exp,
+    exp_sum_mul_log_self, exp_sum_mul_log_self, Nat.cast_lt]
+
+end ProbePartition
 
 section Exchange
 
@@ -617,6 +683,10 @@ section Audit
 #print axioms survivors_product
 #print axioms seqLik_escaped_survivor
 #print axioms escaped_fibre_is_mode
+#print axioms survivors_share_one_likelihood
+#print axioms exp_mul_log_self
+#print axioms exp_sum_mul_log_self
+#print axioms partitionInformation_lt_iff
 #print axioms death_is_an_exchange
 #print axioms certified_inverseCDF_class
 #print axioms certified_draw_is_released_at_zero_tolerance

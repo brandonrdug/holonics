@@ -55,6 +55,13 @@
 //! acceptance: capture in strictly fewer ticks than both controls in sum and in more than half of
 //! the seeds. `action trace` prints each passage's tube sizes tick by tick as well.
 //!
+//! [definition] **The uncertified releases, read through the one law** (THE_REBUILD U3, the second
+//! loop): below each seed's machine line, every tick the one law did not release (`Released` at
+//! tolerance zero is the certified capture) is printed with what the law returned, an offered
+//! probe's class sizes against the commit's and their products `∏_c |c|^|c|` with their
+//! factorization, and the cornering arm's cost comparison (the probe's concession in tube states
+//! against the price `d·|Θ|`).
+//!
 //! [definition; agent-inferred] **The move reading** (THE_REBUILD U4; a reading of the receipt, not
 //! a change of law): for each passage and in sum, each tick's move `(v, v′)` of the runner and of
 //! the chaser counted by its kind (`geometry::motion`: rest, start, stop, free fall, turn, boost,
@@ -80,9 +87,10 @@ use holonics::ratio::algebraic::ExactInterval;
 use holonics::ratio::surprisal::SymbolicSurprisal;
 use holonics::ratio::{Rat, rat};
 use holonics::receiver::population::{
-    ChaseFamily, Family, MachineChaser, MachineDeclaration, MachineReceipt, Population, Posterior,
-    Release, TreeFamily, selected_fibre,
+    ChaseFamily, Family, MachineChaser, MachineDeclaration, MachineReceipt, MachineRelease,
+    Population, Posterior, Release, TreeFamily, selected_fibre,
 };
+use holonics::receiver::release::ReleaseReturn;
 use num_bigint::{BigInt, BigUint};
 
 use exterior::{against, difference, enclosure, per};
@@ -468,6 +476,49 @@ fn move_lines(reading: &MoveReading, indent: &str) {
     );
 }
 
+/// **The uncertified releases, read through the one law** (module header): one line for each tick
+/// the law did not release.
+fn uncertified(receipt: &MachineReceipt) -> Vec<String> {
+    let probe_line = |law: &ReleaseReturn| match law {
+        ReleaseReturn::Ask { probe } => format!(
+            "the law asked {} (classes {:?}, ∏|c|^|c| = {}) against the commit (classes {:?}, {})",
+            probe.observation,
+            probe.partition.classes(),
+            factored(&probe.partition.product()),
+            probe.partition.against(),
+            factored(&probe.partition.against_product())
+        ),
+        other => format!("the law returned {other:?}"),
+    };
+    receipt
+        .releases
+        .iter()
+        .enumerate()
+        .filter_map(|(tick, release)| {
+            let fibre = receipt.fibre[tick];
+            match release {
+                MachineRelease::Law(law @ ReleaseReturn::Ask { .. }) => Some(format!(
+                    "tick {tick}, fibre {fibre}: the probe, emitted: {}",
+                    probe_line(law)
+                )),
+                MachineRelease::Law(_) => None,
+                MachineRelease::Commit {
+                    law: ReleaseReturn::Hold,
+                    ..
+                } => Some(format!(
+                    "tick {tick}, fibre {fibre}: the cornering commit; the law held, no admitted motion separating the fibre more than the commit"
+                )),
+                MachineRelease::Commit { law, price } => Some(format!(
+                    "tick {tick}, fibre {fibre}: the cornering commit; {}; its concession {} tube states exceeds the price d·|Θ| = {}",
+                    probe_line(law),
+                    price.map_or(0, |p| p.concession),
+                    price.map_or(0, |p| p.bound)
+                )),
+            }
+        })
+        .collect()
+}
+
 /// A capture tick, or none within the cap.
 fn capture_line(passage: &ActionPassage) -> String {
     match passage.captured {
@@ -575,6 +626,9 @@ fn action(trace: bool) {
             "  the machine: {} certified, {} commits, {} probes; its predicted consequence missed on {} ticks; the fibre at its last tick {}; read in {ms} ms",
             counts[0], counts[1], counts[2], receipt.misses, fibre
         );
+        for line in uncertified(&receipt) {
+            println!("    {line}");
+        }
     }
     println!();
     println!(

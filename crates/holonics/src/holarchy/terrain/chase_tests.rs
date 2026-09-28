@@ -758,7 +758,7 @@ fn every_chaser_motion_satisfies_its_traction_bound() {
         assert_eq!(receipt.releases.len(), passage.cells.len());
         for (tick, bound) in receipt.certified.iter().enumerate() {
             if let Some(ticks) = bound {
-                assert_eq!(receipt.releases[tick], Release::Certified);
+                assert_eq!(receipt.releases[tick].kind(), Release::Certified);
                 assert!(
                     passage.captured.is_some_and(|at| at <= tick + ticks),
                     "seed {seed}"

@@ -8,7 +8,7 @@
 //! |---|---|---|
 //! | **threshold commit**: `Released`, with `Widen` its named proposal | a width over a compatible fibre, decided at a declared tolerance by the caller's declared law ([`DecisionLaw`]; its data form [`DecisionRule`]) | [`release`]: `Released` inside the law's own tolerance (`ReleaseLaw.sound`), `Widen` wide enough for the width (`ReleaseLaw.widenSound`) |
 //! | **certified draw**: `Drawn` | a declared key `u ∈ [0, 1)` read by the inverse CDF of an exact interval face ([`draw`], [`draw_exact`]) | the certificate `Σ_(j<i) upper_j ≤ u < Σ_(j≤i) lower_j` (`certified_inverseCDF_class`), decided through [`release`] at tolerance zero |
-//! | **probe**: `Ask` | the named observation the owner computed and offered ([`ObservationProbe`]) | [`release`]: only an offered probe |
+//! | **probe**: `Ask` | the named observation the owner computed and offered ([`ObservationProbe`]), carrying the partition of the fibre it is chosen by ([`ProbePartition`]) | [`release`]: only an offered probe; [`ProbePartition::new`]: one fibre's partitions, the probe's strictly more informative than its comparison's |
 //! | **typed refusal**: `Hold`, `Unresolved`, `NoContinuationBridges` | nothing is emitted: the plural fibre is kept (`Hold`); a key the enclosure leaves plural keeps its unresolved draw mass with its exact crossing bounds (`Unresolved`); no admitted continuation reaches the receiver's section (`NoContinuationBridges`, the stop law's refusal when no stop fits the aperture) | unconstrained, as in Lean: which one is the caller's declared law |
 //!
 //! Malformed operands (an empty or unnormalizable face, a key outside `[0, 1)`, a forged width) are
@@ -33,6 +33,18 @@
 //! [`release`] refuses a declared law that returns `Drawn` or `Unresolved`
 //! ([`WidthRefusal::DrawNotOffered`]).
 //!
+//! [proved-derived; formal-checked] **The probe's criterion is information, compared exactly.** A
+//! probe is worth the information its outcome carries about the fibre, `I(Θ; Y | h, do(a))`, zero
+//! for a probe whose outcome is the same under every member. With the fibre read uniform, an
+//! observation partitions it into the classes `c` of members sharing an outcome, and its
+//! information is `I = log₂|Θ| − (1/|Θ|) Σ_c |c| log₂|c|`. Over one fibre, `I > I′` exactly when
+//! `∏_c |c|^|c| < ∏_c′ |c′|^|c′|`, a comparison of integers in which no logarithm is formed (Lean
+//! `Compression/Landmark/Context/Population.partitionInformation_lt_iff`). [`ProbePartition`] carries
+//! the probe's class sizes and those of the move it is compared against, and it exists only where
+//! both partition one nonempty fibre into nonempty classes and the probe's product is strictly below
+//! its comparison's: an offered probe always separates the fibre more than the move it would
+//! replace. The criterion is information, not a residual width.
+//!
 //! [established-bounded] **What the draw does not claim.** The certificate is sufficient, not
 //! necessary: normalization can make every compatible face agree where the prefix bounds still
 //! straddle the key, and that key is `Unresolved`. The inverse-CDF theorem certifies each emitted
@@ -46,9 +58,14 @@
 //! threshold commit at its receiving phases' grain. The population's release pipeline
 //! (`receiver::population::{releasing, text_release}`) returns this law's arms: the family draw
 //! (`Population::select_family`), one certified draw per response cell, the stop law and the
-//! typed refusals (`receiver::population::Population::release_response`). The chaser's rule
-//! (`receiver::population::chaser`) is a separate arm, declared as such: a capture-basin commit with
-//! an information probe, not yet a `ReleaseReturn` (THE_REBUILD U3 names its loop).
+//! typed refusals (`receiver::population::Population::release_response`). The chaser
+//! (`receiver::population::chaser`, THE_REBUILD U3's second loop) returns two of its arms: the
+//! certified capture is `Released` at tolerance zero on the capture-within-`m` reading over the
+//! population's selected fibre (width zero is the capture basin's certificate over every member),
+//! and the probe is `Ask` with its [`ProbePartition`]. Its cornering commit is a separate arm,
+//! declared as such in its owner: the comparison of the probe's concession with the price `d·|Θ|` of
+//! a tick is the Bellman stop law's one-step reading, and **the price is the separating term**, which
+//! no width or tolerance of this law carries.
 //!
 //! | Lean | Rust |
 //! |---|---|
@@ -64,6 +81,7 @@
 //! | `Horizon`, `Horizon.Within`, `horizonWithin_is_not_total` | [`crate::receiver::face::Horizon`] (`the_horizon_has_two_coordinates_that_are_not_one_scale`) |
 //! | `Population.certified_inverseCDF_class` | [`draw`]'s certificate, [`CertifiedDraw`] |
 //! | `Population.{certified_draw_is_released_at_zero_tolerance, plural_draw_is_held}` | [`draw`]: `Drawn` through `Released`, `Unresolved` through `Hold` |
+//! | `Population.{partitionInformation, partitionInformation_lt_iff}` | [`ProbePartition`] and [`partition_product`] (the probe's criterion, `the_probe_partition_compares_information_by_its_product`) |
 //!
 //! [definition] **Retired September 28** (U3; history at `1bdacc8f`). The exact zonotope enclosure
 //! and its `h`-step image under a linearization, the enumerated and enclosed compatible families,
@@ -77,6 +95,7 @@
 //!
 //! [implemented-exact] **No floats.** Every width, tolerance, key, bound and mass is an exact `Rat`.
 
+use num_bigint::BigUint;
 use num_traits::{One, Zero};
 use thiserror::Error;
 
@@ -90,17 +109,90 @@ use crate::receiver::face::{
 // the probe
 // -------------------------------------------------------------------------------------------
 
-/// **The probe an owner offers**: the named observation whose reading would narrow the fibre, and
-/// what it would leave. The owner that computed it offers it through [`LawfulOptions::assemble`];
-/// a law may ask only for the probe offered.
+/// **The probe an owner offers**: the named observation whose outcome would separate the fibre, and
+/// the partition it is chosen by. The owner that computed it offers it through
+/// [`LawfulOptions::assemble`]; a law may ask only for the probe offered.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ObservationProbe {
     /// The observation's declared name.
     pub observation: String,
-    /// The exact width the observation would leave.
-    pub width_after: Rat,
-    /// The exact reduction it buys.
-    pub reduction: Rat,
+    /// The fibre's partition by its outcomes, against the compared move's (module header).
+    pub partition: ProbePartition,
+}
+
+/// [proved-derived; formal-checked] **The partition a probe is chosen by** (module header): the
+/// class sizes of the fibre's partition by the probe's outcomes, and those of the partition it is
+/// compared against. It is constructed only by [`Self::new`], so every value partitions one nonempty
+/// fibre into nonempty classes and separates it strictly more than its comparison (Lean
+/// `Population.partitionInformation_lt_iff`).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ProbePartition {
+    classes: Vec<usize>,
+    against: Vec<usize>,
+}
+
+impl ProbePartition {
+    /// The probe's classes against the compared ones; refused unless both partition one nonempty
+    /// fibre into nonempty classes ([`WidthRefusal::ProbeClasses`]) and
+    /// `∏_c |c|^|c| < ∏_c′ |c′|^|c′|` ([`WidthRefusal::ProbeNotInformative`]).
+    pub fn new(classes: Vec<usize>, against: Vec<usize>) -> Result<Self, WidthRefusal> {
+        let members = |sizes: &[usize]| -> Option<usize> {
+            if sizes.is_empty() || sizes.contains(&0) {
+                return None;
+            }
+            sizes.iter().try_fold(0usize, |total, &size| total.checked_add(size))
+        };
+        match (members(&classes), members(&against)) {
+            (Some(left), Some(right)) if left == right => {}
+            (left, right) => {
+                return Err(WidthRefusal::ProbeClasses {
+                    classes: left.unwrap_or(0),
+                    against: right.unwrap_or(0),
+                });
+            }
+        }
+        let (product, compared) = (partition_product(&classes), partition_product(&against));
+        if product >= compared {
+            return Err(WidthRefusal::ProbeNotInformative {
+                product: product.to_string(),
+                against: compared.to_string(),
+            });
+        }
+        Ok(Self { classes, against })
+    }
+
+    /// The probe's class sizes.
+    pub fn classes(&self) -> &[usize] {
+        &self.classes
+    }
+
+    /// The compared partition's class sizes.
+    pub fn against(&self) -> &[usize] {
+        &self.against
+    }
+
+    /// The fibre's size `|Θ|`, the members both partitions hold.
+    pub fn fibre(&self) -> usize {
+        self.classes.iter().sum()
+    }
+
+    /// `∏_c |c|^|c|` over the probe's classes.
+    pub fn product(&self) -> BigUint {
+        partition_product(&self.classes)
+    }
+
+    /// `∏_c′ |c′|^|c′|` over the compared classes, strictly above [`Self::product`].
+    pub fn against_product(&self) -> BigUint {
+        partition_product(&self.against)
+    }
+}
+
+/// **`∏_c |c|^|c|` over a partition's class sizes** (module header): over one fibre, the smaller
+/// product is the partition carrying the more information.
+pub fn partition_product(sizes: &[usize]) -> BigUint {
+    sizes.iter().fold(BigUint::from(1u32), |product, &size| {
+        product * BigUint::from(size).pow(size as u32)
+    })
 }
 
 // -------------------------------------------------------------------------------------------

@@ -42,7 +42,7 @@ docstring says otherwise.
 | `hnn_exposure.rs` | Campaign 1's exposure on a cut: the model face (the landmark tree mixed with the combined face), the baselines, keys, aeons and the first law; on the host or the card (`realization card`); the loaded resonator (`resonator source`) | `cargo run --release -p holonics --example hnn_exposure -- cut-file .local/cuts/standing-real-cut-campaign-1.bin cells all` | [campaign 1 meets its criterion](../../records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md), [the resonator](../../records/2026-09-26_THE_RESONATOR_RETURNS_ITS_WAVE_AND_THE_COMPARISON_REACHES_ITS_MATERIAL.md), [campaign 2](../../records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md) |
 | `hnn_landmark.rs` | The landmark tree (count-only): the depth sweep and prequential passage; `letters`, `prior`, `wide`, `compact`, `capacity` | `cargo run --release -p holonics --example hnn_landmark -- cut-file .local/cuts/standing-real-cut-campaign-1.bin` | [below PPM-2](../../records/2026-09-26_THE_LANDMARK_TREE_COMPRESSES_THE_STANDING_CUT_BELOW_PPM_TWO.md), [at scale](../../records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md), [capacity](../../records/2026-09-27_A_LANDMARKS_STORAGE_HAS_A_CAPACITY_AT_ITS_CEILING_IT_CARRIES.md), [campaign 2](../../records/2026-09-26_CAMPAIGN_TWO_THE_RINGS_AND_CONTACTS_ARE_LAWFUL_AND_ADD_NO_BITS_ON_TEXT.md) |
 | `hnn_population.rs` (with `hnn_population_{composition,evolution,curated}.rs`) | The egg population: terrain (`tree`, `moire`, `crib`, `switching`, `standing`), `composition`, `evolution`, `species`, the curated source (`curated`, with `merges`), `f4` | `cargo run --release -p holonics --example hnn_population -- <mode>` | [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md), [F4](../../records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md), [the forward plan](../../records/2026-09-28_THE_FORWARD_PLAN_STOPPED_AT_TRANSFER_THE_POPULATION_MEMORIZES_FAMILIES_AND_ITS_STANDING_IS_AN_INDEX.md) |
-| `hnn_chase.rs` | F6's chase terrain: the reception phase, the action phase's choosing sweep (`choose`) and its acceptance (`action`, with U4's move reading) | `cargo run --release -p holonics --example hnn_chase` | [the learner must move](../../records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md) (no dedicated record; the receipts below) |
+| `hnn_chase.rs` | F6's chase terrain: the reception phase, the action phase's choosing sweep (`choose`) and its acceptance (`action`, with U4's move reading and U3's release reading) | `cargo run --release -p holonics --example hnn_chase` | [the learner must move](../../records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md) (no dedicated record; the receipts below) |
 | `exterior.rs` | The shared exterior boundary the examples include | | |
 | `standing_cut.py` | Pins the standing real cut (`6148`) and the wide cut (`wide 1048576`) | `python3 research/notebook/hnn_design/standing_cut.py 6148` | [campaign 1 meets its criterion](../../records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md), [at scale](../../records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md) |
 | `curated_source.py`, `curated_incidence.py` | The curated source, its pinned cut and flat twin; the admitted relations on the cut | `HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/curated_source.py 1048576` | [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md) |
@@ -1999,3 +1999,55 @@ runner and of the chaser by kind, over the 16 acceptance seeds.
   velocities of quadrance `1` (the axes) and `2` (the diagonals), one to each ray, so each of its
   speed changes turns as well. Its starts are its openings, one a seed, and constant bearing's one restart after
   its one stop; the machine's one stop is its last move before capture.
+
+### F6: the chaser releases through the one law (U3's second loop, September 28)
+
+Record: no dedicated record; the law is in `receiver::release` and `receiver::population::chaser`
+(their headers), and F6's amended action law in [THE_REBUILD](../../../docs/plans/THE_REBUILD.md#f6-motion-the-chase-terrain-then-the-motor-chart-campaign-4-27-148); U3, #73, #27.
+
+```sh
+cargo run --release -p holonics --example hnn_chase                    # the reception phase
+cargo run --release -p holonics --example hnn_chase -- action trace    # the action phase, each uncertified release read through the law
+cargo run --release -p holonics --example hnn_chase -- choose 2 12 0   # the chosen rung
+cargo test -p holonics --lib receiver::release receiver::population::chaser holarchy::terrain::chase_tests
+```
+
+[definition; agent-inferred] **The chaser's arms.** Each tick the machine reads the
+capture-within-`m` reading over the population's selected fibre and decides it by the one law
+(`DecisionRule(Release, Ask)` at tolerance zero). The basin's certificate over every member is
+width zero, and the law returns `Released`: the certified capture. Beyond it the law asks the
+offered probe (`Ask`, carrying its `ProbePartition`: its class sizes against the commit's, compared
+as `∏|c|^|c|`) and holds where no admitted motion separates the fibre more than the commit. The
+cornering commit is the declared separate arm. It takes the law's `Hold`, or an `Ask` whose
+concession `K(u_p) − K(u*)` exceeds the price `d·|Θ|`: the price is its separating term.
+
+**Parity: every chase receipt reproduces exactly.** The harness was built at `c10acca9` and after the
+change, and each run was compared with only the wall times masked.
+- The reception phase: 414 lines, identical.
+- `action trace`: 342 lines, identical, with 12 new lines, one for each uncertified release. They
+  carry the capture ticks 164 / 3,704 / 366 and each seed's; the cornering sums 101,054 / 120,868 /
+  133,444 and 101,054 / 2,750,616 / 227,295 with every tube tick by tick; the slips (4, 7) / (83, 112)
+  / (14, 21); the walls 9 / 151 / 19; the releases 152 / 11 / 1; and the 21 misses.
+- `choose 2 12 0`: 150 / 4,668 / 240, identical.
+- A scratch printer read every machine receipt tick by tick (release, fibre, certified bound,
+  misses) on 64 passages: the acceptance seeds at `d = 0, 1, 256` and the choosing seeds at
+  `d = 0`. It agreed on every tick. At `d = 256` the acceptance seeds release 4 probes: three on
+  20260932, at fibres 40, 24 and 16, and one on 20260942.
+- The pre-U3 selector runs beside the law in `chaser_tests.rs` and agrees on 8,320 fixtures.
+- The action run took 16,310 ms at a 249,280 kB peak resident set (16,695 ms at 249,484 kB before).
+
+**The uncertified releases on the acceptance seeds at `d = 0`.**
+
+| Seed, tick | Fibre | The law | The arm |
+|---|---|---|---|
+| 20260942, 0 | 40 | `Ask`: classes `{12, 4, 2, 4, 2, 4, 2, 6, 2, 2}`, `∏ = 2^64·3^18`, against the commit's `{12, 6, 4, 2, 4, 2, 6, 2, 2}`, `2^60·3^24` | the probe, emitted (concession 0) |
+| 20260932, 0 | 40 | `Ask`: `{16, 6, 2, 4, 4, 4, 4}`, `2^104·3^6`, against `{24, 4, 4, 4, 4}`, `2^104·3^24` | cornering: concession 242 above the price 0 |
+| 10 ticks on 6 seeds (20260928 ticks 0–3; 20260930, 20260934, 20260940, 20260941 tick 0; 20260931 ticks 0–1) | 40, 28, 2, 2; 40; 40, 12 | `Hold` | cornering: no probe offered |
+
+[measured] **What the sequential test would read.** Of the 152 certified releases on the acceptance
+seeds, 143 came over a plural fibre (138 of 144 on the choosing seeds). There every member's
+likelihood is `(1 − η)^n` (Lean `Population.survivors_share_one_likelihood`), and the accumulated
+log-odds between members are zero. A test on them commits only on the 9 ticks (6 on the choosing
+seeds) whose fibre is one member, and the capture reading had already certified every one. No
+cornering commit came over a single member. So F6's action law is amended to the built rule
+(THE_REBUILD F6, with the superseded text quoted).

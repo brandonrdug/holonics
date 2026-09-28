@@ -336,8 +336,7 @@ fn plural_options(ask: Option<ObservationProbe>, bridges: bool) -> LawfulOptions
 fn probe() -> ObservationProbe {
     ObservationProbe {
         observation: "observe-x".to_owned(),
-        width_after: Rat::zero(),
-        reduction: integer(4),
+        partition: ProbePartition::new(vec![1, 1], vec![2]).expect("a separating partition"),
     }
 }
 
@@ -497,8 +496,8 @@ fn a_law_naming_an_unoffered_probe_or_a_draw_is_refused() {
             ReleaseReturn::Ask {
                 probe: ObservationProbe {
                     observation: "an-observation-nobody-computed".to_owned(),
-                    width_after: Rat::zero(),
-                    reduction: Rat::zero(),
+                    partition: ProbePartition::new(vec![1, 1], vec![2])
+                        .expect("a separating partition"),
                 },
             }
         }
@@ -526,6 +525,90 @@ fn a_law_naming_an_unoffered_probe_or_a_draw_is_refused() {
         release(&Drawing, &options).expect_err("refused"),
         WidthRefusal::DrawNotOffered { ref law } if law == "drawing"
     ));
+}
+
+// ---------------------------------------------------------------------------------------------
+// the probe's criterion
+// ---------------------------------------------------------------------------------------------
+
+/// Lean: `Population.partitionInformation_lt_iff`. **The probe's criterion is information, read
+/// exactly as `∏_c |c|^|c|`.** Over a fibre of four, `{2, 2}` carries one bit and `{3, 1}` less
+/// (`2 − ¾ log₂ 3`): `2²·2² = 16 < 3³·1¹ = 27`. `{2, 1, 1}` carries three halves and `{4}` none:
+/// `4 < 256`. Equal products carry equal information and offer nothing; a partition of another
+/// fibre, an empty class or no class at all is not a comparison.
+#[test]
+fn the_probe_partition_compares_information_by_its_product() {
+    let halves = ProbePartition::new(vec![2, 2], vec![3, 1]).expect("one bit against less");
+    assert_eq!(halves.fibre(), 4);
+    assert_eq!(
+        (halves.product(), halves.against_product()),
+        (BigUint::from(16u32), BigUint::from(27u32))
+    );
+    let split = ProbePartition::new(vec![2, 1, 1], vec![4]).expect("three halves against none");
+    assert_eq!(
+        (split.product(), split.against_product()),
+        (BigUint::from(4u32), BigUint::from(256u32))
+    );
+    assert_eq!(partition_product(&[]), BigUint::from(1u32));
+    assert!(matches!(
+        ProbePartition::new(vec![3, 1], vec![2, 2]),
+        Err(WidthRefusal::ProbeNotInformative { ref product, ref against })
+            if product == "27" && against == "16"
+    ));
+    assert!(matches!(
+        ProbePartition::new(vec![1, 2], vec![2, 1]),
+        Err(WidthRefusal::ProbeNotInformative { .. })
+    ));
+    for (classes, against) in [
+        (vec![1, 1], vec![3]),
+        (vec![0, 2], vec![2]),
+        (vec![], vec![]),
+    ] {
+        assert!(matches!(
+            ProbePartition::new(classes, against),
+            Err(WidthRefusal::ProbeClasses { .. })
+        ));
+    }
+}
+
+/// **The chaser's rule is the one law on a discrete reading** (THE_REBUILD U3, the second loop):
+/// `DecisionRule(Release, Ask)` at tolerance zero over the capture-within-`m` reading. Width zero
+/// (the basin certifies every member) releases even while a probe is offered; width one (the
+/// discrete band) asks the offered probe, and holds where none is offered. No other arm is lawful
+/// here.
+#[test]
+fn a_certified_capture_releases_at_zero_and_an_uncertified_one_asks_or_holds() {
+    let rule = DecisionRule::new("capture", WithinTolerance::Release, BeyondTolerance::Ask);
+    let reading = |diameter: i64| {
+        let attaining = if diameter == 0 {
+            WidthWitness::Point
+        } else {
+            WidthWitness::Coordinate { coordinate: 0 }
+        };
+        ReceiverWidth::declared(
+            "capture within m",
+            "the selected fibre",
+            DiameterNorm::Supremum,
+            integer(diameter),
+            attaining,
+            4,
+        )
+        .expect("a declared width")
+    };
+    let decide = |diameter: i64, ask: Option<ObservationProbe>| {
+        let options = LawfulOptions::assemble(&reading(diameter), Rat::zero(), ask, true)
+            .expect("coherent options");
+        release(&rule, &options).expect("a lawful return")
+    };
+    assert_eq!(
+        decide(0, Some(probe())),
+        ReleaseReturn::Released {
+            width: Rat::zero(),
+            tolerance: Rat::zero()
+        }
+    );
+    assert_eq!(decide(1, Some(probe())), ReleaseReturn::Ask { probe: probe() });
+    assert_eq!(decide(1, None), ReleaseReturn::Hold);
 }
 
 // ---------------------------------------------------------------------------------------------

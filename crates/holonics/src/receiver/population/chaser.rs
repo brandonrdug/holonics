@@ -1,8 +1,8 @@
-//! **The machine as chaser: the population reads the runner, and each motion is a threshold
-//! commit that corners** (THE_REBUILD F6, the action phase; the record
-//! `2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_…`, §6, §12 items 5, 8, 9 and 13, §14.3–§14.4
-//! and §14.10; campaign 4, #27, #148). It replaces the reception's scripted pursuer with the machine,
-//! a [`Chaser`] of `holarchy::terrain::pursuit`.
+//! **The machine as chaser: the population reads the runner, and each motion is released through
+//! the one decision law or its declared cornering arm** (THE_REBUILD F6, the action phase, and U3's
+//! second loop; the record `2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_…`, §6, §12 items 5, 8,
+//! 9 and 13, §14.3–§14.4 and §14.10; campaign 4, #27, #148). It replaces the reception's scripted
+//! pursuer with the machine, a [`Chaser`] of `holarchy::terrain::pursuit`.
 //!
 //! [definition; agent-inferred] **The reading.** The machine holds the reception's population
 //! (`ChaseFamily`, one family per declared candidate, escape mass `2^(−j)`), joined to the passage's
@@ -28,19 +28,39 @@
 //!   `I = log₂|Θ| − (1/|Θ|) Σ_c |c| log₂|c|`, so `I(u) > I(u′)` exactly when
 //!   `∏_c |c|^|c| < ∏_c′ |c′|^|c′|`, an integer comparison; no logarithm is formed.
 //!
-//! [definition; agent-inferred; §12 item 5, §14.3] **The decision rule: a threshold commit.**
+//! [definition; agent-inferred; §12 item 5, §14.3; THE_REBUILD U3] **The decision: the one law's
+//! arms, and the cornering arm beside them.**
 //! - **The commit** `u*` is the least of the admitted motions in the order `(b(u) certified first,
 //!   then b(u), then K(u), then N(u), then the canonical order)`: a certified capture in the fewest
 //!   ticks, otherwise the move that corners, shrinking the fibre's viable tubes most, closing ties.
-//! - **The probe** `u_p` is the least in `(−I(u), K(u), N(u), canonical order)`.
-//! - **The threshold.** The statistic is the population's posterior over the fibre's future
-//!   classes. The machine commits when the threshold is crossed: when the fibre is one member (its
-//!   log-odds against every other candidate at least one contradiction, `12 + log₂(A − 1)` bits),
-//!   when the capture basin certifies `u*`, when no admitted move separates the fibre beyond what
-//!   `u*` separates (`I(u_p) ≤ I(u*)`: the fibre is one future class for the probe's reach), or when
-//!   the probe is not affordable: `K(u_p) − K(u*) > d·|Θ|`.
-//! - **The price of a tick** `d` is declared in runner motions: the viable-tube states a probing
-//!   tick may concede, per fibre member, against the commit. Otherwise the machine emits the probe.
+//! - **The probe** `u_p` is the least in `(−I(u), K(u), N(u), canonical order)`. It is **offered**
+//!   while the fibre is plural and `I(u_p) > I(u*)`, as a `receiver::release::ObservationProbe`
+//!   carrying its [`ProbePartition`]: its class sizes against the commit's, compared exactly as
+//!   `∏_c |c|^|c|`.
+//! - **The one law** (`receiver::release::release`, `DecisionRule(Release, Ask)` at tolerance zero)
+//!   reads **the capture-within-`m` reading over the selected fibre**: its width is zero when the
+//!   capture basin certifies `u*` (a strategy that captures every member within `b(u*) ≤ m` ticks:
+//!   the reading is constant on the fibre, Lean `Foundation/ReceiverRelease.width_eq_zero_iff`), and
+//!   otherwise the discrete band's one. Width zero returns `Released`, the certified capture, whether
+//!   or not a probe is offered; beyond it the law asks the offered probe (`Ask`) and holds where none
+//!   is offered (`Hold`: the fibre is one member, or no admitted move separates it beyond what `u*`
+//!   separates, one future class for the probe's reach).
+//! - **The cornering arm, declared separate.** An `Ask` is emitted only when the probe is affordable,
+//!   `K(u_p) − K(u*) ≤ d·|Θ|`; the price `d` of a tick is declared in runner motions, the viable-tube
+//!   states a probing tick may concede per fibre member against the commit. Where the concession
+//!   exceeds the price, or the law holds, the machine commits to `u*` uncertified
+//!   ([`MachineRelease::Commit`], carrying the law's return and the cost comparison). This is the
+//!   Bellman stop law's one-step comparison of a viable probe against committing (§14.3): **the price
+//!   is its separating term**, which no width or tolerance of the one law carries, so it stays its own
+//!   arm (THE_REBUILD U3's failure branch).
+//! - **No sequential test on accumulated log-odds is run** (F6's law, amended by U3's second loop).
+//!   Under the declared deterministic candidate laws with their escape, every member of the selected
+//!   fibre has the same likelihood `(1 − η)^n` (Lean `Population.survivors_share_one_likelihood`), so
+//!   the log-odds between members are identically zero, and a threshold at most one contradiction's
+//!   `log₂((1 − η)(A − 1)/η)` bits is crossed exactly when the fibre is one member, where the law
+//!   already holds and the machine commits. The capture reading is coarser than the family's
+//!   identity: it certifies the consequence over a plural fibre, where the test would still be
+//!   sampling.
 //! - **Each emission carries its predicted consequence** (§12 item 9): the leading class's cell (the
 //!   largest class, the least cell on a tie) is read against the cell that unfolds; a miss is counted
 //!   in the receipt.
@@ -64,12 +84,19 @@ use std::collections::BTreeMap;
 use std::sync::Arc;
 
 use num_bigint::BigUint;
+use num_traits::{One, Zero};
 
 use super::{ChaseFamily, Population, PopulationError, refuse, selected_fibre};
 use crate::geometry::motion::quadrance;
 use crate::holarchy::terrain::{
     Basin, BasinMemo, Candidate, Caps, CaptureReach, ChasePorts, ChaseView, Chaser, Motion, Moves,
     Pursuer, RunnerFamily, capture_ticks, classes, viable_tube,
+};
+use crate::ratio::Rat;
+use crate::receiver::face::{DiameterNorm, ReceiverWidth, WidthWitness};
+use crate::receiver::release::{
+    BeyondTolerance, DecisionRule, LawfulOptions, ObservationProbe, ProbePartition, ReleaseReturn,
+    WithinTolerance, partition_product, release,
 };
 
 /// [definition] **The machine's declaration** (module header): the declared runner family it reads,
@@ -84,15 +111,63 @@ pub struct MachineDeclaration {
     pub price: u64,
 }
 
-/// [definition] **What the machine released at a tick.**
+/// [definition] The declared name of the rule the one law decides the chaser's tick by.
+pub const CAPTURE_RULE: &str =
+    "certified capture: release at tolerance zero, else ask the offered probe, else hold";
+
+/// [definition] **What the machine released at a tick, by kind** (the receipt's reading of a
+/// [`MachineRelease`]).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Release {
-    /// A commit the capture basin certified within the horizon.
+    /// The one law's `Released`: a commit the capture basin certified within the horizon.
     Certified,
-    /// A commit to the cornering move.
+    /// The cornering arm: an uncertified commit to the cornering move.
     Commit,
-    /// A probe: the most informative move, affordable at the declared price.
+    /// The one law's `Ask`: the most informative move, affordable at the declared price.
     Probe,
+}
+
+/// [definition] **The cost comparison of the cornering arm**: the probe's concession
+/// `K(u_p) − K(u*)` in viable-tube states (zero when the probe corners at least as much) against the
+/// price `d·|Θ|`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct ProbePrice {
+    pub concession: usize,
+    pub bound: u128,
+}
+
+impl ProbePrice {
+    /// Whether the probe is affordable: its concession within the price.
+    pub fn affordable(&self) -> bool {
+        self.concession as u128 <= self.bound
+    }
+}
+
+/// [definition] **What the machine released at a tick** (module header): a return of the one law,
+/// or its declared cornering arm.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum MachineRelease {
+    /// The one law's return, emitted: `Released` at tolerance zero on the capture reading (the
+    /// certified capture, the commit), or `Ask` with its partition (the probe, within its price).
+    Law(ReleaseReturn),
+    /// **The cornering arm** (declared separate): the uncertified commit to the cornering move.
+    Commit {
+        /// What the one law returned: `Hold` (no probe offered) or the `Ask` the price refused.
+        law: ReleaseReturn,
+        /// The cost comparison, where a probe was offered.
+        price: Option<ProbePrice>,
+    },
+}
+
+impl MachineRelease {
+    /// The release's kind.
+    pub fn kind(&self) -> Release {
+        match self {
+            Self::Law(ReleaseReturn::Ask { .. }) => Release::Probe,
+            Self::Law(_) => Release::Certified,
+            Self::Commit { .. } => Release::Commit,
+        }
+    }
 }
 
 /// [definition] **The machine's receipt**: per tick its release, the fibre's size and, for a
@@ -100,7 +175,7 @@ pub enum Release {
 /// its predicted consequence.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct MachineReceipt {
-    pub releases: Vec<Release>,
+    pub releases: Vec<MachineRelease>,
     pub fibre: Vec<usize>,
     pub certified: Vec<Option<usize>>,
     pub misses: usize,
@@ -109,7 +184,7 @@ pub struct MachineReceipt {
 impl MachineReceipt {
     /// The ticks released as `release`.
     pub fn count(&self, release: Release) -> usize {
-        self.releases.iter().filter(|&&r| r == release).count()
+        self.releases.iter().filter(|r| r.kind() == release).count()
     }
 }
 
@@ -124,12 +199,100 @@ pub struct MachineChaser {
     receipt: MachineReceipt,
 }
 
-/// A move's reading (module header).
+/// A move's reading (module header): `b(u)`, `K(u)`, `N(u)`, and the class sizes of the fibre's
+/// partition by the cells at `t` and `t + 1` with their product `∏_c |c|^|c|` (empty and one while
+/// the fibre is one member).
 struct Worth {
     capture: Option<usize>,
     cornering: usize,
     nearness: i64,
+    classes: Vec<usize>,
     information: BigUint,
+}
+
+/// **The release among the admitted motions' readings** (module header): the commit, the probe the
+/// owner offers, the one law's decision at tolerance zero on the capture reading, and the cornering
+/// arm's cost comparison. Returns the release and the index of the motion it emits.
+fn release_among(
+    worths: &[Worth],
+    fibre: usize,
+    price: u64,
+) -> Result<(MachineRelease, usize), PopulationError> {
+    let commit_key = |w: &Worth| (w.capture.is_none(), w.capture, w.cornering, w.nearness);
+    let commit = (0..worths.len())
+        .min_by_key(|&i| commit_key(&worths[i]))
+        .ok_or_else(|| {
+            refuse(
+                "a machine chaser's decision",
+                "its admitted motions are not empty",
+            )
+        })?;
+    let probe = (0..worths.len())
+        .min_by(|&a, &b| {
+            let (wa, wb) = (&worths[a], &worths[b]);
+            (&wa.information, wa.cornering, wa.nearness).cmp(&(
+                &wb.information,
+                wb.cornering,
+                wb.nearness,
+            ))
+        })
+        .filter(|&p| fibre > 1 && worths[p].information < worths[commit].information);
+    let offered = match probe {
+        Some(p) => Some(ObservationProbe {
+            observation: format!("admitted motion {p} of {}", worths.len()),
+            partition: ProbePartition::new(
+                worths[p].classes.clone(),
+                worths[commit].classes.clone(),
+            )?,
+        }),
+        None => None,
+    };
+    let certified = worths[commit].capture.is_some();
+    let width = ReceiverWidth::declared(
+        "capture within the basin's horizon under the commit",
+        "the population's selected fibre",
+        DiameterNorm::Supremum,
+        if certified { Rat::zero() } else { Rat::one() },
+        if certified {
+            WidthWitness::Point
+        } else {
+            WidthWitness::Coordinate { coordinate: 0 }
+        },
+        fibre,
+    )?;
+    let options = LawfulOptions::assemble(&width, Rat::zero(), offered, true)?;
+    let rule = DecisionRule::new(CAPTURE_RULE, WithinTolerance::Release, BeyondTolerance::Ask);
+    match (release(&rule, &options)?, probe) {
+        (law @ ReleaseReturn::Released { .. }, _) => Ok((MachineRelease::Law(law), commit)),
+        (law @ ReleaseReturn::Ask { .. }, Some(p)) => {
+            let cost = ProbePrice {
+                concession: worths[p].cornering.saturating_sub(worths[commit].cornering),
+                bound: u128::from(price) * fibre as u128,
+            };
+            if cost.affordable() {
+                Ok((MachineRelease::Law(law), p))
+            } else {
+                Ok((
+                    MachineRelease::Commit {
+                        law,
+                        price: Some(cost),
+                    },
+                    commit,
+                ))
+            }
+        }
+        (ReleaseReturn::Hold, _) => Ok((
+            MachineRelease::Commit {
+                law: ReleaseReturn::Hold,
+                price: None,
+            },
+            commit,
+        )),
+        _ => Err(refuse(
+            "a machine chaser's decision",
+            "the capture rule returns a release, the offered probe or a hold",
+        )),
+    }
 }
 
 impl MachineChaser {
@@ -229,13 +392,12 @@ impl MachineChaser {
                 }
             }
         }
-        let information = sizes.iter().fold(BigUint::from(1u32), |product, &size| {
-            product * BigUint::from(size).pow(size as u32)
-        });
+        let information = partition_product(&sizes);
         Ok(Worth {
             capture,
             cornering,
             nearness,
+            classes: sizes,
             information,
         })
     }
@@ -302,52 +464,17 @@ impl Chaser for MachineChaser {
         for &next in &admitted {
             worths.push(self.worth(&basin, &mut memo, &parts, next, tick, plural)?);
         }
-        let commit_key = |w: &Worth| (w.capture.is_none(), w.capture, w.cornering, w.nearness);
-        let commit = (0..admitted.len())
-            .min_by_key(|&i| commit_key(&worths[i]))
-            .ok_or_else(|| {
-                refuse(
-                    "a machine chaser's decision",
-                    "its admitted motions are not empty",
-                )
-            })?;
-        let mut release = if worths[commit].capture.is_some() {
-            Release::Certified
-        } else {
-            Release::Commit
-        };
-        let mut chosen = commit;
-        if plural && release == Release::Commit {
-            let probe = (0..admitted.len())
-                .min_by(|&a, &b| {
-                    let (wa, wb) = (&worths[a], &worths[b]);
-                    (&wa.information, wa.cornering, wa.nearness).cmp(&(
-                        &wb.information,
-                        wb.cornering,
-                        wb.nearness,
-                    ))
-                })
-                .expect("a nonempty admitted set");
-            let concession = worths[probe]
-                .cornering
-                .saturating_sub(worths[commit].cornering);
-            let affordable =
-                (concession as u128) <= u128::from(self.declaration.price) * (fibre.len() as u128);
-            if worths[probe].information < worths[commit].information && affordable {
-                release = Release::Probe;
-                chosen = probe;
-            }
-        }
+        let (released, chosen) = release_among(&worths, fibre.len(), self.declaration.price)?;
         self.predicted = parts
             .iter()
             .max_by(|a, b| a.1.len().cmp(&b.1.len()).then(b.0.cmp(&a.0)))
             .map(|(cell, _)| *cell);
-        self.receipt.releases.push(release);
-        self.receipt.fibre.push(fibre.len());
-        self.receipt.certified.push(match release {
+        self.receipt.certified.push(match released.kind() {
             Release::Certified => worths[chosen].capture,
             _ => None,
         });
+        self.receipt.releases.push(released);
+        self.receipt.fibre.push(fibre.len());
         Ok(admitted[chosen])
     }
 
@@ -370,3 +497,7 @@ impl Chaser for MachineChaser {
         Ok(())
     }
 }
+
+#[cfg(test)]
+#[path = "chaser_tests.rs"]
+mod tests;

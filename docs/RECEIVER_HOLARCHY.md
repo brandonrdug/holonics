@@ -180,9 +180,12 @@ them from here.
   removes it, and the probe is the generator whose removal leaves the least sup-norm diameter. Over
   an enumerated fibre, a declared observation partitions the fibre into its level sets; its survivor
   is the largest width the target reading keeps inside one level set, never more than the whole
-  width (`width_mono`), and the probe is the observation with the least survivor. The chaser's
-  probe (`receiver::population::chaser`) partitions the same way under another criterion, the
-  expected information `I = log₂|Θ| − (1/|Θ|) Σ_c |c| log₂|c|` of the partition.
+  width (`width_mono`), and the probe is the observation with the least survivor. The live probe
+  criterion is information, not a survivor width: the chaser's probe (`receiver::population::chaser`,
+  U3's second loop) partitions its fibre the same way and is offered as
+  `receiver::release::ProbePartition`, the partition's information
+  `I = log₂|Θ| − (1/|Θ|) Σ_c |c| log₂|c|` compared exactly as `∏_c |c|^|c|`
+  (`Population.partitionInformation_lt_iff`).
 - [definition] **The coarsening tower search** (`releaseCoarser`). Up a declared tower of readings,
   finest first, each step's factoring through the step below is checked over the fibre: two
   members the finer reading identifies must be identified by the coarser one
