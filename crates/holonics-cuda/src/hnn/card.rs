@@ -25,10 +25,6 @@
 //! - The moment ingest ([`ingest_layout`]): one block, so no two blocks share the moment; within
 //!   it, the counts are atomic integer additions (commutative), and each tile's scans are ordered
 //!   by barriers.
-//! - The word's tick and adjoint tick ([`read_layout`] over the flattened rows): every block reads
-//!   the immutable charts and the state it is handed and writes only its own entry of the other
-//!   state buffer, its status and its own remainder; the two state buffers alternate, so no block
-//!   reads what another writes in the same launch.
 //! - The inverse residual and refinement ([`read_layout`] over rows × columns): every block reads
 //!   the immutable operator, chart and residual and writes only its own entry (the refinement into
 //!   the other chart buffer). The certificate ([`certificate_layout`]): one block per chart, whose
@@ -41,7 +37,7 @@ use core::marker::PhantomData;
 
 use crate::cuda::{
     self, Context, CudaError, Device, DeviceAttribute, DeviceBuffer, DeviceZeroable, Dim3,
-    GraphCensus, GraphExec, MemoryInfo, Module, PinnedHost, Stream,
+    MemoryInfo, Module, Stream,
 };
 use crate::ffi::CUdeviceptr;
 use crate::hnn::DeviceError;
@@ -610,82 +606,6 @@ impl Card {
         Ok(buffer.buffer.copy_range_from_slice(offset, values)?)
     }
 
-    /// Page-locked host staging of `octets` octets, allocated in the card's context.
-    pub(crate) fn pinned(&self, octets: usize) -> Result<PinnedHost, DeviceError> {
-        self.current()?;
-        Ok(PinnedHost::alloc(octets)?)
-    }
-
-    fn staged_range<T: Copy>(
-        buffer: &CardBuffer<'_, T>,
-        offset: usize,
-        staging: &PinnedHost,
-        at: usize,
-        octets: usize,
-    ) -> Result<(), DeviceError> {
-        let extent = buffer.len * core::mem::size_of::<T>();
-        if offset + octets > extent || at + octets > staging.octets() {
-            return Err(DeviceError::Shape {
-                what: "a staged copy within its buffer and its staging",
-                expected: extent.min(staging.octets()),
-                found: (offset + octets).max(at + octets),
-            });
-        }
-        Ok(())
-    }
-
-    /// **Copy `octets` octets of page-locked staging, from `at`, into a buffer at the octet
-    /// `offset`**, ordered on the card's stream: no host synchronization.
-    ///
-    /// # Safety
-    /// The staged octets stay unwritten until the card's stream has passed the copy.
-    pub(crate) unsafe fn stage_in<T: Copy>(
-        &self,
-        buffer: &CardBuffer<'_, T>,
-        offset: usize,
-        staging: &PinnedHost,
-        at: usize,
-        octets: usize,
-    ) -> Result<(), DeviceError> {
-        self.owns(buffer)?;
-        Self::staged_range(buffer, offset, staging, at, octets)?;
-        self.current()?;
-        unsafe {
-            self.stream.copy_host_to_device_async(
-                buffer.device_ptr() + offset as CUdeviceptr,
-                staging.as_ptr().cast::<u8>().add(at).cast(),
-                octets,
-            )?;
-        }
-        Ok(())
-    }
-
-    /// **Copy `octets` octets of a buffer, from the octet `offset`, into page-locked staging at
-    /// `at`**, ordered on the card's stream: the octets are there once the stream is synchronized.
-    ///
-    /// # Safety
-    /// The staging octets are neither read nor written until the card's stream has passed the copy.
-    pub(crate) unsafe fn stage_out<T: Copy>(
-        &self,
-        buffer: &CardBuffer<'_, T>,
-        offset: usize,
-        staging: &mut PinnedHost,
-        at: usize,
-        octets: usize,
-    ) -> Result<(), DeviceError> {
-        self.owns(buffer)?;
-        Self::staged_range(buffer, offset, staging, at, octets)?;
-        self.current()?;
-        unsafe {
-            self.stream.copy_device_to_host_async(
-                staging.as_mut_octets().as_mut_ptr().add(at).cast(),
-                buffer.device_ptr() + offset as CUdeviceptr,
-                octets,
-            )?;
-        }
-        Ok(())
-    }
-
     /// Zero `octets` octets of a buffer from the octet `offset`, ordered on the card's stream (no
     /// transfer); both are multiples of four, the memset's word.
     pub(crate) fn zero_octets<T: Copy>(
@@ -801,28 +721,6 @@ impl Card {
     /// Wait until every launch on the card's stream has completed.
     pub fn synchronize(&self) -> Result<(), DeviceError> {
         Ok(self.stream.synchronize()?)
-    }
-
-    /// Begin recording the card's stream as one graph: launches issued until
-    /// [`Card::end_capture`] are bound, not executed. No allocation or synchronous transfer may be
-    /// issued in between (the driver refuses it).
-    pub(crate) fn begin_capture(&self) -> Result<(), DeviceError> {
-        self.current()?;
-        Ok(self.stream.begin_capture()?)
-    }
-
-    /// Close the capture and instantiate the bound graph.
-    pub(crate) fn end_capture(&self) -> Result<(GraphExec, GraphCensus), DeviceError> {
-        self.current()?;
-        let graph = self.stream.end_capture()?;
-        let census = graph.census()?;
-        Ok((graph.instantiate()?, census))
-    }
-
-    /// Launch an instantiated graph on the card's stream.
-    pub(crate) fn launch_graph(&self, graph: &GraphExec) -> Result<(), DeviceError> {
-        self.current()?;
-        Ok(graph.launch(&self.stream)?)
     }
 }
 

@@ -394,8 +394,6 @@ fn the_card_opens_with_its_census() {
     for name in [
         lattice::READ_ENTRY,
         moment::INGEST_ENTRY,
-        word::TICK_ENTRY,
-        word::ADJOINT_ENTRY,
         word::RESIDUAL_ENTRY,
         word::REFINE_ENTRY,
         word::CERTIFICATE_ENTRY,

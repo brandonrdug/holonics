@@ -4,9 +4,9 @@
 //!
 //! [definition] One library for the laws, one backend for the card: every law here is a law of
 //! `holonics::hnn`, realized on the card with exact integers, and each kernel family has a parity
-//! test against its host owner or an exact host oracle of its contract (`tests.rs`,
-//! `word_tests.rs`), and the execution port a parity test against the host reference return by
-//! return (`port_tests.rs`). What is built:
+//! test against its host owner or an exact host oracle of its contract (`tests.rs`; the inverse
+//! charts' entries through the port's chart parity), and the execution port a parity test against
+//! the host reference return by return (`port_tests.rs`). What is built:
 //!
 //! - [`card`]: the [`Card`] (one context owning its image, stream and [`CardBuffer`]s, #15), its
 //!   [`DeviceCensus`], and the layouts derived from it with their [`Realization`];
@@ -17,12 +17,9 @@
 //!   a ring rotation;
 //! - [`moment`]: the phase-binned source moment resident on the card, and its ingest (the
 //!   selective steps' scan with carries, then the counts' histogram);
-//! - [`word`] (the lattice word, Lean `HNN/LatticeWord`): the word's carried tick and its adjoint on
-//!   lattice charts, the error-feedback split with the remainder carried on the card and released
-//!   at the word's end, resident chaining (tick by tick, a captured graph of `k` ticks, or a whole
-//!   window's word as one graph with its load and release copies); and the inverse charts'
-//!   Newton–Schulz refinement with its exact certificate `‖1 − AX̂‖∞`, warm-started when a deposit
-//!   moves the operator;
+//! - [`word`] (the lattice word, Lean `HNN/LatticeWord`): the inverse charts' Newton–Schulz
+//!   entries with their exact certificate `‖1 − AX̂‖∞` and exponent ceiling, the entries' refusals,
+//!   and the loaded resonators' plan the resident word runs;
 //! - [`tree`] (campaign 2; the storage where paths part): **the receiving parametron's landmark tree mirrored on the
 //!   card, stored at the faces where paths part**, its windows' splits in cell order and its
 //!   deposits' opened-path updates with their splits and label runs (`kernels/tree.cu`, its own
@@ -43,7 +40,6 @@
 //! |---|---|---|---|---|
 //! | `hnn_lattice_read` | one output entry `(row i, vector b)`; grid `(rows, vectors)` | one residue class `j ≡ t` of the row's columns; `threads` = the least power of two covering the row, at least a warp, within the census | `⌈columns/threads⌉` columns of its row | shared-memory tree of ring words and saturated certificates |
 //! | `hnn_moment_ingest` | the whole cell sequence (one block) | one cell of each tile of `threads` cells; `threads` = the greatest power of two the census and the rings' scans admit | the tiles, in order, carrying the rings' phases | per ring a block scan per tile; the counts are atomic additions |
-//! | `hnn_word_tick`, `hnn_word_adjoint_tick` | one output entry (row `i` of region `g`); grid = the flattened rows `Σ_g n_g`, every region of the stage at once | one residue class `j ≡ t` of the row (of `Q`, or of `Qᵀ`'s column); `threads` as the read's, over the widest region | `⌈n_max/threads⌉` columns | the shared tree; thread 0 adds the remainder and splits |
 //! | `hnn_inverse_residual`, `hnn_inverse_refine` | one output entry `(i, j)` of pair `g`; grid `(Σ_g n_g, n_max)`, blocks with `j ≥ n_g` return at once | one residue class `k ≡ t` of the contraction; `threads` as the read's | `⌈n_max/threads⌉` terms | the shared tree; the refinement's thread 0 splits at `2^S` and moves the chart |
 //! | `hnn_inverse_certificate` | one chart | one residue class `i ≡ t` of the chart's rows; `threads` = the least power of two covering the widest chart, at least a warp | its rows, and within each the row's `n` columns | a shared tree of maxima |
 //! | `hnn_word_forward`, `hnn_word_reverse` | the whole word: one block runs its open, every tick (or reverse step) and its receiving read, the stages ordered by barriers; loaded rings run after the element and the commuting contact solve/arrival, before the next junction | one row of the stage (`row ≡ t`): a ring row, a contact row, an arrival coordinate, an incidence, a logit; `threads` = the least power of two covering the widest stage, at least a warp, within the entry's and the census's ceilings ([`word_layout`]) | `⌈rows/threads⌉` rows of each stage, and within a ring's resonator solve a row loops over its `n` material/chart columns | none across rows: each row's sums are certified in its own thread; the conductance's parts are one thread's loop over its channel or ring |
@@ -106,8 +102,7 @@
 //! | `kernels/exact_resident_adjoint.cuh::section_receiver_return` (one block per row, threads striding the row, a shared tree) and `kernels/exact_packet_linear.cuh::section_packet_contract` (the exact contraction, realized by one thread over every row) | `kernels/hnn.cu::hnn_lattice_read`, [`lattice`] | the lattice read `y = A x` at `2^(−(L_A + L_x))`, one block per entry | `tests::lattice_read_matches_the_host_on_small_fixtures`, `tests::campaign_one_reads_and_ingest_match_the_host` (GPU) |
 //! | `crates/holonics-cuda/src/launch_law.rs` (D1: "no bound is authored") | [`card::read_layout`], [`card::ingest_layout`] | the layout derived from the census, refused past it | `tests::read_layout_is_derived_from_the_census`, `tests::ingest_layout_is_derived_from_the_census` |
 //! | none (new) | `kernels/hnn.cu::hnn_moment_ingest`, [`moment`] | `SourceMoment::ingest` with `Field::selective_step` | `tests::moment_ingest_matches_the_host_moment`, `tests::campaign_one_reads_and_ingest_match_the_host` (GPU) |
-//! | none (new) | `kernels/hnn.cu::{hnn_word_tick, hnn_word_adjoint_tick}`, `exact_integer.cuh::hnn_nearest`, [`word`] | Lean `HNN/LatticeWord.{feedback_tick, feedback_accounting, executed_adjoint_pairing}` | `word_tests::the_tick_accounts_exactly`; GPU: `word_tick_matches_the_oracle_on_small_fixtures`, `word_tick_accounting_holds_on_the_card`, `word_ticks_match_the_oracle_at_campaign_one_shapes`, `resident_word_equals_the_oracle_word_and_is_measured` |
-//! | none (new; history's float proposal is not ported, below) | `kernels/hnn.cu::{hnn_inverse_residual, hnn_inverse_refine, hnn_inverse_certificate}`, `exact_integer.cuh::hnn_bounded_product`, [`word`] | Lean `HNN/LatticeWord.{nsStep, newton_schulz_right, rounded_refinement_certificate, warm_start_certificate}` | GPU: `word_tests::newton_schulz_matches_the_oracle_on_small_fixtures`, `newton_schulz_matches_the_oracle_at_campaign_one_shapes` |
+//! | none (new; history's float proposal is not ported, below) | `kernels/hnn.cu::{hnn_inverse_residual, hnn_inverse_refine, hnn_inverse_certificate}`, `exact_integer.cuh::hnn_bounded_product`, [`word`]'s entries, run by `store` | Lean `HNN/LatticeWord.{nsStep, newton_schulz_right, rounded_refinement_certificate, warm_start_certificate}`; `holonics::hnn::chart::refine` | `word_tests::the_inverse_layouts_are_derived_from_the_census`, `word_tests::the_inverse_ceiling_is_the_carriers`; GPU: the port's chart parity in `port_tests::the_card_port_returns_the_reference_on_{the_chain, a_generic_constitution, campaign_one, the_standing_cut}` |
 //! | none (new; campaign 2; the storage where paths part) | `kernels/tree.cu::{hnn_tree_splits, hnn_tree_deposit, hnn_tree_undo, hnn_tree_gather, hnn_tree_split_ratios}`, [`tree`] | `holonics::compression::landmark::context::{Landmarks::window, Landmarks::deposit, Landmarks::touched, Beta::step, Beta::split}`, `holonics::hnn::receiving::window_splits` | GPU: `tests::the_card_tree_reads_and_deposits_as_the_host_tree`, `tests::the_card_split_is_the_hosts`; the port's lockstep tests |
 //! | none (new) | `kernels/hnn_word.cuh::{hnn_word_forward, hnn_word_reverse, hnn_pair_weights, hnn_copy_words, hnn_scatter_words}`, [`port`] | `holonics::hnn::{word::Word, port::Word::pull_back, receiving::ReceivingPhases::read, moment::SourceMoment::open_storage, chart::refine}` and the reference's `ExecutionPort` | GPU: `port_tests::the_card_port_returns_the_reference_on_{the_chain, a_generic_constitution, campaign_one, the_standing_cut}`, `the_card_port_refuses_as_the_reference` |
 //!
@@ -116,8 +111,8 @@
 //!
 //! **Not ported**, with the reason:
 //! - `kernels/enclosure_cayley.cuh`: its Cayley step proposes by a double-precision LU, a float
-//!   inside a law. The ring element's inverse is now the Newton–Schulz lattice chart
-//!   ([`ResidentInverses`]), exact integers with an exact certificate.
+//!   inside a law. The ring element's inverse is now the Newton–Schulz lattice chart (`store`),
+//!   exact integers with an exact certificate.
 //! - `kernels/exact_resident_adjoint.cuh`'s receiver return: a `tanh`/`exp` chart with enclosures,
 //!   retired by the faces in `ℚ(θ)`.
 //! - `exact_integer.cuh`'s multi-limb `ExactInteger<N>`, the directed shifts, dyadic scaling,
@@ -162,10 +157,7 @@ pub use lattice::{Gather, LatticeCoordinates, LatticeRead, ResidentLattice, Resi
 pub use moment::{MomentCounts, MomentSnapshot, ResidentMoment};
 pub use port::{Mounted, Resident, Traffic};
 pub use tree::{CardTree, TreeTimes};
-pub use word::{
-    CarryRelease, Certificate, ChartRelease, InversePair, Orientation, Refusal, ResidentCarry,
-    ResidentCharts, ResidentInverses, ResonatorPlan, WordChart, WordGraph,
-};
+pub use word::{Refusal, ResonatorPlan};
 
 use holonics::hnn::HnnError;
 use thiserror::Error;
@@ -214,30 +206,8 @@ pub enum DeviceError {
     Carrier { entries: Vec<(usize, usize)> },
     #[error("a gather index lies outside its operand at the entries (vector, row) {entries:?}")]
     Malformed { entries: Vec<(usize, usize)> },
-    #[error("{what}: the exponent {exponent} exceeds its ceiling {ceiling}")]
-    Exponent {
-        what: &'static str,
-        exponent: u32,
-        ceiling: u32,
-    },
-    #[error(
-        "region {region}, entry {entry}: the opening remainder lies outside its cell [-2^({exponent}-1), 2^({exponent}-1))"
-    )]
-    OffCell {
-        region: usize,
-        entry: usize,
-        exponent: u32,
-    },
-    #[error(
-        "the word refused the entries (region, entry, refusal) {entries:?}; they are reported, never rounded"
-    )]
-    Refused {
-        entries: Vec<(usize, usize, word::Refusal)>,
-    },
     #[error("a kernel wrote the status word {status}, which names no refusal")]
     Status { status: u32 },
-    #[error("a word's graph launches only on the carry and parity it was captured on")]
-    Graph,
     #[error(transparent)]
     Hnn(#[from] HnnError),
 }
