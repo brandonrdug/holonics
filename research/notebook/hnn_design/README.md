@@ -1471,3 +1471,51 @@ on the admitted egg, so the population drops the seven trees:
   eight families and 1,298 for the flat tree;
 - the passage takes 166,113 ms at a 3,400,306,688-byte peak resident set, against 272,849 ms at
   10,843,217,920 for all eight families.
+
+## F6 chase terrain: the reception phase (September 28)
+
+```sh
+cargo run --release -p holonics --example hnn_chase
+```
+
+`holarchy::terrain::chase` is the first terrain on which a mover meets another's constitution
+(THE_REBUILD F6; campaign 4, #27, #148). A `16 × 16` lattice arena of `4 × 4` friction patches
+(ice `1/2`, grass `1`, track `3/2`; `g = 8`, `h = 1/2`, `ℓ = 1`) admits a runner's velocity
+change only if `⟨Δv, Δv⟩ ≤ (γ μ g h²/ℓ)²`. The runner demands as on the ground it last pushed
+from, so a demand fails, and slips for its declared hold, where the ground under it has dropped
+to a lower class. Walls clamp the step and zero the crossing velocity. A scripted pure pursuer
+(speed `3/2`, traction `2`) ends the passage at capture, `Q ≤ 2`. The cells are the runner's
+realized moves, slips and wall meetings: 69 moves, 71 letters. The reception population is
+`receiver::population::ChaseFamily`: one family per candidate of the declared 40 (speeds `2, 3`,
+traction coefficients `1, 3/2`, holds `1, 2`, flee, circle both ways, zig-zag at periods `2` and
+`3`), each 6 bits, with escape mass `2^(−12)`.
+
+The receipt covers 16 hash-seeded arenas (seeds `20260927` to `20260942`) with passages of at most
+`2^8` ticks, 9 of them ended by capture (5 to 30 ticks). Each is read in at most 53 ms on the
+host. On all 16:
+
+- the population's selected fibre, read exactly as its greatest `π_f L_f`, is the surviving
+  fibre and holds the truth;
+- its code lies within the 6-bit naming margin of the truth family's own code;
+- its code lies strictly below the landmark tree's least code over depths `1, 2, 4, 8`.
+
+Six of the sixteen seeds, read at `L_R = 16` (the harness prints every seed with exact endpoints):
+
+| Seed | Truth | Cells | Slips (onsets/ticks), walls | Population | Truth's own | Tree's least | Fibre | Future classes (5 ticks) |
+|---|---|---|---|---|---|---|---|---|
+| 20260928 | `[19]` v 3, γ 3/2, hold 1, circle cw | 256 | 19/19, 21 | `4 + 6/16 + ε` | `0 + 1/16 + ε` | `324 + 10/16 + ε` | 2 | 1 |
+| 20260931 | `[36]` v 2, γ 1, hold 2, zig-zag 3 | 256 | 12/19, 6 | `5 + 6/16 + ε` | `0 + 1/16 + ε` | `619 + 5/16 + ε` | 1 (selected) | 1 |
+| 20260934 | `[39]` v 3, γ 3/2, hold 2, zig-zag 3 | 256 | 8/15, 16 | `5 + 6/16 + ε` | `0 + 1/16 + ε` | `519 + 12/16 + ε` | 1 (selected) | 1 |
+| 20260935 | `[37]` v 3, γ 1, hold 2, zig-zag 3 | 9, captured | 0/0, 0 | `3 + 5/16 + ε` | `0 + 0/16 + ε` | `42 + 14/16 + ε` | 4 | 2: `{33, 37}`, `{32, 36}` |
+| 20260937 | `[7]` v 3, γ 3/2, hold 2, flee | 256 | 0/0, 16 | `4 + 6/16 + ε` | `0 + 1/16 + ε` | `370 + 1/16 + ε` | 2 | 1 |
+| 20260941 | `[15]` v 3, γ 3/2, hold 2, circle ccw | 5, captured | 0/0, 0 | `1 + 5/16 + ε` | `0 + 0/16 + ε` | `16 + 11/16 + ε` | 16 | 1 |
+
+A single candidate survives on 5 seeds. Every plural fibre on a passage the pursuer did not end
+early differs only in its slip hold: no slip was demanded, or each slip was followed by a wall
+meeting or another slip, where both holds emit alike. The fibres read as the record's
+identifiability law (§14.10). Seed `20260935`'s passage ends before the runner shows its speed, so
+speeds 2 and 3 survive together, and an admitted pursuer word of five ticks parts them into two
+future classes. There the exact family is required only once that probe is emitted, which is the
+action phase (item 13). The circle navigators ignore the pursuer, so no admitted word parts their
+holds. The runs above are development receipts on terrain whose truth is exact. The action phase
+(the machine as chaser, threshold commits, the switches, cornering) is not built.

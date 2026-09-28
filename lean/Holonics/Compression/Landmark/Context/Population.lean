@@ -24,6 +24,11 @@ emit another class), so this module states the same mixture with **nonnegative**
   pair of its factors' classes, keeps the product of the factors' survivors, so its count is the
   product and its code the sum of the factors' codes (the sheet tuple read per ring; the Rust cell is
   the pair's injective mixed-radix code).
+* `escaped_fibre_is_mode` [proved-derived; formal-checked]: a deterministic key's **escaped** face
+  (`1 − η` on its own class, `δ` elsewhere) keeps faces positive; a key surviving to `n` has
+  likelihood `(1 − η)^n` (`seqLik_escaped_survivor`), and with `0 < δ < 1 − η` it strictly exceeds
+  every contradicted key's, so under the uniform prior the families of greatest posterior are exactly
+  the survivors (Rust `receiver::population::ChaseFamily`, the chase terrain's reception).
 * `death_is_an_exchange` [proved-derived; formal-checked] (a corollary of
   `HolonicAdjointNormalization.sum_replicator`): death is an exchange, never a deletion. At a cell
   whose likelihood is zero for the dying families and positive in total, each dying family's weight
@@ -298,6 +303,49 @@ theorem survivors_product {κ₁ κ₂ C₁ C₂ : Type*} [Fintype κ₁] [Finty
   rw [Real.logb_mul q₁.ne' q₂.ne', Real.logb_mul p₁.ne' p₂.ne']
   ring
 
+/-- [definition] **A deterministic key's escaped face** of the received cell: `1 − η` where it emits
+the cell, the escape `δ` elsewhere (Rust `receiver::population::ChaseFamily`, `δ = η/(A − 1)` on an
+alphabet of `A` letters), so the face stays positive and a contradicted key pays instead of
+dying. -/
+def escaped (e : κ → ℕ → C) (x : ℕ → C) (η δ : ℚ) : κ → ℕ → ℚ :=
+  fun k t => if e k t = x t then 1 - η else δ
+
+omit [Fintype κ] [DecidableEq κ] in
+/-- A key that survives to `n` has escaped likelihood `(1 − η)^n`. -/
+theorem seqLik_escaped_survivor (e : κ → ℕ → C) (x : ℕ → C) (η δ : ℚ) {k : κ} {n : ℕ}
+    (hk : ∀ s < n, e k s = x s) : seqLik (escaped e x η δ k) n = (1 - η) ^ n := by
+  have hface : ∀ t ∈ range n, escaped e x η δ k t = 1 - η := fun t ht => by
+    simp [escaped, hk t (mem_range.mp ht)]
+  unfold seqLik
+  rw [prod_congr rfl hface, prod_const, card_range]
+
+omit [DecidableEq κ] in
+/-- [proved-derived; formal-checked] **`escaped_fibre_is_mode`: the escaped population selects the
+surviving fibre.** With `0 < δ < 1 − η`, every key that survives to `n` has strictly greater
+escaped likelihood than every key the passage contradicted before `n`; so under the uniform prior
+the families of greatest posterior are exactly the survivors whenever one survives (Rust
+`receiver::population::selected_fibre` against `holarchy::terrain::Chase::fibre`). -/
+theorem escaped_fibre_is_mode (e : κ → ℕ → C) (x : ℕ → C) {η δ : ℚ} (hδ : 0 < δ)
+    (hlt : δ < 1 - η) {k j : κ} {n : ℕ} (hk : k ∈ survivors e x n)
+    (hj : j ∉ survivors e x n) :
+    seqLik (escaped e x η δ j) n < seqLik (escaped e x η δ k) n := by
+  simp only [survivors, mem_filter, mem_univ, true_and, not_forall] at hk hj
+  obtain ⟨s, hs, hne⟩ := hj
+  have hη : 0 < 1 - η := lt_trans hδ hlt
+  have hconst : (1 - η) ^ n = ∏ _t ∈ range n, (1 - η) := by rw [prod_const, card_range]
+  rw [seqLik_escaped_survivor e x η δ hk, hconst]
+  unfold seqLik
+  refine Finset.prod_lt_prod (R := ℚ) (fun t _ => ?_) (fun t _ => ?_)
+    ⟨s, mem_range.mpr hs, ?_⟩
+  · unfold escaped; split_ifs
+    · exact hη
+    · exact hδ
+  · unfold escaped; split_ifs
+    · exact le_rfl
+    · exact hlt.le
+  · simp only [escaped, hne, if_false]
+    exact hlt
+
 end Survivors
 
 section Exchange
@@ -361,6 +409,8 @@ section Audit
 #print axioms sum_indicator
 #print axioms survivor_code
 #print axioms survivors_product
+#print axioms seqLik_escaped_survivor
+#print axioms escaped_fibre_is_mode
 #print axioms death_is_an_exchange
 #print axioms certified_inverseCDF_class
 
