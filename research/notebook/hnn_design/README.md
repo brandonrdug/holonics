@@ -867,3 +867,29 @@ the prior is `1/7` a family. Survivor filtering enumerates at most `2^24` keys. 
   `18067 + 2/16 + ε`, `2 + 9/16 + ε` above; held out (1,190 cells) it reads `3677 + 12/16 + ε`
   (`3 + 1/16 + ε` a cell) against the tree's `3677 + 12/16 + ε`, the campaign 1 receipt's exact
   face, `0 + 0/16 + ε` apart.
+
+### The curated source's own navigators, measured and retired (commit `38b0b81c`, reverted)
+
+A tree per port (each channel's bytes on its own conversation span, the part's end coded as a
+boundary) and a section navigator (a letter tree on the section epochs and a recency-rank tree for a
+switch's target) were measured against the flat stream. Bits at `L_R = 16`, each `+ ε`:
+
+| | per-port reader | typed reader (kept) |
+|---|---|---|
+| every byte vs flat, development | `+24904 + 14/16` | `−3080 + 13/16` |
+| every byte vs flat, held out | `+10264 + 8/16` | `−844 + 13/16` |
+| whole stream charged vs flat, development | `+30878 + 2/16` | `+2695 + 12/16` |
+| whole stream charged vs flat, held out | `+10956 + 1/16` | `−161 + 4/16` |
+
+What it located:
+- **Separate trees lose the landmarks the ports share.** A reply and its request quote each other,
+  and the human port's 65101 bytes are too few to learn from alone.
+- **A shared tree still does not help.** One tree shared by all ports on the same
+  per-conversation spans codes its bytes `−2168 + 12/16` below flat, still above the typed reader,
+  which also reads the tail of the request a part answers.
+- **The boundary is the cost.** The section cost splits into the boundaries (where a part ends:
+  human `849 + 1/16` over 84 ends, agent `3139 + 4/16` over 1392), the letter kinds
+  (`1839 + 12/16`, `1 + 3/16` a letter) and the switch targets (`139 + 0/16` over 335).
+
+The typed reader stays. Campaign 5 needs a joint address across ports (the shared landmarks) and a
+cheaper boundary: the part's end predicted by more than its bytes.
