@@ -57,6 +57,11 @@
 //!   mover's loop, its prediction against its own motor record at the reading's tick, closes it
 //!   (the record's §9; the machine's reception).
 //!
+//! [measured] On the switches' pinned population (the notebook's `hnn_chase switches`, 63 chased
+//! seeds of `20261301 + s`, `d = 1`, aeons uniform on `1..=4`), the machine's closure located the
+//! turned frame on 111 of the 111 active aeons read and on no inactive one: 264 of 264 active ticks
+//! with the truth's channel and turn, no false alarm over 583 readings.
+//!
 //! [definition] The computational object is the helical pair interaction: the channels are pair
 //! contacts between the observed frame and the runner's directions, each contact's slip a
 //! quarter-turn, and their loop closure is the Bombe's pairwise closure over the menu of contacts: a

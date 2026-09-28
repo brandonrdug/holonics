@@ -2509,3 +2509,50 @@ it.
   (240); won against both at once on 9 of 16 (3 off); the fault located on 25 of 25 active aeons and
   60 of 60 active ticks, none else; the constitution equal to the prompt one on 16 of 16; 146 of 146
   released bounds kept.
+
+**The run** (once, on the pin at commit `95a8864a`: `switches`, 162,402 ms at a 269,180 kB peak,
+within its projection). The terrain refuses 1 of the 64 draws (20261325 opens within capture), so 63
+seeds are chased.
+
+| Over the 63 chased seeds | The machine | Pure pursuit | Constant bearing |
+|---|---|---|---|
+| Capture ticks in sum, **switches on** | **646** | 19,255 | 4,713 |
+| Capture ticks in sum, switches off | 611 | 17,034 | 1,949 |
+| The machine against both at once, win/tie/loss, switches on | 38/18/7 | | |
+| The machine against both at once, win/tie/loss, switches off | 36/25/2 | | |
+
+The truth-only least sums 587 (the machine's regret 59 with the switches on, 24 off). Pure pursuit
+leaves 36 passages uncaptured by `2^9` with the switches on (32 off), each counting its cap.
+
+- **Criterion 1, capture still beats both controls: passed.** 646 < 19,255 and 646 < 4,713, and the
+  machine takes strictly fewer ticks than both at once on 38 of the 63 chased seeds (more than half
+  is 32). It loses on 7: 20261314 (8 against pursuit's 6), 20261327 (14 against bearing's 13),
+  20261330 (4 against 1 and 1; 3 with the switches off, the least 1), 20261333 (10 against bearing's
+  7), 20261338 (11 against 10), 20261349 (7 against 6) and 20261361 (8 against pursuit's 6). The
+  switches cost the machine 36 ticks over 22 seeds (at most 6, on 20261360) and save it 1 on
+  20261344, 35 net; the cost is the lag's, since at lag zero the located fault leaves every passage
+  unchanged (the probe at `d = 0` and `sensing_tests`). They cost constant bearing 2,764 and pure
+  pursuit 2,221.
+- **Criterion 2, the fault located on exactly its active aeons: passed.** Over the 583 readings
+  received, 250 aeons are read, 111 of them active: all 111 are located, no inactive aeon is, and
+  every location names the truth's channel and turn. Per tick: located exactly on 264 of the 264
+  active ticks, none wrong, none unlocated, no false alarm.
+- **Criterion 3, lag-caused errors deposit nothing: passed.** The switched machine's constitution
+  equals the prompt reception's on the true cells at every decision and exactly at the end, on 63 of
+  63 seeds. Of its 126 action-time misses, 48 are the lag's (the contemporary constitution predicted
+  the reading); they reach no locus. 178 readings deposit in the runner's constitution (a member of
+  the contemporary fibre emitted another cell).
+- **The lagged basin keeps its certificates**: 589 of 589 released bounds kept under `d = 1`, no pledge
+  broken.
+- **F6's switch bullet, as written, passes on this population.** F6's action acceptance as a whole
+  still reads its first bullet on the pinned acceptance seeds, where it fails (7 of 16 won against
+  both controls at once, `action trace`, unchanged); that failure stands as written, so the action
+  acceptance is not passed. With the switches off, this population reads the capture bullet as
+  passing too (611 against 17,034 and 1,949; 36 of 63), beside the second fresh population's 28 of 63
+  for the robust plan.
+- Gates: `cargo check --workspace --all-targets`; `cargo test -p holonics --lib`, 886 passed.
+- **Owed in Lean** (#62): the localization condition (a defect on at most `k` edges of a circuit menu
+  is located uniquely iff `ker C` holds no nonzero vector of support at most `2k`) with the complete
+  three-channel menu over `ℤ/4` as its instance; the lagged capture basin is the Pre recursion of the
+  lagged information structure (and equals the unlagged one at `d = 0`); the attribution's split
+  `q − p_act = (q − p_con) + (p_con − p_act)` with deposition consuming `q − p_con` alone.

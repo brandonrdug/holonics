@@ -747,7 +747,11 @@ fn fresh() {
 /// bullet): the seeds `SWITCH_SEED + s`, `s < SWITCH_SEEDS`, a declared contiguous range disjoint from
 /// every range read so far (the acceptance seeds `SEED + s` and the choosing seeds `CHOOSING_SEED +
 /// s`, `s < 16`; the spent fresh populations `FIRST_FRESH_SEED + s` and `FRESH_SEED + s`, `s < 64`),
-/// none read before this pin and none selected by any property.
+/// none read before this pin and none selected by any property. [measured] Run once (pinned at commit
+/// `95a8864a`; 162,402 ms at a 269,180 kB peak; 63 chased seeds): with the switches on the machine 646
+/// capture ticks against pure pursuit's 19,255 and constant bearing's 4,713, fewer than both at once
+/// on 38 of 63; the fault located on 111 of 111 active aeons and no other; the constitution equal to
+/// the prompt one on 63 of 63. The switch bullet passes as written.
 const SWITCH_SEED: u64 = 20_261_301;
 const SWITCH_SEEDS: u64 = 64;
 

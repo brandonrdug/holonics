@@ -204,6 +204,14 @@
 //!   holds (the notebook's `hnn_chase switches` checks it on every seed, at every tick and exactly at
 //!   the end).
 //!
+//! [measured] **F6's switch bullet, read once** (the notebook's `hnn_chase switches`, pinned at commit
+//! `95a8864a`: 63 chased seeds of `20261301 + s`, `s < 64`, `d = 1`, the fault's aeons uniform on
+//! `1..=4`). With the switches on the machine takes 646 capture ticks against pure pursuit's 19,255 and
+//! constant bearing's 4,713, fewer than both at once on 38 of 63 (off: 611, 17,034 and 1,949; 36 of
+//! 63). The fault is located on 111 of the 111 active aeons read and on no other (264 of 264 active
+//! ticks, none wrong). The constitution equals the prompt one on 63 of 63 seeds, 48 of the 126
+//! action-time misses being the lag's, and 589 of 589 released bounds are kept.
+//!
 //! [definition; agent-inferred] **The parameters**: the viable tube's horizon `n`, the capture
 //! basin's horizon `m` and the price `d`, chosen on a pinned choosing set of seeds disjoint from the
 //! acceptance seeds (the notebook's `hnn_chase choose`), never on the acceptance seeds: `n = 2`,
