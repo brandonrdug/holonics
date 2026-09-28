@@ -219,6 +219,13 @@ orientation class (`Geometry/Navigation`). The Swing's charts are:
   its inner Swings with their individual clock passages. Placement on apparatus is a separate
   receiver (`HolonicClockedPantographicSwingApparatus`).
 
+[proved-derived; GPT-6 Astra, September 27, [record](../research/records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md#14-gpt-6-astras-review)] **The
+Swing is the square of an oriented quarter-turn.** With polarity `D = diag(−1, 1)` and exchange
+`S = [[0, 1], [1, 0]]` (Kauffman's iterants), `D² = S² = I`, `SD = −DS`, and `J = DS` has `J² = −I`,
+`J⁴ = I`. At an anchor, `Q_a x = a + J(x − a)` gives `Q_a² = S_a` and `Q_a⁴ = id`. A distinction
+with an oriented exchange admits a complex phase chart; it does not derive a parametron's storage
+law, and a period-two toggle creates no clock (Lean owed in #62).
+
 Rebasing the observation, receiver and navigators through a Swing preserves every possible future
 face, and in a normed chart the Swing carries a declared tolerance exactly (`Geometry/SwingPotential`).
 With a subspace for its anchor, the Swing is `R_D=2P_D−I`: it splits one current into two shares and
@@ -422,7 +429,18 @@ deposit bends the next current split (1/3 → 5/16 on two parallel edges), that 
 sufficient retention for every solver while the last flux is not, and that the constitution is
 **not minimal**: `(1,1)` and `(2,2)` have identical futures. Retention is therefore the
 future-sufficient **quotient of the constitution** (`Standing.standingLaw_exists_iff_future_factors`),
-never a record of the fluxes that shaped it. One law covers both of Brandon's physical pictures:
+never a record of the fluxes that shaped it.
+
+[proved-derived; GPT-6 Astra, September 27, [record](../research/records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md#14-gpt-6-astras-review)]
+**For an acting receiver, the admitted future includes its actions.** A passive quotient can merge
+two constitutions that emit alike under every action taken so far and differ under a probe. Where
+actions are admitted, retention is the **action-sufficient** quotient: `h ∼ h'` exactly when, for
+every admitted action word `a₁…a_m` and admitted receiver, the future faces under `do(a₁…a_m)` agree.
+In a linear chart this is `ker E ⊆ ker ρ` and `T_a ker E ⊆ ker E` for every admitted `a`: the
+decoding and continuation squares quantified over controls. Predictive-state representations
+(Littman, Sutton and Singh, 2001) are the established construction. Lean owed in #62.
+
+One law covers both of Brandon's physical pictures:
 
 ```text
 flux from constitution    j = ⋆_Θ dφ,  ∂j = σ                               JunctionLaw, HodgeReceiver

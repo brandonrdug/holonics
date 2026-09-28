@@ -128,7 +128,9 @@ mathematics, not a style.
 - No unjustified literal or magic number enters a law.
 
 [definition] **Retention is a quotient sufficient for the admitted future**
-(`Foundation/Standing.lean`, `holonics::receiver::standing`). It is never an event archive, tape,
+(`Foundation/Standing.lean`, `holonics::receiver::standing`). Where the machine acts, the admitted
+future includes its admitted actions: the quotient must not merge constitutions that a probe would
+separate ([objects §8](docs/ELEMENTARY_OBJECTS.md#8-deposition)). It is never an event archive, tape,
 journal, ledger, or frozen producing cut kept for replay. "A current changes the standing a later
 current meets" is a consequence of that law, not the definition of learning. Do not derive from it
 a per-occurrence state chain, its adjoint tape, frozen cuts, or a fold over an update list. The
