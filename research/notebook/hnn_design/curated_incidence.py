@@ -26,7 +26,7 @@ cut's codes: a letter on the reading port and a letter on the target's.
     HOLONICS_ROOT=<main checkout> python3 research/notebook/hnn_design/curated_incidence.py
 
 An optional `choosing` or `validation` argument reads that F4 role's private source and cut;
-pass `F1` or `F2` second to read that item's role. Targets absent from the role's source remain unheld.
+pass `F1`, `F2` or `F5` second to read that item's role. Targets absent from the role's source remain unheld.
 The exterior join shifts validation's within-role relation ticks into the joint passage.
 
 Outputs in `.local/cuts/`:
@@ -58,7 +58,7 @@ def letter_tick(occurrence, start):
 
 def main():
     arguments = sys.argv[1:]
-    if arguments and (len(arguments) not in (1, 2) or arguments[0] not in ("choosing", "validation") or (len(arguments) == 2 and arguments[1] not in ("F1", "F2"))):
+    if arguments and (len(arguments) not in (1, 2) or arguments[0] not in ("choosing", "validation") or (len(arguments) == 2 and arguments[1] not in ("F1", "F2", "F5"))):
         sys.exit(__doc__)
     item = arguments[1].lower() if len(arguments) == 2 else "f4"
     prefix = "curated" if not arguments else f"curated-{item}-{arguments[0]}"

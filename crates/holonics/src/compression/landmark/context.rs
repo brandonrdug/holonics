@@ -549,6 +549,10 @@ pub mod spans;
 
 pub use sections::{Section, SectionChart, SectionSlots, Sections};
 pub use spans::{Located, SpanReading};
+mod checkpoint;
+pub use checkpoint::StandingCodecError;
+mod passage_checkpoint;
+pub use passage_checkpoint::PassageCodecError;
 
 // -------------------------------------------------------------------------------------------
 // the refusals

@@ -1,6 +1,6 @@
 # Construction state
 
-**September 27, after F4's split-family release gate and the F1/F2 pins.**
+**September 27, during F5's development continuation after the F4/F1/F2 gates.**
 [THE_REBUILD](docs/plans/THE_REBUILD.md) owns the implementation order; each law lives in its guide or
 owner, and THE_REBUILD's [Decisions index](docs/plans/THE_REBUILD.md#i-the-decisions-index) maps the
 former numbered Decisions to them.
@@ -17,13 +17,13 @@ The repository was reset on September 24; the pre-reset tree is
 | Campaign 2 | Ring/contact laws and parity pass; its additional predictive criterion fails. The measured field declares no resonators or boost signatures |
 | Loaded resonator (`hnn::ring`) | Loaded resonator forward/adjoint and material deposition built on host/card; the fixed source-ring family does not improve the standing-cut prediction |
 | Register capacity (`compression::landmark::context`) | A landmark's count register carries at its ceiling `2^c`; the development cells choose `c = 11` at scale; the resident tree takes the carry |
-| Forward plan | F4's hash-seeded development-family split, request-incidence planning, score-identical next-face view and one held-out passage are built. F4 fails its release gate: the text decoder, producing keys/provenance, grain/fibre and release square are absent, the moiré's full-period continuation separates, and the charged validation code exceeds the flat control. F1's word terrain, exact segmentation family and sectioned adapter are built on a separate pinned split; one bounded held-out part closes exactly, but full work exceeds budget, so bytes stay. F2 is pinned and has one `n*`-sized field-only held-out passage; its field family still lacks a per-cell face owner. F5's product/evaluation gate remains closed; F3 is conditional on its response deadline and F6 follows the common release law. |
+| Forward plan | F4's pinned held-out passage still fails, but its F5 development continuation checks a complete UTF-8 response path against the population's own face, one byte and stop at a time; full distributional release, producing-key/causal provenance and compatible-source fibre remain owed. F1's exact word law passes a bounded part but exceeds full work budget; bytes stay. F2 has one `n*`-sized field-only held-out passage, while the population family lacks a per-cell field face. F5 has private native diagnostics, a blind case package and a 6,256,005,986-byte tagged choosing standing restored with the same next face/receive at a 16,287,236,096-byte sampled RSS peak. Its diagnostic split is spent and not acceptance; a cold memory-bounded atomic product checkpoint is still owed and evaluation is closed. F3 is conditional on the response deadline, and F6 follows complete release. |
 | Campaign 3 | Mode release, dormant constitution/clock, founding and moment quotient; consumes the loaded ring connection |
 | Campaign 4 (#27) | Existing serial-screw laws need the HNN motor consumer and a motion-recording receipt |
 | Campaign 5 | Holonic Encoding, context, joint prediction and merges priced by their code-length pair |
 | Step 6 | Finite physics K3–K4 complete; target research continues alongside construction; equation extraction #146 remains |
 | Step 7 (#147) | First Lean curation pass and navigator/subject renames complete; short duplicates and named repeated constructions remain |
-| Step 8 (#148) | Workbench, Athena and simulator applications remain; their frozen acceptance cases are unspent |
+| Step 8 (#148) | The Athena-0 development protocol and private blind judging package are built on fixtures; one native diagnostic response path is scored/decoded, and 32 request-only diagnostics ran. Tagged Population/AdmittedEgg standing restores small futures exactly, while the large choosing state needs a memory-bounded atomic file join. Product health, producing-key/fibre receipts and untouched acceptance remain; evaluation is unspent. Workbench and simulator remain. |
 
 ## Measured receiving faces
 
@@ -83,6 +83,19 @@ consumers.
   This is aggregate field evidence only: `Reference::expose` does not return the per-cell
   rational probability needed by `Population::Family`, so no F2 adoption is claimed.
   [F2 pin and receipt](research/records/2026-09-27_F2_FIELD_FAMILY_GATE.md).
+- **F5 development diagnostics.** The one-protocol fixture passes restart/replay checks, and a
+  private 32-request family-ancestral pass completed with 24 provisional UTF-8 paths, eight typed
+  failures and a 20,760-ms longest warm response. A fresh branch checked all 180 faces of one
+  response path, including its stop, and its UTF-8/append-scalar square. Of the 32 requests, 21
+  have complete one-occurrence parent context and 11 refuse an unresolved parent. The product
+  still refuses publication for missing native health, key/causal provenance and compatible
+  fibre; the split was used for design and is not acceptance. Exact native codecs for
+  Landmark/TreeFamily/BoundaryEgg/AdmittedEgg and a tagged Population pass small continuation
+  checks. The actual choosing standing's tagged population stream is 6,256,005,986 bytes with
+  large-restore sampled peak RSS of 16,287,236,096 bytes and an exact next-receive square;
+  a file-backed synthetic refusal on those bytes committed in 7,706 ms and replayed without
+  another Engine call. Independent cold restore, atomic native transition and full product
+  receipt remain open. [F5 record](research/records/2026-09-27_F5_DEVELOPMENT_AND_BLIND_GATE.md).
 
 ## Formal scope and targets
 

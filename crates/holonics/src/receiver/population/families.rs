@@ -61,6 +61,9 @@ use crate::hnn::field::Field;
 use crate::holarchy::terrain::{Grating, MoireClass, MoireFamily};
 use crate::ratio::Rat;
 
+mod checkpoint;
+pub use checkpoint::TreeFamilyCheckpointError;
+
 /// **The Bombe a moiré's joint key space is owed to**: its phases located by loop closure over a
 /// menu of parity relations on the joint clock torus (the audit record's §6.3).
 pub const MOIRE_BOMBE: &str = "parity-constraint propagation on the joint clock torus, one parity relation a tick over at most Π q_i phase configurations once the rates are known; owed";
@@ -81,6 +84,7 @@ pub const ROTOR_BOMBE: &str =
 /// cells ([`TreeFamily::new`]), or on a curated stream the cells bundled with their part's slots,
 /// read once at the section ([`TreeFamily::sectioned`], the typed address of
 /// `compression::landmark::context::sections`: the joint address across ports).
+#[derive(Clone)]
 pub struct TreeFamily {
     label: String,
     description: u64,
@@ -211,6 +215,18 @@ fn prior_of(declaration: &LandmarkDeclaration) -> &'static str {
 }
 
 impl Family for TreeFamily {
+    fn tree_received_cells(&self) -> Option<u64> {
+        Some(self.received)
+    }
+
+    fn tree_checkpoint(&self) -> Option<Vec<u8>> {
+        Some(self.encode_checkpoint())
+    }
+
+    fn branch_future(&self) -> Option<Box<dyn Family>> {
+        Some(Box::new(self.clone()))
+    }
+
     fn label(&self) -> String {
         self.label.clone()
     }

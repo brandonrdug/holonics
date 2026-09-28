@@ -85,6 +85,9 @@ use crate::compression::landmark::context::baseline::kt_probability;
 use crate::compression::landmark::context::{Located, PassageCode, SectionChart, SpanReading};
 use crate::ratio::Rat;
 
+mod checkpoint;
+pub use checkpoint::AdmittedStageCheckpointError;
+
 /// The curated chart's human channel (`SectionChart::curated`: human, agent, tool).
 pub const HUMAN: usize = 0;
 /// The curated chart's agent channel.
@@ -422,6 +425,21 @@ pub struct AdmittedReadout {
     pub retained: usize,
     pub retained_cells: usize,
     pub widest_cells: usize,
+    /// The open response's request operands, when that request relation is held.
+    pub request_provenance: Option<RequestFaceProvenance>,
+}
+
+/// Exact operands identifying the currently open request-conditioned response face.
+/// This is a current readout, not retained event history, and contains no request text.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RequestFaceProvenance {
+    pub response_letter_tick: u64,
+    pub request_target_tick: u64,
+    pub target_span_cells: usize,
+    pub located_length: Option<u64>,
+    pub next_byte: Option<usize>,
+    pub copy_law: CopyLaw,
+    pub copy_cell: Option<CopyCell>,
 }
 
 /// A target's span while a relation still reaches it.
@@ -443,6 +461,7 @@ struct OpenPart {
 
 /// [definition; agent-inferred] **The admitted receivers' egg** (module header): the inner boundary
 /// egg composed with the request's span through the copy stage, the later human's receipt beside it.
+#[derive(Clone)]
 pub struct AdmittedEgg {
     label: String,
     description: u64,
@@ -584,6 +603,29 @@ impl AdmittedEgg {
         open.reading.located(span).map(|located| (kind, located))
     }
 
+    fn request_provenance(&self) -> Option<RequestFaceProvenance> {
+        let open = self.open.as_ref()?;
+        let (kind, target) = open.relation?;
+        if kind != RelationKind::Request {
+            return None;
+        }
+        let span = self.spans.get(&target)?;
+        let located = open.reading.located(&span.cells);
+        let copy_cell = located.and_then(|located| {
+            let q = self.inner.probability(located.next).ok()?;
+            self.stage.readout.law.cell(located.length, &q)
+        });
+        Some(RequestFaceProvenance {
+            response_letter_tick: open.letter,
+            request_target_tick: target,
+            target_span_cells: span.cells.len(),
+            located_length: located.map(|value| value.length),
+            next_byte: located.map(|value| value.next),
+            copy_law: self.stage.readout.law,
+            copy_cell,
+        })
+    }
+
     /// The least length any stage of a kind reads.
     fn least(&self, kind: RelationKind) -> Option<u64> {
         std::iter::once(&self.stage)
@@ -697,6 +739,22 @@ impl AdmittedEgg {
 }
 
 impl Family for AdmittedEgg {
+    fn admitted_checkpoint(&self) -> Option<Result<Vec<u8>, AdmittedStageCheckpointError>> {
+        Some(self.encode_checkpoint())
+    }
+
+    fn admitted_received_cells(&self) -> Option<u64> {
+        match self.inner.likelihood() {
+            Likelihood::Enclosed(code) if code.factors() == self.tick => Some(code.factors()),
+            Likelihood::Exact(_) => None,
+            Likelihood::Enclosed(_) => None,
+        }
+    }
+
+    fn branch_future(&self) -> Option<Box<dyn Family>> {
+        Some(Box::new(self.clone()))
+    }
+
     fn owns_planned_relation(&self) -> bool {
         true
     }
@@ -847,6 +905,7 @@ impl Family for AdmittedEgg {
             retained: self.spans.len(),
             retained_cells: self.held,
             widest_cells: self.widest,
+            request_provenance: self.request_provenance(),
         }))
     }
 

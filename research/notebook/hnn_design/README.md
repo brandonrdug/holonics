@@ -1395,3 +1395,42 @@ once in 363,330 ms on the host. `Reference::expose` provides aggregate code rath
 per-cell rational face required by a population family. The field cannot be inserted or
 validated by substituting its odometer covector for a probability. No F2 held-out
 **field-family** reading has run, and the evaluation partition remains closed.
+
+## F5 development-only release and product protocol (September 27)
+
+The [F5 pin and receipt](../../records/2026-09-27_F5_DEVELOPMENT_AND_BLIND_GATE.md) fix a separate
+hash-seeded development-family split, prospective-request order, context rule, blind rubric and
+privacy. That split was used to refine the release route and is now a **diagnostic**, so an
+untouched development split is still owed before F5 acceptance. The evaluation partition remains
+closed. Private request and response text never enters the tracked tree or public readouts.
+
+`hnn_population f5-native` follows the population's interval face only where an exact draw forces
+one class across its fibre. `f5-family` samples one family from the enclosed posterior and follows
+its exact face; `f5-family-verify` replays the resulting candidate on a fresh branch, capturing
+the population's scored face before every byte and its stop. The first candidate had 179 UTF-8
+bytes, the same private hash after full-path verification, 180 checked faces, and 15,826 ms full
+warm time. The full request-only diagnostic bundle (`f5-bundle`) trained choosing standing once
+and branched 32 times in 314,527 ms of preparation plus warm work: 24 provisional UTF-8 paths,
+four invalid UTF-8 refusals, one over-aperture request and three no-stop paths. Longest warm
+request: 20,760 ms. These are path and resource receipts, not answer-quality or product claims.
+
+The exterior `athena_protocol.py` fixture uses one Ask/Inspect/Checkpoint vocabulary and one
+atomic owner-only checkpoint with standing bytes, cursor, pending comparisons, incomplete input
+tail and a replayable pending output. Fourteen fixture tests pass, including durable staging of a
+complete frame until its native result commits; presenting the provisional native
+path without health/provenance/fibre produces the typed `incomplete-release-receipt` refusal and
+replays it with zero new native calls. `f5_context.py` recovers actual provider-parent context:
+21 complete one-occurrence packets and 11 unresolved-parent refusals on the diagnostic requests.
+`athena_blind.py` has a 32-case owner-only development package with source-hidden sides, no marks
+or unblinding key; it has not been shown for judgment. Exact native standing codecs now cover
+Landmarks, PassageCode, TreeFamily, BoundaryEgg, AdmittedEgg and a tagged Population on small
+continuation fixtures. A choosing-only `f5-checkpoint-census` measured 6,256,005,521 bytes in
+the eight family payloads and 6,256,005,986 bytes in the full population stream; the complete
+stream took 13,266 ms with a 9,897,873,408-byte sampled RSS peak, without printing source
+content. The choosing-only `f5-checkpoint-restore` durably wrote that stream and restored the
+same cursor, face and next receive with a 16,287,236,096-byte sampled RSS peak; its manifest was
+reconstructed from choosing source, so this is a decoder check. The file-backed v2 fixture
+streams standing and protocol metadata into one owner-only atomic file. At this actual standing
+size its synthetic typed-refusal `Ask` committed in 7,706 ms, replayed without a second Engine
+call, and used 22,323,200 bytes peak RSS in Python. An independent cold restore, live atomic
+protocol transition and full product health/provenance/fibre receipts are still owed.

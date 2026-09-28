@@ -145,6 +145,14 @@ record one held-out development-family passage. The F4 failure branch applies: t
 next-face view is built, but the text-release carrier is incomplete, and the charged validation
 stream is above the flat control. The evaluation partition remains closed.
 
+[established-bounded; F5 development continuation] A [private diagnostic](../../research/records/2026-09-27_F5_DEVELOPMENT_AND_BLIND_GATE.md)
+now branches contemporary choosing standing, plans request incidence, samples a family once from
+the posterior enclosure and follows its exact face to a section stop. On one response a fresh
+branch verified the population's scored face before all 179 bytes and the stop and checked UTF-8
+and the append-scalar square in 15,826 ms warm. The posterior's unresolved draw region,
+producing-key/causal relation, compatible-source fibre and product health are retained as missing
+terms; this is not F4 acceptance.
+
 - **Builds on.** `receiver::release`, the generic release law.
 - **New.** The population's text-release consumer.
 - **Law.** A request conditions the same face that scores a complete response, its stopping section
@@ -167,6 +175,21 @@ stream is above the flat control. The evaluation partition remains closed.
 - **If it fails.** The machine is a predictor, not yet a releasing product.
 
 ### F5. Athena-0: the first product outcome (step 8; #148)
+
+[established-bounded; development only] The [F5 pinned diagnostic and gate](../../research/records/2026-09-27_F5_DEVELOPMENT_AND_BLIND_GATE.md)
+have a one-protocol atomic exterior checkpoint/replay fixture, a certified private native
+request path and a 32-request diagnostic pass: 24 provisional UTF-8 candidates, eight typed
+failures, 314,527 ms of choosing preparation plus warm work, and no evaluation read. Eleven of
+those requests have unresolved declared parents; the other 21 have one-occurrence context.
+The split was used to refine the release route, so it is spent for diagnostics and cannot serve
+as F5 acceptance. The product protocol refuses the provisional text for missing native health,
+key/causal provenance and compatible-source fibre. Versioned exact codecs now cover the tree,
+boundary/admitted eggs and a tagged population in small continuation fixtures. On the actual
+choosing standing, the full tagged stream occupies 6,256,005,986 bytes; its development restore
+passed the next-face/receive square at 16,287,236,096 bytes sampled peak RSS. An independent cold
+restore, a memory-bounded single-file atomic native protocol join and truthful product receipts
+remain open; the JSON/base64 fixture is not the large-state path. Freeze the law
+and pin a fresh untouched development split before F5's acceptance pass or evaluation.
 
 - **Definition.** A local interaction on this machine (one RTX 4080 SUPER of 16 GiB, 20 GB of RAM
   admitted). It accepts a visible human request and its declared conversation context, and returns

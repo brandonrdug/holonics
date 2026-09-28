@@ -89,17 +89,23 @@
 
 use std::time::Instant;
 
+use holonics::compression::landmark::context::sections::Section;
 use holonics::compression::landmark::context::{
     Capacity, LandmarkDeclaration, Landmarks, LetterFamily, PassageCode, SectionChart,
     SectionSlots, Sections, StopPrior,
 };
 use holonics::hnn::field::{Field, FieldDeclaration};
+use holonics::holarchy::terrain::Draw;
 use holonics::ratio::Rat;
 use holonics::ratio::algebraic::{ExactInterval, interval_difference, interval_sum};
 use holonics::receiver::population::{
-    AdmittedEgg, AdmittedReadout, BoundaryEgg, BoundaryReadout, CopyLaw, Family, HazardPartition,
-    MergeReceipt, PartReading, PartitionReceipt, PointerReadout, Population, PopulationReceipt,
-    Posterior, Readout, RelationKind, StageReadout, TreeFamily, learn_hazard_partition,
+    AdmittedEgg, AdmittedMemberManifest, AdmittedReadout, BoundaryEgg, BoundaryReadout, CopyLaw,
+    Family,
+    FamilyReleaseError, HazardPartition, MergeReceipt, PartReading, PartitionReceipt,
+    PointerReadout, Population, PopulationMemberManifest, PopulationReceipt, PopulationRelease,
+    Posterior, Readout, Relation, RelationKind, SamplingError, StageReadout, TextRelease,
+    TreeFamily, TreeMemberManifest, learn_hazard_partition, select_class, select_family_class,
+    verify_scored_text_path,
 };
 use num_bigint::BigInt;
 
@@ -262,6 +268,113 @@ fn deepest(declared: &LandmarkDeclaration) -> usize {
         depth += 1;
     }
     depth
+}
+
+/// Build the same eight-family receiver used by the curated harness after development has chosen
+/// the hazard partition. `comparisons` are comparison-only hazard charts attached to the same
+/// boundary egg; they do not enter its scored face. The request/response pair is incidence at the
+/// receiving ports, on the response's actual section letter.
+pub(super) fn curated_population(
+    chart: SectionChart,
+    population: u64,
+    grain: u64,
+    chosen_hazard: HazardPartition,
+    relations: Vec<holonics::receiver::population::Relation>,
+    comparisons: &[(String, HazardPartition)],
+) -> Result<
+    (Population, usize, Vec<PopulationMemberManifest>),
+    holonics::receiver::population::PopulationError,
+> {
+    let cells = |depth| {
+        declaration(
+            chart.alphabet(),
+            depth,
+            population,
+            grain,
+            LetterFamily::cells(),
+        )
+    };
+    let slots = || Sections::new(chart, SectionSlots::Channel).expect("the channel slot");
+    let typed = |depth| {
+        declaration(
+            chart.alphabet(),
+            depth,
+            population,
+            grain,
+            slots().family().clone(),
+        )
+    };
+    let cell_deepest = deepest(&cells(CELL_DEPTHS[CELL_DEPTHS.len() - 1]));
+    let typed_deepest = deepest(&typed(TYPED_DEPTHS[TYPED_DEPTHS.len() - 1]));
+    let letter_declaration = declaration(
+        chart.letters(),
+        LETTER_DEPTH,
+        population,
+        grain,
+        BoundaryEgg::letter_family(population)?,
+    );
+    let families = CELL_DEPTHS.len() + 1 + TYPED_DEPTHS.len() + 1;
+    let naming = ceil_log2(families as u64);
+    let mass = Rat::new(BigInt::from(1u8), BigInt::from(1u8) << naming as usize);
+    let mut declared: Vec<Box<dyn Family>> = Vec::new();
+    let mut manifest = Vec::with_capacity(families);
+    for depth in CELL_DEPTHS.iter().copied().chain([cell_deepest]) {
+        let declaration = cells(depth);
+        manifest.push(PopulationMemberManifest::Tree(TreeMemberManifest {
+            declaration: declaration.clone(),
+            description: naming,
+            mass: mass.clone(),
+            sections: None,
+        }));
+        declared.push(Box::new(TreeFamily::new(declaration, naming)?));
+    }
+    for &depth in &TYPED_DEPTHS {
+        let declaration = typed(depth);
+        manifest.push(PopulationMemberManifest::Tree(TreeMemberManifest {
+            declaration: declaration.clone(),
+            description: naming,
+            mass: mass.clone(),
+            sections: Some((chart, SectionSlots::Channel)),
+        }));
+        declared.push(Box::new(TreeFamily::sectioned(
+            declaration,
+            naming,
+            slots(),
+        )?));
+    }
+    let egg_index = declared.len();
+    let law = CopyLaw::new(COPY_LAW.0, COPY_LAW.1, COPY_LAW.2)?;
+    let mut inner = BoundaryEgg::new(
+        format!(
+            "boundary egg (part clock ⊳ typed tree D = {typed_deepest}, letter tree D_L = {LETTER_DEPTH}; the learned hazard partition)"
+        ),
+        naming,
+        TreeFamily::sectioned(typed(typed_deepest), naming, slots())?,
+        chart,
+        letter_declaration,
+    )?
+    .with_hazard(chosen_hazard)?;
+    for (label, partition) in comparisons {
+        inner = inner.compared_with(label.clone(), partition.clone())?;
+    }
+    let admitted = AdmittedEgg::new(
+        format!(
+            "admitted receivers (request ⊳ boundary egg: part clock ⊳ typed tree D = {typed_deepest}, letter tree D_L = {LETTER_DEPTH}; the learned hazard partition)"
+        ),
+        naming,
+        inner,
+        chart,
+        relations,
+        law,
+    )?
+    .with_receipt(RelationKind::LaterHuman, law);
+    manifest.push(PopulationMemberManifest::Admitted(AdmittedMemberManifest {
+        fresh: admitted.clone(),
+        description: naming,
+        mass,
+    }));
+    declared.push(Box::new(admitted));
+    Ok((Population::new(declared)?, egg_index, manifest))
 }
 
 fn posterior(posterior: &Posterior) -> String {
@@ -846,7 +959,11 @@ pub fn harness(curated_path: &str, flat_path: &str, reach: Reach) {
         .collect();
     println!(
         "hnn_population curated: {} through the egg population against the flat stream of the same bytes (campaign 5; #73, #148)",
-        if f4 { "F4 disjoint choosing and validation families" } else { "the curated source" }
+        if f4 {
+            "F4 disjoint choosing and validation families"
+        } else {
+            "the curated source"
+        }
     );
     println!(
         "0. the cut: {} curated cells (|A| = {}), {flat_count} flat cells, identical bytes: {identical}; n* = {}, L_R = {grain}",
@@ -892,50 +1009,28 @@ pub fn harness(curated_path: &str, flat_path: &str, reach: Reach) {
     println!();
 
     // 2. The declarations.
-    let cells = |depth| {
-        declaration(
-            chart.alphabet(),
-            depth,
-            cut.population,
-            grain,
-            LetterFamily::cells(),
-        )
-    };
-    let slots = || Sections::new(chart, SectionSlots::Channel).expect("the channel slot");
-    let typed = |depth| {
-        declaration(
-            chart.alphabet(),
-            depth,
-            cut.population,
-            grain,
-            slots().family().clone(),
-        )
-    };
-    let cell_deepest = deepest(&cells(CELL_DEPTHS[CELL_DEPTHS.len() - 1]));
-    let typed_deepest = deepest(&typed(TYPED_DEPTHS[TYPED_DEPTHS.len() - 1]));
-    let letter_declaration = declaration(
-        chart.letters(),
-        LETTER_DEPTH,
+    let typed_declaration = declaration(
+        chart.alphabet(),
+        TYPED_DEPTHS[TYPED_DEPTHS.len() - 1],
         cut.population,
         grain,
-        BoundaryEgg::letter_family(cut.population).expect("the letter family"),
+        Sections::new(chart, SectionSlots::Channel)
+            .expect("the channel slot")
+            .family()
+            .clone(),
     );
+    let cell_declaration = declaration(
+        chart.alphabet(),
+        CELL_DEPTHS[CELL_DEPTHS.len() - 1],
+        cut.population,
+        grain,
+        LetterFamily::cells(),
+    );
+    let cell_deepest = deepest(&cell_declaration);
+    let typed_deepest = deepest(&typed_declaration);
     let families = CELL_DEPTHS.len() + 1 + TYPED_DEPTHS.len() + 1;
     let naming = ceil_log2(families as u64);
-    let mut declared: Vec<Box<dyn Family>> = Vec::new();
-    for depth in CELL_DEPTHS.iter().copied().chain([cell_deepest]) {
-        declared.push(Box::new(
-            TreeFamily::new(cells(depth), naming).expect("a cell tree"),
-        ));
-    }
-    for &depth in &TYPED_DEPTHS {
-        declared.push(Box::new(
-            TreeFamily::sectioned(typed(depth), naming, slots()).expect("a typed tree"),
-        ));
-    }
-    let egg_index = declared.len();
     let relations = read_incidence(curated_path);
-    let law = CopyLaw::new(COPY_LAW.0, COPY_LAW.1, COPY_LAW.2).expect("the copy stage's law");
     let declared_relations = |kind: RelationKind, part: usize| {
         relations
             .iter()
@@ -944,36 +1039,19 @@ pub fn harness(curated_path: &str, flat_path: &str, reach: Reach) {
             })
             .count()
     };
-    let inner = BoundaryEgg::new(
-        format!(
-            "boundary egg (part clock ⊳ typed tree D = {typed_deepest}, letter tree D_L = {LETTER_DEPTH}; the learned hazard partition)"
-        ),
-        naming,
-        TreeFamily::sectioned(typed(typed_deepest), naming, slots()).expect("the byte tree"),
+    let comparison_hazards = vec![
+        ("declared".to_string(), HazardPartition::declared()),
+        (other.0.to_string(), other.1),
+    ];
+    let (mut population, egg_index, _manifest) = curated_population(
         chart,
-        letter_declaration,
+        cut.population,
+        grain,
+        partition,
+        relations.clone(),
+        &comparison_hazards,
     )
-    .expect("the boundary egg")
-    .with_hazard(partition.clone())
-    .expect("the learned hazard")
-    .compared_with("declared".to_string(), HazardPartition::declared())
-    .expect("the declared hazard")
-    .compared_with(other.0.to_string(), other.1)
-    .expect("the second stage's other outcome");
-    declared.push(Box::new(
-        AdmittedEgg::new(
-            format!(
-                "admitted receivers (request ⊳ boundary egg: part clock ⊳ typed tree D = {typed_deepest}, letter tree D_L = {LETTER_DEPTH}; the learned hazard partition)"
-            ),
-            naming,
-            inner,
-            chart,
-            relations.clone(),
-            law,
-        )
-        .expect("the admitted receivers")
-        .with_receipt(RelationKind::LaterHuman, law),
-    ));
+    .expect("the curated population");
     let swept: u64 = PROBED.iter().map(|&count| ceil_log2(count)).sum();
     let charge = sum(&point(swept), &learning_receipt.description);
     let flat_charge = ceil_log2(FLAT_SWEEP);
@@ -994,7 +1072,6 @@ pub fn harness(curated_path: &str, flat_path: &str, reach: Reach) {
         declared_relations(RelationKind::LaterHuman, 0),
         declared_relations(RelationKind::LaterHuman, 1)
     );
-    let mut population = Population::new(declared).expect("the population");
     println!("  setup: {} ms", clock.elapsed().as_millis());
     println!();
 
@@ -1204,4 +1281,1082 @@ pub fn harness(curated_path: &str, flat_path: &str, reach: Reach) {
         enclosure(&receipt.code, grain)
     );
     println!("wall time in all: {} ms", clock.elapsed().as_millis());
+}
+
+/// The shared choosing preparation for the native probes. The returned population is the one
+/// unmodified choosing standing; callers that release requests branch from it independently.
+fn prepare_native_population(
+    choosing_path: &str,
+) -> (
+    SectionChart,
+    super::exterior::CuratedCut,
+    Population,
+    Vec<PopulationMemberManifest>,
+    usize,
+    Instant,
+    String,
+) {
+    let chart = SectionChart::curated();
+    let cut = read_curated(choosing_path, &chart);
+    let relations = read_incidence(choosing_path);
+    let setup = Instant::now();
+    let (hazard, learning) =
+        learn_hazard_partition(chart, &cut.codes).expect("the choosing hazard partition");
+    let (mut population, egg_index, manifest) =
+        curated_population(chart, cut.population, super::GRAIN, hazard, relations, &[])
+            .expect("the declared curated population");
+    population
+        .receive_passage(&cut.codes)
+        .expect("the choosing passage");
+    let learned = reading_of(&learning.description, super::GRAIN);
+    (chart, cut, population, manifest, egg_index, setup, learned)
+}
+
+/// Append one request and follow its ancestral family path. `base` is borrowed and remains the
+/// exact choosing standing for every caller. The private output contains only response bytes.
+fn native_family_release(
+    base: &Population,
+    chart: SectionChart,
+    capacity: usize,
+    request: &[u8],
+    seed: u64,
+) -> (
+    Vec<u8>,
+    &'static str,
+    usize,
+    usize,
+    u128,
+    u128,
+    Option<Rat>,
+    Option<usize>,
+) {
+    let response_clock = Instant::now();
+    if request
+        .len()
+        .checked_add(2)
+        .is_none_or(|needed| needed > capacity.saturating_sub(base.cells()))
+    {
+        return (
+            Vec::new(),
+            "request-over-aperture",
+            0,
+            0,
+            0,
+            response_clock.elapsed().as_millis(),
+            None,
+            None,
+        );
+    }
+    let branch_clock = Instant::now();
+    let mut draw = Draw::new(seed);
+    let mut population = match base.branch_future() {
+        Ok(branch) => branch,
+        Err(_) => {
+            return (
+                Vec::new(),
+                "future-branch-refused",
+                0,
+                0,
+                branch_clock.elapsed().as_millis(),
+                response_clock.elapsed().as_millis(),
+                None,
+                None,
+            );
+        }
+    };
+    let branch_ms = branch_clock.elapsed().as_millis();
+    let target = population.cells() as u64;
+    let response_letter = target + 1 + request.len() as u64;
+    if population
+        .plan_relation(Relation {
+            letter: response_letter,
+            kind: RelationKind::Request,
+            target,
+        })
+        .is_err()
+    {
+        return (
+            Vec::new(),
+            "request-relation-refused",
+            0,
+            0,
+            branch_ms,
+            response_clock.elapsed().as_millis(),
+            None,
+            None,
+        );
+    }
+    let human_letter = chart
+        .letter(Section {
+            kind: 2,
+            channel: 0,
+        })
+        .expect("human turn");
+    let agent_letter = chart
+        .letter(Section {
+            kind: 2,
+            channel: 1,
+        })
+        .expect("agent turn");
+    if population.receive(human_letter).is_err()
+        || request
+            .iter()
+            .any(|&byte| population.receive(usize::from(byte)).is_err())
+    {
+        return (
+            Vec::new(),
+            "request-reception-refused",
+            0,
+            0,
+            branch_ms,
+            response_clock.elapsed().as_millis(),
+            None,
+            None,
+        );
+    }
+    if population.cells() as u64 != response_letter || population.receive(agent_letter).is_err() {
+        return (
+            Vec::new(),
+            "response-opening-refused",
+            0,
+            0,
+            branch_ms,
+            response_clock.elapsed().as_millis(),
+            None,
+            None,
+        );
+    }
+    let mut refusal = None;
+    let posterior_width = population.family_posterior_face().ok().map(|bounds| {
+        bounds.iter().fold(
+            Rat::new(BigInt::from(0u8), BigInt::from(1u8)),
+            |sum, bound| sum + (&bound.upper - &bound.lower),
+        )
+    });
+    let mut draw_value = || Rat::new(BigInt::from(draw.next()), BigInt::from(1u8) << 64);
+    let chosen_family = match population.select_family(&draw_value()) {
+        Ok(certified) => Some(certified.class),
+        Err(FamilyReleaseError::Sampling(SamplingError::UnresolvedFibre { .. })) => {
+            refusal = Some("unresolved-family-posterior");
+            None
+        }
+        Err(_) => {
+            refusal = Some("family-posterior-error");
+            None
+        }
+    };
+    let room = match capacity.checked_sub(population.cells() + 1) {
+        Some(room) => room,
+        None => {
+            return (
+                Vec::new(),
+                "no-capacity-for-stop",
+                chosen_family.unwrap_or(usize::MAX),
+                0,
+                branch_ms,
+                response_clock.elapsed().as_millis(),
+                posterior_width,
+                None,
+            );
+        }
+    };
+    let mut bytes = Vec::new();
+    let mut faces = 0usize;
+    let mut stop = None;
+    for _ in 0..=room {
+        if refusal.is_some() {
+            break;
+        }
+        let value = draw_value();
+        let face = match population
+            .families()
+            .nth(chosen_family.expect("family selection succeeded"))
+        {
+            Some(family) => family.face(),
+            None => {
+                refusal = Some("selected-family-missing");
+                break;
+            }
+        };
+        let selected = match face
+            .ok()
+            .and_then(|face| select_family_class(&face, &value).ok())
+        {
+            Some(certified) => certified.class,
+            None => {
+                refusal = Some("unresolved-family-face");
+                break;
+            }
+        };
+        if selected < chart.bytes() && bytes.len() == room {
+            refusal = Some("no-stop-within-capacity");
+            break;
+        }
+        if population.receive(selected).is_err() {
+            refusal = Some("selected-class-refused");
+            break;
+        }
+        faces += 1;
+        if chart.section(selected).is_some() {
+            stop = Some(selected);
+            break;
+        }
+        bytes.push(selected as u8);
+    }
+    let status = if stop.is_some() {
+        if std::str::from_utf8(&bytes).is_ok() {
+            "provisional-family-path-provenance-fibre-health-owed"
+        } else {
+            "invalid-utf8-family-path"
+        }
+    } else {
+        refusal.unwrap_or("no-stop-within-capacity")
+    };
+    let bytes =
+        if stop.is_some() && status == "provisional-family-path-provenance-fibre-health-owed" {
+            bytes
+        } else {
+            Vec::new()
+        };
+    (
+        bytes,
+        status,
+        chosen_family.unwrap_or(usize::MAX),
+        faces,
+        branch_ms,
+        response_clock.elapsed().as_millis(),
+        posterior_width,
+        stop,
+    )
+}
+
+fn write_private_output(path: &std::path::Path, bytes: &[u8]) {
+    use std::io::Write;
+    use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
+    let mut file = std::fs::OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .mode(0o600)
+        .open(path)
+        .expect("private response output");
+    file.set_permissions(std::fs::Permissions::from_mode(0o600))
+        .expect("owner-only response file");
+    file.write_all(bytes).expect("write private response bytes");
+    file.sync_all().expect("durable private response bytes");
+}
+
+/// A development-only native release probe. It shares preparation and family release with F5's
+/// bounded bundle pass; its bytes remain provisional because provenance, fibre and health are owed.
+pub fn native_probe(
+    choosing_path: &str,
+    request_path: &str,
+    seed_path: &str,
+    output_path: &str,
+    ancestral: bool,
+) {
+    use std::os::unix::fs::PermissionsExt;
+    let request = std::fs::read(request_path).expect("the owner-only request");
+    assert!(
+        std::str::from_utf8(&request).is_ok(),
+        "a visible UTF-8 request"
+    );
+    let seed: [u8; 8] = std::fs::read(seed_path)
+        .expect("the owner-only draw key")
+        .try_into()
+        .expect("one exact u64 draw key");
+    let (chart, cut, base, _manifest, egg_index, setup, learned) =
+        prepare_native_population(choosing_path);
+    println!(
+        "F5 native probe: choosing cells {}, learned hazard description {} bits at grain {}, admitted egg index {}; preparation {} ms; sampled RSS {:?} bytes",
+        cut.codes.len(),
+        learned,
+        super::GRAIN,
+        egg_index,
+        setup.elapsed().as_millis(),
+        resident_set().map(|(now, _)| now)
+    );
+    let output = if ancestral {
+        let (bytes, status, _family, faces, branch_ms, warm, posterior_width, stop) =
+            native_family_release(
+                &base,
+                chart,
+                cut.population as usize,
+                &request,
+                u64::from_le_bytes(seed),
+            );
+        println!(
+            "F5 family probe: {status}; response bytes {}; response path faces {}; stop section {stop:?}; posterior interval-width sum {}; branch {branch_ms} ms; warm {warm} ms; sampled RSS {:?} bytes",
+            bytes.len(),
+            faces,
+            posterior_width
+                .as_ref()
+                .map(ToString::to_string)
+                .unwrap_or_else(|| "unavailable".to_string()),
+            resident_set().map(|(now, _)| now)
+        );
+        bytes
+    } else {
+        // Preserve the original population-face native probe behavior through its existing path.
+        let (bytes, status, faces, warm) = native_population_release(
+            &base,
+            chart,
+            cut.population as usize,
+            &request,
+            u64::from_le_bytes(seed),
+        );
+        println!(
+            "F5 native probe: {status}; response bytes {}; response path faces {faces}; warm {warm} ms; sampled RSS {:?} bytes",
+            bytes.len(),
+            resident_set().map(|(now, _)| now)
+        );
+        bytes
+    };
+    let output_path = std::path::Path::new(output_path);
+    let parent = output_path.parent().expect("private output directory");
+    assert_eq!(
+        std::fs::metadata(parent)
+            .expect("output directory")
+            .permissions()
+            .mode()
+            & 0o077,
+        0,
+        "the output directory is owner-only"
+    );
+    write_private_output(output_path, &output);
+}
+
+fn native_population_release(
+    base: &Population,
+    chart: SectionChart,
+    capacity: usize,
+    request: &[u8],
+    seed: u64,
+) -> (Vec<u8>, &'static str, usize, u128) {
+    let response_clock = Instant::now();
+    if request
+        .len()
+        .checked_add(2)
+        .is_none_or(|needed| needed > capacity.saturating_sub(base.cells()))
+    {
+        return (
+            Vec::new(),
+            "request-over-aperture",
+            0,
+            response_clock.elapsed().as_millis(),
+        );
+    }
+    let mut population = base
+        .branch_future()
+        .expect("the curated population's future branch");
+    let mut draw = Draw::new(seed);
+    let target = population.cells() as u64;
+    let response_letter = target + 1 + request.len() as u64;
+    population
+        .plan_relation(Relation {
+            letter: response_letter,
+            kind: RelationKind::Request,
+            target,
+        })
+        .expect("request incidence planned before its target");
+    let human_letter = chart
+        .letter(Section {
+            kind: 2,
+            channel: 0,
+        })
+        .expect("human turn");
+    let agent_letter = chart
+        .letter(Section {
+            kind: 2,
+            channel: 1,
+        })
+        .expect("agent turn");
+    population.receive(human_letter).expect("human opening");
+    for &byte in request {
+        population.receive(usize::from(byte)).expect("request byte");
+    }
+    population.receive(agent_letter).expect("agent opening");
+    let room = capacity
+        .checked_sub(population.cells() + 1)
+        .expect("room for stop");
+    let mut bytes = Vec::new();
+    let mut trace = Vec::new();
+    let mut stop = None;
+    let mut refusal = None;
+    for _ in 0..=room {
+        let value = Rat::new(BigInt::from(draw.next()), BigInt::from(1u8) << 64);
+        let face = population.face().expect("one scored next face");
+        let selected = match select_class(&face, &value) {
+            Ok(certified) => certified.class,
+            Err(_) => {
+                refusal = Some("unresolved-face-fibre");
+                break;
+            }
+        };
+        if selected < chart.bytes() && bytes.len() == room {
+            refusal = Some("no-stop-within-capacity");
+            break;
+        }
+        trace.push(
+            PopulationRelease::from_scored_face(&population, selected)
+                .expect("score-identical release face"),
+        );
+        population
+            .receive(selected)
+            .expect("selected class admitted");
+        if chart.section(selected).is_some() {
+            stop = Some(selected);
+            break;
+        }
+        bytes.push(selected as u8);
+    }
+    let result = stop
+        .and_then(|section| TextRelease::from_population_path(bytes, chart, section, &trace).ok());
+    let status = if result.is_some() {
+        "codec-path-checked-provenance-and-health-owed"
+    } else {
+        refusal.unwrap_or("text-codec-separator")
+    };
+    (
+        result
+            .map(|checked| checked.bytes().to_vec())
+            .unwrap_or_default(),
+        status,
+        trace.len(),
+        response_clock.elapsed().as_millis(),
+    )
+}
+
+/// Run 32 independent request branches from one frozen choosing population. Bundle format is
+/// F5R1, count:u32, then count repetitions of request_len:u32, seed:u64, UTF-8 request bytes.
+pub fn native_bundle(choosing_path: &str, bundle_path: &str, output_dir: &str, limit: usize) {
+    use std::io::Read;
+    use std::os::unix::fs::PermissionsExt;
+    let mut bundle = std::fs::File::open(bundle_path).expect("owner-only F5 request bundle");
+    let mut header = [0u8; 8];
+    bundle
+        .read_exact(&mut header)
+        .expect("complete F5R1 bundle header");
+    assert_eq!(&header[..4], b"F5R1", "F5R1 bundle magic");
+    let count = u32::from_le_bytes(header[4..8].try_into().unwrap()) as usize;
+    assert_eq!(count, 32, "the pinned 32-request bundle");
+    assert!(
+        (1..=count).contains(&limit),
+        "bundle limit is between one and 32"
+    );
+    let mut items = Vec::with_capacity(limit);
+    for _ in 0..limit {
+        let mut record = [0u8; 12];
+        bundle
+            .read_exact(&mut record)
+            .expect("complete request length and seed");
+        let len = u32::from_le_bytes(record[..4].try_into().unwrap()) as usize;
+        let seed = u64::from_le_bytes(record[4..].try_into().unwrap());
+        assert!(len > 0, "nonempty request");
+        let mut request = vec![0u8; len];
+        bundle
+            .read_exact(&mut request)
+            .expect("complete request bytes");
+        assert!(std::str::from_utf8(&request).is_ok(), "request is UTF-8");
+        items.push((request, seed));
+    }
+    if limit == count {
+        let mut trailing = [0u8; 1];
+        assert_eq!(
+            bundle.read(&mut trailing).expect("check bundle end"),
+            0,
+            "no trailing bundle bytes"
+        );
+    }
+    let dir = std::path::Path::new(output_dir);
+    std::fs::create_dir_all(dir).expect("private output directory");
+    std::fs::set_permissions(dir, std::fs::Permissions::from_mode(0o700))
+        .expect("owner-only output directory");
+    let (chart, cut, base, _manifest, _egg_index, setup, _learned) =
+        prepare_native_population(choosing_path);
+    println!(
+        "F5 development diagnostic bundle preparation: choosing cells {}; preparation {} ms; sampled RSS {:?} bytes",
+        cut.codes.len(),
+        setup.elapsed().as_millis(),
+        resident_set().map(|(now, _)| now)
+    );
+    let mut candidates = 0usize;
+    let mut refused = 0usize;
+    let mut total_bytes = 0usize;
+    let mut unresolved_family_posterior = 0usize;
+    for (index, (request, seed)) in items.iter().enumerate() {
+        let (bytes, status, _family, faces, branch_ms, warm, posterior_width, stop) =
+            native_family_release(&base, chart, cut.population as usize, request, *seed);
+        write_private_output(&dir.join(format!("request-{index:02}.bin")), &bytes);
+        let ok = status == "provisional-family-path-provenance-fibre-health-owed";
+        unresolved_family_posterior += usize::from(status == "unresolved-family-posterior");
+        candidates += usize::from(ok);
+        refused += usize::from(!ok);
+        total_bytes += bytes.len();
+        let posterior_width = posterior_width
+            .map(|width| {
+                format!(
+                    "{} (<1/16: {})",
+                    width,
+                    width < Rat::new(BigInt::from(1u8), BigInt::from(16u8))
+                )
+            })
+            .unwrap_or_else(|| "unavailable".to_string());
+        println!(
+            "F5 development diagnostic request {index}: status {status}; bytes {}; faces {faces}; stop section {stop:?}; posterior interval-width sum {posterior_width}; branch {branch_ms} ms; warm {warm} ms; sampled RSS {:?} bytes",
+            bytes.len(),
+            resident_set().map(|(now, _)| now)
+        );
+    }
+    println!(
+        "F5 development diagnostic aggregate: limit {limit}; complete {}; requests {}; provisional candidates {candidates}; refused {refused}; unresolved-family-posterior {unresolved_family_posterior}; response bytes {total_bytes}; final F5 validation not established",
+        limit == 32,
+        items.len()
+    );
+}
+
+/// Measure the family-owned portion of the contemporary choosing standing's native checkpoint
+/// capacity. This reads only the pinned choosing cut and its incidence. Encoded buffers are
+/// measured one at a time and dropped before the next family, so the census does not retain a
+/// second copy of every family. The total covers the seven TreeFamily owners and the AdmittedEgg;
+/// population metadata, the JSON/base64 protocol envelope, and simultaneous old/new disk space
+/// remain excluded.
+pub fn checkpoint_census(choosing_path: &str) {
+    use holonics::receiver::population::Readout;
+    use std::io::{self, Write};
+
+    struct CountingSink {
+        bytes: u64,
+    }
+    impl Write for CountingSink {
+        fn write(&mut self, buffer: &[u8]) -> io::Result<usize> {
+            let amount = u64::try_from(buffer.len()).map_err(|_| {
+                io::Error::new(io::ErrorKind::InvalidInput, "write length does not fit u64")
+            })?;
+            self.bytes = self.bytes.checked_add(amount).ok_or_else(|| {
+                io::Error::new(io::ErrorKind::InvalidData, "checkpoint byte count overflow")
+            })?;
+            Ok(buffer.len())
+        }
+
+        fn flush(&mut self) -> io::Result<()> {
+            Ok(())
+        }
+    }
+
+    let wall = Instant::now();
+    let (_chart, cut, population, manifest, _egg_index, passage_started, _learned) =
+        prepare_native_population(choosing_path);
+    let choosing_cells = cut.codes.len();
+    drop(cut);
+
+    let mut tree_families = 0usize;
+    let mut total_nodes = 0usize;
+    let mut total_tree_bytes = 0usize;
+    let mut admitted_families = 0usize;
+    let mut total_admitted_bytes = 0usize;
+    let mut peak_rss = resident_set().map(|(_, peak)| peak);
+
+    for (family_index, family) in population.families().enumerate() {
+        if let Some(checkpoint) = family.admitted_checkpoint() {
+            let checkpoint = checkpoint.expect("the admitted choosing checkpoint");
+            let byte_count = checkpoint.len();
+            drop(checkpoint);
+
+            admitted_families += 1;
+            total_admitted_bytes = total_admitted_bytes
+                .checked_add(byte_count)
+                .expect("the exact admitted checkpoint byte count fits usize");
+            peak_rss = update_census_peak(peak_rss);
+            println!(
+                "F5 choosing admitted checkpoint: index {family_index}; canonical admitted bytes {byte_count}; sampled RSS current {:?} bytes, peak {:?} bytes",
+                resident_set().map(|(current, _)| current),
+                peak_rss
+            );
+            continue;
+        }
+
+        if let Readout::Standing(tree) = family.readout() {
+            let nodes = tree.nodes();
+            let checkpoint = family
+                .tree_checkpoint()
+                .expect("each standing tree exposes its canonical checkpoint");
+            let byte_count = checkpoint.len();
+            drop(checkpoint);
+
+            tree_families += 1;
+            total_nodes = total_nodes
+                .checked_add(nodes)
+                .expect("the exact tree-node census fits usize");
+            total_tree_bytes = total_tree_bytes
+                .checked_add(byte_count)
+                .expect("the exact tree-byte census fits usize");
+            peak_rss = update_census_peak(peak_rss);
+            println!(
+                "F5 choosing checkpoint family: index {family_index}; tree nodes {nodes}; canonical tree bytes {byte_count}; sampled RSS current {:?} bytes, peak {:?} bytes",
+                resident_set().map(|(current, _)| current),
+                peak_rss
+            );
+        }
+    }
+
+    let native_family_bytes = total_tree_bytes
+        .checked_add(total_admitted_bytes)
+        .expect("the exact native family byte count fits usize");
+
+    let population_families = population.families().count();
+    assert_eq!(tree_families + admitted_families, population_families);
+    assert_eq!(manifest.len(), population_families);
+    let encode_started = Instant::now();
+    let mut sink = CountingSink { bytes: 0 };
+    population
+        .write_checkpoint(&manifest, &mut sink)
+        .expect("the constructor-derived manifest matches every choosing family");
+    let full_population_bytes = sink.bytes;
+    let encode_ms = encode_started.elapsed().as_millis();
+    peak_rss = update_census_peak(peak_rss);
+
+    println!(
+        "F5 choosing checkpoint census: choosing cells {choosing_cells}; population families {population_families}; tree families {tree_families}; admitted families {admitted_families}; tree nodes {total_nodes}; canonical tree bytes {total_tree_bytes}; canonical admitted bytes {total_admitted_bytes}; total native family bytes {native_family_bytes}; full tagged population canonical bytes streamed {full_population_bytes}; JSON/base64 atomic protocol envelope and simultaneous old/new disk space excluded; choosing preparation and passage {} ms; full checkpoint encoding {encode_ms} ms; total wall {} ms; sampled RSS current {:?} bytes, peak {:?} bytes",
+        passage_started.elapsed().as_millis(),
+        wall.elapsed().as_millis(),
+        resident_set().map(|(current, _)| current),
+        peak_rss
+    );
+}
+
+/// Development-only continuation check: reconstruct the constructor-derived manifest from the
+/// choosing source, stream the standing into an owner-only file, then restore it directly and
+/// compare its contemporary face and one admitted next section cell. This is not an independent
+/// cold restart because the immutable manifest is reconstructed outside the checkpoint. It does
+/// not replay the choosing source after the checkpoint is written.
+pub fn checkpoint_restore(choosing_path: &str, checkpoint_path: &str) {
+    use std::io::{self, Write};
+    use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
+
+    const HOST_CAP_BYTES: u128 = 20_000_000_000;
+
+    struct CountingFile<'a> {
+        file: &'a mut std::fs::File,
+        bytes: u64,
+    }
+    impl Write for CountingFile<'_> {
+        fn write(&mut self, buffer: &[u8]) -> io::Result<usize> {
+            let amount = u64::try_from(buffer.len()).map_err(|_| {
+                io::Error::new(io::ErrorKind::InvalidInput, "write length does not fit u64")
+            })?;
+            let next = self.bytes.checked_add(amount).ok_or_else(|| {
+                io::Error::new(io::ErrorKind::InvalidData, "checkpoint byte count overflow")
+            })?;
+            let written = self.file.write(buffer)?;
+            self.bytes = self
+                .bytes
+                .checked_add(u64::try_from(written).map_err(|_| {
+                    io::Error::new(io::ErrorKind::InvalidData, "written length does not fit u64")
+                })?)
+                .filter(|&count| count <= next)
+                .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "byte count mismatch"))?;
+            Ok(written)
+        }
+
+        fn flush(&mut self) -> io::Result<()> {
+            self.file.flush()
+        }
+    }
+
+    let choosing_argument = std::path::Path::new(choosing_path);
+    let choosing_metadata = std::fs::symlink_metadata(choosing_argument)
+        .expect("choosing split metadata");
+    assert!(
+        !choosing_metadata.file_type().is_symlink(),
+        "choosing split path is not a symlink"
+    );
+    let choosing_path = choosing_argument
+        .canonicalize()
+        .expect("canonical choosing split path");
+    let cuts_dir = choosing_path
+        .parent()
+        .expect("choosing split has a parent")
+        .to_path_buf();
+    assert!(cuts_dir.ends_with(std::path::Path::new(".local/cuts")));
+    let cuts_metadata = std::fs::symlink_metadata(&cuts_dir).expect("private cuts metadata");
+    assert!(!cuts_metadata.file_type().is_symlink(), "cuts directory is not a symlink");
+    assert_eq!(
+        cuts_metadata.permissions().mode() & 0o777,
+        0o700,
+        "the choosing cut's parent is mode 0700"
+    );
+
+    let wall = Instant::now();
+    let (chart, cut, mut population, manifest, _egg_index, _passage_started, _learned) =
+        prepare_native_population(
+            choosing_path.to_str().expect("UTF-8 choosing split path"),
+        );
+    let choosing_cells = cut.codes.len();
+    drop(cut);
+
+    let requested = std::path::Path::new(checkpoint_path);
+    let destination = if requested.is_absolute() {
+        requested.to_path_buf()
+    } else {
+        assert!(
+            requested.components().count() == 1
+                || requested.starts_with(std::path::Path::new(".local/cuts")),
+            "relative checkpoint path is a file name or begins with .local/cuts"
+        );
+        cuts_dir.join(
+            requested
+                .file_name()
+                .expect("checkpoint destination has a file name"),
+        )
+    };
+    let parent = destination
+        .parent()
+        .expect("checkpoint destination has a parent")
+        .canonicalize()
+        .expect("checkpoint destination parent exists");
+    assert_eq!(parent, cuts_dir, "raw checkpoint stays under .local/cuts");
+    let destination = parent.join(
+        destination
+            .file_name()
+            .expect("checkpoint destination has a file name"),
+    );
+    match std::fs::symlink_metadata(&destination) {
+        Ok(_) => panic!("checkpoint destination already exists"),
+        Err(error) if error.kind() == io::ErrorKind::NotFound => {}
+        Err(error) => panic!("checkpoint destination metadata failed: {error}"),
+    }
+    let suffix = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .expect("system clock is after the Unix epoch")
+        .as_nanos();
+    let temporary = destination.with_file_name(format!(
+        ".{}.candidate-{}-{suffix}",
+        destination
+            .file_name()
+            .expect("checkpoint destination has a file name")
+            .to_string_lossy(),
+        std::process::id()
+    ));
+
+    let owner_size_started = Instant::now();
+    let mut largest_member_bytes = 0u64;
+    for family in population.families() {
+        let checkpoint = match family.admitted_checkpoint() {
+            Some(result) => result.expect("the admitted choosing checkpoint"),
+            None => family
+                .tree_checkpoint()
+                .expect("the tree choosing checkpoint"),
+        };
+        let byte_count = u64::try_from(checkpoint.len())
+            .expect("a member checkpoint length fits the wire integer");
+        drop(checkpoint);
+        largest_member_bytes = largest_member_bytes.max(byte_count);
+    }
+    let owner_size_ms = owner_size_started.elapsed().as_millis();
+
+    let write_started = Instant::now();
+    let mut file = std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .mode(0o600)
+        .open(&temporary)
+        .expect("create private checkpoint candidate");
+    file.set_permissions(std::fs::Permissions::from_mode(0o600))
+        .expect("owner-only checkpoint candidate");
+    assert_eq!(
+        file.metadata().expect("candidate metadata").permissions().mode() & 0o777,
+        0o600,
+        "checkpoint candidate is mode 0600"
+    );
+    let mut writer = CountingFile {
+        file: &mut file,
+        bytes: 0,
+    };
+    population
+        .write_checkpoint(&manifest, &mut writer)
+        .expect("the constructor-derived manifest matches every choosing family");
+    writer.flush().expect("flush checkpoint candidate");
+    let checkpoint_bytes = writer.bytes;
+    drop(writer);
+    file.sync_all().expect("sync checkpoint candidate");
+    drop(file);
+    std::fs::rename(&temporary, &destination).expect("atomically publish private checkpoint");
+    std::fs::File::open(&cuts_dir)
+        .expect("open private checkpoint directory")
+        .sync_all()
+        .expect("sync private checkpoint directory");
+    let write_ms = write_started.elapsed().as_millis();
+    let recorded_file_bytes = std::fs::metadata(&destination)
+        .expect("checkpoint file metadata")
+        .len();
+    assert_eq!(recorded_file_bytes, checkpoint_bytes);
+    let checkpoint_metadata = std::fs::symlink_metadata(&destination)
+        .expect("durable checkpoint metadata");
+    assert!(!checkpoint_metadata.file_type().is_symlink());
+    assert_eq!(
+        checkpoint_metadata.permissions().mode() & 0o777,
+        0o600,
+        "durable checkpoint is mode 0600"
+    );
+    let encode_peak = resident_set().map(|(_, peak)| peak);
+    if encode_peak.is_none_or(|peak| peak >= HOST_CAP_BYTES) {
+        println!(
+            "F5 choosing checkpoint restore: status measured-rss-refused-after-write; choosing cells {choosing_cells}; checkpoint bytes {checkpoint_bytes}; owner sizing {owner_size_ms} ms; write {} ms; total wall {} ms; sampled RSS current {:?} bytes, peak {:?} bytes",
+            write_ms,
+            wall.elapsed().as_millis(),
+            resident_set().map(|(current, _)| current),
+            encode_peak
+        );
+        return;
+    }
+
+    let pre_cursor = population.cells();
+    let pre_face = population.face().expect("choosing pre-face");
+    let next_cell = chart
+        .letter(Section {
+            kind: 2,
+            channel: 0,
+        })
+        .expect("the declared human-turn section cell");
+    let original_receive = population
+        .receive(next_cell)
+        .expect("the declared next section cell is admitted");
+    let post_cursor = population.cells();
+    let post_face = population.face().expect("choosing post-face");
+    let encode_peak = update_census_peak(encode_peak);
+    let model_current = resident_set().map(|(current, _)| current);
+
+    drop(population);
+    let after_drop = resident_set();
+    let current_after_drop = after_drop.map(|(current, _)| current);
+    let projected_decode_peak = match (current_after_drop, model_current, encode_peak) {
+        (Some(after_drop), Some(model), Some(peak)) if peak < HOST_CAP_BYTES => after_drop
+            .checked_add(u128::from(checkpoint_bytes))
+            .and_then(|total| total.checked_add(model))
+            .and_then(|total| total.checked_add(u128::from(largest_member_bytes))),
+        _ => None,
+    };
+    let refuse_preflight = projected_decode_peak.is_none_or(|projected| {
+        projected >= HOST_CAP_BYTES
+            || current_after_drop.is_none_or(|current| current >= HOST_CAP_BYTES)
+    });
+    if refuse_preflight {
+        println!(
+            "F5 choosing checkpoint restore: status preflight-refused; choosing cells {choosing_cells}; checkpoint bytes {checkpoint_bytes}; largest member bytes {largest_member_bytes}; model current RSS {:?} bytes; projected decode peak {:?} bytes; host cap {HOST_CAP_BYTES} bytes; owner sizing {owner_size_ms} ms; write {} ms; total wall {} ms; sampled RSS current {:?} bytes, peak {:?} bytes",
+            model_current,
+            projected_decode_peak,
+            write_ms,
+            wall.elapsed().as_millis(),
+            current_after_drop,
+            encode_peak
+        );
+        return;
+    }
+
+    let read_started = Instant::now();
+    let bytes = std::fs::read(&destination).expect("read private checkpoint bytes");
+    let read_ms = read_started.elapsed().as_millis();
+    assert_eq!(u64::try_from(bytes.len()).ok(), Some(checkpoint_bytes));
+    let after_read = resident_set();
+    if after_read.is_none_or(|(current, peak)| {
+        current >= HOST_CAP_BYTES || peak >= HOST_CAP_BYTES
+    }) {
+        println!(
+            "F5 choosing checkpoint restore: status measured-rss-refused-before-decode; choosing cells {choosing_cells}; checkpoint bytes {checkpoint_bytes}; largest member bytes {largest_member_bytes}; projected decode peak {:?} bytes; read {} ms; total wall {} ms; sampled RSS current {:?} bytes, peak {:?} bytes",
+            projected_decode_peak,
+            read_ms,
+            wall.elapsed().as_millis(),
+            after_read.map(|(current, _)| current),
+            after_read.map(|(_, peak)| peak)
+        );
+        drop(bytes);
+        return;
+    }
+
+    let decode_started = Instant::now();
+    let mut restored = match Population::decode_checkpoint(&manifest, &bytes) {
+        Ok(population) => population,
+        Err(_error) => {
+            println!(
+                "F5 choosing checkpoint restore: status typed-decode-refusal; choosing cells {choosing_cells}; checkpoint bytes {checkpoint_bytes}; largest member bytes {largest_member_bytes}; read {} ms; decode {} ms; total wall {} ms; sampled RSS current {:?} bytes, peak {:?} bytes",
+                read_ms,
+                decode_started.elapsed().as_millis(),
+                wall.elapsed().as_millis(),
+                resident_set().map(|(current, _)| current),
+                resident_set().map(|(_, peak)| peak)
+            );
+            drop(bytes);
+            return;
+        }
+    };
+    let decode_ms = decode_started.elapsed().as_millis();
+    let decode_rss = resident_set();
+    if decode_rss.is_none_or(|(current, peak)| {
+        current >= HOST_CAP_BYTES || peak >= HOST_CAP_BYTES
+    }) {
+        println!(
+            "F5 choosing checkpoint restore: status measured-rss-exceeded; choosing cells {choosing_cells}; checkpoint bytes {checkpoint_bytes}; largest member bytes {largest_member_bytes}; read {} ms; decode {decode_ms} ms; total wall {} ms; sampled RSS current {:?} bytes, peak {:?} bytes",
+            read_ms,
+            wall.elapsed().as_millis(),
+            decode_rss.map(|(current, _)| current),
+            decode_rss.map(|(_, peak)| peak)
+        );
+        drop(restored);
+        drop(bytes);
+        return;
+    }
+
+    let cursor_match = restored.cells() == pre_cursor;
+    let pre_face_match = restored.face().ok().as_ref() == Some(&pre_face);
+    let restored_receive = restored.receive(next_cell);
+    let receive_match = restored_receive.as_ref().ok() == Some(&original_receive);
+    let cursor_after_match = restored.cells() == post_cursor;
+    let post_face_match = restored.face().ok().as_ref() == Some(&post_face);
+    let square_passed = cursor_match
+        && pre_face_match
+        && receive_match
+        && cursor_after_match
+        && post_face_match;
+    drop(restored);
+    drop(bytes);
+    let final_rss = resident_set();
+    println!(
+        "F5 choosing checkpoint restore: status {}; choosing cells {choosing_cells}; checkpoint bytes {checkpoint_bytes}; largest member bytes {largest_member_bytes}; cold restart 0; manifest reconstructed from choosing 1; next receives {}; pre-face classes {}; cursor match {}; pre-face match {}; receive match {}; post-cursor match {}; post-face match {}; owner sizing {owner_size_ms} ms; read {} ms; decode {decode_ms} ms; write {write_ms} ms; projected decode peak {:?} bytes; host cap {HOST_CAP_BYTES} bytes; total wall {} ms; sampled RSS current {:?} bytes, peak {:?} bytes; checkpoint retained beside private choosing cut",
+        if square_passed { "continuation-square-pass" } else { "continuation-square-fail" },
+        1,
+        pre_face.len(),
+        usize::from(cursor_match),
+        usize::from(pre_face_match),
+        usize::from(receive_match),
+        usize::from(cursor_after_match),
+        usize::from(post_face_match),
+        read_ms,
+        projected_decode_peak,
+        wall.elapsed().as_millis(),
+        final_rss.map(|(current, _)| current),
+        final_rss.map(|(_, peak)| peak)
+    );
+}
+
+fn update_census_peak(previous: Option<u128>) -> Option<u128> {
+    match (previous, resident_set().map(|(_, peak)| peak)) {
+        (Some(before), Some(after)) => Some(before.max(after)),
+        (None, sample) | (sample, None) => sample,
+    }
+}
+
+/// Verify a family-ancestral candidate with the population scorer before every emitted byte and
+/// stop on a separate, disposable future branch. This remains private and provisional until
+/// producer keys, compatible-source fibre and numerical health are joined.
+pub fn native_verify_family_probe(
+    choosing_path: &str,
+    request_path: &str,
+    seed_path: &str,
+    output_path: &str,
+) {
+    use std::os::unix::fs::PermissionsExt;
+    let request = std::fs::read(request_path).expect("the owner-only request");
+    assert!(
+        std::str::from_utf8(&request).is_ok(),
+        "visible UTF-8 request"
+    );
+    let seed: [u8; 8] = std::fs::read(seed_path)
+        .expect("the owner-only draw key")
+        .try_into()
+        .expect("one u64 key");
+    let (chart, cut, base, _manifest, _egg_index, setup, _learned) =
+        prepare_native_population(choosing_path);
+    println!(
+        "F5 family score verification: choosing cells {}; preparation {} ms; sampled RSS {:?} bytes",
+        cut.codes.len(),
+        setup.elapsed().as_millis(),
+        resident_set().map(|(now, _)| now)
+    );
+    let warm_clock = Instant::now();
+    let (bytes, generated_status, family, _faces, branch_ms, release_ms, _posterior_width, stop) =
+        native_family_release(
+            &base,
+            chart,
+            cut.population as usize,
+            &request,
+            u64::from_le_bytes(seed),
+        );
+    let mut output = Vec::new();
+    let mut verified_faces = 0usize;
+    let mut verification_ms = 0u128;
+    let status = if generated_status == "provisional-family-path-provenance-fibre-health-owed" {
+        let verification_clock = Instant::now();
+        let mut branch = base
+            .branch_future()
+            .expect("the same contemporary choosing standing");
+        let target = branch.cells() as u64;
+        let response_letter = target + 1 + request.len() as u64;
+        branch
+            .plan_relation(Relation {
+                letter: response_letter,
+                kind: RelationKind::Request,
+                target,
+            })
+            .expect("request relation");
+        branch
+            .receive(
+                chart
+                    .letter(Section {
+                        kind: 2,
+                        channel: 0,
+                    })
+                    .expect("human turn"),
+            )
+            .expect("human section");
+        for &byte in &request {
+            branch.receive(usize::from(byte)).expect("request byte");
+        }
+        branch
+            .receive(
+                chart
+                    .letter(Section {
+                        kind: 2,
+                        channel: 1,
+                    })
+                    .expect("agent turn"),
+            )
+            .expect("agent section");
+        match verify_scored_text_path(
+            &mut branch,
+            &bytes,
+            stop.expect("a completed path has a stop"),
+            chart,
+        ) {
+            Ok(checked) => {
+                verified_faces = checked.face_trace().len();
+                output.extend_from_slice(checked.bytes());
+                verification_ms = verification_clock.elapsed().as_millis();
+                "whole-path-score-and-codec-checked-provenance-fibre-health-owed"
+            }
+            Err(_) => {
+                verification_ms = verification_clock.elapsed().as_millis();
+                "whole-path-score-separator"
+            }
+        }
+    } else {
+        generated_status
+    };
+    let path = std::path::Path::new(output_path);
+    let parent = path.parent().expect("private output directory");
+    assert_eq!(
+        std::fs::metadata(parent)
+            .expect("output directory")
+            .permissions()
+            .mode()
+            & 0o077,
+        0
+    );
+    write_private_output(path, &output);
+    println!(
+        "F5 family score verification: {status}; selected family {family}; bytes {}; scored faces {verified_faces}; generation branch {branch_ms} ms, release {release_ms} ms, verification {verification_ms} ms, full warm {} ms; sampled RSS {:?} bytes",
+        output.len(),
+        warm_clock.elapsed().as_millis(),
+        resident_set().map(|(now, _)| now)
+    );
 }

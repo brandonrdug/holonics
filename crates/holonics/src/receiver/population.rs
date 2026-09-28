@@ -254,15 +254,24 @@
 
 pub mod admitted;
 pub mod arithmetic;
+pub use checkpoint::{
+    AdmittedMemberManifest, PopulationCheckpointError, PopulationMemberManifest, TreeMemberManifest,
+};
 pub mod boundary;
+pub mod checkpoint;
 pub mod composition;
 pub mod dormancy;
 pub mod evolution;
 pub mod families;
+pub mod family_release;
+pub mod health;
 pub mod merge;
+pub mod provenance;
 pub mod releasing;
+pub mod sampling;
 pub mod sectioned_words;
 pub mod species;
+pub mod text_release;
 pub mod words;
 
 #[cfg(test)]
@@ -270,11 +279,23 @@ mod composition_tests;
 #[cfg(test)]
 mod evolution_tests;
 #[cfg(test)]
+mod family_release_tests;
+#[cfg(test)]
+mod future_branch_tests;
+#[cfg(test)]
+mod health_tests;
+#[cfg(test)]
+mod provenance_tests;
+#[cfg(test)]
 mod releasing_tests;
+#[cfg(test)]
+mod sampling_tests;
 #[cfg(test)]
 mod sectioned_words_tests;
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod text_release_tests;
 #[cfg(test)]
 mod words_tests;
 
@@ -293,16 +314,24 @@ pub use composition::{
 pub use dormancy::{Dormancy, DormantFamily, Layered, Weight};
 pub use evolution::{Declaration, Identity, Selections, Tally};
 pub use families::{GratingParity, GratingSheet, RotorKeys, TreeFamily};
+pub use family_release::{FamilyReleaseError, select_family_class};
+pub use health::{
+    PopulationReceivingFaceHealth, PopulationReceivingFaceHealthError,
+    population_receiving_face_health,
+};
 pub use merge::{
     Blocks, Item, KtTables, MergeReceipt, PartitionReceipt, Price, learn_hazard_partition,
     restaurant_ratio,
 };
-pub use releasing::{
-    MissingTextReleaseTerm, PopulationRelease, ReleaseRefusal, TextReleaseRefusal,
-};
+pub use provenance::{FaceContribution, MissingProducerTerm};
+pub use releasing::{PopulationRelease, ReleaseRefusal};
+pub use sampling::{CertifiedClass, CrossingBounds, SamplingError, select_class};
 pub use sectioned_words::SectionedWordFamily;
 pub use species::{
     AdmittedFuture, Collapse, FactorSpecies, KeystoneMember, KeystoneSpecies, Seed, Species,
+};
+pub use text_release::{
+    TextAppend, TextDecoder, TextRelease, TextReleaseError, TextSeparator, verify_scored_text_path,
 };
 pub use words::{
     EncodingSeparator, EncodingSquare, ParseError, SegmentationLattice, SeparatorCause, WORD_END,
@@ -351,6 +380,10 @@ pub enum PopulationError {
         "every family's likelihood reached zero by cell {cell}: no declared family made the passage"
     )]
     Extinct { cell: usize },
+    #[error("family {label} does not expose a contemporary standing for future branching")]
+    FutureBranchUnsupported { label: String },
+    #[error("a population with a live founding closure cannot be branched")]
+    FutureBranchFounding,
     #[error(transparent)]
     Context(#[from] ContextError),
     #[error(transparent)]
@@ -471,6 +504,31 @@ pub enum Readout<'a> {
 /// [definition] **A declared navigator family** (module header): a candidate egg read by the
 /// receiver.
 pub trait Family: Send {
+    /// Canonical contemporary checkpoint bytes for owners with a declared native codec.
+    /// Unsupported family owners return `None`; the population codec refuses them.
+    fn tree_checkpoint(&self) -> Option<Vec<u8>> {
+        None
+    }
+    /// Cell ticks already received by a tree owner that exposes the tree-only checkpoint.
+    fn tree_received_cells(&self) -> Option<u64> {
+        None
+    }
+    /// Canonical contemporary checkpoint for the admitted request/response receiver, when owned.
+    fn admitted_checkpoint(
+        &self,
+    ) -> Option<Result<Vec<u8>, crate::receiver::population::admitted::AdmittedStageCheckpointError>>
+    {
+        None
+    }
+    /// Cell ticks already received by the admitted egg's inner boundary receiver.
+    fn admitted_received_cells(&self) -> Option<u64> {
+        None
+    }
+    /// An ephemeral continuation at this family's contemporary standing. Implementations must
+    /// copy only the state needed to continue admitted futures; they must not reconstruct by replay.
+    fn branch_future(&self) -> Option<Box<dyn Family>> {
+        None
+    }
     /// The family's declaration, for a receipt.
     fn label(&self) -> String;
     /// The declared cell alphabet.
@@ -1711,6 +1769,42 @@ impl Population {
     /// The cells received.
     pub fn cells(&self) -> usize {
         self.cells
+    }
+
+    /// Make an ephemeral branch from the current standing. The exact current face and receipt are
+    /// preserved by continuing family-owned state, likelihoods, masses, clocks and counters as-is.
+    /// Unsupported owners and populations with a non-cloneable founding closure return refusals.
+    pub fn branch_future(&self) -> Result<Self, PopulationError> {
+        if self.founding.is_some() {
+            return Err(PopulationError::FutureBranchFounding);
+        }
+        let mut members = Vec::with_capacity(self.members.len());
+        for member in &self.members {
+            let Some(family) = member.family.branch_future() else {
+                return Err(PopulationError::FutureBranchUnsupported {
+                    label: member.family.label(),
+                });
+            };
+            members.push(Member {
+                family,
+                mass: member.mass.clone(),
+                prior: member.prior.clone(),
+                born: member.born,
+                inherited: member.inherited.clone(),
+                died: member.died,
+                reseeded: member.reseeded,
+                origin: member.origin,
+            });
+        }
+        Ok(Self {
+            members,
+            alphabet: self.alphabet,
+            mass: self.mass.clone(),
+            founded: self.founded.clone(),
+            cells: self.cells,
+            founding: None,
+            section: self.section.clone(),
+        })
     }
 
     /// The families, in their declared order, newborns after.

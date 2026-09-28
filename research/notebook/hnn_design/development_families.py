@@ -5,7 +5,7 @@ Family keys and assignments stay in an owner-only file; stdout contains counts a
 
     HOLONICS_ROOT=<checkout with private data> python3 development_families.py
 
-Pass `F1` or `F2` for an independent item split before its validation; the default remains the
+Pass `F1`, `F2` or `F5` for an independent item split before its validation; the default remains the
 pinned F4 split.
 
 The split belongs to the exterior codec. A family is the undivided pair
@@ -43,7 +43,7 @@ def assignment(family, seed=SEED):
 
 def main():
     arguments = sys.argv[1:]
-    if arguments not in ([], ["F1"], ["F2"]):
+    if arguments not in ([], ["F1"], ["F2"], ["F5"]):
         sys.exit(__doc__)
     item = arguments[0] if arguments else "F4"
     seed = SEED if item == "F4" else f"holonics-{item.lower()}-development-families-2026-09-27-v1"

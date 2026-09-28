@@ -32,6 +32,9 @@ emit another class), so this module states the same mixture with **nonnegative**
   `w_f w′_g`; under that attribution each dead family's mass is received whole, and a survivor's new
   weight reads as its share of the living mass plus its attributed shares of the dead (Rust
   `receiver::population::DeathReceipt`: the population's total mass is conserved across a death).
+* `certified_inverseCDF_class` [proved-derived; formal-checked]: interval face bounds certify a
+  draw's class when its lower cumulative mass through that class exceeds the draw and its upper
+  cumulative mass before that class does not. An unresolved draw remains unresolved.
 
 The computational object is the helical pair interaction read as a receiver's population of
 candidate eggs; of the winding guide's six general objects this module touches **faces and
@@ -48,6 +51,28 @@ namespace Holonics.Compression.Landmark.Context.Population
 open Finset
 open Holonics.Compression.Landmark.Context.Tree
 open Holonics.Compression.Landmark.Context.LocalWeighing
+
+section CertifiedRelease
+
+/-- A draw lies in one class of a finite exact face, with the left boundary included. -/
+def InverseCDFClass {n : ℕ} (q : Fin n → ℚ) (draw : ℚ) (i : Fin n) : Prop :=
+  (∑ j ∈ Finset.univ.filter (fun j : Fin n => j.val < i.val), q j) ≤ draw ∧
+    draw < ∑ j ∈ Finset.univ.filter (fun j : Fin n => j.val ≤ i.val), q j
+
+/-- [proved-derived; formal-checked] The outward bounds used by Rust's certified inverse-CDF
+selector suffice for every compatible exact receiving face. This theorem preserves the unresolved
+draw region: it does not turn a selectively emitted submeasure into the full mixture. -/
+theorem certified_inverseCDF_class {n : ℕ} (lower upper q : Fin n → ℚ)
+    (draw : ℚ) (i : Fin n) (hlower : ∀ j, lower j ≤ q j)
+    (hupper : ∀ j, q j ≤ upper j)
+    (hbefore : (∑ j ∈ Finset.univ.filter (fun j : Fin n => j.val < i.val), upper j) ≤ draw)
+    (hthrough : draw < ∑ j ∈ Finset.univ.filter (fun j : Fin n => j.val ≤ i.val), lower j) :
+    InverseCDFClass q draw i := by
+  constructor
+  · exact le_trans (Finset.sum_le_sum fun j _ => hupper j) hbefore
+  · exact lt_of_lt_of_le hthrough (Finset.sum_le_sum fun j _ => hlower j)
+
+end CertifiedRelease
 
 /-- A likelihood that reaches zero stays zero. -/
 theorem seqLik_eq_zero_of_le {a : ℕ → ℚ} {t n : ℕ} (h : seqLik a t = 0) (htn : t ≤ n) :
@@ -337,6 +362,7 @@ section Audit
 #print axioms survivor_code
 #print axioms survivors_product
 #print axioms death_is_an_exchange
+#print axioms certified_inverseCDF_class
 
 end Audit
 

@@ -1322,8 +1322,40 @@ fn main() {
         ["f4", curated_cut, flat_cut] => {
             curated::harness(curated_cut, flat_cut, curated::Reach::F4);
         }
+        ["f5-native", choosing_cut, request, seed, private_output] => {
+            curated::native_probe(choosing_cut, request, seed, private_output, false);
+        }
+        ["f5-family", choosing_cut, request, seed, private_output] => {
+            curated::native_probe(choosing_cut, request, seed, private_output, true);
+        }
+        [
+            "f5-family-verify",
+            choosing_cut,
+            request,
+            seed,
+            private_output,
+        ] => {
+            curated::native_verify_family_probe(choosing_cut, request, seed, private_output);
+        }
+        ["f5-bundle", choosing_cut, bundle, private_dir] => {
+            curated::native_bundle(choosing_cut, bundle, private_dir, 32);
+        }
+        ["f5-bundle", choosing_cut, bundle, private_dir, limit] => {
+            curated::native_bundle(
+                choosing_cut,
+                bundle,
+                private_dir,
+                limit.parse().expect("a request limit"),
+            );
+        }
+        ["f5-checkpoint-census", choosing_cut] => {
+            curated::checkpoint_census(choosing_cut);
+        }
+        ["f5-checkpoint-restore", choosing_cut, checkpoint_path] => {
+            curated::checkpoint_restore(choosing_cut, checkpoint_path);
+        }
         _ => println!(
-            "usage: hnn_population -- tree <d> | moire parity | moire sheets | crib | switching | standing <cut> | composition [products | primes] | evolution | species | curated <curated-cut> <flat-cut> [development | merges] | f4 <joined-cut> <joined-flat-cut>"
+            "usage: hnn_population -- tree <d> | moire parity | moire sheets | crib | switching | standing <cut> | composition [products | primes] | evolution | species | curated <curated-cut> <flat-cut> [development | merges] | f4 <joined-cut> <joined-flat-cut> | f5-native <choosing-cut> <private-request> <private-seed> <private-output> | f5-family <choosing-cut> <private-request> <private-seed> <private-output> | f5-family-verify <choosing-cut> <private-request> <private-seed> <private-output> | f5-bundle <choosing-cut> <private-F5R1-bundle> <owner-only-output-dir> [limit 1..32] | f5-checkpoint-census <choosing-cut> | f5-checkpoint-restore <choosing-cut> <.local/cuts/private-checkpoint>"
         ),
     }
 }

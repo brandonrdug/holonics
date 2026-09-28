@@ -25,7 +25,7 @@ def header_object(prefix, key):
     return json.JSONDecoder().raw_decode(prefix[colon + 1:].decode("utf-8").lstrip())[0]
 
 
-def role_by_event():
+def role_by_event(item, seed):
     roles = {}
     counts = {"choosing": 0, "validation": 0}
     with open(SOURCE, "rb") as handle:
@@ -36,10 +36,10 @@ def role_by_event():
                 continue
             family = header_object(prefix, "family")
             position = header_object(prefix, "position")
-            role, _ = assignment(family)
+            role, _ = assignment(family, seed)
             counts[role] += 1
             roles[position["first_event"]] = role
-    with open(os.path.join(OUT_DIR, "development-families-f4.json"), "rb") as handle:
+    with open(os.path.join(OUT_DIR, f"development-families-{item.lower()}.json"), "rb") as handle:
         pinned = json.load(handle)
     assert counts == pinned["counts"], "the pinned split"
     return roles
@@ -91,13 +91,15 @@ def best_control(request, before, candidates):
     return None if best is None else best[3]
 
 
-def main():
-    roles = role_by_event()
+def main(item="F4"):
+    assert item in ("F4", "F5")
+    seed = SEED if item == "F4" else "holonics-f5-development-families-2026-09-27-v1"
+    roles = role_by_event(item, seed)
     with open(os.path.join(OUT_DIR, "curated-source.incidence.jsonl"), "rb") as handle:
         all_occurrences = [json.loads(line) for line in handle]
-    with open(os.path.join(OUT_DIR, "curated-f4-validation-source.json"), "rb") as handle:
+    with open(os.path.join(OUT_DIR, f"curated-{item.lower()}-validation-source.json"), "rb") as handle:
         validation_manifest = json.load(handle)
-    with open(os.path.join(OUT_DIR, "curated-f4-validation-source.incidence.jsonl"), "rb") as handle:
+    with open(os.path.join(OUT_DIR, f"curated-{item.lower()}-validation-source.incidence.jsonl"), "rb") as handle:
         validation_occurrences = [json.loads(line) for line in handle]
     by_event = {entry["event"]: entry for entry in all_occurrences}
     assert len(by_event) == len(all_occurrences)
@@ -137,7 +139,8 @@ def main():
             if not query:
                 continue
             coordinate = f'{response["occurrence"]}:{request_at}'
-            order = hashlib.sha256(SEED.encode() + b"\0F4 inspection" + coordinate.encode()).digest()
+            domain = "F4 inspection" if item == "F4" else "F5 retrospective"
+            order = hashlib.sha256(seed.encode() + b"\0" + domain.encode() + coordinate.encode()).digest()
             eligible.append((order, coordinate, response["occurrence"], request_at, query))
         eligible.sort()
         chosen = []
@@ -147,8 +150,8 @@ def main():
                            "retrieval_refusal": control is None})
     coordinate_bytes = "\n".join(item["coordinate"] for item in chosen).encode()
     receipt = {
-        "schema": "holonics.f4-retrospective.v1",
-        "seed": SEED,
+        "schema": f"holonics.{item.lower()}-retrospective.v1",
+        "seed": seed,
         "eligible": len(eligible),
         "selected": len(chosen),
         "choosing_pairs": len(candidates),
@@ -157,7 +160,8 @@ def main():
         "items": chosen,
     }
     private_directory()
-    private_write(NAME, json.dumps(receipt, ensure_ascii=False).encode("utf-8"))
+    name = NAME if item == "F4" else "f5-retrospective.json"
+    private_write(name, json.dumps(receipt, ensure_ascii=False).encode("utf-8"))
     print(json.dumps({key: receipt[key] for key in (
         "schema", "eligible", "selected", "choosing_pairs", "retrieval_refusals", "coordinates_sha256"
     )}, indent=2))
