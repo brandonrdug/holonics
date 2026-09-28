@@ -90,6 +90,8 @@ that the full probe atlas (every Markov parameter at every excitation, readout a
 the exact linear systems of bounded dimension, and `theEmbeddingIsNotOneVector` exhibits an atlas
 whose every chart is inhabited while no coherent placement exists.
 
+<a id="the-causal-chord"></a>
+
 [definition] **The causal chord.** For a local linearization `ẋ = A_x x + B_x u`, `y = C_x x`, the
 receiver-relative transfer object and its chord are
 
@@ -102,12 +104,77 @@ It carries more than the spectrum of `A_x`: the poles give modal frequency and d
 `B_x` says which modes the source can excite, `C_x` which modes the receiver observes, and the
 residues weight each source–mode–receiver path. For a non-normal `A_x` the eigenvalues omit
 transient amplification, so the receiver reads the resolvent `C_x(iωI − A_x)⁻¹B_x` or its singular
-modes. [proved-derived; formal-checked; implemented-exact] `Foundation/CausalChord` proves the
-resolvent identity, poles ⊆ eigenvalues with strict inclusion for an unexcited or unobserved mode
+modes. [proved-derived; formal-checked] `Foundation/CausalChord` proves the resolvent identity,
+poles ⊆ eigenvalues with strict inclusion for an unexcited or unobserved mode
 (`cancellation_is_strict`), and invariance of the whole transfer object under a chart change
-(`rebase_transfer`). [`holonics::receiver::causal_chord`](../crates/holonics/src/receiver/causal_chord.rs)
-builds `H(s) = C adj(sI−A) B / det(sI−A)` exactly over `ℚ`, certified coefficientwise, and
-`separate_under_probe` returns the probe and readout that separate two cospectral linearizations.
+(`rebase_transfer`).
+
+[definition] **Its Rust realization is retired.** `holonics::receiver::causal_chord` built
+`H(s) = C adj(sI − A) B / det(sI − A)` exactly over `ℚ`. Once `hnn::modes` retired (U2) it had no
+library caller, and it was retired at U3's second loop, September 28
+([history at `c10acca9`](https://github.com/brandonrdug/holonics/blob/c10acca9/crates/holonics/src/receiver/causal_chord.rs)).
+Its pole readings re-entered `ratio::polynomial`, which stays their owner. The laws only it carried
+are kept here, so that an owner which needs the chord can re-enter them:
+- [proved-standard] **The exact construction.** One Faddeev–LeVerrier recurrence returns both halves
+  of `C adj(sI − A) B / det(sI − A)`. With `M_0 = 0`, `M_k = A M_(k−1) + c_(n−k+1) I` and
+  `c_(n−k) = −tr(A M_k)/k` for `k = 1, …, n`, it gives `det(sI − A) = Σ_k c_k s^k` and
+  `adj(sI − A) = Σ_(k=1..n) M_k s^(n−k)`. The scalar half is
+  `ratio::linear::ExactRatMatrix::characteristic_polynomial`. The certificate is the matrix
+  polynomial identity `(sI − A)·adj(sI − A) = det(sI − A)·I`, checked in each of its `n + 1`
+  coefficients. The closing coefficient is Cayley–Hamilton, the one equation the recurrence does
+  not produce by construction. One point is not a certificate: an adjugate corrupted by
+  `D·s − 3D` agrees with the true one at `s = 3`.
+- [proved-standard] **Cancellation is reported, never lost.** The common factor of
+  `C_i adj(sI − A) B_j` and `det(sI − A)` is the modes that source `j` cannot excite or receiver `i`
+  cannot observe. `det(sI − A)` divided by the least common multiple of the reduced entry
+  denominators is the population the whole declared atlas does not see. At a simple eigenvalue `λ`
+  with right eigenvector `v` and left eigenvector `w`, the residue of entry `(i, j)` is
+  `(C_i v)(w B_j)/(w v)`, so `λ` is its pole exactly when `C_i v ≠ 0` and `w B_j ≠ 0` (Hautus).
+  With `A = diag(1, 2)`, `B = e₁` and `C = e₁ᵀ`, the factor `s − 2` cancels. Widening the readout
+  to `C = I` with `B = (1, 1)ᵀ` recovers it: the cancellation belongs to the declared atlas, not to
+  the operator.
+- [definition] **A pole is named by its factor.** The squarefree decomposition of the reduced
+  denominator carries each pole's multiplicity as an index. A rational pole is an exact rational
+  (`ratio::polynomial::{rational_root_census, rational_roots_by_lifting}`). Every other pole is
+  named by the exact squarefree factor it is a root of, and its Sturm isolating interval is only a
+  readout. The half-plane population, with multiplicity, is `ratio::polynomial::half_plane_count`
+  (Routh–Hurwitz in its Sturm form). For a symmetric `A` it is Sylvester's inertia of `A`
+  (`ratio::linear::inertia::inertia`), and `ratio::polynomial`'s tests hold the two to exact
+  agreement.
+- [proved-standard] **Residues.**
+  - At a simple rational pole `a`, the residue of `N/D` is `N(a)/D′(a)`: both residues of
+    `1/(s − 1) + 1/(s − 2)` are one.
+  - At a pole of order `m`, the Laurent head carries `m` coefficients:
+    `1/((s − 1)²(s + 3)) = 1/(4(s − 1)²) − 1/(16(s − 1)) + …`.
+  - At an irrational pole the residue is an element of `ℚ[x]/(f)` for its factor `f`, and it
+    specializes at every root at once: `1/(s² − 2)` has the residue `x/4`, which is
+    `√2/4 = 1/(2√2)` at `√2`.
+- [proved-standard] **The resolvent at a Gaussian-rational point, and the index.**
+  - `(sI − A)⁻¹` at `s = σ + iω` is exact over `ℚ` through the realification
+    `[[σI − A, −ωI], [ωI, σI − A]]`, inverted exactly and re-checked to a zero residual.
+  - The resolvent's order of growth at an eigenvalue is the eigenvalue's index (its largest Jordan
+    block), not its multiplicity. The realifications of `[[i, 1], [0, i]]` and `diag(i, i)` are
+    `4 × 4` rational matrices, both with characteristic polynomial `(s² + 1)²`; their minimal
+    polynomials are `(s² + 1)²` and `s² + 1`.
+  - Probed at `s = i + δ` for `δ = 1/10, 1/100, 1/1000`, the defective resolvent's squared
+    Frobenius norm grows by more than `10³` a decade (`δ^(−4)`), and the semisimple one's by less
+    (`δ^(−2)`). Some coordinate probe of the defective operator has a reduced denominator of
+    degree 4; every probe of the semisimple one stays at degree 2.
+  - Semisimplicity is decided exactly: the minimal polynomial equals its squarefree part
+    (`ratio::linear::ExactRatMatrix::minimal_polynomial`). The semisimple realification has a
+    positive definite conserving receiver (`AᵀG + GA = 0`) and the defective one has none (Lean
+    `semisimple_imaginary_has_conserving_receiver`, `jordan_has_no_conserving_receiver`). The
+    converse is owed in #62.
+- [counterexample; measured] **A cospectral pair the response atlas separates.**
+  - The two graphs on six vertices have the contacts `(0,2) (0,3) (0,4) (0,5) (1,4) (1,5) (2,3)`
+    and `(0,2) (0,4) (0,5) (1,2) (1,4) (1,5) (2,3)`. Their degree sequences, `(4,2,2,2,2,2)` and
+    `(3,3,3,2,2,1)`, differ, so they are not isomorphic.
+  - Their negative Laplacians `A = −L` share `det(sI − A) = s⁶ + 14s⁵ + 73s⁴ + 176s³ + 192s² + 72s`.
+  - Their driving-point numerators at vertex 0 are `s⁵ + 10s⁴ + 37s³ + 62s² + 46s + 12` and
+    `s⁵ + 11s⁴ + 43s³ + 73s² + 52s + 12`.
+  - The full coordinate atlas (`B = C = I`) separates them at 32 of its 36 probe/readout pairs.
+    `Foundation/ReceiverAtlas.spectralTopologicalInsufficiency` carries the driving-point pair as
+    data.
 
 [proved-derived] **Rate as a receiver reading.** With a differentiable Hermitian positive metric
 `G(t)` and `ẋ = A(t)x + s(t)`, the reading `E_G = x*Gx/2` obeys
@@ -180,9 +247,12 @@ them from here.
   removes it, and the probe is the generator whose removal leaves the least sup-norm diameter. Over
   an enumerated fibre, a declared observation partitions the fibre into its level sets; its survivor
   is the largest width the target reading keeps inside one level set, never more than the whole
-  width (`width_mono`), and the probe is the observation with the least survivor. The chaser's
-  probe (`receiver::population::chaser`) partitions the same way under another criterion, the
-  expected information `I = log₂|Θ| − (1/|Θ|) Σ_c |c| log₂|c|` of the partition.
+  width (`width_mono`), and the probe is the observation with the least survivor. The live probe
+  criterion is information, not a survivor width: the chaser's probe (`receiver::population::chaser`,
+  U3's second loop) partitions its fibre the same way and is offered as
+  `receiver::release::ProbePartition`, the partition's information
+  `I = log₂|Θ| − (1/|Θ|) Σ_c |c| log₂|c|` compared exactly as `∏_c |c|^|c|`
+  (`Population.partitionInformation_lt_iff`).
 - [definition] **The coarsening tower search** (`releaseCoarser`). Up a declared tower of readings,
   finest first, each step's factoring through the step below is checked over the fibre: two
   members the finer reading identifies must be identified by the coarser one

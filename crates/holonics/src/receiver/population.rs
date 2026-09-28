@@ -221,8 +221,10 @@
 //! ([`PopulationRelease`], `P_release = P_scored`), the family draw ([`Population::select_family`])
 //! and the response ([`Population::release_response`]) return that law's certified draws, stop law
 //! and typed refusals; a response under the scored law carries each drawn cell's family provenance
-//! ([`Population::face_contributors`]). The chaser's rule ([`chaser`]) is a separate arm, a
-//! capture-basin commit with an information probe.
+//! ([`Population::face_contributors`]). The chaser ([`chaser`]) returns the law's certified capture
+//! (`Released` at tolerance zero on the capture-within-`m` reading) and its probe (`Ask`, with the
+//! partition it is chosen by); its cornering commit is a declared separate arm, whose separating
+//! term is the price of a tick.
 //!
 //! [definition] The computational object is the helical pair interaction, read here as a
 //! receiver's population of candidate eggs through aeons. Of the winding guide's six general objects
@@ -306,7 +308,9 @@ pub use boundary::{
     HazardPartition, HazardRest, LastByte, PartClock, PartPort, byte_index, dyadic_class,
 };
 pub use chase::{ChaseFamily, selected_fibre};
-pub use chaser::{MachineChaser, MachineDeclaration, MachineReceipt, Release};
+pub use chaser::{
+    MachineChaser, MachineDeclaration, MachineReceipt, MachineRelease, ProbePrice, Release,
+};
 pub use composition::{
     Composed, Conditioned, Keystone, Port, PortPath, PortReader, PortedEmitters, Unheld,
 };
@@ -344,6 +348,7 @@ use crate::ratio::Rat;
 use crate::ratio::algebraic::{
     ExactInterval, ExactValueError, LOG_OCTAVES, interval_difference, interval_sum,
 };
+use crate::receiver::face::WidthRefusal;
 
 /// Every refusal of a population. Bad input is a typed return, never a panic.
 #[derive(Debug, Error, PartialEq)]
@@ -385,6 +390,15 @@ pub enum PopulationError {
     /// Boxed: the HNN's refusals are wide.
     #[error(transparent)]
     Hnn(Box<HnnError>),
+    /// The one decision law's refusal (`receiver::release`). Boxed: its refusals are wide.
+    #[error(transparent)]
+    Release(Box<WidthRefusal>),
+}
+
+impl From<WidthRefusal> for PopulationError {
+    fn from(error: WidthRefusal) -> Self {
+        Self::Release(Box::new(error))
+    }
 }
 
 impl From<TerrainError> for PopulationError {

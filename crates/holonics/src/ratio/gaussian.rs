@@ -3,7 +3,7 @@
 //! [definition] An element of `ℚ(i)`: two exact rationals. Its operations are the field's; a
 //! division by zero is a typed refusal. The unit circle of this field is the parametron's carrier
 //! ([`crate::holon::parametron::Carrier::as_gaussian`]); the physical instances (fluid potentials,
-//! wave amplitudes) and the causal chord's resolvent probe carry their complex values in it. Lean
+//! wave amplitudes) carry their complex values in it. Lean
 //! works over `ℂ` (`Physics/Fluid/Singularity`, `Physics/Fluid/ComplexFluid`,
 //! `Physics/Wave/Interference`); every value computed here is a Gaussian-rational instance of those
 //! statements.

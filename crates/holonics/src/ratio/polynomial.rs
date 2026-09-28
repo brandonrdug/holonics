@@ -437,37 +437,6 @@ impl RationalPolynomial {
         Ok(decomposition)
     }
 
-    /// The extended Euclidean relation `s·self + t·other = gcd`, monic gcd.
-    ///
-    /// Returned as `(gcd, s, t)`. A reduction that must split a numerator
-    /// across two coprime denominators is exactly this identity, and computing
-    /// it is what lets the split be *derived* rather than searched for.
-    pub(crate) fn extended_monic_gcd(
-        &self,
-        other: &Self,
-    ) -> Result<(Self, Self, Self), ExactPolynomialError> {
-        let (mut old_remainder, mut remainder) = (self.clone(), other.clone());
-        let (mut old_s, mut s) = (Self::new(vec![Rat::one()]), Self::zero());
-        let (mut old_t, mut t) = (Self::zero(), Self::new(vec![Rat::one()]));
-        while !remainder.is_zero() {
-            let (quotient, next) = old_remainder.divided_by(&remainder)?;
-            old_remainder = std::mem::replace(&mut remainder, next);
-            let next_s = old_s.minus(&quotient.times(&s));
-            old_s = std::mem::replace(&mut s, next_s);
-            let next_t = old_t.minus(&quotient.times(&t));
-            old_t = std::mem::replace(&mut t, next_t);
-        }
-        let Some(leading) = old_remainder.leading().cloned() else {
-            return Err(ExactPolynomialError::ZeroPolynomial);
-        };
-        let inverse = Rat::one() / leading;
-        Ok((
-            old_remainder.scaled(&inverse),
-            old_s.scaled(&inverse),
-            old_t.scaled(&inverse),
-        ))
-    }
-
     /// The primitive integer representative: denominators cleared, integer content removed, sign
     /// fixed so the leading coefficient is positive.
     ///
@@ -894,7 +863,7 @@ fn reflected_with_positive_leading(coefficients: &[BigInt]) -> Vec<BigInt> {
 /// `cauchy_bound` is retained beside them so a reader can see, on their own material, what was
 /// replaced.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub(crate) struct RealRootEnclosure {
+pub struct RealRootEnclosure {
     /// Every real root is strictly below this.
     pub positive_bound: BigInt,
     /// Every real root is strictly above `-negative_bound`.
@@ -1120,7 +1089,7 @@ pub(crate) fn squared_shrinking_steps(
 /// One real root of the auxiliary polynomial, isolated with its Sturm sign-variation certificate,
 /// together with the exact statement of whether it is rational.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub(crate) struct CensusedRealRoot {
+pub struct CensusedRealRoot {
     pub isolating: AlgebraicRoot,
     /// Present exactly when this root is rational, and then it is the root itself.
     pub rational_value: Option<Rat>,
@@ -1132,7 +1101,7 @@ pub(crate) struct CensusedRealRoot {
 /// half is separate on purpose — a real root that is not rational is exactly the obstruction a
 /// chart transition hits, and it is retained here with a certificate rather than discarded.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub(crate) struct RationalRootCensus {
+pub struct RationalRootCensus {
     pub source: RationalPolynomial,
     pub primitive: IntegerPolynomial,
     /// `B(z) = c^(n-1) A(z/c)`, monic over `Z`, whose integer roots are `c` times the rational
@@ -1167,7 +1136,7 @@ pub(crate) struct RationalRootCensus {
 /// A cost is measured in work; a clock may measure but never selects, and nothing here consults
 /// one.
 #[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
-pub(crate) struct CensusWork {
+pub struct CensusWork {
     pub sturm_counts: u64,
     pub bisection_steps: u64,
     pub exact_evaluations: u64,
@@ -1203,7 +1172,7 @@ pub(crate) struct CensusWork {
 /// the lift is transport along the `p`-adic direction, and the reconstruction is the return to the
 /// global chart. The exact evaluation is the receiver's check that the returned object is the one
 /// the question asked for.
-pub(crate) fn rational_roots_by_lifting(
+pub fn rational_roots_by_lifting(
     polynomial: &RationalPolynomial,
 ) -> Result<Vec<Rat>, ExactPolynomialError> {
     let degree = polynomial
@@ -1414,7 +1383,7 @@ pub(crate) fn rational_reconstruction(
 /// The descent runs over [`certified_real_root_enclosure`] of the monic companion: a `k`-th root
 /// bound, split positive from negative, each side carrying its own Taylor-shift certificate. See
 /// that type for what it replaced and why both R1 and R3 had routed around this owner.
-pub(crate) fn rational_root_census(
+pub fn rational_root_census(
     polynomial: &RationalPolynomial,
 ) -> Result<RationalRootCensus, ExactPolynomialError> {
     census_within(polynomial, None)
@@ -1955,7 +1924,7 @@ pub(crate) fn real_root_count_with_multiplicity(
 /// `ω₀`, so `(ω−ω₀)^m` divides both `P` and `Q` and at least one of the two order-`m` coefficients
 /// is nonzero — hence **the multiplicity of `iω₀` in `p` is exactly the multiplicity of `ω₀` as a
 /// real root of `gcd(P,Q)`**.
-pub(crate) fn axis_root_count(
+pub fn axis_root_count(
     polynomial: &RationalPolynomial,
 ) -> Result<usize, ExactPolynomialError> {
     if polynomial.is_zero() {
@@ -2040,13 +2009,14 @@ fn right_half_plane_count_axis_free(
 ///    [`HALF_PLANE_REFINEMENT_CEILING`] so a hostile polynomial returns a named refusal rather than
 ///    running forever.
 ///
-/// [definition] **This is the one owner.** `causal_chord::half_plane_count` is a thin re-entry into
-/// it that maps the refusal into that module's own species; there is no second implementation.
-/// When the operator is symmetric the whole question is already answered by Sylvester's signature
-/// and `causal_chord::half_plane_from_symmetric` routes to `crate::ratio::linear::inertia::inertia` instead. The
-/// two are held to exact agreement by
-/// `receiver::causal_chord::tests::the_half_plane_count_agrees_with_the_inertia_of_a_symmetric_operator`.
-pub(crate) fn half_plane_count(
+/// [definition] **This is the one owner** of the half-plane count; the causal chord's pole readings
+/// re-entered it (`receiver::causal_chord`, retired at U3's second loop; its laws in
+/// `docs/RECEIVER_HOLARCHY.md`, "The causal chord"). When the polynomial is a symmetric operator's
+/// characteristic polynomial the whole question is already answered by Sylvester's signature
+/// (`crate::ratio::linear::inertia::inertia`, the one inertia owner), and the two are held to exact
+/// agreement by `the_half_plane_count_agrees_with_the_inertia_of_a_symmetric_operator` in this
+/// module's tests.
+pub fn half_plane_count(
     polynomial: &RationalPolynomial,
 ) -> Result<HalfPlaneCount, ExactPolynomialError> {
     let Some(degree) = polynomial.degree() else {

@@ -934,6 +934,30 @@ pub enum WidthRefusal {
         /// The probe it named.
         probe: String,
     },
+    /// A probe's partition and the partition it is compared against are not partitions of one
+    /// nonempty fibre into nonempty classes (`receiver::release::ProbePartition`).
+    #[error(
+        "a probe's partition of {classes} members into nonempty classes does not compare with one \
+         of {against} members: both must partition one nonempty fibre"
+    )]
+    ProbeClasses {
+        /// The members the probe's classes hold.
+        classes: usize,
+        /// The members the compared classes hold.
+        against: usize,
+    },
+    /// A probe whose partition carries no more information than the one it is compared against:
+    /// `∏_c |c|^|c|` is not strictly below the comparison's (`receiver::release::ProbePartition`).
+    #[error(
+        "a probe's partition product {product} is not strictly below its comparison's {against}: \
+         it separates the fibre no more than the move it would replace"
+    )]
+    ProbeNotInformative {
+        /// `∏_c |c|^|c|` over the probe's classes, as prose.
+        product: String,
+        /// The same product over the compared classes, as prose.
+        against: String,
+    },
     /// A declared width law returned a draw: a width decision carries no key, and a draw is
     /// decided only by `receiver::release::draw` (the separating term between the two acts).
     #[error(

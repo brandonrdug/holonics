@@ -1019,8 +1019,10 @@ such a complex with no configuration: the grade-0 and grade-1 Hodge spectra unde
 the integral Betti numbers with torsion, and the persistence of the dimension filtration. The
 reading below is the one the retired `receiver_atlas/tests.rs`
 ([history](https://github.com/brandonrdug/holonics/blob/814157ad/crates/holonic-engine/src/receiver_atlas/tests.rs)) computed exactly for
-the two Laplacian-cospectral non-isomorphic graphs of
-`causal_chord.rs::cospectral_graphs_are_separated_by_the_response_atlas`:
+the two Laplacian-cospectral non-isomorphic graphs of the retired
+`causal_chord.rs::cospectral_graphs_are_separated_by_the_response_atlas`
+([history](https://github.com/brandonrdug/holonics/blob/c10acca9/crates/holonics/src/receiver/causal_chord/tests.rs); the reading is kept in
+`docs/RECEIVER_HOLARCHY.md`, "The causal chord"):
 
 * `A`: contacts `(0,2) (0,3) (0,4) (0,5) (1,4) (1,5) (2,3)`, degree sequence `(4,2,2,2,2,2)`;
 * `B`: contacts `(0,2) (0,4) (0,5) (1,2) (1,4) (1,5) (2,3)`, degree sequence `(3,3,3,2,2,1)`.
@@ -1094,8 +1096,9 @@ def graphOf : Bool → SpectralTopologicalReading
   | true => secondGraphReading
 
 /-- [definition] The R1 driving-point response at occurrence `0`, as the ascending coefficient list
-of the numerator of `H(s)` that
-`causal_chord.rs::cospectral_graphs_are_separated_by_the_response_atlas` measures exactly. -/
+of the numerator of `H(s)` that the retired
+`causal_chord.rs::cospectral_graphs_are_separated_by_the_response_atlas` measured exactly (history at
+`c10acca9`; kept in `docs/RECEIVER_HOLARCHY.md`, "The causal chord"). -/
 def drivingPointNumerator : Bool → List ℚ
   | false => [12, 46, 62, 37, 10, 1]
   | true => [12, 52, 73, 43, 11, 1]
